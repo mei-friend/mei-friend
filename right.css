@@ -4,9 +4,7 @@
 }
 
 .notation {
-  /* Initially, the left takes 3/4 width */
   width: 50%;
-  /* Misc */
   align-items: center;
   display: flex;
   justify-content: center;
@@ -21,7 +19,6 @@
 .encoding {
   /* Take the remaining width */
   flex: 1;
-  /* Misc */
   align-items: center;
   display: flex;
   justify-content: center;

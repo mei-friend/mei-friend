@@ -1,6 +1,6 @@
 .friendContainer {
   display: flex;
-flex-direction: row;
+  flex-direction: row;
 }
 
 .notation {
