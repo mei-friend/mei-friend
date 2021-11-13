@@ -1,0 +1,29 @@
+.friendContainer {
+  display: flex;
+/* flex-grow, flex-shrink, flex-basis */
+  flex: 1 1 0%; 
+  flex-direction: column;
+}
+
+.notation {
+  height: 50%;
+  /* Misc */
+  align-items: stretch;
+  display: flex;
+  justify-content: center;
+}
+
+.resizer {
+  cursor: row-resize;
+  width: 100%;
+  height: 6px;
+}
+
+.encoding {
+  /* Take the remaining width */
+  flex: 1;
+  /* Misc */
+  align-items: stretch;
+  display: flex;
+  justify-content: center;
+}

@@ -1,0 +1,28 @@
+.friendContainer {
+  display: flex;
+flex-direction: row;
+}
+
+.notation {
+  /* Initially, the left takes 3/4 width */
+  width: 50%;
+  /* Misc */
+  align-items: center;
+  display: flex;
+  justify-content: center;
+}
+
+.resizer {
+  cursor: ew-resize;
+  height: 100%;
+  width: 6px;
+}
+
+.encoding {
+  /* Take the remaining width */
+  flex: 1;
+  /* Misc */
+  align-items: center;
+  display: flex;
+  justify-content: center;
+}

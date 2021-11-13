@@ -1,0 +1,198 @@
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>mei-friend online</title>
+  <link rel="icon" href="https://www.mdw.ac.at/favicon.ico">
+  <link rel="stylesheet" href="default.css">
+  <link rel="stylesheet" id="orientationCSS" href="bottom.css">
+  <script src="./lib/codemirror.js"></script>
+  <link href="./lib/codemirror.css" rel="stylesheet" />
+  <script src="./mode/xml/xml.js"></script>
+  <link href="./theme/dracula.css" rel="stylesheet" />
+  <script src="./addon/edit/closetag.js"></script>
+  <script src="./addon/edit/closebrackets.js"></script>
+  <script src="./addon/edit/matchtags.js"></script>
+  <script src="./addon/edit/trailingspace.js"></script>
+  <script src="./addon/fold/xml-fold.js"></script>
+  <script src="./addon/fold/foldcode.js"></script>
+  <script src="./addon/fold/foldgutter.js"></script>
+  <script src="http://www.verovio.org/javascript/latest/verovio-toolkit-wasm.js" defer></script>
+</head>
+
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="title">mei-friend online</div>
+      <div class="orientation">Layout:&nbsp;
+        <a onclick="setOrientation('top')" href="#">Top</a>
+        <a onclick="setOrientation('right')" href="#">Right</a>
+        <a onclick="setOrientation('bottom')" href="#">Bottom</a>
+        <a onclick="setOrientation('left')" href="#">Left</a>
+      </div>
+    </div>
+    <div class="friendContainer">
+      <div class="notation"></div>
+      <div class="resizer" id="dragMe"></div>
+      <div class="encoding">
+        <textarea id="editor">Hallo!</textarea>
+      </div>
+    </div>
+    <div class="footer">Werner Goebl, Nov. 2021</div>
+  </div>
+  <script>
+    var cm;
+    var tk;
+
+    window.onload = function() {
+      let myTextarea = document.getElementById("editor");
+
+      let meiFileName = "./Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei";
+      fetch(meiFileName)
+        .then((response) => response.text())
+        .then((meiXML) => {
+          // tk.setOptions({
+          //   scale: 30,
+          //   breaks: "none",
+          //   header: "none",
+          //   footer: "none"
+          // });
+          myTextarea.value = meiXML;
+        });
+
+      cm = CodeMirror.fromTextArea(myTextarea, {
+        lineNumbers: true,
+        lineWrapping: true,
+        styleActiveLine: true,
+        mode: "xml",
+        autoCloseTags: true,
+        autoCloseBrackets: true,
+        matchTags: {
+          bothTags: true
+        },
+        showTrailingSpace: true,
+        foldGutter: true,
+        gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"]
+      });
+      setOrientation('bottom');
+      // let sz = document.querySelector(".encoding").getBoundingClientRect();
+      // cm.setSize(sz.width, sz.height);
+      // // editor.foldCode(CodeMirror.Pos(3, 0));
+    }
+
+    // document.addEventListener("DOMContentLoaded", (event) => {
+    //   document.querySelector(".notation").innerHTML = "<b>Loading Verovio.</b>";
+    //   Module.onRuntimeInitialized = async _ => {
+    //     tk = new verovio.toolkit();
+    //     tkVersion = tk.getVersion();
+    //     console.log("Verovio " + tkVersion + ' loaded.');
+    //     document.querySelector(".notation").innerHTML =
+    //       `Gratefully using&nbsp;
+    //         <a href="https://www.verovio.org/">Verovio ${tkVersion}</a>.`;
+    //   }
+    // });
+  </script>
+
+
+  <script>
+    let orientation = 'bottom';
+    let notationProportion = .5; // proportion notation div takes from container
+
+    function setOrientation(o) {
+      orientation = o;
+      let sz = document.querySelector(".friendContainer").getBoundingClientRect();
+      let notation = document.querySelector(".notation");
+      console.log('setOrientation container size:', sz);
+      if (orientation == "top" || orientation == "bottom") {
+        cm.setSize("100%", sz.height * (1 - notationProportion));
+        notation.style.height = sz.height * notationProportion;
+      }
+      if (orientation == "left" || orientation == "right") {
+        cm.setSize(sz.width * (1 - notationProportion), "100%");
+        notation.style.width = sz.width * notationProportion;
+      }
+      var stylesheet = document.getElementById("orientationCSS");
+      stylesheet.setAttribute('href', orientation + '.css');
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const resizer = document.getElementById('dragMe');
+      const notation = resizer.previousElementSibling;
+      const encoding = resizer.nextElementSibling;
+      let x = 0;
+      let y = 0;
+      let notationSize = 0;
+
+      const mouseDownHandler = function(e) {
+        x = e.clientX;
+        y = e.clientY;
+        if (orientation == "top" || orientation == "bottom")
+          notationSize = notation.getBoundingClientRect().height;
+        if (orientation == "left" || orientation == "right")
+          notationSize = notation.getBoundingClientRect().width;
+        document.addEventListener('mousemove', mouseMoveHandler);
+        document.addEventListener('mouseup', mouseUpHandler);
+        // console.log("Mouse down x/y: " + x + "/" + y + ', ' + notationSize);
+      };
+
+      const mouseMoveHandler = function(e) {
+        const dx = e.clientX - x;
+        const dy = e.clientY - y;
+        let sz = resizer.parentNode.getBoundingClientRect();
+        // console.log("Mouse move dx/dy: " + dx + "/" + dy +
+        //   ', Container: ' + sz.width + '/' + sz.height);
+        switch (orientation) {
+          case 'top':
+            notation.style.height = (notationSize + dy);
+            cm.setSize("100%", sz.height - (notationSize + dy));
+            notationProportion = (notationSize + dy) / sz.height;
+            break;
+          case 'bottom':
+            notation.style.height = (notationSize - dy);
+            console.log('notation height: ' + notation.style.height);
+            cm.setSize("100%", sz.height - (notationSize - dy));
+            notationProportion = (notationSize - dy) / sz.height;
+            break;
+          case 'right':
+            notation.style.width = (notationSize - dx);
+            cm.setSize(sz.width - (notationSize - dx), "100%");
+            notationProportion = (notationSize - dx) / sz.width;
+            break;
+          case 'left':
+          default:
+            notation.style.width = (notationSize + dx);
+            cm.setSize(sz.width - (notationSize + dx), "100%");
+            notationProportion = (notationSize + dx) / sz.width;
+            break;
+        }
+        const cursor =
+          (orientation === 'horizontal') ? 'col-resize' : 'row-resize';
+        resizer.style.cursor = cursor;
+        document.body.style.cursor = cursor;
+        notation.style.userSelect = 'none';
+        notation.style.pointerEvents = 'none';
+        encoding.style.userSelect = 'none';
+        encoding.style.pointerEvents = 'none';
+      };
+
+      const mouseUpHandler = function() {
+        resizer.style.removeProperty('cursor');
+        document.body.style.removeProperty('cursor');
+        notation.style.removeProperty('user-select');
+        notation.style.removeProperty('pointer-events');
+        encoding.style.removeProperty('user-select');
+        encoding.style.removeProperty('pointer-events');
+        document.removeEventListener('mousemove', mouseMoveHandler);
+        document.removeEventListener('mouseup', mouseUpHandler);
+      };
+
+      resizer.addEventListener('mousedown', mouseDownHandler);
+    });
+  </script>
+
+
+
+
+</body>
+
+</html>
