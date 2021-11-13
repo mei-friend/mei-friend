@@ -8,31 +8,36 @@ body {
 
 .container {
   width: 100%;
-height: 100%
-  display: block;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
   overflow: hidden;
   margin: auto;
 }
 
 .header {
   display: flex;
-  height: 24px;
+  flex-shrink: 0;
+  align-items: baseline;
   width: 100%;
-}
-
-.title {
-  font-weight: bold;
-  font-size: 125%;
   background-color: Tomato;
 }
 
+.title {
+  padding: 2px;
+  font-weight: bold;
+  font-size: 125%;
+}
+
+.orientation {
+  padding: 2px;
+}
+
 .friendContainer {
-  /* Misc */
   border: 3px solid #cbd5e0;
   border-radius: 4px;
-  height: 100%;
   width: 100%;
-
 }
 
 .notation {}
@@ -48,6 +53,7 @@ height: 100%
     height: auto;
   } */
 .footer {
+  flex-shrink: 0;
   font-size: 75%;
   width: 100%;
   height: 16px;

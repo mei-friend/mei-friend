@@ -1,7 +1,8 @@
 .friendContainer {
+  height: 100px;
   display: flex;
 /* flex-grow, flex-shrink, flex-basis */
-  flex: 1 1 0%; 
+  flex: 1 1 0%;
   flex-direction: column;
 }
 

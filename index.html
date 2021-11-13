@@ -80,17 +80,17 @@
       // // editor.foldCode(CodeMirror.Pos(3, 0));
     }
 
-    // document.addEventListener("DOMContentLoaded", (event) => {
-    //   document.querySelector(".notation").innerHTML = "<b>Loading Verovio.</b>";
-    //   Module.onRuntimeInitialized = async _ => {
-    //     tk = new verovio.toolkit();
-    //     tkVersion = tk.getVersion();
-    //     console.log("Verovio " + tkVersion + ' loaded.');
-    //     document.querySelector(".notation").innerHTML =
-    //       `Gratefully using&nbsp;
-    //         <a href="https://www.verovio.org/">Verovio ${tkVersion}</a>.`;
-    //   }
-    // });
+    document.addEventListener("DOMContentLoaded", (event) => {
+      document.querySelector(".notation").innerHTML = "<b>Loading Verovio.</b>";
+      Module.onRuntimeInitialized = async _ => {
+        tk = new verovio.toolkit();
+        tkVersion = tk.getVersion();
+        console.log("Verovio " + tkVersion + ' loaded.');
+        document.querySelector(".notation").innerHTML =
+          `Gratefully using&nbsp;
+            <a href="https://www.verovio.org/">Verovio ${tkVersion}</a>.`;
+      }
+    });
   </script>
 
 
