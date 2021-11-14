@@ -6,6 +6,9 @@ import {
 } from './resizer.js'
 import * as verovio from "./verovio-toolkit-wasm.js";
 
+// with node.js
+// var verovio = require( './verovio-toolkit-wasm.js' );
+
 
 document.addEventListener('DOMContentLoaded', function() {
   let myTextarea = document.getElementById("editor");
