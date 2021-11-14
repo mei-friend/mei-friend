@@ -1,5 +1,4 @@
 .friendContainer {
-  height: 100px;
   display: flex;
   flex: 1 1 0%;
   flex-direction: column-reverse;
@@ -17,7 +16,7 @@
 .resizer {
   cursor: row-resize;
   width: 100%;
-  height: 6px;
+  height: 8px;
 }
 
 .encoding {
