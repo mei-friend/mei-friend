@@ -5,7 +5,7 @@ export function setOrientation(cm, o) {
   if (o) orientation = o;
   let friendSz = document.querySelector(".friendContainer");
   var stylesheet = document.getElementById("orientationCSS");
-  stylesheet.setAttribute('href', orientation + '.css');
+  stylesheet.setAttribute('href', './css/' + orientation + '.css');
   let sz = calcSizeOfContainer();
   friendSz.style.width = sz.width;
   friendSz.style.height = sz.height;
