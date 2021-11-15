@@ -97,6 +97,11 @@ function handleFirstWorkerEvent(e) {
   }
 }
 
-export function setLayout(pos) {
-  setOrientation(cm, pos);
-}
+document.querySelector('.top')
+  .addEventListener('click', () => setOrientation(cm, "top"));
+document.querySelector('.bottom')
+  .addEventListener('click', () => setOrientation(cm, "bottom"));
+document.querySelector('.left')
+  .addEventListener('click', () => setOrientation(cm, "left"));
+document.querySelector('.right')
+  .addEventListener('click', () => setOrientation(cm, "right"));
