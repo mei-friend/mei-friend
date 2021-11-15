@@ -1,7 +1,3 @@
-verovio-toolkit*.js
-addon
-lib
-mode
-theme
+verovio-tookit*.js
+CodeMirror/*
 .DS_Store
-
