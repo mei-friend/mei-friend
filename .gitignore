@@ -1,7 +1,3 @@
 verovio-tookit*.js
-addon
-lib
-mode
-theme
+CodeMirror/*
 .DS_Store
-
