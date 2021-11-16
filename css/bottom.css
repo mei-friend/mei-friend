@@ -8,9 +8,9 @@
 .notation {
   height: 50%;
   /* Misc */
-  align-items: stretch;
-  display: flex;
-  justify-content: center;
+  /* align-items: stretch; */
+  /* display: flex;
+  justify-content: center; */
 }
 
 .resizer {
