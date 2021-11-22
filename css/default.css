@@ -38,12 +38,12 @@ body {
   right: 0;
   bottom: 0;
   margin: 50px;
-  border: 5px solid DodgerBlue;
+  border: 5px solid darkblue;
   border-radius: 32px;
-  background-color: turquoise;
+  background-color: cornflowerblue;
   background-blend-mode: difference;
-  opacity: .5;
-  z-index: 2;
+  opacity: .7;
+  z-index: 200;
 }
 
 .dragOverlayText {
