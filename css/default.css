@@ -13,14 +13,14 @@ body {
 .header {
   display: flex;
   flex-shrink: 0;
-  align-items: baseline;
+  align-items: center;
   width: 100%;
-  justify-content: space-between;
+  justify-content: flex-start;
   /* background-color: Tomato; */
 }
 
 .title {
-  padding: 2px;
+  padding: 2px 20px;
   font-weight: bold;
   font-size: 125%;
 }

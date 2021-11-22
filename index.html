@@ -5,6 +5,7 @@
   <title>mei-friend online</title>
   <link rel="icon" href="https://www.mdw.ac.at/favicon.ico">
   <link rel="stylesheet" href="./css/default.css">
+  <link rel="stylesheet" href="./css/navbar.css">
   <link rel="stylesheet" id="orientationCSS" href="./css/bottom.css">
   <script src="./CodeMirror/lib/codemirror.js"></script>
   <link href="./CodeMirror/lib/codemirror.css" rel="stylesheet" />
@@ -24,13 +25,39 @@
 <body>
   <div class="header">
     <div class="title">mei-friend online</div>
-    <div class="orientation">Notation:&nbsp;
-      <button id="top">Top</button>
-      <button id="bottom">Bottom</button>
-      <button id="left">Left</button>
-      <button id="right">Right</button>
-      <button id="rockbar">Move</button>
+    <div class="navbar">
+      <div class="dropdown">
+        <button class="dropbtn" onclick="showDropDown('FileMenu')">File</button>
+        <div class="dropdown-content" id="FileMenu">
+          <a id="OpenMei" href="#asdf">Open MEI</a>
+          <a id="ImportMusicXml" href="#asdf">Import MusicXML</a>
+          <hr class="dropdown-line">
+          <a id="SaveMei" href="#asdf">Save MEI</a>
+          <a id="SavePdf" href="#asf">Save PDF</a>
+          <a id="SaveMidi" href="#asdf">Save MIDI</a>
+        </div>
+      </div>
+      <div class="dropdown">
+        <button class="dropbtn" onclick="showDropDown('ViewMenu')">View</button>
+        <div class="dropdown-content" id="ViewMenu">
+          <a id="top" href="#">Notation top</a>
+          <a id="bottom" href="#">Notation bottom</a>
+          <a id="left" href="#">Notation left</a>
+          <a id="right" href="#">Notation right</a>
+          <hr class="dropdown-line">
+          <a id="rockbar" href="#">Move status bar</a>
+          <a id="DoThis" href="#">Do this</a>
+          <a id="DoThat" href="#">Do that</a>
+        </div>
+      </div>
     </div>
+    <!-- <div class="orientation">Notation:&nbsp;
+  <button id="top">Top</button>
+  <button id="bottom">Bottom</button>
+  <button id="left">Left</button>
+  <button id="right">Right</button>
+  <button id="rockbar">Move</button>
+</div> -->
   </div>
   <div class="dragOverlay">
     <div class="dragOverlayText">Drag your xml file here.</div>
@@ -51,8 +78,24 @@
     <div class="rightfoot"></div>
   </div>
 
-
   <script>
+    // show/hide menu items
+    function showDropDown(target) {
+      document.getElementById(target).classList.toggle("show");
+    }
+
+    // Close all the dropdown content if not current menu item
+    window.onclick = function(ev) {
+      var menuList = document.querySelectorAll(".dropdown-content");
+      menuList.forEach((item, i) => {
+        let id = item.getAttribute('id');
+        let evId = ';'
+        let dropDownContent = ev.target.nextElementSibling;
+        if (dropDownContent) evId = dropDownContent.getAttribute('id');
+        if (item.classList.contains('show') && evId != id)
+          item.classList.remove('show');
+      });
+    }
   </script>
 </body>
 
