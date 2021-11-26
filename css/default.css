@@ -63,8 +63,8 @@ body {
 }
 
 .notation {
-  border: 3px solid DodgerBlue;
-  border-radius: 4px;
+  /* border: 3px solid DodgerBlue;
+  border-radius: 4px; */
   overflow-y: auto;
 }
 
@@ -91,7 +91,7 @@ body {
 }
 
 .leftfoot {
-  padding: 3px;
+  padding: 3px 6px;
   min-width: 180px;
 }
 
@@ -129,7 +129,7 @@ body {
 }
 
 .rightfoot {
-  padding: 3px;
+  padding: 3px 6px;
   min-width: 180px;
 }
 
