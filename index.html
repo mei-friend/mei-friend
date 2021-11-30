@@ -4,8 +4,11 @@
   <meta charset="utf-8">
   <title>mei-friend online</title>
   <link rel="icon" href="https://www.mdw.ac.at/favicon.ico">
-  <link rel="stylesheet" href="default.css">
-  <link rel="stylesheet" id="orientationCSS" href="bottom.css">
+  <link rel="stylesheet" href="./css/default.css">
+  <link rel="stylesheet" href="./css/navbar.css">
+  <link rel="stylesheet" href="./css/icons.css">
+  </link>
+  <link rel="stylesheet" id="orientationCSS" href="./css/bottom.css">
   <script src="./CodeMirror/lib/codemirror.js"></script>
   <link href="./CodeMirror/lib/codemirror.css" rel="stylesheet" />
   <script src="./CodeMirror/mode/xml/xml.js"></script>
@@ -17,210 +20,87 @@
   <script src="./CodeMirror/addon/fold/xml-fold.js"></script>
   <script src="./CodeMirror/addon/fold/foldcode.js"></script>
   <script src="./CodeMirror/addon/fold/foldgutter.js"></script>
-  <script src="http://www.verovio.org/javascript/latest/verovio-toolkit-wasm.js" defer></script>
+  <script type="module" src="./lib/main.js"></script>
 </head>
 
 <body>
-  <!-- <div class="container"> -->
   <div class="header">
     <div class="title">mei-friend online</div>
-    <div class="orientation">Layout:&nbsp;
-      <a onclick="setOrientation('top')" href="#">Top</a>
-      <a onclick="setOrientation('right')" href="#">Right</a>
-      <a onclick="setOrientation('bottom')" href="#">Bottom</a>
-      <a onclick="setOrientation('left')" href="#">Left</a>
+    <div class="navbar">
+      <div class="dropdown">
+        <button class="dropbtn" onclick="showDropDown('FileMenu')">File</button>
+        <div class="dropdown-content" id="FileMenu">
+          <a id="OpenMei" href="#">Open MEI</a>
+          <a id="ImportMusicXml" href="#">Import MusicXML</a>
+          <a id="ImportHumdrum" href="#">Import Humdrum</a>
+          <a id="ImportPae" href="#">Import PAE, ABC</a>
+          <hr class="dropdown-line">
+          <a id="SaveMei" href="#">Save MEI</a>
+          <a id="SavePdf" href="#">Save PDF</a>
+          <a id="SaveMidi" href="#">Save MIDI</a>
+        </div>
+      </div>
+      <div class="dropdown">
+        <button class="dropbtn" onclick="showDropDown('ViewMenu')">View</button>
+        <div class="dropdown-content" id="ViewMenu">
+          <a id="top" href="#">Notation top</a>
+          <a id="bottom" href="#">Notation bottom</a>
+          <a id="left" href="#">Notation left</a>
+          <a id="right" href="#">Notation right</a>
+          <hr class="dropdown-line">
+          <a id="rockbar" href="#">Move status bar</a>
+          <a id="DoThis" href="#">Do this</a>
+          <a id="DoThat" href="#">Do that</a>
+        </div>
+      </div>
+      <div class="dropdown">
+        <button class="dropbtn" onclick="showDropDown('HelpMenu')">Help</button>
+        <div class="dropdown-content" id="HelpMenu">
+          <a id="GoToHelpPage" href="#">Show help page</a>
+        </div>
+      </div>
     </div>
   </div>
-  <div class="friendContainer">
-    <div class="notation"></div>
-    <div class="resizer" id="dragMe"></div>
-    <div class="encoding">
-      <textarea id="editor">Hallo!</textarea>
+  <div class="dragContainer">
+    <div class="dragOverlay">
+      <div class="dragOverlayText">Drag your xml file here.</div>
+    </div>
+    <div class="friendContainer">
+      <div class="notation"></div>
+      <div class="resizer" id="dragMe"></div>
+      <div class="encoding">
+        <textarea id="editor">Hallo!</textarea>
+      </div>
     </div>
   </div>
-  <div class="footer">Werner Goebl, Nov. 2021</div>
-  <!-- </div> -->
+  <div class="footer">
+    <div class="leftfoot">Werner Goebl, Nov. 2021</div>
+    <div class="middlefoot">
+      <div class="statusbar"></div>
+      <div class="progressbar"></div>
+    </div>
+    <div class="rightfoot"></div>
+  </div>
+
   <script>
-    var cm;
-    var tk;
+    // show/hide menu items
+    function showDropDown(target) {
+      document.getElementById(target).classList.toggle("show");
+    }
 
-    window.onload = function() {
-      let myTextarea = document.getElementById("editor");
-
-      let meiFileName = "./Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei";
-      fetch(meiFileName)
-        .then((response) => response.text())
-        .then((meiXML) => {
-          // tk.setOptions({
-          //   scale: 30,
-          //   breaks: "none",
-          //   header: "none",
-          //   footer: "none"
-          // });
-          myTextarea.value = meiXML;
-        });
-
-      cm = CodeMirror.fromTextArea(myTextarea, {
-        lineNumbers: true,
-        lineWrapping: true,
-        styleActiveLine: true,
-        mode: "xml",
-        autoCloseTags: true,
-        autoCloseBrackets: true,
-        matchTags: {
-          bothTags: true
-        },
-        showTrailingSpace: true,
-        foldGutter: true,
-        gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"]
+    // Close all the dropdown content if not current menu item
+    window.onclick = function(ev) {
+      var menuList = document.querySelectorAll(".dropdown-content");
+      menuList.forEach((item, i) => {
+        let id = item.getAttribute('id');
+        let evId = ';'
+        let dropDownContent = ev.target.nextElementSibling;
+        if (dropDownContent) evId = dropDownContent.getAttribute('id');
+        if (item.classList.contains('show') && evId != id)
+          item.classList.remove('show');
       });
-      setOrientation('bottom');
-      // editor.foldCode(CodeMirror.Pos(3, 0));
-
-      window.onresize = () => setOrientation()
     }
-
-    document.addEventListener("DOMContentLoaded", (event) => {
-      document.querySelector(".notation").innerHTML = "<b>Loading Verovio.</b>";
-      Module.onRuntimeInitialized = async _ => {
-        tk = new verovio.toolkit();
-        tkVersion = tk.getVersion();
-        console.log("Verovio " + tkVersion + ' loaded.');
-        document.querySelector(".notation").innerHTML =
-          `Gratefully using&nbsp;
-            <a href="https://www.verovio.org/">Verovio ${tkVersion}</a>.`;
-      }
-    });
   </script>
-
-
-  <script>
-    let orientation = 'bottom';
-    let notationProportion = .5; // proportion notation div takes from container
-
-    function setOrientation(o) {
-      if (o) orientation = o;
-      let friendSz = document.querySelector(".friendContainer");
-      var stylesheet = document.getElementById("orientationCSS");
-      stylesheet.setAttribute('href', orientation + '.css');
-      let sz = calcSizeOfContainer();
-      friendSz.style.width = sz.width;
-      friendSz.style.height = sz.height;
-      let notation = document.querySelector(".notation");
-      console.log('setOrientation(' + o + ') container size:', sz);
-      if (orientation == "top" || orientation == "bottom") {
-        cm.setSize(sz.width, sz.height * (1 - notationProportion));
-        notation.style.height = sz.height * notationProportion;
-      }
-      if (orientation == "left" || orientation == "right") {
-        cm.setSize(sz.width * (1 - notationProportion), sz.height);
-        notation.style.width = sz.width * notationProportion;
-      }
-    }
-
-    function calcSizeOfContainer() {
-      let bodySz = document.querySelector('body').getBoundingClientRect();
-      let friendSz = document.querySelector(".friendContainer")
-        .getBoundingClientRect();
-      let headerSz = document.querySelector('.header').getBoundingClientRect();
-      let sizerSz = document.querySelector('.resizer').getBoundingClientRect();
-      let footerSz = document.querySelector('.footer').getBoundingClientRect();
-      friendSz.height = bodySz.height - headerSz.height - footerSz.height;
-      friendSz.width = bodySz.width;
-      if (orientation == "top" || orientation == "bottom") {
-        friendSz.height -= sizerSz.height;
-      }
-      if (orientation == "left" || orientation == "right") {
-        friendSz.width -= sizerSz.width;
-      }
-      console.log('calcSizeOfContainer bodySz, header, sizer, footer: ' +
-        bodySz.width + '/' + bodySz.height + ', ' +
-        headerSz.width + '/' + headerSz.height + ', ' +
-        sizerSz.width + '/' + sizerSz.height + ', ' +
-        footerSz.width + '/' + footerSz.height + ', ' +
-        friendSz.width + '/' + friendSz.height + '.')
-      return friendSz
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-      const resizer = document.getElementById('dragMe');
-      const notation = resizer.previousElementSibling;
-      const encoding = resizer.nextElementSibling;
-      let x = 0;
-      let y = 0;
-      let notationSize = 0;
-
-      const mouseDownHandler = function(e) {
-        x = e.clientX;
-        y = e.clientY;
-        if (orientation == "top" || orientation == "bottom")
-          notationSize = notation.getBoundingClientRect().height;
-        if (orientation == "left" || orientation == "right")
-          notationSize = notation.getBoundingClientRect().width;
-        document.addEventListener('mousemove', mouseMoveHandler);
-        document.addEventListener('mouseup', mouseUpHandler);
-        // console.log("Mouse down x/y: " + x + "/" + y + ', ' + notationSize);
-      };
-
-      const mouseMoveHandler = function(e) {
-        const dx = e.clientX - x;
-        const dy = e.clientY - y;
-        let sz = resizer.parentNode.getBoundingClientRect();
-        let szSz = resizer.getBoundingClientRect();
-        console.log("Mouse move dx/dy: " + dx + "/" + dy +
-          ', Container: ' + sz.width + '/' + sz.height);
-        switch (orientation) {
-          case 'top':
-            notation.style.height = (notationSize + dy);
-            notationProportion = (notationSize + dy) / sz.height;
-            cm.setSize(sz.width, sz.height - (notationSize + dy) - szSz.height);
-            break;
-          case 'bottom':
-            notation.style.height = (notationSize - dy);
-            console.log('notation height: ' + notation.style.height);
-            notationProportion = (notationSize - dy) / sz.height;
-            cm.setSize(sz.width, sz.height - (notationSize - dy) - szSz.height);
-            break;
-          case 'right':
-            notation.style.width = (notationSize - dx);
-            notationProportion = (notationSize - dx) / sz.width;
-            cm.setSize(sz.width - (notationSize - dx), sz.height - szSz.width);
-            break;
-          case 'left':
-          default:
-            notation.style.width = (notationSize + dx);
-            notationProportion = (notationSize + dx) / sz.width;
-            cm.setSize(sz.width - (notationSize + dx), sz.height - szSz.width);
-            break;
-        }
-        const cursor =
-          (orientation === 'horizontal') ? 'col-resize' : 'row-resize';
-        resizer.style.cursor = cursor;
-        document.body.style.cursor = cursor;
-        notation.style.userSelect = 'none';
-        notation.style.pointerEvents = 'none';
-        encoding.style.userSelect = 'none';
-        encoding.style.pointerEvents = 'none';
-      };
-
-      const mouseUpHandler = function() {
-        resizer.style.removeProperty('cursor');
-        document.body.style.removeProperty('cursor');
-        notation.style.removeProperty('user-select');
-        notation.style.removeProperty('pointer-events');
-        encoding.style.removeProperty('user-select');
-        encoding.style.removeProperty('pointer-events');
-        document.removeEventListener('mousemove', mouseMoveHandler);
-        document.removeEventListener('mouseup', mouseUpHandler);
-      };
-
-      resizer.addEventListener('mousedown', mouseDownHandler);
-    });
-  </script>
-
-
-
-
 </body>
 
 </html>

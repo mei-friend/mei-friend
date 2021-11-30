@@ -1,16 +1,13 @@
 .friendContainer {
   display: flex;
+  /* flex-grow, flex-shrink, flex-basis */
   flex: 1 1 0%;
-  flex-direction: column-reverse;
-  /* Misc */
+  flex-direction: column;
 }
 
 .notation {
   height: 50%;
   /* Misc */
-  align-items: stretch;
-  display: flex;
-  justify-content: center;
 }
 
 .resizer {

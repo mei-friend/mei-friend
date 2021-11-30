@@ -7,9 +7,9 @@
   /* Initially, the left takes 3/4 width */
   width: 50%;
   /* Misc */
-  align-items: center;
-  display: flex;
-  justify-content: center;
+  /* align-items: center; */
+  /* display: flex;
+  justify-content: center; */
 }
 
 .resizer {
