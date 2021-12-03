@@ -179,6 +179,8 @@ body {
 
 .label {
   margin: 0px 3px;
+  display: inline;
+  white-space: nowrap;
 }
 
 .inline-block-tight {
@@ -263,14 +265,14 @@ https://www.w3schools.com/css/css_tooltip.asp
 
 #verovio-panel g.highlighted {
   fill: var(--highlightColor);
-  color: var(--highlightColor) ;
-  stroke: var(--highlightColor) ;
+  color: var(--highlightColor);
+  stroke: var(--highlightColor);
 }
 
 #verovio-panel g.highlighted.inverted {
-  fill: var(--highlightColorInverted) ;
-  color: var(--highlightColorInverted) ;
-  stroke: var(--highlightColorInverted) ;
+  fill: var(--highlightColorInverted);
+  color: var(--highlightColorInverted);
+  stroke: var(--highlightColorInverted);
 }
 
 #verovio-panel.inverted {
