@@ -1,10 +1,10 @@
 :root {
-  --notation-color: #121212;
-  --notation-background-color: #eee;
-  --inverted-color: #eee;
-  --inverted-background-color: #333840;
-  --highlight-color: #4e8bed;
-  --highlight-color-inverted: #1972ff;
+  --notationColor: #121212;
+  --notationBackgroundColor: #eee;
+  --invertedColor: #eee;
+  --invertedBackgroundColor: #333840;
+  --highlightColor: #4e8bed;
+  --highlightColorInverted: #1972ff;
 }
 
 body {
@@ -246,35 +246,35 @@ https://www.w3schools.com/css/css_tooltip.asp
   height: 100%;
   text-align: center;
   z-index: 9;
-  background-color: @notation-background-color;
+  background-color: var(--notationBackgroundColor);
+}
 
-  g * {
-    fill: @notation-color;
-    color: @notation-color;
-    stroke: @notation-color;
-  }
+#verovio-panel g:not(.highlighted) {
+  fill: var(--notationColor);
+  color: var(--notationColor);
+  stroke: var(--notationColor);
+}
 
-  g.inverted * {
-    fill: @inverted-color;
-    color: @inverted-color;
-    stroke: @inverted-color;
-  }
+#verovio-panel g.inverted {
+  fill: var(--invertedColor);
+  color: var(--invertedColor);
+  stroke: var(--invertedColor);
+}
 
-  g.highlighted * {
-    fill: @highlight-color;
-    color: @highlight-color;
-    stroke: @highlight-color;
-  }
+#verovio-panel g.highlighted {
+  fill: var(--highlightColor);
+  color: var(--highlightColor) ;
+  stroke: var(--highlightColor) ;
+}
 
-  g.highlighted.inverted * {
-    fill: @highlight-color-inverted;
-    color: @highlight-color-inverted;
-    stroke: @highlight-color-inverted;
-  }
+#verovio-panel g.highlighted.inverted {
+  fill: var(--highlightColorInverted) !important;
+  color: var(--highlightColorInverted) !important;
+  stroke: var(--highlightColorInverted) !important;
 }
 
 #verovio-panel.inverted {
-  background-color: @inverted-background-color;
+  background-color: var(--invertedBackgroundColor);
 }
 
 .hidden {
