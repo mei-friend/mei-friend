@@ -37,6 +37,12 @@
   /* Important for vertical align on mobile phones */
 }
 
+.label {
+  margin: 0px 3px;
+  display: inline;
+  white-space: nowrap;
+}
+
 /* Add a background color to navbar links on hover */
 .navbar a:hover, .dropdown:hover .dropbtn {
   background-color: lightsteelblue;
