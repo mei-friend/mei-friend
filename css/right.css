@@ -11,7 +11,7 @@
 }
 
 .resizer {
-  cursor: ew-resize;
+  cursor: col-resize;
   height: 100%;
   width: 8px;
 }
