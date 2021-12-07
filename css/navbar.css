@@ -9,7 +9,7 @@
 /* Links inside the navbar */
 .navbar a {
   float: left;
-  font-size: 14px;
+  font-size: 16px;
   color: darkgray;
   text-align: center;
   padding: 3px 12px;
@@ -25,7 +25,7 @@
 /* Dropdown button */
 .dropdown .dropbtn {
   cursor: pointer;
-  font-size: 14px;
+  font-size: 16px;
   border: none;
   outline: none;
   color: black;
