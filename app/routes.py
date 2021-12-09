@@ -22,7 +22,9 @@ github = oauth.register(
 @app.route('/')
 @app.route('/index')
 def index():
-    return render_template('index.html')
+    return render_template('index.html',
+            isLoggedIn = False
+            )
 
 @app.route("/login")
 def login():
@@ -38,8 +40,8 @@ def authorize():
     print("Token: ", token);
     print("Profile: ", profile);
     # do something with the token and profile
-    return render_template('editor.html',
-            githubRepo = 'signature-sound-vienna/test', # TODO get before login
+    return render_template('index.html',
+            isLoggedIn = True,
             githubToken = token["access_token"],
             userLogin = profile["login"],
             userName = profile["name"],

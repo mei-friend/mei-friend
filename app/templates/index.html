@@ -1,5 +1,4 @@
 <html>
-
 <head>
   <meta charset="utf-8">
   <title>mei-friend online</title>
@@ -11,6 +10,14 @@
   <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.64.0/codemirror.min.js" integrity="sha512-4DlmQ+aBOfYTZ3uzRKCDXdyL7y8IlopnVChhXG0pRFgyvhwONVQW3JX8e5DYoXUNr3evQpLZz7S3O1XxMH4WKA==" crossorigin="anonymous"
     referrerpolicy="no-referrer">
   </script> -->
+  <!-- inject GitHub OAuth response details if available -->
+  <script>
+    const isLoggedIn = "{{ isLoggedIn }}";
+    const githubToken = "{{ githubToken }}";
+    const userLogin = "{{ userLogin }}";
+    const userName = "{{ userName }}";
+    const userEmail = "{{ userEmail }}";
+  </script>
   <script src="{{ url_for('static', filename='CodeMirror/lib/codemirror.js') }}"></script>
   <link href="{{ url_for('static', filename='CodeMirror/lib/codemirror.css') }}" rel="stylesheet" />
   <script src="{{ url_for('static', filename='CodeMirror/mode/xml/xml.js') }}"></script>
@@ -67,6 +74,13 @@
         <div class="dropdown-content" id="HelpMenu">
           <a id="GoToHelpPage" href="#">Show help page</a>
         </div>
+      </div>
+      <div class="dropdown">
+      {% if isLoggedIn -%}
+      <button class="dropbtn" onclick="showDropDown('githubMenu')"><img style='height: 1em;' src="{{ url_for('static', filename='img/GitHub-Mark-32px.png') }}"/>{{userName}}</button>
+      {% else -%}
+        <a class="dropbtn" id="GithubLogin" href="/login"><img style='height: 1em;' src="{{ url_for('static', filename='img/GitHub-Mark-32px.png') }}"/>Login</a>
+      {% endif %}
       </div>
     </div>
   </div>
