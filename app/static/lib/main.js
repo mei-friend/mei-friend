@@ -29,11 +29,11 @@ import {
   navElsSelector
 } from './dom-utils.js';
 import Viewer from './viewer.js';
-
+import root from './flaskStatic.js';
 
 let version = '0.0.4';
 let versionDate = '7 Dec 2021';
-let defaultMeiFileName = "Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei";
+let defaultMeiFileName = `${root}/Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei`;
 let defaultOptions = {
   scale: 55,
   breaks: "auto",
@@ -88,7 +88,7 @@ document.addEventListener('DOMContentLoaded', function() {
     "<a href='https://github.com/wergo/mei-friend-online'>mei-friend " +
     version + "</a> (" + versionDate + ").&nbsp;";
 
-  vrvWorker = new Worker('./lib/worker.js');
+  vrvWorker = new Worker(`${root}/lib/worker.js`);
   vrvWorker.onmessage = workerEventsHandler;
 
   v = new Viewer(vrvWorker);

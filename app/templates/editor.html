@@ -1,0 +1,30 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <script>
+      const githubRepo = "{{ githubRepo }}";
+      const githubToken = "{{ githubToken }}";
+      const userLogin = "{{ userLogin }}";
+      const userName = "{{ userName }}";
+      const userEmail = "{{ userEmail }}";
+    </script>
+    <script src="{{ url_for('static', filename='jsgit.js') }}"></script>
+    <script src="{{ url_for('static', filename='prositCommit.js') }}" defer="defer"></script>
+    <title>PrositCommit GitHub Committer</title>
+  </head>
+  <body>
+    <div id="textBoxLabel"></div>
+    <div>
+      <textarea id="textBox" rows="10" cols="80" disabled>Loading content....
+      </textarea>
+    </div>
+    <div>
+      <input type="text" id="commitMessageBox" placeholder="Insert commit message here" disabled/>
+      <input type="submit" value="Submit" id="submit" disabled/>
+      <input type="submit" value="Pull Request" id="pullRequest" disabled/>
+    </div>
+    <div>Commit history</div>
+    <table id="commitLog"/>
+  </body>
+</html>

@@ -1,3 +1,5 @@
+import root from './flaskStatic.js';
+
 let orientation = 'bottom';
 let notationProportion = .5; // proportion notation div takes from container
 let resizerWidth = 8; // 8 px, attention hard-coded also in 4 css files
@@ -6,7 +8,7 @@ export function setOrientation(cm, o = '', v = null) {
   if (o) orientation = o;
   let friendSz = document.querySelector(".friendContainer");
   var stylesheet = document.getElementById("orientationCSS");
-  stylesheet.setAttribute('href', './css/' + orientation + '.css');
+  stylesheet.setAttribute('href', root + '/css/' + orientation + '.css');
   let sz = calcSizeOfContainer();
   friendSz.style.width = sz.width;
   friendSz.style.height = sz.height;
