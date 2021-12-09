@@ -41,7 +41,7 @@ def authorize():
     print("Profile: ", profile);
     # do something with the token and profile
     return render_template('index.html',
-            isLoggedIn = True,
+            isLoggedIn = "true",
             githubToken = token["access_token"],
             userLogin = profile["login"],
             userName = profile["name"],

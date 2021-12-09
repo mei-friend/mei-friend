@@ -11,13 +11,18 @@
     referrerpolicy="no-referrer">
   </script> -->
   <!-- inject GitHub OAuth response details if available -->
-  <script>
-    const isLoggedIn = "{{ isLoggedIn }}";
-    const githubToken = "{{ githubToken }}";
-    const userLogin = "{{ userLogin }}";
-    const userName = "{{ userName }}";
-    const userEmail = "{{ userEmail }}";
-  </script>
+    <script src="{{ url_for('static', filename='lib/jsgit.js') }}"></script>
+    <script src="{{ url_for('static', filename='lib/github.js') }}" type="module"></script>
+    <script>let isLoggedIn; </script>
+  {% if isLoggedIn %}
+    <script>
+      isLoggedIn = true;
+      const githubToken = "{{ githubToken }}";
+      const userLogin = "{{ userLogin }}";
+      const userName = "{{ userName }}";
+      const userEmail = "{{ userEmail }}";
+    </script>
+  {% endif %}
   <script src="{{ url_for('static', filename='CodeMirror/lib/codemirror.js') }}"></script>
   <link href="{{ url_for('static', filename='CodeMirror/lib/codemirror.css') }}" rel="stylesheet" />
   <script src="{{ url_for('static', filename='CodeMirror/mode/xml/xml.js') }}"></script>
@@ -76,11 +81,12 @@
         </div>
       </div>
       <div class="dropdown">
-      {% if isLoggedIn -%}
-      <button class="dropbtn" onclick="showDropDown('githubMenu')"><img style='height: 1em;' src="{{ url_for('static', filename='img/GitHub-Mark-32px.png') }}"/>{{userName}}</button>
-      {% else -%}
-        <a class="dropbtn" id="GithubLogin" href="/login"><img style='height: 1em;' src="{{ url_for('static', filename='img/GitHub-Mark-32px.png') }}"/>Login</a>
-      {% endif %}
+        {% if isLoggedIn -%}
+          <button class="dropbtn" onclick="showDropDown('GithubMenu')"><img style='height: 1em;' src="{{ url_for('static', filename='img/GitHub-Mark-32px.png') }}"/>{{userName}}</button>
+          <div class="dropdown-content" id="GithubMenu"></div>
+        {% else %}
+          <a class="dropbtn" id="GithubLogin" href="/login"><img style='height: 1em;' src="{{ url_for('static', filename='img/GitHub-Mark-32px.png') }}"/>Login</a>
+        {% endif %}
       </div>
     </div>
   </div>

@@ -1,4 +1,4 @@
-class Github { 
+export default class Github { 
   constructor(githubRepo, githubToken, filepath, userLogin, authorName, authorEmail) {
     this.githubRepo = githubRepo;
     this.githubToken = githubToken;
@@ -248,7 +248,17 @@ class Github {
       console.error("Attempted to create pull-request but repo is not a fork");
     }
   }
+
+  async getUserRepos(per_page=30, page=1) { 
+    const reposUrl = `https://api.github.com/user/repos?per_page=${per_page}&page=${page}`;
+    return fetch(reposUrl, {
+      method: 'GET',
+      headers: this.apiHeaders
+    }).then(res => res.json())
+  }
 }
+
+/*
 
 function formatCommitLog(github) { 
   let logTableContent = `
@@ -357,4 +367,4 @@ async function init(githubRepo, githubToken, filepath, userLogin, userName, user
 window.onload = async () => {
   const filepath = "README.md";
   await init(githubRepo, githubToken, filepath, userLogin, userName, userEmail);
-}
+}*/

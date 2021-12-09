@@ -30,6 +30,7 @@ import {
 } from './dom-utils.js';
 import Viewer from './viewer.js';
 import root from './flaskStatic.js';
+import Github from './github.js';
 
 let version = '0.0.4';
 let versionDate = '7 Dec 2021';
@@ -53,7 +54,6 @@ let defaultOptions = {
   clefChangeFactor: .83,
   svgAdditionalAttribute: ["layer@n", "staff@n"]
 };
-
 
 document.addEventListener('DOMContentLoaded', function() {
   let myTextarea = document.getElementById("editor");
@@ -105,6 +105,27 @@ document.addEventListener('DOMContentLoaded', function() {
 
 });
 
+function refreshGithubMenu(github) { 
+  // populate Github menu
+  let githubMenu = document.getElementById("GithubMenu");
+  githubMenu.innerHTML = `<span>Repositories</span>
+    <hr class="dropdown-line">`;
+  fillInUserRepos(github);
+}
+
+async function fillInUserRepos(github, per_page=30, page=1) {
+  let repoDiv = document.getElementById("GithubMenu");
+  const repos = await github.getUserRepos(per_page, page);
+  console.log("GOT REPOS: ", repos, repos.length, per_page)
+  repos.forEach((repo) => { 
+    repoDiv.innerHTML += `<a class="userRepo" href="#">${repo.full_name}</a>`;
+  })
+  if(repos.length && repos.length === per_page) { 
+    console.log("Looking for more Repos...");
+    // there may be more repos on the next page
+    fillInUserRepos(github, per_page, page+1);
+  } 
+}
 
 function workerEventsHandler(e) {
   console.log('main(). Handler received: ' + e.data.cmd, e.data);
@@ -397,3 +418,13 @@ export function log(s) {
   document.getElementById("verovio-panel").innerHTML = s;
   console.log(s);
 }
+
+window.onload = () => {
+  // Initialise Github object if user is logged in
+  if(isLoggedIn) { 
+    console.log("SETTING NEW GITHUB")
+    let github = new Github("", githubToken, "", userLogin, userName, userEmail);
+    refreshGithubMenu(github);
+  }
+}
+
