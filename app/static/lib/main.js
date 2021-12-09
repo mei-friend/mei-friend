@@ -138,7 +138,7 @@ async function fillInRepoBranches(e, per_page=30, page=1) {
   github.githubRepo = e.target.innerText;
   const repoBranches = await github.getRepoBranches(per_page, page);
   let githubMenu = document.getElementById("GithubMenu");
-  githubMenu.innerHTML = `<a id="repositoriesHeader" class="drilldown" href="#">Repository:${e.target.innerText}</a>
+  githubMenu.innerHTML = `<a id="repositoriesHeader" href="#"><span class="btn icon icon-arrow-left inline-block-tight"></span>Repository:${e.target.innerText}</a>
     <hr class="dropdown-line">
     <a id="branchesHeader" href="#">Branches</a>
     <hr class="dropdown-line">
@@ -149,7 +149,6 @@ async function fillInRepoBranches(e, per_page=30, page=1) {
   // GitHub menu interactions
   assignGithubMenuClickHandlers();
 }
-
 
 function workerEventsHandler(e) {
   console.log('main(). Handler received: ' + e.data.cmd, e.data);
