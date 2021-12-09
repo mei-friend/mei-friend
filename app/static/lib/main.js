@@ -105,27 +105,51 @@ document.addEventListener('DOMContentLoaded', function() {
 
 });
 
-function refreshGithubMenu(github) { 
-  // populate Github menu
-  let githubMenu = document.getElementById("GithubMenu");
-  githubMenu.innerHTML = `<span>Repositories</span>
-    <hr class="dropdown-line">`;
-  fillInUserRepos(github);
+function assignGithubMenuClickHandlers() {
+  document.getElementById('repositoriesHeader')
+    .addEventListener('click', refreshGithubMenu);
+  Array.from(document.getElementsByClassName('userRepo')).forEach((e) => 
+    e.addEventListener('click', fillInRepoBranches));
 }
 
-async function fillInUserRepos(github, per_page=30, page=1) {
-  let repoDiv = document.getElementById("GithubMenu");
+function refreshGithubMenu(e) { 
+  // populate Github menu
+  let githubMenu = document.getElementById("GithubMenu");
+  githubMenu.innerHTML = `<a id="repositoriesHeader" href="#">Repositories</a>
+    <hr class="dropdown-line">`;
+  fillInUserRepos();
+}
+
+async function fillInUserRepos(per_page=30, page=1) {
   const repos = await github.getUserRepos(per_page, page);
-  console.log("GOT REPOS: ", repos, repos.length, per_page)
+  let githubMenu = document.getElementById("GithubMenu");
   repos.forEach((repo) => { 
-    repoDiv.innerHTML += `<a class="userRepo" href="#">${repo.full_name}</a>`;
+    githubMenu.innerHTML += `<a class="userRepo" href="#">${repo.full_name}</a>`;
   })
   if(repos.length && repos.length === per_page) { 
-    console.log("Looking for more Repos...");
     // there may be more repos on the next page
-    fillInUserRepos(github, per_page, page+1);
+    fillInUserRepos(per_page, page+1);
   } 
+  // GitHub menu interactions
+  assignGithubMenuClickHandlers();
 }
+
+async function fillInRepoBranches(e, per_page=30, page=1) {
+  github.githubRepo = e.target.innerText;
+  const repoBranches = await github.getRepoBranches(per_page, page);
+  let githubMenu = document.getElementById("GithubMenu");
+  githubMenu.innerHTML = `<a id="repositoriesHeader" class="drilldown" href="#">Repository:${e.target.innerText}</a>
+    <hr class="dropdown-line">
+    <a id="branchesHeader" href="#">Branches</a>
+    <hr class="dropdown-line">
+    `;
+  repoBranches.forEach((branch) => {
+    githubMenu.innerHTML += `<a class="repoBranch" href="#">${branch.name}</a>`;
+  });
+  // GitHub menu interactions
+  assignGithubMenuClickHandlers();
+}
+
 
 function workerEventsHandler(e) {
   console.log('main(). Handler received: ' + e.data.cmd, e.data);
@@ -331,6 +355,12 @@ let cmd = {
   'zoomSlider': () => v.updateOption()
 };
 
+// github API wrapper object
+let github;
+if(isLoggedIn) {
+  github = new Github("", githubToken, "", userLogin, userName, userEmail);
+}
+
 // layout notation position
 document.getElementById('top').addEventListener('click', cmd.notationTop);
 document.getElementById('bottom').addEventListener('click', cmd.notationBottom);
@@ -347,6 +377,7 @@ document.getElementById('ImportHumdrum')
   .addEventListener('click', cmd.openHumdrum);
 document.getElementById('ImportPae')
   .addEventListener('click', cmd.openPae);
+
 
 // drag'n'drop handlers
 // let fc = document.querySelector('body');
@@ -422,9 +453,7 @@ export function log(s) {
 window.onload = () => {
   // Initialise Github object if user is logged in
   if(isLoggedIn) { 
-    console.log("SETTING NEW GITHUB")
-    let github = new Github("", githubToken, "", userLogin, userName, userEmail);
-    refreshGithubMenu(github);
+    refreshGithubMenu();
   }
 }
 

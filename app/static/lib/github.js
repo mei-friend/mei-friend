@@ -256,6 +256,14 @@ export default class Github {
       headers: this.apiHeaders
     }).then(res => res.json())
   }
+
+  async getRepoBranches(per_page=30, page=1) {
+    const branchesUrl = `https://api.github.com/repos/${this.githubRepo}/branches?per_page=${per_page}&page=${page}`;
+    return fetch(branchesUrl, {
+      method: 'GET',
+      headers: this.apiHeaders
+    }).then(res => res.json())
+  }
 }
 
 /*
