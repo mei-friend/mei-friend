@@ -119,15 +119,17 @@
 
     // Close all the dropdown content if not current menu item
     window.onclick = function(ev) {
-      var menuList = document.querySelectorAll(".dropdown-content");
-      menuList.forEach((item, i) => {
-        let id = item.getAttribute('id');
-        let evId = ';'
-        let dropDownContent = ev.target.nextElementSibling;
-        if (dropDownContent) evId = dropDownContent.getAttribute('id');
-        if (item.classList.contains('show') && evId != id)
-          item.classList.remove('show');
-      });
+      if(!ev.target.classList.contains("do-not-close")) { 
+        var menuList = document.querySelectorAll(".dropdown-content");
+        menuList.forEach((item, i) => {
+          let id = item.getAttribute('id');
+          let evId = ';'
+          let dropDownContent = ev.target.nextElementSibling;
+          if (dropDownContent) evId = dropDownContent.getAttribute('id');
+          if (item.classList.contains('show') && evId != id)
+            item.classList.remove('show');
+        });
+      }
     }
   </script>
 </body>
