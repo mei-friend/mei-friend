@@ -128,6 +128,14 @@ export default class Github {
     return this._filepath;
   }
 
+  set branch(branch) { 
+    this._branch = branch;
+  }
+
+  get branch() { 
+    return this._branch;
+  }
+
   set author(author) { 
     this._author = author;
   }
@@ -162,8 +170,7 @@ export default class Github {
 
   async readGithubRepo() { 
     // Retrieve content of file
-    // TODO don't hardcode 'main' as branch
-    this.headHash = await this.repo.readRef("refs/heads/main");
+    this.headHash = await this.repo.readRef(`refs/heads/${this.branch}`);
     this.commit = await this.repo.loadAs("commit", this.headHash);
     const tree = await this.repo.loadAs("tree", this.commit.tree);
     this.entry = tree["README.md"];
@@ -181,7 +188,6 @@ export default class Github {
   }
 
   async writeGithubRepo(content, message) { 
-    // TODO don't hardcode 'main' as branch
     const updates = [{
       path: this.filepath,
       mode: this.entry.mode, // preserve mode of existing file (e.g. executable)
@@ -195,7 +201,7 @@ export default class Github {
       parent: this.headHash,
       message: message
     });
-    await this.repo.updateRef("refs/heads/main", commitHash);
+    await this.repo.updateRef(`refs/heads/${this.branch}`, commitHash);
   }
 
   async fork(callback) {
@@ -230,15 +236,15 @@ export default class Github {
   }
 
   async pullRequest(callback) { 
-    // TODO don't hardcode 'main' as branch; allow user to specify body
+    // TODO allow PR to be done against a different branch in upstream repo
     const pullsUrl = `https://api.github.com/repos/${this.upstreamRepoOwner}/${this.upstreamRepoName}/pulls`
     if(this.isFork) { 
       await fetch(pullsUrl, { 
         method: 'POST',
         headers: this.apiHeaders,
         body: JSON.stringify({
-          head: this.githubRepoOwner+":"+'main',
-          base: 'main',
+          head: this.githubRepoOwner + ":" + this.branch,
+          base: this.branch,
           body: 'Programmatic Pull-Request created using prositCommit',
           title: 'Programmatic Pull-Request created using prositCommit'
         })
@@ -260,6 +266,14 @@ export default class Github {
   async getRepoBranches(per_page=30, page=1) {
     const branchesUrl = `https://api.github.com/repos/${this.githubRepo}/branches?per_page=${per_page}&page=${page}`;
     return fetch(branchesUrl, {
+      method: 'GET',
+      headers: this.apiHeaders
+    }).then(res => res.json())
+  }
+  
+  async getBranchContents(path="/") {
+    const contentsUrl = `https://api.github.com/repos/${this.githubRepo}/contents${path}`;
+    return fetch(contentsUrl, {
       method: 'GET',
       headers: this.apiHeaders
     }).then(res => res.json())
