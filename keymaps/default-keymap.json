@@ -1,0 +1,58 @@
+{
+  "#verovio-panel": {
+    "q": "nightMode",
+    "x": "invertPlacement",
+    "ctrl-x": "betweenPlacement",
+    "right": "nextNote",
+    "left": "previousNote",
+    "up": "layerUp",
+    "down": "layerDown",
+    "shift-up": "shiftPitchNameUp",
+    "shift-down": "shiftPitchNameDown",
+    "delete": "delete",
+    "backspace": "delete",
+    "shift-c": "cleanAccid",
+    "shift-r": "renumberMeasuresTest",
+    "ctrl-shift-r": "renumberMeasures",
+    "pagedown": "nextPage",
+    "pageup": "previousPage",
+    "home": "firstPage",
+    "end": "lastPage",
+    "space": "nextPage",
+    "shift-space": "previousPage"
+  },
+
+  ".platform-darwin #verovio-panel": {
+    "cmd-right": "nextMeasure",
+    "cmd-left": "previousMeasure",
+    "ctrl-cmd-right": "nextPage",
+    "ctrl-cmd-left": "previousPage",
+    "cmd-up": "firstPage",
+    "cmd-down": "lastPage",
+    "cmd-shift-up": "shiftOctaveUp",
+    "cmd-shift-down": "shiftOctaveDown",
+    "cmd-alt-up": "moveElementStaffUp",
+    "cmd-alt-down": "moveElementStaffDown",
+    "cmd-0": "zoom100",
+    "cmd-5": "zoom50",
+    "cmd-+": "zoomIn",
+    "cmd--": "zoomOut"
+  },
+
+  ".platform-win32 #verovio-panel, .platform-linux #verovio-panel": {
+    "ctrl-right": "nextMeasure",
+    "ctrl-left": "previousMeasure",
+    "ctrl-alt-right": "nextPage",
+    "ctrl-alt-left": "previousPage",
+    "ctrl-up": "firstPage",
+    "ctrl-down": "lastPage",
+    "ctrl-shift-up": "shiftOctaveUp",
+    "ctrl-shift-down": "shiftOctaveDown",
+    "ctrl-alt-up": "moveElementStaffUp",
+    "ctrl-alt-down": "moveElementStaffDown",
+    "ctrl-0": "zoom100",
+    "ctrl-5": "zoom50",
+    "ctrl-+": "zoomIn",
+    "ctrl--": "zoomOut"
+  }
+}
