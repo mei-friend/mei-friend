@@ -171,9 +171,10 @@ export default class Github {
   async readGithubRepo() { 
     // Retrieve content of file
     this.headHash = await this.repo.readRef(`refs/heads/${this.branch}`);
-    this.commit = await this.repo.loadAs("commit", this.headHash);
+    this.commit = await this.repo.loadAs("commit", this.headHash);  
     const tree = await this.repo.loadAs("tree", this.commit.tree);
-    this.entry = tree["README.md"];
+    // remove leading slash
+    this.entry = tree[this.filepath.startsWith("/") ? this.filepath.substr(1) : this.filepath];
     this.content = await this.repo.loadAs("text", this.entry.hash);
     // Retrieve git commit log
     const commitsUrl = `https://api.github.com/repos/${this.githubRepo}/commits`;
@@ -273,6 +274,7 @@ export default class Github {
   
   async getBranchContents(path="/") {
     const contentsUrl = `https://api.github.com/repos/${this.githubRepo}/contents${path}`;
+    this.filepath = path;
     return fetch(contentsUrl, {
       method: 'GET',
       headers: this.apiHeaders
