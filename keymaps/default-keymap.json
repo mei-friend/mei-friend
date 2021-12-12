@@ -22,7 +22,7 @@
     "shift-space": "previousPage"
   },
 
-  ".platform-darwin .verovio-panel": {
+  ".platform-darwin": {
     "cmd-right": "nextMeasure",
     "cmd-left": "previousMeasure",
     "ctrl-cmd-right": "nextPage",
@@ -39,7 +39,7 @@
     "cmd--": "zoomOut"
   },
 
-  ".platform-win32 .verovio-panel, .platform-linux .verovio-panel": {
+  ".platform-win32, .platform-linux": {
     "ctrl-right": "nextMeasure",
     "ctrl-left": "previousMeasure",
     "ctrl-alt-right": "nextPage",
