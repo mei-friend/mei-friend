@@ -9,4 +9,6 @@
 # 0.0.4 patch
 * Complete re-organisation of worker logic (patched instead of spaghetti)
 # 0.0.5 patch
-* Support for keymaps, first note highlighting, layout beautifications
+* First note highlighting, layout beautifications
+* Support for key maps 
+* Support for mouse wheel scrolling
