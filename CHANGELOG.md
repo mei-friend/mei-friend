@@ -17,3 +17,4 @@
 * Set orientation with resizing
 * Zoom slider with layout reflow
 # 0.0.7 patch
+* Listen to changes in editor and update notation
