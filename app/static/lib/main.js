@@ -124,7 +124,7 @@ function assignGithubMenuClickHandlers() {
     // on click, move up one directory level in the branch contents
     contentsHeader.addEventListener('click', (ev) => {
       github.filepath = github.filepath.substr(0, github.filepath.lastIndexOf('/'));
-      console.log("FILEPATH NOW: ", github.filepath);
+      github.filepath = github.filepath.length === 0 ? "/" : github.filepath;
       fillInBranchContents(ev);
     });
   }
@@ -138,12 +138,12 @@ function assignGithubMenuClickHandlers() {
     e.addEventListener('click', (ev) => { 
       github.branch = e.innerText;
       github.filepath = "/";
-      console.log("FILEPATH NOW: ", github.filepath);
-      fillInBranchContents(ev)
+      github.readGithubRepo().then(() => {
+        fillInBranchContents(ev)
+      });
     })
   );
   Array.from(document.getElementsByClassName('branchContents')).forEach((e) => {
-    console.log("~~", e)
     if(e.classList.contains("dir")){ 
       e.addEventListener('click', (ev) => {
         if(github.filepath.endsWith("/")) { 
@@ -151,14 +151,15 @@ function assignGithubMenuClickHandlers() {
         } else { 
           github.filepath += "/"+e.querySelector("span.filepath").innerText;
         }
-        console.log("FILEPATH NOW: ", github.filepath);
         fillInBranchContents(ev);
       })
     } else { 
-      e.addEventListener('click', () => {
+      e.addEventListener('click', (ev) => {
         github.filepath += e.querySelector("span.filepath").innerText;
         console.debug(`Loading file: https://github.com/${github.githubRepo}${github.filepath}`);
+        fillInBranchContents(ev);
         github.readGithubRepo().then(() => {
+          document.querySelector(".statusbar").innerText = "Loading from Github...";
           meiFileName = `Github: ${github.githubRepo}${github.filepath}`
           cm.setValue(github.content);
           v.updateAll(cm);
@@ -213,16 +214,46 @@ async function fillInBranchContents(e) {
     <a id="branchesHeader" href="#" class="do-not-close"><span class="btn icon icon-arrow-left inline-block-tight"></span>Branch: ${github.branch}</a>
     <hr class="dropdown-line">
     <a id="contentsHeader" href="#" class="do-not-close"><span class="btn icon icon-arrow-left inline-block-tight"></span>Path: <span class="filepath do-not-close">${github.filepath}</span></a>
-    <hr class="dropdown-line">
     `;
-  Array.from(branchContents).forEach((content) => {
-    const isDir = content.type === "dir";
-    githubMenu.innerHTML += `<a class="branchContents ${content.type}${isDir ? ' do-not-close': ''}" href="#">`+
-    //  content.type === "dir" ? '<span class="btn icon icon-file-symlink-file inline-block-tight"></span>' : "" +
-      `<span class="filepath${isDir ? ' do-not-close':''}">${content.name}</span>${isDir ? "..." : ""}</a>`;
-  });
+  let target = e.target;
+  if(target.classList.contains("filepath")) { 
+    // clicked on file name -- operate on parent (list entry) instead
+    target = e.target.parentNode;
+  }
+  if(target.classList.contains("repoBranch") || target.classList.contains("dir") || target.getAttribute("id") === "contentsHeader") {
+    Array.from(branchContents).forEach((content) => {
+      const isDir = content.type === "dir";
+      githubMenu.innerHTML += `<a class="branchContents ${content.type}${isDir ? ' do-not-close': ''}" href="#">`+
+      //  content.type === "dir" ? '<span class="btn icon icon-file-symlink-file inline-block-tight"></span>' : "" +
+        `<span class="filepath${isDir ? ' do-not-close':''}">${content.name}</span>${isDir ? "..." : ""}</a>`;
+    });
+  }
+  fillInCommitLog();
   // GitHub menu interactions
   assignGithubMenuClickHandlers();
+}
+
+async function fillInCommitLog(e) {
+  let githubMenu = document.getElementById("GithubMenu");
+  const logTable = document.createElement("table");
+  const headerRow = document.createElement("tr");
+  headerRow.innerHTML = "<th>Date</th><th>Author</th><th>Message</th><th>Commit</th>";
+  logTable.appendChild(headerRow);
+  github.commitLog.forEach((c) => { 
+    const commitRow = document.createElement("tr");
+    commitRow.innerHTML = `
+      <td>${c.commit.author.date}</td>
+      <td><a href="${c.author.html_url}">${c.commit.author.name}</a></td>
+      <td>${c.commit.message}</td>
+      <td><a href="${c.commit.url}">${c.sha.slice(0,8)}...</a></td>`;
+    logTable.appendChild(commitRow);
+  })
+  const commitLogHeader = document.createElement("a");
+  commitLogHeader.setAttribute("id", "commitLogHeader");
+  commitLogHeader.setAttribute("class", "do-not-close");
+  commitLogHeader.innerText = "Commit Log";
+  githubMenu.appendChild(document.createElement("hr", {className:'dropdown-line'}));
+  githubMenu.appendChild(logTable);
 }
 
 function workerEventsHandler(e) {

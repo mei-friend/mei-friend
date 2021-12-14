@@ -173,9 +173,11 @@ export default class Github {
     this.headHash = await this.repo.readRef(`refs/heads/${this.branch}`);
     this.commit = await this.repo.loadAs("commit", this.headHash);  
     const tree = await this.repo.loadAs("tree", this.commit.tree);
-    // remove leading slash
-    this.entry = tree[this.filepath.startsWith("/") ? this.filepath.substr(1) : this.filepath];
-    this.content = await this.repo.loadAs("text", this.entry.hash);
+    if(this.filepath && this.filepath !== "/") {
+      // remove leading slash
+      this.entry = tree[this.filepath.startsWith("/") ? this.filepath.substr(1) : this.filepath];
+      this.content = await this.repo.loadAs("text", this.entry.hash);
+    }
     // Retrieve git commit log
     const commitsUrl = `https://api.github.com/repos/${this.githubRepo}/commits`;
     await fetch(commitsUrl, {
