@@ -172,7 +172,7 @@ function assignGithubMenuClickHandlers() {
 function refreshGithubMenu(e) { 
   // populate Github menu
   let githubMenu = document.getElementById("GithubMenu");
-  githubMenu.innerHTML = `<a id="repositoriesHeader" class="do-not-close" href="#">Select repository</a>`
+  githubMenu.innerHTML = `<a id="repositoriesHeader" href="#">Select repository</a>`
   fillInUserRepos();
 }
 
@@ -180,7 +180,7 @@ async function fillInUserRepos(per_page=30, page=1) {
   const repos = await github.getUserRepos(per_page, page);
   let githubMenu = document.getElementById("GithubMenu");
   repos.forEach((repo) => { 
-    githubMenu.innerHTML += `<a class="userRepo do-not-close" href="#">${repo.full_name}</a>`;
+    githubMenu.innerHTML += `<a class="userRepo" href="#">${repo.full_name}</a>`;
   })
   if(repos.length && repos.length === per_page) { 
     // there may be more repos on the next page
@@ -194,12 +194,12 @@ async function fillInRepoBranches(e, per_page=100, page=1) {
   // TODO handle > per_page branches (similar to userRepos)
   const repoBranches = await github.getRepoBranches(per_page, page);
   let githubMenu = document.getElementById("GithubMenu");
-  githubMenu.innerHTML = `<a id="repositoriesHeader" href="#" class="do-not-close"><span class="btn icon icon-arrow-left inline-block-tight"></span>Repository:${github.githubRepo}</a>
+  githubMenu.innerHTML = `<a id="repositoriesHeader" href="#"><span class="btn icon icon-arrow-left inline-block-tight"></span>Repository:${github.githubRepo}</a>
     <hr class="dropdown-line">
-    <a id="branchesHeader" href="#" class="do-not-close">Select branch:</a>
+    <a id="branchesHeader" href="#">Select branch:</a>
     `;
   Array.from(repoBranches).forEach((branch) => {
-    githubMenu.innerHTML += `<a class="repoBranch do-not-close" href="#">${branch.name}</a>`;
+    githubMenu.innerHTML += `<a class="repoBranch" href="#">${branch.name}</a>`;
   });
   // GitHub menu interactions
   assignGithubMenuClickHandlers();
@@ -209,11 +209,11 @@ async function fillInBranchContents(e) {
   // TODO handle > per_page files (similar to userRepos)
   const branchContents = await github.getBranchContents(github.filepath);
   let githubMenu = document.getElementById("GithubMenu");
-  githubMenu.innerHTML = `<a id="repositoriesHeader" href="#" class="do-not-close"><span class="btn icon icon-arrow-left inline-block-tight"></span>Repository:${github.githubRepo}</a>
+  githubMenu.innerHTML = `<a id="repositoriesHeader" href="#"><span class="btn icon icon-arrow-left inline-block-tight"></span>Repository:${github.githubRepo}</a>
     <hr class="dropdown-line">
-    <a id="branchesHeader" href="#" class="do-not-close"><span class="btn icon icon-arrow-left inline-block-tight"></span>Branch: ${github.branch}</a>
+    <a id="branchesHeader" href="#"><span class="btn icon icon-arrow-left inline-block-tight"></span>Branch: ${github.branch}</a>
     <hr class="dropdown-line">
-    <a id="contentsHeader" href="#" class="do-not-close"><span class="btn icon icon-arrow-left inline-block-tight"></span>Path: <span class="filepath do-not-close">${github.filepath}</span></a>
+    <a id="contentsHeader" href="#"><span class="btn icon icon-arrow-left inline-block-tight"></span>Path: <span class="filepath">${github.filepath}</span></a>
     `;
   let target = e.target;
   if(target.classList.contains("filepath")) { 
@@ -223,9 +223,9 @@ async function fillInBranchContents(e) {
   if(target.classList.contains("repoBranch") || target.classList.contains("dir") || target.getAttribute("id") === "contentsHeader") {
     Array.from(branchContents).forEach((content) => {
       const isDir = content.type === "dir";
-      githubMenu.innerHTML += `<a class="branchContents ${content.type}${isDir ? ' do-not-close': ''}" href="#">`+
+      githubMenu.innerHTML += `<a class="branchContents ${content.type}${isDir ? '': ' isGithubFile'}" href="#">`+
       //  content.type === "dir" ? '<span class="btn icon icon-file-symlink-file inline-block-tight"></span>' : "" +
-        `<span class="filepath${isDir ? ' do-not-close':''}">${content.name}</span>${isDir ? "..." : ""}</a>`;
+        `<span class="filepath${isDir ? '':' isGithubFile'}">${content.name}</span>${isDir ? "..." : ""}</a>`;
     });
   }
   fillInCommitLog();
@@ -250,7 +250,6 @@ async function fillInCommitLog(e) {
   })
   const commitLogHeader = document.createElement("a");
   commitLogHeader.setAttribute("id", "commitLogHeader");
-  commitLogHeader.setAttribute("class", "do-not-close");
   commitLogHeader.innerText = "Commit Log";
   githubMenu.appendChild(document.createElement("hr", {className:'dropdown-line'}));
   githubMenu.appendChild(logTable);
