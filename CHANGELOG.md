@@ -16,3 +16,4 @@
 * Re-load bug
 * Set orientation with resizing
 * Zoom slider with layout reflow
+# 0.0.7 patch
