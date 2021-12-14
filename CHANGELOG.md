@@ -10,5 +10,9 @@
 * Complete re-organisation of worker logic (patched instead of spaghetti)
 # 0.0.5 patch
 * First note highlighting, layout beautifications
-* Support for key maps 
+* Support for key maps
 * Support for mouse wheel scrolling
+# 0.0.6 patch
+* Re-load bug
+* Set orientation with resizing
+* Zoom slider with layout reflow
