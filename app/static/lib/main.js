@@ -223,10 +223,29 @@ async function fillInBranchContents(e) {
   if(target.classList.contains("repoBranch") || target.classList.contains("dir") || target.getAttribute("id") === "contentsHeader") {
     Array.from(branchContents).forEach((content) => {
       const isDir = content.type === "dir";
-      githubMenu.innerHTML += `<a class="branchContents ${content.type}${isDir ? '': ' isGithubFile'}" href="#">`+
+      githubMenu.innerHTML += `<a class="branchContents ${content.type}${isDir ? '': ' closeOnClick'}" href="#">`+
       //  content.type === "dir" ? '<span class="btn icon icon-file-symlink-file inline-block-tight"></span>' : "" +
-        `<span class="filepath${isDir ? '':' isGithubFile'}">${content.name}</span>${isDir ? "..." : ""}</a>`;
+        `<span class="filepath${isDir ? '':' closeOnClick'}">${content.name}</span>${isDir ? "..." : ""}</a>`;
     });
+  } else { 
+    // User has selected a file to edit. Display commit interface
+    const commitUI = document.createElement("div");
+    commitUI.setAttribute("id", "commitUI");
+    const commitMessageInput = document.createElement("input");
+    commitMessageInput.setAttribute("type", "text");
+    commitMessageInput.setAttribute("id", "commitMessageInput");
+    commitMessageInput.setAttribute("placeholder", "Updated using mei-friend online");
+    commitMessageInput.disabled = true;
+    const commitButton = document.createElement("input");
+    commitButton.setAttribute("id", "commitButton");
+    commitButton.setAttribute("type", "submit");
+    commitButton.setAttribute("value", "Commit");
+    commitButton.classList.add("closeOnClick");
+    commitButton.disabled = true;
+    commitButton.addEventListener("click", handleCommitButtonClicked);
+    commitUI.appendChild(commitMessageInput);
+    commitUI.appendChild(commitButton);
+    githubMenu.appendChild(commitUI);
   }
   fillInCommitLog();
   // GitHub menu interactions
@@ -234,8 +253,14 @@ async function fillInBranchContents(e) {
 }
 
 async function fillInCommitLog(e) {
+  let logTable = document.getElementById("logTable");
+  if(logTable) { 
+    // clear up previous logTable if it exists
+    logTable.remove();
+  }
+  logTable = document.createElement("table");
+  logTable.setAttribute("id", "logTable");
   let githubMenu = document.getElementById("GithubMenu");
-  const logTable = document.createElement("table");
   const headerRow = document.createElement("tr");
   headerRow.innerHTML = "<th>Date</th><th>Author</th><th>Message</th><th>Commit</th>";
   logTable.appendChild(headerRow);
@@ -530,6 +555,40 @@ function addEventListeners(cm, v) {
 
   // editor activity
   cm.on('cursorActivity', (e) => v.cursorActivity(e, cm));
+  cm.on('change', (e) => {
+    const commitUI = document.querySelector("#commitUI");
+    if(isLoggedIn && github.filepath && commitUI) {
+      const changesExist = cm.getValue() === github.content;
+      document.getElementById("commitMessageInput").disabled = changesExist;
+      document.getElementById("commitButton").disabled = changesExist;
+    }
+  });
+}
+
+// handle Github commit UI
+function handleCommitButtonClicked(e) { 
+  // TODO Let user know of success / failure, allow user to do something about it
+  const messageInput = document.getElementById("commitMessageInput");
+  const message = messageInput.value;
+  // lock editor while we are busy commiting
+  cm.readOnly = "nocursor"; // don't allow editor focus
+  // try commiting to Github
+  github.writeGithubRepo(cm.getValue(), message)
+    .then(() => { 
+      console.log(`Successfully written to github: ${github.githubRepo}${github.filepath}`);
+      messageInput.value = "";
+      github.readGithubRepo()
+        .then(() => {
+          cm.readOnly = false;
+          fillInCommitLog();
+          console.log("Finished updating commit log after writing commit.");
+        })
+        .catch((e) => {
+          cm.readOnly = false;
+          console.log("Couldn't read Github repo after writing commit: ", e, github);
+        })
+    })
+    .catch((e) => { console.log("Couldn't commit Github repo: ", e, github) });
 }
 
 // progress bar demo

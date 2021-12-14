@@ -120,7 +120,7 @@
     window.onclick = function(ev) {
       // Close dropdown content except if in Github Menu 
       // (but DO close Github Menu if a file item is selected)
-      if(!ev.target.closest("#GithubMenu") || ev.target.classList.contains("isGithubFile")) { 
+      if(!ev.target.closest("#GithubMenu") || ev.target.classList.contains("closeOnClick")) { 
         var menuList = document.querySelectorAll(".dropdown-content");
         menuList.forEach((item, i) => {
           let id = item.getAttribute('id');
