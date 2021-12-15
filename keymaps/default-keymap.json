@@ -62,7 +62,7 @@
     "o": "addOctave8Above",
     "ctrl-o": "addOctave8Below",
     "alt-o": "addOctave15Above",
-    "alt-ctrl-o": "addOctave15Below"
+    "ctrl-alt-o": "addOctave15Below"
 
   },
 
