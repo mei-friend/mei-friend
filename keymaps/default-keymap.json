@@ -62,7 +62,7 @@
     "o": "mei-friend:addOctave8Above",
     "ctrl-o": "mei-friend:addOctave8Below",
     "alt-o": "mei-friend:addOctave15Above",
-    "alt-ctrl-o": "mei-friend:addOctave15Below",
+    "alt-ctrl-o": "mei-friend:addOctave15Below"
 
   },
 
