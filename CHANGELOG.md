@@ -20,3 +20,4 @@
 * Listen to changes in editor and update notation
 * Flip to page buttons
 * Update notation buttons
+# 0.0.8 patch
