@@ -18,3 +18,5 @@
 * Zoom slider with layout reflow
 # 0.0.7 patch
 * Listen to changes in editor and update notation
+* Flip to page buttons
+* Update notation buttons
