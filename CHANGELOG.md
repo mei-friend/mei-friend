@@ -24,3 +24,4 @@
 * Editor functionality added: adding/deleting control elementString
 * Support for inverting placement (X)
 * Support for toggling articulations (SHIFT + S, V, I, N, O)
+* Support for shifting pitch up/down step-wise, octave-wise
