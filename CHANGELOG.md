@@ -25,3 +25,4 @@
 * Support for inverting placement (X)
 * Support for toggling articulations (SHIFT + S, V, I, N, O)
 * Support for shifting pitch up/down step-wise, octave-wise
+* Support for moving notes/elements across staves
