@@ -22,3 +22,4 @@
 * Update notation buttons
 # 0.0.8 patch
 * Editor functionality added: adding/deleting control elementString
+* Supprt for inverting placement (X)
