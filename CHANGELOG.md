@@ -20,9 +20,10 @@
 * Listen to changes in editor and update notation
 * Flip to page buttons
 * Update notation buttons
-# 0.0.8 patch
-* Editor functionality added: adding/deleting control elementString
+# 0.0.8 patch: Editor functionality added
+* Adding/deleting control elements 
 * Support for inverting placement (X)
 * Support for toggling articulations (SHIFT + S, V, I, N, O)
 * Support for shifting pitch up/down step-wise, octave-wise
 * Support for moving notes/elements across staves
+* Support for adding octave elements
