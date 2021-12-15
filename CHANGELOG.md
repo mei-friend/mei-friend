@@ -22,4 +22,5 @@
 * Update notation buttons
 # 0.0.8 patch
 * Editor functionality added: adding/deleting control elementString
-* Supprt for inverting placement (X)
+* Support for inverting placement (X)
+* Support for toggling articulations (SHIFT + S, V, I, N, O)

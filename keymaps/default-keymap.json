@@ -52,17 +52,17 @@
     "shift-n": "addTurnAboveLower",
     "shift-ctrl-n": "addTurnBelowLower",
 
-    "shift-s": "mei-friend:toggleStacc",
-    "shift-v": "mei-friend:toggleAccent",
-    "shift-n": "mei-friend:toggleTenuto",
-    "shift-o": "mei-friend:toggleMarcato",
-    "shift-i": "mei-friend:toggleStacciss",
+    "shift-s": "toggleStacc",
+    "shift-v": "toggleAccent",
+    "shift-n": "toggleTenuto",
+    "shift-o": "toggleMarcato",
+    "shift-i": "toggleStacciss",
 
-    "b": "mei-friend:addBeam",
-    "o": "mei-friend:addOctave8Above",
-    "ctrl-o": "mei-friend:addOctave8Below",
-    "alt-o": "mei-friend:addOctave15Above",
-    "alt-ctrl-o": "mei-friend:addOctave15Below"
+    "b": "addBeam",
+    "o": "addOctave8Above",
+    "ctrl-o": "addOctave8Below",
+    "alt-o": "addOctave15Above",
+    "alt-ctrl-o": "addOctave15Below"
 
   },
 
