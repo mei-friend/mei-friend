@@ -21,9 +21,13 @@
 * Flip to page buttons
 * Update notation buttons
 # 0.0.8 patch: Editor functionality added
-* Adding/deleting control elements 
+* Adding/deleting control elements
 * Support for inverting placement (X)
 * Support for toggling articulations (SHIFT + S, V, I, N, O)
 * Support for shifting pitch up/down step-wise, octave-wise
 * Support for moving notes/elements across staves
-* Support for adding octave elements
+* Support for adding and deleting octave elements
+* Support for update encoding through Verovio
+* Support for inserting and deleting beam elements
+* Support for cleaning accid.ges attributes
+*
