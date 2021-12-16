@@ -37,7 +37,7 @@
     <div class="title">mei-friend online</div>
     <div class="navbar">
       <div class="dropdown">
-        <button class="dropbtn" onclick="showDropDown('FileMenu')">File</button>
+        <button class="dropbtn">File</button>
         <div class="dropdown-content" id="FileMenu">
           <a id="OpenMei" href="#">Open MEI</a>
           <a id="ImportMusicXml" href="#">Import MusicXML</a>
@@ -50,7 +50,7 @@
         </div>
       </div>
       <div class="dropdown">
-        <button class="dropbtn" onclick="showDropDown('ViewMenu')">View</button>
+        <button class="dropbtn">View</button>
         <div class="dropdown-content" id="ViewMenu">
           <a id="top" href="#">Notation top</a>
           <a id="bottom" href="#">Notation bottom</a>
@@ -63,7 +63,7 @@
         </div>
       </div>
       <div class="dropdown">
-        <button class="dropbtn" onclick="showDropDown('Manipulate')">Manipulate</button>
+        <button class="dropbtn">Manipulate</button>
         <div class="dropdown-content" id="Manipulate">
           <a id="cleanAccid" href="#">Clean @accid.ges</a>
           <a id="renumTest" href="#">Renumber measures (test)</a>
@@ -72,7 +72,7 @@
         </div>
       </div>
       <div class="dropdown">
-        <button class="dropbtn" onclick="showDropDown('HelpMenu')">Help</button>
+        <button class="dropbtn">Help</button>
         <div class="dropdown-content" id="HelpMenu">
           <a id="GoToHelpPage" href="#">Show help page</a>
         </div>
@@ -92,7 +92,9 @@
     </div>
   </div>
   <div class="footer">
-    <div class="leftfoot">&copy; <a href="https://iwk.mdw.ac.at/signature-sound-vienna/">IWK 2021</a></div>
+    <div class="leftfoot">&copy;
+      <a href="https://iwk.mdw.ac.at/signature-sound-vienna/">IWK 2021</a>
+    </div>
     <div class="middlefoot">
       <div class="statusbar"></div>
       <div class="progressbar"></div>
@@ -101,23 +103,17 @@
   </div>
 
   <script>
-    // show/hide menu items
-    function showDropDown(target) {
-      document.getElementById(target).classList.toggle("show");
+    // menu bar behavior like MacOS menu bars
+    let clicked = false;
+    window.onclick = function(ev) {
+      if (ev.target.closest('.navbar')) {
+        var menuList = document.querySelectorAll(".dropdown-content");
+        menuList.forEach(e => {
+          (clicked) ? e.classList.remove('clicked'): e.classList.add('clicked');
+        });
+        clicked = !clicked;
+      }
     }
-
-    // Close all the dropdown content if not current menu item
-    // window.onclick = function(ev) {
-    //   var menuList = document.querySelectorAll(".dropdown-content");
-    //   menuList.forEach((item, i) => {
-    //     let id = item.getAttribute('id');
-    //     let evId = ';'
-    //     let dropDownContent = ev.target.nextElementSibling;
-    //     if (dropDownContent) evId = dropDownContent.getAttribute('id');
-    //     // if (item.classList.contains('show') && evId != id)
-    //     //   item.classList.remove('show');
-    //   });
-    // }
   </script>
 </body>
 
