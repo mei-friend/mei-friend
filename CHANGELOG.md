@@ -30,4 +30,5 @@
 * Support for update encoding through Verovio
 * Support for inserting and deleting beam elements
 * Support for cleaning accid.ges attributes
-* Support for renumbering measures 
+* Support for renumbering measures
+* Tooltips activated, control menu behavior changed
