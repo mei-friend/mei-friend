@@ -31,4 +31,5 @@
 * Support for inserting and deleting beam elements
 * Support for cleaning accid.ges attributes
 * Support for renumbering measures
-* Tooltips activated, control menu behavior changed
+* Tooltips activated
+* Menu bar behavior changed to match MacOS conventions
