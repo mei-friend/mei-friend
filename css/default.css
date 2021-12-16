@@ -205,6 +205,7 @@ https://www.w3schools.com/css/css_tooltip.asp
 
 .tooltip .tooltiptext {
   visibility: hidden;
+  position: relative;
   width: 120px;
   background-color: #555;
   color: #fff;
@@ -232,7 +233,12 @@ https://www.w3schools.com/css/css_tooltip.asp
   border-color: transparent transparent #555 transparent;
 }
 
-.tooltip:hover .tooltiptext .visible {
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1;
+}
+
+.tooltiptext.visible {
   visibility: visible;
   opacity: 1;
 }
