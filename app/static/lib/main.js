@@ -276,7 +276,9 @@ async function fillInCommitLog(e) {
   const commitLogHeader = document.createElement("a");
   commitLogHeader.setAttribute("id", "commitLogHeader");
   commitLogHeader.innerText = "Commit Log";
-  githubMenu.appendChild(document.createElement("hr", {className:'dropdown-line'}));
+  const hr = document.createElement("hr");
+  hr.classList.add("dropdown-line");
+  githubMenu.appendChild(hr);
   githubMenu.appendChild(logTable);
 }
 

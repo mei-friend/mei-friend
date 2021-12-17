@@ -88,3 +88,14 @@
 .show {
   display: block;
 }
+
+#logTable {
+  font-size:smaller
+}
+#logTable a {
+  font-size:unset;
+}
+
+#logTable tr:nth-child(even) {
+  background-color: steelblue;
+}
