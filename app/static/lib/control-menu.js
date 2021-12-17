@@ -3,8 +3,8 @@ import * as utils from './utils.js';
 export function createControlsMenu(parentElement, scale) {
 
   // Create control form
-  let controlsForm = document.createElement('form');
-  controlsForm.classList.add('controlMenu');
+  let controlsForm = document.createElement('div');
+  controlsForm.classList.add('control-menu');
   controlsForm.id = 'verovio-controls-form';
   parentElement.appendChild(controlsForm);
 
@@ -124,19 +124,31 @@ export function createControlsMenu(parentElement, scale) {
   lastBtn.setAttribute('value', 'last');
   paginationCtrls.appendChild(lastBtn);
 
-  // Flips notation to cursor position in text
-  let updateBtn = document.createElement('button');
-  updateBtn.id = "update-btn";
-  updateBtn.classList.add('btn');
-  updateBtn.classList.add('icon');
-  updateBtn.classList.add('icon-flip-to-encoding'); // icon-alignment-aligned-to
-  updateBtn.classList.add('inline-block-tight');
-  addToolTip(updateBtn, {
+  // Flips notation automatically to cursor position in encoding
+  let flipCheckbox = document.createElement('input');
+  flipCheckbox.id = "flip-checkbox";
+  flipCheckbox.setAttribute('type', 'checkbox');
+  flipCheckbox.setAttribute('value', 'autoFlip');
+  flipCheckbox.setAttribute('checked', 'true');
+  paginationCtrls.appendChild(flipCheckbox);
+  // manually flip to cursor position
+  let flipBtn = document.createElement('button');
+  flipBtn.id = "flip-btn";
+  flipBtn.classList.add('btn');
+  flipBtn.classList.add('icon');
+  flipBtn.classList.add('icon-flip-to-encoding'); // icon-alignment-aligned-to
+  flipBtn.classList.add('inline-block-tight');
+  addToolTip(flipBtn, {
     title: 'Flip page to encoding cursor position'
   });
-  updateBtn.setAttribute('type', 'button');
-  updateBtn.setAttribute('value', 'update');
-  paginationCtrls.appendChild(updateBtn);
+  flipBtn.setAttribute('type', 'button');
+  flipBtn.setAttribute('value', 'update');
+  flipBtn.disabled = true;
+  paginationCtrls.appendChild(flipBtn);
+
+  flipCheckbox.addEventListener('change', () => {
+    flipBtn.disabled = flipCheckbox.checked;
+  });
 
 
   // breaks selector
@@ -149,10 +161,10 @@ export function createControlsMenu(parentElement, scale) {
   let breaksSelector = document.createElement('select');
   breaksSelector.id = 'breaks-select';
   breaksSelector.classList.add('btn');
-  addToolTip(breaksSelector, {
+  breaksSelector.classList.add('input-select');
+  addToolTip(breaksCtrls, {
     title: 'Define system/page breaks behavior of notation'
   });
-  breaksSelector.classList.add('input-select');
   breaksCtrls.appendChild(breaksSelector);
 
   let speedCheckbox = document.createElement('input');
@@ -172,24 +184,24 @@ export function createControlsMenu(parentElement, scale) {
   // updateCtrls.classList.add('block');
   updateCtrls.classList.add('controls');
   controlsForm.appendChild(updateCtrls);
+  addToolTip(updateCtrls, {
+    title: 'Update notation automatically after changes in encoding'
+  });
 
   let updateLabel = document.createElement('label');
   updateLabel.innerText = 'Update: ';
   updateLabel.classList.add('label');
   updateCtrls.appendChild(updateLabel);
-  addToolTip(updateLabel, {
-    title: 'Update behavior of notation after changes in encoding'
-  });
 
-  let liveupdateCtrl = document.createElement("input");
-  liveupdateCtrl.id = 'live-update-checkbox';
-  liveupdateCtrl.setAttribute('type', 'checkbox');
-  liveupdateCtrl.setAttribute('checked', 'true');
-  addToolTip(liveupdateCtrl, {
-    title: 'Re-render notation automatically after each encoding change'
+  let codeUpdateCheckbox = document.createElement("input");
+  codeUpdateCheckbox.id = 'live-update-checkbox';
+  codeUpdateCheckbox.setAttribute('type', 'checkbox');
+  codeUpdateCheckbox.setAttribute('checked', 'true');
+  addToolTip(codeUpdateCheckbox, {
+    title: 'Automatic updates'
   });
-  updateLabel.setAttribute('for', liveupdateCtrl.id);
-  updateCtrls.appendChild(liveupdateCtrl);
+  updateLabel.setAttribute('for', codeUpdateCheckbox.id);
+  updateCtrls.appendChild(codeUpdateCheckbox);
 
   let codeUpdateBtn = document.createElement('button');
   codeUpdateBtn.id = "code-update-btn";
@@ -206,6 +218,11 @@ export function createControlsMenu(parentElement, scale) {
   codeUpdateBtn.disabled = true;
   updateCtrls.appendChild(codeUpdateBtn);
 
+  codeUpdateCheckbox.addEventListener('change', () => {
+    codeUpdateBtn.disabled = codeUpdateCheckbox.checked;
+  });
+
+
   // font selector
   let fontList = ['Leipzig', 'Bravura', 'Gootville', 'Leland', 'Petaluma'];
   let fontCtrls = document.createElement('div');
@@ -217,7 +234,7 @@ export function createControlsMenu(parentElement, scale) {
   let fontSelector = document.createElement('select');
   fontSelector.id = 'font-select';
   fontSelector.classList.add('btn');
-  addToolTip(fontSelector, {
+  addToolTip(fontCtrls, {
     title: 'Select engraving font'
   });
   fontSelector.classList.add('input-select');
@@ -225,30 +242,12 @@ export function createControlsMenu(parentElement, scale) {
   for (let f of fontList)
     fontSelector.add(new Option(f));
 
-  // debug controls (for debugging code and testing new functionality)
+  // navigation controls
   let navigateCtrls = document.createElement('div');
   navigateCtrls.id = 'navigate-ctrls';
   // navigateCtrls.classList.add('block');
   navigateCtrls.classList.add('controls');
   controlsForm.appendChild(navigateCtrls);
-
-  // debugLabel = document.createElement('label');
-  // debugLabel.innerText = 'Navigate: ';
-  // navigateCtrls.appendChild(debugLabel);
-
-  // debugBtn = document.createElement('button');
-  // debugBtn.id = "debug-btn";
-  // debugBtn.innerHTML = 'add slur';
-  // debugBtn.setAttribute('type', 'button');
-  // debugBtn.setAttribute('value', 'debug');
-  // navigateCtrls.appendChild(debugBtn);
-  //
-  // xBtn = document.createElement('button');
-  // xBtn.id = "x-btn";
-  // xBtn.innerHTML = 'X';
-  // xBtn.setAttribute('type', 'button');
-  // xBtn.setAttribute('value', 'debug');
-  // navigateCtrls.appendChild(xBtn);
 
   let backwardsBtn = document.createElement('button');
   backwardsBtn.id = "backwards-btn";
@@ -309,12 +308,15 @@ export function createControlsMenu(parentElement, scale) {
   verovioBtn.classList.add('icon-sync');
   verovioBtn.classList.add('inline-block-tight');
   addToolTip(verovioBtn, {
-    title: 'Regenerate encoding through Verovio (Attention: non-standard encoding will be erased) (ALT: without xml:ids)'
+    title: `Regenerate encoding through Verovio
+            (Attention: non-standard encoding will be erased)
+            (ALT: without xml:ids)`
   });
   versionDiv.appendChild(verovioBtn);
 
   let versionLabel = document.createElement('label');
   versionLabel.innerText = 'Verovio: ';
+  versionLabel.id = "version-label";
   versionDiv.appendChild(versionLabel);
 
   let helpBtn = document.createElement('button');
@@ -328,12 +330,6 @@ export function createControlsMenu(parentElement, scale) {
   });
   versionDiv.appendChild(helpBtn);
 
-  // let helpPanel = document.createElement('atom-panel');
-  // helpPanel.id = 'help-panel';
-  // helpPanel.classList.add('hidden');
-  // parentElement.appendChild(helpPanel);
-  // helpPanel.innerHTML = help.helpText;
-
   // container for on-the-fly changes to CSS styles (to change highlight color)
   let customStyle = document.createElement('style');
   customStyle.type = 'text/css';
@@ -342,7 +338,7 @@ export function createControlsMenu(parentElement, scale) {
 
   // Create container element for Verovio SVG
   let verovioPanel = document.createElement('div');
-  verovioPanel.id = 'verovio-panel';
+  verovioPanel.classList.add('verovio-panel');
   // verovioPanel.classList.add('hidden');
   parentElement.appendChild(verovioPanel);
 }
@@ -376,7 +372,4 @@ export function setBreaksOptions(tkAvailableOptions) {
       breaksEl[breaksEl.options.length] = new Option(index, index);
     }
   }
-
-
-
 }

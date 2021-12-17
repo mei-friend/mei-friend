@@ -13,7 +13,10 @@
   <!-- inject GitHub OAuth response details if available -->
     <script src="{{ url_for('static', filename='lib/jsgit.js') }}"></script>
     <script src="{{ url_for('static', filename='lib/github.js') }}" type="module"></script>
-    <script>let isLoggedIn; </script>
+    <script>
+      let isLoggedIn; 
+      let root = "{{ url_for('static', filename='') }}";
+    </script>
   {% if isLoggedIn %}
     <script>
       isLoggedIn = true;
@@ -49,7 +52,7 @@
     <div class="title">mei-friend online</div>
     <div class="navbar">
       <div class="dropdown">
-        <button class="dropbtn" onclick="showDropDown('FileMenu')">File</button>
+        <button class="dropbtn">File</button>
         <div class="dropdown-content" id="FileMenu">
           <a id="OpenMei" href="#">Open MEI</a>
           <a id="ImportMusicXml" href="#">Import MusicXML</a>
@@ -62,7 +65,7 @@
         </div>
       </div>
       <div class="dropdown">
-        <button class="dropbtn" onclick="showDropDown('ViewMenu')">View</button>
+        <button class="dropbtn">View</button>
         <div class="dropdown-content" id="ViewMenu">
           <a id="top" href="#">Notation top</a>
           <a id="bottom" href="#">Notation bottom</a>
@@ -75,35 +78,47 @@
         </div>
       </div>
       <div class="dropdown">
-        <button class="dropbtn" onclick="showDropDown('HelpMenu')">Help</button>
-        <div class="dropdown-content" id="HelpMenu">
-          <a id="GoToHelpPage" href="#">Show help page</a>
+        <button class="dropbtn">Manipulate</button>
+        <div class="dropdown-content" id="Manipulate">
+          <a id="cleanAccid" href="#">Clean @accid.ges</a>
+          <a id="renumTest" href="#">Renumber measures (test)</a>
+          <a id="renumExec" href="#">Renumber measures (exec)</a>
+          <hr class="dropdown-line">
         </div>
       </div>
       <div class="dropdown">
         {% if isLoggedIn -%}
-          <button class="dropbtn" onclick="showDropDown('GithubMenu')"><img style='height: 1em;' src="{{ url_for('static', filename='img/GitHub-Mark-32px.png') }}"/>{{userName}}</button>
+          <button class="dropbtn"><img id="GithubLogo" src="{{ url_for('static', filename='img/GitHub-Mark-32px.png') }}"/>{{userName}}</button>
           <div class="dropdown-content" id="GithubMenu"></div>
         {% else %}
-          <a class="dropbtn" id="GithubLogin" href="/login"><img style='height: 1em;' src="{{ url_for('static', filename='img/GitHub-Mark-32px.png') }}"/>Login</a>
+          <a class="dropbtn" id="GithubLogin" href="/login"><img id="GithubLogo" src="{{ url_for('static', filename='img/GitHub-Mark-32px.png') }}"/>Login</a>
         {% endif %}
+      </div>
+      <div class="dropdown">
+        <button class="dropbtn">Help</button>
+        <div class="dropdown-content" id="HelpMenu">
+          <a id="GoToHelpPage" href="/help" target="_blank">Show
+            help page</a>
+        </div>
       </div>
     </div>
   </div>
   <div class="dragContainer">
     <div class="dragOverlay">
-      <div class="dragOverlayText">Drag your xml file here.</div>
+      <div class="dragOverlayText">Drag your input file here.</div>
     </div>
     <div class="friendContainer">
       <div class="notation"></div>
       <div class="resizer" id="dragMe"></div>
       <div class="encoding">
-        <textarea id="editor">Hallo!</textarea>
+        <textarea id="editor"></textarea>
       </div>
     </div>
   </div>
   <div class="footer">
-    <div class="leftfoot">Werner Goebl, Nov. 2021</div>
+    <div class="leftfoot">&copy;
+      <a href="https://iwk.mdw.ac.at/signature-sound-vienna/">IWK 2021</a>
+    </div>
     <div class="middlefoot">
       <div class="statusbar"></div>
       <div class="progressbar"></div>
@@ -112,26 +127,20 @@
   </div>
 
   <script>
-    // show/hide menu items
-    function showDropDown(target) {
-      document.getElementById(target).classList.toggle("show");
-    }
-
-    window.onclick = function(ev) {
-      // Close dropdown content except if in Github Menu 
-      // (but DO close Github Menu if a file item is selected)
-      if(!ev.target.closest("#GithubMenu") || ev.target.classList.contains("closeOnClick")) { 
-        var menuList = document.querySelectorAll(".dropdown-content");
-        menuList.forEach((item, i) => {
-          let id = item.getAttribute('id');
-          let evId = ';'
-          let dropDownContent = ev.target.nextElementSibling;
-          if (dropDownContent) evId = dropDownContent.getAttribute('id');
-          if (item.classList.contains('show') && evId != id)
-            item.classList.remove('show');
-        });
+    // menu bar behavior like MacOS menu bars
+    let show = false;
+    document.querySelector(".navbar").addEventListener("click", (ev) => {
+    var menuList = document.querySelectorAll(".dropdown-content");
+    menuList.forEach((e) => {
+      if(show && (!ev.target.closest("#GithubMenu") || ev.target.classList.contains("closeOnClick"))) {
+        e.classList.remove('show');
+      } else { 
+        e.classList.add('show');
       }
-    }
+    })
+
+    show = !show;
+    });
   </script>
 </body>
 

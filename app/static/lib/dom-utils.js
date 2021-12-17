@@ -120,6 +120,7 @@ export function getLastInMeasure(measure, list, stN, lyN) {
 }
 
 export function getX(element, what = 'median') {
+  if (!element) return false;
   let x = [];
   if (element.getAttribute('class').includes("chord")) {
     let els = element.querySelectorAll('g.note');
@@ -141,6 +142,7 @@ export function getX(element, what = 'median') {
 }
 
 export function getY(element) {
+  if (!element) return false;
   let y = [];
   if (element.getAttribute('class').includes("chord")) {
     let els = element.querySelectorAll('g.note');

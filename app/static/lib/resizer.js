@@ -1,5 +1,3 @@
-import root from './flaskStatic.js';
-
 let orientation = 'bottom';
 let notationProportion = .5; // proportion notation div takes from container
 let resizerWidth = 8; // 8 px, attention hard-coded also in 4 css files
@@ -15,22 +13,17 @@ export function setOrientation(cm, o = '', v = null) {
   let notation = document.querySelector(".notation");
   console.log('setOrientation(' + o + ') container size:', sz);
   if (orientation == "top" || orientation == "bottom") {
-    cm.setSize(sz.width, sz.height * (1 - notationProportion) - resizerWidth);
     notation.style.width = sz.width; //- 6; // TODO: remove when border removed
     notation.style.height = sz.height * notationProportion;
+    cm.setSize(sz.width, sz.height * (1 - notationProportion) - resizerWidth);
   }
   if (orientation == "left" || orientation == "right") {
-    cm.setSize(sz.width * (1 - notationProportion), sz.height);
     notation.style.width = sz.width * notationProportion;
     notation.style.height = sz.height; //- 6; TODO: remove when border removed
+    cm.setSize(sz.width * (1 - notationProportion), sz.height);
   }
-  if (v) window.onload = v.updateLayout();
-  // let verovioPanel = document.getElementById('verovio-panel');
-  // if (verovioPanel) {
-  //   let box = getVerovioContainerSize();
-  //   verovioPanel.style.width = box.width;
-  //   verovioPanel.style.height = box.height;
-  // }
+  // redoLayout when done with loading
+  if (v) setTimeout(() => v.updateLayout(), 3);  
 }
 
 export function calcSizeOfContainer() {
@@ -43,13 +36,12 @@ export function calcSizeOfContainer() {
   friendSz.height = bodySz.height - headerSz.height - footerSz.height -
     resizerWidth;
   friendSz.width = bodySz.width - resizerWidth;
-  // console.log('calcSizeOfContainer(' + orientation +
-  // ') bodySz, header, sizer, footer: ' +
-  // Math.round(bodySz.width) + '/' + Math.round(bodySz.height) + ', ' +
-  //   Math.round(headerSz.width) + '/' + Math.round(headerSz.height) + ', ' +
-  //   Math.round(sizerSz.width) + '/' + Math.round(sizerSz.height) + ', ' +
-  //   Math.round(footerSz.width) + '/' + Math.round(footerSz.height) + ', ' +
-  //   Math.round(friendSz.width) + '/' + Math.round(friendSz.height) + '.');
+  console.log('calcSizeOfContainer(' + orientation +
+    ') bodySz, header, sizer, footer: ' +
+    Math.round(bodySz.width) + '/' + Math.round(bodySz.height) + ', ' +
+    Math.round(headerSz.width) + '/' + Math.round(headerSz.height) + ', ' +
+    Math.round(footerSz.width) + '/' + Math.round(footerSz.height) + ', ' +
+    Math.round(friendSz.width) + '/' + Math.round(friendSz.height) + '.');
   return friendSz;
 }
 

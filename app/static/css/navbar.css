@@ -85,7 +85,7 @@
 }
 
 /* Show the dropdown menu on hover */
-.show {
+.dropdown:hover .dropdown-content.show{
   display: block;
 }
 
@@ -98,4 +98,9 @@
 
 #logTable tr:nth-child(even) {
   background-color: steelblue;
+}
+
+#GithubLogo { 
+  height: .8em;
+  margin-right: .2em;
 }

@@ -50,65 +50,69 @@ export default class Viewer {
     // this.showLoadingMessage();
   }
 
-  updateData(cm) {
+  updateData(cm, setCursorToPageBeg = true, setFocusToVerovioPane = true) {
     // is it needed for speed mode?
     //if(!this.speedMode) this.loadVerovioData(this.speedFilter(cm.getValue()));
     let message = {
       'cmd': 'updateData',
       'mei': this.speedFilter(cm.getValue()),
       'pageNo': this.currentPage,
-      'xmlId': ''
+      'xmlId': '',
+      'setCursorToPageBeginning': setCursorToPageBeg,
+      'setFocusToVerovioPane': setFocusToVerovioPane
     };
     this.worker.postMessage(message);
   }
 
-  updatePage(cm, page) {
-    if (this.changeCurrentPage(page)) {
+  updatePage(cm, page, xmlId = '') {
+    if (this.changeCurrentPage(page) || xmlId) {
       if (!this.speedMode) {
         let message = {
           'cmd': 'updatePage',
           'pageNo': this.currentPage,
-          'xmlId': ''
+          'xmlId': xmlId
         };
         this.worker.postMessage(message);
         // this.showCurrentPage();
       } else { // speed mode
-        this.updateDaga(cm);
+        this.updateData(cm);
         // this.loadVerovioData(this.speedFilter(cm.getValue()));
       }
     }
   }
 
-  // TODO implement secCursorToPageBeginning = false
+  // update: options, redoLayout, page/xml:id, render page
   updateLayout(options = {}) {
-    // if (!this.speedMode) {
-    this.setVerovioOptions(options);
-    let message = {
-      'cmd': 'updateLayout',
-      'options': this.vrvOptions,
-      'pageNo': this.currentPage
-      // 'xmlId': this.lastNotId
-    };
-    this.worker.postMessage(message);
+    this.updateQuick(options, 'updateLayout');
   }
 
+  // update: options, page/xml:id, render page
   updateOption(options = {}) {
+    this.updateQuick(options, 'updateOption');
+  }
+
+  // updateLayout and updateOption
+  updateQuick(options, what) {
     // if (!this.speedMode) {
+    let id = '';
+    if (this.selectedElements[0]) id = this.selectedElements[0];
     this.setVerovioOptions(options);
     let message = {
-      'cmd': 'updateOption',
+      'cmd': what,
       'options': this.vrvOptions,
-      'pageNo': this.currentPage
-      // 'xmlId': this.lastNotId
+      'pageNo': this.currentPage,
+      'xmlId': id
     };
     this.worker.postMessage(message);
   }
 
 
-  // with normal mode: pass-through the MEI code;
-  // with speed mode: load into DOM (if encodingHasChanged) and return MEI
-  // of currentPage page
-  speedFilter(mei) {
+  // with normal mode: load DOM and pass-through the MEI code;
+  // with speed mode: load into DOM (if encodingHasChanged) and
+  // return MEI excerpt of currentPage page
+  speedFilter(mei, forceReload = false) {
+    // update DOM only if encoding has been edited or
+    this.loadXml(mei, forceReload);
     if (!this.speedMode) return mei;
     this.breaks = ['sb', 'pb'];
     if ("encoded" == this.breaksSelector.options[
@@ -116,11 +120,8 @@ export default class Viewer {
       this.breaks = ['pb'];
     }
     // console.info('loadXml breaks: ', this.breaks);
-    // update DOM only if encoding has been edited or updated
     if (this.encodingHasChanged || forceReload) {
-      this.xmlDoc = this.parser.parseFromString(mei, "text/xml");
       let elements = this.xmlDoc.querySelectorAll("measure, sb, pb");
-      // console.info('loadXml: breaks and measures: ', elements);
       // count pages
       this.pageCount = 1; // pages are one-based
       countBreaks = false;
@@ -138,6 +139,11 @@ export default class Viewer {
     return speed.getPageFromDom(this.xmlDoc, this.currentPage, this.breaks);
   }
 
+  loadXml(mei, forceReload = false) {
+    if (this.encodingHasChanged || forceReload)
+      this.xmlDoc = this.parser.parseFromString(mei, "text/xml");
+  }
+
 
   // update options in viewer from user interface
   setVerovioOptions(newOptions = {}) {
@@ -147,18 +153,23 @@ export default class Viewer {
     let fontSel = document.getElementById('font-select');
     if (fontSel) this.vrvOptions.font = fontSel.value;
     let breaks = document.getElementById('breaks-select');
-    if (breaks) this.vrvOptions.breaks = breaks.value;
+    if (breaks && breaks.value) this.vrvOptions.breaks = breaks.value;
     let dimensions = getVerovioContainerSize();
-    let vp = document.getElementById('verovio-panel');
+    let vp = document.querySelector('.verovio-panel');
     dimensions.width = vp.clientWidth;
     dimensions.height = vp.clientHeight;
-    console.info('setVerovioOptions: old options: ', this.vrvOptions);
+    // console.info('setVerovioOptions: old options: ', this.vrvOptions);
     if (this.vrvOptions.breaks !== "none") {
       this.vrvOptions.pageWidth = Math.max(Math.round(
         dimensions.width * (100 / this.vrvOptions.scale)), 600);
       this.vrvOptions.pageHeight = Math.max(Math.round(
         dimensions.height * (100 / this.vrvOptions.scale)), 250);
     }
+    if (this.vrvOptions.breaks === "encoded") {
+      // delete this.vrvOptions.pageWidth;
+      delete this.vrvOptions.pageHeight;
+    }
+
     // overwrite existing options if new ones are passed in
     // for (let key in newOptions) { this.vrvOptions[key] = newOptions[key]; }
     console.info('Verovio options updated: ', this.vrvOptions);
@@ -166,10 +177,10 @@ export default class Viewer {
 
   changeHighlightColor(color) {
     document.getElementById('customStyle').innerHTML =
-      `.mei-friend #verovio-panel g.highlighted,
-      .mei-friend #verovio-panel g.highlighted,
-      .mei-friend #verovio-panel g.highlighted,
-      .mei-friend #verovio-panel g.highlighted * {
+      `.mei-friend .verovio-panel g.highlighted,
+      .mei-friend .verovio-panel g.highlighted,
+      .mei-friend .verovio-panel g.highlighted,
+      .mei-friend .verovio-panel g.highlighted * {
         fill: ${color};
         color: ${color};
         stroke: ${color};
@@ -215,13 +226,13 @@ export default class Viewer {
   setCursorToPageBeginning(cm) {
     let id = this.lastNoteId;
     let stNo, lyNo;
-    let c;
+    let sc;
     if (id == '') {
       id = document.querySelector('.note').getAttribute('id');
     } else {
-      c = cm.getSearchCursor('xml:id="' + id + '"');
-      if (c.findNext()) {
-        const p = c.from();
+      sc = cm.getSearchCursor('xml:id="' + id + '"');
+      if (sc.findNext()) {
+        const p = sc.from();
         stNo = utils.getElementAttributeAbove(cm, p.line, 'staff')[0];
         lyNo = utils.getElementAttributeAbove(cm, p.line, 'layer')[0];
         let m = document.querySelector('.measure');
@@ -305,11 +316,23 @@ export default class Viewer {
     // console.info(str);
   }
 
-  cursorActivity(e, cm) {
+  // when cursor pos in editor changed, update notation location / highlight
+  cursorActivity(cm, forceFlip = false) {
     let id = utils.getElementIdAtCursor(cm);
-    // console.info('cursorActivity: ', id);
     this.selectedElements = [].push(id);
+    let fl = document.getElementById('flip-checkbox');
+    if (!document.querySelector('g#' + id) &&
+      ((this.updateNotation && fl && fl.checked) || forceFlip))
+      this.updatePage(cm, '', id);
     this.updateHighlight(cm);
+  }
+
+  // when editor emits changes, update notation rendering
+  notationUpdated(cm, forceUpdate = false) {
+    this.encodingHasChanged = true;
+    let ch = document.getElementById('live-update-checkbox');
+    if (this.updateNotation && ch && ch.checked || forceUpdate)
+      this.updateData(cm, false, false);
   }
 
   // highlight currently selected elements
@@ -341,15 +364,11 @@ export default class Viewer {
     if (this.notationNightMode) {
       let gs = Array.from(document.querySelectorAll('g'));
       gs.forEach(item => item.classList.add('inverted'));
-      document.getElementById('verovio-panel').classList.add('inverted');
-      // $('g').addClass('inverted');
-      // $('#verovio-panel').addClass('inverted');
+      document.querySelector('.verovio-panel').classList.add('inverted');
     } else {
       let gs = Array.from(document.querySelectorAll('g.inverted'));
       gs.forEach(item => item.classList.remove('inverted'));
-      document.getElementById('verovio-panel').classList.remove('inverted');
-      // $('g.inverted').removeClass('inverted');
-      // $('#verovio-panel').removeClass('inverted');
+      document.querySelector('.verovio-panel').classList.remove('inverted');
     }
   }
 
@@ -370,7 +389,7 @@ export default class Viewer {
     else // otherwise take it as the scaling value
       zoomCtrl.value = delta;
     this.updateLayout();
-    this.updateZoomSliderTooltip(zoomCtrl);
+    // this.updateZoomSliderTooltip(zoomCtrl);
   }
 
   // TODO: why is it not showing?
@@ -390,7 +409,9 @@ export default class Viewer {
 
   // set focus to verovioPane in order to ensure working key bindings
   setFocusToVerovioPane() {
-    document.getElementById('verovio-panel').focus();
+    let el = document.querySelector('.verovio-panel');
+    el.setAttribute('tabindex', '-1');
+    el.focus();
     // $(".mei-friend").attr('tabindex', '-1').focus();
   }
 
@@ -411,8 +432,7 @@ export default class Viewer {
       id = this.lastNoteId;
       element = document.querySelector('g#' + id);
     }
-    console.info('Navigate ' + dir + ' ' +
-      incElName + '-wise for: ', element);
+    console.info('Navigate ' + dir + ' ' + incElName + '-wise for: ', element);
     let x = dutils.getX(element);
     let y = dutils.getY(element);
     let measure = element.closest('.measure');
@@ -431,8 +451,7 @@ export default class Viewer {
         id = dutils.getIdOfNextSvgElement(element, dir, elsList, incElName);
         if (!id) { // when no id on screen, turn page
           let what = 'first'; // first/last note within measure
-          if (dir == 'backwards' && incElName !== 'measure')
-            what = 'last';
+          if (dir == 'backwards' && incElName !== 'measure') what = 'last';
           if (!this.changeCurrentPage(dir)) return; // turn page
           this.navigateBeyondPage(dir, what, stNo, lyNo, y);
           return;
@@ -486,7 +505,7 @@ export default class Viewer {
     stNo = 1, lyNo = 1, y = 0) {
     let message = {
       'cmd': 'navigatePage',
-      'msg': this.currentPage,
+      'mei': this.currentPage,
       'dir': dir,
       'what': what,
       'stNo': stNo,
@@ -520,7 +539,7 @@ export default class Viewer {
   displaySVG(cm, svg) {
     // document.querySelector(".statusbar").innerHTML =
     //   meiFileName + ", pg " + v.currentPage + "/" + v.pageCount + " loaded.";
-    document.getElementById('verovio-panel').innerHTML = svg;
+    document.querySelector('.verovio-panel').innerHTML = svg;
     // if (v.doCursorUpdate && false) { // DEBUG
     //   v.setCursorToPageBeginning(cm);
     //   v.doCursorUpdate = false;

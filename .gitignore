@@ -1,3 +1,7 @@
 verovio*
 CodeMirror/*
 .DS_Store
+.env
+venv
+*.swp
+

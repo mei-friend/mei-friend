@@ -1,4 +1,5 @@
 import * as speed from './speed.js';
+import * as e from './editor.js';
 import * as dutils from './dom-utils.js';
 
 const xmlIdString = /(?:xml:id=)(?:['"])(\S+?)(?:['"])/;
@@ -33,8 +34,8 @@ export function findNotes(elId) {
   let notes = document.querySelector('g#' + elId).querySelectorAll('.note');
   let idArray = [];
   for (let note of notes) {
-    noteId = note.getAttribute('id');
-    chordId = insideParent(noteId);
+    let noteId = note.getAttribute('id');
+    let chordId = insideParent(noteId);
     if (chordId && !idArray.includes(chordId)) {
       idArray.push(chordId);
     } else if (!chordId) {
@@ -63,7 +64,7 @@ export function getElementAttributeAbove(cm, row, elementName = 'staff',
 export function getElementAttributeBelow(cm, row, elementName = 'staff',
   searchString = /(?:n=)(?:['"])(\d+?)(?:['"])/) {
   let line;
-  while (line = textBuffer.getLine(++row)) {
+  while (line = cm.getLine(++row)) {
     if (line.includes('<' + elementName)) {
       return [line.match(searchString)[1], row];
     }
@@ -72,22 +73,25 @@ export function getElementAttributeBelow(cm, row, elementName = 'staff',
 }
 
 // move encoding cursor to end of current measure
-export function moveCursorToEndOfMeasure(textEditor, cursorPos) {
-  if (!cursorPos) cursorPos = textEditor.getCursorBufferPosition();
-  let textBuffer = textEditor.getBuffer();
+export function moveCursorToEndOfMeasure(cm, p) {
   const measureEnd = '</measure';
-  for (let row = cursorPos.row; row < textEditor.getLastBufferRow(); row++) {
-    let line = textBuffer.lineForRow(row);
+  for (; p.line < cm.lineCount(); p.line++) {
+    let line = cm.getLine(p.line);
     if (line.includes(measureEnd)) {
-      let column = line.indexOf(measureEnd);
-      textEditor.setCursorBufferPosition([row, column]);
-      return [row, column];
+      p.ch = line.indexOf(measureEnd);
+      cm.setCursor(p);
+      return p;
     }
   }
-  return [null, null];
+  return {
+    line: null,
+    ch: null
+  }
 }
 
+
 // find item by id in buffer
+// NEW: let sc = cm.getSearchCursor('xml:id="' + id + '"');
 // export function locateIdInBuffer(cm, itemId, searchRegExp = '') {
 //   // const searchString = new RegExp(`(?:xml:id="${itemId}")`);
 //   // var searchSelfClosing = '<[\\w.-]+?\\s+?(?:xml:id="' + itemId + '")(.*?)(\/[\\w.-]*?>)';
@@ -142,9 +146,9 @@ export function getIdOfNextElement(cm, rw,
   // console.info('getIdOfNextElement("' + elementNames + '", "' + direction + '").');
 
   if (direction == 'forwards') {
-    while (line = textBuffer.lineForRow(++row)) {
+    while (line = cm.getLine(++row)) {
       let found = false;
-      for (el of elementNames) {
+      for (let el of elementNames) {
         if (line.includes('<' + el)) {
           found = true;
           break;
@@ -159,9 +163,9 @@ export function getIdOfNextElement(cm, rw,
       }
     }
   } else if (direction == 'backwards') {
-    while (line = textBuffer.lineForRow(--row)) {
+    while (line = cm.getLine(--row)) {
       let found = false;
-      for (el of elementNames) {
+      for (let el of elementNames) {
         if (line.includes('<' + el)) {
           found = true;
           break;
@@ -314,12 +318,11 @@ export function hasTag(textEditor, tag = '<mei') {
 }
 
 // sort note elements in array (of xml:ids) by x coordinate of element
-export function sortElementsByScoreTime(arr, tk) {
+export function sortElementsByScorePosition(arr) {
   let j, i;
   let Xs = []; // create array of x values of the ids in arr
   arr.forEach(item => {
     let el = document.querySelector('g#' + item);
-    // console.info('sortElementsByScoreTime el: ', el);
     Xs.push(dutils.getX(el));
   });
   for (j = arr.length; j > 1; --j) {
@@ -342,37 +345,37 @@ export function sortElementsByScoreTime(arr, tk) {
 }
 
 // remove @accid.ges if @accid is present
-export function cleanAccid(xmlDoc, textEditor) {
-  let buffer = textEditor.getBuffer();
-  let checkPoint = buffer.createCheckpoint();
+export function cleanAccid(xmlDoc, cm) {
+  console.log('Clean accid on document:');
   let accidGesList = xmlDoc.querySelectorAll('[accid]');
+  // let checkPoint = buffer.createCheckpoint(); TODO
   let i = 0;
-  for (el of accidGesList) {
+  for (let el of accidGesList) {
     if (el.hasAttribute('accid.ges') &&
       el.getAttribute('accid') == el.getAttribute('accid.ges')) {
       i++;
+      console.log(i + ' @accid.ges removed from ', el);
       el.removeAttribute('accid.ges');
-      speed.replaceInTextEditor(textEditor, el);
+      e.replaceInTextEditor(cm, el);
     }
   }
-  let re = buffer.groupChangesSinceCheckpoint(checkPoint);
-  console.info('cleanAccid: ' + i + ' accid.ges removed, grouped ', re);
+  // let re = buffer.groupChangesSinceCheckpoint(checkPoint); TODO
+  // console.info('cleanAccid: ' + i + ' accid.ges removed, grouped ', re);
 }
 
 // renumber measure@n starting with startNumber
-export function renumberMeasures(xmlDoc, textEditor, startNumber = 1, change = false) {
-  let buffer = textEditor.getBuffer();
+export function renumberMeasures(xmlDoc, cm, startNum = 1, change = false) {
   let measureList = xmlDoc.querySelectorAll('measure');
-  console.info('measureList: ', measureList);
+  console.info('renumber Measures list: ', measureList);
   let i;
   let lgt = measureList.length;
   let metcon = '';
   let metcons = 0; // number of metcon=false measures in a row
-  let n = startNumber;
+  let n = startNum;
   let endingStart = -1; // start number of an ending element
   let endingEnd = -1; // end number of an ending element
   let endingN = '';
-  let checkPoint = buffer.createCheckpoint();
+  // let checkPoint = buffer.createCheckpoint(); TODO
   for (i = 0; i < lgt; i++) {
     if (measureList[i].closest('incip')) continue;
     if (!change)
@@ -411,7 +414,7 @@ export function renumberMeasures(xmlDoc, textEditor, startNumber = 1, change = f
     // change measure@n
     if (change) {
       measureList[i].setAttribute('n', n);
-      speed.replaceInTextEditor(textEditor, measureList[i]);
+      e.replaceInTextEditor(cm, measureList[i]);
       console.info(measureList[i].getAttribute('n') + ' changed to ' + n +
         ', right:' + right + ', metcons:' + metcons);
     } else { // just list the changes
@@ -429,13 +432,14 @@ export function renumberMeasures(xmlDoc, textEditor, startNumber = 1, change = f
     }
     metcon = '';
   }
-  let re = buffer.groupChangesSinceCheckpoint(checkPoint);
-  console.info('renumberMeasures: ' + i + ' measures renumbered, grouped ', re);
+  // let re = buffer.groupChangesSinceCheckpoint(checkPoint);
+  console.info('renumberMeasures: ' + i + ' measures renumbered');
+  //, grouped ', re);
 }
 
 // convert all
 export function attrAsElements(xmlNote) {
-  for (att of ['artic', 'accid']) {
+  for (let att of ['artic', 'accid']) {
     if (xmlNote.hasAttribute(att)) {
       let accidElement = document.createElementNS(speed.meiNameSpace, att);
       accidElement.setAttribute(att, xmlNote.getAttribute(att));
