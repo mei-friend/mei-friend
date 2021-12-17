@@ -286,3 +286,20 @@ https://www.w3schools.com/css/css_tooltip.asp
 .hidden {
   display: none;
 }
+
+.help-container {
+  overflow: auto;
+  border: 3px solid lightsteelblue;
+  border-radius: 4px;
+  margin: 5px;
+  padding: 5px;
+}
+
+span.keyIcon {
+  margin: 3px 3px;
+  padding: 0px 5px;
+  border-style: solid;
+  border-color: DodgerBlue;
+  border-width: 2px;
+  border-radius: 3px;
+}
