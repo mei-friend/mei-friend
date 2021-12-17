@@ -33,3 +33,5 @@
 * Support for renumbering measures
 * Tooltips activated
 * Menu bar behavior changed to match MacOS conventions
+# 0.0.9 patch: Help added
+* Help page added and linked
