@@ -1,7 +1,7 @@
 verovio*
-CodeMirror/*
+app/static/CodeMirror
 .DS_Store
 .env
 venv
 *.swp
-
+app/__pycache__
