@@ -295,6 +295,15 @@ https://www.w3schools.com/css/css_tooltip.asp
   padding: 5px;
 }
 
+.help-container td {
+  min-width: 150px;
+  padding: 3px;
+}
+
+.help-container tr:nth-child(odd) {
+  background: lightgrey
+}
+
 span.keyIcon {
   margin: 3px 3px;
   padding: 0px 5px;
@@ -302,4 +311,17 @@ span.keyIcon {
   border-color: DodgerBlue;
   border-width: 2px;
   border-radius: 3px;
+}
+
+.column {
+  float: left;
+  padding: 3px;
+  width: 48%;
+}
+
+/* Clear floats after the columns */
+.help-container:after {
+  content: "";
+  display: table;
+  clear: both;
 }
