@@ -144,6 +144,11 @@ export default class Viewer {
       this.xmlDoc = this.parser.parseFromString(mei, "text/xml");
   }
 
+  clear() {
+    this.selectedElements = [];
+    this.lastNoteId = '';
+    this.currentPage = 1;
+  }
 
   // update options in viewer from user interface
   setVerovioOptions(newOptions = {}) {

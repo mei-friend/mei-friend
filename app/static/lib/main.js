@@ -164,8 +164,7 @@ function assignGithubMenuClickHandlers() {
         fillInBranchContents(ev);
         github.readGithubRepo().then(() => {
           document.querySelector(".statusbar").innerText = "Loading from Github...";
-          v.currentPage = 1;
-          v.selectedElements = [];
+          v.clear();
           v.updateNotation = false;
           meiFileName = `Github: ${github.githubRepo}${github.filepath}`
           cm.setValue(github.content);
@@ -378,6 +377,7 @@ export function openMei(file = defaultMeiFileName) {
       .then((meiXML) => {
         console.log('MEI file ' + meiFileName + ' loaded.');
         mei = meiXML;
+        v.clear();
         v.updateNotation = false;
         cm.setValue(mei);
         v.updateNotation = true;
@@ -405,8 +405,7 @@ export function openMei(file = defaultMeiFileName) {
     readingPromise.then(
       function(mei) {
         let found = false;
-        v.currentPage = 1;
-        v.selectedElements = [];
+        v.clear();
         if (meiFileName.endsWith('.mxl')) { // compressed MusicXML file
           console.log('Load compressed XML file.', mei.slice(0, 128));
           vrvWorker.postMessage({
