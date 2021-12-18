@@ -111,20 +111,20 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function assignGithubMenuClickHandlers() {
   const repoHeader = document.getElementById('repositoriesHeader');
-  if(repoHeader) { 
+  if (repoHeader) {
     // on click, reload list of all repositories
     repoHeader.addEventListener('click', refreshGithubMenu);
   }
   const branchesHeader = document.getElementById('branchesHeader');
-  if(branchesHeader) { 
+  if (branchesHeader) {
     // on click, reload list of branches for current repo
     branchesHeader.addEventListener('click', (ev) => {
-      github.filepath="";
+      github.filepath = "";
       fillInRepoBranches(ev);
     });
   }
   const contentsHeader = document.getElementById('contentsHeader');
-  if(contentsHeader) {
+  if (contentsHeader) {
     // on click, move up one directory level in the branch contents
     contentsHeader.addEventListener('click', (ev) => {
       github.filepath = github.filepath.substr(0, github.filepath.lastIndexOf('/'));
@@ -132,14 +132,14 @@ function assignGithubMenuClickHandlers() {
       fillInBranchContents(ev);
     });
   }
-  Array.from(document.getElementsByClassName('userRepo')).forEach((e) => 
+  Array.from(document.getElementsByClassName('userRepo')).forEach((e) =>
     e.addEventListener('click', (ev) => {
       github.githubRepo = e.innerText;
       fillInRepoBranches(ev);
     })
   );
-  Array.from(document.getElementsByClassName('repoBranch')).forEach((e) => 
-    e.addEventListener('click', (ev) => { 
+  Array.from(document.getElementsByClassName('repoBranch')).forEach((e) =>
+    e.addEventListener('click', (ev) => {
       github.branch = e.innerText;
       github.filepath = "/";
       github.readGithubRepo().then(() => {
@@ -148,24 +148,28 @@ function assignGithubMenuClickHandlers() {
     })
   );
   Array.from(document.getElementsByClassName('branchContents')).forEach((e) => {
-    if(e.classList.contains("dir")){ 
+    if (e.classList.contains("dir")) {
       e.addEventListener('click', (ev) => {
-        if(github.filepath.endsWith("/")) { 
+        if (github.filepath.endsWith("/")) {
           github.filepath += e.querySelector("span.filepath").innerText;
-        } else { 
-          github.filepath += "/"+e.querySelector("span.filepath").innerText;
+        } else {
+          github.filepath += "/" + e.querySelector("span.filepath").innerText;
         }
         fillInBranchContents(ev);
       })
-    } else { 
+    } else {
       e.addEventListener('click', (ev) => {
         github.filepath += e.querySelector("span.filepath").innerText;
         console.debug(`Loading file: https://github.com/${github.githubRepo}${github.filepath}`);
         fillInBranchContents(ev);
         github.readGithubRepo().then(() => {
           document.querySelector(".statusbar").innerText = "Loading from Github...";
+          v.currentPage = 1;
+          v.selectedElements = [];
+          v.updateNotation = false;
           meiFileName = `Github: ${github.githubRepo}${github.filepath}`
           cm.setValue(github.content);
+          v.updateNotation = true;
           v.updateAll(cm);
         });
       });
@@ -180,21 +184,21 @@ function refreshGithubMenu(e) {
   fillInUserRepos();
 }
 
-async function fillInUserRepos(per_page=30, page=1) {
+async function fillInUserRepos(per_page = 30, page = 1) {
   const repos = await github.getUserRepos(per_page, page);
   let githubMenu = document.getElementById("GithubMenu");
   repos.forEach((repo) => {
     githubMenu.innerHTML += `<a class="userRepo" href="#">${repo.full_name}</a>`;
   })
-  if(repos.length && repos.length === per_page) {
+  if (repos.length && repos.length === per_page) {
     // there may be more repos on the next page
-    fillInUserRepos(per_page, page+1);
+    fillInUserRepos(per_page, page + 1);
   }
   // GitHub menu interactions
   assignGithubMenuClickHandlers();
 }
 
-async function fillInRepoBranches(e, per_page=100, page=1) {
+async function fillInRepoBranches(e, per_page = 100, page = 1) {
   // TODO handle > per_page branches (similar to userRepos)
   const repoBranches = await github.getRepoBranches(per_page, page);
   let githubMenu = document.getElementById("GithubMenu");
@@ -220,15 +224,15 @@ async function fillInBranchContents(e) {
     <a id="contentsHeader" href="#"><span class="btn icon icon-arrow-left inline-block-tight"></span>Path: <span class="filepath">${github.filepath}</span></a>
     `;
   let target = e.target;
-  if(target.classList.contains("filepath")) {
+  if (target.classList.contains("filepath")) {
     // clicked on file name -- operate on parent (list entry) instead
     target = e.target.parentNode;
   }
-  if(target.classList.contains("repoBranch") || target.classList.contains("dir") || target.getAttribute("id") === "contentsHeader") {
+  if (target.classList.contains("repoBranch") || target.classList.contains("dir") || target.getAttribute("id") === "contentsHeader") {
     Array.from(branchContents).forEach((content) => {
       const isDir = content.type === "dir";
-      githubMenu.innerHTML += `<a class="branchContents ${content.type}${isDir ? '': ' closeOnClick'}" href="#">`+
-      //  content.type === "dir" ? '<span class="btn icon icon-file-symlink-file inline-block-tight"></span>' : "" +
+      githubMenu.innerHTML += `<a class="branchContents ${content.type}${isDir ? '': ' closeOnClick'}" href="#">` +
+        //  content.type === "dir" ? '<span class="btn icon icon-file-symlink-file inline-block-tight"></span>' : "" +
         `<span class="filepath${isDir ? '':' closeOnClick'}">${content.name}</span>${isDir ? "..." : ""}</a>`;
     });
   } else {
@@ -258,7 +262,7 @@ async function fillInBranchContents(e) {
 
 async function fillInCommitLog(e) {
   let logTable = document.getElementById("logTable");
-  if(logTable) {
+  if (logTable) {
     // clear up previous logTable if it exists
     logTable.remove();
   }
@@ -557,7 +561,7 @@ let cmd = {
 
 // github API wrapper object
 let github;
-if(isLoggedIn) {
+if (isLoggedIn) {
   github = new Github("", githubToken, "", userLogin, userName, userEmail);
 }
 
@@ -681,7 +685,7 @@ function addEventListeners(cm, v) {
 }
 
 // handle Github commit UI
-function handleCommitButtonClicked(e) { 
+function handleCommitButtonClicked(e) {
   // TODO Let user know of success / failure, allow user to do something about it
   const messageInput = document.getElementById("commitMessageInput");
   const message = messageInput.value;
@@ -689,7 +693,7 @@ function handleCommitButtonClicked(e) {
   cm.readOnly = "nocursor"; // don't allow editor focus
   // try commiting to Github
   github.writeGithubRepo(cm.getValue(), message)
-    .then(() => { 
+    .then(() => {
       console.log(`Successfully written to github: ${github.githubRepo}${github.filepath}`);
       messageInput.value = "";
       github.readGithubRepo()
@@ -703,7 +707,9 @@ function handleCommitButtonClicked(e) {
           console.log("Couldn't read Github repo after writing commit: ", e, github);
         })
     })
-    .catch((e) => { console.log("Couldn't commit Github repo: ", e, github) });
+    .catch((e) => {
+      console.log("Couldn't commit Github repo: ", e, github)
+    });
 }
 
 // progress bar demo
@@ -775,8 +781,7 @@ function setKeyMap(keyMapFilePath) {
 
 window.onload = () => {
   // Initialise Github object if user is logged in
-  if(isLoggedIn) { 
+  if (isLoggedIn) {
     refreshGithubMenu();
   }
 }
-
