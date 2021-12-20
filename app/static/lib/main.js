@@ -654,7 +654,15 @@ function addEventListeners(cm, v) {
     .addEventListener('click', () => e.renumberMeasures(v, cm, true));
 
   // editor activity
-  cm.on('cursorActivity', () => v.cursorActivity(cm));
+  cm.on('cursorActivity', () => { 
+    v.cursorActivity(cm);
+    const commitUI = document.querySelector("#commitUI");
+    if(isLoggedIn && github.filepath && commitUI) {
+      const changesExist = cm.getValue() === github.content;
+      document.getElementById("commitMessageInput").disabled = changesExist;
+      document.getElementById("commitButton").disabled = changesExist;
+    }
+  });
 
   // flip button updates manually notation location to cursor pos in encoding
   document.getElementById('flip-btn').addEventListener('click', () => {
