@@ -33,17 +33,17 @@ import Viewer from './viewer.js';
 import Github from './github.js';
 
 
-const version = '0.1.0';
-const versionDate = '17 Dec 2021';
+const version = 'develop-speedmode-0.1.1';
+const versionDate = '20 Dec 2021';
 const defaultMeiFileName = `${root}/Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei`;
-const defaultOptions = {
+const defaultVerovioOptions = {
   scale: 55,
   breaks: "auto",
   header: "none",
   footer: "none",
   inputFrom: "mei",
-  // adjustPageHeight: true,
-  outputIndent: 4,
+  adjustPageHeight: "true",
+  outputIndent: 3,
   pageMarginLeft: 50,
   pageMarginRight: 25,
   pageMarginBottom: 10,
@@ -52,7 +52,9 @@ const defaultOptions = {
   spacingNonLinear: .5,
   minLastJustification: 0,
   clefChangeFactor: .83,
-  svgAdditionalAttribute: ["layer@n", "staff@n"]
+  svgAdditionalAttribute: ["layer@n", "staff@n"],
+  bottomMarginArtic: 1,
+  topMarginArtic: 1
 };
 const defaultKeyMap = `${root}/keymaps/default-keymap.json`;
 
@@ -62,12 +64,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
   cm = CodeMirror.fromTextArea(myTextarea, {
     lineNumbers: true,
-    lineWrapping: true,
+    lineWrapping: false,
     styleActiveLine: true,
     mode: "xml",
-    indentUnit: 4,
+    indentUnit: 3,
     smartIndent: true,
-    tabSize: 4,
+    tabSize: 3,
     autoCloseTags: true,
     autoCloseBrackets: true,
     matchTags: {
@@ -83,7 +85,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
   setOrientation(cm, 'bottom', v);
 
-  createControlsMenu(document.querySelector('.notation'), defaultOptions.scale);
+  createControlsMenu(
+    document.querySelector('.notation'), defaultVerovioOptions.scale);
 
   console.log('DOMContentLoaded. Trying now to load Verovio...');
   document.querySelector(".statusbar").innerHTML = "Loading Verovio.";
@@ -95,7 +98,7 @@ document.addEventListener('DOMContentLoaded', function() {
   vrvWorker.onmessage = workerEventsHandler;
 
   v = new Viewer(vrvWorker);
-  v.vrvOptions = defaultOptions;
+  v.vrvOptions = defaultVerovioOptions;
 
   addEventListeners(cm, v);
   addResizerHandlers(cm, v);
@@ -269,7 +272,8 @@ async function fillInCommitLog(e) {
   logTable.setAttribute("id", "logTable");
   let githubMenu = document.getElementById("GithubMenu");
   const headerRow = document.createElement("tr");
-  headerRow.innerHTML = "<th>Date</th><th>Author</th><th>Message</th><th>Commit</th>";
+  headerRow.innerHTML =
+    "<th>Date</th><th>Author</th><th>Message</th><th>Commit</th>";
   logTable.appendChild(headerRow);
   github.commitLog.forEach((c) => {
     const commitRow = document.createElement("tr");
@@ -303,7 +307,7 @@ function workerEventsHandler(ev) {
       document.querySelector(".statusbar").innerHTML =
         `Verovio ${tkVersion} loaded.`;
       setBreaksOptions(tkAvailableOptions);
-      v.updateAll(cm, defaultOptions);
+      v.updateAll(cm, defaultVerovioOptions);
       break;
     case 'mei': // returned from importData, importBinaryData
       mei = ev.data.mei;
@@ -311,7 +315,7 @@ function workerEventsHandler(ev) {
       v.updateNotation = false;
       cm.setValue(mei);
       v.updateNotation = true;
-      v.updateAll(cm, defaultOptions);
+      v.updateAll(cm, defaultVerovioOptions);
       break;
     case 'updated': // display SVG data on site
       if (ev.data.mei) {
@@ -431,7 +435,7 @@ export function openMei(file = defaultMeiFileName) {
                 v.updateNotation = false;
                 cm.setValue(mei);
                 v.updateNotation = true;
-                v.updateAll(cm, defaultOptions);
+                v.updateAll(cm, defaultVerovioOptions);
                 break;
               } else { // all other formats that Verovio imports
                 vrvWorker.postMessage({

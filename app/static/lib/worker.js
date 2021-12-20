@@ -1,9 +1,5 @@
-importScripts("https://www.verovio.org/javascript/latest/verovio-toolkit-hum.js");
-// importScripts('../verovio/verovio-toolkit-hum.js');
-
-// see also:
-// https://github.com/DDMAL/Neon/pull/426/commits/f52981ad0927644927e5249f9fbe4ab6e9413f86
-// https: //github.com/DDMAL/Neon/blob/master/src/workers/VerovioWorker.js
+importScripts("https://www.verovio.org/javascript/develop/verovio-toolkit-hum.js");
+// importScripts(`../verovio-toolkit-hum.js`);
 
 var tk;
 var tkOptions;

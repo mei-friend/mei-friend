@@ -7,6 +7,10 @@ export function setOrientation(cm, o = '', v = null) {
   let friendSz = document.querySelector(".friendContainer");
   var stylesheet = document.getElementById("orientationCSS");
   stylesheet.setAttribute('href', root + '/css/' + orientation + '.css');
+  // TODO: find a better solution for changing css and awaiting changes
+  // $("#orientationCSS").load(function() {
+  // v.updateLayout();
+  // }).attr('href', root + '/css/' + orientation + '.css');
   let sz = calcSizeOfContainer();
   friendSz.style.width = sz.width;
   friendSz.style.height = sz.height;
@@ -22,8 +26,9 @@ export function setOrientation(cm, o = '', v = null) {
     notation.style.height = sz.height; //- 6; TODO: remove when border removed
     cm.setSize(sz.width * (1 - notationProportion), sz.height);
   }
-  // redoLayout when done with loading
-  if (v) setTimeout(() => v.updateLayout(), 3);  
+  // console.info('Notation size: ' + notation.style.width + '/' + notation.style.height);
+  // redoLayout when done with loading TODO
+  if (v) setTimeout(() => v.updateLayout(), 33);
 }
 
 export function calcSizeOfContainer() {

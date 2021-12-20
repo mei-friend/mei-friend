@@ -163,7 +163,7 @@ export default class Viewer {
     let vp = document.querySelector('.verovio-panel');
     dimensions.width = vp.clientWidth;
     dimensions.height = vp.clientHeight;
-    // console.info('setVerovioOptions: old options: ', this.vrvOptions);
+    // console.info('client size: ' + dimensions.width + '/' + dimensions.height);
     if (this.vrvOptions.breaks !== "none") {
       this.vrvOptions.pageWidth = Math.max(Math.round(
         dimensions.width * (100 / this.vrvOptions.scale)), 600);
@@ -172,7 +172,7 @@ export default class Viewer {
     }
     if (this.vrvOptions.breaks === "encoded") {
       // delete this.vrvOptions.pageWidth;
-      delete this.vrvOptions.pageHeight;
+      // this.vrvOptions.pageHeight = Math.round(this.vrvOptions.pageWidth * 1.5);
     }
 
     // overwrite existing options if new ones are passed in

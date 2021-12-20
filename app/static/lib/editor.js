@@ -283,14 +283,14 @@ export function toggleArtic(v, cm, artic = "stacc") {
       uuid = toggleArticForNote(note, artic);
       uuid ? ids[i] = uuid : ids[i] = id;
       range = replaceInTextEditor(cm, note, true);
-      // txtEdr.autoIndentSelectedRows();
+      cm.execCommand('indentAuto');
     } else if (noteList = utils.findNotes(id)) {
       let noteId;
       for (noteId of noteList) {
         note = v.xmlDoc.querySelector("[*|id='" + noteId + "']");
         uuid = toggleArticForNote(note, artic);
         range = replaceInTextEditor(cm, note, true);
-        // txtEdr.autoIndentSelectedRows();
+        cm.execCommand('indentAuto');
       }
     }
   }
@@ -557,6 +557,13 @@ export function replaceInTextEditor(cm, xmlNode, select = false, newNode = null)
   } else if (select) {
     sc = cm.getSearchCursor(newMEI);
     if (sc.findNext()) {
+      let c = cm.getCursor();
+      for (let l = sc.from().line; l <= sc.to().line; l++) {
+        if (isEmpty(cm.getLine(l))) {
+          cm.setCursor(l, c.ch);
+          cm.execCommand('deleteLine');
+        }
+      }
       // for (r = range.start.row; r <= range.end.row; r++)
       //   if (textBuffer.isRowBlank(r)) textBuffer.deleteRow(r);
       cm.setSelection(sc.from(), sc.to());

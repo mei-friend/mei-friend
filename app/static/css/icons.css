@@ -76,3 +76,7 @@
 .icon-arrow-down {
   background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M13.03 8.22a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06 0L3.47 9.28a.75.75 0 011.06-1.06l2.97 2.97V3.75a.75.75 0 011.5 0v7.44l2.97-2.97a.75.75 0 011.06 0z"/></svg>');
 }
+
+.icon-slur {
+  background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M16783,1865 C16915,1699 17327,1699 17459,1865 C17327,1761 16915,1761 16783,1865" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="9"></path>/svg>');
+}
