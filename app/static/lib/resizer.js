@@ -26,7 +26,7 @@ export function setOrientation(cm, o = '', v = null) {
     notation.style.height = sz.height; //- 6; TODO: remove when border removed
     cm.setSize(sz.width * (1 - notationProportion), sz.height);
   }
-  console.info('Notation size: ' + notation.style.width + '/' + notation.style.height);
+  // console.info('Notation size: ' + notation.style.width + '/' + notation.style.height);
   // redoLayout when done with loading TODO
   if (v) setTimeout(() => v.updateLayout(), 33);
 }

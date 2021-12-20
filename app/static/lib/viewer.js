@@ -163,8 +163,7 @@ export default class Viewer {
     let vp = document.querySelector('.verovio-panel');
     dimensions.width = vp.clientWidth;
     dimensions.height = vp.clientHeight;
-    console.info('client size: ' + dimensions.width + '/' + dimensions.height);
-    // console.info('setVerovioOptions: old options: ', this.vrvOptions);
+    // console.info('client size: ' + dimensions.width + '/' + dimensions.height);
     if (this.vrvOptions.breaks !== "none") {
       this.vrvOptions.pageWidth = Math.max(Math.round(
         dimensions.width * (100 / this.vrvOptions.scale)), 600);
