@@ -52,7 +52,9 @@ const defaultOptions = {
   spacingNonLinear: .5,
   minLastJustification: 0,
   clefChangeFactor: .83,
-  svgAdditionalAttribute: ["layer@n", "staff@n"]
+  svgAdditionalAttribute: ["layer@n", "staff@n"],
+  bottomMarginArtic: 1,
+  topMarginArtic: 1
 };
 const defaultKeyMap = `${root}/keymaps/default-keymap.json`;
 
