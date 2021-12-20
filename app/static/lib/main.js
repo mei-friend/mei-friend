@@ -33,8 +33,8 @@ import Viewer from './viewer.js';
 import Github from './github.js';
 
 
-const version = '0.1.0';
-const versionDate = '17 Dec 2021';
+const version = 'develop-0.1.1';
+const versionDate = '20 Dec 2021';
 const defaultMeiFileName = `${root}/Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei`;
 const defaultOptions = {
   scale: 55,
@@ -42,8 +42,8 @@ const defaultOptions = {
   header: "none",
   footer: "none",
   inputFrom: "mei",
-  // adjustPageHeight: true,
-  outputIndent: 4,
+  adjustPageHeight: "true",
+  outputIndent: 3,
   pageMarginLeft: 50,
   pageMarginRight: 25,
   pageMarginBottom: 10,
@@ -67,9 +67,9 @@ document.addEventListener('DOMContentLoaded', function() {
     lineWrapping: true,
     styleActiveLine: true,
     mode: "xml",
-    indentUnit: 4,
+    indentUnit: 3,
     smartIndent: true,
-    tabSize: 4,
+    tabSize: 3,
     autoCloseTags: true,
     autoCloseBrackets: true,
     matchTags: {
@@ -623,7 +623,7 @@ function addEventListeners(cm, v) {
   document.getElementById('font-select')
     .addEventListener('change', () => v.updateOption());
   document.getElementById('breaks-select')
-    .addEventListener('change', () => v.updateLayout()); // DEBUG should be
+    .addEventListener('change', () => v.updateAll(cm)); // DEBUG should be
   // DEBUG                      v.updateLayout() BUG in Verovio tk? (5 Dec 2021)
   // navigation
   document.getElementById('backwards-btn')

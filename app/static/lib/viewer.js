@@ -172,7 +172,7 @@ export default class Viewer {
     }
     if (this.vrvOptions.breaks === "encoded") {
       // delete this.vrvOptions.pageWidth;
-      delete this.vrvOptions.pageHeight;
+      // this.vrvOptions.pageHeight = Math.round(this.vrvOptions.pageWidth * 1.5);
     }
 
     // overwrite existing options if new ones are passed in
