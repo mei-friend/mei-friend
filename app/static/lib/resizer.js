@@ -6,7 +6,7 @@ export function setOrientation(cm, o = '', v = null) {
   if (o) orientation = o;
   let friendSz = document.querySelector(".friendContainer");
   var stylesheet = document.getElementById("orientationCSS");
-  stylesheet.setAttribute('href', root + '/css/' + orientation + '.css');
+  stylesheet.setAttribute('href', root + 'css/' + orientation + '.css');
   // TODO: find a better solution for changing css and awaiting changes
   // $("#orientationCSS").load(function() {
   // v.updateLayout();

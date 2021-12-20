@@ -35,7 +35,7 @@ import Github from './github.js';
 
 const version = 'develop-speedmode-0.1.1';
 const versionDate = '20 Dec 2021';
-const defaultMeiFileName = `${root}/Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei`;
+const defaultMeiFileName = `${root}Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei`;
 const defaultVerovioOptions = {
   scale: 55,
   breaks: "auto",
@@ -56,7 +56,7 @@ const defaultVerovioOptions = {
   bottomMarginArtic: 1,
   topMarginArtic: 1
 };
-const defaultKeyMap = `${root}/keymaps/default-keymap.json`;
+const defaultKeyMap = `${root}keymaps/default-keymap.json`;
 
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -94,7 +94,7 @@ document.addEventListener('DOMContentLoaded', function() {
     "<a href='https://github.com/wergo/mei-friend-online'>mei-friend " +
     version + "</a> (" + versionDate + ").&nbsp;";
 
-  vrvWorker = new Worker(`${root}/lib/worker.js`);
+  vrvWorker = new Worker(`${root}lib/worker.js`);
   vrvWorker.onmessage = workerEventsHandler;
 
   v = new Viewer(vrvWorker);
@@ -359,6 +359,20 @@ function workerEventsHandler(ev) {
       v.setNotationColors();
       v.updateHighlight(cm);
       v.setFocusToVerovioPane();
+      break;
+    case 'midi': // export MIDI file
+      const byteCharacters = atob(ev.data.midi);
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      const blob = new Blob([new Uint8Array(byteNumbers)], {
+        type: 'audio/midi'
+      });
+      var a = document.createElement('a');
+      a.download = meiFileName.replace(/\.[^/.]+$/, '.mid');
+      a.href = window.URL.createObjectURL(blob);
+      a.click();
   }
 }
 
@@ -481,6 +495,37 @@ function openFileDialog(accept = '*') {
   input.click();
 }
 
+function downloadMei() {
+  let blob = new Blob([cm.getValue()], {
+    type: 'text/plain'
+  });
+  let a = document.createElement('a');
+  a.download = meiFileName;
+  a.href = window.URL.createObjectURL(blob);
+  a.click();
+}
+
+function downloadMidi() {
+  let message = {
+    'cmd': 'exportMidi',
+    'options': v.vrvOptions,
+    'mei': cm.getValue()
+  };
+  vrvWorker.postMessage(message);
+}
+
+function downloadSvg() {
+  let svg = document.querySelector('.verovio-panel').innerHTML;
+  let blob = new Blob([svg], {
+    type: 'image/svg+xml'
+  });
+  let a = document.createElement('a');
+  a.download = meiFileName.replace(/\.[^/.]+$/, '.svg');;
+  a.href = window.URL.createObjectURL(blob);
+  a.click();
+}
+
+
 // object of interface command functions for buttons and key bindings
 let cmd = {
   'firstPage': () => v.updatePage(cm, 'first'),
@@ -584,6 +629,13 @@ document.getElementById('ImportHumdrum')
   .addEventListener('click', cmd.openHumdrum);
 document.getElementById('ImportPae')
   .addEventListener('click', cmd.openPae);
+document.getElementById('SaveMei')
+  .addEventListener('click', downloadMei);
+document.getElementById('SaveSvg')
+  .addEventListener('click', downloadSvg);
+document.getElementById('SaveMidi')
+  .addEventListener('click', downloadMidi);
+
 
 // drag'n'drop handlers
 let fc = document.querySelector('.dragContainer');

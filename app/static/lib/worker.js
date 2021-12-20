@@ -161,6 +161,17 @@ onmessage = function(e) {
         log(e);
       }
       break;
+    case 'exportMidi': // re-load data and export MIDI base-64 string
+      try { //
+        var tkOptions = result.options;
+        tk.setOptions(tkOptions);
+        tk.loadData(result.mei);
+        result.midi = tk.renderToMidi();
+        result.cmd = 'midi';
+      } catch (e) {
+        log(e);
+      }
+      break;
     case 'getTimeForElement':
       try {
         result = {

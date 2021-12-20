@@ -63,7 +63,7 @@
           <a id="ImportPae" href="#">Import PAE, ABC</a>
           <hr class="dropdown-line">
           <a id="SaveMei" href="#">Save MEI</a>
-          <a id="SavePdf" href="#">Save PDF</a>
+          <a id="SaveSvg" href="#">Save SVG</a>
           <a id="SaveMidi" href="#">Save MIDI</a>
         </div>
       </div>
@@ -76,22 +76,33 @@
           <a id="right" href="#">Notation right</a>
           <hr class="dropdown-line">
           <a id="rockbar" href="#">Move status bar</a>
-          <a id="DoThis" href="#">Do this</a>
-          <a id="DoThat" href="#">Do that</a>
         </div>
       </div>
       <div class="dropdown">
         <button class="dropbtn">Manipulate</button>
         <div class="dropdown-content" id="Manipulate">
+          <a id="invertPlacement" href="#">Invert placement</a>
+          <hr class="dropdown-line">
+          <a id="delete" href="#">Delete element</a>
+          <hr class="dropdown-line">
+          <a id="pitchUp" href="#">Pitch 1 tone up</a>
+          <a id="pitchDown" href="#">Pitch 1 tone down</a>
+          <a id="pitchOctaveUp" href="#">Pitch 1 octave up</a>
+          <a id="pitchOctaveDown" href="#">Pitch 1 octave down</a>
+          <a id="staffUp" href="#">Move element 1 staff down</a>
+          <a id="staffDown" href="#">Move element 1 staff down</a>
+          <hr class="dropdown-line">
           <a id="cleanAccid" href="#">Clean @accid.ges</a>
           <a id="renumTest" href="#">Renumber measures (test)</a>
           <a id="renumExec" href="#">Renumber measures (exec)</a>
-          <hr class="dropdown-line">
         </div>
       </div>
       <div class="dropdown">
         <button class="dropbtn">Insert</button>
         <div class="dropdown-content" id="Insert">
+          <a id="addTempo" href="#">
+            <img src="{{ url_for('static', filename='svg/fermata.svg') }}" class="menu-icon" />Tempo
+          </a>
           <a id="addFermata" href="#">
             <img src="{{ url_for('static', filename='svg/fermata.svg') }}" class="menu-icon" />Fermata
           </a>
