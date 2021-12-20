@@ -33,7 +33,7 @@ import Viewer from './viewer.js';
 import Github from './github.js';
 
 
-const version = 'develop-0.1.1';
+const version = 'develop-speedmode-0.1.1';
 const versionDate = '20 Dec 2021';
 const defaultMeiFileName = `${root}/Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei`;
 const defaultOptions = {
@@ -623,7 +623,7 @@ function addEventListeners(cm, v) {
   document.getElementById('font-select')
     .addEventListener('change', () => v.updateOption());
   document.getElementById('breaks-select')
-    .addEventListener('change', () => v.updateAll(cm)); // DEBUG should be
+    .addEventListener('change', () => v.updateLayout()); // DEBUG should be
   // DEBUG                      v.updateLayout() BUG in Verovio tk? (5 Dec 2021)
   // navigation
   document.getElementById('backwards-btn')
