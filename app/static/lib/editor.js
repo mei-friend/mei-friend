@@ -146,7 +146,7 @@ export function addCtrlEl(v, cm, elName, placement, form) {
   }
   if (['arpeg'].includes(elName)) {
     let plistString = '';
-    for (e of v.selectedElements) {
+    for (let e of v.selectedElements) {
       plistString += '#' + e + ' ';
     }
     newElement.setAttribute('plist', plistString);
