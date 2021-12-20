@@ -72,7 +72,8 @@ export function delEl(v, cm) {
 }
 
 export function addCtrlEl(v, cm, elName, placement, form) {
-  if (v.selectedElements.length < 1) return;
+  if (v.selectedElements.length == undefined || v.selectedElements.length < 1)
+    return;
   v.selectedElements = utils.sortElementsByScorePosition(v.selectedElements);
   v.selectedElements = speed.filterElements(v.selectedElements, v.xmlDoc);
   console.info('addCtrlEl() ', elName, placement, form);

@@ -1,4 +1,5 @@
 <html>
+
 <head>
   <meta charset="utf-8">
   <title>mei-friend online</title>
@@ -11,20 +12,20 @@
     referrerpolicy="no-referrer">
   </script> -->
   <!-- inject GitHub OAuth response details if available -->
-    <script src="{{ url_for('static', filename='lib/jsgit.js') }}"></script>
-    <script src="{{ url_for('static', filename='lib/github.js') }}" type="module"></script>
-    <script>
-      let isLoggedIn;
-      let root = "{{ url_for('static', filename='') }}";
-    </script>
+  <script src="{{ url_for('static', filename='lib/jsgit.js') }}"></script>
+  <script src="{{ url_for('static', filename='lib/github.js') }}" type="module"></script>
+  <script>
+    let isLoggedIn;
+    let root = "{{ url_for('static', filename='') }}";
+  </script>
   {% if isLoggedIn %}
-    <script>
-      isLoggedIn = true;
-      const githubToken = "{{ githubToken }}";
-      const userLogin = "{{ userLogin }}";
-      const userName = "{{ userName }}";
-      const userEmail = "{{ userEmail }}";
-    </script>
+  <script>
+    isLoggedIn = true;
+    const githubToken = "{{ githubToken }}";
+    const userLogin = "{{ userLogin }}";
+    const userName = "{{ userName }}";
+    const userEmail = "{{ userEmail }}";
+  </script>
   {% endif %}
   <script src="{{ url_for('static', filename='CodeMirror/lib/codemirror.js') }}"></script>
   <link href="{{ url_for('static', filename='CodeMirror/lib/codemirror.css') }}" rel="stylesheet" />
@@ -40,7 +41,8 @@
   <script src="{{ url_for('static', filename='CodeMirror/addon/search/searchcursor.js') }}"></script>
   <script src="{{ url_for('static', filename='CodeMirror/addon/hint/show-hint.js') }}"></script>
   <script src="{{ url_for('static', filename='CodeMirror/addon/hint/xml-hint.js') }}"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer">
+  </script>
   <!--
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jshint/2.13.1/jshint.min.js" integrity="sha512-d54ZkbDqP0rlo/mmCO9nJ5tfpigsfTUPztnGEloitkJh5p2Bu4UsY8KMvAqUILBdTKGE7T6YMOuF0yXuNlpq/A==" crossorigin="anonymous" referrerpolicy="no-referrer">
   </script>
@@ -88,11 +90,22 @@
         </div>
       </div>
       <div class="dropdown">
+        <button class="dropbtn">Insert</button>
+        <div class="dropdown-content" id="Insert">
+          <a id="addFermata" href="#">
+            <img src="{{ url_for('static', filename='svg/fermata.svg') }}" class="menu-icon" />Fermata
+          </a>
+          <a id="addSlur" href="#">
+            <img src="{{ url_for('static', filename='svg/slur.svg') }}" class="wide-menu-icon" />Slur
+          </a>
+        </div>
+      </div>
+      <div class="dropdown">
         {% if isLoggedIn -%}
-          <button class="dropbtn"><img id="GithubLogo" src="{{ url_for('static', filename='img/GitHub-Mark-32px.png') }}"/>{{userName}}</button>
-          <div class="dropdown-content" id="GithubMenu"></div>
+        <button class="dropbtn"><img id="GithubLogo" src="{{ url_for('static', filename='img/GitHub-Mark-32px.png') }}" />{{userName}}</button>
+        <div class="dropdown-content" id="GithubMenu"></div>
         {% else %}
-          <a class="dropbtn" id="GithubLogin" href="/login"><img id="GithubLogo" src="{{ url_for('static', filename='img/GitHub-Mark-32px.png') }}"/>Login</a>
+        <a class="dropbtn" id="GithubLogin" href="/login"><img id="GithubLogo" src="{{ url_for('static', filename='img/GitHub-Mark-32px.png') }}" />Login</a>
         {% endif %}
       </div>
       <div class="dropdown">
@@ -131,16 +144,16 @@
     // menu bar behavior like MacOS menu bars
     let show = false;
     document.querySelector(".navbar").addEventListener("click", (ev) => {
-    var menuList = document.querySelectorAll(".dropdown-content");
-    menuList.forEach((e) => {
-      if(show && (!ev.target.closest("#GithubMenu") || ev.target.classList.contains("closeOnClick"))) {
-        e.classList.remove('show');
-      } else {
-        e.classList.add('show');
-      }
-    })
+      var menuList = document.querySelectorAll(".dropdown-content");
+      menuList.forEach((e) => {
+        if (show && (!ev.target.closest("#GithubMenu") || ev.target.classList.contains("closeOnClick"))) {
+          e.classList.remove('show');
+        } else {
+          e.classList.add('show');
+        }
+      })
 
-    show = !show;
+      show = !show;
     });
   </script>
 </body>

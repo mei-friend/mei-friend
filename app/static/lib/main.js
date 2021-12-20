@@ -625,8 +625,7 @@ function addEventListeners(cm, v) {
   document.getElementById('font-select')
     .addEventListener('change', () => v.updateOption());
   document.getElementById('breaks-select')
-    .addEventListener('change', () => v.updateLayout()); // DEBUG should be
-  // DEBUG                      v.updateLayout() BUG in Verovio tk? (5 Dec 2021)
+    .addEventListener('change', () => v.updateLayout());
   // navigation
   document.getElementById('backwards-btn')
     .addEventListener('click', cmd.previousNote);
@@ -636,6 +635,11 @@ function addEventListeners(cm, v) {
     .addEventListener('click', cmd.layerUp);
   document.getElementById('downwards-btn')
     .addEventListener('click', cmd.layerDown);
+  // insert control elements
+  document.getElementById('addSlur')
+    .addEventListener('click', cmd.addSlur);
+  document.getElementById('addFermata')
+    .addEventListener('click', cmd.addFermata);
 
   // update encoding through Verovio
   document.getElementById('verovio-btn')
@@ -658,10 +662,10 @@ function addEventListeners(cm, v) {
     .addEventListener('click', () => e.renumberMeasures(v, cm, true));
 
   // editor activity
-  cm.on('cursorActivity', () => { 
+  cm.on('cursorActivity', () => {
     v.cursorActivity(cm);
     const commitUI = document.querySelector("#commitUI");
-    if(isLoggedIn && github.filepath && commitUI) {
+    if (isLoggedIn && github.filepath && commitUI) {
       const changesExist = cm.getValue() === github.content;
       document.getElementById("commitMessageInput").disabled = changesExist;
       document.getElementById("commitButton").disabled = changesExist;

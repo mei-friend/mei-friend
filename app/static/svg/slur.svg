@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<svg width="127.81446" height="44.65096" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" transform="scale(1,-1)">
+    <metadata id="metadata1671">image/svg+xml</metadata>
+    <defs>
+        <g id="g6">
+            <symbol id="glyph0-0">
+                <path id="path9"/>
+            </symbol>
+        </g>
+    </defs>
+    <g>
+        <rect fill="none" id="canvas_background" height="46.65096" width="129.81446" y="-1" x="-1"/>
+    </g>
+    <g>
+        <g fill="#000000" id="g123">
+            <use xlink:href="#glyph0-0" height="841.88977" width="595.27557" y="-34.850216" x="9.230923" id="use125"/>
+        </g>
+        <path fill="#000000" fill-rule="nonzero" id="path1185"
+            d="m124.62516,0.490562c-28.278198,55.580307 -95.61935,55.580307 -123.897534,0c28.278184,44.627869 95.619336,44.627869 123.897534,0"/>
+    </g>
+</svg>
