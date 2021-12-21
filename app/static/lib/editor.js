@@ -206,6 +206,9 @@ export function invertPlacement(v, cm, modifier = false) {
         (att.dataPlacement.includes(val) && el.getAttribute(attr) != 'below')) {
         val = 'below';
       }
+      if (el.nodeName == 'fermata')
+        val == 'below' ?
+        el.setAttribute('form', 'inv') : el.removeAttribute('form');
       el.setAttribute(attr, val);
       range = replaceInTextEditor(cm, el, true);
       // txtEdr.autoIndentSelectedRows();

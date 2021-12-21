@@ -166,7 +166,7 @@ onmessage = function(e) {
         var tkOptions = result.options;
         tk.setOptions(tkOptions);
         tk.loadData(result.mei);
-        result.midi = tk.renderToMidi();
+        result.midi = tk.renderToMIDI();
         result.cmd = 'midi';
       } catch (e) {
         log(e);
