@@ -48,3 +48,4 @@
 * Add menu items
 * Support for downloading MEI, SVG, MIDI
 * Some editor improvements
+* Github menu moved to be first, styling improved

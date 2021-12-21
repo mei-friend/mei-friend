@@ -34,7 +34,7 @@ import Viewer from './viewer.js';
 import Github from './github.js';
 
 
-const version = 'develop-0.1.1';
+const version = '0.1.1';
 const versionDate = '21 Dec 2021';
 const defaultMeiFileName = `${root}Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei`;
 const defaultVerovioOptions = {
