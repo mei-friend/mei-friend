@@ -50,5 +50,5 @@
 * Some editor improvements
 * Github menu moved to be first, styling improved
 # 0.1.2 patch
-* Inverting fermata changes format
+* Inverting fermata changes form
 * Re-render MEI without xml:id option
