@@ -44,3 +44,7 @@
 * Allow navigation of branch files
 * Load encoding file from branch
 * Author commit message and commit changes
+# 0.1.1 patch: Add menu items
+* Add menu items
+* Support for downloading MEI, SVG, MIDI
+* Some editor improvements
