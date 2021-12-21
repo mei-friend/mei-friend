@@ -321,12 +321,13 @@ function workerEventsHandler(ev) {
       v.updateAll(cm, defaultVerovioOptions);
       break;
     case 'updated': // display SVG data on site
-      if (ev.data.mei) {
+      if (ev.data.mei) { // from reRenderMEI
         v.updateNotation = false;
-        cm.setValue(ev.data.mei); // from reRenderMEI
+        cm.setValue(ev.data.mei);
         v.updateNotation = true;
         v.selectedElements = [];
-        v.selectedElements.push(ev.data.xmlId);
+        if (!ev.data.removeIds)
+          v.selectedElements.push(ev.data.xmlId);
       }
       if (ev.data.pageCount) v.pageCount = ev.data.pageCount;
       v.currentPage = ev.data.pageNo;
@@ -773,12 +774,13 @@ function addEventListeners(cm, v) {
 
   // update encoding through Verovio
   document.getElementById('verovio-btn')
-    .addEventListener('click', () => vrvWorker.postMessage({
+    .addEventListener('click', (ev) => vrvWorker.postMessage({
       'cmd': 'reRenderMEI',
       'format': 'mei',
       'mei': cm.getValue(),
       'xmlId': v.selectedElements[0],
-      'pageNo': v.currentPage
+      'pageNo': v.currentPage,
+      'removeIds': ev.altKey
     }));
   document.getElementById('help-btn')
     .addEventListener('click', () => window.open('/help', '_blank'));

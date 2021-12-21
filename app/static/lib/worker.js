@@ -142,14 +142,17 @@ onmessage = function(e) {
       try {
         tk.loadData(result.mei);
         result.setCursorToPageBeginning = true;
-        if (result.xmlId) {
+        if (result.xmlId && !result.removeIds) {
           result.pageNo = parseInt(tk.getPageWithElement(result.xmlId));
           result.setCursorToPageBeginning = false;
         }
         result.svg = tk.renderToSVG(result.pageNo);
         result.cmd = 'updated';
         result.pageCount = tk.getPageCount();
-        result.mei = tk.getMEI();
+        if (result.removeIds) result.mei = tk.getMEI({
+          'removeIds': result.removeIds
+        })
+        else result.mei = tk.getMEI();
       } catch (e) {
         log(e);
       }
