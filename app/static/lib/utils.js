@@ -319,6 +319,7 @@ export function hasTag(textEditor, tag = '<mei') {
 
 // sort note elements in array (of xml:ids) by x coordinate of element
 export function sortElementsByScorePosition(arr) {
+  if (!Array.isArray(arr)) return;
   let j, i;
   let Xs = []; // create array of x values of the ids in arr
   arr.forEach(item => {

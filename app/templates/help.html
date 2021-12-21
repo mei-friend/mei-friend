@@ -9,9 +9,8 @@
 <body>
 
   <script>
-    let shiftKey = "&#8679"; // SHIFT
+    let shiftKey = "&#8679;"; // SHIFT
     let altKey = "&#8997;"; // ALT
-
     let cmdKey = "&#8963;"; // CTRL
     let cmd2Key = "&#8997;"; // ALT
     if (navigator.platform.startsWith('Mac')) {
@@ -21,9 +20,9 @@
 
     document.addEventListener('DOMContentLoaded', () => {
       document.querySelectorAll(".cmdKey").forEach(e => e.innerHTML = cmdKey);
-      document.querySelectorAll(".altKey").forEach(e => e.innerHTML = altKey);
       document.querySelectorAll(".cmd2Key").forEach(e => e.innerHTML = cmd2Key);
       document.querySelectorAll(".shiftKey").forEach(e => e.innerHTML = shiftKey);
+      document.querySelectorAll(".altKey").forEach(e => e.innerHTML = altKey);
     });
   </script>
 
@@ -129,19 +128,19 @@
         <table>
           <h3 class='text-highlight'>Moving elements</h3>
           <tr>
-            <td><span class="keyIcon">&#8679;</span><span class="keyIcon">&uarr;</span></td>
+            <td><span class="keyIcon shiftKey"></span><span class="keyIcon">&uarr;</span></td>
             <td>Move note, rest, mRest, multiRest one tone upwards </td>
           </tr>
           <tr>
-            <td><span class="keyIcon">&#8679;</span><span class="keyIcon">&darr;</span></td>
+            <td><span class="keyIcon shiftKey"></span><span class="keyIcon">&darr;</span></td>
             <td>Move note, rest, mRest, multiRest one tone downwards</td>
           </tr>
           <tr>
-            <td><span class="keyIcon cmdKey"></span><span class="keyIcon">&#8679;</span><span class="keyIcon">&uarr;</span></td>
+            <td><span class="keyIcon cmdKey"></span><span class="keyIcon shiftKey"></span><span class="keyIcon">&uarr;</span></td>
             <td>Move note, rest, mRest, multiRest one octave upwards </td>
           </tr>
           <tr>
-            <td><span class="keyIcon cmdKey"></span><span class="keyIcon">&#8679;</span><span class="keyIcon">&darr;</span></td>
+            <td><span class="keyIcon cmdKey"></span><span class="keyIcon shiftKey"></span><span class="keyIcon">&darr;</span></td>
             <td>Move note, rest, mRest, multiRest one octave downwards</td>
           </tr>
           <tr>
@@ -169,15 +168,15 @@
         <h3 class="text-highlight">MEI encoding manipulation</h3>
         <table>
           <tr>Renumber measures (counts successive measures with @metcon="false" as one, counts multiple endings with same numbering)
-            <td><span class="keyIcon">&#8679;</span><span class="keyIcon">R</span></td>
+            <td><span class="keyIcon shiftKey"></span><span class="keyIcon">R</span></td>
             <td>Test renumbering (output to console)</td>
           </tr>
           <tr>
-            <td><span class="keyIcon">&#8963;</span><span class="keyIcon">&#8679;</span><span class="keyIcon">R</span></td>
+            <td><span class="keyIcon">&#8963;</span><span class="keyIcon shiftKey"></span><span class="keyIcon">R</span></td>
             <td>Execute renumbering</td>
           </tr>
           <tr>
-            <td><span class="keyIcon">&#8679;</span><span class="keyIcon">C</span></td>
+            <td><span class="keyIcon shiftKey"></span><span class="keyIcon">C</span></td>
             <td>Remove @accid.ges when @accid is present </td>
           </tr>
         </table>
@@ -195,12 +194,8 @@
         </p>
         <table>
           <tr>
-            <td><span class="keyIcon">&#8679;</span><span class="keyIcon">T</span></td>
+            <td><span class="keyIcon shiftKey"></span><span class="keyIcon">T</span></td>
             <td>Insert tempo above selected note(s)</td>
-          </tr>
-          <tr>
-            <td><span class="keyIcon">F</span></td>
-            <td>Insert fermata above selected note</td>
           </tr>
           <tr>
             <td><span class="keyIcon">I</span></td>
@@ -228,8 +223,12 @@
             <td>Insert crescendo hairpin starting/ending above selected notes</td>
           </tr>
           <tr>
-            <td><span class="keyIcon">&#8679;</span><span class="keyIcon">H</span></td>
+            <td><span class="keyIcon shiftKey"></span><span class="keyIcon">H</span></td>
             <td>Insert diminuendo hairpin starting/ending above selected notes</td>
+          </tr>
+          <tr>
+            <td><span class="keyIcon">B</span></td>
+            <td>Insert beam on selected notes/chords sharing identical parent</td>
           </tr>
         </table>
       </div>
@@ -239,6 +238,10 @@
           <tr>
             <td><span class="keyIcon">A</span></td>
             <td>Insert arpeggio for selected note(s)</td>
+          </tr>
+          <tr>
+            <td><span class="keyIcon">F</span></td>
+            <td>Insert fermata above selected note</td>
           </tr>
           <tr>
             <td><span class="keyIcon">G</span></td>
@@ -253,16 +256,16 @@
             <td>Insert pedal up for selected note(s)</td>
           </tr>
           <tr>
+            <td><span class="keyIcon">L</span></td>
+            <td>Insert trill to selected note(s)</td>
+          </tr>
+          <tr>
             <td><span class="keyIcon">N</span></td>
             <td>Insert turn to selected note(s) (with SHIFT: lower form)</td>
           </tr>
           <tr>
             <td><span class="keyIcon">M</span></td>
             <td>Insert mordent to selected note(s) (with SHIFT: upper form)</td>
-          </tr>
-          <tr>
-            <td><span class="keyIcon">L</span></td>
-            <td>Insert trill to selected note(s)</td>
           </tr>
         </table>
       </div>
@@ -275,11 +278,7 @@
           </tr>
           <tr>
             <td><span class="keyIcon altKey"></span><span class="keyIcon">O</span></td>
-            <td>Insert octave shift above (15va), spanning two selected notes/chords (below ith CTRL)</td>
-          </tr>
-          <tr>
-            <td><span class="keyIcon">B</span></td>
-            <td>Insert beam on selected notes/chords sharing identical parent</td>
+            <td>Insert octave shift above (15va), spanning two selected notes/chords (below with CTRL)</td>
           </tr>
         </table>
       </div>
@@ -290,23 +289,23 @@
       <h3 class="text-highlight">Toggle articulation</h3>
       <table>
         <tr>
-          <td><span class="keyIcon">&#8679;</span><span class="keyIcon">S</span></td>
+          <td><span class="keyIcon shiftKey"></span><span class="keyIcon">S</span></td>
           <td>Toggle staccato on note/chord</td>
         </tr>
         <tr>
-          <td><span class="keyIcon">&#8679;</span><span class="keyIcon">V</span></td>
+          <td><span class="keyIcon shiftKey"></span><span class="keyIcon">V</span></td>
           <td>Toggle accent on note/chord</td>
         </tr>
         <tr>
-          <td><span class="keyIcon">&#8679;</span><span class="keyIcon">N</span></td>
+          <td><span class="keyIcon shiftKey"></span><span class="keyIcon">N</span></td>
           <td>Toggle tenuto on note/chord</td>
         </tr>
         <tr>
-          <td><span class="keyIcon">&#8679;</span><span class="keyIcon">O</span></td>
+          <td><span class="keyIcon shiftKey"></span><span class="keyIcon">O</span></td>
           <td>Toggle marcato on note/chord</td>
         </tr>
         <tr>
-          <td><span class="keyIcon">&#8679;</span><span class="keyIcon">I</span></td>
+          <td><span class="keyIcon shiftKey"></span><span class="keyIcon">I</span></td>
           <td>Toggle staccatissimo on note/chord</td>
         </tr>
       </table>

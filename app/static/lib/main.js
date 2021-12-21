@@ -19,7 +19,8 @@ import {
 } from './dragger.js';
 import {
   createControlsMenu,
-  setBreaksOptions
+  setBreaksOptions,
+  addModifyerKeys
 } from './control-menu.js';
 import {
   setCursorToId
@@ -87,6 +88,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   createControlsMenu(
     document.querySelector('.notation'), defaultVerovioOptions.scale);
+  addModifyerKeys(document); //
 
   console.log('DOMContentLoaded. Trying now to load Verovio...');
   document.querySelector(".statusbar").innerHTML = "Loading Verovio.";
@@ -573,16 +575,16 @@ let cmd = {
   'addGlissando': () => e.addCtrlEl(v, cm, 'gliss'),
   'addPedalDown': () => e.addCtrlEl(v, cm, 'pedal', 'down'),
   'addPedalUp': () => e.addCtrlEl(v, cm, 'pedal', 'up'),
-  'addMordentAbove': () => e.addCtrlEl(v, cm, 'mordent', 'above', 'lower'),
-  'addMordentBelow': () => e.addCtrlEl(v, cm, 'mordent', 'below', 'lower'),
-  'addMordentAboveUpper': () => e.addCtrlEl(v, cm, 'mordent', 'above', 'upper'),
-  'addMordentBelowUpper': () => e.addCtrlEl(v, cm, 'mordent', 'below', 'upper'),
   'addTrillAbove': () => e.addCtrlEl(v, cm, 'trill', 'above'),
   'addTrillBelow': () => e.addCtrlEl(v, cm, 'trill', 'below'),
   'addTurnAbove': () => e.addCtrlEl(v, cm, 'turn', 'above', 'upper'),
   'addTurnBelow': () => e.addCtrlEl(v, cm, 'turn', 'below', 'upper'),
   'addTurnAboveLower': () => e.addCtrlEl(v, cm, 'turn', 'above', 'lower'),
   'addTurnBelowLower': () => e.addCtrlEl(v, cm, 'turn', 'below', 'lower'),
+  'addMordentAbove': () => e.addCtrlEl(v, cm, 'mordent', 'above', 'lower'),
+  'addMordentBelow': () => e.addCtrlEl(v, cm, 'mordent', 'below', 'lower'),
+  'addMordentAboveUpper': () => e.addCtrlEl(v, cm, 'mordent', 'above', 'upper'),
+  'addMordentBelowUpper': () => e.addCtrlEl(v, cm, 'mordent', 'below', 'upper'),
   //
   'delete': () => e.delEl(v, cm),
   'invertPlacement': () => e.invertPlacement(v, cm),
@@ -618,7 +620,6 @@ document.getElementById('top').addEventListener('click', cmd.notationTop);
 document.getElementById('bottom').addEventListener('click', cmd.notationBottom);
 document.getElementById('left').addEventListener('click', cmd.notationLeft);
 document.getElementById('right').addEventListener('click', cmd.notationRight);
-document.getElementById("rockbar").addEventListener('click', cmd.moveProgBar);
 
 // open dialogs
 document.getElementById('OpenMei')
@@ -687,11 +688,87 @@ function addEventListeners(cm, v) {
     .addEventListener('click', cmd.layerUp);
   document.getElementById('downwards-btn')
     .addEventListener('click', cmd.layerDown);
+  // manipulation
+  document.getElementById('invertPlacement')
+    .addEventListener('click', cmd.invertPlacement);
+  document.getElementById('delete')
+    .addEventListener('click', cmd.delete);
+  document.getElementById('pitchUp')
+    .addEventListener('click', cmd.shiftPitchNameUp);
+  document.getElementById('pitchDown')
+    .addEventListener('click', cmd.shiftPitchNameDown);
+  document.getElementById('pitchOctaveUp')
+    .addEventListener('click', cmd.shiftOctaveUp);
+  document.getElementById('pitchOctaveDown')
+    .addEventListener('click', cmd.shiftOctaveDown);
+  document.getElementById('staffUp')
+    .addEventListener('click', cmd.moveElementStaffUp);
+  document.getElementById('staffDown')
+    .addEventListener('click', cmd.moveElementStaffDown);
+  // Manipulate encoding methods
+  document.getElementById('cleanAccid')
+    .addEventListener('click', () => e.cleanAccid(v, cm));
+  document.getElementById('renumTest')
+    .addEventListener('click', () => e.renumberMeasures(v, cm, false));
+  document.getElementById('renumExec')
+    .addEventListener('click', () => e.renumberMeasures(v, cm, true));
   // insert control elements
+  document.getElementById('addTempo')
+    .addEventListener('click', cmd.addTempo);
+  document.getElementById('addDirective')
+    .addEventListener('click', cmd.addDirective);
+  document.getElementById('addDynamics')
+    .addEventListener('click', cmd.addDynamics);
   document.getElementById('addSlur')
     .addEventListener('click', cmd.addSlur);
+  document.getElementById('addTie')
+    .addEventListener('click', cmd.addTie);
+  document.getElementById('addCresHairpin')
+    .addEventListener('click', cmd.addCresHairpin);
+  document.getElementById('addDimHairpin')
+    .addEventListener('click', cmd.addDimHairpin);
+  document.getElementById('addBeam')
+    .addEventListener('click', cmd.addBeam);
+  document.getElementById('addArpeggio')
+    // more control elements
+    .addEventListener('click', cmd.addArpeggio);
   document.getElementById('addFermata')
     .addEventListener('click', cmd.addFermata);
+  document.getElementById('addGlissando')
+    .addEventListener('click', cmd.addGlissando);
+  document.getElementById('addPedalDown')
+    .addEventListener('click', cmd.addPedalDown);
+  document.getElementById('addPedalUp')
+    .addEventListener('click', cmd.addPedalUp);
+  document.getElementById('addTrillAbove')
+    .addEventListener('click', cmd.addTrillAbove);
+  document.getElementById('addTurnAbove')
+    .addEventListener('click', cmd.addTurnAbove);
+  document.getElementById('addTurnAboveLower')
+    .addEventListener('click', cmd.addTurnAboveLower);
+  document.getElementById('addMordentAbove')
+    .addEventListener('click', cmd.addMordentAbove);
+  document.getElementById('addMordentAboveUpper')
+    .addEventListener('click', cmd.addMordentAboveUpper);
+  document.getElementById('addOctave8Above')
+    .addEventListener('click', cmd.addOctave8Above);
+  document.getElementById('addOctave15Above')
+    .addEventListener('click', cmd.addOctave15Above);
+  document.getElementById('addOctave8Below')
+    .addEventListener('click', cmd.addOctave8Below);
+  document.getElementById('addOctave15Below')
+    .addEventListener('click', cmd.addOctave15Below);
+  // toggle articulation
+  document.getElementById('toggleStacc')
+    .addEventListener('click', cmd.toggleStacc);
+  document.getElementById('toggleAccent')
+    .addEventListener('click', cmd.toggleAccent);
+  document.getElementById('toggleTenuto')
+    .addEventListener('click', cmd.toggleTenuto);
+  document.getElementById('toggleMarcato')
+    .addEventListener('click', cmd.toggleMarcato);
+  document.getElementById('toggleStacciss')
+    .addEventListener('click', cmd.toggleStacciss);
 
   // update encoding through Verovio
   document.getElementById('verovio-btn')
@@ -704,14 +781,6 @@ function addEventListeners(cm, v) {
     }));
   document.getElementById('help-btn')
     .addEventListener('click', () => window.open('/help', '_blank'));
-
-  // Manipulate encoding methods
-  document.getElementById('cleanAccid')
-    .addEventListener('click', () => e.cleanAccid(v, cm));
-  document.getElementById('renumTest')
-    .addEventListener('click', () => e.renumberMeasures(v, cm, false));
-  document.getElementById('renumExec')
-    .addEventListener('click', () => e.renumberMeasures(v, cm, true));
 
   // editor activity
   cm.on('cursorActivity', () => {

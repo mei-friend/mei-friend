@@ -16,6 +16,15 @@
   text-decoration: none;
 }
 
+.keyShortCut {
+  color: navy;
+  font-weight: bold;
+  /* border: 1px solid darkblue;
+  border-radius: 2px; */
+  float: right;
+  margin-left: 5px;
+}
+
 /* The dropdown container */
 .dropdown {
   float: left;
@@ -52,8 +61,10 @@
 .dropdown-content {
   display: none;
   position: absolute;
-  background-color: lightsteelblue;
+  background-color: #edf2f7; // lightsteelblue 90%: #dbe4f0 // 95%: #edf2f7
+  opacity: .99;
   min-width: 160px;
+  border: 1px solid darkgray;
   border-radius: 4px;
   box-shadow: 0px 8px 12px 0px rgba(0, 0, 0, 0.2);
   overflow-y: auto;

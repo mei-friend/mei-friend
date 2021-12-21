@@ -373,3 +373,22 @@ export function setBreaksOptions(tkAvailableOptions) {
     }
   }
 }
+
+export function addModifyerKeys(element) {
+  let shiftKey = "&#8679;"; // SHIFT
+  let altKey = "&#8997;"; // ALT
+  let cmdKey = "&#8963;"; // CTRL
+  let cmd2Key = "&#8997;"; // ALT
+  if (navigator.platform.startsWith('Mac')) {
+    cmdKey = "&#8984;"; // CMD
+    cmd2Key = "&#8963;"; // CTRL
+  }
+  element.querySelectorAll(".cmdKey")
+    .forEach(e => e.innerHTML = cmdKey + e.innerHTML);
+  element.querySelectorAll(".cmd2Key")
+    .forEach(e => e.innerHTML = cmd2Key + e.innerHTML);
+  element.querySelectorAll(".shiftKey")
+    .forEach(e => e.innerHTML = shiftKey + e.innerHTML);
+  element.querySelectorAll(".altKey")
+    .forEach(e => e.innerHTML = altKey + e.innerHTML);
+}

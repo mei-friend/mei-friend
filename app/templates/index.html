@@ -74,41 +74,60 @@
           <a id="bottom" href="#">Notation bottom</a>
           <a id="left" href="#">Notation left</a>
           <a id="right" href="#">Notation right</a>
-          <hr class="dropdown-line">
-          <a id="rockbar" href="#">Move status bar</a>
         </div>
       </div>
       <div class="dropdown">
         <button class="dropbtn">Manipulate</button>
         <div class="dropdown-content" id="Manipulate">
-          <a id="invertPlacement" href="#">Invert placement</a>
+          <a id="invertPlacement" href="#">Invert placement<span class="keyShortCut">X</span></a>
           <hr class="dropdown-line">
-          <a id="delete" href="#">Delete element</a>
+          <a id="delete" href="#">Delete element<span class="keyShortCut">⌫, DEL</span></a>
           <hr class="dropdown-line">
-          <a id="pitchUp" href="#">Pitch 1 tone up</a>
-          <a id="pitchDown" href="#">Pitch 1 tone down</a>
-          <a id="pitchOctaveUp" href="#">Pitch 1 octave up</a>
-          <a id="pitchOctaveDown" href="#">Pitch 1 octave down</a>
-          <a id="staffUp" href="#">Move element 1 staff down</a>
-          <a id="staffDown" href="#">Move element 1 staff down</a>
+          <a id="pitchUp" href="#">Pitch 1 tone up<span class="keyShortCut shiftKey">&uarr;</span></a>
+          <a id="pitchDown" href="#">Pitch 1 tone down<span class="keyShortCut shiftKey">&darr;</span></a>
+          <a id="pitchOctaveUp" href="#">Pitch 1 octave up<span class="keyShortCut cmdKey shiftKey">&uarr;</span></a>
+          <a id="pitchOctaveDown" href="#">Pitch 1 octave down<span class="keyShortCut cmdKey shiftKey">&darr;</span></a>
+          <a id="staffUp" href="#">Element 1 staff up<span class="keyShortCut cmdKey">&uarr;</span></a>
+          <a id="staffDown" href="#">Element 1 staff down<span class="keyShortCut cmdKey">&darr;</span></a>
           <hr class="dropdown-line">
-          <a id="cleanAccid" href="#">Clean @accid.ges</a>
-          <a id="renumTest" href="#">Renumber measures (test)</a>
-          <a id="renumExec" href="#">Renumber measures (exec)</a>
+          <a id="cleanAccid" href="#">Clean @accid.ges<span class="keyShortCut shiftKey">C</span></a>
+          <a id="renumTest" href="#">Renumber measures (test)<span class="keyShortCut">R</span></a>
+          <a id="renumExec" href="#">Renumber measures (exec)<span class="keyShortCut">R</span></a>
         </div>
       </div>
       <div class="dropdown">
         <button class="dropbtn">Insert</button>
         <div class="dropdown-content" id="Insert">
-          <a id="addTempo" href="#">
-            <img src="{{ url_for('static', filename='svg/fermata.svg') }}" class="menu-icon" />Tempo
-          </a>
-          <a id="addFermata" href="#">
-            <img src="{{ url_for('static', filename='svg/fermata.svg') }}" class="menu-icon" />Fermata
-          </a>
-          <a id="addSlur" href="#">
-            <img src="{{ url_for('static', filename='svg/slur.svg') }}" class="wide-menu-icon" />Slur
-          </a>
+          <a id="addTempo" href="#">Tempo<span class="keyShortCut shiftKey">T</span></a>
+          <a id="addDirective" href="#">Directive<span class="keyShortCut">I</span></a>
+          <a id="addDynamics" href="#">Dynamicts<span class="keyShortCut">D</span></a>
+          <!-- <img src="{{ url_for('static', filename='svg/fermata.svg') }}" class="menu-icon" />Tempo -->
+          <a id="addSlur" href="#">Slur<span class="keyShortCut">S</span></a>
+          <a id="addTie" href="#">Tie<span class="keyShortCut">T</span></a>
+          <a id="addCresHairpin" href="#">Cresc hairpin<span class="keyShortCut">H</span></a>
+          <a id="addDimHairpin" href="#">Dim hairpin<span class="keyShortCut shiftKey">H</span></a>
+          <a id="addBeam" href="#">Beam<span class="keyShortCut">B</span></a>
+          <hr class="dropdown-line">
+          <a id="addFermata" href="#">Fermata<span class="keyShortCut">F</span></a>
+          <a id="addArpeggio" href="#">Arpeggio<span class="keyShortCut">A</span></a>
+          <a id="addGlissando" href="#">Glissando<span class="keyShortCut">G</span></a>
+          <a id="addPedalDown" href="#">Pedal down<span class="keyShortCut">P</span></a>
+          <a id="addPedalUp" href="#">Pedal up<span class="keyShortCut shiftKey">P</span></a>
+          <a id="addTrillAbove" href="#">Trill<span class="keyShortCut">L</span></a>
+          <a id="addTurnAbove" href="#">Turn<span class="keyShortCut">N</span></a>
+          <a id="addTurnAboveLower" href="#">Turn lower<span class="keyShortCut shiftKey">N</span></a>
+          <a id="addMordentAbove" href="#">Mordent<span class="keyShortCut">M</span></a>
+          <a id="addMordentAboveUpper" href="#">Mordent upper<span class="keyShortCut shiftKey">M</span></a>
+          <a id="addOctave8Above" href="#">Octave (8va above)<span class="keyShortCut">O</span></a>
+          <a id="addOctave15Above" href="#">Octave (15va above)<span class="keyShortCut altKey">O</span></a>
+          <a id="addOctave8Below" href="#">Octave (8va below)<span class="keyShortCut cmd2Key">O</span></a>
+          <a id="addOctave15Below" href="#">Octave (15va below)<span class="keyShortCut cmd2Key altKey">O</span></a>
+          <hr class="dropdown-line">
+          <a id="toggleStacc" href="#">Staccato<span class="keyShortCut shiftKey">S</span></a>
+          <a id="toggleAccent" href="#">Accent<span class="keyShortCut shiftKey">V</span></a>
+          <a id="toggleTenuto" href="#">Tenuto<span class="keyShortCut shiftKey">N</span></a>
+          <a id="toggleMarcato" href="#">Marcato<span class="keyShortCut shiftKey">O</span></a>
+          <a id="toggleStacciss" href="#">Staccatissimo<span class="keyShortCut shiftKey">I</span></a>
         </div>
       </div>
       <div class="dropdown">
