@@ -184,7 +184,8 @@ function assignGithubMenuClickHandlers() {
 function refreshGithubMenu(e) {
   // populate Github menu
   let githubMenu = document.getElementById("GithubMenu");
-  githubMenu.innerHTML = `<a id="repositoriesHeader" href="#">Select repository</a>`
+  githubMenu.innerHTML =
+    `<a id="repositoriesHeader" class="dropdown-head" href="#"><b>Select repository:</b></a>`
   fillInUserRepos();
 }
 
@@ -208,7 +209,7 @@ async function fillInRepoBranches(e, per_page = 100, page = 1) {
   let githubMenu = document.getElementById("GithubMenu");
   githubMenu.innerHTML = `<a id="repositoriesHeader" href="#"><span class="btn icon icon-arrow-left inline-block-tight"></span>Repository:${github.githubRepo}</a>
     <hr class="dropdown-line">
-    <a id="branchesHeader" href="#">Select branch:</a>
+    <a id="branchesHeader" class="dropdown-head" href="#"><b>Select branch:</b></a>
     `;
   Array.from(repoBranches).forEach((branch) => {
     githubMenu.innerHTML += `<a class="repoBranch" href="#">${branch.name}</a>`;

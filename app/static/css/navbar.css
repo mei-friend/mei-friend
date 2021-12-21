@@ -79,6 +79,11 @@
   margin: 4px 10px;
 }
 
+.dropdown-head {
+  background-color: #dbe4f0; // lightsteelblue 90%
+  font-weight:  900;
+}
+
 /* Links inside the dropdown */
 .dropdown-content a {
   cursor: pointer;
@@ -109,7 +114,7 @@
 }
 
 #logTable tr:nth-child(even) {
-  background-color: steelblue;
+  background-color: #dbe4f0;
 }
 
 #GithubLogo {
