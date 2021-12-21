@@ -55,6 +55,14 @@
     <div class="title">mei-friend online</div>
     <div class="navbar">
       <div class="dropdown">
+        {% if isLoggedIn -%}
+        <button class="dropbtn"><img id="GithubLogo" src="{{ url_for('static', filename='img/GitHub-Mark-32px.png') }}" />{{userName}}</button>
+        <div class="dropdown-content" id="GithubMenu"></div>
+        {% else %}
+        <a class="dropbtn" id="GithubLogin" href="/login"><img id="GithubLogo" src="{{ url_for('static', filename='img/GitHub-Mark-32px.png') }}" />Login</a>
+        {% endif %}
+      </div>
+      <div class="dropdown">
         <button class="dropbtn">File</button>
         <div class="dropdown-content" id="FileMenu">
           <a id="OpenMei" href="#">Open MEI</a>
@@ -129,14 +137,6 @@
           <a id="toggleMarcato" href="#">Marcato<span class="keyShortCut shiftKey">O</span></a>
           <a id="toggleStacciss" href="#">Staccatissimo<span class="keyShortCut shiftKey">I</span></a>
         </div>
-      </div>
-      <div class="dropdown">
-        {% if isLoggedIn -%}
-        <button class="dropbtn"><img id="GithubLogo" src="{{ url_for('static', filename='img/GitHub-Mark-32px.png') }}" />{{userName}}</button>
-        <div class="dropdown-content" id="GithubMenu"></div>
-        {% else %}
-        <a class="dropbtn" id="GithubLogin" href="/login"><img id="GithubLogo" src="{{ url_for('static', filename='img/GitHub-Mark-32px.png') }}" />Login</a>
-        {% endif %}
       </div>
       <div class="dropdown">
         <button class="dropbtn">Help</button>
