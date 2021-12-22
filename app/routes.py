@@ -29,8 +29,9 @@ def index():
 @app.route("/login")
 def login():
     print(getenv("CLIENT_ID"))
+    env_url = getenv("REDIRECT_URL")
+    redirect_url = env_url if env_url else url_for("authorize", _external=True)
     # redirect_url = url_for("authorize", _external=True)
-    redirect_url = 'https://repo.mdw.ac.at/mei-friend/authorize'
     return github.authorize_redirect(redirect_url)
 
 @app.route("/authorize")
