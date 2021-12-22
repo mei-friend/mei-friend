@@ -66,6 +66,10 @@
   z-index: 99;
 }
 
+#GithubMenu { 
+  min-height:90%;
+}
+
 .dropdown-line {
   background-color: darkgray;
   border: 1px solid darkgray;

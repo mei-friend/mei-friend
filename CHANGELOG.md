@@ -52,3 +52,5 @@
 # 0.1.2 patch
 * Inverting fermata changes form
 * Re-render MEI without xml:id option
+# 0.1.3 patch
+* Fix commit message and button clicking-interaction behaviour with menu
