@@ -305,8 +305,6 @@ function workerEventsHandler(ev) {
       tkAvailableOptions = ev.data.availableOptions;
       document.querySelector(".rightfoot").innerHTML +=
         `&nbsp;<a href="https://www.verovio.org/">Verovio ${tkVersion}</a>.`;
-      document.getElementById('version-label').innerHTML =
-        'Verovio ' + tkVersion;
       document.querySelector(".statusbar").innerHTML =
         `Verovio ${tkVersion} loaded.`;
       setBreaksOptions(tkAvailableOptions);
@@ -608,7 +606,9 @@ let cmd = {
   'addBeam': () => e.addBeamElement(v, cm),
   'cleanAccid': () => e.cleanAccid(v, cm),
   'renumberMeasuresTest': () => e.renumberMeasures(v, cm, false),
-  'renumberMeasures': () => e.renumberMeasures(v, cm, true)
+  'renumberMeasures': () => e.renumberMeasures(v, cm, true),
+  'reRenderMei': () => v.reRenderMei(cm, false),
+  'reRenderMeiWithout': () => v.reRenderMei(cm, true)
 };
 
 // github API wrapper object
@@ -714,6 +714,11 @@ function addEventListeners(cm, v) {
     .addEventListener('click', () => e.renumberMeasures(v, cm, false));
   document.getElementById('renumExec')
     .addEventListener('click', () => e.renumberMeasures(v, cm, true));
+    // re-render through Verovio
+  document.getElementById('reRenderMei')
+    .addEventListener('click', cmd.reRenderMei);
+  document.getElementById('reRenderMeiWithout')
+    .addEventListener('click', cmd.reRenderMeiWithout);
   // insert control elements
   document.getElementById('addTempo')
     .addEventListener('click', cmd.addTempo);
@@ -773,17 +778,17 @@ function addEventListeners(cm, v) {
     .addEventListener('click', cmd.toggleStacciss);
 
   // update encoding through Verovio
-  document.getElementById('verovio-btn')
-    .addEventListener('click', (ev) => vrvWorker.postMessage({
-      'cmd': 'reRenderMEI',
-      'format': 'mei',
-      'mei': cm.getValue(),
-      'xmlId': v.selectedElements[0],
-      'pageNo': v.currentPage,
-      'removeIds': ev.altKey
-    }));
-  document.getElementById('help-btn')
-    .addEventListener('click', () => window.open('/help', '_blank'));
+  // document.getElementById('verovio-btn')
+  //   .addEventListener('click', (ev) => vrvWorker.postMessage({
+  //     'cmd': 'reRenderMEI',
+  //     'format': 'mei',
+  //     'mei': cm.getValue(),
+  //     'xmlId': v.selectedElements[0],
+  //     'pageNo': v.currentPage,
+  //     'removeIds': ev.altKey
+  //   }));
+  // document.getElementById('help-btn')
+  //   .addEventListener('click', () => window.open('/help', '_blank'));
 
   // editor activity
   cm.on('cursorActivity', () => {

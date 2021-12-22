@@ -110,7 +110,7 @@ body {
   /* background-color: Tomato; */
   min-width: 250px;
   min-height: 15px;
-  width: 750px;
+  width: 700px;
   padding: 0px;
   border: 1px solid #cbd5e0;
   border-radius: 4px;
@@ -159,8 +159,8 @@ body {
 
 .controls {
   display: flex;
-  /* vertical alignment */
   align-items: center;
+  min-height: 26px;
   border: 1px solid darkgray;
   border-radius: 7px;
   margin: 0px 3px;
@@ -179,6 +179,18 @@ body {
   background-color: #ffffff;
 }
 
+
+.label {
+  margin-top: 2px;
+  margin-right: 3px;
+  margin-left: 3px;
+  display: inline;
+  line-height: 1.5em;
+  padding: 0 2px;
+  min-height: 21px;
+  min-width: 21px;
+}
+
 .inline-block-tight {
   display: inline-block;
   vertical-align: middle;
@@ -188,6 +200,10 @@ body {
   height: 4px;
   border-radius: 3px;
   background-color: #d5d5d5;
+}
+
+.checkbox {
+  margin-right: 4px;
 }
 
 #version-div {
@@ -212,7 +228,7 @@ https://www.w3schools.com/css/css_tooltip.asp
   text-align: center;
   line-height: 1.1em;
   border-radius: 6px;
-  padding: 5px 0;
+  padding: 5px;
   position: absolute;
   z-index: 110;
   top: 125%;

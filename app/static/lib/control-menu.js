@@ -167,16 +167,6 @@ export function createControlsMenu(parentElement, scale) {
   });
   breaksCtrls.appendChild(breaksSelector);
 
-  let speedCheckbox = document.createElement('input');
-  speedCheckbox.id = "speed-checkbox";
-  speedCheckbox.setAttribute('type', 'checkbox');
-  speedCheckbox.setAttribute('checked', 'false');
-  speedCheckbox.checked = false;
-  speedCheckbox.disabled = true;
-  addToolTip(speedCheckbox, {
-    title: 'Speed mode (optimized notation rendering)'
-  });
-  breaksCtrls.appendChild(speedCheckbox);
 
   // MEI encoding update behavior
   let updateCtrls = document.createElement('div');
@@ -184,22 +174,19 @@ export function createControlsMenu(parentElement, scale) {
   // updateCtrls.classList.add('block');
   updateCtrls.classList.add('controls');
   controlsForm.appendChild(updateCtrls);
-  addToolTip(updateCtrls, {
-    title: 'Update notation automatically after changes in encoding'
-  });
 
   let updateLabel = document.createElement('label');
   updateLabel.innerText = 'Update: ';
   updateLabel.classList.add('label');
   updateCtrls.appendChild(updateLabel);
+  addToolTip(updateLabel, {
+    title: 'Update notation automatically after changes in encoding'
+  });
 
   let codeUpdateCheckbox = document.createElement("input");
   codeUpdateCheckbox.id = 'live-update-checkbox';
   codeUpdateCheckbox.setAttribute('type', 'checkbox');
   codeUpdateCheckbox.setAttribute('checked', 'true');
-  addToolTip(codeUpdateCheckbox, {
-    title: 'Automatic updates'
-  });
   updateLabel.setAttribute('for', codeUpdateCheckbox.id);
   updateCtrls.appendChild(codeUpdateCheckbox);
 
@@ -293,42 +280,35 @@ export function createControlsMenu(parentElement, scale) {
   });
   navigateCtrls.appendChild(downwardsBtn);
 
-
-  // Label for displaying Verovio version
-  let versionDiv = document.createElement('div');
-  versionDiv.id = 'version-div';
+  let speedDiv = document.createElement('div');
+  speedDiv.id = 'speed-div';
   // versionDiv.classList.add('block');
-  versionDiv.classList.add('controls');
-  controlsForm.appendChild(versionDiv);
+  speedDiv.classList.add('controls');
+  controlsForm.appendChild(speedDiv);
 
-  let verovioBtn = document.createElement('button');
-  verovioBtn.id = "verovio-btn";
-  verovioBtn.classList.add('btn');
-  verovioBtn.classList.add('icon');
-  verovioBtn.classList.add('icon-sync');
-  verovioBtn.classList.add('inline-block-tight');
-  addToolTip(verovioBtn, {
-    title: `Regenerate encoding through Verovio
-            (Attention: non-standard encoding will be erased)
-            (ALT: without xml:ids)`
+  let speedLabel = document.createElement('label');
+  speedLabel.innerText = 'Speedmode:';
+  speedLabel.id = 'speed-label';
+  speedLabel.classList.add('label');
+  speedDiv.appendChild(speedLabel);
+  addToolTip(speedLabel, {
+    title: `In Speedmode,
+            only current page is sent to Verovio
+            to reduce rendering time with large files`
   });
-  versionDiv.appendChild(verovioBtn);
 
-  let versionLabel = document.createElement('label');
-  versionLabel.innerText = 'Verovio: ';
-  versionLabel.id = "version-label";
-  versionDiv.appendChild(versionLabel);
+  let speedCheckbox = document.createElement('input');
+  speedCheckbox.id = "speed-checkbox";
+  speedCheckbox.setAttribute('type', 'checkbox');
+  speedCheckbox.setAttribute('checked', 'false');
+  speedCheckbox.classList.add('checkbox');
+  speedCheckbox.checked = false;
+  speedCheckbox.disabled = false;
+  // addToolTip(speedCheckbox, {
+  //   title: 'Speed mode (optimized notation rendering)'
+  // });
+  speedDiv.appendChild(speedCheckbox);
 
-  let helpBtn = document.createElement('button');
-  helpBtn.id = "help-btn";
-  helpBtn.classList.add('btn');
-  helpBtn.classList.add('icon');
-  helpBtn.classList.add('icon-question');
-  helpBtn.classList.add('inline-block-tight');
-  addToolTip(helpBtn, {
-    title: 'Show overview of keyboard shortcuts for inserting elements'
-  });
-  versionDiv.appendChild(helpBtn);
 
   // container for on-the-fly changes to CSS styles (to change highlight color)
   let customStyle = document.createElement('style');
@@ -383,12 +363,12 @@ export function addModifyerKeys(element) {
     cmdKey = "&#8984;"; // CMD
     cmd2Key = "&#8963;"; // CTRL
   }
-  element.querySelectorAll(".cmdKey")
-    .forEach(e => e.innerHTML = cmdKey + e.innerHTML);
-  element.querySelectorAll(".cmd2Key")
-    .forEach(e => e.innerHTML = cmd2Key + e.innerHTML);
-  element.querySelectorAll(".shiftKey")
-    .forEach(e => e.innerHTML = shiftKey + e.innerHTML);
   element.querySelectorAll(".altKey")
     .forEach(e => e.innerHTML = altKey + e.innerHTML);
+  element.querySelectorAll(".shiftKey")
+    .forEach(e => e.innerHTML = shiftKey + e.innerHTML);
+  element.querySelectorAll(".cmd2Key")
+    .forEach(e => e.innerHTML = cmd2Key + e.innerHTML);
+  element.querySelectorAll(".cmdKey")
+    .forEach(e => e.innerHTML = cmdKey + e.innerHTML);
 }

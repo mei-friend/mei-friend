@@ -138,7 +138,7 @@ onmessage = function(e) {
         log(e);
       }
       break;
-    case 'reRenderMEI':
+    case 'reRenderMei':
       try {
         tk.loadData(result.mei);
         result.setCursorToPageBeginning = true;
@@ -147,12 +147,12 @@ onmessage = function(e) {
           result.setCursorToPageBeginning = false;
         }
         result.svg = tk.renderToSVG(result.pageNo);
-        result.cmd = 'updated';
         result.pageCount = tk.getPageCount();
         if (result.removeIds) result.mei = tk.getMEI({
           'removeIds': result.removeIds
         })
         else result.mei = tk.getMEI();
+        result.cmd = 'updated';
       } catch (e) {
         log(e);
       }
