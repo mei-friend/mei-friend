@@ -283,47 +283,6 @@ export function createControlsMenu(parentElement, scale) {
   });
   navigateCtrls.appendChild(downwardsBtn);
 
-
-  // Label for displaying Verovio version
-  let versionDiv = document.createElement('div');
-  versionDiv.id = 'version-div';
-  // versionDiv.classList.add('block');
-  versionDiv.classList.add('controls');
-  controlsForm.appendChild(versionDiv);
-
-  let versionLabel = document.createElement('img');
-  versionLabel.src = `${root}svg/v.svg`;
-  versionLabel.id = "version-label";
-  versionLabel.classList.add('icon');
-  versionDiv.appendChild(versionLabel);
-  addToolTip(versionLabel, {
-    title: 'Verovio version unknown'
-  });
-
-  let verovioBtn = document.createElement('button');
-  verovioBtn.id = "verovio-btn";
-  verovioBtn.classList.add('btn');
-  verovioBtn.classList.add('icon');
-  verovioBtn.classList.add('icon-sync');
-  verovioBtn.classList.add('inline-block-tight');
-  addToolTip(verovioBtn, {
-    title: `Regenerate encoding through Verovio
-            (Attention: non-standard encoding will be erased)
-            (ALT: without xml:ids)`
-  });
-  versionDiv.appendChild(verovioBtn);
-
-  // let helpBtn = document.createElement('button');
-  // helpBtn.id = "help-btn";
-  // helpBtn.classList.add('btn');
-  // helpBtn.classList.add('icon');
-  // helpBtn.classList.add('icon-question');
-  // helpBtn.classList.add('inline-block-tight');
-  // addToolTip(helpBtn, {
-  //   title: 'Show overview of keyboard shortcuts for inserting elements'
-  // });
-  // versionDiv.appendChild(helpBtn);
-
   let speedDiv = document.createElement('div');
   speedDiv.id = 'speed-div';
   // versionDiv.classList.add('block');
@@ -406,12 +365,12 @@ export function addModifyerKeys(element) {
     cmdKey = "&#8984;"; // CMD
     cmd2Key = "&#8963;"; // CTRL
   }
-  element.querySelectorAll(".cmdKey")
-    .forEach(e => e.innerHTML = cmdKey + e.innerHTML);
-  element.querySelectorAll(".cmd2Key")
-    .forEach(e => e.innerHTML = cmd2Key + e.innerHTML);
-  element.querySelectorAll(".shiftKey")
-    .forEach(e => e.innerHTML = shiftKey + e.innerHTML);
   element.querySelectorAll(".altKey")
     .forEach(e => e.innerHTML = altKey + e.innerHTML);
+  element.querySelectorAll(".shiftKey")
+    .forEach(e => e.innerHTML = shiftKey + e.innerHTML);
+  element.querySelectorAll(".cmd2Key")
+    .forEach(e => e.innerHTML = cmd2Key + e.innerHTML);
+  element.querySelectorAll(".cmdKey")
+    .forEach(e => e.innerHTML = cmdKey + e.innerHTML);
 }

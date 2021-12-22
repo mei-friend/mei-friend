@@ -150,6 +150,18 @@ export default class Viewer {
     this.currentPage = 1;
   }
 
+  reRenderMei(cm, removeIds = false) {
+    let message = {
+      'cmd': 'reRenderMei',
+      'format': 'mei',
+      'mei': cm.getValue(),
+      'pageNo': this.currentPage,
+      'removeIds': removeIds
+    }
+    if (false && !removeIds) message.xmlId = this.selectedElements[0];
+    this.worker.postMessage(message);
+  }
+
   // update options in viewer from user interface
   setVerovioOptions(newOptions = {}) {
     if (Object.keys(newOptions).length > 0) this.vrvOptions = newOptions;
