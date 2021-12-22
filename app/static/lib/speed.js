@@ -85,7 +85,8 @@ function readSection(xmlScore, pageNo, spdScore, whichBreaks = ['sb', 'pb']) {
       var currentNodeName = children[i].nodeName;
       // ignore expansion lists
       if (['expansion'].includes(currentNodeName)) continue;
-      // console.info('digDeeper currentNodeName: ', currentNodeName + ', ' + children[i].getAttribute('xml:id'));
+      // console.info('digDeeper currentNodeName: ', currentNodeName + ', '
+      // + children[i].getAttribute('xml:id'));
       if (currentNodeName == 'section') {
         spdScore = digDeeper(children[i]);
         // console.info('digDeeper returned spdScore: ', spdScore);

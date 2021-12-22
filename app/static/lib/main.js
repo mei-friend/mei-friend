@@ -375,6 +375,9 @@ function workerEventsHandler(ev) {
       a.download = meiFileName.replace(/\.[^/.]+$/, '.mid');
       a.href = window.URL.createObjectURL(blob);
       a.click();
+      break;
+    case 'computePageBreaks':
+      v.pageBreaks = ev.data.pageBreaks;
   }
 }
 
@@ -714,7 +717,7 @@ function addEventListeners(cm, v) {
     .addEventListener('click', () => e.renumberMeasures(v, cm, false));
   document.getElementById('renumExec')
     .addEventListener('click', () => e.renumberMeasures(v, cm, true));
-    // re-render through Verovio
+  // re-render through Verovio
   document.getElementById('reRenderMei')
     .addEventListener('click', cmd.reRenderMei);
   document.getElementById('reRenderMeiWithout')

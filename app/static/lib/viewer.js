@@ -25,7 +25,7 @@ export default class Viewer {
     this.parser = new DOMParser();
     this.xmlDoc;
     this.encodingHasChanged = true; // to recalculate DOM or pageLists
-    this.pageList = {}; // object of page number and last measure id '1': 'measure-000423', ...
+    this.pageBreaks = {}; // object of page number and last measure id '1': 'measure-000423', ...
     // this.scoreDefList = []; // list of xmlNodes, one for each change, referenced by 5th element of pageList
     this.meiHeadRange = [];
     this.breaks = ['sb', 'pb'];
@@ -522,7 +522,7 @@ export default class Viewer {
     stNo = 1, lyNo = 1, y = 0) {
     let message = {
       'cmd': 'navigatePage',
-      'mei': this.currentPage,
+      'pageNo': this.currentPage,
       'dir': dir,
       'what': what,
       'stNo': stNo,

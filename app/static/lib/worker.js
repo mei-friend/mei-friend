@@ -159,7 +159,24 @@ onmessage = function(e) {
       break;
     case 'navigatePage': // for a page turn during navigation
       try { // returns original message plus svg
-        result.svg = tk.renderToSVG(result.mei);
+        result.svg = tk.renderToSVG(result.pageNo);
+      } catch (e) {
+        log(e);
+      }
+      break;
+    case 'computePageBreaks': // compute page breaks
+      try {
+        var tkOptions = result.options;
+        tk.setOptions(tkOptions);
+        tk.loadData(result.mei);
+        let noPages = tk.getPageCount();
+        result.pageBreaks = {};
+        for (let p = 1; p < noPages; p++) {
+          let svg = tk.renderToSVG(p);
+          let ms = svg.querySelectorAll('measure');
+          result[p] = ms[ms.length - 1].getAttribute('id');
+        }
+        console.log('Worker computePageBreaks: ', result.pageBreaks);
       } catch (e) {
         log(e);
       }
