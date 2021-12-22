@@ -9,7 +9,7 @@ export var meiNameSpace = 'http://www.music-encoding.org/ns/mei';
 export var xmlNameSpace = 'http://www.w3.org/XML/1998/namespace';
 
 // returns complete MEI code of given page (one-based), defined by sb and pb
-export function getPageFromDom(xmlDoc, pageNo = 1, whichBreaks = ['sb', 'pb']) {
+export function getPageFromDom(xmlDoc, pageNo = 1, breaks = ['sb', 'pb']) {
   let meiHeader = xmlDoc.getElementsByTagName('meiHead');
   if (!meiHeader) {
     console.info('getPageFromDom(): no meiHeader');
@@ -52,7 +52,7 @@ export function getPageFromDom(xmlDoc, pageNo = 1, whichBreaks = ['sb', 'pb']) {
 
   spdScore.appendChild(scoreDef); // is updated within readSection()
   spdScore.appendChild(baseSection);
-  var digger = readSection(xmlScore, pageNo, spdScore, whichBreaks);
+  var digger = readSection(xmlScore, pageNo, spdScore, breaks);
   var sections = xmlScore.childNodes;
   sections.forEach((item) => {
     if (item.nodeName == 'section') { // diggs into section hierachy
@@ -68,12 +68,14 @@ export function getPageFromDom(xmlDoc, pageNo = 1, whichBreaks = ['sb', 'pb']) {
 
 // recursive closure to dig through hierarchically stacked sections and append
 // only those elements within the requested pageNo
-function readSection(xmlScore, pageNo, spdScore, whichBreaks = ['sb', 'pb']) {
-  let p = 1;
+function readSection(xmlScore, pageNo, spdScore, breaks) {
+  let p = 1; // page count
+  let m = 1; // measure count (for a fast first page, with breaks = '')
+  let mxMeasures = 50; // for a quick first page
   let countBreaks = false;
   let startingElements = [];
   let endingElements = [];
-  let whichBreaksSelector = whichBreaks.join(', ');
+  let breaksSelector = breaks.join(', ');
   return function digDeeper(section) {
     var children = section.childNodes;
     let lgt = children.length;
@@ -94,8 +96,9 @@ function readSection(xmlScore, pageNo, spdScore, whichBreaks = ['sb', 'pb']) {
       }
       if (currentNodeName == 'measure') {
         countBreaks = true;
+        if (breaks == '' && (m++) >= mxMeasures) return spdScore;
       }
-      if (countBreaks && whichBreaks.includes(currentNodeName)) {
+      if (countBreaks && breaks.includes(currentNodeName)) {
         p++; // skip breaks before content (that is, a measure)
         continue;
       }
@@ -125,12 +128,12 @@ function readSection(xmlScore, pageNo, spdScore, whichBreaks = ['sb', 'pb']) {
       }
       // scoreDef with staffDef@key.sig or keySig@sig and meter@count/@unit
       var staffDefList = children[i].querySelectorAll(
-        whichBreaksSelector + ',staffDef');
+        breaksSelector + ',staffDef');
       if (staffDefList && staffDefList.length > 0 && p < pageNo) {
         // console.info('staffDef: ', staffDefList);
         var staffDefs = spdScore.querySelectorAll('staffDef');
         for (let st of staffDefList) {
-          if (whichBreaks.includes(st.nodeName)) break;
+          if (breaks.includes(st.nodeName)) break;
           var keysigValue = '',
             meterCountValue = '',
             meterUnitValue = '';
@@ -196,12 +199,12 @@ function readSection(xmlScore, pageNo, spdScore, whichBreaks = ['sb', 'pb']) {
         }
       }
       // update scoreDef with clef elements inside layers (and breaks to stop updating)
-      var clefList = children[i].querySelectorAll(whichBreaksSelector + ', clef');
+      var clefList = children[i].querySelectorAll(breaksSelector + ', clef');
       if (clefList && clefList.length > 0 && p < pageNo) {
         // console.info('clefList: ', clefList);
         for (let clef of clefList) { // check clefs of measure, ignore @sameas
           if (clef.getAttribute('sameas')) continue;
-          if (whichBreaks.includes(clef.nodeName)) break;
+          if (breaks.includes(clef.nodeName)) break;
           let staff = clef.closest('staff, staffDef');
           let staffNo = -1;
           if (staff) staffNo = staff.getAttribute('n');
@@ -259,14 +262,14 @@ function readSection(xmlScore, pageNo, spdScore, whichBreaks = ['sb', 'pb']) {
       }
       // special treatment for endings that contain breaks
       if (['ending'].includes(currentNodeName) &&
-        (children[i].querySelector(whichBreaksSelector))) {
+        (children[i].querySelector(breaksSelector))) {
         var endingNode = children[i].cloneNode(true); // copy elements containing breaks
-        var breakNode = endingNode.querySelector(whichBreaksSelector);
+        var breakNode = endingNode.querySelector(breaksSelector);
         if (p == pageNo) { // breakNode.nextSibling && breakNode.nextSibling.nodeType != Node.TEXT_NODE ||
           breakNode.parentNode.replaceChild(document.createElementNS(meiNameSpace, 'pb'), breakNode);
           spdScore.getElementsByTagName('section').item(0).appendChild(endingNode);
         } else if (p == pageNo - 1) { // remove elements until first break
-          while (!whichBreaks.includes(endingNode.firstChild.nodeName)) {
+          while (!breaks.includes(endingNode.firstChild.nodeName)) {
             endingNode.removeChild(endingNode.firstChild);
           }
           spdScore.getElementsByTagName('section').item(0).appendChild(endingNode);
@@ -424,7 +427,7 @@ export function xmlToString(xmlNode) {
   return str.replace('xmlns="' + meiNameSpace + '" ', '');
 }
 
-export function getPageNumberAtCursor(textEditor, whichBreaks = ['pb', 'sb']) {
+export function getPageNumberAtCursor(textEditor, breaks = ['pb', 'sb']) {
   let cursorRow = textEditor.getCursorBufferPosition().row;
   let text = textEditor.getBuffer();
   let maxLines = text.getLineCount();
@@ -436,8 +439,8 @@ export function getPageNumberAtCursor(textEditor, whichBreaks = ['pb', 'sb']) {
     let line = text.lineForRow(row++);
     if (line.includes('measure')) countPages = true; // skip trailing breaks
     if (countPages) {
-      for (let i = 0; i < whichBreaks.length; i++) { // check breaks list
-        if (line.includes('<' + whichBreaks[i])) hasBreak = true;
+      for (let i = 0; i < breaks.length; i++) { // check breaks list
+        if (line.includes('<' + breaks[i])) hasBreak = true;
       }
       if (hasBreak) {
         pageNo++;
