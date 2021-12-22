@@ -788,12 +788,6 @@ function addEventListeners(cm, v) {
   // editor activity
   cm.on('cursorActivity', () => {
     v.cursorActivity(cm);
-    const commitUI = document.querySelector("#commitUI");
-    if (isLoggedIn && github.filepath && commitUI) {
-      const changesExist = cm.getValue() === github.content;
-      document.getElementById("commitMessageInput").disabled = changesExist;
-      document.getElementById("commitButton").disabled = changesExist;
-    }
   });
 
   // flip button updates manually notation location to cursor pos in encoding
@@ -804,11 +798,19 @@ function addEventListeners(cm, v) {
   // when activated, update notation location once
   let fl = document.getElementById('flip-checkbox');
   fl.addEventListener('change', () => {
-    if (fl.checked) v.cursorActivity(cm, true);
+    if (fl.checked) v.cursorActivity(cm, true)
   });
 
   // editor reports changes
-  cm.on('changes', () => v.notationUpdated(cm));
+  cm.on('changes', () => {
+    const commitUI = document.querySelector("#commitUI");
+    if (isLoggedIn && github.filepath && commitUI) {
+      const changesExist = cm.getValue() === github.content;
+      document.getElementById("commitMessageInput").disabled = changesExist;
+      document.getElementById("commitButton").disabled = changesExist;
+    }
+    v.notationUpdated(cm);
+  })
 
   // manually update notation rendering from encoding
   document.getElementById('code-update-btn').addEventListener('click', () => {

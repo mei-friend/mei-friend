@@ -184,8 +184,10 @@
           e.classList.add('show');
         }
       })
-
-      show = !show;
+      if(!ev.target.closest("#GithubMenu") || ev.target.classList.contains("closeOnClick")) { 
+        // toggle "show" only if not in continuous-Github-menu behaviour
+        show = !show;
+      }
     });
   </script>
 </body>
