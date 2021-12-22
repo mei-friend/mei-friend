@@ -31,23 +31,23 @@ export default class Viewer {
     this.breaks = ['sb', 'pb'];
     this.toolTipTimeOutHandle = null; // handle for zoom tooltip hide timer
     this.vrvOptions;
-    this.doCursorUpdate = false;
   }
 
   // change options, load new data, render current page, add listeners, highlight
   updateAll(cm, options = {}) {
-    this.setVerovioOptions(options);
-    let message = {
-      'cmd': 'updateAll',
-      'options': this.vrvOptions,
-      'mei': this.speedFilter(cm.getValue()),
-      'pageNo': this.currentPage,
-      'xmlId': ''
-    };
-    this.worker.postMessage(message);
-    // TODO txtEdr.setTabLength(3);
-    // console.info('updateAll: tabLength: ' + txtEdr.getTabLength() + ', editor: ', txtEdr);
-    // this.showLoadingMessage();
+    if (!this.speedMode) {
+      this.setVerovioOptions(options);
+      let message = {
+        'cmd': 'updateAll',
+        'options': this.vrvOptions,
+        'mei': this.speedFilter(cm.getValue()),
+        'pageNo': this.currentPage,
+        'xmlId': ''
+      };
+      this.worker.postMessage(message);
+    } else { // in speed mode
+
+    }
   }
 
   updateData(cm, setCursorToPageBeg = true, setFocusToVerovioPane = true) {
@@ -110,17 +110,17 @@ export default class Viewer {
   // with normal mode: load DOM and pass-through the MEI code;
   // with speed mode: load into DOM (if encodingHasChanged) and
   // return MEI excerpt of currentPage page
-  speedFilter(mei, forceReload = false) {
+  speedFilter(mei, brks = ['sb', 'pb']) {
     // update DOM only if encoding has been edited or
-    this.loadXml(mei, forceReload);
+    this.loadXml(mei);
     if (!this.speedMode) return mei;
-    this.breaks = ['sb', 'pb'];
+    this.breaks = brks;
     if ("encoded" == this.breaksSelector.options[
         this.breaksSelector.selectedIndex].value) {
       this.breaks = ['pb'];
     }
     // console.info('loadXml breaks: ', this.breaks);
-    if (this.encodingHasChanged || forceReload) {
+    if (this.encodingHasChanged) {
       let elements = this.xmlDoc.querySelectorAll("measure, sb, pb");
       // count pages
       this.pageCount = 1; // pages are one-based
@@ -551,20 +551,6 @@ export default class Viewer {
         return time;
       }
     );
-  }
-
-  displaySVG(cm, svg) {
-    // document.querySelector(".statusbar").innerHTML =
-    //   meiFileName + ", pg " + v.currentPage + "/" + v.pageCount + " loaded.";
-    document.querySelector('.verovio-panel').innerHTML = svg;
-    // if (v.doCursorUpdate && false) { // DEBUG
-    //   v.setCursorToPageBeginning(cm);
-    //   v.doCursorUpdate = false;
-    // }
-    // this.addNotationEventListeners(cm);
-    // this.setNotationColors();
-    // this.updateHighlight(cm);
-    // this.setFocusToVerovioPane();
   }
 
   findClosestNoteInChord(id, y) {
