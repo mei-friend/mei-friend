@@ -61,8 +61,8 @@
     "b": "addBeam",
     "o": "addOctave8Above",
     "ctrl-o": "addOctave8Below",
-    "alt-o": "addOctave15Above",
-    "ctrl-alt-o": "addOctave15Below"
+    "shift-o": "addOctave15Above",
+    "ctrl-shift-o": "addOctave15Below"
 
   },
 
