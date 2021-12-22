@@ -52,7 +52,7 @@
 
 <body>
   <div class="header">
-    <div class="title">mei-friend online</div>
+    <div class="title"><a href="https://repo.mdw.ac.at/mei-friend/">mei-friend online</a></div>
     <div class="navbar">
       <div class="dropdown">
         {% if isLoggedIn -%}
@@ -187,7 +187,7 @@
           e.classList.add('show');
         }
       })
-      if(!ev.target.closest("#GithubMenu") || ev.target.classList.contains("closeOnClick")) { 
+      if(!ev.target.closest("#GithubMenu") || ev.target.classList.contains("closeOnClick")) {
         // toggle "show" only if not in continuous-Github-menu behaviour
         show = !show;
       }

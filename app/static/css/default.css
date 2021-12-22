@@ -19,6 +19,24 @@ body {
   overflow: hidden;
 }
 
+a:link {
+  text-decoration: none;
+  color: #263c5a;
+}
+
+a:visited {
+  text-decoration: none;
+  color: #263c5a;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+a:active {
+  text-decoration: underline;
+}
+
 .header {
   display: flex;
   flex-shrink: 0;
@@ -178,7 +196,6 @@ body {
   max-height: 21px;
   background-color: #ffffff;
 }
-
 
 .label {
   margin-top: 2px;
