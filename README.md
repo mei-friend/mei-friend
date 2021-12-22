@@ -20,7 +20,9 @@ mei-friend running within a browser
 * Edit .env to add in CLIENT_ID and SECRET_ID from the Github OAuth application
 * Add a random hard to guess string as FLASK_SECRET
 * If required, add a REDIRECT_URL to override the flask url_for("authorize") route in deployment
+* If required, add STATIC_URL_PATH and/or STATIC_FOLDER to override the Flask defaults in deployment
 * For development mode, set FLASK_ENV to "development" => do not deploy in development mode!
+* For deployment, *un*set FLASK_APP. This will cause wsgi.py to be used instead.
 * Run `python -m venv venv` (if your system python is not python 3, run `python3 -m venv venv`)
 * Run `. venv/bin/activate`. Your prompt should update to show (venv) at the start
 * Run `pip install -r requirements.txt`
