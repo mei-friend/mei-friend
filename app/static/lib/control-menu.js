@@ -174,22 +174,19 @@ export function createControlsMenu(parentElement, scale) {
   // updateCtrls.classList.add('block');
   updateCtrls.classList.add('controls');
   controlsForm.appendChild(updateCtrls);
-  addToolTip(updateCtrls, {
-    title: 'Update notation automatically after changes in encoding'
-  });
 
   let updateLabel = document.createElement('label');
   updateLabel.innerText = 'Update: ';
   updateLabel.classList.add('label');
   updateCtrls.appendChild(updateLabel);
+  addToolTip(updateLabel, {
+    title: 'Update notation automatically after changes in encoding'
+  });
 
   let codeUpdateCheckbox = document.createElement("input");
   codeUpdateCheckbox.id = 'live-update-checkbox';
   codeUpdateCheckbox.setAttribute('type', 'checkbox');
   codeUpdateCheckbox.setAttribute('checked', 'true');
-  addToolTip(codeUpdateCheckbox, {
-    title: 'Automatic updates'
-  });
   updateLabel.setAttribute('for', codeUpdateCheckbox.id);
   updateCtrls.appendChild(codeUpdateCheckbox);
 
@@ -304,6 +301,7 @@ export function createControlsMenu(parentElement, scale) {
   speedCheckbox.id = "speed-checkbox";
   speedCheckbox.setAttribute('type', 'checkbox');
   speedCheckbox.setAttribute('checked', 'false');
+  speedCheckbox.classList.add('checkbox');
   speedCheckbox.checked = false;
   speedCheckbox.disabled = false;
   // addToolTip(speedCheckbox, {
