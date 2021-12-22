@@ -305,7 +305,8 @@ function workerEventsHandler(ev) {
       tkAvailableOptions = ev.data.availableOptions;
       document.querySelector(".rightfoot").innerHTML +=
         `&nbsp;<a href="https://www.verovio.org/">Verovio ${tkVersion}</a>.`;
-      document.getElementById('version-label').innerHTML =
+      document.getElementById('version-label')
+        .querySelector('.tooltiptext').innerHTML =
         'Verovio ' + tkVersion;
       document.querySelector(".statusbar").innerHTML =
         `Verovio ${tkVersion} loaded.`;
@@ -782,8 +783,8 @@ function addEventListeners(cm, v) {
       'pageNo': v.currentPage,
       'removeIds': ev.altKey
     }));
-  document.getElementById('help-btn')
-    .addEventListener('click', () => window.open('/help', '_blank'));
+  // document.getElementById('help-btn')
+  //   .addEventListener('click', () => window.open('/help', '_blank'));
 
   // editor activity
   cm.on('cursorActivity', () => {

@@ -167,16 +167,6 @@ export function createControlsMenu(parentElement, scale) {
   });
   breaksCtrls.appendChild(breaksSelector);
 
-  let speedCheckbox = document.createElement('input');
-  speedCheckbox.id = "speed-checkbox";
-  speedCheckbox.setAttribute('type', 'checkbox');
-  speedCheckbox.setAttribute('checked', 'false');
-  speedCheckbox.checked = false;
-  speedCheckbox.disabled = true;
-  addToolTip(speedCheckbox, {
-    title: 'Speed mode (optimized notation rendering)'
-  });
-  breaksCtrls.appendChild(speedCheckbox);
 
   // MEI encoding update behavior
   let updateCtrls = document.createElement('div');
@@ -301,6 +291,15 @@ export function createControlsMenu(parentElement, scale) {
   versionDiv.classList.add('controls');
   controlsForm.appendChild(versionDiv);
 
+  let versionLabel = document.createElement('img');
+  versionLabel.src = `${root}svg/v.svg`;
+  versionLabel.id = "version-label";
+  versionLabel.classList.add('icon');
+  versionDiv.appendChild(versionLabel);
+  addToolTip(versionLabel, {
+    title: 'Verovio version unknown'
+  });
+
   let verovioBtn = document.createElement('button');
   verovioBtn.id = "verovio-btn";
   verovioBtn.classList.add('btn');
@@ -314,21 +313,45 @@ export function createControlsMenu(parentElement, scale) {
   });
   versionDiv.appendChild(verovioBtn);
 
-  let versionLabel = document.createElement('label');
-  versionLabel.innerText = 'Verovio: ';
-  versionLabel.id = "version-label";
-  versionDiv.appendChild(versionLabel);
+  // let helpBtn = document.createElement('button');
+  // helpBtn.id = "help-btn";
+  // helpBtn.classList.add('btn');
+  // helpBtn.classList.add('icon');
+  // helpBtn.classList.add('icon-question');
+  // helpBtn.classList.add('inline-block-tight');
+  // addToolTip(helpBtn, {
+  //   title: 'Show overview of keyboard shortcuts for inserting elements'
+  // });
+  // versionDiv.appendChild(helpBtn);
 
-  let helpBtn = document.createElement('button');
-  helpBtn.id = "help-btn";
-  helpBtn.classList.add('btn');
-  helpBtn.classList.add('icon');
-  helpBtn.classList.add('icon-question');
-  helpBtn.classList.add('inline-block-tight');
-  addToolTip(helpBtn, {
-    title: 'Show overview of keyboard shortcuts for inserting elements'
+  let speedDiv = document.createElement('div');
+  speedDiv.id = 'speed-div';
+  // versionDiv.classList.add('block');
+  speedDiv.classList.add('controls');
+  controlsForm.appendChild(speedDiv);
+
+  let speedLabel = document.createElement('label');
+  speedLabel.innerText = 'Speedmode:';
+  speedLabel.id = 'speed-label';
+  speedLabel.classList.add('label');
+  speedDiv.appendChild(speedLabel);
+  addToolTip(speedLabel, {
+    title: `In Speedmode,
+            only current page is sent to Verovio
+            to reduce rendering time with large files`
   });
-  versionDiv.appendChild(helpBtn);
+
+  let speedCheckbox = document.createElement('input');
+  speedCheckbox.id = "speed-checkbox";
+  speedCheckbox.setAttribute('type', 'checkbox');
+  speedCheckbox.setAttribute('checked', 'false');
+  speedCheckbox.checked = false;
+  speedCheckbox.disabled = false;
+  // addToolTip(speedCheckbox, {
+  //   title: 'Speed mode (optimized notation rendering)'
+  // });
+  speedDiv.appendChild(speedCheckbox);
+
 
   // container for on-the-fly changes to CSS styles (to change highlight color)
   let customStyle = document.createElement('style');
