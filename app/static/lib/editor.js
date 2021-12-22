@@ -35,7 +35,6 @@ export function delEl(v, cm) {
       if (el) selectedElements.push(el.getAttribute('id'));
     }
   } else if (['beam'].includes(element.nodeName)) { // delte beam
-    let p1 = cm.getCursor();
     let p;
     let first = true;
     let childList = element.childNodes;
@@ -155,8 +154,8 @@ export function addCtrlEl(v, cm, elName, placement, form) {
     newElement.appendChild(v.xmlDoc.createTextNode(form));
   }
   // add new element to txtEdr at end of measure
+  v.updateNotation = false; // to prevent reloading after each edit
   if (p) {
-    v.updateNotation = false; // to prevent reloading after each edit
     let p1 = utils.moveCursorToEndOfMeasure(cm, p); // resets selectedElements!!
     console.log('p1: ', p);
     cm.replaceRange(speed.xmlToString(newElement) + '\n', cm.getCursor());
@@ -184,9 +183,9 @@ export function invertPlacement(v, cm, modifier = false) {
   let ids = utils.sortElementsByScorePosition(v.selectedElements);
   ids = speed.filterElements(ids, v.xmlDoc);
   console.info('invertPlacement ids: ', ids);
+  v.updateNotation = false; // no need to redraw notation
   let noteList, range;
   for (let id of ids) {
-    v.updateNotation = false; // no need to redraw notation
     var el = v.xmlDoc.querySelector("[*|id='" + id + "']");
     let chordId = utils.insideParent(id);
     if (el && el.nodeName == 'note') {
@@ -428,11 +427,11 @@ export function addBeamElement(v, cm, elementName = 'beam') {
     v.selectedElements = [];
     v.selectedElements.push(uuid);
     v.speedMode ? v.updateLayout() : v.updateData(cm, false, true);
-    v.updateNotation = true; // update notation again
   } else {
     console.log('Cannot add ' + elementName +
       ' element, selected elements have different parents.');
   }
+  v.updateNotation = true; // update notation again
 }
 
 // add octave element and modify notes inside selected elements
