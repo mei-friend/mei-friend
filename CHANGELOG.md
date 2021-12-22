@@ -54,3 +54,6 @@
 * Re-render MEI without xml:id option
 # 0.1.3 patch
 * Fix commit message and button clicking-interaction behaviour with menu
+# 0.1.4 patch
+* Verovio label removed and speedmode checkbox added (still disabled)
+* Some editor code optimizations
