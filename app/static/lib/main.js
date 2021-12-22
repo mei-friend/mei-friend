@@ -171,7 +171,7 @@ function assignGithubMenuClickHandlers() {
           document.querySelector(".statusbar").innerText = "Loading from Github...";
           v.clear();
           v.updateNotation = false;
-          meiFileName = `Github: ${github.githubRepo}${github.filepath}`
+          meiFileName = `Github:${github.githubRepo}${github.filepath}`
           cm.setValue(github.content);
           v.updateNotation = true;
           v.updateAll(cm);
@@ -331,7 +331,8 @@ function workerEventsHandler(ev) {
       v.currentPage = ev.data.pageNo;
       document.querySelector(".statusbar").innerHTML =
         meiFileName + ", pg " + v.currentPage + "/" + v.pageCount + " loaded.";
-      document.querySelector('title').innerHTML = 'mei-friend: ' + meiFileName;
+      document.querySelector('title').innerHTML = 'mei-friend: ' +
+        meiFileName.replace(/\/static\//, '').replace(/\/mei-friend/, '');
       document.querySelector('.verovio-panel').innerHTML = ev.data.svg;
       if (ev.data.setCursorToPageBeginning) v.setCursorToPageBeginning(cm);
       v.updatePageNumDisplay();
@@ -714,7 +715,7 @@ function addEventListeners(cm, v) {
     .addEventListener('click', () => e.renumberMeasures(v, cm, false));
   document.getElementById('renumExec')
     .addEventListener('click', () => e.renumberMeasures(v, cm, true));
-    // re-render through Verovio
+  // re-render through Verovio
   document.getElementById('reRenderMei')
     .addEventListener('click', cmd.reRenderMei);
   document.getElementById('reRenderMeiWithout')
