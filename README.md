@@ -1,7 +1,7 @@
 # mei-friend-online
 mei-friend running within a browser
 
-##To configure:
+## To configure:
 
 ### Set up Github OAuth application:
 * Go to https://github.com/settings/developers
@@ -26,7 +26,7 @@ mei-friend running within a browser
 * Download CodeMirror 5.x from https://codemirror.net/
 * Extract it and put it into app/static with directory name 'CodeMirror'
 
-##To run:
+## To run:
 ### Development mode:
 * `. venv/bin/activate` 
 * `flask run`
