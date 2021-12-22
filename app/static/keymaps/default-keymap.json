@@ -82,7 +82,9 @@
     "cmd-0": "zoom100",
     "cmd-5": "zoom50",
     "cmd-+": "zoomIn",
-    "cmd--": "zoomOut"
+    "cmd--": "zoomOut",
+    "cmd-o": "open",
+    "cmd-s": "downloadMei"
   },
 
   ".platform-win32, .platform-linux": {
@@ -101,6 +103,8 @@
     "ctrl-0": "zoom100",
     "ctrl-5": "zoom50",
     "ctrl-+": "zoomIn",
-    "ctrl--": "zoomOut"
+    "ctrl--": "zoomOut",
+    "ctrl-o": "open",
+    "ctrl-s": "downloadMei"
   }
 }

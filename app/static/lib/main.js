@@ -503,7 +503,8 @@ function downloadMei() {
     type: 'text/plain'
   });
   let a = document.createElement('a');
-  a.download = meiFileName;
+  a.download = meiFileName
+    .replace(/\/static\//, '').replace(/\.[^/.]+$/, '.mei');
   a.href = window.URL.createObjectURL(blob);
   a.click();
 }
@@ -523,7 +524,7 @@ function downloadSvg() {
     type: 'image/svg+xml'
   });
   let a = document.createElement('a');
-  a.download = meiFileName.replace(/\.[^/.]+$/, '.svg');;
+  a.download = meiFileName.replace(/\.[^/.]+$/, '.svg');
   a.href = window.URL.createObjectURL(blob);
   a.click();
 }
@@ -551,6 +552,7 @@ let cmd = {
   'openMusicXml': () => openFileDialog('.xml,.musicxml,.mxl,text/*'),
   'openHumdrum': () => openFileDialog('.krn,.hum,text/*'),
   'openPae': () => openFileDialog('.pae,.abc,text/*'),
+  'downloadMei': () => downloadMei(),
   'zoomIn': () => v.zoom(+1),
   'zoomOut': () => v.zoom(-1),
   'zoom50': () => v.zoom(50),
