@@ -9,7 +9,6 @@ var v; // viewer instance
 import {
   setOrientation,
   addResizerHandlers,
-  getVerovioContainerSize
 } from './resizer.js'
 import {
   dropHandler,
@@ -34,7 +33,7 @@ import Viewer from './viewer.js';
 import Github from './github.js';
 
 
-const version = '0.1.4';
+const version = 'develop-0.1.5';
 const versionDate = '23 Dec 2021';
 const defaultMeiFileName = `${root}Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei`;
 const defaultVerovioOptions = {
