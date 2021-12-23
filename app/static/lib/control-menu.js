@@ -302,8 +302,8 @@ export function createControlsMenu(parentElement, scale) {
   speedCheckbox.setAttribute('type', 'checkbox');
   speedCheckbox.setAttribute('checked', 'false');
   speedCheckbox.classList.add('checkbox');
-  speedCheckbox.checked = false;
-  speedCheckbox.disabled = true;
+  speedCheckbox.checked = true;
+  speedCheckbox.disabled = false;
   // addToolTip(speedCheckbox, {
   //   title: 'Speed mode (optimized notation rendering)'
   // });

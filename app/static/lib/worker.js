@@ -166,16 +166,28 @@ onmessage = function(e) {
       break;
     case 'computePageBreaks': // compute page breaks
       try {
+        console.log('Worker computePageBreaks started');
         var tkOptions = result.options;
         tk.setOptions(tkOptions);
         tk.loadData(result.mei);
         let noPages = tk.getPageCount();
         result.pageBreaks = {};
-        for (let p = 1; p < noPages; p++) {
-          let svg = tk.renderToSVG(p);
-          let ms = svg.querySelectorAll('measure');
-          result[p] = ms[ms.length - 1].getAttribute('id');
+        let idString = '';
+        for (let p = 1; p <= noPages; p++) {
+          let svgText = tk.renderToSVG(p);
+          let it = svgText
+            .matchAll(/g([^>]+)(?:class=)(?:['"])(?:measure)(?:['"])/g);
+          for (let i of it) {
+            idString = String(i);
+          }
+          let match = idString.match(/(['"])[^'"]*\1/);
+          let id = match[0].replace('"', '').replace("''", "");
+          console.log('svg p.' + p + ':', id);
+          updateProgressbar(p / noPages * 100);
+          console.log('Progress: ' + p / noPages * 100 + '%')
+          result[p] = id;
         }
+        // pb.innerHTML += 'done.';
         console.log('Worker computePageBreaks: ', result.pageBreaks);
       } catch (e) {
         log(e);
@@ -231,4 +243,11 @@ onmessage = function(e) {
 function log(e) {
   console.log('Worker error: ', e);
   return;
+}
+
+function updateProgressbar(perc) {
+  postMessage({
+    'cmd': 'updateProgressbar',
+    'percentage': perc
+  });
 }

@@ -4,7 +4,6 @@ import {
 import * as speed from './speed.js';
 import * as utils from './utils.js';
 import * as dutils from './dom-utils.js';
-import * as att from './attribute-classes.js';
 import {
   addToolTip
 } from './control-menu.js';
@@ -21,7 +20,7 @@ export default class Viewer {
     this.notationNightMode = false;
     // this.tkOptions = this.vrvToolkit.getAvailableOptions();
     this.updateNotation = true; // whether or not notation gets re-rendered after text changes
-    this.speedMode = false; // speed mode (just feeds on page to Verovio to reduce drawing time)
+    this.speedMode = true; // speed mode (just feeds on page to Verovio to reduce drawing time)
     this.parser = new DOMParser();
     this.xmlDoc;
     this.encodingHasChanged = true; // to recalculate DOM or pageLists
@@ -35,8 +34,8 @@ export default class Viewer {
 
   // change options, load new data, render current page, add listeners, highlight
   updateAll(cm, options = {}) {
+    this.setVerovioOptions(options);
     if (!this.speedMode) {
-      this.setVerovioOptions(options);
       let message = {
         'cmd': 'updateAll',
         'options': this.vrvOptions,
@@ -46,7 +45,17 @@ export default class Viewer {
       };
       this.worker.postMessage(message);
     } else { // in speed mode
-
+      let message = {
+        'cmd': 'updateAll',
+        'options': this.vrvOptions,
+        'mei': this.speedFilter(cm.getValue()),
+        'pageNo': this.currentPage,
+        'xmlId': '',
+        'computePageBreaks': false
+      };
+      if (this.speedMode && Object.keys(this.pageBreaks).length == 0)
+        message.computePageBreaks = true;
+      this.worker.postMessage(message);
     }
   }
 
@@ -115,17 +124,20 @@ export default class Viewer {
     this.loadXml(mei);
     if (!this.speedMode) return mei;
     this.breaks = brks;
-    if ("encoded" == this.breaksSelector.options[
-        this.breaksSelector.selectedIndex].value) {
+    let bs = document.getElementById('breaks-select');
+    if (bs.value == "encoded") {
       this.breaks = ['pb'];
+    } else if (bs.value == 'auto') {
+      this.breaks =
+        (Object.keys(this.pageBreaks).length == 0) ? '' : this.pageBreaks;
     }
-    // console.info('loadXml breaks: ', this.breaks);
-    if (this.encodingHasChanged) {
+    // count pages from system/pagebreaks
+    if (this.encodingHasChanged && Array.isArray(this.breaks)) {
       let elements = this.xmlDoc.querySelectorAll("measure, sb, pb");
       // count pages
       this.pageCount = 1; // pages are one-based
-      countBreaks = false;
-      for (e of elements) {
+      let countBreaks = false;
+      for (let e of elements) {
         if (e.nodeName == 'measure') countBreaks = true; // skip trailing breaks
         if (countBreaks && this.breaks.includes(e.nodeName))
           this.pageCount++;
@@ -158,7 +170,17 @@ export default class Viewer {
       'pageNo': this.currentPage,
       'removeIds': removeIds
     }
-    if (false && !removeIds) message.xmlId = this.selectedElements[0];
+    if (false && !removeIds) message.xmlId = this.selectedElements[0]; // TODO
+    this.worker.postMessage(message);
+  }
+
+  computePageBreaks(cm) {
+    let message = {
+      'cmd': 'computePageBreaks',
+      'options': this.vrvOptions,
+      'format': 'mei',
+      'mei': cm.getValue()
+    }
     this.worker.postMessage(message);
   }
 

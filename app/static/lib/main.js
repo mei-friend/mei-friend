@@ -34,7 +34,7 @@ import Viewer from './viewer.js';
 import Github from './github.js';
 
 
-const version = '0.1.4';
+const version = 'develop-0.1.5';
 const versionDate = '23 Dec 2021';
 const defaultMeiFileName = `${root}Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei`;
 const defaultVerovioOptions = {
@@ -81,8 +81,6 @@ document.addEventListener('DOMContentLoaded', function() {
     gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"]
     // theme: 'dracula' // monokai (dark), dracula (bright)
   });
-
-  openMei(); // default MEI
 
   setOrientation(cm, 'bottom', v);
 
@@ -336,7 +334,8 @@ function workerEventsHandler(ev) {
       document.querySelector(".statusbar").innerHTML =
         `Verovio ${tkVersion} loaded.`;
       setBreaksOptions(tkAvailableOptions);
-      v.updateAll(cm, defaultVerovioOptions);
+      openMei(); // default MEI
+      // v.updateAll(cm, defaultVerovioOptions);
       break;
     case 'mei': // returned from importData, importBinaryData
       mei = ev.data.mei;
@@ -358,7 +357,7 @@ function workerEventsHandler(ev) {
       if (ev.data.pageCount) v.pageCount = ev.data.pageCount;
       v.currentPage = ev.data.pageNo;
       document.querySelector(".statusbar").innerHTML =
-        meiFileName + ", pg " + v.currentPage + "/" + v.pageCount + " loaded.";
+        meiFileName + ", p." + v.currentPage + "/" + v.pageCount + " loaded.";
       document.querySelector('title').innerHTML = 'mei-friend: ' +
         meiFileName.substr(meiFileName.lastIndexOf("/") + 1);
       document.querySelector('.verovio-panel').innerHTML = ev.data.svg;
@@ -369,10 +368,11 @@ function workerEventsHandler(ev) {
       v.updateHighlight(cm);
       if (!"setFocusToVerovioPane" in ev.data || ev.data.setFocusToVerovioPane)
         v.setFocusToVerovioPane();
+      if (ev.data.computePageBreaks) v.computePageBreaks(cm);
       break;
     case 'navigatePage': // resolve navigation with page turning
       document.querySelector(".statusbar").innerHTML =
-        meiFileName + ", pg " + v.currentPage + "/" + v.pageCount + " loaded.";
+        meiFileName + ", p." + v.currentPage + "/" + v.pageCount + " loaded.";
       document.querySelector('.verovio-panel').innerHTML = ev.data.svg;
       let ms = document.querySelectorAll('.measure'); // find measures on page
       if (ms.length > 0) {
@@ -860,6 +860,10 @@ function addEventListeners(cm, v) {
   let ch = document.getElementById('live-update-checkbox');
   ch.addEventListener('change', () => {
     if (ch.checked) v.notationUpdated(cm, true);
+  });
+
+  document.getElementById('speed-checkbox').addEventListener('change', (ev) => {
+    v.speedMode = ev.target.checked;
   });
 
 }
