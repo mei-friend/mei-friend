@@ -24,12 +24,13 @@ github = oauth.register(
 def index():
     return render_template('index.html',
             isLoggedIn = False
-            )
+    )
 
 @app.route("/login")
 def login():
-    print(getenv("CLIENT_ID"))
-    redirect_url = url_for("authorize", _external=True)
+    env_url = getenv("REDIRECT_URL")
+    redirect_url = env_url if env_url else url_for("authorize", _external=True)
+    # redirect_url = url_for("authorize", _external=True)
     return github.authorize_redirect(redirect_url)
 
 @app.route("/authorize")
