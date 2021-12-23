@@ -171,7 +171,7 @@ function assignGithubMenuClickHandlers() {
           document.querySelector(".statusbar").innerText = "Loading from Github...";
           v.clear();
           v.updateNotation = false;
-          meiFileName = `Github: ${github.githubRepo}${github.filepath}`
+          meiFileName = `Github:${github.githubRepo}${github.filepath}`
           cm.setValue(github.content);
           v.updateNotation = true;
           v.updateAll(cm);
@@ -331,7 +331,8 @@ function workerEventsHandler(ev) {
       v.currentPage = ev.data.pageNo;
       document.querySelector(".statusbar").innerHTML =
         meiFileName + ", pg " + v.currentPage + "/" + v.pageCount + " loaded.";
-      document.querySelector('title').innerHTML = 'mei-friend: ' + meiFileName;
+      document.querySelector('title').innerHTML = 'mei-friend: ' +
+        meiFileName.replace(/\/static\//, '').replace(/\/mei-friend/, '');
       document.querySelector('.verovio-panel').innerHTML = ev.data.svg;
       if (ev.data.setCursorToPageBeginning) v.setCursorToPageBeginning(cm);
       v.updatePageNumDisplay();
@@ -505,7 +506,8 @@ function downloadMei() {
     type: 'text/plain'
   });
   let a = document.createElement('a');
-  a.download = meiFileName;
+  a.download = meiFileName
+    .replace(/\/static\//, '').replace(/\.[^/.]+$/, '.mei');
   a.href = window.URL.createObjectURL(blob);
   a.click();
 }
@@ -525,7 +527,7 @@ function downloadSvg() {
     type: 'image/svg+xml'
   });
   let a = document.createElement('a');
-  a.download = meiFileName.replace(/\.[^/.]+$/, '.svg');;
+  a.download = meiFileName.replace(/\.[^/.]+$/, '.svg');
   a.href = window.URL.createObjectURL(blob);
   a.click();
 }
@@ -553,6 +555,7 @@ let cmd = {
   'openMusicXml': () => openFileDialog('.xml,.musicxml,.mxl,text/*'),
   'openHumdrum': () => openFileDialog('.krn,.hum,text/*'),
   'openPae': () => openFileDialog('.pae,.abc,text/*'),
+  'downloadMei': () => downloadMei(),
   'zoomIn': () => v.zoom(+1),
   'zoomOut': () => v.zoom(-1),
   'zoom50': () => v.zoom(50),

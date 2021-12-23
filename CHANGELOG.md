@@ -57,3 +57,4 @@
 # 0.1.4 patch
 * Verovio label removed and speedmode checkbox added (still disabled)
 * Some editor code optimizations
+* Open and download keyboard shortcuts added
