@@ -59,7 +59,7 @@
         <button class="dropbtn"><img id="GithubLogo" src="{{ url_for('static', filename='img/GitHub-Mark-32px.png') }}" />{{userName}}</button>
         <div class="dropdown-content" id="GithubMenu"></div>
         {% else %}
-        <a class="dropbtn" id="GithubLogin" href="/login"><img id="GithubLogo" src="{{ url_for('static', filename='img/GitHub-Mark-32px.png') }}" />Login</a>
+        <a class="dropbtn" id="GithubLogin" href="login"><img id="GithubLogo" src="{{ url_for('static', filename='img/GitHub-Mark-32px.png') }}" />Login</a>
         {% endif %}
       </div>
       <div class="dropdown">
@@ -144,7 +144,7 @@
       <div class="dropdown">
         <button class="dropbtn">Help</button>
         <div class="dropdown-content" id="HelpMenu">
-          <a id="GoToHelpPage" href="/help" target="_blank">Show
+          <a id="GoToHelpPage" href="help" target="_blank">Show
             help page</a>
         </div>
       </div>
