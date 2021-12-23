@@ -407,6 +407,8 @@ function workerEventsHandler(ev) {
       break;
     case 'computePageBreaks':
       v.pageBreaks = ev.data.pageBreaks;
+      v.pageCount = ev.data.pageCount;
+      v.updatePageNumDisplay();
   }
 }
 

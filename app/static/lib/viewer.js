@@ -160,6 +160,7 @@ export default class Viewer {
     this.selectedElements = [];
     this.lastNoteId = '';
     this.currentPage = 1;
+    this.pageBreaks = {};
   }
 
   reRenderMei(cm, removeIds = false) {

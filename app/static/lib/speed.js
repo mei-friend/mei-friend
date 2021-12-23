@@ -307,7 +307,7 @@ function readSection(xmlScore, pageNo, spdScore, breaks) {
 
       // increment in countingMode computedBreaks
       if (currentNodeName == 'measure' && countingMode == 'computedBreaks' &&
-        children.at(i).getAttribute('xml:id') == breaks[p]) p++;
+        children[i].getAttribute('xml:id') == breaks[p]) p++;
 
     } // for loop across child nodes
 

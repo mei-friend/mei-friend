@@ -170,10 +170,10 @@ onmessage = function(e) {
         var tkOptions = result.options;
         tk.setOptions(tkOptions);
         tk.loadData(result.mei);
-        let noPages = tk.getPageCount();
+        result.pageCount = tk.getPageCount();
         result.pageBreaks = {};
         let idString = '';
-        for (let p = 1; p <= noPages; p++) {
+        for (let p = 1; p <= result.pageCount; p++) {
           let svgText = tk.renderToSVG(p);
           let it = svgText
             .matchAll(/g([^>]+)(?:class=)(?:['"])(?:measure)(?:['"])/g);
@@ -181,11 +181,11 @@ onmessage = function(e) {
             idString = String(i);
           }
           let match = idString.match(/(['"])[^'"]*\1/);
-          let id = match[0].replace('"', '').replace("''", "");
+          let id = match[0].replace(/['"]/g, '');
           console.log('svg p.' + p + ':', id);
-          updateProgressbar(p / noPages * 100);
-          console.log('Progress: ' + p / noPages * 100 + '%')
-          result[p] = id;
+          updateProgressbar(p / result.pageCount * 100);
+          console.log('Progress: ' + p / result.pageCount * 100 + '%')
+          result.pageBreaks[p] = id;
         }
         // pb.innerHTML += 'done.';
         console.log('Worker computePageBreaks: ', result.pageBreaks);
