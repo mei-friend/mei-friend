@@ -34,8 +34,8 @@ import Viewer from './viewer.js';
 import Github from './github.js';
 
 
-const version = 'develop-0.1.4';
-const versionDate = '22 Dec 2021';
+const version = '0.1.4';
+const versionDate = '23 Dec 2021';
 const defaultMeiFileName = `${root}Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei`;
 const defaultVerovioOptions = {
   scale: 55,
@@ -183,7 +183,7 @@ function assignGithubMenuClickHandlers() {
           cm.setValue(github.content);
           v.updateNotation = true;
           v.updateAll(cm);
-        }).catch(() => { 
+        }).catch(() => {
           console.error("Couldn't read Github repo to fill in branch contents");
           githubLoadingIndicator.classList.remove("loading");
         })
@@ -278,7 +278,7 @@ async function fillInBranchContents(e) {
 }
 
 async function fillInCommitLog(refresh=false) {
-  if(refresh) { 
+  if(refresh) {
     const githubLoadingIndicator = document.getElementById("GithubLogo");
     githubLoadingIndicator.classList.add("loading");
     github.readGithubRepo().then(() => {
@@ -286,7 +286,7 @@ async function fillInCommitLog(refresh=false) {
       console.log("RENDERING AFTER FORCED RELOAD. Commit log: ", github.commitLog);
       renderCommitLog();
     })
-  } else { 
+  } else {
     renderCommitLog();
   }
 }
