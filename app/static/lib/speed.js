@@ -72,10 +72,13 @@ function readSection(xmlScore, pageNo, spdScore, breaks) {
   let p = 1; // page count
   let m = 1; // measure count (for a fast first page, with breaks = '')
   let mxMeasures = 50; // for a quick first page
-  let countBreaks = false;
+  let countingMode = 'measures';
+  if (Array.isArray(breaks)) countingMode = 'encodedBreaks';
+  else if (typeof breaks == 'object') countingMode = 'computedBreaks';
+  let countNow = false; // to ignore encoded page breaks before first measure
   let startingElements = [];
   let endingElements = [];
-  let breaksSelector = breaks.join(', ');
+  let breaksSelector = breaks.join(', '); // TODO
   return function digDeeper(section) {
     var children = section.childNodes;
     let lgt = children.length;
@@ -95,13 +98,18 @@ function readSection(xmlScore, pageNo, spdScore, breaks) {
         continue;
       }
       if (currentNodeName == 'measure') {
-        countBreaks = true;
-        if (breaks == '' && (m++) >= mxMeasures) return spdScore;
+        countNow = true;
+        if (countingMode == 'measures' && (m++) >= mxMeasures) return spdScore;
+        if (countingMode == 'computedBreaks') {
+
+        }
       }
-      if (countBreaks && breaks.includes(currentNodeName)) {
+      if (countingMode == "encodedBreaks" && countNow &&
+        breaks.includes(currentNodeName)) {
         p++; // skip breaks before content (that is, a measure)
         continue;
       }
+
       // update scoreDef @key.sig attribute or keySig@sig and
       // for @meter@count/@unit attr or meterSig@count/unit.
       if (currentNodeName == 'scoreDef' && p < pageNo) {
