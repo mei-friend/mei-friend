@@ -59,3 +59,5 @@
 * Some editor code optimizations
 * Open and download keyboard shortcuts added
 * Incorporate new .env variables for production deployment
+* Bug-fixes and layout improvements for Github menu
+* Add cute Github loading indicator animation
