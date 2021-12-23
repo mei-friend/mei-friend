@@ -72,13 +72,15 @@ function readSection(xmlScore, pageNo, spdScore, breaks) {
   let p = 1; // page count
   let m = 1; // measure count (for a fast first page, with breaks = '')
   let mxMeasures = 50; // for a quick first page
+  let breaksSelector = '';
   let countingMode = 'measures';
-  if (Array.isArray(breaks)) countingMode = 'encodedBreaks';
-  else if (typeof breaks == 'object') countingMode = 'computedBreaks';
+  if (Array.isArray(breaks)) {
+    countingMode = 'encodedBreaks';
+    breaksSelector = breaks.join(', ');
+  } else if (typeof breaks == 'object') countingMode = 'computedBreaks';
   let countNow = false; // to ignore encoded page breaks before first measure
   let startingElements = [];
   let endingElements = [];
-  let breaksSelector = breaks.join(', '); // TODO
   return function digDeeper(section) {
     var children = section.childNodes;
     let lgt = children.length;
@@ -142,7 +144,8 @@ function readSection(xmlScore, pageNo, spdScore, breaks) {
         // console.info('staffDef: ', staffDefList);
         var staffDefs = spdScore.querySelectorAll('staffDef');
         for (let st of staffDefList) {
-          if (breaks.includes(st.nodeName)) break;
+          if (countingMode == 'encodedBreaks' && breaks.includes(st.nodeName))
+            break;
           var keysigValue = '',
             meterCountValue = '',
             meterUnitValue = '';
@@ -213,7 +216,8 @@ function readSection(xmlScore, pageNo, spdScore, breaks) {
         // console.info('clefList: ', clefList);
         for (let clef of clefList) { // check clefs of measure, ignore @sameas
           if (clef.getAttribute('sameas')) continue;
-          if (breaks.includes(clef.nodeName)) break;
+          if (countingMode == 'encodedBreaks' && breaks.includes(clef.nodeName))
+            break;
           let staff = clef.closest('staff, staffDef');
           let staffNo = -1;
           if (staff) staffNo = staff.getAttribute('n');
@@ -310,7 +314,7 @@ function readSection(xmlScore, pageNo, spdScore, breaks) {
       for (e of endingElements) {
         let endingElement = xmlScore.querySelector('[*|id="' + e + '"]');
         if (endingElement) {
-          let startid = removeHashFromString(endingElement.getAttribute('startid'));
+          let startid = rmHash(endingElement.getAttribute('startid'));
           let staff = xmlScore.querySelector('[*|id="' + startid + '"]');
           let staffNo = -1;
           if (staff) staffNo = staff.closest('staff').getAttribute('n');
@@ -322,8 +326,8 @@ function readSection(xmlScore, pageNo, spdScore, breaks) {
       }
       endingElements = [];
     }
+    // 2) go through startingElements and append to a third-page measure
     if (p > pageNo) {
-      // 2) go through startingElements and append to a third-page measure
       var m = spdScore.querySelector('[*|id="endingMeasure"]');
       if (!m) {
         let endingMeasure = dummyMeasure(countStaves(spdScore.querySelector('scoreDef')));
@@ -340,7 +344,7 @@ function readSection(xmlScore, pageNo, spdScore, breaks) {
           // console.info('startingElement s: ', s);
           let startingElement = xmlScore.querySelector('[*|id="' + s + '"]');
           if (startingElement) {
-            let endid = removeHashFromString(startingElement.getAttribute('endid'));
+            let endid = rmHash(startingElement.getAttribute('endid'));
             // console.info('searching for endid: ', endid);
             if (endid) {
               let staff = xmlScore.querySelector('[*|id="' + endid + '"]');
@@ -558,10 +562,8 @@ export function countStaves(scoreDef) {
   return scoreDef.querySelectorAll('staffDef').length;
 }
 
-export function removeHashFromString(hashedString) {
-  if (hashedString.startsWith('#'))
-    hashedString = hashedString.split('#')[1];
-  return hashedString;
+export function rmHash(hashedString) {
+  if (hashedString.startsWith('#')) return hashedString.split('#')[1];
 }
 
 // filter selected elements and keep only highest in DOM
