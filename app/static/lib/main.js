@@ -277,8 +277,8 @@ async function fillInBranchContents(e) {
   assignGithubMenuClickHandlers();
 }
 
-async function fillInCommitLog(refresh=false) {
-  if(refresh) {
+async function fillInCommitLog(refresh = false) {
+  if (refresh) {
     const githubLoadingIndicator = document.getElementById("GithubLogo");
     githubLoadingIndicator.classList.add("loading");
     github.readGithubRepo().then(() => {
@@ -360,7 +360,7 @@ function workerEventsHandler(ev) {
       document.querySelector(".statusbar").innerHTML =
         meiFileName + ", pg " + v.currentPage + "/" + v.pageCount + " loaded.";
       document.querySelector('title').innerHTML = 'mei-friend: ' +
-        meiFileName.replace(/\/static\//, '').replace(/\/mei-friend/, '');
+        meiFileName.substr(meiFileName.lastIndexOf("/") + 1);
       document.querySelector('.verovio-panel').innerHTML = ev.data.svg;
       if (ev.data.setCursorToPageBeginning) v.setCursorToPageBeginning(cm);
       v.updatePageNumDisplay();
