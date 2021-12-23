@@ -99,16 +99,17 @@ function readSection(xmlScore, pageNo, spdScore, breaks) {
       }
       if (currentNodeName == 'measure') {
         countNow = true;
+        // increment m when counting measures for a quick first page
         if (countingMode == 'measures' && (m++) >= mxMeasures) return spdScore;
-        if (countingMode == 'computedBreaks') {
+      }
 
+      if (countingMode == "encodedBreaks") {
+        if (countNow && breaks.includes(currentNodeName)) {
+          p++; // skip breaks before content (that is, a measure)
+          continue;
         }
-      }
-      if (countingMode == "encodedBreaks" && countNow &&
-        breaks.includes(currentNodeName)) {
-        p++; // skip breaks before content (that is, a measure)
-        continue;
-      }
+        // ignore system/page breaks in other countingModes
+      } else if (currentNodeName == 'sb' || currentNodeName == 'pb') continue;
 
       // update scoreDef @key.sig attribute or keySig@sig and
       // for @meter@count/@unit attr or meterSig@count/unit.
@@ -158,7 +159,7 @@ function readSection(xmlScore, pageNo, spdScore, breaks) {
               if (st.getAttribute('n') == staffDef.getAttribute('n')) {
                 var el = document.createElementNS(meiNameSpace, 'keySig');
                 el.setAttribute('sig', keysigValue);
-                // console.info('Updating scoreDef(' + st.getAttribute('n') + '): ', el);
+                //console.info('Updating scoreDef('+st.getAttribute('n')+'): ',el);
                 var k = staffDef.querySelector('keySig');
                 if (k) {
                   k.setAttribute('sig', keysigValue);
@@ -286,15 +287,22 @@ function readSection(xmlScore, pageNo, spdScore, breaks) {
         p++;
         continue;
       }
+
       // append children
       if (p == pageNo) {
         spdScore.getElementsByTagName('section').item(0).appendChild(children[i].cloneNode(true));
         // console.info('digDeeper adds child to spdScore: ', spdScore);
       }
-    }
+
+      // increment in countingMode computedBreaks
+      if (currentNodeName == 'measure' && countingMode == 'computedBreaks' &&
+        children.at(i).getAttribute('xml:id') == breaks[p]) p++;
+
+    } // for loop across child nodes
 
     // console.info('2 startingElements: ', startingElements);
     // console.info('2 endingElements: ', endingElements);
+
     // 1) go through endingElements and add to first measure
     if (endingElements.length > 0 && pageNo > 1) {
       let m = spdScore.querySelector('[*|id="startingMeasure"]');
