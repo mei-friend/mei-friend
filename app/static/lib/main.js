@@ -115,6 +115,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function assignGithubMenuClickHandlers() {
+  const githubLoadingIndicator = document.getElementById("GithubLogo");
   const repoHeader = document.getElementById('repositoriesHeader');
   if (repoHeader) {
     // on click, reload list of all repositories
@@ -147,8 +148,13 @@ function assignGithubMenuClickHandlers() {
     e.addEventListener('click', (ev) => {
       github.branch = e.innerText;
       github.filepath = "/";
+      githubLoadingIndicator.classList.add("loading");
       github.readGithubRepo().then(() => {
         fillInBranchContents(ev)
+        githubLoadingIndicator.classList.remove("loading");
+      }).catch(() => {
+        console.error("Couldn't read Github repo to fill in branch contents");
+        githubLoadingIndicator.classList.remove("loading");
       });
     })
   );
@@ -167,7 +173,9 @@ function assignGithubMenuClickHandlers() {
         github.filepath += e.querySelector("span.filepath").innerText;
         console.debug(`Loading file: https://github.com/${github.githubRepo}${github.filepath}`);
         fillInBranchContents(ev);
+        githubLoadingIndicator.classList.add("loading");
         github.readGithubRepo().then(() => {
+          githubLoadingIndicator.classList.remove("loading");
           document.querySelector(".statusbar").innerText = "Loading from Github...";
           v.clear();
           v.updateNotation = false;
@@ -175,8 +183,11 @@ function assignGithubMenuClickHandlers() {
           cm.setValue(github.content);
           v.updateNotation = true;
           v.updateAll(cm);
-        });
-      });
+        }).catch(() => { 
+          console.error("Couldn't read Github repo to fill in branch contents");
+          githubLoadingIndicator.classList.remove("loading");
+        })
+      })
     }
   })
 }
@@ -221,6 +232,7 @@ async function fillInRepoBranches(e, per_page = 100, page = 1) {
 async function fillInBranchContents(e) {
   // TODO handle > per_page files (similar to userRepos)
   const branchContents = await github.getBranchContents(github.filepath);
+  console.log("Got new branch contents: ", branchContents);
   let githubMenu = document.getElementById("GithubMenu");
   githubMenu.innerHTML = `<a id="repositoriesHeader" href="#"><span class="btn icon icon-arrow-left inline-block-tight"></span>Repository:${github.githubRepo}</a>
     <hr class="dropdown-line">
@@ -260,12 +272,26 @@ async function fillInBranchContents(e) {
     commitUI.appendChild(commitButton);
     githubMenu.appendChild(commitUI);
   }
-  fillInCommitLog();
+  fillInCommitLog("withRefresh");
   // GitHub menu interactions
   assignGithubMenuClickHandlers();
 }
 
-async function fillInCommitLog(e) {
+async function fillInCommitLog(refresh=false) {
+  if(refresh) { 
+    const githubLoadingIndicator = document.getElementById("GithubLogo");
+    githubLoadingIndicator.classList.add("loading");
+    github.readGithubRepo().then(() => {
+      githubLoadingIndicator.classList.remove("loading");
+      console.log("RENDERING AFTER FORCED RELOAD. Commit log: ", github.commitLog);
+      renderCommitLog();
+    })
+  } else { 
+    renderCommitLog();
+  }
+}
+
+function renderCommitLog() {
   let logTable = document.getElementById("logTable");
   if (logTable) {
     // clear up previous logTable if it exists
@@ -840,26 +866,31 @@ function handleCommitButtonClicked(e) {
   // TODO Let user know of success / failure, allow user to do something about it
   const messageInput = document.getElementById("commitMessageInput");
   const message = messageInput.value;
+  const githubLoadingIndicator = document.getElementById("GithubLogo");
   // lock editor while we are busy commiting
   cm.readOnly = "nocursor"; // don't allow editor focus
   // try commiting to Github
+  githubLoadingIndicator.classList.add("loading");
   github.writeGithubRepo(cm.getValue(), message)
     .then(() => {
       console.log(`Successfully written to github: ${github.githubRepo}${github.filepath}`);
       messageInput.value = "";
       github.readGithubRepo()
         .then(() => {
+          githubLoadingIndicator.classList.remove("loading");
           cm.readOnly = false;
           fillInCommitLog();
           console.log("Finished updating commit log after writing commit.");
         })
         .catch((e) => {
           cm.readOnly = false;
-          console.log("Couldn't read Github repo after writing commit: ", e, github);
+          githubLoadingIndicator.classList.remove("loading");
+          console.error("Couldn't read Github repo after writing commit: ", e, github);
         })
     })
     .catch((e) => {
-      console.log("Couldn't commit Github repo: ", e, github)
+      githubLoadingIndicator.classList.remove("loading");
+      console.error("Couldn't commit Github repo: ", e, github)
     });
 }
 

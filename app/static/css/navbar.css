@@ -93,6 +93,10 @@
   text-align: left;
 }
 
+.dropdown-content input, .dropdown-content table {
+  margin: 3px 12px;
+}
+
 /* Add a grey background color to dropdown links on hover */
 .dropdown-content a:hover {
   background-color: #ddd;
@@ -118,6 +122,18 @@
 #GithubLogo {
   height: .8em;
   margin-right: .2em;
+}
+
+@keyframes spinning { 
+  from { transform: rotate(0deg) }
+  to { transform: rotate(359deg) }
+}
+
+#GithubLogo.loading {
+  animation-name: spinning;
+  animation-duration: 1s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
 }
 
 .menu-icon {
