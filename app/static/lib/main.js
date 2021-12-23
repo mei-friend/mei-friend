@@ -270,6 +270,7 @@ async function fillInCommitLog(e) {
   if (logTable) {
     // clear up previous logTable if it exists
     logTable.remove();
+    document.getElementById("commitLogSeperator").remove();
   }
   logTable = document.createElement("table");
   logTable.setAttribute("id", "logTable");
@@ -292,6 +293,7 @@ async function fillInCommitLog(e) {
   commitLogHeader.innerText = "Commit Log";
   const hr = document.createElement("hr");
   hr.classList.add("dropdown-line");
+  hr.setAttribute("id", "commitLogSeperator");
   githubMenu.appendChild(hr);
   githubMenu.appendChild(logTable);
 }
