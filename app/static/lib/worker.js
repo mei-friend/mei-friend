@@ -169,7 +169,15 @@ onmessage = function(e) {
       break;
     case 'navigatePage': // for a page turn during navigation
       try { // returns original message plus svg
-        result.svg = tk.renderToSVG(result.pageNo);
+        if (result.speedMode) {
+          tk.setOptions({
+            breaks: 'encoded'
+          });
+          tk.loadData(result.mei);
+          result.mei = '';
+        }
+        let pg = (result.speedMode && result.pageNo > 1) ? 2 : result.pageNo;
+        result.svg = tk.renderToSVG(pg);
       } catch (e) {
         log(e);
       }

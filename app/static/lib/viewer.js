@@ -483,8 +483,7 @@ export default class Viewer {
         if (!id) { // when no id on screen, turn page
           let what = 'first'; // first/last note within measure
           if (dir == 'backwards' && incElName !== 'measure') what = 'last';
-          if (!this.changeCurrentPage(dir)) return; // turn page
-          this.navigateBeyondPage(dir, what, stNo, lyNo, y);
+          this.navigateBeyondPage(cm, dir, what, stNo, lyNo, y);
           return;
         }
       }
@@ -532,8 +531,9 @@ export default class Viewer {
   }
 
   // turn page for navigation and return svg directly
-  navigateBeyondPage(dir = 'forwards', what = 'first',
+  navigateBeyondPage(cm, dir = 'forwards', what = 'first',
     stNo = 1, lyNo = 1, y = 0) {
+    if (!this.changeCurrentPage(dir)) return; // turn page
     let message = {
       'cmd': 'navigatePage',
       'pageNo': this.currentPage,
@@ -543,6 +543,10 @@ export default class Viewer {
       'lyNo': lyNo,
       'y': y
     };
+    if (this.speedMode) {
+      message.mei = this.speedFilter(cm.getValue());
+      message.speedMode = this.speedMode;
+    }
     this.worker.postMessage(message);
   }
 

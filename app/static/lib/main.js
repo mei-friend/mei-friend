@@ -875,8 +875,9 @@ function addEventListeners(cm, v) {
 
   document.getElementById('speed-checkbox').addEventListener('change', (ev) => {
     v.speedMode = ev.target.checked;
+    if (Object.keys(this.pageBreaks).length > 0)
+      v.pageCount = Object.keys(v.pageBreaks).length;
     v.updateAll(cm);
-    // TODO either delete v.pageBreaks or update v.pageCount and possibly xmlId
   });
 
 }
