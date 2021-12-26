@@ -495,9 +495,9 @@ export function renumberMeasures(v, cm, change) {
 
 
 
-// #############################################################################
-// # private functions                                                         #
-// #############################################################################
+// ############################################################################
+// # (mostly) private functions                                               #
+// ############################################################################
 
 // find xmlNode in textBuffer and remove it (including empty line)
 function removeInBuffer(cm, xmlNode) {

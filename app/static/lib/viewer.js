@@ -123,7 +123,7 @@ export default class Viewer {
         (Object.keys(this.pageBreaks).length == 0) ? '' : this.pageBreaks;
     }
     // count pages from system/pagebreaks
-    if (this.encodingHasChanged && Array.isArray(this.breaks)) {
+    if (Array.isArray(this.breaks)) {
       let elements = this.xmlDoc.querySelectorAll("measure, sb, pb");
       // count pages
       this.pageCount = 1; // pages are one-based
@@ -134,17 +134,18 @@ export default class Viewer {
           this.pageCount++;
       }
       if (this.currentPage > this.pageCount) this.currentPage = 1;
-      console.info('loadXml reloaded: currentPage: ' + this.currentPage +
+      console.info('xmlDOM pages counted: currentPage: ' + this.currentPage +
         ', pageCount: ' + this.pageCount);
-      this.encodingHasChanged = false;
       // speed.getBreaksFromToolkit(this.vrvToolkit, txtEdr.getBuffer().getText());
     }
     return speed.getPageFromDom(this.xmlDoc, this.currentPage, this.breaks);
   }
 
   loadXml(mei, forceReload = false) {
-    if (this.encodingHasChanged || forceReload)
+    if (this.encodingHasChanged || forceReload) {
       this.xmlDoc = this.parser.parseFromString(mei, "text/xml");
+      this.encodingHasChanged = false;
+    }
   }
 
   clear() {
