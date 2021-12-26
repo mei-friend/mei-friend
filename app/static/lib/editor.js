@@ -66,9 +66,9 @@ export function delEl(v, cm) {
   v.selectedElements = selectedElements;
   v.lastNoteId = v.selectedElements[v.selectedElements.length - 1];
   v.encodingHasChanged = true;
-  v.speedMode ? v.updateLayout() : v.updateData(cm, false, true);
+  v.updateData(cm, false, true);
   v.updateNotation = true;
-}
+} // delEl()
 
 export function addCtrlEl(v, cm, elName, placement, form) {
   if (v.selectedElements.length == undefined || v.selectedElements.length < 1)
@@ -173,7 +173,7 @@ export function addCtrlEl(v, cm, elName, placement, form) {
   v.selectedElements.push(uuid);
   v.updateData(cm, false, true);
   v.updateNotation = true;
-}
+} // addCtrlEl()
 
 // Reverse or insert att:placement (artic, ...), att.curvature (slur, tie,
 // phrase) and att.stems (note, chord) of current element
@@ -260,9 +260,9 @@ export function invertPlacement(v, cm, modifier = false) {
   // console.info('TextCursor: ', txtEdr.getCursorBufferPosition());
   if (range) cm.setCursor(range.end);
   v.selectedElements = ids;
-  v.speedMode ? v.updateLayout() : v.updateData(cm, false, true);
+  v.updateData(cm, false, true);
   v.updateNotation = true; // update notation again
-}
+} // invertPlacement()
 
 // toggle (switch on/off) artic to selected elements
 export function toggleArtic(v, cm, artic = "stacc") {
@@ -299,9 +299,9 @@ export function toggleArtic(v, cm, artic = "stacc") {
   }
   if (range) cm.setCursor(range.end);
   v.selectedElements = ids;
-  v.speedMode ? v.updateLayout() : v.updateData(cm, false, true);
+  v.updateData(cm, false, true);
   v.updateNotation = true; // update notation again
-}
+} // toggleArtic()
 
 // shift element (rests, note) up/down by pitch name (1 or 7 steps)
 export function shiftPitch(v, cm, deltaPitch) {
@@ -350,9 +350,9 @@ export function shiftPitch(v, cm, deltaPitch) {
     }
   }
   v.selectedElements = ids;
-  v.speedMode ? v.updateLayout() : v.updateData(cm, false, true);
+  v.updateData(cm, false, true);
   v.updateNotation = true; // update notation again
-}
+} // shiftPitch()
 
 export function moveElementToNextStaff(v, cm, upwards = true) {
   console.info('moveElementToNextStaff(' + (upwards ? 'up' : 'down') + ')');
@@ -377,9 +377,9 @@ export function moveElementToNextStaff(v, cm, upwards = true) {
     }
   }
   v.selectedElements = ids;
-  v.speedMode ? v.updateLayout() : v.updateData(cm, false, true);
+  v.updateData(cm, false, true);
   v.updateNotation = true; // update notation again
-}
+} // moveElementToNextStaff()
 
 // add beam, only speed mode
 export function addBeamElement(v, cm, elementName = 'beam') {
@@ -426,13 +426,13 @@ export function addBeamElement(v, cm, elementName = 'beam') {
     // buffer.groupChangesSinceCheckpoint(checkPoint); // TODO
     v.selectedElements = [];
     v.selectedElements.push(uuid);
-    v.speedMode ? v.updateLayout() : v.updateData(cm, false, true);
+    v.updateData(cm, false, true);
   } else {
     console.log('Cannot add ' + elementName +
       ' element, selected elements have different parents.');
   }
   v.updateNotation = true; // update notation again
-}
+} // addBeamElement()
 
 // add octave element and modify notes inside selected elements
 export function addOctaveElement(v, cm, disPlace = 'above', dis = '8') {
@@ -473,9 +473,9 @@ export function addOctaveElement(v, cm, disPlace = 'above', dis = '8') {
   v.selectedElements = [];
   v.selectedElements.push(uuid);
   v.lastNoteId = id2;
-  v.speedMode ? v.updateLayout() : v.updateData(cm, false, true);
+  v.updateData(cm, false, true);
   v.updateNotation = true; // update notation again
-}
+} // addOctaveElement()
 
 // wrapper for cleaning superfluous @accid.ges attributes
 export function cleanAccid(v, cm) {
