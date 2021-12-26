@@ -30,13 +30,15 @@ onmessage = function(e) {
     case 'updateAll':
       try {
         var tkOptions = result.options;
+        if (result.speedMode) tkOptions.breaks = 'encoded';
         tk.setOptions(tkOptions);
         tk.loadData(result.mei);
         result.mei = '';
         if (result.xmlId) {
           result.pageNo = parseInt(tk.getPageWithElement(result.xmlId));
         }
-        result.svg = tk.renderToSVG(result.pageNo);
+        let pg = (result.speedMode && result.pageNo > 1) ? 2 : result.pageNo;
+        result.svg = tk.renderToSVG(pg);
         result.pageCount = tk.getPageCount();
         result.cmd = 'updated';
       } catch (e) {
@@ -45,12 +47,18 @@ onmessage = function(e) {
       break;
     case 'updateData':
       try {
+        if (result.speedMode) {
+          tk.setOptions({
+            breaks: 'encoded'
+          });
+        }
         tk.loadData(result.mei);
         result.mei = '';
         if (result.xmlId) {
           result.pageNo = parseInt(tk.getPageWithElement(result.xmlId));
         }
-        result.svg = tk.renderToSVG(result.pageNo);
+        let pg = (result.speedMode && result.pageNo > 1) ? 2 : result.pageNo;
+        result.svg = tk.renderToSVG(pg);
         result.pageCount = tk.getPageCount();
         result.cmd = 'updated';
       } catch (e) {
@@ -73,6 +81,7 @@ onmessage = function(e) {
     case 'updateLayout':
       try {
         var tkOptions = result.options;
+        if (result.speedMode) tkOptions.breaks = 'encoded';
         tk.setOptions(tkOptions);
         tk.redoLayout();
         result.setCursorToPageBeginning = true;
@@ -90,6 +99,7 @@ onmessage = function(e) {
     case 'updateOption': // just update option without redoing layout
       try {
         var tkOptions = result.options;
+        if (result.speedMode) tkOptions.breaks = 'encoded';
         tk.setOptions(tkOptions);
         result.setCursorToPageBeginning = true;
         if (result.xmlId) {
@@ -166,7 +176,7 @@ onmessage = function(e) {
       break;
     case 'computePageBreaks': // compute page breaks
       try {
-        console.log('Worker computePageBreaks started');
+        // console.log('Worker computePageBreaks started');
         var tkOptions = result.options;
         tk.setOptions(tkOptions);
         tk.loadData(result.mei);
@@ -182,13 +192,11 @@ onmessage = function(e) {
           }
           let match = idString.match(/(['"])[^'"]*\1/);
           let id = match[0].replace(/['"]/g, '');
-          console.log('svg p.' + p + ':', id);
           updateProgressbar(p / result.pageCount * 100);
-          console.log('Progress: ' + p / result.pageCount * 100 + '%')
+          // console.log('Progress: ' + p / result.pageCount * 100 + '%')
           result.pageBreaks[p] = id;
         }
-        // pb.innerHTML += 'done.';
-        console.log('Worker computePageBreaks: ', result.pageBreaks);
+        // console.log('Worker computePageBreaks: ', result.pageBreaks);
       } catch (e) {
         log(e);
       }

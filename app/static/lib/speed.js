@@ -140,7 +140,7 @@ function readSection(xmlScore, pageNo, spdScore, breaks) {
       }
       // scoreDef with staffDef@key.sig or keySig@sig and meter@count/@unit
       var staffDefList = children[i].querySelectorAll(
-        breaksSelector ? breaksSelector + ', ' : '' + 'staffDef');
+        breaksSelector ? breaksSelector + ', staffDef' : 'staffDef');
       if (staffDefList && staffDefList.length > 0 && p < pageNo) {
         // console.info('staffDef: ', staffDefList);
         var staffDefs = spdScore.querySelectorAll('staffDef');
@@ -213,7 +213,7 @@ function readSection(xmlScore, pageNo, spdScore, breaks) {
       }
       // update scoreDef with clef elements inside layers (and breaks to stop updating)
       var clefList = children[i].querySelectorAll(
-        breaksSelector ? breaksSelector + ', ' : '' + 'clef');
+        breaksSelector ? breaksSelector + ', clef' : 'clef');
       if (clefList && clefList.length > 0 && p < pageNo) {
         // console.info('clefList: ', clefList);
         for (let clef of clefList) { // check clefs of measure, ignore @sameas

@@ -35,28 +35,17 @@ export default class Viewer {
   // change options, load new data, render current page, add listeners, highlight
   updateAll(cm, options = {}) {
     this.setVerovioOptions(options);
-    if (!this.speedMode) {
-      let message = {
-        'cmd': 'updateAll',
-        'options': this.vrvOptions,
-        'mei': this.speedFilter(cm.getValue()),
-        'pageNo': this.currentPage,
-        'xmlId': ''
-      };
-      this.worker.postMessage(message);
-    } else { // in speed mode
-      let message = {
-        'cmd': 'updateAll',
-        'options': this.vrvOptions,
-        'mei': this.speedFilter(cm.getValue()),
-        'pageNo': this.currentPage,
-        'xmlId': '',
-        'computePageBreaks': false
-      };
-      if (this.speedMode && Object.keys(this.pageBreaks).length == 0)
-        message.computePageBreaks = true;
-      this.worker.postMessage(message);
+    let message = {
+      'cmd': 'updateAll',
+      'options': this.vrvOptions,
+      'mei': this.speedFilter(cm.getValue()),
+      'pageNo': this.currentPage,
+      'xmlId': '',
+      'computePageBreaks': false,
+      'speedMode': this.speedMode,
+      'computePageBreaks': (this.speedMode && Object.keys(this.pageBreaks).length == 0)
     }
+    this.worker.postMessage(message);
   }
 
   updateData(cm, setCursorToPageBeg = true, setFocusToVerovioPane = true) {
@@ -68,7 +57,8 @@ export default class Viewer {
       'pageNo': this.currentPage,
       'xmlId': '',
       'setCursorToPageBeginning': setCursorToPageBeg,
-      'setFocusToVerovioPane': setFocusToVerovioPane
+      'setFocusToVerovioPane': setFocusToVerovioPane,
+      'speedMode': this.speedMode
     };
     this.worker.postMessage(message);
   }
@@ -110,7 +100,8 @@ export default class Viewer {
       'cmd': what,
       'options': this.vrvOptions,
       'pageNo': this.currentPage,
-      'xmlId': id
+      'xmlId': id,
+      'speedMode': this.speedMode
     };
     this.worker.postMessage(message);
   }

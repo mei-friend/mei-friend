@@ -334,12 +334,11 @@ function workerEventsHandler(ev) {
       document.querySelector(".statusbar").innerHTML =
         `Verovio ${tkVersion} loaded.`;
       setBreaksOptions(tkAvailableOptions);
-      openMei(); // default MEI
-      // v.updateAll(cm, defaultVerovioOptions);
+      openMei(); // open default MEI
       break;
     case 'mei': // returned from importData, importBinaryData
       mei = ev.data.mei;
-      if (!v.speedMode) v.pageCount = ev.data.pageCount;
+      v.pageCount = ev.data.pageCount;
       v.updateNotation = false;
       cm.setValue(mei);
       v.updateNotation = true;
@@ -354,10 +353,11 @@ function workerEventsHandler(ev) {
         if (!ev.data.removeIds)
           v.selectedElements.push(ev.data.xmlId);
       }
-      if (ev.data.pageCount) v.pageCount = ev.data.pageCount;
+      if (ev.data.pageCount && !v.speedMode) v.pageCount = ev.data.pageCount;
       v.currentPage = ev.data.pageNo;
       document.querySelector(".statusbar").innerHTML =
-        meiFileName + ", p." + v.currentPage + "/" + v.pageCount + " loaded.";
+        meiFileName.substr(meiFileName.lastIndexOf("/") + 1) +
+        ", p." + v.currentPage + "/" + v.pageCount + " loaded.";
       document.querySelector('title').innerHTML = 'mei-friend: ' +
         meiFileName.substr(meiFileName.lastIndexOf("/") + 1);
       document.querySelector('.verovio-panel').innerHTML = ev.data.svg;
@@ -372,7 +372,8 @@ function workerEventsHandler(ev) {
       break;
     case 'navigatePage': // resolve navigation with page turning
       document.querySelector(".statusbar").innerHTML =
-        meiFileName + ", p." + v.currentPage + "/" + v.pageCount + " loaded.";
+        meiFileName.substr(meiFileName.lastIndexOf("/") + 1) +
+        ", p." + v.currentPage + "/" + v.pageCount + " loaded.";
       document.querySelector('.verovio-panel').innerHTML = ev.data.svg;
       let ms = document.querySelectorAll('.measure'); // find measures on page
       if (ms.length > 0) {
@@ -408,7 +409,15 @@ function workerEventsHandler(ev) {
     case 'computePageBreaks':
       v.pageBreaks = ev.data.pageBreaks;
       v.pageCount = ev.data.pageCount;
+      document.querySelector(".statusbar").innerHTML =
+        meiFileName.substr(meiFileName.lastIndexOf("/") + 1) +
+        ", p." + v.currentPage + "/" + v.pageCount + " loaded.";
       v.updatePageNumDisplay();
+      break;
+    case 'updateProgressbar':
+      document.querySelector(".statusbar").innerHTML =
+        "Compute page breaks: " + Math.round(ev.data.percentage) + "%";
+      setProgressBarWidth(ev.data.percentage);
   }
 }
 
@@ -425,7 +434,7 @@ export function openMei(file = defaultMeiFileName) {
   if (typeof file === "string") { // with fileName string
     meiFileName = file;
     console.info('openMei ' + meiFileName + ', ', cm);
-    moveProgressBar();
+    // moveProgressBar();
     fetch(meiFileName)
       .then((response) => response.text())
       .then((meiXML) => {
@@ -454,7 +463,7 @@ export function openMei(file = defaultMeiFileName) {
       } else {
         reader.readAsText(file);
       }
-      moveProgressBar();
+      // moveProgressBar();
     });
     readingPromise.then(
       function(mei) {
@@ -866,6 +875,8 @@ function addEventListeners(cm, v) {
 
   document.getElementById('speed-checkbox').addEventListener('change', (ev) => {
     v.speedMode = ev.target.checked;
+    v.updateAll(cm);
+    // TODO either delete v.pageBreaks or update v.pageCount and possibly xmlId
   });
 
 }
