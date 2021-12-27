@@ -306,8 +306,16 @@ function readSection(xmlScore, pageNo, spdScore, breaks) {
       }
 
       // increment in countingMode computedBreaks
-      if (currentNodeName == 'measure' && countingMode == 'computedBreaks' &&
-        children[i].getAttribute('xml:id') == breaks[p]) p++;
+      if (countingMode == 'computedBreaks') {
+        if (currentNodeName == 'measure' &&
+          children[i].getAttribute('xml:id') == breaks[p]) p++;
+        else {
+          let ms = Array.from(children[i].querySelectorAll('measure'));
+          ms.forEach(m => {
+            if (m.getAttribute('xml:id') == breaks[p]) p++;
+          })
+        }
+      }
 
     } // for loop across child nodes
 
@@ -429,20 +437,22 @@ export function xmlToString(xmlNode) {
 export function getPageWithElement(v, id) {
   let sel = '';
   let page = -1;
+  // for speedMode: selector for all last measures and requested id
   if (v.speedMode && Object.keys(v.pageBreaks).length > 0) {
     for (let barNo in v.pageBreaks) {
       sel += '[*|id="' + v.pageBreaks[barNo] + '"],';
     }
     sel += '[*|id="' + id + '"]';
+    // for normale mode: selector for all breaks and requested id
   } else {
     sel = 'pb, sb, *|id="' + id + '"'; // find all breaks in xmlDoc
   }
   let els = Array.from(v.xmlDoc.querySelectorAll(sel));
   if (els) {
     page = els.findIndex(el => el.getAttribute('xml:id') == id) + 1;
-    if (v.speedMode && page > 1 &&
+    if (v.speedMode && page > 1 && // if element is within last measure, ...
       els[page - 1].closest('measure') == els[page - 2])
-      page--;
+      page--; // ...undo increment
   }
   return page;
 }

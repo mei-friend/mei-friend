@@ -405,6 +405,9 @@ function workerEventsHandler(ev) {
     case 'computePageBreaks':
       v.pageBreaks = ev.data.pageBreaks;
       v.pageCount = ev.data.pageCount;
+      console.log('Page breaks computed for ' +
+        meiFileName.substr(meiFileName.lastIndexOf("/") + 1) +
+        ', pageBreaks', v.pageBreaks);
       updateStatusBar();
       v.updatePageNumDisplay();
       break;
