@@ -355,9 +355,7 @@ function workerEventsHandler(ev) {
       }
       if (ev.data.pageCount && !v.speedMode) v.pageCount = ev.data.pageCount;
       v.currentPage = ev.data.pageNo;
-      document.querySelector(".statusbar").innerHTML =
-        meiFileName.substr(meiFileName.lastIndexOf("/") + 1) +
-        ", p." + v.currentPage + "/" + v.pageCount + " loaded.";
+      updateStatusBar();
       document.querySelector('title').innerHTML = 'mei-friend: ' +
         meiFileName.substr(meiFileName.lastIndexOf("/") + 1);
       document.querySelector('.verovio-panel').innerHTML = ev.data.svg;
@@ -371,9 +369,7 @@ function workerEventsHandler(ev) {
       if (ev.data.computePageBreaks) v.computePageBreaks(cm);
       break;
     case 'navigatePage': // resolve navigation with page turning
-      document.querySelector(".statusbar").innerHTML =
-        meiFileName.substr(meiFileName.lastIndexOf("/") + 1) +
-        ", p." + v.currentPage + "/" + v.pageCount + " loaded.";
+      updateStatusBar();
       document.querySelector('.verovio-panel').innerHTML = ev.data.svg;
       let ms = document.querySelectorAll('.measure'); // find measures on page
       if (ms.length > 0) {
@@ -409,15 +405,13 @@ function workerEventsHandler(ev) {
     case 'computePageBreaks':
       v.pageBreaks = ev.data.pageBreaks;
       v.pageCount = ev.data.pageCount;
-      document.querySelector(".statusbar").innerHTML =
-        meiFileName.substr(meiFileName.lastIndexOf("/") + 1) +
-        ", p." + v.currentPage + "/" + v.pageCount + " loaded.";
+      updateStatusBar();
       v.updatePageNumDisplay();
       break;
     case 'updateProgressbar':
       document.querySelector(".statusbar").innerHTML =
         "Compute page breaks: " + Math.round(ev.data.percentage) + "%";
-      setProgressBarWidth(ev.data.percentage);
+      setProgressBar(ev.data.percentage);
   }
 }
 
@@ -913,9 +907,16 @@ function moveProgressBar() {
   }
 }
 
-// control progress bar width (in percent)
-function setProgressBarWidth(relWidth) {
-  document.querySelector(".progressbar").style.width = relWidth + '%';
+// control progress bar progress/width (in percent)
+function setProgressBar(percentage) {
+  document.querySelector(".progressbar").style.width = percentage + '%';
+}
+
+function updateStatusBar() {
+  document.querySelector(".statusbar").innerHTML =
+    meiFileName.substr(meiFileName.lastIndexOf("/") + 1) +
+    ", page " + v.currentPage + " of " +
+    ((v.pageCount < 0) ? '?' : v.pageCount) + " loaded.";
 }
 
 export function log(s) {

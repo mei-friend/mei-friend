@@ -256,7 +256,8 @@ export default class Viewer {
 
   updatePageNumDisplay() {
     const l = document.getElementById("pagination-label");
-    if (l) l.innerHTML = `Page ${this.currentPage} of ${this.pageCount}`;
+    let pg = (this.pageCount < 0) ? '?' : this.pageCount;
+    if (l) l.innerHTML = `Page ${this.currentPage} of ${pg}`;
   }
 
   // set cursor to first note id in page, taking st/ly of id, if possible
