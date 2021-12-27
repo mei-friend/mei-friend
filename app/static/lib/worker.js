@@ -30,7 +30,8 @@ onmessage = function(e) {
     case 'updateAll':
       try {
         var tkOptions = result.options;
-        if (result.speedMode) tkOptions.breaks = 'encoded';
+        if (result.speedMode && !result.computePageBreaks)
+          tkOptions.breaks = 'encoded';
         tk.setOptions(tkOptions);
         tk.loadData(result.mei);
         result.mei = '';

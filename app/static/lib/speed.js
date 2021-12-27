@@ -103,10 +103,14 @@ function readSection(xmlScore, pageNo, spdScore, breaks) {
       if (currentNodeName == 'measure') {
         countNow = true;
         // increment m when counting measures for a quick first page
-        if (countingMode == 'measures') mNo++;
       }
 
-      if (countingMode == "encodedBreaks") {
+      if (countingMode == 'measures') {
+        if (currentNodeName == 'measure') mNo++;
+        else
+          Array.from(children[i].querySelectorAll('measure'))
+            .forEach(() => mNo++);
+      } else if (countingMode == "encodedBreaks") {
         if (countNow && breaks.includes(currentNodeName)) {
           p++; // skip breaks before content (that is, a measure)
           continue;
