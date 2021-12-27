@@ -416,35 +416,6 @@ export function findByAttributeValue(xmlNode, attribute, value, elementName = "*
   }
 }
 
-// EXPERIMENTAL SKETCH: go through pages from Verovio to remember page breaks
-export function getBreaksFromToolkit(tk, text) {
-  tk.setOptions(this.vrvOptions);
-  tk.loadData(text);
-  tk.redoLayout();
-  var pageCount = tk.getPageCount();
-  // start from page 2 and go through document
-  for (let p = 2; p <= pageCount; p++) {
-    var svg = tk.renderToSVG(p);
-    // console.log('SVG page: ' + p + '.');
-    // console.info(svg);
-    // find first occurrence of <g id="measure-0000001450096684" class="measure">
-    var m = svg.match(/(?:<g\s)(?:id=)(?:['"])(\S+?)(?:['"])\s+?(?:class="measure">)/);
-    // console.info('Match: ', m);
-    if (m && m.length > 1)
-      console.info('Page ' + p + ', breaks before ' + m[1]);
-  }
-}
-
-// select
-export function getRangeOfString(buffer, str) {
-  let range;
-  buffer.scan(str, (obj) => {
-    range = obj.range;
-    obj.stop();
-  });
-  return range;
-}
-
 // convert xmlNode to string and remove meiNameSpace declaration from return string
 export function xmlToString(xmlNode) {
   let str = new XMLSerializer().serializeToString(xmlNode);
@@ -454,34 +425,26 @@ export function xmlToString(xmlNode) {
   return str.replace('xmlns="' + meiNameSpace + '" ', '');
 }
 
-export function getPageNumberAtCursor(textEditor, breaks = ['pb', 'sb']) {
-  let cursorRow = textEditor.getCursorBufferPosition().row;
-  let text = textEditor.getBuffer();
-  let maxLines = text.getLineCount();
-  let pageNo = 1; // page number is one-based
-  let row = 0;
-  let countPages = false,
-    hasBreak = false;
-  while (row <= cursorRow && row <= maxLines) {
-    let line = text.lineForRow(row++);
-    if (line.includes('measure')) countPages = true; // skip trailing breaks
-    if (countPages) {
-      for (let i = 0; i < breaks.length; i++) { // check breaks list
-        if (line.includes('<' + breaks[i])) hasBreak = true;
-      }
-      if (hasBreak) {
-        pageNo++;
-        hasBreak = false;
-      }
+// Retrieve page number of element with xml:id id
+export function getPageWithElement(v, id) {
+  let sel = '';
+  let page = -1;
+  if (v.speedMode && Object.keys(v.pageBreaks).length > 0) {
+    for (let barNo in v.pageBreaks) {
+      sel += '[*|id="' + v.pageBreaks[barNo] + '"],';
     }
+    sel += '[*|id="' + id + '"]';
+  } else {
+    sel = 'pb, sb, *|id="' + id + '"'; // find all breaks in xmlDoc
   }
-  return pageNo;
-}
-
-// EXPERIMENTAL SKETCH
-export function getPageNumberForElement(xmlDoc, xmlNode) {
-  nodeList = xmlDoc.querySelectorAll('pb, sb, *|id="' + xmlNode.getAttribute('xml:id') + '"');
-  console.info('nodeLIST: ', nodeList);
+  let els = Array.from(v.xmlDoc.querySelectorAll(sel));
+  if (els) {
+    page = els.findIndex(el => el.getAttribute('xml:id') == id) + 1;
+    if (v.speedMode && page > 1 &&
+      els[page - 1].closest('measure') == els[page - 2])
+      page--;
+  }
+  return page;
 }
 
 // returns an xmlNode with a <mei> element

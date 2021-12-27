@@ -74,8 +74,12 @@ export default class Viewer {
         this.worker.postMessage(message);
         // this.showCurrentPage();
       } else { // speed mode
-        this.updateData(cm);
-        // this.loadVerovioData(this.speedFilter(cm.getValue()));
+        if (xmlId) {
+          this.currentPage = speed.getPageWithElement(this, xmlId);
+          console.info('UpdatePage(speedMode=true): page: ' +
+            this.currentPage + ', xmlId: ' + xmlId);
+        }
+        this.updateData(cm, false, true);
       }
     }
   }
@@ -152,6 +156,7 @@ export default class Viewer {
     this.selectedElements = [];
     this.lastNoteId = '';
     this.currentPage = 1;
+    this.pageCount = -1;
     this.pageBreaks = {};
   }
 
