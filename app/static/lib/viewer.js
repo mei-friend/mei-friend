@@ -79,7 +79,7 @@ export default class Viewer {
           console.info('UpdatePage(speedMode=true): page: ' +
             this.currentPage + ', xmlId: ' + xmlId);
         }
-        this.updateData(cm, false, true);
+        this.updateData(cm, xmlId ? false : true, true);
       }
     }
   }

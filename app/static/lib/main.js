@@ -822,19 +822,6 @@ function addEventListeners(cm, v) {
   document.getElementById('toggleStacciss')
     .addEventListener('click', cmd.toggleStacciss);
 
-  // update encoding through Verovio
-  // document.getElementById('verovio-btn')
-  //   .addEventListener('click', (ev) => vrvWorker.postMessage({
-  //     'cmd': 'reRenderMEI',
-  //     'format': 'mei',
-  //     'mei': cm.getValue(),
-  //     'xmlId': v.selectedElements[0],
-  //     'pageNo': v.currentPage,
-  //     'removeIds': ev.altKey
-  //   }));
-  // document.getElementById('help-btn')
-  //   .addEventListener('click', () => window.open('/help', '_blank'));
-
   // editor activity
   cm.on('cursorActivity', () => {
     v.cursorActivity(cm);

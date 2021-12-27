@@ -34,7 +34,7 @@ onmessage = function(e) {
         tk.setOptions(tkOptions);
         tk.loadData(result.mei);
         result.mei = '';
-        if (result.xmlId) {
+        if (result.xmlId && !result.speedMode) {
           result.pageNo = parseInt(tk.getPageWithElement(result.xmlId));
         }
         let pg = (result.speedMode && result.pageNo > 1) ? 2 : result.pageNo;
@@ -54,7 +54,7 @@ onmessage = function(e) {
         }
         tk.loadData(result.mei);
         result.mei = '';
-        if (result.xmlId) {
+        if (result.xmlId && !result.speedMode) {
           result.pageNo = parseInt(tk.getPageWithElement(result.xmlId));
         }
         let pg = (result.speedMode && result.pageNo > 1) ? 2 : result.pageNo;
@@ -85,11 +85,12 @@ onmessage = function(e) {
         tk.setOptions(tkOptions);
         tk.redoLayout();
         result.setCursorToPageBeginning = true;
-        if (result.xmlId) {
+        if (result.xmlId && !result.speedMode) {
           result.pageNo = parseInt(tk.getPageWithElement(result.xmlId));
           result.setCursorToPageBeginning = false;
         }
-        result.svg = tk.renderToSVG(result.pageNo);
+        let pg = (result.speedMode && result.pageNo > 1) ? 2 : result.pageNo;
+        result.svg = tk.renderToSVG(pg);
         result.pageCount = tk.getPageCount();
         result.cmd = 'updated';
       } catch (e) {
@@ -102,11 +103,12 @@ onmessage = function(e) {
         if (result.speedMode) tkOptions.breaks = 'encoded';
         tk.setOptions(tkOptions);
         result.setCursorToPageBeginning = true;
-        if (result.xmlId) {
+        if (result.xmlId && !result.speedMode) {
           result.pageNo = parseInt(tk.getPageWithElement(result.xmlId));
           result.setCursorToPageBeginning = false;
         }
-        result.svg = tk.renderToSVG(result.pageNo);
+        let pg = (result.speedMode && result.pageNo > 1) ? 2 : result.pageNo;
+        result.svg = tk.renderToSVG(pg);
         result.pageCount = tk.getPageCount();
         result.cmd = 'updated';
       } catch (e) {
