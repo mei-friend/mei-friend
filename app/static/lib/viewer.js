@@ -41,7 +41,6 @@ export default class Viewer {
       'mei': this.speedFilter(cm.getValue()),
       'pageNo': this.currentPage,
       'xmlId': '',
-      'computePageBreaks': false,
       'speedMode': this.speedMode,
       'computePageBreaks': (this.speedMode && Object.keys(this.pageBreaks).length == 0)
     }

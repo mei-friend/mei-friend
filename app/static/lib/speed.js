@@ -52,7 +52,12 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks = ['sb', 'pb']) {
 
   spdScore.appendChild(scoreDef); // is updated within readSection()
   spdScore.appendChild(baseSection);
-  var digger = readSection(xmlScore, pageNo, spdScore, breaks);
+
+  let countingMode = 'measures';
+  if (Array.isArray(breaks)) countingMode = 'encodedBreaks';
+  else if (typeof breaks == 'object') countingMode = 'computedBreaks';
+
+  var digger = readSection(xmlScore, pageNo, spdScore, breaks, countingMode);
   var sections = xmlScore.childNodes;
   sections.forEach((item) => {
     if (item.nodeName == 'section') { // diggs into section hierachy
@@ -60,24 +65,44 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks = ['sb', 'pb']) {
     }
   });
 
+  // insert sb elements for each element except last
+  if (countingMode == 'computedBreaks') {
+    breaks[pageNo].forEach((id, i) => {
+      if (i < breaks[pageNo].length - 1) { // last element is a <pb>
+        let m = spdScore.querySelector('[*|id="' + id + '"]');
+        console.info("speed (p:" + pageNo + " i:" + i + "): id=" +
+          id + ", m:", m);
+        if (m) {
+          let sb = document.createElementNS(meiNameSpace, 'sb');
+          let next = m.nextSibling;
+          let parent = m.parentNode;
+          console.info('...found. next:', next);
+          console.info('...found. parent:', parent);
+          if (next && next.nodeType != Node.TEXT_NODE)
+            parent.insertBefore(sb, next);
+          else
+            parent.appendChild(sb);
+        }
+      }
+    });
+  }
+
   const serializer = new XMLSerializer();
   let mei = xmlDefs + serializer.serializeToString(spdNode);
-  // console.info('Speed() MEI: ', mei);
+
+  console.info('Speed() MEI: ', mei);
+
   return mei;
 }
 
 // recursive closure to dig through hierarchically stacked sections and append
 // only those elements within the requested pageNo
-function readSection(xmlScore, pageNo, spdScore, breaks) {
+function readSection(xmlScore, pageNo, spdScore, breaks, countingMode) {
   let p = 1; // page count
   let mNo = 1; // measure count (for a fast first page, with breaks = '')
   let mxMeasures = 50; // for a quick first page
   let breaksSelector = '';
-  let countingMode = 'measures';
-  if (Array.isArray(breaks)) {
-    countingMode = 'encodedBreaks';
-    breaksSelector = breaks.join(', ');
-  } else if (typeof breaks == 'object') countingMode = 'computedBreaks';
+  if (countingMode == 'encodedBreaks') breaksSelector = breaks.join(', ');
   let countNow = false; // to ignore encoded page breaks before first measure
   let startingElements = [];
   let endingElements = [];
@@ -109,7 +134,7 @@ function readSection(xmlScore, pageNo, spdScore, breaks) {
         if (currentNodeName == 'measure') mNo++;
         else
           Array.from(children[i].querySelectorAll('measure'))
-            .forEach(() => mNo++);
+          .forEach(() => mNo++);
       } else if (countingMode == "encodedBreaks") {
         if (countNow && breaks.includes(currentNodeName)) {
           p++; // skip breaks before content (that is, a measure)
@@ -304,19 +329,27 @@ function readSection(xmlScore, pageNo, spdScore, breaks) {
 
       // append children
       if (p == pageNo) {
+        let nodeCopy = children[i].cloneNode(true);
+        if (countingMode == 'computedBreaks') {
+          Array.from(nodeCopy.querySelectorAll('pb, sb')).forEach(b => {
+            if (b) nodeCopy.removeChild(b);
+          });
+        }
         spdScore.getElementsByTagName('section')
-          .item(0).appendChild(children[i].cloneNode(true));
+          .item(0).appendChild(nodeCopy);
         // console.info('digDeeper adds child to spdScore: ', spdScore);
       }
 
       // increment in countingMode computedBreaks
       if (countingMode == 'computedBreaks') {
         if (currentNodeName == 'measure' &&
-          children[i].getAttribute('xml:id') == breaks[p]) p++;
+          children[i].getAttribute('xml:id') == breaks[p][breaks[p].length - 1])
+          p++;
         else {
           let ms = Array.from(children[i].querySelectorAll('measure'));
           ms.forEach(m => {
-            if (m.getAttribute('xml:id') == breaks[p]) p++;
+            if (m.getAttribute('xml:id') == breaks[p][breaks[p].length - 1])
+              p++;
           })
         }
       }
@@ -378,6 +411,7 @@ function readSection(xmlScore, pageNo, spdScore, breaks) {
         startingElements = [];
       }
     }
+
     return spdScore;
   }
 }

@@ -193,19 +193,21 @@ onmessage = function(e) {
         tk.loadData(result.mei);
         result.pageCount = tk.getPageCount();
         result.pageBreaks = {};
-        let idString = '';
-        for (let p = 1; p <= result.pageCount; p++) {
-          let svgText = tk.renderToSVG(p);
-          let it = svgText
-            .matchAll(/g([^>]+)(?:class=)(?:['"])(?:measure)(?:['"])/g);
-          for (let i of it) {
-            idString = String(i);
-          }
-          let match = idString.match(/(['"])[^'"]*\1/);
-          let id = match[0].replace(/['"]/g, '');
+        for (let p = 1; p <= result.pageCount; p++) { // one-based page numbers
           updateProgressbar(p / result.pageCount * 100);
           // console.log('Progress: ' + p / result.pageCount * 100 + '%')
-          result.pageBreaks[p] = id;
+          let svgText = tk.renderToSVG(p);
+          let it = svgText // find all measures
+            .matchAll(/g([^>]+)(?:class=)(?:['"])(?:measure|system)(?:['"])/g);
+          let j = -1; // breaks within a page
+          let breaks = [];
+          for (let i of it) {
+            console.info('worker:computePageBreaks: ' + String(i[0]));
+            if (i[0].includes('system')) j++;
+            breaks[j] = String(i[1])
+              .match(/(['"])[^'"]*\1/)[0].replace(/['"]/g, '');
+          }
+          result.pageBreaks[p] = breaks;
         }
         // console.log('Worker computePageBreaks: ', result.pageBreaks);
       } catch (e) {
