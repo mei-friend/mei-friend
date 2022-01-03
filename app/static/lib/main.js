@@ -34,13 +34,13 @@ import Github from './github.js';
 
 
 const version = 'develop-0.1.5';
-const versionDate = '23 Dec 2021';
+const versionDate = '3 Jan 2022';
 const defaultMeiFileName = `${root}Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei`;
 const defaultVerovioOptions = {
   scale: 55,
   breaks: "auto",
-  header: "none",
-  footer: "none",
+  // header: "none",
+  // footer: "none",
   inputFrom: "mei",
   adjustPageHeight: "true",
   outputIndent: 3,
@@ -416,6 +416,7 @@ function workerEventsHandler(ev) {
       console.log('Page breaks computed for ' +
         meiFileName.substr(meiFileName.lastIndexOf("/") + 1) +
         ', pageBreaks', v.pageBreaks);
+      v.updateData(cm, false, true);
       updateStatusBar();
       v.updatePageNumDisplay();
       v.busy(false);
@@ -877,6 +878,8 @@ function addEventListeners(cm, v) {
     v.speedMode = ev.target.checked;
     if (v.speedMode && Object.keys(v.pageBreaks).length > 0)
       v.pageCount = Object.keys(v.pageBreaks).length;
+    // else
+    //   v.pageBreaks = {};
     v.updateAll(cm);
   });
 

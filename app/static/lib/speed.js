@@ -90,7 +90,7 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks = ['sb', 'pb']) {
   const serializer = new XMLSerializer();
   let mei = xmlDefs + serializer.serializeToString(spdNode);
 
-  console.info('Speed() MEI: ', mei);
+  // console.info('Speed() MEI: ', mei);
 
   return mei;
 }
