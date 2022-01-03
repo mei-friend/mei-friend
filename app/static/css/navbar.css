@@ -66,7 +66,7 @@
   z-index: 99;
 }
 
-#GithubMenu { 
+#GithubMenu {
   min-height:90%;
 }
 
@@ -124,12 +124,12 @@
   margin-right: .2em;
 }
 
-@keyframes spinning { 
+@keyframes spinning {
   from { transform: rotate(0deg) }
   to { transform: rotate(359deg) }
 }
 
-#GithubLogo.loading {
+.loading {
   animation-name: spinning;
   animation-duration: 1s;
   animation-timing-function: linear;

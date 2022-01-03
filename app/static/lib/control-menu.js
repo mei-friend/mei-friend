@@ -286,6 +286,12 @@ export function createControlsMenu(parentElement, scale) {
   speedDiv.classList.add('controls');
   controlsForm.appendChild(speedDiv);
 
+  let verovioIcon = document.createElement('img');
+  verovioIcon.src = `${root}svg/v.svg`;
+  verovioIcon.classList.add('icon');
+  verovioIcon.id = 'verovio-icon';
+  speedDiv.appendChild(verovioIcon);
+
   let speedLabel = document.createElement('label');
   speedLabel.innerText = 'Speedmode:';
   speedLabel.id = 'speed-label';

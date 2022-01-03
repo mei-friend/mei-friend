@@ -105,6 +105,7 @@ document.addEventListener('DOMContentLoaded', function() {
   window.onresize = () => setOrientation(cm, '', v);
 
   // ask worker to load Verovio
+  v.busy();
   vrvWorker.postMessage({
     'cmd': 'loadVerovio'
   });
@@ -335,6 +336,7 @@ function workerEventsHandler(ev) {
         `Verovio ${tkVersion} loaded.`;
       setBreaksOptions(tkAvailableOptions);
       openMei(); // open default MEI
+      v.busy(false);
       break;
     case 'mei': // returned from importData, importBinaryData
       mei = ev.data.mei;
@@ -343,6 +345,7 @@ function workerEventsHandler(ev) {
       cm.setValue(mei);
       v.updateNotation = true;
       v.updateAll(cm, defaultVerovioOptions);
+      v.busy(false);
       break;
     case 'updated': // display SVG data on site
       if (ev.data.mei) { // from reRenderMEI
@@ -355,6 +358,7 @@ function workerEventsHandler(ev) {
       }
       if (ev.data.pageCount && !v.speedMode) v.pageCount = ev.data.pageCount;
       v.currentPage = ev.data.pageNo;
+      v.busy(false);
       updateStatusBar();
       document.querySelector('title').innerHTML = 'mei-friend: ' +
         meiFileName.substr(meiFileName.lastIndexOf("/") + 1);
@@ -367,6 +371,7 @@ function workerEventsHandler(ev) {
       if (!"setFocusToVerovioPane" in ev.data || ev.data.setFocusToVerovioPane)
         v.setFocusToVerovioPane();
       if (ev.data.computePageBreaks) v.computePageBreaks(cm);
+      else v.busy(false);
       break;
     case 'navigatePage': // resolve navigation with page turning
       updateStatusBar();
@@ -387,6 +392,7 @@ function workerEventsHandler(ev) {
       v.setNotationColors();
       v.updateHighlight(cm);
       v.setFocusToVerovioPane();
+      v.busy(false);
       break;
     case 'midi': // export MIDI file
       const byteCharacters = atob(ev.data.midi);
@@ -401,6 +407,7 @@ function workerEventsHandler(ev) {
       a.download = meiFileName.replace(/\.[^/.]+$/, '.mid');
       a.href = window.URL.createObjectURL(blob);
       a.click();
+      v.busy(false);
       break;
     case 'computePageBreaks':
       v.pageBreaks = ev.data.pageBreaks;
@@ -410,6 +417,7 @@ function workerEventsHandler(ev) {
         ', pageBreaks', v.pageBreaks);
       updateStatusBar();
       v.updatePageNumDisplay();
+      v.busy(false);
       break;
     case 'updateProgressbar':
       document.querySelector(".statusbar").innerHTML =
@@ -466,6 +474,7 @@ export function openMei(file = defaultMeiFileName) {
       function(mei) {
         let found = false;
         v.clear();
+        v.busy();
         if (meiFileName.endsWith('.mxl')) { // compressed MusicXML file
           console.log('Load compressed XML file.', mei.slice(0, 128));
           vrvWorker.postMessage({
@@ -511,10 +520,12 @@ export function openMei(file = defaultMeiFileName) {
           else {
             log('Format not recognized: ' + meiFileName + '.');
           }
+          v.busy(false);
         }
       },
       function() {
         log('Loading dragged file ' + meiFileName + ' failed.');
+        v.busy(false);
       }
     );
   }

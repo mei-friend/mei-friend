@@ -30,6 +30,7 @@ export default class Viewer {
     this.breaks = ['sb', 'pb'];
     this.toolTipTimeOutHandle = null; // handle for zoom tooltip hide timer
     this.vrvOptions;
+    this.verovioIcon = document.getElementById('verovio-icon');
   }
 
   // change options, load new data, render current page, add listeners, highlight
@@ -44,6 +45,7 @@ export default class Viewer {
       'speedMode': this.speedMode,
       'computePageBreaks': (this.speedMode && Object.keys(this.pageBreaks).length == 0)
     }
+    this.busy();
     this.worker.postMessage(message);
   }
 
@@ -60,6 +62,7 @@ export default class Viewer {
       'speedMode': this.speedMode,
       'breaks': document.getElementById('breaks-select').value
     };
+    this.busy();
     this.worker.postMessage(message);
   }
 
@@ -71,6 +74,7 @@ export default class Viewer {
           'pageNo': this.currentPage,
           'xmlId': xmlId
         };
+        this.busy();
         this.worker.postMessage(message);
         // this.showCurrentPage();
       } else { // speed mode
@@ -107,6 +111,7 @@ export default class Viewer {
       'xmlId': id,
       'speedMode': this.speedMode
     };
+    this.busy();
     this.worker.postMessage(message);
   }
 
@@ -169,6 +174,7 @@ export default class Viewer {
       'removeIds': removeIds
     }
     if (false && !removeIds) message.xmlId = this.selectedElements[0]; // TODO
+    this.busy();
     this.worker.postMessage(message);
   }
 
@@ -179,6 +185,7 @@ export default class Viewer {
       'format': 'mei',
       'mei': cm.getValue()
     }
+    this.busy();
     this.worker.postMessage(message);
   }
 
@@ -555,6 +562,7 @@ export default class Viewer {
       message.mei = this.speedFilter(cm.getValue());
       message.speedMode = this.speedMode;
     }
+    this.busy();
     this.worker.postMessage(message);
   }
 
@@ -597,5 +605,9 @@ export default class Viewer {
     }
   }
 
+  busy(active = true) {
+    if (active) this.verovioIcon.classList.add('loading');
+    else this.verovioIcon.classList.remove('loading');
+  }
 
 }
