@@ -57,7 +57,8 @@ export default class Viewer {
       'xmlId': '',
       'setCursorToPageBeginning': setCursorToPageBeg,
       'setFocusToVerovioPane': setFocusToVerovioPane,
-      'speedMode': this.speedMode
+      'speedMode': this.speedMode,
+      'breaks': document.getElementById('breaks-select').value
     };
     this.worker.postMessage(message);
   }
@@ -116,9 +117,9 @@ export default class Viewer {
   speedFilter(mei, brks = ['sb', 'pb']) {
     // update DOM only if encoding has been edited or
     this.loadXml(mei);
-    if (!this.speedMode) return mei;
-    this.breaks = brks;
     let bs = document.getElementById('breaks-select');
+    if (!this.speedMode || bs.value == 'none') return mei;
+    this.breaks = brks;
     if (bs.value == "encoded") {
       this.breaks = ['pb'];
     } else if (bs.value == 'auto') {

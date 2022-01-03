@@ -721,8 +721,8 @@ function addEventListeners(cm, v) {
     .addEventListener('click', cmd.lastPage);
   document.getElementById('font-select')
     .addEventListener('change', () => v.updateOption());
-  document.getElementById('breaks-select')
-    .addEventListener('change', () => v.updateLayout());
+  document.getElementById('breaks-select').addEventListener('change',
+    () => (v.speedMode) ? v.updateData(cm, false, true) : v.updateLayout());
   // navigation
   document.getElementById('backwards-btn')
     .addEventListener('click', cmd.previousNote);
@@ -857,14 +857,15 @@ function addEventListeners(cm, v) {
     if (ch.checked) v.notationUpdated(cm, true);
   });
 
+  // speedmode checkbox
   document.getElementById('speed-checkbox').addEventListener('change', (ev) => {
     v.speedMode = ev.target.checked;
-    if (Object.keys(v.pageBreaks).length > 0)
+    if (v.speedMode && Object.keys(v.pageBreaks).length > 0)
       v.pageCount = Object.keys(v.pageBreaks).length;
     v.updateAll(cm);
   });
 
-}
+} // addEventListeners()
 
 // handle Github commit UI
 function handleCommitButtonClicked(e) {

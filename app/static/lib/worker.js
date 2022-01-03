@@ -48,11 +48,11 @@ onmessage = function(e) {
       break;
     case 'updateData':
       try {
-        if (result.speedMode) {
-          tk.setOptions({
-            breaks: 'encoded'
-          });
-        }
+        if (result.speedMode && result.breaks != 'none')
+          result.breaks = 'encoded';
+        tk.setOptions({
+          breaks: result.breaks
+        });
         tk.loadData(result.mei);
         result.mei = '';
         if (result.xmlId && !result.speedMode) {
