@@ -330,13 +330,12 @@ function readSection(xmlScore, pageNo, spdScore, breaks, countingMode) {
       // append children
       if (p == pageNo) {
         let nodeCopy = children[i].cloneNode(true);
-        if (countingMode == 'computedBreaks') {
+        if (countingMode == 'computedBreaks') { // remove breaks from DOM
           Array.from(nodeCopy.querySelectorAll('pb, sb')).forEach(b => {
             if (b) nodeCopy.removeChild(b);
           });
         }
-        spdScore.getElementsByTagName('section')
-          .item(0).appendChild(nodeCopy);
+        spdScore.getElementsByTagName('section').item(0).appendChild(nodeCopy);
         // console.info('digDeeper adds child to spdScore: ', spdScore);
       }
 

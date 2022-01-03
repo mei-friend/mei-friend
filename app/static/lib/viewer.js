@@ -356,7 +356,8 @@ export default class Viewer {
   // when cursor pos in editor changed, update notation location / highlight
   cursorActivity(cm, forceFlip = false) {
     let id = utils.getElementIdAtCursor(cm);
-    this.selectedElements = [].push(id);
+    this.selectedElements = [];
+    this.selectedElements.push(id);
     let fl = document.getElementById('flip-checkbox');
     if (!document.querySelector('g#' + id) &&
       ((this.updateNotation && fl && fl.checked) || forceFlip))
