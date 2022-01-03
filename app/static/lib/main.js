@@ -8,8 +8,7 @@ var v; // viewer instance
 
 import {
   setOrientation,
-  addResizerHandlers,
-  getVerovioContainerSize
+  addResizerHandlers
 } from './resizer.js'
 import {
   dropHandler,
@@ -54,8 +53,8 @@ const defaultVerovioOptions = {
   minLastJustification: 0,
   clefChangeFactor: .83,
   svgAdditionalAttribute: ["layer@n", "staff@n"],
-  bottomMarginArtic: 1,
-  topMarginArtic: 1
+  bottomMarginArtic: 1.1,
+  topMarginArtic: 1.1
 };
 const defaultKeyMap = `${root}keymaps/default-keymap.json`;
 
@@ -404,7 +403,9 @@ function workerEventsHandler(ev) {
         type: 'audio/midi'
       });
       var a = document.createElement('a');
-      a.download = meiFileName.replace(/\.[^/.]+$/, '.mid');
+      a.download = meiFileName
+        .substr(meiFileName.lastIndexOf("/") + 1)
+        .replace(/\.[^/.]+$/, '.mid');
       a.href = window.URL.createObjectURL(blob);
       a.click();
       v.busy(false);
@@ -554,7 +555,8 @@ function downloadMei() {
   });
   let a = document.createElement('a');
   a.download = meiFileName
-    .replace(/\/static\//, '').replace(/\.[^/.]+$/, '.mei');
+    .substr(meiFileName.lastIndexOf("/") + 1)
+    .replace(/\.[^/.]+$/, '.mei');
   a.href = window.URL.createObjectURL(blob);
   a.click();
 }
@@ -574,7 +576,9 @@ function downloadSvg() {
     type: 'image/svg+xml'
   });
   let a = document.createElement('a');
-  a.download = meiFileName.replace(/\.[^/.]+$/, '.svg');
+  a.download = meiFileName
+    .substr(meiFileName.lastIndexOf("/") + 1)
+    .replace(/\.[^/.]+$/, '.svg');
   a.href = window.URL.createObjectURL(blob);
   a.click();
 }
