@@ -206,6 +206,7 @@ a:active {
   padding: 0 2px;
   min-height: 21px;
   min-width: 21px;
+  white-space: nowrap;
 }
 
 .inline-block-tight {

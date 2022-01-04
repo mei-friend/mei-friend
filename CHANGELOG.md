@@ -55,9 +55,14 @@
 # 0.1.3 patch
 * Fix commit message and button clicking-interaction behaviour with menu
 # 0.1.4 patch
-* Verovio label removed and speedmode checkbox added (still disabled)
+* Verovio label removed and speedMode checkbox added (still disabled)
 * Some editor code optimizations
 * Open and download keyboard shortcuts added
 * Incorporate new .env variables for production deployment
 * Bug-fixes and layout improvements for Github menu
 * Add cute Github loading indicator animation
+# 0.1.5 patch: speedMode support added
+* Support for speedMode to be en/disabled through checkbox
+* SpeedMode support also for breaks='auto|smart' by computing breaks upon loading
+* Quick first page view when opening file in speedMode with automatic breaks
+* Verovio icon animation during worker activity
