@@ -22,8 +22,8 @@ export function delEl(v, cm) {
     if (element.nodeName == 'octave') { // reset notes inside octave range
       let disPlace = element.getAttribute('dis.place');
       let dis = element.getAttribute('dis');
-      let id1 = speed.removeHashFromString(element.getAttribute('startid'));
-      let id2 = speed.removeHashFromString(element.getAttribute('endid'));
+      let id1 = speed.rmHash(element.getAttribute('startid'));
+      let id2 = speed.rmHash(element.getAttribute('endid'));
       findAndModifyOctaveElements(cm, v.xmlDoc, id1, id2, disPlace, dis, false);
       removeInBuffer(cm, element);
       selectedElements.push(id2);
