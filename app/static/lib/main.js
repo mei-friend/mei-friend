@@ -738,7 +738,7 @@ function addEventListeners(cm, v) {
   document.getElementById('font-select')
     .addEventListener('change', () => v.updateOption());
   document.getElementById('breaks-select').addEventListener('change',
-    () => (v.speedMode) ? v.updateData(cm, false, true) : v.updateLayout());
+    () => (v.speedMode) ? v.updateAll(cm, false, true) : v.updateLayout());
   // navigation
   document.getElementById('backwards-btn')
     .addEventListener('click', cmd.previousNote);
@@ -882,7 +882,6 @@ function addEventListeners(cm, v) {
     //   v.pageBreaks = {};
     v.updateAll(cm);
   });
-
 } // addEventListeners()
 
 // handle Github commit UI

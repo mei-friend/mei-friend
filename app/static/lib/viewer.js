@@ -36,6 +36,10 @@ export default class Viewer {
   // change options, load new data, render current page, add listeners, highlight
   updateAll(cm, options = {}) {
     this.setVerovioOptions(options);
+    let computePageBreaks = false;
+    if (this.speedMode && Object.keys(this.pageBreaks).length == 0 &&
+      document.getElementById('breaks-select').value == 'auto')
+      computePageBreaks = true;
     let message = {
       'cmd': 'updateAll',
       'options': this.vrvOptions,
@@ -43,7 +47,7 @@ export default class Viewer {
       'pageNo': this.currentPage,
       'xmlId': '',
       'speedMode': this.speedMode,
-      'computePageBreaks': (this.speedMode && Object.keys(this.pageBreaks).length == 0)
+      'computePageBreaks': computePageBreaks
     }
     this.busy();
     this.worker.postMessage(message);
