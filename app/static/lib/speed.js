@@ -70,14 +70,13 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks = ['sb', 'pb']) {
     breaks[pageNo].forEach((id, i) => {
       if (i < breaks[pageNo].length - 1) { // last element is a <pb>
         let m = spdScore.querySelector('[*|id="' + id + '"]');
-        console.info("speed (p:" + pageNo + " i:" + i + "): id=" +
-          id + ", m:", m);
+        // console.info("spd(p:" + pageNo + " i:" + i + "): id=" + id + ", m:", m);
         if (m) {
           let sb = document.createElementNS(meiNameSpace, 'sb');
           let next = m.nextSibling;
           let parent = m.parentNode;
-          console.info('...found. next:', next);
-          console.info('...found. parent:', parent);
+          // console.info('...found. next:', next);
+          // console.info('...found. parent:', parent);
           if (next && next.nodeType != Node.TEXT_NODE)
             parent.insertBefore(sb, next);
           else

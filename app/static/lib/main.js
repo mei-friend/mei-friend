@@ -352,12 +352,16 @@ function workerEventsHandler(ev) {
         cm.setValue(ev.data.mei);
         v.updateNotation = true;
         v.selectedElements = [];
-        if (!ev.data.removeIds)
-          v.selectedElements.push(ev.data.xmlId);
+        if (!ev.data.removeIds) v.selectedElements.push(ev.data.xmlId);
       }
-      if (ev.data.pageCount && !v.speedMode) v.pageCount = ev.data.pageCount;
+      if (ev.data.pageCount && (!v.speedMode ||
+          document.getElementById('breaks-select').value == 'none'))
+        v.pageCount = ev.data.pageCount;
+      else if (v.speedMode &&
+        document.getElementById('breaks-select').value == 'auto' &&
+        Object.keys(v.pageBreaks).length > 0)
+        v.pageCount = Object.keys(v.pageBreaks).length;
       v.currentPage = ev.data.pageNo;
-      v.busy(false);
       updateStatusBar();
       document.querySelector('title').innerHTML = 'mei-friend: ' +
         meiFileName.substr(meiFileName.lastIndexOf("/") + 1);

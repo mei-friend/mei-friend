@@ -200,8 +200,8 @@ export default class Viewer {
     if (zoom) this.vrvOptions.scale = parseInt(zoom.value);
     let fontSel = document.getElementById('font-select');
     if (fontSel) this.vrvOptions.font = fontSel.value;
-    let breaks = document.getElementById('breaks-select');
-    if (breaks && breaks.value) this.vrvOptions.breaks = breaks.value;
+    let bs = document.getElementById('breaks-select');
+    if (bs && bs.value) this.vrvOptions.breaks = bs.value;
     let dimensions = getVerovioContainerSize();
     let vp = document.querySelector('.verovio-panel');
     dimensions.width = vp.clientWidth;
@@ -213,11 +213,6 @@ export default class Viewer {
       this.vrvOptions.pageHeight = Math.max(Math.round(
         dimensions.height * (100 / this.vrvOptions.scale)), 250);
     }
-    if (this.vrvOptions.breaks === "encoded") {
-      // delete this.vrvOptions.pageWidth;
-      // this.vrvOptions.pageHeight = Math.round(this.vrvOptions.pageWidth * 1.5);
-    }
-
     // overwrite existing options if new ones are passed in
     // for (let key in newOptions) { this.vrvOptions[key] = newOptions[key]; }
     console.info('Verovio options updated: ', this.vrvOptions);

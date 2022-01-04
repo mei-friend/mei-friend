@@ -30,7 +30,8 @@ onmessage = function(e) {
     case 'updateAll':
       try {
         var tkOptions = result.options;
-        if (result.speedMode && !result.computePageBreaks)
+        if (result.speedMode &&
+          !result.computePageBreaks && tkOptions.breaks != 'none')
           tkOptions.breaks = 'encoded';
         tk.setOptions(tkOptions);
         tk.loadData(result.mei);
@@ -38,9 +39,10 @@ onmessage = function(e) {
         if (result.xmlId && !result.speedMode) {
           result.pageNo = parseInt(tk.getPageWithElement(result.xmlId));
         }
+        result.pageCount = tk.getPageCount();
+        if (result.pageCount < result.pageNo) result.pageNo = result.pageCount;
         let pg = (result.speedMode && result.pageNo > 1) ? 2 : result.pageNo;
         result.svg = tk.renderToSVG(pg);
-        result.pageCount = tk.getPageCount();
         result.cmd = 'updated';
       } catch (e) {
         log(e);
