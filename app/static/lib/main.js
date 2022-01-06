@@ -664,6 +664,12 @@ let cmd = {
   'addOctave8Below': () => e.addOctaveElement(v, cm, 'below', 8),
   'addOctave15Above': () => e.addOctaveElement(v, cm, 'above', 15),
   'addOctave15Below': () => e.addOctaveElement(v, cm, 'below', 15),
+  'addGClefChangeBefore': () => e.addClefChange(v, cm, 'G', '2', true),
+  'addCClefChangeBefore': () => e.addClefChange(v, cm, 'C', '3', true),
+  'addFClefChangeBefore': () => e.addClefChange(v, cm, 'F', '4', true),
+  'addGClefChangeAfter': () => e.addClefChange(v, cm, 'G', '2', false),
+  'addCClefChangeAfter': () => e.addClefChange(v, cm, 'C', '3', false),
+  'addFClefChangeAfter': () => e.addClefChange(v, cm, 'F', '4', false),
   'addBeam': () => e.addBeamElement(v, cm),
   'cleanAccid': () => e.cleanAccid(v, cm),
   'renumberMeasuresTest': () => e.renumberMeasures(v, cm, false),
@@ -826,6 +832,19 @@ function addEventListeners(cm, v) {
     .addEventListener('click', cmd.addOctave8Below);
   document.getElementById('addOctave15Below')
     .addEventListener('click', cmd.addOctave15Below);
+  // add clef change
+  document.getElementById('addGClefChangeBefore')
+    .addEventListener('click', cmd.addGClefChangeBefore);
+  document.getElementById('addCClefChangeBefore')
+    .addEventListener('click', cmd.addCClefChangeBefore);
+  document.getElementById('addFClefChangeBefore')
+    .addEventListener('click', cmd.addFClefChangeBefore);
+  document.getElementById('addGClefChangeAfter')
+    .addEventListener('click', cmd.addGClefChangeAfter);
+  document.getElementById('addCClefChangeAfter')
+    .addEventListener('click', cmd.addCClefChangeAfter);
+  document.getElementById('addFClefChangeAfter')
+    .addEventListener('click', cmd.addFClefChangeAfter);
   // toggle articulation
   document.getElementById('toggleStacc')
     .addEventListener('click', cmd.toggleStacc);

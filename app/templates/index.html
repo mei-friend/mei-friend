@@ -98,9 +98,9 @@
           <a id="staffUp" href="#">Element 1 staff up<span class="keyShortCut cmdKey">&uarr;</span></a>
           <a id="staffDown" href="#">Element 1 staff down<span class="keyShortCut cmdKey">&darr;</span></a>
           <hr class="dropdown-line">
-          <a id="cleanAccid" href="#">Clean @accid.ges<span class="keyShortCut shiftKey">C</span></a>
+          <a id="cleanAccid" href="#">Clean @accid.ges<span class="keyShortCut shiftKey cmdKey">C</span></a>
           <a id="renumTest" href="#">Renumber measures (test)<span class="keyShortCut shiftKey">R</span></a>
-          <a id="renumExec" href="#">Renumber measures (exec)<span class="keyShortCut ctrlKey shiftKey">R</span></a>
+          <a id="renumExec" href="#">Renumber measures (exec)<span class="keyShortCut shiftKey cmdKey">R</span></a>
           <hr class="dropdown-line">
           <a id="reRenderMei" href="#">Re-render MEI (with ids)<span class="keyShortCut cmdKey">V</span></a>
           <a id="reRenderMeiWithout" href="#">Re-render MEI (remove ids)<span class="keyShortCut shiftKey cmdKey">V</span></a>
@@ -133,6 +133,13 @@
           <a id="addOctave15Above" href="#">Octave (15va above)<span class="keyShortCut shiftKey">O</span></a>
           <a id="addOctave8Below" href="#">Octave (8va below)<span class="keyShortCut cmd2Key">O</span></a>
           <a id="addOctave15Below" href="#">Octave (15va below)<span class="keyShortCut cmd2Key shiftKey">O</span></a>
+          <hr class="dropdown-line">
+          <a id="addGClefChangeBefore" href="#">G clef before<span class="keyShortCut shiftKey">G</span></a>
+          <a id="addGClefChangeAfter" href="#">G clef after<span class="keyShortCut cmdKey shiftKey">G</span></a>
+          <a id="addFClefChangeBefore" href="#">F clef before<span class="keyShortCut shiftKey">F</span></a>
+          <a id="addFClefChangeAfter" href="#">F clef after<span class="keyShortCut cmdKey shiftKey">F</span></a>
+          <a id="addCClefChangeBefore" href="#">C clef before<span class="keyShortCut shiftKey">C</span></a>
+          <a id="addCClefChangeAfter" href="#">C clef after</a>
           <hr class="dropdown-line">
           <a id="toggleStacc" href="#">Staccato<span class="keyShortCut shiftKey">S</span></a>
           <a id="toggleAccent" href="#">Accent<span class="keyShortCut shiftKey">V</span></a>
@@ -187,7 +194,7 @@
           e.classList.add('show');
         }
       })
-      if(!ev.target.closest("#GithubMenu") || ev.target.classList.contains("closeOnClick")) {
+      if (!ev.target.closest("#GithubMenu") || ev.target.classList.contains("closeOnClick")) {
         // toggle "show" only if not in continuous-Github-menu behaviour
         show = !show;
       }

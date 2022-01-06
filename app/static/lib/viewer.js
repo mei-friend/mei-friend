@@ -82,6 +82,7 @@ export default class Viewer {
         this.worker.postMessage(message);
         // this.showCurrentPage();
       } else { // speed mode
+        if (this.encodingHasChanged) this.loadXml(cm.getValue());
         if (xmlId) {
           this.currentPage = speed.getPageWithElement(this, xmlId);
           console.info('UpdatePage(speedMode=true): page: ' +
@@ -464,7 +465,6 @@ export default class Viewer {
       this.setCursorToPageBeginning(cm); // re-defines lastNotId
       id = this.lastNoteId;
     };
-    let elsList = '.note, .rest, .mRest, .beatRpt, .halfmRpt, .mRpt';
     let element = document.querySelector('g#' + id);
     if (!element) { // element off-screen
       this.setCursorToPageBeginning(cm); // re-defines lastNotId
@@ -487,7 +487,7 @@ export default class Viewer {
 
       // find elements starting from current note id, element- or measure-wise
       if (incElName == 'note' || incElName == 'measure') {
-        id = dutils.getIdOfNextSvgElement(element, dir, elsList, incElName);
+        id = dutils.getIdOfNextSvgElement(element, dir, undefined, incElName);
         if (!id) { // when no id on screen, turn page
           let what = 'first'; // first/last note within measure
           if (dir == 'backwards' && incElName !== 'measure') what = 'last';
@@ -499,7 +499,7 @@ export default class Viewer {
       // up/down in layers
       if (incElName == 'layer') {
         // console.info('navigate(u/d): x/y: ' + x + '/' + y + ', el: ', element);
-        let els = Array.from(measure.querySelectorAll(elsList));
+        let els = Array.from(measure.querySelectorAll(dutils.navElsSelector));
         els.sort(function(a, b) {
           if (Math.abs(dutils.getX(a) - x) > Math.abs(dutils.getX(b) - x))
             return 1;

@@ -8,6 +8,8 @@ import * as att from './attribute-classes.js';
 export function delEl(v, cm) {
   v.loadXml(cm.getValue(), true);
   let id = v.selectedElements[0]; // TODO: iterate over selectedElements
+  let cursor = cm.getCursor();
+  let nextId = utils.getIdOfNextElement(cm, cursor.line)[0];
   let element = v.xmlDoc.querySelector("[*|id='" + id + "']");
   console.info('Deleting: ', element);
   if (!element) {
@@ -33,6 +35,7 @@ export function delEl(v, cm) {
       let m = utils.getElementIdAtCursor(cm);
       let el = document.getElementById(m).querySelector(dutils.navElsSelector);
       if (el) selectedElements.push(el.getAttribute('id'));
+      else selectedElements.push(nextId);
     }
   } else if (['beam'].includes(element.nodeName)) { // delte beam
     let p;
@@ -84,7 +87,7 @@ export function addCtrlEl(v, cm, elName, placement, form) {
   if (!['note', 'chord', 'rest', 'mRest', 'multiRest']
     .includes(startEl.nodeName)) {
     console.info(
-      'addControlElementDom: Cannot add new element to start element' +
+      'addControlElement: Cannot add new element to start element' +
       startEl.nodeName + '.');
     return;
   }
@@ -174,6 +177,32 @@ export function addCtrlEl(v, cm, elName, placement, form) {
   v.updateData(cm, false, true);
   v.updateNotation = true;
 } // addCtrlEl()
+
+export function addClefChange(v, cm, shape = 'G', line = '2', before = true) {
+  if (v.selectedElements.length == 0) return;
+  v.updateNotation = false; // stop update notation
+  utils.setCursorToId(cm, v.selectedElements[0]);
+  let newElement = v.xmlDoc.createElementNS(speed.meiNameSpace, 'clef');
+  let uuid = 'clef-' + utils.generateUUID();
+  newElement.setAttributeNS(speed.xmlNameSpace, 'xml:id', uuid);
+  newElement.setAttribute('shape', shape);
+  newElement.setAttribute('line', line);
+  v.encodingHasChanged = true;
+  if (before) {
+    cm.replaceRange(speed.xmlToString(newElement) + '\n', cm.getCursor());
+    // cm.execCommand('newLineAndIndent');
+  } else {
+    cm.execCommand('goLineEnd');
+    cm.replaceRange('\n' + speed.xmlToString(newElement), cm.getCursor());
+  }
+  cm.execCommand('indentAuto');
+  v.updateNotation = true; // update notation again
+  v.selectedElements = [];
+  v.selectedElements.push(uuid);
+  v.lastNoteId = uuid;
+  v.updatePage(cm, '', uuid);
+}
+
 
 // Reverse or insert att:placement (artic, ...), att.curvature (slur, tie,
 // phrase) and att.stems (note, chord) of current element
@@ -316,7 +345,7 @@ export function shiftPitch(v, cm, deltaPitch) {
     let chs = Array.from(el.querySelectorAll('note,rest,mRest,multiRest'));
     if (chs.length > 0) // shift many elements
       chs.forEach(ele => replaceInTextEditor(cm, pitchMover(ele, deltaPitch)));
-    else  // shift one element
+    else // shift one element
       replaceInTextEditor(cm, pitchMover(el, deltaPitch));
   }
   v.selectedElements = ids;

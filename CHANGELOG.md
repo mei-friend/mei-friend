@@ -68,3 +68,4 @@
 * Verovio icon animation during worker activity
 * Center selected elements in editor upon notation click
 * Shift pitch of notes/rests inside selected parent elements (e.g., beams)
+* Insert G/F/C clef change before/after selected element 

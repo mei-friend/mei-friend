@@ -116,7 +116,9 @@ export function setCursorToId(cm, id) {
   let c = cm.getSearchCursor(new RegExp(`(?:['"])` + id + `(?:['"])`));
   if (c.findNext()) {
     cm.setCursor(c.from());
+    console.info('setCursorToId cursor: ', c.from());
     let enc = document.querySelector('.encoding');
+    cm.execCommand('goLineStartSmart');
     cm.scrollIntoView(null, Math.round(enc.clientHeight / 2));
   }
 }
@@ -138,8 +140,7 @@ export function getAttributeById(cm, itemId, attribute = 'startid') {
 
 // scans through text from cursorPosition to find next element elementName
 // (e.g. 'note'), also matching staff and layer
-export function getIdOfNextElement(cm, rw,
-  elementNames = ['note', 'rest', 'mRest', 'beatRpt', 'halfmRpt', 'mRpt'],
+export function getIdOfNextElement(cm, rw, elementNames = dutils.navElsArray,
   direction = 'forwards') {
   let row = rw;
   let line;

@@ -1,7 +1,7 @@
 export const navElsSelector =
-  '.note, .rest, .mRest, .beatRpt, .halfmRpt, .mRpt';
+  '.note, .rest, .mRest, .beatRpt, .halfmRpt, .mRpt, .clef';
 export const navElsArray = [
-  'note', 'rest', 'mRest', 'beatRpt', 'halfmRpt', 'mRpt'
+  'note', 'rest', 'mRest', 'beatRpt', 'halfmRpt', 'mRpt', 'clef'
 ];
 
 // scans through SVG starting from element to find next element elementName
