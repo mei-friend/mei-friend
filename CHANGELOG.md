@@ -67,3 +67,4 @@
 * Quick first page view when opening file in speedMode with automatic breaks
 * Verovio icon animation during worker activity
 * Center selected elements in editor upon notation click
+* Shift pitch of notes/rests inside selected parent elements (e.g., beams)

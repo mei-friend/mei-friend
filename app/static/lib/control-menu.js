@@ -369,6 +369,7 @@ export function addModifyerKeys(element) {
     cmdKey = "&#8984;"; // CMD
     cmd2Key = "&#8963;"; // CTRL
   }
+  let ctrlKey = "&#8963;"; // CTRL
   element.querySelectorAll(".altKey")
     .forEach(e => e.innerHTML = altKey + e.innerHTML);
   element.querySelectorAll(".shiftKey")
@@ -377,4 +378,6 @@ export function addModifyerKeys(element) {
     .forEach(e => e.innerHTML = cmd2Key + e.innerHTML);
   element.querySelectorAll(".cmdKey")
     .forEach(e => e.innerHTML = cmdKey + e.innerHTML);
+  element.querySelectorAll(".ctrlKey")
+    .forEach(e => e.innerHTML = ctrlKey + e.innerHTML);
 }
