@@ -114,7 +114,11 @@ export function moveCursorToEndOfMeasure(cm, p) {
 
 export function setCursorToId(cm, id) {
   let c = cm.getSearchCursor(new RegExp(`(?:['"])` + id + `(?:['"])`));
-  if (c.findNext()) cm.setCursor(c.from());
+  if (c.findNext()) {
+    cm.setCursor(c.from());
+    let enc = document.querySelector('.encoding');
+    cm.scrollIntoView(null, Math.round(enc.clientHeight / 2));
+  }
 }
 
 // find attribute (@startid) of element with itemId in textEditor.getBuffer()
@@ -203,7 +207,7 @@ export function getElementIdAtCursor(cm) {
   let column = p.ch;
   // get line from current cursor position
   let line = cm.getLine(row);
-  // check if cursor is on a closing tag by stepping backwards 
+  // check if cursor is on a closing tag by stepping backwards
   for (let j = column; j > 0; j--) {
     if (line[j] === "/" && line[j - 1] === "<") {
       // if closing tag is found, find the name of the tag with regex

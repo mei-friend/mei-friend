@@ -304,14 +304,9 @@ export default class Viewer {
 
   handleClickOnNotation(e, cm) {
     e.stopImmediatePropagation();
-    console.info('click: ', e);
+    // console.info('click: ', e);
     let itemId = String(e.currentTarget.id);
     if (itemId === "undefined") return;
-    let el = document.querySelector('g#' + itemId);
-    if (el.getAttribute('class') == 'note')
-      console.info('CLICK note: x ', dutils.getX(el));
-    else if (el.getAttribute('class') == 'chord')
-      console.info('CLICK chord: x ', dutils.getX(el));
     // take chord rather than note xml:id, when ALT is pressed
     let chordId = utils.insideParent(itemId);
     if (e.altKey && chordId) itemId = chordId;
