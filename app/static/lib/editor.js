@@ -313,41 +313,11 @@ export function shiftPitch(v, cm, deltaPitch) {
     let id = ids[i];
     let el = v.xmlDoc.querySelector("[*|id='" + id + "']");
     if (!el) continue;
-    if (['rest', 'mRest', 'multiRest'].includes(el.nodeName)) {
-      let oloc = 4;
-      let ploc = 'c';
-      if (el.hasAttribute('oloc')) oloc = parseInt(el.getAttribute('oloc'));
-      if (el.hasAttribute('ploc')) ploc = el.getAttribute('ploc');
-      let pi = att.pnames.indexOf(ploc) + deltaPitch;
-      if (pi > att.pnames.length - 1) {
-        pi -= att.pnames.length;
-        oloc++;
-      } else if (pi < 0) {
-        pi += att.pnames.length;
-        oloc--;
-      }
-      el.setAttribute('ploc', att.pnames[pi]);
-      el.setAttribute('oloc', oloc);
-      replaceInTextEditor(cm, el); // , true);
-      // txtEdr.autoIndentSelectedRows();
-    } else if (['note'].includes(el.nodeName)) {
-      let oct = 4;
-      let pname = 'c';
-      if (el.hasAttribute('oct')) oct = parseInt(el.getAttribute('oct'));
-      if (el.hasAttribute('pname')) pname = el.getAttribute('pname');
-      let pi = att.pnames.indexOf(pname) + deltaPitch;
-      if (pi > att.pnames.length - 1) {
-        pi -= att.pnames.length;
-        oct++;
-      } else if (pi < 0) {
-        pi += att.pnames.length;
-        oct--;
-      }
-      el.setAttribute('pname', att.pnames[pi]);
-      el.setAttribute('oct', oct);
-      replaceInTextEditor(cm, el); // , true);
-      // txtEdr.autoIndentSelectedRows();
-    }
+    let chs = Array.from(el.querySelectorAll('note,rest,mRest,multiRest'));
+    if (chs.length > 0) // shift many elements
+      chs.forEach(ele => replaceInTextEditor(cm, pitchMover(ele, deltaPitch)));
+    else  // shift one element
+      replaceInTextEditor(cm, pitchMover(el, deltaPitch));
   }
   v.selectedElements = ids;
   v.updateData(cm, false, true);
@@ -610,6 +580,33 @@ function toggleArticForNote(note, artic) {
   }
   // console.info('modified element: ', note);
   return uuid;
+}
+
+function pitchMover(el, deltaPitch) {
+  let oct = 4;
+  let pname = 'c';
+  let o;
+  let p;
+  if (['note'].includes(el.nodeName)) {
+    o = 'oct';
+    p = 'pname';
+  } else if (['rest', 'mRest', 'multiRest'].includes(el.nodeName)) {
+    o = 'oloc';
+    p = 'ploc';
+  }
+  if (el.hasAttribute(o)) oct = parseInt(el.getAttribute(o));
+  if (el.hasAttribute(p)) pname = el.getAttribute(p);
+  let pi = att.pnames.indexOf(pname) + deltaPitch;
+  if (pi > att.pnames.length - 1) {
+    pi -= att.pnames.length;
+    oct++;
+  } else if (pi < 0) {
+    pi += att.pnames.length;
+    oct--;
+  }
+  el.setAttribute(o, oct);
+  el.setAttribute(p, att.pnames[pi]);
+  return el;
 }
 
 function staffMover(cm, el, upwards) {
