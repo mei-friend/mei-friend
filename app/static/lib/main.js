@@ -354,11 +354,10 @@ function workerEventsHandler(ev) {
         v.selectedElements = [];
         if (!ev.data.removeIds) v.selectedElements.push(ev.data.xmlId);
       }
-      if (ev.data.pageCount && (!v.speedMode ||
-          document.getElementById('breaks-select').value == 'none'))
+      let bs = document.getElementById('breaks-select').value;
+      if (ev.data.pageCount && (!v.speedMode || bs == 'none'))
         v.pageCount = ev.data.pageCount;
-      else if (v.speedMode &&
-        document.getElementById('breaks-select').value == 'auto' &&
+      else if (v.speedMode && bs == 'auto' &&
         Object.keys(v.pageBreaks).length > 0)
         v.pageCount = Object.keys(v.pageBreaks).length;
       v.currentPage = ev.data.pageNo;

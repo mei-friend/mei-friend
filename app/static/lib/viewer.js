@@ -142,14 +142,13 @@ export default class Viewer {
       this.pageCount = 1; // pages are one-based
       let countBreaks = false;
       for (let e of elements) {
-        if (e.nodeName == 'measure') countBreaks = true; // skip trailing breaks
+        if (e.nodeName == 'measure') countBreaks = true; // skip leading breaks
         if (countBreaks && this.breaks.includes(e.nodeName))
           this.pageCount++;
       }
       if (this.currentPage > this.pageCount) this.currentPage = 1;
       console.info('xmlDOM pages counted: currentPage: ' + this.currentPage +
         ', pageCount: ' + this.pageCount);
-      // speed.getBreaksFromToolkit(this.vrvToolkit, txtEdr.getBuffer().getText());
     }
     return speed.getPageFromDom(this.xmlDoc, this.currentPage, this.breaks);
   }
