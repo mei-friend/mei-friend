@@ -66,3 +66,4 @@
 * SpeedMode support also for breaks='auto|smart' by computing breaks upon loading
 * Quick first page view when opening file in speedMode with automatic breaks
 * Verovio icon animation during worker activity
+* Center selected elements in editor upon notation click

@@ -34,7 +34,7 @@ import Github from './github.js';
 
 
 const version = 'develop-0.1.5';
-const versionDate = '3 Jan 2022';
+const versionDate = '6 Jan 2022';
 const defaultMeiFileName = `${root}Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei`;
 const defaultVerovioOptions = {
   scale: 55,
