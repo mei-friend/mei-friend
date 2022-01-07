@@ -12,6 +12,7 @@ export function setOrientation(cm, o = '', v = null) {
   // v.updateLayout();
   // }).attr('href', root + '/css/' + orientation + '.css');
   let sz = calcSizeOfContainer();
+  sz.width = sz.width*.85; // HACK DW - make space for annotation sidebar
   friendSz.style.width = sz.width;
   friendSz.style.height = sz.height;
   let notation = document.querySelector(".notation");

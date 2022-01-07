@@ -83,11 +83,24 @@ a:active {
   -ms-transform: translate(-50%, -50%);
 }
 
+.dragContainer { 
+  display:flex;
+  flex-direction: row;
+}
+
 .friendContainer {
   border: 3px solid lightsteelblue;
   border-radius: 4px;
-  width: 100%;
+  width: 85%;
 }
+
+.annotationContainer { 
+  width:15%;
+  background:#ffffa5;
+  border: 3px solid darkorange;
+  border-radius:4px;
+}
+  
 
 .notation {
   /* border: 3px solid DodgerBlue;
