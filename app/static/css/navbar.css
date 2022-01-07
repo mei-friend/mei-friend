@@ -93,6 +93,13 @@
   text-align: left;
 }
 
+#GithubLoginLink { 
+  float: unset;
+  color: unset;
+  text-align: unset;
+  padding: unset;
+}
+
 .dropdown-content input, .dropdown-content table {
   margin: 3px 12px;
 }

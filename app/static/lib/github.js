@@ -3,6 +3,7 @@ export default class Github {
     this.githubRepo = githubRepo;
     this.githubToken = githubToken;
     this.filepath = filepath;
+    this.userLogin = userLogin;
     this.author = { 
       name: authorName,
       email: authorEmail
@@ -57,6 +58,13 @@ export default class Github {
     return this._repo;
   }
 
+  set userLogin(userLogin) { 
+    this._userLogin = userLogin;
+  } 
+  
+  get userLogin() { 
+    return this._userLogin;
+  }
 
   set githubRepo(githubRepo) {
     this._githubRepo = githubRepo;

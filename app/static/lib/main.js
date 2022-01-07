@@ -58,6 +58,13 @@ const defaultVerovioOptions = {
 };
 const defaultKeyMap = `${root}keymaps/default-keymap.json`;
 
+let storage;
+try { 
+  storage = window.localStorage;
+} 
+catch(err) { 
+  console.error("Unable to access local storage: ", err);
+}
 
 document.addEventListener('DOMContentLoaded', function() {
   let myTextarea = document.getElementById("editor");
@@ -80,8 +87,49 @@ document.addEventListener('DOMContentLoaded', function() {
     gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"]
     // theme: 'dracula' // monokai (dark), dracula (bright)
   });
+  
+  // restore localStorage if we have it, otherwise open default MEI
+  let githubFromStorage;
+  if(storage && storage.getItem("meiXml")) { 
+    meiFileName = storage.getItem("meiFileName");
+    console.log("Moop!", storage.getItem(github))
+    cm.setValue(storage.getItem("meiXml"));
+    if(storage.getItem("github")) { 
+      isLoggedIn = true;
+      githubFromStorage = JSON.parse(storage.getItem("github"));
+      console.log("Retrieved github from storage: ", githubFromStorage);
+    }   
+  } else { 
+    openMei(); // default MEI
+  }
 
-  openMei(); // default MEI
+  if(isLoggedIn) { 
+    // use github object from local storage if available, else initialise
+    if(githubFromStorage) {
+      github = new Github(
+        githubFromStorage.githubRepo, 
+        githubFromStorage.githubToken, 
+        githubFromStorage.filepath,
+        githubFromStorage.userLogin,
+        githubFromStorage.userName,
+        githubFromStorage.userEmail
+      )
+    } else { 
+      github = new Github("", githubToken, "", userLogin, userName, userEmail);
+      if(storage) { 
+        console.log("Trying to set!!!")
+        storage.setItem("github", JSON.stringify({
+          githubRepo:   github.githubRepo,
+          githubToken:  github.githubToken,
+          filepath:     github.filepath,
+          userLogin:    github.userLogin,
+          userName:     github.author.name,
+          userEmail:    github.author.email
+        }));
+      }
+    }
+    refreshGithubMenu();
+  }
 
   setOrientation(cm, 'bottom', v);
 
@@ -115,6 +163,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function assignGithubMenuClickHandlers() {
   const githubLoadingIndicator = document.getElementById("GithubLogo");
+  const logoutButton = document.getElementById('GithubLogout');
+  logoutButton.addEventListener('click', (ev) => { 
+    logoutFromGithub();
+  });
   const repoHeader = document.getElementById('repositoriesHeader');
   if (repoHeader) {
     // on click, reload list of all repositories
@@ -178,8 +230,9 @@ function assignGithubMenuClickHandlers() {
           document.querySelector(".statusbar").innerText = "Loading from Github...";
           v.clear();
           v.updateNotation = false;
-          meiFileName = `Github:${github.githubRepo}${github.filepath}`
+          meiFileName = `Github:${github.githubRepo}${github.filepath}`;
           cm.setValue(github.content);
+          updateStorage(meiFileName, github.content);
           v.updateNotation = true;
           v.updateAll(cm);
         }).catch(() => {
@@ -191,11 +244,43 @@ function assignGithubMenuClickHandlers() {
   })
 }
 
+function updateStorage(meiFileName, meiXml) {
+  // save filename and content to local storage if available
+  if(storage) { 
+    try { 
+      storage.setItem("meiFileName", meiFileName);
+      storage.setItem("meiXml", meiXml);
+    }
+    catch(err) { 
+      console.error("Could not save to local storage. Content may be too big? Content length: ", meiXml.length);
+    }
+  }
+}
+
+function logoutFromGithub() { 
+  // remove github object from memory and, if relevant, local storage
+  github = null;
+  if(storage) {
+    storage.removeItem("github");
+  }
+  // restore logged off state
+  isLoggedIn = false;
+  document.getElementById('GithubName').innerHTML = 
+    `<a href="login" id="GithubLoginLink">Login</a>`;
+  document.getElementById('GithubMenu').classList.add('loggedOut');
+}
+
 function refreshGithubMenu(e) {
+  // display Github name
+  document.getElementById("GithubName").innerText =
+    github.author.name === "None" ? github.userLogin : github.author.name;
   // populate Github menu
   let githubMenu = document.getElementById("GithubMenu");
+  githubMenu.classList.remove("loggedOut");
   githubMenu.innerHTML =
-    `<a id="repositoriesHeader" class="dropdown-head" href="#"><b>Select repository:</b></a>`
+    `<a id="GithubLogout" href="#">Log out</a>
+    <hr class="dropdown-line">
+    <a id="repositoriesHeader" class="dropdown-head" href="#"><b>Select repository:</b></a>`
   fillInUserRepos();
 }
 
@@ -342,6 +427,7 @@ function workerEventsHandler(ev) {
       if (!v.speedMode) v.pageCount = ev.data.pageCount;
       v.updateNotation = false;
       cm.setValue(mei);
+      updateStorage(meiFileName, mei);
       v.updateNotation = true;
       v.updateAll(cm, defaultVerovioOptions);
       break;
@@ -349,10 +435,12 @@ function workerEventsHandler(ev) {
       if (ev.data.mei) { // from reRenderMEI
         v.updateNotation = false;
         cm.setValue(ev.data.mei);
+        updateStorage(meiFileName, ev.data.mei);
         v.updateNotation = true;
         v.selectedElements = [];
         if (!ev.data.removeIds)
           v.selectedElements.push(ev.data.xmlId);
+
       }
       if (ev.data.pageCount) v.pageCount = ev.data.pageCount;
       v.currentPage = ev.data.pageNo;
@@ -428,6 +516,7 @@ export function openMei(file = defaultMeiFileName) {
         v.clear();
         v.updateNotation = false;
         cm.setValue(mei);
+        updateStorage(meiFileName, mei)
         v.updateNotation = true;
         v.updateAll(cm);
       });
@@ -478,6 +567,7 @@ export function openMei(file = defaultMeiFileName) {
               if (key == "mei") { // if already a mei file
                 v.updateNotation = false;
                 cm.setValue(mei);
+                updateStorage(meiFileName, mei);
                 v.updateNotation = true;
                 v.updateAll(cm, defaultVerovioOptions);
                 break;
@@ -643,9 +733,6 @@ let cmd = {
 
 // github API wrapper object
 let github;
-if (isLoggedIn) {
-  github = new Github("", githubToken, "", userLogin, userName, userEmail);
-}
 
 // layout notation position
 document.getElementById('top').addEventListener('click', cmd.notationTop);
@@ -845,6 +932,10 @@ function addEventListeners(cm, v) {
       document.getElementById("commitButton").disabled = changesExist;
     }
     v.notationUpdated(cm);
+    if(storage) { 
+      // TODO evaluate performance hit!!
+      storage.setItem("meiXml", cm.getValue());
+    }
   })
 
   // manually update notation rendering from encoding
@@ -958,11 +1049,4 @@ function setKeyMap(keyMapFilePath) {
         }
       }
     });
-}
-
-window.onload = () => {
-  // Initialise Github object if user is logged in
-  if (isLoggedIn) {
-    refreshGithubMenu();
-  }
 }

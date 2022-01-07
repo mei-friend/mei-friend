@@ -55,12 +55,8 @@
     <div class="title"><a href="https://repo.mdw.ac.at/mei-friend/">mei-friend online</a></div>
     <div class="navbar">
       <div class="dropdown">
-        {% if isLoggedIn -%}
-        <button class="dropbtn"><img id="GithubLogo" src="{{ url_for('static', filename='img/GitHub-Mark-32px.png') }}" />{{userName}}</button>
-        <div class="dropdown-content" id="GithubMenu"></div>
-        {% else %}
-        <a class="dropbtn" id="GithubLogin" href="login"><img id="GithubLogo" src="{{ url_for('static', filename='img/GitHub-Mark-32px.png') }}" />Login</a>
-        {% endif %}
+        <button class="dropbtn GithubButton"><img id="GithubLogo" src="{{ url_for('static', filename='img/GitHub-Mark-32px.png') }}" /><span id="GithubName"><a href="login" id="GithubLoginLink">Login</a></span></button>
+        <div class="dropdown-content loggedOut" id="GithubMenu"></div>
       </div>
       <div class="dropdown">
         <button class="dropbtn">File</button>
@@ -190,6 +186,10 @@
       if(!ev.target.closest("#GithubMenu") || ev.target.classList.contains("closeOnClick")) {
         // toggle "show" only if not in continuous-Github-menu behaviour
         show = !show;
+      }
+      // if user is logged out, force github menu to be hidden
+      if(document.getElementById('GithubMenu').classList.contains("loggedOut")) { 
+        document.getElementById('GithubMenu').classList.remove("show");
       }
     });
   </script>
