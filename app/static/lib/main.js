@@ -878,7 +878,7 @@ function handleCommitButtonClicked(e) {
         .then(() => {
           githubLoadingIndicator.classList.remove("loading");
           cm.readOnly = false;
-          fillInCommitLog();
+          fillInCommitLog("withRefresh");
           console.log("Finished updating commit log after writing commit.");
         })
         .catch((e) => {
