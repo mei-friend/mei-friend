@@ -9,7 +9,7 @@ export function delEl(v, cm) {
   v.loadXml(cm.getValue(), true);
   let id = v.selectedElements[0]; // TODO: iterate over selectedElements
   let cursor = cm.getCursor();
-  let nextId = utils.getIdOfNextElement(cm, cursor.line)[0];
+  let nextId = utils.getIdOfNextElement(cm, cursor.line)[0]; // TODO necessary?
   let element = v.xmlDoc.querySelector("[*|id='" + id + "']");
   console.info('Deleting: ', element);
   if (!element) {
@@ -181,7 +181,11 @@ export function addCtrlEl(v, cm, elName, placement, form) {
 export function addClefChange(v, cm, shape = 'G', line = '2', before = true) {
   if (v.selectedElements.length == 0) return;
   v.updateNotation = false; // stop update notation
-  utils.setCursorToId(cm, v.selectedElements[0]);
+  let id = v.selectedElements[0];
+  var el = v.xmlDoc.querySelector("[*|id='" + id + "']");
+  let chord = el.closest('chord');
+  if (chord) id = chord.getAttribute('xml:id');
+  utils.setCursorToId(cm, id);
   let newElement = v.xmlDoc.createElementNS(speed.meiNameSpace, 'clef');
   let uuid = 'clef-' + utils.generateUUID();
   newElement.setAttributeNS(speed.xmlNameSpace, 'xml:id', uuid);
@@ -192,6 +196,7 @@ export function addClefChange(v, cm, shape = 'G', line = '2', before = true) {
     cm.replaceRange(speed.xmlToString(newElement) + '\n', cm.getCursor());
     // cm.execCommand('newLineAndIndent');
   } else {
+    cm.execCommand('toMatchingTag');
     cm.execCommand('goLineEnd');
     cm.replaceRange('\n' + speed.xmlToString(newElement), cm.getCursor());
   }
