@@ -61,11 +61,12 @@
 * Incorporate new .env variables for production deployment
 * Bug-fixes and layout improvements for Github menu
 * Add cute Github loading indicator animation
-# 0.1.5 patch: speedMode support added
+# 0.2.0 minor: speedMode support
 * Support for speedMode to be en/disabled through checkbox
 * SpeedMode support also for breaks='auto|smart' by computing breaks upon loading
 * Quick first page view when opening file in speedMode with automatic breaks
 * Verovio icon animation during worker activity
 * Center selected elements in editor upon notation click
 * Shift pitch of notes/rests inside selected parent elements (e.g., beams)
-* Insert G/F/C clef change before/after selected element 
+* Insert G/F/C clef change before/after selected element
+* Clef change on selected note inserted before/after chord element
