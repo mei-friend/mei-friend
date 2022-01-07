@@ -196,8 +196,8 @@ export default class Github {
       mode: this.entry.mode, // preserve mode of existing file (e.g. executable)
       content: content
     }];
-    const treeHash = await this.repo.createTree(updates);
     updates.base = this.commit.tree;
+    const treeHash = await this.repo.createTree(updates);
     const commitHash = await this.repo.saveAs("commit", { 
       tree: treeHash,
       author: this.author,
@@ -284,113 +284,3 @@ export default class Github {
   }
 }
 
-/*
-
-function formatCommitLog(github) { 
-  let logTableContent = `
-    <tr>
-      <th>Time</th>
-      <th>User</th>
-      <th>Message</th>
-      <th>SHA</th>
-    <tr>`;
-  github.commitLog.forEach((c) => { 
-    logTableContent += `
-    <tr>
-      <td>${c.commit.author.date}</td>
-      <td><a href="${c.author.html_url}">${c.commit.author.name}</a></td>
-      <td>${c.commit.message}</td>
-      <td><a href="${c.commit.url}">${c.sha.slice(0,8)}...</a></td>
-    </tr>`;
-  });
-  console.log("commits log: ", logTableContent);
-  return logTableContent;
-}
-
-async function handlePullRequest(github, resp) { 
-  console.log("This is where I would handle the pull request response: ", resp);
-}
-
-async function initPageWithRepo(github) {
-  console.log("INIT PAGE: ", github);
-  const submitButton = document.querySelector("#submit");
-  const prButton = document.querySelector("#pullRequest");
-  const textBox = document.querySelector("#textBox");
-  const commitMessageBox = document.querySelector("#commitMessageBox")
-  const textBoxLabel = document.querySelector("#textBoxLabel");
-  const logTable = document.querySelector("#commitLog");
-
-  textBoxLabel.innerHTML = github.githubRepo + ": " + github.filepath;
-
-  await github.readGithubRepo().then(() => {
-    textBox.value = github.content;
-    textBox.disabled = false;
-    prButton.disabled = false;
-    console.log("formating commits:", github);
-    logTable.innerHTML = formatCommitLog(github);
-  })
-
-  textBox.addEventListener("input", () => {
-    submitButton.disabled = textBox.value === github.content ? true : false;
-    commitMessageBox.disabled = submitButton.disabled;
-  });
-
-  commitMessageBox.addEventListener("input", () => {
-    commitMessageBox.style.border="";
-  });
-
-  submitButton.addEventListener("click", () => {
-    if(commitMessageBox.value) { 
-      // Fork the repository first if necessary 
-      const toWrite = textBox.value;
-      textBoxLabel.innerHTML = "<strong>Writing to GitHub repository...</strong>";
-      textBox.disabled = true;
-      commitMessageBox.disabled = true;
-      submitButton.disabled = true;
-      prButton.disabled = true;
-      logTable.innerHTML = "";
-      github.writeGithubRepo(toWrite, commitMessageBox.value)
-        .then(() => github.readGithubRepo())
-        .then(() => {
-          textBox.value = github.content;
-          commitMessageBox.value = "";
-          textBoxLabel.innerHTML = github.githubRepo + ": " + github.filepath;
-          textBox.disabled = false;
-          prButton.disabled = false;
-          console.log("formating commits:", github);
-          logTable.innerHTML = formatCommitLog(github);
-          });
-    } else {
-      commitMessageBox.style.border="2px solid red";
-    }
-  });
-
-  prButton.addEventListener("click", () => { 
-    github.pullRequest(handlePullRequest)
-      .then(() => commitMessageBox.style.border="2px solid green");
-  });
-}
-
-async function init(githubRepo, githubToken, filepath, userLogin, userName, userEmail) {
-  const github = new Github(
-    githubRepo, 
-    githubToken,
-    filepath,
-    userLogin,
-    userName,
-    userEmail
-  );
-
-  if(github.githubRepoOwner !== userLogin) { 
-    // switch to user's fork (or create a new one)
-    console.log("Switching to user fork (creating it first if necessary)...")
-    github.fork(initPageWithRepo);
-  } else {
-    initPageWithRepo(github);
-  }
-}
-
-window.onload = async () => {
-  const filepath = "README.md";
-  await init(githubRepo, githubToken, filepath, userLogin, userName, userEmail);
-}*/

@@ -61,3 +61,5 @@
 * Incorporate new .env variables for production deployment
 * Bug-fixes and layout improvements for Github menu
 * Add cute Github loading indicator animation
+# 0.1.5 patch
+* Fix github commit behaviour
