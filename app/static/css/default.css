@@ -363,6 +363,7 @@ span.keyIcon {
 /* CodeMirror fold gutter css styles */
 .CodeMirror-foldmarker {
   font-family: arial;
+  cursor: pointer;
 }
 
 .CodeMirror-foldgutter {
