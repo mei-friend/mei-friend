@@ -495,17 +495,17 @@ export default class Viewer {
       let firstNote = document.querySelector('.measure').querySelector('.note');
       if (firstNote) id = firstNote.getAttribute('id');
     } else {
-      let layer = element.closest('.layer');
-      let staff = element.closest('.staff');
-      let lyNo = layer.getAttribute('data-n');
-      let stNo = staff.getAttribute('data-n');
-
       // find elements starting from current note id, element- or measure-wise
       if (incElName == 'note' || incElName == 'measure') {
         id = dutils.getIdOfNextSvgElement(element, dir, undefined, incElName);
         if (!id) { // when no id on screen, turn page
           let what = 'first'; // first/last note within measure
           if (dir == 'backwards' && incElName !== 'measure') what = 'last';
+          let lyNo = 1;
+          let layer = element.closest('.layer');
+          if (layer) lyNo = layer.getAttribute('data-n');
+          let staff = element.closest('.staff');
+          let stNo = staff.getAttribute('data-n');
           this.navigateBeyondPage(cm, dir, what, stNo, lyNo, y);
           return;
         }

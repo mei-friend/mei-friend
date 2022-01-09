@@ -10,7 +10,9 @@ export function getIdOfNextSvgElement(currEl, dir = 'forwards',
   sel = navElsSelector, incr = 'all') {
   let measure = currEl.closest('.measure');
   let stN = currEl.closest('.staff').getAttribute('data-n');
-  let lyN = currEl.closest('.layer').getAttribute('data-n');
+  let lyN = 1;
+  let layer = currEl.closest('.layer')
+  if (layer) lyN = layer.getAttribute('data-n');
   let currChord = currEl.closest('.chord');
   let currChordId = '';
   if (currChord) currChordId = currChord.getAttribute('id');
@@ -36,6 +38,7 @@ export function getIdOfNextSvgElement(currEl, dir = 'forwards',
   let found = false;
   for (let i of elementList) { // go thru all elements on page
     if (found && i.closest('.staff').getAttribute('data-n') == stN &&
+      i.closest('.layer') &&
       i.closest('.layer').getAttribute('data-n') == lyN) {
       let ch = i.closest('.chord'); // ignore tones of same chord
       if (ch && ch.getAttribute('id') == currChordId) continue;
