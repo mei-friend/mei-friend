@@ -101,7 +101,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
   addEventListeners(cm, v);
   addResizerHandlers(cm, v);
-  window.onresize = () => setOrientation(cm, '', v);
+  let doit;
+  window.onresize = () => {
+    clearTimeout(doit); // wait half a second before re-calculating orientation
+    doit = setTimeout(() => setOrientation(cm, '', v), 500);
+  };
 
   // ask worker to load Verovio
   v.busy();
