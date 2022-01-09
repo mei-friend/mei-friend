@@ -60,11 +60,33 @@ export function createControlsMenu(parentElement, scale) {
   });
   zoomCtrls.appendChild(notationNightModeBtn);
 
+
   // Pagination, page navigation
   let paginationCtrls = document.createElement('div');
   paginationCtrls.id = 'pagination-ctrls';
   paginationCtrls.classList.add('controls');
   controlsForm.appendChild(paginationCtrls);
+
+  // let sectionSelector = document.createElement('select');
+  // sectionSelector.id = "section-selector";
+  // sectionSelector.classList.add('icon');
+  // sectionSelector.classList.add('btn');
+  // sectionSelector.classList.add('icon-multi-select');
+  // sectionSelector.classList.add('inline-block-tight');
+  // addToolTip(sectionSelector, {
+  //   title: 'Navigate encoded section/ending structure'
+  // });
+  // sectionSelector.options.add(new Option('Var-I'));
+  // sectionSelector.options.add(new Option('| Var-I-A'));
+  // sectionSelector.options.add(new Option('| Var-I-B'));
+  // sectionSelector.options.add(new Option('| Var-I-B1'));
+  // sectionSelector.options.add(new Option('| Var-I-B2'));
+  // sectionSelector.options.add(new Option('Var-II'));
+  // sectionSelector.options.add(new Option('| Var-II-A'));
+  // sectionSelector.options.add(new Option('| Var-II-A1'));
+  // sectionSelector.options.add(new Option('| Var-II-A2'));
+  // sectionSelector.options.add(new Option('| Var-II-B'));
+  // paginationCtrls.appendChild(sectionSelector);
 
   let firstBtn = document.createElement('button');
   firstBtn.id = "first-page-btn";
