@@ -379,6 +379,7 @@ export default class Viewer {
         elRect.y > (vpRect.y + vpRect.height * (1 - closeToPerc)))
         vp.scrollTop -= vpRect.y + vpRect.height / 2 - elRect.y;
       // Firefox Bug: with rests, clientRects are in SVG coordinates
+      // https://bugzilla.mozilla.org/show_bug.cgi?id=1350755
     }
   }
 
