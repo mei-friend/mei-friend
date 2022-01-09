@@ -169,6 +169,17 @@ export default class Viewer {
     this.pageBreaks = {};
   }
 
+  scrollSvg(cm) {
+    let vp = document.querySelector('.verovio-panel');
+    let el = document.querySelector('g#' + utils.getElementIdAtCursor(cm));
+    if (el) {
+      let vpRect = vp.getClientRects();
+      let elRect = el.getClientRects();
+      vp.scrollLeft -= vpRect[0].x + vpRect[0].width / 2 - elRect[0].x;
+      vp.scrollTop -= vpRect[0].y + vpRect[0].height / 2 - elRect[0].y;
+    }
+  }
+
   reRenderMei(cm, removeIds = false) {
     let message = {
       'cmd': 'reRenderMei',
@@ -305,6 +316,7 @@ export default class Viewer {
 
   handleClickOnNotation(e, cm) {
     e.stopImmediatePropagation();
+    this.updateNotation = false;
     // console.info('click: ', e);
     let itemId = String(e.currentTarget.id);
     if (itemId === "undefined") return;
@@ -342,6 +354,7 @@ export default class Viewer {
     // }
     if (startid) this.lastNoteId = startid;
     else this.lastNoteId = itemId;
+    this.updateNotation = true;
 
     // let elementName = 'undefined'; // retrieve element name
     // if (elementString != '') {
@@ -362,9 +375,12 @@ export default class Viewer {
     this.selectedElements.push(id);
     let fl = document.getElementById('flip-checkbox');
     if (!document.querySelector('g#' + id) &&
-      ((this.updateNotation && fl && fl.checked) || forceFlip))
+      ((this.updateNotation && fl && fl.checked) || forceFlip)) {
       this.updatePage(cm, '', id);
-    this.updateHighlight(cm);
+    } else {
+      if (this.updateNotation) this.scrollSvg(cm);
+      this.updateHighlight(cm);
+    }
   }
 
   // when editor emits changes, update notation rendering

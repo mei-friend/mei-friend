@@ -370,6 +370,7 @@ function workerEventsHandler(ev) {
       v.addNotationEventListeners(cm);
       v.setNotationColors();
       v.updateHighlight(cm);
+      v.scrollSvg(cm);
       if (!"setFocusToVerovioPane" in ev.data || ev.data.setFocusToVerovioPane)
         v.setFocusToVerovioPane();
       if (ev.data.computePageBreaks) v.computePageBreaks(cm);
