@@ -254,6 +254,7 @@ https://www.w3schools.com/css/css_tooltip.asp
   margin-left: -60px;
   opacity: 0;
   transition: opacity 0.3s;
+  white-space: normal;
 }
 
 .tooltip .tooltiptext::after {
