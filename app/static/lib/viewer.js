@@ -365,19 +365,19 @@ export default class Viewer {
     let vp = document.querySelector('.verovio-panel');
     let el = document.querySelector('g#' + utils.getElementIdAtCursor(cm));
     if (el) {
-      let vpRect = vp.getClientRects();
-      let elRect = el.getClientRects();
+      let vpRect = vp.getBoundingClientRect();
+      let elRect = el.getBoundingClientRect();
       // adjust scrolling only when element (close to or completely) outside
       const closeToPerc = .1;
-      // if (elRect[0].x < (vpRect[0].x + vpRect[0].width * closeToPerc))
-      //   vp.scrollLeft -= vpRect[0].x + vpRect[0].width * (1 - closeToPerc) - elRect[0].x;
-      //
-      // else if (elRect[0].x > (vpRect[0].x + vpRect[0].width * (1 - closeToPerc)))
-      vp.scrollLeft -= vpRect[0].x + vpRect[0].width * .5 - elRect[0].x;
+      // if (elRect.x < (vpRect.x + vpRect.width * closeToPerc))
+      //   vp.scrollLeft -= vpRect.x + vpRect.width * (1 - closeToPerc) - elRect.x;
+      // else if (elRect.x > (vpRect.x + vpRect.width * (1 - closeToPerc)))
+      //   vp.scrollLeft -= vpRect.x + vpRect.width * closeToPerc - elRect.x;
+      vp.scrollLeft -= vpRect.x + vpRect.width / 2 - elRect.x;
 
-      if (elRect[0].y < (vpRect[0].y + vpRect[0].height * closeToPerc) ||
-        elRect[0].y > (vpRect[0].y + vpRect[0].height * (1 - closeToPerc)))
-        vp.scrollTop -= vpRect[0].y + vpRect[0].height / 2 - elRect[0].y;
+      if (elRect.y < (vpRect.y + vpRect.height * closeToPerc) ||
+        elRect.y > (vpRect.y + vpRect.height * (1 - closeToPerc)))
+        vp.scrollTop -= vpRect.y + vpRect.height / 2 - elRect.y;
       // Firefox Bug: with rests, clientRects are in SVG coordinates
     }
   }
