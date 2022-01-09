@@ -169,17 +169,6 @@ export default class Viewer {
     this.pageBreaks = {};
   }
 
-  scrollSvg(cm) {
-    let vp = document.querySelector('.verovio-panel');
-    let el = document.querySelector('g#' + utils.getElementIdAtCursor(cm));
-    if (el) {
-      let vpRect = vp.getClientRects();
-      let elRect = el.getClientRects();
-      vp.scrollLeft -= vpRect[0].x + vpRect[0].width / 2 - elRect[0].x;
-      vp.scrollTop -= vpRect[0].y + vpRect[0].height / 2 - elRect[0].y;
-    }
-  }
-
   reRenderMei(cm, removeIds = false) {
     let message = {
       'cmd': 'reRenderMei',
@@ -346,7 +335,7 @@ export default class Viewer {
     // set lastNoteId to @startid or @staff of control element
     let startid = utils.getAttributeById(cm, itemId, "startid");
     if (startid && startid.startsWith('#')) startid = startid.split('#')[1];
-    // console.info('startid: ', startid);
+
     // if (!startid) { // work around for tstamp/staff
     // TODO: find note corresponding to @staff/@tstamp
     // startid = utils.getAttributeById(txtEdr.getBuffer(), itemId, attribute = 'tstamp');
@@ -355,18 +344,7 @@ export default class Viewer {
     if (startid) this.lastNoteId = startid;
     else this.lastNoteId = itemId;
     this.updateNotation = true;
-
-    // let elementName = 'undefined'; // retrieve element name
-    // if (elementString != '') {
-    //   elementName = elementString.match(/[\w.-]+/);
-    // }
-    // console.info('elementName: "' + elementName + '"');
-    // if (elementName == 'undefined') return;
-
-    // str = 'handleClickOnNotation() selected: ';
-    // for (i of this.selectedElements) console.info(str += i + ', ');
-    // console.info(str);
-  }
+  } // handleClickOnNotation()
 
   // when cursor pos in editor changed, update notation location / highlight
   cursorActivity(cm, forceFlip = false) {
@@ -380,6 +358,27 @@ export default class Viewer {
     } else {
       if (this.updateNotation) this.scrollSvg(cm);
       this.updateHighlight(cm);
+    }
+  }
+
+  scrollSvg(cm) {
+    let vp = document.querySelector('.verovio-panel');
+    let el = document.querySelector('g#' + utils.getElementIdAtCursor(cm));
+    if (el) {
+      let vpRect = vp.getClientRects();
+      let elRect = el.getClientRects();
+      // adjust scrolling only when element (close to or completely) outside
+      const closeToPerc = .1;
+      // if (elRect[0].x < (vpRect[0].x + vpRect[0].width * closeToPerc))
+      //   vp.scrollLeft -= vpRect[0].x + vpRect[0].width * (1 - closeToPerc) - elRect[0].x;
+      //
+      // else if (elRect[0].x > (vpRect[0].x + vpRect[0].width * (1 - closeToPerc)))
+      vp.scrollLeft -= vpRect[0].x + vpRect[0].width * .5 - elRect[0].x;
+
+      if (elRect[0].y < (vpRect[0].y + vpRect[0].height * closeToPerc) ||
+        elRect[0].y > (vpRect[0].y + vpRect[0].height * (1 - closeToPerc)))
+        vp.scrollTop -= vpRect[0].y + vpRect[0].height / 2 - elRect[0].y;
+      // Firefox Bug: with rests, clientRects are in SVG coordinates
     }
   }
 
