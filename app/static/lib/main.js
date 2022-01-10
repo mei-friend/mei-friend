@@ -164,9 +164,11 @@ document.addEventListener('DOMContentLoaded', function() {
 function assignGithubMenuClickHandlers() {
   const githubLoadingIndicator = document.getElementById("GithubLogo");
   const logoutButton = document.getElementById('GithubLogout');
-  logoutButton.addEventListener('click', (ev) => { 
-    logoutFromGithub();
-  });
+  if(logoutButton) { 
+    logoutButton.addEventListener('click', (ev) => { 
+      logoutFromGithub();
+    });
+  }
   const repoHeader = document.getElementById('repositoriesHeader');
   if (repoHeader) {
     // on click, reload list of all repositories
@@ -302,7 +304,10 @@ async function fillInRepoBranches(e, per_page = 100, page = 1) {
   // TODO handle > per_page branches (similar to userRepos)
   const repoBranches = await github.getRepoBranches(per_page, page);
   let githubMenu = document.getElementById("GithubMenu");
-  githubMenu.innerHTML = `<a id="repositoriesHeader" href="#"><span class="btn icon icon-arrow-left inline-block-tight"></span>Repository:${github.githubRepo}</a>
+  githubMenu.innerHTML = `
+  <a id="GithubLogout" href="#">Log out</a>
+  <hr class="dropdown-line">
+  <a id="repositoriesHeader" href="#"><span class="btn icon icon-arrow-left inline-block-tight"></span>Repository:${github.githubRepo}</a>
     <hr class="dropdown-line">
     <a id="branchesHeader" class="dropdown-head" href="#"><b>Select branch:</b></a>
     `;
@@ -318,7 +323,10 @@ async function fillInBranchContents(e) {
   const branchContents = await github.getBranchContents(github.filepath);
   console.log("Got new branch contents: ", branchContents);
   let githubMenu = document.getElementById("GithubMenu");
-  githubMenu.innerHTML = `<a id="repositoriesHeader" href="#"><span class="btn icon icon-arrow-left inline-block-tight"></span>Repository:${github.githubRepo}</a>
+  githubMenu.innerHTML = `
+  <a id="GithubLogout" href="#">Log out</a>
+  <hr class="dropdown-line">
+  <a id="repositoriesHeader" href="#"><span class="btn icon icon-arrow-left inline-block-tight"></span>Repository:${github.githubRepo}</a>
     <hr class="dropdown-line">
     <a id="branchesHeader" href="#"><span class="btn icon icon-arrow-left inline-block-tight"></span>Branch: ${github.branch}</a>
     <hr class="dropdown-line">
