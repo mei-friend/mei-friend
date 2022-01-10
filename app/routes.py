@@ -1,4 +1,4 @@
-from flask import Flask, url_for, redirect, render_template
+from flask import Flask, url_for, redirect, render_template, session
 from dotenv import load_dotenv
 from os import getenv
 from authlib.integrations.flask_client import OAuth
@@ -20,10 +20,16 @@ github = oauth.register(
 
 
 @app.route('/')
-@app.route('/index')
 def index():
+    if 'githubToken' in session:
+        return render_template('index.html', 
+                isLoggedIn = "true", # for Javascript, not Python...
+                githubToken = session['githubToken'],
+                userLogin = session['userLogin'],
+                userName = session['userName'],
+                userEmail = session['userEmail'])
     return render_template('index.html',
-            isLoggedIn = False
+        isLoggedIn = False
     )
 
 @app.route("/login")
@@ -38,16 +44,11 @@ def authorize():
     token = github.authorize_access_token()
     resp = github.get('user', token=token)
     profile = resp.json()
-    print("Token: ", token);
-    print("Profile: ", profile);
-    # do something with the token and profile
-    return render_template('index.html',
-            isLoggedIn = "true",
-            githubToken = token["access_token"],
-            userLogin = profile["login"],
-            userName = profile["name"],
-            userEmail = profile["login"] + "@users.noreply.github.com"
-            )
+    session['githubToken'] = token["access_token"]
+    session['userLogin'] = profile["login"]
+    session['userName'] = profile["name"]
+    session['userEmail'] = profile["login"] + "@users.noreply.github.com"
+    return redirect(url_for('index'))
 
 @app.route("/help")
 def show_help():
