@@ -72,3 +72,5 @@
 * Shift pitch of notes/rests inside selected parent elements (e.g., beams)
 * Insert G/F/C clef change before/after selected element
 * Clef change on selected note inserted before/after chord element
+* Center SVG to selected element upon cursor activity
+* Activate fold gutters in editor
