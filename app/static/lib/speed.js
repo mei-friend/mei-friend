@@ -477,8 +477,9 @@ export function getPageWithElement(v, id) {
     let bs = document.getElementById('breaks-select').value;
     // for speedMode: selector for all last measures and requested id
     if (bs == 'auto' && Object.keys(v.pageBreaks).length > 0) {
-      for (let barNo in v.pageBreaks) {
-        sel += '[*|id="' + v.pageBreaks[barNo] + '"],';
+      for (let pg in v.pageBreaks) {
+        let br = v.pageBreaks[pg]; // array of breaks
+        sel += '[*|id="' + br[br.length - 1] + '"],';
       }
       sel += '[*|id="' + id + '"]';
       // for normale mode: selector for all breaks and requested id
