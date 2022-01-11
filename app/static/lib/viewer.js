@@ -368,20 +368,21 @@ export default class Viewer {
     let el = document.querySelector('g#' + utils.getElementIdAtCursor(cm));
     if (el) {
       let vpRect = vp.getBoundingClientRect();
-      let elRect = el.getBoundingClientRect();
+      let elRect = el.getBBox();
+      var mx = el.getScreenCTM();
       // adjust scrolling only when element (close to or completely) outside
       const closeToPerc = .1;
+      let sx = mx.a * elRect.x + mx.c * elRect.y + mx.e;
       // if (elRect.x < (vpRect.x + vpRect.width * closeToPerc))
       //   vp.scrollLeft -= vpRect.x + vpRect.width * (1 - closeToPerc) - elRect.x;
       // else if (elRect.x > (vpRect.x + vpRect.width * (1 - closeToPerc)))
       //   vp.scrollLeft -= vpRect.x + vpRect.width * closeToPerc - elRect.x;
-      vp.scrollLeft -= vpRect.x + vpRect.width / 2 - elRect.x;
+      vp.scrollLeft -= vpRect.x + vpRect.width / 2 - sx;
 
-      if (elRect.y < (vpRect.y + vpRect.height * closeToPerc) ||
-        elRect.y > (vpRect.y + vpRect.height * (1 - closeToPerc)))
-        vp.scrollTop -= vpRect.y + vpRect.height / 2 - elRect.y;
-      // Firefox Bug: with rests, clientRects are in SVG coordinates
-      // https://bugzilla.mozilla.org/show_bug.cgi?id=1350755
+      let sy = mx.b * elRect.x + mx.d * elRect.y + mx.f;
+      if (sy < (vpRect.y + vpRect.height * closeToPerc) ||
+        sy > (vpRect.y + vpRect.height * (1 - closeToPerc)))
+        vp.scrollTop -= vpRect.y + vpRect.height / 2 - sy;
     }
   }
 
