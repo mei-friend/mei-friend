@@ -38,8 +38,10 @@ export default class Viewer {
     this.setVerovioOptions(options);
     let computePageBreaks = false;
     if (this.speedMode && Object.keys(this.pageBreaks).length == 0 &&
-      document.getElementById('breaks-select').value == 'auto')
+      document.getElementById('breaks-select').value == 'auto') {
       computePageBreaks = true;
+      this.currentPage = 1;
+    }
     let message = {
       'cmd': 'updateAll',
       'options': this.vrvOptions,

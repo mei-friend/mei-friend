@@ -66,7 +66,7 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks = ['sb', 'pb']) {
   });
 
   // insert sb elements for each element except last
-  if (countingMode == 'computedBreaks') {
+  if (countingMode == 'computedBreaks' && Object.keys(breaks).length > 0) {
     breaks[pageNo].forEach((id, i) => {
       if (i < breaks[pageNo].length - 1) { // last element is a <pb>
         let m = spdScore.querySelector('[*|id="' + id + '"]');
