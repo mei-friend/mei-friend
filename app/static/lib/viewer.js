@@ -357,8 +357,8 @@ export default class Viewer {
     if (!document.querySelector('g#' + id) &&
       ((this.updateNotation && fl && fl.checked) || forceFlip)) {
       this.updatePage(cm, '', id);
-    } else {
-      if (this.updateNotation) this.scrollSvg(cm);
+    } else if (this.updateNotation) {
+      this.scrollSvg(cm);
       this.updateHighlight(cm);
     }
   }
@@ -373,12 +373,12 @@ export default class Viewer {
       // adjust scrolling only when element (close to or completely) outside
       const closeToPerc = .1;
       let sx = mx.a * elRect.x + mx.c * elRect.y + mx.e;
-      // if (elRect.x < (vpRect.x + vpRect.width * closeToPerc))
-      //   vp.scrollLeft -= vpRect.x + vpRect.width * (1 - closeToPerc) - elRect.x;
-      // else if (elRect.x > (vpRect.x + vpRect.width * (1 - closeToPerc)))
-      //   vp.scrollLeft -= vpRect.x + vpRect.width * closeToPerc - elRect.x;
-      vp.scrollLeft -= vpRect.x + vpRect.width / 2 - sx;
-
+      // kind-of page-wise flipping for x
+      if (sx < (vpRect.x + vpRect.width * closeToPerc))
+        vp.scrollLeft -= vpRect.x + vpRect.width * (1 - closeToPerc) - sx;
+      else if (sx > (vpRect.x + vpRect.width * (1 - closeToPerc)))
+        vp.scrollLeft -= vpRect.x + vpRect.width * closeToPerc - sx;
+      // y flipping
       let sy = mx.b * elRect.x + mx.d * elRect.y + mx.f;
       if (sy < (vpRect.y + vpRect.height * closeToPerc) ||
         sy > (vpRect.y + vpRect.height * (1 - closeToPerc)))
@@ -479,6 +479,7 @@ export default class Viewer {
   // by 'dir' an by 'incrementElementName'
   navigate(cm, incElName = 'note', dir = 'forwards') {
     console.info('navigate(): lastNoteId: ', this.lastNoteId);
+    this.updateNotation = false;
     let id = this.lastNoteId;
     if (id == '') { // empty note id
       this.setCursorToPageBeginning(cm); // re-defines lastNotId
@@ -555,6 +556,9 @@ export default class Viewer {
       this.selectedElements.push(id);
       this.lastNoteId = id;
     }
+    this.updateNotation = true;
+    this.scrollSvg(cm);
+    this.updateHighlight(cm);
   }
 
   // turn page for navigation and return svg directly

@@ -397,6 +397,7 @@ function workerEventsHandler(ev) {
       }
       v.addNotationEventListeners(cm);
       v.setNotationColors();
+      v.scrollSvg(cm);
       v.updateHighlight(cm);
       v.setFocusToVerovioPane();
       v.busy(false);
@@ -864,6 +865,7 @@ function addEventListeners(cm, v) {
 
   // editor activity
   cm.on('cursorActivity', () => {
+    // console.debug('cursorActivity fired, ', cm.getCursor());
     v.cursorActivity(cm);
   });
 
