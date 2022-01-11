@@ -204,7 +204,7 @@ onmessage = function(e) {
           let j = -1; // breaks within a page
           let breaks = [];
           for (let i of it) {
-            console.info('worker:computePageBreaks: ' + String(i[0]));
+            // console.info('worker:computePageBreaks: ' + String(i[0]));
             if (i[0].includes('system')) j++;
             breaks[j] = String(i[1])
               .match(/(['"])[^'"]*\1/)[0].replace(/['"]/g, '');
