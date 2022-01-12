@@ -1,7 +1,8 @@
 export default class Github { 
-  constructor(githubRepo, githubToken, filepath, userLogin, authorName, authorEmail) {
-    this.githubRepo = githubRepo;
+  constructor(githubRepo, githubToken, branch, filepath, userLogin, authorName, authorEmail) {
     this.githubToken = githubToken;
+    this.githubRepo = githubRepo;
+    this.branch = branch;
     this.filepath = filepath;
     this.userLogin = userLogin;
     this.author = { 
@@ -177,8 +178,10 @@ export default class Github {
   }
 
   async readGithubRepo() { 
+    const filepath = this.filepath;
     // Retrieve content of file
     this.headHash = await this.repo.readRef(`refs/heads/${this.branch}`);
+    this.filepath = filepath;
     this.commit = await this.repo.loadAs("commit", this.headHash);  
     const tree = await this.repo.loadAs("tree", this.commit.tree);
     if(this.filepath && this.filepath !== "/") {
