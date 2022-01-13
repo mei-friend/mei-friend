@@ -364,17 +364,18 @@ function workerEventsHandler(ev) {
       else if (v.speedMode && bs == 'auto' &&
         Object.keys(v.pageBreaks).length > 0)
         v.pageCount = Object.keys(v.pageBreaks).length;
-      v.currentPage = ev.data.pageNo;
-      updateStatusBar();
-      document.querySelector('title').innerHTML = 'mei-friend: ' +
-        meiFileName.substr(meiFileName.lastIndexOf("/") + 1);
-      document.querySelector('.verovio-panel').innerHTML = ev.data.svg;
-      if (ev.data.setCursorToPageBeginning) v.setCursorToPageBeginning(cm);
-      v.updatePageNumDisplay();
-      v.addNotationEventListeners(cm);
-      v.setNotationColors();
-      v.updateHighlight(cm);
-      v.scrollSvg(cm);
+      if (v.currentPage == ev.data.pageNo) { // update only if still same page
+        updateStatusBar();
+        document.querySelector('title').innerHTML = 'mei-friend: ' +
+          meiFileName.substr(meiFileName.lastIndexOf("/") + 1);
+        document.querySelector('.verovio-panel').innerHTML = ev.data.svg;
+        if (ev.data.setCursorToPageBeginning) v.setCursorToPageBeginning(cm);
+        v.updatePageNumDisplay();
+        v.addNotationEventListeners(cm);
+        v.setNotationColors();
+        v.updateHighlight(cm);
+        v.scrollSvg(cm);
+      }
       if (!"setFocusToVerovioPane" in ev.data || ev.data.setFocusToVerovioPane)
         v.setFocusToVerovioPane();
       if (ev.data.computePageBreaks) v.computePageBreaks(cm);

@@ -256,7 +256,6 @@ export default class Viewer {
     if (targetpage > 0 && targetpage <= this.pageCount &&
       targetpage != this.currentPage) {
       this.currentPage = targetpage;
-      this.updatePageNumDisplay();
       return true;
     }
     return false;
