@@ -263,12 +263,10 @@ export default class Viewer {
 
   updatePageNumDisplay() {
     let pg = (this.pageCount < 0) ? '?' : this.pageCount;
-    const p1 = document.getElementById("pagination1");
-    const p2 = document.getElementById("pagination2");
-    const p3 = document.getElementById("pagination3");
-    p1.innerHTML = 'Page';
-    p2.innerHTML = `&nbsp;${this.currentPage}&nbsp;`;
-    p3.innerHTML = `of ${pg}`;
+    document.getElementById("pagination1").innerHTML = 'Page';;
+    document.getElementById("pagination2").innerHTML =
+      `&nbsp;${this.currentPage}&nbsp;`;
+    document.getElementById("pagination3").innerHTML = `of ${pg}`;
   }
 
   // set cursor to first note id in page, taking st/ly of id, if possible
