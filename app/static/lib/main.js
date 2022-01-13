@@ -747,6 +747,13 @@ function addEventListeners(cm, v) {
     .addEventListener('click', cmd.firstPage);
   document.getElementById('prev-page-btn')
     .addEventListener('click', cmd.previousPage);
+  document.getElementById('pagination2')
+    .addEventListener('input', (ev) => { // TODO: stop listeners prevent edit!!!
+      ev.stopPropagation();
+      console.debug('user page number', ev);
+      v.currentPage = ev.value;
+      v.updatePageNumDisplay();
+    });
   document.getElementById('next-page-btn')
     .addEventListener('click', cmd.nextPage);
   document.getElementById('last-page-btn')

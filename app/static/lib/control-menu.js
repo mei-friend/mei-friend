@@ -117,7 +117,19 @@ export function createControlsMenu(parentElement, scale) {
   let paginationLabel = document.createElement('label');
   paginationLabel.id = 'pagination-label';
   paginationLabel.classList.add('label');
-  paginationLabel.innerHTML = `Loading`;
+  // paginationLabel.innerHTML = `Loading`;
+
+  let pagination1 = document.createElement('div');
+  pagination1.innerHTML = 'Loading';
+  pagination1.id = 'pagination1';
+  let pagination2 = document.createElement('div');
+  pagination2.id = 'pagination2';
+  pagination2.contentEditable = true;
+  let pagination3 = document.createElement('div');
+  pagination3.id = 'pagination3';
+  paginationLabel.appendChild(pagination1);
+  paginationLabel.appendChild(pagination2);
+  paginationLabel.appendChild(pagination3);
   paginationCtrls.appendChild(paginationLabel);
 
   let nextBtn = document.createElement('button');

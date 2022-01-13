@@ -201,7 +201,7 @@ a:active {
   margin-top: 2px;
   margin-right: 3px;
   margin-left: 3px;
-  display: inline;
+  display: flex;
   line-height: 1.5em;
   padding: 0 2px;
   min-height: 21px;
