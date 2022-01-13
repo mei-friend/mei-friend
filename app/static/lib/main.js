@@ -6,6 +6,8 @@ var mei;
 var cm;
 var v; // viewer instance
 
+let github; // github API wrapper object
+
 import {
   setOrientation,
   addResizerHandlers,
@@ -66,6 +68,8 @@ catch(err) {
   console.error("Unable to access local storage: ", err);
 }
 
+let fileChanged = false; // flag to track whether unsaved changes to file exist
+
 document.addEventListener('DOMContentLoaded', function() {
   let myTextarea = document.getElementById("editor");
 
@@ -88,23 +92,20 @@ document.addEventListener('DOMContentLoaded', function() {
     // theme: 'dracula' // monokai (dark), dracula (bright)
   });
   
-  // restore localStorage if we have it, otherwise open default MEI
-  let githubFromStorage;
-  if(storage && storage.getItem("meiXml")) { 
-    meiFileName = storage.getItem("meiFileName");
-    cm.setValue(storage.getItem("meiXml"));
-    if(storage.getItem("github")) { 
+  // restore localStorage if we have it
+  if(storage) { 
+    let meiXmlFromStorage = storage.getItem("meiXml");
+    let githubFromStorage = storage.getItem("github");
+    if(meiXmlFromStorage) { 
+      meiFileName = storage.getItem("meiFileName");
+      cm.setValue(meiXmlFromStorage);
+    } else {
+      openMei(); // default MEI
+    }
+    if(githubFromStorage) { 
+      // use github object from local storage if available
       isLoggedIn = true;
-      githubFromStorage = JSON.parse(storage.getItem("github"));
-      console.log("Retrieved github from storage: ", githubFromStorage);
-    }   
-  } else { 
-    openMei(); // default MEI
-  }
-
-  if(isLoggedIn) { 
-    // use github object from local storage if available, else initialise
-    if(githubFromStorage) {
+      githubFromStorage = JSON.parse(githubFromStorage);
       github = new Github(
         githubFromStorage.githubRepo, 
         githubFromStorage.githubToken, 
@@ -114,37 +115,40 @@ document.addEventListener('DOMContentLoaded', function() {
         githubFromStorage.userName,
         githubFromStorage.userEmail
       )
-      github.content = githubFromStorage.content;
-      github.changesExist = githubFromStorage.changesExist;
       const author = github.author;
       const name = author.name;
       const email = author.email;
-    } else {
+      console.log("Retrieved github from storage: ", githubFromStorage);
+    } else if(isLoggedIn){ 
+      console.log("INITIALISING GITHub")
+      // initialise and store new github object
       github = new Github("", githubToken, "", "", userLogin, userName, userEmail);
-      if(storage) { 
-        const author = github.author;
-        const name = author.name;
-        const email = author.email;
-        storage.setItem("github", JSON.stringify({
-          githubRepo:   github.githubRepo,
-          githubToken:  github.githubToken,
-          branch:       github.branch,
-          filepath:     github.filepath,
-          userLogin:    github.userLogin,
-          userName:     name,
-          userEmail:    email,
-          changesExist: false
-        }));
-      }
+      storage.setItem("github", JSON.stringify({
+        githubRepo:   github.githubRepo,
+        githubToken:  github.githubToken,
+        branch:       github.branch,
+        filepath:     github.filepath,
+        userLogin:    github.userLogin,
+        userName:     userName,
+        userEmail:    userEmail
+      }));
     }
-    // start from fresh github menu
+  } else { // no local storage
+    if(isLoggedIn) {  // initialise new github object
+      github = new Github("", githubToken, "", "", userLogin, userName, userEmail);
+    }
+    openMei(); // default MEI
+  }
+  setFileChangedState(parseInt(storage.getItem("fileChanged")));
+  if(isLoggedIn) { 
+    // regardless of storage availability:
+    // if we are logged in, refresh github menu
     refreshGithubMenu();
     if(github.githubRepo && github.branch && github.filepath) { 
-      // preset github menu to where the user left off
+      // preset github menu to where the user left off, if we can
       fillInBranchContents();
     }
   }
-
   setOrientation(cm, 'bottom', v);
 
   createControlsMenu(
@@ -165,7 +169,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
   addEventListeners(cm, v);
   addResizerHandlers(cm, v);
-  window.onresize = () => setOrientation(cm, '', v);
 
   // ask worker to load Verovio
   vrvWorker.postMessage({
@@ -259,7 +262,7 @@ function assignGithubMenuClickHandlers() {
           v.clear();
           v.updateNotation = false;
           meiFileName = `Github:${github.githubRepo}${github.filepath}`;
-          github.changesExist = false;
+          setFileChangedState(false);
           cm.setValue(github.content);
           updateLocalStorage(meiFileName, github.content);
           v.updateNotation = true;
@@ -301,8 +304,7 @@ function updateGithubInLocalStorage() {
         filepath:     github.filepath,
         userLogin:    github.userLogin,
         userName:     name,
-        userEmail:    email,
-        changesExist: github.changesExist
+        userEmail:    email
       })
     try {
       storage.setItem("github", githubToStorage);
@@ -341,6 +343,21 @@ function refreshGithubMenu(e) {
     fillInUserRepos();
   }
 }
+
+function setFileChangedState(fileChangedState) {
+  fileChanged = fileChangedState;
+  const fileChangedIndicator = document.querySelector("#fileChanged");
+  const commitUI = document.querySelector("#commitUI");
+  fileChangedIndicator.innerText = fileChanged ? "*" : "";
+  if(isLoggedIn && github.filepath && commitUI) {
+    document.getElementById("commitMessageInput").disabled = !fileChanged;
+    document.getElementById("commitButton").disabled = !fileChanged;
+  }
+  if(storage) { 
+    storage.setItem("fileChanged", fileChanged ? 1 : 0)
+  }
+}
+
 
 async function fillInUserRepos(per_page = 30, page = 1) {
   const repos = await github.getUserRepos(per_page, page);
@@ -411,17 +428,16 @@ async function fillInBranchContents(e) {
     commitMessageInput.setAttribute("type", "text");
     commitMessageInput.setAttribute("id", "commitMessageInput");
     commitMessageInput.setAttribute("placeholder", "Updated using mei-friend online");
-    commitMessageInput.disabled = !github.changesExist;
     const commitButton = document.createElement("input");
     commitButton.setAttribute("id", "commitButton");
     commitButton.setAttribute("type", "submit");
     commitButton.setAttribute("value", "Commit");
     commitButton.classList.add("closeOnClick");
-    commitButton.disabled = !github.changesExist;
     commitButton.addEventListener("click", handleCommitButtonClicked);
     commitUI.appendChild(commitMessageInput);
     commitUI.appendChild(commitButton);
     githubMenu.appendChild(commitUI);
+    setFileChangedState(fileChanged);
   }
   fillInCommitLog("withRefresh");
   // GitHub menu interactions
@@ -802,9 +818,6 @@ let cmd = {
   'reRenderMeiWithout': () => v.reRenderMei(cm, true)
 };
 
-// github API wrapper object
-let github;
-
 // layout notation position
 document.getElementById('top').addEventListener('click', cmd.notationTop);
 document.getElementById('bottom').addEventListener('click', cmd.notationBottom);
@@ -1000,34 +1013,19 @@ function addEventListeners(cm, v) {
     let changeIndicator = false;
     let meiXml = cm.getValue();
     if (isLoggedIn && github.filepath && commitUI) {
-      // changesExist flag may have been set from storage - if so, run with it
+      // fileChanged flag may have been set from storage - if so, run with it
       // otherwise set it to true if we've changed the file content this session
-      changeIndicator = github.changesExist || meiXml !== github.content;
-      github.changesExist = changeIndicator;
-      document.getElementById("commitMessageInput").disabled = !changeIndicator;
-      document.getElementById("commitButton").disabled = !changeIndicator;
+      changeIndicator = fileChanged || meiXml !== github.content;
+    } else {
+      // interpret any CodeMirror change as a file changed state
+      changeIndicator = true;
     }
+    setFileChangedState(changeIndicator);
     v.notationUpdated(cm);
     if(storage) { 
       // TODO evaluate performance hit!!
-      // on every set of changes, save editor content and github status
+      // on every set of changes, save editor content
       storage.setItem("meiXml", meiXml); 
-      if(isLoggedIn && github.filepath && changeIndicator) { 
-        const author = github.author;
-        const name = author.name;
-        const email = author.email;
-        console.log("B SETTING: ", name, email)
-        storage.setItem("github", JSON.stringify({
-          githubRepo:   github.githubRepo,
-          githubToken:  github.githubToken,
-          branch:       github.branch,
-          filepath:     github.filepath,
-          userLogin:    github.userLogin,
-          userName:     name,
-          userEmail:    email,
-          changesExist: changeIndicator 
-        }))
-      }
     }
   })
 
@@ -1062,9 +1060,7 @@ function handleCommitButtonClicked(e) {
         .then(() => {
           githubLoadingIndicator.classList.remove("loading");
           cm.readOnly = false;
-          document.getElementById("commitMessageInput").disabled = true;
-          document.getElementById("commitButton").disabled = true;
-          github.changesExist = false;
+          setFileChangedState(false);
           updateGithubInLocalStorage();
           fillInCommitLog("withRefresh");
           console.log("Finished updating commit log after writing commit.");

@@ -2,7 +2,7 @@
 
 <head>
   <meta charset="utf-8">
-  <title>mei-friend online</title>
+  <title>mei-friend</title>
   <link rel="icon" href="https://www.mdw.ac.at/favicon.ico" />
   <link rel="stylesheet" href="{{ url_for('static', filename='css/default.css') }}" />
   <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}" />
@@ -52,7 +52,7 @@
 
 <body>
   <div class="header">
-    <div class="title"><a href="https://repo.mdw.ac.at/mei-friend/">mei-friend online</a></div>
+    <div class="title"><a href="https://repo.mdw.ac.at/mei-friend/">mei-friend</a></div>
     <div class="navbar">
       <div class="dropdown">
         <button class="dropbtn GithubButton"><img id="GithubLogo" src="{{ url_for('static', filename='img/GitHub-Mark-32px.png') }}" /><span id="GithubName"><a href="login" id="GithubLoginLink">Login</a></span></button>
@@ -144,6 +144,11 @@
             help page</a>
         </div>
       </div>
+    </div>
+    <div class="fileStatus">
+      <span id="fileLocation"/>
+      <span id="fileName"/>
+      <span id="fileChanged"/>
     </div>
   </div>
   <div class="dragContainer">
