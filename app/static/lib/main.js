@@ -314,16 +314,15 @@ function updateGithubInLocalStorage() {
 }
 
 function logoutFromGithub() { 
-  // remove github object from memory and, if relevant, local storage
-  github = null;
+  console.debug("Attempting logout");
   if(storage) {
+    // remove github object from local storage
     storage.removeItem("github");
   }
-  // restore logged off state
-  isLoggedIn = false;
-  document.getElementById('GithubName').innerHTML = 
-    `<a href="login" id="GithubLoginLink">Login</a>`;
-  document.getElementById('GithubMenu').classList.add('loggedOut');
+  // redirect to /logout to remove session cookie
+  const url = window.location.href;
+  console.log("URL: ", url)
+  window.location.replace(url.substring(0, url.lastIndexOf("/")) + "/logout");
 }
 
 function refreshGithubMenu(e) {

@@ -39,6 +39,11 @@ def login():
     # redirect_url = url_for("authorize", _external=True)
     return github.authorize_redirect(redirect_url)
 
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect(url_for('index'))
+
 @app.route("/authorize")
 def authorize():
     token = github.authorize_access_token()
