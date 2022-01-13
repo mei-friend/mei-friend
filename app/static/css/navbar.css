@@ -154,3 +154,20 @@
   margin-right: 4px;
   margin-left: 0px;
 }
+
+.fileStatus {
+  font-size: smaller;
+  font-family: monospace;
+  margin-left: 1em;
+  padding: 3px 12px;
+  background: white;
+  color: green;
+}
+
+.fileStatus .fileChanged {
+  margin-left: -1em;
+}
+
+.fileStatus.warn { 
+  color: red;
+}

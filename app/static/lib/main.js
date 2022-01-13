@@ -98,6 +98,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let githubFromStorage = storage.getItem("github");
     if(meiXmlFromStorage) { 
       meiFileName = storage.getItem("meiFileName");
+      document.querySelector("#fileName").innerText = meiFileName;
       cm.setValue(meiXmlFromStorage);
     } else {
       openMei(); // default MEI
@@ -115,12 +116,8 @@ document.addEventListener('DOMContentLoaded', function() {
         githubFromStorage.userName,
         githubFromStorage.userEmail
       )
-      const author = github.author;
-      const name = author.name;
-      const email = author.email;
-      console.log("Retrieved github from storage: ", githubFromStorage);
+      document.querySelector("#fileLocation").innerText = github.githubRepo;
     } else if(isLoggedIn){ 
-      console.log("INITIALISING GITHub")
       // initialise and store new github object
       github = new Github("", githubToken, "", "", userLogin, userName, userEmail);
       storage.setItem("github", JSON.stringify({
@@ -261,7 +258,9 @@ function assignGithubMenuClickHandlers() {
           document.querySelector(".statusbar").innerText = "Loading from Github...";
           v.clear();
           v.updateNotation = false;
-          meiFileName = `Github:${github.githubRepo}${github.filepath}`;
+          document.querySelector("#fileLocation").innerText = github.githubRepo + ":";
+          document.querySelector("#fileName").innerText = github.filepath;
+          meiFileName = github.filepath;
           setFileChangedState(false);
           cm.setValue(github.content);
           updateLocalStorage(meiFileName, github.content);
@@ -316,14 +315,12 @@ function updateGithubInLocalStorage() {
 }
 
 function logoutFromGithub() { 
-  console.debug("Attempting logout");
   if(storage) {
     // remove github object from local storage
     storage.removeItem("github");
   }
   // redirect to /logout to remove session cookie
   const url = window.location.href;
-  console.log("URL: ", url)
   window.location.replace(url.substring(0, url.lastIndexOf("/")) + "/logout");
 }
 
@@ -346,9 +343,16 @@ function refreshGithubMenu(e) {
 
 function setFileChangedState(fileChangedState) {
   fileChanged = fileChangedState;
-  const fileChangedIndicator = document.querySelector("#fileChanged");
+  const fileStatusElement = document.querySelector(".fileStatus");
+  const fileChangedIndicatorElement = document.querySelector("#fileChanged");
   const commitUI = document.querySelector("#commitUI");
-  fileChangedIndicator.innerText = fileChanged ? "*" : "";
+  if(fileChanged) { 
+    fileStatusElement.classList.add("warn");
+    fileChangedIndicatorElement.innerText = "*";
+  } else { 
+    fileStatusElement.classList.remove("warn");
+    fileChangedIndicatorElement.innerText = "";
+  }
   if(isLoggedIn && github.filepath && commitUI) {
     document.getElementById("commitMessageInput").disabled = !fileChanged;
     document.getElementById("commitButton").disabled = !fileChanged;
@@ -398,7 +402,6 @@ async function fillInBranchContents(e) {
     target = e.target;
   }
   const branchContents = await github.getBranchContents(github.filepath);
-  console.log("Got new branch contents: ", branchContents);
   let githubMenu = document.getElementById("GithubMenu");
   githubMenu.innerHTML = `
   <a id="GithubLogout" href="#">Log out</a>
@@ -450,7 +453,6 @@ async function fillInCommitLog(refresh = false) {
     githubLoadingIndicator.classList.add("loading");
     github.readGithubRepo().then(() => {
       githubLoadingIndicator.classList.remove("loading");
-      console.log("RENDERING AFTER FORCED RELOAD. Commit log: ", github.commitLog);
       renderCommitLog();
     }).catch((e) => { 
       githubLoadingIndicator.classList.remove("loading");
@@ -639,7 +641,7 @@ export function openMei(file = defaultMeiFileName) {
           });
           found = true;
         } else if (meiFileName.endsWith('.abc')) { // abc notation file
-          console.log('Load ABC file.', mei.slice(0, 128));
+          console.log('Load ABC file.', mei.slice(0, 128)); 
           vrvWorker.postMessage({
             'cmd': 'importData',
             'format': 'abc',
@@ -683,6 +685,8 @@ export function openMei(file = defaultMeiFileName) {
       }
     );
   }
+  document.querySelector("#fileLocation").innerText = ""; 
+  document.querySelector("#fileName").innerText = meiFileName;
 }
 
 function openFileDialog(accept = '*') {
@@ -1054,7 +1058,7 @@ function handleCommitButtonClicked(e) {
   githubLoadingIndicator.classList.add("loading");
   github.writeGithubRepo(cm.getValue(), message)
     .then(() => {
-      console.log(`Successfully written to github: ${github.githubRepo}${github.filepath}`);
+      console.debug(`Successfully written to github: ${github.githubRepo}${github.filepath}`);
       messageInput.value = "";
       github.readGithubRepo()
         .then(() => {
@@ -1063,7 +1067,7 @@ function handleCommitButtonClicked(e) {
           setFileChangedState(false);
           updateGithubInLocalStorage();
           fillInCommitLog("withRefresh");
-          console.log("Finished updating commit log after writing commit.");
+          console.debug("Finished updating commit log after writing commit.");
         })
         .catch((e) => {
           cm.readOnly = false;
