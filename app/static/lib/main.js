@@ -69,6 +69,7 @@ catch(err) {
 }
 
 let fileChanged = false; // flag to track whether unsaved changes to file exist
+let freshlyLoaded = false; // flag to ignore a cm.on("changes") event on file load
 
 document.addEventListener('DOMContentLoaded', function() {
   let myTextarea = document.getElementById("editor");
@@ -96,12 +97,21 @@ document.addEventListener('DOMContentLoaded', function() {
   if(storage) { 
     let meiXmlFromStorage = storage.getItem("meiXml");
     let githubFromStorage = storage.getItem("github");
+    let fileChangedFromStorage = storage.getItem("fileChanged");
+    console.log("FOUND: ", fileChangedFromStorage);
+    fileChangedFromStorage = fileChangedFromStorage ? parseInt(storage.getItem("fileChanged")) : 0;
+    console.log("NOW: ", fileChangedFromStorage);
+    setFileChangedState(fileChangedFromStorage);
     if(meiXmlFromStorage) { 
       meiFileName = storage.getItem("meiFileName");
       document.querySelector("#fileName").innerText = meiFileName;
-      cm.setValue(meiXmlFromStorage);
+      // on initial page load, CM doesn't fire a "changes" event
+      // so we don't need to skip the "freshly loaded" change
+      // hence the "false" on the following line:
+      loadDataInEditor(meiXmlFromStorage,false); 
     } else {
-      openMei(); // default MEI
+      openMei(undefined, false); // default MEI, skip freshly loaded (see comment above)
+      setFileChangedState(false);
     }
     if(githubFromStorage) { 
       // use github object from local storage if available
@@ -136,7 +146,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     openMei(); // default MEI
   }
-  setFileChangedState(parseInt(storage.getItem("fileChanged")));
   if(isLoggedIn) { 
     // regardless of storage availability:
     // if we are logged in, refresh github menu
@@ -239,6 +248,7 @@ function assignGithubMenuClickHandlers() {
   );
   Array.from(document.getElementsByClassName('branchContents')).forEach((e) => {
     if (e.classList.contains("dir")) {
+      // navigate directory
       e.addEventListener('click', (ev) => {
         if (github.filepath.endsWith("/")) {
           github.filepath += e.querySelector("span.filepath").innerText;
@@ -248,6 +258,7 @@ function assignGithubMenuClickHandlers() {
         fillInBranchContents(ev);
       })
     } else {
+      // load file
       e.addEventListener('click', (ev) => {
         github.filepath += e.querySelector("span.filepath").innerText;
         console.debug(`Loading file: https://github.com/${github.githubRepo}/${github.filepath}`);
@@ -261,8 +272,8 @@ function assignGithubMenuClickHandlers() {
           document.querySelector("#fileLocation").innerText = github.githubRepo + ":";
           document.querySelector("#fileName").innerText = github.filepath;
           meiFileName = github.filepath;
+          loadDataInEditor(github.content)
           setFileChangedState(false);
-          cm.setValue(github.content);
           updateLocalStorage(meiFileName, github.content);
           v.updateNotation = true;
           v.updateAll(cm);
@@ -353,7 +364,7 @@ function setFileChangedState(fileChangedState) {
     fileStatusElement.classList.remove("warn");
     fileChangedIndicatorElement.innerText = "";
   }
-  if(isLoggedIn && github.filepath && commitUI) {
+  if(isLoggedIn && github && github.filepath && commitUI) {
     document.getElementById("commitMessageInput").disabled = !fileChanged;
     document.getElementById("commitButton").disabled = !fileChanged;
   }
@@ -440,6 +451,7 @@ async function fillInBranchContents(e) {
     commitUI.appendChild(commitMessageInput);
     commitUI.appendChild(commitButton);
     githubMenu.appendChild(commitUI);
+    console.log("~~2");
     setFileChangedState(fileChanged);
   }
   fillInCommitLog("withRefresh");
@@ -497,6 +509,11 @@ function renderCommitLog() {
   githubMenu.appendChild(logTable);
 }
 
+function loadDataInEditor(mei, setFreshlyLoaded = true) {
+  freshlyLoaded = setFreshlyLoaded;
+  cm.setValue(mei)
+}
+
 function workerEventsHandler(ev) {
   console.log('main(). Handler received: ' + ev.data.cmd, ev.data);
   switch (ev.data.cmd) {
@@ -515,7 +532,8 @@ function workerEventsHandler(ev) {
       mei = ev.data.mei;
       if (!v.speedMode) v.pageCount = ev.data.pageCount;
       v.updateNotation = false;
-      cm.setValue(mei);
+      loadDataInEditor(mei);
+      setFileChangedState(false);
       updateLocalStorage(meiFileName, mei);
       v.updateNotation = true;
       v.updateAll(cm, defaultVerovioOptions);
@@ -523,7 +541,8 @@ function workerEventsHandler(ev) {
     case 'updated': // display SVG data on site
       if (ev.data.mei) { // from reRenderMEI
         v.updateNotation = false;
-        cm.setValue(ev.data.mei);
+        loadDataInEditor(v.data.mei);
+        setFileChangedState(false);
         updateLocalStorage(meiFileName, ev.data.mei);
         v.updateNotation = true;
         v.selectedElements = [];
@@ -592,7 +611,7 @@ let inputFormats = {
   pae: "@clef",
 };
 
-export function openMei(file = defaultMeiFileName) {
+export function openMei(file = defaultMeiFileName, setFreshlyLoaded = true) {
   if (typeof file === "string") { // with fileName string
     meiFileName = file;
     console.info('openMei ' + meiFileName + ', ', cm);
@@ -604,7 +623,8 @@ export function openMei(file = defaultMeiFileName) {
         mei = meiXML;
         v.clear();
         v.updateNotation = false;
-        cm.setValue(mei);
+        loadDataInEditor(mei, setFreshlyLoaded);
+        setFileChangedState(false);
         updateLocalStorage(meiFileName, mei)
         v.updateNotation = true;
         v.updateAll(cm);
@@ -655,7 +675,8 @@ export function openMei(file = defaultMeiFileName) {
               console.log(key + ' file loading: ' + meiFileName);
               if (key == "mei") { // if already a mei file
                 v.updateNotation = false;
-                cm.setValue(mei);
+                loadDataInEditor(mei, setFreshlyLoaded);
+                setFileChangedState(false);
                 updateLocalStorage(meiFileName, mei);
                 v.updateNotation = true;
                 v.updateAll(cm, defaultVerovioOptions);
@@ -1024,7 +1045,12 @@ function addEventListeners(cm, v) {
       // interpret any CodeMirror change as a file changed state
       changeIndicator = true;
     }
-    setFileChangedState(changeIndicator);
+    if(freshlyLoaded) { 
+      // ignore changes resulting from fresh file load
+      freshlyLoaded = false;
+    } else { 
+      setFileChangedState(changeIndicator);
+    }
     v.notationUpdated(cm);
     if(storage) { 
       // TODO evaluate performance hit!!
@@ -1064,6 +1090,7 @@ function handleCommitButtonClicked(e) {
         .then(() => {
           githubLoadingIndicator.classList.remove("loading");
           cm.readOnly = false;
+          console.log("~~1");
           setFileChangedState(false);
           updateGithubInLocalStorage();
           fillInCommitLog("withRefresh");

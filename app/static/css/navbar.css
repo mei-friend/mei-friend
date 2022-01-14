@@ -162,9 +162,14 @@
   padding: 3px 12px;
   background: white;
   color: green;
+  white-space: nowrap;
 }
 
-.fileStatus .fileChanged {
+.fileStatus #fileName{
+  white-space: pre;
+}
+
+.fileStatus #fileChanged {
   margin-left: -1em;
 }
 
