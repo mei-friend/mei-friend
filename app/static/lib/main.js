@@ -19,7 +19,8 @@ import {
 import {
   createControlsMenu,
   setBreaksOptions,
-  addModifyerKeys
+  addModifyerKeys,
+  manualCurrentPage
 } from './control-menu.js';
 import {
   setCursorToId
@@ -34,7 +35,7 @@ import Github from './github.js';
 
 
 const version = 'develop-0.2.0';
-const versionDate = '11 Jan 2022';
+const versionDate = '14 Jan 2022';
 const defaultMeiFileName = `${root}Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei`;
 const defaultVerovioOptions = {
   scale: 55,
@@ -751,16 +752,9 @@ function addEventListeners(cm, v) {
   document.getElementById('last-page-btn')
     .addEventListener('click', cmd.lastPage);
   // manual page entering
-  let pag = document.getElementById('pagination2');
-  pag.addEventListener('keydown', (ev) => {
-    ev.stopPropagation();
-    if (ev.key == 'Enter') {
-      ev.preventDefault();
-      let pageInput = parseInt(pag.innerText);
-      if (pageInput) v.updatePage(cm, pageInput);
-      v.updatePageNumDisplay();
-    }
-  });
+  let pg2 = document.getElementById('pagination2')
+  pg2.addEventListener('keydown', ev => manualCurrentPage(v, cm, ev));
+  pg2.addEventListener('blur', ev => manualCurrentPage(v, cm, ev));
   // font selector
   document.getElementById('font-select')
     .addEventListener('change', () => v.updateOption());

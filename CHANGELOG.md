@@ -74,3 +74,4 @@
 * Clef change on selected note inserted before/after chord element
 * Center SVG to selected element upon cursor activity
 * Activate fold gutters in editor
+* Allow page numbers to be entered manually at mei-friend control menu

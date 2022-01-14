@@ -367,6 +367,17 @@ export function createControlsMenu(parentElement, scale) {
 
 } // createControlsMenu()
 
+export function manualCurrentPage(v, cm, ev) {
+console.debug('manualCurrentPage: ', ev);
+  ev.stopPropagation();
+  if (ev.key == 'Enter' || ev.type == 'blur') {
+    ev.preventDefault();
+    let pageInput = parseInt(ev.target.innerText);
+    if (pageInput) v.updatePage(cm, pageInput);
+    v.updatePageNumDisplay();
+  }
+}
+
 // add a tooltip to element
 export function addToolTip(element, object) {
   let t = document.createElement('span');
