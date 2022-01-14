@@ -736,8 +736,42 @@ function openUrl() {
   openUrlElement.style.display = "block";
 }
 
-function openUrlFetch() { 
-  console.debug("TBC")
+async function openUrlFetch() { 
+  let urlInput = document.querySelector("#openUrlInput");
+  let urlStatus = document.querySelector("#openUrlStatus");
+  try { 
+    const url = new URL(urlInput.value);
+    const response = await fetch(url, {
+      method: 'GET', 
+      headers: {'Accept': 'application/xml, text/xml, application/mei+xml'}
+    });
+    if(response.status >= 400) {
+      console.warn("Fetching URL produced error status: ", response.status);
+      urlStatus.innerHTML = `${response.status}: ${response.statusText.toLowerCase()}`
+      urlInput.classList.add("warn");
+    } else { 
+      urlStatus.innerHTML = "";
+      urlInput.classList.remove("warn");
+      response.text().then((data) => {
+        document.querySelector(".fileStatus #fileLocation").innerText = 
+          urlInput.hostname;
+        meiFileName =
+          urlInput.pathname.substr(urlInput.pathname.lastIndexOf("/")+1);
+        loadDataInEditor(data);
+        setFileChangedState(false);
+        openUrlCancel(); //hide open URL UI elements 
+      });  
+    } 
+  } 
+  catch (err) {
+    console.warn("Error opening URL provided by user: ", err);
+    if(err instanceof TypeError) { 
+      urlStatus.innerHTML = "CORS error";
+    } else { 
+      urlStatus.innerHTML = "Invalid URL, please fix..."
+    }
+    urlInput.classList.add("warn");
+  }
 }
 
 function openUrlCancel() { 
@@ -900,6 +934,8 @@ document.getElementById('openUrlButton')
   .addEventListener('click', cmd.openUrlFetch);
 document.getElementById('openUrlCancel')
   .addEventListener('click', cmd.openUrlCancel);
+document.getElementById('openUrlInput')
+  .addEventListener('input', (e) => e.target.classList.remove("warn"));
 
 // drag'n'drop handlers
 let fc = document.querySelector('.dragContainer');

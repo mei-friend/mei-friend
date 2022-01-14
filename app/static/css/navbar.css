@@ -176,3 +176,12 @@
 .fileStatus.warn { 
   color: red;
 }
+
+#openUrlInput.warn { 
+  border: 1px solid red;
+  background-color: mistyrose;
+}
+
+#openUrlStatus { 
+  color:red;
+}
