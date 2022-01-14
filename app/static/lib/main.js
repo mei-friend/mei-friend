@@ -20,7 +20,8 @@ import {
   createControlsMenu,
   setBreaksOptions,
   addModifyerKeys,
-  manualCurrentPage
+  manualCurrentPage,
+  generateSectionSelect
 } from './control-menu.js';
 import {
   setCursorToId
@@ -358,6 +359,16 @@ function workerEventsHandler(ev) {
         v.updateNotation = true;
         v.selectedElements = [];
         if (!ev.data.removeIds) v.selectedElements.push(ev.data.xmlId);
+      }
+      // if (!v.xmlDoc) v.loadXml(cm.getValue());
+      let ss = document.getElementById('section-selector');
+      while (ss.options.length > 0) ss.remove(0);
+      let sections = generateSectionSelect(v.xmlDoc);
+      if (sections.length > 0) {
+        sections.forEach(opt => ss.options.add(new Option(opt)));
+        ss.style.display = 'block';
+      } else {
+        ss.style.display = 'none';
       }
       let bs = document.getElementById('breaks-select').value;
       if (ev.data.pageCount && !v.speedMode)
@@ -746,6 +757,8 @@ function addEventListeners(v, cm) {
     }
   });
   // Page turning
+  let ss = document.getElementById('section-selector');
+  ss.addEventListener('change', () => setCursorToId(cm, ss.value));
   document.getElementById('first-page-btn')
     .addEventListener('click', cmd.firstPage);
   document.getElementById('prev-page-btn')

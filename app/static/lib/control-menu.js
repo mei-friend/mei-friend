@@ -67,15 +67,15 @@ export function createControlsMenu(parentElement, scale) {
   paginationCtrls.classList.add('controls');
   controlsForm.appendChild(paginationCtrls);
 
-  // let sectionSelector = document.createElement('select');
-  // sectionSelector.id = "section-selector";
-  // sectionSelector.classList.add('icon');
-  // sectionSelector.classList.add('btn');
+  let sectionSelector = document.createElement('select');
+  sectionSelector.id = "section-selector";
+  sectionSelector.classList.add('icon');
+  sectionSelector.classList.add('btn');
   // sectionSelector.classList.add('icon-multi-select');
-  // sectionSelector.classList.add('inline-block-tight');
-  // addToolTip(sectionSelector, {
-  //   title: 'Navigate encoded section/ending structure'
-  // });
+  sectionSelector.classList.add('inline-block-tight');
+  addToolTip(sectionSelector, {
+    title: 'Navigate encoded section/ending structure'
+  });
   // sectionSelector.options.add(new Option('Var-I'));
   // sectionSelector.options.add(new Option('| Var-I-A'));
   // sectionSelector.options.add(new Option('| Var-I-B'));
@@ -86,7 +86,8 @@ export function createControlsMenu(parentElement, scale) {
   // sectionSelector.options.add(new Option('| Var-II-A1'));
   // sectionSelector.options.add(new Option('| Var-II-A2'));
   // sectionSelector.options.add(new Option('| Var-II-B'));
-  // paginationCtrls.appendChild(sectionSelector);
+  sectionSelector.style.display = 'none';
+  paginationCtrls.appendChild(sectionSelector);
 
   let firstBtn = document.createElement('button');
   firstBtn.id = "first-page-btn";
@@ -368,7 +369,7 @@ export function createControlsMenu(parentElement, scale) {
 } // createControlsMenu()
 
 export function manualCurrentPage(v, cm, ev) {
-console.debug('manualCurrentPage: ', ev);
+  console.debug('manualCurrentPage: ', ev);
   ev.stopPropagation();
   if (ev.key == 'Enter' || ev.type == 'blur') {
     ev.preventDefault();
@@ -407,6 +408,24 @@ export function setBreaksOptions(tkAvailableOptions) {
       breaksEl[breaksEl.options.length] = new Option(index, index);
     }
   }
+}
+
+// checks xmlDoc for section, ending, lem, rdg elements for quick navigation
+export function generateSectionSelect(xmlDoc) {
+  let selector = 'section,ending,lem,rdg';
+  let sections = [];
+  let baseSection = xmlDoc.querySelector('music section');
+  let els = Array.from(baseSection.querySelectorAll(selector));
+  els.forEach(el => {
+    let str = '';
+    // TODO: fix that it cannot find these ids anymore
+    // let parent = el.parentElement.closest(selector);
+    // while (parent = parent.parentElement.closest(selector))
+    //   str += '|';
+    str += el.getAttribute('xml:id');
+    sections.push(str);
+  });
+  return sections;
 }
 
 export function addModifyerKeys(element) {
