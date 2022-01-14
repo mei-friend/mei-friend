@@ -100,8 +100,8 @@ document.addEventListener('DOMContentLoaded', function() {
   v = new Viewer(vrvWorker);
   v.vrvOptions = defaultVerovioOptions;
 
-  addEventListeners(cm, v);
-  addResizerHandlers(cm, v);
+  addEventListeners(v, cm);
+  addResizerHandlers(v, cm);
   let doit;
   window.onresize = () => {
     clearTimeout(doit); // wait half a second before re-calculating orientation
@@ -360,12 +360,15 @@ function workerEventsHandler(ev) {
         if (!ev.data.removeIds) v.selectedElements.push(ev.data.xmlId);
       }
       let bs = document.getElementById('breaks-select').value;
-      if (ev.data.pageCount && (!v.speedMode || bs == 'none'))
+      if (ev.data.pageCount && !v.speedMode)
         v.pageCount = ev.data.pageCount;
+      else if (bs == 'none') v.pageCount = 1;
       else if (v.speedMode && bs == 'auto' &&
         Object.keys(v.pageBreaks).length > 0)
         v.pageCount = Object.keys(v.pageBreaks).length;
-      if (v.currentPage == ev.data.pageNo) { // update only if still same page
+      // update only if still same page
+      if (v.currentPage == ev.data.pageNo || ev.data.forceUpdate) {
+        v.currentPage = ev.data.pageNo;
         updateStatusBar();
         document.querySelector('title').innerHTML = 'mei-friend: ' +
           meiFileName.substr(meiFileName.lastIndexOf("/") + 1);
@@ -724,7 +727,7 @@ fc.addEventListener("dragstart", (ev) => console.log('Drag Start', ev));
 fc.addEventListener("dragend", (ev) => console.log('Drag End', ev));
 
 // add event listeners when controls menu has been instantiated
-function addEventListeners(cm, v) {
+function addEventListeners(v, cm) {
   document.getElementById('notation-night-mode-btn')
     .addEventListener('click', cmd.nightMode);
   // Zooming with buttons
@@ -761,7 +764,7 @@ function addEventListeners(cm, v) {
     .addEventListener('change', () => v.updateOption());
   // breaks selector
   document.getElementById('breaks-select').addEventListener('change',
-    () => (v.speedMode) ? v.updateAll(cm) : v.updateLayout());
+    () => v.updateAll(cm, {}, v.selectedElements[0]));
   // navigation
   document.getElementById('backwards-btn')
     .addEventListener('click', cmd.previousNote);

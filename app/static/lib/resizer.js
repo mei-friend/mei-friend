@@ -68,7 +68,7 @@ export function getVerovioContainerSize() {
   return vbox;
 }
 
-export function addResizerHandlers(cm, v) {
+export function addResizerHandlers(v, cm) {
   const resizer = document.getElementById('dragMe');
   const notation = resizer.previousElementSibling;
   const encoding = resizer.nextElementSibling;

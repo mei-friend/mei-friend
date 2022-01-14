@@ -34,7 +34,7 @@ export default class Viewer {
   }
 
   // change options, load new data, render current page, add listeners, highlight
-  updateAll(cm, options = {}) {
+  updateAll(cm, options = {}, xmlId = '') {
     this.setVerovioOptions(options);
     let computePageBreaks = false;
     if (this.speedMode && Object.keys(this.pageBreaks).length == 0 &&
@@ -42,12 +42,14 @@ export default class Viewer {
       computePageBreaks = true;
       this.currentPage = 1;
     }
+    if (this.speedMode && xmlId) 
+      this.currentPage = speed.getPageWithElement(this, xmlId);
     let message = {
       'cmd': 'updateAll',
       'options': this.vrvOptions,
       'mei': this.speedFilter(cm.getValue()),
       'pageNo': this.currentPage,
-      'xmlId': '',
+      'xmlId': xmlId,
       'speedMode': this.speedMode,
       'computePageBreaks': computePageBreaks
     }
