@@ -550,10 +550,9 @@ function openFileDialog(accept = '*') {
   input.onchange = _ => {
     let files = Array.from(input.files);
     console.log('OpenFile Dialog: ', files);
-    if (files.length == 1) {
-      meiFileName = files[0].name;
-      openMei(files[0]);
-    } else {
+    meiFileName = files[0].name;
+    openMei(files[0]);
+    if (files.length > 1) {
       log('OpenFile Dialog: Multiple files not supported.');
     }
   };
@@ -613,10 +612,10 @@ let cmd = {
   'notationLeft': () => setOrientation(cm, "left", v),
   'notationRight': () => setOrientation(cm, "right", v),
   'moveProgBar': () => moveProgressBar(),
-  'open': () => openFileDialog(),
-  'openMusicXml': () => openFileDialog('.xml,.musicxml,.mxl,text/*'),
-  'openHumdrum': () => openFileDialog('.krn,.hum,text/*'),
-  'openPae': () => openFileDialog('.pae,.abc,text/*'),
+  'open': () => openFileDialog('*'), // 'text/*'
+  'openMusicXml': () => openFileDialog('.xml,.musicxml,.mxl'),
+  'openHumdrum': () => openFileDialog('.krn,.hum'),
+  'openPae': () => openFileDialog('.pae,.abc'),
   'downloadMei': () => downloadMei(),
   'zoomIn': () => v.zoom(+1),
   'zoomOut': () => v.zoom(-1),
@@ -747,19 +746,25 @@ function addEventListeners(cm, v) {
     .addEventListener('click', cmd.firstPage);
   document.getElementById('prev-page-btn')
     .addEventListener('click', cmd.previousPage);
-  document.getElementById('pagination2')
-    .addEventListener('input', (ev) => { // TODO: stop listeners prevent edit!!!
-      ev.stopPropagation();
-      console.debug('user page number', ev);
-      v.currentPage = ev.value;
-      v.updatePageNumDisplay();
-    });
   document.getElementById('next-page-btn')
     .addEventListener('click', cmd.nextPage);
   document.getElementById('last-page-btn')
     .addEventListener('click', cmd.lastPage);
+  // manual page entering
+  let pag = document.getElementById('pagination2');
+  pag.addEventListener('keydown', (ev) => {
+    ev.stopPropagation();
+    if (ev.key == 'Enter') {
+      ev.preventDefault();
+      let pageInput = parseInt(pag.innerText);
+      if (pageInput) v.updatePage(cm, pageInput);
+      v.updatePageNumDisplay();
+    }
+  });
+  // font selector
   document.getElementById('font-select')
     .addEventListener('change', () => v.updateOption());
+  // breaks selector
   document.getElementById('breaks-select').addEventListener('change',
     () => (v.speedMode) ? v.updateAll(cm) : v.updateLayout());
   // navigation
@@ -992,19 +997,18 @@ function setKeyMap(keyMapFilePath) {
   if (os.startsWith('Linux')) vp.classList.add('platform-linux');
   fetch(keyMapFilePath)
     .then((resp) => {
-      console.log('Fetching: ', resp);
       return resp.json();
     })
     .then((keyMap) => {
-      console.log('KeyMap loaded ', keyMap);
       // iterate all keys (element) in keymap.json
       for (const [key, value] of Object.entries(keyMap)) {
         let el = document.querySelector(key);
         if (el) {
-          console.info('Add listener to ', el);
+          // console.info('Add listener to ', el);
           el.setAttribute('tabindex', '-1');
           el.addEventListener('keydown', (ev) => {
-            ev.preventDefault();
+            if (!document.activeElement.id == 'pagination2')
+              ev.preventDefault();
             let keyName = ev.key;
             if (ev.code.toLowerCase() == 'space') keyName = 'space';
             // arrowdown -> down
@@ -1015,7 +1019,6 @@ function setKeyMap(keyMapFilePath) {
             if (ev.shiftKey) keyPress += 'shift-';
             if (ev.altKey) keyPress += 'alt-';
             keyPress += keyName;
-            // let osKey = ev.getModifierState("OS");
             console.info('keyPressString: "' + keyPress + '"');
             let methodName = value[keyPress];
             if (methodName !== undefined) {

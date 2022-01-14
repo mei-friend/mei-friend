@@ -19,6 +19,8 @@ export function dropHandler(ev) {
         console.log('... file[' + i + '].name = ' + file.name);
         openMei(file);
         break; // open only first file dropped
+      } else {
+        console.log('Unrecognized item ' + i + ':', ev.dataTransfer.items[i]);
       }
     }
   } else { // Use DataTransfer interface to access the file(s)

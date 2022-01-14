@@ -209,6 +209,10 @@ a:active {
   white-space: nowrap;
 }
 
+#pagination2 {
+  cursor: text;
+}
+
 .inline-block-tight {
   display: inline-block;
   vertical-align: middle;

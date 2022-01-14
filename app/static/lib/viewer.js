@@ -236,7 +236,8 @@ export default class Viewer {
   changeCurrentPage(newPage) {
     let targetpage;
     if (Number.isInteger(newPage)) {
-      targetpage = Math.abs(Math.round(newPage));
+      targetpage = newPage;
+      console.info('targetPage: ', targetpage);
     } else {
       newPage = newPage.toLowerCase();
       if (newPage === 'first') {
@@ -256,6 +257,7 @@ export default class Viewer {
     if (targetpage > 0 && targetpage <= this.pageCount &&
       targetpage != this.currentPage) {
       this.currentPage = targetpage;
+      this.updatePageNumDisplay();
       return true;
     }
     return false;

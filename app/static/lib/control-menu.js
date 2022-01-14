@@ -125,6 +125,9 @@ export function createControlsMenu(parentElement, scale) {
   let pagination2 = document.createElement('div');
   pagination2.id = 'pagination2';
   pagination2.contentEditable = true;
+  addToolTip(pagination2, {
+    title: 'Click to enter page number'
+  });
   let pagination3 = document.createElement('div');
   pagination3.id = 'pagination3';
   paginationLabel.appendChild(pagination1);
@@ -361,7 +364,8 @@ export function createControlsMenu(parentElement, scale) {
   verovioPanel.classList.add('verovio-panel');
   // verovioPanel.classList.add('hidden');
   parentElement.appendChild(verovioPanel);
-}
+
+} // createControlsMenu()
 
 // add a tooltip to element
 export function addToolTip(element, object) {
