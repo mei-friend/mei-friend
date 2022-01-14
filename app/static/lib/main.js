@@ -736,6 +736,8 @@ function downloadMei() {
     .replace(/\/static\//, '').replace(/\.[^/.]+$/, '.mei');
   a.href = window.URL.createObjectURL(blob);
   a.click();
+  // Now that the user has "saved" the MEI, clear the file change indicator
+  setFileChangedState(false);
 }
 
 function downloadMidi() {
