@@ -752,9 +752,10 @@ function addEventListeners(cm, v) {
   document.getElementById('last-page-btn')
     .addEventListener('click', cmd.lastPage);
   // manual page entering
-  let pg2 = document.getElementById('pagination2')
-  pg2.addEventListener('keydown', ev => manualCurrentPage(v, cm, ev));
-  pg2.addEventListener('blur', ev => manualCurrentPage(v, cm, ev));
+  document.getElementById('pagination2')
+    .addEventListener('keydown', ev => manualCurrentPage(v, cm, ev));
+  document.getElementById('pagination2')
+    .addEventListener('blur', ev => manualCurrentPage(v, cm, ev));
   // font selector
   document.getElementById('font-select')
     .addEventListener('change', () => v.updateOption());
