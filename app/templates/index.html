@@ -61,7 +61,8 @@
       <div class="dropdown">
         <button class="dropbtn">File</button>
         <div class="dropdown-content" id="FileMenu">
-          <a id="OpenMei" href="#">Open<span class="keyShortCut cmdKey">O</span></a>
+          <a id="OpenMei" href="#">Open file<span class="keyShortCut cmdKey">O</span></a>
+          <a id="OpenUrl" href="#">Open URL</a>
           <a id="ImportMusicXml" href="#">Import MusicXML</a>
           <a id="ImportHumdrum" href="#">Import Humdrum</a>
           <a id="ImportPae" href="#">Import PAE, ABC</a>
@@ -149,6 +150,11 @@
       <span id="fileLocation"></span>
       <span id="fileName"></span>
       <span id="fileChanged"></span>
+    </div>
+    <div class="openUrlUI" style="display:none;">
+      <input id="openUrlInput" type="text" placeholder="http://..."/>
+      <button id="openUrlButton">Open URL</button>
+      <button id="openUrlCancel">Cancel</button>
     </div>
   </div>
   <div class="dragContainer">

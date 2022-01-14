@@ -126,7 +126,7 @@ document.addEventListener('DOMContentLoaded', function() {
         githubFromStorage.userName,
         githubFromStorage.userEmail
       )
-      document.querySelector("#fileLocation").innerText = github.githubRepo;
+      document.querySelector("#fileLocation").innerText = github.githubRepo + ":";
     } else if(isLoggedIn){ 
       // initialise and store new github object
       github = new Github("", githubToken, "", "", userLogin, userName, userEmail);
@@ -451,7 +451,6 @@ async function fillInBranchContents(e) {
     commitUI.appendChild(commitMessageInput);
     commitUI.appendChild(commitButton);
     githubMenu.appendChild(commitUI);
-    console.log("~~2");
     setFileChangedState(fileChanged);
   }
   fillInCommitLog("withRefresh");
@@ -727,6 +726,30 @@ function openFileDialog(accept = '*') {
   input.click();
 }
 
+function openUrl() { 
+  // user has selected "Open URL" from menu
+  // => show Open URL interface, hide file status display 
+  let fileStatusElement = document.querySelector(".fileStatus");
+  let openUrlElement = document.querySelector(".openUrlUI");
+  // hide file status, show openUrl
+  fileStatusElement.style.display = "none";
+  openUrlElement.style.display = "block";
+}
+
+function openUrlFetch() { 
+  console.debug("TBC")
+}
+
+function openUrlCancel() { 
+  // user has cancelled the "Open URL" action
+  // => hide Open URL interface, show file status display 
+  let fileStatusElement = document.querySelector(".fileStatus");
+  let openUrlElement = document.querySelector(".openUrlUI");
+  // show file status, hide openUrl
+  openUrlElement.style.display = "none";
+  fileStatusElement.style.display = "block";
+}
+
 function downloadMei() {
   let blob = new Blob([cm.getValue()], {
     type: 'text/plain'
@@ -780,6 +803,9 @@ let cmd = {
   'notationRight': () => setOrientation(cm, "right", v),
   'moveProgBar': () => moveProgressBar(),
   'open': () => openFileDialog(),
+  'openUrl': () => openUrl(),
+  'openUrlFetch': () => openUrlFetch(),
+  'openUrlCancel': () => openUrlCancel(),
   'openMusicXml': () => openFileDialog('.xml,.musicxml,.mxl,text/*'),
   'openHumdrum': () => openFileDialog('.krn,.hum,text/*'),
   'openPae': () => openFileDialog('.pae,.abc,text/*'),
@@ -854,6 +880,8 @@ document.getElementById('right').addEventListener('click', cmd.notationRight);
 // open dialogs
 document.getElementById('OpenMei')
   .addEventListener('click', cmd.open);
+document.getElementById('OpenUrl')
+  .addEventListener('click', cmd.openUrl);
 document.getElementById('ImportMusicXml')
   .addEventListener('click', cmd.openMusicXml);
 document.getElementById('ImportHumdrum')
@@ -867,6 +895,11 @@ document.getElementById('SaveSvg')
 document.getElementById('SaveMidi')
   .addEventListener('click', downloadMidi);
 
+// open URL interface
+document.getElementById('openUrlButton')
+  .addEventListener('click', cmd.openUrlFetch);
+document.getElementById('openUrlCancel')
+  .addEventListener('click', cmd.openUrlCancel);
 
 // drag'n'drop handlers
 let fc = document.querySelector('.dragContainer');
@@ -1092,7 +1125,6 @@ function handleCommitButtonClicked(e) {
         .then(() => {
           githubLoadingIndicator.classList.remove("loading");
           cm.readOnly = false;
-          console.log("~~1");
           setFileChangedState(false);
           updateGithubInLocalStorage();
           fillInCommitLog("withRefresh");
