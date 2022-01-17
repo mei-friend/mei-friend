@@ -845,12 +845,16 @@ async function openUrlFetch() {
           }
           refreshGithubMenu();
         }
+        v.clear();
+        v.updateNotation = false;
         updateFileStatusDisplay();
         updateStatusBar();
         loadDataInEditor(data);
         setFileChangedState(false);
         updateLocalStorage(data);
         openUrlCancel(); //hide open URL UI elements
+        v.updateNotation = true;
+        v.updateAll(cm);
       });
     }
   } catch (err) {
