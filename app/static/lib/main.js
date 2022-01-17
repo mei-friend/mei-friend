@@ -1,7 +1,9 @@
 var vrvWorker;
 var tkVersion = '';
 var tkAvailableOptions;
-let meiFileName;
+let meiFileName = '';
+let meiFileLocation = '';
+let meiFileLocationPrintable = '';
 var mei;
 var cm;
 var v; // viewer instance
@@ -104,12 +106,16 @@ document.addEventListener('DOMContentLoaded', function() {
     setFileChangedState(fileChangedFromStorage);
     if(meiXmlFromStorage) { 
       meiFileName = storage.getItem("meiFileName");
-      document.querySelector("#fileName").innerText = meiFileName;
+      meiFileLocation = storage.getItem("meiFileLocation");
+      meiFileLocationPrintable = storage.getItem("meiFileLocationPrintable");
+      updateFileStatusDisplay();
       // on initial page load, CM doesn't fire a "changes" event
       // so we don't need to skip the "freshly loaded" change
       // hence the "false" on the following line:
       loadDataInEditor(meiXmlFromStorage,false); 
     } else {
+      meiFileLocation = "";
+      meiFileLocationPrintable = "";
       openMei(undefined, false); // default MEI, skip freshly loaded (see comment above)
       setFileChangedState(false);
     }
@@ -126,7 +132,7 @@ document.addEventListener('DOMContentLoaded', function() {
         githubFromStorage.userName,
         githubFromStorage.userEmail
       )
-      document.querySelector("#fileLocation").innerText = github.githubRepo + ":";
+      document.querySelector("#fileLocation").innerText = meiFileLocationPrintable;
     } else if(isLoggedIn){ 
       // initialise and store new github object
       github = new Github("", githubToken, "", "", userLogin, userName, userEmail);
@@ -144,6 +150,8 @@ document.addEventListener('DOMContentLoaded', function() {
     if(isLoggedIn) {  // initialise new github object
       github = new Github("", githubToken, "", "", userLogin, userName, userEmail);
     }
+    meiFileLocation = "";
+    meiFileLocationPrintable = "";
     openMei(); // default MEI
   }
   if(isLoggedIn) { 
@@ -269,12 +277,13 @@ function assignGithubMenuClickHandlers() {
           document.querySelector(".statusbar").innerText = "Loading from Github...";
           v.clear();
           v.updateNotation = false;
-          document.querySelector("#fileLocation").innerText = github.githubRepo + ":";
-          document.querySelector("#fileName").innerText = github.filepath;
           meiFileName = github.filepath;
+          meiFileLocation = github.githubRepo;
+          meiFileLocationPrintable = github.githubRepo + ":";
+          updateFileStatusDisplay();
           loadDataInEditor(github.content)
           setFileChangedState(false);
-          updateLocalStorage(meiFileName, github.content);
+          updateLocalStorage(github.content);
           v.updateNotation = true;
           v.updateAll(cm);
         }).catch((e) => {
@@ -286,18 +295,21 @@ function assignGithubMenuClickHandlers() {
   })
 }
 
-function updateLocalStorage(meiFileName, meiXml) {
-  // save filename content, and github status to local storage if available
+function updateLocalStorage(meiXml) {
+  // if storage is available, save file name, location, content
+  // if we're working with github, save github metadata
   if(storage) { 
     try { 
       storage.setItem("meiFileName", meiFileName);
+      storage.setItem("meiFileLocation", meiFileLocation);
+      storage.setItem("meiFileLocationPrintable", meiFileLocationPrintable);
       storage.setItem("meiXml", meiXml);
       if(isLoggedIn) { 
         updateGithubInLocalStorage();
-      }
+      }     
     }
     catch(err) { 
-      console.error("Could not save file content to local storage. Content may be too big? Content length: ", meiXml.length);
+      console.error("Could not save file content to local storage. Content may be too big? Content length: ", meiXml.length, err);
     }
   }
 }
@@ -371,6 +383,12 @@ function setFileChangedState(fileChangedState) {
   if(storage) { 
     storage.setItem("fileChanged", fileChanged ? 1 : 0)
   }
+}
+
+function updateFileStatusDisplay() { 
+  document.querySelector("#fileName").innerText = meiFileName;
+  document.querySelector("#fileLocation").innerText = meiFileLocationPrintable;
+  document.querySelector("#fileLocation").title = meiFileLocation;
 }
 
 
@@ -533,7 +551,7 @@ function workerEventsHandler(ev) {
       v.updateNotation = false;
       loadDataInEditor(mei);
       setFileChangedState(false);
-      updateLocalStorage(meiFileName, mei);
+      updateLocalStorage(mei);
       v.updateNotation = true;
       v.updateAll(cm, defaultVerovioOptions);
       break;
@@ -542,7 +560,7 @@ function workerEventsHandler(ev) {
         v.updateNotation = false;
         loadDataInEditor(v.data.mei);
         setFileChangedState(false);
-        updateLocalStorage(meiFileName, ev.data.mei);
+        updateLocalStorage(ev.data.mei);
         v.updateNotation = true;
         v.selectedElements = [];
         if (!ev.data.removeIds)
@@ -624,7 +642,7 @@ export function openMei(file = defaultMeiFileName, setFreshlyLoaded = true) {
         v.updateNotation = false;
         loadDataInEditor(mei, setFreshlyLoaded);
         setFileChangedState(false);
-        updateLocalStorage(meiFileName, mei)
+        updateLocalStorage(mei)
         v.updateNotation = true;
         v.updateAll(cm);
       });
@@ -676,7 +694,7 @@ export function openMei(file = defaultMeiFileName, setFreshlyLoaded = true) {
                 v.updateNotation = false;
                 loadDataInEditor(mei, setFreshlyLoaded);
                 setFileChangedState(false);
-                updateLocalStorage(meiFileName, mei);
+                updateLocalStorage(mei);
                 v.updateNotation = true;
                 v.updateAll(cm, defaultVerovioOptions);
                 break;
@@ -705,8 +723,9 @@ export function openMei(file = defaultMeiFileName, setFreshlyLoaded = true) {
       }
     );
   }
-  document.querySelector("#fileLocation").innerText = ""; 
-  document.querySelector("#fileName").innerText = meiFileName;
+  meiFileLocation = '';
+  meiFileLocationPrintable = '';
+  updateFileStatusDisplay();
 }
 
 function openFileDialog(accept = '*') {
@@ -718,6 +737,8 @@ function openFileDialog(accept = '*') {
     console.log('OpenFile Dialog: ', files);
     if (files.length == 1) {
       meiFileName = files[0].name;
+      meiFileLocation = "";
+      meiFileLocationPrintable = "";
       openMei(files[0]);
     } else {
       log('OpenFile Dialog: Multiple files not supported.');
@@ -747,18 +768,21 @@ async function openUrlFetch() {
     });
     if(response.status >= 400) {
       console.warn("Fetching URL produced error status: ", response.status);
-      urlStatus.innerHTML = `${response.status}: ${response.statusText.toLowerCase()}`
+      urlStatus.innerHTML = 
+        `${response.status}: ${response.statusText.toLowerCase()}`
       urlInput.classList.add("warn");
     } else { 
       urlStatus.innerHTML = "";
       urlInput.classList.remove("warn");
       response.text().then((data) => {
-        document.querySelector(".fileStatus #fileLocation").innerText = 
-          urlInput.hostname;
+        meiFileLocation = url.href;
+        meiFileLocationPrintable = url.hostname;
         meiFileName =
-          urlInput.pathname.substr(urlInput.pathname.lastIndexOf("/")+1);
+          url.pathname.substr(url.pathname.lastIndexOf("/")+1);
+        updateFileStatusDisplay();
         loadDataInEditor(data);
         setFileChangedState(false);
+        updateLocalStorage(data);
         openUrlCancel(); //hide open URL UI elements 
       });  
     } 
