@@ -21,6 +21,7 @@ loadVerovio.bind(this);
 
 onmessage = function(e) {
   let result = e.data;
+  result.forceUpdate = false;
   if (!tk && e.data.cmd !== 'loadVerovio') return result;
   console.info("Worker received: " + result.cmd + ', ', result); // + ', tk:', tk);
   switch (result.cmd) {
@@ -38,9 +39,12 @@ onmessage = function(e) {
         result.mei = '';
         if (result.xmlId && !result.speedMode) {
           result.pageNo = parseInt(tk.getPageWithElement(result.xmlId));
+          result.forceUpdate = true;
         }
-        result.pageCount = tk.getPageCount();
-        if (result.pageCount < result.pageNo) result.pageNo = result.pageCount;
+        if (!result.speedMode) {
+          result.pageCount = tk.getPageCount();
+          if (result.pageNo > result.pageCount) result.pageNo = result.pageCount;
+        }
         let pg = (result.speedMode && result.pageNo > 1) ? 2 : result.pageNo;
         result.svg = tk.renderToSVG(pg);
         result.cmd = 'updated';
@@ -59,6 +63,7 @@ onmessage = function(e) {
         result.mei = '';
         if (result.xmlId && !result.speedMode) {
           result.pageNo = parseInt(tk.getPageWithElement(result.xmlId));
+          result.forceUpdate = true;
         }
         let pg = (result.speedMode && result.pageNo > 1) ? 2 : result.pageNo;
         result.svg = tk.renderToSVG(pg);
@@ -71,9 +76,10 @@ onmessage = function(e) {
     case 'updatePage':
       try {
         result.setCursorToPageBeginning = true;
-        if (result.xmlId) {
+        if (result.xmlId && !result.speedMode) {
           result.pageNo = parseInt(tk.getPageWithElement(result.xmlId));
           result.setCursorToPageBeginning = false;
+          result.forceUpdate = true;
         }
         result.svg = tk.renderToSVG(result.pageNo);
         result.cmd = 'updated';
@@ -84,14 +90,16 @@ onmessage = function(e) {
     case 'updateLayout':
       try {
         var tkOptions = result.options;
-        if (result.speedMode) tkOptions.breaks = 'encoded';
+        if (result.speedMode && result.breaks != 'none')
+          tkOptions.breaks = 'encoded';
         tk.setOptions(tkOptions);
         tk.redoLayout();
         result.setCursorToPageBeginning = true;
         if (result.xmlId && !result.speedMode) {
           result.pageNo = parseInt(tk.getPageWithElement(result.xmlId));
-          result.setCursorToPageBeginning = false;
+          result.forceUpdate = true;
         }
+        if (result.xmlId) result.setCursorToPageBeginning = false;
         let pg = (result.speedMode && result.pageNo > 1) ? 2 : result.pageNo;
         result.svg = tk.renderToSVG(pg);
         result.pageCount = tk.getPageCount();
@@ -103,13 +111,15 @@ onmessage = function(e) {
     case 'updateOption': // just update option without redoing layout
       try {
         var tkOptions = result.options;
-        if (result.speedMode) tkOptions.breaks = 'encoded';
+        if (result.speedMode && result.breaks != 'none')
+          tkOptions.breaks = 'encoded';
         tk.setOptions(tkOptions);
         result.setCursorToPageBeginning = true;
         if (result.xmlId && !result.speedMode) {
           result.pageNo = parseInt(tk.getPageWithElement(result.xmlId));
-          result.setCursorToPageBeginning = false;
+          result.forceUpdate = true;
         }
+        if (result.xmlId) result.setCursorToPageBeginning = false;
         let pg = (result.speedMode && result.pageNo > 1) ? 2 : result.pageNo;
         result.svg = tk.renderToSVG(pg);
         result.pageCount = tk.getPageCount();

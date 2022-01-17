@@ -12,7 +12,7 @@ let github; // github API wrapper object
 
 import {
   setOrientation,
-  addResizerHandlers,
+  addResizerHandlers
 } from './resizer.js'
 import {
   dropHandler,
@@ -23,7 +23,9 @@ import {
 import {
   createControlsMenu,
   setBreaksOptions,
-  addModifyerKeys
+  addModifyerKeys,
+  manualCurrentPage,
+  generateSectionSelect
 } from './control-menu.js';
 import {
   setCursorToId
@@ -37,7 +39,7 @@ import Viewer from './viewer.js';
 import Github from './github.js';
 
 
-const version = '0.2.1';
+const version = 'develop-0.2.1';
 const versionDate = '17 Jan 2022';
 const defaultMeiFileName = `${root}Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei`;
 const defaultVerovioOptions = {
@@ -179,8 +181,8 @@ document.addEventListener('DOMContentLoaded', function() {
   v = new Viewer(vrvWorker);
   v.vrvOptions = defaultVerovioOptions;
 
-  addEventListeners(cm, v);
-  addResizerHandlers(cm, v);
+  addEventListeners(v, cm);
+  addResizerHandlers(v, cm);
   let doit;
   window.onresize = () => {
     clearTimeout(doit); // wait half a second before re-calculating orientation
@@ -571,23 +573,37 @@ function workerEventsHandler(ev) {
         v.selectedElements = [];
         if (!ev.data.removeIds) v.selectedElements.push(ev.data.xmlId);
       }
+      // add section selector
+      let ss = document.getElementById('section-selector');
+      while (ss.options.length > 0) ss.remove(0); // clear existing options
+      let sections = generateSectionSelect(v.xmlDoc);
+      if (sections.length > 0) {
+        sections.forEach(opt => ss.options.add(new Option(opt[0], opt[1])));
+        ss.style.display = 'block';
+      } else {
+        ss.style.display = 'none';
+      }
       let bs = document.getElementById('breaks-select').value;
-      if (ev.data.pageCount && (!v.speedMode || bs == 'none'))
+      if (ev.data.pageCount && !v.speedMode)
         v.pageCount = ev.data.pageCount;
+      else if (bs == 'none') v.pageCount = 1;
       else if (v.speedMode && bs == 'auto' &&
         Object.keys(v.pageBreaks).length > 0)
         v.pageCount = Object.keys(v.pageBreaks).length;
-      v.currentPage = ev.data.pageNo;
-      updateStatusBar();
-      document.querySelector('title').innerHTML = 'mei-friend: ' +
-        meiFileName.substr(meiFileName.lastIndexOf("/") + 1);
-      document.querySelector('.verovio-panel').innerHTML = ev.data.svg;
-      if (ev.data.setCursorToPageBeginning) v.setCursorToPageBeginning(cm);
-      v.updatePageNumDisplay();
-      v.addNotationEventListeners(cm);
-      v.setNotationColors();
-      v.updateHighlight(cm);
-      v.scrollSvg(cm);
+      // update only if still same page
+      if (v.currentPage == ev.data.pageNo || ev.data.forceUpdate) {
+        v.currentPage = ev.data.pageNo;
+        updateStatusBar();
+        document.querySelector('title').innerHTML = 'mei-friend: ' +
+          meiFileName.substr(meiFileName.lastIndexOf("/") + 1);
+        document.querySelector('.verovio-panel').innerHTML = ev.data.svg;
+        if (ev.data.setCursorToPageBeginning) v.setCursorToPageBeginning(cm);
+        v.updatePageNumDisplay();
+        v.addNotationEventListeners(cm);
+        v.setNotationColors();
+        v.updateHighlight(cm);
+        v.scrollSvg(cm);
+      }
       if (!"setFocusToVerovioPane" in ev.data || ev.data.setFocusToVerovioPane)
         v.setFocusToVerovioPane();
       if (ev.data.computePageBreaks) v.computePageBreaks(cm);
@@ -917,9 +933,9 @@ let cmd = {
   'openUrl': () => openUrl(),
   'openUrlFetch': () => openUrlFetch(),
   'openUrlCancel': () => openUrlCancel(),
-  'openMusicXml': () => openFileDialog('.xml,.musicxml,.mxl,text/*'),
-  'openHumdrum': () => openFileDialog('.krn,.hum,text/*'),
-  'openPae': () => openFileDialog('.pae,.abc,text/*'),
+  'openMusicXml': () => openFileDialog('.xml,.musicxml,.mxl'),
+  'openHumdrum': () => openFileDialog('.krn,.hum'),
+  'openPae': () => openFileDialog('.pae,.abc'),
   'downloadMei': () => downloadMei(),
   'zoomIn': () => v.zoom(+1),
   'zoomOut': () => v.zoom(-1),
@@ -1030,7 +1046,7 @@ fc.addEventListener("dragstart", (ev) => console.log('Drag Start', ev));
 fc.addEventListener("dragend", (ev) => console.log('Drag End', ev));
 
 // add event listeners when controls menu has been instantiated
-function addEventListeners(cm, v) {
+function addEventListeners(v, cm) {
   document.getElementById('notation-night-mode-btn')
     .addEventListener('click', cmd.nightMode);
   // Zooming with buttons
@@ -1049,6 +1065,13 @@ function addEventListeners(cm, v) {
     }
   });
   // Page turning
+  let ss = document.getElementById('section-selector');
+  ss.addEventListener('change', () => {
+    v.updateNotation = false;
+    setCursorToId(cm, ss.value);
+    v.updatePage(cm, '', ss.value);
+    v.updateNotation = true;
+  });
   document.getElementById('first-page-btn')
     .addEventListener('click', cmd.firstPage);
   document.getElementById('prev-page-btn')
@@ -1057,10 +1080,17 @@ function addEventListeners(cm, v) {
     .addEventListener('click', cmd.nextPage);
   document.getElementById('last-page-btn')
     .addEventListener('click', cmd.lastPage);
+  // manual page entering
+  document.getElementById('pagination2')
+    .addEventListener('keydown', ev => manualCurrentPage(v, cm, ev));
+  document.getElementById('pagination2')
+    .addEventListener('blur', ev => manualCurrentPage(v, cm, ev));
+  // font selector
   document.getElementById('font-select')
     .addEventListener('change', () => v.updateOption());
+  // breaks selector
   document.getElementById('breaks-select').addEventListener('change',
-    () => (v.speedMode) ? v.updateAll(cm) : v.updateLayout());
+    () => v.updateAll(cm, {}, v.selectedElements[0]));
   // navigation
   document.getElementById('backwards-btn')
     .addEventListener('click', cmd.previousNote);
@@ -1307,19 +1337,18 @@ function setKeyMap(keyMapFilePath) {
   if (os.startsWith('Linux')) vp.classList.add('platform-linux');
   fetch(keyMapFilePath)
     .then((resp) => {
-      console.log('Fetching: ', resp);
       return resp.json();
     })
     .then((keyMap) => {
-      console.log('KeyMap loaded ', keyMap);
       // iterate all keys (element) in keymap.json
       for (const [key, value] of Object.entries(keyMap)) {
         let el = document.querySelector(key);
         if (el) {
-          console.info('Add listener to ', el);
+          // console.info('Add listener to ', el);
           el.setAttribute('tabindex', '-1');
           el.addEventListener('keydown', (ev) => {
-            ev.preventDefault();
+            if (!document.activeElement.id == 'pagination2')
+              ev.preventDefault();
             let keyName = ev.key;
             if (ev.code.toLowerCase() == 'space') keyName = 'space';
             // arrowdown -> down
@@ -1330,7 +1359,6 @@ function setKeyMap(keyMapFilePath) {
             if (ev.shiftKey) keyPress += 'shift-';
             if (ev.altKey) keyPress += 'alt-';
             keyPress += keyName;
-            // let osKey = ev.getModifierState("OS");
             console.info('keyPressString: "' + keyPress + '"');
             let methodName = value[keyPress];
             if (methodName !== undefined) {

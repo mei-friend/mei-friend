@@ -67,15 +67,15 @@ export function createControlsMenu(parentElement, scale) {
   paginationCtrls.classList.add('controls');
   controlsForm.appendChild(paginationCtrls);
 
-  // let sectionSelector = document.createElement('select');
-  // sectionSelector.id = "section-selector";
-  // sectionSelector.classList.add('icon');
-  // sectionSelector.classList.add('btn');
+  let sectionSelector = document.createElement('select');
+  sectionSelector.id = "section-selector";
+  sectionSelector.classList.add('icon');
+  sectionSelector.classList.add('btn');
   // sectionSelector.classList.add('icon-multi-select');
-  // sectionSelector.classList.add('inline-block-tight');
-  // addToolTip(sectionSelector, {
-  //   title: 'Navigate encoded section/ending structure'
-  // });
+  sectionSelector.classList.add('inline-block-tight');
+  addToolTip(sectionSelector, {
+    title: 'Navigate encoded section/ending structure'
+  });
   // sectionSelector.options.add(new Option('Var-I'));
   // sectionSelector.options.add(new Option('| Var-I-A'));
   // sectionSelector.options.add(new Option('| Var-I-B'));
@@ -86,7 +86,8 @@ export function createControlsMenu(parentElement, scale) {
   // sectionSelector.options.add(new Option('| Var-II-A1'));
   // sectionSelector.options.add(new Option('| Var-II-A2'));
   // sectionSelector.options.add(new Option('| Var-II-B'));
-  // paginationCtrls.appendChild(sectionSelector);
+  sectionSelector.style.display = 'none';
+  paginationCtrls.appendChild(sectionSelector);
 
   let firstBtn = document.createElement('button');
   firstBtn.id = "first-page-btn";
@@ -117,7 +118,22 @@ export function createControlsMenu(parentElement, scale) {
   let paginationLabel = document.createElement('label');
   paginationLabel.id = 'pagination-label';
   paginationLabel.classList.add('label');
-  paginationLabel.innerHTML = `Loading`;
+  // paginationLabel.innerHTML = `Loading`;
+
+  let pagination1 = document.createElement('div');
+  pagination1.innerHTML = 'Loading';
+  pagination1.id = 'pagination1';
+  let pagination2 = document.createElement('div');
+  pagination2.id = 'pagination2';
+  pagination2.contentEditable = true;
+  addToolTip(pagination2, {
+    title: 'Click to enter page number'
+  });
+  let pagination3 = document.createElement('div');
+  pagination3.id = 'pagination3';
+  paginationLabel.appendChild(pagination1);
+  paginationLabel.appendChild(pagination2);
+  paginationLabel.appendChild(pagination3);
   paginationCtrls.appendChild(paginationLabel);
 
   let nextBtn = document.createElement('button');
@@ -349,6 +365,18 @@ export function createControlsMenu(parentElement, scale) {
   verovioPanel.classList.add('verovio-panel');
   // verovioPanel.classList.add('hidden');
   parentElement.appendChild(verovioPanel);
+
+} // createControlsMenu()
+
+export function manualCurrentPage(v, cm, ev) {
+  console.debug('manualCurrentPage: ', ev);
+  ev.stopPropagation();
+  if (ev.key == 'Enter' || ev.type == 'blur') {
+    ev.preventDefault();
+    let pageInput = parseInt(ev.target.innerText);
+    if (pageInput) v.updatePage(cm, pageInput);
+    v.updatePageNumDisplay();
+  }
 }
 
 // add a tooltip to element
@@ -380,6 +408,24 @@ export function setBreaksOptions(tkAvailableOptions) {
       breaksEl[breaksEl.options.length] = new Option(index, index);
     }
   }
+}
+
+// checks xmlDoc for section, ending, lem, rdg elements for quick navigation
+export function generateSectionSelect(xmlDoc) {
+  let selector = 'section,ending,lem,rdg';
+  let sections = [ //first option with empty string for Firefox (TODO: beautify)
+    ['', '']
+  ];
+  let baseSection = xmlDoc.querySelector('music section');
+  let els = Array.from(baseSection.querySelectorAll(selector));
+  els.forEach(el => {
+    let str = '';
+    let parent = el.parentElement.closest(selector);
+    while (parent = parent.parentElement.closest(selector))
+      str += '│ '; // &#9474;&nbsp; for indentation
+    sections.push([str + el.getAttribute('xml:id'), el.getAttribute('xml:id')]);
+  });
+  return sections;
 }
 
 export function addModifyerKeys(element) {

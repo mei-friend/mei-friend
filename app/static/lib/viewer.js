@@ -34,7 +34,7 @@ export default class Viewer {
   }
 
   // change options, load new data, render current page, add listeners, highlight
-  updateAll(cm, options = {}) {
+  updateAll(cm, options = {}, xmlId = '') {
     this.setVerovioOptions(options);
     let computePageBreaks = false;
     if (this.speedMode && Object.keys(this.pageBreaks).length == 0 &&
@@ -42,12 +42,14 @@ export default class Viewer {
       computePageBreaks = true;
       this.currentPage = 1;
     }
+    if (this.speedMode && xmlId)
+      this.currentPage = speed.getPageWithElement(this, xmlId);
     let message = {
       'cmd': 'updateAll',
       'options': this.vrvOptions,
       'mei': this.speedFilter(cm.getValue()),
       'pageNo': this.currentPage,
-      'xmlId': '',
+      'xmlId': xmlId,
       'speedMode': this.speedMode,
       'computePageBreaks': computePageBreaks
     }
@@ -82,7 +84,6 @@ export default class Viewer {
         };
         this.busy();
         this.worker.postMessage(message);
-        // this.showCurrentPage();
       } else { // speed mode
         if (this.encodingHasChanged) this.loadXml(cm.getValue());
         if (xmlId) {
@@ -236,7 +237,8 @@ export default class Viewer {
   changeCurrentPage(newPage) {
     let targetpage;
     if (Number.isInteger(newPage)) {
-      targetpage = Math.abs(Math.round(newPage));
+      targetpage = newPage;
+      console.info('targetPage: ', targetpage);
     } else {
       newPage = newPage.toLowerCase();
       if (newPage === 'first') {
@@ -263,9 +265,11 @@ export default class Viewer {
   }
 
   updatePageNumDisplay() {
-    const l = document.getElementById("pagination-label");
     let pg = (this.pageCount < 0) ? '?' : this.pageCount;
-    if (l) l.innerHTML = `Page ${this.currentPage} of ${pg}`;
+    document.getElementById("pagination1").innerHTML = 'Page';;
+    document.getElementById("pagination2").innerHTML =
+      `&nbsp;${this.currentPage}&nbsp;`;
+    document.getElementById("pagination3").innerHTML = `of ${pg}`;
   }
 
   // set cursor to first note id in page, taking st/ly of id, if possible

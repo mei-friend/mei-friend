@@ -475,6 +475,7 @@ export function getPageWithElement(v, id) {
   let page = -1;
   if (v.speedMode) {
     let bs = document.getElementById('breaks-select').value;
+    if (bs == 'none') return 1;
     // for speedMode: selector for all last measures and requested id
     if (bs == 'auto' && Object.keys(v.pageBreaks).length > 0) {
       for (let pg in v.pageBreaks) {
@@ -488,6 +489,7 @@ export function getPageWithElement(v, id) {
     } else if (bs == 'encoded') {
       sel = 'pb,[*|id="' + id + '"]'; // find all breaks in xmlDoc
     }
+    if (sel == '') return page;
     let els = Array.from(v.xmlDoc.querySelectorAll(sel));
     if (els) {
       page = els.findIndex(el => el.getAttribute('xml:id') == id) + 1;
