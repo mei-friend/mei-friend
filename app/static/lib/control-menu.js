@@ -413,7 +413,9 @@ export function setBreaksOptions(tkAvailableOptions) {
 // checks xmlDoc for section, ending, lem, rdg elements for quick navigation
 export function generateSectionSelect(xmlDoc) {
   let selector = 'section,ending,lem,rdg';
-  let sections = [];
+  let sections = [ //first option with empty string for Firefox (TODO: beautify)
+    ['', '']
+  ];
   let baseSection = xmlDoc.querySelector('music section');
   let els = Array.from(baseSection.querySelectorAll(selector));
   els.forEach(el => {
