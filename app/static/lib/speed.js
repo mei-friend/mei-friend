@@ -489,7 +489,7 @@ export function getPageWithElement(v, id) {
     } else if (bs == 'encoded') {
       sel = 'pb,[*|id="' + id + '"]'; // find all breaks in xmlDoc
     }
-    if (sel == '') return page;
+    if (sel == '') return 1;
     let els = Array.from(v.xmlDoc.querySelectorAll(sel));
     if (els) {
       page = els.findIndex(el => el.getAttribute('xml:id') == id) + 1;
