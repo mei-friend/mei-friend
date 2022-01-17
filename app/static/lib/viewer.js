@@ -208,7 +208,7 @@ export default class Viewer {
     let fontSel = document.getElementById('font-select');
     if (fontSel) this.vrvOptions.font = fontSel.value;
     let bs = document.getElementById('breaks-select');
-    if (bs && bs.value) this.vrvOptions.breaks = bs.value;
+    if (bs) this.vrvOptions.breaks = bs.value;
     let dimensions = getVerovioContainerSize();
     let vp = document.querySelector('.verovio-panel');
     dimensions.width = vp.clientWidth;

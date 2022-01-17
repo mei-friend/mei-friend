@@ -472,10 +472,10 @@ export function xmlToString(xmlNode) {
 // Retrieve page number of element with xml:id id
 export function getPageWithElement(v, id) {
   let sel = '';
-  let page = -1;
+  let page = 1;
   if (v.speedMode) {
     let bs = document.getElementById('breaks-select').value;
-    if (bs == 'none') return 1;
+    if (bs == 'none') return page;
     // for speedMode: selector for all last measures and requested id
     if (bs == 'auto' && Object.keys(v.pageBreaks).length > 0) {
       for (let pg in v.pageBreaks) {
@@ -483,18 +483,17 @@ export function getPageWithElement(v, id) {
         sel += '[*|id="' + br[br.length - 1] + '"],';
       }
       sel += '[*|id="' + id + '"]';
-      // for normale mode: selector for all breaks and requested id
     } else if (bs == 'line') {
       sel = 'pb,sb,[*|id="' + id + '"]'; // find all breaks in xmlDoc
     } else if (bs == 'encoded') {
       sel = 'pb,[*|id="' + id + '"]'; // find all breaks in xmlDoc
     }
-    if (sel == '') return 1;
+    if (sel == '') return page;
     let els = Array.from(v.xmlDoc.querySelectorAll(sel));
     if (els) {
       page = els.findIndex(el => el.getAttribute('xml:id') == id) + 1;
-      if (v.speedMode && page > 1 && // if element is within last measure, ...
-        els[page - 1].closest('measure') == els[page - 2])
+      // if element is within last measure, ...
+      if (page > 1 && els[page - 1].closest('measure') == els[page - 2])
         page--; // ...undo increment
     }
     if (bs == 'line' || bs == 'encoded') {
