@@ -758,7 +758,12 @@ function addEventListeners(v, cm) {
   });
   // Page turning
   let ss = document.getElementById('section-selector');
-  ss.addEventListener('change', () => setCursorToId(cm, ss.value));
+  ss.addEventListener('change', () => {
+    v.updateNotation = false;
+    setCursorToId(cm, ss.value);
+    v.updatePage(cm, '', ss.value);
+    v.updateNotation = true;
+  });
   document.getElementById('first-page-btn')
     .addEventListener('click', cmd.firstPage);
   document.getElementById('prev-page-btn')

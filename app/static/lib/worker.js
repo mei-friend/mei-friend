@@ -63,6 +63,7 @@ onmessage = function(e) {
         result.mei = '';
         if (result.xmlId && !result.speedMode) {
           result.pageNo = parseInt(tk.getPageWithElement(result.xmlId));
+          result.forceUpdate = true;
         }
         let pg = (result.speedMode && result.pageNo > 1) ? 2 : result.pageNo;
         result.svg = tk.renderToSVG(pg);
@@ -75,9 +76,10 @@ onmessage = function(e) {
     case 'updatePage':
       try {
         result.setCursorToPageBeginning = true;
-        if (result.xmlId) {
+        if (result.xmlId && !result.speedMode) {
           result.pageNo = parseInt(tk.getPageWithElement(result.xmlId));
           result.setCursorToPageBeginning = false;
+          result.forceUpdate = true;
         }
         result.svg = tk.renderToSVG(result.pageNo);
         result.cmd = 'updated';
@@ -93,8 +95,10 @@ onmessage = function(e) {
         tk.setOptions(tkOptions);
         tk.redoLayout();
         result.setCursorToPageBeginning = true;
-        if (result.xmlId && !result.speedMode)
+        if (result.xmlId && !result.speedMode) {
           result.pageNo = parseInt(tk.getPageWithElement(result.xmlId));
+          result.forceUpdate = true;
+        }
         if (result.xmlId) result.setCursorToPageBeginning = false;
         let pg = (result.speedMode && result.pageNo > 1) ? 2 : result.pageNo;
         result.svg = tk.renderToSVG(pg);
@@ -111,8 +115,10 @@ onmessage = function(e) {
           tkOptions.breaks = 'encoded';
         tk.setOptions(tkOptions);
         result.setCursorToPageBeginning = true;
-        if (result.xmlId && !result.speedMode)
+        if (result.xmlId && !result.speedMode) {
           result.pageNo = parseInt(tk.getPageWithElement(result.xmlId));
+          result.forceUpdate = true;
+        }
         if (result.xmlId) result.setCursorToPageBeginning = false;
         let pg = (result.speedMode && result.pageNo > 1) ? 2 : result.pageNo;
         result.svg = tk.renderToSVG(pg);

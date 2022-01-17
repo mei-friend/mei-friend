@@ -42,7 +42,7 @@ export default class Viewer {
       computePageBreaks = true;
       this.currentPage = 1;
     }
-    if (this.speedMode && xmlId) 
+    if (this.speedMode && xmlId)
       this.currentPage = speed.getPageWithElement(this, xmlId);
     let message = {
       'cmd': 'updateAll',
@@ -84,7 +84,6 @@ export default class Viewer {
         };
         this.busy();
         this.worker.postMessage(message);
-        // this.showCurrentPage();
       } else { // speed mode
         if (this.encodingHasChanged) this.loadXml(cm.getValue());
         if (xmlId) {
