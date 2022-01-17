@@ -360,12 +360,12 @@ function workerEventsHandler(ev) {
         v.selectedElements = [];
         if (!ev.data.removeIds) v.selectedElements.push(ev.data.xmlId);
       }
-      // if (!v.xmlDoc) v.loadXml(cm.getValue());
+      // add section selector
       let ss = document.getElementById('section-selector');
-      while (ss.options.length > 0) ss.remove(0);
+      while (ss.options.length > 0) ss.remove(0); // clear existing options
       let sections = generateSectionSelect(v.xmlDoc);
       if (sections.length > 0) {
-        sections.forEach(opt => ss.options.add(new Option(opt)));
+        sections.forEach(opt => ss.options.add(new Option(opt[0], opt[1])));
         ss.style.display = 'block';
       } else {
         ss.style.display = 'none';

@@ -418,12 +418,10 @@ export function generateSectionSelect(xmlDoc) {
   let els = Array.from(baseSection.querySelectorAll(selector));
   els.forEach(el => {
     let str = '';
-    // TODO: fix that it cannot find these ids anymore
-    // let parent = el.parentElement.closest(selector);
-    // while (parent = parent.parentElement.closest(selector))
-    //   str += '|';
-    str += el.getAttribute('xml:id');
-    sections.push(str);
+    let parent = el.parentElement.closest(selector);
+    while (parent = parent.parentElement.closest(selector))
+      str += '│ '; // &#9474;&nbsp; for indentation
+    sections.push([str + el.getAttribute('xml:id'), el.getAttribute('xml:id')]);
   });
   return sections;
 }
