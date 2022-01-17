@@ -9,8 +9,15 @@ export const navElsArray = [
 export function getIdOfNextSvgElement(currEl, dir = 'forwards',
   sel = navElsSelector, incr = 'all') {
   let measure = currEl.closest('.measure');
-  let stN = currEl.closest('.staff').getAttribute('data-n');
+  let st = currEl.closest('.staff');
+  let stN = 1;
   let lyN = 1;
+  if (!st) {
+    return (dir == 'forwards') ?
+      getLastInMeasure(measure, navElsSelector, stN, lyN) :
+      getFirstInMeasure(measure, navElsSelector, stN, lyN);
+  }
+  stN = st.getAttribute('data-n');
   let layer = currEl.closest('.layer')
   if (layer) lyN = layer.getAttribute('data-n');
   let currChord = currEl.closest('.chord');
