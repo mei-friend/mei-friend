@@ -28,7 +28,15 @@ export function setOrientation(cm, o = '', v = null) {
   }
   // console.info('Notation size: ' + notation.style.width + '/' + notation.style.height);
   // redoLayout when done with loading TODO
-  if (v) setTimeout(() => v.updateLayout(), 33);
+  if (v) {
+    if (v.speedMode &&
+      document.getElementById('breaks-select').value == 'auto') {
+      v.pageBreaks = {};
+      setTimeout(() => v.updateAll(cm), 33);
+    } else {
+      setTimeout(() => v.updateLayout(), 33);
+    }
+  }
 }
 
 export function calcSizeOfContainer() {
@@ -130,8 +138,16 @@ export function addResizerHandlers(cm, v) {
     encoding.style.removeProperty('pointer-events');
     document.removeEventListener('mousemove', mouseMoveHandler);
     document.removeEventListener('mouseup', mouseUpHandler);
-    if (v) v.updateLayout();
-  };
+    if (v) {
+      if (v.speedMode &&
+        document.getElementById('breaks-select').value == 'auto') {
+        v.pageBreaks = {};
+        v.updateAll(cm);
+      } else {
+        v.updateLayout();
+      }
+    }
+  }
 
   resizer.addEventListener('mousedown', mouseDownHandler);
 }

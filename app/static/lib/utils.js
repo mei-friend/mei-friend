@@ -114,7 +114,13 @@ export function moveCursorToEndOfMeasure(cm, p) {
 
 export function setCursorToId(cm, id) {
   let c = cm.getSearchCursor(new RegExp(`(?:['"])` + id + `(?:['"])`));
-  if (c.findNext()) cm.setCursor(c.from());
+  if (c.findNext()) {
+    cm.setCursor(c.from());
+    // console.info('setCursorToId cursor: ', c.from());
+    let enc = document.querySelector('.encoding');
+    cm.execCommand('goLineStartSmart');
+    cm.scrollIntoView(null, Math.round(enc.clientHeight / 2));
+  }
 }
 
 // find attribute (@startid) of element with itemId in textEditor.getBuffer()
@@ -134,8 +140,7 @@ export function getAttributeById(cm, itemId, attribute = 'startid') {
 
 // scans through text from cursorPosition to find next element elementName
 // (e.g. 'note'), also matching staff and layer
-export function getIdOfNextElement(cm, rw,
-  elementNames = ['note', 'rest', 'mRest', 'beatRpt', 'halfmRpt', 'mRpt'],
+export function getIdOfNextElement(cm, rw, elementNames = dutils.navElsArray,
   direction = 'forwards') {
   let row = rw;
   let line;
@@ -203,7 +208,7 @@ export function getElementIdAtCursor(cm) {
   let column = p.ch;
   // get line from current cursor position
   let line = cm.getLine(row);
-  // check if cursor is on a closing tag by stepping backwards through the characters
+  // check if cursor is on a closing tag by stepping backwards
   for (let j = column; j > 0; j--) {
     if (line[j] === "/" && line[j - 1] === "<") {
       // if closing tag is found, find the name of the tag with regex

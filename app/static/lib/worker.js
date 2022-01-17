@@ -30,14 +30,19 @@ onmessage = function(e) {
     case 'updateAll':
       try {
         var tkOptions = result.options;
+        if (result.speedMode &&
+          !result.computePageBreaks && tkOptions.breaks != 'none')
+          tkOptions.breaks = 'encoded';
         tk.setOptions(tkOptions);
         tk.loadData(result.mei);
         result.mei = '';
-        if (result.xmlId) {
+        if (result.xmlId && !result.speedMode) {
           result.pageNo = parseInt(tk.getPageWithElement(result.xmlId));
         }
-        result.svg = tk.renderToSVG(result.pageNo);
         result.pageCount = tk.getPageCount();
+        if (result.pageCount < result.pageNo) result.pageNo = result.pageCount;
+        let pg = (result.speedMode && result.pageNo > 1) ? 2 : result.pageNo;
+        result.svg = tk.renderToSVG(pg);
         result.cmd = 'updated';
       } catch (e) {
         log(e);
@@ -45,12 +50,18 @@ onmessage = function(e) {
       break;
     case 'updateData':
       try {
+        if (result.speedMode && result.breaks != 'none')
+          result.breaks = 'encoded';
+        tk.setOptions({
+          breaks: result.breaks
+        });
         tk.loadData(result.mei);
         result.mei = '';
-        if (result.xmlId) {
+        if (result.xmlId && !result.speedMode) {
           result.pageNo = parseInt(tk.getPageWithElement(result.xmlId));
         }
-        result.svg = tk.renderToSVG(result.pageNo);
+        let pg = (result.speedMode && result.pageNo > 1) ? 2 : result.pageNo;
+        result.svg = tk.renderToSVG(pg);
         result.pageCount = tk.getPageCount();
         result.cmd = 'updated';
       } catch (e) {
@@ -73,14 +84,16 @@ onmessage = function(e) {
     case 'updateLayout':
       try {
         var tkOptions = result.options;
+        if (result.speedMode) tkOptions.breaks = 'encoded';
         tk.setOptions(tkOptions);
         tk.redoLayout();
         result.setCursorToPageBeginning = true;
-        if (result.xmlId) {
+        if (result.xmlId && !result.speedMode) {
           result.pageNo = parseInt(tk.getPageWithElement(result.xmlId));
           result.setCursorToPageBeginning = false;
         }
-        result.svg = tk.renderToSVG(result.pageNo);
+        let pg = (result.speedMode && result.pageNo > 1) ? 2 : result.pageNo;
+        result.svg = tk.renderToSVG(pg);
         result.pageCount = tk.getPageCount();
         result.cmd = 'updated';
       } catch (e) {
@@ -90,13 +103,15 @@ onmessage = function(e) {
     case 'updateOption': // just update option without redoing layout
       try {
         var tkOptions = result.options;
+        if (result.speedMode) tkOptions.breaks = 'encoded';
         tk.setOptions(tkOptions);
         result.setCursorToPageBeginning = true;
-        if (result.xmlId) {
+        if (result.xmlId && !result.speedMode) {
           result.pageNo = parseInt(tk.getPageWithElement(result.xmlId));
           result.setCursorToPageBeginning = false;
         }
-        result.svg = tk.renderToSVG(result.pageNo);
+        let pg = (result.speedMode && result.pageNo > 1) ? 2 : result.pageNo;
+        result.svg = tk.renderToSVG(pg);
         result.pageCount = tk.getPageCount();
         result.cmd = 'updated';
       } catch (e) {
@@ -159,7 +174,44 @@ onmessage = function(e) {
       break;
     case 'navigatePage': // for a page turn during navigation
       try { // returns original message plus svg
-        result.svg = tk.renderToSVG(result.mei);
+        if (result.speedMode) {
+          tk.setOptions({
+            breaks: 'encoded'
+          });
+          tk.loadData(result.mei);
+          result.mei = '';
+        }
+        let pg = (result.speedMode && result.pageNo > 1) ? 2 : result.pageNo;
+        result.svg = tk.renderToSVG(pg);
+      } catch (e) {
+        log(e);
+      }
+      break;
+    case 'computePageBreaks': // compute page breaks
+      try {
+        // console.log('Worker computePageBreaks started');
+        var tkOptions = result.options;
+        tk.setOptions(tkOptions);
+        tk.loadData(result.mei);
+        result.pageCount = tk.getPageCount();
+        result.pageBreaks = {};
+        for (let p = 1; p <= result.pageCount; p++) { // one-based page numbers
+          updateProgressbar(p / result.pageCount * 100);
+          // console.log('Progress: ' + p / result.pageCount * 100 + '%')
+          let svgText = tk.renderToSVG(p);
+          let it = svgText // find all measures
+            .matchAll(/g([^>]+)(?:class=)(?:['"])(?:measure|system)(?:['"])/g);
+          let j = -1; // breaks within a page
+          let breaks = [];
+          for (let i of it) {
+            // console.info('worker:computePageBreaks: ' + String(i[0]));
+            if (i[0].includes('system')) j++;
+            breaks[j] = String(i[1])
+              .match(/(['"])[^'"]*\1/)[0].replace(/['"]/g, '');
+          }
+          result.pageBreaks[p] = breaks;
+        }
+        // console.log('Worker computePageBreaks: ', result.pageBreaks);
       } catch (e) {
         log(e);
       }
@@ -214,4 +266,11 @@ onmessage = function(e) {
 function log(e) {
   console.log('Worker error: ', e);
   return;
+}
+
+function updateProgressbar(perc) {
+  postMessage({
+    'cmd': 'updateProgressbar',
+    'percentage': perc
+  });
 }

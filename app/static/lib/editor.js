@@ -8,6 +8,8 @@ import * as att from './attribute-classes.js';
 export function delEl(v, cm) {
   v.loadXml(cm.getValue(), true);
   let id = v.selectedElements[0]; // TODO: iterate over selectedElements
+  let cursor = cm.getCursor();
+  let nextId = utils.getIdOfNextElement(cm, cursor.line)[0]; // TODO necessary?
   let element = v.xmlDoc.querySelector("[*|id='" + id + "']");
   console.info('Deleting: ', element);
   if (!element) {
@@ -22,8 +24,8 @@ export function delEl(v, cm) {
     if (element.nodeName == 'octave') { // reset notes inside octave range
       let disPlace = element.getAttribute('dis.place');
       let dis = element.getAttribute('dis');
-      let id1 = speed.removeHashFromString(element.getAttribute('startid'));
-      let id2 = speed.removeHashFromString(element.getAttribute('endid'));
+      let id1 = speed.rmHash(element.getAttribute('startid'));
+      let id2 = speed.rmHash(element.getAttribute('endid'));
       findAndModifyOctaveElements(cm, v.xmlDoc, id1, id2, disPlace, dis, false);
       removeInBuffer(cm, element);
       selectedElements.push(id2);
@@ -33,6 +35,7 @@ export function delEl(v, cm) {
       let m = utils.getElementIdAtCursor(cm);
       let el = document.getElementById(m).querySelector(dutils.navElsSelector);
       if (el) selectedElements.push(el.getAttribute('id'));
+      else selectedElements.push(nextId);
     }
   } else if (['beam'].includes(element.nodeName)) { // delte beam
     let p;
@@ -66,9 +69,9 @@ export function delEl(v, cm) {
   v.selectedElements = selectedElements;
   v.lastNoteId = v.selectedElements[v.selectedElements.length - 1];
   v.encodingHasChanged = true;
-  v.speedMode ? v.updateLayout() : v.updateData(cm, false, true);
+  v.updateData(cm, false, true);
   v.updateNotation = true;
-}
+} // delEl()
 
 export function addCtrlEl(v, cm, elName, placement, form) {
   if (v.selectedElements.length == undefined || v.selectedElements.length < 1)
@@ -84,7 +87,7 @@ export function addCtrlEl(v, cm, elName, placement, form) {
   if (!['note', 'chord', 'rest', 'mRest', 'multiRest']
     .includes(startEl.nodeName)) {
     console.info(
-      'addControlElementDom: Cannot add new element to start element' +
+      'addControlElement: Cannot add new element to start element' +
       startEl.nodeName + '.');
     return;
   }
@@ -173,7 +176,38 @@ export function addCtrlEl(v, cm, elName, placement, form) {
   v.selectedElements.push(uuid);
   v.updateData(cm, false, true);
   v.updateNotation = true;
+} // addCtrlEl()
+
+export function addClefChange(v, cm, shape = 'G', line = '2', before = true) {
+  if (v.selectedElements.length == 0) return;
+  v.updateNotation = false; // stop update notation
+  let id = v.selectedElements[0];
+  var el = v.xmlDoc.querySelector("[*|id='" + id + "']");
+  let chord = el.closest('chord');
+  if (chord) id = chord.getAttribute('xml:id');
+  utils.setCursorToId(cm, id);
+  let newElement = v.xmlDoc.createElementNS(speed.meiNameSpace, 'clef');
+  let uuid = 'clef-' + utils.generateUUID();
+  newElement.setAttributeNS(speed.xmlNameSpace, 'xml:id', uuid);
+  newElement.setAttribute('shape', shape);
+  newElement.setAttribute('line', line);
+  v.encodingHasChanged = true;
+  if (before) {
+    cm.replaceRange(speed.xmlToString(newElement) + '\n', cm.getCursor());
+    // cm.execCommand('newLineAndIndent');
+  } else {
+    cm.execCommand('toMatchingTag');
+    cm.execCommand('goLineEnd');
+    cm.replaceRange('\n' + speed.xmlToString(newElement), cm.getCursor());
+  }
+  cm.execCommand('indentAuto');
+  v.updateNotation = true; // update notation again
+  v.selectedElements = [];
+  v.selectedElements.push(uuid);
+  v.lastNoteId = uuid;
+  v.updatePage(cm, '', uuid);
 }
+
 
 // Reverse or insert att:placement (artic, ...), att.curvature (slur, tie,
 // phrase) and att.stems (note, chord) of current element
@@ -260,9 +294,9 @@ export function invertPlacement(v, cm, modifier = false) {
   // console.info('TextCursor: ', txtEdr.getCursorBufferPosition());
   if (range) cm.setCursor(range.end);
   v.selectedElements = ids;
-  v.speedMode ? v.updateLayout() : v.updateData(cm, false, true);
+  v.updateData(cm, false, true);
   v.updateNotation = true; // update notation again
-}
+} // invertPlacement()
 
 // toggle (switch on/off) artic to selected elements
 export function toggleArtic(v, cm, artic = "stacc") {
@@ -299,9 +333,9 @@ export function toggleArtic(v, cm, artic = "stacc") {
   }
   if (range) cm.setCursor(range.end);
   v.selectedElements = ids;
-  v.speedMode ? v.updateLayout() : v.updateData(cm, false, true);
+  v.updateData(cm, false, true);
   v.updateNotation = true; // update notation again
-}
+} // toggleArtic()
 
 // shift element (rests, note) up/down by pitch name (1 or 7 steps)
 export function shiftPitch(v, cm, deltaPitch) {
@@ -313,46 +347,16 @@ export function shiftPitch(v, cm, deltaPitch) {
     let id = ids[i];
     let el = v.xmlDoc.querySelector("[*|id='" + id + "']");
     if (!el) continue;
-    if (['rest', 'mRest', 'multiRest'].includes(el.nodeName)) {
-      let oloc = 4;
-      let ploc = 'c';
-      if (el.hasAttribute('oloc')) oloc = parseInt(el.getAttribute('oloc'));
-      if (el.hasAttribute('ploc')) ploc = el.getAttribute('ploc');
-      let pi = att.pnames.indexOf(ploc) + deltaPitch;
-      if (pi > att.pnames.length - 1) {
-        pi -= att.pnames.length;
-        oloc++;
-      } else if (pi < 0) {
-        pi += att.pnames.length;
-        oloc--;
-      }
-      el.setAttribute('ploc', att.pnames[pi]);
-      el.setAttribute('oloc', oloc);
-      replaceInTextEditor(cm, el); // , true);
-      // txtEdr.autoIndentSelectedRows();
-    } else if (['note'].includes(el.nodeName)) {
-      let oct = 4;
-      let pname = 'c';
-      if (el.hasAttribute('oct')) oct = parseInt(el.getAttribute('oct'));
-      if (el.hasAttribute('pname')) pname = el.getAttribute('pname');
-      let pi = att.pnames.indexOf(pname) + deltaPitch;
-      if (pi > att.pnames.length - 1) {
-        pi -= att.pnames.length;
-        oct++;
-      } else if (pi < 0) {
-        pi += att.pnames.length;
-        oct--;
-      }
-      el.setAttribute('pname', att.pnames[pi]);
-      el.setAttribute('oct', oct);
-      replaceInTextEditor(cm, el); // , true);
-      // txtEdr.autoIndentSelectedRows();
-    }
+    let chs = Array.from(el.querySelectorAll('note,rest,mRest,multiRest'));
+    if (chs.length > 0) // shift many elements
+      chs.forEach(ele => replaceInTextEditor(cm, pitchMover(ele, deltaPitch)));
+    else // shift one element
+      replaceInTextEditor(cm, pitchMover(el, deltaPitch));
   }
   v.selectedElements = ids;
-  v.speedMode ? v.updateLayout() : v.updateData(cm, false, true);
+  v.updateData(cm, false, true);
   v.updateNotation = true; // update notation again
-}
+} // shiftPitch()
 
 export function moveElementToNextStaff(v, cm, upwards = true) {
   console.info('moveElementToNextStaff(' + (upwards ? 'up' : 'down') + ')');
@@ -377,9 +381,9 @@ export function moveElementToNextStaff(v, cm, upwards = true) {
     }
   }
   v.selectedElements = ids;
-  v.speedMode ? v.updateLayout() : v.updateData(cm, false, true);
+  v.updateData(cm, false, true);
   v.updateNotation = true; // update notation again
-}
+} // moveElementToNextStaff()
 
 // add beam, only speed mode
 export function addBeamElement(v, cm, elementName = 'beam') {
@@ -426,13 +430,13 @@ export function addBeamElement(v, cm, elementName = 'beam') {
     // buffer.groupChangesSinceCheckpoint(checkPoint); // TODO
     v.selectedElements = [];
     v.selectedElements.push(uuid);
-    v.speedMode ? v.updateLayout() : v.updateData(cm, false, true);
+    v.updateData(cm, false, true);
   } else {
     console.log('Cannot add ' + elementName +
       ' element, selected elements have different parents.');
   }
   v.updateNotation = true; // update notation again
-}
+} // addBeamElement()
 
 // add octave element and modify notes inside selected elements
 export function addOctaveElement(v, cm, disPlace = 'above', dis = '8') {
@@ -473,9 +477,9 @@ export function addOctaveElement(v, cm, disPlace = 'above', dis = '8') {
   v.selectedElements = [];
   v.selectedElements.push(uuid);
   v.lastNoteId = id2;
-  v.speedMode ? v.updateLayout() : v.updateData(cm, false, true);
+  v.updateData(cm, false, true);
   v.updateNotation = true; // update notation again
-}
+} // addOctaveElement()
 
 // wrapper for cleaning superfluous @accid.ges attributes
 export function cleanAccid(v, cm) {
@@ -495,9 +499,9 @@ export function renumberMeasures(v, cm, change) {
 
 
 
-// #############################################################################
-// # private functions                                                         #
-// #############################################################################
+// ############################################################################
+// # (mostly) private functions                                               #
+// ############################################################################
 
 // find xmlNode in textBuffer and remove it (including empty line)
 function removeInBuffer(cm, xmlNode) {
@@ -610,6 +614,33 @@ function toggleArticForNote(note, artic) {
   }
   // console.info('modified element: ', note);
   return uuid;
+}
+
+function pitchMover(el, deltaPitch) {
+  let oct = 4;
+  let pname = 'c';
+  let o;
+  let p;
+  if (['note'].includes(el.nodeName)) {
+    o = 'oct';
+    p = 'pname';
+  } else if (['rest', 'mRest', 'multiRest'].includes(el.nodeName)) {
+    o = 'oloc';
+    p = 'ploc';
+  }
+  if (el.hasAttribute(o)) oct = parseInt(el.getAttribute(o));
+  if (el.hasAttribute(p)) pname = el.getAttribute(p);
+  let pi = att.pnames.indexOf(pname) + deltaPitch;
+  if (pi > att.pnames.length - 1) {
+    pi -= att.pnames.length;
+    oct++;
+  } else if (pi < 0) {
+    pi += att.pnames.length;
+    oct--;
+  }
+  el.setAttribute(o, oct);
+  el.setAttribute(p, att.pnames[pi]);
+  return el;
 }
 
 function staffMover(cm, el, upwards) {

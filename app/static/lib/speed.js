@@ -9,7 +9,7 @@ export var meiNameSpace = 'http://www.music-encoding.org/ns/mei';
 export var xmlNameSpace = 'http://www.w3.org/XML/1998/namespace';
 
 // returns complete MEI code of given page (one-based), defined by sb and pb
-export function getPageFromDom(xmlDoc, pageNo = 1, whichBreaks = ['sb', 'pb']) {
+export function getPageFromDom(xmlDoc, pageNo = 1, breaks = ['sb', 'pb']) {
   let meiHeader = xmlDoc.getElementsByTagName('meiHead');
   if (!meiHeader) {
     console.info('getPageFromDom(): no meiHeader');
@@ -52,7 +52,12 @@ export function getPageFromDom(xmlDoc, pageNo = 1, whichBreaks = ['sb', 'pb']) {
 
   spdScore.appendChild(scoreDef); // is updated within readSection()
   spdScore.appendChild(baseSection);
-  var digger = readSection(xmlScore, pageNo, spdScore, whichBreaks);
+
+  let countingMode = 'measures';
+  if (Array.isArray(breaks)) countingMode = 'encodedBreaks';
+  else if (typeof breaks == 'object') countingMode = 'computedBreaks';
+
+  var digger = readSection(xmlScore, pageNo, spdScore, breaks, countingMode);
   var sections = xmlScore.childNodes;
   sections.forEach((item) => {
     if (item.nodeName == 'section') { // diggs into section hierachy
@@ -60,44 +65,83 @@ export function getPageFromDom(xmlDoc, pageNo = 1, whichBreaks = ['sb', 'pb']) {
     }
   });
 
+  // insert sb elements for each element except last
+  if (countingMode == 'computedBreaks' && Object.keys(breaks).length > 0) {
+    breaks[pageNo].forEach((id, i) => {
+      if (i < breaks[pageNo].length - 1) { // last element is a <pb>
+        let m = spdScore.querySelector('[*|id="' + id + '"]');
+        // console.info("spd(p:" + pageNo + " i:" + i + "): id=" + id + ", m:", m);
+        if (m) {
+          let sb = document.createElementNS(meiNameSpace, 'sb');
+          let next = m.nextSibling;
+          let parent = m.parentNode;
+          // console.info('...found. next:', next);
+          // console.info('...found. parent:', parent);
+          if (next && next.nodeType != Node.TEXT_NODE)
+            parent.insertBefore(sb, next);
+          else
+            parent.appendChild(sb);
+        }
+      }
+    });
+  }
+
   const serializer = new XMLSerializer();
   let mei = xmlDefs + serializer.serializeToString(spdNode);
-  // console.info('Speed() MEI: ' + mei);
+
+  // console.info('Speed() MEI: ', mei);
+
   return mei;
 }
 
 // recursive closure to dig through hierarchically stacked sections and append
 // only those elements within the requested pageNo
-function readSection(xmlScore, pageNo, spdScore, whichBreaks = ['sb', 'pb']) {
-  let p = 1;
-  let countBreaks = false;
+function readSection(xmlScore, pageNo, spdScore, breaks, countingMode) {
+  let p = 1; // page count
+  let mNo = 1; // measure count (for a fast first page, with breaks = '')
+  let mxMeasures = 50; // for a quick first page
+  let breaksSelector = '';
+  if (countingMode == 'encodedBreaks') breaksSelector = breaks.join(', ');
+  let countNow = false; // to ignore encoded page breaks before first measure
   let startingElements = [];
   let endingElements = [];
-  let whichBreaksSelector = whichBreaks.join(', ');
   return function digDeeper(section) {
     var children = section.childNodes;
     let lgt = children.length;
     for (let i = 0; i < lgt; i++) {
       // console.info('digDeeper(' + pageNo + '): p: ' + p +
       //   ', i: ' + i + ', ', children[i]);
+      if (countingMode == 'measures' && mNo >= mxMeasures) return spdScore;
       if (p > pageNo) break; // only until requested pageNo is processed
       if (children[i].nodeType === Node.TEXT_NODE) continue;
       var currentNodeName = children[i].nodeName;
       // ignore expansion lists
       if (['expansion'].includes(currentNodeName)) continue;
-      // console.info('digDeeper currentNodeName: ', currentNodeName + ', ' + children[i].getAttribute('xml:id'));
+      // console.info('digDeeper currentNodeName: ', currentNodeName + ', '
+      // + children[i].getAttribute('xml:id'));
       if (currentNodeName == 'section') {
         spdScore = digDeeper(children[i]);
         // console.info('digDeeper returned spdScore: ', spdScore);
         continue;
       }
       if (currentNodeName == 'measure') {
-        countBreaks = true;
+        countNow = true;
+        // increment m when counting measures for a quick first page
       }
-      if (countBreaks && whichBreaks.includes(currentNodeName)) {
-        p++; // skip breaks before content (that is, a measure)
-        continue;
-      }
+
+      if (countingMode == 'measures') {
+        if (currentNodeName == 'measure') mNo++;
+        else
+          Array.from(children[i].querySelectorAll('measure'))
+          .forEach(() => mNo++);
+      } else if (countingMode == "encodedBreaks") {
+        if (countNow && breaks.includes(currentNodeName)) {
+          p++; // skip breaks before content (that is, a measure)
+          continue;
+        }
+        // ignore system/page breaks in other countingModes
+      } else if (currentNodeName == 'sb' || currentNodeName == 'pb') continue;
+
       // update scoreDef @key.sig attribute or keySig@sig and
       // for @meter@count/@unit attr or meterSig@count/unit.
       if (currentNodeName == 'scoreDef' && p < pageNo) {
@@ -124,12 +168,13 @@ function readSection(xmlScore, pageNo, spdScore, whichBreaks = ['sb', 'pb']) {
       }
       // scoreDef with staffDef@key.sig or keySig@sig and meter@count/@unit
       var staffDefList = children[i].querySelectorAll(
-        whichBreaksSelector + ',staffDef');
+        breaksSelector ? breaksSelector + ', staffDef' : 'staffDef');
       if (staffDefList && staffDefList.length > 0 && p < pageNo) {
         // console.info('staffDef: ', staffDefList);
         var staffDefs = spdScore.querySelectorAll('staffDef');
         for (let st of staffDefList) {
-          if (whichBreaks.includes(st.nodeName)) break;
+          if (countingMode == 'encodedBreaks' && breaks.includes(st.nodeName))
+            break;
           var keysigValue = '',
             meterCountValue = '',
             meterUnitValue = '';
@@ -146,7 +191,7 @@ function readSection(xmlScore, pageNo, spdScore, whichBreaks = ['sb', 'pb']) {
               if (st.getAttribute('n') == staffDef.getAttribute('n')) {
                 var el = document.createElementNS(meiNameSpace, 'keySig');
                 el.setAttribute('sig', keysigValue);
-                // console.info('Updating scoreDef(' + st.getAttribute('n') + '): ', el);
+                //console.info('Updating scoreDef('+st.getAttribute('n')+'): ',el);
                 var k = staffDef.querySelector('keySig');
                 if (k) {
                   k.setAttribute('sig', keysigValue);
@@ -195,12 +240,14 @@ function readSection(xmlScore, pageNo, spdScore, whichBreaks = ['sb', 'pb']) {
         }
       }
       // update scoreDef with clef elements inside layers (and breaks to stop updating)
-      var clefList = children[i].querySelectorAll(whichBreaksSelector + ', clef');
+      var clefList = children[i].querySelectorAll(
+        breaksSelector ? breaksSelector + ', clef' : 'clef');
       if (clefList && clefList.length > 0 && p < pageNo) {
         // console.info('clefList: ', clefList);
         for (let clef of clefList) { // check clefs of measure, ignore @sameas
           if (clef.getAttribute('sameas')) continue;
-          if (whichBreaks.includes(clef.nodeName)) break;
+          if (countingMode == 'encodedBreaks' && breaks.includes(clef.nodeName))
+            break;
           let staff = clef.closest('staff, staffDef');
           let staffNo = -1;
           if (staff) staffNo = staff.getAttribute('n');
@@ -225,7 +272,7 @@ function readSection(xmlScore, pageNo, spdScore, whichBreaks = ['sb', 'pb']) {
         // console.info('LoopStart startingElements: ', startingElements);
         // console.info('LoopStart endingElements: ', endingElements);
         var listOfTargets = children[i].querySelectorAll('note, chord');
-        for (target of listOfTargets) {
+        for (let target of listOfTargets) {
           let id = '#' + target.getAttribute('xml:id');
           //
           let ends = section.querySelectorAll("[startid][endid='" + id + "']");
@@ -257,40 +304,67 @@ function readSection(xmlScore, pageNo, spdScore, whichBreaks = ['sb', 'pb']) {
         // console.info('LoopEnd endingElements: ', endingElements);
       }
       // special treatment for endings that contain breaks
-      if (['ending'].includes(currentNodeName) &&
-        (children[i].querySelector(whichBreaksSelector))) {
-        var endingNode = children[i].cloneNode(true); // copy elements containing breaks
-        var breakNode = endingNode.querySelector(whichBreaksSelector);
-        if (p == pageNo) { // breakNode.nextSibling && breakNode.nextSibling.nodeType != Node.TEXT_NODE ||
-          breakNode.parentNode.replaceChild(document.createElementNS(meiNameSpace, 'pb'), breakNode);
-          spdScore.getElementsByTagName('section').item(0).appendChild(endingNode);
+      if (['ending'].includes(currentNodeName) && breaksSelector &&
+        (children[i].querySelector(breaksSelector))) {
+        // copy elements containing breaks
+        var endingNode = children[i].cloneNode(true);
+        var breakNode = endingNode.querySelector(breaksSelector);
+        if (p == pageNo) {
+          breakNode.parentNode.replaceChild(
+            document.createElementNS(meiNameSpace, 'pb'), breakNode);
+          spdScore.getElementsByTagName('section')
+            .item(0).appendChild(endingNode);
         } else if (p == pageNo - 1) { // remove elements until first break
-          while (!whichBreaks.includes(endingNode.firstChild.nodeName)) {
+          while (!breaks.includes(endingNode.firstChild.nodeName)) {
             endingNode.removeChild(endingNode.firstChild);
           }
-          spdScore.getElementsByTagName('section').item(0).appendChild(endingNode);
+          spdScore.getElementsByTagName('section')
+            .item(0).appendChild(endingNode);
         }
         // console.info('Ending with break inside: ', endingNode);
         p++;
         continue;
       }
+
       // append children
       if (p == pageNo) {
-        spdScore.getElementsByTagName('section').item(0).appendChild(children[i].cloneNode(true));
+        let nodeCopy = children[i].cloneNode(true);
+        if (countingMode == 'computedBreaks') { // remove breaks from DOM
+          Array.from(nodeCopy.querySelectorAll('pb, sb')).forEach(b => {
+            if (b) nodeCopy.removeChild(b);
+          });
+        }
+        spdScore.getElementsByTagName('section').item(0).appendChild(nodeCopy);
         // console.info('digDeeper adds child to spdScore: ', spdScore);
       }
-    }
+
+      // increment in countingMode computedBreaks
+      if (countingMode == 'computedBreaks') {
+        if (currentNodeName == 'measure' &&
+          children[i].getAttribute('xml:id') == breaks[p][breaks[p].length - 1])
+          p++;
+        else {
+          let ms = Array.from(children[i].querySelectorAll('measure'));
+          ms.forEach(m => {
+            if (m.getAttribute('xml:id') == breaks[p][breaks[p].length - 1])
+              p++;
+          })
+        }
+      }
+
+    } // for loop across child nodes
 
     // console.info('2 startingElements: ', startingElements);
     // console.info('2 endingElements: ', endingElements);
+
     // 1) go through endingElements and add to first measure
     if (endingElements.length > 0 && pageNo > 1) {
       let m = spdScore.querySelector('[*|id="startingMeasure"]');
       let uuids = getIdsForDummyMeasure(m);
-      for (e of endingElements) {
+      for (let e of endingElements) {
         let endingElement = xmlScore.querySelector('[*|id="' + e + '"]');
         if (endingElement) {
-          let startid = removeHashFromString(endingElement.getAttribute('startid'));
+          let startid = rmHash(endingElement.getAttribute('startid'));
           let staff = xmlScore.querySelector('[*|id="' + startid + '"]');
           let staffNo = -1;
           if (staff) staffNo = staff.closest('staff').getAttribute('n');
@@ -302,8 +376,8 @@ function readSection(xmlScore, pageNo, spdScore, whichBreaks = ['sb', 'pb']) {
       }
       endingElements = [];
     }
+    // 2) go through startingElements and append to a third-page measure
     if (p > pageNo) {
-      // 2) go through startingElements and append to a third-page measure
       var m = spdScore.querySelector('[*|id="endingMeasure"]');
       if (!m) {
         let endingMeasure = dummyMeasure(countStaves(spdScore.querySelector('scoreDef')));
@@ -316,11 +390,11 @@ function readSection(xmlScore, pageNo, spdScore, whichBreaks = ['sb', 'pb']) {
         // console.info('work through startingElements.');
         m = spdScore.querySelector('[*|id="endingMeasure"]');
         let uuids = getIdsForDummyMeasure(m);
-        for (s of startingElements) {
+        for (let s of startingElements) {
           // console.info('startingElement s: ', s);
           let startingElement = xmlScore.querySelector('[*|id="' + s + '"]');
           if (startingElement) {
-            let endid = removeHashFromString(startingElement.getAttribute('endid'));
+            let endid = rmHash(startingElement.getAttribute('endid'));
             // console.info('searching for endid: ', endid);
             if (endid) {
               let staff = xmlScore.querySelector('[*|id="' + endid + '"]');
@@ -335,6 +409,7 @@ function readSection(xmlScore, pageNo, spdScore, whichBreaks = ['sb', 'pb']) {
         startingElements = [];
       }
     }
+
     return spdScore;
   }
 }
@@ -385,35 +460,6 @@ export function findByAttributeValue(xmlNode, attribute, value, elementName = "*
   }
 }
 
-// EXPERIMENTAL SKETCH: go through pages from Verovio to remember page breaks
-export function getBreaksFromToolkit(tk, text) {
-  tk.setOptions(this.vrvOptions);
-  tk.loadData(text);
-  tk.redoLayout();
-  var pageCount = tk.getPageCount();
-  // start from page 2 and go through document
-  for (let p = 2; p <= pageCount; p++) {
-    var svg = tk.renderToSVG(p);
-    // console.log('SVG page: ' + p + '.');
-    // console.info(svg);
-    // find first occurrence of <g id="measure-0000001450096684" class="measure">
-    var m = svg.match(/(?:<g\s)(?:id=)(?:['"])(\S+?)(?:['"])\s+?(?:class="measure">)/);
-    // console.info('Match: ', m);
-    if (m && m.length > 1)
-      console.info('Page ' + p + ', breaks before ' + m[1]);
-  }
-}
-
-// select
-export function getRangeOfString(buffer, str) {
-  let range;
-  buffer.scan(str, (obj) => {
-    range = obj.range;
-    obj.stop();
-  });
-  return range;
-}
-
 // convert xmlNode to string and remove meiNameSpace declaration from return string
 export function xmlToString(xmlNode) {
   let str = new XMLSerializer().serializeToString(xmlNode);
@@ -423,34 +469,42 @@ export function xmlToString(xmlNode) {
   return str.replace('xmlns="' + meiNameSpace + '" ', '');
 }
 
-export function getPageNumberAtCursor(textEditor, whichBreaks = ['pb', 'sb']) {
-  let cursorRow = textEditor.getCursorBufferPosition().row;
-  let text = textEditor.getBuffer();
-  let maxLines = text.getLineCount();
-  let pageNo = 1; // page number is one-based
-  let row = 0;
-  let countPages = false,
-    hasBreak = false;
-  while (row <= cursorRow && row <= maxLines) {
-    let line = text.lineForRow(row++);
-    if (line.includes('measure')) countPages = true; // skip trailing breaks
-    if (countPages) {
-      for (let i = 0; i < whichBreaks.length; i++) { // check breaks list
-        if (line.includes('<' + whichBreaks[i])) hasBreak = true;
+// Retrieve page number of element with xml:id id
+export function getPageWithElement(v, id) {
+  let sel = '';
+  let page = -1;
+  if (v.speedMode) {
+    let bs = document.getElementById('breaks-select').value;
+    // for speedMode: selector for all last measures and requested id
+    if (bs == 'auto' && Object.keys(v.pageBreaks).length > 0) {
+      for (let pg in v.pageBreaks) {
+        let br = v.pageBreaks[pg]; // array of breaks
+        sel += '[*|id="' + br[br.length - 1] + '"],';
       }
-      if (hasBreak) {
-        pageNo++;
-        hasBreak = false;
-      }
+      sel += '[*|id="' + id + '"]';
+      // for normale mode: selector for all breaks and requested id
+    } else if (bs == 'line') {
+      sel = 'pb,sb,[*|id="' + id + '"]'; // find all breaks in xmlDoc
+    } else if (bs == 'encoded') {
+      sel = 'pb,[*|id="' + id + '"]'; // find all breaks in xmlDoc
     }
+    let els = Array.from(v.xmlDoc.querySelectorAll(sel));
+    if (els) {
+      page = els.findIndex(el => el.getAttribute('xml:id') == id) + 1;
+      if (v.speedMode && page > 1 && // if element is within last measure, ...
+        els[page - 1].closest('measure') == els[page - 2])
+        page--; // ...undo increment
+    }
+    if (bs == 'line' || bs == 'encoded') {
+      els = v.xmlDoc.querySelectorAll('pb,measure');
+      let i;
+      for (i = 0; i < els.length; i++) {
+        if (els[i].nodeName != 'pb') break;
+      }
+      page -= i;
+    }
+    return page;
   }
-  return pageNo;
-}
-
-// EXPERIMENTAL SKETCH
-export function getPageNumberForElement(xmlDoc, xmlNode) {
-  nodeList = xmlDoc.querySelectorAll('pb, sb, *|id="' + xmlNode.getAttribute('xml:id') + '"');
-  console.info('nodeLIST: ', nodeList);
 }
 
 // returns an xmlNode with a <mei> element
@@ -505,16 +559,16 @@ export function dummyMeasure(staves = 2) {
   var m = document.createElementNS(meiNameSpace, 'measure');
   let i;
   for (i = 1; i <= staves; i++) {
-    note = document.createElementNS(meiNameSpace, 'note');
+    let note = document.createElementNS(meiNameSpace, 'note');
     note.setAttribute('pname', 'a');
     note.setAttribute('oct', '3');
     note.setAttribute('dur', '1');
     let uuid = 'note-' + utils.generateUUID();
     note.setAttributeNS(xmlNameSpace, 'xml:id', uuid);
-    layer = document.createElementNS(meiNameSpace, 'layer')
+    let layer = document.createElementNS(meiNameSpace, 'layer')
     layer.setAttribute('n', '1');
     layer.appendChild(note);
-    staff = document.createElementNS(meiNameSpace, 'staff');
+    let staff = document.createElementNS(meiNameSpace, 'staff');
     staff.setAttribute('n', i);
     staff.appendChild(layer);
     m.appendChild(staff);
@@ -538,10 +592,8 @@ export function countStaves(scoreDef) {
   return scoreDef.querySelectorAll('staffDef').length;
 }
 
-export function removeHashFromString(hashedString) {
-  if (hashedString.startsWith('#'))
-    hashedString = hashedString.split('#')[1];
-  return hashedString;
+export function rmHash(hashedString) {
+  if (hashedString.startsWith('#')) return hashedString.split('#')[1];
 }
 
 // filter selected elements and keep only highest in DOM

@@ -206,6 +206,7 @@ a:active {
   padding: 0 2px;
   min-height: 21px;
   min-width: 21px;
+  white-space: nowrap;
 }
 
 .inline-block-tight {
@@ -253,6 +254,7 @@ https://www.w3schools.com/css/css_tooltip.asp
   margin-left: -60px;
   opacity: 0;
   transition: opacity 0.3s;
+  white-space: normal;
 }
 
 .tooltip .tooltiptext::after {
@@ -357,4 +359,28 @@ span.keyIcon {
   content: "";
   display: table;
   clear: both;
+}
+
+/* CodeMirror fold gutter css styles */
+.CodeMirror-foldmarker {
+  font-family: arial;
+  cursor: pointer;
+}
+
+.CodeMirror-foldgutter {
+  width: .7em;
+}
+
+.CodeMirror-foldgutter-open,
+.CodeMirror-foldgutter-folded {
+  color: #555;
+  cursor: pointer;
+}
+
+.CodeMirror-foldgutter-open:after {
+  content: "\25BE";
+}
+
+.CodeMirror-foldgutter-folded:after {
+  content: "\25B8";
 }

@@ -37,14 +37,14 @@ import Viewer from './viewer.js';
 import Github from './github.js';
 
 
-const version = 'develop-0.1.6';
-const versionDate = '7 Jan 2022';
+const version = '0.2.1';
+const versionDate = '17 Jan 2022';
 const defaultMeiFileName = `${root}Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei`;
 const defaultVerovioOptions = {
   scale: 55,
   breaks: "auto",
-  header: "none",
-  footer: "none",
+  // header: "none",
+  // footer: "none",
   inputFrom: "mei",
   adjustPageHeight: "true",
   outputIndent: 3,
@@ -57,8 +57,8 @@ const defaultVerovioOptions = {
   minLastJustification: 0,
   clefChangeFactor: .83,
   svgAdditionalAttribute: ["layer@n", "staff@n"],
-  bottomMarginArtic: 1,
-  topMarginArtic: 1
+  bottomMarginArtic: 1.1,
+  topMarginArtic: 1.1
 };
 const defaultKeyMap = `${root}keymaps/default-keymap.json`;
 
@@ -181,8 +181,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
   addEventListeners(cm, v);
   addResizerHandlers(cm, v);
+  let doit;
+  window.onresize = () => {
+    clearTimeout(doit); // wait half a second before re-calculating orientation
+    doit = setTimeout(() => setOrientation(cm, '', v), 500);
+  };
 
   // ask worker to load Verovio
+  v.busy();
   vrvWorker.postMessage({
     'cmd': 'loadVerovio'
   });
@@ -541,17 +547,19 @@ function workerEventsHandler(ev) {
       document.querySelector(".statusbar").innerHTML =
         `Verovio ${tkVersion} loaded.`;
       setBreaksOptions(tkAvailableOptions);
-      v.updateAll(cm, defaultVerovioOptions);
+      openMei(); // open default MEI
+      v.busy(false);
       break;
     case 'mei': // returned from importData, importBinaryData
       mei = ev.data.mei;
-      if (!v.speedMode) v.pageCount = ev.data.pageCount;
+      v.pageCount = ev.data.pageCount;
       v.updateNotation = false;
       loadDataInEditor(mei);
       setFileChangedState(false);
       updateLocalStorage(mei);
       v.updateNotation = true;
       v.updateAll(cm, defaultVerovioOptions);
+      //v.busy(false);
       break;
     case 'updated': // display SVG data on site
       if (ev.data.mei) { // from reRenderMEI
@@ -561,14 +569,16 @@ function workerEventsHandler(ev) {
         updateLocalStorage(ev.data.mei);
         v.updateNotation = true;
         v.selectedElements = [];
-        if (!ev.data.removeIds)
-          v.selectedElements.push(ev.data.xmlId);
-
+        if (!ev.data.removeIds) v.selectedElements.push(ev.data.xmlId);
       }
-      if (ev.data.pageCount) v.pageCount = ev.data.pageCount;
+      let bs = document.getElementById('breaks-select').value;
+      if (ev.data.pageCount && (!v.speedMode || bs == 'none'))
+        v.pageCount = ev.data.pageCount;
+      else if (v.speedMode && bs == 'auto' &&
+        Object.keys(v.pageBreaks).length > 0)
+        v.pageCount = Object.keys(v.pageBreaks).length;
       v.currentPage = ev.data.pageNo;
-      document.querySelector(".statusbar").innerHTML =
-        meiFileName + ", pg " + v.currentPage + "/" + v.pageCount + " loaded.";
+      updateStatusBar();
       document.querySelector('title').innerHTML = 'mei-friend: ' +
         meiFileName.substr(meiFileName.lastIndexOf("/") + 1);
       document.querySelector('.verovio-panel').innerHTML = ev.data.svg;
@@ -577,12 +587,14 @@ function workerEventsHandler(ev) {
       v.addNotationEventListeners(cm);
       v.setNotationColors();
       v.updateHighlight(cm);
+      v.scrollSvg(cm);
       if (!"setFocusToVerovioPane" in ev.data || ev.data.setFocusToVerovioPane)
         v.setFocusToVerovioPane();
+      if (ev.data.computePageBreaks) v.computePageBreaks(cm);
+      else v.busy(false);
       break;
     case 'navigatePage': // resolve navigation with page turning
-      document.querySelector(".statusbar").innerHTML =
-        meiFileName + ", pg " + v.currentPage + "/" + v.pageCount + " loaded.";
+      updateStatusBar();
       document.querySelector('.verovio-panel').innerHTML = ev.data.svg;
       let ms = document.querySelectorAll('.measure'); // find measures on page
       if (ms.length > 0) {
@@ -598,8 +610,10 @@ function workerEventsHandler(ev) {
       }
       v.addNotationEventListeners(cm);
       v.setNotationColors();
+      v.scrollSvg(cm);
       v.updateHighlight(cm);
       v.setFocusToVerovioPane();
+      v.busy(false);
       break;
     case 'midi': // export MIDI file
       const byteCharacters = atob(ev.data.midi);
@@ -611,9 +625,28 @@ function workerEventsHandler(ev) {
         type: 'audio/midi'
       });
       var a = document.createElement('a');
-      a.download = meiFileName.replace(/\.[^/.]+$/, '.mid');
+      a.download = meiFileName
+        .substr(meiFileName.lastIndexOf("/") + 1)
+        .replace(/\.[^/.]+$/, '.mid');
       a.href = window.URL.createObjectURL(blob);
       a.click();
+      v.busy(false);
+      break;
+    case 'computePageBreaks':
+      v.pageBreaks = ev.data.pageBreaks;
+      v.pageCount = ev.data.pageCount;
+      console.log('Page breaks computed for ' +
+        meiFileName.substr(meiFileName.lastIndexOf("/") + 1) +
+        ', pageBreaks', v.pageBreaks);
+      v.updateData(cm, false, true);
+      updateStatusBar();
+      v.updatePageNumDisplay();
+      v.busy(false);
+      break;
+    case 'updateProgressbar':
+      document.querySelector(".statusbar").innerHTML =
+        "Compute page breaks: " + Math.round(ev.data.percentage) + "%";
+      setProgressBar(ev.data.percentage);
   }
 }
 
@@ -630,7 +663,6 @@ export function openMei(file = defaultMeiFileName, setFreshlyLoaded = true) {
   if (typeof file === "string") { // with fileName string
     meiFileName = file;
     console.info('openMei ' + meiFileName + ', ', cm);
-    moveProgressBar();
     fetch(meiFileName)
       .then((response) => response.text())
       .then((meiXML) => {
@@ -661,12 +693,12 @@ export function openMei(file = defaultMeiFileName, setFreshlyLoaded = true) {
       } else {
         reader.readAsText(file);
       }
-      moveProgressBar();
     });
     readingPromise.then(
       function(mei) {
         let found = false;
         v.clear();
+        v.busy();
         if (meiFileName.endsWith('.mxl')) { // compressed MusicXML file
           console.log('Load compressed XML file.', mei.slice(0, 128));
           vrvWorker.postMessage({
@@ -676,7 +708,7 @@ export function openMei(file = defaultMeiFileName, setFreshlyLoaded = true) {
           });
           found = true;
         } else if (meiFileName.endsWith('.abc')) { // abc notation file
-          console.log('Load ABC file.', mei.slice(0, 128)); 
+          console.log('Load ABC file.', mei.slice(0, 128));
           vrvWorker.postMessage({
             'cmd': 'importData',
             'format': 'abc',
@@ -714,10 +746,12 @@ export function openMei(file = defaultMeiFileName, setFreshlyLoaded = true) {
           else {
             log('Format not recognized: ' + meiFileName + '.');
           }
+          v.busy(false);
         }
       },
       function() {
         log('Loading dragged file ' + meiFileName + ' failed.');
+        v.busy(false);
       }
     );
   }
@@ -830,7 +864,8 @@ function downloadMei() {
   });
   let a = document.createElement('a');
   a.download = meiFileName
-    .replace(/\/static\//, '').replace(/\.[^/.]+$/, '.mei');
+    .substr(meiFileName.lastIndexOf("/") + 1)
+    .replace(/\.[^/.]+$/, '.mei');
   a.href = window.URL.createObjectURL(blob);
   a.click();
   // Now that the user has "saved" the MEI, clear the file change indicator
@@ -852,7 +887,9 @@ function downloadSvg() {
     type: 'image/svg+xml'
   });
   let a = document.createElement('a');
-  a.download = meiFileName.replace(/\.[^/.]+$/, '.svg');
+  a.download = meiFileName
+    .substr(meiFileName.lastIndexOf("/") + 1)
+    .replace(/\.[^/.]+$/, '.svg');
   a.href = window.URL.createObjectURL(blob);
   a.click();
 }
@@ -937,6 +974,12 @@ let cmd = {
   'addOctave8Below': () => e.addOctaveElement(v, cm, 'below', 8),
   'addOctave15Above': () => e.addOctaveElement(v, cm, 'above', 15),
   'addOctave15Below': () => e.addOctaveElement(v, cm, 'below', 15),
+  'addGClefChangeBefore': () => e.addClefChange(v, cm, 'G', '2', true),
+  'addCClefChangeBefore': () => e.addClefChange(v, cm, 'C', '3', true),
+  'addFClefChangeBefore': () => e.addClefChange(v, cm, 'F', '4', true),
+  'addGClefChangeAfter': () => e.addClefChange(v, cm, 'G', '2', false),
+  'addCClefChangeAfter': () => e.addClefChange(v, cm, 'C', '3', false),
+  'addFClefChangeAfter': () => e.addClefChange(v, cm, 'F', '4', false),
   'addBeam': () => e.addBeamElement(v, cm),
   'cleanAccid': () => e.cleanAccid(v, cm),
   'renumberMeasuresTest': () => e.renumberMeasures(v, cm, false),
@@ -1016,8 +1059,8 @@ function addEventListeners(cm, v) {
     .addEventListener('click', cmd.lastPage);
   document.getElementById('font-select')
     .addEventListener('change', () => v.updateOption());
-  document.getElementById('breaks-select')
-    .addEventListener('change', () => v.updateLayout());
+  document.getElementById('breaks-select').addEventListener('change',
+    () => (v.speedMode) ? v.updateAll(cm) : v.updateLayout());
   // navigation
   document.getElementById('backwards-btn')
     .addEventListener('click', cmd.previousNote);
@@ -1102,6 +1145,19 @@ function addEventListeners(cm, v) {
     .addEventListener('click', cmd.addOctave8Below);
   document.getElementById('addOctave15Below')
     .addEventListener('click', cmd.addOctave15Below);
+  // add clef change
+  document.getElementById('addGClefChangeBefore')
+    .addEventListener('click', cmd.addGClefChangeBefore);
+  document.getElementById('addCClefChangeBefore')
+    .addEventListener('click', cmd.addCClefChangeBefore);
+  document.getElementById('addFClefChangeBefore')
+    .addEventListener('click', cmd.addFClefChangeBefore);
+  document.getElementById('addGClefChangeAfter')
+    .addEventListener('click', cmd.addGClefChangeAfter);
+  document.getElementById('addCClefChangeAfter')
+    .addEventListener('click', cmd.addCClefChangeAfter);
+  document.getElementById('addFClefChangeAfter')
+    .addEventListener('click', cmd.addFClefChangeAfter);
   // toggle articulation
   document.getElementById('toggleStacc')
     .addEventListener('click', cmd.toggleStacc);
@@ -1113,19 +1169,6 @@ function addEventListeners(cm, v) {
     .addEventListener('click', cmd.toggleMarcato);
   document.getElementById('toggleStacciss')
     .addEventListener('click', cmd.toggleStacciss);
-
-  // update encoding through Verovio
-  // document.getElementById('verovio-btn')
-  //   .addEventListener('click', (ev) => vrvWorker.postMessage({
-  //     'cmd': 'reRenderMEI',
-  //     'format': 'mei',
-  //     'mei': cm.getValue(),
-  //     'xmlId': v.selectedElements[0],
-  //     'pageNo': v.currentPage,
-  //     'removeIds': ev.altKey
-  //   }));
-  // document.getElementById('help-btn')
-  //   .addEventListener('click', () => window.open('/help', '_blank'));
 
   // editor activity
   cm.on('cursorActivity', () => {
@@ -1164,7 +1207,6 @@ function addEventListeners(cm, v) {
     }
     v.notationUpdated(cm);
     if(storage) { 
-      // TODO evaluate performance hit!!
       // on every set of changes, save editor content
       storage.setItem("meiXml", meiXml); 
     }
@@ -1181,7 +1223,16 @@ function addEventListeners(cm, v) {
     if (ch.checked) v.notationUpdated(cm, true);
   });
 
-}
+  // speedmode checkbox
+  document.getElementById('speed-checkbox').addEventListener('change', (ev) => {
+    v.speedMode = ev.target.checked;
+    if (v.speedMode && Object.keys(v.pageBreaks).length > 0)
+      v.pageCount = Object.keys(v.pageBreaks).length;
+    // else
+    //   v.pageBreaks = {};
+    v.updateAll(cm);
+  });
+} // addEventListeners()
 
 // handle Github commit UI
 function handleCommitButtonClicked(e) {
@@ -1229,9 +1280,16 @@ function moveProgressBar() {
   }
 }
 
-// control progress bar width (in percent)
-function setProgressBarWidth(relWidth) {
-  document.querySelector(".progressbar").style.width = relWidth + '%';
+// control progress bar progress/width (in percent)
+function setProgressBar(percentage) {
+  document.querySelector(".progressbar").style.width = percentage + '%';
+}
+
+function updateStatusBar() {
+  document.querySelector(".statusbar").innerHTML =
+    meiFileName.substr(meiFileName.lastIndexOf("/") + 1) +
+    ", page " + v.currentPage + " of " +
+    ((v.pageCount < 0) ? '?' : v.pageCount) + " loaded.";
 }
 
 export function log(s) {

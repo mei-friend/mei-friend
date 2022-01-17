@@ -60,11 +60,33 @@ export function createControlsMenu(parentElement, scale) {
   });
   zoomCtrls.appendChild(notationNightModeBtn);
 
+
   // Pagination, page navigation
   let paginationCtrls = document.createElement('div');
   paginationCtrls.id = 'pagination-ctrls';
   paginationCtrls.classList.add('controls');
   controlsForm.appendChild(paginationCtrls);
+
+  // let sectionSelector = document.createElement('select');
+  // sectionSelector.id = "section-selector";
+  // sectionSelector.classList.add('icon');
+  // sectionSelector.classList.add('btn');
+  // sectionSelector.classList.add('icon-multi-select');
+  // sectionSelector.classList.add('inline-block-tight');
+  // addToolTip(sectionSelector, {
+  //   title: 'Navigate encoded section/ending structure'
+  // });
+  // sectionSelector.options.add(new Option('Var-I'));
+  // sectionSelector.options.add(new Option('| Var-I-A'));
+  // sectionSelector.options.add(new Option('| Var-I-B'));
+  // sectionSelector.options.add(new Option('| Var-I-B1'));
+  // sectionSelector.options.add(new Option('| Var-I-B2'));
+  // sectionSelector.options.add(new Option('Var-II'));
+  // sectionSelector.options.add(new Option('| Var-II-A'));
+  // sectionSelector.options.add(new Option('| Var-II-A1'));
+  // sectionSelector.options.add(new Option('| Var-II-A2'));
+  // sectionSelector.options.add(new Option('| Var-II-B'));
+  // paginationCtrls.appendChild(sectionSelector);
 
   let firstBtn = document.createElement('button');
   firstBtn.id = "first-page-btn";
@@ -286,6 +308,12 @@ export function createControlsMenu(parentElement, scale) {
   speedDiv.classList.add('controls');
   controlsForm.appendChild(speedDiv);
 
+  let verovioIcon = document.createElement('img');
+  verovioIcon.src = `${root}svg/v.svg`;
+  verovioIcon.classList.add('icon');
+  verovioIcon.id = 'verovio-icon';
+  speedDiv.appendChild(verovioIcon);
+
   let speedLabel = document.createElement('label');
   speedLabel.innerText = 'Speedmode:';
   speedLabel.id = 'speed-label';
@@ -302,8 +330,8 @@ export function createControlsMenu(parentElement, scale) {
   speedCheckbox.setAttribute('type', 'checkbox');
   speedCheckbox.setAttribute('checked', 'false');
   speedCheckbox.classList.add('checkbox');
-  speedCheckbox.checked = false;
-  speedCheckbox.disabled = true;
+  speedCheckbox.checked = true;
+  speedCheckbox.disabled = false;
   // addToolTip(speedCheckbox, {
   //   title: 'Speed mode (optimized notation rendering)'
   // });
@@ -363,6 +391,7 @@ export function addModifyerKeys(element) {
     cmdKey = "&#8984;"; // CMD
     cmd2Key = "&#8963;"; // CTRL
   }
+  let ctrlKey = "&#8963;"; // CTRL
   element.querySelectorAll(".altKey")
     .forEach(e => e.innerHTML = altKey + e.innerHTML);
   element.querySelectorAll(".shiftKey")
@@ -371,4 +400,6 @@ export function addModifyerKeys(element) {
     .forEach(e => e.innerHTML = cmd2Key + e.innerHTML);
   element.querySelectorAll(".cmdKey")
     .forEach(e => e.innerHTML = cmdKey + e.innerHTML);
+  element.querySelectorAll(".ctrlKey")
+    .forEach(e => e.innerHTML = ctrlKey + e.innerHTML);
 }

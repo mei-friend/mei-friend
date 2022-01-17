@@ -4,7 +4,6 @@ import {
 import * as speed from './speed.js';
 import * as utils from './utils.js';
 import * as dutils from './dom-utils.js';
-import * as att from './attribute-classes.js';
 import {
   addToolTip
 } from './control-menu.js';
@@ -21,33 +20,39 @@ export default class Viewer {
     this.notationNightMode = false;
     // this.tkOptions = this.vrvToolkit.getAvailableOptions();
     this.updateNotation = true; // whether or not notation gets re-rendered after text changes
-    this.speedMode = false; // speed mode (just feeds on page to Verovio to reduce drawing time)
+    this.speedMode = true; // speed mode (just feeds on page to Verovio to reduce drawing time)
     this.parser = new DOMParser();
     this.xmlDoc;
     this.encodingHasChanged = true; // to recalculate DOM or pageLists
-    this.pageList = {}; // object of page number and last measure id '1': 'measure-000423', ...
+    this.pageBreaks = {}; // object of page number and last measure id '1': 'measure-000423', ...
     // this.scoreDefList = []; // list of xmlNodes, one for each change, referenced by 5th element of pageList
     this.meiHeadRange = [];
     this.breaks = ['sb', 'pb'];
     this.toolTipTimeOutHandle = null; // handle for zoom tooltip hide timer
     this.vrvOptions;
-    this.doCursorUpdate = false;
+    this.verovioIcon = document.getElementById('verovio-icon');
   }
 
   // change options, load new data, render current page, add listeners, highlight
   updateAll(cm, options = {}) {
     this.setVerovioOptions(options);
+    let computePageBreaks = false;
+    if (this.speedMode && Object.keys(this.pageBreaks).length == 0 &&
+      document.getElementById('breaks-select').value == 'auto') {
+      computePageBreaks = true;
+      this.currentPage = 1;
+    }
     let message = {
       'cmd': 'updateAll',
       'options': this.vrvOptions,
       'mei': this.speedFilter(cm.getValue()),
       'pageNo': this.currentPage,
-      'xmlId': ''
-    };
+      'xmlId': '',
+      'speedMode': this.speedMode,
+      'computePageBreaks': computePageBreaks
+    }
+    this.busy();
     this.worker.postMessage(message);
-    // TODO txtEdr.setTabLength(3);
-    // console.info('updateAll: tabLength: ' + txtEdr.getTabLength() + ', editor: ', txtEdr);
-    // this.showLoadingMessage();
   }
 
   updateData(cm, setCursorToPageBeg = true, setFocusToVerovioPane = true) {
@@ -59,8 +64,11 @@ export default class Viewer {
       'pageNo': this.currentPage,
       'xmlId': '',
       'setCursorToPageBeginning': setCursorToPageBeg,
-      'setFocusToVerovioPane': setFocusToVerovioPane
+      'setFocusToVerovioPane': setFocusToVerovioPane,
+      'speedMode': this.speedMode,
+      'breaks': document.getElementById('breaks-select').value
     };
+    this.busy();
     this.worker.postMessage(message);
   }
 
@@ -72,11 +80,17 @@ export default class Viewer {
           'pageNo': this.currentPage,
           'xmlId': xmlId
         };
+        this.busy();
         this.worker.postMessage(message);
         // this.showCurrentPage();
       } else { // speed mode
-        this.updateData(cm);
-        // this.loadVerovioData(this.speedFilter(cm.getValue()));
+        if (this.encodingHasChanged) this.loadXml(cm.getValue());
+        if (xmlId) {
+          this.currentPage = speed.getPageWithElement(this, xmlId);
+          console.info('UpdatePage(speedMode=true): page: ' +
+            this.currentPage + ', xmlId: ' + xmlId);
+        }
+        this.updateData(cm, xmlId ? false : true, true);
       }
     }
   }
@@ -101,8 +115,10 @@ export default class Viewer {
       'cmd': what,
       'options': this.vrvOptions,
       'pageNo': this.currentPage,
-      'xmlId': id
+      'xmlId': id,
+      'speedMode': this.speedMode
     };
+    this.busy();
     this.worker.postMessage(message);
   }
 
@@ -110,44 +126,49 @@ export default class Viewer {
   // with normal mode: load DOM and pass-through the MEI code;
   // with speed mode: load into DOM (if encodingHasChanged) and
   // return MEI excerpt of currentPage page
-  speedFilter(mei, forceReload = false) {
+  speedFilter(mei, brks = ['sb', 'pb']) {
     // update DOM only if encoding has been edited or
-    this.loadXml(mei, forceReload);
-    if (!this.speedMode) return mei;
-    this.breaks = ['sb', 'pb'];
-    if ("encoded" == this.breaksSelector.options[
-        this.breaksSelector.selectedIndex].value) {
+    this.loadXml(mei);
+    let bs = document.getElementById('breaks-select');
+    if (!this.speedMode || bs.value == 'none') return mei;
+    this.breaks = brks;
+    if (bs.value == "encoded") {
       this.breaks = ['pb'];
+    } else if (bs.value == 'auto') {
+      this.breaks =
+        (Object.keys(this.pageBreaks).length == 0) ? '' : this.pageBreaks;
     }
-    // console.info('loadXml breaks: ', this.breaks);
-    if (this.encodingHasChanged || forceReload) {
+    // count pages from system/pagebreaks
+    if (Array.isArray(this.breaks)) {
       let elements = this.xmlDoc.querySelectorAll("measure, sb, pb");
       // count pages
       this.pageCount = 1; // pages are one-based
-      countBreaks = false;
-      for (e of elements) {
-        if (e.nodeName == 'measure') countBreaks = true; // skip trailing breaks
+      let countBreaks = false;
+      for (let e of elements) {
+        if (e.nodeName == 'measure') countBreaks = true; // skip leading breaks
         if (countBreaks && this.breaks.includes(e.nodeName))
           this.pageCount++;
       }
       if (this.currentPage > this.pageCount) this.currentPage = 1;
-      console.info('loadXml reloaded: currentPage: ' + this.currentPage +
+      console.info('xmlDOM pages counted: currentPage: ' + this.currentPage +
         ', pageCount: ' + this.pageCount);
-      this.encodingHasChanged = false;
-      // speed.getBreaksFromToolkit(this.vrvToolkit, txtEdr.getBuffer().getText());
     }
     return speed.getPageFromDom(this.xmlDoc, this.currentPage, this.breaks);
   }
 
   loadXml(mei, forceReload = false) {
-    if (this.encodingHasChanged || forceReload)
+    if (this.encodingHasChanged || forceReload) {
       this.xmlDoc = this.parser.parseFromString(mei, "text/xml");
+      this.encodingHasChanged = false;
+    }
   }
 
   clear() {
     this.selectedElements = [];
     this.lastNoteId = '';
     this.currentPage = 1;
+    this.pageCount = -1;
+    this.pageBreaks = {};
   }
 
   reRenderMei(cm, removeIds = false) {
@@ -158,7 +179,19 @@ export default class Viewer {
       'pageNo': this.currentPage,
       'removeIds': removeIds
     }
-    if (false && !removeIds) message.xmlId = this.selectedElements[0];
+    if (false && !removeIds) message.xmlId = this.selectedElements[0]; // TODO
+    this.busy();
+    this.worker.postMessage(message);
+  }
+
+  computePageBreaks(cm) {
+    let message = {
+      'cmd': 'computePageBreaks',
+      'options': this.vrvOptions,
+      'format': 'mei',
+      'mei': cm.getValue()
+    }
+    this.busy();
     this.worker.postMessage(message);
   }
 
@@ -169,8 +202,8 @@ export default class Viewer {
     if (zoom) this.vrvOptions.scale = parseInt(zoom.value);
     let fontSel = document.getElementById('font-select');
     if (fontSel) this.vrvOptions.font = fontSel.value;
-    let breaks = document.getElementById('breaks-select');
-    if (breaks && breaks.value) this.vrvOptions.breaks = breaks.value;
+    let bs = document.getElementById('breaks-select');
+    if (bs && bs.value) this.vrvOptions.breaks = bs.value;
     let dimensions = getVerovioContainerSize();
     let vp = document.querySelector('.verovio-panel');
     dimensions.width = vp.clientWidth;
@@ -182,11 +215,6 @@ export default class Viewer {
       this.vrvOptions.pageHeight = Math.max(Math.round(
         dimensions.height * (100 / this.vrvOptions.scale)), 250);
     }
-    if (this.vrvOptions.breaks === "encoded") {
-      // delete this.vrvOptions.pageWidth;
-      // this.vrvOptions.pageHeight = Math.round(this.vrvOptions.pageWidth * 1.5);
-    }
-
     // overwrite existing options if new ones are passed in
     // for (let key in newOptions) { this.vrvOptions[key] = newOptions[key]; }
     console.info('Verovio options updated: ', this.vrvOptions);
@@ -236,7 +264,8 @@ export default class Viewer {
 
   updatePageNumDisplay() {
     const l = document.getElementById("pagination-label");
-    if (l) l.innerHTML = `Page ${this.currentPage} of ${this.pageCount}`;
+    let pg = (this.pageCount < 0) ? '?' : this.pageCount;
+    if (l) l.innerHTML = `Page ${this.currentPage} of ${pg}`;
   }
 
   // set cursor to first note id in page, taking st/ly of id, if possible
@@ -278,14 +307,10 @@ export default class Viewer {
 
   handleClickOnNotation(e, cm) {
     e.stopImmediatePropagation();
-    console.info('click: ', e);
+    this.updateNotation = false;
+    // console.info('click: ', e);
     let itemId = String(e.currentTarget.id);
     if (itemId === "undefined") return;
-    let el = document.querySelector('g#' + itemId);
-    if (el.getAttribute('class') == 'note')
-      console.info('CLICK note: x ', dutils.getX(el));
-    else if (el.getAttribute('class') == 'chord')
-      console.info('CLICK chord: x ', dutils.getX(el));
     // take chord rather than note xml:id, when ALT is pressed
     let chordId = utils.insideParent(itemId);
     if (e.altKey && chordId) itemId = chordId;
@@ -312,7 +337,7 @@ export default class Viewer {
     // set lastNoteId to @startid or @staff of control element
     let startid = utils.getAttributeById(cm, itemId, "startid");
     if (startid && startid.startsWith('#')) startid = startid.split('#')[1];
-    // console.info('startid: ', startid);
+
     // if (!startid) { // work around for tstamp/staff
     // TODO: find note corresponding to @staff/@tstamp
     // startid = utils.getAttributeById(txtEdr.getBuffer(), itemId, attribute = 'tstamp');
@@ -320,28 +345,45 @@ export default class Viewer {
     // }
     if (startid) this.lastNoteId = startid;
     else this.lastNoteId = itemId;
-
-    // let elementName = 'undefined'; // retrieve element name
-    // if (elementString != '') {
-    //   elementName = elementString.match(/[\w.-]+/);
-    // }
-    // console.info('elementName: "' + elementName + '"');
-    // if (elementName == 'undefined') return;
-
-    // str = 'handleClickOnNotation() selected: ';
-    // for (i of this.selectedElements) console.info(str += i + ', ');
-    // console.info(str);
-  }
+    this.updateNotation = true;
+  } // handleClickOnNotation()
 
   // when cursor pos in editor changed, update notation location / highlight
   cursorActivity(cm, forceFlip = false) {
     let id = utils.getElementIdAtCursor(cm);
-    this.selectedElements = [].push(id);
+    this.selectedElements = [];
+    this.selectedElements.push(id);
     let fl = document.getElementById('flip-checkbox');
     if (!document.querySelector('g#' + id) &&
-      ((this.updateNotation && fl && fl.checked) || forceFlip))
+      ((this.updateNotation && fl && fl.checked) || forceFlip)) {
       this.updatePage(cm, '', id);
-    this.updateHighlight(cm);
+    } else if (this.updateNotation) {
+      this.scrollSvg(cm);
+      this.updateHighlight(cm);
+    }
+  }
+
+  scrollSvg(cm) {
+    let vp = document.querySelector('.verovio-panel');
+    let el = document.querySelector('g#' + utils.getElementIdAtCursor(cm));
+    if (el) {
+      let vpRect = vp.getBoundingClientRect();
+      let elRect = el.getBBox();
+      var mx = el.getScreenCTM();
+      // adjust scrolling only when element (close to or completely) outside
+      const closeToPerc = .1;
+      let sx = mx.a * elRect.x + mx.c * elRect.y + mx.e;
+      // kind-of page-wise flipping for x
+      if (sx < (vpRect.x + vpRect.width * closeToPerc))
+        vp.scrollLeft -= vpRect.x + vpRect.width * (1 - closeToPerc) - sx;
+      else if (sx > (vpRect.x + vpRect.width * (1 - closeToPerc)))
+        vp.scrollLeft -= vpRect.x + vpRect.width * closeToPerc - sx;
+      // y flipping
+      let sy = mx.b * elRect.x + mx.d * elRect.y + mx.f;
+      if (sy < (vpRect.y + vpRect.height * closeToPerc) ||
+        sy > (vpRect.y + vpRect.height * (1 - closeToPerc)))
+        vp.scrollTop -= vpRect.y + vpRect.height / 2 - sy;
+    }
   }
 
   // when editor emits changes, update notation rendering
@@ -437,12 +479,12 @@ export default class Viewer {
   // by 'dir' an by 'incrementElementName'
   navigate(cm, incElName = 'note', dir = 'forwards') {
     console.info('navigate(): lastNoteId: ', this.lastNoteId);
+    this.updateNotation = false;
     let id = this.lastNoteId;
     if (id == '') { // empty note id
       this.setCursorToPageBeginning(cm); // re-defines lastNotId
       id = this.lastNoteId;
     };
-    let elsList = '.note, .rest, .mRest, .beatRpt, .halfmRpt, .mRpt';
     let element = document.querySelector('g#' + id);
     if (!element) { // element off-screen
       this.setCursorToPageBeginning(cm); // re-defines lastNotId
@@ -458,19 +500,18 @@ export default class Viewer {
       let firstNote = document.querySelector('.measure').querySelector('.note');
       if (firstNote) id = firstNote.getAttribute('id');
     } else {
-      let layer = element.closest('.layer');
-      let staff = element.closest('.staff');
-      let lyNo = layer.getAttribute('data-n');
-      let stNo = staff.getAttribute('data-n');
-
       // find elements starting from current note id, element- or measure-wise
       if (incElName == 'note' || incElName == 'measure') {
-        id = dutils.getIdOfNextSvgElement(element, dir, elsList, incElName);
+        id = dutils.getIdOfNextSvgElement(element, dir, undefined, incElName);
         if (!id) { // when no id on screen, turn page
           let what = 'first'; // first/last note within measure
           if (dir == 'backwards' && incElName !== 'measure') what = 'last';
-          if (!this.changeCurrentPage(dir)) return; // turn page
-          this.navigateBeyondPage(dir, what, stNo, lyNo, y);
+          let lyNo = 1;
+          let layer = element.closest('.layer');
+          if (layer) lyNo = layer.getAttribute('data-n');
+          let staff = element.closest('.staff');
+          let stNo = staff.getAttribute('data-n');
+          this.navigateBeyondPage(cm, dir, what, stNo, lyNo, y);
           return;
         }
       }
@@ -478,7 +519,7 @@ export default class Viewer {
       // up/down in layers
       if (incElName == 'layer') {
         // console.info('navigate(u/d): x/y: ' + x + '/' + y + ', el: ', element);
-        let els = Array.from(measure.querySelectorAll(elsList));
+        let els = Array.from(measure.querySelectorAll(dutils.navElsSelector));
         els.sort(function(a, b) {
           if (Math.abs(dutils.getX(a) - x) > Math.abs(dutils.getX(b) - x))
             return 1;
@@ -515,20 +556,29 @@ export default class Viewer {
       this.selectedElements.push(id);
       this.lastNoteId = id;
     }
+    this.updateNotation = true;
+    this.scrollSvg(cm);
+    this.updateHighlight(cm);
   }
 
   // turn page for navigation and return svg directly
-  navigateBeyondPage(dir = 'forwards', what = 'first',
+  navigateBeyondPage(cm, dir = 'forwards', what = 'first',
     stNo = 1, lyNo = 1, y = 0) {
+    if (!this.changeCurrentPage(dir)) return; // turn page
     let message = {
       'cmd': 'navigatePage',
-      'mei': this.currentPage,
+      'pageNo': this.currentPage,
       'dir': dir,
       'what': what,
       'stNo': stNo,
       'lyNo': lyNo,
       'y': y
     };
+    if (this.speedMode) {
+      message.mei = this.speedFilter(cm.getValue());
+      message.speedMode = this.speedMode;
+    }
+    this.busy();
     this.worker.postMessage(message);
   }
 
@@ -553,20 +603,6 @@ export default class Viewer {
     );
   }
 
-  displaySVG(cm, svg) {
-    // document.querySelector(".statusbar").innerHTML =
-    //   meiFileName + ", pg " + v.currentPage + "/" + v.pageCount + " loaded.";
-    document.querySelector('.verovio-panel').innerHTML = svg;
-    // if (v.doCursorUpdate && false) { // DEBUG
-    //   v.setCursorToPageBeginning(cm);
-    //   v.doCursorUpdate = false;
-    // }
-    // this.addNotationEventListeners(cm);
-    // this.setNotationColors();
-    // this.updateHighlight(cm);
-    // this.setFocusToVerovioPane();
-  }
-
   findClosestNoteInChord(id, y) {
     if (id) { // if id within chord, find y-closest note to previous
       let ch = document.querySelector('g#' + id).closest('.chord');
@@ -585,5 +621,9 @@ export default class Viewer {
     }
   }
 
+  busy(active = true) {
+    if (active) this.verovioIcon.classList.add('loading');
+    else this.verovioIcon.classList.remove('loading');
+  }
 
 }

@@ -63,3 +63,20 @@
 * Add cute Github loading indicator animation
 # 0.1.5 patch
 * Fix github commit behaviour
+# 0.2.0 minor: speedMode support
+* Support for speedMode to be en/disabled through checkbox
+* SpeedMode support also for breaks='auto|smart' by computing breaks upon loading
+* Quick first page view when opening file in speedMode with automatic breaks
+* Verovio icon animation during worker activity
+* Center selected elements in editor upon notation click
+* Shift pitch of notes/rests inside selected parent elements (e.g., beams)
+* Insert G/F/C clef change before/after selected element
+* Clef change on selected note inserted before/after chord element
+* Center SVG to selected element upon cursor activity
+* Activate fold gutters in editor
+* Allow page numbers to be entered manually at mei-friend control menu
+# 0.2.1 patch: local storage
+* Implement local storage for files and github credentials
+* Improve Flask routing, add session storage
+* Implement file status and change tracking
+* Implement OpenUrl function
