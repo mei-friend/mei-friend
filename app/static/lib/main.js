@@ -564,7 +564,7 @@ function workerEventsHandler(ev) {
     case 'updated': // display SVG data on site
       if (ev.data.mei) { // from reRenderMEI
         v.updateNotation = false;
-        loadDataInEditor(v.data.mei);
+        loadDataInEditor(ev.data.mei);
         setFileChangedState(false);
         updateLocalStorage(ev.data.mei);
         v.updateNotation = true;
