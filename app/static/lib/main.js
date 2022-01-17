@@ -100,9 +100,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let meiXmlFromStorage = storage.getItem("meiXml");
     let githubFromStorage = storage.getItem("github");
     let fileChangedFromStorage = storage.getItem("fileChanged");
-    console.log("FOUND: ", fileChangedFromStorage);
     fileChangedFromStorage = fileChangedFromStorage ? parseInt(storage.getItem("fileChanged")) : 0;
-    console.log("NOW: ", fileChangedFromStorage);
     setFileChangedState(fileChangedFromStorage);
     if(meiXmlFromStorage) { 
       meiFileName = storage.getItem("meiFileName");
@@ -740,6 +738,15 @@ function openFileDialog(accept = '*') {
       meiFileLocation = "";
       meiFileLocationPrintable = "";
       openMei(files[0]);
+      if(isLoggedIn) { 
+        // re-initialise github menu since we're now working locally
+        github.filepath = "";
+        github.branch = "";
+        if(storage) { 
+          updateGithubInLocalStorage();
+        }
+        refreshGithubMenu();
+      }
     } else {
       log('OpenFile Dialog: Multiple files not supported.');
     }
@@ -779,6 +786,15 @@ async function openUrlFetch() {
         meiFileLocationPrintable = url.hostname;
         meiFileName =
           url.pathname.substr(url.pathname.lastIndexOf("/")+1);
+        if(isLoggedIn) { 
+          // re-initialise github menu since we're now working from a URL
+          github.filepath = "";
+          github.branch = "";
+          if(storage) { 
+            updateGithubInLocalStorage();
+          }
+          refreshGithubMenu();
+        }
         updateFileStatusDisplay();
         loadDataInEditor(data);
         setFileChangedState(false);
