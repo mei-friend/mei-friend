@@ -150,6 +150,10 @@ export default class Viewer {
         if (countBreaks && this.breaks.includes(e.nodeName))
           this.pageCount++;
       }
+      for (let e of Array.from(elements).reverse()) { // skip trailing breaks
+        if (e.nodeName == 'measure') break;
+        if (countBreaks && this.breaks.includes(e.nodeName)) this.pageCount--;
+      }
       if (this.currentPage > this.pageCount) this.currentPage = 1;
       console.info('xmlDOM pages counted: currentPage: ' + this.currentPage +
         ', pageCount: ' + this.pageCount);
