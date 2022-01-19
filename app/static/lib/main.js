@@ -21,6 +21,10 @@ import {
   dragLeave
 } from './dragger.js';
 import {
+  openUrl,
+  openUrlCancel
+} from './open-url.js';
+import {
   createControlsMenu,
   setBreaksOptions,
   addModifyerKeys,
@@ -395,6 +399,59 @@ function updateFileStatusDisplay() {
   document.querySelector("#fileName").innerText = meiFileName;
   document.querySelector("#fileLocation").innerText = meiFileLocationPrintable;
   document.querySelector("#fileLocation").title = meiFileLocation;
+}
+
+export async function openUrlFetch() { 
+  let urlInput = document.querySelector("#openUrlInput");
+  let urlStatus = document.querySelector("#openUrlStatus");
+  try { 
+    const url = new URL(urlInput.value);
+    const response = await fetch(url, {
+      method: 'GET', 
+      headers: {'Accept': 'application/xml, text/xml, application/mei+xml'}
+    });
+    if(response.status >= 400) {
+      console.warn("Fetching URL produced error status: ", response.status);
+      urlStatus.innerHTML = 
+        `${response.status}: ${response.statusText.toLowerCase()}`
+      urlStatus.classList.add("warn");
+      urlInput.classList.add("warn");
+    } else { 
+      urlStatus.innerHTML = "";
+      urlStatus.classList.remove("warn");
+      urlInput.classList.remove("warn");
+      response.text().then((data) => {
+        meiFileLocation = url.href;
+        meiFileLocationPrintable = url.hostname;
+        meiFileName =
+          url.pathname.substr(url.pathname.lastIndexOf("/")+1);
+        if(isLoggedIn) { 
+          // re-initialise github menu since we're now working from a URL
+          github.filepath = "";
+          github.branch = "";
+          if(storage) { 
+            updateGithubInLocalStorage();
+          }
+          refreshGithubMenu();
+        }
+        updateFileStatusDisplay();
+        loadDataInEditor(data);
+        setFileChangedState(false);
+        updateLocalStorage(data);
+        openUrlCancel(); //hide open URL UI elements 
+      });  
+    } 
+  } 
+  catch (err) {
+    console.warn("Error opening URL provided by user: ", err);
+    if(err instanceof TypeError) { 
+      urlStatus.innerHTML = "CORS error";
+    } else { 
+      urlStatus.innerHTML = "Invalid URL, please fix..."
+    }
+    urlInput.classList.add("warn");
+    urlStatus.classList.add("warn");
+  }
 }
 
 
@@ -804,76 +861,6 @@ function openFileDialog(accept = '*') {
   input.click();
 }
 
-function openUrl() { 
-  // user has selected "Open URL" from menu
-  // => show Open URL interface, hide file status display 
-  let fileStatusElement = document.querySelector(".fileStatus");
-  let openUrlElement = document.querySelector(".openUrlUI");
-  // hide file status, show openUrl
-  fileStatusElement.style.display = "none";
-  openUrlElement.style.display = "block";
-}
-
-async function openUrlFetch() { 
-  let urlInput = document.querySelector("#openUrlInput");
-  let urlStatus = document.querySelector("#openUrlStatus");
-  try { 
-    const url = new URL(urlInput.value);
-    const response = await fetch(url, {
-      method: 'GET', 
-      headers: {'Accept': 'application/xml, text/xml, application/mei+xml'}
-    });
-    if(response.status >= 400) {
-      console.warn("Fetching URL produced error status: ", response.status);
-      urlStatus.innerHTML = 
-        `${response.status}: ${response.statusText.toLowerCase()}`
-      urlInput.classList.add("warn");
-    } else { 
-      urlStatus.innerHTML = "";
-      urlInput.classList.remove("warn");
-      response.text().then((data) => {
-        meiFileLocation = url.href;
-        meiFileLocationPrintable = url.hostname;
-        meiFileName =
-          url.pathname.substr(url.pathname.lastIndexOf("/")+1);
-        if(isLoggedIn) { 
-          // re-initialise github menu since we're now working from a URL
-          github.filepath = "";
-          github.branch = "";
-          if(storage) { 
-            updateGithubInLocalStorage();
-          }
-          refreshGithubMenu();
-        }
-        updateFileStatusDisplay();
-        loadDataInEditor(data);
-        setFileChangedState(false);
-        updateLocalStorage(data);
-        openUrlCancel(); //hide open URL UI elements 
-      });  
-    } 
-  } 
-  catch (err) {
-    console.warn("Error opening URL provided by user: ", err);
-    if(err instanceof TypeError) { 
-      urlStatus.innerHTML = "CORS error";
-    } else { 
-      urlStatus.innerHTML = "Invalid URL, please fix..."
-    }
-    urlInput.classList.add("warn");
-  }
-}
-
-function openUrlCancel() { 
-  // user has cancelled the "Open URL" action
-  // => hide Open URL interface, show file status display 
-  let fileStatusElement = document.querySelector(".fileStatus");
-  let openUrlElement = document.querySelector(".openUrlUI");
-  // show file status, hide openUrl
-  openUrlElement.style.display = "none";
-  fileStatusElement.style.display = "block";
-}
-
 function downloadMei() {
   let blob = new Blob([cm.getValue()], {
     type: 'text/plain'
@@ -1034,7 +1021,10 @@ document.getElementById('openUrlButton')
 document.getElementById('openUrlCancel')
   .addEventListener('click', cmd.openUrlCancel);
 document.getElementById('openUrlInput')
-  .addEventListener('input', (e) => e.target.classList.remove("warn"));
+  .addEventListener('input', (e) => {
+    e.target.classList.remove("warn");
+    document.getElementById("openUrlStatus").classList.remove("warn");
+  });
 
 // drag'n'drop handlers
 let fc = document.querySelector('.dragContainer');
