@@ -43,8 +43,8 @@ import Viewer from './viewer.js';
 import Github from './github.js';
 
 
-const version = 'develop-0.2.1';
-const versionDate = '17 Jan 2022';
+const version = 'develop-0.2.2';
+const versionDate = '19 Jan 2022';
 const defaultMeiFileName = `${root}Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei`;
 const defaultVerovioOptions = {
   scale: 55,
