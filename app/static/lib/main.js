@@ -611,6 +611,8 @@ function workerEventsHandler(ev) {
         // open default mei file
         openMei(); 
       } else { 
+        // open stored data, setting vrv options first
+        v.updateOption(defaultVerovioOptions);
         loadDataInEditor(storage.getItem("meiXml"));
       }
       v.busy(false);
