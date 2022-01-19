@@ -69,10 +69,10 @@ const defaultVerovioOptions = {
 const defaultKeyMap = `${root}keymaps/default-keymap.json`;
 
 let storage;
-try { 
+try {
   storage = window.localStorage;
-} 
-catch(err) { 
+}
+catch(err) {
   console.error("Unable to access local storage: ", err);
 }
 
@@ -402,22 +402,22 @@ function updateFileStatusDisplay() {
   document.querySelector("#fileLocation").title = meiFileLocation;
 }
 
-export async function openUrlFetch() { 
+export async function openUrlFetch() {
   let urlInput = document.querySelector("#openUrlInput");
   let urlStatus = document.querySelector("#openUrlStatus");
-  try { 
+  try {
     const url = new URL(urlInput.value);
     const response = await fetch(url, {
-      method: 'GET', 
+      method: 'GET',
       headers: {'Accept': 'application/xml, text/xml, application/mei+xml'}
     });
     if(response.status >= 400) {
       console.warn("Fetching URL produced error status: ", response.status);
-      urlStatus.innerHTML = 
+      urlStatus.innerHTML =
         `${response.status}: ${response.statusText.toLowerCase()}`
       urlStatus.classList.add("warn");
       urlInput.classList.add("warn");
-    } else { 
+    } else {
       urlStatus.innerHTML = "";
       urlStatus.classList.remove("warn");
       urlInput.classList.remove("warn");
@@ -426,11 +426,11 @@ export async function openUrlFetch() {
         meiFileLocationPrintable = url.hostname;
         meiFileName =
           url.pathname.substr(url.pathname.lastIndexOf("/")+1);
-        if(isLoggedIn) { 
+        if(isLoggedIn) {
           // re-initialise github menu since we're now working from a URL
           github.filepath = "";
           github.branch = "";
-          if(storage) { 
+          if(storage) {
             updateGithubInLocalStorage();
           }
           refreshGithubMenu();
@@ -443,15 +443,15 @@ export async function openUrlFetch() {
         updateLocalStorage(data);
         v.updateNotation = true;
         v.updateAll(cm);
-        openUrlCancel(); //hide open URL UI elements 
-      });  
-    } 
-  } 
+        openUrlCancel(); //hide open URL UI elements
+      });
+    }
+  }
   catch (err) {
     console.warn("Error opening URL provided by user: ", err);
-    if(err instanceof TypeError) { 
+    if(err instanceof TypeError) {
       urlStatus.innerHTML = "CORS error";
-    } else { 
+    } else {
       urlStatus.innerHTML = "Invalid URL, please fix..."
     }
     urlInput.classList.add("warn");
@@ -611,10 +611,10 @@ function workerEventsHandler(ev) {
       document.querySelector(".statusbar").innerHTML =
         `Verovio ${tkVersion} loaded.`;
       setBreaksOptions(tkAvailableOptions);
-      if(!storage || !meiFileName) { 
+      if(!storage || !meiFileName) {
         // open default mei file
-        openMei(); 
-      } else { 
+        openMei();
+      } else {
         // open stored data, setting vrv options first
         v.clear();
         v.updateNotation = false;
@@ -649,7 +649,7 @@ function workerEventsHandler(ev) {
       let ss = document.getElementById('section-selector');
       while (ss.options.length > 0) ss.remove(0); // clear existing options
       let sections = generateSectionSelect(v.xmlDoc);
-      if (sections.length > 0) {
+      if (sections.length > 1) {
         sections.forEach(opt => ss.options.add(new Option(opt[0], opt[1])));
         ss.style.display = 'block';
       } else {
