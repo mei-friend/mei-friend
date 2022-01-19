@@ -436,9 +436,13 @@ export async function openUrlFetch() {
           refreshGithubMenu();
         }
         updateFileStatusDisplay();
+        v.clear();
+        v.updateNotation = false;
         loadDataInEditor(data);
         setFileChangedState(false);
         updateLocalStorage(data);
+        v.updateNotation = true;
+        v.updateAll(cm);
         openUrlCancel(); //hide open URL UI elements 
       });  
     } 
@@ -612,8 +616,11 @@ function workerEventsHandler(ev) {
         openMei(); 
       } else { 
         // open stored data, setting vrv options first
-        v.updateOption(defaultVerovioOptions);
+        v.clear();
+        v.updateNotation = false;
         loadDataInEditor(storage.getItem("meiXml"));
+        v.updateNotation = true;
+        v.updateAll(cm, defaultVerovioOptions);
       }
       v.busy(false);
       break;
