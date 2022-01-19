@@ -20,5 +20,4 @@ export function openUrlCancel() {
   let openUrlElement = document.querySelector(".openUrlOverlay");
   // show file status, hide openUrl
   openUrlElement.style.display = "none";
-  fileStatusElement.style.display = "block";
 }

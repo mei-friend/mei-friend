@@ -163,14 +163,11 @@
   background: white;
   color: green;
   white-space: nowrap;
+  display: flex;
 }
 
 .fileStatus #fileName{
   white-space: pre;
-}
-
-.fileStatus #fileChanged {
-  margin-left: -1em;
 }
 
 .fileStatus.warn { 
