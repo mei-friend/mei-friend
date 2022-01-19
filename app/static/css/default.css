@@ -73,7 +73,43 @@ a:active {
   z-index: 200;
 }
 
-.dragOverlayText {
+.openUrlOverlay {
+  position: fixed;
+  display: none;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,.8);
+  z-index: 190;
+}
+
+.openUrlOverlay .openUrlUI{
+  position: absolute;
+  top: 20%;
+  left: 20%;
+  width: 60%;
+  height: 60%;
+  border: 5px solid darkblue;
+  border-radius: 32px;
+  background-color: cornflowerblue;
+  color:white;
+  z-index: 190;
+}
+
+.openUrlOverlay .openUrlUI > div {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width:80%;
+  transform: translate(-50%, -50%);
+}
+
+.openUrlOverlay .openUrlUI input {
+  width:70%;
+}
+
+.dragOverlayText, {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -82,6 +118,22 @@ a:active {
   transform: translate(-50%, -50%);
   -ms-transform: translate(-50%, -50%);
 }
+
+#openUrlStatus { 
+  font-size: small;
+  color: crimson;
+  visibility: hidden;
+}
+
+#openUrlStatus.warn {
+  visibility: visible;
+}
+
+#openUrlInput.warn { 
+  border: 1px solid crimson;
+  background-color: mistyrose;
+}
+
 
 .friendContainer {
   border: 3px solid lightsteelblue;

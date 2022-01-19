@@ -80,3 +80,6 @@
 * Improve Flask routing, add session storage
 * Implement file status and change tracking
 * Implement OpenUrl function
+# 0.2.2 patch
+* Move OpenUrl functionality into a new modal display
+* Fix regression error where storage was ignored on vrvLoaded

@@ -21,6 +21,10 @@ import {
   dragLeave
 } from './dragger.js';
 import {
+  openUrl,
+  openUrlCancel
+} from './open-url.js';
+import {
   createControlsMenu,
   setBreaksOptions,
   addModifyerKeys,
@@ -39,8 +43,8 @@ import Viewer from './viewer.js';
 import Github from './github.js';
 
 
-const version = 'develop-0.2.1';
-const versionDate = '17 Jan 2022';
+const version = 'develop-0.2.2';
+const versionDate = '19 Jan 2022';
 const defaultMeiFileName = `${root}Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei`;
 const defaultVerovioOptions = {
   scale: 55,
@@ -65,9 +69,10 @@ const defaultVerovioOptions = {
 const defaultKeyMap = `${root}keymaps/default-keymap.json`;
 
 let storage;
-try {
+try { 
   storage = window.localStorage;
-} catch (err) {
+} 
+catch(err) { 
   console.error("Unable to access local storage: ", err);
 }
 
@@ -97,13 +102,13 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   // restore localStorage if we have it
-  if (storage) {
+  if(storage) {
     let meiXmlFromStorage = storage.getItem("meiXml");
     let githubFromStorage = storage.getItem("github");
     let fileChangedFromStorage = storage.getItem("fileChanged");
     fileChangedFromStorage = fileChangedFromStorage ? parseInt(storage.getItem("fileChanged")) : 0;
     setFileChangedState(fileChangedFromStorage);
-    if (meiXmlFromStorage) {
+    if(meiXmlFromStorage) {
       meiFileName = storage.getItem("meiFileName");
       meiFileLocation = storage.getItem("meiFileLocation");
       meiFileLocationPrintable = storage.getItem("meiFileLocationPrintable");
@@ -111,14 +116,14 @@ document.addEventListener('DOMContentLoaded', function() {
       // on initial page load, CM doesn't fire a "changes" event
       // so we don't need to skip the "freshly loaded" change
       // hence the "false" on the following line:
-      loadDataInEditor(meiXmlFromStorage, false);
+      loadDataInEditor(meiXmlFromStorage,false);
     } else {
       meiFileLocation = "";
       meiFileLocationPrintable = "";
       openMei(undefined, false); // default MEI, skip freshly loaded (see comment above)
       setFileChangedState(false);
     }
-    if (githubFromStorage) {
+    if(githubFromStorage) {
       // use github object from local storage if available
       isLoggedIn = true;
       githubFromStorage = JSON.parse(githubFromStorage);
@@ -132,32 +137,32 @@ document.addEventListener('DOMContentLoaded', function() {
         githubFromStorage.userEmail
       )
       document.querySelector("#fileLocation").innerText = meiFileLocationPrintable;
-    } else if (isLoggedIn) {
+    } else if(isLoggedIn){
       // initialise and store new github object
       github = new Github("", githubToken, "", "", userLogin, userName, userEmail);
       storage.setItem("github", JSON.stringify({
-        githubRepo: github.githubRepo,
-        githubToken: github.githubToken,
-        branch: github.branch,
-        filepath: github.filepath,
-        userLogin: github.userLogin,
-        userName: userName,
-        userEmail: userEmail
+        githubRepo:   github.githubRepo,
+        githubToken:  github.githubToken,
+        branch:       github.branch,
+        filepath:     github.filepath,
+        userLogin:    github.userLogin,
+        userName:     userName,
+        userEmail:    userEmail
       }));
     }
   } else { // no local storage
-    if (isLoggedIn) { // initialise new github object
+    if(isLoggedIn) { // initialise new github object
       github = new Github("", githubToken, "", "", userLogin, userName, userEmail);
     }
     meiFileLocation = "";
     meiFileLocationPrintable = "";
     openMei(); // default MEI
   }
-  if (isLoggedIn) {
+  if(isLoggedIn) {
     // regardless of storage availability:
     // if we are logged in, refresh github menu
     refreshGithubMenu();
-    if (github.githubRepo && github.branch && github.filepath) {
+    if(github.githubRepo && github.branch && github.filepath) {
       // preset github menu to where the user left off, if we can
       fillInBranchContents();
     }
@@ -200,7 +205,7 @@ document.addEventListener('DOMContentLoaded', function() {
 function assignGithubMenuClickHandlers() {
   const githubLoadingIndicator = document.getElementById("GithubLogo");
   const logoutButton = document.getElementById('GithubLogout');
-  if (logoutButton) {
+  if(logoutButton) {
     logoutButton.addEventListener('click', (ev) => {
       logoutFromGithub();
     });
@@ -303,45 +308,47 @@ function assignGithubMenuClickHandlers() {
 function updateLocalStorage(meiXml) {
   // if storage is available, save file name, location, content
   // if we're working with github, save github metadata
-  if (storage) {
+  if(storage) {
     try {
       storage.setItem("meiFileName", meiFileName);
       storage.setItem("meiFileLocation", meiFileLocation);
       storage.setItem("meiFileLocationPrintable", meiFileLocationPrintable);
       storage.setItem("meiXml", meiXml);
-      if (isLoggedIn) {
+      if(isLoggedIn) {
         updateGithubInLocalStorage();
       }
-    } catch (err) {
+    }
+    catch(err) {
       console.error("Could not save file content to local storage. Content may be too big? Content length: ", meiXml.length, err);
     }
   }
 }
 
 function updateGithubInLocalStorage() {
-  if (storage && isLoggedIn) {
+  if(storage && isLoggedIn) {
     const author = github.author;
     const name = author.name;
     const email = author.email;
     const githubToStorage = JSON.stringify({
-      githubRepo: github.githubRepo,
-      githubToken: github.githubToken,
-      branch: github.branch,
-      filepath: github.filepath,
-      userLogin: github.userLogin,
-      userName: name,
-      userEmail: email
+      githubRepo:   github.githubRepo,
+      githubToken:  github.githubToken,
+      branch:       github.branch,
+      filepath:     github.filepath,
+      userLogin:    github.userLogin,
+      userName:     name,
+      userEmail:    email
     })
     try {
       storage.setItem("github", githubToStorage);
-    } catch (err) {
+    }
+    catch(err) {
       console.error("Could not save Github metadata to local storage. Content may be too big? Content length: ", githubToStorage.length);
     }
   }
 }
 
 function logoutFromGithub() {
-  if (storage) {
+  if(storage) {
     // remove github object from local storage
     storage.removeItem("github");
   }
@@ -359,7 +366,7 @@ function refreshGithubMenu(e) {
   githubMenu.classList.remove("loggedOut");
   githubMenu.innerHTML =
     `<a id="GithubLogout" href="#">Log out</a>`
-  if (!github.filepath) {
+  if(!github.filepath) {
     githubMenu.innerHTML += `
     <hr class="dropdown-line">
     <a id="repositoriesHeader" class="dropdown-head" href="#"><b>Select repository:</b></a>`
@@ -372,18 +379,18 @@ function setFileChangedState(fileChangedState) {
   const fileStatusElement = document.querySelector(".fileStatus");
   const fileChangedIndicatorElement = document.querySelector("#fileChanged");
   const commitUI = document.querySelector("#commitUI");
-  if (fileChanged) {
+  if(fileChanged) {
     fileStatusElement.classList.add("warn");
     fileChangedIndicatorElement.innerText = "*";
   } else {
     fileStatusElement.classList.remove("warn");
     fileChangedIndicatorElement.innerText = "";
   }
-  if (isLoggedIn && github && github.filepath && commitUI) {
+  if(isLoggedIn && github && github.filepath && commitUI) {
     document.getElementById("commitMessageInput").disabled = !fileChanged;
     document.getElementById("commitButton").disabled = !fileChanged;
   }
-  if (storage) {
+  if(storage) {
     storage.setItem("fileChanged", fileChanged ? 1 : 0)
   }
 }
@@ -393,6 +400,59 @@ function updateFileStatusDisplay() {
     meiFileName.substr(meiFileName.lastIndexOf("/") + 1);
   document.querySelector("#fileLocation").innerText = meiFileLocationPrintable;
   document.querySelector("#fileLocation").title = meiFileLocation;
+}
+
+export async function openUrlFetch() { 
+  let urlInput = document.querySelector("#openUrlInput");
+  let urlStatus = document.querySelector("#openUrlStatus");
+  try { 
+    const url = new URL(urlInput.value);
+    const response = await fetch(url, {
+      method: 'GET', 
+      headers: {'Accept': 'application/xml, text/xml, application/mei+xml'}
+    });
+    if(response.status >= 400) {
+      console.warn("Fetching URL produced error status: ", response.status);
+      urlStatus.innerHTML = 
+        `${response.status}: ${response.statusText.toLowerCase()}`
+      urlStatus.classList.add("warn");
+      urlInput.classList.add("warn");
+    } else { 
+      urlStatus.innerHTML = "";
+      urlStatus.classList.remove("warn");
+      urlInput.classList.remove("warn");
+      response.text().then((data) => {
+        meiFileLocation = url.href;
+        meiFileLocationPrintable = url.hostname;
+        meiFileName =
+          url.pathname.substr(url.pathname.lastIndexOf("/")+1);
+        if(isLoggedIn) { 
+          // re-initialise github menu since we're now working from a URL
+          github.filepath = "";
+          github.branch = "";
+          if(storage) { 
+            updateGithubInLocalStorage();
+          }
+          refreshGithubMenu();
+        }
+        updateFileStatusDisplay();
+        loadDataInEditor(data);
+        setFileChangedState(false);
+        updateLocalStorage(data);
+        openUrlCancel(); //hide open URL UI elements 
+      });  
+    } 
+  } 
+  catch (err) {
+    console.warn("Error opening URL provided by user: ", err);
+    if(err instanceof TypeError) { 
+      urlStatus.innerHTML = "CORS error";
+    } else { 
+      urlStatus.innerHTML = "Invalid URL, please fix..."
+    }
+    urlInput.classList.add("warn");
+    urlStatus.classList.add("warn");
+  }
 }
 
 
@@ -431,7 +491,7 @@ async function fillInRepoBranches(e, per_page = 100, page = 1) {
 async function fillInBranchContents(e) {
   // TODO handle > per_page files (similar to userRepos)
   let target;
-  if (e) { // not present if restoring from local storage
+  if(e) { // not present if restoring from local storage
     target = e.target;
   }
   const branchContents = await github.getBranchContents(github.filepath);
@@ -547,7 +607,12 @@ function workerEventsHandler(ev) {
       document.querySelector(".statusbar").innerHTML =
         `Verovio ${tkVersion} loaded.`;
       setBreaksOptions(tkAvailableOptions);
-      openMei(); // open default MEI
+      if(!storage || !meiFileName) { 
+        // open default mei file
+        openMei(); 
+      } else { 
+        loadDataInEditor(storage.getItem("meiXml"));
+      }
       v.busy(false);
       break;
     case 'mei': // returned from importData, importBinaryData
@@ -786,11 +851,11 @@ function openFileDialog(accept = '*') {
       meiFileLocation = "";
       meiFileLocationPrintable = "";
       openMei(files[0]);
-      if (isLoggedIn) {
+      if(isLoggedIn) {
         // re-initialise github menu since we're now working locally
         github.filepath = "";
         github.branch = "";
-        if (storage) {
+        if(storage) {
           updateGithubInLocalStorage();
         }
         refreshGithubMenu();
@@ -800,82 +865,6 @@ function openFileDialog(accept = '*') {
     }
   };
   input.click();
-}
-
-function openUrl() {
-  // user has selected "Open URL" from menu
-  // => show Open URL interface, hide file status display
-  let fileStatusElement = document.querySelector(".fileStatus");
-  let openUrlElement = document.querySelector(".openUrlUI");
-  // hide file status, show openUrl
-  fileStatusElement.style.display = "none";
-  openUrlElement.style.display = "block";
-}
-
-async function openUrlFetch() {
-  let urlInput = document.querySelector("#openUrlInput");
-  let urlStatus = document.querySelector("#openUrlStatus");
-  try {
-    const url = new URL(urlInput.value);
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/xml, text/xml, application/mei+xml'
-      }
-    });
-    if (response.status >= 400) {
-      console.warn("Fetching URL produced error status: ", response.status);
-      urlStatus.innerHTML =
-        `${response.status}: ${response.statusText.toLowerCase()}`
-      urlInput.classList.add("warn");
-    } else {
-      urlStatus.innerHTML = "";
-      urlInput.classList.remove("warn");
-      response.text().then((data) => {
-        meiFileLocation = url.href;
-        meiFileLocationPrintable = url.hostname;
-        meiFileName =
-          url.pathname.substr(url.pathname.lastIndexOf("/") + 1);
-        if (isLoggedIn) {
-          // re-initialise github menu since we're now working from a URL
-          github.filepath = "";
-          github.branch = "";
-          if (storage) {
-            updateGithubInLocalStorage();
-          }
-          refreshGithubMenu();
-        }
-        v.clear();
-        v.updateNotation = false;
-        updateFileStatusDisplay();
-        updateStatusBar();
-        loadDataInEditor(data);
-        setFileChangedState(false);
-        updateLocalStorage(data);
-        openUrlCancel(); //hide open URL UI elements
-        v.updateNotation = true;
-        v.updateAll(cm);
-      });
-    }
-  } catch (err) {
-    console.warn("Error opening URL provided by user: ", err);
-    if (err instanceof TypeError) {
-      urlStatus.innerHTML = "CORS error";
-    } else {
-      urlStatus.innerHTML = "Invalid URL, please fix..."
-    }
-    urlInput.classList.add("warn");
-  }
-}
-
-function openUrlCancel() {
-  // user has cancelled the "Open URL" action
-  // => hide Open URL interface, show file status display
-  let fileStatusElement = document.querySelector(".fileStatus");
-  let openUrlElement = document.querySelector(".openUrlUI");
-  // show file status, hide openUrl
-  openUrlElement.style.display = "none";
-  fileStatusElement.style.display = "block";
 }
 
 function downloadMei() {
@@ -1038,7 +1027,10 @@ document.getElementById('openUrlButton')
 document.getElementById('openUrlCancel')
   .addEventListener('click', cmd.openUrlCancel);
 document.getElementById('openUrlInput')
-  .addEventListener('input', (e) => e.target.classList.remove("warn"));
+  .addEventListener('input', (e) => {
+    e.target.classList.remove("warn");
+    document.getElementById("openUrlStatus").classList.remove("warn");
+  });
 
 // drag'n'drop handlers
 let fc = document.querySelector('.dragContainer');
@@ -1233,14 +1225,14 @@ function addEventListeners(v, cm) {
       // interpret any CodeMirror change as a file changed state
       changeIndicator = true;
     }
-    if (freshlyLoaded) {
+    if(freshlyLoaded) {
       // ignore changes resulting from fresh file load
       freshlyLoaded = false;
     } else {
       setFileChangedState(changeIndicator);
     }
     v.notationUpdated(cm);
-    if (storage) {
+    if(storage) {
       // on every set of changes, save editor content
       storage.setItem("meiXml", meiXml);
     }
