@@ -606,7 +606,12 @@ function workerEventsHandler(ev) {
       document.querySelector(".statusbar").innerHTML =
         `Verovio ${tkVersion} loaded.`;
       setBreaksOptions(tkAvailableOptions);
-      openMei(); // open default MEI
+      if(!storage || !meiFileName) { 
+        // open default mei file
+        openMei(); 
+      } else { 
+        loadDataInEditor(storage.getItem("meiXml"));
+      }
       v.busy(false);
       break;
     case 'mei': // returned from importData, importBinaryData
