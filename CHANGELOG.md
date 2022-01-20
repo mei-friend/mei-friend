@@ -83,3 +83,4 @@
 # 0.2.2 patch
 * Move OpenUrl functionality into a new modal display
 * Fix regression error where storage was ignored on vrvLoaded
+* Support multiple encoding formats at openURL 
