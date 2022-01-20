@@ -212,8 +212,10 @@ function assignGithubMenuClickHandlers() {
   const repoHeader = document.getElementById('repositoriesHeader');
   if (repoHeader) {
     // on click, reload list of all repositories
-    github.filepath = "";
-    repoHeader.addEventListener('click', refreshGithubMenu);
+    repoHeader.addEventListener('click', () => { 
+      github.filepath = "";
+      refreshGithubMenu();
+    });
   }
   const branchesHeader = document.getElementById('branchesHeader');
   if (branchesHeader) {
@@ -361,12 +363,11 @@ function refreshGithubMenu(e) {
   // populate Github menu
   let githubMenu = document.getElementById("GithubMenu");
   githubMenu.classList.remove("loggedOut");
-  githubMenu.innerHTML =
-    `<a id="GithubLogout" href="#">Log out</a>`
-  if (!github.filepath) {
+  githubMenu.innerHTML = `<a id="GithubLogout" href="#">Log out</a>`
+  if(!github.filepath) { 
     githubMenu.innerHTML += `
     <hr class="dropdown-line">
-    <a id="repositoriesHeader" class="dropdown-head" href="#"><b>Select repository:</b></a>`
+    <a id="repositoriesHeader" class="dropdown-head" href="#"><b>Select repository:</b></a>`;
     fillInUserRepos();
   }
 }
