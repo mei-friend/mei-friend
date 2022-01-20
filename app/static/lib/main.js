@@ -96,7 +96,8 @@ document.addEventListener('DOMContentLoaded', function() {
     },
     showTrailingSpace: true,
     foldGutter: true,
-    gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"]
+    gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
+    extraKeys: {"Alt-F": "findPersistent"}
     // theme: 'dracula' // monokai (dark), dracula (bright)
   });
 
@@ -212,7 +213,7 @@ function assignGithubMenuClickHandlers() {
   const repoHeader = document.getElementById('repositoriesHeader');
   if (repoHeader) {
     // on click, reload list of all repositories
-    repoHeader.addEventListener('click', () => { 
+    repoHeader.addEventListener('click', () => {
       github.filepath = "";
       refreshGithubMenu();
     });
@@ -364,7 +365,7 @@ function refreshGithubMenu(e) {
   let githubMenu = document.getElementById("GithubMenu");
   githubMenu.classList.remove("loggedOut");
   githubMenu.innerHTML = `<a id="GithubLogout" href="#">Log out</a>`
-  if(!github.filepath) { 
+  if(!github.filepath) {
     githubMenu.innerHTML += `
     <hr class="dropdown-line">
     <a id="repositoriesHeader" class="dropdown-head" href="#"><b>Select repository:</b></a>`;
