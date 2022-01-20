@@ -84,4 +84,5 @@
 * Fix regression error where storage was ignored on vrvLoaded
 * Fix Github menu navigation issue causing empty repo list in certain conditions
 * Move OpenUrl functionality into a new modal display
-* Support multiple encoding formats at openURL 
+* Support multiple encoding formats at openURL
+* Support CodeMirror search/replace etc functionality 
