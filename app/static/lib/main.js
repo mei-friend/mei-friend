@@ -120,7 +120,7 @@ document.addEventListener('DOMContentLoaded', function() {
     } else {
       meiFileLocation = "";
       meiFileLocationPrintable = "";
-      openMei(undefined, false); // default MEI, skip freshly loaded (see comment above)
+      openFile(undefined, false); // default MEI, skip freshly loaded (see comment above)
       setFileChangedState(false);
     }
     if(githubFromStorage) {
@@ -156,7 +156,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     meiFileLocation = "";
     meiFileLocationPrintable = "";
-    openMei(); // default MEI
+    openFile(); // default MEI
   }
   if(isLoggedIn) {
     // regardless of storage availability:
@@ -613,7 +613,7 @@ function workerEventsHandler(ev) {
       setBreaksOptions(tkAvailableOptions);
       if(!storage || !meiFileName) {
         // open default mei file
-        openMei();
+        openFile();
       } else {
         // open stored data, setting vrv options first
         v.clear();
@@ -747,7 +747,7 @@ let inputFormats = {
   pae: "@clef",
 };
 
-export function openMei(file = defaultMeiFileName, setFreshlyLoaded = true) {
+export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true) {
   if (typeof file === "string") { // with fileName string
     meiFileName = file;
     console.info('openMei ' + meiFileName + ', ', cm);
@@ -859,7 +859,7 @@ function openFileDialog(accept = '*') {
       meiFileName = files[0].name;
       meiFileLocation = "";
       meiFileLocationPrintable = "";
-      openMei(files[0]);
+      openFile(files[0]);
       if(isLoggedIn) {
         // re-initialise github menu since we're now working locally
         github.filepath = "";
