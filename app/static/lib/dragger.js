@@ -2,7 +2,7 @@ import {
   calcSizeOfContainer
 } from './resizer.js';
 import {
-  openMei
+  openFile
 } from './main.js';
 
 export function dropHandler(ev) {
@@ -17,7 +17,7 @@ export function dropHandler(ev) {
       if (ev.dataTransfer.items[i].kind === 'file') {
         var file = ev.dataTransfer.items[i].getAsFile();
         console.log('... file[' + i + '].name = ' + file.name);
-        openMei(file);
+        openFile(file);
         break; // open only first file dropped
       } else {
         console.log('Unrecognized item ' + i + ':', ev.dataTransfer.items[i]);
@@ -29,7 +29,7 @@ export function dropHandler(ev) {
     for (var i = 0; i < l; i++) {
       let fileName = ev.dataTransfer.files[i].name;
       console.log('... file[' + i + '].name = ' + fileName);
-      openMei(fileName);
+      openFile(fileName);
       break; // open only first file dropped
     }
   }

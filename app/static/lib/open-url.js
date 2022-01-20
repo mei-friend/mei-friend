@@ -1,9 +1,6 @@
 import {
   calcSizeOfContainer
 } from './resizer.js';
-import {
-  openMei
-} from './main.js';
 
 export function openUrl() {
   let sz = calcSizeOfContainer();
@@ -13,9 +10,9 @@ export function openUrl() {
   fc.style.display = "block";
 }
 
-export function openUrlCancel() { 
+export function openUrlCancel() {
   // user has cancelled the "Open URL" action
-  // => hide Open URL interface, show file status display 
+  // => hide Open URL interface, show file status display
   let fileStatusElement = document.querySelector(".fileStatus");
   let openUrlElement = document.querySelector(".openUrlOverlay");
   // show file status, hide openUrl
