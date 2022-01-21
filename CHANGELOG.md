@@ -85,6 +85,7 @@
 * Fix Github menu navigation issue causing empty repo list in certain conditions
 * Move OpenUrl functionality into a new modal display
 * Support multiple encoding formats at openURL
+# 0.2.3 patch
 * Support CodeMirror search/replace etc functionality 
 # 0.2.4 patch
 * Implement "Reset to default" feature (in Help menu)
