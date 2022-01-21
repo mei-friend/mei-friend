@@ -42,7 +42,8 @@ def login():
 @app.route("/logout")
 def logout():
     session.clear()
-    return redirect(url_for('index'))
+    env_url = getenv("ROOT_URL")
+    return redirect(env_url if env_url else url_for('index'))
 
 @app.route("/authorize")
 def authorize():
@@ -53,7 +54,8 @@ def authorize():
     session['userLogin'] = profile["login"]
     session['userName'] = profile["name"]
     session['userEmail'] = profile["login"] + "@users.noreply.github.com"
-    return redirect(url_for('index'))
+    env_url = getenv("ROOT_URL")
+    return redirect(env_url if env_url else url_for('index'))
 
 @app.route("/help")
 def show_help():
