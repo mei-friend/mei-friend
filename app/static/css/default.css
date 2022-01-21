@@ -396,8 +396,7 @@ https://www.w3schools.com/css/css_tooltip.asp
 }
 
 .help-container td {
-  padding: 3px;
-  line-height: 1.4em;
+  line-height: 1.5em;
 }
 
 .icons {
@@ -415,7 +414,7 @@ https://www.w3schools.com/css/css_tooltip.asp
 }
 
 span.keyIcon {
-  margin: 3px 3px;
+  margin: 1px 2px;
   padding: 1px 5px;
   border-style: solid;
   border-color: DodgerBlue;
