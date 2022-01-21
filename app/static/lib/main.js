@@ -98,7 +98,9 @@ document.addEventListener('DOMContentLoaded', function() {
     showTrailingSpace: true,
     foldGutter: true,
     gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
-    extraKeys: {"Alt-F": "findPersistent"}
+    extraKeys: {
+      "Alt-F": "findPersistent"
+    }
     // theme: 'dracula' // monokai (dark), dracula (bright)
   });
 
@@ -366,7 +368,7 @@ function refreshGithubMenu(e) {
   let githubMenu = document.getElementById("GithubMenu");
   githubMenu.classList.remove("loggedOut");
   githubMenu.innerHTML = `<a id="GithubLogout" href="#">Log out</a>`
-  if(!github.filepath) {
+  if (!github.filepath) {
     githubMenu.innerHTML += `
     <hr class="dropdown-line">
     <a id="repositoriesHeader" class="dropdown-head" href="#"><b>Select repository:</b></a>`;
@@ -730,6 +732,11 @@ function workerEventsHandler(ev) {
       document.querySelector(".statusbar").innerHTML =
         "Compute page breaks: " + Math.round(ev.data.percentage) + "%";
       setProgressBar(ev.data.percentage);
+      break;
+    case 'error':
+      document.querySelector('.verovio-panel').innerHTML =
+        "<h3>Invalid MEI in " + meiFileName +
+        " (" + ev.data.msg + ")</h3>";
   }
 }
 
@@ -1004,9 +1011,9 @@ let cmd = {
   'renumberMeasures': () => e.renumberMeasures(v, cm, true),
   'reRenderMei': () => v.reRenderMei(cm, false),
   'reRenderMeiWithout': () => v.reRenderMei(cm, true),
-  'resetDefault':() => {
+  'resetDefault': () => {
     storage = window.localStorage;
-    if(storage) {
+    if (storage) {
       storage.clear();
     }
     logoutFromGithub();

@@ -35,7 +35,12 @@ onmessage = function(e) {
           !result.computePageBreaks && tkOptions.breaks != 'none')
           tkOptions.breaks = 'encoded';
         tk.setOptions(tkOptions);
-        tk.loadData(result.mei);
+        let r = tk.loadData(result.mei);
+        if (!r) {
+          result.cmd = 'error';
+          result.msg = 'Cannot load MEI data.';
+          break;
+        }
         result.mei = '';
         if (result.xmlId && !result.speedMode) {
           result.pageNo = parseInt(tk.getPageWithElement(result.xmlId));
@@ -48,8 +53,8 @@ onmessage = function(e) {
         let pg = (result.speedMode && result.pageNo > 1) ? 2 : result.pageNo;
         result.svg = tk.renderToSVG(pg);
         result.cmd = 'updated';
-      } catch (e) {
-        log(e);
+      } catch (err) {
+        log(err);
       };
       break;
     case 'updateData':
@@ -59,7 +64,12 @@ onmessage = function(e) {
         tk.setOptions({
           breaks: result.breaks
         });
-        tk.loadData(result.mei);
+        let r = tk.loadData(result.mei);
+        if (!r) {
+          result.cmd = 'error';
+          result.msg = 'Cannot load MEI data.';
+          break;
+        }
         result.mei = '';
         if (result.xmlId && !result.speedMode) {
           result.pageNo = parseInt(tk.getPageWithElement(result.xmlId));
@@ -69,8 +79,8 @@ onmessage = function(e) {
         result.svg = tk.renderToSVG(pg);
         result.pageCount = tk.getPageCount();
         result.cmd = 'updated';
-      } catch (e) {
-        log(e);
+      } catch (err) {
+        log(err);
       };
       break;
     case 'updatePage':
@@ -83,8 +93,8 @@ onmessage = function(e) {
         }
         result.svg = tk.renderToSVG(result.pageNo);
         result.cmd = 'updated';
-      } catch (e) {
-        log(e);
+      } catch (err) {
+        log(err);
       };
       break;
     case 'updateLayout':
@@ -104,8 +114,8 @@ onmessage = function(e) {
         result.svg = tk.renderToSVG(pg);
         result.pageCount = tk.getPageCount();
         result.cmd = 'updated';
-      } catch (e) {
-        log(e);
+      } catch (err) {
+        log(err);
       };
       break;
     case 'updateOption': // just update option without redoing layout
@@ -124,8 +134,8 @@ onmessage = function(e) {
         result.svg = tk.renderToSVG(pg);
         result.pageCount = tk.getPageCount();
         result.cmd = 'updated';
-      } catch (e) {
-        log(e);
+      } catch (err) {
+        log(err);
       };
       break;
     case 'importData': // all non-MEI formats
@@ -133,15 +143,20 @@ onmessage = function(e) {
         tk.setOptions({
           inputFrom: result.format
         })
-        tk.loadData(result.mei);
+        let r = tk.loadData(result.mei);
+        if (!r) {
+          result.cmd = 'error';
+          result.msg = 'Cannot import data.';
+          break;
+        }
         result = {
           'cmd': 'mei',
           'mei': tk.getMEI(),
           'pageCount': tk.getPageCount()
         };
         if (tkOptions) tk.setOptions(tkOptions);
-      } catch (e) {
-        log(e);
+      } catch (err) {
+        log(err);
       }
       break;
     case 'importBinaryData': // compressed XML format
@@ -152,20 +167,30 @@ onmessage = function(e) {
           inputFrom: result.format
         })
         // tk.loadZipDataBase64(result.mei);
-        tk.loadZipDataBuffer(result.mei, result.mei.byteLength)
+        let r = tk.loadZipDataBuffer(result.mei, result.mei.byteLength);
+        if (!r) {
+          result.cmd = 'error';
+          result.msg = 'Cannot import compressed data.';
+          break;
+        }
         result = {
           'cmd': 'mei',
           'mei': tk.getMEI(),
           'pageCount': tk.getPageCount()
         };
         if (tkOptions) tk.setOptions(tkOptions);
-      } catch (e) {
-        log(e);
+      } catch (err) {
+        log(err);
       }
       break;
     case 'reRenderMei':
       try {
-        tk.loadData(result.mei);
+        let r = tk.loadData(result.mei);
+        if (!r) {
+          result.cmd = 'error';
+          result.msg = 'Cannot load MEI data.';
+          break;
+        }
         result.setCursorToPageBeginning = true;
         if (result.xmlId && !result.removeIds) {
           result.pageNo = parseInt(tk.getPageWithElement(result.xmlId));
@@ -178,8 +203,8 @@ onmessage = function(e) {
         })
         else result.mei = tk.getMEI();
         result.cmd = 'updated';
-      } catch (e) {
-        log(e);
+      } catch (err) {
+        log(err);
       }
       break;
     case 'navigatePage': // for a page turn during navigation
@@ -193,8 +218,8 @@ onmessage = function(e) {
         }
         let pg = (result.speedMode && result.pageNo > 1) ? 2 : result.pageNo;
         result.svg = tk.renderToSVG(pg);
-      } catch (e) {
-        log(e);
+      } catch (err) {
+        log(err);
       }
       break;
     case 'computePageBreaks': // compute page breaks
@@ -222,8 +247,8 @@ onmessage = function(e) {
           result.pageBreaks[p] = breaks;
         }
         // console.log('Worker computePageBreaks: ', result.pageBreaks);
-      } catch (e) {
-        log(e);
+      } catch (err) {
+        log(err);
       }
       break;
     case 'exportMidi': // re-load data and export MIDI base-64 string
@@ -233,8 +258,8 @@ onmessage = function(e) {
         tk.loadData(result.mei);
         result.midi = tk.renderToMIDI();
         result.cmd = 'midi';
-      } catch (e) {
-        log(e);
+      } catch (err) {
+        log(err);
       }
       break;
     case 'getTimeForElement':
@@ -243,8 +268,8 @@ onmessage = function(e) {
           'cmd': 'timeForElement',
           'msg': tk.getTimeForElement(result.mei)
         };
-      } catch (e) {
-        log(e);
+      } catch (err) {
+        log(err);
       }
       break;
     case 'getElementAttr':
@@ -253,8 +278,8 @@ onmessage = function(e) {
           'cmd': 'elementAttr',
           'msg': tk.getElementAttr(result.mei)
         };
-      } catch (e) {
-        log(e);
+      } catch (err) {
+        log(err);
       }
       break;
     case 'stop':
