@@ -388,7 +388,7 @@ export function addToolTip(element, object) {
   element.classList.add('tooltip');
 }
 
-export function setBreaksOptions(tkAvailableOptions) {
+export function setBreaksOptions(tkAvailableOptions, defaultValue = 'auto') {
   let breaksEl = document.getElementById('breaks-select');
   var breaksOpts = {
     auto: 'Automatic',
@@ -401,7 +401,7 @@ export function setBreaksOptions(tkAvailableOptions) {
   for (let index of breaks.values) {
     if (breaksOpts[index]) {
       breaksEl[breaksEl.options.length] = new Option(breaksOpts[index], index);
-      if (index == breaks.default) {
+      if (index == defaultValue) {
         breaksEl[breaksEl.options.length - 1].selected = 'selected';
       }
     } else {

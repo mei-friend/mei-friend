@@ -45,10 +45,11 @@ import Github from './github.js';
 
 const version = '0.2.3';
 const versionDate = '20 Jan 2022';
-const defaultMeiFileName = `${root}Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei`;
+// const defaultMeiFileName = `${root}Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei`;
+const defaultMeiFileName = `${root}Beethoven_Op77-BreitkopfHaertel.mei`;
 const defaultVerovioOptions = {
   scale: 55,
-  breaks: "auto",
+  breaks: "line",
   // header: "none",
   // footer: "none",
   inputFrom: "mei",
@@ -604,7 +605,7 @@ function workerEventsHandler(ev) {
         `&nbsp;<a href="https://www.verovio.org/">Verovio ${tkVersion}</a>.`;
       document.querySelector(".statusbar").innerHTML =
         `Verovio ${tkVersion} loaded.`;
-      setBreaksOptions(tkAvailableOptions);
+      setBreaksOptions(tkAvailableOptions, defaultVerovioOptions.breaks);
       if (!storage || !meiFileName) {
         // open default mei file
         openFile();
