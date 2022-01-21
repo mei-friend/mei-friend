@@ -80,11 +80,11 @@ a:active {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0,0,0,.8);
+  background-color: rgba(0, 0, 0, .8);
   z-index: 190;
 }
 
-.openUrlOverlay .openUrlUI{
+.openUrlOverlay .openUrlUI {
   position: absolute;
   top: 20%;
   left: 20%;
@@ -93,20 +93,20 @@ a:active {
   border: 5px solid darkblue;
   border-radius: 32px;
   background-color: cornflowerblue;
-  color:white;
+  color: white;
   z-index: 190;
 }
 
-.openUrlOverlay .openUrlUI > div {
+.openUrlOverlay .openUrlUI>div {
   position: absolute;
   top: 50%;
   left: 50%;
-  width:80%;
+  width: 80%;
   transform: translate(-50%, -50%);
 }
 
 .openUrlOverlay .openUrlUI input {
-  width:70%;
+  width: 70%;
 }
 
 .dragOverlayText, {
@@ -119,7 +119,7 @@ a:active {
   -ms-transform: translate(-50%, -50%);
 }
 
-#openUrlStatus { 
+#openUrlStatus {
   font-size: small;
   color: crimson;
   visibility: hidden;
@@ -129,11 +129,10 @@ a:active {
   visibility: visible;
 }
 
-#openUrlInput.warn { 
+#openUrlInput.warn {
   border: 1px solid crimson;
   background-color: mistyrose;
 }
-
 
 .friendContainer {
   border: 3px solid lightsteelblue;
@@ -379,16 +378,36 @@ https://www.w3schools.com/css/css_tooltip.asp
 }
 
 .help-container {
-  overflow: auto;
+  overflow-x: auto;
+  overflow-y: auto;
   border: 3px solid lightsteelblue;
   border-radius: 4px;
   margin: 5px;
   padding: 5px;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  column-gap: 20px;
+}
+
+.text-info {
+  max-width: 550px;
+  /* margin: 10px; */
 }
 
 .help-container td {
-  min-width: 150px;
   padding: 3px;
+  line-height: 1.4em;
+}
+
+.icons {
+  min-width: 150px;
+  /* max-width: 180px; */
+}
+
+.text-info table {
+  min-width: 540px;
+  max-width: 540px;
 }
 
 .help-container tr:nth-child(odd) {
@@ -397,26 +416,19 @@ https://www.w3schools.com/css/css_tooltip.asp
 
 span.keyIcon {
   margin: 3px 3px;
-  padding: 0px 5px;
+  padding: 1px 5px;
   border-style: solid;
   border-color: DodgerBlue;
   border-width: 2px;
   border-radius: 3px;
 }
 
-.column {
-  float: left;
-  padding: 3px;
-  width: 48%;
-}
-
 /* Clear floats after the columns */
-.help-container:after {
+/* .help-container:after {
   content: "";
   display: table;
   clear: both;
-}
-
+} */
 /* CodeMirror fold gutter css styles */
 .CodeMirror-foldmarker {
   font-family: arial;
