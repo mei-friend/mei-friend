@@ -86,3 +86,5 @@
 * Move OpenUrl functionality into a new modal display
 * Support multiple encoding formats at openURL
 * Support CodeMirror search/replace etc functionality 
+# 0.2.4 patch
+* Implement "Reset to default" feature (in Help menu)

@@ -43,8 +43,8 @@ import Viewer from './viewer.js';
 import Github from './github.js';
 
 
-const version = '0.2.3';
-const versionDate = '20 Jan 2022';
+const version = 'develop-0.2.4';
+const versionDate = '21 Jan 2022';
 const defaultMeiFileName = `${root}Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei`;
 const defaultVerovioOptions = {
   scale: 55,
@@ -1002,7 +1002,15 @@ let cmd = {
   'renumberMeasuresTest': () => e.renumberMeasures(v, cm, false),
   'renumberMeasures': () => e.renumberMeasures(v, cm, true),
   'reRenderMei': () => v.reRenderMei(cm, false),
-  'reRenderMeiWithout': () => v.reRenderMei(cm, true)
+  'reRenderMeiWithout': () => v.reRenderMei(cm, true),
+  'resetDefault':() => {
+    storage = window.localStorage;
+    if(storage) {
+      storage.clear();
+    }
+    logoutFromGithub();
+  }
+
 };
 
 // layout notation position
@@ -1203,6 +1211,10 @@ function addEventListeners(v, cm) {
     .addEventListener('click', cmd.toggleMarcato);
   document.getElementById('toggleStacciss')
     .addEventListener('click', cmd.toggleStacciss);
+  
+  // reset application
+  document.getElementById('resetDefault')
+    .addEventListener('click', cmd.resetDefault);
 
   // editor activity
   cm.on('cursorActivity', () => {
