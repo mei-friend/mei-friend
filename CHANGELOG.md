@@ -86,6 +86,9 @@
 * Move OpenUrl functionality into a new modal display
 * Support multiple encoding formats at openURL
 # 0.2.3 patch
-* Support CodeMirror search/replace etc functionality 
+* Support CodeMirror search/replace etc functionality
 # 0.2.4 patch
 * Implement "Reset to default" feature (in Help menu)
+* Improved error reporting from worker with incomplete MEI files
+* WoO 70 as default piece
+* Small bug fixes (correct page counting with <incip> data)
