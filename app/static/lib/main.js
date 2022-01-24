@@ -50,8 +50,8 @@ const defaultMeiFileName = `${root}Beethoven_WoO70-Breitkopf.mei`;
 const defaultVerovioOptions = {
   scale: 55,
   breaks: "line",
-  // header: "none",
-  // footer: "none",
+  header: "encoded",
+  footer: "encoded",
   inputFrom: "mei",
   adjustPageHeight: "true",
   outputIndent: 3,
