@@ -737,6 +737,8 @@ function workerEventsHandler(ev) {
       document.querySelector('.verovio-panel').innerHTML =
         "<h3>Invalid MEI in " + meiFileName +
         " (" + ev.data.msg + ")</h3>";
+      v.busy(false);
+      break;
   }
 }
 
