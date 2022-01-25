@@ -108,7 +108,6 @@ document.addEventListener('DOMContentLoaded', function() {
       meiFileName = storage.fileName;
       meiFileLocation = storage.fileLocation;
       meiFileLocationPrintable = storage.fileLocationPrintable;
-      console.log("fLP READ: ", meiFileLocationPrintable);
       updateFileStatusDisplay();
       // on initial page load, CM doesn't fire a "changes" event
       // so we don't need to skip the "freshly loaded" change
@@ -306,7 +305,6 @@ function assignGithubMenuClickHandlers() {
 function updateLocalStorage(meiXml) {
   // if storage is available, save file name, location, content
   // if we're working with github, save github metadata
-  console.log("FILE LOCATION: ", meiFileLocation);
   if (storage.supported && !storage.override) {
     try {
       storage.fileName = meiFileName;
@@ -317,6 +315,7 @@ function updateLocalStorage(meiXml) {
       }
     } catch (err) {
       console.error("Could not save file content to local storage. Content may be too big? Content length: ", meiXml.length, err);
+      setFileChangedState(fileChanged); // flags any storage-exceeded issues
       storage.clear();
     }
   }
@@ -372,12 +371,13 @@ function setFileChangedState(fileChangedState) {
   fileChanged = fileChangedState;
   const fileStatusElement = document.querySelector(".fileStatus");
   const fileChangedIndicatorElement = document.querySelector("#fileChanged");
+  const fileStorageExceededIndicatorElement = document.querySelector("#fileStorageExceeded");
   const commitUI = document.querySelector("#commitUI");
   if (fileChanged) {
-    fileStatusElement.classList.add("warn");
+    fileStatusElement.classList.add("changed");
     fileChangedIndicatorElement.innerText = "*";
   } else {
-    fileStatusElement.classList.remove("warn");
+    fileStatusElement.classList.remove("changed");
     fileChangedIndicatorElement.innerText = "";
   }
   if (isLoggedIn && github && github.filepath && commitUI) {
@@ -386,6 +386,22 @@ function setFileChangedState(fileChangedState) {
   }
   if (storage.supported) {
     storage.fileChanged = fileChanged ? 1 : 0;
+    if(storage.override) { 
+      // unable to write to local storage, probably because quota exceeded
+      // warn user...
+      fileStatusElement.classList.add("warn");
+      fileStorageExceededIndicatorElement.innerText = "LOCAL-STORAGE DISABLED!";
+      fileStorageExceededIndicatorElement.classList.add("warn");
+      fileStorageExceededIndicatorElement.title = "Your MEI content exceeds " + 
+        "the browser's local storage space. Please ensure changes are saved " + 
+        "manually or committed to Github before refreshing or leaving "+
+        "the page!";
+    } else { 
+      fileStatusElement.classList.remove("warn");
+      fileStorageExceededIndicatorElement.innerText = "";
+      fileStorageExceededIndicatorElement.classList.remove("warn");
+      fileStorageExceededIndicatorElement.title = "";
+    }
   }
 }
 
@@ -394,7 +410,6 @@ function updateFileStatusDisplay() {
     meiFileName.substr(meiFileName.lastIndexOf("/") + 1);
   document.querySelector("#fileLocation").innerText = meiFileLocationPrintable || "";
   document.querySelector("#fileLocation").title = meiFileLocation || "";
-  console.log("fLP use:", meiFileLocationPrintable);
 }
 
 export async function openUrlFetch() {

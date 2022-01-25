@@ -163,14 +163,25 @@
   background: white;
   color: green;
   white-space: nowrap;
-  display: flex;
 }
 
 .fileStatus #fileName{
   white-space: pre;
 }
 
-.fileStatus.warn { 
+.fileStatus.changed{ 
+  color: darkorange;
+}
+
+.fileStatus.warn #fileName, .fileStatus.warn #fileLocation { 
+  text-decoration: red dotted underline;
+}
+
+.fileStatus #fileStorageExceeded.warn {
   color: red;
+  font-weight: bolder;
+  background: white;
+  border: 1px solid red;
+  cursor: default;
 }
 

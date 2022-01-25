@@ -16,13 +16,13 @@ export default class Storage {
         if(content && typeof content === "object") { 
           content = JSON.stringify(content);
         }
-        this.storage.setItem(item, content)
+        this.storage.setItem(item, content);
       } 
       catch(err) { 
+        this.override = true;
         console.error("Disabling local storage for current file - " + 
          "could not save file content. Content may be too big? ", 
           meiXml.length, err);
-        this.override = true;
         this.clear();
         this.read();
       }
@@ -43,12 +43,6 @@ export default class Storage {
     }
   }
 
-  writeGithub() { 
-    if(this.storage) {
-      this.storage.setItem("github", JSON.stringify(this.github))
-    }
-  }
-
   updateContent() {
     if(this.storage) {
       try { 
@@ -60,19 +54,6 @@ export default class Storage {
         this.override = true;
         this.clear();
         this.read();
-      }
-    }
-  }
-
-  write() { 
-    if(this.storage && !this.override) { 
-      this.updateContent();
-      this.storage.setItem("meiFileName",this.fileName);
-      this.storage.setItem("meiFileLocation",this.fileLocation);
-      this.storage.setItem("meiFileLocationPrintable",
-        this.fileLocationPrintable);
-      if(this.isLoggedIn) { 
-        this.writeGithub();
       }
     }
   }
