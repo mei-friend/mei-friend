@@ -40,6 +40,7 @@ import {
 } from './dom-utils.js';
 import * as e from './editor.js'
 import Viewer from './viewer.js';
+import Storage from './storage.js';
 import Github from './github.js';
 
 
@@ -69,12 +70,7 @@ const defaultVerovioOptions = {
 };
 const defaultKeyMap = `${root}keymaps/default-keymap.json`;
 
-let storage;
-try {
-  storage = window.localStorage;
-} catch (err) {
-  console.error("Unable to access local storage: ", err);
-}
+let storage = new Storage();
 
 let fileChanged = false; // flag to track whether unsaved changes to file exist
 let freshlyLoaded = false; // flag to ignore a cm.on("changes") event on file load
@@ -105,45 +101,42 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   // restore localStorage if we have it
-  if (storage) {
-    let meiXmlFromStorage = storage.getItem("meiXml");
-    let githubFromStorage = storage.getItem("github");
-    let fileChangedFromStorage = storage.getItem("fileChanged");
-    fileChangedFromStorage = fileChangedFromStorage ? parseInt(storage.getItem("fileChanged")) : 0;
-    setFileChangedState(fileChangedFromStorage);
-    if (meiXmlFromStorage) {
-      meiFileName = storage.getItem("meiFileName");
-      meiFileLocation = storage.getItem("meiFileLocation");
-      meiFileLocationPrintable = storage.getItem("meiFileLocationPrintable");
+  if (storage.supported) {
+    storage.read();
+    setFileChangedState(storage.fileChanged);
+    if (storage.content) {
+      meiFileName = storage.fileName;
+      meiFileLocation = storage.fileLocation;
+      meiFileLocationPrintable = storage.fileLocationPrintable;
+      console.log("fLP READ: ", meiFileLocationPrintable);
       updateFileStatusDisplay();
       // on initial page load, CM doesn't fire a "changes" event
       // so we don't need to skip the "freshly loaded" change
       // hence the "false" on the following line:
-      loadDataInEditor(meiXmlFromStorage, false);
+      loadDataInEditor(storage.content, false);
     } else {
       meiFileLocation = "";
       meiFileLocationPrintable = "";
       openFile(undefined, false); // default MEI, skip freshly loaded (see comment above)
       setFileChangedState(false);
     }
-    if (githubFromStorage) {
+    if (storage.github) {
       // use github object from local storage if available
       isLoggedIn = true;
-      githubFromStorage = JSON.parse(githubFromStorage);
       github = new Github(
-        githubFromStorage.githubRepo,
-        githubFromStorage.githubToken,
-        githubFromStorage.branch,
-        githubFromStorage.filepath,
-        githubFromStorage.userLogin,
-        githubFromStorage.userName,
-        githubFromStorage.userEmail
+        storage.github.githubRepo,
+        storage.github.githubToken,
+        storage.github.branch,
+        storage.github.filepath,
+        storage.github.userLogin,
+        storage.github.userName,
+        storage.github.userEmail
       )
-      document.querySelector("#fileLocation").innerText = meiFileLocationPrintable;
+      //document.querySelector("#fileLocation").innerText = meiFileLocationPrintable;
     } else if (isLoggedIn) {
       // initialise and store new github object
       github = new Github("", githubToken, "", "", userLogin, userName, userEmail);
-      storage.setItem("github", JSON.stringify({
+      storage.github = {
         githubRepo: github.githubRepo,
         githubToken: github.githubToken,
         branch: github.branch,
@@ -151,7 +144,7 @@ document.addEventListener('DOMContentLoaded', function() {
         userLogin: github.userLogin,
         userName: userName,
         userEmail: userEmail
-      }));
+      };
     }
   } else { // no local storage
     if (isLoggedIn) { // initialise new github object
@@ -313,27 +306,28 @@ function assignGithubMenuClickHandlers() {
 function updateLocalStorage(meiXml) {
   // if storage is available, save file name, location, content
   // if we're working with github, save github metadata
-  if (storage) {
+  console.log("FILE LOCATION: ", meiFileLocation);
+  if (storage.supported && !storage.override) {
     try {
-      storage.setItem("meiFileName", meiFileName);
-      storage.setItem("meiFileLocation", meiFileLocation);
-      storage.setItem("meiFileLocationPrintable", meiFileLocationPrintable);
-      storage.setItem("meiXml", meiXml);
+      storage.fileName = meiFileName;
+      storage.fileLocation = meiFileLocation;
+      storage.content = meiXml;
       if (isLoggedIn) {
         updateGithubInLocalStorage();
       }
     } catch (err) {
       console.error("Could not save file content to local storage. Content may be too big? Content length: ", meiXml.length, err);
+      storage.clear();
     }
   }
 }
 
 function updateGithubInLocalStorage() {
-  if (storage && isLoggedIn) {
+  if (storage.supported && !storage.override && isLoggedIn) {
     const author = github.author;
     const name = author.name;
     const email = author.email;
-    const githubToStorage = JSON.stringify({
+    storage.github = {
       githubRepo: github.githubRepo,
       githubToken: github.githubToken,
       branch: github.branch,
@@ -341,17 +335,15 @@ function updateGithubInLocalStorage() {
       userLogin: github.userLogin,
       userName: name,
       userEmail: email
-    })
-    try {
-      storage.setItem("github", githubToStorage);
-    } catch (err) {
-      console.error("Could not save Github metadata to local storage. Content may be too big? Content length: ", githubToStorage.length);
+    }
+    if(github.filepath) { 
+      storage.fileLocationType = "github";
     }
   }
 }
 
 function logoutFromGithub() {
-  if (storage) {
+  if (storage.supported) {
     // remove github object from local storage
     storage.removeItem("github");
   }
@@ -392,16 +384,17 @@ function setFileChangedState(fileChangedState) {
     document.getElementById("commitMessageInput").disabled = !fileChanged;
     document.getElementById("commitButton").disabled = !fileChanged;
   }
-  if (storage) {
-    storage.setItem("fileChanged", fileChanged ? 1 : 0)
+  if (storage.supported) {
+    storage.fileChanged = fileChanged ? 1 : 0;
   }
 }
 
 function updateFileStatusDisplay() {
   document.querySelector("#fileName").innerText =
     meiFileName.substr(meiFileName.lastIndexOf("/") + 1);
-  document.querySelector("#fileLocation").innerText = meiFileLocationPrintable;
-  document.querySelector("#fileLocation").title = meiFileLocation;
+  document.querySelector("#fileLocation").innerText = meiFileLocationPrintable || "";
+  document.querySelector("#fileLocation").title = meiFileLocation || "";
+  console.log("fLP use:", meiFileLocationPrintable);
 }
 
 export async function openUrlFetch() {
@@ -434,13 +427,16 @@ export async function openUrlFetch() {
           // re-initialise github menu since we're now working from a URL
           github.filepath = "";
           github.branch = "";
-          if (storage) {
+          if (storage.supported) {
             updateGithubInLocalStorage();
           }
           refreshGithubMenu();
         }
         updateFileStatusDisplay();
         handleEncoding(data);
+        if(storage.supported) { 
+          storage.fileLocationType = "url";
+        }
         openUrlCancel(); //hide open URL UI elements
       });
     }
@@ -519,6 +515,9 @@ async function fillInBranchContents(e) {
     });
   } else {
     // User clicked file, or restoring from local storage. Display commit interface
+    if(storage.supported && github.filepath) { 
+      storage.fileLocationType = "github";
+    }
     const commitUI = document.createElement("div");
     commitUI.setAttribute("id", "commitUI");
     const commitMessageInput = document.createElement("input");
@@ -592,6 +591,9 @@ function renderCommitLog() {
 }
 
 function loadDataInEditor(mei, setFreshlyLoaded = true) {
+  if(storage.supported) { 
+    storage.override = false;
+  }
   freshlyLoaded = setFreshlyLoaded;
   cm.setValue(mei)
 }
@@ -608,14 +610,14 @@ function workerEventsHandler(ev) {
       document.querySelector(".statusbar").innerHTML =
         `Verovio ${tkVersion} loaded.`;
       setBreaksOptions(tkAvailableOptions, defaultVerovioOptions.breaks);
-      if (!storage || !meiFileName) {
+      if (!storage.supported || !meiFileName) {
         // open default mei file
         openFile();
       } else {
         // open stored data, setting vrv options first
         v.clear();
         v.updateNotation = false;
-        loadDataInEditor(storage.getItem("meiXml"));
+        loadDataInEditor(storage.content);
         v.updateNotation = true;
         v.updateAll(cm, defaultVerovioOptions);
       }
@@ -867,11 +869,14 @@ function openFileDialog(accept = '*') {
       meiFileLocation = "";
       meiFileLocationPrintable = "";
       openFile(files[0]);
+      if(storage.supported)  {
+        storage.fileLocationType = "file";
+      }
       if (isLoggedIn) {
         // re-initialise github menu since we're now working locally
         github.filepath = "";
         github.branch = "";
-        if (storage) {
+        if (storage.supported) {
           updateGithubInLocalStorage();
         }
         refreshGithubMenu();
@@ -1012,6 +1017,8 @@ let cmd = {
   'reRenderMei': () => v.reRenderMei(cm, false),
   'reRenderMeiWithout': () => v.reRenderMei(cm, true),
   'resetDefault': () => {
+    // we're in a clickhandler, so our storage object is out of scope
+    // but we only need to clear it, so just grab the window's storage
     storage = window.localStorage;
     if (storage) {
       storage.clear();
@@ -1260,9 +1267,9 @@ function addEventListeners(v, cm) {
       setFileChangedState(changeIndicator);
     }
     v.notationUpdated(cm);
-    if (storage) {
+    if (storage.supported) {
       // on every set of changes, save editor content
-      storage.setItem("meiXml", meiXml);
+      updateLocalStorage(meiXml);
     }
   })
 
