@@ -171,6 +171,7 @@
 
 .fileStatus #fileChanged { 
   margin-left: -.5em;
+  margin-right: .5em;
 }
 
 .fileStatus.changed { 
