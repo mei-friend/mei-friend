@@ -171,6 +171,21 @@ export default class Viewer {
     }
   }
 
+  // returns true if sb/pb elements are contained (more than the leading pb)
+  containsBreaks() {
+    let music = this.xmlDoc.querySelector('music');
+    let elements;
+    if (music) elements = music.querySelectorAll('measure, sb, pb');
+    else return false;
+    let countBreaks = false;
+    for (let e of elements) {
+      if (e.nodeName == 'measure') countBreaks = true; // skip leading breaks
+      if (countBreaks && ['sb', 'pb'].includes(e.nodeName))
+        return true;
+    }
+    return false;
+  }
+
   clear() {
     this.selectedElements = [];
     this.lastNoteId = '';

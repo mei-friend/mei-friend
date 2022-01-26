@@ -64,8 +64,8 @@ const defaultVerovioOptions = {
   minLastJustification: 0,
   clefChangeFactor: .83,
   svgAdditionalAttribute: ["layer@n", "staff@n"],
-  bottomMarginArtic: 1.1,
-  topMarginArtic: 1.1
+  bottomMarginArtic: 1.2,
+  topMarginArtic: 1.2
 };
 const defaultKeyMap = `${root}keymaps/default-keymap.json`;
 
@@ -98,6 +98,26 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     // theme: 'dracula' // monokai (dark), dracula (bright)
   });
+
+  createControlsMenu(
+    document.querySelector('.notation'), defaultVerovioOptions.scale);
+  addModifyerKeys(document); //
+
+  setOrientation(cm, 'bottom', v);
+
+  console.log('DOMContentLoaded. Trying now to load Verovio...');
+  document.querySelector(".statusbar").innerHTML = "Loading Verovio.";
+  document.querySelector(".rightfoot").innerHTML =
+    "<a href='https://github.com/wergo/mei-friend-online'>mei-friend " +
+    version + "</a> (" + versionDate + ").&nbsp;";
+
+  vrvWorker = new Worker(`${root}lib/worker.js`);
+  vrvWorker.onmessage = workerEventsHandler;
+
+  v = new Viewer(vrvWorker);
+  v.vrvOptions = {
+    ...defaultVerovioOptions
+  };
 
   // restore localStorage if we have it
   if (storage.supported) {
@@ -161,23 +181,8 @@ document.addEventListener('DOMContentLoaded', function() {
       fillInBranchContents();
     }
   }
-  setOrientation(cm, 'bottom', v);
 
-  createControlsMenu(
-    document.querySelector('.notation'), defaultVerovioOptions.scale);
-  addModifyerKeys(document); //
 
-  console.log('DOMContentLoaded. Trying now to load Verovio...');
-  document.querySelector(".statusbar").innerHTML = "Loading Verovio.";
-  document.querySelector(".rightfoot").innerHTML =
-    "<a href='https://github.com/wergo/mei-friend-online'>mei-friend " +
-    version + "</a> (" + versionDate + ").&nbsp;";
-
-  vrvWorker = new Worker(`${root}lib/worker.js`);
-  vrvWorker.onmessage = workerEventsHandler;
-
-  v = new Viewer(vrvWorker);
-  v.vrvOptions = defaultVerovioOptions;
 
   addEventListeners(v, cm);
   addResizerHandlers(v, cm);
@@ -334,7 +339,7 @@ function updateGithubInLocalStorage() {
       userName: name,
       userEmail: email
     }
-    if(github.filepath) { 
+    if (github.filepath) {
       storage.fileLocationType = "github";
     }
   }
@@ -385,17 +390,17 @@ function setFileChangedState(fileChangedState) {
   }
   if (storage.supported) {
     storage.fileChanged = fileChanged ? 1 : 0;
-    if(storage.override) { 
+    if (storage.override) {
       // unable to write to local storage, probably because quota exceeded
       // warn user...
       fileStatusElement.classList.add("warn");
       fileStorageExceededIndicatorElement.innerText = "LOCAL-STORAGE DISABLED!";
       fileStorageExceededIndicatorElement.classList.add("warn");
-      fileStorageExceededIndicatorElement.title = "Your MEI content exceeds " + 
-        "the browser's local storage space. Please ensure changes are saved " + 
-        "manually or committed to Github before refreshing or leaving "+
+      fileStorageExceededIndicatorElement.title = "Your MEI content exceeds " +
+        "the browser's local storage space. Please ensure changes are saved " +
+        "manually or committed to Github before refreshing or leaving " +
         "the page!";
-    } else { 
+    } else {
       fileStatusElement.classList.remove("warn");
       fileStorageExceededIndicatorElement.innerText = "";
       fileStorageExceededIndicatorElement.classList.remove("warn");
@@ -448,7 +453,7 @@ export async function openUrlFetch() {
         }
         updateFileStatusDisplay();
         handleEncoding(data);
-        if(storage.supported) { 
+        if (storage.supported) {
           storage.fileLocationType = "url";
         }
         openUrlCancel(); //hide open URL UI elements
@@ -529,7 +534,7 @@ async function fillInBranchContents(e) {
     });
   } else {
     // User clicked file, or restoring from local storage. Display commit interface
-    if(storage.supported && github.filepath) { 
+    if (storage.supported && github.filepath) {
       storage.fileLocationType = "github";
     }
     const commitUI = document.createElement("div");
@@ -605,11 +610,14 @@ function renderCommitLog() {
 }
 
 function loadDataInEditor(mei, setFreshlyLoaded = true) {
-  if(storage.supported) { 
+  if (storage.supported) {
     storage.override = false;
   }
   freshlyLoaded = setFreshlyLoaded;
-  cm.setValue(mei)
+  cm.setValue(mei);
+  v.loadXml(mei);
+  let bs = document.getElementById('breaks-select');
+  if (bs) bs.value = v.containsBreaks() ? 'line' : 'auto';
 }
 
 function workerEventsHandler(ev) {
@@ -885,7 +893,7 @@ function openFileDialog(accept = '*') {
       meiFileLocation = "";
       meiFileLocationPrintable = "";
       openFile(files[0]);
-      if(storage.supported)  {
+      if (storage.supported) {
         storage.fileLocationType = "file";
       }
       if (isLoggedIn) {

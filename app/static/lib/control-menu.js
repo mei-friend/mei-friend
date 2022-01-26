@@ -389,6 +389,7 @@ export function addToolTip(element, object) {
 }
 
 export function setBreaksOptions(tkAvailableOptions, defaultValue = 'auto') {
+  if (defaultValue == '') defaultValue = 'auto';
   let breaksEl = document.getElementById('breaks-select');
   var breaksOpts = {
     auto: 'Automatic',
