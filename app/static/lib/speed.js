@@ -489,7 +489,11 @@ export function getPageWithElement(v, id) {
       sel = 'pb,[*|id="' + id + '"]'; // find all breaks in xmlDoc
     }
     if (sel == '') return page;
-    let els = Array.from(v.xmlDoc.querySelector('music').querySelectorAll(sel));
+    let music = v.xmlDoc.querySelector('music');
+    let els;
+    if (music)
+      els = Array.from(v.xmlDoc.querySelector('music').querySelectorAll(sel));
+    else return page;
     if (els) {
       page = els.findIndex(el => el.getAttribute('xml:id') == id) + 1;
       // if element is within last measure, ...
