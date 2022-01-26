@@ -89,8 +89,10 @@
 * Support CodeMirror search/replace etc functionality
 # 0.2.4 patch
 * Implement "Reset to default" feature (in Help menu)
-* Refactor local storage handling
-* Implement storage override where filesizes exceed storage quota
 * Improved error reporting from worker with incomplete MEI files
 * WoO 70 as default piece
 * Small bug fixes (correct page counting with <incip> data)
+# 0.2.5 patch
+* Refactor local storage handling
+* Implement storage override where filesizes exceed storage quota
+

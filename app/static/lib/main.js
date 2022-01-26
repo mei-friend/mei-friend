@@ -43,9 +43,8 @@ import Viewer from './viewer.js';
 import Storage from './storage.js';
 import Github from './github.js';
 
-
-const version = 'develop-0.2.4';
-const versionDate = '24 Jan 2022';
+const version = 'develop-0.2.5';
+const versionDate = '26 Jan 2022';
 // const defaultMeiFileName = `${root}Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei`;
 const defaultMeiFileName = `${root}Beethoven_WoO70-Breitkopf.mei`;
 const defaultVerovioOptions = {
