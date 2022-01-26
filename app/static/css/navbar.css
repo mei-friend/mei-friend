@@ -169,7 +169,11 @@
   white-space: pre;
 }
 
-.fileStatus.changed{ 
+.fileStatus #fileChanged { 
+  margin-left: -.5em;
+}
+
+.fileStatus.changed { 
   color: darkorange;
 }
 
