@@ -43,21 +43,6 @@ export default class Storage {
     }
   }
 
-  updateContent() {
-    if(this.storage) {
-      try { 
-        this.storage.setItem("meiXml", JSON.stringify(this.content));
-      } 
-      catch(err) { 
-        console.error("Disabling local storage for current file - could not" + 
-          "save file content. Content may be too big? ", meiXml.length, err);
-        this.override = true;
-        this.clear();
-        this.read();
-      }
-    }
-  }
-
   clear() { 
     if(this.supported) { 
       this.storage.clear();
@@ -69,7 +54,6 @@ export default class Storage {
       this.storage.removeItem(item);
     }
   }
-
 
   set storage(storage) { 
     this._storage = storage;
