@@ -313,7 +313,7 @@ function updateLocalStorage(meiXml) {
         updateGithubInLocalStorage();
       }
     } catch (err) {
-      console.error("Could not save file content to local storage. Content may be too big? Content length: ", meiXml.length, err);
+      console.warn("Could not save file content to local storage. Content may be too big? Content length: ", meiXml.length, err);
       setFileChangedState(fileChanged); // flags any storage-exceeded issues
       storage.clear();
     }
