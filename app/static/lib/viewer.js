@@ -141,8 +141,10 @@ export default class Viewer {
     }
     // count pages from system/pagebreaks
     if (Array.isArray(this.breaks)) {
-      let elements = this.xmlDoc
-        .querySelector('music').querySelectorAll('measure, sb, pb');
+      let music = this.xmlDoc.querySelector('music');
+      let elements;
+      if (music) elements = music.querySelectorAll('measure, sb, pb');
+      else return '';
       // count pages
       this.pageCount = 1; // pages are one-based
       let countBreaks = false;
