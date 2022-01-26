@@ -489,15 +489,15 @@ export function getPageWithElement(v, id) {
       sel = 'pb,[*|id="' + id + '"]'; // find all breaks in xmlDoc
     }
     if (sel == '') return page;
-    let els = Array.from(v.xmlDoc.querySelectorAll(sel));
+    let els = Array.from(v.xmlDoc.querySelector('music').querySelectorAll(sel));
     if (els) {
       page = els.findIndex(el => el.getAttribute('xml:id') == id) + 1;
       // if element is within last measure, ...
       if (page > 1 && els[page - 1].closest('measure') == els[page - 2])
         page--; // ...undo increment
     }
-    if (bs == 'line' || bs == 'encoded') {
-      els = v.xmlDoc.querySelectorAll('pb,measure');
+    if (bs == 'line' || bs == 'encoded') { // remove leading pb in MEI file
+      els = v.xmlDoc.querySelector('music').querySelectorAll('pb,measure');
       let i;
       for (i = 0; i < els.length; i++) {
         if (els[i].nodeName != 'pb') break;

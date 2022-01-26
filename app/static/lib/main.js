@@ -45,14 +45,14 @@ import Github from './github.js';
 
 
 const version = 'develop-0.2.4';
-const versionDate = '21 Jan 2022';
+const versionDate = '24 Jan 2022';
 // const defaultMeiFileName = `${root}Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei`;
 const defaultMeiFileName = `${root}Beethoven_WoO70-Breitkopf.mei`;
 const defaultVerovioOptions = {
   scale: 55,
   breaks: "line",
-  // header: "none",
-  // footer: "none",
+  header: "encoded",
+  footer: "encoded",
   inputFrom: "mei",
   adjustPageHeight: "true",
   outputIndent: 3,
@@ -754,6 +754,8 @@ function workerEventsHandler(ev) {
       document.querySelector('.verovio-panel').innerHTML =
         "<h3>Invalid MEI in " + meiFileName +
         " (" + ev.data.msg + ")</h3>";
+      v.busy(false);
+      break;
   }
 }
 
