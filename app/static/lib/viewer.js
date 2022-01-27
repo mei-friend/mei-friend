@@ -74,13 +74,14 @@ export default class Viewer {
     this.worker.postMessage(message);
   }
 
-  updatePage(cm, page, xmlId = '') {
+  updatePage(cm, page, xmlId = '', setFocusToVerovioPane = true) {
     if (this.changeCurrentPage(page) || xmlId) {
       if (!this.speedMode) {
         let message = {
           'cmd': 'updatePage',
           'pageNo': this.currentPage,
-          'xmlId': xmlId
+          'xmlId': xmlId,
+          'setFocusToVerovioPane': setFocusToVerovioPane
         };
         this.busy();
         this.worker.postMessage(message);
@@ -91,7 +92,7 @@ export default class Viewer {
           console.info('UpdatePage(speedMode=true): page: ' +
             this.currentPage + ', xmlId: ' + xmlId);
         }
-        this.updateData(cm, xmlId ? false : true, true);
+        this.updateData(cm, xmlId ? false : true, setFocusToVerovioPane);
       }
     }
   }
@@ -377,14 +378,14 @@ export default class Viewer {
 
   // when cursor pos in editor changed, update notation location / highlight
   cursorActivity(cm, forceFlip = false) {
-    console.debug('cursorActivity forceFlip: ' + forceFlip);
+    console.log('cursorActivity forceFlip: ' + forceFlip);
     let id = utils.getElementIdAtCursor(cm);
     this.selectedElements = [];
     this.selectedElements.push(id);
     let fl = document.getElementById('flip-checkbox');
     if (!document.querySelector('g#' + id) && // when not on current page
       ((this.updateNotation && fl && fl.checked) || forceFlip)) {
-      this.updatePage(cm, '', id);
+      this.updatePage(cm, '', id, false);
     } else if (this.updateNotation) { // on current page
       this.scrollSvg(cm);
       this.updateHighlight(cm);
@@ -416,7 +417,7 @@ export default class Viewer {
 
   // when editor emits changes, update notation rendering
   notationUpdated(cm, forceUpdate = false) {
-    console.debug('NotationUpdated forceUpdate:' + forceUpdate);
+    console.log('NotationUpdated forceUpdate:' + forceUpdate);
     this.encodingHasChanged = true;
     let ch = document.getElementById('live-update-checkbox');
     if (this.updateNotation && ch && ch.checked || forceUpdate)
