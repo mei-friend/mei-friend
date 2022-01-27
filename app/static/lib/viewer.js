@@ -378,7 +378,7 @@ export default class Viewer {
 
   // when cursor pos in editor changed, update notation location / highlight
   cursorActivity(cm, forceFlip = false) {
-    console.log('cursorActivity forceFlip: ' + forceFlip);
+    // console.log('cursorActivity forceFlip: ' + forceFlip);
     let id = utils.getElementIdAtCursor(cm);
     this.selectedElements = [];
     this.selectedElements.push(id);
@@ -417,7 +417,7 @@ export default class Viewer {
 
   // when editor emits changes, update notation rendering
   notationUpdated(cm, forceUpdate = false) {
-    console.log('NotationUpdated forceUpdate:' + forceUpdate);
+    // console.log('NotationUpdated forceUpdate:' + forceUpdate);
     this.encodingHasChanged = true;
     let ch = document.getElementById('live-update-checkbox');
     if (this.updateNotation && ch && ch.checked || forceUpdate)

@@ -97,3 +97,4 @@
 * Implement storage override where filesizes exceed storage quota
 # 0.2.6 patch
 * Set breaks to 'line' when sb/pb elements found in encoding, to 'auto' otherwise
+* CodeMirror stays focussed after cursor activity 

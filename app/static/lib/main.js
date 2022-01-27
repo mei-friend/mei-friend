@@ -44,7 +44,7 @@ import Storage from './storage.js';
 import Github from './github.js';
 
 const version = 'develop-0.2.6';
-const versionDate = '26 Jan 2022';
+const versionDate = '27 Jan 2022';
 // const defaultMeiFileName = `${root}Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei`;
 const defaultMeiFileName = `${root}Beethoven_WoO70-Breitkopf.mei`;
 const defaultVerovioOptions = {
