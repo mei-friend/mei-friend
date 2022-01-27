@@ -157,7 +157,8 @@ export default class Viewer {
         if (e.nodeName == 'measure') break;
         if (countBreaks && this.breaks.includes(e.nodeName)) this.pageCount--;
       }
-      if (this.currentPage > this.pageCount) this.currentPage = 1;
+      if (this.currentPage < 1 || this.currentPage > this.pageCount)
+        this.currentPage = 1;
       console.info('xmlDOM pages counted: currentPage: ' + this.currentPage +
         ', pageCount: ' + this.pageCount);
     }
@@ -376,14 +377,15 @@ export default class Viewer {
 
   // when cursor pos in editor changed, update notation location / highlight
   cursorActivity(cm, forceFlip = false) {
+    console.debug('cursorActivity forceFlip: ' + forceFlip);
     let id = utils.getElementIdAtCursor(cm);
     this.selectedElements = [];
     this.selectedElements.push(id);
     let fl = document.getElementById('flip-checkbox');
-    if (!document.querySelector('g#' + id) &&
+    if (!document.querySelector('g#' + id) && // when not on current page
       ((this.updateNotation && fl && fl.checked) || forceFlip)) {
       this.updatePage(cm, '', id);
-    } else if (this.updateNotation) {
+    } else if (this.updateNotation) { // on current page
       this.scrollSvg(cm);
       this.updateHighlight(cm);
     }
@@ -414,6 +416,7 @@ export default class Viewer {
 
   // when editor emits changes, update notation rendering
   notationUpdated(cm, forceUpdate = false) {
+    console.debug('NotationUpdated forceUpdate:' + forceUpdate);
     this.encodingHasChanged = true;
     let ch = document.getElementById('live-update-checkbox');
     if (this.updateNotation && ch && ch.checked || forceUpdate)
