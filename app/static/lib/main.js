@@ -43,6 +43,9 @@ import Viewer from './viewer.js';
 import Storage from './storage.js';
 import Github from './github.js';
 
+// schemas for autocompletion
+import schema_meiAll from '../schemaInfo/mei-all-4.0.1.schemaInfo.js';
+
 const version = 'develop-0.2.6';
 const versionDate = '27 Jan 2022';
 // const defaultMeiFileName = `${root}Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei`;
@@ -74,6 +77,31 @@ let storage = new Storage();
 let fileChanged = false; // flag to track whether unsaved changes to file exist
 let freshlyLoaded = false; // flag to ignore a cm.on("changes") event on file load
 
+function completeAfter(cm, pred) {
+  var cur = cm.getCursor();
+  if (!pred || pred()) setTimeout(function() {
+    if (!cm.state.completionActive)
+      cm.showHint({completeSingle: false});
+  }, 100);
+  return CodeMirror.Pass;
+}
+
+function completeIfAfterLt(cm) {
+  return completeAfter(cm, function() {
+    var cur = cm.getCursor();
+    return cm.getRange(CodeMirror.Pos(cur.line, cur.ch - 1), cur) == "<";
+  });
+}
+
+function completeIfInTag(cm) {
+  return completeAfter(cm, function() {
+    var tok = cm.getTokenAt(cm.getCursor());
+    if (tok.type == "string" && (!/['"]/.test(tok.string.charAt(tok.string.length - 1)) || tok.string.length == 1)) return false;
+    var inner = CodeMirror.innerMode(cm.getMode(), tok.state).state;
+    return inner.tagName;
+  });
+}
+
 document.addEventListener('DOMContentLoaded', function() {
   let myTextarea = document.getElementById("editor");
 
@@ -94,8 +122,14 @@ document.addEventListener('DOMContentLoaded', function() {
     foldGutter: true,
     gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
     extraKeys: {
-      "Alt-F": "findPersistent"
-    }
+      "Alt-F": "findPersistent",
+      "'<'": completeAfter,
+      "'/'": completeIfAfterLt,
+      "' '": completeIfInTag,
+      "'='": completeIfInTag,
+      "Ctrl-Space": "autocomplete"
+    }, 
+    hintOptions: {schemaInfo: schema_meiAll}
     // theme: 'dracula' // monokai (dark), dracula (bright)
   });
 
