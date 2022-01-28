@@ -389,6 +389,7 @@ export function addToolTip(element, object) {
 }
 
 export function setBreaksOptions(tkAvailableOptions, defaultValue = 'auto') {
+  if (defaultValue == '') defaultValue = 'auto';
   let breaksEl = document.getElementById('breaks-select');
   var breaksOpts = {
     auto: 'Automatic',
@@ -416,15 +417,18 @@ export function generateSectionSelect(xmlDoc) {
   let sections = [ //first option with empty string for Firefox (TODO: beautify)
     ['', '']
   ];
-  let baseSection = xmlDoc.querySelector('music section');
+  let baseSection = xmlDoc.querySelector('music score');
   let els = Array.from(baseSection.querySelectorAll(selector));
   els.forEach(el => {
     let str = '';
     let parent = el.parentElement.closest(selector);
-    while (parent = parent.parentElement.closest(selector))
-      str += '│ '; // &#9474;&nbsp; for indentation
+    if (parent) {
+      while (parent = parent.parentElement.closest(selector))
+        str += '│ '; // &#9474;&nbsp; for indentation
+    }
     sections.push([str + el.getAttribute('xml:id'), el.getAttribute('xml:id')]);
   });
+  if (sections.length == 2) sections.pop(); // remove if only the one section
   return sections;
 }
 

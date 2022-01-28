@@ -74,13 +74,14 @@ export default class Viewer {
     this.worker.postMessage(message);
   }
 
-  updatePage(cm, page, xmlId = '') {
+  updatePage(cm, page, xmlId = '', setFocusToVerovioPane = true) {
     if (this.changeCurrentPage(page) || xmlId) {
       if (!this.speedMode) {
         let message = {
           'cmd': 'updatePage',
           'pageNo': this.currentPage,
-          'xmlId': xmlId
+          'xmlId': xmlId,
+          'setFocusToVerovioPane': setFocusToVerovioPane
         };
         this.busy();
         this.worker.postMessage(message);
@@ -91,7 +92,7 @@ export default class Viewer {
           console.info('UpdatePage(speedMode=true): page: ' +
             this.currentPage + ', xmlId: ' + xmlId);
         }
-        this.updateData(cm, xmlId ? false : true, true);
+        this.updateData(cm, xmlId ? false : true, setFocusToVerovioPane);
       }
     }
   }
@@ -141,7 +142,7 @@ export default class Viewer {
     }
     // count pages from system/pagebreaks
     if (Array.isArray(this.breaks)) {
-      let music = this.xmlDoc.querySelector('music');
+      let music = this.xmlDoc.querySelector('music score');
       let elements;
       if (music) elements = music.querySelectorAll('measure, sb, pb');
       else return '';
@@ -157,7 +158,8 @@ export default class Viewer {
         if (e.nodeName == 'measure') break;
         if (countBreaks && this.breaks.includes(e.nodeName)) this.pageCount--;
       }
-      if (this.currentPage > this.pageCount) this.currentPage = 1;
+      if (this.currentPage < 1 || this.currentPage > this.pageCount)
+        this.currentPage = 1;
       console.info('xmlDOM pages counted: currentPage: ' + this.currentPage +
         ', pageCount: ' + this.pageCount);
     }
@@ -169,6 +171,21 @@ export default class Viewer {
       this.xmlDoc = this.parser.parseFromString(mei, "text/xml");
       this.encodingHasChanged = false;
     }
+  }
+
+  // returns true if sb/pb elements are contained (more than the leading pb)
+  containsBreaks() {
+    let music = this.xmlDoc.querySelector('music');
+    let elements;
+    if (music) elements = music.querySelectorAll('measure, sb, pb');
+    else return false;
+    let countBreaks = false;
+    for (let e of elements) {
+      if (e.nodeName == 'measure') countBreaks = true; // skip leading breaks
+      if (countBreaks && ['sb', 'pb'].includes(e.nodeName))
+        return true;
+    }
+    return false;
   }
 
   clear() {
@@ -285,7 +302,9 @@ export default class Viewer {
     let stNo, lyNo;
     let sc;
     if (id == '') {
-      id = document.querySelector('.note').getAttribute('id');
+      let note = document.querySelector('.note');
+      if (note) id = note.getAttribute('id');
+      else return '';
     } else {
       sc = cm.getSearchCursor('xml:id="' + id + '"');
       if (sc.findNext()) {
@@ -361,14 +380,15 @@ export default class Viewer {
 
   // when cursor pos in editor changed, update notation location / highlight
   cursorActivity(cm, forceFlip = false) {
+    // console.log('cursorActivity forceFlip: ' + forceFlip);
     let id = utils.getElementIdAtCursor(cm);
     this.selectedElements = [];
     this.selectedElements.push(id);
     let fl = document.getElementById('flip-checkbox');
-    if (!document.querySelector('g#' + id) &&
+    if (!document.querySelector('g#' + id) && // when not on current page
       ((this.updateNotation && fl && fl.checked) || forceFlip)) {
-      this.updatePage(cm, '', id);
-    } else if (this.updateNotation) {
+      this.updatePage(cm, '', id, false);
+    } else if (this.updateNotation) { // on current page
       this.scrollSvg(cm);
       this.updateHighlight(cm);
     }
@@ -399,6 +419,7 @@ export default class Viewer {
 
   // when editor emits changes, update notation rendering
   notationUpdated(cm, forceUpdate = false) {
+    // console.log('NotationUpdated forceUpdate:' + forceUpdate);
     this.encodingHasChanged = true;
     let ch = document.getElementById('live-update-checkbox');
     if (this.updateNotation && ch && ch.checked || forceUpdate)

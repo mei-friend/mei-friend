@@ -201,15 +201,11 @@ export function getIdOfNextElement(cm, rw, elementNames = dutils.navElsArray,
 // returns xml:id of current element (at encoding cursor position). If empty,
 // search for next higher staff or measure xml:id
 export function getElementIdAtCursor(cm) {
-  let result;
   let tag;
-  let p = cm.getCursor();
-  let row = p.line;
-  let column = p.ch;
-  // get line from current cursor position
-  let line = cm.getLine(row);
+  let cursor = cm.getCursor();
+  let line = cm.getLine(cursor.line);
   // check if cursor is on a closing tag by stepping backwards
-  for (let j = column; j > 0; j--) {
+  for (let j = cursor.ch; j > 0; j--) {
     if (line[j] === "/" && line[j - 1] === "<") {
       // if closing tag is found, find the name of the tag with regex
       tag = line.slice(j - 1).match(closingTag);
@@ -219,24 +215,44 @@ export function getElementIdAtCursor(cm) {
       }
     }
   }
-  // if closing tag identified, find opening tag and set row number accordingly
-  if (tag) {
-    for (let k = row; k >= 0; k--) {
-      if (cm.getLine(k).includes(`<${tag}`)) {
-        row = k;
-        break;
-      }
+  // if closing tag identified, find opening and closing tag
+  let from = {
+    'line': 0,
+    'ch': 0
+  };
+  let to = {
+    'line': 0,
+    'ch': 0
+  };
+  let startRegEx = /(<\S+?\s+?)/; // self-closing elements
+  let endRegEx = /\/>/;
+  if (tag) { // element tag with closing tag
+    startRegEx = `<${tag}`;
+    endRegEx = `</${tag}`;
+  }
+  for (let k = cursor.line; k >= 0; k--) {
+    if (cm.getLine(k).match(startRegEx)) {
+      from.line = k;
+      break;
+    }
+  }
+  for (let k = cursor.line; k < cm.lineCount(); k++) {
+    let m;
+    if (m = cm.getLine(k).match(endRegEx)) {
+      to.line = k;
+      to.ch = m.index;
+      break;
     }
   }
   // search for xml:id in row
-  result = cm.getLine(row).match(xmlIdString);
+  let result = cm.getRange(from, to).match(xmlIdString);
   // if one is found, return it
   if (result !== null) {
     return result[1];
   }
   // if no id is found, look in parent staff and measure to find one
   let outsideParentStaff = false;
-  for (let m = row; m >= 0; m--) {
+  for (let m = cursor.line; m >= 0; m--) {
     line = cm.getLine(m);
     if (line.includes('<music')) {
       break;

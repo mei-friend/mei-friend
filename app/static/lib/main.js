@@ -11,6 +11,7 @@ var v; // viewer instance
 let github; // github API wrapper object
 
 import {
+  getOrientation,
   setOrientation,
   addResizerHandlers
 } from './resizer.js'
@@ -43,8 +44,11 @@ import Viewer from './viewer.js';
 import Storage from './storage.js';
 import Github from './github.js';
 
-const version = '0.2.5';
-const versionDate = '26 Jan 2022';
+// schemas for autocompletion
+import schema_meiAll from '../schemaInfo/mei-all-4.0.1.schemaInfo.js';
+
+const version = 'develop-0.3.0';
+const versionDate = '28 Jan 2022';
 // const defaultMeiFileName = `${root}Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei`;
 const defaultMeiFileName = `${root}Beethoven_WoO70-Breitkopf.mei`;
 const defaultVerovioOptions = {
@@ -64,8 +68,8 @@ const defaultVerovioOptions = {
   minLastJustification: 0,
   clefChangeFactor: .83,
   svgAdditionalAttribute: ["layer@n", "staff@n"],
-  bottomMarginArtic: 1.1,
-  topMarginArtic: 1.1
+  bottomMarginArtic: 1.2,
+  topMarginArtic: 1.2
 };
 const defaultKeyMap = `${root}keymaps/default-keymap.json`;
 
@@ -73,6 +77,33 @@ let storage = new Storage();
 
 let fileChanged = false; // flag to track whether unsaved changes to file exist
 let freshlyLoaded = false; // flag to ignore a cm.on("changes") event on file load
+
+function completeAfter(cm, pred) {
+  var cur = cm.getCursor();
+  if (!pred || pred()) setTimeout(function() {
+    if (!cm.state.completionActive)
+      cm.showHint({
+        completeSingle: false
+      });
+  }, 100);
+  return CodeMirror.Pass;
+}
+
+function completeIfAfterLt(cm) {
+  return completeAfter(cm, function() {
+    var cur = cm.getCursor();
+    return cm.getRange(CodeMirror.Pos(cur.line, cur.ch - 1), cur) == "<";
+  });
+}
+
+function completeIfInTag(cm) {
+  return completeAfter(cm, function() {
+    var tok = cm.getTokenAt(cm.getCursor());
+    if (tok.type == "string" && (!/['"]/.test(tok.string.charAt(tok.string.length - 1)) || tok.string.length == 1)) return false;
+    var inner = CodeMirror.innerMode(cm.getMode(), tok.state).state;
+    return inner.tagName;
+  });
+}
 
 document.addEventListener('DOMContentLoaded', function() {
   let myTextarea = document.getElementById("editor");
@@ -94,14 +125,42 @@ document.addEventListener('DOMContentLoaded', function() {
     foldGutter: true,
     gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
     extraKeys: {
-      "Alt-F": "findPersistent"
+      "Alt-F": "findPersistent",
+      "'<'": completeAfter,
+      "'/'": completeIfAfterLt,
+      "' '": completeIfInTag,
+      "'='": completeIfInTag,
+      "Ctrl-Space": "autocomplete"
+    },
+    hintOptions: {
+      schemaInfo: schema_meiAll
     }
     // theme: 'dracula' // monokai (dark), dracula (bright)
   });
 
+  createControlsMenu(
+    document.querySelector('.notation'), defaultVerovioOptions.scale);
+  addModifyerKeys(document); //
+
+  console.log('DOMContentLoaded. Trying now to load Verovio...');
+  document.querySelector(".statusbar").innerHTML = "Loading Verovio.";
+  document.querySelector(".rightfoot").innerHTML =
+    "<a href='https://github.com/wergo/mei-friend-online'>mei-friend " +
+    version + "</a> (" + versionDate + ").&nbsp;";
+
+  vrvWorker = new Worker(`${root}lib/worker.js`);
+  vrvWorker.onmessage = workerEventsHandler;
+
+  v = new Viewer(vrvWorker);
+  v.vrvOptions = {
+    ...defaultVerovioOptions
+  };
+
+  let or = 'bottom'; // default layout orientation
   // restore localStorage if we have it
   if (storage.supported) {
     storage.read();
+    or = storage.orientation || or;
     setFileChangedState(storage.fileChanged);
     if (storage.content) {
       meiFileName = storage.fileName;
@@ -161,30 +220,15 @@ document.addEventListener('DOMContentLoaded', function() {
       fillInBranchContents();
     }
   }
-  setOrientation(cm, 'bottom', v);
 
-  createControlsMenu(
-    document.querySelector('.notation'), defaultVerovioOptions.scale);
-  addModifyerKeys(document); //
-
-  console.log('DOMContentLoaded. Trying now to load Verovio...');
-  document.querySelector(".statusbar").innerHTML = "Loading Verovio.";
-  document.querySelector(".rightfoot").innerHTML =
-    "<a href='https://github.com/wergo/mei-friend-online'>mei-friend " +
-    version + "</a> (" + versionDate + ").&nbsp;";
-
-  vrvWorker = new Worker(`${root}lib/worker.js`);
-  vrvWorker.onmessage = workerEventsHandler;
-
-  v = new Viewer(vrvWorker);
-  v.vrvOptions = defaultVerovioOptions;
+  setOrientation(cm, or, v);
 
   addEventListeners(v, cm);
   addResizerHandlers(v, cm);
   let doit;
   window.onresize = () => {
     clearTimeout(doit); // wait half a second before re-calculating orientation
-    doit = setTimeout(() => setOrientation(cm, '', v), 500);
+    doit = setTimeout(() => setOrientation(cm, '', v, storage), 500);
   };
 
   // ask worker to load Verovio
@@ -334,7 +378,7 @@ function updateGithubInLocalStorage() {
       userName: name,
       userEmail: email
     }
-    if(github.filepath) { 
+    if (github.filepath) {
       storage.fileLocationType = "github";
     }
   }
@@ -385,17 +429,17 @@ function setFileChangedState(fileChangedState) {
   }
   if (storage.supported) {
     storage.fileChanged = fileChanged ? 1 : 0;
-    if(storage.override) { 
+    if (storage.override) {
       // unable to write to local storage, probably because quota exceeded
       // warn user...
       fileStatusElement.classList.add("warn");
       fileStorageExceededIndicatorElement.innerText = "LOCAL-STORAGE DISABLED!";
       fileStorageExceededIndicatorElement.classList.add("warn");
-      fileStorageExceededIndicatorElement.title = "Your MEI content exceeds " + 
-        "the browser's local storage space. Please ensure changes are saved " + 
-        "manually or committed to Github before refreshing or leaving "+
+      fileStorageExceededIndicatorElement.title = "Your MEI content exceeds " +
+        "the browser's local storage space. Please ensure changes are saved " +
+        "manually or committed to Github before refreshing or leaving " +
         "the page!";
-    } else { 
+    } else {
       fileStatusElement.classList.remove("warn");
       fileStorageExceededIndicatorElement.innerText = "";
       fileStorageExceededIndicatorElement.classList.remove("warn");
@@ -448,7 +492,7 @@ export async function openUrlFetch() {
         }
         updateFileStatusDisplay();
         handleEncoding(data);
-        if(storage.supported) { 
+        if (storage.supported) {
           storage.fileLocationType = "url";
         }
         openUrlCancel(); //hide open URL UI elements
@@ -529,7 +573,7 @@ async function fillInBranchContents(e) {
     });
   } else {
     // User clicked file, or restoring from local storage. Display commit interface
-    if(storage.supported && github.filepath) { 
+    if (storage.supported && github.filepath) {
       storage.fileLocationType = "github";
     }
     const commitUI = document.createElement("div");
@@ -605,11 +649,14 @@ function renderCommitLog() {
 }
 
 function loadDataInEditor(mei, setFreshlyLoaded = true) {
-  if(storage.supported) { 
+  if (storage.supported) {
     storage.override = false;
   }
   freshlyLoaded = setFreshlyLoaded;
-  cm.setValue(mei)
+  cm.setValue(mei);
+  v.loadXml(mei);
+  let bs = document.getElementById('breaks-select');
+  if (bs) bs.value = v.containsBreaks() ? 'line' : 'auto';
 }
 
 function workerEventsHandler(ev) {
@@ -885,7 +932,7 @@ function openFileDialog(accept = '*') {
       meiFileLocation = "";
       meiFileLocationPrintable = "";
       openFile(files[0]);
-      if(storage.supported)  {
+      if (storage.supported) {
         storage.fileLocationType = "file";
       }
       if (isLoggedIn) {
@@ -954,10 +1001,10 @@ let cmd = {
   'previousMeasure': () => v.navigate(cm, 'measure', 'backwards'),
   'layerUp': () => v.navigate(cm, 'layer', 'upwards'),
   'layerDown': () => v.navigate(cm, 'layer', 'downwards'),
-  'notationTop': () => setOrientation(cm, "top", v),
-  'notationBottom': () => setOrientation(cm, "bottom", v),
-  'notationLeft': () => setOrientation(cm, "left", v),
-  'notationRight': () => setOrientation(cm, "right", v),
+  'notationTop': () => setOrientation(cm, "top", v, storage),
+  'notationBottom': () => setOrientation(cm, "bottom", v, storage),
+  'notationLeft': () => setOrientation(cm, "left", v, storage),
+  'notationRight': () => setOrientation(cm, "right", v, storage),
   'moveProgBar': () => moveProgressBar(),
   'open': () => openFileDialog(),
   'openUrl': () => openUrl(),

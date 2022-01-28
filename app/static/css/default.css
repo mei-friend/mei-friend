@@ -49,12 +49,7 @@ a:active {
 .title {
   padding: 3px 20px;
   font-weight: bold;
-  font-size: 21px;
-}
-
-.orientation button, .orientation {
-  padding: 2px;
-  font-size: 7pt;
+  font-size: 18pt;
 }
 
 .dragOverlay {
@@ -113,14 +108,14 @@ a:active {
   position: absolute;
   top: 50%;
   left: 50%;
-  font-size: 50px;
+  font-size: 28pt;
   color: white;
   transform: translate(-50%, -50%);
   -ms-transform: translate(-50%, -50%);
 }
 
 #openUrlStatus {
-  font-size: small;
+  font-size: 8pt;
   color: crimson;
   visibility: hidden;
 }
@@ -172,7 +167,7 @@ a:active {
 
 .leftfoot {
   padding: 3px 6px;
-  min-width: 180px;
+  min-width: 230px;
 }
 
 .middlefoot {
@@ -210,7 +205,7 @@ a:active {
 
 .rightfoot {
   padding: 3px 6px;
-  min-width: 180px;
+  min-width: 330px;
 }
 
 .control-menu {
