@@ -2,8 +2,9 @@ let orientation = 'bottom';
 let notationProportion = .5; // proportion notation div takes from container
 let resizerWidth = 8; // 8 px, attention hard-coded also in 4 css files
 
-export function setOrientation(cm, o = '', v = null) {
+export function setOrientation(cm, o = '', v = null, storage = null) {
   if (o) orientation = o;
+  if (storage && storage.supported) storage.orientation = orientation;
   let friendSz = document.querySelector(".friendContainer");
   var stylesheet = document.getElementById("orientationCSS");
   stylesheet.setAttribute('href', root + 'css/' + orientation + '.css');
@@ -37,6 +38,10 @@ export function setOrientation(cm, o = '', v = null) {
       setTimeout(() => v.updateLayout(), 33);
     }
   }
+}
+
+export function getOrientation() {
+   return orientation;
 }
 
 export function calcSizeOfContainer() {

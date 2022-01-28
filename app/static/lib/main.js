@@ -11,6 +11,7 @@ var v; // viewer instance
 let github; // github API wrapper object
 
 import {
+  getOrientation,
   setOrientation,
   addResizerHandlers
 } from './resizer.js'
@@ -81,7 +82,9 @@ function completeAfter(cm, pred) {
   var cur = cm.getCursor();
   if (!pred || pred()) setTimeout(function() {
     if (!cm.state.completionActive)
-      cm.showHint({completeSingle: false});
+      cm.showHint({
+        completeSingle: false
+      });
   }, 100);
   return CodeMirror.Pass;
 }
@@ -128,16 +131,16 @@ document.addEventListener('DOMContentLoaded', function() {
       "' '": completeIfInTag,
       "'='": completeIfInTag,
       "Ctrl-Space": "autocomplete"
-    }, 
-    hintOptions: {schemaInfo: schema_meiAll}
+    },
+    hintOptions: {
+      schemaInfo: schema_meiAll
+    }
     // theme: 'dracula' // monokai (dark), dracula (bright)
   });
 
   createControlsMenu(
     document.querySelector('.notation'), defaultVerovioOptions.scale);
   addModifyerKeys(document); //
-
-  setOrientation(cm, 'bottom', v);
 
   console.log('DOMContentLoaded. Trying now to load Verovio...');
   document.querySelector(".statusbar").innerHTML = "Loading Verovio.";
@@ -153,9 +156,11 @@ document.addEventListener('DOMContentLoaded', function() {
     ...defaultVerovioOptions
   };
 
+  let or = 'bottom'; // default layout orientation 
   // restore localStorage if we have it
   if (storage.supported) {
     storage.read();
+    or = storage.orientation || or;
     setFileChangedState(storage.fileChanged);
     if (storage.content) {
       meiFileName = storage.fileName;
@@ -216,14 +221,14 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
-
+  setOrientation(cm, or, v);
 
   addEventListeners(v, cm);
   addResizerHandlers(v, cm);
   let doit;
   window.onresize = () => {
     clearTimeout(doit); // wait half a second before re-calculating orientation
-    doit = setTimeout(() => setOrientation(cm, '', v), 500);
+    doit = setTimeout(() => setOrientation(cm, '', v, storage), 500);
   };
 
   // ask worker to load Verovio
@@ -996,10 +1001,10 @@ let cmd = {
   'previousMeasure': () => v.navigate(cm, 'measure', 'backwards'),
   'layerUp': () => v.navigate(cm, 'layer', 'upwards'),
   'layerDown': () => v.navigate(cm, 'layer', 'downwards'),
-  'notationTop': () => setOrientation(cm, "top", v),
-  'notationBottom': () => setOrientation(cm, "bottom", v),
-  'notationLeft': () => setOrientation(cm, "left", v),
-  'notationRight': () => setOrientation(cm, "right", v),
+  'notationTop': () => setOrientation(cm, "top", v, storage),
+  'notationBottom': () => setOrientation(cm, "bottom", v, storage),
+  'notationLeft': () => setOrientation(cm, "left", v, storage),
+  'notationRight': () => setOrientation(cm, "right", v, storage),
   'moveProgBar': () => moveProgressBar(),
   'open': () => openFileDialog(),
   'openUrl': () => openUrl(),
