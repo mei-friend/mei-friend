@@ -489,10 +489,9 @@ export function getPageWithElement(v, id) {
       sel = 'pb,[*|id="' + id + '"]'; // find all breaks in xmlDoc
     }
     if (sel == '') return page;
-    let music = v.xmlDoc.querySelector('music');
+    let music = v.xmlDoc.querySelector('music score');
     let els;
-    if (music)
-      els = Array.from(v.xmlDoc.querySelector('music').querySelectorAll(sel));
+    if (music) els = Array.from(music.querySelectorAll(sel));
     else return page;
     if (els) {
       page = els.findIndex(el => el.getAttribute('xml:id') == id) + 1;
@@ -501,7 +500,7 @@ export function getPageWithElement(v, id) {
         page--; // ...undo increment
     }
     if (bs == 'line' || bs == 'encoded') { // remove leading pb in MEI file
-      els = v.xmlDoc.querySelector('music').querySelectorAll('pb,measure');
+      els = music.querySelectorAll('pb,measure');
       let i;
       for (i = 0; i < els.length; i++) {
         if (els[i].nodeName != 'pb') break;

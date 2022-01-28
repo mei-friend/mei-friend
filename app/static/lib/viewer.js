@@ -142,7 +142,7 @@ export default class Viewer {
     }
     // count pages from system/pagebreaks
     if (Array.isArray(this.breaks)) {
-      let music = this.xmlDoc.querySelector('music');
+      let music = this.xmlDoc.querySelector('music score');
       let elements;
       if (music) elements = music.querySelectorAll('measure, sb, pb');
       else return '';
