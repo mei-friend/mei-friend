@@ -205,7 +205,8 @@ a:active {
 
 .rightfoot {
   padding: 3px 6px;
-  min-width: 330px;
+  min-width: 300px;
+  text-align: right;
 }
 
 .control-menu {
