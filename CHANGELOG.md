@@ -98,8 +98,8 @@
 # 0.2.6 patch
 * Set breaks to 'line' when sb/pb elements found in encoding, to 'auto' otherwise
 * CodeMirror stays focussed after cursor activity
-# 0.3.0: autocompletion
+# 0.3.0 minor: autocompletion
 * Incorporate CodeMirror's hint addons (show-hint, xml-hint)
 * Implement context-sensitive autocompletion
 * Supply mei-CMN and mei-all 4.0.1 RNGs as schemaInfo objects
-* Remember orientation upon refresh 
+* Remember orientation upon refresh

@@ -45,9 +45,9 @@ import Storage from './storage.js';
 import Github from './github.js';
 
 // schemas for autocompletion
-import schema_meiAll from '../schemaInfo/mei-all-4.0.1.schemaInfo.js';
+import schema_meiAll from '../schemaInfo/mei-CMN-4.0.1.schemaInfo.js';
 
-const version = 'develop-0.3.0';
+const version = '0.3.0';
 const versionDate = '28 Jan 2022';
 // const defaultMeiFileName = `${root}Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei`;
 const defaultMeiFileName = `${root}Beethoven_WoO70-Breitkopf.mei`;
