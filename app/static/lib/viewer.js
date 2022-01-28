@@ -302,7 +302,9 @@ export default class Viewer {
     let stNo, lyNo;
     let sc;
     if (id == '') {
-      id = document.querySelector('.note').getAttribute('id');
+      let note = document.querySelector('.note');
+      if (note) id = note.getAttribute('id');
+      else return '';
     } else {
       sc = cm.getSearchCursor('xml:id="' + id + '"');
       if (sc.findNext()) {
