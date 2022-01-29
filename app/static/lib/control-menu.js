@@ -423,6 +423,7 @@ export function generateSectionSelect(xmlDoc) {
     let str = '';
     let parent = el.parentElement.closest(selector);
     if (parent) {
+      str += '│ ';
       while (parent = parent.parentElement.closest(selector))
         str += '│ '; // &#9474;&nbsp; for indentation
     }

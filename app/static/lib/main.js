@@ -44,10 +44,10 @@ import Storage from './storage.js';
 import Github from './github.js';
 
 // schemas for autocompletion
-import schema_meiAll from '../schemaInfo/mei-all-4.0.1.schemaInfo.js';
+import schema_meiAll from '../schemaInfo/mei-CMN-4.0.1.schemaInfo.js';
 
-const version = 'develop-0.3.0';
-const versionDate = '28 Jan 2022';
+const version = 'develop-0.3.1';
+const versionDate = '29 Jan 2022';
 // const defaultMeiFileName = `${root}Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei`;
 const defaultMeiFileName = `${root}Beethoven_WoO70-Breitkopf.mei`;
 const defaultVerovioOptions = {
@@ -81,7 +81,9 @@ function completeAfter(cm, pred) {
   var cur = cm.getCursor();
   if (!pred || pred()) setTimeout(function() {
     if (!cm.state.completionActive)
-      cm.showHint({completeSingle: false});
+      cm.showHint({
+        completeSingle: false
+      });
   }, 100);
   return CodeMirror.Pass;
 }
@@ -128,16 +130,16 @@ document.addEventListener('DOMContentLoaded', function() {
       "' '": completeIfInTag,
       "'='": completeIfInTag,
       "Ctrl-Space": "autocomplete"
-    }, 
-    hintOptions: {schemaInfo: schema_meiAll}
+    },
+    hintOptions: {
+      schemaInfo: schema_meiAll
+    }
     // theme: 'dracula' // monokai (dark), dracula (bright)
   });
 
   createControlsMenu(
     document.querySelector('.notation'), defaultVerovioOptions.scale);
   addModifyerKeys(document); //
-
-  setOrientation(cm, 'bottom', v);
 
   console.log('DOMContentLoaded. Trying now to load Verovio...');
   document.querySelector(".statusbar").innerHTML = "Loading Verovio.";
@@ -153,77 +155,86 @@ document.addEventListener('DOMContentLoaded', function() {
     ...defaultVerovioOptions
   };
 
-  // restore localStorage if we have it
-  if (storage.supported) {
-    storage.read();
-    setFileChangedState(storage.fileChanged);
-    if (storage.content) {
-      meiFileName = storage.fileName;
-      meiFileLocation = storage.fileLocation;
-      meiFileLocationPrintable = storage.fileLocationPrintable;
-      updateFileStatusDisplay();
-      // on initial page load, CM doesn't fire a "changes" event
-      // so we don't need to skip the "freshly loaded" change
-      // hence the "false" on the following line:
-      loadDataInEditor(storage.content, false);
-    } else {
+  // check for parameters passed through URL
+  let searchParams = new URLSearchParams(window.location.search);
+  let or = 'bottom'; // default layout orientation
+  if (searchParams.get('orientation')) or = searchParams.get('orientation');
+  let urlFileName = searchParams.get('file');
+  if (urlFileName) {
+    openUrlFetch(new URL(urlFileName));
+  } else {
+    // restore localStorage if we have it
+    if (storage.supported) {
+      storage.read();
+      or = storage.orientation || or;
+      setFileChangedState(storage.fileChanged);
+      if (storage.content) {
+        meiFileName = storage.fileName;
+        meiFileLocation = storage.fileLocation;
+        meiFileLocationPrintable = storage.fileLocationPrintable;
+        updateFileStatusDisplay();
+        // on initial page load, CM doesn't fire a "changes" event
+        // so we don't need to skip the "freshly loaded" change
+        // hence the "false" on the following line:
+        loadDataInEditor(storage.content, false);
+      } else {
+        meiFileLocation = "";
+        meiFileLocationPrintable = "";
+        openFile(undefined, false); // default MEI, skip freshly loaded (see comment above)
+        setFileChangedState(false);
+      }
+      if (storage.github) {
+        // use github object from local storage if available
+        isLoggedIn = true;
+        github = new Github(
+          storage.github.githubRepo,
+          storage.github.githubToken,
+          storage.github.branch,
+          storage.github.filepath,
+          storage.github.userLogin,
+          storage.github.userName,
+          storage.github.userEmail
+        )
+        //document.querySelector("#fileLocation").innerText = meiFileLocationPrintable;
+      } else if (isLoggedIn) {
+        // initialise and store new github object
+        github = new Github("", githubToken, "", "", userLogin, userName, userEmail);
+        storage.github = {
+          githubRepo: github.githubRepo,
+          githubToken: github.githubToken,
+          branch: github.branch,
+          filepath: github.filepath,
+          userLogin: github.userLogin,
+          userName: userName,
+          userEmail: userEmail
+        };
+      }
+    } else { // no local storage
+      if (isLoggedIn) { // initialise new github object
+        github = new Github("", githubToken, "", "", userLogin, userName, userEmail);
+      }
       meiFileLocation = "";
       meiFileLocationPrintable = "";
-      openFile(undefined, false); // default MEI, skip freshly loaded (see comment above)
-      setFileChangedState(false);
+      openFile(); // default MEI
     }
-    if (storage.github) {
-      // use github object from local storage if available
-      isLoggedIn = true;
-      github = new Github(
-        storage.github.githubRepo,
-        storage.github.githubToken,
-        storage.github.branch,
-        storage.github.filepath,
-        storage.github.userLogin,
-        storage.github.userName,
-        storage.github.userEmail
-      )
-      //document.querySelector("#fileLocation").innerText = meiFileLocationPrintable;
-    } else if (isLoggedIn) {
-      // initialise and store new github object
-      github = new Github("", githubToken, "", "", userLogin, userName, userEmail);
-      storage.github = {
-        githubRepo: github.githubRepo,
-        githubToken: github.githubToken,
-        branch: github.branch,
-        filepath: github.filepath,
-        userLogin: github.userLogin,
-        userName: userName,
-        userEmail: userEmail
-      };
-    }
-  } else { // no local storage
-    if (isLoggedIn) { // initialise new github object
-      github = new Github("", githubToken, "", "", userLogin, userName, userEmail);
-    }
-    meiFileLocation = "";
-    meiFileLocationPrintable = "";
-    openFile(); // default MEI
-  }
-  if (isLoggedIn) {
-    // regardless of storage availability:
-    // if we are logged in, refresh github menu
-    refreshGithubMenu();
-    if (github.githubRepo && github.branch && github.filepath) {
-      // preset github menu to where the user left off, if we can
-      fillInBranchContents();
+    if (isLoggedIn) {
+      // regardless of storage availability:
+      // if we are logged in, refresh github menu
+      refreshGithubMenu();
+      if (github.githubRepo && github.branch && github.filepath) {
+        // preset github menu to where the user left off, if we can
+        fillInBranchContents();
+      }
     }
   }
 
-
-
+  setOrientation(cm, or, v);
   addEventListeners(v, cm);
   addResizerHandlers(v, cm);
   let doit;
   window.onresize = () => {
     clearTimeout(doit); // wait half a second before re-calculating orientation
-    doit = setTimeout(() => setOrientation(cm, '', v), 500);
+    doit = setTimeout(() => setOrientation(cm, '', v, storage), 500);
   };
 
   // ask worker to load Verovio
@@ -450,11 +461,11 @@ function updateFileStatusDisplay() {
   document.querySelector("#fileLocation").title = meiFileLocation || "";
 }
 
-export async function openUrlFetch() {
+export async function openUrlFetch(url = '') {
   let urlInput = document.querySelector("#openUrlInput");
   let urlStatus = document.querySelector("#openUrlStatus");
   try {
-    const url = new URL(urlInput.value);
+    if (!url) url = new URL(urlInput.value);
     const response = await fetch(url, {
       method: 'GET',
       headers: {
@@ -996,10 +1007,10 @@ let cmd = {
   'previousMeasure': () => v.navigate(cm, 'measure', 'backwards'),
   'layerUp': () => v.navigate(cm, 'layer', 'upwards'),
   'layerDown': () => v.navigate(cm, 'layer', 'downwards'),
-  'notationTop': () => setOrientation(cm, "top", v),
-  'notationBottom': () => setOrientation(cm, "bottom", v),
-  'notationLeft': () => setOrientation(cm, "left", v),
-  'notationRight': () => setOrientation(cm, "right", v),
+  'notationTop': () => setOrientation(cm, "top", v, storage),
+  'notationBottom': () => setOrientation(cm, "bottom", v, storage),
+  'notationLeft': () => setOrientation(cm, "left", v, storage),
+  'notationRight': () => setOrientation(cm, "right", v, storage),
   'moveProgBar': () => moveProgressBar(),
   'open': () => openFileDialog(),
   'openUrl': () => openUrl(),

@@ -9,7 +9,7 @@
 /* Links inside the navbar */
 .navbar a {
   float: left;
-  font-size: 16px;
+  font-size: 12pt;
   color: darkgray;
   text-align: center;
   padding: 3px 12px;
@@ -34,7 +34,7 @@
 /* Dropdown button */
 .dropdown .dropbtn {
   cursor: pointer;
-  font-size: 16px;
+  font-size: 12pt;
   border: none;
   outline: none;
   color: black;
@@ -93,7 +93,7 @@
   text-align: left;
 }
 
-#GithubLoginLink { 
+#GithubLoginLink {
   float: unset;
   color: unset;
   text-align: unset;
@@ -115,7 +115,7 @@
 }
 
 #logTable {
-  font-size: smaller
+  font-size: 8pt;
 }
 
 #logTable a {
@@ -156,7 +156,7 @@
 }
 
 .fileStatus {
-  font-size: smaller;
+  font-size: 10pt;
   font-family: monospace;
   margin-left: 1em;
   padding: 3px 12px;
@@ -169,16 +169,16 @@
   white-space: pre;
 }
 
-.fileStatus #fileChanged { 
+.fileStatus #fileChanged {
   margin-left: -.5em;
   margin-right: .5em;
 }
 
-.fileStatus.changed { 
+.fileStatus.changed {
   color: darkorange;
 }
 
-.fileStatus.warn #fileName, .fileStatus.warn #fileLocation { 
+.fileStatus.warn #fileName, .fileStatus.warn #fileLocation {
   text-decoration: red dotted underline;
 }
 
@@ -189,4 +189,3 @@
   border: 1px solid red;
   cursor: default;
 }
-
