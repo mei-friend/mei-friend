@@ -11,7 +11,6 @@ var v; // viewer instance
 let github; // github API wrapper object
 
 import {
-  getOrientation,
   setOrientation,
   addResizerHandlers
 } from './resizer.js'
@@ -156,73 +155,80 @@ document.addEventListener('DOMContentLoaded', function() {
     ...defaultVerovioOptions
   };
 
+  // check for parameters passed through URL
+  let searchParams = new URLSearchParams(window.location.search);
   let or = 'bottom'; // default layout orientation
-  // restore localStorage if we have it
-  if (storage.supported) {
-    storage.read();
-    or = storage.orientation || or;
-    setFileChangedState(storage.fileChanged);
-    if (storage.content) {
-      meiFileName = storage.fileName;
-      meiFileLocation = storage.fileLocation;
-      meiFileLocationPrintable = storage.fileLocationPrintable;
-      updateFileStatusDisplay();
-      // on initial page load, CM doesn't fire a "changes" event
-      // so we don't need to skip the "freshly loaded" change
-      // hence the "false" on the following line:
-      loadDataInEditor(storage.content, false);
-    } else {
+  if (searchParams.get('orientation')) or = searchParams.get('orientation');
+  let urlFileName = searchParams.get('file');
+  if (urlFileName) {
+    openUrlFetch(new URL(urlFileName));
+  } else {
+    // restore localStorage if we have it
+    if (storage.supported) {
+      storage.read();
+      or = storage.orientation || or;
+      setFileChangedState(storage.fileChanged);
+      if (storage.content) {
+        meiFileName = storage.fileName;
+        meiFileLocation = storage.fileLocation;
+        meiFileLocationPrintable = storage.fileLocationPrintable;
+        updateFileStatusDisplay();
+        // on initial page load, CM doesn't fire a "changes" event
+        // so we don't need to skip the "freshly loaded" change
+        // hence the "false" on the following line:
+        loadDataInEditor(storage.content, false);
+      } else {
+        meiFileLocation = "";
+        meiFileLocationPrintable = "";
+        openFile(undefined, false); // default MEI, skip freshly loaded (see comment above)
+        setFileChangedState(false);
+      }
+      if (storage.github) {
+        // use github object from local storage if available
+        isLoggedIn = true;
+        github = new Github(
+          storage.github.githubRepo,
+          storage.github.githubToken,
+          storage.github.branch,
+          storage.github.filepath,
+          storage.github.userLogin,
+          storage.github.userName,
+          storage.github.userEmail
+        )
+        //document.querySelector("#fileLocation").innerText = meiFileLocationPrintable;
+      } else if (isLoggedIn) {
+        // initialise and store new github object
+        github = new Github("", githubToken, "", "", userLogin, userName, userEmail);
+        storage.github = {
+          githubRepo: github.githubRepo,
+          githubToken: github.githubToken,
+          branch: github.branch,
+          filepath: github.filepath,
+          userLogin: github.userLogin,
+          userName: userName,
+          userEmail: userEmail
+        };
+      }
+    } else { // no local storage
+      if (isLoggedIn) { // initialise new github object
+        github = new Github("", githubToken, "", "", userLogin, userName, userEmail);
+      }
       meiFileLocation = "";
       meiFileLocationPrintable = "";
-      openFile(undefined, false); // default MEI, skip freshly loaded (see comment above)
-      setFileChangedState(false);
+      openFile(); // default MEI
     }
-    if (storage.github) {
-      // use github object from local storage if available
-      isLoggedIn = true;
-      github = new Github(
-        storage.github.githubRepo,
-        storage.github.githubToken,
-        storage.github.branch,
-        storage.github.filepath,
-        storage.github.userLogin,
-        storage.github.userName,
-        storage.github.userEmail
-      )
-      //document.querySelector("#fileLocation").innerText = meiFileLocationPrintable;
-    } else if (isLoggedIn) {
-      // initialise and store new github object
-      github = new Github("", githubToken, "", "", userLogin, userName, userEmail);
-      storage.github = {
-        githubRepo: github.githubRepo,
-        githubToken: github.githubToken,
-        branch: github.branch,
-        filepath: github.filepath,
-        userLogin: github.userLogin,
-        userName: userName,
-        userEmail: userEmail
-      };
-    }
-  } else { // no local storage
-    if (isLoggedIn) { // initialise new github object
-      github = new Github("", githubToken, "", "", userLogin, userName, userEmail);
-    }
-    meiFileLocation = "";
-    meiFileLocationPrintable = "";
-    openFile(); // default MEI
-  }
-  if (isLoggedIn) {
-    // regardless of storage availability:
-    // if we are logged in, refresh github menu
-    refreshGithubMenu();
-    if (github.githubRepo && github.branch && github.filepath) {
-      // preset github menu to where the user left off, if we can
-      fillInBranchContents();
+    if (isLoggedIn) {
+      // regardless of storage availability:
+      // if we are logged in, refresh github menu
+      refreshGithubMenu();
+      if (github.githubRepo && github.branch && github.filepath) {
+        // preset github menu to where the user left off, if we can
+        fillInBranchContents();
+      }
     }
   }
 
   setOrientation(cm, or, v);
-
   addEventListeners(v, cm);
   addResizerHandlers(v, cm);
   let doit;
@@ -455,11 +461,11 @@ function updateFileStatusDisplay() {
   document.querySelector("#fileLocation").title = meiFileLocation || "";
 }
 
-export async function openUrlFetch() {
+export async function openUrlFetch(url = '') {
   let urlInput = document.querySelector("#openUrlInput");
   let urlStatus = document.querySelector("#openUrlStatus");
   try {
-    const url = new URL(urlInput.value);
+    if (!url) url = new URL(urlInput.value);
     const response = await fetch(url, {
       method: 'GET',
       headers: {
