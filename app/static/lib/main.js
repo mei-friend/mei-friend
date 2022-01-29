@@ -47,8 +47,8 @@ import Github from './github.js';
 // schemas for autocompletion
 import schema_meiAll from '../schemaInfo/mei-CMN-4.0.1.schemaInfo.js';
 
-const version = '0.3.0';
-const versionDate = '28 Jan 2022';
+const version = 'develop-0.3.1';
+const versionDate = '29 Jan 2022';
 // const defaultMeiFileName = `${root}Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei`;
 const defaultMeiFileName = `${root}Beethoven_WoO70-Breitkopf.mei`;
 const defaultVerovioOptions = {
