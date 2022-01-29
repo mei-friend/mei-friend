@@ -52,6 +52,10 @@ a:active {
   font-size: 21px;
 }
 
+.title img { 
+  height: 1.6em;
+}
+
 .orientation button, .orientation {
   padding: 2px;
   font-size: 7pt;
