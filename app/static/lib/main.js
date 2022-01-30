@@ -78,7 +78,6 @@ let fileChanged = false; // flag to track whether unsaved changes to file exist
 let freshlyLoaded = false; // flag to ignore a cm.on("changes") event on file load
 
 function completeAfter(cm, pred) {
-  var cur = cm.getCursor();
   if (!pred || pred()) setTimeout(function() {
     if (!cm.state.completionActive)
       cm.showHint({
