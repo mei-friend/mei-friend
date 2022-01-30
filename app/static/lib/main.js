@@ -137,8 +137,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // theme: 'dracula' // monokai (dark), dracula (bright)
   });
 
-  createControlsMenu(
-    document.querySelector('.notation'), defaultVerovioOptions.scale);
+  // check for parameters passed through URL
+  let searchParams = new URLSearchParams(window.location.search);
+  let scaleParam = searchParams.get('scale');
+
+  createControlsMenu(document.querySelector('.notation'),
+    scaleParam ? scaleParam : defaultVerovioOptions.scale);
   addModifyerKeys(document); //
 
   console.log('DOMContentLoaded. Trying now to load Verovio...');
@@ -155,8 +159,6 @@ document.addEventListener('DOMContentLoaded', function() {
     ...defaultVerovioOptions
   };
 
-  // check for parameters passed through URL
-  let searchParams = new URLSearchParams(window.location.search);
   let or = 'bottom'; // default layout orientation
   if (searchParams.get('orientation')) or = searchParams.get('orientation');
   let urlFileName = searchParams.get('file');
