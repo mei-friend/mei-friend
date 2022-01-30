@@ -396,7 +396,7 @@ function logoutFromGithub() {
     storage.removeItem("github");
   }
   // redirect to /logout to remove session cookie
-  const url = window.location.href;
+  const url = window.location.host;
   window.location.replace(url.substring(0, url.lastIndexOf("/")) + "/logout");
 }
 
@@ -487,7 +487,7 @@ export async function openUrlFetch(url = '') {
         meiFileLocationPrintable = url.hostname;
         meiFileName =
           url.pathname.substr(url.pathname.lastIndexOf("/") + 1);
-        if (isLoggedIn) {
+        if (storage.github && isLoggedIn) {
           // re-initialise github menu since we're now working from a URL
           github.filepath = "";
           github.branch = "";
