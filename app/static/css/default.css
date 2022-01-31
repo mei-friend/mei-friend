@@ -52,6 +52,10 @@ a:active {
   font-size: 18pt;
 }
 
+.title img { 
+  height: 1.6em;
+}
+
 .dragOverlay {
   position: fixed;
   display: none;
