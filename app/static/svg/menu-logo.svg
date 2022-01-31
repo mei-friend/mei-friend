@@ -2,9 +2,9 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   width="266.72162mm"
+   width="281.24725mm"
    height="70.274605mm"
-   viewBox="0 0 266.72162 70.274609"
+   viewBox="0 0 281.24725 70.274609"
    version="1.1"
    id="svg442418"
    inkscape:export-filename="/home/weigl/repos/mei-friend-online/app/static/img/logo.png"
@@ -33,9 +33,9 @@
      fit-margin-bottom="0"
      inkscape:zoom="0.77771465"
      inkscape:cx="463.53762"
-     inkscape:cy="588.90494"
-     inkscape:window-width="2560"
-     inkscape:window-height="1371"
+     inkscape:cy="280.30847"
+     inkscape:window-width="1920"
+     inkscape:window-height="1011"
      inkscape:window-x="0"
      inkscape:window-y="32"
      inkscape:window-maximized="1"
@@ -169,14 +169,14 @@
        inkscape:export-ydpi="90" />
     <text
        xml:space="preserve"
-       transform="matrix(0.30591649,0,0,0.30591649,-1370.0145,-364.7535)"
+       transform="matrix(0.30591649,0,0,0.30591649,-1352.0217,-364.7535)"
        id="text357104"
        style="font-style:normal;font-weight:normal;font-size:160px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect357106);fill:#2c5aa0;fill-opacity:1;stroke:none"><tspan
          x="4301.3086"
          y="1320.4128"
-         id="tspan455140"><tspan
+         id="tspan455280"><tspan
            style="font-family:'Latin Modern Sans Demi Cond';-inkscape-font-specification:'Latin Modern Sans Demi Cond'"
-           id="tspan455138">mei-friend</tspan></tspan></text>
+           id="tspan455278">mei-friend</tspan></tspan></text>
     <g
        id="g345801"
        transform="matrix(0.21288875,0,0,0.21288875,-498.01339,835.80945)"
