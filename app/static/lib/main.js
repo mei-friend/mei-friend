@@ -262,6 +262,12 @@ function assignGithubMenuClickHandlers() {
       logoutFromGithub();
     });
   }
+  const forkRepository = document.getElementById('forkRepository');
+  if (forkRepository) {
+    forkRepository.addEventListener('click', (ev) => {
+      github.fork((resp) => console.log("I FORKED: ", resp));
+    });
+  }
   const repoHeader = document.getElementById('repositoriesHeader');
   if (repoHeader) {
     // on click, reload list of all repositories
@@ -418,6 +424,8 @@ function refreshGithubMenu(e) {
   githubMenu.innerHTML = `<a id="GithubLogout" href="#">Log out</a>`
   if (!github.filepath) {
     githubMenu.innerHTML += `
+    <hr class="dropdown-line">
+    <a id="forkRepository" href="#">Fork repository...</b></a>
     <hr class="dropdown-line">
     <a id="repositoriesHeader" class="dropdown-head" href="#"><b>Select repository:</b></a>`;
     fillInUserRepos();
