@@ -2,10 +2,9 @@ var vrvWorker;
 var tkVersion = '';
 var tkAvailableOptions;
 var mei;
-var cm;
 
 // exports
-
+export var cm;
 export var v; // viewer instance
 export let github; // github API wrapper object
 export let storage = new Storage();
@@ -54,6 +53,69 @@ export function setFileChangedState(fileChangedState) {
 export function setGithubInstance(new_github) { 
   // update github instance (from other modules)
   github = new_github;
+}
+
+export function setMeiFileInfo(fName, fLocation, fLocationPrintable) { 
+  meiFileName = fName;
+  meiFileLocation = fLocation;
+  meiFileLocationPrintable= fLocationPrintable;
+}
+
+export function updateFileStatusDisplay() {
+  document.querySelector("#fileName").innerText =
+    meiFileName.substr(meiFileName.lastIndexOf("/") + 1);
+  document.querySelector("#fileLocation").innerText = meiFileLocationPrintable || "";
+  document.querySelector("#fileLocation").title = meiFileLocation || "";
+}
+
+export function loadDataInEditor(mei, setFreshlyLoaded = true) {
+  if (storage.supported) {
+    storage.override = false;
+  }
+  freshlyLoaded = setFreshlyLoaded;
+  cm.setValue(mei);
+  v.loadXml(mei);
+  let bs = document.getElementById('breaks-select');
+  if (bs) bs.value = v.containsBreaks() ? 'line' : 'auto';
+}
+
+export function updateLocalStorage(meiXml) {
+  // if storage is available, save file name, location, content
+  // if we're working with github, save github metadata
+  if (storage.supported && !storage.override) {
+    try {
+      storage.fileName = meiFileName;
+      storage.fileLocation = meiFileLocation;
+      storage.content = meiXml;
+      if (isLoggedIn) {
+        updateGithubInLocalStorage();
+      }
+    } catch (err) {
+      console.warn("Could not save file content to local storage. Content may be too big? Content length: ", meiXml.length, err);
+      setFileChangedState(fileChanged); // flags any storage-exceeded issues
+      storage.clear();
+    }
+  }
+}
+
+export function updateGithubInLocalStorage() {
+  if (storage.supported && !storage.override && isLoggedIn) {
+    const author = github.author;
+    const name = author.name;
+    const email = author.email;
+    storage.github = {
+      githubRepo: github.githubRepo,
+      githubToken: github.githubToken,
+      branch: github.branch,
+      filepath: github.filepath,
+      userLogin: github.userLogin,
+      userName: name,
+      userEmail: email
+    }
+    if (github.filepath) {
+      storage.fileLocationType = "github";
+    }
+  }
 }
 
 import {
@@ -284,7 +346,6 @@ document.addEventListener('DOMContentLoaded', function() {
   if (isLoggedIn) {
     // regardless of storage availability:
     // if we are logged in, refresh github menu
-    console.log("Calling rGM, github: ", github)
     refreshGithubMenu();
     if (github.githubRepo && github.branch && github.filepath) {
       // preset github menu to where the user left off, if we can
@@ -309,52 +370,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
   setKeyMap(defaultKeyMap);
 });
-
-function updateLocalStorage(meiXml) {
-  // if storage is available, save file name, location, content
-  // if we're working with github, save github metadata
-  if (storage.supported && !storage.override) {
-    try {
-      storage.fileName = meiFileName;
-      storage.fileLocation = meiFileLocation;
-      storage.content = meiXml;
-      if (isLoggedIn) {
-        updateGithubInLocalStorage();
-      }
-    } catch (err) {
-      console.warn("Could not save file content to local storage. Content may be too big? Content length: ", meiXml.length, err);
-      setFileChangedState(fileChanged); // flags any storage-exceeded issues
-      storage.clear();
-    }
-  }
-}
-
-function updateGithubInLocalStorage() {
-  if (storage.supported && !storage.override && isLoggedIn) {
-    const author = github.author;
-    const name = author.name;
-    const email = author.email;
-    storage.github = {
-      githubRepo: github.githubRepo,
-      githubToken: github.githubToken,
-      branch: github.branch,
-      filepath: github.filepath,
-      userLogin: github.userLogin,
-      userName: name,
-      userEmail: email
-    }
-    if (github.filepath) {
-      storage.fileLocationType = "github";
-    }
-  }
-}
-
-function updateFileStatusDisplay() {
-  document.querySelector("#fileName").innerText =
-    meiFileName.substr(meiFileName.lastIndexOf("/") + 1);
-  document.querySelector("#fileLocation").innerText = meiFileLocationPrintable || "";
-  document.querySelector("#fileLocation").title = meiFileLocation || "";
-}
 
 export async function openUrlFetch(url = '') {
   let urlInput = document.querySelector("#openUrlInput");
@@ -409,17 +424,6 @@ export async function openUrlFetch(url = '') {
     urlInput.classList.add("warn");
     urlStatus.classList.add("warn");
   }
-}
-
-function loadDataInEditor(mei, setFreshlyLoaded = true) {
-  if (storage.supported) {
-    storage.override = false;
-  }
-  freshlyLoaded = setFreshlyLoaded;
-  cm.setValue(mei);
-  v.loadXml(mei);
-  let bs = document.getElementById('breaks-select');
-  if (bs) bs.value = v.containsBreaks() ? 'line' : 'auto';
 }
 
 function workerEventsHandler(ev) {

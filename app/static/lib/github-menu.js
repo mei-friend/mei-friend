@@ -3,16 +3,19 @@ import {
   forkRepositoryCancel
 } from './fork-repository.js';
 import { 
-  v,
-  github, // instance
-  setGithubInstance, // instance setter
+  cm,
+  github, // github instance
+  loadDataInEditor,
   setFileChangedState,
+  setGithubInstance, // github instance setter
+  setMeiFileInfo,
   storage,
-  meiFileName,
-  meiFileLocation,
-  meiFileLocationPrintable
+  updateFileStatusDisplay,
+  updateGithubInLocalStorage,
+  updateLocalStorage,
+  v
 } from './main.js';
-import Github from './github.js'; // class
+import Github from './github.js'; // github class
 function forkRepo() { 
   forkRepository(github);
 }
@@ -24,9 +27,7 @@ function forkRepoClicked() {
   let forkRepositoryToSelector= document.querySelector("#forkRepositoryToSelector");
   if(inputName && inputRepo) { 
     let githubRepo = `${inputName}/${inputRepo}`;
-    console.log("MAIN SETTING GITHUB REPO: ", githubRepo);
     github.githubRepo = githubRepo;
-    console.log("MAIN AFTER SET GITHUB REPO: ", github.githubRepo);
     github.fork(() => {
       forkRepositoryStatus.classList.remove("warn");
       forkRepositoryStatus.innerHTML = "";
@@ -107,7 +108,6 @@ function branchContentsDirClicked(ev) {
 
 function branchContentsFileClicked(ev) { 
   const githubLoadingIndicator = document.getElementById("GithubLogo");
-  console.log("bCFC: ", ev);
   github.filepath += ev.target.innerText;
   console.debug(`Loading file: https://github.com/${github.githubRepo}/${github.filepath}`);
   fillInBranchContents(ev);
@@ -117,9 +117,11 @@ function branchContentsFileClicked(ev) {
     document.querySelector(".statusbar").innerText = "Loading from Github...";
     v.clear();
     v.updateNotation = false;
-    meiFileName = github.filepath;
-    meiFileLocation = github.githubRepo;
-    meiFileLocationPrintable = github.githubRepo + ":";
+    setMeiFileInfo(
+      github.filepath,          // meiFileName
+      github.githubRepo,        // meiFileLocation
+      github.githubRepo + ":"   // meiFileLocationPrintable
+    );
     updateFileStatusDisplay();
     loadDataInEditor(github.content)
     setFileChangedState(false);
@@ -233,7 +235,6 @@ export async function fillInRepoBranches(e, per_page = 100, page = 1) {
 }
 
 export async function fillInBranchContents(e) {
-  console.log("fIBC:", e);
   // TODO handle > per_page files (similar to userRepos)
   let target;
   if (e) { // not present if restoring from local storage
@@ -325,7 +326,7 @@ export function renderCommitLog() {
       <td>${c.commit.author.date}</td>
       <td><a href="${c.author.html_url}">${c.commit.author.name}</a></td>
       <td>${c.commit.message}</td>
-      <td><a href="${c.commit.url}">${c.sha.slice(0,8)}...</a></td>`;
+      <td><a target="_blank" href="https://github.com/${github.githubRepo}/commits/${c.sha}">${c.sha.slice(0,8)}...</a></td>`;
     logTable.appendChild(commitRow);
   })
   const commitLogHeader = document.createElement("a");
