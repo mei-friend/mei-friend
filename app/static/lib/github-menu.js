@@ -2,13 +2,22 @@ import {
   forkRepository,
   forkRepositoryCancel
 } from './fork-repository.js';
-
+import { 
+  v,
+  github, // instance
+  setGithubInstance, // instance setter
+  setFileChangedState,
+  storage,
+  meiFileName,
+  meiFileLocation,
+  meiFileLocationPrintable
+} from './main.js';
+import Github from './github.js'; // class
 function forkRepo() { 
   forkRepository(github);
 }
 
 function forkRepoClicked() { 
-  console.log("CLICK HANDLER CALLED ONCE", Date.now())
   let inputName = document.getElementById('forkRepositoryInputName').value
   let inputRepo = document.getElementById('forkRepositoryInputRepo').value
   let forkRepositoryStatus = document.querySelector("#forkRepositoryStatus");
@@ -56,6 +65,71 @@ function contentsHeaderClicked(ev) {
   github.filepath = github.filepath.substr(0, github.filepath.lastIndexOf('/'));
   github.filepath = github.filepath.length === 0 ? "/" : github.filepath;
   fillInBranchContents(ev.target);
+}
+
+function userRepoClicked(ev) { 
+  // re-init github object with selected repo
+  const author = github.author;
+  setGithubInstance(new Github(
+    ev.target.innerText,
+    github.githubToken,
+    github.branch,
+    github.filepath,
+    github.userLogin,
+    author.name,
+    author.email
+  ))
+  fillInRepoBranches(ev);
+}
+
+function repoBranchClicked(ev) { 
+  const githubLoadingIndicator = document.getElementById("GithubLogo");
+  github.branch = ev.target.innerText;
+  github.filepath = "/";
+  githubLoadingIndicator.classList.add("loading");
+  github.readGithubRepo().then(() => {
+    fillInBranchContents(ev)
+    githubLoadingIndicator.classList.remove("loading");
+  }).catch(() => {
+    console.error("Couldn't read Github repo to fill in branch contents");
+    githubLoadingIndicator.classList.remove("loading");
+  });
+}
+
+function branchContentsDirClicked(ev) { 
+  if (github.filepath.endsWith("/")) {
+    github.filepath += ev.target.querySelector("span.filepath").innerText;
+  } else {
+    github.filepath += "/" + ev.target.querySelector("span.filepath").innerText;
+  }
+  fillInBranchContents(ev);
+}
+
+function branchContentsFileClicked(ev) { 
+  const githubLoadingIndicator = document.getElementById("GithubLogo");
+  console.log("bCFC: ", ev);
+  github.filepath += ev.target.innerText;
+  console.debug(`Loading file: https://github.com/${github.githubRepo}/${github.filepath}`);
+  fillInBranchContents(ev);
+  githubLoadingIndicator.classList.add("loading");
+  github.readGithubRepo().then(() => {
+    githubLoadingIndicator.classList.remove("loading");
+    document.querySelector(".statusbar").innerText = "Loading from Github...";
+    v.clear();
+    v.updateNotation = false;
+    meiFileName = github.filepath;
+    meiFileLocation = github.githubRepo;
+    meiFileLocationPrintable = github.githubRepo + ":";
+    updateFileStatusDisplay();
+    loadDataInEditor(github.content)
+    setFileChangedState(false);
+    updateLocalStorage(github.content);
+    v.updateNotation = true;
+    v.updateAll(cm);
+  }).catch((err) => {
+    console.error("Couldn't read Github repo to fill in branch contents:", err);
+    githubLoadingIndicator.classList.remove("loading");
+  })
 }
 
 function assignGithubMenuClickHandlers() {
@@ -106,79 +180,22 @@ function assignGithubMenuClickHandlers() {
     contentsHeader.addEventListener('click', contentsHeaderClicked);
   }
   Array.from(document.getElementsByClassName('userRepo')).forEach((e) => {
-    // FIXME skipping removeEventListener as we need both e and ev inside
-      e.addEventListener('click', (ev) => {
-        // re-init github object with selected repo
-        const author = github.author;
-        github = new Github(
-          e.innerText,
-          github.githubToken,
-          github.branch,
-          github.filepath,
-          github.userLogin,
-          author.name,
-          author.email
-        )
-        fillInRepoBranches(ev);
-      })
-    }
-  );
+    e.removeEventListener('click', userRepoClicked);
+    e.addEventListener('click', userRepoClicked);
+  });
   Array.from(document.getElementsByClassName('repoBranch')).forEach((e) => {
-    // FIXME skipping removeEventListener as we need both e and ev inside
-      e.addEventListener('click', (ev) => {
-        github.branch = e.innerText;
-        github.filepath = "/";
-        githubLoadingIndicator.classList.add("loading");
-        github.readGithubRepo().then(() => {
-          fillInBranchContents(ev)
-          githubLoadingIndicator.classList.remove("loading");
-        }).catch(() => {
-          console.error("Couldn't read Github repo to fill in branch contents");
-          githubLoadingIndicator.classList.remove("loading");
-        });
-      })
-    }
-  );
+    e.removeEventListener('click', repoBranchClicked);
+    e.addEventListener('click', repoBranchClicked);
+  });
   Array.from(document.getElementsByClassName('branchContents')).forEach((e) => {
     if (e.classList.contains("dir")) {
-      // FIXME skipping removeEventListener as we need both e and ev inside
       // navigate directory
-      e.addEventListener('click', (ev) => {
-        if (github.filepath.endsWith("/")) {
-          github.filepath += e.querySelector("span.filepath").innerText;
-        } else {
-          github.filepath += "/" + e.querySelector("span.filepath").innerText;
-        }
-        fillInBranchContents(ev);
-      })
+      e.removeEventListener('click', branchContentsDirClicked);
+      e.addEventListener('click', branchContentsDirClicked);
     } else {
       // load file
-      // FIXME skipping removeEventListener as we need both e and ev inside
-      e.removeEventListener('click');
-      e.addEventListener('click', (ev) => {
-        github.filepath += e.querySelector("span.filepath").innerText;
-        console.debug(`Loading file: https://github.com/${github.githubRepo}/${github.filepath}`);
-        fillInBranchContents(ev);
-        githubLoadingIndicator.classList.add("loading");
-        github.readGithubRepo().then(() => {
-          githubLoadingIndicator.classList.remove("loading");
-          document.querySelector(".statusbar").innerText = "Loading from Github...";
-          v.clear();
-          v.updateNotation = false;
-          meiFileName = github.filepath;
-          meiFileLocation = github.githubRepo;
-          meiFileLocationPrintable = github.githubRepo + ":";
-          updateFileStatusDisplay();
-          loadDataInEditor(github.content)
-          setFileChangedState(false);
-          updateLocalStorage(github.content);
-          v.updateNotation = true;
-          v.updateAll(cm);
-        }).catch((e) => {
-          console.error("Couldn't read Github repo to fill in branch contents:", e);
-          githubLoadingIndicator.classList.remove("loading");
-        })
-      })
+      e.removeEventListener('click', branchContentsFileClicked);
+      e.addEventListener('click', branchContentsFileClicked);
     }
   })
 }
@@ -216,6 +233,7 @@ export async function fillInRepoBranches(e, per_page = 100, page = 1) {
 }
 
 export async function fillInBranchContents(e) {
+  console.log("fIBC:", e);
   // TODO handle > per_page files (similar to userRepos)
   let target;
   if (e) { // not present if restoring from local storage
@@ -346,4 +364,39 @@ export function refreshGithubMenu(e) {
     <a id="repositoriesHeader" class="dropdown-head" href="#"><b>Select repository:</b></a>`;
     fillInUserRepos();
   }
+}
+
+// handle Github commit UI
+function handleCommitButtonClicked(e) {
+  // TODO Let user know of success / failure, allow user to do something about it
+  const messageInput = document.getElementById("commitMessageInput");
+  const message = messageInput.value;
+  const githubLoadingIndicator = document.getElementById("GithubLogo");
+  // lock editor while we are busy commiting
+  cm.readOnly = "nocursor"; // don't allow editor focus
+  // try commiting to Github
+  githubLoadingIndicator.classList.add("loading");
+  github.writeGithubRepo(cm.getValue(), message)
+    .then(() => {
+      console.debug(`Successfully written to github: ${github.githubRepo}${github.filepath}`);
+      messageInput.value = "";
+      github.readGithubRepo()
+        .then(() => {
+          githubLoadingIndicator.classList.remove("loading");
+          cm.readOnly = false;
+          setFileChangedState(false);
+          updateGithubInLocalStorage();
+          fillInCommitLog("withRefresh");
+          console.debug("Finished updating commit log after writing commit.");
+        })
+        .catch((e) => {
+          cm.readOnly = false;
+          githubLoadingIndicator.classList.remove("loading");
+          console.error("Couldn't read Github repo after writing commit: ", e, github);
+        })
+    })
+    .catch((e) => {
+      githubLoadingIndicator.classList.remove("loading");
+      console.error("Couldn't commit Github repo: ", e, github)
+    });
 }

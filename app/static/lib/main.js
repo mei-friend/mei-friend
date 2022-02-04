@@ -1,13 +1,60 @@
 var vrvWorker;
 var tkVersion = '';
 var tkAvailableOptions;
-let meiFileName = '';
-let meiFileLocation = '';
-let meiFileLocationPrintable = '';
 var mei;
 var cm;
-var v; // viewer instance
-var github; // github API wrapper object
+
+// exports
+
+export var v; // viewer instance
+export let github; // github API wrapper object
+export let storage = new Storage();
+export let meiFileName = '';
+export let meiFileLocation = '';
+export let meiFileLocationPrintable = '';
+
+export function setFileChangedState(fileChangedState) {
+  fileChanged = fileChangedState;
+  const fileStatusElement = document.querySelector(".fileStatus");
+  const fileChangedIndicatorElement = document.querySelector("#fileChanged");
+  const fileStorageExceededIndicatorElement = document.querySelector("#fileStorageExceeded");
+  const commitUI = document.querySelector("#commitUI");
+  if (fileChanged) {
+    fileStatusElement.classList.add("changed");
+    fileChangedIndicatorElement.innerText = "*";
+  } else {
+    fileStatusElement.classList.remove("changed");
+    fileChangedIndicatorElement.innerText = "";
+  }
+  if (isLoggedIn && github && github.filepath && commitUI) {
+    document.getElementById("commitMessageInput").disabled = !fileChanged;
+    document.getElementById("commitButton").disabled = !fileChanged;
+  }
+  if (storage.supported) {
+    storage.fileChanged = fileChanged ? 1 : 0;
+    if (storage.override) {
+      // unable to write to local storage, probably because quota exceeded
+      // warn user...
+      fileStatusElement.classList.add("warn");
+      fileStorageExceededIndicatorElement.innerText = "LOCAL-STORAGE DISABLED!";
+      fileStorageExceededIndicatorElement.classList.add("warn");
+      fileStorageExceededIndicatorElement.title = "Your MEI content exceeds " +
+        "the browser's local storage space. Please ensure changes are saved " +
+        "manually or committed to Github before refreshing or leaving " +
+        "the page!";
+    } else {
+      fileStatusElement.classList.remove("warn");
+      fileStorageExceededIndicatorElement.innerText = "";
+      fileStorageExceededIndicatorElement.classList.remove("warn");
+      fileStorageExceededIndicatorElement.title = "";
+    }
+  }
+}
+
+export function setGithubInstance(new_github) { 
+  // update github instance (from other modules)
+  github = new_github;
+}
 
 import {
   setOrientation,
@@ -82,9 +129,6 @@ const defaultVerovioOptions = {
   topMarginArtic: 1.2
 };
 const defaultKeyMap = `${root}keymaps/default-keymap.json`;
-
-let storage = new Storage();
-
 let fileChanged = false; // flag to track whether unsaved changes to file exist
 let freshlyLoaded = false; // flag to ignore a cm.on("changes") event on file load
 
@@ -240,6 +284,7 @@ document.addEventListener('DOMContentLoaded', function() {
   if (isLoggedIn) {
     // regardless of storage availability:
     // if we are logged in, refresh github menu
+    console.log("Calling rGM, github: ", github)
     refreshGithubMenu();
     if (github.githubRepo && github.branch && github.filepath) {
       // preset github menu to where the user left off, if we can
@@ -300,44 +345,6 @@ function updateGithubInLocalStorage() {
     }
     if (github.filepath) {
       storage.fileLocationType = "github";
-    }
-  }
-}
-
-function setFileChangedState(fileChangedState) {
-  fileChanged = fileChangedState;
-  const fileStatusElement = document.querySelector(".fileStatus");
-  const fileChangedIndicatorElement = document.querySelector("#fileChanged");
-  const fileStorageExceededIndicatorElement = document.querySelector("#fileStorageExceeded");
-  const commitUI = document.querySelector("#commitUI");
-  if (fileChanged) {
-    fileStatusElement.classList.add("changed");
-    fileChangedIndicatorElement.innerText = "*";
-  } else {
-    fileStatusElement.classList.remove("changed");
-    fileChangedIndicatorElement.innerText = "";
-  }
-  if (isLoggedIn && github && github.filepath && commitUI) {
-    document.getElementById("commitMessageInput").disabled = !fileChanged;
-    document.getElementById("commitButton").disabled = !fileChanged;
-  }
-  if (storage.supported) {
-    storage.fileChanged = fileChanged ? 1 : 0;
-    if (storage.override) {
-      // unable to write to local storage, probably because quota exceeded
-      // warn user...
-      fileStatusElement.classList.add("warn");
-      fileStorageExceededIndicatorElement.innerText = "LOCAL-STORAGE DISABLED!";
-      fileStorageExceededIndicatorElement.classList.add("warn");
-      fileStorageExceededIndicatorElement.title = "Your MEI content exceeds " +
-        "the browser's local storage space. Please ensure changes are saved " +
-        "manually or committed to Github before refreshing or leaving " +
-        "the page!";
-    } else {
-      fileStatusElement.classList.remove("warn");
-      fileStorageExceededIndicatorElement.innerText = "";
-      fileStorageExceededIndicatorElement.classList.remove("warn");
-      fileStorageExceededIndicatorElement.title = "";
     }
   }
 }
@@ -1114,40 +1121,6 @@ function addEventListeners(v, cm) {
   });
 } // addEventListeners()
 
-// handle Github commit UI
-function handleCommitButtonClicked(e) {
-  // TODO Let user know of success / failure, allow user to do something about it
-  const messageInput = document.getElementById("commitMessageInput");
-  const message = messageInput.value;
-  const githubLoadingIndicator = document.getElementById("GithubLogo");
-  // lock editor while we are busy commiting
-  cm.readOnly = "nocursor"; // don't allow editor focus
-  // try commiting to Github
-  githubLoadingIndicator.classList.add("loading");
-  github.writeGithubRepo(cm.getValue(), message)
-    .then(() => {
-      console.debug(`Successfully written to github: ${github.githubRepo}${github.filepath}`);
-      messageInput.value = "";
-      github.readGithubRepo()
-        .then(() => {
-          githubLoadingIndicator.classList.remove("loading");
-          cm.readOnly = false;
-          setFileChangedState(false);
-          updateGithubInLocalStorage();
-          fillInCommitLog("withRefresh");
-          console.debug("Finished updating commit log after writing commit.");
-        })
-        .catch((e) => {
-          cm.readOnly = false;
-          githubLoadingIndicator.classList.remove("loading");
-          console.error("Couldn't read Github repo after writing commit: ", e, github);
-        })
-    })
-    .catch((e) => {
-      githubLoadingIndicator.classList.remove("loading");
-      console.error("Couldn't commit Github repo: ", e, github)
-    });
-}
 
 // progress bar demo
 function moveProgressBar() {
@@ -1220,3 +1193,5 @@ function setKeyMap(keyMapFilePath) {
       }
     });
 }
+
+
