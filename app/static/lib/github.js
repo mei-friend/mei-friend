@@ -69,9 +69,11 @@ export default class Github {
 
   set githubRepo(githubRepo) {
     this._githubRepo = githubRepo;
+    console.log("Before set: ", this._githubRepo, this._githubRepoOwner, this._githubRepoName);
     // also set repo owner and repo name
     [this._githubRepoOwner, this._githubRepoName] = githubRepo.split('/');
     // initialise jsgit repo object
+    console.log("I've set it: ", this._githubRepo, this._githubRepoOwner, this._githubRepoName);
     const repo = {};
     jsgit.mixins.github(repo, this.githubRepo, this.githubToken);
     jsgit.mixins.createTree(repo);
@@ -218,34 +220,82 @@ export default class Github {
     await this.repo.updateRef(`refs/heads/${this.branch}`, commitHash);
   }
 
-  async fork(callback) {
+  async getOrganizations() { 
+    // return JSON object describing user's memberships in 
+    // organizations we have access to
+    const orgsUrl = `https://api.github.com/user/memberships/orgs`;
+    return fetch(orgsUrl, { 
+      method: 'GET',
+      headers: this.apiHeaders
+    }).then(res => res.json());
+    // TODO inspect the organizations list and return those 
+    // that give the user writing permission
+    /*
+      .then((orgs) => orgs.map((o) => {
+          console.log("fethcing: ", o.url)
+          return fetch(o.url,
+           {
+              method: 'GET',
+              headers: this.apiHeaders
+           }
+          ).then(o => o.json())
+          .then((data) => console.log("Got DATA: ", data, "for ", o.url))
+        })
+      )
+    */
+  }
+
+  async fork(callback, forkTo = this.userLogin) {
     // switch to a user's fork, creating it first if necessary
     const forksUrl = `https://api.github.com/repos/${this.githubRepo}/forks`;
-    await fetch(forksUrl, {
+    fetch(forksUrl, {
       method: 'GET',
       headers: this.apiHeaders
     })
-      .then(res => res.json())
+      .then((res) => {
+        if(res.status >= 400) {
+          throw res;
+        } else { 
+          return res.json();
+        }
+      })
       .then(async(data) => {
-        const userFork = data.filter(f => f.owner.login === this.userLogin)[0];
+        const userFork = data.filter(f => f.owner.login === forkTo)[0];
         // If we don't yet have a user fork, create one
         if(!userFork) {
           // create new fork for user
-          await fetch(forksUrl, {
+          let fetchRequestObject = { 
             method:'POST',
             headers: this.apiHeaders
-          }).then(res => res.json())
-            .then(async(userFork) => { 
-                // now switch to it
-                this.githubRepo = userFork.full_name;
-            });
+          }
+          if(forkTo !== this.userLogin) { 
+            // if we are forking to an organization rather than
+            // the user's personal repositories, we have to add
+            // a note to say so to the request body
+            fetchRequestObject.body = JSON.stringify({
+              organization: forkTo
+            })
+          }
+          await fetch(forksUrl, {
+            fetchRequestObject
+          }).then((res) => {
+            if(res.status >= 400) { 
+              throw res;
+            } else { 
+              return res.json();
+            }
+          }).then((userFork) => { 
+                  // now switch to it
+                  this.githubRepo = userFork.full_name;
+              });
         } else { 
           this.githubRepo = userFork.full_name;
         }
         // initialise page with user's fork
         callback(this);
       }).catch(err => {
-        console.error("Couldn't retrieve forks from ", forksUrl, ": ", err);
+        console.debug("Couldn't retrieve forks from ", forksUrl, ": ", err);
+        throw err;
       });
   }
 

@@ -7,8 +7,7 @@ let meiFileLocationPrintable = '';
 var mei;
 var cm;
 var v; // viewer instance
-
-let github; // github API wrapper object
+var github; // github API wrapper object
 
 import {
   setOrientation,
@@ -24,6 +23,10 @@ import {
   openUrl,
   openUrlCancel
 } from './open-url.js';
+import { 
+  forkRepository,
+  forkRepositoryCancel
+} from './fork-repository.js';
 import {
   createControlsMenu,
   setBreaksOptions,
@@ -42,6 +45,14 @@ import * as e from './editor.js'
 import Viewer from './viewer.js';
 import Storage from './storage.js';
 import Github from './github.js';
+import { 
+  fillInUserRepos,
+  fillInRepoBranches,
+  fillInBranchContents,
+  renderCommitLog,
+  logoutFromGithub,
+  refreshGithubMenu
+} from './github-menu.js';
 
 // schemas for autocompletion
 import schema_meiAll from '../schemaInfo/mei-CMN-4.0.1.schemaInfo.js';
@@ -254,117 +265,6 @@ document.addEventListener('DOMContentLoaded', function() {
   setKeyMap(defaultKeyMap);
 });
 
-function assignGithubMenuClickHandlers() {
-  const githubLoadingIndicator = document.getElementById("GithubLogo");
-  const logoutButton = document.getElementById('GithubLogout');
-  if (logoutButton) {
-    logoutButton.addEventListener('click', (ev) => {
-      logoutFromGithub();
-    });
-  }
-  const forkRepository = document.getElementById('forkRepository');
-  if (forkRepository) {
-    forkRepository.addEventListener('click', (ev) => {
-      github.fork((resp) => console.log("I FORKED: ", resp));
-    });
-  }
-  const repoHeader = document.getElementById('repositoriesHeader');
-  if (repoHeader) {
-    // on click, reload list of all repositories
-    repoHeader.addEventListener('click', () => {
-      github.filepath = "";
-      refreshGithubMenu();
-    });
-  }
-  const branchesHeader = document.getElementById('branchesHeader');
-  if (branchesHeader) {
-    // on click, reload list of branches for current repo
-    branchesHeader.addEventListener('click', (ev) => {
-      github.filepath = "";
-      fillInRepoBranches(ev);
-    });
-  }
-  const contentsHeader = document.getElementById('contentsHeader');
-  if (contentsHeader) {
-    // on click, move up one directory level in the branch contents
-    github.filepath = "";
-    contentsHeader.addEventListener('click', (ev) => {
-      github.filepath = github.filepath.substr(0, github.filepath.lastIndexOf('/'));
-      github.filepath = github.filepath.length === 0 ? "/" : github.filepath;
-      fillInBranchContents(ev);
-    });
-  }
-  Array.from(document.getElementsByClassName('userRepo')).forEach((e) =>
-    e.addEventListener('click', (ev) => {
-      // re-init github object with selected repo
-      const author = github.author;
-      github = new Github(
-        e.innerText,
-        github.githubToken,
-        github.branch,
-        github.filepath,
-        github.userLogin,
-        author.name,
-        author.email
-      )
-      fillInRepoBranches(ev);
-    })
-  );
-  Array.from(document.getElementsByClassName('repoBranch')).forEach((e) =>
-    e.addEventListener('click', (ev) => {
-      github.branch = e.innerText;
-      github.filepath = "/";
-      githubLoadingIndicator.classList.add("loading");
-      github.readGithubRepo().then(() => {
-        fillInBranchContents(ev)
-        githubLoadingIndicator.classList.remove("loading");
-      }).catch(() => {
-        console.error("Couldn't read Github repo to fill in branch contents");
-        githubLoadingIndicator.classList.remove("loading");
-      });
-    })
-  );
-  Array.from(document.getElementsByClassName('branchContents')).forEach((e) => {
-    if (e.classList.contains("dir")) {
-      // navigate directory
-      e.addEventListener('click', (ev) => {
-        if (github.filepath.endsWith("/")) {
-          github.filepath += e.querySelector("span.filepath").innerText;
-        } else {
-          github.filepath += "/" + e.querySelector("span.filepath").innerText;
-        }
-        fillInBranchContents(ev);
-      })
-    } else {
-      // load file
-      e.addEventListener('click', (ev) => {
-        github.filepath += e.querySelector("span.filepath").innerText;
-        console.debug(`Loading file: https://github.com/${github.githubRepo}/${github.filepath}`);
-        fillInBranchContents(ev);
-        githubLoadingIndicator.classList.add("loading");
-        github.readGithubRepo().then(() => {
-          githubLoadingIndicator.classList.remove("loading");
-          document.querySelector(".statusbar").innerText = "Loading from Github...";
-          v.clear();
-          v.updateNotation = false;
-          meiFileName = github.filepath;
-          meiFileLocation = github.githubRepo;
-          meiFileLocationPrintable = github.githubRepo + ":";
-          updateFileStatusDisplay();
-          loadDataInEditor(github.content)
-          setFileChangedState(false);
-          updateLocalStorage(github.content);
-          v.updateNotation = true;
-          v.updateAll(cm);
-        }).catch((e) => {
-          console.error("Couldn't read Github repo to fill in branch contents:", e);
-          githubLoadingIndicator.classList.remove("loading");
-        })
-      })
-    }
-  })
-}
-
 function updateLocalStorage(meiXml) {
   // if storage is available, save file name, location, content
   // if we're working with github, save github metadata
@@ -401,34 +301,6 @@ function updateGithubInLocalStorage() {
     if (github.filepath) {
       storage.fileLocationType = "github";
     }
-  }
-}
-
-function logoutFromGithub() {
-  if (storage.supported) {
-    // remove github object from local storage
-    storage.removeItem("github");
-  }
-  // redirect to /logout to remove session cookie
-  const url = window.location.host;
-  window.location.replace(url.substring(0, url.lastIndexOf("/")) + "/logout");
-}
-
-function refreshGithubMenu(e) {
-  // display Github name
-  document.getElementById("GithubName").innerText =
-    github.author.name === "None" ? github.userLogin : github.author.name;
-  // populate Github menu
-  let githubMenu = document.getElementById("GithubMenu");
-  githubMenu.classList.remove("loggedOut");
-  githubMenu.innerHTML = `<a id="GithubLogout" href="#">Log out</a>`
-  if (!github.filepath) {
-    githubMenu.innerHTML += `
-    <hr class="dropdown-line">
-    <a id="forkRepository" href="#">Fork repository...</b></a>
-    <hr class="dropdown-line">
-    <a id="repositoriesHeader" class="dropdown-head" href="#"><b>Select repository:</b></a>`;
-    fillInUserRepos();
   }
 }
 
@@ -530,144 +402,6 @@ export async function openUrlFetch(url = '') {
     urlInput.classList.add("warn");
     urlStatus.classList.add("warn");
   }
-}
-
-
-async function fillInUserRepos(per_page = 30, page = 1) {
-  const repos = await github.getUserRepos(per_page, page);
-  let githubMenu = document.getElementById("GithubMenu");
-  repos.forEach((repo) => {
-    githubMenu.innerHTML += `<a class="userRepo" href="#">${repo.full_name}</a>`;
-  })
-  if (repos.length && repos.length === per_page) {
-    // there may be more repos on the next page
-    fillInUserRepos(per_page, page + 1);
-  }
-  // GitHub menu interactions
-  assignGithubMenuClickHandlers();
-}
-
-async function fillInRepoBranches(e, per_page = 100, page = 1) {
-  // TODO handle > per_page branches (similar to userRepos)
-  const repoBranches = await github.getRepoBranches(per_page, page);
-  let githubMenu = document.getElementById("GithubMenu");
-  githubMenu.innerHTML = `
-  <a id="GithubLogout" href="#">Log out</a>
-  <hr class="dropdown-line">
-  <a id="repositoriesHeader" href="#"><span class="btn icon icon-arrow-left inline-block-tight"></span>Repository:${github.githubRepo}</a>
-    <hr class="dropdown-line">
-    <a id="branchesHeader" class="dropdown-head" href="#"><b>Select branch:</b></a>
-    `;
-  Array.from(repoBranches).forEach((branch) => {
-    githubMenu.innerHTML += `<a class="repoBranch" href="#">${branch.name}</a>`;
-  });
-  // GitHub menu interactions
-  assignGithubMenuClickHandlers();
-}
-
-async function fillInBranchContents(e) {
-  // TODO handle > per_page files (similar to userRepos)
-  let target;
-  if (e) { // not present if restoring from local storage
-    target = e.target;
-  }
-  const branchContents = await github.getBranchContents(github.filepath);
-  let githubMenu = document.getElementById("GithubMenu");
-  githubMenu.innerHTML = `
-  <a id="GithubLogout" href="#">Log out</a>
-  <hr class="dropdown-line">
-  <a id="repositoriesHeader" href="#"><span class="btn icon icon-arrow-left inline-block-tight"></span>Repository:${github.githubRepo}</a>
-    <hr class="dropdown-line">
-    <a id="branchesHeader" href="#"><span class="btn icon icon-arrow-left inline-block-tight"></span>Branch: ${github.branch}</a>
-    <hr class="dropdown-line">
-    <a id="contentsHeader" href="#"><span class="btn icon icon-arrow-left inline-block-tight"></span>Path: <span class="filepath">${github.filepath}</span></a>
-    `;
-  if (e && target && target.classList.contains("filepath")) {
-    // clicked on file name -- operate on parent (list entry) instead
-    target = e.target.parentNode;
-  }
-  if (e && (target.classList.contains("repoBranch") || target.classList.contains("dir") || target.getAttribute("id") === "contentsHeader")) {
-    Array.from(branchContents).forEach((content) => {
-      const isDir = content.type === "dir";
-      githubMenu.innerHTML += `<a class="branchContents ${content.type}${isDir ? '': ' closeOnClick'}" href="#">` +
-        //  content.type === "dir" ? '<span class="btn icon icon-file-symlink-file inline-block-tight"></span>' : "" +
-        `<span class="filepath${isDir ? '':' closeOnClick'}">${content.name}</span>${isDir ? "..." : ""}</a>`;
-    });
-  } else {
-    // User clicked file, or restoring from local storage. Display commit interface
-    if (storage.supported && github.filepath) {
-      storage.fileLocationType = "github";
-    }
-    const commitUI = document.createElement("div");
-    commitUI.setAttribute("id", "commitUI");
-    const commitMessageInput = document.createElement("input");
-    commitMessageInput.setAttribute("type", "text");
-    commitMessageInput.setAttribute("id", "commitMessageInput");
-    commitMessageInput.setAttribute("placeholder", "Updated using mei-friend online");
-    const commitButton = document.createElement("input");
-    commitButton.setAttribute("id", "commitButton");
-    commitButton.setAttribute("type", "submit");
-    commitButton.setAttribute("value", "Commit");
-    commitButton.classList.add("closeOnClick");
-    commitButton.addEventListener("click", handleCommitButtonClicked);
-    commitUI.appendChild(commitMessageInput);
-    commitUI.appendChild(commitButton);
-    githubMenu.appendChild(commitUI);
-    setFileChangedState(fileChanged);
-  }
-  fillInCommitLog("withRefresh");
-  // GitHub menu interactions
-  assignGithubMenuClickHandlers();
-}
-
-async function fillInCommitLog(refresh = false) {
-  if (refresh) {
-    const githubLoadingIndicator = document.getElementById("GithubLogo");
-    githubLoadingIndicator.classList.add("loading");
-    github.readGithubRepo().then(() => {
-      githubLoadingIndicator.classList.remove("loading");
-      renderCommitLog();
-    }).catch((e) => {
-      githubLoadingIndicator.classList.remove("loading");
-      console.error("Couldn't read github repo, forcing log-out: ", e);
-      logoutFromGithub();
-    })
-  } else {
-    renderCommitLog();
-  }
-}
-
-function renderCommitLog() {
-  let logTable = document.getElementById("logTable");
-  if (logTable) {
-    // clear up previous logTable if it exists
-    logTable.remove();
-    document.getElementById("commitLogSeperator").remove();
-  }
-  logTable = document.createElement("table");
-  logTable.setAttribute("id", "logTable");
-  let githubMenu = document.getElementById("GithubMenu");
-  const headerRow = document.createElement("tr");
-  headerRow.innerHTML =
-    "<th>Date</th><th>Author</th><th>Message</th><th>Commit</th>";
-  logTable.appendChild(headerRow);
-  github.commitLog.forEach((c) => {
-    const commitRow = document.createElement("tr");
-    commitRow.innerHTML = `
-      <td>${c.commit.author.date}</td>
-      <td><a href="${c.author.html_url}">${c.commit.author.name}</a></td>
-      <td>${c.commit.message}</td>
-      <td><a href="${c.commit.url}">${c.sha.slice(0,8)}...</a></td>`;
-    logTable.appendChild(commitRow);
-  })
-  const commitLogHeader = document.createElement("a");
-  commitLogHeader.setAttribute("id", "commitLogHeader");
-  commitLogHeader.innerText = "Commit Log";
-  const hr = document.createElement("hr");
-  hr.classList.add("dropdown-line");
-  hr.setAttribute("id", "commitLogSeperator");
-  githubMenu.appendChild(hr);
-  githubMenu.appendChild(logTable);
 }
 
 function loadDataInEditor(mei, setFreshlyLoaded = true) {
