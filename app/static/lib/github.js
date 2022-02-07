@@ -69,11 +69,9 @@ export default class Github {
 
   set githubRepo(githubRepo) {
     this._githubRepo = githubRepo;
-    console.log("Before set: ", this._githubRepo, this._githubRepoOwner, this._githubRepoName);
     // also set repo owner and repo name
     [this._githubRepoOwner, this._githubRepoName] = githubRepo.split('/');
     // initialise jsgit repo object
-    console.log("I've set it: ", this._githubRepo, this._githubRepoOwner, this._githubRepoName);
     const repo = {};
     jsgit.mixins.github(repo, this.githubRepo, this.githubToken);
     jsgit.mixins.createTree(repo);
@@ -91,7 +89,7 @@ export default class Github {
 
   set githubRepoName(githubRepoName) {
     // not allowed: needs to be set via githubRepo
-    console.error("githubRepoName cannot be set directly - please set githubRepo");
+    console.warn("githubRepoName cannot be set directly - please set githubRepo");
   }
 
   get githubRepoName() {
@@ -100,7 +98,7 @@ export default class Github {
 
   set githubRepoOwner(githubRepoOwner) { 
     // not allowed: needs to be set via githubRepo
-    console.error("githubRepoOwner cannot be set directly - please set githubRepo");
+    console.warn("githubRepoOwner cannot be set directly - please set githubRepo");
   }
 
   get githubRepoOwner() { 
@@ -172,7 +170,7 @@ export default class Github {
   }
 
   set isFork(isFork) { 
-    console.error("The isFork flag is set automatically; please do not attempt to set it manually")
+    console.warn("The isFork flag is set automatically; please do not attempt to set it manually")
   }
 
   get isFork() { 
@@ -248,27 +246,24 @@ export default class Github {
   async fork(callback, forkTo = this.userLogin) {
     // switch to a user's fork, creating it first if necessary
     const forksUrl = `https://api.github.com/repos/${this.githubRepo}/forks`;
-    fetch(forksUrl, {
+    await fetch(forksUrl, {
       method: 'GET',
       headers: this.apiHeaders
     })
-      .then((res) => {
-        if(res.status >= 400) {
-          throw res;
-        } else { 
-          return res.json();
-        }
+      .then(res => {
+        if (res.status <= 400) return res.json()
+        else throw res
       })
       .then(async(data) => {
         const userFork = data.filter(f => f.owner.login === forkTo)[0];
         // If we don't yet have a user fork, create one
         if(!userFork) {
           // create new fork for user
-          let fetchRequestObject = { 
+          let fetchRequestObject = {
             method:'POST',
             headers: this.apiHeaders
           }
-          if(forkTo !== this.userLogin) { 
+          if(forkTo !== this.userLogin) {
             // if we are forking to an organization rather than
             // the user's personal repositories, we have to add
             // a note to say so to the request body
@@ -276,26 +271,23 @@ export default class Github {
               organization: forkTo
             })
           }
-          await fetch(forksUrl, {
-            fetchRequestObject
-          }).then((res) => {
-            if(res.status >= 400) { 
-              throw res;
-            } else { 
-              return res.json();
-            }
-          }).then((userFork) => { 
-                  // now switch to it
-                  this.githubRepo = userFork.full_name;
-              });
+          await fetch(forksUrl, fetchRequestObject)
+            .then(res => { 
+              if(res.status <= 400) res.json()
+              else throw res
+            })
+            .then(async(userFork) => { 
+                // now switch to it
+                this.githubRepo = userFork.full_name;
+            });
         } else { 
           this.githubRepo = userFork.full_name;
         }
         // initialise page with user's fork
         callback(this);
       }).catch(err => {
-        console.debug("Couldn't retrieve forks from ", forksUrl, ": ", err);
-        throw err;
+        console.warn("Couldn't retrieve forks from ", forksUrl, ": ", err);
+        return Promise.reject(err);
       });
   }
 
@@ -315,7 +307,7 @@ export default class Github {
       }).then(res => res.json())
         .then(async(data) => callback(this, data));
     } else { 
-      console.error("Attempted to create pull-request but repo is not a fork");
+      console.warn("Attempted to create pull-request but repo is not a fork");
     }
   }
 

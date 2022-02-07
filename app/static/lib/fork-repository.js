@@ -9,7 +9,7 @@ export function forkRepository(github) {
   fc.height = sz.height * .25;
   fc.style.display = "block";
   let selector = document.querySelector("#forkRepositoryToSelector");
-  selector.innerHTML = `<option value="">${github.userLogin}</option>`
+  selector.innerHTML = `<option value="${github.userLogin}">${github.userLogin}</option>`
   github.getOrganizations().then((orgs) => orgs.forEach((org) => {
     try { 
       let orgName = org.organization.login;

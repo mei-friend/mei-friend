@@ -33,16 +33,22 @@ function forkRepoClicked() {
       forkRepositoryStatus.innerHTML = "";
       fillInRepoBranches();
       forkRepositoryCancel();
-    }, forkRepositoryToSelector.value).catch((e) => { 
-      forkRepositoryStatus.classList.add("warn");
-      console.error("Can't fork: ", e)
-      if(typeof e === "object" && "message" in e)
-        forkRepositoryStatus.innerHTML = e.message;
-      else if(typeof e === "object" && "statusText" in e) 
-        forkRepositoryStatus.innerHTML = "Sorry, couldn't fork repository: " + e.statusText;
-      else 
+    }, forkRepositoryToSelector.value)
+      .catch((e) => { 
+        forkRepositoryStatus.classList.add("warn");
         forkRepositoryStatus.innerHTML = "Sorry, couldn't fork repository";
-    })
+        if(typeof e === "object" && "status" in e) {
+          forkRepositoryStatus.innerHTML = 
+            e.status + " " + e.statusText;
+          if(e.status !== 404) {
+            e.json().then((err) => {
+              if ('message' in err) 
+                forkRepositoryStatus.innerHTML += ". Github message: <i>" 
+                  + err.message + "</i>";
+            })
+          }
+        }
+      });
   }
 }
 
@@ -92,7 +98,7 @@ function repoBranchClicked(ev) {
     fillInBranchContents(ev)
     githubLoadingIndicator.classList.remove("loading");
   }).catch(() => {
-    console.error("Couldn't read Github repo to fill in branch contents");
+    console.warn("Couldn't read Github repo to fill in branch contents");
     githubLoadingIndicator.classList.remove("loading");
   });
 }
@@ -129,7 +135,7 @@ function branchContentsFileClicked(ev) {
     v.updateNotation = true;
     v.updateAll(cm);
   }).catch((err) => {
-    console.error("Couldn't read Github repo to fill in branch contents:", err);
+    console.warn("Couldn't read Github repo to fill in branch contents:", err);
     githubLoadingIndicator.classList.remove("loading");
   })
 }
@@ -298,7 +304,7 @@ async function fillInCommitLog(refresh = false) {
       renderCommitLog();
     }).catch((e) => {
       githubLoadingIndicator.classList.remove("loading");
-      console.error("Couldn't read github repo, forcing log-out: ", e);
+      console.warn("Couldn't read github repo, forcing log-out: ", e);
       logoutFromGithub();
     })
   } else {
@@ -393,11 +399,11 @@ function handleCommitButtonClicked(e) {
         .catch((e) => {
           cm.readOnly = false;
           githubLoadingIndicator.classList.remove("loading");
-          console.error("Couldn't read Github repo after writing commit: ", e, github);
+          console.warn("Couldn't read Github repo after writing commit: ", e, github);
         })
     })
     .catch((e) => {
       githubLoadingIndicator.classList.remove("loading");
-      console.error("Couldn't commit Github repo: ", e, github)
+      console.warn("Couldn't commit Github repo: ", e, github)
     });
 }
