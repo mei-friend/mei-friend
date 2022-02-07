@@ -1,6 +1,5 @@
 /* Speed mode: just feed the current page excerpt of the MEI encoding
- *  to Verovio, so minimize loading times.
- *  Currently only for --breaks = line, encoded
+ *  to Verovio, to minimize loading times.
  */
 
 import * as utils from './utils.js';
@@ -106,21 +105,22 @@ function readSection(xmlScore, pageNo, spdScore, breaks, countingMode) {
   let startingElements = [];
   let endingElements = [];
   return function digDeeper(section) {
-    var children = section.childNodes;
+    let children = section.childNodes;
     let lgt = children.length;
     for (let i = 0; i < lgt; i++) {
-      // console.info('digDeeper(' + pageNo + '): p: ' + p +
-      //   ', i: ' + i + ', ', children[i]);
       if (countingMode == 'measures' && mNo >= mxMeasures) return spdScore;
       if (p > pageNo) break; // only until requested pageNo is processed
-      if (children[i].nodeType === Node.TEXT_NODE) continue;
-      var currentNodeName = children[i].nodeName;
+      let currentNode = children[i];
+      // console.info('digDeeper(' + pageNo + '): p: ' + p +
+      //   ', i: ' + i + ', ', currentNode);
+      let currentNodeName = currentNode.nodeName;
+      if (currentNode.nodeType === Node.TEXT_NODE) continue;
       // ignore expansion lists
       if (['expansion'].includes(currentNodeName)) continue;
       // console.info('digDeeper currentNodeName: ', currentNodeName + ', '
-      // + children[i].getAttribute('xml:id'));
+      // + currentNode.getAttribute('xml:id'));
       if (currentNodeName == 'section') {
-        spdScore = digDeeper(children[i]);
+        spdScore = digDeeper(currentNode);
         // console.info('digDeeper returned spdScore: ', spdScore);
         continue;
       }
@@ -132,7 +132,7 @@ function readSection(xmlScore, pageNo, spdScore, breaks, countingMode) {
       if (countingMode == 'measures') {
         if (currentNodeName == 'measure') mNo++;
         else
-          Array.from(children[i].querySelectorAll('measure'))
+          Array.from(currentNode.querySelectorAll('measure'))
           .forEach(() => mNo++);
       } else if (countingMode == "encodedBreaks") {
         if (countNow && breaks.includes(currentNodeName)) {
@@ -146,20 +146,20 @@ function readSection(xmlScore, pageNo, spdScore, breaks, countingMode) {
       // for @meter@count/@unit attr or meterSig@count/unit.
       if (currentNodeName == 'scoreDef' && p < pageNo) {
         let value;
-        // console.info('scoreDef: ', children[i]);
-        if (children[i].hasAttribute('key.sig')) {
-          value = children[i].getAttribute('key.sig');
+        // console.info('scoreDef: ', currentNode);
+        if (currentNode.hasAttribute('key.sig')) {
+          value = currentNode.getAttribute('key.sig');
           addKeySigElement(spdScore, value);
-        } else if (value = children[i].querySelector('keySig')) {
+        } else if (value = currentNode.querySelector('keySig')) {
           value = value.getAttribute('sig');
           if (value) addKeySigElement(spdScore, value);
         }
-        if (children[i].hasAttribute('meter.count') &&
-          children[i].hasAttribute('meter.unit')) {
-          let meterCountValue = children[i].getAttribute('meter.count');
-          let meterUnitValue = children[i].getAttribute('meter.unit');
+        if (currentNode.hasAttribute('meter.count') &&
+          currentNode.hasAttribute('meter.unit')) {
+          let meterCountValue = currentNode.getAttribute('meter.count');
+          let meterUnitValue = currentNode.getAttribute('meter.unit');
           addMeterSigElement(spdScore, meterCountValue, meterUnitValue)
-        } else if (value = children[i].querySelector('meterSig')) {
+        } else if (value = currentNode.querySelector('meterSig')) {
           let countValue = value.getAttribute('count');
           let unitValue = value.getAttribute('unit');
           if (countValue && unitValue)
@@ -167,7 +167,7 @@ function readSection(xmlScore, pageNo, spdScore, breaks, countingMode) {
         }
       }
       // scoreDef with staffDef@key.sig or keySig@sig and meter@count/@unit
-      var staffDefList = children[i].querySelectorAll(
+      var staffDefList = currentNode.querySelectorAll(
         breaksSelector ? breaksSelector + ', staffDef' : 'staffDef');
       if (staffDefList && staffDefList.length > 0 && p < pageNo) {
         // console.info('staffDef: ', staffDefList);
@@ -240,7 +240,7 @@ function readSection(xmlScore, pageNo, spdScore, breaks, countingMode) {
         }
       }
       // update scoreDef with clef elements inside layers (and breaks to stop updating)
-      var clefList = children[i].querySelectorAll(
+      var clefList = currentNode.querySelectorAll(
         breaksSelector ? breaksSelector + ', clef' : 'clef');
       if (clefList && clefList.length > 0 && p < pageNo) {
         // console.info('clefList: ', clefList);
@@ -271,7 +271,7 @@ function readSection(xmlScore, pageNo, spdScore, breaks, countingMode) {
       if (p == pageNo) {
         // console.info('LoopStart startingElements: ', startingElements);
         // console.info('LoopStart endingElements: ', endingElements);
-        var listOfTargets = children[i].querySelectorAll('note, chord');
+        var listOfTargets = currentNode.querySelectorAll('note, chord');
         for (let target of listOfTargets) {
           let id = '#' + target.getAttribute('xml:id');
           //
@@ -305,9 +305,9 @@ function readSection(xmlScore, pageNo, spdScore, breaks, countingMode) {
       }
       // special treatment for endings that contain breaks
       if (['ending'].includes(currentNodeName) && breaksSelector &&
-        (children[i].querySelector(breaksSelector))) {
+        (currentNode.querySelector(breaksSelector))) {
         // copy elements containing breaks
-        var endingNode = children[i].cloneNode(true);
+        var endingNode = currentNode.cloneNode(true);
         var breakNode = endingNode.querySelector(breaksSelector);
         if (p == pageNo) {
           breakNode.parentNode.replaceChild(
@@ -328,7 +328,7 @@ function readSection(xmlScore, pageNo, spdScore, breaks, countingMode) {
 
       // append children
       if (p == pageNo) {
-        let nodeCopy = children[i].cloneNode(true);
+        let nodeCopy = currentNode.cloneNode(true);
         if (countingMode == 'computedBreaks') { // remove breaks from DOM
           Array.from(nodeCopy.querySelectorAll('pb, sb')).forEach(b => {
             if (b) nodeCopy.removeChild(b);
@@ -341,10 +341,10 @@ function readSection(xmlScore, pageNo, spdScore, breaks, countingMode) {
       // increment in countingMode computedBreaks
       if (countingMode == 'computedBreaks') {
         if (currentNodeName == 'measure' &&
-          children[i].getAttribute('xml:id') == breaks[p][breaks[p].length - 1])
+          currentNode.getAttribute('xml:id') == breaks[p][breaks[p].length - 1])
           p++;
         else {
-          let ms = Array.from(children[i].querySelectorAll('measure'));
+          let ms = Array.from(currentNode.querySelectorAll('measure'));
           ms.forEach(m => {
             if (m.getAttribute('xml:id') == breaks[p][breaks[p].length - 1])
               p++;
