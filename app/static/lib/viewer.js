@@ -134,11 +134,11 @@ export default class Viewer {
     let bs = document.getElementById('breaks-select');
     if (!this.speedMode || bs.value == 'none') return mei;
     this.breaks = brks;
-    if (bs.value == "encoded") {
+    if (bs.value === "encoded") {
       this.breaks = ['pb'];
-    } else if (bs.value == 'auto') {
+    } else if (bs.value === 'auto') {
       this.breaks =
-        (Object.keys(this.pageBreaks).length == 0) ? '' : this.pageBreaks;
+        (Object.keys(this.pageBreaks).length === 0) ? '' : this.pageBreaks;
     }
     // count pages from system/pagebreaks
     if (Array.isArray(this.breaks)) {
@@ -150,12 +150,12 @@ export default class Viewer {
       this.pageCount = 1; // pages are one-based
       let countBreaks = false;
       for (let e of elements) {
-        if (e.nodeName == 'measure') countBreaks = true; // skip leading breaks
+        if (e.nodeName === 'measure') countBreaks = true; // skip leading breaks
         if (countBreaks && this.breaks.includes(e.nodeName))
           this.pageCount++;
       }
       for (let e of Array.from(elements).reverse()) { // skip trailing breaks
-        if (e.nodeName == 'measure') break;
+        if (e.nodeName === 'measure') break;
         if (countBreaks && this.breaks.includes(e.nodeName)) this.pageCount--;
       }
       if (this.currentPage < 1 || this.currentPage > this.pageCount)
