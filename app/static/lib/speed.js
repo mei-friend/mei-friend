@@ -119,22 +119,22 @@ function readSection(xmlScore, pageNo, spdScore, breaks, countingMode) {
       if (['expansion'].includes(currentNodeName)) continue;
       // console.info('digDeeper currentNodeName: ', currentNodeName + ', '
       // + currentNode.getAttribute('xml:id'));
-      if (currentNodeName == 'section') {
+      if (currentNodeName === 'section') {
         spdScore = digDeeper(currentNode);
         // console.info('digDeeper returned spdScore: ', spdScore);
         continue;
       }
-      if (currentNodeName == 'measure') {
+      if (currentNodeName === 'measure') {
         countNow = true;
         // increment m when counting measures for a quick first page
       }
 
-      if (countingMode == 'measures') {
-        if (currentNodeName == 'measure') mNo++;
+      if (countingMode === 'measures') {
+        if (currentNodeName === 'measure') mNo++;
         else
           Array.from(currentNode.querySelectorAll('measure'))
           .forEach(() => mNo++);
-      } else if (countingMode == "encodedBreaks") {
+      } else if (countingMode === "encodedBreaks") {
         if (countNow && breaks.includes(currentNodeName)) {
           p++; // skip breaks before content (that is, a measure)
           continue;
@@ -144,7 +144,7 @@ function readSection(xmlScore, pageNo, spdScore, breaks, countingMode) {
 
       // update scoreDef @key.sig attribute or keySig@sig and
       // for @meter@count/@unit attr or meterSig@count/unit.
-      if (currentNodeName == 'scoreDef' && p < pageNo) {
+      if (currentNodeName === 'scoreDef' && p < pageNo) {
         let value;
         // console.info('scoreDef: ', currentNode);
         if (currentNode.hasAttribute('key.sig')) {
@@ -173,26 +173,26 @@ function readSection(xmlScore, pageNo, spdScore, breaks, countingMode) {
         // console.info('staffDef: ', staffDefList);
         var staffDefs = spdScore.querySelectorAll('staffDef');
         for (let st of staffDefList) {
-          if (countingMode == 'encodedBreaks' && breaks.includes(st.nodeName))
+          if (countingMode === 'encodedBreaks' && breaks.includes(st.nodeName))
             break;
-          var keysigValue = '',
-            meterCountValue = '',
-            meterUnitValue = '';
+          let keysigValue = '';
+          let meterCountValue = '';
+          let meterUnitValue = '';
           if (st.hasAttribute('key.sig')) {
             keysigValue = st.getAttribute('key.sig');
           }
-          var keySigElement = st.querySelector('keySig');
+          let keySigElement = st.querySelector('keySig');
           if (keySigElement && keySigElement.hasAttribute('sig')) {
             keysigValue = keySigElement.getAttribute('sig');
           }
           if (keysigValue != '') {
             // console.info('staffDef update: keysig: ' + keysigValue);
-            for (var staffDef of staffDefs) {
-              if (st.getAttribute('n') == staffDef.getAttribute('n')) {
-                var el = document.createElementNS(meiNameSpace, 'keySig');
+            for (let staffDef of staffDefs) {
+              if (st.getAttribute('n') === staffDef.getAttribute('n')) {
+                let el = document.createElementNS(meiNameSpace, 'keySig');
                 el.setAttribute('sig', keysigValue);
                 //console.info('Updating scoreDef('+st.getAttribute('n')+'): ',el);
-                var k = staffDef.querySelector('keySig');
+                let k = staffDef.querySelector('keySig');
                 if (k) {
                   k.setAttribute('sig', keysigValue);
                 } else {
@@ -219,13 +219,13 @@ function readSection(xmlScore, pageNo, spdScore, breaks, countingMode) {
           if (meterCountValue != '' && meterUnitValue != '') {
             // console.info('staffDef update: meterSig: ' +
             //   meterCountValue + '/' + meterUnitValue);
-            for (var staffDef of staffDefs) {
-              if (st.getAttribute('n') == staffDef.getAttribute('n')) {
-                var el = document.createElementNS(meiNameSpace, 'meterSig');
+            for (let staffDef of staffDefs) {
+              if (st.getAttribute('n') === staffDef.getAttribute('n')) {
+                let el = document.createElementNS(meiNameSpace, 'meterSig');
                 el.setAttribute('count', meterCountValue);
                 el.setAttribute('unit', meterUnitValue);
                 // console.info('Updating scoreDef(' + st.getAttribute('n') + '): ', el);
-                var k = staffDef.querySelector('meterSig');
+                let k = staffDef.querySelector('meterSig');
                 if (k) {
                   k.setAttribute('count', meterCountValue);
                   k.setAttribute('unit', meterUnitValue);
@@ -240,7 +240,7 @@ function readSection(xmlScore, pageNo, spdScore, breaks, countingMode) {
         }
       }
       // update scoreDef with clef elements inside layers (and breaks to stop updating)
-      var clefList = currentNode.querySelectorAll(
+      let clefList = currentNode.querySelectorAll(
         breaksSelector ? breaksSelector + ', clef' : 'clef');
       if (clefList && clefList.length > 0 && p < pageNo) {
         // console.info('clefList: ', clefList);
@@ -268,7 +268,7 @@ function readSection(xmlScore, pageNo, spdScore, breaks, countingMode) {
       }
       // List all notes/chords to check whether they are
       // pointed to from outside the requested pageNo
-      if (p == pageNo) {
+      if (false && p == pageNo) {
         // console.info('LoopStart startingElements: ', startingElements);
         // console.info('LoopStart endingElements: ', endingElements);
         var listOfTargets = currentNode.querySelectorAll('note, chord');
@@ -339,8 +339,8 @@ function readSection(xmlScore, pageNo, spdScore, breaks, countingMode) {
       }
 
       // increment in countingMode computedBreaks
-      if (countingMode == 'computedBreaks') {
-        if (currentNodeName == 'measure' &&
+      if (countingMode === 'computedBreaks') {
+        if (currentNodeName === 'measure' &&
           currentNode.getAttribute('xml:id') == breaks[p][breaks[p].length - 1])
           p++;
         else {
@@ -414,7 +414,7 @@ function readSection(xmlScore, pageNo, spdScore, breaks, countingMode) {
   }
 }
 
-// helper function to readSection(); adds @key.sig attribute to spdScore
+// helper function to readSection(); adds keySig element to spdScore
 function addKeySigElement(spdScore, keysigValue) {
   let keySigElement = document.createElementNS(meiNameSpace, 'keySig');
   keySigElement.setAttribute('sig', keysigValue);
