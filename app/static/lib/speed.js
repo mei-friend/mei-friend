@@ -268,7 +268,7 @@ function readSection(xmlScore, pageNo, spdScore, breaks, countingMode) {
       }
       // List all notes/chords to check whether they are
       // pointed to from outside the requested pageNo
-      if (false && p == pageNo) {
+      if (p == pageNo) {
         let t = performance.now();
         // console.info('LoopStart startingElements: ', startingElements);
         // console.info('LoopStart endingElements: ', endingElements);
@@ -303,7 +303,9 @@ function readSection(xmlScore, pageNo, spdScore, breaks, countingMode) {
         }
         // console.info('LoopEnd startingElements: ', startingElements);
         // console.info('LoopEnd endingElements: ', endingElements);
-        console.log('timespan preps took ' + t - performance.now() * ' s.');
+        console.log('timespan preps for ' +
+          currentNodeName + ' ' + currentNode.getAttribute('xml:id') +
+          ' took ' + (performance.now() - t) + ' ms.');
       }
       // special treatment for endings that contain breaks
       if (currentNodeName === 'ending' && breaksSelector &&
