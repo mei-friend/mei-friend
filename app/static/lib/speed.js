@@ -15,7 +15,7 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks = ['sb', 'pb']) {
     return;
   }
   // console.info('getPageFromDom(' + pageNo + ') meiHead: ', meiHeader);
-  var xmlScore = xmlDoc.querySelector("mdiv > score");
+  let xmlScore = xmlDoc.querySelector("mdiv > score");
   if (!xmlScore) {
     console.info('getPageFromDom(): no xmlScore element');
     return;
@@ -29,24 +29,24 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks = ['sb', 'pb']) {
   // console.info('scoreDef: ', scoreDefs);
 
   // construct new MEI node for Verovio engraving
-  var spdNode = minimalMEIFile(xmlDoc);
+  let spdNode = minimalMEIFile(xmlDoc);
   let meiVersion = xmlDoc.querySelector('mei').getAttribute('meiversion');
   if (meiVersion) spdNode.setAttribute('meiversion', meiVersion);
   spdNode.appendChild(meiHeader.item(0).cloneNode(true));
   spdNode.appendChild(minimalMEIMusicTree(xmlDoc));
-  var scoreDef = scoreDefs.item(0).cloneNode(true);
+  let scoreDef = scoreDefs.item(0).cloneNode(true);
   // console.info('scoreDef: ', scoreDef);
-  var baseSection = document.createElementNS(meiNameSpace, 'section');
+  let baseSection = document.createElementNS(meiNameSpace, 'section');
   baseSection.setAttributeNS(xmlNameSpace, 'xml:id', 'baseSection');
   // console.info('section: ', baseSection);
 
   if (pageNo > 1) {
-    var measure = dummyMeasure(countStaves(scoreDef));
+    let measure = dummyMeasure(countStaves(scoreDef));
     measure.setAttributeNS(xmlNameSpace, 'xml:id', 'startingMeasure');
     baseSection.appendChild(measure);
     baseSection.appendChild(document.createElementNS(meiNameSpace, 'pb'));
   }
-  var spdScore = spdNode.querySelector('mdiv > score');
+  let spdScore = spdNode.querySelector('mdiv > score');
   // console.info('spdScore: ', spdScore);
 
   spdScore.appendChild(scoreDef); // is updated within readSection()
@@ -56,16 +56,16 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks = ['sb', 'pb']) {
   if (Array.isArray(breaks)) countingMode = 'encodedBreaks';
   else if (typeof breaks == 'object') countingMode = 'computedBreaks';
 
-  var digger = readSection(xmlScore, pageNo, spdScore, breaks, countingMode);
-  var sections = xmlScore.childNodes;
+  let digger = readSection(xmlScore, pageNo, spdScore, breaks, countingMode);
+  let sections = xmlScore.childNodes;
   sections.forEach((item) => {
-    if (item.nodeName == 'section') { // diggs into section hierachy
+    if (item.nodeName === 'section') { // diggs into section hierachy
       spdScore = digger(item);
     }
   });
 
   // insert sb elements for each element except last
-  if (countingMode == 'computedBreaks' && Object.keys(breaks).length > 0) {
+  if (countingMode === 'computedBreaks' && Object.keys(breaks).length > 0) {
     breaks[pageNo].forEach((id, i) => {
       if (i < breaks[pageNo].length - 1) { // last element is a <pb>
         let m = spdScore.querySelector('[*|id="' + id + '"]');
@@ -87,9 +87,7 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks = ['sb', 'pb']) {
 
   const serializer = new XMLSerializer();
   let mei = xmlDefs + serializer.serializeToString(spdNode);
-
   // console.info('Speed() MEI: ', mei);
-
   return mei;
 }
 
@@ -104,6 +102,9 @@ function readSection(xmlScore, pageNo, spdScore, breaks, countingMode) {
   let countNow = false; // to ignore encoded page breaks before first measure
   let startingElements = [];
   let endingElements = [];
+  let staffDefs = spdScore.querySelectorAll('staffDef');
+  let baseSection = spdScore.querySelector('section');
+
   return function digDeeper(section) {
     let children = section.childNodes;
     let lgt = children.length;
@@ -149,29 +150,28 @@ function readSection(xmlScore, pageNo, spdScore, breaks, countingMode) {
         // console.info('scoreDef: ', currentNode);
         if (currentNode.hasAttribute('key.sig')) {
           value = currentNode.getAttribute('key.sig');
-          addKeySigElement(spdScore, value);
+          addKeySigElement(staffDefs, value);
         } else if (value = currentNode.querySelector('keySig')) {
           value = value.getAttribute('sig');
-          if (value) addKeySigElement(spdScore, value);
+          if (value) addKeySigElement(staffDefs, value);
         }
         if (currentNode.hasAttribute('meter.count') &&
           currentNode.hasAttribute('meter.unit')) {
           let meterCountValue = currentNode.getAttribute('meter.count');
           let meterUnitValue = currentNode.getAttribute('meter.unit');
-          addMeterSigElement(spdScore, meterCountValue, meterUnitValue)
+          addMeterSigElement(staffDefs, meterCountValue, meterUnitValue)
         } else if (value = currentNode.querySelector('meterSig')) {
           let countValue = value.getAttribute('count');
           let unitValue = value.getAttribute('unit');
           if (countValue && unitValue)
-            addMeterSigElement(spdScore, countValue, unitValue);
+            addMeterSigElement(staffDefs, countValue, unitValue);
         }
       }
       // scoreDef with staffDef@key.sig or keySig@sig and meter@count/@unit
-      var staffDefList = currentNode.querySelectorAll(
+      let staffDefList = currentNode.querySelectorAll(
         breaksSelector ? breaksSelector + ', staffDef' : 'staffDef');
       if (staffDefList && staffDefList.length > 0 && p < pageNo) {
         // console.info('staffDef: ', staffDefList);
-        var staffDefs = spdScore.querySelectorAll('staffDef');
         for (let st of staffDefList) {
           if (countingMode === 'encodedBreaks' && breaks.includes(st.nodeName))
             break;
@@ -269,6 +269,7 @@ function readSection(xmlScore, pageNo, spdScore, breaks, countingMode) {
       // List all notes/chords to check whether they are
       // pointed to from outside the requested pageNo
       if (false && p == pageNo) {
+        let t = performance.now();
         // console.info('LoopStart startingElements: ', startingElements);
         // console.info('LoopStart endingElements: ', endingElements);
         var listOfTargets = currentNode.querySelectorAll('note, chord');
@@ -302,24 +303,23 @@ function readSection(xmlScore, pageNo, spdScore, breaks, countingMode) {
         }
         // console.info('LoopEnd startingElements: ', startingElements);
         // console.info('LoopEnd endingElements: ', endingElements);
+        console.log('timespan preps took ' + t - performance.now() * ' s.');
       }
       // special treatment for endings that contain breaks
-      if (['ending'].includes(currentNodeName) && breaksSelector &&
+      if (currentNodeName === 'ending' && breaksSelector &&
         (currentNode.querySelector(breaksSelector))) {
         // copy elements containing breaks
-        var endingNode = currentNode.cloneNode(true);
-        var breakNode = endingNode.querySelector(breaksSelector);
+        let endingNode = currentNode.cloneNode(true);
+        let breakNode = endingNode.querySelector(breaksSelector);
         if (p == pageNo) {
           breakNode.parentNode.replaceChild(
             document.createElementNS(meiNameSpace, 'pb'), breakNode);
-          spdScore.getElementsByTagName('section')
-            .item(0).appendChild(endingNode);
+          baseSection.appendChild(endingNode);
         } else if (p == pageNo - 1) { // remove elements until first break
           while (!breaks.includes(endingNode.firstChild.nodeName)) {
             endingNode.removeChild(endingNode.firstChild);
           }
-          spdScore.getElementsByTagName('section')
-            .item(0).appendChild(endingNode);
+          baseSection.appendChild(endingNode);
         }
         // console.info('Ending with break inside: ', endingNode);
         p++;
@@ -329,12 +329,12 @@ function readSection(xmlScore, pageNo, spdScore, breaks, countingMode) {
       // append children
       if (p == pageNo) {
         let nodeCopy = currentNode.cloneNode(true);
-        if (countingMode == 'computedBreaks') { // remove breaks from DOM
+        if (countingMode === 'computedBreaks') { // remove breaks from DOM
           Array.from(nodeCopy.querySelectorAll('pb, sb')).forEach(b => {
             if (b) nodeCopy.removeChild(b);
           });
         }
-        spdScore.getElementsByTagName('section').item(0).appendChild(nodeCopy);
+        baseSection.appendChild(nodeCopy);
         // console.info('digDeeper adds child to spdScore: ', spdScore);
       }
 
@@ -380,11 +380,10 @@ function readSection(xmlScore, pageNo, spdScore, breaks, countingMode) {
     if (p > pageNo) {
       var m = spdScore.querySelector('[*|id="endingMeasure"]');
       if (!m) {
-        let endingMeasure = dummyMeasure(countStaves(spdScore.querySelector('scoreDef')));
+        let endingMeasure = dummyMeasure(staffDefs.length);
         endingMeasure.setAttributeNS(xmlNameSpace, 'xml:id', 'endingMeasure');
-        let sec = spdScore.querySelector('section'); //[*|id="basesec"]');
-        sec.appendChild(document.createElementNS(meiNameSpace, 'pb'));
-        sec.appendChild(endingMeasure);
+        baseSection.appendChild(document.createElementNS(meiNameSpace, 'pb'));
+        baseSection.appendChild(endingMeasure);
       }
       if (startingElements.length > 0) {
         // console.info('work through startingElements.');
@@ -415,27 +414,23 @@ function readSection(xmlScore, pageNo, spdScore, breaks, countingMode) {
 }
 
 // helper function to readSection(); adds keySig element to spdScore
-function addKeySigElement(spdScore, keysigValue) {
-  let keySigElement = document.createElementNS(meiNameSpace, 'keySig');
-  keySigElement.setAttribute('sig', keysigValue);
-  let staffDefs = spdScore.querySelectorAll('staffDef');
+function addKeySigElement(staffDefs, keysigValue) {
   for (let staffDef of staffDefs) {
     staffDef.removeAttribute('key.sig');
     let k = staffDef.querySelector('keySig');
     if (k) {
       k.setAttribute('sig', keysigValue);
     } else {
-      staffDef.appendChild(keySigElement.cloneNode(true));
+      let keySigElement = document.createElementNS(meiNameSpace, 'keySig');
+      keySigElement.setAttribute('sig', keysigValue);
+      staffDef.appendChild(keySigElement);
     }
   }
 }
 
 // helper function to readSection(); adds @meter.sig attribute to spdScore
-function addMeterSigElement(spdScore, meterCountValue, meterUnitValue) {
-  let meterSigElement = document.createElementNS(meiNameSpace, 'meterSig');
-  meterSigElement.setAttribute('count', meterCountValue);
-  meterSigElement.setAttribute('unit', meterUnitValue);
-  let staffDefs = spdScore.querySelectorAll('staffDef');
+function addMeterSigElement(staffDefs, meterCountValue, meterUnitValue) {
+
   for (let staffDef of staffDefs) {
     staffDef.removeAttribute('meter.count');
     staffDef.removeAttribute('meter.unit');
@@ -444,7 +439,10 @@ function addMeterSigElement(spdScore, meterCountValue, meterUnitValue) {
       k.setAttribute('count', meterCountValue);
       k.setAttribute('unit', meterUnitValue);
     } else {
-      staffDef.appendChild(meterSigElement.cloneNode(true));
+      let meterSigElement = document.createElementNS(meiNameSpace, 'meterSig');
+      meterSigElement.setAttribute('count', meterCountValue);
+      meterSigElement.setAttribute('unit', meterUnitValue);
+      staffDef.appendChild(meterSigElement);
     }
   }
 }
