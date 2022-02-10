@@ -75,10 +75,7 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks = ['sb', 'pb'],
 
   // matchTimespanningElements(xmlScore, spdScore, pageNo);
 
-  let t1 = performance.now();
-  console.log('page spanners ' + Object.keys(pageSpanners).length + ', ', pageSpanners);
   let t2 = performance.now();
-  console.log('took: ' + (t2 - t1) + ' ms.');
   addPageSpanningElements(xmlScore, spdScore, pageSpanners, pageNo);
   console.log('addPageSpanningElements took ' + (performance.now() - t2) + ' ms.');
 
@@ -105,7 +102,7 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks = ['sb', 'pb'],
 
   const serializer = new XMLSerializer();
   let mei = xmlDefs + serializer.serializeToString(spdNode);
-  // console.info('Speed() MEI: ', mei);
+  console.info('Speed() MEI: ', mei);
   return mei;
 }
 
@@ -469,18 +466,21 @@ function addPageSpanningElements(xmlScore, spdScore, pageSpanners, pageNo) {
   let endingElementIds = pageSpanners.end[pageNo];
   if (endingElementIds && pageNo > 1) {
     let m = spdScore.querySelector('[*|id="startingMeasure"]');
-    let uuids = getIdsForDummyMeasure(m);
     for (let endingElementId of endingElementIds) {
       let endingElement =
         xmlScore.querySelector('[*|id="' + endingElementId + '"]');
+      if (!endingElement) continue;
       let startid = rmHash(endingElement.getAttribute('startid'));
-      let note = xmlScore.querySelector('[*|id="' + startid + '"]');
+      let startNote = xmlScore.querySelector('[*|id="' + startid + '"]');
       let staffNo = -1;
-      if (note) staffNo = note.closest('staff').getAttribute('n');
+      if (startNote)
+        staffNo = startNote.closest('staff').getAttribute('n');
       else continue;
-      let el = endingElement.cloneNode(true);
-      el.setAttribute('startid', '#' + uuids[staffNo - 1]);
-      m.appendChild(el);
+      if (!spdScore.querySelector('[*|id="' + startid + '"]')) {
+        let staff = m.querySelector('staff[n="' + staffNo + '"]');
+        staff.querySelector('layer').appendChild(startNote.cloneNode(true));
+      }
+      m.appendChild(endingElement.cloneNode(true));
     }
   } // 1) if
 
@@ -488,19 +488,21 @@ function addPageSpanningElements(xmlScore, spdScore, pageSpanners, pageNo) {
   let startingElementIds = pageSpanners.start[pageNo];
   if (startingElementIds) {
     let m = spdScore.querySelector('[*|id="endingMeasure"]');
-    let uuids = getIdsForDummyMeasure(m);
     for (let startingElementId of startingElementIds) {
       let startingElement =
         xmlScore.querySelector('[*|id="' + startingElementId + '"]');
+      if (!startingElement) continue;
       let endid = rmHash(startingElement.getAttribute('endid'));
       // console.info('searching for endid: ', endid);
       if (endid) {
-        let note = xmlScore.querySelector('[*|id="' + endid + '"]');
+        let endNote = xmlScore.querySelector('[*|id="' + endid + '"]');
         let staffNo = -1;
-        if (note) staffNo = note.closest('staff').getAttribute('n');
+        if (endNote) staffNo = endNote.closest('staff').getAttribute('n');
         else continue;
-        let tel = spdScore.querySelector('[*|id="' + startingElementId + '"]');
-        if (tel) tel.setAttribute('endid', '#' + uuids[staffNo - 1]);
+        if (!spdScore.querySelector('[*|id="' + endid + '"]')) {
+          let staff = m.querySelector('staff[n="' + staffNo + '"]');
+          staff.querySelector('layer').appendChild(endNote.cloneNode(true));
+        }
       }
     }
   }

@@ -169,7 +169,10 @@ export default class Viewer {
     if (Object.keys(this.pageSpanners).length === 0) {
       let t1 = performance.now();
       this.pageSpanners = speed.listPageSpanningElements(this.xmlDoc, this.breaks);
-      console.log('listPageSpanningElements took: ' + (performance.now() - t1) + ' ms.');
+      console.log('listPageSpanningElements took: ' +
+        (performance.now() - t1) + ' ms.');
+      console.log('pageSpanners ' +
+        Object.keys(this.pageSpanners.start).length + ', ', this.pageSpanners);
     }
     // retrieve requested MEI page from DOM
     return speed.getPageFromDom(this.xmlDoc, this.currentPage, this.breaks,
