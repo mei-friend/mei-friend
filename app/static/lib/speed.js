@@ -102,7 +102,7 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks = ['sb', 'pb'],
 
   const serializer = new XMLSerializer();
   let mei = xmlDefs + serializer.serializeToString(spdNode);
-  console.info('Speed() MEI: ', mei);
+  // console.info('Speed() MEI: ', mei);
   return mei;
 }
 
@@ -430,33 +430,70 @@ function matchTimespanningElements(xmlScore, spdScore, pageNo) {
 
 } // matchTimespanningElements
 
-// list all timespanning elements that have @startid/@endid at different pages
+// list all timespanning elements with @startid/@endid attr on different pages
 export function listPageSpanningElements(xmlScore, breaks) {
+  let t1 = performance.now();
   let els = xmlScore.querySelectorAll(att.timeSpanningElements.join(','));
   let pageSpanners = {
     start: {},
     end: {}
   };
+  // for breaks encoded / array; TODO auto/Object
+  let sel = 'pb, sb, ';
+  let tsTable = {};
   for (let el of els) {
-    let p1 = 0;
-    let p2 = 0;
-    let startid = el.getAttribute('startid');
-    if (startid) p1 = getPageWithElement(xmlScore, breaks, rmHash(startid));
-    else continue;
-    let endid = el.getAttribute('endid');
-    if (endid) p2 = getPageWithElement(xmlScore, breaks, rmHash(endid));
-    // console.log(el.getAttribute('xml:id') + ': p1/p2: ' + p1 + '/' + p2);
+    let id = el.getAttribute('xml:id');
+    let startid = rmHash(el.getAttribute('startid'));
+    if (startid) sel += '[*|id="' + startid + '"],';
+    let endid = rmHash(el.getAttribute('endid'));
+    if (endid) sel += '[*|id="' + endid + '"],';
+    if (id && startid && endid) tsTable[id] = [startid, endid];
+
+  }
+  let t2 = performance.now();
+  console.log('listPageSpanningElements selector preps: ' + (t2 - t1) + ' ms.');
+
+  let elList = xmlScore.querySelectorAll(sel.slice(0, -1));
+
+  t1 = t2;
+  t2 = performance.now();
+  console.log('listPageSpanningElements querySelectorAll: ' + (t2 - t1) + ' ms.');
+
+  let noteTable = {};
+  let count = false;
+  let p = 1;
+  for (let e of elList) {
+    if (breaks.includes(e.nodeName)) count = true;
+    if (count && breaks.includes(e.nodeName)) p++;
+    else
+      noteTable[e.getAttribute('xml:id')] = p;
+  }
+
+  t1 = t2;
+  t2 = performance.now();
+  console.log('listPageSpanningElements noteTable: ' + (t2 - t1) + ' ms.');
+
+  let p1 = 0;
+  let p2 = 0;
+  for (let spannerIds of Object.keys(tsTable)) {
+    p1 = noteTable[tsTable[spannerIds][0]];
+    p2 = noteTable[tsTable[spannerIds][1]];
     if (p1 > 0 && p2 > 0 && p1 != p2) {
       if (pageSpanners.start[p1])
-        pageSpanners.start[p1].push(el.getAttribute('xml:id'));
+        pageSpanners.start[p1].push(spannerIds);
       else
-        pageSpanners.start[p1] = [el.getAttribute('xml:id')];
+        pageSpanners.start[p1] = [spannerIds];
       if (pageSpanners.end[p2])
-        pageSpanners.end[p2].push(el.getAttribute('xml:id'));
+        pageSpanners.end[p2].push(spannerIds);
       else
-        pageSpanners.end[p2] = [el.getAttribute('xml:id')];
+        pageSpanners.end[p2] = [spannerIds];
     }
   }
+
+  t1 = t2;
+  t2 = performance.now();
+  console.log('listPageSpanningElements pageSpanners: ' + (t2 - t1) + ' ms.');
+
   return pageSpanners;
 }
 
@@ -689,6 +726,7 @@ export function countStaves(scoreDef) {
 }
 
 export function rmHash(hashedString) {
+  if (!hashedString) return '';
   if (hashedString.startsWith('#')) return hashedString.split('#')[1];
 }
 

@@ -167,10 +167,7 @@ export default class Viewer {
     }
     // compute time-spanning element object TODO: move to dom-worker
     if (Object.keys(this.pageSpanners).length === 0) {
-      let t1 = performance.now();
       this.pageSpanners = speed.listPageSpanningElements(this.xmlDoc, this.breaks);
-      console.log('listPageSpanningElements took: ' +
-        (performance.now() - t1) + ' ms.');
       console.log('pageSpanners ' +
         Object.keys(this.pageSpanners.start).length + ', ', this.pageSpanners);
     }
