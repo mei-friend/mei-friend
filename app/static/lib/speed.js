@@ -34,7 +34,7 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks = ['sb', 'pb']) {
   if (meiVersion) spdNode.setAttribute('meiversion', meiVersion);
   spdNode.appendChild(meiHeader.item(0).cloneNode(true));
   spdNode.appendChild(minimalMEIMusicTree(xmlDoc));
-  let scoreDef = scoreDefs.item(0).cloneNode(true);
+  var scoreDef = scoreDefs.item(0).cloneNode(true);
   // console.info('scoreDef: ', scoreDef);
   let baseSection = document.createElementNS(meiNameSpace, 'section');
   baseSection.setAttributeNS(xmlNameSpace, 'xml:id', 'baseSection');
@@ -63,6 +63,14 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks = ['sb', 'pb']) {
       spdScore = digger(item);
     }
   });
+
+  // add third measure (even if last page)
+  let m = dummyMeasure(countStaves(scoreDef));
+  m.setAttributeNS(xmlNameSpace, 'xml:id', 'endingMeasure');
+  baseSection.appendChild(document.createElementNS(meiNameSpace, 'pb'));
+  baseSection.appendChild(m);
+
+  matchTimespanningElements(xmlScore, spdScore, pageNo);
 
   // insert sb elements for each element except last
   if (countingMode === 'computedBreaks' && Object.keys(breaks).length > 0) {
@@ -93,15 +101,13 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks = ['sb', 'pb']) {
 
 // recursive closure to dig through hierarchically stacked sections and append
 // only those elements within the requested pageNo
-function readSection(xmlScore, pageNo, spdScore, breaks, countingMode) {
+function readSection(pageNo, spdScore, breaks, countingMode) {
   let p = 1; // page count
   let mNo = 1; // measure count (for a fast first page, with breaks = '')
   let mxMeasures = 50; // for a quick first page
   let breaksSelector = '';
   if (countingMode == 'encodedBreaks') breaksSelector = breaks.join(', ');
   let countNow = false; // to ignore encoded page breaks before first measure
-  let startingElements = [];
-  let endingElements = [];
   let staffDefs = spdScore.querySelectorAll('staffDef');
   let baseSection = spdScore.querySelector('section');
 
@@ -266,47 +272,7 @@ function readSection(xmlScore, pageNo, spdScore, breaks, countingMode) {
           // console.info('scoreDef: ', spdScore.querySelector('scoreDef'));
         }
       }
-      // List all notes/chords to check whether they are
-      // pointed to from outside the requested pageNo
-      if (p == pageNo) {
-        let t = performance.now();
-        // console.info('LoopStart startingElements: ', startingElements);
-        // console.info('LoopStart endingElements: ', endingElements);
-        var listOfTargets = currentNode.querySelectorAll('note, chord');
-        for (let target of listOfTargets) {
-          let id = '#' + target.getAttribute('xml:id');
-          //
-          let ends = section.querySelectorAll("[startid][endid='" + id + "']");
-          ends.forEach(e => endingElements.push(e.getAttribute('xml:id')));
-          let starts = section.querySelectorAll("[startid='" + id + "'][endid]");
-          starts.forEach(e => startingElements.push(e.getAttribute('xml:id')));
-          //
-          let j; // check whether this id ends in startingElements
-          for (j = 0; j < startingElements.length; j++) {
-            let el = xmlScore.querySelector('[*|id="' + startingElements[j] + '"]');
-            // console.info('Checking identiy: ' + el.getAttribute('xml:id') + '/' + id);
-            if (el && el.getAttribute('endid') == id) {
-              // console.info('startingElement removed', startingElements[j]);
-              endingElements.splice(endingElements.indexOf(startingElements[j]), 1);
-              startingElements.splice(j--, 1);
-            }
-          }
-          for (j = 0; j < endingElements.length; j++) {
-            let el = xmlScore.querySelector('[*|id="' + endingElements[j] + '"]');
-            // console.info('Checking identiy: ' + el.getAttribute('xml:id') + '/' + id);
-            if (el && el.getAttribute('startid') == id) {
-              // console.info('endingElement removed', endingElements[j]);
-              startingElements.splice(startingElements.indexOf(endingElements[j]), 1);
-              endingElements.splice(j--, 1);
-            }
-          }
-        }
-        // console.info('LoopEnd startingElements: ', startingElements);
-        // console.info('LoopEnd endingElements: ', endingElements);
-        console.log('timespan preps for ' +
-          currentNodeName + ' ' + currentNode.getAttribute('xml:id') +
-          ' took ' + (performance.now() - t) + ' ms.');
-      }
+
       // special treatment for endings that contain breaks
       if (currentNodeName === 'ending' && breaksSelector &&
         (currentNode.querySelector(breaksSelector))) {
@@ -355,65 +321,97 @@ function readSection(xmlScore, pageNo, spdScore, breaks, countingMode) {
       }
 
     } // for loop across child nodes
-
-    // console.info('2 startingElements: ', startingElements);
-    // console.info('2 endingElements: ', endingElements);
-
-    // 1) go through endingElements and add to first measure
-    if (endingElements.length > 0 && pageNo > 1) {
-      let m = spdScore.querySelector('[*|id="startingMeasure"]');
-      let uuids = getIdsForDummyMeasure(m);
-      for (let e of endingElements) {
-        let endingElement = xmlScore.querySelector('[*|id="' + e + '"]');
-        if (endingElement) {
-          let startid = rmHash(endingElement.getAttribute('startid'));
-          let staff = xmlScore.querySelector('[*|id="' + startid + '"]');
-          let staffNo = -1;
-          if (staff) staffNo = staff.closest('staff').getAttribute('n');
-          else continue;
-          let el = endingElement.cloneNode(true);
-          el.setAttribute('startid', '#' + uuids[staffNo - 1]);
-          m.appendChild(el);
-        }
-      }
-      endingElements = [];
-    }
-    // 2) go through startingElements and append to a third-page measure
-    if (p > pageNo) {
-      var m = spdScore.querySelector('[*|id="endingMeasure"]');
-      if (!m) {
-        let endingMeasure = dummyMeasure(staffDefs.length);
-        endingMeasure.setAttributeNS(xmlNameSpace, 'xml:id', 'endingMeasure');
-        baseSection.appendChild(document.createElementNS(meiNameSpace, 'pb'));
-        baseSection.appendChild(endingMeasure);
-      }
-      if (startingElements.length > 0) {
-        // console.info('work through startingElements.');
-        m = spdScore.querySelector('[*|id="endingMeasure"]');
-        let uuids = getIdsForDummyMeasure(m);
-        for (let s of startingElements) {
-          // console.info('startingElement s: ', s);
-          let startingElement = xmlScore.querySelector('[*|id="' + s + '"]');
-          if (startingElement) {
-            let endid = rmHash(startingElement.getAttribute('endid'));
-            // console.info('searching for endid: ', endid);
-            if (endid) {
-              let staff = xmlScore.querySelector('[*|id="' + endid + '"]');
-              let staffNo = -1;
-              if (staff) staffNo = staff.closest('staff').getAttribute('n');
-              else continue;
-              let tel = spdScore.querySelector('[*|id="' + s + '"]');
-              if (tel) tel.setAttribute('endid', '#' + uuids[staffNo - 1]);
-            }
-          }
-        }
-        startingElements = [];
-      }
-    }
-
     return spdScore;
   }
 }
+
+function matchTimespanningElements(xmlScore, spdScore, pageNo) {
+  // List all notes/chords to check whether they are
+  // pointed to from outside the requested pageNo
+  let t1 = performance.now();
+  let startingElements = [];
+  let endingElements = [];
+  // console.info('LoopStart startingElements: ', startingElements);
+  // console.info('LoopStart endingElements: ', endingElements);
+  var listOfTargets = spdScore.querySelectorAll('note, chord');
+  for (let target of listOfTargets) {
+    let id = '#' + target.getAttribute('xml:id');
+    //
+    let ends = xmlScore.querySelectorAll("[startid][endid='" + id + "']");
+    ends.forEach(e => endingElements.push(e));
+    let starts = xmlScore.querySelectorAll("[startid='" + id + "'][endid]");
+    starts.forEach(e => startingElements.push(e));
+    //
+    let j; // check whether this id ends in startingElements
+    for (j = 0; j < startingElements.length; j++) {
+      let el = startingElements[j];
+      // console.info('Checking identiy: ' + el.getAttribute('xml:id') + '/' + id);
+      if (el && el.getAttribute('endid') === id) {
+        // console.info('startingElement removed', startingElements[j]);
+        endingElements.splice(endingElements.indexOf(el), 1);
+        startingElements.splice(j--, 1);
+      }
+    }
+    for (j = 0; j < endingElements.length; j++) {
+      let el = endingElements[j];
+      // console.info('Checking identiy: ' + el.getAttribute('xml:id') + '/' + id);
+      if (el && el.getAttribute('startid') === id) {
+        // console.info('endingElement removed', endingElements[j]);
+        startingElements.splice(startingElements.indexOf(el), 1);
+        endingElements.splice(j--, 1);
+      }
+    }
+  }
+  // console.info('LoopEnd startingElements: ', startingElements);
+  // console.info('LoopEnd endingElements: ', endingElements);
+  let t2 = performance.now();
+  console.log('timespan matching took ' + (t2 - t1) + ' ms.');
+
+  // 1) go through endingElements and add to first measure
+  if (endingElements.length > 0 && pageNo > 1) {
+    let m = spdScore.querySelector('[*|id="startingMeasure"]');
+    let uuids = getIdsForDummyMeasure(m);
+    for (let endingElement of endingElements) {
+      if (endingElement) {
+        let startid = rmHash(endingElement.getAttribute('startid'));
+        let note = xmlScore.querySelector('[*|id="' + startid + '"]');
+        let staffNo = -1;
+        if (note) staffNo = note.closest('staff').getAttribute('n');
+        else continue;
+        let el = endingElement.cloneNode(true);
+        el.setAttribute('startid', '#' + uuids[staffNo - 1]);
+        m.appendChild(el);
+      }
+    }
+  } // 1) if
+
+  // 2) go through startingElements and append to a third-page measure
+  var m = spdScore.querySelector('[*|id="endingMeasure"]');
+  if (startingElements.length > 0) {
+    // console.info('work through startingElements.');
+    m = spdScore.querySelector('[*|id="endingMeasure"]');
+    let uuids = getIdsForDummyMeasure(m);
+    for (let startingElement of startingElements) {
+      if (startingElement) {
+        let endid = rmHash(startingElement.getAttribute('endid'));
+        // console.info('searching for endid: ', endid);
+        if (endid) {
+          let note = xmlScore.querySelector('[*|id="' + endid + '"]');
+          let staffNo = -1;
+          if (note) staffNo = note.closest('staff').getAttribute('n');
+          else continue;
+          let tel = spdScore.querySelector('[*|id="' +
+            startingElement.getAttribute('xml:id') + '"]');
+          if (tel) tel.setAttribute('endid', '#' + uuids[staffNo - 1]);
+        }
+      }
+    }
+  } // 2) if
+
+  console.log('adding slurs took ' + (performance.now() - t2) + ' ms.');
+
+} // matchTimespanningElements
+
 
 // helper function to readSection(); adds keySig element to spdScore
 function addKeySigElement(staffDefs, keysigValue) {
@@ -432,7 +430,6 @@ function addKeySigElement(staffDefs, keysigValue) {
 
 // helper function to readSection(); adds @meter.sig attribute to spdScore
 function addMeterSigElement(staffDefs, meterCountValue, meterUnitValue) {
-
   for (let staffDef of staffDefs) {
     staffDef.removeAttribute('meter.count');
     staffDef.removeAttribute('meter.unit');
