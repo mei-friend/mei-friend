@@ -75,9 +75,8 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks = ['sb', 'pb'],
 
   // matchTimespanningElements(xmlScore, spdScore, pageNo);
 
-  let t2 = performance.now();
-  addPageSpanningElements(xmlScore, spdScore, pageSpanners, pageNo);
-  console.log('addPageSpanningElements took ' + (performance.now() - t2) + ' ms.');
+  if (Object.keys(pageSpanners).length > 0)
+    addPageSpanningElements(xmlScore, spdScore, pageSpanners, pageNo);
 
   // insert sb elements for each element except last
   if (countingMode === 'computedBreaks' && Object.keys(breaks).length > 0) {
@@ -431,7 +430,7 @@ function matchTimespanningElements(xmlScore, spdScore, pageNo) {
 } // matchTimespanningElements
 
 // list all timespanning elements with @startid/@endid attr on different pages
-export function listPageSpanningElements(xmlScore, breaks) {
+export function listPageSpanningElements(xmlScore, breaks, breaksOption) {
   let t1 = performance.now();
   let els = xmlScore.querySelectorAll(att.timeSpanningElements.join(','));
   let pageSpanners = {
@@ -439,7 +438,25 @@ export function listPageSpanningElements(xmlScore, breaks) {
     end: {}
   };
   // for breaks encoded / array; TODO auto/Object
-  let sel = 'pb, sb, ';
+  let sel = '';
+  switch (breaksOption) {
+    case 'none':
+      return {};
+    case 'auto':
+      if (Object.keys(breaks).length > 0) {
+        for (let pg in breaks) {
+          let br = breaks[pg]; // array of breaks
+          sel += '[*|id="' + br[br.length - 1] + '"],';
+        }
+      } else return {};
+      break;
+    case 'line':
+      sel = 'pb,sb,'
+      break;
+    case 'encoded':
+      sel = 'pb,';
+  }
+  // object with time-spanning-element-ids key: [@startid,@endid] array
   let tsTable = {};
   for (let el of els) {
     let id = el.getAttribute('xml:id');
@@ -448,7 +465,6 @@ export function listPageSpanningElements(xmlScore, breaks) {
     let endid = rmHash(el.getAttribute('endid'));
     if (endid) sel += '[*|id="' + endid + '"],';
     if (id && startid && endid) tsTable[id] = [startid, endid];
-
   }
   let t2 = performance.now();
   console.log('listPageSpanningElements selector preps: ' + (t2 - t1) + ' ms.');
@@ -462,11 +478,24 @@ export function listPageSpanningElements(xmlScore, breaks) {
   let noteTable = {};
   let count = false;
   let p = 1;
-  for (let e of elList) {
-    if (breaks.includes(e.nodeName)) count = true;
-    if (count && breaks.includes(e.nodeName)) p++;
-    else
-      noteTable[e.getAttribute('xml:id')] = p;
+  if (breaksOption == 'line' || breaksOption == 'encoded') {
+    for (let e of elList) {
+      if (breaks.includes(e.nodeName)) count = true;
+      if (count && breaks.includes(e.nodeName)) p++;
+      else
+        noteTable[e.getAttribute('xml:id')] = p;
+    }
+  } else if (breaksOption = 'auto') {
+    let m;
+    for (let e of elList) {
+      if (e.nodeName === 'measure') {
+        p++;
+        m = e;
+      } else {
+        noteTable[e.getAttribute('xml:id')] =
+          (m && e.closest('measure') == m) ? p - 1 : p;
+      }
+    }
   }
 
   t1 = t2;
@@ -603,33 +632,44 @@ export function xmlToString(xmlNode) {
 export function getPageWithElement(xmlDoc, breaks, id) {
   let sel = '';
   let page = 1;
-  let bs = document.getElementById('breaks-select').value;
-  if (bs == 'none') return page;
-  // for speedMode: selector for all last measures and requested id
-  if (bs == 'auto' && Object.keys(breaks).length > 0) {
-    for (let pg in breaks) {
-      let br = breaks[pg]; // array of breaks
-      sel += '[*|id="' + br[br.length - 1] + '"],';
-    }
-    sel += '[*|id="' + id + '"]';
-  } else if (bs == 'line') {
-    sel = 'pb,sb,[*|id="' + id + '"]'; // find all breaks in xmlDoc
-  } else if (bs == 'encoded') {
-    sel = 'pb,[*|id="' + id + '"]'; // find all breaks in xmlDoc
+  let breaksOption = document.getElementById('breaks-select').value;
+  switch (breaksOption) {
+    case 'none':
+      return page;
+      // for speedMode: selector for all last measures and requested id
+    case 'auto':
+      if (!Array.isArray(breaks) &&
+        Object.keys(breaks).length > 0) {
+        for (let pg in breaks) {
+          let br = breaks[pg]; // array of breaks
+          sel += '[*|id="' + br[br.length - 1] + '"],';
+        }
+        sel += '[*|id="' + id + '"]';
+      } else return page;
+      break;
+    case 'line':
+      sel = 'pb,sb,[*|id="' + id + '"]'; // find all breaks in xmlDoc
+      break;
+    case 'encoded':
+      sel = 'pb,[*|id="' + id + '"]'; // find all breaks in xmlDoc
+      break;
+    default:
+      return page;
   }
-  if (sel == '') return page;
+  if (sel === '') return page;
   let music = xmlDoc.querySelector('music score');
   if (!music) music = xmlDoc;
   let els;
   if (music) els = Array.from(music.querySelectorAll(sel));
   else return page;
   if (els) {
-    page = els.findIndex(el => el.getAttribute('xml:id') == id) + 1;
+    page = els.findIndex(el => el.getAttribute('xml:id') === id) + 1;
     // if element is within last measure, ...
     if (page > 1 && els[page - 1].closest('measure') == els[page - 2])
       page--; // ...undo increment
   }
-  if (bs == 'line' || bs == 'encoded') { // remove leading pb in MEI file
+  // remove leading pb in MEI file
+  if (breaksOption === 'line' || breaksOption === 'encoded') {
     els = music.querySelectorAll('pb,measure');
     let i;
     for (i = 0; i < els.length; i++) {
@@ -682,8 +722,8 @@ function minimalMEIHeader(xmlNode) {
 
 export const xmlDefs = `
  <?xml version="1.0" encoding="UTF-8"?>
- <?xml-model href="https://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
- <?xml-model href="https://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+ <?xml-model href="https://music-encoding.org/schema/4.0.1/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+ <?xml-model href="https://music-encoding.org/schema/4.0.1/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 `;
 
 

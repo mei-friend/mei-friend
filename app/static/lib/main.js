@@ -163,16 +163,16 @@ document.addEventListener('DOMContentLoaded', function() {
   let urlFileName = searchParams.get('file');
   if (urlFileName) {
     openUrlFetch(new URL(urlFileName));
-  } 
+  }
   // restore localStorage if we have it
   if (storage.supported) {
     storage.read();
     // orientation: use URI param if specified;
     //  else use stored orientation if specified;
-    //  else use default 
+    //  else use default
     or = searchParams.get('orientation') || storage.orientation || or;
     setFileChangedState(storage.fileChanged);
-    if (!urlFileName) { 
+    if (!urlFileName) {
       // no URI param specified - try to restore from storage
       if (storage.content) {
         // restore file name and content from storage
@@ -1194,7 +1194,10 @@ function addEventListeners(v, cm) {
     .addEventListener('change', () => v.updateOption());
   // breaks selector
   document.getElementById('breaks-select').addEventListener('change',
-    () => v.updateAll(cm, {}, v.selectedElements[0]));
+    () => {
+      v.pageSpanners = {};
+      v.updateAll(cm, {}, v.selectedElements[0])
+    });
   // navigation
   document.getElementById('backwards-btn')
     .addEventListener('click', cmd.previousNote);

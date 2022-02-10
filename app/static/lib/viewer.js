@@ -167,9 +167,12 @@ export default class Viewer {
     }
     // compute time-spanning element object TODO: move to dom-worker
     if (Object.keys(this.pageSpanners).length === 0) {
-      this.pageSpanners = speed.listPageSpanningElements(this.xmlDoc, this.breaks);
-      console.log('pageSpanners ' +
-        Object.keys(this.pageSpanners.start).length + ', ', this.pageSpanners);
+      this.pageSpanners = speed
+        .listPageSpanningElements(this.xmlDoc, this.breaks, bs.value);
+      if (Object.keys(this.pageSpanners).length > 0)
+        console.log('pageSpanners object size: ' +
+          Object.keys(this.pageSpanners.start).length + ', ', this.pageSpanners);
+      else console.log('pageSpanners empty: ', this.pageSpanners);
     }
     // retrieve requested MEI page from DOM
     return speed.getPageFromDom(this.xmlDoc, this.currentPage, this.breaks,
