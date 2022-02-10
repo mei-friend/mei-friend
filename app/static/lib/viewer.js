@@ -25,6 +25,7 @@ export default class Viewer {
     this.xmlDoc;
     this.encodingHasChanged = true; // to recalculate DOM or pageLists
     this.pageBreaks = {}; // object of page number and last measure id '1': 'measure-000423', ...
+    this.pageSpanners = {}; // object storing all time-spannind elements spanning across pages
     // this.scoreDefList = []; // list of xmlNodes, one for each change, referenced by 5th element of pageList
     this.meiHeadRange = [];
     this.breaks = ['sb', 'pb'];
@@ -42,8 +43,8 @@ export default class Viewer {
       computePageBreaks = true;
       this.currentPage = 1;
     }
-    if (this.speedMode && xmlId)
-      this.currentPage = speed.getPageWithElement(this, xmlId);
+    if (this.speedMode && xmlId) this.currentPage =
+      speed.getPageWithElement(this.xmlDoc, this.breaks, xmlId);
     let message = {
       'cmd': 'updateAll',
       'options': this.vrvOptions,
@@ -88,7 +89,8 @@ export default class Viewer {
       } else { // speed mode
         if (this.encodingHasChanged) this.loadXml(cm.getValue());
         if (xmlId) {
-          this.currentPage = speed.getPageWithElement(this, xmlId);
+          this.currentPage =
+            speed.getPageWithElement(this.xmlDoc, this.breaks, xmlId);
           console.info('UpdatePage(speedMode=true): page: ' +
             this.currentPage + ', xmlId: ' + xmlId);
         }
@@ -163,7 +165,15 @@ export default class Viewer {
       console.info('xmlDOM pages counted: currentPage: ' + this.currentPage +
         ', pageCount: ' + this.pageCount);
     }
-    return speed.getPageFromDom(this.xmlDoc, this.currentPage, this.breaks);
+    // compute time-spanning element object TODO: move to dom-worker
+    if (Object.keys(this.pageSpanners).length === 0) {
+      let t1 = performance.now();
+      this.pageSpanners = speed.listPageSpanningElements(this.xmlDoc, this.breaks);
+      console.log('listPageSpanningElements took: ' + (performance.now() - t1) + ' ms.');
+    }
+    // retrieve requested MEI page from DOM
+    return speed.getPageFromDom(this.xmlDoc, this.currentPage, this.breaks,
+      this.pageSpanners);
   }
 
   loadXml(mei, forceReload = false) {
@@ -194,6 +204,7 @@ export default class Viewer {
     this.currentPage = 1;
     this.pageCount = -1;
     this.pageBreaks = {};
+    this.pageSpanners = {};
   }
 
   reRenderMei(cm, removeIds = false) {

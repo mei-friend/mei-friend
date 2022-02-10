@@ -3,12 +3,15 @@
  */
 
 import * as utils from './utils.js';
+import * as att from './attribute-classes.js';
 
 export var meiNameSpace = 'http://www.music-encoding.org/ns/mei';
 export var xmlNameSpace = 'http://www.w3.org/XML/1998/namespace';
 
+
 // returns complete MEI code of given page (one-based), defined by sb and pb
-export function getPageFromDom(xmlDoc, pageNo = 1, breaks = ['sb', 'pb']) {
+export function getPageFromDom(xmlDoc, pageNo = 1, breaks = ['sb', 'pb'],
+  pageSpanners) {
   let meiHeader = xmlDoc.getElementsByTagName('meiHead');
   if (!meiHeader) {
     console.info('getPageFromDom(): no meiHeader');
@@ -70,7 +73,14 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks = ['sb', 'pb']) {
   baseSection.appendChild(document.createElementNS(meiNameSpace, 'pb'));
   baseSection.appendChild(m);
 
-  matchTimespanningElements(xmlScore, spdScore, pageNo);
+  // matchTimespanningElements(xmlScore, spdScore, pageNo);
+
+  let t1 = performance.now();
+  console.log('page spanners ' + Object.keys(pageSpanners).length + ', ', pageSpanners);
+  let t2 = performance.now();
+  console.log('took: ' + (t2 - t1) + ' ms.');
+  addPageSpanningElements(xmlScore, spdScore, pageSpanners, pageNo);
+  console.log('addPageSpanningElements took ' + (performance.now() - t2) + ' ms.');
 
   // insert sb elements for each element except last
   if (countingMode === 'computedBreaks' && Object.keys(breaks).length > 0) {
@@ -423,6 +433,79 @@ function matchTimespanningElements(xmlScore, spdScore, pageNo) {
 
 } // matchTimespanningElements
 
+// list all timespanning elements that have @startid/@endid at different pages
+export function listPageSpanningElements(xmlScore, breaks) {
+  let els = xmlScore.querySelectorAll(att.timeSpanningElements.join(','));
+  let pageSpanners = {
+    start: {},
+    end: {}
+  };
+  for (let el of els) {
+    let p1 = 0;
+    let p2 = 0;
+    let startid = el.getAttribute('startid');
+    if (startid) p1 = getPageWithElement(xmlScore, breaks, rmHash(startid));
+    else continue;
+    let endid = el.getAttribute('endid');
+    if (endid) p2 = getPageWithElement(xmlScore, breaks, rmHash(endid));
+    // console.log(el.getAttribute('xml:id') + ': p1/p2: ' + p1 + '/' + p2);
+    if (p1 > 0 && p2 > 0 && p1 != p2) {
+      if (pageSpanners.start[p1])
+        pageSpanners.start[p1].push(el.getAttribute('xml:id'));
+      else
+        pageSpanners.start[p1] = [el.getAttribute('xml:id')];
+      if (pageSpanners.end[p2])
+        pageSpanners.end[p2].push(el.getAttribute('xml:id'));
+      else
+        pageSpanners.end[p2] = [el.getAttribute('xml:id')];
+    }
+  }
+  return pageSpanners;
+}
+
+// add time-spanning elements spanning across page to spdScore
+function addPageSpanningElements(xmlScore, spdScore, pageSpanners, pageNo) {
+  // 1) go through endingElements and add to first measure
+  let endingElementIds = pageSpanners.end[pageNo];
+  if (endingElementIds && pageNo > 1) {
+    let m = spdScore.querySelector('[*|id="startingMeasure"]');
+    let uuids = getIdsForDummyMeasure(m);
+    for (let endingElementId of endingElementIds) {
+      let endingElement =
+        xmlScore.querySelector('[*|id="' + endingElementId + '"]');
+      let startid = rmHash(endingElement.getAttribute('startid'));
+      let note = xmlScore.querySelector('[*|id="' + startid + '"]');
+      let staffNo = -1;
+      if (note) staffNo = note.closest('staff').getAttribute('n');
+      else continue;
+      let el = endingElement.cloneNode(true);
+      el.setAttribute('startid', '#' + uuids[staffNo - 1]);
+      m.appendChild(el);
+    }
+  } // 1) if
+
+  // 2) go through startingElements and append to a third-page measure
+  let startingElementIds = pageSpanners.start[pageNo];
+  if (startingElementIds) {
+    let m = spdScore.querySelector('[*|id="endingMeasure"]');
+    let uuids = getIdsForDummyMeasure(m);
+    for (let startingElementId of startingElementIds) {
+      let startingElement =
+        xmlScore.querySelector('[*|id="' + startingElementId + '"]');
+      let endid = rmHash(startingElement.getAttribute('endid'));
+      // console.info('searching for endid: ', endid);
+      if (endid) {
+        let note = xmlScore.querySelector('[*|id="' + endid + '"]');
+        let staffNo = -1;
+        if (note) staffNo = note.closest('staff').getAttribute('n');
+        else continue;
+        let tel = spdScore.querySelector('[*|id="' + startingElementId + '"]');
+        if (tel) tel.setAttribute('endid', '#' + uuids[staffNo - 1]);
+      }
+    }
+  }
+}
+
 
 // helper function to readSection(); adds keySig element to spdScore
 function addKeySigElement(staffDefs, keysigValue) {
@@ -478,45 +561,44 @@ export function xmlToString(xmlNode) {
 }
 
 // Retrieve page number of element with xml:id id
-export function getPageWithElement(v, id) {
+export function getPageWithElement(xmlDoc, breaks, id) {
   let sel = '';
   let page = 1;
-  if (v.speedMode) {
-    let bs = document.getElementById('breaks-select').value;
-    if (bs == 'none') return page;
-    // for speedMode: selector for all last measures and requested id
-    if (bs == 'auto' && Object.keys(v.pageBreaks).length > 0) {
-      for (let pg in v.pageBreaks) {
-        let br = v.pageBreaks[pg]; // array of breaks
-        sel += '[*|id="' + br[br.length - 1] + '"],';
-      }
-      sel += '[*|id="' + id + '"]';
-    } else if (bs == 'line') {
-      sel = 'pb,sb,[*|id="' + id + '"]'; // find all breaks in xmlDoc
-    } else if (bs == 'encoded') {
-      sel = 'pb,[*|id="' + id + '"]'; // find all breaks in xmlDoc
+  let bs = document.getElementById('breaks-select').value;
+  if (bs == 'none') return page;
+  // for speedMode: selector for all last measures and requested id
+  if (bs == 'auto' && Object.keys(breaks).length > 0) {
+    for (let pg in breaks) {
+      let br = breaks[pg]; // array of breaks
+      sel += '[*|id="' + br[br.length - 1] + '"],';
     }
-    if (sel == '') return page;
-    let music = v.xmlDoc.querySelector('music score');
-    let els;
-    if (music) els = Array.from(music.querySelectorAll(sel));
-    else return page;
-    if (els) {
-      page = els.findIndex(el => el.getAttribute('xml:id') == id) + 1;
-      // if element is within last measure, ...
-      if (page > 1 && els[page - 1].closest('measure') == els[page - 2])
-        page--; // ...undo increment
-    }
-    if (bs == 'line' || bs == 'encoded') { // remove leading pb in MEI file
-      els = music.querySelectorAll('pb,measure');
-      let i;
-      for (i = 0; i < els.length; i++) {
-        if (els[i].nodeName != 'pb') break;
-      }
-      page -= i;
-    }
-    return page;
+    sel += '[*|id="' + id + '"]';
+  } else if (bs == 'line') {
+    sel = 'pb,sb,[*|id="' + id + '"]'; // find all breaks in xmlDoc
+  } else if (bs == 'encoded') {
+    sel = 'pb,[*|id="' + id + '"]'; // find all breaks in xmlDoc
   }
+  if (sel == '') return page;
+  let music = xmlDoc.querySelector('music score');
+  if (!music) music = xmlDoc;
+  let els;
+  if (music) els = Array.from(music.querySelectorAll(sel));
+  else return page;
+  if (els) {
+    page = els.findIndex(el => el.getAttribute('xml:id') == id) + 1;
+    // if element is within last measure, ...
+    if (page > 1 && els[page - 1].closest('measure') == els[page - 2])
+      page--; // ...undo increment
+  }
+  if (bs == 'line' || bs == 'encoded') { // remove leading pb in MEI file
+    els = music.querySelectorAll('pb,measure');
+    let i;
+    for (i = 0; i < els.length; i++) {
+      if (els[i].nodeName != 'pb') break;
+    }
+    page -= i;
+  }
+  return page;
 }
 
 // returns an xmlNode with a <mei> element

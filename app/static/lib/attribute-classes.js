@@ -23,6 +23,7 @@ export const modelControlEvents = ['anchoredText', 'arpeg', 'bracket',
 export const pnames = ['c', 'd', 'e', 'f', 'g', 'a', 'b'];
 
 // according to Verovio 3.9's implementation of timeSpanningInterface()
+// better: att.startEndId and att.timestamp2.logical
 export const timeSpanningElements = [
   'bracketspan', 'dir', 'dynam', 'gliss', 'hairpin', 'harm', 'lv', 'octave',
   'pedal', 'pitchinflection', 'slur', 'tie', 'trill', 'syl'
