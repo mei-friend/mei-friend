@@ -56,7 +56,7 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks = ['sb', 'pb']) {
   if (Array.isArray(breaks)) countingMode = 'encodedBreaks';
   else if (typeof breaks == 'object') countingMode = 'computedBreaks';
 
-  let digger = readSection(xmlScore, pageNo, spdScore, breaks, countingMode);
+  let digger = readSection(pageNo, spdScore, breaks, countingMode);
   let sections = xmlScore.childNodes;
   sections.forEach((item) => {
     if (item.nodeName === 'section') { // diggs into section hierachy
@@ -329,20 +329,32 @@ function matchTimespanningElements(xmlScore, spdScore, pageNo) {
   // List all notes/chords to check whether they are
   // pointed to from outside the requested pageNo
   let t1 = performance.now();
-  let startingElements = [];
-  let endingElements = [];
   // console.info('LoopStart startingElements: ', startingElements);
   // console.info('LoopStart endingElements: ', endingElements);
+  let startingSelector = '';
+  let endingSelector = '';
+
   var listOfTargets = spdScore.querySelectorAll('note, chord');
   for (let target of listOfTargets) {
     let id = '#' + target.getAttribute('xml:id');
     //
-    let ends = xmlScore.querySelectorAll("[startid][endid='" + id + "']");
-    ends.forEach(e => endingElements.push(e));
-    let starts = xmlScore.querySelectorAll("[startid='" + id + "'][endid]");
-    starts.forEach(e => startingElements.push(e));
-    //
-    let j; // check whether this id ends in startingElements
+    endingSelector += "[startid][endid='" + id + "'],";
+    startingSelector += "[startid='" + id + "'][endid],";
+  }
+  let t2 = performance.now();
+  console.log(listOfTargets.length + ' notes: selector constructed ' + (t2 - t1) + ' ms.');
+
+  let endingElements = Array.from(xmlScore
+    .querySelectorAll(endingSelector.slice(0, -1)));
+  let startingElements = Array.from(xmlScore
+    .querySelectorAll(startingSelector.slice(0, -1)));
+
+  let t3 = performance.now();
+  console.log('querySelectorAll ' + (t3 - t2) + ' ms.');
+  //
+  let j; // check whether this id ends in startingElements
+  for (let target of listOfTargets) {
+    let id = '#' + target.getAttribute('xml:id');
     for (j = 0; j < startingElements.length; j++) {
       let el = startingElements[j];
       // console.info('Checking identiy: ' + el.getAttribute('xml:id') + '/' + id);
@@ -362,10 +374,9 @@ function matchTimespanningElements(xmlScore, spdScore, pageNo) {
       }
     }
   }
-  // console.info('LoopEnd startingElements: ', startingElements);
-  // console.info('LoopEnd endingElements: ', endingElements);
-  let t2 = performance.now();
-  console.log('timespan matching took ' + (t2 - t1) + ' ms.');
+
+  let t4 = performance.now();
+  console.log('timespan matching took ' + (t4 - t3) + ' ms.');
 
   // 1) go through endingElements and add to first measure
   if (endingElements.length > 0 && pageNo > 1) {
@@ -408,7 +419,7 @@ function matchTimespanningElements(xmlScore, spdScore, pageNo) {
     }
   } // 2) if
 
-  console.log('adding slurs took ' + (performance.now() - t2) + ' ms.');
+  console.log('adding slurs took ' + (performance.now() - t4) + ' ms.');
 
 } // matchTimespanningElements
 
