@@ -1,4 +1,5 @@
 var vrvWorker;
+var spdWorker;
 var tkVersion = '';
 var tkAvailableOptions;
 let meiFileName = '';
@@ -151,9 +152,12 @@ document.addEventListener('DOMContentLoaded', function() {
     version + "</a> (" + versionDate + ").&nbsp;";
 
   vrvWorker = new Worker(`${root}lib/worker.js`);
-  vrvWorker.onmessage = workerEventsHandler;
+  vrvWorker.onmessage = vrvWorkerEventsHandler;
 
-  v = new Viewer(vrvWorker);
+  spdWorker = new Worker(`${root}lib/speed-worker.js`);
+  spdWorker.onmessage = speedWorkerEventsHandler;
+
+  v = new Viewer(vrvWorker, spdWorker);
   v.vrvOptions = {
     ...defaultVerovioOptions
   };
@@ -673,8 +677,12 @@ function loadDataInEditor(mei, setFreshlyLoaded = true) {
   if (bs) bs.value = v.containsBreaks() ? 'line' : 'auto';
 }
 
-function workerEventsHandler(ev) {
-  console.log('main(). Handler received: ' + ev.data.cmd, ev.data);
+function speedWorkerEventsHandler(ev) {
+  console.log('main(). speedWorkerHandler received: ' + ev.data.cmd);
+}
+
+function vrvWorkerEventsHandler(ev) {
+  console.log('main(). vrvWorkerHandler received: ' + ev.data.cmd, ev.data);
   switch (ev.data.cmd) {
     case 'vrvLoaded':
       console.info('main(). Handler vrvLoaded: ', this);

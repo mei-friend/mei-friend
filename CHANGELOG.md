@@ -104,4 +104,4 @@
 * Supply mei-CMN and mei-all 4.0.1 RNGs as schemaInfo objects
 * Remember orientation upon refresh
 # 0.3.1 patch
-*
+* Speed-up speedMode with separate worker for pre-computing time-spanning elements

@@ -11,8 +11,9 @@ import {
 
 export default class Viewer {
 
-  constructor(worker) {
-    this.worker = worker;
+  constructor(vrvWorker, spdWorker) {
+    this.vrvWorker = vrvWorker;
+    this.spdWorker = spdWorker;
     this.currentPage = 1;
     this.pageCount = 0;
     this.selectedElements = [];
@@ -55,7 +56,7 @@ export default class Viewer {
       'computePageBreaks': computePageBreaks
     }
     this.busy();
-    this.worker.postMessage(message);
+    this.vrvWorker.postMessage(message);
   }
 
   updateData(cm, setCursorToPageBeg = true, setFocusToVerovioPane = true) {
@@ -72,7 +73,7 @@ export default class Viewer {
       'breaks': document.getElementById('breaks-select').value
     };
     this.busy();
-    this.worker.postMessage(message);
+    this.vrvWorker.postMessage(message);
   }
 
   updatePage(cm, page, xmlId = '', setFocusToVerovioPane = true) {
@@ -85,7 +86,7 @@ export default class Viewer {
           'setFocusToVerovioPane': setFocusToVerovioPane
         };
         this.busy();
-        this.worker.postMessage(message);
+        this.vrvWorker.postMessage(message);
       } else { // speed mode
         if (this.encodingHasChanged) this.loadXml(cm.getValue());
         if (xmlId) {
@@ -123,7 +124,7 @@ export default class Viewer {
       'speedMode': this.speedMode
     };
     this.busy();
-    this.worker.postMessage(message);
+    this.vrvWorker.postMessage(message);
   }
 
 
@@ -165,14 +166,22 @@ export default class Viewer {
       console.info('xmlDOM pages counted: currentPage: ' + this.currentPage +
         ', pageCount: ' + this.pageCount);
     }
-    // compute time-spanning element object TODO: move to dom-worker
+    // compute time-spanning element object in speed-worker
     if (Object.keys(this.pageSpanners).length === 0) {
-      this.pageSpanners = speed
-        .listPageSpanningElements(this.xmlDoc, this.breaks, bs.value);
-      if (Object.keys(this.pageSpanners).length > 0)
-        console.log('pageSpanners object size: ' +
-          Object.keys(this.pageSpanners.start).length + ', ', this.pageSpanners);
-      else console.log('pageSpanners empty: ', this.pageSpanners);
+      let message = {
+        'cmd': 'listPageSpanningElements',
+        'xmlDoc': this.xmlDoc.cloneNode(true),
+        'breaks': this.breaks,
+        'breaksOption': bs.value
+      };
+      this.spdWorker.postMessage(message);
+
+      // this.pageSpanners = speed
+      //   .listPageSpanningElements(this.xmlDoc, this.breaks, bs.value);
+      // if (Object.keys(this.pageSpanners).length > 0)
+      //   console.log('pageSpanners object size: ' +
+      //     Object.keys(this.pageSpanners.start).length + ', ', this.pageSpanners);
+      // else console.log('pageSpanners empty: ', this.pageSpanners);
     }
     // retrieve requested MEI page from DOM
     return speed.getPageFromDom(this.xmlDoc, this.currentPage, this.breaks,
@@ -220,7 +229,7 @@ export default class Viewer {
     }
     if (false && !removeIds) message.xmlId = this.selectedElements[0]; // TODO
     this.busy();
-    this.worker.postMessage(message);
+    this.vrvWorker.postMessage(message);
   }
 
   computePageBreaks(cm) {
@@ -231,7 +240,7 @@ export default class Viewer {
       'mei': cm.getValue()
     }
     this.busy();
-    this.worker.postMessage(message);
+    this.vrvWorker.postMessage(message);
   }
 
   // update options in viewer from user interface
@@ -625,7 +634,7 @@ export default class Viewer {
       message.speedMode = this.speedMode;
     }
     this.busy();
-    this.worker.postMessage(message);
+    this.vrvWorker.postMessage(message);
   }
 
   getTimeForElement(id) {
@@ -634,13 +643,13 @@ export default class Viewer {
         'cmd': 'getTimeForElement',
         'msg': id
       };
-      v.worker.addEventListener('message', function handle(ev) {
+      v.vrvWorker.addEventListener('message', function handle(ev) {
         if (ev.data.cmd = message.cmd) {
           ev.target.removeEventListener('message', handle);
           resolve(ev.data.cmd);
         }
       });
-      v.worker.postMessage(message);
+      v.vrvWorker.postMessage(message);
     }); // .bind(this) ??
     promise.then(
       function(time) {
