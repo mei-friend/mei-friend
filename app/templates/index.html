@@ -184,6 +184,31 @@
         </div>
       </div>
     </div>
+    <div class="forkRepositoryOverlay">
+      <div class="forkRepositoryUI">
+        <div id="forkRepositoryUIGrouping">
+          <h3>Fork Github Repository</h3>
+          <p id="forkRepositoryInstructions">Please enter the Github (user or organization) name and the repository name of a Github-hosted repository, below. The repository will be forked to the currently logged in Github user, and become available from the Github menu.</p>
+          <div id="forkRepositoryInputWrapper">
+            <input id="forkRepositoryInputName" type="text" placeholder="Github user or organization" 
+                  onkeydown="(e) => {
+                    console.log('KEYDOWN: ', e);
+                    if(e.code == 'Slash') { 
+                      e.preventDefault();
+                      e.stopPropagation();
+                      document.getElementById('forkRepositoryInputRepo').focus();
+                    }
+                  }"/> /
+            <input id="forkRepositoryInputRepo" type="text" placeholder="Github repository name"/>
+            <label for="forkRepositoryToSelector">Fork to: </label>
+            <select id="forkRepositoryToSelector" name="forkRepositoryToSelector"></select>
+            <button id="forkRepositoryButton">Fork repository</button>
+            <button id="forkRepositoryCancel">Cancel</button>
+          </div>
+          <span id="forkRepositoryStatus"></span>
+        </div>
+      </div>
+    </div>
     <div class="friendContainer">
       <div class="notation"></div>
       <div class="resizer" id="dragMe"></div>

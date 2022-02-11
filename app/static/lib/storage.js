@@ -173,5 +173,4 @@ export default class Storage {
     this.safelySetStorageItem("orientation", orientation);
     this._orientation = orientation;
   }
-
 }
