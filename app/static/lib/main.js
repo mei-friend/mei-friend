@@ -59,7 +59,7 @@ export function setGithubInstance(new_github) {
 export function setMeiFileInfo(fName, fLocation, fLocationPrintable) {
   meiFileName = fName;
   meiFileLocation = fLocation;
-  meiFileLocationPrintable= fLocationPrintable;
+  meiFileLocationPrintable = fLocationPrintable;
 }
 
 export function updateFileStatusDisplay() {
@@ -163,6 +163,7 @@ import {
   logoutFromGithub,
   refreshGithubMenu
 } from './github-menu.js';
+
 
 // schemas for autocompletion
 import schema_meiAll from '../schemaInfo/mei-CMN-4.0.1.schemaInfo.js';
@@ -430,7 +431,11 @@ export async function openUrlFetch(url = '') {
   }
 }
 
-function workerEventsHandler(ev) {
+function speedWorkerEventsHandler(ev) {
+  console.log('main(). speedWorkerHandler received: ' + ev.data.cmd);
+}
+
+function vrvWorkerEventsHandler(ev) {
   console.log('main(). Handler received: ' + ev.data.cmd, ev.data);
   switch (ev.data.cmd) {
     case 'vrvLoaded':

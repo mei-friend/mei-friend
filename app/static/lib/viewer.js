@@ -168,20 +168,22 @@ export default class Viewer {
     }
     // compute time-spanning element object in speed-worker
     if (Object.keys(this.pageSpanners).length === 0) {
-      let message = {
-        'cmd': 'listPageSpanningElements',
-        'xmlDoc': this.xmlDoc.cloneNode(true),
-        'breaks': this.breaks,
-        'breaksOption': bs.value
-      };
-      this.spdWorker.postMessage(message);
-
-      // this.pageSpanners = speed
-      //   .listPageSpanningElements(this.xmlDoc, this.breaks, bs.value);
-      // if (Object.keys(this.pageSpanners).length > 0)
-      //   console.log('pageSpanners object size: ' +
-      //     Object.keys(this.pageSpanners.start).length + ', ', this.pageSpanners);
-      // else console.log('pageSpanners empty: ', this.pageSpanners);
+      if (true) { // TODO: use worker
+        let message = {
+          'cmd': 'listPageSpanningElements',
+          'mei': mei,
+          'breaks': this.breaks,
+          'breaksOpt': bs.value
+        };
+        this.spdWorker.postMessage(message);
+      } else {
+        this.pageSpanners = speed
+          .listPageSpanningElements(this.xmlDoc, this.breaks, bs.value);
+        if (Object.keys(this.pageSpanners).length > 0)
+          console.log('pageSpanners object size: ' +
+            Object.keys(this.pageSpanners.start).length + ', ', this.pageSpanners);
+        else console.log('pageSpanners empty: ', this.pageSpanners);
+      }
     }
     // retrieve requested MEI page from DOM
     return speed.getPageFromDom(this.xmlDoc, this.currentPage, this.breaks,
