@@ -1,6 +1,4 @@
 // worker to pre-compute information for accelerating speedMode
-//importScripts(`./tXml.js`);
-// import * as txml from './tXml.js';
 
 // let message = {
 // cmd: 'listPageSpanningElements',
@@ -8,12 +6,17 @@
 // 'breaks': this.breaks,
 // 'breaksOpt': bs.value
 // };
+var timeSpanningElements;
 
 onmessage = function(e) {
   let result = {};
   let t1 = performance.now();
   console.info("SpeedWorker received: " + e.data.cmd + ', ', e.data);
   switch (e.data.cmd) {
+    case 'variables':
+      timeSpanningElements = e.data.var;
+      console.log('SpeedWorker received variables: ', timeSpanningElements);
+      break;
     case 'listPageSpanningElements':
       result.cmd = 'listPageSpanningElements'
       listPageSpanningElements(e.data.mei, e.data.breaks, e.data.breaksOpt);
@@ -24,26 +27,57 @@ onmessage = function(e) {
   if (result) postMessage(result);
 }
 
-// list all timespanning elements with @startid/@endid attr on different pages
+// List all timespanning elements with @startid/@endid attr on different pages.
+// Does the same as in speed.listPageSpanningElements(), but without DOM stuff
 function listPageSpanningElements(mei, breaks, breaksOption) {
+  let pageSpannerIds = [];
   let t1 = performance.now();
   let xmlDoc = parse(mei);
   console.log('xmlDoc: ', xmlDoc);
   let t2 = performance.now();
   console.log('listPageSpanningElements parse XML: ' + (t2 - t1) + ' ms.');
-  xmlDoc = simplify(xmlDoc);
-  console.log('xmlDoc: ', xmlDoc);
-  t1 = t2;
-  t2 = performance.now();
-  console.log('listPageSpanningElements simplify XML: ' + (t2 - t1) + ' ms.');
 
+  let hasMusic = false;
+  let node = xmlDoc.at(3).children.at(1); // mei > music
+  if (!node) {
+    console.log('Invalid MEI file. ')
+    return pageSpannerIds;
+  }
+  while (node.tagName !== 'score') {
+    if (node.tagName === 'music') hasMusic = true;
+    node = node.children.at(0);
+  }
+  console.log('hasMusic: ' + hasMusic + ', Found: ', node)
 
-  // t1 = t2;
-  // t2 = performance.now();
-  // console.log('listPageSpanningElements pageSpanners: ' + (t2 - t1) + ' ms.');
+  if (node && hasMusic) {
+    // collect all time-spanning elements with startid and endid
+    let tsTable = {}; // object with id as keys and an array of [startid, endid]
+    tsTable = crawl(node.children, tsTable);
+    t1 = t2;
+    t2 = performance.now();
+    console.log('tsTable: ', tsTable);
+    console.log('listPageSpanningElements crawling tsTable: ' + (t2 - t1) + ' ms.');
 
-  return xmlDoc;
+  }
+  return pageSpannerIds;
+
+  function crawl(nodeArray, tsTable) {
+    nodeArray.forEach(el => {
+      if (timeSpanningElements.includes(el.tagName)) {
+        let startid = el.attributes['startid'];
+        let endid = el.attributes['endid'];
+        if (startid && endid)
+          tsTable[el.attributes['xml:id']] = [startid.slice(1), endid.slice(1)];
+      } else if (el.children) {
+        tsTable = crawl(el.children, tsTable);
+      }
+    });
+    return tsTable;
+  } // crawl()
+
 }
+
+
 
 
 
@@ -51,24 +85,6 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
  * @author: Tobias Nickel
  * @created: 06.04.2015
  * I needed a small xmlparser that can be used in a worker.
- */
-
-/**
- * @typedef tNode
- * @property {string} tagName
- * @property {object} attributes
- * @property {(tNode|string)[]} children
- **/
-
-/**
- * @typedef TParseOptions
- * @property {number} [pos]
- * @property {string[]} [noChildNodes]
- * @property {boolean} [setPos]
- * @property {boolean} [keepComments]
- * @property {boolean} [keepWhitespace]
- * @property {boolean} [simplify]
- * @property {(a: tNode, b: tNode) => boolean} [filter]
  */
 
 /**
@@ -502,6 +518,7 @@ function toContentString(tDom) {
   }
 };
 
+// S is xml text
 function getElementById(S, id, simplified) {
   var out = parse(S, {
     attrValue: id
@@ -509,6 +526,7 @@ function getElementById(S, id, simplified) {
   return simplified ? simplify(out) : out[0];
 };
 
+// S is xml text
 function getElementByXmlId(S, id, simplified) {
   var out = parse(S, {
     attrName: 'xml:id',
@@ -517,6 +535,7 @@ function getElementByXmlId(S, id, simplified) {
   return simplified ? simplify(out) : out[0];
 };
 
+// S is xml text
 function getElementsByClassName(S, classname, simplified) {
   const out = parse(S, {
     attrName: 'class',

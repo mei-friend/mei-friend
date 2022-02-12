@@ -133,13 +133,6 @@ import {
   openUrl,
   openUrlCancel
 } from './open-url.js';
-<<<<<<< HEAD
-import {
-  forkRepository,
-  forkRepositoryCancel
-} from './fork-repository.js';
-=======
->>>>>>> develop
 import {
   createControlsMenu,
   setBreaksOptions,
@@ -158,12 +151,8 @@ import * as e from './editor.js'
 import Viewer from './viewer.js';
 import Storage from './storage.js';
 import Github from './github.js';
+import * as att from './attribute-classes.js';
 import {
-<<<<<<< HEAD
-  fillInUserRepos,
-  fillInRepoBranches,
-=======
->>>>>>> develop
   fillInBranchContents,
   logoutFromGithub,
   refreshGithubMenu
@@ -278,6 +267,10 @@ document.addEventListener('DOMContentLoaded', function() {
   vrvWorker.onmessage = vrvWorkerEventsHandler;
 
   spdWorker = new Worker(`${root}lib/speed-worker.js`);
+  spdWorker.postMessage({
+    cmd: 'variables',
+    var: att.timeSpanningElements
+  });
   spdWorker.onmessage = speedWorkerEventsHandler;
 
   v = new Viewer(vrvWorker, spdWorker);
