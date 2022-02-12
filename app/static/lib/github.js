@@ -89,7 +89,7 @@ export default class Github {
 
   set githubRepoName(githubRepoName) {
     // not allowed: needs to be set via githubRepo
-    console.error("githubRepoName cannot be set directly - please set githubRepo");
+    console.warn("githubRepoName cannot be set directly - please set githubRepo");
   }
 
   get githubRepoName() {
@@ -98,7 +98,7 @@ export default class Github {
 
   set githubRepoOwner(githubRepoOwner) { 
     // not allowed: needs to be set via githubRepo
-    console.error("githubRepoOwner cannot be set directly - please set githubRepo");
+    console.warn("githubRepoOwner cannot be set directly - please set githubRepo");
   }
 
   get githubRepoOwner() { 
@@ -170,7 +170,7 @@ export default class Github {
   }
 
   set isFork(isFork) { 
-    console.error("The isFork flag is set automatically; please do not attempt to set it manually")
+    console.warn("The isFork flag is set automatically; please do not attempt to set it manually")
   }
 
   get isFork() { 
@@ -218,23 +218,64 @@ export default class Github {
     await this.repo.updateRef(`refs/heads/${this.branch}`, commitHash);
   }
 
-  async fork(callback) {
+  async getOrganizations() { 
+    // return JSON object describing user's memberships in 
+    // organizations we have access to
+    const orgsUrl = `https://api.github.com/user/memberships/orgs`;
+    return fetch(orgsUrl, { 
+      method: 'GET',
+      headers: this.apiHeaders
+    }).then(res => res.json());
+    // TODO inspect the organizations list and return those 
+    // that give the user writing permission
+    /*
+      .then((orgs) => orgs.map((o) => {
+          console.log("fethcing: ", o.url)
+          return fetch(o.url,
+           {
+              method: 'GET',
+              headers: this.apiHeaders
+           }
+          ).then(o => o.json())
+          .then((data) => console.log("Got DATA: ", data, "for ", o.url))
+        })
+      )
+    */
+  }
+
+  async fork(callback, forkTo = this.userLogin) {
     // switch to a user's fork, creating it first if necessary
     const forksUrl = `https://api.github.com/repos/${this.githubRepo}/forks`;
     await fetch(forksUrl, {
       method: 'GET',
       headers: this.apiHeaders
     })
-      .then(res => res.json())
+      .then(res => {
+        if (res.status <= 400) return res.json()
+        else throw res
+      })
       .then(async(data) => {
-        const userFork = data.filter(f => f.owner.login === this.userLogin)[0];
+        const userFork = data.filter(f => f.owner.login === forkTo)[0];
         // If we don't yet have a user fork, create one
         if(!userFork) {
           // create new fork for user
-          await fetch(forksUrl, {
+          let fetchRequestObject = {
             method:'POST',
             headers: this.apiHeaders
-          }).then(res => res.json())
+          }
+          if(forkTo !== this.userLogin) {
+            // if we are forking to an organization rather than
+            // the user's personal repositories, we have to add
+            // a note to say so to the request body
+            fetchRequestObject.body = JSON.stringify({
+              organization: forkTo
+            })
+          }
+          await fetch(forksUrl, fetchRequestObject)
+            .then(res => { 
+              if(res.status <= 400) res.json()
+              else throw res
+            })
             .then(async(userFork) => { 
                 // now switch to it
                 this.githubRepo = userFork.full_name;
@@ -245,7 +286,8 @@ export default class Github {
         // initialise page with user's fork
         callback(this);
       }).catch(err => {
-        console.error("Couldn't retrieve forks from ", forksUrl, ": ", err);
+        console.warn("Couldn't retrieve forks from ", forksUrl, ": ", err);
+        return Promise.reject(err);
       });
   }
 
@@ -265,7 +307,7 @@ export default class Github {
       }).then(res => res.json())
         .then(async(data) => callback(this, data));
     } else { 
-      console.error("Attempted to create pull-request but repo is not a fork");
+      console.warn("Attempted to create pull-request but repo is not a fork");
     }
   }
 
