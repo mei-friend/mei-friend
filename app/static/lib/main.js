@@ -50,12 +50,12 @@ export function setFileChangedState(fileChangedState) {
   }
 }
 
-export function setGithubInstance(new_github) { 
+export function setGithubInstance(new_github) {
   // update github instance (from other modules)
   github = new_github;
 }
 
-export function setMeiFileInfo(fName, fLocation, fLocationPrintable) { 
+export function setMeiFileInfo(fName, fLocation, fLocationPrintable) {
   meiFileName = fName;
   meiFileLocation = fLocation;
   meiFileLocationPrintable= fLocationPrintable;
@@ -132,10 +132,6 @@ import {
   openUrl,
   openUrlCancel
 } from './open-url.js';
-import { 
-  forkRepository,
-  forkRepositoryCancel
-} from './fork-repository.js';
 import {
   createControlsMenu,
   setBreaksOptions,
@@ -154,11 +150,8 @@ import * as e from './editor.js'
 import Viewer from './viewer.js';
 import Storage from './storage.js';
 import Github from './github.js';
-import { 
-  fillInUserRepos,
-  fillInRepoBranches,
+import {
   fillInBranchContents,
-  renderCommitLog,
   logoutFromGithub,
   refreshGithubMenu
 } from './github-menu.js';
@@ -167,7 +160,7 @@ import {
 import schema_meiAll from '../schemaInfo/mei-CMN-4.0.1.schemaInfo.js';
 
 const version = 'develop-0.3.1';
-const versionDate = '29 Jan 2022';
+const versionDate = '7 Feb 2022';
 // const defaultMeiFileName = `${root}Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei`;
 const defaultMeiFileName = `${root}Beethoven_WoO70-Breitkopf.mei`;
 const defaultVerovioOptions = {
@@ -280,16 +273,16 @@ document.addEventListener('DOMContentLoaded', function() {
   let urlFileName = searchParams.get('file');
   if (urlFileName) {
     openUrlFetch(new URL(urlFileName));
-  } 
+  }
   // restore localStorage if we have it
   if (storage.supported) {
     storage.read();
     // orientation: use URI param if specified;
     //  else use stored orientation if specified;
-    //  else use default 
+    //  else use default
     or = searchParams.get('orientation') || storage.orientation || or;
     setFileChangedState(storage.fileChanged);
-    if (!urlFileName) { 
+    if (!urlFileName) {
       // no URI param specified - try to restore from storage
       if (storage.content) {
         // restore file name and content from storage
@@ -1197,5 +1190,3 @@ function setKeyMap(keyMapFilePath) {
       }
     });
 }
-
-
