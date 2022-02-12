@@ -47,12 +47,12 @@ a:active {
 }
 
 .title {
-  padding: 3px 20px;
+  padding: 3px 20px 3px 10px;
   font-weight: bold;
   font-size: 18pt;
 }
 
-.title img { 
+.title img {
   height: 1.6em;
 }
 

@@ -133,10 +133,13 @@ import {
   openUrl,
   openUrlCancel
 } from './open-url.js';
+<<<<<<< HEAD
 import {
   forkRepository,
   forkRepositoryCancel
 } from './fork-repository.js';
+=======
+>>>>>>> develop
 import {
   createControlsMenu,
   setBreaksOptions,
@@ -156,10 +159,12 @@ import Viewer from './viewer.js';
 import Storage from './storage.js';
 import Github from './github.js';
 import {
+<<<<<<< HEAD
   fillInUserRepos,
   fillInRepoBranches,
+=======
+>>>>>>> develop
   fillInBranchContents,
-  renderCommitLog,
   logoutFromGithub,
   refreshGithubMenu
 } from './github-menu.js';
@@ -169,7 +174,7 @@ import {
 import schema_meiAll from '../schemaInfo/mei-CMN-4.0.1.schemaInfo.js';
 
 const version = 'develop-0.3.1';
-const versionDate = '29 Jan 2022';
+const versionDate = '7 Feb 2022';
 // const defaultMeiFileName = `${root}Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei`;
 const defaultMeiFileName = `${root}Beethoven_WoO70-Breitkopf.mei`;
 const defaultVerovioOptions = {
