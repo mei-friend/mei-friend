@@ -56,7 +56,7 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
     };
     // collect all time-spanning elements with startid and endid
     let tsTable = {}; // object with id as keys and an array of [startid, endid]
-    let idList = [];
+    let idList = []; // list of time-pointer ids to be checked
     tsTable = crawl(node.children, tsTable, idList);
     t1 = t2;
     t2 = performance.now();
@@ -68,7 +68,7 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
     // determine page number for list of ids
     function dig(nodeArray, noteTable, idList) {
       if (breaksOption == 'line' || breaksOption == 'encoded') {
-        nodeArray.forEach(el => {
+        nodeArray.forEach(el => { // el obj w/ tagName, children, attributes
           if (el.hasOwnProperty("tagName")) {
             if (el.tagName === 'measure') count = true;
             if (count && breaks.includes(el.tagName)) p++;
@@ -85,8 +85,27 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
             }
           }
         });
-      } else if (breaksOption = 'auto') {
-        // TODO
+      } else if (breaksOption = 'auto') { // TODO
+        nodeArray.forEach(el => { // el obj w/ tagName, children, attributes
+          if (el.hasOwnProperty("tagName")) {
+            if (p < Object.keys(breaks).length &&  
+              el.attributes['xml:id'] === breaks[p][breaks[p].length - 1]) {
+              console.log('measure ' + el.attributes['xml:id'] + ', p. ' + p + ', noteTable: ', noteTable);
+              p++;
+            }
+            let id = el.attributes['xml:id'];
+            if (id) {
+              let i = idList.indexOf(id);
+              if (i >= 0) {
+                noteTable[id] = p;
+                delete idList[i];
+              }
+            }
+            if (el.children) {
+              noteTable = dig(el.children, noteTable, idList);
+            }
+          }
+        });
       }
       return noteTable;
     } // dig()

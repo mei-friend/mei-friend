@@ -56,8 +56,10 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks = ['sb', 'pb'],
   spdScore.appendChild(baseSection);
 
   let countingMode = 'measures';
-  if (Array.isArray(breaks)) countingMode = 'encodedBreaks';
-  else if (typeof breaks == 'object') countingMode = 'computedBreaks';
+  if (Array.isArray(breaks))
+    countingMode = 'encodedBreaks';
+  else if (typeof breaks == 'object' && Object.keys(breaks).length > 0)
+    countingMode = 'computedBreaks';
 
   let digger = readSection(pageNo, spdScore, breaks, countingMode);
   let sections = xmlScore.childNodes;
@@ -494,7 +496,7 @@ export function listPageSpanningElements(xmlScore, breaks, breaksOption) {
         m = e;
       } else {
         noteTable[e.getAttribute('xml:id')] =
-          (m && e.closest('measure') == m) ? p - 1 : p;
+          (m && e.closest('measure') === m) ? p - 1 : p;
       }
     }
   }

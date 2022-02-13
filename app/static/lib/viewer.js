@@ -29,7 +29,6 @@ export default class Viewer {
     this.pageSpanners = {}; // object storing all time-spannind elements spanning across pages
     // this.scoreDefList = []; // list of xmlNodes, one for each change, referenced by 5th element of pageList
     this.meiHeadRange = [];
-    this.breaks = ['sb', 'pb'];
     this.toolTipTimeOutHandle = null; // handle for zoom tooltip hide timer
     this.vrvOptions;
     this.verovioIcon = document.getElementById('verovio-icon');
@@ -39,13 +38,13 @@ export default class Viewer {
   updateAll(cm, options = {}, xmlId = '') {
     this.setVerovioOptions(options);
     let computePageBreaks = false;
-    if (this.speedMode && Object.keys(this.pageBreaks).length == 0 &&
-      document.getElementById('breaks-select').value == 'auto') {
+    if (this.speedMode && Object.keys(this.pageBreaks).length === 0 &&
+      document.getElementById('breaks-select').value === 'auto') {
       computePageBreaks = true;
       this.currentPage = 1;
     }
     if (this.speedMode && xmlId) this.currentPage =
-      speed.getPageWithElement(this.xmlDoc, this.breaks, xmlId);
+      speed.getPageWithElement(this.xmlDoc, this.breaksValue(), xmlId);
     let message = {
       'cmd': 'updateAll',
       'options': this.vrvOptions,
@@ -91,7 +90,7 @@ export default class Viewer {
         if (this.encodingHasChanged) this.loadXml(cm.getValue());
         if (xmlId) {
           this.currentPage =
-            speed.getPageWithElement(this.xmlDoc, this.breaks, xmlId);
+            speed.getPageWithElement(this.xmlDoc, this.breaksValue(), xmlId);
           console.info('UpdatePage(speedMode=true): page: ' +
             this.currentPage + ', xmlId: ' + xmlId);
         }
@@ -131,20 +130,14 @@ export default class Viewer {
   // with normal mode: load DOM and pass-through the MEI code;
   // with speed mode: load into DOM (if encodingHasChanged) and
   // return MEI excerpt of currentPage page
-  speedFilter(mei, brks = ['sb', 'pb']) {
+  speedFilter(mei) {
     // update DOM only if encoding has been edited or
     this.loadXml(mei);
-    let bs = document.getElementById('breaks-select');
-    if (!this.speedMode || bs.value == 'none') return mei;
-    this.breaks = brks;
-    if (bs.value === "encoded") {
-      this.breaks = ['pb'];
-    } else if (bs.value === 'auto') {
-      this.breaks =
-        (Object.keys(this.pageBreaks).length === 0) ? '' : this.pageBreaks;
-    }
+    let breaks = this.breaksValue();
+    let breaksSelectVal = document.getElementById('breaks-select').value;
+    if (!this.speedMode || breaksSelectVal == 'none') return mei;
     // count pages from system/pagebreaks
-    if (Array.isArray(this.breaks)) {
+    if (Array.isArray(breaks)) {
       let music = this.xmlDoc.querySelector('music score');
       let elements;
       if (music) elements = music.querySelectorAll('measure, sb, pb');
@@ -154,31 +147,32 @@ export default class Viewer {
       let countBreaks = false;
       for (let e of elements) {
         if (e.nodeName === 'measure') countBreaks = true; // skip leading breaks
-        if (countBreaks && this.breaks.includes(e.nodeName))
+        if (countBreaks && breaks.includes(e.nodeName))
           this.pageCount++;
       }
       for (let e of Array.from(elements).reverse()) { // skip trailing breaks
         if (e.nodeName === 'measure') break;
-        if (countBreaks && this.breaks.includes(e.nodeName)) this.pageCount--;
+        if (countBreaks && breaks.includes(e.nodeName)) this.pageCount--;
       }
-      if (this.currentPage < 1 || this.currentPage > this.pageCount)
-        this.currentPage = 1;
-      console.info('xmlDOM pages counted: currentPage: ' + this.currentPage +
-        ', pageCount: ' + this.pageCount);
     }
+    if (this.currentPage < 1 || this.currentPage > this.pageCount)
+      this.currentPage = 1;
+    console.info('xmlDOM pages counted: currentPage: ' + this.currentPage +
+      ', pageCount: ' + this.pageCount);
     // compute time-spanning element object in speed-worker
-    if (Object.keys(this.pageSpanners).length === 0) {
+    if (Object.keys(this.pageSpanners).length === 0 &&
+      (breaksSelectVal !== 'auto' || Object.keys(this.pageBreaks).length > 0)) {
       if (true) { // TODO: use worker
         let message = {
           'cmd': 'listPageSpanningElements',
           'mei': mei,
-          'breaks': this.breaks,
-          'breaksOpt': bs.value
+          'breaks': breaks,
+          'breaksOpt': breaksSelectVal
         };
         this.spdWorker.postMessage(message);
       } else {
         this.pageSpanners = speed
-          .listPageSpanningElements(this.xmlDoc, this.breaks, bs.value);
+          .listPageSpanningElements(this.xmlDoc, breaks, breaksSelectVal);
         if (Object.keys(this.pageSpanners).length > 0)
           console.log('pageSpanners object size: ' +
             Object.keys(this.pageSpanners.start).length + ', ', this.pageSpanners);
@@ -186,7 +180,7 @@ export default class Viewer {
       }
     }
     // retrieve requested MEI page from DOM
-    return speed.getPageFromDom(this.xmlDoc, this.currentPage, this.breaks,
+    return speed.getPageFromDom(this.xmlDoc, this.currentPage, breaks,
       this.pageSpanners);
   }
 
@@ -681,6 +675,22 @@ export default class Viewer {
   busy(active = true) {
     if (active) this.verovioIcon.classList.add('loading');
     else this.verovioIcon.classList.remove('loading');
+  }
+
+  breaksValue() {
+    let breaksSelectVal = document.getElementById('breaks-select').value;
+    switch (breaksSelectVal) {
+      case 'auto':
+        return {
+          ...this.pageBreaks
+        };
+      case 'line':
+        return ['sb', 'pb'];
+      case 'encoded':
+        return ['pb'];
+      default:
+        return '';
+    }
   }
 
 }
