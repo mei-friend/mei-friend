@@ -564,9 +564,9 @@ function vrvWorkerEventsHandler(ev) {
     case 'computePageBreaks':
       v.pageBreaks = ev.data.pageBreaks;
       v.pageCount = ev.data.pageCount;
-      console.log('Page breaks computed for ' +
-        meiFileName.substr(meiFileName.lastIndexOf("/") + 1) +
-        ', pageBreaks', v.pageBreaks);
+      // console.log('Page breaks computed for ' +
+      //   meiFileName.substr(meiFileName.lastIndexOf("/") + 1) +
+      //   ', pageBreaks', v.pageBreaks);
       v.updateData(cm, false, true);
       updateStatusBar();
       v.updatePageNumDisplay();

@@ -34,7 +34,7 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
   let pageSpanners = {};
   let t1 = performance.now();
   let xmlDoc = parse(mei);
-  console.log('xmlDoc: ', xmlDoc);
+  // console.log('xmlDoc: ', xmlDoc);
   let t2 = performance.now();
   console.log('listPageSpanningElements parse XML: ' + (t2 - t1) + ' ms.');
 
@@ -42,7 +42,7 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
   let node = xmlDoc.at(3).children.at(1); // mei > music
   if (!node) {
     console.log('Invalid MEI file. ')
-    return pageSpannerIds;
+    return pageSpanners;
   }
   while (node.tagName !== 'score') {
     if (node.tagName === 'music') hasMusic = true;
@@ -66,7 +66,7 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
     let p = 1;
 
     // determine page number for list of ids
-    function dig(nodeArray, noteTable, idList) {
+    function dig(nodeArray, noteTable, idList, childOfMeasure = false) {
       if (breaksOption == 'line' || breaksOption == 'encoded') {
         nodeArray.forEach(el => { // el obj w/ tagName, children, attributes
           if (el.hasOwnProperty("tagName")) {
@@ -88,21 +88,22 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
       } else if (breaksOption = 'auto') { // TODO
         nodeArray.forEach(el => { // el obj w/ tagName, children, attributes
           if (el.hasOwnProperty("tagName")) {
-            if (p < Object.keys(breaks).length &&  
+            if (el.tagName === 'measure') childOfMeasure = false;
+            if (p < Object.keys(breaks).length &&
               el.attributes['xml:id'] === breaks[p][breaks[p].length - 1]) {
-              console.log('measure ' + el.attributes['xml:id'] + ', p. ' + p + ', noteTable: ', noteTable);
+              childOfMeasure = true; // for children of last measure on page
               p++;
             }
             let id = el.attributes['xml:id'];
             if (id) {
               let i = idList.indexOf(id);
               if (i >= 0) {
-                noteTable[id] = p;
+                noteTable[id] = childOfMeasure ? p - 1 : p;
                 delete idList[i];
               }
             }
             if (el.children) {
-              noteTable = dig(el.children, noteTable, idList);
+              noteTable = dig(el.children, noteTable, idList, childOfMeasure);
             }
           }
         });
