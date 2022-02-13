@@ -481,7 +481,7 @@ export function listPageSpanningElements(xmlScore, breaks, breaksOption) {
   let p = 1;
   if (breaksOption == 'line' || breaksOption == 'encoded') {
     for (let e of elList) {
-      if (breaks.includes(e.nodeName)) count = true;
+      if (e.nodeName === 'measure') count = true;
       if (count && breaks.includes(e.nodeName)) p++;
       else
         noteTable[e.getAttribute('xml:id')] = p;

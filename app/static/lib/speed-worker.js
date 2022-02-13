@@ -70,7 +70,7 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
       if (breaksOption == 'line' || breaksOption == 'encoded') {
         nodeArray.forEach(el => {
           if (el.hasOwnProperty("tagName")) {
-            if (breaks.includes(el.tagName)) count = true;
+            if (el.tagName === 'measure') count = true;
             if (count && breaks.includes(el.tagName)) p++;
             let id = el.attributes['xml:id'];
             if (id) {
