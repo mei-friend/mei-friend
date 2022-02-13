@@ -430,7 +430,14 @@ export async function openUrlFetch(url = '') {
 }
 
 function speedWorkerEventsHandler(ev) {
-  console.log('main(). speedWorkerHandler received: ' + ev.data.cmd);
+  console.log('main() speedWorkerHandler received: ' + ev.data.cmd);
+  if (ev.data.cmd === 'listPageSpanningElements') {
+    console.log('main() speedWorkerHandler pageSpanners: ', ev.data.pageSpanners);
+    v.pageSpanners = {
+      ...ev.data.pageSpanners
+    };
+    v.updateAll(cm, {}, v.selectedElements[0]);
+  }
 }
 
 function vrvWorkerEventsHandler(ev) {
@@ -956,7 +963,7 @@ function addEventListeners(v, cm) {
   document.getElementById('breaks-select').addEventListener('change',
     () => {
       v.pageSpanners = {};
-      v.updateAll(cm, {}, v.selectedElements[0])
+      v.updateAll(cm, {}, v.selectedElements[0]);
     });
   // navigation
   document.getElementById('backwards-btn')
@@ -1131,7 +1138,7 @@ function addEventListeners(v, cm) {
       v.pageCount = Object.keys(v.pageBreaks).length;
     // else
     //   v.pageBreaks = {};
-    v.updateAll(cm);
+    v.updateAll(cm, {}, v.selectedElements[0]);
   });
 } // addEventListeners()
 

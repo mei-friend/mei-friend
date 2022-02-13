@@ -19,7 +19,8 @@ onmessage = function(e) {
       break;
     case 'listPageSpanningElements':
       result.cmd = 'listPageSpanningElements'
-      listPageSpanningElements(e.data.mei, e.data.breaks, e.data.breaksOpt);
+      result.pageSpanners =
+        listPageSpanningElements(e.data.mei, e.data.breaks, e.data.breaksOpt);
       break;
   }
   let t2 = performance.now();
@@ -30,7 +31,7 @@ onmessage = function(e) {
 // List all timespanning elements with @startid/@endid attr on different pages.
 // Does the same as in speed.listPageSpanningElements(), but without DOM stuff
 function listPageSpanningElements(mei, breaks, breaksOption) {
-  let pageSpannerIds = [];
+  let pageSpanners = {};
   let t1 = performance.now();
   let xmlDoc = parse(mei);
   console.log('xmlDoc: ', xmlDoc);
@@ -48,34 +49,97 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
     node = node.children.at(0);
   }
   console.log('hasMusic: ' + hasMusic + ', Found: ', node)
-
   if (node && hasMusic) {
+    pageSpanners = {
+      start: {},
+      end: {}
+    };
     // collect all time-spanning elements with startid and endid
     let tsTable = {}; // object with id as keys and an array of [startid, endid]
-    tsTable = crawl(node.children, tsTable);
+    let idList = [];
+    tsTable = crawl(node.children, tsTable, idList);
     t1 = t2;
     t2 = performance.now();
-    console.log('tsTable: ', tsTable);
     console.log('listPageSpanningElements crawling tsTable: ' + (t2 - t1) + ' ms.');
+    noteTable = {};
+    let count = false;
+    let p = 1;
+
+    // determine page number for list of ids
+    function dig(nodeArray, noteTable, idList) {
+      if (breaksOption == 'line' || breaksOption == 'encoded') {
+        nodeArray.forEach(el => {
+          if (el.hasOwnProperty("tagName")) {
+            if (breaks.includes(el.tagName)) count = true;
+            if (count && breaks.includes(el.tagName)) p++;
+            let id = el.attributes['xml:id'];
+            if (id) {
+              let i = idList.indexOf(id);
+              if (i >= 0) {
+                noteTable[id] = p;
+                delete idList[i];
+              }
+            }
+            if (el.children) {
+              noteTable = dig(el.children, noteTable, idList);
+            }
+          }
+        });
+      } else if (breaksOption = 'auto') {
+        // TODO
+      }
+      return noteTable;
+    } // dig()
+
+    noteTable = dig(node.children, noteTable, idList);
+
+    t1 = t2;
+    t2 = performance.now();
+    console.log('listPageSpanningElements digging for noteTable: ' + (t2 - t1) + ' ms.');
+
+    let p1 = 0;
+    let p2 = 0;
+    for (let spannerIds of Object.keys(tsTable)) {
+      p1 = noteTable[tsTable[spannerIds][0]];
+      p2 = noteTable[tsTable[spannerIds][1]];
+      if (p1 > 0 && p2 > 0 && p1 != p2) {
+        if (pageSpanners.start[p1])
+          pageSpanners.start[p1].push(spannerIds);
+        else
+          pageSpanners.start[p1] = [spannerIds];
+        if (pageSpanners.end[p2])
+          pageSpanners.end[p2].push(spannerIds);
+        else
+          pageSpanners.end[p2] = [spannerIds];
+      }
+    }
+
+    t1 = t2;
+    t2 = performance.now();
+    console.log('listPageSpanningElements packing pageSpanners: ' + (t2 - t1) + ' ms.');
 
   }
-  return pageSpannerIds;
+  return pageSpanners;
 
-  function crawl(nodeArray, tsTable) {
+  // find time-spanning elements and store their @startid/@endids in object
+  function crawl(nodeArray, tsTable, idList) {
     nodeArray.forEach(el => {
       if (timeSpanningElements.includes(el.tagName)) {
         let startid = el.attributes['startid'];
         let endid = el.attributes['endid'];
-        if (startid && endid)
+        if (startid && endid) {
           tsTable[el.attributes['xml:id']] = [startid.slice(1), endid.slice(1)];
+          idList.push(startid.slice(1));
+          idList.push(endid.slice(1));
+        }
       } else if (el.children) {
-        tsTable = crawl(el.children, tsTable);
+        tsTable = crawl(el.children, tsTable, idList);
       }
     });
     return tsTable;
   } // crawl()
 
-}
+} // listPageSpanningElements()
 
 
 

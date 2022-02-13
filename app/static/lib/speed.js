@@ -331,9 +331,10 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
   }
 }
 
+// List all notes/chords to check whether they are
+// pointed to from outside the requested pageNo
+// to be run at each edit/page turn (becomes slow with big files)
 function matchTimespanningElements(xmlScore, spdScore, pageNo) {
-  // List all notes/chords to check whether they are
-  // pointed to from outside the requested pageNo
   let t1 = performance.now();
   // console.info('LoopStart startingElements: ', startingElements);
   // console.info('LoopStart endingElements: ', endingElements);

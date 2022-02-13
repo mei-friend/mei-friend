@@ -284,11 +284,11 @@ export default class Viewer {
 
   // accepts number or string (first, last, forwards, backwards)
   changeCurrentPage(newPage) {
-    let targetpage;
+    let targetpage = -1;
     if (Number.isInteger(newPage)) {
       targetpage = newPage;
       console.info('targetPage: ', targetpage);
-    } else {
+    } else if (typeof newPage === 'string') {
       newPage = newPage.toLowerCase();
       if (newPage === 'first') {
         targetpage = 1;
