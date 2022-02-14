@@ -1,21 +1,17 @@
-// worker to pre-compute information for accelerating speedMode
+// worker to pre-compute time-spanning elements per page for accelerating
+// interaction in speedMode
 
-// let message = {
-// cmd: 'listPageSpanningElements',
-// 'mei': mei,
-// 'breaks': this.breaks,
-// 'breaksOpt': bs.value
-// };
-var timeSpanningElements;
+var timeSpanningElements; // from attribute-classes.js
 
+// message handler
 onmessage = function(e) {
   let result = {};
   let t1 = performance.now();
   console.info("SpeedWorker received: " + e.data.cmd + ', ', e.data);
   switch (e.data.cmd) {
-    case 'variables':
+    case 'variables': // receive const from attribute-classes.js
       timeSpanningElements = e.data.var;
-      console.log('SpeedWorker received variables: ', timeSpanningElements);
+      // console.log('SpeedWorker received variables: ', timeSpanningElements);
       break;
     case 'listPageSpanningElements':
       result.cmd = 'listPageSpanningElements'
@@ -32,23 +28,19 @@ onmessage = function(e) {
 // Does the same as in speed.listPageSpanningElements(), but without DOM stuff
 function listPageSpanningElements(mei, breaks, breaksOption) {
   let pageSpanners = {};
-  let t1 = performance.now();
-  let xmlDoc = parse(mei);
-  // console.log('xmlDoc: ', xmlDoc);
-  let t2 = performance.now();
-  console.log('listPageSpanningElements parse XML: ' + (t2 - t1) + ' ms.');
-
+  let xmlDoc = parse(mei); // txml is very fast!
   let hasMusic = false;
-  let node = xmlDoc.at(3).children.at(1); // mei > music
+  let node = xmlDoc.at(3).children.at(1); // expecting mei > music
   if (!node) {
     console.log('Invalid MEI file. ')
     return pageSpanners;
   }
-  while (node.tagName !== 'score') {
+  while (node.tagName !== 'score') { // expecting a music and score element
     if (node.tagName === 'music') hasMusic = true;
     node = node.children.at(0);
   }
-  console.log('hasMusic: ' + hasMusic + ', Found: ', node)
+  console.log('xmlDoc hasMusic: ' + hasMusic + ', node found: ', node);
+
   if (node && hasMusic) {
     pageSpanners = {
       start: {},
@@ -58,13 +50,9 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
     let tsTable = {}; // object with id as keys and an array of [startid, endid]
     let idList = []; // list of time-pointer ids to be checked
     tsTable = crawl(node.children, tsTable, idList);
-    t1 = t2;
-    t2 = performance.now();
-    console.log('listPageSpanningElements crawling tsTable: ' + (t2 - t1) + ' ms.');
     noteTable = {};
     let count = false;
     let p = 1;
-
     // determine page number for list of ids
     function dig(nodeArray, noteTable, idList, childOfMeasure = false) {
       if (breaksOption == 'line' || breaksOption == 'encoded') {
@@ -113,10 +101,7 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
 
     noteTable = dig(node.children, noteTable, idList);
 
-    t1 = t2;
-    t2 = performance.now();
-    console.log('listPageSpanningElements digging for noteTable: ' + (t2 - t1) + ' ms.');
-
+    // packing pageSpanners with different page references
     let p1 = 0;
     let p2 = 0;
     for (let spannerIds of Object.keys(tsTable)) {
@@ -133,10 +118,6 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
           pageSpanners.end[p2] = [spannerIds];
       }
     }
-
-    t1 = t2;
-    t2 = performance.now();
-    console.log('listPageSpanningElements packing pageSpanners: ' + (t2 - t1) + ' ms.');
 
   }
   return pageSpanners;
@@ -161,9 +142,10 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
 
 } // listPageSpanningElements()
 
-
-
-
+// ACKNOWLEDGEMENTS
+// The below code is taken from https://github.com/TobiasNickel/tXml,
+// published by Tobias Nickel under MIT license.
+// We are thankful for the fast xml parsing inside workers!
 
 /**
  * @author: Tobias Nickel
@@ -610,7 +592,7 @@ function getElementById(S, id, simplified) {
   return simplified ? simplify(out) : out[0];
 };
 
-// S is xml text
+// S is xml text (function by @wergo)
 function getElementByXmlId(S, id, simplified) {
   var out = parse(S, {
     attrName: 'xml:id',

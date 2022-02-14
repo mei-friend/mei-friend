@@ -104,8 +104,6 @@
 * Supply mei-CMN and mei-all 4.0.1 RNGs as schemaInfo objects
 * Remember orientation upon refresh
 # 0.3.1 patch
-<<<<<<< HEAD
-* Speed-up speedMode with separate worker for pre-computing time-spanning elements
-=======
 * Implement fork repository functionality
->>>>>>> develop
+# 0.3.2 patch
+* Accelerate speedMode using tXml in a separate worker for pre-computing time-spanning elements with @startid/@endid attributes
