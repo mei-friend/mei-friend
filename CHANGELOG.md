@@ -107,3 +107,4 @@
 * Implement fork repository functionality
 # 0.3.2 patch
 * Accelerate speedMode using tXml in a separate worker for pre-computing time-spanning elements with @startid/@endid attributes
+* Support for toggling spiccato articulation with Shift+P

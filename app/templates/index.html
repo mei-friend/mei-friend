@@ -148,6 +148,7 @@
           <a id="toggleTenuto" href="#">Tenuto<span class="keyShortCut shiftKey">N</span></a>
           <a id="toggleMarcato" href="#">Marcato<span class="keyShortCut shiftKey">O</span></a>
           <a id="toggleStacciss" href="#">Staccatissimo<span class="keyShortCut shiftKey">I</span></a>
+          <a id="toggleSpicc" href="#">Spiccato<span class="keyShortCut shiftKey">P</span></a>
         </div>
       </div>
       <div class="dropdown">
@@ -190,10 +191,10 @@
           <h3>Fork Github Repository</h3>
           <p id="forkRepositoryInstructions">Please enter the Github (user or organization) name and the repository name of a Github-hosted repository, below. The repository will be forked to the currently logged in Github user, and become available from the Github menu.</p>
           <div id="forkRepositoryInputWrapper">
-            <input id="forkRepositoryInputName" type="text" placeholder="Github user or organization" 
+            <input id="forkRepositoryInputName" type="text" placeholder="Github user or organization"
                   onkeydown="(e) => {
                     console.log('KEYDOWN: ', e);
-                    if(e.code == 'Slash') { 
+                    if(e.code == 'Slash') {
                       e.preventDefault();
                       e.stopPropagation();
                       document.getElementById('forkRepositoryInputRepo').focus();
