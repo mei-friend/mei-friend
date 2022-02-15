@@ -438,6 +438,7 @@ function speedWorkerEventsHandler(ev) {
       ...ev.data.pageSpanners
     };
     v.updateAll(cm, {}, v.selectedElements[0]);
+    v.busy(false, true);
   }
 }
 

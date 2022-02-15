@@ -136,8 +136,20 @@
   to { transform: rotate(359deg) }
 }
 
-.loading {
+.clockwise {
   animation-name: spinning;
+  animation-duration: 1s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+@keyframes reversing {
+  from { transform: rotate(0deg) }
+  to { transform: rotate(-359deg) }
+}
+
+.anticlockwise {
+  animation-name: reversing;
   animation-duration: 1s;
   animation-timing-function: linear;
   animation-iteration-count: infinite;

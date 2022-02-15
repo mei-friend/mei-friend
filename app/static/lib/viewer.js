@@ -169,6 +169,7 @@ export default class Viewer {
           'breaks': breaks,
           'breaksOpt': breaksSelectVal
         };
+        this.busy(true, true);
         this.spdWorker.postMessage(message);
       } else {
         this.pageSpanners = speed
@@ -672,9 +673,10 @@ export default class Viewer {
     }
   }
 
-  busy(active = true) {
-    if (active) this.verovioIcon.classList.add('loading');
-    else this.verovioIcon.classList.remove('loading');
+  busy(active = true, speedWorker = false) {
+    let direction = speedWorker ? 'anticlockwise' : 'clockwise';
+    if (active) this.verovioIcon.classList.add(direction);
+    else this.verovioIcon.classList.remove(direction);
   }
 
   breaksValue() {
