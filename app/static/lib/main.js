@@ -840,6 +840,7 @@ let cmd = {
   'toggleTenuto': () => e.toggleArtic(v, cm, 'ten'),
   'toggleMarcato': () => e.toggleArtic(v, cm, 'marc'),
   'toggleStacciss': () => e.toggleArtic(v, cm, 'stacciss'),
+  'toggleSpicc': () => e.toggleArtic(v, cm, 'spicc'),
   'shiftPitchNameUp': () => e.shiftPitch(v, cm, 1),
   'shiftPitchNameDown': () => e.shiftPitch(v, cm, -1),
   'shiftOctaveUp': () => e.shiftPitch(v, cm, 7),
@@ -1075,6 +1076,8 @@ function addEventListeners(v, cm) {
     .addEventListener('click', cmd.toggleMarcato);
   document.getElementById('toggleStacciss')
     .addEventListener('click', cmd.toggleStacciss);
+  document.getElementById('toggleSpicc')
+    .addEventListener('click', cmd.toggleSpicc);
 
   // reset application
   document.getElementById('resetDefault')

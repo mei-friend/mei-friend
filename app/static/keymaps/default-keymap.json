@@ -55,6 +55,7 @@
     "shift-n": "toggleTenuto",
     "shift-o": "toggleMarcato",
     "shift-i": "toggleStacciss",
+    "shift-p": "toggleSpicc",
 
     "b": "addBeam",
     "o": "addOctave8Above",
