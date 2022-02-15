@@ -35,13 +35,20 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
     console.log('Invalid MEI file. ')
     return pageSpanners;
   }
-  while (node.tagName !== 'score') { // expecting a music and score element
-    if (node.tagName === 'music') hasMusic = true;
-    node = node.children.at(0);
+  // let music = getElementByTagName(node.children, 'music');
+  // if (!music) {
+  //   console.log('Missing music element in MEI file.');
+  //   return;
+  // }
+  let score = getElementByTagName(node.children, 'score');
+  if (!music) {
+    console.log('Missing score element in MEI file.');
+    return;
+  } else {
+    console.log('xmlDoc music > score: ', score);
   }
-  console.log('xmlDoc hasMusic: ' + hasMusic + ', node found: ', node);
 
-  if (node && hasMusic) {
+  if (score && music) {
     pageSpanners = {
       start: {},
       end: {}
@@ -49,7 +56,7 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
     // collect all time-spanning elements with startid and endid
     let tsTable = {}; // object with id as keys and an array of [startid, endid]
     let idList = []; // list of time-pointer ids to be checked
-    tsTable = crawl(node.children, tsTable, idList);
+    tsTable = crawl(score.children, tsTable, idList);
     noteTable = {};
     let count = false;
     let p = 1;
@@ -99,7 +106,7 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
       return noteTable;
     } // dig()
 
-    noteTable = dig(node.children, noteTable, idList);
+    noteTable = dig(score.children, noteTable, idList);
 
     // packing pageSpanners with different page references
     let p1 = 0;
@@ -141,6 +148,27 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
   } // crawl()
 
 } // listPageSpanningElements()
+
+// Return first element with tagName elName
+function getElementByTagName(nodeArray, elName) {
+  let el = null;
+  if (!Array.isArray(nodeArray)) {
+    console.error('getElementById(): not an array: ', nodeArray);
+    return null;
+  }
+  for (let e of nodeArray) {
+    if (e.hasOwnProperty("tagName") && e.tagName === elName) {
+      el = e;
+      break;
+    }
+    if (e.hasOwnProperty("children")) {
+      el = getElementByTagName(e.children, elName);
+      break;
+    }
+  }
+  return el;
+}
+
 
 // ACKNOWLEDGEMENTS
 // The below code is taken from https://github.com/TobiasNickel/tXml,
