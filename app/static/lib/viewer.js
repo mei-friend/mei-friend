@@ -160,7 +160,7 @@ export default class Viewer {
     console.info('xmlDOM pages counted: currentPage: ' + this.currentPage +
       ', pageCount: ' + this.pageCount);
     // compute time-spanning element object in speed-worker
-    if (Object.keys(this.pageSpanners).length === 0 &&
+    if (this.pageSpanners && Object.keys(this.pageSpanners).length === 0 &&
       (breaksSelectVal !== 'auto' || Object.keys(this.pageBreaks).length > 0)) {
       if (true) { // TODO: use worker
         let message = {

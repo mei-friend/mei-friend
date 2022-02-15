@@ -532,6 +532,8 @@ export function listPageSpanningElements(xmlScore, breaks, breaksOption) {
 
 // add time-spanning elements spanning across page to spdScore
 function addPageSpanningElements(xmlScore, spdScore, pageSpanners, pageNo) {
+  if (pageSpanners.start === 'invalid') return;
+
   // 1) go through endingElements and add to first measure
   let endingElementIds = pageSpanners.end[pageNo];
   if (endingElementIds && pageNo > 1) {

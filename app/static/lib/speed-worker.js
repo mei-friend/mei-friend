@@ -29,26 +29,24 @@ onmessage = function(e) {
 function listPageSpanningElements(mei, breaks, breaksOption) {
   let pageSpanners = {};
   let xmlDoc = parse(mei); // txml is very fast!
-  let hasMusic = false;
-  let node = xmlDoc.at(3).children.at(1); // expecting mei > music
-  if (!node) {
+  let music; // expecting mei > music
+  music = getElementByTagName(xmlDoc, 'music', music);
+  if (!music) {
     console.log('Invalid MEI file. ')
+    pageSpanners.start = 'invalid';
     return pageSpanners;
   }
-  // let music = getElementByTagName(node.children, 'music');
-  // if (!music) {
-  //   console.log('Missing music element in MEI file.');
-  //   return;
-  // }
-  let score = getElementByTagName(node.children, 'score');
-  if (!music) {
+  let score;
+  score = getElementByTagName(music.children, 'score', score);
+  if (!score) {
     console.log('Missing score element in MEI file.');
-    return;
+    pageSpanners.start = 'invalid';
+    return pageSpanners;
   } else {
     console.log('xmlDoc music > score: ', score);
   }
 
-  if (score && music) {
+  if (score) {
     pageSpanners = {
       start: {},
       end: {}
@@ -125,9 +123,11 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
           pageSpanners.end[p2] = [spannerIds];
       }
     }
-
+    return pageSpanners;
+  } else {
+    pageSpanners.start = 'invalid';
+    return pageSpanners;
   }
-  return pageSpanners;
 
   // find time-spanning elements and store their @startid/@endids in object
   function crawl(nodeArray, tsTable, idList) {
@@ -150,8 +150,7 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
 } // listPageSpanningElements()
 
 // Return first element with tagName elName
-function getElementByTagName(nodeArray, elName) {
-  let el = null;
+function getElementByTagName(nodeArray, elName, el) {
   if (!Array.isArray(nodeArray)) {
     console.error('getElementById(): not an array: ', nodeArray);
     return null;
@@ -162,8 +161,7 @@ function getElementByTagName(nodeArray, elName) {
       break;
     }
     if (e.hasOwnProperty("children")) {
-      el = getElementByTagName(e.children, elName);
-      break;
+      el = getElementByTagName(e.children, elName, el);
     }
   }
   return el;
@@ -173,7 +171,7 @@ function getElementByTagName(nodeArray, elName) {
 // ACKNOWLEDGEMENTS
 // The below code is taken from https://github.com/TobiasNickel/tXml,
 // published by Tobias Nickel under MIT license.
-// We are thankful for the fast xml parsing inside workers!
+// We are grateful for the fast xml parsing inside workers!
 
 /**
  * @author: Tobias Nickel
