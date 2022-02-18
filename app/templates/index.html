@@ -57,7 +57,7 @@
 
 <body>
   <div class="header">
-    <div class="title"><a href="https://repo.mdw.ac.at/mei-friend/"><img src="{{ url_for('static', filename='img/logo.png') }}" alt="mei-friend"/></a></div>
+    <div class="title"><a href="https://repo.mdw.ac.at/mei-friend/"><img src="{{ url_for('static', filename='img/logo.png') }}" alt="mei-friend" /></a></div>
     <div class="navbar">
       <div class="dropdown">
         <button class="dropbtn GithubButton"><img id="GithubLogo" src="{{ url_for('static', filename='img/GitHub-Mark-32px.png') }}" /><span id="GithubName"><a href="login" id="GithubLoginLink">Login</a></span></button>
@@ -167,6 +167,7 @@
       <span id="fileStorageExceeded"></span>
     </div>
   </div>
+
   <div class="dragContainer">
     <div class="dragOverlay">
       <div class="dragOverlayText">Drag your input file here.</div>
@@ -177,7 +178,7 @@
           <h3>Open Web-hosted encoding by URL</h3>
           <p id="openUrlInstructions">Please enter the URL of a Web-hosted music encoding, below. Note: Host server must support cross-origin resource sharing (CORS).</p>
           <div id="openUrlInputWrapper">
-            <input id="openUrlInput" type="text" placeholder="http://..."/>
+            <input id="openUrlInput" type="text" placeholder="http://..." />
             <button id="openUrlButton">Open URL</button>
             <button id="openUrlCancel">Cancel</button>
           </div>
@@ -189,18 +190,18 @@
       <div class="forkRepositoryUI">
         <div id="forkRepositoryUIGrouping">
           <h3>Fork Github Repository</h3>
-          <p id="forkRepositoryInstructions">Please enter the Github (user or organization) name and the repository name of a Github-hosted repository, below. The repository will be forked to the currently logged in Github user, and become available from the Github menu.</p>
+          <p id="forkRepositoryInstructions">Please enter the Github (user or organization) name and the repository name of a Github-hosted repository, below. The repository will be forked to the currently logged in Github user, and become available
+            from the Github menu.</p>
           <div id="forkRepositoryInputWrapper">
-            <input id="forkRepositoryInputName" type="text" placeholder="Github user or organization"
-                  onkeydown="(e) => {
+            <input id="forkRepositoryInputName" type="text" placeholder="Github user or organization" onkeydown="(e) => {
                     console.log('KEYDOWN: ', e);
                     if(e.code == 'Slash') {
                       e.preventDefault();
                       e.stopPropagation();
                       document.getElementById('forkRepositoryInputRepo').focus();
                     }
-                  }"/> /
-            <input id="forkRepositoryInputRepo" type="text" placeholder="Github repository name"/>
+                  }" /> /
+            <input id="forkRepositoryInputRepo" type="text" placeholder="Github repository name" />
             <label for="forkRepositoryToSelector">Fork to: </label>
             <select id="forkRepositoryToSelector" name="forkRepositoryToSelector"></select>
             <button id="forkRepositoryButton">Fork repository</button>
@@ -218,6 +219,7 @@
       </div>
     </div>
   </div>
+
   <div class="footer">
     <div class="leftfoot">&copy;
       <a href="https://iwk.mdw.ac.at/goebl/">Werner Goebl</a>,
@@ -230,7 +232,28 @@
     </div>
     <div class="rightfoot"></div>
   </div>
-  <div class="settingsPanel"></div>    
+
+  <div class="settingsPanel">
+    <div class="tab">
+      <button class="tabstart"><img src="{{ url_for('static', filename='svg/gear-16.svg') }}" /></button>
+      <button class="tablink" onclick="switchTab(event, 'meiFriendSettings')" id="defaultOpen">mei-friend</button>
+      <button class="tablink" onclick="switchTab(event, 'editorSettings')">Editor</button>
+      <button class="tablink" onclick="switchTab(event, 'verovioSettings')">Verovio</button>
+    </div>
+    <!-- Tab content -->
+    <div id="meiFriendSettings" class="tabcontent">
+      <h3>Settings mei-friend</h3>
+      <p>Supplied.</p>
+    </div>
+    <div id="editorSettings" class="tabcontent">
+      <h3>Editor Settings</h3>
+      <p>CodeMirror settings.</p>
+    </div>
+    <div id="verovioSettings" class="tabcontent">
+      <h3>Verovio Settings</h3>
+      <p>Here come the settings for Verovio.</p>
+    </div>
+  </div>
 
   <script>
     // menu bar behavior like MacOS menu bars
@@ -249,10 +272,34 @@
         show = !show;
       }
       // if user is logged out, force github menu to be hidden
-      if(document.getElementById('GithubMenu').classList.contains("loggedOut")) {
+      if (document.getElementById('GithubMenu').classList.contains("loggedOut")) {
         document.getElementById('GithubMenu').classList.remove("show");
       }
     });
+
+    // switch tabs in settings menu
+    function switchTab(evt, cityName) {
+      // Declare all variables
+      var i, tabcontent, tablink;
+
+      // Get all elements with class="tabcontent" and hide them
+      tabcontent = document.getElementsByClassName("tabcontent");
+      for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+      }
+
+      // Get all elements with class="tablink" and remove the class "active"
+      tablink = document.getElementsByClassName("tablink");
+      for (i = 0; i < tablink.length; i++) {
+        tablink[i].className = tablink[i].className.replace(" active", "");
+      }
+
+      // Show the current tab, and add an "active" class to the button that opened the tab
+      document.getElementById(cityName).style.display = "block";
+      evt.currentTarget.className += " active";
+    }
+
+    document.getElementById("defaultOpen").click();
   </script>
 </body>
 

@@ -85,7 +85,6 @@ a:active {
   -ms-transform: translate(-50%, -50%);
 }
 
-
 .openUrlOverlay {
   position: fixed;
   display: none;
@@ -507,17 +506,89 @@ span.keyIcon {
   content: "\25B8";
 }
 
+/* Settings Panel */
 .settingsPanel {
   position: absolute;
-  top: 5%;
+  top: 2%;
   right: 0;
-  background-color: aliceblue;
-  border-left: DodgerBlue solid 2px;
-  border-top: DodgerBlue solid 2px;
-  border-bottom: DodgerBlue solid 2px;
-  border-top-left-radius: 4px;
-  border-bottom-left-radius: 4px;
   min-width: 400px;
-  height: 90%;
+  height: 96%;
   z-index: 15;
+}
+
+/* Style the tab */
+.tab {
+  overflow: hidden;
+  border: none;
+  background-color: #f1f1f1;
+  border-left: #f1f1f1 solid 2px;
+  border-top: #f1f1f1 solid 2px;
+  border-top-left-radius: 5px;
+}
+
+/* Style the buttons that are used to open the tab content */
+.tablink {
+  font-size: 16px;
+  font-weight: bold;
+  background-color: inherit;
+  float: left;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 4px 12px;
+  transition: .3s;
+  min-height: 38px;
+  min-width: 46px;
+}
+
+.tabstart {
+  border: #f1f1f1 solid 2px;
+  border-top-left-radius: 5px;
+  cursor: default;
+  float: left;
+  outline: none;
+  padding: 4px 12px;
+  height: 38px;
+}
+
+/* Change background color of buttons on hover */
+.tablink:hover {
+  background-color: #ddd;
+  border-color: #ddd;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+}
+
+/* Create an active/current tablink class */
+.tablink.active {
+  background-color: #ddd;
+  border: #ddd solid 2px;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+}
+
+/* Style the tab content */
+.tabcontent {
+  display: none;
+  padding: 6px 12px;
+  animation: fadeEffect .3s;
+  /* Fading effect takes 1 second */
+  background-color: #ddd;
+  border-left: #ddd solid 2px;
+  border-right: #ddd solid 2px;
+  border-bottom: #ddd solid 2px;
+  border-bottom-right-radius: 5px;
+  border-bottom-left-radius: 5px;
+  height: 91%
+}
+
+/* Go from zero to full opacity */
+@keyframes fadeEffect {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
