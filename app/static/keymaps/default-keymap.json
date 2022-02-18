@@ -66,7 +66,6 @@
     "shift-g": "addGClefChangeBefore",
     "shift-c": "addCClefChangeBefore",
     "shift-f": "addFClefChangeBefore"
-
   },
 
   ".platform-darwin": {
@@ -91,7 +90,8 @@
     "cmd-o": "open",
     "cmd-s": "downloadMei",
     "cmd-shift-c": "cleanAccid",
-    "cmd-shift-r": "renumberMeasures"
+    "cmd-shift-r": "renumberMeasures",
+    "cmd-?": "consultGuidelines"
   },
 
   ".platform-win32, .platform-linux": {
@@ -116,6 +116,7 @@
     "ctrl-o": "open",
     "ctrl-s": "downloadMei",
     "ctrl-shift-c": "cleanAccid",
-    "ctrl-shift-r": "renumberMeasures"
+    "ctrl-shift-r": "renumberMeasures",
+    "ctrl-?": "consultGuidelines"
   }
 }

@@ -3,6 +3,11 @@ var spdWorker;
 var tkVersion = '';
 var tkAvailableOptions;
 var mei;
+var elementAtCursor;
+
+// guidelines base URL, needed to construct element / attribute URLs
+// TODO ideally determine version part automatically
+const guidelinesBase = "https://music-encoding.org/guidelines/v4/";
 
 // exports
 export var cm;
@@ -141,7 +146,8 @@ import {
   generateSectionSelect
 } from './control-menu.js';
 import {
-  setCursorToId
+  setCursorToId,
+  getElementAtCursor
 } from './utils.js';
 import {
   getInMeasure,
@@ -770,6 +776,23 @@ function downloadSvg() {
   a.click();
 }
 
+function consultGuidelines()  {
+  if(elementAtCursor) { 
+    // cursor is currently positioned on an element
+    if(elementAtCursor.classList.contains("cm-tag")) { 
+      // it's a tag, i.e. an XML element
+      let xmlEl = elementAtCursor.innerText;
+      if(xmlEl.length && !(xmlEl.includes(":"))) { 
+        // it's an element in the default (hopefully MEI..) namespace
+        window.open(
+          guidelinesBase + "elements/" + xmlEl.toLowerCase(),
+          "_blank"
+        );
+      }
+    }
+  }
+}
+
 
 // object of interface command functions for buttons and key bindings
 let cmd = {
@@ -871,8 +894,8 @@ let cmd = {
       storage.clear();
     }
     logoutFromGithub();
-  }
-
+  },
+  'consultGuidelines': () => { consultGuidelines() }
 };
 
 // layout notation position
@@ -1079,6 +1102,10 @@ function addEventListeners(v, cm) {
   document.getElementById('toggleSpicc')
     .addEventListener('click', cmd.toggleSpicc);
 
+  // consult guidelines 
+  document.getElementById('consultGuidelines')
+    .addEventListener('click', cmd.consultGuidelines);
+
   // reset application
   document.getElementById('resetDefault')
     .addEventListener('click', cmd.resetDefault);
@@ -1086,6 +1113,9 @@ function addEventListeners(v, cm) {
   // editor activity
   cm.on('cursorActivity', () => {
     v.cursorActivity(cm);
+    // determine element at encoding cursor
+    // (to offer guidelines page if requested)
+    elementAtCursor = getElementAtCursor(cm);
   });
 
   // flip button updates manually notation location to cursor pos in encoding
@@ -1196,6 +1226,7 @@ function setKeyMap(keyMapFilePath) {
           // console.info('Add listener to ', el);
           el.setAttribute('tabindex', '-1');
           el.addEventListener('keydown', (ev) => {
+            console.log("KEYDOWN ", ev)
             if (!document.activeElement.id == 'pagination2')
               ev.preventDefault();
             let keyName = ev.key;
