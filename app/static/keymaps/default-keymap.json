@@ -91,7 +91,8 @@
     "cmd-o": "open",
     "cmd-s": "downloadMei",
     "cmd-shift-c": "cleanAccid",
-    "cmd-shift-r": "renumberMeasures"
+    "cmd-shift-r": "renumberMeasures",
+    "cmd-,": "toggleSettingsPanel"
   },
 
   ".platform-win32, .platform-linux": {
@@ -116,6 +117,7 @@
     "ctrl-o": "open",
     "ctrl-s": "downloadMei",
     "ctrl-shift-c": "cleanAccid",
-    "ctrl-shift-r": "renumberMeasures"
+    "ctrl-shift-r": "renumberMeasures",
+    "ctrl-,": "toggleSettingsPanel"
   }
 }

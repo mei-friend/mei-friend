@@ -59,6 +59,14 @@ a:active {
   height: 1.6em;
 }
 
+.fillSpace {
+  flex: auto;
+}
+
+.settingsButton {
+  padding-right: 16px;
+}
+
 .dragOverlay {
   position: fixed;
   display: none;
@@ -507,13 +515,49 @@ span.keyIcon {
 }
 
 /* Settings Panel */
-.settingsPanel {
+#settingsPanel {
   position: absolute;
-  top: 2%;
-  right: 0;
+  top: 4px;
   min-width: 400px;
-  height: 96%;
+  height: 98%;
   z-index: 15;
+  display: none;
+}
+
+.in {
+  right: 0px;
+  animation: moveInFromRight .4s;
+  display: block;
+}
+
+.out {
+  right: -400px;
+  /* display: none; */
+  animation: moveOutToRight .3s;
+}
+
+@keyframes moveInFromRight {
+  from {
+    opacity: 0;
+    right: -400px;
+  }
+
+  to {
+    opacity: 1;
+    right: 0px;
+  }
+}
+
+@keyframes moveOutToRight {
+  from {
+    opacity: 1;
+    right: 0px;
+  }
+
+  to {
+    opacity: 0;
+    right: -400px;
+  }
 }
 
 /* Style the tab */
@@ -529,13 +573,12 @@ span.keyIcon {
 /* Style the buttons that are used to open the tab content */
 .tablink {
   font-size: 16px;
-  font-weight: bold;
   background-color: inherit;
   float: left;
   border: none;
   outline: none;
   cursor: pointer;
-  padding: 4px 12px;
+  padding: 2px 12px;
   transition: .3s;
   min-height: 38px;
   min-width: 46px;
@@ -575,7 +618,6 @@ span.keyIcon {
   /* Fading effect takes 1 second */
   background-color: #ddd;
   border-left: #ddd solid 2px;
-  border-right: #ddd solid 2px;
   border-bottom: #ddd solid 2px;
   border-bottom-right-radius: 5px;
   border-bottom-left-radius: 5px;
@@ -591,4 +633,16 @@ span.keyIcon {
   to {
     opacity: 1;
   }
+}
+
+/* Style the close button */
+.topright {
+  float: right;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 22px;
+}
+
+.topright:hover {
+  color: red;
 }

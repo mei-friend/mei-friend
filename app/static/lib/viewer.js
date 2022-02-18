@@ -524,6 +524,28 @@ export default class Viewer {
     // $(".mei-friend").attr('tabindex', '-1').focus();
   }
 
+  showSettingsPanel() {
+    let sp = document.getElementById('settingsPanel');
+    if (sp.style.display !== 'block') sp.style.display = 'block';
+    sp.classList.remove('out');
+    sp.classList.add('in');
+  }
+
+  toggleSettingsPanel(ev = null) {
+    if (ev) {
+      console.log('stop propagation')
+      ev.preventDefault();
+      ev.stopImmediatePropagation();
+    }
+    let sp = document.getElementById('settingsPanel');
+    if (sp.classList && sp.classList.contains('in')) {
+      sp.classList.remove('in');
+      sp.classList.add('out');
+    } else {
+      this.showSettingsPanel();
+    }
+  }
+
 
   // navigate forwards/backwards/upwards/downwards in the DOM, as defined
   // by 'dir' an by 'incrementElementName'

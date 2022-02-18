@@ -84,6 +84,8 @@
           <a id="bottom" href="#">Notation bottom</a>
           <a id="left" href="#">Notation left</a>
           <a id="right" href="#">Notation right</a>
+          <hr class="dropdown-line">
+          <a id="showSettingsMenu" href="#">Settings<span class="keyShortCut cmdKey">,</span></a>
         </div>
       </div>
       <div class="dropdown">
@@ -166,6 +168,8 @@
       <span id="fileChanged"></span>
       <span id="fileStorageExceeded"></span>
     </div>
+    <div class="fillSpace"></div>
+    <div id="showSettingsButton" class="icon icon-gear settingsButton"></div>
   </div>
 
   <div class="dragContainer">
@@ -233,12 +237,13 @@
     <div class="rightfoot"></div>
   </div>
 
-  <div class="settingsPanel">
+  <div id="settingsPanel" class="out">
     <div class="tab">
       <button class="tabstart"><img src="{{ url_for('static', filename='svg/gear-16.svg') }}" /></button>
       <button class="tablink" onclick="switchTab(event, 'meiFriendSettings')" id="defaultOpen">mei-friend</button>
       <button class="tablink" onclick="switchTab(event, 'editorSettings')">Editor</button>
       <button class="tablink" onclick="switchTab(event, 'verovioSettings')">Verovio</button>
+      <span id="closeSettingsButton" class="topright">&times</span>
     </div>
     <!-- Tab content -->
     <div id="meiFriendSettings" class="tabcontent">
