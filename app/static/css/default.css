@@ -50,14 +50,13 @@ a:active {
 }
 
 .title {
-  padding: 3px 20px;
+  padding: 3px 20px 3px 10px;
   font-weight: bold;
-  font-size: 21px;
+  font-size: 18pt;
 }
 
-.orientation button, .orientation {
-  padding: 2px;
-  font-size: 7pt;
+.title img {
+  height: 1.6em;
 }
 
 .dragOverlay {
@@ -75,6 +74,17 @@ a:active {
   opacity: .7;
   z-index: 200;
 }
+
+.dragOverlayText {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  font-size: 28pt;
+  color: white;
+  transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+}
+
 
 .openUrlOverlay {
   position: fixed;
@@ -112,18 +122,8 @@ a:active {
   width: 70%;
 }
 
-.dragOverlayText, {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  font-size: 50px;
-  color: white;
-  transform: translate(-50%, -50%);
-  -ms-transform: translate(-50%, -50%);
-}
-
 #openUrlStatus {
-  font-size: small;
+  font-size: 8pt;
   color: crimson;
   visibility: hidden;
 }
@@ -133,6 +133,57 @@ a:active {
 }
 
 #openUrlInput.warn {
+  border: 1px solid crimson;
+  background-color: mistyrose;
+}
+
+.forkRepositoryOverlay {
+  position: fixed;
+  display: none;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, .8);
+  z-index: 190;
+}
+
+.forkRepositoryOverlay .forkRepositoryUI {
+  position: absolute;
+  top: 20%;
+  left: 20%;
+  width: 60%;
+  height: 60%;
+  border: 5px solid darkblue;
+  border-radius: 32px;
+  background-color: cornflowerblue;
+  color: white;
+  z-index: 190;
+}
+
+.forkRepositoryOverlay .forkRepositoryUI>div {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 80%;
+  transform: translate(-50%, -50%);
+}
+
+.forkRepositoryOverlay .forkRepositoryUI input {
+  width: 30%;
+}
+
+#forkRepositoryStatus {
+  font-size: 8pt;
+  color: crimson;
+  visibility: hidden;
+}
+
+#forkRepositoryStatus.warn {
+  visibility: visible;
+}
+
+#forkRepositoryInput.warn {
   border: 1px solid crimson;
   background-color: mistyrose;
 }
@@ -175,7 +226,7 @@ a:active {
 
 .leftfoot {
   padding: 3px 6px;
-  min-width: 180px;
+  min-width: 240px;
 }
 
 .middlefoot {
@@ -213,7 +264,8 @@ a:active {
 
 .rightfoot {
   padding: 3px 6px;
-  min-width: 180px;
+  min-width: 330px;
+  text-align: right;
 }
 
 .control-menu {

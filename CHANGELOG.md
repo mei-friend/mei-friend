@@ -92,3 +92,19 @@
 * Improved error reporting from worker with incomplete MEI files
 * WoO 70 as default piece
 * Small bug fixes (correct page counting with <incip> data)
+# 0.2.5 patch
+* Refactor local storage handling
+* Implement storage override where filesizes exceed storage quota
+# 0.2.6 patch
+* Set breaks to 'line' when sb/pb elements found in encoding, to 'auto' otherwise
+* CodeMirror stays focussed after cursor activity
+# 0.3.0 minor: autocompletion
+* Incorporate CodeMirror's hint addons (show-hint, xml-hint)
+* Implement context-sensitive autocompletion
+* Supply mei-CMN and mei-all 4.0.1 RNGs as schemaInfo objects
+* Remember orientation upon refresh
+# 0.3.1 patch
+* Implement fork repository functionality
+# 0.3.2 patch
+* Accelerate speedMode using tXml in a separate worker for pre-computing time-spanning elements with @startid/@endid attributes
+* Support for toggling spiccato articulation with Shift+P
