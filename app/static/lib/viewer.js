@@ -159,26 +159,24 @@ export default class Viewer {
       this.currentPage = 1;
     console.info('xmlDOM pages counted: currentPage: ' + this.currentPage +
       ', pageCount: ' + this.pageCount);
-    // compute time-spanning element object in speed-worker
+    // compute time-spanning elements object in speed-worker
     if (this.pageSpanners && Object.keys(this.pageSpanners).length === 0 &&
       (breaksSelectVal !== 'auto' || Object.keys(this.pageBreaks).length > 0)) {
-      if (true) { // TODO: use worker
-        let message = {
-          'cmd': 'listPageSpanningElements',
-          'mei': mei,
-          'breaks': breaks,
-          'breaksOpt': breaksSelectVal
-        };
-        this.busy(true, true);
-        this.spdWorker.postMessage(message);
-      } else {
-        this.pageSpanners = speed
-          .listPageSpanningElements(this.xmlDoc, breaks, breaksSelectVal);
-        if (Object.keys(this.pageSpanners).length > 0)
-          console.log('pageSpanners object size: ' +
-            Object.keys(this.pageSpanners.start).length + ', ', this.pageSpanners);
-        else console.log('pageSpanners empty: ', this.pageSpanners);
-      }
+      // use worker solution with swift txml parsing
+      let message = {
+        'cmd': 'listPageSpanningElements',
+        'mei': mei,
+        'breaks': breaks,
+        'breaksOpt': breaksSelectVal
+      };
+      this.busy(true, true); // busy with anti-clockwise rotation
+      this.spdWorker.postMessage(message);
+      // this.pageSpanners = speed
+      //   .listPageSpanningElements(this.xmlDoc, breaks, breaksSelectVal);
+      // if (Object.keys(this.pageSpanners).length > 0)
+      //   console.log('pageSpanners object size: ' +
+      //     Object.keys(this.pageSpanners.start).length + ', ', this.pageSpanners);
+      // else console.log('pageSpanners empty: ', this.pageSpanners);
     }
     // retrieve requested MEI page from DOM
     return speed.getPageFromDom(this.xmlDoc, this.currentPage, breaks,
