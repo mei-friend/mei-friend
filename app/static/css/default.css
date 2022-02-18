@@ -65,6 +65,7 @@ a:active {
 
 .settingsButton {
   padding-right: 16px;
+  cursor: pointer;
 }
 
 .dragOverlay {
@@ -572,6 +573,7 @@ span.keyIcon {
 
 /* Style the buttons that are used to open the tab content */
 .tablink {
+  color: #808080;
   font-size: 16px;
   background-color: inherit;
   float: left;
@@ -579,12 +581,13 @@ span.keyIcon {
   outline: none;
   cursor: pointer;
   padding: 2px 12px;
-  transition: .3s;
+  transition: .2s;
   min-height: 38px;
   min-width: 46px;
 }
 
 .tabstart {
+  color: #808080;
   border: #f1f1f1 solid 2px;
   border-top-left-radius: 5px;
   cursor: default;
@@ -595,15 +598,17 @@ span.keyIcon {
 }
 
 /* Change background color of buttons on hover */
-.tablink:hover {
-  background-color: #ddd;
-  border-color: #ddd;
+.tablink:hover, .topright:hover {
+  color: black;
+  background-color: #e6e6e6;
+  border-color: #e6e6e6;
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;
 }
 
 /* Create an active/current tablink class */
 .tablink.active {
+  color: black;
   background-color: #ddd;
   border: #ddd solid 2px;
   border-top-left-radius: 5px;
@@ -614,8 +619,6 @@ span.keyIcon {
 .tabcontent {
   display: none;
   padding: 6px 12px;
-  animation: fadeEffect .3s;
-  /* Fading effect takes 1 second */
   background-color: #ddd;
   border-left: #ddd solid 2px;
   border-bottom: #ddd solid 2px;
@@ -624,19 +627,9 @@ span.keyIcon {
   height: 91%
 }
 
-/* Go from zero to full opacity */
-@keyframes fadeEffect {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
 /* Style the close button */
 .topright {
+  color: #808080;
   float: right;
   padding: 6px 12px;
   cursor: pointer;
@@ -644,5 +637,5 @@ span.keyIcon {
 }
 
 .topright:hover {
-  color: red;
+  color: black;
 }
