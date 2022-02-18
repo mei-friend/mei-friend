@@ -91,7 +91,7 @@
     "cmd-s": "downloadMei",
     "cmd-shift-c": "cleanAccid",
     "cmd-shift-r": "renumberMeasures",
-    "cmd-?": "consultGuidelines"
+    "alt-.": "consultGuidelines"
   },
 
   ".platform-win32, .platform-linux": {
@@ -117,6 +117,6 @@
     "ctrl-s": "downloadMei",
     "ctrl-shift-c": "cleanAccid",
     "ctrl-shift-r": "renumberMeasures",
-    "ctrl-?": "consultGuidelines"
+    "alt-.": "consultGuidelines"
   }
 }

@@ -198,17 +198,6 @@ export function getIdOfNextElement(cm, rw, elementNames = dutils.navElsArray,
   }
 }
 
-// returns the DOM element at encoding cursor position
-export function getElementAtCursor(cm) {
-  let cursor = cm.getCursor();
-  let coords = cm.cursorCoords({
-    ch: cursor.ch,
-    line: cursor.line
-  }, "window"); 
-  let elem = document.elementFromPoint(coords.left, coords.top);
-  return elem;
-}
-
 // returns xml:id of current element (at encoding cursor position). If empty,
 // search for next higher staff or measure xml:id
 export function getElementIdAtCursor(cm) {

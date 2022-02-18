@@ -108,4 +108,6 @@
 # 0.3.2 patch
 * Accelerate speedMode using tXml in a separate worker for pre-computing time-spanning elements with @startid/@endid attributes
 * Support for toggling spiccato articulation with Shift+P
+# 0.3.3 patch
 * Add 'Show MEI Guidelines' in Help menu
+* Implement 'Consult Guidelines' feature ('alt-.')

@@ -146,12 +146,12 @@ import {
   generateSectionSelect
 } from './control-menu.js';
 import {
-  setCursorToId,
-  getElementAtCursor
+  setCursorToId
 } from './utils.js';
 import {
   getInMeasure,
-  navElsSelector
+  navElsSelector,
+  getElementAtCursor
 } from './dom-utils.js';
 import * as e from './editor.js'
 import Viewer from './viewer.js';
@@ -169,8 +169,8 @@ import {
 import schema_meiAll from '../schemaInfo/mei-CMN-4.0.1.schemaInfo.js';
 
 // mei-friend version and date
-const version = 'develop-0.3.2';
-const versionDate = '15 Feb 2022';
+const version = 'develop-0.3.3';
+const versionDate = '18 Feb 2022';
 // const defaultMeiFileName = `${root}Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei`;
 const defaultMeiFileName = `${root}Beethoven_WoO70-Breitkopf.mei`;
 const defaultVerovioOptions = {
@@ -248,7 +248,8 @@ document.addEventListener('DOMContentLoaded', function() {
       "'/'": completeIfAfterLt,
       "' '": completeIfInTag,
       "'='": completeIfInTag,
-      "Ctrl-Space": "autocomplete"
+      "Ctrl-Space": "autocomplete",
+      "Alt-.": consultGuidelines
     },
     hintOptions: {
       schemaInfo: schema_meiAll
@@ -779,15 +780,20 @@ function downloadSvg() {
 function consultGuidelines()  {
   if(elementAtCursor) { 
     // cursor is currently positioned on an element
-    if(elementAtCursor.classList.contains("cm-tag")) { 
-      // it's a tag, i.e. an XML element
-      let xmlEl = elementAtCursor.innerText;
-      if(xmlEl.length && !(xmlEl.includes(":"))) { 
-        // it's an element in the default (hopefully MEI..) namespace
-        window.open(
-          guidelinesBase + "elements/" + xmlEl.toLowerCase(),
-          "_blank"
-        );
+    // move up to the closest "presentation" (codemirror line)
+    const presentation = elementAtCursor.closest('span[role="presentation"]');
+    if(presentation) { 
+      // choose the first XML element (a "tag" that isn't a "bracket")
+      const xmlEl = presentation.querySelector(".cm-tag:not(.cm-bracket)");
+      if(xmlEl) { 
+        let xmlElName = xmlEl.innerText;
+        if(xmlElName.length && !(xmlElName.includes(":"))) { 
+          // it's an element in the default (hopefully MEI...) namespace
+          window.open(
+            guidelinesBase + "elements/" + xmlElName.toLowerCase(),
+            "_blank"
+          );
+        }
       }
     }
   }
@@ -895,7 +901,7 @@ let cmd = {
     }
     logoutFromGithub();
   },
-  'consultGuidelines': () => { consultGuidelines() }
+  'consultGuidelines': () => consultGuidelines()
 };
 
 // layout notation position

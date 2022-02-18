@@ -194,3 +194,15 @@ export function isFirstElementOnPage(id) {
     ', BOOL: ' + (thisId == firstId));
   return (thisId == firstId);
 }
+
+// returns the DOM element at encoding cursor position
+export function getElementAtCursor(cm) {
+  let cursor = cm.getCursor();
+  let coords = cm.cursorCoords({
+    ch: cursor.ch,
+    line: cursor.line
+  }, "window"); 
+  let elem = document.elementFromPoint(coords.left, coords.top);
+  return elem;
+}
+
