@@ -788,6 +788,7 @@ let cmd = {
   'notationBottom': () => setOrientation(cm, "bottom", v, storage),
   'notationLeft': () => setOrientation(cm, "left", v, storage),
   'showSettingsPanel': () => v.showSettingsPanel(),
+  'hideSettingsPanel': () => v.hideSettingsPanel(),
   'toggleSettingsPanel': (ev) => v.toggleSettingsPanel(ev),
   'notationRight': () => setOrientation(cm, "right", v, storage),
   'moveProgBar': () => moveProgressBar(),
@@ -886,8 +887,9 @@ function addEventListeners(v, cm) {
   document.getElementById('right').addEventListener('click', cmd.notationRight);
   // show settings panel
   document.getElementById('showSettingsMenu').addEventListener('click', cmd.showSettingsPanel);
-  document.getElementById('showSettingsButton').addEventListener('click', cmd.toggleSettingsPanel);
-  document.getElementById('closeSettingsButton').addEventListener('click', cmd.toggleSettingsPanel);
+  document.getElementById('showSettingsButton').addEventListener('click', cmd.showSettingsPanel);
+  document.getElementById('hideSettingsButton').addEventListener('click', cmd.hideSettingsPanel);
+  document.getElementById('closeSettingsButton').addEventListener('click', cmd.hideSettingsPanel);
 
   // open dialogs
   document.getElementById('OpenMei').addEventListener('click', cmd.open);

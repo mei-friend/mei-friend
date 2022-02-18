@@ -169,7 +169,7 @@
       <span id="fileStorageExceeded"></span>
     </div>
     <div class="fillSpace"></div>
-    <div id="showSettingsButton" class="icon icon-gear settingsButton"></div>
+    <div id="showSettingsButton" class="icon-gear settingsButton"></div>
   </div>
 
   <div class="dragContainer">
@@ -239,7 +239,7 @@
 
   <div id="settingsPanel" class="out">
     <div class="tab">
-      <button class="tabstart"><img src="{{ url_for('static', filename='svg/gear-16.svg') }}" /></button>
+      <button id="hideSettingsButton" class="tabstart"><img src="{{ url_for('static', filename='svg/gear-16.svg') }}" /></button>
       <button class="tablink" onclick="switchTab(event, 'meiFriendSettings')" id="defaultOpen">mei-friend</button>
       <button class="tablink" onclick="switchTab(event, 'editorSettings')">Editor</button>
       <button class="tablink" onclick="switchTab(event, 'verovioSettings')">Verovio</button>

@@ -531,6 +531,12 @@ export default class Viewer {
     sp.classList.add('in');
   }
 
+  hideSettingsPanel() {
+    let sp = document.getElementById('settingsPanel');
+    sp.classList.add('out');
+    sp.classList.remove('in');
+  }
+
   toggleSettingsPanel(ev = null) {
     if (ev) {
       console.log('stop propagation')
@@ -539,8 +545,7 @@ export default class Viewer {
     }
     let sp = document.getElementById('settingsPanel');
     if (sp.classList && sp.classList.contains('in')) {
-      sp.classList.remove('in');
-      sp.classList.add('out');
+      this.hideSettingsPanel();
     } else {
       this.showSettingsPanel();
     }
