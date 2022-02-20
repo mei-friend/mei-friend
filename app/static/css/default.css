@@ -523,7 +523,7 @@ span.keyIcon {
 #settingsPanel {
   position: absolute;
   top: 4px;
-  min-width: 400px;
+  min-width: 360px;
   height: 98%;
   z-index: 15;
   display: none;
@@ -536,7 +536,7 @@ span.keyIcon {
 }
 
 .out {
-  right: -400px;
+  right: -360px;
   /* display: none; */
   animation: moveOutToRight .3s;
 }
@@ -544,7 +544,7 @@ span.keyIcon {
 @keyframes moveInFromRight {
   from {
     opacity: .7;
-    right: -400px;
+    right: -360px;
   }
 
   to {
@@ -561,7 +561,7 @@ span.keyIcon {
 
   to {
     opacity: .7;
-    right: -400px;
+    right: -360px;
   }
 }
 
@@ -633,6 +633,16 @@ span.keyIcon {
   overflow: auto;
 }
 
+.tabcontent h2 {
+  font-size: 12pt;
+}
+
+.tabcontent input[type="button"] {
+  float: right;
+  margin-top: 10px;
+  margin-right: 2px;
+}
+
 /* Style the close button */
 .topright {
   color: #808080;
@@ -658,4 +668,14 @@ span.keyIcon {
 .optionsItem label {
   margin-left: 3px;
   margin-right: 3px;
+  margin-top: 2px;
+  margin-bottom: 2px;
+  min-width: 220px;
+  float: left;
+  text-align: right;
+}
+
+.optionsItem input[type="number"] {
+  min-width: 55px;
+  max-width: 55px;
 }

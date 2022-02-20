@@ -240,7 +240,10 @@ export default class Viewer {
 
   // update options in viewer from user interface
   setVerovioOptions(newOptions = {}) {
-    if (Object.keys(newOptions).length > 0) this.vrvOptions = newOptions;
+    if (Object.keys(newOptions).length > 0)
+      this.vrvOptions = {
+        ...newOptions
+      };
     let zoom = document.getElementById('verovio-zoom');
     if (zoom) this.vrvOptions.scale = parseInt(zoom.value);
     let fontSel = document.getElementById('font-select');
@@ -554,6 +557,9 @@ export default class Viewer {
   // initializes the settings panel by filling it with content
   addVrvOptionsToSettingsPanel(tkAvailableOptions, defaultVrvOptions) {
     let vsp = document.getElementById('verovioSettings');
+    let addListeners = false; // add event listeners only the first time
+    if (!/\w/g.test(vsp.innerHTML)) addListeners = true;
+    vsp.innerHTML = '';
     Object.keys(tkAvailableOptions.groups).forEach((grp) => {
       console.log('g: ' + grp);
       let grpName = tkAvailableOptions.groups[grp].name;
@@ -561,9 +567,11 @@ export default class Viewer {
       if (!grpName.startsWith('Base short') && !grpName.startsWith('Element selectors')) {
         console.log('Group ' + grpName + ', ' + grpOpts.length + ' options.');
         vsp.innerHTML += '<div><h2>' + grpName + '</h2></div>';
-
+        let skipList = ['font', 'breaks', 'engravingDefaults', 'expand',
+          'svgAdditionalAttribute', 'handwrittenFont'
+        ];
         Object.keys(grpOpts).forEach(opt => {
-          if (opt !== 'font' && opt !== 'breaks') {
+          if (!skipList.includes(opt)) {
             let optTitle = grpOpts[opt].title;
             let optDescr = grpOpts[opt].description;
             let optType = grpOpts[opt].type;
@@ -616,14 +624,22 @@ export default class Viewer {
                 console.log('XXXXX unhandled data type: ' + optType);
             }
             if (input) div.appendChild(input);
-
-            console.log('title: ' + optTitle + ' [' + optType + '], default: [' + optDefault + '], keys: ', optKeys);
             vsp.appendChild(div);
           }
         });
       }
     });
-
+    vsp.innerHTML += '<input type="button" id="reset" value="Reset" />';
+    if (addListeners) { // add change listeners
+      vsp.addEventListener('input', ev => {
+        this.vrvOptions[ev.srcElement.id] = ev.srcElement.value;
+        this.updateLayout(this.vrvOptions);
+      });
+      vsp.addEventListener('click', (ev) => {
+        if (ev.srcElement.id === 'reset')
+          this.addVrvOptionsToSettingsPanel(tkAvailableOptions, defaultVrvOptions);
+      });
+    }
   }
 
   // navigate forwards/backwards/upwards/downwards in the DOM, as defined
