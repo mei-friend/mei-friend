@@ -636,8 +636,10 @@ export default class Viewer {
         this.updateLayout(this.vrvOptions);
       });
       vsp.addEventListener('click', (ev) => {
-        if (ev.srcElement.id === 'reset')
+        if (ev.srcElement.id === 'reset') {
           this.addVrvOptionsToSettingsPanel(tkAvailableOptions, defaultVrvOptions);
+          this.updateLayout(defaultVrvOptions);
+        }
       });
     }
   }
