@@ -449,6 +449,7 @@ function vrvWorkerEventsHandler(ev) {
       console.info('main(). Handler vrvLoaded: ', this);
       tkVersion = ev.data.version;
       tkAvailableOptions = ev.data.availableOptions;
+      v.addVrvOptionsToSettingsPanel(tkAvailableOptions, defaultVerovioOptions);
       document.querySelector(".rightfoot").innerHTML +=
         `&nbsp;<a href="https://www.verovio.org/">Verovio ${tkVersion}</a>.`;
       document.querySelector(".statusbar").innerHTML =

@@ -578,7 +578,7 @@ span.keyIcon {
 /* Style the buttons that are used to open the tab content */
 .tablink {
   color: #808080;
-  font-size: 16px;
+  font-size: 12pt;
   background-color: inherit;
   float: left;
   border: none;
@@ -621,6 +621,7 @@ span.keyIcon {
 
 /* Style the tab content */
 .tabcontent {
+  font-size: 10pt;
   display: none;
   padding: 6px 12px;
   background-color: #ddd;
@@ -629,6 +630,7 @@ span.keyIcon {
   border-bottom-right-radius: 5px;
   border-bottom-left-radius: 5px;
   height: 95%;
+  overflow: auto;
 }
 
 /* Style the close button */
@@ -642,4 +644,18 @@ span.keyIcon {
 
 .topright:hover {
   color: black;
+}
+
+.optionsItem {
+  display: block;
+  margin: 2px;
+}
+
+.optionsItem:nth-of-type(even) {
+  background-color: #e6e6e6;
+}
+
+.optionsItem label {
+  margin-left: 3px;
+  margin-right: 3px;
 }

@@ -551,6 +551,80 @@ export default class Viewer {
     }
   }
 
+  // initializes the settings panel by filling it with content
+  addVrvOptionsToSettingsPanel(tkAvailableOptions, defaultVrvOptions) {
+    let vsp = document.getElementById('verovioSettings');
+    Object.keys(tkAvailableOptions.groups).forEach((grp) => {
+      console.log('g: ' + grp);
+      let grpName = tkAvailableOptions.groups[grp].name;
+      let grpOpts = tkAvailableOptions.groups[grp].options;
+      if (!grpName.startsWith('Base short') && !grpName.startsWith('Element selectors')) {
+        console.log('Group ' + grpName + ', ' + grpOpts.length + ' options.');
+        vsp.innerHTML += '<div><h2>' + grpName + '</h2></div>';
+
+        Object.keys(grpOpts).forEach(opt => {
+          if (opt !== 'font' && opt !== 'breaks') {
+            let optTitle = grpOpts[opt].title;
+            let optDescr = grpOpts[opt].description;
+            let optType = grpOpts[opt].type;
+            let optDefault = grpOpts[opt].default;
+            if (opt in defaultVrvOptions) optDefault = defaultVrvOptions[opt];
+            let div = document.createElement('div');
+            div.classList.add('optionsItem');
+            let label = document.createElement('label')
+            label.setAttribute('title', optDescr + ' (default: ' + optDefault + ')');
+            label.setAttribute('for', opt);
+            label.innerText = optTitle;
+            div.appendChild(label);
+            let optKeys = Object.keys(grpOpts[opt]);
+            let input;
+            let step = .05;
+            switch (optType) {
+              case 'bool':
+                input = document.createElement('input');
+                input.setAttribute('type', 'checkbox');
+                input.setAttribute('name', opt);
+                input.setAttribute('id', opt);
+                if (optDefault) input.setAttribute('checked', true);
+                break;
+              case 'int':
+                step = 1;
+              case 'double':
+                input = document.createElement('input');
+                input.setAttribute('type', 'number');
+                input.setAttribute('name', opt);
+                input.setAttribute('id', opt);
+                if (optKeys.includes('min')) input.setAttribute('min', grpOpts[opt].min);
+                if (optKeys.includes('max')) input.setAttribute('max', grpOpts[opt].max);
+                input.setAttribute('step', (optKeys.includes('step')) ? grpOpts[opt].step : step);
+                input.setAttribute('value', optDefault);
+                break;
+              case 'std::string-list':
+                input = document.createElement('select');
+                input.setAttribute('name', opt);
+                input.setAttribute('id', opt);
+                grpOpts[opt].values.forEach((str, i) => {
+                  input.add(new Option(str, str,
+                    (grpOpts[opt].values.indexOf(optDefault) == i) ? true : false));
+                });
+                // input[grpOpts[opt].values.indexOf(optDefault)].selected = 'selected';
+                // input.options[grpOpts[opt].values.indexOf(optDefault)].selected = 'selected';
+                break;
+                // case 'array':
+                //   break;
+              default:
+                console.log('XXXXX unhandled data type: ' + optType);
+            }
+            if (input) div.appendChild(input);
+
+            console.log('title: ' + optTitle + ' [' + optType + '], default: [' + optDefault + '], keys: ', optKeys);
+            vsp.appendChild(div);
+          }
+        });
+      }
+    });
+
+  }
 
   // navigate forwards/backwards/upwards/downwards in the DOM, as defined
   // by 'dir' an by 'incrementElementName'
