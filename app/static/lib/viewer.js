@@ -606,7 +606,11 @@ export default class Viewer {
         description: 'Select the theme of the editor',
         type: 'select',
         default: 'default',
-        values: ['default', 'abbott', 'base16-dark', 'base16-light', 'darcula', 'dracula', 'eclipse', 'monokai']
+        values: ['default', 'abbott', 'base16-dark', 'base16-light', 'cobalt',
+          'darcula', 'dracula', 'eclipse', 'elegant', 'monokai', 'idea',
+          'juejin', 'mdn-like', 'neo', 'paraiso-dark', 'paraiso-light',
+          'pastel-on-dark', 'xq-dark', 'xq-light', 'yeti', 'yonce', 'zenburn'
+        ]
       },
       tabSize: {
         title: 'Tab size',
@@ -640,14 +644,14 @@ export default class Viewer {
       },
       keyMap: {
         title: 'Key map',
-        description: 'Key map',
+        description: 'Select key map',
         type: 'select',
         default: 'default',
         values: ['default', 'vim', 'emacs']
       },
       hintOptions: {
-        title: 'Show hints',
-        description: 'Show hints',
+        title: 'Show hints for schema',
+        description: 'Show hints for selected XML schema and autocomplete',
         type: 'select',
         default: 'schema_meiCMN_401',
         values: ['schema_meiCMN_401', 'schema_meiAll_401', 'none']

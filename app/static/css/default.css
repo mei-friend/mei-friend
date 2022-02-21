@@ -666,6 +666,18 @@ span.keyIcon {
   background-color: #e6e6e6;
 }
 
+/* Just for #editorSettings */
+#editorSettings .optionsItem label {
+  min-width: 160px;
+  max-width: 160px;
+}
+
+#editorSettings .optionsItem select {
+  min-width: 80px;
+  max-width: 145px;
+}
+
+/* For all options items  */
 .optionsItem label {
   margin-left: 3px;
   margin-right: 3px;
