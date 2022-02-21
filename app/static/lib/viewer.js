@@ -556,44 +556,42 @@ export default class Viewer {
 
   // initializes the settings panel by filling it with content
   addVrvOptionsToSettingsPanel(tkAvailableOptions, defaultVrvOptions) {
+    // skip these options (iin part because they are handled in control menu)
+    let skipList = ['font', 'breaks', 'engravingDefaults', 'expand',
+      'svgAdditionalAttribute', 'handwrittenFont'
+    ];
     let vsp = document.getElementById('verovioSettings');
     let addListeners = false; // add event listeners only the first time
     if (!/\w/g.test(vsp.innerHTML)) addListeners = true;
     vsp.innerHTML = '';
     Object.keys(tkAvailableOptions.groups).forEach((grp) => {
-      console.log('g: ' + grp);
-      let grpName = tkAvailableOptions.groups[grp].name;
-      let grpOpts = tkAvailableOptions.groups[grp].options;
-      if (!grpName.startsWith('Base short') && !grpName.startsWith('Element selectors')) {
-        console.log('Group ' + grpName + ', ' + grpOpts.length + ' options.');
-        vsp.innerHTML += '<div><h2>' + grpName + '</h2></div>';
-        let skipList = ['font', 'breaks', 'engravingDefaults', 'expand',
-          'svgAdditionalAttribute', 'handwrittenFont'
-        ];
-        Object.keys(grpOpts).forEach(opt => {
+      let group = tkAvailableOptions.groups[grp];
+      // skip these two groups: base handled by mei-friend; sel to be thought
+      if (!group.name.startsWith('Base short') &&
+        !group.name.startsWith('Element selectors')) {
+        vsp.innerHTML += '<div><h2>' + group.name + '</h2></div>';
+        Object.keys(group.options).forEach(opt => {
           if (!skipList.includes(opt)) {
-            let optTitle = grpOpts[opt].title;
-            let optDescr = grpOpts[opt].description;
-            let optType = grpOpts[opt].type;
-            let optDefault = grpOpts[opt].default;
+            let o = group.options[opt];
+            let optDefault = o.default;
             if (opt in defaultVrvOptions) optDefault = defaultVrvOptions[opt];
             let div = document.createElement('div');
             div.classList.add('optionsItem');
             let label = document.createElement('label')
-            label.setAttribute('title', optDescr + ' (default: ' + optDefault + ')');
+            label.setAttribute('title', o.description + ' (default: ' + optDefault + ')');
             label.setAttribute('for', opt);
-            label.innerText = optTitle;
+            label.innerText = o.title;
             div.appendChild(label);
-            let optKeys = Object.keys(grpOpts[opt]);
             let input;
             let step = .05;
-            switch (optType) {
+            switch (o.type) {
               case 'bool':
                 input = document.createElement('input');
                 input.setAttribute('type', 'checkbox');
                 input.setAttribute('name', opt);
                 input.setAttribute('id', opt);
                 if (optDefault) input.setAttribute('checked', true);
+                this.vrvOptions[opt] = optDefault;
                 break;
               case 'int':
                 step = 1;
@@ -602,26 +600,27 @@ export default class Viewer {
                 input.setAttribute('type', 'number');
                 input.setAttribute('name', opt);
                 input.setAttribute('id', opt);
-                if (optKeys.includes('min')) input.setAttribute('min', grpOpts[opt].min);
-                if (optKeys.includes('max')) input.setAttribute('max', grpOpts[opt].max);
-                input.setAttribute('step', (optKeys.includes('step')) ? grpOpts[opt].step : step);
+                let optKeys = Object.keys(o);
+                if (optKeys.includes('min')) input.setAttribute('min', o.min);
+                if (optKeys.includes('max')) input.setAttribute('max', o.max);
+                input.setAttribute('step', (optKeys.includes('step')) ? o.step : step);
                 input.setAttribute('value', optDefault);
+                this.vrvOptions[opt] = optDefault;
                 break;
               case 'std::string-list':
                 input = document.createElement('select');
                 input.setAttribute('name', opt);
                 input.setAttribute('id', opt);
-                grpOpts[opt].values.forEach((str, i) => {
+                o.values.forEach((str, i) => {
                   input.add(new Option(str, str,
-                    (grpOpts[opt].values.indexOf(optDefault) == i) ? true : false));
+                    (o.values.indexOf(optDefault) == i) ? true : false));
                 });
-                // input[grpOpts[opt].values.indexOf(optDefault)].selected = 'selected';
-                // input.options[grpOpts[opt].values.indexOf(optDefault)].selected = 'selected';
+                this.vrvOptions[opt] = optDefault;
                 break;
-                // case 'array':
-                //   break;
               default:
-                console.log('XXXXX unhandled data type: ' + optType);
+                console.log('Vervio Options: Unhandled data type: ' + o.type);
+                console.log('title: ' + o.title + ' [' + o.type +
+                  '], default: [' + optDefault + '], keys: ', grp.options);
             }
             if (input) div.appendChild(input);
             vsp.appendChild(div);
@@ -638,7 +637,7 @@ export default class Viewer {
       vsp.addEventListener('click', (ev) => {
         if (ev.srcElement.id === 'reset') {
           this.addVrvOptionsToSettingsPanel(tkAvailableOptions, defaultVrvOptions);
-          this.updateLayout(defaultVrvOptions);
+          this.updateLayout(this.vrvOptions);
         }
       });
     }
