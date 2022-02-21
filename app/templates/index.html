@@ -242,9 +242,9 @@
       <button id="hideSettingsButton" class="tabstart" title="Hide Settings Panel">
         <img src="{{ url_for('static', filename='svg/gear-16.svg') }}" />
       </button>
-      <button class="tablink" onclick="switchTab(event, 'meiFriendSettings')" id="defaultOpen" title="mei-friend Settings">mei-friend</button>
+      <button class="tablink" onclick="switchTab(event, 'meiFriendSettings')" title="mei-friend Settings">mei-friend</button>
       <button class="tablink" onclick="switchTab(event, 'editorSettings')" title="Editor Settings">Editor</button>
-      <button class="tablink" onclick="switchTab(event, 'verovioSettings')" title="Verovio Options">Verovio</button>
+      <button class="tablink" onclick="switchTab(event, 'verovioSettings')" title="Verovio Options" id="defaultOpen">Verovio</button>
       <span id="closeSettingsButton" class="topright" title="Hide Settings Panel">&times</span>
     </div>
     <!-- Tab content -->
