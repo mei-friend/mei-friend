@@ -7,6 +7,8 @@ import * as dutils from './dom-utils.js';
 import {
   addToolTip
 } from './control-menu.js';
+import schema_meiCMN_401 from '../schemaInfo/mei-CMN-4.0.1.schemaInfo.js';
+import schema_meiAll_401 from '../schemaInfo/mei-all-4.0.1.schemaInfo.js';
 
 
 export default class Viewer {
@@ -575,55 +577,9 @@ export default class Viewer {
             let o = group.options[opt];
             let optDefault = o.default;
             if (opt in defaultVrvOptions) optDefault = defaultVrvOptions[opt];
-            let div = document.createElement('div');
-            div.classList.add('optionsItem');
-            let label = document.createElement('label')
-            label.setAttribute('title', o.description + ' (default: ' + optDefault + ')');
-            label.setAttribute('for', opt);
-            label.innerText = o.title;
-            div.appendChild(label);
-            let input;
-            let step = .05;
-            switch (o.type) {
-              case 'bool':
-                input = document.createElement('input');
-                input.setAttribute('type', 'checkbox');
-                input.setAttribute('name', opt);
-                input.setAttribute('id', opt);
-                if (optDefault) input.setAttribute('checked', true);
-                this.vrvOptions[opt] = optDefault;
-                break;
-              case 'int':
-                step = 1;
-              case 'double':
-                input = document.createElement('input');
-                input.setAttribute('type', 'number');
-                input.setAttribute('name', opt);
-                input.setAttribute('id', opt);
-                let optKeys = Object.keys(o);
-                if (optKeys.includes('min')) input.setAttribute('min', o.min);
-                if (optKeys.includes('max')) input.setAttribute('max', o.max);
-                input.setAttribute('step', (optKeys.includes('step')) ? o.step : step);
-                input.setAttribute('value', optDefault);
-                this.vrvOptions[opt] = optDefault;
-                break;
-              case 'std::string-list':
-                input = document.createElement('select');
-                input.setAttribute('name', opt);
-                input.setAttribute('id', opt);
-                o.values.forEach((str, i) => {
-                  input.add(new Option(str, str,
-                    (o.values.indexOf(optDefault) == i) ? true : false));
-                });
-                this.vrvOptions[opt] = optDefault;
-                break;
-              default:
-                console.log('Vervio Options: Unhandled data type: ' + o.type);
-                console.log('title: ' + o.title + ' [' + o.type +
-                  '], default: [' + optDefault + '], keys: ', grp.options);
-            }
-            if (input) div.appendChild(input);
-            vsp.appendChild(div);
+            vsp.appendChild(this.createOptionsItem(opt, o, optDefault));
+            if (['bool', 'int', 'double', 'std::string-list'].includes(o.type))
+              this.vrvOptions[opt] = optDefault;
           }
         });
       }
@@ -641,6 +597,149 @@ export default class Viewer {
         }
       });
     }
+  }
+
+  addCmOptionsToSettingsPanel(cm, mfDefaults) {
+    let optionsToShow = { // key as in CodeMirror
+      theme: {
+        title: 'Theme',
+        description: 'Select the theme of the editor',
+        type: 'select',
+        default: 'default',
+        values: ['default', 'abbott', 'base16-dark', 'base16-light', 'darcula', 'dracula', 'eclipse', 'monokai']
+      },
+      tabSize: {
+        title: 'Tab size',
+        description: 'Number of space characters for each indentation level',
+        type: 'int',
+        min: 1,
+        max: 12,
+        step: 1,
+        default: '3'
+      },
+      lineWrapping: {
+        title: 'Line wrapping',
+        description: 'Whether or not lines are wrapped at end of panel',
+        type: 'bool',
+        default: false
+      },
+      lineNumbers: {
+        title: 'Line numbers',
+        description: 'Show line numbers',
+        type: 'bool',
+        default: true
+      },
+      firstLineNumber: {
+        title: 'First line number',
+        description: 'Set first line number',
+        type: 'int',
+        min: 0,
+        max: 1,
+        step: 1,
+        default: 1
+      },
+      keyMap: {
+        title: 'Key map',
+        description: 'Key map',
+        type: 'select',
+        default: 'default',
+        values: ['default', 'vim', 'emacs']
+      },
+      hintOptions: {
+        title: 'Show hints',
+        description: 'Show hints',
+        type: 'select',
+        default: 'schema_meiCMN_401',
+        values: ['schema_meiCMN_401', 'schema_meiAll_401', 'none']
+      }
+    };
+    let cmsp = document.getElementById('editorSettings');
+    let addListeners = false; // add event listeners only the first time
+    if (!/\w/g.test(cmsp.innerHTML)) addListeners = true;
+    cmsp.innerHTML = '<div><h2>Editor Settings</h2></div>';
+    Object.keys(optionsToShow).forEach(opt => {
+      let o = optionsToShow[opt];
+      let optDefault = o.default;
+      // console.log('OptionItem: ' + opt + ', default: ' + optDefault);
+      cmsp.appendChild(this.createOptionsItem(opt, o, optDefault));
+    });
+    if (addListeners) { // add change listeners
+      cmsp.addEventListener('input', ev => {
+        console.log('ev.srcElement: ', ev.srcElement);
+        let option = ev.srcElement.id;
+        let value = ev.srcElement.value;
+        if (ev.srcElement.type === 'checkbox') value = ev.srcElement.checked;
+        if (ev.srcElement.type === 'number') value = parseFloat(value);
+        console.log('CM EventListener: ' + option + ': ', value);
+        mfDefaults[option] = value;
+        if (option === 'hintOptions') {
+          if (value === 'schema_meiAll_401')
+            cm.setOption(option, {
+              'schemaInfo': {
+                ...schema_meiAll_401
+              }
+            });
+          else if (value === 'schema_meiCMN_401')
+            cm.setOption(option, {
+              'schemaInfo': {
+                ...schema_meiCMN_401
+              }
+            });
+          else cm.setOption(option, {}); // hints: none
+        } else {
+          cm.setOption(option, value);
+        }
+      });
+    }
+  }
+
+  // creates an option div with a label and input/select depending of o.keys
+  createOptionsItem(opt, o, optDefault) {
+    let div = document.createElement('div');
+    div.classList.add('optionsItem');
+    let label = document.createElement('label')
+    label.setAttribute('title', o.description + ' (default: ' +
+      optDefault + ')');
+    label.setAttribute('for', opt);
+    label.innerText = o.title;
+    div.appendChild(label);
+    let input;
+    let step = .05;
+    switch (o.type) {
+      case 'bool':
+        input = document.createElement('input');
+        input.setAttribute('type', 'checkbox');
+        input.setAttribute('name', opt);
+        input.setAttribute('id', opt);
+        if (optDefault) input.setAttribute('checked', true);
+        break;
+      case 'int':
+        step = 1;
+      case 'double':
+        input = document.createElement('input');
+        input.setAttribute('type', 'number');
+        input.setAttribute('name', opt);
+        input.setAttribute('id', opt);
+        let optKeys = Object.keys(o);
+        if (optKeys.includes('min')) input.setAttribute('min', o.min);
+        if (optKeys.includes('max')) input.setAttribute('max', o.max);
+        input.setAttribute('step', (optKeys.includes('step')) ? o.step : step);
+        input.setAttribute('value', optDefault);
+        break;
+      case 'select':
+      case 'std::string-list':
+        input = document.createElement('select');
+        input.setAttribute('name', opt);
+        input.setAttribute('id', opt);
+        o.values.forEach((str, i) => input.add(new Option(str, str,
+          (o.values.indexOf(optDefault) == i) ? true : false)));
+        break;
+      default:
+        console.log('Vervio Options: Unhandled data type: ' + o.type);
+        console.log('title: ' + o.title + ' [' + o.type + '], default: [' + optDefault + ']');
+    }
+    if (input) div.appendChild(input);
+    return div;
   }
 
   // navigate forwards/backwards/upwards/downwards in the DOM, as defined

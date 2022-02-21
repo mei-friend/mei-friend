@@ -160,7 +160,7 @@ import {
 
 
 // schemas for autocompletion
-import schema_meiAll from '../schemaInfo/mei-CMN-4.0.1.schemaInfo.js';
+import default_schema from '../schemaInfo/mei-CMN-4.0.1.schemaInfo.js';
 
 // mei-friend version and date
 const version = 'develop-0.3.3';
@@ -186,6 +186,36 @@ const defaultVerovioOptions = {
   svgAdditionalAttribute: ["layer@n", "staff@n"],
   bottomMarginArtic: 1.2,
   topMarginArtic: 1.2
+};
+const defaultCodeMirrorOptions = {
+  lineNumbers: true,
+  lineWrapping: false,
+  styleActiveLine: true,
+  mode: "xml",
+  indentUnit: 3,
+  smartIndent: true,
+  tabSize: 3,
+  autoCloseTags: true,
+  autoCloseBrackets: true,
+  matchTags: {
+    bothTags: true
+  },
+  showTrailingSpace: true,
+  foldGutter: true,
+  gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
+  extraKeys: {
+    "Alt-F": "findPersistent",
+    "'<'": completeAfter,
+    "'/'": completeIfAfterLt,
+    "' '": completeIfInTag,
+    "'='": completeIfInTag,
+    "Ctrl-Space": "autocomplete"
+  },
+  hintOptions: {
+    schemaInfo: {
+      ...default_schema
+    }
+  }
 };
 const defaultKeyMap = `${root}keymaps/default-keymap.json`;
 let fileChanged = false; // flag to track whether unsaved changes to file exist
@@ -220,35 +250,7 @@ function completeIfInTag(cm) {
 document.addEventListener('DOMContentLoaded', function() {
   let myTextarea = document.getElementById("editor");
 
-  cm = CodeMirror.fromTextArea(myTextarea, {
-    lineNumbers: true,
-    lineWrapping: false,
-    styleActiveLine: true,
-    mode: "xml",
-    indentUnit: 3,
-    smartIndent: true,
-    tabSize: 3,
-    autoCloseTags: true,
-    autoCloseBrackets: true,
-    matchTags: {
-      bothTags: true
-    },
-    showTrailingSpace: true,
-    foldGutter: true,
-    gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
-    extraKeys: {
-      "Alt-F": "findPersistent",
-      "'<'": completeAfter,
-      "'/'": completeIfAfterLt,
-      "' '": completeIfInTag,
-      "'='": completeIfInTag,
-      "Ctrl-Space": "autocomplete"
-    },
-    hintOptions: {
-      schemaInfo: schema_meiAll
-    }
-    // theme: 'dracula' // monokai (dark), dracula (bright)
-  });
+  cm = CodeMirror.fromTextArea(myTextarea, defaultCodeMirrorOptions);
 
   // check for parameters passed through URL
   let searchParams = new URLSearchParams(window.location.search);
@@ -278,6 +280,7 @@ document.addEventListener('DOMContentLoaded', function() {
   v.vrvOptions = {
     ...defaultVerovioOptions
   };
+  v.addCmOptionsToSettingsPanel(cm, defaultCodeMirrorOptions);
 
   let or = 'bottom'; // default layout orientation
   if (searchParams.get('orientation')) or = searchParams.get('orientation');

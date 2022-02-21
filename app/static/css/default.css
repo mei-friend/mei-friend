@@ -659,6 +659,7 @@ span.keyIcon {
 .optionsItem {
   display: block;
   margin: 2px;
+  max-width: 315px;
 }
 
 .optionsItem:nth-of-type(even) {
