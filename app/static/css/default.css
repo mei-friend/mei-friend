@@ -676,6 +676,13 @@ span.keyIcon {
 }
 
 .optionsItem input[type="number"] {
+  font-size: 9.5pt;
   min-width: 55px;
   max-width: 55px;
+}
+
+.optionsItem select {
+  font-size: 9.5pt;
+  min-width: 55px;
+  max-width: 85px;
 }
