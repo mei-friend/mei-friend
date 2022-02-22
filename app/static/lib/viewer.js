@@ -506,6 +506,11 @@ export default class Viewer {
     // this.updateZoomSliderTooltip(zoomCtrl);
   }
 
+  // change font size of editor panel (delta in percent)
+  zoomEditorFontSize(percent) {
+    document.querySelector('.encoding').style.fontSize = percent;
+  }
+
   // TODO: why is it not showing?
   updateZoomSliderTooltip(zoomCtrl) {
     let toolTipText = 'Notation scale: ' + zoomCtrl.value + "%";
@@ -655,6 +660,15 @@ export default class Viewer {
         type: 'select',
         default: 'schema_meiCMN_401',
         values: ['schema_meiCMN_401', 'schema_meiAll_401', 'none']
+      },
+      zoomFont: {
+        title: 'Font size (%)',
+        decription: 'Change font size of editor (in percent)',
+        type: 'int',
+        default: 100,
+        min: 45,
+        max: 300,
+        step: 5
       }
     };
     let cmsp = document.getElementById('editorSettings');
@@ -673,7 +687,7 @@ export default class Viewer {
         let option = ev.srcElement.id;
         let value = ev.srcElement.value;
         if (ev.srcElement.type === 'checkbox') value = ev.srcElement.checked;
-        if (ev.srcElement.type === 'number') value = parseFloat(value);
+        if (ev.srcElement.type === 'int') value = parseFloat(value);
         console.log('CM EventListener: ' + option + ': ', value);
         mfDefaults[option] = value;
         if (option === 'hintOptions') {
@@ -690,6 +704,8 @@ export default class Viewer {
               }
             });
           else cm.setOption(option, {}); // hints: none
+        } else if (option === 'zoomFont') {
+          this.zoomEditorFontSize(value + '%');
         } else {
           cm.setOption(option, value);
         }

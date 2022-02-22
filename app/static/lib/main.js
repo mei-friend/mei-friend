@@ -935,6 +935,7 @@ function addEventListeners(v, cm) {
       v.zoom(Math.sign(event.deltaY) * -5); // scrolling towards user = increase
     }
   });
+
   // Page turning
   let ss = document.getElementById('section-selector');
   ss.addEventListener('change', () => {
@@ -1061,6 +1062,20 @@ function addEventListeners(v, cm) {
       updateLocalStorage(meiXml);
     }
   })
+
+  // Editor font size zooming
+  document.querySelector('.encoding').addEventListener('wheel', event => {
+    if ((navigator.platform.toLowerCase().startsWith('mac') && event.metaKey) ||
+      !navigator.platform.toLowerCase().startsWith('mac') && event.ctrlKey) {
+      event.preventDefault();
+      event.stopPropagation();
+      let zf = document.getElementById('zoomFont');
+      let value = parseInt(zf.value) + Math.sign(event.deltaY) * -5;
+      value = Math.min(300, Math.max(45, value)); // 45---300, see #zoomFont
+      v.zoomEditorFontSize(value + '%');
+      zf.value = value;
+    }
+  });
 
   // manually update notation rendering from encoding
   document.getElementById('code-update-btn').addEventListener('click', () => {
