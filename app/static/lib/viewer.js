@@ -595,13 +595,13 @@ export default class Viewer {
         });
       }
     });
-    vsp.innerHTML += '<input type="button" id="reset" value="Reset" />';
+    vsp.innerHTML += '<input type="button" title="Reset to mei-friend defaults" id="reset" value="Default" />';
     if (addListeners) { // add change listeners
       vsp.addEventListener('input', ev => {
         this.vrvOptions[ev.srcElement.id] = ev.srcElement.value;
         this.updateLayout(this.vrvOptions);
       });
-      vsp.addEventListener('click', (ev) => {
+      vsp.addEventListener('click', ev => {
         if (ev.srcElement.id === 'reset') {
           this.addVrvOptionsToSettingsPanel(tkAvailableOptions, defaultVrvOptions);
           this.updateLayout(this.vrvOptions);
@@ -668,6 +668,30 @@ export default class Viewer {
         type: 'bool',
         default: true
       },
+      autoCloseBrackets: {
+        title: 'Auto close brackets',
+        description: 'Automatically close brackets at input',
+        type: 'bool',
+        default: true
+      },
+      autoCloseTags: {
+        title: 'Auto close tags',
+        description: 'Automatically close tags at input',
+        type: 'bool',
+        default: true
+      },
+      matchTags: {
+        title: 'Match tags',
+        description: 'Highlights matched tags around editor cursor',
+        type: 'bool',
+        default: true
+      },
+      showTrailingSpace: {
+        title: 'Highlight trailing spaces',
+        description: 'Highlights unnecessary trailing spaces at end of lines',
+        type: 'bool',
+        default: true
+      },
       keyMap: {
         title: 'Key map',
         description: 'Select key map',
@@ -690,38 +714,52 @@ export default class Viewer {
     Object.keys(optionsToShow).forEach(opt => {
       let o = optionsToShow[opt];
       let optDefault = o.default;
+      if (opt in mfDefaults) optDefault = mfDefaults[opt];
       // console.log('OptionItem: ' + opt + ', default: ' + optDefault);
       cmsp.appendChild(this.createOptionsItem(opt, o, optDefault));
     });
+    cmsp.innerHTML += '<input type="button" title="Reset to mei-friend defaults" id="reset" value="Default" />';
     if (addListeners) { // add change listeners
       cmsp.addEventListener('input', ev => {
-        console.log('ev.srcElement: ', ev.srcElement);
         let option = ev.srcElement.id;
         let value = ev.srcElement.value;
         if (ev.srcElement.type === 'checkbox') value = ev.srcElement.checked;
         if (ev.srcElement.type === 'int') value = parseFloat(value);
-        console.log('CM EventListener: ' + option + ': ', value);
-        mfDefaults[option] = value;
-        if (option === 'hintOptions') {
-          if (value === 'schema_meiAll_401')
-            cm.setOption(option, {
-              'schemaInfo': {
-                ...schema_meiAll_401
-              }
-            });
-          else if (value === 'schema_meiCMN_401')
-            cm.setOption(option, {
-              'schemaInfo': {
-                ...schema_meiCMN_401
-              }
-            });
-          else cm.setOption(option, {}); // hints: none
-        } else if (option === 'zoomFont') {
-          this.changeEditorFontSize(value);
-        } else {
-          cm.setOption(option, value);
+        this.applyEditorOption(cm, option, value);
+      });
+      cmsp.addEventListener('click', ev => {
+        if (ev.srcElement.id === 'reset') {
+          this.addCmOptionsToSettingsPanel(cm, mfDefaults);
+          Object.keys(mfDefaults).forEach(option =>
+            this.applyEditorOption(cm, option, mfDefaults[option]));
         }
       });
+    }
+  } // addCmOptionsToSettingsPanel()
+
+  applyEditorOption(cm, option, value) {
+    if (option === 'hintOptions') {
+      if (value === 'schema_meiAll_401')
+        cm.setOption(option, {
+          'schemaInfo': {
+            ...schema_meiAll_401
+          }
+        });
+      else if (value === 'schema_meiCMN_401')
+        cm.setOption(option, {
+          'schemaInfo': {
+            ...schema_meiCMN_401
+          }
+        });
+      else cm.setOption(option, {}); // hints: none
+    } else if (option === 'matchTags') {
+      cm.setOption(option, value ? {
+        bothTags: true
+      } : {});
+    } else if (option === 'zoomFont') {
+      this.changeEditorFontSize(value);
+    } else {
+      cm.setOption(option, value);
     }
   }
 

@@ -195,8 +195,8 @@ const defaultCodeMirrorOptions = {
   indentUnit: 3,
   smartIndent: true,
   tabSize: 3,
-  autoCloseTags: true,
   autoCloseBrackets: true,
+  autoCloseTags: true,
   matchTags: {
     bothTags: true
   },
@@ -215,7 +215,9 @@ const defaultCodeMirrorOptions = {
     schemaInfo: {
       ...default_schema
     }
-  }
+  },
+  theme: 'default',
+  zoomFont: 100 // my own option
 };
 const defaultKeyMap = `${root}keymaps/default-keymap.json`;
 let fileChanged = false; // flag to track whether unsaved changes to file exist
