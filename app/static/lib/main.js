@@ -927,7 +927,7 @@ function addEventListeners(v, cm) {
   document.getElementById('decrease-scale-btn').addEventListener('click', cmd.zoomOut);
   document.getElementById('increase-scale-btn').addEventListener('click', cmd.zoomIn);
   document.getElementById('verovio-zoom').addEventListener('click', cmd.zoomSlider);
-  // Zooming with mouse wheel
+  // Zooming notation with mouse wheel
   document.querySelector('.verovio-panel').addEventListener('wheel', ev => {
     if ((navigator.platform.toLowerCase().startsWith('mac') && ev.metaKey) ||
       !navigator.platform.toLowerCase().startsWith('mac') && ev.ctrlKey) {
@@ -1070,7 +1070,7 @@ function addEventListeners(v, cm) {
       !navigator.platform.toLowerCase().startsWith('mac') && ev.ctrlKey) {
       ev.preventDefault();
       ev.stopPropagation();
-      v.changeEditorFontSize(-ev.deltaY);
+      v.changeEditorFontSize(Math.sign(ev.deltaY) * -5);
     }
   });
   document.querySelector('.encoding').addEventListener('keydown', ev => {
@@ -1079,12 +1079,12 @@ function addEventListeners(v, cm) {
       if (ev.key === '-') {
         ev.preventDefault();
         ev.stopPropagation();
-        v.changeEditorFontSize(-1);
+        v.changeEditorFontSize(-5);
       }
       if (ev.key === '+') {
         ev.preventDefault();
         ev.stopPropagation();
-        v.changeEditorFontSize(+1);
+        v.changeEditorFontSize(+5);
       }
       if (ev.key === '0') {
         ev.preventDefault();

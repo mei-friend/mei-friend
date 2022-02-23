@@ -508,11 +508,10 @@ export default class Viewer {
 
   // change font size of editor panel (sign is direction
   // or percent when larger than 30)
-  changeEditorFontSize(sign) {
+  changeEditorFontSize(delta) {
     let zf = document.getElementById('zoomFont');
-    let value = sign;
-    if (sign < 30)
-      value = parseInt(zf.value) + Math.sign(sign) * 5;
+    let value = delta;
+    if (delta < 30) value = parseInt(zf.value) + delta;
     value = Math.min(300, Math.max(45, value)); // 45---300, see #zoomFont
     document.querySelector('.encoding').style.fontSize = value + '%';
     zf.value = value;
