@@ -506,9 +506,16 @@ export default class Viewer {
     // this.updateZoomSliderTooltip(zoomCtrl);
   }
 
-  // change font size of editor panel (delta in percent)
-  zoomEditorFontSize(percent) {
-    document.querySelector('.encoding').style.fontSize = percent;
+  // change font size of editor panel (sign is direction
+  // or percent when larger than 30)
+  changeEditorFontSize(sign) {
+    let zf = document.getElementById('zoomFont');
+    let value = sign;
+    if (sign < 30)
+      value = parseInt(zf.value) + Math.sign(sign) * 5;
+    value = Math.min(300, Math.max(45, value)); // 45---300, see #zoomFont
+    document.querySelector('.encoding').style.fontSize = value + '%';
+    zf.value = value;
   }
 
   // TODO: why is it not showing?
@@ -705,7 +712,7 @@ export default class Viewer {
             });
           else cm.setOption(option, {}); // hints: none
         } else if (option === 'zoomFont') {
-          this.zoomEditorFontSize(value + '%');
+          this.changeEditorFontSize(value);
         } else {
           cm.setOption(option, value);
         }

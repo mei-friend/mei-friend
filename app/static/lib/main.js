@@ -1064,16 +1064,32 @@ function addEventListeners(v, cm) {
   })
 
   // Editor font size zooming
-  document.querySelector('.encoding').addEventListener('wheel', event => {
-    if ((navigator.platform.toLowerCase().startsWith('mac') && event.metaKey) ||
-      !navigator.platform.toLowerCase().startsWith('mac') && event.ctrlKey) {
-      event.preventDefault();
-      event.stopPropagation();
-      let zf = document.getElementById('zoomFont');
-      let value = parseInt(zf.value) + Math.sign(event.deltaY) * -5;
-      value = Math.min(300, Math.max(45, value)); // 45---300, see #zoomFont
-      v.zoomEditorFontSize(value + '%');
-      zf.value = value;
+  document.querySelector('.encoding').addEventListener('wheel', ev => {
+    if ((navigator.platform.toLowerCase().startsWith('mac') && ev.metaKey) ||
+      !navigator.platform.toLowerCase().startsWith('mac') && ev.ctrlKey) {
+      ev.preventDefault();
+      ev.stopPropagation();
+      v.changeEditorFontSize(ev.deltaY);
+    }
+  });
+  document.querySelector('.encoding').addEventListener('keydown', ev => {
+    if ((navigator.platform.toLowerCase().startsWith('mac') && ev.metaKey) ||
+      !navigator.platform.toLowerCase().startsWith('mac') && ev.ctrlKey) {
+      if (ev.key === '-') {
+        ev.preventDefault();
+        ev.stopPropagation();
+        v.changeEditorFontSize(-1);
+      }
+      if (ev.key === '+') {
+        ev.preventDefault();
+        ev.stopPropagation();
+        v.changeEditorFontSize(+1);
+      }
+      if (ev.key === '0') {
+        ev.preventDefault();
+        ev.stopPropagation();
+        v.changeEditorFontSize(100);
+      }
     }
   });
 
