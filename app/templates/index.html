@@ -307,25 +307,14 @@
     });
 
     // switch tabs in settings menu
-    function switchTab(evt, cityName) {
-      // Declare all variables
-      var i, tabcontent, tablink;
-
-      // Get all elements with class="tabcontent" and hide them
-      tabcontent = document.getElementsByClassName("tabcontent");
-      for (i = 0; i < tabcontent.length; i++) {
-        tabcontent[i].style.display = "none";
-      }
-
+    function switchTab(ev, tabId) {
+      // hide all tab contents except tabId
+      for (let cont of document.getElementsByClassName("tabcontent"))
+        cont.style.display = (cont.id === tabId) ? 'block' : 'none';
       // Get all elements with class="tablink" and remove the class "active"
-      tablink = document.getElementsByClassName("tablink");
-      for (i = 0; i < tablink.length; i++) {
-        tablink[i].className = tablink[i].className.replace(" active", "");
-      }
-
-      // Show the current tab, and add an "active" class to the button that opened the tab
-      document.getElementById(cityName).style.display = "block";
-      evt.currentTarget.className += " active";
+      for (let tab of document.getElementsByClassName("tablink"))
+        (tab === ev.currentTarget) ?
+        tab.classList.add('active') : tab.classList.remove('active');
     }
 
     document.getElementById("defaultOpen").click();
