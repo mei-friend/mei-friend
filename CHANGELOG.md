@@ -110,3 +110,4 @@
 * Support for toggling spiccato articulation with Shift+P
 # 0.3.3 patch
 * Settings panel supporting the majority of Verovio options
+* Settings panel supporting CodeMirror options
