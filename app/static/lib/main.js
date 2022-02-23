@@ -1162,10 +1162,9 @@ function setKeyMap(keyMapFilePath) {
       for (const [key, value] of Object.entries(keyMap)) {
         let el = document.querySelector(key);
         if (el) {
-          // console.info('Add listener to ', el);
           el.setAttribute('tabindex', '-1');
           el.addEventListener('keydown', (ev) => {
-            if (!document.activeElement.id == 'pagination2') {
+            if (document.activeElement.id !== 'pagination2') {
               ev.stopPropagation();
               ev.preventDefault();
             }
