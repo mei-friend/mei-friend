@@ -664,9 +664,10 @@ span.keyIcon {
 
 .optionsItem {
   display: block;
-  padding-top: 2px;
-  padding-bottom: 1px;
+  padding-top: 0.5px;
+  padding-bottom: 0.5px;
   max-width: 315px;
+  clear: both;
 }
 
 .optionsItem:nth-of-type(even) {
@@ -705,4 +706,9 @@ span.keyIcon {
   font-size: 9.5pt;
   min-width: 55px;
   max-width: 85px;
+}
+
+.optionsItem input, select {
+  padding-top: 0px;
+  padding-bottom: 0px;
 }

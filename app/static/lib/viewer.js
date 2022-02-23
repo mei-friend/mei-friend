@@ -33,6 +33,7 @@ export default class Viewer {
     this.meiHeadRange = [];
     this.toolTipTimeOutHandle = null; // handle for zoom tooltip hide timer
     this.vrvOptions;
+    this.editorOptions;
     this.verovioIcon = document.getElementById('verovio-icon');
   }
 
@@ -612,6 +613,10 @@ export default class Viewer {
   }
 
   addCmOptionsToSettingsPanel(cm, mfDefaults) {
+    if (Object.keys(mfDefaults).length > 0)
+      this.editorOptions = {
+        ...mfDefaults
+      };
     let optionsToShow = { // key as in CodeMirror
       zoomFont: {
         title: 'Font size (%)',
@@ -640,7 +645,7 @@ export default class Viewer {
         min: 1,
         max: 12,
         step: 1,
-        default: '3'
+        default: 3
       },
       lineWrapping: {
         title: 'Line wrapping',
@@ -725,8 +730,9 @@ export default class Viewer {
         let option = ev.srcElement.id;
         let value = ev.srcElement.value;
         if (ev.srcElement.type === 'checkbox') value = ev.srcElement.checked;
-        if (ev.srcElement.type === 'int') value = parseFloat(value);
+        if (ev.srcElement.type === 'number') value = parseFloat(value);
         this.applyEditorOption(cm, option, value);
+        this.editorOptions[option] = cm.getOption(option);
       });
       cmsp.addEventListener('click', ev => {
         if (ev.srcElement.id === 'reset') {
