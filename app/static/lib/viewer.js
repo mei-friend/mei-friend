@@ -612,6 +612,15 @@ export default class Viewer {
 
   addCmOptionsToSettingsPanel(cm, mfDefaults) {
     let optionsToShow = { // key as in CodeMirror
+      zoomFont: {
+        title: 'Font size (%)',
+        decription: 'Change font size of editor (in percent)',
+        type: 'int',
+        default: 100,
+        min: 45,
+        max: 300,
+        step: 5
+      },
       theme: {
         title: 'Theme',
         description: 'Select the theme of the editor',
@@ -653,6 +662,12 @@ export default class Viewer {
         step: 1,
         default: 1
       },
+      foldGutter: {
+        title: 'Code folding',
+        description: 'Enable code folding through fold gutters',
+        type: 'bool',
+        default: true
+      },
       keyMap: {
         title: 'Key map',
         description: 'Select key map',
@@ -667,15 +682,6 @@ export default class Viewer {
         default: 'schema_meiCMN_401',
         values: ['schema_meiCMN_401', 'schema_meiAll_401', 'none']
       },
-      zoomFont: {
-        title: 'Font size (%)',
-        decription: 'Change font size of editor (in percent)',
-        type: 'int',
-        default: 100,
-        min: 45,
-        max: 300,
-        step: 5
-      }
     };
     let cmsp = document.getElementById('editorSettings');
     let addListeners = false; // add event listeners only the first time
