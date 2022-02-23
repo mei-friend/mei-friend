@@ -928,11 +928,12 @@ function addEventListeners(v, cm) {
   document.getElementById('increase-scale-btn').addEventListener('click', cmd.zoomIn);
   document.getElementById('verovio-zoom').addEventListener('click', cmd.zoomSlider);
   // Zooming with mouse wheel
-  document.querySelector('.verovio-panel').addEventListener('wheel', event => {
-    if ((navigator.platform.toLowerCase().startsWith('mac') && event.metaKey) ||
-      !navigator.platform.toLowerCase().startsWith('mac') && event.ctrlKey) {
-      event.preventDefault();
-      v.zoom(Math.sign(event.deltaY) * -5); // scrolling towards user = increase
+  document.querySelector('.verovio-panel').addEventListener('wheel', ev => {
+    if ((navigator.platform.toLowerCase().startsWith('mac') && ev.metaKey) ||
+      !navigator.platform.toLowerCase().startsWith('mac') && ev.ctrlKey) {
+      ev.preventDefault();
+      ev.stopPropagation();
+      v.zoom(Math.sign(ev.deltaY) * -5); // scrolling towards user = increase
     }
   });
 
@@ -1069,7 +1070,7 @@ function addEventListeners(v, cm) {
       !navigator.platform.toLowerCase().startsWith('mac') && ev.ctrlKey) {
       ev.preventDefault();
       ev.stopPropagation();
-      v.changeEditorFontSize(ev.deltaY);
+      v.changeEditorFontSize(-ev.deltaY);
     }
   });
   document.querySelector('.encoding').addEventListener('keydown', ev => {
@@ -1164,8 +1165,10 @@ function setKeyMap(keyMapFilePath) {
           // console.info('Add listener to ', el);
           el.setAttribute('tabindex', '-1');
           el.addEventListener('keydown', (ev) => {
-            if (!document.activeElement.id == 'pagination2')
+            if (!document.activeElement.id == 'pagination2') {
+              ev.stopPropagation();
               ev.preventDefault();
+            }
             let keyName = ev.key;
             if (ev.code.toLowerCase() == 'space') keyName = 'space';
             // arrowdown -> down
