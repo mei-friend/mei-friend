@@ -588,7 +588,8 @@ export default class Viewer {
             let o = group.options[opt];
             let optDefault = o.default;
             if (opt in defaultVrvOptions) optDefault = defaultVrvOptions[opt];
-            vsp.appendChild(this.createOptionsItem(opt, o, optDefault));
+            let div = this.createOptionsItem(opt, o, optDefault);
+            if (div) vsp.appendChild(div);
             if (['bool', 'int', 'double', 'std::string-list'].includes(o.type))
               this.vrvOptions[opt] = optDefault;
           }
@@ -715,8 +716,8 @@ export default class Viewer {
       let o = optionsToShow[opt];
       let optDefault = o.default;
       if (opt in mfDefaults) optDefault = mfDefaults[opt];
-      // console.log('OptionItem: ' + opt + ', default: ' + optDefault);
-      cmsp.appendChild(this.createOptionsItem(opt, o, optDefault));
+      let div = this.createOptionsItem(opt, o, optDefault)
+      if (div) cmsp.appendChild(div);
     });
     cmsp.innerHTML += '<input type="button" title="Reset to mei-friend defaults" id="reset" value="Default" />';
     if (addListeners) { // add change listeners
@@ -809,7 +810,7 @@ export default class Viewer {
         console.log('title: ' + o.title + ' [' + o.type + '], default: [' + optDefault + ']');
     }
     if (input) div.appendChild(input);
-    return div;
+    return (input) ? div : null;
   }
 
   // navigate forwards/backwards/upwards/downwards in the DOM, as defined

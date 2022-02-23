@@ -664,7 +664,8 @@ span.keyIcon {
 
 .optionsItem {
   display: block;
-  margin: 2px;
+  padding-top: 2px;
+  padding-bottom: 1px;
   max-width: 315px;
 }
 
