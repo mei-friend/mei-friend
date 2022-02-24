@@ -663,7 +663,8 @@ span.keyIcon {
 }
 
 .optionsItem {
-  display: block;
+  display: flex;
+  justify-content: space-between;
   padding-top: 0.5px;
   padding-bottom: 0.5px;
   max-width: 315px;
@@ -693,7 +694,6 @@ span.keyIcon {
   margin-bottom: 2px;
   min-width: 220px;
   float: left;
-  text-align: right;
 }
 
 .optionsItem input[type="number"] {
@@ -711,4 +711,5 @@ span.keyIcon {
 .optionsItem input, select {
   padding-top: 0px;
   padding-bottom: 0px;
+  text-align: right;
 }
