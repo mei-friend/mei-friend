@@ -66,7 +66,6 @@
     "shift-g": "addGClefChangeBefore",
     "shift-c": "addCClefChangeBefore",
     "shift-f": "addFClefChangeBefore"
-
   },
 
   ".platform-darwin": {
@@ -92,6 +91,7 @@
     "cmd-s": "downloadMei",
     "cmd-shift-c": "cleanAccid",
     "cmd-shift-r": "renumberMeasures",
+    "alt-.": "consultGuidelines",
     "cmd-,": "toggleSettingsPanel"
   },
 
@@ -118,6 +118,7 @@
     "ctrl-s": "downloadMei",
     "ctrl-shift-c": "cleanAccid",
     "ctrl-shift-r": "renumberMeasures",
+    "alt-.": "consultGuidelines",
     "ctrl-,": "toggleSettingsPanel"
   }
 }

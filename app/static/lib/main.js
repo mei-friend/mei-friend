@@ -3,6 +3,11 @@ var spdWorker;
 var tkVersion = '';
 var tkAvailableOptions;
 var mei;
+var elementAtCursor;
+
+// guidelines base URL, needed to construct element / attribute URLs
+// TODO ideally determine version part automatically
+const guidelinesBase = "https://music-encoding.org/guidelines/v4/";
 
 // exports
 export var cm;
@@ -145,7 +150,8 @@ import {
 } from './utils.js';
 import {
   getInMeasure,
-  navElsSelector
+  navElsSelector,
+  getElementAtCursor
 } from './dom-utils.js';
 import * as e from './editor.js'
 import Viewer from './viewer.js';
@@ -163,7 +169,7 @@ import {
 import default_schema from '../schemaInfo/mei-CMN-4.0.1.schemaInfo.js';
 
 // mei-friend version and date
-const version = 'develop-0.3.3';
+const version = 'develop-0.3.4';
 const versionDate = '24 Feb 2022';
 // const defaultMeiFileName = `${root}Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei`;
 const defaultMeiFileName = `${root}Beethoven_WoO70-Breitkopf.mei`;
@@ -209,7 +215,8 @@ const defaultCodeMirrorOptions = {
     "'/'": completeIfAfterLt,
     "' '": completeIfInTag,
     "'='": completeIfInTag,
-    "Ctrl-Space": "autocomplete"
+    "Ctrl-Space": "autocomplete",
+    "Alt-.": consultGuidelines
   },
   hintOptions: {
     schemaInfo: {
@@ -776,6 +783,28 @@ function downloadSvg() {
   a.click();
 }
 
+function consultGuidelines() {
+  if (elementAtCursor) {
+    // cursor is currently positioned on an element
+    // move up to the closest "presentation" (codemirror line)
+    const presentation = elementAtCursor.closest('span[role="presentation"]');
+    if (presentation) {
+      // choose the first XML element (a "tag" that isn't a "bracket")
+      const xmlEl = presentation.querySelector(".cm-tag:not(.cm-bracket)");
+      if (xmlEl) {
+        let xmlElName = xmlEl.innerText;
+        if (xmlElName.length && !(xmlElName.includes(":"))) {
+          // it's an element in the default (hopefully MEI...) namespace
+          window.open(
+            guidelinesBase + "elements/" + xmlElName.toLowerCase(),
+            "_blank"
+          );
+        }
+      }
+    }
+  }
+}
+
 
 // object of interface command functions for buttons and key bindings
 let cmd = {
@@ -880,8 +909,8 @@ let cmd = {
       storage.clear();
     }
     logoutFromGithub();
-  }
-
+  },
+  'consultGuidelines': () => consultGuidelines()
 };
 
 // add event listeners when controls menu has been instantiated
@@ -1021,12 +1050,19 @@ function addEventListeners(v, cm) {
   document.getElementById('toggleStacciss').addEventListener('click', cmd.toggleStacciss);
   document.getElementById('toggleSpicc').addEventListener('click', cmd.toggleSpicc);
 
+  // consult guidelines
+  document.getElementById('consultGuidelines')
+    .addEventListener('click', cmd.consultGuidelines);
+
   // reset application
   document.getElementById('resetDefault').addEventListener('click', cmd.resetDefault);
 
   // editor activity
   cm.on('cursorActivity', () => {
     v.cursorActivity(cm);
+    // determine element at encoding cursor
+    // (to offer guidelines page if requested)
+    elementAtCursor = getElementAtCursor(cm);
   });
 
   // flip button updates manually notation location to cursor pos in encoding
