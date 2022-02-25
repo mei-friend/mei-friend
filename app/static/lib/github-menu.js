@@ -351,7 +351,7 @@ export function logoutFromGithub() {
     storage.removeItem("github");
   }
   // redirect to /logout to remove session cookie
-  const url = window.location.host;
+  const url = window.location.href;
   window.location.replace(url.substring(0, url.lastIndexOf("/")) + "/logout");
 }
 
