@@ -474,7 +474,6 @@ export default class Viewer {
     }
   }
 
-
   setNotationColors() {
     if (this.notationNightMode) {
       let gs = Array.from(document.querySelectorAll('g'));
@@ -485,6 +484,22 @@ export default class Viewer {
       gs.forEach(item => item.classList.remove('inverted'));
       document.querySelector('.verovio-panel').classList.remove('inverted');
     }
+  }
+
+  setInterfaceColors(matchTheme = false) {
+    let rt = document.querySelector(':root');
+    if (matchTheme) {
+      let cm = window.getComputedStyle(document.querySelector('.CodeMirror'));
+      rt.style.setProperty('--notationBackgroundColor', cm.backgroundColor);
+      rt.style.setProperty('--notationColor', cm.color);
+      rt.style.setProperty('--highlightColor',
+        window.getComputedStyle(document.querySelector('.cm-attribute')).color);
+    } else {
+      rt.style.setProperty('--notationBackgroundColor', 'var(--defaultBackgroundColor)');
+      rt.style.setProperty('--notationColor', 'var(--defaultTextColor)');
+      rt.style.setProperty('--highlightColor', 'var(--defaultHighlightColor)');
+    }
+    // window.getComputedStyle(document.querySelector('.cm-tag')).color
   }
 
   swapNotationColors() {
@@ -638,6 +653,12 @@ export default class Viewer {
           'pastel-on-dark', 'xq-dark', 'xq-light', 'yeti', 'yonce', 'zenburn'
         ]
       },
+      matchTheme: {
+        title: 'Notation matches theme',
+        description: 'Match notation to editor color theme',
+        type: 'bool',
+        default: false
+      },
       tabSize: {
         title: 'Tab size',
         description: 'Number of space characters for each indentation level',
@@ -731,8 +752,15 @@ export default class Viewer {
         let value = ev.srcElement.value;
         if (ev.srcElement.type === 'checkbox') value = ev.srcElement.checked;
         if (ev.srcElement.type === 'number') value = parseFloat(value);
-        this.applyEditorOption(cm, option, value);
-        this.editorOptions[option] = cm.getOption(option);
+        if (option === 'matchTheme') {
+          this.setInterfaceColors(value);
+          this.editorOptions.matchTheme = value;
+        } else {
+          this.applyEditorOption(cm, option, value);
+          this.editorOptions[option] = cm.getOption(option);
+          if ('matchTheme' in this.editorOptions)
+            this.setInterfaceColors(this.editorOptions.matchTheme);
+        }
       });
       cmsp.addEventListener('click', ev => {
         if (ev.srcElement.id === 'reset') {

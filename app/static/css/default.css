@@ -1,10 +1,106 @@
 :root {
-  --notationColor: #121212;
-  --notationBackgroundColor: #eee;
-  --invertedColor: #eee;
-  --invertedBackgroundColor: #333840;
-  --highlightColor: #4e8bed;
-  --highlightColorInverted: #1972ff;
+  /* DEFAULT COLORS */
+  /* almost black */
+  --defaultTextColor: #121212;
+  /* almost white */
+  --defaultBackgroundColor: #eee;
+  /* TODO use mdw blue */
+  --defaultHighlightColor: #4e8bed;
+  --defaultNavbarBackgroundColor: lightgray;
+  --defaultKeyboardShortCutColor: navy;
+  --defaultDropdownHeadingColor: lightsteelblue;
+  /* 10% brigher lightsteelblue */
+  --defaultDropdownBackgroundColor: #edf2f7;
+  --defaultDropdownBorderColor: darkgray;
+  --defaultOverlayBackgroundColor: cornflowerblue;
+  --defaultOverlayTextColor: white;
+  --defaultOverlayBorderColor: darkblue;
+  /* file status */
+  --defaultFileStatusColor: green;
+  /* file status changed */
+  --defaultFileStatusChangedColor: darkorange;
+  /* file status warn color */
+  --defaultFileStatusWarnColor: crimson;
+  --defaultSettingsBackgroundColor: #f1f1f1;
+  --defaultSettingsBackgroundAlternativeColor: #e4e4e4;
+  /*
+  * Color variables
+  */
+  --textColor: var(--defaultTextColor);
+  --backgroundColor: var(--defaultBackgroundColor);
+  --notationColor: var(--defaultTextColor);
+  --notationBackgroundColor: var(--defaultBackgroundColor);
+  --highlightColor: var(--defaultHighlightColor);
+  --navbarBackgroundColor: var(--defaultNavbarBackgroundColor);
+  --keyboardShortCutColor: var(--defaultKeyboardShortCutColor);
+  --dropdownHeadingColor: var(--defaultDropdownHeadingColor);
+  --dropdownBackgroundColor: var(--defaultDropdownBackgroundColor);
+  --dropdownBorderColor: var(--defaultDropdownBorderColor);
+  --overlayBackgroundColor: var(--defaultOverlayBackgroundColor);
+  --overlayTextColor: var(--defaultOverlayTextColor);
+  --overlayBorderColor: var(--defaultOverlayBorderColor);
+  --fileStatusColor: var(--defaultFileStatusColor);
+  --fileStatusChangedColor: var(--defaultFileStatusChangedColor);
+  --fileStatusWarnColor: var(--defaultFileStatusWarnColor);
+  --settingsBackgroundColor: var(--defaultSettingsBackgroundColor);
+  --settingsBackgroundAlternativeColor: var(--defaultSettingsBackgroundAlternativeColor);
+}
+
+@media (prefers-color-scheme: dark) {
+  .btn, .settingsButton, .tab, #verovio-icon, #GithubLogo {
+    filter: invert(.8);
+    color: var(--defaultBackgroundColor);
+  }
+
+  .optionsItem:nth-of-type(even) {
+    background-color: #555555;
+  }
+
+  :root {
+    /* almost black */
+    --defaultTextColor: #eeeeee;
+    /* almost white */
+    --defaultBackgroundColor: #121212;
+    /* TODO use mdw blue */
+    --defaultHighlightColor: #4e8bed;
+    --defaultNavbarBackgroundColor: #404040;
+    --defaultKeyboardShortCutColor: lightsteelblue;
+    --defaultDropdownHeadingColor: #303030;
+    /* 10% brigher lightsteelblue */
+    --defaultDropdownBackgroundColor: #364f63;
+    --defaultDropdownBorderColor: lightsteelblue;
+    --defaultOverlayBackgroundColor: #396a93;
+    --defaultOverlayTextColor: #cccccc;
+    --defaultOverlayBorderColor: #2b506e;
+    /* file status */
+    --defaultFileStatusColor: lightgreen;
+    /* file status changed */
+    --defaultFileStatusChangedColor: orange;
+    /* file status warn color */
+    --defaultFileStatusWarnColor: crimson;
+    --defaultSettingsBackgroundColor: #f1f1f1;
+    --defaultSettingsBackgroundAlternativeColor: #555555;
+    /* */
+    --textColor: var(--defaultTextColor);
+    --backgroundColor: var(--defaultBackgroundColor);
+    --notationColor: var(--defaultTextColor);
+    --notationBackgroundColor: var(--defaultBackgroundColor);
+    --highlightColor: var(--defaultHighlightColor);
+    --navbarBackgroundColor: var(--defaultNavbarBackgroundColor);
+    --keyboardShortCutColor: var(--defaultKeyboardShortCutColor);
+    --dropdownHeadingColor: var(--defaultDropdownHeadingColor);
+    --dropdownBackgroundColor: var(--defaultDropdownBackgroundColor);
+    --dropdownBorderColor: var(--defaultDropdownBorderColor);
+    --overlayBackgroundColor: var(--defaultOverlayBackgroundColor);
+    --overlayTextColor: var(--defaultOverlayTextColor);
+    --overlayBorderColor: var(--defaultOverlayBorderColor);
+    --fileStatusColor: var(--defaultFileStatusColor);
+    --fileStatusChangedColor: var(--defaultFileStatusChangedColor);
+    --fileStatusWarnColor: var(--defaultFileStatusWarnColor);
+    --settingsBackgroundColor: var(--defaultSettingsBackgroundColor);
+    --settingsBackgroundAlternativeColor: var(--defaultSettingsBackgroundAlternativeColor);
+    color-scheme: dark;
+  }
 }
 
 body {
@@ -24,12 +120,13 @@ body {
 
 a:link {
   text-decoration: none;
-  color: #263c5a;
+  color: var(--highlightColor);
 }
 
 a:visited {
   text-decoration: none;
-  color: #263c5a;
+  /* color: rgb(from var(--highlightColor) h s calc(l + 15%)); */
+  color: var(--highlightColor);
 }
 
 a:hover {
@@ -46,7 +143,7 @@ a:active {
   align-items: center;
   width: 100%;
   justify-content: flex-start;
-  /* background-color: Tomato; */
+  background-color: var(--backgroundColor);
 }
 
 .title {
@@ -80,11 +177,11 @@ a:active {
   right: 0;
   bottom: 0;
   margin: 50px;
-  border: 5px solid darkblue;
+  border: 5px solid var(--overlayBorderColor);
   border-radius: 32px;
-  background-color: cornflowerblue;
+  background-color: var(--overlayBackgroundColor);
   background-blend-mode: difference;
-  opacity: .7;
+  opacity: .8;
   z-index: 200;
 }
 
@@ -93,7 +190,7 @@ a:active {
   top: 50%;
   left: 50%;
   font-size: 28pt;
-  color: white;
+  color: var(--overlayTextColor);
   transform: translate(-50%, -50%);
   -ms-transform: translate(-50%, -50%);
 }
@@ -115,10 +212,10 @@ a:active {
   left: 20%;
   width: 60%;
   height: 60%;
-  border: 5px solid darkblue;
+  border: 5px solid var(--overlayBorderColor);
   border-radius: 32px;
-  background-color: cornflowerblue;
-  color: white;
+  background-color: var(--overlayBackgroundColor);
+  color: var(--overlayTextColor);
   z-index: 190;
 }
 
@@ -136,7 +233,7 @@ a:active {
 
 #openUrlStatus {
   font-size: 8pt;
-  color: crimson;
+  color: var(--fileStatusWarnColor);
   visibility: hidden;
 }
 
@@ -145,7 +242,7 @@ a:active {
 }
 
 #openUrlInput.warn {
-  border: 1px solid crimson;
+  border: 1px solid var(--fileStatusWarnColor);
   background-color: mistyrose;
 }
 
@@ -166,10 +263,10 @@ a:active {
   left: 20%;
   width: 60%;
   height: 60%;
-  border: 5px solid darkblue;
+  border: 5px solid var(--overlayBorderColor);
   border-radius: 32px;
-  background-color: cornflowerblue;
-  color: white;
+  background-color: var(--overlayBackgroundColor);
+  color: var(--overlayTextColor);
   z-index: 190;
 }
 
@@ -187,7 +284,7 @@ a:active {
 
 #forkRepositoryStatus {
   font-size: 8pt;
-  color: crimson;
+  color: var(--fileStatusWarnColor);
   visibility: hidden;
 }
 
@@ -196,12 +293,12 @@ a:active {
 }
 
 #forkRepositoryInput.warn {
-  border: 1px solid crimson;
+  border: 1px solid var(--fileStatusWarnColor);
   background-color: mistyrose;
 }
 
 .friendContainer {
-  border: 3px solid lightsteelblue;
+  border: 3px solid var(--dropdownHeadingColor);
   border-radius: 4px;
   width: 100%;
 }
@@ -215,7 +312,7 @@ a:active {
 }
 
 .resizer {
-  background-color: lightsteelblue;
+  background-color: var(--dropdownHeadingColor);
 }
 
 .encoding {}
@@ -233,7 +330,7 @@ a:active {
   color: darkgray;
   width: 100%;
   height: 20px;
-  /* background-color: Tomato; */
+  background-color: var(--backgroundColor);
 }
 
 .leftfoot {
@@ -267,7 +364,7 @@ a:active {
 .progressbar {
   width: 0%;
   height: 100%;
-  background-color: lavender;
+  background-color: var(--dropdownBackgroundColor);
   opacity: .8;
   position: absolute;
   top: 0px;
@@ -285,10 +382,10 @@ a:active {
   align-items: center;
   justify-content: flex-start;
   font-size: 10pt;
-  color: black;
   width: 100%;
   height: 28px;
-  background-color: ghostwhite;
+  /* color: var(--textColor); */
+  /* background-color: var(--navbarBackgroundColor); */
   padding: 1px;
   margin: 0px;
 }
@@ -339,7 +436,7 @@ a:active {
 .input-range {
   height: 4px;
   border-radius: 3px;
-  background-color: #d5d5d5;
+  background-color: var(--backgroundColor);
 }
 
 .checkbox {
@@ -418,26 +515,10 @@ https://www.w3schools.com/css/css_tooltip.asp
   stroke: var(--notationColor);
 }
 
-.verovio-panel g.inverted {
-  fill: var(--invertedColor);
-  color: var(--invertedColor);
-  stroke: var(--invertedColor);
-}
-
 .verovio-panel g.highlighted {
   fill: var(--highlightColor);
   color: var(--highlightColor);
   stroke: var(--highlightColor);
-}
-
-.verovio-panel g.highlighted.inverted {
-  fill: var(--highlightColorInverted);
-  color: var(--highlightColorInverted);
-  stroke: var(--highlightColorInverted);
-}
-
-.verovio-panel.inverted {
-  background-color: var(--invertedBackgroundColor);
 }
 
 .hidden {
@@ -447,8 +528,9 @@ https://www.w3schools.com/css/css_tooltip.asp
 .help-container {
   overflow-x: auto;
   overflow-y: auto;
-  border: 3px solid lightsteelblue;
+  border: 3px solid var(--dropdownHeadingColor);
   border-radius: 4px;
+  background-color: var(--dropdownBackgroundColor);
   margin: 5px;
   padding: 5px;
   display: flex;
@@ -477,7 +559,7 @@ https://www.w3schools.com/css/css_tooltip.asp
 }
 
 .help-container tr:nth-child(odd) {
-  background: lightgrey
+  background: var(--settingsBackgroundAlternativeColor);
 }
 
 span.keyIcon {
@@ -575,9 +657,9 @@ span.keyIcon {
 .tab {
   overflow: hidden;
   border: none;
-  background-color: #f1f1f1;
-  border-left: #f1f1f1 solid 2px;
-  border-top: #f1f1f1 solid 2px;
+  background-color: var(--settingsBackgroundColor);
+  border-left: darkgray solid 2px;
+  border-top: darkgray solid 2px;
   border-top-left-radius: 5px;
 }
 
@@ -598,8 +680,9 @@ span.keyIcon {
 
 .tabstart {
   color: #808080;
-  border: #f1f1f1 solid 2px;
+  border: var(--settingsBackgroundColor) solid 2px;
   border-top-left-radius: 5px;
+  background-color: inherit;
   cursor: pointer;
   float: left;
   outline: none;
@@ -620,7 +703,7 @@ span.keyIcon {
 .tablink.active {
   color: black;
   background-color: #ddd;
-  border: #ddd solid 2px;
+  border: var(--settingsBackgroundColor) solid 2px;
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;
 }
@@ -630,9 +713,9 @@ span.keyIcon {
   font-size: 10pt;
   display: none;
   padding: 6px 12px;
-  background-color: #ddd;
-  border-left: #ddd solid 2px;
-  border-bottom: #ddd solid 2px;
+  background-color: var(--navbarBackgroundColor);
+  border-left: var(--dropdownBorderColor) solid 2px;
+  border-bottom: var(--dropdownBorderColor) solid 2px;
   border-bottom-right-radius: 5px;
   border-bottom-left-radius: 5px;
   height: 95%;
@@ -672,7 +755,7 @@ span.keyIcon {
 }
 
 .optionsItem:nth-of-type(even) {
-  background-color: #e6e6e6;
+  background-color: var(--settingsBackgroundAlternativeColor);
 }
 
 /* Just for #editorSettings */
