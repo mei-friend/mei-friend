@@ -114,3 +114,7 @@
 # 0.3.4 patch
 * Settings panel supporting the majority of Verovio options
 * Settings panel supporting CodeMirror options
+# 0.3.5 patch
+* Support for dark mode
+* Option to enable notation to match editor theme colors
+* Option to keep notation always black on also in dark mode

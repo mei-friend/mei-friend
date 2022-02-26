@@ -84,18 +84,35 @@
     /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
     _paq.push(["setDoNotTrack", true]);
     _paq.push(["requireCookieConsent"]);
-    if ((function() { try { return JSON.parse(unescape(("; " + document.cookie).split("; consent=").pop().split(";").shift())).tracking; } catch (e) { return false; } })()) { _paq.push(["setCookieConsentGiven"]); } else { _paq.push(["forgetCookieConsentGiven"]); }
+    if ((function() {
+        try {
+          return JSON.parse(unescape(("; " + document.cookie).split("; consent=").pop().split(";").shift())).tracking;
+        } catch (e) {
+          return false;
+        }
+      })()) {
+      _paq.push(["setCookieConsentGiven"]);
+    } else {
+      _paq.push(["forgetCookieConsentGiven"]);
+    }
     _paq.push(['trackPageView']);
     _paq.push(['enableLinkTracking']);
     (function() {
-      var u="//mdw.ac.at/piwik/";
-      _paq.push(['setTrackerUrl', u+'matomo.php']);
+      var u = "//mdw.ac.at/piwik/";
+      _paq.push(['setTrackerUrl', u + 'matomo.php']);
       _paq.push(['setSiteId', '1000092']);
-      var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
-      g.type='text/javascript'; g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
+      var d = document,
+        g = d.createElement('script'),
+        s = d.getElementsByTagName('script')[0];
+      g.type = 'text/javascript';
+      g.async = true;
+      g.src = u + 'matomo.js';
+      s.parentNode.insertBefore(g, s);
     })();
   </script>
-  <noscript><p><img src="//mdw.ac.at/piwik/matomo.php?idsite=1000092&amp;rec=1" style="border:0;" alt="" /></p></noscript>
+  <noscript>
+    <p><img src="//mdw.ac.at/piwik/matomo.php?idsite=1000092&amp;rec=1" style="border:0;" alt="" /></p>
+  </noscript>
   <!-- End Matomo Code -->
 
 </head>
@@ -291,8 +308,8 @@
         <img src="{{ url_for('static', filename='svg/gear-16.svg') }}" />
       </button>
       <button class="tablink" onclick="switchTab(event, 'meiFriendSettings')" title="mei-friend Settings">mei-friend</button>
-      <button class="tablink" onclick="switchTab(event, 'editorSettings')" title="Editor Settings">Editor</button>
-      <button class="tablink" onclick="switchTab(event, 'verovioSettings')" title="Verovio Options" id="defaultOpen">Verovio</button>
+      <button class="tablink" onclick="switchTab(event, 'editorSettings')" title="Editor Settings" id="defaultOpen">Editor</button>
+      <button class="tablink" onclick="switchTab(event, 'verovioSettings')" title="Verovio Options">Verovio</button>
       <span id="closeSettingsButton" class="topright" title="Hide Settings Panel">&times</span>
     </div>
     <!-- Tab content -->

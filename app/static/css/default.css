@@ -181,7 +181,7 @@ a:active {
   border-radius: 32px;
   background-color: var(--overlayBackgroundColor);
   background-blend-mode: difference;
-  opacity: .8;
+  opacity: .95;
   z-index: 200;
 }
 
