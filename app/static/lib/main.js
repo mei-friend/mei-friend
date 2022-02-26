@@ -224,7 +224,9 @@ const defaultCodeMirrorOptions = {
     }
   },
   theme: 'default',
-  zoomFont: 100 // my own option
+  zoomFont: 100, // my own option
+  matchTheme: false, // notation matches editor theme (my option)
+  notationBlackWhite: false // notation always black on white, even in dark mode (my option)
 };
 const defaultKeyMap = `${root}keymaps/default-keymap.json`;
 let fileChanged = false; // flag to track whether unsaved changes to file exist
@@ -528,7 +530,6 @@ function vrvWorkerEventsHandler(ev) {
         if (ev.data.setCursorToPageBeginning) v.setCursorToPageBeginning(cm);
         v.updatePageNumDisplay();
         v.addNotationEventListeners(cm);
-        v.setNotationColors();
         v.updateHighlight(cm);
         v.scrollSvg(cm);
       }
@@ -553,7 +554,6 @@ function vrvWorkerEventsHandler(ev) {
         v.lastNoteId = id;
       }
       v.addNotationEventListeners(cm);
-      v.setNotationColors();
       v.scrollSvg(cm);
       v.updateHighlight(cm);
       v.setFocusToVerovioPane();
@@ -812,7 +812,7 @@ let cmd = {
   'previousPage': () => v.updatePage(cm, 'backwards'),
   'nextPage': () => v.updatePage(cm, 'forwards'),
   'lastPage': () => v.updatePage(cm, 'last'),
-  'nightMode': () => v.swapNotationColors(),
+  // 'nightMode': () => v.swapNotationColors(),
   'nextNote': () => v.navigate(cm, 'note', 'forwards'),
   'previousNote': () => v.navigate(cm, 'note', 'backwards'),
   'nextMeasure': () => v.navigate(cm, 'measure', 'forwards'),
@@ -953,7 +953,7 @@ function addEventListeners(v, cm) {
   fc.addEventListener("dragstart", (ev) => console.log('Drag Start', ev));
   fc.addEventListener("dragend", (ev) => console.log('Drag End', ev));
 
-  document.getElementById('notation-night-mode-btn').addEventListener('click', cmd.nightMode);
+  // document.getElementById('notation-night-mode-btn').addEventListener('click', cmd.nightMode);
   // Zooming with buttons
   document.getElementById('decrease-scale-btn').addEventListener('click', cmd.zoomOut);
   document.getElementById('increase-scale-btn').addEventListener('click', cmd.zoomIn);

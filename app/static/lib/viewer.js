@@ -474,20 +474,14 @@ export default class Viewer {
     }
   }
 
-  setNotationColors() {
-    if (this.notationNightMode) {
-      let gs = Array.from(document.querySelectorAll('g'));
-      gs.forEach(item => item.classList.add('inverted'));
-      document.querySelector('.verovio-panel').classList.add('inverted');
-    } else {
-      let gs = Array.from(document.querySelectorAll('g.inverted'));
-      gs.forEach(item => item.classList.remove('inverted'));
-      document.querySelector('.verovio-panel').classList.remove('inverted');
-    }
-  }
-
-  setInterfaceColors(matchTheme = false) {
+  setNotationColors(matchTheme = false, alwaysBW = false) {
     let rt = document.querySelector(':root');
+    if (alwaysBW) {
+      rt.style.setProperty('--notationBackgroundColor', 'var(--defaultNotationBackgroundColor)');
+      rt.style.setProperty('--notationColor', 'var(--defaultNotationColor)');
+      rt.style.setProperty('--highlightColor', 'var(--defaultHighlightColor)');
+      return;
+    }
     if (matchTheme) {
       let cm = window.getComputedStyle(document.querySelector('.CodeMirror'));
       rt.style.setProperty('--notationBackgroundColor', cm.backgroundColor);
@@ -499,17 +493,6 @@ export default class Viewer {
       rt.style.setProperty('--notationColor', 'var(--defaultTextColor)');
       rt.style.setProperty('--highlightColor', 'var(--defaultHighlightColor)');
     }
-    // window.getComputedStyle(document.querySelector('.cm-tag')).color
-  }
-
-  swapNotationColors() {
-    if (this.notationNightMode) {
-      this.notationNightMode = false;
-    } else {
-      this.notationNightMode = true;
-    }
-    console.info('swapNotationColors() set to: ' + this.notationNightMode);
-    this.setNotationColors();
   }
 
   zoom(delta) {
@@ -659,6 +642,12 @@ export default class Viewer {
         type: 'bool',
         default: false
       },
+      notationBlackWhite: {
+        title: 'Notation always black on white',
+        description: 'Notation is always black on white (also in dark mode)',
+        type: 'bool',
+        default: false
+      },
       tabSize: {
         title: 'Tab size',
         description: 'Number of space characters for each indentation level',
@@ -753,13 +742,16 @@ export default class Viewer {
         if (ev.srcElement.type === 'checkbox') value = ev.srcElement.checked;
         if (ev.srcElement.type === 'number') value = parseFloat(value);
         if (option === 'matchTheme') {
-          this.setInterfaceColors(value);
+          this.setNotationColors(value);
           this.editorOptions.matchTheme = value;
+        } else if (option === 'notationBlackWhite') {
+          this.setNotationColors(false, value);
+          document.getElementById('matchTheme').disabled = value;
         } else {
           this.applyEditorOption(cm, option, value);
           this.editorOptions[option] = cm.getOption(option);
           if ('matchTheme' in this.editorOptions)
-            this.setInterfaceColors(this.editorOptions.matchTheme);
+            this.setNotationColors(this.editorOptions.matchTheme);
         }
       });
       cmsp.addEventListener('click', ev => {

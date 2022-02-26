@@ -3,7 +3,9 @@
   /* almost black */
   --defaultTextColor: #121212;
   /* almost white */
-  --defaultBackgroundColor: #eee;
+  --defaultBackgroundColor: #eeeeee;
+  --defaultNotationColor: #121212;
+  --defaultNotationBackgroundColor: #eeeeee;
   /* TODO use mdw blue */
   --defaultHighlightColor: #4e8bed;
   --defaultNavbarBackgroundColor: lightgray;
@@ -57,12 +59,10 @@
   }
 
   :root {
-    /* almost black */
     --defaultTextColor: #eeeeee;
     /* almost white */
     --defaultBackgroundColor: #121212;
-    /* TODO use mdw blue */
-    --defaultHighlightColor: #4e8bed;
+    --defaultHighlightColor: #629dea;
     --defaultNavbarBackgroundColor: #404040;
     --defaultKeyboardShortCutColor: lightsteelblue;
     --defaultDropdownHeadingColor: #303030;
@@ -761,7 +761,7 @@ span.keyIcon {
 /* Just for #editorSettings */
 #editorSettings .optionsItem label {
   min-width: 160px;
-  max-width: 160px;
+  max-width: 220px;
 }
 
 #editorSettings .optionsItem select {
