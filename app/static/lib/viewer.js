@@ -32,7 +32,7 @@ export default class Viewer {
     // this.scoreDefList = []; // list of xmlNodes, one for each change, referenced by 5th element of pageList
     this.meiHeadRange = [];
     this.toolTipTimeOutHandle = null; // handle for zoom tooltip hide timer
-    this.vrvOptions;
+    this.vrvOptions; // all verovio options
     this.editorOptions;
     this.verovioIcon = document.getElementById('verovio-icon');
   }
@@ -567,11 +567,13 @@ export default class Viewer {
   }
 
   // initializes the settings panel by filling it with content
-  addVrvOptionsToSettingsPanel(tkAvailableOptions, defaultVrvOptions) {
+  addVrvOptionsToSettingsPanel(tkAvailableOptions, defaultVrvOptions,
+    restoreFromLocalStorage = true) {
     // skip these options (iin part because they are handled in control menu)
     let skipList = ['font', 'breaks', 'engravingDefaults', 'expand',
       'svgAdditionalAttribute', 'handwrittenFont'
     ];
+    let storage = window.localStorage;
     let vsp = document.getElementById('verovioSettings');
     let addListeners = false; // add event listeners only the first time
     if (!/\w/g.test(vsp.innerHTML)) addListeners = true;
@@ -584,11 +586,17 @@ export default class Viewer {
         vsp.innerHTML += '<div><h2>' + group.name + '</h2></div>';
         Object.keys(group.options).forEach(opt => {
           if (!skipList.includes(opt)) {
-            let o = group.options[opt];
-            let optDefault = o.default;
-            if (opt in defaultVrvOptions) optDefault = defaultVrvOptions[opt];
+            let o = group.options[opt]; // vrv available options
+            let optDefault = o.default; // available options defaults
+            if (defaultVrvOptions.hasOwnProperty(opt)) // mei-friend vrv defaults
+              optDefault = defaultVrvOptions[opt];
+            if (storage.hasOwnProperty('vrv-' + opt)) {
+              if (restoreFromLocalStorage) optDefault = storage['vrv-' + opt];
+              else delete storage['vrv-' + opt];
+            }
             let div = this.createOptionsItem(opt, o, optDefault);
             if (div) vsp.appendChild(div);
+            // set all options so that toolkit is always completely cleared
             if (['bool', 'int', 'double', 'std::string-list'].includes(o.type))
               this.vrvOptions[opt] = optDefault;
           }
@@ -598,12 +606,21 @@ export default class Viewer {
     vsp.innerHTML += '<input type="button" title="Reset to mei-friend defaults" id="reset" value="Default" />';
     if (addListeners) { // add change listeners
       vsp.addEventListener('input', ev => {
-        this.vrvOptions[ev.srcElement.id] = ev.srcElement.value;
+        let opt = ev.srcElement.id;
+        let value = ev.srcElement.value;
+        if (ev.srcElement.type === 'checkbox') value = ev.srcElement.checked;
+        if (ev.srcElement.type === 'number') value = parseFloat(value);
+        this.vrvOptions[opt] = value;
+        if (defaultVrvOptions.hasOwnProperty(opt) &&
+          defaultVrvOptions[opt].toString() === value.toString())
+          delete storage['vrv-' + opt]; // remove from storage object when default value
+        else
+          storage['vrv-' + opt] = value; // save changes in localStorage object
         this.updateLayout(this.vrvOptions);
       });
-      vsp.addEventListener('click', ev => {
+      vsp.addEventListener('click', ev => { // RESET button
         if (ev.srcElement.id === 'reset') {
-          this.addVrvOptionsToSettingsPanel(tkAvailableOptions, defaultVrvOptions);
+          this.addVrvOptionsToSettingsPanel(tkAvailableOptions, defaultVrvOptions, false);
           this.updateLayout(this.vrvOptions);
         }
       });
@@ -808,7 +825,9 @@ export default class Viewer {
         input.setAttribute('type', 'checkbox');
         input.setAttribute('name', opt);
         input.setAttribute('id', opt);
-        if (optDefault) input.setAttribute('checked', true);
+        if ((typeof optDefault === 'string' && optDefault === 'true') ||
+          (typeof optDefault === 'boolean' && optDefault))
+          input.setAttribute('checked', true);
         break;
       case 'int':
         step = 1;
