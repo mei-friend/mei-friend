@@ -33,7 +33,6 @@ export default class Viewer {
     this.meiHeadRange = [];
     this.toolTipTimeOutHandle = null; // handle for zoom tooltip hide timer
     this.vrvOptions; // all verovio options
-    this.editorOptions;
     this.verovioIcon = document.getElementById('verovio-icon');
   }
 
@@ -486,8 +485,8 @@ export default class Viewer {
       let cm = window.getComputedStyle(document.querySelector('.CodeMirror'));
       rt.style.setProperty('--notationBackgroundColor', cm.backgroundColor);
       rt.style.setProperty('--notationColor', cm.color);
-      rt.style.setProperty('--highlightColor',
-        window.getComputedStyle(document.querySelector('.cm-attribute')).color);
+      let cmAtt = document.querySelector('.cm-attribute');
+      if (cmAtt) rt.style.setProperty('--highlightColor', window.getComputedStyle(cmAtt).color);
     } else {
       rt.style.setProperty('--notationBackgroundColor', 'var(--defaultBackgroundColor)');
       rt.style.setProperty('--notationColor', 'var(--defaultTextColor)');
@@ -611,7 +610,7 @@ export default class Viewer {
         if (ev.srcElement.type === 'checkbox') value = ev.srcElement.checked;
         if (ev.srcElement.type === 'number') value = parseFloat(value);
         this.vrvOptions[opt] = value;
-        if (defaultVrvOptions.hasOwnProperty(opt) &&
+        if (defaultVrvOptions.hasOwnProperty(opt) && // TODO check vrv default values
           defaultVrvOptions[opt].toString() === value.toString())
           delete storage['vrv-' + opt]; // remove from storage object when default value
         else
@@ -627,11 +626,7 @@ export default class Viewer {
     }
   }
 
-  addCmOptionsToSettingsPanel(cm, mfDefaults) {
-    if (Object.keys(mfDefaults).length > 0)
-      this.editorOptions = {
-        ...mfDefaults
-      };
+  addCmOptionsToSettingsPanel(cm, mfDefaults, restoreFromLocalStorage = true) {
     let optionsToShow = { // key as in CodeMirror
       zoomFont: {
         title: 'Font size (%)',
@@ -740,6 +735,7 @@ export default class Viewer {
         values: ['schema_meiCMN_401', 'schema_meiAll_401', 'none']
       },
     };
+    let storage = window.localStorage;
     let cmsp = document.getElementById('editorSettings');
     let addListeners = false; // add event listeners only the first time
     if (!/\w/g.test(cmsp.innerHTML)) addListeners = true;
@@ -747,9 +743,14 @@ export default class Viewer {
     Object.keys(optionsToShow).forEach(opt => {
       let o = optionsToShow[opt];
       let optDefault = o.default;
-      if (opt in mfDefaults) optDefault = mfDefaults[opt];
+      if (mfDefaults.hasOwnProperty(opt)) optDefault = mfDefaults[opt];
+      if (storage.hasOwnProperty('cm-' + opt)) {
+        if (restoreFromLocalStorage) optDefault = storage['cm-' + opt];
+        else delete storage['cm-' + opt];
+      }
       let div = this.createOptionsItem(opt, o, optDefault)
       if (div) cmsp.appendChild(div);
+      this.applyEditorOption(cm, opt, optDefault);
     });
     cmsp.innerHTML += '<input type="button" title="Reset to mei-friend defaults" id="reset" value="Default" />';
     if (addListeners) { // add change listeners
@@ -758,22 +759,18 @@ export default class Viewer {
         let value = ev.srcElement.value;
         if (ev.srcElement.type === 'checkbox') value = ev.srcElement.checked;
         if (ev.srcElement.type === 'number') value = parseFloat(value);
-        if (option === 'matchTheme') {
-          this.setNotationColors(value);
-          this.editorOptions.matchTheme = value;
-        } else if (option === 'notationBlackWhite') {
-          this.setNotationColors(false, value);
-          document.getElementById('matchTheme').disabled = value;
-        } else {
-          this.applyEditorOption(cm, option, value);
-          this.editorOptions[option] = cm.getOption(option);
-          if ('matchTheme' in this.editorOptions)
-            this.setNotationColors(this.editorOptions.matchTheme);
-        }
+        this.applyEditorOption(cm, option, value);
+        if (option === 'theme' && storage.hasOwnProperty('cm-matchTheme'))
+          this.setNotationColors(storage['cm-matchTheme']);
+        if (mfDefaults.hasOwnProperty(option) &&
+          mfDefaults[option].toString() === value.toString())
+          delete storage['cm-' + option]; // remove from storage object when default value
+        else
+          storage['cm-' + option] = value; // save changes in localStorage object
       });
       cmsp.addEventListener('click', ev => {
         if (ev.srcElement.id === 'reset') {
-          this.addCmOptionsToSettingsPanel(cm, mfDefaults);
+          this.addCmOptionsToSettingsPanel(cm, mfDefaults, false);
           Object.keys(mfDefaults).forEach(option =>
             this.applyEditorOption(cm, option, mfDefaults[option]));
         }
@@ -781,29 +778,41 @@ export default class Viewer {
     }
   } // addCmOptionsToSettingsPanel()
 
+  // Apply options to CodeMirror object and handle other specialized options
   applyEditorOption(cm, option, value) {
-    if (option === 'hintOptions') {
-      if (value === 'schema_meiAll_401')
-        cm.setOption(option, {
-          'schemaInfo': {
-            ...schema_meiAll_401
-          }
-        });
-      else if (value === 'schema_meiCMN_401')
-        cm.setOption(option, {
-          'schemaInfo': {
-            ...schema_meiCMN_401
-          }
-        });
-      else cm.setOption(option, {}); // hints: none
-    } else if (option === 'matchTags') {
-      cm.setOption(option, value ? {
-        bothTags: true
-      } : {});
-    } else if (option === 'zoomFont') {
-      this.changeEditorFontSize(value);
-    } else {
-      cm.setOption(option, value);
+    switch (option) {
+      case 'hintOptions':
+        if (value === 'schema_meiAll_401')
+          cm.setOption(option, {
+            'schemaInfo': {
+              ...schema_meiAll_401
+            }
+          });
+        else if (value === 'schema_meiCMN_401')
+          cm.setOption(option, {
+            'schemaInfo': {
+              ...schema_meiCMN_401
+            }
+          });
+        else cm.setOption(option, {}); // hints: none
+        break;
+      case 'zoomFont':
+        this.changeEditorFontSize(value);
+        break;
+      case 'matchTheme':
+        this.setNotationColors(value);
+        break;
+      case 'notationBlackWhite':
+        this.setNotationColors(false, value);
+        document.getElementById('matchTheme').disabled = value;
+        break;
+      case 'matchTags':
+        cm.setOption(option, value ? {
+          bothTags: true
+        } : {});
+        break;
+      default:
+        cm.setOption(option, value);
     }
   }
 
