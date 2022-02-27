@@ -743,16 +743,22 @@ export default class Viewer {
     Object.keys(optionsToShow).forEach(opt => {
       let o = optionsToShow[opt];
       let optDefault = o.default;
-      if (mfDefaults.hasOwnProperty(opt)) optDefault = mfDefaults[opt];
+      if (mfDefaults.hasOwnProperty(opt)) {
+        optDefault = mfDefaults[opt]
+        if (opt === 'matchTags' && typeof optDefault === 'object') optDefault = true;
+      };
       if (storage.hasOwnProperty('cm-' + opt)) {
         if (restoreFromLocalStorage) optDefault = storage['cm-' + opt];
         else delete storage['cm-' + opt];
       }
+      if (window.matchMedia('(prefers-color-scheme: dark)').matches && opt === 'theme')
+        optDefault = 'base16-dark'; // take a dark scheme for dark mode
       let div = this.createOptionsItem(opt, o, optDefault)
       if (div) cmsp.appendChild(div);
       this.applyEditorOption(cm, opt, optDefault);
     });
     cmsp.innerHTML += '<input type="button" title="Reset to mei-friend defaults" id="reset" value="Default" />';
+
     if (addListeners) { // add change listeners
       cmsp.addEventListener('input', ev => {
         let option = ev.srcElement.id;
@@ -772,8 +778,15 @@ export default class Viewer {
       cmsp.addEventListener('click', ev => {
         if (ev.srcElement.id === 'reset') {
           this.addCmOptionsToSettingsPanel(cm, mfDefaults, false);
-          Object.keys(mfDefaults).forEach(option =>
-            this.applyEditorOption(cm, option, mfDefaults[option]));
+        }
+      });
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', ev => {
+        if (ev.matches) { // event listener for dark/bright mode changes
+          document.getElementById('theme').value = 'base16-dark';
+          this.applyEditorOption(cm, 'theme', 'base16-dark');
+        } else {
+          document.getElementById('theme').value = 'default';
+          this.applyEditorOption(cm, 'theme', 'default');
         }
       });
     }
@@ -813,6 +826,7 @@ export default class Viewer {
         } : {});
         break;
       default:
+        if (value == 'true' || value == 'false') value = (value === 'true');
         cm.setOption(option, value);
     }
   }
