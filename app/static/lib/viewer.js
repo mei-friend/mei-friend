@@ -759,7 +759,8 @@ export default class Viewer {
         let value = ev.srcElement.value;
         if (ev.srcElement.type === 'checkbox') value = ev.srcElement.checked;
         if (ev.srcElement.type === 'number') value = parseFloat(value);
-        this.applyEditorOption(cm, option, value);
+        this.applyEditorOption(cm, option, value,
+          storage.hasOwnProperty('cm-matchTheme') ? storage['cm-matchTheme'] : false);
         if (option === 'theme' && storage.hasOwnProperty('cm-matchTheme'))
           this.setNotationColors(storage['cm-matchTheme']);
         if (mfDefaults.hasOwnProperty(option) &&
@@ -779,7 +780,7 @@ export default class Viewer {
   } // addCmOptionsToSettingsPanel()
 
   // Apply options to CodeMirror object and handle other specialized options
-  applyEditorOption(cm, option, value) {
+  applyEditorOption(cm, option, value, matchTheme = false) {
     switch (option) {
       case 'hintOptions':
         if (value === 'schema_meiAll_401')
@@ -803,7 +804,7 @@ export default class Viewer {
         this.setNotationColors(value);
         break;
       case 'notationBlackWhite':
-        this.setNotationColors(false, value);
+        this.setNotationColors(matchTheme, value);
         document.getElementById('matchTheme').disabled = value;
         break;
       case 'matchTags':
