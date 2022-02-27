@@ -747,12 +747,12 @@ export default class Viewer {
         optDefault = mfDefaults[opt]
         if (opt === 'matchTags' && typeof optDefault === 'object') optDefault = true;
       };
-      if (window.matchMedia('(prefers-color-scheme: dark)').matches && opt === 'theme')
-        optDefault = 'base16-dark'; // take a dark scheme for dark mode
       if (storage.hasOwnProperty('cm-' + opt)) {
         if (restoreFromLocalStorage) optDefault = storage['cm-' + opt];
         else delete storage['cm-' + opt];
       }
+      if (window.matchMedia('(prefers-color-scheme: dark)').matches && opt === 'theme')
+        optDefault = 'base16-dark'; // take a dark scheme for dark mode
       let div = this.createOptionsItem(opt, o, optDefault)
       if (div) cmsp.appendChild(div);
       this.applyEditorOption(cm, opt, optDefault);
@@ -778,8 +778,6 @@ export default class Viewer {
       cmsp.addEventListener('click', ev => {
         if (ev.srcElement.id === 'reset') {
           this.addCmOptionsToSettingsPanel(cm, mfDefaults, false);
-          Object.keys(mfDefaults).forEach(option =>
-            this.applyEditorOption(cm, option, mfDefaults[option]));
         }
       });
       window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', ev => {
