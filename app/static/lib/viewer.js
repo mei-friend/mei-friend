@@ -497,6 +497,12 @@ export default class Viewer {
     }
   }
 
+  // sets the color scheme of the
+  setMenuColors() {
+
+
+  }
+
   zoom(delta) {
     let zoomCtrl = document.getElementById('verovio-zoom');
     if (delta <= 30) // delta only up to 30% difference
@@ -755,7 +761,7 @@ export default class Viewer {
         else delete storage['cm-' + opt];
       }
       if (window.matchMedia('(prefers-color-scheme: dark)').matches && opt === 'theme')
-        optDefault = 'base16-dark'; // take a dark scheme for dark mode
+        optDefault = mfDefaults['defaultDarkTheme']; // take a dark scheme for dark mode
       let div = this.createOptionsItem(opt, o, optDefault)
       if (div) cmsp.appendChild(div);
       this.applyEditorOption(cm, opt, optDefault);
@@ -792,11 +798,11 @@ export default class Viewer {
       });
       window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', ev => {
         if (ev.matches) { // event listener for dark/bright mode changes
-          document.getElementById('theme').value = 'base16-dark';
-          this.applyEditorOption(cm, 'theme', 'base16-dark');
+          document.getElementById('theme').value = mfDefaults['defaultDarkTheme'];
+          this.applyEditorOption(cm, 'theme', mfDefaults['defaultDarkTheme']);
         } else {
-          document.getElementById('theme').value = 'default';
-          this.applyEditorOption(cm, 'theme', 'default');
+          document.getElementById('theme').value = mfDefaults['defaultBrightTheme'];
+          this.applyEditorOption(cm, 'theme', mfDefaults['defaultBrightTheme']);
         }
       });
     }
