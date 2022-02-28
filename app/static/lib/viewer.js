@@ -658,7 +658,7 @@ export default class Viewer {
         title: 'Notation always black on white',
         description: 'Notation is always black on white (also in dark mode)',
         type: 'bool',
-        default: false
+        default: true
       },
       tabSize: {
         title: 'Tab size',
