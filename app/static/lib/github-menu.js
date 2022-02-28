@@ -93,13 +93,13 @@ function repoBranchClicked(ev) {
   const githubLoadingIndicator = document.getElementById("GithubLogo");
   github.branch = ev.target.innerText;
   github.filepath = "/";
-  githubLoadingIndicator.classList.add("loading");
+  githubLoadingIndicator.classList.add("clockwise");
   github.readGithubRepo().then(() => {
     fillInBranchContents(ev)
-    githubLoadingIndicator.classList.remove("loading");
+    githubLoadingIndicator.classList.remove("clockwise");
   }).catch(() => {
     console.warn("Couldn't read Github repo to fill in branch contents");
-    githubLoadingIndicator.classList.remove("loading");
+    githubLoadingIndicator.classList.remove("clockwise");
   });
 }
 
@@ -117,9 +117,9 @@ function branchContentsFileClicked(ev) {
   github.filepath += ev.target.innerText;
   console.debug(`Loading file: https://github.com/${github.githubRepo}/${github.filepath}`);
   fillInBranchContents(ev);
-  githubLoadingIndicator.classList.add("loading");
+  githubLoadingIndicator.classList.add("clockwise");
   github.readGithubRepo().then(() => {
-    githubLoadingIndicator.classList.remove("loading");
+    githubLoadingIndicator.classList.remove("clockwise");
     document.querySelector(".statusbar").innerText = "Loading from Github...";
     v.clear();
     v.updateNotation = false;
@@ -136,7 +136,7 @@ function branchContentsFileClicked(ev) {
     v.updateAll(cm);
   }).catch((err) => {
     console.warn("Couldn't read Github repo to fill in branch contents:", err);
-    githubLoadingIndicator.classList.remove("loading");
+    githubLoadingIndicator.classList.remove("clockwise");
   })
 }
 
@@ -298,12 +298,12 @@ export async function fillInBranchContents(e) {
 async function fillInCommitLog(refresh = false) {
   if (refresh) {
     const githubLoadingIndicator = document.getElementById("GithubLogo");
-    githubLoadingIndicator.classList.add("loading");
+    githubLoadingIndicator.classList.add("clockwise");
     github.readGithubRepo().then(() => {
-      githubLoadingIndicator.classList.remove("loading");
+      githubLoadingIndicator.classList.remove("clockwise");
       renderCommitLog();
     }).catch((e) => {
-      githubLoadingIndicator.classList.remove("loading");
+      githubLoadingIndicator.classList.remove("clockwise");
       console.warn("Couldn't read github repo, forcing log-out: ", e);
       logoutFromGithub();
     })
@@ -382,14 +382,14 @@ function handleCommitButtonClicked(e) {
   // lock editor while we are busy commiting
   cm.readOnly = "nocursor"; // don't allow editor focus
   // try commiting to Github
-  githubLoadingIndicator.classList.add("loading");
+  githubLoadingIndicator.classList.add("clockwise");
   github.writeGithubRepo(cm.getValue(), message)
     .then(() => {
       console.debug(`Successfully written to github: ${github.githubRepo}${github.filepath}`);
       messageInput.value = "";
       github.readGithubRepo()
         .then(() => {
-          githubLoadingIndicator.classList.remove("loading");
+          githubLoadingIndicator.classList.remove("clockwise");
           cm.readOnly = false;
           setFileChangedState(false);
           updateGithubInLocalStorage();
@@ -398,12 +398,12 @@ function handleCommitButtonClicked(e) {
         })
         .catch((e) => {
           cm.readOnly = false;
-          githubLoadingIndicator.classList.remove("loading");
+          githubLoadingIndicator.classList.remove("clockwise");
           console.warn("Couldn't read Github repo after writing commit: ", e, github);
         })
     })
     .catch((e) => {
-      githubLoadingIndicator.classList.remove("loading");
+      githubLoadingIndicator.classList.remove("clockwise");
       console.warn("Couldn't commit Github repo: ", e, github)
     });
 }
