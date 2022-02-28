@@ -499,8 +499,24 @@ export default class Viewer {
 
   // sets the color scheme of the
   setMenuColors() {
-
-
+    let rt = document.querySelector(':root');
+    let cm = window.getComputedStyle(document.querySelector('.CodeMirror'));
+    rt.style.setProperty('--backgroundColor', cm.backgroundColor);
+    rt.style.setProperty('color', cm.color);
+    let cmAtt = document.querySelector('.cm-attribute');
+    if (cmAtt) rt.style.setProperty('--highlightColor',
+      window.getComputedStyle(cmAtt).color);
+    let j = 0;
+    cm.backgroundColor.slice(4, -1).split(',').forEach(i => j += parseInt(i));
+    j /= 3;
+    console.log('setMenuColors lightness: ' + j + ', ' + ((j < 128) ? 'dark' : 'bright') + '.');
+    let els = document.querySelectorAll(
+      '.btn,.settingsButton,.tab,.CodeMirror-scrollbar-filler,#verovio-icon,#GithubLogo');
+    if (j < 128) { // dark
+      Array.from(els).forEach(el => el.style.setProperty('filter', 'invert(.8)'));
+    } else {
+      Array.from(els).forEach(el => el.style.removeProperty('filter'));
+    }
   }
 
   zoom(delta) {
@@ -844,6 +860,7 @@ export default class Viewer {
       default:
         if (value == 'true' || value == 'false') value = (value === 'true');
         cm.setOption(option, value);
+        if (option === 'theme') this.setMenuColors();
     }
   }
 
