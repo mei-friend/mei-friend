@@ -474,6 +474,9 @@ export default class Viewer {
   }
 
   setNotationColors(matchTheme = false, alwaysBW = false) {
+    // work-around that booleans retrieved from storage are strings
+    if (typeof matchTheme === 'string') matchTheme = (matchTheme === 'true');
+    if (typeof alwaysBW === 'string') alwaysBW = (alwaysBW === 'true');
     let rt = document.querySelector(':root');
     if (alwaysBW) {
       rt.style.setProperty('--notationBackgroundColor', 'var(--defaultNotationBackgroundColor)');
@@ -658,7 +661,7 @@ export default class Viewer {
         title: 'Notation always black on white',
         description: 'Notation is always black on white (also in dark mode)',
         type: 'bool',
-        default: false
+        default: true
       },
       tabSize: {
         title: 'Tab size',
@@ -766,9 +769,16 @@ export default class Viewer {
         if (ev.srcElement.type === 'checkbox') value = ev.srcElement.checked;
         if (ev.srcElement.type === 'number') value = parseFloat(value);
         this.applyEditorOption(cm, option, value,
-          storage.hasOwnProperty('cm-matchTheme') ? storage['cm-matchTheme'] : false);
-        if (option === 'theme' && storage.hasOwnProperty('cm-matchTheme'))
-          this.setNotationColors(storage['cm-matchTheme']);
+          storage.hasOwnProperty('cm-matchTheme') ?
+          storage['cm-matchTheme'] : mfDefaults['matchTheme']);
+        if (option === 'theme' && (storage.hasOwnProperty('cm-matchTheme') ||
+            storage.hasOwnProperty('cm-notationBlackWhite'))) {
+          this.setNotationColors(
+            storage.hasOwnProperty('cm-matchTheme') ?
+            storage['cm-matchTheme'] : mfDefaults['matchTheme'],
+            storage.hasOwnProperty('cm-notationBlackWhite') ?
+            storage['cm-notationBlackWhite'] : mfDefaults['notationBlackWhite']);
+        }
         if (mfDefaults.hasOwnProperty(option) &&
           mfDefaults[option].toString() === value.toString())
           delete storage['cm-' + option]; // remove from storage object when default value
