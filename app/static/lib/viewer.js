@@ -601,13 +601,25 @@ export default class Viewer {
     let vsp = document.getElementById('verovioSettings');
     let addListeners = false; // add event listeners only the first time
     if (!/\w/g.test(vsp.innerHTML)) addListeners = true;
-    vsp.innerHTML = '';
+    vsp.innerHTML='<a id="settingsVrvGrpSelect"></a>';
+    Object.keys(tkAvailableOptions.groups).forEach((grp) => {
+      // skip these two groups: base handled by mei-friend; sel to be thought
+      let group = tkAvailableOptions.groups[grp];
+      if (!group.name.startsWith('Base short') &&
+        !group.name.startsWith('Element selectors')) {
+        let groupId = group.name.replaceAll(" ", "_");
+        vsp.innerHTML += `
+         <div><a href="#${groupId}">${group.name}</a></div>
+        `;
+      }
+    })
     Object.keys(tkAvailableOptions.groups).forEach((grp) => {
       let group = tkAvailableOptions.groups[grp];
+      let groupId = group.name.replaceAll(" ", "_");
       // skip these two groups: base handled by mei-friend; sel to be thought
       if (!group.name.startsWith('Base short') &&
         !group.name.startsWith('Element selectors')) {
-        vsp.innerHTML += '<div><h2>' + group.name + '</h2></div>';
+        vsp.innerHTML += `<div><h2 id="${groupId}">${group.name}<a href="#settingsVrvGrpSelect">&uarr;</a></h2></div>`;
         Object.keys(group.options).forEach(opt => {
           if (!skipList.includes(opt)) {
             let o = group.options[opt]; // vrv available options
