@@ -519,25 +519,25 @@ export default class Viewer {
     if (j < 128) { // dark
       Array.from(els).forEach(el => el.style.setProperty('filter', 'invert(.8)'));
       rt.style.setProperty('--settingsLinkBackgroundColor', brighter(cm.backgroundColor, 40));
-      rt.style.setProperty('--settingsLinkHoverColor', brighter(cm.backgroundColor, 80));
-      rt.style.setProperty('--settingsBackgroundColor', brighter(cm.backgroundColor, 80));
-      rt.style.setProperty('--settingsBackgroundAlternativeColor', brighter(cm.backgroundColor, 60));
+      rt.style.setProperty('--settingsLinkHoverColor', brighter(cm.backgroundColor, 60));
+      rt.style.setProperty('--settingsBackgroundColor', brighter(cm.backgroundColor, 60));
+      rt.style.setProperty('--settingsBackgroundAlternativeColor', brighter(cm.backgroundColor, 40));
       rt.style.setProperty('--navbarBackgroundColor', brighter(cm.backgroundColor, 60));
-      rt.style.setProperty('--dropdownHeadingColor', brighter(cm.backgroundColor, 80));
-      rt.style.setProperty('--dropdownBackgroundColor', brighter(cm.backgroundColor, 80));
-      rt.style.setProperty('--dropdownBorderColor', brighter(cm.backgroundColor, 120));
+      rt.style.setProperty('--dropdownHeadingColor', brighter(cm.backgroundColor, 60));
+      rt.style.setProperty('--dropdownBackgroundColor', brighter(cm.backgroundColor, 60));
+      rt.style.setProperty('--dropdownBorderColor', brighter(cm.backgroundColor, 100));
       // let tag = window.getComputedStyle(document.querySelector('.cm-tag'));
       // rt.style.setProperty('--keyboardShortCutColor', brighter(tag.color, 140));
     } else {
       Array.from(els).forEach(el => el.style.removeProperty('filter'));
       rt.style.setProperty('--settingsLinkBackgroundColor', brighter(cm.backgroundColor, -40));
-      rt.style.setProperty('--settingsLinkHoverColor', brighter(cm.backgroundColor, -80));
-      rt.style.setProperty('--settingsBackgroundColor', brighter(cm.backgroundColor, -80));
-      rt.style.setProperty('--settingsBackgroundAlternativeColor', brighter(cm.backgroundColor, -60));
-      rt.style.setProperty('--navbarBackgroundColor', brighter(cm.backgroundColor, -80));
-      rt.style.setProperty('--dropdownHeadingColor', brighter(cm.backgroundColor, -80));
-      rt.style.setProperty('--dropdownBackgroundColor', brighter(cm.backgroundColor, -80));
-      rt.style.setProperty('--dropdownBorderColor', brighter(cm.backgroundColor, -120));
+      rt.style.setProperty('--settingsLinkHoverColor', brighter(cm.backgroundColor, -60));
+      rt.style.setProperty('--settingsBackgroundColor', brighter(cm.backgroundColor, -60));
+      rt.style.setProperty('--settingsBackgroundAlternativeColor', brighter(cm.backgroundColor, -40));
+      rt.style.setProperty('--navbarBackgroundColor', brighter(cm.backgroundColor, -60));
+      rt.style.setProperty('--dropdownHeadingColor', brighter(cm.backgroundColor, -60));
+      rt.style.setProperty('--dropdownBackgroundColor', brighter(cm.backgroundColor, -60));
+      rt.style.setProperty('--dropdownBorderColor', brighter(cm.backgroundColor, -100));
       // rt.style.setProperty('--settingsLinkBackgroundColor', 'var(--defaultSettingsLinkBackgroundColor)');
       // rt.style.setProperty('--settingsLinkHoverColor', 'var(--defaultSettingsLinkHoverColor)');
       // rt.style.setProperty('--settingsBackgroundColor', 'var(--defaultSettingsBackgroundColor)');
