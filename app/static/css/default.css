@@ -333,8 +333,7 @@ a:active {
   font-size: 10pt;
   width: 100%;
   height: 28px;
-  /* color: var(--textColor); */
-  /* background-color: var(--navbarBackgroundColor); */
+  color: var(--textColor);
   padding: 1px;
   margin: 0px;
 }

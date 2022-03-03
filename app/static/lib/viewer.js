@@ -518,25 +518,25 @@ export default class Viewer {
       '.btn,.settingsButton,.CodeMirror-scrollbar-filler,#verovio-icon,#GithubLogo,#hideSettingsButtonImg');
     if (j < 128) { // dark
       Array.from(els).forEach(el => el.style.setProperty('filter', 'invert(.8)'));
-      rt.style.setProperty('--settingsLinkBackgroundColor', brighter(cm.backgroundColor, 40));
-      rt.style.setProperty('--settingsLinkHoverColor', brighter(cm.backgroundColor, 60));
-      rt.style.setProperty('--settingsBackgroundColor', brighter(cm.backgroundColor, 60));
-      rt.style.setProperty('--settingsBackgroundAlternativeColor', brighter(cm.backgroundColor, 40));
-      rt.style.setProperty('--navbarBackgroundColor', brighter(cm.backgroundColor, 60));
-      rt.style.setProperty('--dropdownHeadingColor', brighter(cm.backgroundColor, 60));
-      rt.style.setProperty('--dropdownBackgroundColor', brighter(cm.backgroundColor, 60));
+      rt.style.setProperty('--settingsLinkBackgroundColor', brighter(cm.backgroundColor, 21));
+      rt.style.setProperty('--settingsLinkHoverColor', brighter(cm.backgroundColor, 36));
+      rt.style.setProperty('--settingsBackgroundColor', brighter(cm.backgroundColor, 36));
+      rt.style.setProperty('--settingsBackgroundAlternativeColor', brighter(cm.backgroundColor, 24));
+      rt.style.setProperty('--navbarBackgroundColor', brighter(cm.backgroundColor, 50));
+      rt.style.setProperty('--dropdownHeadingColor', brighter(cm.backgroundColor, 70));
+      rt.style.setProperty('--dropdownBackgroundColor', brighter(cm.backgroundColor, 50));
       rt.style.setProperty('--dropdownBorderColor', brighter(cm.backgroundColor, 100));
       // let tag = window.getComputedStyle(document.querySelector('.cm-tag'));
       // rt.style.setProperty('--keyboardShortCutColor', brighter(tag.color, 140));
     } else {
       Array.from(els).forEach(el => el.style.removeProperty('filter'));
-      rt.style.setProperty('--settingsLinkBackgroundColor', brighter(cm.backgroundColor, -40));
-      rt.style.setProperty('--settingsLinkHoverColor', brighter(cm.backgroundColor, -60));
-      rt.style.setProperty('--settingsBackgroundColor', brighter(cm.backgroundColor, -60));
-      rt.style.setProperty('--settingsBackgroundAlternativeColor', brighter(cm.backgroundColor, -40));
-      rt.style.setProperty('--navbarBackgroundColor', brighter(cm.backgroundColor, -60));
-      rt.style.setProperty('--dropdownHeadingColor', brighter(cm.backgroundColor, -60));
-      rt.style.setProperty('--dropdownBackgroundColor', brighter(cm.backgroundColor, -60));
+      rt.style.setProperty('--settingsLinkBackgroundColor', brighter(cm.backgroundColor, -21));
+      rt.style.setProperty('--settingsLinkHoverColor', brighter(cm.backgroundColor, -36));
+      rt.style.setProperty('--settingsBackgroundColor', brighter(cm.backgroundColor, -36));
+      rt.style.setProperty('--settingsBackgroundAlternativeColor', brighter(cm.backgroundColor, -24));
+      rt.style.setProperty('--navbarBackgroundColor', brighter(cm.backgroundColor, -50));
+      rt.style.setProperty('--dropdownHeadingColor', brighter(cm.backgroundColor, -70));
+      rt.style.setProperty('--dropdownBackgroundColor', brighter(cm.backgroundColor, -50));
       rt.style.setProperty('--dropdownBorderColor', brighter(cm.backgroundColor, -100));
       // rt.style.setProperty('--settingsLinkBackgroundColor', 'var(--defaultSettingsLinkBackgroundColor)');
       // rt.style.setProperty('--settingsLinkHoverColor', 'var(--defaultSettingsLinkHoverColor)');
@@ -852,15 +852,16 @@ export default class Viewer {
           this.addCmOptionsToSettingsPanel(cm, mfDefaults, false);
         }
       });
-      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', ev => {
-        if (ev.matches) { // event listener for dark/bright mode changes
-          document.getElementById('theme').value = mfDefaults['defaultDarkTheme'];
-          this.applyEditorOption(cm, 'theme', mfDefaults['defaultDarkTheme']);
-        } else {
-          document.getElementById('theme').value = mfDefaults['defaultBrightTheme'];
-          this.applyEditorOption(cm, 'theme', mfDefaults['defaultBrightTheme']);
-        }
-      });
+      window.matchMedia('(prefers-color-scheme: dark)')
+        .addEventListener('change', ev => {
+          if (ev.matches) { // event listener for dark/bright mode changes
+            document.getElementById('theme').value = mfDefaults['defaultDarkTheme'];
+            this.applyEditorOption(cm, 'theme', mfDefaults['defaultDarkTheme']);
+          } else {
+            document.getElementById('theme').value = mfDefaults['defaultBrightTheme'];
+            this.applyEditorOption(cm, 'theme', mfDefaults['defaultBrightTheme']);
+          }
+        });
     }
   } // addCmOptionsToSettingsPanel()
 
