@@ -7,6 +7,9 @@ import * as dutils from './dom-utils.js';
 import {
   addToolTip
 } from './control-menu.js';
+import {
+  storage
+} from './main.js';
 import schema_meiCMN_401 from '../schemaInfo/mei-CMN-4.0.1.schemaInfo.js';
 import schema_meiAll_401 from '../schemaInfo/mei-all-4.0.1.schemaInfo.js';
 
@@ -630,7 +633,6 @@ export default class Viewer {
     let skipList = ['font', 'breaks', 'engravingDefaults', 'expand',
       'svgAdditionalAttribute', 'handwrittenFont'
     ];
-    let storage = window.localStorage;
     let vsp = document.getElementById('verovioSettings');
     let addListeners = false; // add event listeners only the first time
     if (!/\w/g.test(vsp.innerHTML)) addListeners = true;
