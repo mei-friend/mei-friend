@@ -6,6 +6,7 @@
   --defaultBackgroundColor: #eeeeee;
   --defaultNotationColor: #121212;
   --defaultNotationBackgroundColor: #eeeeee;
+  --defaultSuppliedColor: #e69500; // orange 45% darker
   /* TODO use mdw blue */
   --defaultHighlightColor: #4e8bed;
   --defaultNavbarBackgroundColor: lightgray;
@@ -32,6 +33,7 @@
   --backgroundColor: var(--defaultBackgroundColor);
   --notationColor: var(--defaultTextColor);
   --notationBackgroundColor: var(--defaultBackgroundColor);
+  --suppliedColor: var(--defaultSuppliedColor);
   --highlightColor: var(--defaultHighlightColor);
   --navbarBackgroundColor: var(--defaultNavbarBackgroundColor);
   --keyboardShortCutColor: var(--defaultKeyboardShortCutColor);
@@ -47,7 +49,6 @@
   --settingsBackgroundColor: var(--defaultSettingsBackgroundColor);
   --settingsBackgroundAlternativeColor: var(--defaultSettingsBackgroundAlternativeColor);
 }
-
 
 body {
   font-family: Arial, Helvetica, sans-serif;
@@ -462,6 +463,12 @@ https://www.w3schools.com/css/css_tooltip.asp
   fill: var(--highlightColor);
   color: var(--highlightColor);
   stroke: var(--highlightColor);
+}
+
+.verovio-panel g.supplied g {
+  fill: var(--suppliedColor);
+  color: var(--suppliedColor);
+  stroke: var(--suppliedColor);
 }
 
 .hidden {
