@@ -195,7 +195,7 @@ a:active {
 
 #openUrlInput.warn {
   border: 1px solid var(--fileStatusWarnColor);
-  background-color: mistyrose;
+  background-color: var(--navbarBackgroundColor);
 }
 
 .forkRepositoryOverlay {
@@ -342,9 +342,10 @@ a:active {
   display: flex;
   align-items: center;
   min-height: 26px;
-  border: 1px solid darkgray;
+  border: 1px solid var(--dropdownBorderColor);
   border-radius: 7px;
   margin: 0px 3px;
+  /* background-color: var(--navbarBackgroundColor); */
 }
 
 .btn {
@@ -753,4 +754,9 @@ span.keyIcon {
   padding-top: 0px;
   padding-bottom: 0px;
   text-align: right;
+}
+
+input, select>option {
+  background-color: var(--dropdownBackgroundColor);
+color: var(--textColor);
 }

@@ -526,23 +526,34 @@ export default class Viewer {
       rt.style.setProperty('--dropdownHeadingColor', brighter(cm.backgroundColor, 70));
       rt.style.setProperty('--dropdownBackgroundColor', brighter(cm.backgroundColor, 50));
       rt.style.setProperty('--dropdownBorderColor', brighter(cm.backgroundColor, 100));
-      // let tag = window.getComputedStyle(document.querySelector('.cm-tag'));
-      // rt.style.setProperty('--keyboardShortCutColor', brighter(tag.color, 140));
-    } else {
+      let att = document.querySelector('.cm-attribute');
+      if (att) rt.style.setProperty('--keyboardShortCutColor', brighter(window.getComputedStyle(att).color, 40));
+      let tag = document.querySelector('.cm-tag');
+      if (tag) rt.style.setProperty('--fileStatusColor', brighter(window.getComputedStyle(tag).color, 40));
+      let str = document.querySelector('.cm-string');
+      if (str) {
+        rt.style.setProperty('--fileStatusChangedColor', brighter(window.getComputedStyle(str).color, 40));
+        rt.style.setProperty('--fileStatusWarnColor', brighter(window.getComputedStyle(str).color, 10));
+      }
+    } else { // bright mode
       Array.from(els).forEach(el => el.style.removeProperty('filter'));
-      rt.style.setProperty('--settingsLinkBackgroundColor', brighter(cm.backgroundColor, -21));
-      rt.style.setProperty('--settingsLinkHoverColor', brighter(cm.backgroundColor, -36));
+      rt.style.setProperty('--settingsLinkBackgroundColor', brighter(cm.backgroundColor, -16));
+      rt.style.setProperty('--settingsLinkHoverColor', brighter(cm.backgroundColor, -24));
       rt.style.setProperty('--settingsBackgroundColor', brighter(cm.backgroundColor, -36));
       rt.style.setProperty('--settingsBackgroundAlternativeColor', brighter(cm.backgroundColor, -24));
       rt.style.setProperty('--navbarBackgroundColor', brighter(cm.backgroundColor, -50));
       rt.style.setProperty('--dropdownHeadingColor', brighter(cm.backgroundColor, -70));
       rt.style.setProperty('--dropdownBackgroundColor', brighter(cm.backgroundColor, -50));
       rt.style.setProperty('--dropdownBorderColor', brighter(cm.backgroundColor, -100));
-      // rt.style.setProperty('--settingsLinkBackgroundColor', 'var(--defaultSettingsLinkBackgroundColor)');
-      // rt.style.setProperty('--settingsLinkHoverColor', 'var(--defaultSettingsLinkHoverColor)');
-      // rt.style.setProperty('--settingsBackgroundColor', 'var(--defaultSettingsBackgroundColor)');
-      // rt.style.setProperty('--settingsBackgroundAlternativeColor', 'var(--defaultSettingsBackgroundAlternativeColor)');
-      // rt.style.setProperty('--navbarBackgroundColor', 'var(--defaultNavbarBackgroundColor)');
+      let att = document.querySelector('.cm-attribute');
+      if (att) rt.style.setProperty('--keyboardShortCutColor', brighter(window.getComputedStyle(att).color, -40));
+      let tag = document.querySelector('.cm-tag');
+      if (tag) rt.style.setProperty('--fileStatusColor', brighter(window.getComputedStyle(tag).color, -40));
+      let str = document.querySelector('.cm-string');
+      if (str) {
+        rt.style.setProperty('--fileStatusChangedColor', brighter(window.getComputedStyle(str).color, -40));
+        rt.style.setProperty('--fileStatusWarnColor', brighter(window.getComputedStyle(str).color, -10));
+      }
     }
 
 
