@@ -19,7 +19,7 @@
 }
 
 .keyShortCut {
-  color: var(--defaultKeyboardShortCutColor);
+  color: var(--keyboardShortCutColor);
   font-weight: bold;
   /* border: 1px solid darkblue;
   border-radius: 2px; */
@@ -40,7 +40,7 @@
   font-size: 12pt;
   border: none;
   outline: none;
-  color: var(--defaultTextColor);
+  color: var(--textColor);
   padding: 3px 12px;
   background-color: inherit;
   font-family: inherit;
@@ -51,14 +51,14 @@
 
 /* Add a background color to navbar links on hover */
 .navbar a:hover, .dropdown:hover .dropbtn {
-  background-color: var(--defaultDropdownHeadingColor);
+  background-color: var(--dropdownHeadingColor);
 }
 
 /* Dropdown content (hidden by default) */
 .dropdown-content {
   display: none;
   position: absolute;
-  background-color: var(--defaultDropdownBackgroundColor);
+  background-color: var(--dropdownBackgroundColor);
   /* filter: brightness(140%); */
   /* background-color: #edf2f7; // lightsteelblue 90%: #dbe4f0 // 95%: #edf2f7 */
   opacity: .99;

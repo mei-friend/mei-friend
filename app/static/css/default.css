@@ -25,8 +25,10 @@
   --defaultFileStatusChangedColor: darkorange;
   /* file status warn color */
   --defaultFileStatusWarnColor: crimson;
-  --defaultSettingsBackgroundColor: #f1f1f1;
+  --defaultSettingsBackgroundColor: #ddd;
   --defaultSettingsBackgroundAlternativeColor: #e4e4e4;
+  --defaultSettingsLinkBackgroundColor: #f1f1f1;
+  --defaultSettingsLinkHoverColor: #e6e6e6;
   /*
   * Color variables
   */
@@ -49,6 +51,8 @@
   --fileStatusWarnColor: var(--defaultFileStatusWarnColor);
   --settingsBackgroundColor: var(--defaultSettingsBackgroundColor);
   --settingsBackgroundAlternativeColor: var(--defaultSettingsBackgroundAlternativeColor);
+  --settingsLinkBackgroundColor: var(--defaultSettingsLinkBackgroundColor);
+  --settingsLinkHoverColor: var(--defaultSettingsLinkHoverColor);
 }
 
 body {
@@ -608,15 +612,16 @@ span.keyIcon {
 .tab {
   overflow: hidden;
   border: none;
-  background-color: var(--settingsBackgroundColor);
-  border-left: darkgray solid 2px;
-  border-top: darkgray solid 2px;
+  color: var(--textColor);
+  background-color: var(--settingsLinkBackgroundColor);
+  border-left: var(--settingsLinkBackgroundColor) solid 2px;
+  border-top: var(--settingsLinkBackgroundColor) solid 2px;
   border-top-left-radius: 5px;
 }
 
 /* Style the buttons that are used to open the tab content */
 .tablink {
-  color: #808080;
+  color: var(--textColor);
   font-size: 12pt;
   background-color: inherit;
   float: left;
@@ -630,8 +635,8 @@ span.keyIcon {
 }
 
 .tabstart {
-  color: #808080;
-  border: var(--settingsBackgroundColor) solid 2px;
+  color: var(--textColor);
+  border: var(--settingsLinkBackgroundColor) solid 2px;
   border-top-left-radius: 5px;
   background-color: inherit;
   cursor: pointer;
@@ -642,31 +647,34 @@ span.keyIcon {
 }
 
 /* Change background color of buttons on hover */
-.tablink:hover, .topright:hover {
-  color: black;
-  background-color: #e6e6e6;
-  border-color: #e6e6e6;
+.tablink:hover, .topright:hover, .tabstart:hover {
+  /* color: var(--textColor); */
+  color: var(--textColor);
+  background-color: var(--settingsLinkHoverColor);
+  border-color: var(--settingsLinkHoverColor);
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;
 }
 
 /* Create an active/current tablink class */
 .tablink.active {
-  color: black;
-  background-color: #ddd;
-  border: var(--settingsBackgroundColor) solid 2px;
+  /* color: var(--textColor); */
+  color: var(--textColor);
+  background-color: var(--settingsBackgroundColor);
+  /* border: var(--settingsBackgroundColor) solid 2px; */
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;
 }
 
 /* Style the tab content */
 .tabcontent {
+  color: var(--textColor);
   font-size: 10pt;
   display: none;
   padding: 6px 12px;
-  background-color: var(--navbarBackgroundColor);
-  border-left: var(--dropdownBorderColor) solid 2px;
-  border-bottom: var(--dropdownBorderColor) solid 2px;
+  background-color: var(--settingsBackgroundColor);
+  border-left: var(--settingsBackgroundColor) solid 2px;
+  border-bottom: var(--settingsBackgroundColor) solid 2px;
   border-bottom-right-radius: 5px;
   border-bottom-left-radius: 5px;
   height: 95%;
@@ -685,7 +693,7 @@ span.keyIcon {
 
 /* Style the close button */
 .topright {
-  color: #808080;
+  /* color: #808080; */
   float: right;
   padding: 6px 12px;
   cursor: pointer;

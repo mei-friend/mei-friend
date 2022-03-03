@@ -497,12 +497,13 @@ export default class Viewer {
     }
   }
 
-  // sets the color scheme of the
+  // sets the color scheme of the active theme
   setMenuColors() {
     let rt = document.querySelector(':root');
     let cm = window.getComputedStyle(document.querySelector('.CodeMirror'));
     rt.style.setProperty('--backgroundColor', cm.backgroundColor);
-    rt.style.setProperty('color', cm.color);
+    // rt.style.setProperty('color', cm.color);
+    rt.style.setProperty('--textColor', cm.color);
     let cmAtt = document.querySelector('.cm-attribute');
     if (cmAtt) rt.style.setProperty('--highlightColor',
       window.getComputedStyle(cmAtt).color);
@@ -511,11 +512,43 @@ export default class Viewer {
     j /= 3;
     console.log('setMenuColors lightness: ' + j + ', ' + ((j < 128) ? 'dark' : 'bright') + '.');
     let els = document.querySelectorAll(
-      '.btn,.settingsButton,.tab,.CodeMirror-scrollbar-filler,#verovio-icon,#GithubLogo');
+      '.btn,.settingsButton,.CodeMirror-scrollbar-filler,#verovio-icon,#GithubLogo,#hideSettingsButtonImg');
     if (j < 128) { // dark
       Array.from(els).forEach(el => el.style.setProperty('filter', 'invert(.8)'));
+      rt.style.setProperty('--settingsLinkBackgroundColor', brighter(cm.backgroundColor, 40));
+      rt.style.setProperty('--settingsLinkHoverColor', brighter(cm.backgroundColor, 80));
+      rt.style.setProperty('--settingsBackgroundColor', brighter(cm.backgroundColor, 80));
+      rt.style.setProperty('--settingsBackgroundAlternativeColor', brighter(cm.backgroundColor, 60));
+      rt.style.setProperty('--navbarBackgroundColor', brighter(cm.backgroundColor, 60));
+      rt.style.setProperty('--dropdownHeadingColor', brighter(cm.backgroundColor, 80));
+      rt.style.setProperty('--dropdownBackgroundColor', brighter(cm.backgroundColor, 80));
+      rt.style.setProperty('--dropdownBorderColor', brighter(cm.backgroundColor, 120));
+      // let tag = window.getComputedStyle(document.querySelector('.cm-tag'));
+      // rt.style.setProperty('--keyboardShortCutColor', brighter(tag.color, 140));
     } else {
       Array.from(els).forEach(el => el.style.removeProperty('filter'));
+      rt.style.setProperty('--settingsLinkBackgroundColor', brighter(cm.backgroundColor, -40));
+      rt.style.setProperty('--settingsLinkHoverColor', brighter(cm.backgroundColor, -80));
+      rt.style.setProperty('--settingsBackgroundColor', brighter(cm.backgroundColor, -80));
+      rt.style.setProperty('--settingsBackgroundAlternativeColor', brighter(cm.backgroundColor, -60));
+      rt.style.setProperty('--navbarBackgroundColor', brighter(cm.backgroundColor, -80));
+      rt.style.setProperty('--dropdownHeadingColor', brighter(cm.backgroundColor, -80));
+      rt.style.setProperty('--dropdownBackgroundColor', brighter(cm.backgroundColor, -80));
+      rt.style.setProperty('--dropdownBorderColor', brighter(cm.backgroundColor, -120));
+      // rt.style.setProperty('--settingsLinkBackgroundColor', 'var(--defaultSettingsLinkBackgroundColor)');
+      // rt.style.setProperty('--settingsLinkHoverColor', 'var(--defaultSettingsLinkHoverColor)');
+      // rt.style.setProperty('--settingsBackgroundColor', 'var(--defaultSettingsBackgroundColor)');
+      // rt.style.setProperty('--settingsBackgroundAlternativeColor', 'var(--defaultSettingsBackgroundAlternativeColor)');
+      // rt.style.setProperty('--navbarBackgroundColor', 'var(--defaultNavbarBackgroundColor)');
+    }
+
+
+    function brighter(rgbString, deltaPercent) {
+      let rgb = [];
+      rgbString.slice(4, -1).split(',').forEach(i => {
+        rgb.push(Math.max(0, Math.min(parseInt(i) + deltaPercent, 255)));
+      });
+      return 'rgb(' + rgb.join(', ') + ')';
     }
   }
 
@@ -601,7 +634,7 @@ export default class Viewer {
     let vsp = document.getElementById('verovioSettings');
     let addListeners = false; // add event listeners only the first time
     if (!/\w/g.test(vsp.innerHTML)) addListeners = true;
-    vsp.innerHTML="";
+    vsp.innerHTML = "";
     let settingsVrvGrpSelectHtml = '<a id="settingsVrvGrpSelect"></a>'; // vrv settings navigation links
     Object.keys(tkAvailableOptions.groups).forEach((grp) => {
       let group = tkAvailableOptions.groups[grp];
