@@ -358,7 +358,7 @@ a:active {
   min-height: 21px;
   min-width: 21px;
   max-height: 21px;
-  background-color: #ffffff;
+  background-color: var(--backgroundColor);
 }
 
 .label {
@@ -756,7 +756,12 @@ span.keyIcon {
   text-align: right;
 }
 
-input, select>option {
+input, select {
+  background-color: var(--backgroundColor);
+  color: var(--textColor);
+}
+
+select>option {
   background-color: var(--dropdownBackgroundColor);
-color: var(--textColor);
+  color: var(--textColor);
 }

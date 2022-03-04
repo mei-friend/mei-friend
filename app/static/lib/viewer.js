@@ -523,6 +523,11 @@ export default class Viewer {
       // wake up owl
       owl.setAttribute("src", owlSrc + 'menu-logo.svg');
       Array.from(els).forEach(el => el.style.setProperty('filter', 'invert(.8)'));
+      let btn = document.querySelectorAll('.btn');
+      if (btn) Array.from(btn).forEach(el => {
+        el.style.setProperty('background-color', complementary(cm.backgroundColor));
+        el.style.setProperty('color', complementary(cm.color));
+      });
       rt.style.setProperty('--settingsLinkBackgroundColor', brighter(cm.backgroundColor, 21));
       rt.style.setProperty('--settingsLinkHoverColor', brighter(cm.backgroundColor, 36));
       rt.style.setProperty('--settingsBackgroundColor', brighter(cm.backgroundColor, 36));
@@ -544,6 +549,11 @@ export default class Viewer {
       // sleepy owl
       owl.setAttribute("src", owlSrc + 'menu-logo-asleep.svg');
       Array.from(els).forEach(el => el.style.removeProperty('filter'));
+      let btn = document.querySelectorAll('.btn');
+      if (btn) Array.from(btn).forEach(el => {
+        el.style.setProperty('background-color', cm.backgroundColor);
+        el.style.setProperty('color', cm.color);
+      });
       rt.style.setProperty('--settingsLinkBackgroundColor', brighter(cm.backgroundColor, -16));
       rt.style.setProperty('--settingsLinkHoverColor', brighter(cm.backgroundColor, -24));
       rt.style.setProperty('--settingsBackgroundColor', brighter(cm.backgroundColor, -36));
@@ -568,6 +578,14 @@ export default class Viewer {
       let rgb = [];
       rgbString.slice(4, -1).split(',').forEach(i => {
         rgb.push(Math.max(0, Math.min(parseInt(i) + deltaPercent, 255)));
+      });
+      return 'rgb(' + rgb.join(', ') + ')';
+    }
+
+    function complementary(rgbString) {
+      let rgb = [];
+      rgbString.slice(4, -1).split(',').forEach(i => {
+        rgb.push(255 - i);
       });
       return 'rgb(' + rgb.join(', ') + ')';
     }
