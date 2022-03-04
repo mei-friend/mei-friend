@@ -226,9 +226,8 @@ const defaultCodeMirrorOptions = {
   theme: 'default',
   zoomFont: 100, // my own option
   matchTheme: false, // notation matches editor theme (my option)
-  notationBlackWhite: true, // notation always black on white, even in dark mode (my option)
   defaultBrightTheme: 'default', // default theme for OS bright mode
-  defaultDarkTheme: 'base16-dark', // default theme for OS dark mode
+  defaultDarkTheme: 'cobalt' // 'base16-dark', // default theme for OS dark mode
 };
 const defaultKeyMap = `${root}keymaps/default-keymap.json`;
 let fileChanged = false; // flag to track whether unsaved changes to file exist

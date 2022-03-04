@@ -518,7 +518,7 @@ export default class Viewer {
       '.btn,.settingsButton,.CodeMirror-scrollbar-filler,#verovio-icon,#GithubLogo,#hideSettingsButtonImg');
     let owl = document.getElementById('mei-friend-logo');
     let owlSrc = owl.getAttribute('src');
-    owlSrc = owlSrc.substr(0, owlSrc.lastIndexOf('/')+1);
+    owlSrc = owlSrc.substr(0, owlSrc.lastIndexOf('/') + 1);
     if (j < 128) { // dark
       // wake up owl
       owl.setAttribute("src", owlSrc + 'menu-logo.svg');
@@ -737,12 +737,12 @@ export default class Viewer {
         type: 'bool',
         default: false
       },
-      notationBlackWhite: {
-        title: 'Notation always black on white',
-        description: 'Notation is always black on white (also in dark mode)',
-        type: 'bool',
-        default: true
-      },
+      // notationBlackWhite: {
+      //   title: 'Notation always black on white',
+      //   description: 'Notation is always black on white (also in dark mode)',
+      //   type: 'bool',
+      //   default: true
+      // },
       tabSize: {
         title: 'Tab size',
         description: 'Number of space characters for each indentation level',
@@ -834,8 +834,9 @@ export default class Viewer {
         if (restoreFromLocalStorage) optDefault = storage['cm-' + opt];
         else delete storage['cm-' + opt];
       }
-      if (window.matchMedia('(prefers-color-scheme: dark)').matches && opt === 'theme')
+      if (window.matchMedia('(prefers-color-scheme: dark)').matches && opt === 'theme') {
         optDefault = mfDefaults['defaultDarkTheme']; // take a dark scheme for dark mode
+      }
       let div = this.createOptionsItem(opt, o, optDefault)
       if (div) cmsp.appendChild(div);
       this.applyEditorOption(cm, opt, optDefault);
@@ -851,19 +852,16 @@ export default class Viewer {
         this.applyEditorOption(cm, option, value,
           storage.hasOwnProperty('cm-matchTheme') ?
           storage['cm-matchTheme'] : mfDefaults['matchTheme']);
-        if (option === 'theme' && (storage.hasOwnProperty('cm-matchTheme') ||
-            storage.hasOwnProperty('cm-notationBlackWhite'))) {
+        if (option === 'theme' && storage.hasOwnProperty('cm-matchTheme')) {
           this.setNotationColors(
             storage.hasOwnProperty('cm-matchTheme') ?
-            storage['cm-matchTheme'] : mfDefaults['matchTheme'],
-            storage.hasOwnProperty('cm-notationBlackWhite') ?
-            storage['cm-notationBlackWhite'] : mfDefaults['notationBlackWhite']);
+            storage['cm-matchTheme'] : mfDefaults['matchTheme']);
         }
-        if (mfDefaults.hasOwnProperty(option) &&
-          mfDefaults[option].toString() === value.toString())
+        if (mfDefaults.hasOwnProperty(option) && mfDefaults[option].toString() === value.toString()) {
           delete storage['cm-' + option]; // remove from storage object when default value
-        else
+        } else {
           storage['cm-' + option] = value; // save changes in localStorage object
+        }
       });
       cmsp.addEventListener('click', ev => {
         if (ev.srcElement.id === 'reset') {
@@ -871,13 +869,16 @@ export default class Viewer {
         }
       });
       window.matchMedia('(prefers-color-scheme: dark)')
-        .addEventListener('change', ev => {
-          if (ev.matches) { // event listener for dark/bright mode changes
-            document.getElementById('theme').value = mfDefaults['defaultDarkTheme'];
-            this.applyEditorOption(cm, 'theme', mfDefaults['defaultDarkTheme']);
-          } else {
-            document.getElementById('theme').value = mfDefaults['defaultBrightTheme'];
-            this.applyEditorOption(cm, 'theme', mfDefaults['defaultBrightTheme']);
+        .addEventListener('change', ev => { // system changes from dark to bright or otherway round
+          if (!storage.hasOwnProperty('cm-theme')) { // only if not changed by user
+            let matchTheme = storage.hasOwnProperty('cm-matchTheme') ? storage['cm-matchTheme'] : mfDefaults['matchTheme'];
+            if (ev.matches) { // event listener for dark/bright mode changes
+              document.getElementById('theme').value = mfDefaults['defaultDarkTheme'];
+              this.applyEditorOption(cm, 'theme', mfDefaults['defaultDarkTheme'], matchTheme);
+            } else {
+              document.getElementById('theme').value = mfDefaults['defaultBrightTheme'];
+              this.applyEditorOption(cm, 'theme', mfDefaults['defaultBrightTheme'], matchTheme);
+            }
           }
         });
     }
@@ -907,10 +908,6 @@ export default class Viewer {
       case 'matchTheme':
         this.setNotationColors(value);
         break;
-      case 'notationBlackWhite':
-        this.setNotationColors(matchTheme, value);
-        document.getElementById('matchTheme').disabled = value;
-        break;
       case 'matchTags':
         cm.setOption(option, value ? {
           bothTags: true
@@ -919,7 +916,10 @@ export default class Viewer {
       default:
         if (value == 'true' || value == 'false') value = (value === 'true');
         cm.setOption(option, value);
-        if (option === 'theme') this.setMenuColors();
+        if (option === 'theme') {
+          this.setMenuColors();
+          this.setNotationColors(matchTheme);
+        }
     }
   }
 
