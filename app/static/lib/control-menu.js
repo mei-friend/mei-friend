@@ -408,7 +408,6 @@ export function handleSmartBreaksOption(speedMode) {
       o.disabled = speedMode;
     }
   });
-
 }
 
 // checks xmlDoc for section, ending, lem, rdg elements for quick navigation

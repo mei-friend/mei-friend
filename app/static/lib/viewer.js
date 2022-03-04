@@ -703,7 +703,7 @@ export default class Viewer {
     });
     // inject navigation links at the top of verovio settings
     vsp.innerHTML = settingsVrvGrpSelectHtml + vsp.innerHTML;
-    vsp.innerHTML += '<input type="button" title="Reset to mei-friend defaults" id="reset" value="Default" />';
+    vsp.innerHTML += '<input type="button" title="Reset to mei-friend defaults" id="vrvReset" class="resetButton" value="Default" />';
     if (addListeners) { // add change listeners
       vsp.addEventListener('input', ev => {
         let opt = ev.srcElement.id;
@@ -719,7 +719,7 @@ export default class Viewer {
         this.updateLayout(this.vrvOptions);
       });
       vsp.addEventListener('click', ev => { // RESET button
-        if (ev.srcElement.id === 'reset') {
+        if (ev.srcElement.id === 'vrvReset') {
           this.addVrvOptionsToSettingsPanel(tkAvailableOptions, defaultVrvOptions, false);
           this.updateLayout(this.vrvOptions);
         }
@@ -859,7 +859,7 @@ export default class Viewer {
       if (div) cmsp.appendChild(div);
       this.applyEditorOption(cm, opt, optDefault);
     });
-    cmsp.innerHTML += '<input type="button" title="Reset to mei-friend defaults" id="reset" value="Default" />';
+    cmsp.innerHTML += '<input type="button" title="Reset to mei-friend defaults" id="cmReset" class="resetButton" value="Default" />';
 
     if (addListeners) { // add change listeners
       cmsp.addEventListener('input', ev => {
@@ -882,7 +882,7 @@ export default class Viewer {
         }
       });
       cmsp.addEventListener('click', ev => {
-        if (ev.srcElement.id === 'reset') {
+        if (ev.srcElement.id === 'cmReset') {
           this.addCmOptionsToSettingsPanel(cm, mfDefaults, false);
         }
       });
