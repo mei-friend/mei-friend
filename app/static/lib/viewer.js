@@ -516,7 +516,12 @@ export default class Viewer {
     console.log('setMenuColors lightness: ' + j + ', ' + ((j < 128) ? 'dark' : 'bright') + '.');
     let els = document.querySelectorAll(
       '.btn,.settingsButton,.CodeMirror-scrollbar-filler,#verovio-icon,#GithubLogo,#hideSettingsButtonImg');
+    let owl = document.getElementById('mei-friend-logo');
+    let owlSrc = owl.getAttribute('src');
+    owlSrc = owlSrc.substr(0, owlSrc.lastIndexOf('/')+1);
     if (j < 128) { // dark
+      // wake up owl
+      owl.setAttribute("src", owlSrc + 'menu-logo.svg');
       Array.from(els).forEach(el => el.style.setProperty('filter', 'invert(.8)'));
       rt.style.setProperty('--settingsLinkBackgroundColor', brighter(cm.backgroundColor, 21));
       rt.style.setProperty('--settingsLinkHoverColor', brighter(cm.backgroundColor, 36));
@@ -536,6 +541,8 @@ export default class Viewer {
         rt.style.setProperty('--fileStatusWarnColor', brighter(window.getComputedStyle(str).color, 10));
       }
     } else { // bright mode
+      // sleepy owl
+      owl.setAttribute("src", owlSrc + 'menu-logo-asleep.svg');
       Array.from(els).forEach(el => el.style.removeProperty('filter'));
       rt.style.setProperty('--settingsLinkBackgroundColor', brighter(cm.backgroundColor, -16));
       rt.style.setProperty('--settingsLinkHoverColor', brighter(cm.backgroundColor, -24));
