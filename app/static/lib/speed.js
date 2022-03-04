@@ -147,8 +147,7 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
       if (countingMode === 'measures') {
         if (currentNodeName === 'measure') mNo++;
         else
-          Array.from(currentNode.querySelectorAll('measure'))
-          .forEach(() => mNo++);
+          currentNode.querySelectorAll('measure').forEach(() => mNo++);
       } else if (countingMode === "encodedBreaks") {
         if (countNow && breaks.includes(currentNodeName)) {
           p++; // skip breaks before content (that is, a measure)
@@ -306,7 +305,7 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
       if (p == pageNo) {
         let nodeCopy = currentNode.cloneNode(true);
         if (countingMode === 'computedBreaks') { // remove breaks from DOM
-          Array.from(nodeCopy.querySelectorAll('pb, sb')).forEach(b => {
+          nodeCopy.querySelectorAll('pb, sb').forEach(b => {
             if (b) nodeCopy.removeChild(b);
           });
         }
@@ -320,8 +319,7 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
           currentNode.getAttribute('xml:id') == breaks[p][breaks[p].length - 1])
           p++;
         else {
-          let ms = Array.from(currentNode.querySelectorAll('measure'));
-          ms.forEach(m => {
+          currentNode.querySelectorAll('measure').forEach(m => {
             if (m.getAttribute('xml:id') == breaks[p][breaks[p].length - 1])
               p++;
           })
@@ -337,9 +335,7 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
 // pointed to from outside the requested pageNo
 // to be run at each edit/page turn (becomes slow with big files)
 function matchTimespanningElements(xmlScore, spdScore, pageNo) {
-  let t1 = performance.now();
-  // console.info('LoopStart startingElements: ', startingElements);
-  // console.info('LoopStart endingElements: ', endingElements);
+  // let t1 = performance.now();
   let startingSelector = '';
   let endingSelector = '';
 
@@ -350,16 +346,16 @@ function matchTimespanningElements(xmlScore, spdScore, pageNo) {
     endingSelector += "[startid][endid='" + id + "'],";
     startingSelector += "[startid='" + id + "'][endid],";
   }
-  let t2 = performance.now();
-  console.log(listOfTargets.length + ' notes: selector constructed ' + (t2 - t1) + ' ms.');
+  // let t2 = performance.now();
+  // console.log(listOfTargets.length + ' notes: selector constructed ' + (t2 - t1) + ' ms.');
 
   let endingElements = Array.from(xmlScore
     .querySelectorAll(endingSelector.slice(0, -1)));
   let startingElements = Array.from(xmlScore
     .querySelectorAll(startingSelector.slice(0, -1)));
 
-  let t3 = performance.now();
-  console.log('querySelectorAll ' + (t3 - t2) + ' ms.');
+  // let t3 = performance.now();
+  // console.log('querySelectorAll ' + (t3 - t2) + ' ms.');
   //
   let j; // check whether this id ends in startingElements
   for (let target of listOfTargets) {
@@ -384,8 +380,8 @@ function matchTimespanningElements(xmlScore, spdScore, pageNo) {
     }
   }
 
-  let t4 = performance.now();
-  console.log('timespan matching took ' + (t4 - t3) + ' ms.');
+  // let t4 = performance.now();
+  // console.log('timespan matching took ' + (t4 - t3) + ' ms.');
 
   // 1) go through endingElements and add to first measure
   if (endingElements.length > 0 && pageNo > 1) {
@@ -428,7 +424,7 @@ function matchTimespanningElements(xmlScore, spdScore, pageNo) {
     }
   } // 2) if
 
-  console.log('adding slurs took ' + (performance.now() - t4) + ' ms.');
+  // console.log('adding slurs took ' + (performance.now() - t4) + ' ms.');
 
 } // matchTimespanningElements
 

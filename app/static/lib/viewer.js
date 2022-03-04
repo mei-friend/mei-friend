@@ -354,7 +354,7 @@ export default class Viewer {
   }
 
   addNotationEventListeners(cm) {
-    let elements = Array.from(document.querySelectorAll('g[id]'));
+    let elements = document.querySelectorAll('g[id]');
     elements.forEach(item => {
       item.addEventListener('click',
         (event) => this.handleClickOnNotation(event, cm));
@@ -455,7 +455,7 @@ export default class Viewer {
   // highlight currently selected elements
   updateHighlight(cm) {
     // clear existing highlighted classes
-    let highlighted = Array.from(document.querySelectorAll('g.highlighted'));
+    let highlighted = document.querySelectorAll('g.highlighted');
     // console.info('updateHlt: highlighted: ', highlighted);
     highlighted.forEach(e => e.classList.remove('highlighted'));
     let ids = [];
@@ -469,7 +469,7 @@ export default class Viewer {
         // console.info('updateHlt el: ', el);
         if (el) {
           el.classList.add('highlighted');
-          let children = Array.from(el.querySelectorAll('g'));
+          let children = el.querySelectorAll('g');
           children.forEach(item => item.classList.add('highlighted'));
         }
       }
@@ -522,9 +522,9 @@ export default class Viewer {
     if (j < 128) { // dark
       // wake up owl
       owl.setAttribute("src", owlSrc + 'menu-logo.svg');
-      Array.from(els).forEach(el => el.style.setProperty('filter', 'invert(.8)'));
+      els.forEach(el => el.style.setProperty('filter', 'invert(.8)'));
       let btn = document.querySelectorAll('.btn');
-      if (btn) Array.from(btn).forEach(el => {
+      if (btn) btn.forEach(el => {
         el.style.setProperty('background-color', complementary(cm.backgroundColor));
         el.style.setProperty('color', complementary(cm.color));
       });
@@ -548,9 +548,9 @@ export default class Viewer {
     } else { // bright mode
       // sleepy owl
       owl.setAttribute("src", owlSrc + 'menu-logo-asleep.svg');
-      Array.from(els).forEach(el => el.style.removeProperty('filter'));
+      els.forEach(el => el.style.removeProperty('filter'));
       let btn = document.querySelectorAll('.btn');
-      if (btn) Array.from(btn).forEach(el => {
+      if (btn) btn.forEach(el => {
         el.style.setProperty('background-color', cm.backgroundColor);
         el.style.setProperty('color', cm.color);
       });
