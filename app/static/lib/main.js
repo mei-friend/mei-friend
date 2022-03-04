@@ -141,6 +141,7 @@ import {
 import {
   createControlsMenu,
   setBreaksOptions,
+  handleSmartBreaksOption,
   addModifyerKeys,
   manualCurrentPage,
   generateSectionSelect
@@ -1147,6 +1148,7 @@ function addEventListeners(v, cm) {
   // speedmode checkbox
   document.getElementById('speed-checkbox').addEventListener('change', (ev) => {
     v.speedMode = ev.target.checked;
+    handleSmartBreaksOption(v.speedMode);
     if (v.speedMode && Object.keys(v.pageBreaks).length > 0)
       v.pageCount = Object.keys(v.pageBreaks).length;
     // else

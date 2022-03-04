@@ -324,6 +324,7 @@ a:active {
   padding: 3px 6px;
   min-width: 330px;
   text-align: right;
+  white-space: nowrap;
 }
 
 .control-menu {

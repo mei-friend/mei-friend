@@ -391,7 +391,24 @@ export function setBreaksOptions(tkAvailableOptions, defaultValue = 'auto') {
     } else {
       breaksEl[breaksEl.options.length] = new Option(index, index);
     }
+    // disable breaks=smart by default; only enabled with speedMode=false
+    if (index === 'smart') breaksEl[breaksEl.length - 1].disabled = true;
   }
+}
+
+export function handleSmartBreaksOption(speedMode) {
+  let options = Array.from(document.getElementById('breaks-select').options);
+  options.forEach(o => {
+    if (o.value === 'smart') {
+      if (speedMode && o.selected) {
+        options.forEach(o => {
+          if (o.value === 'auto') o.selected = true;
+        });
+      }
+      o.disabled = speedMode;
+    }
+  });
+
 }
 
 // checks xmlDoc for section, ending, lem, rdg elements for quick navigation
