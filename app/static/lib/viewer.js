@@ -7,6 +7,9 @@ import * as dutils from './dom-utils.js';
 import {
   addToolTip
 } from './control-menu.js';
+import {
+  storage
+} from './main.js';
 import schema_meiCMN_401 from '../schemaInfo/mei-CMN-4.0.1.schemaInfo.js';
 import schema_meiAll_401 from '../schemaInfo/mei-all-4.0.1.schemaInfo.js';
 
@@ -32,8 +35,7 @@ export default class Viewer {
     // this.scoreDefList = []; // list of xmlNodes, one for each change, referenced by 5th element of pageList
     this.meiHeadRange = [];
     this.toolTipTimeOutHandle = null; // handle for zoom tooltip hide timer
-    this.vrvOptions;
-    this.editorOptions;
+    this.vrvOptions; // all verovio options
     this.verovioIcon = document.getElementById('verovio-icon');
   }
 
@@ -352,7 +354,7 @@ export default class Viewer {
   }
 
   addNotationEventListeners(cm) {
-    let elements = Array.from(document.querySelectorAll('g[id]'));
+    let elements = document.querySelectorAll('g[id]');
     elements.forEach(item => {
       item.addEventListener('click',
         (event) => this.handleClickOnNotation(event, cm));
@@ -453,7 +455,7 @@ export default class Viewer {
   // highlight currently selected elements
   updateHighlight(cm) {
     // clear existing highlighted classes
-    let highlighted = Array.from(document.querySelectorAll('g.highlighted'));
+    let highlighted = document.querySelectorAll('g.highlighted');
     // console.info('updateHlt: highlighted: ', highlighted);
     highlighted.forEach(e => e.classList.remove('highlighted'));
     let ids = [];
@@ -467,34 +469,126 @@ export default class Viewer {
         // console.info('updateHlt el: ', el);
         if (el) {
           el.classList.add('highlighted');
-          let children = Array.from(el.querySelectorAll('g'));
+          let children = el.querySelectorAll('g');
           children.forEach(item => item.classList.add('highlighted'));
         }
       }
     }
   }
 
-
-  setNotationColors() {
-    if (this.notationNightMode) {
-      let gs = Array.from(document.querySelectorAll('g'));
-      gs.forEach(item => item.classList.add('inverted'));
-      document.querySelector('.verovio-panel').classList.add('inverted');
+  setNotationColors(matchTheme = false, alwaysBW = false) {
+    // work-around that booleans retrieved from storage are strings
+    if (typeof matchTheme === 'string') matchTheme = (matchTheme === 'true');
+    if (typeof alwaysBW === 'string') alwaysBW = (alwaysBW === 'true');
+    let rt = document.querySelector(':root');
+    if (alwaysBW) {
+      rt.style.setProperty('--notationBackgroundColor', 'var(--defaultNotationBackgroundColor)');
+      rt.style.setProperty('--notationColor', 'var(--defaultNotationColor)');
+      rt.style.setProperty('--highlightColor', 'var(--defaultHighlightColor)');
+      return;
+    }
+    if (matchTheme) {
+      let cm = window.getComputedStyle(document.querySelector('.CodeMirror'));
+      rt.style.setProperty('--notationBackgroundColor', cm.backgroundColor);
+      rt.style.setProperty('--notationColor', cm.color);
+      let cmAtt = document.querySelector('.cm-attribute');
+      if (cmAtt) rt.style.setProperty('--highlightColor', window.getComputedStyle(cmAtt).color);
     } else {
-      let gs = Array.from(document.querySelectorAll('g.inverted'));
-      gs.forEach(item => item.classList.remove('inverted'));
-      document.querySelector('.verovio-panel').classList.remove('inverted');
+      rt.style.setProperty('--notationBackgroundColor', 'var(--defaultBackgroundColor)');
+      rt.style.setProperty('--notationColor', 'var(--defaultTextColor)');
+      rt.style.setProperty('--highlightColor', 'var(--defaultHighlightColor)');
     }
   }
 
-  swapNotationColors() {
-    if (this.notationNightMode) {
-      this.notationNightMode = false;
-    } else {
-      this.notationNightMode = true;
+  // sets the color scheme of the active theme
+  setMenuColors() {
+    let rt = document.querySelector(':root');
+    let cm = window.getComputedStyle(document.querySelector('.CodeMirror'));
+    rt.style.setProperty('--backgroundColor', cm.backgroundColor);
+    // rt.style.setProperty('color', cm.color);
+    rt.style.setProperty('--textColor', cm.color);
+    let cmAtt = document.querySelector('.cm-attribute');
+    if (cmAtt) rt.style.setProperty('--highlightColor',
+      window.getComputedStyle(cmAtt).color);
+    let j = 0;
+    cm.backgroundColor.slice(4, -1).split(',').forEach(i => j += parseInt(i));
+    j /= 3;
+    console.log('setMenuColors lightness: ' + j + ', ' + ((j < 128) ? 'dark' : 'bright') + '.');
+    let els = document.querySelectorAll(
+      '.btn,.settingsButton,.CodeMirror-scrollbar-filler,#verovio-icon,#GithubLogo,#hideSettingsButtonImg');
+    let owl = document.getElementById('mei-friend-logo');
+    let owlSrc = owl.getAttribute('src');
+    owlSrc = owlSrc.substr(0, owlSrc.lastIndexOf('/') + 1);
+    if (j < 128) { // dark
+      // wake up owl
+      owl.setAttribute("src", owlSrc + 'menu-logo.svg');
+      els.forEach(el => el.style.setProperty('filter', 'invert(.8)'));
+      let btn = document.querySelectorAll('.btn');
+      if (btn) btn.forEach(el => {
+        el.style.setProperty('background-color', complementary(cm.backgroundColor));
+        el.style.setProperty('color', complementary(cm.color));
+      });
+      rt.style.setProperty('--settingsLinkBackgroundColor', brighter(cm.backgroundColor, 21));
+      rt.style.setProperty('--settingsLinkHoverColor', brighter(cm.backgroundColor, 36));
+      rt.style.setProperty('--settingsBackgroundColor', brighter(cm.backgroundColor, 36));
+      rt.style.setProperty('--settingsBackgroundAlternativeColor', brighter(cm.backgroundColor, 24));
+      rt.style.setProperty('--navbarBackgroundColor', brighter(cm.backgroundColor, 50));
+      rt.style.setProperty('--dropdownHeadingColor', brighter(cm.backgroundColor, 70));
+      rt.style.setProperty('--dropdownBackgroundColor', brighter(cm.backgroundColor, 50));
+      rt.style.setProperty('--dropdownBorderColor', brighter(cm.backgroundColor, 100));
+      let att = document.querySelector('.cm-attribute');
+      if (att) rt.style.setProperty('--keyboardShortCutColor', brighter(window.getComputedStyle(att).color, 40));
+      let tag = document.querySelector('.cm-tag');
+      if (tag) rt.style.setProperty('--fileStatusColor', brighter(window.getComputedStyle(tag).color, 40));
+      let str = document.querySelector('.cm-string');
+      if (str) {
+        rt.style.setProperty('--fileStatusChangedColor', brighter(window.getComputedStyle(str).color, 40));
+        rt.style.setProperty('--fileStatusWarnColor', brighter(window.getComputedStyle(str).color, 10));
+      }
+    } else { // bright mode
+      // sleepy owl
+      owl.setAttribute("src", owlSrc + 'menu-logo-asleep.svg');
+      els.forEach(el => el.style.removeProperty('filter'));
+      let btn = document.querySelectorAll('.btn');
+      if (btn) btn.forEach(el => {
+        el.style.setProperty('background-color', cm.backgroundColor);
+        el.style.setProperty('color', cm.color);
+      });
+      rt.style.setProperty('--settingsLinkBackgroundColor', brighter(cm.backgroundColor, -16));
+      rt.style.setProperty('--settingsLinkHoverColor', brighter(cm.backgroundColor, -24));
+      rt.style.setProperty('--settingsBackgroundColor', brighter(cm.backgroundColor, -36));
+      rt.style.setProperty('--settingsBackgroundAlternativeColor', brighter(cm.backgroundColor, -24));
+      rt.style.setProperty('--navbarBackgroundColor', brighter(cm.backgroundColor, -50));
+      rt.style.setProperty('--dropdownHeadingColor', brighter(cm.backgroundColor, -70));
+      rt.style.setProperty('--dropdownBackgroundColor', brighter(cm.backgroundColor, -50));
+      rt.style.setProperty('--dropdownBorderColor', brighter(cm.backgroundColor, -100));
+      let att = document.querySelector('.cm-attribute');
+      if (att) rt.style.setProperty('--keyboardShortCutColor', brighter(window.getComputedStyle(att).color, -40));
+      let tag = document.querySelector('.cm-tag');
+      if (tag) rt.style.setProperty('--fileStatusColor', brighter(window.getComputedStyle(tag).color, -40));
+      let str = document.querySelector('.cm-string');
+      if (str) {
+        rt.style.setProperty('--fileStatusChangedColor', brighter(window.getComputedStyle(str).color, -40));
+        rt.style.setProperty('--fileStatusWarnColor', brighter(window.getComputedStyle(str).color, -10));
+      }
     }
-    console.info('swapNotationColors() set to: ' + this.notationNightMode);
-    this.setNotationColors();
+
+
+    function brighter(rgbString, deltaPercent) {
+      let rgb = [];
+      rgbString.slice(4, -1).split(',').forEach(i => {
+        rgb.push(Math.max(0, Math.min(parseInt(i) + deltaPercent, 255)));
+      });
+      return 'rgb(' + rgb.join(', ') + ')';
+    }
+
+    function complementary(rgbString) {
+      let rgb = [];
+      rgbString.slice(4, -1).split(',').forEach(i => {
+        rgb.push(255 - i);
+      });
+      return 'rgb(' + rgb.join(', ') + ')';
+    }
   }
 
   zoom(delta) {
@@ -569,7 +663,8 @@ export default class Viewer {
   }
 
   // initializes the settings panel by filling it with content
-  addVrvOptionsToSettingsPanel(tkAvailableOptions, defaultVrvOptions) {
+  addVrvOptionsToSettingsPanel(tkAvailableOptions, defaultVrvOptions,
+    restoreFromLocalStorage = true) {
     // skip these options (iin part because they are handled in control menu)
     let skipList = ['font', 'breaks', 'engravingDefaults', 'expand',
       'svgAdditionalAttribute', 'handwrittenFont'
@@ -577,46 +672,62 @@ export default class Viewer {
     let vsp = document.getElementById('verovioSettings');
     let addListeners = false; // add event listeners only the first time
     if (!/\w/g.test(vsp.innerHTML)) addListeners = true;
-    vsp.innerHTML = '';
+    vsp.innerHTML = "";
+    let settingsVrvGrpSelectHtml = '<a id="settingsVrvGrpSelect"></a>'; // vrv settings navigation links
     Object.keys(tkAvailableOptions.groups).forEach((grp) => {
       let group = tkAvailableOptions.groups[grp];
+      let groupId = group.name.replaceAll(" ", "_");
       // skip these two groups: base handled by mei-friend; sel to be thought
       if (!group.name.startsWith('Base short') &&
         !group.name.startsWith('Element selectors')) {
-        vsp.innerHTML += '<div><h2>' + group.name + '</h2></div>';
+        vsp.innerHTML += `<div><h2 id="${groupId}">${group.name}<a href="#settingsVrvGrpSelect">&uarr;</a></h2></div>`;
+        settingsVrvGrpSelectHtml += `<div><a href="#${groupId}">${group.name}</a></div>`;
         Object.keys(group.options).forEach(opt => {
           if (!skipList.includes(opt)) {
-            let o = group.options[opt];
-            let optDefault = o.default;
-            if (opt in defaultVrvOptions) optDefault = defaultVrvOptions[opt];
+            let o = group.options[opt]; // vrv available options
+            let optDefault = o.default; // available options defaults
+            if (defaultVrvOptions.hasOwnProperty(opt)) // mei-friend vrv defaults
+              optDefault = defaultVrvOptions[opt];
+            if (storage.hasOwnProperty('vrv-' + opt)) {
+              if (restoreFromLocalStorage) optDefault = storage['vrv-' + opt];
+              else delete storage['vrv-' + opt];
+            }
             let div = this.createOptionsItem(opt, o, optDefault);
             if (div) vsp.appendChild(div);
+            // set all options so that toolkit is always completely cleared
             if (['bool', 'int', 'double', 'std::string-list'].includes(o.type))
               this.vrvOptions[opt] = optDefault;
           }
         });
       }
     });
-    vsp.innerHTML += '<input type="button" title="Reset to mei-friend defaults" id="reset" value="Default" />';
+    // inject navigation links at the top of verovio settings
+    vsp.innerHTML = settingsVrvGrpSelectHtml + vsp.innerHTML;
+    vsp.innerHTML += '<input type="button" title="Reset to mei-friend defaults" id="vrvReset" class="resetButton" value="Default" />';
     if (addListeners) { // add change listeners
       vsp.addEventListener('input', ev => {
-        this.vrvOptions[ev.srcElement.id] = ev.srcElement.value;
+        let opt = ev.srcElement.id;
+        let value = ev.srcElement.value;
+        if (ev.srcElement.type === 'checkbox') value = ev.srcElement.checked;
+        if (ev.srcElement.type === 'number') value = parseFloat(value);
+        this.vrvOptions[opt] = value;
+        if (defaultVrvOptions.hasOwnProperty(opt) && // TODO check vrv default values
+          defaultVrvOptions[opt].toString() === value.toString())
+          delete storage['vrv-' + opt]; // remove from storage object when default value
+        else
+          storage['vrv-' + opt] = value; // save changes in localStorage object
         this.updateLayout(this.vrvOptions);
       });
-      vsp.addEventListener('click', ev => {
-        if (ev.srcElement.id === 'reset') {
-          this.addVrvOptionsToSettingsPanel(tkAvailableOptions, defaultVrvOptions);
+      vsp.addEventListener('click', ev => { // RESET button
+        if (ev.srcElement.id === 'vrvReset') {
+          this.addVrvOptionsToSettingsPanel(tkAvailableOptions, defaultVrvOptions, false);
           this.updateLayout(this.vrvOptions);
         }
       });
     }
   }
 
-  addCmOptionsToSettingsPanel(cm, mfDefaults) {
-    if (Object.keys(mfDefaults).length > 0)
-      this.editorOptions = {
-        ...mfDefaults
-      };
+  addCmOptionsToSettingsPanel(cm, mfDefaults, restoreFromLocalStorage = true) {
     let optionsToShow = { // key as in CodeMirror
       zoomFont: {
         title: 'Font size (%)',
@@ -638,6 +749,18 @@ export default class Viewer {
           'pastel-on-dark', 'xq-dark', 'xq-light', 'yeti', 'yonce', 'zenburn'
         ]
       },
+      matchTheme: {
+        title: 'Notation matches theme',
+        description: 'Match notation to editor color theme',
+        type: 'bool',
+        default: false
+      },
+      // notationBlackWhite: {
+      //   title: 'Notation always black on white',
+      //   description: 'Notation is always black on white (also in dark mode)',
+      //   type: 'bool',
+      //   default: true
+      // },
       tabSize: {
         title: 'Tab size',
         description: 'Number of space characters for each indentation level',
@@ -713,6 +836,7 @@ export default class Viewer {
         values: ['schema_meiCMN_401', 'schema_meiAll_401', 'none']
       },
     };
+    let storage = window.localStorage;
     let cmsp = document.getElementById('editorSettings');
     let addListeners = false; // add event listeners only the first time
     if (!/\w/g.test(cmsp.innerHTML)) addListeners = true;
@@ -720,53 +844,100 @@ export default class Viewer {
     Object.keys(optionsToShow).forEach(opt => {
       let o = optionsToShow[opt];
       let optDefault = o.default;
-      if (opt in mfDefaults) optDefault = mfDefaults[opt];
+      if (mfDefaults.hasOwnProperty(opt)) {
+        optDefault = mfDefaults[opt]
+        if (opt === 'matchTags' && typeof optDefault === 'object') optDefault = true;
+      };
+      if (storage.hasOwnProperty('cm-' + opt)) {
+        if (restoreFromLocalStorage) optDefault = storage['cm-' + opt];
+        else delete storage['cm-' + opt];
+      }
+      if (window.matchMedia('(prefers-color-scheme: dark)').matches && opt === 'theme') {
+        optDefault = mfDefaults['defaultDarkTheme']; // take a dark scheme for dark mode
+      }
       let div = this.createOptionsItem(opt, o, optDefault)
       if (div) cmsp.appendChild(div);
+      this.applyEditorOption(cm, opt, optDefault);
     });
-    cmsp.innerHTML += '<input type="button" title="Reset to mei-friend defaults" id="reset" value="Default" />';
+    cmsp.innerHTML += '<input type="button" title="Reset to mei-friend defaults" id="cmReset" class="resetButton" value="Default" />';
+
     if (addListeners) { // add change listeners
       cmsp.addEventListener('input', ev => {
         let option = ev.srcElement.id;
         let value = ev.srcElement.value;
         if (ev.srcElement.type === 'checkbox') value = ev.srcElement.checked;
         if (ev.srcElement.type === 'number') value = parseFloat(value);
-        this.applyEditorOption(cm, option, value);
-        this.editorOptions[option] = cm.getOption(option);
-      });
-      cmsp.addEventListener('click', ev => {
-        if (ev.srcElement.id === 'reset') {
-          this.addCmOptionsToSettingsPanel(cm, mfDefaults);
-          Object.keys(mfDefaults).forEach(option =>
-            this.applyEditorOption(cm, option, mfDefaults[option]));
+        this.applyEditorOption(cm, option, value,
+          storage.hasOwnProperty('cm-matchTheme') ?
+          storage['cm-matchTheme'] : mfDefaults['matchTheme']);
+        if (option === 'theme' && storage.hasOwnProperty('cm-matchTheme')) {
+          this.setNotationColors(
+            storage.hasOwnProperty('cm-matchTheme') ?
+            storage['cm-matchTheme'] : mfDefaults['matchTheme']);
+        }
+        if (mfDefaults.hasOwnProperty(option) && mfDefaults[option].toString() === value.toString()) {
+          delete storage['cm-' + option]; // remove from storage object when default value
+        } else {
+          storage['cm-' + option] = value; // save changes in localStorage object
         }
       });
+      cmsp.addEventListener('click', ev => {
+        if (ev.srcElement.id === 'cmReset') {
+          this.addCmOptionsToSettingsPanel(cm, mfDefaults, false);
+        }
+      });
+      window.matchMedia('(prefers-color-scheme: dark)')
+        .addEventListener('change', ev => { // system changes from dark to bright or otherway round
+          if (!storage.hasOwnProperty('cm-theme')) { // only if not changed by user
+            let matchTheme = storage.hasOwnProperty('cm-matchTheme') ? storage['cm-matchTheme'] : mfDefaults['matchTheme'];
+            if (ev.matches) { // event listener for dark/bright mode changes
+              document.getElementById('theme').value = mfDefaults['defaultDarkTheme'];
+              this.applyEditorOption(cm, 'theme', mfDefaults['defaultDarkTheme'], matchTheme);
+            } else {
+              document.getElementById('theme').value = mfDefaults['defaultBrightTheme'];
+              this.applyEditorOption(cm, 'theme', mfDefaults['defaultBrightTheme'], matchTheme);
+            }
+          }
+        });
     }
   } // addCmOptionsToSettingsPanel()
 
-  applyEditorOption(cm, option, value) {
-    if (option === 'hintOptions') {
-      if (value === 'schema_meiAll_401')
-        cm.setOption(option, {
-          'schemaInfo': {
-            ...schema_meiAll_401
-          }
-        });
-      else if (value === 'schema_meiCMN_401')
-        cm.setOption(option, {
-          'schemaInfo': {
-            ...schema_meiCMN_401
-          }
-        });
-      else cm.setOption(option, {}); // hints: none
-    } else if (option === 'matchTags') {
-      cm.setOption(option, value ? {
-        bothTags: true
-      } : {});
-    } else if (option === 'zoomFont') {
-      this.changeEditorFontSize(value);
-    } else {
-      cm.setOption(option, value);
+  // Apply options to CodeMirror object and handle other specialized options
+  applyEditorOption(cm, option, value, matchTheme = false) {
+    switch (option) {
+      case 'hintOptions':
+        if (value === 'schema_meiAll_401')
+          cm.setOption(option, {
+            'schemaInfo': {
+              ...schema_meiAll_401
+            }
+          });
+        else if (value === 'schema_meiCMN_401')
+          cm.setOption(option, {
+            'schemaInfo': {
+              ...schema_meiCMN_401
+            }
+          });
+        else cm.setOption(option, {}); // hints: none
+        break;
+      case 'zoomFont':
+        this.changeEditorFontSize(value);
+        break;
+      case 'matchTheme':
+        this.setNotationColors(value);
+        break;
+      case 'matchTags':
+        cm.setOption(option, value ? {
+          bothTags: true
+        } : {});
+        break;
+      default:
+        if (value == 'true' || value == 'false') value = (value === 'true');
+        cm.setOption(option, value);
+        if (option === 'theme') {
+          this.setMenuColors();
+          this.setNotationColors(matchTheme);
+        }
     }
   }
 
@@ -788,7 +959,9 @@ export default class Viewer {
         input.setAttribute('type', 'checkbox');
         input.setAttribute('name', opt);
         input.setAttribute('id', opt);
-        if (optDefault) input.setAttribute('checked', true);
+        if ((typeof optDefault === 'string' && optDefault === 'true') ||
+          (typeof optDefault === 'boolean' && optDefault))
+          input.setAttribute('checked', true);
         break;
       case 'int':
         step = 1;

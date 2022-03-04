@@ -141,6 +141,7 @@ import {
 import {
   createControlsMenu,
   setBreaksOptions,
+  handleSmartBreaksOption,
   addModifyerKeys,
   manualCurrentPage,
   generateSectionSelect
@@ -170,7 +171,7 @@ import default_schema from '../schemaInfo/mei-CMN-4.0.1.schemaInfo.js';
 
 // mei-friend version and date
 const version = 'develop-0.3.5';
-const versionDate = '25 Feb 2022';
+const versionDate = '4 March 2022';
 // const defaultMeiFileName = `${root}Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei`;
 const defaultMeiFileName = `${root}Beethoven_WoO70-Breitkopf.mei`;
 const defaultVerovioOptions = {
@@ -224,7 +225,10 @@ const defaultCodeMirrorOptions = {
     }
   },
   theme: 'default',
-  zoomFont: 100 // my own option
+  zoomFont: 100, // my own option
+  matchTheme: false, // notation matches editor theme (my option)
+  defaultBrightTheme: 'default', // default theme for OS bright mode
+  defaultDarkTheme: 'cobalt' // 'base16-dark', // default theme for OS dark mode
 };
 const defaultKeyMap = `${root}keymaps/default-keymap.json`;
 let fileChanged = false; // flag to track whether unsaved changes to file exist
@@ -528,7 +532,6 @@ function vrvWorkerEventsHandler(ev) {
         if (ev.data.setCursorToPageBeginning) v.setCursorToPageBeginning(cm);
         v.updatePageNumDisplay();
         v.addNotationEventListeners(cm);
-        v.setNotationColors();
         v.updateHighlight(cm);
         v.scrollSvg(cm);
       }
@@ -553,7 +556,6 @@ function vrvWorkerEventsHandler(ev) {
         v.lastNoteId = id;
       }
       v.addNotationEventListeners(cm);
-      v.setNotationColors();
       v.scrollSvg(cm);
       v.updateHighlight(cm);
       v.setFocusToVerovioPane();
@@ -812,7 +814,7 @@ let cmd = {
   'previousPage': () => v.updatePage(cm, 'backwards'),
   'nextPage': () => v.updatePage(cm, 'forwards'),
   'lastPage': () => v.updatePage(cm, 'last'),
-  'nightMode': () => v.swapNotationColors(),
+  // 'nightMode': () => v.swapNotationColors(),
   'nextNote': () => v.navigate(cm, 'note', 'forwards'),
   'previousNote': () => v.navigate(cm, 'note', 'backwards'),
   'nextMeasure': () => v.navigate(cm, 'measure', 'forwards'),
@@ -953,7 +955,7 @@ function addEventListeners(v, cm) {
   fc.addEventListener("dragstart", (ev) => console.log('Drag Start', ev));
   fc.addEventListener("dragend", (ev) => console.log('Drag End', ev));
 
-  document.getElementById('notation-night-mode-btn').addEventListener('click', cmd.nightMode);
+  // document.getElementById('notation-night-mode-btn').addEventListener('click', cmd.nightMode);
   // Zooming with buttons
   document.getElementById('decrease-scale-btn').addEventListener('click', cmd.zoomOut);
   document.getElementById('increase-scale-btn').addEventListener('click', cmd.zoomIn);
@@ -1146,6 +1148,7 @@ function addEventListeners(v, cm) {
   // speedmode checkbox
   document.getElementById('speed-checkbox').addEventListener('change', (ev) => {
     v.speedMode = ev.target.checked;
+    handleSmartBreaksOption(v.speedMode);
     if (v.speedMode && Object.keys(v.pageBreaks).length > 0)
       v.pageCount = Object.keys(v.pageBreaks).length;
     // else

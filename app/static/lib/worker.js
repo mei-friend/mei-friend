@@ -50,6 +50,7 @@ onmessage = function(e) {
           result.pageCount = tk.getPageCount();
           if (result.pageNo > result.pageCount) result.pageNo = result.pageCount;
         }
+        result.pageNo = Math.max(1, result.pageNo);
         let pg = (result.speedMode && result.pageNo > 1) ? 2 : result.pageNo;
         result.svg = tk.renderToSVG(pg);
         result.cmd = 'updated';

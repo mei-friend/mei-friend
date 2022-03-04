@@ -84,25 +84,42 @@
     /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
     _paq.push(["setDoNotTrack", true]);
     _paq.push(["requireCookieConsent"]);
-    if ((function() { try { return JSON.parse(unescape(("; " + document.cookie).split("; consent=").pop().split(";").shift())).tracking; } catch (e) { return false; } })()) { _paq.push(["setCookieConsentGiven"]); } else { _paq.push(["forgetCookieConsentGiven"]); }
+    if ((function() {
+        try {
+          return JSON.parse(unescape(("; " + document.cookie).split("; consent=").pop().split(";").shift())).tracking;
+        } catch (e) {
+          return false;
+        }
+      })()) {
+      _paq.push(["setCookieConsentGiven"]);
+    } else {
+      _paq.push(["forgetCookieConsentGiven"]);
+    }
     _paq.push(['trackPageView']);
     _paq.push(['enableLinkTracking']);
     (function() {
-      var u="//mdw.ac.at/piwik/";
-      _paq.push(['setTrackerUrl', u+'matomo.php']);
+      var u = "//mdw.ac.at/piwik/";
+      _paq.push(['setTrackerUrl', u + 'matomo.php']);
       _paq.push(['setSiteId', '1000092']);
-      var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
-      g.type='text/javascript'; g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
+      var d = document,
+        g = d.createElement('script'),
+        s = d.getElementsByTagName('script')[0];
+      g.type = 'text/javascript';
+      g.async = true;
+      g.src = u + 'matomo.js';
+      s.parentNode.insertBefore(g, s);
     })();
   </script>
-  <noscript><p><img src="//mdw.ac.at/piwik/matomo.php?idsite=1000092&amp;rec=1" style="border:0;" alt="" /></p></noscript>
+  <noscript>
+    <p><img src="//mdw.ac.at/piwik/matomo.php?idsite=1000092&amp;rec=1" style="border:0;" alt="" /></p>
+  </noscript>
   <!-- End Matomo Code -->
 
 </head>
 
 <body>
   <div class="header">
-    <div class="title"><a href="https://repo.mdw.ac.at/mei-friend/"><img src="{{ url_for('static', filename='img/logo.png') }}" alt="mei-friend" /></a></div>
+    <div class="title"><a href="https://repo.mdw.ac.at/mei-friend/"><img src="{{ url_for('static', filename='svg/menu-logo.svg') }}" alt="mei-friend" id="mei-friend-logo" /></a></div>
     <div class="navbar">
       <div class="dropdown">
         <button class="dropbtn GithubButton"><img id="GithubLogo" src="{{ url_for('static', filename='img/GitHub-Mark-32px.png') }}" /><span id="GithubName"><a href="login" id="GithubLoginLink">Login</a></span></button>
@@ -160,7 +177,7 @@
         <div class="dropdown-content" id="Insert">
           <a id="addTempo" href="#">Tempo<span class="keyShortCut shiftKey">T</span></a>
           <a id="addDirective" href="#">Directive<span class="keyShortCut">I</span></a>
-          <a id="addDynamics" href="#">Dynamicts<span class="keyShortCut">D</span></a>
+          <a id="addDynamics" href="#">Dynamics<span class="keyShortCut">D</span></a>
           <!-- <img src="{{ url_for('static', filename='svg/fermata.svg') }}" class="menu-icon" />Tempo -->
           <a id="addSlur" href="#">Slur<span class="keyShortCut">S</span></a>
           <a id="addTie" href="#">Tie<span class="keyShortCut">T</span></a>
@@ -288,11 +305,11 @@
   <div id="settingsPanel" class="out">
     <div class="tab">
       <button id="hideSettingsButton" class="tabstart" title="Hide Settings Panel">
-        <img src="{{ url_for('static', filename='svg/gear-16.svg') }}" />
+        <img src="{{ url_for('static', filename='svg/gear-16.svg') }}" id="hideSettingsButtonImg"  />
       </button>
       <button class="tablink" onclick="switchTab(event, 'meiFriendSettings')" title="mei-friend Settings">mei-friend</button>
-      <button class="tablink" onclick="switchTab(event, 'editorSettings')" title="Editor Settings">Editor</button>
-      <button class="tablink" onclick="switchTab(event, 'verovioSettings')" title="Verovio Options" id="defaultOpen">Verovio</button>
+      <button class="tablink" onclick="switchTab(event, 'editorSettings')" title="Editor Settings" id="defaultOpen">Editor</button>
+      <button class="tablink" onclick="switchTab(event, 'verovioSettings')" title="Verovio Options">Verovio</button>
       <span id="closeSettingsButton" class="topright" title="Hide Settings Panel">&times</span>
     </div>
     <!-- Tab content -->
