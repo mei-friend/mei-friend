@@ -111,10 +111,10 @@
 # 0.3.3 patch
 * Add 'Show MEI Guidelines' in Help menu
 * Implement 'Consult Guidelines' feature ('alt-.')
-# 0.3.4 patch
+# 0.3.4 patch: settings panel
 * Settings panel supporting the majority of Verovio options
 * Settings panel supporting CodeMirror options
-# 0.3.5 patch
-* Support for dark mode
+# 0.3.5 patch: dark mode support
+* mei-friend appearance matches the selected theme
 * Option to enable notation to match editor theme colors
-* Option to keep notation always black on also in dark mode
+* Theme changes automatically upon OS appearance change (e.g., from bright to dark) when in default theme
