@@ -83,6 +83,7 @@ export function loadDataInEditor(mei, setFreshlyLoaded = true) {
   v.loadXml(mei);
   let bs = document.getElementById('breaks-select');
   if (bs) bs.value = v.containsBreaks() ? 'line' : 'auto';
+  v.setRespSelectOptions();
 }
 
 export function updateLocalStorage(meiXml) {
@@ -466,6 +467,7 @@ function vrvWorkerEventsHandler(ev) {
       tkVersion = ev.data.version;
       tkAvailableOptions = ev.data.availableOptions;
       v.addVrvOptionsToSettingsPanel(tkAvailableOptions, defaultVerovioOptions);
+      v.addMeiFriendOptionsToSettingsPanel();
       document.querySelector(".rightfoot").innerHTML +=
         `&nbsp;<a href="https://www.verovio.org/">Verovio ${tkVersion}</a>.`;
       document.querySelector(".statusbar").innerHTML =

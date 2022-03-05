@@ -37,6 +37,7 @@ export default class Viewer {
     this.toolTipTimeOutHandle = null; // handle for zoom tooltip hide timer
     this.vrvOptions; // all verovio options
     this.verovioIcon = document.getElementById('verovio-icon');
+    this.respId = '';
   }
 
   // change options, load new data, render current page, add listeners, highlight
@@ -573,7 +574,6 @@ export default class Viewer {
       }
     }
 
-
     function brighter(rgbString, deltaPercent) {
       let rgb = [];
       rgbString.slice(4, -1).split(',').forEach(i => {
@@ -663,8 +663,7 @@ export default class Viewer {
   }
 
   // initializes the settings panel by filling it with content
-  addVrvOptionsToSettingsPanel(tkAvailableOptions, defaultVrvOptions,
-    restoreFromLocalStorage = true) {
+  addVrvOptionsToSettingsPanel(tkAvailableOptions, defaultVrvOptions, restoreFromLocalStorage = true) {
     // skip these options (iin part because they are handled in control menu)
     let skipList = ['font', 'breaks', 'engravingDefaults', 'expand',
       'svgAdditionalAttribute', 'handwrittenFont'
@@ -673,6 +672,7 @@ export default class Viewer {
     let addListeners = false; // add event listeners only the first time
     if (!/\w/g.test(vsp.innerHTML)) addListeners = true;
     vsp.innerHTML = "";
+    let storage = window.localStorage;
     let settingsVrvGrpSelectHtml = '<a id="settingsVrvGrpSelect"></a>'; // vrv settings navigation links
     Object.keys(tkAvailableOptions.groups).forEach((grp) => {
       let group = tkAvailableOptions.groups[grp];
@@ -701,6 +701,7 @@ export default class Viewer {
         });
       }
     });
+
     // inject navigation links at the top of verovio settings
     vsp.innerHTML = settingsVrvGrpSelectHtml + vsp.innerHTML;
     vsp.innerHTML += '<input type="button" title="Reset to mei-friend defaults" id="vrvReset" class="resetButton" value="Default" />';
@@ -755,12 +756,6 @@ export default class Viewer {
         type: 'bool',
         default: false
       },
-      // notationBlackWhite: {
-      //   title: 'Notation always black on white',
-      //   description: 'Notation is always black on white (also in dark mode)',
-      //   type: 'bool',
-      //   default: true
-      // },
       tabSize: {
         title: 'Tab size',
         description: 'Number of space characters for each indentation level',
@@ -902,6 +897,108 @@ export default class Viewer {
     }
   } // addCmOptionsToSettingsPanel()
 
+  addMeiFriendOptionsToSettingsPanel(restoreFromLocalStorage = true) {
+    let optionsToShow = {
+      titleSupplied: {
+        title: 'Handle <supplied> element',
+        description: 'Control handling of <supplied> elements',
+        type: 'header'
+      },
+      showSupplied: {
+        title: 'Show <supplied> elements',
+        decription: 'Highlight all elements contained by a <supplied> element',
+        type: 'bool',
+        default: true
+      },
+      suppliedColor: {
+        title: 'Select highlight color',
+        description: 'Select <supplied> highlight color',
+        type: 'color',
+        default: '#e69500',
+      },
+      respSelect: {
+        title: 'Select responsibility',
+        description: 'Select responsibility id',
+        type: 'select',
+        default: 'none',
+        values: []
+      },
+
+    };
+    let mfs = document.getElementById('meiFriendSettings');
+    let addListeners = false; // add event listeners only the first time
+    let rt = document.querySelector(':root');
+    if (!/\w/g.test(mfs.innerHTML)) addListeners = true;
+    mfs.innerHTML = '<div><h2>mei-friend Settings</h2></div>';
+    let storage = window.localStorage;
+    Object.keys(optionsToShow).forEach(opt => {
+      let o = optionsToShow[opt];
+      let optDefault = o.default;
+      if (storage.hasOwnProperty('mf-' + opt)) {
+        if (restoreFromLocalStorage) optDefault = storage['mf-' + opt];
+        else delete storage['mf-' + opt];
+      }
+      switch (opt) {
+        case 'showSupplied':
+          rt.style.setProperty('--suppliedColor', (optDefault) ? 'var(--defaultSuppliedColor)' : 'var(--notationColor)')
+          break;
+        case 'suppliedColor':
+          rt.style.setProperty('--defaultSuppliedColor', optDefault);
+          break;
+        case 'respSelect':
+          o.values = Array.from(this.xmlDoc.querySelectorAll('corpName[*|id]')).map(e => e.getAttribute('xml:id'));
+          break;
+      }
+      let div = this.createOptionsItem(opt, o, optDefault)
+      if (div) mfs.appendChild(div);
+    });
+    mfs.innerHTML += '<input type="button" title="Reset to mei-friend defaults" id="mfReset" class="resetButton" value="Default" />';
+
+    if (addListeners) { // add change listeners
+      mfs.addEventListener('input', ev => {
+        let option = ev.srcElement.id;
+        let value = ev.srcElement.value;
+        if (ev.srcElement.type === 'checkbox') value = ev.srcElement.checked;
+        if (ev.srcElement.type === 'number') value = parseFloat(value);
+        switch (option) {
+          case 'showSupplied':
+            rt.style.setProperty('--suppliedColor', (value) ? 'var(--defaultSuppliedColor)' : 'var(--notationColor)');
+            break;
+          case 'suppliedColor':
+            rt.style.setProperty('--defaultSuppliedColor', document.getElementById('suppliedColor').value);
+            break;
+          case 'respSelect':
+            this.respId = document.getElementById('respSelect').value;
+            break;
+        }
+        if (value === optionsToShow[option].default) {
+          delete storage['mf-' + option]; // remove from storage object when default value
+        } else {
+          storage['mf-' + option] = value; // save changes in localStorage object
+        }
+      });
+      mfs.addEventListener('click', ev => {
+        if (ev.srcElement.id === 'mfReset') {
+          this.addMeiFriendOptionsToSettingsPanel(false);
+        }
+      });
+
+    }
+  } // addMeiFriendOptionsToSettingsPanel()
+
+  // add responsibility statement to resp select dropdown
+  setRespSelectOptions() {
+    let rs = document.getElementById('respSelect');
+    if (rs) {
+      while (rs.length > 0) rs.options.remove(0);
+      let optEls = this.xmlDoc.querySelectorAll('corpName[*|id]');
+      optEls.forEach(el => {
+        let id = el.getAttribute('xml:id')
+        rs.add(new Option(id, id));
+      });
+    }
+  }
+
   // Apply options to CodeMirror object and handle other specialized options
   applyEditorOption(cm, option, value, matchTheme = false) {
     switch (option) {
@@ -984,12 +1081,22 @@ export default class Viewer {
         o.values.forEach((str, i) => input.add(new Option(str, str,
           (o.values.indexOf(optDefault) == i) ? true : false)));
         break;
+      case 'color':
+        input = document.createElement('input');
+        input.setAttribute('type', 'color');
+        input.setAttribute('name', opt);
+        input.setAttribute('id', opt);
+        input.setAttribute('value', optDefault);
+        break;
+      case 'header':
+        label.setAttribute('style', 'font-weight: bold; font-size: 105%; margin-top: 3px;');
+        break;
       default:
         console.log('Vervio Options: Unhandled data type: ' + o.type);
         console.log('title: ' + o.title + ' [' + o.type + '], default: [' + optDefault + ']');
     }
     if (input) div.appendChild(input);
-    return (input) ? div : null;
+    return (input || o.type === 'header') ? div : null;
   }
 
   // navigate forwards/backwards/upwards/downwards in the DOM, as defined

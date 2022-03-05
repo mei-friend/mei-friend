@@ -724,9 +724,9 @@ span.keyIcon {
   max-width: 220px;
 }
 
-#editorSettings .optionsItem select {
+#editorSettings .optionsItem select, #meiFriendSettings .optionsItem select {
   min-width: 80px;
-  max-width: 145px;
+  max-width: 150px;
 }
 
 /* For all options items  */
@@ -756,6 +756,10 @@ span.keyIcon {
   padding-bottom: 0px;
   text-align: right;
   border-radius: 4px;
+}
+
+.optionsItem input[type='color'] {
+  padding: 2px;
 }
 
 .resetButton {
