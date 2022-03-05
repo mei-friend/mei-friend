@@ -480,7 +480,7 @@ function vrvWorkerEventsHandler(ev) {
         v.updateNotation = false;
         loadDataInEditor(storage.content);
         v.updateNotation = true;
-        v.updateAll(cm, defaultVerovioOptions);
+        v.updateAll(cm);
       }
       v.busy(false);
       break;
