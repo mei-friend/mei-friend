@@ -183,6 +183,10 @@ a:active {
   width: 70%;
 }
 
+.openUrlOverlay select { 
+  text-align:left;
+}
+
 #openUrlStatus {
   font-size: 8pt;
   color: var(--fileStatusWarnColor);

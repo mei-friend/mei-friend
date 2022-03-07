@@ -18,6 +18,17 @@ export let meiFileName = '';
 export let meiFileLocation = '';
 export let meiFileLocationPrintable = '';
 
+export const sampleEncodings = [];
+export const samp = { 
+  URL: 0,
+  ORG:1,
+  REPO:2,
+  FILE:3,
+  TITLE:4,
+  COMPOSER:5
+}
+
+
 export function setFileChangedState(fileChangedState) {
   fileChanged = fileChangedState;
   const fileStatusElement = document.querySelector(".fileStatus");
@@ -231,6 +242,7 @@ const defaultCodeMirrorOptions = {
   defaultDarkTheme: 'paraiso-dark' // 'base16-dark', // default theme for OS dark mode
 };
 const defaultKeyMap = `${root}keymaps/default-keymap.json`;
+const sampleEncodingsCSV = `${root}sampleEncodings/sampleEncodings.csv`;
 let fileChanged = false; // flag to track whether unsaved changes to file exist
 let freshlyLoaded = false; // flag to ignore a cm.on("changes") event on file load
 
@@ -301,6 +313,10 @@ document.addEventListener('DOMContentLoaded', function() {
   if (urlFileName) {
     openUrlFetch(new URL(urlFileName));
   }
+
+  // fill sample encodings
+  fillInSampleEncodings();
+
   // restore localStorage if we have it
   if (storage.supported) {
     storage.read();
@@ -1185,6 +1201,29 @@ export function log(s) {
   document.querySelector(".statusbar").innerHTML = s;
   document.querySelector(".verovio-panel").innerHTML = s;
   console.log(s);
+}
+
+function fillInSampleEncodings() { 
+  console.log("LOADIng CSV");
+  fetch(sampleEncodingsCSV, {headers: {'content-type':'text/csv'}})
+    .then((response) => response.text())
+    .then((csv) => {
+      const lines = csv.split("\n");
+      lines.forEach(l => {
+        if(l) { 
+          const tuple = l.trim().split("|");
+          sampleEncodings.push([
+              tuple[samp.URL],
+              tuple[samp.ORG],
+              tuple[samp.REPO],
+              tuple[samp.FILE],
+              tuple[samp.TITLE],
+              tuple[samp.COMPOSER]
+          ])
+          console.log("ADFASDFA:", tuple.length, tuple[5])
+        }
+      })
+    })
 }
 
 // sets keyMap.json to target element and defines listeners
