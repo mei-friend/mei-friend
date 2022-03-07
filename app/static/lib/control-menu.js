@@ -417,18 +417,20 @@ export function generateSectionSelect(xmlDoc) {
     ['', '']
   ];
   let baseSection = xmlDoc.querySelector('music score');
-  let els = Array.from(baseSection.querySelectorAll(selector));
-  els.forEach(el => {
-    let str = '';
-    let parent = el.parentElement.closest(selector);
-    if (parent) {
-      str += '│ ';
-      while (parent = parent.parentElement.closest(selector))
-        str += '│ '; // &#9474;&nbsp; for indentation
-    }
-    sections.push([str + el.getAttribute('xml:id'), el.getAttribute('xml:id')]);
-  });
-  if (sections.length == 2) sections.pop(); // remove if only the one section
+  if (baseSection) {
+    let els = baseSection.querySelectorAll(selector);
+    els.forEach(el => {
+      let str = '';
+      let parent = el.parentElement.closest(selector);
+      if (parent) {
+        str += '│ ';
+        while (parent = parent.parentElement.closest(selector))
+          str += '│ '; // &#9474;&nbsp; for indentation
+      }
+      sections.push([str + el.getAttribute('xml:id'), el.getAttribute('xml:id')]);
+    });
+    if (sections.length == 2) sections.pop(); // remove if only the one section
+  }
   return sections;
 }
 
