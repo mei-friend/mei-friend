@@ -222,7 +222,7 @@ export function invertPlacement(v, cm, modifier = false) {
   for (let id of ids) {
     var el = v.xmlDoc.querySelector("[*|id='" + id + "']");
     let chordId = utils.insideParent(id);
-    if (el && el.nodeName == 'note') {
+    if (el && el.nodeName === 'note') {
       if (chordId) id = chordId;
       el = v.xmlDoc.querySelector("[*|id='" + id + "']");
     }
@@ -233,13 +233,13 @@ export function invertPlacement(v, cm, modifier = false) {
     let attr = '';
     let val = 'above';
     // placement above/below as in dir, dynam...
-    if (att.attPlacement.includes(el.nodeName) || el.nodeName === 'beamSpan') {
+    if (att.attPlacement.includes(el.nodeName)) { //|| el.nodeName === 'beamSpan') {
       attr = 'place';
       if (el.hasAttribute(attr) &&
         (att.dataPlacement.includes(val) && el.getAttribute(attr) != 'below')) {
         val = 'below';
       }
-      if (el.nodeName == 'fermata')
+      if (el.nodeName === 'fermata')
         val == 'below' ?
         el.setAttribute('form', 'inv') : el.removeAttribute('form');
       el.setAttribute(attr, val);
@@ -262,7 +262,7 @@ export function invertPlacement(v, cm, modifier = false) {
       range = replaceInTextEditor(cm, el, true);
       // txtEdr.autoIndentSelectedRows();
       // invert @num.place within tuplet
-    } else if (el.nodeName == 'tuplet') {
+    } else if (el.nodeName === 'tuplet') {
       attr = 'num.place';
       val = 'above';
       if (el.hasAttribute(attr) && el.getAttribute(attr) == val) {
@@ -271,13 +271,30 @@ export function invertPlacement(v, cm, modifier = false) {
       el.setAttribute(attr, val);
       range = replaceInTextEditor(cm, el, true);
       // txtEdr.autoIndentSelectedRows();
+    } else if (el.nodeName === 'beamSpan') { // replace individual notes in beamSpan
+      attr = 'stem.dir', val = 'up';
+      let plist = el.getAttribute('plist');
+      if (plist) {
+        plist.split(' ').forEach(p => {
+          let note = v.xmlDoc.querySelector("[*|id='" + speed.rmHash(p) + "']");
+          if (note) {
+            if (note.parentNode.nodeName === 'chord') note = note.parentNode;
+            if (note.hasAttribute(attr) && note.getAttribute(attr) == val) {
+              val = 'down';
+            }
+            note.setAttribute(attr, val);
+          }
+          v.updateNotation = false; // no need to redraw notation
+          range = replaceInTextEditor(cm, note, true);
+        });
+      }
       // find all note/chord elements children and execute InvertingAction
     } else if (noteList = el.querySelectorAll("note, chord")) {
       // console.info('noteList: ', noteList);
       attr = 'stem.dir', val = 'up';
       for (let note of noteList) {
         // skip notes within chords
-        if (note.parentNode.nodeName == 'chord') continue;
+        if (note.parentNode.nodeName === 'chord') continue;
         if (note.hasAttribute(attr) && note.getAttribute(attr) == val) {
           val = 'down';
         }
@@ -442,6 +459,7 @@ export function addBeamElement(v, cm, elementName = 'beam') {
 export function addBeamSpan(v, cm) {
   v.loadXml(cm.getValue());
   if (v.selectedElements.length < 1) return;
+  v.selectedElements = utils.sortElementsByScorePosition(v.selectedElements);
   console.info('addBeamSpan to selectedElements:', v.selectedElements);
   let id1 = v.selectedElements[0]; // xml:id string
   let id2 = v.selectedElements[v.selectedElements.length - 1];
@@ -451,7 +469,7 @@ export function addBeamSpan(v, cm) {
   beamSpan.setAttributeNS(speed.xmlNameSpace, 'xml:id', uuid);
   beamSpan.setAttribute('startid', '#' + id1);
   beamSpan.setAttribute('endid', '#' + id2);
-  beamSpan.setAttribute('plist', v.selectedElements.map(e =>'#' + e).join(' '));
+  beamSpan.setAttribute('plist', v.selectedElements.map(e => '#' + e).join(' '));
   let n1 = v.xmlDoc.querySelector("[*|id='" + id1 + "']");
   n1.closest('measure').appendChild(beamSpan);
   v.updateNotation = false;
