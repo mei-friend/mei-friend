@@ -65,8 +65,6 @@ export default class Viewer {
   }
 
   updateData(cm, setCursorToPageBeg = true, setFocusToVerovioPane = true) {
-    // is it needed for speed mode?
-    //if(!this.speedMode) this.loadVerovioData(this.speedFilter(cm.getValue()));
     let message = {
       'cmd': 'updateData',
       'mei': this.speedFilter(cm.getValue()),

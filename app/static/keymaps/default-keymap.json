@@ -1,8 +1,8 @@
 {
   ".notation": {
-    "q": "nightMode",
     "x": "invertPlacement",
     "ctrl-x": "betweenPlacement",
+    "v": "addVerticalGroup",
     "right": "nextNote",
     "left": "previousNote",
     "up": "layerUp",

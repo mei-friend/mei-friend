@@ -489,14 +489,6 @@ export function addSuppliedElement(v, cm) {
   v.selectedElements = utils.sortElementsByScorePosition(v.selectedElements);
   if (v.selectedElements.length < 1) return;
   console.info('addSuppliedElement(): selectedElements:', v.selectedElements);
-  // let id1 = v.selectedElements[0]; // xml:id string
-  // let parentId;
-  // if (parentId = utils.insideParent(id1, 'chord')) id1 = parentId;
-  // let id2 = v.selectedElements[v.selectedElements.length - 1];
-  // if (parentId = utils.insideParent(id2, 'chord')) id2 = parentId;
-  // let n1 = v.xmlDoc.querySelector("[*|id='" + id1 + "']");
-  // let n2 = v.xmlDoc.querySelector("[*|id='" + id2 + "']");
-  // let par1 = n1.parentNode;
   v.updateNotation = false;
   let uuids = [];
   v.selectedElements.forEach(id => {
@@ -522,6 +514,31 @@ export function addSuppliedElement(v, cm) {
   v.updateData(cm, false, true);
   v.updateNotation = true; // update notation again
 } // addSuppliedElement()
+
+export function addVerticalGroup(v, cm) {
+  v.loadXml(cm.getValue());
+  v.selectedElements = speed.filterElements(v.selectedElements, v.xmlDoc);
+  if (v.selectedElements.length < 1) return;
+  console.info('addVerticalGroup(): selectedElements:', v.selectedElements);
+  v.updateNotation = false;
+  v.selectedElements.forEach(id => {
+    let el = v.xmlDoc.querySelector("[*|id='" + id + "']");
+    if (!el) {
+      console.warn('No such element in xml document: ' + id);
+    } else if (att.attVerticalGroup.includes(el.nodeName)) {
+      let oldEl = el.cloneNode(true);
+      // TODO: look to current page SVG dynam@vgrp, dir@vgrp, hairpin@vgrp, tempo@vgrp, ped@vgrp
+      // and increment value if already taken
+      el.setAttribute('vgrp', 1);
+      replaceInTextEditor(cm, oldEl, true, el);
+      cm.execCommand('indentAuto');
+    } else {
+      console.warn('Vertical group not supported for ', el);
+    }
+  });
+  v.updateData(cm, false, true);
+  v.updateNotation = true; // update notation again
+} // addVerticalGroup()
 
 // wrapper for cleaning superfluous @accid.ges attributes
 export function cleanAccid(v, cm) {

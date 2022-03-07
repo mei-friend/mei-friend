@@ -816,7 +816,6 @@ let cmd = {
   'previousPage': () => v.updatePage(cm, 'backwards'),
   'nextPage': () => v.updatePage(cm, 'forwards'),
   'lastPage': () => v.updatePage(cm, 'last'),
-  // 'nightMode': () => v.swapNotationColors(),
   'nextNote': () => v.navigate(cm, 'note', 'forwards'),
   'previousNote': () => v.navigate(cm, 'note', 'backwards'),
   'nextMeasure': () => v.navigate(cm, 'measure', 'forwards'),
@@ -877,6 +876,7 @@ let cmd = {
   //
   'delete': () => e.delEl(v, cm),
   'invertPlacement': () => e.invertPlacement(v, cm),
+  'addVerticalGroup': () => e.addVerticalGroup(v, cm),
   'toggleStacc': () => e.toggleArtic(v, cm, 'stacc'),
   'toggleAccent': () => e.toggleArtic(v, cm, 'acc'),
   'toggleTenuto': () => e.toggleArtic(v, cm, 'ten'),
@@ -958,7 +958,6 @@ function addEventListeners(v, cm) {
   fc.addEventListener("dragstart", (ev) => console.log('Drag Start', ev));
   fc.addEventListener("dragend", (ev) => console.log('Drag End', ev));
 
-  // document.getElementById('notation-night-mode-btn').addEventListener('click', cmd.nightMode);
   // Zooming with buttons
   document.getElementById('decrease-scale-btn').addEventListener('click', cmd.zoomOut);
   document.getElementById('increase-scale-btn').addEventListener('click', cmd.zoomIn);
@@ -1002,6 +1001,7 @@ function addEventListeners(v, cm) {
   document.getElementById('downwards-btn').addEventListener('click', cmd.layerDown);
   // manipulation
   document.getElementById('invertPlacement').addEventListener('click', cmd.invertPlacement);
+  document.getElementById('addVerticalGroup').addEventListener('click', cmd.addVerticalGroup);
   document.getElementById('delete').addEventListener('click', cmd.delete);
   document.getElementById('pitchUp').addEventListener('click', cmd.shiftPitchNameUp);
   document.getElementById('pitchDown').addEventListener('click', cmd.shiftPitchNameDown);

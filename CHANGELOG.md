@@ -121,3 +121,4 @@
 # 0.3.6 patch: mei-friend settings
 * Support for surrounding selected elements with a supplied element
 * Settings to control supplied element display, color, and responsibility statement
+* Support to insert vertical group attributes to selected elements
