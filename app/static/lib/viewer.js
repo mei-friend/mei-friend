@@ -526,25 +526,25 @@ export default class Viewer {
       els.forEach(el => el.style.setProperty('filter', 'invert(.8)'));
       let btn = document.querySelectorAll('.btn');
       if (btn) btn.forEach(el => {
-        el.style.setProperty('background-color', complementary(cm.backgroundColor));
-        el.style.setProperty('color', complementary(cm.color));
+        el.style.setProperty('background-color', utils.complementary(cm.backgroundColor));
+        el.style.setProperty('color', utils.complementary(cm.color));
       });
-      rt.style.setProperty('--settingsLinkBackgroundColor', brighter(cm.backgroundColor, 21));
-      rt.style.setProperty('--settingsLinkHoverColor', brighter(cm.backgroundColor, 36));
-      rt.style.setProperty('--settingsBackgroundColor', brighter(cm.backgroundColor, 36));
-      rt.style.setProperty('--settingsBackgroundAlternativeColor', brighter(cm.backgroundColor, 24));
-      rt.style.setProperty('--navbarBackgroundColor', brighter(cm.backgroundColor, 50));
-      rt.style.setProperty('--dropdownHeadingColor', brighter(cm.backgroundColor, 70));
-      rt.style.setProperty('--dropdownBackgroundColor', brighter(cm.backgroundColor, 50));
-      rt.style.setProperty('--dropdownBorderColor', brighter(cm.backgroundColor, 100));
+      rt.style.setProperty('--settingsLinkBackgroundColor', utils.brighter(cm.backgroundColor, 21));
+      rt.style.setProperty('--settingsLinkHoverColor', utils.brighter(cm.backgroundColor, 36));
+      rt.style.setProperty('--settingsBackgroundColor', utils.brighter(cm.backgroundColor, 36));
+      rt.style.setProperty('--settingsBackgroundAlternativeColor', utils.brighter(cm.backgroundColor, 24));
+      rt.style.setProperty('--navbarBackgroundColor', utils.brighter(cm.backgroundColor, 50));
+      rt.style.setProperty('--dropdownHeadingColor', utils.brighter(cm.backgroundColor, 70));
+      rt.style.setProperty('--dropdownBackgroundColor', utils.brighter(cm.backgroundColor, 50));
+      rt.style.setProperty('--dropdownBorderColor', utils.brighter(cm.backgroundColor, 100));
       let att = document.querySelector('.cm-attribute');
-      if (att) rt.style.setProperty('--keyboardShortCutColor', brighter(window.getComputedStyle(att).color, 40));
+      if (att) rt.style.setProperty('--keyboardShortCutColor', utils.brighter(window.getComputedStyle(att).color, 40));
       let tag = document.querySelector('.cm-tag');
-      if (tag) rt.style.setProperty('--fileStatusColor', brighter(window.getComputedStyle(tag).color, 40));
+      if (tag) rt.style.setProperty('--fileStatusColor', utils.brighter(window.getComputedStyle(tag).color, 40));
       let str = document.querySelector('.cm-string');
       if (str) {
-        rt.style.setProperty('--fileStatusChangedColor', brighter(window.getComputedStyle(str).color, 40));
-        rt.style.setProperty('--fileStatusWarnColor', brighter(window.getComputedStyle(str).color, 10));
+        rt.style.setProperty('--fileStatusChangedColor', utils.brighter(window.getComputedStyle(str).color, 40));
+        rt.style.setProperty('--fileStatusWarnColor', utils.brighter(window.getComputedStyle(str).color, 10));
       }
     } else { // bright mode
       // sleepy owl
@@ -555,41 +555,25 @@ export default class Viewer {
         el.style.setProperty('background-color', cm.backgroundColor);
         el.style.setProperty('color', cm.color);
       });
-      rt.style.setProperty('--settingsLinkBackgroundColor', brighter(cm.backgroundColor, -16));
-      rt.style.setProperty('--settingsLinkHoverColor', brighter(cm.backgroundColor, -24));
-      rt.style.setProperty('--settingsBackgroundColor', brighter(cm.backgroundColor, -36));
-      rt.style.setProperty('--settingsBackgroundAlternativeColor', brighter(cm.backgroundColor, -24));
-      rt.style.setProperty('--navbarBackgroundColor', brighter(cm.backgroundColor, -50));
-      rt.style.setProperty('--dropdownHeadingColor', brighter(cm.backgroundColor, -70));
-      rt.style.setProperty('--dropdownBackgroundColor', brighter(cm.backgroundColor, -50));
-      rt.style.setProperty('--dropdownBorderColor', brighter(cm.backgroundColor, -100));
+      rt.style.setProperty('--settingsLinkBackgroundColor', utils.brighter(cm.backgroundColor, -16));
+      rt.style.setProperty('--settingsLinkHoverColor', utils.brighter(cm.backgroundColor, -24));
+      rt.style.setProperty('--settingsBackgroundColor', utils.brighter(cm.backgroundColor, -36));
+      rt.style.setProperty('--settingsBackgroundAlternativeColor', utils.brighter(cm.backgroundColor, -24));
+      rt.style.setProperty('--navbarBackgroundColor', utils.brighter(cm.backgroundColor, -50));
+      rt.style.setProperty('--dropdownHeadingColor', utils.brighter(cm.backgroundColor, -70));
+      rt.style.setProperty('--dropdownBackgroundColor', utils.brighter(cm.backgroundColor, -50));
+      rt.style.setProperty('--dropdownBorderColor', utils.brighter(cm.backgroundColor, -100));
       let att = document.querySelector('.cm-attribute');
-      if (att) rt.style.setProperty('--keyboardShortCutColor', brighter(window.getComputedStyle(att).color, -40));
+      if (att) rt.style.setProperty('--keyboardShortCutColor', utils.brighter(window.getComputedStyle(att).color, -40));
       let tag = document.querySelector('.cm-tag');
-      if (tag) rt.style.setProperty('--fileStatusColor', brighter(window.getComputedStyle(tag).color, -40));
+      if (tag) rt.style.setProperty('--fileStatusColor', utils.brighter(window.getComputedStyle(tag).color, -40));
       let str = document.querySelector('.cm-string');
       if (str) {
-        rt.style.setProperty('--fileStatusChangedColor', brighter(window.getComputedStyle(str).color, -40));
-        rt.style.setProperty('--fileStatusWarnColor', brighter(window.getComputedStyle(str).color, -10));
+        rt.style.setProperty('--fileStatusChangedColor', utils.brighter(window.getComputedStyle(str).color, -40));
+        rt.style.setProperty('--fileStatusWarnColor', utils.brighter(window.getComputedStyle(str).color, -10));
       }
     }
-
-    function brighter(rgbString, deltaPercent) {
-      let rgb = [];
-      rgbString.slice(4, -1).split(',').forEach(i => {
-        rgb.push(Math.max(0, Math.min(parseInt(i) + deltaPercent, 255)));
-      });
-      return 'rgb(' + rgb.join(', ') + ')';
-    }
-
-    function complementary(rgbString) {
-      let rgb = [];
-      rgbString.slice(4, -1).split(',').forEach(i => {
-        rgb.push(255 - i);
-      });
-      return 'rgb(' + rgb.join(', ') + ')';
-    }
-  }
+  } // setMenuColors()
 
   zoom(delta) {
     let zoomCtrl = document.getElementById('verovio-zoom');
@@ -935,15 +919,23 @@ export default class Viewer {
       let o = optionsToShow[opt];
       let optDefault = o.default;
       if (storage.hasOwnProperty('mf-' + opt)) {
-        if (restoreFromLocalStorage) optDefault = storage['mf-' + opt];
-        else delete storage['mf-' + opt];
+        if (restoreFromLocalStorage) {
+          optDefault = storage['mf-' + opt];
+          if (typeof optDefault === 'string' && (optDefault === 'true' || optDefault === 'false'))
+            optDefault = optDefault === 'true';
+        } else delete storage['mf-' + opt];
       }
       switch (opt) {
         case 'showSupplied':
           rt.style.setProperty('--suppliedColor', (optDefault) ? 'var(--defaultSuppliedColor)' : 'var(--notationColor)')
+          rt.style.setProperty('--suppliedHighlightedColor', (optDefault) ? 'var(--defaultSuppliedHighlightedColor)' : 'var(--highlightColor)')
           break;
         case 'suppliedColor':
-          rt.style.setProperty('--defaultSuppliedColor', optDefault);
+          let checked = document.getElementById('showSupplied').checked;
+          rt.style.setProperty('--defaultSuppliedColor', checked ? optDefault : 'var(--notationColor)');
+          rt.style.setProperty('--defaultSuppliedHighlightedColor', checked ? utils.brighter(optDefault, -50) : 'var(--highlightColor)');
+          rt.style.setProperty('--suppliedColor', checked ? optDefault : 'var(--notationColor)');
+          rt.style.setProperty('--suppliedHighlightedColor', checked ? utils.brighter(optDefault, -50) : 'var(--highlightColor)');
           break;
         case 'respSelect':
           o.values = Array.from(this.xmlDoc.querySelectorAll('corpName[*|id]')).map(e => e.getAttribute('xml:id'));
@@ -960,12 +952,16 @@ export default class Viewer {
         let value = ev.srcElement.value;
         if (ev.srcElement.type === 'checkbox') value = ev.srcElement.checked;
         if (ev.srcElement.type === 'number') value = parseFloat(value);
+        let col = document.getElementById('suppliedColor').value;
         switch (option) {
           case 'showSupplied':
-            rt.style.setProperty('--suppliedColor', (value) ? 'var(--defaultSuppliedColor)' : 'var(--notationColor)');
+            rt.style.setProperty('--suppliedColor', (value) ? col : 'var(--notationColor)');
+            rt.style.setProperty('--suppliedHighlightedColor', (value) ? utils.brighter(col, -50) : 'var(--highlightColor)');
             break;
           case 'suppliedColor':
-            rt.style.setProperty('--defaultSuppliedColor', document.getElementById('suppliedColor').value);
+            let checked = document.getElementById('showSupplied').checked;
+            rt.style.setProperty('--suppliedColor', checked ? col : 'var(--notationColor)');
+            rt.style.setProperty('--suppliedHighlightedColor', checked ? utils.brighter(col, -50) : 'var(--highlightColor)');
             break;
           case 'respSelect':
             this.respId = document.getElementById('respSelect').value;
@@ -982,7 +978,11 @@ export default class Viewer {
           this.addMeiFriendOptionsToSettingsPanel(false);
         }
       });
-
+      // window.matchMedia('(prefers-color-scheme: dark)')
+      //   .addEventListener('change', ev => { // system changes from dark to bright or otherway round
+      //     rt.style.setProperty('--suppliedHighlightedColor',
+      //       utils.brighter(document.getElementById('suppliedColor').value, ev.matches ? 50 : -50));
+      //   });
     }
   } // addMeiFriendOptionsToSettingsPanel()
 
