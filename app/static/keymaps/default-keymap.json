@@ -58,6 +58,7 @@
     "shift-p": "toggleSpicc",
 
     "b": "addBeam",
+    "shift-b": "addBeamSpan",
     "u": "addSupplied",
     "o": "addOctave8Above",
     "ctrl-o": "addOctave8Below",

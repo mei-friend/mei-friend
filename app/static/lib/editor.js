@@ -233,7 +233,7 @@ export function invertPlacement(v, cm, modifier = false) {
     let attr = '';
     let val = 'above';
     // placement above/below as in dir, dynam...
-    if (att.attPlacement.includes(el.nodeName)) {
+    if (att.attPlacement.includes(el.nodeName) || el.nodeName === 'beamSpan') {
       attr = 'place';
       if (el.hasAttribute(attr) &&
         (att.dataPlacement.includes(val) && el.getAttribute(attr) != 'below')) {
@@ -437,6 +437,38 @@ export function addBeamElement(v, cm, elementName = 'beam') {
   }
   v.updateNotation = true; // update notation again
 } // addBeamElement()
+
+// add beamSpan element
+export function addBeamSpan(v, cm) {
+  v.loadXml(cm.getValue());
+  if (v.selectedElements.length < 1) return;
+  console.info('addBeamSpan to selectedElements:', v.selectedElements);
+  let id1 = v.selectedElements[0]; // xml:id string
+  let id2 = v.selectedElements[v.selectedElements.length - 1];
+  // add control like element <octave @startid @endid @dis @dis.place>
+  let beamSpan = v.xmlDoc.createElementNS(speed.meiNameSpace, 'beamSpan');
+  let uuid = 'beamSpan-' + utils.generateUUID();
+  beamSpan.setAttributeNS(speed.xmlNameSpace, 'xml:id', uuid);
+  beamSpan.setAttribute('startid', '#' + id1);
+  beamSpan.setAttribute('endid', '#' + id2);
+  beamSpan.setAttribute('plist', v.selectedElements.map(e =>'#' + e).join(' '));
+  let n1 = v.xmlDoc.querySelector("[*|id='" + id1 + "']");
+  n1.closest('measure').appendChild(beamSpan);
+  v.updateNotation = false;
+  let sc = cm.getSearchCursor('xml:id="' + id1 + '"');
+  if (sc.findNext()) {
+    let p1 = utils.moveCursorToEndOfMeasure(cm, sc.from());
+    cm.replaceRange(speed.xmlToString(beamSpan) + '\n', cm.getCursor());
+    cm.indentLine(p1.line, 'smart'); // TODO
+    cm.indentLine(p1.line + 1, 'smart');
+    cm.setSelection(p1);
+  }
+  v.selectedElements = [];
+  v.selectedElements.push(uuid);
+  v.lastNoteId = id2;
+  v.updateData(cm, false, true);
+  v.updateNotation = true; // update notation again
+} // addBeamSpan()
 
 // add octave element and modify notes inside selected elements
 export function addOctaveElement(v, cm, disPlace = 'above', dis = '8') {
