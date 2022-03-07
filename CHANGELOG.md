@@ -118,3 +118,6 @@
 * mei-friend appearance matches the selected theme
 * Option to enable notation to match editor theme colors
 * Theme changes automatically upon OS appearance change (e.g., from bright to dark) when in default theme
+# 0.3.6 patch: mei-friend settings
+* Support for surrounding selected elements with a supplied element
+* Settings to control supplied element display, color, and responsibility statement

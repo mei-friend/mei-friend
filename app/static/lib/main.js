@@ -172,7 +172,7 @@ import default_schema from '../schemaInfo/mei-CMN-4.0.1.schemaInfo.js';
 
 // mei-friend version and date
 const version = 'develop-0.3.6';
-const versionDate = '4 March 2022';
+const versionDate = '7 March 2022';
 // const defaultMeiFileName = `${root}Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei`;
 const defaultMeiFileName = `${root}Beethoven_WoO70-Breitkopf.mei`;
 const defaultVerovioOptions = {
