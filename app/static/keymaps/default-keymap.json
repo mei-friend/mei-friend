@@ -58,6 +58,7 @@
     "shift-p": "toggleSpicc",
 
     "b": "addBeam",
+    "u": "addSupplied",
     "o": "addOctave8Above",
     "ctrl-o": "addOctave8Below",
     "shift-o": "addOctave15Above",

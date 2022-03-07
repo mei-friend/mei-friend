@@ -943,6 +943,7 @@ export default class Viewer {
       }
       let div = this.createOptionsItem(opt, o, optDefault)
       if (div) mfs.appendChild(div);
+      if (opt === 'respSelect') this.respId = document.getElementById('respSelect').value;
     });
     mfs.innerHTML += '<input type="button" title="Reset to mei-friend defaults" id="mfReset" class="resetButton" value="Default" />';
 

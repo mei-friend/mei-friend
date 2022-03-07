@@ -481,6 +481,48 @@ export function addOctaveElement(v, cm, disPlace = 'above', dis = '8') {
   v.updateNotation = true; // update notation again
 } // addOctaveElement()
 
+// surround selected elements with a supplied element (and a responsibility
+// statement from v.respId
+export function addSuppliedElement(v, cm) {
+  v.loadXml(cm.getValue());
+  v.selectedElements = speed.filterElements(v.selectedElements, v.xmlDoc);
+  v.selectedElements = utils.sortElementsByScorePosition(v.selectedElements);
+  if (v.selectedElements.length < 1) return;
+  console.info('addSuppliedElement(): selectedElements:', v.selectedElements);
+  // let id1 = v.selectedElements[0]; // xml:id string
+  // let parentId;
+  // if (parentId = utils.insideParent(id1, 'chord')) id1 = parentId;
+  // let id2 = v.selectedElements[v.selectedElements.length - 1];
+  // if (parentId = utils.insideParent(id2, 'chord')) id2 = parentId;
+  // let n1 = v.xmlDoc.querySelector("[*|id='" + id1 + "']");
+  // let n2 = v.xmlDoc.querySelector("[*|id='" + id2 + "']");
+  // let par1 = n1.parentNode;
+  v.updateNotation = false;
+  let uuids = [];
+  v.selectedElements.forEach(id => {
+    let el = v.xmlDoc.querySelector("[*|id='" + id + "']");
+    if (!el) {
+      console.warn('No such element in xml document: ' + id);
+    } else {
+      let parent = el.parentNode;
+      let sup = document.createElementNS(speed.meiNameSpace, 'supplied');
+      let uuid = 'supplied-' + utils.generateUUID();
+      sup.setAttributeNS(speed.xmlNameSpace, 'xml:id', uuid);
+      sup.setAttributeNS(speed.xmlNameSpace, 'resp', '#' + v.respId);
+      parent.replaceChild(sup, el);
+      sup.appendChild(el);
+      replaceInTextEditor(cm, el, true, sup);
+      cm.execCommand('indentAuto');
+      uuids.push(uuid);
+    }
+  });
+  // buffer.groupChangesSinceCheckpoint(checkPoint); // TODO
+  v.selectedElements = [];
+  uuids.forEach(u => v.selectedElements.push(u));
+  v.updateData(cm, false, true);
+  v.updateNotation = true; // update notation again
+} // addSuppliedElement()
+
 // wrapper for cleaning superfluous @accid.ges attributes
 export function cleanAccid(v, cm) {
   v.updateNotation = false;

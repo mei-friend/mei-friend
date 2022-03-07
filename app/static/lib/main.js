@@ -900,6 +900,7 @@ let cmd = {
   'addCClefChangeAfter': () => e.addClefChange(v, cm, 'C', '3', false),
   'addFClefChangeAfter': () => e.addClefChange(v, cm, 'F', '4', false),
   'addBeam': () => e.addBeamElement(v, cm),
+  'addSupplied': () => e.addSuppliedElement(v, cm),
   'cleanAccid': () => e.cleanAccid(v, cm),
   'renumberMeasuresTest': () => e.renumberMeasures(v, cm, false),
   'renumberMeasures': () => e.renumberMeasures(v, cm, true),
@@ -1024,6 +1025,7 @@ function addEventListeners(v, cm) {
   document.getElementById('addCresHairpin').addEventListener('click', cmd.addCresHairpin);
   document.getElementById('addDimHairpin').addEventListener('click', cmd.addDimHairpin);
   document.getElementById('addBeam').addEventListener('click', cmd.addBeam);
+  document.getElementById('addSupplied').addEventListener('click', cmd.addSupplied);
   document.getElementById('addArpeggio').addEventListener('click', cmd.addArpeggio);
   // more control elements
   document.getElementById('addFermata').addEventListener('click', cmd.addFermata);
