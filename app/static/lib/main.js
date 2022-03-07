@@ -191,7 +191,9 @@ const defaultVerovioOptions = {
   spacingNonLinear: .5,
   minLastJustification: 0,
   clefChangeFactor: .83,
-  svgAdditionalAttribute: ["layer@n", "staff@n"],
+  svgAdditionalAttribute: ["layer@n", "staff@n",
+    "dir@vgrp", "dynam@vgrp", "hairpin@vgrp", "pedal@vgrp"
+  ],
   bottomMarginArtic: 1.2,
   topMarginArtic: 1.2
 };

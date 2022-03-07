@@ -9,9 +9,9 @@ export const attPlacement = [
   'refrain', 'reh', 'sp', 'stageDir', 'syl', 'tempo', 'trill', 'turn', 'verse'
 ];
 
-// ped not yet in vertical group, but supported by Verovio
+// pedal not yet in vertical group, but supported by Verovio; attacca, tempo not supported
 export const attVerticalGroup = [
-  'attacca', 'dir', 'dynam', 'hairpin', 'tempo', 'ped'
+  'attacca', 'dir', 'dynam', 'hairpin', 'tempo', 'pedal'
 ];
 
 export const dataPlacement = ['above', 'within', 'between', 'below'];

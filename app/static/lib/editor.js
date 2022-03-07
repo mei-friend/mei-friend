@@ -488,7 +488,6 @@ export function addSuppliedElement(v, cm) {
   v.selectedElements = speed.filterElements(v.selectedElements, v.xmlDoc);
   v.selectedElements = utils.sortElementsByScorePosition(v.selectedElements);
   if (v.selectedElements.length < 1) return;
-  console.info('addSuppliedElement(): selectedElements:', v.selectedElements);
   v.updateNotation = false;
   let uuids = [];
   v.selectedElements.forEach(id => {
@@ -519,17 +518,23 @@ export function addVerticalGroup(v, cm) {
   v.loadXml(cm.getValue());
   v.selectedElements = speed.filterElements(v.selectedElements, v.xmlDoc);
   if (v.selectedElements.length < 1) return;
-  console.info('addVerticalGroup(): selectedElements:', v.selectedElements);
   v.updateNotation = false;
+  let value = 1;
+  let existingValues = []; // search for existing vgrp values on SVG page
+  // look to current page SVG dynam@vgrp, dir@vgrp, hairpin@vgrp, pedal@vgrp
+  // and increment value if already taken
+  document.querySelectorAll('g[data-vgrp]').forEach(e => {
+    let value = parseInt(e.getAttribute('data-vgrp'));
+    if (existingValues.indexOf(value) < 0) existingValues.push(value);
+  });
+  while (existingValues.indexOf(value) >= 0) value++; // increment until unique
   v.selectedElements.forEach(id => {
     let el = v.xmlDoc.querySelector("[*|id='" + id + "']");
     if (!el) {
       console.warn('No such element in xml document: ' + id);
     } else if (att.attVerticalGroup.includes(el.nodeName)) {
       let oldEl = el.cloneNode(true);
-      // TODO: look to current page SVG dynam@vgrp, dir@vgrp, hairpin@vgrp, tempo@vgrp, ped@vgrp
-      // and increment value if already taken
-      el.setAttribute('vgrp', 1);
+      el.setAttribute('vgrp', value);
       replaceInTextEditor(cm, oldEl, true, el);
       cm.execCommand('indentAuto');
     } else {
