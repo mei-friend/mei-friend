@@ -508,7 +508,7 @@ export function addSuppliedElement(v, cm) {
       let sup = document.createElementNS(speed.meiNameSpace, 'supplied');
       let uuid = 'supplied-' + utils.generateUUID();
       sup.setAttributeNS(speed.xmlNameSpace, 'xml:id', uuid);
-      sup.setAttributeNS(speed.xmlNameSpace, 'resp', '#' + v.respId);
+      if (v.respId) sup.setAttributeNS(speed.xmlNameSpace, 'resp', '#' + v.respId);
       parent.replaceChild(sup, el);
       sup.appendChild(el);
       replaceInTextEditor(cm, el, true, sup);
