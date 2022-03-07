@@ -19,7 +19,7 @@ export function delEl(v, cm) {
   let selectedElements = [];
   v.updateNotation = false;
   // let checkPoint = buffer.createCheckpoint(); TODO
-  if (att.modelControlEvents.concat(['accid', 'artic', 'clef', 'octave'])
+  if (att.modelControlEvents.concat(['accid', 'artic', 'clef', 'octave', 'beamSpan'])
     .includes(element.nodeName)) {
     if (element.nodeName == 'octave') { // reset notes inside octave range
       let disPlace = element.getAttribute('dis.place');
@@ -460,7 +460,6 @@ export function addBeamSpan(v, cm) {
   v.loadXml(cm.getValue());
   if (v.selectedElements.length < 1) return;
   v.selectedElements = utils.sortElementsByScorePosition(v.selectedElements);
-  console.info('addBeamSpan to selectedElements:', v.selectedElements);
   let id1 = v.selectedElements[0]; // xml:id string
   let id2 = v.selectedElements[v.selectedElements.length - 1];
   // add control like element <octave @startid @endid @dis @dis.place>
