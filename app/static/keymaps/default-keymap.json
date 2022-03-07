@@ -1,8 +1,8 @@
 {
   ".notation": {
-    "q": "nightMode",
     "x": "invertPlacement",
     "ctrl-x": "betweenPlacement",
+    "v": "addVerticalGroup",
     "right": "nextNote",
     "left": "previousNote",
     "up": "layerUp",
@@ -58,6 +58,8 @@
     "shift-p": "toggleSpicc",
 
     "b": "addBeam",
+    "shift-b": "addBeamSpan",
+    "u": "addSupplied",
     "o": "addOctave8Above",
     "ctrl-o": "addOctave8Below",
     "shift-o": "addOctave15Above",

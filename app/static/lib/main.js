@@ -83,6 +83,7 @@ export function loadDataInEditor(mei, setFreshlyLoaded = true) {
   v.loadXml(mei);
   let bs = document.getElementById('breaks-select');
   if (bs) bs.value = v.containsBreaks() ? 'line' : 'auto';
+  v.setRespSelectOptions();
 }
 
 export function updateLocalStorage(meiXml) {
@@ -171,7 +172,7 @@ import default_schema from '../schemaInfo/mei-CMN-4.0.1.schemaInfo.js';
 
 // mei-friend version and date
 const version = 'develop-0.3.6';
-const versionDate = '4 March 2022';
+const versionDate = '7 March 2022';
 // const defaultMeiFileName = `${root}Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei`;
 const defaultMeiFileName = `${root}Beethoven_WoO70-Breitkopf.mei`;
 const defaultVerovioOptions = {
@@ -190,7 +191,9 @@ const defaultVerovioOptions = {
   spacingNonLinear: .5,
   minLastJustification: 0,
   clefChangeFactor: .83,
-  svgAdditionalAttribute: ["layer@n", "staff@n"],
+  svgAdditionalAttribute: ["layer@n", "staff@n",
+    "dir@vgrp", "dynam@vgrp", "hairpin@vgrp", "pedal@vgrp"
+  ],
   bottomMarginArtic: 1.2,
   topMarginArtic: 1.2
 };
@@ -466,6 +469,7 @@ function vrvWorkerEventsHandler(ev) {
       tkVersion = ev.data.version;
       tkAvailableOptions = ev.data.availableOptions;
       v.addVrvOptionsToSettingsPanel(tkAvailableOptions, defaultVerovioOptions);
+      v.addMeiFriendOptionsToSettingsPanel();
       document.querySelector(".rightfoot").innerHTML +=
         `&nbsp;<a href="https://www.verovio.org/">Verovio ${tkVersion}</a>.`;
       document.querySelector(".statusbar").innerHTML =
@@ -480,7 +484,7 @@ function vrvWorkerEventsHandler(ev) {
         v.updateNotation = false;
         loadDataInEditor(storage.content);
         v.updateNotation = true;
-        v.updateAll(cm, defaultVerovioOptions);
+        v.updateAll(cm);
       }
       v.busy(false);
       break;
@@ -814,7 +818,6 @@ let cmd = {
   'previousPage': () => v.updatePage(cm, 'backwards'),
   'nextPage': () => v.updatePage(cm, 'forwards'),
   'lastPage': () => v.updatePage(cm, 'last'),
-  // 'nightMode': () => v.swapNotationColors(),
   'nextNote': () => v.navigate(cm, 'note', 'forwards'),
   'previousNote': () => v.navigate(cm, 'note', 'backwards'),
   'nextMeasure': () => v.navigate(cm, 'measure', 'forwards'),
@@ -875,6 +878,7 @@ let cmd = {
   //
   'delete': () => e.delEl(v, cm),
   'invertPlacement': () => e.invertPlacement(v, cm),
+  'addVerticalGroup': () => e.addVerticalGroup(v, cm),
   'toggleStacc': () => e.toggleArtic(v, cm, 'stacc'),
   'toggleAccent': () => e.toggleArtic(v, cm, 'acc'),
   'toggleTenuto': () => e.toggleArtic(v, cm, 'ten'),
@@ -898,6 +902,8 @@ let cmd = {
   'addCClefChangeAfter': () => e.addClefChange(v, cm, 'C', '3', false),
   'addFClefChangeAfter': () => e.addClefChange(v, cm, 'F', '4', false),
   'addBeam': () => e.addBeamElement(v, cm),
+  'addBeamSpan': () => e.addBeamSpan(v, cm),
+  'addSupplied': () => e.addSuppliedElement(v, cm),
   'cleanAccid': () => e.cleanAccid(v, cm),
   'renumberMeasuresTest': () => e.renumberMeasures(v, cm, false),
   'renumberMeasures': () => e.renumberMeasures(v, cm, true),
@@ -955,7 +961,6 @@ function addEventListeners(v, cm) {
   fc.addEventListener("dragstart", (ev) => console.log('Drag Start', ev));
   fc.addEventListener("dragend", (ev) => console.log('Drag End', ev));
 
-  // document.getElementById('notation-night-mode-btn').addEventListener('click', cmd.nightMode);
   // Zooming with buttons
   document.getElementById('decrease-scale-btn').addEventListener('click', cmd.zoomOut);
   document.getElementById('increase-scale-btn').addEventListener('click', cmd.zoomIn);
@@ -999,6 +1004,7 @@ function addEventListeners(v, cm) {
   document.getElementById('downwards-btn').addEventListener('click', cmd.layerDown);
   // manipulation
   document.getElementById('invertPlacement').addEventListener('click', cmd.invertPlacement);
+  document.getElementById('addVerticalGroup').addEventListener('click', cmd.addVerticalGroup);
   document.getElementById('delete').addEventListener('click', cmd.delete);
   document.getElementById('pitchUp').addEventListener('click', cmd.shiftPitchNameUp);
   document.getElementById('pitchDown').addEventListener('click', cmd.shiftPitchNameDown);
@@ -1022,6 +1028,8 @@ function addEventListeners(v, cm) {
   document.getElementById('addCresHairpin').addEventListener('click', cmd.addCresHairpin);
   document.getElementById('addDimHairpin').addEventListener('click', cmd.addDimHairpin);
   document.getElementById('addBeam').addEventListener('click', cmd.addBeam);
+  document.getElementById('addBeamSpan').addEventListener('click', cmd.addBeamSpan);
+  document.getElementById('addSupplied').addEventListener('click', cmd.addSupplied);
   document.getElementById('addArpeggio').addEventListener('click', cmd.addArpeggio);
   // more control elements
   document.getElementById('addFermata').addEventListener('click', cmd.addFermata);

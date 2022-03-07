@@ -768,8 +768,8 @@ export function countStaves(scoreDef) {
 }
 
 export function rmHash(hashedString) {
-  if (!hashedString) return '';
-  if (hashedString.startsWith('#')) return hashedString.split('#')[1];
+  return (hashedString.startsWith('#')) ?
+    hashedString.split('#')[1] : hashedString;
 }
 
 // filter selected elements and keep only highest in DOM

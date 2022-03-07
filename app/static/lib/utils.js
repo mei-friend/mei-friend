@@ -475,3 +475,30 @@ export function attrAsElements(xmlNote) {
 export function getOS() {
   return navigator.userAgentData.platform;
 }
+
+// accepts color as string: "rgb(100,12,255)" and hex string "#ffee10" or
+export function brighter(rgbString, deltaPercent) {
+  let rgb = [];
+  if (rgbString.startsWith('#')) {
+    rgb = hexToRgb(rgbString);
+  } else {
+    rgb = rgbString.slice(4, -1).split(',');
+  }
+  rgb = rgb.map(i => Math.max(0, Math.min(parseInt(i) + deltaPercent, 255)));
+  return 'rgb(' + rgb.join(', ') + ')';
+}
+
+function hexToRgb(hex) {
+  return hex.replace(/^#?([a-f\d])([a-f\d])([a-f\d])$/i,
+      (m, r, g, b) => '#' + r + r + g + g + b + b)
+    .substring(1).match(/.{2}/g)
+    .map(x => parseInt(x, 16))
+}
+
+export function complementary(rgbString) {
+  let rgb = [];
+  rgbString.slice(4, -1).split(',').forEach(i => {
+    rgb.push(255 - i);
+  });
+  return 'rgb(' + rgb.join(', ') + ')';
+}
