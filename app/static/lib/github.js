@@ -178,26 +178,30 @@ export default class Github {
   }
 
   async readGithubRepo() { 
-    const filepath = this.filepath;
-    // Retrieve content of file
-    this.headHash = await this.repo.readRef(`refs/heads/${this.branch}`);
-    this.filepath = filepath;
-    this.commit = await this.repo.loadAs("commit", this.headHash);  
-    const tree = await this.repo.loadAs("tree", this.commit.tree);
-    if(this.filepath && this.filepath !== "/") {
-      // remove leading slash
-      this.entry = tree[this.filepath.startsWith("/") ? this.filepath.substr(1) : this.filepath];
-      this.content = await this.repo.loadAs("text", this.entry.hash);
+    try { 
+      const filepath = this.filepath;
+      // Retrieve content of file
+      this.headHash = await this.repo.readRef(`refs/heads/${this.branch}`);
+      this.filepath = filepath;
+      this.commit = await this.repo.loadAs("commit", this.headHash);  
+      const tree = await this.repo.loadAs("tree", this.commit.tree);
+      if(this.filepath && this.filepath !== "/") {
+        // remove leading slash
+        this.entry = tree[this.filepath.startsWith("/") ? this.filepath.substr(1) : this.filepath];
+        this.content = await this.repo.loadAs("text", this.entry.hash);
+      }
+      // Retrieve git commit log
+      const commitsUrl = `https://api.github.com/repos/${this.githubRepo}/commits`;
+      await fetch(commitsUrl, {
+        method: 'GET',
+        headers: this.apiHeaders
+      }).then(res => res.json())
+        .then(async(commits) => { 
+          this.commitLog = commits;
+        });
+    } catch(e) {
+      console.error("Error while reading Github repo: ", e, this);
     }
-    // Retrieve git commit log
-    const commitsUrl = `https://api.github.com/repos/${this.githubRepo}/commits`;
-    await fetch(commitsUrl, {
-      method: 'GET',
-      headers: this.apiHeaders
-    }).then(res => res.json())
-      .then(async(commits) => { 
-        this.commitLog = commits;
-      });
 
   }
 

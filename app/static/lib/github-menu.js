@@ -135,8 +135,8 @@ function branchContentsFileClicked(ev) {
     v.updateNotation = true;
     v.updateAll(cm);
   }).catch((err) => {
-    console.warn("Couldn't read Github repo to fill in branch contents:", err);
-    githubLoadingIndicator.classList.remove("clockwise");
+    console.error("Couldn't read Github repo to fill in branch contents:", err);
+    //githubLoadingIndicator.classList.remove("clockwise");
   })
 }
 
@@ -261,7 +261,9 @@ export async function fillInBranchContents(e) {
     // clicked on file name -- operate on parent (list entry) instead
     target = e.target.parentNode;
   }
-  if (e && (target.classList.contains("repoBranch") || target.classList.contains("dir") || target.getAttribute("id") === "contentsHeader")) {
+  if (e && (target && target.classList.contains("repoBranch") || 
+      target.classList.contains("dir") || 
+      target.getAttribute("id") === "contentsHeader")) {
     Array.from(branchContents).forEach((content) => {
       const isDir = content.type === "dir";
       githubMenu.innerHTML += `<a class="branchContents ${content.type}${isDir ? '': ' closeOnClick'}" href="#">` +
