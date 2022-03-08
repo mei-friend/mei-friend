@@ -1163,6 +1163,15 @@ function addEventListeners(v, cm) {
     //   v.pageBreaks = {};
     v.updateAll(cm, {}, v.selectedElements[0]);
   });
+
+  let clicked = false;
+  let vp = document.querySelector('.verovio-panel');
+  vp.addEventListener('mousedown', ev => clicked = true);
+  vp.addEventListener('mousemove', ev => {
+    if (clicked)
+    console.log('Mouse move: x/y: ' + ev.clientX + '/' + ev.clientY + ', ', ev);
+  });
+  vp.addEventListener('mouseup', ev => clicked = false);
 } // addEventListeners()
 
 
