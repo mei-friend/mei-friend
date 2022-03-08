@@ -155,6 +155,9 @@ import {
   navElsSelector,
   getElementAtCursor
 } from './dom-utils.js';
+import {
+  addMouseSelector
+} from './mouse-selector.js';
 import * as e from './editor.js'
 import Viewer from './viewer.js';
 import Storage from './storage.js';
@@ -923,6 +926,8 @@ let cmd = {
 
 // add event listeners when controls menu has been instantiated
 function addEventListeners(v, cm) {
+  let vp = document.querySelector('.verovio-panel');
+
   // layout notation position
   document.getElementById('top').addEventListener('click', cmd.notationTop);
   document.getElementById('bottom').addEventListener('click', cmd.notationBottom);
@@ -966,7 +971,7 @@ function addEventListeners(v, cm) {
   document.getElementById('increase-scale-btn').addEventListener('click', cmd.zoomIn);
   document.getElementById('verovio-zoom').addEventListener('click', cmd.zoomSlider);
   // Zooming notation with mouse wheel
-  document.querySelector('.verovio-panel').addEventListener('wheel', ev => {
+  vp.addEventListener('wheel', ev => {
     if ((navigator.platform.toLowerCase().startsWith('mac') && ev.metaKey) ||
       !navigator.platform.toLowerCase().startsWith('mac') && ev.ctrlKey) {
       ev.preventDefault();
@@ -1164,14 +1169,13 @@ function addEventListeners(v, cm) {
     v.updateAll(cm, {}, v.selectedElements[0]);
   });
 
-  let clicked = false;
-  let vp = document.querySelector('.verovio-panel');
-  vp.addEventListener('mousedown', ev => clicked = true);
-  vp.addEventListener('mousemove', ev => {
-    if (clicked)
-    console.log('Mouse move: x/y: ' + ev.clientX + '/' + ev.clientY + ', ', ev);
-  });
-  vp.addEventListener('mouseup', ev => clicked = false);
+  vp.addEventListener('click', ev => {
+console.log('REMOVE CLICK', ev);
+    v.selectedElements = [];
+    v.updateHighlight();
+    v.setFocusToVerovioPane();
+  })
+  addMouseSelector(vp);
 } // addEventListeners()
 
 

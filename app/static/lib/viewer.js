@@ -451,7 +451,7 @@ export default class Viewer {
       this.updateData(cm, false, false);
   }
 
-  // highlight currently selected elements
+  // highlight currently selected elements, if cm left out, all are cleared
   updateHighlight(cm) {
     // clear existing highlighted classes
     let highlighted = document.querySelectorAll('g.highlighted');
@@ -460,7 +460,7 @@ export default class Viewer {
     let ids = [];
     if (this.selectedElements.length > 0)
       this.selectedElements.forEach(item => ids.push(item));
-    else ids.push(utils.getElementIdAtCursor(cm));
+    else if (cm) ids.push(utils.getElementIdAtCursor(cm));
     // console.info('updateHlt ids: ', ids);
     for (let id of ids) {
       if (id) {
