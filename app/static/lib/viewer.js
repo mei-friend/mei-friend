@@ -825,12 +825,12 @@ export default class Viewer {
         optDefault = mfDefaults[opt]
         if (opt === 'matchTags' && typeof optDefault === 'object') optDefault = true;
       };
+      if (window.matchMedia('(prefers-color-scheme: dark)').matches && opt === 'theme') {
+        optDefault = mfDefaults['defaultDarkTheme']; // take a dark scheme for dark mode
+      }
       if (storage.hasOwnProperty('cm-' + opt)) {
         if (restoreFromLocalStorage) optDefault = storage['cm-' + opt];
         else delete storage['cm-' + opt];
-      }
-      if (window.matchMedia('(prefers-color-scheme: dark)').matches && opt === 'theme') {
-        optDefault = mfDefaults['defaultDarkTheme']; // take a dark scheme for dark mode
       }
       let div = this.createOptionsItem(opt, o, optDefault)
       if (div) cmsp.appendChild(div);
