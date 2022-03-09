@@ -1169,13 +1169,7 @@ function addEventListeners(v, cm) {
     v.updateAll(cm, {}, v.selectedElements[0]);
   });
 
-  vp.addEventListener('click', ev => {
-console.log('REMOVE CLICK', ev);
-    v.selectedElements = [];
-    v.updateHighlight();
-    v.setFocusToVerovioPane();
-  })
-  addMouseSelector(vp);
+  addMouseSelector(v, vp);
 } // addEventListeners()
 
 

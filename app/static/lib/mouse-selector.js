@@ -1,10 +1,14 @@
 const svgNS = "http://www.w3.org/2000/svg";
+import {
+  navElsSelector
+} from './dom-utils.js';
 
-export function addMouseSelector(vp) {
+export function addMouseSelector(v, vp) {
 
   let clicked = false;
 
-  var svgEls; // object storing x, y coordinates of svg elements
+  // object storing x, y coordinates of svg elements
+  var svgEls = document.querySelectorAll('g ' + navElsSelector);
 
   var start = {};
   var end = {};
@@ -13,6 +17,10 @@ export function addMouseSelector(vp) {
 
   vp.addEventListener('mousedown', ev => {
     clicked = true;
+    if (!((navigator.appVersion.indexOf("Mac") !== -1) && ev.metaKey) && !ev.ctrlKey) {
+      v.selectedElements = [];
+      v.updateHighlight();
+    }
     start.x = ev.clientX;
     start.y = ev.clientY;
     rect = document.createElementNS(svgNS, 'rect');
