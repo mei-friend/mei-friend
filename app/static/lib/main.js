@@ -1169,7 +1169,7 @@ function addEventListeners(v, cm) {
     v.updateAll(cm, {}, v.selectedElements[0]);
   });
 
-  addMouseSelector(v, vp);
+  addMouseSelector(v, cm, vp);
 } // addEventListeners()
 
 
