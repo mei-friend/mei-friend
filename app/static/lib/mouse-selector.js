@@ -9,6 +9,8 @@ export function addMouseSelector(v, cm, vp) {
 
   // object storing x, y coordinates of svg elements
   var obobj = {};
+  let oldEls = [];
+  let newEls = [];
 
   var start = {};
   var end = {};
@@ -22,6 +24,8 @@ export function addMouseSelector(v, cm, vp) {
       v.selectedElements = [];
       v.updateHighlight();
     }
+    oldEls = [];
+    v.selectedElements.forEach(el => oldEls.push(el));
     start.x = ev.clientX;
     start.y = ev.clientY;
     rect = document.createElementNS(svgNS, 'rect');
@@ -30,22 +34,31 @@ export function addMouseSelector(v, cm, vp) {
     var svgEls = document.querySelectorAll('g .note, .rest, .mRest, .beatRpt, .halfmRpt, .mRpt');
     svgEls.forEach(el => {
       let bb = el.getBBox();
-      if (Object.keys(obobj).includes(bb.x) &&
-        Object.keys(obobj[bb.x]).includes(bb.y)) {
-        obobj[bb.x][bb.y].push(el);
+      if (Object.keys(obobj).includes(Math.round(bb.x * 1000)) &&
+        Object.keys(obobj[Math.round(bb.x * 1000)]).includes(Math.round(bb.y * 1000))) {
+        obobj[Math.round(bb.x * 1000)][Math.round(bb.y * 1000)].push(el);
       } else {
-        obobj[bb.x] = {};
-        obobj[bb.x][bb.y] = [el];
+        obobj[Math.round(bb.x * 1000)] = {};
+        obobj[Math.round(bb.x * 1000)][Math.round(bb.y * 1000)] = [el];
       }
+      // if (Object.keys(obobj).includes(bb.x + bb.width) &&
+      //   Object.keys(obobj[bb.x + bb.width]).includes(bb.y + bb.height)) {
+      //   obobj[bb.x + bb.width][bb.y + bb.height].push(el);
+      // } else {
+      //   obobj[bb.x + bb.width] = {};
+      //   obobj[bb.x + bb.width][bb.y + bb.height] = [el];
+      // }
     });
     let asdf = 123123;
   });
 
   vp.addEventListener('mousemove', ev => {
     if (clicked) {
+      newEls = [];
       end.x = ev.clientX;
       end.y = ev.clientY;
       var mx = document.querySelector('g.page-margin').getScreenCTM().inverse();
+      // var mx = document.querySelector('.verovio-panel svg').getScreenCTM().inverse();
       let s = transformCTM(start, mx);
       let e = transformCTM(end, mx);
       let x = s.x;
@@ -58,22 +71,27 @@ export function addMouseSelector(v, cm, vp) {
       updateRect(rect, x, y, width, height, 'var(--notationColor)');
       console.log('Mouse move: x/y: ' + x + '/' + y + ', w/h' + width + '/' + height);
 
-      let selX = Object.keys(obobj).filter(kx => kx > x && kx < x + width);
-      let selY = selX.map(keyX => Object.keys(obobj[keyX])).filter(ky => ky > y && ky < y + height);
-      if (selX.length > 0 && selY.length > 0) {
+      let selX = Object.keys(obobj)
+        .filter(kx => parseFloat(kx) > Math.round(x * 1000) && parseFloat(kx) < Math.round((x + width) * 1000));
+      let selY = selX.map(keyX => Object.keys(obobj[keyX]))
+        .filter(ky => parseFloat(ky) > Math.round(y * 1000) && parseFloat(ky) < Math.round((y + height) * 1000));
 
+      if (selX.length > 0 && selY.length > 0) {
         selX.forEach((keyX, xi) => {
           let ys = selY[xi];
           if (ys) ys.forEach(keyY => {
             let els = obobj[keyX][keyY];
             if (els) els.forEach(e => {
-              if (!v.selectedElements.includes(e.id))
-                v.selectedElements.push(e.id);
+              if (!newEls.includes(e.id))
+                newEls.push(e.id);
             });
           });
         });
       }
-      console.log('selected elements: ', v.selectedElements);
+      console.log('selected elements: ', newEls);
+      v.selectedElements = [];
+      oldEls.forEach(el => v.selectedElements.push(el));
+      newEls.forEach(el => v.selectedElements.push(el));
       v.updateHighlight(cm);
     }
   });

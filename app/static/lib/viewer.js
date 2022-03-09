@@ -362,6 +362,15 @@ export default class Viewer {
 
   handleClickOnNotation(e, cm) {
     e.stopImmediatePropagation();
+    let point = {};
+    point.x = e.clientX;
+    point.y = e.clientY;
+    var matrix = document.querySelector('g.page-margin').getScreenCTM().inverse();
+    let r = {}
+    r.x = matrix.a * point.x + matrix.c * point.y + matrix.e;
+    r.y = matrix.b * point.x + matrix.d * point.y + matrix.f;
+    console.log('Click on ' + e.srcElement.id + ', x/y: ' + r.x + '/' + r.y);
+
     this.updateNotation = false;
     // console.info('click: ', e);
     let itemId = String(e.currentTarget.id);
