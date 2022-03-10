@@ -178,17 +178,31 @@ export default class Github {
   }
 
   async readGithubRepo() { 
+    // TODO fix multi-level directories by implementing tree traversal using treeWalk / treeStreams, see jsgit doc
     try { 
-      const filepath = this.filepath;
       // Retrieve content of file
       this.headHash = await this.repo.readRef(`refs/heads/${this.branch}`);
-      this.filepath = filepath;
       this.commit = await this.repo.loadAs("commit", this.headHash);  
-      const tree = await this.repo.loadAs("tree", this.commit.tree);
-      if(this.filepath && this.filepath !== "/") {
-        // remove leading slash
-        this.entry = tree[this.filepath.startsWith("/") ? this.filepath.substr(1) : this.filepath];
-        this.content = await this.repo.loadAs("text", this.entry.hash);
+      let tree = await this.repo.loadAs("tree", this.commit.tree);
+      console.log("TREEWALK TEST:")
+      let treeStream = await this.repo.treeWalk(this.commit.tree);
+      let obj;
+      let trees = []
+      while (obj = await treeStream.read(), obj !== undefined) {
+        trees.push(obj)
+      }
+
+      const treesFiltered = trees.filter(o => o.path === this.filepath)
+      if(treesFiltered.length === 1) { 
+        this.content = await this.repo.loadAs("text", treesFiltered[0].hash);
+        console.log("SWAPSIES!")
+      } else { 
+        if(this.filepath && this.filepath !== "/") {
+          // remove leading slash
+          this.entry = tree[this.filepath.startsWith("/") ? this.filepath.substr(1) : this.filepath];
+          this.content = await this.repo.loadAs("text", this.entry.hash);
+        }
+        console.log("NOPE!!!!", trees, this.filepath);
       }
       // Retrieve git commit log
       const commitsUrl = `https://api.github.com/repos/${this.githubRepo}/commits`;

@@ -60,17 +60,21 @@ function forkRepoCancelClicked() {
 
 function repoHeaderClicked() { 
   github.filepath = "";
+  console.log("REPO HEADER CLICKED. Filepath was: ", github.filepath)
   refreshGithubMenu();
 }
 
 function branchesHeaderClicked(ev) { 
+  console.log("BRANCHES HEADER CLICKED. Filepath was: ", github.filepath)
   github.filepath = "";
   fillInRepoBranches(ev.target);
 }
 
 function contentsHeaderClicked(ev) { 
+  console.log("CONTENTS HEADER CLICKED. Filepath was: ", github.filepath)
   github.filepath = github.filepath.substr(0, github.filepath.lastIndexOf('/'));
   github.filepath = github.filepath.length === 0 ? "/" : github.filepath;
+  console.log("CONTENTS HEADER CLICKED. Filepath now: ", github.filepath)
   fillInBranchContents(ev.target);
 }
 
@@ -90,6 +94,7 @@ function userRepoClicked(ev) {
 }
 
 function repoBranchClicked(ev) { 
+  console.log("REPO BRANCH CLICKED. Filepath was: ", github.filepath)
   const githubLoadingIndicator = document.getElementById("GithubLogo");
   github.branch = ev.target.innerText;
   github.filepath = "/";
@@ -104,21 +109,28 @@ function repoBranchClicked(ev) {
 }
 
 function branchContentsDirClicked(ev) { 
+  console.log("BRANCH CONTENTS DIR CLICKED. Filepath was: ", github.filepath)
   if (github.filepath.endsWith("/")) {
-    github.filepath += ev.target.querySelector("span.filepath").innerText;
+    github.filepath += ev.target.querySelector("span.filepath").innerText + "/";
   } else {
-    github.filepath += "/" + ev.target.querySelector("span.filepath").innerText;
+    github.filepath += "/" + ev.target.querySelector("span.filepath").innerText + "/";
   }
+  console.log("after BRANCH CONTENTS DIR CLICKED. Filepath now: ", github.filepath)
   fillInBranchContents(ev);
 }
 
 function branchContentsFileClicked(ev) { 
+  console.log("BRANCH CONTENTS FILE CLICKED. Filepath was: ", github.filepath)
   const githubLoadingIndicator = document.getElementById("GithubLogo");
-  github.filepath += ev.target.innerText;
+  github.filepath += ev.target.innerText ;
+  console.log("after BRANCH CONTENTS FILE CLICKED. Filepath NOW: ", github.filepath)
   console.debug(`Loading file: https://github.com/${github.githubRepo}/${github.filepath}`);
+  console.log(1)
   fillInBranchContents(ev);
+  console.log(2)
   githubLoadingIndicator.classList.add("clockwise");
   github.readGithubRepo().then(() => {
+  console.log(3)
     githubLoadingIndicator.classList.remove("clockwise");
     document.querySelector(".statusbar").innerText = "Loading from Github...";
     v.clear();
@@ -129,11 +141,15 @@ function branchContentsFileClicked(ev) {
       github.githubRepo + ":"   // meiFileLocationPrintable
     );
     updateFileStatusDisplay();
+  console.log(4, github)
     loadDataInEditor(github.content)
+  console.log(5)
     setFileChangedState(false);
     updateLocalStorage(github.content);
     v.updateNotation = true;
+  console.log(6)
     v.updateAll(cm);
+  console.log(7)
   }).catch((err) => {
     console.error("Couldn't read Github repo to fill in branch contents:", err);
     //githubLoadingIndicator.classList.remove("clockwise");
@@ -183,7 +199,6 @@ function assignGithubMenuClickHandlers() {
   const contentsHeader = document.getElementById('contentsHeader');
   if (contentsHeader) {
     // on click, move up one directory level in the branch contents
-    github.filepath = "";
     contentsHeader.removeEventListener('click', contentsHeaderClicked);
     contentsHeader.addEventListener('click', contentsHeaderClicked);
   }
@@ -307,7 +322,7 @@ async function fillInCommitLog(refresh = false) {
     }).catch((e) => {
       githubLoadingIndicator.classList.remove("clockwise");
       console.warn("Couldn't read github repo, forcing log-out: ", e);
-      logoutFromGithub();
+//      logoutFromGithub();
     })
   } else {
     renderCommitLog();
