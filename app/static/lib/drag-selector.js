@@ -1,11 +1,11 @@
 const svgNS = "http://www.w3.org/2000/svg";
 
-export function addMouseSelector(v, cm, vp) {
+export function addDragSelector(v, vp) {
 
-  let clicked = false;
-
-  // object storing x, y coordinates of svg elements
-  var obobj = {};
+  let dragging = false;
+  let svgPm;
+  var svgEls;
+  var obobj = {}; // object storing x, y coordinates of svg elements
   let oldEls = [];
   let newEls = [];
   var start = {};
@@ -13,7 +13,7 @@ export function addMouseSelector(v, cm, vp) {
   var rect;
 
   vp.addEventListener('mousedown', ev => {
-    clicked = true;
+    dragging = true;
     // clear selected elements, if no CMD/CTRL key is pressed
     if (!((navigator.appVersion.indexOf("Mac") !== -1) && ev.metaKey) && !ev.ctrlKey) {
       v.selectedElements = [];
@@ -24,20 +24,21 @@ export function addMouseSelector(v, cm, vp) {
     v.selectedElements.forEach(el => oldEls.push(el)); // remember selected els
     // create selection rectangle
     rect = document.createElementNS(svgNS, 'rect');
-    let svgPm = document.querySelector('g.page-margin');
+    svgPm = document.querySelector('g.page-margin');
     svgPm.appendChild(rect);
-    // remember click point
+
+    // remember click/mousedown point
     start.x = ev.clientX;
     start.y = ev.clientY;
 
-    var svgEls = document.querySelectorAll(
+    svgEls = document.querySelectorAll(
       'g .note, .rest, .mRest, .beatRpt, .halfmRpt, .mRpt');
     svgEls.forEach(el => {
       let bb = el.getBBox();
       if (Array.from(el.classList).includes('note'))
         bb = el.querySelector('.notehead').getBBox();
-      let x = Math.round(bb.x * 1000);
-      let y = Math.round(bb.y * 1000);
+      let x = Math.round((bb.x + bb.width / 2) * 1000); // center of element
+      let y = Math.round((bb.y + bb.height / 2) * 1000);
       if (!Object.keys(obobj).includes(x.toString())) obobj[x] = {};
       if (Object.keys(obobj).includes(x.toString()) &&
         Object.keys(obobj[x]).includes(y.toString())) {
@@ -45,31 +46,11 @@ export function addMouseSelector(v, cm, vp) {
       } else {
         obobj[x][y] = [el];
       }
-      // DEBUG: add bounding boxes to notation
-      // rect = document.createElementNS(svgNS, 'rect');
-      // updateRect(rect, bb.x, bb.y, bb.width, bb.height, 'crimson');
-      // svgPm.appendChild(rect);
-      // let txt = document.createElementNS(svgNS, 'text');
-      // txt.setAttribute('x', bb.x);
-      // txt.setAttribute('y', bb.y);
-      // txt.setAttribute('font-size', '160pt');
-      // txt.setAttribute('fill', 'red');
-      // txt.textContent = Math.round(bb.x) + '/' + Math.round(bb.y);
-      // svgPm.appendChild(txt);
-
-      // let x2 = Math.round((bb.x + bb.width) * 1000);
-      // let y2 = Math.round((bb.y + bb.height) * 1000);
-      // if (Object.keys(obobj).includes(x2) && Object.keys(obobj[x2]).includes(y2)) {
-      //   obobj[x2][y2].push(el);
-      // } else {
-      //   obobj[x2] = {};
-      //   obobj[x2][y2] = [el];
-      // }
     });
   });
 
   vp.addEventListener('mousemove', ev => {
-    if (clicked) {
+    if (dragging) {
       newEls = [];
       end.x = ev.clientX;
       end.y = ev.clientY;
@@ -85,7 +66,12 @@ export function addMouseSelector(v, cm, vp) {
       if (e.y < s.y) y = e.y;
 
       updateRect(rect, x, y, width, height, 'var(--notationColor)');
-      // console.log('Mouse move: x/y: ' + x + '/' + y + ', w/h' + width + '/' + height);
+
+      // without Firefox support:
+      // svgEls.forEach(el => {
+      //   if (svgPm.checkIntersection(el, rect))
+      //     newEls.push(el.id);
+      // });
 
       let xx = Math.round(x * 1000);
       let xx2 = Math.round((x + width) * 1000);
@@ -106,17 +92,17 @@ export function addMouseSelector(v, cm, vp) {
           });
         });
       }
-      console.log('selected elements: ', newEls);
       v.selectedElements = [];
       oldEls.forEach(el => v.selectedElements.push(el));
       newEls.forEach(el => v.selectedElements.push(el));
-      v.updateHighlight(cm);
+      v.updateHighlight();
     }
   });
 
-  vp.addEventListener('mouseup', ev => {
-    clicked = false;
+  vp.addEventListener('mouseup', () => {
+    dragging = false;
     document.querySelector('g.page-margin').removeChild(rect);
+    oldEls = [];
   });
 
 }
@@ -128,12 +114,14 @@ function transformCTM(point, matrix) {
   return r;
 }
 
-function updateRect(rect, x, y, width, height, color = "black", strokeWidth = 4) {
+function updateRect(rect, x, y, width, height, color = "black",
+  strokeWidth = 4, strokeDashArray = '50') {
   rect.setAttribute('x', x);
   rect.setAttribute('y', y);
   rect.setAttribute('width', width);
   rect.setAttribute('height', height);
   rect.setAttribute('stroke-width', strokeWidth);
+  rect.setAttribute('stroke-dasharray', strokeDashArray);
   rect.setAttribute('stroke', color);
   rect.setAttribute('fill', 'none');
 }

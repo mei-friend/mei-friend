@@ -156,8 +156,8 @@ import {
   getElementAtCursor
 } from './dom-utils.js';
 import {
-  addMouseSelector
-} from './mouse-selector.js';
+  addDragSelector
+} from './drag-selector.js';
 import * as e from './editor.js'
 import Viewer from './viewer.js';
 import Storage from './storage.js';
@@ -1170,7 +1170,7 @@ function addEventListeners(v, cm) {
     v.updateAll(cm, {}, v.selectedElements[0]);
   });
 
-  addMouseSelector(v, cm, vp);
+  addDragSelector(v, vp);
 } // addEventListeners()
 
 
