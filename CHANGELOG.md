@@ -123,3 +123,5 @@
 * Settings to control supplied element display, color, and responsibility statement
 * Support to insert vertical group attributes to selected elements (automatically finding unused vgrp value on page)
 * Support for inserting, inverting and deleting beamSpan elements
+# 0.3.7 patch
+* Address issue with ALT-F interfering with EMACS keymap
