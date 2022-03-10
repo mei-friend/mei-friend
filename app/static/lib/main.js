@@ -933,6 +933,7 @@ function addEventListeners(v, cm) {
   document.getElementById('bottom').addEventListener('click', cmd.notationBottom);
   document.getElementById('left').addEventListener('click', cmd.notationLeft);
   document.getElementById('right').addEventListener('click', cmd.notationRight);
+
   // show settings panel
   document.getElementById('showSettingsMenu').addEventListener('click', cmd.showSettingsPanel);
   document.getElementById('showSettingsButton').addEventListener('click', cmd.showSettingsPanel);
@@ -948,6 +949,15 @@ function addEventListeners(v, cm) {
   document.getElementById('SaveMei').addEventListener('click', downloadMei);
   document.getElementById('SaveSvg').addEventListener('click', downloadSvg);
   document.getElementById('SaveMidi').addEventListener('click', downloadMidi);
+
+  // edit dialogs
+  document.getElementById('startSearch').addEventListener('click', () => CodeMirror.commands.find(cm));
+  document.getElementById('findNext').addEventListener('click', () => CodeMirror.commands.findNext(cm));
+  document.getElementById('findPrevious').addEventListener('click', () => CodeMirror.commands.findPrev(cm));
+  document.getElementById('replace').addEventListener('click', () => CodeMirror.commands.replace(cm));
+  document.getElementById('replaceAll').addEventListener('click', () => CodeMirror.commands.replaceAll(cm));
+  document.getElementById('jumpToLine').addEventListener('click', () => CodeMirror.commands.jumpToLine(cm));
+  document.querySelectorAll('.keyShortCut').forEach(e => e.classList.add(navigator.platform.startsWith('Mac') ? 'platform-mac' : 'platform-nonmac'));
 
   // open URL interface
   document.getElementById('openUrlButton').addEventListener('click', cmd.openUrlFetch);
@@ -970,6 +980,7 @@ function addEventListeners(v, cm) {
   document.getElementById('decrease-scale-btn').addEventListener('click', cmd.zoomOut);
   document.getElementById('increase-scale-btn').addEventListener('click', cmd.zoomIn);
   document.getElementById('verovio-zoom').addEventListener('click', cmd.zoomSlider);
+
   // Zooming notation with mouse wheel
   vp.addEventListener('wheel', ev => {
     if ((navigator.platform.toLowerCase().startsWith('mac') && ev.metaKey) ||

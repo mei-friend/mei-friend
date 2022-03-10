@@ -27,6 +27,19 @@
   margin-left: 5px;
 }
 
+.keyShortCut.mac {
+  display: none;
+}
+.keyShortCut.mac.platform-mac {
+  display: block;
+}
+.keyShortCut.nonmac {
+  display: none;
+}
+.keyShortCut.nomac.platform-nonmac {
+  display: block;
+}
+
 /* The dropdown container */
 .dropdown {
   float: left;
