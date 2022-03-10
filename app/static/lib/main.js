@@ -667,7 +667,7 @@ export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true) {
 }
 
 // checks format of encoding string and imports or loads data/notation
-function handleEncoding(mei, setFreshlyLoaded = true) {
+export function handleEncoding(mei, setFreshlyLoaded = true) {
   let found = false;
   v.clear();
   v.busy();

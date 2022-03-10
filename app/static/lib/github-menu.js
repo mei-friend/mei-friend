@@ -5,7 +5,7 @@ import {
 import { 
   cm,
   github, // github instance
-  loadDataInEditor,
+  handleEncoding,
   setFileChangedState,
   setGithubInstance, // github instance setter
   setMeiFileInfo,
@@ -125,12 +125,9 @@ function branchContentsFileClicked(ev) {
   github.filepath += ev.target.innerText ;
   console.log("after BRANCH CONTENTS FILE CLICKED. Filepath NOW: ", github.filepath)
   console.debug(`Loading file: https://github.com/${github.githubRepo}/${github.filepath}`);
-  console.log(1)
   fillInBranchContents(ev);
-  console.log(2)
   githubLoadingIndicator.classList.add("clockwise");
   github.readGithubRepo().then(() => {
-  console.log(3)
     githubLoadingIndicator.classList.remove("clockwise");
     document.querySelector(".statusbar").innerText = "Loading from Github...";
     v.clear();
@@ -140,16 +137,14 @@ function branchContentsFileClicked(ev) {
       github.githubRepo,        // meiFileLocation
       github.githubRepo + ":"   // meiFileLocationPrintable
     );
+    handleEncoding(github.content);
     updateFileStatusDisplay();
-  console.log(4, github)
+    /*
     loadDataInEditor(github.content)
-  console.log(5)
     setFileChangedState(false);
     updateLocalStorage(github.content);
     v.updateNotation = true;
-  console.log(6)
-    v.updateAll(cm);
-  console.log(7)
+    v.updateAll(cm);*/
   }).catch((err) => {
     console.error("Couldn't read Github repo to fill in branch contents:", err);
     //githubLoadingIndicator.classList.remove("clockwise");
