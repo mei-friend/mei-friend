@@ -670,6 +670,7 @@ export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true) {
 }
 
 // checks format of encoding string and imports or loads data/notation
+// mei argument may be MEI or any other supported format (text/binary)
 function handleEncoding(mei, setFreshlyLoaded = true) {
   let found = false;
   v.clear();
