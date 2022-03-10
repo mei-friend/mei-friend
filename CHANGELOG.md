@@ -125,3 +125,4 @@
 * Support for inserting, inverting and deleting beamSpan elements
 # 0.3.7 patch
 * Address issue with ALT-F interfering with EMACS keymap
+* Support for drag-selecting notes and rests with mouse 
