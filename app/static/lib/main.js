@@ -214,7 +214,6 @@ const defaultCodeMirrorOptions = {
   foldGutter: true,
   gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
   extraKeys: {
-    "Alt-F": "findPersistent",
     "'<'": completeAfter,
     "'/'": completeIfAfterLt,
     "' '": completeIfInTag,
