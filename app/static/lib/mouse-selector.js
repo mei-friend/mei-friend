@@ -1,7 +1,4 @@
 const svgNS = "http://www.w3.org/2000/svg";
-import {
-  navElsSelector
-} from './dom-utils.js';
 
 export function addMouseSelector(v, cm, vp) {
 
@@ -11,10 +8,8 @@ export function addMouseSelector(v, cm, vp) {
   var obobj = {};
   let oldEls = [];
   let newEls = [];
-
   var start = {};
   var end = {};
-
   var rect;
 
   vp.addEventListener('mousedown', ev => {
@@ -25,31 +20,52 @@ export function addMouseSelector(v, cm, vp) {
       v.updateHighlight();
     }
     oldEls = [];
-    v.selectedElements.forEach(el => oldEls.push(el));
+    obobj = {};
+    v.selectedElements.forEach(el => oldEls.push(el)); // remember selected els
+    // create selection rectangle
+    rect = document.createElementNS(svgNS, 'rect');
+    let svgPm = document.querySelector('g.page-margin');
+    svgPm.appendChild(rect);
+    // remember click point
     start.x = ev.clientX;
     start.y = ev.clientY;
-    rect = document.createElementNS(svgNS, 'rect');
-    document.querySelector('g.page-margin').appendChild(rect);
 
-    var svgEls = document.querySelectorAll('g .note, .rest, .mRest, .beatRpt, .halfmRpt, .mRpt');
+    var svgEls = document.querySelectorAll(
+      'g .note, .rest, .mRest, .beatRpt, .halfmRpt, .mRpt');
     svgEls.forEach(el => {
       let bb = el.getBBox();
-      if (Object.keys(obobj).includes(Math.round(bb.x * 1000)) &&
-        Object.keys(obobj[Math.round(bb.x * 1000)]).includes(Math.round(bb.y * 1000))) {
-        obobj[Math.round(bb.x * 1000)][Math.round(bb.y * 1000)].push(el);
+      if (Array.from(el.classList).includes('note'))
+        bb = el.querySelector('.notehead').getBBox();
+      let x = Math.round(bb.x * 1000);
+      let y = Math.round(bb.y * 1000);
+      if (!Object.keys(obobj).includes(x.toString())) obobj[x] = {};
+      if (Object.keys(obobj).includes(x.toString()) &&
+        Object.keys(obobj[x]).includes(y.toString())) {
+        obobj[x][y].push(el);
       } else {
-        obobj[Math.round(bb.x * 1000)] = {};
-        obobj[Math.round(bb.x * 1000)][Math.round(bb.y * 1000)] = [el];
+        obobj[x][y] = [el];
       }
-      // if (Object.keys(obobj).includes(bb.x + bb.width) &&
-      //   Object.keys(obobj[bb.x + bb.width]).includes(bb.y + bb.height)) {
-      //   obobj[bb.x + bb.width][bb.y + bb.height].push(el);
+      // DEBUG: add bounding boxes to notation
+      // rect = document.createElementNS(svgNS, 'rect');
+      // updateRect(rect, bb.x, bb.y, bb.width, bb.height, 'crimson');
+      // svgPm.appendChild(rect);
+      // let txt = document.createElementNS(svgNS, 'text');
+      // txt.setAttribute('x', bb.x);
+      // txt.setAttribute('y', bb.y);
+      // txt.setAttribute('font-size', '160pt');
+      // txt.setAttribute('fill', 'red');
+      // txt.textContent = Math.round(bb.x) + '/' + Math.round(bb.y);
+      // svgPm.appendChild(txt);
+
+      // let x2 = Math.round((bb.x + bb.width) * 1000);
+      // let y2 = Math.round((bb.y + bb.height) * 1000);
+      // if (Object.keys(obobj).includes(x2) && Object.keys(obobj[x2]).includes(y2)) {
+      //   obobj[x2][y2].push(el);
       // } else {
-      //   obobj[bb.x + bb.width] = {};
-      //   obobj[bb.x + bb.width][bb.y + bb.height] = [el];
+      //   obobj[x2] = {};
+      //   obobj[x2][y2] = [el];
       // }
     });
-    let asdf = 123123;
   });
 
   vp.addEventListener('mousemove', ev => {
@@ -58,7 +74,7 @@ export function addMouseSelector(v, cm, vp) {
       end.x = ev.clientX;
       end.y = ev.clientY;
       var mx = document.querySelector('g.page-margin').getScreenCTM().inverse();
-      // var mx = document.querySelector('.verovio-panel svg').getScreenCTM().inverse();
+      // transform mouse/screen coordinates to SVG coordinates
       let s = transformCTM(start, mx);
       let e = transformCTM(end, mx);
       let x = s.x;
@@ -69,18 +85,20 @@ export function addMouseSelector(v, cm, vp) {
       if (e.y < s.y) y = e.y;
 
       updateRect(rect, x, y, width, height, 'var(--notationColor)');
-      console.log('Mouse move: x/y: ' + x + '/' + y + ', w/h' + width + '/' + height);
+      // console.log('Mouse move: x/y: ' + x + '/' + y + ', w/h' + width + '/' + height);
 
+      let xx = Math.round(x * 1000);
+      let xx2 = Math.round((x + width) * 1000);
+      let yy = Math.round(y * 1000);
+      let yy2 = Math.round((y + height) * 1000);
       let selX = Object.keys(obobj)
-        .filter(kx => parseFloat(kx) > Math.round(x * 1000) && parseFloat(kx) < Math.round((x + width) * 1000));
-      let selY = selX.map(keyX => Object.keys(obobj[keyX]))
-        .filter(ky => parseFloat(ky) > Math.round(y * 1000) && parseFloat(ky) < Math.round((y + height) * 1000));
-
-      if (selX.length > 0 && selY.length > 0) {
-        selX.forEach((keyX, xi) => {
-          let ys = selY[xi];
-          if (ys) ys.forEach(keyY => {
-            let els = obobj[keyX][keyY];
+        .filter(kx => (parseInt(kx) >= xx && parseInt(kx) <= xx2));
+      if (selX.length > 0) {
+        selX.forEach(xKey => {
+          let yKeys = Object.keys(obobj[xKey])
+            .filter(ky => (parseInt(ky) >= yy && parseInt(ky) <= yy2));
+          if (yKeys) yKeys.forEach(yKey => {
+            let els = obobj[xKey][yKey];
             if (els) els.forEach(e => {
               if (!newEls.includes(e.id))
                 newEls.push(e.id);
