@@ -698,8 +698,11 @@ span.keyIcon {
   overflow: auto;
 }
 
-.tabcontent h2 {
+.tabcontent summary {
   font-size: 12pt;
+  font-weight: bold;
+  padding: 9px 6px 6px 6px;
+  cursor: pointer;
 }
 
 .tabcontent input[type="button"] {
