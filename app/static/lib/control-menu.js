@@ -329,6 +329,7 @@ export function createControlsMenu(parentElement, scale) {
   speedCheckbox.setAttribute('type', 'checkbox');
   speedCheckbox.setAttribute('checked', 'false');
   speedCheckbox.classList.add('checkbox');
+  speedLabel.setAttribute('for', speedCheckbox.id);
   speedCheckbox.checked = true;
   speedCheckbox.disabled = false;
   // addToolTip(speedCheckbox, {
