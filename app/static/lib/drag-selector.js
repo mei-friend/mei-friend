@@ -4,7 +4,6 @@ import * as att from './attribute-classes.js';
 export function addDragSelector(v, vp) {
 
   let dragging = false;
-  let svgPm;
   var svgEls;
   var obobj = {}; // object storing x, y coordinates of svg elements
   let oldEls = [];
@@ -31,8 +30,7 @@ export function addDragSelector(v, vp) {
     v.selectedElements.forEach(el => oldEls.push(el)); // remember selected els
     // create selection rectangle
     rect = document.createElementNS(svgNS, 'rect');
-    svgPm = document.querySelector('g.page-margin');
-    svgPm.appendChild(rect);
+    document.querySelector('g.page-margin').appendChild(rect);
 
     // remember click/mousedown point
     start.x = ev.clientX;
@@ -60,7 +58,6 @@ export function addDragSelector(v, vp) {
       sel += (first ? ' ' : ',') + measureSelector;
       first = false;
     }
-    console.log('Selector: ', sel);
     svgEls = document.querySelectorAll(sel);
     svgEls.forEach(el => {
       let bb = el.getBBox();
@@ -130,7 +127,8 @@ export function addDragSelector(v, vp) {
 
   vp.addEventListener('mouseup', () => {
     dragging = false;
-    document.querySelector('g.page-margin').removeChild(rect);
+    let svgPm = document.querySelector('g.page-margin');
+    if (Array.from(svgPm.childNodes).includes(rect)) svgPm.removeChild(rect);
     oldEls = [];
   });
 
