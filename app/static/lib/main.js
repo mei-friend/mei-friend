@@ -224,11 +224,7 @@ const defaultCodeMirrorOptions = {
     "Ctrl-Space": "autocomplete",
     "Alt-.": consultGuidelines
   },
-  hintOptions: {
-    schemaInfo: {
-      ...default_schema
-    }
-  },
+  hintOptions: 'schema_meiCMN_401', // not cm conform: just provide schema name
   theme: 'default',
   zoomFont: 100, // my own option
   matchTheme: false, // notation matches editor theme (my option)
