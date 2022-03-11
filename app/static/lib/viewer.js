@@ -914,7 +914,35 @@ export default class Viewer {
         default: 'none',
         values: []
       },
-
+      dragSelection: {
+        title: 'Drag select',
+        description: 'Select elements in notation with mouse drag',
+        type: 'header'
+      },
+      dragSelectNotes: {
+        title: 'Select notes',
+        description: 'Select notes',
+        type: 'bool',
+        default: true
+      },
+      dragSelectRests: {
+        title: 'Select rests',
+        description: 'Select rests and repeats (rest, mRest, beatRpt, halfmRpt, mRpt)',
+        type: 'bool',
+        default: true
+      },
+      dragSelectControlElements: {
+        title: 'Select control elements ',
+        description: 'Select control elements (tempo, dir, dynam, ...)',
+        type: 'bool',
+        default: false
+      },
+      dragSelectSlurs: {
+        title: 'Select slurs ',
+        description: 'Select slurs, ties',
+        type: 'bool',
+        default: false
+      },
     };
     let mfs = document.getElementById('meiFriendSettings');
     let addListeners = false; // add event listeners only the first time
