@@ -862,7 +862,9 @@ export default class Viewer {
             storage.hasOwnProperty('cm-matchTheme') ?
             storage['cm-matchTheme'] : mfDefaults['matchTheme']);
         }
-        if (mfDefaults.hasOwnProperty(option) && mfDefaults[option].toString() === value.toString()) {
+        if ((mfDefaults.hasOwnProperty(option) && option !== 'theme' && mfDefaults[option].toString() === value.toString()) ||
+          (option === 'theme' && (window.matchMedia('(prefers-color-scheme: dark)').matches ?
+            mfDefaults.defaultDarkTheme : mfDefaults.defaultBrightTheme) === value.toString())) {
           delete storage['cm-' + option]; // remove from storage object when default value
         } else {
           storage['cm-' + option] = value; // save changes in localStorage object
