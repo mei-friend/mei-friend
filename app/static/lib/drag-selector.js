@@ -1,4 +1,5 @@
 const svgNS = "http://www.w3.org/2000/svg";
+import * as att from './attribute-classes.js';
 
 export function addDragSelector(v, vp) {
 
@@ -11,6 +12,12 @@ export function addDragSelector(v, vp) {
   var start = {};
   var end = {};
   var rect;
+
+  let noteSelector = '.note';
+  let restSelector = '.rest,.mRest,.beatRpt,.halfmRpt,.mRpt';
+  let controlSelector = '.' + att.attPlacement.join(',.');
+  let slurSelector = '.' + att.attCurvature.join(',.');
+  let measureSelector = '.measure';
 
   vp.addEventListener('mousedown', ev => {
     dragging = true;
@@ -31,8 +38,30 @@ export function addDragSelector(v, vp) {
     start.x = ev.clientX;
     start.y = ev.clientY;
 
-    svgEls = document.querySelectorAll(
-      'g .note, .rest, .mRest, .beatRpt, .halfmRpt, .mRpt');
+    let sel = 'g';
+    let first = true;
+    if (document.getElementById('dragSelectNotes').checked) {
+      sel += (first ? ' ' : ',') + noteSelector;
+      first = false;
+    }
+    if (document.getElementById('dragSelectRests').checked) {
+      sel += (first ? ' ' : ',') + restSelector;
+      first = false;
+    }
+    if (document.getElementById('dragSelectControlElements').checked) {
+      sel += (first ? ' ' : ',') + controlSelector;
+      first = false;
+    }
+    if (document.getElementById('dragSelectSlurs').checked) {
+      sel += (first ? ' ' : ',') + slurSelector;
+      first = false;
+    }
+    if (document.getElementById('dragSelectMeasures').checked) {
+      sel += (first ? ' ' : ',') + measureSelector;
+      first = false;
+    }
+    console.log('Selector: ', sel);
+    svgEls = document.querySelectorAll(sel);
     svgEls.forEach(el => {
       let bb = el.getBBox();
       if (Array.from(el.classList).includes('note'))

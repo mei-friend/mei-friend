@@ -727,7 +727,7 @@ span.keyIcon {
   justify-content: space-between;
   padding-top: 0.5px;
   padding-bottom: 0.5px;
-  max-width: 318px;
+  max-width: 330px;
   clear: both;
 }
 
@@ -791,4 +791,11 @@ input, select {
 select>option {
   background-color: var(--dropdownBackgroundColor);
   color: var(--textColor);
+}
+
+.options-line {
+  border: 1px solid var(--dropdownBorderColor);
+  border-radius: 1px;
+  margin: 8px 4px;
+  width: 100%;
 }

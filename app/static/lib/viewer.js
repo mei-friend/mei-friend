@@ -4,6 +4,7 @@ import {
 import * as speed from './speed.js';
 import * as utils from './utils.js';
 import * as dutils from './dom-utils.js';
+import * as att from './attribute-classes.js';
 import {
   addToolTip
 } from './control-menu.js';
@@ -914,6 +915,10 @@ export default class Viewer {
         default: 'none',
         values: []
       },
+      dragLineSeparator: {
+        title: 'options-line', // class name of hr element
+        type: 'line'
+      },
       dragSelection: {
         title: 'Drag select',
         description: 'Select elements in notation with mouse drag',
@@ -933,13 +938,21 @@ export default class Viewer {
       },
       dragSelectControlElements: {
         title: 'Select control elements ',
-        description: 'Select control elements (tempo, dir, dynam, ...)',
+        description: 'Select control elements (with @placement attribute: ' +
+          att.attPlacement.join(', ') + ')',
         type: 'bool',
         default: false
       },
       dragSelectSlurs: {
         title: 'Select slurs ',
-        description: 'Select slurs, ties',
+        description: 'Select slurs (i.e., elements with @curvature attribute: ' +
+          att.attCurvature.join(', ') + ')',
+        type: 'bool',
+        default: false
+      },
+      dragSelectMeasures: {
+        title: 'Select measures ',
+        description: 'Select measures',
         type: 'bool',
         default: false
       },
@@ -1127,12 +1140,17 @@ export default class Viewer {
       case 'header':
         label.setAttribute('style', 'font-weight: bold; font-size: 105%; margin-top: 3px;');
         break;
+      case 'line':
+        div.removeChild(label);
+        let line = document.createElement('hr');
+        line.classList.add(o.title);
+        div.appendChild(line);
       default:
         console.log('Vervio Options: Unhandled data type: ' + o.type);
         console.log('title: ' + o.title + ' [' + o.type + '], default: [' + optDefault + ']');
     }
     if (input) div.appendChild(input);
-    return (input || o.type === 'header') ? div : null;
+    return (input || o.type === 'header' || o.type === 'line') ? div : null;
   }
 
   // navigate forwards/backwards/upwards/downwards in the DOM, as defined
