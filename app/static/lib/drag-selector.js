@@ -63,6 +63,12 @@ export function addDragSelector(v, vp) {
       let bb = el.getBBox();
       if (Array.from(el.classList).includes('note'))
         bb = el.querySelector('.notehead').getBBox();
+      if (Array.from(el.classList).includes('measure')) { // take boundingbox
+        let staves = el.querySelectorAll('.staff'); //for  measures from staves
+        bb.width = staves.item(0).getBBox().width;
+        let sbb = staves.item(staves.length - 1).getBBox();
+        bb.height = sbb.y + sbb.height - bb.y;
+      }
       let x = Math.round((bb.x + bb.width / 2) * 1000); // center of element
       let y = Math.round((bb.y + bb.height / 2) * 1000);
       if (!Object.keys(obobj).includes(x.toString())) obobj[x] = {};
