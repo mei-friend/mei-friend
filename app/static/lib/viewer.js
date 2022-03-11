@@ -1040,10 +1040,12 @@ export default class Viewer {
     let rs = document.getElementById('respSelect');
     if (rs) {
       while (rs.length > 0) rs.options.remove(0);
-      let optEls = this.xmlDoc.querySelectorAll('corpName[*|id]');
+      let optEls = this.xmlDoc.querySelectorAll('corpName[*|id],persName[*|id]');
       optEls.forEach(el => {
-        let id = el.getAttribute('xml:id')
-        rs.add(new Option(id, id));
+        if (el.closest('respStmt')) { // only if inside a respStmt
+          let id = el.getAttribute('xml:id')
+          rs.add(new Option(id, id));
+        }
       });
     }
   }
