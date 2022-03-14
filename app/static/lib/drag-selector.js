@@ -61,13 +61,17 @@ export function addDragSelector(v, vp) {
     svgEls = document.querySelectorAll(sel);
     svgEls.forEach(el => {
       let bb = el.getBBox();
-      if (Array.from(el.classList).includes('note'))
-        bb = el.querySelector('.notehead').getBBox();
+      if (Array.from(el.classList).includes('note')) {
+        let noteHead = el.querySelector('.notehead');
+        if (noteHead) bb = noteHead.getBBox();
+      }
       if (Array.from(el.classList).includes('measure')) { // take boundingbox
         let staves = el.querySelectorAll('.staff'); //for  measures from staves
-        bb.width = staves.item(0).getBBox().width;
-        let sbb = staves.item(staves.length - 1).getBBox();
-        bb.height = sbb.y + sbb.height - bb.y;
+        if (staves.length > 0) {
+          bb.width = staves.item(0).getBBox().width;
+          let sbb = staves.item(staves.length - 1).getBBox();
+          bb.height = sbb.y + sbb.height - bb.y;
+        }
       }
       let x = Math.round((bb.x + bb.width / 2) * 1000); // center of element
       let y = Math.round((bb.y + bb.height / 2) * 1000);
