@@ -8,6 +8,7 @@
   --defaultNotationBackgroundColor: #eeeeee;
   /* orange 45% darker */
   --defaultSuppliedColor: #e69500;
+  --defaultSuppliedHighlightedColor: #b37400;
   /* TODO use mdw blue */
   --defaultHighlightColor: #4e8bed;
   --defaultNavbarBackgroundColor: lightgray;
@@ -37,6 +38,7 @@
   --notationColor: var(--defaultTextColor);
   --notationBackgroundColor: var(--defaultBackgroundColor);
   --suppliedColor: var(--defaultSuppliedColor);
+  --suppliedHighlightedColor: var(--defaultSuppliedHighlightedColor);
   --highlightColor: var(--defaultHighlightColor);
   --navbarBackgroundColor: var(--defaultNavbarBackgroundColor);
   --keyboardShortCutColor: var(--defaultKeyboardShortCutColor);
@@ -463,6 +465,14 @@ https://www.w3schools.com/css/css_tooltip.asp
   background-color: var(--notationBackgroundColor);
 }
 
+/* prevent text from being selectable in SVG */
+svg text {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select:  none;
+}
+
 .verovio-panel g.highlighted {
   fill: var(--highlightColor);
   color: var(--highlightColor);
@@ -473,6 +483,12 @@ https://www.w3schools.com/css/css_tooltip.asp
   fill: var(--suppliedColor);
   color: var(--suppliedColor);
   stroke: var(--suppliedColor);
+}
+
+.verovio-panel g.supplied g.highlighted {
+  fill: var(--suppliedHighlightedColor);
+  color: var(--suppliedHighlightedColor);
+  stroke: var(--suppliedHighlightedColor);
 }
 
 .verovio-panel g {
@@ -686,8 +702,11 @@ span.keyIcon {
   overflow: auto;
 }
 
-.tabcontent h2 {
+.tabcontent summary {
   font-size: 12pt;
+  font-weight: bold;
+  padding: 9px 6px 6px 6px;
+  cursor: pointer;
 }
 
 .tabcontent input[type="button"] {
@@ -714,7 +733,7 @@ span.keyIcon {
   justify-content: space-between;
   padding-top: 0.5px;
   padding-bottom: 0.5px;
-  max-width: 318px;
+  max-width: 330px;
   clear: both;
 }
 
@@ -728,9 +747,9 @@ span.keyIcon {
   max-width: 220px;
 }
 
-#editorSettings .optionsItem select {
+#editorSettings .optionsItem select, #meiFriendSettings .optionsItem select {
   min-width: 80px;
-  max-width: 145px;
+  max-width: 150px;
 }
 
 /* For all options items  */
@@ -762,6 +781,10 @@ span.keyIcon {
   border-radius: 4px;
 }
 
+.optionsItem input[type='color'] {
+  padding: 2px;
+}
+
 .resetButton {
   border-radius: 4px;
 }
@@ -774,4 +797,11 @@ input, select {
 select>option {
   background-color: var(--dropdownBackgroundColor);
   color: var(--textColor);
+}
+
+.options-line {
+  border: 1px solid var(--dropdownBorderColor);
+  border-radius: 1px;
+  margin: 8px 4px;
+  width: 100%;
 }

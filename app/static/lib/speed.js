@@ -65,7 +65,8 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks = ['sb', 'pb'],
   let sections = xmlScore.childNodes;
   sections.forEach((item) => {
     if (item.nodeName === 'section') { // diggs into section hierachy
-      spdScore = digger(item);
+      let returnSection = digger(item);
+      baseSection.appendChild(returnSection);
     }
   });
 
@@ -120,10 +121,16 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
   let baseSection = spdScore.querySelector('section');
 
   return function digDeeper(section) {
+    // create a copy of section and copy attributes
+    let newSection = document.createElementNS(meiNameSpace, 'section');
+    section.getAttributeNames().forEach(attrName => {
+      newSection.setAttribute(attrName, section.getAttribute(attrName))
+    });
+
     let children = section.childNodes;
     let lgt = children.length;
     for (let i = 0; i < lgt; i++) {
-      if (countingMode == 'measures' && mNo >= mxMeasures) return spdScore;
+      if (countingMode == 'measures' && mNo >= mxMeasures) return newSection;
       if (p > pageNo) break; // only until requested pageNo is processed
       let currentNode = children[i];
       // console.info('digDeeper(' + pageNo + '): p: ' + p +
@@ -135,7 +142,8 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
       // console.info('digDeeper currentNodeName: ', currentNodeName + ', '
       // + currentNode.getAttribute('xml:id'));
       if (currentNodeName === 'section') {
-        spdScore = digDeeper(currentNode);
+        let returnSection = digDeeper(currentNode);
+        newSection.appendChild(returnSection);
         // console.info('digDeeper returned spdScore: ', spdScore);
         continue;
       }
@@ -289,12 +297,12 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
         if (p == pageNo) {
           breakNode.parentNode.replaceChild(
             document.createElementNS(meiNameSpace, 'pb'), breakNode);
-          baseSection.appendChild(endingNode);
+          newSection.appendChild(endingNode);
         } else if (p == pageNo - 1) { // remove elements until first break
           while (!breaks.includes(endingNode.firstChild.nodeName)) {
             endingNode.removeChild(endingNode.firstChild);
           }
-          baseSection.appendChild(endingNode);
+          newSection.appendChild(endingNode);
         }
         // console.info('Ending with break inside: ', endingNode);
         p++;
@@ -309,7 +317,7 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
             if (b) nodeCopy.removeChild(b);
           });
         }
-        baseSection.appendChild(nodeCopy);
+        newSection.appendChild(nodeCopy);
         // console.info('digDeeper adds child to spdScore: ', spdScore);
       }
 
@@ -327,7 +335,7 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
       }
 
     } // for loop across child nodes
-    return spdScore;
+    return newSection;
   }
 }
 
@@ -768,8 +776,8 @@ export function countStaves(scoreDef) {
 }
 
 export function rmHash(hashedString) {
-  if (!hashedString) return '';
-  if (hashedString.startsWith('#')) return hashedString.split('#')[1];
+  return (hashedString.startsWith('#')) ?
+    hashedString.split('#')[1] : hashedString;
 }
 
 // filter selected elements and keep only highest in DOM

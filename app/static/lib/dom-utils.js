@@ -1,8 +1,8 @@
-export const navElsSelector =
-  '.note, .rest, .mRest, .beatRpt, .halfmRpt, .mRpt, .clef';
 export const navElsArray = [
   'note', 'rest', 'mRest', 'beatRpt', 'halfmRpt', 'mRpt', 'clef'
 ];
+export const navElsSelector = '.' + navElsArray.join(',.');
+
 
 // scans through SVG starting from element to find next element elementName
 // (e.g. 'note'), within same staff and layer
@@ -201,8 +201,7 @@ export function getElementAtCursor(cm) {
   let coords = cm.cursorCoords({
     ch: cursor.ch,
     line: cursor.line
-  }, "window"); 
+  }, "window");
   let elem = document.elementFromPoint(coords.left, coords.top);
   return elem;
 }
-

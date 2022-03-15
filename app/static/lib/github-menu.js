@@ -5,7 +5,7 @@ import {
 import { 
   cm,
   github, // github instance
-  loadDataInEditor,
+  handleEncoding,
   setFileChangedState,
   setGithubInstance, // github instance setter
   setMeiFileInfo,
@@ -105,16 +105,16 @@ function repoBranchClicked(ev) {
 
 function branchContentsDirClicked(ev) { 
   if (github.filepath.endsWith("/")) {
-    github.filepath += ev.target.querySelector("span.filepath").innerText;
+    github.filepath += ev.target.querySelector("span.filepath").innerText + "/";
   } else {
-    github.filepath += "/" + ev.target.querySelector("span.filepath").innerText;
+    github.filepath += "/" + ev.target.querySelector("span.filepath").innerText + "/";
   }
   fillInBranchContents(ev);
 }
 
 function branchContentsFileClicked(ev) { 
   const githubLoadingIndicator = document.getElementById("GithubLogo");
-  github.filepath += ev.target.innerText;
+  github.filepath += ev.target.innerText ;
   console.debug(`Loading file: https://github.com/${github.githubRepo}/${github.filepath}`);
   fillInBranchContents(ev);
   githubLoadingIndicator.classList.add("clockwise");
@@ -128,15 +128,17 @@ function branchContentsFileClicked(ev) {
       github.githubRepo,        // meiFileLocation
       github.githubRepo + ":"   // meiFileLocationPrintable
     );
+    handleEncoding(github.content);
     updateFileStatusDisplay();
+    /*
     loadDataInEditor(github.content)
     setFileChangedState(false);
     updateLocalStorage(github.content);
     v.updateNotation = true;
-    v.updateAll(cm);
+    v.updateAll(cm);*/
   }).catch((err) => {
-    console.warn("Couldn't read Github repo to fill in branch contents:", err);
-    githubLoadingIndicator.classList.remove("clockwise");
+    console.error("Couldn't read Github repo to fill in branch contents:", err);
+    //githubLoadingIndicator.classList.remove("clockwise");
   })
 }
 
@@ -183,7 +185,6 @@ function assignGithubMenuClickHandlers() {
   const contentsHeader = document.getElementById('contentsHeader');
   if (contentsHeader) {
     // on click, move up one directory level in the branch contents
-    github.filepath = "";
     contentsHeader.removeEventListener('click', contentsHeaderClicked);
     contentsHeader.addEventListener('click', contentsHeaderClicked);
   }
@@ -261,7 +262,9 @@ export async function fillInBranchContents(e) {
     // clicked on file name -- operate on parent (list entry) instead
     target = e.target.parentNode;
   }
-  if (e && (target.classList.contains("repoBranch") || target.classList.contains("dir") || target.getAttribute("id") === "contentsHeader")) {
+  if (e && (target && target.classList.contains("repoBranch") || 
+      target.classList.contains("dir") || 
+      target.getAttribute("id") === "contentsHeader")) {
     Array.from(branchContents).forEach((content) => {
       const isDir = content.type === "dir";
       githubMenu.innerHTML += `<a class="branchContents ${content.type}${isDir ? '': ' closeOnClick'}" href="#">` +
@@ -305,7 +308,7 @@ async function fillInCommitLog(refresh = false) {
     }).catch((e) => {
       githubLoadingIndicator.classList.remove("clockwise");
       console.warn("Couldn't read github repo, forcing log-out: ", e);
-      logoutFromGithub();
+//      logoutFromGithub();
     })
   } else {
     renderCommitLog();

@@ -139,6 +139,20 @@
           <a id="SaveMidi" href="#">Save MIDI</a>
         </div>
       </div>
+      <!-- https://codemirror.net/demo/search.html -->
+      <div class="dropdown">
+        <button class="dropbtn">Code</button>
+        <div class="dropdown-content" id="EditMenu">
+          <a id="startSearch" href="#">Search<span class="keyShortCut cmdKey">F</span></a>
+          <a id="findNext" href="#">Find next<span class="keyShortCut cmdKey">G</span></a>
+          <a id="findPrevious" href="#">Find previous<span class="keyShortCut shiftKey cmdKey">G</span></a>
+          <hr class="dropdown-line">
+          <a id="replace" href="#">Replace<span class="keyShortCut mac altKey cmdKey">F</span><span class="keyShortCut nonmac shiftKey ctrlKey">F</span></a>
+          <a id="replaceAll" href="#">Replace all<span class="keyShortCut mac altKey shiftKey cmdKey">F</span><span class="keyShortCut nonmac shiftKey ctrlKey">R</span></a>
+          <hr class="dropdown-line">
+          <a id="jumpToLine" href="#">Jump to line<span class="keyShortCut altKey">G</span></a>
+        </div>
+      </div>
       <div class="dropdown">
         <button class="dropbtn">View</button>
         <div class="dropdown-content" id="ViewMenu">
@@ -154,6 +168,7 @@
         <button class="dropbtn">Manipulate</button>
         <div class="dropdown-content" id="Manipulate">
           <a id="invertPlacement" href="#">Invert placement<span class="keyShortCut">X</span></a>
+          <a id="addVerticalGroup" href="#">Add vertical group<span class="keyShortCut">V</span></a>
           <hr class="dropdown-line">
           <a id="delete" href="#">Delete element<span class="keyShortCut">⌫, DEL</span></a>
           <hr class="dropdown-line">
@@ -184,6 +199,8 @@
           <a id="addCresHairpin" href="#">Cresc hairpin<span class="keyShortCut">H</span></a>
           <a id="addDimHairpin" href="#">Dim hairpin<span class="keyShortCut shiftKey">H</span></a>
           <a id="addBeam" href="#">Beam<span class="keyShortCut">B</span></a>
+          <a id="addBeamSpan" href="#">BeamSpan<span class="keyShortCut shiftKey">B</span></a>
+          <a id="addSupplied" href="#">Supplied<span class="keyShortCut">U</span></a>
           <hr class="dropdown-line">
           <a id="addArpeggio" href="#">Arpeggio<span class="keyShortCut">A</span></a>
           <a id="addFermata" href="#">Fermata<span class="keyShortCut">F</span></a>
@@ -222,7 +239,8 @@
             help page</a>
           <a id="GoToGuidelines" href="https://music-encoding.org/guidelines" target="_blank">Show
             MEI Guidelines</a>
-          <a id="consultGuidelines" href="#" >Consult Guidelines for current element<span class="keyShortCut altKey">.</span></a>
+          <a id="consultGuidelines" href="#">Consult Guidelines for current element<span class="keyShortCut altKey">.</span></a>
+          <hr class="dropdown-line">
           <a id="resetDefault" href="#">Reset to default</a>
         </div>
       </div>
@@ -307,7 +325,7 @@
   <div id="settingsPanel" class="out">
     <div class="tab">
       <button id="hideSettingsButton" class="tabstart" title="Hide Settings Panel">
-        <img src="{{ url_for('static', filename='svg/gear-16.svg') }}" id="hideSettingsButtonImg"  />
+        <img src="{{ url_for('static', filename='svg/gear-16.svg') }}" id="hideSettingsButtonImg" />
       </button>
       <button class="tablink" onclick="switchTab(event, 'meiFriendSettings')" title="mei-friend Settings">mei-friend</button>
       <button class="tablink" onclick="switchTab(event, 'editorSettings')" title="Editor Settings" id="defaultOpen">Editor</button>
@@ -316,11 +334,6 @@
     </div>
     <!-- Tab content -->
     <div id="meiFriendSettings" class="tabcontent">
-      <h3>mei-friend Settings</h3>
-      <div class="optionsItem">Will appear here.</div>
-      <!-- <div class="optionsItem">Show supplied checkbox; pick color; select responsibility id.</div>
-          <div class="optionsItem">Transposition interface. Select semitones up/down; select key; checkbox show original</div>
-          <div class="optionsItem">Choice/App interface</div> -->
     </div>
     <div id="editorSettings" class="tabcontent">
     </div>

@@ -4,6 +4,7 @@ import {
 import * as speed from './speed.js';
 import * as utils from './utils.js';
 import * as dutils from './dom-utils.js';
+import * as att from './attribute-classes.js';
 import {
   addToolTip
 } from './control-menu.js';
@@ -37,6 +38,7 @@ export default class Viewer {
     this.toolTipTimeOutHandle = null; // handle for zoom tooltip hide timer
     this.vrvOptions; // all verovio options
     this.verovioIcon = document.getElementById('verovio-icon');
+    this.respId = '';
   }
 
   // change options, load new data, render current page, add listeners, highlight
@@ -64,8 +66,6 @@ export default class Viewer {
   }
 
   updateData(cm, setCursorToPageBeg = true, setFocusToVerovioPane = true) {
-    // is it needed for speed mode?
-    //if(!this.speedMode) this.loadVerovioData(this.speedFilter(cm.getValue()));
     let message = {
       'cmd': 'updateData',
       'mei': this.speedFilter(cm.getValue()),
@@ -363,6 +363,15 @@ export default class Viewer {
 
   handleClickOnNotation(e, cm) {
     e.stopImmediatePropagation();
+    let point = {};
+    point.x = e.clientX;
+    point.y = e.clientY;
+    var matrix = document.querySelector('g.page-margin').getScreenCTM().inverse();
+    let r = {}
+    r.x = matrix.a * point.x + matrix.c * point.y + matrix.e;
+    r.y = matrix.b * point.x + matrix.d * point.y + matrix.f;
+    console.log('Click on ' + e.srcElement.id + ', x/y: ' + r.x + '/' + r.y);
+
     this.updateNotation = false;
     // console.info('click: ', e);
     let itemId = String(e.currentTarget.id);
@@ -452,7 +461,7 @@ export default class Viewer {
       this.updateData(cm, false, false);
   }
 
-  // highlight currently selected elements
+  // highlight currently selected elements, if cm left out, all are cleared
   updateHighlight(cm) {
     // clear existing highlighted classes
     let highlighted = document.querySelectorAll('g.highlighted');
@@ -461,7 +470,7 @@ export default class Viewer {
     let ids = [];
     if (this.selectedElements.length > 0)
       this.selectedElements.forEach(item => ids.push(item));
-    else ids.push(utils.getElementIdAtCursor(cm));
+    else if (cm) ids.push(utils.getElementIdAtCursor(cm));
     // console.info('updateHlt ids: ', ids);
     for (let id of ids) {
       if (id) {
@@ -525,25 +534,25 @@ export default class Viewer {
       els.forEach(el => el.style.setProperty('filter', 'invert(.8)'));
       let btn = document.querySelectorAll('.btn');
       if (btn) btn.forEach(el => {
-        el.style.setProperty('background-color', complementary(cm.backgroundColor));
-        el.style.setProperty('color', complementary(cm.color));
+        el.style.setProperty('background-color', utils.complementary(cm.backgroundColor));
+        el.style.setProperty('color', utils.complementary(cm.color));
       });
-      rt.style.setProperty('--settingsLinkBackgroundColor', brighter(cm.backgroundColor, 21));
-      rt.style.setProperty('--settingsLinkHoverColor', brighter(cm.backgroundColor, 36));
-      rt.style.setProperty('--settingsBackgroundColor', brighter(cm.backgroundColor, 36));
-      rt.style.setProperty('--settingsBackgroundAlternativeColor', brighter(cm.backgroundColor, 24));
-      rt.style.setProperty('--navbarBackgroundColor', brighter(cm.backgroundColor, 50));
-      rt.style.setProperty('--dropdownHeadingColor', brighter(cm.backgroundColor, 70));
-      rt.style.setProperty('--dropdownBackgroundColor', brighter(cm.backgroundColor, 50));
-      rt.style.setProperty('--dropdownBorderColor', brighter(cm.backgroundColor, 100));
+      rt.style.setProperty('--settingsLinkBackgroundColor', utils.brighter(cm.backgroundColor, 21));
+      rt.style.setProperty('--settingsLinkHoverColor', utils.brighter(cm.backgroundColor, 36));
+      rt.style.setProperty('--settingsBackgroundColor', utils.brighter(cm.backgroundColor, 36));
+      rt.style.setProperty('--settingsBackgroundAlternativeColor', utils.brighter(cm.backgroundColor, 24));
+      rt.style.setProperty('--navbarBackgroundColor', utils.brighter(cm.backgroundColor, 50));
+      rt.style.setProperty('--dropdownHeadingColor', utils.brighter(cm.backgroundColor, 70));
+      rt.style.setProperty('--dropdownBackgroundColor', utils.brighter(cm.backgroundColor, 50));
+      rt.style.setProperty('--dropdownBorderColor', utils.brighter(cm.backgroundColor, 100));
       let att = document.querySelector('.cm-attribute');
-      if (att) rt.style.setProperty('--keyboardShortCutColor', brighter(window.getComputedStyle(att).color, 40));
+      if (att) rt.style.setProperty('--keyboardShortCutColor', utils.brighter(window.getComputedStyle(att).color, 40));
       let tag = document.querySelector('.cm-tag');
-      if (tag) rt.style.setProperty('--fileStatusColor', brighter(window.getComputedStyle(tag).color, 40));
+      if (tag) rt.style.setProperty('--fileStatusColor', utils.brighter(window.getComputedStyle(tag).color, 40));
       let str = document.querySelector('.cm-string');
       if (str) {
-        rt.style.setProperty('--fileStatusChangedColor', brighter(window.getComputedStyle(str).color, 40));
-        rt.style.setProperty('--fileStatusWarnColor', brighter(window.getComputedStyle(str).color, 10));
+        rt.style.setProperty('--fileStatusChangedColor', utils.brighter(window.getComputedStyle(str).color, 40));
+        rt.style.setProperty('--fileStatusWarnColor', utils.brighter(window.getComputedStyle(str).color, 10));
       }
     } else { // bright mode
       // sleepy owl
@@ -554,42 +563,25 @@ export default class Viewer {
         el.style.setProperty('background-color', cm.backgroundColor);
         el.style.setProperty('color', cm.color);
       });
-      rt.style.setProperty('--settingsLinkBackgroundColor', brighter(cm.backgroundColor, -16));
-      rt.style.setProperty('--settingsLinkHoverColor', brighter(cm.backgroundColor, -24));
-      rt.style.setProperty('--settingsBackgroundColor', brighter(cm.backgroundColor, -36));
-      rt.style.setProperty('--settingsBackgroundAlternativeColor', brighter(cm.backgroundColor, -24));
-      rt.style.setProperty('--navbarBackgroundColor', brighter(cm.backgroundColor, -50));
-      rt.style.setProperty('--dropdownHeadingColor', brighter(cm.backgroundColor, -70));
-      rt.style.setProperty('--dropdownBackgroundColor', brighter(cm.backgroundColor, -50));
-      rt.style.setProperty('--dropdownBorderColor', brighter(cm.backgroundColor, -100));
+      rt.style.setProperty('--settingsLinkBackgroundColor', utils.brighter(cm.backgroundColor, -16));
+      rt.style.setProperty('--settingsLinkHoverColor', utils.brighter(cm.backgroundColor, -24));
+      rt.style.setProperty('--settingsBackgroundColor', utils.brighter(cm.backgroundColor, -36));
+      rt.style.setProperty('--settingsBackgroundAlternativeColor', utils.brighter(cm.backgroundColor, -24));
+      rt.style.setProperty('--navbarBackgroundColor', utils.brighter(cm.backgroundColor, -50));
+      rt.style.setProperty('--dropdownHeadingColor', utils.brighter(cm.backgroundColor, -70));
+      rt.style.setProperty('--dropdownBackgroundColor', utils.brighter(cm.backgroundColor, -50));
+      rt.style.setProperty('--dropdownBorderColor', utils.brighter(cm.backgroundColor, -100));
       let att = document.querySelector('.cm-attribute');
-      if (att) rt.style.setProperty('--keyboardShortCutColor', brighter(window.getComputedStyle(att).color, -40));
+      if (att) rt.style.setProperty('--keyboardShortCutColor', utils.brighter(window.getComputedStyle(att).color, -40));
       let tag = document.querySelector('.cm-tag');
-      if (tag) rt.style.setProperty('--fileStatusColor', brighter(window.getComputedStyle(tag).color, -40));
+      if (tag) rt.style.setProperty('--fileStatusColor', utils.brighter(window.getComputedStyle(tag).color, -40));
       let str = document.querySelector('.cm-string');
       if (str) {
-        rt.style.setProperty('--fileStatusChangedColor', brighter(window.getComputedStyle(str).color, -40));
-        rt.style.setProperty('--fileStatusWarnColor', brighter(window.getComputedStyle(str).color, -10));
+        rt.style.setProperty('--fileStatusChangedColor', utils.brighter(window.getComputedStyle(str).color, -40));
+        rt.style.setProperty('--fileStatusWarnColor', utils.brighter(window.getComputedStyle(str).color, -10));
       }
     }
-
-
-    function brighter(rgbString, deltaPercent) {
-      let rgb = [];
-      rgbString.slice(4, -1).split(',').forEach(i => {
-        rgb.push(Math.max(0, Math.min(parseInt(i) + deltaPercent, 255)));
-      });
-      return 'rgb(' + rgb.join(', ') + ')';
-    }
-
-    function complementary(rgbString) {
-      let rgb = [];
-      rgbString.slice(4, -1).split(',').forEach(i => {
-        rgb.push(255 - i);
-      });
-      return 'rgb(' + rgb.join(', ') + ')';
-    }
-  }
+  } // setMenuColors()
 
   zoom(delta) {
     let zoomCtrl = document.getElementById('verovio-zoom');
@@ -663,9 +655,8 @@ export default class Viewer {
   }
 
   // initializes the settings panel by filling it with content
-  addVrvOptionsToSettingsPanel(tkAvailableOptions, defaultVrvOptions,
-    restoreFromLocalStorage = true) {
-    // skip these options (iin part because they are handled in control menu)
+  addVrvOptionsToSettingsPanel(tkAvailableOptions, defaultVrvOptions, restoreFromLocalStorage = true) {
+    // skip these options (in part because they are handled in control menu)
     let skipList = ['font', 'breaks', 'engravingDefaults', 'expand',
       'svgAdditionalAttribute', 'handwrittenFont'
     ];
@@ -673,15 +664,16 @@ export default class Viewer {
     let addListeners = false; // add event listeners only the first time
     if (!/\w/g.test(vsp.innerHTML)) addListeners = true;
     vsp.innerHTML = "";
-    let settingsVrvGrpSelectHtml = '<a id="settingsVrvGrpSelect"></a>'; // vrv settings navigation links
-    Object.keys(tkAvailableOptions.groups).forEach((grp) => {
+    let storage = window.localStorage;
+
+    Object.keys(tkAvailableOptions.groups).forEach((grp, i) => {
       let group = tkAvailableOptions.groups[grp];
       let groupId = group.name.replaceAll(" ", "_");
-      // skip these two groups: base handled by mei-friend; sel to be thought
+      // skip these two groups: base handled by mei-friend; sel to be thought (TODO)
       if (!group.name.startsWith('Base short') &&
         !group.name.startsWith('Element selectors')) {
-        vsp.innerHTML += `<div><h2 id="${groupId}">${group.name}<a href="#settingsVrvGrpSelect">&uarr;</a></h2></div>`;
-        settingsVrvGrpSelectHtml += `<div><a href="#${groupId}">${group.name}</a></div>`;
+        let details = document.createElement('details');
+        details.innerHTML += `<summary id="${groupId}">${group.name}</summary>`;
         Object.keys(group.options).forEach(opt => {
           if (!skipList.includes(opt)) {
             let o = group.options[opt]; // vrv available options
@@ -693,16 +685,17 @@ export default class Viewer {
               else delete storage['vrv-' + opt];
             }
             let div = this.createOptionsItem(opt, o, optDefault);
-            if (div) vsp.appendChild(div);
+            if (div) details.appendChild(div);
             // set all options so that toolkit is always completely cleared
             if (['bool', 'int', 'double', 'std::string-list'].includes(o.type))
               this.vrvOptions[opt] = optDefault;
           }
         });
+        if (i === 1) details.setAttribute('open', 'true');
+        vsp.appendChild(details);
       }
     });
-    // inject navigation links at the top of verovio settings
-    vsp.innerHTML = settingsVrvGrpSelectHtml + vsp.innerHTML;
+
     vsp.innerHTML += '<input type="button" title="Reset to mei-friend defaults" id="vrvReset" class="resetButton" value="Default" />';
     if (addListeners) { // add change listeners
       vsp.addEventListener('input', ev => {
@@ -755,12 +748,6 @@ export default class Viewer {
         type: 'bool',
         default: false
       },
-      // notationBlackWhite: {
-      //   title: 'Notation always black on white',
-      //   description: 'Notation is always black on white (also in dark mode)',
-      //   type: 'bool',
-      //   default: true
-      // },
       tabSize: {
         title: 'Tab size',
         description: 'Number of space characters for each indentation level',
@@ -848,12 +835,12 @@ export default class Viewer {
         optDefault = mfDefaults[opt]
         if (opt === 'matchTags' && typeof optDefault === 'object') optDefault = true;
       };
+      if (window.matchMedia('(prefers-color-scheme: dark)').matches && opt === 'theme') {
+        optDefault = mfDefaults['defaultDarkTheme']; // take a dark scheme for dark mode
+      }
       if (storage.hasOwnProperty('cm-' + opt)) {
         if (restoreFromLocalStorage) optDefault = storage['cm-' + opt];
         else delete storage['cm-' + opt];
-      }
-      if (window.matchMedia('(prefers-color-scheme: dark)').matches && opt === 'theme') {
-        optDefault = mfDefaults['defaultDarkTheme']; // take a dark scheme for dark mode
       }
       let div = this.createOptionsItem(opt, o, optDefault)
       if (div) cmsp.appendChild(div);
@@ -875,7 +862,9 @@ export default class Viewer {
             storage.hasOwnProperty('cm-matchTheme') ?
             storage['cm-matchTheme'] : mfDefaults['matchTheme']);
         }
-        if (mfDefaults.hasOwnProperty(option) && mfDefaults[option].toString() === value.toString()) {
+        if ((mfDefaults.hasOwnProperty(option) && option !== 'theme' && mfDefaults[option].toString() === value.toString()) ||
+          (option === 'theme' && (window.matchMedia('(prefers-color-scheme: dark)').matches ?
+            mfDefaults.defaultDarkTheme : mfDefaults.defaultBrightTheme) === value.toString())) {
           delete storage['cm-' + option]; // remove from storage object when default value
         } else {
           storage['cm-' + option] = value; // save changes in localStorage object
@@ -901,6 +890,167 @@ export default class Viewer {
         });
     }
   } // addCmOptionsToSettingsPanel()
+
+  addMeiFriendOptionsToSettingsPanel(restoreFromLocalStorage = true) {
+    let optionsToShow = {
+      titleSupplied: {
+        title: 'Handle <supplied> element',
+        description: 'Control handling of <supplied> elements',
+        type: 'header'
+      },
+      showSupplied: {
+        title: 'Show <supplied> elements',
+        decription: 'Highlight all elements contained by a <supplied> element',
+        type: 'bool',
+        default: true
+      },
+      suppliedColor: {
+        title: 'Select highlight color',
+        description: 'Select <supplied> highlight color',
+        type: 'color',
+        default: '#e69500',
+      },
+      respSelect: {
+        title: 'Select responsibility',
+        description: 'Select responsibility id',
+        type: 'select',
+        default: 'none',
+        values: []
+      },
+      dragLineSeparator: {
+        title: 'options-line', // class name of hr element
+        type: 'line'
+      },
+      dragSelection: {
+        title: 'Drag select',
+        description: 'Select elements in notation with mouse drag',
+        type: 'header'
+      },
+      dragSelectNotes: {
+        title: 'Select notes',
+        description: 'Select notes',
+        type: 'bool',
+        default: true
+      },
+      dragSelectRests: {
+        title: 'Select rests',
+        description: 'Select rests and repeats (rest, mRest, beatRpt, halfmRpt, mRpt)',
+        type: 'bool',
+        default: true
+      },
+      dragSelectControlElements: {
+        title: 'Select control elements ',
+        description: 'Select control elements (with @placement attribute: ' +
+          att.attPlacement.join(', ') + ')',
+        type: 'bool',
+        default: false
+      },
+      dragSelectSlurs: {
+        title: 'Select slurs ',
+        description: 'Select slurs (i.e., elements with @curvature attribute: ' +
+          att.attCurvature.join(', ') + ')',
+        type: 'bool',
+        default: false
+      },
+      dragSelectMeasures: {
+        title: 'Select measures ',
+        description: 'Select measures',
+        type: 'bool',
+        default: false
+      },
+    };
+    let mfs = document.getElementById('meiFriendSettings');
+    let addListeners = false; // add event listeners only the first time
+    let rt = document.querySelector(':root');
+    if (!/\w/g.test(mfs.innerHTML)) addListeners = true;
+    mfs.innerHTML = '<div><h2>mei-friend Settings</h2></div>';
+    let storage = window.localStorage;
+    Object.keys(optionsToShow).forEach(opt => {
+      let o = optionsToShow[opt];
+      let optDefault = o.default;
+      if (storage.hasOwnProperty('mf-' + opt)) {
+        if (restoreFromLocalStorage) {
+          optDefault = storage['mf-' + opt];
+          if (typeof optDefault === 'string' && (optDefault === 'true' || optDefault === 'false'))
+            optDefault = optDefault === 'true';
+        } else delete storage['mf-' + opt];
+      }
+      switch (opt) {
+        case 'showSupplied':
+          rt.style.setProperty('--suppliedColor', (optDefault) ? 'var(--defaultSuppliedColor)' : 'var(--notationColor)')
+          rt.style.setProperty('--suppliedHighlightedColor', (optDefault) ? 'var(--defaultSuppliedHighlightedColor)' : 'var(--highlightColor)')
+          break;
+        case 'suppliedColor':
+          let checked = document.getElementById('showSupplied').checked;
+          rt.style.setProperty('--defaultSuppliedColor', checked ? optDefault : 'var(--notationColor)');
+          rt.style.setProperty('--defaultSuppliedHighlightedColor', checked ? utils.brighter(optDefault, -50) : 'var(--highlightColor)');
+          rt.style.setProperty('--suppliedColor', checked ? optDefault : 'var(--notationColor)');
+          rt.style.setProperty('--suppliedHighlightedColor', checked ? utils.brighter(optDefault, -50) : 'var(--highlightColor)');
+          break;
+        case 'respSelect':
+          o.values = Array.from(this.xmlDoc.querySelectorAll('corpName[*|id]')).map(e => e.getAttribute('xml:id'));
+          break;
+      }
+      let div = this.createOptionsItem(opt, o, optDefault)
+      if (div) mfs.appendChild(div);
+      if (opt === 'respSelect') this.respId = document.getElementById('respSelect').value;
+    });
+    mfs.innerHTML += '<input type="button" title="Reset to mei-friend defaults" id="mfReset" class="resetButton" value="Default" />';
+
+    if (addListeners) { // add change listeners
+      mfs.addEventListener('input', ev => {
+        let option = ev.srcElement.id;
+        let value = ev.srcElement.value;
+        if (ev.srcElement.type === 'checkbox') value = ev.srcElement.checked;
+        if (ev.srcElement.type === 'number') value = parseFloat(value);
+        let col = document.getElementById('suppliedColor').value;
+        switch (option) {
+          case 'showSupplied':
+            rt.style.setProperty('--suppliedColor', (value) ? col : 'var(--notationColor)');
+            rt.style.setProperty('--suppliedHighlightedColor', (value) ? utils.brighter(col, -50) : 'var(--highlightColor)');
+            break;
+          case 'suppliedColor':
+            let checked = document.getElementById('showSupplied').checked;
+            rt.style.setProperty('--suppliedColor', checked ? col : 'var(--notationColor)');
+            rt.style.setProperty('--suppliedHighlightedColor', checked ? utils.brighter(col, -50) : 'var(--highlightColor)');
+            break;
+          case 'respSelect':
+            this.respId = document.getElementById('respSelect').value;
+            break;
+        }
+        if (value === optionsToShow[option].default) {
+          delete storage['mf-' + option]; // remove from storage object when default value
+        } else {
+          storage['mf-' + option] = value; // save changes in localStorage object
+        }
+      });
+      mfs.addEventListener('click', ev => {
+        if (ev.srcElement.id === 'mfReset') {
+          this.addMeiFriendOptionsToSettingsPanel(false);
+        }
+      });
+      // window.matchMedia('(prefers-color-scheme: dark)')
+      //   .addEventListener('change', ev => { // system changes from dark to bright or otherway round
+      //     rt.style.setProperty('--suppliedHighlightedColor',
+      //       utils.brighter(document.getElementById('suppliedColor').value, ev.matches ? 50 : -50));
+      //   });
+    }
+  } // addMeiFriendOptionsToSettingsPanel()
+
+  // add responsibility statement to resp select dropdown
+  setRespSelectOptions() {
+    let rs = document.getElementById('respSelect');
+    if (rs) {
+      while (rs.length > 0) rs.options.remove(0);
+      let optEls = this.xmlDoc.querySelectorAll('corpName[*|id],persName[*|id]');
+      optEls.forEach(el => {
+        if (el.closest('respStmt')) { // only if inside a respStmt
+          let id = el.getAttribute('xml:id')
+          rs.add(new Option(id, id));
+        }
+      });
+    }
+  }
 
   // Apply options to CodeMirror object and handle other specialized options
   applyEditorOption(cm, option, value, matchTheme = false) {
@@ -984,12 +1134,27 @@ export default class Viewer {
         o.values.forEach((str, i) => input.add(new Option(str, str,
           (o.values.indexOf(optDefault) == i) ? true : false)));
         break;
+      case 'color':
+        input = document.createElement('input');
+        input.setAttribute('type', 'color');
+        input.setAttribute('name', opt);
+        input.setAttribute('id', opt);
+        input.setAttribute('value', optDefault);
+        break;
+      case 'header':
+        label.setAttribute('style', 'font-weight: bold; font-size: 105%; margin-top: 3px;');
+        break;
+      case 'line':
+        div.removeChild(label);
+        let line = document.createElement('hr');
+        line.classList.add(o.title);
+        div.appendChild(line);
       default:
         console.log('Vervio Options: Unhandled data type: ' + o.type);
         console.log('title: ' + o.title + ' [' + o.type + '], default: [' + optDefault + ']');
     }
     if (input) div.appendChild(input);
-    return (input) ? div : null;
+    return (input || o.type === 'header' || o.type === 'line') ? div : null;
   }
 
   // navigate forwards/backwards/upwards/downwards in the DOM, as defined
