@@ -60,21 +60,17 @@ function forkRepoCancelClicked() {
 
 function repoHeaderClicked() { 
   github.filepath = "";
-  console.log("REPO HEADER CLICKED. Filepath was: ", github.filepath)
   refreshGithubMenu();
 }
 
 function branchesHeaderClicked(ev) { 
-  console.log("BRANCHES HEADER CLICKED. Filepath was: ", github.filepath)
   github.filepath = "";
   fillInRepoBranches(ev.target);
 }
 
 function contentsHeaderClicked(ev) { 
-  console.log("CONTENTS HEADER CLICKED. Filepath was: ", github.filepath)
   github.filepath = github.filepath.substr(0, github.filepath.lastIndexOf('/'));
   github.filepath = github.filepath.length === 0 ? "/" : github.filepath;
-  console.log("CONTENTS HEADER CLICKED. Filepath now: ", github.filepath)
   fillInBranchContents(ev.target);
 }
 
@@ -94,7 +90,6 @@ function userRepoClicked(ev) {
 }
 
 function repoBranchClicked(ev) { 
-  console.log("REPO BRANCH CLICKED. Filepath was: ", github.filepath)
   const githubLoadingIndicator = document.getElementById("GithubLogo");
   github.branch = ev.target.innerText;
   github.filepath = "/";
@@ -109,21 +104,17 @@ function repoBranchClicked(ev) {
 }
 
 function branchContentsDirClicked(ev) { 
-  console.log("BRANCH CONTENTS DIR CLICKED. Filepath was: ", github.filepath)
   if (github.filepath.endsWith("/")) {
     github.filepath += ev.target.querySelector("span.filepath").innerText + "/";
   } else {
     github.filepath += "/" + ev.target.querySelector("span.filepath").innerText + "/";
   }
-  console.log("after BRANCH CONTENTS DIR CLICKED. Filepath now: ", github.filepath)
   fillInBranchContents(ev);
 }
 
 function branchContentsFileClicked(ev) { 
-  console.log("BRANCH CONTENTS FILE CLICKED. Filepath was: ", github.filepath)
   const githubLoadingIndicator = document.getElementById("GithubLogo");
   github.filepath += ev.target.innerText ;
-  console.log("after BRANCH CONTENTS FILE CLICKED. Filepath NOW: ", github.filepath)
   console.debug(`Loading file: https://github.com/${github.githubRepo}/${github.filepath}`);
   fillInBranchContents(ev);
   githubLoadingIndicator.classList.add("clockwise");
