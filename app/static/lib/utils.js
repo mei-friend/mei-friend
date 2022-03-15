@@ -52,8 +52,8 @@ export function getElementAttributeAbove(cm, row, elementName = 'staff',
   let line;
   while (line = cm.getLine(--row)) {
     if (line.includes('<' + elementName)) {
-      // col = line.indexOf()
-      return [line.match(searchString)[1], row];
+      let match = line.match(searchString);
+      return [(match && match.length > 0) ? match[1] : 1, row];
     }
   }
   return [null, null];
@@ -66,7 +66,8 @@ export function getElementAttributeBelow(cm, row, elementName = 'staff',
   let line;
   while (line = cm.getLine(++row)) {
     if (line.includes('<' + elementName)) {
-      return [line.match(searchString)[1], row];
+      let match = line.match(searchString);
+      return [(match && match.length > 0) ? match[1] : 1, row];
     }
   }
   return [null, null];
