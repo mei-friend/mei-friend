@@ -220,7 +220,7 @@ export default class Github {
   }
 
   async writeGithubRepo(content, message) { 
-    this.headHash = await this.repo.readRef(`refs/heads/master`);
+    this.headHash = await this.repo.readRef(`refs/heads/${this.branch}`);
     this.commit = await this.repo.loadAs("commit", this.headHash);  
     let tree = await this.repo.loadAs("tree", this.commit.tree);
     let treeHash = await this.generateModifiedTreeHash(tree, this.filepath, content);
@@ -230,10 +230,10 @@ export default class Github {
       parent: this.headHash,
       message: message
     });
-    await this.repo.updateRef(`refs/heads/master`, commitHash);
+    await this.repo.updateRef(`refs/heads/${this.branch}`, commitHash);
     console.debug("Commit complete: ", commitHash)
     // update headHash to new commit's
-    this.headHash = await this.repo.readRef(`refs/heads/master`);
+    this.headHash = await this.repo.readRef(`refs/heads/${this.branch}`);
   }
 
   async readGithubRepo() { 
