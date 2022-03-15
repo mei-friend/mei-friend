@@ -174,8 +174,8 @@ import {
 import default_schema from '../schemaInfo/mei-CMN-4.0.1.schemaInfo.js';
 
 // mei-friend version and date
-const version = 'develop-0.3.7';
-const versionDate = '11 March 2022';
+const version = 'develop-0.3.8';
+const versionDate = '15 March 2022';
 // const defaultMeiFileName = `${root}Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei`;
 const defaultMeiFileName = `${root}Beethoven_WoO70-Breitkopf.mei`;
 const defaultVerovioOptions = {
@@ -667,7 +667,7 @@ export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true) {
 
 // checks format of encoding string and imports or loads data/notation
 // mei argument may be MEI or any other supported format (text/binary)
-function handleEncoding(mei, setFreshlyLoaded = true) {
+export function handleEncoding(mei, setFreshlyLoaded = true) {
   let found = false;
   v.clear();
   v.busy();

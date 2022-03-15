@@ -126,4 +126,7 @@
 # 0.3.7 patch
 * Address issue with ALT-F interfering with EMACS keymap
 * Support for drag-selecting different element categories with mouse
-* Added edit dropdown menu für search/replace/jump-to-line functionality
+* Added edit dropdown menu for search/replace/jump-to-line functionality
+# 0.3.8 patch
+* Refactor writing to github, fixing write-to-subdirectory in the process
+
