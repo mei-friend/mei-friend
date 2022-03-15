@@ -161,6 +161,18 @@ export default class Github {
     return this._entry;
   }
 
+  /* neighbours: paths of all files in current filepath's lowest sub-directory
+   * excluding the filepath itself, if it is a file and not a dir
+   * needed so that we can include them when commiting changes, to avoid
+   * their removal! */
+  set neighbours(neighbours) { 
+    this._neighbours = neighbours;
+  }
+
+  get neighbours() { 
+    return this._neighbours;
+  }
+
   set commitLog(commitLog) { 
     this._commitLog = commitLog;
   }
@@ -177,13 +189,107 @@ export default class Github {
     return this.githubRepoOwner !== this.upstreamRepoOwner;
   }
 
+
+  // recursively dive into tree until we find the file we're updating
+  // update the file, then construct hashes on the way back up
+  async generateModifiedTreeHash(tree, filepath, content) { 
+    // split into path components and discard leading empty string 
+    // using filter (in case filepath starts with slash)
+    let pathComponents = filepath.split("/").filter(p => p);
+    if(pathComponents.length === 1) { 
+      console.log("BASECASE!!", tree, pathComponents);
+/*      let subtree = await this.repo.loadAs("tree", tree[pathComponents[0]].hash)
+      console.log("SUBTREE BEFORE: ", subtree[pathComponents[1]].hash);
+      // arrived at subdir containing our file...
+      let entry = subtree[pathComponents[1]]; */
+      let entry = tree[pathComponents[0]];
+      // replace with new content and get new hash
+      let entryHash = await this.repo.saveAs("text", content);
+      // modify tree with updated entry
+      tree[pathComponents[0]] = { 
+        mode: entry.mode,
+        hash: entryHash
+      }
+      // calculate and return treeHash for modified tree:
+      return await this.repo.saveAs("tree", tree);
+      /*
+      // modify tree with new entryHash
+      subtree[pathComponents[1]] = { 
+        mode: entry.mode, // retain old entry's file permissions
+        hash: entryHash
+      }
+      console.log("SUBTREE AFTER: ", subtree[pathComponents[1]].hash);
+      // calculate and return treeHash for modified tree:
+      return await this.repo.saveAs("tree", subtree);*/
+    } else if(pathComponents.length > 1) { 
+      // we still have some traversing to do
+      // so recurse to the next level:
+      console.log("DIVING!!");
+      let subtree = await this.repo.loadAs("tree", tree[pathComponents[0]].hash);
+      let subtreeHash = await this.generateModifiedTreeHash(
+          subtree,
+          pathComponents.splice(1,pathComponents.length).join("/"),
+          content
+        )
+      // modify tree with new subtreeHash
+      tree[pathComponents[0]] = {
+        mode: tree[pathComponents[0]].mode, // retain old entry's permissions
+        hash: subtreeHash      
+      }
+      // and return modified tree's treeHash
+      return await this.repo.saveAs("tree", tree);
+    } else { 
+      console.error("Problem figuring out pathComponents for:", filepath);
+    }
+  }
+
+  async commitTest() { 
+    let filepath = "/foo.krn";
+    let content = "foo"
+    //let headHash = await this.repo.readRef(`refs/heads/${this.branch}`);
+    let headHash = await this.repo.readRef(`refs/heads/master`);
+    let commit = await this.repo.loadAs("commit", headHash);  
+    let tree = await this.repo.loadAs("tree", commit.tree);
+    let treeHash = await this.generateModifiedTreeHash(tree, filepath, content);
+    /*
+    console.log("TEST: tree: ", tree)
+    let subtree = await this.repo.loadAs("tree", tree["kern"].hash)
+    console.log("TEST: kerntree: ", tree)
+    let entry = subtree["sonata01-1.krn"]
+    console.log("TEST: entry: ", entry)
+    let content = await this.repo.loadAs("text", entry.hash);
+    content = "this is a test";
+    let contentHash = await this.repo.saveAs("text", content);
+    console.log("TEST: contentHAsh: ", contentHash)
+    subtree["sonata01-1.krn"] = { mode: entry.mode, hash: contentHash }
+    let subtreeHash = await this.repo.saveAs("tree", subtree);
+    console.log("TEST: subtreeHash: ", subtreeHash)
+    tree["kern"] = { mode: tree["kern"].mode, hash: subtreeHash };
+    let treeHash = await this.repo.saveAs("tree", tree);
+    */
+    console.log("TEST: final treeHash: ", treeHash)
+    let commitHash = await this.repo.saveAs("commit", { 
+      tree: treeHash,
+      author: {name: "test",email:"test@test.test"},
+      parent: headHash,
+      message: "test of recursive solution" 
+    });
+    console.log("TEST: commitHash: ", commitHash)
+    //await this.repo.updateRef(`refs/heads/${this.branch}`, commitHash);
+    await this.repo.updateRef(`refs/heads/master`, commitHash);
+  }
+
   async readGithubRepo() { 
     // TODO fix multi-level directories by implementing tree traversal using treeWalk / treeStreams, see jsgit doc
+    this.commitTest();
+    return;
     try { 
       // Retrieve content of file
       this.headHash = await this.repo.readRef(`refs/heads/${this.branch}`);
       this.commit = await this.repo.loadAs("commit", this.headHash);  
       let tree = await this.repo.loadAs("tree", this.commit.tree);
+      this.entry = tree[this.filepath.startsWith("/") ? this.filepath.substr(1) : this.filepath];
+      console.log("CUREnT Entry:", this.entry);
       console.log("TREEWALK TEST:")
       let treeStream = await this.repo.treeWalk(this.commit.tree);
       let obj;
@@ -192,17 +298,23 @@ export default class Github {
         trees.push(obj)
       }
 
+      // neighbourhood: all trees in the current subdirectory
+      const neighbourhood = trees.filter(o => 
+        o.path.substr(0, o.path.lastIndexOf("/")+1) == 
+        this.filepath.substr(0, this.filepath.lastIndexOf("/")+1)
+      )
+      
+      // neighbours: neighbourhood minus the current file
+      this.neighbours = neighbourhood.filter(o => o.path !== this.filepath)
       const treesFiltered = trees.filter(o => o.path === this.filepath)
       if(treesFiltered.length === 1) { 
         this.content = await this.repo.loadAs("text", treesFiltered[0].hash);
-        console.log("SWAPSIES!")
       } else { 
         if(this.filepath && this.filepath !== "/") {
           // remove leading slash
-          this.entry = tree[this.filepath.startsWith("/") ? this.filepath.substr(1) : this.filepath];
           this.content = await this.repo.loadAs("text", this.entry.hash);
         }
-        console.log("NOPE!!!!", trees, this.filepath);
+        console.warn("NOPE!!!!", trees, this.filepath, this.entry);
       }
       // Retrieve git commit log
       const commitsUrl = `https://api.github.com/repos/${this.githubRepo}/commits`;
@@ -220,11 +332,20 @@ export default class Github {
   }
 
   async writeGithubRepo(content, message) { 
+    return;
+    console.log("Writing with filepath: ", this.filepath);
+    const neighbours = this.neighbours.map( n => ({ 
+      path: n.path,
+      mode: jsgit.modes.file
+    }))
     const updates = [{
       path: this.filepath,
-      mode: this.entry.mode, // preserve mode of existing file (e.g. executable)
+      mode: jsgit.modes.file,
       content: content
-    }];
+    }, ...neighbours
+    ];
+
+    console.log("WRITING UPDATES: ",updates);
     updates.base = this.commit.tree;
     const treeHash = await this.repo.createTree(updates);
     const commitHash = await this.repo.saveAs("commit", { 
