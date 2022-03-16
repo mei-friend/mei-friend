@@ -26,7 +26,7 @@ def index():
                 isLoggedIn = "true", # for Javascript, not Python...
                 githubToken = session['githubToken'],
                 userLogin = session['userLogin'],
-                userName = session['userName'],
+                userName = session['userName'] if session['userName'] else session['userLogin'],
                 userEmail = session['userEmail'])
     return render_template('index.html',
         isLoggedIn = False
