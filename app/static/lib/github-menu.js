@@ -69,9 +69,22 @@ function branchesHeaderClicked(ev) {
 }
 
 function contentsHeaderClicked(ev) { 
+  // strip trailing slash (in case our filepath is a subdir)
+  if(github.filepath.endsWith("/")) 
+    github.filepath = github.filepath.substr(0, github.filepath.length-1);
+  //  retreat to previous slash (back one directory level)
   github.filepath = github.filepath.substr(0, github.filepath.lastIndexOf('/'));
+  // if we've retreated past the root dir, restore it
   github.filepath = github.filepath.length === 0 ? "/" : github.filepath;
-  fillInBranchContents(ev.target);
+  const githubLoadingIndicator = document.getElementById("GithubLogo");
+  githubLoadingIndicator.classList.add("clockwise");
+  github.readGithubRepo().then(() => {
+    fillInBranchContents(ev)
+    githubLoadingIndicator.classList.remove("clockwise");
+  }).catch(() => {
+    console.warn("Couldn't read Github repo to fill in branch contents");
+    githubLoadingIndicator.classList.remove("clockwise");
+  });
 }
 
 function userRepoClicked(ev) { 
@@ -104,10 +117,15 @@ function repoBranchClicked(ev) {
 }
 
 function branchContentsDirClicked(ev) { 
+  let target = ev.target;
+  if(!target.classList.contains("filepath")) { 
+    // if user hasn't clicked directly on the filepath <span>, drill down to it
+    target = target.querySelector(".filepath")
+  }
   if (github.filepath.endsWith("/")) {
-    github.filepath += ev.target.querySelector("span.filepath").innerText + "/";
+    github.filepath += target.innerText + "/";
   } else {
-    github.filepath += "/" + ev.target.querySelector("span.filepath").innerText + "/";
+    github.filepath += "/" + target.innerText + "/";
   }
   fillInBranchContents(ev);
 }
@@ -262,7 +280,7 @@ export async function fillInBranchContents(e) {
     // clicked on file name -- operate on parent (list entry) instead
     target = e.target.parentNode;
   }
-  if (e && (target && target.classList.contains("repoBranch") || 
+  if (e && target && (target.classList.contains("repoBranch") || 
       target.classList.contains("dir") || 
       target.getAttribute("id") === "contentsHeader")) {
     Array.from(branchContents).forEach((content) => {
@@ -307,8 +325,7 @@ async function fillInCommitLog(refresh = false) {
       renderCommitLog();
     }).catch((e) => {
       githubLoadingIndicator.classList.remove("clockwise");
-      console.warn("Couldn't read github repo, forcing log-out: ", e);
-//      logoutFromGithub();
+      console.warn("Couldn't read github repo", e);
     })
   } else {
     renderCommitLog();

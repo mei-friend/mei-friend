@@ -1,4 +1,4 @@
-Authlib==0.15.5
+Authlib==1.0.0
 certifi==2021.10.8
 cffi==1.15.0
 charset-normalizer==2.0.8
