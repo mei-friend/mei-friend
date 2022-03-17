@@ -33,8 +33,8 @@ export function addDragSelector(v, vp) {
     document.querySelector('g.page-margin').appendChild(rect);
 
     // remember click/mousedown point
-    start.x = ev.clientX;
-    start.y = ev.clientY;
+    start.x = ev.clientX + vp.scrollLeft;
+    start.y = ev.clientY + vp.scrollTop;
 
     let sel = 'g';
     let first = true;
@@ -88,14 +88,19 @@ export function addDragSelector(v, vp) {
   vp.addEventListener('mousemove', ev => {
     if (dragging) {
       newEls = [];
+
+      let thisStart = {}; // adjust starting point to scroll of verovio-panel
+      thisStart.x = start.x - vp.scrollLeft;
+      thisStart.y = start.y - vp.scrollTop;
       end.x = ev.clientX;
       end.y = ev.clientY;
 
       let pm = document.querySelector('g.page-margin');
       if (!pm) return;
-      var mx = pm.getScreenCTM().inverse();
+
       // transform mouse/screen coordinates to SVG coordinates
-      let s = transformCTM(start, mx);
+      var mx = pm.getScreenCTM().inverse();
+      let s = transformCTM(thisStart, mx);
       let e = transformCTM(end, mx);
       let x = s.x;
       let width = Math.abs(e.x - s.x);
@@ -107,6 +112,7 @@ export function addDragSelector(v, vp) {
       let strokeWidth = 10;
       let p = document.querySelector('g.staff > path');
       if (p) strokeWidth = parseFloat(p.getAttribute('stroke-width'));
+
       updateRect(rect, x, y, width, height, window.getComputedStyle(pm).color,
         strokeWidth, strokeWidth * 5);
 
