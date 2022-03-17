@@ -127,6 +127,9 @@
 * Address issue with ALT-F interfering with EMACS keymap
 * Support for drag-selecting different element categories with mouse
 * Added edit dropdown menu for search/replace/jump-to-line functionality
-# 0.3.8 patch
+# 0.3.8 patch: Github fixes and improvements
 * Refactor writing to github, fixing write-to-subdirectory in the process
-
+* Github menu navigation fixes
+* Fallback to login name when username unavailable for commits
+* Implement handleEncoding pipeline when reading from Github
+* Upgrade Python Authlib dependency to fix OAuth CSRF issue
