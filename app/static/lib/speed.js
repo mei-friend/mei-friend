@@ -63,11 +63,6 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks = ['sb', 'pb'],
 
   let digger = readSection(pageNo, spdScore, breaks, countingMode);
   let sections = xmlScore.childNodes;
-<<<<<<< Updated upstream
-  sections.forEach((item) => {
-    if (item.nodeName === 'section') { // diggs into section hierachy
-      spdScore = digger(item);
-=======
   sections.forEach(section => {
     if (section.nodeName === 'section') { // diggs into section hierachy
       if (digger('p') <= pageNo + 1) {
@@ -75,7 +70,6 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks = ['sb', 'pb'],
         if (newSection && newSection.childNodes.length > 0)
           baseSection.appendChild(newSection);
       }
->>>>>>> Stashed changes
     }
   });
 
@@ -130,8 +124,6 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
   let baseSection = spdScore.querySelector('section');
 
   return function digDeeper(section) {
-<<<<<<< Updated upstream
-=======
     if (typeof section === 'string' && section === 'p') return p;
     // create a copy of section and copy attributes
     let newSection = document.createElementNS(meiNameSpace, 'section');
@@ -139,22 +131,16 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
       newSection.setAttribute(attrName, section.getAttribute(attrName))
     });
 
->>>>>>> Stashed changes
     let children = section.childNodes;
     let lgt = children.length;
     console.log('digDeeper ' + section.getAttribute('xml:id') + ', p: ' + p);
     for (let i = 0; i < lgt; i++) {
-<<<<<<< Updated upstream
-      if (countingMode == 'measures' && mNo >= mxMeasures) return spdScore;
-      if (p > pageNo) break; // only until requested pageNo is processed
-=======
       if (countingMode == 'measures' && mNo >= mxMeasures) return newSection;
       if (p > pageNo) {
         if (p === (pageNo + 1) && children[i + 1] && children[i + 1].nodeName === 'scoreDef')
           newSection.appendChild(children[i + 1].cloneNode(true));
         // break; // only until requested pageNo is processed
       }
->>>>>>> Stashed changes
       let currentNode = children[i];
       // console.info('digDeeper(' + pageNo + '): p: ' + p +
       //   ', i: ' + i + ', ', currentNode);
