@@ -63,6 +63,7 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks = ['sb', 'pb'],
 
   let digger = readSection(pageNo, spdScore, breaks, countingMode);
   let sections = xmlScore.childNodes;
+<<<<<<< HEAD
   sections.forEach(section => {
     if (section.nodeName === 'section') { // diggs into section hierachy
       if (digger('p') <= pageNo + 1) {
@@ -70,6 +71,12 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks = ['sb', 'pb'],
         if (newSection && newSection.childNodes.length > 0)
           baseSection.appendChild(newSection);
       }
+=======
+  sections.forEach((item) => {
+    if (item.nodeName === 'section') { // diggs into section hierachy
+      let returnSection = digger(item);
+      baseSection.appendChild(returnSection);
+>>>>>>> develop
     }
   });
 
@@ -124,7 +131,10 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
   let baseSection = spdScore.querySelector('section');
 
   return function digDeeper(section) {
+<<<<<<< HEAD
     if (typeof section === 'string' && section === 'p') return p;
+=======
+>>>>>>> develop
     // create a copy of section and copy attributes
     let newSection = document.createElementNS(meiNameSpace, 'section');
     section.getAttributeNames().forEach(attrName => {
@@ -136,11 +146,15 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
     console.log('digDeeper ' + section.getAttribute('xml:id') + ', p: ' + p);
     for (let i = 0; i < lgt; i++) {
       if (countingMode == 'measures' && mNo >= mxMeasures) return newSection;
+<<<<<<< HEAD
       if (p > pageNo) {
         if (p === (pageNo + 1) && children[i + 1] && children[i + 1].nodeName === 'scoreDef')
           newSection.appendChild(children[i + 1].cloneNode(true));
         // break; // only until requested pageNo is processed
       }
+=======
+      if (p > pageNo) break; // only until requested pageNo is processed
+>>>>>>> develop
       let currentNode = children[i];
       // console.info('digDeeper(' + pageNo + '): p: ' + p +
       //   ', i: ' + i + ', ', currentNode);
@@ -151,7 +165,8 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
       // console.info('digDeeper currentNodeName: ', currentNodeName + ', '
       // + currentNode.getAttribute('xml:id'));
       if (currentNodeName === 'section') {
-        spdScore = digDeeper(currentNode);
+        let returnSection = digDeeper(currentNode);
+        newSection.appendChild(returnSection);
         // console.info('digDeeper returned spdScore: ', spdScore);
         continue;
       }
@@ -163,8 +178,7 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
       if (countingMode === 'measures') {
         if (currentNodeName === 'measure') mNo++;
         else
-          Array.from(currentNode.querySelectorAll('measure'))
-          .forEach(() => mNo++);
+          currentNode.querySelectorAll('measure').forEach(() => mNo++);
       } else if (countingMode === "encodedBreaks") {
         if (countNow && breaks.includes(currentNodeName)) {
           p++; // skip breaks before content (that is, a measure)
@@ -306,12 +320,12 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
         if (p == pageNo) {
           breakNode.parentNode.replaceChild(
             document.createElementNS(meiNameSpace, 'pb'), breakNode);
-          baseSection.appendChild(endingNode);
+          newSection.appendChild(endingNode);
         } else if (p == pageNo - 1) { // remove elements until first break
           while (!breaks.includes(endingNode.firstChild.nodeName)) {
             endingNode.removeChild(endingNode.firstChild);
           }
-          baseSection.appendChild(endingNode);
+          newSection.appendChild(endingNode);
         }
         // console.info('Ending with break inside: ', endingNode);
         p++;
@@ -322,11 +336,11 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
       if (p == pageNo) {
         let nodeCopy = currentNode.cloneNode(true);
         if (countingMode === 'computedBreaks') { // remove breaks from DOM
-          Array.from(nodeCopy.querySelectorAll('pb, sb')).forEach(b => {
+          nodeCopy.querySelectorAll('pb, sb').forEach(b => {
             if (b) nodeCopy.removeChild(b);
           });
         }
-        baseSection.appendChild(nodeCopy);
+        newSection.appendChild(nodeCopy);
         // console.info('digDeeper adds child to spdScore: ', spdScore);
       }
 
@@ -336,8 +350,7 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
           currentNode.getAttribute('xml:id') == breaks[p][breaks[p].length - 1])
           p++;
         else {
-          let ms = Array.from(currentNode.querySelectorAll('measure'));
-          ms.forEach(m => {
+          currentNode.querySelectorAll('measure').forEach(m => {
             if (m.getAttribute('xml:id') == breaks[p][breaks[p].length - 1])
               p++;
           })
@@ -345,7 +358,7 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
       }
 
     } // for loop across child nodes
-    return spdScore;
+    return newSection;
   }
 
 }
@@ -354,9 +367,7 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
 // pointed to from outside the requested pageNo
 // to be run at each edit/page turn (becomes slow with big files)
 function matchTimespanningElements(xmlScore, spdScore, pageNo) {
-  let t1 = performance.now();
-  // console.info('LoopStart startingElements: ', startingElements);
-  // console.info('LoopStart endingElements: ', endingElements);
+  // let t1 = performance.now();
   let startingSelector = '';
   let endingSelector = '';
 
@@ -367,16 +378,16 @@ function matchTimespanningElements(xmlScore, spdScore, pageNo) {
     endingSelector += "[startid][endid='" + id + "'],";
     startingSelector += "[startid='" + id + "'][endid],";
   }
-  let t2 = performance.now();
-  console.log(listOfTargets.length + ' notes: selector constructed ' + (t2 - t1) + ' ms.');
+  // let t2 = performance.now();
+  // console.log(listOfTargets.length + ' notes: selector constructed ' + (t2 - t1) + ' ms.');
 
   let endingElements = Array.from(xmlScore
     .querySelectorAll(endingSelector.slice(0, -1)));
   let startingElements = Array.from(xmlScore
     .querySelectorAll(startingSelector.slice(0, -1)));
 
-  let t3 = performance.now();
-  console.log('querySelectorAll ' + (t3 - t2) + ' ms.');
+  // let t3 = performance.now();
+  // console.log('querySelectorAll ' + (t3 - t2) + ' ms.');
   //
   let j; // check whether this id ends in startingElements
   for (let target of listOfTargets) {
@@ -401,8 +412,8 @@ function matchTimespanningElements(xmlScore, spdScore, pageNo) {
     }
   }
 
-  let t4 = performance.now();
-  console.log('timespan matching took ' + (t4 - t3) + ' ms.');
+  // let t4 = performance.now();
+  // console.log('timespan matching took ' + (t4 - t3) + ' ms.');
 
   // 1) go through endingElements and add to first measure
   if (endingElements.length > 0 && pageNo > 1) {
@@ -445,7 +456,7 @@ function matchTimespanningElements(xmlScore, spdScore, pageNo) {
     }
   } // 2) if
 
-  console.log('adding slurs took ' + (performance.now() - t4) + ' ms.');
+  // console.log('adding slurs took ' + (performance.now() - t4) + ' ms.');
 
 } // matchTimespanningElements
 
@@ -789,8 +800,8 @@ export function countStaves(scoreDef) {
 }
 
 export function rmHash(hashedString) {
-  if (!hashedString) return '';
-  if (hashedString.startsWith('#')) return hashedString.split('#')[1];
+  return (hashedString.startsWith('#')) ?
+    hashedString.split('#')[1] : hashedString;
 }
 
 // filter selected elements and keep only highest in DOM

@@ -1,8 +1,8 @@
-export const navElsSelector =
-  '.note, .rest, .mRest, .beatRpt, .halfmRpt, .mRpt, .clef';
 export const navElsArray = [
   'note', 'rest', 'mRest', 'beatRpt', 'halfmRpt', 'mRpt', 'clef'
 ];
+export const navElsSelector = '.' + navElsArray.join(',.');
+
 
 // scans through SVG starting from element to find next element elementName
 // (e.g. 'note'), within same staff and layer
@@ -193,4 +193,15 @@ export function isFirstElementOnPage(id) {
   console.info('isFirstElement: firstId: ' + firstId + ', thisId: ' + thisId +
     ', BOOL: ' + (thisId == firstId));
   return (thisId == firstId);
+}
+
+// returns the DOM element at encoding cursor position
+export function getElementAtCursor(cm) {
+  let cursor = cm.getCursor();
+  let coords = cm.cursorCoords({
+    ch: cursor.ch,
+    line: cursor.line
+  }, "window");
+  let elem = document.elementFromPoint(coords.left, coords.top);
+  return elem;
 }

@@ -30,7 +30,27 @@
   <script src="{{ url_for('static', filename='CodeMirror/lib/codemirror.js') }}"></script>
   <link href="{{ url_for('static', filename='CodeMirror/lib/codemirror.css') }}" rel="stylesheet" />
   <script src="{{ url_for('static', filename='CodeMirror/mode/xml/xml.js') }}"></script>
+  <link href="{{ url_for('static', filename='CodeMirror/theme/abbott.css') }}" rel="stylesheet" />
+  <link href="{{ url_for('static', filename='CodeMirror/theme/base16-dark.css') }}" rel="stylesheet" />
+  <link href="{{ url_for('static', filename='CodeMirror/theme/base16-light.css') }}" rel="stylesheet" />
+  <link href="{{ url_for('static', filename='CodeMirror/theme/cobalt.css') }}" rel="stylesheet" />
+  <link href="{{ url_for('static', filename='CodeMirror/theme/darcula.css') }}" rel="stylesheet" />
   <link href="{{ url_for('static', filename='CodeMirror/theme/dracula.css') }}" rel="stylesheet" />
+  <link href="{{ url_for('static', filename='CodeMirror/theme/eclipse.css') }}" rel="stylesheet" />
+  <link href="{{ url_for('static', filename='CodeMirror/theme/elegant.css') }}" rel="stylesheet" />
+  <link href="{{ url_for('static', filename='CodeMirror/theme/monokai.css') }}" rel="stylesheet" />
+  <link href="{{ url_for('static', filename='CodeMirror/theme/idea.css') }}" rel="stylesheet" />
+  <link href="{{ url_for('static', filename='CodeMirror/theme/juejin.css') }}" rel="stylesheet" />
+  <link href="{{ url_for('static', filename='CodeMirror/theme/mdn-like.css') }}" rel="stylesheet" />
+  <link href="{{ url_for('static', filename='CodeMirror/theme/neo.css') }}" rel="stylesheet" />
+  <link href="{{ url_for('static', filename='CodeMirror/theme/paraiso-dark.css') }}" rel="stylesheet" />
+  <link href="{{ url_for('static', filename='CodeMirror/theme/paraiso-light.css') }}" rel="stylesheet" />
+  <link href="{{ url_for('static', filename='CodeMirror/theme/pastel-on-dark.css') }}" rel="stylesheet" />
+  <link href="{{ url_for('static', filename='CodeMirror/theme/xq-dark.css') }}" rel="stylesheet" />
+  <link href="{{ url_for('static', filename='CodeMirror/theme/xq-light.css') }}" rel="stylesheet" />
+  <link href="{{ url_for('static', filename='CodeMirror/theme/yeti.css') }}" rel="stylesheet" />
+  <link href="{{ url_for('static', filename='CodeMirror/theme/yonce.css') }}" rel="stylesheet" />
+  <link href="{{ url_for('static', filename='CodeMirror/theme/zenburn.css') }}" rel="stylesheet" />
   <script src="{{ url_for('static', filename='CodeMirror/addon/edit/closetag.js') }}"></script>
   <script src="{{ url_for('static', filename='CodeMirror/addon/edit/closebrackets.js') }}"></script>
   <script src="{{ url_for('static', filename='CodeMirror/addon/edit/matchtags.js') }}"></script>
@@ -46,18 +66,60 @@
   <script src="{{ url_for('static', filename='CodeMirror/addon/hint/show-hint.js') }}"></script>
   <script src="{{ url_for('static', filename='CodeMirror/addon/hint/xml-hint.js') }}"></script>
   <link href="{{ url_for('static', filename='CodeMirror/addon/hint/show-hint.css') }}" rel="stylesheet" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/keymap/emacs.min.js" integrity="sha512-JRRAFgTvx2rg2AO6juzwLSqaBfA5MVnZAdnWNwgsLIAnjYsMI6liEnBjFgIbskM3oi5hHBLGCzwZUMd6Nsee8Q==" crossorigin="anonymous"
+    referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/keymap/vim.min.js" integrity="sha512-px+d4ezEJ2hi3SHqwRziL871LTHSqfj1GxV1Cp78Sp/SAMEIJwxKNDGcQz96FEv/IqRPLcJ848BWhSUM7msEGQ==" crossorigin="anonymous"
+    referrerpolicy="no-referrer"></script>
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"> -->
   </script>
   <!--
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jshint/2.13.1/jshint.min.js" integrity="sha512-d54ZkbDqP0rlo/mmCO9nJ5tfpigsfTUPztnGEloitkJh5p2Bu4UsY8KMvAqUILBdTKGE7T6YMOuF0yXuNlpq/A==" crossorigin="anonymous" referrerpolicy="no-referrer">
   </script>
   -->
   <script type="module" src="{{ url_for('static', filename='lib/main.js') }}"></script>
+
+  <!-- Matomo -->
+  <script type="text/javascript">
+    var _paq = window._paq = window._paq || [];
+    /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+    _paq.push(["setDoNotTrack", true]);
+    _paq.push(["requireCookieConsent"]);
+    if ((function() {
+        try {
+          return JSON.parse(unescape(("; " + document.cookie).split("; consent=").pop().split(";").shift())).tracking;
+        } catch (e) {
+          return false;
+        }
+      })()) {
+      _paq.push(["setCookieConsentGiven"]);
+    } else {
+      _paq.push(["forgetCookieConsentGiven"]);
+    }
+    _paq.push(['trackPageView']);
+    _paq.push(['enableLinkTracking']);
+    (function() {
+      var u = "//mdw.ac.at/piwik/";
+      _paq.push(['setTrackerUrl', u + 'matomo.php']);
+      _paq.push(['setSiteId', '1000092']);
+      var d = document,
+        g = d.createElement('script'),
+        s = d.getElementsByTagName('script')[0];
+      g.type = 'text/javascript';
+      g.async = true;
+      g.src = u + 'matomo.js';
+      s.parentNode.insertBefore(g, s);
+    })();
+  </script>
+  <noscript>
+    <p><img src="//mdw.ac.at/piwik/matomo.php?idsite=1000092&amp;rec=1" style="border:0;" alt="" /></p>
+  </noscript>
+  <!-- End Matomo Code -->
+
 </head>
 
 <body>
   <div class="header">
-    <div class="title"><a href="https://repo.mdw.ac.at/mei-friend/"><img src="{{ url_for('static', filename='img/logo.png') }}" alt="mei-friend"/></a></div>
+    <div class="title"><a href="https://repo.mdw.ac.at/mei-friend/"><img src="{{ url_for('static', filename='svg/menu-logo.svg') }}" alt="mei-friend" id="mei-friend-logo" /></a></div>
     <div class="navbar">
       <div class="dropdown">
         <button class="dropbtn GithubButton"><img id="GithubLogo" src="{{ url_for('static', filename='img/GitHub-Mark-32px.png') }}" /><span id="GithubName"><a href="login" id="GithubLoginLink">Login</a></span></button>
@@ -77,6 +139,20 @@
           <a id="SaveMidi" href="#">Save MIDI</a>
         </div>
       </div>
+      <!-- https://codemirror.net/demo/search.html -->
+      <div class="dropdown">
+        <button class="dropbtn">Code</button>
+        <div class="dropdown-content" id="EditMenu">
+          <a id="startSearch" href="#">Search<span class="keyShortCut cmdKey">F</span></a>
+          <a id="findNext" href="#">Find next<span class="keyShortCut cmdKey">G</span></a>
+          <a id="findPrevious" href="#">Find previous<span class="keyShortCut shiftKey cmdKey">G</span></a>
+          <hr class="dropdown-line">
+          <a id="replace" href="#">Replace<span class="keyShortCut mac altKey cmdKey">F</span><span class="keyShortCut nonmac shiftKey ctrlKey">F</span></a>
+          <a id="replaceAll" href="#">Replace all<span class="keyShortCut mac altKey shiftKey cmdKey">F</span><span class="keyShortCut nonmac shiftKey ctrlKey">R</span></a>
+          <hr class="dropdown-line">
+          <a id="jumpToLine" href="#">Jump to line<span class="keyShortCut altKey">G</span></a>
+        </div>
+      </div>
       <div class="dropdown">
         <button class="dropbtn">View</button>
         <div class="dropdown-content" id="ViewMenu">
@@ -84,12 +160,15 @@
           <a id="bottom" href="#">Notation bottom</a>
           <a id="left" href="#">Notation left</a>
           <a id="right" href="#">Notation right</a>
+          <hr class="dropdown-line">
+          <a id="showSettingsMenu" href="#">Settings<span class="keyShortCut cmdKey">,</span></a>
         </div>
       </div>
       <div class="dropdown">
         <button class="dropbtn">Manipulate</button>
         <div class="dropdown-content" id="Manipulate">
           <a id="invertPlacement" href="#">Invert placement<span class="keyShortCut">X</span></a>
+          <a id="addVerticalGroup" href="#">Add vertical group<span class="keyShortCut">V</span></a>
           <hr class="dropdown-line">
           <a id="delete" href="#">Delete element<span class="keyShortCut">⌫, DEL</span></a>
           <hr class="dropdown-line">
@@ -113,13 +192,15 @@
         <div class="dropdown-content" id="Insert">
           <a id="addTempo" href="#">Tempo<span class="keyShortCut shiftKey">T</span></a>
           <a id="addDirective" href="#">Directive<span class="keyShortCut">I</span></a>
-          <a id="addDynamics" href="#">Dynamicts<span class="keyShortCut">D</span></a>
+          <a id="addDynamics" href="#">Dynamics<span class="keyShortCut">D</span></a>
           <!-- <img src="{{ url_for('static', filename='svg/fermata.svg') }}" class="menu-icon" />Tempo -->
           <a id="addSlur" href="#">Slur<span class="keyShortCut">S</span></a>
           <a id="addTie" href="#">Tie<span class="keyShortCut">T</span></a>
           <a id="addCresHairpin" href="#">Cresc hairpin<span class="keyShortCut">H</span></a>
           <a id="addDimHairpin" href="#">Dim hairpin<span class="keyShortCut shiftKey">H</span></a>
           <a id="addBeam" href="#">Beam<span class="keyShortCut">B</span></a>
+          <a id="addBeamSpan" href="#">BeamSpan<span class="keyShortCut shiftKey">B</span></a>
+          <a id="addSupplied" href="#">Supplied<span class="keyShortCut">U</span></a>
           <hr class="dropdown-line">
           <a id="addArpeggio" href="#">Arpeggio<span class="keyShortCut">A</span></a>
           <a id="addFermata" href="#">Fermata<span class="keyShortCut">F</span></a>
@@ -148,6 +229,7 @@
           <a id="toggleTenuto" href="#">Tenuto<span class="keyShortCut shiftKey">N</span></a>
           <a id="toggleMarcato" href="#">Marcato<span class="keyShortCut shiftKey">O</span></a>
           <a id="toggleStacciss" href="#">Staccatissimo<span class="keyShortCut shiftKey">I</span></a>
+          <a id="toggleSpicc" href="#">Spiccato<span class="keyShortCut shiftKey">P</span></a>
         </div>
       </div>
       <div class="dropdown">
@@ -155,6 +237,10 @@
         <div class="dropdown-content" id="HelpMenu">
           <a id="GoToHelpPage" href="help" target="_blank">Show
             help page</a>
+          <a id="GoToGuidelines" href="https://music-encoding.org/guidelines" target="_blank">Show
+            MEI Guidelines</a>
+          <a id="consultGuidelines" href="#">Consult Guidelines for current element<span class="keyShortCut altKey">.</span></a>
+          <hr class="dropdown-line">
           <a id="resetDefault" href="#">Reset to default</a>
         </div>
       </div>
@@ -165,7 +251,10 @@
       <span id="fileChanged"></span>
       <span id="fileStorageExceeded"></span>
     </div>
+    <div class="fillSpace"></div>
+    <div id="showSettingsButton" class="icon-gear settingsButton" title="Show Settings Panel"></div>
   </div>
+
   <div class="dragContainer">
     <div class="dragOverlay">
       <div class="dragOverlayText">Drag your input file here.</div>
@@ -176,7 +265,7 @@
           <h3>Open Web-hosted encoding by URL</h3>
           <p id="openUrlInstructions">Please enter the URL of a Web-hosted music encoding, below. Note: Host server must support cross-origin resource sharing (CORS).</p>
           <div id="openUrlInputWrapper">
-            <input id="openUrlInput" type="text" placeholder="http://..."/>
+            <input id="openUrlInput" type="text" placeholder="http://..." />
             <button id="openUrlButton">Open URL</button>
             <button id="openUrlCancel">Cancel</button>
           </div>
@@ -188,18 +277,18 @@
       <div class="forkRepositoryUI">
         <div id="forkRepositoryUIGrouping">
           <h3>Fork Github Repository</h3>
-          <p id="forkRepositoryInstructions">Please enter the Github (user or organization) name and the repository name of a Github-hosted repository, below. The repository will be forked to the currently logged in Github user, and become available from the Github menu.</p>
+          <p id="forkRepositoryInstructions">Please enter the Github (user or organization) name and the repository name of a Github-hosted repository, below. The repository will be forked to the currently logged in Github user, and become available
+            from the Github menu.</p>
           <div id="forkRepositoryInputWrapper">
-            <input id="forkRepositoryInputName" type="text" placeholder="Github user or organization" 
-                  onkeydown="(e) => {
+            <input id="forkRepositoryInputName" type="text" placeholder="Github user or organization" onkeydown="(e) => {
                     console.log('KEYDOWN: ', e);
-                    if(e.code == 'Slash') { 
+                    if(e.code == 'Slash') {
                       e.preventDefault();
                       e.stopPropagation();
                       document.getElementById('forkRepositoryInputRepo').focus();
                     }
-                  }"/> /
-            <input id="forkRepositoryInputRepo" type="text" placeholder="Github repository name"/>
+                  }" /> /
+            <input id="forkRepositoryInputRepo" type="text" placeholder="Github repository name" />
             <label for="forkRepositoryToSelector">Fork to: </label>
             <select id="forkRepositoryToSelector" name="forkRepositoryToSelector"></select>
             <button id="forkRepositoryButton">Fork repository</button>
@@ -217,6 +306,7 @@
       </div>
     </div>
   </div>
+
   <div class="footer">
     <div class="leftfoot">&copy;
       <a href="https://iwk.mdw.ac.at/goebl/">Werner Goebl</a>,
@@ -228,6 +318,25 @@
       <div class="progressbar"></div>
     </div>
     <div class="rightfoot"></div>
+  </div>
+
+  <div id="settingsPanel" class="out">
+    <div class="tab">
+      <button id="hideSettingsButton" class="tabstart" title="Hide Settings Panel">
+        <img src="{{ url_for('static', filename='svg/gear-16.svg') }}" id="hideSettingsButtonImg" />
+      </button>
+      <button class="tablink" onclick="switchTab(event, 'meiFriendSettings')" title="mei-friend Settings">mei-friend</button>
+      <button class="tablink" onclick="switchTab(event, 'editorSettings')" title="Editor Settings" id="defaultOpen">Editor</button>
+      <button class="tablink" onclick="switchTab(event, 'verovioSettings')" title="Verovio Options">Verovio</button>
+      <span id="closeSettingsButton" class="topright" title="Hide Settings Panel">&times</span>
+    </div>
+    <!-- Tab content -->
+    <div id="meiFriendSettings" class="tabcontent">
+    </div>
+    <div id="editorSettings" class="tabcontent">
+    </div>
+    <div id="verovioSettings" class="tabcontent">
+    </div>
   </div>
 
   <script>
@@ -247,10 +356,23 @@
         show = !show;
       }
       // if user is logged out, force github menu to be hidden
-      if(document.getElementById('GithubMenu').classList.contains("loggedOut")) {
+      if (document.getElementById('GithubMenu').classList.contains("loggedOut")) {
         document.getElementById('GithubMenu').classList.remove("show");
       }
     });
+
+    // switch tabs in settings menu
+    function switchTab(ev, tabId) {
+      // hide all tab contents except tabId
+      for (let cont of document.getElementsByClassName("tabcontent"))
+        cont.style.display = (cont.id === tabId) ? 'block' : 'none';
+      // remove class "active" from tablinks except for current target
+      for (let tab of document.getElementsByClassName("tablink"))
+        (tab === ev.currentTarget) ? tab.classList.add('active') :
+        tab.classList.remove('active');
+    }
+
+    document.getElementById("defaultOpen").click();
   </script>
 </body>
 

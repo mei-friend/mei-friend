@@ -2,22 +2,24 @@
 .navbar {
   float: left;
   overflow: hidden;
-  background-color: lightgray;
+  background-color: var(--navbarBackgroundColor);
   border-radius: 4px;
+  display: flex;
+  flex-wrap: nowrap;
+  min-width: 410px;
 }
 
 /* Links inside the navbar */
 .navbar a {
   float: left;
   font-size: 12pt;
-  color: darkgray;
   text-align: center;
   padding: 3px 12px;
   text-decoration: none;
 }
 
 .keyShortCut {
-  color: navy;
+  color: var(--keyboardShortCutColor);
   font-weight: bold;
   /* border: 1px solid darkblue;
   border-radius: 2px; */
@@ -25,10 +27,24 @@
   margin-left: 5px;
 }
 
+.keyShortCut.mac {
+  display: none;
+}
+.keyShortCut.mac.platform-mac {
+  display: block;
+}
+.keyShortCut.nonmac {
+  display: none;
+}
+.keyShortCut.nonmac.platform-nonmac {
+  display: block;
+}
+
 /* The dropdown container */
 .dropdown {
   float: left;
   overflow: hidden;
+  white-space: nowrap;
 }
 
 /* Dropdown button */
@@ -37,7 +53,7 @@
   font-size: 12pt;
   border: none;
   outline: none;
-  color: black;
+  color: var(--textColor);
   padding: 3px 12px;
   background-color: inherit;
   font-family: inherit;
@@ -48,18 +64,22 @@
 
 /* Add a background color to navbar links on hover */
 .navbar a:hover, .dropdown:hover .dropbtn {
-  background-color: lightsteelblue;
+  background-color: var(--dropdownHeadingColor);
 }
 
 /* Dropdown content (hidden by default) */
 .dropdown-content {
   display: none;
   position: absolute;
-  background-color: #edf2f7; // lightsteelblue 90%: #dbe4f0 // 95%: #edf2f7
+  background-color: var(--dropdownBackgroundColor);
+  /* filter: brightness(140%); */
+  /* background-color: #edf2f7; // lightsteelblue 90%: #dbe4f0 // 95%: #edf2f7 */
   opacity: .99;
   min-width: 160px;
   border: 1px solid darkgray;
-  border-radius: 4px;
+  border-top-right-radius: 4px;
+  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: 4px;
   box-shadow: 0px 8px 12px 0px rgba(0, 0, 0, 0.2);
   overflow-y: auto;
   max-height: 90%;
@@ -67,26 +87,26 @@
 }
 
 #GithubMenu {
-  min-height:90%;
+  min-height: 90%;
 }
 
 .dropdown-line {
-  background-color: darkgray;
-  border: 1px solid darkgray;
+  /* background-color: darkgray; */
+  border: 1px solid var(--dropdownBorderColor);
   border-radius: 1px;
   margin: 4px 10px;
 }
 
 .dropdown-head {
-  background-color: #dbe4f0; // lightsteelblue 90%
-  font-weight:  900;
+  background-color: var(--dropdownBackgroundColor);
+  font-weight: 900;
 }
 
 /* Links inside the dropdown */
 .dropdown-content a {
   cursor: pointer;
   float: none;
-  color: black;
+  color: var(--textColor);
   padding: 3px 12px;
   text-decoration: none;
   display: block;
@@ -106,7 +126,7 @@
 
 /* Add a grey background color to dropdown links on hover */
 .dropdown-content a:hover {
-  background-color: #ddd;
+  background-color: var(--dropdownHeadingColor);
 }
 
 /* Show the dropdown menu on hover */
@@ -116,6 +136,7 @@
 
 #logTable {
   font-size: 8pt;
+  color: var(--textColor);
 }
 
 #logTable a {
@@ -123,7 +144,7 @@
 }
 
 #logTable tr:nth-child(even) {
-  background-color: #dbe4f0;
+  background-color: var(--settingsBackgroundAlternativeColor);
 }
 
 #GithubLogo {
@@ -132,8 +153,13 @@
 }
 
 @keyframes spinning {
-  from { transform: rotate(0deg) }
-  to { transform: rotate(359deg) }
+  from {
+    transform: rotate(0deg)
+  }
+
+  to {
+    transform: rotate(359deg)
+  }
 }
 
 .clockwise {
@@ -144,8 +170,13 @@
 }
 
 @keyframes reversing {
-  from { transform: rotate(0deg) }
-  to { transform: rotate(-359deg) }
+  from {
+    transform: rotate(0deg)
+  }
+
+  to {
+    transform: rotate(-359deg)
+  }
 }
 
 .anticlockwise {
@@ -172,12 +203,12 @@
   font-family: monospace;
   margin-left: 1em;
   padding: 3px 12px;
-  background: white;
-  color: green;
+  background: var(--backgroundColor);
+  color: var(--fileStatusColor);
   white-space: nowrap;
 }
 
-.fileStatus #fileName{
+.fileStatus #fileName {
   white-space: pre;
 }
 
@@ -187,17 +218,18 @@
 }
 
 .fileStatus.changed {
-  color: darkorange;
+  color: var(--fileStatusChangedColor);
 }
 
 .fileStatus.warn #fileName, .fileStatus.warn #fileLocation {
-  text-decoration: red dotted underline;
+  text-decoration: var(--fileStatusWarnColor) dotted underline;
 }
 
 .fileStatus #fileStorageExceeded.warn {
-  color: red;
+  color: var(--fileStatusWarnColor);
   font-weight: bolder;
-  background: white;
-  border: 1px solid red;
+  background: var(--settingsLinkBackgroundColor);
+  border: 1px solid var(--fileStatusWarnColor);
   cursor: default;
+  padding: 1px 3px;
 }

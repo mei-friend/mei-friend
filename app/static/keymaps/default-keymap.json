@@ -1,8 +1,8 @@
 {
   ".notation": {
-    "q": "nightMode",
     "x": "invertPlacement",
     "ctrl-x": "betweenPlacement",
+    "v": "addVerticalGroup",
     "right": "nextNote",
     "left": "previousNote",
     "up": "layerUp",
@@ -55,8 +55,11 @@
     "shift-n": "toggleTenuto",
     "shift-o": "toggleMarcato",
     "shift-i": "toggleStacciss",
+    "shift-p": "toggleSpicc",
 
     "b": "addBeam",
+    "shift-b": "addBeamSpan",
+    "u": "addSupplied",
     "o": "addOctave8Above",
     "ctrl-o": "addOctave8Below",
     "shift-o": "addOctave15Above",
@@ -65,7 +68,6 @@
     "shift-g": "addGClefChangeBefore",
     "shift-c": "addCClefChangeBefore",
     "shift-f": "addFClefChangeBefore"
-
   },
 
   ".platform-darwin": {
@@ -90,7 +92,9 @@
     "cmd-o": "open",
     "cmd-s": "downloadMei",
     "cmd-shift-c": "cleanAccid",
-    "cmd-shift-r": "renumberMeasures"
+    "cmd-shift-r": "renumberMeasures",
+    "alt-.": "consultGuidelines",
+    "cmd-,": "toggleSettingsPanel"
   },
 
   ".platform-win32, .platform-linux": {
@@ -115,6 +119,8 @@
     "ctrl-o": "open",
     "ctrl-s": "downloadMei",
     "ctrl-shift-c": "cleanAccid",
-    "ctrl-shift-r": "renumberMeasures"
+    "ctrl-shift-r": "renumberMeasures",
+    "alt-.": "consultGuidelines",
+    "ctrl-,": "toggleSettingsPanel"
   }
 }

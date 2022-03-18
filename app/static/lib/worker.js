@@ -30,7 +30,7 @@ onmessage = function(e) {
       return;
     case 'updateAll':
       try {
-        var tkOptions = result.options;
+        tkOptions = result.options;
         if (result.speedMode &&
           !result.computePageBreaks && tkOptions.breaks != 'none')
           tkOptions.breaks = 'encoded';
@@ -50,6 +50,7 @@ onmessage = function(e) {
           result.pageCount = tk.getPageCount();
           if (result.pageNo > result.pageCount) result.pageNo = result.pageCount;
         }
+        result.pageNo = Math.max(1, result.pageNo);
         let pg = (result.speedMode && result.pageNo > 1) ? 2 : result.pageNo;
         result.svg = tk.renderToSVG(pg);
         result.cmd = 'updated';
@@ -99,7 +100,7 @@ onmessage = function(e) {
       break;
     case 'updateLayout':
       try {
-        var tkOptions = result.options;
+        tkOptions = result.options;
         if (result.speedMode && result.breaks != 'none')
           tkOptions.breaks = 'encoded';
         tk.setOptions(tkOptions);
@@ -120,7 +121,7 @@ onmessage = function(e) {
       break;
     case 'updateOption': // just update option without redoing layout
       try {
-        var tkOptions = result.options;
+        tkOptions = result.options;
         if (result.speedMode && result.breaks != 'none')
           tkOptions.breaks = 'encoded';
         tk.setOptions(tkOptions);
@@ -225,7 +226,7 @@ onmessage = function(e) {
     case 'computePageBreaks': // compute page breaks
       try {
         // console.log('Worker computePageBreaks started');
-        var tkOptions = result.options;
+        tkOptions = result.options;
         tk.setOptions(tkOptions);
         tk.loadData(result.mei);
         result.pageCount = tk.getPageCount();
@@ -253,7 +254,7 @@ onmessage = function(e) {
       break;
     case 'exportMidi': // re-load data and export MIDI base-64 string
       try { //
-        var tkOptions = result.options;
+        tkOptions = result.options;
         tk.setOptions(tkOptions);
         tk.loadData(result.mei);
         result.midi = tk.renderToMIDI();

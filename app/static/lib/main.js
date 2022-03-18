@@ -3,6 +3,11 @@ var spdWorker;
 var tkVersion = '';
 var tkAvailableOptions;
 var mei;
+var elementAtCursor;
+
+// guidelines base URL, needed to construct element / attribute URLs
+// TODO ideally determine version part automatically
+const guidelinesBase = "https://music-encoding.org/guidelines/v4/";
 
 // exports
 export var cm;
@@ -78,6 +83,7 @@ export function loadDataInEditor(mei, setFreshlyLoaded = true) {
   v.loadXml(mei);
   let bs = document.getElementById('breaks-select');
   if (bs) bs.value = v.containsBreaks() ? 'line' : 'auto';
+  v.setRespSelectOptions();
 }
 
 export function updateLocalStorage(meiXml) {
@@ -136,6 +142,7 @@ import {
 import {
   createControlsMenu,
   setBreaksOptions,
+  handleSmartBreaksOption,
   addModifyerKeys,
   manualCurrentPage,
   generateSectionSelect
@@ -145,8 +152,12 @@ import {
 } from './utils.js';
 import {
   getInMeasure,
-  navElsSelector
+  navElsSelector,
+  getElementAtCursor
 } from './dom-utils.js';
+import {
+  addDragSelector
+} from './drag-selector.js';
 import * as e from './editor.js'
 import Viewer from './viewer.js';
 import Storage from './storage.js';
@@ -160,11 +171,11 @@ import {
 
 
 // schemas for autocompletion
-import schema_meiAll from '../schemaInfo/mei-CMN-4.0.1.schemaInfo.js';
+import default_schema from '../schemaInfo/mei-CMN-4.0.1.schemaInfo.js';
 
 // mei-friend version and date
-const version = 'develop-0.3.2';
-const versionDate = '14 Feb 2022';
+const version = 'develop-0.3.9';
+const versionDate = '17 March 2022';
 // const defaultMeiFileName = `${root}Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei`;
 const defaultMeiFileName = `${root}Beethoven_WoO70-Breitkopf.mei`;
 const defaultVerovioOptions = {
@@ -173,7 +184,8 @@ const defaultVerovioOptions = {
   header: "encoded",
   footer: "encoded",
   inputFrom: "mei",
-  adjustPageHeight: "true",
+  adjustPageHeight: true,
+  mdivAll: true,
   outputIndent: 3,
   pageMarginLeft: 50,
   pageMarginRight: 25,
@@ -183,9 +195,42 @@ const defaultVerovioOptions = {
   spacingNonLinear: .5,
   minLastJustification: 0,
   clefChangeFactor: .83,
-  svgAdditionalAttribute: ["layer@n", "staff@n"],
+  svgAdditionalAttribute: ["layer@n", "staff@n",
+    "dir@vgrp", "dynam@vgrp", "hairpin@vgrp", "pedal@vgrp"
+  ],
   bottomMarginArtic: 1.2,
   topMarginArtic: 1.2
+};
+const defaultCodeMirrorOptions = {
+  lineNumbers: true,
+  lineWrapping: false,
+  styleActiveLine: true,
+  mode: "xml",
+  indentUnit: 3,
+  smartIndent: true,
+  tabSize: 3,
+  autoCloseBrackets: true,
+  autoCloseTags: true,
+  matchTags: {
+    bothTags: true
+  },
+  showTrailingSpace: true,
+  foldGutter: true,
+  gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
+  extraKeys: {
+    "'<'": completeAfter,
+    "'/'": completeIfAfterLt,
+    "' '": completeIfInTag,
+    "'='": completeIfInTag,
+    "Ctrl-Space": "autocomplete",
+    "Alt-.": consultGuidelines
+  },
+  hintOptions: 'schema_meiCMN_401', // not cm conform: just provide schema name
+  theme: 'default',
+  zoomFont: 100, // my own option
+  matchTheme: false, // notation matches editor theme (my option)
+  defaultBrightTheme: 'default', // default theme for OS bright mode
+  defaultDarkTheme: 'paraiso-dark' // 'base16-dark', // default theme for OS dark mode
 };
 const defaultKeyMap = `${root}keymaps/default-keymap.json`;
 let fileChanged = false; // flag to track whether unsaved changes to file exist
@@ -220,35 +265,7 @@ function completeIfInTag(cm) {
 document.addEventListener('DOMContentLoaded', function() {
   let myTextarea = document.getElementById("editor");
 
-  cm = CodeMirror.fromTextArea(myTextarea, {
-    lineNumbers: true,
-    lineWrapping: false,
-    styleActiveLine: true,
-    mode: "xml",
-    indentUnit: 3,
-    smartIndent: true,
-    tabSize: 3,
-    autoCloseTags: true,
-    autoCloseBrackets: true,
-    matchTags: {
-      bothTags: true
-    },
-    showTrailingSpace: true,
-    foldGutter: true,
-    gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
-    extraKeys: {
-      "Alt-F": "findPersistent",
-      "'<'": completeAfter,
-      "'/'": completeIfAfterLt,
-      "' '": completeIfInTag,
-      "'='": completeIfInTag,
-      "Ctrl-Space": "autocomplete"
-    },
-    hintOptions: {
-      schemaInfo: schema_meiAll
-    }
-    // theme: 'dracula' // monokai (dark), dracula (bright)
-  });
+  cm = CodeMirror.fromTextArea(myTextarea, defaultCodeMirrorOptions);
 
   // check for parameters passed through URL
   let searchParams = new URLSearchParams(window.location.search);
@@ -278,6 +295,7 @@ document.addEventListener('DOMContentLoaded', function() {
   v.vrvOptions = {
     ...defaultVerovioOptions
   };
+  v.addCmOptionsToSettingsPanel(cm, defaultCodeMirrorOptions);
 
   let or = 'bottom'; // default layout orientation
   if (searchParams.get('orientation')) or = searchParams.get('orientation');
@@ -449,6 +467,8 @@ function vrvWorkerEventsHandler(ev) {
       console.info('main(). Handler vrvLoaded: ', this);
       tkVersion = ev.data.version;
       tkAvailableOptions = ev.data.availableOptions;
+      v.addVrvOptionsToSettingsPanel(tkAvailableOptions, defaultVerovioOptions);
+      v.addMeiFriendOptionsToSettingsPanel();
       document.querySelector(".rightfoot").innerHTML +=
         `&nbsp;<a href="https://www.verovio.org/">Verovio ${tkVersion}</a>.`;
       document.querySelector(".statusbar").innerHTML =
@@ -463,7 +483,7 @@ function vrvWorkerEventsHandler(ev) {
         v.updateNotation = false;
         loadDataInEditor(storage.content);
         v.updateNotation = true;
-        v.updateAll(cm, defaultVerovioOptions);
+        v.updateAll(cm);
       }
       v.busy(false);
       break;
@@ -515,7 +535,6 @@ function vrvWorkerEventsHandler(ev) {
         if (ev.data.setCursorToPageBeginning) v.setCursorToPageBeginning(cm);
         v.updatePageNumDisplay();
         v.addNotationEventListeners(cm);
-        v.setNotationColors();
         v.updateHighlight(cm);
         v.scrollSvg(cm);
       }
@@ -540,7 +559,6 @@ function vrvWorkerEventsHandler(ev) {
         v.lastNoteId = id;
       }
       v.addNotationEventListeners(cm);
-      v.setNotationColors();
       v.scrollSvg(cm);
       v.updateHighlight(cm);
       v.setFocusToVerovioPane();
@@ -648,7 +666,8 @@ export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true) {
 }
 
 // checks format of encoding string and imports or loads data/notation
-function handleEncoding(mei, setFreshlyLoaded = true) {
+// mei argument may be MEI or any other supported format (text/binary)
+export function handleEncoding(mei, setFreshlyLoaded = true) {
   let found = false;
   v.clear();
   v.busy();
@@ -770,6 +789,28 @@ function downloadSvg() {
   a.click();
 }
 
+function consultGuidelines() {
+  if (elementAtCursor) {
+    // cursor is currently positioned on an element
+    // move up to the closest "presentation" (codemirror line)
+    const presentation = elementAtCursor.closest('span[role="presentation"]');
+    if (presentation) {
+      // choose the first XML element (a "tag" that isn't a "bracket")
+      const xmlEl = presentation.querySelector(".cm-tag:not(.cm-bracket)");
+      if (xmlEl) {
+        let xmlElName = xmlEl.innerText;
+        if (xmlElName.length && !(xmlElName.includes(":"))) {
+          // it's an element in the default (hopefully MEI...) namespace
+          window.open(
+            guidelinesBase + "elements/" + xmlElName.toLowerCase(),
+            "_blank"
+          );
+        }
+      }
+    }
+  }
+}
+
 
 // object of interface command functions for buttons and key bindings
 let cmd = {
@@ -777,7 +818,6 @@ let cmd = {
   'previousPage': () => v.updatePage(cm, 'backwards'),
   'nextPage': () => v.updatePage(cm, 'forwards'),
   'lastPage': () => v.updatePage(cm, 'last'),
-  'nightMode': () => v.swapNotationColors(),
   'nextNote': () => v.navigate(cm, 'note', 'forwards'),
   'previousNote': () => v.navigate(cm, 'note', 'backwards'),
   'nextMeasure': () => v.navigate(cm, 'measure', 'forwards'),
@@ -787,6 +827,9 @@ let cmd = {
   'notationTop': () => setOrientation(cm, "top", v, storage),
   'notationBottom': () => setOrientation(cm, "bottom", v, storage),
   'notationLeft': () => setOrientation(cm, "left", v, storage),
+  'showSettingsPanel': () => v.showSettingsPanel(),
+  'hideSettingsPanel': () => v.hideSettingsPanel(),
+  'toggleSettingsPanel': (ev) => v.toggleSettingsPanel(ev),
   'notationRight': () => setOrientation(cm, "right", v, storage),
   'moveProgBar': () => moveProgressBar(),
   'open': () => openFileDialog(),
@@ -835,11 +878,13 @@ let cmd = {
   //
   'delete': () => e.delEl(v, cm),
   'invertPlacement': () => e.invertPlacement(v, cm),
+  'addVerticalGroup': () => e.addVerticalGroup(v, cm),
   'toggleStacc': () => e.toggleArtic(v, cm, 'stacc'),
   'toggleAccent': () => e.toggleArtic(v, cm, 'acc'),
   'toggleTenuto': () => e.toggleArtic(v, cm, 'ten'),
   'toggleMarcato': () => e.toggleArtic(v, cm, 'marc'),
   'toggleStacciss': () => e.toggleArtic(v, cm, 'stacciss'),
+  'toggleSpicc': () => e.toggleArtic(v, cm, 'spicc'),
   'shiftPitchNameUp': () => e.shiftPitch(v, cm, 1),
   'shiftPitchNameDown': () => e.shiftPitch(v, cm, -1),
   'shiftOctaveUp': () => e.shiftPitch(v, cm, 7),
@@ -857,6 +902,8 @@ let cmd = {
   'addCClefChangeAfter': () => e.addClefChange(v, cm, 'C', '3', false),
   'addFClefChangeAfter': () => e.addClefChange(v, cm, 'F', '4', false),
   'addBeam': () => e.addBeamElement(v, cm),
+  'addBeamSpan': () => e.addBeamSpan(v, cm),
+  'addSupplied': () => e.addSuppliedElement(v, cm),
   'cleanAccid': () => e.cleanAccid(v, cm),
   'renumberMeasuresTest': () => e.renumberMeasures(v, cm, false),
   'renumberMeasures': () => e.renumberMeasures(v, cm, true),
@@ -870,73 +917,77 @@ let cmd = {
       storage.clear();
     }
     logoutFromGithub();
-  }
-
+  },
+  'consultGuidelines': () => consultGuidelines()
 };
 
-// layout notation position
-document.getElementById('top').addEventListener('click', cmd.notationTop);
-document.getElementById('bottom').addEventListener('click', cmd.notationBottom);
-document.getElementById('left').addEventListener('click', cmd.notationLeft);
-document.getElementById('right').addEventListener('click', cmd.notationRight);
+// add event listeners when controls menu has been instantiated
+function addEventListeners(v, cm) {
+  let vp = document.querySelector('.verovio-panel');
 
-// open dialogs
-document.getElementById('OpenMei')
-  .addEventListener('click', cmd.open);
-document.getElementById('OpenUrl')
-  .addEventListener('click', cmd.openUrl);
-document.getElementById('ImportMusicXml')
-  .addEventListener('click', cmd.openMusicXml);
-document.getElementById('ImportHumdrum')
-  .addEventListener('click', cmd.openHumdrum);
-document.getElementById('ImportPae')
-  .addEventListener('click', cmd.openPae);
-document.getElementById('SaveMei')
-  .addEventListener('click', downloadMei);
-document.getElementById('SaveSvg')
-  .addEventListener('click', downloadSvg);
-document.getElementById('SaveMidi')
-  .addEventListener('click', downloadMidi);
+  // layout notation position
+  document.getElementById('top').addEventListener('click', cmd.notationTop);
+  document.getElementById('bottom').addEventListener('click', cmd.notationBottom);
+  document.getElementById('left').addEventListener('click', cmd.notationLeft);
+  document.getElementById('right').addEventListener('click', cmd.notationRight);
 
-// open URL interface
-document.getElementById('openUrlButton')
-  .addEventListener('click', cmd.openUrlFetch);
-document.getElementById('openUrlCancel')
-  .addEventListener('click', cmd.openUrlCancel);
-document.getElementById('openUrlInput')
-  .addEventListener('input', (e) => {
+  // show settings panel
+  document.getElementById('showSettingsMenu').addEventListener('click', cmd.showSettingsPanel);
+  document.getElementById('showSettingsButton').addEventListener('click', cmd.showSettingsPanel);
+  document.getElementById('hideSettingsButton').addEventListener('click', cmd.hideSettingsPanel);
+  document.getElementById('closeSettingsButton').addEventListener('click', cmd.hideSettingsPanel);
+
+  // open dialogs
+  document.getElementById('OpenMei').addEventListener('click', cmd.open);
+  document.getElementById('OpenUrl').addEventListener('click', cmd.openUrl);
+  document.getElementById('ImportMusicXml').addEventListener('click', cmd.openMusicXml);
+  document.getElementById('ImportHumdrum').addEventListener('click', cmd.openHumdrum);
+  document.getElementById('ImportPae').addEventListener('click', cmd.openPae);
+  document.getElementById('SaveMei').addEventListener('click', downloadMei);
+  document.getElementById('SaveSvg').addEventListener('click', downloadSvg);
+  document.getElementById('SaveMidi').addEventListener('click', downloadMidi);
+
+  // edit dialogs
+  document.getElementById('startSearch').addEventListener('click', () => CodeMirror.commands.find(cm));
+  document.getElementById('findNext').addEventListener('click', () => CodeMirror.commands.findNext(cm));
+  document.getElementById('findPrevious').addEventListener('click', () => CodeMirror.commands.findPrev(cm));
+  document.getElementById('replace').addEventListener('click', () => CodeMirror.commands.replace(cm));
+  document.getElementById('replaceAll').addEventListener('click', () => CodeMirror.commands.replaceAll(cm));
+  document.getElementById('jumpToLine').addEventListener('click', () => CodeMirror.commands.jumpToLine(cm));
+  document.querySelectorAll('.keyShortCut').forEach(e => e.classList.add(navigator.platform.startsWith('Mac') ? 'platform-mac' : 'platform-nonmac'));
+
+  // open URL interface
+  document.getElementById('openUrlButton').addEventListener('click', cmd.openUrlFetch);
+  document.getElementById('openUrlCancel').addEventListener('click', cmd.openUrlCancel);
+  document.getElementById('openUrlInput').addEventListener('input', (e) => {
     e.target.classList.remove("warn");
     document.getElementById("openUrlStatus").classList.remove("warn");
   });
 
-// drag'n'drop handlers
-let fc = document.querySelector('.dragContainer');
-fc.addEventListener('drop', () => dropHandler(event));
-fc.addEventListener('dragover', () => dragOverHandler(event));
-fc.addEventListener("dragenter", () => dragEnter(event));
-fc.addEventListener("dragleave", () => dragLeave(event));
-fc.addEventListener("dragstart", (ev) => console.log('Drag Start', ev));
-fc.addEventListener("dragend", (ev) => console.log('Drag End', ev));
+  // drag'n'drop handlers
+  let fc = document.querySelector('.dragContainer');
+  fc.addEventListener('drop', () => dropHandler(event));
+  fc.addEventListener('dragover', () => dragOverHandler(event));
+  fc.addEventListener("dragenter", () => dragEnter(event));
+  fc.addEventListener("dragleave", () => dragLeave(event));
+  fc.addEventListener("dragstart", (ev) => console.log('Drag Start', ev));
+  fc.addEventListener("dragend", (ev) => console.log('Drag End', ev));
 
-// add event listeners when controls menu has been instantiated
-function addEventListeners(v, cm) {
-  document.getElementById('notation-night-mode-btn')
-    .addEventListener('click', cmd.nightMode);
   // Zooming with buttons
-  document.getElementById('decrease-scale-btn')
-    .addEventListener('click', cmd.zoomOut);
-  document.getElementById('increase-scale-btn')
-    .addEventListener('click', cmd.zoomIn);
-  document.getElementById('verovio-zoom')
-    .addEventListener('click', cmd.zoomSlider);
-  // Zooming with mouse wheel
-  document.querySelector('.verovio-panel').addEventListener('wheel', event => {
-    if ((navigator.platform.toLowerCase().startsWith('mac') && event.metaKey) ||
-      !navigator.platform.toLowerCase().startsWith('mac') && event.ctrlKey) {
-      event.preventDefault();
-      v.zoom(Math.sign(event.deltaY) * -5); // scrolling towards user = increase
+  document.getElementById('decrease-scale-btn').addEventListener('click', cmd.zoomOut);
+  document.getElementById('increase-scale-btn').addEventListener('click', cmd.zoomIn);
+  document.getElementById('verovio-zoom').addEventListener('click', cmd.zoomSlider);
+
+  // Zooming notation with mouse wheel
+  vp.addEventListener('wheel', ev => {
+    if ((navigator.platform.toLowerCase().startsWith('mac') && ev.metaKey) ||
+      !navigator.platform.toLowerCase().startsWith('mac') && ev.ctrlKey) {
+      ev.preventDefault();
+      ev.stopPropagation();
+      v.zoom(Math.sign(ev.deltaY) * -5); // scrolling towards user = increase
     }
   });
+
   // Page turning
   let ss = document.getElementById('section-selector');
   ss.addEventListener('change', () => {
@@ -945,144 +996,96 @@ function addEventListeners(v, cm) {
     v.updatePage(cm, '', ss.value);
     v.updateNotation = true;
   });
-  document.getElementById('first-page-btn')
-    .addEventListener('click', cmd.firstPage);
-  document.getElementById('prev-page-btn')
-    .addEventListener('click', cmd.previousPage);
-  document.getElementById('next-page-btn')
-    .addEventListener('click', cmd.nextPage);
-  document.getElementById('last-page-btn')
-    .addEventListener('click', cmd.lastPage);
+  document.getElementById('first-page-btn').addEventListener('click', cmd.firstPage);
+  document.getElementById('prev-page-btn').addEventListener('click', cmd.previousPage);
+  document.getElementById('next-page-btn').addEventListener('click', cmd.nextPage);
+  document.getElementById('last-page-btn').addEventListener('click', cmd.lastPage);
   // manual page entering
-  document.getElementById('pagination2')
-    .addEventListener('keydown', ev => manualCurrentPage(v, cm, ev));
-  document.getElementById('pagination2')
-    .addEventListener('blur', ev => manualCurrentPage(v, cm, ev));
+  document.getElementById('pagination2').addEventListener('keydown', ev => manualCurrentPage(v, cm, ev));
+  document.getElementById('pagination2').addEventListener('blur', ev => manualCurrentPage(v, cm, ev));
   // font selector
-  document.getElementById('font-select')
-    .addEventListener('change', () => v.updateOption());
+  document.getElementById('font-select').addEventListener('change', () => v.updateOption());
   // breaks selector
-  document.getElementById('breaks-select').addEventListener('change',
-    () => {
-      v.pageSpanners = {};
-      v.updateAll(cm, {}, v.selectedElements[0]);
-    });
+  document.getElementById('breaks-select').addEventListener('change', () => {
+    v.pageSpanners = {};
+    v.updateAll(cm, {}, v.selectedElements[0]);
+  });
   // navigation
-  document.getElementById('backwards-btn')
-    .addEventListener('click', cmd.previousNote);
-  document.getElementById('forwards-btn')
-    .addEventListener('click', cmd.nextNote);
-  document.getElementById('upwards-btn')
-    .addEventListener('click', cmd.layerUp);
-  document.getElementById('downwards-btn')
-    .addEventListener('click', cmd.layerDown);
+  document.getElementById('backwards-btn').addEventListener('click', cmd.previousNote);
+  document.getElementById('forwards-btn').addEventListener('click', cmd.nextNote);
+  document.getElementById('upwards-btn').addEventListener('click', cmd.layerUp);
+  document.getElementById('downwards-btn').addEventListener('click', cmd.layerDown);
   // manipulation
-  document.getElementById('invertPlacement')
-    .addEventListener('click', cmd.invertPlacement);
-  document.getElementById('delete')
-    .addEventListener('click', cmd.delete);
-  document.getElementById('pitchUp')
-    .addEventListener('click', cmd.shiftPitchNameUp);
-  document.getElementById('pitchDown')
-    .addEventListener('click', cmd.shiftPitchNameDown);
-  document.getElementById('pitchOctaveUp')
-    .addEventListener('click', cmd.shiftOctaveUp);
-  document.getElementById('pitchOctaveDown')
-    .addEventListener('click', cmd.shiftOctaveDown);
-  document.getElementById('staffUp')
-    .addEventListener('click', cmd.moveElementStaffUp);
-  document.getElementById('staffDown')
-    .addEventListener('click', cmd.moveElementStaffDown);
+  document.getElementById('invertPlacement').addEventListener('click', cmd.invertPlacement);
+  document.getElementById('addVerticalGroup').addEventListener('click', cmd.addVerticalGroup);
+  document.getElementById('delete').addEventListener('click', cmd.delete);
+  document.getElementById('pitchUp').addEventListener('click', cmd.shiftPitchNameUp);
+  document.getElementById('pitchDown').addEventListener('click', cmd.shiftPitchNameDown);
+  document.getElementById('pitchOctaveUp').addEventListener('click', cmd.shiftOctaveUp);
+  document.getElementById('pitchOctaveDown').addEventListener('click', cmd.shiftOctaveDown);
+  document.getElementById('staffUp').addEventListener('click', cmd.moveElementStaffUp);
+  document.getElementById('staffDown').addEventListener('click', cmd.moveElementStaffDown);
   // Manipulate encoding methods
-  document.getElementById('cleanAccid')
-    .addEventListener('click', () => e.cleanAccid(v, cm));
-  document.getElementById('renumTest')
-    .addEventListener('click', () => e.renumberMeasures(v, cm, false));
-  document.getElementById('renumExec')
-    .addEventListener('click', () => e.renumberMeasures(v, cm, true));
+  document.getElementById('cleanAccid').addEventListener('click', () => e.cleanAccid(v, cm));
+  document.getElementById('renumTest').addEventListener('click', () => e.renumberMeasures(v, cm, false));
+  document.getElementById('renumExec').addEventListener('click', () => e.renumberMeasures(v, cm, true));
   // re-render through Verovio
-  document.getElementById('reRenderMei')
-    .addEventListener('click', cmd.reRenderMei);
-  document.getElementById('reRenderMeiWithout')
-    .addEventListener('click', cmd.reRenderMeiWithout);
+  document.getElementById('reRenderMei').addEventListener('click', cmd.reRenderMei);
+  document.getElementById('reRenderMeiWithout').addEventListener('click', cmd.reRenderMeiWithout);
   // insert control elements
-  document.getElementById('addTempo')
-    .addEventListener('click', cmd.addTempo);
-  document.getElementById('addDirective')
-    .addEventListener('click', cmd.addDirective);
-  document.getElementById('addDynamics')
-    .addEventListener('click', cmd.addDynamics);
-  document.getElementById('addSlur')
-    .addEventListener('click', cmd.addSlur);
-  document.getElementById('addTie')
-    .addEventListener('click', cmd.addTie);
-  document.getElementById('addCresHairpin')
-    .addEventListener('click', cmd.addCresHairpin);
-  document.getElementById('addDimHairpin')
-    .addEventListener('click', cmd.addDimHairpin);
-  document.getElementById('addBeam')
-    .addEventListener('click', cmd.addBeam);
-  document.getElementById('addArpeggio')
-    // more control elements
-    .addEventListener('click', cmd.addArpeggio);
-  document.getElementById('addFermata')
-    .addEventListener('click', cmd.addFermata);
-  document.getElementById('addGlissando')
-    .addEventListener('click', cmd.addGlissando);
-  document.getElementById('addPedalDown')
-    .addEventListener('click', cmd.addPedalDown);
-  document.getElementById('addPedalUp')
-    .addEventListener('click', cmd.addPedalUp);
-  document.getElementById('addTrillAbove')
-    .addEventListener('click', cmd.addTrillAbove);
-  document.getElementById('addTurnAbove')
-    .addEventListener('click', cmd.addTurnAbove);
-  document.getElementById('addTurnAboveLower')
-    .addEventListener('click', cmd.addTurnAboveLower);
-  document.getElementById('addMordentAbove')
-    .addEventListener('click', cmd.addMordentAbove);
-  document.getElementById('addMordentAboveUpper')
-    .addEventListener('click', cmd.addMordentAboveUpper);
-  document.getElementById('addOctave8Above')
-    .addEventListener('click', cmd.addOctave8Above);
-  document.getElementById('addOctave15Above')
-    .addEventListener('click', cmd.addOctave15Above);
-  document.getElementById('addOctave8Below')
-    .addEventListener('click', cmd.addOctave8Below);
-  document.getElementById('addOctave15Below')
-    .addEventListener('click', cmd.addOctave15Below);
+  document.getElementById('addTempo').addEventListener('click', cmd.addTempo);
+  document.getElementById('addDirective').addEventListener('click', cmd.addDirective);
+  document.getElementById('addDynamics').addEventListener('click', cmd.addDynamics);
+  document.getElementById('addSlur').addEventListener('click', cmd.addSlur);
+  document.getElementById('addTie').addEventListener('click', cmd.addTie);
+  document.getElementById('addCresHairpin').addEventListener('click', cmd.addCresHairpin);
+  document.getElementById('addDimHairpin').addEventListener('click', cmd.addDimHairpin);
+  document.getElementById('addBeam').addEventListener('click', cmd.addBeam);
+  document.getElementById('addBeamSpan').addEventListener('click', cmd.addBeamSpan);
+  document.getElementById('addSupplied').addEventListener('click', cmd.addSupplied);
+  document.getElementById('addArpeggio').addEventListener('click', cmd.addArpeggio);
+  // more control elements
+  document.getElementById('addFermata').addEventListener('click', cmd.addFermata);
+  document.getElementById('addGlissando').addEventListener('click', cmd.addGlissando);
+  document.getElementById('addPedalDown').addEventListener('click', cmd.addPedalDown);
+  document.getElementById('addPedalUp').addEventListener('click', cmd.addPedalUp);
+  document.getElementById('addTrillAbove').addEventListener('click', cmd.addTrillAbove);
+  document.getElementById('addTurnAbove').addEventListener('click', cmd.addTurnAbove);
+  document.getElementById('addTurnAboveLower').addEventListener('click', cmd.addTurnAboveLower);
+  document.getElementById('addMordentAbove').addEventListener('click', cmd.addMordentAbove);
+  document.getElementById('addMordentAboveUpper').addEventListener('click', cmd.addMordentAboveUpper);
+  document.getElementById('addOctave8Above').addEventListener('click', cmd.addOctave8Above);
+  document.getElementById('addOctave15Above').addEventListener('click', cmd.addOctave15Above);
+  document.getElementById('addOctave8Below').addEventListener('click', cmd.addOctave8Below);
+  document.getElementById('addOctave15Below').addEventListener('click', cmd.addOctave15Below);
   // add clef change
-  document.getElementById('addGClefChangeBefore')
-    .addEventListener('click', cmd.addGClefChangeBefore);
-  document.getElementById('addCClefChangeBefore')
-    .addEventListener('click', cmd.addCClefChangeBefore);
-  document.getElementById('addFClefChangeBefore')
-    .addEventListener('click', cmd.addFClefChangeBefore);
-  document.getElementById('addGClefChangeAfter')
-    .addEventListener('click', cmd.addGClefChangeAfter);
-  document.getElementById('addCClefChangeAfter')
-    .addEventListener('click', cmd.addCClefChangeAfter);
-  document.getElementById('addFClefChangeAfter')
-    .addEventListener('click', cmd.addFClefChangeAfter);
+  document.getElementById('addGClefChangeBefore').addEventListener('click', cmd.addGClefChangeBefore);
+  document.getElementById('addCClefChangeBefore').addEventListener('click', cmd.addCClefChangeBefore);
+  document.getElementById('addFClefChangeBefore').addEventListener('click', cmd.addFClefChangeBefore);
+  document.getElementById('addGClefChangeAfter').addEventListener('click', cmd.addGClefChangeAfter);
+  document.getElementById('addCClefChangeAfter').addEventListener('click', cmd.addCClefChangeAfter);
+  document.getElementById('addFClefChangeAfter').addEventListener('click', cmd.addFClefChangeAfter);
   // toggle articulation
-  document.getElementById('toggleStacc')
-    .addEventListener('click', cmd.toggleStacc);
-  document.getElementById('toggleAccent')
-    .addEventListener('click', cmd.toggleAccent);
-  document.getElementById('toggleTenuto')
-    .addEventListener('click', cmd.toggleTenuto);
-  document.getElementById('toggleMarcato')
-    .addEventListener('click', cmd.toggleMarcato);
-  document.getElementById('toggleStacciss')
-    .addEventListener('click', cmd.toggleStacciss);
+  document.getElementById('toggleStacc').addEventListener('click', cmd.toggleStacc);
+  document.getElementById('toggleAccent').addEventListener('click', cmd.toggleAccent);
+  document.getElementById('toggleTenuto').addEventListener('click', cmd.toggleTenuto);
+  document.getElementById('toggleMarcato').addEventListener('click', cmd.toggleMarcato);
+  document.getElementById('toggleStacciss').addEventListener('click', cmd.toggleStacciss);
+  document.getElementById('toggleSpicc').addEventListener('click', cmd.toggleSpicc);
+
+  // consult guidelines
+  document.getElementById('consultGuidelines')
+    .addEventListener('click', cmd.consultGuidelines);
 
   // reset application
-  document.getElementById('resetDefault')
-    .addEventListener('click', cmd.resetDefault);
+  document.getElementById('resetDefault').addEventListener('click', cmd.resetDefault);
 
   // editor activity
   cm.on('cursorActivity', () => {
     v.cursorActivity(cm);
+    // determine element at encoding cursor
+    // (to offer guidelines page if requested)
+    elementAtCursor = getElementAtCursor(cm);
   });
 
   // flip button updates manually notation location to cursor pos in encoding
@@ -1122,6 +1125,36 @@ function addEventListeners(v, cm) {
     }
   })
 
+  // Editor font size zooming
+  document.querySelector('.encoding').addEventListener('wheel', ev => {
+    if ((navigator.platform.toLowerCase().startsWith('mac') && ev.metaKey) ||
+      !navigator.platform.toLowerCase().startsWith('mac') && ev.ctrlKey) {
+      ev.preventDefault();
+      ev.stopPropagation();
+      v.changeEditorFontSize(Math.sign(ev.deltaY) * -5);
+    }
+  });
+  document.querySelector('.encoding').addEventListener('keydown', ev => {
+    if ((navigator.platform.toLowerCase().startsWith('mac') && ev.metaKey) ||
+      !navigator.platform.toLowerCase().startsWith('mac') && ev.ctrlKey) {
+      if (ev.key === '-') {
+        ev.preventDefault();
+        ev.stopPropagation();
+        v.changeEditorFontSize(-5);
+      }
+      if (ev.key === '+') {
+        ev.preventDefault();
+        ev.stopPropagation();
+        v.changeEditorFontSize(+5);
+      }
+      if (ev.key === '0') {
+        ev.preventDefault();
+        ev.stopPropagation();
+        v.changeEditorFontSize(100);
+      }
+    }
+  });
+
   // manually update notation rendering from encoding
   document.getElementById('code-update-btn').addEventListener('click', () => {
     v.notationUpdated(cm, true);
@@ -1136,12 +1169,15 @@ function addEventListeners(v, cm) {
   // speedmode checkbox
   document.getElementById('speed-checkbox').addEventListener('change', (ev) => {
     v.speedMode = ev.target.checked;
+    handleSmartBreaksOption(v.speedMode);
     if (v.speedMode && Object.keys(v.pageBreaks).length > 0)
       v.pageCount = Object.keys(v.pageBreaks).length;
     // else
     //   v.pageBreaks = {};
     v.updateAll(cm, {}, v.selectedElements[0]);
   });
+
+  addDragSelector(v, vp);
 } // addEventListeners()
 
 
@@ -1190,11 +1226,12 @@ function setKeyMap(keyMapFilePath) {
       for (const [key, value] of Object.entries(keyMap)) {
         let el = document.querySelector(key);
         if (el) {
-          // console.info('Add listener to ', el);
           el.setAttribute('tabindex', '-1');
           el.addEventListener('keydown', (ev) => {
-            if (!document.activeElement.id == 'pagination2')
+            if (document.activeElement.id !== 'pagination2') {
+              ev.stopPropagation();
               ev.preventDefault();
+            }
             let keyName = ev.key;
             if (ev.code.toLowerCase() == 'space') keyName = 'space';
             // arrowdown -> down

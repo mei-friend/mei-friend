@@ -177,45 +177,100 @@ export default class Github {
     return this.githubRepoOwner !== this.upstreamRepoOwner;
   }
 
-  async readGithubRepo() { 
-    const filepath = this.filepath;
-    // Retrieve content of file
-    this.headHash = await this.repo.readRef(`refs/heads/${this.branch}`);
-    this.filepath = filepath;
-    this.commit = await this.repo.loadAs("commit", this.headHash);  
-    const tree = await this.repo.loadAs("tree", this.commit.tree);
-    if(this.filepath && this.filepath !== "/") {
-      // remove leading slash
-      this.entry = tree[this.filepath.startsWith("/") ? this.filepath.substr(1) : this.filepath];
-      this.content = await this.repo.loadAs("text", this.entry.hash);
-    }
-    // Retrieve git commit log
-    const commitsUrl = `https://api.github.com/repos/${this.githubRepo}/commits`;
-    await fetch(commitsUrl, {
-      method: 'GET',
-      headers: this.apiHeaders
-    }).then(res => res.json())
-      .then(async(commits) => { 
-        this.commitLog = commits;
-      });
 
+  // Recursively dive into tree until we find the file we're updating.
+  // Update the file, then construct hashes all the way back up
+  async generateModifiedTreeHash(tree, filepath, content) { 
+    // split into path components and discard leading empty string using filter
+    // (in case filepath starts with slash)
+    let pathComponents = filepath.split("/").filter(p => p);
+    if(pathComponents.length === 1) { 
+      // Basecase: we've arrived at the subdir containing our file...
+      let entry = tree[pathComponents[0]];
+      // replace with new content and get new hash
+      let entryHash = await this.repo.saveAs("text", content);
+      // modify tree with updated entry
+      tree[pathComponents[0]] = { 
+        mode: entry.mode,
+        hash: entryHash
+      }
+      // calculate and return treeHash for the modified tree:
+      return await this.repo.saveAs("tree", tree);
+    } else if(pathComponents.length > 1) { 
+      // we still have some traversing to do
+      // load the next subtree along our filepath:
+      let subtree = await this.repo.loadAs("tree", 
+        tree[pathComponents[0]].hash);
+      // and recurse on it to get a modified (sub)treeHash 
+      let subtreeHash = await this.generateModifiedTreeHash(
+          subtree,
+          pathComponents.splice(1,pathComponents.length).join("/"),
+          content
+        )
+      // modify this tree with new subtreeHash
+      tree[pathComponents[0]] = {
+        mode: tree[pathComponents[0]].mode, // retain old entry's permissions
+        hash: subtreeHash      
+      }
+      // and return modified tree's treeHash
+      return await this.repo.saveAs("tree", tree);
+    } else { 
+      console.error("Problem figuring out pathComponents for:", filepath);
+    }
   }
 
   async writeGithubRepo(content, message) { 
-    const updates = [{
-      path: this.filepath,
-      mode: this.entry.mode, // preserve mode of existing file (e.g. executable)
-      content: content
-    }];
-    updates.base = this.commit.tree;
-    const treeHash = await this.repo.createTree(updates);
-    const commitHash = await this.repo.saveAs("commit", { 
+    this.headHash = await this.repo.readRef(`refs/heads/${this.branch}`);
+    this.commit = await this.repo.loadAs("commit", this.headHash);  
+    let tree = await this.repo.loadAs("tree", this.commit.tree);
+    let treeHash = await this.generateModifiedTreeHash(tree, this.filepath, content);
+    let commitHash = await this.repo.saveAs("commit", { 
       tree: treeHash,
       author: this.author,
       parent: this.headHash,
       message: message
     });
     await this.repo.updateRef(`refs/heads/${this.branch}`, commitHash);
+    console.debug("Commit complete: ", commitHash)
+    // update headHash to new commit's
+    this.headHash = await this.repo.readRef(`refs/heads/${this.branch}`);
+  }
+
+  async readGithubRepo() { 
+    // TODO fix multi-level directories by implementing tree traversal using treeWalk / treeStreams, see jsgit doc
+    try { 
+      // Retrieve content of file
+      this.headHash = await this.repo.readRef(`refs/heads/${this.branch}`);
+      this.commit = await this.repo.loadAs("commit", this.headHash);  
+      let tree = await this.repo.loadAs("tree", this.commit.tree);
+      this.entry = tree[this.filepath.startsWith("/") ? this.filepath.substr(1) : this.filepath];
+      let treeStream = await this.repo.treeWalk(this.commit.tree);
+      let obj;
+      let trees = []
+      while (obj = await treeStream.read(), obj !== undefined) {
+        trees.push(obj)
+      }
+      const treesFiltered = trees.filter(o => o.path === this.filepath)
+      if(treesFiltered.length === 1) { 
+        this.content = await this.repo.loadAs("text", treesFiltered[0].hash);
+      } else { 
+        if(this.filepath && this.filepath !== "/") {
+          // remove leading slash
+          this.content = await this.repo.loadAs("text", this.entry.hash);
+        }
+      }
+      // Retrieve git commit log
+      const commitsUrl = `https://api.github.com/repos/${this.githubRepo}/commits`;
+      await fetch(commitsUrl, {
+        method: 'GET',
+        headers: this.apiHeaders
+      }).then(res => res.json())
+        .then(async(commits) => { 
+          this.commitLog = commits;
+        });
+    } catch(e) {
+      console.error("Error while reading Github repo: ", e, this);
+    }
   }
 
   async getOrganizations() { 
@@ -276,7 +331,7 @@ export default class Github {
               if(res.status <= 400) res.json()
               else throw res
             })
-            .then(async(userFork) => { 
+            .then((userFork) => { 
                 // now switch to it
                 this.githubRepo = userFork.full_name;
             });

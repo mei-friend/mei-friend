@@ -49,18 +49,6 @@ export function createControlsMenu(parentElement, scale) {
   });
   zoomCtrls.appendChild(increaseBtn);
 
-  let notationNightModeBtn = document.createElement('button');
-  notationNightModeBtn.id = "notation-night-mode-btn";
-  notationNightModeBtn.classList.add('btn');
-  notationNightModeBtn.classList.add('icon');
-  notationNightModeBtn.classList.add('icon-ruby');
-  notationNightModeBtn.classList.add('inline-block-tight');
-  addToolTip(notationNightModeBtn, {
-    title: 'Invert colors of notation'
-  });
-  zoomCtrls.appendChild(notationNightModeBtn);
-
-
   // Pagination, page navigation
   let paginationCtrls = document.createElement('div');
   paginationCtrls.id = 'pagination-ctrls';
@@ -81,11 +69,6 @@ export function createControlsMenu(parentElement, scale) {
   // sectionSelector.options.add(new Option('| Var-I-B'));
   // sectionSelector.options.add(new Option('| Var-I-B1'));
   // sectionSelector.options.add(new Option('| Var-I-B2'));
-  // sectionSelector.options.add(new Option('Var-II'));
-  // sectionSelector.options.add(new Option('| Var-II-A'));
-  // sectionSelector.options.add(new Option('| Var-II-A1'));
-  // sectionSelector.options.add(new Option('| Var-II-A2'));
-  // sectionSelector.options.add(new Option('| Var-II-B'));
   sectionSelector.style.display = 'none';
   paginationCtrls.appendChild(sectionSelector);
 
@@ -346,6 +329,7 @@ export function createControlsMenu(parentElement, scale) {
   speedCheckbox.setAttribute('type', 'checkbox');
   speedCheckbox.setAttribute('checked', 'false');
   speedCheckbox.classList.add('checkbox');
+  speedLabel.setAttribute('for', speedCheckbox.id);
   speedCheckbox.checked = true;
   speedCheckbox.disabled = false;
   // addToolTip(speedCheckbox, {
@@ -408,7 +392,23 @@ export function setBreaksOptions(tkAvailableOptions, defaultValue = 'auto') {
     } else {
       breaksEl[breaksEl.options.length] = new Option(index, index);
     }
+    // disable breaks=smart by default; only enabled with speedMode=false
+    if (index === 'smart') breaksEl[breaksEl.length - 1].disabled = true;
   }
+}
+
+export function handleSmartBreaksOption(speedMode) {
+  let options = Array.from(document.getElementById('breaks-select').options);
+  options.forEach(o => {
+    if (o.value === 'smart') {
+      if (speedMode && o.selected) {
+        options.forEach(o => {
+          if (o.value === 'auto') o.selected = true;
+        });
+      }
+      o.disabled = speedMode;
+    }
+  });
 }
 
 // checks xmlDoc for section, ending, lem, rdg elements for quick navigation
@@ -418,18 +418,20 @@ export function generateSectionSelect(xmlDoc) {
     ['', '']
   ];
   let baseSection = xmlDoc.querySelector('music score');
-  let els = Array.from(baseSection.querySelectorAll(selector));
-  els.forEach(el => {
-    let str = '';
-    let parent = el.parentElement.closest(selector);
-    if (parent) {
-      str += '│ ';
-      while (parent = parent.parentElement.closest(selector))
-        str += '│ '; // &#9474;&nbsp; for indentation
-    }
-    sections.push([str + el.getAttribute('xml:id'), el.getAttribute('xml:id')]);
-  });
-  if (sections.length == 2) sections.pop(); // remove if only the one section
+  if (baseSection) {
+    let els = baseSection.querySelectorAll(selector);
+    els.forEach(el => {
+      let str = '';
+      let parent = el.parentElement.closest(selector);
+      if (parent) {
+        str += '│ ';
+        while (parent = parent.parentElement.closest(selector))
+          str += '│ '; // &#9474;&nbsp; for indentation
+      }
+      sections.push([str + el.getAttribute('xml:id'), el.getAttribute('xml:id')]);
+    });
+    if (sections.length == 2) sections.pop(); // remove if only the one section
+  }
   return sections;
 }
 

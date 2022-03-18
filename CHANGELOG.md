@@ -107,3 +107,30 @@
 * Implement fork repository functionality
 # 0.3.2 patch
 * Accelerate speedMode using tXml in a separate worker for pre-computing time-spanning elements with @startid/@endid attributes
+* Support for toggling spiccato articulation with Shift+P
+# 0.3.3 patch
+* Add 'Show MEI Guidelines' in Help menu
+* Implement 'Consult Guidelines' feature ('alt-.')
+# 0.3.4 patch: settings panel
+* Settings panel supporting the majority of Verovio options
+* Settings panel supporting CodeMirror options
+# 0.3.5 patch: dark mode support
+* mei-friend appearance matches the selected theme
+* Option to enable notation to match editor theme colors
+* Theme changes automatically upon OS appearance change (e.g., from bright to dark) when in default theme
+# 0.3.6 patch: mei-friend settings and new functionality
+* Support for surrounding selected elements with a supplied element
+* Settings to control supplied element display, color, and responsibility statement
+* Support to insert vertical group attributes to selected elements (automatically finding unused vgrp value on page)
+* Support for inserting, inverting and deleting beamSpan elements
+# 0.3.7 patch
+* Address issue with ALT-F interfering with EMACS keymap
+* Support for drag-selecting different element categories with mouse
+* Added edit dropdown menu for search/replace/jump-to-line functionality
+# 0.3.8 patch: Github fixes and improvements
+* Refactor writing to github, fixing write-to-subdirectory in the process
+* Github menu navigation fixes
+* Fallback to login name when username unavailable for commits
+* Implement handleEncoding pipeline when reading from Github
+* Upgrade Python Authlib dependency to fix OAuth CSRF issue
+# 0.3.9 patch
