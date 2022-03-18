@@ -133,17 +133,15 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
 
     let children = section.childNodes;
     let lgt = children.length;
-    console.log('digDeeper ' + section.getAttribute('xml:id') + ', p: ' + p);
     for (let i = 0; i < lgt; i++) {
       if (countingMode == 'measures' && mNo >= mxMeasures) return newSection;
-      if (p > pageNo) {
-        if (p === (pageNo + 1) && children[i + 1] && children[i + 1].nodeName === 'scoreDef')
-          newSection.appendChild(children[i + 1].cloneNode(true));
-        // break; // only until requested pageNo is processed
+      if (p === (pageNo + 1) && children[i + 1] && children[i + 1].nodeName === 'scoreDef')
+        newSection.appendChild(children[i + 1].cloneNode(true));
+      // break; // only until requested pageNo is processed
+      if (p > pageNo + 1) {
+        break;
       }
       let currentNode = children[i];
-      // console.info('digDeeper(' + pageNo + '): p: ' + p +
-      //   ', i: ' + i + ', ', currentNode);
       let currentNodeName = currentNode.nodeName;
       if (currentNode.nodeType === Node.TEXT_NODE) continue;
       // ignore expansion lists
