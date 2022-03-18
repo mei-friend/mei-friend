@@ -137,7 +137,6 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
       if (countingMode == 'measures' && mNo >= mxMeasures) return newSection;
       if (p === (pageNo + 1) && children[i + 1] && children[i + 1].nodeName === 'scoreDef')
         newSection.appendChild(children[i + 1].cloneNode(true));
-      // break; // only until requested pageNo is processed
       if (p > pageNo + 1) {
         break;
       }
