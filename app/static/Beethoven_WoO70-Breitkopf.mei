@@ -78,6 +78,9 @@
                      </rend>
                   </pgFoot2>
                   <staffGrp xml:id="staffgrp-0000000664100862" bar.thru="true" symbol="brace">
+                     <label xml:id="lr8v906">
+                        <rend xml:id="rophl5o" fontsize="120.00%" fontweight="bold">TEMA.</rend>
+                     </label>
                      <staffDef xml:id="staffdef-0000000856347723" n="1" lines="5" clef.shape="G" clef.line="2">
                         <instrDef xml:id="instrdef-0000000137914881" midi.channel="0" midi.instrnum="0" midi.volume="78.00%" />
                      </staffDef>
@@ -98,9 +101,6 @@
                            <rest xml:id="rest-0000000508640225" dur="8" />
                         </layer>
                      </staff>
-                     <tempo xml:id="tempo-0000000839981936" place="above" staff="1" startid="#note-0000001631474113" midi.bpm="120.000000">
-                        <rend xml:id="rend-0000002022187909" fontweight="bold">Tema.</rend>
-                     </tempo>
                   </measure>
                   <measure xml:id="measure-0000001731346515" n="1">
                      <staff xml:id="staff-0000001926817137" n="1">
@@ -620,8 +620,16 @@
                   </measure>
                   <sb xml:id="sb-0000000156556691" />
                </section>
-               <section xml:id="Var-I">
-                  <scoreDef xml:id="scoredef-0000000580838062" meter.count="6" meter.unit="8" />
+               <section xml:id="Var-I" restart="true">
+                  <scoreDef xml:id="scoredef-0000000580838062">
+                     <staffGrp xml:id="sgsw8ak">
+                        <label xml:id="lrio3ah">
+                           <rend xml:id="rs8q2w1" fontsize="120.00%" fontweight="bold">VAR. I.</rend>
+                        </label>
+                        <staffDef xml:id="s7srur5" n="1" lines="5" />
+                        <staffDef xml:id="s3v1y62" n="2" lines="5" />
+                     </staffGrp>
+                  </scoreDef>
                   <measure xml:id="measure-0000001979718762" metcon="false" n="20">
                      <staff xml:id="staff-0000001722647144" n="1">
                         <layer xml:id="layer-0000001450793277" n="1">
@@ -633,9 +641,6 @@
                            <rest xml:id="rest-0000001086568934" dur="8" />
                         </layer>
                      </staff>
-                     <tempo xml:id="tempo-0000002029035447" place="above" staff="1" startid="#note-0000000953278501" midi.bpm="132.000000">
-                        <rend xml:id="rend-0000001637371705" fontweight="bold">Var. I.</rend>
-                     </tempo>
                   </measure>
                   <measure xml:id="measure-0000001910623297" n="21">
                      <staff xml:id="staff-0000001202157045" n="1">
@@ -1404,8 +1409,16 @@
                   </measure>
                   <sb xml:id="sb-0000000163623719" />
                </section>
-               <section xml:id="Var-II">
-                  <scoreDef xml:id="scoredef-0000001244777073" meter.count="6" meter.unit="8" />
+               <section xml:id="Var-II" restart="true">
+                  <scoreDef xml:id="scoredef-0000001244777073">
+                     <staffGrp xml:id="sq8egf0">
+                        <label xml:id="llh46j5">
+                           <rend xml:id="ri7qdsm" fontsize="120.00%" fontweight="bold">VAR. II.</rend>
+                        </label>
+                        <staffDef xml:id="s7srur5" n="1" lines="5" />
+                        <staffDef xml:id="s3v1y62" n="2" lines="5" />
+                     </staffGrp>
+                  </scoreDef>
                   <measure xml:id="measure-0000000547662691" metcon="false" n="40">
                      <staff xml:id="staff-0000001394869297" n="1">
                         <layer xml:id="layer-0000000807917916" n="1">
@@ -1417,9 +1430,6 @@
                            <rest xml:id="rest-0000000486018049" dur="8" />
                         </layer>
                      </staff>
-                     <tempo xml:id="tempo-0000001962251543" place="above" staff="1" startid="#note-0000000137314231" midi.bpm="126.000000">
-                        <rend xml:id="rend-0000001603601338" fontweight="bold">Var. II.</rend>
-                     </tempo>
                   </measure>
                   <measure xml:id="measure-0000001625040002" n="41">
                      <staff xml:id="staff-0000001501780542" n="1">
@@ -1966,10 +1976,10 @@
                   <measure xml:id="measure-0000001192834115" n="55">
                      <staff xml:id="staff-0000000169213376" n="1">
                         <layer xml:id="layer-0000000436536033" n="1">
-                           <chord xml:id="chord-0000000484498569" dur="4" stem.dir="down">
-                              <note xml:id="note-0000001056968479" oct="4" pname="a" />
+                           <chord xml:id="chord-0000000484498569" dur="4" stem.dir="up">
+                              <note xml:id="note-0000001056968479" oct="4" pname="a"/>
                               <note xml:id="note-0000001856943406" oct="5" pname="c">
-                                 <accid xml:id="accid-0000000267982791" accid="n" />
+                                 <accid xml:id="accid-0000000267982791" accid="n"/>
                               </note>
                            </chord>
                            <note xml:id="note-0000000713560578" dur="8" oct="4" pname="d" stem.dir="up" />
@@ -2176,8 +2186,16 @@
                   </measure>
                   <pb xml:id="pb-0000000487458891" />
                </section>
-               <section xml:id="Var-III">
-                  <scoreDef xml:id="scoredef-0000000071467732" meter.count="6" meter.unit="8" />
+               <section xml:id="Var-III" restart="true">
+                  <scoreDef xml:id="scoredef-0000000071467732">
+                     <staffGrp xml:id="sb9tpyx">
+                        <label xml:id="l8yh84y">
+                           <rend xml:id="r1y2iyi" fontsize="120.00%" fontweight="bold">VAR. III.</rend>
+                        </label>
+                        <staffDef xml:id="s7srur5" n="1" lines="5" />
+                        <staffDef xml:id="s3v1y62" n="2" lines="5" />
+                     </staffGrp>
+                  </scoreDef>
                   <measure xml:id="measure-0000000853348693" metcon="false" n="60">
                      <staff xml:id="staff-0000000230833570" n="1">
                         <layer xml:id="layer-0000000304412858" n="1">
@@ -2189,9 +2207,6 @@
                            <rest xml:id="rest-0000001032712505" dur="8" />
                         </layer>
                      </staff>
-                     <tempo xml:id="tempo-0000000839426839" place="above" staff="1" startid="#note-0000000960857252" midi.bpm="126.000000">
-                        <rend xml:id="rend-0000001524863108" fontweight="bold">Var. III.</rend>
-                     </tempo>
                   </measure>
                   <measure xml:id="measure-0000000836236481" n="61">
                      <staff xml:id="staff-0000002088978518" n="1">
@@ -2827,11 +2842,18 @@
                         </layer>
                      </staff>
                   </measure>
-                  <scoreDef xml:id="scoredef-0000001228142668" key.sig="2f" />
                   <sb xml:id="sb-0000002044660882" />
                </section>
-               <section xml:id="Var-IV">
-                  <scoreDef xml:id="scoredef-0000000582124480" meter.count="6" meter.unit="8" />
+               <section xml:id="Var-IV" restart="true">
+                  <scoreDef xml:id="scoredef-0000000582124480" key.sig="2f" keysig.showchange="true">
+                     <staffGrp xml:id="sle5n58">
+                        <label xml:id="lrbnfr0">
+                           <rend xml:id="rf7hntp" fontsize="120.00%" fontweight="bold">VAR. IV.</rend>
+                        </label>
+                        <staffDef xml:id="s7srur5" n="1" lines="5" />
+                        <staffDef xml:id="s3v1y62" n="2" lines="5" />
+                     </staffGrp>
+                  </scoreDef>
                   <measure xml:id="measure-0000000601488703" metcon="false" n="80">
                      <staff xml:id="staff-0000001466221028" n="1">
                         <layer xml:id="layer-0000001036080766" n="1">
@@ -2843,9 +2865,6 @@
                            <rest xml:id="rest-0000000939962491" dur="8" />
                         </layer>
                      </staff>
-                     <tempo xml:id="tempo-0000001123543718" place="above" staff="1" startid="#note-0000001612024286" midi.bpm="96.000000">
-                        <rend xml:id="rend-0000001176540397" fontweight="bold">Var. IV.</rend>
-                     </tempo>
                      <tie xml:id="tie-0000000638484250" startid="#note-0000001612024286" endid="#note-0000000280289533" />
                      <slur xml:id="slur-0000000029005691" startid="#note-0000001612024286" endid="#note-0000000452047462" curvedir="above" />
                   </measure>
@@ -3579,11 +3598,18 @@
                      <slur xml:id="slur-0000002127347242" startid="#note-0000001598568916" endid="#note-0000000408636065" curvedir="above" />
                      <tie xml:id="tie-0000001191500250" startid="#note-0000000312731837" endid="#note-0000000259693475" />
                   </measure>
-                  <scoreDef xml:id="scoredef-0000000722623834" key.sig="1s" />
                   <sb xml:id="sb-0000001792601862" />
                </section>
-               <section xml:id="Var-V">
-                  <scoreDef xml:id="scoredef-0000002037535337" meter.count="6" meter.unit="8" />
+               <section xml:id="Var-V" restart="true">
+                  <scoreDef xml:id="scoredef-0000002037535337" key.sig="1s" keysig.showchange="true">
+                     <staffGrp xml:id="s5gke37">
+                        <label xml:id="l9b4xpg">
+                           <rend xml:id="rbsrvej" fontsize="120.00%" fontweight="bold">VAR. V.</rend>
+                        </label>
+                        <staffDef xml:id="s7srur5" n="1" lines="5" />
+                        <staffDef xml:id="s3v1y62" n="2" lines="5" />
+                     </staffGrp>
+                  </scoreDef>
                   <measure xml:id="measure-0000001533142326" metcon="false" n="100">
                      <staff xml:id="staff-0000001242096854" n="1">
                         <layer xml:id="layer-0000001082871551" n="1">
@@ -3599,9 +3625,6 @@
                            </chord>
                         </layer>
                      </staff>
-                     <tempo xml:id="tempo-0000001057680436" place="above" staff="1" startid="#rest-0000002045732979" midi.bpm="108.000000">
-                        <rend xml:id="rend-0000000244254149" fontweight="bold">Var. V.</rend>
-                     </tempo>
                   </measure>
                   <measure xml:id="measure-0000001513540441" n="101">
                      <staff xml:id="staff-0000001416611136" n="1">
@@ -4588,8 +4611,16 @@
                   </measure>
                   <pb xml:id="pb-0000001718236710" />
                </section>
-               <section xml:id="Var-VI">
-                  <scoreDef xml:id="scoredef-0000001191783761" meter.count="6" meter.unit="8" />
+               <section xml:id="Var-VI" restart="true">
+                  <scoreDef xml:id="scoredef-0000001191783761">
+                     <staffGrp xml:id="sywa7ck">
+                        <label xml:id="lwkspwn">
+                           <rend xml:id="r3tqc1s" fontsize="120.00%" fontweight="bold">VAR. VI.</rend>
+                        </label>
+                        <staffDef xml:id="s7srur5" n="1" lines="5" />
+                        <staffDef xml:id="s3v1y62" n="2" lines="5" />
+                     </staffGrp>
+                  </scoreDef>
                   <measure xml:id="measure-0000000396549766" metcon="false" n="120">
                      <staff xml:id="staff-0000000359053991" n="1">
                         <layer xml:id="layer-0000002020041103" n="1">
@@ -4604,9 +4635,6 @@
                            <rest xml:id="rest-0000001942057891" dur="8" />
                         </layer>
                      </staff>
-                     <tempo xml:id="tempo-0000001861618936" place="above" staff="1" startid="#note-0000001389211161" midi.bpm="126.000000">
-                        <rend xml:id="rend-0000000444259725" fontweight="bold">Var. VI.</rend>
-                     </tempo>
                   </measure>
                   <measure xml:id="measure-0000000563023284" n="121">
                      <staff xml:id="staff-0000000480018761" n="1">
@@ -6521,8 +6549,8 @@
                            <rest xml:id="rest-0000001035288182" dur="8" />
                         </layer>
                      </staff>
-                     <fermata xml:id="fermata-0000001249286044" staff="1" tstamp="5.000000" form="norm" place="above" />
-                     <fermata xml:id="fermata-0000001471625183" staff="2" tstamp="5.000000" form="norm" place="above" />
+                     <fermata xml:id="fermata-0000001249286044" staff="1" tstamp="5.500000" form="norm" place="above" />
+                     <fermata xml:id="fermata-0000001471625183" staff="2" tstamp="5.500000" form="norm" place="above" />
                   </measure>
                </section>
             </score>
