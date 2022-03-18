@@ -136,6 +136,7 @@
 
 #logTable {
   font-size: 8pt;
+  color: var(--textColor);
 }
 
 #logTable a {
