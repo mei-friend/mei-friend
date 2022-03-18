@@ -1,8 +1,8 @@
-import { 
+import {
   forkRepository,
   forkRepositoryCancel
 } from './fork-repository.js';
-import { 
+import {
   cm,
   github, // github instance
   handleEncoding,
@@ -16,35 +16,35 @@ import {
   v
 } from './main.js';
 import Github from './github.js'; // github class
-function forkRepo() { 
+function forkRepo() {
   forkRepository(github);
 }
 
-function forkRepoClicked() { 
+function forkRepoClicked() {
   let inputName = document.getElementById('forkRepositoryInputName').value
   let inputRepo = document.getElementById('forkRepositoryInputRepo').value
   let forkRepositoryStatus = document.querySelector("#forkRepositoryStatus");
-  let forkRepositoryToSelector= document.querySelector("#forkRepositoryToSelector");
-  if(inputName && inputRepo) { 
+  let forkRepositoryToSelector = document.querySelector("#forkRepositoryToSelector");
+  if (inputName && inputRepo) {
     let githubRepo = `${inputName}/${inputRepo}`;
     github.githubRepo = githubRepo;
     github.fork(() => {
-      forkRepositoryStatus.classList.remove("warn");
-      forkRepositoryStatus.innerHTML = "";
-      fillInRepoBranches();
-      forkRepositoryCancel();
-    }, forkRepositoryToSelector.value)
-      .catch((e) => { 
+        forkRepositoryStatus.classList.remove("warn");
+        forkRepositoryStatus.innerHTML = "";
+        fillInRepoBranches();
+        forkRepositoryCancel();
+      }, forkRepositoryToSelector.value)
+      .catch((e) => {
         forkRepositoryStatus.classList.add("warn");
         forkRepositoryStatus.innerHTML = "Sorry, couldn't fork repository";
-        if(typeof e === "object" && "status" in e) {
-          forkRepositoryStatus.innerHTML = 
+        if (typeof e === "object" && "status" in e) {
+          forkRepositoryStatus.innerHTML =
             e.status + " " + e.statusText;
-          if(e.status !== 404) {
+          if (e.status !== 404) {
             e.json().then((err) => {
-              if ('message' in err) 
-                forkRepositoryStatus.innerHTML += ". Github message: <i>" 
-                  + err.message + "</i>";
+              if ('message' in err)
+                forkRepositoryStatus.innerHTML += ". Github message: <i>" +
+                err.message + "</i>";
             })
           }
         }
@@ -52,26 +52,26 @@ function forkRepoClicked() {
   }
 }
 
-function forkRepoCancelClicked() { 
+function forkRepoCancelClicked() {
   let menuList = document.querySelectorAll(".dropdown-content");
   menuList.forEach((e) => e.classList.remove('show'));
   forkRepositoryCancel();
 };
 
-function repoHeaderClicked() { 
+function repoHeaderClicked() {
   github.filepath = "";
   refreshGithubMenu();
 }
 
-function branchesHeaderClicked(ev) { 
+function branchesHeaderClicked(ev) {
   github.filepath = "";
   fillInRepoBranches(ev.target);
 }
 
-function contentsHeaderClicked(ev) { 
+function contentsHeaderClicked(ev) {
   // strip trailing slash (in case our filepath is a subdir)
-  if(github.filepath.endsWith("/")) 
-    github.filepath = github.filepath.substr(0, github.filepath.length-1);
+  if (github.filepath.endsWith("/"))
+    github.filepath = github.filepath.substr(0, github.filepath.length - 1);
   //  retreat to previous slash (back one directory level)
   github.filepath = github.filepath.substr(0, github.filepath.lastIndexOf('/'));
   // if we've retreated past the root dir, restore it
@@ -87,7 +87,7 @@ function contentsHeaderClicked(ev) {
   });
 }
 
-function userRepoClicked(ev) { 
+function userRepoClicked(ev) {
   // re-init github object with selected repo
   const author = github.author;
   setGithubInstance(new Github(
@@ -102,7 +102,7 @@ function userRepoClicked(ev) {
   fillInRepoBranches(ev);
 }
 
-function repoBranchClicked(ev) { 
+function repoBranchClicked(ev) {
   const githubLoadingIndicator = document.getElementById("GithubLogo");
   github.branch = ev.target.innerText;
   github.filepath = "/";
@@ -116,9 +116,9 @@ function repoBranchClicked(ev) {
   });
 }
 
-function branchContentsDirClicked(ev) { 
+function branchContentsDirClicked(ev) {
   let target = ev.target;
-  if(!target.classList.contains("filepath")) { 
+  if (!target.classList.contains("filepath")) {
     // if user hasn't clicked directly on the filepath <span>, drill down to it
     target = target.querySelector(".filepath")
   }
@@ -130,9 +130,9 @@ function branchContentsDirClicked(ev) {
   fillInBranchContents(ev);
 }
 
-function branchContentsFileClicked(ev) { 
+function branchContentsFileClicked(ev) {
   const githubLoadingIndicator = document.getElementById("GithubLogo");
-  github.filepath += ev.target.innerText ;
+  github.filepath += ev.target.innerText;
   console.debug(`Loading file: https://github.com/${github.githubRepo}/${github.filepath}`);
   fillInBranchContents(ev);
   githubLoadingIndicator.classList.add("clockwise");
@@ -142,9 +142,9 @@ function branchContentsFileClicked(ev) {
     v.clear();
     v.updateNotation = false;
     setMeiFileInfo(
-      github.filepath,          // meiFileName
-      github.githubRepo,        // meiFileLocation
-      github.githubRepo + ":"   // meiFileLocationPrintable
+      github.filepath, // meiFileName
+      github.githubRepo, // meiFileLocation
+      github.githubRepo + ":" // meiFileLocationPrintable
     );
     handleEncoding(github.content);
     updateFileStatusDisplay();
@@ -178,12 +178,12 @@ function assignGithubMenuClickHandlers() {
 
   const forkRepositoryButton = document.getElementById('forkRepositoryButton');
   const forkRepositoryCancelButton = document.getElementById('forkRepositoryCancel');
-  if (forkRepositoryButton) { 
+  if (forkRepositoryButton) {
     forkRepositoryButton.removeEventListener('click', forkRepoClicked)
     forkRepositoryButton.addEventListener('click', forkRepoClicked)
   }
-  
-  if (forkRepositoryCancelButton) { 
+
+  if (forkRepositoryCancelButton) {
     forkRepositoryCancelButton.removeEventListener('click', forkRepoCancelClicked);
     forkRepositoryCancelButton.addEventListener('click', forkRepoCancelClicked);
   }
@@ -257,6 +257,7 @@ export async function fillInRepoBranches(e, per_page = 100, page = 1) {
   });
   // GitHub menu interactions
   assignGithubMenuClickHandlers();
+  v.setMenuColors();
 }
 
 export async function fillInBranchContents(e) {
@@ -280,8 +281,8 @@ export async function fillInBranchContents(e) {
     // clicked on file name -- operate on parent (list entry) instead
     target = e.target.parentNode;
   }
-  if (e && target && (target.classList.contains("repoBranch") || 
-      target.classList.contains("dir") || 
+  if (e && target && (target.classList.contains("repoBranch") ||
+      target.classList.contains("dir") ||
       target.getAttribute("id") === "contentsHeader")) {
     Array.from(branchContents).forEach((content) => {
       const isDir = content.type === "dir";
@@ -314,6 +315,7 @@ export async function fillInBranchContents(e) {
   fillInCommitLog("withRefresh");
   // GitHub menu interactions
   assignGithubMenuClickHandlers();
+  v.setMenuColors();
 }
 
 async function fillInCommitLog(refresh = false) {
