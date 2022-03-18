@@ -73,7 +73,7 @@ function contentsHeaderClicked(ev) {
   if (github.filepath.endsWith("/"))
     github.filepath = github.filepath.substr(0, github.filepath.length - 1);
   //  retreat to previous slash (back one directory level)
-  github.filepath = github.filepath.substr(0, github.filepath.lastIndexOf('/'));
+  github.filepath = github.filepath.substr(0, github.filepath.lastIndexOf('/') + 1);
   // if we've retreated past the root dir, restore it
   github.filepath = github.filepath.length === 0 ? "/" : github.filepath;
   const githubLoadingIndicator = document.getElementById("GithubLogo");
