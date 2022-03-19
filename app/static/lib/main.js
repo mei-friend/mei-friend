@@ -1227,7 +1227,6 @@ export function log(s) {
 }
 
 function fillInSampleEncodings() { 
-  console.log("LOADIng CSV");
   fetch(sampleEncodingsCSV, {headers: {'content-type':'text/csv'}})
     .then((response) => response.text())
     .then((csv) => {
@@ -1243,7 +1242,6 @@ function fillInSampleEncodings() {
               tuple[samp.TITLE],
               tuple[samp.COMPOSER]
           ])
-          console.log("ADFASDFA:", tuple.length, tuple[5])
         }
       })
     })

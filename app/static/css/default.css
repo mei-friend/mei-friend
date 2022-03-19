@@ -185,6 +185,19 @@ a:active {
   width: 70%;
 }
 
+.openUrlOverlay .openUrlUI details { 
+  cursor: pointer;
+  margin-bottom: 1em;
+}
+
+.openUrlOverlay .openUrlUI details div div { 
+  padding: 10px 15px;
+}
+
+.openUrlOverlay .openUrlUI details>div {
+  margin-left: 1em;
+}
+
 .openUrlOverlay select { 
   text-align:left;
 }

@@ -11,13 +11,40 @@ function fillInSampleUrl(e) {
     e.target.value;
 }
 
+function fillInComposerEncodings(e) { 
+  let fc = document.querySelector('.openUrlOverlay');
+  let composerSelector = fc.querySelector("#sampleEncodingsComposer")
+  let encodingSelector = fc.querySelector("#sampleEncodingsEncoding")
+  encodingSelector.innerHTML = "";
+  const dummyOpt = document.createElement('option')
+  dummyOpt.text = "Choose a sample encoding...";
+  dummyOpt.value = "";
+  dummyOpt.classList.add("sampleEntry");
+  encodingSelector.appendChild(dummyOpt)
+  let composer = e.target.value;
+  if(composer) { 
+    const composerEntries  = sampleEncodings.filter((s) => s[samp.COMPOSER] === composer);
+    // alphabetically by work title
+    composerEntries.sort((a,b) => a[samp.TITLE] - b[samp.TITLE]).forEach(e => {
+      const entryOpt = document.createElement('option');
+      entryOpt.text =  e[samp.TITLE] + " - " + e[samp.FILE];
+      entryOpt.value = e[samp.URL]
+      entryOpt.classList.add("sampleEntry");
+      encodingSelector.appendChild(entryOpt);
+    })
+  } else {
+    fillInSampleUrl(e); // clear input when no composer selected
+  }
+}
+
 export function openUrl() {
   let sz = calcSizeOfContainer();
   let fc = document.querySelector('.openUrlOverlay');
   fc.width = sz.width * .25;
   fc.height = sz.height * .25;
   fc.style.display = "block";
-  let sampleEncodingsSelector = fc.querySelector("#sampleEncodings")
+  let composerSelector = fc.querySelector("#sampleEncodingsComposer")
+  let encodingSelector = fc.querySelector("#sampleEncodingsEncoding")
   // arrange by composer
   let byComposer = {};
   sampleEncodings.forEach(s => {
@@ -29,32 +56,24 @@ export function openUrl() {
   })
 
   const dummyOpt = document.createElement('option')
-  dummyOpt.text = "Choose a sample encoding...";
+  dummyOpt.text = "Choose a composer...";
   dummyOpt.value = "";
   dummyOpt.classList.add("sampleEntry");
-  sampleEncodingsSelector.appendChild(dummyOpt)
+  composerSelector.appendChild(dummyOpt)
 
   // alphabetically by composer...
   Object.keys(byComposer).sort().forEach( c => {
-    /*
     const composerOpt = document.createElement('option');
-    composerOpt.text = byComposer[c][samp.COMPOSER];
-    composerOpt.value = byComposer[c][samp.COMPOSER];
-    sampleEncodingsSelector.appendChild(composerOpt);
-    */
-    const composerEntries  = byComposer[c];
-    // alphabetically by work title
-    composerEntries.sort((a,b) => a[samp.TITLE] - b[samp.TITLE]).forEach(e => {
-      const entryOpt = document.createElement('option');
-      entryOpt.text = e[samp.COMPOSER]+ ": " + 
-        e[samp.TITLE] + " - " + e[samp.FILE];
-      entryOpt.value = e[samp.URL]
-      entryOpt.classList.add("sampleEntry");
-      sampleEncodingsSelector.appendChild(entryOpt);
-    })
+    composerOpt.text = c;
+    composerOpt.value = c;
+    composerSelector.appendChild(composerOpt);
   })
-  sampleEncodingsSelector.removeEventListener("change", fillInSampleUrl);
-  sampleEncodingsSelector.addEventListener("change", fillInSampleUrl);
+
+  composerSelector.removeEventListener("change", fillInComposerEncodings)
+  composerSelector.addEventListener("change", fillInComposerEncodings)
+
+  encodingSelector.removeEventListener("change", fillInSampleUrl);
+  encodingSelector.addEventListener("change", fillInSampleUrl);
 }
 
 export function openUrlCancel() {
