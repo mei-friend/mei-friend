@@ -331,7 +331,7 @@ export default class Github {
               if(res.status <= 400) res.json()
               else throw res
             })
-            .then(async(userFork) => { 
+            .then((userFork) => { 
                 // now switch to it
                 this.githubRepo = userFork.full_name;
             });

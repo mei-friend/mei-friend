@@ -133,3 +133,4 @@
 * Fallback to login name when username unavailable for commits
 * Implement handleEncoding pipeline when reading from Github
 * Upgrade Python Authlib dependency to fix OAuth CSRF issue
+# 0.3.9 patch
