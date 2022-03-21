@@ -30,7 +30,8 @@ export function addDragSelector(v, vp) {
     v.selectedElements.forEach(el => oldEls.push(el)); // remember selected els
     // create selection rectangle
     rect = document.createElementNS(svgNS, 'rect');
-    document.querySelector('g.page-margin').appendChild(rect);
+    let pm = document.querySelector('g.page-margin');
+    if (pm) pm.appendChild(rect);
 
     // remember click/mousedown point
     start.x = ev.clientX + vp.scrollLeft;
@@ -151,7 +152,8 @@ export function addDragSelector(v, vp) {
   vp.addEventListener('mouseup', () => {
     dragging = false;
     let svgPm = document.querySelector('g.page-margin');
-    if (Array.from(svgPm.childNodes).includes(rect)) svgPm.removeChild(rect);
+    if (svgPm && Array.from(svgPm.childNodes).includes(rect))
+      svgPm.removeChild(rect);
     oldEls = [];
   });
 
