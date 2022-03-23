@@ -852,6 +852,7 @@ let cmd = {
   'openUrl': () => openUrl(),
   'openUrlFetch': () => openUrlFetch(),
   'openUrlCancel': () => openUrlCancel(),
+  'openExample': () => openUrl(true),
   'openMusicXml': () => openFileDialog('.xml,.musicxml,.mxl'),
   'openHumdrum': () => openFileDialog('.krn,.hum'),
   'openPae': () => openFileDialog('.pae,.abc'),
@@ -956,6 +957,7 @@ function addEventListeners(v, cm) {
   // open dialogs
   document.getElementById('OpenMei').addEventListener('click', cmd.open);
   document.getElementById('OpenUrl').addEventListener('click', cmd.openUrl);
+  document.getElementById('OpenExample').addEventListener('click', cmd.openExample);
   document.getElementById('ImportMusicXml').addEventListener('click', cmd.openMusicXml);
   document.getElementById('ImportHumdrum').addEventListener('click', cmd.openHumdrum);
   document.getElementById('ImportPae').addEventListener('click', cmd.openPae);

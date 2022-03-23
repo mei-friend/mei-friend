@@ -37,14 +37,25 @@ function fillInComposerEncodings(e) {
   }
 }
 
-export function openUrl() {
+export function openUrl(showSamples = false) {
   let sz = calcSizeOfContainer();
   let fc = document.querySelector('.openUrlOverlay');
   fc.width = sz.width * .25;
   fc.height = sz.height * .25;
   fc.style.display = "block";
-  let composerSelector = fc.querySelector("#sampleEncodingsComposer")
-  let encodingSelector = fc.querySelector("#sampleEncodingsEncoding")
+  let sampleEncodingsDetails = fc.querySelector("details");
+  let popupHeader = fc.querySelector("h3");
+  if(showSamples) {
+    popupHeader.innerText = "Open sample encoding";
+    sampleEncodingsDetails.setAttribute("open", "");
+  } else { 
+    popupHeader.innerText = "Open Web-hosted encoding by URL";
+    sampleEncodingsDetails.removeAttribute("open");
+  }
+  let composerSelector = fc.querySelector("#sampleEncodingsComposer");
+  composerSelector.innerHTML = "";
+  let encodingSelector = fc.querySelector("#sampleEncodingsEncoding");
+  encodingSelector.innerHTML = '<option value="">Choose a sample encoding...</option>';
   // arrange by composer
   let byComposer = {};
   sampleEncodings.forEach(s => {
