@@ -6,6 +6,8 @@ import {
   samp
 } from './main.js';
 
+const seperator = "|MEI-FRIEND|"; 
+
 function onSelectComposer(e) { 
   const orgSelector = document.querySelector("#forkRepertoireOrganization");
   orgSelector.innerHTML = '<option value="">All GitHub users and organizations</option>';
@@ -14,6 +16,8 @@ function onSelectComposer(e) {
   const repoSelector = document.querySelector("#forkRepertoireRepository");
   // clear repository selector
   repoSelector.innerHTML = '<option value="">Choose a repository</option>';
+  repoSelector.removeEventListener("change", onSelectRepository);
+  repoSelector.addEventListener("change", onSelectRepository);
   let composer = false;
   if(e) { 
     composer = e.target.value;
@@ -25,12 +29,12 @@ function onSelectComposer(e) {
     const composerEntries  = sampleEncodings.filter((s) => s[samp.COMPOSER] === composer);
     composerEntries.forEach( s => { 
       orgs.add(s[samp.ORG]); 
-      repos.add(s[samp.REPO]);
+      repos.add(s[samp.ORG] + seperator + s[samp.REPO]);
     })
   } else { 
     sampleEncodings.forEach( s => { 
       orgs.add(s[samp.ORG]); 
-      repos.add(s[samp.REPO]);
+      repos.add(s[samp.ORG] + seperator + s[samp.REPO]);
     })
     console.log("INITIALISED: ", repos, orgs)
   }
@@ -42,7 +46,7 @@ function onSelectComposer(e) {
   });
   Array.from(repos).sort().forEach(r => { 
     let repoOpt = document.createElement('option');
-    repoOpt.text = r;
+    repoOpt.text = r.split(seperator)[1];
     repoOpt.value = r;
     repoSelector.appendChild(repoOpt);
   });
@@ -52,6 +56,8 @@ function onSelectOrganization(e) {
   // clear repository selector
   const repoSelector = document.querySelector("#forkRepertoireRepository");
   repoSelector.innerHTML = '<option value="">Choose a repository</option>';
+  repoSelector.removeEventListener("change", onSelectRepository);
+  repoSelector.addEventListener("change", onSelectRepository);
   let githubOrg;
   let repos = new Set();
   if(e) {
@@ -60,24 +66,32 @@ function onSelectOrganization(e) {
   if(githubOrg) { 
     const orgEntries  = sampleEncodings.filter((s) => s[samp.ORG] === githubOrg);
     orgEntries.forEach( s => { 
-      repos.add(s[samp.REPO]);
+      repos.add(s[samp.ORG] + seperator + s[samp.REPO]);
     })
   } else { 
     sampleEncodings.forEach( s=> { 
-      repos.add(s[samp.REPO]);
+      repos.add(s[samp.ORG] + seperator + s[samp.REPO]);
     })
   }
-  console.log("REPOS: ", repos);
   Array.from(repos).sort().forEach(r => { 
     let repoOpt = document.createElement('option');
-    repoOpt.text = r;
+    repoOpt.text = r.split(seperator)[1];
     repoOpt.value = r;
     repoSelector.appendChild(repoOpt);
   });
-
-
-
 }
+
+function onSelectRepository(e) {
+  console.log("REPO SELECTED: ", e)
+  if(e.target.value) { 
+    const orgRepo = e.target.value.split(seperator);
+    const orgInput = document.querySelector("#forkRepositoryInputName")
+    const repoInput = document.querySelector("#forkRepositoryInputRepo");
+    orgInput.value = orgRepo[0];
+    repoInput.value = orgRepo[1];
+  }
+}
+
 
 export function forkRepository(github) {
   let sz = calcSizeOfContainer();
@@ -104,6 +118,8 @@ export function forkRepository(github) {
   composerSelector.addEventListener("change", onSelectComposer);
   organizationSelector.removeEventListener("change", onSelectOrganization);
   organizationSelector.addEventListener("change", onSelectOrganization);
+  repositorySelector.removeEventListener("change", onSelectRepository);
+  repositorySelector.addEventListener("change", onSelectRepository);
 
   onSelectComposer(); // initialise
 
