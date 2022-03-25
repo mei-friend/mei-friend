@@ -160,7 +160,8 @@ a:active {
   z-index: 190;
 }
 
-.openUrlOverlay .openUrlUI {
+.openUrlOverlay .openUrlUI, 
+.forkRepositoryOverlay .forkRepositoryUI {
   position: absolute;
   top: 20%;
   left: 20%;
@@ -173,7 +174,8 @@ a:active {
   z-index: 190;
 }
 
-.openUrlOverlay .openUrlUI>div {
+.openUrlOverlay .openUrlUI>div, 
+.forkRepositoryOverlay .forkRepositoryUI>div {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -181,24 +183,30 @@ a:active {
   transform: translate(-50%, -50%);
 }
 
-.openUrlOverlay .openUrlUI input {
-  width: 70%;
-}
-
-.openUrlOverlay .openUrlUI details { 
+.openUrlOverlay .openUrlUI details,
+.forkRepositoryOverlay .forkRepositoryUI details { 
   cursor: pointer;
   margin-bottom: 1em;
 }
 
-.openUrlOverlay .openUrlUI details div div { 
-  padding: 10px 15px;
-}
-
-.openUrlOverlay .openUrlUI details>div {
+.openUrlOverlay .openUrlUI details>div ,
+.forkRepositoryOverlay .forkRepositoryUI details>div {
   margin-left: 1em;
 }
 
-.openUrlOverlay select { 
+.openUrlOverlay .openUrlUI input {
+  width: 70%;
+}
+
+
+.openUrlOverlay .openUrlUI details div div , 
+.forkRepositoryOverlay .forkRepositoryUI details div div { 
+  padding: 10px 15px;
+}
+
+
+.openUrlOverlay select, 
+.forkRepositoryOverlay select { 
   text-align:left;
 }
 
@@ -226,27 +234,6 @@ a:active {
   bottom: 0;
   background-color: rgba(0, 0, 0, .8);
   z-index: 190;
-}
-
-.forkRepositoryOverlay .forkRepositoryUI {
-  position: absolute;
-  top: 20%;
-  left: 20%;
-  width: 60%;
-  height: 60%;
-  border: 5px solid var(--overlayBorderColor);
-  border-radius: 32px;
-  background-color: var(--overlayBackgroundColor);
-  color: var(--overlayTextColor);
-  z-index: 190;
-}
-
-.forkRepositoryOverlay .forkRepositoryUI>div {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 80%;
-  transform: translate(-50%, -50%);
 }
 
 .forkRepositoryOverlay .forkRepositoryUI input {
