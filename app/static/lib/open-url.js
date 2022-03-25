@@ -17,7 +17,7 @@ function fillInComposerEncodings(e) {
   let encodingSelector = fc.querySelector("#sampleEncodingsEncoding")
   encodingSelector.innerHTML = "";
   const dummyOpt = document.createElement('option')
-  dummyOpt.text = "Choose a sample encoding...";
+  dummyOpt.text = "Choose an encoding...";
   dummyOpt.value = "";
   dummyOpt.classList.add("sampleEntry");
   encodingSelector.appendChild(dummyOpt)
@@ -46,7 +46,7 @@ export function openUrl(showSamples = false) {
   let sampleEncodingsDetails = fc.querySelector("details");
   let popupHeader = fc.querySelector("h3");
   if(showSamples) {
-    popupHeader.innerText = "Open sample encoding";
+    popupHeader.innerText = "Public repertoire";
     sampleEncodingsDetails.setAttribute("open", "");
   } else { 
     popupHeader.innerText = "Open Web-hosted encoding by URL";
@@ -55,7 +55,7 @@ export function openUrl(showSamples = false) {
   let composerSelector = fc.querySelector("#sampleEncodingsComposer");
   composerSelector.innerHTML = "";
   let encodingSelector = fc.querySelector("#sampleEncodingsEncoding");
-  encodingSelector.innerHTML = '<option value="">Choose a sample encoding...</option>';
+  encodingSelector.innerHTML = '<option value="">Choose an encoding...</option>';
   // arrange by composer
   let byComposer = {};
   sampleEncodings.forEach(s => {

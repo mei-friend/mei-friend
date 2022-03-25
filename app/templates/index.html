@@ -130,7 +130,7 @@
         <div class="dropdown-content" id="FileMenu">
           <a id="OpenMei" href="#">Open file<span class="keyShortCut cmdKey">O</span></a>
           <a id="OpenUrl" href="#">Open URL</a>
-          <a id="OpenExample" href="#">Open Example</a>
+          <a id="OpenExample" href="#">Public repertoire</a>
           <a id="ImportMusicXml" href="#">Import MusicXML</a>
           <a id="ImportHumdrum" href="#">Import Humdrum</a>
           <a id="ImportPae" href="#">Import PAE, ABC</a>
@@ -264,9 +264,9 @@
       <div class="openUrlUI">
         <div id="openUrlUIGrouping">
           <h3>Open Web-hosted encoding by URL</h3>
-          <p id="openUrlInstructions">Please choose a sample encoding or enter the URL of a Web-hosted music encoding, below. Note: Host server must support cross-origin resource sharing (CORS).</p>
+          <p id="openUrlInstructions">Please choose from the public repertoire or enter the URL of a Web-hosted music encoding, below. Note: Host server must support cross-origin resource sharing (CORS).</p>
           <details>
-            <summary>Load sample encoding</summary>
+            <summary>Public repertoire</summary>
             <div>
               <div>
                 <label for="sampleEncodingsComposer">Composer:</label>
@@ -275,7 +275,7 @@
               <div>
                 <label for="sampleEncodingsEncoding">Encoding:</label>
                 <select id="sampleEncodingsEncoding" name="sampleEncodingsEncoding">
-                  <option value="">Choose a sample encoding...</option>
+                  <option value="">Choose an encoding...</option>
                 </select>
               </div>
             </div>
@@ -295,6 +295,27 @@
           <h3>Fork Github Repository</h3>
           <p id="forkRepositoryInstructions">Please enter the Github (user or organization) name and the repository name of a Github-hosted repository, below. The repository will be forked to the currently logged in Github user, and become available
             from the Github menu.</p>
+          <details>
+            <summary>Public repertoire</summary>
+            <div>
+              <div>
+                <label for="forkRepertoireComposer">Composer:</label>
+                <select id="forkRepertoireComposer" name="forkRepertoireComposer"></select>
+              </div>
+              <div>
+                <label for="forkRepertoireOrganization">Organization:</label>
+                <select id="forkRepertoireOrganization" name="forkRepertoireOrganization">
+                  <option value="">Choose a GitHub Organization...</option>
+                </select>
+              </div>
+              <div>
+                <label for="forkRepertoireRepository">Repository:</label>
+                <select id="forkRepertoireRepository" name="forkRepertoireRepository">
+                  <option value="">Choose an encoding...</option>
+                </select>
+              </div>
+            </div>
+          </details>
           <div id="forkRepositoryInputWrapper">
             <input id="forkRepositoryInputName" type="text" placeholder="Github user or organization" onkeydown="(e) => {
                     console.log('KEYDOWN: ', e);
