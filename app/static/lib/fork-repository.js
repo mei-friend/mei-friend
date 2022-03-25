@@ -8,6 +8,9 @@ import {
 
 function onSelectComposer(e) { 
   const orgSelector = document.querySelector("#forkRepertoireOrganization");
+  orgSelector.innerHTML = '<option value="">All GitHub users and organizations</option>';
+  orgSelector.removeEventListener("change", onSelectOrganization);
+  orgSelector.addEventListener("change", onSelectOrganization);
   const repoSelector = document.querySelector("#forkRepertoireRepository");
   // clear repository selector
   repoSelector.innerHTML = '<option value="">Choose a repository</option>';
@@ -29,6 +32,7 @@ function onSelectComposer(e) {
       orgs.add(s[samp.ORG]); 
       repos.add(s[samp.REPO]);
     })
+    console.log("INITIALISED: ", repos, orgs)
   }
   Array.from(orgs).sort().forEach(o => {
     let orgOpt = document.createElement('option');
@@ -42,6 +46,37 @@ function onSelectComposer(e) {
     repoOpt.value = r;
     repoSelector.appendChild(repoOpt);
   });
+}
+
+function onSelectOrganization(e) { 
+  // clear repository selector
+  const repoSelector = document.querySelector("#forkRepertoireRepository");
+  repoSelector.innerHTML = '<option value="">Choose a repository</option>';
+  let githubOrg;
+  let repos = new Set();
+  if(e) {
+    githubOrg = e.target.value;
+  } 
+  if(githubOrg) { 
+    const orgEntries  = sampleEncodings.filter((s) => s[samp.ORG] === githubOrg);
+    orgEntries.forEach( s => { 
+      repos.add(s[samp.REPO]);
+    })
+  } else { 
+    sampleEncodings.forEach( s=> { 
+      repos.add(s[samp.REPO]);
+    })
+  }
+  console.log("REPOS: ", repos);
+  Array.from(repos).sort().forEach(r => { 
+    let repoOpt = document.createElement('option');
+    repoOpt.text = r;
+    repoOpt.value = r;
+    repoSelector.appendChild(repoOpt);
+  });
+
+
+
 }
 
 export function forkRepository(github) {
@@ -69,6 +104,8 @@ export function forkRepository(github) {
   composerSelector.addEventListener("change", onSelectComposer);
   organizationSelector.removeEventListener("change", onSelectOrganization);
   organizationSelector.addEventListener("change", onSelectOrganization);
+
+  onSelectComposer(); // initialise
 
   // forkToSelector: User's options as to where to fork the repository to
   forkToSelector.innerHTML = `<option value="${github.userLogin}">${github.userLogin}</option>`
