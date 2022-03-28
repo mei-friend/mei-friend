@@ -147,9 +147,14 @@
   background-color: var(--settingsBackgroundAlternativeColor);
 }
 
-#GithubLogo {
+#GithubLogo, #forkRepoGithubLogo {
   height: .8em;
   margin-right: .2em;
+}
+
+#forkRepoGithubLogo { 
+  vertical-align: Baseline;
+  filter: invert(1);
 }
 
 @keyframes spinning {

@@ -28,6 +28,7 @@ function forkRepoClicked() {
   if (inputName && inputRepo) {
     let githubRepo = `${inputName}/${inputRepo}`;
     github.githubRepo = githubRepo;
+    document.getElementById("forkRepoGithubLogo").classList.add("clockwise");
     github.fork(() => {
         forkRepositoryStatus.classList.remove("warn");
         forkRepositoryStatus.innerHTML = "";
@@ -48,7 +49,10 @@ function forkRepoClicked() {
             })
           }
         }
-      });
+      }).finally(() => 
+          document.getElementById("forkRepoGithubLogo")
+            .classList.remove("clockwise")
+      )
   }
 }
 
