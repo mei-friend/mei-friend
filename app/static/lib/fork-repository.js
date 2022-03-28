@@ -3,19 +3,30 @@ import {
 } from './resizer.js';
 import { 
   sampleEncodings,
-  samp
+  samp, 
+  github
 } from './main.js';
 
 const seperator = "|MEI-FRIEND|"; 
 
+function onOrganizationInputChange(e) { 
+  console.log("CHANGE: ", e)
+  if(e.target.value) { 
+    const userOrgRepos = document.getElementById("forkRepositoryInputRepo");
+    userOrgRepos.innerHTML = '<option value="" disabled selected hidden>Choose a repository</option>';
+    document.getElementById("forkRepoGithubLogo").classList.add("clockwise");
+    let repos = fillInUserOrgRepos();
+  }
+}
+
 function onSelectComposer(e) { 
   const orgSelector = document.querySelector("#forkRepertoireOrganization");
-  orgSelector.innerHTML = '<option value="">All GitHub users and organizations</option>';
+  orgSelector.innerHTML = '<option value="" >All GitHub users and organizations</option>';
   orgSelector.removeEventListener("change", onSelectOrganization);
   orgSelector.addEventListener("change", onSelectOrganization);
   const repoSelector = document.querySelector("#forkRepertoireRepository");
   // clear repository selector
-  repoSelector.innerHTML = '<option value="">Choose a repository</option>';
+  repoSelector.innerHTML = '<option value="" disabled selected hidden>Choose a repository</option>';
   repoSelector.removeEventListener("change", onSelectRepository);
   repoSelector.addEventListener("change", onSelectRepository);
   let composer = false;
@@ -52,7 +63,43 @@ function onSelectComposer(e) {
   });
 }
 
+async function fillInUserOrgRepos(per_page = 30, page = 1) {
+  // read a page of repos from the specified user or organisation
+  // add it to the repository drop-down,
+  // recursing to fetch next page, if applicable
+  const userOrg = document.getElementById("forkRepositoryInputName").value;
+  const repertoireRepo = document.getElementById("forkRepertoireRepository");
+  const userOrgRepos = document.getElementById("forkRepositoryInputRepo");
+  const status = document.getElementById("forkRepositoryStatus");
+  status.innerText = "";
+  status.style.visibility = "hidden";
+  if(userOrg) { // user or org specified
+    const prevRepos = userOrgRepos.childNodes;
+    const repos = await github.getSpecifiedUserOrgRepos(userOrg, per_page, page);
+    if(Array.isArray(repos)) { 
+      repos.forEach((repo) => {
+        const repoOpt = document.createElement("option");
+        repoOpt.text = repo.name;
+        repoOpt.value = repo.name;
+        userOrgRepos.appendChild(repoOpt);
+      });
+      if(repos.length && repos.length === per_page) { 
+        // there may be more repos on the next page
+        fillInUserOrgRepos(per_page, page+1);
+      } 
+    } else if("message" in repos) { 
+      status.innerText = "GitHub says: " + repos["message"];
+      status.style.visibility = "visible";
+    } else { 
+      status.innerText = "Could not access repositories for supplied user or organization";
+      status.style.visibility = "visible";
+    }
+  }
+  document.getElementById("forkRepoGithubLogo").classList.remove("clockwise");
+}
+
 function onSelectOrganization(e) { 
+  const orgInput = document.querySelector("#forkRepositoryInputName")
   // clear repository selector
   const repoSelector = document.querySelector("#forkRepertoireRepository");
   repoSelector.innerHTML = '<option value="">Choose a repository</option>';
@@ -62,6 +109,8 @@ function onSelectOrganization(e) {
   let repos = new Set();
   if(e) {
     githubOrg = e.target.value;
+    orgInput.value = e.target.value;
+    orgInput.dispatchEvent(new Event("change"));
   } 
   if(githubOrg) { 
     const orgEntries  = sampleEncodings.filter((s) => s[samp.ORG] === githubOrg);
@@ -82,7 +131,6 @@ function onSelectOrganization(e) {
 }
 
 function onSelectRepository(e) {
-  console.log("REPO SELECTED: ", e)
   if(e.target.value) { 
     const orgRepo = e.target.value.split(seperator);
     const orgInput = document.querySelector("#forkRepositoryInputName")
@@ -99,13 +147,16 @@ export function forkRepository(github) {
   fc.width = sz.width * .25;
   fc.height = sz.height * .25;
   fc.style.display = "block";
-  let forkToSelector = document.querySelector("#forkRepositoryToSelector");
+  // public repertoire selectors:
   let composerSelector = document.querySelector("#forkRepertoireComposer");
   let organizationSelector = document.querySelector("#forkRepertoireOrganization");
   let repositorySelector = document.querySelector("#forkRepertoireRepository");
-
+  // fork UI:
+  let organizationNameInput = document.querySelector("#forkRepositoryInputName");
+  let forkRepoSelector = document.querySelector("#forkRepositoryInputRepo");
+  let forkToSelector = document.querySelector("#forkRepositoryToSelector");
   // initialise public repertoire dropdowns
-  composerSelector.innerHTML = '<option value="">All composers</option>';
+  composerSelector.innerHTML = '<option value="" >All composers</option>';
   let composers = new Set(sampleEncodings.map(s => s[samp.COMPOSER]));
   Array.from(composers).sort().forEach(c => {
     let composerOpt = document.createElement('option');
@@ -120,6 +171,8 @@ export function forkRepository(github) {
   organizationSelector.addEventListener("change", onSelectOrganization);
   repositorySelector.removeEventListener("change", onSelectRepository);
   repositorySelector.addEventListener("change", onSelectRepository);
+  organizationNameInput.removeEventListener("change", onOrganizationInputChange);
+  organizationNameInput.addEventListener("change", onOrganizationInputChange);
 
   onSelectComposer(); // initialise
 
@@ -131,7 +184,12 @@ export function forkRepository(github) {
       forkToSelector.innerHTML += `<option value="${orgName}">${orgName}</option>`;
     } 
     catch(e) { console.error("Can't add organization to selector: ", org, e) };
-  })); 
+  }));
+
+  if(organizationNameInput.value.length) {
+    document.getElementById("forkRepoGithubLogo").classList.add("clockwise");
+    fillInUserOrgRepos(); // initialise with pre-supplied name
+  }
 }
 
 export function forkRepositoryCancel() {

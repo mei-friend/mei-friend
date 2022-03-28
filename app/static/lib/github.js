@@ -366,6 +366,14 @@ export default class Github {
     }
   }
 
+  async getSpecifiedUserOrgRepos(userOrg, per_page=30, page=1) { 
+    const reposUrl = `https://api.github.com/users/${userOrg}/repos?per_page=${per_page}&page=${page}`;
+    return fetch(reposUrl, {
+      method: 'GET',
+      headers: this.apiHeaders
+    }).then(res => res.json())
+  }
+
   async getUserRepos(per_page=30, page=1) { 
     const reposUrl = `https://api.github.com/user/repos?per_page=${per_page}&page=${page}`;
     return fetch(reposUrl, {

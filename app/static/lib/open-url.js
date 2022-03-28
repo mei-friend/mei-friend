@@ -20,6 +20,9 @@ function fillInComposerEncodings(e) {
   dummyOpt.text = "Choose an encoding...";
   dummyOpt.value = "";
   dummyOpt.classList.add("sampleEntry");
+  dummyOpt.setAttribute("selected", "");
+  dummyOpt.setAttribute("disabled", "");
+  dummyOpt.setAttribute("hidden", "");
   encodingSelector.appendChild(dummyOpt)
   let composer = e.target.value;
   if(composer) { 
@@ -70,6 +73,9 @@ export function openUrl(showSamples = false) {
   dummyOpt.text = "Choose a composer...";
   dummyOpt.value = "";
   dummyOpt.classList.add("sampleEntry");
+  dummyOpt.setAttribute("selected", "");
+  dummyOpt.setAttribute("disabled", "");
+  dummyOpt.setAttribute("hidden", "");
   composerSelector.appendChild(dummyOpt)
 
   // alphabetically by composer...
