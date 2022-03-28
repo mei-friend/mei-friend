@@ -71,8 +71,8 @@ async function fillInUserOrgRepos(per_page = 30, page = 1) {
   const repertoireRepo = document.getElementById("forkRepertoireRepository");
   const userOrgRepos = document.getElementById("forkRepositoryInputRepo");
   const status = document.getElementById("forkRepositoryStatus");
-  status.innerText = "";
-  status.style.visibility = "hidden";
+  status.classList.remove("warn");
+  status.innerHTML = "";
   if(userOrg) { // user or org specified
     const prevRepos = userOrgRepos.childNodes;
     const repos = await github.getSpecifiedUserOrgRepos(userOrg, per_page, page);
@@ -86,16 +86,20 @@ async function fillInUserOrgRepos(per_page = 30, page = 1) {
       if(repos.length && repos.length === per_page) { 
         // there may be more repos on the next page
         fillInUserOrgRepos(per_page, page+1);
-      } 
-    } else if("message" in repos) { 
-      status.innerText = "GitHub says: " + repos["message"];
-      status.style.visibility = "visible";
+      } else { 
+        // finished!
+        document.getElementById("forkRepoGithubLogo").classList.remove("clockwise");
+      }
     } else { 
-      status.innerText = "Could not access repositories for supplied user or organization";
-      status.style.visibility = "visible";
+      // give up!
+      document.getElementById("forkRepoGithubLogo").classList.remove("clockwise");
+      status.innerHTML = "Sorry, can't access repositories for supplied user" + 
+        " or organization.";
+      if("message" in repos) { 
+        status.innerHTML += " GitHub message: <i>" + repos["message"] + "</i>";
+      }   
     }
   }
-  document.getElementById("forkRepoGithubLogo").classList.remove("clockwise");
 }
 
 function onSelectOrganization(e) { 

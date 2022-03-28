@@ -328,13 +328,14 @@ export default class Github {
           }
           await fetch(forksUrl, fetchRequestObject)
             .then(res => { 
-              if(res.status <= 400) res.json()
-              else throw res
+              if(res.status <= 400) {
+                res.json().then(userFork => { 
+                  // switch to newly created fork
+                  this.githubRepo = userFork.full_name; 
+                })
+              }
+              else throw res;
             })
-            .then((userFork) => { 
-                // now switch to it
-                this.githubRepo = userFork.full_name;
-            });
         } else { 
           this.githubRepo = userFork.full_name;
         }
