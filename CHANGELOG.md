@@ -133,3 +133,8 @@
 * Fallback to login name when username unavailable for commits
 * Implement handleEncoding pipeline when reading from Github
 * Upgrade Python Authlib dependency to fix OAuth CSRF issue
+# 0.3.9 patch: Public repertoire
+* Introduce CSV file listing public MEI repertoire (patches welcome!)
+* Add mechanisms to access this repertoire, via fork or via Open URL
+* Add 'Public repertoire' menu point as an alternate entry route for Open URL
+* Fix bug that was preventing initial fork attempts from displaying success

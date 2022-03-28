@@ -328,13 +328,14 @@ export default class Github {
           }
           await fetch(forksUrl, fetchRequestObject)
             .then(res => { 
-              if(res.status <= 400) res.json()
-              else throw res
+              if(res.status <= 400) {
+                res.json().then(userFork => { 
+                  // switch to newly created fork
+                  this.githubRepo = userFork.full_name; 
+                })
+              }
+              else throw res;
             })
-            .then((userFork) => { 
-                // now switch to it
-                this.githubRepo = userFork.full_name;
-            });
         } else { 
           this.githubRepo = userFork.full_name;
         }
@@ -364,6 +365,14 @@ export default class Github {
     } else { 
       console.warn("Attempted to create pull-request but repo is not a fork");
     }
+  }
+
+  async getSpecifiedUserOrgRepos(userOrg, per_page=30, page=1) { 
+    const reposUrl = `https://api.github.com/users/${userOrg}/repos?per_page=${per_page}&page=${page}`;
+    return fetch(reposUrl, {
+      method: 'GET',
+      headers: this.apiHeaders
+    }).then(res => res.json())
   }
 
   async getUserRepos(per_page=30, page=1) { 

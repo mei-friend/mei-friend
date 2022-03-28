@@ -18,6 +18,17 @@ export let meiFileName = '';
 export let meiFileLocation = '';
 export let meiFileLocationPrintable = '';
 
+export const sampleEncodings = [];
+export const samp = { 
+  URL: 0,
+  ORG:1,
+  REPO:2,
+  FILE:3,
+  TITLE:4,
+  COMPOSER:5
+}
+
+
 export function setFileChangedState(fileChangedState) {
   fileChanged = fileChangedState;
   const fileStatusElement = document.querySelector(".fileStatus");
@@ -174,8 +185,8 @@ import {
 import default_schema from '../schemaInfo/mei-CMN-4.0.1.schemaInfo.js';
 
 // mei-friend version and date
-const version = '0.3.8';
-const versionDate = '18 March 2022';
+const version = '0.3.9';
+const versionDate = '28 March 2022';
 // const defaultMeiFileName = `${root}Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei`;
 const defaultMeiFileName = `${root}Beethoven_WoO70-Breitkopf.mei`;
 const defaultVerovioOptions = {
@@ -233,6 +244,7 @@ const defaultCodeMirrorOptions = {
   defaultDarkTheme: 'paraiso-dark' // 'base16-dark', // default theme for OS dark mode
 };
 const defaultKeyMap = `${root}keymaps/default-keymap.json`;
+const sampleEncodingsCSV = `${root}sampleEncodings/sampleEncodings.csv`;
 let fileChanged = false; // flag to track whether unsaved changes to file exist
 let freshlyLoaded = false; // flag to ignore a cm.on("changes") event on file load
 
@@ -303,6 +315,10 @@ document.addEventListener('DOMContentLoaded', function() {
   if (urlFileName) {
     openUrlFetch(new URL(urlFileName));
   }
+
+  // fill sample encodings
+  fillInSampleEncodings();
+
   // restore localStorage if we have it
   if (storage.supported) {
     storage.read();
@@ -836,6 +852,7 @@ let cmd = {
   'openUrl': () => openUrl(),
   'openUrlFetch': () => openUrlFetch(),
   'openUrlCancel': () => openUrlCancel(),
+  'openExample': () => openUrl(true),
   'openMusicXml': () => openFileDialog('.xml,.musicxml,.mxl'),
   'openHumdrum': () => openFileDialog('.krn,.hum'),
   'openPae': () => openFileDialog('.pae,.abc'),
@@ -940,6 +957,7 @@ function addEventListeners(v, cm) {
   // open dialogs
   document.getElementById('OpenMei').addEventListener('click', cmd.open);
   document.getElementById('OpenUrl').addEventListener('click', cmd.openUrl);
+  document.getElementById('OpenExample').addEventListener('click', cmd.openExample);
   document.getElementById('ImportMusicXml').addEventListener('click', cmd.openMusicXml);
   document.getElementById('ImportHumdrum').addEventListener('click', cmd.openHumdrum);
   document.getElementById('ImportPae').addEventListener('click', cmd.openPae);
@@ -1208,6 +1226,27 @@ export function log(s) {
   document.querySelector(".statusbar").innerHTML = s;
   document.querySelector(".verovio-panel").innerHTML = s;
   console.log(s);
+}
+
+function fillInSampleEncodings() { 
+  fetch(sampleEncodingsCSV, {headers: {'content-type':'text/csv'}})
+    .then((response) => response.text())
+    .then((csv) => {
+      const lines = csv.split("\n");
+      lines.forEach(l => {
+        if(l) { 
+          const tuple = l.trim().split("|");
+          sampleEncodings.push([
+              tuple[samp.URL],
+              tuple[samp.ORG],
+              tuple[samp.REPO],
+              tuple[samp.FILE],
+              tuple[samp.TITLE],
+              tuple[samp.COMPOSER]
+          ])
+        }
+      })
+    })
 }
 
 // sets keyMap.json to target element and defines listeners
