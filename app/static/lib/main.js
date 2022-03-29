@@ -17,6 +17,7 @@ export let storage = new Storage();
 export let meiFileName = '';
 export let meiFileLocation = '';
 export let meiFileLocationPrintable = '';
+export let isMEI = false; // is the currently edited file native MEI?
 
 export const sampleEncodings = [];
 export const samp = { 
@@ -105,6 +106,7 @@ export function updateLocalStorage(meiXml) {
       storage.fileName = meiFileName;
       storage.fileLocation = meiFileLocation;
       storage.content = meiXml;
+      storage.isMEI = isMEI;
       if (isLoggedIn) {
         updateGithubInLocalStorage();
       }
@@ -332,6 +334,7 @@ document.addEventListener('DOMContentLoaded', function() {
       if (storage.content) {
         // restore file name and content from storage
         // unless a URI param was specified
+        isMEI = storage.isMEI;
         meiFileName = storage.fileName;
         meiFileLocation = storage.fileLocation;
         meiFileLocationPrintable = storage.fileLocationPrintable;
@@ -684,6 +687,7 @@ export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true) {
 // checks format of encoding string and imports or loads data/notation
 // mei argument may be MEI or any other supported format (text/binary)
 export function handleEncoding(mei, setFreshlyLoaded = true) {
+  isMEI = false;
   let found = false;
   v.clear();
   v.busy();
@@ -709,6 +713,7 @@ export function handleEncoding(mei, setFreshlyLoaded = true) {
         found = true;
         console.log(key + ' file loading: ' + meiFileName);
         if (key == "mei") { // if already a mei file
+          isMEI = true;
           v.updateNotation = false;
           loadDataInEditor(mei, setFreshlyLoaded);
           setFileChangedState(false);

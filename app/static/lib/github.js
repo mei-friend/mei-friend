@@ -42,6 +42,14 @@ export default class Github {
     return this._commit;
   }
 
+  set tree(tree) { 
+    this._tree = tree;
+  }
+
+  get tree() { 
+    return this._tree;
+  }
+
   set commitLog(commitLog) { 
     this._commitLog = commitLog;
   }
@@ -237,7 +245,6 @@ export default class Github {
   }
 
   async readGithubRepo() { 
-    // TODO fix multi-level directories by implementing tree traversal using treeWalk / treeStreams, see jsgit doc
     try { 
       // Retrieve content of file
       this.headHash = await this.repo.readRef(`refs/heads/${this.branch}`);
@@ -257,6 +264,7 @@ export default class Github {
         if(this.filepath && this.filepath !== "/") {
           // remove leading slash
           this.content = await this.repo.loadAs("text", this.entry.hash);
+          this.tree = tree;
         }
       }
       // Retrieve git commit log

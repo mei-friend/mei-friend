@@ -39,8 +39,8 @@ export default class Storage {
       this._fileLocationType = this.storage.getItem("meiFileLocationType");
       this._github = JSON.parse(this.storage.getItem("github"));
       this._fileChanged = this.storage.getItem("fileChanged");
+      this._isMEI = this.storage.getItem("isMEI");
       this._orientation = this.storage.getItem("orientation");
-      //fileChangedFromStorage = fileChangedFromStorage ? parseInt(storage.getItem("fileChanged")) : 0;
     }
   }
 
@@ -85,6 +85,15 @@ export default class Storage {
   set fileName(fileName) {
     this.safelySetStorageItem("meiFileName", fileName);
     this._fileName = fileName;
+  }
+
+  get isMEI() { 
+    return this._isMEI === "true";
+  }
+
+  set isMEI(isMEI) { 
+    this.safelySetStorageItem("isMEI", isMEI);
+    this._isMEI = isMEI;
   }
 
   get fileLocation() {

@@ -226,7 +226,7 @@
   color: var(--fileStatusChangedColor);
 }
 
-.fileStatus.warn #fileName, .fileStatus.warn #fileLocation {
+.fileStatus.warn #fileName, .fileStatus.warn #fileLocation, #commitFileName.warn {
   text-decoration: var(--fileStatusWarnColor) dotted underline;
 }
 
@@ -237,4 +237,25 @@
   border: 1px solid var(--fileStatusWarnColor);
   cursor: default;
   padding: 1px 3px;
+}
+
+#commitFileNameEdit { 
+  font-size: 12pt;
+	float: none;
+	color: var(--textColor);
+	padding: 3px 12px;
+	display: block;
+	text-align: left;
+}
+
+#commitFileName { 
+  text-decoration: var(--textColor) dotted underline;
+  background: var(--dropdownHeadingColor);
+  padding: 2px 2px;
+  cursor: text;
+}
+
+#commitFileName:focus{ 
+  background: var(--textColor);
+  color: var(--dropdownHeadingColor);
 }

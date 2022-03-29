@@ -6,6 +6,8 @@ import {
   cm,
   github, // github instance
   handleEncoding,
+  isMEI,
+  meiFileName,
   setFileChangedState,
   setGithubInstance, // github instance setter
   setMeiFileInfo,
@@ -152,12 +154,6 @@ function branchContentsFileClicked(ev) {
     );
     handleEncoding(github.content);
     updateFileStatusDisplay();
-    /*
-    loadDataInEditor(github.content)
-    setFileChangedState(false);
-    updateLocalStorage(github.content);
-    v.updateNotation = true;
-    v.updateAll(cm);*/
   }).catch((err) => {
     console.error("Couldn't read Github repo to fill in branch contents:", err);
     //githubLoadingIndicator.classList.remove("clockwise");
@@ -264,6 +260,70 @@ export async function fillInRepoBranches(e, per_page = 100, page = 1) {
   v.setMenuColors();
 }
 
+async function markFileName(fname) {
+  // purpose: assign markers like "~1" before the suffix
+  // to differentiate from existing files
+  // e.g. "meifile.mei" => "myfile~1.mei"
+  if(!fname.endsWith(".mei")) { 
+    console.warn("markFileName called on non-mei suffix: ", fname);
+  }
+  const without = fname.substr(0, fname.lastIndexOf("."));
+  const match = without.match("(.*)~\\d+$");
+  const unmarked = match ? match[1] : without;
+  let fnamesInTree;
+  return github.repo.loadAs("tree", github.commit.tree).then(tree => { 
+    fnamesInTree = Object.keys(github.commit.tree)
+    const prevMarked = fnamesInTree.filter(f => f.match(without+"~\\d+.mei$"));
+    let marked;
+    if(prevMarked.length) { 
+      // marks already exist in current tree, so use "~n" where n is 
+      // one bigger than the largest existing mark
+      const prevMarkNums = prevMarked.map(f => 
+        f.match(without + "~(\\d+).mei$")[1])
+      console.log("PREV MARK NUMS: ", prevMarkNums);
+      const n = Math.max(...prevMarkNums) + 1;
+      marked = `${unmarked}~${n}.mei`;
+    } else marked = `${unmarked}~1.mei`;
+    return marked;
+  });
+}
+
+async function proposeFileName(fname) { 
+  // if we're here, the original file wasn't MEI
+  const suffixPos = fname.lastIndexOf(".");
+  let suffix = "";
+  let without = fname; 
+  let newname;
+  let fnamesInTree;
+  let nameSpan = document.getElementById("commitFileName");
+  github.repo.loadAs("tree", github.commit.tree).then(tree => { 
+    fnamesInTree = Object.keys(github.commit.tree)
+    if (suffixPos > 0) { 
+      // there's a dot and it's not at the start of the name
+      // => treat everything after it as the suffix
+      without = fname.substr(0, suffixPos);
+      suffix = fname.substr(suffixPos+1);
+    }
+    if(suffix.toLowerCase() !== "mei") { 
+      // see if we can get away with simply swapping suffix
+      newname = without + ".mei";
+      if(fnamesInTree.includes(newname)) { 
+        // no we can't - so mark it to differentiate
+        markFileName(newname).then(
+          marked => nameSpan.innerText = marked
+        )
+      }
+      console.log("NEWNAME 1:", newname)
+    } else { 
+      // file was already (mis-)named (?) as ".mei"
+      // propose adding a marker like "~1" to differentiate
+      markFileName(fname).then(
+        marked => nameSpan.innerText = marked
+      )
+    }
+  });
+}
+
 export async function fillInBranchContents(e) {
   // TODO handle > per_page files (similar to userRepos)
   let target;
@@ -280,6 +340,7 @@ export async function fillInBranchContents(e) {
     <a id="branchesHeader" href="#"><span class="btn icon icon-arrow-left inline-block-tight"></span>Branch: ${github.branch}</a>
     <hr class="dropdown-line">
     <a id="contentsHeader" href="#"><span class="btn icon icon-arrow-left inline-block-tight"></span>Path: <span class="filepath">${github.filepath}</span></a>
+    <hr class="dropdown-line">
     `;
   if (e && target && target.classList.contains("filepath")) {
     // clicked on file name -- operate on parent (list entry) instead
@@ -292,15 +353,27 @@ export async function fillInBranchContents(e) {
       const isDir = content.type === "dir";
       githubMenu.innerHTML += `<a class="branchContents ${content.type}${isDir ? '': ' closeOnClick'}" href="#">` +
         //  content.type === "dir" ? '<span class="btn icon icon-file-symlink-file inline-block-tight"></span>' : "" +
-        `<span class="filepath${isDir ? '':' closeOnClick'}">${content.name}</span>${isDir ? "..." : ""}</a>`;
+        `<span class="filepath${isDir ? '':' closeOnClick'}">${content.name}</span>${isDir ? "..." : ""}</a><hr class="dropdown-line YO"/>`;
     });
   } else {
     // User clicked file, or restoring from local storage. Display commit interface
     if (storage.supported && github.filepath) {
       storage.fileLocationType = "github";
     }
+
     const commitUI = document.createElement("div");
     commitUI.setAttribute("id", "commitUI");
+
+    const commitFileName = document.createElement("span");
+    commitFileName.setAttribute("contenteditable", "");
+    commitFileName.setAttribute("id", "commitFileName");
+    commitFileName.setAttribute("spellcheck", "false");
+    
+    const commitFileNameEdit = document.createElement("div");
+    commitFileNameEdit.setAttribute("id", "commitFileNameEdit");
+    commitFileNameEdit.innerHTML = 'Filename: ';
+    commitFileNameEdit.appendChild(commitFileName);
+    
     const commitMessageInput = document.createElement("input");
     commitMessageInput.setAttribute("type", "text");
     commitMessageInput.setAttribute("id", "commitMessageInput");
@@ -311,10 +384,20 @@ export async function fillInBranchContents(e) {
     commitButton.setAttribute("value", "Commit");
     commitButton.classList.add("closeOnClick");
     commitButton.addEventListener("click", handleCommitButtonClicked);
+    commitUI.appendChild(commitFileNameEdit);
     commitUI.appendChild(commitMessageInput);
     commitUI.appendChild(commitButton);
     githubMenu.appendChild(commitUI);
     setFileChangedState(fileChanged);
+    console.log("isMEI IS: ", isMEI);
+    if(isMEI) { 
+      // trim preceding slash
+      commitFileName.innerText = meiFileName.replace(/^\//, "");
+    } else { 
+      commitFileName.innerText = "...";
+      // trim preceding slash
+      proposeFileName(meiFileName.replace(/^\//, ""));
+    }
   }
   fillInCommitLog("withRefresh");
   // GitHub menu interactions
