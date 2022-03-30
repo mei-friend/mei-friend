@@ -160,6 +160,15 @@ function branchContentsFileClicked(ev) {
   })
 }
 
+function onFileNameEdit(e)  {
+  const commitButton = document.querySelector("#commitButton");
+  console.log("file name eidt: ", e.target.innerText)
+  console.log("meiFileNAm: ", stripMeiFileName())
+  commitButton.setAttribute("value", 
+    e.target.innerText === stripMeiFileName()
+      ? "Commit" : "Commit as new file");
+}
+
 function assignGithubMenuClickHandlers() {
   // This function is called repeatedly during runtime as the content of the
   // Github menu is dynamic. Therefore, we remove all event listeners below
@@ -353,12 +362,18 @@ export async function fillInBranchContents(e) {
       const isDir = content.type === "dir";
       githubMenu.innerHTML += `<a class="branchContents ${content.type}${isDir ? '': ' closeOnClick'}" href="#">` +
         //  content.type === "dir" ? '<span class="btn icon icon-file-symlink-file inline-block-tight"></span>' : "" +
-        `<span class="filepath${isDir ? '':' closeOnClick'}">${content.name}</span>${isDir ? "..." : ""}</a><hr class="dropdown-line YO"/>`;
+        `<span class="filepath${isDir ? '':' closeOnClick'}">${content.name}</span>${isDir ? "..." : ""}</a>`;
     });
+    githubMenu.innerHTML += '<hr class="dropdown-line"/>';
   } else {
     // User clicked file, or restoring from local storage. Display commit interface
     if (storage.supported && github.filepath) {
       storage.fileLocationType = "github";
+      setMeiFileInfo(
+        github.filepath, // meiFileName
+        github.githubRepo, // meiFileLocation
+        github.githubRepo + ":" // meiFileLocationPrintable
+      );
     }
 
     const commitUI = document.createElement("div");
@@ -381,7 +396,6 @@ export async function fillInBranchContents(e) {
     const commitButton = document.createElement("input");
     commitButton.setAttribute("id", "commitButton");
     commitButton.setAttribute("type", "submit");
-    commitButton.setAttribute("value", "Commit");
     commitButton.classList.add("closeOnClick");
     commitButton.addEventListener("click", handleCommitButtonClicked);
     commitUI.appendChild(commitFileNameEdit);
@@ -392,12 +406,18 @@ export async function fillInBranchContents(e) {
     console.log("isMEI IS: ", isMEI);
     if(isMEI) { 
       // trim preceding slash
-      commitFileName.innerText = meiFileName.replace(/^\//, "");
+      commitFileName.innerText = stripMeiFileName();
+      console.log("is MEI! ", stripMeiFileName());
+      commitButton.setAttribute("value", "Commit");
     } else { 
       commitFileName.innerText = "...";
+      console.log("is NOT MEI! ", stripMeiFileName());
+      commitButton.setAttribute("value", "...");
       // trim preceding slash
-      proposeFileName(meiFileName.replace(/^\//, ""));
+      proposeFileName(stripMeiFileName());
     }
+    commitFileName.removeEventListener("input", onFileNameEdit);
+    commitFileName.addEventListener("input", onFileNameEdit);
   }
   fillInCommitLog("withRefresh");
   // GitHub menu interactions
@@ -498,6 +518,11 @@ function handleCommitButtonClicked(e) {
       messageInput.value = "";
       github.readGithubRepo()
         .then(() => {
+          setMeiFileInfo(
+            github.filepath, // meiFileName
+            github.githubRepo, // meiFileLocation
+            github.githubRepo + ":" // meiFileLocationPrintable
+          );
           githubLoadingIndicator.classList.remove("clockwise");
           cm.readOnly = false;
           setFileChangedState(false);
@@ -515,4 +540,13 @@ function handleCommitButtonClicked(e) {
       githubLoadingIndicator.classList.remove("clockwise");
       console.warn("Couldn't commit Github repo: ", e, github)
     });
+}
+
+function stripMeiFileName() { 
+  const stripped = meiFileName.match(/^.*\/([^\/]+)$/);
+  if(Array.isArray(stripped)) { 
+    return stripped[1];
+  } else { 
+    console.warn("stripMeiFileName called on invalid filename: ", meiFileName);
+  }
 }

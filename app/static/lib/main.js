@@ -722,6 +722,7 @@ export function handleEncoding(mei, setFreshlyLoaded = true) {
           v.updateAll(cm, defaultVerovioOptions);
           break;
         } else { // all other formats that Verovio imports
+          isMEI = false;
           vrvWorker.postMessage({
             'cmd': 'importData',
             'format': key,
