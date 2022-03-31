@@ -19,7 +19,7 @@ export let meiFileLocation = '';
 export let meiFileLocationPrintable = '';
 
 export const sampleEncodings = [];
-export const samp = { 
+export const samp = {
   URL: 0,
   ORG:1,
   REPO:2,
@@ -180,9 +180,6 @@ import {
   refreshGithubMenu
 } from './github-menu.js';
 
-
-// schemas for autocompletion
-import default_schema from '../schemaInfo/mei-CMN-4.0.1.schemaInfo.js';
 
 // mei-friend version and date
 const version = 'develop-0.3.9';
@@ -1228,13 +1225,13 @@ export function log(s) {
   console.log(s);
 }
 
-function fillInSampleEncodings() { 
+function fillInSampleEncodings() {
   fetch(sampleEncodingsCSV, {headers: {'content-type':'text/csv'}})
     .then((response) => response.text())
     .then((csv) => {
       const lines = csv.split("\n");
       lines.forEach(l => {
-        if(l) { 
+        if(l) {
           const tuple = l.trim().split("|");
           sampleEncodings.push([
               tuple[samp.URL],
