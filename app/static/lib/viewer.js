@@ -939,8 +939,8 @@ export default class Viewer {
         default: true
       },
       dragSelectControlElements: {
-        title: 'Select control elements ',
-        description: 'Select control elements (with @placement attribute: ' +
+        title: 'Select placement elements ',
+        description: 'Select placement elements (i.e., with a @placement attribute: ' +
           att.attPlacement.join(', ') + ')',
         type: 'bool',
         default: false

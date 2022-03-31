@@ -407,11 +407,11 @@ export function renumberMeasures(xmlDoc, cm, startNum = 1, change = false) {
       metcon = measureList[i].getAttribute('metcon');
     }
     // 1) first measure with @metcon="false" is upbeat => @n=0
-    if (i == 0 && metcon == 'false') n--; // first measure upbeat
+    if (i === 0 && metcon === 'false') n--; // first measure upbeat
     // 2) treat series of @metcon="false" as one measure
-    if (metcon == 'false') {
+    if (metcon === 'false') {
       metcons++;
-    } else if (metcon == '' || metcon == 'true') {
+    } else if (metcon === '' || metcon === 'true') {
       metcons = 0;
     }
     if (metcons > 1) n--;
@@ -420,7 +420,7 @@ export function renumberMeasures(xmlDoc, cm, startNum = 1, change = false) {
     if (ending && endingStart > 0 && ending.hasAttribute('n') &&
       ending.getAttribute('n') != endingN) endingEnd = n; // compare ending ns
     if (ending && ending.hasAttribute('n')) endingN = ending.getAttribute('n');
-    if (ending && endingStart < 0) endingStart = n; // rember start number
+    if (ending && endingStart < 0) endingStart = n; // remember start number
     if (ending && endingStart > 0 && endingEnd > 0) { // set @n to start number
       n = endingStart;
       endingEnd = -1;
@@ -450,7 +450,7 @@ export function renumberMeasures(xmlDoc, cm, startNum = 1, change = false) {
       let num = multiRest.getAttribute('num');
       if (num) n += parseInt(num);
       else n++; // should not happen...
-    } else if (right != 'invis' || metcon == "false") {
+    } else if (right !== 'invis' || metcon === "false") {
       n++;
     }
     metcon = '';
