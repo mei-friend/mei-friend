@@ -14,7 +14,7 @@ export function addDragSelector(v, vp) {
 
   let noteSelector = '.note';
   let restSelector = '.rest,.mRest,.beatRpt,.halfmRpt,.mRpt';
-  let controlSelector = '.' + att.attPlacement.join(',.');
+  let controlSelector = '.' + att.modelControlEvents.join(',.');
   let slurSelector = '.' + att.attCurvature.join(',.');
   let measureSelector = '.measure';
 
