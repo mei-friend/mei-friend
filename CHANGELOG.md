@@ -138,3 +138,6 @@
 * Add mechanisms to access this repertoire, via fork or via Open URL
 * Add 'Public repertoire' menu point as an alternate entry route for Open URL
 * Fix bug that was preventing initial fork attempts from displaying success
+# 0.3.10 patch:
+* Some update call optimizations
+* Support for `speed` as URL parameter for speedMode

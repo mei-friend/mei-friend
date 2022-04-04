@@ -160,7 +160,7 @@ a:active {
   z-index: 190;
 }
 
-.openUrlOverlay .openUrlUI, 
+.openUrlOverlay .openUrlUI,
 .forkRepositoryOverlay .forkRepositoryUI {
   position: absolute;
   top: 20%;
@@ -174,7 +174,7 @@ a:active {
   z-index: 190;
 }
 
-.openUrlOverlay .openUrlUI>div, 
+.openUrlOverlay .openUrlUI>div,
 .forkRepositoryOverlay .forkRepositoryUI>div {
   position: absolute;
   top: 50%;
@@ -184,7 +184,7 @@ a:active {
 }
 
 .openUrlOverlay .openUrlUI details,
-.forkRepositoryOverlay .forkRepositoryUI details { 
+.forkRepositoryOverlay .forkRepositoryUI details {
   cursor: pointer;
   margin-bottom: 1em;
 }
@@ -199,14 +199,14 @@ a:active {
 }
 
 
-.openUrlOverlay .openUrlUI details div div , 
-.forkRepositoryOverlay .forkRepositoryUI details div div { 
+.openUrlOverlay .openUrlUI details div div ,
+.forkRepositoryOverlay .forkRepositoryUI details div div {
   padding: 10px 15px;
 }
 
 
-.openUrlOverlay select, 
-.forkRepositoryOverlay select { 
+.openUrlOverlay select,
+.forkRepositoryOverlay select {
   text-align:left;
 }
 
@@ -527,6 +527,10 @@ svg text {
 .icons {
   min-width: 150px;
   /* max-width: 180px; */
+}
+
+.params {
+  font-family: monospace;
 }
 
 .text-info table {
