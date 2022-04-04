@@ -6,16 +6,19 @@ var tkOptions;
 
 loadVerovio = function() {
   /* create the worker toolkit instance */
-  console.log('Loading toolkit...');
-  tk = new verovio.toolkit();
-  let message = {
-    'cmd': 'vrvLoaded',
-    'version': tk.getVersion(),
-    'availableOptions': tk.getAvailableOptions()
+  console.log('Verovio Worker: Loading toolkit...');
+  try {
+    tk = new verovio.toolkit();
+    let message = {
+      'cmd': 'vrvLoaded',
+      'version': tk.getVersion(),
+      'availableOptions': tk.getAvailableOptions()
+    };
+    console.log('...done.');
+    return message;
+  } catch (err) {
+    log(err);
   };
-  console.log('...done.')
-  postMessage(message);
-  return;
 }
 loadVerovio.bind(this);
 
@@ -26,7 +29,8 @@ onmessage = function(e) {
   console.info("Worker received: " + result.cmd + ', ', result); // + ', tk:', tk);
   switch (result.cmd) {
     case 'loadVerovio':
-      Module.onRuntimeInitialized = loadVerovio();
+      let mes = Module.onRuntimeInitialized = loadVerovio();
+      postMessage(mes);
       return;
     case 'updateAll':
       try {

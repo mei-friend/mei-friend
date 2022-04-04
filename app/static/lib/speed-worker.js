@@ -11,10 +11,10 @@ onmessage = function(e) {
   switch (e.data.cmd) {
     case 'variables': // receive const from attribute-classes.js
       timeSpanningElements = e.data.var;
-      // console.log('SpeedWorker received variables: ', timeSpanningElements);
+      result.cmd = 'variables defined.';
       break;
     case 'listPageSpanningElements':
-      result.cmd = 'listPageSpanningElements'
+      result.cmd = 'listPageSpanningElements';
       result.pageSpanners =
         listPageSpanningElements(e.data.mei, e.data.breaks, e.data.breaksOpt);
       break;
@@ -27,7 +27,10 @@ onmessage = function(e) {
 // List all timespanning elements with @startid/@endid attr on different pages.
 // Does the same as in speed.listPageSpanningElements(), but without DOM stuff
 function listPageSpanningElements(mei, breaks, breaksOption) {
-  let pageSpanners = {};
+  let pageSpanners = {
+    start: {},
+    end: {}
+  };
   let xmlDoc = parse(mei); // txml is very fast!
   let music; // expecting mei > music
   music = getElementByTagName(xmlDoc, 'music', music);
@@ -47,10 +50,6 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
   }
 
   if (score) {
-    pageSpanners = {
-      start: {},
-      end: {}
-    };
     // collect all time-spanning elements with startid and endid
     let tsTable = {}; // object with id as keys and an array of [startid, endid]
     let idList = []; // list of time-pointer ids to be checked

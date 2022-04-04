@@ -9,7 +9,8 @@ import {
   addToolTip
 } from './control-menu.js';
 import {
-  storage
+  storage,
+  tkVersion
 } from './main.js';
 import schema_meiCMN_401 from '../schemaInfo/mei-CMN-4.0.1.schemaInfo.js';
 import schema_meiAll_401 from '../schemaInfo/mei-all-4.0.1.schemaInfo.js';
@@ -32,7 +33,10 @@ export default class Viewer {
     this.xmlDoc;
     this.encodingHasChanged = true; // to recalculate DOM or pageLists
     this.pageBreaks = {}; // object of page number and last measure id '1': 'measure-000423', ...
-    this.pageSpanners = {}; // object storing all time-spannind elements spanning across pages
+    this.pageSpanners = { // object storing all time-spannind elements spanning across pages
+      start: {},
+      end: {}
+    };
     // this.scoreDefList = []; // list of xmlNodes, one for each change, referenced by 5th element of pageList
     this.meiHeadRange = [];
     this.toolTipTimeOutHandle = null; // handle for zoom tooltip hide timer
@@ -165,7 +169,7 @@ export default class Viewer {
     console.info('xmlDOM pages counted: currentPage: ' + this.currentPage +
       ', pageCount: ' + this.pageCount);
     // compute time-spanning elements object in speed-worker
-    if (this.pageSpanners && Object.keys(this.pageSpanners).length === 0 &&
+    if (tkVersion && this.pageSpanners && Object.keys(this.pageSpanners.start).length === 0 &&
       (breaksSelectVal !== 'auto' || Object.keys(this.pageBreaks).length > 0)) {
       // use worker solution with swift txml parsing
       let message = {
@@ -216,7 +220,10 @@ export default class Viewer {
     this.currentPage = 1;
     this.pageCount = -1;
     this.pageBreaks = {};
-    this.pageSpanners = {};
+    this.pageSpanners = {
+      start: {},
+      end: {}
+    };
   }
 
   reRenderMei(cm, removeIds = false) {
@@ -1150,8 +1157,8 @@ export default class Viewer {
         line.classList.add(o.title);
         div.appendChild(line);
       default:
-        console.log('Vervio Options: Unhandled data type: ' + o.type);
-        console.log('title: ' + o.title + ' [' + o.type + '], default: [' + optDefault + ']');
+        console.log('Creating Verovio Options: Unhandled data type: ' + o.type +
+          ', title: ' + o.title + ' [' + o.type + '], default: [' + optDefault + ']');
     }
     if (input) div.appendChild(input);
     return (input || o.type === 'header' || o.type === 'line') ? div : null;

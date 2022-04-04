@@ -1,6 +1,5 @@
 var vrvWorker;
 var spdWorker;
-var tkVersion = '';
 var tkAvailableOptions;
 var mei;
 var elementAtCursor;
@@ -14,6 +13,7 @@ export var cm;
 export var v; // viewer instance
 export let github; // github API wrapper object
 export let storage = new Storage();
+export var tkVersion = '';
 export let meiFileName = '';
 export let meiFileLocation = '';
 export let meiFileLocationPrintable = '';
@@ -21,11 +21,11 @@ export let meiFileLocationPrintable = '';
 export const sampleEncodings = [];
 export const samp = {
   URL: 0,
-  ORG:1,
-  REPO:2,
-  FILE:3,
-  TITLE:4,
-  COMPOSER:5
+  ORG: 1,
+  REPO: 2,
+  FILE: 3,
+  TITLE: 4,
+  COMPOSER: 5
 }
 
 
@@ -287,7 +287,7 @@ document.addEventListener('DOMContentLoaded', function() {
   console.log('DOMContentLoaded. Trying now to load Verovio...');
   document.querySelector(".statusbar").innerHTML = "Loading Verovio.";
   document.querySelector(".rightfoot").innerHTML =
-    "<a href='https://github.com/wergo/mei-friend-online'>mei-friend " +
+    "<a href='https://github.com/Signature-Sound-Vienna/mei-friend-online'>mei-friend " +
     version + "</a> (" + versionDate + ").&nbsp;";
 
   vrvWorker = new Worker(`${root}lib/worker.js`);
@@ -340,7 +340,7 @@ document.addEventListener('DOMContentLoaded', function() {
       } else {
         meiFileLocation = "";
         meiFileLocationPrintable = "";
-        openFile(undefined, false); // default MEI, skip freshly loaded (see comment above)
+        openFile(undefined, false, false); // default MEI, skip freshly loaded (see comment above)
         setFileChangedState(false);
       }
     }
@@ -376,7 +376,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     meiFileLocation = "";
     meiFileLocationPrintable = "";
-    openFile(); // default MEI
+    openFile(undefined, false, false); // default MEI
   }
   if (isLoggedIn) {
     // regardless of storage availability:
@@ -388,7 +388,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
-  setOrientation(cm, or, v);
+  setOrientation(cm, or);
   addEventListeners(v, cm);
   addResizerHandlers(v, cm);
   let doit;
@@ -468,7 +468,9 @@ function speedWorkerEventsHandler(ev) {
     v.pageSpanners = {
       ...ev.data.pageSpanners
     };
-    v.updateAll(cm, {}, v.selectedElements[0]);
+    if (Object.keys(v.pageSpanners.start).length > 0) {
+      v.updateAll(cm, {}, v.selectedElements[0]);
+    }
     v.busy(false, true);
   }
 }
@@ -628,7 +630,8 @@ let inputFormats = {
   pae: "@clef",
 };
 
-export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true) {
+export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true,
+  updateAfterLoading = true) {
   if (typeof file === "string") { // with fileName string
     meiFileName = file;
     console.info('openMei ' + meiFileName + ', ', cm);
@@ -641,9 +644,11 @@ export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true) {
         v.updateNotation = false;
         loadDataInEditor(mei, setFreshlyLoaded);
         setFileChangedState(false);
-        updateLocalStorage(mei)
-        v.updateNotation = true;
-        v.updateAll(cm);
+        updateLocalStorage(mei);
+        if (updateAfterLoading) {
+          v.updateNotation = true;
+          v.updateAll(cm);
+        }
       });
   } else { // if a file
     let readingPromise = new Promise(function(loaded, notLoaded) {
@@ -665,7 +670,7 @@ export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true) {
     });
     readingPromise.then(
       function(mei) {
-        handleEncoding(mei, setFreshlyLoaded);
+        handleEncoding(mei, setFreshlyLoaded, updateAfterLoading);
       },
       function() {
         log('Loading dragged file ' + meiFileName + ' failed.');
@@ -680,7 +685,8 @@ export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true) {
 
 // checks format of encoding string and imports or loads data/notation
 // mei argument may be MEI or any other supported format (text/binary)
-export function handleEncoding(mei, setFreshlyLoaded = true) {
+export function handleEncoding(mei, setFreshlyLoaded = true,
+  updateAfterLoading = true) {
   let found = false;
   v.clear();
   v.busy();
@@ -710,8 +716,10 @@ export function handleEncoding(mei, setFreshlyLoaded = true) {
           loadDataInEditor(mei, setFreshlyLoaded);
           setFileChangedState(false);
           updateLocalStorage(mei);
-          v.updateNotation = true;
-          v.updateAll(cm, defaultVerovioOptions);
+          if (updateAfterLoading) {
+            v.updateNotation = true;
+            v.updateAll(cm, defaultVerovioOptions);
+          }
           break;
         } else { // all other formats that Verovio imports
           vrvWorker.postMessage({
@@ -1022,7 +1030,10 @@ function addEventListeners(v, cm) {
   document.getElementById('font-select').addEventListener('change', () => v.updateOption());
   // breaks selector
   document.getElementById('breaks-select').addEventListener('change', () => {
-    v.pageSpanners = {};
+    v.pageSpanners = {
+      start: {},
+      end: {}
+    };
     v.updateAll(cm, {}, v.selectedElements[0]);
   });
   // navigation
@@ -1226,20 +1237,24 @@ export function log(s) {
 }
 
 function fillInSampleEncodings() {
-  fetch(sampleEncodingsCSV, {headers: {'content-type':'text/csv'}})
+  fetch(sampleEncodingsCSV, {
+      headers: {
+        'content-type': 'text/csv'
+      }
+    })
     .then((response) => response.text())
     .then((csv) => {
       const lines = csv.split("\n");
       lines.forEach(l => {
-        if(l) {
+        if (l) {
           const tuple = l.trim().split("|");
           sampleEncodings.push([
-              tuple[samp.URL],
-              tuple[samp.ORG],
-              tuple[samp.REPO],
-              tuple[samp.FILE],
-              tuple[samp.TITLE],
-              tuple[samp.COMPOSER]
+            tuple[samp.URL],
+            tuple[samp.ORG],
+            tuple[samp.REPO],
+            tuple[samp.FILE],
+            tuple[samp.TITLE],
+            tuple[samp.COMPOSER]
           ])
         }
       })
