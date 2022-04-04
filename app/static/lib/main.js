@@ -271,6 +271,7 @@ function completeIfInTag(cm) {
   });
 }
 
+// when initial page content has been loaded
 document.addEventListener('DOMContentLoaded', function() {
   let myTextarea = document.getElementById("editor");
 
@@ -279,6 +280,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // check for parameters passed through URL
   let searchParams = new URLSearchParams(window.location.search);
   let scaleParam = searchParams.get('scale');
+  let speedModeParam = searchParams.get('speed');
 
   createControlsMenu(document.querySelector('.notation'),
     scaleParam ? scaleParam : defaultVerovioOptions.scale);
@@ -304,6 +306,7 @@ document.addEventListener('DOMContentLoaded', function() {
   v.vrvOptions = {
     ...defaultVerovioOptions
   };
+
   v.addCmOptionsToSettingsPanel(cm, defaultCodeMirrorOptions);
 
   let or = 'bottom'; // default layout orientation
@@ -319,6 +322,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // restore localStorage if we have it
   if (storage.supported) {
     storage.read();
+    if (speedModeParam !== null) storage.speed = speedModeParam;
     // orientation: use URI param if specified;
     //  else use stored orientation if specified;
     //  else use default
@@ -388,6 +392,13 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
+  if (speedModeParam !== null) {
+    v.speedMode = (speedModeParam === 'true');
+    document.getElementById('speed-checkbox').checked = v.speedMode;
+  } else if (storage && storage.supported && storage.hasItem('speed')) {
+    v.speedMode = storage.speed;
+    document.getElementById('speed-checkbox').checked = v.speedMode;
+  }
   setOrientation(cm, or);
   addEventListeners(v, cm);
   addResizerHandlers(v, cm);
@@ -406,7 +417,7 @@ document.addEventListener('DOMContentLoaded', function() {
   setKeyMap(defaultKeyMap);
 });
 
-export async function openUrlFetch(url = '') {
+export async function openUrlFetch(url = '', updateAfterLoading = true) {
   let urlInput = document.querySelector("#openUrlInput");
   let urlStatus = document.querySelector("#openUrlStatus");
   try {
@@ -442,7 +453,7 @@ export async function openUrlFetch(url = '') {
           refreshGithubMenu();
         }
         updateFileStatusDisplay();
-        handleEncoding(data);
+        handleEncoding(data, true, false);
         if (storage.supported) {
           storage.fileLocationType = "url";
         }
@@ -685,8 +696,7 @@ export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true,
 
 // checks format of encoding string and imports or loads data/notation
 // mei argument may be MEI or any other supported format (text/binary)
-export function handleEncoding(mei, setFreshlyLoaded = true,
-  updateAfterLoading = true) {
+export function handleEncoding(mei, setFreshlyLoaded = true, updateAfterLoading = true) {
   let found = false;
   v.clear();
   v.busy();
@@ -1195,6 +1205,7 @@ function addEventListeners(v, cm) {
   // speedmode checkbox
   document.getElementById('speed-checkbox').addEventListener('change', (ev) => {
     v.speedMode = ev.target.checked;
+    if (storage && storage.supported) storage.speed = v.speedMode;
     handleSmartBreaksOption(v.speedMode);
     if (v.speedMode && Object.keys(v.pageBreaks).length > 0)
       v.pageCount = Object.keys(v.pageBreaks).length;
