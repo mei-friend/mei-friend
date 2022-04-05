@@ -110,7 +110,7 @@ export function addDragSelector(v, vp) {
       if (e.x < s.x) x = e.x;
       if (e.y < s.y) y = e.y;
 
-      let strokeWidth = 10;
+      let strokeWidth = 10; // take stroke width from note line width
       let p = document.querySelector('g.staff > path');
       if (p) strokeWidth = parseFloat(p.getAttribute('stroke-width'));
 

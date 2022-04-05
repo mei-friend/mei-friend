@@ -52,10 +52,11 @@ export default class Viewer {
     if (this.speedMode && Object.keys(this.pageBreaks).length === 0 &&
       document.getElementById('breaks-select').value === 'auto') {
       computePageBreaks = true;
-      this.currentPage = 1;
+      this.changeCurrentPage('first'); // set currentPage = 1
     }
-    if (this.speedMode && xmlId) this.currentPage =
-      speed.getPageWithElement(this.xmlDoc, this.breaksValue(), xmlId);
+    if (this.speedMode && xmlId) {
+      this.changeCurrentPage(speed.getPageWithElement(this.xmlDoc, this.breaksValue(), xmlId));
+    }
     let message = {
       'cmd': 'updateAll',
       'options': this.vrvOptions,
@@ -98,8 +99,7 @@ export default class Viewer {
       } else { // speed mode
         if (this.encodingHasChanged) this.loadXml(cm.getValue());
         if (xmlId) {
-          this.currentPage =
-            speed.getPageWithElement(this.xmlDoc, this.breaksValue(), xmlId);
+          this.changeCurrentPage(speed.getPageWithElement(this.xmlDoc, this.breaksValue(), xmlId));
           console.info('UpdatePage(speedMode=true): page: ' +
             this.currentPage + ', xmlId: ' + xmlId);
         }
@@ -315,6 +315,7 @@ export default class Viewer {
     if (targetpage > 0 && targetpage <= this.pageCount &&
       targetpage != this.currentPage) {
       this.currentPage = targetpage;
+      if (storage && storage.supported) storage.page = this.currentPage;
       this.updatePageNumDisplay();
       return true;
     }
