@@ -4,6 +4,7 @@ var tkAvailableOptions;
 var mei;
 var elementAtCursor;
 var breaksParam; // the breaks parameter given through URL
+var selectParam; // (array) select ids given through multiple instances in URL
 
 // guidelines base URL, needed to construct element / attribute URLs
 // TODO ideally determine version part automatically
@@ -290,6 +291,12 @@ document.addEventListener('DOMContentLoaded', function() {
   let searchParams = new URLSearchParams(window.location.search);
   let orientationParam = searchParams.get('orientation');
   let scaleParam = searchParams.get('scale');
+  // select parameter: both syntax version allowed (also mixed):
+  // ?select=note1,chord2,note3... and/or
+  // ?select=note1&select=chord2&select=note3
+  selectParam = searchParams.getAll('select');
+  if (selectParam && selectParam.length > 0)
+    selectParam = selectParam.map(e => e.split(',')).reduce((a1, a2) => a1.concat(a2));
   let speedParam = searchParams.get('speed');
   breaksParam = searchParams.get('breaks');
 
@@ -332,6 +339,7 @@ document.addEventListener('DOMContentLoaded', function() {
     storage.read();
     if (orientationParam !== null) storage.orientation = orientationParam;
     if (scaleParam !== null) storage.scale = scaleParam;
+    if (selectParam !== null) storage.select = selectParam;
     if (speedParam !== null) storage.speed = speedParam;
     if (breaksParam !== null) storage.breaks = breaksParam;
     setFileChangedState(storage.fileChanged);
@@ -400,9 +408,9 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   // Retrieve parameters from URL params, from storage, or default values
   if (scaleParam !== null) {
-     document.getElementById('verovio-zoom').value = scaleParam;
+    document.getElementById('verovio-zoom').value = scaleParam;
   } else if (storage && storage.supported && storage.hasItem('scale')) {
-     document.getElementById('verovio-zoom').value = storage.scale;
+    document.getElementById('verovio-zoom').value = storage.scale;
   }
   if (speedParam !== null) {
     v.speedMode = (speedParam === 'true');
@@ -527,7 +535,7 @@ function vrvWorkerEventsHandler(ev) {
         v.updateNotation = false;
         loadDataInEditor(storage.content);
         v.updateNotation = true;
-        v.updateAll(cm);
+        v.updateAll(cm, {}, handleURLSelect());
       }
       v.busy(false);
       break;
@@ -539,7 +547,7 @@ function vrvWorkerEventsHandler(ev) {
       setFileChangedState(false);
       updateLocalStorage(mei);
       v.updateNotation = true;
-      v.updateAll(cm, defaultVerovioOptions);
+      v.updateAll(cm, defaultVerovioOptions, handleURLSelect());
       //v.busy(false);
       break;
     case 'updated': // display SVG data on site
@@ -650,6 +658,15 @@ function vrvWorkerEventsHandler(ev) {
   }
 }
 
+function handleURLSelect() {
+  if (selectParam && selectParam.length > 0) {
+    v.selectedElements = selectParam;
+  } else if (storage && storage.supported && storage.hasItem('select')) {
+    v.selectedElements = storage.select;
+  }
+  return v.selectedElements ? v.selectedElements[0] : '';
+}
+
 // key is the input-from option in Verovio, value the distinctive string
 let inputFormats = {
   mei: "<mei",
@@ -676,7 +693,7 @@ export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true,
         updateLocalStorage(mei);
         if (updateAfterLoading) {
           v.updateNotation = true;
-          v.updateAll(cm);
+          v.updateAll(cm, {}, handleURLSelect());
         }
       });
   } else { // if a file
@@ -746,7 +763,7 @@ export function handleEncoding(mei, setFreshlyLoaded = true, updateAfterLoading 
           updateLocalStorage(mei);
           if (updateAfterLoading) {
             v.updateNotation = true;
-            v.updateAll(cm, defaultVerovioOptions);
+            v.updateAll(cm, defaultVerovioOptions, handleURLSelect());
           }
           break;
         } else { // all other formats that Verovio imports

@@ -40,6 +40,7 @@ export default class Storage {
       this._fileChanged = this.storage.getItem("fileChanged");
       this._orientation = this.storage.getItem("orientation");
       this._scale = this.storage.getItem("scale");
+      this._select = JSON.parse(this.storage.getItem("select")); // Array
       this._speed = this.storage.getItem("speed");
       this._breaks = this.storage.getItem("breaks");
       //fileChangedFromStorage = fileChangedFromStorage ? parseInt(storage.getItem("fileChanged")) : 0;
@@ -189,6 +190,15 @@ export default class Storage {
   set scale(scale) {
     this.safelySetStorageItem('scale', scale);
     this._scale = scale;
+  }
+
+  get select() {
+    return this._select;
+  }
+
+  set select(select) {
+    this.safelySetStorageItem('select', select);
+    this._select = select;
   }
 
   get speed() {
