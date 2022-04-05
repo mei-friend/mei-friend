@@ -3,7 +3,8 @@ var spdWorker;
 var tkAvailableOptions;
 var mei;
 var elementAtCursor;
-var breaksParam; // the breaks parameter given through URL
+var breaksParam; // (string) the breaks parameter given through URL
+var pageParam; // (int) page parameter given through URL
 var selectParam; // (array) select ids given through multiple instances in URL
 
 // guidelines base URL, needed to construct element / attribute URLs
@@ -291,6 +292,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // check for parameters passed through URL
   let searchParams = new URLSearchParams(window.location.search);
   let orientationParam = searchParams.get('orientation');
+  pageParam = searchParams.get('page');
   let scaleParam = searchParams.get('scale');
   // select parameter: both syntax versions allowed (also mixed):
   // ?select=note1,chord2,note3 and/or ?select=note1&select=chord2&select=note3
@@ -337,9 +339,11 @@ document.addEventListener('DOMContentLoaded', function() {
   // restore localStorage if we have it
   if (storage.supported) {
     storage.read();
+    // save (most) URL parameters in storage
     if (orientationParam !== null) storage.orientation = orientationParam;
+    if (pageParam !== null) storage.page = pageParam;
     if (scaleParam !== null) storage.scale = scaleParam;
-    if (selectParam && selectParam.length > 0) storage.select = selectParam;
+    // if (selectParam && selectParam.length > 0) storage.select = selectParam;
     if (speedParam !== null) storage.speed = speedParam;
     if (breaksParam !== null) storage.breaks = breaksParam;
     setFileChangedState(storage.fileChanged);
@@ -659,10 +663,15 @@ function vrvWorkerEventsHandler(ev) {
 }
 
 function handleURLSelect() {
+  if (pageParam !== null) {
+    v.currentPage = parseInt(pageParam);
+  } else if (storage && storage.supported && storage.hasItem('page')) {
+    v.currentPage = storage.page;
+  }
   if (selectParam && selectParam.length > 0) {
     v.selectedElements = selectParam;
-  } else if (storage && storage.supported && storage.hasItem('select')) {
-    v.selectedElements = storage.select;
+    // } else if (storage && storage.supported && storage.hasItem('select')) {
+    //   v.selectedElements = storage.select;
   }
   return v.selectedElements.length > 0 ? v.selectedElements[0] : '';
 }
