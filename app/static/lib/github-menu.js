@@ -49,7 +49,7 @@ function forkRepoClicked() {
             })
           }
         }
-      }).finally(() => 
+      }).finally(() =>
           document.getElementById("forkRepoGithubLogo")
             .classList.remove("clockwise")
       )
@@ -378,7 +378,7 @@ export function logoutFromGithub() {
   }
   // redirect to /logout to remove session cookie
   const url = window.location.href;
-  window.location.replace(url.substring(0, url.lastIndexOf("/")) + "/logout");
+  window.location.replace(url.substring(0, url.lastIndexOf("/?")) + "/logout");
 }
 
 export function refreshGithubMenu(e) {
