@@ -17,7 +17,8 @@ export let storage = new Storage();
 export let meiFileName = '';
 export let meiFileLocation = '';
 export let meiFileLocationPrintable = '';
-export let isMEI = false; // is the currently edited file native MEI?
+export let isMEI; // is the currently edited file native MEI?
+export let fileChanged = false; // flag to track whether unsaved changes to file exist
 
 export const sampleEncodings = [];
 export const samp = { 
@@ -29,6 +30,9 @@ export const samp = {
   COMPOSER:5
 }
 
+export function setIsMEI(bool) { 
+  isMEI = !!bool;
+}
 
 export function setFileChangedState(fileChangedState) {
   fileChanged = fileChangedState;
@@ -44,8 +48,7 @@ export function setFileChangedState(fileChangedState) {
     fileChangedIndicatorElement.innerText = "";
   }
   if (isLoggedIn && github && github.filepath && commitUI) {
-    document.getElementById("commitMessageInput").disabled = !fileChanged;
-    document.getElementById("commitButton").disabled = !fileChanged;
+    setCommitUIEnabledStatus();
   }
   if (storage.supported) {
     storage.fileChanged = fileChanged ? 1 : 0;
@@ -127,6 +130,7 @@ export function updateGithubInLocalStorage() {
       githubRepo: github.githubRepo,
       githubToken: github.githubToken,
       branch: github.branch,
+      commit: github.commit,
       filepath: github.filepath,
       userLogin: github.userLogin,
       userName: name,
@@ -179,7 +183,8 @@ import * as att from './attribute-classes.js';
 import {
   fillInBranchContents,
   logoutFromGithub,
-  refreshGithubMenu
+  refreshGithubMenu,
+  setCommitUIEnabledStatus
 } from './github-menu.js';
 
 
@@ -247,7 +252,6 @@ const defaultCodeMirrorOptions = {
 };
 const defaultKeyMap = `${root}keymaps/default-keymap.json`;
 const sampleEncodingsCSV = `${root}sampleEncodings/sampleEncodings.csv`;
-let fileChanged = false; // flag to track whether unsaved changes to file exist
 let freshlyLoaded = false; // flag to ignore a cm.on("changes") event on file load
 
 function completeAfter(cm, pred) {
@@ -334,7 +338,7 @@ document.addEventListener('DOMContentLoaded', function() {
       if (storage.content) {
         // restore file name and content from storage
         // unless a URI param was specified
-        isMEI = storage.isMEI;
+        setIsMEI(storage.isMEI);
         meiFileName = storage.fileName;
         meiFileLocation = storage.fileLocation;
         meiFileLocationPrintable = storage.fileLocationPrintable;
@@ -346,6 +350,7 @@ document.addEventListener('DOMContentLoaded', function() {
       } else {
         meiFileLocation = "";
         meiFileLocationPrintable = "";
+        setIsMEI(true); // default MEI
         openFile(undefined, false); // default MEI, skip freshly loaded (see comment above)
         setFileChangedState(false);
       }
@@ -357,19 +362,21 @@ document.addEventListener('DOMContentLoaded', function() {
         storage.github.githubRepo,
         storage.github.githubToken,
         storage.github.branch,
+        storage.github.commit,
         storage.github.filepath,
         storage.github.userLogin,
         storage.github.userName,
-        storage.github.userEmail
+        storage.github.userEmail,
       )
       //document.querySelector("#fileLocation").innerText = meiFileLocationPrintable;
     } else if (isLoggedIn) {
       // initialise and store new github object
-      github = new Github("", githubToken, "", "", userLogin, userName, userEmail);
+      github = new Github("", githubToken, "", "", "", userLogin, userName, userEmail);
       storage.github = {
         githubRepo: github.githubRepo,
         githubToken: github.githubToken,
         branch: github.branch,
+        commit: github.commit,
         filepath: github.filepath,
         userLogin: github.userLogin,
         userName: userName,
@@ -378,7 +385,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   } else { // no local storage
     if (isLoggedIn) { // initialise new github object
-      github = new Github("", githubToken, "", "", userLogin, userName, userEmail);
+      github = new Github("", githubToken, "", "", "", userLogin, userName, userEmail);
     }
     meiFileLocation = "";
     meiFileLocationPrintable = "";
@@ -687,7 +694,6 @@ export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true) {
 // checks format of encoding string and imports or loads data/notation
 // mei argument may be MEI or any other supported format (text/binary)
 export function handleEncoding(mei, setFreshlyLoaded = true) {
-  isMEI = false;
   let found = false;
   v.clear();
   v.busy();
@@ -699,6 +705,7 @@ export function handleEncoding(mei, setFreshlyLoaded = true) {
       'mei': mei
     });
     found = true;
+    setIsMEI(false);
   } else if (meiFileName.endsWith('.abc')) { // abc notation file
     console.log('Load ABC file.', mei.slice(0, 128));
     vrvWorker.postMessage({
@@ -707,13 +714,14 @@ export function handleEncoding(mei, setFreshlyLoaded = true) {
       'mei': mei
     });
     found = true;
+    setIsMEI(false);
   } else { // all other formats are found by search term in text file
     for (const [key, value] of Object.entries(inputFormats)) {
       if (mei.includes(value)) { // a hint that it is a MEI file
         found = true;
         console.log(key + ' file loading: ' + meiFileName);
         if (key == "mei") { // if already a mei file
-          isMEI = true;
+          setIsMEI(true);
           v.updateNotation = false;
           loadDataInEditor(mei, setFreshlyLoaded);
           setFileChangedState(false);
@@ -722,7 +730,7 @@ export function handleEncoding(mei, setFreshlyLoaded = true) {
           v.updateAll(cm, defaultVerovioOptions);
           break;
         } else { // all other formats that Verovio imports
-          isMEI = false;
+          setIsMEI(false);
           vrvWorker.postMessage({
             'cmd': 'importData',
             'format': key,
@@ -740,6 +748,7 @@ export function handleEncoding(mei, setFreshlyLoaded = true) {
     else {
       log('Format not recognized: ' + meiFileName + '.');
     }
+    setIsMEI(false);
     v.busy(false);
   }
 }

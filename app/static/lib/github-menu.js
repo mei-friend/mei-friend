@@ -4,12 +4,14 @@ import {
 } from './fork-repository.js';
 import {
   cm,
+  fileChanged,
   github, // github instance
   handleEncoding,
   isMEI,
   meiFileName,
   setFileChangedState,
   setGithubInstance, // github instance setter
+  setIsMEI,
   setMeiFileInfo,
   storage,
   updateFileStatusDisplay,
@@ -100,6 +102,7 @@ function userRepoClicked(ev) {
     ev.target.innerText,
     github.githubToken,
     github.branch,
+    github.commit,
     github.filepath,
     github.userLogin,
     author.name,
@@ -137,13 +140,18 @@ function branchContentsDirClicked(ev) {
 }
 
 function branchContentsFileClicked(ev) {
+  loadFile(ev.target.innerText);
+}
+
+function loadFile(fileName, ev = null) { 
   const githubLoadingIndicator = document.getElementById("GithubLogo");
-  github.filepath += ev.target.innerText;
-  console.debug(`Loading file: https://github.com/${github.githubRepo}/${github.filepath}`);
+  github.filepath += fileName; 
+  console.debug(`Loading file: https://github.com/${github.githubRepo}${github.filepath}`);
   fillInBranchContents(ev);
   githubLoadingIndicator.classList.add("clockwise");
   github.readGithubRepo().then(() => {
     githubLoadingIndicator.classList.remove("clockwise");
+    cm.readOnly = false;
     document.querySelector(".statusbar").innerText = "Loading from Github...";
     v.clear();
     v.updateNotation = false;
@@ -153,20 +161,19 @@ function branchContentsFileClicked(ev) {
       github.githubRepo + ":" // meiFileLocationPrintable
     );
     handleEncoding(github.content);
+    setFileNameAfterLoad();
     updateFileStatusDisplay();
+    setFileChangedState(false);
+    updateGithubInLocalStorage();
+    fillInCommitLog("withRefresh");
   }).catch((err) => {
     console.error("Couldn't read Github repo to fill in branch contents:", err);
-    //githubLoadingIndicator.classList.remove("clockwise");
+    githubLoadingIndicator.classList.remove("clockwise");
   })
 }
 
 function onFileNameEdit(e)  {
-  const commitButton = document.querySelector("#commitButton");
-  console.log("file name eidt: ", e.target.innerText)
-  console.log("meiFileNAm: ", stripMeiFileName())
-  commitButton.setAttribute("value", 
-    e.target.innerText === stripMeiFileName()
-      ? "Commit" : "Commit as new file");
+  setCommitUIEnabledStatus();
 }
 
 function assignGithubMenuClickHandlers() {
@@ -305,6 +312,8 @@ async function proposeFileName(fname) {
   let newname;
   let fnamesInTree;
   let nameSpan = document.getElementById("commitFileName");
+  //FIXME: instead of github.commit.tree, ensure github.tree (at local level) exists
+  //and then use it
   github.repo.loadAs("tree", github.commit.tree).then(tree => { 
     fnamesInTree = Object.keys(github.commit.tree)
     if (suffixPos > 0) { 
@@ -318,17 +327,21 @@ async function proposeFileName(fname) {
       newname = without + ".mei";
       if(fnamesInTree.includes(newname)) { 
         // no we can't - so mark it to differentiate
-        markFileName(newname).then(
-          marked => nameSpan.innerText = marked
-        )
+        markFileName(newname).then( marked => { 
+          nameSpan.innerText = marked;
+          nameSpan.dispatchEvent(new Event('input'));
+        })
+      } else { 
+        nameSpan.innerText = newname;
+        nameSpan.dispatchEvent(new Event('input'));
       }
-      console.log("NEWNAME 1:", newname)
     } else { 
       // file was already (mis-)named (?) as ".mei"
       // propose adding a marker like "~1" to differentiate
-      markFileName(fname).then(
-        marked => nameSpan.innerText = marked
-      )
+      markFileName(fname).then( marked => {
+        nameSpan.innerText = marked;
+        nameSpan.dispatchEvent(new Event('input'));
+      })
     }
   });
 }
@@ -402,20 +415,8 @@ export async function fillInBranchContents(e) {
     commitUI.appendChild(commitMessageInput);
     commitUI.appendChild(commitButton);
     githubMenu.appendChild(commitUI);
+    setFileNameAfterLoad();
     setFileChangedState(fileChanged);
-    console.log("isMEI IS: ", isMEI);
-    if(isMEI) { 
-      // trim preceding slash
-      commitFileName.innerText = stripMeiFileName();
-      console.log("is MEI! ", stripMeiFileName());
-      commitButton.setAttribute("value", "Commit");
-    } else { 
-      commitFileName.innerText = "...";
-      console.log("is NOT MEI! ", stripMeiFileName());
-      commitButton.setAttribute("value", "...");
-      // trim preceding slash
-      proposeFileName(stripMeiFileName());
-    }
     commitFileName.removeEventListener("input", onFileNameEdit);
     commitFileName.addEventListener("input", onFileNameEdit);
   }
@@ -502,9 +503,51 @@ export function refreshGithubMenu(e) {
   }
 }
 
+export function setCommitUIEnabledStatus() {
+  const commitButton = document.getElementById("commitButton");
+  const commitFileName = document.getElementById("commitFileName");
+  if(commitFileName.innerText === stripMeiFileName()) {
+    // no name change => button reads "Commit"
+    commitButton.setAttribute("value", "Commit");
+    if(fileChanged) { 
+      // enable commit UI if file has changed
+      commitButton.removeAttribute("disabled");
+      commitMessageInput.removeAttribute("disabled");
+    } else { 
+      // disable commit UI if file hasn't changed
+      commitButton.setAttribute("disabled", "");
+      commitMessageInput.setAttribute("disabled", "");
+      commitMessageInput.value = "";
+    }
+  } else { 
+      // file name has changed => button reads "Commit as new file"
+      commitButton.setAttribute("value", "Commit as new file");
+      // enable commit UI regardless of fileChanged state
+      commitButton.removeAttribute("disabled");
+      commitMessageInput.removeAttribute("disabled");
+  }
+}
+
+
+function setFileNameAfterLoad(ev) {
+  const commitFileName = document.getElementById("commitFileName");
+  const commitButton = document.getElementById("commitButton");
+  if(isMEI) { 
+    // trim preceding slash
+    commitFileName.innerText = stripMeiFileName();
+    commitButton.setAttribute("value", "Commit");
+  } else { 
+    commitFileName.innerText = "...";
+    commitButton.setAttribute("value", "...");
+    // trim preceding slash
+    proposeFileName(stripMeiFileName());
+  }
+  setCommitUIEnabledStatus();
+}
+
 // handle Github commit UI
 function handleCommitButtonClicked(e) {
-  // TODO Let user know of success / failure, allow user to do something about it
+  const commitFileName = document.getElementById("commitFileName");
   const messageInput = document.getElementById("commitMessageInput");
   const message = messageInput.value;
   const githubLoadingIndicator = document.getElementById("GithubLogo");
@@ -512,10 +555,13 @@ function handleCommitButtonClicked(e) {
   cm.readOnly = "nocursor"; // don't allow editor focus
   // try commiting to Github
   githubLoadingIndicator.classList.add("clockwise");
-  github.writeGithubRepo(cm.getValue(), message)
+  const newfile = commitFileName.innerText !== stripMeiFileName() 
+    ? commitFileName.innerText : null;
+  github.writeGithubRepo(cm.getValue(), message, newfile)
     .then(() => {
       console.debug(`Successfully written to github: ${github.githubRepo}${github.filepath}`);
       messageInput.value = "";
+      /*
       github.readGithubRepo()
         .then(() => {
           setMeiFileInfo(
@@ -534,9 +580,16 @@ function handleCommitButtonClicked(e) {
           cm.readOnly = false;
           githubLoadingIndicator.classList.remove("clockwise");
           console.warn("Couldn't read Github repo after writing commit: ", e, github);
-        })
+        })*/
+      if(newfile) { 
+        // switch to new filepath
+        github.filepath = github.filepath.substr(0, github.filepath.lastIndexOf('/') + 1) + newfile;
+      }
+      // load after write
+      loadFile("");
     })
     .catch((e) => {
+      cm.readOnly = false;
       githubLoadingIndicator.classList.remove("clockwise");
       console.warn("Couldn't commit Github repo: ", e, github)
     });
@@ -550,3 +603,4 @@ function stripMeiFileName() {
     console.warn("stripMeiFileName called on invalid filename: ", meiFileName);
   }
 }
+
