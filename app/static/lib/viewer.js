@@ -590,14 +590,17 @@ export default class Viewer {
     }
   } // setMenuColors()
 
-  zoom(delta) {
+  zoom(delta, storage = null) {
     let zoomCtrl = document.getElementById('verovio-zoom');
-    if (delta <= 30) // delta only up to 30% difference
-      zoomCtrl.value = parseInt(zoomCtrl.value) + delta;
-    else // otherwise take it as the scaling value
-      zoomCtrl.value = delta;
-    this.updateLayout();
-    // this.updateZoomSliderTooltip(zoomCtrl);
+    if (zoomCtrl) {
+      if (delta <= 30) // delta only up to 30% difference
+        zoomCtrl.value = parseInt(zoomCtrl.value) + delta;
+      else // otherwise take it as the scaling value
+        zoomCtrl.value = delta;
+      if (storage && storage.supported) storage.scale = zoomCtrl.value;
+      this.updateLayout();
+      // this.updateZoomSliderTooltip(zoomCtrl);
+    }
   }
 
   // change font size of editor panel (sign is direction

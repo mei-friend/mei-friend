@@ -39,6 +39,7 @@ export default class Storage {
       this._github = JSON.parse(this.storage.getItem("github"));
       this._fileChanged = this.storage.getItem("fileChanged");
       this._orientation = this.storage.getItem("orientation");
+      this._scale = this.storage.getItem("scale");
       this._speed = this.storage.getItem("speed");
       this._breaks = this.storage.getItem("breaks");
       //fileChangedFromStorage = fileChangedFromStorage ? parseInt(storage.getItem("fileChanged")) : 0;
@@ -179,6 +180,15 @@ export default class Storage {
   set orientation(orientation) {
     this.safelySetStorageItem("orientation", orientation);
     this._orientation = orientation;
+  }
+
+  get scale() {
+    return parseInt(this._scale);
+  }
+
+  set scale(scale) {
+    this.safelySetStorageItem('scale', scale);
+    this._scale = scale;
   }
 
   get speed() {

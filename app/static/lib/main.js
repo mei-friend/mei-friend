@@ -293,8 +293,7 @@ document.addEventListener('DOMContentLoaded', function() {
   let speedModeParam = searchParams.get('speed');
   breaksParam = searchParams.get('breaks');
 
-  createControlsMenu(document.querySelector('.notation'),
-    scaleParam ? scaleParam : defaultVerovioOptions.scale);
+  createControlsMenu(document.querySelector('.notation'), defaultVerovioOptions.scale);
   addModifyerKeys(document); //
 
   console.log('DOMContentLoaded. Trying now to load Verovio...');
@@ -332,6 +331,7 @@ document.addEventListener('DOMContentLoaded', function() {
   if (storage.supported) {
     storage.read();
     if (orientationParam !== null) storage.orientation = orientationParam;
+    if (scaleParam !== null) storage.scale = scaleParam;
     if (speedModeParam !== null) storage.speed = speedModeParam;
     if (breaksParam !== null) storage.breaks = breaksParam;
     setFileChangedState(storage.fileChanged);
@@ -399,6 +399,11 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
   // Retrieve parameters from URL params, from storage, or default values
+  if (scaleParam !== null) {
+     document.getElementById('verovio-zoom').value = scaleParam;
+  } else if (storage && storage.supported && storage.hasItem('scale')) {
+     document.getElementById('verovio-zoom').value = storage.scale;
+  }
   if (speedModeParam !== null) {
     v.speedMode = (speedModeParam === 'true');
     document.getElementById('speed-checkbox').checked = v.speedMode;
@@ -885,11 +890,15 @@ let cmd = {
   'openHumdrum': () => openFileDialog('.krn,.hum'),
   'openPae': () => openFileDialog('.pae,.abc'),
   'downloadMei': () => downloadMei(),
-  'zoomIn': () => v.zoom(+1),
-  'zoomOut': () => v.zoom(-1),
-  'zoom50': () => v.zoom(50),
-  'zoom100': () => v.zoom(100),
-  'zoomSlider': () => v.updateLayout(),
+  'zoomIn': () => v.zoom(+1, storage),
+  'zoomOut': () => v.zoom(-1, storage),
+  'zoom50': () => v.zoom(50, storage),
+  'zoom100': () => v.zoom(100, storage),
+  'zoomSlider': () => {
+    let zoomCtrl = document.getElementById('verovio-zoom');
+    if (zoomCtrl && storage && storage.supported) storage.scale = zoomCtrl.value;
+    v.updateLayout()
+  },
   // add control elements
   'addSlur': () => e.addCtrlEl(v, cm, 'slur', ''),
   'addSlurBelow': () => e.addCtrlEl(v, cm, 'slur', 'below'),
