@@ -104,6 +104,7 @@ export function loadDataInEditor(mei, setFreshlyLoaded = true) {
       bs.value = v.containsBreaks() ? 'line' : 'auto';
   }
   v.setRespSelectOptions();
+  setCursorToId(cm, handleURLSelect());
 }
 
 export function updateLocalStorage(meiXml) {
@@ -178,11 +179,11 @@ import {
 import {
   addDragSelector
 } from './drag-selector.js';
-import * as e from './editor.js'
-import Viewer from './viewer.js';
-import Storage from './storage.js';
-import Github from './github.js';
 import * as att from './attribute-classes.js';
+import * as e from './editor.js';
+import Viewer from './viewer.js';
+import Github from './github.js';
+import Storage from './storage.js';
 import {
   fillInBranchContents,
   logoutFromGithub,

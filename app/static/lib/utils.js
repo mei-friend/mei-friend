@@ -114,13 +114,14 @@ export function moveCursorToEndOfMeasure(cm, p) {
 // }
 
 export function setCursorToId(cm, id) {
+  if (id === '') return;
   let c = cm.getSearchCursor(new RegExp(`(?:['"])` + id + `(?:['"])`));
   if (c.findNext()) {
     cm.setCursor(c.from());
     // console.info('setCursorToId cursor: ', c.from());
     let enc = document.querySelector('.encoding');
     cm.execCommand('goLineStartSmart');
-    cm.scrollIntoView(null, Math.round(enc.clientHeight / 2));
+    if (enc) cm.scrollIntoView(null, Math.round(enc.clientHeight / 2));
   }
 }
 
