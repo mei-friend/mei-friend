@@ -205,6 +205,7 @@ export function getIdOfNextElement(cm, rw, elementNames = dutils.navElsArray,
 export function getElementIdAtCursor(cm) {
   let tag;
   let cursor = cm.getCursor();
+  if (cursor.line === 0 && cursor.ch === 0) return null;
   let line = cm.getLine(cursor.line);
   // check if cursor is on a closing tag by stepping backwards
   for (let j = cursor.ch; j > 0; j--) {

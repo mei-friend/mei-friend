@@ -425,14 +425,16 @@ export default class Viewer {
     // console.log('cursorActivity forceFlip: ' + forceFlip);
     let id = utils.getElementIdAtCursor(cm);
     this.selectedElements = [];
-    this.selectedElements.push(id);
-    let fl = document.getElementById('flip-checkbox');
-    if (!document.querySelector('g#' + id) && // when not on current page
-      ((this.updateNotation && fl && fl.checked) || forceFlip)) {
-      this.updatePage(cm, '', id, false);
-    } else if (this.updateNotation) { // on current page
-      this.scrollSvg(cm);
-      this.updateHighlight(cm);
+    if (id) {
+      this.selectedElements.push(id);
+      let fl = document.getElementById('flip-checkbox');
+      if (!document.querySelector('g#' + id) && // when not on current page
+        ((this.updateNotation && fl && fl.checked) || forceFlip)) {
+        this.updatePage(cm, '', id, false);
+      } else if (this.updateNotation) { // on current page
+        this.scrollSvg(cm);
+        this.updateHighlight(cm);
+      }
     }
   }
 
