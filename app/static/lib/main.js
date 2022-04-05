@@ -194,6 +194,7 @@ const version = 'develop-0.3.10';
 const versionDate = '4 April 2022';
 // const defaultMeiFileName = `${root}Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei`;
 const defaultMeiFileName = `${root}Beethoven_WoO70-Breitkopf.mei`;
+const defaultOrientation = 'bottom'; // default notation position in window
 const defaultVerovioOptions = {
   scale: 55,
   breaks: "line",
@@ -287,6 +288,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // check for parameters passed through URL
   let searchParams = new URLSearchParams(window.location.search);
+  let orientationParam = searchParams.get('orientation');
   let scaleParam = searchParams.get('scale');
   let speedModeParam = searchParams.get('speed');
   breaksParam = searchParams.get('breaks');
@@ -318,8 +320,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
   v.addCmOptionsToSettingsPanel(cm, defaultCodeMirrorOptions);
 
-  let or = 'bottom'; // default layout orientation
-  if (searchParams.get('orientation')) or = searchParams.get('orientation');
   let urlFileName = searchParams.get('file');
   if (urlFileName) {
     openUrlFetch(new URL(urlFileName));
@@ -331,12 +331,9 @@ document.addEventListener('DOMContentLoaded', function() {
   // restore localStorage if we have it
   if (storage.supported) {
     storage.read();
+    if (orientationParam !== null) storage.orientation = orientationParam;
     if (speedModeParam !== null) storage.speed = speedModeParam;
     if (breaksParam !== null) storage.breaks = breaksParam;
-    // orientation: use URI param if specified;
-    //  else use stored orientation if specified;
-    //  else use default
-    or = searchParams.get('orientation') || storage.orientation || or;
     setFileChangedState(storage.fileChanged);
     if (!urlFileName) {
       // no URI param specified - try to restore from storage
@@ -401,7 +398,7 @@ document.addEventListener('DOMContentLoaded', function() {
       fillInBranchContents();
     }
   }
-
+  // Retrieve parameters from URL params, from storage, or default values
   if (speedModeParam !== null) {
     v.speedMode = (speedModeParam === 'true');
     document.getElementById('speed-checkbox').checked = v.speedMode;
@@ -409,7 +406,13 @@ document.addEventListener('DOMContentLoaded', function() {
     v.speedMode = storage.speed;
     document.getElementById('speed-checkbox').checked = v.speedMode;
   }
-  setOrientation(cm, or);
+  if (orientationParam !== null) {
+    setOrientation(cm, orientationParam);
+  } else if (storage && storage.supported && storage.hasItem('orientation')) {
+    setOrientation(cm, storage.orientation);
+  } else {
+    setOrientation(cm, defaultOrientation);
+  }
   addEventListeners(v, cm);
   addResizerHandlers(v, cm);
   let doit;
@@ -868,10 +871,10 @@ let cmd = {
   'notationTop': () => setOrientation(cm, "top", v, storage),
   'notationBottom': () => setOrientation(cm, "bottom", v, storage),
   'notationLeft': () => setOrientation(cm, "left", v, storage),
+  'notationRight': () => setOrientation(cm, "right", v, storage),
   'showSettingsPanel': () => v.showSettingsPanel(),
   'hideSettingsPanel': () => v.hideSettingsPanel(),
   'toggleSettingsPanel': (ev) => v.toggleSettingsPanel(ev),
-  'notationRight': () => setOrientation(cm, "right", v, storage),
   'moveProgBar': () => moveProgressBar(),
   'open': () => openFileDialog(),
   'openUrl': () => openUrl(),
