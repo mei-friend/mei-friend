@@ -290,7 +290,7 @@ document.addEventListener('DOMContentLoaded', function() {
   let searchParams = new URLSearchParams(window.location.search);
   let orientationParam = searchParams.get('orientation');
   let scaleParam = searchParams.get('scale');
-  let speedModeParam = searchParams.get('speed');
+  let speedParam = searchParams.get('speed');
   breaksParam = searchParams.get('breaks');
 
   createControlsMenu(document.querySelector('.notation'), defaultVerovioOptions.scale);
@@ -332,7 +332,7 @@ document.addEventListener('DOMContentLoaded', function() {
     storage.read();
     if (orientationParam !== null) storage.orientation = orientationParam;
     if (scaleParam !== null) storage.scale = scaleParam;
-    if (speedModeParam !== null) storage.speed = speedModeParam;
+    if (speedParam !== null) storage.speed = speedParam;
     if (breaksParam !== null) storage.breaks = breaksParam;
     setFileChangedState(storage.fileChanged);
     if (!urlFileName) {
@@ -404,8 +404,8 @@ document.addEventListener('DOMContentLoaded', function() {
   } else if (storage && storage.supported && storage.hasItem('scale')) {
      document.getElementById('verovio-zoom').value = storage.scale;
   }
-  if (speedModeParam !== null) {
-    v.speedMode = (speedModeParam === 'true');
+  if (speedParam !== null) {
+    v.speedMode = (speedParam === 'true');
     document.getElementById('speed-checkbox').checked = v.speedMode;
   } else if (storage && storage.supported && storage.hasItem('speed')) {
     v.speedMode = storage.speed;

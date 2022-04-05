@@ -1070,15 +1070,11 @@ export default class Viewer {
       case 'hintOptions':
         if (value === 'schema_meiAll_401')
           cm.setOption(option, {
-            'schemaInfo': {
-              ...schema_meiAll_401
-            }
+            'schemaInfo': schema_meiAll_401
           });
         else if (value === 'schema_meiCMN_401')
           cm.setOption(option, {
-            'schemaInfo': {
-              ...schema_meiCMN_401
-            }
+            'schemaInfo': schema_meiCMN_401
           });
         else cm.setOption(option, {}); // hints: none
         break;
