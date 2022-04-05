@@ -292,9 +292,8 @@ document.addEventListener('DOMContentLoaded', function() {
   let searchParams = new URLSearchParams(window.location.search);
   let orientationParam = searchParams.get('orientation');
   let scaleParam = searchParams.get('scale');
-  // select parameter: both syntax version allowed (also mixed):
-  // ?select=note1,chord2,note3... and/or
-  // ?select=note1&select=chord2&select=note3
+  // select parameter: both syntax versions allowed (also mixed):
+  // ?select=note1,chord2,note3 and/or ?select=note1&select=chord2&select=note3
   selectParam = searchParams.getAll('select');
   if (selectParam && selectParam.length > 0)
     selectParam = selectParam.map(e => e.split(',')).reduce((a1, a2) => a1.concat(a2));
@@ -340,7 +339,7 @@ document.addEventListener('DOMContentLoaded', function() {
     storage.read();
     if (orientationParam !== null) storage.orientation = orientationParam;
     if (scaleParam !== null) storage.scale = scaleParam;
-    if (selectParam !== null) storage.select = selectParam;
+    if (selectParam && selectParam.length > 0) storage.select = selectParam;
     if (speedParam !== null) storage.speed = speedParam;
     if (breaksParam !== null) storage.breaks = breaksParam;
     setFileChangedState(storage.fileChanged);
@@ -665,7 +664,7 @@ function handleURLSelect() {
   } else if (storage && storage.supported && storage.hasItem('select')) {
     v.selectedElements = storage.select;
   }
-  return v.selectedElements ? v.selectedElements[0] : '';
+  return v.selectedElements.length > 0 ? v.selectedElements[0] : '';
 }
 
 // key is the input-from option in Verovio, value the distinctive string

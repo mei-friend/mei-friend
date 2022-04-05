@@ -140,4 +140,5 @@
 * Fix bug that was preventing initial fork attempts from displaying success
 # 0.3.10 patch:
 * Some update call optimizations
-* Support for `speed` as URL parameter for speedMode
+* Support for `speed`, `select` as additional URL parameters
+* Support for all URL parameters to be stored to and retrieved from local storage 
