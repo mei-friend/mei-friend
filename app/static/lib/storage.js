@@ -40,6 +40,7 @@ export default class Storage {
       this._fileChanged = this.storage.getItem("fileChanged");
       this._orientation = this.storage.getItem("orientation");
       this._speed = this.storage.getItem("speed");
+      this._breaks = this.storage.getItem("breaks");
       //fileChangedFromStorage = fileChangedFromStorage ? parseInt(storage.getItem("fileChanged")) : 0;
     }
   }
@@ -185,7 +186,17 @@ export default class Storage {
   }
 
   set speed(speed) {
-      this.safelySetStorageItem('speed', speed);
-      this._speed = speed;
+    this.safelySetStorageItem('speed', speed);
+    this._speed = speed;
   }
+
+  get breaks() {
+    return this._breaks;
+  }
+
+  set breaks(breaks) {
+    this.safelySetStorageItem('breaks', breaks);
+    this._breaks = breaks;
+  }
+
 }

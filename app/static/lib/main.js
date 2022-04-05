@@ -3,6 +3,7 @@ var spdWorker;
 var tkAvailableOptions;
 var mei;
 var elementAtCursor;
+var breaksParam; // the breaks parameter given through URL
 
 // guidelines base URL, needed to construct element / attribute URLs
 // TODO ideally determine version part automatically
@@ -93,7 +94,14 @@ export function loadDataInEditor(mei, setFreshlyLoaded = true) {
   cm.setValue(mei);
   v.loadXml(mei);
   let bs = document.getElementById('breaks-select');
-  if (bs) bs.value = v.containsBreaks() ? 'line' : 'auto';
+  if (bs) {
+    if (breaksParam)
+      bs.value = breaksParam
+    else if (storage && storage.supported && storage.hasItem('breaks'))
+      bs.value = storage.breaks;
+    else
+      bs.value = v.containsBreaks() ? 'line' : 'auto';
+  }
   v.setRespSelectOptions();
 }
 
@@ -281,6 +289,7 @@ document.addEventListener('DOMContentLoaded', function() {
   let searchParams = new URLSearchParams(window.location.search);
   let scaleParam = searchParams.get('scale');
   let speedModeParam = searchParams.get('speed');
+  breaksParam = searchParams.get('breaks');
 
   createControlsMenu(document.querySelector('.notation'),
     scaleParam ? scaleParam : defaultVerovioOptions.scale);
@@ -323,6 +332,7 @@ document.addEventListener('DOMContentLoaded', function() {
   if (storage.supported) {
     storage.read();
     if (speedModeParam !== null) storage.speed = speedModeParam;
+    if (breaksParam !== null) storage.breaks = breaksParam;
     // orientation: use URI param if specified;
     //  else use stored orientation if specified;
     //  else use default
@@ -1039,7 +1049,8 @@ function addEventListeners(v, cm) {
   // font selector
   document.getElementById('font-select').addEventListener('change', () => v.updateOption());
   // breaks selector
-  document.getElementById('breaks-select').addEventListener('change', () => {
+  document.getElementById('breaks-select').addEventListener('change', (ev) => {
+    if (storage && storage.supported) storage.breaks = ev.srcElement.value;
     v.pageSpanners = {
       start: {},
       end: {}
