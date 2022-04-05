@@ -995,7 +995,9 @@ export default class Viewer {
           rt.style.setProperty('--suppliedHighlightedColor', checked ? utils.brighter(optDefault, -50) : 'var(--highlightColor)');
           break;
         case 'respSelect':
-          o.values = Array.from(this.xmlDoc.querySelectorAll('corpName[*|id]')).map(e => e.getAttribute('xml:id'));
+          if (this.xmlDoc)
+            o.values = Array.from(this.xmlDoc.querySelectorAll('corpName[*|id]'))
+            .map(e => e.getAttribute('xml:id'));
           break;
       }
       let div = this.createOptionsItem(opt, o, optDefault)
