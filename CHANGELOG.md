@@ -142,3 +142,5 @@
 * Some update call optimizations
 * Support for `speed`, `select` as additional URL parameters
 * Support for all URL parameters to be stored to and retrieved from local storage 
+* Support for file renaming (new file creation) with Github commit UI
+* Automatically propose renaming for converted encodings
