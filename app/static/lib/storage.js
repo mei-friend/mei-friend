@@ -57,6 +57,7 @@ export default class Storage {
   removeItem(item) {
     if (this.supported) {
       this.storage.removeItem(item);
+      this["_" + item] = null;
     }
   }
 

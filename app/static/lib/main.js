@@ -91,7 +91,7 @@ export function updateFileStatusDisplay() {
 export function loadDataInEditor(mei, setFreshlyLoaded = true) {
   if (storage && storage.supported) {
     storage.override = false;
-    storage.removeItem('page');
+    if (pageParam === null) storage.removeItem('page');
   }
   freshlyLoaded = setFreshlyLoaded;
   cm.setValue(mei);
