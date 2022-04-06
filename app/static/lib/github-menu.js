@@ -312,38 +312,40 @@ async function proposeFileName(fname) {
   let newname;
   let fnamesInTree;
   let nameSpan = document.getElementById("commitFileName");
-  //FIXME: instead of github.commit.tree, ensure github.tree (at local level) exists
-  //and then use it
   github.repo.loadAs("tree", github.commit.tree).then(tree => { 
-    fnamesInTree = Object.keys(github.commit.tree)
-    if (suffixPos > 0) { 
-      // there's a dot and it's not at the start of the name
-      // => treat everything after it as the suffix
-      without = fname.substr(0, suffixPos);
-      suffix = fname.substr(suffixPos+1);
-    }
-    if(suffix.toLowerCase() !== "mei") { 
-      // see if we can get away with simply swapping suffix
-      newname = without + ".mei";
-      if(fnamesInTree.includes(newname)) { 
-        // no we can't - so mark it to differentiate
-        markFileName(newname).then( marked => { 
+    const containingDir = github.filepath.substr(
+      0,github.filepath.lastIndexOf("/"));
+    github.getBranchContents(containingDir).then(dirContents=>{ 
+      const fnamesInTree = dirContents.map(c => c.name);
+      if (suffixPos > 0) { 
+        // there's a dot and it's not at the start of the name
+        // => treat everything after it as the suffix
+        without = fname.substr(0, suffixPos);
+        suffix = fname.substr(suffixPos+1);
+      }
+      if(suffix.toLowerCase() !== "mei") { 
+        // see if we can get away with simply swapping suffix
+        newname = without + ".mei";
+        if(fnamesInTree.includes(newname)) { 
+          // no we can't - so mark it to differentiate
+          markFileName(newname).then( marked => { 
+            nameSpan.innerText = marked;
+            nameSpan.dispatchEvent(new Event('input'));
+          })
+        } else { 
+          nameSpan.innerText = newname;
+          nameSpan.dispatchEvent(new Event('input'));
+        }
+      } else { 
+        // file was already (mis-)named (?) as ".mei"
+        // propose adding a marker like "~1" to differentiate
+        markFileName(fname).then( marked => {
           nameSpan.innerText = marked;
           nameSpan.dispatchEvent(new Event('input'));
         })
-      } else { 
-        nameSpan.innerText = newname;
-        nameSpan.dispatchEvent(new Event('input'));
       }
-    } else { 
-      // file was already (mis-)named (?) as ".mei"
-      // propose adding a marker like "~1" to differentiate
-      markFileName(fname).then( marked => {
-        nameSpan.innerText = marked;
-        nameSpan.dispatchEvent(new Event('input'));
-      })
-    }
-  });
+    })
+  })
 }
 
 export async function fillInBranchContents(e) {

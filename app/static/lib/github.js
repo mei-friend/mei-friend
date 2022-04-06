@@ -413,7 +413,6 @@ export default class Github {
   
   async getBranchContents(path="/") {
     const contentsUrl = `https://api.github.com/repos/${this.githubRepo}/contents${path}`;
-    this.filepath = path;
     return fetch(contentsUrl, {
       method: 'GET',
       headers: this.apiHeaders
