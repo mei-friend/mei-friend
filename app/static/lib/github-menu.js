@@ -287,8 +287,10 @@ async function markFileName(fname) {
   const match = without.match("(.*)~\\d+$");
   const unmarked = match ? match[1] : without;
   let fnamesInTree;
-  return github.repo.loadAs("tree", github.commit.tree).then(tree => { 
-    fnamesInTree = Object.keys(github.commit.tree)
+  const containingDir = github.filepath.substr(
+    0,github.filepath.lastIndexOf("/"));
+  return github.getBranchContents(containingDir).then(tree => { 
+    fnamesInTree = tree.map(contents => contents.name);
     const prevMarked = fnamesInTree.filter(f => f.match(without+"~\\d+.mei$"));
     let marked;
     if(prevMarked.length) { 
@@ -379,7 +381,6 @@ export async function fillInBranchContents(e) {
         //  content.type === "dir" ? '<span class="btn icon icon-file-symlink-file inline-block-tight"></span>' : "" +
         `<span class="filepath${isDir ? '':' closeOnClick'}">${content.name}</span>${isDir ? "..." : ""}</a>`;
     });
-    githubMenu.innerHTML += '<hr class="dropdown-line"/>';
   } else {
     // User clicked file, or restoring from local storage. Display commit interface
     if (storage.supported && github.filepath) {
