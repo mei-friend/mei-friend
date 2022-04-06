@@ -33,7 +33,7 @@ export const samp = {
   COMPOSER: 5
 }
 
-export function setIsMEI(bool) { 
+export function setIsMEI(bool) {
   isMEI = !!bool;
 }
 
@@ -110,7 +110,7 @@ export function loadDataInEditor(mei, setFreshlyLoaded = true) {
       bs.value = v.containsBreaks() ? 'line' : 'auto';
   }
   v.setRespSelectOptions();
-  setCursorToId(cm, handleURLSelect());
+  setCursorToId(cm, handleURLParamSelect());
 }
 
 export function updateLocalStorage(meiXml) {
@@ -549,7 +549,7 @@ function vrvWorkerEventsHandler(ev) {
         v.updateNotation = false;
         loadDataInEditor(storage.content);
         v.updateNotation = true;
-        v.updateAll(cm, {}, handleURLSelect());
+        v.updateAll(cm, {}, handleURLParamSelect());
       }
       v.busy(false);
       break;
@@ -561,7 +561,7 @@ function vrvWorkerEventsHandler(ev) {
       setFileChangedState(false);
       updateLocalStorage(mei);
       v.updateNotation = true;
-      v.updateAll(cm, defaultVerovioOptions, handleURLSelect());
+      v.updateAll(cm, defaultVerovioOptions, handleURLParamSelect());
       //v.busy(false);
       break;
     case 'updated': // display SVG data on site
@@ -672,7 +672,8 @@ function vrvWorkerEventsHandler(ev) {
   }
 }
 
-function handleURLSelect() {
+// handles select (& page) input parameter from URL arguments ".../?select=..."
+function handleURLParamSelect() {
   if (pageParam !== null) {
     v.currentPage = parseInt(pageParam);
   } else if (storage && storage.supported && storage.hasItem('page')) {
@@ -712,7 +713,7 @@ export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true,
         updateLocalStorage(mei);
         if (updateAfterLoading) {
           v.updateNotation = true;
-          v.updateAll(cm, {}, handleURLSelect());
+          v.updateAll(cm, {}, handleURLParamSelect());
         }
       });
   } else { // if a file
@@ -785,7 +786,7 @@ export function handleEncoding(mei, setFreshlyLoaded = true, updateAfterLoading 
           updateLocalStorage(mei);
           if (updateAfterLoading) {
             v.updateNotation = true;
-            v.updateAll(cm, defaultVerovioOptions, handleURLSelect());
+            v.updateAll(cm, defaultVerovioOptions, handleURLParamSelect());
           }
           break;
         } else { // all other formats that Verovio imports
