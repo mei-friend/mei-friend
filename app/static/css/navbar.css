@@ -136,6 +136,7 @@
 
 #logTable {
   font-size: 8pt;
+  white-space: nowrap;
   color: var(--textColor);
 }
 
