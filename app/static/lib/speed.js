@@ -10,8 +10,7 @@ export var xmlNameSpace = 'http://www.w3.org/XML/1998/namespace';
 
 
 // returns complete MEI code of given page (one-based), defined by sb and pb
-export function getPageFromDom(xmlDoc, pageNo = 1, breaks = ['sb', 'pb'],
-  pageSpanners) {
+export function getPageFromDom(xmlDoc, pageNo = 1, breaks = ['sb', 'pb'], pageSpanners) {
   let meiHeader = xmlDoc.getElementsByTagName('meiHead');
   if (!meiHeader) {
     console.info('getPageFromDom(): no meiHeader');
@@ -30,6 +29,14 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks = ['sb', 'pb'],
     return;
   }
   // console.info('scoreDef: ', scoreDefs);
+
+  // determine one of three counting modes
+  let countingMode = 'measures'; // quick first page for xx measures
+  if (Array.isArray(breaks))
+    countingMode = 'encodedBreaks'; // encoded sb and pb as provided
+  else if (typeof breaks == 'object' && Object.keys(breaks).length > 0)
+    countingMode = 'computedBreaks'; // breaks object
+  if (countingMode === 'measures') pageNo = 1; // for quick first page, always 1
 
   // construct new MEI node for Verovio engraving
   let spdNode = minimalMEIFile(xmlDoc);
@@ -55,12 +62,6 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks = ['sb', 'pb'],
   spdScore.appendChild(scoreDef); // is updated within readSection()
   spdScore.appendChild(baseSection);
 
-  let countingMode = 'measures';
-  if (Array.isArray(breaks))
-    countingMode = 'encodedBreaks';
-  else if (typeof breaks == 'object' && Object.keys(breaks).length > 0)
-    countingMode = 'computedBreaks';
-
   let digger = readSection(pageNo, spdScore, breaks, countingMode);
   let sections = xmlScore.childNodes;
   sections.forEach((item) => {
@@ -78,7 +79,7 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks = ['sb', 'pb'],
 
   // matchTimespanningElements(xmlScore, spdScore, pageNo);
 
-  if (Object.keys(pageSpanners).length > 0)
+  if (Object.keys(pageSpanners.start).length > 0)
     addPageSpanningElements(xmlScore, spdScore, pageSpanners, pageNo);
 
   // insert sb elements for each element except last

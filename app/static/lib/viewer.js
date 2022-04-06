@@ -49,19 +49,21 @@ export default class Viewer {
   updateAll(cm, options = {}, xmlId = '') {
     this.setVerovioOptions(options);
     let computePageBreaks = false;
+    let p = this.currentPage;
     if (this.speedMode && Object.keys(this.pageBreaks).length === 0 &&
       document.getElementById('breaks-select').value === 'auto') {
       computePageBreaks = true;
-      this.changeCurrentPage('first'); // set currentPage = 1
+      p = 1; // request page one, but leave currentPage unchanged
     }
     if (this.speedMode && xmlId) {
-      this.changeCurrentPage(speed.getPageWithElement(this.xmlDoc, this.breaksValue(), xmlId));
+      p = speed.getPageWithElement(this.xmlDoc, this.breaksValue(), xmlId);
+      this.changeCurrentPage(p);
     }
     let message = {
       'cmd': 'updateAll',
       'options': this.vrvOptions,
       'mei': this.speedFilter(cm.getValue()),
-      'pageNo': this.currentPage,
+      'pageNo': p,
       'xmlId': xmlId,
       'speedMode': this.speedMode,
       'computePageBreaks': computePageBreaks
@@ -164,7 +166,7 @@ export default class Viewer {
         if (countBreaks && breaks.includes(e.nodeName)) this.pageCount--;
       }
     }
-    if (this.currentPage < 1 || this.currentPage > this.pageCount)
+    if (this.pageCount > 0 && (this.currentPage < 1 || this.currentPage > this.pageCount))
       this.currentPage = 1;
     console.info('xmlDOM pages counted: currentPage: ' + this.currentPage +
       ', pageCount: ' + this.pageCount);

@@ -370,7 +370,7 @@ document.addEventListener('DOMContentLoaded', function() {
       } else {
         meiFileLocation = "";
         meiFileLocationPrintable = "";
-	setIsMEI(true); // default MEI
+        setIsMEI(true); // default MEI
         openFile(undefined, false, false); // default MEI, skip freshly loaded (see comment above)
         setFileChangedState(false);
       }
@@ -588,12 +588,11 @@ function vrvWorkerEventsHandler(ev) {
       if (ev.data.pageCount && !v.speedMode)
         v.pageCount = ev.data.pageCount;
       else if (bs == 'none') v.pageCount = 1;
-      else if (v.speedMode && bs == 'auto' &&
-        Object.keys(v.pageBreaks).length > 0)
+      else if (v.speedMode && bs == 'auto' && Object.keys(v.pageBreaks).length > 0)
         v.pageCount = Object.keys(v.pageBreaks).length;
       // update only if still same page
-      if (v.currentPage == ev.data.pageNo || ev.data.forceUpdate) {
-        v.currentPage = ev.data.pageNo;
+      if (v.currentPage == ev.data.pageNo || ev.data.forceUpdate || ev.data.computePageBreaks) {
+        if (ev.data.forceUpdate) v.currentPage = ev.data.pageNo;
         updateStatusBar();
         document.querySelector('title').innerHTML = 'mei-friend: ' +
           meiFileName.substr(meiFileName.lastIndexOf("/") + 1);
