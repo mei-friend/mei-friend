@@ -176,6 +176,17 @@ function onFileNameEdit(e)  {
   setCommitUIEnabledStatus();
 }
 
+function onMessageInput(e) { 
+  e.target.classList.remove("warn");
+  console.log("GOT INPUT: ", e.target)
+  if(e.target.innerText= "") { 
+    document.getElementById("commitButton").setAttribute("disabled", "");
+  } else { 
+    document.getElementById("commitButton").removeAttribute("disabled");
+  }
+
+}
+
 function assignGithubMenuClickHandlers() {
   // This function is called repeatedly during runtime as the content of the
   // Github menu is dynamic. Therefore, we remove all event listeners below
@@ -418,6 +429,8 @@ export async function fillInBranchContents(e) {
     githubMenu.appendChild(commitUI);
     setFileNameAfterLoad();
     setFileChangedState(fileChanged);
+    commitMessageInput.removeEventListener("input", onMessageInput);
+    commitMessageInput.addEventListener("input", onMessageInput);
     commitFileName.removeEventListener("input", onFileNameEdit);
     commitFileName.addEventListener("input", onFileNameEdit);
   }
@@ -551,49 +564,37 @@ function handleCommitButtonClicked(e) {
   const commitFileName = document.getElementById("commitFileName");
   const messageInput = document.getElementById("commitMessageInput");
   const message = messageInput.value;
-  const githubLoadingIndicator = document.getElementById("GithubLogo");
-  // lock editor while we are busy commiting
-  cm.readOnly = "nocursor"; // don't allow editor focus
-  // try commiting to Github
-  githubLoadingIndicator.classList.add("clockwise");
-  const newfile = commitFileName.innerText !== stripMeiFileName() 
-    ? commitFileName.innerText : null;
-  github.writeGithubRepo(cm.getValue(), message, newfile)
-    .then(() => {
-      console.debug(`Successfully written to github: ${github.githubRepo}${github.filepath}`);
-      messageInput.value = "";
-      /*
-      github.readGithubRepo()
-        .then(() => {
-          setMeiFileInfo(
-            github.filepath, // meiFileName
-            github.githubRepo, // meiFileLocation
-            github.githubRepo + ":" // meiFileLocationPrintable
-          );
-          githubLoadingIndicator.classList.remove("clockwise");
-          cm.readOnly = false;
-          setFileChangedState(false);
-          updateGithubInLocalStorage();
-          fillInCommitLog("withRefresh");
-          console.debug("Finished updating commit log after writing commit.");
-        })
-        .catch((e) => {
-          cm.readOnly = false;
-          githubLoadingIndicator.classList.remove("clockwise");
-          console.warn("Couldn't read Github repo after writing commit: ", e, github);
-        })*/
-      if(newfile) { 
-        // switch to new filepath
-        github.filepath = github.filepath.substr(0, github.filepath.lastIndexOf('/') + 1) + newfile;
-      }
-      // load after write
-      loadFile("");
-    })
-    .catch((e) => {
-      cm.readOnly = false;
-      githubLoadingIndicator.classList.remove("clockwise");
-      console.warn("Couldn't commit Github repo: ", e, github)
-    });
+  console.log("Got message: ", message);
+  if(message) { 
+    const githubLoadingIndicator = document.getElementById("GithubLogo");
+    // lock editor while we are busy commiting
+    cm.readOnly = "nocursor"; // don't allow editor focus
+    // try commiting to Github
+    githubLoadingIndicator.classList.add("clockwise");
+    const newfile = commitFileName.innerText !== stripMeiFileName() 
+      ? commitFileName.innerText : null;
+    github.writeGithubRepo(cm.getValue(), message, newfile)
+      .then(() => {
+        console.debug(`Successfully written to github: ${github.githubRepo}${github.filepath}`);
+        messageInput.value = "";
+        if(newfile) { 
+          // switch to new filepath
+          github.filepath = github.filepath.substr(0, github.filepath.lastIndexOf('/') + 1) + newfile;
+        }
+        // load after write
+        loadFile("");
+      })
+      .catch((e) => {
+        cm.readOnly = false;
+        githubLoadingIndicator.classList.remove("clockwise");
+        console.warn("Couldn't commit Github repo: ", e, github)
+      });
+  } else { 
+    // no commit without a comit message!
+    messageInput.classList.add("warn");
+    document.getElementById("commitButton").setAttribute("disabled", "");
+    e.stopPropagation(); // prevent bubbling to stop github menu closing
+  }
 }
 
 function stripMeiFileName() { 

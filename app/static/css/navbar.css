@@ -259,3 +259,13 @@
   background: var(--textColor);
   color: var(--dropdownHeadingColor);
 }
+
+#commitMessageInput.warn { 
+  background: var(--textColor);
+  color: var(--dropdownHeadingColor);
+  border: 1px dotted var(--fileStatusWarnColor);
+}
+
+#commitMessageInput[disabled], #commitButton[disabled] { 
+  cursor: not-allowed;
+}
