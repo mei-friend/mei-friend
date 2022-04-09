@@ -805,7 +805,7 @@ export function handleEncoding(mei, setFreshlyLoaded = true, updateAfterLoading 
       log('Loading ' + meiFileName + 'did not succeed. ' +
         'No support for timewise MusicXML files.');
     else {
-      log('Format not recognized: ' + meiFileName + '.');
+      log('Format not recognized: ' + meiFileName + '.', 1649499359728);
     }
     setIsMEI(false);
     v.busy(false);
@@ -1305,7 +1305,15 @@ function updateStatusBar() {
     ((v.pageCount < 0) ? '?' : v.pageCount) + " loaded.";
 }
 
-export function log(s) {
+export function log(s, code=null) {
+  s += "<div>"
+  if(code) { 
+    s += " Error Code: " + code + "<br/>";
+    s += `<a id="bugReport" target="_blank" href="https://github.com/Signature-Sound-Vienna/mei-friend-online/issues/new?assignees=&labels=&template=bug_report.md&title=Error ${code}">Submit bug report</a>`;
+  } else { 
+    s += `<a id="bugReport" target="_blank" href="https://github.com/Signature-Sound-Vienna/mei-friend-online/issues/new?assignees=&labels=&template=bug_report.md">Submit bug report</a>`;
+  }
+  s += "</div>"
   document.querySelector(".statusbar").innerHTML = s;
   document.querySelector(".verovio-panel").innerHTML = s;
   console.log(s);

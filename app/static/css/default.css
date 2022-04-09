@@ -809,3 +809,8 @@ select>option {
   margin: 8px 4px;
   width: 100%;
 }
+
+#bugReport { 
+  font-size: 1.5em;
+  padding:20px;
+}
