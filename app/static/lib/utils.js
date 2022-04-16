@@ -24,22 +24,26 @@ export function findKey(key, obj) {
 
 // checks whether note noteId is inside a chord. Returns false or the chord id.
 export function insideParent(noteId, what = 'chord') {
-  let chord = document.querySelector('g#' + noteId).closest('.' + what);
-  if (chord) return chord.getAttribute('id');
-  else return false;
+  if (noteId) {
+    let chord = document.querySelector('g#' + noteId).closest('.' + what);
+    if (chord) return chord.getAttribute('id');
+  }
+  return false;
 }
 
 // finds all chords/notes inside an element and return array of id strings
 export function findNotes(elId) {
-  let notes = document.querySelector('g#' + elId).querySelectorAll('.note');
   let idArray = [];
-  for (let note of notes) {
-    let noteId = note.getAttribute('id');
-    let chordId = insideParent(noteId);
-    if (chordId && !idArray.includes(chordId)) {
-      idArray.push(chordId);
-    } else if (!chordId) {
-      idArray.push(noteId);
+  if (elId) {
+    let notes = document.querySelector('g#' + elId).querySelectorAll('.note');
+    for (let note of notes) {
+      let noteId = note.getAttribute('id');
+      let chordId = insideParent(noteId);
+      if (chordId && !idArray.includes(chordId)) {
+        idArray.push(chordId);
+      } else if (!chordId) {
+        idArray.push(noteId);
+      }
     }
   }
   return idArray;
@@ -152,7 +156,7 @@ export function getIdOfNextElement(cm, rw, elementNames = dutils.navElsArray,
     numberLikeString)[0]);
   // console.info('getIdOfNextElement("' + elementNames + '", "' + direction + '").');
 
-  if (direction == 'forwards') {
+  if (direction === 'forwards') {
     while (line = cm.getLine(++row)) {
       let found = false;
       for (let el of elementNames) {
@@ -162,14 +166,14 @@ export function getIdOfNextElement(cm, rw, elementNames = dutils.navElsArray,
         }
       }
       if (found &&
-        (staffNo == parseInt(getElementAttributeAbove(cm, row,
+        (staffNo === parseInt(getElementAttributeAbove(cm, row,
           'staff', numberLikeString)[0])) &&
-        (layerNo == parseInt(getElementAttributeAbove(cm, row,
+        (layerNo === parseInt(getElementAttributeAbove(cm, row,
           'layer', numberLikeString)[0]))) { // && (layerNo == layerN)
         break;
       }
     }
-  } else if (direction == 'backwards') {
+  } else if (direction === 'backwards') {
     while (line = cm.getLine(--row)) {
       let found = false;
       for (let el of elementNames) {
@@ -179,9 +183,9 @@ export function getIdOfNextElement(cm, rw, elementNames = dutils.navElsArray,
         }
       }
       if (found &&
-        (staffNo == parseInt(getElementAttributeAbove(cm, row,
+        (staffNo === parseInt(getElementAttributeAbove(cm, row,
           'staff', numberLikeString)[0])) &&
-        (layerNo == parseInt(getElementAttributeAbove(cm, row,
+        (layerNo === parseInt(getElementAttributeAbove(cm, row,
           'layer', numberLikeString)[0]))) { // && (layerNo == layerN)
         break;
       }
@@ -295,7 +299,7 @@ export function findElementBelow(textEditor, elementName = 'measure', point = [1
   let found2 = false;
   let row2 = row1;
   let col2 = 0;
-  while ((line = textBuffer.lineForRow(row2++)) != '' && row2 < mxRows) {
+  while ((line = textBuffer.lineForRow(row2++)) !== '' && row2 < mxRows) {
     console.info('findElement: line: ', line);
     if ((col2 = line.indexOf('</' + elementName)) > 0) {
       col2 += line.slice(col2).indexOf('>') + 1;
