@@ -20,6 +20,7 @@
   --defaultOverlayBackgroundColor: cornflowerblue;
   --defaultOverlayTextColor: white;
   --defaultOverlayBorderColor: darkblue;
+  --defaultOverlayLinkColor: darkblue;
   /* file status */
   --defaultFileStatusColor: green;
   /* file status changed */
@@ -48,6 +49,7 @@
   --overlayBackgroundColor: var(--defaultOverlayBackgroundColor);
   --overlayTextColor: var(--defaultOverlayTextColor);
   --overlayBorderColor: var(--defaultOverlayBorderColor);
+  --overlayLinkColor: var(--defaultOverlayLinkColor);
   --fileStatusColor: var(--defaultFileStatusColor);
   --fileStatusChangedColor: var(--defaultFileStatusChangedColor);
   --fileStatusWarnColor: var(--defaultFileStatusWarnColor);
@@ -158,6 +160,10 @@ a:active {
   bottom: 0;
   background-color: rgba(0, 0, 0, .8);
   z-index: 190;
+}
+
+.openUrlOverlay a {
+  color: var(--overlayLinkColor);
 }
 
 .openUrlOverlay .openUrlUI,
