@@ -162,7 +162,7 @@ a:active {
   z-index: 190;
 }
 
-.openUrlOverlay a {
+.openUrlOverlay a, .forkRepositoryOverlay a {
   color: var(--overlayLinkColor);
 }
 
