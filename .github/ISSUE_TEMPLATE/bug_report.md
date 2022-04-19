@@ -6,6 +6,8 @@ labels: ''
 assignees: ''
 
 ---
+Your issue may already be reported!
+Please search on the [issue tracker](../) before creating a new bug report.
 
 **Error Code**
 If mei-friend has given you an error code, please copy it here:
