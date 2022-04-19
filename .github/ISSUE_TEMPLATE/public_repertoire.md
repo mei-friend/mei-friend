@@ -7,11 +7,11 @@ assignees: ''
 
 ---
 
-mei-friend provides access to publicly-licensed encodings through the 'Public repertoire' and 'Open URL' options of the File menu, and through the 'Fork repository' option of the GitHub menu. We welcome proposed additions to the list of available encodings, with the following requirements: 
+mei-friend provides access to publicly-licensed encodings through the 'Public repertoire' and 'Open URL' options of the File menu, and through the 'Fork repository' option of the GitHub menu. We welcome proposed additions to the list of available encodings, in any supported encoding format (MEI, Kern, MusicXML, ABC, PAE), with the following requirements: 
 
 * Encodings must be available via public Github repositories.
 * Encodings must be made available under a public (e.g., a Creative Commons) license. 
-* The licensing of the encoding must be explicitly stated in the GitHub repository and/or in the MEI encoding e.g. using the [useRestrict](https://music-encoding.org/guidelines/v4/elements/userestrict) element.
+* The licensing of the encoding must be explicitly stated in the GitHub repository and/or in the encoding itself, e.g. using the MEI [useRestrict](https://music-encoding.org/guidelines/v4/elements/userestrict) element.
 
 To propose additions that meet these requirements, please provide for each encoding, below:
 
