@@ -493,7 +493,7 @@ export async function openUrlFetch(url = '', updateAfterLoading = true) {
           refreshGithubMenu();
         }
         updateFileStatusDisplay();
-        handleEncoding(data, true, false);
+        handleEncoding(data, true, updateAfterLoading);
         if (storage.supported) {
           storage.fileLocationType = "url";
         }
@@ -1307,10 +1307,10 @@ function updateStatusBar() {
 
 export function log(s, code=null) {
   s += "<div>"
-  if(code) { 
+  if(code) {
     s += " Error Code: " + code + "<br/>";
     s += `<a id="bugReport" target="_blank" href="https://github.com/Signature-Sound-Vienna/mei-friend-online/issues/new?assignees=&labels=&template=bug_report.md&title=Error ${code}">Submit bug report</a>`;
-  } else { 
+  } else {
     s += `<a id="bugReport" target="_blank" href="https://github.com/Signature-Sound-Vienna/mei-friend-online/issues/new?assignees=&labels=&template=bug_report.md">Submit bug report</a>`;
   }
   s += "</div>"
