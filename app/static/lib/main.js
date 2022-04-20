@@ -200,7 +200,7 @@ import {
 } from './github-menu.js';
 
 // mei-friend version and date
-const version = '0.3.10';
+const version = 'develop-0.3.10';
 const versionDate = '20 April 2022';
 // const defaultMeiFileName = `${root}Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei`;
 const defaultMeiFileName = `${root}Beethoven_WoO70-Breitkopf.mei`;
