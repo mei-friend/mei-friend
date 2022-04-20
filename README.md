@@ -1,6 +1,6 @@
 ![mei-friend logo](https://raw.githubusercontent.com/Signature-Sound-Vienna/mei-friend-online/main/app/static/svg/menu-logo.svg)
 
-# The *mei-friend* Web Application: Editing MEI in the Browser
+#  [The *mei-friend* Web Application: Editing MEI in the Browser](https://mei-friend.mdw.ac.at)
 
 *mei-friend* is a ‘last mile’ editor for [MEI music encodings](https://music-encoding.org) intended to alleviate the common task of cleaning up encodings generated via optical music recognition, or via conversion from other formats, originally implemented as a [plugin package for the Atom text editor](https://atom.io/packages/mei-friend). The [*mei-friend* Web Application](https://mei-friend.mdw.ac.at) is a reworking of the tool as a full-featured, cross-browser compatible Web application, with optimised performance and an extended set of features. The application is available online at https://mei-friend.mdw.ac.at.
 
