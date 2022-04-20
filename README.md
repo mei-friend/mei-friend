@@ -1,4 +1,4 @@
-![mei-friend logo](https://github.com/Signature-Sound-Vienna/mei-friend-online/raw/main/logo.png)
+![mei-friend logo](https://raw.githubusercontent.com/Signature-Sound-Vienna/mei-friend-online/main/app/static/svg/menu-logo.svg)
 
 # The *mei-friend* Web Application: Editing MEI in the Browser
 
