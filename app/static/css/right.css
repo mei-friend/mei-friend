@@ -1,3 +1,9 @@
+.dragContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
 .friendContainer {
   display: flex;
   flex-direction: row-reverse;

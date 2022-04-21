@@ -1,5 +1,6 @@
 import {
-  getVerovioContainerSize
+  getVerovioContainerSize,
+  setOrientation
 } from './resizer.js'
 import * as speed from './speed.js';
 import * as utils from './utils.js';
@@ -9,6 +10,7 @@ import {
   addToolTip
 } from './control-menu.js';
 import {
+  cm,
   storage,
   tkVersion
 } from './main.js';
@@ -647,12 +649,14 @@ export default class Viewer {
     if (sp.style.display !== 'block') sp.style.display = 'block';
     sp.classList.remove('out');
     sp.classList.add('in');
+    document.getElementById('showSettingsButton').style.visibility = 'hidden';
   }
 
   hideSettingsPanel() {
     let sp = document.getElementById('settingsPanel');
     sp.classList.add('out');
     sp.classList.remove('in');
+    document.getElementById('showSettingsButton').style.visibility = 'visible';
   }
 
   toggleSettingsPanel(ev = null) {
@@ -908,6 +912,21 @@ export default class Viewer {
 
   addMeiFriendOptionsToSettingsPanel(restoreFromLocalStorage = true) {
     let optionsToShow = {
+      titleAnnotationPanel: {
+        title: 'Annotation panel',
+        description: 'Annotation panel',
+        type: 'header'
+      },
+      showAnnotationPanel: {
+        title: 'Show annotation panel',
+        decription: 'Show annotation panel',
+        type: 'bool',
+        default: false
+      },
+      annotationPanelSeparator: {
+        title: 'options-line', // class name of hr element
+        type: 'line'
+      },
       titleSupplied: {
         title: 'Handle <supplied> element',
         description: 'Control handling of <supplied> elements',
@@ -1022,6 +1041,16 @@ export default class Viewer {
         if (ev.srcElement.type === 'number') value = parseFloat(value);
         let col = document.getElementById('suppliedColor').value;
         switch (option) {
+          case 'showAnnotationPanel':
+            setOrientation(cm);
+            if (this.speedMode &&
+              document.getElementById('breaks-select').value == 'auto') {
+              this.pageBreaks = {};
+              this.updateAll(cm);
+            } else {
+              this.updateLayout();
+            }
+            break;
           case 'showSupplied':
             rt.style.setProperty('--suppliedColor', (value) ? col : 'var(--notationColor)');
             rt.style.setProperty('--suppliedHighlightedColor', (value) ? utils.brighter(col, -50) : 'var(--highlightColor)');

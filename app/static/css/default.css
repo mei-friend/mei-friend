@@ -195,7 +195,7 @@ a:active {
   margin-bottom: 1em;
 }
 
-.openUrlOverlay .openUrlUI details>div ,
+.openUrlOverlay .openUrlUI details>div,
 .forkRepositoryOverlay .forkRepositoryUI details>div {
   margin-left: 1em;
 }
@@ -204,16 +204,14 @@ a:active {
   width: 70%;
 }
 
-
-.openUrlOverlay .openUrlUI details div div ,
+.openUrlOverlay .openUrlUI details div div,
 .forkRepositoryOverlay .forkRepositoryUI details div div {
   padding: 10px 15px;
 }
 
-
 .openUrlOverlay select,
 .forkRepositoryOverlay select {
-  text-align:left;
+  text-align: left;
 }
 
 #openUrlStatus {
@@ -278,6 +276,15 @@ a:active {
 }
 
 .encoding {}
+
+.annotationPanel {
+  height: 100%;
+  width: 100%;
+  background: #ffffa5;
+  border: 3px solid darkorange;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
 
 /* .CodeMirror {
     border: 1px solid #eee;
@@ -476,7 +483,7 @@ svg text {
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
-  user-select:  none;
+  user-select: none;
 }
 
 .verovio-panel g.highlighted {
@@ -816,7 +823,7 @@ select>option {
   width: 100%;
 }
 
-#bugReport { 
+#bugReport {
   font-size: 1.5em;
-  padding:20px;
+  padding: 20px;
 }

@@ -2,6 +2,8 @@ let orientation = 'bottom';
 let notationProportion = .5; // proportion notation div takes from container
 let resizerWidth = 8; // 8 px, attention hard-coded also in 4 css files
 
+let annotationPanelExtent = 250; // px, taken away from width of friendContainer
+
 export function setOrientation(cm, o = '', v = null, storage = null) {
   if (o) orientation = o;
   if (storage && storage.supported) storage.orientation = orientation;
@@ -13,20 +15,33 @@ export function setOrientation(cm, o = '', v = null, storage = null) {
   // v.updateLayout();
   // }).attr('href', root + '/css/' + orientation + '.css');
   let sz = calcSizeOfContainer();
-  friendSz.style.width = sz.width;
-  friendSz.style.height = sz.height;
   let notation = document.querySelector(".notation");
   console.log('setOrientation(' + o + ') container size:', sz);
+  let showAnnotationPanelCheckbox = document.getElementById('showAnnotationPanel');
   if (orientation == "top" || orientation == "bottom") {
+    if (showAnnotationPanelCheckbox && showAnnotationPanelCheckbox.checked) {
+      sz.width -= annotationPanelExtent; // subtract width of annotation panel
+      document.querySelector('.annotationPanel').style.display = 'unset';
+    } else {
+      document.querySelector('.annotationPanel').style.display = 'none';
+    }
     notation.style.width = sz.width; //- 6; // TODO: remove when border removed
     notation.style.height = sz.height * notationProportion;
     cm.setSize(sz.width, sz.height * (1 - notationProportion) - resizerWidth);
   }
   if (orientation == "left" || orientation == "right") {
+    if (showAnnotationPanelCheckbox && showAnnotationPanelCheckbox.checked) {
+      sz.height -= annotationPanelExtent; // subtract width of annotation panel
+      document.querySelector('.annotationPanel').style.display = 'unset';
+    } else {
+      document.querySelector('.annotationPanel').style.display = 'none';
+    }
     notation.style.width = sz.width * notationProportion;
     notation.style.height = sz.height; //- 6; TODO: remove when border removed
     cm.setSize(sz.width * (1 - notationProportion), sz.height);
   }
+  friendSz.style.width = sz.width;
+  friendSz.style.height = sz.height;
   // console.info('Notation size: ' + notation.style.width + '/' + notation.style.height);
   // redoLayout when done with loading TODO
   if (v) {
@@ -42,7 +57,7 @@ export function setOrientation(cm, o = '', v = null, storage = null) {
 }
 
 export function getOrientation() {
-   return orientation;
+  return orientation;
 }
 
 export function calcSizeOfContainer() {

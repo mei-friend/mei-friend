@@ -333,6 +333,7 @@ document.addEventListener('DOMContentLoaded', function() {
   };
 
   v.addCmOptionsToSettingsPanel(cm, defaultCodeMirrorOptions);
+  v.addMeiFriendOptionsToSettingsPanel();
 
   let urlFileName = searchParams.get('file');
   if (urlFileName) {
@@ -534,7 +535,7 @@ function vrvWorkerEventsHandler(ev) {
       tkVersion = ev.data.version;
       tkAvailableOptions = ev.data.availableOptions;
       v.addVrvOptionsToSettingsPanel(tkAvailableOptions, defaultVerovioOptions);
-      v.addMeiFriendOptionsToSettingsPanel();
+      // v.addMeiFriendOptionsToSettingsPanel();
       document.querySelector(".rightfoot").innerHTML +=
         `&nbsp;<a href="https://www.verovio.org/">Verovio ${tkVersion}</a>.`;
       document.querySelector(".statusbar").innerHTML =
@@ -1305,9 +1306,9 @@ function updateStatusBar() {
     ((v.pageCount < 0) ? '?' : v.pageCount) + " loaded.";
 }
 
-export function log(s, code=null) {
+export function log(s, code = null) {
   s += "<div>"
-  if(code) {
+  if (code) {
     s += " Error Code: " + code + "<br/>";
     s += `<a id="bugReport" target="_blank" href="https://github.com/Signature-Sound-Vienna/mei-friend-online/issues/new?assignees=&labels=&template=bug_report.md&title=Error ${code}">Submit bug report</a>`;
   } else {

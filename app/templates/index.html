@@ -297,9 +297,9 @@
       <div class="forkRepositoryUI">
         <div id="forkRepositoryUIGrouping">
           <h3><img id="forkRepoGithubLogo" src="{{ url_for('static', filename='img/GitHub-Mark-32px.png') }}" />
-Fork Github Repository</h3>
-          <p id="forkRepositoryInstructions">          
-          Please choose from the public repertoire or enter the Github (user or organization) name and the repository name of a Github-hosted repository, below. Your forked repository will become available
+            Fork Github Repository</h3>
+          <p id="forkRepositoryInstructions">
+            Please choose from the public repertoire or enter the Github (user or organization) name and the repository name of a Github-hosted repository, below. Your forked repository will become available
             from the Github menu.</p>
           <details>
             <summary>Public repertoire</summary>
@@ -323,7 +323,7 @@ Fork Github Repository</h3>
             </div>
           </details>
           <div id="forkRepositoryInputWrapper">
-            <input id="forkRepositoryInputName" type="text" placeholder="Github user or organization" /> 
+            <input id="forkRepositoryInputName" type="text" placeholder="Github user or organization" />
             <select id="forkRepositoryInputRepo" name="forkRepositoryInputRepo">
               <option value="" disabled selected hidden>Choose a repository</option>
             </select>
@@ -344,6 +344,7 @@ Fork Github Repository</h3>
         <textarea id="editor"></textarea>
       </div>
     </div>
+    <div class="annotationPanel" style="display: none;">Annotations</div>
   </div>
 
   <div class="footer">
@@ -364,9 +365,9 @@ Fork Github Repository</h3>
       <button id="hideSettingsButton" class="tabstart" title="Hide Settings Panel">
         <img src="{{ url_for('static', filename='svg/gear-16.svg') }}" id="hideSettingsButtonImg" />
       </button>
-      <button class="tablink" onclick="switchTab(event, 'meiFriendSettings')" title="mei-friend Settings">mei-friend</button>
-      <button class="tablink" onclick="switchTab(event, 'editorSettings')" title="Editor Settings" id="defaultOpen">Editor</button>
-      <button class="tablink" onclick="switchTab(event, 'verovioSettings')" title="Verovio Options">Verovio</button>
+      <button class="tablink" onclick="switchTab(event, 'settingsPanel', 'meiFriendSettings')" title="mei-friend Settings">mei-friend</button>
+      <button class="tablink" onclick="switchTab(event, 'settingsPanel', 'editorSettings')" title="Editor Settings" id="defaultOpen">Editor</button>
+      <button class="tablink" onclick="switchTab(event, 'settingsPanel', 'verovioSettings')" title="Verovio Options">Verovio</button>
       <span id="closeSettingsButton" class="topright" title="Hide Settings Panel">&times</span>
     </div>
     <!-- Tab content -->
@@ -401,12 +402,13 @@ Fork Github Repository</h3>
     });
 
     // switch tabs in settings menu
-    function switchTab(ev, tabId) {
+    function switchTab(ev, containingElementId, tabId) {
+      let containingElement = document.getElementById(containingElementId);
       // hide all tab contents except tabId
-      for (let cont of document.getElementsByClassName("tabcontent"))
+      for (let cont of containingElement.getElementsByClassName("tabcontent"))
         cont.style.display = (cont.id === tabId) ? 'block' : 'none';
       // remove class "active" from tablinks except for current target
-      for (let tab of document.getElementsByClassName("tablink"))
+      for (let tab of containingElement.getElementsByClassName("tablink"))
         (tab === ev.currentTarget) ? tab.classList.add('active') :
         tab.classList.remove('active');
     }
