@@ -1,3 +1,7 @@
+// mei-friend version and date
+const version = 'develop-0.3.10';
+const versionDate = '21 April 2022';
+
 var vrvWorker;
 var spdWorker;
 var tkAvailableOptions;
@@ -32,6 +36,112 @@ export const samp = {
   TITLE: 4,
   COMPOSER: 5
 }
+
+import {
+  setOrientation,
+  addResizerHandlers
+} from './resizer.js'
+import {
+  dropHandler,
+  dragEnter,
+  dragOverHandler,
+  dragLeave
+} from './dragger.js';
+import {
+  openUrl,
+  openUrlCancel
+} from './open-url.js';
+import {
+  createControlsMenu,
+  setBreaksOptions,
+  handleSmartBreaksOption,
+  addModifyerKeys,
+  manualCurrentPage,
+  generateSectionSelect
+} from './control-menu.js';
+import {
+  setCursorToId
+} from './utils.js';
+import {
+  getInMeasure,
+  navElsSelector,
+  getElementAtCursor
+} from './dom-utils.js';
+import {
+  addDragSelector
+} from './drag-selector.js';
+import * as att from './attribute-classes.js';
+import * as e from './editor.js';
+import Viewer from './viewer.js';
+import Github from './github.js';
+import Storage from './storage.js';
+import {
+  fillInBranchContents,
+  logoutFromGithub,
+  refreshGithubMenu,
+  setCommitUIEnabledStatus
+} from './github-menu.js';
+
+// const defaultMeiFileName = `${root}Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei`;
+const defaultMeiFileName = `${root}Beethoven_WoO70-Breitkopf.mei`;
+const defaultOrientation = 'bottom'; // default notation position in window
+const defaultVerovioOptions = {
+  scale: 55,
+  breaks: "line",
+  header: "encoded",
+  footer: "encoded",
+  inputFrom: "mei",
+  adjustPageHeight: true,
+  mdivAll: true,
+  outputIndent: 3,
+  pageMarginLeft: 50,
+  pageMarginRight: 25,
+  pageMarginBottom: 10,
+  pageMarginTop: 25,
+  spacingLinear: .2,
+  spacingNonLinear: .5,
+  minLastJustification: 0,
+  clefChangeFactor: .83,
+  svgAdditionalAttribute: ["layer@n", "staff@n",
+    "dir@vgrp", "dynam@vgrp", "hairpin@vgrp", "pedal@vgrp"
+  ],
+  bottomMarginArtic: 1.2,
+  topMarginArtic: 1.2
+};
+const defaultCodeMirrorOptions = {
+  lineNumbers: true,
+  lineWrapping: false,
+  styleActiveLine: true,
+  mode: "xml",
+  indentUnit: 3,
+  smartIndent: true,
+  tabSize: 3,
+  autoCloseBrackets: true,
+  autoCloseTags: true,
+  matchTags: {
+    bothTags: true
+  },
+  showTrailingSpace: true,
+  foldGutter: true,
+  gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
+  extraKeys: {
+    "'<'": completeAfter,
+    "'/'": completeIfAfterLt,
+    "' '": completeIfInTag,
+    "'='": completeIfInTag,
+    "Ctrl-Space": "autocomplete",
+    "Alt-.": consultGuidelines
+  },
+  hintOptions: 'schema_meiCMN_401', // not cm conform: just provide schema name
+  theme: 'default',
+  zoomFont: 100, // my own option
+  matchTheme: false, // notation matches editor theme (my option)
+  defaultBrightTheme: 'default', // default theme for OS bright mode
+  defaultDarkTheme: 'paraiso-dark' // 'base16-dark', // default theme for OS dark mode
+};
+const defaultKeyMap = `${root}keymaps/default-keymap.json`;
+const sampleEncodingsCSV = `${root}sampleEncodings/sampleEncodings.csv`;
+let freshlyLoaded = false; // flag to ignore a cm.on("changes") event on file load
 
 export function setIsMEI(bool) {
   isMEI = !!bool;
@@ -95,7 +205,6 @@ export function updateFileStatusDisplay() {
 export function loadDataInEditor(mei, setFreshlyLoaded = true) {
   if (storage && storage.supported) {
     storage.override = false;
-    if (pageParam === null) storage.removeItem('page');
   }
   freshlyLoaded = setFreshlyLoaded;
   cm.setValue(mei);
@@ -154,114 +263,6 @@ export function updateGithubInLocalStorage() {
   }
 }
 
-import {
-  setOrientation,
-  addResizerHandlers
-} from './resizer.js'
-import {
-  dropHandler,
-  dragEnter,
-  dragOverHandler,
-  dragLeave
-} from './dragger.js';
-import {
-  openUrl,
-  openUrlCancel
-} from './open-url.js';
-import {
-  createControlsMenu,
-  setBreaksOptions,
-  handleSmartBreaksOption,
-  addModifyerKeys,
-  manualCurrentPage,
-  generateSectionSelect
-} from './control-menu.js';
-import {
-  setCursorToId
-} from './utils.js';
-import {
-  getInMeasure,
-  navElsSelector,
-  getElementAtCursor
-} from './dom-utils.js';
-import {
-  addDragSelector
-} from './drag-selector.js';
-import * as att from './attribute-classes.js';
-import * as e from './editor.js';
-import Viewer from './viewer.js';
-import Github from './github.js';
-import Storage from './storage.js';
-import {
-  fillInBranchContents,
-  logoutFromGithub,
-  refreshGithubMenu,
-  setCommitUIEnabledStatus
-} from './github-menu.js';
-
-// mei-friend version and date
-const version = 'staging-0.3.10';
-const versionDate = '20 April 2022';
-// const defaultMeiFileName = `${root}Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei`;
-const defaultMeiFileName = `${root}Beethoven_WoO70-Breitkopf.mei`;
-const defaultOrientation = 'bottom'; // default notation position in window
-const defaultVerovioOptions = {
-  scale: 55,
-  breaks: "line",
-  header: "encoded",
-  footer: "encoded",
-  inputFrom: "mei",
-  adjustPageHeight: true,
-  mdivAll: true,
-  outputIndent: 3,
-  pageMarginLeft: 50,
-  pageMarginRight: 25,
-  pageMarginBottom: 10,
-  pageMarginTop: 25,
-  spacingLinear: .2,
-  spacingNonLinear: .5,
-  minLastJustification: 0,
-  clefChangeFactor: .83,
-  svgAdditionalAttribute: ["layer@n", "staff@n",
-    "dir@vgrp", "dynam@vgrp", "hairpin@vgrp", "pedal@vgrp"
-  ],
-  bottomMarginArtic: 1.2,
-  topMarginArtic: 1.2
-};
-const defaultCodeMirrorOptions = {
-  lineNumbers: true,
-  lineWrapping: false,
-  styleActiveLine: true,
-  mode: "xml",
-  indentUnit: 3,
-  smartIndent: true,
-  tabSize: 3,
-  autoCloseBrackets: true,
-  autoCloseTags: true,
-  matchTags: {
-    bothTags: true
-  },
-  showTrailingSpace: true,
-  foldGutter: true,
-  gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
-  extraKeys: {
-    "'<'": completeAfter,
-    "'/'": completeIfAfterLt,
-    "' '": completeIfInTag,
-    "'='": completeIfInTag,
-    "Ctrl-Space": "autocomplete",
-    "Alt-.": consultGuidelines
-  },
-  hintOptions: 'schema_meiCMN_401', // not cm conform: just provide schema name
-  theme: 'default',
-  zoomFont: 100, // my own option
-  matchTheme: false, // notation matches editor theme (my option)
-  defaultBrightTheme: 'default', // default theme for OS bright mode
-  defaultDarkTheme: 'paraiso-dark' // 'base16-dark', // default theme for OS dark mode
-};
-const defaultKeyMap = `${root}keymaps/default-keymap.json`;
-const sampleEncodingsCSV = `${root}sampleEncodings/sampleEncodings.csv`;
-let freshlyLoaded = false; // flag to ignore a cm.on("changes") event on file load
 
 function completeAfter(cm, pred) {
   if (!pred || pred()) setTimeout(function() {
@@ -697,6 +698,9 @@ let inputFormats = {
 
 export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true,
   updateAfterLoading = true) {
+  if (pageParam === null) storage.removeItem('page');
+  // remove any URL parameters, because we open a file locally or through github
+  window.history.replaceState(null, null, window.location.pathname);
   if (typeof file === "string") { // with fileName string
     meiFileName = file;
     console.info('openMei ' + meiFileName + ', ', cm);
@@ -752,6 +756,7 @@ export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true,
 // mei argument may be MEI or any other supported format (text/binary)
 export function handleEncoding(mei, setFreshlyLoaded = true, updateAfterLoading = true) {
   let found = false;
+  if (pageParam === null) storage.removeItem('page');
   v.clear();
   v.busy();
   if (meiFileName.endsWith('.mxl')) { // compressed MusicXML file
@@ -1305,9 +1310,9 @@ function updateStatusBar() {
     ((v.pageCount < 0) ? '?' : v.pageCount) + " loaded.";
 }
 
-export function log(s, code=null) {
+export function log(s, code = null) {
   s += "<div>"
-  if(code) {
+  if (code) {
     s += " Error Code: " + code + "<br/>";
     s += `<a id="bugReport" target="_blank" href="https://github.com/Signature-Sound-Vienna/mei-friend-online/issues/new?assignees=&labels=&template=bug_report.md&title=Error ${code}">Submit bug report</a>`;
   } else {
