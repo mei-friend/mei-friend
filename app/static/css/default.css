@@ -535,7 +535,7 @@ svg text {
   /* max-width: 180px; */
 }
 
-.params {
+.code {
   font-family: monospace;
 }
 
@@ -816,7 +816,7 @@ select>option {
   width: 100%;
 }
 
-#bugReport { 
+#bugReport {
   font-size: 1.5em;
   padding:20px;
 }
