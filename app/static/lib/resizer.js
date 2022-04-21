@@ -69,7 +69,7 @@ export function calcSizeOfContainer() {
   let footerSz = document.querySelector('.footer').getBoundingClientRect();
   friendSz.height = bodySz.height - headerSz.height - footerSz.height -
     resizerWidth;
-  friendSz.width = bodySz.width - resizerWidth;
+  friendSz.width = bodySz.width - resizerWidth + 2; // TODO: hack for missing 2-px-width (21 April 2022)
   console.log('calcSizeOfContainer(' + orientation +
     ') bodySz, header, sizer, footer: ' +
     Math.round(bodySz.width) + '/' + Math.round(bodySz.height) + ', ' +
