@@ -21,9 +21,9 @@ export function setOrientation(cm, o = '', v = null, storage = null) {
   if (orientation == "top" || orientation == "bottom") {
     if (showAnnotationPanelCheckbox && showAnnotationPanelCheckbox.checked) {
       sz.width -= annotationPanelExtent; // subtract width of annotation panel
-      document.querySelector('.annotationPanel').style.display = 'unset';
+      document.getElementById('annotationPanel').style.display = 'unset';
     } else {
-      document.querySelector('.annotationPanel').style.display = 'none';
+      document.getElementById('annotationPanel').style.display = 'none';
     }
     notation.style.width = sz.width; //- 6; // TODO: remove when border removed
     notation.style.height = sz.height * notationProportion;
@@ -32,9 +32,9 @@ export function setOrientation(cm, o = '', v = null, storage = null) {
   if (orientation == "left" || orientation == "right") {
     if (showAnnotationPanelCheckbox && showAnnotationPanelCheckbox.checked) {
       sz.height -= annotationPanelExtent; // subtract width of annotation panel
-      document.querySelector('.annotationPanel').style.display = 'unset';
+      document.getElementById('annotationPanel').style.display = 'unset';
     } else {
-      document.querySelector('.annotationPanel').style.display = 'none';
+      document.getElementById('annotationPanel').style.display = 'none';
     }
     notation.style.width = sz.width * notationProportion;
     notation.style.height = sz.height; //- 6; TODO: remove when border removed

@@ -922,6 +922,10 @@ let cmd = {
   'showSettingsPanel': () => v.showSettingsPanel(),
   'hideSettingsPanel': () => v.hideSettingsPanel(),
   'toggleSettingsPanel': (ev) => v.toggleSettingsPanel(ev),
+  'hideAnnotationPanel': () => {
+    document.getElementById('showAnnotationPanel').checked = false;
+    v.toggleAnnotationPanel();
+  },
   'moveProgBar': () => moveProgressBar(),
   'open': () => openFileDialog(),
   'openUrl': () => openUrl(),
@@ -1032,6 +1036,7 @@ function addEventListeners(v, cm) {
   document.getElementById('showSettingsButton').addEventListener('click', cmd.showSettingsPanel);
   document.getElementById('hideSettingsButton').addEventListener('click', cmd.hideSettingsPanel);
   document.getElementById('closeSettingsButton').addEventListener('click', cmd.hideSettingsPanel);
+  document.getElementById('closeAnnotationPanelButton').addEventListener('click', cmd.hideAnnotationPanel);
 
   // open dialogs
   document.getElementById('OpenMei').addEventListener('click', cmd.open);

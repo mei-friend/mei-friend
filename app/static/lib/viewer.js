@@ -659,6 +659,17 @@ export default class Viewer {
     document.getElementById('showSettingsButton').style.visibility = 'visible';
   }
 
+  toggleAnnotationPanel() {
+    setOrientation(cm);
+    if (this.speedMode &&
+      document.getElementById('breaks-select').value == 'auto') {
+      this.pageBreaks = {};
+      this.updateAll(cm);
+    } else {
+      this.updateLayout();
+    }
+  }
+
   toggleSettingsPanel(ev = null) {
     if (ev) {
       console.log('stop propagation')
@@ -1042,14 +1053,7 @@ export default class Viewer {
         let col = document.getElementById('suppliedColor').value;
         switch (option) {
           case 'showAnnotationPanel':
-            setOrientation(cm);
-            if (this.speedMode &&
-              document.getElementById('breaks-select').value == 'auto') {
-              this.pageBreaks = {};
-              this.updateAll(cm);
-            } else {
-              this.updateLayout();
-            }
+            this.toggleAnnotationPanel();
             break;
           case 'showSupplied':
             rt.style.setProperty('--suppliedColor', (value) ? col : 'var(--notationColor)');

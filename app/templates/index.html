@@ -344,7 +344,15 @@
         <textarea id="editor"></textarea>
       </div>
     </div>
-    <div class="annotationPanel" style="display: none;">Annotations</div>
+    <div id="annotationPanel" style="display: none;">
+      <div class="tab">
+        <button class="tablink defaultOpen" onclick="switchTab(event, 'annotationPanel', 'annotationTools')" title="Annotation tools">Tools</button>
+        <button class="tablink" onclick="switchTab(event, 'annotationPanel', 'listAnnotations')" title="List annotations">List</button>
+        <span id="closeAnnotationPanelButton" class="topright" title="Hide Annotation Panel">&times;</span>
+      </div>
+      <div id="annotationTools" class="tabcontent">Annotation Tools</div>
+      <div id="listAnnotations" class="tabcontent">List Annotations</div>
+    </div>
   </div>
 
   <div class="footer">
@@ -366,17 +374,14 @@
         <img src="{{ url_for('static', filename='svg/gear-16.svg') }}" id="hideSettingsButtonImg" />
       </button>
       <button class="tablink" onclick="switchTab(event, 'settingsPanel', 'meiFriendSettings')" title="mei-friend Settings">mei-friend</button>
-      <button class="tablink" onclick="switchTab(event, 'settingsPanel', 'editorSettings')" title="Editor Settings" id="defaultOpen">Editor</button>
+      <button class="tablink defaultOpen" onclick="switchTab(event, 'settingsPanel', 'editorSettings')" title="Editor Settings">Editor</button>
       <button class="tablink" onclick="switchTab(event, 'settingsPanel', 'verovioSettings')" title="Verovio Options">Verovio</button>
-      <span id="closeSettingsButton" class="topright" title="Hide Settings Panel">&times</span>
+      <span id="closeSettingsButton" class="topright" title="Hide Settings Panel">&times;</span>
     </div>
     <!-- Tab content -->
-    <div id="meiFriendSettings" class="tabcontent">
-    </div>
-    <div id="editorSettings" class="tabcontent">
-    </div>
-    <div id="verovioSettings" class="tabcontent">
-    </div>
+    <div id="meiFriendSettings" class="tabcontent"> </div>
+    <div id="editorSettings" class="tabcontent"> </div>
+    <div id="verovioSettings" class="tabcontent"> </div>
   </div>
 
   <script>
@@ -403,17 +408,21 @@
 
     // switch tabs in settings menu
     function switchTab(ev, containingElementId, tabId) {
+      console.log('switchTab: ', containingElementId, tabId);
+      console.log('switchTab: ', ev);
       let containingElement = document.getElementById(containingElementId);
-      // hide all tab contents except tabId
-      for (let cont of containingElement.getElementsByClassName("tabcontent"))
-        cont.style.display = (cont.id === tabId) ? 'block' : 'none';
-      // remove class "active" from tablinks except for current target
-      for (let tab of containingElement.getElementsByClassName("tablink"))
-        (tab === ev.currentTarget) ? tab.classList.add('active') :
-        tab.classList.remove('active');
+      if (containingElement) {
+        // hide all tab contents except tabId
+        for (let cont of containingElement.getElementsByClassName("tabcontent"))
+          cont.style.display = (cont.id === tabId) ? 'block' : 'none';
+        // remove class "active" from tablinks except for current target
+        for (let tab of containingElement.getElementsByClassName("tablink"))
+          (tab === ev.currentTarget) ? tab.classList.add('active') :
+          tab.classList.remove('active');
+      }
     }
 
-    document.getElementById("defaultOpen").click();
+    document.querySelectorAll(".defaultOpen").forEach(item => item.click());
   </script>
 </body>
 

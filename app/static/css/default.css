@@ -277,7 +277,7 @@ a:active {
 
 .encoding {}
 
-.annotationPanel {
+#annotationPanel {
   height: 100%;
   width: 100%;
   background: #ffffa5;
