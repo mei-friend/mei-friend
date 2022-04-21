@@ -146,3 +146,4 @@
 * Support for file renaming (new file creation) with Github commit UI
 * Automatically propose renaming for converted encodings
 * Implement GitHub issue reporting features
+# 0.3.11 patch:
