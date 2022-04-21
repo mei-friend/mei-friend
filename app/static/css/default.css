@@ -286,6 +286,20 @@ a:active {
   box-sizing: border-box;
 }
 
+#annotationPanel .tab {
+    background-color: #ffffcf;
+}
+
+#annotationPanel .tablink.active, #annotationPanel .tabcontent {
+    background-color: #ffffa5;
+}
+
+#annotationPanel .tablink:hover {
+  background-color: #ffeecf;
+}
+
+
+
 /* .CodeMirror {
     border: 1px solid #eee;
     height: auto;
