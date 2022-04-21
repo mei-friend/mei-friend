@@ -502,10 +502,14 @@ function hexToRgb(hex) {
     .map(x => parseInt(x, 16))
 }
 
+// supports "rgb(123,234,0)" format
 export function complementary(rgbString) {
   let rgb = [];
-  rgbString.slice(4, -1).split(',').forEach(i => {
-    rgb.push(255 - i);
-  });
+  if (rgbString.startsWith('#')) {
+    rgb = hexToRgb(rgbString);
+  } else {
+    rgbString.slice(4, -1).split(',').forEach(i => rgb.push(i));
+  }
+  rgb = rgb.map(i => 255 - i);
   return 'rgb(' + rgb.join(', ') + ')';
 }

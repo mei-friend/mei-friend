@@ -568,6 +568,16 @@ export default class Viewer {
         rt.style.setProperty('--fileStatusChangedColor', utils.brighter(window.getComputedStyle(str).color, 40));
         rt.style.setProperty('--fileStatusWarnColor', utils.brighter(window.getComputedStyle(str).color, 10));
       }
+      rt.style.setProperty('--annotationPanelBackgroundColor',
+        window.getComputedStyle(rt).getPropertyValue('--defaultAnnotationPanelDarkBackgroundColor'));
+      // utils.brighter(window.getComputedStyle(rt).getPropertyValue('--defaultAnnotationPanelBackgroundColor'), -40));
+      rt.style.setProperty('--annotationPanelLinkBackgroundColor',
+        utils.brighter(window.getComputedStyle(rt).getPropertyValue('--defaultAnnotationPanelDarkBackgroundColor'), -30));
+      rt.style.setProperty('--annotationPanelHoverColor',
+        utils.brighter(window.getComputedStyle(rt).getPropertyValue('--defaultAnnotationPanelDarkBackgroundColor'), -60));
+      rt.style.setProperty('--annotationPanelTextColor', 'white');
+      rt.style.setProperty('--annotationPanelBorderColor',
+        utils.brighter(window.getComputedStyle(rt).getPropertyValue('--defaultAnnotationPanelDarkBackgroundColor'), 30));
     } else { // bright mode
       // sleepy owl
       owl.setAttribute("src", owlSrc + 'menu-logo-asleep.svg');
@@ -594,7 +604,18 @@ export default class Viewer {
         rt.style.setProperty('--fileStatusChangedColor', utils.brighter(window.getComputedStyle(str).color, -40));
         rt.style.setProperty('--fileStatusWarnColor', utils.brighter(window.getComputedStyle(str).color, -10));
       }
+      rt.style.setProperty('--annotationPanelBackgroundColor',
+        window.getComputedStyle(rt).getPropertyValue('--defaultAnnotationPanelBackgroundColor'));
+      rt.style.setProperty('--annotationPanelLinkBackgroundColor',
+        window.getComputedStyle(rt).getPropertyValue('--defaultAnnotationPanelLinkBackgroundColor'));
+      rt.style.setProperty('--annotationPanelHoverColor',
+        window.getComputedStyle(rt).getPropertyValue('--defaultAnnotationPanelHoverColor'));
+      rt.style.setProperty('--annotationPanelTextColor',
+        window.getComputedStyle(rt).getPropertyValue('--defaultAnnotationPanelTextColor'));
+      rt.style.setProperty('--annotationPanelBorderColor',
+        utils.brighter(window.getComputedStyle(rt).getPropertyValue('--defaultAnnotationPanelBackgroundColor'), -30));
     }
+
   } // setMenuColors()
 
   zoom(delta, storage = null) {
