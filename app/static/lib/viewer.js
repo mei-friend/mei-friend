@@ -1209,10 +1209,12 @@ export default class Viewer {
         input.setAttribute('value', optDefault);
         break;
       case 'header':
-        label.setAttribute('style', 'font-weight: bold; font-size: 105%; margin-top: 3px;');
+        div.classList.remove('optionsItem');
+        div.classList.add('optionsSubHeading');
         break;
       case 'line':
         div.removeChild(label);
+        div.classList.remove('optionsItem');
         let line = document.createElement('hr');
         line.classList.add(o.title);
         div.appendChild(line);
