@@ -699,6 +699,8 @@ let inputFormats = {
 export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true,
   updateAfterLoading = true) {
   if (pageParam === null) storage.removeItem('page');
+  // remove any URL parameters, because we open a file locally or through github
+  window.history.replaceState(null, null, window.location.pathname);
   if (typeof file === "string") { // with fileName string
     meiFileName = file;
     console.info('openMei ' + meiFileName + ', ', cm);
