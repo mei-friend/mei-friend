@@ -358,31 +358,43 @@
 
     <div class='text-info'>
       <h3 class="text-highlight">URL Parameters</h3>
+      <p>mei-friend may ba called with several parameters passed through the URL
+        in the form of <span class="code">https://mei-friend.mdw.ac.at/?file=fileURL&select=beamId</span>.</p>
       <table>
         <tr>
-          <td class="params">file=<i>fileURL</i></td>
+          <td class="code">file=<i>fileURL</i></td>
           <td class="explanation">Open specified file URL</td>
         </tr>
         <tr>
-          <td class="params">orientation=<i>top|right|bottom|left</i></td>
+          <td class="code">orientation=<i>top|right|bottom|left</i></td>
           <td class="explanation">Set relative position of notation in window</td>
         </tr>
         <tr>
-          <td class="params">scale=<i>number</i></td>
+          <td class="code">scale=<i>number</i></td>
           <td class="explanation">Specify scaling of notation (default: 55; min: 10; max: 200)</td>
         </tr>
         <tr>
-          <td class="params">select=<i>n1,n2,n3</i>&<br>select=<i>ch1</i>&<br>select=<i>slur1</i></td>
-          <td class="explanation">Specify selected elements (pass multiple comma-separated xml:ids and/or repeat select parameter); notation and encoding will page-flip and scroll to first selected element</td>
+          <td class="code">breaks=<i>none|line|encoded|auto</i></td>
+          <td class="explanation">Specify breaks option of Verovio</td>
         </tr>
         <tr>
-          <td class="params">speed=<i>true|false</i></td>
+          <td class="code">select=<i>n1,n2,n3</i>&<br>select=<i>ch1</i>&<br>select=<i>slur1</i></td>
+          <td class="explanation">Specify selected elements (pass multiple
+            comma-separated xml:ids and/or repeat select parameter); notation and
+            encoding will page-flip and scroll to first selected element; overrides page parameter</td>
+        </tr>
+        <tr>
+          <td class="code">page=<i>number</i></td>
+          <td class="explanation">Specify a page number to be displayed (depends on breaks settings; overridden by select, see above)</td>
+        </tr>
+        <tr>
+          <td class="code">speed=<i>true|false</i></td>
           <td class="explanation">Set speed mode</td>
         </tr>
         <tr>
           <td colspan="2">Example: <br />
-            <a class="params" target="_blank"
-              href="http://https://repo.mdw.ac.at/mei-friend/?file=https://raw.githubusercontent.com/trompamusic-encodings/Schumann-Clara_Romanze-in-a-Moll/master/Schumann-Clara_Romanze-ohne-Opuszahl_a-Moll.mei&orientation=top&select=beam-0000001097443359,staff-0000001071700568,chord-0000002117575656,chord-0000000554871076&select=slur-0000000400617177,slur-0000001381747608&speed=true&breaks=auto">http://https://repo.mdw.ac.at/mei-friend/?file=https://raw.githubusercontent.com/trompamusic-encodings/Schumann-Clara_Romanze-in-a-Moll/master/Schumann-Clara_Romanze-ohne-Opuszahl_a-Moll.mei&orientation=top&select=beam-0000001097443359,staff-0000001071700568,chord-0000002117575656,chord-0000000554871076&select=slur-0000000400617177,slur-0000001381747608&speed=true&breaks=auto</a>
+            <a class="code" target="_blank"
+              href="https://repo.mdw.ac.at/mei-friend/?file=https://raw.githubusercontent.com/trompamusic-encodings/Schumann-Clara_Romanze-in-a-Moll/master/Schumann-Clara_Romanze-ohne-Opuszahl_a-Moll.mei&orientation=top&select=beam-0000001097443359,staff-0000001071700568,chord-0000002117575656,chord-0000000554871076&select=slur-0000000400617177,slur-0000001381747608&speed=true&breaks=auto">https://repo.mdw.ac.at/mei-friend/?file=https://raw.githubusercontent.com/trompamusic-encodings/Schumann-Clara_Romanze-in-a-Moll/master/Schumann-Clara_Romanze-ohne-Opuszahl_a-Moll.mei&orientation=top&select=beam-0000001097443359,staff-0000001071700568,chord-0000002117575656,chord-0000000554871076&select=slur-0000000400617177,slur-0000001381747608&speed=true&breaks=auto</a>
           </td>
         </tr>
       </table>

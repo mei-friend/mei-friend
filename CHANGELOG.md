@@ -105,6 +105,7 @@
 * Remember orientation upon refresh
 # 0.3.1 patch
 * Implement fork repository functionality
+* Support for `file`, `orientation`, and `scale` as URL parameters
 # 0.3.2 patch
 * Accelerate speedMode using tXml in a separate worker for pre-computing time-spanning elements with @startid/@endid attributes
 * Support for toggling spiccato articulation with Shift+P
@@ -140,7 +141,7 @@
 * Fix bug that was preventing initial fork attempts from displaying success
 # 0.3.10 patch:
 * Some update call optimizations
-* Support for `speed`, `select`, `page` as additional URL parameters
+* Support for `breaks`, `select`, `page`, and `speed` as additional URL parameters
 * Support for all URL parameters to be stored to and retrieved from local storage
 * Support for file renaming (new file creation) with Github commit UI
 * Automatically propose renaming for converted encodings
