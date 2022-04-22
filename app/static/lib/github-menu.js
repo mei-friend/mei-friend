@@ -496,7 +496,12 @@ export function logoutFromGithub() {
   }
   // redirect to /logout to remove session cookie
   const url = window.location.href;
-  window.location.replace(url.substring(0, url.lastIndexOf("/?")) + "/logout");
+  // remove any url parameters (since these might include URLs with slashes in)
+  const paramsStartIx = url.indexOf("?");
+  if(paramStartIx > -1) 
+    url = url.substr(0, paramStartIx);
+  // now modify last slash to navigate to /logout
+  window.location.replace(url.substr(0, url.lastIndexOf("/")) + "/logout");
 }
 
 export function refreshGithubMenu(e) {
