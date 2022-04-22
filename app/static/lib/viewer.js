@@ -739,7 +739,7 @@ export default class Viewer {
     let optionsToShow = { // key as in CodeMirror
       zoomFont: {
         title: 'Font size (%)',
-        decription: 'Change font size of editor (in percent)',
+        description: 'Change font size of editor (in percent)',
         type: 'int',
         default: 100,
         min: 45,
