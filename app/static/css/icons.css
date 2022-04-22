@@ -6,7 +6,7 @@
 }
 
 .icon[disabled] {
-  filter: opacity(20%);
+  opacity: 30%;
 }
 
 .icon-chevron-left {
