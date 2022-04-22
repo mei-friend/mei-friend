@@ -1095,7 +1095,7 @@ export default class Viewer {
         } : {});
         break;
       default:
-        if (value == 'true' || value == 'false') value = (value === 'true');
+        if (value === 'true' || value === 'false') value = (value === 'true');
         cm.setOption(option, value);
         if (option === 'theme') {
           this.setMenuColors();

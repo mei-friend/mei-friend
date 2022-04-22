@@ -219,6 +219,7 @@ export function loadDataInEditor(mei, setFreshlyLoaded = true) {
       bs.value = v.containsBreaks() ? 'line' : 'auto';
   }
   v.setRespSelectOptions();
+  v.setMenuColors();
   setCursorToId(cm, handleURLParamSelect());
 }
 
