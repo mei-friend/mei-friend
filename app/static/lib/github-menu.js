@@ -498,8 +498,8 @@ export function logoutFromGithub() {
   const url = window.location.href;
   // remove any url parameters (since these might include URLs with slashes in)
   const paramsStartIx = url.indexOf("?");
-  if(paramStartIx > -1) 
-    url = url.substr(0, paramStartIx);
+  if(paramsStartIx > -1) 
+    url = url.substr(0, paramsStartIx);
   // now modify last slash to navigate to /logout
   window.location.replace(url.substr(0, url.lastIndexOf("/")) + "/logout");
 }
