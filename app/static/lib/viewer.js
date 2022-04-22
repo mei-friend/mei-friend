@@ -6,9 +6,6 @@ import * as utils from './utils.js';
 import * as dutils from './dom-utils.js';
 import * as att from './attribute-classes.js';
 import {
-  addToolTip
-} from './control-menu.js';
-import {
   storage,
   tkVersion
 } from './main.js';
@@ -39,7 +36,6 @@ export default class Viewer {
     };
     // this.scoreDefList = []; // list of xmlNodes, one for each change, referenced by 5th element of pageList
     this.meiHeadRange = [];
-    this.toolTipTimeOutHandle = null; // handle for zoom tooltip hide timer
     this.vrvOptions; // all verovio options
     this.verovioIcon = document.getElementById('verovio-icon');
     this.respId = '';
@@ -604,7 +600,6 @@ export default class Viewer {
         zoomCtrl.value = delta;
       if (storage && storage.supported) storage.scale = zoomCtrl.value;
       this.updateLayout();
-      // this.updateZoomSliderTooltip(zoomCtrl);
     }
   }
 
@@ -617,21 +612,6 @@ export default class Viewer {
     value = Math.min(300, Math.max(45, value)); // 45---300, see #zoomFont
     document.querySelector('.encoding').style.fontSize = value + '%';
     zf.value = value;
-  }
-
-  // TODO: why is it not showing?
-  updateZoomSliderTooltip(zoomCtrl) {
-    let toolTipText = 'Notation scale: ' + zoomCtrl.value + "%";
-    let tt = zoomCtrl.querySelector('.tooltiptext');
-    // console.info('Zoomctr.TT: ', tt);
-    if (tt) tt.innerHTML = toolTipText;
-    else addToolTip(zoomCtrl, {
-      title: toolTipText
-    });
-    tt.classList.add('visible');
-    if (this.toolTipTimeOutHandle) clearTimeout(this.toolTipTimeOutHandle);
-    this.toolTipTimeOutHandle = setTimeout(() =>
-      tt.classList.remove('visible'), 1500);
   }
 
   // set focus to verovioPane in order to ensure working key bindings
