@@ -148,4 +148,4 @@
 * Implement GitHub issue reporting features
 # 0.3.11 patch:
 * Tooltips displayed as html title attributes
-* 
+* Clean control menu appearance
