@@ -1,4 +1,5 @@
 import * as utils from './utils.js';
+import * as icon from './../css/icons.js';
 
 export function createControlsMenu(parentElement, scale) {
 
@@ -18,7 +19,7 @@ export function createControlsMenu(parentElement, scale) {
   decreaseBtn.id = "decrease-scale-btn";
   decreaseBtn.classList.add('btn');
   decreaseBtn.classList.add('icon');
-  decreaseBtn.classList.add('icon-diff-removed');
+  decreaseBtn.innerHTML = icon.diffRemoved;
   decreaseBtn.classList.add('inline-block-tight');
   decreaseBtn.title = 'Decrease notation';
   zoomCtrls.appendChild(decreaseBtn);
@@ -38,7 +39,7 @@ export function createControlsMenu(parentElement, scale) {
   increaseBtn.id = "increase-scale-btn";
   increaseBtn.classList.add('btn');
   increaseBtn.classList.add('icon');
-  increaseBtn.classList.add('icon-diff-added');
+  increaseBtn.innerHTML = icon.diffAdded;
   increaseBtn.classList.add('inline-block-tight');
   increaseBtn.title = 'Increase notation';
   zoomCtrls.appendChild(increaseBtn);
@@ -63,7 +64,7 @@ export function createControlsMenu(parentElement, scale) {
   firstBtn.id = "first-page-btn";
   firstBtn.classList.add('icon');
   firstBtn.classList.add('btn');
-  firstBtn.classList.add('icon-chevron-first');
+  firstBtn.innerHTML = icon.chevronFirst;
   firstBtn.classList.add('inline-block-tight');
   firstBtn.title = 'Flip to first page';
   firstBtn.setAttribute('type', 'button');
@@ -74,7 +75,7 @@ export function createControlsMenu(parentElement, scale) {
   prevBtn.id = "prev-page-btn";
   prevBtn.classList.add('icon');
   prevBtn.classList.add('btn');
-  prevBtn.classList.add('icon-chevron-left');
+  prevBtn.innerHTML = icon.chevronLeft;
   prevBtn.classList.add('inline-block-tight');
   prevBtn.title = 'Flip to previous page';
   prevBtn.setAttribute('type', 'button');
@@ -84,8 +85,7 @@ export function createControlsMenu(parentElement, scale) {
   let paginationLabel = document.createElement('label');
   paginationLabel.id = 'pagination-label';
   paginationLabel.classList.add('label');
-  paginationLabel.title = `Page navigation: click to manually
-enter page number to be displayed`;
+  paginationLabel.title = 'Page navigation: click to manually enter page number to be displayed';
 
   let pagination1 = document.createElement('div');
   pagination1.innerHTML = 'Loading';
@@ -105,7 +105,7 @@ enter page number to be displayed`;
   nextBtn.id = "next-page-btn";
   nextBtn.classList.add('btn');
   nextBtn.classList.add('icon');
-  nextBtn.classList.add('icon-chevron-right');
+  nextBtn.innerHTML = icon.chevronRight;
   nextBtn.classList.add('inline-block-tight');
   nextBtn.title = 'Flip to next page';
   nextBtn.setAttribute('type', 'button');
@@ -116,7 +116,7 @@ enter page number to be displayed`;
   lastBtn.id = "last-page-btn";
   lastBtn.classList.add('btn');
   lastBtn.classList.add('icon');
-  lastBtn.classList.add('icon-chevron-last');
+  lastBtn.innerHTML = icon.chevronLast;
   lastBtn.classList.add('inline-block-tight');
   lastBtn.title = 'Flip to last page';
   lastBtn.setAttribute('type', 'button');
@@ -136,7 +136,7 @@ enter page number to be displayed`;
   flipBtn.id = "flip-btn";
   flipBtn.classList.add('btn');
   flipBtn.classList.add('icon');
-  flipBtn.classList.add('icon-flip-to-encoding'); // icon-alignment-aligned-to
+  flipBtn.innerHTML = icon.flipToEncoding; // icon-alignment-aligned-to
   flipBtn.classList.add('inline-block-tight');
   flipBtn.title = 'Flip page manually to encoding cursor position';
   flipBtn.setAttribute('type', 'button');
@@ -189,7 +189,7 @@ enter page number to be displayed`;
   codeUpdateBtn.id = "code-update-btn";
   codeUpdateBtn.classList.add('btn');
   codeUpdateBtn.classList.add('icon');
-  codeUpdateBtn.classList.add('icon-file-symlink-file'); // icon-alignment-aligned-to
+  codeUpdateBtn.innerHTML = icon.symLinkFile; // icon-alignment-aligned-to
   codeUpdateBtn.classList.add('inline-block-tight');
   codeUpdateBtn.title = 'Update notation manually';
   // codeUpdateBtn.innerHTML = 'Redo';
@@ -231,7 +231,7 @@ enter page number to be displayed`;
   backwardsBtn.id = "backwards-btn";
   backwardsBtn.classList.add('btn');
   backwardsBtn.classList.add('icon');
-  backwardsBtn.classList.add('icon-arrow-left');
+  backwardsBtn.innerHTML = icon.arrowLeft;
   backwardsBtn.classList.add('inline-block-tight');
   backwardsBtn.title = 'Navigate to left in notation';
   navigateCtrls.appendChild(backwardsBtn);
@@ -240,7 +240,7 @@ enter page number to be displayed`;
   forwardsBtn.id = "forwards-btn";
   forwardsBtn.classList.add('btn');
   forwardsBtn.classList.add('icon');
-  forwardsBtn.classList.add('icon-arrow-right');
+  forwardsBtn.innerHTML = icon.arrowRight;
   forwardsBtn.classList.add('inline-block-tight');
   forwardsBtn.title = 'Navigate to right in notation';
   navigateCtrls.appendChild(forwardsBtn);
@@ -249,7 +249,7 @@ enter page number to be displayed`;
   upwardsBtn.id = "upwards-btn";
   upwardsBtn.classList.add('btn');
   upwardsBtn.classList.add('icon');
-  upwardsBtn.classList.add('icon-arrow-up');
+  upwardsBtn.innerHTML = icon.arrowUp;
   upwardsBtn.classList.add('inline-block-tight');
   upwardsBtn.title = 'Navigate upwards in notation';
   navigateCtrls.appendChild(upwardsBtn);
@@ -258,7 +258,7 @@ enter page number to be displayed`;
   downwardsBtn.id = "downwards-btn";
   downwardsBtn.classList.add('btn');
   downwardsBtn.classList.add('icon');
-  downwardsBtn.classList.add('icon-arrow-down');
+  downwardsBtn.innerHTML = icon.arrowDown;
   downwardsBtn.classList.add('inline-block-tight');
   downwardsBtn.title = 'Navigate downwards in notation';
   navigateCtrls.appendChild(downwardsBtn);
@@ -269,8 +269,8 @@ enter page number to be displayed`;
   speedDiv.classList.add('controls');
   controlsForm.appendChild(speedDiv);
 
-  let verovioIcon = document.createElement('img');
-  verovioIcon.src = `${root}svg/v.svg`;
+  let verovioIcon = document.createElement('div');
+  verovioIcon.innerHTML = icon.verovioV;
   verovioIcon.classList.add('icon');
   verovioIcon.id = 'verovio-icon';
   verovioIcon.title = `Worker activity:

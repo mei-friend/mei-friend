@@ -195,7 +195,7 @@ a:active {
   margin-bottom: 1em;
 }
 
-.openUrlOverlay .openUrlUI details>div ,
+.openUrlOverlay .openUrlUI details>div,
 .forkRepositoryOverlay .forkRepositoryUI details>div {
   margin-left: 1em;
 }
@@ -204,16 +204,14 @@ a:active {
   width: 70%;
 }
 
-
-.openUrlOverlay .openUrlUI details div div ,
+.openUrlOverlay .openUrlUI details div div,
 .forkRepositoryOverlay .forkRepositoryUI details div div {
   padding: 10px 15px;
 }
 
-
 .openUrlOverlay select,
 .forkRepositoryOverlay select {
-  text-align:left;
+  text-align: left;
 }
 
 #openUrlStatus {
@@ -363,15 +361,23 @@ a:active {
 
 .btn {
   margin: 2px;
-  border: 2.5px solid rgb(0,0,0,0);
+  border: 2.5px solid rgb(0, 0, 0, 0);
   border-radius: 4px;
   /* font-size: 10px; */
   line-height: 1.5em;
-  padding: 0 2px;
+  padding: 0px;
   min-height: 21px;
   min-width: 21px;
   max-height: 21px;
   background-color: var(--backgroundColor);
+}
+
+.btn:hover {
+  background-color: var(--settingsLinkHoverColor);
+}
+
+.btn svg path {
+  color: var(--textColor);
 }
 
 .label {
@@ -476,7 +482,7 @@ svg text {
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
-  user-select:  none;
+  user-select: none;
 }
 
 .verovio-panel g.highlighted {
@@ -818,5 +824,5 @@ select>option {
 
 #bugReport {
   font-size: 1.5em;
-  padding:20px;
+  padding: 20px;
 }
