@@ -377,7 +377,7 @@ a:active {
 }
 
 .btn svg path {
-  color: var(--textColor);
+  fill: var(--textColor);
 }
 
 .label {
@@ -539,6 +539,33 @@ svg text {
 .icons {
   min-width: 150px;
   /* max-width: 180px; */
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
+  /* background-repeat: no-repeat;
+  background-position: 50% 50%; */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.icon[disabled] {
+  opacity: 30%;
+}
+
+#verovio-icon {
+  width: 21px;
+  height: 21px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .code {

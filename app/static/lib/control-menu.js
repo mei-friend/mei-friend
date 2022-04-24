@@ -265,13 +265,11 @@ export function createControlsMenu(parentElement, scale) {
 
   let speedDiv = document.createElement('div');
   speedDiv.id = 'speed-div';
-  // versionDiv.classList.add('block');
   speedDiv.classList.add('controls');
   controlsForm.appendChild(speedDiv);
 
   let verovioIcon = document.createElement('div');
   verovioIcon.innerHTML = icon.verovioV;
-  verovioIcon.classList.add('icon');
   verovioIcon.id = 'verovio-icon';
   verovioIcon.title = `Worker activity:
 clockwise denotes Verovio activity,

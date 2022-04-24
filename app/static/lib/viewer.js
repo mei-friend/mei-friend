@@ -532,7 +532,8 @@ export default class Viewer {
     j /= 3;
     console.log('setMenuColors lightness: ' + j + ', ' + ((j < 128) ? 'dark' : 'bright') + '.');
     let els = document.querySelectorAll(
-      '.btn,.settingsButton,.CodeMirror-scrollbar-filler,#verovio-icon,#GithubLogo,#hideSettingsButtonImg');
+      '.settingsButton,.CodeMirror-scrollbar-filler,#verovio-icon,#GithubLogo,#hideSettingsButtonImg');
+      // '.btn,.settingsButton,.CodeMirror-scrollbar-filler,#verovio-icon,#GithubLogo,#hideSettingsButtonImg');
     let owl = document.getElementById('mei-friend-logo');
     let owlSrc = owl.getAttribute('src');
     owlSrc = owlSrc.substr(0, owlSrc.lastIndexOf('/') + 1);
@@ -540,11 +541,11 @@ export default class Viewer {
       // wake up owl
       owl.setAttribute("src", owlSrc + 'menu-logo.svg');
       els.forEach(el => el.style.setProperty('filter', 'invert(.8)'));
-      let btn = document.querySelectorAll('.btn');
-      if (btn) btn.forEach(el => {
-        el.style.setProperty('background-color', utils.complementary(cm.backgroundColor));
-        el.style.setProperty('color', utils.complementary(cm.color));
-      });
+      // let btn = document.querySelectorAll('.btn');
+      // if (btn) btn.forEach(el => {
+      //   el.style.setProperty('background-color', utils.complementary(cm.backgroundColor));
+      //   el.style.setProperty('color', utils.complementary(cm.color));
+      // });
       rt.style.setProperty('--settingsLinkBackgroundColor', utils.brighter(cm.backgroundColor, 21));
       rt.style.setProperty('--settingsLinkHoverColor', utils.brighter(cm.backgroundColor, 36));
       rt.style.setProperty('--settingsBackgroundColor', utils.brighter(cm.backgroundColor, 36));
@@ -566,11 +567,11 @@ export default class Viewer {
       // sleepy owl
       owl.setAttribute("src", owlSrc + 'menu-logo-asleep.svg');
       els.forEach(el => el.style.removeProperty('filter'));
-      let btn = document.querySelectorAll('.btn');
-      if (btn) btn.forEach(el => {
-        el.style.setProperty('background-color', cm.backgroundColor);
-        el.style.setProperty('color', cm.color);
-      });
+      // let btn = document.querySelectorAll('.btn');
+      // if (btn) btn.forEach(el => {
+      //   el.style.setProperty('background-color', cm.backgroundColor);
+      //   el.style.setProperty('color', cm.color);
+      // });
       rt.style.setProperty('--settingsLinkBackgroundColor', utils.brighter(cm.backgroundColor, -16));
       rt.style.setProperty('--settingsLinkHoverColor', utils.brighter(cm.backgroundColor, -24));
       rt.style.setProperty('--settingsBackgroundColor', utils.brighter(cm.backgroundColor, -36));
@@ -873,7 +874,7 @@ export default class Viewer {
       window.matchMedia('(prefers-color-scheme: dark)')
         .addEventListener('change', ev => { // system changes from dark to bright or otherway round
           if (!storage.hasOwnProperty('cm-theme')) { // only if not changed by user
-            let matchTheme = storage.hasOwnProperty('cm-matchTheme') ? storage['cm-matchTheme'] : mfDefaults['matchTheme'];
+            let matchTheme = storage.hasOwnProperty('cm-matchTheme') ? storage['cm-matchTheme'] : mfDefaults['cm-matchTheme'];
             if (ev.matches) { // event listener for dark/bright mode changes
               document.getElementById('theme').value = mfDefaults['defaultDarkTheme'];
               this.applyEditorOption(cm, 'theme', mfDefaults['defaultDarkTheme'], matchTheme);
