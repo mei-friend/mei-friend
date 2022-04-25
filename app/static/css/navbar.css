@@ -162,8 +162,8 @@
 
 #GithubLogo, #forkRepoGithubLogo {
   fill: var(--textColor);
-  height: .8em;
-  margin-right: -.1em;
+  height: .75em;
+  margin-right: -.2em;
 }
 
 #forkRepoGithubLogo {
