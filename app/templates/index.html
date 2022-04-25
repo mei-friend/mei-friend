@@ -11,13 +11,14 @@
   <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.64.0/codemirror.min.js" integrity="sha512-4DlmQ+aBOfYTZ3uzRKCDXdyL7y8IlopnVChhXG0pRFgyvhwONVQW3JX8e5DYoXUNr3evQpLZz7S3O1XxMH4WKA==" crossorigin="anonymous"
     referrerpolicy="no-referrer">
   </script> -->
-  <!-- inject GitHub OAuth response details if available -->
+  <script src="{{ url_for('static', filename='lib/env.js') }}"></script>
   <script src="{{ url_for('static', filename='lib/jsgit.js') }}"></script>
   <script src="{{ url_for('static', filename='lib/github.js') }}" type="module"></script>
   <script>
     let isLoggedIn;
     let root = "{{ url_for('static', filename='') }}";
   </script>
+  <!-- inject GitHub OAuth response details if available -->
   {% if isLoggedIn %}
   <script>
     isLoggedIn = true;
@@ -119,7 +120,7 @@
 
 <body>
   <div class="header">
-    <div class="title"><a href="https://repo.mdw.ac.at/mei-friend/"><img src="{{ url_for('static', filename='svg/menu-logo.svg') }}" alt="mei-friend" id="mei-friend-logo" /></a></div>
+    <div class="title"><a href="https://mei-friend.mdw.ac.at/"><img src="{{ url_for('static', filename='svg/menu-logo.svg') }}" alt="mei-friend" id="mei-friend-logo" /></a></div>
     <div class="navbar">
       <div class="dropdown">
         <button class="dropbtn GithubButton">

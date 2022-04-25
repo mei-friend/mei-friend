@@ -536,6 +536,8 @@ export default class Viewer {
     let owl = document.getElementById('mei-friend-logo');
     let owlSrc = owl.getAttribute('src');
     owlSrc = owlSrc.substr(0, owlSrc.lastIndexOf('/') + 1);
+    if(env === environments.staging)
+      owlSrc += 'staging-';
     if (j < 128) { // dark
       // wake up owl
       owl.setAttribute("src", owlSrc + 'menu-logo.svg');

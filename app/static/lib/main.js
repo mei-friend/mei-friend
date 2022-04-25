@@ -1,6 +1,6 @@
 // mei-friend version and date
-const version = 'develop-0.3.11';
-const versionDate = '24 April 2022';
+const version = '0.3.11';
+const versionDate = '25 April 2022';
 
 var vrvWorker;
 var spdWorker;
@@ -317,7 +317,8 @@ document.addEventListener('DOMContentLoaded', function() {
   document.querySelector(".statusbar").innerHTML = "Loading Verovio.";
   document.querySelector(".rightfoot").innerHTML =
     "<a href='https://github.com/Signature-Sound-Vienna/mei-friend-online'>mei-friend " +
-    version + "</a> (" + versionDate + ").&nbsp;";
+    (env === environments.production ? version : `${env}-${version}`) + 
+    "</a> (" + versionDate + ").&nbsp;";
 
   vrvWorker = new Worker(`${root}lib/worker.js`);
   vrvWorker.onmessage = vrvWorkerEventsHandler;
