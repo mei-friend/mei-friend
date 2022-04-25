@@ -560,14 +560,15 @@ svg text {
 }
 
 #verovio-icon {
-  width: 24px;
-  height: 21px;
+  margin-left: 3px;
+  width: 22px;
+  height: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
   fill: var(--textColor);
-  stroke: var(--textColor);
-  stroke-width: 1px;
+  /* stroke: var(--textColor);
+  stroke-width: 1px; */
 }
 
 .code {
