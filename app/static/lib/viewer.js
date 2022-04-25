@@ -167,7 +167,7 @@ export default class Viewer {
     console.info('xmlDOM pages counted: currentPage: ' + this.currentPage +
       ', pageCount: ' + this.pageCount);
     // compute time-spanning elements object in speed-worker
-    if (tkVersion && this.pageSpanners && Object.keys(this.pageSpanners.start).length === 0 &&
+    if (tkVersion && this.pageSpanners.start && Object.keys(this.pageSpanners.start).length === 0 &&
       (breaksSelectVal !== 'auto' || Object.keys(this.pageBreaks).length > 0)) {
       // use worker solution with swift txml parsing
       let message = {
@@ -186,8 +186,7 @@ export default class Viewer {
       // else console.log('pageSpanners empty: ', this.pageSpanners);
     }
     // retrieve requested MEI page from DOM
-    return speed.getPageFromDom(this.xmlDoc, this.currentPage, breaks,
-      this.pageSpanners);
+    return speed.getPageFromDom(this.xmlDoc, this.currentPage, breaks, this.pageSpanners);
   }
 
   loadXml(mei, forceReload = false) {
