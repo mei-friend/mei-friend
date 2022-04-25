@@ -119,10 +119,9 @@ a:active {
 .settingsButton {
   width: 16px;
   height: 16px;
-  background-repeat: no-repeat;
-  background-position: 50% 50%;
   padding-right: 16px;
   cursor: pointer;
+  fill: var(--textColor);
 }
 
 .dragOverlay {
@@ -361,9 +360,9 @@ a:active {
 
 .btn {
   margin: 2px;
-  border: 2.5px solid rgb(0, 0, 0, 0);
+  border: 2px solid rgb(0, 0, 0, 0);
   border-radius: 4px;
-  /* font-size: 10px; */
+  font-size: 10pt;
   line-height: 1.5em;
   padding: 0px;
   min-height: 21px;
@@ -561,11 +560,14 @@ svg text {
 }
 
 #verovio-icon {
-  width: 21px;
+  width: 24px;
   height: 21px;
   display: flex;
   align-items: center;
   justify-content: center;
+  fill: var(--textColor);
+  stroke: var(--textColor);
+  stroke-width: 1px;
 }
 
 .code {
@@ -699,7 +701,7 @@ span.keyIcon {
 }
 
 .tabstart {
-  color: var(--textColor);
+  fill: var(--textColor);
   border: var(--settingsLinkBackgroundColor) solid 2px;
   border-top-left-radius: 5px;
   background-color: inherit;
@@ -712,7 +714,6 @@ span.keyIcon {
 
 /* Change background color of buttons on hover */
 .tablink:hover, .topright:hover, .tabstart:hover {
-  /* color: var(--textColor); */
   color: var(--textColor);
   background-color: var(--settingsLinkHoverColor);
   border-color: var(--settingsLinkHoverColor);
@@ -760,15 +761,11 @@ span.keyIcon {
 
 /* Style the close button */
 .topright {
-  /* color: #808080; */
+  color: var(--textcolor);
   float: right;
   padding: 6px 12px;
   cursor: pointer;
   font-size: 22px;
-}
-
-.topright:hover {
-  color: black;
 }
 
 .optionsItem {

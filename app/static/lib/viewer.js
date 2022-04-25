@@ -531,12 +531,11 @@ export default class Viewer {
     cm.backgroundColor.slice(4, -1).split(',').forEach(i => j += parseInt(i));
     j /= 3;
     console.log('setMenuColors lightness: ' + j + ', ' + ((j < 128) ? 'dark' : 'bright') + '.');
-    let els = document.querySelectorAll(
-      '.settingsButton,.CodeMirror-scrollbar-filler,#verovio-icon,#GithubLogo,#hideSettingsButtonImg');
+    let els = document.querySelectorAll('.CodeMirror-scrollbar-filler');
     let owl = document.getElementById('mei-friend-logo');
     let owlSrc = owl.getAttribute('src');
     owlSrc = owlSrc.substr(0, owlSrc.lastIndexOf('/') + 1);
-    if(env === environments.staging)
+    if (env === environments.staging)
       owlSrc += 'staging-';
     if (j < 128) { // dark
       // wake up owl
