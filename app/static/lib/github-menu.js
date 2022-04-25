@@ -19,6 +19,7 @@ import {
   updateLocalStorage,
   v
 } from './main.js';
+import * as icon from './../css/icons.js';
 import Github from './github.js'; // github class
 function forkRepo() {
   forkRepository(github);
@@ -54,8 +55,8 @@ function forkRepoClicked() {
           }
         }
       }).finally(() =>
-          document.getElementById("forkRepoGithubLogo")
-            .classList.remove("clockwise")
+        document.getElementById("forkRepoGithubLogo")
+        .classList.remove("clockwise")
       )
   }
 }
@@ -143,9 +144,9 @@ function branchContentsFileClicked(ev) {
   loadFile(ev.target.innerText);
 }
 
-function loadFile(fileName, ev = null) { 
+function loadFile(fileName, ev = null) {
   const githubLoadingIndicator = document.getElementById("GithubLogo");
-  github.filepath += fileName; 
+  github.filepath += fileName;
   console.debug(`Loading file: https://github.com/${github.githubRepo}${github.filepath}`);
   fillInBranchContents(ev);
   githubLoadingIndicator.classList.add("clockwise");
@@ -172,16 +173,16 @@ function loadFile(fileName, ev = null) {
   })
 }
 
-function onFileNameEdit(e)  {
+function onFileNameEdit(e) {
   setCommitUIEnabledStatus();
 }
 
-function onMessageInput(e) { 
+function onMessageInput(e) {
   e.target.classList.remove("warn");
   console.log("GOT INPUT: ", e.target)
-  if(e.target.innerText= "") { 
+  if (e.target.innerText = "") {
     document.getElementById("commitButton").setAttribute("disabled", "");
-  } else { 
+  } else {
     document.getElementById("commitButton").removeAttribute("disabled");
   }
 
@@ -275,7 +276,7 @@ export async function fillInRepoBranches(e, per_page = 100, page = 1) {
   githubMenu.innerHTML = `
   <a id="GithubLogout" href="#">Log out</a>
   <hr class="dropdown-line">
-  <a id="repositoriesHeader" href="#"><span class="btn icon icon-arrow-left inline-block-tight"></span>Repository:${github.githubRepo}</a>
+  <a id="repositoriesHeader" href="#"><span class="btn icon inline-block-tight">${icon.arrowLeft}</span>Repository:${github.githubRepo}</a>
     <hr class="dropdown-line">
     <a id="branchesHeader" class="dropdown-head" href="#"><b>Select branch:</b></a>
     `;
@@ -291,7 +292,7 @@ async function markFileName(fname) {
   // purpose: assign markers like "~1" before the suffix
   // to differentiate from existing files
   // e.g. "meifile.mei" => "myfile~1.mei"
-  if(!fname.endsWith(".mei")) { 
+  if (!fname.endsWith(".mei")) {
     console.warn("markFileName called on non-mei suffix: ", fname);
   }
   const without = fname.substr(0, fname.lastIndexOf("."));
@@ -299,15 +300,15 @@ async function markFileName(fname) {
   const unmarked = match ? match[1] : without;
   let fnamesInTree;
   const containingDir = github.filepath.substr(
-    0,github.filepath.lastIndexOf("/"));
-  return github.getBranchContents(containingDir).then(tree => { 
+    0, github.filepath.lastIndexOf("/"));
+  return github.getBranchContents(containingDir).then(tree => {
     fnamesInTree = tree.map(contents => contents.name);
-    const prevMarked = fnamesInTree.filter(f => f.match(without+"~\\d+.mei$"));
+    const prevMarked = fnamesInTree.filter(f => f.match(without + "~\\d+.mei$"));
     let marked;
-    if(prevMarked.length) { 
-      // marks already exist in current tree, so use "~n" where n is 
+    if (prevMarked.length) {
+      // marks already exist in current tree, so use "~n" where n is
       // one bigger than the largest existing mark
-      const prevMarkNums = prevMarked.map(f => 
+      const prevMarkNums = prevMarked.map(f =>
         f.match(without + "~(\\d+).mei$")[1])
       console.log("PREV MARK NUMS: ", prevMarkNums);
       const n = Math.max(...prevMarkNums) + 1;
@@ -317,41 +318,41 @@ async function markFileName(fname) {
   });
 }
 
-async function proposeFileName(fname) { 
+async function proposeFileName(fname) {
   // if we're here, the original file wasn't MEI
   const suffixPos = fname.lastIndexOf(".");
   let suffix = "";
-  let without = fname; 
+  let without = fname;
   let newname;
   let fnamesInTree;
   let nameSpan = document.getElementById("commitFileName");
   const containingDir = github.filepath.substr(
-    0,github.filepath.lastIndexOf("/"));
-  github.getBranchContents(containingDir).then(dirContents=>{ 
+    0, github.filepath.lastIndexOf("/"));
+  github.getBranchContents(containingDir).then(dirContents => {
     const fnamesInTree = dirContents.map(c => c.name);
-    if (suffixPos > 0) { 
+    if (suffixPos > 0) {
       // there's a dot and it's not at the start of the name
       // => treat everything after it as the suffix
       without = fname.substr(0, suffixPos);
-      suffix = fname.substr(suffixPos+1);
+      suffix = fname.substr(suffixPos + 1);
     }
-    if(suffix.toLowerCase() !== "mei") { 
+    if (suffix.toLowerCase() !== "mei") {
       // see if we can get away with simply swapping suffix
       newname = without + ".mei";
-      if(fnamesInTree.includes(newname)) { 
+      if (fnamesInTree.includes(newname)) {
         // no we can't - so mark it to differentiate
-        markFileName(newname).then( marked => { 
+        markFileName(newname).then(marked => {
           nameSpan.innerText = marked;
           nameSpan.dispatchEvent(new Event('input'));
         })
-      } else { 
+      } else {
         nameSpan.innerText = newname;
         nameSpan.dispatchEvent(new Event('input'));
       }
-    } else { 
+    } else {
       // file was already (mis-)named (?) as ".mei"
       // propose adding a marker like "~1" to differentiate
-      markFileName(fname).then( marked => {
+      markFileName(fname).then(marked => {
         nameSpan.innerText = marked;
         nameSpan.dispatchEvent(new Event('input'));
       })
@@ -370,11 +371,11 @@ export async function fillInBranchContents(e) {
   githubMenu.innerHTML = `
   <a id="GithubLogout" href="#">Log out</a>
   <hr class="dropdown-line">
-  <a id="repositoriesHeader" href="#"><span class="btn icon icon-arrow-left inline-block-tight"></span>Repository:${github.githubRepo}</a>
+  <a id="repositoriesHeader" href="#"><span class="btn icon inline-block-tight">${icon.arrowLeft}</span>Repository:${github.githubRepo}</a>
     <hr class="dropdown-line">
-    <a id="branchesHeader" href="#"><span class="btn icon icon-arrow-left inline-block-tight"></span>Branch: ${github.branch}</a>
+    <a id="branchesHeader" href="#"><span class="btn icon inline-block-tight">${icon.arrowLeft}</span>Branch: ${github.branch}</a>
     <hr class="dropdown-line">
-    <a id="contentsHeader" href="#"><span class="btn icon icon-arrow-left inline-block-tight"></span>Path: <span class="filepath">${github.filepath}</span></a>
+    <a id="contentsHeader" href="#"><span class="btn icon inline-block-tight">${icon.arrowLeft}</span>Path: <span class="filepath">${github.filepath}</span></a>
     <hr class="dropdown-line">
     `;
   if (e && target && target.classList.contains("filepath")) {
@@ -408,12 +409,12 @@ export async function fillInBranchContents(e) {
     commitFileName.setAttribute("contenteditable", "");
     commitFileName.setAttribute("id", "commitFileName");
     commitFileName.setAttribute("spellcheck", "false");
-    
+
     const commitFileNameEdit = document.createElement("div");
     commitFileNameEdit.setAttribute("id", "commitFileNameEdit");
     commitFileNameEdit.innerHTML = 'Filename: ';
     commitFileNameEdit.appendChild(commitFileName);
-    
+
     const commitMessageInput = document.createElement("input");
     commitMessageInput.setAttribute("type", "text");
     commitMessageInput.setAttribute("id", "commitMessageInput");
@@ -498,7 +499,7 @@ export function logoutFromGithub() {
   const url = window.location.href;
   // remove any url parameters (since these might include URLs with slashes in)
   const paramsStartIx = url.indexOf("?");
-  if(paramsStartIx > -1) 
+  if (paramsStartIx > -1)
     url = url.substr(0, paramsStartIx);
   // now modify last slash to navigate to /logout
   window.location.replace(url.substr(0, url.lastIndexOf("/")) + "/logout");
@@ -525,25 +526,25 @@ export function refreshGithubMenu(e) {
 export function setCommitUIEnabledStatus() {
   const commitButton = document.getElementById("commitButton");
   const commitFileName = document.getElementById("commitFileName");
-  if(commitFileName.innerText === stripMeiFileName()) {
+  if (commitFileName.innerText === stripMeiFileName()) {
     // no name change => button reads "Commit"
     commitButton.setAttribute("value", "Commit");
-    if(fileChanged) { 
+    if (fileChanged) {
       // enable commit UI if file has changed
       commitButton.removeAttribute("disabled");
       commitMessageInput.removeAttribute("disabled");
-    } else { 
+    } else {
       // disable commit UI if file hasn't changed
       commitButton.setAttribute("disabled", "");
       commitMessageInput.setAttribute("disabled", "");
       commitMessageInput.value = "";
     }
-  } else { 
-      // file name has changed => button reads "Commit as new file"
-      commitButton.setAttribute("value", "Commit as new file");
-      // enable commit UI regardless of fileChanged state
-      commitButton.removeAttribute("disabled");
-      commitMessageInput.removeAttribute("disabled");
+  } else {
+    // file name has changed => button reads "Commit as new file"
+    commitButton.setAttribute("value", "Commit as new file");
+    // enable commit UI regardless of fileChanged state
+    commitButton.removeAttribute("disabled");
+    commitMessageInput.removeAttribute("disabled");
   }
 }
 
@@ -551,11 +552,11 @@ export function setCommitUIEnabledStatus() {
 function setFileNameAfterLoad(ev) {
   const commitFileName = document.getElementById("commitFileName");
   const commitButton = document.getElementById("commitButton");
-  if(isMEI) { 
+  if (isMEI) {
     // trim preceding slash
     commitFileName.innerText = stripMeiFileName();
     commitButton.setAttribute("value", "Commit");
-  } else { 
+  } else {
     commitFileName.innerText = "...";
     commitButton.setAttribute("value", "...");
     // trim preceding slash
@@ -570,19 +571,19 @@ function handleCommitButtonClicked(e) {
   const messageInput = document.getElementById("commitMessageInput");
   const message = messageInput.value;
   console.log("Got message: ", message);
-  if(message) { 
+  if (message) {
     const githubLoadingIndicator = document.getElementById("GithubLogo");
     // lock editor while we are busy commiting
     cm.readOnly = "nocursor"; // don't allow editor focus
     // try commiting to Github
     githubLoadingIndicator.classList.add("clockwise");
-    const newfile = commitFileName.innerText !== stripMeiFileName() 
-      ? commitFileName.innerText : null;
+    const newfile = commitFileName.innerText !== stripMeiFileName() ?
+      commitFileName.innerText : null;
     github.writeGithubRepo(cm.getValue(), message, newfile)
       .then(() => {
         console.debug(`Successfully written to github: ${github.githubRepo}${github.filepath}`);
         messageInput.value = "";
-        if(newfile) { 
+        if (newfile) {
           // switch to new filepath
           github.filepath = github.filepath.substr(0, github.filepath.lastIndexOf('/') + 1) + newfile;
         }
@@ -594,7 +595,7 @@ function handleCommitButtonClicked(e) {
         githubLoadingIndicator.classList.remove("clockwise");
         console.warn("Couldn't commit Github repo: ", e, github)
       });
-  } else { 
+  } else {
     // no commit without a comit message!
     messageInput.classList.add("warn");
     document.getElementById("commitButton").setAttribute("disabled", "");
@@ -602,12 +603,11 @@ function handleCommitButtonClicked(e) {
   }
 }
 
-function stripMeiFileName() { 
+function stripMeiFileName() {
   const stripped = meiFileName.match(/^.*\/([^\/]+)$/);
-  if(Array.isArray(stripped)) { 
+  if (Array.isArray(stripped)) {
     return stripped[1];
-  } else { 
+  } else {
     console.warn("stripMeiFileName called on invalid filename: ", meiFileName);
   }
 }
-

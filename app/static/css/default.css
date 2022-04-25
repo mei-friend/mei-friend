@@ -546,7 +546,7 @@ svg text {
   height: 20px;
   /* background-repeat: no-repeat;
   background-position: 50% 50%; */
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
 }
