@@ -79,7 +79,7 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks = ['sb', 'pb'], pageSp
 
   // matchTimespanningElements(xmlScore, spdScore, pageNo);
 
-  if (Object.keys(pageSpanners.start).length > 0)
+  if (pageSpanners.start && Object.keys(pageSpanners.start).length > 0)
     addPageSpanningElements(xmlScore, spdScore, pageSpanners, pageNo);
 
   // insert sb elements for each element except last
