@@ -1078,8 +1078,10 @@ export default class Viewer {
   createOptionsItem(opt, o, optDefault) {
     let div = document.createElement('div');
     div.classList.add('optionsItem');
-    let label = document.createElement('label')
-    label.setAttribute('title', o.description + ' (default: ' + o.default+')');
+    let label = document.createElement('label');
+    let title = o.description;
+    if (o.default) title += ' (default: ' + o.default+')';
+    label.setAttribute('title', title);
     label.setAttribute('for', opt);
     label.innerText = o.title;
     div.appendChild(label);
