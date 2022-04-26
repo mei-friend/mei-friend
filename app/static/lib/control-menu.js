@@ -1,4 +1,5 @@
 import * as utils from './utils.js';
+import * as icon from './../css/icons.js';
 
 export function createControlsMenu(parentElement, scale) {
 
@@ -18,11 +19,9 @@ export function createControlsMenu(parentElement, scale) {
   decreaseBtn.id = "decrease-scale-btn";
   decreaseBtn.classList.add('btn');
   decreaseBtn.classList.add('icon');
-  decreaseBtn.classList.add('icon-diff-removed');
+  decreaseBtn.innerHTML = icon.diffRemoved;
   decreaseBtn.classList.add('inline-block-tight');
-  addToolTip(decreaseBtn, {
-    title: 'Decrease notation'
-  });
+  decreaseBtn.title = 'Decrease notation';
   zoomCtrls.appendChild(decreaseBtn);
 
   let zoomCtrl = document.createElement("input");
@@ -34,19 +33,15 @@ export function createControlsMenu(parentElement, scale) {
   zoomCtrl.setAttribute('step', 1);
   zoomCtrl.setAttribute('value', `${scale}`);
   zoomCtrls.appendChild(zoomCtrl);
-  addToolTip(zoomCtrl, {
-    title: 'Scale notation'
-  });
+  zoomCtrl.title = 'Scale size of notation';
 
   let increaseBtn = document.createElement('button');
   increaseBtn.id = "increase-scale-btn";
   increaseBtn.classList.add('btn');
   increaseBtn.classList.add('icon');
-  increaseBtn.classList.add('icon-diff-added');
+  increaseBtn.innerHTML = icon.diffAdded;
   increaseBtn.classList.add('inline-block-tight');
-  addToolTip(increaseBtn, {
-    title: 'Increase notation'
-  });
+  increaseBtn.title = 'Increase notation';
   zoomCtrls.appendChild(increaseBtn);
 
   // Pagination, page navigation
@@ -61,14 +56,7 @@ export function createControlsMenu(parentElement, scale) {
   sectionSelector.classList.add('btn');
   // sectionSelector.classList.add('icon-multi-select');
   sectionSelector.classList.add('inline-block-tight');
-  addToolTip(sectionSelector, {
-    title: 'Navigate encoded section/ending structure'
-  });
-  // sectionSelector.options.add(new Option('Var-I'));
-  // sectionSelector.options.add(new Option('| Var-I-A'));
-  // sectionSelector.options.add(new Option('| Var-I-B'));
-  // sectionSelector.options.add(new Option('| Var-I-B1'));
-  // sectionSelector.options.add(new Option('| Var-I-B2'));
+  sectionSelector.title = 'Navigate encoded section/ending structure';
   sectionSelector.style.display = 'none';
   paginationCtrls.appendChild(sectionSelector);
 
@@ -76,11 +64,9 @@ export function createControlsMenu(parentElement, scale) {
   firstBtn.id = "first-page-btn";
   firstBtn.classList.add('icon');
   firstBtn.classList.add('btn');
-  firstBtn.classList.add('icon-chevron-first');
+  firstBtn.innerHTML = icon.chevronFirst;
   firstBtn.classList.add('inline-block-tight');
-  addToolTip(firstBtn, {
-    title: 'Jump to first page'
-  });
+  firstBtn.title = 'Flip to first page';
   firstBtn.setAttribute('type', 'button');
   firstBtn.setAttribute('value', 'first');
   paginationCtrls.appendChild(firstBtn);
@@ -89,11 +75,9 @@ export function createControlsMenu(parentElement, scale) {
   prevBtn.id = "prev-page-btn";
   prevBtn.classList.add('icon');
   prevBtn.classList.add('btn');
-  prevBtn.classList.add('icon-chevron-left');
+  prevBtn.innerHTML = icon.chevronLeft;
   prevBtn.classList.add('inline-block-tight');
-  addToolTip(prevBtn, {
-    title: 'Go to previous page'
-  });
+  prevBtn.title = 'Flip to previous page';
   prevBtn.setAttribute('type', 'button');
   prevBtn.setAttribute('value', 'backwards');
   paginationCtrls.appendChild(prevBtn);
@@ -101,7 +85,7 @@ export function createControlsMenu(parentElement, scale) {
   let paginationLabel = document.createElement('label');
   paginationLabel.id = 'pagination-label';
   paginationLabel.classList.add('label');
-  // paginationLabel.innerHTML = `Loading`;
+  paginationLabel.title = 'Page navigation: click to manually enter page number to be displayed';
 
   let pagination1 = document.createElement('div');
   pagination1.innerHTML = 'Loading';
@@ -109,9 +93,7 @@ export function createControlsMenu(parentElement, scale) {
   let pagination2 = document.createElement('div');
   pagination2.id = 'pagination2';
   pagination2.contentEditable = true;
-  addToolTip(pagination2, {
-    title: 'Click to enter page number'
-  });
+  pagination2.title = 'Click to enter page number';
   let pagination3 = document.createElement('div');
   pagination3.id = 'pagination3';
   paginationLabel.appendChild(pagination1);
@@ -123,11 +105,9 @@ export function createControlsMenu(parentElement, scale) {
   nextBtn.id = "next-page-btn";
   nextBtn.classList.add('btn');
   nextBtn.classList.add('icon');
-  nextBtn.classList.add('icon-chevron-right');
+  nextBtn.innerHTML = icon.chevronRight;
   nextBtn.classList.add('inline-block-tight');
-  addToolTip(nextBtn, {
-    title: 'Go to next page'
-  });
+  nextBtn.title = 'Flip to next page';
   nextBtn.setAttribute('type', 'button');
   nextBtn.setAttribute('value', 'forwards');
   paginationCtrls.appendChild(nextBtn);
@@ -136,11 +116,9 @@ export function createControlsMenu(parentElement, scale) {
   lastBtn.id = "last-page-btn";
   lastBtn.classList.add('btn');
   lastBtn.classList.add('icon');
-  lastBtn.classList.add('icon-chevron-last');
+  lastBtn.innerHTML = icon.chevronLast;
   lastBtn.classList.add('inline-block-tight');
-  addToolTip(lastBtn, {
-    title: 'Jump to last page'
-  });
+  lastBtn.title = 'Flip to last page';
   lastBtn.setAttribute('type', 'button');
   lastBtn.setAttribute('value', 'last');
   paginationCtrls.appendChild(lastBtn);
@@ -151,17 +129,16 @@ export function createControlsMenu(parentElement, scale) {
   flipCheckbox.setAttribute('type', 'checkbox');
   flipCheckbox.setAttribute('value', 'autoFlip');
   flipCheckbox.setAttribute('checked', 'true');
+  flipCheckbox.title = 'Automatically flip page to encoding cursor position';
   paginationCtrls.appendChild(flipCheckbox);
   // manually flip to cursor position
   let flipBtn = document.createElement('button');
   flipBtn.id = "flip-btn";
   flipBtn.classList.add('btn');
   flipBtn.classList.add('icon');
-  flipBtn.classList.add('icon-flip-to-encoding'); // icon-alignment-aligned-to
+  flipBtn.innerHTML = icon.flipToEncoding; // icon-alignment-aligned-to
   flipBtn.classList.add('inline-block-tight');
-  addToolTip(flipBtn, {
-    title: 'Flip page to encoding cursor position'
-  });
+  flipBtn.title = 'Flip page manually to encoding cursor position';
   flipBtn.setAttribute('type', 'button');
   flipBtn.setAttribute('value', 'update');
   flipBtn.disabled = true;
@@ -183,9 +160,7 @@ export function createControlsMenu(parentElement, scale) {
   breaksSelector.id = 'breaks-select';
   breaksSelector.classList.add('btn');
   breaksSelector.classList.add('input-select');
-  addToolTip(breaksCtrls, {
-    title: 'Define system/page breaks behavior of notation'
-  });
+  breaksCtrls.title = 'Define system/page breaks behavior of notation';
   breaksCtrls.appendChild(breaksSelector);
 
 
@@ -200,14 +175,13 @@ export function createControlsMenu(parentElement, scale) {
   updateLabel.innerText = 'Update: ';
   updateLabel.classList.add('label');
   updateCtrls.appendChild(updateLabel);
-  addToolTip(updateLabel, {
-    title: 'Update notation automatically after changes in encoding'
-  });
+  updateLabel.title = 'Control update behavior of notation after changes in encoding';
 
   let codeUpdateCheckbox = document.createElement("input");
   codeUpdateCheckbox.id = 'live-update-checkbox';
   codeUpdateCheckbox.setAttribute('type', 'checkbox');
   codeUpdateCheckbox.setAttribute('checked', 'true');
+  codeUpdateCheckbox.title = 'Automatically update notation after changes in encoding';
   updateLabel.setAttribute('for', codeUpdateCheckbox.id);
   updateCtrls.appendChild(codeUpdateCheckbox);
 
@@ -215,11 +189,9 @@ export function createControlsMenu(parentElement, scale) {
   codeUpdateBtn.id = "code-update-btn";
   codeUpdateBtn.classList.add('btn');
   codeUpdateBtn.classList.add('icon');
-  codeUpdateBtn.classList.add('icon-file-symlink-file'); // icon-alignment-aligned-to
+  codeUpdateBtn.innerHTML = icon.symLinkFile; // icon-alignment-aligned-to
   codeUpdateBtn.classList.add('inline-block-tight');
-  addToolTip(codeUpdateBtn, {
-    title: 'Re-render encoding manually'
-  });
+  codeUpdateBtn.title = 'Update notation manually';
   // codeUpdateBtn.innerHTML = 'Redo';
   codeUpdateBtn.setAttribute('type', 'button');
   codeUpdateBtn.setAttribute('value', 'codeUpdate');
@@ -242,9 +214,7 @@ export function createControlsMenu(parentElement, scale) {
   let fontSelector = document.createElement('select');
   fontSelector.id = 'font-select';
   fontSelector.classList.add('btn');
-  addToolTip(fontCtrls, {
-    title: 'Select engraving font'
-  });
+  fontCtrls.title = 'Select engraving font';
   fontSelector.classList.add('input-select');
   fontCtrls.appendChild(fontSelector);
   for (let f of fontList)
@@ -261,56 +231,49 @@ export function createControlsMenu(parentElement, scale) {
   backwardsBtn.id = "backwards-btn";
   backwardsBtn.classList.add('btn');
   backwardsBtn.classList.add('icon');
-  backwardsBtn.classList.add('icon-arrow-left');
+  backwardsBtn.innerHTML = icon.arrowLeft;
   backwardsBtn.classList.add('inline-block-tight');
-  addToolTip(backwardsBtn, {
-    title: 'Navigate to left'
-  });
+  backwardsBtn.title = 'Navigate to left in notation';
   navigateCtrls.appendChild(backwardsBtn);
 
   let forwardsBtn = document.createElement('button');
   forwardsBtn.id = "forwards-btn";
   forwardsBtn.classList.add('btn');
   forwardsBtn.classList.add('icon');
-  forwardsBtn.classList.add('icon-arrow-right');
+  forwardsBtn.innerHTML = icon.arrowRight;
   forwardsBtn.classList.add('inline-block-tight');
-  addToolTip(forwardsBtn, {
-    title: 'Navigate to right'
-  });
+  forwardsBtn.title = 'Navigate to right in notation';
   navigateCtrls.appendChild(forwardsBtn);
 
   let upwardsBtn = document.createElement('button');
   upwardsBtn.id = "upwards-btn";
   upwardsBtn.classList.add('btn');
   upwardsBtn.classList.add('icon');
-  upwardsBtn.classList.add('icon-arrow-up');
+  upwardsBtn.innerHTML = icon.arrowUp;
   upwardsBtn.classList.add('inline-block-tight');
-  addToolTip(upwardsBtn, {
-    title: 'Navigate to staffN higher layer'
-  });
+  upwardsBtn.title = 'Navigate upwards in notation';
   navigateCtrls.appendChild(upwardsBtn);
 
   let downwardsBtn = document.createElement('button');
   downwardsBtn.id = "downwards-btn";
   downwardsBtn.classList.add('btn');
   downwardsBtn.classList.add('icon');
-  downwardsBtn.classList.add('icon-arrow-down');
+  downwardsBtn.innerHTML = icon.arrowDown;
   downwardsBtn.classList.add('inline-block-tight');
-  addToolTip(downwardsBtn, {
-    title: 'Navigate to next lower layer'
-  });
+  downwardsBtn.title = 'Navigate downwards in notation';
   navigateCtrls.appendChild(downwardsBtn);
 
   let speedDiv = document.createElement('div');
   speedDiv.id = 'speed-div';
-  // versionDiv.classList.add('block');
   speedDiv.classList.add('controls');
   controlsForm.appendChild(speedDiv);
 
-  let verovioIcon = document.createElement('img');
-  verovioIcon.src = `${root}svg/v.svg`;
-  verovioIcon.classList.add('icon');
+  let verovioIcon = document.createElement('div');
+  verovioIcon.innerHTML = icon.verovioV;
   verovioIcon.id = 'verovio-icon';
+  verovioIcon.title = `Worker activity:
+clockwise denotes Verovio activity,
+anticlockwise speed worker activity`;
   speedDiv.appendChild(verovioIcon);
 
   let speedLabel = document.createElement('label');
@@ -318,23 +281,19 @@ export function createControlsMenu(parentElement, scale) {
   speedLabel.id = 'speed-label';
   speedLabel.classList.add('label');
   speedDiv.appendChild(speedLabel);
-  addToolTip(speedLabel, {
-    title: `In Speedmode,
-            only current page is sent to Verovio
-            to reduce rendering time with large files`
-  });
+  speedLabel.title = `In Speedmode, only the current page
+is sent to Verovio to reduce rendering
+time with large files`;
 
   let speedCheckbox = document.createElement('input');
   speedCheckbox.id = "speed-checkbox";
   speedCheckbox.setAttribute('type', 'checkbox');
   speedCheckbox.setAttribute('checked', 'false');
   speedCheckbox.classList.add('checkbox');
+  speedCheckbox.title = 'Activate speedmode';
   speedLabel.setAttribute('for', speedCheckbox.id);
   speedCheckbox.checked = true;
   speedCheckbox.disabled = false;
-  // addToolTip(speedCheckbox, {
-  //   title: 'Speed mode (optimized notation rendering)'
-  // });
   speedDiv.appendChild(speedCheckbox);
 
 
@@ -361,15 +320,6 @@ export function manualCurrentPage(v, cm, ev) {
     if (pageInput) v.updatePage(cm, pageInput);
     v.updatePageNumDisplay();
   }
-}
-
-// add a tooltip to element
-export function addToolTip(element, object) {
-  let t = document.createElement('span');
-  t.classList.add('tooltiptext');
-  t.innerHTML = object.title;
-  element.appendChild(t);
-  element.classList.add('tooltip');
 }
 
 export function setBreaksOptions(tkAvailableOptions, defaultValue = 'auto') {
