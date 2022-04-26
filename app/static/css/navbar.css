@@ -23,7 +23,7 @@
   font-weight: bold;
   /* border: 1px solid darkblue;
   border-radius: 2px; */
-  float: right;
+  align-self: flex-end;
   margin-left: 5px;
 }
 
@@ -114,6 +114,7 @@
   text-decoration: none;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   text-align: left;
 }
 
@@ -123,6 +124,10 @@
 
 .dropdown-content a:hover .btn {
   background-color: var(--settingsBackgroundColor);
+}
+
+#GithubMenu.dropdown-content a {
+  justify-content: flex-start;
 }
 
 #GithubLoginLink {
