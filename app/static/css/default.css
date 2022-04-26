@@ -119,10 +119,9 @@ a:active {
 .settingsButton {
   width: 16px;
   height: 16px;
-  background-repeat: no-repeat;
-  background-position: 50% 50%;
   padding-right: 16px;
   cursor: pointer;
+  fill: var(--textColor);
 }
 
 .dragOverlay {
@@ -195,7 +194,7 @@ a:active {
   margin-bottom: 1em;
 }
 
-.openUrlOverlay .openUrlUI details>div ,
+.openUrlOverlay .openUrlUI details>div,
 .forkRepositoryOverlay .forkRepositoryUI details>div {
   margin-left: 1em;
 }
@@ -204,16 +203,14 @@ a:active {
   width: 70%;
 }
 
-
-.openUrlOverlay .openUrlUI details div div ,
+.openUrlOverlay .openUrlUI details div div,
 .forkRepositoryOverlay .forkRepositoryUI details div div {
   padding: 10px 15px;
 }
 
-
 .openUrlOverlay select,
 .forkRepositoryOverlay select {
-  text-align:left;
+  text-align: left;
 }
 
 #openUrlStatus {
@@ -363,15 +360,23 @@ a:active {
 
 .btn {
   margin: 2px;
-  border: 1px solid gainsboro;
+  border: 2px solid rgb(0, 0, 0, 0);
   border-radius: 4px;
-  /* font-size: 10px; */
+  font-size: 10pt;
   line-height: 1.5em;
-  padding: 0 2px;
+  padding: 0px;
   min-height: 21px;
   min-width: 21px;
   max-height: 21px;
   background-color: var(--backgroundColor);
+}
+
+.btn:hover {
+  background-color: var(--settingsLinkHoverColor);
+}
+
+.btn svg path {
+  fill: var(--textColor);
 }
 
 .label {
@@ -476,7 +481,7 @@ svg text {
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
-  user-select:  none;
+  user-select: none;
 }
 
 .verovio-panel g.highlighted {
@@ -535,7 +540,38 @@ svg text {
   /* max-width: 180px; */
 }
 
-.params {
+.icon {
+  width: 20px;
+  height: 20px;
+  /* background-repeat: no-repeat;
+  background-position: 50% 50%; */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.icon[disabled] {
+  opacity: 30%;
+}
+
+#verovio-icon {
+  margin-left: 3px;
+  width: 22px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  fill: var(--textColor);
+  /* stroke: var(--textColor);
+  stroke-width: 1px; */
+}
+
+.code {
   font-family: monospace;
 }
 
@@ -666,7 +702,7 @@ span.keyIcon {
 }
 
 .tabstart {
-  color: var(--textColor);
+  fill: var(--textColor);
   border: var(--settingsLinkBackgroundColor) solid 2px;
   border-top-left-radius: 5px;
   background-color: inherit;
@@ -679,7 +715,6 @@ span.keyIcon {
 
 /* Change background color of buttons on hover */
 .tablink:hover, .topright:hover, .tabstart:hover {
-  /* color: var(--textColor); */
   color: var(--textColor);
   background-color: var(--settingsLinkHoverColor);
   border-color: var(--settingsLinkHoverColor);
@@ -727,15 +762,11 @@ span.keyIcon {
 
 /* Style the close button */
 .topright {
-  /* color: #808080; */
+  color: var(--textcolor);
   float: right;
   padding: 6px 12px;
   cursor: pointer;
   font-size: 22px;
-}
-
-.topright:hover {
-  color: black;
 }
 
 .optionsItem {
@@ -816,7 +847,7 @@ select>option {
   width: 100%;
 }
 
-#bugReport { 
+#bugReport {
   font-size: 1.5em;
-  padding:20px;
+  padding: 20px;
 }
