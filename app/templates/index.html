@@ -6,6 +6,7 @@
   <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.png') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/default.css') }}" />
   <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/annotationPanel.css') }}" />
   <link rel="stylesheet" href="{{ url_for('static', filename='css/icons.css') }}" />
   <link rel="stylesheet" id="orientationCSS" href="{{ url_for('static', filename='css/bottom.css') }}" />
   <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.64.0/codemirror.min.js" integrity="sha512-4DlmQ+aBOfYTZ3uzRKCDXdyL7y8IlopnVChhXG0pRFgyvhwONVQW3JX8e5DYoXUNr3evQpLZz7S3O1XxMH4WKA==" crossorigin="anonymous"
@@ -351,7 +352,62 @@
         <button class="tablink" onclick="switchTab(event, 'annotationPanel', 'externalLinks')" title="External links">External links</button>
         <span id="closeAnnotationPanelButton" class="topright" title="Hide Annotation Panel">&times;</span>
       </div>
-      <div id="annotationTools" class="tabcontent">Annotation Tools</div>
+      <div id="annotationTools" class="tabcontent">
+        <menu id="annotationToolsMenu">
+          <li>
+            <div class="annotationToolsIcon">Highlight</div>
+            <div class="annotationToolsDomainSelection">
+              <div class="annotationToolsDomainSelectionItem">
+                <input type="checkbox" checked id="highlightInline"/>
+                <label for="#highlightInline">&lt;annot&gt;</label>
+              </div>
+              <div class="annotationToolsDomainSelectionItem">
+                <input type="checkbox" id="highlightStandoff"/>
+                <label for="#highlightStandoff">Web Annotation</label>
+              </div>
+            </div>
+          </li>
+          <li>
+            <div class="annotationToolsIcon">Circle</div>
+            <div class="annotationToolsDomainSelection">
+              <div class="annotationToolsDomainSelectionItem">
+                <input type="checkbox" checked id="circleInline"/>
+                <label for="#circleInline">&lt;annot&gt;</label>
+              </div>
+              <div class="annotationToolsDomainSelectionItem">
+                <input type="checkbox" id="circleStandoff"/>
+                <label for="#circleStandoff">Web Annotation</label>
+              </div>
+            </div>
+          </li>
+          <li>
+            <div class="annotationToolsIcon">Describe</div>
+            <div class="annotationToolsDomainSelection">
+              <div class="annotationToolsDomainSelectionItem">
+                <input type="checkbox" checked id="describeInline"/>
+                <label for="#describeInline">&lt;annot&gt;</label>
+              </div>
+              <div class="annotationToolsDomainSelectionItem">
+                <input type="checkbox" id="describeStandoff"/>
+                <label for="#describeStandoff">Web Annotation</label>
+              </div>
+            </div>
+          </li>
+          <li>
+            <div class="annotationToolsIcon">Link</div>
+            <div class="annotationToolsDomainSelection">
+              <div class="annotationToolsDomainSelectionItem">
+                <input type="checkbox" checked id="linkInline"/>
+                <label for="#linkInline">&lt;annot&gt;</label>
+              </div>
+              <div class="annotationToolsDomainSelectionItem">
+                <input type="checkbox" id="linkStandoff"/>
+                <label for="#linkStandoff">Web Annotation</label>
+              </div>
+            </div>
+          </li>
+        </menu>
+      </div>
       <div id="listAnnotations" class="tabcontent">List Annotations</div>
       <div id="externalLinks" class="tabcontent">External Links</div>
     </div>
