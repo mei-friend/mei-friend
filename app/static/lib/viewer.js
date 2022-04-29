@@ -7,13 +7,7 @@ import * as utils from './utils.js';
 import * as dutils from './dom-utils.js';
 import * as att from './attribute-classes.js';
 import {
-<<<<<<< HEAD
-  addToolTip
-} from './control-menu.js';
-import {
   cm,
-=======
->>>>>>> develop
   storage,
   tkVersion
 } from './main.js';
