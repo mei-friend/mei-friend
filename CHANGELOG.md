@@ -147,3 +147,8 @@
 * Automatically propose renaming for converted encodings
 * Implement GitHub issue reporting features
 # 0.3.11 patch:
+* Tooltips displayed as html title attributes
+* Clean control menu appearance
+* Track deployment environment and add use warning to 'staging' environment
+# 0.3.11 patch:
+*

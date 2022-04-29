@@ -7,10 +7,13 @@ import * as utils from './utils.js';
 import * as dutils from './dom-utils.js';
 import * as att from './attribute-classes.js';
 import {
+<<<<<<< HEAD
   addToolTip
 } from './control-menu.js';
 import {
   cm,
+=======
+>>>>>>> develop
   storage,
   tkVersion
 } from './main.js';
@@ -41,7 +44,6 @@ export default class Viewer {
     };
     // this.scoreDefList = []; // list of xmlNodes, one for each change, referenced by 5th element of pageList
     this.meiHeadRange = [];
-    this.toolTipTimeOutHandle = null; // handle for zoom tooltip hide timer
     this.vrvOptions; // all verovio options
     this.verovioIcon = document.getElementById('verovio-icon');
     this.respId = '';
@@ -173,7 +175,7 @@ export default class Viewer {
     console.info('xmlDOM pages counted: currentPage: ' + this.currentPage +
       ', pageCount: ' + this.pageCount);
     // compute time-spanning elements object in speed-worker
-    if (tkVersion && this.pageSpanners && Object.keys(this.pageSpanners.start).length === 0 &&
+    if (tkVersion && this.pageSpanners.start && Object.keys(this.pageSpanners.start).length === 0 &&
       (breaksSelectVal !== 'auto' || Object.keys(this.pageBreaks).length > 0)) {
       // use worker solution with swift txml parsing
       let message = {
@@ -192,8 +194,7 @@ export default class Viewer {
       // else console.log('pageSpanners empty: ', this.pageSpanners);
     }
     // retrieve requested MEI page from DOM
-    return speed.getPageFromDom(this.xmlDoc, this.currentPage, breaks,
-      this.pageSpanners);
+    return speed.getPageFromDom(this.xmlDoc, this.currentPage, breaks, this.pageSpanners);
   }
 
   loadXml(mei, forceReload = false) {
@@ -537,20 +538,16 @@ export default class Viewer {
     cm.backgroundColor.slice(4, -1).split(',').forEach(i => j += parseInt(i));
     j /= 3;
     console.log('setMenuColors lightness: ' + j + ', ' + ((j < 128) ? 'dark' : 'bright') + '.');
-    let els = document.querySelectorAll(
-      '.btn,.settingsButton,.CodeMirror-scrollbar-filler,#verovio-icon,#GithubLogo,#hideSettingsButtonImg');
+    let els = document.querySelectorAll('.CodeMirror-scrollbar-filler');
     let owl = document.getElementById('mei-friend-logo');
     let owlSrc = owl.getAttribute('src');
     owlSrc = owlSrc.substr(0, owlSrc.lastIndexOf('/') + 1);
+    if (env === environments.staging)
+      owlSrc += 'staging-';
     if (j < 128) { // dark
       // wake up owl
       owl.setAttribute("src", owlSrc + 'menu-logo.svg');
       els.forEach(el => el.style.setProperty('filter', 'invert(.8)'));
-      let btn = document.querySelectorAll('.btn');
-      if (btn) btn.forEach(el => {
-        el.style.setProperty('background-color', utils.complementary(cm.backgroundColor));
-        el.style.setProperty('color', utils.complementary(cm.color));
-      });
       rt.style.setProperty('--settingsLinkBackgroundColor', utils.brighter(cm.backgroundColor, 21));
       rt.style.setProperty('--settingsLinkHoverColor', utils.brighter(cm.backgroundColor, 36));
       rt.style.setProperty('--settingsBackgroundColor', utils.brighter(cm.backgroundColor, 36));
@@ -582,11 +579,6 @@ export default class Viewer {
       // sleepy owl
       owl.setAttribute("src", owlSrc + 'menu-logo-asleep.svg');
       els.forEach(el => el.style.removeProperty('filter'));
-      let btn = document.querySelectorAll('.btn');
-      if (btn) btn.forEach(el => {
-        el.style.setProperty('background-color', cm.backgroundColor);
-        el.style.setProperty('color', cm.color);
-      });
       rt.style.setProperty('--settingsLinkBackgroundColor', utils.brighter(cm.backgroundColor, -16));
       rt.style.setProperty('--settingsLinkHoverColor', utils.brighter(cm.backgroundColor, -24));
       rt.style.setProperty('--settingsBackgroundColor', utils.brighter(cm.backgroundColor, -36));
@@ -627,7 +619,6 @@ export default class Viewer {
         zoomCtrl.value = delta;
       if (storage && storage.supported) storage.scale = zoomCtrl.value;
       this.updateLayout();
-      // this.updateZoomSliderTooltip(zoomCtrl);
     }
   }
 
@@ -640,21 +631,6 @@ export default class Viewer {
     value = Math.min(300, Math.max(45, value)); // 45---300, see #zoomFont
     document.querySelector('.encoding').style.fontSize = value + '%';
     zf.value = value;
-  }
-
-  // TODO: why is it not showing?
-  updateZoomSliderTooltip(zoomCtrl) {
-    let toolTipText = 'Notation scale: ' + zoomCtrl.value + "%";
-    let tt = zoomCtrl.querySelector('.tooltiptext');
-    // console.info('Zoomctr.TT: ', tt);
-    if (tt) tt.innerHTML = toolTipText;
-    else addToolTip(zoomCtrl, {
-      title: toolTipText
-    });
-    tt.classList.add('visible');
-    if (this.toolTipTimeOutHandle) clearTimeout(this.toolTipTimeOutHandle);
-    this.toolTipTimeOutHandle = setTimeout(() =>
-      tt.classList.remove('visible'), 1500);
   }
 
   // set focus to verovioPane in order to ensure working key bindings
@@ -775,7 +751,7 @@ export default class Viewer {
     let optionsToShow = { // key as in CodeMirror
       zoomFont: {
         title: 'Font size (%)',
-        decription: 'Change font size of editor (in percent)',
+        description: 'Change font size of editor (in percent)',
         type: 'int',
         default: 100,
         min: 45,
@@ -929,7 +905,7 @@ export default class Viewer {
       window.matchMedia('(prefers-color-scheme: dark)')
         .addEventListener('change', ev => { // system changes from dark to bright or otherway round
           if (!storage.hasOwnProperty('cm-theme')) { // only if not changed by user
-            let matchTheme = storage.hasOwnProperty('cm-matchTheme') ? storage['cm-matchTheme'] : mfDefaults['matchTheme'];
+            let matchTheme = storage.hasOwnProperty('cm-matchTheme') ? storage['cm-matchTheme'] : mfDefaults['cm-matchTheme'];
             if (ev.matches) { // event listener for dark/bright mode changes
               document.getElementById('theme').value = mfDefaults['defaultDarkTheme'];
               this.applyEditorOption(cm, 'theme', mfDefaults['defaultDarkTheme'], matchTheme);
@@ -1149,7 +1125,7 @@ export default class Viewer {
         } : {});
         break;
       default:
-        if (value == 'true' || value == 'false') value = (value === 'true');
+        if (value === 'true' || value === 'false') value = (value === 'true');
         cm.setOption(option, value);
         if (option === 'theme') {
           this.setMenuColors();
@@ -1162,9 +1138,10 @@ export default class Viewer {
   createOptionsItem(opt, o, optDefault) {
     let div = document.createElement('div');
     div.classList.add('optionsItem');
-    let label = document.createElement('label')
-    label.setAttribute('title', o.description + ' (default: ' +
-      optDefault + ')');
+    let label = document.createElement('label');
+    let title = o.description;
+    if (o.default) title += ' (default: ' + o.default+')';
+    label.setAttribute('title', title);
     label.setAttribute('for', opt);
     label.innerText = o.title;
     div.appendChild(label);

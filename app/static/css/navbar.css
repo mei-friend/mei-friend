@@ -23,19 +23,22 @@
   font-weight: bold;
   /* border: 1px solid darkblue;
   border-radius: 2px; */
-  float: right;
+  align-self: flex-end;
   margin-left: 5px;
 }
 
 .keyShortCut.mac {
   display: none;
 }
+
 .keyShortCut.mac.platform-mac {
   display: block;
 }
+
 .keyShortCut.nonmac {
   display: none;
 }
+
 .keyShortCut.nonmac.platform-nonmac {
   display: block;
 }
@@ -109,8 +112,22 @@
   color: var(--textColor);
   padding: 3px 12px;
   text-decoration: none;
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   text-align: left;
+}
+
+.dropdown-content a .btn {
+  background-color: var(--settingsBackgroundAlternativeColor);
+}
+
+.dropdown-content a:hover .btn {
+  background-color: var(--settingsBackgroundColor);
+}
+
+#GithubMenu.dropdown-content a {
+  justify-content: flex-start;
 }
 
 #GithubLoginLink {
@@ -149,11 +166,12 @@
 }
 
 #GithubLogo, #forkRepoGithubLogo {
-  height: .8em;
-  margin-right: .2em;
+  fill: var(--textColor);
+  height: .75em;
+  margin-right: -.2em;
 }
 
-#forkRepoGithubLogo { 
+#forkRepoGithubLogo {
   vertical-align: Baseline;
   filter: invert(1);
 }
@@ -240,33 +258,33 @@
   padding: 1px 3px;
 }
 
-#commitFileNameEdit { 
+#commitFileNameEdit {
   font-size: 12pt;
-	float: none;
-	color: var(--textColor);
-	padding: 3px 12px;
-	display: block;
-	text-align: left;
+  float: none;
+  color: var(--textColor);
+  padding: 3px 12px;
+  display: block;
+  text-align: left;
 }
 
-#commitFileName { 
+#commitFileName {
   text-decoration: var(--textColor) dotted underline;
   background: var(--dropdownHeadingColor);
   padding: 2px 2px;
   cursor: text;
 }
 
-#commitFileName:focus{ 
+#commitFileName:focus {
   background: var(--textColor);
   color: var(--dropdownHeadingColor);
 }
 
-#commitMessageInput.warn { 
+#commitMessageInput.warn {
   background: var(--textColor);
   color: var(--dropdownHeadingColor);
   border: 1px dotted var(--fileStatusWarnColor);
 }
 
-#commitMessageInput[disabled], #commitButton[disabled] { 
+#commitMessageInput[disabled], #commitButton[disabled] {
   cursor: not-allowed;
 }
