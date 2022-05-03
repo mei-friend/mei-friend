@@ -6,6 +6,7 @@ import * as utils from './utils.js';
 import * as dutils from './dom-utils.js';
 import * as att from './attribute-classes.js';
 import {
+  fontList,
   storage,
   tkVersion
 } from './main.js';
@@ -1111,6 +1112,15 @@ export default class Viewer {
         if (optKeys.includes('max')) input.setAttribute('max', o.max);
         input.setAttribute('step', (optKeys.includes('step')) ? o.step : step);
         input.setAttribute('value', optDefault);
+        break;
+      case 'std::string':
+        if (opt === 'font') {
+          input = document.createElement('select');
+          input.setAttribute('name', opt);
+          input.setAttribute('id', opt);
+          fontList.forEach((str, i) => input.add(new Option(str, str,
+            (fontList.indexOf(optDefault) == i) ? true : false)));
+        }
         break;
       case 'select':
       case 'std::string-list':

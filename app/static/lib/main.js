@@ -36,6 +36,8 @@ export const samp = {
   TITLE: 4,
   COMPOSER: 5
 }
+export const fontList = ['Leipzig', 'Bravura', 'Gootville', 'Leland', 'Petaluma'];
+
 
 import {
   setOrientation,
