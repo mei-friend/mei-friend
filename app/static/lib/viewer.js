@@ -947,6 +947,27 @@ export default class Viewer {
         type: 'bool',
         default: false
       },
+      controlMenuLineSeparator: {
+        title: 'options-line', // class name of hr element
+        type: 'line'
+      },
+      controlMenuSettings: {
+        title: 'Control menu',
+        description: 'Define items to be shown in control menu',
+        type: 'header'
+      },
+      controlMenuFontSelector: {
+        title: 'Show font select',
+        description: 'Show font select in control menu',
+        type: 'bool',
+        default: false
+      },
+      controlMenuNavigateArrows: {
+        title: 'Show navigation arrows',
+        description: 'Show notation navigation arrows in control menu',
+        type: 'bool',
+        default: false
+      },
     };
     let mfs = document.getElementById('meiFriendSettings');
     let addListeners = false; // add event listeners only the first time
@@ -981,6 +1002,12 @@ export default class Viewer {
             o.values = Array.from(this.xmlDoc.querySelectorAll('corpName[*|id]'))
             .map(e => e.getAttribute('xml:id'));
           break;
+        case 'controlMenuFontSelector':
+          document.getElementById('font-ctrls').style.visibility = optDefault ? 'inherit' : 'collapse';
+          break;
+        case 'controlMenuNavigateArrows':
+          document.getElementById('navigate-ctrls').style.visibility = optDefault ? 'inherit' : 'collapse';
+          break;
       }
       let div = this.createOptionsItem(opt, o, optDefault)
       if (div) mfs.appendChild(div);
@@ -1007,6 +1034,14 @@ export default class Viewer {
             break;
           case 'respSelect':
             this.respId = document.getElementById('respSelect').value;
+            break;
+          case 'controlMenuFontSelector':
+            document.getElementById('font-ctrls').style.visibility =
+              document.getElementById('controlMenuFontSelector').checked ? 'inherit' : 'collapse';
+            break;
+          case 'controlMenuNavigateArrows':
+            document.getElementById('navigate-ctrls').style.visibility =
+              document.getElementById('controlMenuNavigateArrows').checked ? 'inherit' : 'collapse';
             break;
         }
         if (value === optionsToShow[option].default) {
