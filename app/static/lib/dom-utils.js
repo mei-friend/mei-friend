@@ -205,3 +205,21 @@ export function getElementAtCursor(cm) {
   let elem = document.elementFromPoint(coords.left, coords.top);
   return elem;
 }
+
+// checks whether a page beginning or system beginning has to be counted as a
+// new page (normally true, and if within an <app>, count only
+// if inside a <lem> or inside first <rdg> or <rdg|source=id)
+export function countAsBreak(el, sourceId = '') {
+  let app;
+  if (app = el.closest('app')) {
+    let rdgs = app.querySelectorAll('rdg');
+    if (rdgs && rdgs.length > 0 &&
+      (el.closest('lem')) || el.closest('rdg') === rdgs[0] ||
+      el.closest('rdg') && el.closest('rdg').getAttribute('source') === sourceId) {
+      return true;
+    }
+  } else {
+    return true;
+  }
+  return false;
+}

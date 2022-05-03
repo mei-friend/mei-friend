@@ -154,8 +154,10 @@ export default class Viewer {
       let countBreaks = false;
       for (let e of elements) {
         if (e.nodeName === 'measure') countBreaks = true; // skip leading breaks
-        if (countBreaks && breaks.includes(e.nodeName))
-          this.pageCount++;
+        if (countBreaks && breaks.includes(e.nodeName)) {
+          // if within app, increment only if inside lem or 1st rdg
+          if (dutils.countAsBreak(e)) this.pageCount++;
+        }
       }
       for (let e of Array.from(elements).reverse()) { // skip trailing breaks
         if (e.nodeName === 'measure') break;
@@ -420,8 +422,8 @@ export default class Viewer {
 
   // when cursor pos in editor changed, update notation location / highlight
   cursorActivity(cm, forceFlip = false) {
-    // console.log('cursorActivity forceFlip: ' + forceFlip);
     let id = utils.getElementIdAtCursor(cm);
+    // console.log('cursorActivity forceFlip: ' + forceFlip + ' to: ' + id);
     this.selectedElements = [];
     if (id) {
       this.selectedElements.push(id);
