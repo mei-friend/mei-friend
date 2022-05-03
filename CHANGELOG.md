@@ -152,3 +152,4 @@
 * Track deployment environment and add use warning to 'staging' environment
 # 0.3.12 patch:
 * Page processing bug with page/system beginnings inside apparatus element
+* Make font select appear Verovio options and control visibility in control menu through settings pane
