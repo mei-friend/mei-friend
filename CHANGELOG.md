@@ -150,5 +150,5 @@
 * Tooltips displayed as html title attributes
 * Clean control menu appearance
 * Track deployment environment and add use warning to 'staging' environment
-# 0.3.11 patch:
-*
+# 0.3.12 patch:
+* Page processing bug with page/system beginnings inside apparatus element
