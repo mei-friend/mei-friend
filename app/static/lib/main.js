@@ -1109,7 +1109,10 @@ function addEventListeners(v, cm) {
   document.getElementById('pagination2').addEventListener('keydown', ev => manualCurrentPage(v, cm, ev));
   document.getElementById('pagination2').addEventListener('blur', ev => manualCurrentPage(v, cm, ev));
   // font selector
-  document.getElementById('font-select').addEventListener('change', () => v.updateOption());
+  document.getElementById('font-select').addEventListener('change', () => {
+    document.getElementById('font').value = document.getElementById('font-select').value;
+    v.updateOption();
+  });
   // breaks selector
   document.getElementById('breaks-select').addEventListener('change', (ev) => {
     if (storage && storage.supported) storage.breaks = ev.srcElement.value;

@@ -645,7 +645,7 @@ export default class Viewer {
   // initializes the settings panel by filling it with content
   addVrvOptionsToSettingsPanel(tkAvailableOptions, defaultVrvOptions, restoreFromLocalStorage = true) {
     // skip these options (in part because they are handled in control menu)
-    let skipList = ['font', 'breaks', 'engravingDefaults', 'expand',
+    let skipList = ['breaks', 'engravingDefaults', 'expand',
       'svgAdditionalAttribute', 'handwrittenFont'
     ];
     let vsp = document.getElementById('verovioSettings');
@@ -697,6 +697,7 @@ export default class Viewer {
           delete storage['vrv-' + opt]; // remove from storage object when default value
         else
           storage['vrv-' + opt] = value; // save changes in localStorage object
+        if (opt === 'font') document.getElementById('font-select').value = value;
         this.updateLayout(this.vrvOptions);
       });
       vsp.addEventListener('click', ev => { // RESET button
