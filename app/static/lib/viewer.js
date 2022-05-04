@@ -994,7 +994,7 @@ export default class Viewer {
         title: 'Use suffix at endings',
         description: 'Use number suffix at endings (e.g., 23-a)',
         type: 'select',
-        values: ['none','ending@n','a/b/c','A/B/C','-a/-b/-c','-A/-B/-C'],
+        values: ['none', 'ending@n', 'a/b/c', 'A/B/C', '-a/-b/-c', '-A/-B/-C'],
         default: false
       },
     };
@@ -1216,10 +1216,12 @@ export default class Viewer {
         input.setAttribute('value', optDefault);
         break;
       case 'header':
-        label.setAttribute('style', 'font-weight: bold; font-size: 105%; margin-top: 3px;');
+        div.classList.remove('optionsItem');
+        div.classList.add('optionsSubHeading');
         break;
       case 'line':
         div.removeChild(label);
+        div.classList.remove('optionsItem');
         let line = document.createElement('hr');
         line.classList.add(o.title);
         div.appendChild(line);

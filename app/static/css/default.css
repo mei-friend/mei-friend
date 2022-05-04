@@ -826,6 +826,12 @@ span.keyIcon {
   padding: 2px;
 }
 
+.optionsSubHeading {
+  font-weight: bold;
+  font-size: 110%;
+  margin: 3px;
+}
+
 .resetButton {
   border-radius: 4px;
 }
@@ -844,7 +850,7 @@ select>option {
   border: 1px solid var(--dropdownBorderColor);
   border-radius: 1px;
   margin: 8px 4px;
-  width: 100%;
+  width: 96%;
 }
 
 #bugReport {
