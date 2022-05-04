@@ -728,7 +728,8 @@ export default class Viewer {
         values: ['default', 'abbott', 'base16-dark', 'base16-light', 'cobalt',
           'darcula', 'dracula', 'eclipse', 'elegant', 'monokai', 'idea',
           'juejin', 'mdn-like', 'neo', 'paraiso-dark', 'paraiso-light',
-          'pastel-on-dark', 'xq-dark', 'xq-light', 'yeti', 'yonce', 'zenburn'
+          'pastel-on-dark', 'solarized dark', 'solarized light',
+          'xq-dark', 'xq-light', 'yeti', 'yonce', 'zenburn'
         ]
       },
       matchTheme: {
@@ -952,7 +953,7 @@ export default class Viewer {
         type: 'line'
       },
       controlMenuSettings: {
-        title: 'Control menu',
+        title: 'Control bar',
         description: 'Define items to be shown in control menu',
         type: 'header'
       },
