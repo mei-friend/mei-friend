@@ -634,7 +634,7 @@ span.keyIcon {
   position: absolute;
   top: 4px;
   min-width: 360px;
-  height: 98%;
+  height: calc(100% - 20px);;
   z-index: 15;
   display: none;
 }
