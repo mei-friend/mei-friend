@@ -2,7 +2,9 @@
 
 ### 0.3.12 patch:
 * Address page processing bug with page/system beginnings inside apparatus element
-* Make font select appear Verovio options and control visibility in control menu through settings pane
+* Make font select appear in Verovio options
+* Control visibility of font select, update controls, navigation arrows
+in control menu through mei-friend settings pane
 ### 0.3.11 patch:
 * Tooltips displayed as html title attributes
 * Clean control menu appearance
