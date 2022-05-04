@@ -968,6 +968,12 @@ export default class Viewer {
         type: 'bool',
         default: false
       },
+      controlMenuUpdateNotation: {
+        title: 'Show notation update controls',
+        description: 'Show notation update behavior controls in control menu',
+        type: 'bool',
+        default: true
+      },
     };
     let mfs = document.getElementById('meiFriendSettings');
     let addListeners = false; // add event listeners only the first time
@@ -1008,6 +1014,9 @@ export default class Viewer {
         case 'controlMenuNavigateArrows':
           document.getElementById('navigate-ctrls').style.visibility = optDefault ? 'inherit' : 'collapse';
           break;
+        case 'controlMenuUpdateNotation':
+          document.getElementById('update-ctrls').style.visibility = optDefault ? 'inherit' : 'collapse';
+          break;
       }
       let div = this.createOptionsItem(opt, o, optDefault)
       if (div) mfs.appendChild(div);
@@ -1042,6 +1051,10 @@ export default class Viewer {
           case 'controlMenuNavigateArrows':
             document.getElementById('navigate-ctrls').style.visibility =
               document.getElementById('controlMenuNavigateArrows').checked ? 'inherit' : 'collapse';
+            break;
+          case 'controlMenuUpdateNotation':
+            document.getElementById('update-ctrls').style.visibility =
+              document.getElementById('controlMenuUpdateNotation').checked ? 'inherit' : 'collapse';
             break;
         }
         if (value === optionsToShow[option].default) {
