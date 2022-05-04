@@ -73,12 +73,12 @@
 * Fix Github menu navigation issue causing empty repo list in certain conditions
 * Move OpenUrl functionality into a new modal display
 * Support multiple encoding formats at openURL
-### 0.2.1 patch: local storage
+### 0.2.1 patch: Local storage support
 * Implement local storage for files and github credentials
 * Improve Flask routing, add session storage
 * Implement file status and change tracking
 * Implement OpenUrl function
-## 0.2.0 minor: speedMode support
+## 0.2.0 minor: Speed mode support
 * Support for speedMode to be en/disabled through checkbox
 * SpeedMode support also for breaks='auto|smart' by computing breaks upon loading
 * Quick first page view when opening file in speedMode with automatic breaks
@@ -109,7 +109,7 @@
 * Support for downloading MEI, SVG, MIDI
 * Some editor improvements
 * Github menu moved to be first, styling improved
-## 0.1.0 minor: Merge with develop-github
+## 0.1.0 minor: Support for GitHub integration
 * Add in Github menu
 * Allow user login to Github via OAuth
 * List user repositories
