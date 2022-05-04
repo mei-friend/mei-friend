@@ -403,6 +403,7 @@ export function renumberMeasures(xmlDoc, cm, startNum = 1, change = false) {
   let n = startNum;
   let endingStart = -1; // start number of an ending element
   let endingEnd = -1; // end number of an ending element
+  let endingCount = 0;
   let endingN = '';
   // let checkPoint = buffer.createCheckpoint(); TODO
   for (i = 0; i < lgt; i++) {
@@ -422,18 +423,49 @@ export function renumberMeasures(xmlDoc, cm, startNum = 1, change = false) {
     }
     if (metcons > 1) n--;
     // 3) Measures within endings are numbered starting with the same number.
-    let ending = measureList[i].closest('ending');
-    if (ending && endingStart > 0 && ending.hasAttribute('n') &&
-      ending.getAttribute('n') != endingN) endingEnd = n; // compare ending ns
-    if (ending && ending.hasAttribute('n')) endingN = ending.getAttribute('n');
-    if (ending && endingStart < 0) endingStart = n; // remember start number
-    if (ending && endingStart > 0 && endingEnd > 0) { // set @n to start number
-      n = endingStart;
-      endingEnd = -1;
-    }
-    if (!ending) { // reset both measure numbers
-      endingStart = -1;
-      endingEnd = -1;
+    let suffix = '';
+    let cont = document.getElementById('renumberMeasuresContinueAcrossEndings');
+    if (cont && !cont.checked) {
+      let ending = measureList[i].closest('ending');
+      if (ending && endingStart > 0 && ending.hasAttribute('n') &&
+        ending.getAttribute('n') != endingN) endingEnd = n; // compare ending ns
+      if (ending && ending.hasAttribute('n')) endingN = ending.getAttribute('n');
+      if (ending && endingStart < 0) {
+        endingStart = n; // remember start number
+        endingCount++; // increment ending count
+      }
+      if (ending && endingStart > 0 && endingEnd > 0) { // set @n to start number
+        n = endingStart;
+        endingEnd = -1;
+        endingCount++; // increment ending count
+      }
+      if (ending) {
+        let sufSel = document.getElementById('renumberMeasuresUseSuffixAtEndings');
+        switch (sufSel.value) {
+          case 'none':
+            break;
+          case 'ending@n':
+            suffix = '-' + (ending.hasAttribute('n') ? ending.getAttribute('n') : '');
+            break;
+          case 'a/b/c':
+            suffix = String.fromCharCode(endingCount + 64).toLowerCase();
+            break;
+          case 'A/B/C':
+            suffix = String.fromCharCode(endingCount + 64);
+            break;
+          case '-a/-b/-c':
+            suffix = '-' + String.fromCharCode(endingCount + 64).toLowerCase();
+            break;
+          case '-A/-B/-C':
+            suffix = '-' + String.fromCharCode(endingCount + 64);
+            break;
+        }
+      }
+      if (!ending) { // reset both measure numbers
+        endingStart = -1;
+        endingEnd = -1;
+        endingCount = 0;
+      }
     }
     // 4) No increment after bars with invisible barline (@right="invis")
     let right = '';
@@ -442,7 +474,7 @@ export function renumberMeasures(xmlDoc, cm, startNum = 1, change = false) {
 
     // change measure@n
     if (change) {
-      measureList[i].setAttribute('n', n);
+      measureList[i].setAttribute('n', n + suffix);
       e.replaceInTextEditor(cm, measureList[i]);
       console.info(measureList[i].getAttribute('n') + ' changed to ' + n +
         ', right:' + right + ', metcons:' + metcons);

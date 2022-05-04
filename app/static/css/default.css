@@ -555,7 +555,7 @@ svg text {
   height: 20px;
 }
 
-.icon[disabled] {
+.icon[disabled], .disabled {
   opacity: 30%;
 }
 

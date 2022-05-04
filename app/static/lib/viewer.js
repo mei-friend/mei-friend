@@ -974,6 +974,28 @@ export default class Viewer {
         type: 'bool',
         default: true
       },
+      renumberMeasuresLineSeparator: {
+        title: 'options-line', // class name of hr element
+        type: 'line'
+      },
+      renumberMeasuresHeading: {
+        title: 'Renumber measures',
+        description: 'Settings for renumbering measures',
+        type: 'header'
+      },
+      renumberMeasuresContinueAcrossEndings: {
+        title: 'Continue across endings',
+        description: 'Continue measure numbers across endings',
+        type: 'bool',
+        default: false
+      },
+      renumberMeasuresUseSuffixAtEndings: {
+        title: 'Use suffix at endings',
+        description: 'Use number suffix at endings (e.g., 23-a)',
+        type: 'select',
+        values: ['none','ending@n','a/b/c','A/B/C','-a/-b/-c','-A/-B/-C'],
+        default: false
+      },
     };
     let mfs = document.getElementById('meiFriendSettings');
     let addListeners = false; // add event listeners only the first time
@@ -1021,6 +1043,9 @@ export default class Viewer {
       let div = this.createOptionsItem(opt, o, optDefault)
       if (div) mfs.appendChild(div);
       if (opt === 'respSelect') this.respId = document.getElementById('respSelect').value;
+      if (opt === 'renumberMeasuresUseSuffixAtEndings') {
+        this.enableRenumberMeasuresUseSuffixAtEndings();
+      }
     });
     mfs.innerHTML += '<input type="button" title="Reset to mei-friend defaults" id="mfReset" class="resetButton" value="Default" />';
 
@@ -1055,6 +1080,9 @@ export default class Viewer {
           case 'controlMenuUpdateNotation':
             document.getElementById('update-ctrls').style.visibility =
               document.getElementById('controlMenuUpdateNotation').checked ? 'inherit' : 'collapse';
+            break;
+          case 'renumberMeasuresContinueAcrossEndings':
+            this.enableRenumberMeasuresUseSuffixAtEndings();
             break;
         }
         if (value === optionsToShow[option].default) {
@@ -1368,6 +1396,16 @@ export default class Viewer {
       default:
         return '';
     }
+  }
+
+
+  // toggle disabled at one specific checkbox
+  enableRenumberMeasuresUseSuffixAtEndings() {
+    let cont = document.getElementById('renumberMeasuresContinueAcrossEndings').checked;
+    let el = document.getElementById('renumberMeasuresUseSuffixAtEndings');
+    el.disabled = cont;
+    if (cont) el.parentNode.classList.add('disabled');
+    else el.parentNode.classList.remove('disabled');
   }
 
 }
