@@ -957,8 +957,8 @@ export default class Viewer {
         type: 'header'
       },
       controlMenuFontSelector: {
-        title: 'Show font select',
-        description: 'Show font select in control menu',
+        title: 'Show notation font selector',
+        description: 'Show notation font (SMuFL) selector in control menu',
         type: 'bool',
         default: false
       },
