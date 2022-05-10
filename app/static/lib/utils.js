@@ -513,3 +513,26 @@ export function complementary(rgbString) {
   rgb = rgb.map(i => 255 - i);
   return 'rgb(' + rgb.join(', ') + ')';
 }
+
+// input Verovio-SVG element, return bounding box coords in default screen coordinate space
+export function convertCoords(elem) {
+  if(!!elem && document.getElementById(elem.getAttribute("id"))
+    && elem.style.display !== "none" && (elem.getBBox().x !== 0 || elem.getBBox().y !== 0)) {
+    const x = elem.getBBox().x;
+    const width = elem.getBBox().width;
+    const y = elem.getBBox().y;
+    const height = elem.getBBox().height;
+    const offset = elem.closest("svg").parentElement.getBoundingClientRect();
+    const matrix = elem.getScreenCTM();
+    return {
+        x: (matrix.a * x) + (matrix.c * y) + matrix.e - offset.left,
+        y: (matrix.b * x) + (matrix.d * y) + matrix.f - offset.top,
+        x2: (matrix.a * (x + width)) + (matrix.c * y) + matrix.e - offset.left,
+        y2: (matrix.b * x) + (matrix.d * (y + height)) + matrix.f - offset.top
+    };
+  } else {
+    console.warn("Element unavailable on page: ", elem.getAttribute("id"));
+    return { x:0, y:0, x2:0, y2:0 }
+  }
+}
+

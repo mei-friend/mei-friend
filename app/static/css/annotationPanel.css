@@ -27,3 +27,20 @@
   display:flx;
   flex-direction:row;
 }
+
+.annotationHighlight {
+    filter: drop-shadow(0px 0px 3em var(--annotationPanelBackgroundColor))
+}
+
+#renderedAnnotationsContainer { 
+  position:absolute;
+  pointer-events:none;
+  z-index: 10;
+}
+
+#renderedAnnotationsContainer .highlightEllipse{
+  fill:none;
+  stroke:red;
+  stroke-width: 3;
+  stroke-opacity: .7;
+}

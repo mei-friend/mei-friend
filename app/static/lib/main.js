@@ -40,7 +40,10 @@ export const samp = {
 import {
   setOrientation,
   addResizerHandlers
-} from './resizer.js'
+} from './resizer.js';
+import { 
+  addAnnotationHandlers
+} from './annotation.js';
 import {
   dropHandler,
   dragEnter,
@@ -445,6 +448,7 @@ document.addEventListener('DOMContentLoaded', function() {
     setOrientation(cm, defaultOrientation);
   }
   addEventListeners(v, cm);
+  addAnnotationHandlers();
   addResizerHandlers(v, cm);
   let doit;
   window.onresize = () => {
