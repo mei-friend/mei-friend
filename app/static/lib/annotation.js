@@ -72,17 +72,27 @@ export function addAnnotationHandlers() {
     annotations.push({"type": "annotateHighlight", "selection": v.selectedElements});
   const createCircle = (e) => 
     annotations.push({"type": "annotateCircle", "selection": v.selectedElements});
-  const createLink = (e) => 
-    console.log("Linking: ", e);
-  const createDescribe = (e) => 
-    console.log("Describing: ", e);
+  const createDescribe = (e => {
+    // TODO improve!
+    const desc = window.prompt("Please enter a textual description to apply");
+    annotations.push(
+      { "type": "annotateDescribe", "selection": v.selectedElements, "description": desc }
+    );
+  })
+  const createLink = (e => {
+    // TODO improve!
+    const url = window.prompt("Please enter a url to link to");
+    annotations.push(
+      { "type": "annotateLink", "selection": v.selectedElements, "url": url }
+    );
+  })
   // functions to draw annotations
   const drawHighlight = (a) => {
     if("selection" in a) { 
       const els = a.selection.map(s => document.getElementById(s));
       els.forEach(e => e.classList.add("annotationHighlight"));
     } else { 
-      console.warn("Failing to draw highlight annotation without selection: ", a);
+      console.warn("failing to draw highlight annotation without selection: ", a);
     }
   }
   const drawCircle = (a) => { 
@@ -112,11 +122,38 @@ export function addAnnotationHandlers() {
     }
 
   }
-  const drawLink = (a) => { 
-    console.log("Draw link: ", a);
-  }
   const drawDescribe = (a) => { 
-    console.log("Draw circle: ", a);
+    if("selection" in a && "description" in a) { 
+      const els = a.selection.map(s => document.getElementById(s));
+      els.forEach(e => { 
+        e.classList.add("annotationDescribe");
+        // create a title element within the described element to house the description (which will be available on hover)
+        const title = document.createElementNS("http://www.w3.org/2000/svg", "title");
+        title.innerHTML = a.description;
+        // slot it in as the first child of the selected element
+        e.insertBefore(title, e.firstChild);
+      });
+    } else { 
+      console.warn("Failing to draw describe annotation missing selection and/or description: ", a);
+    }
+  }
+
+  const drawLink = (a) => { 
+    if("selection" in a && "url" in a) { 
+      const els = a.selection.map(s => document.getElementById(s));
+      els.forEach(e => { 
+        e.classList.add("annotationLink");
+        // create a title element within the linked element to house the url (which will be available on hover)
+        const title = document.createElementNS("http://www.w3.org/2000/svg", "title");
+        title.innerHTML = "Open in new tab: " + a.url;
+        // slot it in as the first child of the selected element
+        e.insertBefore(title, e.firstChild);
+        // make the element clickable
+        e.addEventListener("click", () => window.open(a.url, "_blank"), true);
+      });
+    } else { 
+      console.warn("Failing to draw link annotation missing selection and/or url: ", a);
+    }
   }
 
   document.querySelectorAll(".annotationToolsIcon").forEach(a => a.removeEventListener("click", annotationHandler));
