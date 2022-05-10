@@ -1,7 +1,34 @@
 import { v } from './main.js'; 
 import { convertCoords } from './utils.js';
+import { highlight, pencil, circle, link } from '../css/icons.js';
 
 let annotations = [];
+
+export function refreshAnnotationsList() { 
+  const list = document.getElementById("listAnnotations");
+  list.innerHTML = "";
+  annotations.forEach(a => {
+    const annoDiv = document.createElement("div");
+    annoDiv.classList.add("annotationIcon");
+    switch(a.type) { 
+      case 'annotateHighlight':
+        annoDiv.innerHTML = highlight;
+        break;
+      case 'annotateCircle':
+        annoDiv.innerHTML = circle;
+        break;
+      case 'annotateLink':
+        annoDiv.innerHTML = link;
+        break;
+      case 'annotateDescribe':
+        annoDiv.innerHTML = pencil;
+        break;
+      default:
+        console.warn("Unknown type when drawing annotation in list: ", a);
+    }
+    list.appendChild(annoDiv);
+  });
+}
 
 export function addAnnotationHandlers() { 
 // TODO extend this to allow app to consume (TROMPA-style) Annotation Toolkit descriptions
@@ -65,6 +92,7 @@ export function addAnnotationHandlers() {
         console.warn("Skipping annotation without type: ", a);
       }
     });
+    refreshAnnotationsList();
   }
 
   // functions to create annotations
