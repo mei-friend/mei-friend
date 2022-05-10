@@ -1,11 +1,9 @@
 #annotationToolsMenu {
   display: flex;
-  flex-direction: row;
 }
 
 #annotationToolsMenu li {
   display: flex;
-  flex-direction: column;
   list-style: none;
   padding:10px;
 }
@@ -20,12 +18,10 @@
 
 .annotationToolsDomainSelection {
   display: flex;
-  flex-direction:column;
 }
 
 .annotationToolsDomainSelectionItem {
   display:flex;
-  flex-direction:row;
 }
 
 .annotationHighlight {

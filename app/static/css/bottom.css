@@ -32,3 +32,19 @@
   display: flex;
   justify-content: center;
 }
+
+#annotationToolsMenu { 
+  flex-direction: column;
+}
+
+#annotationToolsMenu li { 
+  flex-direction: column;
+}
+
+.annotationToolsDomainSelection { 
+  flex-direction: column;
+}
+
+.annotationToolsDomainSelectionItem{
+  flex-direction: row;
+}
