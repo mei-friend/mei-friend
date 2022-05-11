@@ -52,3 +52,17 @@
   stroke-opacity: .7;
 }
 
+#listAnnotations details { 
+  border: 1px solid black;
+  padding: 10px;
+  margin: 5px;
+}
+
+#listAnnotation details[open] summary {
+  border-bottom: 1px solid black;
+}
+
+summary.noDetails { 
+  list-style: none;
+  cursor:default;
+}

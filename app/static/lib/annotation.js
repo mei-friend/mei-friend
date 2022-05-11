@@ -5,29 +5,55 @@ import { highlight, pencil, circle, link } from '../css/icons.js';
 let annotations = [];
 
 export function refreshAnnotationsList() { 
+  situateAnnotations();
   const list = document.getElementById("listAnnotations");
   list.innerHTML = "";
   annotations.forEach(a => {
     const annoDiv = document.createElement("div");
     annoDiv.classList.add("annotationIcon");
+    const details = document.createElement("details");
+    const summary = document.createElement("summary");
     switch(a.type) { 
       case 'annotateHighlight':
-        annoDiv.innerHTML = highlight;
+        summary.innerHTML = highlight;
         break;
       case 'annotateCircle':
-        annoDiv.innerHTML = circle;
+        summary.innerHTML = circle;
         break;
       case 'annotateLink':
-        annoDiv.innerHTML = link;
+        summary.innerHTML = link;
+        details.innerHTML = a.url;
         break;
       case 'annotateDescribe':
-        annoDiv.innerHTML = pencil;
+        summary.innerHTML = pencil;
+        details.innerHTML = a.description;
         break;
       default:
         console.warn("Unknown type when drawing annotation in list: ", a);
     }
+    const pageSpan = a.firstPage === a.lastPage 
+      ?  a.firstPage : a.firstPage + "-" + a.lastPage;
+    summary.innerHTML += `p.${pageSpan} (${a.selection.length} elements)`;
+    if (!details.innerHTML.length) { 
+      // some annotation types don't have any annotation body to display
+      summary.classList.add("noDetails");
+    }
+    details.prepend(summary);
+    annoDiv.appendChild(details);
     list.appendChild(annoDiv);
   });
+}
+
+// call whenever layout reflows to re-situate annotations appropriately
+export function situateAnnotations() { 
+  annotations.forEach(a => { 
+    // for each element in a.selection, ask Verovio for the page number
+    // set a.firstPage and a.lastPage to min/max page numbers returned
+    
+    // dummy values for now:
+    a.firstPage=1;
+    a.lastPage=1;
+  })
 }
 
 export function addAnnotationHandlers() { 
