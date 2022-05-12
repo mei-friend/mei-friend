@@ -135,6 +135,28 @@ export default class Viewer {
     this.vrvWorker.postMessage(message);
   }
 
+  getPageWithElement(xmlId) {
+    let pageNumber = -1;
+    console.log('getPageWithElement(' + xmlId + '), speedMode: ' + this.speedMode);
+    if (this.speedMode) {
+      pageNumber = speed.getPageWithElement(this.xmlDoc, this.breaksValue(), xmlId);
+    } else {
+      pageNumber = new Promise((resolve) => {
+        const msg = {
+          'cmd': 'getPageWithElement',
+          'msg': xmlId
+        };
+        this.vrvWorker.addEventListener('message', function handle(ev) => {
+          if (ev.cmd === 'pageWithElement') {
+            this.vrvWorker.removeEventListener('message', handle);
+            resolve(ev.msg);
+          }
+        });
+      });
+    }
+    return pageNumber;
+  }
+
 
   // with normal mode: load DOM and pass-through the MEI code;
   // with speed mode: load into DOM (if encodingHasChanged) and
