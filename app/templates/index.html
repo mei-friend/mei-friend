@@ -12,6 +12,7 @@
   <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.64.0/codemirror.min.js" integrity="sha512-4DlmQ+aBOfYTZ3uzRKCDXdyL7y8IlopnVChhXG0pRFgyvhwONVQW3JX8e5DYoXUNr3evQpLZz7S3O1XxMH4WKA==" crossorigin="anonymous"
     referrerpolicy="no-referrer">
   </script> -->
+  <script src="{{ url_for('static', filename='solid/solid-client-authn.bundle.js') }}"></script>
   <script src="{{ url_for('static', filename='lib/env.js') }}"></script>
   <script src="{{ url_for('static', filename='lib/jsgit.js') }}"></script>
   <script src="{{ url_for('static', filename='lib/github.js') }}" type="module"></script>
@@ -363,7 +364,8 @@
       <div class="tab">
         <button class="tablink defaultOpen" onclick="switchTab(event, 'annotationPanel', 'annotationTools')" title="Annotation tools">Tools</button>
         <button class="tablink" onclick="switchTab(event, 'annotationPanel', 'listAnnotations')" title="List annotations">List</button>
-        <button class="tablink" onclick="switchTab(event, 'annotationPanel', 'externalLinks')" title="External links">External links</button>
+        <button class="tablink" onclick="switchTab(event, 'annotationPanel', 'externalLinks')" title="External links">Links</button>
+        <button class="tablink" id="solidLogin" title="Login to Solid">Login</button>
         <span id="closeAnnotationPanelButton" class="topright" title="Hide Annotation Panel">&times;</span>
       </div>
       <div id="annotationTools" class="tabcontent">

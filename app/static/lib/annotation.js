@@ -1,7 +1,7 @@
 import { v } from './main.js'; 
 import { convertCoords } from './utils.js';
 import { highlight, pencil, circle, link } from '../css/icons.js';
-
+const session = new solidClientAuthentication.Session();
 let annotations = [];
 
 export function refreshAnnotationsList() { 
@@ -58,7 +58,6 @@ export function situateAnnotations() {
 
 export function addAnnotationHandlers() { 
 // TODO extend this to allow app to consume (TROMPA-style) Annotation Toolkit descriptions
-  
   const annotationHandler = (e) => { 
     console.log("Clicked to make new annotation!", e);
     console.log("Selected elements: ", v.selectedElements);
@@ -213,5 +212,26 @@ export function addAnnotationHandlers() {
   document.querySelectorAll(".annotationToolsIcon").forEach(a => a.removeEventListener("click", annotationHandler));
   document.querySelectorAll(".annotationToolsIcon").forEach(a => a.addEventListener("click", annotationHandler));
 }
-
 export const clearAnnotations = () => annotations = [];
+
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('solidLogin').addEventListener("click", (e) => { 
+    // When loading the page, check if you are being redirected from the IdP
+    session
+      .handleIncomingRedirect(window.location.href)
+      .then((sessionInfo) => {
+        if(!sessionInfo.isLoggedIn) {
+          // If you are not logged in, initiate the login
+          session.login({
+            redirectUrl: "http://localhost:5000/",
+           // oidcIssuer: document.getElementById("oidcIssuer").innerHTML,
+          oidcIssuer: "https://solidcommunity.net"
+          });
+        } else {
+          // The page was loaded after a redirect from the IdP
+          document.getElementById("WebId").innerHTML = sessionInfo.webId;
+        }
+      });
+  });
+});
+
