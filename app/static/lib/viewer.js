@@ -141,19 +141,24 @@ export default class Viewer {
     if (this.speedMode) {
       pageNumber = speed.getPageWithElement(this.xmlDoc, this.breaksValue(), xmlId);
     } else {
-      pageNumber = new Promise((resolve) => {
+      let promise = new Promise(function(resolve) {
         const msg = {
           'cmd': 'getPageWithElement',
           'msg': xmlId
         };
-        this.vrvWorker.addEventListener('message', function handle(ev) => {
+        this.vrvWorker.addEventListener('message', function handle(ev) {
           if (ev.cmd === 'pageWithElement') {
             this.vrvWorker.removeEventListener('message', handle);
             resolve(ev.msg);
           }
         });
+        this.vrvWorker.postMessage(msg);
+      });
+      promise.then(function(p) {
+        pageNumber = p;
       });
     }
+    console.log('pageNumber: ', pageNumber);
     return pageNumber;
   }
 

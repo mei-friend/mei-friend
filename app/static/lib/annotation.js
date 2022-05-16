@@ -41,7 +41,7 @@ export function refreshAnnotationsList() {
         console.warn("Unknown type when drawing annotation in list: ", a);
     }
     const pageSpan = a.firstPage === a.lastPage ?
-      a.firstPage : a.firstPage + "-" + a.lastPage;
+      a.firstPage : a.firstPage + "&ndash;" + a.lastPage;
     summary.innerHTML += `p.${pageSpan} (${a.selection.length} elements)`;
     if (!details.innerHTML.length) {
       // some annotation types don't have any annotation body to display
@@ -60,8 +60,8 @@ export function situateAnnotations() {
     // set a.firstPage and a.lastPage to min/max page numbers returned
 
     // dummy values for now:
-    a.firstPage = 1; // v.getPageWithElement(a.selection[0]);
-    a.lastPage = 1;
+    a.firstPage = v.getPageWithElement(a.selection[0]);
+    a.lastPage = v.getPageWithElement(a.selection[a.selection.length - 1]);;
   })
 }
 
