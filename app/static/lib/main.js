@@ -318,7 +318,7 @@ document.addEventListener('DOMContentLoaded', function() {
   console.log('DOMContentLoaded. Trying now to load Verovio...');
   document.querySelector(".statusbar").innerHTML = "Loading Verovio.";
   document.querySelector(".rightfoot").innerHTML =
-    "<a href='https://github.com/Signature-Sound-Vienna/mei-friend-online'>mei-friend " +
+    "<a href='https://github.com/Signature-Sound-Vienna/mei-friend-online' target='_blank'>mei-friend " +
     (env === environments.production ? version : `${env}-${version}`) +
     "</a> (" + versionDate + ").&nbsp;";
 
@@ -541,7 +541,7 @@ function vrvWorkerEventsHandler(ev) {
       v.addVrvOptionsToSettingsPanel(tkAvailableOptions, defaultVerovioOptions);
       v.addMeiFriendOptionsToSettingsPanel();
       document.querySelector(".rightfoot").innerHTML +=
-        `&nbsp;<a href="https://www.verovio.org/">Verovio ${tkVersion}</a>.`;
+        `&nbsp;<a href="https://www.verovio.org/" target="_blank">Verovio ${tkVersion}</a>.`;
       document.querySelector(".statusbar").innerHTML =
         `Verovio ${tkVersion} loaded.`;
       setBreaksOptions(tkAvailableOptions, defaultVerovioOptions.breaks);
