@@ -4,7 +4,9 @@
 
 *mei-friend* is a ‘last mile’ editor for [MEI music encodings](https://music-encoding.org) intended to alleviate the common task of cleaning up encodings generated via optical music recognition, or via conversion from other formats, originally implemented as a [plugin package for the Atom text editor](https://atom.io/packages/mei-friend). The [*mei-friend* Web Application](https://mei-friend.mdw.ac.at) is a reworking of the tool as a full-featured, cross-browser compatible Web application, with optimised performance and an extended set of features. The application is available online at https://mei-friend.mdw.ac.at.
 
-![Animated screenshot of mei-friend](https://github.com/Signature-Sound-Vienna/mei-friend-online/blob/develop/demo/mei-friend-01.gif)
+![mei-friend fundamental functionality](https://github.com/Signature-Sound-Vienna/mei-friend-online/blob/develop/demo/mei-friend-01.gif)
+
+![mei-friend github workflow](https://github.com/Signature-Sound-Vienna/mei-friend-online/blob/develop/demo/mei-friend-02.gif)
 
 ## Components
 We use [CodeMirror](https://codemirror.net) as our text editor, and [Verovio](https://www.verovio.org) as our music engraving engine. [GitHub](https://github.org) integration is provided using [jsgit](https://github.com/creationix/jsgit), [jsgit-browser](https://github.com/LivelyKernel/js-git-browser), and the [GitHub REST API](https://docs.github.com/en/rest). XML-DOM manipulations are performed using [tXml](https://github.com/TobiasNickel/tXml).
