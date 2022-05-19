@@ -30,7 +30,7 @@ Configurable display. Many aspects of the tool’s interface are user-configurab
 **Editor functions**. In addition to all features of the Atom plugin package, we now offer commands to insert and delete clefs, beam-spans, and spiccato articulation; to insert the vertical group (vgrp) attribute for selected elements supporting this attribute (such as dynam, dir, hairpin), with dynamic number attribution; and, to insert the supplied element around a selection and show all supplied elements in a configurable colour.
 
 ## Publications
-Goebl, W. & Weigl, D. M. (2022). Alleviating the Last Mile of Encoding: The mei-friend Package for the Atom Text Editor.  In Music Encoding Conference Proceedings 2021 (pp. 31&ndash;39). University of Alicante. doi:[10.17613/fc1c-mx52](https://doi.org/10.17613/fc1c-mx52)
+Goebl, W. & Weigl, D. M. (2022). Alleviating the Last Mile of Encoding: The mei-friend Package for the Atom Text Editor.  In S. Münnich & D. Rizo (Eds.), Music Encoding Conference Proceedings 2021 (pp. 31&ndash;39). University of Alicante. doi:[10.17613/fc1c-mx52](https://doi.org/10.17613/fc1c-mx52)
 
 Goebl, W. & Weigl, D. M. (2022). The mei-friend Web Application: Editing MEI in the Browser. Music Encoding Conference 2022 [Late-breaking Reports]. [forthcoming].
 
