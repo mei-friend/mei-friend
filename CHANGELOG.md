@@ -6,6 +6,7 @@
 * Control visibility of font select, update controls, navigation arrows
 in control menu through mei-friend settings pane
 * Control measure renumbering behavior across endings through mei-friend settings pane
+* Add demo animated GIFs to README.md
 ### 0.3.11 patch:
 * Tooltips displayed as html title attributes
 * Clean control menu appearance
