@@ -215,7 +215,14 @@ export function addAnnotationHandlers() {
 export const clearAnnotations = () => annotations = [];
 
 document.addEventListener('DOMContentLoaded', function() {
-  document.getElementById('solidLogin').addEventListener("click", (e) => { 
+  session.handleIncomingRedirect(window.location.href, {restorePreviousSession: true})
+    .then((sessionInfo) => {
+      if(sessionInfo.isLoggedIn) {
+        alert("YAY!");
+      }
+    });
+  document.getElementById('solidLogin').addEventListener("click", (e) => {
+    console.log("click");
     // When loading the page, check if you are being redirected from the IdP
     session
       .handleIncomingRedirect(window.location.href)
