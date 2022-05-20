@@ -1,5 +1,8 @@
 import * as utils from './utils.js';
 import * as icon from './../css/icons.js';
+import {
+  fontList
+} from './main.js';
 
 export function createControlsMenu(parentElement, scale) {
 
@@ -204,10 +207,8 @@ export function createControlsMenu(parentElement, scale) {
 
 
   // font selector
-  let fontList = ['Leipzig', 'Bravura', 'Gootville', 'Leland', 'Petaluma'];
   let fontCtrls = document.createElement('div');
   fontCtrls.id = 'font-ctrls';
-  // fontCtrls.classList.add('block');
   fontCtrls.classList.add('controls');
   controlsForm.appendChild(fontCtrls);
 
@@ -216,9 +217,8 @@ export function createControlsMenu(parentElement, scale) {
   fontSelector.classList.add('btn');
   fontCtrls.title = 'Select engraving font';
   fontSelector.classList.add('input-select');
+  fontList.forEach(font => fontSelector.add(new Option(font)));
   fontCtrls.appendChild(fontSelector);
-  for (let f of fontList)
-    fontSelector.add(new Option(f));
 
   // navigation controls
   let navigateCtrls = document.createElement('div');

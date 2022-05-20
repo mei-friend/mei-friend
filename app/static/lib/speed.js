@@ -3,6 +3,7 @@
  */
 
 import * as utils from './utils.js';
+import * as dutils from './dom-utils.js';
 import * as att from './attribute-classes.js';
 
 export var meiNameSpace = 'http://www.music-encoding.org/ns/mei';
@@ -116,7 +117,7 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
   let mNo = 1; // measure count (for a fast first page, with breaks = '')
   let mxMeasures = 50; // for a quick first page
   let breaksSelector = '';
-  if (countingMode == 'encodedBreaks') breaksSelector = breaks.join(', ');
+  if (countingMode === 'encodedBreaks') breaksSelector = breaks.join(', ');
   let countNow = false; // to ignore encoded page breaks before first measure
   let staffDefs = spdScore.querySelectorAll('staffDef');
   let baseSection = spdScore.querySelector('section');
@@ -157,9 +158,10 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
         if (currentNodeName === 'measure') mNo++;
         else
           currentNode.querySelectorAll('measure').forEach(() => mNo++);
-      } else if (countingMode === "encodedBreaks") {
-        if (countNow && breaks.includes(currentNodeName)) {
-          p++; // skip breaks before content (that is, a measure)
+      } else if (countingMode === 'encodedBreaks') {
+        let sb;
+        if (countNow && (breaks.includes(currentNodeName) || (sb = currentNode.querySelector(breaksSelector)))) {
+          if (dutils.countAsBreak(sb ? sb : currentNode)) p++;
           continue;
         }
         // ignore system/page breaks in other countingModes
@@ -489,7 +491,7 @@ export function listPageSpanningElements(xmlScore, breaks, breaksOption) {
   if (breaksOption == 'line' || breaksOption == 'encoded') {
     for (let e of elList) {
       if (e.nodeName === 'measure') count = true;
-      if (count && breaks.includes(e.nodeName)) p++;
+      if (count && breaks.includes(e.nodeName) && dutils.countAsBreak(e)) p++;
       else
         noteTable[e.getAttribute('xml:id')] = p;
     }
@@ -671,22 +673,30 @@ export function getPageWithElement(xmlDoc, breaks, id) {
   let music = xmlDoc.querySelector('music score');
   if (!music) music = xmlDoc;
   let els;
-  if (music) els = Array.from(music.querySelectorAll(sel));
-  else return page;
+  if (music) {
+    els = Array.from(music.querySelectorAll(sel));
+    for (let i = els.length - 1; i >= 0; i--) {
+      if (!dutils.countAsBreak(els[i])) els.splice(i, 1);
+    }
+  } else {
+    return page;
+  }
+
   if (els) {
     page = els.findIndex(el => el.getAttribute('xml:id') === id) + 1;
     // if element is within last measure, ...
-    if (page > 1 && els[page - 1].closest('measure') == els[page - 2])
+    if (page > 1 && els[page - 1].closest('measure') === els[page - 2])
       page--; // ...undo increment
   }
   // remove leading pb in MEI file
   if (breaksOption === 'line' || breaksOption === 'encoded') {
     els = music.querySelectorAll('pb,measure');
-    let i;
-    for (i = 0; i < els.length; i++) {
-      if (els[i].nodeName != 'pb') break;
+    let j = 0;
+    for (let i = 0; i < els.length; i++) {
+      if (els[i].nodeName !== 'pb') break;
+      if (dutils.countAsBreak(els[i])) j++;
     }
-    page -= i;
+    page -= j;
   }
   return page;
 }

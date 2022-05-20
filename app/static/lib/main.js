@@ -1,6 +1,6 @@
 // mei-friend version and date
-const version = '0.3.11';
-const versionDate = '26 April 2022';
+const version = '0.3.12';
+const versionDate = '20 May 2022';
 
 var vrvWorker;
 var spdWorker;
@@ -36,6 +36,8 @@ export const samp = {
   TITLE: 4,
   COMPOSER: 5
 }
+export const fontList = ['Leipzig', 'Bravura', 'Gootville', 'Leland', 'Petaluma'];
+
 
 import {
   setOrientation,
@@ -316,8 +318,8 @@ document.addEventListener('DOMContentLoaded', function() {
   console.log('DOMContentLoaded. Trying now to load Verovio...');
   document.querySelector(".statusbar").innerHTML = "Loading Verovio.";
   document.querySelector(".rightfoot").innerHTML =
-    "<a href='https://github.com/Signature-Sound-Vienna/mei-friend-online'>mei-friend " +
-    (env === environments.production ? version : `${env}-${version}`) + 
+    "<a href='https://github.com/Signature-Sound-Vienna/mei-friend-online' target='_blank'>mei-friend " +
+    (env === environments.production ? version : `${env}-${version}`) +
     "</a> (" + versionDate + ").&nbsp;";
 
   vrvWorker = new Worker(`${root}lib/worker.js`);
@@ -539,7 +541,7 @@ function vrvWorkerEventsHandler(ev) {
       v.addVrvOptionsToSettingsPanel(tkAvailableOptions, defaultVerovioOptions);
       v.addMeiFriendOptionsToSettingsPanel();
       document.querySelector(".rightfoot").innerHTML +=
-        `&nbsp;<a href="https://www.verovio.org/">Verovio ${tkVersion}</a>.`;
+        `&nbsp;<a href="https://www.verovio.org/" target="_blank">Verovio ${tkVersion}</a>.`;
       document.querySelector(".statusbar").innerHTML =
         `Verovio ${tkVersion} loaded.`;
       setBreaksOptions(tkAvailableOptions, defaultVerovioOptions.breaks);
@@ -1107,7 +1109,10 @@ function addEventListeners(v, cm) {
   document.getElementById('pagination2').addEventListener('keydown', ev => manualCurrentPage(v, cm, ev));
   document.getElementById('pagination2').addEventListener('blur', ev => manualCurrentPage(v, cm, ev));
   // font selector
-  document.getElementById('font-select').addEventListener('change', () => v.updateOption());
+  document.getElementById('font-select').addEventListener('change', () => {
+    document.getElementById('font').value = document.getElementById('font-select').value;
+    v.updateOption();
+  });
   // breaks selector
   document.getElementById('breaks-select').addEventListener('change', (ev) => {
     if (storage && storage.supported) storage.breaks = ev.srcElement.value;
