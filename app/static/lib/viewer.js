@@ -6,6 +6,7 @@ import * as utils from './utils.js';
 import * as dutils from './dom-utils.js';
 import * as att from './attribute-classes.js';
 import {
+  fontList,
   storage,
   tkVersion
 } from './main.js';
@@ -154,8 +155,10 @@ export default class Viewer {
       let countBreaks = false;
       for (let e of elements) {
         if (e.nodeName === 'measure') countBreaks = true; // skip leading breaks
-        if (countBreaks && breaks.includes(e.nodeName))
-          this.pageCount++;
+        if (countBreaks && breaks.includes(e.nodeName)) {
+          // if within app, increment only if inside lem or 1st rdg
+          if (dutils.countAsBreak(e)) this.pageCount++;
+        }
       }
       for (let e of Array.from(elements).reverse()) { // skip trailing breaks
         if (e.nodeName === 'measure') break;
@@ -420,8 +423,8 @@ export default class Viewer {
 
   // when cursor pos in editor changed, update notation location / highlight
   cursorActivity(cm, forceFlip = false) {
-    // console.log('cursorActivity forceFlip: ' + forceFlip);
     let id = utils.getElementIdAtCursor(cm);
+    // console.log('cursorActivity forceFlip: ' + forceFlip + ' to: ' + id);
     this.selectedElements = [];
     if (id) {
       this.selectedElements.push(id);
@@ -642,7 +645,7 @@ export default class Viewer {
   // initializes the settings panel by filling it with content
   addVrvOptionsToSettingsPanel(tkAvailableOptions, defaultVrvOptions, restoreFromLocalStorage = true) {
     // skip these options (in part because they are handled in control menu)
-    let skipList = ['font', 'breaks', 'engravingDefaults', 'expand',
+    let skipList = ['breaks', 'engravingDefaults', 'expand',
       'svgAdditionalAttribute', 'handwrittenFont'
     ];
     let vsp = document.getElementById('verovioSettings');
@@ -694,6 +697,7 @@ export default class Viewer {
           delete storage['vrv-' + opt]; // remove from storage object when default value
         else
           storage['vrv-' + opt] = value; // save changes in localStorage object
+        if (opt === 'font') document.getElementById('font-select').value = value;
         this.updateLayout(this.vrvOptions);
       });
       vsp.addEventListener('click', ev => { // RESET button
@@ -724,7 +728,8 @@ export default class Viewer {
         values: ['default', 'abbott', 'base16-dark', 'base16-light', 'cobalt',
           'darcula', 'dracula', 'eclipse', 'elegant', 'monokai', 'idea',
           'juejin', 'mdn-like', 'neo', 'paraiso-dark', 'paraiso-light',
-          'pastel-on-dark', 'xq-dark', 'xq-light', 'yeti', 'yonce', 'zenburn'
+          'pastel-on-dark', 'solarized dark', 'solarized light',
+          'xq-dark', 'xq-light', 'yeti', 'yonce', 'zenburn'
         ]
       },
       matchTheme: {
@@ -943,6 +948,55 @@ export default class Viewer {
         type: 'bool',
         default: false
       },
+      controlMenuLineSeparator: {
+        title: 'options-line', // class name of hr element
+        type: 'line'
+      },
+      controlMenuSettings: {
+        title: 'Control bar',
+        description: 'Define items to be shown in control menu',
+        type: 'header'
+      },
+      controlMenuFontSelector: {
+        title: 'Show notation font selector',
+        description: 'Show notation font (SMuFL) selector in control menu',
+        type: 'bool',
+        default: false
+      },
+      controlMenuNavigateArrows: {
+        title: 'Show navigation arrows',
+        description: 'Show notation navigation arrows in control menu',
+        type: 'bool',
+        default: false
+      },
+      controlMenuUpdateNotation: {
+        title: 'Show notation update controls',
+        description: 'Show notation update behavior controls in control menu',
+        type: 'bool',
+        default: true
+      },
+      renumberMeasuresLineSeparator: {
+        title: 'options-line', // class name of hr element
+        type: 'line'
+      },
+      renumberMeasuresHeading: {
+        title: 'Renumber measures',
+        description: 'Settings for renumbering measures',
+        type: 'header'
+      },
+      renumberMeasuresContinueAcrossEndings: {
+        title: 'Continue across endings',
+        description: 'Continue measure numbers across endings',
+        type: 'bool',
+        default: false
+      },
+      renumberMeasuresUseSuffixAtEndings: {
+        title: 'Use suffix at endings',
+        description: 'Use number suffix at endings (e.g., 23-a)',
+        type: 'select',
+        values: ['none', 'ending@n', 'a/b/c', 'A/B/C', '-a/-b/-c', '-A/-B/-C'],
+        default: false
+      },
     };
     let mfs = document.getElementById('meiFriendSettings');
     let addListeners = false; // add event listeners only the first time
@@ -977,10 +1031,22 @@ export default class Viewer {
             o.values = Array.from(this.xmlDoc.querySelectorAll('corpName[*|id]'))
             .map(e => e.getAttribute('xml:id'));
           break;
+        case 'controlMenuFontSelector':
+          document.getElementById('font-ctrls').style.visibility = optDefault ? 'inherit' : 'collapse';
+          break;
+        case 'controlMenuNavigateArrows':
+          document.getElementById('navigate-ctrls').style.visibility = optDefault ? 'inherit' : 'collapse';
+          break;
+        case 'controlMenuUpdateNotation':
+          document.getElementById('update-ctrls').style.visibility = optDefault ? 'inherit' : 'collapse';
+          break;
       }
       let div = this.createOptionsItem(opt, o, optDefault)
       if (div) mfs.appendChild(div);
       if (opt === 'respSelect') this.respId = document.getElementById('respSelect').value;
+      if (opt === 'renumberMeasuresUseSuffixAtEndings') {
+        this.enableRenumberMeasuresUseSuffixAtEndings();
+      }
     });
     mfs.innerHTML += '<input type="button" title="Reset to mei-friend defaults" id="mfReset" class="resetButton" value="Default" />';
 
@@ -1003,6 +1069,21 @@ export default class Viewer {
             break;
           case 'respSelect':
             this.respId = document.getElementById('respSelect').value;
+            break;
+          case 'controlMenuFontSelector':
+            document.getElementById('font-ctrls').style.visibility =
+              document.getElementById('controlMenuFontSelector').checked ? 'inherit' : 'collapse';
+            break;
+          case 'controlMenuNavigateArrows':
+            document.getElementById('navigate-ctrls').style.visibility =
+              document.getElementById('controlMenuNavigateArrows').checked ? 'inherit' : 'collapse';
+            break;
+          case 'controlMenuUpdateNotation':
+            document.getElementById('update-ctrls').style.visibility =
+              document.getElementById('controlMenuUpdateNotation').checked ? 'inherit' : 'collapse';
+            break;
+          case 'renumberMeasuresContinueAcrossEndings':
+            this.enableRenumberMeasuresUseSuffixAtEndings();
             break;
         }
         if (value === optionsToShow[option].default) {
@@ -1110,6 +1191,15 @@ export default class Viewer {
         input.setAttribute('step', (optKeys.includes('step')) ? o.step : step);
         input.setAttribute('value', optDefault);
         break;
+      case 'std::string':
+        if (opt === 'font') {
+          input = document.createElement('select');
+          input.setAttribute('name', opt);
+          input.setAttribute('id', opt);
+          fontList.forEach((str, i) => input.add(new Option(str, str,
+            (fontList.indexOf(optDefault) == i) ? true : false)));
+        }
+        break;
       case 'select':
       case 'std::string-list':
         input = document.createElement('select');
@@ -1126,10 +1216,12 @@ export default class Viewer {
         input.setAttribute('value', optDefault);
         break;
       case 'header':
-        label.setAttribute('style', 'font-weight: bold; font-size: 105%; margin-top: 3px;');
+        div.classList.remove('optionsItem');
+        div.classList.add('optionsSubHeading');
         break;
       case 'line':
         div.removeChild(label);
+        div.classList.remove('optionsItem');
         let line = document.createElement('hr');
         line.classList.add(o.title);
         div.appendChild(line);
@@ -1307,6 +1399,16 @@ export default class Viewer {
       default:
         return '';
     }
+  }
+
+
+  // toggle disabled at one specific checkbox
+  enableRenumberMeasuresUseSuffixAtEndings() {
+    let cont = document.getElementById('renumberMeasuresContinueAcrossEndings').checked;
+    let el = document.getElementById('renumberMeasuresUseSuffixAtEndings');
+    el.disabled = cont;
+    if (cont) el.parentNode.classList.add('disabled');
+    else el.parentNode.classList.remove('disabled');
   }
 
 }
