@@ -1032,13 +1032,13 @@ export default class Viewer {
             .map(e => e.getAttribute('xml:id'));
           break;
         case 'controlMenuFontSelector':
-          document.getElementById('font-ctrls').style.visibility = optDefault ? 'inherit' : 'collapse';
+          document.getElementById('font-ctrls').style.display = optDefault ? 'inherit' : 'none';
           break;
         case 'controlMenuNavigateArrows':
-          document.getElementById('navigate-ctrls').style.visibility = optDefault ? 'inherit' : 'collapse';
+          document.getElementById('navigate-ctrls').style.display = optDefault ? 'inherit' : 'none';
           break;
         case 'controlMenuUpdateNotation':
-          document.getElementById('update-ctrls').style.visibility = optDefault ? 'inherit' : 'collapse';
+          document.getElementById('update-ctrls').style.display = optDefault ? 'inherit' : 'none';
           break;
       }
       let div = this.createOptionsItem(opt, o, optDefault)
@@ -1071,16 +1071,16 @@ export default class Viewer {
             this.respId = document.getElementById('respSelect').value;
             break;
           case 'controlMenuFontSelector':
-            document.getElementById('font-ctrls').style.visibility =
-              document.getElementById('controlMenuFontSelector').checked ? 'inherit' : 'collapse';
+            document.getElementById('font-ctrls').style.display =
+              document.getElementById('controlMenuFontSelector').checked ? 'inherit' : 'none';
             break;
           case 'controlMenuNavigateArrows':
-            document.getElementById('navigate-ctrls').style.visibility =
-              document.getElementById('controlMenuNavigateArrows').checked ? 'inherit' : 'collapse';
+            document.getElementById('navigate-ctrls').style.display =
+              document.getElementById('controlMenuNavigateArrows').checked ? 'inherit' : 'none';
             break;
           case 'controlMenuUpdateNotation':
-            document.getElementById('update-ctrls').style.visibility =
-              document.getElementById('controlMenuUpdateNotation').checked ? 'inherit' : 'collapse';
+            document.getElementById('update-ctrls').style.display =
+              document.getElementById('controlMenuUpdateNotation').checked ? 'inherit' : 'none';
             break;
           case 'renumberMeasuresContinueAcrossEndings':
             this.enableRenumberMeasuresUseSuffixAtEndings();
