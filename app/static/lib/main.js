@@ -42,7 +42,9 @@ import {
   addResizerHandlers
 } from './resizer.js';
 import { 
-  addAnnotationHandlers
+  addAnnotationHandlers,
+  refreshAnnotationsList,
+  refreshAnnotations
 } from './annotation.js';
 import {
   dropHandler,
@@ -609,7 +611,7 @@ function vrvWorkerEventsHandler(ev) {
         v.updatePageNumDisplay();
         v.addNotationEventListeners(cm);
         v.updateHighlight(cm);
-        // TODO DW - refresh annotations here!
+        refreshAnnotations();
         v.scrollSvg(cm);
       }
       if (!"setFocusToVerovioPane" in ev.data || ev.data.setFocusToVerovioPane)
@@ -633,7 +635,7 @@ function vrvWorkerEventsHandler(ev) {
         v.lastNoteId = id;
       }
       v.addNotationEventListeners(cm);
-      // TODO DW - refresh annotations here!
+      refreshAnnotations();
       v.scrollSvg(cm);
       v.updateHighlight(cm);
       v.setFocusToVerovioPane();
