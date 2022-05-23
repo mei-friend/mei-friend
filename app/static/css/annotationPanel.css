@@ -53,7 +53,6 @@
 }
 
 #listAnnotations details { 
-  border: 1px solid black;
   padding: 10px;
   margin: 5px;
 }
@@ -66,3 +65,19 @@ summary.noDetails {
   list-style: none;
   cursor:default;
 }
+
+.annotationListItem { 
+  border: 1px solid black;
+}
+
+.annotationListItemButtons { 
+  border-top: 1px solid black;
+  padding:.5em 1em;;
+}
+
+.annotationListItemButtons svg { 
+  width:2em;
+  height:2em;
+}
+
+

@@ -1,14 +1,19 @@
 import {
-  v
+  v, 
+  cm
 } from './main.js';
 import {
-  convertCoords
+  convertCoords,
+  generateUUID
 } from './utils.js';
 import {
   highlight,
   pencil,
   circle,
-  link
+  link, 
+  flipToEncoding,
+  symLinkFile,
+  diffRemoved
 } from '../css/icons.js';
 
 let annotations = [];
@@ -16,12 +21,18 @@ let annotations = [];
 export function refreshAnnotationsList() {
   situateAnnotations();
   const list = document.getElementById("listAnnotations");
-  list.innerHTML = "";
-  annotations.forEach(a => {
+  list.innerHTML = annotations.length ? "" : "No annotations present.";
+  annotations.forEach( (a, aix) => {
     const annoDiv = document.createElement("div");
-    annoDiv.classList.add("annotationIcon");
+    annoDiv.classList.add("annotationListItem");
     const details = document.createElement("details");
     const summary = document.createElement("summary");
+    const annoListItemButtons = document.createElement("div");
+    annoListItemButtons.classList.add("annotationListItemButtons");
+    const flipToAnno = document.createElement("a");
+    flipToAnno.innerHTML = symLinkFile; //flipToEncoding;
+    const deleteAnno = document.createElement("a");
+    deleteAnno.innerHTML = diffRemoved;
     switch (a.type) {
       case 'annotateHighlight':
         summary.innerHTML = highlight;
@@ -43,12 +54,25 @@ export function refreshAnnotationsList() {
     const pageSpan = a.firstPage === a.lastPage ?
       a.firstPage : a.firstPage + "&ndash;" + a.lastPage;
     summary.innerHTML += `p.${pageSpan} (${a.selection.length} elements)`;
+    flipToAnno.addEventListener("click", (e) => { 
+      console.debug("Flipping to annotation: ", a);
+      v.updatePage(cm, a.firstPage);
+    });
+    deleteAnno.addEventListener("click", (e) => { 
+      const reallyDelete = confirm("Are you sure you wish to delete this annotation?");
+      if(reallyDelete) {
+        deleteAnnotation(a.id); 
+      }
+    });
     if (!details.innerHTML.length) {
       // some annotation types don't have any annotation body to display
       summary.classList.add("noDetails");
     }
     details.prepend(summary);
     annoDiv.appendChild(details);
+    annoListItemButtons.appendChild(flipToAnno);
+    annoListItemButtons.appendChild(deleteAnno);
+    annoDiv.appendChild(annoListItemButtons);
     list.appendChild(annoDiv);
   });
 }
@@ -59,10 +83,17 @@ export function situateAnnotations() {
     // for each element in a.selection, ask Verovio for the page number
     // set a.firstPage and a.lastPage to min/max page numbers returned
 
-    // dummy values for now:
-    a.firstPage = v.getPageWithElement(a.selection[0]);
+    a.firstPage = v.getPageWithElement(a.selection[0])
     a.lastPage = v.getPageWithElement(a.selection[a.selection.length - 1]);;
   })
+}
+
+export function deleteAnnotation(uuid) { 
+  const ix = annotations.findIndex( a => a.id === uuid);
+  if(ix>=0) { 
+    annotations.splice(ix, 1);
+    refreshAnnotationsList();
+  }
 }
 
 export function addAnnotationHandlers() {
@@ -134,27 +165,31 @@ export function addAnnotationHandlers() {
   // functions to create annotations
   const createHighlight = (e) =>
     annotations.push({
+      "id": generateUUID(),
       "type": "annotateHighlight",
       "selection": v.selectedElements
     });
   const createCircle = (e) =>
     annotations.push({
+      "id": generateUUID(),
       "type": "annotateCircle",
       "selection": v.selectedElements
     });
   const createDescribe = (e => {
-    // TODO improve!
+    // TODO improve UX!
     const desc = window.prompt("Please enter a textual description to apply");
     annotations.push({
+      "id": generateUUID(),
       "type": "annotateDescribe",
       "selection": v.selectedElements,
       "description": desc
     });
   })
   const createLink = (e => {
-    // TODO improve!
+    // TODO improve UX!
     const url = window.prompt("Please enter a url to link to");
     annotations.push({
+      "id": generateUUID(),
       "type": "annotateLink",
       "selection": v.selectedElements,
       "url": url
