@@ -1,4 +1,3 @@
-import * as speed from './speed.js';
 import * as e from './editor.js';
 import * as dutils from './dom-utils.js';
 
@@ -470,7 +469,7 @@ export function renumberMeasures(xmlDoc, cm, startNum = 1, change = false) {
 export function attrAsElements(xmlNote) {
   for (let att of ['artic', 'accid']) {
     if (xmlNote.hasAttribute(att)) {
-      let accidElement = document.createElementNS(speed.meiNameSpace, att);
+      let accidElement = document.createElementNS(dutils.meiNameSpace, att);
       accidElement.setAttribute(att, xmlNote.getAttribute(att));
       xmlNote.appendChild(accidElement);
       xmlNote.removeAttribute(att);

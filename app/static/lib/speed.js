@@ -4,10 +4,10 @@
 
 import * as utils from './utils.js';
 import * as att from './attribute-classes.js';
-
-export var meiNameSpace = 'http://www.music-encoding.org/ns/mei';
-export var xmlNameSpace = 'http://www.w3.org/XML/1998/namespace';
-
+import {
+  meiNameSpace,
+  xmlNameSpace
+} from './dom-utils.js';
 
 // returns complete MEI code of given page (one-based), defined by sb and pb
 export function getPageFromDom(xmlDoc, pageNo = 1, breaks = ['sb', 'pb'], pageSpanners) {
