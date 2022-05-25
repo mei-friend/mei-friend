@@ -208,3 +208,12 @@ export function getElementAtCursor(cm) {
   let elem = document.elementFromPoint(coords.left, coords.top);
   return elem;
 }
+
+// convert xmlNode to string and remove meiNameSpace declaration from return string
+export function xmlToString(xmlNode) {
+  let str = new XMLSerializer().serializeToString(xmlNode);
+  // console.info('xmlToString: ' + str);
+  str = str.replace(/(?:><)/g, '>\n<');
+  // console.info('xmlToString: ' + str);
+  return str.replace('xmlns="' + meiNameSpace + '" ', '');
+}

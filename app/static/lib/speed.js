@@ -630,15 +630,6 @@ export function findByAttributeValue(xmlNode, attribute, value, elementName = "*
   }
 }
 
-// convert xmlNode to string and remove meiNameSpace declaration from return string
-export function xmlToString(xmlNode) {
-  let str = new XMLSerializer().serializeToString(xmlNode);
-  // console.info('xmlToString: ' + str);
-  str = str.replace(/(?:><)/g, '>\n<');
-  // console.info('xmlToString: ' + str);
-  return str.replace('xmlns="' + meiNameSpace + '" ', '');
-}
-
 // Retrieve page number of element with xml:id id
 export function getPageWithElement(xmlDoc, breaks, id) {
   let sel = '';
