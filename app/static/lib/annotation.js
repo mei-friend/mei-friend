@@ -5,6 +5,7 @@ import {
 import {
   convertCoords,
   generateUUID,
+  rmHash,
   setCursorToId
 } from './utils.js';
 import {
@@ -38,6 +39,8 @@ export function refreshAnnotationsList() {
     const flipToAnno = document.createElement("a");
     flipToAnno.innerHTML = symLinkFile; //flipToEncoding;
     flipToAnno.title = "Flip page to this annotation";
+    flipToAnno.classList.add('icon');
+    if (!'selection' in a) flipToAnno.classList.add('disabled');
     const deleteAnno = document.createElement("a");
     deleteAnno.innerHTML = diffRemoved;
     deleteAnno.title = "Delete this annotation";
@@ -59,9 +62,17 @@ export function refreshAnnotationsList() {
       default:
         console.warn("Unknown type when drawing annotation in list: ", a);
     }
-    const pageSpan = a.firstPage === a.lastPage ?
-      a.firstPage : a.firstPage + "&ndash;" + a.lastPage;
-    summary.innerHTML += `p.${pageSpan} (${a.selection.length} elements)`;
+    let annotationLocationLabel = '';
+    if (a.firstPage === 'meiHead') {
+      annotationLocationLabel = `MEI head (${a.selection.length} elements)`;
+    } else if (a.firstPage === 'unsituated') {
+      annotationLocationLabel = 'Unsituated';
+    } else {
+      annotationLocationLabel = 'p. ' + (a.firstPage === a.lastPage ?
+        a.firstPage : a.firstPage + "&ndash;" + a.lastPage) +
+        `(${a.selection.length} elements)`;
+    }
+    summary.innerHTML += annotationLocationLabel;
     flipToAnno.addEventListener("click", (e) => {
       console.debug("Flipping to annotation: ", a);
       v.updatePage(cm, a.firstPage);
@@ -90,9 +101,16 @@ export function situateAnnotations() {
   annotations.forEach(a => {
     // for each element in a.selection, ask Verovio for the page number
     // set a.firstPage and a.lastPage to min/max page numbers returned
-
-    a.firstPage = v.getPageWithElement(a.selection[0])
-    a.lastPage = v.getPageWithElement(a.selection[a.selection.length - 1]);;
+    a.firstPage = 'unsituated';
+    a.lastPage = -1;
+    if ('selection' in a) {
+      a.firstPage = v.getPageWithElement(a.selection[0]);
+      a.lastPage = v.getPageWithElement(a.selection[a.selection.length - 1]);
+      if (a.firstPage < 0) {
+        if (v.xmlDoc.querySelector('[*|id=' + a.selection[0] + ']').closest('meiHead')) a.firstPage = 'meiHead';
+        else console.warn('Cannot locate annotation ', a);
+      }
+    }
   })
 }
 
@@ -186,6 +204,7 @@ export function refreshAnnotations() {
   rac.innerHTML = "";
   // reset annotations-containing svg
   const scoreSvg = document.querySelector(".verovio-panel svg");
+  if (!scoreSvg) return;
   const annoSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   annoSvg.setAttribute("width", scoreSvg.getAttribute("width"))
   annoSvg.setAttribute("height", scoreSvg.getAttribute("height"))
@@ -289,7 +308,28 @@ export function addAnnotationHandlers() {
   document.querySelectorAll(".annotationToolsIcon").forEach(a => a.addEventListener("click", annotationHandler));
 }
 
-export const clearAnnotations = () => annotations = [];
+// reads <annot> elements from XML DOM and adds them into annotations array
+export function readAnnots() {
+  if (!v.xmlDoc) return;
+  let annots = Array.from(v.xmlDoc.querySelectorAll('annot'));
+  annots = annots.filter(annot => annotations.findIndex(a => a.id !== 'annot-' + annot.getAttribute('xml:id')));
+  annots.forEach(annot => {
+    let annotation = {
+      "type": annot.textContent ? "annotateDescribe" : "annotateHighlight",
+    };
+    if (annot.textContent.length) annotation.description = annot.textContent;
+    if (annot.hasAttribute('xml:id')) annotation.id = annot.getAttribute('xml:id').replace('annot-', '');
+    if (annot.hasAttribute('plist')) {
+      annotation.selection = annot.getAttribute('plist').split(' ').map(id => rmHash(id));
+    } else if (annot.parentNode.hasAttribute('xml:id')) {
+      annotation.selection = [annot.parentNode.getAttribute('xml:id')];
+    } else {
+      console.warn('readAnnots(): found annot without id ', annot);
+    }
+    annotations.push(annotation);
+  });
+  refreshAnnotations();
+}
 
 // inserts new annot element before beforeThis element,
 // with @xml:id, @plist and optional payload (string or ptr)
@@ -306,4 +346,8 @@ export function writeAnnot(beforeThis, xmlId, plist, payload) {
     cm.replaceRange(xmlToString(annot) + '\n', cm.getCursor());
     cm.execCommand('indentAuto');
   }
+}
+
+export function clearAnnotations() {
+  annotations = [];
 }

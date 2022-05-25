@@ -41,8 +41,10 @@ import {
   setOrientation,
   addResizerHandlers
 } from './resizer.js';
-import { 
+import {
   addAnnotationHandlers,
+  clearAnnotations,
+  readAnnots,
   refreshAnnotationsList,
   refreshAnnotations
 } from './annotation.js';
@@ -225,6 +227,8 @@ export function loadDataInEditor(mei, setFreshlyLoaded = true) {
   }
   v.setRespSelectOptions();
   v.setMenuColors();
+  clearAnnotations();
+  readAnnots(); // from annotation.js
   setCursorToId(cm, handleURLParamSelect());
 }
 
@@ -1244,6 +1248,7 @@ function addEventListeners(v, cm) {
       // on every set of changes, save editor content
       updateLocalStorage(meiXml);
     }
+    readAnnots(); // from annotation.js
   })
 
   // Editor font size zooming

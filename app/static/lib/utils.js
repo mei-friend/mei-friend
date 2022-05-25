@@ -539,3 +539,8 @@ export function convertCoords(elem) {
     }
   }
 }
+
+export function rmHash(hashedString) {
+  return (hashedString.startsWith('#')) ?
+    hashedString.split('#')[1] : hashedString;
+}
