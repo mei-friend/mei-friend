@@ -1,5 +1,5 @@
 import {
-  v, 
+  v,
   cm
 } from './main.js';
 import {
@@ -10,7 +10,7 @@ import {
   highlight,
   pencil,
   circle,
-  link, 
+  link,
   flipToEncoding,
   symLinkFile,
   diffRemoved
@@ -22,7 +22,7 @@ export function refreshAnnotationsList() {
   situateAnnotations();
   const list = document.getElementById("listAnnotations");
   list.innerHTML = annotations.length ? "" : "No annotations present.";
-  annotations.forEach( (a, aix) => {
+  annotations.forEach((a, aix) => {
     const annoDiv = document.createElement("div");
     annoDiv.classList.add("annotationListItem");
     const details = document.createElement("details");
@@ -56,14 +56,14 @@ export function refreshAnnotationsList() {
     const pageSpan = a.firstPage === a.lastPage ?
       a.firstPage : a.firstPage + "&ndash;" + a.lastPage;
     summary.innerHTML += `p.${pageSpan} (${a.selection.length} elements)`;
-    flipToAnno.addEventListener("click", (e) => { 
+    flipToAnno.addEventListener("click", (e) => {
       console.debug("Flipping to annotation: ", a);
       v.updatePage(cm, a.firstPage);
     });
-    deleteAnno.addEventListener("click", (e) => { 
+    deleteAnno.addEventListener("click", (e) => {
       const reallyDelete = confirm("Are you sure you wish to delete this annotation?");
-      if(reallyDelete) {
-        deleteAnnotation(a.id); 
+      if (reallyDelete) {
+        deleteAnnotation(a.id);
       }
     });
     if (!details.innerHTML.length) {
@@ -90,9 +90,9 @@ export function situateAnnotations() {
   })
 }
 
-export function deleteAnnotation(uuid) { 
-  const ix = annotations.findIndex( a => a.id === uuid);
-  if(ix>=0) { 
+export function deleteAnnotation(uuid) {
+  const ix = annotations.findIndex(a => a.id === uuid);
+  if (ix >= 0) {
     annotations.splice(ix, 1);
     refreshAnnotationsList();
   }
@@ -109,7 +109,7 @@ function drawHighlight(a) {
   }
 }
 
-function drawCircle (a) {
+function drawCircle(a) {
   if ("selection" in a) {
     // mission: draw an ellipse into the raSvg that encompasses a collection of selection objects
     let raSvg = document.querySelector('#renderedAnnotationsSvg');
@@ -136,17 +136,19 @@ function drawCircle (a) {
   }
 
 }
+
 function drawDescribe(a) {
   if ("selection" in a && "description" in a) {
     const els = a.selection.map(s => document.getElementById(s));
-    els.forEach(e => {
-      e.classList.add("annotationDescribe");
-      // create a title element within the described element to house the description (which will be available on hover)
-      const title = document.createElementNS("http://www.w3.org/2000/svg", "title");
-      title.innerHTML = a.description;
-      // slot it in as the first child of the selected element
-      e.insertBefore(title, e.firstChild);
-    });
+    els.filter(e => e !== null) // (null if not on current page)
+      .forEach(e => {
+        e.classList.add("annotationDescribe");
+        // create a title element within the described element to house the description (which will be available on hover)
+        const title = document.createElementNS("http://www.w3.org/2000/svg", "title");
+        title.innerHTML = a.description;
+        // slot it in as the first child of the selected element
+        e.insertBefore(title, e.firstChild);
+      });
   } else {
     console.warn("Failing to draw describe annotation missing selection and/or description: ", a);
   }
@@ -155,16 +157,17 @@ function drawDescribe(a) {
 function drawLink(a) {
   if ("selection" in a && "url" in a) {
     const els = a.selection.map(s => document.getElementById(s));
-    els.forEach(e => {
-      e.classList.add("annotationLink");
-      // create a title element within the linked element to house the url (which will be available on hover)
-      const title = document.createElementNS("http://www.w3.org/2000/svg", "title");
-      title.innerHTML = "Open in new tab: " + a.url;
-      // slot it in as the first child of the selected element
-      e.insertBefore(title, e.firstChild);
-      // make the element clickable
-      e.addEventListener("click", () => window.open(a.url, "_blank"), true);
-    });
+    els.filter(e => e !== null) // (null if not on current page)
+      .forEach(e => {
+        e.classList.add("annotationLink");
+        // create a title element within the linked element to house the url (which will be available on hover)
+        const title = document.createElementNS("http://www.w3.org/2000/svg", "title");
+        title.innerHTML = "Open in new tab: " + a.url;
+        // slot it in as the first child of the selected element
+        e.insertBefore(title, e.firstChild);
+        // make the element clickable
+        e.addEventListener("click", () => window.open(a.url, "_blank"), true);
+      });
   } else {
     console.warn("Failing to draw link annotation missing selection and/or url: ", a);
   }
