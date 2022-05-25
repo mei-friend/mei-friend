@@ -4,8 +4,14 @@ import {
 } from './main.js';
 import {
   convertCoords,
-  generateUUID
+  generateUUID,
+  setCursorToId
 } from './utils.js';
+import {
+  meiNameSpace,
+  xmlNameSpace,
+  xmlToString
+} from './dom-utils.js';
 import {
   highlight,
   pencil,
@@ -255,12 +261,18 @@ export function addAnnotationHandlers() {
   const createDescribe = (e => {
     // TODO improve UX!
     const desc = window.prompt("Please enter a textual description to apply");
-    annotations.push({
+    const a = {
       "id": generateUUID(),
       "type": "annotateDescribe",
       "selection": v.selectedElements,
       "description": desc
-    });
+    };
+    annotations.push(a);
+    if (document.getElementById('writeAnnotInline').checked) {
+      let el = document.querySelector('[*|id="' + v.selectedElements[0] + '"]');
+      if (el) writeAnnot(el, a.id, a.selection, a.description)
+      else console.warn('createDescribe(): Cannot find beforeThis element for ' + a.id);
+    }
   })
   const createLink = (e => {
     // TODO improve UX!
@@ -278,3 +290,20 @@ export function addAnnotationHandlers() {
 }
 
 export const clearAnnotations = () => annotations = [];
+
+// inserts new annot element before beforeThis element,
+// with @xml:id, @plist and optional payload (string or ptr)
+export function writeAnnot(beforeThis, xmlId, plist, payload) {
+  let parent = beforeThis.parentNode;
+  if (parent) {
+    let annot = document.createElementNS(meiNameSpace, 'annot');
+    annot.setAttributeNS(xmlNameSpace, 'id', 'annot-' + xmlId);
+    annot.setAttribute('plist', plist.map(p => '#' + p).join(' '));
+    if (payload) annot.textContent = payload;
+    parent.insertBefore(annot, beforeThis);
+
+    setCursorToId(cm, beforeThis.getAttribute('id'))
+    cm.replaceRange(xmlToString(annot) + '\n', cm.getCursor());
+    cm.execCommand('indentAuto');
+  }
+}
