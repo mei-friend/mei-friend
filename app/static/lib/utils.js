@@ -134,13 +134,15 @@ export function goTagStart(cm) {
   let tagStart = /<[\w]+?/;
   let p = cm.getCursor();
   let line = cm.getLine(p.line);
-  let found = [...line.slice(0, p.ch).match(tagStart)];
-  while (found.length <= 0 && p.line > 0) {
+  let found = line.slice(0, p.ch).match(tagStart);
+  while (!found && p.line > 0) {
     line = cm.getLine(--p.line);
-    found = [...line.match(tagStart)];
+    found = line.match(tagStart);
   }
-  p.ch = line.indexOf(found[found.length]);
-  cm.setCursor(p);
+  if (found) {
+    p.ch = line.indexOf(found[found.length - 1]);
+    cm.setCursor(p);
+  }
 }
 
 // find attribute (@startid) of element with itemId in textEditor.getBuffer()
