@@ -14,13 +14,14 @@ import {
   xmlToString
 } from './dom-utils.js';
 import {
-  highlight,
-  pencil,
   circle,
-  link,
+  diffRemoved,
+  highlight,
   flipToEncoding,
+  link,
+  pencil,
+  rdf,
   symLinkFile,
-  diffRemoved
 } from '../css/icons.js';
 
 let annotations = [];
@@ -28,7 +29,21 @@ let annotations = [];
 export function refreshAnnotationsList() {
   situateAnnotations();
   const list = document.getElementById("listAnnotations");
-  list.innerHTML = annotations.length ? "" : "No annotations present.";
+  // clear list
+  while(list.firstChild) { 
+    list.removeChild(list.lastChild);
+  }
+  // add web annotation button
+  const addWebAnnotation = document.createElement("div");
+  const rdfIcon = document.createElement("span");
+  addWebAnnotation.textContent = "Add Web Annotation ";
+  rdfIcon.id = "addWebAnnotationIcon";
+  rdfIcon.insertAdjacentHTML("beforeend", rdf);
+  addWebAnnotation.appendChild(rdfIcon);
+  addWebAnnotation.id = "addWebAnnotation";
+  addWebAnnotation.addEventListener("click", () => loadWebAnnotation());
+  list.appendChild(addWebAnnotation);
+  list.insertAdjacentHTML("beforeend", annotations.length ? "" : "<p>No annotations present.</p>");
   annotations.forEach((a, aix) => {
     const annoDiv = document.createElement("div");
     annoDiv.classList.add("annotationListItem");
@@ -37,27 +52,27 @@ export function refreshAnnotationsList() {
     const annoListItemButtons = document.createElement("div");
     annoListItemButtons.classList.add("annotationListItemButtons");
     const flipToAnno = document.createElement("a");
-    flipToAnno.innerHTML = symLinkFile; //flipToEncoding;
+    flipToAnno.insertAdjacentHTML("afterbegin", symLinkFile); //flipToEncoding;
     flipToAnno.title = "Flip page to this annotation";
     flipToAnno.classList.add('icon');
     if (!'selection' in a) flipToAnno.classList.add('disabled');
     const deleteAnno = document.createElement("a");
-    deleteAnno.innerHTML = diffRemoved;
+    deleteAnno.insertAdjacentHTML("afterbegin", diffRemoved);
     deleteAnno.title = "Delete this annotation";
     switch (a.type) {
       case 'annotateHighlight':
-        summary.innerHTML = highlight;
+        summary.insertAdjacentHTML("afterbegin", highlight);
         break;
       case 'annotateCircle':
-        summary.innerHTML = circle;
+        summary.insertAdjacentHTML("afterbegin", circle);
         break;
       case 'annotateLink':
-        summary.innerHTML = link;
-        details.innerHTML = a.url;
+        summary.insertAdjacentHTML("afterbegin", link);
+        details.insertAdjacentHTML("afterbegin", a.url);
         break;
       case 'annotateDescribe':
-        summary.innerHTML = pencil;
-        details.innerHTML = a.description;
+        summary.insertAdjacentHTML("afterbegin", pencil);
+        details.insertAdjacentHTML("afterbegin", a.description);
         break;
       default:
         console.warn("Unknown type when drawing annotation in list: ", a);
@@ -72,7 +87,7 @@ export function refreshAnnotationsList() {
         a.firstPage : a.firstPage + "&ndash;" + a.lastPage) +
         `(${a.selection.length} elements)`;
     }
-    summary.innerHTML += annotationLocationLabel;
+    summary.insertAdjacentHTML("beforeend", annotationLocationLabel);
     flipToAnno.addEventListener("click", (e) => {
       console.debug("Flipping to annotation: ", a);
       v.updatePage(cm, a.firstPage);
@@ -211,7 +226,6 @@ export function refreshAnnotations() {
   annoSvg.setAttribute("id", "renderedAnnotationsSvg");
   annoSvg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
   annoSvg.setAttribute("xmlnsXlink", "http://www.w3.org/1999/xlink");
-  console.log("rac: ", rac);
   rac.appendChild(annoSvg);
   // drawing handlers can draw into renderedAnnotationsSvg if they need to
   annotations.forEach(a => {
@@ -348,6 +362,124 @@ export function writeAnnot(beforeThis, xmlId, plist, payload) {
   }
 }
 
+export function loadWebAnnotation() { 
+  // spin the icon to indicate loading activity
+  const url = window.prompt("Enter URL of Web Annotation or Web Annotation Container");
+  fetchWebAnnotations(url);
+}
+
+export function fetchWebAnnotations(url, jumps=10) {
+  const icon = document.getElementById("addWebAnnotationIcon");
+  const svgs = Array.from(icon.getElementsByTagName("svg"));
+  svgs.forEach(t => t.classList.add("clockwise"));
+  fetch(url, { 
+    headers: { 
+      'Accept': 'application/ld+json'
+    }
+  }).then((resp) => resp.json())
+    .then((json) => {
+      console.log("json response: ", json)
+      let resourceDescription;
+      if(Array.isArray(json)) { 
+        resourceDescription = json.find(o => o["@id"] === url);
+        if(!resourceDescription && !url.endsWith("/")) { 
+          // try again with trailing slash
+          resourceDescription = json.find(o => o["@id"] === url+"/");
+        }
+      } else { 
+        resourceDescription = json;
+      }
+      if(resourceDescription && "@type" in resourceDescription) { 
+        console.log("found resource desc: ", resourceDescription)
+        if(resourceDescription["@type"].includes("http://www.w3.org/ns/ldp#Container")) { 
+          // found a container, recurse on members
+          if("http://www.w3.org/ns/ldp#contains" in resourceDescription) { 
+            if(jumps >= 0) { 
+              return resourceDescription["http://www.w3.org/ns/ldp#contains"].map( resource => {
+                jumps -= 1;
+                fetchWebAnnotations(resource["@id"], jumps);
+              });
+            } else  {
+              console.warn("Prematurely ending traversal as out of jumps", url);
+            }
+          } else { 
+            console.warn("Container without content: ", url, resourceDescription);
+          }
+        } else if(resourceDescription["@type"].includes("http://www.w3.org/ns/oa#Annotation")) { 
+          // found an annotation!
+          console.log("Found annotation!!", resourceDescription);
+          ingestWebAnnotation(resourceDescription);
+          return resourceDescription;
+        } else { 
+          console.warn("fetchWebAnnotations: Don't know how to handle resource: ", url, resourceDescription);
+        }
+      } else { 
+        console.warn("Problem working with the specified resource identifier in requested resource: ", url, json);
+      }
+    })
+  .catch((err) => console.warn("Couldn't load Web Annotation: ", err))
+  .finally(() => { 
+    // notify that we've stopped loading
+    svgs.forEach(t => t.classList.remove("clockwise"));
+  });
+}
+
+export function ingestWebAnnotation(webAnno) { 
+  // terminological note: 'webAnno' => the web annotation, 'anno' => internal mei-friend annotation we are generating
+  if(!("http://www.w3.org/ns/oa#hasTarget" in webAnno)) { 
+    console.warn("Skipping Web Annotation without a target: ", webAnno);
+    return;
+  } else { 
+    let anno = {
+      id: webAnno["@id"]
+    }
+    let targets = webAnno["http://www.w3.org/ns/oa#hasTarget"];
+    if(!Array.isArray(targets)) 
+      targets = [targets];
+    anno.type = "annotateHighlight"; // default type
+    let bodies = webAnno["http://www.w3.org/ns/oa#hasBody"];
+    if(bodies && !Array.isArray(bodies)) 
+      bodies = [bodies];
+    if(bodies && bodies.length) { 
+    // TODO decide what to do for multiple bodies
+      let firstBody = bodies[0];
+      if(typeof firstBody === "object") { 
+        if("@id" in firstBody) { 
+          console.log("Declaring a linking annotation!");
+          // decare a linking annotation
+          anno.url = firstBody["@id"];
+          anno.type = "annotateLink";
+        } else if("@type" in firstBody && 
+            "http://www.w3.org/1999/02/22-rdf-syntax-ns#value" in firstBody  &&
+            "http://www.w3.org/ns/oa#TextualBody" in firstBody["@type"]) { 
+            // declare a describing annotation
+          console.log("Declaring a describing annotation!");
+          anno.description = firstBody["http://www.w3.org/1999/02/22-rdf-syntax-ns#"];
+          anno.type = "annotateDescribe";
+        } else { 
+          console.log("Don't know how to handle body of this annotation: ", anno);
+        }
+      }
+    } else if("http://www.w3.org/ns/oa#bodyValue" in webAnno) { 
+      // declare describing annotation
+          console.log("Declaring a describing annotation!");
+          // TODO decide what to do for multiple bodies
+          anno.description = webAnno["http://www.w3.org/ns/oa#bodyValue"][0]["@value"];
+          anno.type = "annotateDescribe";
+    }
+
+    anno.selection = targets.map(t => t["@id"].split("#")[1]);
+    annotations.push(anno);
+    refreshAnnotations();
+  }
+}
+
 export function clearAnnotations() {
   annotations = [];
 }
+
+
+
+
+
+

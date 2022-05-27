@@ -10,10 +10,12 @@
 
 .annotationToolsIcon {
   border: 1px solid black;
+  border-radius:5px;
   padding:10px;
   display: flex;
   align-content: center;
   gap: 6px;
+  cursor:pointer;
 }
 
 .annotationToolsDomainSelection {
@@ -37,7 +39,6 @@
   filter: drop-shadow(0px 0px 3em purple);
   cursor:pointer;
 }
-
 
 #renderedAnnotationsContainer { 
   position:absolute;
@@ -72,17 +73,28 @@ summary.noDetails {
 
 .annotationListItem { 
   border: 1px solid black;
-  margin-bottom: 1em;
+  margin-bottom: .5em;
+  margin-top: .5em;
 }
 
 .annotationListItemButtons { 
   border-top: 1px solid black;
-  padding:.5em 1em;;
+  padding:.5em 1em;
+
 }
 
-.annotationListItemButtons svg { 
-  width:2em;
-  height:2em;
+#listAnnotations #addWebAnnotation {
+  border: 1px solid black;
+  border-radius: 5px;
+  padding:.2em;
+  margin-bottom: .5em;
+  cursor:pointer;
+
+}
+
+.annotationListItemButtons svg, #listAnnotations svg { 
+  width:1em;
+  height:1em;
 }
 
 
