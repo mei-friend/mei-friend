@@ -123,9 +123,24 @@ export function setCursorToId(cm, id) {
     cm.setCursor(c.from());
     // console.info('setCursorToId cursor: ', c.from());
     let enc = document.querySelector('.encoding');
-    cm.execCommand('goLineStartSmart');
+    // cm.execCommand('goLineStartSmart');
+    goTagStart(cm);
     if (enc) cm.scrollIntoView(null, Math.round(enc.clientHeight / 2));
   }
+}
+
+// moves cursor of CodeMirror to start of tag
+export function goTagStart(cm) {
+  let tagStart = /<[\w]+?/;
+  let p = cm.getCursor();
+  let line = cm.getLine(p.line);
+  let found = [...line.slice(0, p.ch).match(tagStart)];
+  while (found.length <= 0 && p.line > 0) {
+    line = cm.getLine(--p.line);
+    found = [...line.match(tagStart)];
+  }
+  p.ch = line.indexOf(found[found.length]);
+  cm.setCursor(p);
 }
 
 // find attribute (@startid) of element with itemId in textEditor.getBuffer()
