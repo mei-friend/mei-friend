@@ -140,8 +140,10 @@ export function goTagStart(cm) {
     found = line.match(tagStart);
   }
   if (found) {
-    p.ch = line.indexOf(found[found.length - 1]);
+    p.ch = line.lastIndexOf(found[found.length - 1]);
     cm.setCursor(p);
+  } else {
+    console.warn('Cannot find tag start.');
   }
 }
 
