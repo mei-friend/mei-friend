@@ -279,18 +279,24 @@ export function addAnnotationHandlers() {
   }
 
   // functions to create annotations
-  const createHighlight = (e) =>
-    annotations.push({
+  const createHighlight = (e) => {
+    const a = {
       "id": generateUUID(),
       "type": "annotateHighlight",
       "selection": v.selectedElements
-    });
-  const createCircle = (e) =>
-    annotations.push({
+    }
+    annotations.push(a);
+    writeInlineIfRequested(a);
+  }
+  const createCircle = (e) => {
+    const a = {
       "id": generateUUID(),
       "type": "annotateCircle",
       "selection": v.selectedElements
-    });
+    }
+    annotations.push(a);
+    writeInlineIfRequested(a);
+  }
   const createDescribe = (e => {
     // TODO improve UX!
     const desc = window.prompt("Please enter a textual description to apply");
@@ -301,21 +307,19 @@ export function addAnnotationHandlers() {
       "description": desc
     };
     annotations.push(a);
-    if (document.getElementById('writeAnnotInline').checked) {
-      let el = document.querySelector('[*|id="' + v.selectedElements[0] + '"]');
-      if (el) writeAnnot(el, a.id, a.selection, a.description)
-      else console.warn('createDescribe(): Cannot find beforeThis element for ' + a.id);
-    }
+    writeInlineIfRequested(a);
   })
   const createLink = (e => {
     // TODO improve UX!
     const url = window.prompt("Please enter a url to link to");
-    annotations.push({
+    const a = {
       "id": generateUUID(),
       "type": "annotateLink",
       "selection": v.selectedElements,
       "url": url
-    });
+    }
+    annotations.push(a);
+    writeInlineIfRequested(a);
   })
 
   document.querySelectorAll(".annotationToolsIcon").forEach(a => a.removeEventListener("click", annotationHandler));
@@ -353,7 +357,13 @@ export function writeAnnot(beforeThis, xmlId, plist, payload) {
     let annot = document.createElementNS(meiNameSpace, 'annot');
     annot.setAttributeNS(xmlNameSpace, 'id', 'annot-' + xmlId);
     annot.setAttribute('plist', plist.map(p => '#' + p).join(' '));
-    if (payload) annot.textContent = payload;
+    if (payload) { 
+      if(typeof payload === "string") { 
+        annot.textContent = payload;
+      } else if (typeof payload === "object") { 
+        annot.appendChild(payload);
+      }
+    }
     parent.insertBefore(annot, beforeThis);
 
     setCursorToId(cm, beforeThis.getAttribute('id'))
@@ -471,6 +481,25 @@ export function ingestWebAnnotation(webAnno) {
     anno.selection = targets.map(t => t["@id"].split("#")[1]);
     annotations.push(anno);
     refreshAnnotations();
+  }
+}
+
+function writeInlineIfRequested(a) { 
+  // write annotation to inline <annot> if the user has requested this
+  if (document.getElementById('writeAnnotInline').checked) {
+    let el = document.querySelector('[*|id="' + v.selectedElements[0] + '"]');
+    if(el) { 
+      let payload;
+      if(a.type === "annotateDescribe") payload = a.description
+      else if (a.type === "annotateLink") { 
+        payload = document.createElementNS(meiNameSpace, "ptr");
+        payload.id = "ptr-" + generateUUID();
+        payload.setAttribute("target",  a.url);
+      }
+      writeAnnot(el, a.id, a.selection, payload)
+    } 
+    else 
+      console.warn('writeInlineIfRequested: Cannot find beforeThis element for ' + a.id);
   }
 }
 
