@@ -51,7 +51,7 @@ export function delEl(v, cm) {
         first = false;
       } else {
         // txtEdr.insertNewline();
-        let newMEI = speed.xmlToString(childList[i]);
+        let newMEI = dutils.xmlToString(childList[i]);
         cm.replaceRange(newMEI + '\n', p.end);
         let cursor = cm.getCursor();
         for (let l = p.end.line; l < cursor.line; l++) cm.indentLine(l);
@@ -114,9 +114,9 @@ export function addCtrlEl(v, cm, elName, placement, form) {
     }
   }
   // create element to be inserted
-  let newElement = v.xmlDoc.createElementNS(speed.meiNameSpace, elName);
+  let newElement = v.xmlDoc.createElementNS(dutils.meiNameSpace, elName);
   let uuid = elName + '-' + utils.generateUUID();
-  newElement.setAttributeNS(speed.xmlNameSpace, 'xml:id', uuid);
+  newElement.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
   // elements with both startid and endid
   if (['slur', 'tie', 'phrase', 'hairpin', 'gliss'].includes(elName)) {
     newElement.setAttribute('startid', '#' + startId);
@@ -161,7 +161,7 @@ export function addCtrlEl(v, cm, elName, placement, form) {
   if (p) {
     let p1 = utils.moveCursorToEndOfMeasure(cm, p); // resets selectedElements!!
     console.log('p1: ', p);
-    cm.replaceRange(speed.xmlToString(newElement) + '\n', cm.getCursor());
+    cm.replaceRange(dutils.xmlToString(newElement) + '\n', cm.getCursor());
     cm.indentLine(p1.line, 'smart');
     cm.indentLine(p1.line + 1, 'smart');
     cm.setSelection(p1);
@@ -186,19 +186,19 @@ export function addClefChange(v, cm, shape = 'G', line = '2', before = true) {
   let chord = el.closest('chord');
   if (chord) id = chord.getAttribute('xml:id');
   utils.setCursorToId(cm, id);
-  let newElement = v.xmlDoc.createElementNS(speed.meiNameSpace, 'clef');
+  let newElement = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'clef');
   let uuid = 'clef-' + utils.generateUUID();
-  newElement.setAttributeNS(speed.xmlNameSpace, 'xml:id', uuid);
+  newElement.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
   newElement.setAttribute('shape', shape);
   newElement.setAttribute('line', line);
   v.encodingHasChanged = true;
   if (before) {
-    cm.replaceRange(speed.xmlToString(newElement) + '\n', cm.getCursor());
+    cm.replaceRange(dutils.xmlToString(newElement) + '\n', cm.getCursor());
     // cm.execCommand('newLineAndIndent');
   } else {
     cm.execCommand('toMatchingTag');
     cm.execCommand('goLineEnd');
-    cm.replaceRange('\n' + speed.xmlToString(newElement), cm.getCursor());
+    cm.replaceRange('\n' + dutils.xmlToString(newElement), cm.getCursor());
   }
   cm.execCommand('indentAuto');
   v.updateNotation = true; // update notation again
@@ -423,9 +423,9 @@ export function addBeamElement(v, cm, elementName = 'beam') {
   // add beam element, if selected elements have same parent
   // TODO check whether inside tuplets and accept that as well
   if (par1.getAttribute('xml:id') == n2.parentNode.getAttribute('xml:id')) {
-    let beam = document.createElementNS(speed.meiNameSpace, elementName);
+    let beam = document.createElementNS(dutils.meiNameSpace, elementName);
     let uuid = elementName + '-' + utils.generateUUID();
-    beam.setAttributeNS(speed.xmlNameSpace, 'xml:id', uuid);
+    beam.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
     par1.insertBefore(beam, n1);
     let nodeList = par1.childNodes;
     let insert = false;
@@ -463,9 +463,9 @@ export function addBeamSpan(v, cm) {
   let id1 = v.selectedElements[0]; // xml:id string
   let id2 = v.selectedElements[v.selectedElements.length - 1];
   // add control like element <octave @startid @endid @dis @dis.place>
-  let beamSpan = v.xmlDoc.createElementNS(speed.meiNameSpace, 'beamSpan');
+  let beamSpan = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'beamSpan');
   let uuid = 'beamSpan-' + utils.generateUUID();
-  beamSpan.setAttributeNS(speed.xmlNameSpace, 'xml:id', uuid);
+  beamSpan.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
   beamSpan.setAttribute('startid', '#' + id1);
   beamSpan.setAttribute('endid', '#' + id2);
   beamSpan.setAttribute('plist', v.selectedElements.map(e => '#' + e).join(' '));
@@ -475,7 +475,7 @@ export function addBeamSpan(v, cm) {
   let sc = cm.getSearchCursor('xml:id="' + id1 + '"');
   if (sc.findNext()) {
     let p1 = utils.moveCursorToEndOfMeasure(cm, sc.from());
-    cm.replaceRange(speed.xmlToString(beamSpan) + '\n', cm.getCursor());
+    cm.replaceRange(dutils.xmlToString(beamSpan) + '\n', cm.getCursor());
     cm.indentLine(p1.line, 'smart'); // TODO
     cm.indentLine(p1.line + 1, 'smart');
     cm.setSelection(p1);
@@ -496,9 +496,9 @@ export function addOctaveElement(v, cm, disPlace = 'above', dis = '8') {
   let id2 = v.selectedElements[v.selectedElements.length - 1];
   let n1 = v.xmlDoc.querySelector("[*|id='" + id1 + "']");
   // add control like element <octave @startid @endid @dis @dis.place>
-  let octave = v.xmlDoc.createElementNS(speed.meiNameSpace, "octave");
+  let octave = v.xmlDoc.createElementNS(dutils.meiNameSpace, "octave");
   let uuid = 'octave-' + utils.generateUUID();
-  octave.setAttributeNS(speed.xmlNameSpace, 'xml:id', uuid);
+  octave.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
   octave.setAttribute('startid', '#' + id1);
   octave.setAttribute('endid', '#' + id2);
   octave.setAttribute('dis', dis);
@@ -510,11 +510,11 @@ export function addOctaveElement(v, cm, disPlace = 'above', dis = '8') {
   let sc = cm.getSearchCursor('xml:id="' + id1 + '"');
   if (sc.findNext()) {
     let p1 = utils.moveCursorToEndOfMeasure(cm, sc.from());
-    cm.replaceRange(speed.xmlToString(octave) + '\n', cm.getCursor());
+    cm.replaceRange(dutils.xmlToString(octave) + '\n', cm.getCursor());
     cm.indentLine(p1.line, 'smart'); // TODO
     cm.indentLine(p1.line + 1, 'smart');
     cm.setSelection(p1);
-    // txtEdr.insertText(speed.xmlToString(octave));
+    // txtEdr.insertText(dutils.xmlToString(octave));
     // txtEdr.insertNewline();
     // txtEdr.setSelectedBufferRange([begin, [begin[0] + 2, begin[1]]]);
     // txtEdr.autoIndentSelectedRows();
@@ -545,10 +545,10 @@ export function addSuppliedElement(v, cm) {
       console.warn('No such element in xml document: ' + id);
     } else {
       let parent = el.parentNode;
-      let sup = document.createElementNS(speed.meiNameSpace, 'supplied');
+      let sup = document.createElementNS(dutils.meiNameSpace, 'supplied');
       let uuid = 'supplied-' + utils.generateUUID();
-      sup.setAttributeNS(speed.xmlNameSpace, 'xml:id', uuid);
-      if (v.respId) sup.setAttributeNS(speed.xmlNameSpace, 'resp', '#' + v.respId);
+      sup.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
+      if (v.respId) sup.setAttributeNS(dutils.xmlNameSpace, 'resp', '#' + v.respId);
       parent.replaceChild(sup, el);
       sup.appendChild(el);
       replaceInTextEditor(cm, el, true, sup);
@@ -655,7 +655,7 @@ function isEmpty(str) {
 // find xmlNode in textBuffer and replace it with new serialized content
 export function replaceInTextEditor(cm, xmlNode, select = false, newNode = null) {
   let newMEI = (newNode) ?
-    speed.xmlToString(newNode) : speed.xmlToString(xmlNode);
+    dutils.xmlToString(newNode) : dutils.xmlToString(xmlNode);
   // search in buffer
   let itemId = xmlNode.getAttribute('xml:id');
   let searchSelfClosing = '(?:<' + xmlNode.nodeName +
@@ -717,9 +717,9 @@ function toggleArticForNote(note, artic) {
     add = true;
   }
   if (add) { // add artic as element
-    let articElement = document.createElementNS(speed.meiNameSpace, 'artic');
+    let articElement = document.createElementNS(dutils.meiNameSpace, 'artic');
     uuid = 'artic-' + utils.generateUUID();
-    articElement.setAttributeNS(speed.xmlNameSpace, 'xml:id', uuid);
+    articElement.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
     articElement.setAttribute('artic', artic);
     // let textNode = document.createTextNode('/n');
     // note.appendChild(textNode);

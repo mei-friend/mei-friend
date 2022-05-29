@@ -1,4 +1,3 @@
-import * as speed from './speed.js';
 import * as e from './editor.js';
 import * as dutils from './dom-utils.js';
 
@@ -124,8 +123,27 @@ export function setCursorToId(cm, id) {
     cm.setCursor(c.from());
     // console.info('setCursorToId cursor: ', c.from());
     let enc = document.querySelector('.encoding');
-    cm.execCommand('goLineStartSmart');
+    // cm.execCommand('goLineStartSmart');
+    goTagStart(cm);
     if (enc) cm.scrollIntoView(null, Math.round(enc.clientHeight / 2));
+  }
+}
+
+// moves cursor of CodeMirror to start of tag
+export function goTagStart(cm) {
+  let tagStart = /<[\w]+?/;
+  let p = cm.getCursor();
+  let line = cm.getLine(p.line);
+  let found = line.slice(0, p.ch).match(tagStart);
+  while (!found && p.line > 0) {
+    line = cm.getLine(--p.line);
+    found = line.match(tagStart);
+  }
+  if (found) {
+    p.ch = line.lastIndexOf(found[found.length - 1]);
+    cm.setCursor(p);
+  } else {
+    console.warn('Cannot find tag start.');
   }
 }
 
@@ -502,7 +520,7 @@ export function renumberMeasures(xmlDoc, cm, startNum = 1, change = false) {
 export function attrAsElements(xmlNote) {
   for (let att of ['artic', 'accid']) {
     if (xmlNote.hasAttribute(att)) {
-      let accidElement = document.createElementNS(speed.meiNameSpace, att);
+      let accidElement = document.createElementNS(dutils.meiNameSpace, att);
       accidElement.setAttribute(att, xmlNote.getAttribute(att));
       xmlNote.appendChild(accidElement);
       xmlNote.removeAttribute(att);
@@ -534,10 +552,46 @@ function hexToRgb(hex) {
     .map(x => parseInt(x, 16))
 }
 
+// supports "rgb(123,234,0)" format
 export function complementary(rgbString) {
   let rgb = [];
-  rgbString.slice(4, -1).split(',').forEach(i => {
-    rgb.push(255 - i);
-  });
+  if (rgbString.startsWith('#')) {
+    rgb = hexToRgb(rgbString);
+  } else {
+    rgbString.slice(4, -1).split(',').forEach(i => rgb.push(i));
+  }
+  rgb = rgb.map(i => 255 - i);
   return 'rgb(' + rgb.join(', ') + ')';
+}
+
+// input Verovio-SVG element, return bounding box coords in default screen coordinate space
+export function convertCoords(elem) {
+  if (!!elem && document.getElementById(elem.getAttribute("id")) &&
+    elem.style.display !== "none" && (elem.getBBox().x !== 0 || elem.getBBox().y !== 0)) {
+    const x = elem.getBBox().x;
+    const width = elem.getBBox().width;
+    const y = elem.getBBox().y;
+    const height = elem.getBBox().height;
+    const offset = elem.closest("svg").parentElement.getBoundingClientRect();
+    const matrix = elem.getScreenCTM();
+    return {
+      x: (matrix.a * x) + (matrix.c * y) + matrix.e - offset.left,
+      y: (matrix.b * x) + (matrix.d * y) + matrix.f - offset.top,
+      x2: (matrix.a * (x + width)) + (matrix.c * y) + matrix.e - offset.left,
+      y2: (matrix.b * x) + (matrix.d * (y + height)) + matrix.f - offset.top
+    };
+  } else {
+    console.warn("Element unavailable on page: ", elem ? elem.getAttribute("id") : 'none');
+    return {
+      x: 0,
+      y: 0,
+      x2: 0,
+      y2: 0
+    }
+  }
+}
+
+export function rmHash(hashedString) {
+  return (hashedString.startsWith('#')) ?
+    hashedString.split('#')[1] : hashedString;
 }

@@ -1,3 +1,8 @@
+.dragContainer {
+  display: flex;
+  flex-direction: row;
+}
+
 .friendContainer {
   display: flex;
   flex: 1 1 0%;
@@ -26,4 +31,20 @@
   align-items: stretch;
   display: flex;
   justify-content: center;
+}
+
+#annotationToolsMenu { 
+  flex-direction: column;
+}
+
+#annotationToolsMenu li { 
+  flex-direction: column;
+}
+
+.annotationToolsDomainSelection { 
+  flex-direction: column;
+}
+
+.annotationToolsDomainSelectionItem{
+  flex-direction: row;
 }

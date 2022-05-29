@@ -31,6 +31,12 @@
   --defaultSettingsBackgroundAlternativeColor: #e4e4e4;
   --defaultSettingsLinkBackgroundColor: #f1f1f1;
   --defaultSettingsLinkHoverColor: #e6e6e6;
+  /* annotation panel colors */
+  --defaultAnnotationPanelBackgroundColor: #ffffa5;
+  --defaultAnnotationPanelLinkBackgroundColor: #ffffdc;
+  --defaultAnnotationPanelHoverColor: #fff300;
+  --defaultAnnotationPanelTextColor: black;
+  --defaultAnnotationPanelDarkBackgroundColor: #aa7c08;
   /*
   * Color variables
   */
@@ -57,6 +63,10 @@
   --settingsBackgroundAlternativeColor: var(--defaultSettingsBackgroundAlternativeColor);
   --settingsLinkBackgroundColor: var(--defaultSettingsLinkBackgroundColor);
   --settingsLinkHoverColor: var(--defaultSettingsLinkHoverColor);
+  --annotationPanelBackgroundColor: var(--defaultAnnotationPanelBackgroundColor);
+  --annotationPanelLinkBackgroundColor: var(--defaultAnnotationPanelLinkBackgroundColor);
+  --annotationPanelHoverColor: var(--defaultAnnotationPanelHoverColor);
+  --annotationPanelTextColor: var(--defaultAnnotationPanelTextColor);
 }
 
 body {
@@ -275,6 +285,38 @@ a:active {
 }
 
 .encoding {}
+
+#annotationPanel {
+  height: 100%;
+  width: 100%;
+  background: var(--annotationPanelBackgroundColor);
+  border: 3px solid var(--annotationPanelBorderColor);
+  border-radius: 4px;
+  box-sizing: border-box;
+  /* TODO: hack to fix size of #annotationPanel .tabcontent */
+  overflow: hidden;
+}
+
+#annotationPanel .tab, #annotationPanel .tablink {
+  background-color: var(--annotationPanelLinkBackgroundColor);
+  color: var(--annotationPanelTextColor);
+  border: unset;
+}
+
+#annotationPanel .tablink.active, #annotationPanel .tabcontent {
+  background-color: var(--annotationPanelBackgroundColor);
+  color: var(--annotationPanelTextColor);
+  border: unset;
+}
+
+#annotationPanel .tabcontent {
+  border: unset;
+}
+
+#annotationPanel .tablink:hover {
+  background-color: var(--annotationPanelHoverColor);
+  color: var(--annotationPanelTextColor);
+}
 
 /* .CodeMirror {
     border: 1px solid #eee;
@@ -778,7 +820,7 @@ span.keyIcon {
   clear: both;
 }
 
-.optionsItem:nth-of-type(even) {
+.optionsItem:nth-of-type(odd) {
   background-color: var(--settingsBackgroundAlternativeColor);
 }
 

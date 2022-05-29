@@ -1,3 +1,6 @@
+export var meiNameSpace = 'http://www.music-encoding.org/ns/mei';
+export var xmlNameSpace = 'http://www.w3.org/XML/1998/namespace';
+
 export const navElsArray = [
   'note', 'rest', 'mRest', 'beatRpt', 'halfmRpt', 'mRpt', 'clef'
 ];
@@ -222,4 +225,13 @@ export function countAsBreak(el, sourceId = '') {
     return true;
   }
   return false;
+}
+
+// convert xmlNode to string and remove meiNameSpace declaration from return string
+export function xmlToString(xmlNode) {
+  let str = new XMLSerializer().serializeToString(xmlNode);
+  // console.info('xmlToString: ' + str);
+  str = str.replace(/(?:><)/g, '>\n<');
+  // console.info('xmlToString: ' + str);
+  return str.replace('xmlns="' + meiNameSpace + '" ', '');
 }

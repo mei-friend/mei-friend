@@ -1,11 +1,13 @@
 import {
-  getVerovioContainerSize
+  getVerovioContainerSize,
+  setOrientation
 } from './resizer.js'
 import * as speed from './speed.js';
 import * as utils from './utils.js';
 import * as dutils from './dom-utils.js';
 import * as att from './attribute-classes.js';
 import {
+  cm,
   fontList,
   storage,
   tkVersion
@@ -132,6 +134,33 @@ export default class Viewer {
     };
     this.busy();
     this.vrvWorker.postMessage(message);
+  }
+
+  getPageWithElement(xmlId) {
+    let pageNumber = -1;
+    console.log('getPageWithElement(' + xmlId + '), speedMode: ' + this.speedMode);
+    if (this.speedMode) {
+      pageNumber = speed.getPageWithElement(this.xmlDoc, this.breaksValue(), xmlId);
+    } else {
+      let promise = new Promise(function(resolve) {
+        const msg = {
+          'cmd': 'getPageWithElement',
+          'msg': xmlId
+        };
+        this.vrvWorker.addEventListener('message', function handle(ev) {
+          if (ev.cmd === 'pageWithElement') {
+            this.vrvWorker.removeEventListener('message', handle);
+            resolve(ev.msg);
+          }
+        });
+        this.vrvWorker.postMessage(msg);
+      });
+      promise.then(function(p) {
+        pageNumber = p;
+      });
+    }
+    console.log('pageNumber: ', pageNumber);
+    return pageNumber;
   }
 
 
@@ -560,6 +589,16 @@ export default class Viewer {
         rt.style.setProperty('--fileStatusChangedColor', utils.brighter(window.getComputedStyle(str).color, 40));
         rt.style.setProperty('--fileStatusWarnColor', utils.brighter(window.getComputedStyle(str).color, 10));
       }
+      rt.style.setProperty('--annotationPanelBackgroundColor',
+        window.getComputedStyle(rt).getPropertyValue('--defaultAnnotationPanelDarkBackgroundColor'));
+      // utils.brighter(window.getComputedStyle(rt).getPropertyValue('--defaultAnnotationPanelBackgroundColor'), -40));
+      rt.style.setProperty('--annotationPanelLinkBackgroundColor',
+        utils.brighter(window.getComputedStyle(rt).getPropertyValue('--defaultAnnotationPanelDarkBackgroundColor'), -30));
+      rt.style.setProperty('--annotationPanelHoverColor',
+        utils.brighter(window.getComputedStyle(rt).getPropertyValue('--defaultAnnotationPanelDarkBackgroundColor'), -60));
+      rt.style.setProperty('--annotationPanelTextColor', 'white');
+      rt.style.setProperty('--annotationPanelBorderColor',
+        utils.brighter(window.getComputedStyle(rt).getPropertyValue('--defaultAnnotationPanelDarkBackgroundColor'), 30));
     } else { // bright mode
       // sleepy owl
       owl.setAttribute("src", owlSrc + 'menu-logo-asleep.svg');
@@ -581,7 +620,18 @@ export default class Viewer {
         rt.style.setProperty('--fileStatusChangedColor', utils.brighter(window.getComputedStyle(str).color, -40));
         rt.style.setProperty('--fileStatusWarnColor', utils.brighter(window.getComputedStyle(str).color, -10));
       }
+      rt.style.setProperty('--annotationPanelBackgroundColor',
+        window.getComputedStyle(rt).getPropertyValue('--defaultAnnotationPanelBackgroundColor'));
+      rt.style.setProperty('--annotationPanelLinkBackgroundColor',
+        window.getComputedStyle(rt).getPropertyValue('--defaultAnnotationPanelLinkBackgroundColor'));
+      rt.style.setProperty('--annotationPanelHoverColor',
+        window.getComputedStyle(rt).getPropertyValue('--defaultAnnotationPanelHoverColor'));
+      rt.style.setProperty('--annotationPanelTextColor',
+        window.getComputedStyle(rt).getPropertyValue('--defaultAnnotationPanelTextColor'));
+      rt.style.setProperty('--annotationPanelBorderColor',
+        utils.brighter(window.getComputedStyle(rt).getPropertyValue('--defaultAnnotationPanelBackgroundColor'), -30));
     }
+
   } // setMenuColors()
 
   zoom(delta, storage = null) {
@@ -620,12 +670,25 @@ export default class Viewer {
     if (sp.style.display !== 'block') sp.style.display = 'block';
     sp.classList.remove('out');
     sp.classList.add('in');
+    document.getElementById('showSettingsButton').style.visibility = 'hidden';
   }
 
   hideSettingsPanel() {
     let sp = document.getElementById('settingsPanel');
     sp.classList.add('out');
     sp.classList.remove('in');
+    document.getElementById('showSettingsButton').style.visibility = 'visible';
+  }
+
+  toggleAnnotationPanel() {
+    setOrientation(cm);
+    if (this.speedMode &&
+      document.getElementById('breaks-select').value == 'auto') {
+      this.pageBreaks = {};
+      this.updateAll(cm);
+    } else {
+      this.updateLayout();
+    }
   }
 
   toggleSettingsPanel(ev = null) {
@@ -645,7 +708,7 @@ export default class Viewer {
   // initializes the settings panel by filling it with content
   addVrvOptionsToSettingsPanel(tkAvailableOptions, defaultVrvOptions, restoreFromLocalStorage = true) {
     // skip these options (in part because they are handled in control menu)
-    let skipList = ['breaks', 'engravingDefaults', 'expand',
+    let skipList = ['font', 'breaks', 'engravingDefaults', 'expand',
       'svgAdditionalAttribute', 'handwrittenFont'
     ];
     let vsp = document.getElementById('verovioSettings');
@@ -883,6 +946,21 @@ export default class Viewer {
 
   addMeiFriendOptionsToSettingsPanel(restoreFromLocalStorage = true) {
     let optionsToShow = {
+      titleAnnotationPanel: {
+        title: 'Annotation panel',
+        description: 'Annotation panel',
+        type: 'header'
+      },
+      showAnnotationPanel: {
+        title: 'Show annotation panel',
+        decription: 'Show annotation panel',
+        type: 'bool',
+        default: false
+      },
+      annotationPanelSeparator: {
+        title: 'options-line', // class name of hr element
+        type: 'line'
+      },
       titleSupplied: {
         title: 'Handle <supplied> element',
         description: 'Control handling of <supplied> elements',
@@ -1058,6 +1136,9 @@ export default class Viewer {
         if (ev.srcElement.type === 'number') value = parseFloat(value);
         let col = document.getElementById('suppliedColor').value;
         switch (option) {
+          case 'showAnnotationPanel':
+            this.toggleAnnotationPanel();
+            break;
           case 'showSupplied':
             rt.style.setProperty('--suppliedColor', (value) ? col : 'var(--notationColor)');
             rt.style.setProperty('--suppliedHighlightedColor', (value) ? utils.brighter(col, -50) : 'var(--highlightColor)');

@@ -277,6 +277,16 @@ onmessage = function(e) {
         log(err);
       }
       break;
+    case 'getPageWithElement':
+      try {
+        result = {
+          'cmd': 'pageWithElement',
+          'msg': tk.getPageWithElement(result.msg)
+        };
+      } catch (err) {
+        log(err);
+      }
+      break;
     case 'getElementAttr':
       try {
         result = {

@@ -42,7 +42,14 @@ export const fontList = ['Leipzig', 'Bravura', 'Gootville', 'Leland', 'Petaluma'
 import {
   setOrientation,
   addResizerHandlers
-} from './resizer.js'
+} from './resizer.js';
+import {
+  addAnnotationHandlers,
+  clearAnnotations,
+  readAnnots,
+  refreshAnnotationsList,
+  refreshAnnotations
+} from './annotation.js';
 import {
   dropHandler,
   dragEnter,
@@ -222,6 +229,8 @@ export function loadDataInEditor(mei, setFreshlyLoaded = true) {
   }
   v.setRespSelectOptions();
   v.setMenuColors();
+  clearAnnotations();
+  readAnnots(); // from annotation.js
   setCursorToId(cm, handleURLParamSelect());
 }
 
@@ -338,6 +347,7 @@ document.addEventListener('DOMContentLoaded', function() {
   };
 
   v.addCmOptionsToSettingsPanel(cm, defaultCodeMirrorOptions);
+  v.addMeiFriendOptionsToSettingsPanel();
 
   let urlFileName = searchParams.get('file');
   if (urlFileName) {
@@ -446,6 +456,7 @@ document.addEventListener('DOMContentLoaded', function() {
     setOrientation(cm, defaultOrientation);
   }
   addEventListeners(v, cm);
+  addAnnotationHandlers();
   addResizerHandlers(v, cm);
   let doit;
   window.onresize = () => {
@@ -539,7 +550,7 @@ function vrvWorkerEventsHandler(ev) {
       tkVersion = ev.data.version;
       tkAvailableOptions = ev.data.availableOptions;
       v.addVrvOptionsToSettingsPanel(tkAvailableOptions, defaultVerovioOptions);
-      v.addMeiFriendOptionsToSettingsPanel();
+      // v.addMeiFriendOptionsToSettingsPanel();
       document.querySelector(".rightfoot").innerHTML +=
         `&nbsp;<a href="https://www.verovio.org/" target="_blank">Verovio ${tkVersion}</a>.`;
       document.querySelector(".statusbar").innerHTML =
@@ -606,6 +617,7 @@ function vrvWorkerEventsHandler(ev) {
         v.updatePageNumDisplay();
         v.addNotationEventListeners(cm);
         v.updateHighlight(cm);
+        refreshAnnotations();
         v.scrollSvg(cm);
       }
       if (!"setFocusToVerovioPane" in ev.data || ev.data.setFocusToVerovioPane)
@@ -629,6 +641,7 @@ function vrvWorkerEventsHandler(ev) {
         v.lastNoteId = id;
       }
       v.addNotationEventListeners(cm);
+      refreshAnnotations();
       v.scrollSvg(cm);
       v.updateHighlight(cm);
       v.setFocusToVerovioPane();
@@ -930,6 +943,10 @@ let cmd = {
   'showSettingsPanel': () => v.showSettingsPanel(),
   'hideSettingsPanel': () => v.hideSettingsPanel(),
   'toggleSettingsPanel': (ev) => v.toggleSettingsPanel(ev),
+  'hideAnnotationPanel': () => {
+    document.getElementById('showAnnotationPanel').checked = false;
+    v.toggleAnnotationPanel();
+  },
   'moveProgBar': () => moveProgressBar(),
   'open': () => openFileDialog(),
   'openUrl': () => openUrl(),
@@ -1040,6 +1057,7 @@ function addEventListeners(v, cm) {
   document.getElementById('showSettingsButton').addEventListener('click', cmd.showSettingsPanel);
   document.getElementById('hideSettingsButton').addEventListener('click', cmd.hideSettingsPanel);
   document.getElementById('closeSettingsButton').addEventListener('click', cmd.hideSettingsPanel);
+  document.getElementById('closeAnnotationPanelButton').addEventListener('click', cmd.hideAnnotationPanel);
 
   // open dialogs
   document.getElementById('OpenMei').addEventListener('click', cmd.open);
@@ -1235,6 +1253,7 @@ function addEventListeners(v, cm) {
       // on every set of changes, save editor content
       updateLocalStorage(meiXml);
     }
+    readAnnots(); // from annotation.js
   })
 
   // Editor font size zooming
