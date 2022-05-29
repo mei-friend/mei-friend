@@ -36,7 +36,7 @@ export function refreshAnnotationsList() {
   // add web annotation button
   const addWebAnnotation = document.createElement("div");
   const rdfIcon = document.createElement("span");
-  addWebAnnotation.textContent = "Add Web Annotation ";
+  addWebAnnotation.textContent = "Load Web Annotation(s)";
   rdfIcon.id = "addWebAnnotationIcon";
   rdfIcon.insertAdjacentHTML("beforeend", rdf);
   addWebAnnotation.appendChild(rdfIcon);
@@ -332,10 +332,21 @@ export function readAnnots() {
   let annots = Array.from(v.xmlDoc.querySelectorAll('annot'));
   annots = annots.filter(annot => annotations.findIndex(a => a.id !== 'annot-' + annot.getAttribute('xml:id')));
   annots.forEach(annot => {
-    let annotation = {
-      "type": annot.textContent ? "annotateDescribe" : "annotateHighlight",
-    };
-    if (annot.textContent.length) annotation.description = annot.textContent;
+    let annotation = {};
+    if(annot.textContent) { 
+      const ptrs = annot.getElementsByTagNameNS(meiNameSpace, "ptr");
+      if(ptrs.length) { 
+        console.log(ptrs)
+        annotation.type = "annotateLink";
+        console.log("ptrs: ", ptrs)
+        annotation.url = ptrs[0].getAttribute("target");
+      }
+      else {
+        annotation.type = "annotateDescribe"
+        annotation.description = annot.textContent;
+      }
+    } else 
+      annotation.type = "annotateHighlight";
     if (annot.hasAttribute('xml:id')) annotation.id = annot.getAttribute('xml:id').replace('annot-', '');
     if (annot.hasAttribute('plist')) {
       annotation.selection = annot.getAttribute('plist').split(' ').map(id => rmHash(id));

@@ -379,12 +379,12 @@
       <div class="tab">
         <button class="tablink defaultOpen" onclick="switchTab(event, 'annotationPanel', 'annotationTools')" title="Annotation tools">Tools</button>
         <button class="tablink" onclick="switchTab(event, 'annotationPanel', 'listAnnotations')" title="List annotations">List</button>
-        <button class="tablink" onclick="switchTab(event, 'annotationPanel', 'externalLinks')" title="Links">Links</button>
+        <!--DW HACK ESWC<button class="tablink" onclick="switchTab(event, 'annotationPanel', 'externalLinks')" title="Links">Links</button>-->
         <span id="closeAnnotationPanelButton" class="topright" title="Hide Annotation Panel">&times;</span>
       </div>
       <div id="annotationTools" class="tabcontent">
         <menu id="annotationToolsMenu">
-          <div class="annotationToolsDomainSelection">
+          <div class="annotationToolsDomainSelection" style="display:none;">
             <div class="annotationToolsDomainSelectionItem">
               <input type="checkbox" checked id="writeAnnotInline" />
               <label for="#writeAnnotInline">&lt;annot&gt;</label>
@@ -409,14 +409,14 @@
               Highlight
             </div>
           </li>
-          <li>
+          <!--DW HACK ESWC <li>
             <div class="annotationToolsIcon" id="annotateCircle">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
                 <path fill-rule="evenodd" d="M8 1.5a6.5 6.5 0 100 13 6.5 6.5 0 000-13zM0 8a8 8 0 1116 0A8 8 0 010 8z" />
               </svg>
               Circle
             </div>
-          </li>
+          </li>-->
           <li>
             <div class="annotationToolsIcon" id="annotateDescribe">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
@@ -438,7 +438,7 @@
         </menu>
       </div>
       <div id="listAnnotations" class="tabcontent">No annotations present.</div>
-      <div id="externalLinks" class="tabcontent">Links</div>
+      <!-- DW HACK ESWC <div id="externalLinks" class="tabcontent">Links</div>-->
     </div>
   </div>
 
