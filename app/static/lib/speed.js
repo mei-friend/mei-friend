@@ -5,10 +5,10 @@
 import * as utils from './utils.js';
 import * as dutils from './dom-utils.js';
 import * as att from './attribute-classes.js';
-
-export var meiNameSpace = 'http://www.music-encoding.org/ns/mei';
-export var xmlNameSpace = 'http://www.w3.org/XML/1998/namespace';
-
+import {
+  meiNameSpace,
+  xmlNameSpace
+} from './dom-utils.js';
 
 // returns complete MEI code of given page (one-based), defined by sb and pb
 export function getPageFromDom(xmlDoc, pageNo = 1, breaks = ['sb', 'pb'], pageSpanners) {
@@ -400,7 +400,7 @@ function matchTimespanningElements(xmlScore, spdScore, pageNo) {
     let uuids = getIdsForDummyMeasure(m);
     for (let endingElement of endingElements) {
       if (endingElement) {
-        let startid = rmHash(endingElement.getAttribute('startid'));
+        let startid = utils.rmHash(endingElement.getAttribute('startid'));
         let note = xmlScore.querySelector('[*|id="' + startid + '"]');
         let staffNo = -1;
         if (note) staffNo = note.closest('staff').getAttribute('n');
@@ -420,7 +420,7 @@ function matchTimespanningElements(xmlScore, spdScore, pageNo) {
     let uuids = getIdsForDummyMeasure(m);
     for (let startingElement of startingElements) {
       if (startingElement) {
-        let endid = rmHash(startingElement.getAttribute('endid'));
+        let endid = utils.rmHash(startingElement.getAttribute('endid'));
         // console.info('searching for endid: ', endid);
         if (endid) {
           let note = xmlScore.querySelector('[*|id="' + endid + '"]');
@@ -470,9 +470,9 @@ export function listPageSpanningElements(xmlScore, breaks, breaksOption) {
   let tsTable = {};
   for (let el of els) {
     let id = el.getAttribute('xml:id');
-    let startid = rmHash(el.getAttribute('startid'));
+    let startid = utils.rmHash(el.getAttribute('startid'));
     if (startid) sel += '[*|id="' + startid + '"],';
-    let endid = rmHash(el.getAttribute('endid'));
+    let endid = utils.rmHash(el.getAttribute('endid'));
     if (endid) sel += '[*|id="' + endid + '"],';
     if (id && startid && endid) tsTable[id] = [startid, endid];
   }
@@ -549,7 +549,7 @@ function addPageSpanningElements(xmlScore, spdScore, pageSpanners, pageNo) {
       let endingElement =
         xmlScore.querySelector('[*|id="' + endingElementId + '"]');
       if (!endingElement) continue;
-      let startid = rmHash(endingElement.getAttribute('startid'));
+      let startid = utils.rmHash(endingElement.getAttribute('startid'));
       let startNote = xmlScore.querySelector('[*|id="' + startid + '"]');
       let staffNo = -1;
       if (startNote)
@@ -571,7 +571,7 @@ function addPageSpanningElements(xmlScore, spdScore, pageSpanners, pageNo) {
       let startingElement =
         xmlScore.querySelector('[*|id="' + startingElementId + '"]');
       if (!startingElement) continue;
-      let endid = rmHash(startingElement.getAttribute('endid'));
+      let endid = utils.rmHash(startingElement.getAttribute('endid'));
       // console.info('searching for endid: ', endid);
       if (endid) {
         let endNote = xmlScore.querySelector('[*|id="' + endid + '"]');
@@ -630,15 +630,6 @@ export function findByAttributeValue(xmlNode, attribute, value, elementName = "*
       return list[i];
     }
   }
-}
-
-// convert xmlNode to string and remove meiNameSpace declaration from return string
-export function xmlToString(xmlNode) {
-  let str = new XMLSerializer().serializeToString(xmlNode);
-  // console.info('xmlToString: ' + str);
-  str = str.replace(/(?:><)/g, '>\n<');
-  // console.info('xmlToString: ' + str);
-  return str.replace('xmlns="' + meiNameSpace + '" ', '');
 }
 
 // Retrieve page number of element with xml:id id
@@ -784,11 +775,6 @@ export function getIdsForDummyMeasure(dummyMeasure) {
 // returns number of staff elements within scoreDef
 export function countStaves(scoreDef) {
   return scoreDef.querySelectorAll('staffDef').length;
-}
-
-export function rmHash(hashedString) {
-  return (hashedString.startsWith('#')) ?
-    hashedString.split('#')[1] : hashedString;
 }
 
 // filter selected elements and keep only highest in DOM

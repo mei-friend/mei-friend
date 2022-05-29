@@ -1,5 +1,11 @@
 # mei-friend-online CHANGELOG.md
 
+### 0.4.0 minor: Annotation
+* Implement annotation panel (activate from mei-friend settings)
+* Annotation tools for highlight, describe, link 
+* Reading and writing of <annot> elements
+* Listing of annotations in annotation panel
+* Loading and interpreting simple Web Annotations
 ### 0.3.12 patch: Settings improvements
 * Address page processing bug with page/system beginnings inside apparatus element
 * Make font select appear in Verovio options

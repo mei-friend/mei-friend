@@ -3,10 +3,26 @@
 <head>
   <meta charset="utf-8">
   <title>mei-friend</title>
+  <meta name="author" content="Werner Goebl">
+  <meta name="author" content="David M. Weigl">
+  <meta name="description" content="mei-friend is a ‘last mile’ editor for MEI music encodings
+  intended to alleviate the common task of cleaning up encodings generated via optical music recognition,
+  or via conversion from other formats, originally implemented as a plugin package for the Atom text editor.
+  The mei-friend Web Application is a reworking of the tool as a full-featured,
+  cross-browser compatible Web application, with optimised performance and an extended set of features.
+  The application is available online at https://mei-friend.mdw.ac.at.">
+  <meta property="og:image" content="https://mei-friend.mdw.ac.at/static/svg/menu-logo.svg">
+  <meta property="og:description" content="mei-friend is a ‘last mile’ editor for MEI music encodings.">
+  <meta property="og:title" content="mei-friend online editor">
+  <meta name="keywords" content="music encoding initiative, MEI, musicXML, humdrum, ABC, PAE,
+  music notation, music editing software, Verovio">
   <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.png') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/default.css') }}" />
   <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/annotationPanel.css') }}" />
   <link rel="stylesheet" href="{{ url_for('static', filename='css/icons.css') }}" />
+  <!-- TODO: FIX IMPORT OF ICONS -->
+  <!-- <script src="{{ url_for('static', filename='css/icons.js') }}"></script> -->
   <link rel="stylesheet" id="orientationCSS" href="{{ url_for('static', filename='css/bottom.css') }}" />
   <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.64.0/codemirror.min.js" integrity="sha512-4DlmQ+aBOfYTZ3uzRKCDXdyL7y8IlopnVChhXG0pRFgyvhwONVQW3JX8e5DYoXUNr3evQpLZz7S3O1XxMH4WKA==" crossorigin="anonymous"
     referrerpolicy="no-referrer">
@@ -352,11 +368,77 @@
       </div>
     </div>
     <div class="friendContainer">
+      <div id="renderedAnnotationsContainer"></div>
       <div class="notation"></div>
       <div class="resizer" id="dragMe"></div>
       <div class="encoding">
         <textarea id="editor"></textarea>
       </div>
+    </div>
+    <div id="annotationPanel" style="display: none;">
+      <div class="tab">
+        <button class="tablink defaultOpen" onclick="switchTab(event, 'annotationPanel', 'annotationTools')" title="Annotation tools">Tools</button>
+        <button class="tablink" onclick="switchTab(event, 'annotationPanel', 'listAnnotations')" title="List annotations">List</button>
+        <!--DW HACK ESWC<button class="tablink" onclick="switchTab(event, 'annotationPanel', 'externalLinks')" title="Links">Links</button>-->
+        <span id="closeAnnotationPanelButton" class="topright" title="Hide Annotation Panel">&times;</span>
+      </div>
+      <div id="annotationTools" class="tabcontent">
+        <menu id="annotationToolsMenu">
+          <div class="annotationToolsDomainSelection" style="display:none;">
+            <div class="annotationToolsDomainSelectionItem">
+              <input type="checkbox" checked id="writeAnnotInline" />
+              <label for="#writeAnnotInline">&lt;annot&gt;</label>
+            </div>
+            <div class="annotationToolsDomainSelectionItem">
+              <input type="checkbox" id="writeAnnotStandoff" />
+              <label for="#writeAnnotStandoff">Web Annotation</label>
+              <!-- <script>document.querySelector('label[for="#writeAnnotStandoff"]').innerHTML = rdf;</script> -->
+            </div>
+          </div>
+          <li>
+            <div class="annotationToolsIcon" id="annotateHighlight">
+              <!--<svg xmlns="http://www.w3.org/2000/svg"  aria-hidden="true" role="img" id="footer-sample-full" width="16px" height="16px"  viewBox="0 0 1024 1024">
+                <path fill="currentColor"
+                  d="M957.6 507.4L603.2 158.2a7.9 7.9 0 0 0-11.2 0L353.3 393.4a8.03 8.03 0 0 0-.1 11.3l.1.1l40 39.4l-117.2 115.3a8.03 8.03 0 0 0-.1 11.3l.1.1l39.5 38.9l-189.1 187H72.1c-4.4 0-8.1 3.6-8.1 8V860c0 4.4 3.6 8 8 8h344.9c2.1 0 4.1-.8 5.6-2.3l76.1-75.6l40.4 39.8a7.9 7.9 0 0 0 11.2 0l117.1-115.6l40.1 39.5a7.9 7.9 0 0 0 11.2 0l238.7-235.2c3.4-3 3.4-8 .3-11.2zM389.8 796.2H229.6l134.4-133l80.1 78.9l-54.3 54.1zm154.8-62.1L373.2 565.2l68.6-67.6l171.4 168.9l-68.6 67.6zM713.1 658L450.3 399.1L597.6 254l262.8 259l-147.3 145z">
+                </path>
+              </svg>-->
+              <svg xmlns="http://www.w3.org/2000/svg" width="16px" height="16px" viewBox="0 0 20 20">
+                <title>highlight</title>
+                <path d="M15.14 2.27a1 1 0 0 0-1.41 0l-10 10a1 1 0 0 0 0 1.41L4 14l-3 4h5l1-1 .29.29a1 1 0 0 0 1.41 0l10-10a1 1 0 0 0 .03-1.43zM7 15l-2-2 9-9 2 2z" />
+              </svg>
+              Highlight
+            </div>
+          </li>
+          <!--DW HACK ESWC <li>
+            <div class="annotationToolsIcon" id="annotateCircle">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M8 1.5a6.5 6.5 0 100 13 6.5 6.5 0 000-13zM0 8a8 8 0 1116 0A8 8 0 010 8z" />
+              </svg>
+              Circle
+            </div>
+          </li>-->
+          <li>
+            <div class="annotationToolsIcon" id="annotateDescribe">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                <path fill-rule="evenodd"
+                  d="M11.013 1.427a1.75 1.75 0 012.474 0l1.086 1.086a1.75 1.75 0 010 2.474l-8.61 8.61c-.21.21-.47.364-.756.445l-3.251.93a.75.75 0 01-.927-.928l.929-3.25a1.75 1.75 0 01.445-.758l8.61-8.61zm1.414 1.06a.25.25 0 00-.354 0L10.811 3.75l1.439 1.44 1.263-1.263a.25.25 0 000-.354l-1.086-1.086zM11.189 6.25L9.75 4.81l-6.286 6.287a.25.25 0 00-.064.108l-.558 1.953 1.953-.558a.249.249 0 00.108-.064l6.286-6.286z" />
+              </svg>
+              Describe
+            </div>
+          </li>
+          <li>
+            <div class="annotationToolsIcon" id="annotateLink">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                <path fill-rule="evenodd"
+                  d="M7.775 3.275a.75.75 0 001.06 1.06l1.25-1.25a2 2 0 112.83 2.83l-2.5 2.5a2 2 0 01-2.83 0 .75.75 0 00-1.06 1.06 3.5 3.5 0 004.95 0l2.5-2.5a3.5 3.5 0 00-4.95-4.95l-1.25 1.25zm-4.69 9.64a2 2 0 010-2.83l2.5-2.5a2 2 0 012.83 0 .75.75 0 001.06-1.06 3.5 3.5 0 00-4.95 0l-2.5 2.5a3.5 3.5 0 004.95 4.95l1.25-1.25a.75.75 0 00-1.06-1.06l-1.25 1.25a2 2 0 01-2.83 0z" />
+              </svg>
+              Link
+            </div>
+          </li>
+        </menu>
+      </div>
+      <div id="listAnnotations" class="tabcontent">No annotations present.</div>
+      <!-- DW HACK ESWC <div id="externalLinks" class="tabcontent">Links</div>-->
     </div>
   </div>
 
@@ -381,18 +463,15 @@
             d="M7.429 1.525a6.593 6.593 0 011.142 0c.036.003.108.036.137.146l.289 1.105c.147.56.55.967.997 1.189.174.086.341.183.501.29.417.278.97.423 1.53.27l1.102-.303c.11-.03.175.016.195.046.219.31.41.641.573.989.014.031.022.11-.059.19l-.815.806c-.411.406-.562.957-.53 1.456a4.588 4.588 0 010 .582c-.032.499.119 1.05.53 1.456l.815.806c.08.08.073.159.059.19a6.494 6.494 0 01-.573.99c-.02.029-.086.074-.195.045l-1.103-.303c-.559-.153-1.112-.008-1.529.27-.16.107-.327.204-.5.29-.449.222-.851.628-.998 1.189l-.289 1.105c-.029.11-.101.143-.137.146a6.613 6.613 0 01-1.142 0c-.036-.003-.108-.037-.137-.146l-.289-1.105c-.147-.56-.55-.967-.997-1.189a4.502 4.502 0 01-.501-.29c-.417-.278-.97-.423-1.53-.27l-1.102.303c-.11.03-.175-.016-.195-.046a6.492 6.492 0 01-.573-.989c-.014-.031-.022-.11.059-.19l.815-.806c.411-.406.562-.957.53-1.456a4.587 4.587 0 010-.582c.032-.499-.119-1.05-.53-1.456l-.815-.806c-.08-.08-.073-.159-.059-.19a6.44 6.44 0 01.573-.99c.02-.029.086-.075.195-.045l1.103.303c.559.153 1.112.008 1.529-.27.16-.107.327-.204.5-.29.449-.222.851-.628.998-1.189l.289-1.105c.029-.11.101-.143.137-.146zM8 0c-.236 0-.47.01-.701.03-.743.065-1.29.615-1.458 1.261l-.29 1.106c-.017.066-.078.158-.211.224a5.994 5.994 0 00-.668.386c-.123.082-.233.09-.3.071L3.27 2.776c-.644-.177-1.392.02-1.82.63a7.977 7.977 0 00-.704 1.217c-.315.675-.111 1.422.363 1.891l.815.806c.05.048.098.147.088.294a6.084 6.084 0 000 .772c.01.147-.038.246-.088.294l-.815.806c-.474.469-.678 1.216-.363 1.891.2.428.436.835.704 1.218.428.609 1.176.806 1.82.63l1.103-.303c.066-.019.176-.011.299.071.213.143.436.272.668.386.133.066.194.158.212.224l.289 1.106c.169.646.715 1.196 1.458 1.26a8.094 8.094 0 001.402 0c.743-.064 1.29-.614 1.458-1.26l.29-1.106c.017-.066.078-.158.211-.224a5.98 5.98 0 00.668-.386c.123-.082.233-.09.3-.071l1.102.302c.644.177 1.392-.02 1.82-.63.268-.382.505-.789.704-1.217.315-.675.111-1.422-.364-1.891l-.814-.806c-.05-.048-.098-.147-.088-.294a6.1 6.1 0 000-.772c-.01-.147.039-.246.088-.294l.814-.806c.475-.469.679-1.216.364-1.891a7.992 7.992 0 00-.704-1.218c-.428-.609-1.176-.806-1.82-.63l-1.103.303c-.066.019-.176.011-.299-.071a5.991 5.991 0 00-.668-.386c-.133-.066-.194-.158-.212-.224L10.16 1.29C9.99.645 9.444.095 8.701.031A8.094 8.094 0 008 0zm1.5 8a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM11 8a3 3 0 11-6 0 3 3 0 016 0z" />
         </svg>
       </button>
-      <button class="tablink" onclick="switchTab(event, 'meiFriendSettings')" title="mei-friend Settings">mei-friend</button>
-      <button class="tablink" onclick="switchTab(event, 'editorSettings')" title="Editor Settings" id="defaultOpen">Editor</button>
-      <button class="tablink" onclick="switchTab(event, 'verovioSettings')" title="Verovio Options">Verovio</button>
-      <span id="closeSettingsButton" class="topright" title="Hide Settings Panel">&times</span>
+      <button class="tablink" onclick="switchTab(event, 'settingsPanel', 'meiFriendSettings')" title="mei-friend Settings">mei-friend</button>
+      <button class="tablink defaultOpen" onclick="switchTab(event, 'settingsPanel', 'editorSettings')" title="Editor Settings">Editor</button>
+      <button class="tablink" onclick="switchTab(event, 'settingsPanel', 'verovioSettings')" title="Verovio Options">Verovio</button>
+      <span id="closeSettingsButton" class="topright" title="Hide Settings Panel">&times;</span>
     </div>
     <!-- Tab content -->
-    <div id="meiFriendSettings" class="tabcontent">
-    </div>
-    <div id="editorSettings" class="tabcontent">
-    </div>
-    <div id="verovioSettings" class="tabcontent">
-    </div>
+    <div id="meiFriendSettings" class="tabcontent"> </div>
+    <div id="editorSettings" class="tabcontent"> </div>
+    <div id="verovioSettings" class="tabcontent"> </div>
   </div>
 
   <script>
@@ -418,17 +497,22 @@
     });
 
     // switch tabs in settings menu
-    function switchTab(ev, tabId) {
-      // hide all tab contents except tabId
-      for (let cont of document.getElementsByClassName("tabcontent"))
-        cont.style.display = (cont.id === tabId) ? 'block' : 'none';
-      // remove class "active" from tablinks except for current target
-      for (let tab of document.getElementsByClassName("tablink"))
-        (tab === ev.currentTarget) ? tab.classList.add('active') :
-        tab.classList.remove('active');
+    function switchTab(ev, containingElementId, tabId) {
+      console.log('switchTab: ', containingElementId, tabId);
+      console.log('switchTab: ', ev);
+      let containingElement = document.getElementById(containingElementId);
+      if (containingElement) {
+        // hide all tab contents except tabId
+        for (let cont of containingElement.getElementsByClassName("tabcontent"))
+          cont.style.display = (cont.id === tabId) ? 'block' : 'none';
+        // remove class "active" from tablinks except for current target
+        for (let tab of containingElement.getElementsByClassName("tablink"))
+          (tab === ev.currentTarget) ? tab.classList.add('active') :
+          tab.classList.remove('active');
+      }
     }
 
-    document.getElementById("defaultOpen").click();
+    document.querySelectorAll(".defaultOpen").forEach(item => item.click());
   </script>
 </body>
 
