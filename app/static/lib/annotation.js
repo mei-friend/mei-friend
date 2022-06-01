@@ -281,7 +281,7 @@ export function addAnnotationHandlers() {
   // functions to create annotations
   const createHighlight = (e) => {
     const a = {
-      "id": generateUUID(),
+      "id": "annot-"+generateUUID(),
       "type": "annotateHighlight",
       "selection": v.selectedElements
     }
@@ -290,7 +290,7 @@ export function addAnnotationHandlers() {
   }
   const createCircle = (e) => {
     const a = {
-      "id": generateUUID(),
+      "id": "annot-"+generateUUID(),
       "type": "annotateCircle",
       "selection": v.selectedElements
     }
@@ -301,7 +301,7 @@ export function addAnnotationHandlers() {
     // TODO improve UX!
     const desc = window.prompt("Please enter a textual description to apply");
     const a = {
-      "id": generateUUID(),
+      "id": "annot-"+generateUUID(),
       "type": "annotateDescribe",
       "selection": v.selectedElements,
       "description": desc
@@ -313,7 +313,7 @@ export function addAnnotationHandlers() {
     // TODO improve UX!
     const url = window.prompt("Please enter a url to link to");
     const a = {
-      "id": generateUUID(),
+      "id": "annot-"+generateUUID(),
       "type": "annotateLink",
       "selection": v.selectedElements,
       "url": url
@@ -330,7 +330,7 @@ export function addAnnotationHandlers() {
 export function readAnnots() {
   if (!v.xmlDoc) return;
   let annots = Array.from(v.xmlDoc.querySelectorAll('annot'));
-  annots = annots.filter(annot => annotations.findIndex(a => a.id !== 'annot-' + annot.getAttribute('xml:id')));
+  annots = annots.filter(annot => annotations.findIndex(a => a.id !== annot.getAttribute('xml:id')));
   annots.forEach(annot => {
     let annotation = {};
     if(annot.textContent) { 
@@ -347,7 +347,6 @@ export function readAnnots() {
       }
     } else 
       annotation.type = "annotateHighlight";
-    if (annot.hasAttribute('xml:id')) annotation.id = annot.getAttribute('xml:id').replace('annot-', '');
     if (annot.hasAttribute('plist')) {
       annotation.selection = annot.getAttribute('plist').split(' ').map(id => rmHash(id));
     } else if (annot.parentNode.hasAttribute('xml:id')) {
@@ -366,7 +365,7 @@ export function writeAnnot(beforeThis, xmlId, plist, payload) {
   let parent = beforeThis.parentNode;
   if (parent) {
     let annot = document.createElementNS(meiNameSpace, 'annot');
-    annot.setAttributeNS(xmlNameSpace, 'id', 'annot-' + xmlId);
+    annot.setAttributeNS(xmlNameSpace, 'id', xmlId);
     annot.setAttribute('plist', plist.map(p => '#' + p).join(' '));
     if (payload) { 
       if(typeof payload === "string") { 
@@ -489,8 +488,13 @@ export function ingestWebAnnotation(webAnno) {
           anno.type = "annotateDescribe";
     }
 
+    console.log("Annotations: ", annotations);
+    console.log("Anno: ", anno);
     anno.selection = targets.map(t => t["@id"].split("#")[1]);
-    annotations.push(anno);
+    if(annotations.findIndex(a => a.id === anno.id) < 0) { 
+      // add to list if we don't already have it
+      annotations.push(anno);
+    }
     refreshAnnotations();
   }
 }
