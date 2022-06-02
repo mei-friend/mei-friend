@@ -17,6 +17,7 @@ import {
   circle,
   diffRemoved,
   highlight,
+  fileCode,
   flipToEncoding,
   link,
   pencil,
@@ -59,6 +60,31 @@ export function refreshAnnotationsList() {
     const deleteAnno = document.createElement("a");
     deleteAnno.insertAdjacentHTML("afterbegin", diffRemoved);
     deleteAnno.title = "Delete this annotation";
+    const isStandoff = document.createElement("a");
+    isStandoff.insertAdjacentHTML("afterbegin", rdf);
+    isStandoff.title = "Stand-off status (Web Annotation)";
+    isStandoff.classList.add('icon');
+    isStandoff.style.filter = "grayscale(100%)";
+    if(!a.isStandoff) {
+      isStandoff.title = "Write to Solid as Web Annotation";
+      isStandoff.style.opacity = 0.3;
+    } else { 
+      isStandoff.title = "Copy Web Annotation URI to clipboard: ", a.id;
+      isStandoff.dataset.id = a.id;
+      isStandoff.addEventListener("click", copyIdToClipboard);
+    }
+    const isInline = document.createElement("a");
+    isInline.insertAdjacentHTML("afterbegin", fileCode);
+    isInline.classList.add('icon');
+    isInline.style.fontFamily = "monospace";
+    if(!a.isInline) {
+      isInline.title = "Click to in-line annotation";
+      isInline.style.opacity = 0.3;
+    } else {
+      isInline.title = "Copy <annot> xml:id to clipboard: [" + a.id + "]";
+      isInline.dataset.id = a.id;
+      isInline.addEventListener("click", copyIdToClipboard);
+    }
     switch (a.type) {
       case 'annotateHighlight':
         summary.insertAdjacentHTML("afterbegin", highlight);
@@ -105,6 +131,8 @@ export function refreshAnnotationsList() {
     details.prepend(summary);
     annoDiv.appendChild(details);
     annoListItemButtons.appendChild(flipToAnno);
+    annoListItemButtons.appendChild(isInline);
+    annoListItemButtons.appendChild(isStandoff);
     annoListItemButtons.appendChild(deleteAnno);
     annoDiv.appendChild(annoListItemButtons);
     list.appendChild(annoDiv);
@@ -354,6 +382,12 @@ export function readAnnots() {
     } else {
       console.warn('readAnnots(): found annot without id ', annot);
     }
+    if (annot.hasAttributeNS(xmlNameSpace, "id")) { 
+      annotation.id = annot.getAttributeNS(xmlNameSpace, "id")
+    } else  {
+      annotation.id = "None";
+    }
+    annotation.isInline = true;
     annotations.push(annotation);
   });
   refreshAnnotations();
@@ -493,6 +527,7 @@ export function ingestWebAnnotation(webAnno) {
     anno.selection = targets.map(t => t["@id"].split("#")[1]);
     if(annotations.findIndex(a => a.id === anno.id) < 0) { 
       // add to list if we don't already have it
+      anno.isStandoff = true;
       annotations.push(anno);
     }
     refreshAnnotations();
@@ -512,10 +547,17 @@ function writeInlineIfRequested(a) {
         payload.setAttribute("target",  a.url);
       }
       writeAnnot(el, a.id, a.selection, payload)
+      a.inline = true;
     } 
     else 
       console.warn('writeInlineIfRequested: Cannot find beforeThis element for ' + a.id);
   }
+}
+
+export function copyIdToClipboard(e) { 
+  console.log("Attempting to copy ID to clipboard: ", e);
+  navigator.clipboard.writeText(e.target.closest(".icon").dataset.id)
+    .catch(err => { console.warn("Couldn't copy id to clipboard: ", err) });
 }
 
 export function clearAnnotations() {
