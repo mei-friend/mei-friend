@@ -941,8 +941,12 @@ let cmd = {
   'showSettingsPanel': () => v.showSettingsPanel(),
   'hideSettingsPanel': () => v.hideSettingsPanel(),
   'toggleSettingsPanel': (ev) => v.toggleSettingsPanel(ev),
+  'showAnnotationPanel': () => {
+    document.getElementById('showAnnotationPanel').checked = true; // TODO: remove?
+    v.toggleAnnotationPanel();
+  },
   'hideAnnotationPanel': () => {
-    document.getElementById('showAnnotationPanel').checked = false;
+    document.getElementById('showAnnotationPanel').checked = false; // TODO: remove?
     v.toggleAnnotationPanel();
   },
   'moveProgBar': () => moveProgressBar(),
@@ -1055,6 +1059,7 @@ function addEventListeners(v, cm) {
   document.getElementById('showSettingsButton').addEventListener('click', cmd.showSettingsPanel);
   document.getElementById('hideSettingsButton').addEventListener('click', cmd.hideSettingsPanel);
   document.getElementById('closeSettingsButton').addEventListener('click', cmd.hideSettingsPanel);
+  document.getElementById('showAnnotationMenu').addEventListener('click', cmd.showAnnotationPanel);
   document.getElementById('closeAnnotationPanelButton').addEventListener('click', cmd.hideAnnotationPanel);
 
   // open dialogs
