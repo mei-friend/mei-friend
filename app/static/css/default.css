@@ -745,13 +745,13 @@ span.keyIcon {
 
 .tabstart {
   fill: var(--textColor);
-  border: var(--settingsLinkBackgroundColor) solid 2px;
+  border: rgba(0, 0, 0, 0) solid 2px;
   border-top-left-radius: 5px;
   background-color: inherit;
   cursor: pointer;
   float: left;
   outline: none;
-  padding: 4px 12px;
+  padding: 4px 6px;
   height: 38px;
 }
 
