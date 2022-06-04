@@ -949,6 +949,11 @@ let cmd = {
     document.getElementById('showAnnotationPanel').checked = false; // TODO: remove?
     v.toggleAnnotationPanel();
   },
+  'toggleAnnotationPanel': () => {
+    let status = document.getElementById('showAnnotationPanel').checked;
+    document.getElementById('showAnnotationPanel').checked = !status;
+    v.toggleAnnotationPanel();
+  },
   'moveProgBar': () => moveProgressBar(),
   'open': () => openFileDialog(),
   'openUrl': () => openUrl(),
@@ -1060,6 +1065,7 @@ function addEventListeners(v, cm) {
   document.getElementById('hideSettingsButton').addEventListener('click', cmd.hideSettingsPanel);
   document.getElementById('closeSettingsButton').addEventListener('click', cmd.hideSettingsPanel);
   document.getElementById('showAnnotationMenu').addEventListener('click', cmd.showAnnotationPanel);
+  document.getElementById('showAnnotationsButton').addEventListener('click', cmd.toggleAnnotationPanel);
   document.getElementById('closeAnnotationPanelButton').addEventListener('click', cmd.hideAnnotationPanel);
 
   // open dialogs

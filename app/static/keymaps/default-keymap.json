@@ -94,7 +94,8 @@
     "cmd-shift-c": "cleanAccid",
     "cmd-shift-r": "renumberMeasures",
     "alt-.": "consultGuidelines",
-    "cmd-,": "toggleSettingsPanel"
+    "cmd-,": "toggleSettingsPanel",
+    "cmd-a": "toggleAnnotationPanel"
   },
 
   ".platform-win32, .platform-linux": {
@@ -121,6 +122,7 @@
     "ctrl-shift-c": "cleanAccid",
     "ctrl-shift-r": "renumberMeasures",
     "alt-.": "consultGuidelines",
-    "ctrl-,": "toggleSettingsPanel"
+    "ctrl-,": "toggleSettingsPanel",
+    "ctrl-a": "toggleAnnotationPanel"
   }
 }
