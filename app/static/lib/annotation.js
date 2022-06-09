@@ -34,6 +34,7 @@ export function refreshAnnotationsList() {
   while (list.firstChild) {
     list.removeChild(list.lastChild);
   }
+  console.log("Annotations: ",annotations);
   // add web annotation button
   const addWebAnnotation = document.createElement("div");
   const rdfIcon = document.createElement("span");
@@ -356,6 +357,7 @@ export function addAnnotationHandlers() {
 
 // reads <annot> elements from XML DOM and adds them into annotations array
 export function readAnnots() {
+  console.log("READ ANNOTS")
   if (!v.xmlDoc) return;
   let annots = Array.from(v.xmlDoc.querySelectorAll('annot'));
   annots = annots.filter(annot => annotations.findIndex(a => a.id !== annot.getAttribute('xml:id')));
@@ -387,7 +389,10 @@ export function readAnnots() {
       annotation.id = "None";
     }
     annotation.isInline = true;
-    annotations.push(annotation);
+    if(annotations.findIndex(a => annotation.id) === -1)
+      // only if not already included
+      // FIXME: will ignore all but the first annotation without xml:id
+      annotations.push(annotation);
   });
   refreshAnnotations();
 }
