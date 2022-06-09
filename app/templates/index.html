@@ -188,6 +188,7 @@
           <a id="right" href="#">Notation right</a>
           <hr class="dropdown-line">
           <a id="showSettingsMenu" href="#">Settings<span class="keyShortCut cmdKey">,</span></a>
+          <a id="showAnnotationMenu" href="#">Annotations<span class="keyShortCut cmdKey">A</span></a>
         </div>
       </div>
       <div class="dropdown">
@@ -281,6 +282,12 @@
       <span id="fileStorageExceeded"></span>
     </div>
     <div class="fillSpace"></div>
+    <div id="showAnnotationsButton" class="settingsButton" title="Toggle Annotations Panel">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" viewBox="0 0 19 21">
+        <title>Annotations Panel</title>
+        <path d="M15.14 2.27a1 1 0 0 0-1.41 0l-10 10a1 1 0 0 0 0 1.41L4 14l-3 4h5l1-1 .29.29a1 1 0 0 0 1.41 0l10-10a1 1 0 0 0 .03-1.43zM7 15l-2-2 9-9 2 2z" />
+      </svg>
+    </div>
     <div id="showSettingsButton" class="settingsButton" title="Show Settings Panel">
       <svg xmlns="http://www.w3.org/2000/svg" width="16" viewBox="0 0 16 16">
         <path fill-rule="evenodd"
@@ -377,10 +384,16 @@
     </div>
     <div id="annotationPanel" style="display: none;">
       <div class="tab">
+        <button id="hideAnnotationPanelButton" class="tabstart" title="Close Annotations Panel">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" viewBox="0 0 19 21">
+            <title>Close Annotations Panel</title>
+            <path d="M15.14 2.27a1 1 0 0 0-1.41 0l-10 10a1 1 0 0 0 0 1.41L4 14l-3 4h5l1-1 .29.29a1 1 0 0 0 1.41 0l10-10a1 1 0 0 0 .03-1.43zM7 15l-2-2 9-9 2 2z" />
+          </svg>
+        </button>
         <button class="tablink defaultOpen" onclick="switchTab(event, 'annotationPanel', 'annotationTools')" title="Annotation tools">Tools</button>
         <button class="tablink" onclick="switchTab(event, 'annotationPanel', 'listAnnotations')" title="List annotations">List</button>
-        <!--DW HACK ESWC<button class="tablink" onclick="switchTab(event, 'annotationPanel', 'externalLinks')" title="Links">Links</button>-->
-        <span id="closeAnnotationPanelButton" class="topright" title="Hide Annotation Panel">&times;</span>
+        <button class="tablink" onclick="switchTab(event, 'annotationPanel', 'externalLinks')" title="Links">Links</button>
+        <span id="closeAnnotationPanelButton" class="topright" title="Close Annotations Panel">&times;</span>
       </div>
       <div id="annotationTools" class="tabcontent">
         <menu id="annotationToolsMenu">

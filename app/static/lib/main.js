@@ -1,6 +1,6 @@
 // mei-friend version and date
 const version = '0.4.0';
-const versionDate = '1 June 2022';
+const versionDate = '9 June 2022';
 
 var vrvWorker;
 var spdWorker;
@@ -943,8 +943,17 @@ let cmd = {
   'showSettingsPanel': () => v.showSettingsPanel(),
   'hideSettingsPanel': () => v.hideSettingsPanel(),
   'toggleSettingsPanel': (ev) => v.toggleSettingsPanel(ev),
+  'showAnnotationPanel': () => {
+    document.getElementById('showAnnotationPanel').checked = true; // TODO: remove?
+    v.toggleAnnotationPanel();
+  },
   'hideAnnotationPanel': () => {
-    document.getElementById('showAnnotationPanel').checked = false;
+    document.getElementById('showAnnotationPanel').checked = false; // TODO: remove?
+    v.toggleAnnotationPanel();
+  },
+  'toggleAnnotationPanel': () => {
+    let status = document.getElementById('showAnnotationPanel').checked;
+    document.getElementById('showAnnotationPanel').checked = !status;
     v.toggleAnnotationPanel();
   },
   'moveProgBar': () => moveProgressBar(),
@@ -1057,7 +1066,10 @@ function addEventListeners(v, cm) {
   document.getElementById('showSettingsButton').addEventListener('click', cmd.showSettingsPanel);
   document.getElementById('hideSettingsButton').addEventListener('click', cmd.hideSettingsPanel);
   document.getElementById('closeSettingsButton').addEventListener('click', cmd.hideSettingsPanel);
+  document.getElementById('showAnnotationMenu').addEventListener('click', cmd.showAnnotationPanel);
+  document.getElementById('showAnnotationsButton').addEventListener('click', cmd.toggleAnnotationPanel);
   document.getElementById('closeAnnotationPanelButton').addEventListener('click', cmd.hideAnnotationPanel);
+  document.getElementById('hideAnnotationPanelButton').addEventListener('click', cmd.hideAnnotationPanel);
 
   // open dialogs
   document.getElementById('OpenMei').addEventListener('click', cmd.open);
