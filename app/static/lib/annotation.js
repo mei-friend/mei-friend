@@ -418,13 +418,31 @@ export function writeAnnot(beforeThis, xmlId, plist, payload) {
   }
 }
 
-export function loadWebAnnotation() {
-  // spin the icon to indicate loading activity
-  const url = window.prompt("Enter URL of Web Annotation or Web Annotation Container");
-  fetchWebAnnotations(url);
+export function loadWebAnnotation(prev = "") {
+  let msg = "Enter URL of Web Annotation or Web Annotation Container";
+  let prevurl = "";
+  if(prev) {  
+    if(prev.status) { 
+      // response object received
+      msg = `Couldn't load URL provided (${prev.status}: ${prev.statusText}), please try again. ${msg}` 
+      prevurl = prev.url;
+    } else {
+      // no response object received, e.g. due to CORS network error
+      // we have been handed the url string instead
+      msg = `Couldn't load URL provided (network error), please try again. ${msg}` 
+      prevurl = prev;
+    }
+  }
+  let urlstr = window.prompt(msg, prevurl);
+  if(urlstr) { 
+    if(!(urlstr.startsWith("http://") || urlstr.startsWith("https://"))) 
+      urlstr = "https://" + urlstr;
+    fetchWebAnnotations(urlstr);
+  }
 }
 
-export function fetchWebAnnotations(url, jumps = 10) {
+export function fetchWebAnnotations(url, userProvided = true, jumps = 10) {
+  // spin the icon to indicate loading activity
   const icon = document.getElementById("addWebAnnotationIcon");
   const svgs = Array.from(icon.getElementsByTagName("svg"));
   svgs.forEach(t => t.classList.add("clockwise"));
@@ -432,8 +450,13 @@ export function fetchWebAnnotations(url, jumps = 10) {
       headers: {
         'Accept': 'application/ld+json'
       }
-    }).then((resp) => resp.json())
-    .then((json) => {
+    }).then((resp) => { 
+      if(resp.status >= 400) { 
+        throw Error(resp);
+      } else { 
+        return resp.json()
+      }
+    }).then((json) => {
       console.log("json response: ", json)
       let resourceDescription;
       if (Array.isArray(json)) {
@@ -453,7 +476,7 @@ export function fetchWebAnnotations(url, jumps = 10) {
             if (jumps >= 0) {
               return resourceDescription["http://www.w3.org/ns/ldp#contains"].map(resource => {
                 jumps -= 1;
-                fetchWebAnnotations(resource["@id"], jumps);
+                fetchWebAnnotations(resource["@id"], false, jumps);
               });
             } else {
               console.warn("Prematurely ending traversal as out of jumps", url);
@@ -472,9 +495,16 @@ export function fetchWebAnnotations(url, jumps = 10) {
       } else {
         console.warn("Problem working with the specified resource identifier in requested resource: ", url, json);
       }
-    })
-    .catch((err) => console.warn("Couldn't load Web Annotation: ", err))
-    .finally(() => {
+    }).catch((resp) => {
+      if(userProvided) { 
+        console.error("Couldn't load web annotation, error response: ", resp);
+        // user-provided url didn't work, so hand control back to user
+        if(resp.url) 
+          loadWebAnnotation(resp)
+        else 
+          loadWebAnnotation(url)
+      }
+    }).finally(() => {
       // notify that we've stopped loading
       svgs.forEach(t => t.classList.remove("clockwise"));
     });
