@@ -1,21 +1,26 @@
 #annotationToolsMenu {
   display: flex;
+  padding-left: 0px;
+}
+
+#annotationToolsMenu div {
+  padding: 3px;
 }
 
 #annotationToolsMenu li {
   display: flex;
   list-style: none;
-  padding:10px;
+  padding: 10px;
 }
 
 .annotationToolsIcon {
   border: 1px solid black;
-  border-radius:5px;
-  padding:10px;
+  border-radius: 5px;
+  padding: 10px;
   display: flex;
   align-content: center;
   gap: 6px;
-  cursor:pointer;
+  cursor: pointer;
 }
 
 .annotationToolsDomainSelection {
@@ -23,37 +28,37 @@
 }
 
 .annotationToolsDomainSelectionItem {
-  display:flex;
+  display: flex;
 }
 
 .annotationHighlight {
   filter: drop-shadow(0px 0px 3em darkgreen);
 }
 
-.annotationDescribe { 
+.annotationDescribe {
   filter: drop-shadow(0px 0px 3em blue);
-  cursor:help;
+  cursor: help;
 }
 
-.annotationLink { 
+.annotationLink {
   filter: drop-shadow(0px 0px 3em purple);
-  cursor:pointer;
+  cursor: pointer;
 }
 
-#renderedAnnotationsContainer { 
-  position:absolute;
+#renderedAnnotationsContainer {
+  position: absolute;
   z-index: 10;
   pointer-events: none;
 }
 
-#renderedAnnotationsContainer .highlightEllipse{
-  fill:none;
-  stroke:red;
+#renderedAnnotationsContainer .highlightEllipse {
+  fill: none;
+  stroke: red;
   stroke-width: 3;
   stroke-opacity: .7;
 }
 
-#listAnnotations details { 
+#listAnnotations details {
   padding: 10px;
   margin: 5px;
 }
@@ -62,39 +67,35 @@
   border-bottom: 1px solid black;
 }
 
-summary svg { 
+summary svg {
   padding-right: 1em;
 }
 
-summary.noDetails { 
+summary.noDetails {
   list-style: none;
-  cursor:default;
+  cursor: default;
 }
 
-.annotationListItem { 
+.annotationListItem {
   border: 1px solid black;
   margin-bottom: .5em;
   margin-top: .5em;
 }
 
-.annotationListItemButtons { 
+.annotationListItemButtons {
   border-top: 1px solid black;
-  padding:.5em 1em;
-
+  padding: .5em 1em;
 }
 
 #listAnnotations #addWebAnnotation {
   border: 1px solid black;
   border-radius: 5px;
-  padding:.2em;
+  padding: .2em;
   margin-bottom: .5em;
-  cursor:pointer;
-
+  cursor: pointer;
 }
 
-.annotationListItemButtons svg, #listAnnotations svg { 
-  width:1em;
-  height:1em;
+.annotationListItemButtons svg, #listAnnotations svg {
+  width: 1em;
+  height: 1em;
 }
-
-
