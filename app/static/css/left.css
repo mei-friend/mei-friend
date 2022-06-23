@@ -48,3 +48,12 @@
 .annotationToolsDomainSelectionItem{
   flex-direction: row;
 }
+
+#listAnnotations { 
+  flex-direction: row;
+  overflow-x: scroll;
+}
+
+#addWebAnnotation {
+  width: 100px;
+}

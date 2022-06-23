@@ -36,7 +36,7 @@ export function refreshAnnotationsList() {
   }
   console.log("Annotations: ",annotations);
   // add web annotation button
-  const addWebAnnotation = document.createElement("div");
+  const addWebAnnotation = document.createElement("span");
   const rdfIcon = document.createElement("span");
   addWebAnnotation.textContent = "Load Web Annotation(s)";
   rdfIcon.id = "addWebAnnotationIcon";

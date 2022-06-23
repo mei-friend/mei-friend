@@ -58,6 +58,10 @@
   stroke-opacity: .7;
 }
 
+#listAnnotations { 
+  display:flex !important;
+}
+
 #listAnnotations details {
   padding: 10px;
   margin: 5px;
@@ -78,8 +82,10 @@ summary.noDetails {
 
 .annotationListItem {
   border: 1px solid black;
-  margin-bottom: .5em;
-  margin-top: .5em;
+  height: fit-content;
+  max-height: 220px; 
+  width: 220px;
+  margin: .5em;
 }
 
 .annotationListItemButtons {
@@ -87,15 +93,18 @@ summary.noDetails {
   padding: .5em 1em;
 }
 
-#listAnnotations #addWebAnnotation {
+#addWebAnnotation {
   border: 1px solid black;
   border-radius: 5px;
   padding: .2em;
-  margin-bottom: .5em;
+  margin: .5em;
   cursor: pointer;
+  height: fit-content;
+  padding: .5em 1em;
 }
 
 .annotationListItemButtons svg, #listAnnotations svg {
   width: 1em;
   height: 1em;
 }
+
