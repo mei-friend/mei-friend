@@ -1,5 +1,7 @@
 # mei-friend-online CHANGELOG.md
 
+### 0.3.13 patch: hotfix
+* Filter comment nodes in speed mode 
 ### 0.3.12 patch: Settings improvements
 * Address page processing bug with page/system beginnings inside apparatus element
 * Make font select appear in Verovio options
