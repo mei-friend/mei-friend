@@ -138,7 +138,7 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
       // console.info('digDeeper(' + pageNo + '): p: ' + p +
       //   ', i: ' + i + ', ', currentNode);
       let currentNodeName = currentNode.nodeName;
-      if (currentNode.nodeType === Node.TEXT_NODE) continue;
+      if (currentNode.nodeType === Node.TEXT_NODE || currentNode.nodeType === Node.COMMENT_NODE) continue;
       // ignore expansion lists
       if (['expansion'].includes(currentNodeName)) continue;
       // console.info('digDeeper currentNodeName: ', currentNodeName + ', '
