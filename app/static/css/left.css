@@ -4,12 +4,12 @@
   height: 100%;
 }
 
-.friendContainer {
+#friendContainer {
   display: flex;
   flex-direction: row;
 }
 
-.notation {
+#notation {
   /* Initially, the left takes 3/4 width */
   width: 50%;
   /* Misc */
@@ -24,7 +24,7 @@
   width: 8px;
 }
 
-.encoding {
+#encoding {
   /* Take the remaining width */
   flex: 1;
   /* Misc */
@@ -33,23 +33,23 @@
   justify-content: center;
 }
 
-#annotationToolsMenu { 
+#annotationToolsMenu {
   flex-direction: row;
 }
 
-#annotationToolsMenu li { 
+#annotationToolsMenu li {
   flex-direction: column;
 }
 
-.annotationToolsDomainSelection { 
+.annotationToolsDomainSelection {
   flex-direction: column;
 }
 
-.annotationToolsDomainSelectionItem{
+.annotationToolsDomainSelectionItem {
   flex-direction: row;
 }
 
-#listAnnotations { 
+#listAnnotations {
   flex-direction: row;
   overflow-x: scroll;
 }
