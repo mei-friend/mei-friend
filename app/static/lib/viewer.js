@@ -949,6 +949,21 @@ export default class Viewer {
         title: 'options-line', // class name of hr element
         type: 'line'
       },
+      /*   titleSourceImagePanel: {
+          title: 'Source image panel',
+          description: 'Show the score images of the source edition, if available',
+          type: 'header'
+        },
+        showSourceImagePanel: {
+          title: 'Source image panel',
+          decription: 'Show the score images of the source edition, if available',
+          type: 'bool',
+          default: false
+        },
+        sourceImagePanelSeparator: {
+          title: 'options-line', // class name of hr element
+          type: 'line'
+        }, */
       titleSupplied: {
         title: 'Handle <supplied> element',
         description: 'Control handling of <supplied> elements',

@@ -309,6 +309,7 @@ time with large files`;
   // Create container element for Source Edition Image
   let imagePanel = document.createElement('div');
   imagePanel.id = 'image-panel';
+  imagePanel.style.display = 'none';
   pixPanel.appendChild(imagePanel);
 
 } // createControlsMenu()

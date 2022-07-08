@@ -1,8 +1,12 @@
-let orientation = 'bottom';
+let orientation = 'bottom'; // position of notation
 let notationProportion = .5; // proportion notation div takes from container
 let resizerWidth = 8; // 8 px, Attention: hard-coded also in left.css, right.css, top.css, bottom.css
 
 let annotationPanelExtent = 250; // px, taken away from width of friendContainer
+
+// showSourceImagePanel
+let sourceImageLocation = 'bottomright'; // 'topleft' it will change according to orientation setting 
+let sourceImageProportion = .5;
 
 export function setOrientation(cm, o = '', v = null, storage = null) {
   if (o) orientation = o;
@@ -18,7 +22,7 @@ export function setOrientation(cm, o = '', v = null, storage = null) {
   let notation = document.getElementById("notation");
   console.log('setOrientation(' + o + ') container size:', sz);
   let showAnnotationPanelCheckbox = document.getElementById('showAnnotationPanel');
-  if (orientation == "top" || orientation == "bottom") {
+  if (orientation === "top" || orientation === "bottom") {
     if (showAnnotationPanelCheckbox && showAnnotationPanelCheckbox.checked) {
       sz.width -= annotationPanelExtent; // subtract width of annotation panel
       document.getElementById('annotationPanel').style.display = 'unset';
@@ -29,7 +33,7 @@ export function setOrientation(cm, o = '', v = null, storage = null) {
     notation.style.height = sz.height * notationProportion;
     cm.setSize(sz.width, sz.height * (1 - notationProportion) - resizerWidth);
   }
-  if (orientation == "left" || orientation == "right") {
+  if (orientation === "left" || orientation === "right") {
     if (showAnnotationPanelCheckbox && showAnnotationPanelCheckbox.checked) {
       sz.height -= annotationPanelExtent; // subtract width of annotation panel
       document.getElementById('annotationPanel').style.display = 'unset';
@@ -98,9 +102,9 @@ export function addResizerHandlers(v, cm) {
   const mouseDownHandler = function (e) {
     x = e.clientX;
     y = e.clientY;
-    if (orientation == "top" || orientation == "bottom")
+    if (orientation === "top" || orientation === "bottom")
       notationSize = notation.getBoundingClientRect().height;
-    if (orientation == "left" || orientation == "right")
+    if (orientation === "left" || orientation === "right")
       notationSize = notation.getBoundingClientRect().width;
     document.addEventListener('mousemove', mouseMoveHandler);
     document.addEventListener('mouseup', mouseUpHandler);
@@ -138,7 +142,7 @@ export function addResizerHandlers(v, cm) {
         cm.setSize(sz.width - (notationSize + dx), sz.height - szSz.width);
         break;
     }
-    const cursor = (orientation == "left" || orientation == "right") ?
+    const cursor = (orientation === "left" || orientation === "right") ?
       'col-resize' : 'row-resize';
     resizer.style.cursor = cursor;
     document.body.style.cursor = cursor;
