@@ -310,6 +310,9 @@ time with large files`;
   let imagePanel = document.createElement('div');
   imagePanel.id = 'image-panel';
   imagePanel.style.display = 'none';
+  let img = new Image(); 
+  img.src = `${root}img/00058.jpg`;
+  imagePanel.append(img);
   pixPanel.appendChild(imagePanel);
 
 } // createControlsMenu()

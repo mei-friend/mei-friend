@@ -19,7 +19,11 @@ export function setOrientation(cm, o = '', v = null, storage = null) {
   // v.updateLayout();
   // }).attr('href', root + '/css/' + orientation + '.css');
   let sz = calcSizeOfContainer();
-  let notation = document.getElementById("notation");
+  let notationPane = document.getElementById('notation');
+  let imagePane = document.getElementById('image-panel');
+  let verovioPane = document.getElementById('verovio-panel');
+  let pixContainer = document.getElementById('pix-container');
+  let showSourceImage = document.getElementById('showSourceImagePanel').checked;
   console.log('setOrientation(' + o + ') container size:', sz);
   let showAnnotationPanelCheckbox = document.getElementById('showAnnotationPanel');
   if (orientation === "top" || orientation === "bottom") {
@@ -29,9 +33,22 @@ export function setOrientation(cm, o = '', v = null, storage = null) {
     } else {
       document.getElementById('annotationPanel').style.display = 'none';
     }
-    notation.style.width = sz.width; //- 6; // TODO: remove when border removed
-    notation.style.height = sz.height * notationProportion;
+    notationPane.style.width = sz.width; //- 6; // TODO: remove when border removed
+    notationPane.style.height = sz.height * notationProportion;
     cm.setSize(sz.width, sz.height * (1 - notationProportion) - resizerWidth);
+    // pixContainer.style.flexDirection = 'column';
+    // if (showSourceImage) {
+    //   imagePane.style.display = 'block';
+    //   //imagePane.style.height = sz.height * (1 - notationProportion) - parseFloat(notationPane.style.height);
+    //   imagePane.style.height = '50%';
+    //   verovioPane.style.height = '50%';
+    // } else {
+    //   imagePane.style.display = 'none';
+    //   imagePane.style.height = 0;
+    //   verovioPane.style.height = '100%';
+    // }
+    // imagePane.style.width = sz.width;
+    // verovioPane.style.width = sz.width;
   }
   if (orientation === "left" || orientation === "right") {
     if (showAnnotationPanelCheckbox && showAnnotationPanelCheckbox.checked) {
@@ -40,13 +57,26 @@ export function setOrientation(cm, o = '', v = null, storage = null) {
     } else {
       document.getElementById('annotationPanel').style.display = 'none';
     }
-    notation.style.width = sz.width * notationProportion;
-    notation.style.height = sz.height; //- 6; TODO: remove when border removed
+    notationPane.style.width = sz.width * notationProportion;
+    notationPane.style.height = sz.height; //- 6; TODO: remove when border removed
     cm.setSize(sz.width * (1 - notationProportion), sz.height);
+    // pixContainer.style.flexDirection = 'row';
+    // if (showSourceImage) {
+    //   imagePane.style.display = 'block';
+    //   //imagePane.style.height = sz.height * (1 - notationProportion) - parseFloat(notationPane.style.height);
+    //   imagePane.style.width = '50%';
+    //   verovioPane.style.width = '50%';
+    // } else {
+    //   imagePane.style.display = 'none';
+    //   imagePane.style.width = 0;
+    //   verovioPane.style.width = '100%';
+    // }
+    // imagePane.style.height = sz.height;
+    // verovioPane.style.height = sz.height;
   }
   friendSz.style.width = sz.width;
   friendSz.style.height = sz.height;
-  // console.info('Notation size: ' + notation.style.width + '/' + notation.style.height);
+  // console.info('Notation size: ' + notationPane.style.width + '/' + notationPane.style.height);
   // redoLayout when done with loading TODO
   if (v) {
     if (v.speedMode &&
@@ -66,8 +96,7 @@ export function getOrientation() {
 
 export function calcSizeOfContainer() {
   let bodySz = document.querySelector('body').getBoundingClientRect();
-  let friendSz = document.getElementById("friendContainer")
-    .getBoundingClientRect();
+  let friendSz = document.getElementById("friendContainer").getBoundingClientRect();
   let headerSz = document.querySelector('.header').getBoundingClientRect();
   //let sizerSz = document.querySelector('.resizer').getBoundingClientRect();
   let footerSz = document.querySelector('.footer').getBoundingClientRect();
@@ -120,26 +149,26 @@ export function addResizerHandlers(v, cm) {
       ', Container: ' + sz.width + '/' + sz.height);
     switch (orientation) {
       case 'top':
-        notation.style.height = (notationSize + dy);
+        notation.style.height = (notationSize + dy) + szSz.height;
         notationProportion = (notationSize + dy) / sz.height;
         cm.setSize(sz.width, sz.height - (notationSize + dy) - szSz.height);
         break;
       case 'bottom':
-        notation.style.height = (notationSize - dy);
+        notation.style.height = (notationSize - dy) + szSz.height;
         console.log('notation height: ' + notation.style.height);
         notationProportion = (notationSize - dy) / sz.height;
         cm.setSize(sz.width, sz.height - (notationSize - dy) - szSz.height);
         break;
       case 'right':
-        notation.style.width = (notationSize - dx);
+        notation.style.width = (notationSize - dx) + resizerWidth;
         notationProportion = (notationSize - dx) / sz.width;
-        cm.setSize(sz.width - (notationSize - dx), sz.height - szSz.width);
+        cm.setSize(sz.width - (notationSize - dx) - resizerWidth, sz.height - szSz.width);
         break;
       case 'left':
       default:
-        notation.style.width = (notationSize + dx);
+        notation.style.width = (notationSize + dx) + resizerWidth;
         notationProportion = (notationSize + dx) / sz.width;
-        cm.setSize(sz.width - (notationSize + dx), sz.height - szSz.width);
+        cm.setSize(sz.width - (notationSize + dx) - resizerWidth, sz.height - szSz.width);
         break;
     }
     const cursor = (orientation === "left" || orientation === "right") ?
