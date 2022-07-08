@@ -738,10 +738,10 @@ export default class Viewer {
     vsp.innerHTML += '<input type="button" title="Reset to mei-friend defaults" id="vrvReset" class="resetButton" value="Default" />';
     if (addListeners) { // add change listeners
       vsp.addEventListener('input', ev => {
-        let opt = ev.srcElement.id;
-        let value = ev.srcElement.value;
-        if (ev.srcElement.type === 'checkbox') value = ev.srcElement.checked;
-        if (ev.srcElement.type === 'number') value = parseFloat(value);
+        let opt = ev.target.id;
+        let value = ev.target.value;
+        if (ev.target.type === 'checkbox') value = ev.target.checked;
+        if (ev.target.type === 'number') value = parseFloat(value);
         this.vrvOptions[opt] = value;
         if (defaultVrvOptions.hasOwnProperty(opt) && // TODO check vrv default values
           defaultVrvOptions[opt].toString() === value.toString())
@@ -752,7 +752,7 @@ export default class Viewer {
         this.updateLayout(this.vrvOptions);
       });
       vsp.addEventListener('click', ev => { // RESET button
-        if (ev.srcElement.id === 'vrvReset') {
+        if (ev.target.id === 'vrvReset') {
           this.addVrvOptionsToSettingsPanel(tkAvailableOptions, defaultVrvOptions, false);
           this.updateLayout(this.vrvOptions);
         }
@@ -891,10 +891,10 @@ export default class Viewer {
 
     if (addListeners) { // add change listeners
       cmsp.addEventListener('input', ev => {
-        let option = ev.srcElement.id;
-        let value = ev.srcElement.value;
-        if (ev.srcElement.type === 'checkbox') value = ev.srcElement.checked;
-        if (ev.srcElement.type === 'number') value = parseFloat(value);
+        let option = ev.target.id;
+        let value = ev.target.value;
+        if (ev.target.type === 'checkbox') value = ev.target.checked;
+        if (ev.target.type === 'number') value = parseFloat(value);
         this.applyEditorOption(cm, option, value,
           storage.hasOwnProperty('cm-matchTheme') ?
           storage['cm-matchTheme'] : mfDefaults['matchTheme']);
@@ -912,7 +912,7 @@ export default class Viewer {
         }
       });
       cmsp.addEventListener('click', ev => {
-        if (ev.srcElement.id === 'cmReset') {
+        if (ev.target.id === 'cmReset') {
           this.addCmOptionsToSettingsPanel(cm, mfDefaults, false);
         }
       });
@@ -949,21 +949,28 @@ export default class Viewer {
         title: 'options-line', // class name of hr element
         type: 'line'
       },
-      /*   titleSourceImagePanel: {
-          title: 'Source image panel',
-          description: 'Show the score images of the source edition, if available',
-          type: 'header'
-        },
-        showSourceImagePanel: {
-          title: 'Source image panel',
-          decription: 'Show the score images of the source edition, if available',
-          type: 'bool',
-          default: false
-        },
-        sourceImagePanelSeparator: {
-          title: 'options-line', // class name of hr element
-          type: 'line'
-        }, */
+      titleSourceImagePanel: {
+        title: 'Source image panel',
+        description: 'Show the score images of the source edition, if available',
+        type: 'header'
+      },
+      showSourceImagePanel: {
+        title: 'Source image panel',
+        decription: 'Show the score images of the source edition, if available',
+        type: 'bool',
+        default: false
+      },
+      selectSourceImagePosition: {
+        title: 'Source image position',
+        description: 'Select source image position relative to notation',
+        type: 'select',
+        values: ['left', 'right', 'top', 'bottom'],
+        default: 'bottom'
+      },
+      sourceImagePanelSeparator: {
+        title: 'options-line', // class name of hr element
+        type: 'line'
+      },
       titleSupplied: {
         title: 'Handle <supplied> element',
         description: 'Control handling of <supplied> elements',
@@ -1133,14 +1140,18 @@ export default class Viewer {
 
     if (addListeners) { // add change listeners
       mfs.addEventListener('input', ev => {
-        let option = ev.srcElement.id;
-        let value = ev.srcElement.value;
-        if (ev.srcElement.type === 'checkbox') value = ev.srcElement.checked;
-        if (ev.srcElement.type === 'number') value = parseFloat(value);
+        let option = ev.target.id;
+        let value = ev.target.value;
+        if (ev.target.type === 'checkbox') value = ev.target.checked;
+        if (ev.target.type === 'number') value = parseFloat(value);
         let col = document.getElementById('suppliedColor').value;
         switch (option) {
           case 'showAnnotationPanel':
             this.toggleAnnotationPanel();
+            break;
+          case 'showSourceImagePanel':
+          case 'selectSourceImagePosition':
+            setOrientation(cm, '', this);
             break;
           case 'showSupplied':
             rt.style.setProperty('--suppliedColor', (value) ? col : 'var(--notationColor)');
@@ -1177,7 +1188,7 @@ export default class Viewer {
         }
       });
       mfs.addEventListener('click', ev => {
-        if (ev.srcElement.id === 'mfReset') {
+        if (ev.target.id === 'mfReset') {
           this.addMeiFriendOptionsToSettingsPanel(false);
         }
       });

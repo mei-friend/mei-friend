@@ -289,6 +289,11 @@ a:active {
   height: 100%;
   width: 100%;
   overflow: inherit;
+  display: flex;
+}
+
+#image-panel {
+  overflow: auto;
 }
 
 /* #encoding {} */

@@ -4,10 +4,6 @@ let resizerWidth = 8; // 8 px, Attention: hard-coded also in left.css, right.css
 
 let annotationPanelExtent = 250; // px, taken away from width of friendContainer
 
-// showSourceImagePanel
-let sourceImageLocation = 'bottomright'; // 'topleft' it will change according to orientation setting 
-let sourceImageProportion = .5;
-
 export function setOrientation(cm, o = '', v = null, storage = null) {
   if (o) orientation = o;
   if (storage && storage.supported) storage.orientation = orientation;
@@ -24,6 +20,7 @@ export function setOrientation(cm, o = '', v = null, storage = null) {
   let verovioPane = document.getElementById('verovio-panel');
   let pixContainer = document.getElementById('pix-container');
   let showSourceImage = document.getElementById('showSourceImagePanel').checked;
+  let controlMenu = document.getElementById('verovio-controls-form');
   console.log('setOrientation(' + o + ') container size:', sz);
   let showAnnotationPanelCheckbox = document.getElementById('showAnnotationPanel');
   if (orientation === "top" || orientation === "bottom") {
@@ -36,19 +33,6 @@ export function setOrientation(cm, o = '', v = null, storage = null) {
     notationPane.style.width = sz.width; //- 6; // TODO: remove when border removed
     notationPane.style.height = sz.height * notationProportion;
     cm.setSize(sz.width, sz.height * (1 - notationProportion) - resizerWidth);
-    // pixContainer.style.flexDirection = 'column';
-    // if (showSourceImage) {
-    //   imagePane.style.display = 'block';
-    //   //imagePane.style.height = sz.height * (1 - notationProportion) - parseFloat(notationPane.style.height);
-    //   imagePane.style.height = '50%';
-    //   verovioPane.style.height = '50%';
-    // } else {
-    //   imagePane.style.display = 'none';
-    //   imagePane.style.height = 0;
-    //   verovioPane.style.height = '100%';
-    // }
-    // imagePane.style.width = sz.width;
-    // verovioPane.style.width = sz.width;
   }
   if (orientation === "left" || orientation === "right") {
     if (showAnnotationPanelCheckbox && showAnnotationPanelCheckbox.checked) {
@@ -57,25 +41,58 @@ export function setOrientation(cm, o = '', v = null, storage = null) {
     } else {
       document.getElementById('annotationPanel').style.display = 'none';
     }
-    notationPane.style.width = sz.width * notationProportion;
+    notationPane.style.width = Math.ceil(sz.width * notationProportion);
     notationPane.style.height = sz.height; //- 6; TODO: remove when border removed
-    cm.setSize(sz.width * (1 - notationProportion), sz.height);
-    // pixContainer.style.flexDirection = 'row';
-    // if (showSourceImage) {
-    //   imagePane.style.display = 'block';
-    //   //imagePane.style.height = sz.height * (1 - notationProportion) - parseFloat(notationPane.style.height);
-    //   imagePane.style.width = '50%';
-    //   verovioPane.style.width = '50%';
-    // } else {
-    //   imagePane.style.display = 'none';
-    //   imagePane.style.width = 0;
-    //   verovioPane.style.width = '100%';
-    // }
-    // imagePane.style.height = sz.height;
-    // verovioPane.style.height = sz.height;
+    cm.setSize(Math.floor(sz.width * (1 - notationProportion) - resizerWidth), sz.height);
   }
   friendSz.style.width = sz.width;
   friendSz.style.height = sz.height;
+  let sourceImagePosition = document.getElementById('selectSourceImagePosition').value;
+  switch (sourceImagePosition) {
+    case 'top':
+      pixContainer.style.flexDirection = 'column-reverse';
+      break;
+    case 'bottom':
+      pixContainer.style.flexDirection = 'column';
+      break;
+    case 'left':
+      pixContainer.style.flexDirection = 'row-reverse';
+      break;
+    case 'right':
+      pixContainer.style.flexDirection = 'row';
+      break
+  }
+  switch (sourceImagePosition) {
+    case 'top':
+    case 'bottom':
+      if (showSourceImage) {
+        imagePane.style.display = 'block';
+        imagePane.style.height = '50%';
+        verovioPane.style.height = '50%';
+      } else {
+        imagePane.style.display = 'none';
+        imagePane.style.height = 0;
+        verovioPane.style.height = '100%';
+      }
+      imagePane.style.width = notationPane.style.width;
+      verovioPane.style.width = notationPane.style.width;
+      break;
+    case 'left':
+    case 'right':
+      if (showSourceImage) {
+        imagePane.style.display = 'block';
+        imagePane.style.width = '50%';
+        verovioPane.style.width = '50%';
+      } else {
+        imagePane.style.display = 'none';
+        imagePane.style.width = 0;
+        verovioPane.style.width = '100%';
+      }
+      imagePane.style.height = parseFloat(notationPane.style.height) - controlMenu.getBoundingClientRect().height;
+      verovioPane.style.height = parseFloat(notationPane.style.height) - controlMenu.getBoundingClientRect().height;
+      break;
+  }
+
   // console.info('Notation size: ' + notationPane.style.width + '/' + notationPane.style.height);
   // redoLayout when done with loading TODO
   if (v) {
@@ -191,13 +208,7 @@ export function addResizerHandlers(v, cm) {
     document.removeEventListener('mousemove', mouseMoveHandler);
     document.removeEventListener('mouseup', mouseUpHandler);
     if (v) {
-      if (v.speedMode &&
-        document.getElementById('breaks-select').value == 'auto') {
-        v.pageBreaks = {};
-        v.updateAll(cm);
-      } else {
-        v.updateLayout();
-      }
+      setOrientation(cm, '', v);
     }
   }
 
