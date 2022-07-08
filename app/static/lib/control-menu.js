@@ -296,18 +296,20 @@ time with large files`;
   speedCheckbox.disabled = false;
   speedDiv.appendChild(speedCheckbox);
 
-
-  // container for on-the-fly changes to CSS styles (to change highlight color)
-  let customStyle = document.createElement('style');
-  customStyle.type = 'text/css';
-  customStyle.id = 'customStyle';
-  document.querySelector('head').appendChild(customStyle);
+  // Create container element for pixel content (svg and jpg)
+  let pixPanel = document.createElement('div');
+  pixPanel.id = 'pix-container';
+  parentElement.appendChild(pixPanel);
 
   // Create container element for Verovio SVG
   let verovioPanel = document.createElement('div');
-  verovioPanel.classList.add('verovio-panel');
-  // verovioPanel.classList.add('hidden');
-  parentElement.appendChild(verovioPanel);
+  verovioPanel.id = 'verovio-panel';
+  pixPanel.appendChild(verovioPanel);
+
+  // Create container element for Source Edition Image
+  let imagePanel = document.createElement('div');
+  imagePanel.id = 'image-panel';
+  pixPanel.appendChild(imagePanel);
 
 } // createControlsMenu()
 

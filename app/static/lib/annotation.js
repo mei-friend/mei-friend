@@ -247,7 +247,7 @@ export function refreshAnnotations() {
   const rac = document.getElementById("renderedAnnotationsContainer");
   rac.innerHTML = "";
   // reset annotations-containing svg
-  const scoreSvg = document.querySelector(".verovio-panel svg");
+  const scoreSvg = document.getElementById("verovio-panel svg");
   if (!scoreSvg) return;
   const annoSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   annoSvg.setAttribute("width", scoreSvg.getAttribute("width"))

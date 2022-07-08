@@ -1,6 +1,6 @@
 let orientation = 'bottom';
 let notationProportion = .5; // proportion notation div takes from container
-let resizerWidth = 8; // 8 px, attention hard-coded also in 4 css files
+let resizerWidth = 8; // 8 px, Attention: hard-coded also in left.css, right.css, top.css, bottom.css
 
 let annotationPanelExtent = 250; // px, taken away from width of friendContainer
 
@@ -46,7 +46,7 @@ export function setOrientation(cm, o = '', v = null, storage = null) {
   // redoLayout when done with loading TODO
   if (v) {
     if (v.speedMode &&
-      document.getElementById('breaks-select').value == 'auto') {
+      document.getElementById('breaks-select').value === 'auto') {
       v.pageBreaks = {};
       v.pageSpanners = {};
       setTimeout(() => v.updateAll(cm), 33);
@@ -67,11 +67,9 @@ export function calcSizeOfContainer() {
   let headerSz = document.querySelector('.header').getBoundingClientRect();
   //let sizerSz = document.querySelector('.resizer').getBoundingClientRect();
   let footerSz = document.querySelector('.footer').getBoundingClientRect();
-  friendSz.height = bodySz.height - headerSz.height - footerSz.height -
-    resizerWidth;
+  friendSz.height = bodySz.height - headerSz.height - footerSz.height - resizerWidth;
   friendSz.width = bodySz.width - resizerWidth + 2; // TODO: hack for missing 2-px-width (21 April 2022)
-  console.log('calcSizeOfContainer(' + orientation +
-    ') bodySz, header, sizer, footer: ' +
+  console.log('calcSizeOfContainer(' + orientation + ') bodySz, header, sizer, footer: ' +
     Math.round(bodySz.width) + '/' + Math.round(bodySz.height) + ', ' +
     Math.round(headerSz.width) + '/' + Math.round(headerSz.height) + ', ' +
     Math.round(footerSz.width) + '/' + Math.round(footerSz.height) + ', ' +
@@ -97,7 +95,7 @@ export function addResizerHandlers(v, cm) {
   let y = 0;
   let notationSize = 0;
 
-  const mouseDownHandler = function(e) {
+  const mouseDownHandler = function (e) {
     x = e.clientX;
     y = e.clientY;
     if (orientation == "top" || orientation == "bottom")
@@ -109,7 +107,7 @@ export function addResizerHandlers(v, cm) {
     // console.log("Mouse down x/y: " + x + "/" + y + ', ' + notationSize);
   };
 
-  const mouseMoveHandler = function(e) {
+  const mouseMoveHandler = function (e) {
     const dx = e.clientX - x;
     const dy = e.clientY - y;
     let sz = resizer.parentNode.getBoundingClientRect();
@@ -150,7 +148,7 @@ export function addResizerHandlers(v, cm) {
     encoding.style.pointerEvents = 'none';
   };
 
-  const mouseUpHandler = function() {
+  const mouseUpHandler = function () {
     resizer.style.removeProperty('cursor');
     document.body.style.removeProperty('cursor');
     notation.style.removeProperty('user-select');

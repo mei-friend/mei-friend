@@ -142,7 +142,7 @@ export default class Viewer {
     if (this.speedMode) {
       pageNumber = speed.getPageWithElement(this.xmlDoc, this.breaksValue(), xmlId);
     } else {
-      let promise = new Promise(function(resolve) {
+      let promise = new Promise(function (resolve) {
         const msg = {
           'cmd': 'getPageWithElement',
           'msg': xmlId
@@ -155,7 +155,7 @@ export default class Viewer {
         });
         this.vrvWorker.postMessage(msg);
       });
-      promise.then(function(p) {
+      promise.then(function (p) {
         pageNumber = p;
       });
     }
@@ -292,7 +292,7 @@ export default class Viewer {
     let bs = document.getElementById('breaks-select');
     if (bs) this.vrvOptions.breaks = bs.value;
     let dimensions = getVerovioContainerSize();
-    let vp = document.querySelector('.verovio-panel');
+    let vp = document.getElementById('verovio-panel');
     dimensions.width = vp.clientWidth;
     dimensions.height = vp.clientHeight;
     // console.info('client size: ' + dimensions.width + '/' + dimensions.height);
@@ -305,18 +305,6 @@ export default class Viewer {
     // overwrite existing options if new ones are passed in
     // for (let key in newOptions) { this.vrvOptions[key] = newOptions[key]; }
     console.info('Verovio options updated: ', this.vrvOptions);
-  }
-
-  changeHighlightColor(color) {
-    document.getElementById('customStyle').innerHTML =
-      `.mei-friend .verovio-panel g.highlighted,
-      .mei-friend .verovio-panel g.highlighted,
-      .mei-friend .verovio-panel g.highlighted,
-      .mei-friend .verovio-panel g.highlighted * {
-        fill: ${color};
-        color: ${color};
-        stroke: ${color};
-    }`;
   }
 
   // accepts number or string (first, last, forwards, backwards)
@@ -469,7 +457,7 @@ export default class Viewer {
   }
 
   scrollSvg(cm) {
-    let vp = document.querySelector('.verovio-panel');
+    let vp = document.getElementById('verovio-panel');
     let el = document.querySelector('g#' + utils.getElementIdAtCursor(cm));
     if (el) {
       let vpRect = vp.getBoundingClientRect();
@@ -659,7 +647,7 @@ export default class Viewer {
 
   // set focus to verovioPane in order to ensure working key bindings
   setFocusToVerovioPane() {
-    let el = document.querySelector('.verovio-panel');
+    let el = document.getElementById('verovio-panel');
     el.setAttribute('tabindex', '-1');
     el.focus();
     // $(".mei-friend").attr('tabindex', '-1').focus();
@@ -1359,7 +1347,7 @@ export default class Viewer {
       if (incElName == 'layer') {
         // console.info('navigate(u/d): x/y: ' + x + '/' + y + ', el: ', element);
         let els = Array.from(measure.querySelectorAll(dutils.navElsSelector));
-        els.sort(function(a, b) {
+        els.sort(function (a, b) {
           if (Math.abs(dutils.getX(a) - x) > Math.abs(dutils.getX(b) - x))
             return 1;
           if (Math.abs(dutils.getX(a) - x) < Math.abs(dutils.getX(b) - x))
@@ -1422,7 +1410,7 @@ export default class Viewer {
   }
 
   getTimeForElement(id) {
-    let promise = new Promise(function(resolve) {
+    let promise = new Promise(function (resolve) {
       let message = {
         'cmd': 'getTimeForElement',
         'msg': id
@@ -1436,7 +1424,7 @@ export default class Viewer {
       v.vrvWorker.postMessage(message);
     }); // .bind(this) ??
     promise.then(
-      function(time) {
+      function (time) {
         return time;
       }
     );

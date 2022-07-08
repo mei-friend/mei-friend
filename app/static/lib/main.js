@@ -612,7 +612,7 @@ function vrvWorkerEventsHandler(ev) {
         updateStatusBar();
         document.querySelector('title').innerHTML = 'mei-friend: ' +
           meiFileName.substr(meiFileName.lastIndexOf("/") + 1);
-        document.querySelector('.verovio-panel').innerHTML = ev.data.svg;
+        document.getElementById('verovio-panel').innerHTML = ev.data.svg;
         if (ev.data.setCursorToPageBeginning) v.setCursorToPageBeginning(cm);
         v.updatePageNumDisplay();
         v.addNotationEventListeners(cm);
@@ -627,7 +627,7 @@ function vrvWorkerEventsHandler(ev) {
       break;
     case 'navigatePage': // resolve navigation with page turning
       updateStatusBar();
-      document.querySelector('.verovio-panel').innerHTML = ev.data.svg;
+      document.getElementById('verovio-panel').innerHTML = ev.data.svg;
       let ms = document.querySelectorAll('.measure'); // find measures on page
       if (ms.length > 0) {
         let m = ms[0];
@@ -681,7 +681,7 @@ function vrvWorkerEventsHandler(ev) {
       setProgressBar(ev.data.percentage);
       break;
     case 'error':
-      document.querySelector('.verovio-panel').innerHTML =
+      document.getElementById('verovio-panel').innerHTML =
         "<h3>Invalid MEI in " + meiFileName +
         " (" + ev.data.msg + ")</h3>";
       v.busy(false);
@@ -889,7 +889,7 @@ function downloadMidi() {
 }
 
 function downloadSvg() {
-  let svg = document.querySelector('.verovio-panel').innerHTML;
+  let svg = document.getElementById('verovio-panel').innerHTML;
   let blob = new Blob([svg], {
     type: 'image/svg+xml'
   });
@@ -1053,7 +1053,7 @@ let cmd = {
 
 // add event listeners when controls menu has been instantiated
 function addEventListeners(v, cm) {
-  let vp = document.querySelector('.verovio-panel');
+  let vp = document.getElementById('verovio-panel');
 
   // layout notation position
   document.getElementById('top').addEventListener('click', cmd.notationTop);
@@ -1358,7 +1358,7 @@ export function log(s, code = null) {
   }
   s += "</div>"
   document.querySelector(".statusbar").innerHTML = s;
-  document.querySelector(".verovio-panel").innerHTML = s;
+  document.getElementById("verovio-panel").innerHTML = s;
   console.log(s);
 }
 
