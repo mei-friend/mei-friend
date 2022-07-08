@@ -171,7 +171,8 @@ a:active {
   z-index: 190;
 }
 
-.openUrlOverlay a, .forkRepositoryOverlay a {
+.openUrlOverlay a,
+.forkRepositoryOverlay a {
   color: var(--overlayLinkColor);
 }
 
@@ -268,13 +269,13 @@ a:active {
   background-color: mistyrose;
 }
 
-.friendContainer {
+#friendContainer {
   border: 3px solid var(--dropdownHeadingColor);
   border-radius: 4px;
   width: 100%;
 }
 
-.notation {
+#notation {
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -284,7 +285,7 @@ a:active {
   background-color: var(--dropdownHeadingColor);
 }
 
-.encoding {}
+/* #encoding {} */
 
 #annotationPanel {
   height: 100%;
@@ -297,13 +298,15 @@ a:active {
   overflow: hidden;
 }
 
-#annotationPanel .tab, #annotationPanel .tablink {
+#annotationPanel .tab,
+#annotationPanel .tablink {
   background-color: var(--annotationPanelLinkBackgroundColor);
   color: var(--annotationPanelTextColor);
   border: unset;
 }
 
-#annotationPanel .tablink.active, #annotationPanel .tabcontent {
+#annotationPanel .tablink.active,
+#annotationPanel .tabcontent {
   background-color: var(--annotationPanelBackgroundColor);
   color: var(--annotationPanelTextColor);
   border: unset;
@@ -442,11 +445,11 @@ a:active {
   vertical-align: middle;
 }
 
-.input-range {
-  /* height: 4px; */
-  /* border-radius: 3px; */
-  /* background-color: var(--backgroundColor); */
-}
+/* .input-range {
+   height: 4px;
+   border-radius: 3px;
+   background-color: var(--backgroundColor);
+} */
 
 .checkbox {
   margin-right: 4px;
@@ -597,7 +600,8 @@ svg text {
   height: 20px;
 }
 
-.icon[disabled], .disabled {
+.icon[disabled],
+.disabled {
   opacity: 30%;
 }
 
@@ -676,7 +680,8 @@ span.keyIcon {
   position: absolute;
   top: 4px;
   min-width: 360px;
-  height: calc(100% - 20px);;
+  height: calc(100% - 20px);
+  ;
   z-index: 15;
   display: none;
 }
@@ -756,7 +761,9 @@ span.keyIcon {
 }
 
 /* Change background color of buttons on hover */
-.tablink:hover, .topright:hover, .tabstart:hover {
+.tablink:hover,
+.topright:hover,
+.tabstart:hover {
   color: var(--textColor);
   background-color: var(--settingsLinkHoverColor);
   border-color: var(--settingsLinkHoverColor);
@@ -830,7 +837,8 @@ span.keyIcon {
   max-width: 220px;
 }
 
-#editorSettings .optionsItem select, #meiFriendSettings .optionsItem select {
+#editorSettings .optionsItem select,
+#meiFriendSettings .optionsItem select {
   min-width: 80px;
   max-width: 150px;
 }
@@ -857,7 +865,8 @@ span.keyIcon {
   max-width: 85px;
 }
 
-.optionsItem input, select {
+.optionsItem input,
+select {
   padding-top: 0px;
   padding-bottom: 0px;
   text-align: right;
@@ -878,7 +887,8 @@ span.keyIcon {
   border-radius: 4px;
 }
 
-input, select {
+input,
+select {
   background-color: var(--backgroundColor);
   color: var(--textColor);
 }

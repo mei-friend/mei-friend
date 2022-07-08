@@ -7,7 +7,7 @@ let annotationPanelExtent = 250; // px, taken away from width of friendContainer
 export function setOrientation(cm, o = '', v = null, storage = null) {
   if (o) orientation = o;
   if (storage && storage.supported) storage.orientation = orientation;
-  let friendSz = document.querySelector(".friendContainer");
+  let friendSz = document.getElementById("friendContainer");
   var stylesheet = document.getElementById("orientationCSS");
   stylesheet.setAttribute('href', root + 'css/' + orientation + '.css');
   // TODO: find a better solution for changing css and awaiting changes
@@ -15,7 +15,7 @@ export function setOrientation(cm, o = '', v = null, storage = null) {
   // v.updateLayout();
   // }).attr('href', root + '/css/' + orientation + '.css');
   let sz = calcSizeOfContainer();
-  let notation = document.querySelector(".notation");
+  let notation = document.getElementById("notation");
   console.log('setOrientation(' + o + ') container size:', sz);
   let showAnnotationPanelCheckbox = document.getElementById('showAnnotationPanel');
   if (orientation == "top" || orientation == "bottom") {
@@ -62,7 +62,7 @@ export function getOrientation() {
 
 export function calcSizeOfContainer() {
   let bodySz = document.querySelector('body').getBoundingClientRect();
-  let friendSz = document.querySelector(".friendContainer")
+  let friendSz = document.getElementById("friendContainer")
     .getBoundingClientRect();
   let headerSz = document.querySelector('.header').getBoundingClientRect();
   //let sizerSz = document.querySelector('.resizer').getBoundingClientRect();
@@ -80,7 +80,7 @@ export function calcSizeOfContainer() {
 }
 
 export function getVerovioContainerSize() {
-  let v = document.querySelector('.notation');
+  let v = document.getElementById('notation');
   let c = document.getElementById('verovio-controls-form');
   if (!c || !v) return false;
   let vbox = v.getBoundingClientRect();

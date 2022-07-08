@@ -321,7 +321,7 @@ document.addEventListener('DOMContentLoaded', function() {
   let speedParam = searchParams.get('speed');
   breaksParam = searchParams.get('breaks');
 
-  createControlsMenu(document.querySelector('.notation'), defaultVerovioOptions.scale);
+  createControlsMenu(document.getElementById('notation'), defaultVerovioOptions.scale);
   addModifyerKeys(document); //
 
   console.log('DOMContentLoaded. Trying now to load Verovio...');
@@ -1269,7 +1269,7 @@ function addEventListeners(v, cm) {
   })
 
   // Editor font size zooming
-  document.querySelector('.encoding').addEventListener('wheel', ev => {
+  document.getElementById('encoding').addEventListener('wheel', ev => {
     if ((navigator.platform.toLowerCase().startsWith('mac') && ev.metaKey) ||
       !navigator.platform.toLowerCase().startsWith('mac') && ev.ctrlKey) {
       ev.preventDefault();
@@ -1277,7 +1277,7 @@ function addEventListeners(v, cm) {
       v.changeEditorFontSize(Math.sign(ev.deltaY) * -5);
     }
   });
-  document.querySelector('.encoding').addEventListener('keydown', ev => {
+  document.getElementById('encoding').addEventListener('keydown', ev => {
     if ((navigator.platform.toLowerCase().startsWith('mac') && ev.metaKey) ||
       !navigator.platform.toLowerCase().startsWith('mac') && ev.ctrlKey) {
       if (ev.key === '-') {
@@ -1390,7 +1390,7 @@ function fillInSampleEncodings() {
 // sets keyMap.json to target element and defines listeners
 function setKeyMap(keyMapFilePath) {
   let os = navigator.platform;
-  let vp = document.querySelector('.notation');
+  let vp = document.getElementById('notation');
   if (os.startsWith('Mac')) vp.classList.add('platform-darwin');
   if (os.startsWith('Win')) vp.classList.add('platform-win32');
   if (os.startsWith('Linux')) vp.classList.add('platform-linux');

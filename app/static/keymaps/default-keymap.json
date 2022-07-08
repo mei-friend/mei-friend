@@ -1,5 +1,5 @@
 {
-  ".notation": {
+  "#notation": {
     "x": "invertPlacement",
     "ctrl-x": "betweenPlacement",
     "v": "addVerticalGroup",

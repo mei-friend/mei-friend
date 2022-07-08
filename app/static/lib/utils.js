@@ -122,7 +122,7 @@ export function setCursorToId(cm, id) {
   if (c.findNext()) {
     cm.setCursor(c.from());
     // console.info('setCursorToId cursor: ', c.from());
-    let enc = document.querySelector('.encoding');
+    let enc = document.getElementById('encoding');
     // cm.execCommand('goLineStartSmart');
     goTagStart(cm);
     if (enc) cm.scrollIntoView(null, Math.round(enc.clientHeight / 2));

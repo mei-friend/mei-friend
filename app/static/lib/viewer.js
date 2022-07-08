@@ -653,7 +653,7 @@ export default class Viewer {
     let value = delta;
     if (delta < 30) value = parseInt(zf.value) + delta;
     value = Math.min(300, Math.max(45, value)); // 45---300, see #zoomFont
-    document.querySelector('.encoding').style.fontSize = value + '%';
+    document.getElementById('encoding').style.fontSize = value + '%';
     zf.value = value;
   }
 
