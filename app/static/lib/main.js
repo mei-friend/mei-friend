@@ -26,6 +26,7 @@ export let meiFileLocation = '';
 export let meiFileLocationPrintable = '';
 export let isMEI; // is the currently edited file native MEI?
 export let fileChanged = false; // flag to track whether unsaved changes to file exist
+export let facs = {}; // facsimile structure in MEI file
 
 export const sampleEncodings = [];
 export const samp = {
@@ -74,7 +75,8 @@ import {
 import {
   getInMeasure,
   navElsSelector,
-  getElementAtCursor
+  getElementAtCursor,
+  loadFacsimile
 } from './dom-utils.js';
 import {
   addDragSelector
@@ -112,7 +114,7 @@ const defaultVerovioOptions = {
   minLastJustification: 0,
   clefChangeFactor: .83,
   svgAdditionalAttribute: ["layer@n", "staff@n",
-    "dir@vgrp", "dynam@vgrp", "hairpin@vgrp", "pedal@vgrp"
+    "dir@vgrp", "dynam@vgrp", "hairpin@vgrp", "pedal@vgrp", "measure@facs"
   ],
   bottomMarginArtic: 1.2,
   topMarginArtic: 1.2
@@ -218,6 +220,7 @@ export function loadDataInEditor(mei, setFreshlyLoaded = true) {
   freshlyLoaded = setFreshlyLoaded;
   cm.setValue(mei);
   v.loadXml(mei);
+  facs = loadFacsimile(v.xmlDoc);
   let bs = document.getElementById('breaks-select');
   if (bs) {
     if (breaksParam)
@@ -277,7 +280,7 @@ export function updateGithubInLocalStorage() {
 
 
 function completeAfter(cm, pred) {
-  if (!pred || pred()) setTimeout(function() {
+  if (!pred || pred()) setTimeout(function () {
     if (!cm.state.completionActive)
       cm.showHint({
         completeSingle: false
@@ -287,14 +290,14 @@ function completeAfter(cm, pred) {
 }
 
 function completeIfAfterLt(cm) {
-  return completeAfter(cm, function() {
+  return completeAfter(cm, function () {
     var cur = cm.getCursor();
     return cm.getRange(CodeMirror.Pos(cur.line, cur.ch - 1), cur) == "<";
   });
 }
 
 function completeIfInTag(cm) {
-  return completeAfter(cm, function() {
+  return completeAfter(cm, function () {
     var tok = cm.getTokenAt(cm.getCursor());
     if (tok.type == "string" && (!/['"]/.test(tok.string.charAt(tok.string.length - 1)) || tok.string.length == 1)) return false;
     var inner = CodeMirror.innerMode(cm.getMode(), tok.state).state;
@@ -303,7 +306,7 @@ function completeIfInTag(cm) {
 }
 
 // when initial page content has been loaded
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
   let myTextarea = document.getElementById("editor");
 
   cm = CodeMirror.fromTextArea(myTextarea, defaultCodeMirrorOptions);
@@ -737,7 +740,7 @@ export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true,
         }
       });
   } else { // if a file
-    let readingPromise = new Promise(function(loaded, notLoaded) {
+    let readingPromise = new Promise(function (loaded, notLoaded) {
       meiFileName = file.name;
       console.info('openMei ' + meiFileName + ', ', cm);
       let reader = new FileReader();
@@ -755,10 +758,10 @@ export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true,
       }
     });
     readingPromise.then(
-      function(mei) {
+      function (mei) {
         handleEncoding(mei, setFreshlyLoaded, updateAfterLoading);
       },
-      function() {
+      function () {
         log('Loading dragged file ' + meiFileName + ' failed.');
         v.busy(false);
       }

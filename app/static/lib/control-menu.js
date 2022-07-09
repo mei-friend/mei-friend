@@ -311,7 +311,7 @@ time with large files`;
   imagePanel.id = 'image-panel';
   imagePanel.style.display = 'none';
   let img = new Image(); 
-  img.src = `${root}img/00058.jpg`;
+  img.src = `${root}local/00058.jpg`;
   imagePanel.append(img);
   pixPanel.appendChild(imagePanel);
 
