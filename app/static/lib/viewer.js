@@ -299,9 +299,9 @@ export default class Viewer {
     // console.info('client size: ' + dimensions.width + '/' + dimensions.height);
     if (this.vrvOptions.breaks !== "none") {
       this.vrvOptions.pageWidth = Math.max(Math.round(
-        dimensions.width * (100 / this.vrvOptions.scale)), 600);
+        dimensions.width * (100 / this.vrvOptions.scale)), 100);
       this.vrvOptions.pageHeight = Math.max(Math.round(
-        dimensions.height * (100 / this.vrvOptions.scale)), 250);
+        dimensions.height * (100 / this.vrvOptions.scale)), 100);
     }
     // overwrite existing options if new ones are passed in
     // for (let key in newOptions) { this.vrvOptions[key] = newOptions[key]; }
