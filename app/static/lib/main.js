@@ -27,6 +27,7 @@ export let meiFileLocationPrintable = '';
 export let isMEI; // is the currently edited file native MEI?
 export let fileChanged = false; // flag to track whether unsaved changes to file exist
 export let facs = {}; // facsimile structure in MEI file
+export let sourceImages = {}; // object of source images
 
 export const sampleEncodings = [];
 export const samp = {
@@ -70,6 +71,7 @@ import {
   generateSectionSelect
 } from './control-menu.js';
 import {
+  rmHash,
   setCursorToId
 } from './utils.js';
 import {
@@ -616,6 +618,7 @@ function vrvWorkerEventsHandler(ev) {
         document.querySelector('title').innerHTML = 'mei-friend: ' +
           meiFileName.substr(meiFileName.lastIndexOf("/") + 1);
         document.getElementById('verovio-panel').innerHTML = ev.data.svg;
+        if (document.getElementById('showSourceImagePanel').checked) showSourceImage();
         if (ev.data.setCursorToPageBeginning) v.setCursorToPageBeginning(cm);
         v.updatePageNumDisplay();
         v.addNotationEventListeners(cm);
@@ -1432,4 +1435,43 @@ function setKeyMap(keyMapFilePath) {
         }
       }
     });
+}
+
+async function showSourceImage() {
+  let ulx = Number.MAX_VALUE;
+  let uly = Number.MAX_VALUE;
+  let lrx = 0;
+  let lry = 0;
+  let zoneId;
+  let svgFacs = document.querySelectorAll('[data-facs]');
+  svgFacs.forEach((f) => {
+    if (f.hasAttribute('data-facs'))
+      zoneId = rmHash(f.getAttribute('data-facs'));
+    if (facs[zoneId]) {
+      if (parseFloat(facs[zoneId].ulx) < ulx) ulx = parseFloat(facs[zoneId].ulx);
+      if (parseFloat(facs[zoneId].uly) < uly) uly = parseFloat(facs[zoneId].uly);
+      if (parseFloat(facs[zoneId].lrx) > lrx) lrx = parseFloat(facs[zoneId].lrx);
+      if (parseFloat(facs[zoneId].lry) > lry) lry = parseFloat(facs[zoneId].lry);
+    }
+  });
+  if (facs[zoneId]) {
+    let imgName = `${root}local/` + facs[zoneId].target;
+    let img = await loadImage(imgName);
+    let c = document.getElementById('source-image-canvas');
+    let ctx = c.getContext("2d");
+    let width = lrx - ulx;
+    let height = lry - uly;
+    c.width = width;
+    c.height = height;
+    console.log('ulx/uly//lrx/lry;w/h: ' + ulx + '/' + uly + '; ' + lrx + '/' + lry + '; ' + width + '/' + height);
+    ctx.drawImage(img, ulx, uly, width, height, 0, 0, width, height);
+  }
+}
+
+async function loadImage(url) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.src = url;
+    img.onload = () => resolve(img);
+  });
 }

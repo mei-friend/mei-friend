@@ -1,5 +1,6 @@
 import * as e from './editor.js';
 import * as dutils from './dom-utils.js';
+import { refreshAnnotationsList } from './annotation.js';
 
 const xmlIdString = /(?:xml:id=)(?:['"])(\S+?)(?:['"])/;
 const numberLikeString = /(?:n=)(?:['"])(\d+?)(?:['"])/;
@@ -595,3 +596,11 @@ export function rmHash(hashedString) {
   return (hashedString.startsWith('#')) ?
     hashedString.split('#')[1] : hashedString;
 }
+
+// export async function loadImage(url) {
+//   new Promise((resolve) => {
+//     const img = new Image();
+//     img.src = url;
+//     img.onload = () => resolve(img);
+//   })
+// }

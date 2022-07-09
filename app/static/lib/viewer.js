@@ -8,6 +8,7 @@ import * as dutils from './dom-utils.js';
 import * as att from './attribute-classes.js';
 import {
   cm,
+  facs,
   fontList,
   storage,
   tkVersion
@@ -1505,5 +1506,4 @@ export default class Viewer {
     if (cont) el.parentNode.classList.add('disabled');
     else el.parentNode.classList.remove('disabled');
   }
-
 }
