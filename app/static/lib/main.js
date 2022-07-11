@@ -1,6 +1,6 @@
 // mei-friend version and date
 const version = '0.4.0';
-const versionDate = '9 June 2022';
+const versionDate = '11 July 2022';
 
 var vrvWorker;
 var spdWorker;
