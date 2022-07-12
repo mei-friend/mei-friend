@@ -13,7 +13,7 @@ import {
   tkVersion
 } from './main.js';
 import {
-  showSourceImage
+  drawSourceImage
 } from './source-imaging.js';
 import schema_meiCMN_401 from '../schemaInfo/mei-CMN-4.0.1.schemaInfo.js';
 import schema_meiAll_401 from '../schemaInfo/mei-all-4.0.1.schemaInfo.js';
@@ -1176,7 +1176,7 @@ export default class Viewer {
             setOrientation(cm, '', this);
             break;
           case 'sourceImageZoom':
-            showSourceImage();
+            drawSourceImage();
             break;
           case 'showSupplied':
             rt.style.setProperty('--suppliedColor', (value) ? col : 'var(--notationColor)');

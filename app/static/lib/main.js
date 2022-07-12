@@ -93,7 +93,8 @@ import {
 } from './github-menu.js';
 import {
   loadFacsimile,
-  showSourceImage
+  drawSourceImage,
+  zoomSourceImage
 } from './source-imaging.js';
 
 // const defaultMeiFileName = `${root}Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei`;
@@ -619,7 +620,7 @@ function vrvWorkerEventsHandler(ev) {
         document.querySelector('title').innerHTML = 'mei-friend: ' +
           meiFileName.substr(meiFileName.lastIndexOf("/") + 1);
         document.getElementById('verovio-panel').innerHTML = ev.data.svg;
-        if (document.getElementById('showSourceImagePanel').checked) showSourceImage();
+        if (document.getElementById('showSourceImagePanel').checked) drawSourceImage();
         if (ev.data.setCursorToPageBeginning) v.setCursorToPageBeginning(cm);
         v.updatePageNumDisplay();
         v.addNotationEventListeners(cm);
@@ -1127,6 +1128,17 @@ function addEventListeners(v, cm) {
       ev.preventDefault();
       ev.stopPropagation();
       v.zoom(Math.sign(ev.deltaY) * -5); // scrolling towards user = increase
+    }
+  });
+
+  // Zooming source image with mouse wheel
+  let ip = document.getElementById('image-panel');
+  ip.addEventListener('wheel', ev => {
+    if ((navigator.platform.toLowerCase().startsWith('mac') && ev.metaKey) ||
+      !navigator.platform.toLowerCase().startsWith('mac') && ev.ctrlKey) {
+      ev.preventDefault();
+      ev.stopPropagation();
+      zoomSourceImage(Math.sign(ev.deltaY) * -5); // scrolling towards user = increase
     }
   });
 

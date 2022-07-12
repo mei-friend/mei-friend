@@ -42,7 +42,7 @@ export function loadFacsimile(xmlDoc) {
     return facs;
 }
 
-export async function showSourceImage() {
+export async function drawSourceImage() {
     let imgBorder = 0; // px
     let ulx = Number.MAX_VALUE;
     let uly = Number.MAX_VALUE;
@@ -97,4 +97,12 @@ async function loadImage(url) {
         img.src = url;
         img.onload = () => resolve(img);
     });
+}
+
+export function zoomSourceImage(percent) {
+    let sourceImageZoom = document.getElementById('sourceImageZoom');
+    if (sourceImageZoom)
+        sourceImageZoom.value = Math.min(parseInt(sourceImageZoom.max),
+            Math.max(parseInt(sourceImageZoom.min), parseInt(sourceImageZoom.value) + percent));
+    drawSourceImage();
 }
