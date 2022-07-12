@@ -12,6 +12,9 @@ import {
   storage,
   tkVersion
 } from './main.js';
+import {
+  showSourceImage
+} from './source-imaging.js';
 import schema_meiCMN_401 from '../schemaInfo/mei-CMN-4.0.1.schemaInfo.js';
 import schema_meiAll_401 from '../schemaInfo/mei-all-4.0.1.schemaInfo.js';
 
@@ -941,7 +944,7 @@ export default class Viewer {
       },
       showAnnotationPanel: {
         title: 'Show annotation panel',
-        decription: 'Show annotation panel',
+        description: 'Show annotation panel',
         type: 'bool',
         default: false
       },
@@ -955,8 +958,8 @@ export default class Viewer {
         type: 'header'
       },
       showSourceImagePanel: {
-        title: 'Source image panel',
-        decription: 'Show the score images of the source edition, if available',
+        title: 'Show source image panel',
+        description: 'Show the score images of the source edition, if available',
         type: 'bool',
         default: false
       },
@@ -976,6 +979,15 @@ export default class Viewer {
         step: 1,
         default: 50
       },
+      sourceImageZoom: {
+        title: 'Source image zoom (%)',
+        description: 'Zoom level of source image (in percent)',
+        type: 'int',
+        min: 10,
+        max: 300,
+        step: 5,
+        default: 100
+      },
       sourceImagePanelSeparator: {
         title: 'options-line', // class name of hr element
         type: 'line'
@@ -987,7 +999,7 @@ export default class Viewer {
       },
       showSupplied: {
         title: 'Show <supplied> elements',
-        decription: 'Highlight all elements contained by a <supplied> element',
+        description: 'Highlight all elements contained by a <supplied> element',
         type: 'bool',
         default: true
       },
@@ -1162,6 +1174,9 @@ export default class Viewer {
           case 'selectSourceImagePosition':
           case 'sourceImageProportion':
             setOrientation(cm, '', this);
+            break;
+          case 'sourceImageZoom':
+            showSourceImage();
             break;
           case 'showSupplied':
             rt.style.setProperty('--suppliedColor', (value) ? col : 'var(--notationColor)');

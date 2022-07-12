@@ -11,6 +11,7 @@ import {
 // loads facsimile content of xmlDoc into an object
 export function loadFacsimile(xmlDoc) {
     facs = {};
+    sourceImages = {};
     let facsimile = xmlDoc.querySelector('facsimile');
     if (facsimile) {
         let zones = facsimile.querySelectorAll('zone');
@@ -42,6 +43,7 @@ export function loadFacsimile(xmlDoc) {
 }
 
 export async function showSourceImage() {
+    let imgBorder = 0; // px
     let ulx = Number.MAX_VALUE;
     let uly = Number.MAX_VALUE;
     let lrx = 0;
@@ -69,7 +71,13 @@ export async function showSourceImage() {
             lrx *= xfact;
             lry *= yfact;
         }
-        let img = await loadImage(imgName);
+        let img;
+        if (!sourceImages.hasOwnProperty(imgName)) {
+            img = await loadImage(imgName);
+            sourceImages[imgName] = img;
+        } else {
+            img = sourceImages[imgName]
+        }
         let c = document.getElementById('source-image-canvas');
         let ctx = c.getContext("2d");
         let width = lrx - ulx;
@@ -77,7 +85,9 @@ export async function showSourceImage() {
         c.width = width;
         c.height = height;
         console.log('ulx/uly//lrx/lry;w/h: ' + ulx + '/' + uly + '; ' + lrx + '/' + lry + '; ' + width + '/' + height);
-        ctx.drawImage(img, ulx, uly, width, height, 0, 0, width, height);
+        let zoomFactor = document.getElementById('sourceImageZoom').value / 100;
+        ctx.drawImage(img, ulx, uly, width, height,
+            imgBorder, imgBorder, width * zoomFactor, height * zoomFactor);
     }
 }
 
