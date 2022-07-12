@@ -968,6 +968,15 @@ export default class Viewer {
         values: ['left', 'right', 'top', 'bottom'],
         default: 'bottom'
       },
+      sourceImageProportion: {
+        title: 'Source image proportion (%)',
+        description: 'Proportion that the source image pane takes from the notation pane (in percent)',
+        type: 'int',
+        min: 0,
+        max: 100, 
+        step: 1,
+        default: 50
+      },
       sourceImagePanelSeparator: {
         title: 'options-line', // class name of hr element
         type: 'line'
@@ -1152,6 +1161,7 @@ export default class Viewer {
             break;
           case 'showSourceImagePanel':
           case 'selectSourceImagePosition':
+          case 'sourceImageProportion':
             setOrientation(cm, '', this);
             break;
           case 'showSupplied':

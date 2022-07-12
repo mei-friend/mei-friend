@@ -48,6 +48,7 @@ export function setOrientation(cm, o = '', v = null, storage = null) {
   friendSz.style.width = sz.width;
   friendSz.style.height = sz.height;
   let sourceImagePosition = document.getElementById('selectSourceImagePosition').value;
+  let sourceImageProportion = document.getElementById('sourceImageProportion').value;
   switch (sourceImagePosition) {
     case 'top':
       pixContainer.style.flexDirection = 'column-reverse';
@@ -67,8 +68,8 @@ export function setOrientation(cm, o = '', v = null, storage = null) {
     case 'bottom':
       if (showSourceImage) {
         imagePane.style.display = 'block';
-        imagePane.style.height = '50%';
-        verovioPane.style.height = '50%';
+        imagePane.style.height = sourceImageProportion + '%';
+        verovioPane.style.height = (100 - sourceImageProportion) + '%';
       } else {
         imagePane.style.display = 'none';
         imagePane.style.height = 0;
@@ -81,8 +82,8 @@ export function setOrientation(cm, o = '', v = null, storage = null) {
     case 'right':
       if (showSourceImage) {
         imagePane.style.display = 'block';
-        imagePane.style.width = '50%';
-        verovioPane.style.width = '50%';
+        imagePane.style.width = sourceImageProportion + '%';;
+        verovioPane.style.width = (100 - sourceImageProportion) + '%';;
       } else {
         imagePane.style.display = 'none';
         imagePane.style.width = 0;
