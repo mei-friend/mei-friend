@@ -1456,6 +1456,15 @@ async function showSourceImage() {
   });
   if (facs[zoneId]) {
     let imgName = `${root}local/` + facs[zoneId].target;
+    imgName = imgName.replace('.tif','.jpg'); // hack for some DIME files...
+    if (false) {
+      let xfact = .33;
+      let yfact = .67;
+      ulx *= xfact;
+      uly *= yfact;
+      lrx *= xfact;
+      lry *= yfact;
+    }
     let img = await loadImage(imgName);
     let c = document.getElementById('source-image-canvas');
     let ctx = c.getContext("2d");
