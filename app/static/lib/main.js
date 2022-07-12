@@ -26,8 +26,6 @@ export let meiFileLocation = '';
 export let meiFileLocationPrintable = '';
 export let isMEI; // is the currently edited file native MEI?
 export let fileChanged = false; // flag to track whether unsaved changes to file exist
-export let facs = {}; // facsimile structure in MEI file
-export let sourceImages = {}; // object of source images
 
 export const sampleEncodings = [];
 export const samp = {
@@ -78,7 +76,6 @@ import {
   getInMeasure,
   navElsSelector,
   getElementAtCursor,
-  loadFacsimile
 } from './dom-utils.js';
 import {
   addDragSelector
@@ -94,6 +91,10 @@ import {
   refreshGithubMenu,
   setCommitUIEnabledStatus
 } from './github-menu.js';
+import {
+  loadFacsimile,
+  showSourceImage
+} from './source-imaging.js';
 
 // const defaultMeiFileName = `${root}Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei`;
 const defaultMeiFileName = `${root}Beethoven_WoO70-Breitkopf.mei`;
@@ -222,7 +223,7 @@ export function loadDataInEditor(mei, setFreshlyLoaded = true) {
   freshlyLoaded = setFreshlyLoaded;
   cm.setValue(mei);
   v.loadXml(mei);
-  facs = loadFacsimile(v.xmlDoc);
+  loadFacsimile(v.xmlDoc); // load all facsimila data of MEI
   let bs = document.getElementById('breaks-select');
   if (bs) {
     if (breaksParam)
@@ -1435,52 +1436,4 @@ function setKeyMap(keyMapFilePath) {
         }
       }
     });
-}
-
-async function showSourceImage() {
-  let ulx = Number.MAX_VALUE;
-  let uly = Number.MAX_VALUE;
-  let lrx = 0;
-  let lry = 0;
-  let zoneId;
-  let svgFacs = document.querySelectorAll('[data-facs]');
-  svgFacs.forEach((f) => {
-    if (f.hasAttribute('data-facs'))
-      zoneId = rmHash(f.getAttribute('data-facs'));
-    if (facs[zoneId]) {
-      if (parseFloat(facs[zoneId].ulx) < ulx) ulx = parseFloat(facs[zoneId].ulx);
-      if (parseFloat(facs[zoneId].uly) < uly) uly = parseFloat(facs[zoneId].uly);
-      if (parseFloat(facs[zoneId].lrx) > lrx) lrx = parseFloat(facs[zoneId].lrx);
-      if (parseFloat(facs[zoneId].lry) > lry) lry = parseFloat(facs[zoneId].lry);
-    }
-  });
-  if (facs[zoneId]) {
-    let imgName = `${root}local/` + facs[zoneId].target;
-    imgName = imgName.replace('.tif','.jpg'); // hack for some DIME files...
-    if (false) {
-      let xfact = .33;
-      let yfact = .67;
-      ulx *= xfact;
-      uly *= yfact;
-      lrx *= xfact;
-      lry *= yfact;
-    }
-    let img = await loadImage(imgName);
-    let c = document.getElementById('source-image-canvas');
-    let ctx = c.getContext("2d");
-    let width = lrx - ulx;
-    let height = lry - uly;
-    c.width = width;
-    c.height = height;
-    console.log('ulx/uly//lrx/lry;w/h: ' + ulx + '/' + uly + '; ' + lrx + '/' + lry + '; ' + width + '/' + height);
-    ctx.drawImage(img, ulx, uly, width, height, 0, 0, width, height);
-  }
-}
-
-async function loadImage(url) {
-  return new Promise((resolve) => {
-    const img = new Image();
-    img.src = url;
-    img.onload = () => resolve(img);
-  });
 }

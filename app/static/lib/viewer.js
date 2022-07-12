@@ -8,7 +8,6 @@ import * as dutils from './dom-utils.js';
 import * as att from './attribute-classes.js';
 import {
   cm,
-  facs,
   fontList,
   storage,
   tkVersion
@@ -973,7 +972,7 @@ export default class Viewer {
         description: 'Proportion that the source image pane takes from the notation pane (in percent)',
         type: 'int',
         min: 0,
-        max: 100, 
+        max: 100,
         step: 1,
         default: 50
       },

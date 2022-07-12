@@ -235,36 +235,3 @@ export function xmlToString(xmlNode) {
   // console.info('xmlToString: ' + str);
   return str.replace('xmlns="' + meiNameSpace + '" ', '');
 }
-
-// loads facsimile content of xmlDoc into an object
-export function loadFacsimile(xmlDoc) {
-  let facs = {};
-  let facsimile = xmlDoc.querySelector('facsimile');
-  if (facsimile) {
-    let zones = facsimile.querySelectorAll('zone');
-    zones.forEach(z => {
-      let id, ulx, uly, lrx, lry;
-      if (z.hasAttribute('xml:id')) id = z.getAttribute('xml:id');
-      if (z.hasAttribute('ulx')) ulx = z.getAttribute('ulx');
-      if (z.hasAttribute('uly')) uly = z.getAttribute('uly');
-      if (z.hasAttribute('lrx')) lrx = z.getAttribute('lrx');
-      if (z.hasAttribute('lry')) lry = z.getAttribute('lry');
-      let graphic = z.parentElement.querySelector('graphic');
-      if (graphic) {
-        let target, width, height;
-        if (graphic.hasAttribute('target')) target = graphic.getAttribute('target');
-        if (graphic.hasAttribute('width')) width = graphic.getAttribute('width');
-        if (graphic.hasAttribute('height')) height = graphic.getAttribute('height');
-        if (id) facs[id] = {};
-        if (id && target) facs[id]['target'] = target;
-        if (id && width) facs[id]['width'] = width;
-        if (id && height) facs[id]['height'] = height;
-        if (id && ulx) facs[id]['ulx'] = ulx;
-        if (id && uly) facs[id]['uly'] = uly;
-        if (id && lrx) facs[id]['lrx'] = lrx;
-        if (id && lry) facs[id]['lry'] = lry;
-      }
-    });
-  }
-  return facs;
-}
