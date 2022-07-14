@@ -3,6 +3,9 @@ import * as icon from './../css/icons.js';
 import {
   fontList
 } from './main.js';
+import {
+  svgNS
+} from './dom-utils.js'
 
 export function createControlsMenu(parentElement, scale) {
 
@@ -310,11 +313,13 @@ time with large files`;
   let imagePanel = document.createElement('div');
   imagePanel.id = 'image-panel';
   imagePanel.style.display = 'none';
-  var canvas = document.createElement('canvas');
-  canvas.id = 'source-image-canvas';
+  // var canvas = document.createElement('canvas');
+  // canvas.id = 'source-image-canvas';
+  var svg = document.createElementNS(svgNS, 'svg');
+  svg.id = 'soucre-image-svg';
   // let img = new Image(); 
   // img.src = `${root}local/00058.jpg`;
-  imagePanel.append(canvas);
+  imagePanel.append(svg);
   pixPanel.appendChild(imagePanel);
 
 } // createControlsMenu()

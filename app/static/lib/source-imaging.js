@@ -6,6 +6,10 @@ var sourceImages = {}; // object of source images
 import {
     rmHash
 } from './utils.js';
+import {
+    svgNS
+} from './dom-utils.js'
+
 
 
 // loads facsimile content of xmlDoc into an object
@@ -43,8 +47,7 @@ export function loadFacsimile(xmlDoc) {
 }
 
 export async function drawSourceImage() {
-    let imgBorder = 0; // px
-    let ulx = Number.MAX_VALUE;
+    let ulx = Number.MAX_VALUE; // boundary values for image envelope
     let uly = Number.MAX_VALUE;
     let lrx = 0;
     let lry = 0;
@@ -73,21 +76,27 @@ export async function drawSourceImage() {
         }
         let img;
         if (!sourceImages.hasOwnProperty(imgName)) {
-            img = await loadImage(imgName);
+            // img = await loadImage(imgName);
+            img = document.createElementNS(svgNS, 'image');
+            img.setAttribute('id', 'testimg2');
+            img.setAttributeNS('http://www.w3.org/1999/xlink', 'href', imgName);
             sourceImages[imgName] = img;
         } else {
             img = sourceImages[imgName]
         }
-        let c = document.getElementById('source-image-canvas');
-        let ctx = c.getContext("2d");
+
+        let svg = document.getElementById('soucre-image-svg');
+        let zoomFactor = document.getElementById('sourceImageZoom').value / 100;
         let width = lrx - ulx;
         let height = lry - uly;
-        c.width = width;
-        c.height = height;
-        console.log('ulx/uly//lrx/lry;w/h: ' + ulx + '/' + uly + '; ' + lrx + '/' + lry + '; ' + width + '/' + height);
-        let zoomFactor = document.getElementById('sourceImageZoom').value / 100;
-        ctx.drawImage(img, ulx, uly, width, height,
-            imgBorder, imgBorder, width * zoomFactor, height * zoomFactor);
+        svg.setAttribute('width', width * zoomFactor);
+        svg.setAttribute('height', height * zoomFactor);
+        svg.setAttribute('viewBox', ulx + ' ' + uly + ' ' + width + ' ' + height);
+        // let ctx = c.getContext("2d");
+        // ctx.drawImage(img, ulx, uly, width, height,
+        //     0, 0, width * zoomFactor, height * zoomFactor);
+        svg.appendChild(img);
+        // console.log('ulx/uly//lrx/lry;w/h: ' + ulx + '/' + uly + '; ' + lrx + '/' + lry + '; ' + width + '/' + height);
     }
 }
 

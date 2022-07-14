@@ -1,4 +1,6 @@
-const svgNS = "http://www.w3.org/2000/svg";
+import {
+  svgNS
+} from './dom-utils.js'
 import * as att from './attribute-classes.js';
 
 export function addDragSelector(v, vp) {
