@@ -63,6 +63,8 @@ export async function drawSourceImage() {
             if (parseFloat(facs[zoneId].lry) > lry) lry = parseFloat(facs[zoneId].lry);
         }
     });
+    let svg = document.getElementById('soucre-image-svg');
+    svg.innerHTML = '';
     if (facs[zoneId]) {
         let imgName = `${root}local/` + facs[zoneId].target;
         imgName = imgName.replace('.tif', '.jpg'); // hack for some DIME files...
@@ -85,7 +87,6 @@ export async function drawSourceImage() {
             img = sourceImages[imgName]
         }
 
-        let svg = document.getElementById('soucre-image-svg');
         let zoomFactor = document.getElementById('sourceImageZoom').value / 100;
         let width = lrx - ulx;
         let height = lry - uly;
