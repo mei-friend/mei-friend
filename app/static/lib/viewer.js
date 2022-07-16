@@ -494,7 +494,7 @@ export default class Viewer {
   // highlight currently selected elements, if cm left out, all are cleared
   updateHighlight(cm) {
     // clear existing highlighted classes
-    let highlighted = document.querySelectorAll('g.highlighted');
+    let highlighted = document.querySelectorAll('.highlighted');
     // console.info('updateHlt: highlighted: ', highlighted);
     highlighted.forEach(e => e.classList.remove('highlighted'));
     let ids = [];
@@ -504,12 +504,13 @@ export default class Viewer {
     // console.info('updateHlt ids: ', ids);
     for (let id of ids) {
       if (id) {
-        let el = document.querySelector('g#' + id)
+        let el = document.querySelectorAll('#' + id); // was: 'g#'+id
         // console.info('updateHlt el: ', el);
         if (el) {
-          el.classList.add('highlighted');
-          let children = el.querySelectorAll('g');
-          children.forEach(item => item.classList.add('highlighted'));
+          el.forEach(e => {
+            e.classList.add('highlighted');
+            e.querySelectorAll('g').forEach(g => g.classList.add('highlighted'));
+            });
         }
       }
     }

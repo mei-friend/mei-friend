@@ -168,7 +168,7 @@ function transformCTM(point, matrix) {
   return r;
 }
 
-function updateRect(rect, x, y, width, height, color = "black",
+export function updateRect(rect, x, y, width, height, color = "black",
   strokeWidth = 13, strokeDashArray = 50) {
   rect.setAttribute('x', x);
   rect.setAttribute('y', y);

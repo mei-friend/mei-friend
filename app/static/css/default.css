@@ -296,6 +296,10 @@ a:active {
   overflow: auto;
 }
 
+#source-image-label {
+  justify-content: center;
+}
+
 /* #encoding {} */
 
 #annotationPanel {
@@ -540,25 +544,32 @@ svg text {
   user-select: none;
 }
 
-#verovio-panel g.highlighted {
-  fill: var(--highlightColor);
+#pix-container .highlighted {
   color: var(--highlightColor);
   stroke: var(--highlightColor);
 }
 
-#verovio-panel g.supplied g {
+#pix-container g.highlighted,
+#pix-container text.highlighted {
+  fill: var(--highlightColor);
+}
+
+#pix-container g.supplied g {
   fill: var(--suppliedColor);
   color: var(--suppliedColor);
   stroke: var(--suppliedColor);
 }
 
-#verovio-panel g.supplied g.highlighted {
-  fill: var(--suppliedHighlightedColor);
+#pix-container .supplied .highlighted {
   color: var(--suppliedHighlightedColor);
   stroke: var(--suppliedHighlightedColor);
 }
 
-#verovio-panel g {
+#pix-container g.supplied g.highlighted {
+  fill: var(--suppliedHighlightedColor);
+}
+
+#pix-container g {
   fill: var(--notationColor);
   color: var(--notationColor);
   stroke: var(--notationColor);

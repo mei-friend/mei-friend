@@ -118,7 +118,8 @@ const defaultVerovioOptions = {
   minLastJustification: 0,
   clefChangeFactor: .83,
   svgAdditionalAttribute: ["layer@n", "staff@n",
-    "dir@vgrp", "dynam@vgrp", "hairpin@vgrp", "pedal@vgrp", "measure@facs"
+    "dir@vgrp", "dynam@vgrp", "hairpin@vgrp", "pedal@vgrp",
+    "measure@facs", "measure@n"
   ],
   bottomMarginArtic: 1.2,
   topMarginArtic: 1.2

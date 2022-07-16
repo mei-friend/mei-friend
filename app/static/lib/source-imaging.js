@@ -9,6 +9,9 @@ import {
 import {
     svgNS
 } from './dom-utils.js'
+import {
+    updateRect
+} from './drag-selector.js';
 
 
 
@@ -46,7 +49,9 @@ export function loadFacsimile(xmlDoc) {
     return facs;
 }
 
+// Draw the source image with bounding boxes for each zone
 export async function drawSourceImage() {
+    let rectangleLineWidth = 4; 
     let ulx = Number.MAX_VALUE; // boundary values for image envelope
     let uly = Number.MAX_VALUE;
     let lrx = 0;
@@ -57,14 +62,15 @@ export async function drawSourceImage() {
         if (f.hasAttribute('data-facs'))
             zoneId = rmHash(f.getAttribute('data-facs'));
         if (facs[zoneId]) {
-            if (parseFloat(facs[zoneId].ulx) < ulx) ulx = parseFloat(facs[zoneId].ulx);
-            if (parseFloat(facs[zoneId].uly) < uly) uly = parseFloat(facs[zoneId].uly);
-            if (parseFloat(facs[zoneId].lrx) > lrx) lrx = parseFloat(facs[zoneId].lrx);
-            if (parseFloat(facs[zoneId].lry) > lry) lry = parseFloat(facs[zoneId].lry);
+            if (parseFloat(facs[zoneId].ulx) < ulx) ulx = parseFloat(facs[zoneId].ulx) - rectangleLineWidth / 2;
+            if (parseFloat(facs[zoneId].uly) < uly) uly = parseFloat(facs[zoneId].uly) - rectangleLineWidth / 2;
+            if (parseFloat(facs[zoneId].lrx) > lrx) lrx = parseFloat(facs[zoneId].lrx) + rectangleLineWidth / 2;
+            if (parseFloat(facs[zoneId].lry) > lry) lry = parseFloat(facs[zoneId].lry) + rectangleLineWidth / 2;
         }
     });
-    let svg = document.getElementById('soucre-image-svg');
-    svg.innerHTML = '';
+    let svgContainer = document.getElementById('source-image-container');
+    let svg = document.getElementById('source-image-svg');
+    if (svg) svg.innerHTML = '';
     if (facs[zoneId]) {
         let imgName = `${root}local/` + facs[zoneId].target;
         imgName = imgName.replace('.tif', '.jpg'); // hack for some DIME files...
@@ -86,17 +92,53 @@ export async function drawSourceImage() {
         } else {
             img = sourceImages[imgName]
         }
-
         let zoomFactor = document.getElementById('sourceImageZoom').value / 100;
         let width = lrx - ulx;
         let height = lry - uly;
-        svg.setAttribute('width', width * zoomFactor);
-        svg.setAttribute('height', height * zoomFactor);
+        // svgContainer.setAttribute("transform", "translate(" + (ulx / 2) + " " + (uly / 2 ) + ") scale(" + zoomFactor + ")");
+        svgContainer.setAttribute("transform", "scale(" + zoomFactor + ")");
+        svgContainer.setAttribute('width', width);
+        svgContainer.setAttribute('height', height);
+        // svgContainer.appendChild(document.createAttributeNS(svgNS, 'circle'))
         svg.setAttribute('viewBox', ulx + ' ' + uly + ' ' + width + ' ' + height);
         // let ctx = c.getContext("2d");
         // ctx.drawImage(img, ulx, uly, width, height,
         //     0, 0, width * zoomFactor, height * zoomFactor);
         svg.appendChild(img);
+        let lbl = document.getElementById('source-image-svg-label');
+        if (!lbl) {
+            lbl = document.createElementNS(svgNS, 'text');
+            lbl.setAttribute('id', 'source-image-svg-label')
+        }
+        lbl.textContent = imgName.split('\\').pop().split('/').pop();
+        lbl.setAttribute('x', ulx);
+        lbl.setAttribute('dy', uly + 20);
+        svgContainer.appendChild(lbl);
+        svgFacs.forEach((f) => {
+            if (f.hasAttribute('data-facs'))
+                zoneId = rmHash(f.getAttribute('data-facs'));
+            if (facs[zoneId]) {
+                let rect = document.createElementNS(svgNS, 'rect');
+                svg.appendChild(rect);
+                let x = parseFloat(facs[zoneId].ulx);
+                let y = parseFloat(facs[zoneId].uly);
+                let width = parseFloat(facs[zoneId].lrx) - x;
+                let height = parseFloat(facs[zoneId].lry) - y;
+                updateRect(rect, x, y, width, height, 'darkred', rectangleLineWidth, 'none');
+                if (f.hasAttribute('id')) rect.id = f.getAttribute('id');
+                if (f.hasAttribute('data-n')) { // draw number-like info from measure
+                    let txt = document.createElementNS(svgNS, 'text');
+                    svg.appendChild(txt);
+                    txt.setAttribute('font-size', '24px');
+                    txt.setAttribute('font-weight', 'bold');
+                    txt.setAttribute('fill', 'darkred');
+                    txt.setAttribute('x', x + 6);
+                    txt.setAttribute('y', y + 25);
+                    txt.textContent = f.getAttribute('data-n');
+                    if (f.hasAttribute('id')) txt.id = f.getAttribute('id');
+                }
+            }
+        });
         // console.log('ulx/uly//lrx/lry;w/h: ' + ulx + '/' + uly + '; ' + lrx + '/' + lry + '; ' + width + '/' + height);
     }
 }
@@ -114,5 +156,6 @@ export function zoomSourceImage(percent) {
     if (sourceImageZoom)
         sourceImageZoom.value = Math.min(parseInt(sourceImageZoom.max),
             Math.max(parseInt(sourceImageZoom.min), parseInt(sourceImageZoom.value) + percent));
-    drawSourceImage();
+    let svgContainer = document.getElementById('source-image-container');
+    svgContainer.setAttribute("transform", "scale(" + sourceImageZoom.value / 100 + ")");
 }
