@@ -313,18 +313,11 @@ time with large files`;
   let imagePanel = document.createElement('div');
   imagePanel.id = 'image-panel';
   imagePanel.style.display = 'none';
-  // var canvas = document.createElement('canvas');
-  // canvas.id = 'source-image-canvas';
-  // var label = document.createElement('label');
-  // label.id = 'source-image-label';
-  // imagePanel.append(label);
   var svg = document.createElementNS(svgNS, 'svg');
   svg.id = 'source-image-container';
   var g = document.createElementNS(svgNS, 'svg');
   g.id = 'source-image-svg';
   svg.appendChild(g);
-  // let img = new Image(); 
-  // img.src = `${root}local/00058.jpg`;
   imagePanel.append(svg);
   pixPanel.appendChild(imagePanel);
 

@@ -980,6 +980,12 @@ export default class Viewer {
         step: 1,
         default: 50
       },
+      showSourceImageFullPage: {
+        title: 'Show full page',
+        description: 'Shouw source image on full page',
+        type: 'bool',
+        default: false
+      },
       sourceImageZoom: {
         title: 'Source image zoom (%)',
         description: 'Zoom level of source image (in percent)',
