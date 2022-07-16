@@ -80,8 +80,8 @@ export async function drawSourceImage() {
     if (svg) svg.innerHTML = '';
     if (facs[zoneId]) {
         let imgName = `${root}local/` + facs[zoneId].target;
+        imgName = imgName.replace('.tif', '.jpg'); // hack for some DIME files...
         if (false) {
-            imgName = imgName.replace('.tif', '.jpg'); // hack for some DIME files...
             let xfact = .33;
             let yfact = .67;
             ulx *= xfact;
@@ -169,7 +169,7 @@ async function loadImage(url) {
 
 export function zoomSourceImage(percent) {
     let sourceImageZoom = document.getElementById('sourceImageZoom');
-    if (sourceImageZoom)
+    if (sourceImageZoom && percent)
         sourceImageZoom.value = Math.min(parseInt(sourceImageZoom.max),
             Math.max(parseInt(sourceImageZoom.min), parseInt(sourceImageZoom.value) + percent));
     let svgContainer = document.getElementById('source-image-container');

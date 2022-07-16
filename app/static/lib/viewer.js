@@ -13,7 +13,8 @@ import {
   tkVersion
 } from './main.js';
 import {
-  drawSourceImage
+  drawSourceImage,
+  zoomSourceImage
 } from './source-imaging.js';
 import schema_meiCMN_401 from '../schemaInfo/mei-CMN-4.0.1.schemaInfo.js';
 import schema_meiAll_401 from '../schemaInfo/mei-all-4.0.1.schemaInfo.js';
@@ -510,7 +511,7 @@ export default class Viewer {
           el.forEach(e => {
             e.classList.add('highlighted');
             e.querySelectorAll('g').forEach(g => g.classList.add('highlighted'));
-            });
+          });
         }
       }
     }
@@ -1182,8 +1183,11 @@ export default class Viewer {
           case 'sourceImageProportion':
             setOrientation(cm, '', this);
             break;
-          case 'sourceImageZoom':
+          case 'showSourceImageFullPage':
             drawSourceImage();
+            break;
+          case 'sourceImageZoom':
+            zoomSourceImage();
             break;
           case 'showSupplied':
             rt.style.setProperty('--suppliedColor', (value) ? col : 'var(--notationColor)');
