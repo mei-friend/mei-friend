@@ -154,13 +154,14 @@ export async function drawSourceImage() {
     function drawBoundingBox(zoneId, measureId, measureN) {
         if (facs[zoneId]) {
             let rect = document.createElementNS(svgNS, 'rect');
+            let linkToSourceImageZone = document.getElementById('linkToSourceImageZone').checked;
             svg.appendChild(rect);
             let x = parseFloat(facs[zoneId].ulx);
             let y = parseFloat(facs[zoneId].uly);
             let width = parseFloat(facs[zoneId].lrx) - x;
             let height = parseFloat(facs[zoneId].lry) - y;
             updateRect(rect, x, y, width, height, 'darkred', rectangleLineWidth, 'none');
-            if (measureId) rect.id = measureId;
+            if (measureId) rect.id = linkToSourceImageZone ? zoneId : measureId;
             if (measureN) { // draw number-like info from measure
                 let txt = document.createElementNS(svgNS, 'text');
                 svg.appendChild(txt);
@@ -170,7 +171,7 @@ export async function drawSourceImage() {
                 txt.setAttribute('x', x + 6);
                 txt.setAttribute('y', y + 25);
                 txt.textContent = measureN;
-                if (measureId) txt.id = measureId;
+                if (measureId) txt.id = linkToSourceImageZone ? zoneId : measureId;
             }
         }
     }

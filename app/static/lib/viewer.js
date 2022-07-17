@@ -987,6 +987,12 @@ export default class Viewer {
         type: 'bool',
         default: false
       },
+      linkToSourceImageZone: {
+        title: 'Link to source image zone',
+        description: 'Link to source image zone rather than to source image encoding',
+        type: 'bool',
+        default: false
+      },
       sourceImageZoom: {
         title: 'Source image zoom (%)',
         description: 'Zoom level of source image (in percent)',
