@@ -35,19 +35,27 @@ export function loadFacsimile(xmlDoc) {
                 if (graphic.hasAttribute('target')) target = graphic.getAttribute('target');
                 if (graphic.hasAttribute('width')) width = graphic.getAttribute('width');
                 if (graphic.hasAttribute('height')) height = graphic.getAttribute('height');
-                if (id) facs[id] = {};
-                if (id && target) facs[id]['target'] = target;
-                if (id && width) facs[id]['width'] = width;
-                if (id && height) facs[id]['height'] = height;
-                if (id && ulx) facs[id]['ulx'] = ulx;
-                if (id && uly) facs[id]['uly'] = uly;
-                if (id && lrx) facs[id]['lrx'] = lrx;
-                if (id && lry) facs[id]['lry'] = lry;
+                if (id) {
+                    facs[id] = {};
+                    if (target) facs[id]['target'] = target;
+                    if (width) facs[id]['width'] = width;
+                    if (height) facs[id]['height'] = height;
+                    if (ulx) facs[id]['ulx'] = ulx;
+                    if (uly) facs[id]['uly'] = uly;
+                    if (lrx) facs[id]['lrx'] = lrx;
+                    if (lry) facs[id]['lry'] = lry;
+                    let measure = xmlDoc.querySelector('[facs="#' + id + '"]');
+                    if (measure) {
+                        if (measure.hasAttribute('xml:id')) facs[id]['measureId'] = measure.getAttribute('xml:id');
+                        if (measure.hasAttribute('n')) facs[id]['measureN'] = measure.getAttribute('n');
+                    }
+                }
             }
         });
     }
     return facs;
 }
+
 
 // Draw the source image with bounding boxes for each zone
 export async function drawSourceImage() {
@@ -59,7 +67,7 @@ export async function drawSourceImage() {
     let lry = 0;
     let zoneId;
     let svgFacs = document.querySelectorAll('[data-facs]'); // list displayed zones
-    if (fullPage && svgFacs) {
+    if (svgFacs && fullPage) {
         let firstZone = svgFacs.item(0);
         if (firstZone.hasAttribute('data-facs'))
             zoneId = rmHash(firstZone.getAttribute('data-facs'));
@@ -130,32 +138,41 @@ export async function drawSourceImage() {
             svg.appendChild(lbl);
         }
         // go through displayed zones and draw bounding boxes with number-like label
-        svgFacs.forEach((f) => {
-            if (f.hasAttribute('data-facs'))
-                zoneId = rmHash(f.getAttribute('data-facs'));
-            if (facs[zoneId]) {
-                let rect = document.createElementNS(svgNS, 'rect');
-                svg.appendChild(rect);
-                let x = parseFloat(facs[zoneId].ulx);
-                let y = parseFloat(facs[zoneId].uly);
-                let width = parseFloat(facs[zoneId].lrx) - x;
-                let height = parseFloat(facs[zoneId].lry) - y;
-                updateRect(rect, x, y, width, height, 'darkred', rectangleLineWidth, 'none');
-                if (f.hasAttribute('id')) rect.id = f.getAttribute('id');
-                if (f.hasAttribute('data-n')) { // draw number-like info from measure
-                    let txt = document.createElementNS(svgNS, 'text');
-                    svg.appendChild(txt);
-                    txt.setAttribute('font-size', '24px');
-                    txt.setAttribute('font-weight', 'bold');
-                    txt.setAttribute('fill', 'darkred');
-                    txt.setAttribute('x', x + 6);
-                    txt.setAttribute('y', y + 25);
-                    txt.textContent = f.getAttribute('data-n');
-                    if (f.hasAttribute('id')) txt.id = f.getAttribute('id');
-                }
+        if (fullPage)
+            for (let z in facs) {
+                if (facs[z]['target'] === facs[zoneId]['target'])
+                    drawBoundingBox(z, facs[z]['measureId'], facs[z]['measureN']);
+            } else {
+                svgFacs.forEach(m => {
+                    if (m.hasAttribute('data-facs')) zoneId = rmHash(m.getAttribute('data-facs'));
+                    drawBoundingBox(zoneId, facs[zoneId]['measureId'], facs[zoneId]['measureN'])
+                });
             }
-        });
         // console.log('ulx/uly//lrx/lry;w/h: ' + ulx + '/' + uly + '; ' + lrx + '/' + lry + '; ' + width + '/' + height);
+    }
+
+    function drawBoundingBox(zoneId, measureId, measureN) {
+        if (facs[zoneId]) {
+            let rect = document.createElementNS(svgNS, 'rect');
+            svg.appendChild(rect);
+            let x = parseFloat(facs[zoneId].ulx);
+            let y = parseFloat(facs[zoneId].uly);
+            let width = parseFloat(facs[zoneId].lrx) - x;
+            let height = parseFloat(facs[zoneId].lry) - y;
+            updateRect(rect, x, y, width, height, 'darkred', rectangleLineWidth, 'none');
+            if (measureId) rect.id = measureId;
+            if (measureN) { // draw number-like info from measure
+                let txt = document.createElementNS(svgNS, 'text');
+                svg.appendChild(txt);
+                txt.setAttribute('font-size', '24px');
+                txt.setAttribute('font-weight', 'bold');
+                txt.setAttribute('fill', 'darkred');
+                txt.setAttribute('x', x + 6);
+                txt.setAttribute('y', y + 25);
+                txt.textContent = measureN;
+                if (measureId) txt.id = measureId;
+            }
+        }
     }
 }
 

@@ -1,6 +1,8 @@
 import * as e from './editor.js';
 import * as dutils from './dom-utils.js';
-import { refreshAnnotationsList } from './annotation.js';
+import {
+  refreshAnnotationsList
+} from './annotation.js';
 
 const xmlIdString = /(?:xml:id=)(?:['"])(\S+?)(?:['"])/;
 const numberLikeString = /(?:n=)(?:['"])(\d+?)(?:['"])/;
@@ -25,7 +27,9 @@ export function findKey(key, obj) {
 // checks whether note noteId is inside a chord. Returns false or the chord id.
 export function insideParent(noteId, what = 'chord') {
   if (noteId) {
-    let chord = document.querySelector('g#' + noteId).closest('.' + what);
+    let note = document.querySelector('g#' + noteId);
+    let chord;
+    if (note) chord = note.closest('.' + what);
     if (chord) return chord.getAttribute('id');
   }
   return false;
