@@ -383,7 +383,7 @@ export default class Viewer {
   }
 
   addNotationEventListeners(cm) {
-    let elements = document.querySelectorAll('g[id]');
+    let elements = document.querySelectorAll('g[id],rect[id],text[id]');
     elements.forEach(item => {
       item.addEventListener('click',
         (event) => this.handleClickOnNotation(event, cm));
