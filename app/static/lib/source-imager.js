@@ -143,7 +143,7 @@ export async function drawSourceImage() {
             }
             lbl.textContent = imgName.split('\\').pop().split('/').pop();
             lbl.setAttribute('font-size', '28px');
-            lbl.setAttribute('font-weight','bold');
+            lbl.setAttribute('font-weight', 'bold');
             lbl.setAttribute('x', ulx + 7);
             lbl.setAttribute('y', uly + 29);
             svg.appendChild(lbl);
@@ -189,8 +189,6 @@ function drawBoundingBox(zoneId, measureId, measureN) {
             txt.textContent = measureN;
             if (measureId) txt.id = linkToSourceImageZone ? zoneId : measureId;
         }
-        // if (rect.classList.contains('highlighed'))
-        //     addZoneResizer(v, rect);
     }
 }
 
@@ -231,20 +229,6 @@ export function addZoneResizer(v, rect) {
     var what = ''; // west, east, north, south side
     let bb;
 
-    // to modify cursor shape
-    function mouseOver(ev) {
-        let bcr = rect.getBoundingClientRect();
-        if (Math.abs(ev.clientX - bcr.x) < rectangleLineWidth * 2 ||
-            Math.abs(ev.clientX - bcr.x - bcr.width) < rectangleLineWidth * 2)
-            rect.style.cursor = 'ew-resize';
-        else
-            rect.style.cursor = 'ns-resize';
-    };
-
-    function mouseOut(ev) {
-        rect.style.cursor = 'default'
-    };
-
     function mouseDown(ev) {
         let bcr = rect.getBoundingClientRect();
         bb = rect.getBBox();
@@ -262,6 +246,19 @@ export function addZoneResizer(v, rect) {
     };
 
     function mouseMove(ev) {
+        let bcr = rect.getBoundingClientRect();
+        // console.log('bcr x/y: ' + bcr.x + '/' + bcr.y);
+        // console.log('client x/y: ' + ev.clientX + '/' + ev.clientY);
+        // console.log('diff x/y: ' + Math.abs(ev.clientX - bcr.x) + '/' + Math.abs(ev.clientY - bcr.y));
+        if (Math.abs(ev.clientX - bcr.x) <= (rectangleLineWidth * 2) ||
+            Math.abs(ev.clientX - bcr.x - bcr.width) <= (rectangleLineWidth * 2))
+            rect.style.cursor = 'ew-resize';
+        else if (Math.abs(ev.clientY - bcr.y) <= (rectangleLineWidth * 2) ||
+            Math.abs(ev.clientY - bcr.y - bcr.height) <= (rectangleLineWidth * 2))
+            rect.style.cursor = 'ns-resize';
+        else
+            rect.style.cursor = 'default';
+
         if (what) {
             let thisStart = {}; // adjust starting point to scroll of verovio-panel
             thisStart.x = start.x - ip.scrollLeft;
@@ -310,15 +307,11 @@ export function addZoneResizer(v, rect) {
         console.log('mouse up');
     };
 
-    rect.addEventListener('mouseover', mouseOver);
-    rect.addEventListener('mouseout', mouseOut);
     rect.addEventListener('mousedown', mouseDown);
     ip.addEventListener('mousemove', mouseMove);
     ip.addEventListener('mouseup', mouseUp);
 
     return {
-        'mouseover': mouseOver,
-        'mouseout': mouseOut,
         'mousedown': mouseDown,
         'mousemove': mouseMove,
         'mouseup': mouseUp
