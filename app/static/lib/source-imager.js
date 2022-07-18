@@ -142,9 +142,10 @@ export async function drawSourceImage() {
                 lbl.setAttribute('id', 'source-image-svg-label')
             }
             lbl.textContent = imgName.split('\\').pop().split('/').pop();
-            lbl.setAttribute('font-size', '24px');
-            lbl.setAttribute('x', ulx + 6);
-            lbl.setAttribute('y', uly + 25);
+            lbl.setAttribute('font-size', '28px');
+            lbl.setAttribute('font-weight','bold');
+            lbl.setAttribute('x', ulx + 7);
+            lbl.setAttribute('y', uly + 29);
             svg.appendChild(lbl);
         }
         // go through displayed zones and draw bounding boxes with number-like label
@@ -180,11 +181,11 @@ function drawBoundingBox(zoneId, measureId, measureN) {
         if (measureN) { // draw number-like info from measure
             let txt = document.createElementNS(svgNS, 'text');
             svg.appendChild(txt);
-            txt.setAttribute('font-size', '24px');
+            txt.setAttribute('font-size', '28px');
             txt.setAttribute('font-weight', 'bold');
             txt.setAttribute('fill', rectangleColor);
-            txt.setAttribute('x', x + 6);
-            txt.setAttribute('y', y + 25);
+            txt.setAttribute('x', x + 7);
+            txt.setAttribute('y', y + 29);
             txt.textContent = measureN;
             if (measureId) txt.id = linkToSourceImageZone ? zoneId : measureId;
         }
@@ -233,7 +234,6 @@ export function addZoneResizer(v, rect) {
     // to modify cursor shape
     function mouseOver(ev) {
         let bcr = rect.getBoundingClientRect();
-        console.log('selected node: ', rect.selectedNode);
         if (Math.abs(ev.clientX - bcr.x) < rectangleLineWidth * 2 ||
             Math.abs(ev.clientX - bcr.x - bcr.width) < rectangleLineWidth * 2)
             rect.style.cursor = 'ew-resize';
@@ -290,14 +290,23 @@ export function addZoneResizer(v, rect) {
                     x = bb.x, y = bb.y, width = bb.width, height = bb.height + dy;
                     break;
             }
+            x = Math.round(x), y = Math.round(y), width = Math.round(width), height = Math.round(height);
             updateRect(rect, x, y, width, height, rectangleColor, rectangleLineWidth, 'none');
-            // v.xmlDoc.getElementById(rect.id)
+            let zone = v.xmlDoc.querySelector('[*|id=' + rect.id + ']');
+            zone.setAttribute('ulx', x);
+            zone.setAttribute('uly', y);
+            zone.setAttribute('lrx', x + width);
+            zone.setAttribute('lry', y + height);
+            v.updateNotation = false;
+            replaceInTextEditor(cm, zone, true);
+            v.updateNotation = true;
             console.log('Dragging: ' + what + ' ' + dx + '/' + dy);
         }
     };
 
     function mouseUp(ev) {
         what = '';
+        loadFacsimile(v.xmlDoc);
         console.log('mouse up');
     };
 
@@ -305,7 +314,7 @@ export function addZoneResizer(v, rect) {
     rect.addEventListener('mouseout', mouseOut);
     rect.addEventListener('mousedown', mouseDown);
     ip.addEventListener('mousemove', mouseMove);
-    rect.addEventListener('mouseup', mouseUp);
+    ip.addEventListener('mouseup', mouseUp);
 
     return {
         'mouseover': mouseOver,
