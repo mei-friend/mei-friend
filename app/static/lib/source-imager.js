@@ -2,8 +2,9 @@
 
 var facs = {}; // facsimile structure in MEI file
 var sourceImages = {}; // object of source images
-let rectangleLineWidth = 4; // width of bounding box rectangles in px
+let rectangleLineWidth = 6; // width of bounding box rectangles in px
 let rectangleColor = 'darkred';
+let listenerHandles = {};
 
 import {
     rmHash
@@ -16,6 +17,7 @@ import {
     updateRect
 } from './drag-selector.js';
 import {
+    cm,
     v
 } from './main.js';
 
@@ -143,43 +145,48 @@ export async function drawSourceImage() {
             svg.appendChild(lbl);
         }
         // go through displayed zones and draw bounding boxes with number-like label
-        if (fullPage)
+        if (fullPage) {
             for (let z in facs) {
                 if (facs[z]['target'] === facs[zoneId]['target'])
                     drawBoundingBox(z, facs[z]['measureId'], facs[z]['measureN']);
-            } else {
-                svgFacs.forEach(m => {
-                    if (m.hasAttribute('data-facs')) zoneId = rmHash(m.getAttribute('data-facs'));
-                    drawBoundingBox(zoneId, facs[zoneId]['measureId'], facs[zoneId]['measureN'])
-                });
             }
+        } else {
+            svgFacs.forEach(m => {
+                if (m.hasAttribute('data-facs')) zoneId = rmHash(m.getAttribute('data-facs'));
+                drawBoundingBox(zoneId, facs[zoneId]['measureId'], facs[zoneId]['measureN'])
+            });
+        }
         // console.log('ulx/uly//lrx/lry;w/h: ' + ulx + '/' + uly + '; ' + lrx + '/' + lry + '; ' + width + '/' + height);
     }
+}
 
-    function drawBoundingBox(zoneId, measureId, measureN) {
-        if (facs[zoneId]) {
-            let rect = document.createElementNS(svgNS, 'rect');
-            let linkToSourceImageZone = document.getElementById('linkToSourceImageZone').checked;
-            svg.appendChild(rect);
-            let x = parseFloat(facs[zoneId].ulx);
-            let y = parseFloat(facs[zoneId].uly);
-            let width = parseFloat(facs[zoneId].lrx) - x;
-            let height = parseFloat(facs[zoneId].lry) - y;
-            updateRect(rect, x, y, width, height, rectangleColor, rectangleLineWidth, 'none');
-            if (measureId) rect.id = linkToSourceImageZone ? zoneId : measureId;
-            if (measureN) { // draw number-like info from measure
-                let txt = document.createElementNS(svgNS, 'text');
-                svg.appendChild(txt);
-                txt.setAttribute('font-size', '24px');
-                txt.setAttribute('font-weight', 'bold');
-                txt.setAttribute('fill', rectangleColor);
-                txt.setAttribute('x', x + 6);
-                txt.setAttribute('y', y + 25);
-                txt.textContent = measureN;
-                if (measureId) txt.id = linkToSourceImageZone ? zoneId : measureId;
-            }
-            addZoneResizer(v, rect);
+function drawBoundingBox(zoneId, measureId, measureN) {
+    if (facs[zoneId]) {
+        let rect = document.createElementNS(svgNS, 'rect');
+        rect.setAttribute('rx', rectangleLineWidth / 2);
+        rect.setAttribute('ry', rectangleLineWidth / 2);
+        let linkToSourceImageZone = document.getElementById('linkToSourceImageZone').checked;
+        let svg = document.getElementById('source-image-svg');
+        svg.appendChild(rect);
+        let x = parseFloat(facs[zoneId].ulx);
+        let y = parseFloat(facs[zoneId].uly);
+        let width = parseFloat(facs[zoneId].lrx) - x;
+        let height = parseFloat(facs[zoneId].lry) - y;
+        updateRect(rect, x, y, width, height, rectangleColor, rectangleLineWidth, 'none');
+        if (measureId) rect.id = linkToSourceImageZone ? zoneId : measureId;
+        if (measureN) { // draw number-like info from measure
+            let txt = document.createElementNS(svgNS, 'text');
+            svg.appendChild(txt);
+            txt.setAttribute('font-size', '24px');
+            txt.setAttribute('font-weight', 'bold');
+            txt.setAttribute('fill', rectangleColor);
+            txt.setAttribute('x', x + 6);
+            txt.setAttribute('y', y + 25);
+            txt.textContent = measureN;
+            if (measureId) txt.id = linkToSourceImageZone ? zoneId : measureId;
         }
+        // if (rect.classList.contains('highlighed'))
+        //     addZoneResizer(v, rect);
     }
 }
 
@@ -200,14 +207,30 @@ export function zoomSourceImage(percent) {
     svgContainer.setAttribute("transform", "scale(" + sourceImageZoom.value / 100 + ")");
 }
 
-export function addZoneResizer(v, rect) {
+export function highlightZone(rect) {
+    let svg = document.getElementById('source-image-svg');
+    // remove event listerners
+    for (let key in listenerHandles) {
+     svg.querySelectorAll('rect').forEach(r => r.removeEventListener(key, listenerHandles[key]));
+    }
+    // svg.querySelectorAll('rect').forEach(r =>
+    //     r.outerHTML = r.outerHTML
+    // );
+    listenerHandles = addZoneResizer(v, rect);
+}
 
+// event listeners for resizing a zone bounding box
+export function addZoneResizer(v, rect) {
+    rect.draggable = true;
+    let ip = document.getElementById('image-panel');
+    let svg = document.getElementById('source-image-svg');
     var start = {}; // starting point start.x, start.y
     var end = {}; // ending point
     var what = ''; // west, east, north, south side
     let bb;
 
-    rect.addEventListener('mouseover', ev => {
+    // to modify cursor shape
+    function mouseOver(ev) {
         let bcr = rect.getBoundingClientRect();
         console.log('selected node: ', rect.selectedNode);
         if (Math.abs(ev.clientX - bcr.x) < rectangleLineWidth * 2 ||
@@ -215,15 +238,17 @@ export function addZoneResizer(v, rect) {
             rect.style.cursor = 'ew-resize';
         else
             rect.style.cursor = 'ns-resize';
-    });
+    };
 
-    rect.addEventListener('mouseout', ev => rect.style.cursor = 'default');
+    function mouseOut(ev) {
+        rect.style.cursor = 'default'
+    };
 
-    rect.addEventListener('mousedown', ev => {
+    function mouseDown(ev) {
         let bcr = rect.getBoundingClientRect();
         bb = rect.getBBox();
-        start.x = ev.clientX;
-        start.y = ev.clientY;
+        start.x = ev.clientX + ip.scrollLeft;
+        start.y = ev.clientY + ip.scrollTop;
         if (Math.abs(ev.clientX - bcr.x) < rectangleLineWidth * 2)
             what = 'west';
         else if (Math.abs(ev.clientY - bcr.y) < rectangleLineWidth * 2)
@@ -233,12 +258,22 @@ export function addZoneResizer(v, rect) {
         else if (Math.abs(ev.clientY - bcr.y - bcr.height) < rectangleLineWidth * 2)
             what = 'south';
         console.log('Mouse down: ' + start.x + '/' + start.y + ': ' + what);
-    });
+    };
 
-    rect.addEventListener('mousemove', ev => {
+    function mouseMove(ev) {
         if (what) {
-            let dx = ev.clientX - start.x;
-            let dy = ev.clientY - start.y;
+            let thisStart = {}; // adjust starting point to scroll of verovio-panel
+            thisStart.x = start.x - ip.scrollLeft;
+            thisStart.y = start.y - ip.scrollTop;
+            end.x = ev.clientX;
+            end.y = ev.clientY;
+
+            var mx = svg.getScreenCTM().inverse();
+            let s = transformCTM(thisStart, mx);
+            let e = transformCTM(end, mx);
+            let dx = e.x - s.x;
+            let dy = e.y - s.y;
+
             switch (what) {
                 case 'west':
                     updateRect(rect, bb.x + dx, bb.y, bb.width - dx, bb.height,
@@ -252,18 +287,32 @@ export function addZoneResizer(v, rect) {
                     updateRect(rect, bb.x, bb.y + dy, bb.width, bb.height - dy,
                         rectangleColor, rectangleLineWidth, 'none');
                     break;
-                case 'east':
+                case 'south':
                     updateRect(rect, bb.x, bb.y, bb.width, bb.height + dy,
                         rectangleColor, rectangleLineWidth, 'none');
                     break;
             }
             console.log('Dragging: ' + what + ' ' + dx + '/' + dy);
         }
-    });
+    };
 
-    rect.addEventListener('mouseup', ev => {
+    function mouseUp(ev) {
         what = '';
         console.log('mouse up');
-    });
+    };
+
+    rect.addEventListener('mouseover', mouseOver);
+    rect.addEventListener('mouseout', mouseOut);
+    rect.addEventListener('mousedown', mouseDown);
+    ip.addEventListener('mousemove', mouseMove);
+    rect.addEventListener('mouseup', mouseUp);
+
+    return {
+        'mouseover': mouseOver,
+        'mouseout': mouseOut,
+        'mousedown': mouseDown,
+        'mousemove': mouseMove,
+        'mouseup': mouseUp
+    };
 
 } // addZoneResizer()

@@ -554,6 +554,13 @@ svg text {
   fill: var(--highlightColor);
 }
 
+#pix-container rect.highlighted {
+  stroke: var(--highlightColor);
+  stroke-opacity: 80%;
+  fill: var(--highlightColor);
+  fill-opacity: 20%;
+}
+
 #pix-container g.supplied g {
   fill: var(--suppliedColor);
   color: var(--suppliedColor);
@@ -573,6 +580,10 @@ svg text {
   fill: var(--notationColor);
   color: var(--notationColor);
   stroke: var(--notationColor);
+}
+
+#pix-container rect {
+  stroke-opacity: 50%;
 }
 
 .hidden {

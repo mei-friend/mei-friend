@@ -14,6 +14,7 @@ import {
 } from './main.js';
 import {
   drawSourceImage,
+  highlightZone,
   zoomSourceImage
 } from './source-imager.js';
 import schema_meiCMN_401 from '../schemaInfo/mei-CMN-4.0.1.schemaInfo.js';
@@ -510,6 +511,8 @@ export default class Viewer {
         if (el) {
           el.forEach(e => {
             e.classList.add('highlighted');
+            if (e.nodeName === 'rect' && e.closest('#source-image-svg'))
+              highlightZone(e);
             e.querySelectorAll('g').forEach(g => g.classList.add('highlighted'));
           });
         }
@@ -1184,6 +1187,7 @@ export default class Viewer {
           case 'showAnnotationPanel':
             this.toggleAnnotationPanel();
             break;
+          case 'linkToSourceImageZone':
           case 'showSourceImagePanel':
           case 'selectSourceImagePosition':
           case 'sourceImageProportion':

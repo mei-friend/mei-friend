@@ -1,5 +1,9 @@
 # mei-friend-online CHANGELOG.md
 
+### 0.5.0 minor: Source Image Display
+* Parse facsimile information and display source image zones
+* Provide options to activate, position, resize and zoom source image pane
+* Full-page option to show entire source page with zone bounding boxes
 ### 0.4.0 minor: Annotation
 * Implement annotation panel (activate from mei-friend settings)
 * Annotation tools for highlight, describe, link 
