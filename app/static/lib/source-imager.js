@@ -20,6 +20,9 @@ import {
     cm,
     v
 } from './main.js';
+import {
+    replaceInTextEditor
+} from './editor.js';
 
 
 
@@ -211,11 +214,9 @@ export function highlightZone(rect) {
     let svg = document.getElementById('source-image-svg');
     // remove event listerners
     for (let key in listenerHandles) {
-     svg.querySelectorAll('rect').forEach(r => r.removeEventListener(key, listenerHandles[key]));
+        svg.querySelectorAll('rect').forEach(r => r.removeEventListener(key, listenerHandles[key]));
     }
-    // svg.querySelectorAll('rect').forEach(r =>
-    //     r.outerHTML = r.outerHTML
-    // );
+    // add zone resizer for selected zone box
     listenerHandles = addZoneResizer(v, rect);
 }
 
@@ -274,24 +275,23 @@ export function addZoneResizer(v, rect) {
             let dx = e.x - s.x;
             let dy = e.y - s.y;
 
+            let x, y, width, height;
             switch (what) {
                 case 'west':
-                    updateRect(rect, bb.x + dx, bb.y, bb.width - dx, bb.height,
-                        rectangleColor, rectangleLineWidth, 'none');
+                    x = bb.x + dx, y = bb.y, width = bb.width - dx, height = bb.height;
                     break;
                 case 'east':
-                    updateRect(rect, bb.x, bb.y, bb.width + dx, bb.height,
-                        rectangleColor, rectangleLineWidth, 'none');
+                    x = bb.x, y = bb.y, width = bb.width + dx, height = bb.height;
                     break;
                 case 'north':
-                    updateRect(rect, bb.x, bb.y + dy, bb.width, bb.height - dy,
-                        rectangleColor, rectangleLineWidth, 'none');
+                    x = bb.x, y = bb.y + dy, width = bb.width, height = bb.height - dy;
                     break;
                 case 'south':
-                    updateRect(rect, bb.x, bb.y, bb.width, bb.height + dy,
-                        rectangleColor, rectangleLineWidth, 'none');
+                    x = bb.x, y = bb.y, width = bb.width, height = bb.height + dy;
                     break;
             }
+            updateRect(rect, x, y, width, height, rectangleColor, rectangleLineWidth, 'none');
+            // v.xmlDoc.getElementById(rect.id)
             console.log('Dragging: ' + what + ' ' + dx + '/' + dy);
         }
     };
