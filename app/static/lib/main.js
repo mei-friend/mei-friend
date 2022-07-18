@@ -95,7 +95,7 @@ import {
   loadFacsimile,
   drawSourceImage,
   zoomSourceImage
-} from './source-imaging.js';
+} from './source-imager.js';
 
 // const defaultMeiFileName = `${root}Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei`;
 const defaultMeiFileName = `${root}Beethoven_WoO70-Breitkopf.mei`;

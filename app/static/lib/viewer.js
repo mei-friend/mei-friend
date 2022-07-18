@@ -15,7 +15,7 @@ import {
 import {
   drawSourceImage,
   zoomSourceImage
-} from './source-imaging.js';
+} from './source-imager.js';
 import schema_meiCMN_401 from '../schemaInfo/mei-CMN-4.0.1.schemaInfo.js';
 import schema_meiAll_401 from '../schemaInfo/mei-all-4.0.1.schemaInfo.js';
 

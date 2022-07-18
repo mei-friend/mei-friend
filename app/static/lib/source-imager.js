@@ -2,6 +2,8 @@
 
 var facs = {}; // facsimile structure in MEI file
 var sourceImages = {}; // object of source images
+let rectangleLineWidth = 4; // width of bounding box rectangles in px
+let rectangleColor = 'darkred';
 
 import {
     rmHash
@@ -10,8 +12,12 @@ import {
     svgNS
 } from './dom-utils.js'
 import {
+    transformCTM,
     updateRect
 } from './drag-selector.js';
+import {
+    v
+} from './main.js';
 
 
 
@@ -59,7 +65,6 @@ export function loadFacsimile(xmlDoc) {
 
 // Draw the source image with bounding boxes for each zone
 export async function drawSourceImage() {
-    let rectangleLineWidth = 4;
     let fullPage = document.getElementById('showSourceImageFullPage').checked;
     let ulx = Number.MAX_VALUE; // boundary values for image envelope
     let uly = Number.MAX_VALUE;
@@ -160,19 +165,20 @@ export async function drawSourceImage() {
             let y = parseFloat(facs[zoneId].uly);
             let width = parseFloat(facs[zoneId].lrx) - x;
             let height = parseFloat(facs[zoneId].lry) - y;
-            updateRect(rect, x, y, width, height, 'darkred', rectangleLineWidth, 'none');
+            updateRect(rect, x, y, width, height, rectangleColor, rectangleLineWidth, 'none');
             if (measureId) rect.id = linkToSourceImageZone ? zoneId : measureId;
             if (measureN) { // draw number-like info from measure
                 let txt = document.createElementNS(svgNS, 'text');
                 svg.appendChild(txt);
                 txt.setAttribute('font-size', '24px');
                 txt.setAttribute('font-weight', 'bold');
-                txt.setAttribute('fill', 'darkred');
+                txt.setAttribute('fill', rectangleColor);
                 txt.setAttribute('x', x + 6);
                 txt.setAttribute('y', y + 25);
                 txt.textContent = measureN;
                 if (measureId) txt.id = linkToSourceImageZone ? zoneId : measureId;
             }
+            addZoneResizer(v, rect);
         }
     }
 }
@@ -193,3 +199,71 @@ export function zoomSourceImage(percent) {
     let svgContainer = document.getElementById('source-image-container');
     svgContainer.setAttribute("transform", "scale(" + sourceImageZoom.value / 100 + ")");
 }
+
+export function addZoneResizer(v, rect) {
+
+    var start = {}; // starting point start.x, start.y
+    var end = {}; // ending point
+    var what = ''; // west, east, north, south side
+    let bb;
+
+    rect.addEventListener('mouseover', ev => {
+        let bcr = rect.getBoundingClientRect();
+        console.log('selected node: ', rect.selectedNode);
+        if (Math.abs(ev.clientX - bcr.x) < rectangleLineWidth * 2 ||
+            Math.abs(ev.clientX - bcr.x - bcr.width) < rectangleLineWidth * 2)
+            rect.style.cursor = 'ew-resize';
+        else
+            rect.style.cursor = 'ns-resize';
+    });
+
+    rect.addEventListener('mouseout', ev => rect.style.cursor = 'default');
+
+    rect.addEventListener('mousedown', ev => {
+        let bcr = rect.getBoundingClientRect();
+        bb = rect.getBBox();
+        start.x = ev.clientX;
+        start.y = ev.clientY;
+        if (Math.abs(ev.clientX - bcr.x) < rectangleLineWidth * 2)
+            what = 'west';
+        else if (Math.abs(ev.clientY - bcr.y) < rectangleLineWidth * 2)
+            what = 'north';
+        else if (Math.abs(ev.clientX - bcr.x - bcr.width) < rectangleLineWidth * 2)
+            what = 'east';
+        else if (Math.abs(ev.clientY - bcr.y - bcr.height) < rectangleLineWidth * 2)
+            what = 'south';
+        console.log('Mouse down: ' + start.x + '/' + start.y + ': ' + what);
+    });
+
+    rect.addEventListener('mousemove', ev => {
+        if (what) {
+            let dx = ev.clientX - start.x;
+            let dy = ev.clientY - start.y;
+            switch (what) {
+                case 'west':
+                    updateRect(rect, bb.x + dx, bb.y, bb.width - dx, bb.height,
+                        rectangleColor, rectangleLineWidth, 'none');
+                    break;
+                case 'east':
+                    updateRect(rect, bb.x, bb.y, bb.width + dx, bb.height,
+                        rectangleColor, rectangleLineWidth, 'none');
+                    break;
+                case 'north':
+                    updateRect(rect, bb.x, bb.y + dy, bb.width, bb.height - dy,
+                        rectangleColor, rectangleLineWidth, 'none');
+                    break;
+                case 'east':
+                    updateRect(rect, bb.x, bb.y, bb.width, bb.height + dy,
+                        rectangleColor, rectangleLineWidth, 'none');
+                    break;
+            }
+            console.log('Dragging: ' + what + ' ' + dx + '/' + dy);
+        }
+    });
+
+    rect.addEventListener('mouseup', ev => {
+        what = '';
+        console.log('mouse up');
+    });
+
+} // addZoneResizer()

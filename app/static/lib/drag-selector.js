@@ -161,7 +161,7 @@ export function addDragSelector(v, vp) {
 
 }
 
-function transformCTM(point, matrix) {
+export function transformCTM(point, matrix) {
   let r = {};
   r.x = matrix.a * point.x + matrix.c * point.y + matrix.e;
   r.y = matrix.b * point.x + matrix.d * point.y + matrix.f;
