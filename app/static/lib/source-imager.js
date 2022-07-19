@@ -215,13 +215,19 @@ export function highlightZone(rect) {
     for (let key in listenerHandles) {
         svg.querySelectorAll('rect').forEach(r => r.removeEventListener(key, listenerHandles[key]));
     }
-    // add zone resizer for selected zone box
-    listenerHandles = addZoneResizer(v, rect);
+    // add zone resizer for selected zone box (only when linked to zone rather than to measure)
+    if (document.getElementById('linkToSourceImageZone').checked)
+        listenerHandles = addZoneResizer(v, rect);
 }
 
 // event listeners for resizing a zone bounding box
 export function addZoneResizer(v, rect) {
-    rect.draggable = true;
+    let txt = document.querySelector('text[id="' + rect.id + '"]');
+    let txtX, txtY;
+    if (txt) {
+        txtX = parseFloat(txt.getAttribute('x'));
+        txtY = parseFloat(txt.getAttribute('y'));
+    }
     let ip = document.getElementById('image-panel');
     let svg = document.getElementById('source-image-svg');
     var start = {}; // starting point start.x, start.y
@@ -234,30 +240,38 @@ export function addZoneResizer(v, rect) {
         bb = rect.getBBox();
         start.x = ev.clientX + ip.scrollLeft;
         start.y = ev.clientY + ip.scrollTop;
-        if (Math.abs(ev.clientX - bcr.x) < rectangleLineWidth * 2)
-            what = 'west';
-        else if (Math.abs(ev.clientY - bcr.y) < rectangleLineWidth * 2)
-            what = 'north';
-        else if (Math.abs(ev.clientX - bcr.x - bcr.width) < rectangleLineWidth * 2)
-            what = 'east';
-        else if (Math.abs(ev.clientY - bcr.y - bcr.height) < rectangleLineWidth * 2)
-            what = 'south';
-        console.log('Mouse down: ' + start.x + '/' + start.y + ': ' + what);
+        let thres = rectangleLineWidth * 2;
+        let xl = Math.abs(ev.clientX - bcr.x);
+        let xr = Math.abs(ev.clientX - bcr.x - bcr.width);
+        let yu = Math.abs(ev.clientY - bcr.y);
+        let yl = Math.abs(ev.clientY - bcr.y - bcr.height);
+        if (xl < thres) what = 'west';
+        if (yu < thres) what = 'north';
+        if (xr < thres) what = 'east';
+        if (yl < thres) what = 'south';
+        if (xl < thres && yu < thres) what = 'northwest';
+        if (xr < thres && yu < thres) what = 'northeast';
+        if (xl < thres && yl < thres) what = 'southwest';
+        if (xr < thres && yl < thres) what = 'southeast';
+        // console.log('Mouse down: ev.clientX/Y:' + ev.clientX + '/' + ev.clientX + ': ' + what + ', rect:', rect);
     };
 
     function mouseMove(ev) {
         let bcr = rect.getBoundingClientRect();
-        // console.log('bcr x/y: ' + bcr.x + '/' + bcr.y);
-        // console.log('client x/y: ' + ev.clientX + '/' + ev.clientY);
-        // console.log('diff x/y: ' + Math.abs(ev.clientX - bcr.x) + '/' + Math.abs(ev.clientY - bcr.y));
-        if (Math.abs(ev.clientX - bcr.x) <= (rectangleLineWidth * 2) ||
-            Math.abs(ev.clientX - bcr.x - bcr.width) <= (rectangleLineWidth * 2))
-            rect.style.cursor = 'ew-resize';
-        else if (Math.abs(ev.clientY - bcr.y) <= (rectangleLineWidth * 2) ||
-            Math.abs(ev.clientY - bcr.y - bcr.height) <= (rectangleLineWidth * 2))
-            rect.style.cursor = 'ns-resize';
-        else
-            rect.style.cursor = 'default';
+        let thres = rectangleLineWidth * 2;
+        let xl = Math.abs(ev.clientX - bcr.x);
+        let xr = Math.abs(ev.clientX - bcr.x - bcr.width);
+        let yu = Math.abs(ev.clientY - bcr.y);
+        let yl = Math.abs(ev.clientY - bcr.y - bcr.height);
+        rect.style.cursor = 'default';
+        if (xl < thres) rect.style.cursor = 'ew-resize';
+        if (yu < thres) rect.style.cursor = 'ns-resize';
+        if (xr < thres) rect.style.cursor = 'ew-resize';
+        if (yl < thres) rect.style.cursor = 'ns-resize';
+        if (xl < thres && yu < thres) rect.style.cursor = 'nwse-resize';
+        if (xr < thres && yu < thres) rect.style.cursor = 'nesw-resize';
+        if (xl < thres && yl < thres) rect.style.cursor = 'nesw-resize';
+        if (xr < thres && yl < thres) rect.style.cursor = 'nwse-resize';
 
         if (what) {
             let thisStart = {}; // adjust starting point to scroll of verovio-panel
@@ -286,25 +300,41 @@ export function addZoneResizer(v, rect) {
                 case 'south':
                     x = bb.x, y = bb.y, width = bb.width, height = bb.height + dy;
                     break;
+                case 'northwest':
+                    x = bb.x + dx, y = bb.y + dy, width = bb.width - dx, height = bb.height - dy;
+                    break;
+                case 'northeast':
+                    x = bb.x, y = bb.y + dy, width = bb.width + dx, height = bb.height - dy;
+                    break;
+                case 'southwest':
+                    x = bb.x + dx, y = bb.y, width = bb.width - dx, height = bb.height + dy;
+                    break;
+                case 'southeast':
+                    x = bb.x, y = bb.y, width = bb.width + dx, height = bb.height + dy;
+                    break;
             }
             x = Math.round(x), y = Math.round(y), width = Math.round(width), height = Math.round(height);
             updateRect(rect, x, y, width, height, rectangleColor, rectangleLineWidth, 'none');
+            if (txt && what === 'northwest' || what === 'west') txt.setAttribute('x', txtX + dx);
+            if (txt && what === 'north' || what === 'northwest') txt.setAttribute('y', txtY + dy);
+
             let zone = v.xmlDoc.querySelector('[*|id=' + rect.id + ']');
             zone.setAttribute('ulx', x);
             zone.setAttribute('uly', y);
             zone.setAttribute('lrx', x + width);
             zone.setAttribute('lry', y + height);
+            // edit in CodeMirror
             v.updateNotation = false;
             replaceInTextEditor(cm, zone, true);
             v.updateNotation = true;
-            console.log('Dragging: ' + what + ' ' + dx + '/' + dy);
+            // console.log('Dragging: ' + what + ' ' + dx + '/' + dy);
         }
     };
 
     function mouseUp(ev) {
         what = '';
         loadFacsimile(v.xmlDoc);
-        console.log('mouse up');
+        // console.log('mouse up');
     };
 
     rect.addEventListener('mousedown', mouseDown);

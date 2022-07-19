@@ -357,7 +357,7 @@ export function addAnnotationHandlers() {
 
 // reads <annot> elements from XML DOM and adds them into annotations array
 export function readAnnots() {
-  console.log("READ ANNOTS")
+  // console.log("READ ANNOTS")
   if (!v.xmlDoc) return;
   let annots = Array.from(v.xmlDoc.querySelectorAll('annot'));
   annots = annots.filter(annot => annotations.findIndex(a => a.id !== annot.getAttribute('xml:id')));
