@@ -94,7 +94,8 @@ import {
 import {
   loadFacsimile,
   drawSourceImage,
-  zoomSourceImage
+  zoomSourceImage,
+  addZoneDrawer
 } from './source-imager.js';
 
 // const defaultMeiFileName = `${root}Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei`;
@@ -1342,6 +1343,8 @@ function addEventListeners(v, cm) {
   });
 
   addDragSelector(v, vp);
+
+  addZoneDrawer();
 } // addEventListeners()
 
 

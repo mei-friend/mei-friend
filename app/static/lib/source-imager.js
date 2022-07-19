@@ -10,7 +10,8 @@ import {
     rmHash
 } from './utils.js';
 import {
-    svgNS
+    svgNS,
+    xmlNameSpace
 } from './dom-utils.js'
 import {
     transformCTM,
@@ -348,3 +349,75 @@ export function addZoneResizer(v, rect) {
     };
 
 } // addZoneResizer()
+
+// enables zone drawing with mouse click-and-drag
+export function addZoneDrawer() {
+    let ip = document.getElementById('image-panel');
+    let svg = document.getElementById('source-image-svg');
+    var start = {}; // starting point start.x, start.y
+    var end = {}; // ending point
+    let what = '';
+
+    function mouseDown(ev) {
+        ev.preventDefault();
+        ev.stopPropagation();
+        start.x = ev.clientX; // + ip.scrollLeft;
+        start.y = ev.clientY; // + ip.scrollTop;
+        if (document.getElementById('editZones').checked) {
+            let rect = document.createElementNS(svgNS, 'rect');
+            rect.id = 'new-rect';
+            rect.setAttribute('rx', rectangleLineWidth / 2);
+            rect.setAttribute('ry', rectangleLineWidth / 2);
+            rect.setAttribute('x', start.x);
+            rect.setAttribute('y', start.y);
+            rect.setAttribute('stroke', rectangleColor);
+            rect.setAttribute('stroke-width', rectangleLineWidth);
+            rect.setAttribute('fill', 'none');
+            svg.appendChild(rect);
+            what = 'new';
+        }
+    }
+
+    function mouseMove(ev) {
+        ev.preventDefault();
+        ev.stopPropagation();
+        if (document.getElementById('editZones').checked && what === 'new') {
+            let rect = document.getElementById('new-rect');
+            if (rect) {
+                let thisStart = {}; // adjust starting point to scroll of verovio-panel
+                thisStart.x = start.x; // - ip.scrollLeft;
+                thisStart.y = start.y; // - ip.scrollTop;
+                end.x = ev.clientX;
+                end.y = ev.clientY;
+
+                var mx = svg.getScreenCTM().inverse();
+                let s = transformCTM(thisStart, mx);
+                let e = transformCTM(end, mx);
+                let width = e.x - s.x;
+                let height = e.y - s.y;
+                // let width = end.x - thisStart.x;
+                // let height = end.y - thisStart.y;
+
+                rect.setAttribute('width', width);
+                rect.setAttribute('height', height);
+            }
+        }
+    }
+
+    function mouseUp(ev) {
+        if (document.getElementById('editZones').checked) {
+            let rect = document.getElementById('new-rect');
+            if (rect) {
+                let zone = v.xmlDoc.createElementNS(xmlNameSpace, 'zone');
+                console.log('new zone', rect);
+                // TODO: add new zone to xmlDoc and to cm
+                // TODO: update rect.id to new xml:id
+            }
+            what = '';
+        }
+    }
+
+    svg.addEventListener('mousedown', mouseDown);
+    svg.addEventListener('mousemove', mouseMove);
+    svg.addEventListener('mouseup', mouseUp);
+}

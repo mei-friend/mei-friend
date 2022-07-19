@@ -41,7 +41,7 @@ export function delEl(v, cm) {
       if (el) selectedElements.push(el.getAttribute('id'));
       else selectedElements.push(nextId);
     }
-  } else if (['beam'].includes(element.nodeName)) { // delte beam
+  } else if (['beam'].includes(element.nodeName)) { // delete beam
     let p;
     let first = true;
     let childList = element.childNodes;
