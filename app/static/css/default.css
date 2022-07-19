@@ -555,7 +555,7 @@ svg text {
   fill-opacity: 100%;
 }
 
-#pix-container rect.highlighted {
+#image-panel rect.highlighted {
   stroke: var(--highlightColor);
   stroke-opacity: 70%;
   fill: var(--highlightColor);
@@ -583,11 +583,11 @@ svg text {
   stroke: var(--notationColor);
 }
 
-#pix-container rect {
+#image-panel rect {
   stroke-opacity: 40%;
 }
 
-#pix-container text {
+#image-panel text {
   stroke-opacity: 40%;
   fill-opacity: 40%;
 }

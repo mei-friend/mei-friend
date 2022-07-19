@@ -3,6 +3,9 @@ import * as speed from './speed.js';
 import * as utils from './utils.js';
 import * as dutils from './dom-utils.js';
 import * as att from './attribute-classes.js';
+import {
+  loadFacsimile
+} from './source-imager.js';
 
 // delete selected elements
 export function delEl(v, cm) {
@@ -19,6 +22,7 @@ export function delEl(v, cm) {
   let selectedElements = [];
   v.updateNotation = false;
   // let checkPoint = buffer.createCheckpoint(); TODO
+
   if (att.modelControlEvents.concat(['accid', 'artic', 'clef', 'octave', 'beamSpan'])
     .includes(element.nodeName)) {
     if (element.nodeName == 'octave') { // reset notes inside octave range
@@ -60,11 +64,19 @@ export function delEl(v, cm) {
       selectedElements.push(childList[i].getAttribute('xml:id'))
       element.parentNode.insertBefore(childList[i--], element);
     }
-  } else {
-    console.info('Element ' + id + ' not supported for deletion.');
-    return;
-  }
+  } else // delete Zone in source image display
+    if (element.nodeName === 'zone' && document.getElementById('editZones').checked) {
+      removeInBuffer(cm, element);
+      let rect = document.querySelector('rect[id="' + element.getAttribute('xml:id') + '"]');
+      if (rect) rect.parentElement.removeChild(rect);
+      let txt = document.querySelector('text[id="' + element.getAttribute('xml:id') + '"]');
+      if (txt) txt.parentElement.removeChild(txt);
+    } else {
+      console.info('Element ' + id + ' not supported for deletion.');
+      return;
+    }
   element.remove();
+  loadFacsimile(v.xmlDoc);
   // buffer.groupChangesSinceCheckpoint(checkPoint); TODO
   v.selectedElements = selectedElements;
   v.lastNoteId = v.selectedElements[v.selectedElements.length - 1];
