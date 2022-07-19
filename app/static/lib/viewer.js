@@ -990,9 +990,9 @@ export default class Viewer {
         type: 'bool',
         default: false
       },
-      linkToSourceImageZone: {
-        title: 'Link to source image zone',
-        description: 'Link to source image zone rather than to source image encoding',
+      editZones: {
+        title: 'Edit source image zones',
+        description: 'Edit source image zones (will link bounding boxes to facsimile zones)',
         type: 'bool',
         default: false
       },
@@ -1187,7 +1187,7 @@ export default class Viewer {
           case 'showAnnotationPanel':
             this.toggleAnnotationPanel();
             break;
-          case 'linkToSourceImageZone':
+          case 'editZones':
           case 'showSourceImagePanel':
           case 'selectSourceImagePosition':
           case 'sourceImageProportion':

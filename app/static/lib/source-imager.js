@@ -169,7 +169,7 @@ function drawBoundingBox(zoneId, measureId, measureN) {
         let rect = document.createElementNS(svgNS, 'rect');
         rect.setAttribute('rx', rectangleLineWidth / 2);
         rect.setAttribute('ry', rectangleLineWidth / 2);
-        let linkToSourceImageZone = document.getElementById('linkToSourceImageZone').checked;
+        let editZones = document.getElementById('editZones').checked;
         let svg = document.getElementById('source-image-svg');
         svg.appendChild(rect);
         let x = parseFloat(facs[zoneId].ulx);
@@ -177,7 +177,7 @@ function drawBoundingBox(zoneId, measureId, measureN) {
         let width = parseFloat(facs[zoneId].lrx) - x;
         let height = parseFloat(facs[zoneId].lry) - y;
         updateRect(rect, x, y, width, height, rectangleColor, rectangleLineWidth, 'none');
-        if (measureId) rect.id = linkToSourceImageZone ? zoneId : measureId;
+        if (measureId) rect.id = editZones ? zoneId : measureId;
         if (measureN) { // draw number-like info from measure
             let txt = document.createElementNS(svgNS, 'text');
             svg.appendChild(txt);
@@ -187,7 +187,7 @@ function drawBoundingBox(zoneId, measureId, measureN) {
             txt.setAttribute('x', x + 7);
             txt.setAttribute('y', y + 29);
             txt.textContent = measureN;
-            if (measureId) txt.id = linkToSourceImageZone ? zoneId : measureId;
+            if (measureId) txt.id = editZones ? zoneId : measureId;
         }
     }
 }
@@ -216,7 +216,7 @@ export function highlightZone(rect) {
         svg.querySelectorAll('rect').forEach(r => r.removeEventListener(key, listenerHandles[key]));
     }
     // add zone resizer for selected zone box (only when linked to zone rather than to measure)
-    if (document.getElementById('linkToSourceImageZone').checked)
+    if (document.getElementById('editZones').checked)
         listenerHandles = addZoneResizer(v, rect);
 }
 
