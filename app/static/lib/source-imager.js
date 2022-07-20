@@ -2,16 +2,22 @@
 
 var facs = {}; // facsimile structure in MEI file
 var sourceImages = {}; // object of source images
-let rectangleLineWidth = 6; // width of bounding box rectangles in px
-let rectangleColor = 'darkred';
-let listenerHandles = {};
+var rectangleLineWidth = 6; // width of bounding box rectangles in px
+var rectangleColor = 'darkred';
+var listenerHandles = {};
+var resize = ''; // west, east, north, south, northwest, southeast etc
 
 import {
+    generateUUID,
+    getElementIdAtCursor,
+    insideParent,
     rmHash
 } from './utils.js';
 import {
+    meiNameSpace,
     svgNS,
-    xmlNameSpace
+    xmlNameSpace,
+    xmlToString
 } from './dom-utils.js'
 import {
     transformCTM,
@@ -178,7 +184,8 @@ function drawBoundingBox(zoneId, measureId, measureN) {
         let width = parseFloat(facs[zoneId].lrx) - x;
         let height = parseFloat(facs[zoneId].lry) - y;
         updateRect(rect, x, y, width, height, rectangleColor, rectangleLineWidth, 'none');
-        if (measureId) rect.id = editZones ? zoneId : measureId;
+        if (editZones) rect.id = zoneId;
+        else if (measureId) rect.id = measureId;
         if (measureN) { // draw number-like info from measure
             let txt = document.createElementNS(svgNS, 'text');
             svg.appendChild(txt);
@@ -221,6 +228,7 @@ export function highlightZone(rect) {
         listenerHandles = addZoneResizer(v, rect);
 }
 
+
 // event listeners for resizing a zone bounding box
 export function addZoneResizer(v, rect) {
     let txt = document.querySelector('text[id="' + rect.id + '"]');
@@ -229,12 +237,11 @@ export function addZoneResizer(v, rect) {
         txtX = parseFloat(txt.getAttribute('x'));
         txtY = parseFloat(txt.getAttribute('y'));
     }
-    let ip = document.getElementById('image-panel');
-    let svg = document.getElementById('source-image-svg');
+    var ip = document.getElementById('image-panel');
+    var svg = document.getElementById('source-image-svg');
     var start = {}; // starting point start.x, start.y
     var end = {}; // ending point
-    var what = ''; // west, east, north, south side
-    let bb;
+    var bb;
 
     function mouseDown(ev) {
         let bcr = rect.getBoundingClientRect();
@@ -246,15 +253,18 @@ export function addZoneResizer(v, rect) {
         let xr = Math.abs(ev.clientX - bcr.x - bcr.width);
         let yu = Math.abs(ev.clientY - bcr.y);
         let yl = Math.abs(ev.clientY - bcr.y - bcr.height);
-        if (xl < thres) what = 'west';
-        if (yu < thres) what = 'north';
-        if (xr < thres) what = 'east';
-        if (yl < thres) what = 'south';
-        if (xl < thres && yu < thres) what = 'northwest';
-        if (xr < thres && yu < thres) what = 'northeast';
-        if (xl < thres && yl < thres) what = 'southwest';
-        if (xr < thres && yl < thres) what = 'southeast';
-        // console.log('Mouse down: ev.clientX/Y:' + ev.clientX + '/' + ev.clientX + ': ' + what + ', rect:', rect);
+        if (ev.clientX > bcr.x && ev.clientX < (bcr.x + bcr.width) &&
+            ev.clientY > bcr.y && ev.clientY < (bcr.y + bcr.height))
+            resize = 'pan';
+        if (xl < thres) resize = 'west';
+        if (yu < thres) resize = 'north';
+        if (xr < thres) resize = 'east';
+        if (yl < thres) resize = 'south';
+        if (xl < thres && yu < thres) resize = 'northwest';
+        if (xr < thres && yu < thres) resize = 'northeast';
+        if (xl < thres && yl < thres) resize = 'southwest';
+        if (xr < thres && yl < thres) resize = 'southeast';
+        console.log('ZoneResizer: Mouse down ' + resize + ' ev.clientX/Y:' + ev.clientX + '/' + ev.clientX + ', rect:', rect);
     };
 
     function mouseMove(ev) {
@@ -265,6 +275,10 @@ export function addZoneResizer(v, rect) {
         let yu = Math.abs(ev.clientY - bcr.y);
         let yl = Math.abs(ev.clientY - bcr.y - bcr.height);
         rect.style.cursor = 'default';
+        if (ev.clientX > bcr.x && ev.clientX < (bcr.x + bcr.width) &&
+            ev.clientY > bcr.y && ev.clientY < (bcr.y + bcr.height) &&
+            ev.target === rect)
+            rect.style.cursor = 'move';
         if (xl < thres) rect.style.cursor = 'ew-resize';
         if (yu < thres) rect.style.cursor = 'ns-resize';
         if (xr < thres) rect.style.cursor = 'ew-resize';
@@ -273,8 +287,9 @@ export function addZoneResizer(v, rect) {
         if (xr < thres && yu < thres) rect.style.cursor = 'nesw-resize';
         if (xl < thres && yl < thres) rect.style.cursor = 'nesw-resize';
         if (xr < thres && yl < thres) rect.style.cursor = 'nwse-resize';
+        // console.log('ZoneResizer: Mouse Move ' + resize + ' ev.clientX/Y:' + ev.clientX + '/' + ev.clientY + ', rect:', bcr);
 
-        if (what) {
+        if (resize || (resize === 'pan' && ev.target === rect)) {
             let thisStart = {}; // adjust starting point to scroll of verovio-panel
             thisStart.x = start.x - ip.scrollLeft;
             thisStart.y = start.y - ip.scrollTop;
@@ -288,7 +303,7 @@ export function addZoneResizer(v, rect) {
             let dy = e.y - s.y;
 
             let x, y, width, height;
-            switch (what) {
+            switch (resize) {
                 case 'west':
                     x = bb.x + dx, y = bb.y, width = bb.width - dx, height = bb.height;
                     break;
@@ -313,11 +328,16 @@ export function addZoneResizer(v, rect) {
                 case 'southeast':
                     x = bb.x, y = bb.y, width = bb.width + dx, height = bb.height + dy;
                     break;
+                case 'pan':
+                    x = bb.x + dx, y = bb.y + dy, width = bb.width, height = bb.height;
+                    break;
             }
             x = Math.round(x), y = Math.round(y), width = Math.round(width), height = Math.round(height);
             updateRect(rect, x, y, width, height, rectangleColor, rectangleLineWidth, 'none');
-            if (txt && what === 'northwest' || what === 'west') txt.setAttribute('x', txtX + dx);
-            if (txt && what === 'north' || what === 'northwest') txt.setAttribute('y', txtY + dy);
+            if (txt && (resize === 'northwest' || resize === 'west' || resize === 'pan'))
+                txt.setAttribute('x', txtX + dx);
+            if (txt && (resize === 'north' || resize === 'northwest' || resize === 'pan'))
+                txt.setAttribute('y', txtY + dy);
 
             let zone = v.xmlDoc.querySelector('[*|id=' + rect.id + ']');
             zone.setAttribute('ulx', x);
@@ -328,12 +348,12 @@ export function addZoneResizer(v, rect) {
             v.updateNotation = false;
             replaceInTextEditor(cm, zone, true);
             v.updateNotation = true;
-            // console.log('Dragging: ' + what + ' ' + dx + '/' + dy);
+            // console.log('Dragging: ' + resize + ' ' + dx + '/' + dy);
         }
     };
 
     function mouseUp(ev) {
-        what = '';
+        resize = '';
         loadFacsimile(v.xmlDoc);
         // console.log('mouse up');
     };
@@ -350,70 +370,95 @@ export function addZoneResizer(v, rect) {
 
 } // addZoneResizer()
 
-// enables zone drawing with mouse click-and-drag
+// enables new zone drawing with mouse click-and-drag
 export function addZoneDrawer() {
     let ip = document.getElementById('image-panel');
     let svg = document.getElementById('source-image-svg');
-    var start = {}; // starting point start.x, start.y
-    var end = {}; // ending point
-    let what = '';
+    let start = {}; // starting point start.x, start.y
+    let end = {}; // ending point
+    let drawWhat = '';
+    let minSize = 20; // px, minimum width and height for a zone
 
     function mouseDown(ev) {
         ev.preventDefault();
-        ev.stopPropagation();
-        start.x = ev.clientX; // + ip.scrollLeft;
-        start.y = ev.clientY; // + ip.scrollTop;
-        if (document.getElementById('editZones').checked) {
+        if (document.getElementById('editZones').checked && !resize) {
+            start.x = ev.clientX; // + ip.scrollLeft;
+            start.y = ev.clientY; // + ip.scrollTop;
+
+            var mx = svg.getScreenCTM().inverse();
+            let s = transformCTM(start, mx);
+
             let rect = document.createElementNS(svgNS, 'rect');
             rect.id = 'new-rect';
             rect.setAttribute('rx', rectangleLineWidth / 2);
             rect.setAttribute('ry', rectangleLineWidth / 2);
-            rect.setAttribute('x', start.x);
-            rect.setAttribute('y', start.y);
+            rect.setAttribute('x', s.x);
+            rect.setAttribute('y', s.y);
             rect.setAttribute('stroke', rectangleColor);
             rect.setAttribute('stroke-width', rectangleLineWidth);
             rect.setAttribute('fill', 'none');
             svg.appendChild(rect);
-            what = 'new';
+            drawWhat = 'new';
+            console.log('ZoneDrawer mouse down: ' + drawWhat + '; ' +
+                ev.clientX + '/' + ev.clientY + ', scroll: ' + ip.scrollLeft + '/' + ip.scrollTop + ', start: ', start);
         }
     }
 
     function mouseMove(ev) {
         ev.preventDefault();
-        ev.stopPropagation();
-        if (document.getElementById('editZones').checked && what === 'new') {
+        if (document.getElementById('editZones').checked && drawWhat === 'new') {
             let rect = document.getElementById('new-rect');
-            if (rect) {
-                let thisStart = {}; // adjust starting point to scroll of verovio-panel
-                thisStart.x = start.x; // - ip.scrollLeft;
-                thisStart.y = start.y; // - ip.scrollTop;
+            if (rect && !resize) {
+                // let thisStart = {}; // adjust starting point to scroll of verovio-panel
+                // thisStart.x = start.x - ip.scrollLeft;
+                // thisStart.y = start.y - ip.scrollTop;
                 end.x = ev.clientX;
                 end.y = ev.clientY;
-
                 var mx = svg.getScreenCTM().inverse();
-                let s = transformCTM(thisStart, mx);
+                let s = transformCTM(start, mx);
                 let e = transformCTM(end, mx);
-                let width = e.x - s.x;
-                let height = e.y - s.y;
-                // let width = end.x - thisStart.x;
-                // let height = end.y - thisStart.y;
-
-                rect.setAttribute('width', width);
-                rect.setAttribute('height', height);
+                rect.setAttribute('width', e.x - s.x);
+                rect.setAttribute('height', e.y - s.y);
             }
         }
     }
 
     function mouseUp(ev) {
-        if (document.getElementById('editZones').checked) {
+        if (document.getElementById('editZones').checked && !resize) {
             let rect = document.getElementById('new-rect');
-            if (rect) {
-                let zone = v.xmlDoc.createElementNS(xmlNameSpace, 'zone');
-                console.log('new zone', rect);
-                // TODO: add new zone to xmlDoc and to cm
-                // TODO: update rect.id to new xml:id
+            let width, height;
+            if (rect && (width = Math.round(rect.getAttribute('width'))) > minSize &&
+                (height = Math.round(rect.getAttribute('height'))) > minSize) {
+                // create xml dom element
+                let zone = v.xmlDoc.createElementNS(meiNameSpace, 'zone');
+                let uuid = 'zone-' + generateUUID();
+                rect.setAttribute('id', uuid);
+                zone.setAttributeNS(xmlNameSpace, 'xml:id', uuid);
+                let x = Math.round(rect.getAttribute('x'));
+                let y = Math.round(rect.getAttribute('y'));
+                zone.setAttribute('ulx', x);
+                zone.setAttribute('uly', y);
+                zone.setAttribute('lrx', x + width);
+                zone.setAttribute('lry', y + height);
+                v.updateNotation = false;
+                let currentId = getElementIdAtCursor(cm);
+                if (true || insideParent(currentId, 'surface')) {
+                    cm.execCommand('goLineEnd');
+                    cm.replaceRange('\n' + xmlToString(zone), cm.getCursor());
+                    cm.execCommand('indentAuto');
+                    v.updateData(cm, false, false);
+                    // v.loadXml(cm.getValue(), true); // force-reloading DOM
+                    // loadFacsimile(v.xmlDoc);
+                    // drawSourceImage();
+                    console.log('new zone added', rect);
+                    v.updateNotation = true;
+                } else {
+                    console.warn('Cannot add zone element outside a surface. Please click inside a surface element.');
+                }
+            } else {
+                rect.remove();
             }
-            what = '';
+            drawWhat = '';
         }
     }
 
