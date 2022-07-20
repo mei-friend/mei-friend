@@ -221,7 +221,12 @@ export function highlightZone(rect) {
     let svg = document.getElementById('source-image-svg');
     // remove event listerners
     for (let key in listenerHandles) {
-        svg.querySelectorAll('rect').forEach(r => r.removeEventListener(key, listenerHandles[key]));
+        if (key === 'mousedown') { // remove mousedown listener from all rectangles
+            svg.querySelectorAll('rect').forEach(r => r.removeEventListener(key, listenerHandles[key]));
+        } else { // and the other two from the image-panel
+            let ip = document.getElementById('image-panel')
+            if (ip) ip.removeEventListener(key, listenerHandles[key]);
+        }
     }
     // add zone resizer for selected zone box (only when linked to zone rather than to measure)
     if (document.getElementById('editZones').checked)
@@ -289,7 +294,7 @@ export function addZoneResizer(v, rect) {
         if (xr < thres && yl < thres) rect.style.cursor = 'nwse-resize';
         // console.log('ZoneResizer: Mouse Move ' + resize + ' ev.clientX/Y:' + ev.clientX + '/' + ev.clientY + ', rect:', bcr);
 
-        if (resize || (resize === 'pan' && ev.target === rect)) {
+        if (bb && resize) {
             let thisStart = {}; // adjust starting point to scroll of verovio-panel
             thisStart.x = start.x - ip.scrollLeft;
             thisStart.y = start.y - ip.scrollTop;
@@ -455,7 +460,7 @@ export function addZoneDrawer() {
                 } else {
                     console.warn('Cannot add zone element outside a surface. Please click inside a surface element.');
                 }
-            } else {
+            } else if (rect) {
                 rect.remove();
             }
             drawWhat = '';
