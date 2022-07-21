@@ -625,6 +625,7 @@ export function renumberMeasures(v, cm, change) {
   v.updateNotation = false;
   v.loadXml(cm.getValue(), true);
   utils.renumberMeasures(v.xmlDoc, cm, 1, change);
+  v.updateData(cm, false, true);
   v.updateNotation = true;
 }
 

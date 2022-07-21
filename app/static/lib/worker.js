@@ -1,7 +1,7 @@
+// importScripts("https://www.verovio.org/javascript/3.10.0/verovio-toolkit-hum.js");
+// importScripts("https://www.verovio.org/javascript/latest/verovio-toolkit-wasm.js");
 // importScripts("https://www.verovio.org/javascript/develop/verovio-toolkit-hum.js");
-importScripts("https://www.verovio.org/javascript/3.10.0/verovio-toolkit-hum.js");
-//importScripts("https://www.verovio.org/javascript/latest/verovio-toolkit-wasm.js");
-// importScripts(`../verovio-toolkit-hum.js`);
+importScripts(`../verovio-toolkit-hum.js`);
 
 var tk;
 var tkOptions;
