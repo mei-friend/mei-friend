@@ -71,6 +71,12 @@ export function delEl(v, cm) {
       if (rect) rect.parentElement.removeChild(rect);
       let txt = document.querySelector('text[id="' + element.getAttribute('xml:id') + '"]');
       if (txt) txt.parentElement.removeChild(txt);
+      // find elements referring to this zone id via @facs and delete them
+      let ms = v.xmlDoc.querySelectorAll('[facs="#' + element.getAttribute('xml:id') + '"]');
+      ms.forEach(e => {
+        e.removeAttribute('facs');
+        replaceInTextEditor(cm, e);
+      });
     } else {
       console.info('Element ' + id + ' not supported for deletion.');
       return;
