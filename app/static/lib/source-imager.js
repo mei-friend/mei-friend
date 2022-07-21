@@ -338,17 +338,18 @@ export function addZoneResizer(v, rect) {
                     break;
             }
             x = Math.round(x), y = Math.round(y), width = Math.round(width), height = Math.round(height);
-            updateRect(rect, x, y, width, height, rectangleColor, rectangleLineWidth, 'none');
+            let c = adjustCoordinates(x, y, width, height);
+            updateRect(rect, c.x, c.y, c.width, c.height, rectangleColor, rectangleLineWidth, 'none');
             if (txt && (resize === 'northwest' || resize === 'west' || resize === 'pan'))
                 txt.setAttribute('x', txtX + dx);
             if (txt && (resize === 'north' || resize === 'northwest' || resize === 'pan'))
                 txt.setAttribute('y', txtY + dy);
 
             let zone = v.xmlDoc.querySelector('[*|id=' + rect.id + ']');
-            zone.setAttribute('ulx', x);
-            zone.setAttribute('uly', y);
-            zone.setAttribute('lrx', x + width);
-            zone.setAttribute('lry', y + height);
+            zone.setAttribute('ulx', c.x);
+            zone.setAttribute('uly', c.y);
+            zone.setAttribute('lrx', c.x + c.width);
+            zone.setAttribute('lry', c.y + c.height);
             // edit in CodeMirror
             v.updateNotation = false;
             replaceInTextEditor(cm, zone, true);
@@ -381,7 +382,7 @@ export function addZoneDrawer() {
     let svg = document.getElementById('source-image-svg');
     let start = {}; // starting point start.x, start.y
     let end = {}; // ending point
-    let drawWhat = '';
+    let drawing = '';
     let minSize = 20; // px, minimum width and height for a zone
 
     function mouseDown(ev) {
@@ -403,27 +404,27 @@ export function addZoneDrawer() {
             rect.setAttribute('stroke-width', rectangleLineWidth);
             rect.setAttribute('fill', 'none');
             svg.appendChild(rect);
-            drawWhat = 'new';
-            console.log('ZoneDrawer mouse down: ' + drawWhat + '; ' +
+            drawing = 'new';
+            console.log('ZoneDrawer mouse down: ' + drawing + '; ' +
                 ev.clientX + '/' + ev.clientY + ', scroll: ' + ip.scrollLeft + '/' + ip.scrollTop + ', start: ', start);
         }
     }
 
     function mouseMove(ev) {
         ev.preventDefault();
-        if (document.getElementById('editZones').checked && drawWhat === 'new') {
+        if (document.getElementById('editZones').checked && drawing === 'new') {
             let rect = document.getElementById('new-rect');
             if (rect && !resize) {
-                // let thisStart = {}; // adjust starting point to scroll of verovio-panel
-                // thisStart.x = start.x - ip.scrollLeft;
-                // thisStart.y = start.y - ip.scrollTop;
                 end.x = ev.clientX;
                 end.y = ev.clientY;
                 var mx = svg.getScreenCTM().inverse();
                 let s = transformCTM(start, mx);
                 let e = transformCTM(end, mx);
-                rect.setAttribute('width', e.x - s.x);
-                rect.setAttribute('height', e.y - s.y);
+                let c = adjustCoordinates(s.x, s.y, e.x - s.x, e.y - s.y);
+                rect.setAttribute('x', c.x);
+                rect.setAttribute('y', c.y);
+                rect.setAttribute('width', c.width);
+                rect.setAttribute('height', c.height);
             }
         }
     }
@@ -447,14 +448,12 @@ export function addZoneDrawer() {
                 zone.setAttribute('lry', y + height);
                 v.updateNotation = false;
                 let currentId = getElementIdAtCursor(cm);
+                // TODO: check, if cursor inside a <surface> otherwise warn
                 if (true || insideParent(currentId, 'surface')) {
                     cm.execCommand('goLineEnd');
                     cm.replaceRange('\n' + xmlToString(zone), cm.getCursor());
                     cm.execCommand('indentAuto');
                     v.updateData(cm, false, false);
-                    // v.loadXml(cm.getValue(), true); // force-reloading DOM
-                    // loadFacsimile(v.xmlDoc);
-                    // drawSourceImage();
                     console.log('new zone added', rect);
                     v.updateNotation = true;
                 } else {
@@ -463,11 +462,20 @@ export function addZoneDrawer() {
             } else if (rect) {
                 rect.remove();
             }
-            drawWhat = '';
+            drawing = '';
         }
     }
 
     svg.addEventListener('mousedown', mouseDown);
     svg.addEventListener('mousemove', mouseMove);
     svg.addEventListener('mouseup', mouseUp);
+}
+
+function adjustCoordinates(x, y, width, height) {
+    let c = {};
+    c.x = Math.min(x, x + width);
+    c.y = Math.min(y, y + height);
+    c.width = Math.abs(width);
+    c.height = Math.abs(height);
+    return c;
 }
