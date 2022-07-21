@@ -136,6 +136,7 @@ export async function drawSourceImage() {
         let height = lry - uly;
         // svgContainer.setAttribute("transform", "translate(" + (ulx / 2) + " " + (uly / 2 ) + ") scale(" + zoomFactor + ")");
         let zoomFactor = document.getElementById('sourceImageZoom').value / 100;
+        svgContainer.setAttribute("transform-origin", "left top");
         svgContainer.setAttribute("transform", "scale(" + zoomFactor + ")");
         svgContainer.setAttribute('width', width);
         svgContainer.setAttribute('height', height);
@@ -155,6 +156,7 @@ export async function drawSourceImage() {
             lbl.setAttribute('y', uly + 29);
             svg.appendChild(lbl);
         }
+
         // go through displayed zones and draw bounding boxes with number-like label
         if (fullPage) {
             for (let z in facs) {
