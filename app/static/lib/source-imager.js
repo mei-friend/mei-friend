@@ -106,7 +106,7 @@ export async function drawSourceImage() {
     if (facs[zoneId]) {
         let imgName = `${root}local/` + facs[zoneId].target;
         imgName = imgName.replace('.tif', '.jpg'); // hack for some DIME files...
-        if (false) {
+        if (false) { // TODO: hack for strange DIME coordinates
             let xfact = .33;
             let yfact = .67;
             ulx *= xfact;
@@ -114,11 +114,11 @@ export async function drawSourceImage() {
             lrx *= xfact;
             lry *= yfact;
         }
+        
+        // load image asynchronously
         let img;
         if (!sourceImages.hasOwnProperty(imgName)) {
-            img = document.createElementNS(svgNS, 'image');
-            img.setAttribute('id', 'source-image');
-            img.setAttributeNS('http://www.w3.org/1999/xlink', 'href', imgName);
+            img = await loadImage(imgName);
             sourceImages[imgName] = img;
         } else {
             img = sourceImages[imgName]
@@ -204,8 +204,9 @@ function drawBoundingBox(zoneId, measureId, measureN) {
 
 async function loadImage(url) {
     return new Promise((resolve) => {
-        const img = new Image();
-        img.src = url;
+        const img = document.createElementNS(svgNS, 'image');
+        img.setAttribute('id', 'source-image');
+        img.setAttributeNS('http://www.w3.org/1999/xlink', 'href', url);
         img.onload = () => resolve(img);
     });
 }

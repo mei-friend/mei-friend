@@ -551,7 +551,7 @@ function speedWorkerEventsHandler(ev) {
   }
 }
 
-function vrvWorkerEventsHandler(ev) {
+async function vrvWorkerEventsHandler(ev) {
   console.log('main(). Handler received: ' + ev.data.cmd, ev.data);
   switch (ev.data.cmd) {
     case 'vrvLoaded':
@@ -622,7 +622,7 @@ function vrvWorkerEventsHandler(ev) {
         document.querySelector('title').innerHTML = 'mei-friend: ' +
           meiFileName.substr(meiFileName.lastIndexOf("/") + 1);
         document.getElementById('verovio-panel').innerHTML = ev.data.svg;
-        if (document.getElementById('showSourceImagePanel').checked) drawSourceImage();
+        if (document.getElementById('showSourceImagePanel').checked) await drawSourceImage();
         if (ev.data.setCursorToPageBeginning) v.setCursorToPageBeginning(cm);
         v.updatePageNumDisplay();
         v.addNotationEventListeners(cm);
