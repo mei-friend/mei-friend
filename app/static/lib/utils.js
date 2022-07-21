@@ -430,23 +430,34 @@ export function renumberMeasures(xmlDoc, cm, startNum = 1, change = false) {
   let endingN = '';
   // let checkPoint = buffer.createCheckpoint(); TODO
   for (i = 0; i < lgt; i++) {
+    let suffix = '';
     if (measureList[i].closest('incip')) continue;
     if (!change)
       console.info(i + '/' + lgt + ': measure ', measureList[i]);
     if (measureList[i].hasAttribute('metcon')) {
       metcon = measureList[i].getAttribute('metcon');
     }
+    let contMeas = document.getElementById('renumberMeasureContinueAcrossIncompleteMeasures');
     // 1) first measure with @metcon="false" is upbeat => @n=0
-    if (i === 0 && metcon === 'false') n--; // first measure upbeat
+    if (contMeas && !contMeas.checked && i === 0 && metcon === 'false') n--; // first measure upbeat
     // 2) treat series of @metcon="false" as one measure
-    if (metcon === 'false') {
+    if (contMeas && !contMeas.checked && metcon === 'false') {
       metcons++;
     } else if (metcon === '' || metcon === 'true') {
       metcons = 0;
     }
-    if (metcons > 1) n--;
+    if (contMeas && !contMeas.checked && metcons > 1) {
+      n--;
+      let sufSel = document.getElementById('renumberMeasuresUseSuffixAtMeasures');
+      switch (sufSel.value) {
+        case 'none':
+          break;
+        case '-cont':
+          suffix = '-cont';
+          break;
+      }
+    }
     // 3) Measures within endings are numbered starting with the same number.
-    let suffix = '';
     let cont = document.getElementById('renumberMeasuresContinueAcrossEndings');
     if (cont && !cont.checked) {
       let ending = measureList[i].closest('ending');

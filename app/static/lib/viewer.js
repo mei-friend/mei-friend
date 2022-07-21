@@ -1110,6 +1110,19 @@ export default class Viewer {
         description: 'Settings for renumbering measures',
         type: 'header'
       },
+      renumberMeasureContinueAcrossIncompleteMeasures: {
+        title: 'Continue across incomplete measures',
+        description: 'Continue measure numbers across incomplete measures (@metcon="false")',
+        type: 'bool',
+        default: false
+      },
+      renumberMeasuresUseSuffixAtMeasures: {
+        title: 'Use suffix at incomplete measures',
+        description: 'Use number suffix at incomplete measures (e.g., 23-cont)',
+        type: 'select',
+        values: ['none', '-cont'],
+        default: false
+      },
       renumberMeasuresContinueAcrossEndings: {
         title: 'Continue across endings',
         description: 'Continue measure numbers across endings',
@@ -1171,7 +1184,12 @@ export default class Viewer {
       if (div) mfs.appendChild(div);
       if (opt === 'respSelect') this.respId = document.getElementById('respSelect').value;
       if (opt === 'renumberMeasuresUseSuffixAtEndings') {
-        this.enableRenumberMeasuresUseSuffixAtEndings();
+        this.disableElementThroughCheckbox(
+          'renumberMeasuresContinueAcrossEndings', 'renumberMeasuresUseSuffixAtEndings');
+      }
+      if (opt === 'renumberMeasuresUseSuffixAtMeasures') {
+        this.disableElementThroughCheckbox(
+          'renumberMeasureContinueAcrossIncompleteMeasures', 'renumberMeasuresUseSuffixAtMeasures');
       }
     });
     mfs.innerHTML += '<input type="button" title="Reset to mei-friend defaults" id="mfReset" class="resetButton" value="Default" />';
@@ -1224,7 +1242,12 @@ export default class Viewer {
               document.getElementById('controlMenuUpdateNotation').checked ? 'inherit' : 'none';
             break;
           case 'renumberMeasuresContinueAcrossEndings':
-            this.enableRenumberMeasuresUseSuffixAtEndings();
+            this.disableElementThroughCheckbox(
+              'renumberMeasuresContinueAcrossEndings', 'renumberMeasuresUseSuffixAtEndings');
+            break;
+          case 'renumberMeasureContinueAcrossIncompleteMeasures':
+            this.disableElementThroughCheckbox(
+              'renumberMeasureContinueAcrossIncompleteMeasures', 'renumberMeasuresUseSuffixAtMeasures');
             break;
         }
         if (value === optionsToShow[option].default) {
@@ -1544,11 +1567,12 @@ export default class Viewer {
 
 
   // toggle disabled at one specific checkbox
-  enableRenumberMeasuresUseSuffixAtEndings() {
-    let cont = document.getElementById('renumberMeasuresContinueAcrossEndings').checked;
-    let el = document.getElementById('renumberMeasuresUseSuffixAtEndings');
+  disableElementThroughCheckbox(checkbox, affectedElement) {
+    let cont = document.getElementById(checkbox).checked;
+    let el = document.getElementById(affectedElement);
     el.disabled = cont;
     if (cont) el.parentNode.classList.add('disabled');
     else el.parentNode.classList.remove('disabled');
   }
+
 }
