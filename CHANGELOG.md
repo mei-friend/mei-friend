@@ -9,6 +9,7 @@
 * Support for resizing selected zone at 8 locations and pan with mouse drag  
 * Support for inserting new zone with mouse click and drag
 * Support for deleting selected zone with DEL key
+* Menu item to ingest facsimile information to MEI file (assuming measure@n equality among target and skeleton file)
 ### 0.4.0 minor: Annotation
 * Implement annotation panel (activate from mei-friend settings)
 * Annotation tools for highlight, describe, link 
