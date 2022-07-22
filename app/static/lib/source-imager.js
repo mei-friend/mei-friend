@@ -11,7 +11,8 @@ import {
     generateUUID,
     getElementIdAtCursor,
     insideParent,
-    rmHash
+    rmHash,
+    setCursorToId
 } from './utils.js';
 import {
     meiNameSpace,
@@ -86,7 +87,7 @@ export async function drawSourceImage() {
     let svgFacs = document.querySelectorAll('[data-facs]'); // list displayed zones
     if (svgFacs && fullPage) {
         let firstZone = svgFacs.item(0);
-        if (firstZone.hasAttribute('data-facs'))
+        if (firstZone && firstZone.hasAttribute('data-facs'))
             zoneId = rmHash(firstZone.getAttribute('data-facs'));
     } else {
         svgFacs.forEach((f) => { // go through displayed zones and find envelope
@@ -114,7 +115,7 @@ export async function drawSourceImage() {
             lrx *= xfact;
             lry *= yfact;
         }
-        
+
         // load image asynchronously
         let img;
         if (!sourceImages.hasOwnProperty(imgName)) {
@@ -481,4 +482,104 @@ function adjustCoordinates(x, y, width, height) {
     c.width = Math.abs(width);
     c.height = Math.abs(height);
     return c;
+}
+
+export function ingestFacsimile() {
+    let reply = {};
+    let input = document.createElement('input');
+    input.type = 'file';
+    let accept = '.mei,.xml,.musicxml,.txt';
+    input.accept = accept;
+    input.addEventListener('change', ev => ingestionInputHandler(ev));
+    input.click();
+}
+
+function ingestionInputHandler(ev) {
+    let files = Array.from(ev.target.files);
+    let reply = {};
+
+    let readingPromise = new Promise(function (loaded, notLoaded) {
+        reply.fileName = files[0].name;
+        let reader = new FileReader();
+        reader.onload = (event) => {
+            reply.mei = event.target.result;
+            if (reply.mei) loaded(reply);
+            else notLoaded();
+        }
+        reader.readAsText(files[0]);
+    });
+    readingPromise.then(
+        function (reply) {
+            handleFacsimileIngestion(reply)
+        },
+        function () {
+            log('Loading of ingestion file ' + reply.fileName + ' failed.');
+        }
+    );
+
+
+    // console.log('OpenFile Dialog: ', files);
+    // if (files.length == 1) {
+    //     reply.fileName = files[0].name;
+    //     fetch(files[0])
+    //         .then((response) => response.text())
+    //         .then((mei) => {
+    //             reply.mei = mei;
+    //             handleFacsimileIngestion(reply);
+    //         });
+    // } else {
+    //     log('OpenFile Dialog: Multiple files not supported.');
+    // }
+}
+
+function handleFacsimileIngestion(reply) {
+    console.log('Skeleton MEI file ' + reply.fileName + ' loaded.');
+    let skelXml = new DOMParser().parseFromString(reply.mei, "text/xml");
+    let facsimile = skelXml.querySelector('facsimile');
+    let zones = facsimile.querySelectorAll('zone');
+    let music = v.xmlDoc.querySelector('music');
+    if (!music) return;
+    v.updateNotation = false;
+    zones.forEach(z => {
+        let zoneId = '';
+        if (z.hasAttribute('xml:id')) zoneId = z.getAttribute('xml:id');
+        let ms = skelXml.querySelectorAll('[facs="#' + zoneId + '"]');
+        ms.forEach(m => {
+            let n = m.getAttribute('n');
+            let targetMeasure = music.querySelectorAll('measure[n="' + n + '"]');
+            if (targetMeasure.length < 1)
+                console.warning('Measure number not found: n=' + n + ', ', targetMeasure);
+            if (targetMeasure.length > 1)
+                console.warning('Measure number not unique: n=' + n + ', ', targetMeasure);
+            if (targetMeasure.length === 1) {
+                // console.info('Adding @facs=' + zoneId + ' to ', targetMeasure)
+                targetMeasure.item(0).setAttribute('facs', '#' + zoneId);
+                replaceInTextEditor(cm, targetMeasure.item(0));
+            }
+        });
+    });
+
+    // ingest facsimile into target MEI (in music before body)
+    let body = music.querySelector('body');
+    if (body) {
+        music.insertBefore(facsimile, body);
+        let id = body.getAttribute('xml:id');
+        if (!id) {
+            console.warn('Please put @xml:id to body element');
+            // id = 'body-' + generateUUID();
+            // body.setAttributeNS(xmlNameSpace, 'id', id);
+            // replaceInTextEditor(cm, body);
+        }
+        if (id) {
+            setCursorToId(cm, id);
+            let cr = cm.getCursor();
+            cm.replaceRange(xmlToString(facsimile) + '\n', cr);
+            let cr2 = cm.getCursor();
+            for (let l = cr.line; l < cr2.line; l++) cm.indentLine(l);
+            loadFacsimile(v.xmlDoc);
+            console.log('Adding facsimile before body', facsimile);
+        }
+    }
+    v.updateData(cm, false, true);
+    v.updateNotation = true;
 }

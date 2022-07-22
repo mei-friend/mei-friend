@@ -92,10 +92,11 @@ import {
   setCommitUIEnabledStatus
 } from './github-menu.js';
 import {
+  addZoneDrawer,
+  ingestFacsimile,
   loadFacsimile,
   drawSourceImage,
   zoomSourceImage,
-  addZoneDrawer
 } from './source-imager.js';
 
 // const defaultMeiFileName = `${root}Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei`;
@@ -1049,6 +1050,7 @@ let cmd = {
   'renumberMeasures': () => e.renumberMeasures(v, cm, true),
   'reRenderMei': () => v.reRenderMei(cm, false),
   'reRenderMeiWithout': () => v.reRenderMei(cm, true),
+  'ingestFacsimile': () => ingestFacsimile(),
   'resetDefault': () => {
     // we're in a clickhandler, so our storage object is out of scope
     // but we only need to clear it, so just grab the window's storage
@@ -1195,6 +1197,8 @@ function addEventListeners(v, cm) {
   // re-render through Verovio
   document.getElementById('reRenderMei').addEventListener('click', cmd.reRenderMei);
   document.getElementById('reRenderMeiWithout').addEventListener('click', cmd.reRenderMeiWithout);
+  // ingest facsimile sekelton into currently loaded MEI file
+  document.getElementById('ingestFacsimile').addEventListener('click', cmd.ingestFacsimile);
   // insert control elements
   document.getElementById('addTempo').addEventListener('click', cmd.addTempo);
   document.getElementById('addDirective').addEventListener('click', cmd.addDirective);
