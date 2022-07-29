@@ -440,18 +440,18 @@ export function addZoneDrawer() {
             let width, height;
             if (rect && (width = Math.round(rect.getAttribute('width'))) > minSize &&
                 (height = Math.round(rect.getAttribute('height'))) > minSize) {
-                // create xml dom element
+                // add zone and a measure
                 let zone = v.xmlDoc.createElementNS(meiNameSpace, 'zone');
                 let uuid = 'zone-' + generateUUID();
                 rect.setAttribute('id', uuid);
                 zone.setAttributeNS(xmlNameSpace, 'xml:id', uuid);
                 let x = Math.round(rect.getAttribute('x'));
                 let y = Math.round(rect.getAttribute('y'));
+                zone.setAttribute('type', 'measure');
                 zone.setAttribute('ulx', x);
                 zone.setAttribute('uly', y);
                 zone.setAttribute('lrx', x + width);
                 zone.setAttribute('lry', y + height);
-                zone.setAttribute('type', 'measure');
                 v.updateNotation = false;
                 let currentId = getElementIdAtCursor(cm);
                 // check if current element a zone
@@ -470,12 +470,16 @@ export function addZoneDrawer() {
                     cm.execCommand('goLineEnd');
                     cm.replaceRange('\n' + xmlToString(meas), cm.getCursor());
                     cm.execCommand('indentAuto');
+                    setCursorToId(cm, uuid);
 
                     v.updateData(cm, false, false);
                     console.log('new zone added', rect);
                     v.updateNotation = true;
                 } else {
-                    console.warn('Cannot add zone element outside a surface. Please click inside a surface element.');
+                    if (rect) rect.remove();
+                    let warning = 'Cannot add zone element outside a surface. Please click inside a surface element first.';
+                    console.warn(warning);
+                    document.querySelector(".statusbar").innerHTML = warning;
                 }
             } else if (rect) {
                 rect.remove();
