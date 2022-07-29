@@ -451,13 +451,26 @@ export function addZoneDrawer() {
                 zone.setAttribute('uly', y);
                 zone.setAttribute('lrx', x + width);
                 zone.setAttribute('lry', y + height);
+                zone.setAttribute('type', 'measure');
                 v.updateNotation = false;
                 let currentId = getElementIdAtCursor(cm);
-                // TODO: check, if cursor inside a <surface> otherwise warn
-                if (true || insideParent(currentId, 'surface')) {
+                // check if current element a zone
+                let el = v.xmlDoc.querySelector('[*|id=' + currentId + ']');
+                if (el && el.nodeName === 'zone' && el.parentElement.nodeName === 'surface') {
                     cm.execCommand('goLineEnd');
                     cm.replaceRange('\n' + xmlToString(zone), cm.getCursor());
                     cm.execCommand('indentAuto');
+                    // new measure element
+                    let meas = v.xmlDoc.createElementNS(meiNameSpace, 'measure');
+                    meas.setAttributeNS(xmlNameSpace, 'xml:id', 'measure-' + generateUUID());
+                    meas.setAttribute('facs', '#' + uuid);
+                    let ms = v.xmlDoc.querySelector('[facs="#' + el.getAttribute('xml:id') + '"]');
+                    setCursorToId(cm, ms.getAttribute('xml:id'));
+                    cm.execCommand('toMatchingTag');
+                    cm.execCommand('goLineEnd');
+                    cm.replaceRange('\n' + xmlToString(meas), cm.getCursor());
+                    cm.execCommand('indentAuto');
+
                     v.updateData(cm, false, false);
                     console.log('new zone added', rect);
                     v.updateNotation = true;
