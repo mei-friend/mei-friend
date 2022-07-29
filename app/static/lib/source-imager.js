@@ -6,6 +6,7 @@ var rectangleLineWidth = 6; // width of bounding box rectangles in px
 var rectangleColor = 'darkred';
 var listenerHandles = {};
 var resize = ''; // west, east, north, south, northwest, southeast etc
+var ulx, uly;
 
 import {
     generateUUID,
@@ -79,8 +80,8 @@ export function loadFacsimile(xmlDoc) {
 // Draw the source image with bounding boxes for each zone
 export async function drawSourceImage() {
     let fullPage = document.getElementById('showSourceImageFullPage').checked;
-    let ulx = Number.MAX_VALUE; // boundary values for image envelope
-    let uly = Number.MAX_VALUE;
+    ulx = Number.MAX_VALUE; // boundary values for image envelope
+    uly = Number.MAX_VALUE;
     let lrx = 0;
     let lry = 0;
     let zoneId;
@@ -402,8 +403,8 @@ export function addZoneDrawer() {
             rect.id = 'new-rect';
             rect.setAttribute('rx', rectangleLineWidth / 2);
             rect.setAttribute('ry', rectangleLineWidth / 2);
-            rect.setAttribute('x', s.x);
-            rect.setAttribute('y', s.y);
+            rect.setAttribute('x', s.x + ulx);
+            rect.setAttribute('y', s.y + uly);
             rect.setAttribute('stroke', rectangleColor);
             rect.setAttribute('stroke-width', rectangleLineWidth);
             rect.setAttribute('fill', 'none');
@@ -425,8 +426,8 @@ export function addZoneDrawer() {
                 let s = transformCTM(start, mx);
                 let e = transformCTM(end, mx);
                 let c = adjustCoordinates(s.x, s.y, e.x - s.x, e.y - s.y);
-                rect.setAttribute('x', c.x);
-                rect.setAttribute('y', c.y);
+                rect.setAttribute('x', c.x + ulx);
+                rect.setAttribute('y', c.y + uly);
                 rect.setAttribute('width', c.width);
                 rect.setAttribute('height', c.height);
             }
@@ -475,6 +476,8 @@ export function addZoneDrawer() {
     svg.addEventListener('mouseup', mouseUp);
 }
 
+
+// convert negative width/height to correct left-upper corner & width/height values
 function adjustCoordinates(x, y, width, height) {
     let c = {};
     c.x = Math.min(x, x + width);
