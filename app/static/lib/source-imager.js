@@ -30,7 +30,7 @@ import {
     v
 } from './main.js';
 import {
-    replaceInTextEditor
+    replaceInEditor
 } from './editor.js';
 
 
@@ -357,7 +357,7 @@ export function addZoneResizer(v, rect) {
             zone.setAttribute('lry', c.y + c.height);
             // edit in CodeMirror
             v.updateNotation = false;
-            replaceInTextEditor(cm, zone, true);
+            replaceInEditor(cm, zone, true);
             v.updateNotation = true;
             // console.log('Dragging: ' + resize + ' ' + dx + '/' + dy);
         }
@@ -557,7 +557,7 @@ function handleFacsimileIngestion(reply) {
             if (targetMeasure.length === 1) {
                 // console.info('Adding @facs=' + zoneId + ' to ', targetMeasure)
                 targetMeasure.item(0).setAttribute('facs', '#' + zoneId);
-                replaceInTextEditor(cm, targetMeasure.item(0));
+                replaceInEditor(cm, targetMeasure.item(0));
             }
         });
     });
@@ -571,7 +571,7 @@ function handleFacsimileIngestion(reply) {
             console.warn('Please put @xml:id to body element');
             // id = 'body-' + generateUUID();
             // body.setAttributeNS(xmlNameSpace, 'id', id);
-            // replaceInTextEditor(cm, body);
+            // replaceInEditor(cm, body);
         }
         if (id) {
             setCursorToId(cm, id);

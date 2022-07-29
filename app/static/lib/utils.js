@@ -408,7 +408,7 @@ export function cleanAccid(xmlDoc, cm) {
       i++;
       console.log(i + ' @accid.ges removed from ', el);
       el.removeAttribute('accid.ges');
-      e.replaceInTextEditor(cm, el);
+      e.replaceInEditor(cm, el);
     }
   }
   // let re = buffer.groupChangesSinceCheckpoint(checkPoint); TODO
@@ -509,7 +509,7 @@ export function renumberMeasures(xmlDoc, cm, startNum = 1, change = false) {
     // change measure@n
     if (change) {
       measureList[i].setAttribute('n', n + suffix);
-      e.replaceInTextEditor(cm, measureList[i]);
+      e.replaceInEditor(cm, measureList[i]);
       console.info(measureList[i].getAttribute('n') + ' changed to ' + n +
         ', right:' + right + ', metcons:' + metcons);
     } else { // just list the changes
