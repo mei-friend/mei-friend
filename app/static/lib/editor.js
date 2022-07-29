@@ -66,17 +66,7 @@ export function delEl(v, cm) {
     }
   } else // delete Zone in source image display
     if (element.nodeName === 'zone' && document.getElementById('editZones').checked) {
-      removeInBuffer(cm, element);
-      let rect = document.querySelector('rect[id="' + element.getAttribute('xml:id') + '"]');
-      if (rect) rect.parentElement.removeChild(rect);
-      let txt = document.querySelector('text[id="' + element.getAttribute('xml:id') + '"]');
-      if (txt) txt.parentElement.removeChild(txt);
-      // find elements referring to this zone id via @facs and delete them
-      let ms = v.xmlDoc.querySelectorAll('[facs="#' + element.getAttribute('xml:id') + '"]');
-      ms.forEach(e => {
-        e.removeAttribute('facs');
-        replaceInTextEditor(cm, e);
-      });
+      removeZone(v, cm, element);
     } else {
       console.info('Element ' + id + ' not supported for deletion.');
       return;
@@ -628,6 +618,26 @@ export function renumberMeasures(v, cm, change) {
   if (document.getElementById('showSourceImagePanel').checked) loadFacsimile(v.xmlDoc);
   v.updateData(cm, false, true);
   v.updateNotation = true;
+}
+
+// remove zone in editor, called from editor.js
+export function removeZone(v, cm, zone, removeMeasure = true) {
+  if (!zone) return;
+  removeInBuffer(cm, zone);
+  let rect = document.querySelector('rect[id="' + zone.getAttribute('xml:id') + '"]');
+  if (rect) rect.parentElement.removeChild(rect);
+  let txt = document.querySelector('text[id="' + zone.getAttribute('xml:id') + '"]');
+  if (txt) txt.parentElement.removeChild(txt);
+  // find elements referring to this zone id via @facs and delete them
+  let ms = v.xmlDoc.querySelectorAll('[facs="#' + zone.getAttribute('xml:id') + '"]');
+  ms.forEach(e => {
+    if (removeMeasure) {
+      removeInBuffer(cm, e);
+    } else {
+      e.removeAttribute('facs');
+      replaceInTextEditor(cm, e);
+    }
+  });
 }
 
 
