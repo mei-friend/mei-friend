@@ -948,3 +948,48 @@ select>option {
   font-size: 1.5em;
   padding: 20px;
 }
+
+/* The alert message box */
+.alert {
+  position: fixed;
+  top: 60px;
+  left: 3%;
+  width: 90%;
+  padding: 20px;
+  background-color: #f44336;
+  border-style: solid;
+  border-width: 2px;
+  border-radius: 4px;
+  color: white;
+  font-size: larger;
+  z-index: 100;
+}
+
+.alert.success {
+  background-color: #04AA6D;
+}
+
+.alert.info {
+  background-color: #2196F3;
+}
+
+.alert.warning {
+  background-color: #ff9800;
+}
+
+/* The close button */
+.alertCloseButton {
+  margin-left: 15px;
+  color: white;
+  font-weight: bold;
+  float: right;
+  font-size: 22px;
+  line-height: 20px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+/* When moving the mouse over the close button */
+.alertCloseButton:hover {
+  color: black;
+}

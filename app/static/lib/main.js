@@ -1060,7 +1060,8 @@ let cmd = {
     }
     logoutFromGithub();
   },
-  'consultGuidelines': () => consultGuidelines()
+  'consultGuidelines': () => consultGuidelines(),
+  'closeAlerts': () => v.hideAlerts()
 };
 
 // add event listeners when controls menu has been instantiated

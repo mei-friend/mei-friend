@@ -443,9 +443,9 @@ export function addZoneDrawer() {
                 // add zone and a measure
                 if (!addZone(v, cm, rect)) {
                     if (rect) rect.remove();
-                    let warning = 'Cannot add zone element outside a surface. Please click inside a surface element first.';
+                    let warning = `Cannot add a zone element. Please select a zone element first.`;
+                    v.showAlert(warning, 'warning', 10000);
                     console.warn(warning);
-                    document.querySelector(".statusbar").innerHTML = warning;
                 }
             } else if (rect) {
                 rect.remove();

@@ -67,7 +67,9 @@
 
     "shift-g": "addGClefChangeBefore",
     "shift-c": "addCClefChangeBefore",
-    "shift-f": "addFClefChangeBefore"
+    "shift-f": "addFClefChangeBefore",
+    
+    "escape": "closeAlerts"
   },
 
   ".platform-darwin": {

@@ -393,6 +393,7 @@ export default class Viewer {
 
   handleClickOnNotation(e, cm) {
     e.stopImmediatePropagation();
+    this.hideAlerts();
     let point = {};
     point.x = e.clientX;
     point.y = e.clientY;
@@ -1573,6 +1574,40 @@ export default class Viewer {
     el.disabled = cont;
     if (cont) el.parentNode.classList.add('disabled');
     else el.parentNode.classList.remove('disabled');
+  }
+
+  // show alert to user
+  // type: ['alert'] 'warning' 'info' 'success'
+  // disappearAfter: in milliseconds
+  showAlert(message, type = 'alert', disappearAfter = 30000) {
+    let alert = document.getElementById('alertOverlay');
+    alert.classList.remove('warning');
+    alert.classList.remove('info');
+    alert.classList.remove('success');
+    switch (type) {
+      case 'warning':
+        alert.classList.add('warning');
+        break;
+      case 'info':
+        alert.classList.add('info');
+        break;
+      case 'success':
+        alert.classList.add('success');
+        break;
+    }
+    alert.querySelector('span').innerHTML = message;
+    alert.style.display = 'block';
+    this.setFocusToVerovioPane();
+    setTimeout(() => {
+      alert.style.display = "none";
+    }, disappearAfter);
+  }
+
+  hideAlerts() {
+    let btns = document.getElementsByClassName('alertCloseButton');
+    for (let b of btns) {
+      b.parentElement.style.display = 'none';
+    }
   }
 
 }
