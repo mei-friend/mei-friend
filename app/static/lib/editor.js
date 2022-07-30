@@ -620,6 +620,53 @@ export function renumberMeasures(v, cm, change) {
   v.updateNotation = true;
 }
 
+// add zone in editor, called from source-imager.js
+export function addZone(v, cm, rect, addMeasure = true) {
+  let zone = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'zone');
+  let uuid = 'zone-' + utils.generateUUID();
+  zone.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
+  let x = Math.round(rect.getAttribute('x'));
+  let y = Math.round(rect.getAttribute('y'));
+  let width = Math.round(rect.getAttribute('width'));
+  let height = Math.round(rect.getAttribute('height'));
+  rect.setAttribute('id', uuid);
+  zone.setAttribute('type', 'measure');
+  zone.setAttribute('ulx', x);
+  zone.setAttribute('uly', y);
+  zone.setAttribute('lrx', x + width);
+  zone.setAttribute('lry', y + height);
+  v.updateNotation = false;
+  let currentId = utils.getElementIdAtCursor(cm);
+  // check if current element a zone
+  let el = v.xmlDoc.querySelector('[*|id=' + currentId + ']');
+  if (el && el.nodeName === 'zone' && el.parentElement.nodeName === 'surface') {
+    cm.execCommand('goLineEnd');
+    cm.replaceRange('\n' + xmlToString(zone), cm.getCursor());
+    cm.execCommand('indentAuto');
+    let prevMeas = v.xmlDoc.querySelector('[facs="#' + el.getAttribute('xml:id') + '"]');
+    // new measure element
+    let newMeas = v.xmlDoc.createElementNS(meiNameSpace, 'Measure');
+    newMeas.setAttributeNS(xmlNameSpace, 'xml:id', 'Measure-' + utils.generateUUID());
+    newMeas.setAttribute('n', prevMeas.getAttribute('n') + '-new');
+    newMeas.setAttribute('facs', '#' + uuid);
+
+    // navigate to prev measure element
+    utils.setCursorToId(cm, prevMeas.getAttribute('xml:id'));
+    cm.execCommand('toMatchingTag');
+    cm.execCommand('goLineEnd');
+    cm.replaceRange('\n' + xmlToString(newMeas), cm.getCursor());
+    cm.execCommand('indentAuto');
+    utils.setCursorToId(cm, uuid);
+
+    v.updateData(cm, false, false);
+    console.log('new zone added', rect);
+    v.updateNotation = true;
+    return true;
+  } else {
+    return false;
+  }
+}
+
 // remove zone in editor, called from editor.js
 export function removeZone(v, cm, zone, removeMeasure = true) {
   if (!zone) return;

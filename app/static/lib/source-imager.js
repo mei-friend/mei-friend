@@ -30,6 +30,7 @@ import {
     v
 } from './main.js';
 import {
+    addZone,
     replaceInEditor
 } from './editor.js';
 
@@ -437,45 +438,10 @@ export function addZoneDrawer() {
     function mouseUp(ev) {
         if (document.getElementById('editZones').checked && !resize) {
             let rect = document.getElementById('new-rect');
-            let width, height;
-            if (rect && (width = Math.round(rect.getAttribute('width'))) > minSize &&
-                (height = Math.round(rect.getAttribute('height'))) > minSize) {
+            if (rect && (Math.round(rect.getAttribute('width'))) > minSize &&
+                (Math.round(rect.getAttribute('height'))) > minSize) {
                 // add zone and a measure
-                let zone = v.xmlDoc.createElementNS(meiNameSpace, 'zone');
-                let uuid = 'zone-' + generateUUID();
-                rect.setAttribute('id', uuid);
-                zone.setAttributeNS(xmlNameSpace, 'xml:id', uuid);
-                let x = Math.round(rect.getAttribute('x'));
-                let y = Math.round(rect.getAttribute('y'));
-                zone.setAttribute('type', 'measure');
-                zone.setAttribute('ulx', x);
-                zone.setAttribute('uly', y);
-                zone.setAttribute('lrx', x + width);
-                zone.setAttribute('lry', y + height);
-                v.updateNotation = false;
-                let currentId = getElementIdAtCursor(cm);
-                // check if current element a zone
-                let el = v.xmlDoc.querySelector('[*|id=' + currentId + ']');
-                if (el && el.nodeName === 'zone' && el.parentElement.nodeName === 'surface') {
-                    cm.execCommand('goLineEnd');
-                    cm.replaceRange('\n' + xmlToString(zone), cm.getCursor());
-                    cm.execCommand('indentAuto');
-                    // new measure element
-                    let meas = v.xmlDoc.createElementNS(meiNameSpace, 'measure');
-                    meas.setAttributeNS(xmlNameSpace, 'xml:id', 'measure-' + generateUUID());
-                    meas.setAttribute('facs', '#' + uuid);
-                    let ms = v.xmlDoc.querySelector('[facs="#' + el.getAttribute('xml:id') + '"]');
-                    setCursorToId(cm, ms.getAttribute('xml:id'));
-                    cm.execCommand('toMatchingTag');
-                    cm.execCommand('goLineEnd');
-                    cm.replaceRange('\n' + xmlToString(meas), cm.getCursor());
-                    cm.execCommand('indentAuto');
-                    setCursorToId(cm, uuid);
-
-                    v.updateData(cm, false, false);
-                    console.log('new zone added', rect);
-                    v.updateNotation = true;
-                } else {
+                if (!addZone(v, cm, rect)) {
                     if (rect) rect.remove();
                     let warning = 'Cannot add zone element outside a surface. Please click inside a surface element first.';
                     console.warn(warning);
