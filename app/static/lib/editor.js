@@ -641,12 +641,12 @@ export function addZone(v, cm, rect, addMeasure = true) {
   let el = v.xmlDoc.querySelector('[*|id=' + currentId + ']');
   if (el && el.nodeName === 'zone' && el.parentElement.nodeName === 'surface') {
     cm.execCommand('goLineEnd');
-    cm.replaceRange('\n' + xmlToString(zone), cm.getCursor());
+    cm.replaceRange('\n' + dutils.xmlToString(zone), cm.getCursor());
     cm.execCommand('indentAuto');
     let prevMeas = v.xmlDoc.querySelector('[facs="#' + el.getAttribute('xml:id') + '"]');
     // new measure element
-    let newMeas = v.xmlDoc.createElementNS(meiNameSpace, 'Measure');
-    newMeas.setAttributeNS(xmlNameSpace, 'xml:id', 'Measure-' + utils.generateUUID());
+    let newMeas = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'measure');
+    newMeas.setAttributeNS(dutils.xmlNameSpace, 'xml:id', 'measure-' + utils.generateUUID());
     newMeas.setAttribute('n', prevMeas.getAttribute('n') + '-new');
     newMeas.setAttribute('facs', '#' + uuid);
 
@@ -654,7 +654,7 @@ export function addZone(v, cm, rect, addMeasure = true) {
     utils.setCursorToId(cm, prevMeas.getAttribute('xml:id'));
     cm.execCommand('toMatchingTag');
     cm.execCommand('goLineEnd');
-    cm.replaceRange('\n' + xmlToString(newMeas), cm.getCursor());
+    cm.replaceRange('\n' + dutils.xmlToString(newMeas), cm.getCursor());
     cm.execCommand('indentAuto');
     utils.setCursorToId(cm, uuid);
 
