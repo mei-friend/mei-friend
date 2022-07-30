@@ -7,8 +7,8 @@
 * Option to edit zone coordinates (rather than displaying linked elements, e.g., measures)
 * Support for selecting zone with mouse or through encoding
 * Support for resizing selected zone at 8 locations and pan with mouse drag  
-* Support for inserting new zone with mouse click and drag
-* Support for deleting selected zone with DEL key
+* Support for inserting new zone/measure with mouse click and drag
+* Support for deleting selected zone/measure with DEL key or through menu
 * Menu item to ingest facsimile information to MEI file (assuming measure@n equality among target and skeleton file)
 ### 0.4.0 minor: Annotation
 * Implement annotation panel (activate from mei-friend settings)
