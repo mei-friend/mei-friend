@@ -416,8 +416,10 @@ export function cleanAccid(xmlDoc, cm) {
 }
 
 // renumber measure@n starting with startNumber
-export function renumberMeasures(xmlDoc, cm, startNum = 1, change = false) {
-  let measureList = xmlDoc.querySelectorAll('measure');
+export function renumberMeasures(v, cm, startNum = 1, change = false) {
+  let measureList = v.xmlDoc.querySelectorAll('measure');
+  v.showAlert(`<b>Renumber measures ${change ? '' : 'TEST'}</b>`,
+    change ? 'success' : 'info', 120000);
   console.info('renumber Measures list: ', measureList);
   let i;
   let lgt = measureList.length;
@@ -506,15 +508,16 @@ export function renumberMeasures(xmlDoc, cm, startNum = 1, change = false) {
     if (measureList[i].hasAttribute('right'))
       right = measureList[i].getAttribute('right');
 
+    let msg;
+    msg = 'n="' + measureList[i].getAttribute('n') + '" ' +
+      (change ? '' : 'would be ') + 'changed to n="' + (n + suffix) + '"' +
+      (right ? (', right:' + right) : '') + (metcons ? (', metcons:' + metcons) : '');
+    console.info(msg);
+    v.updateAlert(msg);
     // change measure@n
     if (change) {
       measureList[i].setAttribute('n', n + suffix);
       e.replaceInEditor(cm, measureList[i]);
-      console.info(measureList[i].getAttribute('n') + ' changed to ' + n +
-        ', right:' + right + ', metcons:' + metcons);
-    } else { // just list the changes
-      console.info(measureList[i].getAttribute('n') + ' to be changed to ' + n +
-        ', right:' + right + ', metcons:' + metcons);
     }
     // 5) handle increment from multiRest@num
     let multiRest;
@@ -528,7 +531,9 @@ export function renumberMeasures(xmlDoc, cm, startNum = 1, change = false) {
     metcon = '';
   }
   // let re = buffer.groupChangesSinceCheckpoint(checkPoint);
-  console.info('renumberMeasures: ' + i + ' measures renumbered');
+  let str = 'renumberMeasures: ' + i + ' measures renumbered';
+  console.info(str);
+  v.updateAlert(str)
   //, grouped ', re);
 }
 

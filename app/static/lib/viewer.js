@@ -47,6 +47,7 @@ export default class Viewer {
     this.vrvOptions; // all verovio options
     this.verovioIcon = document.getElementById('verovio-icon');
     this.respId = '';
+    this.alertCloser;
   }
 
   // change options, load new data, render current page, add listeners, highlight
@@ -1580,6 +1581,7 @@ export default class Viewer {
   // type: ['alert'] 'warning' 'info' 'success'
   // disappearAfter: in milliseconds
   showAlert(message, type = 'alert', disappearAfter = 30000) {
+    if (this.alertCloser) clearTimeout(this.alertCloser);
     let alert = document.getElementById('alertOverlay');
     alert.classList.remove('warning');
     alert.classList.remove('info');
@@ -1596,16 +1598,22 @@ export default class Viewer {
         break;
     }
     alert.querySelector('span').innerHTML = message;
-    alert.style.display = 'block';
+    alert.style.display = 'flex';
     this.setFocusToVerovioPane();
-    setTimeout(() => {
+    this.alertCloser = setTimeout(() => {
       alert.style.display = "none";
     }, disappearAfter);
+  }
+
+  updateAlert(newMsg) {
+    let alert = document.getElementById('alertOverlay');
+    alert.querySelector('span').innerHTML += '<br />' + newMsg;
   }
 
   hideAlerts() {
     let btns = document.getElementsByClassName('alertCloseButton');
     for (let b of btns) {
+      if (this.alertCloser) clearTimeout(this.alertCloser);
       b.parentElement.style.display = 'none';
     }
   }
