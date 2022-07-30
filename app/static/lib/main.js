@@ -1067,6 +1067,7 @@ let cmd = {
 // add event listeners when controls menu has been instantiated
 function addEventListeners(v, cm) {
   let vp = document.getElementById('verovio-panel');
+  document.querySelector('body').addEventListener('mousedown', () => v.hideAlerts());
 
   // layout notation position
   document.getElementById('top').addEventListener('click', cmd.notationTop);

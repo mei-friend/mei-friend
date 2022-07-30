@@ -418,7 +418,7 @@ export function cleanAccid(xmlDoc, cm) {
 // renumber measure@n starting with startNumber
 export function renumberMeasures(v, cm, startNum = 1, change = false) {
   let measureList = v.xmlDoc.querySelectorAll('measure');
-  v.showAlert(`<b>Renumber measures ${change ? '' : 'TEST'}</b>`,
+  if (!change) v.showAlert(`<b>Renumber measures ${change ? '' : 'TEST'}</b>`,
     change ? 'success' : 'info', 120000);
   console.info('renumber Measures list: ', measureList);
   let i;
@@ -513,7 +513,7 @@ export function renumberMeasures(v, cm, startNum = 1, change = false) {
       (change ? '' : 'would be ') + 'changed to n="' + (n + suffix) + '"' +
       (right ? (', right:' + right) : '') + (metcons ? (', metcons:' + metcons) : '');
     console.info(msg);
-    v.updateAlert(msg);
+    if (!change) v.updateAlert(msg);
     // change measure@n
     if (change) {
       measureList[i].setAttribute('n', n + suffix);
@@ -533,7 +533,7 @@ export function renumberMeasures(v, cm, startNum = 1, change = false) {
   // let re = buffer.groupChangesSinceCheckpoint(checkPoint);
   let str = 'renumberMeasures: ' + i + ' measures renumbered';
   console.info(str);
-  v.updateAlert(str)
+  if (!change) v.updateAlert(str)
   //, grouped ', re);
 }
 
