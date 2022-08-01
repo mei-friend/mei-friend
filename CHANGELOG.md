@@ -10,7 +10,7 @@
 * Support for inserting new zone/measure with mouse click and drag
 * Support for deleting selected zone/measure with DEL key or through menu
 * Menu item to ingest facsimile information to MEI file (assuming measure@n equality among target and skeleton file)
-* General alert panel added with 'alert', 'warning', 'info', and 'success' as levels
+* General alert panel added with 'error', 'warning', 'info', and 'success' as levels
 ### 0.4.0 minor: Annotation
 * Implement annotation panel (activate from mei-friend settings)
 * Annotation tools for highlight, describe, link 

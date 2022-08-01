@@ -566,6 +566,8 @@ function handleFacsimileIngestion(reply) {
             console.log('Adding facsimile before body', facsimile);
         }
     }
+    // uncheck edit zones after ingest
+    document.getElementById('editZones').checked = false;
     v.updateData(cm, false, true);
     v.updateNotation = true;
 }

@@ -982,19 +982,13 @@ export default class Viewer {
         description: 'Proportion that the source image pane takes from the notation pane (in percent)',
         type: 'int',
         min: 0,
-        max: 100,
+        max: 99,
         step: 1,
         default: 50
       },
       showSourceImageFullPage: {
         title: 'Show full page',
         description: 'Shouw source image on full page',
-        type: 'bool',
-        default: false
-      },
-      editZones: {
-        title: 'Edit source image zones',
-        description: 'Edit source image zones (will link bounding boxes to facsimile zones)',
         type: 'bool',
         default: false
       },
@@ -1006,6 +1000,12 @@ export default class Viewer {
         max: 300,
         step: 5,
         default: 100
+      },
+      editZones: {
+        title: 'Edit source image zones',
+        description: 'Edit source image zones (will link bounding boxes to facsimile zones)',
+        type: 'bool',
+        default: false
       },
       sourceImagePanelSeparator: {
         title: 'options-line', // class name of hr element
@@ -1578,9 +1578,9 @@ export default class Viewer {
   }
 
   // show alert to user
-  // type: ['alert'] 'warning' 'info' 'success'
+  // type: ['error'] 'warning' 'info' 'success'
   // disappearAfter: in milliseconds
-  showAlert(message, type = 'alert', disappearAfter = 30000) {
+  showAlert(message, type = 'error', disappearAfter = 30000) {
     if (this.alertCloser) clearTimeout(this.alertCloser);
     let alert = document.getElementById('alertOverlay');
     alert.classList.remove('warning');

@@ -1067,7 +1067,11 @@ let cmd = {
 // add event listeners when controls menu has been instantiated
 function addEventListeners(v, cm) {
   let vp = document.getElementById('verovio-panel');
-  document.querySelector('body').addEventListener('mousedown', () => v.hideAlerts());
+  // document.getElementById('alertOverlay').addEventListener('mousedown')
+  document.querySelector('body').addEventListener('mousedown', (ev) => {
+    if (ev.target.id !== 'alertOverlay' && ev.target.id !== 'alertMessage')
+      v.hideAlerts();
+  });
 
   // layout notation position
   document.getElementById('top').addEventListener('click', cmd.notationTop);
@@ -1382,8 +1386,10 @@ export function log(s, code = null) {
   if (code) {
     s += " Error Code: " + code + "<br/>";
     s += `<a id="bugReport" target="_blank" href="https://github.com/Signature-Sound-Vienna/mei-friend-online/issues/new?assignees=&labels=&template=bug_report.md&title=Error ${code}">Submit bug report</a>`;
+    v.showAlert(s, 'error', 30000);
   } else {
     s += `<a id="bugReport" target="_blank" href="https://github.com/Signature-Sound-Vienna/mei-friend-online/issues/new?assignees=&labels=&template=bug_report.md">Submit bug report</a>`;
+    v.showAlert(s, 'warning', 30000);
   }
   s += "</div>"
   document.querySelector(".statusbar").innerHTML = s;

@@ -964,7 +964,7 @@ select>option {
   border-radius: 8px;
   color: white;
   font-size: larger;
-  z-index: 10;
+  z-index: 20;
   overflow-y: auto;
 }
 
