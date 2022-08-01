@@ -338,25 +338,30 @@ export function setBreaksOptions(tkAvailableOptions, defaultValue = 'auto') {
   if (defaultValue == '') defaultValue = 'auto';
   let breaksEl = document.getElementById('breaks-select');
   var breaksOpts = {
+    none: 'None',
     auto: 'Automatic',
-    smart: 'Smart',
+    // measure: 'Measure',
     line: 'System',
     encoded: 'System and page',
-    none: 'None'
+    smart: 'Smart'
   };
-  var breaks = utils.findKey('breaks', tkAvailableOptions);
-  for (let index of breaks.values) {
-    if (breaksOpts[index]) {
-      breaksEl[breaksEl.options.length] = new Option(breaksOpts[index], index);
-      if (index == defaultValue) {
-        breaksEl[breaksEl.options.length - 1].selected = 'selected';
-      }
-    } else {
-      breaksEl[breaksEl.options.length] = new Option(index, index);
-    }
-    // disable breaks=smart by default; only enabled with speedMode=false
-    if (index === 'smart') breaksEl[breaksEl.length - 1].disabled = true;
+  for (let key of Object.keys(breaksOpts)) {
+    breaksEl[breaksEl.options.length] = new Option(breaksOpts[key], key);
+    if (key === 'smart') breaksEl[breaksEl.length - 1].disabled = true;
   }
+  // var breaks = utils.findKey('breaks', tkAvailableOptions);
+  // for (let index of breaks.values) {
+  //   if (breaksOpts[index]) {
+  //     breaksEl[breaksEl.options.length] = new Option(breaksOpts[index], index);
+  //     if (index == defaultValue) {
+  //       breaksEl[breaksEl.options.length - 1].selected = 'selected';
+  //     }
+  //   } else {
+  //     breaksEl[breaksEl.options.length] = new Option(index, index);
+  //   }
+  // disable breaks=smart by default; only enabled with speedMode=false
+  //   if (index === 'smart') breaksEl[breaksEl.length - 1].disabled = true;
+  // }
 }
 
 export function handleSmartBreaksOption(speedMode) {

@@ -133,7 +133,8 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
     let children = section.childNodes;
     let lgt = children.length;
     for (let i = 0; i < lgt; i++) {
-      if (countingMode === 'firstPage' && mNo >= mxMeasures) return newSection;
+      if (countingMode === 'firstPage' && mNo >= mxMeasures) // exit with first page
+        return newSection;
       if (p > pageNo) break; // only until requested pageNo is processed
       let currentNode = children[i];
       // console.info('digDeeper(' + pageNo + '): p: ' + p +
@@ -156,8 +157,10 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
 
       if (countingMode === 'firstPage') {
         if (currentNodeName === 'measure') mNo++;
-        else
-          currentNode.querySelectorAll('measure').forEach(() => mNo++);
+        else currentNode.querySelectorAll('measure').forEach(() => mNo++);
+      // } else if (countingMode === 'measure') {
+      //   if (currentNodeName === 'measure') p++;
+      //   else currentNode.querySelectorAll('measure').forEach(() => p++);
       } else if (countingMode === 'encodedBreaks') {
         let sb;
         if (countNow && (breaks.includes(currentNodeName) || (sb = currentNode.querySelector(breaksSelector)))) {
