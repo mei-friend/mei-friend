@@ -508,8 +508,7 @@ export function renumberMeasures(v, cm, startNum = 1, change = false) {
     if (measureList[i].hasAttribute('right'))
       right = measureList[i].getAttribute('right');
 
-    let msg;
-    msg = 'n="' + measureList[i].getAttribute('n') + '" ' +
+    let msg = 'measure n="' + measureList[i].getAttribute('n') + '" ' +
       (change ? '' : 'would be ') + 'changed to n="' + (n + suffix) + '"' +
       (right ? (', right:' + right) : '') + (metcons ? (', metcons:' + metcons) : '');
     console.info(msg);
