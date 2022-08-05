@@ -284,7 +284,9 @@ export function updateGithubInLocalStorage() {
       storage.fileLocationType = "github";
     }
   }
-  fileLocationType = "github";
+  if (isLoggedIn && github.filepath) {
+    fileLocationType = "github";
+  }
 }
 
 
@@ -730,9 +732,15 @@ let inputFormats = {
 
 export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true,
   updateAfterLoading = true) {
+  console.log('OpenFile()');
   if (pageParam === null) storage.removeItem('page');
   // remove any URL parameters, because we open a file locally or through github
   window.history.replaceState(null, null, window.location.pathname);
+  if (storage.supported) {
+    storage.fileLocationType = "file";
+  }
+  fileLocationType = "file";
+  github.filepath = '';
   if (typeof file === "string") { // with fileName string
     meiFileName = file;
     console.info('openMei ' + meiFileName + ', ', cm);
@@ -861,10 +869,6 @@ function openFileDialog(accept = '*') {
       meiFileLocation = "";
       meiFileLocationPrintable = "";
       openFile(files[0]);
-      if (storage.supported) {
-        storage.fileLocationType = "file";
-      }
-      fileLocationType = "file";
       if (isLoggedIn) {
         // re-initialise github menu since we're now working locally
         github.filepath = "";

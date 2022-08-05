@@ -129,6 +129,7 @@ export async function drawSourceImage() {
         // load image asynchronously
         let img;
         if (!sourceImages.hasOwnProperty(imgName)) {
+            console.log('Loading image from ' + imgName);
             img = await loadImage(imgName);
             sourceImages[imgName] = img;
         } else {
