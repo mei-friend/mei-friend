@@ -13,9 +13,7 @@ import {
     setCursorToId
 } from './utils.js';
 import {
-    meiNameSpace,
     svgNameSpace,
-    xmlNameSpace,
     xmlToString
 } from './dom-utils.js'
 import {
@@ -105,6 +103,7 @@ export async function drawSourceImage() {
     if (svg) svg.innerHTML = '';
     if (facs[zoneId]) {
         let imgName = `${root}local/` + facs[zoneId].target;
+        
         imgName = imgName.replace('.tif', '.jpg'); // hack for some DIME files...
         if (false) { // TODO: hack for strange DIME coordinates
             let xfact = .33;
