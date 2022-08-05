@@ -1,6 +1,6 @@
 // mei-friend version and date
 const version = '0.5.0';
-const versionDate = '30 July 2022';
+const versionDate = '5 Aug 2022';
 
 var vrvWorker;
 var spdWorker;
@@ -740,7 +740,7 @@ export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true,
     storage.fileLocationType = "file";
   }
   fileLocationType = "file";
-  github.filepath = '';
+  if (github) github.filepath = '';
   if (typeof file === "string") { // with fileName string
     meiFileName = file;
     console.info('openMei ' + meiFileName + ', ', cm);
