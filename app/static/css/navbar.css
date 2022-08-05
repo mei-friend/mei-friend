@@ -48,6 +48,7 @@
   float: left;
   overflow: hidden;
   white-space: nowrap;
+  z-index: 12;
 }
 
 /* Dropdown button */

@@ -3,6 +3,9 @@ import * as speed from './speed.js';
 import * as utils from './utils.js';
 import * as dutils from './dom-utils.js';
 import * as att from './attribute-classes.js';
+import {
+  loadFacsimile
+} from './source-imager.js';
 
 // delete selected elements
 export function delEl(v, cm) {
@@ -19,6 +22,7 @@ export function delEl(v, cm) {
   let selectedElements = [];
   v.updateNotation = false;
   // let checkPoint = buffer.createCheckpoint(); TODO
+
   if (att.modelControlEvents.concat(['accid', 'artic', 'clef', 'octave', 'beamSpan'])
     .includes(element.nodeName)) {
     if (element.nodeName == 'octave') { // reset notes inside octave range
@@ -27,24 +31,24 @@ export function delEl(v, cm) {
       let id1 = speed.rmHash(element.getAttribute('startid'));
       let id2 = speed.rmHash(element.getAttribute('endid'));
       findAndModifyOctaveElements(cm, v.xmlDoc, id1, id2, disPlace, dis, false);
-      removeInBuffer(cm, element);
+      removeInEditor(cm, element);
       selectedElements.push(id2);
     } else {
-      removeInBuffer(cm, element);
+      removeInEditor(cm, element);
       // place cursor at a sensible place...
       let m = utils.getElementIdAtCursor(cm);
       let el = document.getElementById(m).querySelector(dutils.navElsSelector);
       if (el) selectedElements.push(el.getAttribute('id'));
       else selectedElements.push(nextId);
     }
-  } else if (['beam'].includes(element.nodeName)) { // delte beam
+  } else if (['beam'].includes(element.nodeName)) { // delete beam
     let p;
     let first = true;
     let childList = element.childNodes;
     for (let i = 0; i < childList.length; i++) {
       if (childList[i].nodeType === Node.TEXT_NODE) continue;
       if (first) {
-        p = replaceInTextEditor(cm, element, false, childList[i]);
+        p = replaceInEditor(cm, element, false, childList[i]);
         p.end.line += 1;
         p.end.ch = 0;
         cm.setCursor(p.end);
@@ -60,11 +64,15 @@ export function delEl(v, cm) {
       selectedElements.push(childList[i].getAttribute('xml:id'))
       element.parentNode.insertBefore(childList[i--], element);
     }
-  } else {
-    console.info('Element ' + id + ' not supported for deletion.');
-    return;
-  }
+  } else // delete Zone in source image display
+    if (element.nodeName === 'zone' && document.getElementById('editZones').checked) {
+      removeZone(v, cm, element);
+    } else {
+      console.info('Element ' + id + ' not supported for deletion.');
+      return;
+    }
   element.remove();
+  loadFacsimile(v.xmlDoc);
   // buffer.groupChangesSinceCheckpoint(checkPoint); TODO
   v.selectedElements = selectedElements;
   v.lastNoteId = v.selectedElements[v.selectedElements.length - 1];
@@ -243,7 +251,7 @@ export function invertPlacement(v, cm, modifier = false) {
         val == 'below' ?
         el.setAttribute('form', 'inv') : el.removeAttribute('form');
       el.setAttribute(attr, val);
-      range = replaceInTextEditor(cm, el, true);
+      range = replaceInEditor(cm, el, true);
       // txtEdr.autoIndentSelectedRows();
     } else if (att.attCurvature.includes(el.nodeName)) {
       attr = 'curvedir';
@@ -251,7 +259,7 @@ export function invertPlacement(v, cm, modifier = false) {
         val = 'below';
       }
       el.setAttribute(attr, val);
-      range = replaceInTextEditor(cm, el, true);
+      range = replaceInEditor(cm, el, true);
       // txtEdr.autoIndentSelectedRows();
     } else if (att.attStems.includes(el.nodeName)) {
       attr = 'stem.dir', val = 'up';
@@ -259,7 +267,7 @@ export function invertPlacement(v, cm, modifier = false) {
         val = 'down';
       }
       el.setAttribute(attr, val);
-      range = replaceInTextEditor(cm, el, true);
+      range = replaceInEditor(cm, el, true);
       // txtEdr.autoIndentSelectedRows();
       // invert @num.place within tuplet
     } else if (el.nodeName === 'tuplet') {
@@ -269,7 +277,7 @@ export function invertPlacement(v, cm, modifier = false) {
         val = 'below';
       }
       el.setAttribute(attr, val);
-      range = replaceInTextEditor(cm, el, true);
+      range = replaceInEditor(cm, el, true);
       // txtEdr.autoIndentSelectedRows();
     } else if (el.nodeName === 'beamSpan') { // replace individual notes in beamSpan
       attr = 'stem.dir', val = 'up';
@@ -285,7 +293,7 @@ export function invertPlacement(v, cm, modifier = false) {
             note.setAttribute(attr, val);
           }
           v.updateNotation = false; // no need to redraw notation
-          range = replaceInTextEditor(cm, note, true);
+          range = replaceInEditor(cm, note, true);
         });
       }
       // find all note/chord elements children and execute InvertingAction
@@ -300,7 +308,7 @@ export function invertPlacement(v, cm, modifier = false) {
         }
         note.setAttribute(attr, val);
         v.updateNotation = false; // no need to redraw notation
-        range = replaceInTextEditor(cm, note, true);
+        range = replaceInEditor(cm, note, true);
         // txtEdr.autoIndentSelectedRows();
       }
     } else {
@@ -336,14 +344,14 @@ export function toggleArtic(v, cm, artic = "stacc") {
     if (['note', 'chord'].includes(note.nodeName)) {
       uuid = toggleArticForNote(note, artic);
       uuid ? ids[i] = uuid : ids[i] = id;
-      range = replaceInTextEditor(cm, note, true);
+      range = replaceInEditor(cm, note, true);
       cm.execCommand('indentAuto');
     } else if (noteList = utils.findNotes(id)) {
       let noteId;
       for (noteId of noteList) {
         note = v.xmlDoc.querySelector("[*|id='" + noteId + "']");
         uuid = toggleArticForNote(note, artic);
-        range = replaceInTextEditor(cm, note, true);
+        range = replaceInEditor(cm, note, true);
         cm.execCommand('indentAuto');
       }
     }
@@ -366,9 +374,9 @@ export function shiftPitch(v, cm, deltaPitch) {
     if (!el) continue;
     let chs = Array.from(el.querySelectorAll('note,rest,mRest,multiRest'));
     if (chs.length > 0) // shift many elements
-      chs.forEach(ele => replaceInTextEditor(cm, pitchMover(ele, deltaPitch)));
+      chs.forEach(ele => replaceInEditor(cm, pitchMover(ele, deltaPitch)));
     else // shift one element
-      replaceInTextEditor(cm, pitchMover(el, deltaPitch));
+      replaceInEditor(cm, pitchMover(el, deltaPitch));
   }
   v.selectedElements = ids;
   v.updateData(cm, false, true);
@@ -435,12 +443,12 @@ export function addBeamElement(v, cm, elementName = 'beam') {
       if (nodeList[i].getAttribute('xml:id') == id2) {
         let n = nodeList[i].cloneNode(); // make a copy for replacement later
         beam.appendChild(nodeList[i--]);
-        replaceInTextEditor(cm, n, true, beam);
+        replaceInEditor(cm, n, true, beam);
         cm.execCommand('indentAuto');
         break;
       }
       if (insert) {
-        removeInBuffer(cm, nodeList[i]);
+        removeInEditor(cm, nodeList[i]);
         beam.appendChild(nodeList[i--]);
       }
     }
@@ -551,7 +559,7 @@ export function addSuppliedElement(v, cm) {
       if (v.respId) sup.setAttributeNS(dutils.xmlNameSpace, 'resp', '#' + v.respId);
       parent.replaceChild(sup, el);
       sup.appendChild(el);
-      replaceInTextEditor(cm, el, true, sup);
+      replaceInEditor(cm, el, true, sup);
       cm.execCommand('indentAuto');
       uuids.push(uuid);
     }
@@ -584,7 +592,7 @@ export function addVerticalGroup(v, cm) {
     } else if (att.attVerticalGroup.includes(el.nodeName)) {
       let oldEl = el.cloneNode(true);
       el.setAttribute('vgrp', value);
-      replaceInTextEditor(cm, oldEl, true, el);
+      replaceInEditor(cm, oldEl, true, el);
       cm.execCommand('indentAuto');
     } else {
       console.warn('Vertical group not supported for ', el);
@@ -606,8 +614,77 @@ export function cleanAccid(v, cm) {
 export function renumberMeasures(v, cm, change) {
   v.updateNotation = false;
   v.loadXml(cm.getValue(), true);
-  utils.renumberMeasures(v.xmlDoc, cm, 1, change);
+  utils.renumberMeasures(v, cm, 1, change);
+  if (document.getElementById('showSourceImagePanel').checked) loadFacsimile(v.xmlDoc);
+  v.updateData(cm, false, true);
   v.updateNotation = true;
+}
+
+// add zone in editor, called from source-imager.js
+export function addZone(v, cm, rect, addMeasure = true) {
+  let zone = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'zone');
+  let uuid = 'zone-' + utils.generateUUID();
+  zone.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
+  let x = Math.round(rect.getAttribute('x'));
+  let y = Math.round(rect.getAttribute('y'));
+  let width = Math.round(rect.getAttribute('width'));
+  let height = Math.round(rect.getAttribute('height'));
+  rect.setAttribute('id', uuid);
+  zone.setAttribute('type', 'measure');
+  zone.setAttribute('ulx', x);
+  zone.setAttribute('uly', y);
+  zone.setAttribute('lrx', x + width);
+  zone.setAttribute('lry', y + height);
+  v.updateNotation = false;
+  let currentId = utils.getElementIdAtCursor(cm);
+  // check if current element a zone
+  let el = v.xmlDoc.querySelector('[*|id=' + currentId + ']');
+  if (el && el.nodeName === 'zone' && el.parentElement.nodeName === 'surface') {
+    cm.execCommand('goLineEnd');
+    cm.replaceRange('\n' + dutils.xmlToString(zone), cm.getCursor());
+    cm.execCommand('indentAuto');
+    let prevMeas = v.xmlDoc.querySelector('[facs="#' + el.getAttribute('xml:id') + '"]');
+    // new measure element
+    let newMeas = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'measure');
+    newMeas.setAttributeNS(dutils.xmlNameSpace, 'xml:id', 'measure-' + utils.generateUUID());
+    newMeas.setAttribute('n', prevMeas.getAttribute('n') + '-new');
+    newMeas.setAttribute('facs', '#' + uuid);
+
+    // navigate to prev measure element
+    utils.setCursorToId(cm, prevMeas.getAttribute('xml:id'));
+    cm.execCommand('toMatchingTag');
+    cm.execCommand('goLineEnd');
+    cm.replaceRange('\n' + dutils.xmlToString(newMeas), cm.getCursor());
+    cm.execCommand('indentAuto');
+    utils.setCursorToId(cm, uuid);
+
+    v.updateData(cm, false, false);
+    console.log('new zone added', rect);
+    v.updateNotation = true;
+    return true;
+  } else {
+    return false;
+  }
+}
+
+// remove zone in editor, called from editor.js
+export function removeZone(v, cm, zone, removeMeasure = true) {
+  if (!zone) return;
+  removeInEditor(cm, zone);
+  let rect = document.querySelector('rect[id="' + zone.getAttribute('xml:id') + '"]');
+  if (rect) rect.parentElement.removeChild(rect);
+  let txt = document.querySelector('text[id="' + zone.getAttribute('xml:id') + '"]');
+  if (txt) txt.parentElement.removeChild(txt);
+  // find elements referring to this zone id via @facs and delete them
+  let ms = v.xmlDoc.querySelectorAll('[facs="#' + zone.getAttribute('xml:id') + '"]');
+  ms.forEach(e => {
+    if (removeMeasure) {
+      removeInEditor(cm, e);
+    } else {
+      e.removeAttribute('facs');
+      replaceInEditor(cm, e);
+    }
+  });
 }
 
 
@@ -617,22 +694,22 @@ export function renumberMeasures(v, cm, change) {
 // ############################################################################
 
 // find xmlNode in textBuffer and remove it (including empty line)
-function removeInBuffer(cm, xmlNode) {
+function removeInEditor(cm, xmlNode) {
   let itemId = xmlNode.getAttribute('xml:id');
   let searchSelfClosing = '(?:<' + xmlNode.nodeName +
     `)(\\s+?)([^>]*?)(?:xml:id=["']` + itemId + `['"])([^>]*?)(?:/>)`;
   let sc = cm.getSearchCursor(new RegExp(searchSelfClosing));
   if (sc.findNext()) {
-    console.info('removeInBuffer() self closing from: ', sc.from());
-    console.info('removeInBuffer() self closing to: ', sc.to());
+    console.info('removeInEditor() self closing from: ', sc.from());
+    console.info('removeInEditor() self closing to: ', sc.to());
   } else {
     let searchFullElement = '(?:<' + xmlNode.nodeName +
       `)(\\s+?)([^>]*?)(?:xml:id=["']` + itemId + `["'])([\\s\\S]*?)(?:</` +
       xmlNode.nodeName + '[ ]*?>)';
     sc = cm.getSearchCursor(new RegExp(searchFullElement));
     if (sc.findNext()) {
-      console.info('removeInBuffer() full element from: ', sc.from());
-      console.info('removeInBuffer() full element to: ', sc.to());
+      console.info('removeInEditor() full element from: ', sc.from());
+      console.info('removeInEditor() full element to: ', sc.to());
     }
   }
   if (sc.atOccurrence) {
@@ -645,7 +722,7 @@ function removeInBuffer(cm, xmlNode) {
       }
     }
   } else
-    console.info('removeInBuffer(): nothing replaced for ' + itemId + '.');
+    console.info('removeInEditor(): nothing removed for ' + itemId + '.');
 }
 
 function isEmpty(str) {
@@ -653,7 +730,7 @@ function isEmpty(str) {
 }
 
 // find xmlNode in textBuffer and replace it with new serialized content
-export function replaceInTextEditor(cm, xmlNode, select = false, newNode = null) {
+export function replaceInEditor(cm, xmlNode, select = false, newNode = null) {
   let newMEI = (newNode) ?
     dutils.xmlToString(newNode) : dutils.xmlToString(xmlNode);
   // search in buffer
@@ -673,7 +750,7 @@ export function replaceInTextEditor(cm, xmlNode, select = false, newNode = null)
     // console.info('searchFullElement: ' + searchFullElement);
   }
   if (!sc.atOccurrence) {
-    console.info('replaceInTextEditor(): nothing replaced for ' + itemId + '.');
+    console.info('replaceInEditor(): nothing replaced for ' + itemId + '.');
   } else if (select) {
     sc = cm.getSearchCursor(newMEI);
     if (sc.findNext()) {
@@ -775,7 +852,7 @@ function staffMover(cm, el, upwards) {
   }
   if (staffNo == newStaffNo) el.removeAttribute('staff');
   else el.setAttribute('staff', newStaffNo);
-  replaceInTextEditor(cm, el);
+  replaceInEditor(cm, el);
 }
 
 // find all notes between two ids in the same staff and set @oct.ges and
@@ -815,7 +892,7 @@ function findAndModifyOctaveElements(cm, xmlDoc, id1, id2,
               n.removeAttribute('oct.ges');
             }
             n.setAttribute('oct', oct + deltaOct)
-            replaceInTextEditor(cm, n);
+            replaceInEditor(cm, n);
           }
           if (n.getAttribute('xml:id') == id2) {
             return;

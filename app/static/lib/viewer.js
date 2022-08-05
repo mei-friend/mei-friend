@@ -12,6 +12,11 @@ import {
   storage,
   tkVersion
 } from './main.js';
+import {
+  drawSourceImage,
+  highlightZone,
+  zoomSourceImage
+} from './source-imager.js';
 import schema_meiCMN_401 from '../schemaInfo/mei-CMN-4.0.1.schemaInfo.js';
 import schema_meiAll_401 from '../schemaInfo/mei-all-4.0.1.schemaInfo.js';
 
@@ -42,6 +47,7 @@ export default class Viewer {
     this.vrvOptions; // all verovio options
     this.verovioIcon = document.getElementById('verovio-icon');
     this.respId = '';
+    this.alertCloser;
   }
 
   // change options, load new data, render current page, add listeners, highlight
@@ -298,9 +304,9 @@ export default class Viewer {
     // console.info('client size: ' + dimensions.width + '/' + dimensions.height);
     if (this.vrvOptions.breaks !== "none") {
       this.vrvOptions.pageWidth = Math.max(Math.round(
-        dimensions.width * (100 / this.vrvOptions.scale)), 600);
+        dimensions.width * (100 / this.vrvOptions.scale)), 100);
       this.vrvOptions.pageHeight = Math.max(Math.round(
-        dimensions.height * (100 / this.vrvOptions.scale)), 250);
+        dimensions.height * (100 / this.vrvOptions.scale)), 100);
     }
     // overwrite existing options if new ones are passed in
     // for (let key in newOptions) { this.vrvOptions[key] = newOptions[key]; }
@@ -379,7 +385,7 @@ export default class Viewer {
   }
 
   addNotationEventListeners(cm) {
-    let elements = document.querySelectorAll('g[id]');
+    let elements = document.querySelectorAll('g[id],rect[id],text[id]');
     elements.forEach(item => {
       item.addEventListener('click',
         (event) => this.handleClickOnNotation(event, cm));
@@ -388,6 +394,7 @@ export default class Viewer {
 
   handleClickOnNotation(e, cm) {
     e.stopImmediatePropagation();
+    this.hideAlerts();
     let point = {};
     point.x = e.clientX;
     point.y = e.clientY;
@@ -491,7 +498,7 @@ export default class Viewer {
   // highlight currently selected elements, if cm left out, all are cleared
   updateHighlight(cm) {
     // clear existing highlighted classes
-    let highlighted = document.querySelectorAll('g.highlighted');
+    let highlighted = document.querySelectorAll('.highlighted');
     // console.info('updateHlt: highlighted: ', highlighted);
     highlighted.forEach(e => e.classList.remove('highlighted'));
     let ids = [];
@@ -501,12 +508,15 @@ export default class Viewer {
     // console.info('updateHlt ids: ', ids);
     for (let id of ids) {
       if (id) {
-        let el = document.querySelector('g#' + id)
+        let el = document.querySelectorAll('#' + id); // was: 'g#'+id
         // console.info('updateHlt el: ', el);
         if (el) {
-          el.classList.add('highlighted');
-          let children = el.querySelectorAll('g');
-          children.forEach(item => item.classList.add('highlighted'));
+          el.forEach(e => {
+            e.classList.add('highlighted');
+            if (e.nodeName === 'rect' && e.closest('#source-image-svg'))
+              highlightZone(e);
+            e.querySelectorAll('g').forEach(g => g.classList.add('highlighted'));
+          });
         }
       }
     }
@@ -738,10 +748,10 @@ export default class Viewer {
     vsp.innerHTML += '<input type="button" title="Reset to mei-friend defaults" id="vrvReset" class="resetButton" value="Default" />';
     if (addListeners) { // add change listeners
       vsp.addEventListener('input', ev => {
-        let opt = ev.srcElement.id;
-        let value = ev.srcElement.value;
-        if (ev.srcElement.type === 'checkbox') value = ev.srcElement.checked;
-        if (ev.srcElement.type === 'number') value = parseFloat(value);
+        let opt = ev.target.id;
+        let value = ev.target.value;
+        if (ev.target.type === 'checkbox') value = ev.target.checked;
+        if (ev.target.type === 'number') value = parseFloat(value);
         this.vrvOptions[opt] = value;
         if (defaultVrvOptions.hasOwnProperty(opt) && // TODO check vrv default values
           defaultVrvOptions[opt].toString() === value.toString())
@@ -752,7 +762,7 @@ export default class Viewer {
         this.updateLayout(this.vrvOptions);
       });
       vsp.addEventListener('click', ev => { // RESET button
-        if (ev.srcElement.id === 'vrvReset') {
+        if (ev.target.id === 'vrvReset') {
           this.addVrvOptionsToSettingsPanel(tkAvailableOptions, defaultVrvOptions, false);
           this.updateLayout(this.vrvOptions);
         }
@@ -891,10 +901,10 @@ export default class Viewer {
 
     if (addListeners) { // add change listeners
       cmsp.addEventListener('input', ev => {
-        let option = ev.srcElement.id;
-        let value = ev.srcElement.value;
-        if (ev.srcElement.type === 'checkbox') value = ev.srcElement.checked;
-        if (ev.srcElement.type === 'number') value = parseFloat(value);
+        let option = ev.target.id;
+        let value = ev.target.value;
+        if (ev.target.type === 'checkbox') value = ev.target.checked;
+        if (ev.target.type === 'number') value = parseFloat(value);
         this.applyEditorOption(cm, option, value,
           storage.hasOwnProperty('cm-matchTheme') ?
           storage['cm-matchTheme'] : mfDefaults['matchTheme']);
@@ -912,7 +922,7 @@ export default class Viewer {
         }
       });
       cmsp.addEventListener('click', ev => {
-        if (ev.srcElement.id === 'cmReset') {
+        if (ev.target.id === 'cmReset') {
           this.addCmOptionsToSettingsPanel(cm, mfDefaults, false);
         }
       });
@@ -941,7 +951,7 @@ export default class Viewer {
       },
       showAnnotationPanel: {
         title: 'Show annotation panel',
-        decription: 'Show annotation panel',
+        description: 'Show annotation panel',
         type: 'bool',
         default: false
       },
@@ -949,21 +959,58 @@ export default class Viewer {
         title: 'options-line', // class name of hr element
         type: 'line'
       },
-      /*   titleSourceImagePanel: {
-          title: 'Source image panel',
-          description: 'Show the score images of the source edition, if available',
-          type: 'header'
-        },
-        showSourceImagePanel: {
-          title: 'Source image panel',
-          decription: 'Show the score images of the source edition, if available',
-          type: 'bool',
-          default: false
-        },
-        sourceImagePanelSeparator: {
-          title: 'options-line', // class name of hr element
-          type: 'line'
-        }, */
+      titleSourceImagePanel: {
+        title: 'Source image panel',
+        description: 'Show the score images of the source edition, if available',
+        type: 'header'
+      },
+      showSourceImagePanel: {
+        title: 'Show source image panel',
+        description: 'Show the score images of the source edition, if available',
+        type: 'bool',
+        default: false
+      },
+      selectSourceImagePosition: {
+        title: 'Source image position',
+        description: 'Select source image position relative to notation',
+        type: 'select',
+        values: ['left', 'right', 'top', 'bottom'],
+        default: 'bottom'
+      },
+      sourceImageProportion: {
+        title: 'Source image proportion (%)',
+        description: 'Proportion that the source image pane takes from the notation pane (in percent)',
+        type: 'int',
+        min: 0,
+        max: 99,
+        step: 1,
+        default: 50
+      },
+      showSourceImageFullPage: {
+        title: 'Show full page',
+        description: 'Shouw source image on full page',
+        type: 'bool',
+        default: false
+      },
+      sourceImageZoom: {
+        title: 'Source image zoom (%)',
+        description: 'Zoom level of source image (in percent)',
+        type: 'int',
+        min: 10,
+        max: 300,
+        step: 5,
+        default: 100
+      },
+      editZones: {
+        title: 'Edit source image zones',
+        description: 'Edit source image zones (will link bounding boxes to facsimile zones)',
+        type: 'bool',
+        default: false
+      },
+      sourceImagePanelSeparator: {
+        title: 'options-line', // class name of hr element
+        type: 'line'
+      },
       titleSupplied: {
         title: 'Handle <supplied> element',
         description: 'Control handling of <supplied> elements',
@@ -971,7 +1018,7 @@ export default class Viewer {
       },
       showSupplied: {
         title: 'Show <supplied> elements',
-        decription: 'Highlight all elements contained by a <supplied> element',
+        description: 'Highlight all elements contained by a <supplied> element',
         type: 'bool',
         default: true
       },
@@ -1065,6 +1112,19 @@ export default class Viewer {
         description: 'Settings for renumbering measures',
         type: 'header'
       },
+      renumberMeasureContinueAcrossIncompleteMeasures: {
+        title: 'Continue across incomplete measures',
+        description: 'Continue measure numbers across incomplete measures (@metcon="false")',
+        type: 'bool',
+        default: false
+      },
+      renumberMeasuresUseSuffixAtMeasures: {
+        title: 'Use suffix at incomplete measures',
+        description: 'Use number suffix at incomplete measures (e.g., 23-cont)',
+        type: 'select',
+        values: ['none', '-cont'],
+        default: false
+      },
       renumberMeasuresContinueAcrossEndings: {
         title: 'Continue across endings',
         description: 'Continue measure numbers across endings',
@@ -1126,21 +1186,38 @@ export default class Viewer {
       if (div) mfs.appendChild(div);
       if (opt === 'respSelect') this.respId = document.getElementById('respSelect').value;
       if (opt === 'renumberMeasuresUseSuffixAtEndings') {
-        this.enableRenumberMeasuresUseSuffixAtEndings();
+        this.disableElementThroughCheckbox(
+          'renumberMeasuresContinueAcrossEndings', 'renumberMeasuresUseSuffixAtEndings');
+      }
+      if (opt === 'renumberMeasuresUseSuffixAtMeasures') {
+        this.disableElementThroughCheckbox(
+          'renumberMeasureContinueAcrossIncompleteMeasures', 'renumberMeasuresUseSuffixAtMeasures');
       }
     });
     mfs.innerHTML += '<input type="button" title="Reset to mei-friend defaults" id="mfReset" class="resetButton" value="Default" />';
 
     if (addListeners) { // add change listeners
       mfs.addEventListener('input', ev => {
-        let option = ev.srcElement.id;
-        let value = ev.srcElement.value;
-        if (ev.srcElement.type === 'checkbox') value = ev.srcElement.checked;
-        if (ev.srcElement.type === 'number') value = parseFloat(value);
+        let option = ev.target.id;
+        let value = ev.target.value;
+        if (ev.target.type === 'checkbox') value = ev.target.checked;
+        if (ev.target.type === 'number') value = parseFloat(value);
         let col = document.getElementById('suppliedColor').value;
         switch (option) {
           case 'showAnnotationPanel':
             this.toggleAnnotationPanel();
+            break;
+          case 'editZones':
+          case 'showSourceImagePanel':
+          case 'selectSourceImagePosition':
+          case 'sourceImageProportion':
+            setOrientation(cm, '', this);
+            break;
+          case 'showSourceImageFullPage':
+            drawSourceImage();
+            break;
+          case 'sourceImageZoom':
+            zoomSourceImage();
             break;
           case 'showSupplied':
             rt.style.setProperty('--suppliedColor', (value) ? col : 'var(--notationColor)');
@@ -1167,7 +1244,12 @@ export default class Viewer {
               document.getElementById('controlMenuUpdateNotation').checked ? 'inherit' : 'none';
             break;
           case 'renumberMeasuresContinueAcrossEndings':
-            this.enableRenumberMeasuresUseSuffixAtEndings();
+            this.disableElementThroughCheckbox(
+              'renumberMeasuresContinueAcrossEndings', 'renumberMeasuresUseSuffixAtEndings');
+            break;
+          case 'renumberMeasureContinueAcrossIncompleteMeasures':
+            this.disableElementThroughCheckbox(
+              'renumberMeasureContinueAcrossIncompleteMeasures', 'renumberMeasuresUseSuffixAtMeasures');
             break;
         }
         if (value === optionsToShow[option].default) {
@@ -1177,7 +1259,7 @@ export default class Viewer {
         }
       });
       mfs.addEventListener('click', ev => {
-        if (ev.srcElement.id === 'mfReset') {
+        if (ev.target.id === 'mfReset') {
           this.addMeiFriendOptionsToSettingsPanel(false);
         }
       });
@@ -1487,12 +1569,53 @@ export default class Viewer {
 
 
   // toggle disabled at one specific checkbox
-  enableRenumberMeasuresUseSuffixAtEndings() {
-    let cont = document.getElementById('renumberMeasuresContinueAcrossEndings').checked;
-    let el = document.getElementById('renumberMeasuresUseSuffixAtEndings');
+  disableElementThroughCheckbox(checkbox, affectedElement) {
+    let cont = document.getElementById(checkbox).checked;
+    let el = document.getElementById(affectedElement);
     el.disabled = cont;
     if (cont) el.parentNode.classList.add('disabled');
     else el.parentNode.classList.remove('disabled');
+  }
+
+  // show alert to user
+  // type: ['error'] 'warning' 'info' 'success'
+  // disappearAfter: in milliseconds
+  showAlert(message, type = 'error', disappearAfter = 30000) {
+    if (this.alertCloser) clearTimeout(this.alertCloser);
+    let alert = document.getElementById('alertOverlay');
+    alert.classList.remove('warning');
+    alert.classList.remove('info');
+    alert.classList.remove('success');
+    switch (type) {
+      case 'warning':
+        alert.classList.add('warning');
+        break;
+      case 'info':
+        alert.classList.add('info');
+        break;
+      case 'success':
+        alert.classList.add('success');
+        break;
+    }
+    alert.querySelector('span').innerHTML = message;
+    alert.style.display = 'flex';
+    this.setFocusToVerovioPane();
+    this.alertCloser = setTimeout(() => {
+      alert.style.display = "none";
+    }, disappearAfter);
+  }
+
+  updateAlert(newMsg) {
+    let alert = document.getElementById('alertOverlay');
+    alert.querySelector('span').innerHTML += '<br />' + newMsg;
+  }
+
+  hideAlerts() {
+    let btns = document.getElementsByClassName('alertCloseButton');
+    for (let b of btns) {
+      if (this.alertCloser) clearTimeout(this.alertCloser);
+      b.parentElement.style.display = 'none';
+    }
   }
 
 }

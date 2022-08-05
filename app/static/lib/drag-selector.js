@@ -1,4 +1,6 @@
-const svgNS = "http://www.w3.org/2000/svg";
+import {
+  svgNameSpace
+} from './dom-utils.js'
 import * as att from './attribute-classes.js';
 
 export function addDragSelector(v, vp) {
@@ -29,7 +31,7 @@ export function addDragSelector(v, vp) {
     obobj = {};
     v.selectedElements.forEach(el => oldEls.push(el)); // remember selected els
     // create selection rectangle
-    rect = document.createElementNS(svgNS, 'rect');
+    rect = document.createElementNS(svgNameSpace, 'rect');
     let pm = document.querySelector('g.page-margin');
     if (pm) pm.appendChild(rect);
 
@@ -159,14 +161,14 @@ export function addDragSelector(v, vp) {
 
 }
 
-function transformCTM(point, matrix) {
+export function transformCTM(point, matrix) {
   let r = {};
   r.x = matrix.a * point.x + matrix.c * point.y + matrix.e;
   r.y = matrix.b * point.x + matrix.d * point.y + matrix.f;
   return r;
 }
 
-function updateRect(rect, x, y, width, height, color = "black",
+export function updateRect(rect, x, y, width, height, color = "black",
   strokeWidth = 13, strokeDashArray = 50) {
   rect.setAttribute('x', x);
   rect.setAttribute('y', y);

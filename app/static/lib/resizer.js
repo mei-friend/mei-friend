@@ -4,10 +4,6 @@ let resizerWidth = 8; // 8 px, Attention: hard-coded also in left.css, right.css
 
 let annotationPanelExtent = 250; // px, taken away from width of friendContainer
 
-// showSourceImagePanel
-let sourceImageLocation = 'bottomright'; // 'topleft' it will change according to orientation setting 
-let sourceImageProportion = .5;
-
 export function setOrientation(cm, o = '', v = null, storage = null) {
   if (o) orientation = o;
   if (storage && storage.supported) storage.orientation = orientation;
@@ -19,7 +15,12 @@ export function setOrientation(cm, o = '', v = null, storage = null) {
   // v.updateLayout();
   // }).attr('href', root + '/css/' + orientation + '.css');
   let sz = calcSizeOfContainer();
-  let notation = document.getElementById("notation");
+  let notationPane = document.getElementById('notation');
+  let imagePane = document.getElementById('image-panel');
+  let verovioPane = document.getElementById('verovio-panel');
+  let pixContainer = document.getElementById('pix-container');
+  let showSourceImage = document.getElementById('showSourceImagePanel').checked;
+  let controlMenu = document.getElementById('verovio-controls-form');
   console.log('setOrientation(' + o + ') container size:', sz);
   let showAnnotationPanelCheckbox = document.getElementById('showAnnotationPanel');
   if (orientation === "top" || orientation === "bottom") {
@@ -29,8 +30,8 @@ export function setOrientation(cm, o = '', v = null, storage = null) {
     } else {
       document.getElementById('annotationPanel').style.display = 'none';
     }
-    notation.style.width = sz.width; //- 6; // TODO: remove when border removed
-    notation.style.height = sz.height * notationProportion;
+    notationPane.style.width = sz.width; //- 6; // TODO: remove when border removed
+    notationPane.style.height = sz.height * notationProportion;
     cm.setSize(sz.width, sz.height * (1 - notationProportion) - resizerWidth);
   }
   if (orientation === "left" || orientation === "right") {
@@ -40,13 +41,60 @@ export function setOrientation(cm, o = '', v = null, storage = null) {
     } else {
       document.getElementById('annotationPanel').style.display = 'none';
     }
-    notation.style.width = sz.width * notationProportion;
-    notation.style.height = sz.height; //- 6; TODO: remove when border removed
-    cm.setSize(sz.width * (1 - notationProportion), sz.height);
+    notationPane.style.width = Math.ceil(sz.width * notationProportion);
+    notationPane.style.height = sz.height; //- 6; TODO: remove when border removed
+    cm.setSize(Math.floor(sz.width * (1 - notationProportion) - resizerWidth), sz.height);
   }
   friendSz.style.width = sz.width;
   friendSz.style.height = sz.height;
-  // console.info('Notation size: ' + notation.style.width + '/' + notation.style.height);
+  let sourceImagePosition = document.getElementById('selectSourceImagePosition').value;
+  let sourceImageProportion = document.getElementById('sourceImageProportion').value;
+  switch (sourceImagePosition) {
+    case 'top':
+      pixContainer.style.flexDirection = 'column-reverse';
+      break;
+    case 'bottom':
+      pixContainer.style.flexDirection = 'column';
+      break;
+    case 'left':
+      pixContainer.style.flexDirection = 'row-reverse';
+      break;
+    case 'right':
+      pixContainer.style.flexDirection = 'row';
+      break
+  }
+  switch (sourceImagePosition) {
+    case 'top':
+    case 'bottom':
+      if (showSourceImage) {
+        imagePane.style.display = 'block';
+        imagePane.style.height = sourceImageProportion + '%';
+        verovioPane.style.height = (100 - sourceImageProportion) + '%';
+      } else {
+        imagePane.style.display = 'none';
+        imagePane.style.height = 0;
+        verovioPane.style.height = '100%';
+      }
+      imagePane.style.width = notationPane.style.width;
+      verovioPane.style.width = notationPane.style.width;
+      break;
+    case 'left':
+    case 'right':
+      if (showSourceImage) {
+        imagePane.style.display = 'block';
+        imagePane.style.width = sourceImageProportion + '%';;
+        verovioPane.style.width = (100 - sourceImageProportion) + '%';;
+      } else {
+        imagePane.style.display = 'none';
+        imagePane.style.width = 0;
+        verovioPane.style.width = '100%';
+      }
+      imagePane.style.height = parseFloat(notationPane.style.height) - controlMenu.getBoundingClientRect().height;
+      verovioPane.style.height = parseFloat(notationPane.style.height) - controlMenu.getBoundingClientRect().height;
+      break;
+  }
+
+  // console.info('Notation size: ' + notationPane.style.width + '/' + notationPane.style.height);
   // redoLayout when done with loading TODO
   if (v) {
     if (v.speedMode &&
@@ -66,8 +114,7 @@ export function getOrientation() {
 
 export function calcSizeOfContainer() {
   let bodySz = document.querySelector('body').getBoundingClientRect();
-  let friendSz = document.getElementById("friendContainer")
-    .getBoundingClientRect();
+  let friendSz = document.getElementById("friendContainer").getBoundingClientRect();
   let headerSz = document.querySelector('.header').getBoundingClientRect();
   //let sizerSz = document.querySelector('.resizer').getBoundingClientRect();
   let footerSz = document.querySelector('.footer').getBoundingClientRect();
@@ -120,26 +167,26 @@ export function addResizerHandlers(v, cm) {
       ', Container: ' + sz.width + '/' + sz.height);
     switch (orientation) {
       case 'top':
-        notation.style.height = (notationSize + dy);
+        notation.style.height = (notationSize + dy) + szSz.height;
         notationProportion = (notationSize + dy) / sz.height;
         cm.setSize(sz.width, sz.height - (notationSize + dy) - szSz.height);
         break;
       case 'bottom':
-        notation.style.height = (notationSize - dy);
+        notation.style.height = (notationSize - dy) + szSz.height;
         console.log('notation height: ' + notation.style.height);
         notationProportion = (notationSize - dy) / sz.height;
         cm.setSize(sz.width, sz.height - (notationSize - dy) - szSz.height);
         break;
       case 'right':
-        notation.style.width = (notationSize - dx);
+        notation.style.width = (notationSize - dx) + resizerWidth;
         notationProportion = (notationSize - dx) / sz.width;
-        cm.setSize(sz.width - (notationSize - dx), sz.height - szSz.width);
+        cm.setSize(sz.width - (notationSize - dx) - resizerWidth, sz.height - szSz.width);
         break;
       case 'left':
       default:
-        notation.style.width = (notationSize + dx);
+        notation.style.width = (notationSize + dx) + resizerWidth;
         notationProportion = (notationSize + dx) / sz.width;
-        cm.setSize(sz.width - (notationSize + dx), sz.height - szSz.width);
+        cm.setSize(sz.width - (notationSize + dx) - resizerWidth, sz.height - szSz.width);
         break;
     }
     const cursor = (orientation === "left" || orientation === "right") ?
@@ -162,13 +209,7 @@ export function addResizerHandlers(v, cm) {
     document.removeEventListener('mousemove', mouseMoveHandler);
     document.removeEventListener('mouseup', mouseUpHandler);
     if (v) {
-      if (v.speedMode &&
-        document.getElementById('breaks-select').value == 'auto') {
-        v.pageBreaks = {};
-        v.updateAll(cm);
-      } else {
-        v.updateLayout();
-      }
+      setOrientation(cm, '', v);
     }
   }
 
