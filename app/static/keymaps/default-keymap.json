@@ -1,5 +1,5 @@
 {
-  ".notation": {
+  "#notation": {
     "x": "invertPlacement",
     "ctrl-x": "betweenPlacement",
     "v": "addVerticalGroup",
@@ -46,14 +46,13 @@
     "l": "addTrillAbove",
     "ctrl-l": "addTrillBelow",
     "n": "addTurnAbove",
-    "ctrl-n": "addTurnBelow",
-    "shift-n": "addTurnAboveLower",
+    "ctrl-n": "addTurnAboveLower",
     "shift-ctrl-n": "addTurnBelowLower",
 
     "shift-s": "toggleStacc",
     "shift-v": "toggleAccent",
     "shift-n": "toggleTenuto",
-    "shift-o": "toggleMarcato",
+    "shift-a": "toggleMarcato",
     "shift-i": "toggleStacciss",
     "shift-p": "toggleSpicc",
 
@@ -67,7 +66,9 @@
 
     "shift-g": "addGClefChangeBefore",
     "shift-c": "addCClefChangeBefore",
-    "shift-f": "addFClefChangeBefore"
+    "shift-f": "addFClefChangeBefore",
+
+    "escape": "closeAlerts"
   },
 
   ".platform-darwin": {

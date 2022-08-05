@@ -3,16 +3,15 @@
   flex-direction: row;
 }
 
-.friendContainer {
+#friendContainer {
   display: flex;
   /* flex-grow, flex-shrink, flex-basis */
   flex: 1 1 0%;
   flex-direction: column;
 }
 
-.notation {
+#notation {
   height: 50%;
-  /* Misc */
 }
 
 .resizer {
@@ -21,7 +20,7 @@
   height: 8px;
 }
 
-.encoding {
+#encoding {
   /* Take the remaining width */
   flex: 1;
   /* Misc */
@@ -30,23 +29,23 @@
   justify-content: center;
 }
 
-#annotationToolsMenu { 
+#annotationToolsMenu {
   flex-direction: column;
 }
 
-#annotationToolsMenu li { 
+#annotationToolsMenu li {
   flex-direction: column;
 }
 
-.annotationToolsDomainSelection { 
+.annotationToolsDomainSelection {
   flex-direction: column;
 }
 
-.annotationToolsDomainSelectionItem{
+.annotationToolsDomainSelectionItem {
   flex-direction: row;
 }
 
-#listAnnotations { 
+#listAnnotations {
   flex-direction: column;
   overflow-y: auto;
 }
@@ -54,4 +53,3 @@
 #addWebAnnotation {
   width: fit-content;
 }
-

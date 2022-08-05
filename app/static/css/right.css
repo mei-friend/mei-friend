@@ -4,16 +4,13 @@
   height: 100%;
 }
 
-.friendContainer {
+#friendContainer {
   display: flex;
   flex-direction: row-reverse;
 }
 
-.notation {
+#notation {
   width: 50%;
-  /* align-items: center; */
-  /* display: flex;
-  justify-content: center; */
 }
 
 .resizer {
@@ -22,7 +19,7 @@
   width: 8px;
 }
 
-.encoding {
+#encoding {
   /* Take the remaining width */
   flex: 1;
   align-items: center;
@@ -30,18 +27,18 @@
   justify-content: center;
 }
 
-#annotationToolsMenu { 
+#annotationToolsMenu {
   flex-direction: row;
 }
 
-#annotationToolsMenu li { 
+#annotationToolsMenu li {
   flex-direction: column;
 }
 
-.annotationToolsDomainSelection { 
+.annotationToolsDomainSelection {
   flex-direction: column;
 }
 
-.annotationToolsDomainSelectionItem{
+.annotationToolsDomainSelectionItem {
   flex-direction: row;
 }

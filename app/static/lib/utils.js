@@ -1,5 +1,8 @@
 import * as e from './editor.js';
 import * as dutils from './dom-utils.js';
+import {
+  refreshAnnotationsList
+} from './annotation.js';
 
 const xmlIdString = /(?:xml:id=)(?:['"])(\S+?)(?:['"])/;
 const numberLikeString = /(?:n=)(?:['"])(\d+?)(?:['"])/;
@@ -24,7 +27,9 @@ export function findKey(key, obj) {
 // checks whether note noteId is inside a chord. Returns false or the chord id.
 export function insideParent(noteId, what = 'chord') {
   if (noteId) {
-    let chord = document.querySelector('g#' + noteId).closest('.' + what);
+    let note = document.querySelector('g#' + noteId);
+    let chord;
+    if (note) chord = note.closest('.' + what);
     if (chord) return chord.getAttribute('id');
   }
   return false;
@@ -122,7 +127,7 @@ export function setCursorToId(cm, id) {
   if (c.findNext()) {
     cm.setCursor(c.from());
     // console.info('setCursorToId cursor: ', c.from());
-    let enc = document.querySelector('.encoding');
+    let enc = document.getElementById('encoding');
     // cm.execCommand('goLineStartSmart');
     goTagStart(cm);
     if (enc) cm.scrollIntoView(null, Math.round(enc.clientHeight / 2));
@@ -403,7 +408,7 @@ export function cleanAccid(xmlDoc, cm) {
       i++;
       console.log(i + ' @accid.ges removed from ', el);
       el.removeAttribute('accid.ges');
-      e.replaceInTextEditor(cm, el);
+      e.replaceInEditor(cm, el);
     }
   }
   // let re = buffer.groupChangesSinceCheckpoint(checkPoint); TODO
@@ -411,8 +416,10 @@ export function cleanAccid(xmlDoc, cm) {
 }
 
 // renumber measure@n starting with startNumber
-export function renumberMeasures(xmlDoc, cm, startNum = 1, change = false) {
-  let measureList = xmlDoc.querySelectorAll('measure');
+export function renumberMeasures(v, cm, startNum = 1, change = false) {
+  let measureList = v.xmlDoc.querySelectorAll('measure');
+  if (!change) v.showAlert(`<b>Renumber measures ${change ? '' : 'TEST'}</b>`,
+    change ? 'success' : 'info', 120000);
   console.info('renumber Measures list: ', measureList);
   let i;
   let lgt = measureList.length;
@@ -425,23 +432,34 @@ export function renumberMeasures(xmlDoc, cm, startNum = 1, change = false) {
   let endingN = '';
   // let checkPoint = buffer.createCheckpoint(); TODO
   for (i = 0; i < lgt; i++) {
+    let suffix = '';
     if (measureList[i].closest('incip')) continue;
     if (!change)
       console.info(i + '/' + lgt + ': measure ', measureList[i]);
     if (measureList[i].hasAttribute('metcon')) {
       metcon = measureList[i].getAttribute('metcon');
     }
+    let contMeas = document.getElementById('renumberMeasureContinueAcrossIncompleteMeasures');
     // 1) first measure with @metcon="false" is upbeat => @n=0
-    if (i === 0 && metcon === 'false') n--; // first measure upbeat
+    if (contMeas && !contMeas.checked && i === 0 && metcon === 'false') n--; // first measure upbeat
     // 2) treat series of @metcon="false" as one measure
-    if (metcon === 'false') {
+    if (contMeas && !contMeas.checked && metcon === 'false') {
       metcons++;
     } else if (metcon === '' || metcon === 'true') {
       metcons = 0;
     }
-    if (metcons > 1) n--;
+    if (contMeas && !contMeas.checked && metcons > 1) {
+      n--;
+      let sufSel = document.getElementById('renumberMeasuresUseSuffixAtMeasures');
+      switch (sufSel.value) {
+        case 'none':
+          break;
+        case '-cont':
+          suffix = '-cont';
+          break;
+      }
+    }
     // 3) Measures within endings are numbered starting with the same number.
-    let suffix = '';
     let cont = document.getElementById('renumberMeasuresContinueAcrossEndings');
     if (cont && !cont.checked) {
       let ending = measureList[i].closest('ending');
@@ -490,15 +508,15 @@ export function renumberMeasures(xmlDoc, cm, startNum = 1, change = false) {
     if (measureList[i].hasAttribute('right'))
       right = measureList[i].getAttribute('right');
 
+    let msg = 'measure n="' + measureList[i].getAttribute('n') + '" ' +
+      (change ? '' : 'would be ') + 'changed to n="' + (n + suffix) + '"' +
+      (right ? (', right:' + right) : '') + (metcons ? (', metcons:' + metcons) : '');
+    console.info(msg);
+    if (!change) v.updateAlert(msg);
     // change measure@n
     if (change) {
       measureList[i].setAttribute('n', n + suffix);
-      e.replaceInTextEditor(cm, measureList[i]);
-      console.info(measureList[i].getAttribute('n') + ' changed to ' + n +
-        ', right:' + right + ', metcons:' + metcons);
-    } else { // just list the changes
-      console.info(measureList[i].getAttribute('n') + ' to be changed to ' + n +
-        ', right:' + right + ', metcons:' + metcons);
+      e.replaceInEditor(cm, measureList[i]);
     }
     // 5) handle increment from multiRest@num
     let multiRest;
@@ -512,7 +530,9 @@ export function renumberMeasures(xmlDoc, cm, startNum = 1, change = false) {
     metcon = '';
   }
   // let re = buffer.groupChangesSinceCheckpoint(checkPoint);
-  console.info('renumberMeasures: ' + i + ' measures renumbered');
+  let str = 'renumberMeasures: ' + i + ' measures renumbered';
+  console.info(str);
+  if (!change) v.updateAlert(str)
   //, grouped ', re);
 }
 

@@ -3,19 +3,15 @@
   flex-direction: row;
 }
 
-.friendContainer {
+#friendContainer {
   display: flex;
   flex: 1 1 0%;
   flex-direction: column-reverse;
   /* Misc */
 }
 
-.notation {
+#notation {
   height: 50%;
-  /* Misc */
-  /* align-items: stretch; */
-  /* display: flex;
-  justify-content: center; */
 }
 
 .resizer {
@@ -24,7 +20,7 @@
   height: 8px;
 }
 
-.encoding {
+#encoding {
   /* Take the remaining width */
   flex: 1;
   /* Misc */
@@ -33,18 +29,18 @@
   justify-content: center;
 }
 
-#annotationToolsMenu { 
+#annotationToolsMenu {
   flex-direction: column;
 }
 
-#annotationToolsMenu li { 
+#annotationToolsMenu li {
   flex-direction: column;
 }
 
-.annotationToolsDomainSelection { 
+.annotationToolsDomainSelection {
   flex-direction: column;
 }
 
-.annotationToolsDomainSelectionItem{
+.annotationToolsDomainSelectionItem {
   flex-direction: row;
 }

@@ -171,7 +171,8 @@ a:active {
   z-index: 190;
 }
 
-.openUrlOverlay a, .forkRepositoryOverlay a {
+.openUrlOverlay a,
+.forkRepositoryOverlay a {
   color: var(--overlayLinkColor);
 }
 
@@ -268,13 +269,13 @@ a:active {
   background-color: mistyrose;
 }
 
-.friendContainer {
+#friendContainer {
   border: 3px solid var(--dropdownHeadingColor);
   border-radius: 4px;
   width: 100%;
 }
 
-.notation {
+#notation {
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -284,7 +285,22 @@ a:active {
   background-color: var(--dropdownHeadingColor);
 }
 
-.encoding {}
+#pix-container {
+  height: 100%;
+  width: 100%;
+  overflow: inherit;
+  display: flex;
+}
+
+#image-panel {
+  overflow: auto;
+}
+
+#source-image-label {
+  justify-content: center;
+}
+
+/* #encoding {} */
 
 #annotationPanel {
   height: 100%;
@@ -297,13 +313,15 @@ a:active {
   overflow: hidden;
 }
 
-#annotationPanel .tab, #annotationPanel .tablink {
+#annotationPanel .tab,
+#annotationPanel .tablink {
   background-color: var(--annotationPanelLinkBackgroundColor);
   color: var(--annotationPanelTextColor);
   border: unset;
 }
 
-#annotationPanel .tablink.active, #annotationPanel .tabcontent {
+#annotationPanel .tablink.active,
+#annotationPanel .tabcontent {
   background-color: var(--annotationPanelBackgroundColor);
   color: var(--annotationPanelTextColor);
   border: unset;
@@ -442,11 +460,11 @@ a:active {
   vertical-align: middle;
 }
 
-.input-range {
-  /* height: 4px; */
-  /* border-radius: 3px; */
-  /* background-color: var(--backgroundColor); */
-}
+/* .input-range {
+   height: 4px;
+   border-radius: 3px;
+   background-color: var(--backgroundColor);
+} */
 
 .checkbox {
   margin-right: 4px;
@@ -506,7 +524,7 @@ https://www.w3schools.com/css/css_tooltip.asp
   opacity: 1;
 }
 
-.verovio-panel {
+#verovio-panel {
   /* padding: 1rem 2rem 3rem 1rem; */
   display: block;
   padding: 0px;
@@ -526,28 +544,52 @@ svg text {
   user-select: none;
 }
 
-.verovio-panel g.highlighted {
-  fill: var(--highlightColor);
+#pix-container .highlighted {
   color: var(--highlightColor);
   stroke: var(--highlightColor);
 }
 
-.verovio-panel g.supplied g {
+#pix-container g.highlighted,
+#pix-container text.highlighted {
+  fill: var(--highlightColor);
+  fill-opacity: 100%;
+}
+
+#image-panel rect.highlighted {
+  stroke: var(--highlightColor);
+  stroke-opacity: 70%;
+  fill: var(--highlightColor);
+  fill-opacity: 15%;
+}
+
+#pix-container g.supplied g {
   fill: var(--suppliedColor);
   color: var(--suppliedColor);
   stroke: var(--suppliedColor);
 }
 
-.verovio-panel g.supplied g.highlighted {
-  fill: var(--suppliedHighlightedColor);
+#pix-container .supplied .highlighted {
   color: var(--suppliedHighlightedColor);
   stroke: var(--suppliedHighlightedColor);
 }
 
-.verovio-panel g {
+#pix-container g.supplied g.highlighted {
+  fill: var(--suppliedHighlightedColor);
+}
+
+#pix-container g {
   fill: var(--notationColor);
   color: var(--notationColor);
   stroke: var(--notationColor);
+}
+
+#image-panel rect {
+  stroke-opacity: 40%;
+}
+
+#image-panel text {
+  stroke-opacity: 40%;
+  fill-opacity: 40%;
 }
 
 .hidden {
@@ -597,7 +639,8 @@ svg text {
   height: 20px;
 }
 
-.icon[disabled], .disabled {
+.icon[disabled],
+.disabled {
   opacity: 30%;
 }
 
@@ -676,7 +719,8 @@ span.keyIcon {
   position: absolute;
   top: 4px;
   min-width: 360px;
-  height: calc(100% - 20px);;
+  height: calc(100% - 20px);
+  ;
   z-index: 15;
   display: none;
 }
@@ -756,7 +800,9 @@ span.keyIcon {
 }
 
 /* Change background color of buttons on hover */
-.tablink:hover, .topright:hover, .tabstart:hover {
+.tablink:hover,
+.topright:hover,
+.tabstart:hover {
   color: var(--textColor);
   background-color: var(--settingsLinkHoverColor);
   border-color: var(--settingsLinkHoverColor);
@@ -830,7 +876,8 @@ span.keyIcon {
   max-width: 220px;
 }
 
-#editorSettings .optionsItem select, #meiFriendSettings .optionsItem select {
+#editorSettings .optionsItem select,
+#meiFriendSettings .optionsItem select {
   min-width: 80px;
   max-width: 150px;
 }
@@ -857,7 +904,8 @@ span.keyIcon {
   max-width: 85px;
 }
 
-.optionsItem input, select {
+.optionsItem input,
+select {
   padding-top: 0px;
   padding-bottom: 0px;
   text-align: right;
@@ -878,7 +926,8 @@ span.keyIcon {
   border-radius: 4px;
 }
 
-input, select {
+input,
+select {
   background-color: var(--backgroundColor);
   color: var(--textColor);
 }
@@ -898,4 +947,52 @@ select>option {
 #bugReport {
   font-size: 1.5em;
   padding: 20px;
+}
+
+/* The alert message box */
+.alert {
+  position: fixed;
+  top: 80px;
+  left: 3%;
+  width: 92%;
+  max-height: 70%;
+  justify-content: space-between;
+  padding: 20px;
+  background-color: #f44336;
+  /* border-style: solid;
+  border-width: 2px; */
+  border-radius: 8px;
+  color: white;
+  font-size: larger;
+  z-index: 20;
+  overflow-y: auto;
+}
+
+.alert.success {
+  background-color: #04AA6D;
+}
+
+.alert.info {
+  background-color: #2196F3;
+}
+
+.alert.warning {
+  background-color: #ff9800;
+}
+
+/* The close button */
+.alertCloseButton {
+  margin-left: 15px;
+  color: white;
+  font-weight: bold;
+  float: right;
+  font-size: 22px;
+  line-height: 20px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+/* When moving the mouse over the close button */
+.alertCloseButton:hover {
+  color: black;
 }

@@ -1,11 +1,25 @@
 # mei-friend-online CHANGELOG.md
 
-### 0.4.0 minor: Annotation
+### 0.5.0: Support for source image display
+* Parsing facsimile information and display source image zones
+* Providing options to activate, position, resize and zoom source image pane
+* Full-page option to show entire source page with zone bounding boxes
+* Option to edit zone coordinates (rather than displaying linked elements, e.g., measures)
+* Support for selecting zone with mouse or through encoding
+* Support for resizing selected zone at 8 locations and pan with mouse drag  
+* Support for inserting new zone/measure with mouse click and drag
+* Support for deleting selected zone/measure with DEL key or through menu
+* Menu item to ingest facsimile information to MEI file (assuming measure@n equality among target and skeleton file)
+* General alert panel added with 'error', 'warning', 'info', and 'success' as levels
+* Source images loaded locally, from URL origin, or directly from github
+### 0.4.0: Initial support for annotations
 * Implement annotation panel (activate from mei-friend settings)
 * Annotation tools for highlight, describe, link 
 * Reading and writing of <annot> elements
 * Listing of annotations in annotation panel
 * Loading and interpreting simple Web Annotations
+### 0.3.13 patch: hotfix
+* Filter comment nodes in speed mode
 ### 0.3.12 patch: Settings improvements
 * Address page processing bug with page/system beginnings inside apparatus element
 * Make font select appear in Verovio options

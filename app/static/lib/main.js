@@ -1,6 +1,6 @@
 // mei-friend version and date
-const version = '0.4.0';
-const versionDate = '18 July 2022';
+const version = '0.5.0';
+const versionDate = '5 Aug 2022';
 
 var vrvWorker;
 var spdWorker;
@@ -24,6 +24,7 @@ export var tkVersion = '';
 export let meiFileName = '';
 export let meiFileLocation = '';
 export let meiFileLocationPrintable = '';
+export let fileLocationType = ''; // file, github, url
 export let isMEI; // is the currently edited file native MEI?
 export let fileChanged = false; // flag to track whether unsaved changes to file exist
 
@@ -69,12 +70,13 @@ import {
   generateSectionSelect
 } from './control-menu.js';
 import {
+  rmHash,
   setCursorToId
 } from './utils.js';
 import {
   getInMeasure,
   navElsSelector,
-  getElementAtCursor
+  getElementAtCursor,
 } from './dom-utils.js';
 import {
   addDragSelector
@@ -90,6 +92,13 @@ import {
   refreshGithubMenu,
   setCommitUIEnabledStatus
 } from './github-menu.js';
+import {
+  addZoneDrawer,
+  ingestFacsimile,
+  loadFacsimile,
+  drawSourceImage,
+  zoomSourceImage,
+} from './source-imager.js';
 
 // const defaultMeiFileName = `${root}Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei`;
 const defaultMeiFileName = `${root}Beethoven_WoO70-Breitkopf.mei`;
@@ -112,7 +121,8 @@ const defaultVerovioOptions = {
   minLastJustification: 0,
   clefChangeFactor: .83,
   svgAdditionalAttribute: ["layer@n", "staff@n",
-    "dir@vgrp", "dynam@vgrp", "hairpin@vgrp", "pedal@vgrp"
+    "dir@vgrp", "dynam@vgrp", "hairpin@vgrp", "pedal@vgrp",
+    "measure@facs", "measure@n"
   ],
   bottomMarginArtic: 1.2,
   topMarginArtic: 1.2
@@ -218,6 +228,7 @@ export function loadDataInEditor(mei, setFreshlyLoaded = true) {
   freshlyLoaded = setFreshlyLoaded;
   cm.setValue(mei);
   v.loadXml(mei);
+  loadFacsimile(v.xmlDoc); // load all facsimila data of MEI
   let bs = document.getElementById('breaks-select');
   if (bs) {
     if (breaksParam)
@@ -273,11 +284,14 @@ export function updateGithubInLocalStorage() {
       storage.fileLocationType = "github";
     }
   }
+  if (isLoggedIn && github.filepath) {
+    fileLocationType = "github";
+  }
 }
 
 
 function completeAfter(cm, pred) {
-  if (!pred || pred()) setTimeout(function() {
+  if (!pred || pred()) setTimeout(function () {
     if (!cm.state.completionActive)
       cm.showHint({
         completeSingle: false
@@ -287,14 +301,14 @@ function completeAfter(cm, pred) {
 }
 
 function completeIfAfterLt(cm) {
-  return completeAfter(cm, function() {
+  return completeAfter(cm, function () {
     var cur = cm.getCursor();
     return cm.getRange(CodeMirror.Pos(cur.line, cur.ch - 1), cur) == "<";
   });
 }
 
 function completeIfInTag(cm) {
-  return completeAfter(cm, function() {
+  return completeAfter(cm, function () {
     var tok = cm.getTokenAt(cm.getCursor());
     if (tok.type == "string" && (!/['"]/.test(tok.string.charAt(tok.string.length - 1)) || tok.string.length == 1)) return false;
     var inner = CodeMirror.innerMode(cm.getMode(), tok.state).state;
@@ -303,7 +317,7 @@ function completeIfInTag(cm) {
 }
 
 // when initial page content has been loaded
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
   let myTextarea = document.getElementById("editor");
 
   cm = CodeMirror.fromTextArea(myTextarea, defaultCodeMirrorOptions);
@@ -321,7 +335,7 @@ document.addEventListener('DOMContentLoaded', function() {
   let speedParam = searchParams.get('speed');
   breaksParam = searchParams.get('breaks');
 
-  createControlsMenu(document.querySelector('.notation'), defaultVerovioOptions.scale);
+  createControlsMenu(document.getElementById('notation'), defaultVerovioOptions.scale);
   addModifyerKeys(document); //
 
   console.log('DOMContentLoaded. Trying now to load Verovio...');
@@ -426,6 +440,7 @@ document.addEventListener('DOMContentLoaded', function() {
     meiFileLocationPrintable = "";
     openFile(undefined, false, false); // default MEI
   }
+  if (storage.fileLocationType) fileLocationType = storage.fileLocationType;
   if (isLoggedIn) {
     // regardless of storage availability:
     // if we are logged in, refresh github menu
@@ -513,6 +528,7 @@ export async function openUrlFetch(url = '', updateAfterLoading = true) {
         if (storage.supported) {
           storage.fileLocationType = "url";
         }
+        fileLocationType = "url";
         openUrlCancel(); //hide open URL UI elements
       });
     }
@@ -542,7 +558,7 @@ function speedWorkerEventsHandler(ev) {
   }
 }
 
-function vrvWorkerEventsHandler(ev) {
+async function vrvWorkerEventsHandler(ev) {
   console.log('main(). Handler received: ' + ev.data.cmd, ev.data);
   switch (ev.data.cmd) {
     case 'vrvLoaded':
@@ -612,7 +628,8 @@ function vrvWorkerEventsHandler(ev) {
         updateStatusBar();
         document.querySelector('title').innerHTML = 'mei-friend: ' +
           meiFileName.substr(meiFileName.lastIndexOf("/") + 1);
-        document.querySelector('.verovio-panel').innerHTML = ev.data.svg;
+        document.getElementById('verovio-panel').innerHTML = ev.data.svg;
+        if (document.getElementById('showSourceImagePanel').checked) await drawSourceImage();
         if (ev.data.setCursorToPageBeginning) v.setCursorToPageBeginning(cm);
         v.updatePageNumDisplay();
         v.addNotationEventListeners(cm);
@@ -627,7 +644,7 @@ function vrvWorkerEventsHandler(ev) {
       break;
     case 'navigatePage': // resolve navigation with page turning
       updateStatusBar();
-      document.querySelector('.verovio-panel').innerHTML = ev.data.svg;
+      document.getElementById('verovio-panel').innerHTML = ev.data.svg;
       let ms = document.querySelectorAll('.measure'); // find measures on page
       if (ms.length > 0) {
         let m = ms[0];
@@ -681,7 +698,7 @@ function vrvWorkerEventsHandler(ev) {
       setProgressBar(ev.data.percentage);
       break;
     case 'error':
-      document.querySelector('.verovio-panel').innerHTML =
+      document.getElementById('verovio-panel').innerHTML =
         "<h3>Invalid MEI in " + meiFileName +
         " (" + ev.data.msg + ")</h3>";
       v.busy(false);
@@ -715,9 +732,15 @@ let inputFormats = {
 
 export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true,
   updateAfterLoading = true) {
+  console.log('OpenFile()');
   if (pageParam === null) storage.removeItem('page');
   // remove any URL parameters, because we open a file locally or through github
   window.history.replaceState(null, null, window.location.pathname);
+  if (storage.supported) {
+    storage.fileLocationType = "file";
+  }
+  fileLocationType = "file";
+  if (github) github.filepath = '';
   if (typeof file === "string") { // with fileName string
     meiFileName = file;
     console.info('openMei ' + meiFileName + ', ', cm);
@@ -737,7 +760,7 @@ export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true,
         }
       });
   } else { // if a file
-    let readingPromise = new Promise(function(loaded, notLoaded) {
+    let readingPromise = new Promise(function (loaded, notLoaded) {
       meiFileName = file.name;
       console.info('openMei ' + meiFileName + ', ', cm);
       let reader = new FileReader();
@@ -755,10 +778,10 @@ export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true,
       }
     });
     readingPromise.then(
-      function(mei) {
+      function (mei) {
         handleEncoding(mei, setFreshlyLoaded, updateAfterLoading);
       },
-      function() {
+      function () {
         log('Loading dragged file ' + meiFileName + ' failed.');
         v.busy(false);
       }
@@ -846,9 +869,6 @@ function openFileDialog(accept = '*') {
       meiFileLocation = "";
       meiFileLocationPrintable = "";
       openFile(files[0]);
-      if (storage.supported) {
-        storage.fileLocationType = "file";
-      }
       if (isLoggedIn) {
         // re-initialise github menu since we're now working locally
         github.filepath = "";
@@ -889,7 +909,7 @@ function downloadMidi() {
 }
 
 function downloadSvg() {
-  let svg = document.querySelector('.verovio-panel').innerHTML;
+  let svg = document.getElementById('verovio-panel').innerHTML;
   let blob = new Blob([svg], {
     type: 'image/svg+xml'
   });
@@ -1039,6 +1059,7 @@ let cmd = {
   'renumberMeasures': () => e.renumberMeasures(v, cm, true),
   'reRenderMei': () => v.reRenderMei(cm, false),
   'reRenderMeiWithout': () => v.reRenderMei(cm, true),
+  'ingestFacsimile': () => ingestFacsimile(),
   'resetDefault': () => {
     // we're in a clickhandler, so our storage object is out of scope
     // but we only need to clear it, so just grab the window's storage
@@ -1048,12 +1069,18 @@ let cmd = {
     }
     logoutFromGithub();
   },
-  'consultGuidelines': () => consultGuidelines()
+  'consultGuidelines': () => consultGuidelines(),
+  'closeAlerts': () => v.hideAlerts()
 };
 
 // add event listeners when controls menu has been instantiated
 function addEventListeners(v, cm) {
-  let vp = document.querySelector('.verovio-panel');
+  let vp = document.getElementById('verovio-panel');
+  // document.getElementById('alertOverlay').addEventListener('mousedown')
+  document.querySelector('body').addEventListener('mousedown', (ev) => {
+    if (ev.target.id !== 'alertOverlay' && ev.target.id !== 'alertMessage')
+      v.hideAlerts();
+  });
 
   // layout notation position
   document.getElementById('top').addEventListener('click', cmd.notationTop);
@@ -1123,6 +1150,17 @@ function addEventListeners(v, cm) {
     }
   });
 
+  // Zooming source image with mouse wheel
+  let ip = document.getElementById('image-panel');
+  ip.addEventListener('wheel', ev => {
+    if ((navigator.platform.toLowerCase().startsWith('mac') && ev.metaKey) ||
+      !navigator.platform.toLowerCase().startsWith('mac') && ev.ctrlKey) {
+      ev.preventDefault();
+      ev.stopPropagation();
+      zoomSourceImage(Math.sign(ev.deltaY) * -5); // scrolling towards user = increase
+    }
+  });
+
   // Page turning
   let ss = document.getElementById('section-selector');
   ss.addEventListener('change', () => {
@@ -1174,6 +1212,8 @@ function addEventListeners(v, cm) {
   // re-render through Verovio
   document.getElementById('reRenderMei').addEventListener('click', cmd.reRenderMei);
   document.getElementById('reRenderMeiWithout').addEventListener('click', cmd.reRenderMeiWithout);
+  // ingest facsimile sekelton into currently loaded MEI file
+  document.getElementById('ingestFacsimile').addEventListener('click', cmd.ingestFacsimile);
   // insert control elements
   document.getElementById('addTempo').addEventListener('click', cmd.addTempo);
   document.getElementById('addDirective').addEventListener('click', cmd.addDirective);
@@ -1269,7 +1309,7 @@ function addEventListeners(v, cm) {
   })
 
   // Editor font size zooming
-  document.querySelector('.encoding').addEventListener('wheel', ev => {
+  document.getElementById('encoding').addEventListener('wheel', ev => {
     if ((navigator.platform.toLowerCase().startsWith('mac') && ev.metaKey) ||
       !navigator.platform.toLowerCase().startsWith('mac') && ev.ctrlKey) {
       ev.preventDefault();
@@ -1277,7 +1317,7 @@ function addEventListeners(v, cm) {
       v.changeEditorFontSize(Math.sign(ev.deltaY) * -5);
     }
   });
-  document.querySelector('.encoding').addEventListener('keydown', ev => {
+  document.getElementById('encoding').addEventListener('keydown', ev => {
     if ((navigator.platform.toLowerCase().startsWith('mac') && ev.metaKey) ||
       !navigator.platform.toLowerCase().startsWith('mac') && ev.ctrlKey) {
       if (ev.key === '-') {
@@ -1322,6 +1362,8 @@ function addEventListeners(v, cm) {
   });
 
   addDragSelector(v, vp);
+
+  addZoneDrawer();
 } // addEventListeners()
 
 
@@ -1353,12 +1395,14 @@ export function log(s, code = null) {
   if (code) {
     s += " Error Code: " + code + "<br/>";
     s += `<a id="bugReport" target="_blank" href="https://github.com/Signature-Sound-Vienna/mei-friend-online/issues/new?assignees=&labels=&template=bug_report.md&title=Error ${code}">Submit bug report</a>`;
+    v.showAlert(s, 'error', 30000);
   } else {
     s += `<a id="bugReport" target="_blank" href="https://github.com/Signature-Sound-Vienna/mei-friend-online/issues/new?assignees=&labels=&template=bug_report.md">Submit bug report</a>`;
+    v.showAlert(s, 'warning', 30000);
   }
   s += "</div>"
   document.querySelector(".statusbar").innerHTML = s;
-  document.querySelector(".verovio-panel").innerHTML = s;
+  document.getElementById("verovio-panel").innerHTML = s;
   console.log(s);
 }
 
@@ -1390,7 +1434,7 @@ function fillInSampleEncodings() {
 // sets keyMap.json to target element and defines listeners
 function setKeyMap(keyMapFilePath) {
   let os = navigator.platform;
-  let vp = document.querySelector('.notation');
+  let vp = document.getElementById('notation');
   if (os.startsWith('Mac')) vp.classList.add('platform-darwin');
   if (os.startsWith('Win')) vp.classList.add('platform-win32');
   if (os.startsWith('Linux')) vp.classList.add('platform-linux');
