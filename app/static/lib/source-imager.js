@@ -22,6 +22,9 @@ import {
 } from './drag-selector.js';
 import {
     cm,
+    fileLocationType,
+    github,
+    meiFileLocation,
     v
 } from './main.js';
 import {
@@ -102,16 +105,25 @@ export async function drawSourceImage() {
     let svg = document.getElementById('source-image-svg');
     if (svg) svg.innerHTML = '';
     if (facs[zoneId]) {
-        let imgName = `${root}local/` + facs[zoneId].target;
-        
-        imgName = imgName.replace('.tif', '.jpg'); // hack for some DIME files...
-        if (false) { // TODO: hack for strange DIME coordinates
-            let xfact = .33;
-            let yfact = .67;
-            ulx *= xfact;
-            uly *= yfact;
-            lrx *= xfact;
-            lry *= yfact;
+        let imgName = facs[zoneId].target;
+        if (!imgName.startsWith('http')) { // relative file paths in surface@target
+            if (fileLocationType === 'github') {
+                let url = new URL('https://raw.githubusercontent.com/' + github.githubRepo + '/' +
+                    github.branch + '/' + facs[zoneId].target);
+                url.searchParams.append('token', github.githubToken);
+                imgName = url.href;
+            } else if (fileLocationType === 'url') {
+                let url = new URL(meiFileLocation);
+                imgName = url.origin + url.pathname.substring(url.pathname.lastIndexOf('/') + 1) + imgName;
+            } else {
+                imgName = `${root}local/` + facs[zoneId].target;
+                imgName = imgName.replace('.tif', '.jpg'); // hack for some DIME files...
+            }
+        } else if (imgName.startsWith('https://raw.githubusercontent.com/') && github.githubToken) { // absolute file paths
+            let url = new URL('https://raw.githubusercontent.com/' + github.githubRepo + '/' +
+                github.branch + github.filepath);
+            url.searchParams.append('token', github.githubToken);
+            imgName = url.href;
         }
 
         // load image asynchronously

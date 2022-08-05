@@ -24,6 +24,7 @@ export var tkVersion = '';
 export let meiFileName = '';
 export let meiFileLocation = '';
 export let meiFileLocationPrintable = '';
+export let fileLocationType = ''; // file, github, url
 export let isMEI; // is the currently edited file native MEI?
 export let fileChanged = false; // flag to track whether unsaved changes to file exist
 
@@ -283,6 +284,7 @@ export function updateGithubInLocalStorage() {
       storage.fileLocationType = "github";
     }
   }
+  fileLocationType = "github";
 }
 
 
@@ -436,6 +438,7 @@ document.addEventListener('DOMContentLoaded', function () {
     meiFileLocationPrintable = "";
     openFile(undefined, false, false); // default MEI
   }
+  if (storage.fileLocationType) fileLocationType = storage.fileLocationType;
   if (isLoggedIn) {
     // regardless of storage availability:
     // if we are logged in, refresh github menu
@@ -523,6 +526,7 @@ export async function openUrlFetch(url = '', updateAfterLoading = true) {
         if (storage.supported) {
           storage.fileLocationType = "url";
         }
+        fileLocationType = "url";
         openUrlCancel(); //hide open URL UI elements
       });
     }
@@ -860,6 +864,7 @@ function openFileDialog(accept = '*') {
       if (storage.supported) {
         storage.fileLocationType = "file";
       }
+      fileLocationType = "file";
       if (isLoggedIn) {
         // re-initialise github menu since we're now working locally
         github.filepath = "";

@@ -35,7 +35,7 @@ export default class Storage {
       this._content = this.storage.getItem("meiXml");
       this._fileName = this.storage.getItem("meiFileName");
       this._fileLocation = this.storage.getItem("meiFileLocation");
-      this._fileLocationType = this.storage.getItem("meiFileLocationType");
+      this._fileLocationType = this.storage.getItem("fileLocationType");
       this._github = JSON.parse(this.storage.getItem("github"));
       this._fileChanged = this.storage.getItem("fileChanged");
       this._isMEI = this.storage.getItem("isMEI");
@@ -125,7 +125,7 @@ export default class Storage {
   }
 
   set fileLocationType(fileLocationType) {
-    this.safelySetStorageItem("meiFileLocationType", fileLocationType);
+    this.safelySetStorageItem("fileLocationType", fileLocationType);
     this._fileLocationType = fileLocationType;
   }
 
