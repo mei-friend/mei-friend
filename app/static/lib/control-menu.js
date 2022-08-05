@@ -4,7 +4,7 @@ import {
   fontList
 } from './main.js';
 import {
-  svgNS
+  svgNameSpace
 } from './dom-utils.js'
 
 export function createControlsMenu(parentElement, scale) {
@@ -313,9 +313,9 @@ time with large files`;
   let imagePanel = document.createElement('div');
   imagePanel.id = 'image-panel';
   imagePanel.style.display = 'none';
-  var svg = document.createElementNS(svgNS, 'svg');
+  var svg = document.createElementNS(svgNameSpace, 'svg');
   svg.id = 'source-image-container';
-  var g = document.createElementNS(svgNS, 'svg');
+  var g = document.createElementNS(svgNameSpace, 'svg');
   g.id = 'source-image-svg';
   svg.appendChild(g);
   imagePanel.append(svg);

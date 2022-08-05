@@ -9,15 +9,12 @@ var resize = ''; // west, east, north, south, northwest, southeast etc
 var ulx, uly;
 
 import {
-    generateUUID,
-    getElementIdAtCursor,
-    insideParent,
     rmHash,
     setCursorToId
 } from './utils.js';
 import {
     meiNameSpace,
-    svgNS,
+    svgNameSpace,
     xmlNameSpace,
     xmlToString
 } from './dom-utils.js'
@@ -143,13 +140,13 @@ export async function drawSourceImage() {
         svgContainer.setAttribute("transform", "scale(" + zoomFactor + ")");
         svgContainer.setAttribute('width', width);
         svgContainer.setAttribute('height', height);
-        // svgContainer.appendChild(document.createAttributeNS(svgNS, 'circle'))
+        // svgContainer.appendChild(document.createAttributeNS(svgNameSpace, 'circle'))
         svg.setAttribute('viewBox', ulx + ' ' + uly + ' ' + width + ' ' + height);
 
         if (false) { // show page name on svg
             let lbl = document.getElementById('source-image-svg-label');
             if (!lbl) {
-                lbl = document.createElementNS(svgNS, 'text');
+                lbl = document.createElementNS(svgNameSpace, 'text');
                 lbl.setAttribute('id', 'source-image-svg-label')
             }
             lbl.textContent = imgName.split('\\').pop().split('/').pop();
@@ -178,7 +175,7 @@ export async function drawSourceImage() {
 
 function drawBoundingBox(zoneId, measureId, measureN) {
     if (facs[zoneId]) {
-        let rect = document.createElementNS(svgNS, 'rect');
+        let rect = document.createElementNS(svgNameSpace, 'rect');
         rect.setAttribute('rx', rectangleLineWidth / 2);
         rect.setAttribute('ry', rectangleLineWidth / 2);
         let editZones = document.getElementById('editZones').checked;
@@ -192,7 +189,7 @@ function drawBoundingBox(zoneId, measureId, measureN) {
         if (editZones) rect.id = zoneId;
         else if (measureId) rect.id = measureId;
         if (measureN) { // draw number-like info from measure
-            let txt = document.createElementNS(svgNS, 'text');
+            let txt = document.createElementNS(svgNameSpace, 'text');
             svg.appendChild(txt);
             txt.setAttribute('font-size', '28px');
             txt.setAttribute('font-weight', 'bold');
@@ -207,7 +204,7 @@ function drawBoundingBox(zoneId, measureId, measureN) {
 
 async function loadImage(url) {
     return new Promise((resolve) => {
-        const img = document.createElementNS(svgNS, 'image');
+        const img = document.createElementNS(svgNameSpace, 'image');
         img.setAttribute('id', 'source-image');
         img.setAttributeNS('http://www.w3.org/1999/xlink', 'href', url);
         img.onload = () => resolve(img);
@@ -400,7 +397,7 @@ export function addZoneDrawer() {
             var mx = svg.getScreenCTM().inverse();
             let s = transformCTM(start, mx);
 
-            let rect = document.createElementNS(svgNS, 'rect');
+            let rect = document.createElementNS(svgNameSpace, 'rect');
             rect.id = 'new-rect';
             rect.setAttribute('rx', rectangleLineWidth / 2);
             rect.setAttribute('ry', rectangleLineWidth / 2);

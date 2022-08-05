@@ -1,6 +1,6 @@
 export var meiNameSpace = 'http://www.music-encoding.org/ns/mei';
 export var xmlNameSpace = 'http://www.w3.org/XML/1998/namespace';
-export const svgNS = "http://www.w3.org/2000/svg";
+export const svgNameSpace = "http://www.w3.org/2000/svg";
 
 export const navElsArray = [
   'note', 'rest', 'mRest', 'beatRpt', 'halfmRpt', 'mRpt', 'clef'

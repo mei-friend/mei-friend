@@ -1,5 +1,5 @@
 import {
-  svgNS
+  svgNameSpace
 } from './dom-utils.js'
 import * as att from './attribute-classes.js';
 
@@ -31,7 +31,7 @@ export function addDragSelector(v, vp) {
     obobj = {};
     v.selectedElements.forEach(el => oldEls.push(el)); // remember selected els
     // create selection rectangle
-    rect = document.createElementNS(svgNS, 'rect');
+    rect = document.createElementNS(svgNameSpace, 'rect');
     let pm = document.querySelector('g.page-margin');
     if (pm) pm.appendChild(rect);
 
