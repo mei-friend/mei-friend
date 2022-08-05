@@ -25,7 +25,7 @@ function forkRepo() {
   forkRepository(github);
 }
 
-function forkRepoClicked() {
+export function forkRepoClicked() {
   let inputName = document.getElementById('forkRepositoryInputName').value
   let inputRepo = document.getElementById('forkRepositoryInputRepo').value
   let forkRepositoryStatus = document.querySelector("#forkRepositoryStatus");

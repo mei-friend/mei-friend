@@ -330,7 +330,27 @@
         </div>
       </div>
     </div>
-    <div class="forkRepositoryOverlay">
+    <div class="forkRepositoryOverlay" id="forkAndOpenOverlay">
+      <div class="forkRepositoryUI">
+          <h3><img id="forkRepoGithubLogo" src="{{ url_for('static', filename='img/GitHub-Mark-32px.png') }}" />
+            Fork Github Repository</h3>
+          <p>
+            The link you have followed will create a GitHub fork of the following repository for editing in mei-friend: 
+          </p>
+          <p id="forkRepoRequested"/>
+          <p>
+          Is this OK?
+          </p>
+          <div id="forkAndOpenInputWrapper">
+            <label for="forkAndOpenSelector">Fork to: </label>
+            <select id="forkAndOpenSelector" name="forkAndOpenSelector"></select>
+            <button id="forkAndOpenButton" class="forkRepositoryButton">Fork repository</button>
+            <button id="forkAndOpenCancel">Cancel</button>
+          </div>
+          <span id="forkAndOpenStatus"/>
+      </div>
+    </div>
+    <div class="forkRepositoryOverlay" id="forkRepositoryOverlay">
       <div class="forkRepositoryUI">
         <div id="forkRepositoryUIGrouping">
           <h3><img id="forkRepoGithubLogo" src="{{ url_for('static', filename='img/GitHub-Mark-32px.png') }}" />
@@ -366,7 +386,7 @@
             </select>
             <label for="forkRepositoryToSelector">Fork to: </label>
             <select id="forkRepositoryToSelector" name="forkRepositoryToSelector"></select>
-            <button id="forkRepositoryButton">Fork repository</button>
+            <button id="forkRepositoryButton" class="forkRepositoryButton">Fork repository</button>
             <button id="forkRepositoryCancel">Cancel</button>
           </div>
           <span id="forkRepositoryStatus"></span>

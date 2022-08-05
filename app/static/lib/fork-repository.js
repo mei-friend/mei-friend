@@ -6,6 +6,9 @@ import {
   samp, 
   github
 } from './main.js';
+import {
+  forkRepoClicked
+} from './github-menu.js';
 
 const seperator = "|MEI-FRIEND|"; 
 
@@ -144,10 +147,56 @@ function onSelectRepository(e) {
   }
 }
 
+export function forkAndOpen(github, url) { 
+  console.log("FORK AND OPEN: ", github, url);
+  // ensure URL matches our expectations
+  // (fully qualified raw github url)
+  const components = url.match(/https?:\/\/raw.githubusercontent.com\/([^/]+)\/([^/]+)\/([^/]+)\/([^/]+)/);
+  if(components.length === 5) { 
+    let sz = calcSizeOfContainer();
+    let fc = document.querySelector('#forkAndOpenOverlay');
+    fc.width = sz.width * .25;
+    fc.height = sz.height * .25;
+    fc.style.display = "block";
+    let userOrg = components[1];
+    let repo = components[2];
+    let branch = components[3];
+    let file = components[4];
+    
+    document.querySelector("#forkRepoRequested")
+      .innerText = `${components[1]}/${components[2]}`;
+ 
+    let forkToSelector = document.getElementById("forkAndOpenSelector");
+    // forkToSelector: User's options as to where to fork the repository to
+    forkToSelector.innerHTML = `<option value="${github.userLogin}">${github.userLogin}</option>`
+    github.getOrganizations().then((orgs) => orgs.forEach((org) => {
+      try { 
+        let orgName = org.organization.login;
+        forkToSelector.innerHTML += `<option value="${orgName}">${orgName}</option>`;
+      } 
+      catch(e) { console.error("Can't add organization to selector: ", org, e) };
+    }));
+    // forkAndOpen fork button
+    const forkAndOpenButton = document.getElementById('forkAndOpenButton');
+    if(forkAndOpenButton) { 
+      forkAndOpenButton.addEventListener('click', forkAndOpenClicked(github, components))
+    }
+  }
+  else { 
+    console.warn("'fork' parameter specified but supplied URL violates raw GitHub URL expectations");
+  }
+}
 
-export function forkRepository(github) {
+export function forkAndOpenClicked(github, components) {
+  // set up values for forkRepoClicked():
+  document.getElementById('forkRepositoryInputName').value = components[1];
+  document.getElementById('forkRepositoryInputRepo').value = components[2];
+  forkRepoClicked();
+}
+
+export function forkRepository(github, components) {
   let sz = calcSizeOfContainer();
-  let fc = document.querySelector('.forkRepositoryOverlay');
+  let fc = document.querySelector('#forkRepositoryOverlay');
   fc.width = sz.width * .25;
   fc.height = sz.height * .25;
   fc.style.display = "block";
@@ -199,7 +248,8 @@ export function forkRepository(github) {
 export function forkRepositoryCancel() {
   // user has cancelled the "fork repository" action
   // => hide fork interface
-  let forkRepositoryElement = document.querySelector(".forkRepositoryOverlay");
+  // n.b. there are two, 'normal' and forkAndOpen, so we have to iterate:
+  let forkRepositoryElements = Array.from(document.querySelectorAll(".forkRepositoryOverlay"));
   // show file status, hide forkRepository
-  forkRepositoryElement.style.display = "none";
+  forkRepositoryElements.forEach(e => e.style.display = "none");
 }

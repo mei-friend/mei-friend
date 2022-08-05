@@ -90,6 +90,10 @@ import {
   refreshGithubMenu,
   setCommitUIEnabledStatus
 } from './github-menu.js';
+import { 
+  forkAndOpen,
+  forkRepositoryCancel
+} from './fork-repository.js';
 
 // const defaultMeiFileName = `${root}Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei`;
 const defaultMeiFileName = `${root}Beethoven_WoO70-Breitkopf.mei`;
@@ -350,7 +354,12 @@ document.addEventListener('DOMContentLoaded', function() {
   v.addMeiFriendOptionsToSettingsPanel();
 
   let urlFileName = searchParams.get('file');
-  if (urlFileName) {
+  // fork parameter: if true AND ?fileParam is set to a URL,
+  // then put mei-friend into "remote fork request" mode:
+  // If user is logged in, open a pre-populated fork-repository menu
+  // Else, remember we are in remote fork request mode, log user in, and then proceed as above.
+  let forkParam = searchParams.get('fork');
+  if (urlFileName && !(forkParam)) { // normally open the file from URL
     openUrlFetch(new URL(urlFileName));
   }
 
@@ -392,6 +401,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     if (storage.github) {
       // use github object from local storage if available
+      console.log("~GITHUB!!!");
       isLoggedIn = true;
       github = new Github(
         storage.github.githubRepo,
@@ -405,6 +415,7 @@ document.addEventListener('DOMContentLoaded', function() {
       )
       //document.querySelector("#fileLocation").innerText = meiFileLocationPrintable;
     } else if (isLoggedIn) {
+      console.log("~NO GITHUB BUT LOGGED IN !!!");
       // initialise and store new github object
       github = new Github("", githubToken, "", "", "", userLogin, userName, userEmail);
       storage.github = {
@@ -418,6 +429,13 @@ document.addEventListener('DOMContentLoaded', function() {
         userEmail: userEmail
       };
     }
+    if(storage.forkAndOpen && github) { 
+      // we've arrived back after an automated log-in request
+      // now fork and open the supplied URL, and remove it from storage
+      console.log("~ AT THIS POINT< GITHUB: ", github);
+      forkAndOpen(github, storage.forkAndOpen);
+      storage.removeItem("forkAndOpen");
+    }
   } else { // no local storage
     if (isLoggedIn) { // initialise new github object
       github = new Github("", githubToken, "", "", "", userLogin, userName, userEmail);
@@ -427,6 +445,7 @@ document.addEventListener('DOMContentLoaded', function() {
     openFile(undefined, false, false); // default MEI
   }
   if (isLoggedIn) {
+    console.log("~LOGGED IN");
     // regardless of storage availability:
     // if we are logged in, refresh github menu
     refreshGithubMenu();
@@ -435,6 +454,21 @@ document.addEventListener('DOMContentLoaded', function() {
       fillInBranchContents();
     }
   }
+  if(forkParam && urlFileName) { 
+    console.log("~ FORK PARAM")
+    console.debug("......1");
+    if(isLoggedIn && github) {
+      console.debug("......2", github);
+      forkAndOpen(github, urlFileName);
+    } else { 
+      console.debug("......3");
+      if(storage.supported) { 
+        console.debug("......4");
+        storage.safelySetStorageItem("forkAndOpen", urlFileName);
+        document.getElementById("GithubLoginLink").click();
+      }
+    }
+  } 
   // Retrieve parameters from URL params, from storage, or default values
   if (scaleParam !== null) {
     document.getElementById('verovio-zoom').value = scaleParam;
@@ -469,7 +503,6 @@ document.addEventListener('DOMContentLoaded', function() {
   vrvWorker.postMessage({
     'cmd': 'loadVerovio'
   });
-
   setKeyMap(defaultKeyMap);
 });
 
@@ -1240,6 +1273,12 @@ function addEventListeners(v, cm) {
   fl.addEventListener('change', () => {
     if (fl.checked) v.cursorActivity(cm, true)
   });
+
+  // forkAndOpen cancel button
+  const forkAndOpenCancelButton = document.getElementById('forkAndOpenCancel');
+  if(forkAndOpenCancelButton) { 
+    forkAndOpenCancelButton.addEventListener('click', forkRepositoryCancel);
+  }
 
   // editor reports changes
   cm.on('changes', () => {

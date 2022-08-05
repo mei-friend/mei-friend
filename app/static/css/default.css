@@ -239,6 +239,7 @@ a:active {
   background-color: var(--navbarBackgroundColor);
 }
 
+.forkAndOpenOverlay, 
 .forkRepositoryOverlay {
   position: fixed;
   display: none;
