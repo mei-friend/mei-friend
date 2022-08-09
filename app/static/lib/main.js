@@ -209,6 +209,7 @@ export function setMeiFileInfo(fName, fLocation, fLocationPrintable) {
 }
 
 export function updateFileStatusDisplay() {
+  console.log("Updating file status display!")
   document.querySelector("#fileName").innerText =
     meiFileName.substr(meiFileName.lastIndexOf("/") + 1);
   document.querySelector("#fileLocation").innerText = meiFileLocationPrintable || "";

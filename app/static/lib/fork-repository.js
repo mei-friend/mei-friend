@@ -162,6 +162,7 @@ export function forkAndOpen(github, url) {
     let repo = components[2];
     let branch = components[3];
     let file = components[4];
+    console.log("URL: ", url, " COMPONENTS: ", components)
     
     document.querySelector("#forkRepoRequested")
       .innerText = `${components[1]}/${components[2]}`;
@@ -179,7 +180,7 @@ export function forkAndOpen(github, url) {
     // forkAndOpen fork button
     const forkAndOpenButton = document.getElementById('forkAndOpenButton');
     if(forkAndOpenButton) { 
-      forkAndOpenButton.addEventListener('click', forkAndOpenClicked(github, components))
+      forkAndOpenButton.addEventListener('click', () => forkAndOpenClicked(github, components))
     }
   }
   else { 
@@ -189,8 +190,12 @@ export function forkAndOpen(github, url) {
 
 export function forkAndOpenClicked(github, components) {
   // set up values for forkRepoClicked():
+  console.log("FORK AND OPEN CLICKED")
   document.getElementById('forkRepositoryInputName').value = components[1];
-  document.getElementById('forkRepositoryInputRepo').value = components[2];
+  document.getElementById('forkRepositoryInputRepoOverride').value = components[2];
+  document.getElementById('forkRepositoryInputBranchOverride').value = components[3];
+  document.getElementById('forkRepositoryInputFilepathOverride').value = "/" + components[4];
+  document.getElementById("GithubLogo").classList.add("clockwise");
   forkRepoClicked();
 }
 

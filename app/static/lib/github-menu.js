@@ -26,11 +26,16 @@ function forkRepo() {
 }
 
 export function forkRepoClicked() {
+  // inputRepoOverride is used to supply a repository via the forkAndOpen (?fork parameter) path
   let inputName = document.getElementById('forkRepositoryInputName').value
   let inputRepo = document.getElementById('forkRepositoryInputRepo').value
+  let inputRepoOverride = document.getElementById('forkRepositoryInputRepoOverride').value
+  let inputBranchOverride = document.getElementById('forkRepositoryInputBranchOverride').value
+  let inputFilepathOverride = document.getElementById('forkRepositoryInputFilepathOverride').value
   let forkRepositoryStatus = document.querySelector("#forkRepositoryStatus");
   let forkRepositoryToSelector = document.querySelector("#forkRepositoryToSelector");
-  if (inputName && inputRepo) {
+  if (inputName && (inputRepo || inputRepoOverride)) {
+    inputRepo = inputRepoOverride ? inputRepoOverride : inputRepo;
     let githubRepo = `${inputName}/${inputRepo}`;
     github.githubRepo = githubRepo;
     document.getElementById("forkRepoGithubLogo").classList.add("clockwise");
@@ -54,10 +59,22 @@ export function forkRepoClicked() {
             })
           }
         }
-      }).finally(() =>
-        document.getElementById("forkRepoGithubLogo")
-        .classList.remove("clockwise")
-      )
+      }).finally(() => {
+        if(inputRepoOverride && inputBranchOverride && inputFilepathOverride) {
+          // forkAndOpen path: directly switch to specified branch and open file
+          github.branch = inputBranchOverride;
+          const _filepath = inputFilepathOverride.substr(0,inputFilepathOverride.lastIndexOf("/")+1)
+          const _file = inputFilepathOverride.substr(inputFilepathOverride.lastIndexOf("/")+1)
+          github.filepath = _filepath;
+          setMeiFileInfo(github.filepath, github.githubRepo, github.githubRepo + ":");
+          loadFile(_file);
+        }
+        document.getElementById("GithubLogo").classList.remove("clockwise");
+        document.getElementById("forkRepoGithubLogo").classList.remove("clockwise");
+        document.getElementById("forkRepositoryInputRepoOverride").value = "";
+        document.getElementById("forkRepositoryInputBranchOverride").value = "";
+        document.getElementById("forkRepositoryInputFilepathOverride").value = "";
+      });
   }
 }
 
@@ -161,6 +178,7 @@ function loadFile(fileName, ev = null) {
       github.githubRepo, // meiFileLocation
       github.githubRepo + ":" // meiFileLocationPrintable
     );
+    console.log("File name set!")
     handleEncoding(github.content);
     setFileNameAfterLoad();
     updateFileStatusDisplay();
@@ -392,14 +410,17 @@ export async function fillInBranchContents(e) {
         `<span class="filepath${isDir ? '':' closeOnClick'}">${content.name}</span>${isDir ? "..." : ""}</a>`;
     });
   } else {
-    // User clicked file, or restoring from local storage. Display commit interface
-    if (storage.supported && github.filepath) {
-      storage.fileLocationType = "github";
+    // Either User clicked file, or we're on forkAndOpen path, or restoring from local storage. Display commit interface
+    if (github.filepath) {
+      console.log("~~ Github file path", github.filepath, github.githubRepo, github.githubRepo + ":");
       setMeiFileInfo(
         github.filepath, // meiFileName
         github.githubRepo, // meiFileLocation
         github.githubRepo + ":" // meiFileLocationPrintable
       );
+    }
+    if(storage.supported) { 
+      storage.fileLocationType = "github";
     }
 
     const commitUI = document.createElement("div");
