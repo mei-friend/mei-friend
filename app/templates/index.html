@@ -315,8 +315,7 @@
       <div class="openUrlUI">
         <div id="openUrlUIGrouping">
           <h3>Open Web-hosted encoding by URL</h3>
-          <p id="openUrlInstructions">Please choose from the public repertoire or enter the URL of a Web-hosted music
-            encoding, below. Note: Host server must support cross-origin resource sharing (CORS).</p>
+          <p id="openUrlInstructions">Please choose from the public repertoire or enter the URL of a Web-hosted music encoding, below. Note: Host server must support cross-origin resource sharing (CORS).</p>
           <details>
             <summary>Public repertoire</summary>
             <div>
@@ -344,10 +343,32 @@
         </div>
       </div>
     </div>
-    <div class="forkRepositoryOverlay">
+    <div class="forkRepositoryOverlay" id="forkAndOpenOverlay">
       <div class="forkRepositoryUI">
-        <div id="forkRepositoryUIGrouping">
-          <h3><img id="forkRepoGithubLogo" src="{{ url_for('static', filename='img/GitHub-Mark-32px.png') }}" />
+        <div class="forkRepositoryUIGrouping">
+          <h3><img class="forkRepoGithubLogo" src="{{ url_for('static', filename='img/GitHub-Mark-32px.png') }}" />
+            Fork Github Repository</h3>
+          <p>
+            The link you have followed will create a GitHub fork of the following repository for editing in mei-friend: 
+          </p>
+          <p id="forkRepoRequested"/>
+          <p>
+          Is this OK?
+          </p>
+          <div id="forkAndOpenInputWrapper">
+            <label for="forkAndOpenSelector">Fork to: </label>
+            <select id="forkAndOpenSelector" name="forkAndOpenSelector"></select>
+            <button id="forkAndOpenButton" class="forkRepositoryButton">Fork repository</button>
+            <button id="forkAndOpenCancel">Cancel</button>
+          </div>
+          <span id="forkAndOpenStatus" class="forkRepositoryStatus"/>
+        </div>
+      </div>
+    </div>
+    <div class="forkRepositoryOverlay" id="forkRepositoryOverlay">
+      <div class="forkRepositoryUI">
+        <div class="forkRepositoryUIGrouping">
+          <h3><img class="forkRepoGithubLogo" src="{{ url_for('static', filename='img/GitHub-Mark-32px.png') }}" />
             Fork Github Repository</h3>
           <p id="forkRepositoryInstructions">
             Please choose from the public repertoire or enter the Github (user or organization) name and the repository
@@ -376,15 +397,18 @@
           </details>
           <div id="forkRepositoryInputWrapper">
             <input id="forkRepositoryInputName" type="text" placeholder="Github user or organization" />
+            <input id="forkRepositoryInputRepoOverride" type="hidden" />
+            <input id="forkRepositoryInputBranchOverride" type="hidden" />
+            <input id="forkRepositoryInputFilepathOverride" type="hidden" />
             <select id="forkRepositoryInputRepo" name="forkRepositoryInputRepo">
               <option value="" disabled selected hidden>Choose a repository</option>
             </select>
             <label for="forkRepositoryToSelector">Fork to: </label>
             <select id="forkRepositoryToSelector" name="forkRepositoryToSelector"></select>
-            <button id="forkRepositoryButton">Fork repository</button>
+            <button id="forkRepositoryButton" class="forkRepositoryButton">Fork repository</button>
             <button id="forkRepositoryCancel">Cancel</button>
           </div>
-          <span id="forkRepositoryStatus"></span>
+          <span id="forkRepositoryStatus" class="forkRepositoryStatus"></span>
           <p id="forkProposePublicRepertoire">We welcome proposals for <a target="_blank"
               href="https://github.com/Signature-Sound-Vienna/mei-friend-online/issues/new?template=public_repertoire.md">additions
               to the public repertoire</a>.</p>

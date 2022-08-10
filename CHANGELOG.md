@@ -1,5 +1,7 @@
 # mei-friend-online CHANGELOG.md
 
+### 0.5.1 patch: forkAndOpen
+* Implement 'fork' parameter that directs user to fork and open raw github resources specified via 'file' param
 ### 0.5.0: Support for source image display
 * Parsing facsimile information and display source image zones
 * Providing options to activate, position, resize and zoom source image pane
