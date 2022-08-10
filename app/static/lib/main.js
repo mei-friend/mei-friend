@@ -360,7 +360,8 @@ document.addEventListener('DOMContentLoaded', function() {
   // If user is logged in, open a pre-populated fork-repository menu
   // Else, remember we are in remote fork request mode, log user in, and then proceed as above.
   let forkParam = searchParams.get('fork');
-  if (urlFileName && !(forkParam)) { // normally open the file from URL
+  console.log("Fork param: ", forkParam, typeof forkParam);
+  if (urlFileName && !(forkParam==="true")) { // normally open the file from URL
     openUrlFetch(new URL(urlFileName));
   }
 
@@ -402,7 +403,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     if (storage.github) {
       // use github object from local storage if available
-      console.log("~GITHUB!!!");
       isLoggedIn = true;
       github = new Github(
         storage.github.githubRepo,
@@ -416,7 +416,6 @@ document.addEventListener('DOMContentLoaded', function() {
       )
       //document.querySelector("#fileLocation").innerText = meiFileLocationPrintable;
     } else if (isLoggedIn) {
-      console.log("~NO GITHUB BUT LOGGED IN !!!");
       // initialise and store new github object
       github = new Github("", githubToken, "", "", "", userLogin, userName, userEmail);
       storage.github = {
@@ -433,7 +432,6 @@ document.addEventListener('DOMContentLoaded', function() {
     if(storage.forkAndOpen && github) { 
       // we've arrived back after an automated log-in request
       // now fork and open the supplied URL, and remove it from storage
-      console.log("~ AT THIS POINT< GITHUB: ", github);
       forkAndOpen(github, storage.forkAndOpen);
       storage.removeItem("forkAndOpen");
     }
@@ -446,7 +444,6 @@ document.addEventListener('DOMContentLoaded', function() {
     openFile(undefined, false, false); // default MEI
   }
   if (isLoggedIn) {
-    console.log("~LOGGED IN");
     // regardless of storage availability:
     // if we are logged in, refresh github menu
     refreshGithubMenu();
@@ -455,16 +452,11 @@ document.addEventListener('DOMContentLoaded', function() {
       fillInBranchContents();
     }
   }
-  if(forkParam && urlFileName) { 
-    console.log("~ FORK PARAM")
-    console.debug("......1");
+  if(forkParam==="true"&& urlFileName) { 
     if(isLoggedIn && github) {
-      console.debug("......2", github);
       forkAndOpen(github, urlFileName);
     } else { 
-      console.debug("......3");
       if(storage.supported) { 
-        console.debug("......4");
         storage.safelySetStorageItem("forkAndOpen", urlFileName);
         document.getElementById("GithubLoginLink").click();
       }
