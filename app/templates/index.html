@@ -332,6 +332,7 @@
     </div>
     <div class="forkRepositoryOverlay" id="forkAndOpenOverlay">
       <div class="forkRepositoryUI">
+        <div class="forkRepositoryUIGrouping">
           <h3><img id="forkRepoGithubLogo" src="{{ url_for('static', filename='img/GitHub-Mark-32px.png') }}" />
             Fork Github Repository</h3>
           <p>
@@ -347,12 +348,13 @@
             <button id="forkAndOpenButton" class="forkRepositoryButton">Fork repository</button>
             <button id="forkAndOpenCancel">Cancel</button>
           </div>
-          <span id="forkAndOpenStatus"/>
+          <span id="forkAndOpenStatus" class="forkRepositoryStatus"/>
+        </div>
       </div>
     </div>
     <div class="forkRepositoryOverlay" id="forkRepositoryOverlay">
       <div class="forkRepositoryUI">
-        <div id="forkRepositoryUIGrouping">
+        <div class="forkRepositoryUIGrouping">
           <h3><img id="forkRepoGithubLogo" src="{{ url_for('static', filename='img/GitHub-Mark-32px.png') }}" />
             Fork Github Repository</h3>
           <p id="forkRepositoryInstructions">
@@ -392,7 +394,7 @@
             <button id="forkRepositoryButton" class="forkRepositoryButton">Fork repository</button>
             <button id="forkRepositoryCancel">Cancel</button>
           </div>
-          <span id="forkRepositoryStatus"></span>
+          <span id="forkRepositoryStatus" class="forkRepositoryStatus"></span>
           <p id="forkProposePublicRepertoire">We welcome proposals for <a target="_blank" href="https://github.com/Signature-Sound-Vienna/mei-friend-online/issues/new?template=public_repertoire.md">additions to the public repertoire</a>.</p>
         </div>
       </div>

@@ -32,7 +32,7 @@ export function forkRepoClicked() {
   let inputRepoOverride = document.getElementById('forkRepositoryInputRepoOverride').value
   let inputBranchOverride = document.getElementById('forkRepositoryInputBranchOverride').value
   let inputFilepathOverride = document.getElementById('forkRepositoryInputFilepathOverride').value
-  let forkRepositoryStatus = document.querySelector("#forkRepositoryStatus");
+  let forkRepositoryStatus = Array.from(document.getElementsByClassName("forkRepositoryStatus"));
   let forkRepositoryToSelector = document.querySelector("#forkRepositoryToSelector");
   if (inputName && (inputRepo || inputRepoOverride)) {
     inputRepo = inputRepoOverride ? inputRepoOverride : inputRepo;
@@ -40,25 +40,28 @@ export function forkRepoClicked() {
     github.githubRepo = githubRepo;
     document.getElementById("forkRepoGithubLogo").classList.add("clockwise");
     github.fork(() => {
-        forkRepositoryStatus.classList.remove("warn");
-        forkRepositoryStatus.innerHTML = "";
-        fillInRepoBranches();
-        forkRepositoryCancel();
-      }, forkRepositoryToSelector.value)
+      forkRepositoryStatus.forEach(s =>  {
+        s.classList.remove("warn");
+        s.innerHTML = "";
+      })
+      fillInRepoBranches();
+      forkRepositoryCancel();
+    }, forkRepositoryToSelector.value)
       .catch((e) => {
-        forkRepositoryStatus.classList.add("warn");
-        forkRepositoryStatus.innerHTML = "Sorry, couldn't fork repository";
-        if (typeof e === "object" && "status" in e) {
-          forkRepositoryStatus.innerHTML =
-            e.status + " " + e.statusText;
-          if (e.status !== 404) {
-            e.json().then((err) => {
-              if ('message' in err)
-                forkRepositoryStatus.innerHTML += ". Github message: <i>" +
-                err.message + "</i>";
-            })
+        forkRepositoryStatus.forEach(s => {
+          s.classList.add("warn");
+          s.innerHTML = "Sorry, couldn't fork repository";
+          if (typeof e === "object" && "status" in e) {
+            s.innerHTML = e.status + " " + e.statusText;
+            if (e.status !== 404) {
+              e.json().then((err) => {
+                if ('message' in err)
+                  s.innerHTML += ". Github message: <i>" +
+                  err.message + "</i>";
+              })
+            }
           }
-        }
+        })
       }).finally(() => {
         if(inputRepoOverride && inputBranchOverride && inputFilepathOverride) {
           // forkAndOpen path: directly switch to specified branch and open file
