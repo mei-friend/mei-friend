@@ -38,7 +38,8 @@ export function forkRepoClicked() {
     inputRepo = inputRepoOverride ? inputRepoOverride : inputRepo;
     let githubRepo = `${inputName}/${inputRepo}`;
     github.githubRepo = githubRepo;
-    document.getElementById("forkRepoGithubLogo").classList.add("clockwise");
+    Array.from(document.getElementsByClassName("forkRepoGithubLogo"))
+      .forEach(l => l.classList.add("clockwise"));
     github.fork(() => {
       forkRepositoryStatus.forEach(s =>  {
         s.classList.remove("warn");
@@ -73,7 +74,8 @@ export function forkRepoClicked() {
           loadFile(_file);
         }
         document.getElementById("GithubLogo").classList.remove("clockwise");
-        document.getElementById("forkRepoGithubLogo").classList.remove("clockwise");
+        Array.from(document.getElementsByClassName("forkRepoGithubLogo"))
+          .forEach(l => l.classList.remove("clockwise"));
         document.getElementById("forkRepositoryInputRepoOverride").value = "";
         document.getElementById("forkRepositoryInputBranchOverride").value = "";
         document.getElementById("forkRepositoryInputFilepathOverride").value = "";
@@ -181,7 +183,6 @@ function loadFile(fileName, ev = null) {
       github.githubRepo, // meiFileLocation
       github.githubRepo + ":" // meiFileLocationPrintable
     );
-    console.log("File name set!")
     handleEncoding(github.content);
     setFileNameAfterLoad();
     updateFileStatusDisplay();
@@ -415,7 +416,6 @@ export async function fillInBranchContents(e) {
   } else {
     // Either User clicked file, or we're on forkAndOpen path, or restoring from local storage. Display commit interface
     if (github.filepath) {
-      console.log("~~ Github file path", github.filepath, github.githubRepo, github.githubRepo + ":");
       setMeiFileInfo(
         github.filepath, // meiFileName
         github.githubRepo, // meiFileLocation
@@ -499,7 +499,7 @@ export function renderCommitLog() {
     const commitRow = document.createElement("tr");
     commitRow.innerHTML = `
       <td>${c.commit.author.date}</td>
-      <td><a href="${c.author.html_url}">${c.commit.author.name}</a></td>
+      <td><a href="${c.commit.author.html_url}">${c.commit.author.name}</a></td>
       <td>${c.commit.message}</td>
       <td><a target="_blank" href="https://github.com/${github.githubRepo}/commits/${c.sha}">${c.sha.slice(0,8)}...</a></td>`;
     logTable.appendChild(commitRow);

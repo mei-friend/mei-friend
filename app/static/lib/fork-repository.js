@@ -13,7 +13,6 @@ import {
 const seperator = "|MEI-FRIEND|"; 
 
 function onOrganizationInputChange(e) { 
-  console.log("CHANGE: ", e)
   if(e.target.value) { 
     const userOrgRepos = document.getElementById("forkRepositoryInputRepo");
     userOrgRepos.innerHTML = '<option value="" disabled selected hidden>Choose a repository</option>';
@@ -50,7 +49,6 @@ function onSelectComposer(e) {
       orgs.add(s[samp.ORG]); 
       repos.add(s[samp.ORG] + seperator + s[samp.REPO]);
     })
-    console.log("INITIALISED: ", repos, orgs)
   }
   Array.from(orgs).sort().forEach(o => {
     let orgOpt = document.createElement('option');
@@ -150,11 +148,10 @@ function onSelectRepository(e) {
 }
 
 export function forkAndOpen(github, url) { 
-  console.log("FORK AND OPEN: ", github, url);
   // ensure URL matches our expectations
   // (fully qualified raw github url)
   const components = url.match(/https?:\/\/raw.githubusercontent.com\/([^/]+)\/([^/]+)\/([^/]+)\/([^/]+)/);
-  if(components.length === 5) { 
+  if(components && components.length === 5) { 
     let sz = calcSizeOfContainer();
     let fc = document.querySelector('#forkAndOpenOverlay');
     fc.width = sz.width * .25;
@@ -164,7 +161,6 @@ export function forkAndOpen(github, url) {
     let repo = components[2];
     let branch = components[3];
     let file = components[4];
-    console.log("URL: ", url, " COMPONENTS: ", components)
     
     document.querySelector("#forkRepoRequested")
       .innerText = `${components[1]}/${components[2]}`;
@@ -192,7 +188,6 @@ export function forkAndOpen(github, url) {
 
 export function forkAndOpenClicked(github, components) {
   // set up values for forkRepoClicked():
-  console.log("FORK AND OPEN CLICKED")
   document.getElementById('forkRepositoryInputName').value = components[1];
   document.getElementById('forkRepositoryInputRepoOverride').value = components[2];
   document.getElementById('forkRepositoryInputBranchOverride').value = components[3];
