@@ -1,6 +1,6 @@
 // mei-friend version and date
-const version = '0.5.0';
-const versionDate = '5 Aug 2022';
+const version = '0.5.1';
+const versionDate = '10 Aug 2022';
 
 var vrvWorker;
 var spdWorker;
@@ -92,6 +92,10 @@ import {
   refreshGithubMenu,
   setCommitUIEnabledStatus
 } from './github-menu.js';
+import { 
+  forkAndOpen,
+  forkRepositoryCancel
+} from './fork-repository.js';
 import {
   addZoneDrawer,
   ingestFacsimile,
@@ -99,7 +103,6 @@ import {
   drawSourceImage,
   zoomSourceImage,
 } from './source-imager.js';
-
 // const defaultMeiFileName = `${root}Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei`;
 const defaultMeiFileName = `${root}Beethoven_WoO70-Breitkopf.mei`;
 const defaultOrientation = 'bottom'; // default notation position in window
@@ -364,7 +367,13 @@ document.addEventListener('DOMContentLoaded', function () {
   v.addMeiFriendOptionsToSettingsPanel();
 
   let urlFileName = searchParams.get('file');
-  if (urlFileName) {
+  // fork parameter: if true AND ?fileParam is set to a URL,
+  // then put mei-friend into "remote fork request" mode:
+  // If user is logged in, open a pre-populated fork-repository menu
+  // Else, remember we are in remote fork request mode, log user in, and then proceed as above.
+  let forkParam = searchParams.get('fork');
+  console.log("Fork param: ", forkParam, typeof forkParam);
+  if (urlFileName && !(forkParam==="true")) { // normally open the file from URL
     openUrlFetch(new URL(urlFileName));
   }
 
@@ -432,6 +441,12 @@ document.addEventListener('DOMContentLoaded', function () {
         userEmail: userEmail
       };
     }
+    if(storage.forkAndOpen && github) { 
+      // we've arrived back after an automated log-in request
+      // now fork and open the supplied URL, and remove it from storage
+      forkAndOpen(github, storage.forkAndOpen);
+      storage.removeItem("forkAndOpen");
+    }
   } else { // no local storage
     if (isLoggedIn) { // initialise new github object
       github = new Github("", githubToken, "", "", "", userLogin, userName, userEmail);
@@ -450,6 +465,16 @@ document.addEventListener('DOMContentLoaded', function () {
       fillInBranchContents();
     }
   }
+  if(forkParam==="true"&& urlFileName) { 
+    if(isLoggedIn && github) {
+      forkAndOpen(github, urlFileName);
+    } else { 
+      if(storage.supported) { 
+        storage.safelySetStorageItem("forkAndOpen", urlFileName);
+        document.getElementById("GithubLoginLink").click();
+      }
+    }
+  } 
   // Retrieve parameters from URL params, from storage, or default values
   if (scaleParam !== null) {
     document.getElementById('verovio-zoom').value = scaleParam;
@@ -732,7 +757,6 @@ let inputFormats = {
 
 export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true,
   updateAfterLoading = true) {
-  console.log('OpenFile()');
   if (pageParam === null) storage.removeItem('page');
   // remove any URL parameters, because we open a file locally or through github
   window.history.replaceState(null, null, window.location.pathname);
@@ -1280,6 +1304,12 @@ function addEventListeners(v, cm) {
   fl.addEventListener('change', () => {
     if (fl.checked) v.cursorActivity(cm, true)
   });
+
+  // forkAndOpen cancel button
+  const forkAndOpenCancelButton = document.getElementById('forkAndOpenCancel');
+  if(forkAndOpenCancelButton) { 
+    forkAndOpenCancelButton.addEventListener('click', forkRepositoryCancel);
+  }
 
   // editor reports changes
   cm.on('changes', () => {
