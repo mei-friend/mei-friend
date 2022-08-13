@@ -706,7 +706,7 @@ export default class Viewer {
   // initializes the settings panel by filling it with content
   addVrvOptionsToSettingsPanel(tkAvailableOptions, defaultVrvOptions, restoreFromLocalStorage = true) {
     // skip these options (in part because they are handled in control menu)
-    let skipList = ['font', 'breaks', 'engravingDefaults', 'expand',
+    let skipList = ['breaks', 'engravingDefaults', 'expand',
       'svgAdditionalAttribute', 'handwrittenFont'
     ];
     let vsp = document.getElementById('verovioSettings');
