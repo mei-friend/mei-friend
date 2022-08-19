@@ -28,8 +28,8 @@ export function delEl(v, cm) {
     if (element.nodeName == 'octave') { // reset notes inside octave range
       let disPlace = element.getAttribute('dis.place');
       let dis = element.getAttribute('dis');
-      let id1 = speed.rmHash(element.getAttribute('startid'));
-      let id2 = speed.rmHash(element.getAttribute('endid'));
+      let id1 = utils.rmHash(element.getAttribute('startid'));
+      let id2 = utils.rmHash(element.getAttribute('endid'));
       findAndModifyOctaveElements(cm, v.xmlDoc, id1, id2, disPlace, dis, false);
       removeInEditor(cm, element);
       selectedElements.push(id2);
@@ -284,7 +284,7 @@ export function invertPlacement(v, cm, modifier = false) {
       let plist = el.getAttribute('plist');
       if (plist) {
         plist.split(' ').forEach(p => {
-          let note = v.xmlDoc.querySelector("[*|id='" + speed.rmHash(p) + "']");
+          let note = v.xmlDoc.querySelector("[*|id='" + utils.rmHash(p) + "']");
           if (note) {
             if (note.parentNode.nodeName === 'chord') note = note.parentNode;
             if (note.hasAttribute(attr) && note.getAttribute(attr) == val) {
@@ -467,6 +467,15 @@ export function addBeamElement(v, cm, elementName = 'beam') {
 export function addBeamSpan(v, cm) {
   v.loadXml(cm.getValue());
   if (v.selectedElements.length < 1) return;
+  // select chords instead of individual notes
+  for (let i = 0; i < v.selectedElements.length; i++) {
+    let chord = utils.insideParent(v.selectedElements[i], 'chord');
+    if (chord && !v.selectedElements.includes(chord)) {
+      v.selectedElements.unshift(chord);
+      i++;
+    }
+  }
+  v.selectedElements = speed.filterElements(v.selectedElements, v.xmlDoc);
   v.selectedElements = utils.sortElementsByScorePosition(v.selectedElements);
   let id1 = v.selectedElements[0]; // xml:id string
   let id2 = v.selectedElements[v.selectedElements.length - 1];
