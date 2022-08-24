@@ -247,7 +247,7 @@ export function refreshAnnotations() {
   const rac = document.getElementById("renderedAnnotationsContainer");
   rac.innerHTML = "";
   // reset annotations-containing svg
-  const scoreSvg = document.getElementById("verovio-panel svg");
+  const scoreSvg = document.querySelector("#verovio-panel svg");
   if (!scoreSvg) return;
   const annoSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   annoSvg.setAttribute("width", scoreSvg.getAttribute("width"))
@@ -357,7 +357,6 @@ export function addAnnotationHandlers() {
 
 // reads <annot> elements from XML DOM and adds them into annotations array
 export function readAnnots() {
-  // console.log("READ ANNOTS")
   if (!v.xmlDoc) return;
   let annots = Array.from(v.xmlDoc.querySelectorAll('annot'));
   annots = annots.filter(annot => annotations.findIndex(a => a.id !== annot.getAttribute('xml:id')));
