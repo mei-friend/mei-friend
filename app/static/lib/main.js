@@ -4,6 +4,8 @@ const versionDate = '24 Aug 2022';
 
 var vrvWorker;
 var spdWorker;
+var validator; // validator object
+var rngLoader; // object for loading a relaxNG schema for hinting
 var tkAvailableOptions;
 var mei;
 var elementAtCursor;
@@ -92,7 +94,7 @@ import {
   refreshGithubMenu,
   setCommitUIEnabledStatus
 } from './github-menu.js';
-import { 
+import {
   forkAndOpen,
   forkRepositoryCancel
 } from './fork-repository.js';
@@ -103,6 +105,14 @@ import {
   drawSourceImage,
   zoomSourceImage,
 } from './source-imager.js';
+import {
+  ValidatorWorker
+} from './validator-worker.js';
+import {
+  RNGLoader
+} from './rng-loader.js';
+
+
 // const defaultMeiFileName = `${root}Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei`;
 const defaultMeiFileName = `${root}Beethoven_WoO70-Breitkopf.mei`;
 const defaultOrientation = 'bottom'; // default notation position in window
@@ -322,7 +332,6 @@ function completeIfInTag(cm) {
 // when initial page content has been loaded
 document.addEventListener('DOMContentLoaded', function () {
   let myTextarea = document.getElementById("editor");
-
   cm = CodeMirror.fromTextArea(myTextarea, defaultCodeMirrorOptions);
 
   // check for parameters passed through URL
@@ -340,6 +349,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
   createControlsMenu(document.getElementById('notation'), defaultVerovioOptions.scale);
   addModifyerKeys(document); //
+
+  validator = new WorkerProxy(new ValidatorWorker());
+  rngLoader = new RNGLoader();
 
   console.log('DOMContentLoaded. Trying now to load Verovio...');
   document.querySelector(".statusbar").innerHTML = "Loading Verovio.";
@@ -373,7 +385,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // Else, remember we are in remote fork request mode, log user in, and then proceed as above.
   let forkParam = searchParams.get('fork');
   console.log("Fork param: ", forkParam, typeof forkParam);
-  if (urlFileName && !(forkParam==="true")) { // normally open the file from URL
+  if (urlFileName && !(forkParam === "true")) { // normally open the file from URL
     openUrlFetch(new URL(urlFileName));
   }
 
@@ -441,7 +453,7 @@ document.addEventListener('DOMContentLoaded', function () {
         userEmail: userEmail
       };
     }
-    if(storage.forkAndOpen && github) { 
+    if (storage.forkAndOpen && github) {
       // we've arrived back after an automated log-in request
       // now fork and open the supplied URL, and remove it from storage
       forkAndOpen(github, storage.forkAndOpen);
@@ -465,16 +477,16 @@ document.addEventListener('DOMContentLoaded', function () {
       fillInBranchContents();
     }
   }
-  if(forkParam==="true"&& urlFileName) { 
-    if(isLoggedIn && github) {
+  if (forkParam === "true" && urlFileName) {
+    if (isLoggedIn && github) {
       forkAndOpen(github, urlFileName);
-    } else { 
-      if(storage.supported) { 
+    } else {
+      if (storage.supported) {
         storage.safelySetStorageItem("forkAndOpen", urlFileName);
         document.getElementById("GithubLoginLink").click();
       }
     }
-  } 
+  }
   // Retrieve parameters from URL params, from storage, or default values
   if (scaleParam !== null) {
     document.getElementById('verovio-zoom').value = scaleParam;
@@ -1307,7 +1319,7 @@ function addEventListeners(v, cm) {
 
   // forkAndOpen cancel button
   const forkAndOpenCancelButton = document.getElementById('forkAndOpenCancel');
-  if(forkAndOpenCancelButton) { 
+  if (forkAndOpenCancelButton) {
     forkAndOpenCancelButton.addEventListener('click', forkRepositoryCancel);
   }
 
