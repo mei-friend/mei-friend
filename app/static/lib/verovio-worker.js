@@ -1,12 +1,12 @@
-importScripts("https://www.verovio.org/javascript/3.10.0/verovio-toolkit-hum.js");
-// importScripts("https://www.verovio.org/javascript/latest/verovio-toolkit-wasm.js");
+// importScripts("https://www.verovio.org/javascript/3.10.0/verovio-toolkit-hum.js");
+importScripts("https://www.verovio.org/javascript/latest/verovio-toolkit-wasm.js");
 // importScripts("https://www.verovio.org/javascript/develop/verovio-toolkit-hum.js");
 // importScripts(`../verovio-toolkit-hum.js`);
 
 var tk;
 var tkOptions;
 
-loadVerovio = function () {
+loadVerovio = async () => {
   /* create the worker toolkit instance */
   console.log('Verovio Worker: Loading toolkit...');
   try {
@@ -17,7 +17,7 @@ loadVerovio = function () {
       'availableOptions': tk.getAvailableOptions()
     };
     console.log('...done.');
-    return message;
+    postMessage(message);
   } catch (err) {
     log(err);
   };
@@ -31,8 +31,7 @@ onmessage = function (e) {
   console.info("Worker received: " + result.cmd + ', ', result); // + ', tk:', tk);
   switch (result.cmd) {
     case 'loadVerovio':
-      let mes = Module.onRuntimeInitialized = loadVerovio();
-      postMessage(mes);
+      verovio.module.onRuntimeInitialized = loadVerovio;
       return;
     case 'updateAll':
       try {
