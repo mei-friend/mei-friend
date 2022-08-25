@@ -15,7 +15,9 @@ var selectParam; // (array) select ids given through multiple instances in URL
 
 // guidelines base URL, needed to construct element / attribute URLs
 // TODO ideally determine version part automatically
-const guidelinesBase = "https://music-encoding.org/guidelines/v4/";
+const guidelinesBase = 'https://music-encoding.org/guidelines/v4/';
+const defaultSchema = 'https://music-encoding.org/schema/4.0.1/mei-all.rng';
+var currentSchema = '';
 
 // exports
 export var cm;
@@ -106,8 +108,8 @@ import {
   zoomSourceImage,
 } from './source-imager.js';
 import {
-  ValidatorWorker
-} from './validator-worker.js';
+  WorkerProxy
+} from './worker-proxy.js';
 import {
   RNGLoader
 } from './rng-loader.js';
@@ -163,6 +165,11 @@ const defaultCodeMirrorOptions = {
     "'='": completeIfInTag,
     "Ctrl-Space": "autocomplete",
     "Alt-.": consultGuidelines
+  },
+  lint: {
+    "caller": cm,
+    "getAnnotations": validate,
+    "async": true
   },
   hintOptions: 'schema_meiCMN_401', // not cm conform: just provide schema name
   theme: 'default',
@@ -329,6 +336,33 @@ function completeIfInTag(cm) {
   });
 }
 
+async function validate(text, updateLinting, options) {
+  // console.debug("XMLEditorView::validate");
+  if (options && options.caller && text) {
+    const editor = options.caller;
+    console.debug("XMLEditorView::validate", editor);
+
+    if (editor.formatting) return;
+    if (editor.skipValidation) return;
+
+    // keep the callback
+    if (editor.ui.xmlvalid) {
+      editor.ui.xmlvalid.classList.remove("ok");
+      editor.ui.xmlvalid.classList.remove("error");
+      editor.ui.xmlvalid.classList.add("wait");
+    }
+    editor.updateLinting = updateLinting;
+    editor.app.startLoading("Validating ...", true);
+    const validation = await editor.validator.validateNG(text);
+    editor.app.endLoading(true);
+    editor.highlightValidation(text, validation, editor.timestamp);
+  }
+}
+
+async function suspendedValidate(text, updateLinting, options) {
+  // Do nothing...
+}
+
 // when initial page content has been loaded
 document.addEventListener('DOMContentLoaded', function () {
   let myTextarea = document.getElementById("editor");
@@ -350,9 +384,6 @@ document.addEventListener('DOMContentLoaded', function () {
   createControlsMenu(document.getElementById('notation'), defaultVerovioOptions.scale);
   addModifyerKeys(document); //
 
-  validator = new WorkerProxy(new ValidatorWorker());
-  rngLoader = new RNGLoader();
-
   console.log('DOMContentLoaded. Trying now to load Verovio...');
   document.querySelector(".statusbar").innerHTML = "Loading Verovio.";
   document.querySelector(".rightfoot").innerHTML =
@@ -369,6 +400,20 @@ document.addEventListener('DOMContentLoaded', function () {
     var: att.timeSpanningElements
   });
   spdWorker.onmessage = speedWorkerEventsHandler;
+
+  const validatorWorker = new Worker(`${root}lib/validator-worker.js`);
+  validator = new WorkerProxy(validatorWorker);
+  rngLoader = new RNGLoader();
+
+  validator.onRuntimeInitialized().then(async () => {
+    currentSchema = defaultSchema;
+    const response = await fetch(currentSchema);
+    const data = await response.text();
+    const res = await validator.setRelaxNGSchema(data);
+    console.log("Schema loaded", res);
+    // rngLoader.setRelaxNGSchema(data);
+    // console.log("Schema loaded", res);
+  });
 
   v = new Viewer(vrvWorker, spdWorker);
   v.vrvOptions = {

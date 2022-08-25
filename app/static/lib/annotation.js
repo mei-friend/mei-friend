@@ -34,7 +34,8 @@ export function refreshAnnotationsList() {
   while (list.firstChild) {
     list.removeChild(list.lastChild);
   }
-  console.log("Annotations: ",annotations);
+  // console.log("Annotations: ",annotations);
+  
   // add web annotation button
   const addWebAnnotation = document.createElement("span");
   const rdfIcon = document.createElement("span");
