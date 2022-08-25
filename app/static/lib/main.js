@@ -348,7 +348,7 @@ document.addEventListener('DOMContentLoaded', function () {
     (env === environments.production ? version : `${env}-${version}`) +
     "</a> (" + versionDate + ").&nbsp;";
 
-  vrvWorker = new Worker(`${root}lib/worker.js`);
+  vrvWorker = new Worker(`${root}lib/verovio-worker.js`);
   vrvWorker.onmessage = vrvWorkerEventsHandler;
 
   spdWorker = new Worker(`${root}lib/speed-worker.js`);
