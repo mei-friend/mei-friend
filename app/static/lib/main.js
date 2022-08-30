@@ -16,6 +16,7 @@ var selectParam; // (array) select ids given through multiple instances in URL
 // guidelines base URL, needed to construct element / attribute URLs
 // TODO ideally determine version part automatically
 const guidelinesBase = 'https://music-encoding.org/guidelines/v4/';
+const defaultToolkit = "https://www.verovio.org/javascript/latest/verovio-toolkit-wasm.js";
 const defaultSchema = 'https://music-encoding.org/schema/4.0.1/mei-all.rng';
 var currentSchema = '';
 

@@ -1,12 +1,13 @@
 // importScripts("https://www.verovio.org/javascript/3.10.0/verovio-toolkit-hum.js");
 importScripts("https://www.verovio.org/javascript/latest/verovio-toolkit-wasm.js");
+// importScripts("https://www.verovio.org/javascript/develop/verovio-toolkit-wasm.js");
 // importScripts("https://www.verovio.org/javascript/develop/verovio-toolkit-hum.js");
 // importScripts(`../verovio-toolkit-hum.js`);
 
 var tk;
 var tkOptions;
 
-loadVerovio = async () => {
+loadVerovio = () => {
   /* create the worker toolkit instance */
   console.log('Verovio Worker: Loading toolkit...');
   try {
@@ -21,10 +22,9 @@ loadVerovio = async () => {
   } catch (err) {
     log(err);
   };
-}
-loadVerovio.bind(this);
+};
 
-onmessage = function (e) {
+addEventListener('message', function (e) {
   let result = e.data;
   result.forceUpdate = false;
   if (!tk && e.data.cmd !== 'loadVerovio') return result;
@@ -312,7 +312,7 @@ onmessage = function (e) {
       };
   };
   if (result) postMessage(result);
-}
+}, false);
 
 function log(e) {
   console.log('Worker error: ', e);
