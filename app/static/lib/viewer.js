@@ -8,8 +8,10 @@ import * as dutils from './dom-utils.js';
 import * as att from './attribute-classes.js';
 import {
   cm,
+  defaultVerovioVersion,
   fontList,
   storage,
+  supportedVerovioVersions,
   tkVersion
 } from './main.js';
 import {
@@ -944,6 +946,18 @@ export default class Viewer {
 
   addMeiFriendOptionsToSettingsPanel(restoreFromLocalStorage = true) {
     let optionsToShow = {
+      titleSelectToolkitVersion: {
+        title: 'Verovio version',
+        description: 'Select Verovio toolkit version',
+        type: 'header'
+      },
+      selectToolkitVersion: {
+        title: 'Verovio version',
+        description: 'SeleSelect Verovio toolkit version',
+        type: 'select',
+        default: defaultVerovioVersion,
+        values: Object.keys(supportedVerovioVersions)
+      },
       titleAnnotationPanel: {
         title: 'Annotation panel',
         description: 'Annotation panel',
@@ -1204,6 +1218,13 @@ export default class Viewer {
         if (ev.target.type === 'number') value = parseFloat(value);
         let col = document.getElementById('suppliedColor').value;
         switch (option) {
+          case 'selectToolkitVersion':
+            this.vrvWorker.postMessage({
+              'cmd': 'loadVerovio',
+              'msg': value,
+              'url': supportedVerovioVersions[value]
+            });
+            break;
           case 'showAnnotationPanel':
             this.toggleAnnotationPanel();
             break;

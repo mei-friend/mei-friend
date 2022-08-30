@@ -1,5 +1,5 @@
 // importScripts("https://www.verovio.org/javascript/3.10.0/verovio-toolkit-hum.js");
-importScripts("https://www.verovio.org/javascript/latest/verovio-toolkit-wasm.js");
+// importScripts("https://www.verovio.org/javascript/latest/verovio-toolkit-wasm.js");
 // importScripts("https://www.verovio.org/javascript/develop/verovio-toolkit-wasm.js");
 // importScripts("https://www.verovio.org/javascript/develop/verovio-toolkit-hum.js");
 // importScripts(`../verovio-toolkit-hum.js`);
@@ -7,7 +7,7 @@ importScripts("https://www.verovio.org/javascript/latest/verovio-toolkit-wasm.js
 var tk;
 var tkOptions;
 
-loadVerovio = () => {
+loadVerovio = async () => {
   /* create the worker toolkit instance */
   console.log('Verovio Worker: Loading toolkit...');
   try {
@@ -26,12 +26,18 @@ loadVerovio = () => {
 
 addEventListener('message', function (e) {
   let result = e.data;
+  console.log('verovio-worker: result: ', result);
   result.forceUpdate = false;
   if (!tk && e.data.cmd !== 'loadVerovio') return result;
   console.info("Worker received: " + result.cmd + ', ', result); // + ', tk:', tk);
   switch (result.cmd) {
     case 'loadVerovio':
-      verovio.module.onRuntimeInitialized = loadVerovio;
+      importScripts(result.url);
+      if (['3.7', '3.8', '3.9', '3.10'].includes(result.msg)){
+        console.log('Load Verovio 3.10 or earlier');
+        Module.onRuntimeInitialized = loadVerovio
+     } else
+        verovio.module.onRuntimeInitialized = loadVerovio;
       return;
     case 'updateAll':
       try {

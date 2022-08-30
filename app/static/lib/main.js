@@ -16,7 +16,6 @@ var selectParam; // (array) select ids given through multiple instances in URL
 // guidelines base URL, needed to construct element / attribute URLs
 // TODO ideally determine version part automatically
 const guidelinesBase = 'https://music-encoding.org/guidelines/v4/';
-const defaultToolkit = "https://www.verovio.org/javascript/latest/verovio-toolkit-wasm.js";
 const defaultSchema = 'https://music-encoding.org/schema/4.0.1/mei-all.rng';
 var currentSchema = '';
 
@@ -32,6 +31,15 @@ export let meiFileLocationPrintable = '';
 export let fileLocationType = ''; // file, github, url
 export let isMEI; // is the currently edited file native MEI?
 export let fileChanged = false; // flag to track whether unsaved changes to file exist
+export const defaultVerovioVersion = 'latest'; // 'develop', '3.10'
+export let supportedVerovioVersions = {
+  'develop': 'https://www.verovio.org/javascript/develop/verovio-toolkit-wasm.js',
+  'latest': 'https://www.verovio.org/javascript/latest/verovio-toolkit-hum.js',
+  '3.10': 'https://www.verovio.org/javascript/3.10.0/verovio-toolkit-hum.js',
+  '3.9': 'https://www.verovio.org/javascript/3.9.0/verovio-toolkit-hum.js',
+  '3.8': 'https://www.verovio.org/javascript/3.8.1/verovio-toolkit-hum.js',
+  '3.7': 'https://www.verovio.org/javascript/3.7.0/verovio-toolkit-hum.js'
+};
 
 export const sampleEncodings = [];
 export const samp = {
@@ -387,10 +395,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   console.log('DOMContentLoaded. Trying now to load Verovio...');
   document.querySelector(".statusbar").innerHTML = "Loading Verovio.";
-  document.querySelector(".rightfoot").innerHTML =
-    "<a href='https://github.com/Signature-Sound-Vienna/mei-friend-online' target='_blank'>mei-friend " +
-    (env === environments.production ? version : `${env}-${version}`) +
-    "</a> (" + versionDate + ").&nbsp;";
+  drawRightFooter();
 
   vrvWorker = new Worker(`${root}lib/verovio-worker.js`);
   vrvWorker.onmessage = vrvWorkerEventsHandler;
@@ -564,8 +569,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // ask worker to load Verovio
   v.busy();
+  let verovioVersion = document.getElementById('selectToolkitVersion').value;
   vrvWorker.postMessage({
-    'cmd': 'loadVerovio'
+    'cmd': 'loadVerovio',
+    'msg': verovioVersion,
+    'url': supportedVerovioVersions[verovioVersion]
   });
 
   setKeyMap(defaultKeyMap);
@@ -650,8 +658,7 @@ async function vrvWorkerEventsHandler(ev) {
       tkAvailableOptions = ev.data.availableOptions;
       v.addVrvOptionsToSettingsPanel(tkAvailableOptions, defaultVerovioOptions);
       // v.addMeiFriendOptionsToSettingsPanel();
-      document.querySelector(".rightfoot").innerHTML +=
-        `&nbsp;<a href="https://www.verovio.org/" target="_blank">Verovio ${tkVersion}</a>.`;
+      drawRightFooter();
       document.querySelector(".statusbar").innerHTML =
         `Verovio ${tkVersion} loaded.`;
       setBreaksOptions(tkAvailableOptions, defaultVerovioOptions.breaks);
@@ -1476,6 +1483,17 @@ function updateStatusBar() {
     meiFileName.substr(meiFileName.lastIndexOf("/") + 1) +
     ", page " + v.currentPage + " of " +
     ((v.pageCount < 0) ? '?' : v.pageCount) + " loaded.";
+}
+
+function drawRightFooter() {
+  let rf = document.querySelector(".rightfoot");
+  rf.innerHTML =
+    "<a href='https://github.com/Signature-Sound-Vienna/mei-friend-online' target='_blank'>mei-friend " +
+    (env === environments.production ? version : `${env}-${version}`) +
+    "</a> (" + versionDate + ").&nbsp;";
+  if (tkVersion)
+    rf.innerHTML +=
+    `&nbsp;<a href="https://www.verovio.org/" target="_blank">Verovio ${tkVersion}</a>.`;
 }
 
 export function log(s, code = null) {
