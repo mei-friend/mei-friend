@@ -84,6 +84,9 @@ import {
   generateSectionSelect
 } from './control-menu.js';
 import {
+  clock
+} from '../css/icons.js';
+import {
   rmHash,
   setCursorToId
 } from './utils.js';
@@ -356,10 +359,7 @@ async function validate(text, updateLinting, options) {
     // if (editor.skipValidation) return;
 
     let vs = document.getElementById('validation-status');
-    vs.classList.remove("ok");
-    vs.classList.remove("error");
-    vs.classList.add("wait");
-    vs.title = 'Validate against ' + currentSchema;
+    vs.innerHTML = clock;
 
     // keep the callback
     v.updateLinting = updateLinting;

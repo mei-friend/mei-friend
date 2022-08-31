@@ -322,7 +322,7 @@ a:active {
   margin-right: -16px;
 }
 
-#validation-status.ok {
+/* #validation-status.ok {
   background: url(../svg/verified-16.svg) no-repeat center;
   background-color: green;
   opacity: 70% ;
@@ -338,7 +338,7 @@ a:active {
   background: url(../svg/alert-16.svg) no-repeat center;
   background-color: #B00;
   opacity: 70% ;
-}
+} */
 
 #annotationPanel {
   height: 100%;

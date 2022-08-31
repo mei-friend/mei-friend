@@ -21,7 +21,10 @@ import {
 } from './source-imager.js';
 import schema_meiCMN_401 from '../schemaInfo/mei-CMN-4.0.1.schemaInfo.js';
 import schema_meiAll_401 from '../schemaInfo/mei-all-4.0.1.schemaInfo.js';
-
+import {
+  alert,
+  verified
+} from '../css/icons.js';
 
 export default class Viewer {
 
@@ -1691,13 +1694,9 @@ export default class Viewer {
       //   } else {
       //     console.log("Validated data is obsolete");
       //   }
-      vs.classList.remove("wait");
-      vs.classList.remove("error");
-      vs.classList.add("ok");
+      vs.innerHTML = verified;
     } else {
-      vs.classList.remove("wait");
-      vs.classList.remove("ok");
-      vs.classList.add("error");
+      vs.innerHTML = alert;
     }
   }
 
