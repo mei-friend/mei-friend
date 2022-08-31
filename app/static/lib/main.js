@@ -660,6 +660,7 @@ async function vrvWorkerEventsHandler(ev) {
       console.info('main(). Handler vrvLoaded: ', this);
       tkVersion = ev.data.version;
       tkAvailableOptions = ev.data.availableOptions;
+      v.clearVrvOptionsSettingsPanel();
       v.addVrvOptionsToSettingsPanel(tkAvailableOptions, defaultVerovioOptions);
       // v.addMeiFriendOptionsToSettingsPanel();
       drawRightFooter();

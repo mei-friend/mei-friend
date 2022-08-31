@@ -12,6 +12,7 @@ loadVerovio = async () => {
   console.info('VerovioWorker: Loading toolkit...');
   try {
     tk = new verovio.toolkit();
+    tkOptions = {};
     let message = {
       'cmd': 'vrvLoaded',
       'version': tk.getVersion(),

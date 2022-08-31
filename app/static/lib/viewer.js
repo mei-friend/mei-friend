@@ -705,6 +705,11 @@ export default class Viewer {
     }
   }
 
+  clearVrvOptionsSettingsPanel() {
+    this.vrvOptions = {};
+    document.getElementById('verovioSettings').innerHTML = '';
+  }
+
   // initializes the settings panel by filling it with content
   addVrvOptionsToSettingsPanel(tkAvailableOptions, defaultVrvOptions, restoreFromLocalStorage = true) {
     // skip these options (in part because they are handled in control menu)
