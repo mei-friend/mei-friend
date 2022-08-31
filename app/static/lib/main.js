@@ -640,7 +640,7 @@ export async function openUrlFetch(url = '', updateAfterLoading = true) {
 }
 
 function speedWorkerEventsHandler(ev) {
-  console.log('main() speedWorkerHandler received: ' + ev.data.cmd);
+  console.log('main.speedWorkerEventsHandler received: ' + ev.data.cmd);
   if (ev.data.cmd === 'listPageSpanningElements') {
     console.log('main() speedWorkerHandler pageSpanners: ', ev.data.pageSpanners);
     v.pageSpanners = {
@@ -654,7 +654,7 @@ function speedWorkerEventsHandler(ev) {
 }
 
 async function vrvWorkerEventsHandler(ev) {
-  console.log('main(). Handler received: ' + ev.data.cmd, ev.data);
+  console.log('main.vrvWorkerEventsHandler() received: ' + ev.data.cmd); // , ev.data
   switch (ev.data.cmd) {
     case 'vrvLoaded':
       console.info('main(). Handler vrvLoaded: ', this);
