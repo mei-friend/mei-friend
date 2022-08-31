@@ -9,7 +9,7 @@ var tkOptions;
 
 loadVerovio = async () => {
   /* create the worker toolkit instance */
-  console.log('Verovio Worker: Loading toolkit...');
+  console.info('VerovioWorker: Loading toolkit...');
   try {
     tk = new verovio.toolkit();
     let message = {
@@ -17,26 +17,37 @@ loadVerovio = async () => {
       'version': tk.getVersion(),
       'availableOptions': tk.getAvailableOptions()
     };
-    console.log('...done.');
+    console.info('Verovio Toolkit ' + message.version + ' loaded.');
     postMessage(message);
   } catch (err) {
-    log(err);
+    log('loadVerovio(): ' + err);
   };
 };
 
 addEventListener('message', function (e) {
   let result = e.data;
-  console.log('verovio-worker: result: ', result);
+  // console.log('verovio-worker: result: ', result);
   result.forceUpdate = false;
   if (!tk && e.data.cmd !== 'loadVerovio') return result;
-  console.info("Worker received: " + result.cmd + ', ', result); // + ', tk:', tk);
+  console.log('VerovioWorker received: "' + result.cmd + '".'); 
   switch (result.cmd) {
     case 'loadVerovio':
+      if (tk) tk.destroy();
+      // here we attempt to delete/destroy the toolkit module...
+      if (typeof verovio !== 'undefined' && 'module' in verovio)
+        delete verovio.module;
+      // if (typeof verovio !== 'undefined')
+      //   verovio = {};
+      // if (typeof Module !== 'undefined') {
+      //   console.log('MODULE: ', Module);
+      //   Module = {};
+      //   console.log('MODULE: ', Module);
+      // }
       importScripts(result.url);
-      if (['3.7', '3.8', '3.9', '3.10'].includes(result.msg)){
-        console.log('Load Verovio 3.10 or earlier');
+      if (['3.7.0', '3.8.1', '3.9.0', '3.10.0'].includes(result.msg)) {
+        console.log('Load Verovio 3.10.0 or earlier');
         Module.onRuntimeInitialized = loadVerovio
-     } else
+      } else
         verovio.module.onRuntimeInitialized = loadVerovio;
       return;
     case 'updateAll':
@@ -66,7 +77,7 @@ addEventListener('message', function (e) {
         result.svg = tk.renderToSVG(pg);
         result.cmd = 'updated';
       } catch (err) {
-        log(err);
+        log('updateAll: ' + err);
       };
       break;
     case 'updateData':
@@ -92,7 +103,7 @@ addEventListener('message', function (e) {
         result.pageCount = tk.getPageCount();
         result.cmd = 'updated';
       } catch (err) {
-        log(err);
+        log('updateData: ' + err);
       };
       break;
     case 'updatePage':
@@ -106,7 +117,7 @@ addEventListener('message', function (e) {
         result.svg = tk.renderToSVG(result.pageNo);
         result.cmd = 'updated';
       } catch (err) {
-        log(err);
+        log('updatePage: ' + err);
       };
       break;
     case 'updateLayout':
@@ -127,7 +138,7 @@ addEventListener('message', function (e) {
         result.pageCount = tk.getPageCount();
         result.cmd = 'updated';
       } catch (err) {
-        log(err);
+        log('updateLayout: ' + err);
       };
       break;
     case 'updateOption': // just update option without redoing layout
@@ -147,7 +158,7 @@ addEventListener('message', function (e) {
         result.pageCount = tk.getPageCount();
         result.cmd = 'updated';
       } catch (err) {
-        log(err);
+        log('updateOption: ' + err);
       };
       break;
     case 'importData': // all non-MEI formats
@@ -168,7 +179,7 @@ addEventListener('message', function (e) {
         };
         if (tkOptions) tk.setOptions(tkOptions);
       } catch (err) {
-        log(err);
+        log('importData: ' + err);
       }
       break;
     case 'importBinaryData': // compressed XML format
@@ -192,7 +203,7 @@ addEventListener('message', function (e) {
         };
         if (tkOptions) tk.setOptions(tkOptions);
       } catch (err) {
-        log(err);
+        log('importBinaryData: ' + err);
       }
       break;
     case 'reRenderMei':
@@ -216,7 +227,7 @@ addEventListener('message', function (e) {
         else result.mei = tk.getMEI();
         result.cmd = 'updated';
       } catch (err) {
-        log(err);
+        log('reRenderMei: ' + err);
       }
       break;
     case 'navigatePage': // for a page turn during navigation
@@ -231,7 +242,7 @@ addEventListener('message', function (e) {
         let pg = (result.speedMode && result.pageNo > 1) ? 2 : result.pageNo;
         result.svg = tk.renderToSVG(pg);
       } catch (err) {
-        log(err);
+        log('navigatePage: ' + err);
       }
       break;
     case 'computePageBreaks': // compute page breaks
@@ -260,7 +271,7 @@ addEventListener('message', function (e) {
         }
         // console.log('Worker computePageBreaks: ', result.pageBreaks);
       } catch (err) {
-        log(err);
+        log('computePageBreaks: ' + err);
       }
       break;
     case 'exportMidi': // re-load data and export MIDI base-64 string
@@ -271,7 +282,7 @@ addEventListener('message', function (e) {
         result.midi = tk.renderToMIDI();
         result.cmd = 'midi';
       } catch (err) {
-        log(err);
+        log('exportMidi: ' + err);
       }
       break;
     case 'getTimeForElement':
@@ -281,7 +292,7 @@ addEventListener('message', function (e) {
           'msg': tk.getTimeForElement(result.mei)
         };
       } catch (err) {
-        log(err);
+        log('getTimeForElement: ' + err);
       }
       break;
     case 'getPageWithElement':
@@ -291,7 +302,7 @@ addEventListener('message', function (e) {
           'msg': tk.getPageWithElement(result.msg)
         };
       } catch (err) {
-        log(err);
+        log('getPageWithElement: ' + err);
       }
       break;
     case 'getElementAttr':
@@ -301,7 +312,7 @@ addEventListener('message', function (e) {
           'msg': tk.getElementAttr(result.mei)
         };
       } catch (err) {
-        log(err);
+        log('getElementAttr: ' + err);
       }
       break;
     case 'stop':
@@ -321,7 +332,7 @@ addEventListener('message', function (e) {
 }, false);
 
 function log(e) {
-  console.log('Worker error: ', e);
+  console.log('ERROR in VerovioWorker ', e);
   return;
 }
 

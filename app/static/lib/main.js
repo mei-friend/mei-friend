@@ -31,14 +31,15 @@ export let meiFileLocationPrintable = '';
 export let fileLocationType = ''; // file, github, url
 export let isMEI; // is the currently edited file native MEI?
 export let fileChanged = false; // flag to track whether unsaved changes to file exist
-export const defaultVerovioVersion = 'latest'; // 'develop', '3.10'
+export const defaultVerovioVersion = 'latest'; // 'develop', '3.10.0'
 export let supportedVerovioVersions = {
   'develop': 'https://www.verovio.org/javascript/develop/verovio-toolkit-wasm.js',
   'latest': 'https://www.verovio.org/javascript/latest/verovio-toolkit-hum.js',
-  '3.10': 'https://www.verovio.org/javascript/3.10.0/verovio-toolkit-hum.js',
-  '3.9': 'https://www.verovio.org/javascript/3.9.0/verovio-toolkit-hum.js',
-  '3.8': 'https://www.verovio.org/javascript/3.8.1/verovio-toolkit-hum.js',
-  '3.7': 'https://www.verovio.org/javascript/3.7.0/verovio-toolkit-hum.js'
+  // '3.11.0': 'https://www.verovio.org/javascript/3.11.0/verovio-toolkit-hum.js',
+  '3.10.0': 'https://www.verovio.org/javascript/3.10.0/verovio-toolkit-hum.js',
+  '3.9.0': 'https://www.verovio.org/javascript/3.9.0/verovio-toolkit-hum.js',
+  '3.8.1': 'https://www.verovio.org/javascript/3.8.1/verovio-toolkit-hum.js',
+  '3.7.0': 'https://www.verovio.org/javascript/3.7.0/verovio-toolkit-hum.js'
 };
 
 export const sampleEncodings = [];
@@ -143,7 +144,7 @@ const defaultVerovioOptions = {
   spacingLinear: .2,
   spacingNonLinear: .5,
   minLastJustification: 0,
-  clefChangeFactor: .83,
+  // clefChangeFactor: .83, // option removed in Verovio 3.10.0
   svgAdditionalAttribute: ["layer@n", "staff@n",
     "dir@vgrp", "dynam@vgrp", "hairpin@vgrp", "pedal@vgrp",
     "measure@facs", "measure@n"
@@ -346,25 +347,26 @@ function completeIfInTag(cm) {
 }
 
 async function validate(text, updateLinting, options) {
-  // console.debug("XMLEditorView::validate");
-  if (options && options.caller && text) {
-    const editor = options.caller;
-    console.debug("XMLEditorView::validate", editor);
+  console.debug("validate(): ", options);
+  if (options && text) {
+    // const editor = options.caller;
+    // console.debug("XMLEditorView::validate", editor);
 
-    if (editor.formatting) return;
-    if (editor.skipValidation) return;
+    // if (editor.formatting) return;
+    // if (editor.skipValidation) return;
 
-    // keep the callback
-    if (editor.ui.xmlvalid) {
-      editor.ui.xmlvalid.classList.remove("ok");
-      editor.ui.xmlvalid.classList.remove("error");
-      editor.ui.xmlvalid.classList.add("wait");
-    }
-    editor.updateLinting = updateLinting;
-    editor.app.startLoading("Validating ...", true);
-    const validation = await editor.validator.validateNG(text);
-    editor.app.endLoading(true);
-    editor.highlightValidation(text, validation, editor.timestamp);
+    // // keep the callback
+    // if (editor.ui.xmlvalid) {
+    //   editor.ui.xmlvalid.classList.remove("ok");
+    //   editor.ui.xmlvalid.classList.remove("error");
+    //   editor.ui.xmlvalid.classList.add("wait");
+    // }
+    // editor.updateLinting = updateLinting;
+    // editor.app.startLoading("Validating ...", true);
+    const validation = await validator.validateNG(text);
+    console.log('validation done: ', validation);
+    // editor.app.endLoading(true);
+    // editor.highlightValidation(text, validation, editor.timestamp);
   }
 }
 
@@ -376,6 +378,7 @@ async function suspendedValidate(text, updateLinting, options) {
 document.addEventListener('DOMContentLoaded', function () {
   let myTextarea = document.getElementById("editor");
   cm = CodeMirror.fromTextArea(myTextarea, defaultCodeMirrorOptions);
+  cm.options.lint.caller = cm;
 
   // check for parameters passed through URL
   let searchParams = new URLSearchParams(window.location.search);
@@ -412,11 +415,12 @@ document.addEventListener('DOMContentLoaded', function () {
   rngLoader = new RNGLoader();
 
   validator.onRuntimeInitialized().then(async () => {
+    console.log('validator: onRuntimeInitialized()');
     currentSchema = defaultSchema;
     const response = await fetch(currentSchema);
     const data = await response.text();
     const res = await validator.setRelaxNGSchema(data);
-    console.log("Schema loaded", res);
+    console.log("validator: Schema loaded", res);
     // rngLoader.setRelaxNGSchema(data);
     // console.log("Schema loaded", res);
   });

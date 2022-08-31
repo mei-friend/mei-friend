@@ -4,10 +4,18 @@
  */
 
 importScripts("https://www.verovio.org/javascript/validator/xml-validator.js");
-
-import {
-    Deferred
-} from './deferred.js';
+// importScripts('./deferred.js');
+// import {
+//     Deferred
+// } from './deferred.js';
+class Deferred {
+    constructor() {
+        this.promise = new Promise((resolve, reject) => {
+            this.reject = reject
+            this.resolve = resolve
+        });
+    }
+}
 
 let methods = {
     setSchema: null,
@@ -36,6 +44,8 @@ addEventListener('message', function (event) {
         method,
         args
     } = event.data;
+
+    console.log('validator-worker: data ', event.data);
 
     // postMessage on a `onRuntimeInitialized` method as soon as
     // Module is initialized
