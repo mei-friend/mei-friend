@@ -1,6 +1,6 @@
 // mei-friend version and date
-const version = '0.5.2';
-const versionDate = '24 Aug 2022';
+const version = '0.5.3';
+const versionDate = '31 Aug 2022';
 
 var vrvWorker;
 var spdWorker;
@@ -167,7 +167,7 @@ const defaultCodeMirrorOptions = {
   },
   showTrailingSpace: true,
   foldGutter: true,
-  gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
+  gutters: ["CodeMirror-lint-markers", "CodeMirror-linenumbers", "CodeMirror-foldgutter"],
   extraKeys: {
     "'<'": completeAfter,
     "'/'": completeIfAfterLt,
@@ -355,18 +355,19 @@ async function validate(text, updateLinting, options) {
     // if (editor.formatting) return;
     // if (editor.skipValidation) return;
 
-    // // keep the callback
-    // if (editor.ui.xmlvalid) {
-    //   editor.ui.xmlvalid.classList.remove("ok");
-    //   editor.ui.xmlvalid.classList.remove("error");
-    //   editor.ui.xmlvalid.classList.add("wait");
-    // }
-    // editor.updateLinting = updateLinting;
+    let vs = document.getElementById('validation-status');
+    vs.classList.remove("ok");
+    vs.classList.remove("error");
+    vs.classList.add("wait");
+    vs.title = 'Validate against ' + currentSchema;
+
+    // keep the callback
+    v.updateLinting = updateLinting;
     // editor.app.startLoading("Validating ...", true);
     const validation = await validator.validateNG(text);
     console.log('validation done: ', validation);
     // editor.app.endLoading(true);
-    // editor.highlightValidation(text, validation, editor.timestamp);
+    v.highlightValidation(text, validation, v.timestamp);
   }
 }
 
@@ -376,9 +377,7 @@ async function suspendedValidate(text, updateLinting, options) {
 
 // when initial page content has been loaded
 document.addEventListener('DOMContentLoaded', function () {
-  let myTextarea = document.getElementById("editor");
-  cm = CodeMirror.fromTextArea(myTextarea, defaultCodeMirrorOptions);
-  cm.options.lint.caller = cm;
+  cm = CodeMirror.fromTextArea(document.getElementById("editor"), defaultCodeMirrorOptions);
 
   // check for parameters passed through URL
   let searchParams = new URLSearchParams(window.location.search);

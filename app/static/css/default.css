@@ -239,7 +239,7 @@ a:active {
   background-color: var(--navbarBackgroundColor);
 }
 
-.forkAndOpenOverlay, 
+.forkAndOpenOverlay,
 .forkRepositoryOverlay {
   position: fixed;
   display: none;
@@ -272,12 +272,12 @@ a:active {
 
 #forkRepoRequested {
   font-family: monospace;
-  background:lightsteelblue;
+  background: lightsteelblue;
   color: darkblue;
-  width:fit-content;
-  padding:.5em;
+  width: fit-content;
+  padding: .5em;
   border-radius: 10px;
- }
+}
 
 #friendContainer {
   border: 3px solid var(--dropdownHeadingColor);
@@ -311,6 +311,34 @@ a:active {
 }
 
 /* #encoding {} */
+
+#validation-status {
+  z-index: 5;
+  position: relative;
+  height: 16px;
+  width: 16px;
+  left: 0px;
+  top: 0px;
+  margin-right: -16px;
+}
+
+#validation-status.ok {
+  background: url(../svg/verified-16.svg) no-repeat center;
+  background-color: green;
+  opacity: 70% ;
+}
+
+#validation-status.wait {
+  background: url(../svg/clock-16.svg) no-repeat center;
+  background-color: darkorange;
+  opacity: 70% ;
+}
+
+#validation-status.error {
+  background: url(../svg/alert-16.svg) no-repeat center;
+  background-color: #B00;
+  opacity: 70% ;
+}
 
 #annotationPanel {
   height: 100%;

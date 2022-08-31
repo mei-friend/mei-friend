@@ -28,6 +28,8 @@ export default class Viewer {
   constructor(vrvWorker, spdWorker) {
     this.vrvWorker = vrvWorker;
     this.spdWorker = spdWorker;
+    this.timestamp = Date.now();
+    this.updateLinting;
     this.currentPage = 1;
     this.pageCount = 0;
     this.selectedElements = [];
@@ -1641,6 +1643,61 @@ export default class Viewer {
     for (let b of btns) {
       if (this.alertCloser) clearTimeout(this.alertCloser);
       b.parentElement.style.display = 'none';
+    }
+  }
+
+  // highlight validation results in CodeMirror editor
+  highlightValidation(text, validation, timestamp) {
+    let lines;
+    let found = [];
+    let i = 0;
+    let messages;
+
+    try {
+      lines = text.split("\n");
+      messages = JSON.parse(validation);
+    } catch (err) {
+      console.log("Could not parse json:", err);
+      return;
+    }
+    // parse error messages into an array
+    while (i < messages.length) {
+      let line = Math.max(messages[i].line - 1, 0);
+      found.push({
+        from: new CodeMirror.Pos(line, 0),
+        to: new CodeMirror.Pos(line, lines[line].length),
+        severity: "error",
+        message: messages[i].message
+      });
+      i += 1;
+    }
+    this.updateLinting(cm, found);
+
+    // update overall status of validation 
+    let vs = document.getElementById('validation-status');
+
+    if (found.length == 0) {
+      //   if (this.loaded && timestamp === this.timestamp) {
+      //     this.app.mei = text;
+      //     this.app.startLoading("Updating data ...", true);
+      //     let event = new CustomEvent('onUpdateData', {
+      //       detail: {
+      //         caller: this
+      //       }
+      //     });
+      //     this.app.customEventManager.dispatch(event);
+      //   } else if (!this.loaded && timestamp === this.timestamp) {
+      //     this.loaded = true;
+      //   } else {
+      //     console.log("Validated data is obsolete");
+      //   }
+      vs.classList.remove("wait");
+      vs.classList.remove("error");
+      vs.classList.add("ok");
+    } else {
+      vs.classList.remove("wait");
+      vs.classList.remove("ok");
+      vs.classList.add("error");
     }
   }
 
