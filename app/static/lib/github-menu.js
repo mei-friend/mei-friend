@@ -201,7 +201,6 @@ function onFileNameEdit(e) {
 
 function onMessageInput(e) {
   e.target.classList.remove("warn");
-  console.log("GOT INPUT: ", e.target)
   if (e.target.innerText = "") {
     document.getElementById("commitButton").setAttribute("disabled", "");
   } else {
@@ -279,6 +278,11 @@ function assignGithubMenuClickHandlers() {
 
 export async function fillInUserRepos(per_page = 30, page = 1) {
   const repos = await github.getUserRepos(per_page, page);
+  if(document.getElementById("branchesHeader")) { 
+    // if user has navigated away wiew while we 
+    // were waiting for the user repos list, abandon it
+    return;
+  }
   let githubMenu = document.getElementById("GithubMenu");
   repos.forEach((repo) => {
     githubMenu.innerHTML += `<a class="userRepo" href="#">${repo.full_name}</a>`;
@@ -332,7 +336,6 @@ async function markFileName(fname) {
       // one bigger than the largest existing mark
       const prevMarkNums = prevMarked.map(f =>
         f.match(without + "~(\\d+).mei$")[1])
-      console.log("PREV MARK NUMS: ", prevMarkNums);
       const n = Math.max(...prevMarkNums) + 1;
       marked = `${unmarked}~${n}.mei`;
     } else marked = `${unmarked}~1.mei`;
@@ -384,10 +387,7 @@ async function proposeFileName(fname) {
 
 export async function fillInBranchContents(e) {
   // TODO handle > per_page files (similar to userRepos)
-  let target;
-  if (e) { // not present if restoring from local storage
-    target = e.target;
-  }
+  let target = document.getElementById("contentsHeader");
   const branchContents = await github.getBranchContents(github.filepath);
   let githubMenu = document.getElementById("GithubMenu");
   githubMenu.innerHTML = `
@@ -397,16 +397,11 @@ export async function fillInBranchContents(e) {
     <hr class="dropdown-line">
     <a id="branchesHeader" href="#"><span class="btn icon inline-block-tight">${icon.arrowLeft}</span>Branch: ${github.branch}</a>
     <hr class="dropdown-line">
-    <a id="contentsHeader" href="#"><span class="btn icon inline-block-tight">${icon.arrowLeft}</span>Path: <span class="filepath">${github.filepath}</span></a>
+    <a id="contentsHeader" href="#"><span class="btn icon inline-block-tight filepath">${icon.arrowLeft}</span>Path: <span class="filepath">${github.filepath}</span></a>
     <hr class="dropdown-line">
     `;
-  if (e && target && target.classList.contains("filepath")) {
-    // clicked on file name -- operate on parent (list entry) instead
-    target = e.target.parentNode;
-  }
-  if (e && target && (target.classList.contains("repoBranch") ||
-      target.classList.contains("dir") ||
-      target.getAttribute("id") === "contentsHeader")) {
+
+    if (e) {
     Array.from(branchContents).forEach((content) => {
       const isDir = content.type === "dir";
       githubMenu.innerHTML += `<a class="branchContents ${content.type}${isDir ? '': ' closeOnClick'}" href="#">` +
@@ -482,6 +477,12 @@ async function fillInCommitLog(refresh = false) {
 }
 
 export function renderCommitLog() {
+  let branchesHeader = document.getElementById("branchesHeader");
+  if(!branchesHeader) { 
+    // if user has navigated away from branch contents view while we 
+    // were waiting for the commit log, abandon it.
+    return; 
+  }
   let logTable = document.getElementById("logTable");
   if (logTable) {
     // clear up previous logTable if it exists
