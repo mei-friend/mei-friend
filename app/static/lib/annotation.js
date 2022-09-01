@@ -340,7 +340,7 @@ export function addAnnotationHandlers() {
   })
   const createLink = (e => {
     // TODO improve UX!
-    const url = window.prompt("Please enter a url to link to");
+    let url = window.prompt("Please enter a url to link to");
     if(!url.startsWith("http"))
       url = "https://" + url;
     const a = {
