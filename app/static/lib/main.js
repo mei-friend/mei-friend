@@ -360,6 +360,8 @@ async function validate(text, updateLinting, options) {
 
     let vs = document.getElementById('validation-status');
     vs.innerHTML = clock;
+    vs.querySelector('path').setAttribute('fill', 'darkorange');
+    vs.setAttribute('title', 'Tested against ' + currentSchema);
 
     // keep the callback
     v.updateLinting = updateLinting;

@@ -1695,8 +1695,10 @@ export default class Viewer {
       //     console.log("Validated data is obsolete");
       //   }
       vs.innerHTML = verified;
+      vs.querySelector('path').setAttribute('fill', 'green');
     } else {
       vs.innerHTML = alert;
+      vs.querySelector('path').setAttribute('fill', 'red');
     }
   }
 
