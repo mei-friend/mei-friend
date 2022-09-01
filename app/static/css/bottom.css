@@ -44,3 +44,8 @@
 .annotationToolsDomainSelectionItem {
   flex-direction: row;
 }
+
+#listAnnotations { 
+  flex-direction: column;
+  overflow-y: auto;
+}
