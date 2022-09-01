@@ -12,7 +12,9 @@ import {
   fontList,
   storage,
   supportedVerovioVersions,
-  tkVersion
+  tkVersion,
+  validate,
+  validator
 } from './main.js';
 import {
   drawSourceImage,
@@ -31,7 +33,9 @@ export default class Viewer {
   constructor(vrvWorker, spdWorker) {
     this.vrvWorker = vrvWorker;
     this.spdWorker = spdWorker;
-    this.timestamp = Date.now();
+    this.validatorInitialized = false;
+    this.validatorWithSchema = false;
+    this.currentSchema = '';
     this.updateLinting;
     this.currentPage = 1;
     this.pageCount = 0;
@@ -497,6 +501,7 @@ export default class Viewer {
   notationUpdated(cm, forceUpdate = false) {
     // console.log('NotationUpdated forceUpdate:' + forceUpdate);
     this.encodingHasChanged = true;
+    this.checkSchema(cm.getValue());
     let ch = document.getElementById('live-update-checkbox');
     if (this.updateNotation && ch && ch.checked || forceUpdate)
       this.updateData(cm, false, false);
@@ -878,13 +883,13 @@ export default class Viewer {
         default: 'default',
         values: ['default', 'vim', 'emacs']
       },
-      hintOptions: {
-        title: 'Show hints for schema',
-        description: 'Show hints for selected XML schema and autocomplete',
-        type: 'select',
-        default: 'schema_meiCMN_401',
-        values: ['schema_meiCMN_401', 'schema_meiAll_401', 'none']
-      },
+      // hintOptions: {
+      //   title: 'Show hints for schema',
+      //   description: 'Show hints for selected XML schema and autocomplete',
+      //   type: 'select',
+      //   default: 'schema_meiCMN_401',
+      //   values: ['schema_meiCMN_401', 'schema_meiAll_401', 'none']
+      // },
     };
     let storage = window.localStorage;
     let cmsp = document.getElementById('editorSettings');
@@ -1649,6 +1654,38 @@ export default class Viewer {
     }
   }
 
+  async checkSchema(mei) {
+    console.log('checking for schema...')
+    const hasSchema = /<\?xml-model.*schematypens=\"http?:\/\/relaxng\.org\/ns\/structure\/1\.0\"/
+    const hasSchemaMatch = hasSchema.exec(mei);
+    if (!hasSchemaMatch) return;
+    const schema = /<\?xml-model.*href="([^"]*).*/;
+    const schemaMatch = schema.exec(mei);
+    if (schemaMatch && schemaMatch[1] !== this.currentSchema) {
+      this.currentSchema = schemaMatch[1];
+      console.log('...new schema ' + this.currentSchema);
+      await this.replaceSchema(this.currentSchema);
+    }
+  }
+
+  async replaceSchema(schemaFile) {
+    if (!this.validatorInitialized) return;
+    console.log('Replace schema: ' + schemaFile);
+    const response = await fetch(schemaFile);
+    if (!response.ok) {
+      console.warn('Schema not found (' + response.status + ' ' + response.statusText + ': ' + schemaFile + ')')
+      return;
+    }
+    const data = await response.text();
+    const res = await validator.setRelaxNGSchema(data);
+    this.validatorWithSchema = true;
+    validate(cm.getValue(), this.updateLinting, true)
+    console.log("New schema loaded to validator", schemaFile);
+    // rngLoader.setRelaxNGSchema( data );
+    // cm.options.hintOptions.schemaInfo = rngLoader.tags
+  }
+
+
   // highlight validation results in CodeMirror editor
   highlightValidation(text, validation, timestamp) {
     let lines;
@@ -1678,28 +1715,23 @@ export default class Viewer {
 
     // update overall status of validation 
     let vs = document.getElementById('validation-status');
+    vs.classList.remove('wait');
+    vs.querySelector('svg').classList.remove('clockwise');
 
+    let msg = '';
     if (found.length == 0) {
-      //   if (this.loaded && timestamp === this.timestamp) {
-      //     this.app.mei = text;
-      //     this.app.startLoading("Updating data ...", true);
-      //     let event = new CustomEvent('onUpdateData', {
-      //       detail: {
-      //         caller: this
-      //       }
-      //     });
-      //     this.app.customEventManager.dispatch(event);
-      //   } else if (!this.loaded && timestamp === this.timestamp) {
-      //     this.loaded = true;
-      //   } else {
-      //     console.log("Validated data is obsolete");
-      //   }
       vs.innerHTML = verified;
-      vs.querySelector('path').setAttribute('fill', 'green');
+      vs.classList.add('ok');
+      vs.classList.remove('error');
     } else {
       vs.innerHTML = alert;
-      vs.querySelector('path').setAttribute('fill', 'red');
+      vs.innerHTML += '<span>' + Object.keys(messages).length + '</span>';
+      msg = 'Validation failed. ' + Object.keys(messages).length + ' validation messages:';
+      messages.forEach(m => msg += '\nLine ' + m.line + ': ' + m.message);
+      vs.classList.remove('ok');
+      vs.classList.add('error');
     }
+    vs.setAttribute('title', 'Tested against ' + this.currentSchema + '\n' + msg);
   }
 
 }

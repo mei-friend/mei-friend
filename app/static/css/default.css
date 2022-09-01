@@ -316,29 +316,29 @@ a:active {
   z-index: 5;
   position: relative;
   height: 16px;
-  width: 16px;
-  left: 0px;
-  top: 0px;
-  margin-right: -16px;
-}
-
-/* #validation-status.ok {
-  background: url(../svg/verified-16.svg) no-repeat center;
-  background-color: green;
-  opacity: 70% ;
+  width: 64px;
+  left: 3px;
+  top: 3px;
+  margin-right: -64px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 3px;
 }
 
 #validation-status.wait {
-  background: url(../svg/clock-16.svg) no-repeat center;
-  background-color: darkorange;
-  opacity: 70% ;
+  fill: darkorange;
 }
 
 #validation-status.error {
-  background: url(../svg/alert-16.svg) no-repeat center;
-  background-color: #B00;
-  opacity: 70% ;
-} */
+  color: darkred;
+  fill: darkred;
+}
+
+#validation-status.ok {
+  color: green;
+  fill: green;
+}
 
 #annotationPanel {
   height: 100%;

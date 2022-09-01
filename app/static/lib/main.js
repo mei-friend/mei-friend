@@ -4,7 +4,6 @@ const versionDate = '31 Aug 2022';
 
 var vrvWorker;
 var spdWorker;
-var validator; // validator object
 var rngLoader; // object for loading a relaxNG schema for hinting
 var tkAvailableOptions;
 var mei;
@@ -17,11 +16,11 @@ var selectParam; // (array) select ids given through multiple instances in URL
 // TODO ideally determine version part automatically
 const guidelinesBase = 'https://music-encoding.org/guidelines/v4/';
 const defaultSchema = 'https://music-encoding.org/schema/4.0.1/mei-all.rng';
-var currentSchema = '';
 
 // exports
 export var cm;
 export var v; // viewer instance
+export var validator; // validator object
 export let github; // github API wrapper object
 export let storage = new Storage();
 export var tkVersion = '';
@@ -84,7 +83,8 @@ import {
   generateSectionSelect
 } from './control-menu.js';
 import {
-  clock
+  clock,
+  unverified
 } from '../css/icons.js';
 import {
   rmHash,
@@ -273,6 +273,7 @@ export function loadDataInEditor(mei, setFreshlyLoaded = true) {
   }
   v.setRespSelectOptions();
   v.setMenuColors();
+  v.checkSchema(mei);
   clearAnnotations();
   readAnnots(); // from annotation.js
   setCursorToId(cm, handleURLParamSelect());
@@ -349,27 +350,25 @@ function completeIfInTag(cm) {
   });
 }
 
-async function validate(text, updateLinting, options) {
-  console.debug("validate(): ", options);
+export async function validate(text, updateLinting, options) {
+  // console.debug("validate(): ", options);
   if (options && text) {
-    // const editor = options.caller;
-    // console.debug("XMLEditorView::validate", editor);
-
-    // if (editor.formatting) return;
-    // if (editor.skipValidation) return;
-
-    let vs = document.getElementById('validation-status');
-    vs.innerHTML = clock;
-    vs.querySelector('path').setAttribute('fill', 'darkorange');
-    vs.setAttribute('title', 'Tested against ' + currentSchema);
-
     // keep the callback
     v.updateLinting = updateLinting;
-    // editor.app.startLoading("Validating ...", true);
-    const validation = await validator.validateNG(text);
-    console.log('validation done: ', validation);
-    // editor.app.endLoading(true);
-    v.highlightValidation(text, validation, v.timestamp);
+
+    if (v.validatorWithSchema) {
+      let vs = document.getElementById('validation-status');
+      vs.innerHTML = clock;
+      // vs.querySelector('path').setAttribute('fill', 'darkorange');
+      vs.classList.add('wait');
+      vs.querySelector('svg').classList.add('clockwise');
+      vs.classList.remove('ok');
+      vs.classList.remove('error');
+      vs.setAttribute('title', 'Testing against ' + v.currentSchema);
+      const validation = await validator.validateNG(text);
+      // console.log('Validation complete: ', validation);
+      v.highlightValidation(text, validation, v.timestamp);
+    }
   }
 }
 
@@ -380,6 +379,8 @@ async function suspendedValidate(text, updateLinting, options) {
 // when initial page content has been loaded
 document.addEventListener('DOMContentLoaded', function () {
   cm = CodeMirror.fromTextArea(document.getElementById("editor"), defaultCodeMirrorOptions);
+  let vs = document.getElementById('validation-status');
+  vs.innerHTML = unverified;
 
   // check for parameters passed through URL
   let searchParams = new URLSearchParams(window.location.search);
@@ -411,25 +412,21 @@ document.addEventListener('DOMContentLoaded', function () {
   });
   spdWorker.onmessage = speedWorkerEventsHandler;
 
+  v = new Viewer(vrvWorker, spdWorker);
+  v.vrvOptions = {
+    ...defaultVerovioOptions
+  };
+
   const validatorWorker = new Worker(`${root}lib/validator-worker.js`);
   validator = new WorkerProxy(validatorWorker);
   rngLoader = new RNGLoader();
 
   validator.onRuntimeInitialized().then(async () => {
     console.log('validator: onRuntimeInitialized()');
-    currentSchema = defaultSchema;
-    const response = await fetch(currentSchema);
-    const data = await response.text();
-    const res = await validator.setRelaxNGSchema(data);
-    console.log("validator: Schema loaded", res);
-    // rngLoader.setRelaxNGSchema(data);
-    // console.log("Schema loaded", res);
+    v.validatorInitialized = true;
+    if (!v.currentSchema) v.currentSchema = defaultSchema;
+    await v.replaceSchema(v.currentSchema);
   });
-
-  v = new Viewer(vrvWorker, spdWorker);
-  v.vrvOptions = {
-    ...defaultVerovioOptions
-  };
 
   v.addCmOptionsToSettingsPanel(cm, defaultCodeMirrorOptions);
   v.addMeiFriendOptionsToSettingsPanel();
