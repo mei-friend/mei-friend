@@ -10,6 +10,7 @@ import {
   cm,
   defaultVerovioVersion,
   fontList,
+  rngLoader,
   storage,
   supportedVerovioVersions,
   tkVersion,
@@ -1681,8 +1682,9 @@ export default class Viewer {
     this.validatorWithSchema = true;
     validate(cm.getValue(), this.updateLinting, true)
     console.log("New schema loaded to validator", schemaFile);
-    // rngLoader.setRelaxNGSchema( data );
-    // cm.options.hintOptions.schemaInfo = rngLoader.tags
+    rngLoader.setRelaxNGSchema( data );
+    cm.options.hintOptions.schemaInfo = rngLoader.tags
+    console.log("New schema loaded to rngLoader", schemaFile);
   }
 
 

@@ -4,7 +4,6 @@ const versionDate = '31 Aug 2022';
 
 var vrvWorker;
 var spdWorker;
-var rngLoader; // object for loading a relaxNG schema for hinting
 var tkAvailableOptions;
 var mei;
 var elementAtCursor;
@@ -21,6 +20,7 @@ const defaultSchema = 'https://music-encoding.org/schema/4.0.1/mei-all.rng';
 export var cm;
 export var v; // viewer instance
 export var validator; // validator object
+export var rngLoader; // object for loading a relaxNG schema for hinting
 export let github; // github API wrapper object
 export let storage = new Storage();
 export var tkVersion = '';
@@ -184,7 +184,10 @@ const defaultCodeMirrorOptions = {
     "getAnnotations": validate,
     "async": true
   },
-  hintOptions: 'schema_meiCMN_401', // not cm conform: just provide schema name
+  hintOptions: {
+    schemaInfo: null
+  },
+  // hintOptions: 'schema_meiCMN_401', // not cm conform: just provide schema name
   theme: 'default',
   zoomFont: 100, // my own option
   matchTheme: false, // notation matches editor theme (my option)
