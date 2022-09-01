@@ -1415,8 +1415,8 @@
                         <label xml:id="llh46j5">
                            <rend xml:id="ri7qdsm" fontsize="120.00%" fontweight="bold">VAR. II.</rend>
                         </label>
-                        <staffDef xml:id="s7srur5" n="1" lines="5" />
-                        <staffDef xml:id="s3v1y62" n="2" lines="5" />
+                        <staffDef xml:id="sn5dm1v" n="1" lines="5" />
+                        <staffDef xml:id="s19pcbwj" n="2" lines="5" />
                      </staffGrp>
                   </scoreDef>
                   <measure xml:id="measure-0000000547662691" metcon="false" n="40">
@@ -1977,9 +1977,9 @@
                      <staff xml:id="staff-0000000169213376" n="1">
                         <layer xml:id="layer-0000000436536033" n="1">
                            <chord xml:id="chord-0000000484498569" dur="4" stem.dir="up">
-                              <note xml:id="note-0000001056968479" oct="4" pname="a"/>
+                              <note xml:id="note-0000001056968479" oct="4" pname="a" />
                               <note xml:id="note-0000001856943406" oct="5" pname="c">
-                                 <accid xml:id="accid-0000000267982791" accid="n"/>
+                                 <accid xml:id="accid-0000000267982791" accid="n" />
                               </note>
                            </chord>
                            <note xml:id="note-0000000713560578" dur="8" oct="4" pname="d" stem.dir="up" />
@@ -2192,8 +2192,8 @@
                         <label xml:id="l8yh84y">
                            <rend xml:id="r1y2iyi" fontsize="120.00%" fontweight="bold">VAR. III.</rend>
                         </label>
-                        <staffDef xml:id="s7srur5" n="1" lines="5" />
-                        <staffDef xml:id="s3v1y62" n="2" lines="5" />
+                        <staffDef xml:id="s1uxdfhw" n="1" lines="5" />
+                        <staffDef xml:id="s67gih1" n="2" lines="5" />
                      </staffGrp>
                   </scoreDef>
                   <measure xml:id="measure-0000000853348693" metcon="false" n="60">
@@ -2850,8 +2850,8 @@
                         <label xml:id="lrbnfr0">
                            <rend xml:id="rf7hntp" fontsize="120.00%" fontweight="bold">VAR. IV.</rend>
                         </label>
-                        <staffDef xml:id="s7srur5" n="1" lines="5" />
-                        <staffDef xml:id="s3v1y62" n="2" lines="5" />
+                        <staffDef xml:id="stshvb9" n="1" lines="5" />
+                        <staffDef xml:id="sjzx6or" n="2" lines="5" />
                      </staffGrp>
                   </scoreDef>
                   <measure xml:id="measure-0000000601488703" metcon="false" n="80">
@@ -3606,8 +3606,8 @@
                         <label xml:id="l9b4xpg">
                            <rend xml:id="rbsrvej" fontsize="120.00%" fontweight="bold">VAR. V.</rend>
                         </label>
-                        <staffDef xml:id="s7srur5" n="1" lines="5" />
-                        <staffDef xml:id="s3v1y62" n="2" lines="5" />
+                        <staffDef xml:id="sugmd8v" n="1" lines="5" />
+                        <staffDef xml:id="s19wsk9z" n="2" lines="5" />
                      </staffGrp>
                   </scoreDef>
                   <measure xml:id="measure-0000001533142326" metcon="false" n="100">
@@ -4617,8 +4617,8 @@
                         <label xml:id="lwkspwn">
                            <rend xml:id="r3tqc1s" fontsize="120.00%" fontweight="bold">VAR. VI.</rend>
                         </label>
-                        <staffDef xml:id="s7srur5" n="1" lines="5" />
-                        <staffDef xml:id="s3v1y62" n="2" lines="5" />
+                        <staffDef xml:id="szwibzj" n="1" lines="5" />
+                        <staffDef xml:id="s1rabbak" n="2" lines="5" />
                      </staffGrp>
                   </scoreDef>
                   <measure xml:id="measure-0000000396549766" metcon="false" n="120">
