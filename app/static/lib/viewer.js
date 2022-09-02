@@ -1682,7 +1682,7 @@ export default class Viewer {
     this.validatorWithSchema = true;
     validate(cm.getValue(), this.updateLinting, true)
     console.log("New schema loaded to validator", schemaFile);
-    rngLoader.setRelaxNGSchema( data );
+    rngLoader.setRelaxNGSchema(data);
     cm.options.hintOptions.schemaInfo = rngLoader.tags
     console.log("New schema loaded to rngLoader", schemaFile);
   }
@@ -1725,6 +1725,7 @@ export default class Viewer {
       vs.innerHTML = verified;
       vs.classList.add('ok');
       vs.classList.remove('error');
+      msg = 'Everything ok, no errors.';
     } else {
       vs.innerHTML = alert;
       vs.innerHTML += '<span>' + Object.keys(messages).length + '</span>';
@@ -1733,7 +1734,7 @@ export default class Viewer {
       vs.classList.remove('ok');
       vs.classList.add('error');
     }
-    vs.setAttribute('title', 'Tested against ' + this.currentSchema + '\n' + msg);
+    vs.setAttribute('title', 'Validated against ' + this.currentSchema + '\n' + msg);
   }
 
 }

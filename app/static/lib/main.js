@@ -367,7 +367,7 @@ export async function validate(text, updateLinting, options) {
       vs.querySelector('svg').classList.add('clockwise');
       vs.classList.remove('ok');
       vs.classList.remove('error');
-      vs.setAttribute('title', 'Testing against ' + v.currentSchema);
+      vs.setAttribute('title', 'Validating against ' + v.currentSchema);
       const validation = await validator.validateNG(text);
       // console.log('Validation complete: ', validation);
       v.highlightValidation(text, validation, v.timestamp);
