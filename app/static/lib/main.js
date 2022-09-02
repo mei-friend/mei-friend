@@ -363,7 +363,7 @@ export async function validate(text, updateLinting, options) {
       let vs = document.getElementById('validation-status');
       vs.innerHTML = clock;
       // vs.querySelector('path').setAttribute('fill', 'darkorange');
-      v.switchClasses(vs, 'wait', ['error','ok']);
+      v.changeStatus(vs, 'wait', ['error','ok']);
       vs.querySelector('svg').classList.add('clockwise');
       vs.setAttribute('title', 'Validating against ' + v.currentSchema);
       const validation = await validator.validateNG(text);

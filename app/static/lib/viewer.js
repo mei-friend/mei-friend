@@ -1675,6 +1675,7 @@ export default class Viewer {
     if (!this.validatorInitialized) return;
     let vs = document.getElementById('validation-status');
     vs.innerHTML = download;
+    vs.setAttribute('title', 'Loading schema ' + schemaFile);
     this.changeStatus(vs, 'wait', ['error', 'ok']);
 
     console.log('Replace schema: ' + schemaFile);
@@ -1690,13 +1691,14 @@ export default class Viewer {
     }
     const data = await response.text();
     const res = await validator.setRelaxNGSchema(data);
+    vs.setAttribute('title', 'Schema loaded ' + schemaFile);
+    vs.innerHTML = unverified;
     this.validatorWithSchema = true;
     validate(cm.getValue(), this.updateLinting, true)
     console.log("New schema loaded to validator", schemaFile);
     rngLoader.setRelaxNGSchema(data);
     cm.options.hintOptions.schemaInfo = rngLoader.tags
     console.log("New schema loaded to rngLoader", schemaFile);
-    vs.innerHTML = unverified;
   }
 
   // helper function that adds addedClass (string) 
