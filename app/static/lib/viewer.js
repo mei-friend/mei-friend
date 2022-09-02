@@ -718,6 +718,13 @@ export default class Viewer {
     }
   }
 
+  toggleVisibility(el) {
+    if (el.style.visibility === 'visible')
+      el.style.visibility = 'hidden'
+    else
+      el.style.visibility = 'visible';
+  }
+
   clearVrvOptionsSettingsPanel() {
     this.vrvOptions = {};
     document.getElementById('verovioSettings').innerHTML = '';
@@ -1659,6 +1666,8 @@ export default class Viewer {
 
   async checkSchema(mei) {
     console.log('checking for schema...')
+    let vr = document.getElementById('validation-report');
+    if (vr) vr.style.visibility = 'hidden';
     const hasSchema = /<\?xml-model.*schematypens=\"http?:\/\/relaxng\.org\/ns\/structure\/1\.0\"/
     const hasSchemaMatch = hasSchema.exec(mei);
     if (!hasSchemaMatch) return;
@@ -1748,20 +1757,62 @@ export default class Viewer {
     // update overall status of validation 
     let vs = document.getElementById('validation-status');
     vs.querySelector('svg').classList.remove('clockwise');
+    let reportDiv = document.getElementById('validation-report');
 
     let msg = '';
     if (found.length == 0) {
-      vs.innerHTML = verified;
       this.changeStatus(vs, 'ok', ['error', 'wait']);
+      vs.innerHTML = verified;
       msg = 'Everything ok, no errors.';
     } else {
+      this.changeStatus(vs, 'error', ['wait', 'ok']);
       vs.innerHTML = alert;
       vs.innerHTML += '<span>' + Object.keys(messages).length + '</span>';
       msg = 'Validation failed. ' + Object.keys(messages).length + ' validation messages:';
       messages.forEach(m => msg += '\nLine ' + m.line + ': ' + m.message);
-      this.changeStatus(vs, 'error', ['wait', 'ok']);
+
+      // detailed validation report
+      if (!reportDiv) {
+        reportDiv = document.createElement('div');
+        reportDiv.id = 'validation-report';
+        reportDiv.classList.add('validation-report');
+        let CM = document.querySelector('.CodeMirror');
+        CM.parentElement.insertBefore(reportDiv, CM);
+      } else {
+        reportDiv.innerHTML = '';
+        reportDiv.style.visibility = 'visible';
+      }
+      let closeButton = document.createElement('span');
+      closeButton.classList.add('rightButton');
+      closeButton.innerHTML = '&times';
+      closeButton.addEventListener('click', (ev) => reportDiv.style.visibility = 'hidden');
+      reportDiv.appendChild(closeButton);
+      let p = document.createElement('div');
+      p.classList.add('validation-title');
+      p.innerHTML = 'Validation failed. ' + Object.keys(messages).length + ' validation messages:';
+      reportDiv.appendChild(p);
+      messages.forEach((m, i) => {
+        let p = document.createElement('div');
+        p.classList.add('validation-item');
+        p.id = 'error' + i;
+        p.innerHTML = 'Line ' + m.line + ': ' + m.message;
+        p.addEventListener('click', (ev) => {
+          cm.scrollIntoView({
+            from: {
+              line: Math.max(0, m.line - 5),
+              ch: 0
+            },
+            to: {
+              line: Math.min(cm.lineCount() - 1, m.line + 5),
+              ch: 0
+            }
+          });
+        });
+        reportDiv.appendChild(p);
+      });
     }
     vs.setAttribute('title', 'Validated against ' + this.currentSchema + '\n' + msg);
+    if (reportDiv) vs.addEventListener('click', (ev) => this.toggleVisibility(reportDiv));
   }
 
 }

@@ -315,15 +315,44 @@ a:active {
 #validation-status {
   z-index: 5;
   position: relative;
+  width: 48px;
+  margin-right: -48px;
   height: 16px;
-  width: 64px;
   left: 3px;
   top: 3px;
-  margin-right: -64px;
   display: flex;
   align-items: center;
   justify-content: flex-start;
   gap: 3px;
+  font-size: 100%;
+  /* pointer-events: none; */
+}
+
+.validation-report {
+  font-size: 100%;
+  display: block;
+  position: relative;
+  z-index: 12;
+  left: 72px;
+  top: 3px;
+  width: 480px;
+  margin-right: -480px;
+  max-height: 130px;
+  padding: 2px;
+  overflow: auto;
+  color: var(--textColor);
+  background-color: var(--settingsBackgroundColor);
+  border: 1px solid var(--settingsBackgroundAlternativeColor);
+  border-radius: 4px;
+}
+
+.validation-title {
+  font-weight: bold;
+}
+
+.validation-item {
+  cursor: pointer;
+  flex-wrap: nowrap;
 }
 
 #validation-status.wait {
@@ -331,13 +360,21 @@ a:active {
 }
 
 #validation-status.error {
-  color: darkred;
-  fill: darkred;
+  color: rgb(175, 51, 51);
+  fill: rgb(175, 51, 51);
 }
 
 #validation-status.ok {
   color: green;
   fill: green;
+}
+
+.rightButton {
+  float: right;
+  cursor: pointer;
+  font-size: 16pt;
+  padding-right: 4px;
+  margin-top: -2px;
 }
 
 #annotationPanel {
