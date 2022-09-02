@@ -341,7 +341,9 @@ export function addAnnotationHandlers() {
   })
   const createLink = (e => {
     // TODO improve UX!
-    const url = window.prompt("Please enter a url to link to");
+    let url = window.prompt("Please enter a url to link to");
+    if(!url.startsWith("http"))
+      url = "https://" + url;
     const a = {
       "id": "annot-" + generateUUID(),
       "type": "annotateLink",
@@ -358,6 +360,7 @@ export function addAnnotationHandlers() {
 
 // reads <annot> elements from XML DOM and adds them into annotations array
 export function readAnnots() {
+  console.debug("readannots called with annotations ", annotations)
   if (!v.xmlDoc) return;
   let annots = Array.from(v.xmlDoc.querySelectorAll('annot'));
   annots = annots.filter(annot => annotations.findIndex(a => a.id !== annot.getAttribute('xml:id')));
@@ -389,10 +392,16 @@ export function readAnnots() {
       annotation.id = "None";
     }
     annotation.isInline = true;
-    if(annotations.findIndex(a => annotation.id) === -1)
+    console.debug("Decision time for ", annot)
+    if(annotations.findIndex(a => a.id === annotation.id) === -1) {
       // only if not already included
       // FIXME: will ignore all but the first annotation without xml:id
       annotations.push(annotation);
+      console.debug("thumbs up for ", annot)
+    } else { 
+      console.debug("thumbs DOWN for ", annot)
+    }
+    console.debug("ending with annotations", annotations)
   });
   refreshAnnotations();
 }
