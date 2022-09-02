@@ -26,7 +26,9 @@ import schema_meiCMN_401 from '../schemaInfo/mei-CMN-4.0.1.schemaInfo.js';
 import schema_meiAll_401 from '../schemaInfo/mei-all-4.0.1.schemaInfo.js';
 import {
   alert,
-  verified
+  download,
+  verified,
+  unverified
 } from '../css/icons.js';
 
 export default class Viewer {
@@ -1671,10 +1673,19 @@ export default class Viewer {
 
   async replaceSchema(schemaFile) {
     if (!this.validatorInitialized) return;
+    let vs = document.getElementById('validation-status');
+    vs.innerHTML = download;
+    this.changeStatus(vs, 'wait', ['error', 'ok']);
+
     console.log('Replace schema: ' + schemaFile);
     const response = await fetch(schemaFile);
-    if (!response.ok) {
-      console.warn('Schema not found (' + response.status + ' ' + response.statusText + ': ' + schemaFile + ')')
+    if (!response.ok) { // schema not found
+      this.validatorWithSchema = false;
+      vs.innerHTML = unverified;
+      this.changeStatus(vs, 'error', ['wait', 'ok']);
+      let msg = 'Schema not found (' + response.status + ' ' + response.statusText + ': ' + schemaFile + ')';
+      vs.setAttribute('title', msg);
+      console.warn(msg);
       return;
     }
     const data = await response.text();
@@ -1685,6 +1696,15 @@ export default class Viewer {
     rngLoader.setRelaxNGSchema(data);
     cm.options.hintOptions.schemaInfo = rngLoader.tags
     console.log("New schema loaded to rngLoader", schemaFile);
+    vs.innerHTML = unverified;
+  }
+
+  // helper function that adds addedClass (string) 
+  // after removing removedClasses (array of strings)
+  // from el (DOM element) 
+  changeStatus(el, addedClass = '', removedClasses = []) {
+    removedClasses.forEach(c => el.classList.remove(c));
+    el.classList.add(addedClass);
   }
 
 
@@ -1717,22 +1737,19 @@ export default class Viewer {
 
     // update overall status of validation 
     let vs = document.getElementById('validation-status');
-    vs.classList.remove('wait');
     vs.querySelector('svg').classList.remove('clockwise');
 
     let msg = '';
     if (found.length == 0) {
       vs.innerHTML = verified;
-      vs.classList.add('ok');
-      vs.classList.remove('error');
+      this.changeStatus(vs, 'ok', ['error', 'wait']);
       msg = 'Everything ok, no errors.';
     } else {
       vs.innerHTML = alert;
       vs.innerHTML += '<span>' + Object.keys(messages).length + '</span>';
       msg = 'Validation failed. ' + Object.keys(messages).length + ' validation messages:';
       messages.forEach(m => msg += '\nLine ' + m.line + ': ' + m.message);
-      vs.classList.remove('ok');
-      vs.classList.add('error');
+      this.changeStatus(vs, 'error', ['wait', 'ok']);
     }
     vs.setAttribute('title', 'Validated against ' + this.currentSchema + '\n' + msg);
   }
