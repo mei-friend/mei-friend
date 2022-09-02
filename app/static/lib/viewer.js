@@ -1724,7 +1724,15 @@ export default class Viewer {
       console.log("Could not parse json:", err);
       return;
     }
-    // parse error messages into an array
+
+    // sort messages by line number
+    messages.sort((a, b) => {
+      if (a.line < b.line) return -1;
+      if (a.line > b.line) return 1;
+      return 0;
+    });
+
+    // parse error messages into an array for CodeMirror
     while (i < messages.length) {
       let line = Math.max(messages[i].line - 1, 0);
       found.push({
