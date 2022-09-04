@@ -329,7 +329,7 @@ a:active {
 }
 
 .validation-report {
-  font-size: 100%;
+  font-size: 90%;
   display: block;
   position: relative;
   z-index: 12;
@@ -337,7 +337,7 @@ a:active {
   top: 3px;
   width: 480px;
   margin-right: -480px;
-  max-height: 130px;
+  max-height: 10.5em;
   padding: 2px;
   overflow: auto;
   color: var(--textColor);

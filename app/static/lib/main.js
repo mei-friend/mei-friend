@@ -353,9 +353,9 @@ function completeIfInTag(cm) {
   });
 }
 
-export async function validate(text, updateLinting, options) {
+export async function validate(mei, updateLinting, options) {
   // console.debug("validate(): ", options);
-  if (options && text) {
+  if (options && mei) {
     // keep the callback
     v.updateLinting = updateLinting;
 
@@ -366,9 +366,9 @@ export async function validate(text, updateLinting, options) {
       v.changeStatus(vs, 'wait', ['error','ok']);
       vs.querySelector('svg').classList.add('clockwise');
       vs.setAttribute('title', 'Validating against ' + v.currentSchema);
-      const validation = await validator.validateNG(text);
+      const validation = await validator.validateNG(mei);
       // console.log('Validation complete: ', validation);
-      v.highlightValidation(text, validation, v.timestamp);
+      v.highlightValidation(mei, validation, v.timestamp);
     }
   }
 }

@@ -856,6 +856,16 @@ export default class Viewer {
         step: 1,
         default: 1
       },
+      meifriendSeparator: {
+        title: 'options-line', // class name of hr element
+        type: 'line'
+      },
+      autoValidate: {
+        title: 'Auto validation',
+        description: 'Validate encoding against schema automatically after each edit',
+        type: 'bool',
+        default: true
+      },
       foldGutter: {
         title: 'Code folding',
         description: 'Enable code folding through fold gutters',
@@ -971,22 +981,12 @@ export default class Viewer {
 
   addMeiFriendOptionsToSettingsPanel(restoreFromLocalStorage = true) {
     let optionsToShow = {
-      titleSelectToolkitVersion: {
-        title: 'Verovio version',
-        description: 'Select Verovio toolkit version',
-        type: 'header'
-      },
       selectToolkitVersion: {
         title: 'Verovio version',
         description: 'SeleSelect Verovio toolkit version',
         type: 'select',
         default: defaultVerovioVersion,
         values: Object.keys(supportedVerovioVersions)
-      },
-      titleAnnotationPanel: {
-        title: 'Annotation panel',
-        description: 'Annotation panel',
-        type: 'header'
       },
       showAnnotationPanel: {
         title: 'Show annotation panel',
