@@ -369,6 +369,11 @@ a:active {
   fill: green;
 }
 
+#validation-status.manual {
+  color: grey;
+  fill: grey
+}
+
 .rightButton {
   float: right;
   cursor: pointer;

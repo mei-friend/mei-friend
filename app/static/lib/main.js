@@ -357,13 +357,15 @@ export async function validate(mei, updateLinting, options) {
   // console.debug("validate(): ", options);
   if (options && mei) {
     // keep the callback
-    v.updateLinting = updateLinting;
+    if (updateLinting && typeof updateLinting === 'function')
+      v.updateLinting = updateLinting;
 
-    if (v.validatorWithSchema) {
+    if (v.validatorWithSchema &&
+      document.getElementById('autoValidate').checked) {
       let vs = document.getElementById('validation-status');
       vs.innerHTML = clock;
       // vs.querySelector('path').setAttribute('fill', 'darkorange');
-      v.changeStatus(vs, 'wait', ['error','ok']);
+      v.changeStatus(vs, 'wait', ['error', 'ok', 'manual']);
       vs.querySelector('svg').classList.add('clockwise');
       vs.setAttribute('title', 'Validating against ' + v.currentSchema);
       const validation = await validator.validateNG(mei);

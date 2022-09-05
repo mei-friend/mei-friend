@@ -1685,14 +1685,14 @@ export default class Viewer {
     let vs = document.getElementById('validation-status');
     vs.innerHTML = download;
     vs.setAttribute('title', 'Loading schema ' + schemaFile);
-    this.changeStatus(vs, 'wait', ['error', 'ok']);
+    this.changeStatus(vs, 'wait', ['error', 'ok', 'manual']);
 
     console.log('Replace schema: ' + schemaFile);
     const response = await fetch(schemaFile);
     if (!response.ok) { // schema not found
       this.validatorWithSchema = false;
       vs.innerHTML = unverified;
-      this.changeStatus(vs, 'error', ['wait', 'ok']);
+      this.changeStatus(vs, 'error', ['wait', 'ok', 'manual']);
       let msg = 'Schema not found (' + response.status + ' ' + response.statusText + ': ' + schemaFile + ')';
       vs.setAttribute('title', msg);
       console.warn(msg);
@@ -1703,7 +1703,10 @@ export default class Viewer {
     vs.setAttribute('title', 'Schema loaded ' + schemaFile);
     vs.innerHTML = unverified;
     this.validatorWithSchema = true;
-    validate(cm.getValue(), this.updateLinting, true)
+    if (document.getElementById('autoValidate').checked)
+      validate(cm.getValue(), this.updateLinting, true)
+    else
+      this.changeStatus(vs, 'manual', ['wait', 'ok', 'error']);
     console.log("New schema loaded to validator", schemaFile);
     rngLoader.setRelaxNGSchema(data);
     cm.options.hintOptions.schemaInfo = rngLoader.tags
@@ -1761,11 +1764,11 @@ export default class Viewer {
 
     let msg = '';
     if (found.length == 0) {
-      this.changeStatus(vs, 'ok', ['error', 'wait']);
+      this.changeStatus(vs, 'ok', ['error', 'wait', 'manual']);
       vs.innerHTML = verified;
       msg = 'Everything ok, no errors.';
     } else {
-      this.changeStatus(vs, 'error', ['wait', 'ok']);
+      this.changeStatus(vs, 'error', ['wait', 'ok', 'manual']);
       vs.innerHTML = alert;
       vs.innerHTML += '<span>' + Object.keys(messages).length + '</span>';
       msg = 'Validation failed. ' + Object.keys(messages).length + ' validation messages:';
