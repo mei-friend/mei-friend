@@ -38,6 +38,7 @@ export default class Viewer {
     this.spdWorker = spdWorker;
     this.validatorInitialized = false;
     this.validatorWithSchema = false;
+    this.validationEventHandler = [];
     this.currentSchema = '';
     this.updateLinting;
     this.currentPage = 1;
@@ -718,11 +719,14 @@ export default class Viewer {
     }
   }
 
-  toggleVisibility(el) {
-    if (el.style.visibility === 'visible')
-      el.style.visibility = 'hidden'
-    else
-      el.style.visibility = 'visible';
+  toggleVisibility() {
+    let reportDiv = document.getElementById('validation-report');
+    if (reportDiv) {
+      if (reportDiv.style.visibility === '' || reportDiv.style.visibility === 'visible')
+        reportDiv.style.visibility = 'hidden'
+      else
+        reportDiv.style.visibility = 'visible';
+    }
   }
 
   clearVrvOptionsSettingsPanel() {
@@ -956,6 +960,15 @@ export default class Viewer {
           delete storage['cm-' + option]; // remove from storage object when default value
         } else {
           storage['cm-' + option] = value; // save changes in localStorage object
+        }
+        if (option === 'autoValidate') { // validate if auto validation is switched on again
+          if (value) {
+            validate(cm.getValue(), this.updateLinting, {
+              'forceValidate': true
+            })
+          } else {
+            this.setValidationStatusToManual();
+          }
         }
       });
       cmsp.addEventListener('click', ev => {
@@ -1665,7 +1678,7 @@ export default class Viewer {
   }
 
   async checkSchema(mei) {
-    console.log('checking for schema...')
+    console.log('Validation: checking for schema...')
     let vr = document.getElementById('validation-report');
     if (vr) vr.style.visibility = 'hidden';
     const hasSchema = /<\?xml-model.*schematypens=\"http?:\/\/relaxng\.org\/ns\/structure\/1\.0\"/
@@ -1675,8 +1688,10 @@ export default class Viewer {
     const schemaMatch = schema.exec(mei);
     if (schemaMatch && schemaMatch[1] !== this.currentSchema) {
       this.currentSchema = schemaMatch[1];
-      console.log('...new schema ' + this.currentSchema);
+      console.log('Validation: ...new schema ' + this.currentSchema);
       await this.replaceSchema(this.currentSchema);
+    } else {
+      console.log('Validation: same schema.');
     }
   }
 
@@ -1706,7 +1721,7 @@ export default class Viewer {
     if (document.getElementById('autoValidate').checked)
       validate(cm.getValue(), this.updateLinting, true)
     else
-      this.changeStatus(vs, 'manual', ['wait', 'ok', 'error']);
+      this.setValidationStatusToManual();
     console.log("New schema loaded to validator", schemaFile);
     rngLoader.setRelaxNGSchema(data);
     cm.options.hintOptions.schemaInfo = rngLoader.tags
@@ -1721,9 +1736,29 @@ export default class Viewer {
     el.classList.add(addedClass);
   }
 
+  setValidationStatusToManual() {
+    let vs = document.getElementById('validation-status');
+    // vs.replaceWith(vs.cloneNode(true)); // to remove all event listeners
+    vs.innerHTML = unverified;
+    vs.style.cursor = 'pointer';
+    vs.setAttribute('title', 'Not validated. Press here to validate.');
+    vs.removeEventListener('click', this.manualValidate);
+    vs.removeEventListener('click', this.toggleVisibility);
+    vs.addEventListener('click', this.manualValidate);
+    this.changeStatus(vs, 'manual', ['wait', 'ok', 'error']);
+    let reportDiv = document.getElementById('validation-report');
+    if (reportDiv) reportDiv.style.visibility = 'hidden';
+    if (this.updateLinting) this.updateLinting(cm, []); // clear errors in CodeMirror
+  }
+
+  manualValidate() {
+    validate(cm.getValue(), undefined, {
+      'forceValidate': true
+    })
+  }
 
   // highlight validation results in CodeMirror editor
-  highlightValidation(text, validation, timestamp) {
+  highlightValidation(text, validation) {
     let lines;
     let found = [];
     let i = 0;
@@ -1761,6 +1796,7 @@ export default class Viewer {
     let vs = document.getElementById('validation-status');
     vs.querySelector('svg').classList.remove('clockwise');
     let reportDiv = document.getElementById('validation-report');
+    if (reportDiv) reportDiv.innerHTML = '';
 
     let msg = '';
     if (found.length == 0) {
@@ -1782,7 +1818,6 @@ export default class Viewer {
         let CM = document.querySelector('.CodeMirror');
         CM.parentElement.insertBefore(reportDiv, CM);
       } else {
-        reportDiv.innerHTML = '';
         reportDiv.style.visibility = 'visible';
       }
       let closeButton = document.createElement('span');
@@ -1815,7 +1850,11 @@ export default class Viewer {
       });
     }
     vs.setAttribute('title', 'Validated against ' + this.currentSchema + '\n' + msg);
-    if (reportDiv) vs.addEventListener('click', (ev) => this.toggleVisibility(reportDiv));
+    if (reportDiv) {
+      vs.removeEventListener('click', this.manualValidate);
+      vs.removeEventListener('click', this.toggleVisibility);
+      vs.addEventListener('click', this.toggleVisibility);
+    }
   }
 
 }

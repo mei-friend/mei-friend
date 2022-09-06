@@ -357,11 +357,15 @@ export async function validate(mei, updateLinting, options) {
   // console.debug("validate(): ", options);
   if (options && mei) {
     // keep the callback
-    if (updateLinting && typeof updateLinting === 'function')
+    if (updateLinting && typeof updateLinting === 'function') {
       v.updateLinting = updateLinting;
+      console.debug("validate(updateLinting): ", updateLinting);
+    }
 
     if (v.validatorWithSchema &&
-      document.getElementById('autoValidate').checked) {
+      (document.getElementById('autoValidate').checked || options.forceValidate)) {
+      let reportDiv = document.getElementById('validation-report');
+      if (reportDiv) reportDiv.style.visibility = 'hidden';
       let vs = document.getElementById('validation-status');
       vs.innerHTML = clock;
       // vs.querySelector('path').setAttribute('fill', 'darkorange');
@@ -369,8 +373,10 @@ export async function validate(mei, updateLinting, options) {
       vs.querySelector('svg').classList.add('clockwise');
       vs.setAttribute('title', 'Validating against ' + v.currentSchema);
       const validation = await validator.validateNG(mei);
-      // console.log('Validation complete: ', validation);
-      v.highlightValidation(mei, validation, v.timestamp);
+      console.log('Validation complete: ', validation);
+      v.highlightValidation(mei, validation);
+    } else if (!document.getElementById('autoValidate').checked) {
+      v.setValidationStatusToManual();
     }
   }
 }
@@ -382,6 +388,8 @@ async function suspendedValidate(text, updateLinting, options) {
 // when initial page content has been loaded
 document.addEventListener('DOMContentLoaded', function () {
   cm = CodeMirror.fromTextArea(document.getElementById("editor"), defaultCodeMirrorOptions);
+
+  // set validation status icon to unverified 
   let vs = document.getElementById('validation-status');
   vs.innerHTML = unverified;
 
@@ -433,6 +441,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
   v.addCmOptionsToSettingsPanel(cm, defaultCodeMirrorOptions);
   v.addMeiFriendOptionsToSettingsPanel();
+
+  // add event listener to validation status icon, if no autoValidation
+  if (!document.getElementById('autoValidate').checked) {
+    v.setValidationStatusToManual();
+  }
 
   let urlFileName = searchParams.get('file');
   // fork parameter: if true AND ?fileParam is set to a URL,
