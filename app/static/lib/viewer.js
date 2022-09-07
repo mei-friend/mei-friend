@@ -22,8 +22,6 @@ import {
   highlightZone,
   zoomSourceImage
 } from './source-imager.js';
-import schema_meiCMN_401 from '../schemaInfo/mei-CMN-4.0.1.schemaInfo.js';
-import schema_meiAll_401 from '../schemaInfo/mei-all-4.0.1.schemaInfo.js';
 import {
   alert,
   download,
@@ -38,15 +36,13 @@ export default class Viewer {
     this.spdWorker = spdWorker;
     this.validatorInitialized = false;
     this.validatorWithSchema = false;
-    this.validationEventHandler = [];
     this.currentSchema = '';
-    this.updateLinting;
+    this.updateLinting; // CodeMirror function for linting
     this.currentPage = 1;
     this.pageCount = 0;
     this.selectedElements = [];
     this.lastNoteId = '';
     this.notationNightMode = false;
-    // this.tkOptions = this.vrvToolkit.getAvailableOptions();
     this.updateNotation = true; // whether or not notation gets re-rendered after text changes
     this.speedMode = true; // speed mode (just feeds on page to Verovio to reduce drawing time)
     this.parser = new DOMParser();
@@ -274,6 +270,9 @@ export default class Viewer {
       start: {},
       end: {}
     };
+    this.validatorInitialized = false;
+    this.validatorWithSchema = false;
+    this.currentSchema = '';
   }
 
   reRenderMei(cm, removeIds = false) {
@@ -362,10 +361,9 @@ export default class Viewer {
 
   updatePageNumDisplay() {
     let pg = (this.pageCount < 0) ? '?' : this.pageCount;
-    document.getElementById("pagination1").innerHTML = 'Page';;
-    document.getElementById("pagination2").innerHTML =
-      `&nbsp;${this.currentPage}&nbsp;`;
-    document.getElementById("pagination3").innerHTML = `of ${pg}`;
+    document.getElementById('pagination1').innerHTML = 'Page';;
+    document.getElementById('pagination2').innerHTML = `&nbsp;${this.currentPage}&nbsp;`;
+    document.getElementById('pagination3').innerHTML = `of ${pg}`;
   }
 
   // set cursor to first note id in page, taking st/ly of id, if possible
@@ -478,6 +476,7 @@ export default class Viewer {
     }
   }
 
+  // Scroll notation SVG into view, both vertically and horizontally
   scrollSvg(cm) {
     let vp = document.getElementById('verovio-panel');
     let el = document.querySelector('g#' + utils.getElementIdAtCursor(cm));
@@ -648,6 +647,7 @@ export default class Viewer {
 
   } // setMenuColors()
 
+  // Control zoom of notation display and update Verovio layout
   zoom(delta, storage = null) {
     let zoomCtrl = document.getElementById('verovio-zoom');
     if (zoomCtrl) {
@@ -676,7 +676,6 @@ export default class Viewer {
     let el = document.getElementById('verovio-panel');
     el.setAttribute('tabindex', '-1');
     el.focus();
-    // $(".mei-friend").attr('tabindex', '-1').focus();
   }
 
   showSettingsPanel() {
@@ -694,17 +693,6 @@ export default class Viewer {
     document.getElementById('showSettingsButton').style.visibility = 'visible';
   }
 
-  toggleAnnotationPanel() {
-    setOrientation(cm);
-    if (this.speedMode &&
-      document.getElementById('breaks-select').value == 'auto') {
-      this.pageBreaks = {};
-      this.updateAll(cm);
-    } else {
-      this.updateLayout();
-    }
-  }
-
   toggleSettingsPanel(ev = null) {
     if (ev) {
       console.log('stop propagation')
@@ -719,13 +707,14 @@ export default class Viewer {
     }
   }
 
-  toggleVisibility() {
-    let reportDiv = document.getElementById('validation-report');
-    if (reportDiv) {
-      if (reportDiv.style.visibility === '' || reportDiv.style.visibility === 'visible')
-        reportDiv.style.visibility = 'hidden'
-      else
-        reportDiv.style.visibility = 'visible';
+  toggleAnnotationPanel() {
+    setOrientation(cm);
+    if (this.speedMode &&
+      document.getElementById('breaks-select').value == 'auto') {
+      this.pageBreaks = {};
+      this.updateAll(cm);
+    } else {
+      this.updateLayout();
     }
   }
 
@@ -907,13 +896,6 @@ export default class Viewer {
         default: 'default',
         values: ['default', 'vim', 'emacs']
       },
-      // hintOptions: {
-      //   title: 'Show hints for schema',
-      //   description: 'Show hints for selected XML schema and autocomplete',
-      //   type: 'select',
-      //   default: 'schema_meiCMN_401',
-      //   values: ['schema_meiCMN_401', 'schema_meiAll_401', 'none']
-      // },
     };
     let storage = window.localStorage;
     let cmsp = document.getElementById('editorSettings');
@@ -1348,17 +1330,6 @@ export default class Viewer {
   // Apply options to CodeMirror object and handle other specialized options
   applyEditorOption(cm, option, value, matchTheme = false) {
     switch (option) {
-      case 'hintOptions':
-        if (value === 'schema_meiAll_401')
-          cm.setOption(option, {
-            'schemaInfo': schema_meiAll_401
-          });
-        else if (value === 'schema_meiCMN_401')
-          cm.setOption(option, {
-            'schemaInfo': schema_meiCMN_401
-          });
-        else cm.setOption(option, {}); // hints: none
-        break;
       case 'zoomFont':
         this.changeEditorFontSize(value);
         break;
@@ -1703,18 +1674,23 @@ export default class Viewer {
     this.changeStatus(vs, 'wait', ['error', 'ok', 'manual']);
 
     console.log('Replace schema: ' + schemaFile);
-    const response = await fetch(schemaFile);
-    if (!response.ok) { // schema not found
-      this.validatorWithSchema = false;
-      vs.innerHTML = unverified;
-      this.changeStatus(vs, 'error', ['wait', 'ok', 'manual']);
-      let msg = 'Schema not found (' + response.status + ' ' + response.statusText + ': ' + schemaFile + ')';
-      vs.setAttribute('title', msg);
-      console.warn(msg);
-      return;
+    try {
+      const response = await fetch(schemaFile);
+      if (!response.ok) { // schema not found
+        this.throwSchemaError({
+          'response': response,
+          'schemaFile': schemaFile
+        });
+        return;
+      }
+      const data = await response.text();
+      const res = await validator.setRelaxNGSchema(data);
+    } catch (err) {
+      this.throwSchemaError({
+        'err': err
+      });
+      return
     }
-    const data = await response.text();
-    const res = await validator.setRelaxNGSchema(data);
     vs.setAttribute('title', 'Schema loaded ' + schemaFile);
     vs.innerHTML = unverified;
     this.validatorWithSchema = true;
@@ -1725,8 +1701,25 @@ export default class Viewer {
     console.log("New schema loaded to validator", schemaFile);
     rngLoader.setRelaxNGSchema(data);
     cm.options.hintOptions.schemaInfo = rngLoader.tags
-    console.log("New schema loaded to rngLoader", schemaFile);
+    console.log("New schema loaded to hinting system", schemaFile);
   }
+
+  throwSchemaError(msgObj) {
+    this.validatorWithSchema = false;
+    let msg;
+    if (msgObj.hasOwnProperty('response'))
+      msg = 'Schema not found (' + msgObj.response.status + ' ' +
+      msgObj.response.statusText + ': ' + msgObj.schemaFile + ')';
+    if (msgObj.hasOwnProperty('err'))
+      msg = msgObj.err;
+    let vs = document.getElementById('validation-status');
+    vs.innerHTML = unverified;
+    vs.setAttribute('title', msg);
+    console.warn(msg);
+    this.changeStatus(vs, 'error', ['wait', 'ok', 'manual']);
+    return;
+  }
+
 
   // helper function that adds addedClass (string) 
   // after removing removedClasses (array of strings)
@@ -1743,7 +1736,7 @@ export default class Viewer {
     vs.style.cursor = 'pointer';
     vs.setAttribute('title', 'Not validated. Press here to validate.');
     vs.removeEventListener('click', this.manualValidate);
-    vs.removeEventListener('click', this.toggleVisibility);
+    vs.removeEventListener('click', this.toggleValidationReportVisibility);
     vs.addEventListener('click', this.manualValidate);
     this.changeStatus(vs, 'manual', ['wait', 'ok', 'error']);
     let reportDiv = document.getElementById('validation-report');
@@ -1799,7 +1792,7 @@ export default class Viewer {
     if (reportDiv) reportDiv.innerHTML = '';
 
     let msg = '';
-    if (found.length == 0) {
+    if (found.length == 0 && this.validatorWithSchema) {
       this.changeStatus(vs, 'ok', ['error', 'wait', 'manual']);
       vs.innerHTML = verified;
       msg = 'Everything ok, no errors.';
@@ -1852,9 +1845,20 @@ export default class Viewer {
     vs.setAttribute('title', 'Validated against ' + this.currentSchema + '\n' + msg);
     if (reportDiv) {
       vs.removeEventListener('click', this.manualValidate);
-      vs.removeEventListener('click', this.toggleVisibility);
-      vs.addEventListener('click', this.toggleVisibility);
+      vs.removeEventListener('click', this.toggleValidationReportVisibility);
+      vs.addEventListener('click', this.toggleValidationReportVisibility);
     }
   }
+
+  toggleValidationReportVisibility() {
+    let reportDiv = document.getElementById('validation-report');
+    if (reportDiv) {
+      if (reportDiv.style.visibility === '' || reportDiv.style.visibility === 'visible')
+        reportDiv.style.visibility = 'hidden'
+      else
+        reportDiv.style.visibility = 'visible';
+    }
+  }
+
 
 }
