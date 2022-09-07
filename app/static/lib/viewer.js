@@ -270,9 +270,6 @@ export default class Viewer {
       start: {},
       end: {}
     };
-    this.validatorInitialized = false;
-    this.validatorWithSchema = false;
-    this.currentSchema = '';
   }
 
   reRenderMei(cm, removeIds = false) {
@@ -1607,7 +1604,7 @@ export default class Viewer {
     else el.parentNode.classList.remove('disabled');
   }
 
-  // show alert to user
+  // show alert to user in #alertOverlay
   // type: ['error'] 'warning' 'info' 'success'
   // disappearAfter: in milliseconds
   showAlert(message, type = 'error', disappearAfter = 30000) {
@@ -1635,11 +1632,13 @@ export default class Viewer {
     }, disappearAfter);
   }
 
+  // Update alert message of #alertOverlay
   updateAlert(newMsg) {
     let alert = document.getElementById('alertOverlay');
     alert.querySelector('span').innerHTML += '<br />' + newMsg;
   }
 
+  // Hide alert overlay
   hideAlerts() {
     let btns = document.getElementsByClassName('alertCloseButton');
     for (let b of btns) {
@@ -1648,6 +1647,7 @@ export default class Viewer {
     }
   }
 
+  // Method to check from MEI whether the XML schema filename has changed
   async checkSchema(mei) {
     console.log('Validation: checking for schema...')
     let vr = document.getElementById('validation-report');
@@ -1666,6 +1666,8 @@ export default class Viewer {
     }
   }
 
+  // Loads and replaces XML schema; throws errors if not found/CORS error, 
+  // update validation-status icon
   async replaceSchema(schemaFile) {
     if (!this.validatorInitialized) return;
     let vs = document.getElementById('validation-status');
@@ -1674,6 +1676,7 @@ export default class Viewer {
     this.changeStatus(vs, 'wait', ['error', 'ok', 'manual']);
 
     console.log('Replace schema: ' + schemaFile);
+    let data; // content of schema file
     try {
       const response = await fetch(schemaFile);
       if (!response.ok) { // schema not found
@@ -1683,7 +1686,7 @@ export default class Viewer {
         });
         return;
       }
-      const data = await response.text();
+      data = await response.text();
       const res = await validator.setRelaxNGSchema(data);
     } catch (err) {
       this.throwSchemaError({
@@ -1704,6 +1707,7 @@ export default class Viewer {
     console.log("New schema loaded to hinting system", schemaFile);
   }
 
+  // Throw an schema error and update validation-status icon
   throwSchemaError(msgObj) {
     this.validatorWithSchema = false;
     let msg;
@@ -1729,9 +1733,9 @@ export default class Viewer {
     el.classList.add(addedClass);
   }
 
+  // Switch validation-status icon to manual mode and add click event handlers
   setValidationStatusToManual() {
     let vs = document.getElementById('validation-status');
-    // vs.replaceWith(vs.cloneNode(true)); // to remove all event listeners
     vs.innerHTML = unverified;
     vs.style.cursor = 'pointer';
     vs.setAttribute('title', 'Not validated. Press here to validate.');
@@ -1744,13 +1748,14 @@ export default class Viewer {
     if (this.updateLinting) this.updateLinting(cm, []); // clear errors in CodeMirror
   }
 
+  // Callback for manual validation 
   manualValidate() {
     validate(cm.getValue(), undefined, {
       'forceValidate': true
     })
   }
 
-  // highlight validation results in CodeMirror editor
+  // Highlight validation results in CodeMirror editor linting system
   highlightValidation(text, validation) {
     let lines;
     let found = [];
@@ -1850,6 +1855,7 @@ export default class Viewer {
     }
   }
 
+  // Show/hide #validation-report panel
   toggleValidationReportVisibility() {
     let reportDiv = document.getElementById('validation-report');
     if (reportDiv) {
@@ -1859,6 +1865,5 @@ export default class Viewer {
         reportDiv.style.visibility = 'visible';
     }
   }
-
 
 }
