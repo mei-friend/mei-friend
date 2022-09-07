@@ -178,6 +178,8 @@
               class="keyShortCut nonmac shiftKey ctrlKey">R</span></a>
           <hr class="dropdown-line">
           <a id="jumpToLine" href="#">Jump to line<span class="keyShortCut altKey">G</span></a>
+          <hr class="dropdown-line">
+          <a id="manualValidate" href="#">Validate encoding<span class="keyShortCut shiftKey cmdKey">V</span></a>
         </div>
       </div>
       <div class="dropdown">
@@ -213,8 +215,9 @@
           <a id="renumExec" href="#">Renumber measures (exec)<span class="keyShortCut shiftKey cmdKey">R</span></a>
           <hr class="dropdown-line">
           <a id="reRenderMei" href="#">Re-render MEI (with ids)<span class="keyShortCut cmdKey">V</span></a>
-          <a id="reRenderMeiWithout" href="#">Re-render MEI (remove ids)<span
-              class="keyShortCut shiftKey cmdKey">V</span></a>
+          <a id="reRenderMeiWithout" href="#">Re-render MEI (remove ids)
+            <!--<span class="keyShortCut shiftKey cmdKey">V</span>-->
+          </a>
           <a id="ingestFacsimile" href="#">Ingest facsimile<span class="keyShortCut cmdKey">I</span></a>
         </div>
       </div>
@@ -311,7 +314,8 @@
       <div class="openUrlUI">
         <div id="openUrlUIGrouping">
           <h3>Open Web-hosted encoding by URL</h3>
-          <p id="openUrlInstructions">Please choose from the public repertoire or enter the URL of a Web-hosted music encoding, below. Note: Host server must support cross-origin resource sharing (CORS).</p>
+          <p id="openUrlInstructions">Please choose from the public repertoire or enter the URL of a Web-hosted music
+            encoding, below. Note: Host server must support cross-origin resource sharing (CORS).</p>
           <details>
             <summary>Public repertoire</summary>
             <div>
@@ -345,11 +349,11 @@
           <h3><img class="forkRepoGithubLogo" src="{{ url_for('static', filename='img/GitHub-Mark-32px.png') }}" />
             Fork Github Repository</h3>
           <p>
-            The link you have followed will create a GitHub fork of the following repository for editing in mei-friend: 
+            The link you have followed will create a GitHub fork of the following repository for editing in mei-friend:
           </p>
-          <p id="forkRepoRequested"/>
+          <p id="forkRepoRequested" />
           <p>
-          Is this OK?
+            Is this OK?
           </p>
           <div id="forkAndOpenInputWrapper">
             <label for="forkAndOpenSelector">Fork to: </label>
@@ -357,7 +361,7 @@
             <button id="forkAndOpenButton" class="forkRepositoryButton">Fork repository</button>
             <button id="forkAndOpenCancel">Cancel</button>
           </div>
-          <span id="forkAndOpenStatus" class="forkRepositoryStatus"/>
+          <span id="forkAndOpenStatus" class="forkRepositoryStatus" />
         </div>
       </div>
     </div>

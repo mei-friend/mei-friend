@@ -1094,6 +1094,7 @@ let cmd = {
   'openHumdrum': () => openFileDialog('.krn,.hum'),
   'openPae': () => openFileDialog('.pae,.abc'),
   'downloadMei': () => downloadMei(),
+  'validate': () => v.manualValidate(),
   'zoomIn': () => v.zoom(+1, storage),
   'zoomOut': () => v.zoom(-1, storage),
   'zoom50': () => v.zoom(50, storage),
@@ -1224,6 +1225,7 @@ function addEventListeners(v, cm) {
   document.getElementById('replace').addEventListener('click', () => CodeMirror.commands.replace(cm));
   document.getElementById('replaceAll').addEventListener('click', () => CodeMirror.commands.replaceAll(cm));
   document.getElementById('jumpToLine').addEventListener('click', () => CodeMirror.commands.jumpToLine(cm));
+  document.getElementById('manualValidate').addEventListener('click', cmd.validate);
   document.querySelectorAll('.keyShortCut').forEach(e => e.classList.add(navigator.platform.startsWith('Mac') ? 'platform-mac' : 'platform-nonmac'));
 
   // open URL interface

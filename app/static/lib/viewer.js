@@ -1681,8 +1681,8 @@ export default class Viewer {
       const response = await fetch(schemaFile);
       if (!response.ok) { // schema not found
         this.throwSchemaError({
-          'response': response,
-          'schemaFile': schemaFile
+          "response": response,
+          "schemaFile": schemaFile
         });
         return;
       }
@@ -1690,7 +1690,7 @@ export default class Viewer {
       const res = await validator.setRelaxNGSchema(data);
     } catch (err) {
       this.throwSchemaError({
-        'err': err
+        "err": err
       });
       return
     }
@@ -1751,7 +1751,7 @@ export default class Viewer {
   // Callback for manual validation 
   manualValidate() {
     validate(cm.getValue(), undefined, {
-      'forceValidate': true
+      "forceValidate": true
     })
   }
 
