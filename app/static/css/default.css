@@ -324,7 +324,7 @@ a:active {
   align-items: center;
   justify-content: flex-start;
   gap: 3px;
-  font-size: 100%;
+  font-size: 90%;
   /* pointer-events: none; */
 }
 
@@ -344,6 +344,11 @@ a:active {
   background-color: var(--settingsBackgroundColor);
   border: 1px solid var(--settingsBackgroundAlternativeColor);
   border-radius: 4px;
+  font-family: monospace;
+}
+
+.validation-report div:nth-child(odd) {
+  background: var(--settingsBackgroundAlternativeColor);
 }
 
 .validation-title {
