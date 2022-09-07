@@ -1847,7 +1847,7 @@ export default class Viewer {
         reportDiv.appendChild(p);
       });
     }
-    vs.setAttribute('title', 'Validated against ' + this.currentSchema + '\n' + msg);
+    vs.setAttribute('title', 'Validated against ' + this.currentSchema + ': ' + Object.keys(messages).length + ' validation messages.');
     if (reportDiv) {
       vs.removeEventListener('click', this.manualValidate);
       vs.removeEventListener('click', this.toggleValidationReportVisibility);
