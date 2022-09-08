@@ -379,6 +379,34 @@ a:active {
   fill: grey
 }
 
+/* Overriding Codemirror Defaults */
+.CodeMirror-lint-marker-error
+ {
+  background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="14px"><path fill-rule="evenodd" fill="rgb(175, 51, 51)" d="M3.404 12.596a6.5 6.5 0 119.192-9.192 6.5 6.5 0 01-9.192 9.192zM2.344 2.343a8 8 0 1011.313 11.314A8 8 0 002.343 2.343zM6.03 4.97a.75.75 0 00-1.06 1.06L6.94 8 4.97 9.97a.75.75 0 101.06 1.06L8 9.06l1.97 1.97a.75.75 0 101.06-1.06L9.06 8l1.97-1.97a.75.75 0 10-1.06-1.06L8 6.94 6.03 4.97z"/></svg>');
+}
+
+.CodeMirror-lint-marker-multiple {
+  background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" width="8" viewBox="0 0 16 16"><path stroke="black" stroke-width="1.5px" fill-rule="evenodd" d="M7.75 2a.75.75 0 01.75.75V7h4.25a.75.75 0 110 1.5H8.5v4.25a.75.75 0 11-1.5 0V8.5H2.75a.75.75 0 010-1.5H7V2.75A.75.75 0 017.75 2z"/></svg>');
+  background-repeat: no-repeat;
+  background-position: right bottom;
+  width: 100%; height: 100%;
+}
+
+.CodeMirror-lint-message-error {
+  background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" width="14" viewBox="0 0 16 16"><path fill-rule="evenodd" fill="rgb(175, 51, 51)" d="M2.343 13.657A8 8 0 1113.657 2.343 8 8 0 012.343 13.657zM6.03 4.97a.75.75 0 00-1.06 1.06L6.94 8 4.97 9.97a.75.75 0 101.06 1.06L8 9.06l1.97 1.97a.75.75 0 101.06-1.06L9.06 8l1.97-1.97a.75.75 0 10-1.06-1.06L8 6.94 6.03 4.97z"/></svg>');
+}
+
+.CodeMirror-lint-mark-error {
+  background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" height="8" fill-rule="evenodd" clip-rule="evenodd" viewBox="0 0 160 160"><path fill="rgb(175, 51, 51)" fill-rule="nonzero" stroke="rgb(175, 51, 51)" stroke-width="8" stroke-miterlimit="22.9256" d="M159.627 148.658c-1.395,-1.022 -2.79,-2.155 -4.187,-3.4l0 -0.006c-11.915,-10.738 -22.754,-10.769 -32.517,-0.092l-3.765 -0.525 3.75 0.537c-3.83,4.035 -7.857,6.909 -12.08,8.621 -3.325,1.348 -6.866,2.037 -10.622,2.067 -3.733,0.03 -7.363,-0.597 -10.886,-1.879 -4.611,-1.679 -9.238,-4.587 -13.881,-8.723l0 -0.006c-11.914,-10.738 -22.754,-10.769 -32.516,-0.092l-3.399 -0.474 3.405 0.488c-3.83,4.035 -7.857,6.909 -12.08,8.621 -3.325,1.348 -6.866,2.037 -10.622,2.067 -3.733,0.03 -7.363,-0.597 -10.887,-1.88 -3.272,-1.191 -6.551,-3.001 -9.839,-5.43l0 -7.307c1.083,0.861 2.171,1.784 3.266,2.771l0.006 -0.001c4.193,3.737 8.196,6.299 12.005,7.685 1.957,0.713 3.722,1.063 5.292,1.05 1.549,-0.012 3.226,-0.384 5.029,-1.115 3.439,-1.395 6.878,-3.901 10.316,-7.521l-0.023 -0.003c14.292,-15.632 30.078,-15.664 47.354,-0.097l0.006 -0.001c4.194,3.737 8.196,6.299 12.005,7.686 1.957,0.712 3.722,1.062 5.293,1.05 1.548,-0.013 3.225,-0.384 5.028,-1.116 3.439,-1.394 6.879,-3.902 10.318,-7.522 13.424,-14.686 28.169,-15.601 44.231,-2.751l0 7.298z"/></svg>');
+}
+
+.CodeMirror-lint-message {
+  padding-left: 18px;
+  background-position: top left;
+  background-repeat: no-repeat;
+}
+
+
 .rightButton {
   float: right;
   cursor: pointer;
