@@ -7,6 +7,7 @@
 * Checkbox added to set validation mode to manual
 * UI elements for displaying validation status and report
 * Click and key handlers for showing/hiding report and initiating validation
+* Selector to change Verovio toolkit version (develop, latest, specific versions down to 3.7.0)
 ### 0.5.2 patch: small bug fixes
 * Add chord to beamSpan when notes are selected
 * Fix font selector
