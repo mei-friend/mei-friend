@@ -1638,7 +1638,7 @@ export default class Viewer {
     alert.querySelector('span').innerHTML += '<br />' + newMsg;
   }
 
-  // Hide alert overlay
+  // Hide all alert windows, such as alert overlay
   hideAlerts() {
     let btns = document.getElementsByClassName('alertCloseButton');
     for (let b of btns) {
@@ -1855,14 +1855,18 @@ export default class Viewer {
     }
   }
 
-  // Show/hide #validation-report panel
-  toggleValidationReportVisibility() {
+  // Show/hide #validation-report panel, or force visibility (by string)
+  toggleValidationReportVisibility(forceVisibility = '') {
     let reportDiv = document.getElementById('validation-report');
     if (reportDiv) {
-      if (reportDiv.style.visibility === '' || reportDiv.style.visibility === 'visible')
-        reportDiv.style.visibility = 'hidden'
-      else
-        reportDiv.style.visibility = 'visible';
+      if (typeof forceVisibility === 'string') {
+        reportDiv.style.visibility = forceVisibility;
+      } else {
+        if (reportDiv.style.visibility === '' || reportDiv.style.visibility === 'visible')
+          reportDiv.style.visibility = 'hidden'
+        else
+          reportDiv.style.visibility = 'visible';
+      }
     }
   }
 

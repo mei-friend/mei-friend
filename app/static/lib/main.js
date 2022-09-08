@@ -1179,16 +1179,26 @@ let cmd = {
     logoutFromGithub();
   },
   'consultGuidelines': () => consultGuidelines(),
-  'closeAlerts': () => v.hideAlerts()
+  'closeOverlays': () => {
+    v.hideAlerts();
+    v.toggleValidationReportVisibility('hidden');
+    // TODO: close all other overlays too...
+  }
 };
 
 // add event listeners when controls menu has been instantiated
 function addEventListeners(v, cm) {
   let vp = document.getElementById('verovio-panel');
-  // document.getElementById('alertOverlay').addEventListener('mousedown')
-  document.querySelector('body').addEventListener('mousedown', (ev) => {
+
+  // register global event listeners
+  let body = document.querySelector('body')
+  body.addEventListener('mousedown', (ev) => {
     if (ev.target.id !== 'alertOverlay' && ev.target.id !== 'alertMessage')
       v.hideAlerts();
+  });
+  body.addEventListener('keydown', (ev) => {
+    if (ev.key === 'Escape')
+      cmd.closeOverlays();
   });
 
   // layout notation position
