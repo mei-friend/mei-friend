@@ -1,6 +1,6 @@
 // mei-friend version and date
 const version = '0.6.0';
-const versionDate = '8 Sept 2022';
+const versionDate = '9 Sept 2022';
 
 var vrvWorker;
 var spdWorker;
@@ -10,6 +10,8 @@ var elementAtCursor;
 var breaksParam; // (string) the breaks parameter given through URL
 var pageParam; // (int) page parameter given through URL
 var selectParam; // (array) select ids given through multiple instances in URL
+let platform = navigator.platform.toLowerCase(); // TODO
+// let platform = (navigator?.userAgentData?.platform || navigator?.platform || 'unknown').toLowerCase();
 
 // guidelines base URL, needed to construct element / attribute URLs
 // TODO ideally determine version part automatically
@@ -177,7 +179,7 @@ const defaultCodeMirrorOptions = {
     "' '": completeIfInTag,
     "'='": completeIfInTag,
     "Ctrl-Space": "autocomplete",
-    "Alt-.": consultGuidelines
+    "Alt-.": consultGuidelines,
   },
   lint: {
     "caller": cm,
@@ -388,6 +390,7 @@ async function suspendedValidate(text, updateLinting, options) {
 // when initial page content has been loaded
 document.addEventListener('DOMContentLoaded', function () {
   cm = CodeMirror.fromTextArea(document.getElementById("editor"), defaultCodeMirrorOptions);
+  CodeMirror.normalizeKeyMap();
 
   // set validation status icon to unverified 
   let vs = document.getElementById('validation-status');
@@ -1201,6 +1204,16 @@ function addEventListeners(v, cm) {
       cmd.closeOverlays();
   });
 
+  // Register key handlers to #encoding rather than giving it to CodeMirror directly
+  let enc = document.getElementById('encoding');
+  if (enc) enc.addEventListener('keydown', (ev) => {
+    // Ctrl-Shift-V or Cmd-Shift-V for validation
+    if (isCtrlOrCmd(ev) && ev.shiftKey && ev.key === 'v') {
+      ev.preventDefault();
+      cmd.validate();
+    }
+  });
+
   // layout notation position
   document.getElementById('top').addEventListener('click', cmd.notationTop);
   document.getElementById('bottom').addEventListener('click', cmd.notationBottom);
@@ -1236,7 +1249,7 @@ function addEventListeners(v, cm) {
   document.getElementById('replaceAll').addEventListener('click', () => CodeMirror.commands.replaceAll(cm));
   document.getElementById('jumpToLine').addEventListener('click', () => CodeMirror.commands.jumpToLine(cm));
   document.getElementById('manualValidate').addEventListener('click', cmd.validate);
-  document.querySelectorAll('.keyShortCut').forEach(e => e.classList.add(navigator.platform.startsWith('Mac') ? 'platform-mac' : 'platform-nonmac'));
+  document.querySelectorAll('.keyShortCut').forEach(e => e.classList.add(platform.startsWith('Mac') ? 'platform-mac' : 'platform-nonmac'));
 
   // open URL interface
   document.getElementById('openUrlButton').addEventListener('click', cmd.openUrlFetch);
@@ -1262,8 +1275,7 @@ function addEventListeners(v, cm) {
 
   // Zooming notation with mouse wheel
   vp.addEventListener('wheel', ev => {
-    if ((navigator.platform.toLowerCase().startsWith('mac') && ev.metaKey) ||
-      !navigator.platform.toLowerCase().startsWith('mac') && ev.ctrlKey) {
+    if (isCtrlOrCmd(ev)) {
       ev.preventDefault();
       ev.stopPropagation();
       v.zoom(Math.sign(ev.deltaY) * -5); // scrolling towards user = increase
@@ -1273,8 +1285,7 @@ function addEventListeners(v, cm) {
   // Zooming source image with mouse wheel
   let ip = document.getElementById('image-panel');
   ip.addEventListener('wheel', ev => {
-    if ((navigator.platform.toLowerCase().startsWith('mac') && ev.metaKey) ||
-      !navigator.platform.toLowerCase().startsWith('mac') && ev.ctrlKey) {
+    if (isCtrlOrCmd(ev)) {
       ev.preventDefault();
       ev.stopPropagation();
       zoomSourceImage(Math.sign(ev.deltaY) * -5); // scrolling towards user = increase
@@ -1436,16 +1447,14 @@ function addEventListeners(v, cm) {
 
   // Editor font size zooming
   document.getElementById('encoding').addEventListener('wheel', ev => {
-    if ((navigator.platform.toLowerCase().startsWith('mac') && ev.metaKey) ||
-      !navigator.platform.toLowerCase().startsWith('mac') && ev.ctrlKey) {
+    if (isCtrlOrCmd(ev)) {
       ev.preventDefault();
       ev.stopPropagation();
       v.changeEditorFontSize(Math.sign(ev.deltaY) * -5);
     }
   });
   document.getElementById('encoding').addEventListener('keydown', ev => {
-    if ((navigator.platform.toLowerCase().startsWith('mac') && ev.metaKey) ||
-      !navigator.platform.toLowerCase().startsWith('mac') && ev.ctrlKey) {
+    if (isCtrlOrCmd(ev)) {
       if (ev.key === '-') {
         ev.preventDefault();
         ev.stopPropagation();
@@ -1570,11 +1579,10 @@ function fillInSampleEncodings() {
 
 // sets keyMap.json to target element and defines listeners
 function setKeyMap(keyMapFilePath) {
-  let os = navigator.platform;
   let vp = document.getElementById('notation');
-  if (os.startsWith('Mac')) vp.classList.add('platform-darwin');
-  if (os.startsWith('Win')) vp.classList.add('platform-win32');
-  if (os.startsWith('Linux')) vp.classList.add('platform-linux');
+  if (platform.startsWith('mac')) vp.classList.add('platform-darwin');
+  if (platform.startsWith('win')) vp.classList.add('platform-win32');
+  if (platform.startsWith('linux')) vp.classList.add('platform-linux');
   fetch(keyMapFilePath)
     .then((resp) => {
       return resp.json();
@@ -1610,4 +1618,9 @@ function setKeyMap(keyMapFilePath) {
         }
       }
     });
+}
+
+function isCtrlOrCmd(ev) {
+  return (platform.startsWith('mac') && ev.metaKey) ||
+    (!platform.startsWith('mac') && ev.ctrlKey);
 }
