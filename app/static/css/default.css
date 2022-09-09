@@ -16,6 +16,7 @@
   --defaultDropdownHeadingColor: lightsteelblue;
   /* 10% brigher lightsteelblue */
   --defaultDropdownBackgroundColor: #edf2f7;
+  --defaultValidationStatusBackgroundColor: #edf2f711;
   --defaultDropdownBorderColor: darkgray;
   --defaultOverlayBackgroundColor: cornflowerblue;
   --defaultOverlayTextColor: white;
@@ -51,6 +52,7 @@
   --keyboardShortCutColor: var(--defaultKeyboardShortCutColor);
   --dropdownHeadingColor: var(--defaultDropdownHeadingColor);
   --dropdownBackgroundColor: var(--defaultDropdownBackgroundColor);
+  --validationStatusBackgroundColor: var(--defaultValidationStatusBackgroundColor)
   --dropdownBorderColor: var(--defaultDropdownBorderColor);
   --overlayBackgroundColor: var(--defaultOverlayBackgroundColor);
   --overlayTextColor: var(--defaultOverlayTextColor);
@@ -315,9 +317,9 @@ a:active {
 #validation-status {
   z-index: 5;
   position: relative;
-  width: 48px;
-  margin-right: -48px;
-  height: 16px;
+  width: 3.5em;
+  margin-right: -3.5em;
+  height: 1.2em;
   left: 3px;
   top: 3px;
   display: flex;
@@ -325,7 +327,9 @@ a:active {
   justify-content: flex-start;
   gap: 3px;
   font-size: 90%;
-  /* pointer-events: none; */
+  /* background-color: var(--validationStatusBackgroundColor);
+  border-radius: 4px;
+  padding: 1px; */
 }
 
 .validation-report {
@@ -382,24 +386,24 @@ a:active {
 
 /* Overriding Codemirror Defaults */
 .CodeMirror-lint-marker {
-  width: 1em;
-  height: 1em;
+  width: 1.2em;
+  height: 1.2em;
 }
 
 .CodeMirror-lint-marker-error {
-  background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path fill-rule="evenodd" fill="rgb(175, 51, 51)" d="M3.404 12.596a6.5 6.5 0 119.192-9.192 6.5 6.5 0 01-9.192 9.192zM2.344 2.343a8 8 0 1011.313 11.314A8 8 0 002.343 2.343zM6.03 4.97a.75.75 0 00-1.06 1.06L6.94 8 4.97 9.97a.75.75 0 101.06 1.06L8 9.06l1.97 1.97a.75.75 0 101.06-1.06L9.06 8l1.97-1.97a.75.75 0 10-1.06-1.06L8 6.94 6.03 4.97z"/></svg>');
+  background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision" viewBox="0 0 20 16"><circle fill="white" stroke="rgb(175, 51, 51)" stroke-width="1.75" stroke-miterlimit="22.9256" cx="8.001" cy="8" r="6.875"/><polygon fill="rgb(175, 51, 51)" stroke="rgb(175, 51, 51)" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="2.3662" points="5,10.386 7.386,7.999 5,5.613 5.613,4.999 8,7.386 10.387,4.999 11.001,5.613 8.614,7.999 11.001,10.386 10.387,11 8,8.613 5.613,11 "/></svg>');
 }
 
 .CodeMirror-lint-marker-multiple {
-  background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path stroke="black" stroke-width="1.5px" fill-rule="evenodd" d="M7.75 2a.75.75 0 01.75.75V7h4.25a.75.75 0 110 1.5H8.5v4.25a.75.75 0 11-1.5 0V8.5H2.75a.75.75 0 010-1.5H7V2.75A.75.75 0 017.75 2z"/></svg>');
+  background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision" viewBox="0 0 20 16"><circle fill="none" stroke="rgb(175, 51, 51)" stroke-width="0.75" stroke-miterlimit="22.9256" cx="12.5" cy="8" r="6.75"/><circle fill="none" stroke="rgb(175, 51, 51)" stroke-miterlimit="22.9256" cx="10.5" cy="8" r="6.876"/><circle fill="white" stroke="rgb(175, 51, 51)" stroke-width="1.75" stroke-miterlimit="22.9256" cx="8.001" cy="8" r="6.875"/><polygon fill="rgb(175, 51, 51)" stroke="rgb(175, 51, 51)" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="2.3662" points="5,10.386 7.386,7.999 5,5.613 5.613,4.999 8,7.386 10.387,4.999 11.001,5.613 8.614,7.999 11.001,10.386 10.387,11 8,8.613 5.613,11 "/></svg>');
   background-repeat: no-repeat;
-  background-position: right bottom;
-  width: .25em;
-  height: 1em;
+  background-position: center center;
+  /* width: .25em;
+  height: 1em; */
 }
 
 .CodeMirror-lint-message-error {
-  background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path fill-rule="evenodd" fill="rgb(175, 51, 51)" d="M2.343 13.657A8 8 0 1113.657 2.343 8 8 0 012.343 13.657zM6.03 4.97a.75.75 0 00-1.06 1.06L6.94 8 4.97 9.97a.75.75 0 101.06 1.06L8 9.06l1.97 1.97a.75.75 0 101.06-1.06L9.06 8l1.97-1.97a.75.75 0 10-1.06-1.06L8 6.94 6.03 4.97z"/></svg>');
+  background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision" viewBox="0 0 20 16"><circle fill="rgb(175, 51, 51)" stroke="rgb(175, 51, 51)" stroke-width="1.75" stroke-miterlimit="22.9256" cx="8.001" cy="8" r="6.875"/><polygon fill="rgb(175, 51, 51)" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="2.3662" points="5,10.386 7.386,7.999 5,5.613 5.613,4.999 8,7.386 10.387,4.999 11.001,5.613 8.614,7.999 11.001,10.386 10.387,11 8,8.613 5.613,11 "/></svg>');
 }
 
 .CodeMirror-lint-mark-error {

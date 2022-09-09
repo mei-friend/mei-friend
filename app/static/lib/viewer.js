@@ -589,6 +589,7 @@ export default class Viewer {
       rt.style.setProperty('--navbarBackgroundColor', utils.brighter(cm.backgroundColor, 50));
       rt.style.setProperty('--dropdownHeadingColor', utils.brighter(cm.backgroundColor, 70));
       rt.style.setProperty('--dropdownBackgroundColor', utils.brighter(cm.backgroundColor, 50));
+      rt.style.setProperty('--validationStatusBackgroundColor', utils.brighter(cm.backgroundColor, 50, .3));
       rt.style.setProperty('--dropdownBorderColor', utils.brighter(cm.backgroundColor, 100));
       let att = document.querySelector('.cm-attribute');
       if (att) rt.style.setProperty('--keyboardShortCutColor', utils.brighter(window.getComputedStyle(att).color, 40));
@@ -620,6 +621,7 @@ export default class Viewer {
       rt.style.setProperty('--navbarBackgroundColor', utils.brighter(cm.backgroundColor, -50));
       rt.style.setProperty('--dropdownHeadingColor', utils.brighter(cm.backgroundColor, -70));
       rt.style.setProperty('--dropdownBackgroundColor', utils.brighter(cm.backgroundColor, -50));
+      rt.style.setProperty('--validationStatusBackgroundColor', utils.brighter(cm.backgroundColor, -50, .3));
       rt.style.setProperty('--dropdownBorderColor', utils.brighter(cm.backgroundColor, -100));
       let att = document.querySelector('.cm-attribute');
       if (att) rt.style.setProperty('--keyboardShortCutColor', utils.brighter(window.getComputedStyle(att).color, -40));
