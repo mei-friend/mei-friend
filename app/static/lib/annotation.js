@@ -25,10 +25,14 @@ import {
   symLinkFile,
 } from '../css/icons.js';
 
-let annotations = [];
+export let annotations = [];
 
-export function refreshAnnotationsList() {
+export function situateAndRefreshAnnotationsList() {
   situateAnnotations();
+  refreshAnnotationsList();
+}
+
+export function refreshAnnotationsList() { 
   const list = document.getElementById("listAnnotations");
   // clear list
   while (list.firstChild) {
@@ -149,12 +153,12 @@ export function situateAnnotations() {
     a.firstPage = 'unsituated';
     a.lastPage = -1;
     if ('selection' in a) {
-      a.firstPage = v.getPageWithElement(a.selection[0]);
-      a.lastPage = v.getPageWithElement(a.selection[a.selection.length - 1]);
-      if (a.firstPage < 0) {
+      a.firstPage = v.getPageWithElement(a.selection[0], { id: a.id, type: 'first' });
+      a.lastPage = v.getPageWithElement(a.selection[a.selection.length - 1], { id: a.id, type: 'last' });
+      if (a.firstPage < 0 && v.speedMode) {
         if (v.xmlDoc.querySelector('[*|id=' + a.selection[0] + ']').closest('meiHead')) a.firstPage = 'meiHead';
         else console.warn('Cannot locate annotation ', a);
-      }
+      } // if not speedmode, asynchronous return of page numbers after we are finished here
     }
   })
 }
@@ -163,7 +167,7 @@ export function deleteAnnotation(uuid) {
   const ix = annotations.findIndex(a => a.id === uuid);
   if (ix >= 0) {
     annotations.splice(ix, 1);
-    refreshAnnotationsList();
+    situateAndRefreshAnnotationsList();
   }
 }
 
@@ -280,7 +284,7 @@ export function refreshAnnotations() {
       console.warn("Skipping annotation without type: ", a);
     }
   });
-  refreshAnnotationsList();
+  situateAndRefreshAnnotationsList();
 }
 
 export function addAnnotationHandlers() {

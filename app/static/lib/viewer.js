@@ -6,6 +6,10 @@ import * as speed from './speed.js';
 import * as utils from './utils.js';
 import * as dutils from './dom-utils.js';
 import * as att from './attribute-classes.js';
+import { 
+  annotations,
+  refreshAnnotationsList 
+} from './annotation.js'
 import {
   cm,
   defaultVerovioVersion,
@@ -40,6 +44,7 @@ export default class Viewer {
     this.updateLinting; // CodeMirror function for linting
     this.currentPage = 1;
     this.pageCount = 0;
+    this.DELETE_ME_taskId = 0;
     this.selectedElements = [];
     this.lastNoteId = '';
     this.notationNightMode = false;
@@ -153,27 +158,55 @@ export default class Viewer {
     this.vrvWorker.postMessage(message);
   }
 
-  getPageWithElement(xmlId) {
+  getPageWithElement(xmlId, situateAnno = null) {
+    /* optional param situateAnno: expects an object like
+    { 
+      id: annotationXmlId,
+      type: ['first'|'last']
+    }
+    purpose: allow asynchronous supply of page numbers by web worker
+    compare: situateAnnotations() in annotation.js
+    */
     let pageNumber = -1;
+    let that = this;
     console.log('getPageWithElement(' + xmlId + '), speedMode: ' + this.speedMode);
     if (this.speedMode) {
       pageNumber = speed.getPageWithElement(this.xmlDoc, this.breaksValue(), xmlId);
     } else {
       let promise = new Promise(function (resolve) {
+        that.DELETE_ME_taskId += 1;
         const msg = {
           'cmd': 'getPageWithElement',
-          'msg': xmlId
+          'msg': xmlId,
+          'taskId': that.DELETE_ME_taskId
         };
-        this.vrvWorker.addEventListener('message', function handle(ev) {
-          if (ev.cmd === 'pageWithElement') {
-            this.vrvWorker.removeEventListener('message', handle);
-            resolve(ev.msg);
+        that.vrvWorker.addEventListener('message', function handle(ev) {
+          if (ev.data.cmd === 'pageWithElement') {
+            console.debug("ABOUT TO RESOLVE WITH ", ev.data)
+            resolve(ev.data.msg);
+            that.vrvWorker.removeEventListener('message', handle);
           }
         });
-        this.vrvWorker.postMessage(msg);
-      });
+        that.vrvWorker.postMessage(msg);
+      }.bind(that));
       promise.then(function (p) {
-        pageNumber = p;
+        console.debug("HEARD BACK", p)
+        if(situateAnno && 'id' in situateAnno) { 
+          const ix = annotations.findIndex(a => a.id === situateAnno.id);
+          if(ix >= 0) { // found it
+            switch(situateAnno.type)  {
+              case 'first': 
+                annotations[ix].firstPage = p;
+                break;
+              case 'last':
+                annotations[ix].lastPage = p;
+                break;
+              default:
+                console.error("Called getPageWithElement on Verovio worker with invalid situateAnno: ", situateAnno);
+            }
+            refreshAnnotationsList();
+          }
+        }
       });
     }
     console.log('pageNumber: ', pageNumber);

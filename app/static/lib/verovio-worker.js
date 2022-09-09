@@ -298,10 +298,21 @@ addEventListener('message', function (e) {
       break;
     case 'getPageWithElement':
       try {
+        console.debug("WORKER GOT: ", result.msg)
+        const pageNo = tk.getPageWithElement(result.msg);
+        const aVariableWithAnInt = 99;
+        console.debug("VEROVIO SAYS: ", pageNo)
         result = {
           'cmd': 'pageWithElement',
-          'msg': tk.getPageWithElement(result.msg)
+          'msg': pageNo,
+          'pageNo': pageNo,
+          'thirteen': 13,
+          'string': '13',
+          'variable': aVariableWithAnInt,
+          'xmlId': result.msg,
+          'taskId': result.taskId
         };
+        console.debug("WORKER FOUND: ", result)
       } catch (err) {
         log('getPageWithElement: ' + err);
       }
@@ -329,7 +340,10 @@ addEventListener('message', function (e) {
         'msg': 'Unknown command: ' + result.msg
       };
   };
-  if (result) postMessage(result);
+  if (result) { 
+    console.debug("POSTING RESULT: ", result)
+    postMessage(result);
+  }
 }, false);
 
 function log(e) {

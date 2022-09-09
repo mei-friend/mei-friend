@@ -109,7 +109,7 @@ import {
   refreshGithubMenu,
   setCommitUIEnabledStatus
 } from './github-menu.js';
-import {
+import { 
   forkAndOpen,
   forkRepositoryCancel
 } from './fork-repository.js';
@@ -549,13 +549,13 @@ document.addEventListener('DOMContentLoaded', function () {
   if (forkParam === "true" && urlFileName) {
     if (isLoggedIn && github) {
       forkAndOpen(github, urlFileName);
-    } else {
+    } else { 
       if (storage.supported) {
         storage.safelySetStorageItem("forkAndOpen", urlFileName);
         document.getElementById("GithubLoginLink").click();
       }
     }
-  }
+  } 
   // Retrieve parameters from URL params, from storage, or default values
   if (scaleParam !== null) {
     document.getElementById('verovio-zoom').value = scaleParam;
