@@ -305,12 +305,9 @@ addEventListener('message', function (e) {
         result = {
           'cmd': 'pageWithElement',
           'msg': pageNo,
-          'pageNo': pageNo,
-          'thirteen': 13,
-          'string': '13',
-          'variable': aVariableWithAnInt,
           'xmlId': result.msg,
-          'taskId': result.taskId
+          'taskId': result.taskId,
+          'type': result.type
         };
         console.debug("WORKER FOUND: ", result)
       } catch (err) {

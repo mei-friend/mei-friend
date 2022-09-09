@@ -44,7 +44,6 @@ export default class Viewer {
     this.updateLinting; // CodeMirror function for linting
     this.currentPage = 1;
     this.pageCount = 0;
-    this.DELETE_ME_taskId = 0;
     this.selectedElements = [];
     this.lastNoteId = '';
     this.notationNightMode = false;
@@ -174,14 +173,17 @@ export default class Viewer {
       pageNumber = speed.getPageWithElement(this.xmlDoc, this.breaksValue(), xmlId);
     } else {
       let promise = new Promise(function (resolve) {
-        that.DELETE_ME_taskId += 1;
+        let taskId = Math.random();
         const msg = {
           'cmd': 'getPageWithElement',
           'msg': xmlId,
-          'taskId': that.DELETE_ME_taskId
+          'taskId': taskId,
         };
+        if(situateAnno && 'type' in situateAnno) { 
+          msg.type = situateAnno.type;
+        }
         that.vrvWorker.addEventListener('message', function handle(ev) {
-          if (ev.data.cmd === 'pageWithElement') {
+          if (ev.data.cmd === 'pageWithElement' && ev.data.taskId === taskId) {
             console.debug("ABOUT TO RESOLVE WITH ", ev.data)
             resolve(ev.data.msg);
             that.vrvWorker.removeEventListener('message', handle);
@@ -1567,19 +1569,20 @@ export default class Viewer {
   }
 
   getTimeForElement(id) {
+    let that = this;
     let promise = new Promise(function (resolve) {
       let message = {
         'cmd': 'getTimeForElement',
         'msg': id
       };
-      v.vrvWorker.addEventListener('message', function handle(ev) {
+      that.vrvWorker.addEventListener('message', function handle(ev) {
         if (ev.data.cmd = message.cmd) {
           ev.target.removeEventListener('message', handle);
           resolve(ev.data.cmd);
         }
       });
-      v.vrvWorker.postMessage(message);
-    }); // .bind(this) ??
+      that.vrvWorker.postMessage(message);
+    }.bind(that)); 
     promise.then(
       function (time) {
         return time;

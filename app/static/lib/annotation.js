@@ -112,12 +112,12 @@ export function refreshAnnotationsList() {
     let annotationLocationLabel = '';
     if (a.firstPage === 'meiHead') {
       annotationLocationLabel = `MEI head (${a.selection.length} elements)`;
-    } else if (a.firstPage === 'unsituated') {
+    } else if (a.firstPage === 'unsituated' || a.firstPage < 0) {
       annotationLocationLabel = 'Unsituated';
     } else {
       annotationLocationLabel = 'p. ' + (a.firstPage === a.lastPage ?
           a.firstPage : a.firstPage + "&ndash;" + a.lastPage) +
-        `(${a.selection.length} elements)`;
+        ` (${a.selection.length} elements)`;
     }
     summary.insertAdjacentHTML("beforeend", annotationLocationLabel);
     flipToAnno.addEventListener("click", (e) => {
