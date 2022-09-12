@@ -36,11 +36,11 @@ export const defaultVerovioVersion = 'latest'; // 'develop', '3.10.0'
 export let supportedVerovioVersions = {
   'develop': 'https://www.verovio.org/javascript/develop/verovio-toolkit-wasm.js',
   'latest': 'https://www.verovio.org/javascript/latest/verovio-toolkit-hum.js',
-  // '3.11.0': 'https://www.verovio.org/javascript/3.11.0/verovio-toolkit-hum.js',
-  '3.10.0': 'https://www.verovio.org/javascript/3.10.0/verovio-toolkit-hum.js',
-  '3.9.0': 'https://www.verovio.org/javascript/3.9.0/verovio-toolkit-hum.js',
-  '3.8.1': 'https://www.verovio.org/javascript/3.8.1/verovio-toolkit-hum.js',
-  '3.7.0': 'https://www.verovio.org/javascript/3.7.0/verovio-toolkit-hum.js'
+  '3.11.0': 'https://www.verovio.org/javascript/3.11.0/verovio-toolkit-hum.js',
+//  '3.10.0': 'https://www.verovio.org/javascript/3.10.0/verovio-toolkit-hum.js',
+//  '3.9.0': 'https://www.verovio.org/javascript/3.9.0/verovio-toolkit-hum.js',
+//  '3.8.1': 'https://www.verovio.org/javascript/3.8.1/verovio-toolkit-hum.js',
+//  '3.7.0': 'https://www.verovio.org/javascript/3.7.0/verovio-toolkit-hum.js'
 };
 
 export const sampleEncodings = [];
