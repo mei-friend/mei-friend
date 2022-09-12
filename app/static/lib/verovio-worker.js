@@ -1,5 +1,6 @@
 // importScripts("https://www.verovio.org/javascript/3.10.0/verovio-toolkit-hum.js");
-importScripts("https://www.verovio.org/javascript/latest/verovio-toolkit-wasm.js");
+// importScripts("https://www.verovio.org/javascript/latest/verovio-toolkit-wasm.js");
+// importScripts("https://www.verovio.org/javascript/develop/verovio-toolkit-wasm.js");
 // importScripts("https://www.verovio.org/javascript/develop/verovio-toolkit-hum.js");
 // importScripts(`../verovio-toolkit-hum.js`);
 
@@ -8,30 +9,47 @@ var tkOptions;
 
 loadVerovio = async () => {
   /* create the worker toolkit instance */
-  console.log('Verovio Worker: Loading toolkit...');
+  console.info('VerovioWorker: Loading toolkit...');
   try {
     tk = new verovio.toolkit();
+    tkOptions = {};
     let message = {
       'cmd': 'vrvLoaded',
       'version': tk.getVersion(),
       'availableOptions': tk.getAvailableOptions()
     };
-    console.log('...done.');
+    console.info('Verovio Toolkit ' + message.version + ' loaded.');
     postMessage(message);
   } catch (err) {
-    log(err);
+    log('loadVerovio(): ' + err);
   };
-}
-loadVerovio.bind(this);
+};
 
-onmessage = function (e) {
+addEventListener('message', function (e) {
   let result = e.data;
+  // console.log('verovio-worker: result: ', result);
   result.forceUpdate = false;
   if (!tk && e.data.cmd !== 'loadVerovio') return result;
-  console.info("Worker received: " + result.cmd + ', ', result); // + ', tk:', tk);
+  console.log('VerovioWorker received: "' + result.cmd + '".'); 
   switch (result.cmd) {
     case 'loadVerovio':
-      verovio.module.onRuntimeInitialized = loadVerovio;
+      if (tk) tk.destroy();
+      // here we attempt to delete/destroy the toolkit module...
+      if (typeof verovio !== 'undefined' && 'module' in verovio)
+        delete verovio.module;
+      // if (typeof verovio !== 'undefined')
+      //   verovio = {};
+      // if (typeof Module !== 'undefined') {
+      //   console.log('MODULE: ', Module);
+      //   Module = {};
+      //   console.log('MODULE: ', Module);
+      // }
+      importScripts(result.url);
+      if (['3.7.0', '3.8.1', '3.9.0', '3.10.0'].includes(result.msg)) {
+        console.log('Load Verovio 3.10.0 or earlier');
+        Module.onRuntimeInitialized = loadVerovio
+      } else
+        verovio.module.onRuntimeInitialized = loadVerovio;
       return;
     case 'updateAll':
       try {
@@ -60,7 +78,7 @@ onmessage = function (e) {
         result.svg = tk.renderToSVG(pg);
         result.cmd = 'updated';
       } catch (err) {
-        log(err);
+        log('updateAll: ' + err);
       };
       break;
     case 'updateData':
@@ -86,7 +104,7 @@ onmessage = function (e) {
         result.pageCount = tk.getPageCount();
         result.cmd = 'updated';
       } catch (err) {
-        log(err);
+        log('updateData: ' + err);
       };
       break;
     case 'updatePage':
@@ -100,7 +118,7 @@ onmessage = function (e) {
         result.svg = tk.renderToSVG(result.pageNo);
         result.cmd = 'updated';
       } catch (err) {
-        log(err);
+        log('updatePage: ' + err);
       };
       break;
     case 'updateLayout':
@@ -121,7 +139,7 @@ onmessage = function (e) {
         result.pageCount = tk.getPageCount();
         result.cmd = 'updated';
       } catch (err) {
-        log(err);
+        log('updateLayout: ' + err);
       };
       break;
     case 'updateOption': // just update option without redoing layout
@@ -141,7 +159,7 @@ onmessage = function (e) {
         result.pageCount = tk.getPageCount();
         result.cmd = 'updated';
       } catch (err) {
-        log(err);
+        log('updateOption: ' + err);
       };
       break;
     case 'importData': // all non-MEI formats
@@ -162,7 +180,7 @@ onmessage = function (e) {
         };
         if (tkOptions) tk.setOptions(tkOptions);
       } catch (err) {
-        log(err);
+        log('importData: ' + err);
       }
       break;
     case 'importBinaryData': // compressed XML format
@@ -186,7 +204,7 @@ onmessage = function (e) {
         };
         if (tkOptions) tk.setOptions(tkOptions);
       } catch (err) {
-        log(err);
+        log('importBinaryData: ' + err);
       }
       break;
     case 'reRenderMei':
@@ -210,7 +228,7 @@ onmessage = function (e) {
         else result.mei = tk.getMEI();
         result.cmd = 'updated';
       } catch (err) {
-        log(err);
+        log('reRenderMei: ' + err);
       }
       break;
     case 'navigatePage': // for a page turn during navigation
@@ -225,7 +243,7 @@ onmessage = function (e) {
         let pg = (result.speedMode && result.pageNo > 1) ? 2 : result.pageNo;
         result.svg = tk.renderToSVG(pg);
       } catch (err) {
-        log(err);
+        log('navigatePage: ' + err);
       }
       break;
     case 'computePageBreaks': // compute page breaks
@@ -254,7 +272,7 @@ onmessage = function (e) {
         }
         // console.log('Worker computePageBreaks: ', result.pageBreaks);
       } catch (err) {
-        log(err);
+        log('computePageBreaks: ' + err);
       }
       break;
     case 'exportMidi': // re-load data and export MIDI base-64 string
@@ -265,7 +283,7 @@ onmessage = function (e) {
         result.midi = tk.renderToMIDI();
         result.cmd = 'midi';
       } catch (err) {
-        log(err);
+        log('exportMidi: ' + err);
       }
       break;
     case 'getTimeForElement':
@@ -275,17 +293,25 @@ onmessage = function (e) {
           'msg': tk.getTimeForElement(result.mei)
         };
       } catch (err) {
-        log(err);
+        log('getTimeForElement: ' + err);
       }
       break;
     case 'getPageWithElement':
       try {
+        console.debug("WORKER GOT: ", result.msg)
+        const pageNo = tk.getPageWithElement(result.msg);
+        const aVariableWithAnInt = 99;
+        console.debug("VEROVIO SAYS: ", pageNo)
         result = {
           'cmd': 'pageWithElement',
-          'msg': tk.getPageWithElement(result.msg)
+          'msg': pageNo,
+          'xmlId': result.msg,
+          'taskId': result.taskId,
+          'type': result.type
         };
+        console.debug("WORKER FOUND: ", result)
       } catch (err) {
-        log(err);
+        log('getPageWithElement: ' + err);
       }
       break;
     case 'getElementAttr':
@@ -295,7 +321,7 @@ onmessage = function (e) {
           'msg': tk.getElementAttr(result.mei)
         };
       } catch (err) {
-        log(err);
+        log('getElementAttr: ' + err);
       }
       break;
     case 'stop':
@@ -311,11 +337,14 @@ onmessage = function (e) {
         'msg': 'Unknown command: ' + result.msg
       };
   };
-  if (result) postMessage(result);
-}
+  if (result) { 
+    console.debug("POSTING RESULT: ", result)
+    postMessage(result);
+  }
+}, false);
 
 function log(e) {
-  console.log('Worker error: ', e);
+  console.log('ERROR in VerovioWorker ', e);
   return;
 }
 

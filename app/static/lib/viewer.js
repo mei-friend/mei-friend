@@ -6,32 +6,47 @@ import * as speed from './speed.js';
 import * as utils from './utils.js';
 import * as dutils from './dom-utils.js';
 import * as att from './attribute-classes.js';
+import { 
+  annotations,
+  generateAnnotationLocationLabel
+} from './annotation.js'
 import {
   cm,
+  defaultVerovioVersion,
   fontList,
+  rngLoader,
   storage,
-  tkVersion
+  supportedVerovioVersions,
+  tkVersion,
+  validate,
+  validator
 } from './main.js';
 import {
   drawSourceImage,
   highlightZone,
   zoomSourceImage
 } from './source-imager.js';
-import schema_meiCMN_401 from '../schemaInfo/mei-CMN-4.0.1.schemaInfo.js';
-import schema_meiAll_401 from '../schemaInfo/mei-all-4.0.1.schemaInfo.js';
-
+import {
+  alert,
+  download,
+  verified,
+  unverified
+} from '../css/icons.js';
 
 export default class Viewer {
 
   constructor(vrvWorker, spdWorker) {
     this.vrvWorker = vrvWorker;
     this.spdWorker = spdWorker;
+    this.validatorInitialized = false;
+    this.validatorWithSchema = false;
+    this.currentSchema = '';
+    this.updateLinting; // CodeMirror function for linting
     this.currentPage = 1;
     this.pageCount = 0;
     this.selectedElements = [];
     this.lastNoteId = '';
     this.notationNightMode = false;
-    // this.tkOptions = this.vrvToolkit.getAvailableOptions();
     this.updateNotation = true; // whether or not notation gets re-rendered after text changes
     this.speedMode = true; // speed mode (just feeds on page to Verovio to reduce drawing time)
     this.parser = new DOMParser();
@@ -142,31 +157,72 @@ export default class Viewer {
     this.vrvWorker.postMessage(message);
   }
 
-  getPageWithElement(xmlId) {
+  getPageWithElement(xmlId, situateAnno = null) {
+    /* optional param situateAnno: expects an object like
+    { 
+      id: annotationXmlId,
+      type: ['first'|'last']
+    }
+    purpose: allow asynchronous supply of page numbers by web worker
+    compare: situateAnnotations() in annotation.js
+    */
     let pageNumber = -1;
+    let that = this;
     console.log('getPageWithElement(' + xmlId + '), speedMode: ' + this.speedMode);
     if (this.speedMode) {
       pageNumber = speed.getPageWithElement(this.xmlDoc, this.breaksValue(), xmlId);
     } else {
       let promise = new Promise(function (resolve) {
+        let taskId = Math.random();
         const msg = {
           'cmd': 'getPageWithElement',
-          'msg': xmlId
+          'msg': xmlId,
+          'taskId': taskId,
         };
-        this.vrvWorker.addEventListener('message', function handle(ev) {
-          if (ev.cmd === 'pageWithElement') {
-            this.vrvWorker.removeEventListener('message', handle);
-            resolve(ev.msg);
+        if(situateAnno && 'type' in situateAnno) { 
+          msg.type = situateAnno.type;
+        }
+        that.vrvWorker.addEventListener('message', function handle(ev) {
+          if (ev.data.cmd === 'pageWithElement' && ev.data.taskId === taskId) {
+            console.debug("ABOUT TO RESOLVE WITH ", ev.data)
+            resolve(ev.data.msg);
+            that.vrvWorker.removeEventListener('message', handle);
           }
         });
-        this.vrvWorker.postMessage(msg);
-      });
+        that.vrvWorker.postMessage(msg);
+      }.bind(that));
       promise.then(function (p) {
-        pageNumber = p;
+        console.debug("HEARD BACK", p)
+        if(situateAnno && 'id' in situateAnno) { 
+          const ix = annotations.findIndex(a => a.id === situateAnno.id);
+          if(ix >= 0) { // found it
+            switch(situateAnno.type)  {
+              case 'first': 
+                annotations[ix].firstPage = p;
+                break;
+              case 'last':
+                annotations[ix].lastPage = p;
+                break;
+              default:
+                console.error("Called getPageWithElement on Verovio worker with invalid situateAnno: ", situateAnno);
+            }
+            const annotationLocationLabelElement = document.querySelector(`.annotationLocationLabel[data-id=${situateAnno.id}`);
+            if(annotationLocationLabelElement)  {
+              annotationLocationLabelElement.innerHTML = generateAnnotationLocationLabel(annotations[ix]).innerHTML;
+            }
+          }
+        }
       });
     }
     console.log('pageNumber: ', pageNumber);
     return pageNumber;
+  }
+
+  gotPageNumber(ev) {
+    if (ev.cmd === 'pageWithElement') {
+      this.vrvWorker.removeEventListener('message', handle);
+      resolve(ev.msg);
+    }
   }
 
 
@@ -347,10 +403,9 @@ export default class Viewer {
 
   updatePageNumDisplay() {
     let pg = (this.pageCount < 0) ? '?' : this.pageCount;
-    document.getElementById("pagination1").innerHTML = 'Page';;
-    document.getElementById("pagination2").innerHTML =
-      `&nbsp;${this.currentPage}&nbsp;`;
-    document.getElementById("pagination3").innerHTML = `of ${pg}`;
+    document.getElementById('pagination1').innerHTML = 'Page';;
+    document.getElementById('pagination2').innerHTML = `&nbsp;${this.currentPage}&nbsp;`;
+    document.getElementById('pagination3').innerHTML = `of ${pg}`;
   }
 
   // set cursor to first note id in page, taking st/ly of id, if possible
@@ -463,6 +518,7 @@ export default class Viewer {
     }
   }
 
+  // Scroll notation SVG into view, both vertically and horizontally
   scrollSvg(cm) {
     let vp = document.getElementById('verovio-panel');
     let el = document.querySelector('g#' + utils.getElementIdAtCursor(cm));
@@ -490,6 +546,7 @@ export default class Viewer {
   notationUpdated(cm, forceUpdate = false) {
     // console.log('NotationUpdated forceUpdate:' + forceUpdate);
     this.encodingHasChanged = true;
+    this.checkSchema(cm.getValue());
     let ch = document.getElementById('live-update-checkbox');
     if (this.updateNotation && ch && ch.checked || forceUpdate)
       this.updateData(cm, false, false);
@@ -577,6 +634,7 @@ export default class Viewer {
       rt.style.setProperty('--navbarBackgroundColor', utils.brighter(cm.backgroundColor, 50));
       rt.style.setProperty('--dropdownHeadingColor', utils.brighter(cm.backgroundColor, 70));
       rt.style.setProperty('--dropdownBackgroundColor', utils.brighter(cm.backgroundColor, 50));
+      rt.style.setProperty('--validationStatusBackgroundColor', utils.brighter(cm.backgroundColor, 50, .3));
       rt.style.setProperty('--dropdownBorderColor', utils.brighter(cm.backgroundColor, 100));
       let att = document.querySelector('.cm-attribute');
       if (att) rt.style.setProperty('--keyboardShortCutColor', utils.brighter(window.getComputedStyle(att).color, 40));
@@ -608,6 +666,7 @@ export default class Viewer {
       rt.style.setProperty('--navbarBackgroundColor', utils.brighter(cm.backgroundColor, -50));
       rt.style.setProperty('--dropdownHeadingColor', utils.brighter(cm.backgroundColor, -70));
       rt.style.setProperty('--dropdownBackgroundColor', utils.brighter(cm.backgroundColor, -50));
+      rt.style.setProperty('--validationStatusBackgroundColor', utils.brighter(cm.backgroundColor, -50, .3));
       rt.style.setProperty('--dropdownBorderColor', utils.brighter(cm.backgroundColor, -100));
       let att = document.querySelector('.cm-attribute');
       if (att) rt.style.setProperty('--keyboardShortCutColor', utils.brighter(window.getComputedStyle(att).color, -40));
@@ -632,6 +691,7 @@ export default class Viewer {
 
   } // setMenuColors()
 
+  // Control zoom of notation display and update Verovio layout
   zoom(delta, storage = null) {
     let zoomCtrl = document.getElementById('verovio-zoom');
     if (zoomCtrl) {
@@ -660,7 +720,6 @@ export default class Viewer {
     let el = document.getElementById('verovio-panel');
     el.setAttribute('tabindex', '-1');
     el.focus();
-    // $(".mei-friend").attr('tabindex', '-1').focus();
   }
 
   showSettingsPanel() {
@@ -678,17 +737,6 @@ export default class Viewer {
     document.getElementById('showSettingsButton').style.visibility = 'visible';
   }
 
-  toggleAnnotationPanel() {
-    setOrientation(cm);
-    if (this.speedMode &&
-      document.getElementById('breaks-select').value == 'auto') {
-      this.pageBreaks = {};
-      this.updateAll(cm);
-    } else {
-      this.updateLayout();
-    }
-  }
-
   toggleSettingsPanel(ev = null) {
     if (ev) {
       console.log('stop propagation')
@@ -701,6 +749,22 @@ export default class Viewer {
     } else {
       this.showSettingsPanel();
     }
+  }
+
+  toggleAnnotationPanel() {
+    setOrientation(cm);
+    if (this.speedMode &&
+      document.getElementById('breaks-select').value == 'auto') {
+      this.pageBreaks = {};
+      this.updateAll(cm);
+    } else {
+      this.updateLayout();
+    }
+  }
+
+  clearVrvOptionsSettingsPanel() {
+    this.vrvOptions = {};
+    document.getElementById('verovioSettings').innerHTML = '';
   }
 
   // initializes the settings panel by filling it with content
@@ -829,6 +893,16 @@ export default class Viewer {
         step: 1,
         default: 1
       },
+      meifriendSeparator: {
+        title: 'options-line', // class name of hr element
+        type: 'line'
+      },
+      autoValidate: {
+        title: 'Auto validation',
+        description: 'Validate encoding against schema automatically after each edit',
+        type: 'bool',
+        default: true
+      },
       foldGutter: {
         title: 'Code folding',
         description: 'Enable code folding through fold gutters',
@@ -865,13 +939,6 @@ export default class Viewer {
         type: 'select',
         default: 'default',
         values: ['default', 'vim', 'emacs']
-      },
-      hintOptions: {
-        title: 'Show hints for schema',
-        description: 'Show hints for selected XML schema and autocomplete',
-        type: 'select',
-        default: 'schema_meiCMN_401',
-        values: ['schema_meiCMN_401', 'schema_meiAll_401', 'none']
       },
     };
     let storage = window.localStorage;
@@ -920,6 +987,15 @@ export default class Viewer {
         } else {
           storage['cm-' + option] = value; // save changes in localStorage object
         }
+        if (option === 'autoValidate') { // validate if auto validation is switched on again
+          if (value) {
+            validate(cm.getValue(), this.updateLinting, {
+              'forceValidate': true
+            })
+          } else {
+            this.setValidationStatusToManual();
+          }
+        }
       });
       cmsp.addEventListener('click', ev => {
         if (ev.target.id === 'cmReset') {
@@ -944,10 +1020,12 @@ export default class Viewer {
 
   addMeiFriendOptionsToSettingsPanel(restoreFromLocalStorage = true) {
     let optionsToShow = {
-      titleAnnotationPanel: {
-        title: 'Annotation panel',
-        description: 'Annotation panel',
-        type: 'header'
+      selectToolkitVersion: {
+        title: 'Verovio version',
+        description: 'SeleSelect Verovio toolkit version',
+        type: 'select',
+        default: defaultVerovioVersion,
+        values: Object.keys(supportedVerovioVersions)
       },
       showAnnotationPanel: {
         title: 'Show annotation panel',
@@ -1204,6 +1282,13 @@ export default class Viewer {
         if (ev.target.type === 'number') value = parseFloat(value);
         let col = document.getElementById('suppliedColor').value;
         switch (option) {
+          case 'selectToolkitVersion':
+            this.vrvWorker.postMessage({
+              'cmd': 'loadVerovio',
+              'msg': value,
+              'url': supportedVerovioVersions[value]
+            });
+            break;
           case 'showAnnotationPanel':
             this.toggleAnnotationPanel();
             break;
@@ -1289,17 +1374,6 @@ export default class Viewer {
   // Apply options to CodeMirror object and handle other specialized options
   applyEditorOption(cm, option, value, matchTheme = false) {
     switch (option) {
-      case 'hintOptions':
-        if (value === 'schema_meiAll_401')
-          cm.setOption(option, {
-            'schemaInfo': schema_meiAll_401
-          });
-        else if (value === 'schema_meiCMN_401')
-          cm.setOption(option, {
-            'schemaInfo': schema_meiCMN_401
-          });
-        else cm.setOption(option, {}); // hints: none
-        break;
       case 'zoomFont':
         this.changeEditorFontSize(value);
         break;
@@ -1507,19 +1581,20 @@ export default class Viewer {
   }
 
   getTimeForElement(id) {
+    let that = this;
     let promise = new Promise(function (resolve) {
       let message = {
         'cmd': 'getTimeForElement',
         'msg': id
       };
-      v.vrvWorker.addEventListener('message', function handle(ev) {
+      that.vrvWorker.addEventListener('message', function handle(ev) {
         if (ev.data.cmd = message.cmd) {
           ev.target.removeEventListener('message', handle);
           resolve(ev.data.cmd);
         }
       });
-      v.vrvWorker.postMessage(message);
-    }); // .bind(this) ??
+      that.vrvWorker.postMessage(message);
+    }.bind(that)); 
     promise.then(
       function (time) {
         return time;
@@ -1577,7 +1652,7 @@ export default class Viewer {
     else el.parentNode.classList.remove('disabled');
   }
 
-  // show alert to user
+  // show alert to user in #alertOverlay
   // type: ['error'] 'warning' 'info' 'success'
   // disappearAfter: in milliseconds
   showAlert(message, type = 'error', disappearAfter = 30000) {
@@ -1605,16 +1680,241 @@ export default class Viewer {
     }, disappearAfter);
   }
 
+  // Update alert message of #alertOverlay
   updateAlert(newMsg) {
     let alert = document.getElementById('alertOverlay');
     alert.querySelector('span').innerHTML += '<br />' + newMsg;
   }
 
+  // Hide all alert windows, such as alert overlay
   hideAlerts() {
     let btns = document.getElementsByClassName('alertCloseButton');
     for (let b of btns) {
       if (this.alertCloser) clearTimeout(this.alertCloser);
       b.parentElement.style.display = 'none';
+    }
+  }
+
+  // Method to check from MEI whether the XML schema filename has changed
+  async checkSchema(mei) {
+    console.log('Validation: checking for schema...')
+    let vr = document.getElementById('validation-report');
+    if (vr) vr.style.visibility = 'hidden';
+    const hasSchema = /<\?xml-model.*schematypens=\"http?:\/\/relaxng\.org\/ns\/structure\/1\.0\"/
+    const hasSchemaMatch = hasSchema.exec(mei);
+    if (!hasSchemaMatch) return;
+    const schema = /<\?xml-model.*href="([^"]*).*/;
+    const schemaMatch = schema.exec(mei);
+    if (schemaMatch && schemaMatch[1] !== this.currentSchema) {
+      this.currentSchema = schemaMatch[1];
+      console.log('Validation: ...new schema ' + this.currentSchema);
+      await this.replaceSchema(this.currentSchema);
+    } else {
+      console.log('Validation: same schema.');
+    }
+  }
+
+  // Loads and replaces XML schema; throws errors if not found/CORS error, 
+  // update validation-status icon
+  async replaceSchema(schemaFile) {
+    if (!this.validatorInitialized) return;
+    let vs = document.getElementById('validation-status');
+    vs.innerHTML = download;
+    vs.setAttribute('title', 'Loading schema ' + schemaFile);
+    this.changeStatus(vs, 'wait', ['error', 'ok', 'manual']);
+
+    console.log('Replace schema: ' + schemaFile);
+    let data; // content of schema file
+    try {
+    const response = await fetch(schemaFile);
+    if (!response.ok) { // schema not found
+        this.throwSchemaError({
+          "response": response,
+          "schemaFile": schemaFile
+        });
+      return;
+    }
+      data = await response.text();
+    const res = await validator.setRelaxNGSchema(data);
+    } catch (err) {
+      this.throwSchemaError({
+        "err": err
+      });
+      return
+    }
+    vs.setAttribute('title', 'Schema loaded ' + schemaFile);
+    vs.innerHTML = unverified;
+    this.validatorWithSchema = true;
+    if (document.getElementById('autoValidate').checked)
+    validate(cm.getValue(), this.updateLinting, true)
+    else
+      this.setValidationStatusToManual();
+    console.log("New schema loaded to validator", schemaFile);
+    rngLoader.setRelaxNGSchema(data);
+    cm.options.hintOptions.schemaInfo = rngLoader.tags
+    console.log("New schema loaded to hinting system", schemaFile);
+  }
+
+  // Throw an schema error and update validation-status icon
+  throwSchemaError(msgObj) {
+    this.validatorWithSchema = false;
+    let msg;
+    if (msgObj.hasOwnProperty('response'))
+      msg = 'Schema not found (' + msgObj.response.status + ' ' +
+      msgObj.response.statusText + ': ' + msgObj.schemaFile + ')';
+    if (msgObj.hasOwnProperty('err'))
+      msg = msgObj.err;
+    let vs = document.getElementById('validation-status');
+    vs.innerHTML = unverified;
+    vs.setAttribute('title', msg);
+    console.warn(msg);
+    this.changeStatus(vs, 'error', ['wait', 'ok', 'manual']);
+    return;
+  }
+
+
+  // helper function that adds addedClass (string) 
+  // after removing removedClasses (array of strings)
+  // from el (DOM element) 
+  changeStatus(el, addedClass = '', removedClasses = []) {
+    removedClasses.forEach(c => el.classList.remove(c));
+    el.classList.add(addedClass);
+  }
+
+  // Switch validation-status icon to manual mode and add click event handlers
+  setValidationStatusToManual() {
+    let vs = document.getElementById('validation-status');
+    vs.innerHTML = unverified;
+    vs.style.cursor = 'pointer';
+    vs.setAttribute('title', 'Not validated. Press here to validate.');
+    vs.removeEventListener('click', this.manualValidate);
+    vs.removeEventListener('click', this.toggleValidationReportVisibility);
+    vs.addEventListener('click', this.manualValidate);
+    this.changeStatus(vs, 'manual', ['wait', 'ok', 'error']);
+    let reportDiv = document.getElementById('validation-report');
+    if (reportDiv) reportDiv.style.visibility = 'hidden';
+    if (this.updateLinting) this.updateLinting(cm, []); // clear errors in CodeMirror
+  }
+
+  // Callback for manual validation 
+  manualValidate() {
+    validate(cm.getValue(), undefined, {
+      "forceValidate": true
+    })
+  }
+
+  // Highlight validation results in CodeMirror editor linting system
+  highlightValidation(text, validation) {
+    let lines;
+    let found = [];
+    let i = 0;
+    let messages;
+
+    try {
+      lines = text.split("\n");
+      messages = JSON.parse(validation);
+    } catch (err) {
+      console.log("Could not parse json:", err);
+      return;
+    }
+
+    // sort messages by line number
+    messages.sort((a, b) => {
+      if (a.line < b.line) return -1;
+      if (a.line > b.line) return 1;
+      return 0;
+    });
+
+    // parse error messages into an array for CodeMirror
+    while (i < messages.length) {
+      let line = Math.max(messages[i].line - 1, 0);
+      found.push({
+        from: new CodeMirror.Pos(line, 0),
+        to: new CodeMirror.Pos(line, lines[line].length),
+        severity: "error",
+        message: messages[i].message
+      });
+      i += 1;
+    }
+    this.updateLinting(cm, found);
+
+    // update overall status of validation 
+    let vs = document.getElementById('validation-status');
+    vs.querySelector('svg').classList.remove('clockwise');
+    let reportDiv = document.getElementById('validation-report');
+    if (reportDiv) reportDiv.innerHTML = '';
+
+    let msg = '';
+    if (found.length == 0 && this.validatorWithSchema) {
+      this.changeStatus(vs, 'ok', ['error', 'wait', 'manual']);
+      vs.innerHTML = verified;
+      msg = 'Everything ok, no errors.';
+    } else {
+      this.changeStatus(vs, 'error', ['wait', 'ok', 'manual']);
+      vs.innerHTML = alert;
+      vs.innerHTML += '<span>' + Object.keys(messages).length + '</span>';
+      msg = 'Validation failed. ' + Object.keys(messages).length + ' validation messages:';
+      messages.forEach(m => msg += '\nLine ' + m.line + ': ' + m.message);
+
+      // detailed validation report
+      if (!reportDiv) {
+        reportDiv = document.createElement('div');
+        reportDiv.id = 'validation-report';
+        reportDiv.classList.add('validation-report');
+        let CM = document.querySelector('.CodeMirror');
+        CM.parentElement.insertBefore(reportDiv, CM);
+      } else {
+        reportDiv.style.visibility = 'visible';
+      }
+      let closeButton = document.createElement('span');
+      closeButton.classList.add('rightButton');
+      closeButton.innerHTML = '&times';
+      closeButton.addEventListener('click', (ev) => reportDiv.style.visibility = 'hidden');
+      reportDiv.appendChild(closeButton);
+      let p = document.createElement('div');
+      p.classList.add('validation-title');
+      p.innerHTML = 'Validation failed. ' + Object.keys(messages).length + ' validation messages:';
+      reportDiv.appendChild(p);
+      messages.forEach((m, i) => {
+        let p = document.createElement('div');
+        p.classList.add('validation-item');
+        p.id = 'error' + i;
+        p.innerHTML = 'Line ' + m.line + ': ' + m.message;
+        p.addEventListener('click', (ev) => {
+          cm.scrollIntoView({
+            from: {
+              line: Math.max(0, m.line - 5),
+              ch: 0
+            },
+            to: {
+              line: Math.min(cm.lineCount() - 1, m.line + 5),
+              ch: 0
+            }
+          });
+        });
+        reportDiv.appendChild(p);
+      });
+    }
+    vs.setAttribute('title', 'Validated against ' + this.currentSchema + ': ' + Object.keys(messages).length + ' validation messages.');
+    if (reportDiv) {
+      vs.removeEventListener('click', this.manualValidate);
+      vs.removeEventListener('click', this.toggleValidationReportVisibility);
+      vs.addEventListener('click', this.toggleValidationReportVisibility);
+    }
+  }
+
+  // Show/hide #validation-report panel, or force visibility (by string)
+  toggleValidationReportVisibility(forceVisibility = '') {
+    let reportDiv = document.getElementById('validation-report');
+    if (reportDiv) {
+      if (typeof forceVisibility === 'string') {
+        reportDiv.style.visibility = forceVisibility;
+      } else {
+        if (reportDiv.style.visibility === '' || reportDiv.style.visibility === 'visible')
+          reportDiv.style.visibility = 'hidden'
+        else
+          reportDiv.style.visibility = 'visible';
+      }
     }
   }
 

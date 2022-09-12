@@ -25,16 +25,22 @@ import {
   symLinkFile,
 } from '../css/icons.js';
 
-let annotations = [];
+export let annotations = [];
 
-export function refreshAnnotationsList() {
+export function situateAndRefreshAnnotationsList(forceRefresh=false) {
   situateAnnotations();
+  if(forceRefresh || !document.getElementsByClassName('annotationListItem').length)
+    refreshAnnotationsList();
+}
+
+export function refreshAnnotationsList() { 
   const list = document.getElementById("listAnnotations");
   // clear list
   while (list.firstChild) {
     list.removeChild(list.lastChild);
   }
-  console.log("Annotations: ",annotations);
+  // console.log("Annotations: ",annotations);
+  
   // add web annotation button
   const addWebAnnotation = document.createElement("span");
   const rdfIcon = document.createElement("span");
@@ -104,17 +110,8 @@ export function refreshAnnotationsList() {
       default:
         console.warn("Unknown type when drawing annotation in list: ", a);
     }
-    let annotationLocationLabel = '';
-    if (a.firstPage === 'meiHead') {
-      annotationLocationLabel = `MEI head (${a.selection.length} elements)`;
-    } else if (a.firstPage === 'unsituated') {
-      annotationLocationLabel = 'Unsituated';
-    } else {
-      annotationLocationLabel = 'p. ' + (a.firstPage === a.lastPage ?
-          a.firstPage : a.firstPage + "&ndash;" + a.lastPage) +
-        `(${a.selection.length} elements)`;
-    }
-    summary.insertAdjacentHTML("beforeend", annotationLocationLabel);
+    const annotationLocationLabel = generateAnnotationLocationLabel(a);
+    summary.appendChild(annotationLocationLabel);
     flipToAnno.addEventListener("click", (e) => {
       console.debug("Flipping to annotation: ", a);
       v.updatePage(cm, a.firstPage);
@@ -140,6 +137,22 @@ export function refreshAnnotationsList() {
   });
 }
 
+export function generateAnnotationLocationLabel(a) { 
+  const annotationLocationLabel = document.createElement("span");
+  if (a.firstPage === 'meiHead') {
+    annotationLocationLabel.innerHTML = `MEI head (${a.selection.length} elements)`;
+  } else if (a.firstPage === 'unsituated' || a.firstPage < 0) {
+    annotationLocationLabel.innerHTML = 'Unsituated';
+  } else {
+    annotationLocationLabel.innerHTML = 'p. ' + (a.firstPage === a.lastPage ?
+        a.firstPage : a.firstPage + "&ndash;" + a.lastPage) +
+      ` (${a.selection.length} elements)`;
+  }
+  annotationLocationLabel.classList.add("annotationLocationLabel");
+  annotationLocationLabel.dataset.id = a.id;
+  return annotationLocationLabel;
+}
+
 // call whenever layout reflows to re-situate annotations appropriately
 export function situateAnnotations() {
   annotations.forEach(a => {
@@ -148,12 +161,12 @@ export function situateAnnotations() {
     a.firstPage = 'unsituated';
     a.lastPage = -1;
     if ('selection' in a) {
-      a.firstPage = v.getPageWithElement(a.selection[0]);
-      a.lastPage = v.getPageWithElement(a.selection[a.selection.length - 1]);
-      if (a.firstPage < 0) {
+      a.firstPage = v.getPageWithElement(a.selection[0], { id: a.id, type: 'first' });
+      a.lastPage = v.getPageWithElement(a.selection[a.selection.length - 1], { id: a.id, type: 'last' });
+      if (a.firstPage < 0 && v.speedMode) {
         if (v.xmlDoc.querySelector('[*|id=' + a.selection[0] + ']').closest('meiHead')) a.firstPage = 'meiHead';
         else console.warn('Cannot locate annotation ', a);
-      }
+      } // if not speedmode, asynchronous return of page numbers after we are finished here
     }
   })
 }
@@ -162,7 +175,7 @@ export function deleteAnnotation(uuid) {
   const ix = annotations.findIndex(a => a.id === uuid);
   if (ix >= 0) {
     annotations.splice(ix, 1);
-    refreshAnnotationsList();
+    situateAndRefreshAnnotationsList(true);
   }
 }
 
@@ -242,7 +255,7 @@ function drawLink(a) {
 }
 
 // Draws annotations in Verovio notation panel
-export function refreshAnnotations() {
+export function refreshAnnotations(forceListRefresh = false) {
   // clear rendered annotations container
   const rac = document.getElementById("renderedAnnotationsContainer");
   rac.innerHTML = "";
@@ -279,7 +292,7 @@ export function refreshAnnotations() {
       console.warn("Skipping annotation without type: ", a);
     }
   });
-  refreshAnnotationsList();
+  situateAndRefreshAnnotationsList(forceListRefresh);
 }
 
 export function addAnnotationHandlers() {
@@ -304,7 +317,7 @@ export function addAnnotationHandlers() {
       default:
         console.warn("Don't have a handler for this type of annotation", e);
     }
-    refreshAnnotations();
+    refreshAnnotations(true);
   }
 
   // functions to create annotations
@@ -340,7 +353,9 @@ export function addAnnotationHandlers() {
   })
   const createLink = (e => {
     // TODO improve UX!
-    const url = window.prompt("Please enter a url to link to");
+    let url = window.prompt("Please enter a url to link to");
+    if(!url.startsWith("http"))
+      url = "https://" + url;
     const a = {
       "id": "annot-" + generateUUID(),
       "type": "annotateLink",
@@ -357,6 +372,7 @@ export function addAnnotationHandlers() {
 
 // reads <annot> elements from XML DOM and adds them into annotations array
 export function readAnnots() {
+  console.debug("readannots called with annotations ", annotations)
   if (!v.xmlDoc) return;
   let annots = Array.from(v.xmlDoc.querySelectorAll('annot'));
   annots = annots.filter(annot => annotations.findIndex(a => a.id !== annot.getAttribute('xml:id')));
@@ -388,10 +404,16 @@ export function readAnnots() {
       annotation.id = "None";
     }
     annotation.isInline = true;
-    if(annotations.findIndex(a => annotation.id) === -1)
+    console.debug("Decision time for ", annot)
+    if(annotations.findIndex(a => a.id === annotation.id) === -1) {
       // only if not already included
       // FIXME: will ignore all but the first annotation without xml:id
       annotations.push(annotation);
+      console.debug("thumbs up for ", annot)
+    } else { 
+      console.debug("thumbs DOWN for ", annot)
+    }
+    console.debug("ending with annotations", annotations)
   });
   refreshAnnotations();
 }

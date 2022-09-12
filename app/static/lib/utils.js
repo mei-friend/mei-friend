@@ -554,7 +554,7 @@ export function getOS() {
 }
 
 // accepts color as string: "rgb(100,12,255)" and hex string "#ffee10" or
-export function brighter(rgbString, deltaPercent) {
+export function brighter(rgbString, deltaPercent, alpha = 1) {
   let rgb = [];
   if (rgbString.startsWith('#')) {
     rgb = hexToRgb(rgbString);
@@ -562,6 +562,7 @@ export function brighter(rgbString, deltaPercent) {
     rgb = rgbString.slice(4, -1).split(',');
   }
   rgb = rgb.map(i => Math.max(0, Math.min(parseInt(i) + deltaPercent, 255)));
+  if (alpha < 1) rgb.push(alpha);
   return 'rgb(' + rgb.join(', ') + ')';
 }
 

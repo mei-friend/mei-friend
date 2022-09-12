@@ -24,7 +24,7 @@
   /* Take the remaining width */
   flex: 1;
   /* Misc */
-  align-items: center;
+  /* align-items: center; */
   display: flex;
   justify-content: center;
 }

@@ -4,10 +4,11 @@
 var timeSpanningElements; // from attribute-classes.js
 
 // message handler
-onmessage = function(e) {
+onmessage = function (e) {
   let result = {};
   let t1 = performance.now();
-  console.info("SpeedWorker received: " + e.data.cmd + ', ', e.data);
+  console.info("SpeedWorker received: " + e.data.cmd + '. ');
+  // console.info("SpeedWorker received: " + e.data.cmd + ', ', e.data);
   switch (e.data.cmd) {
     case 'variables': // receive const from attribute-classes.js
       timeSpanningElements = e.data.var;
@@ -219,10 +220,11 @@ function parse(S, options) {
           var closeTag = S.substring(closeStart, pos)
           if (closeTag.indexOf(tagName) == -1) {
             var parsedText = S.substring(0, pos).split('\n');
-            throw new Error(
-              'Unexpected close tag\nLine: ' + (parsedText.length - 1) +
-              '\nColumn: ' + (parsedText[parsedText.length - 1].length + 1) +
-              '\nChar: ' + S[pos]
+            console.error(
+              'SpeedWorker Parsing Error: Unexpected close tag:' +
+              ' Line ' + (parsedText.length - 1) +
+              ', Column ' + (parsedText[parsedText.length - 1].length + 1) +
+              ', Char ' + S[pos]
             );
           }
 
@@ -467,7 +469,7 @@ function simplify(children) {
     return children[0];
   }
   // map each object
-  children.forEach(function(child) {
+  children.forEach(function (child) {
     if (typeof child !== 'object') {
       return;
     }
@@ -508,7 +510,7 @@ function simplifyLostLess(children, parentAttributes = {}) {
     } : children[0];
   }
   // map each object
-  children.forEach(function(child) {
+  children.forEach(function (child) {
     if (typeof child !== 'object') {
       return;
     }
@@ -531,8 +533,8 @@ function simplifyLostLess(children, parentAttributes = {}) {
  */
 function filter(children, f, dept = 0, path = '') {
   var out = [];
-  children.forEach(function(child, i) {
-    if (typeof(child) === 'object' && f(child, i, dept, path)) out.push(child);
+  children.forEach(function (child, i) {
+    if (typeof (child) === 'object' && f(child, i, dept, path)) out.push(child);
     if (child.children) {
       var kids = filter(child.children, f, dept + 1, (path ? path + '.' : '') + i + '.' + child.tagName);
       out = out.concat(kids);
@@ -597,7 +599,7 @@ function stringify(O) {
 function toContentString(tDom) {
   if (Array.isArray(tDom)) {
     var out = '';
-    tDom.forEach(function(e) {
+    tDom.forEach(function (e) {
       out += ' ' + toContentString(e);
       out = out.trim();
     });

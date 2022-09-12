@@ -1,5 +1,14 @@
 # mei-friend-online CHANGELOG.md
 
+### 0.6.0 XML code validation
+* Automatically derive schema URL from MEI (upon each text change)
+* Fetch (new) schema and load it both for code completion and schema validation
+* Automatically validate MEI encoding upon text change
+* Checkbox added to set validation mode to manual
+* UI elements for displaying validation status and report
+* Click and key handlers for showing/hiding report and initiating validation
+* Selector to change Verovio toolkit version (develop, latest, specific versions 3.11.0 and up)
+* Bugfix: make annotation page numbers work in annotation panel when not in speed mode
 ### 0.5.2 patch: small bug fixes
 * Add chord to beamSpan when notes are selected
 * Fix font selector

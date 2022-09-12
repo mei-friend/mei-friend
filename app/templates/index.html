@@ -17,10 +17,6 @@
   <meta name="keywords" content="music encoding initiative, MEI, musicXML, humdrum, ABC, PAE,
   music notation, music editing software, Verovio">
   <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.png') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/default.css') }}" />
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}" />
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/annotationPanel.css') }}" />
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/icons.css') }}" />
   <!-- TODO: FIX IMPORT OF ICONS -->
   <!-- <script src="{{ url_for('static', filename='css/icons.js') }}"></script> -->
   <link rel="stylesheet" id="orientationCSS" href="{{ url_for('static', filename='css/bottom.css') }}" />
@@ -84,18 +80,18 @@
   <script src="{{ url_for('static', filename='CodeMirror/addon/hint/show-hint.js') }}"></script>
   <script src="{{ url_for('static', filename='CodeMirror/addon/hint/xml-hint.js') }}"></script>
   <link href="{{ url_for('static', filename='CodeMirror/addon/hint/show-hint.css') }}" rel="stylesheet" />
+  <link href="{{ url_for('static', filename='CodeMirror/addon/lint/lint.css') }}" rel="stylesheet" />
+  <script src="{{ url_for('static', filename='CodeMirror/addon/lint/lint.js') }}"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/keymap/emacs.min.js"
     integrity="sha512-JRRAFgTvx2rg2AO6juzwLSqaBfA5MVnZAdnWNwgsLIAnjYsMI6liEnBjFgIbskM3oi5hHBLGCzwZUMd6Nsee8Q=="
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/keymap/vim.min.js"
     integrity="sha512-px+d4ezEJ2hi3SHqwRziL871LTHSqfj1GxV1Cp78Sp/SAMEIJwxKNDGcQz96FEv/IqRPLcJ848BWhSUM7msEGQ=="
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"> -->
-  </script>
-  <!--
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jshint/2.13.1/jshint.min.js" integrity="sha512-d54ZkbDqP0rlo/mmCO9nJ5tfpigsfTUPztnGEloitkJh5p2Bu4UsY8KMvAqUILBdTKGE7T6YMOuF0yXuNlpq/A==" crossorigin="anonymous" referrerpolicy="no-referrer">
-  </script>
-  -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/default.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/annotationPanel.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/icons.css') }}" />
   <script type="module" src="{{ url_for('static', filename='lib/main.js') }}"></script>
 
   <!-- Matomo -->
@@ -182,6 +178,8 @@
               class="keyShortCut nonmac shiftKey ctrlKey">R</span></a>
           <hr class="dropdown-line">
           <a id="jumpToLine" href="#">Jump to line<span class="keyShortCut altKey">G</span></a>
+          <hr class="dropdown-line">
+          <a id="manualValidate" href="#">Validate<span class="keyShortCut shiftKey cmdKey">V</span></a>
         </div>
       </div>
       <div class="dropdown">
@@ -217,8 +215,9 @@
           <a id="renumExec" href="#">Renumber measures (exec)<span class="keyShortCut shiftKey cmdKey">R</span></a>
           <hr class="dropdown-line">
           <a id="reRenderMei" href="#">Re-render MEI (with ids)<span class="keyShortCut cmdKey">V</span></a>
-          <a id="reRenderMeiWithout" href="#">Re-render MEI (remove ids)<span
-              class="keyShortCut shiftKey cmdKey">V</span></a>
+          <a id="reRenderMeiWithout" href="#">Re-render MEI (remove ids)
+            <!--<span class="keyShortCut shiftKey cmdKey">V</span>-->
+          </a>
           <a id="ingestFacsimile" href="#">Ingest facsimile<span class="keyShortCut cmdKey">I</span></a>
         </div>
       </div>
@@ -315,7 +314,8 @@
       <div class="openUrlUI">
         <div id="openUrlUIGrouping">
           <h3>Open Web-hosted encoding by URL</h3>
-          <p id="openUrlInstructions">Please choose from the public repertoire or enter the URL of a Web-hosted music encoding, below. Note: Host server must support cross-origin resource sharing (CORS).</p>
+          <p id="openUrlInstructions">Please choose from the public repertoire or enter the URL of a Web-hosted music
+            encoding, below. Note: Host server must support cross-origin resource sharing (CORS).</p>
           <details>
             <summary>Public repertoire</summary>
             <div>
@@ -349,11 +349,11 @@
           <h3><img class="forkRepoGithubLogo" src="{{ url_for('static', filename='img/GitHub-Mark-32px.png') }}" />
             Fork Github Repository</h3>
           <p>
-            The link you have followed will create a GitHub fork of the following repository for editing in mei-friend: 
+            The link you have followed will create a GitHub fork of the following repository for editing in mei-friend:
           </p>
-          <p id="forkRepoRequested"/>
+          <p id="forkRepoRequested" />
           <p>
-          Is this OK?
+            Is this OK?
           </p>
           <div id="forkAndOpenInputWrapper">
             <label for="forkAndOpenSelector">Fork to: </label>
@@ -361,7 +361,7 @@
             <button id="forkAndOpenButton" class="forkRepositoryButton">Fork repository</button>
             <button id="forkAndOpenCancel">Cancel</button>
           </div>
-          <span id="forkAndOpenStatus" class="forkRepositoryStatus"/>
+          <span id="forkAndOpenStatus" class="forkRepositoryStatus" />
         </div>
       </div>
     </div>
@@ -424,6 +424,7 @@
       <div id="notation"></div>
       <div class="resizer" id="dragMe"></div>
       <div id="encoding">
+        <span id="validation-status"></span>
         <textarea id="editor"></textarea>
       </div>
     </div>

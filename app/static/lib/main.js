@@ -1,6 +1,6 @@
 // mei-friend version and date
-const version = '0.5.2';
-const versionDate = '24 Aug 2022';
+const version = '0.6.0';
+const versionDate = '12 Sept 2022';
 
 var vrvWorker;
 var spdWorker;
@@ -10,14 +10,19 @@ var elementAtCursor;
 var breaksParam; // (string) the breaks parameter given through URL
 var pageParam; // (int) page parameter given through URL
 var selectParam; // (array) select ids given through multiple instances in URL
+let platform = navigator.platform.toLowerCase(); // TODO
+// let platform = (navigator?.userAgentData?.platform || navigator?.platform || 'unknown').toLowerCase();
 
 // guidelines base URL, needed to construct element / attribute URLs
 // TODO ideally determine version part automatically
-const guidelinesBase = "https://music-encoding.org/guidelines/v4/";
+const guidelinesBase = 'https://music-encoding.org/guidelines/v4/';
+const defaultSchema = 'https://music-encoding.org/schema/4.0.1/mei-all.rng';
 
 // exports
 export var cm;
 export var v; // viewer instance
+export var validator; // validator object
+export var rngLoader; // object for loading a relaxNG schema for hinting
 export let github; // github API wrapper object
 export let storage = new Storage();
 export var tkVersion = '';
@@ -27,6 +32,16 @@ export let meiFileLocationPrintable = '';
 export let fileLocationType = ''; // file, github, url
 export let isMEI; // is the currently edited file native MEI?
 export let fileChanged = false; // flag to track whether unsaved changes to file exist
+export const defaultVerovioVersion = 'latest'; // 'develop', '3.10.0'
+export let supportedVerovioVersions = {
+  'develop': 'https://www.verovio.org/javascript/develop/verovio-toolkit-wasm.js',
+  'latest': 'https://www.verovio.org/javascript/latest/verovio-toolkit-hum.js',
+  // '3.11.0': 'https://www.verovio.org/javascript/3.11.0/verovio-toolkit-hum.js',
+  '3.10.0': 'https://www.verovio.org/javascript/3.10.0/verovio-toolkit-hum.js',
+  '3.9.0': 'https://www.verovio.org/javascript/3.9.0/verovio-toolkit-hum.js',
+  '3.8.1': 'https://www.verovio.org/javascript/3.8.1/verovio-toolkit-hum.js',
+  '3.7.0': 'https://www.verovio.org/javascript/3.7.0/verovio-toolkit-hum.js'
+};
 
 export const sampleEncodings = [];
 export const samp = {
@@ -70,6 +85,10 @@ import {
   generateSectionSelect
 } from './control-menu.js';
 import {
+  clock,
+  unverified
+} from '../css/icons.js';
+import {
   rmHash,
   setCursorToId
 } from './utils.js';
@@ -103,6 +122,14 @@ import {
   drawSourceImage,
   zoomSourceImage,
 } from './source-imager.js';
+import {
+  WorkerProxy
+} from './worker-proxy.js';
+import {
+  RNGLoader
+} from './rng-loader.js';
+
+
 // const defaultMeiFileName = `${root}Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei`;
 const defaultMeiFileName = `${root}Beethoven_WoO70-Breitkopf.mei`;
 const defaultOrientation = 'bottom'; // default notation position in window
@@ -122,7 +149,7 @@ const defaultVerovioOptions = {
   spacingLinear: .2,
   spacingNonLinear: .5,
   minLastJustification: 0,
-  clefChangeFactor: .83,
+  // clefChangeFactor: .83, // option removed in Verovio 3.10.0
   svgAdditionalAttribute: ["layer@n", "staff@n",
     "dir@vgrp", "dynam@vgrp", "hairpin@vgrp", "pedal@vgrp",
     "measure@facs", "measure@n"
@@ -145,16 +172,24 @@ const defaultCodeMirrorOptions = {
   },
   showTrailingSpace: true,
   foldGutter: true,
-  gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
+  gutters: ["CodeMirror-lint-markers", "CodeMirror-linenumbers", "CodeMirror-foldgutter"],
   extraKeys: {
     "'<'": completeAfter,
     "'/'": completeIfAfterLt,
     "' '": completeIfInTag,
     "'='": completeIfInTag,
     "Ctrl-Space": "autocomplete",
-    "Alt-.": consultGuidelines
+    "Alt-.": consultGuidelines,
   },
-  hintOptions: 'schema_meiCMN_401', // not cm conform: just provide schema name
+  lint: {
+    "caller": cm,
+    "getAnnotations": validate,
+    "async": true
+  },
+  hintOptions: {
+    schemaInfo: null
+  },
+  // hintOptions: 'schema_meiCMN_401', // not cm conform: just provide schema name
   theme: 'default',
   zoomFont: 100, // my own option
   matchTheme: false, // notation matches editor theme (my option)
@@ -243,6 +278,7 @@ export function loadDataInEditor(mei, setFreshlyLoaded = true) {
   }
   v.setRespSelectOptions();
   v.setMenuColors();
+  v.checkSchema(mei);
   clearAnnotations();
   readAnnots(); // from annotation.js
   setCursorToId(cm, handleURLParamSelect());
@@ -319,11 +355,46 @@ function completeIfInTag(cm) {
   });
 }
 
+export async function validate(mei, updateLinting, options) {
+  // console.debug("validate(): ", options);
+  if (options && mei) {
+    // keep the callback
+    if (updateLinting && typeof updateLinting === 'function') {
+      v.updateLinting = updateLinting;
+      // console.debug("validate(updateLinting): ", updateLinting);
+    }
+
+    if (v.validatorWithSchema &&
+      (document.getElementById('autoValidate').checked || options.forceValidate)) {
+      let reportDiv = document.getElementById('validation-report');
+      if (reportDiv) reportDiv.style.visibility = 'hidden';
+      let vs = document.getElementById('validation-status');
+      vs.innerHTML = clock;
+      // vs.querySelector('path').setAttribute('fill', 'darkorange');
+      v.changeStatus(vs, 'wait', ['error', 'ok', 'manual']);
+      vs.querySelector('svg').classList.add('clockwise');
+      vs.setAttribute('title', 'Validating against ' + v.currentSchema);
+      const validation = await validator.validateNG(mei);
+      console.log('Validation complete: ', validation);
+      v.highlightValidation(mei, validation);
+    } else if (!document.getElementById('autoValidate').checked) {
+      v.setValidationStatusToManual();
+    }
+  }
+}
+
+async function suspendedValidate(text, updateLinting, options) {
+  // Do nothing...
+}
+
 // when initial page content has been loaded
 document.addEventListener('DOMContentLoaded', function () {
-  let myTextarea = document.getElementById("editor");
+  cm = CodeMirror.fromTextArea(document.getElementById("editor"), defaultCodeMirrorOptions);
+  CodeMirror.normalizeKeyMap();
 
-  cm = CodeMirror.fromTextArea(myTextarea, defaultCodeMirrorOptions);
+  // set validation status icon to unverified 
+  let vs = document.getElementById('validation-status');
+  vs.innerHTML = unverified;
 
   // check for parameters passed through URL
   let searchParams = new URLSearchParams(window.location.search);
@@ -343,10 +414,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   console.log('DOMContentLoaded. Trying now to load Verovio...');
   document.querySelector(".statusbar").innerHTML = "Loading Verovio.";
-  document.querySelector(".rightfoot").innerHTML =
-    "<a href='https://github.com/Signature-Sound-Vienna/mei-friend-online' target='_blank'>mei-friend " +
-    (env === environments.production ? version : `${env}-${version}`) +
-    "</a> (" + versionDate + ").&nbsp;";
+  drawRightFooter();
 
   vrvWorker = new Worker(`${root}lib/verovio-worker.js`);
   vrvWorker.onmessage = vrvWorkerEventsHandler;
@@ -363,8 +431,24 @@ document.addEventListener('DOMContentLoaded', function () {
     ...defaultVerovioOptions
   };
 
+  const validatorWorker = new Worker(`${root}lib/validator-worker.js`);
+  validator = new WorkerProxy(validatorWorker);
+  rngLoader = new RNGLoader();
+
+  validator.onRuntimeInitialized().then(async () => {
+    console.log('validator: onRuntimeInitialized()');
+    v.validatorInitialized = true;
+    if (!v.currentSchema) v.currentSchema = defaultSchema;
+    await v.replaceSchema(v.currentSchema);
+  });
+
   v.addCmOptionsToSettingsPanel(cm, defaultCodeMirrorOptions);
   v.addMeiFriendOptionsToSettingsPanel();
+
+  // add event listener to validation status icon, if no autoValidation
+  if (!document.getElementById('autoValidate').checked) {
+    v.setValidationStatusToManual();
+  }
 
   let urlFileName = searchParams.get('file');
   // fork parameter: if true AND ?fileParam is set to a URL,
@@ -373,7 +457,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // Else, remember we are in remote fork request mode, log user in, and then proceed as above.
   let forkParam = searchParams.get('fork');
   console.log("Fork param: ", forkParam, typeof forkParam);
-  if (urlFileName && !(forkParam==="true")) { // normally open the file from URL
+  if (urlFileName && !(forkParam === "true")) { // normally open the file from URL
     openUrlFetch(new URL(urlFileName));
   }
 
@@ -441,7 +525,7 @@ document.addEventListener('DOMContentLoaded', function () {
         userEmail: userEmail
       };
     }
-    if(storage.forkAndOpen && github) { 
+    if (storage.forkAndOpen && github) {
       // we've arrived back after an automated log-in request
       // now fork and open the supplied URL, and remove it from storage
       forkAndOpen(github, storage.forkAndOpen);
@@ -465,11 +549,11 @@ document.addEventListener('DOMContentLoaded', function () {
       fillInBranchContents();
     }
   }
-  if(forkParam==="true"&& urlFileName) { 
-    if(isLoggedIn && github) {
+  if (forkParam === "true" && urlFileName) {
+    if (isLoggedIn && github) {
       forkAndOpen(github, urlFileName);
     } else { 
-      if(storage.supported) { 
+      if (storage.supported) {
         storage.safelySetStorageItem("forkAndOpen", urlFileName);
         document.getElementById("GithubLoginLink").click();
       }
@@ -506,8 +590,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // ask worker to load Verovio
   v.busy();
+  let verovioVersion = document.getElementById('selectToolkitVersion').value;
   vrvWorker.postMessage({
-    'cmd': 'loadVerovio'
+    'cmd': 'loadVerovio',
+    'msg': verovioVersion,
+    'url': supportedVerovioVersions[verovioVersion]
   });
 
   setKeyMap(defaultKeyMap);
@@ -570,7 +657,7 @@ export async function openUrlFetch(url = '', updateAfterLoading = true) {
 }
 
 function speedWorkerEventsHandler(ev) {
-  console.log('main() speedWorkerHandler received: ' + ev.data.cmd);
+  console.log('main.speedWorkerEventsHandler received: ' + ev.data.cmd);
   if (ev.data.cmd === 'listPageSpanningElements') {
     console.log('main() speedWorkerHandler pageSpanners: ', ev.data.pageSpanners);
     v.pageSpanners = {
@@ -584,16 +671,16 @@ function speedWorkerEventsHandler(ev) {
 }
 
 async function vrvWorkerEventsHandler(ev) {
-  console.log('main(). Handler received: ' + ev.data.cmd, ev.data);
+  console.log('main.vrvWorkerEventsHandler() received: ' + ev.data.cmd); // , ev.data
   switch (ev.data.cmd) {
     case 'vrvLoaded':
       console.info('main(). Handler vrvLoaded: ', this);
       tkVersion = ev.data.version;
       tkAvailableOptions = ev.data.availableOptions;
+      v.clearVrvOptionsSettingsPanel();
       v.addVrvOptionsToSettingsPanel(tkAvailableOptions, defaultVerovioOptions);
       // v.addMeiFriendOptionsToSettingsPanel();
-      document.querySelector(".rightfoot").innerHTML +=
-        `&nbsp;<a href="https://www.verovio.org/" target="_blank">Verovio ${tkVersion}</a>.`;
+      drawRightFooter();
       document.querySelector(".statusbar").innerHTML =
         `Verovio ${tkVersion} loaded.`;
       setBreaksOptions(tkAvailableOptions, defaultVerovioOptions.breaks);
@@ -659,7 +746,7 @@ async function vrvWorkerEventsHandler(ev) {
         v.updatePageNumDisplay();
         v.addNotationEventListeners(cm);
         v.updateHighlight(cm);
-        refreshAnnotations();
+        refreshAnnotations(false);
         v.scrollSvg(cm);
       }
       if (!"setFocusToVerovioPane" in ev.data || ev.data.setFocusToVerovioPane)
@@ -683,7 +770,7 @@ async function vrvWorkerEventsHandler(ev) {
         v.lastNoteId = id;
       }
       v.addNotationEventListeners(cm);
-      refreshAnnotations();
+      refreshAnnotations(false);
       v.scrollSvg(cm);
       v.updateHighlight(cm);
       v.setFocusToVerovioPane();
@@ -1010,6 +1097,7 @@ let cmd = {
   'openHumdrum': () => openFileDialog('.krn,.hum'),
   'openPae': () => openFileDialog('.pae,.abc'),
   'downloadMei': () => downloadMei(),
+  'validate': () => v.manualValidate(),
   'zoomIn': () => v.zoom(+1, storage),
   'zoomOut': () => v.zoom(-1, storage),
   'zoom50': () => v.zoom(50, storage),
@@ -1094,16 +1182,36 @@ let cmd = {
     logoutFromGithub();
   },
   'consultGuidelines': () => consultGuidelines(),
-  'closeAlerts': () => v.hideAlerts()
+  'closeOverlays': () => {
+    v.hideAlerts();
+    v.toggleValidationReportVisibility('hidden');
+    // TODO: close all other overlays too...
+  }
 };
 
 // add event listeners when controls menu has been instantiated
 function addEventListeners(v, cm) {
   let vp = document.getElementById('verovio-panel');
-  // document.getElementById('alertOverlay').addEventListener('mousedown')
-  document.querySelector('body').addEventListener('mousedown', (ev) => {
+
+  // register global event listeners
+  let body = document.querySelector('body')
+  body.addEventListener('mousedown', (ev) => {
     if (ev.target.id !== 'alertOverlay' && ev.target.id !== 'alertMessage')
       v.hideAlerts();
+  });
+  body.addEventListener('keydown', (ev) => {
+    if (ev.key === 'Escape')
+      cmd.closeOverlays();
+  });
+
+  // Register key handlers to #encoding rather than giving it to CodeMirror directly
+  let enc = document.getElementById('encoding');
+  if (enc) enc.addEventListener('keydown', (ev) => {
+    // Ctrl-Shift-V or Cmd-Shift-V for validation
+    if (isCtrlOrCmd(ev) && ev.shiftKey && ev.key === 'v') {
+      ev.preventDefault();
+      cmd.validate();
+    }
   });
 
   // layout notation position
@@ -1140,7 +1248,8 @@ function addEventListeners(v, cm) {
   document.getElementById('replace').addEventListener('click', () => CodeMirror.commands.replace(cm));
   document.getElementById('replaceAll').addEventListener('click', () => CodeMirror.commands.replaceAll(cm));
   document.getElementById('jumpToLine').addEventListener('click', () => CodeMirror.commands.jumpToLine(cm));
-  document.querySelectorAll('.keyShortCut').forEach(e => e.classList.add(navigator.platform.startsWith('Mac') ? 'platform-mac' : 'platform-nonmac'));
+  document.getElementById('manualValidate').addEventListener('click', cmd.validate);
+  document.querySelectorAll('.keyShortCut').forEach(e => e.classList.add(platform.startsWith('Mac') ? 'platform-mac' : 'platform-nonmac'));
 
   // open URL interface
   document.getElementById('openUrlButton').addEventListener('click', cmd.openUrlFetch);
@@ -1166,8 +1275,7 @@ function addEventListeners(v, cm) {
 
   // Zooming notation with mouse wheel
   vp.addEventListener('wheel', ev => {
-    if ((navigator.platform.toLowerCase().startsWith('mac') && ev.metaKey) ||
-      !navigator.platform.toLowerCase().startsWith('mac') && ev.ctrlKey) {
+    if (isCtrlOrCmd(ev)) {
       ev.preventDefault();
       ev.stopPropagation();
       v.zoom(Math.sign(ev.deltaY) * -5); // scrolling towards user = increase
@@ -1177,8 +1285,7 @@ function addEventListeners(v, cm) {
   // Zooming source image with mouse wheel
   let ip = document.getElementById('image-panel');
   ip.addEventListener('wheel', ev => {
-    if ((navigator.platform.toLowerCase().startsWith('mac') && ev.metaKey) ||
-      !navigator.platform.toLowerCase().startsWith('mac') && ev.ctrlKey) {
+    if (isCtrlOrCmd(ev)) {
       ev.preventDefault();
       ev.stopPropagation();
       zoomSourceImage(Math.sign(ev.deltaY) * -5); // scrolling towards user = increase
@@ -1307,7 +1414,7 @@ function addEventListeners(v, cm) {
 
   // forkAndOpen cancel button
   const forkAndOpenCancelButton = document.getElementById('forkAndOpenCancel');
-  if(forkAndOpenCancelButton) { 
+  if (forkAndOpenCancelButton) {
     forkAndOpenCancelButton.addEventListener('click', forkRepositoryCancel);
   }
 
@@ -1340,16 +1447,14 @@ function addEventListeners(v, cm) {
 
   // Editor font size zooming
   document.getElementById('encoding').addEventListener('wheel', ev => {
-    if ((navigator.platform.toLowerCase().startsWith('mac') && ev.metaKey) ||
-      !navigator.platform.toLowerCase().startsWith('mac') && ev.ctrlKey) {
+    if (isCtrlOrCmd(ev)) {
       ev.preventDefault();
       ev.stopPropagation();
       v.changeEditorFontSize(Math.sign(ev.deltaY) * -5);
     }
   });
   document.getElementById('encoding').addEventListener('keydown', ev => {
-    if ((navigator.platform.toLowerCase().startsWith('mac') && ev.metaKey) ||
-      !navigator.platform.toLowerCase().startsWith('mac') && ev.ctrlKey) {
+    if (isCtrlOrCmd(ev)) {
       if (ev.key === '-') {
         ev.preventDefault();
         ev.stopPropagation();
@@ -1420,6 +1525,17 @@ function updateStatusBar() {
     ((v.pageCount < 0) ? '?' : v.pageCount) + " loaded.";
 }
 
+function drawRightFooter() {
+  let rf = document.querySelector(".rightfoot");
+  rf.innerHTML =
+    "<a href='https://github.com/Signature-Sound-Vienna/mei-friend-online' target='_blank'>mei-friend " +
+    (env === environments.production ? version : `${env}-${version}`) +
+    "</a> (" + versionDate + ").&nbsp;";
+  if (tkVersion)
+    rf.innerHTML +=
+    `&nbsp;<a href="https://www.verovio.org/" target="_blank">Verovio ${tkVersion}</a>.`;
+}
+
 export function log(s, code = null) {
   s += "<div>"
   if (code) {
@@ -1463,11 +1579,10 @@ function fillInSampleEncodings() {
 
 // sets keyMap.json to target element and defines listeners
 function setKeyMap(keyMapFilePath) {
-  let os = navigator.platform;
   let vp = document.getElementById('notation');
-  if (os.startsWith('Mac')) vp.classList.add('platform-darwin');
-  if (os.startsWith('Win')) vp.classList.add('platform-win32');
-  if (os.startsWith('Linux')) vp.classList.add('platform-linux');
+  if (platform.startsWith('mac')) vp.classList.add('platform-darwin');
+  if (platform.startsWith('win')) vp.classList.add('platform-win32');
+  if (platform.startsWith('linux')) vp.classList.add('platform-linux');
   fetch(keyMapFilePath)
     .then((resp) => {
       return resp.json();
@@ -1503,4 +1618,9 @@ function setKeyMap(keyMapFilePath) {
         }
       }
     });
+}
+
+function isCtrlOrCmd(ev) {
+  return (platform.startsWith('mac') && ev.metaKey) ||
+    (!platform.startsWith('mac') && ev.ctrlKey);
 }

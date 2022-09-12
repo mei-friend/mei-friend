@@ -68,7 +68,7 @@
     "shift-c": "addCClefChangeBefore",
     "shift-f": "addFClefChangeBefore",
 
-    "escape": "closeAlerts"
+    "escape": "closeOverlays"
   },
 
   ".platform-darwin": {
@@ -85,7 +85,7 @@
     "cmd-alt-up": "moveElementStaffUp",
     "cmd-alt-down": "moveElementStaffDown",
     "cmd-v": "reRenderMei",
-    "cmd-shift-v": "reRenderMeiWithout",
+    "cmd-shift-v": "validate",
     "cmd-0": "zoom100",
     "cmd-5": "zoom50",
     "cmd-+": "zoomIn",
@@ -113,7 +113,7 @@
     "ctrl-alt-up": "moveElementStaffUp",
     "ctrl-alt-down": "moveElementStaffDown",
     "ctrl-v": "reRenderMei",
-    "ctrl-shift-v": "reRenderMeiWithout",
+    "ctrl-shift-v": "validate",
     "ctrl-0": "zoom100",
     "ctrl-5": "zoom50",
     "ctrl-+": "zoomIn",
