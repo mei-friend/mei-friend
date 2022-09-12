@@ -413,11 +413,26 @@ export function readAnnots() {
   refreshAnnotations();
 }
 
-// inserts new annot element before beforeThis element into CodeMirror editor,
+// inserts new annot element based on anchor element into CodeMirror editor,
 // with @xml:id, @plist and optional payload (string or ptr)
-export function writeAnnot(beforeThis, xmlId, plist, payload) {
-  let parent = beforeThis.parentNode;
-  if (parent) {
+export function writeAnnot(anchor, xmlId, plist, payload) {
+  // TODO: Place the annotation in the most sensible place according to the MEI schema
+  // i.e., probably the closest permissible level to the anchor element.
+  // For now, we only support a limited range of music body elements
+  let insertHere;
+	if(anchor.closest(".supplied"))
+		insertHere = anchor.closest(".supplied")
+	else if(anchor.closest(".layer"))
+		insertHere = anchor.closest(".layer")
+	else if(anchor.closest(".measure"))
+		insertHere = anchor.closest(".measure")
+	else if(anchor.closest(".score"))
+		insertHere = anchor.closest(".score")
+	else {
+		console.error("Sorry, cannot currently write annotations placed outside <score>");
+		return;
+	}
+  if (insertHere) {
     let annot = document.createElementNS(meiNameSpace, 'annot');
     annot.setAttributeNS(xmlNameSpace, 'id', xmlId);
     annot.setAttribute('plist', plist.map(p => '#' + p).join(' '));
@@ -428,9 +443,12 @@ export function writeAnnot(beforeThis, xmlId, plist, payload) {
         annot.appendChild(payload);
       }
     }
-    parent.insertBefore(annot, beforeThis);
-
-    setCursorToId(cm, beforeThis.getAttribute('id'));
+		// add at end of insertHere element's list of children
+		console.log("Insert here: ", insertHere)
+		console.log("Insert here first child: ", insertHere.firstChild)
+    insertHere.insertBefore(annot, insertHere.firstChild);
+		console.log("After insert: ", insertHere.firstChild)
+    setCursorToId(cm, insertHere.firstChild.getAttribute("id"));
     let p1 = cm.getCursor();
     cm.replaceRange(xmlToString(annot) + '\n', p1);
     let p2 = cm.getCursor();
