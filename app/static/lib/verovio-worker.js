@@ -298,10 +298,8 @@ addEventListener('message', function (e) {
       break;
     case 'getPageWithElement':
       try {
-        console.debug("WORKER GOT: ", result.msg)
         const pageNo = tk.getPageWithElement(result.msg);
         const aVariableWithAnInt = 99;
-        console.debug("VEROVIO SAYS: ", pageNo)
         result = {
           'cmd': 'pageWithElement',
           'msg': pageNo,
@@ -309,7 +307,6 @@ addEventListener('message', function (e) {
           'taskId': result.taskId,
           'type': result.type
         };
-        console.debug("WORKER FOUND: ", result)
       } catch (err) {
         log('getPageWithElement: ' + err);
       }
@@ -338,7 +335,6 @@ addEventListener('message', function (e) {
       };
   };
   if (result) { 
-    console.debug("POSTING RESULT: ", result)
     postMessage(result);
   }
 }, false);
