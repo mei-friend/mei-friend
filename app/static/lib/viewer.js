@@ -164,12 +164,8 @@ export default class Viewer {
           'cmd': 'getPageWithElement',
           'msg': xmlId
         };
-        this.vrvWorker.addEventListener('message', function handle(ev) {
-          if (ev.cmd === 'pageWithElement') {
-            this.vrvWorker.removeEventListener('message', handle);
-            resolve(ev.msg);
-          }
-        });
+
+        this.vrvWorker.addEventListener('message', this.gotPageNumber );
         this.vrvWorker.postMessage(msg);
       });
       promise.then(function (p) {
@@ -178,6 +174,13 @@ export default class Viewer {
     }
     console.log('pageNumber: ', pageNumber);
     return pageNumber;
+  }
+
+  gotPageNumber(ev) {
+    if (ev.cmd === 'pageWithElement') {
+      this.vrvWorker.removeEventListener('message', handle);
+      resolve(ev.msg);
+    }
   }
 
 
@@ -1680,16 +1683,16 @@ export default class Viewer {
     console.log('Replace schema: ' + schemaFile);
     let data; // content of schema file
     try {
-      const response = await fetch(schemaFile);
-      if (!response.ok) { // schema not found
+    const response = await fetch(schemaFile);
+    if (!response.ok) { // schema not found
         this.throwSchemaError({
           "response": response,
           "schemaFile": schemaFile
         });
-        return;
-      }
+      return;
+    }
       data = await response.text();
-      const res = await validator.setRelaxNGSchema(data);
+    const res = await validator.setRelaxNGSchema(data);
     } catch (err) {
       this.throwSchemaError({
         "err": err
@@ -1700,7 +1703,7 @@ export default class Viewer {
     vs.innerHTML = unverified;
     this.validatorWithSchema = true;
     if (document.getElementById('autoValidate').checked)
-      validate(cm.getValue(), this.updateLinting, true)
+    validate(cm.getValue(), this.updateLinting, true)
     else
       this.setValidationStatusToManual();
     console.log("New schema loaded to validator", schemaFile);
