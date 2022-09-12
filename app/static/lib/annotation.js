@@ -27,9 +27,10 @@ import {
 
 export let annotations = [];
 
-export function situateAndRefreshAnnotationsList() {
+export function situateAndRefreshAnnotationsList(forceRefresh=false) {
   situateAnnotations();
-  refreshAnnotationsList();
+  if(forceRefresh || !document.getElementsByClassName('annotationListItem').length)
+    refreshAnnotationsList();
 }
 
 export function refreshAnnotationsList() { 
@@ -109,17 +110,8 @@ export function refreshAnnotationsList() {
       default:
         console.warn("Unknown type when drawing annotation in list: ", a);
     }
-    let annotationLocationLabel = '';
-    if (a.firstPage === 'meiHead') {
-      annotationLocationLabel = `MEI head (${a.selection.length} elements)`;
-    } else if (a.firstPage === 'unsituated' || a.firstPage < 0) {
-      annotationLocationLabel = 'Unsituated';
-    } else {
-      annotationLocationLabel = 'p. ' + (a.firstPage === a.lastPage ?
-          a.firstPage : a.firstPage + "&ndash;" + a.lastPage) +
-        ` (${a.selection.length} elements)`;
-    }
-    summary.insertAdjacentHTML("beforeend", annotationLocationLabel);
+    const annotationLocationLabel = generateAnnotationLocationLabel(a);
+    summary.appendChild(annotationLocationLabel);
     flipToAnno.addEventListener("click", (e) => {
       console.debug("Flipping to annotation: ", a);
       v.updatePage(cm, a.firstPage);
@@ -145,6 +137,22 @@ export function refreshAnnotationsList() {
   });
 }
 
+export function generateAnnotationLocationLabel(a) { 
+  const annotationLocationLabel = document.createElement("span");
+  if (a.firstPage === 'meiHead') {
+    annotationLocationLabel.innerHTML = `MEI head (${a.selection.length} elements)`;
+  } else if (a.firstPage === 'unsituated' || a.firstPage < 0) {
+    annotationLocationLabel.innerHTML = 'Unsituated';
+  } else {
+    annotationLocationLabel.innerHTML = 'p. ' + (a.firstPage === a.lastPage ?
+        a.firstPage : a.firstPage + "&ndash;" + a.lastPage) +
+      ` (${a.selection.length} elements)`;
+  }
+  annotationLocationLabel.classList.add("annotationLocationLabel");
+  annotationLocationLabel.dataset.id = a.id;
+  return annotationLocationLabel;
+}
+
 // call whenever layout reflows to re-situate annotations appropriately
 export function situateAnnotations() {
   annotations.forEach(a => {
@@ -167,7 +175,7 @@ export function deleteAnnotation(uuid) {
   const ix = annotations.findIndex(a => a.id === uuid);
   if (ix >= 0) {
     annotations.splice(ix, 1);
-    situateAndRefreshAnnotationsList();
+    situateAndRefreshAnnotationsList(true);
   }
 }
 
@@ -247,7 +255,7 @@ function drawLink(a) {
 }
 
 // Draws annotations in Verovio notation panel
-export function refreshAnnotations() {
+export function refreshAnnotations(forceListRefresh = false) {
   // clear rendered annotations container
   const rac = document.getElementById("renderedAnnotationsContainer");
   rac.innerHTML = "";
@@ -284,7 +292,7 @@ export function refreshAnnotations() {
       console.warn("Skipping annotation without type: ", a);
     }
   });
-  situateAndRefreshAnnotationsList();
+  situateAndRefreshAnnotationsList(forceListRefresh);
 }
 
 export function addAnnotationHandlers() {
@@ -309,7 +317,7 @@ export function addAnnotationHandlers() {
       default:
         console.warn("Don't have a handler for this type of annotation", e);
     }
-    refreshAnnotations();
+    refreshAnnotations(true);
   }
 
   // functions to create annotations

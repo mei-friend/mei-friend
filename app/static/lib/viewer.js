@@ -8,7 +8,7 @@ import * as dutils from './dom-utils.js';
 import * as att from './attribute-classes.js';
 import { 
   annotations,
-  refreshAnnotationsList 
+  generateAnnotationLocationLabel
 } from './annotation.js'
 import {
   cm,
@@ -206,7 +206,10 @@ export default class Viewer {
               default:
                 console.error("Called getPageWithElement on Verovio worker with invalid situateAnno: ", situateAnno);
             }
-            refreshAnnotationsList();
+            const annotationLocationLabelElement = document.querySelector(`.annotationLocationLabel[data-id=${situateAnno.id}`);
+            if(annotationLocationLabelElement)  {
+              annotationLocationLabelElement.innerHTML = generateAnnotationLocationLabel(annotations[ix]).innerHTML;
+            }
           }
         }
       });

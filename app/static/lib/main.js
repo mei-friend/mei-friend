@@ -743,7 +743,7 @@ async function vrvWorkerEventsHandler(ev) {
         v.updatePageNumDisplay();
         v.addNotationEventListeners(cm);
         v.updateHighlight(cm);
-        refreshAnnotations();
+        refreshAnnotations(false);
         v.scrollSvg(cm);
       }
       if (!"setFocusToVerovioPane" in ev.data || ev.data.setFocusToVerovioPane)
@@ -767,7 +767,7 @@ async function vrvWorkerEventsHandler(ev) {
         v.lastNoteId = id;
       }
       v.addNotationEventListeners(cm);
-      refreshAnnotations();
+      refreshAnnotations(false);
       v.scrollSvg(cm);
       v.updateHighlight(cm);
       v.setFocusToVerovioPane();
