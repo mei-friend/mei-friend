@@ -361,7 +361,7 @@ export async function validate(mei, updateLinting, options) {
     // keep the callback
     if (updateLinting && typeof updateLinting === 'function') {
       v.updateLinting = updateLinting;
-      console.debug("validate(updateLinting): ", updateLinting);
+      // console.debug("validate(updateLinting): ", updateLinting);
     }
 
     if (v.validatorWithSchema &&
