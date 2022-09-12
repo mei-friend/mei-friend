@@ -111,7 +111,7 @@ import {
   refreshGithubMenu,
   setCommitUIEnabledStatus
 } from './github-menu.js';
-import {
+import { 
   forkAndOpen,
   forkRepositoryCancel
 } from './fork-repository.js';
@@ -552,13 +552,13 @@ document.addEventListener('DOMContentLoaded', function () {
   if (forkParam === "true" && urlFileName) {
     if (isLoggedIn && github) {
       forkAndOpen(github, urlFileName);
-    } else {
+    } else { 
       if (storage.supported) {
         storage.safelySetStorageItem("forkAndOpen", urlFileName);
         document.getElementById("GithubLoginLink").click();
       }
     }
-  }
+  } 
   // Retrieve parameters from URL params, from storage, or default values
   if (scaleParam !== null) {
     document.getElementById('verovio-zoom').value = scaleParam;
@@ -746,7 +746,7 @@ async function vrvWorkerEventsHandler(ev) {
         v.updatePageNumDisplay();
         v.addNotationEventListeners(cm);
         v.updateHighlight(cm);
-        refreshAnnotations();
+        refreshAnnotations(false);
         v.scrollSvg(cm);
       }
       if (!"setFocusToVerovioPane" in ev.data || ev.data.setFocusToVerovioPane)
@@ -770,7 +770,7 @@ async function vrvWorkerEventsHandler(ev) {
         v.lastNoteId = id;
       }
       v.addNotationEventListeners(cm);
-      refreshAnnotations();
+      refreshAnnotations(false);
       v.scrollSvg(cm);
       v.updateHighlight(cm);
       v.setFocusToVerovioPane();
