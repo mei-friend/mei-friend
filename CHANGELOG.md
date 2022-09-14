@@ -9,6 +9,7 @@
 * Click and key handlers for showing/hiding report and initiating validation
 * Selector to change Verovio toolkit version (develop, latest, specific versions 3.11.0 and up)
 * Bugfix: make annotation page numbers work in annotation panel when not in speed mode
+* Bugfix: ensure <annot>s are generated in a valid location within the MEI
 ### 0.5.2 patch: small bug fixes
 * Add chord to beamSpan when notes are selected
 * Fix font selector
