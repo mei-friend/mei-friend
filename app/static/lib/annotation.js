@@ -1,6 +1,7 @@
 import {
   v,
-  cm
+  cm,
+  log
 } from './main.js';
 import {
   convertCoords,
@@ -413,29 +414,62 @@ export function readAnnots() {
   refreshAnnotations();
 }
 
-// inserts new annot element before beforeThis element into CodeMirror editor,
+// inserts new annot element based on anchor element into CodeMirror editor,
 // with @xml:id, @plist and optional payload (string or ptr)
-export function writeAnnot(beforeThis, xmlId, plist, payload) {
-  let parent = beforeThis.parentNode;
-  if (parent) {
-    let annot = document.createElementNS(meiNameSpace, 'annot');
-    annot.setAttributeNS(xmlNameSpace, 'id', xmlId);
-    annot.setAttribute('plist', plist.map(p => '#' + p).join(' '));
-    if (payload) {
-      if (typeof payload === 'string') {
-        annot.textContent = payload;
-      } else if (typeof payload === 'object') {
-        annot.appendChild(payload);
+export function writeAnnot(anchor, xmlId, plist, payload) {
+  // TODO: Place the annotation in the most sensible place according to the MEI schema
+  // i.e., probably the closest permissible level to the anchor element.
+  // For now, we only support a limited range of music body elements
+  let insertHere;
+	if(anchor.closest("supplied"))
+		insertHere = anchor.closest("supplied")
+	else if(anchor.closest("layer"))
+		insertHere = anchor.closest("layer")
+	else if(anchor.closest("measure"))
+		insertHere = anchor.closest("measure")
+	else if(anchor.closest("section"))
+		insertHere = anchor.closest("section")
+	else if(anchor.closest("score"))
+		insertHere = anchor.closest("score")
+	else {
+		console.error("Sorry, cannot currently write annotations placed outside <score>");
+		return;
+	}
+  if (insertHere) {
+    // trz to add our annotation at beginning of insertHere element's list of children:
+    // find first non-text child with an identifier
+    const firstChildNode = Array.from(insertHere.childNodes)
+      .filter(c => c.nodeType !== Node.TEXT_NODE)
+      .filter(c => c.hasAttribute("xml:id"))[0]
+    if(firstChildNode) { 
+      // set cursor based on it
+      setCursorToId(cm, firstChildNode.getAttribute("xml:id"))
+      let annot = document.createElementNS(meiNameSpace, 'annot');
+      annot.setAttributeNS(xmlNameSpace, 'id', xmlId);
+      annot.setAttribute('plist', plist.map(p => '#' + p).join(' '));
+      if (payload) {
+        if (typeof payload === 'string') {
+          annot.textContent = payload;
+        } else if (typeof payload === 'object') {
+          annot.appendChild(payload);
+        }
       }
+      // insert <annot> into the DOM
+      insertHere.insertAdjacentElement("afterbegin", annot);
+      // now write it into CM
+      let p1 = cm.getCursor();
+      cm.replaceRange(xmlToString(annot) + '\n', p1);
+      let p2 = cm.getCursor();
+      // indent nicely
+      while (p1.line <= p2.line)
+        cm.indentLine(p1.line++, 'smart');
+      // jump to the written <annot> in CM
+      setCursorToId(cm, xmlId)
+    } else {
+      let errMsg = '<p>Cannot write annotation as MEI anchor-point lacks xml:id.</p><p>Please assign identifiers by selecting "Manipulate" -> "Re-render MEI (with ids)" and try again.</p>'
+      console.warn(errMsg);
+      log(errMsg);
     }
-    parent.insertBefore(annot, beforeThis);
-
-    setCursorToId(cm, beforeThis.getAttribute('id'));
-    let p1 = cm.getCursor();
-    cm.replaceRange(xmlToString(annot) + '\n', p1);
-    let p2 = cm.getCursor();
-    while (p1.line <= p2.line)
-      cm.indentLine(p1.line++, 'smart');
   }
 }
 
@@ -590,7 +624,8 @@ export function ingestWebAnnotation(webAnno) {
 function writeInlineIfRequested(a) {
   // write annotation to inline <annot> if the user has requested this
   if (document.getElementById('writeAnnotInline').checked) {
-    let el = document.querySelector('[*|id="' + v.selectedElements[0] + '"]');
+ //   let el = document.querySelector('[*|id="' + v.selectedElements[0] + '"]');
+    let el = v.xmlDoc.querySelector('[*|id="' + v.selectedElements[0] + '"]');
     if (el) {
       let payload;
       if (a.type === "annotateDescribe") payload = a.description
