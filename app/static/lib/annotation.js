@@ -1,6 +1,7 @@
 import {
   v,
-  cm
+  cm,
+  log
 } from './main.js';
 import {
   convertCoords,
@@ -435,33 +436,40 @@ export function writeAnnot(anchor, xmlId, plist, payload) {
 		return;
 	}
   if (insertHere) {
-    let annot = document.createElementNS(meiNameSpace, 'annot');
-    annot.setAttributeNS(xmlNameSpace, 'id', xmlId);
-    annot.setAttribute('plist', plist.map(p => '#' + p).join(' '));
-    if (payload) {
-      if (typeof payload === 'string') {
-        annot.textContent = payload;
-      } else if (typeof payload === 'object') {
-        annot.appendChild(payload);
-      }
-    }
-    // add at beginning of insertHere element's list of children:
-    // find first non-text child
+    // trz to add our annotation at beginning of insertHere element's list of children:
+    // find first non-text child with an identifier
     const firstChildNode = Array.from(insertHere.childNodes)
-      .filter(c => c.nodeType !== Node.TEXT_NODE)[0]
-    // set cursor based on it
-    setCursorToId(cm, firstChildNode.getAttribute("xml:id"))
-    // insert <annot> into the DOM
-    insertHere.insertAdjacentElement("afterbegin", annot);
-    // now write it into CM
-    let p1 = cm.getCursor();
-    cm.replaceRange(xmlToString(annot) + '\n', p1);
-    let p2 = cm.getCursor();
-    // indent nicely
-    while (p1.line <= p2.line)
-      cm.indentLine(p1.line++, 'smart');
-    // jump to the written <annot> in CM
-    setCursorToId(cm, xmlId)
+      .filter(c => c.nodeType !== Node.TEXT_NODE)
+      .filter(c => c.hasAttribute("xml:id"))[0]
+    if(firstChildNode) { 
+      // set cursor based on it
+      setCursorToId(cm, firstChildNode.getAttribute("xml:id"))
+      let annot = document.createElementNS(meiNameSpace, 'annot');
+      annot.setAttributeNS(xmlNameSpace, 'id', xmlId);
+      annot.setAttribute('plist', plist.map(p => '#' + p).join(' '));
+      if (payload) {
+        if (typeof payload === 'string') {
+          annot.textContent = payload;
+        } else if (typeof payload === 'object') {
+          annot.appendChild(payload);
+        }
+      }
+      // insert <annot> into the DOM
+      insertHere.insertAdjacentElement("afterbegin", annot);
+      // now write it into CM
+      let p1 = cm.getCursor();
+      cm.replaceRange(xmlToString(annot) + '\n', p1);
+      let p2 = cm.getCursor();
+      // indent nicely
+      while (p1.line <= p2.line)
+        cm.indentLine(p1.line++, 'smart');
+      // jump to the written <annot> in CM
+      setCursorToId(cm, xmlId)
+    } else {
+      let errMsg = '<p>Cannot write annotation as MEI anchor-point lacks xml:id.</p><p>Please assign identifiers by selecting "Manipulate" -> "Re-render MEI (with ids)" and try again.</p>'
+      console.warn(errMsg);
+      log(errMsg);
+    }
   }
 }
 
