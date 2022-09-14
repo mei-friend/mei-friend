@@ -115,7 +115,7 @@ export function refreshAnnotationsList() {
     summary.appendChild(annotationLocationLabel);
     flipToAnno.addEventListener("click", (e) => {
       console.debug("Flipping to annotation: ", a);
-      v.updatePage(cm, a.firstPage);
+      v.updatePage(cm, a.firstPage, a.id);
       setCursorToId(cm, a.id);
     });
     deleteAnno.addEventListener("click", (e) => {
