@@ -420,14 +420,16 @@ export function writeAnnot(anchor, xmlId, plist, payload) {
   // i.e., probably the closest permissible level to the anchor element.
   // For now, we only support a limited range of music body elements
   let insertHere;
-	if(anchor.closest(".supplied"))
-		insertHere = anchor.closest(".supplied")
-	else if(anchor.closest(".layer"))
-		insertHere = anchor.closest(".layer")
-	else if(anchor.closest(".measure"))
-		insertHere = anchor.closest(".measure")
-	else if(anchor.closest(".score"))
-		insertHere = anchor.closest(".score")
+	if(anchor.closest("supplied"))
+		insertHere = anchor.closest("supplied")
+	else if(anchor.closest("layer"))
+		insertHere = anchor.closest("layer")
+	else if(anchor.closest("measure"))
+		insertHere = anchor.closest("measure")
+	else if(anchor.closest("section"))
+		insertHere = anchor.closest("section")
+	else if(anchor.closest("score"))
+		insertHere = anchor.closest("score")
 	else {
 		console.error("Sorry, cannot currently write annotations placed outside <score>");
 		return;
@@ -443,17 +445,23 @@ export function writeAnnot(anchor, xmlId, plist, payload) {
         annot.appendChild(payload);
       }
     }
-		// add at end of insertHere element's list of children
-		console.log("Insert here: ", insertHere)
-		console.log("Insert here first child: ", insertHere.firstChild)
-    insertHere.insertBefore(annot, insertHere.firstChild);
-		console.log("After insert: ", insertHere.firstChild)
-    setCursorToId(cm, insertHere.firstChild.getAttribute("id"));
+    // add at beginning of insertHere element's list of children:
+    // find first non-text child
+    const firstChildNode = Array.from(insertHere.childNodes)
+      .filter(c => c.nodeType !== Node.TEXT_NODE)[0]
+    // set cursor based on it
+    setCursorToId(cm, firstChildNode.getAttribute("xml:id"))
+    // insert <annot> into the DOM
+    insertHere.insertAdjacentElement("afterbegin", annot);
+    // now write it into CM
     let p1 = cm.getCursor();
     cm.replaceRange(xmlToString(annot) + '\n', p1);
     let p2 = cm.getCursor();
+    // indent nicely
     while (p1.line <= p2.line)
       cm.indentLine(p1.line++, 'smart');
+    // jump to the written <annot> in CM
+    setCursorToId(cm, xmlId)
   }
 }
 
@@ -608,7 +616,8 @@ export function ingestWebAnnotation(webAnno) {
 function writeInlineIfRequested(a) {
   // write annotation to inline <annot> if the user has requested this
   if (document.getElementById('writeAnnotInline').checked) {
-    let el = document.querySelector('[*|id="' + v.selectedElements[0] + '"]');
+ //   let el = document.querySelector('[*|id="' + v.selectedElements[0] + '"]');
+    let el = v.xmlDoc.querySelector('[*|id="' + v.selectedElements[0] + '"]');
     if (el) {
       let payload;
       if (a.type === "annotateDescribe") payload = a.description
