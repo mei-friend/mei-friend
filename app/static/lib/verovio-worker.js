@@ -45,7 +45,7 @@ addEventListener('message', function (e) {
       //   console.log('MODULE: ', Module);
       // }
       importScripts(result.url);
-      if (['3.7.0', '3.8.1', '3.9.0', '3.10.0'].includes(result.msg)) {
+      if (['3.7.0*', '3.8.1*', '3.9.0*', '3.10.0*'].includes(result.msg)) {
         console.log('Load Verovio 3.10.0 or earlier');
         Module.onRuntimeInitialized = loadVerovio
       } else

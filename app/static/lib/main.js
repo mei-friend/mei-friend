@@ -1,6 +1,6 @@
 // mei-friend version and date
-const version = '0.6.0';
-const versionDate = '12 Sept 2022';
+const version = '0.6.1';
+const versionDate = '14 Sept 2022';
 
 var vrvWorker;
 var spdWorker;
@@ -37,10 +37,10 @@ export let supportedVerovioVersions = {
   'develop': 'https://www.verovio.org/javascript/develop/verovio-toolkit-wasm.js',
   'latest': 'https://www.verovio.org/javascript/latest/verovio-toolkit-hum.js',
   '3.11.0': 'https://www.verovio.org/javascript/3.11.0/verovio-toolkit-hum.js',
-//  '3.10.0': 'https://www.verovio.org/javascript/3.10.0/verovio-toolkit-hum.js',
-//  '3.9.0': 'https://www.verovio.org/javascript/3.9.0/verovio-toolkit-hum.js',
-//  '3.8.1': 'https://www.verovio.org/javascript/3.8.1/verovio-toolkit-hum.js',
-//  '3.7.0': 'https://www.verovio.org/javascript/3.7.0/verovio-toolkit-hum.js'
+  '3.10.0*': 'https://www.verovio.org/javascript/3.10.0/verovio-toolkit-hum.js',
+  '3.9.0*': 'https://www.verovio.org/javascript/3.9.0/verovio-toolkit-hum.js',
+  '3.8.1*': 'https://www.verovio.org/javascript/3.8.1/verovio-toolkit-hum.js',
+  '3.7.0*': 'https://www.verovio.org/javascript/3.7.0/verovio-toolkit-hum.js'
 };
 
 export const sampleEncodings = [];
@@ -111,7 +111,7 @@ import {
   refreshGithubMenu,
   setCommitUIEnabledStatus
 } from './github-menu.js';
-import { 
+import {
   forkAndOpen,
   forkRepositoryCancel
 } from './fork-repository.js';
@@ -552,13 +552,13 @@ document.addEventListener('DOMContentLoaded', function () {
   if (forkParam === "true" && urlFileName) {
     if (isLoggedIn && github) {
       forkAndOpen(github, urlFileName);
-    } else { 
+    } else {
       if (storage.supported) {
         storage.safelySetStorageItem("forkAndOpen", urlFileName);
         document.getElementById("GithubLoginLink").click();
       }
     }
-  } 
+  }
   // Retrieve parameters from URL params, from storage, or default values
   if (scaleParam !== null) {
     document.getElementById('verovio-zoom').value = scaleParam;

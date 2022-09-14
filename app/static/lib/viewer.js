@@ -1022,7 +1022,7 @@ export default class Viewer {
     let optionsToShow = {
       selectToolkitVersion: {
         title: 'Verovio version',
-        description: 'SeleSelect Verovio toolkit version',
+        description: 'SeleSelect Verovio toolkit version (* Switching to older versions before 3.11.0 might need a refresh due to memory issues.)',
         type: 'select',
         default: defaultVerovioVersion,
         values: Object.keys(supportedVerovioVersions)
