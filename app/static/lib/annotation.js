@@ -116,6 +116,7 @@ export function refreshAnnotationsList() {
     flipToAnno.addEventListener("click", (e) => {
       console.debug("Flipping to annotation: ", a);
       v.updatePage(cm, a.firstPage);
+      setCursorToId(cm, a.id);
     });
     deleteAnno.addEventListener("click", (e) => {
       const reallyDelete = confirm("Are you sure you wish to delete this annotation?");
