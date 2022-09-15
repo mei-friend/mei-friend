@@ -632,7 +632,7 @@ function writeInlineIfRequested(a) {
       if (a.type === "annotateDescribe") payload = a.description
       else if (a.type === "annotateLink") {
         payload = document.createElementNS(meiNameSpace, "ptr");
-        payload.id = "ptr-" + generateUUID();
+        payload.setAttributeNS(xmlNameSpace, 'id', 'ptr-' + generateUUID());
         payload.setAttribute("target", a.url);
       }
       writeAnnot(el, a.id, a.selection, payload)

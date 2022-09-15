@@ -1,5 +1,8 @@
 # mei-friend-online CHANGELOG.md
 
+### 0.6.2 patch: small bug fixes
+* Bugfix: create valid <ptr/> objects for linking annotations
+* Bugfix: guard against edge-cases when switching vrvTk versions
 ### 0.6.1 Verovio toolkit version selection
 * Added Verovio toolkit versions before 3.11.0 with warning for a refresh upon memomry slip.
 * Bugfix: ensure <annot>s are generated in a valid location within the MEI
