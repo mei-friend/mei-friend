@@ -6,6 +6,7 @@
 
 var tk;
 var tkOptions;
+var tkUrl;
 
 loadVerovio = async () => {
   /* create the worker toolkit instance */
@@ -16,7 +17,8 @@ loadVerovio = async () => {
     let message = {
       'cmd': 'vrvLoaded',
       'version': tk.getVersion(),
-      'availableOptions': tk.getAvailableOptions()
+      'availableOptions': tk.getAvailableOptions(),
+      'url': tkUrl
     };
     console.info('Verovio Toolkit ' + message.version + ' loaded.');
     postMessage(message);
@@ -33,6 +35,7 @@ addEventListener('message', function (e) {
   console.log('VerovioWorker received: "' + result.cmd + '".'); 
   switch (result.cmd) {
     case 'loadVerovio':
+      tkUrl = result.url;
       if (tk) tk.destroy();
       // here we attempt to delete/destroy the toolkit module...
       if (typeof verovio !== 'undefined' && 'module' in verovio)
@@ -44,7 +47,7 @@ addEventListener('message', function (e) {
       //   Module = {};
       //   console.log('MODULE: ', Module);
       // }
-      importScripts(result.url);
+      importScripts(tkUrl);
       if (['3.7.0*', '3.8.1*', '3.9.0*', '3.10.0*'].includes(result.msg)) {
         console.log('Load Verovio 3.10.0 or earlier');
         Module.onRuntimeInitialized = loadVerovio

@@ -25,7 +25,8 @@ export var validator; // validator object
 export var rngLoader; // object for loading a relaxNG schema for hinting
 export let github; // github API wrapper object
 export let storage = new Storage();
-export var tkVersion = '';
+export var tkVersion = ''; // string of the currently loaded toolkit version
+export var tkUrl = ''; // string of the currently loaded toolkit origin
 export let meiFileName = '';
 export let meiFileLocation = '';
 export let meiFileLocationPrintable = '';
@@ -34,13 +35,34 @@ export let isMEI; // is the currently edited file native MEI?
 export let fileChanged = false; // flag to track whether unsaved changes to file exist
 export const defaultVerovioVersion = 'latest'; // 'develop', '3.10.0'
 export let supportedVerovioVersions = {
-  'develop': 'https://www.verovio.org/javascript/develop/verovio-toolkit-wasm.js',
-  'latest': 'https://www.verovio.org/javascript/latest/verovio-toolkit-hum.js',
-  '3.11.0': 'https://www.verovio.org/javascript/3.11.0/verovio-toolkit-hum.js',
-  '3.10.0*': 'https://www.verovio.org/javascript/3.10.0/verovio-toolkit-hum.js',
-  '3.9.0*': 'https://www.verovio.org/javascript/3.9.0/verovio-toolkit-hum.js',
-  '3.8.1*': 'https://www.verovio.org/javascript/3.8.1/verovio-toolkit-hum.js',
-  '3.7.0*': 'https://www.verovio.org/javascript/3.7.0/verovio-toolkit-hum.js'
+  'develop': {
+    'url': 'https: //www.verovio.org/javascript/develop/verovio-toolkit-wasm.js',
+    'description': 'Current Verovio develop version'
+  },
+  'latest': {
+    'url': 'https://www.verovio.org/javascript/latest/verovio-toolkit-hum.js',
+    'description': 'Current Verovio release'
+  },
+  '3.11.0': {
+    'url': 'https://www.verovio.org/javascript/3.11.0/verovio-toolkit-hum.js',
+    'description': 'Verovio release 3.11.0'
+  },
+  '3.10.0*': {
+    'url': 'https://www.verovio.org/javascript/3.10.0/verovio-toolkit-hum.js',
+    'description': 'Verovio release 3.10.0. *ATTENTION: Switching to this version might require a refresh due to memory issues.'
+  },
+  '3.9.0*': {
+    'url': 'https://www.verovio.org/javascript/3.9.0/verovio-toolkit-hum.js',
+    'description': 'Verovio release 3.9.0. *ATTENTION: Switching to this version might require a refresh due to memory issues.'
+  },
+  '3.8.1*': {
+    'url': 'https://www.verovio.org/javascript/3.8.1/verovio-toolkit-hum.js',
+    'description': 'Verovio release 3.8.1. *ATTENTION: Switching to this version might require a refresh due to memory issues.'
+  },
+  '3.7.0*': {
+    'url': 'https://www.verovio.org/javascript/3.7.0/verovio-toolkit-hum.js',
+    'description': 'Verovio release 3.7.0. *ATTENTION: Switching to this version might require a refresh due to memory issues.'
+  }
 };
 
 export const sampleEncodings = [];
@@ -594,7 +616,7 @@ document.addEventListener('DOMContentLoaded', function () {
   vrvWorker.postMessage({
     'cmd': 'loadVerovio',
     'msg': verovioVersion,
-    'url': supportedVerovioVersions[verovioVersion]
+    'url': supportedVerovioVersions[verovioVersion].url
   });
 
   setKeyMap(defaultKeyMap);
@@ -676,6 +698,7 @@ async function vrvWorkerEventsHandler(ev) {
     case 'vrvLoaded':
       console.info('main(). Handler vrvLoaded: ', this);
       tkVersion = ev.data.version;
+      tkUrl = ev.data.url;
       tkAvailableOptions = ev.data.availableOptions;
       v.clearVrvOptionsSettingsPanel();
       v.addVrvOptionsToSettingsPanel(tkAvailableOptions, defaultVerovioOptions);
@@ -1531,9 +1554,11 @@ function drawRightFooter() {
     "<a href='https://github.com/Signature-Sound-Vienna/mei-friend-online' target='_blank'>mei-friend " +
     (env === environments.production ? version : `${env}-${version}`) +
     "</a> (" + versionDate + ").&nbsp;";
-  if (tkVersion)
+  if (tkVersion) {
+    let githubUrl = 'https://github.com/rism-digital/verovio/releases/tag/version-' + tkVersion.split('-')[0];
     rf.innerHTML +=
-    `&nbsp;<a href="https://www.verovio.org/" target="_blank">Verovio ${tkVersion}</a>.`;
+      `&nbsp;<a href="${githubUrl}" target="_blank" title="${tkUrl}">Verovio ${tkVersion}</a>.`;
+  }
 }
 
 export function log(s, code = null) {

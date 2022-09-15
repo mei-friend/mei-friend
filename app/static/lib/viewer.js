@@ -6,7 +6,7 @@ import * as speed from './speed.js';
 import * as utils from './utils.js';
 import * as dutils from './dom-utils.js';
 import * as att from './attribute-classes.js';
-import { 
+import {
   annotations,
   generateAnnotationLocationLabel
 } from './annotation.js'
@@ -179,7 +179,7 @@ export default class Viewer {
           'msg': xmlId,
           'taskId': taskId,
         };
-        if(situateAnno && 'type' in situateAnno) { 
+        if (situateAnno && 'type' in situateAnno) {
           msg.type = situateAnno.type;
         }
         that.vrvWorker.addEventListener('message', function handle(ev) {
@@ -193,11 +193,11 @@ export default class Viewer {
       }.bind(that));
       promise.then(function (p) {
         console.debug("HEARD BACK", p)
-        if(situateAnno && 'id' in situateAnno) { 
+        if (situateAnno && 'id' in situateAnno) {
           const ix = annotations.findIndex(a => a.id === situateAnno.id);
-          if(ix >= 0) { // found it
-            switch(situateAnno.type)  {
-              case 'first': 
+          if (ix >= 0) { // found it
+            switch (situateAnno.type) {
+              case 'first':
                 annotations[ix].firstPage = p;
                 break;
               case 'last':
@@ -207,7 +207,7 @@ export default class Viewer {
                 console.error("Called getPageWithElement on Verovio worker with invalid situateAnno: ", situateAnno);
             }
             const annotationLocationLabelElement = document.querySelector(`.annotationLocationLabel[data-id=${situateAnno.id}`);
-            if(annotationLocationLabelElement)  {
+            if (annotationLocationLabelElement) {
               annotationLocationLabelElement.innerHTML = generateAnnotationLocationLabel(annotations[ix]).innerHTML;
             }
           }
@@ -1022,10 +1022,11 @@ export default class Viewer {
     let optionsToShow = {
       selectToolkitVersion: {
         title: 'Verovio version',
-        description: 'SeleSelect Verovio toolkit version (* Switching to older versions before 3.11.0 might need a refresh due to memory issues.)',
+        description: 'Select Verovio toolkit version (* Switching to older versions before 3.11.0 might require a refresh due to memory issues.)',
         type: 'select',
         default: defaultVerovioVersion,
-        values: Object.keys(supportedVerovioVersions)
+        values: Object.keys(supportedVerovioVersions),
+        valuesDescriptions: Object.keys(supportedVerovioVersions).map(key => supportedVerovioVersions[key].description)
       },
       showAnnotationPanel: {
         title: 'Show annotation panel',
@@ -1233,7 +1234,15 @@ export default class Viewer {
             optDefault = optDefault === 'true';
         } else delete storage['mf-' + opt];
       }
+      // set default values for mei-friend settings
       switch (opt) {
+        case 'selectToolkitVersion':
+          this.vrvWorker.postMessage({
+            'cmd': 'loadVerovio',
+            'msg': optDefault,
+            'url': supportedVerovioVersions[optDefault].url
+          });
+          break;
         case 'showSupplied':
           rt.style.setProperty('--suppliedColor', (optDefault) ? 'var(--defaultSuppliedColor)' : 'var(--notationColor)')
           rt.style.setProperty('--suppliedHighlightedColor', (optDefault) ? 'var(--defaultSuppliedHighlightedColor)' : 'var(--highlightColor)')
@@ -1286,7 +1295,7 @@ export default class Viewer {
             this.vrvWorker.postMessage({
               'cmd': 'loadVerovio',
               'msg': value,
-              'url': supportedVerovioVersions[value]
+              'url': supportedVerovioVersions[value].url
             });
             break;
           case 'showAnnotationPanel':
@@ -1445,8 +1454,12 @@ export default class Viewer {
         input = document.createElement('select');
         input.setAttribute('name', opt);
         input.setAttribute('id', opt);
-        o.values.forEach((str, i) => input.add(new Option(str, str,
-          (o.values.indexOf(optDefault) == i) ? true : false)));
+        o.values.forEach((str, i) => {
+          let option = new Option(str, str,
+            (o.values.indexOf(optDefault) == i) ? true : false);
+          if ('valuesDescriptions' in o) option.title = o.valuesDescriptions[i];
+          input.add(option)
+        });
         break;
       case 'color':
         input = document.createElement('input');
@@ -1594,7 +1607,7 @@ export default class Viewer {
         }
       });
       that.vrvWorker.postMessage(message);
-    }.bind(that)); 
+    }.bind(that));
     promise.then(
       function (time) {
         return time;
@@ -1726,16 +1739,16 @@ export default class Viewer {
     console.log('Replace schema: ' + schemaFile);
     let data; // content of schema file
     try {
-    const response = await fetch(schemaFile);
-    if (!response.ok) { // schema not found
+      const response = await fetch(schemaFile);
+      if (!response.ok) { // schema not found
         this.throwSchemaError({
           "response": response,
           "schemaFile": schemaFile
         });
-      return;
-    }
+        return;
+      }
       data = await response.text();
-    const res = await validator.setRelaxNGSchema(data);
+      const res = await validator.setRelaxNGSchema(data);
     } catch (err) {
       this.throwSchemaError({
         "err": err
@@ -1746,7 +1759,7 @@ export default class Viewer {
     vs.innerHTML = unverified;
     this.validatorWithSchema = true;
     if (document.getElementById('autoValidate').checked)
-    validate(cm.getValue(), this.updateLinting, true)
+      validate(cm.getValue(), this.updateLinting, true)
     else
       this.setValidationStatusToManual();
     console.log("New schema loaded to validator", schemaFile);
