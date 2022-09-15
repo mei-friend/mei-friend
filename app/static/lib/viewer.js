@@ -1240,7 +1240,9 @@ export default class Viewer {
           this.vrvWorker.postMessage({
             'cmd': 'loadVerovio',
             'msg': optDefault,
-            'url': supportedVerovioVersions[optDefault].url
+            'url': optDefault in supportedVerovioVersions 
+              ? supportedVerovioVersions[optDefault].url
+              : supportedVerovioVersions[o.default].url
           });
           break;
         case 'showSupplied':

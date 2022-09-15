@@ -1556,6 +1556,10 @@ function drawRightFooter() {
     "</a> (" + versionDate + ").&nbsp;";
   if (tkVersion) {
     let githubUrl = 'https://github.com/rism-digital/verovio/releases/tag/version-' + tkVersion.split('-')[0];
+    if(tkVersion.includes("dev")) { 
+      // current develop version, no release yet...
+      githubUrl = 'https://github.com/rism-digital/verovio/tree/develop';
+    }
     rf.innerHTML +=
       `&nbsp;<a href="${githubUrl}" target="_blank" title="${tkUrl}">Verovio ${tkVersion}</a>.`;
   }
