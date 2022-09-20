@@ -4,7 +4,6 @@ const versionDate = '15 Sept 2022';
 
 var vrvWorker;
 var spdWorker;
-var tkAvailableOptions;
 var mei;
 var elementAtCursor;
 var breaksParam; // (string) the breaks parameter given through URL
@@ -699,14 +698,14 @@ async function vrvWorkerEventsHandler(ev) {
       console.info('main(). Handler vrvLoaded: ', this);
       tkVersion = ev.data.version;
       tkUrl = ev.data.url;
-      tkAvailableOptions = ev.data.availableOptions;
+      v.tkAvailableOptions = ev.data.availableOptions;
       v.clearVrvOptionsSettingsPanel();
-      v.addVrvOptionsToSettingsPanel(tkAvailableOptions, defaultVerovioOptions);
+      v.addVrvOptionsToSettingsPanel(defaultVerovioOptions);
       // v.addMeiFriendOptionsToSettingsPanel();
       drawRightFooter();
       document.querySelector(".statusbar").innerHTML =
         `Verovio ${tkVersion} loaded.`;
-      setBreaksOptions(tkAvailableOptions, defaultVerovioOptions.breaks);
+      setBreaksOptions(v.tkAvailableOptions, defaultVerovioOptions.breaks);
       if (!storage.supported || !meiFileName) {
         // open default mei file
         openFile();
@@ -1097,6 +1096,7 @@ let cmd = {
   'showSettingsPanel': () => v.showSettingsPanel(),
   'hideSettingsPanel': () => v.hideSettingsPanel(),
   'toggleSettingsPanel': (ev) => v.toggleSettingsPanel(ev),
+  'filterSettings': (ev) => v.filterSettings(ev),
   'showAnnotationPanel': () => {
     document.getElementById('showAnnotationPanel').checked = true; // TODO: remove?
     v.toggleAnnotationPanel();
@@ -1248,6 +1248,8 @@ function addEventListeners(v, cm) {
   document.getElementById('showSettingsButton').addEventListener('click', cmd.showSettingsPanel);
   document.getElementById('hideSettingsButton').addEventListener('click', cmd.hideSettingsPanel);
   document.getElementById('closeSettingsButton').addEventListener('click', cmd.hideSettingsPanel);
+  document.getElementById('filterSettings').addEventListener('input', cmd.filterSettings);
+  document.getElementById('filterSettings').value=""; 
   document.getElementById('showAnnotationMenu').addEventListener('click', cmd.showAnnotationPanel);
   document.getElementById('showAnnotationsButton').addEventListener('click', cmd.toggleAnnotationPanel);
   document.getElementById('closeAnnotationPanelButton').addEventListener('click', cmd.hideAnnotationPanel);

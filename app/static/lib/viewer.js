@@ -63,6 +63,7 @@ export default class Viewer {
     this.verovioIcon = document.getElementById('verovio-icon');
     this.respId = '';
     this.alertCloser;
+    this.filterSettingsString = ''; // used to filter settings options
   }
 
   // change options, load new data, render current page, add listeners, highlight
@@ -184,7 +185,6 @@ export default class Viewer {
         }
         that.vrvWorker.addEventListener('message', function handle(ev) {
           if (ev.data.cmd === 'pageWithElement' && ev.data.taskId === taskId) {
-            console.debug("ABOUT TO RESOLVE WITH ", ev.data)
             resolve(ev.data.msg);
             that.vrvWorker.removeEventListener('message', handle);
           }
@@ -192,7 +192,6 @@ export default class Viewer {
         that.vrvWorker.postMessage(msg);
       }.bind(that));
       promise.then(function (p) {
-        console.debug("HEARD BACK", p)
         if (situateAnno && 'id' in situateAnno) {
           const ix = annotations.findIndex(a => a.id === situateAnno.id);
           if (ix >= 0) { // found it
@@ -762,13 +761,19 @@ export default class Viewer {
     }
   }
 
+  filterSettings(e) { 
+    this.filterSettingsString = e.target.value;
+    this.clearVrvOptionsSettingsPanel();
+    this.addVrvOptionsToSettingsPanel(this.vrvOptions);
+  }
+
   clearVrvOptionsSettingsPanel() {
     this.vrvOptions = {};
     document.getElementById('verovioSettings').innerHTML = '';
   }
 
   // initializes the settings panel by filling it with content
-  addVrvOptionsToSettingsPanel(tkAvailableOptions, defaultVrvOptions, restoreFromLocalStorage = true) {
+  addVrvOptionsToSettingsPanel(defaultVrvOptions, restoreFromLocalStorage = true) {
     let userFilter = document.querySelector(".settingsFilter");
 
     // skip these options (in part because they are handled in control menu)
@@ -781,17 +786,23 @@ export default class Viewer {
     vsp.innerHTML = "";
     let storage = window.localStorage;
 
-    Object.keys(tkAvailableOptions.groups).forEach((grp, i) => {
-      let group = tkAvailableOptions.groups[grp];
+    Object.keys(this.tkAvailableOptions.groups).forEach((grp, i) => {
+      let group = this.tkAvailableOptions.groups[grp];
       let groupId = group.name.replaceAll(" ", "_");
       // skip these two groups: base handled by mei-friend; sel to be thought (TODO)
       if (!group.name.startsWith('Base short') &&
         !group.name.startsWith('Element selectors')) {
         let details = document.createElement('details');
         details.innerHTML += `<summary id="${groupId}">${group.name}</summary>`;
-        console.debug("group: ", group)
         Object.keys(group.options).forEach(opt => {
-          if (!skipList.includes(opt)) {
+          // proceed (i.e., don't skip this opt) if it's not in our skip list... 
+          // AND the user has not specified a filter string
+          // ... or if they have specified one, skip unless the string matches the opt name or description
+          if (!skipList.includes(opt) && 
+              !this.filterSettingsString ||
+              opt.toLowerCase().includes(this.filterSettingsString.toLowerCase()) ||
+              group.options[opt].description.toLowerCase().includes(this.filterSettingsString.toLowerCase())
+           ) {
             let o = group.options[opt]; // vrv available options
             let optDefault = o.default; // available options defaults
             if (defaultVrvOptions.hasOwnProperty(opt)) // mei-friend vrv defaults
@@ -830,7 +841,7 @@ export default class Viewer {
       });
       vsp.addEventListener('click', ev => { // RESET button
         if (ev.target.id === 'vrvReset') {
-          this.addVrvOptionsToSettingsPanel(tkAvailableOptions, defaultVrvOptions, false);
+          this.addVrvOptionsToSettingsPanel(this.tkAvailableOptions, defaultVrvOptions, false);
           this.updateLayout(this.vrvOptions);
         }
       });
