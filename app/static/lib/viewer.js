@@ -769,6 +769,8 @@ export default class Viewer {
 
   // initializes the settings panel by filling it with content
   addVrvOptionsToSettingsPanel(tkAvailableOptions, defaultVrvOptions, restoreFromLocalStorage = true) {
+    let userFilter = document.querySelector(".settingsFilter");
+
     // skip these options (in part because they are handled in control menu)
     let skipList = ['breaks', 'engravingDefaults', 'expand',
       'svgAdditionalAttribute', 'handwrittenFont'
@@ -787,6 +789,7 @@ export default class Viewer {
         !group.name.startsWith('Element selectors')) {
         let details = document.createElement('details');
         details.innerHTML += `<summary id="${groupId}">${group.name}</summary>`;
+        console.debug("group: ", group)
         Object.keys(group.options).forEach(opt => {
           if (!skipList.includes(opt)) {
             let o = group.options[opt]; // vrv available options

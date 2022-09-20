@@ -445,25 +445,25 @@ export function writeAnnot(anchor, xmlId, plist, payload) {
     if(firstChildNode) { 
       // set cursor based on it
       setCursorToId(cm, firstChildNode.getAttribute("xml:id"))
-      let annot = document.createElementNS(meiNameSpace, 'annot');
-      annot.setAttributeNS(xmlNameSpace, 'id', xmlId);
-      annot.setAttribute('plist', plist.map(p => '#' + p).join(' '));
-      if (payload) {
-        if (typeof payload === 'string') {
-          annot.textContent = payload;
-        } else if (typeof payload === 'object') {
-          annot.appendChild(payload);
-        }
+    let annot = document.createElementNS(meiNameSpace, 'annot');
+    annot.setAttributeNS(xmlNameSpace, 'id', xmlId);
+    annot.setAttribute('plist', plist.map(p => '#' + p).join(' '));
+    if (payload) {
+      if (typeof payload === 'string') {
+        annot.textContent = payload;
+      } else if (typeof payload === 'object') {
+        annot.appendChild(payload);
       }
+    }
       // insert <annot> into the DOM
       insertHere.insertAdjacentElement("afterbegin", annot);
       // now write it into CM
-      let p1 = cm.getCursor();
-      cm.replaceRange(xmlToString(annot) + '\n', p1);
-      let p2 = cm.getCursor();
+    let p1 = cm.getCursor();
+    cm.replaceRange(xmlToString(annot) + '\n', p1);
+    let p2 = cm.getCursor();
       // indent nicely
-      while (p1.line <= p2.line)
-        cm.indentLine(p1.line++, 'smart');
+    while (p1.line <= p2.line)
+      cm.indentLine(p1.line++, 'smart');
       // jump to the written <annot> in CM
       setCursorToId(cm, xmlId)
     } else {
@@ -625,7 +625,6 @@ export function ingestWebAnnotation(webAnno) {
 function writeInlineIfRequested(a) {
   // write annotation to inline <annot> if the user has requested this
   if (document.getElementById('writeAnnotInline').checked) {
- //   let el = document.querySelector('[*|id="' + v.selectedElements[0] + '"]');
     let el = v.xmlDoc.querySelector('[*|id="' + v.selectedElements[0] + '"]');
     if (el) {
       let payload;

@@ -536,9 +536,13 @@
       <span id="closeSettingsButton" class="topright" title="Hide Settings Panel">&times;</span>
     </div>
     <!-- Tab content -->
-    <div id="meiFriendSettings" class="tabcontent"> </div>
-    <div id="editorSettings" class="tabcontent"> </div>
-    <div id="verovioSettings" class="tabcontent"> </div>
+    <div id="settingsTabContentWrapper">
+      <div id="searchFilterWrapper">
+        <span>Filter settings: </span><input type="text" id="searchFilter" placeholder="Enter setting description"/></div>
+      <div id="meiFriendSettings" class="tabcontent"> </div>
+      <div id="editorSettings" class="tabcontent"> </div>
+      <div id="verovioSettings" class="tabcontent"> </div>
+    </div>
   </div>
 
   <script>

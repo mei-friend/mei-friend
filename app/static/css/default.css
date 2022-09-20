@@ -52,8 +52,7 @@
   --keyboardShortCutColor: var(--defaultKeyboardShortCutColor);
   --dropdownHeadingColor: var(--defaultDropdownHeadingColor);
   --dropdownBackgroundColor: var(--defaultDropdownBackgroundColor);
-  --validationStatusBackgroundColor: var(--defaultValidationStatusBackgroundColor)
-  --dropdownBorderColor: var(--defaultDropdownBorderColor);
+  --validationStatusBackgroundColor: var(--defaultValidationStatusBackgroundColor) --dropdownBorderColor: var(--defaultDropdownBorderColor);
   --overlayBackgroundColor: var(--defaultOverlayBackgroundColor);
   --overlayTextColor: var(--defaultOverlayTextColor);
   --overlayBorderColor: var(--defaultOverlayBorderColor);
@@ -946,18 +945,34 @@ span.keyIcon {
 }
 
 /* Style the tab content */
-.tabcontent {
-  color: var(--textColor);
-  font-size: 10pt;
-  display: none;
-  padding: 6px 12px;
+#settingsTabContentWrapper {
   background-color: var(--settingsBackgroundColor);
   border-left: var(--settingsBackgroundColor) solid 2px;
   border-bottom: var(--settingsBackgroundColor) solid 2px;
   border-bottom-right-radius: 5px;
   border-bottom-left-radius: 5px;
   height: 95%;
+}
+
+#settingsTabContentWrapper #searchFilterWrapper {
+  position: relative;
+  top: 0.1em;
+  height: 1.6em;
+  left: .8em;
+  display:flex;
+  flex-direction:row;
+  width:calc(100% - 2em);
+  justify-content:space-between;
+  align-items: baseline;
+}
+
+.tabcontent {
+  color: var(--textColor);
+  font-size: 10pt;
+  display: none;
+  padding: 6px 12px;
   overflow: auto;
+  height: 100%;
 }
 
 .tabcontent summary {
