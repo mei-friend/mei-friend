@@ -763,11 +763,12 @@ export default class Viewer {
 
   filterSettings(e) { 
     this.filterSettingsString = e.target.value;
-    this.clearVrvOptionsSettingsPanel();
+    this.clearVrvOptionsSettingsPanel(true);
     this.addVrvOptionsToSettingsPanel(this.vrvOptions);
   }
 
-  clearVrvOptionsSettingsPanel() {
+  clearVrvOptionsSettingsPanel(retainOptions = false) {
+    if(!retainOptions) 
     this.vrvOptions = {};
     document.getElementById('verovioSettings').innerHTML = '';
   }
