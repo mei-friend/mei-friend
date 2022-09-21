@@ -763,8 +763,12 @@ export default class Viewer {
 
   filterSettings(e) { 
     this.filterSettingsString = e.target.value;
+    // filter Verovio settings
     this.clearVrvOptionsSettingsPanel(true);
     this.addVrvOptionsToSettingsPanel(this.vrvOptions);
+    // filter mei-friend settings
+    document.getElementById('meiFriendSettings').innerHTML = "";
+    this.addMeiFriendOptionsToSettingsPanel(false);
   }
 
   clearVrvOptionsSettingsPanel(retainOptions = false) {
@@ -798,11 +802,11 @@ export default class Viewer {
         Object.keys(group.options).forEach(opt => {
           // proceed (i.e., don't skip this opt) if it's not in our skip list... 
           // AND the user has not specified a filter string
-          // ... or if they have specified one, skip unless the string matches the opt name or description
+          // ... or if they have specified one, skip unless the string matches the opt name or title 
           if (!skipList.includes(opt) && 
               !this.filterSettingsString ||
               opt.toLowerCase().includes(this.filterSettingsString.toLowerCase()) ||
-              group.options[opt].description.toLowerCase().includes(this.filterSettingsString.toLowerCase())
+              group.options[opt].title.toLowerCase().includes(this.filterSettingsString.toLowerCase())
            ) {
             let o = group.options[opt]; // vrv available options
             let optDefault = o.default; // available options defaults
@@ -1240,62 +1244,72 @@ export default class Viewer {
     mfs.innerHTML = '<div><h2>mei-friend Settings</h2></div>';
     let storage = window.localStorage;
     Object.keys(optionsToShow).forEach(opt => {
-      let o = optionsToShow[opt];
-      let optDefault = o.default;
-      if (storage.hasOwnProperty('mf-' + opt)) {
-        if (restoreFromLocalStorage) {
-          optDefault = storage['mf-' + opt];
-          if (typeof optDefault === 'string' && (optDefault === 'true' || optDefault === 'false'))
-            optDefault = optDefault === 'true';
-        } else delete storage['mf-' + opt];
-      }
-      // set default values for mei-friend settings
-      switch (opt) {
-        case 'selectToolkitVersion':
-          this.vrvWorker.postMessage({
-            'cmd': 'loadVerovio',
-            'msg': optDefault,
-            'url': optDefault in supportedVerovioVersions 
-              ? supportedVerovioVersions[optDefault].url
-              : supportedVerovioVersions[o.default].url
-          });
-          break;
-        case 'showSupplied':
-          rt.style.setProperty('--suppliedColor', (optDefault) ? 'var(--defaultSuppliedColor)' : 'var(--notationColor)')
-          rt.style.setProperty('--suppliedHighlightedColor', (optDefault) ? 'var(--defaultSuppliedHighlightedColor)' : 'var(--highlightColor)')
-          break;
-        case 'suppliedColor':
-          let checked = document.getElementById('showSupplied').checked;
-          rt.style.setProperty('--defaultSuppliedColor', checked ? optDefault : 'var(--notationColor)');
-          rt.style.setProperty('--defaultSuppliedHighlightedColor', checked ? utils.brighter(optDefault, -50) : 'var(--highlightColor)');
-          rt.style.setProperty('--suppliedColor', checked ? optDefault : 'var(--notationColor)');
-          rt.style.setProperty('--suppliedHighlightedColor', checked ? utils.brighter(optDefault, -50) : 'var(--highlightColor)');
-          break;
-        case 'respSelect':
-          if (this.xmlDoc)
-            o.values = Array.from(this.xmlDoc.querySelectorAll('corpName[*|id]'))
-            .map(e => e.getAttribute('xml:id'));
-          break;
-        case 'controlMenuFontSelector':
-          document.getElementById('font-ctrls').style.display = optDefault ? 'inherit' : 'none';
-          break;
-        case 'controlMenuNavigateArrows':
-          document.getElementById('navigate-ctrls').style.display = optDefault ? 'inherit' : 'none';
-          break;
-        case 'controlMenuUpdateNotation':
-          document.getElementById('update-ctrls').style.display = optDefault ? 'inherit' : 'none';
-          break;
-      }
-      let div = this.createOptionsItem(opt, o, optDefault)
-      if (div) mfs.appendChild(div);
-      if (opt === 'respSelect') this.respId = document.getElementById('respSelect').value;
-      if (opt === 'renumberMeasuresUseSuffixAtEndings') {
-        this.disableElementThroughCheckbox(
-          'renumberMeasuresContinueAcrossEndings', 'renumberMeasuresUseSuffixAtEndings');
-      }
-      if (opt === 'renumberMeasuresUseSuffixAtMeasures') {
-        this.disableElementThroughCheckbox(
-          'renumberMeasureContinueAcrossIncompleteMeasures', 'renumberMeasuresUseSuffixAtMeasures');
+      if(this.filterSettingsString && optionsToShow[opt].type === "line") // throw out divider lines when filtering
+        return
+      // proceed (i.e., don't skip this opt) if the user has not specified a filter string
+      // ... or if they have specified one, skip opts unless the string matches the opt name or title 
+      console.debug("considering: ", opt, optionsToShow[opt]);
+      if (!this.filterSettingsString ||
+          opt.toLowerCase().includes(this.filterSettingsString.toLowerCase()) ||
+          optionsToShow[opt].title.toLowerCase().includes(this.filterSettingsString.toLowerCase())
+        ) {
+        let o = optionsToShow[opt];
+        let optDefault = o.default;
+        if (storage.hasOwnProperty('mf-' + opt)) {
+          if (restoreFromLocalStorage) {
+            optDefault = storage['mf-' + opt];
+            if (typeof optDefault === 'string' && (optDefault === 'true' || optDefault === 'false'))
+              optDefault = optDefault === 'true';
+          } else delete storage['mf-' + opt];
+        }
+        // set default values for mei-friend settings
+        switch (opt) {
+          case 'selectToolkitVersion':
+            this.vrvWorker.postMessage({
+              'cmd': 'loadVerovio',
+              'msg': optDefault,
+              'url': optDefault in supportedVerovioVersions 
+                ? supportedVerovioVersions[optDefault].url
+                : supportedVerovioVersions[o.default].url
+            });
+            break;
+          case 'showSupplied':
+            rt.style.setProperty('--suppliedColor', (optDefault) ? 'var(--defaultSuppliedColor)' : 'var(--notationColor)')
+            rt.style.setProperty('--suppliedHighlightedColor', (optDefault) ? 'var(--defaultSuppliedHighlightedColor)' : 'var(--highlightColor)')
+            break;
+          case 'suppliedColor':
+            let checked = document.getElementById('showSupplied').checked;
+            rt.style.setProperty('--defaultSuppliedColor', checked ? optDefault : 'var(--notationColor)');
+            rt.style.setProperty('--defaultSuppliedHighlightedColor', checked ? utils.brighter(optDefault, -50) : 'var(--highlightColor)');
+            rt.style.setProperty('--suppliedColor', checked ? optDefault : 'var(--notationColor)');
+            rt.style.setProperty('--suppliedHighlightedColor', checked ? utils.brighter(optDefault, -50) : 'var(--highlightColor)');
+            break;
+          case 'respSelect':
+            if (this.xmlDoc)
+              o.values = Array.from(this.xmlDoc.querySelectorAll('corpName[*|id]'))
+              .map(e => e.getAttribute('xml:id'));
+            break;
+          case 'controlMenuFontSelector':
+            document.getElementById('font-ctrls').style.display = optDefault ? 'inherit' : 'none';
+            break;
+          case 'controlMenuNavigateArrows':
+            document.getElementById('navigate-ctrls').style.display = optDefault ? 'inherit' : 'none';
+            break;
+          case 'controlMenuUpdateNotation':
+            document.getElementById('update-ctrls').style.display = optDefault ? 'inherit' : 'none';
+            break;
+        }
+        let div = this.createOptionsItem(opt, o, optDefault)
+        if (div) mfs.appendChild(div);
+        if (opt === 'respSelect') this.respId = document.getElementById('respSelect').value;
+        if (opt === 'renumberMeasuresUseSuffixAtEndings') {
+          this.disableElementThroughCheckbox(
+            'renumberMeasuresContinueAcrossEndings', 'renumberMeasuresUseSuffixAtEndings');
+        }
+        if (opt === 'renumberMeasuresUseSuffixAtMeasures') {
+          this.disableElementThroughCheckbox(
+            'renumberMeasureContinueAcrossIncompleteMeasures', 'renumberMeasuresUseSuffixAtMeasures');
+        }
       }
     });
     mfs.innerHTML += '<input type="button" title="Reset to mei-friend defaults" id="mfReset" class="resetButton" value="Default" />';

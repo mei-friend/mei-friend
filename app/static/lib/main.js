@@ -763,7 +763,8 @@ async function vrvWorkerEventsHandler(ev) {
         document.querySelector('title').innerHTML = 'mei-friend: ' +
           meiFileName.substr(meiFileName.lastIndexOf("/") + 1);
         document.getElementById('verovio-panel').innerHTML = ev.data.svg;
-        if (document.getElementById('showSourceImagePanel').checked) await drawSourceImage();
+        if (document.getElementById('showSourceImagePanel') && 
+            document.getElementById('showSourceImagePanel').checked) await drawSourceImage();
         if (ev.data.setCursorToPageBeginning) v.setCursorToPageBeginning(cm);
         v.updatePageNumDisplay();
         v.addNotationEventListeners(cm);
