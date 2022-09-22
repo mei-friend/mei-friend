@@ -463,7 +463,8 @@ document.addEventListener('DOMContentLoaded', function () {
     await v.replaceSchema(v.currentSchema);
   });
 
-  v.addCmOptionsToSettingsPanel(cm, defaultCodeMirrorOptions);
+  v.mfDefaults = defaultCodeMirrorOptions;
+  v.addCmOptionsToSettingsPanel(defaultCodeMirrorOptions);
   v.addMeiFriendOptionsToSettingsPanel();
 
   // add event listener to validation status icon, if no autoValidation

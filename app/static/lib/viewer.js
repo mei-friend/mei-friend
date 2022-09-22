@@ -64,6 +64,8 @@ export default class Viewer {
     this.respId = '';
     this.alertCloser;
     this.filterSettingsString = ''; // used to filter settings options
+    this.mfDefaults = {}; // default CodeMirror options
+    
   }
 
   // change options, load new data, render current page, add listeners, highlight
@@ -762,13 +764,19 @@ export default class Viewer {
   }
 
   filterSettings(e) { 
+    // empty our storage of previously filtered-out settings (as we're starting a new filter process)
+    document.getElementById('filteredOut').innerHTML = '';
+    // grab current filter string
     this.filterSettingsString = e.target.value;
     // filter Verovio settings
     this.clearVrvOptionsSettingsPanel(true);
     this.addVrvOptionsToSettingsPanel(this.vrvOptions);
     // filter mei-friend settings
-    document.getElementById('meiFriendSettings').innerHTML = "";
+    document.getElementById('meiFriendSettings').innerHTML = '';
     this.addMeiFriendOptionsToSettingsPanel();
+    // Update CodeMirror settings
+    document.getElementById('editorSettings').innerHTML = '';
+    this.addCmOptionsToSettingsPanel();
   }
 
   clearVrvOptionsSettingsPanel(retainOptions = false) {
@@ -779,8 +787,6 @@ export default class Viewer {
 
   // initializes the settings panel by filling it with content
   addVrvOptionsToSettingsPanel(defaultVrvOptions, restoreFromLocalStorage = true) {
-    let userFilter = document.querySelector(".settingsFilter");
-
     // skip these options (in part because they are handled in control menu)
     let skipList = ['breaks', 'engravingDefaults', 'expand',
       'svgAdditionalAttribute', 'handwrittenFont'
@@ -801,13 +807,7 @@ export default class Viewer {
         details.innerHTML += `<summary id="${groupId}">${group.name}</summary>`;
         Object.keys(group.options).forEach(opt => {
           // proceed (i.e., don't skip this opt) if it's not in our skip list... 
-          // AND the user has not specified a filter string
-          // ... or if they have specified one, skip unless the string matches the opt name or title 
-          if (!skipList.includes(opt) && 
-              !this.filterSettingsString ||
-              opt.toLowerCase().includes(this.filterSettingsString.toLowerCase()) ||
-              group.options[opt].title.toLowerCase().includes(this.filterSettingsString.toLowerCase())
-           ) {
+          if (!skipList.includes(opt)) {  
             let o = group.options[opt]; // vrv available options
             let optDefault = o.default; // available options defaults
             if (defaultVrvOptions.hasOwnProperty(opt)) // mei-friend vrv defaults
@@ -817,7 +817,15 @@ export default class Viewer {
               else delete storage['vrv-' + opt];
             }
             let div = this.createOptionsItem(opt, o, optDefault);
-            if (div) details.appendChild(div);
+            if(div){ 
+              if(!this.filterSettingsString ||
+                  opt.toLowerCase().includes(this.filterSettingsString.toLowerCase()) ||
+                  group.options[opt].title.toLowerCase().includes(this.filterSettingsString.toLowerCase()) 
+              ) 
+                details.appendChild(div);
+              else
+                document.getElementById("filteredOut").appendChild(div);
+            }
             // set all options so that toolkit is always completely cleared
             if (['bool', 'int', 'double', 'std::string-list'].includes(o.type))
               this.vrvOptions[opt] = optDefault;
@@ -853,7 +861,7 @@ export default class Viewer {
     }
   }
 
-  addCmOptionsToSettingsPanel(cm, mfDefaults, restoreFromLocalStorage = true) {
+  addCmOptionsToSettingsPanel(restoreFromLocalStorage = true) {
     let optionsToShow = { // key as in CodeMirror
       zoomFont: {
         title: 'Font size (%)',
@@ -968,19 +976,29 @@ export default class Viewer {
     Object.keys(optionsToShow).forEach(opt => {
       let o = optionsToShow[opt];
       let optDefault = o.default;
-      if (mfDefaults.hasOwnProperty(opt)) {
-        optDefault = mfDefaults[opt]
+      if (this.mfDefaults.hasOwnProperty(opt)) {
+        optDefault = this.mfDefaults[opt]
         if (opt === 'matchTags' && typeof optDefault === 'object') optDefault = true;
       };
       if (window.matchMedia('(prefers-color-scheme: dark)').matches && opt === 'theme') {
-        optDefault = mfDefaults['defaultDarkTheme']; // take a dark scheme for dark mode
+        optDefault = this.mfDefaults['defaultDarkTheme']; // take a dark scheme for dark mode
       }
       if (storage.hasOwnProperty('cm-' + opt)) {
         if (restoreFromLocalStorage) optDefault = storage['cm-' + opt];
         else delete storage['cm-' + opt];
       }
       let div = this.createOptionsItem(opt, o, optDefault)
-      if (div) cmsp.appendChild(div);
+      // proceed (i.e., don't skip this opt) if the user has not specified a filter string
+      // ... or if they have specified one, skip unless the string matches the opt name or title
+      if(!this.filterSettingsString ||
+          opt.toLowerCase().includes(this.filterSettingsString.toLowerCase()) ||
+          optionsToShow[opt].title.toLowerCase().includes(this.filterSettingsString.toLowerCase())
+      ) {
+        //if (div) cmsp.appendChild(div);
+        cmsp.appendChild(div);
+      } else { 
+        document.getElementById("filteredOut").appendChild(div);
+      }
       this.applyEditorOption(cm, opt, optDefault);
     });
     cmsp.innerHTML += '<input type="button" title="Reset to mei-friend defaults" id="cmReset" class="resetButton" value="Default" />';
@@ -993,15 +1011,15 @@ export default class Viewer {
         if (ev.target.type === 'number') value = parseFloat(value);
         this.applyEditorOption(cm, option, value,
           storage.hasOwnProperty('cm-matchTheme') ?
-          storage['cm-matchTheme'] : mfDefaults['matchTheme']);
+          storage['cm-matchTheme'] : this.mfDefaults['matchTheme']);
         if (option === 'theme' && storage.hasOwnProperty('cm-matchTheme')) {
           this.setNotationColors(
             storage.hasOwnProperty('cm-matchTheme') ?
-            storage['cm-matchTheme'] : mfDefaults['matchTheme']);
+            storage['cm-matchTheme'] : this.mfDefaults['matchTheme']);
         }
-        if ((mfDefaults.hasOwnProperty(option) && option !== 'theme' && mfDefaults[option].toString() === value.toString()) ||
+        if ((this.mfDefaults.hasOwnProperty(option) && option !== 'theme' && this.mfDefaults[option].toString() === value.toString()) ||
           (option === 'theme' && (window.matchMedia('(prefers-color-scheme: dark)').matches ?
-            mfDefaults.defaultDarkTheme : mfDefaults.defaultBrightTheme) === value.toString())) {
+            this.mfDefaults.defaultDarkTheme : this.mfDefaults.defaultBrightTheme) === value.toString())) {
           delete storage['cm-' + option]; // remove from storage object when default value
         } else {
           storage['cm-' + option] = value; // save changes in localStorage object
@@ -1018,19 +1036,19 @@ export default class Viewer {
       });
       cmsp.addEventListener('click', ev => {
         if (ev.target.id === 'cmReset') {
-          this.addCmOptionsToSettingsPanel(cm, mfDefaults, false);
+          this.addCmOptionsToSettingsPanel(false);
         }
       });
       window.matchMedia('(prefers-color-scheme: dark)')
         .addEventListener('change', ev => { // system changes from dark to bright or otherway round
           if (!storage.hasOwnProperty('cm-theme')) { // only if not changed by user
-            let matchTheme = storage.hasOwnProperty('cm-matchTheme') ? storage['cm-matchTheme'] : mfDefaults['cm-matchTheme'];
+            let matchTheme = storage.hasOwnProperty('cm-matchTheme') ? storage['cm-matchTheme'] : this.mfDefaults['cm-matchTheme'];
             if (ev.matches) { // event listener for dark/bright mode changes
-              document.getElementById('theme').value = mfDefaults['defaultDarkTheme'];
-              this.applyEditorOption(cm, 'theme', mfDefaults['defaultDarkTheme'], matchTheme);
+              document.getElementById('theme').value = this.mfDefaults['defaultDarkTheme'];
+              this.applyEditorOption(cm, 'theme', this.mfDefaults['defaultDarkTheme'], matchTheme);
             } else {
-              document.getElementById('theme').value = mfDefaults['defaultBrightTheme'];
-              this.applyEditorOption(cm, 'theme', mfDefaults['defaultBrightTheme'], matchTheme);
+              document.getElementById('theme').value = this.mfDefaults['defaultBrightTheme'];
+              this.applyEditorOption(cm, 'theme', this.mfDefaults['defaultBrightTheme'], matchTheme);
             }
           }
         });
@@ -1246,70 +1264,70 @@ export default class Viewer {
     Object.keys(optionsToShow).forEach(opt => {
       if(this.filterSettingsString && optionsToShow[opt].type === "line") // throw out divider lines when filtering
         return
+      let o = optionsToShow[opt];
+      let optDefault = o.default;
+      if (storage.hasOwnProperty('mf-' + opt)) {
+        if (restoreFromLocalStorage) {
+          optDefault = storage['mf-' + opt];
+          if (typeof optDefault === 'string' && (optDefault === 'true' || optDefault === 'false'))
+            optDefault = optDefault === 'true';
+        } else delete storage['mf-' + opt];
+      }
+      // set default values for mei-friend settings
+      switch (opt) {
+        case 'selectToolkitVersion':
+          this.vrvWorker.postMessage({
+            'cmd': 'loadVerovio',
+            'msg': optDefault,
+            'url': optDefault in supportedVerovioVersions 
+              ? supportedVerovioVersions[optDefault].url
+              : supportedVerovioVersions[o.default].url
+          });
+          break;
+        case 'showSupplied':
+          rt.style.setProperty('--suppliedColor', (optDefault) ? 'var(--defaultSuppliedColor)' : 'var(--notationColor)')
+          rt.style.setProperty('--suppliedHighlightedColor', (optDefault) ? 'var(--defaultSuppliedHighlightedColor)' : 'var(--highlightColor)')
+          break;
+        case 'suppliedColor':
+          let checked = document.getElementById('showSupplied').checked;
+          rt.style.setProperty('--defaultSuppliedColor', checked ? optDefault : 'var(--notationColor)');
+          rt.style.setProperty('--defaultSuppliedHighlightedColor', checked ? utils.brighter(optDefault, -50) : 'var(--highlightColor)');
+          rt.style.setProperty('--suppliedColor', checked ? optDefault : 'var(--notationColor)');
+          rt.style.setProperty('--suppliedHighlightedColor', checked ? utils.brighter(optDefault, -50) : 'var(--highlightColor)');
+          break;
+        case 'respSelect':
+          if (this.xmlDoc)
+            o.values = Array.from(this.xmlDoc.querySelectorAll('corpName[*|id]'))
+            .map(e => e.getAttribute('xml:id'));
+          break;
+        case 'controlMenuFontSelector':
+          document.getElementById('font-ctrls').style.display = optDefault ? 'inherit' : 'none';
+          break;
+        case 'controlMenuNavigateArrows':
+          document.getElementById('navigate-ctrls').style.display = optDefault ? 'inherit' : 'none';
+          break;
+        case 'controlMenuUpdateNotation':
+          document.getElementById('update-ctrls').style.display = optDefault ? 'inherit' : 'none';
+          break;
+      }
+      let div = this.createOptionsItem(opt, o, optDefault)
       // proceed (i.e., don't skip this opt) if the user has not specified a filter string
       // ... or if they have specified one, skip opts unless the string matches the opt name or title 
-      console.debug("considering: ", opt, optionsToShow[opt]);
       if (!this.filterSettingsString ||
           opt.toLowerCase().includes(this.filterSettingsString.toLowerCase()) ||
           optionsToShow[opt].title.toLowerCase().includes(this.filterSettingsString.toLowerCase())
-        ) {
-        let o = optionsToShow[opt];
-        let optDefault = o.default;
-        if (storage.hasOwnProperty('mf-' + opt)) {
-          if (restoreFromLocalStorage) {
-            optDefault = storage['mf-' + opt];
-            if (typeof optDefault === 'string' && (optDefault === 'true' || optDefault === 'false'))
-              optDefault = optDefault === 'true';
-          } else delete storage['mf-' + opt];
-        }
-        // set default values for mei-friend settings
-        switch (opt) {
-          case 'selectToolkitVersion':
-            this.vrvWorker.postMessage({
-              'cmd': 'loadVerovio',
-              'msg': optDefault,
-              'url': optDefault in supportedVerovioVersions 
-                ? supportedVerovioVersions[optDefault].url
-                : supportedVerovioVersions[o.default].url
-            });
-            break;
-          case 'showSupplied':
-            rt.style.setProperty('--suppliedColor', (optDefault) ? 'var(--defaultSuppliedColor)' : 'var(--notationColor)')
-            rt.style.setProperty('--suppliedHighlightedColor', (optDefault) ? 'var(--defaultSuppliedHighlightedColor)' : 'var(--highlightColor)')
-            break;
-          case 'suppliedColor':
-            let checked = document.getElementById('showSupplied').checked;
-            rt.style.setProperty('--defaultSuppliedColor', checked ? optDefault : 'var(--notationColor)');
-            rt.style.setProperty('--defaultSuppliedHighlightedColor', checked ? utils.brighter(optDefault, -50) : 'var(--highlightColor)');
-            rt.style.setProperty('--suppliedColor', checked ? optDefault : 'var(--notationColor)');
-            rt.style.setProperty('--suppliedHighlightedColor', checked ? utils.brighter(optDefault, -50) : 'var(--highlightColor)');
-            break;
-          case 'respSelect':
-            if (this.xmlDoc)
-              o.values = Array.from(this.xmlDoc.querySelectorAll('corpName[*|id]'))
-              .map(e => e.getAttribute('xml:id'));
-            break;
-          case 'controlMenuFontSelector':
-            document.getElementById('font-ctrls').style.display = optDefault ? 'inherit' : 'none';
-            break;
-          case 'controlMenuNavigateArrows':
-            document.getElementById('navigate-ctrls').style.display = optDefault ? 'inherit' : 'none';
-            break;
-          case 'controlMenuUpdateNotation':
-            document.getElementById('update-ctrls').style.display = optDefault ? 'inherit' : 'none';
-            break;
-        }
-        let div = this.createOptionsItem(opt, o, optDefault)
-        if (div) mfs.appendChild(div);
-        if (opt === 'respSelect') this.respId = document.getElementById('respSelect').value;
-        if (opt === 'renumberMeasuresUseSuffixAtEndings') {
-          this.disableElementThroughCheckbox(
-            'renumberMeasuresContinueAcrossEndings', 'renumberMeasuresUseSuffixAtEndings');
-        }
-        if (opt === 'renumberMeasuresUseSuffixAtMeasures') {
-          this.disableElementThroughCheckbox(
-            'renumberMeasureContinueAcrossIncompleteMeasures', 'renumberMeasuresUseSuffixAtMeasures');
-        }
+        ) 
+        mfs.appendChild(div);
+      else
+        document.getElementById('filteredOut').appendChild(div)
+      if (opt === 'respSelect') this.respId = document.getElementById('respSelect').value;
+      if (opt === 'renumberMeasuresUseSuffixAtEndings') {
+        this.disableElementThroughCheckbox(
+          'renumberMeasuresContinueAcrossEndings', 'renumberMeasuresUseSuffixAtEndings');
+      }
+      if (opt === 'renumberMeasuresUseSuffixAtMeasures') {
+        this.disableElementThroughCheckbox(
+          'renumberMeasureContinueAcrossIncompleteMeasures', 'renumberMeasuresUseSuffixAtMeasures');
       }
     });
     mfs.innerHTML += '<input type="button" title="Reset to mei-friend defaults" id="mfReset" class="resetButton" value="Default" />';
@@ -1789,7 +1807,8 @@ export default class Viewer {
     vs.setAttribute('title', 'Schema loaded ' + schemaFile);
     vs.innerHTML = unverified;
     this.validatorWithSchema = true;
-    if (document.getElementById('autoValidate').checked)
+    const autoValidate = document.getElementById('autoValidate');
+    if (autoValidate && autoValidate.checked)
       validate(cm.getValue(), this.updateLinting, true)
     else
       this.setValidationStatusToManual();
