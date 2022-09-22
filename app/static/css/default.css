@@ -1145,12 +1145,21 @@ select>option {
   border-radius: 5px;
 }
 
+#filterSettingsWrapper { 
+  color:var(--textColor);
+}
+
+#filterSettingsWrapper span { 
+  padding-right:1em;
+}
+
 #filterReset {
 	border:1px solid transparent;
 	background-color: transparent;
 	display: inline;
   cursor: pointer;
 }
+
 #filterReset:after {
   background-color: var(--settingsBackgroundColor);
 	content: "×";
