@@ -1099,6 +1099,10 @@ let cmd = {
   'hideSettingsPanel': () => v.hideSettingsPanel(),
   'toggleSettingsPanel': (ev) => v.toggleSettingsPanel(ev),
   'filterSettings': (ev) => v.filterSettings(ev),
+  'filterReset': () => { 
+    document.getElementById('filterSettings').value='';
+    document.getElementById('filterSettings').dispatchEvent(new Event("input"));
+  },
   'showAnnotationPanel': () => {
     document.getElementById('showAnnotationPanel').checked = true; // TODO: remove?
     v.toggleAnnotationPanel();
@@ -1252,6 +1256,7 @@ function addEventListeners(v, cm) {
   document.getElementById('closeSettingsButton').addEventListener('click', cmd.hideSettingsPanel);
   document.getElementById('filterSettings').addEventListener('input', cmd.filterSettings);
   document.getElementById('filterSettings').value=""; 
+  document.getElementById('filterReset').addEventListener('click', cmd.filterReset) 
   document.getElementById('showAnnotationMenu').addEventListener('click', cmd.showAnnotationPanel);
   document.getElementById('showAnnotationsButton').addEventListener('click', cmd.toggleAnnotationPanel);
   document.getElementById('closeAnnotationPanelButton').addEventListener('click', cmd.hideAnnotationPanel);

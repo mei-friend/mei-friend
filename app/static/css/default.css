@@ -1136,3 +1136,43 @@ select>option {
 .alertCloseButton:hover {
   color: black;
 }
+
+#filterSettings {
+	width: 80%;
+	border: 1px solid var(--dropdownBorderColor);
+  outline: 0;
+  border-radius: 5px;
+}
+
+#filterReset {
+	border:1px solid transparent;
+	background-color: transparent;
+	display: inline-block;
+	vertical-align: middle;
+  outline: 0;
+  cursor: pointer;
+}
+#filterReset:after {
+  background-color:red;
+	content: "X";
+	display: block;
+	width: 15px;
+	height: 15px;
+	position: absolute;
+	z-index:1;
+	right: 35px;
+	top: 0;
+	bottom: 0;
+	margin: auto;
+	padding: 2px;
+	border-radius: 50%;
+	text-align: center;
+	color: white;
+	font-weight: normal;
+	font-size: 12px;
+	box-shadow: 0 0 2px red;
+	cursor: pointer;
+}
+#filterSettings:not(:valid) ~ #filterReset {
+	display: none;
+}
