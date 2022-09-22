@@ -449,6 +449,7 @@ async function suspendedValidate(text, updateLinting, options) {
 
 // when initial page content has been loaded
 document.addEventListener('DOMContentLoaded', function () {
+  // console.log('DomConentLoaded: ' + Math.random());
   cm = CodeMirror.fromTextArea(document.getElementById("editor"), defaultCodeMirrorOptions);
   CodeMirror.normalizeKeyMap();
 
@@ -503,6 +504,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
 
+  v.busy();
   v.addCmOptionsToSettingsPanel(cm, defaultCodeMirrorOptions);
   v.addMeiFriendOptionsToSettingsPanel();
 
@@ -648,15 +650,6 @@ document.addEventListener('DOMContentLoaded', function () {
     clearTimeout(doit); // wait half a second before re-calculating orientation
     doit = setTimeout(() => setOrientation(cm, '', v, storage), 500);
   };
-
-  // ask worker to load Verovio
-  v.busy();
-  let verovioVersion = document.getElementById('selectToolkitVersion').value;
-  vrvWorker.postMessage({
-    'cmd': 'loadVerovio',
-    'msg': verovioVersion,
-    'url': supportedVerovioVersions[verovioVersion].url
-  });
 
   setKeyMap(defaultKeyMap);
 });

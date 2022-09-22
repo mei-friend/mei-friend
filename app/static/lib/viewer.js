@@ -1841,19 +1841,22 @@ export default class Viewer {
       switch (status) {
         case 'ok':
           this.changeStatus(el, 'ok', ['error', 'manual', 'wait']);
+          // pretty-printing for known schemas from music-encoding.org
           if (schemaName.includes('music-encoding.org')) {
             let pathElements = schemaName.split('/');
             let type = pathElements.pop();
             if (type.toLowerCase().includes('anystart')) type = 'any';
+            let noChars = 3;
+            if (type.toLowerCase().includes('neumes') || type.toLowerCase().includes('mensural')) noChars = 4;
             let schemaVersion = pathElements.pop();
-            el.innerHTML = type.split('mei-').pop().slice(0, 3).toUpperCase() + ' ' + schemaVersion;
+            el.innerHTML = type.split('mei-').pop().slice(0, noChars).toUpperCase() + ' ' + schemaVersion;
           } else {
             el.innerHTML = schemaName.split('/').pop().split('.').at(0);
           }
           break;
         case 'wait':
           this.changeStatus(el, 'wait', ['ok', 'manual', 'error']);
-          el.innerHTML = '&nbsp;?&nbsp;';
+          el.innerHTML = '&nbsp;&#8681;&nbsp;';
           break;
         case 'error':
           this.changeStatus(el, 'error', ['ok', 'manual', 'wait']);

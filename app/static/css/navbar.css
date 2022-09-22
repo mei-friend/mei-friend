@@ -242,7 +242,11 @@
   border-style: solid;
   border-radius: 4px;
   display: inline;
-  padding: 1px;
+  padding-bottom: 1px;
+  padding-top: 1.5px;
+  padding-left: 2px;
+  padding-right: 2px;
+  cursor: pointer;
 }
 
 .fileStatus #fileName {
