@@ -778,6 +778,19 @@ export default class Viewer {
     // Update CodeMirror settings
     document.getElementById('editorSettings').innerHTML = '';
     this.addCmOptionsToSettingsPanel();
+    // adjust flaps on Verovio tab according to whether filter string present
+    const vrvSettingsFlaps = document.querySelectorAll("#verovioSettings details");
+    if(this.filterSettingsString) {
+      // filter specified - open all flaps on Verovio tab
+      Array.from(vrvSettingsFlaps).forEach(f => f.setAttribute("open", "true"));
+    } else { 
+      Array.from(vrvSettingsFlaps).forEach((f, ix) => {
+        if(ix === 0)
+          f.setAttribute("open", "true");
+        else
+          f.removeAttribute("open");
+      })
+    }
   }
 
   clearVrvOptionsSettingsPanel(retainOptions = false) {
