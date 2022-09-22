@@ -768,7 +768,7 @@ export default class Viewer {
     this.addVrvOptionsToSettingsPanel(this.vrvOptions);
     // filter mei-friend settings
     document.getElementById('meiFriendSettings').innerHTML = "";
-    this.addMeiFriendOptionsToSettingsPanel(false);
+    this.addMeiFriendOptionsToSettingsPanel();
   }
 
   clearVrvOptionsSettingsPanel(retainOptions = false) {
