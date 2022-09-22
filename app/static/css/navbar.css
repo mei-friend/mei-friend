@@ -236,13 +236,13 @@
 
 .fileStatus #schemaStatus {
   font-family: Arial, Helvetica, sans-serif;
-  font-size: 7pt;
+  font-size: 6pt;
   font-weight: bold;
-  border-width: 2px;
+  border-width: 1.5px;
   border-style: solid;
   border-radius: 4px;
-  display: none;
-  padding: 2px;
+  /* display: none; */
+  padding: 1px;
 }
 
 .fileStatus #fileName {

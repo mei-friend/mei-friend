@@ -1819,7 +1819,7 @@ export default class Viewer {
     vs.setAttribute('title', msg);
     console.warn(msg);
     this.changeStatus(vs, 'error', ['wait', 'ok', 'manual']);
-    this.updateSchemaStatusSpan('');
+    this.updateSchemaStatusSpan('', msg);
     return;
   }
 
@@ -1831,12 +1831,12 @@ export default class Viewer {
     el.classList.add(addedClass);
   }
 
-  updateSchemaStatusSpan(schemaName) {
+  updateSchemaStatusSpan(schemaName, errorMsg = '') {
     let el = document.getElementById('schemaStatus');
     if (el) {
       if (schemaName) {
         el.style.display = 'inline';
-        this.changeStatus(el, 'ok', ['error']);
+        this.changeStatus(el, 'ok', ['error','manual']);
         if (schemaName.includes('music-encoding.org')) {
           let pathElements = schemaName.split('/');
           let type = pathElements.pop();
@@ -1848,7 +1848,10 @@ export default class Viewer {
         }
         el.title = 'Loaded schema: ' + schemaName;
       } else {
-        el.style.display = 'none';
+        this.changeStatus(el, 'error', ['ok','manual']);
+        el.innerHTML = '&nbsp;?&nbsp;';
+        el.title = errorMsg;
+        // el.style.display = 'none';
       }
     }
   }
