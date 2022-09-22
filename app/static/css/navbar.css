@@ -241,7 +241,7 @@
   border-width: 1.5px;
   border-style: solid;
   border-radius: 4px;
-  /* display: none; */
+  display: inline;
   padding: 1px;
 }
 

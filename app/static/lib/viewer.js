@@ -1758,8 +1758,10 @@ export default class Viewer {
     if (!this.validatorInitialized) return;
     let vs = document.getElementById('validation-status');
     vs.innerHTML = download;
-    vs.setAttribute('title', 'Loading schema ' + schemaFile);
+    let msg = 'Loading schema ' + schemaFile;
+    vs.setAttribute('title', msg);
     this.changeStatus(vs, 'wait', ['error', 'ok', 'manual']);
+    this.updateSchemaStatusSpan('wait', schemaFile, msg);
 
     console.log('Validation: Replace schema: ' + schemaFile);
     let data; // content of schema file
@@ -1780,7 +1782,8 @@ export default class Viewer {
       });
       return
     }
-    vs.setAttribute('title', 'Schema loaded ' + schemaFile);
+    msg = 'Schema loaded ' + schemaFile;
+    vs.setAttribute('title', msg);
     vs.innerHTML = unverified;
     this.validatorWithSchema = true;
     if (document.getElementById('autoValidate').checked)
@@ -1791,7 +1794,7 @@ export default class Viewer {
     rngLoader.setRelaxNGSchema(data);
     cm.options.hintOptions.schemaInfo = rngLoader.tags
     console.log("New schema loaded for auto completion", schemaFile);
-    this.updateSchemaStatusSpan(schemaFile);
+    this.updateSchemaStatusSpan('ok', schemaFile, msg);
   }
 
   // Throw an schema error and update validation-status icon
@@ -1819,7 +1822,7 @@ export default class Viewer {
     vs.setAttribute('title', msg);
     console.warn(msg);
     this.changeStatus(vs, 'error', ['wait', 'ok', 'manual']);
-    this.updateSchemaStatusSpan('', msg);
+    this.updateSchemaStatusSpan('error', '', msg);
     return;
   }
 
@@ -1831,27 +1834,31 @@ export default class Viewer {
     el.classList.add(addedClass);
   }
 
-  updateSchemaStatusSpan(schemaName, errorMsg = '') {
+  updateSchemaStatusSpan(status = 'ok', schemaName, msg = '') {
     let el = document.getElementById('schemaStatus');
     if (el) {
-      if (schemaName) {
-        el.style.display = 'inline';
-        this.changeStatus(el, 'ok', ['error','manual']);
-        if (schemaName.includes('music-encoding.org')) {
-          let pathElements = schemaName.split('/');
-          let type = pathElements.pop();
-          if (type.toLowerCase().includes('anystart')) type = 'any';
-          let schemaVersion = pathElements.pop();
-          el.innerHTML = type.split('mei-').pop().slice(0, 3).toUpperCase() + ' ' + schemaVersion;
-        } else {
-          el.innerHTML = schemaName.split('/').pop().split('.').at(0);
-        }
-        el.title = 'Loaded schema: ' + schemaName;
-      } else {
-        this.changeStatus(el, 'error', ['ok','manual']);
-        el.innerHTML = '&nbsp;?&nbsp;';
-        el.title = errorMsg;
-        // el.style.display = 'none';
+      el.title = msg;
+      switch (status) {
+        case 'ok':
+          this.changeStatus(el, 'ok', ['error', 'manual', 'wait']);
+          if (schemaName.includes('music-encoding.org')) {
+            let pathElements = schemaName.split('/');
+            let type = pathElements.pop();
+            if (type.toLowerCase().includes('anystart')) type = 'any';
+            let schemaVersion = pathElements.pop();
+            el.innerHTML = type.split('mei-').pop().slice(0, 3).toUpperCase() + ' ' + schemaVersion;
+          } else {
+            el.innerHTML = schemaName.split('/').pop().split('.').at(0);
+          }
+          break;
+        case 'wait':
+          this.changeStatus(el, 'wait', ['ok', 'manual', 'error']);
+          el.innerHTML = '&nbsp;?&nbsp;';
+          break;
+        case 'error':
+          this.changeStatus(el, 'error', ['ok', 'manual', 'wait']);
+          el.innerHTML = '&nbsp;?&nbsp;';
+          break;
       }
     }
   }

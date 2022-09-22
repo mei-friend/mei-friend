@@ -52,8 +52,7 @@
   --keyboardShortCutColor: var(--defaultKeyboardShortCutColor);
   --dropdownHeadingColor: var(--defaultDropdownHeadingColor);
   --dropdownBackgroundColor: var(--defaultDropdownBackgroundColor);
-  --validationStatusBackgroundColor: var(--defaultValidationStatusBackgroundColor)
-  --dropdownBorderColor: var(--defaultDropdownBorderColor);
+  --validationStatusBackgroundColor: var(--defaultValidationStatusBackgroundColor) --dropdownBorderColor: var(--defaultDropdownBorderColor);
   --overlayBackgroundColor: var(--defaultOverlayBackgroundColor);
   --overlayTextColor: var(--defaultOverlayTextColor);
   --overlayBorderColor: var(--defaultOverlayBorderColor);
@@ -367,11 +366,14 @@ a:active {
 
 .wait {
   fill: darkorange;
+  color: darkorange;
+  border-color: darkorange;
 }
 
 .error {
   color: rgb(175, 51, 51);
   fill: rgb(175, 51, 51);
+  border-color: rgb(175, 51, 51);
 }
 
 .ok {
