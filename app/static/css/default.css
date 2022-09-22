@@ -1139,6 +1139,7 @@ select>option {
 
 #filterSettings {
 	width: 80%;
+  height:2em;
 	border: 1px solid var(--dropdownBorderColor);
   outline: 0;
   border-radius: 5px;
@@ -1147,32 +1148,30 @@ select>option {
 #filterReset {
 	border:1px solid transparent;
 	background-color: transparent;
-	display: inline-block;
-	vertical-align: middle;
-  outline: 0;
+	display: inline;
   cursor: pointer;
 }
 #filterReset:after {
-  background-color:red;
-	content: "X";
-	display: block;
-	width: 15px;
-	height: 15px;
+  background-color: var(--settingsBackgroundColor);
+	content: "×";
+	display: inline;
+	width: .6em;
+	height: .6em;
 	position: absolute;
-	z-index:1;
-	right: 35px;
-	top: 0;
+	right: 1.2em;
+	top: 0.1em;
 	bottom: 0;
-	margin: auto;
-	padding: 2px;
+	padding: .15em;
 	border-radius: 50%;
 	text-align: center;
-	color: white;
+	color: var(--textColor);
 	font-weight: normal;
-	font-size: 12px;
-	box-shadow: 0 0 2px red;
+	font-size: 22px;
+  line-height:20px;
+  vertical-align: middle;
+  box-shadow: var(--settingsBackgroundColor);
 	cursor: pointer;
 }
 #filterSettings:not(:valid) ~ #filterReset {
-	display: none;
+	visibility:hidden;
 }

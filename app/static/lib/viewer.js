@@ -65,6 +65,7 @@ export default class Viewer {
     this.alertCloser;
     this.filterSettingsString = ''; // used to filter settings options
     this.mfDefaults = {}; // default CodeMirror options
+    this.tkAvailableOptions = {}; 
     
   }
 
@@ -796,7 +797,6 @@ export default class Viewer {
     if (!/\w/g.test(vsp.innerHTML)) addListeners = true;
     vsp.innerHTML = "";
     let storage = window.localStorage;
-
     Object.keys(this.tkAvailableOptions.groups).forEach((grp, i) => {
       let group = this.tkAvailableOptions.groups[grp];
       let groupId = group.name.replaceAll(" ", "_");
