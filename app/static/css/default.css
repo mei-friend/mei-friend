@@ -365,21 +365,22 @@ a:active {
   flex-wrap: nowrap;
 }
 
-#validation-status.wait {
+.wait {
   fill: darkorange;
 }
 
-#validation-status.error {
+.error {
   color: rgb(175, 51, 51);
   fill: rgb(175, 51, 51);
 }
 
-#validation-status.ok {
+.ok {
   color: green;
   fill: green;
+  border-color: green;
 }
 
-#validation-status.manual {
+.manual {
   color: grey;
   fill: grey
 }

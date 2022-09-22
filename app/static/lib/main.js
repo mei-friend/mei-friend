@@ -16,7 +16,45 @@ let platform = navigator.platform.toLowerCase(); // TODO
 // guidelines base URL, needed to construct element / attribute URLs
 // TODO ideally determine version part automatically
 const guidelinesBase = 'https://music-encoding.org/guidelines/v4/';
-const defaultSchema = 'https://music-encoding.org/schema/4.0.1/mei-all.rng';
+
+export const commonSchemas = {
+  'CMN': {
+    '2.1.1': 'https://music-encoding.org/schema/2.1.1/mei-CMN.rng',
+    '3.0.0': 'https://music-encoding.org/schema/3.0.0/mei-CMN.rng',
+    '4.0.0': 'https://music-encoding.org/schema/4.0.0/mei-CMN.rng',
+    '4.0.1': 'https://music-encoding.org/schema/4.0.1/mei-CMN.rng',
+    '5.0.0-dev': 'https://music-encoding.org/schema/dev/mei-CMN.rng'
+  },
+  'Mensural': {
+    '2.1.1': 'https://music-encoding.org/schema/2.1.1/mei-Mensural.rng',
+    '3.0.0': 'https://music-encoding.org/schema/3.0.0/mei-Mensural.rng',
+    '4.0.0': 'https://music-encoding.org/schema/4.0.0/mei-Mensural.rng',
+    '4.0.1': 'https://music-encoding.org/schema/4.0.1/mei-Mensural.rng',
+    '5.0.0-dev': 'https://music-encoding.org/schema/dev/mei-Mensural.rng'
+  },
+  'Neumes': {
+    '2.1.1': 'https://music-encoding.org/schema/2.1.1/mei-Neumes.rng',
+    '3.0.0': 'https://music-encoding.org/schema/3.0.0/mei-Neumes.rng',
+    '4.0.0': 'https://music-encoding.org/schema/4.0.0/mei-Neumes.rng',
+    '4.0.1': 'https://music-encoding.org/schema/4.0.1/mei-Neumes.rng',
+    '5.0.0-dev': 'https://music-encoding.org/schema/dev/mei-Neumes.rng'
+  },
+  'All': {
+    '2.1.1': 'https://music-encoding.org/schema/2.1.1/mei-all.rng',
+    '3.0.0': 'https://music-encoding.org/schema/3.0.0/mei-all.rng',
+    '4.0.0': 'https://music-encoding.org/schema/4.0.0/mei-all.rng',
+    '4.0.1': 'https://music-encoding.org/schema/4.0.1/mei-all.rng',
+    '5.0.0-dev': 'https://music-encoding.org/schema/dev/mei-all.rng'
+  },
+  'Any': {
+    '2.1.1': 'https://music-encoding.org/schema/2.1.1/mei-all_anyStart.rng',
+    '3.0.0': 'https://music-encoding.org/schema/3.0.0/mei-all_anyStart.rng',
+    '4.0.0': 'https://music-encoding.org/schema/4.0.0/mei-all_anyStart.rng',
+    '4.0.1': 'https://music-encoding.org/schema/4.0.1/mei-all_anyStart.rng',
+    '5.0.0-dev': 'https://music-encoding.org/schema/dev/mei-all_anyStart.rng'
+  }
+};
+const defaultSchema = commonSchemas['CMN']['4.0.1'];
 
 // exports
 export var cm;
@@ -458,10 +496,11 @@ document.addEventListener('DOMContentLoaded', function () {
   rngLoader = new RNGLoader();
 
   validator.onRuntimeInitialized().then(async () => {
-    console.log('validator: onRuntimeInitialized()');
+    console.log('Validator: onRuntimeInitialized()');
     v.validatorInitialized = true;
-    if (!v.currentSchema) v.currentSchema = defaultSchema;
-    await v.replaceSchema(v.currentSchema);
+    if (!v.validatorWithSchema && v.currentSchema) {
+      await v.replaceSchema(v.currentSchema);
+    }
   });
 
   v.addCmOptionsToSettingsPanel(cm, defaultCodeMirrorOptions);
@@ -1556,7 +1595,7 @@ function drawRightFooter() {
     "</a> (" + versionDate + ").&nbsp;";
   if (tkVersion) {
     let githubUrl = 'https://github.com/rism-digital/verovio/releases/tag/version-' + tkVersion.split('-')[0];
-    if(tkVersion.includes("dev")) { 
+    if (tkVersion.includes("dev")) {
       // current develop version, no release yet...
       githubUrl = 'https://github.com/rism-digital/verovio/tree/develop';
     }
