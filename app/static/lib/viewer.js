@@ -825,7 +825,7 @@ export default class Viewer {
     let vsp = document.getElementById('verovioSettings');
     let addListeners = false; // add event listeners only the first time
     if (!/\w/g.test(vsp.innerHTML)) addListeners = true;
-    vsp.innerHTML = "";
+    vsp.innerHTML = '<div class="settingsHeader">Verovio Settings</div>';
     let storage = window.localStorage;
 
     Object.keys(tkAvailableOptions.groups).forEach((grp, i) => {
@@ -994,7 +994,7 @@ export default class Viewer {
     let cmsp = document.getElementById('editorSettings');
     let addListeners = false; // add event listeners only the first time
     if (!/\w/g.test(cmsp.innerHTML)) addListeners = true;
-    cmsp.innerHTML = '<div><h2>Editor Settings</h2></div>';
+    cmsp.innerHTML = '<div class="settingsHeader">Editor Settings</div>';
     Object.keys(optionsToShow).forEach(opt => {
       let o = optionsToShow[opt];
       let optDefault = o.default;
@@ -1276,7 +1276,7 @@ export default class Viewer {
     let addListeners = false; // add event listeners only the first time
     let rt = document.querySelector(':root');
     if (!/\w/g.test(mfs.innerHTML)) addListeners = true;
-    mfs.innerHTML = '<div><h2>mei-friend Settings</h2></div>';
+    mfs.innerHTML = '<div class="settingsHeader">mei-friend Settings</div>';
     let storage = window.localStorage;
     let currentHeader;
     Object.keys(optionsToShow).forEach(opt => {

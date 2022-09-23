@@ -962,16 +962,16 @@ span.keyIcon {
   height: 95%;
 }
 
-#settingsTabContentWrapper #filterSettingsWrapper{
-  position: relative;
+#settingsTabContentWrapper #filterSettingsWrapper {
+  /* position: relative;
   top: 0.1em;
   height: 1.6em;
-  left: .8em;
-  display:flex;
-  flex-direction:row;
-  width:calc(100% - 2em);
-  justify-content:space-between;
-  align-items: baseline;
+  left: .8em; */
+  /* display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: baseline; */
+  width: calc(100% - 2em);
 }
 
 .tabcontent {
@@ -980,13 +980,14 @@ span.keyIcon {
   display: none;
   padding: 6px 12px;
   overflow: auto;
-  height: 100%;
+  height: calc(100% - 20px);;
+  width: calc(100% - 2em);
 }
 
 .tabcontent summary {
   font-size: 12pt;
   font-weight: bold;
-  padding: 9px 6px 6px 6px;
+  padding: 3px 6px 6px 6px;
   cursor: pointer;
 }
 
@@ -1003,6 +1004,13 @@ span.keyIcon {
   padding: 6px 12px;
   cursor: pointer;
   font-size: 22px;
+}
+
+.settingsHeader {
+  font-weight: bold;
+  font-size: 150%;
+  margin: 0px;
+  margin-bottom: 1em;
 }
 
 .optionsSubHeading {
@@ -1148,49 +1156,54 @@ select>option {
 }
 
 #filterSettings {
-	width: 80%;
-  height:2em;
-	border: 1px solid var(--dropdownBorderColor);
+  width: 33%;
+  height: 1.5em;
+  border: 1px solid var(--dropdownBorderColor);
   outline: 0;
-  border-radius: 5px;
+  border-radius: 4px;
+  float: right;
+  margin-right: -1em;
+  margin-top: 1em;
+  margin-bottom: -2em;
 }
 
-#filterSettingsWrapper { 
-  color:var(--textColor);
+#filterSettingsWrapper {
+  color: var(--textColor);
 }
 
-#filterSettingsWrapper span { 
-  padding-right:1em;
+#filterSettingsWrapper span {
+  padding-right: 1em;
 }
 
 #filterReset {
-	border:1px solid transparent;
-	background-color: transparent;
-	display: inline;
+  border: 1px solid transparent;
+  background-color: transparent;
+  display: inline;
   cursor: pointer;
 }
 
 #filterReset:after {
   background-color: var(--settingsBackgroundColor);
-	content: "×";
-	display: inline;
-	width: .6em;
-	height: .6em;
-	position: absolute;
-	right: 1.2em;
-	top: 0.1em;
-	bottom: 0;
-	padding: .15em;
-	border-radius: 50%;
-	text-align: center;
-	color: var(--textColor);
-	font-weight: normal;
-	font-size: 22px;
-  line-height:20px;
+  content: "×";
+  display: inline;
+  width: .6em;
+  height: .6em;
+  position: absolute;
+  right: 1.2em;
+  top: 0.1em;
+  bottom: 0;
+  padding: .15em;
+  border-radius: 50%;
+  text-align: center;
+  color: var(--textColor);
+  font-weight: normal;
+  font-size: 22px;
+  line-height: 20px;
   vertical-align: middle;
   box-shadow: var(--settingsBackgroundColor);
-	cursor: pointer;
+  cursor: pointer;
 }
-#filterSettings:not(:valid) ~ #filterReset {
-	visibility:hidden;
+
+#filterSettings:not(:valid)~#filterReset {
+  visibility: hidden;
 }

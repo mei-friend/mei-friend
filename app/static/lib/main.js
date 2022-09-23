@@ -796,8 +796,8 @@ async function vrvWorkerEventsHandler(ev) {
         document.querySelector('title').innerHTML = 'mei-friend: ' +
           meiFileName.substr(meiFileName.lastIndexOf("/") + 1);
         document.getElementById('verovio-panel').innerHTML = ev.data.svg;
-        if (document.getElementById('showSourceImagePanel') && 
-            document.getElementById('showSourceImagePanel').checked) await drawSourceImage();
+        if (document.getElementById('showSourceImagePanel') &&
+          document.getElementById('showSourceImagePanel').checked) await drawSourceImage();
         if (ev.data.setCursorToPageBeginning) v.setCursorToPageBeginning(cm);
         v.updatePageNumDisplay();
         v.addNotationEventListeners(cm);
@@ -1131,8 +1131,8 @@ let cmd = {
   'hideSettingsPanel': () => v.hideSettingsPanel(),
   'toggleSettingsPanel': (ev) => v.toggleSettingsPanel(ev),
   'filterSettings': () => v.applySettingsFilter(),
-  'filterReset': () => { 
-    document.getElementById('filterSettings').value='';
+  'filterReset': () => {
+    document.getElementById('filterSettings').value = '';
     document.getElementById('filterSettings').dispatchEvent(new Event("input"));
   },
   'showAnnotationPanel': () => {
@@ -1287,8 +1287,8 @@ function addEventListeners(v, cm) {
   document.getElementById('hideSettingsButton').addEventListener('click', cmd.hideSettingsPanel);
   document.getElementById('closeSettingsButton').addEventListener('click', cmd.hideSettingsPanel);
   document.getElementById('filterSettings').addEventListener('input', cmd.filterSettings);
-  document.getElementById('filterSettings').value=""; 
-  document.getElementById('filterReset').addEventListener('click', cmd.filterReset) 
+  document.getElementById('filterSettings').value = "";
+  document.getElementById('filterReset').addEventListener('click', cmd.filterReset)
   document.getElementById('showAnnotationMenu').addEventListener('click', cmd.showAnnotationPanel);
   document.getElementById('showAnnotationsButton').addEventListener('click', cmd.toggleAnnotationPanel);
   document.getElementById('closeAnnotationPanelButton').addEventListener('click', cmd.hideAnnotationPanel);
