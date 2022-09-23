@@ -463,7 +463,6 @@ document.addEventListener('DOMContentLoaded', function () {
     await v.replaceSchema(v.currentSchema);
   });
 
-  v.mfDefaults = defaultCodeMirrorOptions;
   v.addCmOptionsToSettingsPanel(defaultCodeMirrorOptions);
   v.addMeiFriendOptionsToSettingsPanel();
 
@@ -699,9 +698,8 @@ async function vrvWorkerEventsHandler(ev) {
       console.info('main(). Handler vrvLoaded: ', this);
       tkVersion = ev.data.version;
       tkUrl = ev.data.url;
-      v.tkAvailableOptions = ev.data.availableOptions;
       v.clearVrvOptionsSettingsPanel();
-      v.addVrvOptionsToSettingsPanel(defaultVerovioOptions);
+      v.addVrvOptionsToSettingsPanel(ev.data.availableOptions, defaultVerovioOptions);
       // v.addMeiFriendOptionsToSettingsPanel();
       drawRightFooter();
       document.querySelector(".statusbar").innerHTML =
@@ -1098,7 +1096,7 @@ let cmd = {
   'showSettingsPanel': () => v.showSettingsPanel(),
   'hideSettingsPanel': () => v.hideSettingsPanel(),
   'toggleSettingsPanel': (ev) => v.toggleSettingsPanel(ev),
-  'filterSettings': (ev) => v.filterSettings(ev),
+  'filterSettings': () => v.applySettingsFilter(),
   'filterReset': () => { 
     document.getElementById('filterSettings').value='';
     document.getElementById('filterSettings').dispatchEvent(new Event("input"));
@@ -1261,6 +1259,8 @@ function addEventListeners(v, cm) {
   document.getElementById('showAnnotationsButton').addEventListener('click', cmd.toggleAnnotationPanel);
   document.getElementById('closeAnnotationPanelButton').addEventListener('click', cmd.hideAnnotationPanel);
   document.getElementById('hideAnnotationPanelButton').addEventListener('click', cmd.hideAnnotationPanel);
+  // re-apply settings filtering when switching settings tabs
+  document.querySelectorAll('#settingsPanel .tablink').forEach(t => t.addEventListener('click', cmd.filterSettings))
 
   // open dialogs
   document.getElementById('OpenMei').addEventListener('click', cmd.open);
