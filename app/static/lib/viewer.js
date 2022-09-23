@@ -761,46 +761,51 @@ export default class Viewer {
     }
   }
 
-  applySettingsFilter() { 
+  // go through current active tab of settings menu and filter option items (make invisible)
+  applySettingsFilter() {
     const filterSettingsString = document.getElementById("filterSettings").value;
 
     // current active tab
     const activeTabButton = document.querySelector("#settingsPanel .tablink.active");
-    if(activeTabButton) {
+    if (activeTabButton) {
       const activeTab = document.getElementById(activeTabButton.dataset.tab);
-      if(activeTab) { 
+      if (activeTab) {
         // restore any previously filtered out settings
         const optionsList = activeTab.querySelectorAll("div.optionsItem");
         optionsList.forEach(opt => {
-            opt.style.display="flex"; // reset to active...
-            opt.dataset.tab = activeTab.id;
-            const optInput = opt.querySelector("input,select");
-            const optLabel = opt.querySelector("label");
-            // if we're filtering and don't have a match
-            if(filterSettingsString && optInput && optLabel &&
-              !(
-                optInput.id.toLowerCase().includes(filterSettingsString.toLowerCase()) ||
-                optLabel.innerText.toLowerCase().includes(filterSettingsString.toLowerCase())
-              )
-            ) opt.style.display = "none"; // filter out
+          opt.style.display = "flex"; // reset to active...
+          opt.dataset.tab = activeTab.id;
+          const optInput = opt.querySelector("input,select");
+          const optLabel = opt.querySelector("label");
+          // if we're filtering and don't have a match
+          if (filterSettingsString && optInput && optLabel &&
+            !(
+              optInput.id.toLowerCase().includes(filterSettingsString.toLowerCase()) ||
+              optLabel.innerText.toLowerCase().includes(filterSettingsString.toLowerCase())
+            )
+          ) opt.style.display = "none"; // filter out
         });
 
         // additional filter-specific layout modifications
-        if(filterSettingsString) {
+        if (filterSettingsString) {
           // remove dividing lines
           activeTab.querySelectorAll("hr.options-line").forEach(l => l.style.display = "none");
           // open all flaps
-          Array.from(activeTab.getElementsByTagName("details")).forEach(d => d.setAttribute("open", "true"));
-        } else { 
+          activeTab.querySelectorAll('details').forEach(d => {
+            d.setAttribute("open", "true");
+            if (!d.querySelector('div.optionsItem[style="display: flex;"]')) d.style.display = 'none';
+          })
+        } else {
           // show dividing lines
           activeTab.querySelectorAll("hr.options-line").forEach(l => l.style.display = "block");
+          activeTab.querySelectorAll('details').forEach(d => d.style.display = 'block');
           // open only the first flap 
-          Array.from(activeTab.getElementsByTagName("details")).forEach((d, ix) => {
-            if(ix === 0)
-              d.setAttribute("open", "true");
-            else
-              d.removeAttribute("open");
-          })
+          // Array.from(activeTab.getElementsByTagName("details")).forEach((d, ix) => {
+          //   if (ix === 0)
+          //     d.setAttribute("open", "true");
+          //   else
+          //     d.removeAttribute("open");
+          // })
         }
       }
     }
@@ -811,7 +816,7 @@ export default class Viewer {
     document.getElementById('verovioSettings').innerHTML = '';
   }
 
-   // initializes the settings panel by filling it with content
+  // initializes the settings panel by filling it with content
   addVrvOptionsToSettingsPanel(tkAvailableOptions, defaultVrvOptions, restoreFromLocalStorage = true) {
     // skip these options (in part because they are handled in control menu)
     let skipList = ['breaks', 'engravingDefaults', 'expand',
@@ -830,22 +835,22 @@ export default class Viewer {
       if (!group.name.startsWith('Base short') &&
         !group.name.startsWith('Element selectors')) {
         let details = document.createElement('details');
-        details.innerHTML += `<summary id="${groupId}">${group.name}</summary>`;
+        details.innerHTML += `<summary id="vrv-${groupId}">${group.name}</summary>`;
         Object.keys(group.options).forEach(opt => {
           if (!skipList.includes(opt)) {
             let o = group.options[opt]; // vrv available options
             let optDefault = o.default; // available options defaults
             if (defaultVrvOptions.hasOwnProperty(opt)) // mei-friend vrv defaults
               optDefault = defaultVrvOptions[opt];
-            if (storage.hasOwnProperty('vrv-' + opt)) {
-              if (restoreFromLocalStorage) optDefault = storage['vrv-' + opt];
-              else delete storage['vrv-' + opt];
+            if (storage.hasOwnProperty(opt)) {
+              if (restoreFromLocalStorage) optDefault = storage[opt];
+              else delete storage[opt];
             }
-            let div = this.createOptionsItem(opt, o, optDefault);
+            let div = this.createOptionsItem('vrv-' + opt, o, optDefault);
             if (div) details.appendChild(div);
             // set all options so that toolkit is always completely cleared
             if (['bool', 'int', 'double', 'std::string-list'].includes(o.type))
-              this.vrvOptions[opt] = optDefault;
+              this.vrvOptions[opt.split('vrv-').pop()] = optDefault;
           }
         });
         if (i === 1) details.setAttribute('open', 'true');
@@ -860,13 +865,13 @@ export default class Viewer {
         let value = ev.target.value;
         if (ev.target.type === 'checkbox') value = ev.target.checked;
         if (ev.target.type === 'number') value = parseFloat(value);
-        this.vrvOptions[opt] = value;
+        this.vrvOptions[opt.split('vrv-').pop()] = value;
         if (defaultVrvOptions.hasOwnProperty(opt) && // TODO check vrv default values
           defaultVrvOptions[opt].toString() === value.toString())
-          delete storage['vrv-' + opt]; // remove from storage object when default value
+          delete storage[opt]; // remove from storage object when default value
         else
-          storage['vrv-' + opt] = value; // save changes in localStorage object
-        if (opt === 'font') document.getElementById('font-select').value = value;
+          storage[opt] = value; // save changes in localStorage object
+        if (opt === 'vrv-font') document.getElementById('font-select').value = value;
         this.updateLayout(this.vrvOptions);
       });
       vsp.addEventListener('click', ev => { // RESET button
@@ -1064,6 +1069,11 @@ export default class Viewer {
 
   addMeiFriendOptionsToSettingsPanel(restoreFromLocalStorage = true) {
     let optionsToShow = {
+      titleGeneral: {
+        title: 'General',
+        description: 'General mei-friend settings',
+        type: 'header'
+      },
       selectToolkitVersion: {
         title: 'Verovio version',
         description: 'Select Verovio toolkit version (* Switching to older versions before 3.11.0 might require a refresh due to memory issues.)',
@@ -1077,90 +1087,6 @@ export default class Viewer {
         description: 'Show annotation panel',
         type: 'bool',
         default: false
-      },
-      annotationPanelSeparator: {
-        title: 'options-line', // class name of hr element
-        type: 'line'
-      },
-      titleSourceImagePanel: {
-        title: 'Source image panel',
-        description: 'Show the score images of the source edition, if available',
-        type: 'header'
-      },
-      showSourceImagePanel: {
-        title: 'Show source image panel',
-        description: 'Show the score images of the source edition, if available',
-        type: 'bool',
-        default: false
-      },
-      selectSourceImagePosition: {
-        title: 'Source image position',
-        description: 'Select source image position relative to notation',
-        type: 'select',
-        values: ['left', 'right', 'top', 'bottom'],
-        default: 'bottom'
-      },
-      sourceImageProportion: {
-        title: 'Source image proportion (%)',
-        description: 'Proportion that the source image pane takes from the notation pane (in percent)',
-        type: 'int',
-        min: 0,
-        max: 99,
-        step: 1,
-        default: 50
-      },
-      showSourceImageFullPage: {
-        title: 'Show full page',
-        description: 'Shouw source image on full page',
-        type: 'bool',
-        default: false
-      },
-      sourceImageZoom: {
-        title: 'Source image zoom (%)',
-        description: 'Zoom level of source image (in percent)',
-        type: 'int',
-        min: 10,
-        max: 300,
-        step: 5,
-        default: 100
-      },
-      editZones: {
-        title: 'Edit source image zones',
-        description: 'Edit source image zones (will link bounding boxes to facsimile zones)',
-        type: 'bool',
-        default: false
-      },
-      sourceImagePanelSeparator: {
-        title: 'options-line', // class name of hr element
-        type: 'line'
-      },
-      titleSupplied: {
-        title: 'Handle <supplied> element',
-        description: 'Control handling of <supplied> elements',
-        type: 'header'
-      },
-      showSupplied: {
-        title: 'Show <supplied> elements',
-        description: 'Highlight all elements contained by a <supplied> element',
-        type: 'bool',
-        default: true
-      },
-      suppliedColor: {
-        title: 'Select highlight color',
-        description: 'Select <supplied> highlight color',
-        type: 'color',
-        default: '#e69500',
-      },
-      respSelect: {
-        title: 'Select responsibility',
-        description: 'Select responsibility id',
-        type: 'select',
-        default: 'none',
-        values: []
-      },
-      dragLineSeparator: {
-        title: 'options-line', // class name of hr element
-        type: 'line'
       },
       dragSelection: {
         title: 'Drag select',
@@ -1261,6 +1187,90 @@ export default class Viewer {
         values: ['none', 'ending@n', 'a/b/c', 'A/B/C', '-a/-b/-c', '-A/-B/-C'],
         default: false
       },
+      annotationPanelSeparator: {
+        title: 'options-line', // class name of hr element
+        type: 'line'
+      },
+      titleSourceImagePanel: {
+        title: 'Source image panel',
+        description: 'Show the score images of the source edition, if available',
+        type: 'header'
+      },
+      showSourceImagePanel: {
+        title: 'Show source image panel',
+        description: 'Show the score images of the source edition, if available',
+        type: 'bool',
+        default: false
+      },
+      selectSourceImagePosition: {
+        title: 'Source image position',
+        description: 'Select source image position relative to notation',
+        type: 'select',
+        values: ['left', 'right', 'top', 'bottom'],
+        default: 'bottom'
+      },
+      sourceImageProportion: {
+        title: 'Source image proportion (%)',
+        description: 'Proportion that the source image pane takes from the notation pane (in percent)',
+        type: 'int',
+        min: 0,
+        max: 99,
+        step: 1,
+        default: 50
+      },
+      showSourceImageFullPage: {
+        title: 'Show full page',
+        description: 'Shouw source image on full page',
+        type: 'bool',
+        default: false
+      },
+      sourceImageZoom: {
+        title: 'Source image zoom (%)',
+        description: 'Zoom level of source image (in percent)',
+        type: 'int',
+        min: 10,
+        max: 300,
+        step: 5,
+        default: 100
+      },
+      editZones: {
+        title: 'Edit source image zones',
+        description: 'Edit source image zones (will link bounding boxes to facsimile zones)',
+        type: 'bool',
+        default: false
+      },
+      sourceImagePanelSeparator: {
+        title: 'options-line', // class name of hr element
+        type: 'line'
+      },
+      titleSupplied: {
+        title: 'Handle <supplied> element',
+        description: 'Control handling of <supplied> elements',
+        type: 'header'
+      },
+      showSupplied: {
+        title: 'Show <supplied> elements',
+        description: 'Highlight all elements contained by a <supplied> element',
+        type: 'bool',
+        default: true
+      },
+      suppliedColor: {
+        title: 'Select highlight color',
+        description: 'Select <supplied> highlight color',
+        type: 'color',
+        default: '#e69500',
+      },
+      respSelect: {
+        title: 'Select responsibility',
+        description: 'Select responsibility id',
+        type: 'select',
+        default: 'none',
+        values: []
+      },
+      dragLineSeparator: {
+        title: 'options-line', // class name of hr element
+        type: 'line'
+      },
     };
     let mfs = document.getElementById('meiFriendSettings');
     let addListeners = false; // add event listeners only the first time
@@ -1268,6 +1278,7 @@ export default class Viewer {
     if (!/\w/g.test(mfs.innerHTML)) addListeners = true;
     mfs.innerHTML = '<div><h2>mei-friend Settings</h2></div>';
     let storage = window.localStorage;
+    let currentHeader;
     Object.keys(optionsToShow).forEach(opt => {
       let o = optionsToShow[opt];
       let optDefault = o.default;
@@ -1315,7 +1326,16 @@ export default class Viewer {
           break;
       }
       let div = this.createOptionsItem(opt, o, optDefault)
-      if (div) mfs.appendChild(div);
+      if (div) {
+        if (div.classList.contains('optionsSubHeading')) {
+          currentHeader = div;
+          mfs.appendChild(currentHeader);
+        } else if (currentHeader) {
+          currentHeader.appendChild(div);
+        } else {
+          mfs.appendChild(div);
+        }
+      }
       if (opt === 'respSelect') this.respId = document.getElementById('respSelect').value;
       if (opt === 'renumberMeasuresUseSuffixAtEndings') {
         this.disableElementThroughCheckbox(
@@ -1409,7 +1429,7 @@ export default class Viewer {
       //   });
     }
   } // addMeiFriendOptionsToSettingsPanel()
-  
+
 
   // add responsibility statement to resp select dropdown
   setRespSelectOptions() {
@@ -1452,6 +1472,18 @@ export default class Viewer {
 
   // creates an option div with a label and input/select depending of o.keys
   createOptionsItem(opt, o, optDefault) {
+    if (o.type === 'header') {
+      // create a details>summary structure instead of header
+      let details = document.createElement('details');
+      details.classList.add('optionsSubHeading');
+      details.open = true;
+      let summary = document.createElement('summary');
+      summary.setAttribute('title', o.description);
+      summary.setAttribute('id', opt);
+      summary.innerText = o.title;
+      details.appendChild(summary);
+      return details;
+    }
     let div = document.createElement('div');
     div.classList.add('optionsItem');
     let label = document.createElement('label');
@@ -1487,7 +1519,7 @@ export default class Viewer {
         input.setAttribute('value', optDefault);
         break;
       case 'std::string':
-        if (opt === 'font') {
+        if (opt.endsWith('font')) {
           input = document.createElement('select');
           input.setAttribute('name', opt);
           input.setAttribute('id', opt);
@@ -1513,10 +1545,6 @@ export default class Viewer {
         input.setAttribute('name', opt);
         input.setAttribute('id', opt);
         input.setAttribute('value', optDefault);
-        break;
-      case 'header':
-        div.classList.remove('optionsItem');
-        div.classList.add('optionsSubHeading');
         break;
       case 'line':
         div.removeChild(label);

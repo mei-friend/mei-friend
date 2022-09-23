@@ -1375,7 +1375,7 @@ function addEventListeners(v, cm) {
   document.getElementById('pagination2').addEventListener('blur', ev => manualCurrentPage(v, cm, ev));
   // font selector
   document.getElementById('font-select').addEventListener('change', () => {
-    document.getElementById('font').value = document.getElementById('font-select').value;
+    document.getElementById('vrv-font').value = document.getElementById('font-select').value;
     v.updateOption();
   });
   // breaks selector
