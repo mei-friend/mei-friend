@@ -762,24 +762,18 @@ export default class Viewer {
 
   applySettingsFilter() { 
     const filterSettingsString = document.getElementById("filterSettings").value;
-    // restore any previously filtered out settings
-    const filteredOutContainer = document.getElementById("filteredOut")
-    const previouslyFiltered = filteredOutContainer.querySelectorAll("div.optionsItem");
-    Array.from(previouslyFiltered).forEach(o =>{
-      const homeTab = document.getElementById(o.dataset.tab);
-      if (homeTab) 
-        homeTab.appendChild(o);
-    })
 
     // current active tab
     const activeTabButton = document.querySelector("#settingsPanel .tablink.active");
     if(activeTabButton) {
       const activeTab = document.getElementById(activeTabButton.dataset.tab);
       if(activeTab) { 
+        // restore any previously filtered out settings
         const optionsList = activeTab.querySelectorAll("div.optionsItem");
-        Array.from(optionsList).forEach(opt => {
+        optionsList.forEach(opt => {
+            opt.style.display="flex"; // reset to active...
             opt.dataset.tab = activeTab.id;
-            const optInput = opt.querySelector("input");
+            const optInput = opt.querySelector("input,select");
             const optLabel = opt.querySelector("label");
             // if we're filtering and don't have a match
             if(filterSettingsString && optInput && optLabel &&
@@ -787,7 +781,7 @@ export default class Viewer {
                 optInput.id.toLowerCase().includes(filterSettingsString.toLowerCase()) ||
                 optLabel.innerText.toLowerCase().includes(filterSettingsString.toLowerCase())
               )
-            ) filteredOutContainer.appendChild(opt); // throw the option into our filtered out container
+            ) opt.style.display = "none"; // filter out
         });
 
         // additional filter-specific layout modifications
