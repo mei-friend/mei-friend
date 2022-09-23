@@ -1024,7 +1024,7 @@ span.keyIcon {
   clear: both;
 }
 
-.optionsItem:nth-of-type(odd) {
+.optionsItem.odd {
   background-color: var(--settingsBackgroundAlternativeColor);
 }
 

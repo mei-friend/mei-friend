@@ -774,19 +774,30 @@ export default class Viewer {
       const activeTab = document.getElementById(activeTabButton.dataset.tab);
       if (activeTab) {
         // restore any previously filtered out settings
-        const optionsList = activeTab.querySelectorAll("div.optionsItem");
+        const optionsList = activeTab.querySelectorAll("div.optionsItem,details");
+        let i = 0;
         optionsList.forEach(opt => {
-          opt.style.display = "flex"; // reset to active...
-          opt.dataset.tab = activeTab.id;
-          const optInput = opt.querySelector("input,select");
-          const optLabel = opt.querySelector("label");
-          // if we're filtering and don't have a match
-          if (filterSettingsString && optInput && optLabel &&
-            !(
-              optInput.id.toLowerCase().includes(filterSettingsString.toLowerCase()) ||
-              optLabel.innerText.toLowerCase().includes(filterSettingsString.toLowerCase())
-            )
-          ) opt.style.display = "none"; // filter out
+          opt.classList.remove('odd');
+          if (opt.nodeName.toLowerCase() === 'details') {
+            i = 0; // reset counter at each details element
+          } else {
+            opt.style.display = "flex"; // reset to active...
+            opt.dataset.tab = activeTab.id;
+            const optInput = opt.querySelector("input,select");
+            const optLabel = opt.querySelector("label");
+            // if we're filtering and don't have a match
+            if (filterSettingsString && optInput && optLabel &&
+              !(
+                optInput.id.toLowerCase().includes(filterSettingsString.toLowerCase()) ||
+                optLabel.innerText.toLowerCase().includes(filterSettingsString.toLowerCase())
+              )
+            ) {
+              opt.style.display = "none"; // filter out
+            } else {
+              i++;
+              if (i % 2 === 1) opt.classList.add('odd');
+            }
+          }
         });
 
         // additional filter-specific layout modifications
