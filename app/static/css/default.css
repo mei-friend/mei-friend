@@ -981,7 +981,7 @@ span.keyIcon {
 .tabcontent summary {
   font-size: 12pt;
   font-weight: bold;
-  padding: 3px 6px 6px 6px;
+  padding: 9px 6px 6px 6px;
   cursor: pointer;
 }
 
@@ -1004,7 +1004,7 @@ span.keyIcon {
   font-weight: bold;
   font-size: 150%;
   margin: 0px;
-  margin-bottom: 1em;
+  margin-bottom: 6pt;
 }
 
 .optionsSubHeading {
