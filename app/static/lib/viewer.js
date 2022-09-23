@@ -1129,10 +1129,10 @@ export default class Viewer {
         type: 'bool',
         default: false
       },
-      controlMenuLineSeparator: {
-        title: 'options-line', // class name of hr element
-        type: 'line'
-      },
+      // controlMenuLineSeparator: {
+      //   title: 'options-line', // class name of hr element
+      //   type: 'line'
+      // },
       controlMenuSettings: {
         title: 'Control bar',
         description: 'Define items to be shown in control menu',
@@ -1156,10 +1156,10 @@ export default class Viewer {
         type: 'bool',
         default: true
       },
-      renumberMeasuresLineSeparator: {
-        title: 'options-line', // class name of hr element
-        type: 'line'
-      },
+      // renumberMeasuresLineSeparator: {
+      //   title: 'options-line', // class name of hr element
+      //   type: 'line'
+      // },
       renumberMeasuresHeading: {
         title: 'Renumber measures',
         description: 'Settings for renumbering measures',
@@ -1191,10 +1191,10 @@ export default class Viewer {
         values: ['none', 'ending@n', 'a/b/c', 'A/B/C', '-a/-b/-c', '-A/-B/-C'],
         default: false
       },
-      annotationPanelSeparator: {
-        title: 'options-line', // class name of hr element
-        type: 'line'
-      },
+      // annotationPanelSeparator: {
+      //   title: 'options-line', // class name of hr element
+      //   type: 'line'
+      // },
       titleSourceImagePanel: {
         title: 'Source image panel',
         description: 'Show the score images of the source edition, if available',
@@ -1243,10 +1243,10 @@ export default class Viewer {
         type: 'bool',
         default: false
       },
-      sourceImagePanelSeparator: {
-        title: 'options-line', // class name of hr element
-        type: 'line'
-      },
+      // sourceImagePanelSeparator: {
+      //   title: 'options-line', // class name of hr element
+      //   type: 'line'
+      // },
       titleSupplied: {
         title: 'Handle <supplied> element',
         description: 'Control handling of <supplied> elements',
@@ -1271,10 +1271,10 @@ export default class Viewer {
         default: 'none',
         values: []
       },
-      dragLineSeparator: {
-        title: 'options-line', // class name of hr element
-        type: 'line'
-      },
+      // dragLineSeparator: {
+      //   title: 'options-line', // class name of hr element
+      //   type: 'line'
+      // },
     };
     let mfs = document.getElementById('meiFriendSettings');
     let addListeners = false; // add event listeners only the first time
