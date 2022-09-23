@@ -793,9 +793,48 @@ export default class Viewer {
     }
   }
 
+  applySettingsFilter() { 
+    // restore any previously filtered out settings
+    const filteredOutContainer = document.getElementById("filteredOut")
+    const previouslyFiltered = filteredOutContainer.querySelectorAll("div.optionsItem");
+    Array.from(previouslyFiltered).forEach(o =>{
+      const homeTab = document.getElementById(o.dataset.tab);
+      if (homeTab) 
+        homeTab.appendChild(o);
+    })
+
+    // current active tab
+    const activeTab = document.querySelector(".tablink.active");
+    if(activeTab) {
+      const optionsList = activeTab.querySelectorAll("div.optionsItem");
+      Array.from(optionsList).forEach(opt => {
+          opt.dataset.tab = activeTab.id;
+          if(!this.filterSettingsString ||
+              opt.querySelector("input").id.toLowerCase().includes(this.filterSettingsString.toLowerCase()) ||
+              opt.querySelector("label").innerText.toLowerCase().includes(this.filterSettingsString.toLowerCase()) 
+          ) { 
+            console.debug("retaining ", opt);
+          } else { 
+            filteredOutContainer.appendChild(opt);
+          }
+      })
+    }
+    if(this.filterSettingsString) {
+      // filter specified - open all flaps on Verovio tab
+      Array.from(activeTab.getElementsByTagName("details")).forEach(d => d.setAttribute("open", "true"));
+    } else { 
+      Array.from(activeTab.getElementsByTagName("details")).forEach((d, ix) => {
+        if(ix === 0)
+          d.setAttribute("open", "true");
+        else
+          d.removeAttribute("open");
+      })
+    }
+  }
+
   clearVrvOptionsSettingsPanel(retainOptions = false) {
     if(!retainOptions) 
-    this.vrvOptions = {};
+      this.vrvOptions = {};
     document.getElementById('verovioSettings').innerHTML = '';
   }
 
