@@ -8,6 +8,10 @@ export class RNGLoader {
         this.tags = {}
     }
 
+    clearRelaxNGSchema() {
+        this.tags = {};
+    }
+
     setRelaxNGSchema(data) {
         const parser = new window.DOMParser();
         const doc = parser.parseFromString(data, "text/xml");

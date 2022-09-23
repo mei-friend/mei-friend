@@ -32,7 +32,7 @@ addEventListener('message', function (e) {
   // console.log('verovio-worker: result: ', result);
   result.forceUpdate = false;
   if (!tk && e.data.cmd !== 'loadVerovio') return result;
-  console.log('VerovioWorker received: "' + result.cmd + '".'); 
+  console.log('VerovioWorker received: "' + result.cmd + '" (' + Math.random() + ').');
   switch (result.cmd) {
     case 'loadVerovio':
       tkUrl = result.url;
@@ -337,7 +337,7 @@ addEventListener('message', function (e) {
         'msg': 'Unknown command: ' + result.msg
       };
   };
-  if (result) { 
+  if (result) {
     postMessage(result);
   }
 }, false);

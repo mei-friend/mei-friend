@@ -12,6 +12,7 @@ import {
 } from './annotation.js'
 import {
   cm,
+  commonSchemas,
   defaultVerovioVersion,
   fontList,
   rngLoader,
@@ -1760,7 +1761,30 @@ export default class Viewer {
     if (vr) vr.style.visibility = 'hidden';
     const hasSchema = /<\?xml-model.*schematypens=\"http?:\/\/relaxng\.org\/ns\/structure\/1\.0\"/
     const hasSchemaMatch = hasSchema.exec(mei);
-    if (!hasSchemaMatch) return;
+    const meiVersion = /<mei.*meiversion="([^"]*).*/;
+    const meiVersionMatch = meiVersion.exec(mei);
+    if (!hasSchemaMatch) {
+      if (meiVersionMatch && meiVersionMatch[1]) {
+        let sch = commonSchemas['All'][meiVersionMatch[1]];
+        if (sch) {
+          if (sch !== this.currentSchema) {
+            this.currentSchema = sch;
+            console.log('Validation: ...new schema from @meiversion ' + this.currentSchema);
+            await this.replaceSchema(this.currentSchema);
+            return;
+          } else {
+            console.log('Validation: same schema.');
+            return;
+          }
+        }
+      }
+      console.log('Validation: No schema information found in MEI.');
+      this.currentSchema = '';
+      this.throwSchemaError({
+        "schemaFile": "No schema information found in MEI."
+      });
+      return;
+    }
     const schema = /<\?xml-model.*href="([^"]*).*/;
     const schemaMatch = schema.exec(mei);
     if (schemaMatch && schemaMatch[1] !== this.currentSchema) {
@@ -1778,10 +1802,12 @@ export default class Viewer {
     if (!this.validatorInitialized) return;
     let vs = document.getElementById('validation-status');
     vs.innerHTML = download;
-    vs.setAttribute('title', 'Loading schema ' + schemaFile);
+    let msg = 'Loading schema ' + schemaFile;
+    vs.setAttribute('title', msg);
     this.changeStatus(vs, 'wait', ['error', 'ok', 'manual']);
+    this.updateSchemaStatusDisplay('wait', schemaFile, msg);
 
-    console.log('Replace schema: ' + schemaFile);
+    console.log('Validation: Replace schema: ' + schemaFile);
     let data; // content of schema file
     try {
       const response = await fetch(schemaFile);
@@ -1800,7 +1826,8 @@ export default class Viewer {
       });
       return
     }
-    vs.setAttribute('title', 'Schema loaded ' + schemaFile);
+    msg = 'Schema loaded ' + schemaFile;
+    vs.setAttribute('title', msg);
     vs.innerHTML = unverified;
     this.validatorWithSchema = true;
     const autoValidate = document.getElementById('autoValidate');
@@ -1811,26 +1838,38 @@ export default class Viewer {
     console.log("New schema loaded to validator", schemaFile);
     rngLoader.setRelaxNGSchema(data);
     cm.options.hintOptions.schemaInfo = rngLoader.tags
-    console.log("New schema loaded to hinting system", schemaFile);
+    console.log("New schema loaded for auto completion", schemaFile);
+    this.updateSchemaStatusDisplay('ok', schemaFile, msg);
   }
 
   // Throw an schema error and update validation-status icon
   throwSchemaError(msgObj) {
     this.validatorWithSchema = false;
-    let msg;
+    if (this.updateLinting && typeof this.updateLinting === 'function')
+      this.updateLinting(cm, []); // clear errors in CodeMirror
+    // Remove schema from validator and hinting / code completion
+    rngLoader.clearRelaxNGSchema();
+    console.log("Schema removed from validator", this.currentSchema);
+    cm.options.hintOptions = {};
+    console.log("Schema removed from auto completion", this.currentSchema);
+    // construct error message
+    let msg = '';
     if (msgObj.hasOwnProperty('response'))
       msg = 'Schema not found (' + msgObj.response.status + ' ' +
-      msgObj.response.statusText + ': ' + msgObj.schemaFile + ')';
+      msgObj.response.statusText + '): ';
     if (msgObj.hasOwnProperty('err'))
-      msg = msgObj.err;
+      msg = msgObj.err + ': ';
+    if (msgObj.hasOwnProperty('schemaFile'))
+      msg += msgObj.schemaFile;
+    // set icon to unverified and error color
     let vs = document.getElementById('validation-status');
     vs.innerHTML = unverified;
     vs.setAttribute('title', msg);
     console.warn(msg);
     this.changeStatus(vs, 'error', ['wait', 'ok', 'manual']);
+    this.updateSchemaStatusDisplay('error', '', msg);
     return;
   }
-
 
   // helper function that adds addedClass (string) 
   // after removing removedClasses (array of strings)
@@ -1838,6 +1877,38 @@ export default class Viewer {
   changeStatus(el, addedClass = '', removedClasses = []) {
     removedClasses.forEach(c => el.classList.remove(c));
     el.classList.add(addedClass);
+  }
+
+  updateSchemaStatusDisplay(status = 'ok', schemaName, msg = '') {
+    let el = document.getElementById('schemaStatus');
+    if (el) {
+      el.title = msg;
+      switch (status) {
+        case 'ok':
+          this.changeStatus(el, 'ok', ['error', 'manual', 'wait']);
+          // pretty-printing for known schemas from music-encoding.org
+          if (schemaName.includes('music-encoding.org')) {
+            let pathElements = schemaName.split('/');
+            let type = pathElements.pop();
+            if (type.toLowerCase().includes('anystart')) type = 'any';
+            let noChars = 3;
+            if (type.toLowerCase().includes('neumes') || type.toLowerCase().includes('mensural')) noChars = 4;
+            let schemaVersion = pathElements.pop();
+            el.innerHTML = type.split('mei-').pop().slice(0, noChars).toUpperCase() + ' ' + schemaVersion;
+          } else {
+            el.innerHTML = schemaName.split('/').pop().split('.').at(0);
+          }
+          break;
+        case 'wait': // downloading schema
+          this.changeStatus(el, 'wait', ['ok', 'manual', 'error']);
+          el.innerHTML = '&nbsp;&#11015;&nbsp;'; // #8681 #8615
+          break;
+        case 'error': // no schema in MEI or @meiversion
+          this.changeStatus(el, 'error', ['ok', 'manual', 'wait']);
+          el.innerHTML = '&nbsp;?&nbsp;';
+          break;
+      }
+    }
   }
 
   // Switch validation-status icon to manual mode and add click event handlers
@@ -1852,7 +1923,8 @@ export default class Viewer {
     this.changeStatus(vs, 'manual', ['wait', 'ok', 'error']);
     let reportDiv = document.getElementById('validation-report');
     if (reportDiv) reportDiv.style.visibility = 'hidden';
-    if (this.updateLinting) this.updateLinting(cm, []); // clear errors in CodeMirror
+    if (this.updateLinting && typeof this.updateLinting === 'function')
+      this.updateLinting(cm, []); // clear errors in CodeMirror
   }
 
   // Callback for manual validation 
@@ -1863,14 +1935,14 @@ export default class Viewer {
   }
 
   // Highlight validation results in CodeMirror editor linting system
-  highlightValidation(text, validation) {
+  highlightValidation(mei, validation) {
     let lines;
     let found = [];
     let i = 0;
     let messages;
 
     try {
-      lines = text.split("\n");
+      lines = mei.split("\n");
       messages = JSON.parse(validation);
     } catch (err) {
       console.log("Could not parse json:", err);
