@@ -31,7 +31,8 @@ import {
   alert,
   download,
   verified,
-  unverified
+  unverified,
+  xCircleFill
 } from '../css/icons.js';
 
 export default class Viewer {
@@ -764,6 +765,8 @@ export default class Viewer {
   // go through current active tab of settings menu and filter option items (make invisible)
   applySettingsFilter() {
     const filterSettingsString = document.getElementById("filterSettings").value;
+    const resetButton = document.getElementById('filterReset');
+    if (resetButton) resetButton.style.visibility = 'hidden';
 
     // current active tab
     const activeTabButton = document.querySelector("#settingsPanel .tablink.active");
@@ -795,6 +798,7 @@ export default class Viewer {
             d.setAttribute("open", "true");
             if (!d.querySelector('div.optionsItem[style="display: flex;"]')) d.style.display = 'none';
           })
+          if (resetButton) resetButton.style.visibility = 'visible';
         } else {
           // show dividing lines
           activeTab.querySelectorAll("hr.options-line").forEach(l => l.style.display = "block");

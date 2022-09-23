@@ -963,15 +963,9 @@ span.keyIcon {
 }
 
 #settingsTabContentWrapper #filterSettingsWrapper {
-  /* position: relative;
-  top: 0.1em;
-  height: 1.6em;
-  left: .8em; */
-  /* display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: baseline; */
-  width: calc(100% - 2em);
+  display: inline-block;
+  width: calc(100% - 1em);
+  margin-bottom: -1.6em;
 }
 
 .tabcontent {
@@ -980,7 +974,7 @@ span.keyIcon {
   display: none;
   padding: 6px 12px;
   overflow: auto;
-  height: calc(100% - 20px);;
+  height: calc(100% - 20px);
   width: calc(100% - 2em);
 }
 
@@ -1162,17 +1156,12 @@ select>option {
   outline: 0;
   border-radius: 4px;
   float: right;
-  margin-right: -1em;
   margin-top: 1em;
-  margin-bottom: -2em;
+  margin-bottom: -3em;
 }
 
 #filterSettingsWrapper {
   color: var(--textColor);
-}
-
-#filterSettingsWrapper span {
-  padding-right: 1em;
 }
 
 #filterReset {
@@ -1180,30 +1169,8 @@ select>option {
   background-color: transparent;
   display: inline;
   cursor: pointer;
-}
-
-#filterReset:after {
-  background-color: var(--settingsBackgroundColor);
-  content: "×";
-  display: inline;
-  width: .6em;
-  height: .6em;
-  position: absolute;
-  right: 1.2em;
-  top: 0.1em;
-  bottom: 0;
-  padding: .15em;
-  border-radius: 50%;
-  text-align: center;
-  color: var(--textColor);
-  font-weight: normal;
-  font-size: 22px;
-  line-height: 20px;
-  vertical-align: middle;
-  box-shadow: var(--settingsBackgroundColor);
-  cursor: pointer;
-}
-
-#filterSettings:not(:valid)~#filterReset {
-  visibility: hidden;
+  float: right;
+  margin-top: .96em;
+  padding-right: 2px;
+  fill: var(--dropdownHeadingColor);
 }

@@ -146,7 +146,8 @@ import {
 } from './control-menu.js';
 import {
   clock,
-  unverified
+  unverified,
+  xCircleFill
 } from '../css/icons.js';
 import {
   rmHash,
@@ -504,6 +505,11 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   v.busy();
+  const resetButton = document.getElementById('filterReset');
+  if (resetButton) {
+    resetButton.innerHTML = xCircleFill;
+    resetButton.style.visibility = 'hidden';
+  }
   v.addCmOptionsToSettingsPanel(defaultCodeMirrorOptions);
   v.addMeiFriendOptionsToSettingsPanel();
 
@@ -734,6 +740,7 @@ async function vrvWorkerEventsHandler(ev) {
       tkAvailableOptions = ev.data.availableOptions;
       v.clearVrvOptionsSettingsPanel();
       v.addVrvOptionsToSettingsPanel(tkAvailableOptions, defaultVerovioOptions);
+
       // v.addMeiFriendOptionsToSettingsPanel();
       drawRightFooter();
       document.querySelector(".statusbar").innerHTML =
