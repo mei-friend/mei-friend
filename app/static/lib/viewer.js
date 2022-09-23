@@ -1761,7 +1761,7 @@ export default class Viewer {
     let msg = 'Loading schema ' + schemaFile;
     vs.setAttribute('title', msg);
     this.changeStatus(vs, 'wait', ['error', 'ok', 'manual']);
-    this.updateSchemaStatusSpan('wait', schemaFile, msg);
+    this.updateSchemaStatusDisplay('wait', schemaFile, msg);
 
     console.log('Validation: Replace schema: ' + schemaFile);
     let data; // content of schema file
@@ -1794,7 +1794,7 @@ export default class Viewer {
     rngLoader.setRelaxNGSchema(data);
     cm.options.hintOptions.schemaInfo = rngLoader.tags
     console.log("New schema loaded for auto completion", schemaFile);
-    this.updateSchemaStatusSpan('ok', schemaFile, msg);
+    this.updateSchemaStatusDisplay('ok', schemaFile, msg);
   }
 
   // Throw an schema error and update validation-status icon
@@ -1822,7 +1822,7 @@ export default class Viewer {
     vs.setAttribute('title', msg);
     console.warn(msg);
     this.changeStatus(vs, 'error', ['wait', 'ok', 'manual']);
-    this.updateSchemaStatusSpan('error', '', msg);
+    this.updateSchemaStatusDisplay('error', '', msg);
     return;
   }
 
@@ -1834,7 +1834,7 @@ export default class Viewer {
     el.classList.add(addedClass);
   }
 
-  updateSchemaStatusSpan(status = 'ok', schemaName, msg = '') {
+  updateSchemaStatusDisplay(status = 'ok', schemaName, msg = '') {
     let el = document.getElementById('schemaStatus');
     if (el) {
       el.title = msg;
@@ -1854,11 +1854,11 @@ export default class Viewer {
             el.innerHTML = schemaName.split('/').pop().split('.').at(0);
           }
           break;
-        case 'wait':
+        case 'wait': // downloading schema
           this.changeStatus(el, 'wait', ['ok', 'manual', 'error']);
-          el.innerHTML = '&nbsp;&#8681;&nbsp;';
+          el.innerHTML = '&nbsp;&#11015;&nbsp;'; // #8681 #8615
           break;
-        case 'error':
+        case 'error': // no schema in MEI or @meiversion
           this.changeStatus(el, 'error', ['ok', 'manual', 'wait']);
           el.innerHTML = '&nbsp;?&nbsp;';
           break;
