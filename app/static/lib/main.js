@@ -1253,6 +1253,12 @@ let cmd = {
   'closeOverlays': () => {
     v.hideAlerts();
     v.toggleValidationReportVisibility('hidden');
+    // reset settings filter, if settings have focus
+    if (document.getElementById('settingsPanel') &&
+      document.getElementById('settingsPanel') ===
+      document.activeElement.closest('#settingsPanel')) {
+      cmd.filterReset();
+    }
     // TODO: close all other overlays too...
   }
 };
