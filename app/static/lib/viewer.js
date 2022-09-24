@@ -714,6 +714,7 @@ export default class Viewer {
     value = Math.min(300, Math.max(45, value)); // 45---300, see #zoomFont
     document.getElementById('encoding').style.fontSize = value + '%';
     zf.value = value;
+    cm.refresh(); // to align selections with new font size (24 Sept 2022)
   }
 
   // set focus to verovioPane in order to ensure working key bindings
