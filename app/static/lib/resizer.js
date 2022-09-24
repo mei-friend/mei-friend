@@ -21,14 +21,17 @@ export function setOrientation(cm, o = '', v = null, storage = null) {
   let pixContainer = document.getElementById('pix-container');
   let showSourceImage = document.getElementById('showSourceImagePanel').checked;
   let controlMenu = document.getElementById('verovio-controls-form');
+  let annotationPanel = document.getElementById('annotationPanel');
   console.log('setOrientation(' + o + ') container size:', sz);
   let showAnnotationPanelCheckbox = document.getElementById('showAnnotationPanel');
   if (orientation === "top" || orientation === "bottom") {
     if (showAnnotationPanelCheckbox && showAnnotationPanelCheckbox.checked) {
       sz.width -= annotationPanelExtent; // subtract width of annotation panel
-      document.getElementById('annotationPanel').style.display = 'unset';
+      annotationPanel.style.display = 'unset';
+      annotationPanel.style.width = annotationPanelExtent;
+      annotationPanel.style.height = sz.height;
     } else {
-      document.getElementById('annotationPanel').style.display = 'none';
+      annotationPanel.style.display = 'none';
     }
     notationPane.style.width = sz.width; //- 6; // TODO: remove when border removed
     notationPane.style.height = sz.height * notationProportion;
@@ -37,9 +40,11 @@ export function setOrientation(cm, o = '', v = null, storage = null) {
   if (orientation === "left" || orientation === "right") {
     if (showAnnotationPanelCheckbox && showAnnotationPanelCheckbox.checked) {
       sz.height -= annotationPanelExtent; // subtract width of annotation panel
-      document.getElementById('annotationPanel').style.display = 'unset';
+      annotationPanel.style.display = 'unset';
+      annotationPanel.style.width = sz.width;
+      annotationPanel.style.height = annotationPanelExtent;
     } else {
-      document.getElementById('annotationPanel').style.display = 'none';
+      annotationPanel.style.display = 'none';
     }
     notationPane.style.width = Math.ceil(sz.width * notationProportion);
     notationPane.style.height = sz.height; //- 6; TODO: remove when border removed

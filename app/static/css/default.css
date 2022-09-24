@@ -435,8 +435,6 @@ a:active {
 }
 
 #annotationPanel {
-  height: 100%;
-  width: 100%;
   background: var(--annotationPanelBackgroundColor);
   border: 3px solid var(--annotationPanelBorderColor);
   border-radius: 4px;
