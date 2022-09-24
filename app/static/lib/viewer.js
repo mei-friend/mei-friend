@@ -794,8 +794,7 @@ export default class Viewer {
             ) {
               opt.style.display = "none"; // filter out
             } else {
-              i++;
-              if (i % 2 === 1) opt.classList.add('odd');
+              if (++i % 2 === 1) opt.classList.add('odd');
             }
           }
         });

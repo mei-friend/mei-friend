@@ -512,6 +512,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
   v.addCmOptionsToSettingsPanel(defaultCodeMirrorOptions);
   v.addMeiFriendOptionsToSettingsPanel();
+  v.applySettingsFilter();
 
   // add event listener to validation status icon, if no autoValidation
   if (!document.getElementById('autoValidate').checked) {
@@ -1250,7 +1251,7 @@ let cmd = {
     logoutFromGithub();
   },
   'consultGuidelines': () => consultGuidelines(),
-  'closeOverlays': () => {
+  'escapeKeyPressed': () => {
     // reset settings filter, if settings have focus
     if (document.getElementById('settingsPanel') &&
       document.getElementById('settingsPanel') ===
@@ -1259,8 +1260,8 @@ let cmd = {
     } else {
       v.hideAlerts();
       v.toggleValidationReportVisibility('hidden');
+      // TODO: close all other overlays too...
     }
-    // TODO: close all other overlays too...
   }
 };
 
@@ -1276,7 +1277,7 @@ function addEventListeners(v, cm) {
   });
   body.addEventListener('keydown', (ev) => {
     if (ev.key === 'Escape')
-      cmd.closeOverlays();
+      cmd.escapeKeyPressed();
   });
 
   // Register key handlers to #encoding rather than giving it to CodeMirror directly

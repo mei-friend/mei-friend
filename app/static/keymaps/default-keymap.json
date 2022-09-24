@@ -68,7 +68,7 @@
     "shift-c": "addCClefChangeBefore",
     "shift-f": "addFClefChangeBefore",
 
-    "escape": "closeOverlays"
+    "escape": "escapeKeyPressed"
   },
 
   ".platform-darwin": {
