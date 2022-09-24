@@ -457,6 +457,7 @@ a:active {
   background-color: var(--annotationPanelBackgroundColor);
   color: var(--annotationPanelTextColor);
   border: unset;
+  overflow: auto;
 }
 
 #annotationPanel .tabcontent {
@@ -960,6 +961,7 @@ span.keyIcon {
   border-bottom-right-radius: 5px;
   border-bottom-left-radius: 5px;
   height: 95%;
+  overflow: auto;
 }
 
 #settingsTabContentWrapper #filterSettingsWrapper {
@@ -973,7 +975,7 @@ span.keyIcon {
   font-size: 10pt;
   display: none;
   padding: 6px 12px;
-  overflow: auto;
+  overflow: none;
   height: calc(100% - 20px);
   width: calc(100% - 2em);
 }
