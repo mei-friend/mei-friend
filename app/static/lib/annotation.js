@@ -25,6 +25,9 @@ import {
   rdf,
   symLinkFile,
 } from '../css/icons.js';
+import {
+  removeInEditor  
+} from './editor.js';
 
 export let annotations = [];
 
@@ -177,7 +180,9 @@ export function deleteAnnotation(uuid) {
   const ix = annotations.findIndex(a => a.id === uuid);
   if (ix >= 0) {
     annotations.splice(ix, 1);
+    deleteAnnot(uuid);
     situateAndRefreshAnnotationsList(true);
+    refreshAnnotations();
   }
 }
 
@@ -472,6 +477,16 @@ export function writeAnnot(anchor, xmlId, plist, payload) {
       log(errMsg);
     }
   }
+}
+
+export function deleteAnnot(xmlId) { 
+   const annot = v.xmlDoc.querySelector('[*|id=' + xmlId + ']');
+   if(annot) { 
+    removeInEditor(cm, annot);
+    annot.remove();
+   } else { 
+    console.warn("Failed to delete non-existing annot with xml:id ", xmlId);
+   } 
 }
 
 export function loadWebAnnotation(prev = "") {
