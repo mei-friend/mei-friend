@@ -521,7 +521,7 @@ export function logoutFromGithub() {
     storage.removeItem("github");
   }
   // redirect to /logout to remove session cookie
-  const url = window.location.href;
+  let url = window.location.href;
   // remove any url parameters (since these might include URLs with slashes in)
   const paramsStartIx = url.indexOf("?");
   if (paramsStartIx > -1)

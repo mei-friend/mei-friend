@@ -1,6 +1,6 @@
 // mei-friend version and date
 const version = '0.6.3';
-const versionDate = '22 Sept 2022';
+const versionDate = '26 Sept 2022';
 
 var vrvWorker;
 var spdWorker;
@@ -508,8 +508,14 @@ document.addEventListener('DOMContentLoaded', function () {
   v.addCmOptionsToSettingsPanel(cm, defaultCodeMirrorOptions);
   v.addMeiFriendOptionsToSettingsPanel();
 
+  // check autoValidate as URL param
+  let autoValidateParam = searchParams.get('autoValidate');
+  let av = document.getElementById('autoValidate')
+  if (autoValidateParam !== null && av) {
+    av.checked = autoValidateParam === 'true';
+  }
   // add event listener to validation status icon, if no autoValidation
-  if (!document.getElementById('autoValidate').checked) {
+  if (av && !av.checked) {
     v.setValidationStatusToManual();
   }
 
