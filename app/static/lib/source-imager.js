@@ -543,9 +543,9 @@ function handleFacsimileIngestion(reply) {
             let n = m.getAttribute('n');
             let targetMeasure = music.querySelectorAll('measure[n="' + n + '"]');
             if (targetMeasure.length < 1)
-                console.warning('Measure number not found: n=' + n + ', ', targetMeasure);
+                console.warn('Measure number not found: n=' + n + ', ', targetMeasure);
             if (targetMeasure.length > 1)
-                console.warning('Measure number not unique: n=' + n + ', ', targetMeasure);
+                console.warn('Measure number not unique: n=' + n + ', ', targetMeasure);
             if (targetMeasure.length === 1) {
                 // console.info('Adding @facs=' + zoneId + ' to ', targetMeasure)
                 targetMeasure.item(0).setAttribute('facs', '#' + zoneId);

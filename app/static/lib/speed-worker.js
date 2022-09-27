@@ -7,7 +7,7 @@ var timeSpanningElements; // from attribute-classes.js
 onmessage = function (e) {
   let result = {};
   let t1 = performance.now();
-  console.info("SpeedWorker received: " + e.data.cmd + '. ');
+  console.info("SpeedWorker received: " + Math.random() + '; ' + e.data.cmd + '. ');
   // console.info("SpeedWorker received: " + e.data.cmd + ', ', e.data);
   switch (e.data.cmd) {
     case 'variables': // receive const from attribute-classes.js

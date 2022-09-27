@@ -1,12 +1,17 @@
 # mei-friend-online CHANGELOG.md
 
+### 0.6.3 patch: display schema info
+* Display schema info before file name
+* Automatically load schema from provided `@meiversion` attribute, when no schema is given in <xml-model>
+* Filter settings through text input panel (incl. settings refactoring)
+* Annotation list layout fixes
 ### 0.6.2 patch: small bug fixes
 * Bugfix: create valid <ptr/> objects for linking annotations
 * Bugfix: guard against edge-cases when switching vrvTk versions
 ### 0.6.1 Verovio toolkit version selection
-* Added Verovio toolkit versions before 3.11.0 with warning for a refresh upon memomry slip.
+* Added Verovio toolkit versions before 3.11.0 with warning for a refresh upon memory slip.
 * Bugfix: ensure <annot>s are generated in a valid location within the MEI
-### 0.6.0 XML code validation
+### 0.6.0 XML code validation (based on Laurent Pugin's code from the Verovio editor)
 * Automatically derive schema URL from MEI (upon each text change)
 * Fetch (new) schema and load it both for code completion and schema validation
 * Automatically validate MEI encoding upon text change

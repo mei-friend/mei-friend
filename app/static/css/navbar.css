@@ -68,7 +68,8 @@
 }
 
 /* Add a background color to navbar links on hover */
-.navbar a:hover, .dropdown:hover .dropbtn {
+.navbar a:hover,
+.dropdown:hover .dropbtn {
   background-color: var(--dropdownHeadingColor);
 }
 
@@ -139,7 +140,8 @@
   padding: unset;
 }
 
-.dropdown-content input, .dropdown-content table {
+.dropdown-content input,
+.dropdown-content table {
   margin: 3px 12px;
 }
 
@@ -167,7 +169,8 @@
   background-color: var(--settingsBackgroundAlternativeColor);
 }
 
-#GithubLogo, #forkRepoGithubLogo {
+#GithubLogo,
+#forkRepoGithubLogo {
   fill: var(--textColor);
   height: .75em;
   margin-right: -.2em;
@@ -232,6 +235,20 @@
   background: var(--backgroundColor);
   color: var(--fileStatusColor);
   white-space: nowrap;
+  display: flex;
+  align-content: center;
+  gap: 0.2em;
+}
+
+.fileStatus #schemaStatus {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 6pt;
+  font-weight: bold;
+  border-width: 1.5px;
+  border-style: solid;
+  border-radius: 4px;
+  padding: 2px;
+  cursor: default;
 }
 
 .fileStatus #fileName {
@@ -239,7 +256,7 @@
 }
 
 .fileStatus #fileChanged {
-  margin-left: -.5em;
+  margin-left: -.2em;
   margin-right: .5em;
 }
 
@@ -247,7 +264,9 @@
   color: var(--fileStatusChangedColor);
 }
 
-.fileStatus.warn #fileName, .fileStatus.warn #fileLocation, #commitFileName.warn {
+.fileStatus.warn #fileName,
+.fileStatus.warn #fileLocation,
+#commitFileName.warn {
   text-decoration: var(--fileStatusWarnColor) dotted underline;
 }
 
@@ -287,6 +306,7 @@
   border: 1px dotted var(--fileStatusWarnColor);
 }
 
-#commitMessageInput[disabled], #commitButton[disabled] {
+#commitMessageInput[disabled],
+#commitButton[disabled] {
   cursor: not-allowed;
 }

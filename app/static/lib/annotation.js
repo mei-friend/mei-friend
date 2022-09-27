@@ -25,6 +25,9 @@ import {
   rdf,
   symLinkFile,
 } from '../css/icons.js';
+import {
+  removeInEditor  
+} from './editor.js';
 
 export let annotations = [];
 
@@ -57,6 +60,7 @@ export function refreshAnnotationsList() {
     const annoDiv = document.createElement("div");
     annoDiv.classList.add("annotationListItem");
     const details = document.createElement("details");
+    details.setAttribute("open", "");
     const summary = document.createElement("summary");
     const annoListItemButtons = document.createElement("div");
     annoListItemButtons.classList.add("annotationListItemButtons");
@@ -142,13 +146,13 @@ export function refreshAnnotationsList() {
 export function generateAnnotationLocationLabel(a) { 
   const annotationLocationLabel = document.createElement("span");
   if (a.firstPage === 'meiHead') {
-    annotationLocationLabel.innerHTML = `MEI head (${a.selection.length} elements)`;
+    annotationLocationLabel.innerHTML = `MEI&nbsp;head&nbsp;(${a.selection.length}&nbsp;elements)`;
   } else if (a.firstPage === 'unsituated' || a.firstPage < 0) {
     annotationLocationLabel.innerHTML = 'Unsituated';
   } else {
-    annotationLocationLabel.innerHTML = 'p. ' + (a.firstPage === a.lastPage ?
+    annotationLocationLabel.innerHTML = 'p.&nbsp;' + (a.firstPage === a.lastPage ?
         a.firstPage : a.firstPage + "&ndash;" + a.lastPage) +
-      ` (${a.selection.length} elements)`;
+      ` (${a.selection.length}&nbsp;elements)`;
   }
   annotationLocationLabel.classList.add("annotationLocationLabel");
   annotationLocationLabel.dataset.id = a.id;
@@ -177,7 +181,9 @@ export function deleteAnnotation(uuid) {
   const ix = annotations.findIndex(a => a.id === uuid);
   if (ix >= 0) {
     annotations.splice(ix, 1);
+    deleteAnnot(uuid);
     situateAndRefreshAnnotationsList(true);
+    refreshAnnotations();
   }
 }
 
@@ -445,25 +451,25 @@ export function writeAnnot(anchor, xmlId, plist, payload) {
     if(firstChildNode) { 
       // set cursor based on it
       setCursorToId(cm, firstChildNode.getAttribute("xml:id"))
-      let annot = document.createElementNS(meiNameSpace, 'annot');
-      annot.setAttributeNS(xmlNameSpace, 'id', xmlId);
-      annot.setAttribute('plist', plist.map(p => '#' + p).join(' '));
-      if (payload) {
-        if (typeof payload === 'string') {
-          annot.textContent = payload;
-        } else if (typeof payload === 'object') {
-          annot.appendChild(payload);
-        }
+    let annot = document.createElementNS(meiNameSpace, 'annot');
+    annot.setAttributeNS(xmlNameSpace, 'id', xmlId);
+    annot.setAttribute('plist', plist.map(p => '#' + p).join(' '));
+    if (payload) {
+      if (typeof payload === 'string') {
+        annot.textContent = payload;
+      } else if (typeof payload === 'object') {
+        annot.appendChild(payload);
       }
+    }
       // insert <annot> into the DOM
       insertHere.insertAdjacentElement("afterbegin", annot);
       // now write it into CM
-      let p1 = cm.getCursor();
-      cm.replaceRange(xmlToString(annot) + '\n', p1);
-      let p2 = cm.getCursor();
+    let p1 = cm.getCursor();
+    cm.replaceRange(xmlToString(annot) + '\n', p1);
+    let p2 = cm.getCursor();
       // indent nicely
-      while (p1.line <= p2.line)
-        cm.indentLine(p1.line++, 'smart');
+    while (p1.line <= p2.line)
+      cm.indentLine(p1.line++, 'smart');
       // jump to the written <annot> in CM
       setCursorToId(cm, xmlId)
     } else {
@@ -472,6 +478,16 @@ export function writeAnnot(anchor, xmlId, plist, payload) {
       log(errMsg);
     }
   }
+}
+
+export function deleteAnnot(xmlId) { 
+   const annot = v.xmlDoc.querySelector('[*|id=' + xmlId + ']');
+   if(annot) { 
+    removeInEditor(cm, annot);
+    annot.remove();
+   } else { 
+    console.warn("Failed to delete non-existing annot with xml:id ", xmlId);
+   } 
 }
 
 export function loadWebAnnotation(prev = "") {
@@ -625,7 +641,6 @@ export function ingestWebAnnotation(webAnno) {
 function writeInlineIfRequested(a) {
   // write annotation to inline <annot> if the user has requested this
   if (document.getElementById('writeAnnotInline').checked) {
- //   let el = document.querySelector('[*|id="' + v.selectedElements[0] + '"]');
     let el = v.xmlDoc.querySelector('[*|id="' + v.selectedElements[0] + '"]');
     if (el) {
       let payload;
@@ -636,7 +651,7 @@ function writeInlineIfRequested(a) {
         payload.setAttribute("target", a.url);
       }
       writeAnnot(el, a.id, a.selection, payload)
-      a.inline = true;
+      a.isInline = true;
     } else
       console.warn('writeInlineIfRequested: Cannot find beforeThis element for ' + a.id);
   }

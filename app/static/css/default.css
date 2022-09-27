@@ -52,8 +52,7 @@
   --keyboardShortCutColor: var(--defaultKeyboardShortCutColor);
   --dropdownHeadingColor: var(--defaultDropdownHeadingColor);
   --dropdownBackgroundColor: var(--defaultDropdownBackgroundColor);
-  --validationStatusBackgroundColor: var(--defaultValidationStatusBackgroundColor)
-  --dropdownBorderColor: var(--defaultDropdownBorderColor);
+  --validationStatusBackgroundColor: var(--defaultValidationStatusBackgroundColor) --dropdownBorderColor: var(--defaultDropdownBorderColor);
   --overlayBackgroundColor: var(--defaultOverlayBackgroundColor);
   --overlayTextColor: var(--defaultOverlayTextColor);
   --overlayBorderColor: var(--defaultOverlayBorderColor);
@@ -365,21 +364,25 @@ a:active {
   flex-wrap: nowrap;
 }
 
-#validation-status.wait {
+.wait {
   fill: darkorange;
+  color: darkorange;
+  border-color: darkorange;
 }
 
-#validation-status.error {
+.error {
   color: rgb(175, 51, 51);
   fill: rgb(175, 51, 51);
+  border-color: rgb(175, 51, 51);
 }
 
-#validation-status.ok {
+.ok {
   color: green;
   fill: green;
+  border-color: green;
 }
 
-#validation-status.manual {
+.manual {
   color: grey;
   fill: grey
 }
@@ -407,6 +410,10 @@ a:active {
   background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision" viewBox="0 0 20 16"><circle fill="rgb(175, 51, 51)" stroke="rgb(175, 51, 51)" stroke-width="1.75" stroke-miterlimit="22.9256" cx="8.001" cy="8" r="6.875"/><polygon fill="rgb(175, 51, 51)" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="2.3662" points="5,10.386 7.386,7.999 5,5.613 5.613,4.999 8,7.386 10.387,4.999 11.001,5.613 8.614,7.999 11.001,10.386 10.387,11 8,8.613 5.613,11 "/></svg>');
 }
 
+.CodeMirror-lint-marker {
+  cursor: default;
+}
+
 /* Wavyline */
 .CodeMirror-lint-mark-error {
   background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" viewBox="0 0 160 160" height="8px"><path fill="rgb(175, 51, 51)" fill-rule="nonzero" stroke="rgb(175, 51, 51)" stroke-width="8" stroke-miterlimit="22.9256" d="M159.627 148.658c-1.395,-1.022 -2.79,-2.155 -4.187,-3.4l0 -0.006c-11.915,-10.738 -22.754,-10.769 -32.517,-0.092l-3.765 -0.525 3.75 0.537c-3.83,4.035 -7.857,6.909 -12.08,8.621 -3.325,1.348 -6.866,2.037 -10.622,2.067 -3.733,0.03 -7.363,-0.597 -10.886,-1.879 -4.611,-1.679 -9.238,-4.587 -13.881,-8.723l0 -0.006c-11.914,-10.738 -22.754,-10.769 -32.516,-0.092l-3.399 -0.474 3.405 0.488c-3.83,4.035 -7.857,6.909 -12.08,8.621 -3.325,1.348 -6.866,2.037 -10.622,2.067 -3.733,0.03 -7.363,-0.597 -10.887,-1.88 -3.272,-1.191 -6.551,-3.001 -9.839,-5.43l0 -7.307c1.083,0.861 2.171,1.784 3.266,2.771l0.006 -0.001c4.193,3.737 8.196,6.299 12.005,7.685 1.957,0.713 3.722,1.063 5.292,1.05 1.549,-0.012 3.226,-0.384 5.029,-1.115 3.439,-1.395 6.878,-3.901 10.316,-7.521l-0.023 -0.003c14.292,-15.632 30.078,-15.664 47.354,-0.097l0.006 -0.001c4.194,3.737 8.196,6.299 12.005,7.686 1.957,0.712 3.722,1.062 5.293,1.05 1.548,-0.013 3.225,-0.384 5.028,-1.116 3.439,-1.394 6.879,-3.902 10.318,-7.522 13.424,-14.686 28.169,-15.601 44.231,-2.751l0 7.298z"/></svg>');
@@ -428,8 +435,6 @@ a:active {
 }
 
 #annotationPanel {
-  height: 100%;
-  width: 100%;
   background: var(--annotationPanelBackgroundColor);
   border: 3px solid var(--annotationPanelBorderColor);
   border-radius: 4px;
@@ -439,7 +444,8 @@ a:active {
 }
 
 #annotationPanel .tab,
-#annotationPanel .tablink {
+#annotationPanel .tablink,
+#annotationPanel .tabstart {
   background-color: var(--annotationPanelLinkBackgroundColor);
   color: var(--annotationPanelTextColor);
   border: unset;
@@ -450,13 +456,16 @@ a:active {
   background-color: var(--annotationPanelBackgroundColor);
   color: var(--annotationPanelTextColor);
   border: unset;
+  overflow: auto;
 }
 
 #annotationPanel .tabcontent {
   border: unset;
 }
 
-#annotationPanel .tablink:hover {
+#annotationPanel .tablink:hover,
+#annotationPanel .tabstart:hover,
+#annotationPanel .topright:hover {
   background-color: var(--annotationPanelHoverColor);
   color: var(--annotationPanelTextColor);
 }
@@ -946,11 +955,7 @@ span.keyIcon {
 }
 
 /* Style the tab content */
-.tabcontent {
-  color: var(--textColor);
-  font-size: 10pt;
-  display: none;
-  padding: 6px 12px;
+#settingsTabContentWrapper {
   background-color: var(--settingsBackgroundColor);
   border-left: var(--settingsBackgroundColor) solid 2px;
   border-bottom: var(--settingsBackgroundColor) solid 2px;
@@ -958,6 +963,22 @@ span.keyIcon {
   border-bottom-left-radius: 5px;
   height: 95%;
   overflow: auto;
+}
+
+#settingsTabContentWrapper #filterSettingsWrapper {
+  display: inline-block;
+  width: calc(100% - 1em);
+  margin-bottom: -1.6em;
+}
+
+.tabcontent {
+  color: var(--textColor);
+  font-size: 10pt;
+  display: none;
+  padding: 6px 12px;
+  overflow: none;
+  height: calc(100% - 50px);
+  width: calc(100% - 2em);
 }
 
 .tabcontent summary {
@@ -982,7 +1003,22 @@ span.keyIcon {
   font-size: 22px;
 }
 
+.settingsHeader {
+  font-weight: bold;
+  font-size: 150%;
+  margin: 0px;
+  margin-bottom: 6pt;
+}
+
+.optionsSubHeading {
+  font-weight: bold;
+  font-size: 110%;
+  margin: 3px;
+}
+
 .optionsItem {
+  font-size: 100%;
+  font-weight: normal;
   display: flex;
   justify-content: space-between;
   padding-top: 0.5px;
@@ -991,7 +1027,7 @@ span.keyIcon {
   clear: both;
 }
 
-.optionsItem:nth-of-type(odd) {
+.optionsItem.odd {
   background-color: var(--settingsBackgroundAlternativeColor);
 }
 
@@ -1039,12 +1075,6 @@ select {
 
 .optionsItem input[type='color'] {
   padding: 2px;
-}
-
-.optionsSubHeading {
-  font-weight: bold;
-  font-size: 110%;
-  margin: 3px;
 }
 
 .resetButton {
@@ -1120,4 +1150,30 @@ select>option {
 /* When moving the mouse over the close button */
 .alertCloseButton:hover {
   color: black;
+}
+
+#filterSettings {
+  width: 33%;
+  height: 1.5em;
+  border: 1px solid var(--dropdownBorderColor);
+  outline: 0;
+  border-radius: 4px;
+  float: right;
+  margin-top: 1em;
+  margin-bottom: -3em;
+}
+
+#filterSettingsWrapper {
+  color: var(--textColor);
+}
+
+#filterReset {
+  border: 1px solid transparent;
+  background-color: transparent;
+  display: inline;
+  cursor: pointer;
+  float: right;
+  margin-top: .96em;
+  padding-right: 2px;
+  fill: var(--dropdownHeadingColor);
 }

@@ -12,6 +12,7 @@ import {
 } from './annotation.js'
 import {
   cm,
+  commonSchemas,
   defaultVerovioVersion,
   fontList,
   rngLoader,
@@ -30,7 +31,8 @@ import {
   alert,
   download,
   verified,
-  unverified
+  unverified,
+  xCircleFill
 } from '../css/icons.js';
 
 export default class Viewer {
@@ -184,7 +186,6 @@ export default class Viewer {
         }
         that.vrvWorker.addEventListener('message', function handle(ev) {
           if (ev.data.cmd === 'pageWithElement' && ev.data.taskId === taskId) {
-            console.debug("ABOUT TO RESOLVE WITH ", ev.data)
             resolve(ev.data.msg);
             that.vrvWorker.removeEventListener('message', handle);
           }
@@ -192,7 +193,6 @@ export default class Viewer {
         that.vrvWorker.postMessage(msg);
       }.bind(that));
       promise.then(function (p) {
-        console.debug("HEARD BACK", p)
         if (situateAnno && 'id' in situateAnno) {
           const ix = annotations.findIndex(a => a.id === situateAnno.id);
           if (ix >= 0) { // found it
@@ -713,6 +713,7 @@ export default class Viewer {
     value = Math.min(300, Math.max(45, value)); // 45---300, see #zoomFont
     document.getElementById('encoding').style.fontSize = value + '%';
     zf.value = value;
+    cm.refresh(); // to align selections with new font size (24 Sept 2022)
   }
 
   // set focus to verovioPane in order to ensure working key bindings
@@ -762,6 +763,69 @@ export default class Viewer {
     }
   }
 
+  // go through current active tab of settings menu and filter option items (make invisible)
+  applySettingsFilter() {
+    const filterSettingsString = document.getElementById("filterSettings").value;
+    const resetButton = document.getElementById('filterReset');
+    if (resetButton) resetButton.style.visibility = 'hidden';
+
+    // current active tab
+    const activeTabButton = document.querySelector("#settingsPanel .tablink.active");
+    if (activeTabButton) {
+      const activeTab = document.getElementById(activeTabButton.dataset.tab);
+      if (activeTab) {
+        // restore any previously filtered out settings
+        const optionsList = activeTab.querySelectorAll("div.optionsItem,details");
+        let i = 0;
+        optionsList.forEach(opt => {
+          opt.classList.remove('odd');
+          if (opt.nodeName.toLowerCase() === 'details') {
+            i = 0; // reset counter at each details element
+          } else {
+            opt.style.display = "flex"; // reset to active...
+            opt.dataset.tab = activeTab.id;
+            const optInput = opt.querySelector("input,select");
+            const optLabel = opt.querySelector("label");
+            // if we're filtering and don't have a match
+            if (filterSettingsString && optInput && optLabel &&
+              !(
+                optInput.id.toLowerCase().includes(filterSettingsString.toLowerCase()) ||
+                optLabel.innerText.toLowerCase().includes(filterSettingsString.toLowerCase())
+              )
+            ) {
+              opt.style.display = "none"; // filter out
+            } else {
+              if (++i % 2 === 1) opt.classList.add('odd');
+            }
+          }
+        });
+
+        // additional filter-specific layout modifications
+        if (filterSettingsString) {
+          // remove dividing lines
+          activeTab.querySelectorAll("hr.options-line").forEach(l => l.style.display = "none");
+          // open all flaps
+          activeTab.querySelectorAll('details').forEach(d => {
+            d.setAttribute("open", "true");
+            if (!d.querySelector('div.optionsItem[style="display: flex;"]')) d.style.display = 'none';
+          })
+          if (resetButton) resetButton.style.visibility = 'visible';
+        } else {
+          // show dividing lines
+          activeTab.querySelectorAll("hr.options-line").forEach(l => l.style.display = "block");
+          activeTab.querySelectorAll('details').forEach(d => d.style.display = 'block');
+          // open only the first flap 
+          // Array.from(activeTab.getElementsByTagName("details")).forEach((d, ix) => {
+          //   if (ix === 0)
+          //     d.setAttribute("open", "true");
+          //   else
+          //     d.removeAttribute("open");
+          // })
+        }
+      }
+    }
+  }
+
   clearVrvOptionsSettingsPanel() {
     this.vrvOptions = {};
     document.getElementById('verovioSettings').innerHTML = '';
@@ -776,7 +840,7 @@ export default class Viewer {
     let vsp = document.getElementById('verovioSettings');
     let addListeners = false; // add event listeners only the first time
     if (!/\w/g.test(vsp.innerHTML)) addListeners = true;
-    vsp.innerHTML = "";
+    vsp.innerHTML = '<div class="settingsHeader">Verovio Settings</div>';
     let storage = window.localStorage;
 
     Object.keys(tkAvailableOptions.groups).forEach((grp, i) => {
@@ -786,22 +850,22 @@ export default class Viewer {
       if (!group.name.startsWith('Base short') &&
         !group.name.startsWith('Element selectors')) {
         let details = document.createElement('details');
-        details.innerHTML += `<summary id="${groupId}">${group.name}</summary>`;
+        details.innerHTML += `<summary id="vrv-${groupId}">${group.name}</summary>`;
         Object.keys(group.options).forEach(opt => {
           if (!skipList.includes(opt)) {
             let o = group.options[opt]; // vrv available options
             let optDefault = o.default; // available options defaults
             if (defaultVrvOptions.hasOwnProperty(opt)) // mei-friend vrv defaults
               optDefault = defaultVrvOptions[opt];
-            if (storage.hasOwnProperty('vrv-' + opt)) {
-              if (restoreFromLocalStorage) optDefault = storage['vrv-' + opt];
-              else delete storage['vrv-' + opt];
+            if (storage.hasOwnProperty(opt)) {
+              if (restoreFromLocalStorage) optDefault = storage[opt];
+              else delete storage[opt];
             }
-            let div = this.createOptionsItem(opt, o, optDefault);
+            let div = this.createOptionsItem('vrv-' + opt, o, optDefault);
             if (div) details.appendChild(div);
             // set all options so that toolkit is always completely cleared
             if (['bool', 'int', 'double', 'std::string-list'].includes(o.type))
-              this.vrvOptions[opt] = optDefault;
+              this.vrvOptions[opt.split('vrv-').pop()] = optDefault;
           }
         });
         if (i === 1) details.setAttribute('open', 'true');
@@ -816,13 +880,13 @@ export default class Viewer {
         let value = ev.target.value;
         if (ev.target.type === 'checkbox') value = ev.target.checked;
         if (ev.target.type === 'number') value = parseFloat(value);
-        this.vrvOptions[opt] = value;
+        this.vrvOptions[opt.split('vrv-').pop()] = value;
         if (defaultVrvOptions.hasOwnProperty(opt) && // TODO check vrv default values
           defaultVrvOptions[opt].toString() === value.toString())
-          delete storage['vrv-' + opt]; // remove from storage object when default value
+          delete storage[opt]; // remove from storage object when default value
         else
-          storage['vrv-' + opt] = value; // save changes in localStorage object
-        if (opt === 'font') document.getElementById('font-select').value = value;
+          storage[opt] = value; // save changes in localStorage object
+        if (opt === 'vrv-font') document.getElementById('font-select').value = value;
         this.updateLayout(this.vrvOptions);
       });
       vsp.addEventListener('click', ev => { // RESET button
@@ -834,7 +898,7 @@ export default class Viewer {
     }
   }
 
-  addCmOptionsToSettingsPanel(cm, mfDefaults, restoreFromLocalStorage = true) {
+  addCmOptionsToSettingsPanel(mfDefaults, restoreFromLocalStorage = true) {
     let optionsToShow = { // key as in CodeMirror
       zoomFont: {
         title: 'Font size (%)',
@@ -945,7 +1009,7 @@ export default class Viewer {
     let cmsp = document.getElementById('editorSettings');
     let addListeners = false; // add event listeners only the first time
     if (!/\w/g.test(cmsp.innerHTML)) addListeners = true;
-    cmsp.innerHTML = '<div><h2>Editor Settings</h2></div>';
+    cmsp.innerHTML = '<div class="settingsHeader">Editor Settings</div>';
     Object.keys(optionsToShow).forEach(opt => {
       let o = optionsToShow[opt];
       let optDefault = o.default;
@@ -999,7 +1063,7 @@ export default class Viewer {
       });
       cmsp.addEventListener('click', ev => {
         if (ev.target.id === 'cmReset') {
-          this.addCmOptionsToSettingsPanel(cm, mfDefaults, false);
+          this.addCmOptionsToSettingsPanel(mfDefaults, false);
         }
       });
       window.matchMedia('(prefers-color-scheme: dark)')
@@ -1020,6 +1084,11 @@ export default class Viewer {
 
   addMeiFriendOptionsToSettingsPanel(restoreFromLocalStorage = true) {
     let optionsToShow = {
+      titleGeneral: {
+        title: 'General',
+        description: 'General mei-friend settings',
+        type: 'header'
+      },
       selectToolkitVersion: {
         title: 'Verovio version',
         description: 'Select Verovio toolkit version (* Switching to older versions before 3.11.0 might require a refresh due to memory issues.)',
@@ -1034,10 +1103,109 @@ export default class Viewer {
         type: 'bool',
         default: false
       },
-      annotationPanelSeparator: {
-        title: 'options-line', // class name of hr element
-        type: 'line'
+      dragSelection: {
+        title: 'Drag select',
+        description: 'Select elements in notation with mouse drag',
+        type: 'header'
       },
+      dragSelectNotes: {
+        title: 'Select notes',
+        description: 'Select notes',
+        type: 'bool',
+        default: true
+      },
+      dragSelectRests: {
+        title: 'Select rests',
+        description: 'Select rests and repeats (rest, mRest, beatRpt, halfmRpt, mRpt)',
+        type: 'bool',
+        default: true
+      },
+      dragSelectControlElements: {
+        title: 'Select placement elements ',
+        description: 'Select placement elements (i.e., with a @placement attribute: ' +
+          att.attPlacement.join(', ') + ')',
+        type: 'bool',
+        default: false
+      },
+      dragSelectSlurs: {
+        title: 'Select slurs ',
+        description: 'Select slurs (i.e., elements with @curvature attribute: ' +
+          att.attCurvature.join(', ') + ')',
+        type: 'bool',
+        default: false
+      },
+      dragSelectMeasures: {
+        title: 'Select measures ',
+        description: 'Select measures',
+        type: 'bool',
+        default: false
+      },
+      // controlMenuLineSeparator: {
+      //   title: 'options-line', // class name of hr element
+      //   type: 'line'
+      // },
+      controlMenuSettings: {
+        title: 'Control bar',
+        description: 'Define items to be shown in control menu',
+        type: 'header'
+      },
+      controlMenuFontSelector: {
+        title: 'Show notation font selector',
+        description: 'Show notation font (SMuFL) selector in control menu',
+        type: 'bool',
+        default: false
+      },
+      controlMenuNavigateArrows: {
+        title: 'Show navigation arrows',
+        description: 'Show notation navigation arrows in control menu',
+        type: 'bool',
+        default: false
+      },
+      controlMenuUpdateNotation: {
+        title: 'Show notation update controls',
+        description: 'Show notation update behavior controls in control menu',
+        type: 'bool',
+        default: true
+      },
+      // renumberMeasuresLineSeparator: {
+      //   title: 'options-line', // class name of hr element
+      //   type: 'line'
+      // },
+      renumberMeasuresHeading: {
+        title: 'Renumber measures',
+        description: 'Settings for renumbering measures',
+        type: 'header'
+      },
+      renumberMeasureContinueAcrossIncompleteMeasures: {
+        title: 'Continue across incomplete measures',
+        description: 'Continue measure numbers across incomplete measures (@metcon="false")',
+        type: 'bool',
+        default: false
+      },
+      renumberMeasuresUseSuffixAtMeasures: {
+        title: 'Use suffix at incomplete measures',
+        description: 'Use number suffix at incomplete measures (e.g., 23-cont)',
+        type: 'select',
+        values: ['none', '-cont'],
+        default: false
+      },
+      renumberMeasuresContinueAcrossEndings: {
+        title: 'Continue across endings',
+        description: 'Continue measure numbers across endings',
+        type: 'bool',
+        default: false
+      },
+      renumberMeasuresUseSuffixAtEndings: {
+        title: 'Use suffix at endings',
+        description: 'Use number suffix at endings (e.g., 23-a)',
+        type: 'select',
+        values: ['none', 'ending@n', 'a/b/c', 'A/B/C', '-a/-b/-c', '-A/-B/-C'],
+        default: false
+      },
+      // annotationPanelSeparator: {
+      //   title: 'options-line', // class name of hr element
+      //   type: 'line'
+      // },
       titleSourceImagePanel: {
         title: 'Source image panel',
         description: 'Show the score images of the source edition, if available',
@@ -1086,10 +1254,10 @@ export default class Viewer {
         type: 'bool',
         default: false
       },
-      sourceImagePanelSeparator: {
-        title: 'options-line', // class name of hr element
-        type: 'line'
-      },
+      // sourceImagePanelSeparator: {
+      //   title: 'options-line', // class name of hr element
+      //   type: 'line'
+      // },
       titleSupplied: {
         title: 'Handle <supplied> element',
         description: 'Control handling of <supplied> elements',
@@ -1114,116 +1282,18 @@ export default class Viewer {
         default: 'none',
         values: []
       },
-      dragLineSeparator: {
-        title: 'options-line', // class name of hr element
-        type: 'line'
-      },
-      dragSelection: {
-        title: 'Drag select',
-        description: 'Select elements in notation with mouse drag',
-        type: 'header'
-      },
-      dragSelectNotes: {
-        title: 'Select notes',
-        description: 'Select notes',
-        type: 'bool',
-        default: true
-      },
-      dragSelectRests: {
-        title: 'Select rests',
-        description: 'Select rests and repeats (rest, mRest, beatRpt, halfmRpt, mRpt)',
-        type: 'bool',
-        default: true
-      },
-      dragSelectControlElements: {
-        title: 'Select placement elements ',
-        description: 'Select placement elements (i.e., with a @placement attribute: ' +
-          att.attPlacement.join(', ') + ')',
-        type: 'bool',
-        default: false
-      },
-      dragSelectSlurs: {
-        title: 'Select slurs ',
-        description: 'Select slurs (i.e., elements with @curvature attribute: ' +
-          att.attCurvature.join(', ') + ')',
-        type: 'bool',
-        default: false
-      },
-      dragSelectMeasures: {
-        title: 'Select measures ',
-        description: 'Select measures',
-        type: 'bool',
-        default: false
-      },
-      controlMenuLineSeparator: {
-        title: 'options-line', // class name of hr element
-        type: 'line'
-      },
-      controlMenuSettings: {
-        title: 'Control bar',
-        description: 'Define items to be shown in control menu',
-        type: 'header'
-      },
-      controlMenuFontSelector: {
-        title: 'Show notation font selector',
-        description: 'Show notation font (SMuFL) selector in control menu',
-        type: 'bool',
-        default: false
-      },
-      controlMenuNavigateArrows: {
-        title: 'Show navigation arrows',
-        description: 'Show notation navigation arrows in control menu',
-        type: 'bool',
-        default: false
-      },
-      controlMenuUpdateNotation: {
-        title: 'Show notation update controls',
-        description: 'Show notation update behavior controls in control menu',
-        type: 'bool',
-        default: true
-      },
-      renumberMeasuresLineSeparator: {
-        title: 'options-line', // class name of hr element
-        type: 'line'
-      },
-      renumberMeasuresHeading: {
-        title: 'Renumber measures',
-        description: 'Settings for renumbering measures',
-        type: 'header'
-      },
-      renumberMeasureContinueAcrossIncompleteMeasures: {
-        title: 'Continue across incomplete measures',
-        description: 'Continue measure numbers across incomplete measures (@metcon="false")',
-        type: 'bool',
-        default: false
-      },
-      renumberMeasuresUseSuffixAtMeasures: {
-        title: 'Use suffix at incomplete measures',
-        description: 'Use number suffix at incomplete measures (e.g., 23-cont)',
-        type: 'select',
-        values: ['none', '-cont'],
-        default: false
-      },
-      renumberMeasuresContinueAcrossEndings: {
-        title: 'Continue across endings',
-        description: 'Continue measure numbers across endings',
-        type: 'bool',
-        default: false
-      },
-      renumberMeasuresUseSuffixAtEndings: {
-        title: 'Use suffix at endings',
-        description: 'Use number suffix at endings (e.g., 23-a)',
-        type: 'select',
-        values: ['none', 'ending@n', 'a/b/c', 'A/B/C', '-a/-b/-c', '-A/-B/-C'],
-        default: false
-      },
+      // dragLineSeparator: {
+      //   title: 'options-line', // class name of hr element
+      //   type: 'line'
+      // },
     };
     let mfs = document.getElementById('meiFriendSettings');
     let addListeners = false; // add event listeners only the first time
     let rt = document.querySelector(':root');
     if (!/\w/g.test(mfs.innerHTML)) addListeners = true;
-    mfs.innerHTML = '<div><h2>mei-friend Settings</h2></div>';
+    mfs.innerHTML = '<div class="settingsHeader">mei-friend Settings</div>';
     let storage = window.localStorage;
+    let currentHeader;
     Object.keys(optionsToShow).forEach(opt => {
       let o = optionsToShow[opt];
       let optDefault = o.default;
@@ -1240,9 +1310,8 @@ export default class Viewer {
           this.vrvWorker.postMessage({
             'cmd': 'loadVerovio',
             'msg': optDefault,
-            'url': optDefault in supportedVerovioVersions 
-              ? supportedVerovioVersions[optDefault].url
-              : supportedVerovioVersions[o.default].url
+            'url': optDefault in supportedVerovioVersions ?
+              supportedVerovioVersions[optDefault].url : supportedVerovioVersions[o.default].url
           });
           break;
         case 'showSupplied':
@@ -1272,7 +1341,16 @@ export default class Viewer {
           break;
       }
       let div = this.createOptionsItem(opt, o, optDefault)
-      if (div) mfs.appendChild(div);
+      if (div) {
+        if (div.classList.contains('optionsSubHeading')) {
+          currentHeader = div;
+          mfs.appendChild(currentHeader);
+        } else if (currentHeader) {
+          currentHeader.appendChild(div);
+        } else {
+          mfs.appendChild(div);
+        }
+      }
       if (opt === 'respSelect') this.respId = document.getElementById('respSelect').value;
       if (opt === 'renumberMeasuresUseSuffixAtEndings') {
         this.disableElementThroughCheckbox(
@@ -1367,6 +1445,7 @@ export default class Viewer {
     }
   } // addMeiFriendOptionsToSettingsPanel()
 
+
   // add responsibility statement to resp select dropdown
   setRespSelectOptions() {
     let rs = document.getElementById('respSelect');
@@ -1408,6 +1487,18 @@ export default class Viewer {
 
   // creates an option div with a label and input/select depending of o.keys
   createOptionsItem(opt, o, optDefault) {
+    if (o.type === 'header') {
+      // create a details>summary structure instead of header
+      let details = document.createElement('details');
+      details.classList.add('optionsSubHeading');
+      details.open = true;
+      let summary = document.createElement('summary');
+      summary.setAttribute('title', o.description);
+      summary.setAttribute('id', opt);
+      summary.innerText = o.title;
+      details.appendChild(summary);
+      return details;
+    }
     let div = document.createElement('div');
     div.classList.add('optionsItem');
     let label = document.createElement('label');
@@ -1443,7 +1534,7 @@ export default class Viewer {
         input.setAttribute('value', optDefault);
         break;
       case 'std::string':
-        if (opt === 'font') {
+        if (opt.endsWith('font')) {
           input = document.createElement('select');
           input.setAttribute('name', opt);
           input.setAttribute('id', opt);
@@ -1469,10 +1560,6 @@ export default class Viewer {
         input.setAttribute('name', opt);
         input.setAttribute('id', opt);
         input.setAttribute('value', optDefault);
-        break;
-      case 'header':
-        div.classList.remove('optionsItem');
-        div.classList.add('optionsSubHeading');
         break;
       case 'line':
         div.removeChild(label);
@@ -1717,7 +1804,30 @@ export default class Viewer {
     if (vr) vr.style.visibility = 'hidden';
     const hasSchema = /<\?xml-model.*schematypens=\"http?:\/\/relaxng\.org\/ns\/structure\/1\.0\"/
     const hasSchemaMatch = hasSchema.exec(mei);
-    if (!hasSchemaMatch) return;
+    const meiVersion = /<mei.*meiversion="([^"]*).*/;
+    const meiVersionMatch = meiVersion.exec(mei);
+    if (!hasSchemaMatch) {
+      if (meiVersionMatch && meiVersionMatch[1]) {
+        let sch = commonSchemas['All'][meiVersionMatch[1]];
+        if (sch) {
+          if (sch !== this.currentSchema) {
+            this.currentSchema = sch;
+            console.log('Validation: ...new schema from @meiversion ' + this.currentSchema);
+            await this.replaceSchema(this.currentSchema);
+            return;
+          } else {
+            console.log('Validation: same schema.');
+            return;
+          }
+        }
+      }
+      console.log('Validation: No schema information found in MEI.');
+      this.currentSchema = '';
+      this.throwSchemaError({
+        "schemaFile": "No schema information found in MEI."
+      });
+      return;
+    }
     const schema = /<\?xml-model.*href="([^"]*).*/;
     const schemaMatch = schema.exec(mei);
     if (schemaMatch && schemaMatch[1] !== this.currentSchema) {
@@ -1735,10 +1845,12 @@ export default class Viewer {
     if (!this.validatorInitialized) return;
     let vs = document.getElementById('validation-status');
     vs.innerHTML = download;
-    vs.setAttribute('title', 'Loading schema ' + schemaFile);
+    let msg = 'Loading schema ' + schemaFile;
+    vs.setAttribute('title', msg);
     this.changeStatus(vs, 'wait', ['error', 'ok', 'manual']);
+    this.updateSchemaStatusDisplay('wait', schemaFile, msg);
 
-    console.log('Replace schema: ' + schemaFile);
+    console.log('Validation: Replace schema: ' + schemaFile);
     let data; // content of schema file
     try {
       const response = await fetch(schemaFile);
@@ -1757,36 +1869,50 @@ export default class Viewer {
       });
       return
     }
-    vs.setAttribute('title', 'Schema loaded ' + schemaFile);
+    msg = 'Schema loaded ' + schemaFile;
+    vs.setAttribute('title', msg);
     vs.innerHTML = unverified;
     this.validatorWithSchema = true;
-    if (document.getElementById('autoValidate').checked)
+    const autoValidate = document.getElementById('autoValidate');
+    if (autoValidate && autoValidate.checked)
       validate(cm.getValue(), this.updateLinting, true)
     else
       this.setValidationStatusToManual();
     console.log("New schema loaded to validator", schemaFile);
     rngLoader.setRelaxNGSchema(data);
     cm.options.hintOptions.schemaInfo = rngLoader.tags
-    console.log("New schema loaded to hinting system", schemaFile);
+    console.log("New schema loaded for auto completion", schemaFile);
+    this.updateSchemaStatusDisplay('ok', schemaFile, msg);
   }
 
   // Throw an schema error and update validation-status icon
   throwSchemaError(msgObj) {
     this.validatorWithSchema = false;
-    let msg;
+    if (this.updateLinting && typeof this.updateLinting === 'function')
+      this.updateLinting(cm, []); // clear errors in CodeMirror
+    // Remove schema from validator and hinting / code completion
+    rngLoader.clearRelaxNGSchema();
+    console.log("Schema removed from validator", this.currentSchema);
+    cm.options.hintOptions = {};
+    console.log("Schema removed from auto completion", this.currentSchema);
+    // construct error message
+    let msg = '';
     if (msgObj.hasOwnProperty('response'))
       msg = 'Schema not found (' + msgObj.response.status + ' ' +
-      msgObj.response.statusText + ': ' + msgObj.schemaFile + ')';
+      msgObj.response.statusText + '): ';
     if (msgObj.hasOwnProperty('err'))
-      msg = msgObj.err;
+      msg = msgObj.err + ': ';
+    if (msgObj.hasOwnProperty('schemaFile'))
+      msg += msgObj.schemaFile;
+    // set icon to unverified and error color
     let vs = document.getElementById('validation-status');
     vs.innerHTML = unverified;
     vs.setAttribute('title', msg);
     console.warn(msg);
     this.changeStatus(vs, 'error', ['wait', 'ok', 'manual']);
+    this.updateSchemaStatusDisplay('error', '', msg);
     return;
   }
-
 
   // helper function that adds addedClass (string) 
   // after removing removedClasses (array of strings)
@@ -1794,6 +1920,38 @@ export default class Viewer {
   changeStatus(el, addedClass = '', removedClasses = []) {
     removedClasses.forEach(c => el.classList.remove(c));
     el.classList.add(addedClass);
+  }
+
+  updateSchemaStatusDisplay(status = 'ok', schemaName, msg = '') {
+    let el = document.getElementById('schemaStatus');
+    if (el) {
+      el.title = msg;
+      switch (status) {
+        case 'ok':
+          this.changeStatus(el, 'ok', ['error', 'manual', 'wait']);
+          // pretty-printing for known schemas from music-encoding.org
+          if (schemaName.includes('music-encoding.org')) {
+            let pathElements = schemaName.split('/');
+            let type = pathElements.pop();
+            if (type.toLowerCase().includes('anystart')) type = 'any';
+            let noChars = 3;
+            if (type.toLowerCase().includes('neumes') || type.toLowerCase().includes('mensural')) noChars = 4;
+            let schemaVersion = pathElements.pop();
+            el.innerHTML = type.split('mei-').pop().slice(0, noChars).toUpperCase() + ' ' + schemaVersion;
+          } else {
+            el.innerHTML = schemaName.split('/').pop().split('.').at(0);
+          }
+          break;
+        case 'wait': // downloading schema
+          this.changeStatus(el, 'wait', ['ok', 'manual', 'error']);
+          el.innerHTML = '&nbsp;&#11015;&nbsp;'; // #8681 #8615
+          break;
+        case 'error': // no schema in MEI or @meiversion
+          this.changeStatus(el, 'error', ['ok', 'manual', 'wait']);
+          el.innerHTML = '&nbsp;?&nbsp;';
+          break;
+      }
+    }
   }
 
   // Switch validation-status icon to manual mode and add click event handlers
@@ -1808,7 +1966,8 @@ export default class Viewer {
     this.changeStatus(vs, 'manual', ['wait', 'ok', 'error']);
     let reportDiv = document.getElementById('validation-report');
     if (reportDiv) reportDiv.style.visibility = 'hidden';
-    if (this.updateLinting) this.updateLinting(cm, []); // clear errors in CodeMirror
+    if (this.updateLinting && typeof this.updateLinting === 'function')
+      this.updateLinting(cm, []); // clear errors in CodeMirror
   }
 
   // Callback for manual validation 
@@ -1819,14 +1978,14 @@ export default class Viewer {
   }
 
   // Highlight validation results in CodeMirror editor linting system
-  highlightValidation(text, validation) {
+  highlightValidation(mei, validation) {
     let lines;
     let found = [];
     let i = 0;
     let messages;
 
     try {
-      lines = text.split("\n");
+      lines = mei.split("\n");
       messages = JSON.parse(validation);
     } catch (err) {
       console.log("Could not parse json:", err);

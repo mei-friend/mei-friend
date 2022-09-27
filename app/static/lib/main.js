@@ -1,6 +1,6 @@
 // mei-friend version and date
-const version = '0.6.2';
-const versionDate = '15 Sept 2022';
+const version = '0.6.3';
+const versionDate = '27 Sept 2022';
 
 var vrvWorker;
 var spdWorker;
@@ -16,7 +16,45 @@ let platform = navigator.platform.toLowerCase(); // TODO
 // guidelines base URL, needed to construct element / attribute URLs
 // TODO ideally determine version part automatically
 const guidelinesBase = 'https://music-encoding.org/guidelines/v4/';
-const defaultSchema = 'https://music-encoding.org/schema/4.0.1/mei-all.rng';
+
+export const commonSchemas = {
+  'CMN': {
+    '2.1.1': 'https://music-encoding.org/schema/2.1.1/mei-CMN.rng',
+    '3.0.0': 'https://music-encoding.org/schema/3.0.0/mei-CMN.rng',
+    '4.0.0': 'https://music-encoding.org/schema/4.0.0/mei-CMN.rng',
+    '4.0.1': 'https://music-encoding.org/schema/4.0.1/mei-CMN.rng',
+    '5.0.0-dev': 'https://music-encoding.org/schema/dev/mei-CMN.rng'
+  },
+  'Mensural': {
+    '2.1.1': 'https://music-encoding.org/schema/2.1.1/mei-Mensural.rng',
+    '3.0.0': 'https://music-encoding.org/schema/3.0.0/mei-Mensural.rng',
+    '4.0.0': 'https://music-encoding.org/schema/4.0.0/mei-Mensural.rng',
+    '4.0.1': 'https://music-encoding.org/schema/4.0.1/mei-Mensural.rng',
+    '5.0.0-dev': 'https://music-encoding.org/schema/dev/mei-Mensural.rng'
+  },
+  'Neumes': {
+    '2.1.1': 'https://music-encoding.org/schema/2.1.1/mei-Neumes.rng',
+    '3.0.0': 'https://music-encoding.org/schema/3.0.0/mei-Neumes.rng',
+    '4.0.0': 'https://music-encoding.org/schema/4.0.0/mei-Neumes.rng',
+    '4.0.1': 'https://music-encoding.org/schema/4.0.1/mei-Neumes.rng',
+    '5.0.0-dev': 'https://music-encoding.org/schema/dev/mei-Neumes.rng'
+  },
+  'All': {
+    '2.1.1': 'https://music-encoding.org/schema/2.1.1/mei-all.rng',
+    '3.0.0': 'https://music-encoding.org/schema/3.0.0/mei-all.rng',
+    '4.0.0': 'https://music-encoding.org/schema/4.0.0/mei-all.rng',
+    '4.0.1': 'https://music-encoding.org/schema/4.0.1/mei-all.rng',
+    '5.0.0-dev': 'https://music-encoding.org/schema/dev/mei-all.rng'
+  },
+  'Any': {
+    '2.1.1': 'https://music-encoding.org/schema/2.1.1/mei-all_anyStart.rng',
+    '3.0.0': 'https://music-encoding.org/schema/3.0.0/mei-all_anyStart.rng',
+    '4.0.0': 'https://music-encoding.org/schema/4.0.0/mei-all_anyStart.rng',
+    '4.0.1': 'https://music-encoding.org/schema/4.0.1/mei-all_anyStart.rng',
+    '5.0.0-dev': 'https://music-encoding.org/schema/dev/mei-all_anyStart.rng'
+  }
+};
+const defaultSchema = commonSchemas['CMN']['4.0.1'];
 
 // exports
 export var cm;
@@ -108,7 +146,8 @@ import {
 } from './control-menu.js';
 import {
   clock,
-  unverified
+  unverified,
+  xCircleFill
 } from '../css/icons.js';
 import {
   rmHash,
@@ -458,14 +497,22 @@ document.addEventListener('DOMContentLoaded', function () {
   rngLoader = new RNGLoader();
 
   validator.onRuntimeInitialized().then(async () => {
-    console.log('validator: onRuntimeInitialized()');
+    console.log('Validator: onRuntimeInitialized()');
     v.validatorInitialized = true;
-    if (!v.currentSchema) v.currentSchema = defaultSchema;
-    await v.replaceSchema(v.currentSchema);
+    if (!v.validatorWithSchema && v.currentSchema) {
+      await v.replaceSchema(v.currentSchema);
+    }
   });
 
-  v.addCmOptionsToSettingsPanel(cm, defaultCodeMirrorOptions);
+  v.busy();
+  const resetButton = document.getElementById('filterReset');
+  if (resetButton) {
+    resetButton.innerHTML = xCircleFill;
+    resetButton.style.visibility = 'hidden';
+  }
+  v.addCmOptionsToSettingsPanel(defaultCodeMirrorOptions);
   v.addMeiFriendOptionsToSettingsPanel();
+  v.applySettingsFilter();
 
   // add event listener to validation status icon, if no autoValidation
   if (!document.getElementById('autoValidate').checked) {
@@ -610,14 +657,6 @@ document.addEventListener('DOMContentLoaded', function () {
     doit = setTimeout(() => setOrientation(cm, '', v, storage), 500);
   };
 
-  // ask worker to load Verovio
-  v.busy();
-  let verovioVersion = document.getElementById('selectToolkitVersion').value;
-  vrvWorker.postMessage({
-    'cmd': 'loadVerovio',
-    'msg': verovioVersion,
-    'url': supportedVerovioVersions[verovioVersion].url
-  });
 
   setKeyMap(defaultKeyMap);
 });
@@ -702,6 +741,7 @@ async function vrvWorkerEventsHandler(ev) {
       tkAvailableOptions = ev.data.availableOptions;
       v.clearVrvOptionsSettingsPanel();
       v.addVrvOptionsToSettingsPanel(tkAvailableOptions, defaultVerovioOptions);
+
       // v.addMeiFriendOptionsToSettingsPanel();
       drawRightFooter();
       document.querySelector(".statusbar").innerHTML =
@@ -764,7 +804,8 @@ async function vrvWorkerEventsHandler(ev) {
         document.querySelector('title').innerHTML = 'mei-friend: ' +
           meiFileName.substr(meiFileName.lastIndexOf("/") + 1);
         document.getElementById('verovio-panel').innerHTML = ev.data.svg;
-        if (document.getElementById('showSourceImagePanel').checked) await drawSourceImage();
+        if (document.getElementById('showSourceImagePanel') &&
+          document.getElementById('showSourceImagePanel').checked) await drawSourceImage();
         if (ev.data.setCursorToPageBeginning) v.setCursorToPageBeginning(cm);
         v.updatePageNumDisplay();
         v.addNotationEventListeners(cm);
@@ -1097,6 +1138,11 @@ let cmd = {
   'showSettingsPanel': () => v.showSettingsPanel(),
   'hideSettingsPanel': () => v.hideSettingsPanel(),
   'toggleSettingsPanel': (ev) => v.toggleSettingsPanel(ev),
+  'filterSettings': () => v.applySettingsFilter(),
+  'filterReset': () => {
+    document.getElementById('filterSettings').value = '';
+    document.getElementById('filterSettings').dispatchEvent(new Event("input"));
+  },
   'showAnnotationPanel': () => {
     document.getElementById('showAnnotationPanel').checked = true; // TODO: remove?
     v.toggleAnnotationPanel();
@@ -1205,10 +1251,17 @@ let cmd = {
     logoutFromGithub();
   },
   'consultGuidelines': () => consultGuidelines(),
-  'closeOverlays': () => {
-    v.hideAlerts();
-    v.toggleValidationReportVisibility('hidden');
-    // TODO: close all other overlays too...
+  'escapeKeyPressed': () => {
+    // reset settings filter, if settings have focus
+    if (document.getElementById('settingsPanel') &&
+      document.getElementById('settingsPanel') ===
+      document.activeElement.closest('#settingsPanel')) {
+      cmd.filterReset();
+    } else {
+      v.hideAlerts();
+      v.toggleValidationReportVisibility('hidden');
+      // TODO: close all other overlays too...
+    }
   }
 };
 
@@ -1224,7 +1277,7 @@ function addEventListeners(v, cm) {
   });
   body.addEventListener('keydown', (ev) => {
     if (ev.key === 'Escape')
-      cmd.closeOverlays();
+      cmd.escapeKeyPressed();
   });
 
   // Register key handlers to #encoding rather than giving it to CodeMirror directly
@@ -1248,10 +1301,15 @@ function addEventListeners(v, cm) {
   document.getElementById('showSettingsButton').addEventListener('click', cmd.showSettingsPanel);
   document.getElementById('hideSettingsButton').addEventListener('click', cmd.hideSettingsPanel);
   document.getElementById('closeSettingsButton').addEventListener('click', cmd.hideSettingsPanel);
+  document.getElementById('filterSettings').addEventListener('input', cmd.filterSettings);
+  document.getElementById('filterSettings').value = "";
+  document.getElementById('filterReset').addEventListener('click', cmd.filterReset)
   document.getElementById('showAnnotationMenu').addEventListener('click', cmd.showAnnotationPanel);
   document.getElementById('showAnnotationsButton').addEventListener('click', cmd.toggleAnnotationPanel);
   document.getElementById('closeAnnotationPanelButton').addEventListener('click', cmd.hideAnnotationPanel);
   document.getElementById('hideAnnotationPanelButton').addEventListener('click', cmd.hideAnnotationPanel);
+  // re-apply settings filtering when switching settings tabs
+  document.querySelectorAll('#settingsPanel .tablink').forEach(t => t.addEventListener('click', cmd.filterSettings))
 
   // open dialogs
   document.getElementById('OpenMei').addEventListener('click', cmd.open);
@@ -1332,7 +1390,7 @@ function addEventListeners(v, cm) {
   document.getElementById('pagination2').addEventListener('blur', ev => manualCurrentPage(v, cm, ev));
   // font selector
   document.getElementById('font-select').addEventListener('change', () => {
-    document.getElementById('font').value = document.getElementById('font-select').value;
+    document.getElementById('vrv-font').value = document.getElementById('font-select').value;
     v.updateOption();
   });
   // breaks selector
@@ -1556,7 +1614,7 @@ function drawRightFooter() {
     "</a> (" + versionDate + ").&nbsp;";
   if (tkVersion) {
     let githubUrl = 'https://github.com/rism-digital/verovio/releases/tag/version-' + tkVersion.split('-')[0];
-    if(tkVersion.includes("dev")) { 
+    if (tkVersion.includes("dev")) {
       // current develop version, no release yet...
       githubUrl = 'https://github.com/rism-digital/verovio/tree/develop';
     }

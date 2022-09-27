@@ -45,7 +45,7 @@ addEventListener('message', function (event) {
         args
     } = event.data;
 
-    console.log('validator-worker: data ', event.data);
+    console.log('validator-worker: ' + Math.random() + ', data ', event.data);
 
     // postMessage on a `onRuntimeInitialized` method as soon as
     // Module is initialized

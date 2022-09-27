@@ -697,13 +697,8 @@ export function removeZone(v, cm, zone, removeMeasure = true) {
 }
 
 
-
-// ############################################################################
-// # (mostly) private functions                                               #
-// ############################################################################
-
 // find xmlNode in textBuffer and remove it (including empty line)
-function removeInEditor(cm, xmlNode) {
+export function removeInEditor(cm, xmlNode) {
   let itemId = xmlNode.getAttribute('xml:id');
   let searchSelfClosing = '(?:<' + xmlNode.nodeName +
     `)(\\s+?)([^>]*?)(?:xml:id=["']` + itemId + `['"])([^>]*?)(?:/>)`;
@@ -780,6 +775,11 @@ export function replaceInEditor(cm, xmlNode, select = false, newNode = null) {
     end: sc.to()
   };
 }
+
+
+// ############################################################################
+// # (mostly) private functions                                               #
+// ############################################################################
 
 function toggleArticForNote(note, artic) {
   note = utils.attrAsElements(note);

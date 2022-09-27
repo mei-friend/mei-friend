@@ -82,25 +82,33 @@ summary.noDetails {
 
 .annotationListItem {
   border: 1px solid black;
+  border-radius: 5px;
   height: fit-content;
-  max-height: 220px; 
-  width: 220px;
-  margin: .5em;
+  max-height: 205px; 
+  width: 205px;
+  margin: .25em;
+  flex-shrink: 0;
+}
+
+.annotationListItem summary { 
+  font-size:10pt;
+  font-weight: normal !important;
 }
 
 .annotationListItemButtons {
   border-top: 1px solid black;
-  padding: .5em 1em;
+  padding: .25em .5em;
 }
 
 #addWebAnnotation {
   border: 1px solid black;
   border-radius: 5px;
   padding: .2em;
-  margin: .5em;
+  margin: .25em;
   cursor: pointer;
   height: fit-content;
-  padding: .5em 1em;
+  max-width: 192px;
+  padding: .25em .5em;
 }
 
 .annotationListItemButtons svg, #listAnnotations svg {
