@@ -4,6 +4,7 @@
 * Display schema info before file name
 * Automatically load schema from provided `@meiversion` attribute, when no schema is given in <xml-model>
 * Filter settings through text input panel (incl. settings refactoring)
+* Annotation list layout fixes
 ### 0.6.2 patch: small bug fixes
 * Bugfix: create valid <ptr/> objects for linking annotations
 * Bugfix: guard against edge-cases when switching vrvTk versions
