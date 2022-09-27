@@ -6,7 +6,8 @@ import {
   setCursorToId
 } from './utils.js';
 import {
-  cm
+  cm,
+  platform
 } from './main.js';
 
 export function addDragSelector(v, vp) {
@@ -30,7 +31,7 @@ export function addDragSelector(v, vp) {
   vp.addEventListener('mousedown', ev => {
     dragging = true;
     // clear selected elements, if no CMD/CTRL key is pressed
-    if (!((navigator.appVersion.indexOf("Mac") !== -1) && ev.metaKey) && !ev.ctrlKey) {
+    if (!(platform.startsWith('mac') && ev.metaKey) && !ev.ctrlKey) {
       v.selectedElements = [];
       v.updateHighlight();
     }

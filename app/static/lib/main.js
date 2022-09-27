@@ -10,7 +10,7 @@ var elementAtCursor;
 var breaksParam; // (string) the breaks parameter given through URL
 var pageParam; // (int) page parameter given through URL
 var selectParam; // (array) select ids given through multiple instances in URL
-let platform = navigator.platform.toLowerCase(); // TODO
+export let platform = navigator.platform.toLowerCase(); // TODO
 // let platform = (navigator?.userAgentData?.platform || navigator?.platform || 'unknown').toLowerCase();
 
 // guidelines base URL, needed to construct element / attribute URLs
