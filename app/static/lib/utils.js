@@ -556,6 +556,7 @@ export function getOS() {
 // accepts color as string: "rgb(100,12,255)" and hex string "#ffee10" or
 export function brighter(rgbString, deltaPercent, alpha = 1) {
   let rgb = [];
+  rgbString = rgbString.trim(); // remove white space on either side
   if (rgbString.startsWith('#')) {
     rgb = hexToRgb(rgbString);
   } else {
