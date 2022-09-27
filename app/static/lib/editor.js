@@ -8,7 +8,7 @@ import {
 } from './source-imager.js';
 
 // delete selected elements
-export function delEl(v, cm) {
+export function deleteElement(v, cm) {
   v.loadXml(cm.getValue(), true);
   let id = v.selectedElements[0]; // TODO: iterate over selectedElements
   let cursor = cm.getCursor();
@@ -79,14 +79,14 @@ export function delEl(v, cm) {
   v.encodingHasChanged = true;
   v.updateData(cm, false, true);
   v.updateNotation = true;
-} // delEl()
+} // deleteElement()
 
-export function addCtrlEl(v, cm, elName, placement, form) {
+export function addControlElement(v, cm, elName, placement, form) {
   if (v.selectedElements.length == undefined || v.selectedElements.length < 1)
     return;
   v.selectedElements = utils.sortElementsByScorePosition(v.selectedElements);
   v.selectedElements = speed.filterElements(v.selectedElements, v.xmlDoc);
-  console.info('addCtrlEl() ', elName, placement, form);
+  console.info('addControlElement() ', elName, placement, form);
 
   // find and validate startEl with @startId
   let startId = v.selectedElements[0];
@@ -116,7 +116,7 @@ export function addCtrlEl(v, cm, elName, placement, form) {
     endEl = v.xmlDoc.querySelector("[*|id='" + endId + "']");
     if (!['note', 'chord', 'mRest', 'multiRest'].includes(endEl.nodeName)) {
       console.info(
-        'addCtrlEl: Cannot add new element to end element ' +
+        'addControlElement: Cannot add new element to end element ' +
         endEl.nodeName);
       return;
     }
@@ -184,7 +184,7 @@ export function addCtrlEl(v, cm, elName, placement, form) {
   v.selectedElements.push(uuid);
   v.updateData(cm, false, true);
   v.updateNotation = true;
-} // addCtrlEl()
+} // addControlElement()
 
 export function addClefChange(v, cm, shape = 'G', line = '2', before = true) {
   if (v.selectedElements.length == 0) return;

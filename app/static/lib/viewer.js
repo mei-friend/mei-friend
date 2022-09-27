@@ -16,6 +16,7 @@ import {
   defaultVerovioVersion,
   fontList,
   rngLoader,
+  platform,
   storage,
   supportedVerovioVersions,
   tkVersion,
@@ -470,7 +471,7 @@ export default class Viewer {
     if (e.currentTarget.getAttribute('class') == 'tupletNum')
       itemId = utils.insideParent(itemId, 'tuplet');
 
-    if (((navigator.appVersion.indexOf("Mac") !== -1) && e.metaKey) || e.ctrlKey) {
+    if (((platform.startsWith('mac')) && e.metaKey) || e.ctrlKey) {
       this.selectedElements.push(itemId);
       console.info('handleClickOnNotation() added: ' +
         this.selectedElements[this.selectedElements.length - 1] +

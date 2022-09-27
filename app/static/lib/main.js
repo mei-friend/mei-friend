@@ -10,7 +10,7 @@ var elementAtCursor;
 var breaksParam; // (string) the breaks parameter given through URL
 var pageParam; // (int) page parameter given through URL
 var selectParam; // (array) select ids given through multiple instances in URL
-let platform = navigator.platform.toLowerCase(); // TODO
+export let platform = navigator.platform.toLowerCase(); // TODO
 // let platform = (navigator?.userAgentData?.platform || navigator?.platform || 'unknown').toLowerCase();
 
 // guidelines base URL, needed to construct element / attribute URLs
@@ -514,8 +514,14 @@ document.addEventListener('DOMContentLoaded', function () {
   v.addMeiFriendOptionsToSettingsPanel();
   v.applySettingsFilter();
 
+  // check autoValidate as URL param
+  let autoValidateParam = searchParams.get('autoValidate');
+  let av = document.getElementById('autoValidate')
+  if (autoValidateParam !== null && av) {
+    av.checked = autoValidateParam === 'true';
+  }
   // add event listener to validation status icon, if no autoValidation
-  if (!document.getElementById('autoValidate').checked) {
+  if (av && !av.checked) {
     v.setValidationStatusToManual();
   }
 
@@ -1177,37 +1183,37 @@ let cmd = {
     v.updateLayout()
   },
   // add control elements
-  'addSlur': () => e.addCtrlEl(v, cm, 'slur', ''),
-  'addSlurBelow': () => e.addCtrlEl(v, cm, 'slur', 'below'),
-  'addTie': () => e.addCtrlEl(v, cm, 'tie', ''),
-  'addTieBelow': () => e.addCtrlEl(v, cm, 'tie', 'below'),
-  'addCresHairpin': () => e.addCtrlEl(v, cm, 'hairpin', '', 'cres'),
-  'addDimHairpin': () => e.addCtrlEl(v, cm, 'hairpin', '', 'dim'),
-  'addCresHairpinBelow': () => e.addCtrlEl(v, cm, 'hairpin', 'below', 'cres'),
-  'addDimHairpinBelow': () => e.addCtrlEl(v, cm, 'hairpin', 'below', 'dim'),
-  'addFermata': () => e.addCtrlEl(v, cm, 'fermata', 'above', 'norm'),
-  'addFermataBelow': () => e.addCtrlEl(v, cm, 'fermata', 'below', 'inv'),
-  'addDirective': () => e.addCtrlEl(v, cm, 'dir', 'above', 'dolce'),
-  'addDirectiveBelow': () => e.addCtrlEl(v, cm, 'dir', 'below', 'dolce'),
-  'addDynamics': () => e.addCtrlEl(v, cm, 'dynam', 'above', 'mf'),
-  'addDnamicsBelow': () => e.addCtrlEl(v, cm, 'dynam', 'below', 'mf'),
-  'addTempo': () => e.addCtrlEl(v, cm, 'tempo', 'above', 'Allegro'),
-  'addArpeggio': () => e.addCtrlEl(v, cm, 'arpeg'),
-  'addGlissando': () => e.addCtrlEl(v, cm, 'gliss'),
-  'addPedalDown': () => e.addCtrlEl(v, cm, 'pedal', 'down'),
-  'addPedalUp': () => e.addCtrlEl(v, cm, 'pedal', 'up'),
-  'addTrillAbove': () => e.addCtrlEl(v, cm, 'trill', 'above'),
-  'addTrillBelow': () => e.addCtrlEl(v, cm, 'trill', 'below'),
-  'addTurnAbove': () => e.addCtrlEl(v, cm, 'turn', 'above', 'upper'),
-  'addTurnBelow': () => e.addCtrlEl(v, cm, 'turn', 'below', 'upper'),
-  'addTurnAboveLower': () => e.addCtrlEl(v, cm, 'turn', 'above', 'lower'),
-  'addTurnBelowLower': () => e.addCtrlEl(v, cm, 'turn', 'below', 'lower'),
-  'addMordentAbove': () => e.addCtrlEl(v, cm, 'mordent', 'above', 'lower'),
-  'addMordentBelow': () => e.addCtrlEl(v, cm, 'mordent', 'below', 'lower'),
-  'addMordentAboveUpper': () => e.addCtrlEl(v, cm, 'mordent', 'above', 'upper'),
-  'addMordentBelowUpper': () => e.addCtrlEl(v, cm, 'mordent', 'below', 'upper'),
+  'addSlur': () => e.addControlElement(v, cm, 'slur', ''),
+  'addSlurBelow': () => e.addControlElement(v, cm, 'slur', 'below'),
+  'addTie': () => e.addControlElement(v, cm, 'tie', ''),
+  'addTieBelow': () => e.addControlElement(v, cm, 'tie', 'below'),
+  'addCresHairpin': () => e.addControlElement(v, cm, 'hairpin', '', 'cres'),
+  'addDimHairpin': () => e.addControlElement(v, cm, 'hairpin', '', 'dim'),
+  'addCresHairpinBelow': () => e.addControlElement(v, cm, 'hairpin', 'below', 'cres'),
+  'addDimHairpinBelow': () => e.addControlElement(v, cm, 'hairpin', 'below', 'dim'),
+  'addFermata': () => e.addControlElement(v, cm, 'fermata', 'above', 'norm'),
+  'addFermataBelow': () => e.addControlElement(v, cm, 'fermata', 'below', 'inv'),
+  'addDirective': () => e.addControlElement(v, cm, 'dir', 'above', 'dolce'),
+  'addDirectiveBelow': () => e.addControlElement(v, cm, 'dir', 'below', 'dolce'),
+  'addDynamics': () => e.addControlElement(v, cm, 'dynam', 'above', 'mf'),
+  'addDnamicsBelow': () => e.addControlElement(v, cm, 'dynam', 'below', 'mf'),
+  'addTempo': () => e.addControlElement(v, cm, 'tempo', 'above', 'Allegro'),
+  'addArpeggio': () => e.addControlElement(v, cm, 'arpeg'),
+  'addGlissando': () => e.addControlElement(v, cm, 'gliss'),
+  'addPedalDown': () => e.addControlElement(v, cm, 'pedal', 'down'),
+  'addPedalUp': () => e.addControlElement(v, cm, 'pedal', 'up'),
+  'addTrillAbove': () => e.addControlElement(v, cm, 'trill', 'above'),
+  'addTrillBelow': () => e.addControlElement(v, cm, 'trill', 'below'),
+  'addTurnAbove': () => e.addControlElement(v, cm, 'turn', 'above', 'upper'),
+  'addTurnBelow': () => e.addControlElement(v, cm, 'turn', 'below', 'upper'),
+  'addTurnAboveLower': () => e.addControlElement(v, cm, 'turn', 'above', 'lower'),
+  'addTurnBelowLower': () => e.addControlElement(v, cm, 'turn', 'below', 'lower'),
+  'addMordentAbove': () => e.addControlElement(v, cm, 'mordent', 'above', 'lower'),
+  'addMordentBelow': () => e.addControlElement(v, cm, 'mordent', 'below', 'lower'),
+  'addMordentAboveUpper': () => e.addControlElement(v, cm, 'mordent', 'above', 'upper'),
+  'addMordentBelowUpper': () => e.addControlElement(v, cm, 'mordent', 'below', 'upper'),
   //
-  'delete': () => e.delEl(v, cm),
+  'delete': () => e.deleteElement(v, cm),
   'invertPlacement': () => e.invertPlacement(v, cm),
   'addVerticalGroup': () => e.addVerticalGroup(v, cm),
   'toggleStacc': () => e.toggleArtic(v, cm, 'stacc'),
