@@ -29,7 +29,7 @@ export function setOrientation(cm, o = '', v = null, storage = null) {
       sz.width -= annotationPanelExtent; // subtract width of annotation panel
       annotationPanel.style.display = 'unset';
       annotationPanel.style.width = annotationPanelExtent;
-      annotationPanel.style.height = sz.height + 5; // HACK!
+      annotationPanel.style.height = sz.height + 5; // HACK for 5 pix difference!
     } else {
       annotationPanel.style.display = 'none';
     }
@@ -41,7 +41,7 @@ export function setOrientation(cm, o = '', v = null, storage = null) {
     if (showAnnotationPanelCheckbox && showAnnotationPanelCheckbox.checked) {
       sz.height -= annotationPanelExtent; // subtract width of annotation panel
       annotationPanel.style.display = 'unset';
-      annotationPanel.style.width = sz.width + 5; // HACK!
+      annotationPanel.style.width = sz.width + 5; // HACK for 5 pix difference!
       annotationPanel.style.height = annotationPanelExtent;
     } else {
       annotationPanel.style.display = 'none';

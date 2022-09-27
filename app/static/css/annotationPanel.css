@@ -87,6 +87,7 @@ summary.noDetails {
   max-height: 205px; 
   width: 205px;
   margin: .25em;
+  flex-shrink: 0;
 }
 
 .annotationListItem summary { 
