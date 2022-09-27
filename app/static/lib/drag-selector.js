@@ -2,6 +2,12 @@ import {
   svgNameSpace
 } from './dom-utils.js'
 import * as att from './attribute-classes.js';
+import {
+  setCursorToId
+} from './utils.js';
+import {
+  cm
+} from './main.js';
 
 export function addDragSelector(v, vp) {
 
@@ -13,6 +19,7 @@ export function addDragSelector(v, vp) {
   var start = {};
   var end = {};
   var rect;
+  let firstElementHighlighted = false; // flag to highlight first selected element
 
   let noteSelector = '.note';
   let restSelector = '.rest,.mRest,.beatRpt,.halfmRpt,.mRpt';
@@ -138,8 +145,13 @@ export function addDragSelector(v, vp) {
           if (yKeys) yKeys.forEach(yKey => {
             let els = obobj[xKey][yKey];
             if (els) els.forEach(e => {
-              if (!newEls.includes(e.id))
+              if (!newEls.includes(e.id)) {
                 newEls.push(e.id);
+                if (!firstElementHighlighted) {
+                  setCursorToId(cm, e.id);
+                  firstElementHighlighted = true;
+                }
+              }
             });
           });
         });
@@ -157,6 +169,7 @@ export function addDragSelector(v, vp) {
     if (svgPm && Array.from(svgPm.childNodes).includes(rect))
       svgPm.removeChild(rect);
     oldEls = [];
+    firstElementHighlighted = false;
   });
 
 }
