@@ -651,7 +651,7 @@ function writeInlineIfRequested(a) {
         payload.setAttribute("target", a.url);
       }
       writeAnnot(el, a.id, a.selection, payload)
-      a.inline = true;
+      a.isInline = true;
     } else
       console.warn('writeInlineIfRequested: Cannot find beforeThis element for ' + a.id);
   }
