@@ -977,7 +977,7 @@ span.keyIcon {
   display: none;
   padding: 6px 12px;
   overflow: none;
-  height: calc(100% - 20px);
+  height: calc(100% - 50px);
   width: calc(100% - 2em);
 }
 
