@@ -60,6 +60,7 @@ export function refreshAnnotationsList() {
     const annoDiv = document.createElement("div");
     annoDiv.classList.add("annotationListItem");
     const details = document.createElement("details");
+    details.setAttribute("open", "");
     const summary = document.createElement("summary");
     const annoListItemButtons = document.createElement("div");
     annoListItemButtons.classList.add("annotationListItemButtons");
@@ -145,13 +146,13 @@ export function refreshAnnotationsList() {
 export function generateAnnotationLocationLabel(a) { 
   const annotationLocationLabel = document.createElement("span");
   if (a.firstPage === 'meiHead') {
-    annotationLocationLabel.innerHTML = `MEI head (${a.selection.length} elements)`;
+    annotationLocationLabel.innerHTML = `MEI&nbsp;head&nbsp;(${a.selection.length}&nbsp;elements)`;
   } else if (a.firstPage === 'unsituated' || a.firstPage < 0) {
     annotationLocationLabel.innerHTML = 'Unsituated';
   } else {
-    annotationLocationLabel.innerHTML = 'p. ' + (a.firstPage === a.lastPage ?
+    annotationLocationLabel.innerHTML = 'p.&nbsp;' + (a.firstPage === a.lastPage ?
         a.firstPage : a.firstPage + "&ndash;" + a.lastPage) +
-      ` (${a.selection.length} elements)`;
+      ` (${a.selection.length}&nbsp;elements)`;
   }
   annotationLocationLabel.classList.add("annotationLocationLabel");
   annotationLocationLabel.dataset.id = a.id;
