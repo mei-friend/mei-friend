@@ -444,7 +444,8 @@ a:active {
 }
 
 #annotationPanel .tab,
-#annotationPanel .tablink {
+#annotationPanel .tablink,
+#annotationPanel .tabstart {
   background-color: var(--annotationPanelLinkBackgroundColor);
   color: var(--annotationPanelTextColor);
   border: unset;
@@ -462,7 +463,9 @@ a:active {
   border: unset;
 }
 
-#annotationPanel .tablink:hover {
+#annotationPanel .tablink:hover,
+#annotationPanel .tabstart:hover,
+#annotationPanel .topright:hover {
   background-color: var(--annotationPanelHoverColor);
   color: var(--annotationPanelTextColor);
 }
