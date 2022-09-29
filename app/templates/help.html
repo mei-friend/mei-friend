@@ -14,9 +14,15 @@
     let altKey = "&#8997;"; // ALT
     let cmdKey = "&#8963;"; // CTRL
     let cmd2Key = "&#8997;"; // ALT
+    shiftKey = 'SHIFT';
+    altKey = 'ALT';
+    cmdKey = 'CTRL';
+    cmd2Key = 'ALT';
     if (navigator.platform.startsWith('Mac')) {
       cmdKey = "&#8984;"; // CMD
       cmd2Key = "&#8963;"; // CTRL
+      cmdKey = 'CMD';
+      cmd2Key = 'CTRL';
     }
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -63,12 +69,14 @@
           <td class="explanation">Selected note, rest, mRest in previous measure </td>
         </tr>
         <tr>
-          <td class="icons"><span class="keyIcon cmdKey"></span><span class="keyIcon cmd2Key"></span><span class="keyIcon">&rarr;</span></td>
+          <td class="icons"><span class="keyIcon cmdKey"></span><span class="keyIcon cmd2Key"></span><span
+              class="keyIcon">&rarr;</span></td>
           <td class="explanation">Go to next page (or <span class="keyIcon">&#8671;</span>
             or <span class="keyIcon">SPACE</span>)</td>
         </tr>
         <tr>
-          <td class="icons"><span class="keyIcon cmdKey"></span><span class="keyIcon cmd2Key"></span><span class="keyIcon">&larr;</span></td>
+          <td class="icons"><span class="keyIcon cmdKey"></span><span class="keyIcon cmd2Key"></span><span
+              class="keyIcon">&larr;</span></td>
           <td class="explanation">Go to previous page (or <span class="keyIcon">&#8670;</span>
             or <span class="keyIcon shiftKey"></span><span class="keyIcon">SPACE</span>)</td>
         </tr>
@@ -84,11 +92,14 @@
       <table>
         <h3 class='text-highlight'>Zooming/Display</h3>
         <tr>
-          <td class="icons"><span class="keyIcon cmdKey"></span><span class="keyIcon">+</span>, <span class="keyIcon cmdKey"></span><span class="keyIcon">–</span></td>
-          <td class="explanation">Zoom notation in/out (or <span class="keyIcon cmdKey"></span><span class="keyIcon">Mouse wheel</span>)</td>
+          <td class="icons"><span class="keyIcon cmdKey"></span><span class="keyIcon">+</span>, <span
+              class="keyIcon cmdKey"></span><span class="keyIcon">–</span></td>
+          <td class="explanation">Zoom notation in/out (or <span class="keyIcon cmdKey"></span><span
+              class="keyIcon">Mouse wheel</span>)</td>
         </tr>
         <tr>
-          <td class="icons"><span class="keyIcon cmdKey"></span><span class="keyIcon">0</span>, <span class="keyIcon cmdKey"></span><span class="keyIcon">5</span></td>
+          <td class="icons"><span class="keyIcon cmdKey"></span><span class="keyIcon">0</span>, <span
+              class="keyIcon cmdKey"></span><span class="keyIcon">5</span></td>
           <td class="explanation">Zoom to 100%, 50%, respectively</td>
         </tr>
       </table>
@@ -140,19 +151,23 @@
           <td class="explanation">Move note, rest, mRest, multiRest one tone downwards</td>
         </tr>
         <tr>
-          <td class="icons"><span class="keyIcon cmdKey"></span><span class="keyIcon shiftKey"></span><span class="keyIcon">&uarr;</span></td>
+          <td class="icons"><span class="keyIcon cmdKey"></span><span class="keyIcon shiftKey"></span><span
+              class="keyIcon">&uarr;</span></td>
           <td class="explanation">Move note, rest, mRest, multiRest one octave upwards </td>
         </tr>
         <tr>
-          <td class="icons"><span class="keyIcon cmdKey"></span><span class="keyIcon shiftKey"></span><span class="keyIcon">&darr;</span></td>
+          <td class="icons"><span class="keyIcon cmdKey"></span><span class="keyIcon shiftKey"></span><span
+              class="keyIcon">&darr;</span></td>
           <td class="explanation">Move note, rest, mRest, multiRest one octave downwards</td>
         </tr>
         <tr>
-          <td class="icons"><span class="keyIcon altKey"></span><span class="keyIcon cmdKey"></span><span class="keyIcon">&uarr;</span></td>
+          <td class="icons"><span class="keyIcon altKey"></span><span class="keyIcon cmdKey"></span><span
+              class="keyIcon">&uarr;</span></td>
           <td class="explanation">Move note, rest, mRest, multiRest one staff downwards </td>
         </tr>
         <tr>
-          <td class="icons"><span class="keyIcon altKey"></span><span class="keyIcon cmdKey"></span><span class="keyIcon">&darr;</span></td>
+          <td class="icons"><span class="keyIcon altKey"></span><span class="keyIcon cmdKey"></span><span
+              class="keyIcon">&darr;</span></td>
           <td class="explanation">Move note, rest, mRest, multiRest one staff upwards</td>
         </tr>
       </table>
@@ -171,16 +186,19 @@
     <div class='text-info'>
       <h3 class="text-highlight">MEI encoding manipulation</h3>
       <table>
-        <tr>Renumber measures (counts successive measures with @metcon="false" as one, counts multiple endings with same numbering)
+        <tr>Renumber measures (counts successive measures with @metcon="false" as one, counts multiple endings with same
+          numbering)
           <td class="icons"><span class="keyIcon shiftKey"></span><span class="keyIcon">R</span></td>
           <td class="explanation">Test renumbering (output to console)</td>
         </tr>
         <tr>
-          <td class="icons"><span class="keyIcon cmdKey"></span><span class="keyIcon shiftKey"></span><span class="keyIcon">R</span></td>
+          <td class="icons"><span class="keyIcon cmdKey"></span><span class="keyIcon shiftKey"></span><span
+              class="keyIcon">R</span></td>
           <td class="explanation">Execute renumbering</td>
         </tr>
         <tr>
-          <td class="icons"><span class="keyIcon cmdKey"></span><span class="keyIcon shiftKey"></span><span class="keyIcon">C</span></td>
+          <td class="icons"><span class="keyIcon cmdKey"></span><span class="keyIcon shiftKey"></span><span
+              class="keyIcon">C</span></td>
           <td class="explanation">Remove @accid.ges when @accid is present </td>
         </tr>
       </table>
@@ -240,7 +258,8 @@
         </tr>
         <tr>
           <td class="icons"><span class="keyIcon">U</span></td>
-          <td class="explanation">Surround selected elements with a supplied element; responsibility attribute to be selected in settings</td>
+          <td class="explanation">Surround selected elements with a supplied element; responsibility attribute to be
+            selected in settings</td>
         </tr>
       </table>
     </div>
@@ -286,11 +305,13 @@
       <table>
         <tr>
           <td class="icons"><span class="keyIcon">O</span></td>
-          <td class="explanation">Insert octave shift above (8va), spanning two selected notes/chords (below with CTRL)</td>
+          <td class="explanation">Insert octave shift above (8va), spanning two selected notes/chords (below with CTRL)
+          </td>
         </tr>
         <tr>
           <td class="icons"><span class="keyIcon altKey"></span><span class="keyIcon">O</span></td>
-          <td class="explanation">Insert octave shift above (15va), spanning two selected notes/chords (below with CTRL)</td>
+          <td class="explanation">Insert octave shift above (15va), spanning two selected notes/chords (below with CTRL)
+          </td>
         </tr>
       </table>
     </div>
@@ -302,7 +323,8 @@
           <td class="explanation">Insert G clef <i>before</i> selected element</td>
         </tr>
         <tr>
-          <td class="icons"><span class="keyIcon cmdKey"></span><span class="keyIcon shiftKey"></span><span class="keyIcon">G</span></td>
+          <td class="icons"><span class="keyIcon cmdKey"></span><span class="keyIcon shiftKey"></span><span
+              class="keyIcon">G</span></td>
           <td class="explanation">Insert G clef <i>after</i> selected element</td>
         </tr>
         <tr>
@@ -310,7 +332,8 @@
           <td class="explanation">Insert F clef <i>before</i> selected element</td>
         </tr>
         <tr>
-          <td class="icons"><span class="keyIcon cmdKey"></span><span class="keyIcon shiftKey"></span><span class="keyIcon">F</span></td>
+          <td class="icons"><span class="keyIcon cmdKey"></span><span class="keyIcon shiftKey"></span><span
+              class="keyIcon">F</span></td>
           <td class="explanation">Insert F clef <i>after</i> selected element</td>
         </tr>
         <tr>
@@ -385,7 +408,8 @@
         </tr>
         <tr>
           <td class="code">page=<i>number</i></td>
-          <td class="explanation">Specify a page number to be displayed (depends on breaks settings; overridden by select, see above)</td>
+          <td class="explanation">Specify a page number to be displayed (depends on breaks settings; overridden by
+            select, see above)</td>
         </tr>
         <tr>
           <td class="code">speed=<i>true|false</i></td>
@@ -393,7 +417,9 @@
         </tr>
         <tr>
           <td class="code">fork=<i>true|false</i></td>
-          <td class="explanation">If a <span class="code">https://raw.githubusercontent.com</span> URL is supplied via the <span class="code">file</span> parameter (see above), direct the user to fork the corresponding repository and open their forked version (logging them in first if necessary)</td>
+          <td class="explanation">If a <span class="code">https://raw.githubusercontent.com</span> URL is supplied via
+            the <span class="code">file</span> parameter (see above), direct the user to fork the corresponding
+            repository and open their forked version (logging them in first if necessary)</td>
         </tr>
         <tr>
           <td class="code">autoValidate=<i>true|false</i></td>

@@ -402,24 +402,53 @@ export function generateSectionSelect(xmlDoc) {
   return sections;
 }
 
-export function addModifyerKeys(element) {
-  let shiftKey = "&#8679;"; // SHIFT
-  let altKey = "&#8997;"; // ALT
-  let cmdKey = "&#8963;"; // CTRL
-  let cmd2Key = "&#8997;"; // ALT
-  if (navigator.platform.startsWith('Mac')) {
-    cmdKey = "&#8984;"; // CMD
-    cmd2Key = "&#8963;"; // CTRL
+export function addModifyerKeys(root) {
+  let modifierKeys = {
+    altKey: {
+      symbol: "&#8997;",
+      text: 'Alt',
+      description: 'Alt key'
+    }, // ALT
+    shiftKey: {
+      symbol: "&#8679;",
+      text: "Shift",
+      description: 'Shift key'
+    }, // SHIFT
+    cmd2Key: {
+      symbol: "&#8997;",
+      text: 'Alt',
+      description: 'Alt key'
+    }, // ALT
+    cmdKey: {
+      symbol: "&#8963;",
+      text: 'Ctrl',
+      description: 'Ctrl key'
+    }, // CTRL
+    ctrlKey: {
+      symbol: "&#8963;",
+      text: 'Ctrl',
+      description: 'Ctrl key'
+    }, // CTRL
   }
-  let ctrlKey = "&#8963;"; // CTRL
-  element.querySelectorAll(".altKey")
-    .forEach(e => e.innerHTML = altKey + e.innerHTML);
-  element.querySelectorAll(".shiftKey")
-    .forEach(e => e.innerHTML = shiftKey + e.innerHTML);
-  element.querySelectorAll(".cmd2Key")
-    .forEach(e => e.innerHTML = cmd2Key + e.innerHTML);
-  element.querySelectorAll(".cmdKey")
-    .forEach(e => e.innerHTML = cmdKey + e.innerHTML);
-  element.querySelectorAll(".ctrlKey")
-    .forEach(e => e.innerHTML = ctrlKey + e.innerHTML);
+  // MAC key mapping
+  if (navigator.platform.startsWith('Mac')) {
+    modifierKeys.cmdKey = {
+      symbol: "&#8984;",
+      text: 'Cmd',
+      description: 'Cmd key'
+    }; // CMD
+    modifierKeys.cmd2Key = {
+      symbol: "&#8963;",
+      text: 'Ctrl',
+      description: 'Ctrl key'
+    }; // Ctrl
+  }
+  // attach these symbols to all occurrences in root
+  Object.keys(modifierKeys).forEach(k => {
+    root.querySelectorAll('.' + k).forEach(e =>{
+      e.innerHTML = modifierKeys[k].symbold + e.innerHTML;
+      e.title = modifierKeys[k].description;
+      // TODO add into separate span elements to control classes separately
+    });
+  });
 }
