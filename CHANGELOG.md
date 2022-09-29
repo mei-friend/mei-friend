@@ -1,5 +1,7 @@
 # mei-friend-online CHANGELOG.md
 
+### 0.6.4 patch: display schema info
+* Update Verovio release version list to include release 3.12.0
 ### 0.6.3 patch: display schema info
 * Display schema info before file name
 * Automatically load schema from provided `@meiversion` attribute, when no schema is given in <xml-model>
