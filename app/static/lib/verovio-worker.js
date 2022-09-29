@@ -1,14 +1,8 @@
-// importScripts("https://www.verovio.org/javascript/3.10.0/verovio-toolkit-hum.js");
-// importScripts("https://www.verovio.org/javascript/latest/verovio-toolkit-wasm.js");
-// importScripts("https://www.verovio.org/javascript/develop/verovio-toolkit-wasm.js");
-// importScripts("https://www.verovio.org/javascript/develop/verovio-toolkit-hum.js");
-// importScripts(`../verovio-toolkit-hum.js`);
-
 var tk;
 var tkOptions;
 var tkUrl;
 
-loadVerovio = async () => {
+loadVerovio = () => {
   /* create the worker toolkit instance */
   console.info('VerovioWorker: Loading toolkit...');
   try {
@@ -168,7 +162,7 @@ addEventListener('message', function (e) {
     case 'importData': // all non-MEI formats
       try {
         tk.setOptions({
-          inputFrom: result.format
+          'inputFrom': result.format
         })
         let r = tk.loadData(result.mei);
         if (!r) {
@@ -191,7 +185,7 @@ addEventListener('message', function (e) {
         result.mei.byteLength + ' / ', result.mei);
       try {
         tk.setOptions({
-          inputFrom: result.format
+          'inputFrom': result.format
         })
         // tk.loadZipDataBase64(result.mei);
         let r = tk.loadZipDataBuffer(result.mei, result.mei.byteLength);
