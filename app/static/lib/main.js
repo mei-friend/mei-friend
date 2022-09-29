@@ -74,7 +74,7 @@ export let fileChanged = false; // flag to track whether unsaved changes to file
 export const defaultVerovioVersion = 'latest'; // 'develop', '3.10.0'
 export let supportedVerovioVersions = {
   'develop': {
-    'url': 'https://www.verovio.org/javascript/develop/verovio-toolkit-hum.js',
+    'url': 'https://www.verovio.org/javascript/develop/verovio-toolkit-wasm.js',
     'description': 'Current Verovio develop version'
   },
   'latest': {
