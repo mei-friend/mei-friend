@@ -44,6 +44,11 @@
   display: block;
 }
 
+.keyShortCut > .keyIcon {
+  border-color: var(--keyboardShortCutColor);
+  border-width: 1px;
+}
+
 /* The dropdown container */
 .dropdown {
   float: left;
@@ -90,6 +95,7 @@
   overflow-y: auto;
   max-height: 90%;
   z-index: 99;
+  padding-bottom: 6px;
 }
 
 #GithubMenu {

@@ -443,12 +443,19 @@ export function addModifyerKeys(root) {
       description: 'Ctrl key'
     }; // Ctrl
   }
+  // all keyShortCut innerHTML as spearate keyIcon spans
+  document.querySelectorAll('.keyShortCut').forEach(e => {
+    if (!e.querySelector('span'))
+      e.innerHTML = '<span class="keyIcon">' + e.innerHTML + '</span>';
+  });
   // attach these symbols to all occurrences in root
   Object.keys(modifierKeys).forEach(k => {
-    root.querySelectorAll('.' + k).forEach(e =>{
-      e.innerHTML = modifierKeys[k].symbold + e.innerHTML;
-      e.title = modifierKeys[k].description;
-      // TODO add into separate span elements to control classes separately
+    root.querySelectorAll('.' + k).forEach(e => {
+      let span = '<span class="keyIcon" title="' + modifierKeys[k].description + '">' + modifierKeys[k].symbol + '</span>';
+      if (!e.querySelector('span'))
+        e.innerHTML = span + '<span class="keyIcon">' + e.innerHTML + '</span>';
+      else
+        e.innerHTML = span + e.innerHTML;
     });
   });
 }
