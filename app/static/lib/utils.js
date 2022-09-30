@@ -369,13 +369,15 @@ export function hasTag(textEditor, tag = '<mei') {
 }
 
 // sort note elements in array (of xml:ids) by x coordinate of element
-export function sortElementsByScorePosition(arr) {
+export function sortElementsByScorePosition(arr, includeY = false) {
   if (!Array.isArray(arr)) return;
   let j, i;
   let Xs = []; // create array of x values of the ids in arr
+  let Ys = []; // create array of y values of the ids in arr
   arr.forEach(item => {
     let el = document.querySelector('g#' + item);
     Xs.push(dutils.getX(el));
+    if (includeY) Ys.push(dutils.getY(el));
   });
   for (j = arr.length; j > 1; --j) {
     for (i = 0; i < (j - 1); ++i) {
@@ -387,9 +389,17 @@ export function sortElementsByScorePosition(arr) {
         console.info('Utils.sortElementsByScoreTime(): zero t: ' + arr[i + 1]);
         continue;
       }
-      if (Xs[i] > Xs[i + 1]) { // swap elements
+      // swap elements for X
+      if (Xs[i] > Xs[i + 1]) { 
         [arr[i], arr[i + 1]] = [arr[i + 1], arr[i]];
         [Xs[i], Xs[i + 1]] = [Xs[i + 1], Xs[i]];
+        if (includeY)[Ys[i], Ys[i + 1]] = [Ys[i + 1], Ys[i]];
+      }
+      // swap elements for Y, if X equal 
+      if (includeY && Xs[i] === Xs[i + 1] && Ys[i] > Ys[i + 1]) {
+        [arr[i], arr[i + 1]] = [arr[i + 1], arr[i]];
+        [Xs[i], Xs[i + 1]] = [Xs[i + 1], Xs[i]];
+        [Ys[i], Ys[i + 1]] = [Ys[i + 1], Ys[i]];
       }
     }
   }

@@ -3,7 +3,8 @@ import {
 } from './dom-utils.js'
 import * as att from './attribute-classes.js';
 import {
-  setCursorToId
+  setCursorToId,
+  sortElementsByScorePosition
 } from './utils.js';
 import {
   cm,
@@ -20,7 +21,6 @@ export function addDragSelector(v, vp) {
   var start = {};
   var end = {};
   var rect;
-  let firstElementHighlighted = false; // flag to highlight first selected element
 
   let noteSelector = '.note';
   let restSelector = '.rest,.mRest,.beatRpt,.halfmRpt,.mRpt';
@@ -148,19 +148,19 @@ export function addDragSelector(v, vp) {
             if (els) els.forEach(e => {
               if (!newEls.includes(e.id)) {
                 newEls.push(e.id);
-                if (!firstElementHighlighted) {
-                  setCursorToId(cm, e.id);
-                  firstElementHighlighted = true;
-                }
               }
             });
           });
         });
       }
       v.selectedElements = [];
-      oldEls.forEach(el => v.selectedElements.push(el));
-      newEls.forEach(el => v.selectedElements.push(el));
+      oldEls.forEach(el => newEls.push(el));
+      let sortedEls = sortElementsByScorePosition(newEls, true);
+      v.updateNotation = false;
+      setCursorToId(cm, sortedEls[0]);
+      v.selectedElements = sortedEls;
       v.updateHighlight();
+      v.updateNotation = true;
     }
   });
 
@@ -170,7 +170,6 @@ export function addDragSelector(v, vp) {
     if (svgPm && Array.from(svgPm.childNodes).includes(rect))
       svgPm.removeChild(rect);
     oldEls = [];
-    firstElementHighlighted = false;
   });
 
 }
