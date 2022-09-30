@@ -155,9 +155,9 @@ export function addDragSelector(v, vp) {
               }
               let x = getX(el);
               let y = getY(el);
-              if (Object.keys(latest).length === 0 ||
-                (latest && (Math.abs(latest.x - e.x) < Math.abs(x - e.x) ||
-                  Math.abs(latest.y - e.y) < Math.abs(y - e.y)))) {
+              // keep the element closest to the cursor position (whilst disburdening Pythagoras from exponential load)
+              if (Object.keys(latest).length === 0 || (Object.keys(latest).length > 0 &&
+                  ((Math.abs(x - e.x) + Math.abs(y - e.y)) < (Math.abs(latest.x - e.x) + Math.abs(latest.y - e.y))))) {
                 latest.el = el;
                 latest.x = x;
                 latest.y = y;
@@ -166,9 +166,7 @@ export function addDragSelector(v, vp) {
           });
         });
       }
-      // v.selectedElements = [];
       oldEls.forEach(el => newEls.push(el));
-      // let sortedEls = sortElementsByScorePosition(newEls, true);
       v.updateNotation = false;
       if (latest && Object.keys(latest).length > 0) setCursorToId(cm, latest.el.id);
       v.selectedElements = newEls;
