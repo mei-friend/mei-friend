@@ -12,6 +12,7 @@ var pageParam; // (int) page parameter given through URL
 var selectParam; // (array) select ids given through multiple instances in URL
 export let platform = navigator.platform.toLowerCase(); // TODO
 // let platform = (navigator?.userAgentData?.platform || navigator?.platform || 'unknown').toLowerCase();
+export const isSafari = !!navigator.userAgent.match(/Version\/[\d\.]+.*Safari/);
 
 // guidelines base URL, needed to construct element / attribute URLs
 // TODO ideally determine version part automatically
@@ -343,7 +344,9 @@ export function loadDataInEditor(mei, setFreshlyLoaded = true) {
   }
   v.setRespSelectOptions();
   v.setMenuColors();
-  v.checkSchema(mei);
+  if (!isSafari) { // disable validation on Safari because of this strange error: "RangeError: Maximum call stack size exceeded" (WG, 1 Oct 2022)
+    v.checkSchema(mei);
+  } 
   clearAnnotations();
   readAnnots(); // from annotation.js
   setCursorToId(cm, handleURLParamSelect());
@@ -496,6 +499,10 @@ document.addEventListener('DOMContentLoaded', function () {
     ...defaultVerovioOptions
   };
 
+  if (isSafari) {
+    v.showAlert("It seems that you are using Safari, on which mei-friend unfortunately does not support all functionality. Please use another browser.", 'error', -1);
+  }
+
   const validatorWorker = new Worker(`${root}lib/validator-worker.js`);
   validator = new WorkerProxy(validatorWorker);
   rngLoader = new RNGLoader();
@@ -523,6 +530,9 @@ document.addEventListener('DOMContentLoaded', function () {
   let av = document.getElementById('autoValidate')
   if (autoValidateParam !== null && av) {
     av.checked = autoValidateParam === 'true';
+  }
+  if (isSafari) {
+    av.checked = false;
   }
   // add event listener to validation status icon, if no autoValidation
   if (av && !av.checked) {
