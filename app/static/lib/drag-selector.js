@@ -1,9 +1,12 @@
 import {
+  getX,
+  getY,
   svgNameSpace
 } from './dom-utils.js'
 import * as att from './attribute-classes.js';
 import {
-  setCursorToId
+  setCursorToId,
+  sortElementsByScorePosition
 } from './utils.js';
 import {
   cm,
@@ -20,7 +23,6 @@ export function addDragSelector(v, vp) {
   var start = {};
   var end = {};
   var rect;
-  let firstElementHighlighted = false; // flag to highlight first selected element
 
   let noteSelector = '.note';
   let restSelector = '.rest,.mRest,.beatRpt,.halfmRpt,.mRpt';
@@ -120,10 +122,12 @@ export function addDragSelector(v, vp) {
       if (e.x < s.x) x = e.x;
       if (e.y < s.y) y = e.y;
 
-      let strokeWidth = 10; // take stroke width from note line width
+      // take stroke width from note line width
+      let strokeWidth = 10;
       let p = document.querySelector('g.staff > path');
       if (p) strokeWidth = parseFloat(p.getAttribute('stroke-width'));
 
+      // draw drag-select rectangle
       updateRect(rect, x, y, width, height, window.getComputedStyle(pm).color,
         strokeWidth, strokeWidth * 5);
 
@@ -133,34 +137,41 @@ export function addDragSelector(v, vp) {
       //     newEls.push(el.id);
       // });
 
+      // filter selected elements that are inside rectangle
       let xx = Math.round(x * 1000);
       let xx2 = Math.round((x + width) * 1000);
       let yy = Math.round(y * 1000);
       let yy2 = Math.round((y + height) * 1000);
-      let selX = Object.keys(obobj)
-        .filter(kx => (parseInt(kx) >= xx && parseInt(kx) <= xx2));
+      let latest = {};
+      let selX = Object.keys(obobj).filter(kx => (parseInt(kx) >= xx && parseInt(kx) <= xx2));
       if (selX.length > 0) {
         selX.forEach(xKey => {
-          let yKeys = Object.keys(obobj[xKey])
-            .filter(ky => (parseInt(ky) >= yy && parseInt(ky) <= yy2));
+          let yKeys = Object.keys(obobj[xKey]).filter(ky => (parseInt(ky) >= yy && parseInt(ky) <= yy2));
           if (yKeys) yKeys.forEach(yKey => {
             let els = obobj[xKey][yKey];
-            if (els) els.forEach(e => {
-              if (!newEls.includes(e.id)) {
-                newEls.push(e.id);
-                if (!firstElementHighlighted) {
-                  setCursorToId(cm, e.id);
-                  firstElementHighlighted = true;
-                }
+            if (els) els.forEach(el => {
+              if (!newEls.includes(el.id)) {
+                newEls.push(el.id);
+              }
+              let x = getX(el);
+              let y = getY(el);
+              // keep the element closest to the cursor position (whilst disburdening Pythagoras from exponential load)
+              if (Object.keys(latest).length === 0 || (Object.keys(latest).length > 0 &&
+                  ((Math.abs(x - e.x) + Math.abs(y - e.y)) < (Math.abs(latest.x - e.x) + Math.abs(latest.y - e.y))))) {
+                latest.el = el;
+                latest.x = x;
+                latest.y = y;
               }
             });
           });
         });
       }
-      v.selectedElements = [];
-      oldEls.forEach(el => v.selectedElements.push(el));
-      newEls.forEach(el => v.selectedElements.push(el));
+      oldEls.forEach(el => newEls.push(el));
+      v.updateNotation = false;
+      if (latest && Object.keys(latest).length > 0) setCursorToId(cm, latest.el.id);
+      v.selectedElements = newEls;
       v.updateHighlight();
+      v.updateNotation = true;
     }
   });
 
@@ -170,7 +181,6 @@ export function addDragSelector(v, vp) {
     if (svgPm && Array.from(svgPm.childNodes).includes(rect))
       svgPm.removeChild(rect);
     oldEls = [];
-    firstElementHighlighted = false;
   });
 
 }

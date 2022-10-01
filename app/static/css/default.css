@@ -331,6 +331,10 @@ a:active {
   padding: 1px; */
 }
 
+#validation-status svg {
+  height: 1.2em;
+}
+
 .validation-report {
   font-size: 90%;
   display: block;
@@ -1109,17 +1113,18 @@ select>option {
 .alert {
   position: fixed;
   top: 80px;
-  left: 3%;
-  width: 92%;
+  left: 10%;
+  width: 80%;
   max-height: 70%;
   justify-content: space-between;
+  gap: .5em;
   padding: 20px;
   background-color: #f44336;
   /* border-style: solid;
   border-width: 2px; */
   border-radius: 8px;
   color: white;
-  font-size: larger;
+  font-size: normal;
   z-index: 20;
   overflow-y: auto;
 }
@@ -1135,6 +1140,12 @@ select>option {
 .alert.warning {
   background-color: #ff9800;
 }
+
+#alertIcon svg {
+  width: 2.2em; 
+  height: 2.2em;
+  fill: white; 
+  }
 
 /* The close button */
 .alertCloseButton {

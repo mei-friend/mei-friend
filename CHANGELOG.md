@@ -1,6 +1,8 @@
 # mei-friend-online CHANGELOG.md
 
 ### 0.6.4 patch: display schema info
+* Display warning message in Safari for partial functionality
+* During drag-select, editor follows the element closest to cursor
 * Update Verovio release version list to include release 3.12.0
 ### 0.6.3 patch: display schema info
 * Display schema info before file name

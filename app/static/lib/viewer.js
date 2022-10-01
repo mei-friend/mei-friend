@@ -15,6 +15,7 @@ import {
   commonSchemas,
   defaultVerovioVersion,
   fontList,
+  isSafari,
   rngLoader,
   platform,
   storage,
@@ -31,6 +32,8 @@ import {
 import {
   alert,
   download,
+  info,
+  success,
   verified,
   unverified,
   xCircleFill
@@ -547,7 +550,7 @@ export default class Viewer {
   notationUpdated(cm, forceUpdate = false) {
     // console.log('NotationUpdated forceUpdate:' + forceUpdate);
     this.encodingHasChanged = true;
-    this.checkSchema(cm.getValue());
+    if (!isSafari) this.checkSchema(cm.getValue());
     let ch = document.getElementById('live-update-checkbox');
     if (this.updateNotation && ch && ch.checked || forceUpdate)
       this.updateData(cm, false, false);
@@ -1757,36 +1760,42 @@ export default class Viewer {
 
   // show alert to user in #alertOverlay
   // type: ['error'] 'warning' 'info' 'success'
-  // disappearAfter: in milliseconds
+  // disappearAfter: in milliseconds, when negative, no time out
   showAlert(message, type = 'error', disappearAfter = 30000) {
     if (this.alertCloser) clearTimeout(this.alertCloser);
-    let alert = document.getElementById('alertOverlay');
-    alert.classList.remove('warning');
-    alert.classList.remove('info');
-    alert.classList.remove('success');
+    let alertOverlay = document.getElementById('alertOverlay');
+    let alertIcon = document.getElementById('alertIcon');
+    let alertMessage = document.getElementById('alertMessage');
+    alertIcon.innerHTML = xCircleFill; // error as default icon
+    alertOverlay.classList.remove('warning');
+    alertOverlay.classList.remove('info');
+    alertOverlay.classList.remove('success');
     switch (type) {
       case 'warning':
-        alert.classList.add('warning');
+        alertOverlay.classList.add('warning');
+        alertIcon.innerHTML = alert;
         break;
       case 'info':
-        alert.classList.add('info');
+        alertOverlay.classList.add('info');
+        alertIcon.innerHTML = info;
         break;
       case 'success':
-        alert.classList.add('success');
+        alertOverlay.classList.add('success');
+        alertIcon.innerHTML = success;
         break;
     }
-    alert.querySelector('span').innerHTML = message;
-    alert.style.display = 'flex';
+    alertMessage.innerHTML = message;
+    alertOverlay.style.display = 'flex';
     this.setFocusToVerovioPane();
-    this.alertCloser = setTimeout(() => {
-      alert.style.display = "none";
-    }, disappearAfter);
+    if (disappearAfter > 0) {
+      this.alertCloser = setTimeout(() => alertOverlay.style.display = 'none', disappearAfter);
+    }
   }
 
   // Update alert message of #alertOverlay
   updateAlert(newMsg) {
-    let alert = document.getElementById('alertOverlay');
-    alert.querySelector('span').innerHTML += '<br />' + newMsg;
+    let alertOverlay = document.getElementById('alertOverlay');
+    alertOverlay.querySelector('span').innerHTML += '<br />' + newMsg;
   }
 
   // Hide all alert windows, such as alert overlay
@@ -1866,7 +1875,7 @@ export default class Viewer {
       const res = await validator.setRelaxNGSchema(data);
     } catch (err) {
       this.throwSchemaError({
-        "err": err
+        "err": 'Schema error at replacing schema: ' + err
       });
       return
     }
