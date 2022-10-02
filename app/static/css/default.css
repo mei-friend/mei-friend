@@ -858,8 +858,8 @@ span.keyIcon {
   position: absolute;
   top: 4px;
   min-width: 360px;
+  max-width: 360px;
   height: calc(100% - 20px);
-  ;
   z-index: 15;
   display: none;
 }
@@ -974,6 +974,7 @@ span.keyIcon {
   display: inline-block;
   width: calc(100% - 1em);
   margin-bottom: -1.6em;
+  height: 2em;
 }
 
 .tabcontent {
