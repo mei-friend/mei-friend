@@ -1,6 +1,6 @@
 // mei-friend version and date
 const version = '0.6.4';
-const versionDate = '1 Oct 2022';
+const versionDate = '2 Oct 2022';
 
 var vrvWorker;
 var spdWorker;
@@ -320,7 +320,7 @@ export function setMeiFileInfo(fName, fLocation, fLocationPrintable) {
 
 export function updateFileStatusDisplay() {
   document.querySelector("#fileName").innerText =
-    meiFileName.substr(meiFileName.lastIndexOf("/") + 1);
+    meiFileName.substring(meiFileName.lastIndexOf("/") + 1);
   document.querySelector("#fileLocation").innerText = meiFileLocationPrintable || "";
   document.querySelector("#fileLocation").title = meiFileLocation || "";
 }
@@ -706,7 +706,7 @@ export async function openUrlFetch(url = '', updateAfterLoading = true) {
         meiFileLocation = url.href;
         meiFileLocationPrintable = url.hostname;
         meiFileName =
-          url.pathname.substr(url.pathname.lastIndexOf("/") + 1);
+          url.pathname.substring(url.pathname.lastIndexOf("/") + 1);
         if (storage.github && isLoggedIn) {
           // re-initialise github menu since we're now working from a URL
           github.filepath = "";
@@ -822,7 +822,7 @@ async function vrvWorkerEventsHandler(ev) {
         if (ev.data.forceUpdate) v.currentPage = ev.data.pageNo;
         updateStatusBar();
         document.querySelector('title').innerHTML = 'mei-friend: ' +
-          meiFileName.substr(meiFileName.lastIndexOf("/") + 1);
+          meiFileName.substring(meiFileName.lastIndexOf("/") + 1);
         document.getElementById('verovio-panel').innerHTML = ev.data.svg;
         if (document.getElementById('showSourceImagePanel') &&
           document.getElementById('showSourceImagePanel').checked) await drawSourceImage();
@@ -871,7 +871,7 @@ async function vrvWorkerEventsHandler(ev) {
       });
       var a = document.createElement('a');
       a.download = meiFileName
-        .substr(meiFileName.lastIndexOf("/") + 1)
+        .substring(meiFileName.lastIndexOf("/") + 1)
         .replace(/\.[^/.]+$/, '.mid');
       a.href = window.URL.createObjectURL(blob);
       a.click();
@@ -881,7 +881,7 @@ async function vrvWorkerEventsHandler(ev) {
       v.pageBreaks = ev.data.pageBreaks;
       v.pageCount = ev.data.pageCount;
       // console.log('Page breaks computed for ' +
-      //   meiFileName.substr(meiFileName.lastIndexOf("/") + 1) +
+      //   meiFileName.substring(meiFileName.lastIndexOf("/") + 1) +
       //   ', pageBreaks', v.pageBreaks);
       v.updateData(cm, false, true);
       updateStatusBar();
@@ -1086,7 +1086,7 @@ function downloadMei() {
   });
   let a = document.createElement('a');
   a.download = meiFileName
-    .substr(meiFileName.lastIndexOf("/") + 1)
+    .substring(meiFileName.lastIndexOf("/") + 1)
     .replace(/\.[^/.]+$/, '.mei');
   a.href = window.URL.createObjectURL(blob);
   a.click();
@@ -1110,7 +1110,7 @@ function downloadSvg() {
   });
   let a = document.createElement('a');
   a.download = meiFileName
-    .substr(meiFileName.lastIndexOf("/") + 1)
+    .substring(meiFileName.lastIndexOf("/") + 1)
     .replace(/\.[^/.]+$/, '.svg');
   a.href = window.URL.createObjectURL(blob);
   a.click();
@@ -1621,7 +1621,7 @@ function setProgressBar(percentage) {
 
 function updateStatusBar() {
   document.querySelector(".statusbar").innerHTML =
-    meiFileName.substr(meiFileName.lastIndexOf("/") + 1) +
+    meiFileName.substring(meiFileName.lastIndexOf("/") + 1) +
     ", page " + v.currentPage + " of " +
     ((v.pageCount < 0) ? '?' : v.pageCount) + " loaded.";
 }

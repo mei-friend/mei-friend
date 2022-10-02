@@ -247,12 +247,12 @@ function parse(S, options) {
           } else if (
             S.charCodeAt(pos + 2) === openCornerBracketCC &&
             S.charCodeAt(pos + 8) === openCornerBracketCC &&
-            S.substr(pos + 3, 5).toLowerCase() === 'cdata'
+            S.substring(pos + 3, pos + 8).toLowerCase() === 'cdata'
           ) {
             // cdata
             var cdataEndIndex = S.indexOf(']]>', pos);
             if (cdataEndIndex == -1) {
-              children.push(S.substr(pos + 9));
+              children.push(S.substring(pos + 9));
               pos = S.length;
             } else {
               children.push(S.substring(pos + 9, cdataEndIndex));
@@ -427,7 +427,7 @@ function parse(S, options) {
       if (pos !== -1) {
         out.push(parseNode());
       }
-      S = S.substr(pos);
+      S = S.substring(pos);
       pos = 0;
     }
   } else if (options.parseNode) {

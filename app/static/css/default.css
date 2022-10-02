@@ -1190,3 +1190,8 @@ select>option {
   padding-right: 2px;
   fill: var(--dropdownHeadingColor);
 }
+
+#filterReset svg {
+  width: 14px;
+  height: 14px;
+}

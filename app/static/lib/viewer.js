@@ -624,7 +624,7 @@ export default class Viewer {
     let els = document.querySelectorAll('.CodeMirror-scrollbar-filler');
     let owl = document.getElementById('mei-friend-logo');
     let owlSrc = owl.getAttribute('src');
-    owlSrc = owlSrc.substr(0, owlSrc.lastIndexOf('/') + 1);
+    owlSrc = owlSrc.substring(0, owlSrc.lastIndexOf('/') + 1);
     if (env === environments.staging)
       owlSrc += 'staging-';
     if (j < 128) { // dark
