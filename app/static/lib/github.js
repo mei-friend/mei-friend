@@ -261,7 +261,7 @@ export default class Github {
       this.headHash = await this.repo.readRef(`refs/heads/${this.branch}`);
       this.commit = await this.repo.loadAs("commit", this.headHash);  
       let tree = await this.repo.loadAs("tree", this.commit.tree);
-      this.entry = tree[this.filepath.startsWith("/") ? this.filepath.substr(1) : this.filepath];
+      this.entry = tree[this.filepath.startsWith("/") ? this.filepath.substring(1) : this.filepath];
       let treeStream = await this.repo.treeWalk(this.commit.tree);
       let obj;
       let trees = []
