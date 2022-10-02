@@ -16,7 +16,7 @@
 ### 0.6.1 Verovio toolkit version selection
 * Added Verovio toolkit versions before 3.11.0 with warning for a refresh upon memory slip.
 * Bugfix: ensure <annot>s are generated in a valid location within the MEI
-## 0.6.0 XML code validation (based on Laurent Pugin's code from the Verovio editor)
+## 0.6.0 XML code validation (based on Laurent Pugin's code from the Verovio editor and Gnome xmllint)
 * Automatically derive schema URL from MEI (upon each text change)
 * Fetch (new) schema and load it both for code completion and schema validation
 * Automatically validate MEI encoding upon text change
