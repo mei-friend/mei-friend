@@ -16,7 +16,7 @@
 ### 0.6.1 Verovio toolkit version selection
 * Added Verovio toolkit versions before 3.11.0 with warning for a refresh upon memory slip.
 * Bugfix: ensure <annot>s are generated in a valid location within the MEI
-### 0.6.0 XML code validation (based on Laurent Pugin's code from the Verovio editor)
+## 0.6.0 XML code validation (based on Laurent Pugin's code from the Verovio editor and Gnome xmllint)
 * Automatically derive schema URL from MEI (upon each text change)
 * Fetch (new) schema and load it both for code completion and schema validation
 * Automatically validate MEI encoding upon text change
@@ -30,7 +30,7 @@
 * Fix font selector
 ### 0.5.1 patch: forkAndOpen
 * Implement 'fork' parameter that directs user to fork and open raw github resources specified via 'file' param
-### 0.5.0: Support for source image display
+## 0.5.0: Support for source image display
 * Parsing facsimile information and display source image zones
 * Providing options to activate, position, resize and zoom source image pane
 * Full-page option to show entire source page with zone bounding boxes
@@ -42,7 +42,7 @@
 * Menu item to ingest facsimile information to MEI file (assuming measure@n equality among target and skeleton file)
 * General alert panel added with 'error', 'warning', 'info', and 'success' as levels
 * Source images loaded locally, from URL origin, or directly from github
-### 0.4.0: Initial support for annotations
+## 0.4.0: Initial support for annotations
 * Implement annotation panel (activate from mei-friend settings)
 * Annotation tools for highlight, describe, link 
 * Reading and writing of <annot> elements
