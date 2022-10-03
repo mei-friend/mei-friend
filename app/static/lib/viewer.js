@@ -428,15 +428,14 @@ export default class Viewer {
         stNo = utils.getElementAttributeAbove(cm, p.line, 'staff')[0];
         lyNo = utils.getElementAttributeAbove(cm, p.line, 'layer')[0];
         let m = document.querySelector('.measure');
-        console.info('setCursorToPgBg st/ly;m: ' + stNo + '/' + lyNo + '; ', m);
+        // console.info('setCursorToPgBg st/ly;m: ' + stNo + '/' + lyNo + '; ', m);
         if (m) {
           id = dutils.getFirstInMeasure(m, dutils.navElsSelector, stNo, lyNo);
         }
       }
     }
     utils.setCursorToId(cm, id);
-    console.info('setCrsrToPgBeg(): lastNoteId: ' + this.lastNoteId +
-      ', new id: ' + id);
+    // console.info('setCrsrToPgBeg(): lastNoteId: ' + this.lastNoteId + ', new id: ' + id);
     this.selectedElements = [];
     this.selectedElements.push(id);
     this.lastNoteId = id;
@@ -620,7 +619,7 @@ export default class Viewer {
     let j = 0;
     cm.backgroundColor.slice(4, -1).split(',').forEach(i => j += parseInt(i));
     j /= 3;
-    console.log('setMenuColors lightness: ' + j + ', ' + ((j < 128) ? 'dark' : 'bright') + '.');
+    // console.log('setMenuColors lightness: ' + j + ', ' + ((j < 128) ? 'dark' : 'bright') + '.');
     let els = document.querySelectorAll('.CodeMirror-scrollbar-filler');
     let owl = document.getElementById('mei-friend-logo');
     let owlSrc = owl.getAttribute('src');
