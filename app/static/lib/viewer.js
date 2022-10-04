@@ -628,7 +628,7 @@ export default class Viewer {
       owlSrc += 'staging-';
     if (j < 128) { // dark
       // wake up owl
-      owl.setAttribute("src", owlSrc + 'menu-logo.svg');
+      owlSrc += 'menu-logo' + (isSafari ? '.png' : '.svg');
       els.forEach(el => el.style.setProperty('filter', 'invert(.8)'));
       rt.style.setProperty('--settingsLinkBackgroundColor', utils.brighter(cm.backgroundColor, 21));
       rt.style.setProperty('--settingsLinkHoverColor', utils.brighter(cm.backgroundColor, 36));
@@ -660,7 +660,7 @@ export default class Viewer {
         utils.brighter(window.getComputedStyle(rt).getPropertyValue('--defaultAnnotationPanelDarkBackgroundColor'), 30));
     } else { // bright mode
       // sleepy owl
-      owl.setAttribute("src", owlSrc + 'menu-logo-asleep.svg');
+      owlSrc += 'menu-logo-asleep' + (isSafari ? '.png' : '.svg');
       els.forEach(el => el.style.removeProperty('filter'));
       rt.style.setProperty('--settingsLinkBackgroundColor', utils.brighter(cm.backgroundColor, -16));
       rt.style.setProperty('--settingsLinkHoverColor', utils.brighter(cm.backgroundColor, -24));
@@ -691,7 +691,7 @@ export default class Viewer {
       rt.style.setProperty('--annotationPanelBorderColor',
         utils.brighter(window.getComputedStyle(rt).getPropertyValue('--defaultAnnotationPanelBackgroundColor'), -30));
     }
-
+    owl.setAttribute("src", owlSrc);
   } // setMenuColors()
 
   // Control zoom of notation display and update Verovio layout
