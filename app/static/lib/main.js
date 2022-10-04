@@ -1,6 +1,6 @@
 // mei-friend version and date
 const version = '0.6.4';
-const versionDate = '2 Oct 2022';
+const versionDate = '4 Oct 2022';
 
 var vrvWorker;
 var spdWorker;
@@ -545,7 +545,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // If user is logged in, open a pre-populated fork-repository menu
   // Else, remember we are in remote fork request mode, log user in, and then proceed as above.
   let forkParam = searchParams.get('fork');
-  console.log("Fork param: ", forkParam, typeof forkParam);
+  // console.log("Fork param: ", forkParam, typeof forkParam);
   if (urlFileName && !(forkParam === "true")) { // normally open the file from URL
     openUrlFetch(new URL(urlFileName));
   }
