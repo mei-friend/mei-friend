@@ -3,6 +3,9 @@ import * as icon from './../css/icons.js';
 import {
   fontList
 } from './main.js';
+import {
+  svgNameSpace
+} from './dom-utils.js'
 
 export function createControlsMenu(parentElement, scale) {
 
@@ -296,18 +299,27 @@ time with large files`;
   speedCheckbox.disabled = false;
   speedDiv.appendChild(speedCheckbox);
 
-
-  // container for on-the-fly changes to CSS styles (to change highlight color)
-  let customStyle = document.createElement('style');
-  customStyle.type = 'text/css';
-  customStyle.id = 'customStyle';
-  document.querySelector('head').appendChild(customStyle);
+  // Create container element for pixel content (svg and jpg)
+  let pixPanel = document.createElement('div');
+  pixPanel.id = 'pix-container';
+  parentElement.appendChild(pixPanel);
 
   // Create container element for Verovio SVG
   let verovioPanel = document.createElement('div');
-  verovioPanel.classList.add('verovio-panel');
-  // verovioPanel.classList.add('hidden');
-  parentElement.appendChild(verovioPanel);
+  verovioPanel.id = 'verovio-panel';
+  pixPanel.appendChild(verovioPanel);
+
+  // Create container element for Source Edition Image
+  let imagePanel = document.createElement('div');
+  imagePanel.id = 'image-panel';
+  imagePanel.style.display = 'none';
+  var svg = document.createElementNS(svgNameSpace, 'svg');
+  svg.id = 'source-image-container';
+  var g = document.createElementNS(svgNameSpace, 'svg');
+  g.id = 'source-image-svg';
+  svg.appendChild(g);
+  imagePanel.append(svg);
+  pixPanel.appendChild(imagePanel);
 
 } // createControlsMenu()
 
@@ -326,25 +338,30 @@ export function setBreaksOptions(tkAvailableOptions, defaultValue = 'auto') {
   if (defaultValue == '') defaultValue = 'auto';
   let breaksEl = document.getElementById('breaks-select');
   var breaksOpts = {
+    none: 'None',
     auto: 'Automatic',
-    smart: 'Smart',
+    // measure: 'Measure',
     line: 'System',
     encoded: 'System and page',
-    none: 'None'
+    smart: 'Smart'
   };
-  var breaks = utils.findKey('breaks', tkAvailableOptions);
-  for (let index of breaks.values) {
-    if (breaksOpts[index]) {
-      breaksEl[breaksEl.options.length] = new Option(breaksOpts[index], index);
-      if (index == defaultValue) {
-        breaksEl[breaksEl.options.length - 1].selected = 'selected';
-      }
-    } else {
-      breaksEl[breaksEl.options.length] = new Option(index, index);
-    }
-    // disable breaks=smart by default; only enabled with speedMode=false
-    if (index === 'smart') breaksEl[breaksEl.length - 1].disabled = true;
+  for (let key of Object.keys(breaksOpts)) {
+    breaksEl[breaksEl.options.length] = new Option(breaksOpts[key], key);
+    if (key === 'smart') breaksEl[breaksEl.length - 1].disabled = true;
   }
+  // var breaks = utils.findKey('breaks', tkAvailableOptions);
+  // for (let index of breaks.values) {
+  //   if (breaksOpts[index]) {
+  //     breaksEl[breaksEl.options.length] = new Option(breaksOpts[index], index);
+  //     if (index == defaultValue) {
+  //       breaksEl[breaksEl.options.length - 1].selected = 'selected';
+  //     }
+  //   } else {
+  //     breaksEl[breaksEl.options.length] = new Option(index, index);
+  //   }
+  // disable breaks=smart by default; only enabled with speedMode=false
+  //   if (index === 'smart') breaksEl[breaksEl.length - 1].disabled = true;
+  // }
 }
 
 export function handleSmartBreaksOption(speedMode) {
@@ -385,24 +402,60 @@ export function generateSectionSelect(xmlDoc) {
   return sections;
 }
 
-export function addModifyerKeys(element) {
-  let shiftKey = "&#8679;"; // SHIFT
-  let altKey = "&#8997;"; // ALT
-  let cmdKey = "&#8963;"; // CTRL
-  let cmd2Key = "&#8997;"; // ALT
-  if (navigator.platform.startsWith('Mac')) {
-    cmdKey = "&#8984;"; // CMD
-    cmd2Key = "&#8963;"; // CTRL
+export function addModifyerKeys(root) {
+  let modifierKeys = {
+    altKey: {
+      symbol: "&#8997;",
+      text: 'Alt',
+      description: 'Alt key'
+    }, // ALT
+    shiftKey: {
+      symbol: "&#8679;",
+      text: "Shift",
+      description: 'Shift key'
+    }, // SHIFT
+    cmd2Key: {
+      symbol: "&#8997;",
+      text: 'Alt',
+      description: 'Alt key'
+    }, // ALT
+    cmdKey: {
+      symbol: "&#8963;",
+      text: 'Ctrl',
+      description: 'Ctrl key'
+    }, // CTRL
+    ctrlKey: {
+      symbol: "&#8963;",
+      text: 'Ctrl',
+      description: 'Ctrl key'
+    }, // CTRL
   }
-  let ctrlKey = "&#8963;"; // CTRL
-  element.querySelectorAll(".altKey")
-    .forEach(e => e.innerHTML = altKey + e.innerHTML);
-  element.querySelectorAll(".shiftKey")
-    .forEach(e => e.innerHTML = shiftKey + e.innerHTML);
-  element.querySelectorAll(".cmd2Key")
-    .forEach(e => e.innerHTML = cmd2Key + e.innerHTML);
-  element.querySelectorAll(".cmdKey")
-    .forEach(e => e.innerHTML = cmdKey + e.innerHTML);
-  element.querySelectorAll(".ctrlKey")
-    .forEach(e => e.innerHTML = ctrlKey + e.innerHTML);
+  // MAC key mapping
+  if (navigator.platform.startsWith('Mac')) {
+    modifierKeys.cmdKey = {
+      symbol: "&#8984;",
+      text: 'Cmd',
+      description: 'Cmd key'
+    }; // CMD
+    modifierKeys.cmd2Key = {
+      symbol: "&#8963;",
+      text: 'Ctrl',
+      description: 'Ctrl key'
+    }; // Ctrl
+  }
+  // all keyShortCut innerHTML as spearate keyIcon spans
+  document.querySelectorAll('.keyShortCut').forEach(e => {
+    if (!e.querySelector('span'))
+      e.innerHTML = '<span class="keyIcon">' + e.innerHTML + '</span>';
+  });
+  // attach these symbols to all occurrences in root
+  Object.keys(modifierKeys).forEach(k => {
+    root.querySelectorAll('.' + k).forEach(e => {
+      let span = '<span class="keyIcon" title="' + modifierKeys[k].description + '">' + modifierKeys[k].symbol + '</span>';
+      if (!e.querySelector('span'))
+        e.innerHTML = span + '<span class="keyIcon">' + e.innerHTML + '</span>';
+      else
+        e.innerHTML = span + e.innerHTML;
+    });
+  });
 }

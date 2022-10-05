@@ -1,16 +1,17 @@
-.friendContainer {
+.dragContainer {
+  display: flex;
+  flex-direction: row;
+}
+
+#friendContainer {
   display: flex;
   flex: 1 1 0%;
   flex-direction: column-reverse;
   /* Misc */
 }
 
-.notation {
+#notation {
   height: 50%;
-  /* Misc */
-  /* align-items: stretch; */
-  /* display: flex;
-  justify-content: center; */
 }
 
 .resizer {
@@ -19,11 +20,32 @@
   height: 8px;
 }
 
-.encoding {
+#encoding {
   /* Take the remaining width */
   flex: 1;
   /* Misc */
   align-items: stretch;
   display: flex;
   justify-content: center;
+}
+
+#annotationToolsMenu {
+  flex-direction: column;
+}
+
+#annotationToolsMenu li {
+  flex-direction: column;
+}
+
+.annotationToolsDomainSelection {
+  flex-direction: column;
+}
+
+.annotationToolsDomainSelectionItem {
+  flex-direction: row;
+}
+
+#listAnnotations { 
+  flex-direction: column;
+  overflow-y: auto;
 }

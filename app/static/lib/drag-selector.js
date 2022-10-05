@@ -1,5 +1,17 @@
-const svgNS = "http://www.w3.org/2000/svg";
+import {
+  getX,
+  getY,
+  svgNameSpace
+} from './dom-utils.js'
 import * as att from './attribute-classes.js';
+import {
+  setCursorToId,
+  sortElementsByScorePosition
+} from './utils.js';
+import {
+  cm,
+  platform
+} from './main.js';
 
 export function addDragSelector(v, vp) {
 
@@ -21,7 +33,7 @@ export function addDragSelector(v, vp) {
   vp.addEventListener('mousedown', ev => {
     dragging = true;
     // clear selected elements, if no CMD/CTRL key is pressed
-    if (!((navigator.appVersion.indexOf("Mac") !== -1) && ev.metaKey) && !ev.ctrlKey) {
+    if (!(platform.startsWith('mac') && ev.metaKey) && !ev.ctrlKey) {
       v.selectedElements = [];
       v.updateHighlight();
     }
@@ -29,7 +41,7 @@ export function addDragSelector(v, vp) {
     obobj = {};
     v.selectedElements.forEach(el => oldEls.push(el)); // remember selected els
     // create selection rectangle
-    rect = document.createElementNS(svgNS, 'rect');
+    rect = document.createElementNS(svgNameSpace, 'rect');
     let pm = document.querySelector('g.page-margin');
     if (pm) pm.appendChild(rect);
 
@@ -110,10 +122,12 @@ export function addDragSelector(v, vp) {
       if (e.x < s.x) x = e.x;
       if (e.y < s.y) y = e.y;
 
-      let strokeWidth = 10; // take stroke width from note line width
+      // take stroke width from note line width
+      let strokeWidth = 10;
       let p = document.querySelector('g.staff > path');
       if (p) strokeWidth = parseFloat(p.getAttribute('stroke-width'));
 
+      // draw drag-select rectangle
       updateRect(rect, x, y, width, height, window.getComputedStyle(pm).color,
         strokeWidth, strokeWidth * 5);
 
@@ -123,29 +137,44 @@ export function addDragSelector(v, vp) {
       //     newEls.push(el.id);
       // });
 
+      // filter selected elements that are inside rectangle
       let xx = Math.round(x * 1000);
       let xx2 = Math.round((x + width) * 1000);
       let yy = Math.round(y * 1000);
       let yy2 = Math.round((y + height) * 1000);
-      let selX = Object.keys(obobj)
-        .filter(kx => (parseInt(kx) >= xx && parseInt(kx) <= xx2));
+      let latest = {};
+      let selX = Object.keys(obobj).filter(kx => (parseInt(kx) >= xx && parseInt(kx) <= xx2));
       if (selX.length > 0) {
         selX.forEach(xKey => {
-          let yKeys = Object.keys(obobj[xKey])
-            .filter(ky => (parseInt(ky) >= yy && parseInt(ky) <= yy2));
+          let yKeys = Object.keys(obobj[xKey]).filter(ky => (parseInt(ky) >= yy && parseInt(ky) <= yy2));
           if (yKeys) yKeys.forEach(yKey => {
             let els = obobj[xKey][yKey];
-            if (els) els.forEach(e => {
-              if (!newEls.includes(e.id))
-                newEls.push(e.id);
+            if (els) els.forEach(el => {
+              if (!newEls.includes(el.id)) {
+                newEls.push(el.id);
+              }
+              let x = getX(el);
+              let y = getY(el);
+              // keep the element closest to the cursor position (whilst disburdening Pythagoras from exponential load)
+              if (Object.keys(latest).length === 0 || (Object.keys(latest).length > 0 &&
+                  ((Math.abs(x - e.x) + Math.abs(y - e.y)) < (Math.abs(latest.x - e.x) + Math.abs(latest.y - e.y))))) {
+                latest.el = el;
+                latest.x = x;
+                latest.y = y;
+              }
             });
           });
         });
       }
-      v.selectedElements = [];
-      oldEls.forEach(el => v.selectedElements.push(el));
-      newEls.forEach(el => v.selectedElements.push(el));
+      oldEls.forEach(el => newEls.push(el));
+      v.updateNotation = false;
+      if (latest && Object.keys(latest).length > 0) {
+        setCursorToId(cm, latest.el.id);
+        v.lastNoteId = latest.el.id;
+      }
+      v.selectedElements = newEls;
       v.updateHighlight();
+      v.updateNotation = true;
     }
   });
 
@@ -159,14 +188,14 @@ export function addDragSelector(v, vp) {
 
 }
 
-function transformCTM(point, matrix) {
+export function transformCTM(point, matrix) {
   let r = {};
   r.x = matrix.a * point.x + matrix.c * point.y + matrix.e;
   r.y = matrix.b * point.x + matrix.d * point.y + matrix.f;
   return r;
 }
 
-function updateRect(rect, x, y, width, height, color = "black",
+export function updateRect(rect, x, y, width, height, color = "black",
   strokeWidth = 13, strokeDashArray = 50) {
   rect.setAttribute('x', x);
   rect.setAttribute('y', y);

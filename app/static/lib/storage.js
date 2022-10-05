@@ -35,7 +35,7 @@ export default class Storage {
       this._content = this.storage.getItem("meiXml");
       this._fileName = this.storage.getItem("meiFileName");
       this._fileLocation = this.storage.getItem("meiFileLocation");
-      this._fileLocationType = this.storage.getItem("meiFileLocationType");
+      this._fileLocationType = this.storage.getItem("fileLocationType");
       this._github = JSON.parse(this.storage.getItem("github"));
       this._fileChanged = this.storage.getItem("fileChanged");
       this._isMEI = this.storage.getItem("isMEI");
@@ -45,6 +45,7 @@ export default class Storage {
       this._select = JSON.parse(this.storage.getItem("select")); // Array
       this._speed = this.storage.getItem("speed");
       this._breaks = this.storage.getItem("breaks");
+      this._forkAndOpen = this.storage.getItem("forkAndOpen");
       //fileChangedFromStorage = fileChangedFromStorage ? parseInt(storage.getItem("fileChanged")) : 0;
     }
   }
@@ -125,7 +126,7 @@ export default class Storage {
   }
 
   set fileLocationType(fileLocationType) {
-    this.safelySetStorageItem("meiFileLocationType", fileLocationType);
+    this.safelySetStorageItem("fileLocationType", fileLocationType);
     this._fileLocationType = fileLocationType;
   }
 
@@ -238,6 +239,15 @@ export default class Storage {
   set breaks(breaks) {
     this.safelySetStorageItem('breaks', breaks);
     this._breaks = breaks;
+  }
+
+  get forkAndOpen() {
+    return this._forkAndOpen;
+  }
+
+  set forkAndOpen(forkAndOpen) {
+    this.safelySetStorageItem('forkAndOpen', forkAndOpen);
+    this._forkAndOpen = forkAndOpen;
   }
 
 }

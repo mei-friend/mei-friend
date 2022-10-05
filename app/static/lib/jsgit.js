@@ -1506,8 +1506,8 @@ module.exports = function (repo) {
     // and saves any inline content blobs.
     entries.forEach(function (entry) {
       var index = entry.path.lastIndexOf("/");
-      var parentPath = entry.path.substr(0, index);
-      var name = entry.path.substr(index + 1);
+      var parentPath = entry.path.substring(0, index);
+      var name = entry.path.substring(index + 1);
       markTree(parentPath);
       var tree = trees[parentPath];
       var adds = tree.add;
@@ -9812,19 +9812,19 @@ module.exports = function (repo, root, accessToken) {
     // Calculate trees that need to be re-built and save any provided content.
     var parents = {};
     toDelete.forEach(function (path) {
-      var parentPath = path.substr(0, path.lastIndexOf("/"));
+      var parentPath = path.substring(0, path.lastIndexOf("/"));
       var parent = parents[parentPath] || (parents[parentPath] = {
         add: {}, del: []
       });
-      var name = path.substr(path.lastIndexOf("/") + 1);
+      var name = path.substring(path.lastIndexOf("/") + 1);
       parent.del.push(name);
     });
     var other = entries.filter(function (entry) {
       if (!entry.mode) return false;
-      var parentPath = entry.path.substr(0, entry.path.lastIndexOf("/"));
+      var parentPath = entry.path.substring(0, entry.path.lastIndexOf("/"));
       var parent = parents[parentPath];
       if (!parent) return true;
-      var name = entry.path.substr(entry.path.lastIndexOf("/") + 1);
+      var name = entry.path.substring(entry.path.lastIndexOf("/") + 1);
       if (entry.hash) {
         parent.add[name] = {
           mode: entry.mode,

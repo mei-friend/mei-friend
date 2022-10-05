@@ -1,7 +1,56 @@
 # mei-friend-online CHANGELOG.md
 
+### 0.6.4 patch: display schema info
+* Display warning message in Safari for missing validation support
+* Introduce some Safari tweaks (logos in png)
+* During drag-select, editor follows the element closest to cursor
+* Update Verovio release version list to include release 3.12.0
+### 0.6.3 patch: display schema info
+* Display schema info before file name
+* Automatically load schema from provided `@meiversion` attribute, when no schema is given in <xml-model>
+* Filter settings through text input panel (incl. settings refactoring)
+* Annotation list layout fixes
+* Support autoValidate (true|false) as URL parameter
+### 0.6.2 patch: small bug fixes
+* Bugfix: create valid <ptr/> objects for linking annotations
+* Bugfix: guard against edge-cases when switching vrvTk versions
+### 0.6.1 Verovio toolkit version selection
+* Added Verovio toolkit versions before 3.11.0 with warning for a refresh upon memory slip.
+* Bugfix: ensure <annot>s are generated in a valid location within the MEI
+## 0.6.0 XML code validation (based on Laurent Pugin's code from the Verovio editor and Gnome xmllint)
+* Automatically derive schema URL from MEI (upon each text change)
+* Fetch (new) schema and load it both for code completion and schema validation
+* Automatically validate MEI encoding upon text change
+* Checkbox added to set validation mode to manual
+* UI elements for displaying validation status and report
+* Click and key handlers for showing/hiding report and initiating validation
+* Selector to change Verovio toolkit version (develop, latest, specific versions 3.11.0 and up)
+* Bugfix: make annotation page numbers work in annotation panel when not in speed mode
+### 0.5.2 patch: small bug fixes
+* Add chord to beamSpan when notes are selected
+* Fix font selector
+### 0.5.1 patch: forkAndOpen
+* Implement 'fork' parameter that directs user to fork and open raw github resources specified via 'file' param
+## 0.5.0: Support for source image display
+* Parsing facsimile information and display source image zones
+* Providing options to activate, position, resize and zoom source image pane
+* Full-page option to show entire source page with zone bounding boxes
+* Option to edit zone coordinates (rather than displaying linked elements, e.g., measures)
+* Support for selecting zone with mouse or through encoding
+* Support for resizing selected zone at 8 locations and pan with mouse drag  
+* Support for inserting new zone/measure with mouse click and drag
+* Support for deleting selected zone/measure with DEL key or through menu
+* Menu item to ingest facsimile information to MEI file (assuming measure@n equality among target and skeleton file)
+* General alert panel added with 'error', 'warning', 'info', and 'success' as levels
+* Source images loaded locally, from URL origin, or directly from github
+## 0.4.0: Initial support for annotations
+* Implement annotation panel (activate from mei-friend settings)
+* Annotation tools for highlight, describe, link 
+* Reading and writing of <annot> elements
+* Listing of annotations in annotation panel
+* Loading and interpreting simple Web Annotations
 ### 0.3.13 patch: hotfix
-* Filter comment nodes in speed mode 
+* Filter comment nodes in speed mode
 ### 0.3.12 patch: Settings improvements
 * Address page processing bug with page/system beginnings inside apparatus element
 * Make font select appear in Verovio options

@@ -25,39 +25,61 @@ function forkRepo() {
   forkRepository(github);
 }
 
-function forkRepoClicked() {
+export function forkRepoClicked() {
+  // inputRepoOverride is used to supply a repository via the forkAndOpen (?fork parameter) path
   let inputName = document.getElementById('forkRepositoryInputName').value
   let inputRepo = document.getElementById('forkRepositoryInputRepo').value
-  let forkRepositoryStatus = document.querySelector("#forkRepositoryStatus");
+  let inputRepoOverride = document.getElementById('forkRepositoryInputRepoOverride').value
+  let inputBranchOverride = document.getElementById('forkRepositoryInputBranchOverride').value
+  let inputFilepathOverride = document.getElementById('forkRepositoryInputFilepathOverride').value
+  let forkRepositoryStatus = Array.from(document.getElementsByClassName("forkRepositoryStatus"));
   let forkRepositoryToSelector = document.querySelector("#forkRepositoryToSelector");
-  if (inputName && inputRepo) {
+  if (inputName && (inputRepo || inputRepoOverride)) {
+    inputRepo = inputRepoOverride ? inputRepoOverride : inputRepo;
     let githubRepo = `${inputName}/${inputRepo}`;
     github.githubRepo = githubRepo;
-    document.getElementById("forkRepoGithubLogo").classList.add("clockwise");
+    Array.from(document.getElementsByClassName("forkRepoGithubLogo"))
+      .forEach(l => l.classList.add("clockwise"));
     github.fork(() => {
-        forkRepositoryStatus.classList.remove("warn");
-        forkRepositoryStatus.innerHTML = "";
+        forkRepositoryStatus.forEach(s => {
+          s.classList.remove("warn");
+          s.innerHTML = "";
+        })
         fillInRepoBranches();
         forkRepositoryCancel();
       }, forkRepositoryToSelector.value)
       .catch((e) => {
-        forkRepositoryStatus.classList.add("warn");
-        forkRepositoryStatus.innerHTML = "Sorry, couldn't fork repository";
-        if (typeof e === "object" && "status" in e) {
-          forkRepositoryStatus.innerHTML =
-            e.status + " " + e.statusText;
-          if (e.status !== 404) {
-            e.json().then((err) => {
-              if ('message' in err)
-                forkRepositoryStatus.innerHTML += ". Github message: <i>" +
-                err.message + "</i>";
-            })
+        forkRepositoryStatus.forEach(s => {
+          s.classList.add("warn");
+          s.innerHTML = "Sorry, couldn't fork repository";
+          if (typeof e === "object" && "status" in e) {
+            s.innerHTML = e.status + " " + e.statusText;
+            if (e.status !== 404) {
+              e.json().then((err) => {
+                if ('message' in err)
+                  s.innerHTML += ". Github message: <i>" +
+                  err.message + "</i>";
+              })
+            }
           }
+        })
+      }).finally(() => {
+        if (inputRepoOverride && inputBranchOverride && inputFilepathOverride) {
+          // forkAndOpen path: directly switch to specified branch and open file
+          github.branch = inputBranchOverride;
+          const _filepath = inputFilepathOverride.substring(0, inputFilepathOverride.lastIndexOf("/") + 1)
+          const _file = inputFilepathOverride.substring(inputFilepathOverride.lastIndexOf("/") + 1)
+          github.filepath = _filepath;
+          setMeiFileInfo(github.filepath, github.githubRepo, github.githubRepo + ":");
+          loadFile(_file);
         }
-      }).finally(() =>
-        document.getElementById("forkRepoGithubLogo")
-        .classList.remove("clockwise")
-      )
+        document.getElementById("GithubLogo").classList.remove("clockwise");
+        Array.from(document.getElementsByClassName("forkRepoGithubLogo"))
+          .forEach(l => l.classList.remove("clockwise"));
+        document.getElementById("forkRepositoryInputRepoOverride").value = "";
+        document.getElementById("forkRepositoryInputBranchOverride").value = "";
+        document.getElementById("forkRepositoryInputFilepathOverride").value = "";
+      });
   }
 }
 
@@ -80,9 +102,9 @@ function branchesHeaderClicked(ev) {
 function contentsHeaderClicked(ev) {
   // strip trailing slash (in case our filepath is a subdir)
   if (github.filepath.endsWith("/"))
-    github.filepath = github.filepath.substr(0, github.filepath.length - 1);
+    github.filepath = github.filepath.substring(0, github.filepath.length - 1);
   //  retreat to previous slash (back one directory level)
-  github.filepath = github.filepath.substr(0, github.filepath.lastIndexOf('/') + 1);
+  github.filepath = github.filepath.substring(0, github.filepath.lastIndexOf('/') + 1);
   // if we've retreated past the root dir, restore it
   github.filepath = github.filepath.length === 0 ? "/" : github.filepath;
   const githubLoadingIndicator = document.getElementById("GithubLogo");
@@ -179,7 +201,6 @@ function onFileNameEdit(e) {
 
 function onMessageInput(e) {
   e.target.classList.remove("warn");
-  console.log("GOT INPUT: ", e.target)
   if (e.target.innerText = "") {
     document.getElementById("commitButton").setAttribute("disabled", "");
   } else {
@@ -257,6 +278,11 @@ function assignGithubMenuClickHandlers() {
 
 export async function fillInUserRepos(per_page = 30, page = 1) {
   const repos = await github.getUserRepos(per_page, page);
+  if (document.getElementById("branchesHeader")) {
+    // if user has navigated away wiew while we 
+    // were waiting for the user repos list, abandon it
+    return;
+  }
   let githubMenu = document.getElementById("GithubMenu");
   repos.forEach((repo) => {
     githubMenu.innerHTML += `<a class="userRepo" href="#">${repo.full_name}</a>`;
@@ -295,12 +321,11 @@ async function markFileName(fname) {
   if (!fname.endsWith(".mei")) {
     console.warn("markFileName called on non-mei suffix: ", fname);
   }
-  const without = fname.substr(0, fname.lastIndexOf("."));
+  const without = fname.substring(0, fname.lastIndexOf("."));
   const match = without.match("(.*)~\\d+$");
   const unmarked = match ? match[1] : without;
   let fnamesInTree;
-  const containingDir = github.filepath.substr(
-    0, github.filepath.lastIndexOf("/"));
+  const containingDir = github.filepath.substring(0, github.filepath.lastIndexOf("/"));
   return github.getBranchContents(containingDir).then(tree => {
     fnamesInTree = tree.map(contents => contents.name);
     const prevMarked = fnamesInTree.filter(f => f.match(without + "~\\d+.mei$"));
@@ -310,7 +335,6 @@ async function markFileName(fname) {
       // one bigger than the largest existing mark
       const prevMarkNums = prevMarked.map(f =>
         f.match(without + "~(\\d+).mei$")[1])
-      console.log("PREV MARK NUMS: ", prevMarkNums);
       const n = Math.max(...prevMarkNums) + 1;
       marked = `${unmarked}~${n}.mei`;
     } else marked = `${unmarked}~1.mei`;
@@ -326,15 +350,14 @@ async function proposeFileName(fname) {
   let newname;
   let fnamesInTree;
   let nameSpan = document.getElementById("commitFileName");
-  const containingDir = github.filepath.substr(
-    0, github.filepath.lastIndexOf("/"));
+  const containingDir = github.filepath.substring(0, github.filepath.lastIndexOf("/"));
   github.getBranchContents(containingDir).then(dirContents => {
     const fnamesInTree = dirContents.map(c => c.name);
     if (suffixPos > 0) {
       // there's a dot and it's not at the start of the name
       // => treat everything after it as the suffix
-      without = fname.substr(0, suffixPos);
-      suffix = fname.substr(suffixPos + 1);
+      without = fname.substring(0, suffixPos);
+      suffix = fname.substring(suffixPos + 1);
     }
     if (suffix.toLowerCase() !== "mei") {
       // see if we can get away with simply swapping suffix
@@ -362,10 +385,7 @@ async function proposeFileName(fname) {
 
 export async function fillInBranchContents(e) {
   // TODO handle > per_page files (similar to userRepos)
-  let target;
-  if (e) { // not present if restoring from local storage
-    target = e.target;
-  }
+  let target = document.getElementById("contentsHeader");
   const branchContents = await github.getBranchContents(github.filepath);
   let githubMenu = document.getElementById("GithubMenu");
   githubMenu.innerHTML = `
@@ -375,16 +395,11 @@ export async function fillInBranchContents(e) {
     <hr class="dropdown-line">
     <a id="branchesHeader" href="#"><span class="btn icon inline-block-tight">${icon.arrowLeft}</span>Branch: ${github.branch}</a>
     <hr class="dropdown-line">
-    <a id="contentsHeader" href="#"><span class="btn icon inline-block-tight">${icon.arrowLeft}</span>Path: <span class="filepath">${github.filepath}</span></a>
+    <a id="contentsHeader" href="#"><span class="btn icon inline-block-tight filepath">${icon.arrowLeft}</span>Path: <span class="filepath">${github.filepath}</span></a>
     <hr class="dropdown-line">
     `;
-  if (e && target && target.classList.contains("filepath")) {
-    // clicked on file name -- operate on parent (list entry) instead
-    target = e.target.parentNode;
-  }
-  if (e && target && (target.classList.contains("repoBranch") ||
-      target.classList.contains("dir") ||
-      target.getAttribute("id") === "contentsHeader")) {
+
+  if (e) {
     Array.from(branchContents).forEach((content) => {
       const isDir = content.type === "dir";
       githubMenu.innerHTML += `<a class="branchContents ${content.type}${isDir ? '': ' closeOnClick'}" href="#">` +
@@ -392,14 +407,16 @@ export async function fillInBranchContents(e) {
         `<span class="filepath${isDir ? '':' closeOnClick'}">${content.name}</span>${isDir ? "..." : ""}</a>`;
     });
   } else {
-    // User clicked file, or restoring from local storage. Display commit interface
-    if (storage.supported && github.filepath) {
-      storage.fileLocationType = "github";
+    // Either User clicked file, or we're on forkAndOpen path, or restoring from local storage. Display commit interface
+    if (github.filepath) {
       setMeiFileInfo(
         github.filepath, // meiFileName
         github.githubRepo, // meiFileLocation
         github.githubRepo + ":" // meiFileLocationPrintable
       );
+    }
+    if (storage.supported) {
+      storage.fileLocationType = "github";
     }
 
     const commitUI = document.createElement("div");
@@ -458,6 +475,12 @@ async function fillInCommitLog(refresh = false) {
 }
 
 export function renderCommitLog() {
+  let branchesHeader = document.getElementById("branchesHeader");
+  if (!branchesHeader) {
+    // if user has navigated away from branch contents view while we 
+    // were waiting for the commit log, abandon it.
+    return;
+  }
   let logTable = document.getElementById("logTable");
   if (logTable) {
     // clear up previous logTable if it exists
@@ -475,7 +498,7 @@ export function renderCommitLog() {
     const commitRow = document.createElement("tr");
     commitRow.innerHTML = `
       <td>${c.commit.author.date}</td>
-      <td><a href="${c.author.html_url}">${c.commit.author.name}</a></td>
+      <td><a href="${c.commit.author.html_url}">${c.commit.author.name}</a></td>
       <td>${c.commit.message}</td>
       <td><a target="_blank" href="https://github.com/${github.githubRepo}/commits/${c.sha}">${c.sha.slice(0,8)}...</a></td>`;
     logTable.appendChild(commitRow);
@@ -496,13 +519,13 @@ export function logoutFromGithub() {
     storage.removeItem("github");
   }
   // redirect to /logout to remove session cookie
-  const url = window.location.href;
+  let url = window.location.href;
   // remove any url parameters (since these might include URLs with slashes in)
   const paramsStartIx = url.indexOf("?");
   if (paramsStartIx > -1)
-    url = url.substr(0, paramsStartIx);
+    url = url.substring(0, paramsStartIx);
   // now modify last slash to navigate to /logout
-  window.location.replace(url.substr(0, url.lastIndexOf("/")) + "/logout");
+  window.location.replace(url.substring(0, url.lastIndexOf("/")) + "/logout");
 }
 
 export function refreshGithubMenu(e) {
@@ -585,7 +608,7 @@ function handleCommitButtonClicked(e) {
         messageInput.value = "";
         if (newfile) {
           // switch to new filepath
-          github.filepath = github.filepath.substr(0, github.filepath.lastIndexOf('/') + 1) + newfile;
+          github.filepath = github.filepath.substring(0, github.filepath.lastIndexOf('/') + 1) + newfile;
         }
         // load after write
         loadFile("");
@@ -611,4 +634,3 @@ function stripMeiFileName() {
     console.warn("stripMeiFileName called on invalid filename: ", meiFileName);
   }
 }
-
