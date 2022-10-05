@@ -5,4 +5,4 @@ var environments = {
   production: "production"
 }
 // mei-friend version and date
-var env = environments.production;
+var env = environments.staging;
