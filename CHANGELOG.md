@@ -1,7 +1,7 @@
 # mei-friend-online CHANGELOG.md
 
 ### 0.6.4 patch: display schema info
-* Display warning message in Safari for partial functionality
+* Display warning message in Safari for missing validation support
 * Introduce some Safari tweaks (logos in png)
 * During drag-select, editor follows the element closest to cursor
 * Update Verovio release version list to include release 3.12.0
