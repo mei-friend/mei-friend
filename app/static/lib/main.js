@@ -6,7 +6,6 @@ var vrvWorker;
 var spdWorker;
 var tkAvailableOptions;
 var mei;
-var elementAtCursor;
 var breaksParam; // (string) the breaks parameter given through URL
 var pageParam; // (int) page parameter given through URL
 var selectParam; // (array) select ids given through multiple instances in URL
@@ -346,7 +345,7 @@ export function loadDataInEditor(mei, setFreshlyLoaded = true) {
   v.setMenuColors();
   if (!isSafari) { // disable validation on Safari because of this strange error: "RangeError: Maximum call stack size exceeded" (WG, 1 Oct 2022)
     v.checkSchema(mei);
-  } 
+  }
   clearAnnotations();
   readAnnots(); // from annotation.js
   setCursorToId(cm, handleURLParamSelect());
@@ -1117,22 +1116,21 @@ function downloadSvg() {
 }
 
 function consultGuidelines() {
+  const elementAtCursor = getElementAtCursor(cm);
   if (elementAtCursor) {
     // cursor is currently positioned on an element
     // move up to the closest "presentation" (codemirror line)
     const presentation = elementAtCursor.closest('span[role="presentation"]');
     if (presentation) {
       // choose the first XML element (a "tag" that isn't a "bracket")
-      const xmlEl = presentation.querySelector(".cm-tag:not(.cm-bracket)");
-      if (xmlEl) {
-        let xmlElName = xmlEl.innerText;
-        if (xmlElName.length && !(xmlElName.includes(":"))) {
-          // it's an element in the default (hopefully MEI...) namespace
-          window.open(
-            guidelinesBase + "elements/" + xmlElName.toLowerCase(),
-            "_blank"
-          );
-        }
+      const xmlEls = presentation.querySelectorAll(".cm-tag:not(.cm-bracket)");
+      let xmlElName = Array.from(xmlEls).map(e => e.innerText).join('');
+      if (xmlElName && !(xmlElName.includes(":"))) {
+        // it's an element in the default (hopefully MEI...) namespace
+        window.open(
+          guidelinesBase + "elements/" + xmlElName.toLowerCase(),
+          "_blank"
+        );
       }
     }
   }
@@ -1495,12 +1493,7 @@ function addEventListeners(v, cm) {
   document.getElementById('resetDefault').addEventListener('click', cmd.resetDefault);
 
   // editor activity
-  cm.on('cursorActivity', () => {
-    v.cursorActivity(cm);
-    // determine element at encoding cursor
-    // (to offer guidelines page if requested)
-    elementAtCursor = getElementAtCursor(cm);
-  });
+  cm.on('cursorActivity', () => v.cursorActivity(cm));
 
   // flip button updates manually notation location to cursor pos in encoding
   document.getElementById('flip-btn').addEventListener('click', () => {
