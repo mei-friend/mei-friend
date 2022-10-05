@@ -22,7 +22,7 @@ export function setOrientation(cm, o = '', v = null, storage = null) {
   let showSourceImage = document.getElementById('showSourceImagePanel').checked;
   let controlMenu = document.getElementById('verovio-controls-form');
   let annotationPanel = document.getElementById('annotationPanel');
-  console.log('setOrientation(' + o + ') container size:', sz);
+  // console.log('setOrientation(' + o + ') container size:', sz);
   let showAnnotationPanelCheckbox = document.getElementById('showAnnotationPanel');
   if (orientation === "top" || orientation === "bottom") {
     if (showAnnotationPanelCheckbox && showAnnotationPanelCheckbox.checked) {
@@ -125,11 +125,11 @@ export function calcSizeOfContainer() {
   let footerSz = document.querySelector('.footer').getBoundingClientRect();
   friendSz.height = bodySz.height - headerSz.height - footerSz.height - resizerWidth;
   friendSz.width = bodySz.width - resizerWidth + 2; // TODO: hack for missing 2-px-width (21 April 2022)
-  console.log('calcSizeOfContainer(' + orientation + ') bodySz, header, sizer, footer: ' +
-    Math.round(bodySz.width) + '/' + Math.round(bodySz.height) + ', ' +
-    Math.round(headerSz.width) + '/' + Math.round(headerSz.height) + ', ' +
-    Math.round(footerSz.width) + '/' + Math.round(footerSz.height) + ', ' +
-    Math.round(friendSz.width) + '/' + Math.round(friendSz.height) + '.');
+  // console.log('calcSizeOfContainer(' + orientation + ') bodySz, header, sizer, footer: ' +
+  // Math.round(bodySz.width) + '/' + Math.round(bodySz.height) + ', ' +
+  // Math.round(headerSz.width) + '/' + Math.round(headerSz.height) + ', ' +
+  // Math.round(footerSz.width) + '/' + Math.round(footerSz.height) + ', ' +
+  // Math.round(friendSz.width) + '/' + Math.round(friendSz.height) + '.');
   return friendSz;
 }
 

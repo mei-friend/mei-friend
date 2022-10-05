@@ -417,7 +417,7 @@ export default class Viewer {
     let id = this.lastNoteId;
     let stNo, lyNo;
     let sc;
-    if (id == '') {
+    if (id === '') {
       let note = document.querySelector('.note');
       if (note) id = note.getAttribute('id');
       else return '';
@@ -428,15 +428,14 @@ export default class Viewer {
         stNo = utils.getElementAttributeAbove(cm, p.line, 'staff')[0];
         lyNo = utils.getElementAttributeAbove(cm, p.line, 'layer')[0];
         let m = document.querySelector('.measure');
-        console.info('setCursorToPgBg st/ly;m: ' + stNo + '/' + lyNo + '; ', m);
+        // console.info('setCursorToPgBg st/ly;m: ' + stNo + '/' + lyNo + '; ', m);
         if (m) {
           id = dutils.getFirstInMeasure(m, dutils.navElsSelector, stNo, lyNo);
         }
       }
     }
     utils.setCursorToId(cm, id);
-    console.info('setCrsrToPgBeg(): lastNoteId: ' + this.lastNoteId +
-      ', new id: ' + id);
+    // console.info('setCrsrToPgBeg(): lastNoteId: ' + this.lastNoteId + ', new id: ' + id);
     this.selectedElements = [];
     this.selectedElements.push(id);
     this.lastNoteId = id;
@@ -620,7 +619,7 @@ export default class Viewer {
     let j = 0;
     cm.backgroundColor.slice(4, -1).split(',').forEach(i => j += parseInt(i));
     j /= 3;
-    console.log('setMenuColors lightness: ' + j + ', ' + ((j < 128) ? 'dark' : 'bright') + '.');
+    // console.log('setMenuColors lightness: ' + j + ', ' + ((j < 128) ? 'dark' : 'bright') + '.');
     let els = document.querySelectorAll('.CodeMirror-scrollbar-filler');
     let owl = document.getElementById('mei-friend-logo');
     let owlSrc = owl.getAttribute('src');
@@ -629,7 +628,7 @@ export default class Viewer {
       owlSrc += 'staging-';
     if (j < 128) { // dark
       // wake up owl
-      owl.setAttribute("src", owlSrc + 'menu-logo.svg');
+      owlSrc += 'menu-logo' + (isSafari ? '.png' : '.svg');
       els.forEach(el => el.style.setProperty('filter', 'invert(.8)'));
       rt.style.setProperty('--settingsLinkBackgroundColor', utils.brighter(cm.backgroundColor, 21));
       rt.style.setProperty('--settingsLinkHoverColor', utils.brighter(cm.backgroundColor, 36));
@@ -661,7 +660,7 @@ export default class Viewer {
         utils.brighter(window.getComputedStyle(rt).getPropertyValue('--defaultAnnotationPanelDarkBackgroundColor'), 30));
     } else { // bright mode
       // sleepy owl
-      owl.setAttribute("src", owlSrc + 'menu-logo-asleep.svg');
+      owlSrc += 'menu-logo-asleep' + (isSafari ? '.png' : '.svg');
       els.forEach(el => el.style.removeProperty('filter'));
       rt.style.setProperty('--settingsLinkBackgroundColor', utils.brighter(cm.backgroundColor, -16));
       rt.style.setProperty('--settingsLinkHoverColor', utils.brighter(cm.backgroundColor, -24));
@@ -692,7 +691,7 @@ export default class Viewer {
       rt.style.setProperty('--annotationPanelBorderColor',
         utils.brighter(window.getComputedStyle(rt).getPropertyValue('--defaultAnnotationPanelBackgroundColor'), -30));
     }
-
+    owl.setAttribute("src", owlSrc);
   } // setMenuColors()
 
   // Control zoom of notation display and update Verovio layout
@@ -856,20 +855,21 @@ export default class Viewer {
         let details = document.createElement('details');
         details.innerHTML += `<summary id="vrv-${groupId}">${group.name}</summary>`;
         Object.keys(group.options).forEach(opt => {
+          let o = group.options[opt]; // vrv available options
+          let optDefault = o.default; // available options defaults
+          if (defaultVrvOptions.hasOwnProperty(opt)) // mei-friend vrv defaults
+            optDefault = defaultVrvOptions[opt];
+          if (storage.hasOwnProperty(opt)) {
+            if (restoreFromLocalStorage) optDefault = storage[opt];
+            else delete storage[opt];
+          }
           if (!skipList.includes(opt)) {
-            let o = group.options[opt]; // vrv available options
-            let optDefault = o.default; // available options defaults
-            if (defaultVrvOptions.hasOwnProperty(opt)) // mei-friend vrv defaults
-              optDefault = defaultVrvOptions[opt];
-            if (storage.hasOwnProperty(opt)) {
-              if (restoreFromLocalStorage) optDefault = storage[opt];
-              else delete storage[opt];
-            }
             let div = this.createOptionsItem('vrv-' + opt, o, optDefault);
             if (div) details.appendChild(div);
-            // set all options so that toolkit is always completely cleared
-            if (['bool', 'int', 'double', 'std::string-list'].includes(o.type))
-              this.vrvOptions[opt.split('vrv-').pop()] = optDefault;
+          }
+          // set all options so that toolkit is always completely cleared
+          if (['bool', 'int', 'double', 'std::string-list', 'array'].includes(o.type)) {
+            this.vrvOptions[opt.split('vrv-').pop()] = optDefault;
           }
         });
         if (i === 1) details.setAttribute('open', 'true');
@@ -1585,9 +1585,9 @@ export default class Viewer {
     console.info('navigate(): lastNoteId: ', this.lastNoteId);
     this.updateNotation = false;
     let id = this.lastNoteId;
-    if (id == '') { // empty note id
-      this.setCursorToPageBeginning(cm); // re-defines lastNotId
-      id = this.lastNoteId;
+    if (id === '') { // empty note id
+      id = this.setCursorToPageBeginning(cm); // re-defines lastNotId
+      if (id === '') return;
     };
     let element = document.querySelector('g#' + id);
     if (!element) { // element off-screen

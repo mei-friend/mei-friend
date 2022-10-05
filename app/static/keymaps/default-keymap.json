@@ -96,6 +96,7 @@
     "cmd-shift-c": "cleanAccid",
     "cmd-shift-r": "renumberMeasures",
     "alt-.": "consultGuidelines",
+    "alt-…": "consultGuidelines",
     "cmd-,": "toggleSettingsPanel",
     "cmd-a": "toggleAnnotationPanel"
   },
