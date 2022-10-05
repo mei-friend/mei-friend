@@ -417,7 +417,7 @@ export default class Viewer {
     let id = this.lastNoteId;
     let stNo, lyNo;
     let sc;
-    if (id == '') {
+    if (id === '') {
       let note = document.querySelector('.note');
       if (note) id = note.getAttribute('id');
       else return '';
@@ -855,20 +855,21 @@ export default class Viewer {
         let details = document.createElement('details');
         details.innerHTML += `<summary id="vrv-${groupId}">${group.name}</summary>`;
         Object.keys(group.options).forEach(opt => {
+          let o = group.options[opt]; // vrv available options
+          let optDefault = o.default; // available options defaults
+          if (defaultVrvOptions.hasOwnProperty(opt)) // mei-friend vrv defaults
+            optDefault = defaultVrvOptions[opt];
+          if (storage.hasOwnProperty(opt)) {
+            if (restoreFromLocalStorage) optDefault = storage[opt];
+            else delete storage[opt];
+          }
           if (!skipList.includes(opt)) {
-            let o = group.options[opt]; // vrv available options
-            let optDefault = o.default; // available options defaults
-            if (defaultVrvOptions.hasOwnProperty(opt)) // mei-friend vrv defaults
-              optDefault = defaultVrvOptions[opt];
-            if (storage.hasOwnProperty(opt)) {
-              if (restoreFromLocalStorage) optDefault = storage[opt];
-              else delete storage[opt];
-            }
             let div = this.createOptionsItem('vrv-' + opt, o, optDefault);
             if (div) details.appendChild(div);
-            // set all options so that toolkit is always completely cleared
-            if (['bool', 'int', 'double', 'std::string-list'].includes(o.type))
-              this.vrvOptions[opt.split('vrv-').pop()] = optDefault;
+          }
+          // set all options so that toolkit is always completely cleared
+          if (['bool', 'int', 'double', 'std::string-list', 'array'].includes(o.type)) {
+            this.vrvOptions[opt.split('vrv-').pop()] = optDefault;
           }
         });
         if (i === 1) details.setAttribute('open', 'true');
@@ -1584,9 +1585,9 @@ export default class Viewer {
     console.info('navigate(): lastNoteId: ', this.lastNoteId);
     this.updateNotation = false;
     let id = this.lastNoteId;
-    if (id == '') { // empty note id
-      this.setCursorToPageBeginning(cm); // re-defines lastNotId
-      id = this.lastNoteId;
+    if (id === '') { // empty note id
+      id = this.setCursorToPageBeginning(cm); // re-defines lastNotId
+      if (id === '') return;
     };
     let element = document.querySelector('g#' + id);
     if (!element) { // element off-screen
