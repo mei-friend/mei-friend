@@ -500,7 +500,7 @@ document.addEventListener('DOMContentLoaded', function () {
   };
 
   if (isSafari) {
-    v.showAlert("It seems that you are using Safari, on which mei-friend unfortunately does not support all functionality. Please use another browser.", 'error', -1);
+    v.showAlert("It seems that you are using Safari as your browser, on which mei-friend unfortunately does not currently support schema validation. Please use another browser for full validation support.", 'error', -1);
   }
 
   const validatorWorker = new Worker(`${root}lib/validator-worker.js`);
