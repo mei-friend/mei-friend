@@ -1,4 +1,4 @@
-<img src="https://raw.githubusercontent.com/Signature-Sound-Vienna/mei-friend-online/main/app/static/svg/menu-logo.svg" title="mei-friend" width="33%">
+<img src="https://raw.githubusercontent.com/Signature-Sound-Vienna/mei-friend-online/main/app/static/owl/menu-logo.svg" title="mei-friend" width="33%">
 
 #  [The *mei-friend* Web Application: Editing MEI in the Browser](https://mei-friend.mdw.ac.at)
 
