@@ -1,5 +1,9 @@
 # mei-friend-online CHANGELOG.md
 
+### 0.6.5 patch: code refinements
+* Show link to changelog to the branch corresponding to `env`
+* Reduce verbosity and fix small glitches
+* Extended annotations configurability, gracefully handle large amounts of annot elements
 ### 0.6.4 patch: display schema info
 * Display warning message in Safari for missing validation support
 * Introduce some Safari tweaks (logos in png)

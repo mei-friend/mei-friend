@@ -1,6 +1,6 @@
 // mei-friend version and date
-const version = '0.6.4';
-const versionDate = '5 Oct 2022';
+const version = '0.6.5';
+const versionDate = '6 Oct 2022';
 
 var vrvWorker;
 var spdWorker;
@@ -347,7 +347,7 @@ export function loadDataInEditor(mei, setFreshlyLoaded = true) {
     v.checkSchema(mei);
   }
   clearAnnotations();
-  readAnnots(); // from annotation.js
+  readAnnots(true); // from annotation.js
   setCursorToId(cm, handleURLParamSelect());
 }
 
@@ -423,12 +423,10 @@ function completeIfInTag(cm) {
 }
 
 export async function validate(mei, updateLinting, options) {
-  // console.debug("validate(): ", options);
   if (options && mei) {
-    // keep the callback
+    // keep the callback (important for first call)
     if (updateLinting && typeof updateLinting === 'function') {
       v.updateLinting = updateLinting;
-      // console.debug("validate(updateLinting): ", updateLinting);
     }
 
     if (v.validatorWithSchema &&
@@ -437,12 +435,18 @@ export async function validate(mei, updateLinting, options) {
       if (reportDiv) reportDiv.style.visibility = 'hidden';
       let vs = document.getElementById('validation-status');
       vs.innerHTML = clock;
-      // vs.querySelector('path').setAttribute('fill', 'darkorange');
-      v.changeStatus(vs, 'wait', ['error', 'ok', 'manual']);
+      v.changeStatus(vs, 'wait', ['error', 'ok', 'manual']); // darkorange
       vs.querySelector('svg').classList.add('clockwise');
       vs.setAttribute('title', 'Validating against ' + v.currentSchema);
-      const validation = await validator.validateNG(mei);
-      console.log('Validation complete: ', validation);
+      const validationString = await validator.validateNG(mei);
+      let validation;
+      try {
+        validation = JSON.parse(validationString);
+      } catch (err) {
+        console.error("Could not parse validation json:", err);
+        return;
+      }
+      console.log('Validation complete: ', (validation === []) ? 'no errors.' : (validation.length + ' errors found.'));
       v.highlightValidation(mei, validation);
     } else if (!document.getElementById('autoValidate').checked) {
       v.setValidationStatusToManual();
@@ -456,6 +460,21 @@ async function suspendedValidate(text, updateLinting, options) {
 
 // when initial page content has been loaded
 document.addEventListener('DOMContentLoaded', function () {
+  // link to changelog page according to env settings (develop/staging/production)
+  let changeLogUrl;
+  switch (env) {
+    case 'develop':
+      changeLogUrl = 'https://github.com/Signature-Sound-Vienna/mei-friend-online/blob/develop/CHANGELOG.md';
+      break;
+    case 'staging':
+      changeLogUrl = 'https://github.com/Signature-Sound-Vienna/mei-friend-online/blob/staging/CHANGELOG.md';
+      break;
+    case 'production':
+      changeLogUrl = 'https://github.com/Signature-Sound-Vienna/mei-friend-online/blob/main/CHANGELOG.md';
+  }
+  const showChangeLogLink = document.getElementById('showChangelog');
+  if (showChangeLogLink) showChangeLogLink.setAttribute('href', changeLogUrl);
+
   cm = CodeMirror.fromTextArea(document.getElementById("editor"), defaultCodeMirrorOptions);
   CodeMirror.normalizeKeyMap();
 

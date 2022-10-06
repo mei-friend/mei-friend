@@ -8,7 +8,8 @@ import * as dutils from './dom-utils.js';
 import * as att from './attribute-classes.js';
 import {
   annotations,
-  generateAnnotationLocationLabel
+  generateAnnotationLocationLabel,
+  refreshAnnotations
 } from './annotation.js'
 import {
   cm,
@@ -22,7 +23,8 @@ import {
   supportedVerovioVersions,
   tkVersion,
   validate,
-  validator
+  validator,
+  v
 } from './main.js';
 import {
   drawSourceImage,
@@ -174,7 +176,7 @@ export default class Viewer {
     */
     let pageNumber = -1;
     let that = this;
-    console.log('getPageWithElement(' + xmlId + '), speedMode: ' + this.speedMode);
+    // console.log('getPageWithElement(' + xmlId + '), speedMode: ' + this.speedMode);
     if (this.speedMode) {
       pageNumber = speed.getPageWithElement(this.xmlDoc, this.breaksValue(), xmlId);
     } else {
@@ -218,7 +220,7 @@ export default class Viewer {
         }
       });
     }
-    console.log('pageNumber: ', pageNumber);
+    // console.log('pageNumber: ', pageNumber);
     return pageNumber;
   }
 
@@ -1101,11 +1103,30 @@ export default class Viewer {
         values: Object.keys(supportedVerovioVersions),
         valuesDescriptions: Object.keys(supportedVerovioVersions).map(key => supportedVerovioVersions[key].description)
       },
+      titleAnnotations: {
+        title: 'Annotations',
+        description: 'Annotation settings',
+        type: 'header'
+      },
+      showAnnotations: {
+        title: 'Show annotations',
+        description: 'Show annotations in notation',
+        type: 'bool',
+        default: true
+      },
       showAnnotationPanel: {
         title: 'Show annotation panel',
         description: 'Show annotation panel',
         type: 'bool',
         default: false
+      },
+      annotationDisplayLimit: {
+        title: 'Maximum number of annotations',
+        description: 'Maximum number of annotations to display (large numbers may slow mei-friend)',
+        type: 'int',
+        min: 0,
+        step: 100,
+        default: 100
       },
       dragSelection: {
         title: 'Drag select',
@@ -1382,6 +1403,9 @@ export default class Viewer {
               'url': supportedVerovioVersions[value].url
             });
             break;
+          case 'showAnnotations':
+            v.updateLayout();
+            break;
           case 'showAnnotationPanel':
             this.toggleAnnotationPanel();
             break;
@@ -1571,6 +1595,7 @@ export default class Viewer {
         let line = document.createElement('hr');
         line.classList.add(o.title);
         div.appendChild(line);
+        break;
       default:
         console.log('Creating Verovio Options: Unhandled data type: ' + o.type +
           ', title: ' + o.title + ' [' + o.type + '], default: [' + optDefault + ']');
@@ -1809,7 +1834,7 @@ export default class Viewer {
 
   // Method to check from MEI whether the XML schema filename has changed
   async checkSchema(mei) {
-    console.log('Validation: checking for schema...')
+    // console.log('Validation: checking for schema...')
     let vr = document.getElementById('validation-report');
     if (vr) vr.style.visibility = 'hidden';
     const hasSchema = /<\?xml-model.*schematypens=\"http?:\/\/relaxng\.org\/ns\/structure\/1\.0\"/
@@ -1826,7 +1851,7 @@ export default class Viewer {
             await this.replaceSchema(this.currentSchema);
             return;
           } else {
-            console.log('Validation: same schema.');
+            // console.log('Validation: same schema.');
             return;
           }
         }
@@ -1844,9 +1869,10 @@ export default class Viewer {
       this.currentSchema = schemaMatch[1];
       console.log('Validation: ...new schema ' + this.currentSchema);
       await this.replaceSchema(this.currentSchema);
-    } else {
-      console.log('Validation: same schema.');
     }
+    //else {
+    // console.log('Validation: same schema.');
+    //}
   }
 
   // Loads and replaces XML schema; throws errors if not found/CORS error, 
@@ -1988,17 +2014,15 @@ export default class Viewer {
   }
 
   // Highlight validation results in CodeMirror editor linting system
-  highlightValidation(mei, validation) {
+  highlightValidation(mei, messages) {
     let lines;
     let found = [];
     let i = 0;
-    let messages;
 
     try {
       lines = mei.split("\n");
-      messages = JSON.parse(validation);
     } catch (err) {
-      console.log("Could not parse json:", err);
+      console.log("Could not split MEI json:", err);
       return;
     }
 
