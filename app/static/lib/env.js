@@ -5,4 +5,4 @@ const environments = {
   production: "production"
 }
 // mei-friend version and date
-var env = environments.staging;
+var env = environments.develop;
