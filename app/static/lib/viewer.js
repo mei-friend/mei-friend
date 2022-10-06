@@ -1,15 +1,10 @@
-import {
-  getVerovioContainerSize,
-  setOrientation
-} from './resizer.js'
 import * as speed from './speed.js';
 import * as utils from './utils.js';
 import * as dutils from './dom-utils.js';
 import * as att from './attribute-classes.js';
 import {
   annotations,
-  generateAnnotationLocationLabel,
-  refreshAnnotations
+  generateAnnotationLocationLabel
 } from './annotation.js'
 import {
   cm,
@@ -26,6 +21,10 @@ import {
   validator,
   v
 } from './main.js';
+import {
+  getVerovioContainerSize,
+  setOrientation
+} from './resizer.js'
 import {
   drawSourceImage,
   highlightZone,
@@ -240,7 +239,7 @@ export default class Viewer {
     this.loadXml(mei);
     let breaks = this.breaksValue();
     let breaksSelectVal = document.getElementById('breaks-select').value;
-    if (!this.speedMode || breaksSelectVal == 'none') return mei;
+    if (!this.speedMode || breaksSelectVal === 'none') return mei;
     // count pages from system/pagebreaks
     if (Array.isArray(breaks)) {
       let music = this.xmlDoc.querySelector('music score');
@@ -304,7 +303,7 @@ export default class Viewer {
     else return false;
     let countBreaks = false;
     for (let e of elements) {
-      if (e.nodeName == 'measure') countBreaks = true; // skip leading breaks
+      if (e.nodeName === 'measure') countBreaks = true; // skip leading breaks
       if (countBreaks && ['sb', 'pb'].includes(e.nodeName))
         return true;
     }
@@ -472,7 +471,7 @@ export default class Viewer {
     let chordId = utils.insideParent(itemId);
     if (e.altKey && chordId) itemId = chordId;
     // select tuplet when clicking on tupletNum
-    if (e.currentTarget.getAttribute('class') == 'tupletNum')
+    if (e.currentTarget.getAttribute('class') === 'tupletNum')
       itemId = utils.insideParent(itemId, 'tuplet');
 
     if (((platform.startsWith('mac')) && e.metaKey) || e.ctrlKey) {
@@ -760,7 +759,7 @@ export default class Viewer {
   toggleAnnotationPanel() {
     setOrientation(cm);
     if (this.speedMode &&
-      document.getElementById('breaks-select').value == 'auto') {
+      document.getElementById('breaks-select').value === 'auto') {
       this.pageBreaks = {};
       this.updateAll(cm);
     } else {
@@ -1567,7 +1566,7 @@ export default class Viewer {
           input.setAttribute('name', opt);
           input.setAttribute('id', opt);
           fontList.forEach((str, i) => input.add(new Option(str, str,
-            (fontList.indexOf(optDefault) == i) ? true : false)));
+            (fontList.indexOf(optDefault) === i) ? true : false)));
         }
         break;
       case 'select':
@@ -1577,7 +1576,7 @@ export default class Viewer {
         input.setAttribute('id', opt);
         o.values.forEach((str, i) => {
           let option = new Option(str, str,
-            (o.values.indexOf(optDefault) == i) ? true : false);
+            (o.values.indexOf(optDefault) === i) ? true : false);
           if ('valuesDescriptions' in o) option.title = o.valuesDescriptions[i];
           input.add(option)
         });
@@ -1630,11 +1629,11 @@ export default class Viewer {
       if (firstNote) id = firstNote.getAttribute('id');
     } else {
       // find elements starting from current note id, element- or measure-wise
-      if (incElName == 'note' || incElName == 'measure') {
+      if (incElName === 'note' || incElName === 'measure') {
         id = dutils.getIdOfNextSvgElement(element, dir, undefined, incElName);
         if (!id) { // when no id on screen, turn page
           let what = 'first'; // first/last note within measure
-          if (dir == 'backwards' && incElName !== 'measure') what = 'last';
+          if (dir === 'backwards' && incElName !== 'measure') what = 'last';
           let lyNo = 1;
           let layer = element.closest('.layer');
           if (layer) lyNo = layer.getAttribute('data-n');
@@ -1646,7 +1645,7 @@ export default class Viewer {
       }
 
       // up/down in layers
-      if (incElName == 'layer') {
+      if (incElName === 'layer') {
         // console.info('navigate(u/d): x/y: ' + x + '/' + y + ', el: ', element);
         let els = Array.from(measure.querySelectorAll(dutils.navElsSelector));
         els.sort(function (a, b) {
@@ -1655,9 +1654,9 @@ export default class Viewer {
           if (Math.abs(dutils.getX(a) - x) < Math.abs(dutils.getX(b) - x))
             return -1;
           if (dutils.getY(a) < dutils.getY(b))
-            return (dir == 'upwards') ? 1 : -1;
+            return (dir === 'upwards') ? 1 : -1;
           if (dutils.getY(a) > dutils.getY(b))
-            return (dir == 'upwards') ? -1 : 1;
+            return (dir === 'upwards') ? -1 : 1;
           return 0;
         });
         // console.info('els: ', els);
@@ -1666,8 +1665,8 @@ export default class Viewer {
         for (let e of els) { // go thru all elements to find closest in x/y space
           if (found) {
             yy = dutils.getY(e);
-            if (dir == 'upwards' && yy >= y) continue;
-            if (dir == 'downwards' && yy <= y) continue;
+            if (dir === 'upwards' && yy >= y) continue;
+            if (dir === 'downwards' && yy <= y) continue;
             id = e.getAttribute('id');
             break;
           }
@@ -2053,7 +2052,7 @@ export default class Viewer {
     if (reportDiv) reportDiv.innerHTML = '';
 
     let msg = '';
-    if (found.length == 0 && this.validatorWithSchema) {
+    if (found.length === 0 && this.validatorWithSchema) {
       this.changeStatus(vs, 'ok', ['error', 'wait', 'manual']);
       vs.innerHTML = verified;
       msg = 'Everything ok, no errors.';

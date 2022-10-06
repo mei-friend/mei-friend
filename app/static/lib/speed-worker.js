@@ -60,7 +60,7 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
     let p = 1;
     // determine page number for list of ids
     function dig(nodeArray, noteTable, idList, childOfMeasure = false) {
-      if (breaksOption == 'line' || breaksOption == 'encoded') {
+      if (breaksOption === 'line' || breaksOption === 'encoded') {
         nodeArray.forEach(el => { // el obj w/ tagName, children, attributes
           if (el.hasOwnProperty("tagName")) {
             if (el.tagName === 'measure') count = true;
@@ -171,7 +171,32 @@ function getElementByTagName(nodeArray, elName, el) {
 // ACKNOWLEDGEMENTS
 // The below code is taken from https://github.com/TobiasNickel/tXml,
 // published by Tobias Nickel under MIT license.
-// We are grateful for the fast xml parsing inside workers!
+
+// We are grateful for the fast xml parsing inside workers! Thanks a lot!
+
+// The MIT License (MIT)
+
+// Copyright (c) 2015 Tobias Nickel
+
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
+
 
 /**
  * @author: Tobias Nickel
@@ -212,13 +237,13 @@ function parse(S, options) {
   function parseChildren(tagName) {
     var children = [];
     while (S[pos]) {
-      if (S.charCodeAt(pos) == openBracketCC) {
+      if (S.charCodeAt(pos) === openBracketCC) {
         if (S.charCodeAt(pos + 1) === slashCC) {
           var closeStart = pos + 2;
           pos = S.indexOf(closeBracket, pos);
 
           var closeTag = S.substring(closeStart, pos)
-          if (closeTag.indexOf(tagName) == -1) {
+          if (closeTag.indexOf(tagName) === -1) {
             var parsedText = S.substring(0, pos).split('\n');
             console.error(
               'SpeedWorker Parsing Error: Unexpected close tag:' +
@@ -232,10 +257,10 @@ function parse(S, options) {
 
           return children;
         } else if (S.charCodeAt(pos + 1) === exclamationCC) {
-          if (S.charCodeAt(pos + 2) == minusCC) {
+          if (S.charCodeAt(pos + 2) === minusCC) {
             //comment support
             const startCommentPos = pos;
-            while (pos !== -1 && !(S.charCodeAt(pos) === closeBracketCC && S.charCodeAt(pos - 1) == minusCC && S.charCodeAt(pos - 2) == minusCC && pos != -1)) {
+            while (pos !== -1 && !(S.charCodeAt(pos) === closeBracketCC && S.charCodeAt(pos - 1) === minusCC && S.charCodeAt(pos - 2) === minusCC && pos != -1)) {
               pos = S.indexOf(closeBracket, pos + 1);
             }
             if (pos === -1) {
@@ -251,7 +276,7 @@ function parse(S, options) {
           ) {
             // cdata
             var cdataEndIndex = S.indexOf(']]>', pos);
-            if (cdataEndIndex == -1) {
+            if (cdataEndIndex === -1) {
               children.push(S.substring(pos + 9));
               pos = S.length;
             } else {
@@ -367,12 +392,12 @@ function parse(S, options) {
     }
     // optional parsing of children
     if (S.charCodeAt(pos - 1) !== slashCC) {
-      if (tagName == "script") {
+      if (tagName === "script") {
         var start = pos + 1;
         pos = S.indexOf('</script>', pos);
         children = [S.slice(start, pos)];
         pos += 9;
-      } else if (tagName == "style") {
+      } else if (tagName === "style") {
         var start = pos + 1;
         pos = S.indexOf('</style>', pos);
         children = [S.slice(start, pos)];
@@ -465,7 +490,7 @@ function simplify(children) {
     return '';
   }
 
-  if (children.length === 1 && typeof children[0] == 'string') {
+  if (children.length === 1 && typeof children[0] === 'string') {
     return children[0];
   }
   // map each object
@@ -483,7 +508,7 @@ function simplify(children) {
   });
 
   for (var i in out) {
-    if (out[i].length == 1) {
+    if (out[i].length === 1) {
       out[i] = out[i][0];
     }
   }
@@ -503,7 +528,7 @@ function simplifyLostLess(children, parentAttributes = {}) {
     return out;
   }
 
-  if (children.length === 1 && typeof children[0] == 'string') {
+  if (children.length === 1 && typeof children[0] === 'string') {
     return Object.keys(parentAttributes).length ? {
       _attributes: parentAttributes,
       value: children[0]
@@ -556,7 +581,7 @@ function stringify(O) {
   function writeChildren(O) {
     if (O) {
       for (var i = 0; i < O.length; i++) {
-        if (typeof O[i] == 'string') {
+        if (typeof O[i] === 'string') {
           out += O[i].trim();
         } else {
           writeNode(O[i]);

@@ -25,7 +25,7 @@ export function deleteElement(v, cm) {
 
   if (att.modelControlEvents.concat(['accid', 'artic', 'clef', 'octave', 'beamSpan'])
     .includes(element.nodeName)) {
-    if (element.nodeName == 'octave') { // reset notes inside octave range
+    if (element.nodeName === 'octave') { // reset notes inside octave range
       let disPlace = element.getAttribute('dis.place');
       let dis = element.getAttribute('dis');
       let id1 = utils.rmHash(element.getAttribute('startid'));
@@ -82,7 +82,7 @@ export function deleteElement(v, cm) {
 } // deleteElement()
 
 export function addControlElement(v, cm, elName, placement, form) {
-  if (v.selectedElements.length == undefined || v.selectedElements.length < 1)
+  if (v.selectedElements.length === undefined || v.selectedElements.length < 1)
     return;
   v.selectedElements = utils.sortElementsByScorePosition(v.selectedElements);
   v.selectedElements = speed.filterElements(v.selectedElements, v.xmlDoc);
@@ -105,7 +105,7 @@ export function addControlElement(v, cm, elName, placement, form) {
   if (!sc.findNext()) return;
   const p = sc.from();
   var endEl;
-  if (v.selectedElements.length == 1 &&
+  if (v.selectedElements.length === 1 &&
     (['slur', 'tie', 'phrase', 'hairpin', 'gliss'].includes(elName))) {
     // if one selected element, find a second automatically
     endId = utils.getIdOfNextElement(cm, p.line, ['note'])[0];
@@ -187,7 +187,7 @@ export function addControlElement(v, cm, elName, placement, form) {
 } // addControlElement()
 
 export function addClefChange(v, cm, shape = 'G', line = '2', before = true) {
-  if (v.selectedElements.length == 0) return;
+  if (v.selectedElements.length === 0) return;
   v.updateNotation = false; // stop update notation
   let id = v.selectedElements[0];
   var el = v.xmlDoc.querySelector("[*|id='" + id + "']");
@@ -248,14 +248,14 @@ export function invertPlacement(v, cm, modifier = false) {
         val = 'below';
       }
       if (el.nodeName === 'fermata')
-        val == 'below' ?
+        val === 'below' ?
         el.setAttribute('form', 'inv') : el.removeAttribute('form');
       el.setAttribute(attr, val);
       range = replaceInEditor(cm, el, true);
       // txtEdr.autoIndentSelectedRows();
     } else if (att.attCurvature.includes(el.nodeName)) {
       attr = 'curvedir';
-      if (el.hasAttribute(attr) && el.getAttribute(attr) == 'above') {
+      if (el.hasAttribute(attr) && el.getAttribute(attr) === 'above') {
         val = 'below';
       }
       el.setAttribute(attr, val);
@@ -263,7 +263,7 @@ export function invertPlacement(v, cm, modifier = false) {
       // txtEdr.autoIndentSelectedRows();
     } else if (att.attStems.includes(el.nodeName)) {
       attr = 'stem.dir', val = 'up';
-      if (el.hasAttribute(attr) && el.getAttribute(attr) == val) {
+      if (el.hasAttribute(attr) && el.getAttribute(attr) === val) {
         val = 'down';
       }
       el.setAttribute(attr, val);
@@ -273,7 +273,7 @@ export function invertPlacement(v, cm, modifier = false) {
     } else if (el.nodeName === 'tuplet') {
       attr = 'num.place';
       val = 'above';
-      if (el.hasAttribute(attr) && el.getAttribute(attr) == val) {
+      if (el.hasAttribute(attr) && el.getAttribute(attr) === val) {
         val = 'below';
       }
       el.setAttribute(attr, val);
@@ -287,7 +287,7 @@ export function invertPlacement(v, cm, modifier = false) {
           let note = v.xmlDoc.querySelector("[*|id='" + utils.rmHash(p) + "']");
           if (note) {
             if (note.parentNode.nodeName === 'chord') note = note.parentNode;
-            if (note.hasAttribute(attr) && note.getAttribute(attr) == val) {
+            if (note.hasAttribute(attr) && note.getAttribute(attr) === val) {
               val = 'down';
             }
             note.setAttribute(attr, val);
@@ -303,7 +303,7 @@ export function invertPlacement(v, cm, modifier = false) {
       for (let note of noteList) {
         // skip notes within chords
         if (note.parentNode.nodeName === 'chord') continue;
-        if (note.hasAttribute(attr) && note.getAttribute(attr) == val) {
+        if (note.hasAttribute(attr) && note.getAttribute(attr) === val) {
           val = 'down';
         }
         note.setAttribute(attr, val);
@@ -430,7 +430,7 @@ export function addBeamElement(v, cm, elementName = 'beam') {
   // let checkPoint = buffer.createCheckpoint(); TODO
   // add beam element, if selected elements have same parent
   // TODO check whether inside tuplets and accept that as well
-  if (par1.getAttribute('xml:id') == n2.parentNode.getAttribute('xml:id')) {
+  if (par1.getAttribute('xml:id') === n2.parentNode.getAttribute('xml:id')) {
     let beam = document.createElementNS(dutils.meiNameSpace, elementName);
     let uuid = elementName + '-' + utils.generateUUID();
     beam.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
@@ -439,8 +439,8 @@ export function addBeamElement(v, cm, elementName = 'beam') {
     let insert = false;
     for (let i = 0; i < nodeList.length; i++) {
       if (nodeList[i].nodeType === Node.TEXT_NODE) continue;
-      if (nodeList[i].getAttribute('xml:id') == id1) insert = true;
-      if (nodeList[i].getAttribute('xml:id') == id2) {
+      if (nodeList[i].getAttribute('xml:id') === id1) insert = true;
+      if (nodeList[i].getAttribute('xml:id') === id2) {
         let n = nodeList[i].cloneNode(); // make a copy for replacement later
         beam.appendChild(nodeList[i--]);
         replaceInEditor(cm, n, true, beam);
@@ -457,8 +457,7 @@ export function addBeamElement(v, cm, elementName = 'beam') {
     v.selectedElements.push(uuid);
     v.updateData(cm, false, true);
   } else {
-    console.log('Cannot add ' + elementName +
-      ' element, selected elements have different parents.');
+    console.log('Cannot add ' + elementName + ' element, selected elements have different parents.');
   }
   v.updateNotation = true; // update notation again
 } // addBeamElement()
@@ -531,15 +530,10 @@ export function addOctaveElement(v, cm, disPlace = 'above', dis = '8') {
     cm.indentLine(p1.line, 'smart'); // TODO
     cm.indentLine(p1.line + 1, 'smart');
     cm.setSelection(p1);
-    // txtEdr.insertText(dutils.xmlToString(octave));
-    // txtEdr.insertNewline();
-    // txtEdr.setSelectedBufferRange([begin, [begin[0] + 2, begin[1]]]);
-    // txtEdr.autoIndentSelectedRows();
-    // txtEdr.setCursorBufferPosition(begin);
   }
   // find plist and modify elements
   findAndModifyOctaveElements(cm, v.xmlDoc, id1, id2, disPlace, dis);
-  // buffer.groupChangesSinceCheckpoint(checkPoint);
+  // buffer.groupChangesSinceCheckpoint(checkPoint); // TODO
   v.selectedElements = [];
   v.selectedElements.push(uuid);
   v.lastNoteId = id2;
@@ -765,8 +759,6 @@ export function replaceInEditor(cm, xmlNode, select = false, newNode = null) {
           cm.execCommand('deleteLine');
         }
       }
-      // for (r = range.start.row; r <= range.end.row; r++)
-      //   if (textBuffer.isRowBlank(r)) textBuffer.deleteRow(r);
       cm.setSelection(sc.from(), sc.to());
     }
   }
@@ -792,7 +784,7 @@ function toggleArticForNote(note, artic) {
     // console.info('toggleArtic check children: ', articChildren);
     for (let articChild of articChildren) {
       let existingArtic = articChild.getAttribute('artic');
-      if (existingArtic == artic) {
+      if (existingArtic === artic) {
         articChild.remove();
         add = false;
       } else {
@@ -807,8 +799,6 @@ function toggleArticForNote(note, artic) {
     uuid = 'artic-' + utils.generateUUID();
     articElement.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
     articElement.setAttribute('artic', artic);
-    // let textNode = document.createTextNode('/n');
-    // note.appendChild(textNode);
     note.appendChild(articElement);
   }
   // console.info('modified element: ', note);
@@ -859,7 +849,7 @@ function staffMover(cm, el, upwards) {
     if (staffNoAttr > 0) newStaffNo = staffNoAttr + 1;
     else newStaffNo = staffNo + 1;
   }
-  if (staffNo == newStaffNo) el.removeAttribute('staff');
+  if (staffNo === newStaffNo) el.removeAttribute('staff');
   else el.setAttribute('staff', newStaffNo);
   replaceInEditor(cm, el);
 }
@@ -870,7 +860,7 @@ function staffMover(cm, el, upwards) {
 function findAndModifyOctaveElements(cm, xmlDoc, id1, id2,
   disPlace, dis, add = true) {
   let deltaOct = (parseInt(dis) - 1) / 7;
-  if (disPlace == 'below') deltaOct *= -1; // normal logic: minus 1 when below
+  if (disPlace === 'below') deltaOct *= -1; // normal logic: minus 1 when below
   if (add) deltaOct *= -1; // inverse logic: minus when adding above 8
   let n1 = xmlDoc.querySelector("[*|id='" + id1 + "']");
   let st1 = n1.closest("staff");
@@ -890,7 +880,7 @@ function findAndModifyOctaveElements(cm, xmlDoc, id1, id2,
       if (staffFound) { // select notes after
         let notes = st.getElementsByTagName('note');
         for (let n of notes) {
-          if (n.getAttribute('xml:id') == id1) {
+          if (n.getAttribute('xml:id') === id1) {
             noteFound = true;
           }
           if (noteFound) {
@@ -903,7 +893,7 @@ function findAndModifyOctaveElements(cm, xmlDoc, id1, id2,
             n.setAttribute('oct', oct + deltaOct)
             replaceInEditor(cm, n);
           }
-          if (n.getAttribute('xml:id') == id2) {
+          if (n.getAttribute('xml:id') === id2) {
             return;
           }
         }

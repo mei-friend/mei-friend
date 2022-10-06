@@ -409,14 +409,14 @@ function completeAfter(cm, pred) {
 function completeIfAfterLt(cm) {
   return completeAfter(cm, function () {
     var cur = cm.getCursor();
-    return cm.getRange(CodeMirror.Pos(cur.line, cur.ch - 1), cur) == "<";
+    return cm.getRange(CodeMirror.Pos(cur.line, cur.ch - 1), cur) === "<";
   });
 }
 
 function completeIfInTag(cm) {
   return completeAfter(cm, function () {
     var tok = cm.getTokenAt(cm.getCursor());
-    if (tok.type == "string" && (!/['"]/.test(tok.string.charAt(tok.string.length - 1)) || tok.string.length == 1)) return false;
+    if (tok.type === "string" && (!/['"]/.test(tok.string.charAt(tok.string.length - 1)) || tok.string.length === 1)) return false;
     var inner = CodeMirror.innerMode(cm.getMode(), tok.state).state;
     return inner.tagName;
   });
@@ -832,11 +832,11 @@ async function vrvWorkerEventsHandler(ev) {
       let bs = document.getElementById('breaks-select').value;
       if (ev.data.pageCount && !v.speedMode)
         v.pageCount = ev.data.pageCount;
-      else if (bs == 'none') v.pageCount = 1;
-      else if (v.speedMode && bs == 'auto' && Object.keys(v.pageBreaks).length > 0)
+      else if (bs === 'none') v.pageCount = 1;
+      else if (v.speedMode && bs === 'auto' && Object.keys(v.pageBreaks).length > 0)
         v.pageCount = Object.keys(v.pageBreaks).length;
       // update only if still same page
-      if (v.currentPage == ev.data.pageNo || ev.data.forceUpdate || ev.data.computePageBreaks) {
+      if (v.currentPage === ev.data.pageNo || ev.data.forceUpdate || ev.data.computePageBreaks) {
         if (ev.data.forceUpdate) v.currentPage = ev.data.pageNo;
         updateStatusBar();
         document.querySelector('title').innerHTML = 'mei-friend: ' +
@@ -862,7 +862,7 @@ async function vrvWorkerEventsHandler(ev) {
       let ms = document.querySelectorAll('.measure'); // find measures on page
       if (ms.length > 0) {
         let m = ms[0];
-        if (ev.data.dir == 'backwards') m = ms[ms.length - 1]; // last measure
+        if (ev.data.dir === 'backwards') m = ms[ms.length - 1]; // last measure
         let id = getInMeasure(m, navElsSelector,
           ev.data.stNo, ev.data.lyNo, ev.data.what);
         if (id) v.findClosestNoteInChord(id, ev.data.y);
@@ -1035,7 +1035,7 @@ export function handleEncoding(mei, setFreshlyLoaded = true, updateAfterLoading 
       if (mei.includes(value)) { // a hint that it is a MEI file
         found = true;
         console.log(key + ' file loading: ' + meiFileName);
-        if (key == "mei") { // if already a mei file
+        if (key === "mei") { // if already a mei file
           setIsMEI(true);
           v.updateNotation = false;
           loadDataInEditor(mei, setFreshlyLoaded);
@@ -1077,7 +1077,7 @@ function openFileDialog(accept = '*') {
   input.onchange = _ => {
     let files = Array.from(input.files);
     console.log('OpenFile Dialog: ', files);
-    if (files.length == 1) {
+    if (files.length === 1) {
       meiFileName = files[0].name;
       meiFileLocation = "";
       meiFileLocationPrintable = "";
@@ -1718,7 +1718,7 @@ function setKeyMap(keyMapFilePath) {
               ev.preventDefault();
             }
             let keyName = ev.key;
-            if (ev.code.toLowerCase() == 'space') keyName = 'space';
+            if (ev.code.toLowerCase() === 'space') keyName = 'space';
             // arrowdown -> down
             keyName = keyName.toLowerCase().replace('arrow', '');
             let keyPress = '';

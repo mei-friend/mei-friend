@@ -105,7 +105,7 @@ export function moveCursorToEndOfMeasure(cm, p) {
 //   // const searchString = new RegExp(`(?:xml:id="${itemId}")`);
 //   // var searchSelfClosing = '<[\\w.-]+?\\s+?(?:xml:id="' + itemId + '")(.*?)(\/[\\w.-]*?>)';
 //   // var searchElement = '(?:<' + elementName + ')\\s+?(?:xml:id="' + itemId + '")(.*?)(?:</' + elementName + ')*?>';
-//   if (searchRegExp == '') searchRegExp = '(?:xml:id="' + itemId + '")';
+//   if (searchRegExp === '') searchRegExp = '(?:xml:id="' + itemId + '")';
 //   let searchString = new RegExp(searchRegExp);
 //   let sc = cm.getSearchCursor(searchString);
 //   let foundString = mei.match(searchString);
@@ -192,7 +192,7 @@ export function getIdOfNextElement(cm, rw, elementNames = dutils.navElsArray,
         (staffNo === parseInt(getElementAttributeAbove(cm, row,
           'staff', numberLikeString)[0])) &&
         (layerNo === parseInt(getElementAttributeAbove(cm, row,
-          'layer', numberLikeString)[0]))) { // && (layerNo == layerN)
+          'layer', numberLikeString)[0]))) { // && (layerNo === layerN)
         break;
       }
     }
@@ -209,7 +209,7 @@ export function getIdOfNextElement(cm, rw, elementNames = dutils.navElsArray,
         (staffNo === parseInt(getElementAttributeAbove(cm, row,
           'staff', numberLikeString)[0])) &&
         (layerNo === parseInt(getElementAttributeAbove(cm, row,
-          'layer', numberLikeString)[0]))) { // && (layerNo == layerN)
+          'layer', numberLikeString)[0]))) { // && (layerNo === layerN)
         break;
       }
     }
@@ -414,7 +414,7 @@ export function cleanAccid(xmlDoc, cm) {
   let i = 0;
   for (let el of accidGesList) {
     if (el.hasAttribute('accid.ges') &&
-      el.getAttribute('accid') == el.getAttribute('accid.ges')) {
+      el.getAttribute('accid') === el.getAttribute('accid.ges')) {
       i++;
       console.log(i + ' @accid.ges removed from ', el);
       el.removeAttribute('accid.ges');

@@ -1,3 +1,4 @@
+// Facsimile support: 
 // Handles display of sources score images as referenced through zone and surface elements.
 
 var facs = {}; // facsimile structure in MEI file
@@ -511,20 +512,6 @@ function ingestionInputHandler(ev) {
             log('Loading of ingestion file ' + reply.fileName + ' failed.');
         }
     );
-
-
-    // console.log('OpenFile Dialog: ', files);
-    // if (files.length == 1) {
-    //     reply.fileName = files[0].name;
-    //     fetch(files[0])
-    //         .then((response) => response.text())
-    //         .then((mei) => {
-    //             reply.mei = mei;
-    //             handleFacsimileIngestion(reply);
-    //         });
-    // } else {
-    //     log('OpenFile Dialog: Multiple files not supported.');
-    // }
 }
 
 function handleFacsimileIngestion(reply) {

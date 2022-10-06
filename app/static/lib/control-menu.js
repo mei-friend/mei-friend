@@ -1,4 +1,3 @@
-import * as utils from './utils.js';
 import * as icon from './../css/icons.js';
 import {
   fontList
@@ -326,7 +325,7 @@ time with large files`;
 export function manualCurrentPage(v, cm, ev) {
   console.debug('manualCurrentPage: ', ev);
   ev.stopPropagation();
-  if (ev.key == 'Enter' || ev.type == 'blur') {
+  if (ev.key === 'Enter' || ev.type === 'blur') {
     ev.preventDefault();
     let pageInput = parseInt(ev.target.innerText);
     if (pageInput) v.updatePage(cm, pageInput);
@@ -335,7 +334,7 @@ export function manualCurrentPage(v, cm, ev) {
 }
 
 export function setBreaksOptions(tkAvailableOptions, defaultValue = 'auto') {
-  if (defaultValue == '') defaultValue = 'auto';
+  if (defaultValue === '') defaultValue = 'auto';
   let breaksEl = document.getElementById('breaks-select');
   var breaksOpts = {
     none: 'None',
@@ -353,7 +352,7 @@ export function setBreaksOptions(tkAvailableOptions, defaultValue = 'auto') {
   // for (let index of breaks.values) {
   //   if (breaksOpts[index]) {
   //     breaksEl[breaksEl.options.length] = new Option(breaksOpts[index], index);
-  //     if (index == defaultValue) {
+  //     if (index === defaultValue) {
   //       breaksEl[breaksEl.options.length - 1].selected = 'selected';
   //     }
   //   } else {
@@ -397,7 +396,7 @@ export function generateSectionSelect(xmlDoc) {
       }
       sections.push([str + el.getAttribute('xml:id'), el.getAttribute('xml:id')]);
     });
-    if (sections.length == 2) sections.pop(); // remove if only the one section
+    if (sections.length === 2) sections.pop(); // remove if only the one section
   }
   return sections;
 }

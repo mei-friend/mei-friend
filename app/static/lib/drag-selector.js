@@ -5,8 +5,7 @@ import {
 } from './dom-utils.js'
 import * as att from './attribute-classes.js';
 import {
-  setCursorToId,
-  sortElementsByScorePosition
+  setCursorToId
 } from './utils.js';
 import {
   cm,
