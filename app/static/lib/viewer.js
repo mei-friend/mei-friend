@@ -799,6 +799,7 @@ export default class Viewer {
             ) {
               opt.style.display = "none"; // filter out
             } else {
+              // add class "odd" to every other displayed element
               if (++i % 2 === 1) opt.classList.add('odd');
             }
           }
@@ -829,263 +830,6 @@ export default class Viewer {
       }
     }
   }
-
-  clearVrvOptionsSettingsPanel() {
-    this.vrvOptions = {};
-    document.getElementById('verovioSettings').innerHTML = '';
-  }
-
-  // initializes the settings panel by filling it with content
-  addVrvOptionsToSettingsPanel(tkAvailableOptions, defaultVrvOptions, restoreFromLocalStorage = true) {
-    // skip these options (in part because they are handled in control menu)
-    let skipList = ['breaks', 'engravingDefaults', 'expand',
-      'svgAdditionalAttribute', 'handwrittenFont'
-    ];
-    let vsp = document.getElementById('verovioSettings');
-    let addListeners = false; // add event listeners only the first time
-    if (!/\w/g.test(vsp.innerHTML)) addListeners = true;
-    vsp.innerHTML = '<div class="settingsHeader">Verovio Settings</div>';
-    let storage = window.localStorage;
-
-    Object.keys(tkAvailableOptions.groups).forEach((grp, i) => {
-      let group = tkAvailableOptions.groups[grp];
-      let groupId = group.name.replaceAll(" ", "_");
-      // skip these two groups: base handled by mei-friend; sel to be thought (TODO)
-      if (!group.name.startsWith('Base short') &&
-        !group.name.startsWith('Element selectors')) {
-        let details = document.createElement('details');
-        details.innerHTML += `<summary id="vrv-${groupId}">${group.name}</summary>`;
-        Object.keys(group.options).forEach(opt => {
-          let o = group.options[opt]; // vrv available options
-          let optDefault = o.default; // available options defaults
-          if (defaultVrvOptions.hasOwnProperty(opt)) // mei-friend vrv defaults
-            optDefault = defaultVrvOptions[opt];
-          if (storage.hasOwnProperty(opt)) {
-            if (restoreFromLocalStorage) optDefault = storage[opt];
-            else delete storage[opt];
-          }
-          if (!skipList.includes(opt)) {
-            let div = this.createOptionsItem('vrv-' + opt, o, optDefault);
-            if (div) details.appendChild(div);
-          }
-          // set all options so that toolkit is always completely cleared
-          if (['bool', 'int', 'double', 'std::string-list', 'array'].includes(o.type)) {
-            this.vrvOptions[opt.split('vrv-').pop()] = optDefault;
-          }
-        });
-        if (i === 1) details.setAttribute('open', 'true');
-        vsp.appendChild(details);
-      }
-    });
-
-    vsp.innerHTML += '<input type="button" title="Reset to mei-friend defaults" id="vrvReset" class="resetButton" value="Default" />';
-    if (addListeners) { // add change listeners
-      vsp.addEventListener('input', ev => {
-        let opt = ev.target.id;
-        let value = ev.target.value;
-        if (ev.target.type === 'checkbox') value = ev.target.checked;
-        if (ev.target.type === 'number') value = parseFloat(value);
-        this.vrvOptions[opt.split('vrv-').pop()] = value;
-        if (defaultVrvOptions.hasOwnProperty(opt) && // TODO check vrv default values
-          defaultVrvOptions[opt].toString() === value.toString())
-          delete storage[opt]; // remove from storage object when default value
-        else
-          storage[opt] = value; // save changes in localStorage object
-        if (opt === 'vrv-font') document.getElementById('font-select').value = value;
-        this.updateLayout(this.vrvOptions);
-      });
-      vsp.addEventListener('click', ev => { // RESET button
-        if (ev.target.id === 'vrvReset') {
-          this.addVrvOptionsToSettingsPanel(tkAvailableOptions, defaultVrvOptions, false);
-          this.updateLayout(this.vrvOptions);
-        }
-      });
-    }
-  }
-
-  addCmOptionsToSettingsPanel(mfDefaults, restoreFromLocalStorage = true) {
-    let optionsToShow = { // key as in CodeMirror
-      zoomFont: {
-        title: 'Font size (%)',
-        description: 'Change font size of editor (in percent)',
-        type: 'int',
-        default: 100,
-        min: 45,
-        max: 300,
-        step: 5
-      },
-      theme: {
-        title: 'Theme',
-        description: 'Select the theme of the editor',
-        type: 'select',
-        default: 'default',
-        values: ['default', 'abbott', 'base16-dark', 'base16-light', 'cobalt',
-          'darcula', 'dracula', 'eclipse', 'elegant', 'monokai', 'idea',
-          'juejin', 'mdn-like', 'neo', 'paraiso-dark', 'paraiso-light',
-          'pastel-on-dark', 'solarized dark', 'solarized light',
-          'xq-dark', 'xq-light', 'yeti', 'yonce', 'zenburn'
-        ]
-      },
-      matchTheme: {
-        title: 'Notation matches theme',
-        description: 'Match notation to editor color theme',
-        type: 'bool',
-        default: false
-      },
-      tabSize: {
-        title: 'Tab size',
-        description: 'Number of space characters for each indentation level',
-        type: 'int',
-        min: 1,
-        max: 12,
-        step: 1,
-        default: 3
-      },
-      lineWrapping: {
-        title: 'Line wrapping',
-        description: 'Whether or not lines are wrapped at end of panel',
-        type: 'bool',
-        default: false
-      },
-      lineNumbers: {
-        title: 'Line numbers',
-        description: 'Show line numbers',
-        type: 'bool',
-        default: true
-      },
-      firstLineNumber: {
-        title: 'First line number',
-        description: 'Set first line number',
-        type: 'int',
-        min: 0,
-        max: 1,
-        step: 1,
-        default: 1
-      },
-      meifriendSeparator: {
-        title: 'options-line', // class name of hr element
-        type: 'line'
-      },
-      autoValidate: {
-        title: 'Auto validation',
-        description: 'Validate encoding against schema automatically after each edit',
-        type: 'bool',
-        default: true
-      },
-      foldGutter: {
-        title: 'Code folding',
-        description: 'Enable code folding through fold gutters',
-        type: 'bool',
-        default: true
-      },
-      autoCloseBrackets: {
-        title: 'Auto close brackets',
-        description: 'Automatically close brackets at input',
-        type: 'bool',
-        default: true
-      },
-      autoCloseTags: {
-        title: 'Auto close tags',
-        description: 'Automatically close tags at input',
-        type: 'bool',
-        default: true
-      },
-      matchTags: {
-        title: 'Match tags',
-        description: 'Highlights matched tags around editor cursor',
-        type: 'bool',
-        default: true
-      },
-      showTrailingSpace: {
-        title: 'Highlight trailing spaces',
-        description: 'Highlights unnecessary trailing spaces at end of lines',
-        type: 'bool',
-        default: true
-      },
-      keyMap: {
-        title: 'Key map',
-        description: 'Select key map',
-        type: 'select',
-        default: 'default',
-        values: ['default', 'vim', 'emacs']
-      },
-    };
-    let storage = window.localStorage;
-    let cmsp = document.getElementById('editorSettings');
-    let addListeners = false; // add event listeners only the first time
-    if (!/\w/g.test(cmsp.innerHTML)) addListeners = true;
-    cmsp.innerHTML = '<div class="settingsHeader">Editor Settings</div>';
-    Object.keys(optionsToShow).forEach(opt => {
-      let o = optionsToShow[opt];
-      let optDefault = o.default;
-      if (mfDefaults.hasOwnProperty(opt)) {
-        optDefault = mfDefaults[opt]
-        if (opt === 'matchTags' && typeof optDefault === 'object') optDefault = true;
-      };
-      if (window.matchMedia('(prefers-color-scheme: dark)').matches && opt === 'theme') {
-        optDefault = mfDefaults['defaultDarkTheme']; // take a dark scheme for dark mode
-      }
-      if (storage.hasOwnProperty('cm-' + opt)) {
-        if (restoreFromLocalStorage) optDefault = storage['cm-' + opt];
-        else delete storage['cm-' + opt];
-      }
-      let div = this.createOptionsItem(opt, o, optDefault)
-      if (div) cmsp.appendChild(div);
-      this.applyEditorOption(cm, opt, optDefault);
-    });
-    cmsp.innerHTML += '<input type="button" title="Reset to mei-friend defaults" id="cmReset" class="resetButton" value="Default" />';
-
-    if (addListeners) { // add change listeners
-      cmsp.addEventListener('input', ev => {
-        let option = ev.target.id;
-        let value = ev.target.value;
-        if (ev.target.type === 'checkbox') value = ev.target.checked;
-        if (ev.target.type === 'number') value = parseFloat(value);
-        this.applyEditorOption(cm, option, value,
-          storage.hasOwnProperty('cm-matchTheme') ?
-          storage['cm-matchTheme'] : mfDefaults['matchTheme']);
-        if (option === 'theme' && storage.hasOwnProperty('cm-matchTheme')) {
-          this.setNotationColors(
-            storage.hasOwnProperty('cm-matchTheme') ?
-            storage['cm-matchTheme'] : mfDefaults['matchTheme']);
-        }
-        if ((mfDefaults.hasOwnProperty(option) && option !== 'theme' && mfDefaults[option].toString() === value.toString()) ||
-          (option === 'theme' && (window.matchMedia('(prefers-color-scheme: dark)').matches ?
-            mfDefaults.defaultDarkTheme : mfDefaults.defaultBrightTheme) === value.toString())) {
-          delete storage['cm-' + option]; // remove from storage object when default value
-        } else {
-          storage['cm-' + option] = value; // save changes in localStorage object
-        }
-        if (option === 'autoValidate') { // validate if auto validation is switched on again
-          if (value) {
-            validate(cm.getValue(), this.updateLinting, {
-              'forceValidate': true
-            })
-          } else {
-            this.setValidationStatusToManual();
-          }
-        }
-      });
-      cmsp.addEventListener('click', ev => {
-        if (ev.target.id === 'cmReset') {
-          this.addCmOptionsToSettingsPanel(mfDefaults, false);
-        }
-      });
-      window.matchMedia('(prefers-color-scheme: dark)')
-        .addEventListener('change', ev => { // system changes from dark to bright or otherway round
-          if (!storage.hasOwnProperty('cm-theme')) { // only if not changed by user
-            let matchTheme = storage.hasOwnProperty('cm-matchTheme') ? storage['cm-matchTheme'] : mfDefaults['cm-matchTheme'];
-            if (ev.matches) { // event listener for dark/bright mode changes
-              document.getElementById('theme').value = mfDefaults['defaultDarkTheme'];
-              this.applyEditorOption(cm, 'theme', mfDefaults['defaultDarkTheme'], matchTheme);
-            } else {
-              document.getElementById('theme').value = mfDefaults['defaultBrightTheme'];
-              this.applyEditorOption(cm, 'theme', mfDefaults['defaultBrightTheme'], matchTheme);
-            }
-          }
-        });
-    }
-  } // addCmOptionsToSettingsPanel()
 
   addMeiFriendOptionsToSettingsPanel(restoreFromLocalStorage = true) {
     let optionsToShow = {
@@ -1169,8 +913,8 @@ export default class Viewer {
       //   type: 'line'
       // },
       controlMenuSettings: {
-        title: 'Control bar',
-        description: 'Define items to be shown in control menu',
+        title: 'Control menu',
+        description: 'Define items to be shown in control menu above the notation',
         type: 'header'
       },
       controlMenuFontSelector: {
@@ -1224,33 +968,33 @@ export default class Viewer {
         description: 'Use number suffix at endings (e.g., 23-a)',
         type: 'select',
         values: ['none', 'ending@n', 'a/b/c', 'A/B/C', '-a/-b/-c', '-A/-B/-C'],
-        default: false
+        default: 'a/b/c'
       },
       // annotationPanelSeparator: {
       //   title: 'options-line', // class name of hr element
       //   type: 'line'
       // },
       titleSourceImagePanel: {
-        title: 'Source image panel',
-        description: 'Show the score images of the source edition, if available',
+        title: 'Facsimile panel',
+        description: 'Show the facsimile imiages of the source edition, if available',
         type: 'header'
       },
       showSourceImagePanel: {
-        title: 'Show source image panel',
-        description: 'Show the score images of the source edition, if available',
+        title: 'Show facsimile panel',
+        description: 'Show the score images of the source edition provided in the facsimile element',
         type: 'bool',
         default: false
       },
       selectSourceImagePosition: {
-        title: 'Source image position',
-        description: 'Select source image position relative to notation',
+        title: 'Facsimile panel position',
+        description: 'Select facsimile panel position relative to notation',
         type: 'select',
         values: ['left', 'right', 'top', 'bottom'],
         default: 'bottom'
       },
       sourceImageProportion: {
-        title: 'Source image proportion (%)',
-        description: 'Proportion that the source image pane takes from the notation pane (in percent)',
+        title: 'Facsimile panel proportion (%)',
+        description: 'Proportion that the facsimile panel takes from the notation panel (in percent)',
         type: 'int',
         min: 0,
         max: 99,
@@ -1259,13 +1003,13 @@ export default class Viewer {
       },
       showSourceImageFullPage: {
         title: 'Show full page',
-        description: 'Shouw source image on full page',
+        description: 'Show facsimile image on full page',
         type: 'bool',
         default: false
       },
       sourceImageZoom: {
-        title: 'Source image zoom (%)',
-        description: 'Zoom level of source image (in percent)',
+        title: 'Facsimile image zoom (%)',
+        description: 'Zoom level of facsimile image (in percent)',
         type: 'int',
         min: 10,
         max: 300,
@@ -1273,8 +1017,8 @@ export default class Viewer {
         default: 100
       },
       editZones: {
-        title: 'Edit source image zones',
-        description: 'Edit source image zones (will link bounding boxes to facsimile zones)',
+        title: 'Edit facsimile zones',
+        description: 'Edit facsimile zones (will link bounding boxes to facsimile zones)',
         type: 'bool',
         default: false
       },
@@ -1283,7 +1027,7 @@ export default class Viewer {
       //   type: 'line'
       // },
       titleSupplied: {
-        title: 'Handle <supplied> element',
+        title: 'Handle editorial content',
         description: 'Control handling of <supplied> elements',
         type: 'header'
       },
@@ -1294,13 +1038,13 @@ export default class Viewer {
         default: true
       },
       suppliedColor: {
-        title: 'Select highlight color',
+        title: 'Select <supplied> highlight color',
         description: 'Select <supplied> highlight color',
         type: 'color',
         default: '#e69500',
       },
       respSelect: {
-        title: 'Select responsibility',
+        title: 'Select <supplied> responsibility',
         description: 'Select responsibility id',
         type: 'select',
         default: 'none',
@@ -1462,15 +1206,280 @@ export default class Viewer {
       mfs.addEventListener('click', ev => {
         if (ev.target.id === 'mfReset') {
           this.addMeiFriendOptionsToSettingsPanel(false);
+          this.applySettingsFilter();
         }
       });
-      // window.matchMedia('(prefers-color-scheme: dark)')
-      //   .addEventListener('change', ev => { // system changes from dark to bright or otherway round
-      //     rt.style.setProperty('--suppliedHighlightedColor',
-      //       utils.brighter(document.getElementById('suppliedColor').value, ev.matches ? 50 : -50));
-      //   });
     }
   } // addMeiFriendOptionsToSettingsPanel()
+
+
+  addCmOptionsToSettingsPanel(mfDefaults, restoreFromLocalStorage = true) {
+    let optionsToShow = { // key as in CodeMirror
+      titleAppearance: {
+        title: 'Editor appearance',
+        description: 'Controls the appearance of the editor',
+        type: 'header'
+      },
+      zoomFont: {
+        title: 'Font size (%)',
+        description: 'Change font size of editor (in percent)',
+        type: 'int',
+        default: 100,
+        min: 45,
+        max: 300,
+        step: 5
+      },
+      theme: {
+        title: 'Theme',
+        description: 'Select the theme of the editor',
+        type: 'select',
+        default: 'default',
+        values: ['default', 'abbott', 'base16-dark', 'base16-light', 'cobalt',
+          'darcula', 'dracula', 'eclipse', 'elegant', 'monokai', 'idea',
+          'juejin', 'mdn-like', 'neo', 'paraiso-dark', 'paraiso-light',
+          'pastel-on-dark', 'solarized dark', 'solarized light',
+          'xq-dark', 'xq-light', 'yeti', 'yonce', 'zenburn'
+        ]
+      },
+      matchTheme: {
+        title: 'Notation matches theme',
+        description: 'Match notation to editor color theme',
+        type: 'bool',
+        default: false
+      },
+      tabSize: {
+        title: 'Indentation size',
+        description: 'Number of space characters for each indentation level',
+        type: 'int',
+        min: 1,
+        max: 12,
+        step: 1,
+        default: 3
+      },
+      lineWrapping: {
+        title: 'Line wrapping',
+        description: 'Whether or not lines are wrapped at end of panel',
+        type: 'bool',
+        default: false
+      },
+      lineNumbers: {
+        title: 'Line numbers',
+        description: 'Show line numbers',
+        type: 'bool',
+        default: true
+      },
+      firstLineNumber: {
+        title: 'First line number',
+        description: 'Set first line number',
+        type: 'int',
+        min: 0,
+        max: 1,
+        step: 1,
+        default: 1
+      },
+      foldGutter: {
+        title: 'Code folding',
+        description: 'Enable code folding through fold gutters',
+        type: 'bool',
+        default: true
+      },
+      titleEditorOptions: {
+        title: 'Editor behavior',
+        description: 'Controls the behavior of the editor',
+        type: 'header'
+      },
+      autoValidate: {
+        title: 'Auto validation',
+        description: 'Validate encoding against schema automatically after each edit',
+        type: 'bool',
+        default: true
+      },
+      autoCloseBrackets: {
+        title: 'Auto close brackets',
+        description: 'Automatically close brackets at input',
+        type: 'bool',
+        default: true
+      },
+      autoCloseTags: {
+        title: 'Auto close tags',
+        description: 'Automatically close tags at input',
+        type: 'bool',
+        default: true
+      },
+      matchTags: {
+        title: 'Match tags',
+        description: 'Highlights matched tags around editor cursor',
+        type: 'bool',
+        default: true
+      },
+      showTrailingSpace: {
+        title: 'Highlight trailing spaces',
+        description: 'Highlights unnecessary trailing spaces at end of lines',
+        type: 'bool',
+        default: true
+      },
+      keyMap: {
+        title: 'Key map',
+        description: 'Select key map',
+        type: 'select',
+        default: 'default',
+        values: ['default', 'vim', 'emacs']
+      },
+    };
+    let storage = window.localStorage;
+    let cmsp = document.getElementById('editorSettings');
+    let addListeners = false; // add event listeners only the first time
+    if (!/\w/g.test(cmsp.innerHTML)) addListeners = true;
+    cmsp.innerHTML = '<div class="settingsHeader">Editor Settings</div>';
+    Object.keys(optionsToShow).forEach(opt => {
+      let o = optionsToShow[opt];
+      let optDefault = o.default;
+      if (mfDefaults.hasOwnProperty(opt)) {
+        optDefault = mfDefaults[opt]
+        if (opt === 'matchTags' && typeof optDefault === 'object') optDefault = true;
+      };
+      if (window.matchMedia('(prefers-color-scheme: dark)').matches && opt === 'theme') {
+        optDefault = mfDefaults['defaultDarkTheme']; // take a dark scheme for dark mode
+      }
+      if (storage.hasOwnProperty('cm-' + opt)) {
+        if (restoreFromLocalStorage) optDefault = storage['cm-' + opt];
+        else delete storage['cm-' + opt];
+      }
+      let div = this.createOptionsItem(opt, o, optDefault)
+      if (div) cmsp.appendChild(div);
+      this.applyEditorOption(cm, opt, optDefault);
+    });
+    cmsp.innerHTML += '<input type="button" title="Reset to mei-friend defaults" id="cmReset" class="resetButton" value="Default" />';
+
+    if (addListeners) { // add change listeners
+      cmsp.addEventListener('input', ev => {
+        let option = ev.target.id;
+        let value = ev.target.value;
+        if (ev.target.type === 'checkbox') value = ev.target.checked;
+        if (ev.target.type === 'number') value = parseFloat(value);
+        this.applyEditorOption(cm, option, value,
+          storage.hasOwnProperty('cm-matchTheme') ?
+          storage['cm-matchTheme'] : mfDefaults['matchTheme']);
+        if (option === 'theme' && storage.hasOwnProperty('cm-matchTheme')) {
+          this.setNotationColors(
+            storage.hasOwnProperty('cm-matchTheme') ?
+            storage['cm-matchTheme'] : mfDefaults['matchTheme']);
+        }
+        if ((mfDefaults.hasOwnProperty(option) && option !== 'theme' && mfDefaults[option].toString() === value.toString()) ||
+          (option === 'theme' && (window.matchMedia('(prefers-color-scheme: dark)').matches ?
+            mfDefaults.defaultDarkTheme : mfDefaults.defaultBrightTheme) === value.toString())) {
+          delete storage['cm-' + option]; // remove from storage object when default value
+        } else {
+          storage['cm-' + option] = value; // save changes in localStorage object
+        }
+        if (option === 'autoValidate') { // validate if auto validation is switched on again
+          if (value) {
+            validate(cm.getValue(), this.updateLinting, {
+              'forceValidate': true
+            })
+          } else {
+            this.setValidationStatusToManual();
+          }
+        }
+      });
+      // reset CodeMirror options to default
+      cmsp.addEventListener('click', ev => {
+        if (ev.target.id === 'cmReset') {
+          this.addCmOptionsToSettingsPanel(mfDefaults, false);
+          this.applySettingsFilter();
+        }
+      });
+      // automatically switch color scheme, if on default schemes
+      window.matchMedia('(prefers-color-scheme: dark)')
+        .addEventListener('change', ev => { // system changes from dark to bright or otherway round
+          if (!storage.hasOwnProperty('cm-theme')) { // only if not changed by user
+            let matchTheme = storage.hasOwnProperty('cm-matchTheme') ? storage['cm-matchTheme'] : mfDefaults['cm-matchTheme'];
+            if (ev.matches) { // event listener for dark/bright mode changes
+              document.getElementById('theme').value = mfDefaults['defaultDarkTheme'];
+              this.applyEditorOption(cm, 'theme', mfDefaults['defaultDarkTheme'], matchTheme);
+            } else {
+              document.getElementById('theme').value = mfDefaults['defaultBrightTheme'];
+              this.applyEditorOption(cm, 'theme', mfDefaults['defaultBrightTheme'], matchTheme);
+            }
+          }
+        });
+    }
+  } // addCmOptionsToSettingsPanel()
+
+
+  clearVrvOptionsSettingsPanel() {
+    this.vrvOptions = {};
+    document.getElementById('verovioSettings').innerHTML = '';
+  }
+
+  // initializes the settings panel by filling it with content
+  addVrvOptionsToSettingsPanel(tkAvailableOptions, defaultVrvOptions, restoreFromLocalStorage = true) {
+    // skip these options (in part because they are handled in control menu)
+    let skipList = ['breaks', 'engravingDefaults', 'expand',
+      'svgAdditionalAttribute', 'handwrittenFont'
+    ];
+    let vsp = document.getElementById('verovioSettings');
+    let addListeners = false; // add event listeners only the first time
+    if (!/\w/g.test(vsp.innerHTML)) addListeners = true;
+    vsp.innerHTML = '<div class="settingsHeader">Verovio Settings</div>';
+    let storage = window.localStorage;
+
+    Object.keys(tkAvailableOptions.groups).forEach((grp, i) => {
+      let group = tkAvailableOptions.groups[grp];
+      let groupId = group.name.replaceAll(" ", "_");
+      // skip these two groups: base handled by mei-friend; sel to be thought (TODO)
+      if (!group.name.startsWith('Base short') &&
+        !group.name.startsWith('Element selectors')) {
+        let details = document.createElement('details');
+        details.innerHTML += `<summary id="vrv-${groupId}">${group.name}</summary>`;
+        Object.keys(group.options).forEach(opt => {
+          let o = group.options[opt]; // vrv available options
+          let optDefault = o.default; // available options defaults
+          if (defaultVrvOptions.hasOwnProperty(opt)) // mei-friend vrv defaults
+            optDefault = defaultVrvOptions[opt];
+          if (storage.hasOwnProperty(opt)) {
+            if (restoreFromLocalStorage) optDefault = storage[opt];
+            else delete storage[opt];
+          }
+          if (!skipList.includes(opt)) {
+            let div = this.createOptionsItem('vrv-' + opt, o, optDefault);
+            if (div) details.appendChild(div);
+          }
+          // set all options so that toolkit is always completely cleared
+          if (['bool', 'int', 'double', 'std::string-list', 'array'].includes(o.type)) {
+            this.vrvOptions[opt.split('vrv-').pop()] = optDefault;
+          }
+        });
+        if (i === 1) details.setAttribute('open', 'true');
+        vsp.appendChild(details);
+      }
+    });
+
+    vsp.innerHTML += '<input type="button" title="Reset to mei-friend defaults" id="vrvReset" class="resetButton" value="Default" />';
+    if (addListeners) { // add change listeners
+      vsp.addEventListener('input', ev => {
+        let opt = ev.target.id;
+        let value = ev.target.value;
+        if (ev.target.type === 'checkbox') value = ev.target.checked;
+        if (ev.target.type === 'number') value = parseFloat(value);
+        this.vrvOptions[opt.split('vrv-').pop()] = value;
+        if (defaultVrvOptions.hasOwnProperty(opt) && // TODO check vrv default values
+          defaultVrvOptions[opt].toString() === value.toString())
+          delete storage[opt]; // remove from storage object when default value
+        else
+          storage[opt] = value; // save changes in localStorage object
+        if (opt === 'vrv-font') document.getElementById('font-select').value = value;
+        this.updateLayout(this.vrvOptions);
+      });
+      vsp.addEventListener('click', ev => { // RESET button
+        if (ev.target.id === 'vrvReset') {
+          this.addVrvOptionsToSettingsPanel(tkAvailableOptions, defaultVrvOptions, false);
+          this.updateLayout(this.vrvOptions);
+          this.applySettingsFilter();
+        }
+      });
+    }
+  }
 
 
   // add responsibility statement to resp select dropdown
