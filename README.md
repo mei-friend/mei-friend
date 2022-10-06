@@ -12,7 +12,8 @@
 ![mei-friend github workflow](https://github.com/Signature-Sound-Vienna/mei-friend-online/blob/develop/demo/mei-friend-02.gif)
 
 ## Components
-We use [CodeMirror](https://codemirror.net) as our text editor, and [Verovio](https://www.verovio.org) as our music engraving engine. [GitHub](https://github.org) integration is provided using [jsgit](https://github.com/creationix/jsgit), [jsgit-browser](https://github.com/LivelyKernel/js-git-browser), and the [GitHub REST API](https://docs.github.com/en/rest). XML-DOM manipulations are performed using [tXml](https://github.com/TobiasNickel/tXml).
+We use [CodeMirror](https://codemirror.net) as our text editor, and [Verovio](https://www.verovio.org) as our music engraving engine. [GitHub](https://github.org) integration is provided using [jsgit](https://github.com/creationix/jsgit), [jsgit-browser](https://github.com/LivelyKernel/js-git-browser), and the [GitHub REST API](https://docs.github.com/en/rest). XML-DOM manipulations are performed using [tXml](https://github.com/TobiasNickel/tXml). Icons are taken from GitHub's 
+[Octicons repository](https://github.com/primer/octicons)
 
 ## Features
 
