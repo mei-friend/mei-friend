@@ -347,7 +347,7 @@ export function loadDataInEditor(mei, setFreshlyLoaded = true) {
     v.checkSchema(mei);
   }
   clearAnnotations();
-  readAnnots(); // from annotation.js
+  readAnnots(true); // from annotation.js
   setCursorToId(cm, handleURLParamSelect());
 }
 

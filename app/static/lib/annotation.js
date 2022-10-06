@@ -26,25 +26,25 @@ import {
   symLinkFile,
 } from '../css/icons.js';
 import {
-  removeInEditor  
+  removeInEditor
 } from './editor.js';
 
 export let annotations = [];
 
-export function situateAndRefreshAnnotationsList(forceRefresh=false) {
+export function situateAndRefreshAnnotationsList(forceRefresh = false) {
   situateAnnotations();
-  if(forceRefresh || !document.getElementsByClassName('annotationListItem').length)
+  if (forceRefresh || !document.getElementsByClassName('annotationListItem').length)
     refreshAnnotationsList();
 }
 
-export function refreshAnnotationsList() { 
+export function refreshAnnotationsList() {
   const list = document.getElementById("listAnnotations");
   // clear list
   while (list.firstChild) {
     list.removeChild(list.lastChild);
   }
   // console.log("Annotations: ",annotations);
-  
+
   // add web annotation button
   const addWebAnnotation = document.createElement("span");
   const rdfIcon = document.createElement("span");
@@ -55,7 +55,7 @@ export function refreshAnnotationsList() {
   addWebAnnotation.id = "addWebAnnotation";
   addWebAnnotation.addEventListener("click", () => loadWebAnnotation());
   list.appendChild(addWebAnnotation);
-  list.insertAdjacentHTML("beforeend", annotations.length ? "" : "<p>No annotations present.</p>");
+  list.insertAdjacentHTML("beforeend", annotations.length ? "" : "<p>No annotations to display.</p>");
   annotations.forEach((a, aix) => {
     const annoDiv = document.createElement("div");
     annoDiv.classList.add("annotationListItem");
@@ -143,7 +143,7 @@ export function refreshAnnotationsList() {
   });
 }
 
-export function generateAnnotationLocationLabel(a) { 
+export function generateAnnotationLocationLabel(a) {
   const annotationLocationLabel = document.createElement("span");
   if (a.firstPage === 'meiHead') {
     annotationLocationLabel.innerHTML = `MEI&nbsp;head&nbsp;(${a.selection.length}&nbsp;elements)`;
@@ -167,8 +167,14 @@ export function situateAnnotations() {
     a.firstPage = 'unsituated';
     a.lastPage = -1;
     if ('selection' in a) {
-      a.firstPage = v.getPageWithElement(a.selection[0], { id: a.id, type: 'first' });
-      a.lastPage = v.getPageWithElement(a.selection[a.selection.length - 1], { id: a.id, type: 'last' });
+      a.firstPage = v.getPageWithElement(a.selection[0], {
+        id: a.id,
+        type: 'first'
+      });
+      a.lastPage = v.getPageWithElement(a.selection[a.selection.length - 1], {
+        id: a.id,
+        type: 'last'
+      });
       if (a.firstPage < 0 && v.speedMode) {
         if (v.xmlDoc.querySelector('[*|id=' + a.selection[0] + ']').closest('meiHead')) a.firstPage = 'meiHead';
         else console.warn('Cannot locate annotation ', a);
@@ -277,29 +283,31 @@ export function refreshAnnotations(forceListRefresh = false) {
   annoSvg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
   annoSvg.setAttribute("xmlnsXlink", "http://www.w3.org/1999/xlink");
   rac.appendChild(annoSvg);
-  // drawing handlers can draw into renderedAnnotationsSvg if they need to
-  annotations.forEach(a => {
-    if ("type" in a) {
-      switch (a.type) {
-        case 'annotateHighlight':
-          drawHighlight(a);
-          break;
-        case 'annotateCircle':
-          drawCircle(a);
-          break;
-        case 'annotateLink':
-          drawLink(a);
-          break;
-        case 'annotateDescribe':
-          drawDescribe(a);
-          break;
-        default:
-          console.warn("Don't have a drawing function for this type of annotation", a);
+  if (document.getElementById('showAnnotations').checked) {
+    // drawing handlers can draw into renderedAnnotationsSvg if they need to
+    annotations.forEach(a => {
+      if ("type" in a) {
+        switch (a.type) {
+          case 'annotateHighlight':
+            drawHighlight(a);
+            break;
+          case 'annotateCircle':
+            drawCircle(a);
+            break;
+          case 'annotateLink':
+            drawLink(a);
+            break;
+          case 'annotateDescribe':
+            drawDescribe(a);
+            break;
+          default:
+            console.warn("Don't have a drawing function for this type of annotation", a);
+        }
+      } else {
+        console.warn("Skipping annotation without type: ", a);
       }
-    } else {
-      console.warn("Skipping annotation without type: ", a);
-    }
-  });
+    });
+  }
   situateAndRefreshAnnotationsList(forceListRefresh);
 }
 
@@ -362,7 +370,7 @@ export function addAnnotationHandlers() {
   const createLink = (e => {
     // TODO improve UX!
     let url = window.prompt("Please enter a url to link to");
-    if(!url.startsWith("http"))
+    if (!url.startsWith("http"))
       url = "https://" + url;
     const a = {
       "id": "annot-" + generateUUID(),
@@ -379,10 +387,20 @@ export function addAnnotationHandlers() {
 }
 
 // reads <annot> elements from XML DOM and adds them into annotations array
-export function readAnnots() {
+export function readAnnots(flagLimit = false) {
   if (!v.xmlDoc) return;
   let annots = Array.from(v.xmlDoc.querySelectorAll('annot'));
   annots = annots.filter(annot => annotations.findIndex(a => a.id !== annot.getAttribute('xml:id')));
+  let limit = document.getElementById('annotationDisplayLimit');
+  if (limit && annots.length > limit.value) {
+    if (flagLimit) {
+      v.showAlert('Number of annot elements exceeds configurable "Maximum number of annotations" (' +
+        limit.value +
+        '). New annotations can still be generated and will be displayed if "Show annotations" is set.',
+        'warning', -1);
+    }
+    return;
+  }
   annots.forEach(annot => {
     let annotation = {};
     if (annot.textContent) {
@@ -411,12 +429,11 @@ export function readAnnots() {
       annotation.id = "None";
     }
     annotation.isInline = true;
-    if(annotations.findIndex(a => a.id === annotation.id) === -1) {
+    if (annotations.findIndex(a => a.id === annotation.id) === -1) {
       // only if not already included
       // FIXME: will ignore all but the first annotation without xml:id
       annotations.push(annotation);
-    } else { 
-    }
+    } else {}
   });
   refreshAnnotations();
 }
@@ -428,48 +445,48 @@ export function writeAnnot(anchor, xmlId, plist, payload) {
   // i.e., probably the closest permissible level to the anchor element.
   // For now, we only support a limited range of music body elements
   let insertHere;
-	if(anchor.closest("supplied"))
-		insertHere = anchor.closest("supplied")
-	else if(anchor.closest("layer"))
-		insertHere = anchor.closest("layer")
-	else if(anchor.closest("measure"))
-		insertHere = anchor.closest("measure")
-	else if(anchor.closest("section"))
-		insertHere = anchor.closest("section")
-	else if(anchor.closest("score"))
-		insertHere = anchor.closest("score")
-	else {
-		console.error("Sorry, cannot currently write annotations placed outside <score>");
-		return;
-	}
+  if (anchor.closest("supplied"))
+    insertHere = anchor.closest("supplied")
+  else if (anchor.closest("layer"))
+    insertHere = anchor.closest("layer")
+  else if (anchor.closest("measure"))
+    insertHere = anchor.closest("measure")
+  else if (anchor.closest("section"))
+    insertHere = anchor.closest("section")
+  else if (anchor.closest("score"))
+    insertHere = anchor.closest("score")
+  else {
+    console.error("Sorry, cannot currently write annotations placed outside <score>");
+    return;
+  }
   if (insertHere) {
     // trz to add our annotation at beginning of insertHere element's list of children:
     // find first non-text child with an identifier
     const firstChildNode = Array.from(insertHere.childNodes)
       .filter(c => c.nodeType !== Node.TEXT_NODE)
       .filter(c => c.hasAttribute("xml:id"))[0]
-    if(firstChildNode) { 
+    if (firstChildNode) {
       // set cursor based on it
       setCursorToId(cm, firstChildNode.getAttribute("xml:id"))
-    let annot = document.createElementNS(meiNameSpace, 'annot');
-    annot.setAttributeNS(xmlNameSpace, 'id', xmlId);
-    annot.setAttribute('plist', plist.map(p => '#' + p).join(' '));
-    if (payload) {
-      if (typeof payload === 'string') {
-        annot.textContent = payload;
-      } else if (typeof payload === 'object') {
-        annot.appendChild(payload);
+      let annot = document.createElementNS(meiNameSpace, 'annot');
+      annot.setAttributeNS(xmlNameSpace, 'id', xmlId);
+      annot.setAttribute('plist', plist.map(p => '#' + p).join(' '));
+      if (payload) {
+        if (typeof payload === 'string') {
+          annot.textContent = payload;
+        } else if (typeof payload === 'object') {
+          annot.appendChild(payload);
+        }
       }
-    }
       // insert <annot> into the DOM
       insertHere.insertAdjacentElement("afterbegin", annot);
       // now write it into CM
-    let p1 = cm.getCursor();
-    cm.replaceRange(xmlToString(annot) + '\n', p1);
-    let p2 = cm.getCursor();
+      let p1 = cm.getCursor();
+      cm.replaceRange(xmlToString(annot) + '\n', p1);
+      let p2 = cm.getCursor();
       // indent nicely
-    while (p1.line <= p2.line)
-      cm.indentLine(p1.line++, 'smart');
+      while (p1.line <= p2.line)
+        cm.indentLine(p1.line++, 'smart');
       // jump to the written <annot> in CM
       setCursorToId(cm, xmlId)
     } else {
@@ -480,34 +497,34 @@ export function writeAnnot(anchor, xmlId, plist, payload) {
   }
 }
 
-export function deleteAnnot(xmlId) { 
-   const annot = v.xmlDoc.querySelector('[*|id=' + xmlId + ']');
-   if(annot) { 
+export function deleteAnnot(xmlId) {
+  const annot = v.xmlDoc.querySelector('[*|id=' + xmlId + ']');
+  if (annot) {
     removeInEditor(cm, annot);
     annot.remove();
-   } else { 
+  } else {
     console.warn("Failed to delete non-existing annot with xml:id ", xmlId);
-   } 
+  }
 }
 
 export function loadWebAnnotation(prev = "") {
   let msg = "Enter URL of Web Annotation or Web Annotation Container";
   let prevurl = "";
-  if(prev) {  
-    if(prev.status) { 
+  if (prev) {
+    if (prev.status) {
       // response object received
-      msg = `Couldn't load URL provided (${prev.status}: ${prev.statusText}), please try again. ${msg}` 
+      msg = `Couldn't load URL provided (${prev.status}: ${prev.statusText}), please try again. ${msg}`
       prevurl = prev.url;
     } else {
       // no response object received, e.g. due to CORS network error
       // we have been handed the url string instead
-      msg = `Couldn't load URL provided (network error), please try again. ${msg}` 
+      msg = `Couldn't load URL provided (network error), please try again. ${msg}`
       prevurl = prev;
     }
   }
   let urlstr = window.prompt(msg, prevurl);
-  if(urlstr) { 
-    if(!(urlstr.startsWith("http://") || urlstr.startsWith("https://"))) 
+  if (urlstr) {
+    if (!(urlstr.startsWith("http://") || urlstr.startsWith("https://")))
       urlstr = "https://" + urlstr;
     fetchWebAnnotations(urlstr);
   }
@@ -519,67 +536,67 @@ export function fetchWebAnnotations(url, userProvided = true, jumps = 10) {
   const svgs = Array.from(icon.getElementsByTagName("svg"));
   svgs.forEach(t => t.classList.add("clockwise"));
   fetch(url, {
-      headers: {
-        'Accept': 'application/ld+json'
+    headers: {
+      'Accept': 'application/ld+json'
+    }
+  }).then((resp) => {
+    if (resp.status >= 400) {
+      throw Error(resp);
+    } else {
+      return resp.json()
+    }
+  }).then((json) => {
+    console.log("json response: ", json)
+    let resourceDescription;
+    if (Array.isArray(json)) {
+      resourceDescription = json.find(o => o["@id"] === url);
+      if (!resourceDescription && !url.endsWith("/")) {
+        // try again with trailing slash
+        resourceDescription = json.find(o => o["@id"] === url + "/");
       }
-    }).then((resp) => { 
-      if(resp.status >= 400) { 
-        throw Error(resp);
-      } else { 
-        return resp.json()
-      }
-    }).then((json) => {
-      console.log("json response: ", json)
-      let resourceDescription;
-      if (Array.isArray(json)) {
-        resourceDescription = json.find(o => o["@id"] === url);
-        if (!resourceDescription && !url.endsWith("/")) {
-          // try again with trailing slash
-          resourceDescription = json.find(o => o["@id"] === url + "/");
-        }
-      } else {
-        resourceDescription = json;
-      }
-      if (resourceDescription && "@type" in resourceDescription) {
-        console.log("found resource desc: ", resourceDescription)
-        if (resourceDescription["@type"].includes("http://www.w3.org/ns/ldp#Container")) {
-          // found a container, recurse on members
-          if ("http://www.w3.org/ns/ldp#contains" in resourceDescription) {
-            if (jumps >= 0) {
-              return resourceDescription["http://www.w3.org/ns/ldp#contains"].map(resource => {
-                jumps -= 1;
-                fetchWebAnnotations(resource["@id"], false, jumps);
-              });
-            } else {
-              console.warn("Prematurely ending traversal as out of jumps", url);
-            }
+    } else {
+      resourceDescription = json;
+    }
+    if (resourceDescription && "@type" in resourceDescription) {
+      console.log("found resource desc: ", resourceDescription)
+      if (resourceDescription["@type"].includes("http://www.w3.org/ns/ldp#Container")) {
+        // found a container, recurse on members
+        if ("http://www.w3.org/ns/ldp#contains" in resourceDescription) {
+          if (jumps >= 0) {
+            return resourceDescription["http://www.w3.org/ns/ldp#contains"].map(resource => {
+              jumps -= 1;
+              fetchWebAnnotations(resource["@id"], false, jumps);
+            });
           } else {
-            console.warn("Container without content: ", url, resourceDescription);
+            console.warn("Prematurely ending traversal as out of jumps", url);
           }
-        } else if (resourceDescription["@type"].includes("http://www.w3.org/ns/oa#Annotation")) {
-          // found an annotation!
-          console.log("Found annotation!!", resourceDescription);
-          ingestWebAnnotation(resourceDescription);
-          return resourceDescription;
         } else {
-          console.warn("fetchWebAnnotations: Don't know how to handle resource: ", url, resourceDescription);
+          console.warn("Container without content: ", url, resourceDescription);
         }
+      } else if (resourceDescription["@type"].includes("http://www.w3.org/ns/oa#Annotation")) {
+        // found an annotation!
+        console.log("Found annotation!!", resourceDescription);
+        ingestWebAnnotation(resourceDescription);
+        return resourceDescription;
       } else {
-        console.warn("Problem working with the specified resource identifier in requested resource: ", url, json);
+        console.warn("fetchWebAnnotations: Don't know how to handle resource: ", url, resourceDescription);
       }
-    }).catch((resp) => {
-      if(userProvided) { 
-        console.error("Couldn't load web annotation, error response: ", resp);
-        // user-provided url didn't work, so hand control back to user
-        if(resp.url) 
-          loadWebAnnotation(resp)
-        else 
-          loadWebAnnotation(url)
-      }
-    }).finally(() => {
-      // notify that we've stopped loading
-      svgs.forEach(t => t.classList.remove("clockwise"));
-    });
+    } else {
+      console.warn("Problem working with the specified resource identifier in requested resource: ", url, json);
+    }
+  }).catch((resp) => {
+    if (userProvided) {
+      console.error("Couldn't load web annotation, error response: ", resp);
+      // user-provided url didn't work, so hand control back to user
+      if (resp.url)
+        loadWebAnnotation(resp)
+      else
+        loadWebAnnotation(url)
+    }
+  }).finally(() => {
+    // notify that we've stopped loading
+    svgs.forEach(t => t.classList.remove("clockwise"));
+  });
 }
 
 export function ingestWebAnnotation(webAnno) {

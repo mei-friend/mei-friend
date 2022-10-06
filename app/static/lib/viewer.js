@@ -8,7 +8,8 @@ import * as dutils from './dom-utils.js';
 import * as att from './attribute-classes.js';
 import {
   annotations,
-  generateAnnotationLocationLabel
+  generateAnnotationLocationLabel,
+  refreshAnnotations
 } from './annotation.js'
 import {
   cm,
@@ -22,7 +23,8 @@ import {
   supportedVerovioVersions,
   tkVersion,
   validate,
-  validator
+  validator,
+  v
 } from './main.js';
 import {
   drawSourceImage,
@@ -174,7 +176,7 @@ export default class Viewer {
     */
     let pageNumber = -1;
     let that = this;
-    console.log('getPageWithElement(' + xmlId + '), speedMode: ' + this.speedMode);
+    // console.log('getPageWithElement(' + xmlId + '), speedMode: ' + this.speedMode);
     if (this.speedMode) {
       pageNumber = speed.getPageWithElement(this.xmlDoc, this.breaksValue(), xmlId);
     } else {
@@ -218,7 +220,7 @@ export default class Viewer {
         }
       });
     }
-    console.log('pageNumber: ', pageNumber);
+    // console.log('pageNumber: ', pageNumber);
     return pageNumber;
   }
 
@@ -1101,11 +1103,30 @@ export default class Viewer {
         values: Object.keys(supportedVerovioVersions),
         valuesDescriptions: Object.keys(supportedVerovioVersions).map(key => supportedVerovioVersions[key].description)
       },
+      titleAnnotations: {
+        title: 'Annotations',
+        description: 'Annotation settings',
+        type: 'header'
+      },
+      showAnnotations: {
+        title: 'Show annotations',
+        description: 'Show annotations in notation',
+        type: 'bool',
+        default: true
+      },
       showAnnotationPanel: {
         title: 'Show annotation panel',
         description: 'Show annotation panel',
         type: 'bool',
         default: false
+      },
+      annotationDisplayLimit: {
+        title: 'Maximum number of annotations',
+        description: 'Maximum number of annotations to display (large numbers may slow mei-friend)',
+        type: 'int',
+        min: 0,
+        step: 100,
+        default: 100
       },
       dragSelection: {
         title: 'Drag select',
@@ -1381,6 +1402,9 @@ export default class Viewer {
               'msg': value,
               'url': supportedVerovioVersions[value].url
             });
+            break;
+          case 'showAnnotations':
+            v.updateLayout();
             break;
           case 'showAnnotationPanel':
             this.toggleAnnotationPanel();
