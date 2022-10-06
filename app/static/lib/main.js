@@ -1,6 +1,6 @@
 // mei-friend version and date
-const version = '0.6.4';
-const versionDate = '5 Oct 2022';
+const version = '0.6.5';
+const versionDate = '6 Oct 2022';
 
 var vrvWorker;
 var spdWorker;
@@ -460,6 +460,21 @@ async function suspendedValidate(text, updateLinting, options) {
 
 // when initial page content has been loaded
 document.addEventListener('DOMContentLoaded', function () {
+  // link to changelog page according to env settings (develop/staging/production)
+  let changeLogUrl;
+  switch (env) {
+    case 'develop':
+      changeLogUrl = 'https://github.com/Signature-Sound-Vienna/mei-friend-online/blob/develop/CHANGELOG.md';
+      break;
+    case 'staging':
+      changeLogUrl = 'https://github.com/Signature-Sound-Vienna/mei-friend-online/blob/staging/CHANGELOG.md';
+      break;
+    case 'production':
+      changeLogUrl = 'https://github.com/Signature-Sound-Vienna/mei-friend-online/blob/main/CHANGELOG.md';
+  }
+  const showChangeLogLink = document.getElementById('showChangelog');
+  if (showChangeLogLink) showChangeLogLink.setAttribute('href', changeLogUrl);
+
   cm = CodeMirror.fromTextArea(document.getElementById("editor"), defaultCodeMirrorOptions);
   CodeMirror.normalizeKeyMap();
 

@@ -1,7 +1,7 @@
 // global, loads before app
-var environments = {
-  staging: "staging",
+const environments = {
   develop: "develop",
+  staging: "staging",
   production: "production"
 }
 // mei-friend version and date
