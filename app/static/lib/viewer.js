@@ -1571,6 +1571,7 @@ export default class Viewer {
         let line = document.createElement('hr');
         line.classList.add(o.title);
         div.appendChild(line);
+        break;
       default:
         console.log('Creating Verovio Options: Unhandled data type: ' + o.type +
           ', title: ' + o.title + ' [' + o.type + '], default: [' + optDefault + ']');
@@ -1809,7 +1810,7 @@ export default class Viewer {
 
   // Method to check from MEI whether the XML schema filename has changed
   async checkSchema(mei) {
-    console.log('Validation: checking for schema...')
+    // console.log('Validation: checking for schema...')
     let vr = document.getElementById('validation-report');
     if (vr) vr.style.visibility = 'hidden';
     const hasSchema = /<\?xml-model.*schematypens=\"http?:\/\/relaxng\.org\/ns\/structure\/1\.0\"/
@@ -1826,7 +1827,7 @@ export default class Viewer {
             await this.replaceSchema(this.currentSchema);
             return;
           } else {
-            console.log('Validation: same schema.');
+            // console.log('Validation: same schema.');
             return;
           }
         }
@@ -1844,9 +1845,10 @@ export default class Viewer {
       this.currentSchema = schemaMatch[1];
       console.log('Validation: ...new schema ' + this.currentSchema);
       await this.replaceSchema(this.currentSchema);
-    } else {
-      console.log('Validation: same schema.');
     }
+    //else {
+    // console.log('Validation: same schema.');
+    //}
   }
 
   // Loads and replaces XML schema; throws errors if not found/CORS error, 
@@ -1988,17 +1990,15 @@ export default class Viewer {
   }
 
   // Highlight validation results in CodeMirror editor linting system
-  highlightValidation(mei, validation) {
+  highlightValidation(mei, messages) {
     let lines;
     let found = [];
     let i = 0;
-    let messages;
 
     try {
       lines = mei.split("\n");
-      messages = JSON.parse(validation);
     } catch (err) {
-      console.log("Could not parse json:", err);
+      console.log("Could not split MEI json:", err);
       return;
     }
 

@@ -423,12 +423,10 @@ function completeIfInTag(cm) {
 }
 
 export async function validate(mei, updateLinting, options) {
-  // console.debug("validate(): ", options);
   if (options && mei) {
-    // keep the callback
+    // keep the callback (important for first call)
     if (updateLinting && typeof updateLinting === 'function') {
       v.updateLinting = updateLinting;
-      // console.debug("validate(updateLinting): ", updateLinting);
     }
 
     if (v.validatorWithSchema &&
@@ -437,12 +435,18 @@ export async function validate(mei, updateLinting, options) {
       if (reportDiv) reportDiv.style.visibility = 'hidden';
       let vs = document.getElementById('validation-status');
       vs.innerHTML = clock;
-      // vs.querySelector('path').setAttribute('fill', 'darkorange');
-      v.changeStatus(vs, 'wait', ['error', 'ok', 'manual']);
+      v.changeStatus(vs, 'wait', ['error', 'ok', 'manual']); // darkorange
       vs.querySelector('svg').classList.add('clockwise');
       vs.setAttribute('title', 'Validating against ' + v.currentSchema);
-      const validation = await validator.validateNG(mei);
-      console.log('Validation complete: ', validation);
+      const validationString = await validator.validateNG(mei);
+      let validation;
+      try {
+        validation = JSON.parse(validationString);
+      } catch (err) {
+        console.error("Could not parse validation json:", err);
+        return;
+      }
+      console.log('Validation complete: ', (validation === []) ? 'no errors.' : (validation.length + ' errors found.'));
       v.highlightValidation(mei, validation);
     } else if (!document.getElementById('autoValidate').checked) {
       v.setValidationStatusToManual();
