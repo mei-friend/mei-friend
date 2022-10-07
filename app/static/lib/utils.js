@@ -390,7 +390,7 @@ export function sortElementsByScorePosition(arr, includeY = false) {
         continue;
       }
       // swap elements for X
-      if (Xs[i] > Xs[i + 1]) { 
+      if (Xs[i] > Xs[i + 1]) {
         [arr[i], arr[i + 1]] = [arr[i + 1], arr[i]];
         [Xs[i], Xs[i + 1]] = [Xs[i + 1], Xs[i]];
         if (includeY)[Ys[i], Ys[i + 1]] = [Ys[i + 1], Ys[i]];
@@ -440,10 +440,11 @@ export function renumberMeasures(v, cm, startNum = 1, change = false) {
   let endingEnd = -1; // end number of an ending element
   let endingCount = 0;
   let endingN = '';
+  let isFirstMeasure = true;
   // let checkPoint = buffer.createCheckpoint(); TODO
   for (i = 0; i < lgt; i++) {
     let suffix = '';
-    if (measureList[i].closest('incip')) continue;
+    if (measureList[i].closest('incip')) continue; // ignore incipit
     if (!change)
       console.info(i + '/' + lgt + ': measure ', measureList[i]);
     if (measureList[i].hasAttribute('metcon')) {
@@ -451,7 +452,10 @@ export function renumberMeasures(v, cm, startNum = 1, change = false) {
     }
     let contMeas = document.getElementById('renumberMeasureContinueAcrossIncompleteMeasures');
     // 1) first measure with @metcon="false" is upbeat => @n=0
-    if (contMeas && !contMeas.checked && i === 0 && metcon === 'false') n--; // first measure upbeat
+    if (contMeas && !contMeas.checked && isFirstMeasure && metcon === 'false') { // first measure upbeat
+      n--;
+      isFirstMeasure = false;
+    } 
     // 2) treat series of @metcon="false" as one measure
     if (contMeas && !contMeas.checked && metcon === 'false') {
       metcons++;
