@@ -106,6 +106,8 @@ export async function drawSourceImage() {
     let svg = document.getElementById('source-image-svg');
     if (svg) svg.innerHTML = '';
     if (facs[zoneId]) {
+        // find the correct path of the image file
+        let img;
         let imgName = facs[zoneId].target;
         if (!imgName.startsWith('http')) { // relative file paths in surface@target
             if (fileLocationType === 'github') {
@@ -113,6 +115,15 @@ export async function drawSourceImage() {
                     github.branch + '/' + facs[zoneId].target);
                 url.searchParams.append('token', github.githubToken);
                 imgName = url.href;
+                img = await loadImage(imgName);
+                if (!img) { // try to find images in the 'img' folder on github repo
+                    url = new URL('https://raw.githubusercontent.com/' + github.githubRepo + '/' +
+                        github.branch + '/img/' + facs[zoneId].target);
+                    url.searchParams.append('token', github.githubToken);
+                    imgName = url.href;
+                } else {
+                    sourceImages[imgName] = img;
+                }
             } else if (fileLocationType === 'url') {
                 let url = new URL(meiFileLocation);
                 imgName = url.origin + url.pathname.substring(url.pathname.lastIndexOf('/') + 1) + imgName;
@@ -128,7 +139,6 @@ export async function drawSourceImage() {
         }
 
         // load image asynchronously
-        let img;
         if (!sourceImages.hasOwnProperty(imgName)) {
             console.log('Loading image from ' + imgName);
             img = await loadImage(imgName);
@@ -221,8 +231,13 @@ async function loadImage(url) {
         img.setAttribute('id', 'source-image');
         img.setAttributeNS('http://www.w3.org/1999/xlink', 'href', url);
         img.onload = () => resolve(img);
+        img.onerror = (err) => {
+            console.log('Cannot load image file ' + url + ', error: ', err);
+            resolve(null);
+        }
     });
 }
+
 
 export function zoomSourceImage(percent) {
     let sourceImageZoom = document.getElementById('sourceImageZoom');
