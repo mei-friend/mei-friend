@@ -1215,20 +1215,20 @@ export default class Viewer {
         }
       });
       // add event listener for details toggling
-      let storageSuffix = 'mf-';
-      // this.addToggleListener(mfs, 'mf-');
-      mfs.addEventListener('toggle', (ev) => {
-        console.log('ToggleListener: ', ev.target);
-        if (ev.target.hasAttribute('type') && ev.target.getAttribute('type') === 'header') {
-          let option = ev.target.id;
-          let value = ev.target.hasAttribute('open') ? true : false;
-          if (value === optionsToShow[option].default) {
-            delete storage[storageSuffix + option]; // remove from storage object when default value
-          } else {
-            storage[storageSuffix + option] = value; // save changes in localStorage object
-          }
-        }
-      });
+      this.addToggleListener(mfs, 'mf-');
+      // let storageSuffix = 'mf-';
+      // mfs.addEventListener('toggle', (ev) => {
+      //   console.log('ToggleListener: ', ev.target);
+      //   if (ev.target.hasAttribute('type') && ev.target.getAttribute('type') === 'header') {
+      //     let option = ev.target.id;
+      //     let value = ev.target.hasAttribute('open') ? true : false;
+      //     if (value === optionsToShow[option].default) {
+      //       delete storage[storageSuffix + option]; // remove from storage object when default value
+      //     } else {
+      //       storage[storageSuffix + option] = value; // save changes in localStorage object
+      //     }
+      //   }
+      // });
       // add event listener for reset button
       mfs.addEventListener('click', ev => {
         if (ev.target.id === 'mfReset') {
@@ -1424,7 +1424,7 @@ export default class Viewer {
         }
       });
       // add event listener for details toggling
-      // this.addToggleListener(cmsp, 'cm-');
+      this.addToggleListener(cmsp, 'cm-');
       // reset CodeMirror options to default
       cmsp.addEventListener('click', ev => {
         if (ev.target.id === 'cmReset') {
@@ -1515,7 +1515,7 @@ export default class Viewer {
         this.updateLayout(this.vrvOptions);
       });
       // add event listener for details toggling
-      // this.addToggleListener(vsp, 'vrv-');
+      this.addToggleListener(vsp, 'vrv-');
       // add listener for the reset button
       vsp.addEventListener('click', ev => {
         if (ev.target.id === 'vrvReset') {
