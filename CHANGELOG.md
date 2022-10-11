@@ -1,5 +1,7 @@
 # mei-friend-online CHANGELOG.md
 
+### 0.6.6 patch: small fixes and refinements
+* Correctly reset GitHub menu when switching to local file (via menu or drag'n'drop)
 ### 0.6.5 patch: code refinements
 * Show link to changelog to the branch corresponding to `env`
 * Reduce verbosity and fix small glitches
