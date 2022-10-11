@@ -130,9 +130,14 @@ a:active {
 .settingsButton {
   width: 16px;
   height: 16px;
-  padding-right: 16px;
+  padding-left: 6px;
+  padding-right: 6px;
   cursor: pointer;
   fill: var(--textColor);
+}
+
+.rightMargin {
+  margin-right: 6px;
 }
 
 .dragOverlay {

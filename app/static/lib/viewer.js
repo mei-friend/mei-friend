@@ -836,7 +836,8 @@ export default class Viewer {
       titleGeneral: {
         title: 'General',
         description: 'General mei-friend settings',
-        type: 'header'
+        type: 'header',
+        default: true
       },
       selectToolkitVersion: {
         title: 'Verovio version',
@@ -849,7 +850,8 @@ export default class Viewer {
       titleAnnotations: {
         title: 'Annotations',
         description: 'Annotation settings',
-        type: 'header'
+        type: 'header',
+        default: true
       },
       showAnnotations: {
         title: 'Show annotations',
@@ -874,7 +876,8 @@ export default class Viewer {
       dragSelection: {
         title: 'Drag select',
         description: 'Select elements in notation with mouse drag',
-        type: 'header'
+        type: 'header',
+        default: true
       },
       dragSelectNotes: {
         title: 'Select notes',
@@ -915,7 +918,8 @@ export default class Viewer {
       controlMenuSettings: {
         title: 'Control menu',
         description: 'Define items to be shown in control menu above the notation',
-        type: 'header'
+        type: 'header',
+        default: true
       },
       controlMenuFontSelector: {
         title: 'Show notation font selector',
@@ -942,7 +946,8 @@ export default class Viewer {
       renumberMeasuresHeading: {
         title: 'Renumber measures',
         description: 'Settings for renumbering measures',
-        type: 'header'
+        type: 'header',
+        default: true
       },
       renumberMeasureContinueAcrossIncompleteMeasures: {
         title: 'Continue across incomplete measures',
@@ -977,7 +982,9 @@ export default class Viewer {
       titleSourceImagePanel: {
         title: 'Facsimile panel',
         description: 'Show the facsimile imiages of the source edition, if available',
-        type: 'header'
+        type: 'header',
+        open: false,
+        default: false
       },
       showSourceImagePanel: {
         title: 'Show facsimile panel',
@@ -1029,7 +1036,9 @@ export default class Viewer {
       titleSupplied: {
         title: 'Handle editorial content',
         description: 'Control handling of <supplied> elements',
-        type: 'header'
+        type: 'header',
+        open: false,
+        default: false
       },
       showSupplied: {
         title: 'Show <supplied> elements',
@@ -1070,7 +1079,9 @@ export default class Viewer {
           optDefault = storage['mf-' + opt];
           if (typeof optDefault === 'string' && (optDefault === 'true' || optDefault === 'false'))
             optDefault = optDefault === 'true';
-        } else delete storage['mf-' + opt];
+        } else {
+          delete storage['mf-' + opt];
+        }
       }
       // set default values for mei-friend settings
       switch (opt) {
@@ -1203,6 +1214,22 @@ export default class Viewer {
           storage['mf-' + option] = value; // save changes in localStorage object
         }
       });
+      // add event listener for details toggling
+      this.addToggleListener(mfs, 'mf-');
+      // let storageSuffix = 'mf-';
+      // mfs.addEventListener('toggle', (ev) => {
+      //   console.log('ToggleListener: ', ev.target);
+      //   if (ev.target.hasAttribute('type') && ev.target.getAttribute('type') === 'header') {
+      //     let option = ev.target.id;
+      //     let value = ev.target.hasAttribute('open') ? true : false;
+      //     if (value === optionsToShow[option].default) {
+      //       delete storage[storageSuffix + option]; // remove from storage object when default value
+      //     } else {
+      //       storage[storageSuffix + option] = value; // save changes in localStorage object
+      //     }
+      //   }
+      // });
+      // add event listener for reset button
       mfs.addEventListener('click', ev => {
         if (ev.target.id === 'mfReset') {
           this.addMeiFriendOptionsToSettingsPanel(false);
@@ -1212,13 +1239,15 @@ export default class Viewer {
     }
   } // addMeiFriendOptionsToSettingsPanel()
 
-
+  
   addCmOptionsToSettingsPanel(mfDefaults, restoreFromLocalStorage = true) {
     let optionsToShow = { // key as in CodeMirror
       titleAppearance: {
         title: 'Editor appearance',
         description: 'Controls the appearance of the editor',
-        type: 'header'
+        type: 'header',
+        open: true,
+        default: true
       },
       zoomFont: {
         title: 'Font size (%)',
@@ -1286,7 +1315,9 @@ export default class Viewer {
       titleEditorOptions: {
         title: 'Editor behavior',
         description: 'Controls the behavior of the editor',
-        type: 'header'
+        type: 'header',
+        open: true,
+        default: true
       },
       autoValidate: {
         title: 'Auto validation',
@@ -1329,6 +1360,7 @@ export default class Viewer {
     let storage = window.localStorage;
     let cmsp = document.getElementById('editorSettings');
     let addListeners = false; // add event listeners only the first time
+    let currentHeader;
     if (!/\w/g.test(cmsp.innerHTML)) addListeners = true;
     cmsp.innerHTML = '<div class="settingsHeader">Editor Settings</div>';
     Object.keys(optionsToShow).forEach(opt => {
@@ -1346,7 +1378,16 @@ export default class Viewer {
         else delete storage['cm-' + opt];
       }
       let div = this.createOptionsItem(opt, o, optDefault)
-      if (div) cmsp.appendChild(div);
+      if (div) {
+        if (div.classList.contains('optionsSubHeading')) {
+          currentHeader = div;
+          cmsp.appendChild(currentHeader);
+        } else if (currentHeader) {
+          currentHeader.appendChild(div);
+        } else {
+          cmsp.appendChild(div);
+        }
+      }
       this.applyEditorOption(cm, opt, optDefault);
     });
     cmsp.innerHTML += '<input type="button" title="Reset to mei-friend defaults" id="cmReset" class="resetButton" value="Default" />';
@@ -1382,6 +1423,8 @@ export default class Viewer {
           }
         }
       });
+      // add event listener for details toggling
+      this.addToggleListener(cmsp, 'cm-');
       // reset CodeMirror options to default
       cmsp.addEventListener('click', ev => {
         if (ev.target.id === 'cmReset') {
@@ -1471,7 +1514,10 @@ export default class Viewer {
         if (opt === 'vrv-font') document.getElementById('font-select').value = value;
         this.updateLayout(this.vrvOptions);
       });
-      vsp.addEventListener('click', ev => { // RESET button
+      // add event listener for details toggling
+      this.addToggleListener(vsp, 'vrv-');
+      // add listener for the reset button
+      vsp.addEventListener('click', ev => {
         if (ev.target.id === 'vrvReset') {
           this.addVrvOptionsToSettingsPanel(tkAvailableOptions, defaultVrvOptions, false);
           this.updateLayout(this.vrvOptions);
@@ -1481,23 +1527,24 @@ export default class Viewer {
     }
   }
 
-
-  // add responsibility statement to resp select dropdown
-  setRespSelectOptions() {
-    let rs = document.getElementById('respSelect');
-    if (rs) {
-      while (rs.length > 0) rs.options.remove(0);
-      let optEls = this.xmlDoc.querySelectorAll('corpName[*|id],persName[*|id]');
-      optEls.forEach(el => {
-        if (el.closest('respStmt')) { // only if inside a respStmt
-          let id = el.getAttribute('xml:id')
-          rs.add(new Option(id, id));
+  // adds an event listener to the targetNode, to listen to 'header' elements (details/summary)
+  // and storing this information in local storage, using the storageSuffix in the variable name
+  addToggleListener(targetNode, storageSuffix = 'mf-') {
+    targetNode.addEventListener('toggle', (ev) => {
+      console.log('ToggleListener: ', ev.target);
+      if (ev.target.hasAttribute('type') && ev.target.getAttribute('type') === 'header') {
+        let option = ev.target.id;
+        let value = ev.target.hasAttribute('open') ? true : false;
+        if (value === optionsToShow[option].default) {
+          delete storage[storageSuffix + option]; // remove from storage object when default value
+        } else {
+          storage[storageSuffix + option] = value; // save changes in localStorage object
         }
-      });
-    }
+      }
+    });
   }
 
-  // Apply options to CodeMirror object and handle other specialized options
+   // Apply options to CodeMirror object and handle other specialized options
   applyEditorOption(cm, option, value, matchTheme = false) {
     switch (option) {
       case 'zoomFont':
@@ -1527,10 +1574,11 @@ export default class Viewer {
       // create a details>summary structure instead of header
       let details = document.createElement('details');
       details.classList.add('optionsSubHeading');
-      details.open = true;
+      details.open = o.hasOwnProperty('default') ? optDefault : true;
+      details.setAttribute('id', opt);
+      details.setAttribute('type', 'header');
       let summary = document.createElement('summary');
       summary.setAttribute('title', o.description);
-      summary.setAttribute('id', opt);
       summary.innerText = o.title;
       details.appendChild(summary);
       return details;
@@ -1611,6 +1659,22 @@ export default class Viewer {
     if (input) div.appendChild(input);
     return (input || o.type === 'header' || o.type === 'line') ? div : null;
   }
+
+   // add responsibility statement to resp select dropdown
+   setRespSelectOptions() {
+    let rs = document.getElementById('respSelect');
+    if (rs) {
+      while (rs.length > 0) rs.options.remove(0);
+      let optEls = this.xmlDoc.querySelectorAll('corpName[*|id],persName[*|id]');
+      optEls.forEach(el => {
+        if (el.closest('respStmt')) { // only if inside a respStmt
+          let id = el.getAttribute('xml:id')
+          rs.add(new Option(id, id));
+        }
+      });
+    }
+  }
+
 
   // navigate forwards/backwards/upwards/downwards in the DOM, as defined
   // by 'dir' an by 'incrementElementName'

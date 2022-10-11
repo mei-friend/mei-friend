@@ -189,6 +189,8 @@ function loadFile(fileName, ev = null) {
     setFileChangedState(false);
     updateGithubInLocalStorage();
     fillInCommitLog("withRefresh");
+    const fnStatus = document.getElementById("fileName");
+    if (fnStatus) fnStatus.removeAttribute("contenteditable");
   }).catch((err) => {
     console.error("Couldn't read Github repo to fill in branch contents:", err);
     githubLoadingIndicator.classList.remove("clockwise");
