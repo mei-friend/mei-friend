@@ -322,7 +322,12 @@ export function updateFileStatusDisplay() {
     meiFileName.substring(meiFileName.lastIndexOf("/") + 1);
   document.querySelector("#fileLocation").innerText = meiFileLocationPrintable || "";
   document.querySelector("#fileLocation").title = meiFileLocation || "";
+  if(fileLocationType === "file") 
+    document.querySelector("#fileName").setAttribute("contenteditable", "")
+  else 
+    document.querySelector("#fileName").removeAttribute("contenteditable", "");
 }
+
 
 export function loadDataInEditor(mei, setFreshlyLoaded = true) {
   if (storage && storage.supported) {
@@ -591,6 +596,7 @@ document.addEventListener('DOMContentLoaded', function () {
         meiFileName = storage.fileName;
         meiFileLocation = storage.fileLocation;
         meiFileLocationPrintable = storage.fileLocationPrintable;
+        fileLocationType = storage.fileLocationType;
         updateFileStatusDisplay();
         // on initial page load, CM doesn't fire a "changes" event
         // so we don't need to skip the "freshly loaded" change
@@ -646,7 +652,6 @@ document.addEventListener('DOMContentLoaded', function () {
     meiFileLocationPrintable = "";
     openFile(undefined, false, false); // default MEI
   }
-  if (storage.fileLocationType) fileLocationType = storage.fileLocationType;
   if (isLoggedIn) {
     // regardless of storage availability:
     // if we are logged in, refresh github menu
@@ -741,6 +746,8 @@ export async function openUrlFetch(url = '', updateAfterLoading = true) {
         }
         fileLocationType = "url";
         openUrlCancel(); //hide open URL UI elements
+        const fnStatus = document.getElementById("fileName");
+        if (fnStatus) fnStatus.removeAttribute("contenteditable");
       });
     }
   } catch (err) {
@@ -1167,6 +1174,15 @@ function consultGuidelines() {
 
 // object of interface command functions for buttons and key bindings
 let cmd = {
+  'fileNameChange': () => {
+    if(fileLocationType === 'file') {
+      meiFileName = document.getElementById("fileName").innerText;
+      if (storage.supported && !storage.override)
+        storage.safelySetStorageItem('meiFileName', meiFileName);
+    }
+    else 
+      console.warn("Attempted to change file name on non-local file")
+  },
   'firstPage': () => v.updatePage(cm, 'first'),
   'previousPage': () => v.updatePage(cm, 'backwards'),
   'nextPage': () => v.updatePage(cm, 'forwards'),
@@ -1335,6 +1351,9 @@ function addEventListeners(v, cm) {
       cmd.validate();
     }
   });
+
+  // file status file name display
+  document.getElementById('fileName').addEventListener('input', cmd.fileNameChange);
 
   // layout notation position
   document.getElementById('top').addEventListener('click', cmd.notationTop);

@@ -244,6 +244,7 @@
   display: flex;
   align-content: center;
   gap: 0.2em;
+  cursor:default;
 }
 
 .fileStatus #schemaStatus {
@@ -254,7 +255,6 @@
   border-style: solid;
   border-radius: 4px;
   padding: 2px;
-  cursor: default;
 }
 
 .fileStatus #fileName {
@@ -292,6 +292,13 @@
   padding: 3px 12px;
   display: block;
   text-align: left;
+}
+
+#fileName[contenteditable] { 
+  text-decoration: var(--textColor) dotted underline;
+  background: var(--dropdownHeadingColor);
+  padding: 2px 2px;
+  cursor: text;
 }
 
 #commitFileName {
