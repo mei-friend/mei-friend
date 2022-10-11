@@ -946,6 +946,15 @@ let inputFormats = {
 
 export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true,
   updateAfterLoading = true) {
+  if (storage.github && isLoggedIn) {
+    // re-initialise github menu since we're now working from a file 
+    github.filepath = "";
+    github.branch = "";
+    if (storage.supported) {
+      updateGithubInLocalStorage();
+    }
+    refreshGithubMenu();
+  }
   if (pageParam === null) storage.removeItem('page');
   // remove any URL parameters, because we open a file locally or through github
   window.history.replaceState(null, null, window.location.pathname);
