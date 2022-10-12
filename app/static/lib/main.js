@@ -1,6 +1,6 @@
 // mei-friend version and date
 const version = '0.6.6';
-const versionDate = '11 Oct 2022';
+const versionDate = '12 Oct 2022';
 
 var vrvWorker;
 var spdWorker;
@@ -1354,6 +1354,11 @@ function addEventListeners(v, cm) {
 
   // file status file name display
   document.getElementById('fileName').addEventListener('input', cmd.fileNameChange);
+  document.getElementById('fileName').addEventListener('keydown', ev => {
+    if(ev.key === "Escape" || ev.key === "Enter") 
+      ev.target.blur(); //remove focus
+    }
+  );
 
   // layout notation position
   document.getElementById('top').addEventListener('click', cmd.notationTop);
