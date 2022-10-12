@@ -1,8 +1,5 @@
 import * as e from './editor.js';
 import * as dutils from './dom-utils.js';
-import {
-  refreshAnnotationsList
-} from './annotation.js';
 
 const xmlIdString = /(?:xml:id=)(?:['"])(\S+?)(?:['"])/;
 const numberLikeString = /(?:n=)(?:['"])(\d+?)(?:['"])/;
@@ -27,7 +24,7 @@ export function findKey(key, obj) {
 // checks whether note noteId is inside a chord. Returns false or the chord id.
 export function insideParent(noteId, what = 'chord') {
   if (noteId) {
-    let note = document.querySelector('g#' + noteId);
+    let note = document.querySelector('g#' + escapeXmlId(noteId));
     let chord;
     if (note) chord = note.closest('.' + what);
     if (chord) return chord.getAttribute('id');
@@ -39,7 +36,7 @@ export function insideParent(noteId, what = 'chord') {
 export function findNotes(elId) {
   let idArray = [];
   if (elId) {
-    let notes = document.querySelector('g#' + elId).querySelectorAll('.note');
+    let notes = document.querySelector('g#' + escapeXmlId(elId)).querySelectorAll('.note');
     for (let note of notes) {
       let noteId = note.getAttribute('id');
       let chordId = insideParent(noteId);
@@ -375,7 +372,7 @@ export function sortElementsByScorePosition(arr, includeY = false) {
   let Xs = []; // create array of x values of the ids in arr
   let Ys = []; // create array of y values of the ids in arr
   arr.forEach(item => {
-    let el = document.querySelector('g#' + item);
+    let el = document.querySelector('g#' + escapeXmlId(item));
     Xs.push(dutils.getX(el));
     if (includeY) Ys.push(dutils.getY(el));
   });
@@ -455,7 +452,7 @@ export function renumberMeasures(v, cm, startNum = 1, change = false) {
     if (contMeas && !contMeas.checked && isFirstMeasure && metcon === 'false') { // first measure upbeat
       n--;
       isFirstMeasure = false;
-    } 
+    }
     // 2) treat series of @metcon="false" as one measure
     if (contMeas && !contMeas.checked && metcon === 'false') {
       metcons++;
@@ -630,4 +627,10 @@ export function convertCoords(elem) {
 export function rmHash(hashedString) {
   return (hashedString.startsWith('#')) ?
     hashedString.split('#')[1] : hashedString;
+}
+
+// escape special characters '.' and ':' for usagage in queryselectors 
+export function escapeXmlId(str) {
+  if (str == null) return '';
+  return str.replace(/\./g, '\\.').replace(/\:/g, '\\:');
 }

@@ -512,7 +512,7 @@ export default class Viewer {
     if (id) {
       this.selectedElements.push(id);
       let fl = document.getElementById('flip-checkbox');
-      if (!document.querySelector('g#' + id) && // when not on current page
+      if (!document.querySelector('g#' + utils.escapeXmlId(id)) && // when not on current page
         ((this.updateNotation && fl && fl.checked) || forceFlip)) {
         this.updatePage(cm, '', id, false);
       } else if (this.updateNotation) { // on current page
@@ -525,7 +525,9 @@ export default class Viewer {
   // Scroll notation SVG into view, both vertically and horizontally
   scrollSvg(cm) {
     let vp = document.getElementById('verovio-panel');
-    let el = document.querySelector('g#' + utils.getElementIdAtCursor(cm));
+    let id = utils.getElementIdAtCursor(cm);
+    if (!id) return;
+    let el = document.querySelector('g#' + utils.escapeXmlId(id));
     if (el) {
       let vpRect = vp.getBoundingClientRect();
       let elRect = el.getBBox();
@@ -569,7 +571,7 @@ export default class Viewer {
     // console.info('updateHlt ids: ', ids);
     for (let id of ids) {
       if (id) {
-        let el = document.querySelectorAll('#' + id); // was: 'g#'+id
+        let el = document.querySelectorAll('#' + utils.escapeXmlId(id)); // was: 'g#'+id
         // console.info('updateHlt el: ', el);
         if (el) {
           el.forEach(e => {
@@ -1215,7 +1217,7 @@ export default class Viewer {
         }
       });
       // add event listener for details toggling
-      this.addToggleListener(mfs, 'mf-');
+      // this.addToggleListener(mfs, 'mf-');
       // let storageSuffix = 'mf-';
       // mfs.addEventListener('toggle', (ev) => {
       //   console.log('ToggleListener: ', ev.target);
@@ -1239,7 +1241,7 @@ export default class Viewer {
     }
   } // addMeiFriendOptionsToSettingsPanel()
 
-  
+
   addCmOptionsToSettingsPanel(mfDefaults, restoreFromLocalStorage = true) {
     let optionsToShow = { // key as in CodeMirror
       titleAppearance: {
@@ -1424,7 +1426,7 @@ export default class Viewer {
         }
       });
       // add event listener for details toggling
-      this.addToggleListener(cmsp, 'cm-');
+      // this.addToggleListener(cmsp, optionsToShow, 'cm-');
       // reset CodeMirror options to default
       cmsp.addEventListener('click', ev => {
         if (ev.target.id === 'cmReset') {
@@ -1515,7 +1517,7 @@ export default class Viewer {
         this.updateLayout(this.vrvOptions);
       });
       // add event listener for details toggling
-      this.addToggleListener(vsp, 'vrv-');
+      // this.addToggleListener(vsp, 'vrv-');
       // add listener for the reset button
       vsp.addEventListener('click', ev => {
         if (ev.target.id === 'vrvReset') {
@@ -1527,9 +1529,10 @@ export default class Viewer {
     }
   }
 
+  // TODO: does not get called for unknown reasons (WG., 12 Okt 2022)
   // adds an event listener to the targetNode, to listen to 'header' elements (details/summary)
   // and storing this information in local storage, using the storageSuffix in the variable name
-  addToggleListener(targetNode, storageSuffix = 'mf-') {
+  addToggleListener(targetNode, optionsToShow, storageSuffix = 'mf-') {
     targetNode.addEventListener('toggle', (ev) => {
       console.log('ToggleListener: ', ev.target);
       if (ev.target.hasAttribute('type') && ev.target.getAttribute('type') === 'header') {
@@ -1544,7 +1547,7 @@ export default class Viewer {
     });
   }
 
-   // Apply options to CodeMirror object and handle other specialized options
+  // Apply options to CodeMirror object and handle other specialized options
   applyEditorOption(cm, option, value, matchTheme = false) {
     switch (option) {
       case 'zoomFont':
@@ -1660,8 +1663,8 @@ export default class Viewer {
     return (input || o.type === 'header' || o.type === 'line') ? div : null;
   }
 
-   // add responsibility statement to resp select dropdown
-   setRespSelectOptions() {
+  // add responsibility statement to resp select dropdown
+  setRespSelectOptions() {
     let rs = document.getElementById('respSelect');
     if (rs) {
       while (rs.length > 0) rs.options.remove(0);
@@ -1686,11 +1689,11 @@ export default class Viewer {
       id = this.setCursorToPageBeginning(cm); // re-defines lastNotId
       if (id === '') return;
     };
-    let element = document.querySelector('g#' + id);
+    let element = document.querySelector('g#' + utils.escapeXmlId(id));
     if (!element) { // element off-screen
       this.setCursorToPageBeginning(cm); // re-defines lastNotId
       id = this.lastNoteId;
-      element = document.querySelector('g#' + id);
+      element = document.querySelector('g#' + utils.escapeXmlId(id));
     }
     console.info('Navigate ' + dir + ' ' + incElName + '-wise for: ', element);
     let x = dutils.getX(element);
@@ -1807,7 +1810,7 @@ export default class Viewer {
 
   findClosestNoteInChord(id, y) {
     if (id) { // if id within chord, find y-closest note to previous
-      let ch = document.querySelector('g#' + id).closest('.chord');
+      let ch = document.querySelector('g#' + utils.escapeXmlId(id)).closest('.chord');
       if (ch) {
         // console.info('back/forwards within a chord (y: ' + y + '), ', ch);
         let diff = Number.MAX_VALUE;
