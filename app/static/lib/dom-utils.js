@@ -7,6 +7,9 @@ export const navElsArray = [
 ];
 export const navElsSelector = '.' + navElsArray.join(',.');
 
+import {
+  escapeXmlId
+} from "./utils.js";
 
 // scans through SVG starting from element to find next element elementName
 // (e.g. 'note'), within same staff and layer
@@ -33,7 +36,7 @@ export function getIdOfNextSvgElement(currEl, dir = 'forwards',
     let firstId = getFirstInMeasure(measure, navElsSelector, stN, lyN);
     let currId = currEl.getAttribute('id');
     if (currChord) currId = currChordId;
-    let firstChord = document.querySelector('g#' + firstId).closest('.chord');
+    let firstChord = document.querySelector('g#' + escapeXmlId(firstId)).closest('.chord');
     if (firstChord) firstId = firstChord.getAttribute('id');
     if (currId === firstId) {
       let id = getIdInNextMeasure(currEl, dir.substring(0, 4), stN, lyN);
@@ -182,7 +185,7 @@ export function median(numbers) {
 // returns true when element is the first in SVG page in same staff & layer
 export function isFirstElementOnPage(id) {
   if (!id) return true;
-  let element = document.querySelector('g#' + id);
+  let element = document.querySelector('g#' + escapeXmlId(id));
   if (!element) return true;
   let measure = element.closest('.measure');
   let stN = element.closest('.staff').getAttribute('data-n');
