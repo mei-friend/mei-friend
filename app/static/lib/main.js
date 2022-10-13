@@ -322,9 +322,9 @@ export function updateFileStatusDisplay() {
     meiFileName.substring(meiFileName.lastIndexOf("/") + 1);
   document.querySelector("#fileLocation").innerText = meiFileLocationPrintable || "";
   document.querySelector("#fileLocation").title = meiFileLocation || "";
-  if(fileLocationType === "file") 
+  if (fileLocationType === "file")
     document.querySelector("#fileName").setAttribute("contenteditable", "")
-  else 
+  else
     document.querySelector("#fileName").removeAttribute("contenteditable", "");
 }
 
@@ -846,8 +846,7 @@ async function vrvWorkerEventsHandler(ev) {
       if (v.currentPage === ev.data.pageNo || ev.data.forceUpdate || ev.data.computePageBreaks) {
         if (ev.data.forceUpdate) v.currentPage = ev.data.pageNo;
         updateStatusBar();
-        document.querySelector('head > title').innerHTML = 'mei-friend: ' +
-          meiFileName.substring(meiFileName.lastIndexOf("/") + 1);
+        updateHtmlTitle();
         document.getElementById('verovio-panel').innerHTML = ev.data.svg;
         if (document.getElementById('showSourceImagePanel') &&
           document.getElementById('showSourceImagePanel').checked) await drawSourceImage();
@@ -1175,13 +1174,15 @@ function consultGuidelines() {
 // object of interface command functions for buttons and key bindings
 let cmd = {
   'fileNameChange': () => {
-    if(fileLocationType === 'file') {
+    if (fileLocationType === 'file') {
       meiFileName = document.getElementById("fileName").innerText;
+      updateStatusBar();
+      updateHtmlTitle();
       if (storage.supported && !storage.override)
         storage.safelySetStorageItem('meiFileName', meiFileName);
+    } else {
+      console.warn("Attempted to change file name on non-local file");
     }
-    else 
-      console.warn("Attempted to change file name on non-local file")
   },
   'firstPage': () => v.updatePage(cm, 'first'),
   'previousPage': () => v.updatePage(cm, 'backwards'),
@@ -1355,10 +1356,9 @@ function addEventListeners(v, cm) {
   // file status file name display
   document.getElementById('fileName').addEventListener('input', cmd.fileNameChange);
   document.getElementById('fileName').addEventListener('keydown', ev => {
-    if(ev.key === "Escape" || ev.key === "Enter") 
+    if (ev.key === "Escape" || ev.key === "Enter")
       ev.target.blur(); //remove focus
-    }
-  );
+  });
 
   // layout notation position
   document.getElementById('top').addEventListener('click', cmd.notationTop);
@@ -1669,6 +1669,11 @@ function updateStatusBar() {
     meiFileName.substring(meiFileName.lastIndexOf("/") + 1) +
     ", page " + v.currentPage + " of " +
     ((v.pageCount < 0) ? '?' : v.pageCount) + " loaded.";
+}
+
+function updateHtmlTitle() {
+  document.querySelector('head > title').innerHTML = 'mei-friend: ' +
+    meiFileName.substring(meiFileName.lastIndexOf("/") + 1);
 }
 
 function drawRightFooter() {
