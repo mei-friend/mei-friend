@@ -243,6 +243,7 @@
   white-space: nowrap;
   display: flex;
   align-content: center;
+  align-items: center;
   gap: 0.2em;
   cursor:default;
 }
@@ -255,6 +256,7 @@
   border-style: solid;
   border-radius: 4px;
   padding: 2px;
+  max-height: calc(1em + 2px);
 }
 
 .fileStatus #fileName {
@@ -298,6 +300,7 @@
   padding: 2px 2px;
   border-width: 1px;
   border-style: dotted; 
+  border-radius: 4px;
   cursor: text;
 }
 

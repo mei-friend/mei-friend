@@ -846,7 +846,7 @@ async function vrvWorkerEventsHandler(ev) {
       if (v.currentPage === ev.data.pageNo || ev.data.forceUpdate || ev.data.computePageBreaks) {
         if (ev.data.forceUpdate) v.currentPage = ev.data.pageNo;
         updateStatusBar();
-        document.querySelector('title').innerHTML = 'mei-friend: ' +
+        document.querySelector('head > title').innerHTML = 'mei-friend: ' +
           meiFileName.substring(meiFileName.lastIndexOf("/") + 1);
         document.getElementById('verovio-panel').innerHTML = ev.data.svg;
         if (document.getElementById('showSourceImagePanel') &&

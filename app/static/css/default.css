@@ -587,6 +587,7 @@ a:active {
   margin-right: 3px;
   margin-left: 3px;
   display: flex;
+  align-items: center;
   line-height: 1.5em;
   padding: 0 2px;
   min-height: 21px;
@@ -598,6 +599,11 @@ a:active {
   cursor: text;
   border-style: dotted;
   border-width: 1px;
+  border-radius: 4px;
+}
+
+#pagination2:empty {
+  display: none;
 }
 
 .inline-block-tight {
