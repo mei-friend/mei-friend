@@ -295,9 +295,9 @@
 }
 
 #fileName[contenteditable] { 
-  text-decoration: var(--textColor) dotted underline;
-  background: var(--dropdownHeadingColor);
   padding: 2px 2px;
+  border-width: 1px;
+  border-style: dotted; 
   cursor: text;
 }
 

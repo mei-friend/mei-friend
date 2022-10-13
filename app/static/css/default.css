@@ -596,6 +596,8 @@ a:active {
 
 #pagination2 {
   cursor: text;
+  border-style: dotted;
+  border-width: 1px;
 }
 
 .inline-block-tight {
