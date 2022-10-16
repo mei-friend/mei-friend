@@ -1639,6 +1639,8 @@ function addEventListeners(v, cm) {
       v.pageCount = Object.keys(v.pageBreaks).length;
     // else
     //   v.pageBreaks = {};
+    let sm = document.getElementById('toggleSpeedMode');
+    if (sm) sm.checked = v.speedMode;
     v.updateAll(cm, {}, v.selectedElements[0]);
   });
 

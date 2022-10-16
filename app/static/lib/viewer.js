@@ -843,11 +843,22 @@ export default class Viewer {
       },
       selectToolkitVersion: {
         title: 'Verovio version',
-        description: 'Select Verovio toolkit version (* Switching to older versions before 3.11.0 might require a refresh due to memory issues.)',
+        description: `Select Verovio toolkit version 
+                      (* Switching to older versions before 3.11.0
+                      might require a refresh due to memory issues.)`,
         type: 'select',
         default: defaultVerovioVersion,
         values: Object.keys(supportedVerovioVersions),
         valuesDescriptions: Object.keys(supportedVerovioVersions).map(key => supportedVerovioVersions[key].description)
+      },
+      toggleSpeedMode: {
+        title: 'Speed Mode',
+        description: `Toggle Verovio Speed Mode. 
+                      In Speedmode, only the current page
+                      is sent to Verovio to reduce rendering
+                      time with large files`,
+        type: 'bool',
+        default: true
       },
       titleAnnotations: {
         title: 'Annotations',
@@ -1095,6 +1106,8 @@ export default class Viewer {
               supportedVerovioVersions[optDefault].url : supportedVerovioVersions[o.default].url
           });
           break;
+        case 'toggleSpeedMode':
+          break;
         case 'showSupplied':
           rt.style.setProperty('--suppliedColor', (optDefault) ? 'var(--defaultSuppliedColor)' : 'var(--notationColor)')
           rt.style.setProperty('--suppliedHighlightedColor', (optDefault) ? 'var(--defaultSuppliedHighlightedColor)' : 'var(--highlightColor)')
@@ -1158,6 +1171,13 @@ export default class Viewer {
               'msg': value,
               'url': supportedVerovioVersions[value].url
             });
+            break;
+          case 'toggleSpeedMode':
+            let sb = document.getElementById('speed-checkbox');
+            if (sb) {
+              sb.checked = value;
+              sb.dispatchEvent(new Event('change'));
+            }
             break;
           case 'showAnnotations':
             v.updateLayout();
