@@ -78,7 +78,7 @@ export function loadFacsimile(xmlDoc) {
 
 
 // Draw the source image with bounding boxes for each zone
-export async function drawSourceImage() {
+export async function drawFacsimile() {
     let fullPage = document.getElementById('showFacsimileFullPage').checked;
     ulx = Number.MAX_VALUE; // boundary values for image envelope
     uly = Number.MAX_VALUE;
@@ -239,7 +239,7 @@ async function loadImage(url) {
 }
 
 
-export function zoomSourceImage(deltaPercent) {
+export function zoomFacsimile(deltaPercent) {
     let facsimileZoomInput = document.getElementById('facsimileZoomInput');
     let facsZoom = document.getElementById('facsimile-zoom');
     if (facsimileZoomInput && deltaPercent) {

@@ -26,10 +26,10 @@ import {
   setOrientation
 } from './resizer.js'
 import {
-  drawSourceImage,
+  drawFacsimile,
   highlightZone,
-  zoomSourceImage
-} from './source-imager.js';
+  zoomFacsimile
+} from './facsimile.js';
 import {
   alert,
   download,
@@ -1194,10 +1194,10 @@ export default class Viewer {
             break;
           case 'showFacsimileFullPage':
             document.getElementById('facsimile-full-page-checkbox').checked = value;
-            drawSourceImage();
+            drawFacsimile();
             break;
           case 'facsimileZoomInput':
-            zoomSourceImage();
+            zoomFacsimile();
             let facsZoom = document.getElementById('facsimile-zoom');
             if (facsZoom) facsZoom.value = value;
             break;

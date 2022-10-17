@@ -5,7 +5,7 @@ import * as dutils from './dom-utils.js';
 import * as att from './attribute-classes.js';
 import {
   loadFacsimile
-} from './source-imager.js';
+} from './facsimile.js';
 
 // delete selected elements
 export function deleteElement(v, cm) {

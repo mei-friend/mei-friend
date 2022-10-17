@@ -185,9 +185,9 @@ import {
   addZoneDrawer,
   ingestFacsimile,
   loadFacsimile,
-  drawSourceImage,
-  zoomSourceImage,
-} from './source-imager.js';
+  drawFacsimile,
+  zoomFacsimile,
+} from './facsimile.js';
 import {
   WorkerProxy
 } from './worker-proxy.js';
@@ -851,7 +851,7 @@ async function vrvWorkerEventsHandler(ev) {
         updateHtmlTitle();
         document.getElementById('verovio-panel').innerHTML = ev.data.svg;
         if (document.getElementById('showFacsimilePanel') &&
-          document.getElementById('showFacsimilePanel').checked) await drawSourceImage();
+          document.getElementById('showFacsimilePanel').checked) await drawFacsimile();
         if (ev.data.setCursorToPageBeginning) v.setCursorToPageBeginning(cm);
         v.updatePageNumDisplay();
         v.addNotationEventListeners(cm);
@@ -1245,14 +1245,14 @@ let cmd = {
     if (zoomCtrl && storage && storage.supported) storage.scale = zoomCtrl.value;
     v.updateLayout()
   },
-  'facsZoomIn': () => zoomSourceImage(+5),
-  'facsZoomOut': () => zoomSourceImage(-5),
+  'facsZoomIn': () => zoomFacsimile(+5),
+  'facsZoomOut': () => zoomFacsimile(-5),
   'facsZoomSlider': () => {
     let facsZoom = document.getElementById('facsimile-zoom');
     let facsZoomInput = document.getElementById('facsimileZoomInput');
     if (facsZoom && facsZoomInput) {
       facsZoomInput.value = facsZoom.value;
-      zoomSourceImage();
+      zoomFacsimile();
     }
   },
   // add control elements
@@ -1467,7 +1467,7 @@ function addEventListeners(v, cm) {
     if (isCtrlOrCmd(ev)) {
       ev.preventDefault();
       ev.stopPropagation();
-      zoomSourceImage(Math.sign(ev.deltaY) * -5); // scrolling towards user = increase
+      zoomFacsimile(Math.sign(ev.deltaY) * -5); // scrolling towards user = increase
       document.getElementById('facsimile-zoom').value = document.getElementById('facsimileZoomInput').value;
     }
   });
@@ -1475,7 +1475,7 @@ function addEventListeners(v, cm) {
   // facsimile full-page
   document.getElementById('facsimile-full-page-checkbox').addEventListener('click', e => {
     document.getElementById('showFacsimileFullPage').checked = e.target.checked;
-    drawSourceImage();
+    drawFacsimile();
   });
 
   // facsimile edit zones
