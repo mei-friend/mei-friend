@@ -10,7 +10,7 @@ export function setOrientation(cm, o = '', vo = '', v = null, storage = null) {
   if (o) orientation = o;
   if (vo) {
     facsimileOrientation = vo;
-    document.getElementById('selectSourceImagePosition').value = facsimileOrientation;
+    document.getElementById('selectFacsimilePanelOrientation').value = facsimileOrientation;
   }
   if (storage && storage.supported) {
     storage.orientation = orientation;
@@ -65,7 +65,7 @@ export function setOrientation(cm, o = '', vo = '', v = null, storage = null) {
   friendSz.style.height = sz.height;
 
   // TODO: put out of settings menu
-  facsimileOrientation = document.getElementById('selectSourceImagePosition').value;
+  facsimileOrientation = document.getElementById('selectFacsimilePanelOrientation').value;
 
   let facsCss = document.getElementById("facsimileOrientationCSS");
   facsCss.setAttribute('href', root + 'css/facsimile-' + facsimileOrientation + '.css');

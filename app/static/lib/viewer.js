@@ -992,7 +992,7 @@ export default class Viewer {
       //   title: 'options-line', // class name of hr element
       //   type: 'line'
       // },
-      titleSourcefacsimilePanel: {
+      titleFacsimilePanel: {
         title: 'Facsimile panel',
         description: 'Show the facsimile imiages of the source edition, if available',
         type: 'header',
@@ -1006,20 +1006,14 @@ export default class Viewer {
         default: false
       },
       // deleteme
-      selectSourceImagePosition: {
+      selectFacsimilePanelOrientation: {
         title: 'Facsimile panel position',
         description: 'Select facsimile panel position relative to notation',
         type: 'select',
         values: ['left', 'right', 'top', 'bottom'],
         default: 'bottom'
       },
-      showSourceImageFullPage: {
-        title: 'Show full page',
-        description: 'Show facsimile image on full page',
-        type: 'bool',
-        default: false
-      },
-      sourceImageZoom: {
+      facsimileZoomInput: {
         title: 'Facsimile image zoom (%)',
         description: 'Zoom level of facsimile image (in percent)',
         type: 'int',
@@ -1028,7 +1022,13 @@ export default class Viewer {
         step: 5,
         default: 100
       },
-      editZones: {
+      showFacsimileFullPage: {
+        title: 'Show full page',
+        description: 'Show facsimile image on full page',
+        type: 'bool',
+        default: false
+      },
+      editFacsimileZones: {
         title: 'Edit facsimile zones',
         description: 'Edit facsimile zones (will link bounding boxes to facsimile zones)',
         type: 'bool',
@@ -1177,16 +1177,16 @@ export default class Viewer {
           case 'showAnnotationPanel':
             this.toggleAnnotationPanel();
             break;
-          case 'editZones':
+          case 'editFacsimileZones':
           case 'showFacsimilePanel':
-          case 'selectSourceImagePosition':
+          case 'selectFacsimilePanelOrientation':
           case 'facsimileImageProportion':
             setOrientation(cm, '', '', this);
             break;
-          case 'showSourceImageFullPage':
+          case 'showFacsimileFullPage':
             drawSourceImage();
             break;
-          case 'sourceImageZoom':
+          case 'facsimileZoomInput':
             zoomSourceImage();
             break;
           case 'showSupplied':

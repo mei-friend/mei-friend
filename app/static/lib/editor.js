@@ -65,7 +65,7 @@ export function deleteElement(v, cm) {
       element.parentNode.insertBefore(childList[i--], element);
     }
   } else // delete Zone in source image display
-    if (element.nodeName === 'zone' && document.getElementById('editZones').checked) {
+    if (element.nodeName === 'zone' && document.getElementById('editFacsimileZones').checked) {
       removeZone(v, cm, element);
     } else {
       console.info('Element ' + id + ' not supported for deletion.');

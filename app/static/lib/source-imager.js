@@ -79,7 +79,7 @@ export function loadFacsimile(xmlDoc) {
 
 // Draw the source image with bounding boxes for each zone
 export async function drawSourceImage() {
-    let fullPage = document.getElementById('showSourceImageFullPage').checked;
+    let fullPage = document.getElementById('showFacsimileFullPage').checked;
     ulx = Number.MAX_VALUE; // boundary values for image envelope
     uly = Number.MAX_VALUE;
     let lrx = 0;
@@ -158,7 +158,7 @@ export async function drawSourceImage() {
         let width = lrx - ulx;
         let height = lry - uly;
         // svgContainer.setAttribute("transform", "translate(" + (ulx / 2) + " " + (uly / 2 ) + ") scale(" + zoomFactor + ")");
-        let zoomFactor = document.getElementById('sourceImageZoom').value / 100;
+        let zoomFactor = document.getElementById('facsimileZoomInput').value / 100;
         svgContainer.setAttribute("transform-origin", "left top");
         svgContainer.setAttribute("transform", "scale(" + zoomFactor + ")");
         svgContainer.setAttribute('width', width);
@@ -201,7 +201,7 @@ function drawBoundingBox(zoneId, measureId, measureN) {
         let rect = document.createElementNS(svgNameSpace, 'rect');
         rect.setAttribute('rx', rectangleLineWidth / 2);
         rect.setAttribute('ry', rectangleLineWidth / 2);
-        let editZones = document.getElementById('editZones').checked;
+        let editFacsimileZones = document.getElementById('editFacsimileZones').checked;
         let svg = document.getElementById('source-image-svg');
         svg.appendChild(rect);
         let x = parseFloat(facs[zoneId].ulx);
@@ -209,7 +209,7 @@ function drawBoundingBox(zoneId, measureId, measureN) {
         let width = parseFloat(facs[zoneId].lrx) - x;
         let height = parseFloat(facs[zoneId].lry) - y;
         updateRect(rect, x, y, width, height, rectangleColor, rectangleLineWidth, 'none');
-        if (editZones) rect.id = zoneId;
+        if (editFacsimileZones) rect.id = zoneId;
         else if (measureId) rect.id = measureId;
         if (measureN) { // draw number-like info from measure
             let txt = document.createElementNS(svgNameSpace, 'text');
@@ -220,7 +220,7 @@ function drawBoundingBox(zoneId, measureId, measureN) {
             txt.setAttribute('x', x + 7);
             txt.setAttribute('y', y + 29);
             txt.textContent = measureN;
-            if (measureId) txt.id = editZones ? zoneId : measureId;
+            if (measureId) txt.id = editFacsimileZones ? zoneId : measureId;
         }
     }
 }
@@ -240,12 +240,12 @@ async function loadImage(url) {
 
 
 export function zoomSourceImage(percent) {
-    let sourceImageZoom = document.getElementById('sourceImageZoom');
-    if (sourceImageZoom && percent)
-        sourceImageZoom.value = Math.min(parseInt(sourceImageZoom.max),
-            Math.max(parseInt(sourceImageZoom.min), parseInt(sourceImageZoom.value) + percent));
+    let facsimileZoomInput = document.getElementById('facsimileZoomInput');
+    if (facsimileZoomInput && percent)
+        facsimileZoomInput.value = Math.min(parseInt(facsimileZoomInput.max),
+            Math.max(parseInt(facsimileZoomInput.min), parseInt(facsimileZoomInput.value) + percent));
     let svgContainer = document.getElementById('source-image-container');
-    svgContainer.setAttribute("transform", "scale(" + sourceImageZoom.value / 100 + ")");
+    svgContainer.setAttribute("transform", "scale(" + facsimileZoomInput.value / 100 + ")");
 }
 
 export function highlightZone(rect) {
@@ -260,7 +260,7 @@ export function highlightZone(rect) {
         }
     }
     // add zone resizer for selected zone box (only when linked to zone rather than to measure)
-    if (document.getElementById('editZones').checked)
+    if (document.getElementById('editFacsimileZones').checked)
         listenerHandles = addZoneResizer(v, rect);
 }
 
@@ -418,7 +418,7 @@ export function addZoneDrawer() {
 
     function mouseDown(ev) {
         ev.preventDefault();
-        if (document.getElementById('editZones').checked && !resize) {
+        if (document.getElementById('editFacsimileZones').checked && !resize) {
             start.x = ev.clientX; // + ip.scrollLeft;
             start.y = ev.clientY; // + ip.scrollTop;
 
@@ -443,7 +443,7 @@ export function addZoneDrawer() {
 
     function mouseMove(ev) {
         ev.preventDefault();
-        if (document.getElementById('editZones').checked && drawing === 'new') {
+        if (document.getElementById('editFacsimileZones').checked && drawing === 'new') {
             let rect = document.getElementById('new-rect');
             if (rect && !resize) {
                 end.x = ev.clientX;
@@ -461,7 +461,7 @@ export function addZoneDrawer() {
     }
 
     function mouseUp(ev) {
-        if (document.getElementById('editZones').checked && !resize) {
+        if (document.getElementById('editFacsimileZones').checked && !resize) {
             let rect = document.getElementById('new-rect');
             if (rect && (Math.round(rect.getAttribute('width'))) > minSize &&
                 (Math.round(rect.getAttribute('height'))) > minSize) {
@@ -578,7 +578,7 @@ function handleFacsimileIngestion(reply) {
         }
     }
     // uncheck edit zones after ingest
-    document.getElementById('editZones').checked = false;
+    document.getElementById('editFacsimileZones').checked = false;
     v.updateData(cm, false, true);
     v.updateNotation = true;
 }
