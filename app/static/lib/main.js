@@ -1393,6 +1393,8 @@ function addEventListeners(v, cm) {
   document.getElementById('SaveMidi').addEventListener('click', downloadMidi);
 
   // edit dialogs
+  document.getElementById('undo').addEventListener('click', () => cm.undo());
+  document.getElementById('redo').addEventListener('click', () => cm.redo());
   document.getElementById('startSearch').addEventListener('click', () => CodeMirror.commands.find(cm));
   document.getElementById('findNext').addEventListener('click', () => CodeMirror.commands.findNext(cm));
   document.getElementById('findPrevious').addEventListener('click', () => CodeMirror.commands.findPrev(cm));
