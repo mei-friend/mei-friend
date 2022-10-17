@@ -20,10 +20,10 @@ export function createNotationDiv(parentElement, scale) {
   verovioPanel.id = 'verovio-panel';
   verovioContainer.appendChild(verovioPanel);
 
-   // container for Verovio 
-   let facsimileDragger = document.createElement('div');
-   facsimileDragger.id = 'facsimile-dragger';
-   facsimileDragger.classList.add('resizer');
+  // container for Verovio 
+  let facsimileDragger = document.createElement('div');
+  facsimileDragger.id = 'facsimile-dragger';
+  facsimileDragger.classList.add('resizer');
 
   // Create container element for pixel content (svg and jpg)
   let facsimileContainer = document.createElement('div');
@@ -389,6 +389,30 @@ export function createFacsilimieControlMenu(parentElement) {
   increaseBtn.title = 'Increase notation';
   zoomCtrls.appendChild(increaseBtn);
 
+  // full page
+  let fullPageDiv = document.createElement('div');
+  fullPageDiv.id = 'facsimile-full-page';
+  fullPageDiv.classList.add('controls');
+
+  let fullPageLabel = document.createElement('label');
+  fullPageLabel.innerText = 'Full page:';
+  fullPageLabel.id = 'facsimile-full-page-label';
+  fullPageLabel.classList.add('label');
+  fullPageDiv.appendChild(fullPageLabel);
+  fullPageLabel.title = 'Show full page of facsimile image';
+
+  let fullPageCheckbox = document.createElement('input');
+  fullPageCheckbox.id = 'facsimile-full-page-checkbox';
+  fullPageCheckbox.setAttribute('type', 'checkbox');
+  fullPageCheckbox.classList.add('checkbox');
+  fullPageCheckbox.title = 'Activate speedmode';
+  fullPageLabel.setAttribute('for', fullPageCheckbox.id);
+  fullPageCheckbox.checked = false;
+  fullPageCheckbox.disabled = false;
+  fullPageDiv.appendChild(fullPageCheckbox);
+
+  facsCtrlMenu.appendChild(fullPageDiv);
+ 
 } // createFacsilimieControlMenu()
 
 

@@ -1472,6 +1472,12 @@ function addEventListeners(v, cm) {
     }
   });
 
+  // facsimile full-page
+  document.getElementById('facsimile-full-page-checkbox').addEventListener('click', e => {
+    document.getElementById('showFacsimileFullPage').checked = e.target.checked;
+    drawSourceImage();
+  });
+
   // Page turning
   let ss = document.getElementById('section-selector');
   ss.addEventListener('change', () => {

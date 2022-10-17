@@ -1127,6 +1127,9 @@ export default class Viewer {
         case 'controlMenuUpdateNotation':
           document.getElementById('update-ctrls').style.display = optDefault ? 'inherit' : 'none';
           break;
+        case 'showFacsimileFullPage':
+          document.getElementById('facsimile-full-page-checkbox').checked = optDefault;
+          break;
       }
       let div = this.createOptionsItem(opt, o, optDefault)
       if (div) {
@@ -1186,6 +1189,7 @@ export default class Viewer {
             setOrientation(cm, '', '', this);
             break;
           case 'showFacsimileFullPage':
+            document.getElementById('facsimile-full-page-checkbox').checked = value;
             drawSourceImage();
             break;
           case 'facsimileZoomInput':
