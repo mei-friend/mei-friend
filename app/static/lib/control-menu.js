@@ -412,7 +412,31 @@ export function createFacsilimieControlMenu(parentElement) {
   fullPageDiv.appendChild(fullPageCheckbox);
 
   facsCtrlMenu.appendChild(fullPageDiv);
- 
+
+  // edit zones
+  let editZonesDiv = document.createElement('div');
+  editZonesDiv.id = 'facsimile-edit-zones';
+  editZonesDiv.classList.add('controls');
+
+  let editZonesLabel = document.createElement('label');
+  editZonesLabel.innerText = 'Edit zones:';
+  editZonesLabel.id = 'facsimile-edit-zones-label';
+  editZonesLabel.classList.add('label');
+  editZonesDiv.appendChild(editZonesLabel);
+  editZonesLabel.title = 'Edit zones of facsimile';
+
+  let editZonesCheckbox = document.createElement('input');
+  editZonesCheckbox.id = 'facsimile-edit-zones-checkbox';
+  editZonesCheckbox.setAttribute('type', 'checkbox');
+  editZonesCheckbox.classList.add('checkbox');
+  editZonesCheckbox.title = 'Edit zones of facsimile';
+  editZonesLabel.setAttribute('for', editZonesCheckbox.id);
+  editZonesCheckbox.checked = false;
+  editZonesCheckbox.disabled = false;
+  editZonesDiv.appendChild(editZonesCheckbox);
+
+  facsCtrlMenu.appendChild(editZonesDiv);
+
 } // createFacsilimieControlMenu()
 
 

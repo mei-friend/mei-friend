@@ -1130,6 +1130,9 @@ export default class Viewer {
         case 'showFacsimileFullPage':
           document.getElementById('facsimile-full-page-checkbox').checked = optDefault;
           break;
+        case 'editFacsimileZones':
+          document.getElementById('facsimile-edit-zones-checkbox').checked = optDefault;
+          break;
       }
       let div = this.createOptionsItem(opt, o, optDefault)
       if (div) {
@@ -1183,6 +1186,7 @@ export default class Viewer {
             this.toggleAnnotationPanel();
             break;
           case 'editFacsimileZones':
+            document.getElementById('facsimile-edit-zones-checkbox').checked = value;
           case 'showFacsimilePanel':
           case 'selectFacsimilePanelOrientation':
           case 'facsimileImageProportion':

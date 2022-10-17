@@ -1478,6 +1478,12 @@ function addEventListeners(v, cm) {
     drawSourceImage();
   });
 
+  // facsimile edit zones
+  document.getElementById('facsimile-edit-zones-checkbox').addEventListener('click', e => {
+    document.getElementById('editFacsimileZones').checked = e.target.checked;
+    setOrientation(cm, '', '', v);
+  });
+
   // Page turning
   let ss = document.getElementById('section-selector');
   ss.addEventListener('change', () => {
