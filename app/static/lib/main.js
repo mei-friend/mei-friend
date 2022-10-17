@@ -141,7 +141,7 @@ import {
   openUrlCancel
 } from './open-url.js';
 import {
-  createControlsMenu,
+  createVerovioControlMenu,
   setBreaksOptions,
   handleSmartBreaksOption,
   addModifyerKeys,
@@ -500,7 +500,7 @@ document.addEventListener('DOMContentLoaded', function () {
   let speedParam = searchParams.get('speed');
   breaksParam = searchParams.get('breaks');
 
-  createControlsMenu(document.getElementById('notation'), defaultVerovioOptions.scale);
+  createVerovioControlMenu(document.getElementById('notation'), defaultVerovioOptions.scale);
   addModifyerKeys(document); //
 
   console.log('DOMContentLoaded. Trying now to load Verovio...');
@@ -848,8 +848,8 @@ async function vrvWorkerEventsHandler(ev) {
         updateStatusBar();
         updateHtmlTitle();
         document.getElementById('verovio-panel').innerHTML = ev.data.svg;
-        if (document.getElementById('showSourceImagePanel') &&
-          document.getElementById('showSourceImagePanel').checked) await drawSourceImage();
+        if (document.getElementById('showSourcefacsimilePanel') &&
+          document.getElementById('showSourcefacsimilePanel').checked) await drawSourceImage();
         if (ev.data.setCursorToPageBeginning) v.setCursorToPageBeginning(cm);
         v.updatePageNumDisplay();
         v.addNotationEventListeners(cm);
@@ -1436,7 +1436,7 @@ function addEventListeners(v, cm) {
   });
 
   // Zooming source image with mouse wheel
-  let ip = document.getElementById('image-panel');
+  let ip = document.getElementById('facsimile-panel');
   ip.addEventListener('wheel', ev => {
     if (isCtrlOrCmd(ev)) {
       ev.preventDefault();

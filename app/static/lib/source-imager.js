@@ -254,8 +254,8 @@ export function highlightZone(rect) {
     for (let key in listenerHandles) {
         if (key === 'mousedown') { // remove mousedown listener from all rectangles
             svg.querySelectorAll('rect').forEach(r => r.removeEventListener(key, listenerHandles[key]));
-        } else { // and the other two from the image-panel
-            let ip = document.getElementById('image-panel')
+        } else { // and the other two from the facsimile-panel
+            let ip = document.getElementById('facsimile-panel')
             if (ip) ip.removeEventListener(key, listenerHandles[key]);
         }
     }
@@ -273,7 +273,7 @@ export function addZoneResizer(v, rect) {
         txtX = parseFloat(txt.getAttribute('x'));
         txtY = parseFloat(txt.getAttribute('y'));
     }
-    var ip = document.getElementById('image-panel');
+    var ip = document.getElementById('facsimile-panel');
     var svg = document.getElementById('source-image-svg');
     var start = {}; // starting point start.x, start.y
     var end = {}; // ending point
@@ -409,7 +409,7 @@ export function addZoneResizer(v, rect) {
 
 // enables new zone drawing with mouse click-and-drag
 export function addZoneDrawer() {
-    let ip = document.getElementById('image-panel');
+    let ip = document.getElementById('facsimile-panel');
     let svg = document.getElementById('source-image-svg');
     let start = {}; // starting point start.x, start.y
     let end = {}; // ending point

@@ -16,11 +16,11 @@ export function setOrientation(cm, o = '', v = null, storage = null) {
   // }).attr('href', root + '/css/' + orientation + '.css');
   let sz = calcSizeOfContainer();
   let notationPane = document.getElementById('notation');
-  let imagePane = document.getElementById('image-panel');
+  let imagePane = document.getElementById('facsimile-panel');
   let verovioPane = document.getElementById('verovio-panel');
-  let pixContainer = document.getElementById('pix-container');
-  let showSourceImage = document.getElementById('showSourceImagePanel').checked;
-  let controlMenu = document.getElementById('verovio-controls-form');
+  let pixContainer = document.getElementById('facsimile-container');
+  let showSourceImage = document.getElementById('showSourcefacsimilePanel').checked;
+  let controlMenu = document.getElementById('verovio-control-menu');
   let annotationPanel = document.getElementById('annotationPanel');
   // console.log('setOrientation(' + o + ') container size:', sz);
   let showAnnotationPanelCheckbox = document.getElementById('showAnnotationPanel');
@@ -135,7 +135,7 @@ export function calcSizeOfContainer() {
 
 export function getVerovioContainerSize() {
   let v = document.getElementById('notation');
-  let c = document.getElementById('verovio-controls-form');
+  let c = document.getElementById('verovio-control-menu');
   if (!c || !v) return false;
   let vbox = v.getBoundingClientRect();
   let cbox = c.getBoundingClientRect();

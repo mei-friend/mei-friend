@@ -6,19 +6,19 @@ import {
   svgNameSpace
 } from './dom-utils.js'
 
-export function createControlsMenu(parentElement, scale) {
+export function createVerovioControlMenu(parentElement, scale) {
 
   // Create control form
-  let controlsForm = document.createElement('div');
-  controlsForm.classList.add('control-menu');
-  controlsForm.id = 'verovio-controls-form';
-  parentElement.appendChild(controlsForm);
+  let vrvCtrlMenu = document.createElement('div');
+  vrvCtrlMenu.classList.add('control-menu');
+  vrvCtrlMenu.id = 'verovio-control-menu';
+  parentElement.appendChild(vrvCtrlMenu);
 
   // Zoom controls
   let zoomCtrls = document.createElement('div');
   zoomCtrls.id = 'zoom-ctrls';
   zoomCtrls.classList.add('controls');
-  controlsForm.appendChild(zoomCtrls);
+  vrvCtrlMenu.appendChild(zoomCtrls);
 
   let decreaseBtn = document.createElement('button');
   decreaseBtn.id = "decrease-scale-btn";
@@ -53,7 +53,7 @@ export function createControlsMenu(parentElement, scale) {
   let paginationCtrls = document.createElement('div');
   paginationCtrls.id = 'pagination-ctrls';
   paginationCtrls.classList.add('controls');
-  controlsForm.appendChild(paginationCtrls);
+  vrvCtrlMenu.appendChild(paginationCtrls);
 
   let sectionSelector = document.createElement('select');
   sectionSelector.id = "section-selector";
@@ -159,7 +159,7 @@ export function createControlsMenu(parentElement, scale) {
   breaksCtrls.id = 'breaks-ctrls';
   // breaksCtrls.classList.add('block');
   breaksCtrls.classList.add('controls');
-  controlsForm.appendChild(breaksCtrls);
+  vrvCtrlMenu.appendChild(breaksCtrls);
 
   let breaksSelector = document.createElement('select');
   breaksSelector.id = 'breaks-select';
@@ -174,7 +174,7 @@ export function createControlsMenu(parentElement, scale) {
   updateCtrls.id = 'update-ctrls';
   // updateCtrls.classList.add('block');
   updateCtrls.classList.add('controls');
-  controlsForm.appendChild(updateCtrls);
+  vrvCtrlMenu.appendChild(updateCtrls);
 
   let updateLabel = document.createElement('label');
   updateLabel.innerText = 'Update: ';
@@ -212,7 +212,7 @@ export function createControlsMenu(parentElement, scale) {
   let fontCtrls = document.createElement('div');
   fontCtrls.id = 'font-ctrls';
   fontCtrls.classList.add('controls');
-  controlsForm.appendChild(fontCtrls);
+  vrvCtrlMenu.appendChild(fontCtrls);
 
   let fontSelector = document.createElement('select');
   fontSelector.id = 'font-select';
@@ -227,7 +227,7 @@ export function createControlsMenu(parentElement, scale) {
   navigateCtrls.id = 'navigate-ctrls';
   // navigateCtrls.classList.add('block');
   navigateCtrls.classList.add('controls');
-  controlsForm.appendChild(navigateCtrls);
+  vrvCtrlMenu.appendChild(navigateCtrls);
 
   let backwardsBtn = document.createElement('button');
   backwardsBtn.id = "backwards-btn";
@@ -268,14 +268,14 @@ export function createControlsMenu(parentElement, scale) {
   let speedDiv = document.createElement('div');
   speedDiv.id = 'speed-div';
   speedDiv.classList.add('controls');
-  controlsForm.appendChild(speedDiv);
+  vrvCtrlMenu.appendChild(speedDiv);
 
   let verovioIcon = document.createElement('div');
   verovioIcon.innerHTML = icon.verovioV;
   verovioIcon.id = 'verovio-icon';
   verovioIcon.title = `Worker activity:
-clockwise denotes Verovio activity,
-anticlockwise speed worker activity`;
+     clockwise denotes Verovio activity,
+     anticlockwise speed worker activity`;
   speedDiv.appendChild(verovioIcon);
 
   let speedLabel = document.createElement('label');
@@ -283,9 +283,10 @@ anticlockwise speed worker activity`;
   speedLabel.id = 'speed-label';
   speedLabel.classList.add('label');
   speedDiv.appendChild(speedLabel);
-  speedLabel.title = `In Speedmode, only the current page
-is sent to Verovio to reduce rendering
-time with large files`;
+  speedLabel.title =
+    `In Speedmode, only the current page
+     is sent to Verovio to reduce rendering
+     time with large files`;
 
   let speedCheckbox = document.createElement('input');
   speedCheckbox.id = "speed-checkbox";
@@ -299,28 +300,31 @@ time with large files`;
   speedDiv.appendChild(speedCheckbox);
 
   // Create container element for pixel content (svg and jpg)
-  let pixPanel = document.createElement('div');
-  pixPanel.id = 'pix-container';
-  parentElement.appendChild(pixPanel);
+  let facsimileContainer = document.createElement('div');
+  facsimileContainer.id = 'facsimile-container';
+  parentElement.appendChild(facsimileContainer);
 
   // Create container element for Verovio SVG
   let verovioPanel = document.createElement('div');
   verovioPanel.id = 'verovio-panel';
-  pixPanel.appendChild(verovioPanel);
+  facsimileContainer.appendChild(verovioPanel);
 
-  // Create container element for Source Edition Image
-  let imagePanel = document.createElement('div');
-  imagePanel.id = 'image-panel';
-  imagePanel.style.display = 'none';
+  // Create container element for Facsimile Image
+  let facsimilePanel = document.createElement('div');
+  facsimilePanel.id = 'facsimile-panel';
+  facsimilePanel.style.display = 'none';
+  // SVG: facsimile image container
   var svg = document.createElementNS(svgNameSpace, 'svg');
   svg.id = 'source-image-container';
+  // SVG: facsimile image svg
   var g = document.createElementNS(svgNameSpace, 'svg');
   g.id = 'source-image-svg';
   svg.appendChild(g);
-  imagePanel.append(svg);
-  pixPanel.appendChild(imagePanel);
+  facsimilePanel.append(svg);
+  facsimileContainer.appendChild(facsimilePanel);
 
-} // createControlsMenu()
+} // createVerovioControlMenu()
+
 
 export function manualCurrentPage(v, cm, ev) {
   console.debug('manualCurrentPage: ', ev);

@@ -992,14 +992,14 @@ export default class Viewer {
       //   title: 'options-line', // class name of hr element
       //   type: 'line'
       // },
-      titleSourceImagePanel: {
+      titleSourcefacsimilePanel: {
         title: 'Facsimile panel',
         description: 'Show the facsimile imiages of the source edition, if available',
         type: 'header',
         open: false,
         default: false
       },
-      showSourceImagePanel: {
+      showSourcefacsimilePanel: {
         title: 'Show facsimile panel',
         description: 'Show the score images of the source edition provided in the facsimile element',
         type: 'bool',
@@ -1042,7 +1042,7 @@ export default class Viewer {
         type: 'bool',
         default: false
       },
-      // sourceImagePanelSeparator: {
+      // sourcefacsimilePanelSeparator: {
       //   title: 'options-line', // class name of hr element
       //   type: 'line'
       // },
@@ -1186,7 +1186,7 @@ export default class Viewer {
             this.toggleAnnotationPanel();
             break;
           case 'editZones':
-          case 'showSourceImagePanel':
+          case 'showSourcefacsimilePanel':
           case 'selectSourceImagePosition':
           case 'sourceImageProportion':
             setOrientation(cm, '', this);
