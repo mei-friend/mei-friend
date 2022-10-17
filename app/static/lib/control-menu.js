@@ -437,6 +437,17 @@ export function createFacsilimieControlMenu(parentElement) {
 
   facsCtrlMenu.appendChild(editZonesDiv);
 
+  let filler = document.createElement('div');
+  filler.classList.add('fillSpace');
+  facsCtrlMenu.appendChild(filler);
+
+  let facsimileCloseButton = document.createElement('div');
+  facsimileCloseButton.id = 'facsimile-close-button';
+  facsimileCloseButton.title = 'Close facsimile panel';
+  facsimileCloseButton.classList.add('settingsButton');
+  facsimileCloseButton.innerHTML = icon.xCircle;
+  facsCtrlMenu.appendChild(facsimileCloseButton);
+
 } // createFacsilimieControlMenu()
 
 

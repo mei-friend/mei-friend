@@ -1204,6 +1204,14 @@ let cmd = {
   'facsimileBottom': () => setOrientation(cm, '', 'bottom', v, storage),
   'facsimileLeft': () => setOrientation(cm, '', 'left', v, storage),
   'facsimileRight': () => setOrientation(cm, '', 'right', v, storage),
+  'showFacsimilePanel': () => {
+    document.getElementById('showFacsimilePanel').checked = true;
+    setOrientation(cm, '', '', v);
+  },
+  'hideFacsimilePanel': () => {
+    document.getElementById('showFacsimilePanel').checked = false;
+    setOrientation(cm, '', '', v);
+  },
   'showSettingsPanel': () => v.showSettingsPanel(),
   'hideSettingsPanel': () => v.hideSettingsPanel(),
   'toggleSettingsPanel': (ev) => v.toggleSettingsPanel(ev),
@@ -1399,6 +1407,7 @@ function addEventListeners(v, cm) {
   document.getElementById('showAnnotationsButton').addEventListener('click', cmd.toggleAnnotationPanel);
   document.getElementById('closeAnnotationPanelButton').addEventListener('click', cmd.hideAnnotationPanel);
   document.getElementById('hideAnnotationPanelButton').addEventListener('click', cmd.hideAnnotationPanel);
+  document.getElementById('showFacsimileMenu').addEventListener('click', cmd.showFacsimilePanel);
   // re-apply settings filtering when switching settings tabs
   document.querySelectorAll('#settingsPanel .tablink').forEach(t => t.addEventListener('click', cmd.filterSettings))
 
@@ -1483,6 +1492,9 @@ function addEventListeners(v, cm) {
     document.getElementById('editFacsimileZones').checked = e.target.checked;
     setOrientation(cm, '', '', v);
   });
+
+  // facsimile close button
+  document.getElementById('facsimile-close-button').addEventListener('click', cmd.hideFacsimilePanel);
 
   // Page turning
   let ss = document.getElementById('section-selector');
