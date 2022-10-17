@@ -361,7 +361,7 @@ export function createFacsilimieControlMenu(parentElement) {
   facsCtrlMenu.appendChild(zoomCtrls);
 
   let decreaseBtn = document.createElement('button');
-  decreaseBtn.id = "facs-decrease-scale-btn";
+  decreaseBtn.id = 'facs-decrease-scale-btn';
   decreaseBtn.classList.add('btn');
   decreaseBtn.classList.add('icon');
   decreaseBtn.innerHTML = icon.diffRemoved;
@@ -369,7 +369,7 @@ export function createFacsilimieControlMenu(parentElement) {
   decreaseBtn.title = 'Decrease notation';
   zoomCtrls.appendChild(decreaseBtn);
 
-  let zoomCtrl = document.createElement("input");
+  let zoomCtrl = document.createElement('input');
   zoomCtrl.id = 'facsimile-zoom';
   zoomCtrl.classList.add('input-range');
   zoomCtrl.setAttribute('type', 'range');
@@ -381,7 +381,7 @@ export function createFacsilimieControlMenu(parentElement) {
   zoomCtrl.title = 'Scale size of notation';
 
   let increaseBtn = document.createElement('button');
-  increaseBtn.id = "facs-increase-scale-btn";
+  increaseBtn.id = 'facs-increase-scale-btn';
   increaseBtn.classList.add('btn');
   increaseBtn.classList.add('icon');
   increaseBtn.innerHTML = icon.diffAdded;

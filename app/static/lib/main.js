@@ -1245,6 +1245,16 @@ let cmd = {
     if (zoomCtrl && storage && storage.supported) storage.scale = zoomCtrl.value;
     v.updateLayout()
   },
+  'facsZoomIn': () => zoomSourceImage(+5),
+  'facsZoomOut': () => zoomSourceImage(-5),
+  'facsZoomSlider': () => {
+    let facsZoom = document.getElementById('facsimile-zoom');
+    let facsZoomInput = document.getElementById('facsimileZoomInput');
+    if (facsZoom && facsZoomInput) {
+      facsZoomInput.value = facsZoom.value;
+      zoomSourceImage();
+    }
+  },
   // add control elements
   'addSlur': () => e.addControlElement(v, cm, 'slur', ''),
   'addSlurBelow': () => e.addControlElement(v, cm, 'slur', 'below'),
@@ -1432,10 +1442,10 @@ function addEventListeners(v, cm) {
   fc.addEventListener("dragstart", (ev) => console.log('Drag Start', ev));
   fc.addEventListener("dragend", (ev) => console.log('Drag End', ev));
 
-  // Zooming with buttons
+  // Zooming notation with buttons
   document.getElementById('decrease-scale-btn').addEventListener('click', cmd.zoomOut);
   document.getElementById('increase-scale-btn').addEventListener('click', cmd.zoomIn);
-  document.getElementById('verovio-zoom').addEventListener('click', cmd.zoomSlider);
+  document.getElementById('verovio-zoom').addEventListener('input', cmd.zoomSlider);
 
   // Zooming notation with mouse wheel
   vp.addEventListener('wheel', ev => {
@@ -1446,13 +1456,19 @@ function addEventListeners(v, cm) {
     }
   });
 
-  // Zooming source image with mouse wheel
+  // Zooming facsimile with buttons
+  document.getElementById('facs-decrease-scale-btn').addEventListener('click', cmd.facsZoomOut);
+  document.getElementById('facs-increase-scale-btn').addEventListener('click', cmd.facsZoomIn);
+  document.getElementById('facsimile-zoom').addEventListener('input', cmd.facsZoomSlider);
+
+  // Zooming facsimile with mouse wheel
   let ip = document.getElementById('facsimile-panel');
   ip.addEventListener('wheel', ev => {
     if (isCtrlOrCmd(ev)) {
       ev.preventDefault();
       ev.stopPropagation();
       zoomSourceImage(Math.sign(ev.deltaY) * -5); // scrolling towards user = increase
+      document.getElementById('facsimile-zoom').value = document.getElementById('facsimileZoomInput').value;
     }
   });
 

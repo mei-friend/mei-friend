@@ -849,7 +849,8 @@ export default class Viewer {
         type: 'select',
         default: defaultVerovioVersion,
         values: Object.keys(supportedVerovioVersions),
-        valuesDescriptions: Object.keys(supportedVerovioVersions).map(key => supportedVerovioVersions[key].description)
+        valuesDescriptions: Object.keys(supportedVerovioVersions)
+          .map(key => supportedVerovioVersions[key].description)
       },
       toggleSpeedMode: {
         title: 'Speed Mode',
@@ -880,7 +881,8 @@ export default class Viewer {
       },
       annotationDisplayLimit: {
         title: 'Maximum number of annotations',
-        description: 'Maximum number of annotations to display (large numbers may slow mei-friend)',
+        description: `Maximum number of annotations to display 
+                      (large numbers may slow mei-friend)`,
         type: 'int',
         min: 0,
         step: 100,
@@ -1188,6 +1190,8 @@ export default class Viewer {
             break;
           case 'facsimileZoomInput':
             zoomSourceImage();
+            let facsZoom = document.getElementById('facsimile-zoom');
+            if (facsZoom) facsZoom.value = value;
             break;
           case 'showSupplied':
             rt.style.setProperty('--suppliedColor', (value) ? col : 'var(--notationColor)');

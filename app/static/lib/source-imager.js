@@ -239,11 +239,19 @@ async function loadImage(url) {
 }
 
 
-export function zoomSourceImage(percent) {
+export function zoomSourceImage(deltaPercent) {
     let facsimileZoomInput = document.getElementById('facsimileZoomInput');
-    if (facsimileZoomInput && percent)
-        facsimileZoomInput.value = Math.min(parseInt(facsimileZoomInput.max),
-            Math.max(parseInt(facsimileZoomInput.min), parseInt(facsimileZoomInput.value) + percent));
+    let facsZoom = document.getElementById('facsimile-zoom');
+    if (facsimileZoomInput && deltaPercent) {
+        facsimileZoomInput.value =
+            Math.min(parseInt(facsimileZoomInput.max),
+                Math.max(parseInt(facsimileZoomInput.min),
+                    parseInt(facsimileZoomInput.value) + deltaPercent)
+            );
+    }
+    if (facsZoom && deltaPercent) {
+        facsZoom.value = facsimileZoomInput.value;
+    }
     let svgContainer = document.getElementById('source-image-container');
     svgContainer.setAttribute("transform", "scale(" + facsimileZoomInput.value / 100 + ")");
 }
