@@ -699,7 +699,7 @@ document.addEventListener('DOMContentLoaded', function () {
   let doit;
   window.onresize = () => {
     clearTimeout(doit); // wait half a second before re-calculating orientation
-    doit = setTimeout(() => setOrientation(cm, '', v, storage), 500);
+    doit = setTimeout(() => setOrientation(cm, '', '', v, storage), 500);
   };
 
 
@@ -1196,10 +1196,14 @@ let cmd = {
   'previousMeasure': () => v.navigate(cm, 'measure', 'backwards'),
   'layerUp': () => v.navigate(cm, 'layer', 'upwards'),
   'layerDown': () => v.navigate(cm, 'layer', 'downwards'),
-  'notationTop': () => setOrientation(cm, "top", v, storage),
-  'notationBottom': () => setOrientation(cm, "bottom", v, storage),
-  'notationLeft': () => setOrientation(cm, "left", v, storage),
-  'notationRight': () => setOrientation(cm, "right", v, storage),
+  'notationTop': () => setOrientation(cm, 'top', '', v, storage),
+  'notationBottom': () => setOrientation(cm, 'bottom', '', v, storage),
+  'notationLeft': () => setOrientation(cm, 'left', '', v, storage),
+  'notationRight': () => setOrientation(cm, 'right', '', v, storage),
+  'facsimileTop': () => setOrientation(cm, '', 'top', v, storage),
+  'facsimileBottom': () => setOrientation(cm, '', 'bottom', v, storage),
+  'facsimileLeft': () => setOrientation(cm, '', 'left', v, storage),
+  'facsimileRight': () => setOrientation(cm, '', 'right', v, storage),
   'showSettingsPanel': () => v.showSettingsPanel(),
   'hideSettingsPanel': () => v.hideSettingsPanel(),
   'toggleSettingsPanel': (ev) => v.toggleSettingsPanel(ev),
@@ -1367,6 +1371,11 @@ function addEventListeners(v, cm) {
   document.getElementById('bottom').addEventListener('click', cmd.notationBottom);
   document.getElementById('left').addEventListener('click', cmd.notationLeft);
   document.getElementById('right').addEventListener('click', cmd.notationRight);
+  // facsimile position
+  document.getElementById('facstop').addEventListener('click', cmd.facsimileTop);
+  document.getElementById('facsbottom').addEventListener('click', cmd.facsimileBottom);
+  document.getElementById('facsleft').addEventListener('click', cmd.facsimileLeft);
+  document.getElementById('facsright').addEventListener('click', cmd.facsimileRight);
 
   // show settings panel
   document.getElementById('showSettingsMenu').addEventListener('click', cmd.showSettingsPanel);

@@ -1181,7 +1181,7 @@ export default class Viewer {
           case 'showFacsimilePanel':
           case 'selectSourceImagePosition':
           case 'facsimileImageProportion':
-            setOrientation(cm, '', this);
+            setOrientation(cm, '', '', this);
             break;
           case 'showSourceImageFullPage':
             drawSourceImage();

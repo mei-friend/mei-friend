@@ -6,9 +6,16 @@ let facsimileOrientation = 'bottom';
 let facsimileImageProportion = .65;
 let annotationPanelExtent = 250; // px, taken away from width of friendContainer
 
-export function setOrientation(cm, o = '', v = null, storage = null) {
+export function setOrientation(cm, o = '', vo = '', v = null, storage = null) {
   if (o) orientation = o;
-  if (storage && storage.supported) storage.orientation = orientation;
+  if (vo) {
+    facsimileOrientation = vo;
+    document.getElementById('selectSourceImagePosition').value = facsimileOrientation;
+  }
+  if (storage && storage.supported) {
+    storage.orientation = orientation;
+    storage.facsimileOrientation = facsimileOrientation;
+  }
   let friendSz = document.getElementById("friendContainer");
   let stylesheet = document.getElementById("orientationCSS");
   stylesheet.setAttribute('href', root + 'css/' + orientation + '.css');
@@ -235,7 +242,7 @@ export function addResizerHandlers(v, cm) {
     document.removeEventListener('mousemove', mouseMoveHandler);
     document.removeEventListener('mouseup', mouseUpHandler);
     if (v) {
-      setOrientation(cm, '', v);
+      setOrientation(cm, '', '', v);
     }
   }
 
@@ -310,7 +317,7 @@ export function addFacsimilerResizerHandlers(v, cm) {
     document.removeEventListener('mousemove', mouseMoveHandler);
     document.removeEventListener('mouseup', mouseUpHandler);
     if (v) {
-      setOrientation(cm, '', v);
+      setOrientation(cm, '', '', v);
     }
   }
 
