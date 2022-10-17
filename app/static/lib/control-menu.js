@@ -6,13 +6,56 @@ import {
   svgNameSpace
 } from './dom-utils.js'
 
+// constructs the div structure of #notation parent
+export function createNotationDiv(parentElement, scale) {
+
+  // container for Verovio 
+  let verovioContainer = document.createElement('div');
+  verovioContainer.id = 'verovio-container';
+
+  createVerovioControlMenu(verovioContainer, scale);
+
+  // Create container element for Verovio SVG
+  let verovioPanel = document.createElement('div');
+  verovioPanel.id = 'verovio-panel';
+  verovioContainer.appendChild(verovioPanel);
+
+   // container for Verovio 
+   let facsimileDragger = document.createElement('div');
+   facsimileDragger.id = 'facsimile-dragger';
+   facsimileDragger.classList.add('resizer');
+
+  // Create container element for pixel content (svg and jpg)
+  let facsimileContainer = document.createElement('div');
+  facsimileContainer.id = 'facsimile-container';
+
+  createFacsilimieControlMenu(facsimileContainer);
+
+  // Create container element for Facsimile Image
+  let facsimilePanel = document.createElement('div');
+  facsimilePanel.id = 'facsimile-panel';
+  // SVG: facsimile image container
+  var svg = document.createElementNS(svgNameSpace, 'svg');
+  svg.id = 'source-image-container';
+  // SVG: facsimile image svg
+  var g = document.createElementNS(svgNameSpace, 'svg');
+  g.id = 'source-image-svg';
+  svg.appendChild(g);
+  facsimilePanel.append(svg);
+  facsimileContainer.appendChild(facsimilePanel);
+
+  // add both containers to parent (#notation)
+  parentElement.appendChild(verovioContainer);
+  parentElement.appendChild(facsimileDragger);
+  parentElement.appendChild(facsimileContainer);
+}
+
 export function createVerovioControlMenu(parentElement, scale) {
 
   // Create control form
   let vrvCtrlMenu = document.createElement('div');
   vrvCtrlMenu.classList.add('control-menu');
   vrvCtrlMenu.id = 'verovio-control-menu';
-  parentElement.appendChild(vrvCtrlMenu);
 
   // Zoom controls
   let zoomCtrls = document.createElement('div');
@@ -36,7 +79,7 @@ export function createVerovioControlMenu(parentElement, scale) {
   zoomCtrl.setAttribute('min', 10);
   zoomCtrl.setAttribute('max', 200);
   zoomCtrl.setAttribute('step', 1);
-  zoomCtrl.setAttribute('value', `${scale}`);
+  zoomCtrl.setAttribute('value', scale);
   zoomCtrls.appendChild(zoomCtrl);
   zoomCtrl.title = 'Scale size of notation';
 
@@ -268,7 +311,6 @@ export function createVerovioControlMenu(parentElement, scale) {
   let speedDiv = document.createElement('div');
   speedDiv.id = 'speed-div';
   speedDiv.classList.add('controls');
-  vrvCtrlMenu.appendChild(speedDiv);
 
   let verovioIcon = document.createElement('div');
   verovioIcon.innerHTML = icon.verovioV;
@@ -299,31 +341,55 @@ export function createVerovioControlMenu(parentElement, scale) {
   speedCheckbox.disabled = false;
   speedDiv.appendChild(speedCheckbox);
 
-  // Create container element for pixel content (svg and jpg)
-  let facsimileContainer = document.createElement('div');
-  facsimileContainer.id = 'facsimile-container';
-  parentElement.appendChild(facsimileContainer);
+  vrvCtrlMenu.appendChild(speedDiv);
 
-  // Create container element for Verovio SVG
-  let verovioPanel = document.createElement('div');
-  verovioPanel.id = 'verovio-panel';
-  facsimileContainer.appendChild(verovioPanel);
-
-  // Create container element for Facsimile Image
-  let facsimilePanel = document.createElement('div');
-  facsimilePanel.id = 'facsimile-panel';
-  facsimilePanel.style.display = 'none';
-  // SVG: facsimile image container
-  var svg = document.createElementNS(svgNameSpace, 'svg');
-  svg.id = 'source-image-container';
-  // SVG: facsimile image svg
-  var g = document.createElementNS(svgNameSpace, 'svg');
-  g.id = 'source-image-svg';
-  svg.appendChild(g);
-  facsimilePanel.append(svg);
-  facsimileContainer.appendChild(facsimilePanel);
+  parentElement.appendChild(vrvCtrlMenu);
 
 } // createVerovioControlMenu()
+
+export function createFacsilimieControlMenu(parentElement) {
+  // Create control form
+  let facsCtrlMenu = document.createElement('div');
+  facsCtrlMenu.classList.add('control-menu');
+  facsCtrlMenu.id = 'facsimile-control-menu';
+  parentElement.appendChild(facsCtrlMenu);
+
+  // Zoom controls
+  let zoomCtrls = document.createElement('div');
+  zoomCtrls.id = 'facimile-zoom-ctrls';
+  zoomCtrls.classList.add('controls');
+  facsCtrlMenu.appendChild(zoomCtrls);
+
+  let decreaseBtn = document.createElement('button');
+  decreaseBtn.id = "facs-decrease-scale-btn";
+  decreaseBtn.classList.add('btn');
+  decreaseBtn.classList.add('icon');
+  decreaseBtn.innerHTML = icon.diffRemoved;
+  decreaseBtn.classList.add('inline-block-tight');
+  decreaseBtn.title = 'Decrease notation';
+  zoomCtrls.appendChild(decreaseBtn);
+
+  let zoomCtrl = document.createElement("input");
+  zoomCtrl.id = 'facsimile-zoom';
+  zoomCtrl.classList.add('input-range');
+  zoomCtrl.setAttribute('type', 'range');
+  zoomCtrl.setAttribute('min', 10);
+  zoomCtrl.setAttribute('max', 300);
+  zoomCtrl.setAttribute('step', 5);
+  zoomCtrl.setAttribute('value', 100);
+  zoomCtrls.appendChild(zoomCtrl);
+  zoomCtrl.title = 'Scale size of notation';
+
+  let increaseBtn = document.createElement('button');
+  increaseBtn.id = "facs-increase-scale-btn";
+  increaseBtn.classList.add('btn');
+  increaseBtn.classList.add('icon');
+  increaseBtn.innerHTML = icon.diffAdded;
+  increaseBtn.classList.add('inline-block-tight');
+  increaseBtn.title = 'Increase notation';
+  zoomCtrls.appendChild(increaseBtn);
+
+} // createFacsilimieControlMenu()
 
 
 export function manualCurrentPage(v, cm, ev) {

@@ -294,7 +294,6 @@ a:active {
 #notation {
   overflow: hidden;
   display: flex;
-  flex-direction: column;
 }
 
 .resizer {
@@ -306,6 +305,7 @@ a:active {
   width: 100%;
   overflow: inherit;
   display: flex;
+  flex-direction: column;
 }
 
 #facsimile-panel {

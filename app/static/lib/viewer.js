@@ -999,12 +999,13 @@ export default class Viewer {
         open: false,
         default: false
       },
-      showSourcefacsimilePanel: {
+      showFacsimilePanel: {
         title: 'Show facsimile panel',
         description: 'Show the score images of the source edition provided in the facsimile element',
         type: 'bool',
         default: false
       },
+      // deleteme
       selectSourceImagePosition: {
         title: 'Facsimile panel position',
         description: 'Select facsimile panel position relative to notation',
@@ -1012,7 +1013,8 @@ export default class Viewer {
         values: ['left', 'right', 'top', 'bottom'],
         default: 'bottom'
       },
-      sourceImageProportion: {
+      // deleteme
+      facsimileImageProportion: {
         title: 'Facsimile panel proportion (%)',
         description: 'Proportion that the facsimile panel takes from the notation panel (in percent)',
         type: 'int',
@@ -1186,9 +1188,9 @@ export default class Viewer {
             this.toggleAnnotationPanel();
             break;
           case 'editZones':
-          case 'showSourcefacsimilePanel':
+          case 'showFacsimilePanel':
           case 'selectSourceImagePosition':
-          case 'sourceImageProportion':
+          case 'facsimileImageProportion':
             setOrientation(cm, '', this);
             break;
           case 'showSourceImageFullPage':

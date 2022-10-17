@@ -1,0 +1,9 @@
+#notation {
+    flex-direction: column-reverse;
+}
+
+#facsimile-dragger.resizer {
+    cursor: row-resize;
+    width: 100%;
+    height: 6px;
+}

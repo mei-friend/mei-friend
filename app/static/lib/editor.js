@@ -618,7 +618,7 @@ export function renumberMeasures(v, cm, change) {
   v.updateNotation = false;
   v.loadXml(cm.getValue(), true);
   utils.renumberMeasures(v, cm, 1, change);
-  if (document.getElementById('showSourcefacsimilePanel').checked) loadFacsimile(v.xmlDoc);
+  if (document.getElementById('showFacsimilePanel').checked) loadFacsimile(v.xmlDoc);
   v.updateData(cm, false, true);
   v.updateNotation = true;
 }

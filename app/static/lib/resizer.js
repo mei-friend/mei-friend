@@ -1,6 +1,7 @@
 let orientation = 'bottom'; // position of notation
 let notationProportion = .5; // proportion notation div takes from container
 let resizerWidth = 8; // 8 px, Attention: hard-coded also in left.css, right.css, top.css, bottom.css
+let facsimileResizerWidth = 6; // px, compare to css facsimile-[left/right/top/bottom].css
 
 let annotationPanelExtent = 250; // px, taken away from width of friendContainer
 
@@ -15,12 +16,14 @@ export function setOrientation(cm, o = '', v = null, storage = null) {
   // v.updateLayout();
   // }).attr('href', root + '/css/' + orientation + '.css');
   let sz = calcSizeOfContainer();
-  let notationPane = document.getElementById('notation');
-  let imagePane = document.getElementById('facsimile-panel');
-  let verovioPane = document.getElementById('verovio-panel');
-  let pixContainer = document.getElementById('facsimile-container');
-  let showSourceImage = document.getElementById('showSourcefacsimilePanel').checked;
+  let notationDiv = document.getElementById('notation');
+  let verovioContainer = document.getElementById('verovio-container');
+  let verovioPanel = document.getElementById('verovio-panel');
+  let facsimileDragger = document.getElementById('facsimile-dragger');
+  let facsimileContainer = document.getElementById('facsimile-container');
+  let showFacsimile = document.getElementById('showFacsimilePanel').checked;
   let controlMenu = document.getElementById('verovio-control-menu');
+  let facsimileControlMenu = document.getElementById('facsimile-control-menu');
   let annotationPanel = document.getElementById('annotationPanel');
   // console.log('setOrientation(' + o + ') container size:', sz);
   let showAnnotationPanelCheckbox = document.getElementById('showAnnotationPanel');
@@ -33,8 +36,8 @@ export function setOrientation(cm, o = '', v = null, storage = null) {
     } else {
       annotationPanel.style.display = 'none';
     }
-    notationPane.style.width = sz.width; //- 6; // TODO: remove when border removed
-    notationPane.style.height = sz.height * notationProportion;
+    notationDiv.style.width = sz.width; //- 6; // TODO: remove when border removed
+    notationDiv.style.height = sz.height * notationProportion;
     cm.setSize(sz.width, sz.height * (1 - notationProportion) - resizerWidth);
   }
   if (orientation === "left" || orientation === "right") {
@@ -46,60 +49,57 @@ export function setOrientation(cm, o = '', v = null, storage = null) {
     } else {
       annotationPanel.style.display = 'none';
     }
-    notationPane.style.width = Math.ceil(sz.width * notationProportion);
-    notationPane.style.height = sz.height; //- 6; TODO: remove when border removed
+    notationDiv.style.width = Math.ceil(sz.width * notationProportion);
+    notationDiv.style.height = sz.height; //- 6; TODO: remove when border removed
     cm.setSize(Math.floor(sz.width * (1 - notationProportion) - resizerWidth), sz.height);
   }
   friendSz.style.width = sz.width;
   friendSz.style.height = sz.height;
-  let sourceImagePosition = document.getElementById('selectSourceImagePosition').value;
-  let sourceImageProportion = document.getElementById('sourceImageProportion').value;
-  switch (sourceImagePosition) {
-    case 'top':
-      pixContainer.style.flexDirection = 'column-reverse';
-      break;
-    case 'bottom':
-      pixContainer.style.flexDirection = 'column';
-      break;
-    case 'left':
-      pixContainer.style.flexDirection = 'row-reverse';
-      break;
-    case 'right':
-      pixContainer.style.flexDirection = 'row';
-      break
-  }
-  switch (sourceImagePosition) {
-    case 'top':
-    case 'bottom':
-      if (showSourceImage) {
-        imagePane.style.display = 'block';
-        imagePane.style.height = sourceImageProportion + '%';
-        verovioPane.style.height = (100 - sourceImageProportion) + '%';
-      } else {
-        imagePane.style.display = 'none';
-        imagePane.style.height = 0;
-        verovioPane.style.height = '100%';
-      }
-      imagePane.style.width = notationPane.style.width;
-      verovioPane.style.width = notationPane.style.width;
-      break;
-    case 'left':
-    case 'right':
-      if (showSourceImage) {
-        imagePane.style.display = 'block';
-        imagePane.style.width = sourceImageProportion + '%';;
-        verovioPane.style.width = (100 - sourceImageProportion) + '%';;
-      } else {
-        imagePane.style.display = 'none';
-        imagePane.style.width = 0;
-        verovioPane.style.width = '100%';
-      }
-      imagePane.style.height = parseFloat(notationPane.style.height) - controlMenu.getBoundingClientRect().height;
-      verovioPane.style.height = parseFloat(notationPane.style.height) - controlMenu.getBoundingClientRect().height;
-      break;
-  }
 
-  // console.info('Notation size: ' + notationPane.style.width + '/' + notationPane.style.height);
+  // TODO: put out of settings menu
+  let facsimileOrientation = document.getElementById('selectSourceImagePosition').value;
+  // TODO: make this completely draggable
+  let facsimileImageProportion = document.getElementById('facsimileImageProportion').value / 100;
+
+  let facsCss = document.getElementById("facsimileOrientationCSS");
+  facsCss.setAttribute('href', root + 'css/facsimile-' + facsimileOrientation + '.css');
+
+  switch (facsimileOrientation) {
+    case 'top':
+    case 'bottom':
+      if (showFacsimile) {
+        facsimileContainer.style.display = 'block';
+        facsimileContainer.style.height = parseFloat(notationDiv.style.height) * facsimileImageProportion - facsimileResizerWidth;
+        verovioContainer.style.height = parseFloat(notationDiv.style.height) * (1 - facsimileImageProportion);
+        verovioPanel.style.height = parseFloat(verovioContainer.style.height) - facsimileControlMenu.getBoundingClientRect().height;
+      } else {
+        facsimileContainer.style.display = 'none';
+        facsimileContainer.style.height = 0;
+        verovioContainer.style.height = '100%';
+        verovioPanel.style.height = '100%';
+      }
+      facsimileContainer.style.width = notationDiv.style.width;
+      verovioContainer.style.width = notationDiv.style.width;
+      break;
+    case 'left':
+    case 'right':
+      if (showFacsimile) {
+        facsimileContainer.style.display = 'block';
+        facsimileContainer.style.width = parseFloat(notationDiv.style.width) * facsimileImageProportion - facsimileResizerWidth;
+        verovioContainer.style.width = parseFloat(notationDiv.style.width) * (1 - facsimileImageProportion);
+      } else {
+        facsimileContainer.style.display = 'none';
+        facsimileContainer.style.width = 0;
+        verovioContainer.style.width = '100%';
+      }
+      facsimileContainer.style.height = parseFloat(notationDiv.style.height) - controlMenu.getBoundingClientRect().height;
+      verovioContainer.style.height = parseFloat(notationDiv.style.height) - controlMenu.getBoundingClientRect().height;
+      break;
+  }
+  facsimileDragger.style.display = showFacsimile ? 'unset' : 'none';
+
+
+  // console.info('Notation size: ' + notationDiv.style.width + '/' + notationDiv.style.height);
   // redoLayout when done with loading TODO
   if (v) {
     if (v.speedMode &&

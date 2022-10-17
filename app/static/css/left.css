@@ -14,7 +14,7 @@
   width: 50%;
 }
 
-.resizer {
+#dragMe.resizer {
   cursor: col-resize;
   height: 100%;
   width: 8px;

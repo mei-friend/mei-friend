@@ -141,7 +141,7 @@ import {
   openUrlCancel
 } from './open-url.js';
 import {
-  createVerovioControlMenu,
+  createNotationDiv,
   setBreaksOptions,
   handleSmartBreaksOption,
   addModifyerKeys,
@@ -500,7 +500,7 @@ document.addEventListener('DOMContentLoaded', function () {
   let speedParam = searchParams.get('speed');
   breaksParam = searchParams.get('breaks');
 
-  createVerovioControlMenu(document.getElementById('notation'), defaultVerovioOptions.scale);
+  createNotationDiv(document.getElementById('notation'), defaultVerovioOptions.scale);
   addModifyerKeys(document); //
 
   console.log('DOMContentLoaded. Trying now to load Verovio...');
@@ -848,8 +848,8 @@ async function vrvWorkerEventsHandler(ev) {
         updateStatusBar();
         updateHtmlTitle();
         document.getElementById('verovio-panel').innerHTML = ev.data.svg;
-        if (document.getElementById('showSourcefacsimilePanel') &&
-          document.getElementById('showSourcefacsimilePanel').checked) await drawSourceImage();
+        if (document.getElementById('showFacsimilePanel') &&
+          document.getElementById('showFacsimilePanel').checked) await drawSourceImage();
         if (ev.data.setCursorToPageBeginning) v.setCursorToPageBeginning(cm);
         v.updatePageNumDisplay();
         v.addNotationEventListeners(cm);
