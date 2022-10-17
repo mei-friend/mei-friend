@@ -121,7 +121,8 @@ export const fontList = ['Leipzig', 'Bravura', 'Gootville', 'Leland', 'Petaluma'
 
 import {
   setOrientation,
-  addResizerHandlers
+  addResizerHandlers,
+  addFacsimilerResizerHandlers
 } from './resizer.js';
 import {
   addAnnotationHandlers,
@@ -694,6 +695,7 @@ document.addEventListener('DOMContentLoaded', function () {
   addEventListeners(v, cm);
   addAnnotationHandlers();
   addResizerHandlers(v, cm);
+  addFacsimilerResizerHandlers(v, cm);
   let doit;
   window.onresize = () => {
     clearTimeout(doit); // wait half a second before re-calculating orientation

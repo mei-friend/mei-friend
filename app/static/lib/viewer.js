@@ -1013,16 +1013,6 @@ export default class Viewer {
         values: ['left', 'right', 'top', 'bottom'],
         default: 'bottom'
       },
-      // deleteme
-      facsimileImageProportion: {
-        title: 'Facsimile panel proportion (%)',
-        description: 'Proportion that the facsimile panel takes from the notation panel (in percent)',
-        type: 'int',
-        min: 0,
-        max: 99,
-        step: 1,
-        default: 50
-      },
       showSourceImageFullPage: {
         title: 'Show full page',
         description: 'Show facsimile image on full page',

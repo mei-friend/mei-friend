@@ -2,31 +2,32 @@ let orientation = 'bottom'; // position of notation
 let notationProportion = .5; // proportion notation div takes from container
 let resizerWidth = 8; // 8 px, Attention: hard-coded also in left.css, right.css, top.css, bottom.css
 let facsimileResizerWidth = 6; // px, compare to css facsimile-[left/right/top/bottom].css
-
+let facsimileOrientation = 'bottom';
+let facsimileImageProportion = .65;
 let annotationPanelExtent = 250; // px, taken away from width of friendContainer
 
 export function setOrientation(cm, o = '', v = null, storage = null) {
   if (o) orientation = o;
   if (storage && storage.supported) storage.orientation = orientation;
   let friendSz = document.getElementById("friendContainer");
-  var stylesheet = document.getElementById("orientationCSS");
+  let stylesheet = document.getElementById("orientationCSS");
   stylesheet.setAttribute('href', root + 'css/' + orientation + '.css');
   // TODO: find a better solution for changing css and awaiting changes
   // $("#orientationCSS").load(function() {
   // v.updateLayout();
   // }).attr('href', root + '/css/' + orientation + '.css');
   let sz = calcSizeOfContainer();
-  let notationDiv = document.getElementById('notation');
-  let verovioContainer = document.getElementById('verovio-container');
-  let verovioPanel = document.getElementById('verovio-panel');
-  let facsimileDragger = document.getElementById('facsimile-dragger');
-  let facsimileContainer = document.getElementById('facsimile-container');
-  let showFacsimile = document.getElementById('showFacsimilePanel').checked;
-  let controlMenu = document.getElementById('verovio-control-menu');
-  let facsimileControlMenu = document.getElementById('facsimile-control-menu');
-  let annotationPanel = document.getElementById('annotationPanel');
+  const notationDiv = document.getElementById('notation');
+  const verovioContainer = document.getElementById('verovio-container');
+  const verovioPanel = document.getElementById('verovio-panel');
+  const facsimileDragger = document.getElementById('facsimile-dragger');
+  const facsimileContainer = document.getElementById('facsimile-container');
+  const showFacsimile = document.getElementById('showFacsimilePanel').checked;
+  const controlMenu = document.getElementById('verovio-control-menu');
+  const facsimileControlMenu = document.getElementById('facsimile-control-menu');
+  const annotationPanel = document.getElementById('annotationPanel');
+  const showAnnotationPanelCheckbox = document.getElementById('showAnnotationPanel');
   // console.log('setOrientation(' + o + ') container size:', sz);
-  let showAnnotationPanelCheckbox = document.getElementById('showAnnotationPanel');
   if (orientation === "top" || orientation === "bottom") {
     if (showAnnotationPanelCheckbox && showAnnotationPanelCheckbox.checked) {
       sz.width -= annotationPanelExtent; // subtract width of annotation panel
@@ -57,9 +58,7 @@ export function setOrientation(cm, o = '', v = null, storage = null) {
   friendSz.style.height = sz.height;
 
   // TODO: put out of settings menu
-  let facsimileOrientation = document.getElementById('selectSourceImagePosition').value;
-  // TODO: make this completely draggable
-  let facsimileImageProportion = document.getElementById('facsimileImageProportion').value / 100;
+  facsimileOrientation = document.getElementById('selectSourceImagePosition').value;
 
   let facsCss = document.getElementById("facsimileOrientationCSS");
   facsCss.setAttribute('href', root + 'css/facsimile-' + facsimileOrientation + '.css');
@@ -80,6 +79,7 @@ export function setOrientation(cm, o = '', v = null, storage = null) {
       }
       facsimileContainer.style.width = notationDiv.style.width;
       verovioContainer.style.width = notationDiv.style.width;
+      verovioPanel.style.width = parseFloat(verovioContainer.style.width);
       break;
     case 'left':
     case 'right':
@@ -94,6 +94,7 @@ export function setOrientation(cm, o = '', v = null, storage = null) {
       }
       facsimileContainer.style.height = parseFloat(notationDiv.style.height) - controlMenu.getBoundingClientRect().height;
       verovioContainer.style.height = parseFloat(notationDiv.style.height) - controlMenu.getBoundingClientRect().height;
+      verovioPanel.style.height = parseFloat(verovioContainer.style.height);
       break;
   }
   facsimileDragger.style.display = showFacsimile ? 'unset' : 'none';
@@ -143,10 +144,14 @@ export function getVerovioContainerSize() {
   return vbox;
 }
 
+
+// resizer handlers for resizing the notation/editor relative size
 export function addResizerHandlers(v, cm) {
   const resizer = document.getElementById('dragMe');
   const notation = resizer.previousElementSibling;
   const encoding = resizer.nextElementSibling;
+  const verovioContainer = document.getElementById('verovio-container');
+  const facsimileContainer = document.getElementById('facsimile-container');
   let x = 0;
   let y = 0;
   let notationSize = 0;
@@ -168,8 +173,7 @@ export function addResizerHandlers(v, cm) {
     const dy = e.clientY - y;
     let sz = resizer.parentNode.getBoundingClientRect();
     let szSz = resizer.getBoundingClientRect();
-    console.log("Mouse move dx/dy: " + dx + "/" + dy +
-      ', Container: ' + sz.width + '/' + sz.height);
+    // console.log("Mouse move dx/dy: " + dx + "/" + dy + ', Container: ' + sz.width + '/' + sz.height);
     switch (orientation) {
       case 'top':
         notation.style.height = (notationSize + dy) + szSz.height;
@@ -178,7 +182,6 @@ export function addResizerHandlers(v, cm) {
         break;
       case 'bottom':
         notation.style.height = (notationSize - dy) + szSz.height;
-        console.log('notation height: ' + notation.style.height);
         notationProportion = (notationSize - dy) / sz.height;
         cm.setSize(sz.width, sz.height - (notationSize - dy) - szSz.height);
         break;
@@ -188,11 +191,29 @@ export function addResizerHandlers(v, cm) {
         cm.setSize(sz.width - (notationSize - dx) - resizerWidth, sz.height - szSz.width);
         break;
       case 'left':
-      default:
         notation.style.width = (notationSize + dx) + resizerWidth;
         notationProportion = (notationSize + dx) / sz.width;
         cm.setSize(sz.width - (notationSize + dx) - resizerWidth, sz.height - szSz.width);
         break;
+    }
+    // update relative size of facsimile images, if active
+    if (document.getElementById('showFacsimilePanel').checked) {
+      switch (orientation) {
+        case 'top':
+        case 'bottom':
+          if (facsimileOrientation === 'top' || facsimileOrientation === 'bottom') {
+            verovioContainer.style.height = parseFloat(notation.style.height) * (1 - facsimileImageProportion);
+            facsimileContainer.style.height = parseFloat(notation.style.height) * (facsimileImageProportion) - facsimileResizerWidth;
+          }
+          break;
+        case 'left':
+        case 'right':
+          if (facsimileOrientation === 'left' || facsimileOrientation === 'right') {
+            verovioContainer.style.width = parseFloat(notation.style.width) * (1 - facsimileImageProportion);
+            facsimileContainer.style.width = parseFloat(notation.style.width) * (facsimileImageProportion) - facsimileResizerWidth;
+          }
+          break;
+      }
     }
     const cursor = (orientation === "left" || orientation === "right") ?
       'col-resize' : 'row-resize';
@@ -219,4 +240,80 @@ export function addResizerHandlers(v, cm) {
   }
 
   resizer.addEventListener('mousedown', mouseDownHandler);
-}
+} // addResizerHandlers() 
+
+// resizer handlers for resizing the facsimile panel
+export function addFacsimilerResizerHandlers(v, cm) {
+
+  const resizer = document.getElementById('facsimile-dragger');
+  const verovioContainer = document.getElementById('verovio-container');
+  const facsimileContainer = document.getElementById('facsimile-container');
+  let x = 0;
+  let y = 0;
+  let facsimileContainerSize = 0;
+
+  const mouseDownHandler = function (e) {
+    x = e.clientX;
+    y = e.clientY;
+    if (facsimileOrientation === "top" || facsimileOrientation === "bottom")
+      facsimileContainerSize = facsimileContainer.getBoundingClientRect().height;
+    if (facsimileOrientation === "left" || facsimileOrientation === "right")
+      facsimileContainerSize = facsimileContainer.getBoundingClientRect().width;
+    document.addEventListener('mousemove', mouseMoveHandler);
+    document.addEventListener('mouseup', mouseUpHandler);
+    // console.log("Mouse down x/y: " + x + "/" + y + ', ' + facsimileContainerSize);
+  };
+
+  const mouseMoveHandler = function (e) {
+    const dx = e.clientX - x;
+    const dy = e.clientY - y;
+    let sz = resizer.parentNode.getBoundingClientRect();
+    // console.log("Mouse move dx/dy: " + dx + "/" + dy + ', Container: ' + sz.width + '/' + sz.height);
+    switch (facsimileOrientation) {
+      case 'top':
+        facsimileImageProportion = (facsimileContainerSize + dy) / sz.height;
+        verovioContainer.style.height = sz.height * (1 - facsimileImageProportion);
+        facsimileContainer.style.height = sz.height * facsimileImageProportion - facsimileResizerWidth;
+        break;
+      case 'bottom':
+        facsimileImageProportion = (facsimileContainerSize - dy) / sz.height;
+        verovioContainer.style.height = sz.height * (1 - facsimileImageProportion);
+        facsimileContainer.style.height = sz.height * facsimileImageProportion - facsimileResizerWidth;
+        break;
+      case 'right':
+        facsimileImageProportion = (facsimileContainerSize - dx) / sz.width;
+        verovioContainer.style.width = sz.width * (1 - facsimileImageProportion);
+        facsimileContainer.style.width = sz.width * facsimileImageProportion - facsimileResizerWidth;
+        break;
+      case 'left':
+        facsimileImageProportion = (facsimileContainerSize + dx) / sz.width;
+        verovioContainer.style.width = sz.width * (1 - facsimileImageProportion);
+        facsimileContainer.style.width = sz.width * facsimileImageProportion - facsimileResizerWidth;
+        break;
+    }
+    const cursor = (facsimileOrientation === "left" || facsimileOrientation === "right") ? 'col-resize' : 'row-resize';
+    resizer.style.cursor = cursor;
+    document.body.style.cursor = cursor;
+    verovioContainer.style.userSelect = 'none';
+    verovioContainer.style.pointerEvents = 'none';
+    facsimileContainer.style.userSelect = 'none';
+    facsimileContainer.style.pointerEvents = 'none';
+  };
+
+  const mouseUpHandler = function () {
+    resizer.style.removeProperty('cursor');
+    document.body.style.removeProperty('cursor');
+    verovioContainer.style.removeProperty('user-select');
+    verovioContainer.style.removeProperty('pointer-events');
+    facsimileContainer.style.removeProperty('user-select');
+    facsimileContainer.style.removeProperty('pointer-events');
+    document.removeEventListener('mousemove', mouseMoveHandler);
+    document.removeEventListener('mouseup', mouseUpHandler);
+    if (v) {
+      setOrientation(cm, '', v);
+    }
+  }
+
+  resizer.addEventListener('mousedown', mouseDownHandler);
+
+} // addFacsimilerResizerHandlers()
