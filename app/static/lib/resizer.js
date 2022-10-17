@@ -94,10 +94,12 @@ export function setOrientation(cm, o = '', vo = '', v = null, storage = null) {
         facsimileContainer.style.display = 'block';
         facsimileContainer.style.width = parseFloat(notationDiv.style.width) * facsimileImageProportion - facsimileResizerWidth;
         verovioContainer.style.width = parseFloat(notationDiv.style.width) * (1 - facsimileImageProportion);
+        verovioPanel.width = parseFloat(verovioContainer.style.width);
       } else {
         facsimileContainer.style.display = 'none';
         facsimileContainer.style.width = 0;
         verovioContainer.style.width = '100%';
+        verovioPanel.style.width = '100%';
       }
       facsimileContainer.style.height = parseFloat(notationDiv.style.height) - controlMenu.getBoundingClientRect().height;
       verovioContainer.style.height = parseFloat(notationDiv.style.height) - controlMenu.getBoundingClientRect().height;

@@ -314,6 +314,8 @@ a:active {
 
 #facsimile-panel {
   overflow: auto;
+  width: 100%;
+  height: 100%;
 }
 
 #source-image-label {
@@ -548,9 +550,10 @@ a:active {
   align-items: center;
   justify-content: flex-start;
   font-size: 10pt;
-  width: 100%;
+  /* width: 100%; */
   height: 28px;
   color: var(--textColor);
+  /* background-color: var(--backgroundColor); */
   padding: 1px;
   margin: 0px;
 }
