@@ -564,7 +564,6 @@ a:active {
   border: 1px solid var(--dropdownBorderColor);
   border-radius: 7px;
   margin: 0px 3px;
-  /* background-color: var(--navbarBackgroundColor); */
 }
 
 .btn {

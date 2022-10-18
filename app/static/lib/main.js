@@ -337,6 +337,7 @@ export function loadDataInEditor(mei, setFreshlyLoaded = true) {
   freshlyLoaded = setFreshlyLoaded;
   cm.setValue(mei);
   v.loadXml(mei);
+  cmd.checkFacsimile();
   loadFacsimile(v.xmlDoc); // load all facsimila data of MEI
   let bs = document.getElementById('breaks-select');
   if (bs) {
@@ -1212,6 +1213,7 @@ let cmd = {
     document.getElementById('showFacsimilePanel').checked = false;
     setOrientation(cm, '', '', v);
   },
+  'checkFacsimile': () => (v.xmlDoc.querySelector('facsimile')) ? cmd.showFacsimilePanel() : cmd.hideFacsimilePanel(),
   'showSettingsPanel': () => v.showSettingsPanel(),
   'hideSettingsPanel': () => v.hideSettingsPanel(),
   'toggleSettingsPanel': (ev) => v.toggleSettingsPanel(ev),
