@@ -304,13 +304,12 @@ a:active {
   background-color: var(--dropdownHeadingColor);
 }
 
-#facsimile-container {
+#verovio-container {
   height: 100%;
   width: 100%;
   overflow: inherit;
   display: flex;
   flex-direction: column;
-  background-color: var(--backgroundColor);
 }
 
 #facsimile-panel {
@@ -551,10 +550,9 @@ a:active {
   align-items: center;
   justify-content: flex-start;
   font-size: 10pt;
-  /* width: 100%; */
   height: 28px;
   color: var(--textColor);
-  /* background-color: var(--backgroundColor); */
+  background-color: var(--backgroundColor);
   padding: 1px;
   margin: 0px;
 }
@@ -703,13 +701,13 @@ svg text {
   user-select: none;
 }
 
-#facsimile-container .highlighted {
+#verovio-container .highlighted {
   color: var(--highlightColor);
   stroke: var(--highlightColor);
 }
 
-#facsimile-container g.highlighted,
-#facsimile-container text.highlighted {
+#verovio-container g.highlighted,
+#verovio-container text.highlighted {
   fill: var(--highlightColor);
   fill-opacity: 100%;
 }
@@ -721,22 +719,22 @@ svg text {
   fill-opacity: 15%;
 }
 
-#facsimile-container g.supplied g {
+#verovio-container g.supplied g {
   fill: var(--suppliedColor);
   color: var(--suppliedColor);
   stroke: var(--suppliedColor);
 }
 
-#facsimile-container .supplied .highlighted {
+#verovio-container .supplied .highlighted {
   color: var(--suppliedHighlightedColor);
   stroke: var(--suppliedHighlightedColor);
 }
 
-#facsimile-container g.supplied g.highlighted {
+#verovio-container g.supplied g.highlighted {
   fill: var(--suppliedHighlightedColor);
 }
 
-#facsimile-container g {
+#verovio-container g {
   fill: var(--notationColor);
   color: var(--notationColor);
   stroke: var(--notationColor);
@@ -798,9 +796,10 @@ svg text {
   height: 20px;
 }
 
-.icon[disabled],
+.icon[disabled] svg path,
 .disabled {
-  opacity: 30%;
+  /* opacity: 30%; */
+  fill: var(--settingsBackgroundColor);
 }
 
 #verovio-icon {
