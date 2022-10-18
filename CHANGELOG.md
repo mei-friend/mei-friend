@@ -1,5 +1,9 @@
 # mei-friend-online CHANGELOG.md
 
+### 0.6.7 patch: facsimile panel re-organisation
+* Facsimile panel with separate control menu
+* Resizing of facsimile panel via mouse drag
+* Facsimile panel automatically shown/hidden when facsimile element present/absent
 ### 0.6.6 patch: small fixes and refinements
 * Correctly reset GitHub menu when switching to local file (via menu or drag'n'drop)
 * Make filename in file status display editable when working locally
