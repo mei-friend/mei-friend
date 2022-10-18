@@ -302,6 +302,7 @@ a:active {
 
 .resizer {
   background-color: var(--dropdownHeadingColor);
+  z-index: 6;
 }
 
 #verovio-container {
@@ -555,6 +556,7 @@ a:active {
   background-color: var(--backgroundColor);
   padding: 1px;
   margin: 0px;
+  z-index: 6;
 }
 
 .controls {
