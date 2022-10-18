@@ -310,6 +310,7 @@ a:active {
   overflow: inherit;
   display: flex;
   flex-direction: column;
+  background-color: var(--backgroundColor);
 }
 
 #facsimile-panel {
