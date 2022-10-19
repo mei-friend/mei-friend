@@ -3,7 +3,7 @@ let orientation = 'bottom'; // position of notation
 let notationProportion = .5; // proportion notation div takes from container
 let notationResizerWidth = 8; // 8 px, Attention: hard-coded also in left.css, right.css, top.css, bottom.css
 // facsimile variables (facsimile-container)
-let facsimileResizerWidth = 6; // px, compare to css facsimile-[left/right/top/bottom].css
+let facsimileResizerWidth = 8; // px, compare to css facsimile-[left/right/top/bottom].css
 let facsimileOrientation = 'bottom';
 let facsimileImageProportion = .65;
 // annotation panel size
@@ -70,7 +70,6 @@ export function setOrientation(cm, o = '', vo = '', v = null, storage = null) {
   friendSz.style.width = sz.width;
   friendSz.style.height = sz.height;
 
-  // TODO: put out of settings menu
   facsimileOrientation = document.getElementById('selectFacsimilePanelOrientation').value;
 
   let facsCss = document.getElementById("facsimileOrientationCSS");
@@ -112,11 +111,9 @@ export function setOrientation(cm, o = '', vo = '', v = null, storage = null) {
       verovioPanel.style.height = parseFloat(verovioContainer.style.height) - controlMenu.getBoundingClientRect().height;
       break;
   }
-  facsimileDragger.style.display = showFacsimile ? 'unset' : 'none';
+  facsimileDragger.style.display = showFacsimile ? 'flex' : 'none';
 
-
-  // console.info('Notation size: ' + notationDiv.style.width + '/' + notationDiv.style.height);
-  // redoLayout when done with loading TODO
+  // redoLayout when done with loading
   if (v) {
     if (v.speedMode &&
       document.getElementById('breaks-select').value === 'auto') {

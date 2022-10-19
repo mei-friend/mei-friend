@@ -20,6 +20,11 @@
   height: 8px;
 }
 
+#dragMe.resizer svg {
+  min-height: 16px;
+  max-height: 16px;
+}
+
 #encoding {
   /* Take the remaining width */
   flex: 1;
@@ -45,7 +50,7 @@
   flex-direction: row;
 }
 
-#listAnnotations { 
+#listAnnotations {
   flex-direction: column;
   overflow-y: auto;
 }

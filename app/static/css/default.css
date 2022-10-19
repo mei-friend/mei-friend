@@ -303,6 +303,13 @@ a:active {
 .resizer {
   background-color: var(--dropdownHeadingColor);
   z-index: 6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.resizer svg {
+  fill: var(--textColor);
 }
 
 #verovio-container {

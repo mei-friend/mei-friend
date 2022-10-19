@@ -20,6 +20,11 @@
   width: 8px;
 }
 
+#dragMe.resizer svg {
+  min-width: 16px;
+  transform: rotate(90deg);
+}
+
 #encoding {
   /* Take the remaining width */
   flex: 1;

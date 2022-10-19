@@ -4,6 +4,11 @@
 
 #facsimile-dragger.resizer {
   cursor: col-resize;
-  width: 6px;
+  width: 8px;
   height: 100%;
+}
+
+#facsimile-dragger.resizer svg {
+  min-width: 16px;
+  transform: rotate(90deg);
 }

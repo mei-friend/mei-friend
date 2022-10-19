@@ -24,6 +24,7 @@ export function createNotationDiv(parentElement, scale) {
   let facsimileDragger = document.createElement('div');
   facsimileDragger.id = 'facsimile-dragger';
   facsimileDragger.classList.add('resizer');
+  facsimileDragger.innerHTML = icon.kebab;
 
   // Create container element for pixel content (svg and jpg)
   let facsimileContainer = document.createElement('div');
@@ -48,6 +49,11 @@ export function createNotationDiv(parentElement, scale) {
   parentElement.appendChild(verovioContainer);
   parentElement.appendChild(facsimileDragger);
   parentElement.appendChild(facsimileContainer);
+
+  // add three dots icon to resizer
+  const resizer = document.getElementById('dragMe');
+  if (resizer) resizer.innerHTML = icon.kebab;
+
 }
 
 export function createVerovioControlMenu(parentElement, scale) {
