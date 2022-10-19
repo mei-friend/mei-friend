@@ -444,8 +444,8 @@ export function createFacsilimieControlMenu(parentElement) {
   let facsimileCloseButton = document.createElement('div');
   facsimileCloseButton.id = 'facsimile-close-button';
   facsimileCloseButton.title = 'Close facsimile panel';
-  facsimileCloseButton.classList.add('settingsButton');
-  facsimileCloseButton.innerHTML = icon.xCircle;
+  facsimileCloseButton.classList.add('topright');
+  facsimileCloseButton.innerHTML = '&times;'; // icon.xCircle;
   facsCtrlMenu.appendChild(facsimileCloseButton);
 
 } // createFacsilimieControlMenu()
