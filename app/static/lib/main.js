@@ -81,6 +81,10 @@ export let supportedVerovioVersions = {
     'url': 'https://www.verovio.org/javascript/latest/verovio-toolkit-hum.js',
     'description': 'Current Verovio release'
   },
+  '3.12.1': {
+    'url': 'https://www.verovio.org/javascript/3.12.1/verovio-toolkit-hum.js',
+    'description': 'Verovio release 3.12.1'
+  },
   '3.12.0': {
     'url': 'https://www.verovio.org/javascript/3.12.0/verovio-toolkit-hum.js',
     'description': 'Verovio release 3.12.0'
@@ -1883,6 +1887,7 @@ function setKeyMap(keyMapFilePath) {
     });
 }
 
+// returns true, if event is a CMD (Mac) or a CTRL (Windows, Linux) event
 function isCtrlOrCmd(ev) {
   return (platform.startsWith('mac') && ev.metaKey) ||
     (!platform.startsWith('mac') && ev.ctrlKey);
