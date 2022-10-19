@@ -1252,7 +1252,16 @@ export let cmd = {
     document.getElementById('showFacsimilePanel').checked = !document.getElementById('showFacsimilePanel').checked;
     setOrientation(cm, '', '', -1, -1, v);
   },
-  'checkFacsimile': () => (v.xmlDoc.querySelector('facsimile')) ? cmd.showFacsimilePanel() : cmd.hideFacsimilePanel(),
+  'checkFacsimile': () => {
+    let tf = document.getElementById('titleFacsimilePanel');
+    if (v.xmlDoc.querySelector('facsimile')) {
+      if (tf) tf.setAttribute('open','true');
+      cmd.showFacsimilePanel();
+    } else {
+      if (tf) tf.removeAttribute('open');
+      cmd.hideFacsimilePanel();
+    }
+  },
   'showSettingsPanel': () => v.showSettingsPanel(),
   'hideSettingsPanel': () => v.hideSettingsPanel(),
   'toggleSettingsPanel': (ev) => v.toggleSettingsPanel(ev),
