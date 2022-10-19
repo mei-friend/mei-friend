@@ -1189,9 +1189,6 @@ export default class Viewer {
             document.getElementById('facsimile-edit-zones-checkbox').checked = value;
           case 'showFacsimilePanel':
           case 'selectFacsimilePanelOrientation':
-          case 'facsimileImageProportion':
-            setOrientation(cm, '', '', this);
-            break;
           case 'showFacsimileFullPage':
             document.getElementById('facsimile-full-page-checkbox').checked = value;
             drawFacsimile();

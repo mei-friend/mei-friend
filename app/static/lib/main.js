@@ -199,6 +199,9 @@ import {
 // const defaultMeiFileName = `${root}Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei`;
 const defaultMeiFileName = `${root}Beethoven_WoO70-Breitkopf.mei`;
 const defaultOrientation = 'bottom'; // default notation position in window
+const defaultPorportion = 0.5; // default notation size relative to window
+const defaultFacsimileOrientation = 'left'; // default facsimile position in notation window
+const defaultFacsimilePorportion = 0.65; // default facsimile panel size relative to notation
 const defaultVerovioOptions = {
   scale: 55,
   breaks: "line",
@@ -492,6 +495,9 @@ document.addEventListener('DOMContentLoaded', function () {
   // check for parameters passed through URL
   let searchParams = new URLSearchParams(window.location.search);
   let orientationParam = searchParams.get('orientation');
+  let notationProportionParam = searchParams.get('notationProportion');
+  let facsimileOrientationParam = searchParams.get('facsimileOrientation');
+  let facsimileProportionParam = searchParams.get('facsimileProportion');
   pageParam = searchParams.get('page');
   let scaleParam = searchParams.get('scale');
   // select parameter: both syntax versions allowed (also mixed):
@@ -583,6 +589,9 @@ document.addEventListener('DOMContentLoaded', function () {
     storage.read();
     // save (most) URL parameters in storage
     if (orientationParam !== null) storage.orientation = orientationParam;
+    if (notationProportionParam !== null) storage.notationProportion = notationProportionParam;
+    if (facsimileOrientationParam !== null) storage.facsimileOrientation = facsimileOrientationParam;
+    if (facsimileProportionParam !== null) storage.facsimileProportion = facsimileProportionParam;
     if (pageParam !== null) storage.page = pageParam;
     if (scaleParam !== null) storage.scale = scaleParam;
     // if (selectParam && selectParam.length > 0) storage.select = selectParam;
@@ -686,13 +695,40 @@ document.addEventListener('DOMContentLoaded', function () {
     v.speedMode = storage.speed;
     document.getElementById('speed-checkbox').checked = v.speedMode;
   }
+  let o = ''; // orientation from URLparam, storage or default (in this order)
   if (orientationParam !== null) {
-    setOrientation(cm, orientationParam);
+    o = orientationParam;
   } else if (storage && storage.supported && storage.hasItem('orientation')) {
-    setOrientation(cm, storage.orientation);
+    o = storage.orientation;
   } else {
-    setOrientation(cm, defaultOrientation);
+    o = defaultOrientation;
   }
+  let fo = ''; // facsimile orientation from URLparam, storage or default (in this order)
+  if (facsimileOrientationParam !== null) {
+    fo = facsimileOrientationParam;
+  } else if (storage && storage.supported && storage.hasItem('facsimileOrientation')) {
+    fo = storage.facsimileOrientation;
+  } else {
+    fo = defaultFacsimileOrientation;
+  }
+  let np = -1;
+  if (notationProportionParam !== null) {
+    np = notationProportionParam;
+  } else if (storage && storage.supported && storage.hasItem('notationProportion')) {
+    np = storage.notationProportion;
+  } else {
+    np = defaultNotationPorportion;
+  }
+  let fp = -1;
+  if (facsimileProportionParam !== null) {
+    fp = facsimileProportionParam;
+  } else if (storage && storage.supported && storage.hasItem('facsimileProportion')) {
+    fp = storage.facsimileProportion;
+  } else {
+    fp = defaultFacsimilePorportion;
+  }
+  setOrientation(cm, o, fo, np, fp, v, storage);
+
   addEventListeners(v, cm);
   addAnnotationHandlers();
   addResizerHandlers(v, cm);
@@ -700,12 +736,11 @@ document.addEventListener('DOMContentLoaded', function () {
   let doit;
   window.onresize = () => {
     clearTimeout(doit); // wait half a second before re-calculating orientation
-    doit = setTimeout(() => setOrientation(cm, '', '', v, storage), 500);
+    doit = setTimeout(() => setOrientation(cm, '', '', -1, -1, v, storage), 500);
   };
 
-
   setKeyMap(defaultKeyMap);
-});
+}); // DOMContentLoaded listener
 
 export async function openUrlFetch(url = '', updateAfterLoading = true) {
   let urlInput = document.querySelector("#openUrlInput");
@@ -1197,21 +1232,21 @@ let cmd = {
   'previousMeasure': () => v.navigate(cm, 'measure', 'backwards'),
   'layerUp': () => v.navigate(cm, 'layer', 'upwards'),
   'layerDown': () => v.navigate(cm, 'layer', 'downwards'),
-  'notationTop': () => setOrientation(cm, 'top', '', v, storage),
-  'notationBottom': () => setOrientation(cm, 'bottom', '', v, storage),
-  'notationLeft': () => setOrientation(cm, 'left', '', v, storage),
-  'notationRight': () => setOrientation(cm, 'right', '', v, storage),
-  'facsimileTop': () => setOrientation(cm, '', 'top', v, storage),
-  'facsimileBottom': () => setOrientation(cm, '', 'bottom', v, storage),
-  'facsimileLeft': () => setOrientation(cm, '', 'left', v, storage),
-  'facsimileRight': () => setOrientation(cm, '', 'right', v, storage),
+  'notationTop': () => setOrientation(cm, 'top', '', -1, -1, v, storage),
+  'notationBottom': () => setOrientation(cm, 'bottom', '', -1, -1, v, storage),
+  'notationLeft': () => setOrientation(cm, 'left', '', -1, -1, v, storage),
+  'notationRight': () => setOrientation(cm, 'right', '', -1, -1, v, storage),
+  'facsimileTop': () => setOrientation(cm, '', 'top', -1, -1, v, storage),
+  'facsimileBottom': () => setOrientation(cm, '', 'bottom', -1, -1, v, storage),
+  'facsimileLeft': () => setOrientation(cm, '', 'left', -1, -1, v, storage),
+  'facsimileRight': () => setOrientation(cm, '', 'right', -1, -1, v, storage),
   'showFacsimilePanel': () => {
     document.getElementById('showFacsimilePanel').checked = true;
-    setOrientation(cm, '', '', v);
+    setOrientation(cm, '', '', -1, -1, v);
   },
   'hideFacsimilePanel': () => {
     document.getElementById('showFacsimilePanel').checked = false;
-    setOrientation(cm, '', '', v);
+    setOrientation(cm, '', '', -1, -1, v);
   },
   'checkFacsimile': () => (v.xmlDoc.querySelector('facsimile')) ? cmd.showFacsimilePanel() : cmd.hideFacsimilePanel(),
   'showSettingsPanel': () => v.showSettingsPanel(),
@@ -1492,7 +1527,7 @@ function addEventListeners(v, cm) {
   // facsimile edit zones
   document.getElementById('facsimile-edit-zones-checkbox').addEventListener('click', e => {
     document.getElementById('editFacsimileZones').checked = e.target.checked;
-    setOrientation(cm, '', '', v);
+    setOrientation(cm, '', '', -1, -1, v);
   });
 
   // facsimile close button
