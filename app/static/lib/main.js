@@ -199,9 +199,9 @@ import {
 // const defaultMeiFileName = `${root}Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei`;
 const defaultMeiFileName = `${root}Beethoven_WoO70-Breitkopf.mei`;
 const defaultOrientation = 'bottom'; // default notation position in window
-const defaultPorportion = 0.5; // default notation size relative to window
+const defaultNotationPorportion = 0.5; // default notation size relative to window
 const defaultFacsimileOrientation = 'left'; // default facsimile position in notation window
-const defaultFacsimilePorportion = 0.65; // default facsimile panel size relative to notation
+const defaultFacsimilePorportion = 0.5; // default facsimile panel size relative to notation
 const defaultVerovioOptions = {
   scale: 55,
   breaks: "line",
@@ -1248,6 +1248,10 @@ let cmd = {
     document.getElementById('showFacsimilePanel').checked = false;
     setOrientation(cm, '', '', -1, -1, v);
   },
+  'toggleFacsimilePanel': () => {
+    document.getElementById('showFacsimilePanel').checked = !document.getElementById('showFacsimilePanel').checked;
+    setOrientation(cm, '', '', -1, -1, v);
+  },
   'checkFacsimile': () => (v.xmlDoc.querySelector('facsimile')) ? cmd.showFacsimilePanel() : cmd.hideFacsimilePanel(),
   'showSettingsPanel': () => v.showSettingsPanel(),
   'hideSettingsPanel': () => v.hideSettingsPanel(),
@@ -1442,6 +1446,7 @@ function addEventListeners(v, cm) {
   document.getElementById('filterReset').addEventListener('click', cmd.filterReset)
   document.getElementById('showAnnotationMenu').addEventListener('click', cmd.showAnnotationPanel);
   document.getElementById('showAnnotationsButton').addEventListener('click', cmd.toggleAnnotationPanel);
+  document.getElementById('showFacsimileButton').addEventListener('click', cmd.toggleFacsimilePanel);
   document.getElementById('closeAnnotationPanelButton').addEventListener('click', cmd.hideAnnotationPanel);
   document.getElementById('hideAnnotationPanelButton').addEventListener('click', cmd.hideAnnotationPanel);
   document.getElementById('showFacsimileMenu').addEventListener('click', cmd.showFacsimilePanel);
