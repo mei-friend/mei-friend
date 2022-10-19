@@ -32,6 +32,8 @@ We use [CodeMirror](https://codemirror.net) as our text editor, and [Verovio](ht
 
 **Facsimile support**. mei-friend makes the content of the facsimile element accessible by displaying zone elements ontop of the surface images in a dedicated facsimile panel, providing interactive zone editing functionality (resizing, panning, inserting & deleting zones) as well as an automated workflow for ingesting external facsimile content into MEI encodings.
 
+**Annotation support**. The annotation panel provides tooling for generating in-line <annot> elements, as well as for listing, navigating between, and visualising annotations. Support for stand-off Web Annotations is planned for future development.
+
 ## Publications
 Goebl, W. & Weigl, D. M. (2022). Alleviating the Last Mile of Encoding: The mei-friend Package for the Atom Text Editor.  In S. Münnich & D. Rizo (Eds.), Music Encoding Conference Proceedings 2021 (pp. 31&ndash;39). University of Alicante. doi:[10.17613/fc1c-mx52](https://doi.org/10.17613/fc1c-mx52)
 
