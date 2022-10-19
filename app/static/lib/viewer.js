@@ -8,6 +8,7 @@ import {
 } from './annotation.js'
 import {
   cm,
+  cmd,
   commonSchemas,
   defaultVerovioVersion,
   fontList,
@@ -637,6 +638,7 @@ export default class Viewer {
       rt.style.setProperty('--settingsLinkHoverColor', utils.brighter(cm.backgroundColor, 36));
       rt.style.setProperty('--settingsBackgroundColor', utils.brighter(cm.backgroundColor, 36));
       rt.style.setProperty('--settingsBackgroundAlternativeColor', utils.brighter(cm.backgroundColor, 24));
+      rt.style.setProperty('--controlMenuBackgroundColor', utils.brighter(cm.backgroundColor, 8));
       rt.style.setProperty('--navbarBackgroundColor', utils.brighter(cm.backgroundColor, 50));
       rt.style.setProperty('--dropdownHeadingColor', utils.brighter(cm.backgroundColor, 70));
       rt.style.setProperty('--dropdownBackgroundColor', utils.brighter(cm.backgroundColor, 50));
@@ -669,6 +671,7 @@ export default class Viewer {
       rt.style.setProperty('--settingsLinkHoverColor', utils.brighter(cm.backgroundColor, -24));
       rt.style.setProperty('--settingsBackgroundColor', utils.brighter(cm.backgroundColor, -36));
       rt.style.setProperty('--settingsBackgroundAlternativeColor', utils.brighter(cm.backgroundColor, -24));
+      rt.style.setProperty('--controlMenuBackgroundColor', utils.brighter(cm.backgroundColor, -8));
       rt.style.setProperty('--navbarBackgroundColor', utils.brighter(cm.backgroundColor, -50));
       rt.style.setProperty('--dropdownHeadingColor', utils.brighter(cm.backgroundColor, -70));
       rt.style.setProperty('--dropdownBackgroundColor', utils.brighter(cm.backgroundColor, -50));
@@ -1187,8 +1190,14 @@ export default class Viewer {
             break;
           case 'editFacsimileZones':
             document.getElementById('facsimile-edit-zones-checkbox').checked = value;
+            drawFacsimile();
+            break;
           case 'showFacsimilePanel':
+            value ? cmd.showFacsimilePanel() : cmd.hideFacsimilePanel();
+            break;
           case 'selectFacsimilePanelOrientation':
+            drawFacsimile();
+            break;
           case 'showFacsimileFullPage':
             document.getElementById('facsimile-full-page-checkbox').checked = value;
             drawFacsimile();

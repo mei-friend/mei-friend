@@ -11,6 +11,7 @@
   --defaultSuppliedHighlightedColor: #b37400;
   /* TODO use mdw blue */
   --defaultHighlightColor: #4e8bed;
+  --defaultControlMenuBackgroundColor: lightgray;
   --defaultNavbarBackgroundColor: lightgray;
   --defaultKeyboardShortCutColor: navy;
   --defaultDropdownHeadingColor: lightsteelblue;
@@ -48,6 +49,7 @@
   --suppliedColor: var(--defaultSuppliedColor);
   --suppliedHighlightedColor: var(--defaultSuppliedHighlightedColor);
   --highlightColor: var(--defaultHighlightColor);
+  --controlMenuBackgroundColor: var(--defaultControlMenuBackgroundColor);
   --navbarBackgroundColor: var(--defaultNavbarBackgroundColor);
   --keyboardShortCutColor: var(--defaultKeyboardShortCutColor);
   --dropdownHeadingColor: var(--defaultDropdownHeadingColor);
@@ -560,10 +562,14 @@ a:active {
   font-size: 10pt;
   height: 28px;
   color: var(--textColor);
-  background-color: var(--backgroundColor);
   padding: 1px;
   margin: 0px;
   z-index: 6;
+  /* border-bottom-width: 2px;
+  border-bottom-style: solid;
+  border-bottom-color: var(--navbarBackgroundColor);
+  background-color: var(--backgroundColor); */
+  background-color: var(--controlMenuBackgroundColor);;
 }
 
 .controls {
@@ -585,7 +591,7 @@ a:active {
   min-height: 21px;
   min-width: 21px;
   max-height: 21px;
-  background-color: var(--backgroundColor);
+  background-color: var(--controlMenuBackgroundColor);
 }
 
 .btn:hover {
@@ -755,6 +761,12 @@ svg text {
 #facsimile-panel text {
   stroke-opacity: 40%;
   fill-opacity: 40%;
+}
+
+#source-image-svg text {
+  fill: var(--dropdownHeadingColor);
+  stroke: var(--dropdownHeadingColor);
+  fill-opacity: 1;
 }
 
 .hidden {

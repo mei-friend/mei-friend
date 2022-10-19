@@ -1210,7 +1210,7 @@ function consultGuidelines() {
 
 
 // object of interface command functions for buttons and key bindings
-let cmd = {
+export let cmd = {
   'fileNameChange': () => {
     if (fileLocationType === 'file') {
       meiFileName = document.getElementById("fileName").innerText;
