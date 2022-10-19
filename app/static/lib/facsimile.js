@@ -34,6 +34,12 @@ import {
 } from './editor.js';
 
 
+let warningSvgText = document.createElementNS(svgNameSpace, 'text');
+warningSvgText.setAttribute('font-size', '24px');
+warningSvgText.setAttribute('font-weight', 'bold');
+warningSvgText.setAttribute('x', 30);
+warningSvgText.setAttribute('y', 30);
+warningSvgText.textContent = 'No facsimile content available.';
 
 // loads facsimile content of xmlDoc into an object
 export function loadFacsimile(xmlDoc) {
@@ -104,8 +110,9 @@ export async function drawFacsimile() {
     }
     let svgContainer = document.getElementById('source-image-container');
     let svg = document.getElementById('source-image-svg');
-    if (svg) svg.innerHTML = '';
+    if (!svg) return;
     if (facs[zoneId]) {
+        svg.innerHTML = '';
         // find the correct path of the image file
         let img;
         let imgName = facs[zoneId].target;
@@ -193,6 +200,9 @@ export async function drawFacsimile() {
             });
         }
         // console.log('ulx/uly//lrx/lry;w/h: ' + ulx + '/' + uly + '; ' + lrx + '/' + lry + '; ' + width + '/' + height);
+    } else {
+        svg.innerHTML = '';
+        svg.appendChild(warningSvgText);
     }
 }
 

@@ -35,14 +35,19 @@ export function createNotationDiv(parentElement, scale) {
   // Create container element for Facsimile Image
   let facsimilePanel = document.createElement('div');
   facsimilePanel.id = 'facsimile-panel';
+
   // SVG: facsimile image container
-  var svg = document.createElementNS(svgNameSpace, 'svg');
-  svg.id = 'source-image-container';
+  var svgContainer = document.createElementNS(svgNameSpace, 'svg');
+  svgContainer.id = 'source-image-container';
+  svgContainer.setAttribute('width', '500px');
+
   // SVG: facsimile image svg
-  var g = document.createElementNS(svgNameSpace, 'svg');
-  g.id = 'source-image-svg';
-  svg.appendChild(g);
-  facsimilePanel.append(svg);
+  var svg = document.createElementNS(svgNameSpace, 'svg');
+  svg.id = 'source-image-svg';
+  
+  // append everything
+  svgContainer.appendChild(svg);
+  facsimilePanel.append(svgContainer);
   facsimileContainer.appendChild(facsimilePanel);
 
   // add both containers to parent (#notation)
