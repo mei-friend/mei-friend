@@ -44,7 +44,7 @@ export function createNotationDiv(parentElement, scale) {
   // SVG: facsimile image svg
   var svg = document.createElementNS(svgNameSpace, 'svg');
   svg.id = 'source-image-svg';
-  
+
   // append everything
   svgContainer.appendChild(svg);
   facsimilePanel.append(svgContainer);
@@ -67,6 +67,15 @@ export function createVerovioControlMenu(parentElement, scale) {
   let vrvCtrlMenu = document.createElement('div');
   vrvCtrlMenu.classList.add('control-menu');
   vrvCtrlMenu.id = 'verovio-control-menu';
+
+  // Verovio spinning icon
+  let verovioIcon = document.createElement('div');
+  verovioIcon.innerHTML = icon.verovioV;
+  verovioIcon.id = 'verovio-icon';
+  verovioIcon.title = `mei-friend worker activity:
+     clockwise rotation denotes Verovio activity,
+     anticlockwise rotation speed worker activity`;
+  vrvCtrlMenu.appendChild(verovioIcon);
 
   // Zoom controls
   let zoomCtrls = document.createElement('div');
@@ -322,15 +331,7 @@ export function createVerovioControlMenu(parentElement, scale) {
   let speedDiv = document.createElement('div');
   speedDiv.id = 'speed-div';
   speedDiv.classList.add('controls');
-
-  let verovioIcon = document.createElement('div');
-  verovioIcon.innerHTML = icon.verovioV;
-  verovioIcon.id = 'verovio-icon';
-  verovioIcon.title = `Worker activity:
-     clockwise denotes Verovio activity,
-     anticlockwise speed worker activity`;
-  speedDiv.appendChild(verovioIcon);
-
+  
   let speedLabel = document.createElement('label');
   speedLabel.innerText = 'Speedmode:';
   speedLabel.id = 'speed-label';
@@ -364,6 +365,13 @@ export function createFacsilimieControlMenu(parentElement) {
   facsCtrlMenu.classList.add('control-menu');
   facsCtrlMenu.id = 'facsimile-control-menu';
   parentElement.appendChild(facsCtrlMenu);
+
+  // facsimile icon (octicon log)
+  let facsimileIcon = document.createElement('div');
+  facsimileIcon.innerHTML = icon.log;
+  facsimileIcon.id = 'facsimile-icon';
+  facsimileIcon.title = 'Facsimile panel';
+  facsCtrlMenu.appendChild(facsimileIcon);
 
   // Zoom controls
   let zoomCtrls = document.createElement('div');

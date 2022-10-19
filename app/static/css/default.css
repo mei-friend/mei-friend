@@ -561,14 +561,10 @@ a:active {
   justify-content: flex-start;
   font-size: 10pt;
   height: 28px;
-  color: var(--textColor);
-  padding: 1px;
+  padding: 2px;
   margin: 0px;
   z-index: 6;
-  /* border-bottom-width: 2px;
-  border-bottom-style: solid;
-  border-bottom-color: var(--navbarBackgroundColor);
-  background-color: var(--backgroundColor); */
+  color: var(--textColor);
   background-color: var(--controlMenuBackgroundColor);;
 }
 
@@ -824,14 +820,19 @@ svg text {
 
 #verovio-icon {
   margin-left: 3px;
+  margin-right: 3px;
   width: 22px;
   height: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   fill: var(--textColor);
-  /* stroke: var(--textColor);
-  stroke-width: 1px; */
+  stroke: var(--textColor);
+  stroke-width: 1.5px;
+}
+
+#facsimile-icon {
+  margin-left: 3px;
+  margin-right: 3px;
+  width: 16px;
+  fill: var(--textColor);
 }
 
 .code {
