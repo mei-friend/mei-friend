@@ -3,7 +3,10 @@
 ### 0.6.7 patch: facsimile panel re-organisation
 * Facsimile panel with separate control menu
 * Resizing of facsimile panel via mouse drag
-* Facsimile panel automatically shown/hidden when facsimile element present/absent
+* Intuitive (kebab/burger) icon on both resizers to enhance GUI affordance
+* When facsimile element present/absent, facsimile panel automatically shown/hidden and facsimile settings details opened/folded away
+* Notation and facsimile orientation and proportion values as URL parameters and in local storage
+* Verovio icon (activity status) moved to beginning of notation control menu
 ### 0.6.6 patch: small fixes and refinements
 * Correctly reset GitHub menu when switching to local file (via menu or drag'n'drop)
 * Make filename in file status display editable when working locally
