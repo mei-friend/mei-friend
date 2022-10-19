@@ -86,6 +86,7 @@ export function loadFacsimile(xmlDoc) {
 
 // Draw the source image with bounding boxes for each zone
 export async function drawFacsimile() {
+    busy();
     let fullPage = document.getElementById('showFacsimileFullPage').checked;
     ulx = Number.MAX_VALUE; // boundary values for image envelope
     uly = Number.MAX_VALUE;
@@ -208,6 +209,7 @@ export async function drawFacsimile() {
         svg.innerHTML = '';
         svg.appendChild(warningSvgText);
     }
+    busy(false);
 }
 
 function drawBoundingBox(zoneId, measureId, measureN) {
@@ -552,6 +554,7 @@ function ingestionInputHandler(ev) {
 }
 
 function handleFacsimileIngestion(reply) {
+    busy();
     console.log('Skeleton MEI file ' + reply.fileName + ' loaded.');
     let skelXml = new DOMParser().parseFromString(reply.mei, "text/xml");
     let facsimile = skelXml.querySelector('facsimile');
@@ -603,4 +606,13 @@ function handleFacsimileIngestion(reply) {
     document.getElementById('editFacsimileZones').checked = false;
     v.updateData(cm, false, true);
     v.updateNotation = true;
+    busy(false);
+}
+
+function busy(active = true) {
+    let facsimileIcon = document.getElementById('facsimile-icon');
+    if (facsimileIcon && active) {
+        facsimileIcon.classList.add('clockwise');
+    } else if (facsimileIcon && !active)
+        facsimileIcon.classList.remove('clockwise');
 }
