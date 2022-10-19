@@ -763,11 +763,11 @@ svg text {
   fill-opacity: 40%;
 }
 
-#source-image-svg text {
+/* #source-image-svg text {
   fill: var(--dropdownHeadingColor);
   stroke: var(--dropdownHeadingColor);
   fill-opacity: 1;
-}
+} */
 
 .hidden {
   display: none;

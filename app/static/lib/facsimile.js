@@ -37,6 +37,7 @@ import {
 let warningSvgText = document.createElementNS(svgNameSpace, 'text');
 warningSvgText.setAttribute('font-size', '24px');
 warningSvgText.setAttribute('font-weight', 'bold');
+warningSvgText.setAttribute('fill', 'var(--textColor)');
 warningSvgText.setAttribute('x', 30);
 warningSvgText.setAttribute('y', 30);
 warningSvgText.textContent = 'No facsimile content available.';
@@ -201,6 +202,9 @@ export async function drawFacsimile() {
         }
         // console.log('ulx/uly//lrx/lry;w/h: ' + ulx + '/' + uly + '; ' + lrx + '/' + lry + '; ' + width + '/' + height);
     } else {
+        svgContainer.removeAttribute('transform-origin');
+        svgContainer.removeAttribute('transform');
+        svg.removeAttribute('viewBox');
         svg.innerHTML = '';
         svg.appendChild(warningSvgText);
     }
