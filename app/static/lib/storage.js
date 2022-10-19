@@ -40,6 +40,10 @@ export default class Storage {
       this._fileChanged = this.storage.getItem("fileChanged");
       this._isMEI = this.storage.getItem("isMEI");
       this._orientation = this.storage.getItem("orientation");
+      this._notationOrientation = this.storage.getItem("notationOrientation");
+      this._facsimileOrientation = this.storage.getItem("facsimileOrientation");
+      this._notationProportion = this.storage.getItem("notationProportion");
+      this._facsimileProportion = this.storage.getItem("facsimileProportion");
       this._page = this.storage.getItem("page");
       this._scale = this.storage.getItem("scale");
       this._select = JSON.parse(this.storage.getItem("select")); // Array
@@ -100,11 +104,11 @@ export default class Storage {
     this._fileName = fileName;
   }
 
-  get isMEI() { 
+  get isMEI() {
     return this._isMEI === "true";
   }
 
-  set isMEI(isMEI) { 
+  set isMEI(isMEI) {
     this.safelySetStorageItem("isMEI", isMEI);
     this._isMEI = isMEI;
   }
@@ -194,6 +198,42 @@ export default class Storage {
   set orientation(orientation) {
     this.safelySetStorageItem("orientation", orientation);
     this._orientation = orientation;
+  }
+
+  get notationOrientation() {
+    return this._notationOrientation;
+  }
+
+  set notationOrientation(orientation) {
+    this.safelySetStorageItem("notationOrientation", orientation);
+    this._notationOrientation = orientation;
+  }
+
+  get facsimileOrientation() {
+    return this._facsimileOrientation;
+  }
+
+  set facsimileOrientation(orientation) {
+    this.safelySetStorageItem("facsimileOrientation", orientation);
+    this._facsimileOrientation = orientation;
+  }
+
+  get notationProportion() {
+    return parseFloat(this._notationProportion);
+  }
+
+  set notationProportion(proportion) {
+    this.safelySetStorageItem("notationProportion", proportion);
+    this._notationProportion = proportion;
+  }
+
+  get facsimileProportion() {
+    return parseFloat(this._facsimileProportion);
+  }
+
+  set facsimileProportion(proportion) {
+    this.safelySetStorageItem("facsimileProportion", proportion);
+    this._facsimileProportion = proportion;
   }
 
   get page() {

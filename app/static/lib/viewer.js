@@ -8,6 +8,7 @@ import {
 } from './annotation.js'
 import {
   cm,
+  cmd,
   commonSchemas,
   defaultVerovioVersion,
   fontList,
@@ -26,10 +27,10 @@ import {
   setOrientation
 } from './resizer.js'
 import {
-  drawSourceImage,
+  drawFacsimile,
   highlightZone,
-  zoomSourceImage
-} from './source-imager.js';
+  zoomFacsimile
+} from './facsimile.js';
 import {
   alert,
   download,
@@ -637,6 +638,7 @@ export default class Viewer {
       rt.style.setProperty('--settingsLinkHoverColor', utils.brighter(cm.backgroundColor, 36));
       rt.style.setProperty('--settingsBackgroundColor', utils.brighter(cm.backgroundColor, 36));
       rt.style.setProperty('--settingsBackgroundAlternativeColor', utils.brighter(cm.backgroundColor, 24));
+      rt.style.setProperty('--controlMenuBackgroundColor', utils.brighter(cm.backgroundColor, 8));
       rt.style.setProperty('--navbarBackgroundColor', utils.brighter(cm.backgroundColor, 50));
       rt.style.setProperty('--dropdownHeadingColor', utils.brighter(cm.backgroundColor, 70));
       rt.style.setProperty('--dropdownBackgroundColor', utils.brighter(cm.backgroundColor, 50));
@@ -669,6 +671,7 @@ export default class Viewer {
       rt.style.setProperty('--settingsLinkHoverColor', utils.brighter(cm.backgroundColor, -24));
       rt.style.setProperty('--settingsBackgroundColor', utils.brighter(cm.backgroundColor, -36));
       rt.style.setProperty('--settingsBackgroundAlternativeColor', utils.brighter(cm.backgroundColor, -24));
+      rt.style.setProperty('--controlMenuBackgroundColor', utils.brighter(cm.backgroundColor, -8));
       rt.style.setProperty('--navbarBackgroundColor', utils.brighter(cm.backgroundColor, -50));
       rt.style.setProperty('--dropdownHeadingColor', utils.brighter(cm.backgroundColor, -70));
       rt.style.setProperty('--dropdownBackgroundColor', utils.brighter(cm.backgroundColor, -50));
@@ -849,7 +852,8 @@ export default class Viewer {
         type: 'select',
         default: defaultVerovioVersion,
         values: Object.keys(supportedVerovioVersions),
-        valuesDescriptions: Object.keys(supportedVerovioVersions).map(key => supportedVerovioVersions[key].description)
+        valuesDescriptions: Object.keys(supportedVerovioVersions)
+          .map(key => supportedVerovioVersions[key].description)
       },
       toggleSpeedMode: {
         title: 'Speed Mode',
@@ -880,7 +884,8 @@ export default class Viewer {
       },
       annotationDisplayLimit: {
         title: 'Maximum number of annotations',
-        description: 'Maximum number of annotations to display (large numbers may slow mei-friend)',
+        description: `Maximum number of annotations to display 
+                      (large numbers may slow mei-friend)`,
         type: 'int',
         min: 0,
         step: 100,
@@ -992,42 +997,28 @@ export default class Viewer {
       //   title: 'options-line', // class name of hr element
       //   type: 'line'
       // },
-      titleSourceImagePanel: {
+      titleFacsimilePanel: {
         title: 'Facsimile panel',
         description: 'Show the facsimile imiages of the source edition, if available',
         type: 'header',
         open: false,
         default: false
       },
-      showSourceImagePanel: {
+      showFacsimilePanel: {
         title: 'Show facsimile panel',
         description: 'Show the score images of the source edition provided in the facsimile element',
         type: 'bool',
         default: false
       },
-      selectSourceImagePosition: {
+      // deleteme
+      selectFacsimilePanelOrientation: {
         title: 'Facsimile panel position',
         description: 'Select facsimile panel position relative to notation',
         type: 'select',
         values: ['left', 'right', 'top', 'bottom'],
         default: 'bottom'
       },
-      sourceImageProportion: {
-        title: 'Facsimile panel proportion (%)',
-        description: 'Proportion that the facsimile panel takes from the notation panel (in percent)',
-        type: 'int',
-        min: 0,
-        max: 99,
-        step: 1,
-        default: 50
-      },
-      showSourceImageFullPage: {
-        title: 'Show full page',
-        description: 'Show facsimile image on full page',
-        type: 'bool',
-        default: false
-      },
-      sourceImageZoom: {
+      facsimileZoomInput: {
         title: 'Facsimile image zoom (%)',
         description: 'Zoom level of facsimile image (in percent)',
         type: 'int',
@@ -1036,13 +1027,19 @@ export default class Viewer {
         step: 5,
         default: 100
       },
-      editZones: {
+      showFacsimileFullPage: {
+        title: 'Show full page',
+        description: 'Show facsimile image on full page',
+        type: 'bool',
+        default: false
+      },
+      editFacsimileZones: {
         title: 'Edit facsimile zones',
         description: 'Edit facsimile zones (will link bounding boxes to facsimile zones)',
         type: 'bool',
         default: false
       },
-      // sourceImagePanelSeparator: {
+      // sourcefacsimilePanelSeparator: {
       //   title: 'options-line', // class name of hr element
       //   type: 'line'
       // },
@@ -1133,6 +1130,12 @@ export default class Viewer {
         case 'controlMenuUpdateNotation':
           document.getElementById('update-ctrls').style.display = optDefault ? 'inherit' : 'none';
           break;
+        case 'showFacsimileFullPage':
+          document.getElementById('facsimile-full-page-checkbox').checked = optDefault;
+          break;
+        case 'editFacsimileZones':
+          document.getElementById('facsimile-edit-zones-checkbox').checked = optDefault;
+          break;
       }
       let div = this.createOptionsItem(opt, o, optDefault)
       if (div) {
@@ -1185,17 +1188,24 @@ export default class Viewer {
           case 'showAnnotationPanel':
             this.toggleAnnotationPanel();
             break;
-          case 'editZones':
-          case 'showSourceImagePanel':
-          case 'selectSourceImagePosition':
-          case 'sourceImageProportion':
-            setOrientation(cm, '', this);
+          case 'editFacsimileZones':
+            document.getElementById('facsimile-edit-zones-checkbox').checked = value;
+            drawFacsimile();
             break;
-          case 'showSourceImageFullPage':
-            drawSourceImage();
+          case 'showFacsimilePanel':
+            value ? cmd.showFacsimilePanel() : cmd.hideFacsimilePanel();
             break;
-          case 'sourceImageZoom':
-            zoomSourceImage();
+          case 'selectFacsimilePanelOrientation':
+            drawFacsimile();
+            break;
+          case 'showFacsimileFullPage':
+            document.getElementById('facsimile-full-page-checkbox').checked = value;
+            drawFacsimile();
+            break;
+          case 'facsimileZoomInput':
+            zoomFacsimile();
+            let facsZoom = document.getElementById('facsimile-zoom');
+            if (facsZoom) facsZoom.value = value;
             break;
           case 'showSupplied':
             rt.style.setProperty('--suppliedColor', (value) ? col : 'var(--notationColor)');

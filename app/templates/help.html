@@ -389,10 +389,6 @@
           <td class="explanation">Open specified file URL</td>
         </tr>
         <tr>
-          <td class="code">orientation=<i>top|right|bottom|left</i></td>
-          <td class="explanation">Set relative position of notation in window</td>
-        </tr>
-        <tr>
           <td class="code">scale=<i>number</i></td>
           <td class="explanation">Specify scaling of notation (default: 55; min: 10; max: 200)</td>
         </tr>
@@ -426,9 +422,33 @@
           <td class="explanation">Activate (default) or deactivate automatic validation upon MEI text input</td>
         </tr>
         <tr>
+          <td class="code">notationOrientation=<i>top|right|bottom|left</i></td>
+          <td class="explanation">Set relative position of notation in window</td>
+        </tr>
+        <tr>
+          <td class="code">notationProportion=<i>0.5&ndash;0.95</i></td>
+          <td class="explanation">Size of notation panel relative to window</td>
+        </tr>
+        <tr>
+          <td class="code">facsimileOrientation=<i>top|right|bottom|left</i></td>
+          <td class="explanation">Set relative position of facsimile relative to notation panel</td>
+        </tr>
+        <tr>
+          <td class="code">facsimileProportion=<i>0.5&ndash;0.95</i></td>
+          <td class="explanation">Size of facsimile panel relative to notation panel</td>
+        </tr>
+        <tr>
           <td colspan="2">Example: <br />
-            <a class="code" target="_blank"
-              href="https://mei-friend.mdw.ac.at/?file=https://raw.githubusercontent.com/trompamusic-encodings/Schumann-Clara_Romanze-in-a-Moll/master/Schumann-Clara_Romanze-ohne-Opuszahl_a-Moll.mei&orientation=top&select=beam-0000001097443359,staff-0000001071700568,chord-0000002117575656,chord-0000000554871076&select=slur-0000000400617177,slur-0000001381747608&speed=true&breaks=auto">https://mei-friend.mdw.ac.at/?file=https://raw.githubusercontent.com/trompamusic-encodings/Schumann-Clara_Romanze-in-a-Moll/master/Schumann-Clara_Romanze-ohne-Opuszahl_a-Moll.mei&orientation=top&select=beam-0000001097443359,staff-0000001071700568,chord-0000002117575656,chord-0000000554871076&select=slur-0000000400617177,slur-0000001381747608&speed=true&breaks=auto</a>
+            <p>
+              <a class="code" target="_blank"
+                href="https://mei-friend.mdw.ac.at/?file=https://raw.githubusercontent.com/trompamusic-encodings/Schumann-Clara_Romanze-in-a-Moll/master/Schumann-Clara_Romanze-ohne-Opuszahl_a-Moll.mei&orientation=top&select=beam-0000001097443359,staff-0000001071700568,chord-0000002117575656,chord-0000000554871076&select=slur-0000000400617177,slur-0000001381747608&speed=true&breaks=auto">Schumann piece with several elements 
+                selected in the middle</a>
+            </p>
+            <p>
+              <a class="code" target="_blank"
+                href="http://mei-friend.mdw.ac.at/?notationOrientation=top&notationProportion=.6&facsimileOrientation=left&facsimileProportion=.6&breaks=line&file=https://raw.githubusercontent.com/trompamusic-encodings/Beethoven_Op76_BreitkopfHaertel/master/Beethoven_Op76-Breitkopf-Haertel.mei">Beethoven Op.76 containing facsimile
+                elements with measure-wise zones</a>
+            </p>
           </td>
         </tr>
       </table>

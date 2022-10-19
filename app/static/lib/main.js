@@ -1,6 +1,6 @@
 // mei-friend version and date
-const version = '0.6.6';
-const versionDate = '17 Oct 2022';
+const version = '0.6.7';
+const versionDate = '19 Oct 2022';
 
 var vrvWorker;
 var spdWorker;
@@ -81,6 +81,10 @@ export let supportedVerovioVersions = {
     'url': 'https://www.verovio.org/javascript/latest/verovio-toolkit-hum.js',
     'description': 'Current Verovio release'
   },
+  '3.12.1': {
+    'url': 'https://www.verovio.org/javascript/3.12.1/verovio-toolkit-hum.js',
+    'description': 'Verovio release 3.12.1'
+  },
   '3.12.0': {
     'url': 'https://www.verovio.org/javascript/3.12.0/verovio-toolkit-hum.js',
     'description': 'Verovio release 3.12.0'
@@ -121,7 +125,8 @@ export const fontList = ['Leipzig', 'Bravura', 'Gootville', 'Leland', 'Petaluma'
 
 import {
   setOrientation,
-  addResizerHandlers
+  addResizerHandlers,
+  addFacsimilerResizerHandlers
 } from './resizer.js';
 import {
   addAnnotationHandlers,
@@ -141,7 +146,7 @@ import {
   openUrlCancel
 } from './open-url.js';
 import {
-  createControlsMenu,
+  createNotationDiv,
   setBreaksOptions,
   handleSmartBreaksOption,
   addModifyerKeys,
@@ -184,9 +189,9 @@ import {
   addZoneDrawer,
   ingestFacsimile,
   loadFacsimile,
-  drawSourceImage,
-  zoomSourceImage,
-} from './source-imager.js';
+  drawFacsimile,
+  zoomFacsimile,
+} from './facsimile.js';
 import {
   WorkerProxy
 } from './worker-proxy.js';
@@ -198,6 +203,9 @@ import {
 // const defaultMeiFileName = `${root}Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei`;
 const defaultMeiFileName = `${root}Beethoven_WoO70-Breitkopf.mei`;
 const defaultOrientation = 'bottom'; // default notation position in window
+const defaultNotationPorportion = 0.5; // default notation size relative to window
+const defaultFacsimileOrientation = 'left'; // default facsimile position in notation window
+const defaultFacsimilePorportion = 0.5; // default facsimile panel size relative to notation
 const defaultVerovioOptions = {
   scale: 55,
   breaks: "line",
@@ -336,6 +344,7 @@ export function loadDataInEditor(mei, setFreshlyLoaded = true) {
   freshlyLoaded = setFreshlyLoaded;
   cm.setValue(mei);
   v.loadXml(mei);
+  cmd.checkFacsimile();
   loadFacsimile(v.xmlDoc); // load all facsimila data of MEI
   let bs = document.getElementById('breaks-select');
   if (bs) {
@@ -489,7 +498,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // check for parameters passed through URL
   let searchParams = new URLSearchParams(window.location.search);
-  let orientationParam = searchParams.get('orientation');
+  let orientationParam = searchParams.get('notationOrientation') || searchParams.get('orientation');
+  let notationProportionParam = searchParams.get('notationProportion');
+  let facsimileOrientationParam = searchParams.get('facsimileOrientation');
+  let facsimileProportionParam = searchParams.get('facsimileProportion');
   pageParam = searchParams.get('page');
   let scaleParam = searchParams.get('scale');
   // select parameter: both syntax versions allowed (also mixed):
@@ -500,7 +512,7 @@ document.addEventListener('DOMContentLoaded', function () {
   let speedParam = searchParams.get('speed');
   breaksParam = searchParams.get('breaks');
 
-  createControlsMenu(document.getElementById('notation'), defaultVerovioOptions.scale);
+  createNotationDiv(document.getElementById('notation'), defaultVerovioOptions.scale);
   addModifyerKeys(document); //
 
   console.log('DOMContentLoaded. Trying now to load Verovio...');
@@ -580,7 +592,10 @@ document.addEventListener('DOMContentLoaded', function () {
   if (storage.supported) {
     storage.read();
     // save (most) URL parameters in storage
-    if (orientationParam !== null) storage.orientation = orientationParam;
+    if (orientationParam !== null) storage.notationOrientation = orientationParam;
+    if (notationProportionParam !== null) storage.notationProportion = notationProportionParam;
+    if (facsimileOrientationParam !== null) storage.facsimileOrientation = facsimileOrientationParam;
+    if (facsimileProportionParam !== null) storage.facsimileProportion = facsimileProportionParam;
     if (pageParam !== null) storage.page = pageParam;
     if (scaleParam !== null) storage.scale = scaleParam;
     // if (selectParam && selectParam.length > 0) storage.select = selectParam;
@@ -684,25 +699,52 @@ document.addEventListener('DOMContentLoaded', function () {
     v.speedMode = storage.speed;
     document.getElementById('speed-checkbox').checked = v.speedMode;
   }
+  let o = ''; // orientation from URLparam, storage or default (in this order)
   if (orientationParam !== null) {
-    setOrientation(cm, orientationParam);
-  } else if (storage && storage.supported && storage.hasItem('orientation')) {
-    setOrientation(cm, storage.orientation);
+    o = orientationParam;
+  } else if (storage && storage.supported && storage.hasItem('notationOrientation')) {
+    o = storage.notationOrientation;
   } else {
-    setOrientation(cm, defaultOrientation);
+    o = defaultOrientation;
   }
+  let fo = ''; // facsimile orientation from URLparam, storage or default (in this order)
+  if (facsimileOrientationParam !== null) {
+    fo = facsimileOrientationParam;
+  } else if (storage && storage.supported && storage.hasItem('facsimileOrientation')) {
+    fo = storage.facsimileOrientation;
+  } else {
+    fo = defaultFacsimileOrientation;
+  }
+  let np = -1;
+  if (notationProportionParam !== null) {
+    np = notationProportionParam;
+  } else if (storage && storage.supported && storage.hasItem('notationProportion')) {
+    np = storage.notationProportion;
+  } else {
+    np = defaultNotationPorportion;
+  }
+  let fp = -1;
+  if (facsimileProportionParam !== null) {
+    fp = facsimileProportionParam;
+  } else if (storage && storage.supported && storage.hasItem('facsimileProportion')) {
+    fp = storage.facsimileProportion;
+  } else {
+    fp = defaultFacsimilePorportion;
+  }
+  setOrientation(cm, o, fo, np, fp, v, storage);
+
   addEventListeners(v, cm);
   addAnnotationHandlers();
   addResizerHandlers(v, cm);
+  addFacsimilerResizerHandlers(v, cm);
   let doit;
   window.onresize = () => {
     clearTimeout(doit); // wait half a second before re-calculating orientation
-    doit = setTimeout(() => setOrientation(cm, '', v, storage), 500);
+    doit = setTimeout(() => setOrientation(cm, '', '', -1, -1, v, storage), 500);
   };
 
-
   setKeyMap(defaultKeyMap);
-});
+}); // DOMContentLoaded listener
 
 export async function openUrlFetch(url = '', updateAfterLoading = true) {
   let urlInput = document.querySelector("#openUrlInput");
@@ -848,8 +890,8 @@ async function vrvWorkerEventsHandler(ev) {
         updateStatusBar();
         updateHtmlTitle();
         document.getElementById('verovio-panel').innerHTML = ev.data.svg;
-        if (document.getElementById('showSourceImagePanel') &&
-          document.getElementById('showSourceImagePanel').checked) await drawSourceImage();
+        if (document.getElementById('showFacsimilePanel') &&
+          document.getElementById('showFacsimilePanel').checked) await drawFacsimile();
         if (ev.data.setCursorToPageBeginning) v.setCursorToPageBeginning(cm);
         v.updatePageNumDisplay();
         v.addNotationEventListeners(cm);
@@ -1172,7 +1214,7 @@ function consultGuidelines() {
 
 
 // object of interface command functions for buttons and key bindings
-let cmd = {
+export let cmd = {
   'fileNameChange': () => {
     if (fileLocationType === 'file') {
       meiFileName = document.getElementById("fileName").innerText;
@@ -1194,10 +1236,36 @@ let cmd = {
   'previousMeasure': () => v.navigate(cm, 'measure', 'backwards'),
   'layerUp': () => v.navigate(cm, 'layer', 'upwards'),
   'layerDown': () => v.navigate(cm, 'layer', 'downwards'),
-  'notationTop': () => setOrientation(cm, "top", v, storage),
-  'notationBottom': () => setOrientation(cm, "bottom", v, storage),
-  'notationLeft': () => setOrientation(cm, "left", v, storage),
-  'notationRight': () => setOrientation(cm, "right", v, storage),
+  'notationTop': () => setOrientation(cm, 'top', '', -1, -1, v, storage),
+  'notationBottom': () => setOrientation(cm, 'bottom', '', -1, -1, v, storage),
+  'notationLeft': () => setOrientation(cm, 'left', '', -1, -1, v, storage),
+  'notationRight': () => setOrientation(cm, 'right', '', -1, -1, v, storage),
+  'facsimileTop': () => setOrientation(cm, '', 'top', -1, -1, v, storage),
+  'facsimileBottom': () => setOrientation(cm, '', 'bottom', -1, -1, v, storage),
+  'facsimileLeft': () => setOrientation(cm, '', 'left', -1, -1, v, storage),
+  'facsimileRight': () => setOrientation(cm, '', 'right', -1, -1, v, storage),
+  'showFacsimilePanel': () => {
+    document.getElementById('showFacsimilePanel').checked = true;
+    setOrientation(cm, '', '', -1, -1, v);
+  },
+  'hideFacsimilePanel': () => {
+    document.getElementById('showFacsimilePanel').checked = false;
+    setOrientation(cm, '', '', -1, -1, v);
+  },
+  'toggleFacsimilePanel': () => {
+    document.getElementById('showFacsimilePanel').checked = !document.getElementById('showFacsimilePanel').checked;
+    setOrientation(cm, '', '', -1, -1, v);
+  },
+  'checkFacsimile': () => {
+    let tf = document.getElementById('titleFacsimilePanel');
+    if (v.xmlDoc.querySelector('facsimile')) {
+      if (tf) tf.setAttribute('open','true');
+      cmd.showFacsimilePanel();
+    } else {
+      if (tf) tf.removeAttribute('open');
+      cmd.hideFacsimilePanel();
+    }
+  },
   'showSettingsPanel': () => v.showSettingsPanel(),
   'hideSettingsPanel': () => v.hideSettingsPanel(),
   'toggleSettingsPanel': (ev) => v.toggleSettingsPanel(ev),
@@ -1238,6 +1306,16 @@ let cmd = {
     let zoomCtrl = document.getElementById('verovio-zoom');
     if (zoomCtrl && storage && storage.supported) storage.scale = zoomCtrl.value;
     v.updateLayout()
+  },
+  'facsZoomIn': () => zoomFacsimile(+5),
+  'facsZoomOut': () => zoomFacsimile(-5),
+  'facsZoomSlider': () => {
+    let facsZoom = document.getElementById('facsimile-zoom');
+    let facsZoomInput = document.getElementById('facsimileZoomInput');
+    if (facsZoom && facsZoomInput) {
+      facsZoomInput.value = facsZoom.value;
+      zoomFacsimile();
+    }
   },
   // add control elements
   'addSlur': () => e.addControlElement(v, cm, 'slur', ''),
@@ -1365,6 +1443,11 @@ function addEventListeners(v, cm) {
   document.getElementById('bottom').addEventListener('click', cmd.notationBottom);
   document.getElementById('left').addEventListener('click', cmd.notationLeft);
   document.getElementById('right').addEventListener('click', cmd.notationRight);
+  // facsimile position
+  document.getElementById('facstop').addEventListener('click', cmd.facsimileTop);
+  document.getElementById('facsbottom').addEventListener('click', cmd.facsimileBottom);
+  document.getElementById('facsleft').addEventListener('click', cmd.facsimileLeft);
+  document.getElementById('facsright').addEventListener('click', cmd.facsimileRight);
 
   // show settings panel
   document.getElementById('showSettingsMenu').addEventListener('click', cmd.showSettingsPanel);
@@ -1376,8 +1459,10 @@ function addEventListeners(v, cm) {
   document.getElementById('filterReset').addEventListener('click', cmd.filterReset)
   document.getElementById('showAnnotationMenu').addEventListener('click', cmd.showAnnotationPanel);
   document.getElementById('showAnnotationsButton').addEventListener('click', cmd.toggleAnnotationPanel);
+  document.getElementById('showFacsimileButton').addEventListener('click', cmd.toggleFacsimilePanel);
   document.getElementById('closeAnnotationPanelButton').addEventListener('click', cmd.hideAnnotationPanel);
   document.getElementById('hideAnnotationPanelButton').addEventListener('click', cmd.hideAnnotationPanel);
+  document.getElementById('showFacsimileMenu').addEventListener('click', cmd.showFacsimilePanel);
   // re-apply settings filtering when switching settings tabs
   document.querySelectorAll('#settingsPanel .tablink').forEach(t => t.addEventListener('click', cmd.filterSettings))
 
@@ -1421,10 +1506,10 @@ function addEventListeners(v, cm) {
   fc.addEventListener("dragstart", (ev) => console.log('Drag Start', ev));
   fc.addEventListener("dragend", (ev) => console.log('Drag End', ev));
 
-  // Zooming with buttons
+  // Zooming notation with buttons
   document.getElementById('decrease-scale-btn').addEventListener('click', cmd.zoomOut);
   document.getElementById('increase-scale-btn').addEventListener('click', cmd.zoomIn);
-  document.getElementById('verovio-zoom').addEventListener('click', cmd.zoomSlider);
+  document.getElementById('verovio-zoom').addEventListener('input', cmd.zoomSlider);
 
   // Zooming notation with mouse wheel
   vp.addEventListener('wheel', ev => {
@@ -1435,15 +1520,36 @@ function addEventListeners(v, cm) {
     }
   });
 
-  // Zooming source image with mouse wheel
-  let ip = document.getElementById('image-panel');
+  // Zooming facsimile with buttons
+  document.getElementById('facs-decrease-scale-btn').addEventListener('click', cmd.facsZoomOut);
+  document.getElementById('facs-increase-scale-btn').addEventListener('click', cmd.facsZoomIn);
+  document.getElementById('facsimile-zoom').addEventListener('input', cmd.facsZoomSlider);
+
+  // Zooming facsimile with mouse wheel
+  let ip = document.getElementById('facsimile-panel');
   ip.addEventListener('wheel', ev => {
     if (isCtrlOrCmd(ev)) {
       ev.preventDefault();
       ev.stopPropagation();
-      zoomSourceImage(Math.sign(ev.deltaY) * -5); // scrolling towards user = increase
+      zoomFacsimile(Math.sign(ev.deltaY) * -5); // scrolling towards user = increase
+      document.getElementById('facsimile-zoom').value = document.getElementById('facsimileZoomInput').value;
     }
   });
+
+  // facsimile full-page
+  document.getElementById('facsimile-full-page-checkbox').addEventListener('click', e => {
+    document.getElementById('showFacsimileFullPage').checked = e.target.checked;
+    drawFacsimile();
+  });
+
+  // facsimile edit zones
+  document.getElementById('facsimile-edit-zones-checkbox').addEventListener('click', e => {
+    document.getElementById('editFacsimileZones').checked = e.target.checked;
+    setOrientation(cm, '', '', -1, -1, v);
+  });
+
+  // facsimile close button
+  document.getElementById('facsimile-close-button').addEventListener('click', cmd.hideFacsimilePanel);
 
   // Page turning
   let ss = document.getElementById('section-selector');
@@ -1781,6 +1887,7 @@ function setKeyMap(keyMapFilePath) {
     });
 }
 
+// returns true, if event is a CMD (Mac) or a CTRL (Windows, Linux) event
 function isCtrlOrCmd(ev) {
   return (platform.startsWith('mac') && ev.metaKey) ||
     (!platform.startsWith('mac') && ev.ctrlKey);
