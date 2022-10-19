@@ -30,6 +30,8 @@ We use [CodeMirror](https://codemirror.net) as our text editor, and [Verovio](ht
 
 **Editor functions**. In addition to all features of the Atom plugin package, we now offer commands to insert and delete clefs, beam-spans, and spiccato articulation; to insert the vertical group (vgrp) attribute for selected elements supporting this attribute (such as dynam, dir, hairpin), with dynamic number attribution; and, to insert the supplied element around a selection and show all supplied elements in a configurable colour.
 
+**Facsimile support**. mei-friend makes the content of the facsimile element accessible by displaying zone elements ontop of the surface images in a dedicated facsimile panel, providing interactive zone editing functionality (resizing, panning, inserting & deleting zones) as well as an automated workflow for ingesting external facsimile content into MEI encodings.
+
 ## Publications
 Goebl, W. & Weigl, D. M. (2022). Alleviating the Last Mile of Encoding: The mei-friend Package for the Atom Text Editor.  In S. Münnich & D. Rizo (Eds.), Music Encoding Conference Proceedings 2021 (pp. 31&ndash;39). University of Alicante. doi:[10.17613/fc1c-mx52](https://doi.org/10.17613/fc1c-mx52)
 
