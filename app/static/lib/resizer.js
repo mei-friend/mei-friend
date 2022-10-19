@@ -1,10 +1,10 @@
 // notation variables (verovio-container)
-let orientation = 'bottom'; // position of notation
+let notationOrientation = 'bottom'; // position of notation
 let notationProportion = .5; // proportion notation div takes from container
 let notationResizerWidth = 8; // 8 px, Attention: hard-coded also in left.css, right.css, top.css, bottom.css
 // facsimile variables (facsimile-container)
 let facsimileResizerWidth = 8; // px, compare to css facsimile-[left/right/top/bottom].css
-let facsimileOrientation = 'bottom'; // orientation of facsimile relative to notation
+let facsimileOrientation = 'bottom'; // notationOrientation of facsimile relative to notation
 let facsimileProportion = .65;
 // annotation panel size
 let annotationPanelExtent = 250; // px, taken away from width of friendContainer
@@ -15,7 +15,7 @@ let storage;
 
 export function setOrientation(cm, o = '', vo = '', np = -1, fp = -1, v = null, _storage = null) {
   if (_storage !== null) storage = _storage;
-  if (o) orientation = o;
+  if (o) notationOrientation = o;
   if (vo) {
     facsimileOrientation = vo;
     document.getElementById('selectFacsimilePanelOrientation').value = facsimileOrientation;
@@ -24,16 +24,16 @@ export function setOrientation(cm, o = '', vo = '', np = -1, fp = -1, v = null, 
   if (fp > 0) facsimileProportion = fp;
   // save in local storage
   if (storage && storage.supported) {
-    storage.orientation = orientation;
+    storage.notationOrientation = notationOrientation;
     storage.facsimileOrientation = facsimileOrientation;
   }
   let friendSz = document.getElementById("friendContainer");
   let stylesheet = document.getElementById("orientationCSS");
-  stylesheet.setAttribute('href', root + 'css/' + orientation + '.css');
+  stylesheet.setAttribute('href', root + 'css/' + notationOrientation + '.css');
   // TODO: find a better solution for changing css and awaiting changes
   // $("#orientationCSS").load(function() {
   // v.updateLayout();
-  // }).attr('href', root + '/css/' + orientation + '.css');
+  // }).attr('href', root + '/css/' + notationOrientation + '.css');
   let sz = calcSizeOfContainer();
   const notationDiv = document.getElementById('notation');
   const verovioContainer = document.getElementById('verovio-container');
@@ -46,7 +46,7 @@ export function setOrientation(cm, o = '', vo = '', np = -1, fp = -1, v = null, 
   const annotationPanel = document.getElementById('annotationPanel');
   const showAnnotationPanelCheckbox = document.getElementById('showAnnotationPanel');
   // console.log('setOrientation(' + o + ') container size:', sz);
-  if (orientation === "top" || orientation === "bottom") {
+  if (notationOrientation === "top" || notationOrientation === "bottom") {
     if (showAnnotationPanelCheckbox && showAnnotationPanelCheckbox.checked) {
       sz.width -= annotationPanelExtent; // subtract width of annotation panel
       annotationPanel.style.display = 'unset';
@@ -59,7 +59,7 @@ export function setOrientation(cm, o = '', vo = '', np = -1, fp = -1, v = null, 
     notationDiv.style.height = sz.height * notationProportion;
     cm.setSize(sz.width, sz.height * (1 - notationProportion) - notationResizerWidth);
   }
-  if (orientation === "left" || orientation === "right") {
+  if (notationOrientation === "left" || notationOrientation === "right") {
     if (showAnnotationPanelCheckbox && showAnnotationPanelCheckbox.checked) {
       sz.height -= annotationPanelExtent; // subtract width of annotation panel
       annotationPanel.style.display = 'unset';
@@ -132,7 +132,7 @@ export function setOrientation(cm, o = '', vo = '', np = -1, fp = -1, v = null, 
 }
 
 export function getOrientation() {
-  return orientation;
+  return notationOrientation;
 }
 
 export function calcSizeOfContainer() {
@@ -143,7 +143,7 @@ export function calcSizeOfContainer() {
   let footerSz = document.querySelector('.footer').getBoundingClientRect();
   friendSz.height = bodySz.height - headerSz.height - footerSz.height - notationResizerWidth;
   friendSz.width = bodySz.width - notationResizerWidth + 2; // TODO: hack for missing 2-px-width (21 April 2022)
-  // console.log('calcSizeOfContainer(' + orientation + ') bodySz, header, sizer, footer: ' +
+  // console.log('calcSizeOfContainer(' + notationOrientation + ') bodySz, header, sizer, footer: ' +
   // Math.round(bodySz.width) + '/' + Math.round(bodySz.height) + ', ' +
   // Math.round(headerSz.width) + '/' + Math.round(headerSz.height) + ', ' +
   // Math.round(footerSz.width) + '/' + Math.round(footerSz.height) + ', ' +
@@ -176,9 +176,9 @@ export function addResizerHandlers(v, cm) {
   const mouseDownHandler = function (e) {
     x = e.clientX;
     y = e.clientY;
-    if (orientation === "top" || orientation === "bottom")
+    if (notationOrientation === "top" || notationOrientation === "bottom")
       notationSize = notation.getBoundingClientRect().height;
-    if (orientation === "left" || orientation === "right")
+    if (notationOrientation === "left" || notationOrientation === "right")
       notationSize = notation.getBoundingClientRect().width;
     document.addEventListener('mousemove', mouseMoveHandler);
     document.addEventListener('mouseup', mouseUpHandler);
@@ -191,7 +191,7 @@ export function addResizerHandlers(v, cm) {
     let sz = resizer.parentNode.getBoundingClientRect();
     let szSz = resizer.getBoundingClientRect();
     // console.log("Mouse move dx/dy: " + dx + "/" + dy + ', Container: ' + sz.width + '/' + sz.height);
-    switch (orientation) {
+    switch (notationOrientation) {
       case 'top':
         notationProportion = (notationSize + dy) / sz.height;
         break;
@@ -208,7 +208,7 @@ export function addResizerHandlers(v, cm) {
     // restrict to min/max
     notationProportion = Math.min(maxProportion, Math.max(minProportion, notationProportion));
     // update relative size of facsimile images, if active
-    switch (orientation) {
+    switch (notationOrientation) {
       case 'top':
       case 'bottom':
         notation.style.height = notationProportion * sz.height;
@@ -229,7 +229,7 @@ export function addResizerHandlers(v, cm) {
         break;
     }
     // console.log('notation w/h: ' + notation.style.width + '/' + notation.style.height)
-    const cursor = (orientation === "left" || orientation === "right") ? 'col-resize' : 'row-resize';
+    const cursor = (notationOrientation === "left" || notationOrientation === "right") ? 'col-resize' : 'row-resize';
     resizer.style.cursor = cursor;
     document.body.style.cursor = cursor;
     notation.style.userSelect = 'none';

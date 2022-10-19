@@ -40,6 +40,7 @@ export default class Storage {
       this._fileChanged = this.storage.getItem("fileChanged");
       this._isMEI = this.storage.getItem("isMEI");
       this._orientation = this.storage.getItem("orientation");
+      this._notationOrientation = this.storage.getItem("notationOrientation");
       this._facsimileOrientation = this.storage.getItem("facsimileOrientation");
       this._notationProportion = this.storage.getItem("notationProportion");
       this._facsimileProportion = this.storage.getItem("facsimileProportion");
@@ -197,6 +198,15 @@ export default class Storage {
   set orientation(orientation) {
     this.safelySetStorageItem("orientation", orientation);
     this._orientation = orientation;
+  }
+
+  get notationOrientation() {
+    return this._notationOrientation;
+  }
+
+  set notationOrientation(orientation) {
+    this.safelySetStorageItem("notationOrientation", orientation);
+    this._notationOrientation = orientation;
   }
 
   get facsimileOrientation() {

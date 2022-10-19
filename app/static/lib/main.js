@@ -494,7 +494,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // check for parameters passed through URL
   let searchParams = new URLSearchParams(window.location.search);
-  let orientationParam = searchParams.get('orientation');
+  let orientationParam = searchParams.get('notationOrientation') || searchParams.get('orientation');
   let notationProportionParam = searchParams.get('notationProportion');
   let facsimileOrientationParam = searchParams.get('facsimileOrientation');
   let facsimileProportionParam = searchParams.get('facsimileProportion');
@@ -588,7 +588,7 @@ document.addEventListener('DOMContentLoaded', function () {
   if (storage.supported) {
     storage.read();
     // save (most) URL parameters in storage
-    if (orientationParam !== null) storage.orientation = orientationParam;
+    if (orientationParam !== null) storage.notationOrientation = orientationParam;
     if (notationProportionParam !== null) storage.notationProportion = notationProportionParam;
     if (facsimileOrientationParam !== null) storage.facsimileOrientation = facsimileOrientationParam;
     if (facsimileProportionParam !== null) storage.facsimileProportion = facsimileProportionParam;
@@ -698,8 +698,8 @@ document.addEventListener('DOMContentLoaded', function () {
   let o = ''; // orientation from URLparam, storage or default (in this order)
   if (orientationParam !== null) {
     o = orientationParam;
-  } else if (storage && storage.supported && storage.hasItem('orientation')) {
-    o = storage.orientation;
+  } else if (storage && storage.supported && storage.hasItem('notationOrientation')) {
+    o = storage.notationOrientation;
   } else {
     o = defaultOrientation;
   }

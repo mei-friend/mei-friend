@@ -126,7 +126,7 @@ export async function drawFacsimile() {
                 }
             } else if (fileLocationType === 'url') {
                 let url = new URL(meiFileLocation);
-                imgName = url.origin + url.pathname.substring(url.pathname.lastIndexOf('/') + 1) + imgName;
+                imgName = url.origin + url.pathname.substring(0, url.pathname.lastIndexOf('/') + 1) + imgName;
             } else {
                 imgName = `${root}local/` + facs[zoneId].target;
                 imgName = imgName.replace('.tif', '.jpg'); // hack for some DIME files...
