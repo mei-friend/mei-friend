@@ -791,10 +791,10 @@ export default class Viewer {
         let i = 0;
         optionsList.forEach(opt => {
           opt.classList.remove('odd');
+          opt.style.display = "flex"; // reset to active...
           if (opt.nodeName.toLowerCase() === 'details') {
             i = 0; // reset counter at each details element
           } else {
-            opt.style.display = "flex"; // reset to active...
             opt.dataset.tab = activeTab.id;
             const optInput = opt.querySelector("input,select");
             const optLabel = opt.querySelector("label");
