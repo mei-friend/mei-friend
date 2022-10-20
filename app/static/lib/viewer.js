@@ -2009,7 +2009,8 @@ export default class Viewer {
       const res = await validator.setRelaxNGSchema(data);
     } catch (err) {
       this.throwSchemaError({
-        "err": 'Schema error at replacing schema: ' + err
+        "err": 'Schema error at replacing schema: ' + err,
+        "schemaFile": schemaFile
       });
       return
     }
@@ -2045,14 +2046,14 @@ export default class Viewer {
       msg = 'Schema not found (' + msgObj.response.status + ' ' +
       msgObj.response.statusText + '): ';
     if (msgObj.hasOwnProperty('err'))
-      msg = msgObj.err + ': ';
+      msg = msgObj.err + ' ';
     if (msgObj.hasOwnProperty('schemaFile'))
       msg += msgObj.schemaFile;
     // set icon to unverified and error color
     let vs = document.getElementById('validation-status');
     vs.innerHTML = unverified;
     vs.setAttribute('title', msg);
-    console.warn(msg);
+    this.showAlert(msg, 'error', -1);
     this.changeStatus(vs, 'error', ['wait', 'ok', 'manual']);
     this.updateSchemaStatusDisplay('error', '', msg);
     return;
