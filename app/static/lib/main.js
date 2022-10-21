@@ -1,6 +1,6 @@
 // mei-friend version and date
 const version = '0.6.7';
-const versionDate = '19 Oct 2022';
+const versionDate = '21 Oct 2022';
 
 var vrvWorker;
 var spdWorker;
@@ -125,7 +125,7 @@ export const fontList = ['Leipzig', 'Bravura', 'Gootville', 'Leland', 'Petaluma'
 
 import {
   setOrientation,
-  addResizerHandlers,
+  addNotationResizerHandlers,
   addFacsimilerResizerHandlers
 } from './resizer.js';
 import {
@@ -735,7 +735,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   addEventListeners(v, cm);
   addAnnotationHandlers();
-  addResizerHandlers(v, cm);
+  addNotationResizerHandlers(v, cm);
   addFacsimilerResizerHandlers(v, cm);
   let doit;
   window.onresize = () => {
