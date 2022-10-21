@@ -91,7 +91,10 @@ function forkRepoCancelClicked() {
 
 function repoHeaderClicked() {
   github.filepath = "";
-  refreshGithubMenu();
+  refreshGithubMenu(); // reopen
+  let githubMenu = document.getElementById("GithubMenu");
+  githubMenu.classList.add("forceShow");
+  githubMenu.classList.add("show");
 }
 
 function branchesHeaderClicked(ev) {
@@ -164,6 +167,7 @@ function branchContentsDirClicked(ev) {
 
 function branchContentsFileClicked(ev) {
   loadFile(ev.target.innerText);
+  document.getElementById("GithubMenu").classList.remove("forceShow");
 }
 
 function loadFile(fileName, ev = null) {
@@ -215,6 +219,12 @@ function assignGithubMenuClickHandlers() {
   // This function is called repeatedly during runtime as the content of the
   // Github menu is dynamic. Therefore, we remove all event listeners below
   // before adding them, to avoid attaching multiple identical listeners.
+  const githubMenu = document.getElementById("GithubMenu");
+  if(githubMenu) { 
+    githubMenu.removeEventListener('mouseleave', (e) => e.target.classList.remove("forceShow"));
+    githubMenu.addEventListener('mouseleave', (e) => e.target.classList.remove("forceShow"));
+  }
+
   const githubLoadingIndicator = document.getElementById("GithubLogo");
   const logoutButton = document.getElementById('GithubLogout');
   if (logoutButton) {
@@ -530,7 +540,7 @@ export function logoutFromGithub() {
   window.location.replace(url.substring(0, url.lastIndexOf("/")) + "/logout");
 }
 
-export function refreshGithubMenu(e) {
+export function refreshGithubMenu() {
   // display Github name
   document.getElementById("GithubName").innerText =
     github.author.name === "None" ? github.userLogin : github.author.name;
