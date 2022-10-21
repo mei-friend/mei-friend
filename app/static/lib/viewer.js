@@ -445,11 +445,14 @@ export default class Viewer {
   }
 
   addNotationEventListeners(cm) {
-    let elements = document.querySelectorAll('g[id],rect[id],text[id]');
-    elements.forEach(item => {
-      item.addEventListener('click',
-        (event) => this.handleClickOnNotation(event, cm));
-    });
+    let vp = document.getElementById('verovio-panel');
+    if (vp) {
+      let elements = vp.querySelectorAll('g[id],rect[id],text[id]');
+      elements.forEach(item => {
+        item.addEventListener('click',
+          (event) => this.handleClickOnNotation(event, cm));
+      });
+    }
   }
 
   handleClickOnNotation(e, cm) {
@@ -788,10 +791,10 @@ export default class Viewer {
         let i = 0;
         optionsList.forEach(opt => {
           opt.classList.remove('odd');
+          opt.style.display = "flex"; // reset to active...
           if (opt.nodeName.toLowerCase() === 'details') {
             i = 0; // reset counter at each details element
           } else {
-            opt.style.display = "flex"; // reset to active...
             opt.dataset.tab = activeTab.id;
             const optInput = opt.querySelector("input,select");
             const optLabel = opt.querySelector("label");
@@ -2006,7 +2009,8 @@ export default class Viewer {
       const res = await validator.setRelaxNGSchema(data);
     } catch (err) {
       this.throwSchemaError({
-        "err": 'Schema error at replacing schema: ' + err
+        "err": 'Schema error at replacing schema: ' + err,
+        "schemaFile": schemaFile
       });
       return
     }
@@ -2042,14 +2046,14 @@ export default class Viewer {
       msg = 'Schema not found (' + msgObj.response.status + ' ' +
       msgObj.response.statusText + '): ';
     if (msgObj.hasOwnProperty('err'))
-      msg = msgObj.err + ': ';
+      msg = msgObj.err + ' ';
     if (msgObj.hasOwnProperty('schemaFile'))
       msg += msgObj.schemaFile;
     // set icon to unverified and error color
     let vs = document.getElementById('validation-status');
     vs.innerHTML = unverified;
     vs.setAttribute('title', msg);
-    console.warn(msg);
+    this.showAlert(msg, 'error', -1);
     this.changeStatus(vs, 'error', ['wait', 'ok', 'manual']);
     this.updateSchemaStatusDisplay('error', '', msg);
     return;

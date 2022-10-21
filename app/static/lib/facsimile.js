@@ -217,6 +217,7 @@ function drawBoundingBox(zoneId, measureId, measureN) {
         let rect = document.createElementNS(svgNameSpace, 'rect');
         rect.setAttribute('rx', rectangleLineWidth / 2);
         rect.setAttribute('ry', rectangleLineWidth / 2);
+        rect.addEventListener('click', (e) => v.handleClickOnNotation(e, cm));
         let editFacsimileZones = document.getElementById('editFacsimileZones').checked;
         let svg = document.getElementById('source-image-svg');
         svg.appendChild(rect);
@@ -235,6 +236,7 @@ function drawBoundingBox(zoneId, measureId, measureN) {
             txt.setAttribute('fill', rectangleColor);
             txt.setAttribute('x', x + 7);
             txt.setAttribute('y', y + 29);
+            txt.addEventListener('click', (e) => v.handleClickOnNotation(e, cm));
             txt.textContent = measureN;
             if (measureId) txt.id = editFacsimileZones ? zoneId : measureId;
         }
