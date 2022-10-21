@@ -2053,7 +2053,7 @@ export default class Viewer {
     let vs = document.getElementById('validation-status');
     vs.innerHTML = unverified;
     vs.setAttribute('title', msg);
-    this.showAlert(msg, 'error', -1);
+    console.warn(msg);
     this.changeStatus(vs, 'error', ['wait', 'ok', 'manual']);
     this.updateSchemaStatusDisplay('error', '', msg);
     return;

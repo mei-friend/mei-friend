@@ -462,9 +462,9 @@ export async function validate(mei, updateLinting, options) {
       }
       console.log('Validation complete: ', (validation === []) ? 'no errors.' : (validation.length + ' errors found.'));
       v.highlightValidation(mei, validation);
-    } else if (!document.getElementById('autoValidate').checked) {
+    } else if (v.validatorWithSchema && !document.getElementById('autoValidate').checked) {
       v.setValidationStatusToManual();
-    }
+    } 
   }
 }
 
