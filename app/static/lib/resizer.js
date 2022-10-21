@@ -48,7 +48,8 @@ export function setOrientation(cm,
   const verovioPanel = document.getElementById('verovio-panel');
   const facsimileDragger = document.getElementById('facsimile-dragger');
   const facsimileContainer = document.getElementById('facsimile-container');
-  const controlMenu = document.getElementById('verovio-control-menu');
+  const facsimilePanel = document.getElementById('facsimile-panel');
+  const verovioControlMenu = document.getElementById('verovio-control-menu');
   const facsimileControlMenu = document.getElementById('facsimile-control-menu');
   const annotationPanel = document.getElementById('annotationPanel');
   const showAnnotationPanelCheckbox = document.getElementById('showAnnotationPanel');
@@ -90,15 +91,18 @@ export function setOrientation(cm,
       if (showFacsimile) {
         facsimileContainer.style.display = 'block';
         facsimileContainer.style.height = parseFloat(notationDiv.style.height) * facsimileProportion - facsimileResizerWidth;
+        facsimilePanel.style.height = parseFloat(facsimileContainer.style.height) - facsimileControlMenu.getBoundingClientRect().height;
         verovioContainer.style.height = parseFloat(notationDiv.style.height) * (1 - facsimileProportion);
-        verovioPanel.style.height = parseFloat(verovioContainer.style.height) - facsimileControlMenu.getBoundingClientRect().height;
+        verovioPanel.style.height = parseFloat(verovioContainer.style.height) - verovioControlMenu.getBoundingClientRect().height;
       } else {
         facsimileContainer.style.display = 'none';
         facsimileContainer.style.height = 0;
+        facsimilePanel.style.height = '';
         verovioContainer.style.height = '';
         verovioPanel.style.height = '';
       }
       facsimileContainer.style.width = notationDiv.style.width;
+      facsimilePanel.style.width = parseFloat(facsimileContainer.style.width);
       verovioContainer.style.width = notationDiv.style.width;
       verovioPanel.style.width = parseFloat(verovioContainer.style.width);
       break;
@@ -107,17 +111,20 @@ export function setOrientation(cm,
       if (showFacsimile) {
         facsimileContainer.style.display = 'block';
         facsimileContainer.style.width = parseFloat(notationDiv.style.width) * facsimileProportion - facsimileResizerWidth;
+        facsimilePanel.style.width = parseFloat(facsimileContainer.style.width);
         verovioContainer.style.width = parseFloat(notationDiv.style.width) * (1 - facsimileProportion);
-        verovioPanel.width = parseFloat(verovioContainer.style.width);
+        verovioPanel.style.width = parseFloat(verovioContainer.style.width);
       } else {
         facsimileContainer.style.display = 'none';
         facsimileContainer.style.width = 0;
+        facsimilePanel.style.width = '';
         verovioContainer.style.width = '';
         verovioPanel.style.width = '';
       }
       facsimileContainer.style.height = parseFloat(notationDiv.style.height);
       verovioContainer.style.height = parseFloat(notationDiv.style.height);
-      verovioPanel.style.height = parseFloat(verovioContainer.style.height) - controlMenu.getBoundingClientRect().height;
+      verovioPanel.style.height = parseFloat(verovioContainer.style.height) - verovioControlMenu.getBoundingClientRect().height;
+      facsimilePanel.style.height = parseFloat(facsimileContainer.style.height) - facsimileControlMenu.getBoundingClientRect().height;
       break;
   }
   facsimileDragger.style.display = showFacsimile ? 'flex' : 'none';
