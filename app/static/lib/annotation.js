@@ -457,6 +457,9 @@ export function writeAnnot(anchor, xmlId, plist, payload) {
     insertHere = anchor.closest("score")
   else {
     console.error("Sorry, cannot currently write annotations placed outside <score>");
+    v.showAlert("Sorry, cannot currently write annotations placed outside &lt;score&gt;", "warning", 5000);
+    // remove from list
+    deleteAnnotation(xmlId)
     return;
   }
   if (insertHere) {
