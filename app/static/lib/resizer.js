@@ -13,39 +13,48 @@ let minProportion = .05; // mimimum proportion of both notationProportion, facsi
 let maxProportion = .95;
 let storage;
 
-export function setOrientation(cm, o = '', vo = '', np = -1, fp = -1, v = null, _storage = null) {
-  if (_storage !== null) storage = _storage;
-  if (o) notationOrientation = o;
-  if (vo) {
-    facsimileOrientation = vo;
+export function setOrientation(cm,
+  _notationOrientation = '', _facsimileOrientation = '',
+  _notationProportion = -1, _facsimileProportion = -1,
+  v = null, _storage = null) {
+
+  // store arguments
+  if (_notationOrientation) notationOrientation = _notationOrientation;
+  if (_facsimileOrientation) {
+    facsimileOrientation = _facsimileOrientation;
     document.getElementById('selectFacsimilePanelOrientation').value = facsimileOrientation;
   }
-  if (np > 0) notationProportion = np;
-  if (fp > 0) facsimileProportion = fp;
+  if (_notationProportion > 0) notationProportion = _notationProportion;
+  if (_facsimileProportion > 0) facsimileProportion = _facsimileProportion;
+  if (_storage !== null) storage = _storage;
+
   // save in local storage
   if (storage && storage.supported) {
     storage.notationOrientation = notationOrientation;
     storage.facsimileOrientation = facsimileOrientation;
   }
-  let friendSz = document.getElementById("friendContainer");
+
+  // change CSS for notation orientation
   let stylesheet = document.getElementById("orientationCSS");
   stylesheet.setAttribute('href', root + 'css/' + notationOrientation + '.css');
-  // TODO: find a better solution for changing css and awaiting changes
-  // $("#orientationCSS").load(function() {
-  // v.updateLayout();
-  // }).attr('href', root + '/css/' + notationOrientation + '.css');
-  let sz = calcSizeOfContainer();
+  // change CSS for facsimile orientation
+  facsimileOrientation = document.getElementById('selectFacsimilePanelOrientation').value;
+  let facsCss = document.getElementById("facsimileOrientationCSS");
+  facsCss.setAttribute('href', root + 'css/facsimile-' + facsimileOrientation + '.css');
+
+  const friendSz = document.getElementById("friendContainer");
   const notationDiv = document.getElementById('notation');
   const verovioContainer = document.getElementById('verovio-container');
   const verovioPanel = document.getElementById('verovio-panel');
   const facsimileDragger = document.getElementById('facsimile-dragger');
   const facsimileContainer = document.getElementById('facsimile-container');
-  const showFacsimile = document.getElementById('showFacsimilePanel').checked;
   const controlMenu = document.getElementById('verovio-control-menu');
   const facsimileControlMenu = document.getElementById('facsimile-control-menu');
   const annotationPanel = document.getElementById('annotationPanel');
   const showAnnotationPanelCheckbox = document.getElementById('showAnnotationPanel');
-  // console.log('setOrientation(' + o + ') container size:', sz);
+  const showFacsimile = document.getElementById('showFacsimilePanel').checked;
+  let sz = calcSizeOfContainer();
+  // console.log('setOrientation(' + _notationOrientation + ') container size:', sz);
   if (notationOrientation === "top" || notationOrientation === "bottom") {
     if (showAnnotationPanelCheckbox && showAnnotationPanelCheckbox.checked) {
       sz.width -= annotationPanelExtent; // subtract width of annotation panel
@@ -74,11 +83,6 @@ export function setOrientation(cm, o = '', vo = '', np = -1, fp = -1, v = null, 
   }
   friendSz.style.width = sz.width;
   friendSz.style.height = sz.height;
-
-  facsimileOrientation = document.getElementById('selectFacsimilePanelOrientation').value;
-
-  let facsCss = document.getElementById("facsimileOrientationCSS");
-  facsCss.setAttribute('href', root + 'css/facsimile-' + facsimileOrientation + '.css');
 
   switch (facsimileOrientation) {
     case 'top':
@@ -118,7 +122,7 @@ export function setOrientation(cm, o = '', vo = '', np = -1, fp = -1, v = null, 
   }
   facsimileDragger.style.display = showFacsimile ? 'flex' : 'none';
 
-  // redoLayout when done with loading
+  // redoLayout when done with loading, only when viewer object (v) present
   if (v) {
     if (v.speedMode &&
       document.getElementById('breaks-select').value === 'auto') {
@@ -163,7 +167,7 @@ export function getVerovioContainerSize() {
 
 
 // resizer handlers for resizing the notation/editor relative size
-export function addResizerHandlers(v, cm) {
+export function addNotationResizerHandlers(v, cm) {
   const resizer = document.getElementById('dragMe');
   const notation = resizer.previousElementSibling;
   const encoding = resizer.nextElementSibling;
@@ -254,15 +258,14 @@ export function addResizerHandlers(v, cm) {
     if (storage && storage.supported) {
       storage.notationProportion = notationProportion;
     }
-
   }
 
   resizer.addEventListener('mousedown', mouseDownHandler);
-} // addResizerHandlers() 
+
+} // addNotationResizerHandlers() 
 
 // resizer handlers for resizing the facsimile panel
 export function addFacsimilerResizerHandlers(v, cm) {
-
   const resizer = document.getElementById('facsimile-dragger');
   const verovioContainer = document.getElementById('verovio-container');
   const facsimileContainer = document.getElementById('facsimile-container');
