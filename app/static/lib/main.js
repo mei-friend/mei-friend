@@ -132,7 +132,6 @@ import {
   addAnnotationHandlers,
   clearAnnotations,
   readAnnots,
-  refreshAnnotationsList,
   refreshAnnotations
 } from './annotation.js';
 import {
@@ -159,7 +158,6 @@ import {
   xCircleFill
 } from '../css/icons.js';
 import {
-  rmHash,
   setCursorToId
 } from './utils.js';
 import {
@@ -187,10 +185,11 @@ import {
 } from './fork-repository.js';
 import {
   addZoneDrawer,
+  clearFacsimile,
+  drawFacsimile,
   ingestFacsimile,
   loadFacsimile,
-  drawFacsimile,
-  zoomFacsimile,
+  zoomFacsimile
 } from './facsimile.js';
 import {
   WorkerProxy
@@ -1123,6 +1122,8 @@ export function handleEncoding(mei, setFreshlyLoaded = true, updateAfterLoading 
       log('Format not recognized: ' + meiFileName + '.', 1649499359728);
     }
     setIsMEI(false);
+    clearFacsimile();
+    clearAnnotations();
     v.busy(false);
   }
 }
