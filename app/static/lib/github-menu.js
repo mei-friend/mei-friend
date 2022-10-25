@@ -72,7 +72,8 @@ export function forkRepoClicked() {
           github.filepath = _filepath;
           setMeiFileInfo(github.filepath, github.githubRepo, github.githubRepo + ":");
           loadFile(_file);
-        }
+          updateFileStatusDisplay();
+        } 
         document.getElementById("GithubLogo").classList.remove("clockwise");
         Array.from(document.getElementsByClassName("forkRepoGithubLogo"))
           .forEach(l => l.classList.remove("clockwise"));
