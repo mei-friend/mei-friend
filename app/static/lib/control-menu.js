@@ -331,7 +331,7 @@ export function createVerovioControlMenu(parentElement, scale) {
   let speedDiv = document.createElement('div');
   speedDiv.id = 'speed-div';
   speedDiv.classList.add('controls');
-  
+
   let speedLabel = document.createElement('label');
   speedLabel.innerText = 'Speedmode:';
   speedLabel.id = 'speed-label';
@@ -484,6 +484,7 @@ export function manualCurrentPage(v, cm, ev) {
 export function setBreaksOptions(tkAvailableOptions, defaultValue = 'auto') {
   if (defaultValue === '') defaultValue = 'auto';
   let breaksEl = document.getElementById('breaks-select');
+  while (breaksEl.hasChildNodes()) breaksEl.remove(0);
   var breaksOpts = {
     none: 'None',
     auto: 'Automatic',
