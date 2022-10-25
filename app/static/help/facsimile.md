@@ -1,6 +1,6 @@
 # mei-friend facsimile support
 
-The [https://music-encoding.org/guidelines/v4/elements/facsimile](facsimile element) contains image information of the written source. mei-friend is able to display this information (given that the graphical sources are available online), to edit the zones (change size, pan, insert, delete) and ingest facsimile information of a skeleton MEI file (such as exported from [https://measure-detector.edirom.de/](Deep Optical Measure Detector)) to another MEI file.
+The [https://music-encoding.org/guidelines/v4/elements/facsimile](facsimile element) contains image information of the written notation source. mei-friend is able to display this information (given that the graphical sources are available online), to edit the zones (change size, pan, insert, delete) and ingest facsimile information of a skeleton MEI file (such as exported from [https://measure-detector.edirom.de/](Deep Optical Measure Detector)) to a given MEI file.
 
 ## Explore an MEI file with facsimile information
 To demonstrate the functionality, please load our example file WoO57 Andante favori from our public-domain github repository. Upon opening, the facsimile panel will be activated automatically that shows the image information provided in the MEI file. The facsimile source images are stored in the github repository in a separate folder ìmg`.
