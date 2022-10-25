@@ -72,7 +72,8 @@ export function forkRepoClicked() {
           github.filepath = _filepath;
           setMeiFileInfo(github.filepath, github.githubRepo, github.githubRepo + ":");
           loadFile(_file);
-        }
+          updateFileStatusDisplay();
+        } 
         document.getElementById("GithubLogo").classList.remove("clockwise");
         Array.from(document.getElementsByClassName("forkRepoGithubLogo"))
           .forEach(l => l.classList.remove("clockwise"));
@@ -360,7 +361,6 @@ async function proposeFileName(fname) {
   let suffix = "";
   let without = fname;
   let newname;
-  let fnamesInTree;
   let nameSpan = document.getElementById("commitFileName");
   const containingDir = github.filepath.substring(0, github.filepath.lastIndexOf("/"));
   github.getBranchContents(containingDir).then(dirContents => {
@@ -560,44 +560,48 @@ export function refreshGithubMenu() {
 
 export function setCommitUIEnabledStatus() {
   const commitButton = document.getElementById("commitButton");
-  const commitFileName = document.getElementById("commitFileName");
-  if (commitFileName.innerText === stripMeiFileName()) {
-    // no name change => button reads "Commit"
-    commitButton.setAttribute("value", "Commit");
-    if (fileChanged) {
-      // enable commit UI if file has changed
+  if(commitButton) { 
+    const commitFileName = document.getElementById("commitFileName");
+    if (commitFileName.innerText === stripMeiFileName()) {
+      // no name change => button reads "Commit"
+      commitButton.setAttribute("value", "Commit");
+      if (fileChanged) {
+        // enable commit UI if file has changed
+        commitButton.removeAttribute("disabled");
+        commitMessageInput.removeAttribute("disabled");
+      } else {
+        // disable commit UI if file hasn't changed
+        commitButton.setAttribute("disabled", "");
+        commitMessageInput.setAttribute("disabled", "");
+        commitMessageInput.value = "";
+      }
+    } else {
+      // file name has changed => button reads "Commit as new file"
+      commitButton.setAttribute("value", "Commit as new file");
+      // enable commit UI regardless of fileChanged state
       commitButton.removeAttribute("disabled");
       commitMessageInput.removeAttribute("disabled");
-    } else {
-      // disable commit UI if file hasn't changed
-      commitButton.setAttribute("disabled", "");
-      commitMessageInput.setAttribute("disabled", "");
-      commitMessageInput.value = "";
     }
-  } else {
-    // file name has changed => button reads "Commit as new file"
-    commitButton.setAttribute("value", "Commit as new file");
-    // enable commit UI regardless of fileChanged state
-    commitButton.removeAttribute("disabled");
-    commitMessageInput.removeAttribute("disabled");
   }
 }
 
 
 function setFileNameAfterLoad(ev) {
-  const commitFileName = document.getElementById("commitFileName");
   const commitButton = document.getElementById("commitButton");
-  if (isMEI) {
-    // trim preceding slash
-    commitFileName.innerText = stripMeiFileName();
-    commitButton.setAttribute("value", "Commit");
-  } else {
-    commitFileName.innerText = "...";
-    commitButton.setAttribute("value", "...");
-    // trim preceding slash
-    proposeFileName(stripMeiFileName());
+  if(commitButton) { 
+    const commitFileName = document.getElementById("commitFileName");
+    if (isMEI) {
+      // trim preceding slash
+      commitFileName.innerText = stripMeiFileName();
+      commitButton.setAttribute("value", "Commit");
+    } else {
+      commitFileName.innerText = "...";
+      commitButton.setAttribute("value", "...");
+      // trim preceding slash
+      proposeFileName(stripMeiFileName());
+    }
+    setCommitUIEnabledStatus();
   }
-  setCommitUIEnabledStatus();
 }
 
 // handle Github commit UI
