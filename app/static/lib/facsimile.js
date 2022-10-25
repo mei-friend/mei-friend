@@ -3,8 +3,8 @@
 
 var facs = {}; // facsimile structure in MEI file
 var sourceImages = {}; // object of source images
-var rectangleLineWidth = 6; // width of bounding box rectangles in px
-var rectangleColor = 'darkred';
+const rectangleLineWidth = 6; // width of bounding box rectangles in px
+const rectangleColor = 'darkred';
 var listenerHandles = {};
 var resize = ''; // west, east, north, south, northwest, southeast etc
 var ulx, uly;
@@ -42,10 +42,15 @@ warningSvgText.setAttribute('x', 30);
 warningSvgText.setAttribute('y', 30);
 warningSvgText.textContent = 'No facsimile content available.';
 
-// loads facsimile content of xmlDoc into an object
-export function loadFacsimile(xmlDoc) {
+// clear main variables
+export function clearFacsimile() {
     facs = {};
     sourceImages = {};
+}
+
+// loads facsimile content of xmlDoc into an object
+export function loadFacsimile(xmlDoc) {
+    clearFacsimile();
     let facsimile = xmlDoc.querySelector('facsimile');
     if (facsimile) {
         let zones = facsimile.querySelectorAll('zone');
