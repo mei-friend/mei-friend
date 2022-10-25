@@ -161,6 +161,10 @@
   display: block;
 }
 
+.dropdown-content.forceShow { 
+  display:block;
+}
+
 #logTable {
   font-size: 8pt;
   white-space: nowrap;

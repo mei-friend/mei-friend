@@ -11,6 +11,7 @@
   --defaultSuppliedHighlightedColor: #b37400;
   /* TODO use mdw blue */
   --defaultHighlightColor: #4e8bed;
+  --defaultControlMenuBackgroundColor: lightgray;
   --defaultNavbarBackgroundColor: lightgray;
   --defaultKeyboardShortCutColor: navy;
   --defaultDropdownHeadingColor: lightsteelblue;
@@ -48,6 +49,7 @@
   --suppliedColor: var(--defaultSuppliedColor);
   --suppliedHighlightedColor: var(--defaultSuppliedHighlightedColor);
   --highlightColor: var(--defaultHighlightColor);
+  --controlMenuBackgroundColor: var(--defaultControlMenuBackgroundColor);
   --navbarBackgroundColor: var(--defaultNavbarBackgroundColor);
   --keyboardShortCutColor: var(--defaultKeyboardShortCutColor);
   --dropdownHeadingColor: var(--defaultDropdownHeadingColor);
@@ -134,6 +136,10 @@ a:active {
   padding-right: 6px;
   cursor: pointer;
   fill: var(--textColor);
+}
+
+#facsimile-close-button {
+  fill: var(--dropdownBorderColor)
 }
 
 .rightMargin {
@@ -294,22 +300,32 @@ a:active {
 #notation {
   overflow: hidden;
   display: flex;
-  flex-direction: column;
 }
 
 .resizer {
   background-color: var(--dropdownHeadingColor);
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-#pix-container {
+.resizer svg {
+  fill: var(--textColor);
+}
+
+#verovio-container {
   height: 100%;
   width: 100%;
   overflow: inherit;
   display: flex;
+  flex-direction: column;
 }
 
-#image-panel {
+#facsimile-panel {
   overflow: auto;
+  width: 100%;
+  height: 100%;
 }
 
 #source-image-label {
@@ -544,11 +560,12 @@ a:active {
   align-items: center;
   justify-content: flex-start;
   font-size: 10pt;
-  width: 100%;
   height: 28px;
-  color: var(--textColor);
-  padding: 1px;
+  padding: 2px;
   margin: 0px;
+  z-index: 6;
+  color: var(--textColor);
+  background-color: var(--controlMenuBackgroundColor);;
 }
 
 .controls {
@@ -558,7 +575,6 @@ a:active {
   border: 1px solid var(--dropdownBorderColor);
   border-radius: 7px;
   margin: 0px 3px;
-  /* background-color: var(--navbarBackgroundColor); */
 }
 
 .btn {
@@ -571,7 +587,7 @@ a:active {
   min-height: 21px;
   min-width: 21px;
   max-height: 21px;
-  background-color: var(--backgroundColor);
+  background-color: var(--controlMenuBackgroundColor);
 }
 
 .btn:hover {
@@ -695,53 +711,59 @@ svg text {
   user-select: none;
 }
 
-#pix-container .highlighted {
+#verovio-container .highlighted {
   color: var(--highlightColor);
   stroke: var(--highlightColor);
 }
 
-#pix-container g.highlighted,
-#pix-container text.highlighted {
+#verovio-container g.highlighted,
+#verovio-container text.highlighted {
   fill: var(--highlightColor);
   fill-opacity: 100%;
 }
 
-#image-panel rect.highlighted {
+#facsimile-panel rect.highlighted {
   stroke: var(--highlightColor);
   stroke-opacity: 70%;
   fill: var(--highlightColor);
   fill-opacity: 15%;
 }
 
-#pix-container g.supplied g {
+#verovio-container g.supplied g {
   fill: var(--suppliedColor);
   color: var(--suppliedColor);
   stroke: var(--suppliedColor);
 }
 
-#pix-container .supplied .highlighted {
+#verovio-container .supplied .highlighted {
   color: var(--suppliedHighlightedColor);
   stroke: var(--suppliedHighlightedColor);
 }
 
-#pix-container g.supplied g.highlighted {
+#verovio-container g.supplied g.highlighted {
   fill: var(--suppliedHighlightedColor);
 }
 
-#pix-container g {
+#verovio-container g {
   fill: var(--notationColor);
   color: var(--notationColor);
   stroke: var(--notationColor);
 }
 
-#image-panel rect {
+#facsimile-panel rect {
   stroke-opacity: 40%;
 }
 
-#image-panel text {
+#facsimile-panel text {
   stroke-opacity: 40%;
   fill-opacity: 40%;
 }
+
+/* #source-image-svg text {
+  fill: var(--dropdownHeadingColor);
+  stroke: var(--dropdownHeadingColor);
+  fill-opacity: 1;
+} */
 
 .hidden {
   display: none;
@@ -790,21 +812,27 @@ svg text {
   height: 20px;
 }
 
-.icon[disabled],
+.icon[disabled] svg path,
 .disabled {
-  opacity: 30%;
+  /* opacity: 30%; */
+  fill: var(--settingsBackgroundColor);
 }
 
 #verovio-icon {
   margin-left: 3px;
+  margin-right: 3px;
   width: 22px;
   height: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   fill: var(--textColor);
-  /* stroke: var(--textColor);
-  stroke-width: 1px; */
+  stroke: var(--textColor);
+  stroke-width: 1.5px;
+}
+
+#facsimile-icon {
+  margin-left: 3px;
+  margin-right: 3px;
+  width: 16px;
+  fill: var(--textColor);
 }
 
 .code {
@@ -1156,10 +1184,10 @@ select>option {
 }
 
 #alertIcon svg {
-  width: 2.2em; 
+  width: 2.2em;
   height: 2.2em;
-  fill: white; 
-  }
+  fill: white;
+}
 
 /* The close button */
 .alertCloseButton {

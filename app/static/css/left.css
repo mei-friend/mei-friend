@@ -14,10 +14,15 @@
   width: 50%;
 }
 
-.resizer {
+#dragMe.resizer {
   cursor: col-resize;
   height: 100%;
   width: 8px;
+}
+
+#dragMe.resizer svg {
+  min-width: 16px;
+  transform: rotate(90deg);
 }
 
 #encoding {

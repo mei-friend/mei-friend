@@ -5,7 +5,7 @@ import * as dutils from './dom-utils.js';
 import * as att from './attribute-classes.js';
 import {
   loadFacsimile
-} from './source-imager.js';
+} from './facsimile.js';
 
 // delete selected elements
 export function deleteElement(v, cm) {
@@ -65,7 +65,7 @@ export function deleteElement(v, cm) {
       element.parentNode.insertBefore(childList[i--], element);
     }
   } else // delete Zone in source image display
-    if (element.nodeName === 'zone' && document.getElementById('editZones').checked) {
+    if (element.nodeName === 'zone' && document.getElementById('editFacsimileZones').checked) {
       removeZone(v, cm, element);
     } else {
       console.info('Element ' + id + ' not supported for deletion.');
@@ -618,7 +618,7 @@ export function renumberMeasures(v, cm, change) {
   v.updateNotation = false;
   v.loadXml(cm.getValue(), true);
   utils.renumberMeasures(v, cm, 1, change);
-  if (document.getElementById('showSourceImagePanel').checked) loadFacsimile(v.xmlDoc);
+  if (document.getElementById('showFacsimilePanel').checked) loadFacsimile(v.xmlDoc);
   v.updateData(cm, false, true);
   v.updateNotation = true;
 }
