@@ -69,15 +69,15 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks, pageSpanners) {
     return;
   }
   // console.info('scoreDef: ', scoreDef);
-  let baseSection = document.createElementNS(meiNameSpace, 'section');
+  let baseSection = xmlDoc.createElementNS(meiNameSpace, 'section');
   baseSection.setAttributeNS(xmlNameSpace, 'xml:id', 'baseSection');
   // console.info('section: ', baseSection);
 
   if (pageNo > 1) {
-    let measure = dummyMeasure(countStaves(scoreDef));
+    let measure = dummyMeasure(xmlDoc, countStaves(scoreDef));
     measure.setAttributeNS(xmlNameSpace, 'xml:id', 'startingMeasure');
     baseSection.appendChild(measure);
-    baseSection.appendChild(document.createElementNS(meiNameSpace, 'pb'));
+    baseSection.appendChild(xmlDoc.createElementNS(meiNameSpace, 'pb'));
   }
   let spdScore = /** @type {Element} */ (spdNode.querySelector('mdiv > score'));
   // console.info('spdScore: ', spdScore);
@@ -95,9 +95,9 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks, pageSpanners) {
   });
 
   // add third measure (even if last page)
-  let m = dummyMeasure(countStaves(scoreDef));
+  let m = dummyMeasure(xmlDoc, countStaves(scoreDef));
   m.setAttributeNS(xmlNameSpace, 'xml:id', 'endingMeasure');
-  baseSection.appendChild(document.createElementNS(meiNameSpace, 'pb'));
+  baseSection.appendChild(xmlDoc.createElementNS(meiNameSpace, 'pb'));
   baseSection.appendChild(m);
 
   // matchTimespanningElements(xmlScore, spdScore, pageNo);
@@ -112,7 +112,7 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks, pageSpanners) {
         let m = spdScore.querySelector('[*|id="' + id + '"]');
         // console.info("spd(p:" + pageNo + " i:" + i + "): id=" + id + ", m:", m);
         if (m) {
-          let sb = document.createElementNS(meiNameSpace, 'sb');
+          let sb = xmlDoc.createElementNS(meiNameSpace, 'sb');
           let next = m.nextSibling;
           let parent = /** @type {Element} */ (m.parentNode);
           // console.info('...found. next:', next);
@@ -155,6 +155,7 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
   // recursive closure to dig through hierarchically stacked sections and append
   // only those elements within the requested pageNo
   return function digDeeper(section) {
+    const document = section.ownerDocument;
     // create a copy of section and copy attributes
     let newSection = document.createElementNS(meiNameSpace, 'section');
     section.getAttributeNames().forEach((attrName) => {
@@ -660,7 +661,7 @@ function addKeySigElement(staffDefs, keysigValue) {
     if (k) {
       k.setAttribute('sig', keysigValue);
     } else {
-      let keySigElement = document.createElementNS(meiNameSpace, 'keySig');
+      let keySigElement = staffDef.ownerDocument.createElementNS(meiNameSpace, 'keySig');
       keySigElement.setAttribute('sig', keysigValue);
       staffDef.appendChild(keySigElement);
     }
@@ -682,7 +683,7 @@ function addMeterSigElement(staffDefs, meterCountValue, meterUnitValue) {
       k.setAttribute('count', meterCountValue);
       k.setAttribute('unit', meterUnitValue);
     } else {
-      let meterSigElement = document.createElementNS(meiNameSpace, 'meterSig');
+      let meterSigElement = staffDef.ownerDocument.createElementNS(meiNameSpace, 'meterSig');
       meterSigElement.setAttribute('count', meterCountValue);
       meterSigElement.setAttribute('unit', meterUnitValue);
       staffDef.appendChild(meterSigElement);
@@ -695,12 +696,12 @@ function addMeterSigElement(staffDefs, meterCountValue, meterUnitValue) {
  * @param {Document} xmlDoc
  * @param {Breaks} breaks
  * @param {string} id
+ * @param {BreaksOption} breaksOption
  * @returns {number} pageNumber
  */
-export function getPageWithElement(xmlDoc, breaks, id) {
+export function getPageWithElement(xmlDoc, breaks, id, breaksOption) {
   let sel = '';
   let page = 1;
-  let breaksOption = /** @type HTMLSelectElement */ (document.getElementById('breaks-select')).value;
   switch (breaksOption) {
     case 'none':
       return page;
@@ -806,10 +807,13 @@ export const xmlDefs = `
 
 
 /**
+ * @param {Document} document  Any Document. Is only needed for
+ * `document.createElementNS()`. The global `document` form the browser is not
+ * used so that this function can also be used in Node.
  * @param {number} [staves]
  * @returns {Element} A dummy `<measure>` with `number` `<staff>` elements
  */
-export function dummyMeasure(staves = 2) {
+export function dummyMeasure(document, staves = 2) {
   var m = document.createElementNS(meiNameSpace, 'measure');
   for (let i = 1; i <= staves; i++) {
     let note = document.createElementNS(meiNameSpace, 'note');
