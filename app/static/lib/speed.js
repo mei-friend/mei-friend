@@ -14,8 +14,8 @@ import {
 
 /** @typedef {('sb' | 'pb')[] | {[pageNum: string]: string[]}} Breaks */
 /** @typedef {{
- *   start?: {[pageNum: string]: string[]} | 'invalid',
- *   end?: {[pageNum: string]: string[]} | 'invalid'
+ *   start: {[pageNum: string]: string[]},
+ *   end: {[pageNum: string]: string[]}
  * }} PageSpanners;
  */
 /** @typedef {'computedBreaks' | 'encodedBreaks' | 'firstPage'} CountingMode */
@@ -102,7 +102,7 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks, pageSpanners) {
 
   // matchTimespanningElements(xmlScore, spdScore, pageNo);
 
-  if (pageSpanners.start && Object.keys(pageSpanners.start).length > 0)
+  if (Object.keys(pageSpanners.start).length > 0)
     addPageSpanningElements(xmlScore, spdScore, pageSpanners, pageNo);
 
   // insert sb elements for each element except last
@@ -474,14 +474,14 @@ export function listPageSpanningElements(xmlScore, breaks, breaksOption) {
   let sel = '';
   switch (breaksOption) {
     case 'none':
-      return {};
+      return {start: {}, end: {}};
     case 'auto':
       if (Object.keys(breaks).length > 0) {
         for (let pg in breaks) {
           let br = breaks[pg]; // array of breaks
           sel += '[*|id="' + br[br.length - 1] + '"],';
         }
-      } else return {};
+      } else return {start: {}, end: {}};
       break;
     case 'line':
       sel = 'pb,sb,'
@@ -603,10 +603,8 @@ function getMeter(scoreDef) {
  * @param {number} pageNo
  */
 function addPageSpanningElements(xmlScore, spdScore, pageSpanners, pageNo) {
-  if (pageSpanners.start === 'invalid') return;
-
   // 1) go through endingElements and add to first measure
-  let endingElementIds = pageSpanners.end && pageSpanners.end[pageNo];
+  let endingElementIds = pageSpanners.end[pageNo];
   if (endingElementIds && pageNo > 1) {
     const m = /** @type {Element} */ (spdScore.querySelector('[*|id="endingMeasure"]'));
     for (let endingElementId of endingElementIds) {
@@ -626,7 +624,7 @@ function addPageSpanningElements(xmlScore, spdScore, pageSpanners, pageNo) {
   } // 1) if
 
   // 2) go through startingElements and append to a third-page measure
-  let startingElementIds = pageSpanners.start && pageSpanners.start[pageNo];
+  let startingElementIds = pageSpanners.start[pageNo];
   if (startingElementIds) {
     const m = /** @type {Element} */ (spdScore.querySelector('[*|id="endingMeasure"]'));
     for (let startingElementId of startingElementIds) {

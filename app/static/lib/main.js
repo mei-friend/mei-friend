@@ -807,6 +807,10 @@ function speedWorkerEventsHandler(ev) {
   console.log('main.speedWorkerEventsHandler received: ' + ev.data.cmd);
   if (ev.data.cmd === 'listPageSpanningElements') {
     console.log('main() speedWorkerHandler pageSpanners: ', ev.data.pageSpanners);
+    if (!ev.data.pageSpanners) {
+      // MEI file is malformed and pageSpanners could not be extracted
+      return;
+    }
     v.pageSpanners = {
       ...ev.data.pageSpanners
     };

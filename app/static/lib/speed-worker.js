@@ -37,15 +37,13 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
   music = getElementByTagName(xmlDoc, 'music', music);
   if (!music) {
     console.log('Invalid MEI file. ')
-    pageSpanners.start = 'invalid';
-    return pageSpanners;
+    return undefined;
   }
   let score;
   score = getElementByTagName(music.children, 'score', score);
   if (!score) {
     console.log('Missing score element in MEI file.');
-    pageSpanners.start = 'invalid';
-    return pageSpanners;
+    return undefined;
   } else {
     console.log('xmlDoc music > score: ', score);
   }
