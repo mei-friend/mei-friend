@@ -50,84 +50,79 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
     console.log('xmlDoc music > score: ', score);
   }
 
-  if (score) {
-    // collect all time-spanning elements with startid and endid
-    let tsTable = {}; // object with id as keys and an array of [startid, endid]
-    let idList = []; // list of time-pointer ids to be checked
-    tsTable = crawl(score.children, tsTable, idList);
-    noteTable = {};
-    let count = false;
-    let p = 1;
-    // determine page number for list of ids
-    function dig(nodeArray, noteTable, idList, childOfMeasure = false) {
-      if (breaksOption === 'line' || breaksOption === 'encoded') {
-        nodeArray.forEach(el => { // el obj w/ tagName, children, attributes
-          if (el.hasOwnProperty("tagName")) {
-            if (el.tagName === 'measure') count = true;
-            if (count && breaks.includes(el.tagName)) p++;
-            let id = el.attributes['xml:id'];
-            if (id) {
-              let i = idList.indexOf(id);
-              if (i >= 0) {
-                noteTable[id] = p;
-                delete idList[i];
-              }
-            }
-            if (el.children) {
-              noteTable = dig(el.children, noteTable, idList);
+  // collect all time-spanning elements with startid and endid
+  let tsTable = {}; // object with id as keys and an array of [startid, endid]
+  let idList = []; // list of time-pointer ids to be checked
+  tsTable = crawl(score.children, tsTable, idList);
+  noteTable = {};
+  let count = false;
+  let p = 1;
+  // determine page number for list of ids
+  function dig(nodeArray, noteTable, idList, childOfMeasure = false) {
+    if (breaksOption === 'line' || breaksOption === 'encoded') {
+      nodeArray.forEach(el => { // el obj w/ tagName, children, attributes
+        if (el.hasOwnProperty("tagName")) {
+          if (el.tagName === 'measure') count = true;
+          if (count && breaks.includes(el.tagName)) p++;
+          let id = el.attributes['xml:id'];
+          if (id) {
+            let i = idList.indexOf(id);
+            if (i >= 0) {
+              noteTable[id] = p;
+              delete idList[i];
             }
           }
-        });
-      } else if (breaksOption = 'auto') { // TODO
-        nodeArray.forEach(el => { // el obj w/ tagName, children, attributes
-          if (el.hasOwnProperty("tagName")) {
-            if (el.tagName === 'measure') childOfMeasure = false;
-            if (p < Object.keys(breaks).length &&
-              el.attributes['xml:id'] === breaks[p][breaks[p].length - 1]) {
-              childOfMeasure = true; // for children of last measure on page
-              p++;
-            }
-            let id = el.attributes['xml:id'];
-            if (id) {
-              let i = idList.indexOf(id);
-              if (i >= 0) {
-                noteTable[id] = childOfMeasure ? p - 1 : p;
-                delete idList[i];
-              }
-            }
-            if (el.children) {
-              noteTable = dig(el.children, noteTable, idList, childOfMeasure);
+          if (el.children) {
+            noteTable = dig(el.children, noteTable, idList);
+          }
+        }
+      });
+    } else if (breaksOption = 'auto') { // TODO
+      nodeArray.forEach(el => { // el obj w/ tagName, children, attributes
+        if (el.hasOwnProperty("tagName")) {
+          if (el.tagName === 'measure') childOfMeasure = false;
+          if (p < Object.keys(breaks).length &&
+            el.attributes['xml:id'] === breaks[p][breaks[p].length - 1]) {
+            childOfMeasure = true; // for children of last measure on page
+            p++;
+          }
+          let id = el.attributes['xml:id'];
+          if (id) {
+            let i = idList.indexOf(id);
+            if (i >= 0) {
+              noteTable[id] = childOfMeasure ? p - 1 : p;
+              delete idList[i];
             }
           }
-        });
-      }
-      return noteTable;
-    } // dig()
-
-    noteTable = dig(score.children, noteTable, idList);
-
-    // packing pageSpanners with different page references
-    let p1 = 0;
-    let p2 = 0;
-    for (let spannerIds of Object.keys(tsTable)) {
-      p1 = noteTable[tsTable[spannerIds][0]];
-      p2 = noteTable[tsTable[spannerIds][1]];
-      if (p1 > 0 && p2 > 0 && p1 != p2) {
-        if (pageSpanners.start[p1])
-          pageSpanners.start[p1].push(spannerIds);
-        else
-          pageSpanners.start[p1] = [spannerIds];
-        if (pageSpanners.end[p2])
-          pageSpanners.end[p2].push(spannerIds);
-        else
-          pageSpanners.end[p2] = [spannerIds];
-      }
+          if (el.children) {
+            noteTable = dig(el.children, noteTable, idList, childOfMeasure);
+          }
+        }
+      });
     }
-    return pageSpanners;
-  } else {
-    pageSpanners.start = 'invalid';
-    return pageSpanners;
+    return noteTable;
+  } // dig()
+
+  noteTable = dig(score.children, noteTable, idList);
+
+  // packing pageSpanners with different page references
+  let p1 = 0;
+  let p2 = 0;
+  for (let spannerIds of Object.keys(tsTable)) {
+    p1 = noteTable[tsTable[spannerIds][0]];
+    p2 = noteTable[tsTable[spannerIds][1]];
+    if (p1 > 0 && p2 > 0 && p1 != p2) {
+      if (pageSpanners.start[p1])
+        pageSpanners.start[p1].push(spannerIds);
+      else
+        pageSpanners.start[p1] = [spannerIds];
+      if (pageSpanners.end[p2])
+        pageSpanners.end[p2].push(spannerIds);
+      else
+        pageSpanners.end[p2] = [spannerIds];
+    }
   }
+  return pageSpanners;
 
   // find time-spanning elements and store their @startid/@endids in object
   function crawl(nodeArray, tsTable, idList) {
