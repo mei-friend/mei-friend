@@ -134,12 +134,14 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks, pageSpanners) {
 
 /**
  * @param {number} pageNo  Page number, starting at 1
- * @param {Element} spdScore  The score the
+ * @param {Element} spdScore  The returned closure updates the `<staffDef>`s
+ * in this speed score according to what's found in the section element the
+ * closure takes as argument.
  * @param {Breaks} breaks
  * @param {string} countingMode
  * @returns {function(Element): Element}  Recursive closure that takes an
  * original `<section>` as argument and creates a new `<section>` with the
- * content of the original `<section>` reduced to the page with number page
+ * content of the original `<section>` reduced to the page with page number
  * `pageNo`.
  */
 function readSection(pageNo, spdScore, breaks, countingMode) {
