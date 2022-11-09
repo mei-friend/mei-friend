@@ -282,7 +282,7 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
           const staffNo = getStaffNumber(clef);
           if (!staffNo) continue;
           // console.info('clefList stffNo: ' + stffNo);
-          let staffDef = spdScore.querySelector(`staffDef[n=${staffNo}]`);
+          let staffDef = spdScore.querySelector(`staffDef[n="${staffNo}"]`);
           if (!staffDef) {
             console.info('digDeeper(): no staffDef for staff ' + staffNo);
             continue;
