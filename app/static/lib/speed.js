@@ -608,7 +608,7 @@ function addPageSpanningElements(xmlScore, spdScore, pageSpanners, pageNo) {
   // 1) go through endingElements and add to first measure
   let endingElementIds = pageSpanners.end[pageNo];
   if (endingElementIds && pageNo > 1) {
-    const m = /** @type {Element} */ (spdScore.querySelector('[*|id="endingMeasure"]'));
+    const m = /** @type {Element} */ (spdScore.querySelector('[*|id="startingMeasure"]'));
     for (let endingElementId of endingElementIds) {
       let endingElement =
         xmlScore.querySelector('[*|id="' + endingElementId + '"]');
