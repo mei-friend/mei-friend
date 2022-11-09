@@ -134,7 +134,7 @@ export function setOrientation(cm,
     if (v.speedMode &&
       document.getElementById('breaks-select').value === 'auto') {
       v.pageBreaks = {};
-      v.pageSpanners = {};
+      v.pageSpanners = {start: {}, end: {}};
       setTimeout(() => v.updateAll(cm), 33);
     } else {
       setTimeout(() => v.updateLayout(), 33);
