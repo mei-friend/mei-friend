@@ -1,8 +1,9 @@
 export default class Github { 
-  constructor(githubRepo, githubToken, branch, filepath, userLogin, authorName, authorEmail) {
+  constructor(githubRepo, githubToken, branch, commit, filepath, userLogin, authorName, authorEmail) {
     this.githubToken = githubToken;
     this.githubRepo = githubRepo;
     this.branch = branch;
+    this.commit = commit;
     this.filepath = filepath;
     this.userLogin = userLogin;
     this.author = { 
@@ -40,6 +41,14 @@ export default class Github {
 
   get commit() { 
     return this._commit;
+  }
+
+  set tree(tree) { 
+    this._tree = tree;
+  }
+
+  get tree() { 
+    return this._tree;
   }
 
   set commitLog(commitLog) { 
@@ -180,7 +189,7 @@ export default class Github {
 
   // Recursively dive into tree until we find the file we're updating.
   // Update the file, then construct hashes all the way back up
-  async generateModifiedTreeHash(tree, filepath, content) { 
+  async generateModifiedTreeHash(tree, filepath, content, newfile) { 
     // split into path components and discard leading empty string using filter
     // (in case filepath starts with slash)
     let pathComponents = filepath.split("/").filter(p => p);
@@ -189,10 +198,19 @@ export default class Github {
       let entry = tree[pathComponents[0]];
       // replace with new content and get new hash
       let entryHash = await this.repo.saveAs("text", content);
-      // modify tree with updated entry
-      tree[pathComponents[0]] = { 
-        mode: entry.mode,
-        hash: entryHash
+      if(newfile) { 
+        // user has requested creation of a new file based off current entry
+        // so clone it with the new name
+        tree[newfile] = { 
+          mode: entry.mode,
+          hash: entryHash
+        }
+      } else { 
+        // modify tree with updated entry
+        tree[pathComponents[0]] = { 
+          mode: entry.mode,
+          hash: entryHash
+        }
       }
       // calculate and return treeHash for the modified tree:
       return await this.repo.saveAs("tree", tree);
@@ -205,7 +223,8 @@ export default class Github {
       let subtreeHash = await this.generateModifiedTreeHash(
           subtree,
           pathComponents.splice(1,pathComponents.length).join("/"),
-          content
+          content,
+          newfile
         )
       // modify this tree with new subtreeHash
       tree[pathComponents[0]] = {
@@ -219,11 +238,11 @@ export default class Github {
     }
   }
 
-  async writeGithubRepo(content, message) { 
+  async writeGithubRepo(content, message, newfile = null) { 
     this.headHash = await this.repo.readRef(`refs/heads/${this.branch}`);
     this.commit = await this.repo.loadAs("commit", this.headHash);  
     let tree = await this.repo.loadAs("tree", this.commit.tree);
-    let treeHash = await this.generateModifiedTreeHash(tree, this.filepath, content);
+    let treeHash = await this.generateModifiedTreeHash(tree, this.filepath, content, newfile);
     let commitHash = await this.repo.saveAs("commit", { 
       tree: treeHash,
       author: this.author,
@@ -237,13 +256,12 @@ export default class Github {
   }
 
   async readGithubRepo() { 
-    // TODO fix multi-level directories by implementing tree traversal using treeWalk / treeStreams, see jsgit doc
     try { 
       // Retrieve content of file
       this.headHash = await this.repo.readRef(`refs/heads/${this.branch}`);
       this.commit = await this.repo.loadAs("commit", this.headHash);  
       let tree = await this.repo.loadAs("tree", this.commit.tree);
-      this.entry = tree[this.filepath.startsWith("/") ? this.filepath.substr(1) : this.filepath];
+      this.entry = tree[this.filepath.startsWith("/") ? this.filepath.substring(1) : this.filepath];
       let treeStream = await this.repo.treeWalk(this.commit.tree);
       let obj;
       let trees = []
@@ -257,6 +275,7 @@ export default class Github {
         if(this.filepath && this.filepath !== "/") {
           // remove leading slash
           this.content = await this.repo.loadAs("text", this.entry.hash);
+          this.tree = tree;
         }
       }
       // Retrieve git commit log
@@ -270,6 +289,7 @@ export default class Github {
         });
     } catch(e) {
       console.error("Error while reading Github repo: ", e, this);
+      throw e;
     }
   }
 
@@ -328,13 +348,14 @@ export default class Github {
           }
           await fetch(forksUrl, fetchRequestObject)
             .then(res => { 
-              if(res.status <= 400) res.json()
-              else throw res
+              if(res.status <= 400) {
+                res.json().then(userFork => { 
+                  // switch to newly created fork
+                  this.githubRepo = userFork.full_name; 
+                })
+              }
+              else throw res;
             })
-            .then((userFork) => { 
-                // now switch to it
-                this.githubRepo = userFork.full_name;
-            });
         } else { 
           this.githubRepo = userFork.full_name;
         }
@@ -366,6 +387,14 @@ export default class Github {
     }
   }
 
+  async getSpecifiedUserOrgRepos(userOrg, per_page=30, page=1) { 
+    const reposUrl = `https://api.github.com/users/${userOrg}/repos?per_page=${per_page}&page=${page}`;
+    return fetch(reposUrl, {
+      method: 'GET',
+      headers: this.apiHeaders
+    }).then(res => res.json())
+  }
+
   async getUserRepos(per_page=30, page=1) { 
     const reposUrl = `https://api.github.com/user/repos?per_page=${per_page}&page=${page}`;
     return fetch(reposUrl, {
@@ -384,7 +413,6 @@ export default class Github {
   
   async getBranchContents(path="/") {
     const contentsUrl = `https://api.github.com/repos/${this.githubRepo}/contents${path}`;
-    this.filepath = path;
     return fetch(contentsUrl, {
       method: 'GET',
       headers: this.apiHeaders

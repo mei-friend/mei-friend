@@ -1,38 +1,49 @@
-# mei-friend-online
-mei-friend running within a browser
+<img src="https://raw.githubusercontent.com/Signature-Sound-Vienna/mei-friend-online/main/app/static/owl/menu-logo.svg" title="mei-friend" width="33%">
 
-## To configure:
+#  [The *mei-friend* Web Application: Editing MEI in the Browser](https://mei-friend.mdw.ac.at)
 
-### Set up Github OAuth application:
-* Go to https://github.com/settings/developers
-* Click on "Register a new application"
-* Enter application name = "mei-friend"
-* Enter homepage = "https://iwk.mdw.ac.at"
-* Enter callback URL = "http://localhost:4000/authorize"
-* Click "Register application"
-* Click "Generate a client secret" and log in if necessary
-* Retain this page for configuration in the next steps:
+*mei-friend* is a ‘last mile’ editor for [MEI music encodings](https://music-encoding.org) intended to alleviate the common task of cleaning up encodings generated via optical music recognition, or via conversion from other formats, originally implemented as a [plugin package for the Atom text editor](https://atom.io/packages/mei-friend). The [*mei-friend* Web Application](https://mei-friend.mdw.ac.at) is a reworking of the tool as a full-featured, cross-browser compatible Web application, with optimised performance and an extended set of features. The application is available online at https://mei-friend.mdw.ac.at.
 
-### Set up mei-friend-online app
-* `git clone git@github.com:wergo/mei-friend-online`
-* `cd mei-friend-online`
-* `cp env-template .env`
-* Edit .env to add in CLIENT_ID and SECRET_ID from the Github OAuth application
-* Add a random hard to guess string as FLASK_SECRET
-* If required, add a REDIRECT_URL to override the flask url_for("authorize") route in deployment
-* If required, add STATIC_URL_PATH and/or STATIC_FOLDER to override the Flask defaults in deployment
-* For development mode, set FLASK_ENV to "development" => do not deploy in development mode!
-* For deployment, *un*set FLASK_APP. This will cause wsgi.py to be used instead.
-* Run `python -m venv venv` (if your system python is not python 3, run `python3 -m venv venv`)
-* Run `. venv/bin/activate`. Your prompt should update to show (venv) at the start
-* Run `pip install -r requirements.txt`
-* Download CodeMirror 5.x from https://codemirror.net/
-* Extract it and put it into app/static with directory name 'CodeMirror'
+### Fundamental functionalities
+![mei-friend fundamental functionalities](https://github.com/Signature-Sound-Vienna/mei-friend-online/blob/develop/demo/mei-friend-01.gif)
 
-## To run:
-### Development mode:
-* `. venv/bin/activate` 
-* `flask run`
 
-### Production deployment:
-* Use wsgi and gunicorn (instructions tbc)
+### Github workflow
+![mei-friend github workflow](https://github.com/Signature-Sound-Vienna/mei-friend-online/blob/develop/demo/mei-friend-02.gif)
+
+## Components
+We use [CodeMirror](https://codemirror.net) as our text editor, and [Verovio](https://www.verovio.org) as our music engraving engine. [GitHub](https://github.org) integration is provided using [jsgit](https://github.com/creationix/jsgit), [jsgit-browser](https://github.com/LivelyKernel/js-git-browser), and the [GitHub REST API](https://docs.github.com/en/rest). XML-DOM manipulations are performed using [tXml](https://github.com/TobiasNickel/tXml) by Tobias Nickel. The MEI validation and RNG loading code is adapted from the implementation in the [Verovio editor](https://editor.verovio.org), kindly contributed by Laurent Pugin. It makes use of [libxml2](https://gitlab.gnome.org/GNOME/libxml2/). Icons are taken from GitHub's [Octicons repository](https://github.com/primer/octicons).
+
+## Features
+
+**Editor**. The CodeMirror editor implements important coding conveniences including code folding, line numbering, tag- and bracket matching and auto-closing; as well as alternate key mappings (e.g., ‘vim’, ‘emacs’). MEI-schema-informed autocomplete is also available.
+
+**File input and output**. Files may be opened from the local file system (via a menu option or using drag’n’drop); from the Web via URL; or from GitHub, by specifying a user/organisation and selecting from the available repositories. GitHub integration allows users to log in, fork repositories, view logs, and commit changes. All Verovio-supported encoding formats are supported (MEI, uncompressed and compressed MusicXML, Humdrum, ABC, PAE). The current encoding can be downloaded as MEI, MIDI, and SVG. All interactions occur locally in the browser; nothing is uploaded anywhere, excepting GitHub commits. Editor content is persisted in local storage through page refreshes and browser restarts; support for persisting multiple files simultaneously is envisioned for future development.
+
+**Public repertoire**. Our codebase includes a CSV file recording publicly licensed music encodings, which are offered through the ‘fork repository’ and ‘open URL’ interfaces, alongside a dedicated ‘public repertoire’ access point. Proposed additions to this repertoire meeting our requirements (publicly licensed files; available via GitHub or hosted on a CORS-enabled Web server) are gladly accepted via Github Issue or Pull Request.
+
+**Configurable display**. Many aspects of the tool’s interface are user-configurable, including the orientation and size of the notation and editor panes; their scale factor / font-size; and colouring, via a selection of preconfigured themes, with the option of having the notation match the editor theme (or remain black on white); and, optionally setting the interface to follow the local system’s bright / dark mode settings. Crucially, Eulise’s circadian rhythm adjusts accordingly. These configurations are done via a dedicated ‘settings’ menu, which also exposes a large collection of tool-specific options for CodeMirror and Verovio.
+
+**Navigation**. The interface supports musically meaningful navigation according to encoded sections, pages (first, prev, next, last, specified page number), and within displayed notes/rests. Due to the tightly coupled interaction between encoding (MEI text) and engraving (SVG image), selection and navigation occurs seamlessly across both modalities.
+
+**Pedagogy**. To smooth the learning curve of users new to MEI, the MEI Guidelines are linked to from the ‘Help’ menu; further, users are able to directly look up documentation for the currently selected element through a keyboard shortcut / help menu item.
+
+**Editor functions**. In addition to all features of the Atom plugin package, we now offer commands to insert and delete clefs, beam-spans, and spiccato articulation; to insert the vertical group (vgrp) attribute for selected elements supporting this attribute (such as dynam, dir, hairpin), with dynamic number attribution; and, to insert the supplied element around a selection and show all supplied elements in a configurable colour.
+
+**Validation against MEI schema**. Based on the code of the Verovio editor kindly provided by Laurent Pugin, mei-friend automatically loads the RNG schema specified in the MEI file to validate the encoding. It makes use of Gnome’s libxml2. Validation behaviour is configurable (automatic or on-demand) through the mei-friend settings.
+
+**Facsimile support**. mei-friend makes the content of the facsimile element accessible by displaying zone elements ontop of the surface images in a dedicated facsimile panel, providing interactive zone editing functionality (resizing, panning, inserting & deleting zones) as well as an automated workflow for ingesting external facsimile content into MEI encodings.
+
+**Annotation support**. The annotation panel provides tooling for generating in-line <annot> elements, as well as for listing, navigating between, and visualising annotations. Support for stand-off Web Annotations is planned for future development.
+
+## Publications
+Goebl, W. & Weigl, D. M. (2022). Alleviating the Last Mile of Encoding: The mei-friend Package for the Atom Text Editor.  In S. Münnich & D. Rizo (Eds.), Music Encoding Conference Proceedings 2021 (pp. 31&ndash;39). University of Alicante. doi:[10.17613/fc1c-mx52](https://doi.org/10.17613/fc1c-mx52)
+
+Goebl, W. & Weigl, D. M. (2022). The mei-friend Web Application: Editing MEI in the Browser. Music Encoding Conference 2022 [Late-breaking Reports]. [forthcoming].
+
+## Acknowledgements
+
+The *mei-friend* Web application is developed by [Werner Goebl](https://iwk.mdw.ac.at/goebl) ([@wergo](https://github.com/wergo)) and [David M. Weigl](https://iwk.mdw.ac.at/david-weigl) ([@musicog](https://github.com/musicog)), [Department of Music Acoustics – Wiener Klangstil (IWK)](https://iwk.mdw.ac.at), [mdw – University of Music and Performing Arts Vienna](https://mdw.ac.at). Development is undertaken as part of the [Signature Sound Vienna Project](https://iwk.mdw.ac.at/signature-sound-vienna). This research was funded by the [Austrian Science Fund (FWF)](https://fwf.ac.at) P 34664-G. The *mei-friend* Atom plugin package was developed as part of [TROMPA](https://trompamusic.eu) (Towards Richer Online Music Public-domain Archives), with funding from the [European Union's Horizon 2020 research and innovation programme](https://ec.europa.eu/info/research-and-innovation/funding/funding-opportunities/funding-programmes-and-open-calls/horizon-2020_en) H2020-EU.3.6.3.1. under grant agreement No 770376.
+
+## License
+The *mei-friend* Web application is published under the [GNU AGPL 3.0](https://www.gnu.org/licenses/agpl-3.0.html) license.

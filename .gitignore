@@ -1,5 +1,7 @@
+local
 verovio
 app/static/CodeMirror
+app/static/lib/env.js
 .DS_Store
 .env
 venv

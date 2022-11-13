@@ -1,5 +1,5 @@
 {
-  ".notation": {
+  "#notation": {
     "x": "invertPlacement",
     "ctrl-x": "betweenPlacement",
     "v": "addVerticalGroup",
@@ -46,14 +46,13 @@
     "l": "addTrillAbove",
     "ctrl-l": "addTrillBelow",
     "n": "addTurnAbove",
-    "ctrl-n": "addTurnBelow",
-    "shift-n": "addTurnAboveLower",
+    "ctrl-n": "addTurnAboveLower",
     "shift-ctrl-n": "addTurnBelowLower",
 
     "shift-s": "toggleStacc",
     "shift-v": "toggleAccent",
     "shift-n": "toggleTenuto",
-    "shift-o": "toggleMarcato",
+    "shift-a": "toggleMarcato",
     "shift-i": "toggleStacciss",
     "shift-p": "toggleSpicc",
 
@@ -67,7 +66,9 @@
 
     "shift-g": "addGClefChangeBefore",
     "shift-c": "addCClefChangeBefore",
-    "shift-f": "addFClefChangeBefore"
+    "shift-f": "addFClefChangeBefore",
+
+    "escape": "escapeKeyPressed"
   },
 
   ".platform-darwin": {
@@ -83,8 +84,11 @@
     "cmd-shift-f": "addFClefChangeAfter",
     "cmd-alt-up": "moveElementStaffUp",
     "cmd-alt-down": "moveElementStaffDown",
-    "cmd-v": "reRenderMei",
-    "cmd-shift-v": "reRenderMeiWithout",
+    "cmd-m": "reRenderMei",
+    "cmd-shift-m": "reRenderMeiWithout",
+    "cmd-shift-v": "validate",
+    "cmd-z": "undo",
+    "cmd-shift-z": "redo",
     "cmd-0": "zoom100",
     "cmd-5": "zoom50",
     "cmd-+": "zoomIn",
@@ -94,7 +98,9 @@
     "cmd-shift-c": "cleanAccid",
     "cmd-shift-r": "renumberMeasures",
     "alt-.": "consultGuidelines",
-    "cmd-,": "toggleSettingsPanel"
+    "alt-…": "consultGuidelines",
+    "cmd-,": "toggleSettingsPanel",
+    "cmd-a": "toggleAnnotationPanel"
   },
 
   ".platform-win32, .platform-linux": {
@@ -110,8 +116,11 @@
     "ctrl-shift-f": "addFClefChangeAfter",
     "ctrl-alt-up": "moveElementStaffUp",
     "ctrl-alt-down": "moveElementStaffDown",
-    "ctrl-v": "reRenderMei",
-    "ctrl-shift-v": "reRenderMeiWithout",
+    "ctrl-m": "reRenderMei",
+    "ctrl-shift-m": "reRenderMeiWithout",
+    "ctrl-shift-v": "validate",
+    "ctrl-z": "undo",
+    "ctrl-shift-z": "redo",
     "ctrl-0": "zoom100",
     "ctrl-5": "zoom50",
     "ctrl-+": "zoomIn",
@@ -121,6 +130,7 @@
     "ctrl-shift-c": "cleanAccid",
     "ctrl-shift-r": "renumberMeasures",
     "alt-.": "consultGuidelines",
-    "ctrl-,": "toggleSettingsPanel"
+    "ctrl-,": "toggleSettingsPanel",
+    "ctrl-a": "toggleAnnotationPanel"
   }
 }

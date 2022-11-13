@@ -1,4 +1,3 @@
-import * as speed from './speed.js';
 import * as e from './editor.js';
 import * as dutils from './dom-utils.js';
 
@@ -24,22 +23,28 @@ export function findKey(key, obj) {
 
 // checks whether note noteId is inside a chord. Returns false or the chord id.
 export function insideParent(noteId, what = 'chord') {
-  let chord = document.querySelector('g#' + noteId).closest('.' + what);
-  if (chord) return chord.getAttribute('id');
-  else return false;
+  if (noteId) {
+    let note = document.querySelector('g#' + escapeXmlId(noteId));
+    let chord;
+    if (note) chord = note.closest('.' + what);
+    if (chord) return chord.getAttribute('id');
+  }
+  return false;
 }
 
 // finds all chords/notes inside an element and return array of id strings
 export function findNotes(elId) {
-  let notes = document.querySelector('g#' + elId).querySelectorAll('.note');
   let idArray = [];
-  for (let note of notes) {
-    let noteId = note.getAttribute('id');
-    let chordId = insideParent(noteId);
-    if (chordId && !idArray.includes(chordId)) {
-      idArray.push(chordId);
-    } else if (!chordId) {
-      idArray.push(noteId);
+  if (elId) {
+    let notes = document.querySelector('g#' + escapeXmlId(elId)).querySelectorAll('.note');
+    for (let note of notes) {
+      let noteId = note.getAttribute('id');
+      let chordId = insideParent(noteId);
+      if (chordId && !idArray.includes(chordId)) {
+        idArray.push(chordId);
+      } else if (!chordId) {
+        idArray.push(noteId);
+      }
     }
   }
   return idArray;
@@ -97,7 +102,7 @@ export function moveCursorToEndOfMeasure(cm, p) {
 //   // const searchString = new RegExp(`(?:xml:id="${itemId}")`);
 //   // var searchSelfClosing = '<[\\w.-]+?\\s+?(?:xml:id="' + itemId + '")(.*?)(\/[\\w.-]*?>)';
 //   // var searchElement = '(?:<' + elementName + ')\\s+?(?:xml:id="' + itemId + '")(.*?)(?:</' + elementName + ')*?>';
-//   if (searchRegExp == '') searchRegExp = '(?:xml:id="' + itemId + '")';
+//   if (searchRegExp === '') searchRegExp = '(?:xml:id="' + itemId + '")';
 //   let searchString = new RegExp(searchRegExp);
 //   let sc = cm.getSearchCursor(searchString);
 //   let foundString = mei.match(searchString);
@@ -114,13 +119,33 @@ export function moveCursorToEndOfMeasure(cm, p) {
 // }
 
 export function setCursorToId(cm, id) {
+  if (id === '') return;
   let c = cm.getSearchCursor(new RegExp(`(?:['"])` + id + `(?:['"])`));
   if (c.findNext()) {
     cm.setCursor(c.from());
     // console.info('setCursorToId cursor: ', c.from());
-    let enc = document.querySelector('.encoding');
-    cm.execCommand('goLineStartSmart');
-    cm.scrollIntoView(null, Math.round(enc.clientHeight / 2));
+    let enc = document.getElementById('encoding');
+    // cm.execCommand('goLineStartSmart');
+    goTagStart(cm);
+    if (enc) cm.scrollIntoView(null, Math.round(enc.clientHeight / 2));
+  }
+}
+
+// moves cursor of CodeMirror to start of tag
+export function goTagStart(cm) {
+  let tagStart = /<[\w]+?/;
+  let p = cm.getCursor();
+  let line = cm.getLine(p.line);
+  let found = line.slice(0, p.ch).match(tagStart);
+  while (!found && p.line > 0) {
+    line = cm.getLine(--p.line);
+    found = line.match(tagStart);
+  }
+  if (found) {
+    p.ch = line.lastIndexOf(found[found.length - 1]);
+    cm.setCursor(p);
+  } else {
+    console.warn('Cannot find tag start.');
   }
 }
 
@@ -151,7 +176,7 @@ export function getIdOfNextElement(cm, rw, elementNames = dutils.navElsArray,
     numberLikeString)[0]);
   // console.info('getIdOfNextElement("' + elementNames + '", "' + direction + '").');
 
-  if (direction == 'forwards') {
+  if (direction === 'forwards') {
     while (line = cm.getLine(++row)) {
       let found = false;
       for (let el of elementNames) {
@@ -161,14 +186,14 @@ export function getIdOfNextElement(cm, rw, elementNames = dutils.navElsArray,
         }
       }
       if (found &&
-        (staffNo == parseInt(getElementAttributeAbove(cm, row,
+        (staffNo === parseInt(getElementAttributeAbove(cm, row,
           'staff', numberLikeString)[0])) &&
-        (layerNo == parseInt(getElementAttributeAbove(cm, row,
-          'layer', numberLikeString)[0]))) { // && (layerNo == layerN)
+        (layerNo === parseInt(getElementAttributeAbove(cm, row,
+          'layer', numberLikeString)[0]))) { // && (layerNo === layerN)
         break;
       }
     }
-  } else if (direction == 'backwards') {
+  } else if (direction === 'backwards') {
     while (line = cm.getLine(--row)) {
       let found = false;
       for (let el of elementNames) {
@@ -178,10 +203,10 @@ export function getIdOfNextElement(cm, rw, elementNames = dutils.navElsArray,
         }
       }
       if (found &&
-        (staffNo == parseInt(getElementAttributeAbove(cm, row,
+        (staffNo === parseInt(getElementAttributeAbove(cm, row,
           'staff', numberLikeString)[0])) &&
-        (layerNo == parseInt(getElementAttributeAbove(cm, row,
-          'layer', numberLikeString)[0]))) { // && (layerNo == layerN)
+        (layerNo === parseInt(getElementAttributeAbove(cm, row,
+          'layer', numberLikeString)[0]))) { // && (layerNo === layerN)
         break;
       }
     }
@@ -204,6 +229,7 @@ export function getIdOfNextElement(cm, rw, elementNames = dutils.navElsArray,
 export function getElementIdAtCursor(cm) {
   let tag;
   let cursor = cm.getCursor();
+  if (cursor.line === 0 && cursor.ch === 0) return null;
   let line = cm.getLine(cursor.line);
   // check if cursor is on a closing tag by stepping backwards
   for (let j = cursor.ch; j > 0; j--) {
@@ -293,7 +319,7 @@ export function findElementBelow(textEditor, elementName = 'measure', point = [1
   let found2 = false;
   let row2 = row1;
   let col2 = 0;
-  while ((line = textBuffer.lineForRow(row2++)) != '' && row2 < mxRows) {
+  while ((line = textBuffer.lineForRow(row2++)) !== '' && row2 < mxRows) {
     console.info('findElement: line: ', line);
     if ((col2 = line.indexOf('</' + elementName)) > 0) {
       col2 += line.slice(col2).indexOf('>') + 1;
@@ -340,13 +366,15 @@ export function hasTag(textEditor, tag = '<mei') {
 }
 
 // sort note elements in array (of xml:ids) by x coordinate of element
-export function sortElementsByScorePosition(arr) {
+export function sortElementsByScorePosition(arr, includeY = false) {
   if (!Array.isArray(arr)) return;
   let j, i;
   let Xs = []; // create array of x values of the ids in arr
+  let Ys = []; // create array of y values of the ids in arr
   arr.forEach(item => {
-    let el = document.querySelector('g#' + item);
+    let el = document.querySelector('g#' + escapeXmlId(item));
     Xs.push(dutils.getX(el));
+    if (includeY) Ys.push(dutils.getY(el));
   });
   for (j = arr.length; j > 1; --j) {
     for (i = 0; i < (j - 1); ++i) {
@@ -358,9 +386,17 @@ export function sortElementsByScorePosition(arr) {
         console.info('Utils.sortElementsByScoreTime(): zero t: ' + arr[i + 1]);
         continue;
       }
-      if (Xs[i] > Xs[i + 1]) { // swap elements
+      // swap elements for X
+      if (Xs[i] > Xs[i + 1]) {
         [arr[i], arr[i + 1]] = [arr[i + 1], arr[i]];
         [Xs[i], Xs[i + 1]] = [Xs[i + 1], Xs[i]];
+        if (includeY)[Ys[i], Ys[i + 1]] = [Ys[i + 1], Ys[i]];
+      }
+      // swap elements for Y, if X equal 
+      if (includeY && Xs[i] === Xs[i + 1] && Ys[i] > Ys[i + 1]) {
+        [arr[i], arr[i + 1]] = [arr[i + 1], arr[i]];
+        [Xs[i], Xs[i + 1]] = [Xs[i + 1], Xs[i]];
+        [Ys[i], Ys[i + 1]] = [Ys[i + 1], Ys[i]];
       }
     }
   }
@@ -375,11 +411,11 @@ export function cleanAccid(xmlDoc, cm) {
   let i = 0;
   for (let el of accidGesList) {
     if (el.hasAttribute('accid.ges') &&
-      el.getAttribute('accid') == el.getAttribute('accid.ges')) {
+      el.getAttribute('accid') === el.getAttribute('accid.ges')) {
       i++;
       console.log(i + ' @accid.ges removed from ', el);
       el.removeAttribute('accid.ges');
-      e.replaceInTextEditor(cm, el);
+      e.replaceInEditor(cm, el);
     }
   }
   // let re = buffer.groupChangesSinceCheckpoint(checkPoint); TODO
@@ -387,8 +423,10 @@ export function cleanAccid(xmlDoc, cm) {
 }
 
 // renumber measure@n starting with startNumber
-export function renumberMeasures(xmlDoc, cm, startNum = 1, change = false) {
-  let measureList = xmlDoc.querySelectorAll('measure');
+export function renumberMeasures(v, cm, startNum = 1, change = false) {
+  let measureList = v.xmlDoc.querySelectorAll('measure');
+  if (!change) v.showAlert(`<b>Renumber measures ${change ? '' : 'TEST'}</b>`,
+    change ? 'success' : 'info', 120000);
   console.info('renumber Measures list: ', measureList);
   let i;
   let lgt = measureList.length;
@@ -397,52 +435,99 @@ export function renumberMeasures(xmlDoc, cm, startNum = 1, change = false) {
   let n = startNum;
   let endingStart = -1; // start number of an ending element
   let endingEnd = -1; // end number of an ending element
+  let endingCount = 0;
   let endingN = '';
+  let isFirstMeasure = true;
   // let checkPoint = buffer.createCheckpoint(); TODO
   for (i = 0; i < lgt; i++) {
-    if (measureList[i].closest('incip')) continue;
+    let suffix = '';
+    if (measureList[i].closest('incip')) continue; // ignore incipit
     if (!change)
       console.info(i + '/' + lgt + ': measure ', measureList[i]);
     if (measureList[i].hasAttribute('metcon')) {
       metcon = measureList[i].getAttribute('metcon');
     }
+    let contMeas = document.getElementById('renumberMeasureContinueAcrossIncompleteMeasures');
     // 1) first measure with @metcon="false" is upbeat => @n=0
-    if (i == 0 && metcon == 'false') n--; // first measure upbeat
+    if (contMeas && !contMeas.checked && isFirstMeasure && metcon === 'false') { // first measure upbeat
+      n--;
+      isFirstMeasure = false;
+    }
     // 2) treat series of @metcon="false" as one measure
-    if (metcon == 'false') {
+    if (contMeas && !contMeas.checked && metcon === 'false') {
       metcons++;
-    } else if (metcon == '' || metcon == 'true') {
+    } else if (metcon === '' || metcon === 'true') {
       metcons = 0;
     }
-    if (metcons > 1) n--;
-    // 3) Measures within endings are numbered starting with the same number.
-    let ending = measureList[i].closest('ending');
-    if (ending && endingStart > 0 && ending.hasAttribute('n') &&
-      ending.getAttribute('n') != endingN) endingEnd = n; // compare ending ns
-    if (ending && ending.hasAttribute('n')) endingN = ending.getAttribute('n');
-    if (ending && endingStart < 0) endingStart = n; // rember start number
-    if (ending && endingStart > 0 && endingEnd > 0) { // set @n to start number
-      n = endingStart;
-      endingEnd = -1;
+    if (contMeas && !contMeas.checked && metcons > 1) {
+      n--;
+      let sufSel = document.getElementById('renumberMeasuresUseSuffixAtMeasures');
+      switch (sufSel.value) {
+        case 'none':
+          break;
+        case '-cont':
+          suffix = '-cont';
+          break;
+      }
     }
-    if (!ending) { // reset both measure numbers
-      endingStart = -1;
-      endingEnd = -1;
+    // 3) Measures within endings are numbered starting with the same number.
+    let cont = document.getElementById('renumberMeasuresContinueAcrossEndings');
+    if (cont && !cont.checked) {
+      let ending = measureList[i].closest('ending');
+      if (ending && endingStart > 0 && ending.hasAttribute('n') &&
+        ending.getAttribute('n') != endingN) endingEnd = n; // compare ending ns
+      if (ending && ending.hasAttribute('n')) endingN = ending.getAttribute('n');
+      if (ending && endingStart < 0) {
+        endingStart = n; // remember start number
+        endingCount++; // increment ending count
+      }
+      if (ending && endingStart > 0 && endingEnd > 0) { // set @n to start number
+        n = endingStart;
+        endingEnd = -1;
+        endingCount++; // increment ending count
+      }
+      if (ending) {
+        let sufSel = document.getElementById('renumberMeasuresUseSuffixAtEndings');
+        switch (sufSel.value) {
+          case 'none':
+            break;
+          case 'ending@n':
+            suffix = '-' + (ending.hasAttribute('n') ? ending.getAttribute('n') : '');
+            break;
+          case 'a/b/c':
+            suffix = String.fromCharCode(endingCount + 64).toLowerCase();
+            break;
+          case 'A/B/C':
+            suffix = String.fromCharCode(endingCount + 64);
+            break;
+          case '-a/-b/-c':
+            suffix = '-' + String.fromCharCode(endingCount + 64).toLowerCase();
+            break;
+          case '-A/-B/-C':
+            suffix = '-' + String.fromCharCode(endingCount + 64);
+            break;
+        }
+      }
+      if (!ending) { // reset both measure numbers
+        endingStart = -1;
+        endingEnd = -1;
+        endingCount = 0;
+      }
     }
     // 4) No increment after bars with invisible barline (@right="invis")
     let right = '';
     if (measureList[i].hasAttribute('right'))
       right = measureList[i].getAttribute('right');
 
+    let msg = 'measure n="' + measureList[i].getAttribute('n') + '" ' +
+      (change ? '' : 'would be ') + 'changed to n="' + (n + suffix) + '"' +
+      (right ? (', right:' + right) : '') + (metcons ? (', metcons:' + metcons) : '');
+    console.info(msg);
+    if (!change) v.updateAlert(msg);
     // change measure@n
     if (change) {
-      measureList[i].setAttribute('n', n);
-      e.replaceInTextEditor(cm, measureList[i]);
-      console.info(measureList[i].getAttribute('n') + ' changed to ' + n +
-        ', right:' + right + ', metcons:' + metcons);
-    } else { // just list the changes
-      console.info(measureList[i].getAttribute('n') + ' to be changed to ' + n +
-        ', right:' + right + ', metcons:' + metcons);
+      measureList[i].setAttribute('n', n + suffix);
+      e.replaceInEditor(cm, measureList[i]);
     }
     // 5) handle increment from multiRest@num
     let multiRest;
@@ -450,13 +535,15 @@ export function renumberMeasures(xmlDoc, cm, startNum = 1, change = false) {
       let num = multiRest.getAttribute('num');
       if (num) n += parseInt(num);
       else n++; // should not happen...
-    } else if (right != 'invis' || metcon == "false") {
+    } else if (right !== 'invis' || metcon === "false") {
       n++;
     }
     metcon = '';
   }
   // let re = buffer.groupChangesSinceCheckpoint(checkPoint);
-  console.info('renumberMeasures: ' + i + ' measures renumbered');
+  let str = 'renumberMeasures: ' + i + ' measures renumbered';
+  console.info(str);
+  if (!change) v.updateAlert(str)
   //, grouped ', re);
 }
 
@@ -464,7 +551,7 @@ export function renumberMeasures(xmlDoc, cm, startNum = 1, change = false) {
 export function attrAsElements(xmlNote) {
   for (let att of ['artic', 'accid']) {
     if (xmlNote.hasAttribute(att)) {
-      let accidElement = document.createElementNS(speed.meiNameSpace, att);
+      let accidElement = document.createElementNS(dutils.meiNameSpace, att);
       accidElement.setAttribute(att, xmlNote.getAttribute(att));
       xmlNote.appendChild(accidElement);
       xmlNote.removeAttribute(att);
@@ -478,14 +565,16 @@ export function getOS() {
 }
 
 // accepts color as string: "rgb(100,12,255)" and hex string "#ffee10" or
-export function brighter(rgbString, deltaPercent) {
+export function brighter(rgbString, deltaPercent, alpha = 1) {
   let rgb = [];
+  rgbString = rgbString.trim(); // remove white space on either side
   if (rgbString.startsWith('#')) {
     rgb = hexToRgb(rgbString);
   } else {
     rgb = rgbString.slice(4, -1).split(',');
   }
   rgb = rgb.map(i => Math.max(0, Math.min(parseInt(i) + deltaPercent, 255)));
+  if (alpha < 1) rgb.push(alpha);
   return 'rgb(' + rgb.join(', ') + ')';
 }
 
@@ -496,10 +585,52 @@ function hexToRgb(hex) {
     .map(x => parseInt(x, 16))
 }
 
+// supports "rgb(123,234,0)" format
 export function complementary(rgbString) {
   let rgb = [];
-  rgbString.slice(4, -1).split(',').forEach(i => {
-    rgb.push(255 - i);
-  });
+  if (rgbString.startsWith('#')) {
+    rgb = hexToRgb(rgbString);
+  } else {
+    rgbString.slice(4, -1).split(',').forEach(i => rgb.push(i));
+  }
+  rgb = rgb.map(i => 255 - i);
   return 'rgb(' + rgb.join(', ') + ')';
+}
+
+// input Verovio-SVG element, return bounding box coords in default screen coordinate space
+export function convertCoords(elem) {
+  if (!!elem && document.getElementById(elem.getAttribute("id")) &&
+    elem.style.display !== "none" && (elem.getBBox().x !== 0 || elem.getBBox().y !== 0)) {
+    const x = elem.getBBox().x;
+    const width = elem.getBBox().width;
+    const y = elem.getBBox().y;
+    const height = elem.getBBox().height;
+    const offset = elem.closest("svg").parentElement.getBoundingClientRect();
+    const matrix = elem.getScreenCTM();
+    return {
+      x: (matrix.a * x) + (matrix.c * y) + matrix.e - offset.left,
+      y: (matrix.b * x) + (matrix.d * y) + matrix.f - offset.top,
+      x2: (matrix.a * (x + width)) + (matrix.c * y) + matrix.e - offset.left,
+      y2: (matrix.b * x) + (matrix.d * (y + height)) + matrix.f - offset.top
+    };
+  } else {
+    console.warn("Element unavailable on page: ", elem ? elem.getAttribute("id") : 'none');
+    return {
+      x: 0,
+      y: 0,
+      x2: 0,
+      y2: 0
+    }
+  }
+}
+
+export function rmHash(hashedString) {
+  return (hashedString.startsWith('#')) ?
+    hashedString.split('#')[1] : hashedString;
+}
+
+// escape special characters '.' and ':' for usagage in queryselectors 
+export function escapeXmlId(str) {
+  if (str == null) return '';
+  return str.replace(/\./g, '\\.').replace(/\:/g, '\\:');
 }

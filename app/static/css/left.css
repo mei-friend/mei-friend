@@ -1,28 +1,60 @@
-.friendContainer {
+.dragContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+#friendContainer {
   display: flex;
   flex-direction: row;
 }
 
-.notation {
+#notation {
   /* Initially, the left takes 3/4 width */
   width: 50%;
-  /* Misc */
-  /* align-items: center; */
-  /* display: flex;
-  justify-content: center; */
 }
 
-.resizer {
+#dragMe.resizer {
   cursor: col-resize;
   height: 100%;
   width: 8px;
 }
 
-.encoding {
+#dragMe.resizer svg {
+  min-width: 16px;
+  transform: rotate(90deg);
+}
+
+#encoding {
   /* Take the remaining width */
   flex: 1;
   /* Misc */
-  align-items: center;
+  /* align-items: center; */
   display: flex;
   justify-content: center;
+}
+
+#annotationToolsMenu {
+  flex-direction: row;
+}
+
+#annotationToolsMenu li {
+  flex-direction: column;
+}
+
+.annotationToolsDomainSelection {
+  flex-direction: column;
+}
+
+.annotationToolsDomainSelectionItem {
+  flex-direction: row;
+}
+
+#listAnnotations {
+  flex-direction: row;
+  overflow-x: scroll;
+}
+
+#addWebAnnotation {
+  width: 100px;
 }

@@ -1,0 +1,118 @@
+#annotationToolsMenu {
+  display: flex;
+  padding-left: 0px;
+}
+
+#annotationToolsMenu div {
+  padding: 8px;
+}
+
+#annotationToolsMenu li {
+  display: flex;
+  list-style: none;
+  padding: 10px;
+}
+
+.annotationToolsIcon {
+  border: 1px solid black;
+  border-radius: 5px;
+  padding: 10px;
+  display: flex;
+  align-content: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.annotationToolsDomainSelection {
+  display: flex;
+}
+
+.annotationToolsDomainSelectionItem {
+  display: flex;
+}
+
+.annotationHighlight {
+  filter: drop-shadow(0px 0px 3em darkgreen);
+}
+
+.annotationDescribe {
+  filter: drop-shadow(0px 0px 3em blue);
+  cursor: help;
+}
+
+.annotationLink {
+  filter: drop-shadow(0px 0px 3em purple);
+  cursor: pointer;
+}
+
+#renderedAnnotationsContainer {
+  position: absolute;
+  z-index: 10;
+  pointer-events: none;
+}
+
+#renderedAnnotationsContainer .highlightEllipse {
+  fill: none;
+  stroke: red;
+  stroke-width: 3;
+  stroke-opacity: .7;
+}
+
+#listAnnotations { 
+  display:flex !important;
+}
+
+#listAnnotations details {
+  padding: 10px;
+  margin: 5px;
+}
+
+#listAnnotation details[open] summary {
+  border-bottom: 1px solid black;
+}
+
+summary svg {
+  padding-right: 1em;
+}
+
+summary.noDetails {
+  list-style: none;
+  cursor: default;
+}
+
+.annotationListItem {
+  border: 1px solid black;
+  border-radius: 5px;
+  height: fit-content;
+  max-height: 205px; 
+  width: 205px;
+  margin: .25em;
+  flex-shrink: 0;
+}
+
+.annotationListItem summary { 
+  font-size:10pt;
+  font-weight: normal !important;
+}
+
+.annotationListItemButtons {
+  border-top: 1px solid black;
+  padding: .25em .5em;
+}
+
+#addWebAnnotation {
+  border: 1px solid black;
+  border-radius: 5px;
+  padding: .2em;
+  margin: .25em;
+  cursor: pointer;
+  height: fit-content;
+  max-width: 192px;
+  padding: .25em .5em;
+}
+
+.annotationListItemButtons svg, #listAnnotations svg {
+  width: 1em;
+  height: 1em;
+}
+

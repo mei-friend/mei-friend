@@ -1,29 +1,56 @@
-.friendContainer {
+.dragContainer {
+  display: flex;
+  flex-direction: row;
+}
+
+#friendContainer {
   display: flex;
   flex: 1 1 0%;
   flex-direction: column-reverse;
   /* Misc */
 }
 
-.notation {
+/* #notation {
   height: 50%;
-  /* Misc */
-  /* align-items: stretch; */
-  /* display: flex;
-  justify-content: center; */
-}
+} */
 
-.resizer {
+#dragMe.resizer {
   cursor: row-resize;
   width: 100%;
   height: 8px;
 }
 
-.encoding {
+#dragMe.resizer svg {
+  min-height: 16px;
+  max-height: 16px;
+}
+
+#encoding {
   /* Take the remaining width */
   flex: 1;
   /* Misc */
   align-items: stretch;
   display: flex;
   justify-content: center;
+}
+
+#annotationToolsMenu {
+  flex-direction: column;
+}
+
+#annotationToolsMenu li {
+  flex-direction: column;
+}
+
+.annotationToolsDomainSelection {
+  flex-direction: column;
+}
+
+.annotationToolsDomainSelectionItem {
+  flex-direction: row;
+}
+
+#listAnnotations {
+  flex-direction: column;
+  overflow-y: auto;
 }

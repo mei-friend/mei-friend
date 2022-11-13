@@ -11,15 +11,18 @@
   --defaultSuppliedHighlightedColor: #b37400;
   /* TODO use mdw blue */
   --defaultHighlightColor: #4e8bed;
+  --defaultControlMenuBackgroundColor: lightgray;
   --defaultNavbarBackgroundColor: lightgray;
   --defaultKeyboardShortCutColor: navy;
   --defaultDropdownHeadingColor: lightsteelblue;
   /* 10% brigher lightsteelblue */
   --defaultDropdownBackgroundColor: #edf2f7;
+  --defaultValidationStatusBackgroundColor: #edf2f711;
   --defaultDropdownBorderColor: darkgray;
   --defaultOverlayBackgroundColor: cornflowerblue;
   --defaultOverlayTextColor: white;
   --defaultOverlayBorderColor: darkblue;
+  --defaultOverlayLinkColor: darkblue;
   /* file status */
   --defaultFileStatusColor: green;
   /* file status changed */
@@ -30,6 +33,12 @@
   --defaultSettingsBackgroundAlternativeColor: #e4e4e4;
   --defaultSettingsLinkBackgroundColor: #f1f1f1;
   --defaultSettingsLinkHoverColor: #e6e6e6;
+  /* annotation panel colors */
+  --defaultAnnotationPanelBackgroundColor: #ffffa5;
+  --defaultAnnotationPanelLinkBackgroundColor: #ffffdc;
+  --defaultAnnotationPanelHoverColor: #fff300;
+  --defaultAnnotationPanelTextColor: black;
+  --defaultAnnotationPanelDarkBackgroundColor: #aa7c08;
   /*
   * Color variables
   */
@@ -40,14 +49,16 @@
   --suppliedColor: var(--defaultSuppliedColor);
   --suppliedHighlightedColor: var(--defaultSuppliedHighlightedColor);
   --highlightColor: var(--defaultHighlightColor);
+  --controlMenuBackgroundColor: var(--defaultControlMenuBackgroundColor);
   --navbarBackgroundColor: var(--defaultNavbarBackgroundColor);
   --keyboardShortCutColor: var(--defaultKeyboardShortCutColor);
   --dropdownHeadingColor: var(--defaultDropdownHeadingColor);
   --dropdownBackgroundColor: var(--defaultDropdownBackgroundColor);
-  --dropdownBorderColor: var(--defaultDropdownBorderColor);
+  --validationStatusBackgroundColor: var(--defaultValidationStatusBackgroundColor) --dropdownBorderColor: var(--defaultDropdownBorderColor);
   --overlayBackgroundColor: var(--defaultOverlayBackgroundColor);
   --overlayTextColor: var(--defaultOverlayTextColor);
   --overlayBorderColor: var(--defaultOverlayBorderColor);
+  --overlayLinkColor: var(--defaultOverlayLinkColor);
   --fileStatusColor: var(--defaultFileStatusColor);
   --fileStatusChangedColor: var(--defaultFileStatusChangedColor);
   --fileStatusWarnColor: var(--defaultFileStatusWarnColor);
@@ -55,6 +66,10 @@
   --settingsBackgroundAlternativeColor: var(--defaultSettingsBackgroundAlternativeColor);
   --settingsLinkBackgroundColor: var(--defaultSettingsLinkBackgroundColor);
   --settingsLinkHoverColor: var(--defaultSettingsLinkHoverColor);
+  --annotationPanelBackgroundColor: var(--defaultAnnotationPanelBackgroundColor);
+  --annotationPanelLinkBackgroundColor: var(--defaultAnnotationPanelLinkBackgroundColor);
+  --annotationPanelHoverColor: var(--defaultAnnotationPanelHoverColor);
+  --annotationPanelTextColor: var(--defaultAnnotationPanelTextColor);
 }
 
 body {
@@ -117,10 +132,18 @@ a:active {
 .settingsButton {
   width: 16px;
   height: 16px;
-  background-repeat: no-repeat;
-  background-position: 50% 50%;
-  padding-right: 16px;
+  padding-left: 6px;
+  padding-right: 6px;
   cursor: pointer;
+  fill: var(--textColor);
+}
+
+#facsimile-close-button {
+  fill: var(--dropdownBorderColor)
+}
+
+.rightMargin {
+  margin-right: 6px;
 }
 
 .dragOverlay {
@@ -160,7 +183,13 @@ a:active {
   z-index: 190;
 }
 
-.openUrlOverlay .openUrlUI {
+.openUrlOverlay a,
+.forkRepositoryOverlay a {
+  color: var(--overlayLinkColor);
+}
+
+.openUrlOverlay .openUrlUI,
+.forkRepositoryOverlay .forkRepositoryUI {
   position: absolute;
   top: 20%;
   left: 20%;
@@ -173,7 +202,8 @@ a:active {
   z-index: 190;
 }
 
-.openUrlOverlay .openUrlUI>div {
+.openUrlOverlay .openUrlUI>div,
+.forkRepositoryOverlay .forkRepositoryUI>div {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -181,8 +211,29 @@ a:active {
   transform: translate(-50%, -50%);
 }
 
+.openUrlOverlay .openUrlUI details,
+.forkRepositoryOverlay .forkRepositoryUI details {
+  cursor: pointer;
+  margin-bottom: 1em;
+}
+
+.openUrlOverlay .openUrlUI details>div,
+.forkRepositoryOverlay .forkRepositoryUI details>div {
+  margin-left: 1em;
+}
+
 .openUrlOverlay .openUrlUI input {
   width: 70%;
+}
+
+.openUrlOverlay .openUrlUI details div div,
+.forkRepositoryOverlay .forkRepositoryUI details div div {
+  padding: 10px 15px;
+}
+
+.openUrlOverlay select,
+.forkRepositoryOverlay select {
+  text-align: left;
 }
 
 #openUrlStatus {
@@ -200,6 +251,7 @@ a:active {
   background-color: var(--navbarBackgroundColor);
 }
 
+.forkAndOpenOverlay,
 .forkRepositoryOverlay {
   position: fixed;
   display: none;
@@ -211,38 +263,17 @@ a:active {
   z-index: 190;
 }
 
-.forkRepositoryOverlay .forkRepositoryUI {
-  position: absolute;
-  top: 20%;
-  left: 20%;
-  width: 60%;
-  height: 60%;
-  border: 5px solid var(--overlayBorderColor);
-  border-radius: 32px;
-  background-color: var(--overlayBackgroundColor);
-  color: var(--overlayTextColor);
-  z-index: 190;
-}
-
-.forkRepositoryOverlay .forkRepositoryUI>div {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 80%;
-  transform: translate(-50%, -50%);
-}
-
 .forkRepositoryOverlay .forkRepositoryUI input {
   width: 30%;
 }
 
-#forkRepositoryStatus {
+.forkRepositoryStatus {
   font-size: 8pt;
   color: var(--fileStatusWarnColor);
   visibility: hidden;
 }
 
-#forkRepositoryStatus.warn {
+.forkRepositoryStatus.warn {
   visibility: visible;
 }
 
@@ -251,23 +282,218 @@ a:active {
   background-color: mistyrose;
 }
 
-.friendContainer {
+#forkRepoRequested {
+  font-family: monospace;
+  background: lightsteelblue;
+  color: darkblue;
+  width: fit-content;
+  padding: .5em;
+  border-radius: 10px;
+}
+
+#friendContainer {
   border: 3px solid var(--dropdownHeadingColor);
   border-radius: 4px;
   width: 100%;
 }
 
-.notation {
+#notation {
   overflow: hidden;
   display: flex;
-  flex-direction: column;
 }
 
 .resizer {
   background-color: var(--dropdownHeadingColor);
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.encoding {}
+.resizer svg {
+  fill: var(--textColor);
+}
+
+#verovio-container {
+  height: 100%;
+  width: 100%;
+  overflow: inherit;
+  display: flex;
+  flex-direction: column;
+}
+
+#facsimile-panel {
+  overflow: auto;
+  width: 100%;
+  height: 100%;
+}
+
+#source-image-label {
+  justify-content: center;
+}
+
+/* #encoding {} */
+
+#validation-status {
+  z-index: 5;
+  position: relative;
+  width: 3.5em;
+  margin-right: -3.5em;
+  height: 1.2em;
+  left: 3px;
+  top: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 3px;
+  font-size: 90%;
+  /* background-color: var(--validationStatusBackgroundColor);
+  border-radius: 4px;
+  padding: 1px; */
+}
+
+#validation-status svg {
+  height: 1.2em;
+}
+
+.validation-report {
+  font-size: 90%;
+  display: block;
+  position: relative;
+  z-index: 12;
+  left: 72px;
+  top: 3px;
+  width: 480px;
+  margin-right: -480px;
+  max-height: 10.5em;
+  padding: 2px;
+  overflow-x: auto;
+  overflow-y: scroll;
+  color: var(--textColor);
+  background-color: var(--settingsBackgroundColor);
+  border: 2px solid var(--settingsBackgroundAlternativeColor);
+  border-radius: 4px;
+  font-family: monospace;
+}
+
+.validation-report div:nth-child(odd) {
+  background: var(--settingsBackgroundAlternativeColor);
+}
+
+.validation-title {
+  font-weight: bold;
+}
+
+.validation-item {
+  cursor: pointer;
+  flex-wrap: nowrap;
+}
+
+.wait {
+  fill: darkorange;
+  color: darkorange;
+  border-color: darkorange;
+}
+
+.error {
+  color: rgb(175, 51, 51);
+  fill: rgb(175, 51, 51);
+  border-color: rgb(175, 51, 51);
+}
+
+.ok {
+  color: green;
+  fill: green;
+  border-color: green;
+}
+
+.manual {
+  color: grey;
+  fill: grey
+}
+
+/* Overriding Codemirror Defaults */
+.CodeMirror-lint-marker {
+  width: 1.2em;
+  height: 1.2em;
+}
+
+/* Marker Error: Empty circle with x inside */
+.CodeMirror-lint-marker-error {
+  background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision" viewBox="0 0 20 20"><circle fill="none" stroke="rgb(175, 51, 51)" stroke-width="1.75" stroke-miterlimit="22.9256" cx="8.001" cy="12" r="6.875"/><polygon fill="rgb(175, 51, 51)" stroke="rgb(175, 51, 51)" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="2.3662" points="5,14.386 7.386,11.999 5,9.613 5.613,8.999 8,11.386 10.387,8.999 11.001,9.613 8.614,11.999 11.001,14.386 10.387,15 8,12.613 5.613,15 "/></svg>');
+}
+
+/* Marker Multiple Errors: Three empty circles fading to the upper right */
+.CodeMirror-lint-marker-multiple {
+  background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision" viewBox="0 0 20 20"><path fill="none" stroke="rgb(175, 51, 51)" stroke-width="0.75" stroke-miterlimit="22.9256" d="M12.814 0.749c3.452,0 6.25,3.023 6.25,6.751 0,2.337 -1.1,4.398 -2.772,5.609 0.648,-1.049 1.022,-2.285 1.022,-3.608 0,-3.797 -3.078,-6.875 -6.875,-6.875 -0.807,0 -1.582,0.14 -2.302,0.395 1.146,-1.393 2.816,-2.272 4.677,-2.272z"/><path fill="none" stroke="rgb(175, 51, 51)" stroke-miterlimit="22.9256" d="M10.439 2.626c3.797,0 6.875,3.078 6.875,6.875 0,2.502 -1.337,4.692 -3.334,5.894 0.569,-1.002 0.896,-2.16 0.896,-3.395 0,-3.797 -3.078,-6.875 -6.875,-6.875 -1.295,0 -2.507,0.358 -3.541,0.981 1.183,-2.078 3.417,-3.48 5.979,-3.48z"/><circle fill="none" stroke="rgb(175, 51, 51)" stroke-width="1.75" stroke-miterlimit="22.9256" cx="8.001" cy="12" r="6.875"/><polygon fill="rgb(175, 51, 51)" stroke="rgb(175, 51, 51)" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="2.3662" points="5,14.386 7.386,11.999 5,9.613 5.613,8.999 8,11.386 10.387,8.999 11.001,9.613 8.614,11.999 11.001,14.386 10.387,15 8,12.613 5.613,15 "/></svg>');
+  background-repeat: no-repeat;
+  background-position: center center;
+}
+
+/* Message error: Filled circle with x inside */
+.CodeMirror-lint-message-error {
+  background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision" viewBox="0 0 20 16"><circle fill="rgb(175, 51, 51)" stroke="rgb(175, 51, 51)" stroke-width="1.75" stroke-miterlimit="22.9256" cx="8.001" cy="8" r="6.875"/><polygon fill="rgb(175, 51, 51)" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="2.3662" points="5,10.386 7.386,7.999 5,5.613 5.613,4.999 8,7.386 10.387,4.999 11.001,5.613 8.614,7.999 11.001,10.386 10.387,11 8,8.613 5.613,11 "/></svg>');
+}
+
+.CodeMirror-lint-marker {
+  cursor: default;
+}
+
+/* Wavyline */
+.CodeMirror-lint-mark-error {
+  background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" viewBox="0 0 160 160" height="8px"><path fill="rgb(175, 51, 51)" fill-rule="nonzero" stroke="rgb(175, 51, 51)" stroke-width="8" stroke-miterlimit="22.9256" d="M159.627 148.658c-1.395,-1.022 -2.79,-2.155 -4.187,-3.4l0 -0.006c-11.915,-10.738 -22.754,-10.769 -32.517,-0.092l-3.765 -0.525 3.75 0.537c-3.83,4.035 -7.857,6.909 -12.08,8.621 -3.325,1.348 -6.866,2.037 -10.622,2.067 -3.733,0.03 -7.363,-0.597 -10.886,-1.879 -4.611,-1.679 -9.238,-4.587 -13.881,-8.723l0 -0.006c-11.914,-10.738 -22.754,-10.769 -32.516,-0.092l-3.399 -0.474 3.405 0.488c-3.83,4.035 -7.857,6.909 -12.08,8.621 -3.325,1.348 -6.866,2.037 -10.622,2.067 -3.733,0.03 -7.363,-0.597 -10.887,-1.88 -3.272,-1.191 -6.551,-3.001 -9.839,-5.43l0 -7.307c1.083,0.861 2.171,1.784 3.266,2.771l0.006 -0.001c4.193,3.737 8.196,6.299 12.005,7.685 1.957,0.713 3.722,1.063 5.292,1.05 1.549,-0.012 3.226,-0.384 5.029,-1.115 3.439,-1.395 6.878,-3.901 10.316,-7.521l-0.023 -0.003c14.292,-15.632 30.078,-15.664 47.354,-0.097l0.006 -0.001c4.194,3.737 8.196,6.299 12.005,7.686 1.957,0.712 3.722,1.062 5.293,1.05 1.548,-0.013 3.225,-0.384 5.028,-1.116 3.439,-1.394 6.879,-3.902 10.318,-7.522 13.424,-14.686 28.169,-15.601 44.231,-2.751l0 7.298z"/></svg>');
+}
+
+.CodeMirror-lint-message {
+  padding-left: 18px;
+  background-position: top left;
+  background-repeat: no-repeat;
+}
+
+.rightButton {
+  /* only for validation report close button */
+  float: right;
+  cursor: pointer;
+  font-size: 2em;
+  padding-right: .01em;
+  margin-top: -.35em;
+}
+
+#annotationPanel {
+  background: var(--annotationPanelBackgroundColor);
+  border: 3px solid var(--annotationPanelBorderColor);
+  border-radius: 4px;
+  box-sizing: border-box;
+  /* TODO: hack to fix size of #annotationPanel .tabcontent */
+  overflow: hidden;
+}
+
+#annotationPanel .tab,
+#annotationPanel .tablink,
+#annotationPanel .tabstart {
+  background-color: var(--annotationPanelLinkBackgroundColor);
+  color: var(--annotationPanelTextColor);
+  border: unset;
+}
+
+#annotationPanel .tablink.active,
+#annotationPanel .tabcontent {
+  background-color: var(--annotationPanelBackgroundColor);
+  color: var(--annotationPanelTextColor);
+  border: unset;
+  overflow: auto;
+}
+
+#annotationPanel .tabcontent {
+  border: unset;
+}
+
+#annotationPanel .tablink:hover,
+#annotationPanel .tabstart:hover,
+#annotationPanel .topright:hover {
+  background-color: var(--annotationPanelHoverColor);
+  color: var(--annotationPanelTextColor);
+}
 
 /* .CodeMirror {
     border: 1px solid #eee;
@@ -334,11 +560,12 @@ a:active {
   align-items: center;
   justify-content: flex-start;
   font-size: 10pt;
-  width: 100%;
   height: 28px;
-  color: var(--textColor);
-  padding: 1px;
+  padding: 2px;
   margin: 0px;
+  z-index: 6;
+  color: var(--textColor);
+  background-color: var(--controlMenuBackgroundColor);;
 }
 
 .controls {
@@ -348,20 +575,27 @@ a:active {
   border: 1px solid var(--dropdownBorderColor);
   border-radius: 7px;
   margin: 0px 3px;
-  /* background-color: var(--navbarBackgroundColor); */
 }
 
 .btn {
   margin: 2px;
-  border: 1px solid gainsboro;
+  border: 2px solid rgb(0, 0, 0, 0);
   border-radius: 4px;
-  /* font-size: 10px; */
+  font-size: 10pt;
   line-height: 1.5em;
-  padding: 0 2px;
+  padding: 0px;
   min-height: 21px;
   min-width: 21px;
   max-height: 21px;
-  background-color: var(--backgroundColor);
+  background-color: var(--controlMenuBackgroundColor);
+}
+
+.btn:hover {
+  background-color: var(--settingsLinkHoverColor);
+}
+
+.btn svg path {
+  fill: var(--textColor);
 }
 
 .label {
@@ -369,6 +603,7 @@ a:active {
   margin-right: 3px;
   margin-left: 3px;
   display: flex;
+  align-items: center;
   line-height: 1.5em;
   padding: 0 2px;
   min-height: 21px;
@@ -378,6 +613,13 @@ a:active {
 
 #pagination2 {
   cursor: text;
+  border-style: dotted;
+  border-width: 1px;
+  border-radius: 4px;
+}
+
+#pagination2:empty {
+  display: none;
 }
 
 .inline-block-tight {
@@ -385,11 +627,11 @@ a:active {
   vertical-align: middle;
 }
 
-.input-range {
-  /* height: 4px; */
-  /* border-radius: 3px; */
-  /* background-color: var(--backgroundColor); */
-}
+/* .input-range {
+   height: 4px;
+   border-radius: 3px;
+   background-color: var(--backgroundColor);
+} */
 
 .checkbox {
   margin-right: 4px;
@@ -449,7 +691,7 @@ https://www.w3schools.com/css/css_tooltip.asp
   opacity: 1;
 }
 
-.verovio-panel {
+#verovio-panel {
   /* padding: 1rem 2rem 3rem 1rem; */
   display: block;
   padding: 0px;
@@ -466,32 +708,62 @@ svg text {
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
-  user-select:  none;
+  user-select: none;
 }
 
-.verovio-panel g.highlighted {
-  fill: var(--highlightColor);
+#verovio-container .highlighted {
   color: var(--highlightColor);
   stroke: var(--highlightColor);
 }
 
-.verovio-panel g.supplied g {
+#verovio-container g.highlighted,
+#verovio-container text.highlighted {
+  fill: var(--highlightColor);
+  fill-opacity: 100%;
+}
+
+#facsimile-panel rect.highlighted {
+  stroke: var(--highlightColor);
+  stroke-opacity: 70%;
+  fill: var(--highlightColor);
+  fill-opacity: 15%;
+}
+
+#verovio-container g.supplied g {
   fill: var(--suppliedColor);
   color: var(--suppliedColor);
   stroke: var(--suppliedColor);
 }
 
-.verovio-panel g.supplied g.highlighted {
-  fill: var(--suppliedHighlightedColor);
+#verovio-container .supplied .highlighted {
   color: var(--suppliedHighlightedColor);
   stroke: var(--suppliedHighlightedColor);
 }
 
-.verovio-panel g {
+#verovio-container g.supplied g.highlighted {
+  fill: var(--suppliedHighlightedColor);
+}
+
+#verovio-container g {
   fill: var(--notationColor);
   color: var(--notationColor);
   stroke: var(--notationColor);
 }
+
+#facsimile-panel rect {
+  stroke-opacity: 40%;
+}
+
+#facsimile-panel text {
+  stroke-opacity: 40%;
+  fill-opacity: 40%;
+}
+
+/* #source-image-svg text {
+  fill: var(--dropdownHeadingColor);
+  stroke: var(--dropdownHeadingColor);
+  fill-opacity: 1;
+} */
 
 .hidden {
   display: none;
@@ -525,6 +797,48 @@ svg text {
   /* max-width: 180px; */
 }
 
+.icon {
+  width: 20px;
+  height: 20px;
+  /* background-repeat: no-repeat;
+  background-position: 50% 50%; */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.icon[disabled] svg path,
+.disabled {
+  /* opacity: 30%; */
+  fill: var(--settingsBackgroundColor);
+}
+
+#verovio-icon {
+  margin-left: 3px;
+  margin-right: 3px;
+  width: 22px;
+  height: 20px;
+  fill: var(--textColor);
+  stroke: var(--textColor);
+  stroke-width: 1.5px;
+}
+
+#facsimile-icon {
+  margin-left: 3px;
+  margin-right: 3px;
+  width: 16px;
+  fill: var(--textColor);
+}
+
+.code {
+  font-family: monospace;
+}
+
 .text-info table {
   min-width: 540px;
   max-width: 540px;
@@ -535,12 +849,13 @@ svg text {
 }
 
 span.keyIcon {
-  margin: 1px 2px;
-  padding: 1px 5px;
+  margin: 1px 1px;
+  padding: 1px 3px;
   border-style: solid;
   border-color: DodgerBlue;
   border-width: 2px;
   border-radius: 3px;
+  font-size: 85%;
 }
 
 /* Clear floats after the columns */
@@ -584,7 +899,8 @@ span.keyIcon {
   position: absolute;
   top: 4px;
   min-width: 360px;
-  height: 98%;
+  max-width: 360px;
+  height: calc(100% - 20px);
   z-index: 15;
   display: none;
 }
@@ -652,20 +968,21 @@ span.keyIcon {
 }
 
 .tabstart {
-  color: var(--textColor);
-  border: var(--settingsLinkBackgroundColor) solid 2px;
+  fill: var(--textColor);
+  border: rgba(0, 0, 0, 0) solid 2px;
   border-top-left-radius: 5px;
   background-color: inherit;
   cursor: pointer;
   float: left;
   outline: none;
-  padding: 4px 12px;
+  padding: 4px 6px;
   height: 38px;
 }
 
 /* Change background color of buttons on hover */
-.tablink:hover, .topright:hover, .tabstart:hover {
-  /* color: var(--textColor); */
+.tablink:hover,
+.topright:hover,
+.tabstart:hover {
   color: var(--textColor);
   background-color: var(--settingsLinkHoverColor);
   border-color: var(--settingsLinkHoverColor);
@@ -684,11 +1001,7 @@ span.keyIcon {
 }
 
 /* Style the tab content */
-.tabcontent {
-  color: var(--textColor);
-  font-size: 10pt;
-  display: none;
-  padding: 6px 12px;
+#settingsTabContentWrapper {
   background-color: var(--settingsBackgroundColor);
   border-left: var(--settingsBackgroundColor) solid 2px;
   border-bottom: var(--settingsBackgroundColor) solid 2px;
@@ -696,6 +1009,23 @@ span.keyIcon {
   border-bottom-left-radius: 5px;
   height: 95%;
   overflow: auto;
+}
+
+#settingsTabContentWrapper #filterSettingsWrapper {
+  display: inline-block;
+  width: calc(100% - 1em);
+  margin-bottom: -1.6em;
+  height: 2em;
+}
+
+.tabcontent {
+  color: var(--textColor);
+  font-size: 10pt;
+  display: none;
+  padding: 6px 12px;
+  overflow: none;
+  height: calc(100% - 50px);
+  width: calc(100% - 2em);
 }
 
 .tabcontent summary {
@@ -713,18 +1043,29 @@ span.keyIcon {
 
 /* Style the close button */
 .topright {
-  /* color: #808080; */
+  color: var(--textcolor);
   float: right;
   padding: 6px 12px;
   cursor: pointer;
   font-size: 22px;
 }
 
-.topright:hover {
-  color: black;
+.settingsHeader {
+  font-weight: bold;
+  font-size: 150%;
+  margin: 0px;
+  margin-bottom: 6pt;
+}
+
+.optionsSubHeading {
+  font-weight: bold;
+  font-size: 110%;
+  margin: 3px;
 }
 
 .optionsItem {
+  font-size: 100%;
+  font-weight: normal;
   display: flex;
   justify-content: space-between;
   padding-top: 0.5px;
@@ -733,7 +1074,7 @@ span.keyIcon {
   clear: both;
 }
 
-.optionsItem:nth-of-type(even) {
+.optionsItem.odd {
   background-color: var(--settingsBackgroundAlternativeColor);
 }
 
@@ -743,7 +1084,8 @@ span.keyIcon {
   max-width: 220px;
 }
 
-#editorSettings .optionsItem select, #meiFriendSettings .optionsItem select {
+#editorSettings .optionsItem select,
+#meiFriendSettings .optionsItem select {
   min-width: 80px;
   max-width: 150px;
 }
@@ -770,7 +1112,8 @@ span.keyIcon {
   max-width: 85px;
 }
 
-.optionsItem input, select {
+.optionsItem input,
+select {
   padding-top: 0px;
   padding-bottom: 0px;
   text-align: right;
@@ -785,7 +1128,8 @@ span.keyIcon {
   border-radius: 4px;
 }
 
-input, select {
+input,
+select {
   background-color: var(--backgroundColor);
   color: var(--textColor);
 }
@@ -799,5 +1143,96 @@ select>option {
   border: 1px solid var(--dropdownBorderColor);
   border-radius: 1px;
   margin: 8px 4px;
-  width: 100%;
+  width: 96%;
+}
+
+#bugReport {
+  font-size: 1.5em;
+  padding: 20px;
+}
+
+/* The alert message box */
+.alert {
+  position: fixed;
+  top: 80px;
+  left: 10%;
+  width: 80%;
+  max-height: 70%;
+  justify-content: space-between;
+  gap: .5em;
+  padding: 20px;
+  background-color: #f44336;
+  /* border-style: solid;
+  border-width: 2px; */
+  border-radius: 8px;
+  color: white;
+  font-size: normal;
+  z-index: 20;
+  overflow-y: auto;
+}
+
+.alert.success {
+  background-color: #04AA6D;
+}
+
+.alert.info {
+  background-color: #2196F3;
+}
+
+.alert.warning {
+  background-color: #ff9800;
+}
+
+#alertIcon svg {
+  width: 2.2em;
+  height: 2.2em;
+  fill: white;
+}
+
+/* The close button */
+.alertCloseButton {
+  margin-left: 15px;
+  color: white;
+  font-weight: bold;
+  float: right;
+  font-size: 22px;
+  line-height: 20px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+/* When moving the mouse over the close button */
+.alertCloseButton:hover {
+  color: black;
+}
+
+#filterSettings {
+  width: 33%;
+  height: 1.5em;
+  border: 1px solid var(--dropdownBorderColor);
+  outline: 0;
+  border-radius: 4px;
+  float: right;
+  margin-top: 1em;
+  margin-bottom: -3em;
+}
+
+#filterSettingsWrapper {
+  color: var(--textColor);
+}
+
+#filterReset {
+  border: 1px solid transparent;
+  background-color: transparent;
+  display: inline;
+  cursor: pointer;
+  float: right;
+  margin-top: .96em;
+  padding-right: 2px;
+  fill: var(--dropdownHeadingColor);
+}
+
+#filterReset svg {
+  width: 14px;
+  height: 14px;
 }

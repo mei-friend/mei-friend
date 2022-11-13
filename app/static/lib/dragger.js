@@ -55,7 +55,7 @@ export function dragEnter(ev) {
 export function dragLeave(ev) {
   ev.stopPropagation();
   ev.preventDefault();
-  if (ev.target.className == 'dragOverlay') {
+  if (ev.target.className === 'dragOverlay') {
     // console.log('dragLeave()', ev);
     off();
   }

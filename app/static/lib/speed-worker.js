@@ -4,17 +4,18 @@
 var timeSpanningElements; // from attribute-classes.js
 
 // message handler
-onmessage = function(e) {
+onmessage = function (e) {
   let result = {};
   let t1 = performance.now();
-  console.info("SpeedWorker received: " + e.data.cmd + ', ', e.data);
+  console.info("SpeedWorker received: " + Math.random() + '; ' + e.data.cmd + '. ');
+  // console.info("SpeedWorker received: " + e.data.cmd + ', ', e.data);
   switch (e.data.cmd) {
     case 'variables': // receive const from attribute-classes.js
       timeSpanningElements = e.data.var;
-      // console.log('SpeedWorker received variables: ', timeSpanningElements);
+      result.cmd = 'variables defined.';
       break;
     case 'listPageSpanningElements':
-      result.cmd = 'listPageSpanningElements'
+      result.cmd = 'listPageSpanningElements';
       result.pageSpanners =
         listPageSpanningElements(e.data.mei, e.data.breaks, e.data.breaksOpt);
       break;
@@ -27,7 +28,10 @@ onmessage = function(e) {
 // List all timespanning elements with @startid/@endid attr on different pages.
 // Does the same as in speed.listPageSpanningElements(), but without DOM stuff
 function listPageSpanningElements(mei, breaks, breaksOption) {
-  let pageSpanners = {};
+  let pageSpanners = {
+    start: {},
+    end: {}
+  };
   let xmlDoc = parse(mei); // txml is very fast!
   let music; // expecting mei > music
   music = getElementByTagName(xmlDoc, 'music', music);
@@ -47,10 +51,6 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
   }
 
   if (score) {
-    pageSpanners = {
-      start: {},
-      end: {}
-    };
     // collect all time-spanning elements with startid and endid
     let tsTable = {}; // object with id as keys and an array of [startid, endid]
     let idList = []; // list of time-pointer ids to be checked
@@ -60,7 +60,7 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
     let p = 1;
     // determine page number for list of ids
     function dig(nodeArray, noteTable, idList, childOfMeasure = false) {
-      if (breaksOption == 'line' || breaksOption == 'encoded') {
+      if (breaksOption === 'line' || breaksOption === 'encoded') {
         nodeArray.forEach(el => { // el obj w/ tagName, children, attributes
           if (el.hasOwnProperty("tagName")) {
             if (el.tagName === 'measure') count = true;
@@ -171,7 +171,32 @@ function getElementByTagName(nodeArray, elName, el) {
 // ACKNOWLEDGEMENTS
 // The below code is taken from https://github.com/TobiasNickel/tXml,
 // published by Tobias Nickel under MIT license.
-// We are grateful for the fast xml parsing inside workers!
+
+// We are grateful for the fast xml parsing inside workers! Thanks a lot!
+
+// The MIT License (MIT)
+
+// Copyright (c) 2015 Tobias Nickel
+
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
+
 
 /**
  * @author: Tobias Nickel
@@ -212,18 +237,19 @@ function parse(S, options) {
   function parseChildren(tagName) {
     var children = [];
     while (S[pos]) {
-      if (S.charCodeAt(pos) == openBracketCC) {
+      if (S.charCodeAt(pos) === openBracketCC) {
         if (S.charCodeAt(pos + 1) === slashCC) {
           var closeStart = pos + 2;
           pos = S.indexOf(closeBracket, pos);
 
           var closeTag = S.substring(closeStart, pos)
-          if (closeTag.indexOf(tagName) == -1) {
+          if (closeTag.indexOf(tagName) === -1) {
             var parsedText = S.substring(0, pos).split('\n');
-            throw new Error(
-              'Unexpected close tag\nLine: ' + (parsedText.length - 1) +
-              '\nColumn: ' + (parsedText[parsedText.length - 1].length + 1) +
-              '\nChar: ' + S[pos]
+            console.error(
+              'SpeedWorker Parsing Error: Unexpected close tag:' +
+              ' Line ' + (parsedText.length - 1) +
+              ', Column ' + (parsedText[parsedText.length - 1].length + 1) +
+              ', Char ' + S[pos]
             );
           }
 
@@ -231,10 +257,10 @@ function parse(S, options) {
 
           return children;
         } else if (S.charCodeAt(pos + 1) === exclamationCC) {
-          if (S.charCodeAt(pos + 2) == minusCC) {
+          if (S.charCodeAt(pos + 2) === minusCC) {
             //comment support
             const startCommentPos = pos;
-            while (pos !== -1 && !(S.charCodeAt(pos) === closeBracketCC && S.charCodeAt(pos - 1) == minusCC && S.charCodeAt(pos - 2) == minusCC && pos != -1)) {
+            while (pos !== -1 && !(S.charCodeAt(pos) === closeBracketCC && S.charCodeAt(pos - 1) === minusCC && S.charCodeAt(pos - 2) === minusCC && pos != -1)) {
               pos = S.indexOf(closeBracket, pos + 1);
             }
             if (pos === -1) {
@@ -246,12 +272,12 @@ function parse(S, options) {
           } else if (
             S.charCodeAt(pos + 2) === openCornerBracketCC &&
             S.charCodeAt(pos + 8) === openCornerBracketCC &&
-            S.substr(pos + 3, 5).toLowerCase() === 'cdata'
+            S.substring(pos + 3, pos + 8).toLowerCase() === 'cdata'
           ) {
             // cdata
             var cdataEndIndex = S.indexOf(']]>', pos);
-            if (cdataEndIndex == -1) {
-              children.push(S.substr(pos + 9));
+            if (cdataEndIndex === -1) {
+              children.push(S.substring(pos + 9));
               pos = S.length;
             } else {
               children.push(S.substring(pos + 9, cdataEndIndex));
@@ -366,12 +392,12 @@ function parse(S, options) {
     }
     // optional parsing of children
     if (S.charCodeAt(pos - 1) !== slashCC) {
-      if (tagName == "script") {
+      if (tagName === "script") {
         var start = pos + 1;
         pos = S.indexOf('</script>', pos);
         children = [S.slice(start, pos)];
         pos += 9;
-      } else if (tagName == "style") {
+      } else if (tagName === "style") {
         var start = pos + 1;
         pos = S.indexOf('</style>', pos);
         children = [S.slice(start, pos)];
@@ -426,7 +452,7 @@ function parse(S, options) {
       if (pos !== -1) {
         out.push(parseNode());
       }
-      S = S.substr(pos);
+      S = S.substring(pos);
       pos = 0;
     }
   } else if (options.parseNode) {
@@ -464,11 +490,11 @@ function simplify(children) {
     return '';
   }
 
-  if (children.length === 1 && typeof children[0] == 'string') {
+  if (children.length === 1 && typeof children[0] === 'string') {
     return children[0];
   }
   // map each object
-  children.forEach(function(child) {
+  children.forEach(function (child) {
     if (typeof child !== 'object') {
       return;
     }
@@ -482,7 +508,7 @@ function simplify(children) {
   });
 
   for (var i in out) {
-    if (out[i].length == 1) {
+    if (out[i].length === 1) {
       out[i] = out[i][0];
     }
   }
@@ -502,14 +528,14 @@ function simplifyLostLess(children, parentAttributes = {}) {
     return out;
   }
 
-  if (children.length === 1 && typeof children[0] == 'string') {
+  if (children.length === 1 && typeof children[0] === 'string') {
     return Object.keys(parentAttributes).length ? {
       _attributes: parentAttributes,
       value: children[0]
     } : children[0];
   }
   // map each object
-  children.forEach(function(child) {
+  children.forEach(function (child) {
     if (typeof child !== 'object') {
       return;
     }
@@ -532,8 +558,8 @@ function simplifyLostLess(children, parentAttributes = {}) {
  */
 function filter(children, f, dept = 0, path = '') {
   var out = [];
-  children.forEach(function(child, i) {
-    if (typeof(child) === 'object' && f(child, i, dept, path)) out.push(child);
+  children.forEach(function (child, i) {
+    if (typeof (child) === 'object' && f(child, i, dept, path)) out.push(child);
     if (child.children) {
       var kids = filter(child.children, f, dept + 1, (path ? path + '.' : '') + i + '.' + child.tagName);
       out = out.concat(kids);
@@ -555,7 +581,7 @@ function stringify(O) {
   function writeChildren(O) {
     if (O) {
       for (var i = 0; i < O.length; i++) {
-        if (typeof O[i] == 'string') {
+        if (typeof O[i] === 'string') {
           out += O[i].trim();
         } else {
           writeNode(O[i]);
@@ -598,7 +624,7 @@ function stringify(O) {
 function toContentString(tDom) {
   if (Array.isArray(tDom)) {
     var out = '';
-    tDom.forEach(function(e) {
+    tDom.forEach(function (e) {
       out += ' ' + toContentString(e);
       out = out.trim();
     });

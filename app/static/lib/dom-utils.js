@@ -1,8 +1,15 @@
+export const meiNameSpace = 'http://www.music-encoding.org/ns/mei';
+export const xmlNameSpace = 'http://www.w3.org/XML/1998/namespace';
+export const svgNameSpace = "http://www.w3.org/2000/svg";
+
 export const navElsArray = [
   'note', 'rest', 'mRest', 'beatRpt', 'halfmRpt', 'mRpt', 'clef'
 ];
 export const navElsSelector = '.' + navElsArray.join(',.');
 
+import {
+  escapeXmlId
+} from "./utils.js";
 
 // scans through SVG starting from element to find next element elementName
 // (e.g. 'note'), within same staff and layer
@@ -13,7 +20,7 @@ export function getIdOfNextSvgElement(currEl, dir = 'forwards',
   let stN = 1;
   let lyN = 1;
   if (!st) {
-    return (dir == 'forwards') ?
+    return (dir === 'forwards') ?
       getLastInMeasure(measure, navElsSelector, stN, lyN) :
       getFirstInMeasure(measure, navElsSelector, stN, lyN);
   }
@@ -23,15 +30,15 @@ export function getIdOfNextSvgElement(currEl, dir = 'forwards',
   let currChord = currEl.closest('.chord');
   let currChordId = '';
   if (currChord) currChordId = currChord.getAttribute('id');
-  if (incr == 'measure' && dir == 'forwards')
+  if (incr === 'measure' && dir === 'forwards')
     return getIdInNextMeasure(currEl, dir, stN, lyN);
-  if (incr == 'measure' && dir == 'backwards') {
+  if (incr === 'measure' && dir === 'backwards') {
     let firstId = getFirstInMeasure(measure, navElsSelector, stN, lyN);
     let currId = currEl.getAttribute('id');
     if (currChord) currId = currChordId;
-    let firstChord = document.querySelector('g#' + firstId).closest('.chord');
+    let firstChord = document.querySelector('g#' + escapeXmlId(firstId)).closest('.chord');
     if (firstChord) firstId = firstChord.getAttribute('id');
-    if (currId == firstId) {
+    if (currId === firstId) {
       let id = getIdInNextMeasure(currEl, dir.substring(0, 4), stN, lyN);
       console.info('getIdOfNextElement ' + dir.substring(0, 4) + ', ' +
         stN + '/' + lyN + ', id: ' + id);
@@ -40,15 +47,15 @@ export function getIdOfNextSvgElement(currEl, dir = 'forwards',
   }
   let id = '';
   let elementList = Array.from(measure.querySelectorAll(sel));
-  if (dir == 'backwards') elementList.reverse();
+  if (dir === 'backwards') elementList.reverse();
   // console.info("getIdOfNextSvgElement: elementList ", elementList);
   let found = false;
   for (let i of elementList) { // go thru all elements on page
-    if (found && i.closest('.staff').getAttribute('data-n') == stN &&
+    if (found && i.closest('.staff').getAttribute('data-n') === stN &&
       i.closest('.layer') &&
-      i.closest('.layer').getAttribute('data-n') == lyN) {
+      i.closest('.layer').getAttribute('data-n') === lyN) {
       let ch = i.closest('.chord'); // ignore tones of same chord
-      if (ch && ch.getAttribute('id') == currChordId) continue;
+      if (ch && ch.getAttribute('id') === currChordId) continue;
       id = i.getAttribute("id"); // if layer-matched -- wonderful!
       break;
     }
@@ -71,13 +78,13 @@ export function getIdInNextMeasure(currEl, dir = 'forwards', stN = 0, lyN = 0) {
   let measureList = Array.from(document.querySelectorAll('.measure'));
   if (dir.startsWith('back')) measureList.reverse();
   let measure = currEl.closest('.measure');
-  if (lyN == 0) lyN = currEl.closest('.layer').getAttribute('data-n');
-  if (stN == 0) stN = currEl.closest('.staff').getAttribute('data-n');
+  if (lyN === 0) lyN = currEl.closest('.layer').getAttribute('data-n');
+  if (stN === 0) stN = currEl.closest('.staff').getAttribute('data-n');
   let found = false;
   for (let m of measureList) {
     // console.info('getIdInNextMeasure ' + dir + ', m: ', m);
     if (found) {
-      if (dir == 'backwards')
+      if (dir === 'backwards')
         return getLastInMeasure(m, navElsSelector, stN, lyN);
       else // forwards, back
         return getFirstInMeasure(m, navElsSelector, stN, lyN);
@@ -87,8 +94,8 @@ export function getIdInNextMeasure(currEl, dir = 'forwards', stN = 0, lyN = 0) {
 }
 
 export function getInMeasure(measure, list, stN, lyN, what = '') {
-  if (what == 'first') return getFirstInMeasure(measure, list, stN, lyN);
-  if (what == 'last') return getLastInMeasure(measure, list, stN, lyN);
+  if (what === 'first') return getFirstInMeasure(measure, list, stN, lyN);
+  if (what === 'last') return getLastInMeasure(measure, list, stN, lyN);
 }
 
 export function getFirstInMeasure(measure, list, stN, lyN) {
@@ -141,14 +148,12 @@ export function getX(element, what = 'median') {
       element.getAttribute('class').includes(el))) {
     // (element.getAttribute('class').includes("note")) {
     let els = element.querySelectorAll('.notehead > use[x]'); // should be one!
-    if (els.length == 0) els = element.querySelectorAll('use[x]'); // non-notes
-    els.forEach((item, i) => {
-      x.push(parseInt(item.getAttribute('x')));
-    });
+    if (els.length === 0) els = element.querySelectorAll('use[x]'); // non-notes
+    els.forEach(item => x.push(parseInt(item.getAttribute('x'))));
   }
-  if (what == 'median') return median(x);
-  if (what == 'range') return (Math.max(x) - Math.min(x));
-  if (what == 'array') return x;
+  if (what === 'median') return median(x);
+  if (what === 'range') return (Math.max(x) - Math.min(x));
+  if (what === 'array') return x;
 }
 
 export function getY(element) {
@@ -162,7 +167,7 @@ export function getY(element) {
   } else if (navElsArray.some(el =>
       element.getAttribute('class').includes(el))) {
     let els = element.querySelectorAll('.notehead > use[y]'); // should be one!
-    if (els.length == 0) els = element.querySelectorAll('use[y]'); // non-notes
+    if (els.length === 0) els = element.querySelectorAll('use[y]'); // non-notes
     els.forEach((item, i) => {
       y.push(parseInt(item.getAttribute('y')));
     });
@@ -180,7 +185,7 @@ export function median(numbers) {
 // returns true when element is the first in SVG page in same staff & layer
 export function isFirstElementOnPage(id) {
   if (!id) return true;
-  let element = document.querySelector('g#' + id);
+  let element = document.querySelector('g#' + escapeXmlId(id));
   if (!element) return true;
   let measure = element.closest('.measure');
   let stN = element.closest('.staff').getAttribute('data-n');
@@ -191,8 +196,8 @@ export function isFirstElementOnPage(id) {
   let m = document.querySelector('.measure');
   let firstId = getFirstInMeasure(m, navElsSelector, stN, lyN);
   console.info('isFirstElement: firstId: ' + firstId + ', thisId: ' + thisId +
-    ', BOOL: ' + (thisId == firstId));
-  return (thisId == firstId);
+    ', BOOL: ' + (thisId === firstId));
+  return (thisId === firstId);
 }
 
 // returns the DOM element at encoding cursor position
@@ -204,4 +209,31 @@ export function getElementAtCursor(cm) {
   }, "window");
   let elem = document.elementFromPoint(coords.left, coords.top);
   return elem;
+}
+
+// checks whether a page beginning or system beginning has to be counted as a
+// new page (normally true, and if within an <app>, count only
+// if inside a <lem> or inside first <rdg> or <rdg|source=id)
+export function countAsBreak(el, sourceId = '') {
+  let app;
+  if (app = el.closest('app')) {
+    let rdgs = app.querySelectorAll('rdg');
+    if (rdgs && rdgs.length > 0 &&
+      (el.closest('lem')) || el.closest('rdg') === rdgs[0] ||
+      el.closest('rdg') && el.closest('rdg').getAttribute('source') === sourceId) {
+      return true;
+    }
+  } else {
+    return true;
+  }
+  return false;
+}
+
+// convert xmlNode to string and remove meiNameSpace declaration from return string
+export function xmlToString(xmlNode) {
+  let str = new XMLSerializer().serializeToString(xmlNode);
+  // console.info('xmlToString: ' + str);
+  str = str.replace(/(?:><)/g, '>\n<');
+  // console.info('xmlToString: ' + str);
+  return str.replace('xmlns="' + meiNameSpace + '" ', '');
 }
