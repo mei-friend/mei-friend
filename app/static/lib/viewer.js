@@ -69,6 +69,7 @@ export default class Viewer {
     this.meiHeadRange = [];
     this.vrvOptions; // all verovio options
     this.verovioIcon = document.getElementById('verovio-icon');
+    this.breaksSelect = /** @type HTMLSelectElement */ (document.getElementById('breaks-select'));
     this.respId = '';
     this.alertCloser;
   }
@@ -79,12 +80,13 @@ export default class Viewer {
     let computePageBreaks = false;
     let p = this.currentPage;
     if (this.speedMode && Object.keys(this.pageBreaks).length === 0 &&
-      document.getElementById('breaks-select').value === 'auto') {
+      this.breaksSelect.value === 'auto') {
       computePageBreaks = true;
       p = 1; // request page one, but leave currentPage unchanged
     }
     if (this.speedMode && xmlId) {
-      p = speed.getPageWithElement(this.xmlDoc, this.breaksValue(), xmlId);
+      const breaksOption = this.breaksSelect.value;
+      p = speed.getPageWithElement(this.xmlDoc, this.breaksValue(), xmlId, breaksOption);
       this.changeCurrentPage(p);
     }
     let message = {
@@ -109,7 +111,7 @@ export default class Viewer {
       'setCursorToPageBeginning': setCursorToPageBeg,
       'setFocusToVerovioPane': setFocusToVerovioPane,
       'speedMode': this.speedMode,
-      'breaks': document.getElementById('breaks-select').value
+      'breaks': this.breaksSelect.value
     };
     this.busy();
     this.vrvWorker.postMessage(message);
@@ -129,7 +131,8 @@ export default class Viewer {
       } else { // speed mode
         if (this.encodingHasChanged) this.loadXml(cm.getValue());
         if (xmlId) {
-          this.changeCurrentPage(speed.getPageWithElement(this.xmlDoc, this.breaksValue(), xmlId));
+          const pageNumber = speed.getPageWithElement(this.xmlDoc, this.breaksValue(), xmlId, this.breaksSelect.value);
+          this.changeCurrentPage(pageNumber);
           console.info('UpdatePage(speedMode=true): page: ' +
             this.currentPage + ', xmlId: ' + xmlId);
         }
@@ -178,7 +181,7 @@ export default class Viewer {
     let that = this;
     // console.log('getPageWithElement(' + xmlId + '), speedMode: ' + this.speedMode);
     if (this.speedMode) {
-      pageNumber = speed.getPageWithElement(this.xmlDoc, this.breaksValue(), xmlId);
+      pageNumber = speed.getPageWithElement(this.xmlDoc, this.breaksValue(), xmlId, this.breaksSelect.value);
     } else {
       let promise = new Promise(function (resolve) {
         let taskId = Math.random();
@@ -239,7 +242,7 @@ export default class Viewer {
     // update DOM only if encoding has been edited or
     this.loadXml(mei);
     let breaks = this.breaksValue();
-    let breaksSelectVal = document.getElementById('breaks-select').value;
+    let breaksSelectVal = this.breaksSelect.value;
     if (!this.speedMode || breaksSelectVal === 'none') return mei;
     // count pages from system/pagebreaks
     if (Array.isArray(breaks)) {
@@ -357,7 +360,7 @@ export default class Viewer {
     if (zoom) this.vrvOptions.scale = parseInt(zoom.value);
     let fontSel = document.getElementById('font-select');
     if (fontSel) this.vrvOptions.font = fontSel.value;
-    let bs = document.getElementById('breaks-select');
+    let bs = this.breaksSelect;
     if (bs) this.vrvOptions.breaks = bs.value;
     let dimensions = getVerovioContainerSize();
     let vp = document.getElementById('verovio-panel');
@@ -767,7 +770,7 @@ export default class Viewer {
   toggleAnnotationPanel() {
     setOrientation(cm);
     if (this.speedMode &&
-      document.getElementById('breaks-select').value === 'auto') {
+      this.breaksSelect.value === 'auto') {
       this.pageBreaks = {};
       this.updateAll(cm);
     } else {
@@ -1866,7 +1869,7 @@ export default class Viewer {
   }
 
   breaksValue() {
-    let breaksSelectVal = document.getElementById('breaks-select').value;
+    let breaksSelectVal = this.breaksSelect.value;
     switch (breaksSelectVal) {
       case 'auto':
         return {
