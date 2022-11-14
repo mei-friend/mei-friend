@@ -89,7 +89,7 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks, pageSpanners) {
   let sections = xmlScore.childNodes;
   sections.forEach((item) => {
     if (item.nodeName === 'section') { // diggs into section hierachy
-      let returnSection = digger(/** @type {Element}*/ (item));
+      let returnSection = digger( /** @type {Element}*/ (item));
       baseSection.appendChild(returnSection);
     }
   });
@@ -192,16 +192,17 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
       if (countingMode === 'firstPage') {
         if (currentNodeName === 'measure') mNo++;
         else currentNode.querySelectorAll('measure').forEach(() => mNo++);
-      // } else if (countingMode === 'measure') {
-      //   if (currentNodeName === 'measure') p++;
-      //   else currentNode.querySelectorAll('measure').forEach(() => p++);
+        // } else if (countingMode === 'measure') {
+        //   if (currentNodeName === 'measure') p++;
+        //   else currentNode.querySelectorAll('measure').forEach(() => p++);
       } else if (countingMode === 'encodedBreaks') {
         let sb = null;
         // For 'encdedBreaks', `breaks` is an Array
         if (countNow && (
-            /** @type {string[]} */ (breaks).includes(currentNodeName)
-            || (sb = /** @type {Element} */ (currentNode).querySelector(breaksSelector))
-        )) {
+            /** @type {string[]} */
+            (breaks).includes(currentNodeName) ||
+            (sb = /** @type {Element} */ (currentNode).querySelector(breaksSelector))
+          )) {
           if (dutils.countAsBreak(sb ? sb : currentNode)) p++;
           continue;
         }
@@ -216,7 +217,10 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
         if (keySig) {
           addKeySigElement(staffDefs, keySig);
         }
-        const {count, unit} = getMeter(scoreDef);
+        const {
+          count,
+          unit
+        } = getMeter(scoreDef);
         if (count && unit) {
           addMeterSigElement(staffDefs, count, unit);
         }
@@ -248,7 +252,10 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
           } else {
             console.info('No key.sig information in ', st);
           }
-          const {count, unit} = getMeter(st);
+          const {
+            count,
+            unit
+          } = getMeter(st);
           if (count && unit) {
             // console.info('staffDef update: meterSig: ' +
             //   meterCountValue + '/' + meterUnitValue);
@@ -312,7 +319,7 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
           newSection.appendChild(endingNode);
         } else if (p === pageNo - 1) { // remove elements until first break
           // QUESTION: Can we be sure that breaks is an array here?
-          while (endingNode.firstChild && !/** @type {string[]} */ (breaks).includes(endingNode.firstChild.nodeName)) {
+          while (endingNode.firstChild && ! /** @type {string[]} */ (breaks).includes(endingNode.firstChild.nodeName)) {
             endingNode.removeChild(endingNode.firstChild);
           }
           newSection.appendChild(endingNode);
@@ -476,14 +483,19 @@ export function listPageSpanningElements(xmlScore, breaks, breaksOption) {
   let sel = '';
   switch (breaksOption) {
     case 'none':
-      return {start: {}, end: {}};
+      return {
+        start: {}, end: {}
+      };
     case 'auto':
       if (Object.keys(breaks).length > 0) {
         for (let pg in breaks) {
           let br = breaks[pg]; // array of breaks
           sel += '[*|id="' + br[br.length - 1] + '"],';
         }
-      } else return {start: {}, end: {}};
+      } else return {
+        start: {},
+        end: {}
+      };
       break;
     case 'line':
       sel = 'pb,sb,'
@@ -516,7 +528,7 @@ export function listPageSpanningElements(xmlScore, breaks, breaksOption) {
   if (breaksOption === 'line' || breaksOption === 'encoded') {
     for (let e of elList) {
       if (e.nodeName === 'measure') count = true;
-      if (count && breaks.includes(/** @type {Break} */ (e.nodeName)) && dutils.countAsBreak(e)) p++;
+      if (count && breaks.includes( /** @type {Break} */ (e.nodeName)) && dutils.countAsBreak(e)) p++;
       else
         noteTable[e.getAttribute('xml:id') || ""] = p;
     }
@@ -610,8 +622,7 @@ function addPageSpanningElements(xmlScore, spdScore, pageSpanners, pageNo) {
   if (endingElementIds && pageNo > 1) {
     const m = /** @type {Element} */ (spdScore.querySelector('[*|id="startingMeasure"]'));
     for (let endingElementId of endingElementIds) {
-      let endingElement =
-        xmlScore.querySelector('[*|id="' + endingElementId + '"]');
+      let endingElement = xmlScore.querySelector('[*|id="' + endingElementId + '"]');
       if (!endingElement) continue;
       let startid = utils.rmHash(endingElement.getAttribute('startid'));
       let startNote = xmlScore.querySelector('[*|id="' + startid + '"]');
@@ -630,8 +641,7 @@ function addPageSpanningElements(xmlScore, spdScore, pageSpanners, pageNo) {
   if (startingElementIds) {
     const m = /** @type {Element} */ (spdScore.querySelector('[*|id="endingMeasure"]'));
     for (let startingElementId of startingElementIds) {
-      let startingElement =
-        xmlScore.querySelector('[*|id="' + startingElementId + '"]');
+      let startingElement = xmlScore.querySelector('[*|id="' + startingElementId + '"]');
       if (!startingElement) continue;
       let endid = utils.rmHash(startingElement.getAttribute('endid'));
       // console.info('searching for endid: ', endid);
@@ -645,7 +655,7 @@ function addPageSpanningElements(xmlScore, spdScore, pageSpanners, pageNo) {
         }
       }
     }
-  }
+  } // 2) if
 }
 
 
