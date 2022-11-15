@@ -11,6 +11,11 @@ import {
   meiNameSpace,
   xmlNameSpace
 } from './dom-utils.js';
+import {
+  commonSchemas,
+  defaultMeiProfile,
+  defaultMeiVersion
+} from './main.js';
 
 /** @typedef {('sb' | 'pb')[] | {[pageNum: string]: string[]}} Breaks */
 /** @typedef {{
@@ -45,7 +50,7 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks, pageSpanners) {
     console.info('getPageFromDom(): no xmlScore element');
     return;
   }
-  // console.info('xmlScore: ', xmlScore);
+
   // determine one of three counting modes
   /** @type CountingMode */
   let countingMode = 'firstPage'; // quick first page for xx measures
@@ -59,8 +64,12 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks, pageSpanners) {
 
   // construct new MEI node for Verovio engraving
   let spdNode = minimalMEIFile(xmlDoc);
-  const meiVersion = xmlDoc.querySelector('mei')?.getAttribute('meiversion');
-  if (meiVersion) spdNode.setAttribute('meiversion', meiVersion);
+
+  // check for mei version or use default
+  let meiVersion = xmlDoc.querySelector('mei')?.getAttribute('meiversion');
+  if (!meiVersion) meiVersion = defaultMeiVersion;
+  spdNode.setAttribute('meiversion', meiVersion);
+  
   spdNode.appendChild(meiHeader.cloneNode(true));
   spdNode.appendChild(minimalMEIMusicTree(xmlDoc));
   const scoreDef = /** @type {Element | undefined} */ (xmlScore.querySelector("music scoreDef")?.cloneNode(true));
@@ -127,7 +136,7 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks, pageSpanners) {
   }
 
   const serializer = new XMLSerializer();
-  let mei = xmlDefs + serializer.serializeToString(spdNode);
+  let mei = xmlDefs(meiVersion) + serializer.serializeToString(spdNode);
   // console.info('Speed() MEI: ', mei);
   return mei;
 }
@@ -808,12 +817,21 @@ function minimalMEIHeader(xmlNode) {
   return meiHead;
 }
 
+// Standard XML prolog
+export const xmlProlog = '<?xml version="1.0" encoding="UTF-8"?>';
 
-export const xmlDefs = `
- <?xml version="1.0" encoding="UTF-8"?>
- <?xml-model href="https://music-encoding.org/schema/4.0.1/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
- <?xml-model href="https://music-encoding.org/schema/4.0.1/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-`;
+/**
+ * Returns standard XML definitions with prolog and schema and schematron models
+ * @param {string} meiVersion (such as '4.0.1')
+ * @param {string} meiProfile (such as 'CMN' or 'Mensural)
+ * @returns 
+ */
+export function xmlDefs(meiVersion = defaultMeiVersion, meiProfile = defaultMeiProfile) {  
+  let xml = xmlProlog;
+  xml += '<?xml-model href="' + commonSchemas[meiProfile][meiVersion] + '" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>';
+  xml += '<?xml-model href="' + commonSchemas[meiProfile][meiVersion] + '" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>';
+  return xml;
+}
 
 
 /**
@@ -869,7 +887,7 @@ export function countStaves(scoreDef) {
 
 /**
  * Filter selected elements and keep only highest in DOM
- * @param {string[]} ids  Is modified by this function
+ * @param {string[]} ids is modified by this function
  * @param {Document} xmlDoc
  * @returns {string[]} The modified `ids` array, with all elements removed that
  * have an ancestor that is also in the `ids` array.

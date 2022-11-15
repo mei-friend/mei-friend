@@ -17,6 +17,11 @@ export const isSafari = !!navigator.userAgent.match(/Version\/[\d\.]+.*Safari/);
 // TODO ideally determine version part automatically
 const guidelinesBase = 'https://music-encoding.org/guidelines/v4/';
 
+/**
+ * Object of common MEI schemas, 
+ * by meiProfile ('CMN', 'Mensural', 'Neumes', 'All', 'Any') 
+ * and meiVersion ('4.0.1', etc.)
+ */
 export const commonSchemas = {
   'CMN': {
     '2.1.1': 'https://music-encoding.org/schema/2.1.1/mei-CMN.rng',
@@ -54,7 +59,9 @@ export const commonSchemas = {
     '5.0.0-dev': 'https://music-encoding.org/schema/dev/mei-all_anyStart.rng'
   }
 };
-const defaultSchema = commonSchemas['CMN']['4.0.1'];
+export const defaultMeiVersion = '4.0.1';
+export const defaultMeiProfile = 'CMN';
+export const defaultSchema = commonSchemas[defaultMeiProfile][defaultMeiVersion];
 
 // exports
 export var cm;
