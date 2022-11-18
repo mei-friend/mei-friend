@@ -97,6 +97,8 @@
     "cmd-s": "downloadMei",
     "cmd-shift-c": "cleanAccid",
     "cmd-shift-r": "renumberMeasures",
+    "cmd-?": "openHelp",
+    "cmd-ß": "openHelp",
     "alt-.": "consultGuidelines",
     "alt-…": "consultGuidelines",
     "cmd-,": "toggleSettingsPanel",
@@ -129,6 +131,8 @@
     "ctrl-s": "downloadMei",
     "ctrl-shift-c": "cleanAccid",
     "ctrl-shift-r": "renumberMeasures",
+    "ctrl-?": "openHelp",
+    "ctrl-ß": "openHelp",
     "alt-.": "consultGuidelines",
     "ctrl-,": "toggleSettingsPanel",
     "ctrl-a": "toggleAnnotationPanel"

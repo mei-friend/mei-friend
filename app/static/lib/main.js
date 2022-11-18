@@ -1,6 +1,6 @@
 // mei-friend version and date
-const version = '0.6.7';
-const versionDate = '25 Oct 2022';
+const version = '0.6.8';
+const versionDate = '18 Nov 2022';
 
 var vrvWorker;
 var spdWorker;
@@ -1405,6 +1405,7 @@ export let cmd = {
     }
     logoutFromGithub();
   },
+  'openHelp': () => window.open(`./help`, '_blank'),
   'consultGuidelines': () => consultGuidelines(),
   'escapeKeyPressed': () => {
     // reset settings filter, if settings have focus
