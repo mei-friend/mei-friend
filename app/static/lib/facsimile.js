@@ -1,5 +1,9 @@
-// Facsimile support: 
-// Handles display of sources score images as referenced through zone and surface elements.
+/**
+ * Facsimile support:
+ * Handles display of source score images as referenced 
+ * through zone and surface elements.
+ */
+
 
 var facs = {}; // facsimile structure in MEI file
 var sourceImages = {}; // object of source images
@@ -33,7 +37,9 @@ import {
     replaceInEditor
 } from './editor.js';
 
-
+/**
+ * Default warning text, if no facsimile content is available
+ */
 let warningSvgText = document.createElementNS(svgNameSpace, 'text');
 warningSvgText.setAttribute('font-size', '24px');
 warningSvgText.setAttribute('font-weight', 'bold');
@@ -42,13 +48,24 @@ warningSvgText.setAttribute('x', 30);
 warningSvgText.setAttribute('y', 30);
 warningSvgText.textContent = 'No facsimile content available.';
 
-// clear main variables
+
+/**
+ * Clear main variables
+ */
 export function clearFacsimile() {
     facs = {};
     sourceImages = {};
-}
+} // clearFacsimile()
 
-// loads facsimile content of xmlDoc into an object
+
+/**
+ * Loads facsimile content of xmlDoc into an object
+ * with zone ids as property names, 
+ * each containing own coordinates (ulx, uly, lrx, lry) 
+ * and containing surface info (target, width, height)
+ * @param {Document} xmlDoc 
+ * @returns {object} facs
+ */
 export function loadFacsimile(xmlDoc) {
     clearFacsimile();
     let facsimile = xmlDoc.querySelector('facsimile');
@@ -86,10 +103,12 @@ export function loadFacsimile(xmlDoc) {
         });
     }
     return facs;
-}
+} // loadFacsimile()
 
 
-// Draw the source image with bounding boxes for each zone
+/**
+ * Draw the source image with bounding boxes for each zone
+ */
 export async function drawFacsimile() {
     busy();
     let fullPage = document.getElementById('showFacsimileFullPage').checked;
@@ -198,12 +217,12 @@ export async function drawFacsimile() {
         if (fullPage) {
             for (let z in facs) {
                 if (facs[z]['target'] === facs[zoneId]['target'])
-                    drawBoundingBox(z, facs[z]['measureId'], facs[z]['measureN']);
+                    drawBoundingBox(z);
             }
         } else {
             svgFacs.forEach(m => {
                 if (m.hasAttribute('data-facs')) zoneId = rmHash(m.getAttribute('data-facs'));
-                drawBoundingBox(zoneId, facs[zoneId]['measureId'], facs[zoneId]['measureN'])
+                drawBoundingBox(zoneId);
             });
         }
         // console.log('ulx/uly//lrx/lry;w/h: ' + ulx + '/' + uly + '; ' + lrx + '/' + lry + '; ' + width + '/' + height);
@@ -215,10 +234,19 @@ export async function drawFacsimile() {
         svg.appendChild(warningSvgText);
     }
     busy(false);
-}
+} // drawFacsimile()
 
-function drawBoundingBox(zoneId, measureId, measureN) {
+
+/**
+ * Draws the bounding box for the zone with zoneId, using global object facs
+ * @param {string} zoneId 
+ * @param {string} measureId 
+ * @param {string} measureN 
+ */
+function drawBoundingBox(zoneId) {
     if (facs[zoneId]) {
+        let measureId = facs[zoneId]['measureId'];
+        let measureN = facs[zoneId]['measureN'];
         let rect = document.createElementNS(svgNameSpace, 'rect');
         rect.setAttribute('rx', rectangleLineWidth / 2);
         rect.setAttribute('ry', rectangleLineWidth / 2);
@@ -231,8 +259,7 @@ function drawBoundingBox(zoneId, measureId, measureN) {
         let width = parseFloat(facs[zoneId].lrx) - x;
         let height = parseFloat(facs[zoneId].lry) - y;
         updateRect(rect, x, y, width, height, rectangleColor, rectangleLineWidth, 'none');
-        if (editFacsimileZones) rect.id = zoneId;
-        else if (measureId) rect.id = measureId;
+        if (measureId) rect.id = editFacsimileZones ? zoneId : measureId;
         if (measureN) { // draw number-like info from measure
             let txt = document.createElementNS(svgNameSpace, 'text');
             svg.appendChild(txt);
@@ -246,8 +273,15 @@ function drawBoundingBox(zoneId, measureId, measureN) {
             if (measureId) txt.id = editFacsimileZones ? zoneId : measureId;
         }
     }
-}
+} // drawBoundingBox()
 
+
+/**
+ * Load asynchronously the image from url and returns a promise 
+ * with an svg image object upon resolving
+ * @param {string} url 
+ * @returns {Promise}
+ */
 async function loadImage(url) {
     return new Promise((resolve) => {
         const img = document.createElementNS(svgNameSpace, 'image');
@@ -259,9 +293,13 @@ async function loadImage(url) {
             resolve(null);
         }
     });
-}
+} // loadImage()
 
 
+/**
+ * Zooms the facsimile surface image in the source-image-container svg.
+ * @param {float} deltaPercent 
+ */
 export function zoomFacsimile(deltaPercent) {
     let facsimileZoomInput = document.getElementById('facsimileZoomInput');
     let facsZoom = document.getElementById('facsimile-zoom');
@@ -277,8 +315,14 @@ export function zoomFacsimile(deltaPercent) {
     }
     let svgContainer = document.getElementById('source-image-container');
     svgContainer.setAttribute("transform", "scale(" + facsimileZoomInput.value / 100 + ")");
-}
+} // zoomFacsimile()
 
+
+/**
+ * Remove all eventlisteners from zones, highlight the one rect, 
+ * and add the resizer event listeners, if edit is enabled
+ * @param {rect} rect 
+ */
 export function highlightZone(rect) {
     let svg = document.getElementById('source-image-svg');
     // remove event listerners
@@ -293,10 +337,16 @@ export function highlightZone(rect) {
     // add zone resizer for selected zone box (only when linked to zone rather than to measure)
     if (document.getElementById('editFacsimileZones').checked)
         listenerHandles = addZoneResizer(v, rect);
-}
+} // highlightZone()
 
 
-// event listeners for resizing a zone bounding box
+/**
+ * Adds event listeners for resizing a zone bounding box
+ * to each 
+ * @param {object} v 
+ * @param {rect} rect 
+ * @returns {object} of event listener handles
+ */
 export function addZoneResizer(v, rect) {
     let txt = document.querySelector('text[id="' + rect.id + '"]');
     let txtX, txtY;
@@ -438,7 +488,11 @@ export function addZoneResizer(v, rect) {
 
 } // addZoneResizer()
 
-// enables new zone drawing with mouse click-and-drag
+
+/**
+ * Adds eventlisteners to source-image-svg to enable 
+ * drawing of new zones with mouse click-and-drag
+ */
 export function addZoneDrawer() {
     let ip = document.getElementById('facsimile-panel');
     let svg = document.getElementById('source-image-svg');
@@ -513,10 +567,18 @@ export function addZoneDrawer() {
     svg.addEventListener('mousedown', mouseDown);
     svg.addEventListener('mousemove', mouseMove);
     svg.addEventListener('mouseup', mouseUp);
-}
+} // addZoneDrawer()
 
 
-// convert negative width/height to correct left-upper corner & width/height values
+/**
+ * Converts negative width/height to always positive
+ * left-upper corner & width/height values in an object 
+ * @param {int} x 
+ * @param {int} y 
+ * @param {int} width 
+ * @param {int} height 
+ * @returns {object}
+ */
 function adjustCoordinates(x, y, width, height) {
     let c = {};
     c.x = Math.min(x, x + width);
@@ -524,8 +586,14 @@ function adjustCoordinates(x, y, width, height) {
     c.width = Math.abs(width);
     c.height = Math.abs(height);
     return c;
-}
+} // adjustCoordinates()
 
+
+/**
+ * Creates input dialog to load facsimile skeleton file
+ * to be ingested into the existing MEI file, and
+ * adds ingestionInputHander to input element.
+ */
 export function ingestFacsimile() {
     let reply = {};
     let input = document.createElement('input');
@@ -534,8 +602,14 @@ export function ingestFacsimile() {
     input.accept = accept;
     input.addEventListener('change', ev => ingestionInputHandler(ev));
     input.click();
-}
+} // ingestFacsimile()
 
+
+/**
+ * Handles loading of ingestion file and calls
+ * handleFacsimileIngestion() to finalize ingestion
+ * @param {event} ev 
+ */
 function ingestionInputHandler(ev) {
     let files = Array.from(ev.target.files);
     let reply = {};
@@ -558,8 +632,15 @@ function ingestionInputHandler(ev) {
             log('Loading of ingestion file ' + reply.fileName + ' failed.');
         }
     );
-}
+} // ingestionInputHandler()
 
+
+/**
+ * Handles ingestion of facsimile information into current MEI file
+ * and adds a @facs attribute into each measure based on the @n attribute
+ * @param {object} reply 
+ * @returns 
+ */
 function handleFacsimileIngestion(reply) {
     busy();
     console.log('Skeleton MEI file ' + reply.fileName + ' loaded.');
@@ -614,12 +695,16 @@ function handleFacsimileIngestion(reply) {
     v.updateData(cm, false, true);
     v.updateNotation = true;
     busy(false);
-}
+} // handleFacsimileIngestion()
 
+/**
+ * Set facsimile icon to busy (true) or idle (false)
+ * @param {boolean} active 
+ */
 function busy(active = true) {
     let facsimileIcon = document.getElementById('facsimile-icon');
     if (facsimileIcon && active) {
         facsimileIcon.classList.add('clockwise');
     } else if (facsimileIcon && !active)
         facsimileIcon.classList.remove('clockwise');
-}
+} // busy()
