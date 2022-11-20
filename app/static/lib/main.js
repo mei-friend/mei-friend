@@ -1396,6 +1396,7 @@ export let cmd = {
   'reRenderMei': () => v.reRenderMei(cm, false),
   'reRenderMeiWithout': () => v.reRenderMei(cm, true),
   'ingestFacsimile': () => ingestFacsimile(),
+  'addFacsimile': () => e.addFacsimile(v, cm),
   'resetDefault': () => {
     // we're in a clickhandler, so our storage object is out of scope
     // but we only need to clear it, so just grab the window's storage
@@ -1619,6 +1620,7 @@ function addEventListeners(v, cm) {
   document.getElementById('reRenderMeiWithout').addEventListener('click', cmd.reRenderMeiWithout);
   // ingest facsimile sekelton into currently loaded MEI file
   document.getElementById('ingestFacsimile').addEventListener('click', cmd.ingestFacsimile);
+  document.getElementById('addFacsimile').addEventListener('click', cmd.addFacsimile);
   // insert control elements
   document.getElementById('addTempo').addEventListener('click', cmd.addTempo);
   document.getElementById('addDirective').addEventListener('click', cmd.addDirective);

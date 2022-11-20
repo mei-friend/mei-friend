@@ -625,6 +625,7 @@ export function convertCoords(elem) {
 }
 
 export function rmHash(hashedString) {
+  if (!hashedString) return '';
   return (hashedString.startsWith('#')) ?
     hashedString.split('#')[1] : hashedString;
 }

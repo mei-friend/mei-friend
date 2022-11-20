@@ -249,7 +249,7 @@ export function invertPlacement(v, cm, modifier = false) {
       }
       if (el.nodeName === 'fermata')
         val === 'below' ?
-        el.setAttribute('form', 'inv') : el.removeAttribute('form');
+          el.setAttribute('form', 'inv') : el.removeAttribute('form');
       el.setAttribute(attr, val);
       range = replaceInEditor(cm, el, true);
       // txtEdr.autoIndentSelectedRows();
@@ -668,7 +668,7 @@ export function addZone(v, cm, rect, addMeasure = true) {
   } else {
     return false;
   }
-}
+} // addZone()
 
 // remove zone in editor, called from editor.js
 export function removeZone(v, cm, zone, removeMeasure = true) {
@@ -688,7 +688,75 @@ export function removeZone(v, cm, zone, removeMeasure = true) {
       replaceInEditor(cm, e);
     }
   });
-}
+} // removeZone()
+
+/**
+ * Adds a facsimile element to DOM and editor, 
+ * with a surface element for each page beginning <pb> to which
+ * a @facs attribute is added referencing the surface element. 
+ * Additionally, each surface elements will be added a <graphic>
+ * element. 
+ * If the facsimile element exists, it will check all 
+ * surface elements and the pb@facs references and add them if 
+ * necessary.
+ * @param {object} v 
+ * @param {object} cm 
+ */
+export function addFacsimile(v, cm) {
+  v.updateNotation = false;
+  let facsimile = v.xmlDoc.querySelector('facsimile');
+  let facsimileId;
+  if (facsimile) {
+    facsimileId = facsimile.getAttribute('xml:id');
+    this.removeInEditor(cm, facsimile);
+  }
+  if (!facsimile) {
+    facsimile = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'facsimile');
+    facsimileId = 'facsimile-' + utils.generateUUID();
+    facsimile.setAttributeNS(dutils.xmlNameSpace, 'id', facsimileId);
+  }
+  v.xmlDoc.querySelectorAll('pb').forEach((pb, p) => {
+    let pbFacs = utils.rmHash(pb.getAttribute('facs'));
+    let surface = v.xmlDoc.querySelector('surface[*|id="' + pbFacs + '"]');
+    let surfaceId;
+    if (surface) {
+      surfaceId = surface.getAttribute('xml:id');
+    } else {
+      surface = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'surface');
+      surfaceId = 'surface-' + utils.generateUUID();
+      surface.setAttributeNS(dutils.xmlNameSpace, 'id', surfaceId);
+      facsimile.appendChild(surface);
+      // update pb elements in DOM and in editor
+      pb.setAttribute('facs', '#' + surfaceId);
+      this.replaceInEditor(cm, pb);
+    }
+    let graphic = surface.querySelector('graphic');
+    if (!graphic) {
+      graphic = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'graphic');
+      let graphicId = 'graphic-' + utils.generateUUID();
+      graphic.setAttributeNS(dutils.xmlNameSpace, 'id', graphicId);
+      graphic.setAttribute('target', 'Page-' + (p + 1)); // dummy values
+      graphic.setAttribute('width', '0');
+      graphic.setAttribute('height', '0');
+      surface.appendChild(graphic);
+    }
+  });
+
+  // add to editor
+  let c = cm.getSearchCursor('<body');
+  let p1;
+  if (c.findNext()) {
+    p1 = c.from();
+    cm.setCursor(p1);
+  }
+  cm.replaceRange(dutils.xmlToString(facsimile) + '\n', cm.getCursor());
+  for (let l = p1.line; l <= cm.getCursor().line; l++) cm.indentLine(l);
+  utils.setCursorToId(cm, facsimileId);
+
+  v.updateData(cm, false, false);
+  console.log('Editor: new facsimile added', facsimile);
+  v.updateNotation = true;
+} // addFacsimile()
 
 
 // find xmlNode in textBuffer and remove it (including empty line)

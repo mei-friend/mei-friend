@@ -103,12 +103,12 @@
     _paq.push(["setDoNotTrack", true]);
     _paq.push(["requireCookieConsent"]);
     if ((function () {
-        try {
-          return JSON.parse(unescape(("; " + document.cookie).split("; consent=").pop().split(";").shift())).tracking;
-        } catch (e) {
-          return false;
-        }
-      })()) {
+      try {
+        return JSON.parse(unescape(("; " + document.cookie).split("; consent=").pop().split(";").shift())).tracking;
+      } catch (e) {
+        return false;
+      }
+    })()) {
       _paq.push(["setCookieConsentGiven"]);
     } else {
       _paq.push(["forgetCookieConsentGiven"]);
@@ -227,8 +227,9 @@
           <a id="renumExec" href="#">Renumber measures (exec)<span class="keyShortCut shiftKey cmdKey">R</span></a>
           <hr class="dropdown-line">
           <a id="reRenderMei" href="#">Re-render MEI (with ids)<span class="keyShortCut cmdKey">M</span></a>
-          <a id="reRenderMeiWithout" href="#">Re-render MEI (remove ids)<span
-              class="keyShortCut shiftKey cmdKey">M</span></a>
+          <a id="reRenderMeiWithout" href="#">Re-render MEI (remove ids)<span class="keyShortCut shiftKey cmdKey">M</span></a>
+          <hr class="dropdown-line">
+          <a id="addFacsimile" href="#">Add facsimile element</a>
           <a id="ingestFacsimile" href="#">Ingest facsimile<span class="keyShortCut cmdKey">I</span></a>
         </div>
       </div>
@@ -369,7 +370,8 @@
     <div class="forkRepositoryOverlay" id="forkAndOpenOverlay">
       <div class="forkRepositoryUI">
         <div class="forkRepositoryUIGrouping">
-          <h3><img id="forkRepoGithubLogo" class="forkRepoGithubLogo" src="{{ url_for('static', filename='img/GitHub-Mark-32px.png') }}" />
+          <h3><img id="forkRepoGithubLogo" class="forkRepoGithubLogo"
+              src="{{ url_for('static', filename='img/GitHub-Mark-32px.png') }}" />
             Fork Github Repository</h3>
           <p>
             The link you have followed will create a GitHub fork of the following repository for editing in mei-friend:
@@ -581,13 +583,13 @@
       // ... the GitHub menu should stay open on clicks (=> navigation)
       // ... UNLESS a file is opened or commit button is clicked.
       let targetAfterClick = "";
-      if(ev.target.hasAttribute('id')) { 
-      // During navigation, GitHub menu rebuilds itself, so the ev.target 
-      // might be lost by the time we get to this handler.
-      // For these cases (e.g., click on repositoriesHeader), we fetch the newly-built
-      // version of the target, below, if it has an ID.
+      if (ev.target.hasAttribute('id')) {
+        // During navigation, GitHub menu rebuilds itself, so the ev.target 
+        // might be lost by the time we get to this handler.
+        // For these cases (e.g., click on repositoriesHeader), we fetch the newly-built
+        // version of the target, below, if it has an ID.
         targetAfterClick = document.getElementById(ev.target.id);
-      } else { 
+      } else {
         // otherwise, we just use the target as is.
         targetAfterClick = ev.target;
       }
@@ -622,7 +624,7 @@
         // remove class "active" from tablinks except for current target
         for (let tab of containingElement.getElementsByClassName("tablink"))
           (tab === ev.currentTarget) ? tab.classList.add('active') :
-          tab.classList.remove('active');
+            tab.classList.remove('active');
       }
     }
 

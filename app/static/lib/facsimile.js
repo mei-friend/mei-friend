@@ -233,7 +233,13 @@ export async function drawFacsimile() {
         } else {
             img = sourceImages[imgName]
         }
-        svg.appendChild(img);
+        if (img) {
+            svg.appendChild(img);
+        } else {
+            showWarningText('Could not load image \n(' + imgName + ').'); 
+            busy(false);
+            return;
+        }
 
         if (fullPage) {
             let bb = img.getBBox();
