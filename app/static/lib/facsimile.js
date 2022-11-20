@@ -78,7 +78,7 @@ export function clearFacsimile() {
 
 /**
  * Loads facsimile content of xmlDoc into an object
- * with zone ids as property names, 
+ * with zone and surface ids as property names, 
  * each containing own coordinates (ulx, uly, lrx, lry) 
  * and containing surface info (target, width, height)
  * @param {Document} xmlDoc 
@@ -91,13 +91,8 @@ export function loadFacsimile(xmlDoc) {
         // look for surface elements
         let surfaces = facsimile.querySelectorAll('surface');
         surfaces.forEach(s => {
-            let id, target, width, height;
-            let graphic = s.querySelector('graphic');
-            if (graphic) {
-                if (graphic.hasAttribute('target')) target = graphic.getAttribute('target');
-                if (graphic.hasAttribute('width')) width = graphic.getAttribute('width');
-                if (graphic.hasAttribute('height')) height = graphic.getAttribute('height');
-            }
+            let id;
+            let { target, width, height } = fillGraphic(s.querySelector('graphic'));
             if (s.hasAttribute('xml:id')) id = s.getAttribute('xml:id');
             if (id) {
                 facs[id] = {};
@@ -109,18 +104,13 @@ export function loadFacsimile(xmlDoc) {
         // look for zone elements
         let zones = facsimile.querySelectorAll('zone');
         zones.forEach(z => {
-            let id, ulx, uly, lrx, lry, target, width, height;
+            let id, ulx, uly, lrx, lry;
             if (z.hasAttribute('xml:id')) id = z.getAttribute('xml:id');
             if (z.hasAttribute('ulx')) ulx = z.getAttribute('ulx');
             if (z.hasAttribute('uly')) uly = z.getAttribute('uly');
             if (z.hasAttribute('lrx')) lrx = z.getAttribute('lrx');
             if (z.hasAttribute('lry')) lry = z.getAttribute('lry');
-            let graphic = z.parentElement.querySelector('graphic');
-            if (graphic) {
-                if (graphic.hasAttribute('target')) target = graphic.getAttribute('target');
-                if (graphic.hasAttribute('width')) width = graphic.getAttribute('width');
-                if (graphic.hasAttribute('height')) height = graphic.getAttribute('height');
-            }
+            let { target, width, height } = fillGraphic(z.parentElement.querySelector('graphic'));
             if (id) {
                 facs[id] = {};
                 if (target) facs[id]['target'] = target;
@@ -139,6 +129,22 @@ export function loadFacsimile(xmlDoc) {
         });
     }
     return facs;
+
+    /**
+     * Local function to handle main attributes of graphic element.
+     * @param {Node} graphic 
+     * @returns {object}
+     */
+    function fillGraphic(graphic) {
+        let t, w, h;
+        if (graphic) {
+            if (graphic.hasAttribute('target')) t = graphic.getAttribute('target');
+            if (graphic.hasAttribute('width')) w = graphic.getAttribute('width');
+            if (graphic.hasAttribute('height')) h = graphic.getAttribute('height');
+        }
+        return { target: t, width: w, height: h };
+    } // fillGraphic()
+
 } // loadFacsimile()
 
 
