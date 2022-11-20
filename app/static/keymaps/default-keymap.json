@@ -68,7 +68,9 @@
     "shift-c": "addCClefChangeBefore",
     "shift-f": "addFClefChangeBefore",
 
-    "escape": "escapeKeyPressed"
+    "escape": "escapeKeyPressed",
+
+    "shift-alt-f": "indentSelection"
   },
 
   ".platform-darwin": {
@@ -102,7 +104,8 @@
     "alt-.": "consultGuidelines",
     "alt-…": "consultGuidelines",
     "cmd-,": "toggleSettingsPanel",
-    "cmd-a": "toggleAnnotationPanel"
+    "cmd-a": "toggleAnnotationPanel",
+    "shift-alt-ï": "indentSelection"
   },
 
   ".platform-win32, .platform-linux": {

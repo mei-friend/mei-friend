@@ -259,6 +259,8 @@ const defaultCodeMirrorOptions = {
     "'='": completeIfInTag,
     "Ctrl-Space": "autocomplete",
     "Alt-.": consultGuidelines,
+    "Shift-Alt-f": indentSelection,
+    "Shift-Alt-ï": indentSelection // TODO: overcome strange bindings on MAC
   },
   lint: {
     "caller": cm,
@@ -470,7 +472,7 @@ export async function validate(mei, updateLinting, options) {
       v.highlightValidation(mei, validation);
     } else if (v.validatorWithSchema && !document.getElementById('autoValidate').checked) {
       v.setValidationStatusToManual();
-    } 
+    }
   }
 }
 
@@ -1224,6 +1226,10 @@ function consultGuidelines() {
   }
 }
 
+function indentSelection() {
+  e.indentSelection(v, cm);
+}
+
 
 // object of interface command functions for buttons and key bindings
 export let cmd = {
@@ -1271,7 +1277,7 @@ export let cmd = {
   'checkFacsimile': () => {
     let tf = document.getElementById('titleFacsimilePanel');
     if (v.xmlDoc.querySelector('facsimile')) {
-      if (tf) tf.setAttribute('open','true');
+      if (tf) tf.setAttribute('open', 'true');
       cmd.showFacsimilePanel();
     } else {
       if (tf) tf.removeAttribute('open');
@@ -1309,6 +1315,7 @@ export let cmd = {
   'openHumdrum': () => openFileDialog('.krn,.hum'),
   'openPae': () => openFileDialog('.pae,.abc'),
   'downloadMei': () => downloadMei(),
+  'indentSelection': () => indentSelection(),
   'validate': () => v.manualValidate(),
   'zoomIn': () => v.zoom(+1, storage),
   'zoomOut': () => v.zoom(-1, storage),
@@ -1501,6 +1508,7 @@ function addEventListeners(v, cm) {
   document.getElementById('findPrevious').addEventListener('click', () => CodeMirror.commands.findPrev(cm));
   document.getElementById('replace').addEventListener('click', () => CodeMirror.commands.replace(cm));
   document.getElementById('replaceAll').addEventListener('click', () => CodeMirror.commands.replaceAll(cm));
+  document.getElementById('indentSelection').addEventListener('click', cmd.indentSelection);
   document.getElementById('jumpToLine').addEventListener('click', () => CodeMirror.commands.jumpToLine(cm));
   document.getElementById('manualValidate').addEventListener('click', cmd.validate);
   document.querySelectorAll('.keyShortCut').forEach(e => e.classList.add(platform.startsWith('Mac') ? 'platform-mac' : 'platform-nonmac'));
@@ -1782,7 +1790,7 @@ function moveProgressBar() {
   var id = setInterval(frame, 10);
 
   function frame() {
-    (width < 100) ? elem.style.width = (++width) + '%': clearInterval(id);
+    (width < 100) ? elem.style.width = (++width) + '%' : clearInterval(id);
   }
 }
 
@@ -1838,10 +1846,10 @@ export function log(s, code = null) {
 
 function fillInSampleEncodings() {
   fetch(sampleEncodingsCSV, {
-      headers: {
-        'content-type': 'text/csv'
-      }
-    })
+    headers: {
+      'content-type': 'text/csv'
+    }
+  })
     .then((response) => response.text())
     .then((csv) => {
       const lines = csv.split("\n");

@@ -7,6 +7,27 @@ import {
   loadFacsimile
 } from './facsimile.js';
 
+// smart indent selected region in editor, if none, do all
+export function indentSelection(v, cm) {
+  v.updateNotation = false;
+  let selections = cm.listSelections();
+  selections.forEach(s => {
+    let l1 = s.anchor.line;
+    let l2 = s.head.line;
+    if (l1 > l2) {
+      let tmp = l1; 
+      l1 = l2; 
+      l2 = tmp;
+    }
+    if (l1 === l2) {
+      l1 = 0; 
+      l2 = cm.lastLine()
+    }
+    for (let l = l1; l <= l2; l++) cm.indentLine(l, 'smart');
+  });
+  v.updateNotation = true;
+}
+
 // delete selected elements
 export function deleteElement(v, cm) {
   v.loadXml(cm.getValue(), true);
