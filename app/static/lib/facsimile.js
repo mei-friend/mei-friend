@@ -4,11 +4,10 @@
  * through zone and surface elements.
  */
 
-
 var facs = {}; // facsimile structure in MEI file
 var sourceImages = {}; // object of source images
 const rectangleLineWidth = 6; // width of bounding box rectangles in px
-const rectangleColor = 'darkred';
+const rectangleColor = 'darkred'; // color of zone rectangles
 var listenerHandles = {};
 var resize = ''; // west, east, north, south, northwest, southeast etc
 var ulx, uly;
@@ -46,7 +45,26 @@ warningSvgText.setAttribute('font-weight', 'bold');
 warningSvgText.setAttribute('fill', 'var(--textColor)');
 warningSvgText.setAttribute('x', 30);
 warningSvgText.setAttribute('y', 30);
-warningSvgText.textContent = 'No facsimile content available.';
+
+/**
+ * Show warning text to facsimile panel (as svg text element) and 
+ * resets svg and svgContainer
+ * @param {String} txt 
+ * @returns void
+ */
+function showWarningText(txt = 'No facsimile content to display.') {
+    let svgContainer = document.getElementById('source-image-container');
+    let svg = document.getElementById('source-image-svg');
+    if (!svg || !svgContainer) return;
+
+    // no facsimile content to show
+    svgContainer.removeAttribute('transform-origin');
+    svgContainer.removeAttribute('transform');
+    svg.removeAttribute('viewBox');
+    svg.innerHTML = '';
+    warningSvgText.textContent = txt;
+    svg.appendChild(warningSvgText);
+} // showWarningText()
 
 
 /**
@@ -70,9 +88,28 @@ export function loadFacsimile(xmlDoc) {
     clearFacsimile();
     let facsimile = xmlDoc.querySelector('facsimile');
     if (facsimile) {
+        // look for surface elements
+        let surfaces = facsimile.querySelectorAll('surface');
+        surfaces.forEach(s => {
+            let id, target, width, height;
+            let graphic = s.querySelector('graphic');
+            if (graphic) {
+                if (graphic.hasAttribute('target')) target = graphic.getAttribute('target');
+                if (graphic.hasAttribute('width')) width = graphic.getAttribute('width');
+                if (graphic.hasAttribute('height')) height = graphic.getAttribute('height');
+            }
+            if (s.hasAttribute('xml:id')) id = s.getAttribute('xml:id');
+            if (id) {
+                facs[id] = {};
+                if (target) facs[id]['target'] = target;
+                if (width) facs[id]['width'] = width;
+                if (height) facs[id]['height'] = height;
+            }
+        });
+        // look for zone elements
         let zones = facsimile.querySelectorAll('zone');
         zones.forEach(z => {
-            let id, ulx, uly, lrx, lry;
+            let id, ulx, uly, lrx, lry, target, width, height;
             if (z.hasAttribute('xml:id')) id = z.getAttribute('xml:id');
             if (z.hasAttribute('ulx')) ulx = z.getAttribute('ulx');
             if (z.hasAttribute('uly')) uly = z.getAttribute('uly');
@@ -80,24 +117,23 @@ export function loadFacsimile(xmlDoc) {
             if (z.hasAttribute('lry')) lry = z.getAttribute('lry');
             let graphic = z.parentElement.querySelector('graphic');
             if (graphic) {
-                let target, width, height;
                 if (graphic.hasAttribute('target')) target = graphic.getAttribute('target');
                 if (graphic.hasAttribute('width')) width = graphic.getAttribute('width');
                 if (graphic.hasAttribute('height')) height = graphic.getAttribute('height');
-                if (id) {
-                    facs[id] = {};
-                    if (target) facs[id]['target'] = target;
-                    if (width) facs[id]['width'] = width;
-                    if (height) facs[id]['height'] = height;
-                    if (ulx) facs[id]['ulx'] = ulx;
-                    if (uly) facs[id]['uly'] = uly;
-                    if (lrx) facs[id]['lrx'] = lrx;
-                    if (lry) facs[id]['lry'] = lry;
-                    let measure = xmlDoc.querySelector('[facs="#' + id + '"]');
-                    if (measure) {
-                        if (measure.hasAttribute('xml:id')) facs[id]['measureId'] = measure.getAttribute('xml:id');
-                        if (measure.hasAttribute('n')) facs[id]['measureN'] = measure.getAttribute('n');
-                    }
+            }
+            if (id) {
+                facs[id] = {};
+                if (target) facs[id]['target'] = target;
+                if (width) facs[id]['width'] = width;
+                if (height) facs[id]['height'] = height;
+                if (ulx) facs[id]['ulx'] = ulx;
+                if (uly) facs[id]['uly'] = uly;
+                if (lrx) facs[id]['lrx'] = lrx;
+                if (lry) facs[id]['lry'] = lry;
+                let measure = xmlDoc.querySelector('[facs="#' + id + '"]');
+                if (measure) {
+                    if (measure.hasAttribute('xml:id')) facs[id]['measureId'] = measure.getAttribute('xml:id');
+                    if (measure.hasAttribute('n')) facs[id]['measureN'] = measure.getAttribute('n');
                 }
             }
         });
@@ -112,11 +148,14 @@ export function loadFacsimile(xmlDoc) {
 export async function drawFacsimile() {
     busy();
     let fullPage = document.getElementById('showFacsimileFullPage').checked;
-    ulx = Number.MAX_VALUE; // boundary values for image envelope
+    let svgContainer = document.getElementById('source-image-container');
+    let svg = document.getElementById('source-image-svg');
+    if (!svg || !svgContainer) return;
+    ulx = Number.MAX_VALUE; // boundary values for image envelope (left-upper corner is global)
     uly = Number.MAX_VALUE;
     let lrx = 0;
     let lry = 0;
-    let zoneId;
+    let zoneId = '';
     let svgFacs = document.querySelectorAll('[data-facs]'); // list displayed zones
     if (svgFacs && fullPage) {
         let firstZone = svgFacs.item(0);
@@ -134,10 +173,19 @@ export async function drawFacsimile() {
             }
         });
     }
-    let svgContainer = document.getElementById('source-image-container');
-    let svg = document.getElementById('source-image-svg');
-    if (!svg) return;
-    if (facs[zoneId]) {
+    if (!facs[zoneId]) {
+        let pbId = findPageBeginning(v.xmlDoc); // id of last page beginning
+        let pb = v.xmlDoc.querySelector('[*|id="' + pbId + '"]');
+        if (pb && pb.hasAttribute('facs')) {
+            zoneId = rmHash(pb.getAttribute('facs'));
+        }
+        if (zoneId && !fullPage) {
+            showWarningText('Facsimile only visible in full page mode.');
+            busy(false);
+            return;
+        }
+    }
+    if (zoneId && facs[zoneId]) {
         svg.innerHTML = '';
         // find the correct path of the image file
         let img;
@@ -227,11 +275,7 @@ export async function drawFacsimile() {
         }
         // console.log('ulx/uly//lrx/lry;w/h: ' + ulx + '/' + uly + '; ' + lrx + '/' + lry + '; ' + width + '/' + height);
     } else {
-        svgContainer.removeAttribute('transform-origin');
-        svgContainer.removeAttribute('transform');
-        svg.removeAttribute('viewBox');
-        svg.innerHTML = '';
-        svg.appendChild(warningSvgText);
+        showWarningText(); // no facsimile content to show
     }
     busy(false);
 } // drawFacsimile()
@@ -514,8 +558,8 @@ export function addZoneDrawer() {
             rect.id = 'new-rect';
             rect.setAttribute('rx', rectangleLineWidth / 2);
             rect.setAttribute('ry', rectangleLineWidth / 2);
-            rect.setAttribute('x', s.x + ulx);
-            rect.setAttribute('y', s.y + uly);
+            rect.setAttribute('x', s.x + ulx); // global variable ulx (upper-left corner)
+            rect.setAttribute('y', s.y + uly); // global variable uly (upper-left corner)
             rect.setAttribute('stroke', rectangleColor);
             rect.setAttribute('stroke-width', rectangleLineWidth);
             rect.setAttribute('fill', 'none');
@@ -537,8 +581,8 @@ export function addZoneDrawer() {
                 let s = transformCTM(start, mx);
                 let e = transformCTM(end, mx);
                 let c = adjustCoordinates(s.x, s.y, e.x - s.x, e.y - s.y);
-                rect.setAttribute('x', c.x + ulx);
-                rect.setAttribute('y', c.y + uly);
+                rect.setAttribute('x', c.x + ulx); // global variable ulx (upper-left corner)
+                rect.setAttribute('y', c.y + uly); // global variable uly (upper-left corner)
                 rect.setAttribute('width', c.width);
                 rect.setAttribute('height', c.height);
             }
@@ -708,3 +752,23 @@ function busy(active = true) {
     } else if (facsimileIcon && !active)
         facsimileIcon.classList.remove('clockwise');
 } // busy()
+
+
+/**
+ * Retrieve last pb element with a @facs attribute for the displayed page
+ * @param {Document} xmlDoc 
+ * @returns {string} id of page beginning or empty string, if none found
+ */
+function findPageBeginning(xmlDoc) {
+    let referenceElement = document.querySelector('g.measure,g.barLine');
+    let elementList = xmlDoc.querySelectorAll('pb[facs],[*|id="' + referenceElement.id + '"');
+    let lastPb = '';
+    for (let p of elementList) {
+        if (p.nodeName === referenceElement.classList[0]) {
+            break;
+        } else {
+            lastPb = p.getAttribute('xml:id');
+        }
+    }
+    return lastPb;
+}
