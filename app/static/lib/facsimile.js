@@ -735,7 +735,7 @@ function handleFacsimileIngestion(reply) {
             let cr = cm.getCursor();
             cm.replaceRange(xmlToString(facsimile) + '\n', cr);
             let cr2 = cm.getCursor();
-            for (let l = cr.line; l < cr2.line; l++) cm.indentLine(l);
+            for (let l = cr.line; l <= cr2.line; l++) cm.indentLine(l);
             loadFacsimile(v.xmlDoc);
             console.log('Adding facsimile before body', facsimile);
         }
