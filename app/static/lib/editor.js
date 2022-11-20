@@ -750,7 +750,7 @@ export function addFacsimile(v, cm) {
     cm.setCursor(p1);
   }
   cm.replaceRange(dutils.xmlToString(facsimile) + '\n', cm.getCursor());
-  for (let l = p1.line; l <= cm.getCursor().line; l++) cm.indentLine(l);
+  for (let l = p1.line; l <= cm.getCursor().line; l++) cm.indentLine(l, 'smart');
   utils.setCursorToId(cm, facsimileId);
 
   v.updateData(cm, false, false);
