@@ -565,7 +565,8 @@ a:active {
   margin: 0px;
   z-index: 6;
   color: var(--textColor);
-  background-color: var(--controlMenuBackgroundColor);;
+  background-color: var(--controlMenuBackgroundColor);
+  ;
 }
 
 .controls {
@@ -727,6 +728,13 @@ svg text {
   stroke-opacity: 70%;
   fill: var(--highlightColor);
   fill-opacity: 15%;
+}
+
+#facsimile-panel text.highlighted {
+  stroke: var(--highlightColor);
+  stroke-opacity: 70%;
+  fill: var(--highlightColor);
+  fill-opacity: 70%;
 }
 
 #verovio-container g.supplied g {
