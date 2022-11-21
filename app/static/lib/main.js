@@ -1914,7 +1914,7 @@ function setKeyMap(keyMapFilePath) {
 }
 
 // returns true, if event is a CMD (Mac) or a CTRL (Windows, Linux) event
-function isCtrlOrCmd(ev) {
+export function isCtrlOrCmd(ev) {
   return (platform.startsWith('mac') && ev.metaKey) ||
     (!platform.startsWith('mac') && ev.ctrlKey);
 }

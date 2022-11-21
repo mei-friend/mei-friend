@@ -659,7 +659,9 @@ export function renumberMeasures(v, cm, change) {
  */
 export function addZone(v, cm, rect, addMeasure = true) {
   v.updateNotation = false;
-
+  // get current element id from editor
+  let currentId = utils.getElementIdAtCursor(cm);
+  
   // create zone with all attributes
   let zone = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'zone');
   let uuid = 'zone-' + utils.generateUUID();
@@ -675,8 +677,6 @@ export function addZone(v, cm, rect, addMeasure = true) {
   zone.setAttribute('lrx', x + width);
   zone.setAttribute('lry', y + height);
 
-  // get current element id from editor
-  let currentId = utils.getElementIdAtCursor(cm);
   // check if current element a zone
   let el = v.xmlDoc.querySelector('[*|id=' + currentId + ']');
   if (el && el.nodeName === 'zone' && el.parentElement.nodeName === 'surface') {
