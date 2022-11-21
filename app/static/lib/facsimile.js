@@ -122,8 +122,8 @@ export function loadFacsimile(xmlDoc) {
                 if (lry) facs[id]['lry'] = lry;
                 let measure = xmlDoc.querySelector('[facs="#' + id + '"]');
                 if (measure) {
-                    if (measure.hasAttribute('xml:id')) facs[id]['measureId'] = measure.getAttribute('xml:id');
-                    if (measure.hasAttribute('n')) facs[id]['measureN'] = measure.getAttribute('n');
+                    if (measure.hasAttribute('xml:id')) facs[id]['pointerId'] = measure.getAttribute('xml:id');
+                    if (measure.hasAttribute('n')) facs[id]['pointerN'] = measure.getAttribute('n');
                 }
             }
         });
@@ -296,13 +296,13 @@ export async function drawFacsimile() {
 /**
  * Draws the bounding box for the zone with zoneId, using global object facs
  * @param {string} zoneId 
- * @param {string} measureId 
- * @param {string} measureN 
+ * @param {string} pointerId 
+ * @param {string} pointerN 
  */
 function drawBoundingBox(zoneId) {
     if (facs[zoneId]) {
-        let measureId = facs[zoneId]['measureId'];
-        let measureN = facs[zoneId]['measureN'];
+        let pointerId = facs[zoneId]['pointerId'];
+        let pointerN = facs[zoneId]['pointerN'];
         let rect = document.createElementNS(svgNameSpace, 'rect');
         rect.setAttribute('rx', rectangleLineWidth / 2);
         rect.setAttribute('ry', rectangleLineWidth / 2);
@@ -315,8 +315,8 @@ function drawBoundingBox(zoneId) {
         let width = parseFloat(facs[zoneId].lrx) - x;
         let height = parseFloat(facs[zoneId].lry) - y;
         updateRect(rect, x, y, width, height, rectangleColor, rectangleLineWidth, 'none');
-        if (measureId) rect.id = editFacsimileZones ? zoneId : measureId;
-        if (measureN) { // draw number-like info from measure
+        if (pointerId) rect.id = editFacsimileZones ? zoneId : pointerId;
+        if (pointerN) { // draw number-like info from element (e.g., measure)
             let txt = document.createElementNS(svgNameSpace, 'text');
             svg.appendChild(txt);
             txt.setAttribute('font-size', '28px');
@@ -325,8 +325,8 @@ function drawBoundingBox(zoneId) {
             txt.setAttribute('x', x + 7);
             txt.setAttribute('y', y + 29);
             txt.addEventListener('click', (e) => v.handleClickOnNotation(e, cm));
-            txt.textContent = measureN;
-            if (measureId) txt.id = editFacsimileZones ? zoneId : measureId;
+            txt.textContent = pointerN;
+            if (pointerId) txt.id = editFacsimileZones ? zoneId : pointerId;
         }
     }
 } // drawBoundingBox()
@@ -390,7 +390,8 @@ export function highlightZone(rect) {
             if (ip) ip.removeEventListener(key, listenerHandles[key]);
         }
     }
-    // add zone resizer for selected zone box (only when linked to zone rather than to measure)
+    // add zone resizer for selected zone box (only when linked to zone 
+    // rather than to pointing element, ie. measure)
     if (document.getElementById('editFacsimileZones').checked)
         listenerHandles = addZoneResizer(v, rect);
 } // highlightZone()
@@ -606,7 +607,7 @@ export function addZoneDrawer() {
             let rect = document.getElementById('new-rect');
             if (rect && (Math.round(rect.getAttribute('width'))) > minSize &&
                 (Math.round(rect.getAttribute('height'))) > minSize) {
-                // add zone and a measure
+                // add zone and a measure TODO
                 if (!addZone(v, cm, rect)) {
                     if (rect) rect.remove();
                     let warning = `Cannot add a zone element. Please select a zone element first.`;
@@ -709,18 +710,20 @@ function handleFacsimileIngestion(reply) {
     zones.forEach(z => {
         let zoneId = '';
         if (z.hasAttribute('xml:id')) zoneId = z.getAttribute('xml:id');
+        let type = '';
+        if (z.hasAttribute('type')) type = z.getAttribute('type'); 
         let ms = skelXml.querySelectorAll('[facs="#' + zoneId + '"]');
         ms.forEach(m => {
             let n = m.getAttribute('n');
-            let targetMeasure = music.querySelectorAll('measure[n="' + n + '"]');
-            if (targetMeasure.length < 1)
-                console.warn('Measure number not found: n=' + n + ', ', targetMeasure);
-            if (targetMeasure.length > 1)
-                console.warn('Measure number not unique: n=' + n + ', ', targetMeasure);
-            if (targetMeasure.length === 1) {
-                // console.info('Adding @facs=' + zoneId + ' to ', targetMeasure)
-                targetMeasure.item(0).setAttribute('facs', '#' + zoneId);
-                replaceInEditor(cm, targetMeasure.item(0));
+            let pointerElement = music.querySelectorAll(type + '[n="' + n + '"]');
+            if (pointerElement.length < 1)
+                console.warn(type + '@n not found: n=' + n + ', ', pointerElement);
+            if (pointerElement.length > 1)
+                console.warn(type + '@n not unique: n=' + n + ', ', pointerElement);
+            if (pointerElement.length === 1) {
+                // console.info('Adding @facs=' + zoneId + ' to ', pointerElement)
+                pointerElement.item(0).setAttribute('facs', '#' + zoneId);
+                replaceInEditor(cm, pointerElement.item(0));
             }
         });
     });
