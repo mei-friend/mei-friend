@@ -558,6 +558,10 @@ export function addZoneDrawer() {
     let drawing = '';
     let minSize = 20; // px, minimum width and height for a zone
 
+    svg.addEventListener('mousedown', mouseDown);
+    svg.addEventListener('mousemove', mouseMove);
+    svg.addEventListener('mouseup', mouseUp);
+
     function mouseDown(ev) {
         ev.preventDefault();
         if (document.getElementById('editFacsimileZones').checked && !resize) {
@@ -621,9 +625,6 @@ export function addZoneDrawer() {
         }
     }
 
-    svg.addEventListener('mousedown', mouseDown);
-    svg.addEventListener('mousemove', mouseMove);
-    svg.addEventListener('mouseup', mouseUp);
 } // addZoneDrawer()
 
 
