@@ -1,4 +1,7 @@
-// contains all the editor functions
+/**
+ * Provides all the editor functions
+ */
+
 import * as speed from './speed.js';
 import * as utils from './utils.js';
 import * as dutils from './dom-utils.js';
@@ -6,6 +9,7 @@ import * as att from './attribute-classes.js';
 import {
   loadFacsimile
 } from './facsimile.js';
+import Viewer from './viewer.js';
 
 // smart indent selected region in editor, if none, do all
 export function indentSelection(v, cm) {
@@ -15,12 +19,12 @@ export function indentSelection(v, cm) {
     let l1 = s.anchor.line;
     let l2 = s.head.line;
     if (l1 > l2) {
-      let tmp = l1; 
-      l1 = l2; 
+      let tmp = l1;
+      l1 = l2;
       l2 = tmp;
     }
     if (l1 === l2) {
-      l1 = 0; 
+      l1 = 0;
       l2 = cm.lastLine()
     }
     for (let l = l1; l <= l2; l++) cm.indentLine(l, 'smart');
@@ -644,8 +648,19 @@ export function renumberMeasures(v, cm, change) {
   v.updateNotation = true;
 }
 
-// add zone in editor, called from source-imager.js
+/**
+ * Add zone element in editor (called from source-imager.js), 
+ * places it 
+ * @param {Viewer} v 
+ * @param {CodeMirror} cm 
+ * @param {object} rect 
+ * @param {boolean} addMeasure 
+ * @returns 
+ */
 export function addZone(v, cm, rect, addMeasure = true) {
+  v.updateNotation = false;
+
+  // create zone with all attributes
   let zone = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'zone');
   let uuid = 'zone-' + utils.generateUUID();
   zone.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
@@ -659,16 +674,19 @@ export function addZone(v, cm, rect, addMeasure = true) {
   zone.setAttribute('uly', y);
   zone.setAttribute('lrx', x + width);
   zone.setAttribute('lry', y + height);
-  v.updateNotation = false;
+
+  // get current element id from editor
   let currentId = utils.getElementIdAtCursor(cm);
   // check if current element a zone
   let el = v.xmlDoc.querySelector('[*|id=' + currentId + ']');
   if (el && el.nodeName === 'zone' && el.parentElement.nodeName === 'surface') {
+    // add zone to surface
     cm.execCommand('goLineEnd');
     cm.replaceRange('\n' + dutils.xmlToString(zone), cm.getCursor());
     cm.execCommand('indentAuto');
     let prevMeas = v.xmlDoc.querySelector('[facs="#' + el.getAttribute('xml:id') + '"]');
-    // new measure element
+
+    // Create new measure element
     let newMeas = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'measure');
     newMeas.setAttributeNS(dutils.xmlNameSpace, 'xml:id', 'measure-' + utils.generateUUID());
     newMeas.setAttribute('n', prevMeas.getAttribute('n') + '-new');
@@ -682,11 +700,13 @@ export function addZone(v, cm, rect, addMeasure = true) {
     cm.execCommand('indentAuto');
     utils.setCursorToId(cm, uuid);
 
+    // updating
     v.updateData(cm, false, false);
     console.log('new zone added', rect);
     v.updateNotation = true;
     return true;
   } else {
+    v.updateNotation = true;
     return false;
   }
 } // addZone()

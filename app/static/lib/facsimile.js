@@ -180,7 +180,7 @@ export async function drawFacsimile() {
         });
     }
     if (!facs[zoneId]) {
-        let pbId = findPageBeginning(v.xmlDoc); // id of last page beginning
+        let pbId = getCurrentPbElement(v.xmlDoc); // id of last page beginning
         let pb = v.xmlDoc.querySelector('[*|id="' + pbId + '"]');
         if (pb && pb.hasAttribute('facs')) {
             zoneId = rmHash(pb.getAttribute('facs'));
@@ -417,6 +417,16 @@ export function addZoneResizer(v, rect) {
     var end = {}; // ending point
     var bb;
 
+    rect.addEventListener('mousedown', mouseDown);
+    ip.addEventListener('mousemove', mouseMove);
+    ip.addEventListener('mouseup', mouseUp);
+
+    return {
+        'mousedown': mouseDown,
+        'mousemove': mouseMove,
+        'mouseup': mouseUp
+    };
+
     function mouseDown(ev) {
         let bcr = rect.getBoundingClientRect();
         bb = rect.getBBox();
@@ -531,16 +541,6 @@ export function addZoneResizer(v, rect) {
         resize = '';
         loadFacsimile(v.xmlDoc);
         // console.log('mouse up');
-    };
-
-    rect.addEventListener('mousedown', mouseDown);
-    ip.addEventListener('mousemove', mouseMove);
-    ip.addEventListener('mouseup', mouseUp);
-
-    return {
-        'mousedown': mouseDown,
-        'mousemove': mouseMove,
-        'mouseup': mouseUp
     };
 
 } // addZoneResizer()
@@ -756,6 +756,7 @@ function handleFacsimileIngestion(reply) {
     busy(false);
 } // handleFacsimileIngestion()
 
+
 /**
  * Set facsimile icon to busy (true) or idle (false)
  * @param {boolean} active 
@@ -770,11 +771,12 @@ function busy(active = true) {
 
 
 /**
- * Retrieve last pb element with a @facs attribute for the displayed page
+ * Retrieve current pb element with a @facs attribute for the currently 
+ * displayed page, based on first g.measure/g.barLine element in SVG
  * @param {Document} xmlDoc 
  * @returns {string} id of page beginning or empty string, if none found
  */
-function findPageBeginning(xmlDoc) {
+function getCurrentPbElement(xmlDoc) {
     let referenceElement = document.querySelector('g.measure,g.barLine');
     let elementList = xmlDoc.querySelectorAll('pb[facs],[*|id="' + referenceElement.id + '"');
     let lastPb = '';
@@ -786,4 +788,4 @@ function findPageBeginning(xmlDoc) {
         }
     }
     return lastPb;
-}
+} // getCurrentPbElement()
