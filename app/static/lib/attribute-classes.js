@@ -41,3 +41,19 @@ export const timeSpanningElements = [
   'bracketspan', 'dir', 'dynam', 'gliss', 'hairpin', 'harm', 'lv', 'octave',
   'pedal', 'pitchinflection', 'slur', 'tie', 'trill', 'syl'
 ];
+
+// elements allowed to contain a @facs attribute (5.0.0)
+export const attFacsimile = ['abbr', 'accid', 'add',
+  'anchoredText', 'annot', 'arpeg', 'artic', 'barLine', 'beam', 'beamSpan',
+  'beatRpt', 'bracketSpan', 'breath', 'caesura', 'chord', 'clef', 'custos',
+  'damage', 'del', 'dir', 'dot', 'dynam', 'ending', 'expan', 'f', 'fTrem',
+  'fb', 'fermata', 'fig', 'fing', 'gliss', 'graceGrp', 'graphic', 'grpSym',
+  'hairpin', 'halfmRpt', 'harm', 'keyAccid', 'keySig', 'label', 'labelAbbr',
+  'layer', 'lb', 'ligature', 'lv', 'mNum', 'mRest', 'mRpt', 'mRpt2', 'mSpace',
+  'mdiv', 'measure', 'mensur', 'meterSig', 'meterSigGrp', 'mordent',
+  'multiRest', 'multiRpt', 'nc', 'neume', 'note', 'num', 'octave', 'orig',
+  'pb', 'pedal', 'pgFoot', 'pgHead', 'phrase', 'plica', 'proport', 'reh',
+  'rest', 'restore', 'sb', 'section', 'sic', 'slur', 'space', 'staff',
+  'staffGrp', 'stem', 'supplied', 'syl', 'syllable', 'symbol', 'tempo',
+  'tie', 'trill', 'tuplet', 'turn', 'unclear', 'verse'
+];

@@ -230,8 +230,7 @@ const defaultVerovioOptions = {
   minLastJustification: 0,
   // clefChangeFactor: .83, // option removed in Verovio 3.10.0
   svgAdditionalAttribute: ["layer@n", "staff@n",
-    "dir@vgrp", "dynam@vgrp", "hairpin@vgrp", "pedal@vgrp",
-    "measure@facs", "measure@n"
+    "dir@vgrp", "dynam@vgrp", "hairpin@vgrp", "pedal@vgrp", "measure@n"    
   ],
   bottomMarginArtic: 1.2,
   topMarginArtic: 1.2
@@ -277,6 +276,8 @@ const defaultCodeMirrorOptions = {
   defaultBrightTheme: 'default', // default theme for OS bright mode
   defaultDarkTheme: 'paraiso-dark' // 'base16-dark', // default theme for OS dark mode
 };
+// add all possible facsimile elements
+att.attFacsimile.forEach(e => defaultVerovioOptions.svgAdditionalAttribute.push(e + '@facs'));
 const defaultKeyMap = `${root}keymaps/default-keymap.json`;
 const sampleEncodingsCSV = `${root}sampleEncodings/sampleEncodings.csv`;
 let freshlyLoaded = false; // flag to ignore a cm.on("changes") event on file load
