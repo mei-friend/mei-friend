@@ -230,7 +230,7 @@ const defaultVerovioOptions = {
   minLastJustification: 0,
   // clefChangeFactor: .83, // option removed in Verovio 3.10.0
   svgAdditionalAttribute: ["layer@n", "staff@n",
-    "dir@vgrp", "dynam@vgrp", "hairpin@vgrp", "pedal@vgrp", "measure@n"    
+    "dir@vgrp", "dynam@vgrp", "hairpin@vgrp", "pedal@vgrp", "measure@n"
   ],
   bottomMarginArtic: 1.2,
   topMarginArtic: 1.2
@@ -1915,6 +1915,7 @@ function setKeyMap(keyMapFilePath) {
 
 // returns true, if event is a CMD (Mac) or a CTRL (Windows, Linux) event
 export function isCtrlOrCmd(ev) {
-  return (platform.startsWith('mac') && ev.metaKey) ||
-    (!platform.startsWith('mac') && ev.ctrlKey);
+  return ev ?
+    ((platform.startsWith('mac') && ev.metaKey) || (!platform.startsWith('mac') && ev.ctrlKey))
+    : false;
 }

@@ -659,52 +659,54 @@ export function renumberMeasures(v, cm, change) {
  */
 export function addZone(v, cm, rect, addMeasure = true) {
   v.updateNotation = false;
-  // get current element id from editor
+  // get current element id and nodeName from editor
   let currentId = utils.getElementIdAtCursor(cm);
-  
-  // create zone with all attributes
-  let zone = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'zone');
-  let uuid = 'zone-' + utils.generateUUID();
-  zone.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
-  let x = Math.round(rect.getAttribute('x'));
-  let y = Math.round(rect.getAttribute('y'));
-  let width = Math.round(rect.getAttribute('width'));
-  let height = Math.round(rect.getAttribute('height'));
-  rect.setAttribute('id', uuid);
-  zone.setAttribute('type', 'measure');
-  zone.setAttribute('ulx', x);
-  zone.setAttribute('uly', y);
-  zone.setAttribute('lrx', x + width);
-  zone.setAttribute('lry', y + height);
-
-  // check if current element a zone
   let el = v.xmlDoc.querySelector('[*|id=' + currentId + ']');
-  if (el && el.nodeName === 'zone' && el.parentElement.nodeName === 'surface') {
-    // add zone to surface
-    cm.execCommand('goLineEnd');
-    cm.replaceRange('\n' + dutils.xmlToString(zone), cm.getCursor());
-    cm.execCommand('indentAuto');
-    let prevMeas = v.xmlDoc.querySelector('[facs="#' + el.getAttribute('xml:id') + '"]');
+  if (el) {
 
-    // Create new measure element
-    let newMeas = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'measure');
-    newMeas.setAttributeNS(dutils.xmlNameSpace, 'xml:id', 'measure-' + utils.generateUUID());
-    newMeas.setAttribute('n', prevMeas.getAttribute('n') + '-new');
-    newMeas.setAttribute('facs', '#' + uuid);
+    // create zone with all attributes
+    let zone = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'zone');
+    let uuid = 'zone-' + utils.generateUUID();
+    zone.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
+    let x = Math.round(rect.getAttribute('x'));
+    let y = Math.round(rect.getAttribute('y'));
+    let width = Math.round(rect.getAttribute('width'));
+    let height = Math.round(rect.getAttribute('height'));
+    rect.setAttribute('id', uuid);
+    zone.setAttribute('type', addMeasure ? 'measure' : el.nodeName);
+    zone.setAttribute('ulx', x);
+    zone.setAttribute('uly', y);
+    zone.setAttribute('lrx', x + width);
+    zone.setAttribute('lry', y + height);
 
-    // navigate to prev measure element
-    utils.setCursorToId(cm, prevMeas.getAttribute('xml:id'));
-    cm.execCommand('toMatchingTag');
-    cm.execCommand('goLineEnd');
-    cm.replaceRange('\n' + dutils.xmlToString(newMeas), cm.getCursor());
-    cm.execCommand('indentAuto');
-    utils.setCursorToId(cm, uuid);
+    // check if current element a zone
+    if (addMeasure && el.nodeName === 'zone' && el.parentElement.nodeName === 'surface') {
+      // add zone to surface
+      cm.execCommand('goLineEnd');
+      cm.replaceRange('\n' + dutils.xmlToString(zone), cm.getCursor());
+      cm.execCommand('indentAuto');
+      let prevMeas = v.xmlDoc.querySelector('[facs="#' + el.getAttribute('xml:id') + '"]');
 
-    // updating
-    v.updateData(cm, false, false);
-    console.log('new zone added', rect);
-    v.updateNotation = true;
-    return true;
+      // Create new measure element
+      let newMeas = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'measure');
+      newMeas.setAttributeNS(dutils.xmlNameSpace, 'xml:id', 'measure-' + utils.generateUUID());
+      newMeas.setAttribute('n', prevMeas.getAttribute('n') + '-new');
+      newMeas.setAttribute('facs', '#' + uuid);
+
+      // navigate to prev measure element
+      utils.setCursorToId(cm, prevMeas.getAttribute('xml:id'));
+      cm.execCommand('toMatchingTag');
+      cm.execCommand('goLineEnd');
+      cm.replaceRange('\n' + dutils.xmlToString(newMeas), cm.getCursor());
+      cm.execCommand('indentAuto');
+      utils.setCursorToId(cm, uuid);
+
+      // updating
+      v.updateData(cm, false, false);
+      console.log('Editor: new zone ' + uuid + 'added.', rect);
+      v.updateNotation = true;
+      return true;
+    }
   } else {
     v.updateNotation = true;
     return false;

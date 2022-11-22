@@ -28,6 +28,7 @@ import {
     cm,
     fileLocationType,
     github,
+    isCtrlOrCmd,
     meiFileLocation,
     v
 } from './main.js';
@@ -35,6 +36,7 @@ import {
     addZone,
     replaceInEditor
 } from './editor.js';
+import { attCurvature, attFacsimile } from './attribute-classes.js';
 
 /**
  * Default warning text, if no facsimile content is available
@@ -236,7 +238,7 @@ export async function drawFacsimile() {
         if (img) {
             svg.appendChild(img);
         } else {
-            showWarningText('Could not load image \n(' + imgName + ').'); 
+            showWarningText('Could not load image \n(' + imgName + ').');
             busy(false);
             return;
         }
@@ -611,11 +613,19 @@ export function addZoneDrawer() {
             let rect = document.getElementById('new-rect');
             if (rect && (Math.round(rect.getAttribute('width'))) > minSize &&
                 (Math.round(rect.getAttribute('height'))) > minSize) {
-                // add zone and a measure TODO
-                if (!addZone(v, cm, rect)) {
+                let metaPressed = isCtrlOrCmd(ev);
+                // * Without modifier key: select an existing element (e.g. measure, dynam)
+                //   a zone will be added to pertinent surface and @facs add to the selected element
+                // * With CMD/CTRL: select a zone, add a zone afterwards and a measure; 
+                if (!addZone(v, cm, rect, metaPressed)) {
                     if (rect) rect.remove();
-                    let warning = `Cannot add a zone element. Please select a zone element first.`;
-                    v.showAlert(warning, 'warning', 10000);
+                    let warning = 'Cannot add zone element. ';
+                    if (!metaPressed) {
+                        warning += 'Please select an allowed element first (' + attFacsimile + ').';
+                    } else {
+                        warning += 'Please select an existing zone element first.';
+                    }
+                    v.showAlert(warning, 'warning', 15000);
                     console.warn(warning);
                 }
             } else if (rect) {
@@ -712,7 +722,7 @@ function handleFacsimileIngestion(reply) {
         let zoneId = '';
         if (z.hasAttribute('xml:id')) zoneId = z.getAttribute('xml:id');
         let type = '';
-        if (z.hasAttribute('type')) type = z.getAttribute('type'); 
+        if (z.hasAttribute('type')) type = z.getAttribute('type');
         let ms = skelXml.querySelectorAll('[facs="#' + zoneId + '"]');
         ms.forEach(m => {
             let n = m.getAttribute('n');
