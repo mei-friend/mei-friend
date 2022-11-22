@@ -660,9 +660,9 @@ export function renumberMeasures(v, cm, change) {
 export function addZone(v, cm, rect, addMeasure = true) {
   v.updateNotation = false;
   // get current element id and nodeName from editor
-  let currentId = utils.getElementIdAtCursor(cm);
-  let el = v.xmlDoc.querySelector('[*|id=' + currentId + ']');
-  if (el) {
+  let selectedId = utils.getElementIdAtCursor(cm);
+  let selectedElement = v.xmlDoc.querySelector('[*|id=' + selectedId + ']');
+  if (selectedElement) {
 
     // create zone with all attributes
     let zone = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'zone');
@@ -673,19 +673,19 @@ export function addZone(v, cm, rect, addMeasure = true) {
     let width = Math.round(rect.getAttribute('width'));
     let height = Math.round(rect.getAttribute('height'));
     rect.setAttribute('id', uuid);
-    zone.setAttribute('type', addMeasure ? 'measure' : el.nodeName);
+    zone.setAttribute('type', addMeasure ? 'measure' : selectedElement.nodeName);
     zone.setAttribute('ulx', x);
     zone.setAttribute('uly', y);
     zone.setAttribute('lrx', x + width);
     zone.setAttribute('lry', y + height);
 
     // check if current element a zone
-    if (addMeasure && el.nodeName === 'zone' && el.parentElement.nodeName === 'surface') {
+    if (addMeasure && selectedElement.nodeName === 'zone' && selectedElement.parentElement.nodeName === 'surface') {
       // add zone to surface
       cm.execCommand('goLineEnd');
       cm.replaceRange('\n' + dutils.xmlToString(zone), cm.getCursor());
       cm.execCommand('indentAuto');
-      let prevMeas = v.xmlDoc.querySelector('[facs="#' + el.getAttribute('xml:id') + '"]');
+      let prevMeas = v.xmlDoc.querySelector('[facs="#' + selectedElement.getAttribute('xml:id') + '"]');
 
       // Create new measure element
       let newMeas = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'measure');
@@ -708,6 +708,16 @@ export function addZone(v, cm, rect, addMeasure = true) {
       v.updateNotation = true;
       return true;
     }
+    // only add zone and a @facs for the selected element
+  } else  if (!addMeasure && att.attFacsimile.includes(selectedElement.nodeName)) {
+    // find pertinent zone in surface for inserting new zone
+    // 1) look for querySelectorAll('[data-facs]')
+    // 2) and for all pb facs in v.xmlDoc
+    
+    // 3) insertBefore(zone, referenceNode)
+
+    // 4) selectedElement.setAttribute('facs', uuid);
+
   } else {
     v.updateNotation = true;
     return false;
