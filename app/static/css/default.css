@@ -328,6 +328,12 @@ a:active {
   height: 100%;
 }
 
+#facsimile-message-panel {
+  padding: 8px;
+  color: var(--textColor);
+  background-color: var(--backgroundColor);
+}
+
 #source-image-label {
   justify-content: center;
 }

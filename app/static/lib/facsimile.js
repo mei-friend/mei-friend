@@ -36,17 +36,10 @@ import {
     addZone,
     replaceInEditor
 } from './editor.js';
-import { attCurvature, attFacsimile } from './attribute-classes.js';
+import {
+    attFacsimile
+} from './attribute-classes.js';
 
-/**
- * Default warning text, if no facsimile content is available
- */
-let warningSvgText = document.createElementNS(svgNameSpace, 'text');
-warningSvgText.setAttribute('font-size', '24px');
-warningSvgText.setAttribute('font-weight', 'bold');
-warningSvgText.setAttribute('fill', 'var(--textColor)');
-warningSvgText.setAttribute('x', 30);
-warningSvgText.setAttribute('y', 30);
 
 /**
  * Show warning text to facsimile panel (as svg text element) and 
@@ -59,13 +52,23 @@ function showWarningText(txt = 'No facsimile content to display.') {
     let svg = document.getElementById('source-image-svg');
     if (!svg || !svgContainer) return;
 
-    // no facsimile content to show
+    // clear existing structures
     svgContainer.removeAttribute('transform-origin');
     svgContainer.removeAttribute('transform');
     svg.removeAttribute('viewBox');
     svg.innerHTML = '';
-    warningSvgText.textContent = txt;
-    svg.appendChild(warningSvgText);
+
+    let facsimileMessagePanel = document.getElementById('facsimile-message-panel');
+    facsimileMessagePanel.style.display = 'block';
+    if (facsimileMessagePanel) {
+        txt.split('\n').forEach((t, i) => {
+            if (i === 0) {
+                facsimileMessagePanel.innerHTML = '<h2>' + t + '</h2>';
+            } else {
+                facsimileMessagePanel.innerHTML += '<p>' + t + '</p>';
+            }
+        });
+    }
 } // showWarningText()
 
 
@@ -94,7 +97,11 @@ export function loadFacsimile(xmlDoc) {
         let surfaces = facsimile.querySelectorAll('surface');
         surfaces.forEach(s => {
             let id;
-            let { target, width, height } = fillGraphic(s.querySelector('graphic'));
+            let {
+                target,
+                width,
+                height
+            } = fillGraphic(s.querySelector('graphic'));
             if (s.hasAttribute('xml:id')) id = s.getAttribute('xml:id');
             if (id) {
                 facs[id] = {};
@@ -112,7 +119,11 @@ export function loadFacsimile(xmlDoc) {
             if (z.hasAttribute('uly')) uly = z.getAttribute('uly');
             if (z.hasAttribute('lrx')) lrx = z.getAttribute('lrx');
             if (z.hasAttribute('lry')) lry = z.getAttribute('lry');
-            let { target, width, height } = fillGraphic(z.parentElement.querySelector('graphic'));
+            let {
+                target,
+                width,
+                height
+            } = fillGraphic(z.parentElement.querySelector('graphic'));
             if (id) {
                 facs[id] = {};
                 if (target) facs[id]['target'] = target;
@@ -144,7 +155,11 @@ export function loadFacsimile(xmlDoc) {
             if (graphic.hasAttribute('width')) w = graphic.getAttribute('width');
             if (graphic.hasAttribute('height')) h = graphic.getAttribute('height');
         }
-        return { target: t, width: w, height: h };
+        return {
+            target: t,
+            width: w,
+            height: h
+        };
     } // fillGraphic()
 
 } // loadFacsimile()
@@ -156,6 +171,8 @@ export function loadFacsimile(xmlDoc) {
 export async function drawFacsimile() {
     busy();
     let fullPage = document.getElementById('showFacsimileFullPage').checked;
+    let facsimileMessagePanel = document.getElementById('facsimile-message-panel');
+    facsimileMessagePanel.style.display = 'none';
     let svgContainer = document.getElementById('source-image-container');
     let svg = document.getElementById('source-image-svg');
     if (!svg || !svgContainer) return;
@@ -181,8 +198,14 @@ export async function drawFacsimile() {
             }
         });
     }
-    if (!facs[zoneId]) {
-        let pbId = getCurrentPbElement(v.xmlDoc); // id of last page beginning
+    // display surface graphic if no data-facs are found in SVG
+    if (!zoneId || !facs[zoneId]) {
+        let pbId = getCurrentPbElement(v.xmlDoc); // id of current page beginning
+        if (!pbId) {
+            showWarningText('No surface element found for this page.\n(An initial pb element might be missing.)');
+            busy(false);
+            return;
+        }
         let pb = v.xmlDoc.querySelector('[*|id="' + pbId + '"]');
         if (pb && pb.hasAttribute('facs')) {
             zoneId = rmHash(pb.getAttribute('facs'));

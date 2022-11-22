@@ -274,7 +274,7 @@ export function invertPlacement(v, cm, modifier = false) {
       }
       if (el.nodeName === 'fermata')
         val === 'below' ?
-          el.setAttribute('form', 'inv') : el.removeAttribute('form');
+        el.setAttribute('form', 'inv') : el.removeAttribute('form');
       el.setAttribute(attr, val);
       range = replaceInEditor(cm, el, true);
       // txtEdr.autoIndentSelectedRows();
@@ -646,7 +646,7 @@ export function renumberMeasures(v, cm, change) {
   if (document.getElementById('showFacsimilePanel').checked) loadFacsimile(v.xmlDoc);
   v.updateData(cm, false, true);
   v.updateNotation = true;
-}
+} // renumberMeasures()
 
 /**
  * Add zone element in editor (called from source-imager.js), 
@@ -702,6 +702,7 @@ export function addZone(v, cm, rect, addMeasure = true) {
       utils.setCursorToId(cm, uuid);
 
       // updating
+      loadFacsimile(v.xmlDoc);
       v.updateData(cm, false, false);
       console.log('Editor: new zone ' + uuid + 'added.', rect);
       v.updateNotation = true;
@@ -731,6 +732,8 @@ export function removeZone(v, cm, zone, removeMeasure = true) {
       replaceInEditor(cm, e);
     }
   });
+  loadFacsimile(v.xmlDoc);
+  v.updateData(cm, false, false);
 } // removeZone()
 
 /**
@@ -796,6 +799,7 @@ export function addFacsimile(v, cm) {
   for (let l = p1.line; l <= cm.getCursor().line; l++) cm.indentLine(l, 'smart');
   utils.setCursorToId(cm, facsimileId);
 
+  loadFacsimile(v.xmlDoc);
   v.updateData(cm, false, false);
   console.log('Editor: new facsimile added', facsimile);
   v.updateNotation = true;
