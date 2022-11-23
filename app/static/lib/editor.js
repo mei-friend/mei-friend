@@ -6,10 +6,9 @@ import * as speed from './speed.js';
 import * as utils from './utils.js';
 import * as dutils from './dom-utils.js';
 import * as att from './attribute-classes.js';
-import {
-  loadFacsimile
-} from './facsimile.js';
+import { loadFacsimile } from './facsimile.js';
 import Viewer from './viewer.js';
+import { isCtrlOrCmd } from './main.js';
 
 // smart indent selected region in editor, if none, do all
 export function indentSelection(v, cm) {
@@ -33,7 +32,7 @@ export function indentSelection(v, cm) {
 }
 
 // delete selected elements
-export function deleteElement(v, cm) {
+export function deleteElement(v, cm, modifyerKey = false) {
   v.loadXml(cm.getValue(), true);
   let id = v.selectedElements[0]; // TODO: iterate over selectedElements
   let cursor = cm.getCursor();
@@ -91,7 +90,10 @@ export function deleteElement(v, cm) {
     }
   } else // delete Zone in source image display
     if (element.nodeName === 'zone' && document.getElementById('editFacsimileZones').checked) {
-      removeZone(v, cm, element);
+      // remove zone; with CMD remove pointing element; without just remove @facs from pointing element
+      removeZone(v, cm, element, modifyerKey);
+    } else if (!document.getElementById('editFacsimileZones').checked) {
+      v.show
     } else {
       console.info('Element ' + id + ' not supported for deletion.');
       return;
@@ -274,7 +276,7 @@ export function invertPlacement(v, cm, modifier = false) {
       }
       if (el.nodeName === 'fermata')
         val === 'below' ?
-        el.setAttribute('form', 'inv') : el.removeAttribute('form');
+          el.setAttribute('form', 'inv') : el.removeAttribute('form');
       el.setAttribute(attr, val);
       range = replaceInEditor(cm, el, true);
       // txtEdr.autoIndentSelectedRows();
@@ -772,7 +774,7 @@ export function addZone(v, cm, rect, addMeasure = true) {
 } // addZone()
 
 // remove zone in editor, called from editor.js
-export function removeZone(v, cm, zone, removeMeasure = true) {
+export function removeZone(v, cm, zone, removeMeasure = false) {
   if (!zone) return;
   removeInEditor(cm, zone);
   let rect = document.querySelector('rect[id="' + zone.getAttribute('xml:id') + '"]');

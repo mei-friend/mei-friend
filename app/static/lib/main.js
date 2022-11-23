@@ -1371,6 +1371,7 @@ export let cmd = {
   'addMordentBelowUpper': () => e.addControlElement(v, cm, 'mordent', 'below', 'upper'),
   //
   'delete': () => e.deleteElement(v, cm),
+  'cmdDelete': () => e.deleteElement(v, cm, true),
   'invertPlacement': () => e.invertPlacement(v, cm),
   'addVerticalGroup': () => e.addVerticalGroup(v, cm),
   'toggleStacc': () => e.toggleArtic(v, cm, 'stacc'),

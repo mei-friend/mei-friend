@@ -105,7 +105,8 @@
     "alt-…": "consultGuidelines",
     "cmd-,": "toggleSettingsPanel",
     "cmd-a": "toggleAnnotationPanel",
-    "shift-alt-ï": "indentSelection"
+    "shift-alt-ï": "indentSelection",
+    "cmd-delete": "cmdDelete"
   },
 
   ".platform-win32, .platform-linux": {
@@ -138,6 +139,7 @@
     "ctrl-ß": "openHelp",
     "alt-.": "consultGuidelines",
     "ctrl-,": "toggleSettingsPanel",
-    "ctrl-a": "toggleAnnotationPanel"
+    "ctrl-a": "toggleAnnotationPanel",
+    "ctrl-delete": "cmdDelete"
   }
 }
