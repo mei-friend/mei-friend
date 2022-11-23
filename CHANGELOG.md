@@ -1,5 +1,11 @@
 # mei-friend-online CHANGELOG.md
 
+### 0.6.8 patch: enhance facsimile functionality
+* Support for inserting facsimile element with pb@facs references
+* Support for inserting zones on empty surface on selected elements (creating @facs attribute on all possible elements supported by Verovio)
+* Support for inserting zones with parallel insertion of measure element (CMD/CTRL)
+* Support for deleting zones with (CMD/CTRL) or without removing pointing elements
+* Menu item for indenting encoding
 ### 0.6.7 patch: facsimile panel re-organisation
 * Facsimile panel with separate control menu
 * Resizing of facsimile panel via mouse drag
