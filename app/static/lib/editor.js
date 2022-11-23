@@ -662,66 +662,113 @@ export function addZone(v, cm, rect, addMeasure = true) {
   // get current element id and nodeName from editor
   let selectedId = utils.getElementIdAtCursor(cm);
   let selectedElement = v.xmlDoc.querySelector('[*|id=' + selectedId + ']');
-  if (selectedElement) {
+  if (!selectedElement) {
+    v.updateNotation = true;
+    return false;
+  }
 
-    // create zone with all attributes
-    let zone = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'zone');
-    let uuid = 'zone-' + utils.generateUUID();
-    zone.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
-    let x = Math.round(rect.getAttribute('x'));
-    let y = Math.round(rect.getAttribute('y'));
-    let width = Math.round(rect.getAttribute('width'));
-    let height = Math.round(rect.getAttribute('height'));
-    rect.setAttribute('id', uuid);
-    zone.setAttribute('type', addMeasure ? 'measure' : selectedElement.nodeName);
-    zone.setAttribute('ulx', x);
-    zone.setAttribute('uly', y);
-    zone.setAttribute('lrx', x + width);
-    zone.setAttribute('lry', y + height);
+  // create zone with all attributes
+  let zone = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'zone');
+  let uuid = 'zone-' + utils.generateUUID();
+  zone.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
+  let x = Math.round(rect.getAttribute('x'));
+  let y = Math.round(rect.getAttribute('y'));
+  let width = Math.round(rect.getAttribute('width'));
+  let height = Math.round(rect.getAttribute('height'));
+  rect.setAttribute('id', uuid);
+  zone.setAttribute('type', addMeasure ? 'measure' : selectedElement.nodeName);
+  zone.setAttribute('ulx', x);
+  zone.setAttribute('uly', y);
+  zone.setAttribute('lrx', x + width);
+  zone.setAttribute('lry', y + height);
 
-    // check if current element a zone
-    if (addMeasure && selectedElement.nodeName === 'zone' && selectedElement.parentElement.nodeName === 'surface') {
-      // add zone to surface
+  // check if current element a zone
+  if (addMeasure && selectedElement.nodeName === 'zone' && selectedElement.parentElement.nodeName === 'surface') {
+    // add zone to surface
+    cm.execCommand('goLineEnd');
+    cm.replaceRange('\n' + dutils.xmlToString(zone), cm.getCursor());
+    cm.execCommand('indentAuto');
+    let prevMeas = v.xmlDoc.querySelector('[facs="#' + selectedElement.getAttribute('xml:id') + '"]');
+    if (prevMeas.nodeName !== 'measure') { // try to find closest measure element
+      let m = prevMeas.closest('measure');
+      if (!m) return false; // and stop, if unsuccessful
+      prevMeas = m;
+    }
+
+    // Create new measure element
+    let newMeas = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'measure');
+    newMeas.setAttributeNS(dutils.xmlNameSpace, 'xml:id', 'measure-' + utils.generateUUID());
+    newMeas.setAttribute('n', prevMeas.getAttribute('n') + '-new');
+    newMeas.setAttribute('facs', '#' + uuid);
+
+    // add to DOM
+    prevMeas.after(newMeas);
+
+    // navigate to prev measure element
+    utils.setCursorToId(cm, prevMeas.getAttribute('xml:id'));
+    cm.execCommand('toMatchingTag');
+    cm.execCommand('goLineEnd');
+    cm.replaceRange('\n' + dutils.xmlToString(newMeas), cm.getCursor());
+    cm.execCommand('indentAuto');
+    utils.setCursorToId(cm, uuid);
+
+    // updating
+    loadFacsimile(v.xmlDoc);
+    v.updateData(cm, false, false);
+    console.log('Editor: new zone ' + uuid + 'added.', rect);
+    v.updateNotation = true;
+    return true;
+
+    // only add zone and a @facs for the selected element
+  } else if (!addMeasure && att.attFacsimile.includes(selectedElement.nodeName)) {
+    // find pertinent zone in surface for inserting new zone
+    let facs = v.xmlDoc.querySelectorAll('[facs],[*|id="' + selectedId + '"');
+    let i = Array.from(facs).findIndex(n => n.isEqualNode(selectedElement));
+    let referenceNodeId = utils.rmHash(facs[(i === 0) ? i + 1 : i - 1].getAttribute('facs'));
+    let referenceNode = v.xmlDoc.querySelector('[*|id="' + referenceNodeId + '"');
+    console.log('addZone() referenceNode: ', referenceNode);
+    if (!referenceNode) {
+      console.log('addZone(): no reference element found with xml:id="' + referenceNodeId + '"');
+      v.updateNotation = true;
+      return false;
+    }
+    if (referenceNode.nodeName === 'surface') {
+      referenceNode.appendChild(zone);
+    } else {
+      referenceNode.after(zone);
+    }
+
+    // add zone to editor
+    utils.setCursorToId(cm, referenceNodeId);
+    cm.execCommand('toMatchingTag');
+    if (referenceNode.nodeName !== 'surface') {
       cm.execCommand('goLineEnd');
       cm.replaceRange('\n' + dutils.xmlToString(zone), cm.getCursor());
       cm.execCommand('indentAuto');
-      let prevMeas = v.xmlDoc.querySelector('[facs="#' + selectedElement.getAttribute('xml:id') + '"]');
-
-      // Create new measure element
-      let newMeas = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'measure');
-      newMeas.setAttributeNS(dutils.xmlNameSpace, 'xml:id', 'measure-' + utils.generateUUID());
-      newMeas.setAttribute('n', prevMeas.getAttribute('n') + '-new');
-      newMeas.setAttribute('facs', '#' + uuid);
-
-      // navigate to prev measure element
-      utils.setCursorToId(cm, prevMeas.getAttribute('xml:id'));
-      cm.execCommand('toMatchingTag');
-      cm.execCommand('goLineEnd');
-      cm.replaceRange('\n' + dutils.xmlToString(newMeas), cm.getCursor());
+    } else {
+      cm.execCommand('goLineStart');
+      cm.replaceRange(dutils.xmlToString(zone), cm.getCursor());
       cm.execCommand('indentAuto');
-      utils.setCursorToId(cm, uuid);
-
-      // updating
-      loadFacsimile(v.xmlDoc);
-      v.updateData(cm, false, false);
-      console.log('Editor: new zone ' + uuid + 'added.', rect);
-      v.updateNotation = true;
-      return true;
+      cm.execCommand('newlineAndIndent');
     }
-    // only add zone and a @facs for the selected element
-  } else  if (!addMeasure && att.attFacsimile.includes(selectedElement.nodeName)) {
-    // find pertinent zone in surface for inserting new zone
-    // 1) look for querySelectorAll('[data-facs]')
-    // 2) and for all pb facs in v.xmlDoc
-    
-    // 3) insertBefore(zone, referenceNode)
 
-    // 4) selectedElement.setAttribute('facs', uuid);
+    // add @facs to selected element
+    selectedElement.setAttribute('facs', '#' + uuid);
+    replaceInEditor(cm, selectedElement);
+    utils.setCursorToId(cm, uuid);
+
+    // updating
+    loadFacsimile(v.xmlDoc);
+    v.updateData(cm, false, false);
+    console.log('Editor: new zone ' + uuid + 'added.', rect);
+    v.updateNotation = true;
+    return true;
 
   } else {
     v.updateNotation = true;
     return false;
   }
+
 } // addZone()
 
 // remove zone in editor, called from editor.js
