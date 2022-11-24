@@ -786,6 +786,7 @@ export function removeZone(v, cm, zone, removeMeasure = false) {
   ms.forEach(e => {
     if (removeMeasure) {
       removeInEditor(cm, e);
+      e.remove();
     } else {
       e.removeAttribute('facs');
       replaceInEditor(cm, e);
@@ -819,6 +820,7 @@ export function addFacsimile(v, cm) {
     facsimile = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'facsimile');
     facsimileId = 'facsimile-' + utils.generateUUID();
     facsimile.setAttributeNS(dutils.xmlNameSpace, 'id', facsimileId);
+    v.xmlDoc.querySelector('body').before(facsimile);
   }
   v.xmlDoc.querySelectorAll('pb').forEach((pb, p) => {
     let pbFacs = utils.rmHash(pb.getAttribute('facs'));
