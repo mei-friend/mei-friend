@@ -812,14 +812,18 @@ function busy(active = true) {
  */
 function getCurrentPbElement(xmlDoc) {
     let referenceElement = document.querySelector('g.measure,g.barLine');
-    let elementList = xmlDoc.querySelectorAll('pb[facs],[*|id="' + referenceElement.id + '"');
-    let lastPb = '';
-    for (let p of elementList) {
-        if (p.nodeName === referenceElement.classList[0]) {
-            break;
-        } else {
-            lastPb = p.getAttribute('xml:id');
+    if (referenceElement) {
+        let elementList = xmlDoc.querySelectorAll('pb[facs],[*|id="' + referenceElement.id + '"');
+        let lastPb = '';
+        for (let p of elementList) {
+            if (p.nodeName === referenceElement.classList[0]) {
+                break;
+            } else {
+                lastPb = p.getAttribute('xml:id');
+            }
         }
+        return lastPb;
+    } else {
+        return '';
     }
-    return lastPb;
 } // getCurrentPbElement()
