@@ -1,14 +1,38 @@
-// contains all the editor functions
+/**
+ * Provides all the editor functions
+ */
+
 import * as speed from './speed.js';
 import * as utils from './utils.js';
 import * as dutils from './dom-utils.js';
 import * as att from './attribute-classes.js';
-import {
-  loadFacsimile
-} from './facsimile.js';
+import { loadFacsimile } from './facsimile.js';
+import Viewer from './viewer.js';
+import { isCtrlOrCmd } from './main.js';
+
+// smart indent selected region in editor, if none, do all
+export function indentSelection(v, cm) {
+  v.updateNotation = false;
+  let selections = cm.listSelections();
+  selections.forEach(s => {
+    let l1 = s.anchor.line;
+    let l2 = s.head.line;
+    if (l1 > l2) {
+      let tmp = l1;
+      l1 = l2;
+      l2 = tmp;
+    }
+    if (l1 === l2) {
+      l1 = 0;
+      l2 = cm.lastLine()
+    }
+    for (let l = l1; l <= l2; l++) cm.indentLine(l, 'smart');
+  });
+  v.updateNotation = true;
+}
 
 // delete selected elements
-export function deleteElement(v, cm) {
+export function deleteElement(v, cm, modifyerKey = false) {
   v.loadXml(cm.getValue(), true);
   let id = v.selectedElements[0]; // TODO: iterate over selectedElements
   let cursor = cm.getCursor();
@@ -66,7 +90,10 @@ export function deleteElement(v, cm) {
     }
   } else // delete Zone in source image display
     if (element.nodeName === 'zone' && document.getElementById('editFacsimileZones').checked) {
-      removeZone(v, cm, element);
+      // remove zone; with CMD remove pointing element; without just remove @facs from pointing element
+      removeZone(v, cm, element, modifyerKey);
+    } else if (!document.getElementById('editFacsimileZones').checked) {
+      v.show
     } else {
       console.info('Element ' + id + ' not supported for deletion.');
       return;
@@ -249,7 +276,7 @@ export function invertPlacement(v, cm, modifier = false) {
       }
       if (el.nodeName === 'fermata')
         val === 'below' ?
-        el.setAttribute('form', 'inv') : el.removeAttribute('form');
+          el.setAttribute('form', 'inv') : el.removeAttribute('form');
       el.setAttribute(attr, val);
       range = replaceInEditor(cm, el, true);
       // txtEdr.autoIndentSelectedRows();
@@ -621,10 +648,28 @@ export function renumberMeasures(v, cm, change) {
   if (document.getElementById('showFacsimilePanel').checked) loadFacsimile(v.xmlDoc);
   v.updateData(cm, false, true);
   v.updateNotation = true;
-}
+} // renumberMeasures()
 
-// add zone in editor, called from source-imager.js
+/**
+ * Add zone element in editor (called from source-imager.js), 
+ * places it 
+ * @param {Viewer} v 
+ * @param {CodeMirror} cm 
+ * @param {object} rect 
+ * @param {boolean} addMeasure 
+ * @returns 
+ */
 export function addZone(v, cm, rect, addMeasure = true) {
+  v.updateNotation = false;
+  // get current element id and nodeName from editor
+  let selectedId = utils.getElementIdAtCursor(cm);
+  let selectedElement = v.xmlDoc.querySelector('[*|id=' + selectedId + ']');
+  if (!selectedElement) {
+    v.updateNotation = true;
+    return false;
+  }
+
+  // create zone with all attributes
   let zone = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'zone');
   let uuid = 'zone-' + utils.generateUUID();
   zone.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
@@ -633,25 +678,33 @@ export function addZone(v, cm, rect, addMeasure = true) {
   let width = Math.round(rect.getAttribute('width'));
   let height = Math.round(rect.getAttribute('height'));
   rect.setAttribute('id', uuid);
-  zone.setAttribute('type', 'measure');
+  zone.setAttribute('type', addMeasure ? 'measure' : selectedElement.nodeName);
   zone.setAttribute('ulx', x);
   zone.setAttribute('uly', y);
   zone.setAttribute('lrx', x + width);
   zone.setAttribute('lry', y + height);
-  v.updateNotation = false;
-  let currentId = utils.getElementIdAtCursor(cm);
+
   // check if current element a zone
-  let el = v.xmlDoc.querySelector('[*|id=' + currentId + ']');
-  if (el && el.nodeName === 'zone' && el.parentElement.nodeName === 'surface') {
+  if (addMeasure && selectedElement.nodeName === 'zone' && selectedElement.parentElement.nodeName === 'surface') {
+    // add zone to surface
     cm.execCommand('goLineEnd');
     cm.replaceRange('\n' + dutils.xmlToString(zone), cm.getCursor());
     cm.execCommand('indentAuto');
-    let prevMeas = v.xmlDoc.querySelector('[facs="#' + el.getAttribute('xml:id') + '"]');
-    // new measure element
+    let prevMeas = v.xmlDoc.querySelector('[facs="#' + selectedElement.getAttribute('xml:id') + '"]');
+    if (prevMeas.nodeName !== 'measure') { // try to find closest measure element
+      let m = prevMeas.closest('measure');
+      if (!m) return false; // and stop, if unsuccessful
+      prevMeas = m;
+    }
+
+    // Create new measure element
     let newMeas = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'measure');
     newMeas.setAttributeNS(dutils.xmlNameSpace, 'xml:id', 'measure-' + utils.generateUUID());
     newMeas.setAttribute('n', prevMeas.getAttribute('n') + '-new');
     newMeas.setAttribute('facs', '#' + uuid);
+
+    // add to DOM
+    prevMeas.after(newMeas);
 
     // navigate to prev measure element
     utils.setCursorToId(cm, prevMeas.getAttribute('xml:id'));
@@ -661,17 +714,67 @@ export function addZone(v, cm, rect, addMeasure = true) {
     cm.execCommand('indentAuto');
     utils.setCursorToId(cm, uuid);
 
+    // updating
+    loadFacsimile(v.xmlDoc);
     v.updateData(cm, false, false);
-    console.log('new zone added', rect);
+    console.log('Editor: new zone ' + uuid + 'added.', rect);
     v.updateNotation = true;
     return true;
+
+    // only add zone and a @facs for the selected element
+  } else if (!addMeasure && att.attFacsimile.includes(selectedElement.nodeName)) {
+    // find pertinent zone in surface for inserting new zone
+    let facs = v.xmlDoc.querySelectorAll('[facs],[*|id="' + selectedId + '"');
+    let i = Array.from(facs).findIndex(n => n.isEqualNode(selectedElement));
+    let referenceNodeId = utils.rmHash(facs[(i === 0) ? i + 1 : i - 1].getAttribute('facs'));
+    let referenceNode = v.xmlDoc.querySelector('[*|id="' + referenceNodeId + '"');
+    console.log('addZone() referenceNode: ', referenceNode);
+    if (!referenceNode) {
+      console.log('addZone(): no reference element found with xml:id="' + referenceNodeId + '"');
+      v.updateNotation = true;
+      return false;
+    }
+    if (referenceNode.nodeName === 'surface') {
+      referenceNode.appendChild(zone);
+    } else {
+      referenceNode.after(zone);
+    }
+
+    // add zone to editor
+    utils.setCursorToId(cm, referenceNodeId);
+    cm.execCommand('toMatchingTag');
+    if (referenceNode.nodeName !== 'surface') {
+      cm.execCommand('goLineEnd');
+      cm.replaceRange('\n' + dutils.xmlToString(zone), cm.getCursor());
+      cm.execCommand('indentAuto');
+    } else {
+      cm.execCommand('goLineStart');
+      cm.replaceRange(dutils.xmlToString(zone), cm.getCursor());
+      cm.execCommand('indentAuto');
+      cm.execCommand('newlineAndIndent');
+    }
+
+    // add @facs to selected element
+    selectedElement.setAttribute('facs', '#' + uuid);
+    replaceInEditor(cm, selectedElement);
+    utils.setCursorToId(cm, uuid);
+
+    // updating
+    loadFacsimile(v.xmlDoc);
+    v.updateData(cm, false, false);
+    console.log('Editor: new zone ' + uuid + 'added.', rect);
+    v.updateNotation = true;
+    return true;
+
   } else {
+    v.updateNotation = true;
     return false;
   }
-}
+
+} // addZone()
 
 // remove zone in editor, called from editor.js
-export function removeZone(v, cm, zone, removeMeasure = true) {
+export function removeZone(v, cm, zone, removeMeasure = false) {
   if (!zone) return;
   removeInEditor(cm, zone);
   let rect = document.querySelector('rect[id="' + zone.getAttribute('xml:id') + '"]');
@@ -683,12 +786,85 @@ export function removeZone(v, cm, zone, removeMeasure = true) {
   ms.forEach(e => {
     if (removeMeasure) {
       removeInEditor(cm, e);
+      e.remove();
     } else {
       e.removeAttribute('facs');
       replaceInEditor(cm, e);
     }
   });
-}
+  loadFacsimile(v.xmlDoc);
+  v.updateData(cm, false, false);
+} // removeZone()
+
+/**
+ * Adds a facsimile element to DOM and editor, 
+ * with a surface element for each page beginning <pb> to which
+ * a @facs attribute is added referencing the surface element. 
+ * Additionally, each surface elements will be added a <graphic>
+ * element. 
+ * If the facsimile element exists, it will check all 
+ * surface elements and the pb@facs references and add them if 
+ * necessary.
+ * @param {object} v 
+ * @param {object} cm 
+ */
+export function addFacsimile(v, cm) {
+  v.updateNotation = false;
+  let facsimile = v.xmlDoc.querySelector('facsimile');
+  let facsimileId;
+  if (facsimile) {
+    facsimileId = facsimile.getAttribute('xml:id');
+    this.removeInEditor(cm, facsimile);
+  }
+  if (!facsimile) {
+    facsimile = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'facsimile');
+    facsimileId = 'facsimile-' + utils.generateUUID();
+    facsimile.setAttributeNS(dutils.xmlNameSpace, 'id', facsimileId);
+    v.xmlDoc.querySelector('body').before(facsimile);
+  }
+  v.xmlDoc.querySelectorAll('pb').forEach((pb, p) => {
+    let pbFacs = utils.rmHash(pb.getAttribute('facs'));
+    let surface = v.xmlDoc.querySelector('surface[*|id="' + pbFacs + '"]');
+    let surfaceId;
+    if (surface) {
+      surfaceId = surface.getAttribute('xml:id');
+    } else {
+      surface = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'surface');
+      surfaceId = 'surface-' + utils.generateUUID();
+      surface.setAttributeNS(dutils.xmlNameSpace, 'id', surfaceId);
+      facsimile.appendChild(surface);
+      // update pb elements in DOM and in editor
+      pb.setAttribute('facs', '#' + surfaceId);
+      this.replaceInEditor(cm, pb);
+    }
+    let graphic = surface.querySelector('graphic');
+    if (!graphic) {
+      graphic = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'graphic');
+      let graphicId = 'graphic-' + utils.generateUUID();
+      graphic.setAttributeNS(dutils.xmlNameSpace, 'id', graphicId);
+      graphic.setAttribute('target', 'Page-' + (p + 1)); // dummy values
+      graphic.setAttribute('width', '0');
+      graphic.setAttribute('height', '0');
+      surface.appendChild(graphic);
+    }
+  });
+
+  // add to editor
+  let c = cm.getSearchCursor('<body');
+  let p1;
+  if (c.findNext()) {
+    p1 = c.from();
+    cm.setCursor(p1);
+  }
+  cm.replaceRange(dutils.xmlToString(facsimile) + '\n', cm.getCursor());
+  for (let l = p1.line; l <= cm.getCursor().line; l++) cm.indentLine(l, 'smart');
+  utils.setCursorToId(cm, facsimileId);
+
+  loadFacsimile(v.xmlDoc);
+  v.updateData(cm, false, false);
+  console.log('Editor: new facsimile added', facsimile);
+  v.updateNotation = true;
+} // addFacsimile()
 
 
 // find xmlNode in textBuffer and remove it (including empty line)

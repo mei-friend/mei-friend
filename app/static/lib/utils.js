@@ -625,12 +625,14 @@ export function convertCoords(elem) {
 }
 
 export function rmHash(hashedString) {
+  if (!hashedString) return '';
   return (hashedString.startsWith('#')) ?
     hashedString.split('#')[1] : hashedString;
 }
 
 // escape special characters '.' and ':' for usagage in queryselectors 
 export function escapeXmlId(str) {
-  if (str == null) return '';
+  if (str === null ) return '';
+  if (/^\d/.test(str)) str = 'a' + str;
   return str.replace(/\./g, '\\.').replace(/\:/g, '\\:');
 }

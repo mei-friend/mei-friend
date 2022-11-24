@@ -36,6 +36,9 @@ export function createNotationDiv(parentElement, scale) {
   let facsimilePanel = document.createElement('div');
   facsimilePanel.id = 'facsimile-panel';
 
+  let facsimileMessagePanel = document.createElement('div');
+  facsimileMessagePanel.id = 'facsimile-message-panel';
+
   // SVG: facsimile image container
   var svgContainer = document.createElementNS(svgNameSpace, 'svg');
   svgContainer.id = 'source-image-container';
@@ -47,6 +50,7 @@ export function createNotationDiv(parentElement, scale) {
 
   // append everything
   svgContainer.appendChild(svg);
+  facsimilePanel.append(facsimileMessagePanel);
   facsimilePanel.append(svgContainer);
   facsimileContainer.appendChild(facsimilePanel);
 
@@ -59,7 +63,7 @@ export function createNotationDiv(parentElement, scale) {
   const resizer = document.getElementById('dragMe');
   if (resizer) resizer.innerHTML = icon.kebab;
 
-}
+} // createNotationDiv()
 
 export function createVerovioControlMenu(parentElement, scale) {
 

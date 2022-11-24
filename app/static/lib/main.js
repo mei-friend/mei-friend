@@ -1,6 +1,6 @@
 // mei-friend version and date
-const version = '0.6.7';
-const versionDate = '25 Oct 2022';
+const version = '0.6.8';
+const versionDate = '24 Nov 2022';
 
 var vrvWorker;
 var spdWorker;
@@ -17,6 +17,11 @@ export const isSafari = !!navigator.userAgent.match(/Version\/[\d\.]+.*Safari/);
 // TODO ideally determine version part automatically
 const guidelinesBase = 'https://music-encoding.org/guidelines/v4/';
 
+/**
+ * Object of common MEI schemas, 
+ * by meiProfile ('CMN', 'Mensural', 'Neumes', 'All', 'Any') 
+ * and meiVersion ('4.0.1', etc.)
+ */
 export const commonSchemas = {
   'CMN': {
     '2.1.1': 'https://music-encoding.org/schema/2.1.1/mei-CMN.rng',
@@ -54,7 +59,9 @@ export const commonSchemas = {
     '5.0.0-dev': 'https://music-encoding.org/schema/dev/mei-all_anyStart.rng'
   }
 };
-const defaultSchema = commonSchemas['CMN']['4.0.1'];
+export const defaultMeiVersion = '4.0.1';
+export const defaultMeiProfile = 'CMN';
+export const defaultSchema = commonSchemas[defaultMeiProfile][defaultMeiVersion];
 
 // exports
 export var cm;
@@ -223,8 +230,7 @@ const defaultVerovioOptions = {
   minLastJustification: 0,
   // clefChangeFactor: .83, // option removed in Verovio 3.10.0
   svgAdditionalAttribute: ["layer@n", "staff@n",
-    "dir@vgrp", "dynam@vgrp", "hairpin@vgrp", "pedal@vgrp",
-    "measure@facs", "measure@n"
+    "dir@vgrp", "dynam@vgrp", "hairpin@vgrp", "pedal@vgrp", "measure@n"
   ],
   bottomMarginArtic: 1.2,
   topMarginArtic: 1.2
@@ -252,6 +258,8 @@ const defaultCodeMirrorOptions = {
     "'='": completeIfInTag,
     "Ctrl-Space": "autocomplete",
     "Alt-.": consultGuidelines,
+    "Shift-Alt-f": indentSelection,
+    "Shift-Alt-ï": indentSelection // TODO: overcome strange bindings on MAC
   },
   lint: {
     "caller": cm,
@@ -268,6 +276,8 @@ const defaultCodeMirrorOptions = {
   defaultBrightTheme: 'default', // default theme for OS bright mode
   defaultDarkTheme: 'paraiso-dark' // 'base16-dark', // default theme for OS dark mode
 };
+// add all possible facsimile elements
+att.attFacsimile.forEach(e => defaultVerovioOptions.svgAdditionalAttribute.push(e + '@facs'));
 const defaultKeyMap = `${root}keymaps/default-keymap.json`;
 const sampleEncodingsCSV = `${root}sampleEncodings/sampleEncodings.csv`;
 let freshlyLoaded = false; // flag to ignore a cm.on("changes") event on file load
@@ -463,7 +473,7 @@ export async function validate(mei, updateLinting, options) {
       v.highlightValidation(mei, validation);
     } else if (v.validatorWithSchema && !document.getElementById('autoValidate').checked) {
       v.setValidationStatusToManual();
-    } 
+    }
   }
 }
 
@@ -807,6 +817,10 @@ function speedWorkerEventsHandler(ev) {
   console.log('main.speedWorkerEventsHandler received: ' + ev.data.cmd);
   if (ev.data.cmd === 'listPageSpanningElements') {
     console.log('main() speedWorkerHandler pageSpanners: ', ev.data.pageSpanners);
+    if (!ev.data.pageSpanners) {
+      // MEI file is malformed and pageSpanners could not be extracted
+      return;
+    }
     v.pageSpanners = {
       ...ev.data.pageSpanners
     };
@@ -1213,6 +1227,10 @@ function consultGuidelines() {
   }
 }
 
+function indentSelection() {
+  e.indentSelection(v, cm);
+}
+
 
 // object of interface command functions for buttons and key bindings
 export let cmd = {
@@ -1260,7 +1278,7 @@ export let cmd = {
   'checkFacsimile': () => {
     let tf = document.getElementById('titleFacsimilePanel');
     if (v.xmlDoc.querySelector('facsimile')) {
-      if (tf) tf.setAttribute('open','true');
+      if (tf) tf.setAttribute('open', 'true');
       cmd.showFacsimilePanel();
     } else {
       if (tf) tf.removeAttribute('open');
@@ -1298,6 +1316,7 @@ export let cmd = {
   'openHumdrum': () => openFileDialog('.krn,.hum'),
   'openPae': () => openFileDialog('.pae,.abc'),
   'downloadMei': () => downloadMei(),
+  'indentSelection': () => indentSelection(),
   'validate': () => v.manualValidate(),
   'zoomIn': () => v.zoom(+1, storage),
   'zoomOut': () => v.zoom(-1, storage),
@@ -1352,6 +1371,7 @@ export let cmd = {
   'addMordentBelowUpper': () => e.addControlElement(v, cm, 'mordent', 'below', 'upper'),
   //
   'delete': () => e.deleteElement(v, cm),
+  'cmdDelete': () => e.deleteElement(v, cm, true),
   'invertPlacement': () => e.invertPlacement(v, cm),
   'addVerticalGroup': () => e.addVerticalGroup(v, cm),
   'toggleStacc': () => e.toggleArtic(v, cm, 'stacc'),
@@ -1385,6 +1405,7 @@ export let cmd = {
   'reRenderMei': () => v.reRenderMei(cm, false),
   'reRenderMeiWithout': () => v.reRenderMei(cm, true),
   'ingestFacsimile': () => ingestFacsimile(),
+  'addFacsimile': () => e.addFacsimile(v, cm),
   'resetDefault': () => {
     // we're in a clickhandler, so our storage object is out of scope
     // but we only need to clear it, so just grab the window's storage
@@ -1394,6 +1415,7 @@ export let cmd = {
     }
     logoutFromGithub();
   },
+  'openHelp': () => window.open(`./help`, '_blank'),
   'consultGuidelines': () => consultGuidelines(),
   'escapeKeyPressed': () => {
     // reset settings filter, if settings have focus
@@ -1488,6 +1510,7 @@ function addEventListeners(v, cm) {
   document.getElementById('findPrevious').addEventListener('click', () => CodeMirror.commands.findPrev(cm));
   document.getElementById('replace').addEventListener('click', () => CodeMirror.commands.replace(cm));
   document.getElementById('replaceAll').addEventListener('click', () => CodeMirror.commands.replaceAll(cm));
+  document.getElementById('indentSelection').addEventListener('click', cmd.indentSelection);
   document.getElementById('jumpToLine').addEventListener('click', () => CodeMirror.commands.jumpToLine(cm));
   document.getElementById('manualValidate').addEventListener('click', cmd.validate);
   document.querySelectorAll('.keyShortCut').forEach(e => e.classList.add(platform.startsWith('Mac') ? 'platform-mac' : 'platform-nonmac'));
@@ -1607,6 +1630,7 @@ function addEventListeners(v, cm) {
   document.getElementById('reRenderMeiWithout').addEventListener('click', cmd.reRenderMeiWithout);
   // ingest facsimile sekelton into currently loaded MEI file
   document.getElementById('ingestFacsimile').addEventListener('click', cmd.ingestFacsimile);
+  document.getElementById('addFacsimile').addEventListener('click', cmd.addFacsimile);
   // insert control elements
   document.getElementById('addTempo').addEventListener('click', cmd.addTempo);
   document.getElementById('addDirective').addEventListener('click', cmd.addDirective);
@@ -1768,7 +1792,7 @@ function moveProgressBar() {
   var id = setInterval(frame, 10);
 
   function frame() {
-    (width < 100) ? elem.style.width = (++width) + '%': clearInterval(id);
+    (width < 100) ? elem.style.width = (++width) + '%' : clearInterval(id);
   }
 }
 
@@ -1824,10 +1848,10 @@ export function log(s, code = null) {
 
 function fillInSampleEncodings() {
   fetch(sampleEncodingsCSV, {
-      headers: {
-        'content-type': 'text/csv'
-      }
-    })
+    headers: {
+      'content-type': 'text/csv'
+    }
+  })
     .then((response) => response.text())
     .then((csv) => {
       const lines = csv.split("\n");
@@ -1891,7 +1915,8 @@ function setKeyMap(keyMapFilePath) {
 }
 
 // returns true, if event is a CMD (Mac) or a CTRL (Windows, Linux) event
-function isCtrlOrCmd(ev) {
-  return (platform.startsWith('mac') && ev.metaKey) ||
-    (!platform.startsWith('mac') && ev.ctrlKey);
+export function isCtrlOrCmd(ev) {
+  return ev ?
+    ((platform.startsWith('mac') && ev.metaKey) || (!platform.startsWith('mac') && ev.ctrlKey))
+    : false;
 }

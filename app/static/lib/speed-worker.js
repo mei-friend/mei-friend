@@ -1,9 +1,16 @@
-// worker to pre-compute time-spanning elements per page for accelerating
-// interaction in speedMode
+/* 
+ * Worker to pre-compute time-spanning elements per page for accelerating
+ * interaction in speedMode.
+ * 
+ * We use tXml by Tobias Nickel to parse the MEI encoding and recursive
+ * operations for traversing the DOM structure.
+ */
 
-var timeSpanningElements; // from attribute-classes.js
+var timeSpanningElements; // elements with @tstamp2; from attribute-classes.js
 
-// message handler
+/*
+ * Message handler
+ */
 onmessage = function (e) {
   let result = {};
   let t1 = performance.now();
@@ -23,10 +30,16 @@ onmessage = function (e) {
   let t2 = performance.now();
   console.log('SpeedWorker finished in ' + (t2 - t1) + ' ms.');
   if (result) postMessage(result);
-}
+} // onmessage()
 
-// List all timespanning elements with @startid/@endid attr on different pages.
-// Does the same as in speed.listPageSpanningElements(), but without DOM stuff
+/**
+ * @param {string} mei
+ * @param {array} breaks
+ * @param {string} breaksOption
+ * @returns {array} pageSpanners
+ * List all timespanning elements with @startid|@endid attr on different pages.
+ * Does the same as in speed.listPageSpanningElements(), but without DOM stuff
+ */
 function listPageSpanningElements(mei, breaks, breaksOption) {
   let pageSpanners = {
     start: {},
@@ -37,99 +50,56 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
   music = getElementByTagName(xmlDoc, 'music', music);
   if (!music) {
     console.log('Invalid MEI file. ')
-    pageSpanners.start = 'invalid';
-    return pageSpanners;
+    return undefined;
   }
   let score;
   score = getElementByTagName(music.children, 'score', score);
   if (!score) {
     console.log('Missing score element in MEI file.');
-    pageSpanners.start = 'invalid';
-    return pageSpanners;
+    return undefined;
   } else {
     console.log('xmlDoc music > score: ', score);
   }
 
-  if (score) {
-    // collect all time-spanning elements with startid and endid
-    let tsTable = {}; // object with id as keys and an array of [startid, endid]
-    let idList = []; // list of time-pointer ids to be checked
-    tsTable = crawl(score.children, tsTable, idList);
-    noteTable = {};
-    let count = false;
-    let p = 1;
-    // determine page number for list of ids
-    function dig(nodeArray, noteTable, idList, childOfMeasure = false) {
-      if (breaksOption === 'line' || breaksOption === 'encoded') {
-        nodeArray.forEach(el => { // el obj w/ tagName, children, attributes
-          if (el.hasOwnProperty("tagName")) {
-            if (el.tagName === 'measure') count = true;
-            if (count && breaks.includes(el.tagName)) p++;
-            let id = el.attributes['xml:id'];
-            if (id) {
-              let i = idList.indexOf(id);
-              if (i >= 0) {
-                noteTable[id] = p;
-                delete idList[i];
-              }
-            }
-            if (el.children) {
-              noteTable = dig(el.children, noteTable, idList);
-            }
-          }
-        });
-      } else if (breaksOption = 'auto') { // TODO
-        nodeArray.forEach(el => { // el obj w/ tagName, children, attributes
-          if (el.hasOwnProperty("tagName")) {
-            if (el.tagName === 'measure') childOfMeasure = false;
-            if (p < Object.keys(breaks).length &&
-              el.attributes['xml:id'] === breaks[p][breaks[p].length - 1]) {
-              childOfMeasure = true; // for children of last measure on page
-              p++;
-            }
-            let id = el.attributes['xml:id'];
-            if (id) {
-              let i = idList.indexOf(id);
-              if (i >= 0) {
-                noteTable[id] = childOfMeasure ? p - 1 : p;
-                delete idList[i];
-              }
-            }
-            if (el.children) {
-              noteTable = dig(el.children, noteTable, idList, childOfMeasure);
-            }
-          }
-        });
-      }
-      return noteTable;
-    } // dig()
+  // collect all time-spanning elements with @startid and @endid
+  let tsTable = {}; // object with id as keys and an array of [startid, endid]
+  let idList = []; // list of time-pointer ids to be checked
+  tsTable = crawl(score.children, tsTable, idList);
 
-    noteTable = dig(score.children, noteTable, idList);
+  // determine page number for list of ids
+  noteTable = {};
+  let count = false;
+  let p = 1;
 
-    // packing pageSpanners with different page references
-    let p1 = 0;
-    let p2 = 0;
-    for (let spannerIds of Object.keys(tsTable)) {
-      p1 = noteTable[tsTable[spannerIds][0]];
-      p2 = noteTable[tsTable[spannerIds][1]];
-      if (p1 > 0 && p2 > 0 && p1 != p2) {
-        if (pageSpanners.start[p1])
-          pageSpanners.start[p1].push(spannerIds);
-        else
-          pageSpanners.start[p1] = [spannerIds];
-        if (pageSpanners.end[p2])
-          pageSpanners.end[p2].push(spannerIds);
-        else
-          pageSpanners.end[p2] = [spannerIds];
-      }
+  noteTable = dig(score.children, noteTable, idList);
+
+  // packing pageSpanners with different page references
+  let p1 = 0;
+  let p2 = 0;
+  for (let spannerIds of Object.keys(tsTable)) {
+    p1 = noteTable[tsTable[spannerIds][0]];
+    p2 = noteTable[tsTable[spannerIds][1]];
+    if (p1 > 0 && p2 > 0 && p1 != p2) {
+      if (pageSpanners.start[p1])
+        pageSpanners.start[p1].push(spannerIds);
+      else
+        pageSpanners.start[p1] = [spannerIds];
+      if (pageSpanners.end[p2])
+        pageSpanners.end[p2].push(spannerIds);
+      else
+        pageSpanners.end[p2] = [spannerIds];
     }
-    return pageSpanners;
-  } else {
-    pageSpanners.start = 'invalid';
-    return pageSpanners;
   }
+  return pageSpanners;
 
-  // find time-spanning elements and store their @startid/@endids in object
+  /**
+   * Find time-spanning elements and store their @startid/@endids in object tsTable
+   * and additionally in one aggregated array idList
+   * @param {array} nodeArray 
+   * @param {object} tsTable 
+   * @param {array} idList 
+   * @returns {object} tsTable
+   */
   function crawl(nodeArray, tsTable, idList) {
     nodeArray.forEach(el => {
       if (timeSpanningElements.includes(el.tagName)) {
@@ -146,6 +116,60 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
     });
     return tsTable;
   } // crawl()
+
+  /**
+   * Determine the page number for each element in nodeArray recursively, 
+   * store it in noteTable[id] = p; and delete it from idList
+   * @param {array} nodeArray 
+   * @param {object} noteTable 
+   * @param {array} idList 
+   * @param {boolean} childOfMeasure 
+   * @returns 
+   */
+  function dig(nodeArray, noteTable, idList, childOfMeasure = false) {
+    if (breaksOption === 'line' || breaksOption === 'encoded') {
+      nodeArray.forEach(el => { // el obj w/ tagName, children, attributes
+        if (el.hasOwnProperty('tagName')) {
+          if (el.tagName === 'measure') count = true;
+          if (count && breaks.includes(el.tagName)) p++;
+          let id = el.attributes['xml:id'];
+          if (id) {
+            let i = idList.indexOf(id);
+            if (i >= 0) { // found an id pointed to, so remember it
+              noteTable[id] = p;
+              delete idList[i];
+            }
+          }
+          if (el.children) {
+            noteTable = dig(el.children, noteTable, idList);
+          }
+        }
+      });
+    } else if (breaksOption === 'auto') {
+      nodeArray.forEach(el => { // el obj w/ tagName, children, attributes
+        if (el.hasOwnProperty('tagName')) {
+          if (el.tagName === 'measure') childOfMeasure = false;
+          if (p < Object.keys(breaks).length &&
+            el.attributes['xml:id'] === breaks[p][breaks[p].length - 1]) {
+            childOfMeasure = true; // for children of last measure on page
+            p++;
+          }
+          let id = el.attributes['xml:id'];
+          if (id) {
+            let i = idList.indexOf(id);
+            if (i >= 0) { // found an id pointed to, so remember it
+              noteTable[id] = childOfMeasure ? p - 1 : p;
+              delete idList[i];
+            }
+          }
+          if (el.children) {
+            noteTable = dig(el.children, noteTable, idList, childOfMeasure);
+          }
+        }
+      });
+    }
+    return noteTable;
+  } // dig()
 
 } // listPageSpanningElements()
 

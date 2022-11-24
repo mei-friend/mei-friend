@@ -68,7 +68,9 @@
     "shift-c": "addCClefChangeBefore",
     "shift-f": "addFClefChangeBefore",
 
-    "escape": "escapeKeyPressed"
+    "escape": "escapeKeyPressed",
+
+    "shift-alt-f": "indentSelection"
   },
 
   ".platform-darwin": {
@@ -97,10 +99,14 @@
     "cmd-s": "downloadMei",
     "cmd-shift-c": "cleanAccid",
     "cmd-shift-r": "renumberMeasures",
+    "cmd-?": "openHelp",
+    "cmd-ß": "openHelp",
     "alt-.": "consultGuidelines",
     "alt-…": "consultGuidelines",
     "cmd-,": "toggleSettingsPanel",
-    "cmd-a": "toggleAnnotationPanel"
+    "cmd-a": "toggleAnnotationPanel",
+    "shift-alt-ï": "indentSelection",
+    "cmd-delete": "cmdDelete"
   },
 
   ".platform-win32, .platform-linux": {
@@ -129,8 +135,11 @@
     "ctrl-s": "downloadMei",
     "ctrl-shift-c": "cleanAccid",
     "ctrl-shift-r": "renumberMeasures",
+    "ctrl-?": "openHelp",
+    "ctrl-ß": "openHelp",
     "alt-.": "consultGuidelines",
     "ctrl-,": "toggleSettingsPanel",
-    "ctrl-a": "toggleAnnotationPanel"
+    "ctrl-a": "toggleAnnotationPanel",
+    "ctrl-delete": "cmdDelete"
   }
 }
