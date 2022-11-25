@@ -88,6 +88,10 @@ export let supportedVerovioVersions = {
     'url': 'https://www.verovio.org/javascript/latest/verovio-toolkit-hum.js',
     'description': 'Current Verovio release'
   },
+  '3.13.0': {
+    'url': 'https://www.verovio.org/javascript/3.12.1/verovio-toolkit-hum.js',
+    'description': 'Verovio release 3.13.0'
+  },
   '3.12.1': {
     'url': 'https://www.verovio.org/javascript/3.12.1/verovio-toolkit-hum.js',
     'description': 'Verovio release 3.12.1'
