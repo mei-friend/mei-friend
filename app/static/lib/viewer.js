@@ -852,9 +852,9 @@ export default class Viewer {
       },
       selectToolkitVersion: {
         title: 'Verovio version',
-        description: `Select Verovio toolkit version 
-                      (* Switching to older versions before 3.11.0
-                      might require a refresh due to memory issues.)`,
+        description: 'Select Verovio toolkit version ' +
+          '(* Switching to older versions before 3.11.0 ' +
+          'might require a refresh due to memory issues.)',
         type: 'select',
         default: defaultVerovioVersion,
         values: Object.keys(supportedVerovioVersions),
@@ -863,10 +863,19 @@ export default class Viewer {
       },
       toggleSpeedMode: {
         title: 'Speed Mode',
-        description: `Toggle Verovio Speed Mode. 
-                      In Speedmode, only the current page
-                      is sent to Verovio to reduce rendering
-                      time with large files`,
+        description: 'Toggle Verovio Speed Mode. ' +
+          'In Speedmode, only the current page ' +
+          'is sent to Verovio to reduce rendering ' +
+          'time with large files',
+        type: 'bool',
+        default: true
+      },
+      addApplicationNote: {
+        title: 'Auto add application note',
+        description: 'Add a application element to the encoding ' +
+          'description in the MEI header identifying ' +
+          'application name, version, date of first ' +
+          'and last edit',
         type: 'bool',
         default: true
       },
@@ -890,8 +899,8 @@ export default class Viewer {
       },
       annotationDisplayLimit: {
         title: 'Maximum number of annotations',
-        description: `Maximum number of annotations to display 
-                      (large numbers may slow mei-friend)`,
+        description: 'Maximum number of annotations to display ' + 
+                      '(large numbers may slow mei-friend)',
         type: 'int',
         min: 0,
         step: 100,
@@ -935,10 +944,6 @@ export default class Viewer {
         type: 'bool',
         default: false
       },
-      // controlMenuLineSeparator: {
-      //   title: 'options-line', // class name of hr element
-      //   type: 'line'
-      // },
       controlMenuSettings: {
         title: 'Control menu',
         description: 'Define items to be shown in control menu above the notation',
@@ -963,10 +968,6 @@ export default class Viewer {
         type: 'bool',
         default: true
       },
-      // renumberMeasuresLineSeparator: {
-      //   title: 'options-line', // class name of hr element
-      //   type: 'line'
-      // },
       renumberMeasuresHeading: {
         title: 'Renumber measures',
         description: 'Settings for renumbering measures',
@@ -1016,7 +1017,6 @@ export default class Viewer {
         type: 'bool',
         default: false
       },
-      // deleteme
       selectFacsimilePanelOrientation: {
         title: 'Facsimile panel position',
         description: 'Select facsimile panel position relative to notation',
@@ -1125,7 +1125,7 @@ export default class Viewer {
         case 'respSelect':
           if (this.xmlDoc)
             o.values = Array.from(this.xmlDoc.querySelectorAll('corpName[*|id]'))
-            .map(e => e.getAttribute('xml:id'));
+              .map(e => e.getAttribute('xml:id'));
           break;
         case 'controlMenuFontSelector':
           document.getElementById('font-ctrls').style.display = optDefault ? 'inherit' : 'none';
@@ -1438,11 +1438,11 @@ export default class Viewer {
         if (ev.target.type === 'number') value = parseFloat(value);
         this.applyEditorOption(cm, option, value,
           storage.hasOwnProperty('cm-matchTheme') ?
-          storage['cm-matchTheme'] : mfDefaults['matchTheme']);
+            storage['cm-matchTheme'] : mfDefaults['matchTheme']);
         if (option === 'theme' && storage.hasOwnProperty('cm-matchTheme')) {
           this.setNotationColors(
             storage.hasOwnProperty('cm-matchTheme') ?
-            storage['cm-matchTheme'] : mfDefaults['matchTheme']);
+              storage['cm-matchTheme'] : mfDefaults['matchTheme']);
         }
         if ((mfDefaults.hasOwnProperty(option) && option !== 'theme' && mfDefaults[option].toString() === value.toString()) ||
           (option === 'theme' && (window.matchMedia('(prefers-color-scheme: dark)').matches ?
@@ -1626,7 +1626,7 @@ export default class Viewer {
     div.classList.add('optionsItem');
     let label = document.createElement('label');
     let title = o.description;
-    if (o.default) title += ' (default: ' + o.default+')';
+    if (o.default) title += ' (default: ' + o.default + ')';
     label.setAttribute('title', title);
     label.setAttribute('for', opt);
     label.innerText = o.title;
@@ -2047,7 +2047,7 @@ export default class Viewer {
     let msg = '';
     if (msgObj.hasOwnProperty('response'))
       msg = 'Schema not found (' + msgObj.response.status + ' ' +
-      msgObj.response.statusText + '): ';
+        msgObj.response.statusText + '): ';
     if (msgObj.hasOwnProperty('err'))
       msg = msgObj.err + ' ';
     if (msgObj.hasOwnProperty('schemaFile'))

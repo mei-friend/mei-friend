@@ -98,17 +98,18 @@ export function deleteElement(v, cm, modifyerKey = false) {
       // remove zone; with CMD remove pointing element; without just remove @facs from pointing element
       removeZone(v, cm, element, modifyerKey);
     } else if (!document.getElementById('editFacsimileZones').checked) {
-    v.show
-  } else {
-    console.info('Element ' + id + ' not supported for deletion.');
-    return;
-  }
+      v.show
+    } else {
+      console.info('Element ' + id + ' not supported for deletion.');
+      return;
+    }
   element.remove();
   loadFacsimile(v.xmlDoc);
   // buffer.groupChangesSinceCheckpoint(checkPoint); TODO
   v.selectedElements = selectedElements;
   v.lastNoteId = v.selectedElements[v.selectedElements.length - 1];
   v.encodingHasChanged = true;
+  addApplicationInfo(v, cm)
   v.updateData(cm, false, true);
   v.updateNotation = true;
 } // deleteElement()
@@ -212,6 +213,7 @@ export function addControlElement(v, cm, elName, placement, form) {
   v.selectedElements = [];
   v.selectedElements.push(uuid);
   addApplicationInfo(v, cm);
+  addApplicationInfo(v, cm)
   v.updateData(cm, false, true);
   v.updateNotation = true;
 } // addControlElement()
@@ -279,7 +281,7 @@ export function invertPlacement(v, cm, modifier = false) {
       }
       if (el.nodeName === 'fermata')
         val === 'below' ?
-        el.setAttribute('form', 'inv') : el.removeAttribute('form');
+          el.setAttribute('form', 'inv') : el.removeAttribute('form');
       el.setAttribute(attr, val);
       range = replaceInEditor(cm, el, true);
       // txtEdr.autoIndentSelectedRows();
@@ -349,6 +351,7 @@ export function invertPlacement(v, cm, modifier = false) {
   // console.info('TextCursor: ', txtEdr.getCursorBufferPosition());
   if (range) cm.setCursor(range.end);
   v.selectedElements = ids;
+  addApplicationInfo(v, cm)
   v.updateData(cm, false, true);
   v.updateNotation = true; // update notation again
 } // invertPlacement()
@@ -388,6 +391,7 @@ export function toggleArtic(v, cm, artic = "stacc") {
   }
   if (range) cm.setCursor(range.end);
   v.selectedElements = ids;
+  addApplicationInfo(v, cm)
   v.updateData(cm, false, true);
   v.updateNotation = true; // update notation again
 } // toggleArtic()
@@ -409,6 +413,7 @@ export function shiftPitch(v, cm, deltaPitch) {
       replaceInEditor(cm, pitchMover(el, deltaPitch));
   }
   v.selectedElements = ids;
+  addApplicationInfo(v, cm)
   v.updateData(cm, false, true);
   v.updateNotation = true; // update notation again
 } // shiftPitch()
@@ -436,6 +441,7 @@ export function moveElementToNextStaff(v, cm, upwards = true) {
     }
   }
   v.selectedElements = ids;
+  addApplicationInfo(v, cm)
   v.updateData(cm, false, true);
   v.updateNotation = true; // update notation again
 } // moveElementToNextStaff()
@@ -485,6 +491,7 @@ export function addBeamElement(v, cm, elementName = 'beam') {
     // buffer.groupChangesSinceCheckpoint(checkPoint); // TODO
     v.selectedElements = [];
     v.selectedElements.push(uuid);
+    addApplicationInfo(v, cm)
     v.updateData(cm, false, true);
   } else {
     console.log('Cannot add ' + elementName + ' element, selected elements have different parents.');
@@ -529,6 +536,7 @@ export function addBeamSpan(v, cm) {
   v.selectedElements = [];
   v.selectedElements.push(uuid);
   v.lastNoteId = id2;
+  addApplicationInfo(v, cm)
   v.updateData(cm, false, true);
   v.updateNotation = true; // update notation again
 } // addBeamSpan()
@@ -567,6 +575,7 @@ export function addOctaveElement(v, cm, disPlace = 'above', dis = '8') {
   v.selectedElements = [];
   v.selectedElements.push(uuid);
   v.lastNoteId = id2;
+  addApplicationInfo(v, cm)
   v.updateData(cm, false, true);
   v.updateNotation = true; // update notation again
 } // addOctaveElement()
@@ -600,6 +609,7 @@ export function addSuppliedElement(v, cm) {
   // buffer.groupChangesSinceCheckpoint(checkPoint); // TODO
   v.selectedElements = [];
   uuids.forEach(u => v.selectedElements.push(u));
+  addApplicationInfo(v, cm)
   v.updateData(cm, false, true);
   v.updateNotation = true; // update notation again
 } // addSuppliedElement()
@@ -631,6 +641,7 @@ export function addVerticalGroup(v, cm) {
       console.warn('Vertical group not supported for ', el);
     }
   });
+  addApplicationInfo(v, cm)
   v.updateData(cm, false, true);
   v.updateNotation = true; // update notation again
 } // addVerticalGroup()
@@ -641,62 +652,60 @@ export function addVerticalGroup(v, cm) {
  * @param {object} cm 
  */
 export function addApplicationInfo(v, cm) {
-  let meiHead = v.xmlDoc.querySelector('meiHead');
-  if (!meiHead) return false;
-  let appList = v.xmlDoc.querySelectorAll('application');
-  let encodingDesc, appInfo, application;
-  let update = false;
-  for (let a of appList) {
-    appInfo = a.parentElement;
-    encodingDesc = appInfo.parentElement;
-    if (a.querySelector('name').textContent === 'mei-friend') {
-      application = a; // update existing application element
-      application.setAttribute('enddate', utils.toISOStringLocal(new Date()));
-      application.setAttribute('version', version);
-      replaceInEditor(cm, application);
-      update = true;
-      break;
+  if (document.getElementById('addApplicationNote').checked) {
+    let meiHead = v.xmlDoc.querySelector('meiHead');
+    if (!meiHead) return false;
+    let appList = v.xmlDoc.querySelectorAll('application');
+    let encodingDesc, appInfo, application;
+    let update = false;
+    for (let a of appList) {
+      appInfo = a.parentElement;
+      encodingDesc = appInfo.parentElement;
+      if (a.querySelector('name').textContent === 'mei-friend') {
+        application = a; // update existing application element
+        application.setAttribute('enddate', utils.toISOStringLocal(new Date()));
+        application.setAttribute('version', version);
+        replaceInEditor(cm, application);
+        update = true;
+        break;
+      }
     }
-  }
-  if (update) return true;
+    if (update) return true;
 
-  // application tree is created first time
-  let updateElement;
-  if (!encodingDesc) {
-    encodingDesc = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'encodingDesc');
-    encodingDesc.setAttributeNS(dutils.xmlNameSpace, 'id', 'encodingDesc-' + utils.generateUUID());
-    meiHead.appendChild(encodingDesc);
-    updateElement = encodingDesc;
+    // application tree for mei-friend is created first time
+    if (!encodingDesc) {
+      encodingDesc = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'encodingDesc');
+      encodingDesc.setAttributeNS(dutils.xmlNameSpace, 'id', 'encodingDesc-' + utils.generateUUID());
+      meiHead.appendChild(encodingDesc);
+    }
+    if (!appInfo) {
+      appInfo = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'appInfo');
+      appInfo.setAttributeNS(dutils.xmlNameSpace, 'id', 'appInfo-' + utils.generateUUID());
+      encodingDesc.appendChild(appInfo);
+    }
+    if (!application) {
+      application = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'application');
+      application.setAttributeNS(dutils.xmlNameSpace, 'id', 'application-' + utils.generateUUID());
+      application.setAttribute('startdate', utils.toISOStringLocal(new Date()));
+      application.setAttribute('version', version);
+      let name = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'name');
+      name.textContent = 'mei-friend';
+      name.setAttributeNS(dutils.xmlNameSpace, 'id', 'name-' + utils.generateUUID());
+      let p = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'p')
+      p.textContent = 'First edit by mei-friend ' + version + ' (' + versionDate + ')';
+      p.setAttributeNS(dutils.xmlNameSpace, 'id', 'p-' + utils.generateUUID());
+      application.appendChild(name);
+      application.appendChild(p);
+      appInfo.appendChild(application);
+    }
+    // insert new element to editor
+    const {
+      start,
+      end
+    } = replaceInEditor(cm, meiHead);
+    for (let l = start.line; l <= end.line; l++) cm.indentLine(l, 'smart');
+    return true;
   }
-  if (!appInfo) {
-    appInfo = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'appInfo');
-    appInfo.setAttributeNS(dutils.xmlNameSpace, 'id', 'appInfo-' + utils.generateUUID());
-    encodingDesc.appendChild(appInfo);
-    updateElement = appInfo;
-  }
-  if (!application) {
-    application = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'application');
-    application.setAttributeNS(dutils.xmlNameSpace, 'id', 'application-' + utils.generateUUID());
-    application.setAttribute('startdate', utils.toISOStringLocal(new Date()));
-    application.setAttribute('version', version);
-    let name = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'name');
-    name.textContent = 'mei-friend';
-    name.setAttributeNS(dutils.xmlNameSpace, 'id', 'name-' + utils.generateUUID());
-    let p = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'p')
-    p.textContent = 'First edit by mei-friend ' + version + ' (' + versionDate + ')';
-    p.setAttributeNS(dutils.xmlNameSpace, 'id', 'p-' + utils.generateUUID());
-    application.appendChild(name);
-    application.appendChild(p);
-    appInfo.appendChild(application);
-    updateElement = application;
-  }
-  // insert new element to editor
-  const {
-    start,
-    end
-  } = replaceInEditor(cm, meiHead);
-  for (let l = start.line; l <= end.line; l++) cm.indentLine(l, 'smart');
-  return true;
 } // addApplicationInfo()
 
 // wrapper for cleaning superfluous @accid.ges attributes
@@ -713,6 +722,7 @@ export function renumberMeasures(v, cm, change) {
   v.loadXml(cm.getValue(), true);
   utils.renumberMeasures(v, cm, 1, change);
   if (document.getElementById('showFacsimilePanel').checked) loadFacsimile(v.xmlDoc);
+  addApplicationInfo(v, cm)
   v.updateData(cm, false, true);
   v.updateNotation = true;
 } // renumberMeasures()
@@ -783,6 +793,7 @@ export function addZone(v, cm, rect, addMeasure = true) {
 
     // updating
     loadFacsimile(v.xmlDoc);
+    addApplicationInfo(v, cm)
     v.updateData(cm, false, false);
     console.log('Editor: new zone ' + uuid + 'added.', rect);
     v.updateNotation = true;
@@ -828,6 +839,7 @@ export function addZone(v, cm, rect, addMeasure = true) {
 
     // updating
     loadFacsimile(v.xmlDoc);
+    addApplicationInfo(v, cm)
     v.updateData(cm, false, false);
     console.log('Editor: new zone ' + uuid + 'added.', rect);
     v.updateNotation = true;
@@ -860,6 +872,7 @@ export function removeZone(v, cm, zone, removeMeasure = false) {
     }
   });
   loadFacsimile(v.xmlDoc);
+  addApplicationInfo(v, cm)
   v.updateData(cm, false, false);
 } // removeZone()
 
@@ -928,6 +941,7 @@ export function addFacsimile(v, cm) {
   utils.setCursorToId(cm, facsimileId);
 
   loadFacsimile(v.xmlDoc);
+  addApplicationInfo(v, cm)
   v.updateData(cm, false, false);
   console.log('Editor: new facsimile added', facsimile);
   v.updateNotation = true;
