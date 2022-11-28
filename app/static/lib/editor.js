@@ -6,9 +6,14 @@ import * as speed from './speed.js';
 import * as utils from './utils.js';
 import * as dutils from './dom-utils.js';
 import * as att from './attribute-classes.js';
-import { loadFacsimile } from './facsimile.js';
+import {
+  loadFacsimile
+} from './facsimile.js';
 import Viewer from './viewer.js';
-import { isCtrlOrCmd } from './main.js';
+import {
+  version,
+  versionDate
+} from './main.js';
 
 // smart indent selected region in editor, if none, do all
 export function indentSelection(v, cm) {
@@ -93,11 +98,11 @@ export function deleteElement(v, cm, modifyerKey = false) {
       // remove zone; with CMD remove pointing element; without just remove @facs from pointing element
       removeZone(v, cm, element, modifyerKey);
     } else if (!document.getElementById('editFacsimileZones').checked) {
-      v.show
-    } else {
-      console.info('Element ' + id + ' not supported for deletion.');
-      return;
-    }
+    v.show
+  } else {
+    console.info('Element ' + id + ' not supported for deletion.');
+    return;
+  }
   element.remove();
   loadFacsimile(v.xmlDoc);
   // buffer.groupChangesSinceCheckpoint(checkPoint); TODO
@@ -276,7 +281,7 @@ export function invertPlacement(v, cm, modifier = false) {
       }
       if (el.nodeName === 'fermata')
         val === 'below' ?
-          el.setAttribute('form', 'inv') : el.removeAttribute('form');
+        el.setAttribute('form', 'inv') : el.removeAttribute('form');
       el.setAttribute(attr, val);
       range = replaceInEditor(cm, el, true);
       // txtEdr.autoIndentSelectedRows();
@@ -631,6 +636,49 @@ export function addVerticalGroup(v, cm) {
   v.updateData(cm, false, true);
   v.updateNotation = true; // update notation again
 } // addVerticalGroup()
+
+/**
+ * Adds an application element to appInfo or updates its date, if already there
+ * @param {Viewer} v 
+ * @param {object} cm 
+ */
+export function addApplicationInfo(v, cm) {
+  let appList = v.xmlDoc.querySelectorAll('application');
+  let appInfo, application;
+  appList.forEach(a => {
+    appInfo = a.parentElement;
+    if (a.querySelector('name').textContent === 'mei-friend') {
+      application = a;
+      application.setAttribute('enddate', utils.toISOStringLocal(new Date()));
+      application.setAttribute('version', version);
+      replaceInEditor(cm, application);
+    }
+  });
+  if (!application) {
+    application = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'application');
+    application.setAttributeNS(dutils.xmlNameSpace, 'id', 'application-' + utils.generateUUID());
+    application.setAttribute('startdate', utils.toISOStringLocal(new Date()));
+    application.setAttribute('version', version);
+    let name = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'name');
+    name.textContent = 'mei-friend';
+    name.setAttributeNS(dutils.xmlNameSpace, 'id', 'name-' + utils.generateUUID());
+    let p = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'p')
+    p.textContent = 'Edited by mei-friend ' + version + '(' + versionDate + ')';
+    p.setAttributeNS(dutils.xmlNameSpace, 'id', 'p-' + utils.generateUUID());
+    application.appendChild(name);
+    application.appendChild(p);
+
+    if (appInfo)
+      appInfo.appendChild(application);
+    let appInfoId = appInfo.getAttribute('xml:id');
+    if (appInfoId) {
+      utils.setCursorToId(cm, appInfoId);
+      cm.execCommand('goLineEnd');
+      cm.replaceRange('\n' + dutils.xmlToString(application), cm.getCursor());
+      cm.execCommand('indentAuto');
+    }
+  }
+} // addApplicationInfo()
 
 // wrapper for cleaning superfluous @accid.ges attributes
 export function cleanAccid(v, cm) {

@@ -632,7 +632,22 @@ export function rmHash(hashedString) {
 
 // escape special characters '.' and ':' for usagage in queryselectors 
 export function escapeXmlId(str) {
-  if (str === null ) return '';
+  if (str === null) return '';
   if (/^\d/.test(str)) str = 'a' + str;
   return str.replace(/\./g, '\\.').replace(/\:/g, '\\:');
+}
+
+/** 
+ * Returns an ISO 8601 string in lokal timezone
+ * @param {Date} d - date to create string for
+ * @returns {string} formatted string
+ */
+export function toISOStringLocal(d) {
+  function z(n) {
+    return (n < 10 ? '0' : '') + n
+  }
+  return d.getFullYear() + '-' + z(d.getMonth() + 1) + '-' +
+    z(d.getDate()) + 'T' + z(d.getHours()) + ':' +
+    z(d.getMinutes()) + ':' + z(d.getSeconds())
+
 }
