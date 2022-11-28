@@ -124,11 +124,8 @@ export function addControlElement(v, cm, elName, placement, form) {
   let startId = v.selectedElements[0];
   var startEl = v.xmlDoc.querySelector("[*|id='" + startId + "']");
   if (!startEl) return;
-  if (!['note', 'chord', 'rest', 'mRest', 'multiRest']
-    .includes(startEl.nodeName)) {
-    console.info(
-      'addControlElement: Cannot add new element to start element' +
-      startEl.nodeName + '.');
+  if (!['note', 'chord', 'rest', 'mRest', 'multiRest'].includes(startEl.nodeName)) {
+    console.info('addControlElement: Cannot add new element to start element' + startEl.nodeName + '.');
     return;
   }
   // find and validate end element
@@ -214,6 +211,7 @@ export function addControlElement(v, cm, elName, placement, form) {
   v.lastNoteId = startId;
   v.selectedElements = [];
   v.selectedElements.push(uuid);
+  addApplicationInfo(v, cm);
   v.updateData(cm, false, true);
   v.updateNotation = true;
 } // addControlElement()
@@ -643,17 +641,39 @@ export function addVerticalGroup(v, cm) {
  * @param {object} cm 
  */
 export function addApplicationInfo(v, cm) {
+  let meiHead = v.xmlDoc.querySelector('meiHead');
+  if (!meiHead) return false;
   let appList = v.xmlDoc.querySelectorAll('application');
-  let appInfo, application;
-  appList.forEach(a => {
+  let encodingDesc, appInfo, application;
+  let update = false;
+  for (let a of appList) {
     appInfo = a.parentElement;
+    encodingDesc = appInfo.parentElement;
     if (a.querySelector('name').textContent === 'mei-friend') {
-      application = a;
+      application = a; // update existing application element
       application.setAttribute('enddate', utils.toISOStringLocal(new Date()));
       application.setAttribute('version', version);
       replaceInEditor(cm, application);
+      update = true;
+      break;
     }
-  });
+  }
+  if (update) return true;
+
+  // application tree is created first time
+  let updateElement;
+  if (!encodingDesc) {
+    encodingDesc = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'encodingDesc');
+    encodingDesc.setAttributeNS(dutils.xmlNameSpace, 'id', 'encodingDesc-' + utils.generateUUID());
+    meiHead.appendChild(encodingDesc);
+    updateElement = encodingDesc;
+  }
+  if (!appInfo) {
+    appInfo = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'appInfo');
+    appInfo.setAttributeNS(dutils.xmlNameSpace, 'id', 'appInfo-' + utils.generateUUID());
+    encodingDesc.appendChild(appInfo);
+    updateElement = appInfo;
+  }
   if (!application) {
     application = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'application');
     application.setAttributeNS(dutils.xmlNameSpace, 'id', 'application-' + utils.generateUUID());
@@ -663,21 +683,20 @@ export function addApplicationInfo(v, cm) {
     name.textContent = 'mei-friend';
     name.setAttributeNS(dutils.xmlNameSpace, 'id', 'name-' + utils.generateUUID());
     let p = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'p')
-    p.textContent = 'Edited by mei-friend ' + version + '(' + versionDate + ')';
+    p.textContent = 'First edit by mei-friend ' + version + ' (' + versionDate + ')';
     p.setAttributeNS(dutils.xmlNameSpace, 'id', 'p-' + utils.generateUUID());
     application.appendChild(name);
     application.appendChild(p);
-
-    if (appInfo)
-      appInfo.appendChild(application);
-    let appInfoId = appInfo.getAttribute('xml:id');
-    if (appInfoId) {
-      utils.setCursorToId(cm, appInfoId);
-      cm.execCommand('goLineEnd');
-      cm.replaceRange('\n' + dutils.xmlToString(application), cm.getCursor());
-      cm.execCommand('indentAuto');
-    }
+    appInfo.appendChild(application);
+    updateElement = application;
   }
+  // insert new element to editor
+  const {
+    start,
+    end
+  } = replaceInEditor(cm, meiHead);
+  for (let l = start.line; l <= end.line; l++) cm.indentLine(l, 'smart');
+  return true;
 } // addApplicationInfo()
 
 // wrapper for cleaning superfluous @accid.ges attributes
@@ -957,22 +976,27 @@ export function replaceInEditor(cm, xmlNode, select = false, newNode = null) {
     dutils.xmlToString(newNode) : dutils.xmlToString(xmlNode);
   // search in buffer
   let itemId = xmlNode.getAttribute('xml:id');
-  let searchSelfClosing = '(?:<' + xmlNode.nodeName +
-    `)(\\s+?)([^>]*?)(?:xml:id=["']` + itemId + `['"])([^>]*?)(?:/>)`;
+  let xmlIdCheck = '';
+  if (itemId) xmlIdCheck = `(\\s+?)([^>]*?)(?:xml:id=["']` + itemId + `['"])`;
+  let searchSelfClosing = '(?:<' + xmlNode.nodeName + `)` +
+    xmlIdCheck + `([^>]*?)(?:/>)`;
   // console.info('searchSelfClosing: ' + searchSelfClosing);
   let sc = cm.getSearchCursor(new RegExp(searchSelfClosing));
   if (sc.findNext()) {
     sc.replace(newMEI);
   } else {
-    let searchFullElement = '(?:<' + xmlNode.nodeName +
-      `)(\\s+?)([^>]*?)(?:xml:id=["']` + itemId +
-      `["'])([\\s\\S]*?)(?:</` + xmlNode.nodeName + '[ ]*?>)';
+    let searchFullElement = '(?:<' + xmlNode.nodeName + `)` +
+      xmlIdCheck + `([\\s\\S]*?)(?:</` + xmlNode.nodeName + '[ ]*?>)';
     sc = cm.getSearchCursor(new RegExp(searchFullElement));
     if (sc.findNext()) sc.replace(newMEI)
     // console.info('searchFullElement: ' + searchFullElement);
   }
   if (!sc.atOccurrence) {
     console.info('replaceInEditor(): nothing replaced for ' + itemId + '.');
+    return {
+      start: -1,
+      end: -1
+    };
   } else if (select) {
     sc = cm.getSearchCursor(newMEI);
     if (sc.findNext()) {
