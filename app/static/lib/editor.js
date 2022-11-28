@@ -692,7 +692,7 @@ export function addApplicationInfo(v, cm) {
       name.textContent = 'mei-friend';
       name.setAttributeNS(dutils.xmlNameSpace, 'id', 'name-' + utils.generateUUID());
       let p = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'p')
-      p.textContent = 'First edit by mei-friend ' + version + ' (' + versionDate + ')';
+      p.textContent = 'First edit by mei-friend ' + version + ', ' + versionDate + '.';
       p.setAttributeNS(dutils.xmlNameSpace, 'id', 'p-' + utils.generateUUID());
       application.appendChild(name);
       application.appendChild(p);
