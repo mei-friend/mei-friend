@@ -1,6 +1,6 @@
 // mei-friend version and date
 const version = '0.6.8';
-const versionDate = '24 Nov 2022';
+const versionDate = '28 Nov 2022';
 
 var vrvWorker;
 var spdWorker;
@@ -87,6 +87,10 @@ export let supportedVerovioVersions = {
   'latest': {
     'url': 'https://www.verovio.org/javascript/latest/verovio-toolkit-hum.js',
     'description': 'Current Verovio release'
+  },
+  '3.13.1': {
+    'url': 'https://www.verovio.org/javascript/3.12.1/verovio-toolkit-hum.js',
+    'description': 'Verovio release 3.13.0'
   },
   '3.13.0': {
     'url': 'https://www.verovio.org/javascript/3.12.1/verovio-toolkit-hum.js',
