@@ -69,7 +69,7 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks, pageSpanners) {
   let meiVersion = xmlDoc.querySelector('mei')?.getAttribute('meiversion');
   if (!meiVersion) meiVersion = defaultMeiVersion;
   spdNode.setAttribute('meiversion', meiVersion);
-  
+
   spdNode.appendChild(meiHeader.cloneNode(true));
   spdNode.appendChild(minimalMEIMusicTree(xmlDoc));
   const scoreDef = /** @type {Element | undefined} */ (xmlScore.querySelector("music scoreDef")?.cloneNode(true));
@@ -98,7 +98,7 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks, pageSpanners) {
   let sections = xmlScore.childNodes;
   sections.forEach((item) => {
     if (item.nodeName === 'section') { // diggs into section hierachy
-      let returnSection = digger( /** @type {Element}*/ (item));
+      let returnSection = digger( /** @type {Element}*/(item));
       baseSection.appendChild(returnSection);
     }
   });
@@ -206,12 +206,12 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
         //   else currentNode.querySelectorAll('measure').forEach(() => p++);
       } else if (countingMode === 'encodedBreaks') {
         let sb = null;
-        // For 'encdedBreaks', `breaks` is an Array
+        // For 'encodedBreaks', `breaks` is an Array
         if (countNow && (
-            /** @type {string[]} */
-            (breaks).includes(currentNodeName) ||
-            (sb = /** @type {Element} */ (currentNode).querySelector(breaksSelector))
-          )) {
+          /** @type {string[]} */
+          (breaks).includes(currentNodeName) ||
+          (sb = /** @type {Element} */ (currentNode).querySelector(breaksSelector))
+        )) {
           if (dutils.countAsBreak(sb ? sb : currentNode)) p++;
           continue;
         }
@@ -226,10 +226,7 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
         if (keySig) {
           addKeySigElement(staffDefs, keySig);
         }
-        const {
-          count,
-          unit
-        } = getMeter(scoreDef);
+        const { count, unit } = getMeter(scoreDef);
         if (count && unit) {
           addMeterSigElement(staffDefs, count, unit);
         }
@@ -315,7 +312,10 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
           // console.info('scoreDef: ', spdScore.querySelector('scoreDef'));
         }
       }
-
+      if (currentNodeName === 'ending') {
+        console.log('ENDING', currentNode);
+        console.log('breaks in element: ', currentNode.querySelector(breaksSelector));
+      }
       // special treatment for endings that contain breaks
       if (currentNodeName === 'ending' && breaksSelector &&
         (currentNode.querySelector(breaksSelector))) {
@@ -537,7 +537,7 @@ export function listPageSpanningElements(xmlScore, breaks, breaksOption) {
   if (breaksOption === 'line' || breaksOption === 'encoded') {
     for (let e of elList) {
       if (e.nodeName === 'measure') count = true;
-      if (count && breaks.includes( /** @type {Break} */ (e.nodeName)) && dutils.countAsBreak(e)) p++;
+      if (count && breaks.includes( /** @type {Break} */(e.nodeName)) && dutils.countAsBreak(e)) p++;
       else
         noteTable[e.getAttribute('xml:id') || ""] = p;
     }
@@ -724,7 +724,7 @@ export function getPageWithElement(xmlDoc, breaks, id, breaksOption) {
   switch (breaksOption) {
     case 'none':
       return page;
-      // for speedMode: selector for all last measures and requested id
+    // for speedMode: selector for all last measures and requested id
     case 'auto':
       if (!Array.isArray(breaks) &&
         Object.keys(breaks).length > 0) {
@@ -826,7 +826,7 @@ export const xmlProlog = '<?xml version="1.0" encoding="UTF-8"?>';
  * @param {string} meiProfile (such as 'CMN' or 'Mensural)
  * @returns 
  */
-export function xmlDefs(meiVersion = defaultMeiVersion, meiProfile = defaultMeiProfile) {  
+export function xmlDefs(meiVersion = defaultMeiVersion, meiProfile = defaultMeiProfile) {
   let xml = xmlProlog;
   xml += '<?xml-model href="' + commonSchemas[meiProfile][meiVersion] + '" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>';
   xml += '<?xml-model href="' + commonSchemas[meiProfile][meiVersion] + '" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>';
