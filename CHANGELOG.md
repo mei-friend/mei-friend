@@ -4,6 +4,7 @@
 * Settings item for selecting different xml:id styles of newly inserted elements
 * Insert application statement with name, version, and date information
 * Settings checkbox for managing application statement insertion
+* Flag user that they are still logged in to GitHub (due to OAuth) when logging out of mei-friend
 ### 0.6.8 patch: enhance facsimile functionality
 * Support for inserting facsimile element with `pb@facs` references to new surface elements
 * Support for displaying empty surface images
