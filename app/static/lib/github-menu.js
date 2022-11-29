@@ -529,6 +529,7 @@ export function logoutFromGithub() {
   if (storage.supported) {
     // remove github object from local storage
     storage.removeItem("github");
+    storage.githubLogoutRequested = "true";
   }
   // redirect to /logout to remove session cookie
   let url = window.location.href;
