@@ -1,11 +1,15 @@
 # mei-friend-online CHANGELOG.md
 
+### 0.6.9 patch
+* Settings item for selecting different xml:id styles of newly inserted elements
+* Insert application statement with name, version, and date information
+* Settings checkbox for managing application statement insertion
 ### 0.6.8 patch: enhance facsimile functionality
-* Support for inserting facsimile element with pb@facs references to new surface elements
+* Support for inserting facsimile element with `pb@facs` references to new surface elements
 * Support for displaying empty surface images
-* Support for inserting zones on empty surface on selected elements (creating @facs attribute on all att.facsimile elements supported by Verovio)
-* Support for inserting zones with parallel insertion of measure element (CMD/CTRL+click)
-* Support for deleting zones with (CMD/CTRL+DELETE) or without (DELETE) removing pointing elements
+* Support for inserting zones on empty surface on selected elements (creating `@facs` attribute on all att.facsimile elements supported by Verovio)
+* Support for inserting zones with parallel insertion of measure element (`CMD/CTRL`+`click`)
+* Support for deleting zones with (`CMD/CTRL`+`DELETE`) or without (`DELETE`) removing pointing elements
 * Menu item for smart indenting encoding
 ### 0.6.7 patch: facsimile panel re-organisation
 * Facsimile panel with separate control menu
