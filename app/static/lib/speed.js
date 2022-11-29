@@ -848,7 +848,7 @@ export function dummyMeasure(document, staves = 2) {
     note.setAttribute('pname', 'a');
     note.setAttribute('oct', '3');
     note.setAttribute('dur', '1');
-    let uuid = 'note-' + utils.generateUUID();
+    let uuid = utils.generateXmlId('note');
     note.setAttributeNS(xmlNameSpace, 'xml:id', uuid);
     let layer = document.createElementNS(meiNameSpace, 'layer')
     layer.setAttribute('n', '1');

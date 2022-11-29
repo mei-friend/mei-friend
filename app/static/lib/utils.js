@@ -289,7 +289,7 @@ export function getElementIdAtCursor(cm) {
       continue;
     }
     if (line.includes('<measure') || (line.includes('<staff') &&
-      !outsideParentStaff)) {
+        !outsideParentStaff)) {
       result = line.match(xmlIdString);
       if (result !== null) return result[1];
       // if this line is parent <measure>, stop looking
@@ -336,28 +336,41 @@ export function findElementBelow(textEditor, elementName = 'measure', point = [1
 
 const base62Chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-// creates a random ID value in Verovio style
-export function generateUUID(style = 'short36') {
-  let rnd =  Math.round(Math.random() * Math.pow(2, 32));
+/**
+ * Creates an xml:id in different styles:
+ * 'Original' Verovio style: "note-0000001318117900",
+ * Verovio 'Base36' (since mid-2021): "nophl5o",
+ * 'mei-friend' style (node name with base 36): "note-ophl5o"
+ * @param {string} style 
+ * @param {string} nodeName 
+ * @returns {string} xml:id 
+ */
+export function generateXmlId(nodeName = '', style = 'mei-friend') {
+  let rnd = Math.round(Math.random() * Math.pow(2, 32));
   // let rnd = Math.round((Math.random() * 32768) * (Math.random() * 32768));
   let id = '';
   let base = 36;
-
   let zeros = '';
-  if (style === 'numbersWithZeros') {
-    let lgt = rnd.toString().length;
-    for (let i = 0; i < 16 - lgt; i++) {
-      zeros += '0';
-    }
-    id = zeros + rnd;
-  } else {
-    id = rnd;
+  switch (style) {
+    case 'Base36':
+    case 'mei-friend':
+      while (rnd) {
+        id += base62Chars[rnd % base];
+        rnd = Math.round(rnd / base);
+      }
+      break;
+    case 'Original':
+      let lgt = rnd.toString().length;
+      for (let i = 0; i < 16 - lgt; i++) {
+        zeros += '0';
+      }
+      id = zeros + rnd;
+      break;
   }
-  if (style === 'short36') {
-    while (rnd) {
-      id += base62Chars[rnd % base];
-      rnd = Math.round(rnd / base);
-    }
+  if (style === 'mei-friend' || style === 'Original') {
+    id = nodeName + '-' + id; // add full node name
+  } else if (style === 'Base36') {
+    id = nodeName[0] + id; // add first character
   }
   return id;
 }
@@ -407,7 +420,7 @@ export function sortElementsByScorePosition(arr, includeY = false) {
       if (Xs[i] > Xs[i + 1]) {
         [arr[i], arr[i + 1]] = [arr[i + 1], arr[i]];
         [Xs[i], Xs[i + 1]] = [Xs[i + 1], Xs[i]];
-        if (includeY) [Ys[i], Ys[i + 1]] = [Ys[i + 1], Ys[i]];
+        if (includeY)[Ys[i], Ys[i + 1]] = [Ys[i + 1], Ys[i]];
       }
       // swap elements for Y, if X equal 
       if (includeY && Xs[i] === Xs[i + 1] && Ys[i] > Ys[i + 1]) {
@@ -597,7 +610,7 @@ export function brighter(rgbString, deltaPercent, alpha = 1) {
 
 function hexToRgb(hex) {
   return hex.replace(/^#?([a-f\d])([a-f\d])([a-f\d])$/i,
-    (m, r, g, b) => '#' + r + r + g + g + b + b)
+      (m, r, g, b) => '#' + r + r + g + g + b + b)
     .substring(1).match(/.{2}/g)
     .map(x => parseInt(x, 16))
 }

@@ -49,6 +49,7 @@ export default class Viewer {
     this.validatorInitialized = false;
     this.validatorWithSchema = false;
     this.currentSchema = '';
+    this.xmlIdStyle; // xml:id style (Original, Base36, mei-friend)
     this.updateLinting; // CodeMirror function for linting
     this.currentPage = 1;
     this.pageCount = 0;
@@ -870,10 +871,20 @@ export default class Viewer {
         type: 'bool',
         default: true
       },
+      selectIdStyle: {
+        title: 'Style of generated xml:ids',
+        description: 'Style of newly generated xml:ids (existing xml:ids are not changed)' +
+          'e.g., Verovio original: "note-0000001318117900", ' +
+          'Verovio base 36: "nophl5o", ' +
+          'mei-friend style: "note-ophl5o"',
+        type: 'select',
+        values: ['Original', 'Base36', 'mei-friend'],
+        default: 'Base36'
+      },
       addApplicationNote: {
-        title: 'Auto add application note',
-        description: 'Add a application element to the encoding ' +
-          'description in the MEI header identifying ' +
+        title: 'Insert application statement',
+        description: 'Insert an application statement to the encoding ' +
+          'description in the MEI header, identifying ' +
           'application name, version, date of first ' +
           'and last edit',
         type: 'bool',
@@ -899,8 +910,8 @@ export default class Viewer {
       },
       annotationDisplayLimit: {
         title: 'Maximum number of annotations',
-        description: 'Maximum number of annotations to display ' + 
-                      '(large numbers may slow mei-friend)',
+        description: 'Maximum number of annotations to display ' +
+          '(large numbers may slow mei-friend)',
         type: 'int',
         min: 0,
         step: 100,
@@ -1109,6 +1120,9 @@ export default class Viewer {
               supportedVerovioVersions[optDefault].url : supportedVerovioVersions[o.default].url
           });
           break;
+        case 'selectIdStyle':
+          v.xmlIdStyle = optDefault;
+          break;
         case 'toggleSpeedMode':
           break;
         case 'showSupplied':
@@ -1125,7 +1139,7 @@ export default class Viewer {
         case 'respSelect':
           if (this.xmlDoc)
             o.values = Array.from(this.xmlDoc.querySelectorAll('corpName[*|id]'))
-              .map(e => e.getAttribute('xml:id'));
+            .map(e => e.getAttribute('xml:id'));
           break;
         case 'controlMenuFontSelector':
           document.getElementById('font-ctrls').style.display = optDefault ? 'inherit' : 'none';
@@ -1180,6 +1194,9 @@ export default class Viewer {
               'msg': value,
               'url': supportedVerovioVersions[value].url
             });
+            break;
+          case 'selectIdStyle':
+            v.xmlIdStyle = value;
             break;
           case 'toggleSpeedMode':
             let sb = document.getElementById('speed-checkbox');
@@ -1438,11 +1455,11 @@ export default class Viewer {
         if (ev.target.type === 'number') value = parseFloat(value);
         this.applyEditorOption(cm, option, value,
           storage.hasOwnProperty('cm-matchTheme') ?
-            storage['cm-matchTheme'] : mfDefaults['matchTheme']);
+          storage['cm-matchTheme'] : mfDefaults['matchTheme']);
         if (option === 'theme' && storage.hasOwnProperty('cm-matchTheme')) {
           this.setNotationColors(
             storage.hasOwnProperty('cm-matchTheme') ?
-              storage['cm-matchTheme'] : mfDefaults['matchTheme']);
+            storage['cm-matchTheme'] : mfDefaults['matchTheme']);
         }
         if ((mfDefaults.hasOwnProperty(option) && option !== 'theme' && mfDefaults[option].toString() === value.toString()) ||
           (option === 'theme' && (window.matchMedia('(prefers-color-scheme: dark)').matches ?
@@ -1626,7 +1643,7 @@ export default class Viewer {
     div.classList.add('optionsItem');
     let label = document.createElement('label');
     let title = o.description;
-    if (o.default) title += ' (default: ' + o.default + ')';
+    if (o.default) title += ' (default: ' + o.default+')';
     label.setAttribute('title', title);
     label.setAttribute('for', opt);
     label.innerText = o.title;
@@ -2047,7 +2064,7 @@ export default class Viewer {
     let msg = '';
     if (msgObj.hasOwnProperty('response'))
       msg = 'Schema not found (' + msgObj.response.status + ' ' +
-        msgObj.response.statusText + '): ';
+      msgObj.response.statusText + '): ';
     if (msgObj.hasOwnProperty('err'))
       msg = msgObj.err + ' ';
     if (msgObj.hasOwnProperty('schemaFile'))
