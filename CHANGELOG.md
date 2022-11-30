@@ -12,6 +12,7 @@
 * Support for inserting zones with parallel insertion of measure element (`CMD/CTRL`+`click`)
 * Support for deleting zones with (`CMD/CTRL`+`DELETE`) or without (`DELETE`) removing pointing elements
 * Menu item for smart indenting encoding
+* Typescript checks, refactoring and documentation of speed mode (thanks to @th-we)
 ### 0.6.7 patch: facsimile panel re-organisation
 * Facsimile panel with separate control menu
 * Resizing of facsimile panel via mouse drag
