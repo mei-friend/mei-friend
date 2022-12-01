@@ -86,7 +86,9 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks, pageSpanners) {
     let measure = dummyMeasure(xmlDoc, countStaves(scoreDef));
     measure.setAttributeNS(xmlNameSpace, 'xml:id', 'startingMeasure');
     baseSection.appendChild(measure);
-    baseSection.appendChild(xmlDoc.createElementNS(meiNameSpace, 'pb'));
+    let startingPb = xmlDoc.createElementNS(meiNameSpace, 'pb');
+    startingPb.setAttributeNS(xmlNameSpace, 'id', 'startingPb');
+    baseSection.appendChild(startingPb);
   }
   let spdScore = /** @type {Element} */ (spdNode.querySelector('mdiv > score'));
   // console.info('spdScore: ', spdScore);
@@ -207,7 +209,7 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
       } else if (countingMode === 'encodedBreaks') {
         let sb = null;
         // For 'encodedBreaks', `breaks` is an Array
-        if (countNow && (
+        if (countNow && ( // currentNodeName !== 'ending' && (
           /** @type {string[]} */
           (breaks).includes(currentNodeName) ||
           (sb = /** @type {Element} */ (currentNode).querySelector(breaksSelector))
@@ -331,6 +333,7 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
           while (endingNode.firstChild && ! /** @type {string[]} */ (breaks).includes(endingNode.firstChild.nodeName)) {
             endingNode.removeChild(endingNode.firstChild);
           }
+          // try remove beginningPb
           newSection.appendChild(endingNode);
         }
         // console.info('Ending with break inside: ', endingNode);
