@@ -400,14 +400,15 @@ export default class Viewer {
           targetpage = this.currentPage - 1;
         }
       }
-      targetpage = Math.max(1, Math.min(targetpage, this.pageCount));
     }
+    // if within a sensible range, update and return true
     if (targetpage > 0 && targetpage <= this.pageCount && targetpage != this.currentPage) {
       this.currentPage = targetpage;
       if (storage && storage.supported) storage.page = this.currentPage;
       this.updatePageNumDisplay();
       return true;
     }
+    // dont update and return false otherwise
     return false;
   }
 
