@@ -776,7 +776,7 @@
          if (!id) {
              console.warn('Please put @xml:id to body element');
              // id = generateXmlId('body', v.xmlIdStyle);
-             // body.setAttributeNS(xmlNameSpace, 'id', id);
+             // body.setAttributeNS(xmlNameSpace, 'xml:id', id);
              // replaceInEditor(cm, body);
          }
          if (id) {

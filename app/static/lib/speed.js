@@ -87,7 +87,7 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks, pageSpanners) {
     measure.setAttributeNS(xmlNameSpace, 'xml:id', 'startingMeasure');
     baseSection.appendChild(measure);
     let startingPb = xmlDoc.createElementNS(meiNameSpace, 'pb');
-    startingPb.setAttributeNS(xmlNameSpace, 'id', 'startingPb');
+    startingPb.setAttributeNS(xmlNameSpace, 'xml:id', 'startingPb');
     baseSection.appendChild(startingPb);
   }
   let spdScore = /** @type {Element} */ (spdNode.querySelector('mdiv > score'));

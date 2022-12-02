@@ -1,10 +1,13 @@
 /**
  * Provides functionality to handle editorial markup in MEI.
+ * TODO: currently (Dec 2022) only default behavior. 
+ * Future development would have to think about how to 
+ * retrieve different options.
  */
 
 
 /**
- * (Wrapper for selectApparatus() and selectChoice().) 
+ * [Wrapper for selectApparatus() and selectChoice().] 
  * Returns xmlDoc in which the app and choice elements are 
  * resolved (i.e. selected elements kept and others removed).
  * Currently they default to lem or first rdg in app 
