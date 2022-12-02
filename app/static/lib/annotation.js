@@ -175,7 +175,7 @@ export function situateAnnotations() {
         type: 'last'
       });
       if (a.firstPage < 0 && v.speedMode) {
-        if (v.xmlDoc.querySelector('[*|id=' + a.selection[0] + ']').closest('meiHead')) a.firstPage = 'meiHead';
+        if (v.xmlDoc.querySelector('[*|id=' + a.selection[0] + ']')?.closest('meiHead')) a.firstPage = 'meiHead';
         else console.warn('Cannot locate annotation ', a);
       } // if not speedmode, asynchronous return of page numbers after we are finished here
     }
