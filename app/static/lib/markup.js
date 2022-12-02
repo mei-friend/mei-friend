@@ -67,7 +67,7 @@ export function selectChoice(xmlDoc, sourceId) {
         let firstChild = choice.childNodes[0];
         if (parent && firstChild) {
             // add clones of child nodes before choice...
-            el.childNodes.forEach(child => {
+            firstChild.childNodes.forEach(child => {
                 parent.insertBefore(child.cloneNode(true), choice)
             });
             choice.remove(); // ... and remove choice afterwards
