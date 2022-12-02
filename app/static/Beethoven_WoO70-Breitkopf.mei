@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?xml-model href="https://music-encoding.org/schema/4.0.1/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
-<?xml-model href="https://music-encoding.org/schema/4.0.1/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="https://music-encoding.org/schema/4.0.1/mei-CMN.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="https://music-encoding.org/schema/4.0.1/mei-CMN.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="4.0.1">
    <meiHead>
       <fileDesc>
@@ -34,48 +34,28 @@
             <score xml:id="score-0000001286820719">
                <scoreDef xml:id="scoredef-0000001058976644" key.mode="major" key.sig="1s" meter.count="6" meter.unit="8">
                   <pgHead xml:id="pghead-0000002045266725">
-                     <rend xml:id="rend-0000000423485031" halign="left" valign="middle" fontsize="100.00%">Beethovens Werke.<lb xml:id="lb-0000000931946803" />
-                     </rend>
-                     <rend xml:id="rend-0000000423485032" halign="right" valign="middle" fontsize="100.00%">Serie 17. <abbr xml:id="abbr-0000000045878681" type="superscription">No.</abbr> 168.<lb xml:id="lb-0000000931946807" />
-                     </rend>
+                     <rend xml:id="rend-0000000423485031" halign="left" valign="middle" fontsize="100.00%">Beethovens Werke.</rend>
+                     <rend xml:id="rend-0000000423485032" halign="right" valign="middle" fontsize="100.00%">Serie 17. <abbr xml:id="abbr-0000000045878681" type="superscription">No.</abbr> 168.</rend>
                      <rend xml:id="rend-0000000027109546" halign="center" valign="middle" fontweight="bold">
                         <rend xml:id="rend-0000002081006402" fontsize="200.00%">SECHS VARIATIONEN</rend>
-                        <rend xml:id="rend-0000002081006948" fontsize="20.00%">
-                           <lb xml:id="lb-0000001190255347" /> <lb xml:id="lb-0000001438721318" />
-                        </rend>
-                        <rend xml:id="rend-0000001223265768" halign="center" valign="middle" fontsize="115.00%">
-                           <lb xml:id="lb-0000000931946801" />über das Duett: „Nel cor più non mi sento“</rend>
-                        <rend xml:id="rend-0000001839060298" fontsize="20.00%">
-                           <lb xml:id="lb-0000000354297215" /> <lb xml:id="lb-0000000013709151" />
-                        </rend>
-                        <rend xml:id="rend-0000000628950628" halign="center" valign="middle" fontsize="100.00%">
-                           <lb xml:id="lb-0000000858694262" />aus der Oper La Molinara von Paisiello</rend>
-                        <rend xml:id="rend-0000001964321517" fontsize="20.00%">
-                           <lb xml:id="lb-0000001085630888" /> <lb xml:id="lb-0000001605075317" />
-                        </rend>
-                        <rend xml:id="rend-0000001958762852" halign="center" valign="middle" fontsize="115.00%">
-                           <lb xml:id="lb-0000000002945054" />für das Pianoforte</rend>
-                        <rend xml:id="rend-0000001631646837" halign="center" valign="middle" fontsize="100.00%">
-                           <lb xml:id="lb-0000000495749949" />von</rend>
-                        <rend xml:id="rend-0000001223265771" halign="center" valign="middle" fontsize="200.00%">
-                           <lb xml:id="lb-0000000931946442" />L.<rend xml:id="rend-0000000420181481" fontsize="130.00%"> VAN </rend> BEETHOVEN.<lb xml:id="lb-0000000931946802" />
-                        </rend>
-                        <rend xml:id="rend-0000002081006989" fontsize="20.00%">
-                           <lb xml:id="lb-0000000072357948" /> <lb xml:id="lb-0000000933077864" />
-                        </rend>
+                        <rend xml:id="rend-0000002081006989" fontsize="20.00%"><lb xml:id="lb-06" /></rend>
+                        <rend xml:id="rend-0000001223265768" fontsize="115.00%"><lb xml:id="lb-01" />über das Duett: „Nel cor più non mi sento“</rend>
+                        <rend xml:id="rend-0000002081006432" fontsize="20.00%"><lb xml:id="lb-07" /></rend>
+                        <rend xml:id="rend-0000000628950628" fontsize="100.00%"><lb xml:id="lb-02" />aus der Oper La Molinara von Paisiello</rend>
+                        <rend xml:id="rend-0000002081006321" fontsize="20.00%"><lb xml:id="lb-08" /></rend>
+                        <rend xml:id="rend-0000001958762852" fontsize="115.00%"><lb xml:id="lb-03" />für das Pianoforte</rend>
+                        <rend xml:id="rend-0000002081006654" fontsize="20.00%"><lb xml:id="lb-09" /></rend>
+                        <rend xml:id="rend-0000001631646837" fontsize="100.00%"><lb xml:id="lb-04" />von</rend>
+                        <rend xml:id="rend-0000001223265771" fontsize="200.00%"><lb xml:id="lb-05" />L.<rend xml:id="rend-0000000420181481" fontsize="75.00%"> VAN </rend> BEETHOVEN.</rend>
                      </rend>
                   </pgHead>
                   <pgFoot xml:id="pgfoot-0000000472217220">
-                     <rend xml:id="rend-0000000443485032" halign="left" valign="middle" fontsize="75.00%">Original-Verleger: C. A. Spina in Wien.<lb xml:id="lb-0000000931946844" />
-                     </rend>
-                     <rend xml:id="rend-0000000423485035" halign="right" valign="middle" fontsize="75.00%">Stich und Druck von Breitkopf &amp; Härtel in Leipzig.<lb xml:id="lb-0000000931946804" />
-                     </rend>
+                     <rend xml:id="rend-0000000443485032" halign="left" valign="middle" fontsize="75.00%">Original-Verleger: C. A. Spina in Wien.</rend>
+                     <rend xml:id="rend-0000000423485035" halign="right" valign="middle" fontsize="75.00%">Stich und Druck von Breitkopf &amp; Härtel in Leipzig.</rend>
                      <rend xml:id="rend-0000001325220316" halign="center" fontsize="100.00%">B.168.</rend>
                   </pgFoot>
                   <pgFoot2 xml:id="pgfoot2-0000001694763880">
-                     <rend xml:id="rend-0000001820920999" halign="center" valign="bottom">
-                        <rend xml:id="rend-0000000429776796" fontsize="100.00%">B.168.</rend>
-                     </rend>
+                     <rend xml:id="rend-0000001820920999" halign="center" valign="bottom" fontsize="100.00%">B.168.</rend>
                   </pgFoot2>
                   <staffGrp xml:id="staffgrp-0000000664100862" bar.thru="true" symbol="brace">
                      <label xml:id="lr8v906">
@@ -90,6 +70,7 @@
                   </staffGrp>
                </scoreDef>
                <section xml:id="Tema">
+                  <pb xml:id="pb-0000000934641123"/>
                   <measure xml:id="measure-0000000934641231" metcon="false" n="0">
                      <staff xml:id="staff-0000001866356633" n="1">
                         <layer xml:id="layer-0000000835989141" n="1">

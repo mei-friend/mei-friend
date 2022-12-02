@@ -1,6 +1,6 @@
 // mei-friend version and date
-const version = '0.6.8';
-const versionDate = '24 Nov 2022';
+export const version = '0.6.9';
+export const versionDate = '2 Dec 2022';
 
 var vrvWorker;
 var spdWorker;
@@ -87,6 +87,14 @@ export let supportedVerovioVersions = {
   'latest': {
     'url': 'https://www.verovio.org/javascript/latest/verovio-toolkit-hum.js',
     'description': 'Current Verovio release'
+  },
+  '3.13.1': {
+    'url': 'https://www.verovio.org/javascript/3.13.1/verovio-toolkit-hum.js',
+    'description': 'Verovio release 3.13.1'
+  },
+  '3.13.0': {
+    'url': 'https://www.verovio.org/javascript/3.13.0/verovio-toolkit-hum.js',
+    'description': 'Verovio release 3.13.0'
   },
   '3.12.1': {
     'url': 'https://www.verovio.org/javascript/3.12.1/verovio-toolkit-hum.js',
@@ -610,6 +618,12 @@ document.addEventListener('DOMContentLoaded', function () {
     // if (selectParam && selectParam.length > 0) storage.select = selectParam;
     if (speedParam !== null) storage.speed = speedParam;
     if (breaksParam !== null) storage.breaks = breaksParam;
+    if(storage.githubLogoutRequested) { 
+      v.showAlert(`You have logged out of mei-friend's GitHub integration, but your browser is still logged in to GitHub!
+      <a href="https://github.com/logout" target="_blank">Click here to logout from GitHub</a>.`, 'warning', 30000);
+      storage.removeItem("githubLogoutRequested");
+    }
+
     setFileChangedState(storage.fileChanged);
     if (!urlFileName) {
       // no URI param specified - try to restore from storage
@@ -1438,8 +1452,13 @@ function addEventListeners(v, cm) {
   // register global event listeners
   let body = document.querySelector('body')
   body.addEventListener('mousedown', (ev) => {
-    if (ev.target.id !== 'alertOverlay' && ev.target.id !== 'alertMessage')
+    if(ev.target.matches("#alertMessage a")) {
+      // user clicked on link in message. Open link (before the DOM element disappears in the next conditional...)
+      window.open(ev.target.href, "_blank");
+    } 
+    if (ev.target.id !== 'alertOverlay' && ev.target.id !== 'alertMessage') {
       v.hideAlerts();
+    }
   });
   body.addEventListener('keydown', (ev) => {
     if (ev.key === 'Escape')

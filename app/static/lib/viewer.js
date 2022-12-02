@@ -40,6 +40,9 @@ import {
   unverified,
   xCircleFill
 } from '../css/icons.js';
+import {
+  selectMarkup
+} from './markup.js';
 
 export default class Viewer {
 
@@ -49,6 +52,7 @@ export default class Viewer {
     this.validatorInitialized = false;
     this.validatorWithSchema = false;
     this.currentSchema = '';
+    this.xmlIdStyle; // xml:id style (Original, Base36, mei-friend)
     this.updateLinting; // CodeMirror function for linting
     this.currentPage = 1;
     this.pageCount = 0;
@@ -244,6 +248,7 @@ export default class Viewer {
     let breaks = this.breaksValue();
     let breaksSelectVal = this.breaksSelect.value;
     if (!this.speedMode || breaksSelectVal === 'none') return mei;
+    this.xmlDoc = selectMarkup(this.xmlDoc); // select markup
     // count pages from system/pagebreaks
     if (Array.isArray(breaks)) {
       let music = this.xmlDoc.querySelector('music score');
@@ -399,14 +404,15 @@ export default class Viewer {
           targetpage = this.currentPage - 1;
         }
       }
-      targetpage = Math.max(1, Math.min(targetpage, this.pageCount));
     }
+    // if within a sensible range, update and return true
     if (targetpage > 0 && targetpage <= this.pageCount && targetpage != this.currentPage) {
       this.currentPage = targetpage;
       if (storage && storage.supported) storage.page = this.currentPage;
       this.updatePageNumDisplay();
       return true;
     }
+    // dont update and return false otherwise
     return false;
   }
 
@@ -852,9 +858,9 @@ export default class Viewer {
       },
       selectToolkitVersion: {
         title: 'Verovio version',
-        description: `Select Verovio toolkit version 
-                      (* Switching to older versions before 3.11.0
-                      might require a refresh due to memory issues.)`,
+        description: 'Select Verovio toolkit version ' +
+          '(* Switching to older versions before 3.11.0 ' +
+          'might require a refresh due to memory issues.)',
         type: 'select',
         default: defaultVerovioVersion,
         values: Object.keys(supportedVerovioVersions),
@@ -863,10 +869,29 @@ export default class Viewer {
       },
       toggleSpeedMode: {
         title: 'Speed Mode',
-        description: `Toggle Verovio Speed Mode. 
-                      In Speedmode, only the current page
-                      is sent to Verovio to reduce rendering
-                      time with large files`,
+        description: 'Toggle Verovio Speed Mode. ' +
+          'In Speedmode, only the current page ' +
+          'is sent to Verovio to reduce rendering ' +
+          'time with large files',
+        type: 'bool',
+        default: true
+      },
+      selectIdStyle: {
+        title: 'Style of generated xml:ids',
+        description: 'Style of newly generated xml:ids (existing xml:ids are not changed)' +
+          'e.g., Verovio original: "note-0000001318117900", ' +
+          'Verovio base 36: "nophl5o", ' +
+          'mei-friend style: "note-ophl5o"',
+        type: 'select',
+        values: ['Original', 'Base36', 'mei-friend'],
+        default: 'Base36'
+      },
+      addApplicationNote: {
+        title: 'Insert application statement',
+        description: 'Insert an application statement to the encoding ' +
+          'description in the MEI header, identifying ' +
+          'application name, version, date of first ' +
+          'and last edit',
         type: 'bool',
         default: true
       },
@@ -890,8 +915,8 @@ export default class Viewer {
       },
       annotationDisplayLimit: {
         title: 'Maximum number of annotations',
-        description: `Maximum number of annotations to display 
-                      (large numbers may slow mei-friend)`,
+        description: 'Maximum number of annotations to display ' +
+          '(large numbers may slow mei-friend)',
         type: 'int',
         min: 0,
         step: 100,
@@ -935,10 +960,6 @@ export default class Viewer {
         type: 'bool',
         default: false
       },
-      // controlMenuLineSeparator: {
-      //   title: 'options-line', // class name of hr element
-      //   type: 'line'
-      // },
       controlMenuSettings: {
         title: 'Control menu',
         description: 'Define items to be shown in control menu above the notation',
@@ -963,10 +984,6 @@ export default class Viewer {
         type: 'bool',
         default: true
       },
-      // renumberMeasuresLineSeparator: {
-      //   title: 'options-line', // class name of hr element
-      //   type: 'line'
-      // },
       renumberMeasuresHeading: {
         title: 'Renumber measures',
         description: 'Settings for renumbering measures',
@@ -1016,7 +1033,6 @@ export default class Viewer {
         type: 'bool',
         default: false
       },
-      // deleteme
       selectFacsimilePanelOrientation: {
         title: 'Facsimile panel position',
         description: 'Select facsimile panel position relative to notation',
@@ -1109,6 +1125,9 @@ export default class Viewer {
               supportedVerovioVersions[optDefault].url : supportedVerovioVersions[o.default].url
           });
           break;
+        case 'selectIdStyle':
+          v.xmlIdStyle = optDefault;
+          break;
         case 'toggleSpeedMode':
           break;
         case 'showSupplied':
@@ -1180,6 +1199,9 @@ export default class Viewer {
               'msg': value,
               'url': supportedVerovioVersions[value].url
             });
+            break;
+          case 'selectIdStyle':
+            v.xmlIdStyle = value;
             break;
           case 'toggleSpeedMode':
             let sb = document.getElementById('speed-checkbox');
@@ -1731,6 +1753,7 @@ export default class Viewer {
       id = this.lastNoteId;
       element = document.querySelector('g#' + utils.escapeXmlId(id));
     }
+    if (!element) return;
     console.info('Navigate ' + dir + ' ' + incElName + '-wise for: ', element);
     let x = dutils.getX(element);
     let y = dutils.getY(element);

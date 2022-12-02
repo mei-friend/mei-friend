@@ -5,7 +5,7 @@ import {
 } from './main.js';
 import {
   convertCoords,
-  generateUUID,
+  generateXmlId,
   rmHash,
   setCursorToId
 } from './utils.js';
@@ -19,7 +19,6 @@ import {
   diffRemoved,
   highlight,
   fileCode,
-  flipToEncoding,
   link,
   pencil,
   rdf,
@@ -176,7 +175,7 @@ export function situateAnnotations() {
         type: 'last'
       });
       if (a.firstPage < 0 && v.speedMode) {
-        if (v.xmlDoc.querySelector('[*|id=' + a.selection[0] + ']').closest('meiHead')) a.firstPage = 'meiHead';
+        if (v.xmlDoc.querySelector('[*|id=' + a.selection[0] + ']')?.closest('meiHead')) a.firstPage = 'meiHead';
         else console.warn('Cannot locate annotation ', a);
       } // if not speedmode, asynchronous return of page numbers after we are finished here
     }
@@ -339,7 +338,7 @@ export function addAnnotationHandlers() {
   // functions to create annotations
   const createHighlight = (e) => {
     const a = {
-      "id": "annot-" + generateUUID(),
+      "id": generateXmlId('annot', v.xmlIdStyle),
       "type": "annotateHighlight",
       "selection": v.selectedElements
     }
@@ -348,7 +347,7 @@ export function addAnnotationHandlers() {
   }
   const createCircle = (e) => {
     const a = {
-      "id": "annot-" + generateUUID(),
+      "id": generateXmlId('annot', v.xmlIdStyle),
       "type": "annotateCircle",
       "selection": v.selectedElements
     }
@@ -359,7 +358,7 @@ export function addAnnotationHandlers() {
     // TODO improve UX!
     const desc = window.prompt("Please enter a textual description to apply");
     const a = {
-      "id": "annot-" + generateUUID(),
+      "id": generateXmlId('annot', v.xmlIdStyle),
       "type": "annotateDescribe",
       "selection": v.selectedElements,
       "description": desc
@@ -373,7 +372,7 @@ export function addAnnotationHandlers() {
     if (!url.startsWith("http"))
       url = "https://" + url;
     const a = {
-      "id": "annot-" + generateUUID(),
+      "id": generateXmlId('annot', v.xmlIdStyle),
       "type": "annotateLink",
       "selection": v.selectedElements,
       "url": url
@@ -667,7 +666,7 @@ function writeInlineIfRequested(a) {
       if (a.type === "annotateDescribe") payload = a.description
       else if (a.type === "annotateLink") {
         payload = document.createElementNS(meiNameSpace, "ptr");
-        payload.setAttributeNS(xmlNameSpace, 'id', 'ptr-' + generateUUID());
+        payload.setAttributeNS(xmlNameSpace, 'id', 'ptr-' + generateXmlId());
         payload.setAttribute("target", a.url);
       }
       writeAnnot(el, a.id, a.selection, payload)

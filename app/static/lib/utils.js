@@ -334,15 +334,45 @@ export function findElementBelow(textEditor, elementName = 'measure', point = [1
   else return null;
 }
 
-// creates a random ID value in Verovio style
-export function generateUUID() {
-  let tmp = Math.round((Math.random() * 32768) * (Math.random() * 32768)).toString();
-  let uuid = '',
-    lgt = tmp.length;
-  for (let i = 0; i < 16 - lgt; i++) {
-    uuid += '0';
+const base62Chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+/**
+ * Creates an xml:id in different styles:
+ * 'Original' Verovio style: "note-0000001318117900",
+ * Verovio 'Base36' (since mid-2021): "nophl5o",
+ * 'mei-friend' style (node name with base 36): "note-ophl5o"
+ * @param {string} style 
+ * @param {string} nodeName 
+ * @returns {string} xml:id 
+ */
+export function generateXmlId(nodeName = '', style = 'mei-friend') {
+  let rnd = Math.round(Math.random() * Math.pow(2, 32));
+  // let rnd = Math.round((Math.random() * 32768) * (Math.random() * 32768));
+  let id = '';
+  let base = 36;
+  let zeros = '';
+  switch (style) {
+    case 'Base36':
+    case 'mei-friend':
+      while (rnd) {
+        id += base62Chars[rnd % base];
+        rnd = Math.round(rnd / base);
+      }
+      break;
+    case 'Original':
+      let lgt = rnd.toString().length;
+      for (let i = 0; i < 16 - lgt; i++) {
+        zeros += '0';
+      }
+      id = zeros + rnd;
+      break;
   }
-  return uuid + tmp;
+  if (style === 'mei-friend' || style === 'Original') {
+    id = nodeName + '-' + id; // add full node name
+  } else if (style === 'Base36') {
+    id = nodeName[0] + id; // add first character
+  }
+  return id;
 }
 
 // add n tabs to current cursor position in textEditor
@@ -632,7 +662,22 @@ export function rmHash(hashedString) {
 
 // escape special characters '.' and ':' for usagage in queryselectors 
 export function escapeXmlId(str) {
-  if (str === null ) return '';
+  if (str === null) return '';
   if (/^\d/.test(str)) str = 'a' + str;
   return str.replace(/\./g, '\\.').replace(/\:/g, '\\:');
+}
+
+/** 
+ * Returns an ISO 8601 string in lokal timezone
+ * @param {Date} d - date to create string for
+ * @returns {string} formatted string
+ */
+export function toISOStringLocal(d) {
+  function z(n) {
+    return (n < 10 ? '0' : '') + n
+  }
+  return d.getFullYear() + '-' + z(d.getMonth() + 1) + '-' +
+    z(d.getDate()) + 'T' + z(d.getHours()) + ':' +
+    z(d.getMinutes()) + ':' + z(d.getSeconds())
+
 }
