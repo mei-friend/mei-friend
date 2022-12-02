@@ -1753,6 +1753,7 @@ export default class Viewer {
       id = this.lastNoteId;
       element = document.querySelector('g#' + utils.escapeXmlId(id));
     }
+    if (!element) return;
     console.info('Navigate ' + dir + ' ' + incElName + '-wise for: ', element);
     let x = dutils.getX(element);
     let y = dutils.getY(element);

@@ -209,7 +209,7 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
       } else if (countingMode === 'encodedBreaks') {
         let sb = null;
         // For 'encodedBreaks', `breaks` is an Array
-        if (countNow && ( // currentNodeName !== 'ending' && (
+        if (countNow && currentNodeName !== 'ending' && (
           /** @type {string[]} */
           (breaks).includes(currentNodeName) ||
           (sb = /** @type {Element} */ (currentNode).querySelector(breaksSelector))
@@ -328,12 +328,16 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
           breakNode.parentNode?.replaceChild(
             document.createElementNS(meiNameSpace, 'pb'), breakNode);
           newSection.appendChild(endingNode);
-        } else if (p === pageNo - 1) { // remove elements until first break
-          // QUESTION: Can we be sure that breaks is an array here?
-          while (endingNode.firstChild && ! /** @type {string[]} */ (breaks).includes(endingNode.firstChild.nodeName)) {
-            endingNode.removeChild(endingNode.firstChild);
+        } else if (p === pageNo - 1 && breakNode) { // remove elements until first break
+          // remove starting pb (in case of a pb inside endingNode) 
+          // or replace existing sb inside endingNode with startingPb
+          let startingPd = spdScore.querySelector('[*|id="startingPb"]');
+          if (startingPd && breakNode.nodeName === 'sb'){ 
+            endingNode.replaceChild(startingPd, breakNode);
+          } else {
+            startingPd?.remove();
           }
-          // try remove beginningPb
+          // ...and add endingNode
           newSection.appendChild(endingNode);
         }
         // console.info('Ending with break inside: ', endingNode);
