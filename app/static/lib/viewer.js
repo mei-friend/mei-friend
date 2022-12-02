@@ -40,6 +40,9 @@ import {
   unverified,
   xCircleFill
 } from '../css/icons.js';
+import {
+  selectMarkup
+} from './markup.js';
 
 export default class Viewer {
 
@@ -245,6 +248,7 @@ export default class Viewer {
     let breaks = this.breaksValue();
     let breaksSelectVal = this.breaksSelect.value;
     if (!this.speedMode || breaksSelectVal === 'none') return mei;
+    this.xmlDoc = selectMarkup(this.xmlDoc); // select markup
     // count pages from system/pagebreaks
     if (Array.isArray(breaks)) {
       let music = this.xmlDoc.querySelector('music score');
