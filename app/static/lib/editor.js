@@ -665,7 +665,10 @@ export function addApplicationInfo(v, cm) {
         application = a; // update existing application element
         application.setAttribute('enddate', utils.toISOStringLocal(new Date()));
         application.setAttribute('version', version);
-        replaceInEditor(cm, application);
+        const range = replaceInEditor(cm, application);
+        for (let l = range.start.line; l <= range.end.line; l++) {
+          cm.indentLine(l, 'smart');
+        }
         update = true;
         break;
       }
@@ -675,35 +678,34 @@ export function addApplicationInfo(v, cm) {
     // application tree for mei-friend is created first time
     if (!encodingDesc) {
       encodingDesc = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'encodingDesc');
-      encodingDesc.setAttributeNS(dutils.xmlNameSpace, 'id', utils.generateXmlId('encodingDesc', v.xmlIdStyle));
+      encodingDesc.setAttributeNS(dutils.xmlNameSpace, 'xml:id', utils.generateXmlId('encodingDesc', v.xmlIdStyle));
       meiHead.appendChild(encodingDesc);
     }
     if (!appInfo) {
       appInfo = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'appInfo');
-      appInfo.setAttributeNS(dutils.xmlNameSpace, 'id', utils.generateXmlId('appInfo', v.xmlIdStyle));
+      appInfo.setAttributeNS(dutils.xmlNameSpace, 'xml:id', utils.generateXmlId('appInfo', v.xmlIdStyle));
       encodingDesc.appendChild(appInfo);
     }
     if (!application) {
       application = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'application');
-      application.setAttributeNS(dutils.xmlNameSpace, 'id', utils.generateXmlId('application', v.xmlIdStyle));
+      application.setAttributeNS(dutils.xmlNameSpace, 'xml:id', utils.generateXmlId('application', v.xmlIdStyle));
       application.setAttribute('startdate', utils.toISOStringLocal(new Date()));
       application.setAttribute('version', version);
       let name = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'name');
       name.textContent = 'mei-friend';
-      name.setAttributeNS(dutils.xmlNameSpace, 'id', utils.generateXmlId('name', v.xmlIdStyle));
+      name.setAttributeNS(dutils.xmlNameSpace, 'xml:id', utils.generateXmlId('name', v.xmlIdStyle));
       let p = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'p')
       p.textContent = 'First edit by mei-friend ' + version + ', ' + versionDate + '.';
-      p.setAttributeNS(dutils.xmlNameSpace, 'id', utils.generateXmlId('p', v.xmlIdStyle));
+      p.setAttributeNS(dutils.xmlNameSpace, 'xml:id', utils.generateXmlId('p', v.xmlIdStyle));
       application.appendChild(name);
       application.appendChild(p);
       appInfo.appendChild(application);
     }
     // insert new element to editor
-    const {
-      start,
-      end
-    } = replaceInEditor(cm, meiHead);
-    for (let l = start.line; l <= end.line; l++) cm.indentLine(l, 'smart');
+    const range = replaceInEditor(cm, meiHead);
+    for (let l = range.start.line; l <= range.end.line; l++) {
+      cm.indentLine(l, 'smart');
+    }
     return true;
   }
 } // addApplicationInfo()
@@ -899,7 +901,7 @@ export function addFacsimile(v, cm) {
   if (!facsimile) {
     facsimile = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'facsimile');
     facsimileId = utils.generateXmlId('facsimile', v.xmlIdStyle);
-    facsimile.setAttributeNS(dutils.xmlNameSpace, 'id', facsimileId);
+    facsimile.setAttributeNS(dutils.xmlNameSpace, 'xml:id', facsimileId);
     v.xmlDoc.querySelector('body').before(facsimile);
   }
   v.xmlDoc.querySelectorAll('pb').forEach((pb, p) => {
@@ -911,7 +913,7 @@ export function addFacsimile(v, cm) {
     } else {
       surface = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'surface');
       surfaceId = utils.generateXmlId('surface', v.xmlIdStyle);
-      surface.setAttributeNS(dutils.xmlNameSpace, 'id', surfaceId);
+      surface.setAttributeNS(dutils.xmlNameSpace, 'xml:id', surfaceId);
       facsimile.appendChild(surface);
       // update pb elements in DOM and in editor
       pb.setAttribute('facs', '#' + surfaceId);
@@ -921,7 +923,7 @@ export function addFacsimile(v, cm) {
     if (!graphic) {
       graphic = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'graphic');
       let graphicId = utils.generateXmlId('graphic', v.xmlIdStyle);
-      graphic.setAttributeNS(dutils.xmlNameSpace, 'id', graphicId);
+      graphic.setAttributeNS(dutils.xmlNameSpace, 'xml:id', graphicId);
       graphic.setAttribute('target', 'Page-' + (p + 1)); // dummy values
       graphic.setAttribute('width', '0');
       graphic.setAttribute('height', '0');

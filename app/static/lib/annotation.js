@@ -471,7 +471,7 @@ export function writeAnnot(anchor, xmlId, plist, payload) {
       // set cursor based on it
       setCursorToId(cm, firstChildNode.getAttribute("xml:id"))
       let annot = document.createElementNS(meiNameSpace, 'annot');
-      annot.setAttributeNS(xmlNameSpace, 'id', xmlId);
+      annot.setAttributeNS(xmlNameSpace, 'xml:id', xmlId);
       annot.setAttribute('plist', plist.map(p => '#' + p).join(' '));
       if (payload) {
         if (typeof payload === 'string') {
@@ -666,7 +666,7 @@ function writeInlineIfRequested(a) {
       if (a.type === "annotateDescribe") payload = a.description
       else if (a.type === "annotateLink") {
         payload = document.createElementNS(meiNameSpace, "ptr");
-        payload.setAttributeNS(xmlNameSpace, 'id', 'ptr-' + generateXmlId());
+        payload.setAttributeNS(xmlNameSpace, 'xml:id', 'ptr-' + generateXmlId());
         payload.setAttribute("target", a.url);
       }
       writeAnnot(el, a.id, a.selection, payload)
