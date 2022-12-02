@@ -5,6 +5,7 @@
 * Insert application statement with name, version, and date information
 * Settings checkbox for managing application statement insertion
 * Flag user that they are still logged in to GitHub (due to OAuth) when logging out of mei-friend
+* Fix for #9 to correctly handle breaks within endings in speed mode
 ### 0.6.8 patch: enhance facsimile functionality
 * Support for inserting facsimile element with `pb@facs` references to new surface elements
 * Support for displaying empty surface images
