@@ -376,9 +376,9 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
 /**
  * List all notes/chords to check whether they are pointed to from outside the
  * requested pageNo to be run at each edit/page turn (becomes slow with big
- * files).
+ * files). Not used; kept for documentation.
  *
- * TODO: This is currently not used and probably O(n²). If it should be used
+ * TODO: @th-we: This is currently not used and probably O(n²). If it should be used
  * again, create objects mapping all `@startid` and `@endid` values once and
  * pass it as argument to this function. This should probably give us something
  * like O(n log n) complexity.
@@ -482,7 +482,8 @@ function matchTimespanningElements(xmlScore, spdScore, pageNo) {
 
 /**
  * List all timespanning elements with `@startid`/`@endid` attributes on
- * different pages
+ * different pages (similar to speed-worker::listPageSpanningElements(), 
+ * but for a common DOM object)
  * @param {Document} xmlScore
  * @param {Break[]} breaks
  * @param {BreaksOption} breaksOption
@@ -660,7 +661,7 @@ function addPageSpanningElements(xmlScore, spdScore, pageSpanners, pageNo) {
       for (let elId of elementIds) {
         let page = getPageNumberForIdInPageSpannersEndObject(elId);
         if (page > 0) {
-          console.log('XXXXXX Spanner ' + elId + ' from ' + p + ' to ' + page);
+          console.log('AAAAAcross-page PageSpanner ' + elId + ' from ' + p + ' to ' + page);
           addPointingNote(elId, 'startid', startingMeasure);
           addPointingNote(elId, 'endid', endingMeasure);
         }
@@ -668,11 +669,11 @@ function addPageSpanningElements(xmlScore, spdScore, pageSpanners, pageNo) {
     } else {
       break;
     }
-  }
+  } // 3)
 
   // add pointing note (@startid or @endid) to starting/endingMeasure
   // and add element itself in case of @startid
-  function addPointingNote(id, searchAttribute = 'startid', referenceMeasure) {
+  function addPointingNote(id = '', searchAttribute = 'startid', /** @type {Element} */ referenceMeasure) {
     let endingElement = xmlScore.querySelector('[*|id="' + id + '"]');
     if (!endingElement) return false;
     let startid = utils.rmHash(endingElement.getAttribute(searchAttribute));
@@ -688,7 +689,7 @@ function addPageSpanningElements(xmlScore, spdScore, pageSpanners, pageNo) {
     }
   }
 
-  // find matching 
+  // find the matching id in list of ending elements after pageNo, or return -1
   function getPageNumberForIdInPageSpannersEndObject(/** @type {string} */ id) {
     let pageNumber = -1;
     for (let p of Object.keys(pageSpanners.end)) {
