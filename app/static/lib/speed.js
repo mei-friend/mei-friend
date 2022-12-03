@@ -633,46 +633,79 @@ function getMeter(scoreDef) {
  * @param {number} pageNo
  */
 function addPageSpanningElements(xmlScore, spdScore, pageSpanners, pageNo) {
-  // 1) go through endingElements and add to first measure
+  // 1) go through endingElements and add to starting measure (p. 1)
+  const startingMeasure = /** @type {Element} */ (spdScore.querySelector('[*|id="startingMeasure"]'));
   let endingElementIds = pageSpanners.end[pageNo];
   if (endingElementIds && pageNo > 1) {
-    const m = /** @type {Element} */ (spdScore.querySelector('[*|id="startingMeasure"]'));
     for (let endingElementId of endingElementIds) {
-      let endingElement = xmlScore.querySelector('[*|id="' + endingElementId + '"]');
-      if (!endingElement) continue;
-      let startid = utils.rmHash(endingElement.getAttribute('startid'));
-      let startNote = xmlScore.querySelector('[*|id="' + startid + '"]');
-      if (!startNote) continue;
-      const staffNo = startNote.closest('staff')?.getAttribute('n') || '-1';
-      if (!spdScore.querySelector('[*|id="' + startid + '"]')) {
-        let staff = m.querySelector('staff[n="' + staffNo + '"]');
-        staff?.querySelector('layer')?.appendChild(startNote.cloneNode(true));
-      }
-      m.appendChild(endingElement.cloneNode(true));
+      addPointingNote(endingElementId, 'startid', startingMeasure);
     }
   } // 1) if
 
-  // 2) go through startingElements and append to a third-page measure
+  // 2) go through startingElements and append to ending measure (p. 3)
+  const endingMeasure = /** @type {Element} */ (spdScore.querySelector('[*|id="endingMeasure"]'));
   let startingElementIds = pageSpanners.start[pageNo];
   if (startingElementIds) {
-    const m = /** @type {Element} */ (spdScore.querySelector('[*|id="endingMeasure"]'));
     for (let startingElementId of startingElementIds) {
-      let startingElement = xmlScore.querySelector('[*|id="' + startingElementId + '"]');
-      if (!startingElement) continue;
-      let endid = utils.rmHash(startingElement.getAttribute('endid'));
-      // console.info('searching for endid: ', endid);
-      if (endid) {
-        let endNote = xmlScore.querySelector('[*|id="' + endid + '"]');
-        if (!endNote) continue;
-        const staffNo = endNote.closest('staff')?.getAttribute('n') || "-1";
-        if (!spdScore.querySelector('[*|id="' + endid + '"]')) {
-          let staff = m.querySelector('staff[n="' + staffNo + '"]');
-          staff?.querySelector('layer')?.appendChild(endNote.cloneNode(true));
+      addPointingNote(startingElementId, 'endid', endingMeasure);
+    }
+  } // 2) if
+
+  // 3) find those element that start before pageNo and end after it
+  // Iterate through starting elements while < pageNo and
+  // look for each element whether it ends after pageNo
+  for (let p of Object.keys(pageSpanners.start)) {
+    if (parseInt(p) < pageNo) {
+      let elementIds = pageSpanners.start[p];
+      for (let elId of elementIds) {
+        let page = getPageNumberForIdInPageSpannersEndObject(elId);
+        if (page > 0) {
+          console.log('XXXXXX Spanner ' + elId + ' from ' + p + ' to ' + page);
+          addPointingNote(elId, 'startid', startingMeasure);
+          addPointingNote(elId, 'endid', endingMeasure);
+        }
+      }
+    } else {
+      break;
+    }
+  }
+
+  // add pointing note (@startid or @endid) to starting/endingMeasure
+  // and add element itself in case of @startid
+  function addPointingNote(id, searchAttribute = 'startid', referenceMeasure) {
+    let endingElement = xmlScore.querySelector('[*|id="' + id + '"]');
+    if (!endingElement) return false;
+    let startid = utils.rmHash(endingElement.getAttribute(searchAttribute));
+    let startNote = xmlScore.querySelector('[*|id="' + startid + '"]');
+    if (!startNote) return false;
+    const staffNo = startNote.closest('staff')?.getAttribute('n') || '-1';
+    if (!spdScore.querySelector('[*|id="' + startid + '"]')) {
+      let staff = referenceMeasure.querySelector('staff[n="' + staffNo + '"]');
+      staff?.querySelector('layer')?.appendChild(startNote.cloneNode(true));
+    }
+    if (searchAttribute === 'startid') {
+      referenceMeasure.appendChild(endingElement.cloneNode(true));
+    }
+  }
+
+  // find matching 
+  function getPageNumberForIdInPageSpannersEndObject(/** @type {string} */ id) {
+    let pageNumber = -1;
+    for (let p of Object.keys(pageSpanners.end)) {
+      if (parseInt(p) > pageNo) {
+        let elementIds = pageSpanners.end[p];
+        for (let elId of elementIds) {
+          if (elId === id) {
+            return parseInt(p);
+          }
         }
       }
     }
-  } // 2) if
-}
+    return pageNumber;
+  } // getPageNumberForIdInPageSpannersObject()
+
+} // addPageSpanningElements()
+
 
 
 /**
