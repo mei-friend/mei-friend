@@ -64,14 +64,14 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
   // collect all time-spanning elements with @startid and @endid
   let tsTable = {}; // object with id as keys and an array of [startid, endid]
   let idList = []; // list of time-pointer ids to be checked
-  tsTable = crawl(score.children, tsTable, idList);
+  tsTable = findTimeSpanningElements(score.children, tsTable, idList);
 
   // determine page number for list of ids
   noteTable = {};
   let count = false;
   let p = 1;
 
-  noteTable = dig(score.children, noteTable, idList);
+  noteTable = getPageNumberForElements(score.children, noteTable, idList);
 
   // packing pageSpanners with different page references
   let p1 = 0;
@@ -92,6 +92,7 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
   }
   return pageSpanners;
 
+
   /**
    * Find time-spanning elements and store their @startid/@endids in object tsTable
    * and additionally in one aggregated array idList
@@ -100,7 +101,7 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
    * @param {array} idList 
    * @returns {object} tsTable
    */
-  function crawl(nodeArray, tsTable, idList) {
+  function findTimeSpanningElements(nodeArray, tsTable, idList) {
     nodeArray.forEach(el => {
       if (timeSpanningElements.includes(el.tagName)) {
         let startid = el.attributes['startid'];
@@ -111,11 +112,11 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
           idList.push(endid.slice(1));
         }
       } else if (el.children) {
-        tsTable = crawl(el.children, tsTable, idList);
+        tsTable = findTimeSpanningElements(el.children, tsTable, idList);
       }
     });
     return tsTable;
-  } // crawl()
+  } // findTimeSpanningElements()
 
   /**
    * Determine the page number for each element in nodeArray recursively, 
@@ -126,7 +127,7 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
    * @param {boolean} childOfMeasure 
    * @returns 
    */
-  function dig(nodeArray, noteTable, idList, childOfMeasure = false) {
+  function getPageNumberForElements(nodeArray, noteTable, idList, childOfMeasure = false) {
     if (breaksOption === 'line' || breaksOption === 'encoded') {
       nodeArray.forEach(el => { // el obj w/ tagName, children, attributes
         if (el.hasOwnProperty('tagName')) {
@@ -141,7 +142,7 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
             }
           }
           if (el.children) {
-            noteTable = dig(el.children, noteTable, idList);
+            noteTable = getPageNumberForElements(el.children, noteTable, idList);
           }
         }
       });
@@ -163,15 +164,16 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
             }
           }
           if (el.children) {
-            noteTable = dig(el.children, noteTable, idList, childOfMeasure);
+            noteTable = getPageNumberForElements(el.children, noteTable, idList, childOfMeasure);
           }
         }
       });
     }
     return noteTable;
-  } // dig()
+  } // getPageNumberForElements()
 
 } // listPageSpanningElements()
+
 
 // Return first element with tagName elName
 function getElementByTagName(nodeArray, elName, el) {
@@ -189,7 +191,7 @@ function getElementByTagName(nodeArray, elName, el) {
     }
   }
   return el;
-}
+} // getElementByTagName()
 
 
 // ACKNOWLEDGEMENTS
