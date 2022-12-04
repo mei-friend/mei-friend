@@ -1209,8 +1209,6 @@ function downloadSpeedMei() {
     .replace(/\.[^/.]+$/, '_page-' + v.currentPage + '-speedMode.mei');
   a.href = window.URL.createObjectURL(blob);
   a.click();
-  // Now that the user has "saved" the MEI, clear the file change indicator
-  setFileChangedState(false);
 }
 
 function downloadMidi() {

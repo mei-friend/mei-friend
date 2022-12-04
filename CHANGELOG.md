@@ -1,5 +1,10 @@
 # mei-friend-online CHANGELOG.md
 
+
+## 0.7.0 minor: Consolidate speed mode
+* Support for time-spanning elements with `@startid/endid` that start before and end after current page
+* Support for time-spanning elements with `@tstamp/tstamp2` attributes, starting or ending on current page as well as those spanning across current page (start before and end afterwards)
+* Download current speed mode page (with dummy pages that are normally not shown) with `CTRL-SHIFT-S` (or on MacOS `CMD-SHIFT-S`)
 ### 0.6.9 patch
 * Settings item for selecting different xml:id styles of newly inserted elements
 * Insert application statement with name, version, and date information
