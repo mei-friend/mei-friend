@@ -289,7 +289,7 @@ export function getElementIdAtCursor(cm) {
       continue;
     }
     if (line.includes('<measure') || (line.includes('<staff') &&
-        !outsideParentStaff)) {
+      !outsideParentStaff)) {
       result = line.match(xmlIdString);
       if (result !== null) return result[1];
       // if this line is parent <measure>, stop looking
@@ -420,7 +420,7 @@ export function sortElementsByScorePosition(arr, includeY = false) {
       if (Xs[i] > Xs[i + 1]) {
         [arr[i], arr[i + 1]] = [arr[i + 1], arr[i]];
         [Xs[i], Xs[i + 1]] = [Xs[i + 1], Xs[i]];
-        if (includeY)[Ys[i], Ys[i + 1]] = [Ys[i + 1], Ys[i]];
+        if (includeY) [Ys[i], Ys[i + 1]] = [Ys[i + 1], Ys[i]];
       }
       // swap elements for Y, if X equal 
       if (includeY && Xs[i] === Xs[i + 1] && Ys[i] > Ys[i + 1]) {
@@ -610,7 +610,7 @@ export function brighter(rgbString, deltaPercent, alpha = 1) {
 
 function hexToRgb(hex) {
   return hex.replace(/^#?([a-f\d])([a-f\d])([a-f\d])$/i,
-      (m, r, g, b) => '#' + r + r + g + g + b + b)
+    (m, r, g, b) => '#' + r + r + g + g + b + b)
     .substring(1).match(/.{2}/g)
     .map(x => parseInt(x, 16))
 }
@@ -679,5 +679,35 @@ export function toISOStringLocal(d) {
   return d.getFullYear() + '-' + z(d.getMonth() + 1) + '-' +
     z(d.getDate()) + 'T' + z(d.getHours()) + ':' +
     z(d.getMinutes()) + ':' + z(d.getSeconds())
+} // toISOStringLocal()
 
+/** @typedef { measure: Number, beat: Number } MeasureBeat */
+
+/**
+ * Returns object with measure and beat count from @tstamp2 
+ * (according to data.MEASUREBEAT)
+ * @param {string} tstamp2 
+ * @returns {MeasureBeat}
+ */
+export function readMeasureBeat(tstamp2) {
+  let measure = 0;
+  let beat = 0;
+  if (tstamp2.includes('m')) {
+    let split = tstamp2.split('m');
+    measure = parseInt(split.at(0));
+    beat = parseFloat(split.at(1));
+  } else {
+    beat = parseFloat(tstamp2);
+  }
+  return { 'measure': measure, 'beat': beat };
+} // readMeasureBeat()
+
+/**
+ * Returns a data.MEASUREBEAT string
+ * @param {Number} measure 
+ * @param {Number} beat 
+ * @returns {string} 
+ */
+export function writeMeasureBeat(measure, beat) {
+  return measure + 'm+' + beat;
 }

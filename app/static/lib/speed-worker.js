@@ -85,7 +85,7 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
     p1 = noteTable[tsTable[spannerIds][0]];
     if (tsTable[spannerIds].length == 2) {
       p2 = noteTable[tsTable[spannerIds][1]];
-    } else { // find page number for spannerIds[0]
+    } else { // find page number for spannerIds[0] from timeStamp2Pages
       p2 = timeStamp2Pages[spannerIds];
     }
     if (p1 > 0 && p2 > 0 && p1 != p2) {
@@ -155,7 +155,6 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
                 delete tmp[id];
               }
             }
-            // then move id: p into an extra array
           }
           if (count && breaks.includes(el.tagName)) p++;
           const id = el.attributes['xml:id'];
@@ -182,6 +181,13 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
           if (el.tagName === 'measure') {
             childOfMeasure = false;
             measureCount++;
+            // Check whether one of the timeStamp2Pages exceeded measureCount
+            for (let id in tmp) {
+              if (tmp[id] === measureCount) {
+                timeStamp2Pages[id] = p; // store page
+                delete tmp[id];
+              }
+            }
           }
           if (p < Object.keys(breaks).length &&
             el.attributes['xml:id'] === breaks[p][breaks[p].length - 1]) {
@@ -194,6 +200,11 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
             if (i >= 0) { // found an id pointed to, so remember it
               noteTable[id] = childOfMeasure ? p - 1 : p;
               delete idList[i];
+              // check for time stamp 2
+              const tstamp2 = el.attributes['tstamp2'];
+              if (tstamp2) {
+                tmp[id] = getMeasureCount(tstamp2) + measureCount;
+              }
             }
           }
           if (el.children) {
