@@ -1,6 +1,6 @@
 // mei-friend version and date
-export const version = '0.6.9';
-export const versionDate = '2 Dec 2022';
+export const version = '0.7.0';
+export const versionDate = '4 Dec 2022';
 
 var vrvWorker;
 var spdWorker;
@@ -186,6 +186,7 @@ import {
 import * as att from './attribute-classes.js';
 import * as e from './editor.js';
 import Viewer from './viewer.js';
+import * as speed from './speed.js';
 import Github from './github.js';
 import Storage from './storage.js';
 import {
@@ -1198,6 +1199,20 @@ function downloadMei() {
   setFileChangedState(false);
 }
 
+function downloadSpeedMei() {
+  let blob = new Blob([speed.getPageFromDom(v.xmlDoc, v.currentPage, v.breaksValue(), v.pageSpanners)], {
+    type: 'text/plain'
+  });
+  let a = document.createElement('a');
+  a.download = meiFileName
+    .substring(meiFileName.lastIndexOf("/") + 1)
+    .replace(/\.[^/.]+$/, '_page-' + v.currentPage + '-speedMode.mei');
+  a.href = window.URL.createObjectURL(blob);
+  a.click();
+  // Now that the user has "saved" the MEI, clear the file change indicator
+  setFileChangedState(false);
+}
+
 function downloadMidi() {
   let message = {
     'cmd': 'exportMidi',
@@ -1330,6 +1345,7 @@ export let cmd = {
   'openHumdrum': () => openFileDialog('.krn,.hum'),
   'openPae': () => openFileDialog('.pae,.abc'),
   'downloadMei': () => downloadMei(),
+  'downloadSpeedMei': () => downloadSpeedMei(),
   'indentSelection': () => indentSelection(),
   'validate': () => v.manualValidate(),
   'zoomIn': () => v.zoom(+1, storage),
