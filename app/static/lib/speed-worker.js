@@ -6,6 +6,8 @@
  * operations for traversing the DOM structure.
  */
 
+// importScripts('../lib/utils.js');
+
 var timeSpanningElements; // elements with @tstamp2; from attribute-classes.js
 
 /*
@@ -64,30 +66,39 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
   // collect all time-spanning elements with @startid and @endid
   let tsTable = {}; // object with id as keys and an array of [startid, endid]
   let idList = []; // list of time-pointer ids to be checked
-  tsTable = crawl(score.children, tsTable, idList);
+  tsTable = findTimeSpanningElements(score.children, tsTable, idList);
 
   // determine page number for list of ids
   noteTable = {};
   let count = false;
   let p = 1;
+  let measureCount = 0;
+  let tmp = {}; // list of unpaged tstamp2 elements (with xml:id as keys and endMeasure as value)
+  let timeStamp2Pages = {}; // list of elements with @tstamp2 and end page 
 
-  noteTable = dig(score.children, noteTable, idList);
+  noteTable = getPageNumberForElements(score.children, noteTable, idList);
 
   // packing pageSpanners with different page references
   let p1 = 0;
   let p2 = 0;
   for (let spannerIds of Object.keys(tsTable)) {
     p1 = noteTable[tsTable[spannerIds][0]];
-    p2 = noteTable[tsTable[spannerIds][1]];
+    if (tsTable[spannerIds].length == 2) {
+      p2 = noteTable[tsTable[spannerIds][1]];
+    } else { // find page number for spannerIds[0] from timeStamp2Pages
+      p2 = timeStamp2Pages[spannerIds];
+    }
     if (p1 > 0 && p2 > 0 && p1 != p2) {
-      if (pageSpanners.start[p1])
+      if (pageSpanners.start[p1]) {
         pageSpanners.start[p1].push(spannerIds);
-      else
+      } else {
         pageSpanners.start[p1] = [spannerIds];
-      if (pageSpanners.end[p2])
+      }
+      if (pageSpanners.end[p2]) {
         pageSpanners.end[p2].push(spannerIds);
-      else
+      } else {
         pageSpanners.end[p2] = [spannerIds];
+      }
     }
   }
   return pageSpanners;
@@ -100,22 +111,26 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
    * @param {array} idList 
    * @returns {object} tsTable
    */
-  function crawl(nodeArray, tsTable, idList) {
+  function findTimeSpanningElements(nodeArray, tsTable, idList) {
     nodeArray.forEach(el => {
       if (timeSpanningElements.includes(el.tagName)) {
-        let startid = el.attributes['startid'];
-        let endid = el.attributes['endid'];
+        const startid = rmHash(el.attributes['startid']);
+        const endid = rmHash(el.attributes['endid']);
+        const tstamp2 = el.attributes['tstamp2'];
         if (startid && endid) {
-          tsTable[el.attributes['xml:id']] = [startid.slice(1), endid.slice(1)];
-          idList.push(startid.slice(1));
-          idList.push(endid.slice(1));
+          tsTable[el.attributes['xml:id']] = [startid, endid];
+          idList.push(startid);
+          idList.push(endid);
+        } else if (tstamp2) { // store element xml:id
+          tsTable[el.attributes['xml:id']] = [el.attributes['xml:id']];
+          idList.push(el.attributes['xml:id']);
         }
       } else if (el.children) {
-        tsTable = crawl(el.children, tsTable, idList);
+        tsTable = findTimeSpanningElements(el.children, tsTable, idList);
       }
     });
     return tsTable;
-  } // crawl()
+  } // findTimeSpanningElements()
 
   /**
    * Determine the page number for each element in nodeArray recursively, 
@@ -126,52 +141,83 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
    * @param {boolean} childOfMeasure 
    * @returns 
    */
-  function dig(nodeArray, noteTable, idList, childOfMeasure = false) {
+  function getPageNumberForElements(nodeArray, noteTable, idList, childOfMeasure = false) {
     if (breaksOption === 'line' || breaksOption === 'encoded') {
       nodeArray.forEach(el => { // el obj w/ tagName, children, attributes
         if (el.hasOwnProperty('tagName')) {
-          if (el.tagName === 'measure') count = true;
+          if (el.tagName === 'measure') {
+            count = true;
+            measureCount++;
+            // Check whether one of the timeStamp2Pages exceeded measureCount
+            for (let id in tmp) {
+              if (tmp[id] === measureCount) {
+                timeStamp2Pages[id] = p; // store page
+                delete tmp[id];
+              }
+            }
+          }
           if (count && breaks.includes(el.tagName)) p++;
-          let id = el.attributes['xml:id'];
+          const id = el.attributes['xml:id'];
           if (id) {
             let i = idList.indexOf(id);
             if (i >= 0) { // found an id pointed to, so remember it
               noteTable[id] = p;
               delete idList[i];
+              // check for time stamp 2
+              const tstamp2 = el.attributes['tstamp2'];
+              if (tstamp2) {
+                tmp[id] = getMeasureCount(tstamp2) + measureCount;
+              }
             }
           }
           if (el.children) {
-            noteTable = dig(el.children, noteTable, idList);
+            noteTable = getPageNumberForElements(el.children, noteTable, idList);
           }
         }
       });
     } else if (breaksOption === 'auto') {
       nodeArray.forEach(el => { // el obj w/ tagName, children, attributes
         if (el.hasOwnProperty('tagName')) {
-          if (el.tagName === 'measure') childOfMeasure = false;
+          if (el.tagName === 'measure') {
+            childOfMeasure = false;
+            measureCount++;
+            // Check whether one of the timeStamp2Pages exceeded measureCount
+            for (let id in tmp) {
+              if (tmp[id] === measureCount) {
+                timeStamp2Pages[id] = p; // store page
+                delete tmp[id];
+              }
+            }
+          }
           if (p < Object.keys(breaks).length &&
             el.attributes['xml:id'] === breaks[p][breaks[p].length - 1]) {
             childOfMeasure = true; // for children of last measure on page
             p++;
           }
-          let id = el.attributes['xml:id'];
+          const id = el.attributes['xml:id'];
           if (id) {
             let i = idList.indexOf(id);
             if (i >= 0) { // found an id pointed to, so remember it
               noteTable[id] = childOfMeasure ? p - 1 : p;
               delete idList[i];
+              // check for time stamp 2
+              const tstamp2 = el.attributes['tstamp2'];
+              if (tstamp2) {
+                tmp[id] = getMeasureCount(tstamp2) + measureCount;
+              }
             }
           }
           if (el.children) {
-            noteTable = dig(el.children, noteTable, idList, childOfMeasure);
+            noteTable = getPageNumberForElements(el.children, noteTable, idList, childOfMeasure);
           }
         }
       });
     }
     return noteTable;
-  } // dig()
+  } // getPageNumberForElements()
 
 } // listPageSpanningElements()
+
 
 // Return first element with tagName elName
 function getElementByTagName(nodeArray, elName, el) {
@@ -189,14 +235,35 @@ function getElementByTagName(nodeArray, elName, el) {
     }
   }
   return el;
+} // getElementByTagName()
+
+
+// same as in ./utils.js, but importScripts do not seem to do the job...
+function rmHash(hashedString) {
+  if (!hashedString) return '';
+  return (hashedString.startsWith('#')) ?
+    hashedString.split('#')[1] : hashedString;
+} // rmHash()
+
+
+// returns measure count from tstamp2 (according to data.MEASUREBEAT)
+function getMeasureCount(tstamp2) {
+  return (tstamp2.includes('m')) ? parseInt(tstamp2.split('m').at(0)) : 0;
 }
 
 
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// 
 // ACKNOWLEDGEMENTS
+//
 // The below code is taken from https://github.com/TobiasNickel/tXml,
 // published by Tobias Nickel under MIT license.
-
+//
 // We are grateful for the fast xml parsing inside workers! Thanks a lot!
+//
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 // The MIT License (MIT)
 

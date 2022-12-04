@@ -113,8 +113,9 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks, pageSpanners) {
 
   // matchTimespanningElements(xmlScore, spdScore, pageNo);
 
-  if (Object.keys(pageSpanners.start).length > 0)
-    addPageSpanningElements(xmlScore, spdScore, pageSpanners, pageNo);
+  if (Object.keys(pageSpanners.start).length > 0) {
+    addPageSpanningElements(xmlScore, spdScore, pageSpanners, pageNo, breaks);
+  }
 
   // insert sb elements for each element except last
   if (countingMode === 'computedBreaks' && Object.keys(breaks).length > 0 && !Array.isArray(breaks)) {
@@ -332,7 +333,7 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
           // remove starting pb (in case of a pb inside endingNode) 
           // or replace existing sb inside endingNode with startingPb
           let startingPd = spdScore.querySelector('[*|id="startingPb"]');
-          if (startingPd && breakNode.nodeName === 'sb'){ 
+          if (startingPd && breakNode.nodeName === 'sb') {
             endingNode.replaceChild(startingPd, breakNode);
           } else {
             startingPd?.remove();
@@ -370,15 +371,15 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
 
     } // for loop across child nodes
     return newSection;
-  }
+  } // digDeeper()
 }
 
 /**
  * List all notes/chords to check whether they are pointed to from outside the
  * requested pageNo to be run at each edit/page turn (becomes slow with big
- * files).
+ * files). NOT USED; KEPT FOR DOCUMENTATION.
  *
- * TODO: This is currently not used and probably O(n²). If it should be used
+ * TODO: @th-we: This is currently not used and probably O(n²). If it should be used
  * again, create objects mapping all `@startid` and `@endid` values once and
  * pass it as argument to this function. This should probably give us something
  * like O(n log n) complexity.
@@ -482,7 +483,8 @@ function matchTimespanningElements(xmlScore, spdScore, pageNo) {
 
 /**
  * List all timespanning elements with `@startid`/`@endid` attributes on
- * different pages
+ * different pages (similar to speed-worker::listPageSpanningElements(), 
+ * but for a common DOM object). NOT USED; KEPT FOR DOCUMENTATION.
  * @param {Document} xmlScore
  * @param {Break[]} breaks
  * @param {BreaksOption} breaksOption
@@ -631,48 +633,177 @@ function getMeter(scoreDef) {
  * @param {Element} spdScore
  * @param {PageSpanners} pageSpanners
  * @param {number} pageNo
+ * @param {*} breaks
  */
-function addPageSpanningElements(xmlScore, spdScore, pageSpanners, pageNo) {
-  // 1) go through endingElements and add to first measure
+function addPageSpanningElements(xmlScore, spdScore, pageSpanners, pageNo, breaks) {
+
+  // 1) go through endingElements and add to starting measure (p. 1)
+  const startingMeasure = /** @type {Element} */ (spdScore.querySelector('[*|id="startingMeasure"]'));
   let endingElementIds = pageSpanners.end[pageNo];
   if (endingElementIds && pageNo > 1) {
-    const m = /** @type {Element} */ (spdScore.querySelector('[*|id="startingMeasure"]'));
     for (let endingElementId of endingElementIds) {
       let endingElement = xmlScore.querySelector('[*|id="' + endingElementId + '"]');
-      if (!endingElement) continue;
-      let startid = utils.rmHash(endingElement.getAttribute('startid'));
-      let startNote = xmlScore.querySelector('[*|id="' + startid + '"]');
-      if (!startNote) continue;
-      const staffNo = startNote.closest('staff')?.getAttribute('n') || '-1';
-      if (!spdScore.querySelector('[*|id="' + startid + '"]')) {
-        let staff = m.querySelector('staff[n="' + staffNo + '"]');
-        staff?.querySelector('layer')?.appendChild(startNote.cloneNode(true));
+      if (endingElement && endingElement.hasAttribute('startid')) {
+        addPointingNote(endingElement, 'startid', startingMeasure);
+      } else if (endingElement && endingElement.hasAttribute('tstamp2')) {
+        handleTimeStamp2Element(endingElement, 'ending');
       }
-      m.appendChild(endingElement.cloneNode(true));
     }
   } // 1) if
 
-  // 2) go through startingElements and append to a third-page measure
+  // 2) go through startingElements and append to ending measure (p. 3)
+  const endingMeasure = /** @type {Element} */ (spdScore.querySelector('[*|id="endingMeasure"]'));
   let startingElementIds = pageSpanners.start[pageNo];
   if (startingElementIds) {
-    const m = /** @type {Element} */ (spdScore.querySelector('[*|id="endingMeasure"]'));
     for (let startingElementId of startingElementIds) {
-      let startingElement = xmlScore.querySelector('[*|id="' + startingElementId + '"]');
-      if (!startingElement) continue;
-      let endid = utils.rmHash(startingElement.getAttribute('endid'));
-      // console.info('searching for endid: ', endid);
-      if (endid) {
-        let endNote = xmlScore.querySelector('[*|id="' + endid + '"]');
-        if (!endNote) continue;
-        const staffNo = endNote.closest('staff')?.getAttribute('n') || "-1";
-        if (!spdScore.querySelector('[*|id="' + endid + '"]')) {
-          let staff = m.querySelector('staff[n="' + staffNo + '"]');
-          staff?.querySelector('layer')?.appendChild(endNote.cloneNode(true));
-        }
+      let startingElement = spdScore.querySelector('[*|id="' + startingElementId + '"]');
+      if (startingElement && startingElement.hasAttribute('endid')) {
+        addPointingNote(startingElement, 'endid', endingMeasure);
+      } else if (startingElement && startingElement.hasAttribute('tstamp2')) {
+        handleTimeStamp2Element(startingElement, 'starting');
       }
     }
   } // 2) if
-}
+
+  // 3) find those element that start before pageNo and end after it
+  // Iterate through starting elements while < pageNo and
+  // look for each element whether it ends after pageNo
+  for (let p of Object.keys(pageSpanners.start)) {
+    if (parseInt(p) < pageNo) {
+      let elementIds = pageSpanners.start[p];
+      for (let elId of elementIds) {
+        let page = getPageNumberForIdInPageSpannersEndObject(elId);
+        if (page > 0) {
+          console.log('AAAAAcross-page PageSpanner ' + elId + ' from ' + p + ' to ' + page);
+          let el = xmlScore.querySelector('[*|id="' + elId + '"]');
+          if (el && el.hasAttribute('startid') && el.hasAttribute('endid')) {
+            addPointingNote(el, 'startid', startingMeasure);
+            addPointingNote(el, 'endid', endingMeasure);
+          } else if (el && el.hasAttribute('tstamp2')) {
+            handleTimeStamp2Element(el, 'spanning');
+          }
+        }
+      }
+    } else {
+      break;
+    }
+  } // 3)
+
+  /**
+   * Add pointing note (@startid or @endid) to starting/endingMeasure
+   * and add element itself in case of @startid
+   * @param {Element} el 
+   * @param {string} searchAttr 
+   * @param {Element} refMeas 
+   * @returns 
+   */
+  function addPointingNote(el, searchAttr = 'startid', refMeas) {
+    let startid = utils.rmHash(el.getAttribute(searchAttr));
+    let startNote = xmlScore.querySelector('[*|id="' + startid + '"]');
+    if (!startNote) return false;
+    const staffNo = startNote.closest('staff')?.getAttribute('n') || '-1';
+    if (!spdScore.querySelector('[*|id="' + startid + '"]')) {
+      let staff = refMeas.querySelector('staff[n="' + staffNo + '"]');
+      staff?.querySelector('layer')?.appendChild(startNote.cloneNode(true));
+    }
+    if (searchAttr === 'startid') {
+      refMeas.appendChild(el.cloneNode(true));
+    }
+  } // addPointingNote()
+
+  /** @typedef {'starting' | 'ending' | 'spanning'} SpanMode */
+
+  /**
+   * Handles timeStamp2 element under different breaks and span modes:
+   * 
+   * @param {Element} el 
+   * @param {SpanMode} spanMode 
+   */
+  function handleTimeStamp2Element(el, spanMode = 'ending') {
+    let tstamp2 = el.getAttribute('tstamp2');
+    if (tstamp2) {
+      let elId = el.getAttribute('xml:id');
+      let mb = utils.readMeasureBeat(tstamp2);
+      console.log('handleTimeStamp2Element(): el: ', el);
+
+      // find number of measures until next page/system break
+      let nodeList;
+      if (Array.isArray(breaks)) {
+        nodeList = xmlScore.querySelectorAll('measure,[*|id="' + elId + '"],' + breaks);
+      } else {
+        nodeList = xmlScore.querySelectorAll('measure,[*|id="' + elId + '"]');
+      }
+      let dm = 0;
+      let count = false;
+      let dmOfLastBreak = 0;
+      let dmOfLastLastBreak = 0;
+      let pageNumber = 1;
+      for (let n of nodeList) {
+        if (n.getAttribute('xml:id') === elId) {
+          count = true; // start counting after first occurrence of el
+        }
+        if (count && n.nodeName === 'measure') {
+          dm++; // count measures
+        }
+        // break, if delta measures dm exceeds tstamp2 or pageNumber pageNo
+        if (count && (dm >= mb.measure || pageNumber > pageNo)) {
+          if (spanMode === 'spanning') {
+            dm = dmOfLastBreak - dmOfLastLastBreak;
+          } else if (spanMode === 'ending') {
+            dm = dm - dmOfLastBreak;
+          }
+          break;
+        }
+        // count pages and keep track of last and lastlast break for spanMode==='spanning'
+        if ((Array.isArray(breaks) && breaks.includes(n.nodeName)) ||
+          (!Array.isArray(breaks) && typeof(breaks) === 'object' && breaks[pageNumber].at(-1) === n.getAttribute('xml:id'))) {
+            // an array is also an object!
+            pageNumber++;
+          if (count && spanMode === 'starting') {
+            break;
+          } else {
+            dmOfLastLastBreak = dmOfLastBreak;
+            dmOfLastBreak = dm;
+          }
+        }
+      }
+      // console.log('addPageSpanningElements(): dm: ' + dm + ', spanMode: ' + spanMode);
+      if (spanMode === 'starting') { // element starting on current page (pageNo)
+        el.setAttribute('tstamp2', utils.writeMeasureBeat(dm + 1, 1));
+        // console.log('Element modified: ', el);
+      } else { // element ending on current page (pageNo)
+        let spanningElement = el.cloneNode(true);
+        if (spanMode === 'spanning') {
+          // @ts-ignore
+          spanningElement.setAttribute('tstamp2', utils.writeMeasureBeat(dm + 1, 1));
+        } else if (spanMode === 'ending') {
+          // @ts-ignore
+          spanningElement.setAttribute('tstamp2', utils.writeMeasureBeat(dm, mb.beat));
+        }
+        // console.log('Element added: ', spanningElement);
+        startingMeasure.appendChild(spanningElement);
+      }
+    }
+  } // handleTimeStamp2Element()
+
+  // find the matching id in list of ending elements after pageNo, or return -1
+  function getPageNumberForIdInPageSpannersEndObject(/** @type {string} */ id) {
+    let pageNumber = -1;
+    for (let p of Object.keys(pageSpanners.end)) {
+      if (parseInt(p) > pageNo) {
+        let elementIds = pageSpanners.end[p];
+        for (let elId of elementIds) {
+          if (elId === id) {
+            return parseInt(p);
+          }
+        }
+      }
+    }
+    return pageNumber;
+  } // getPageNumberForIdInPageSpannersObject()
+
+} // addPageSpanningElements()
+
 
 
 /**

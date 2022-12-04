@@ -375,7 +375,7 @@ export function toggleArtic(v, cm, artic = "stacc") {
     let uuid;
     let noteList;
     if (['note', 'chord'].includes(note.nodeName)) {
-      uuid = toggleArticForNote(note, artic);
+      uuid = toggleArticForNote(v, note, artic);
       uuid ? ids[i] = uuid : ids[i] = id;
       range = replaceInEditor(cm, note, true);
       cm.execCommand('indentAuto');
@@ -383,7 +383,7 @@ export function toggleArtic(v, cm, artic = "stacc") {
       let noteId;
       for (noteId of noteList) {
         note = v.xmlDoc.querySelector("[*|id='" + noteId + "']");
-        uuid = toggleArticForNote(note, artic);
+        uuid = toggleArticForNote(v, note, artic);
         range = replaceInEditor(cm, note, true);
         cm.execCommand('indentAuto');
       }
@@ -1037,7 +1037,7 @@ export function replaceInEditor(cm, xmlNode, select = false, newNode = null) {
 // # (mostly) private functions                                               #
 // ############################################################################
 
-function toggleArticForNote(note, artic) {
+function toggleArticForNote(v, note, artic) {
   note = utils.attrAsElements(note);
   let articChildren;
   let add = false;
