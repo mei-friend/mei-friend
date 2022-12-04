@@ -73,7 +73,8 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
   let count = false;
   let p = 1;
   let measureCount = 0;
-  let timeStampers = [];
+  let tmp = {}; // list of unpaged tstamp2 elements (with xml:id as keys and endMeasure as value)
+  let timeStamp2Pages = {}; // list of elements with @tstamp2 and end page 
 
   noteTable = getPageNumberForElements(score.children, noteTable, idList);
 
@@ -82,10 +83,10 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
   let p2 = 0;
   for (let spannerIds of Object.keys(tsTable)) {
     p1 = noteTable[tsTable[spannerIds][0]];
-    if (spannerIds.length > 1) {
+    if (tsTable[spannerIds].length == 2) {
       p2 = noteTable[tsTable[spannerIds][1]];
-    } else {
-      // find page number for spannerIds[0]
+    } else { // find page number for spannerIds[0]
+      p2 = timeStamp2Pages[spannerIds];
     }
     if (p1 > 0 && p2 > 0 && p1 != p2) {
       if (pageSpanners.start[p1]) {
@@ -101,10 +102,6 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
     }
   }
   return pageSpanners;
-
-  function getPageNumberForTstamp2(id) {
-
-  }
 
   /**
    * Find time-spanning elements and store their @startid/@endids in object tsTable
@@ -151,7 +148,13 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
           if (el.tagName === 'measure') {
             count = true;
             measureCount++;
-            // TODO CHECK HERE WHETHER A timeStamper exceeded measureCount
+            // Check whether one of the timeStamp2Pages exceeded measureCount
+            for (let id in tmp) {
+              if (tmp[id] === measureCount) {
+                timeStamp2Pages[id] = p; // store page
+                delete tmp[id];
+              }
+            }
             // then move id: p into an extra array
           }
           if (count && breaks.includes(el.tagName)) p++;
@@ -164,7 +167,7 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
               // check for time stamp 2
               const tstamp2 = el.attributes['tstamp2'];
               if (tstamp2) {
-                timeStampers.push({id: getMeasureCount(tstamp2) + measureCount});
+                tmp[id] = getMeasureCount(tstamp2) + measureCount;
               }
             }
           }
@@ -234,7 +237,7 @@ function rmHash(hashedString) {
 
 // returns measure count from tstamp2 (according to data.MEASUREBEAT)
 function getMeasureCount(tstamp2) {
-  return (tstamp2.includes('m')) ? tstamp2.split('m').at(0) : 0;
+  return (tstamp2.includes('m')) ? parseInt(tstamp2.split('m').at(0)) : 0;
 }
 
 
