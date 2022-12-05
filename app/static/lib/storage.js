@@ -21,7 +21,7 @@ export default class Storage {
         this.override = true;
         console.warn("Disabling local storage for current file - " +
           "could not save file content. Content may be too big? ",
-          meiXml.length, err);
+          err);
         this.clear();
         this.read();
       }
