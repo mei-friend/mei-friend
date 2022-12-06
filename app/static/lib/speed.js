@@ -315,10 +315,7 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
           // console.info('scoreDef: ', spdScore.querySelector('scoreDef'));
         }
       }
-      if (currentNodeName === 'ending') {
-        console.log('ENDING', currentNode);
-        console.log('breaks in element: ', currentNode.querySelector(breaksSelector));
-      }
+
       // special treatment for endings that contain breaks
       if (currentNodeName === 'ending' && breaksSelector &&
         (currentNode.querySelector(breaksSelector))) {
