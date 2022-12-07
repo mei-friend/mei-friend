@@ -598,7 +598,7 @@ export function addSuppliedElement(v, cm) {
       let sup = document.createElementNS(dutils.meiNameSpace, 'supplied');
       let uuid = utils.generateXmlId('supplied', v.xmlIdStyle);
       sup.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
-      if (v.respId) sup.setAttributeNS(dutils.xmlNameSpace, 'resp', '#' + v.respId);
+      if (v.respId) sup.setAttribute('resp', '#' + v.respId);
       parent.replaceChild(sup, el);
       sup.appendChild(el);
       replaceInEditor(cm, el, true, sup);
