@@ -7,7 +7,7 @@ assignees: ''
 
 ---
 Your issue may already be reported!
-Please search on the [issue tracker](https://github.com/Signature-Sound-Vienna/mei-friend-online/issues) before creating a new feature request.
+Please search on the [issue tracker](https://github.com/mei-friend/mei-friend/issues) before creating a new feature request.
 
 **Is your feature request related to a problem? Please describe.**
 A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]

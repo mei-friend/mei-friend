@@ -496,13 +496,13 @@ document.addEventListener('DOMContentLoaded', function () {
   let changeLogUrl;
   switch (env) {
     case 'develop':
-      changeLogUrl = 'https://github.com/Signature-Sound-Vienna/mei-friend-online/blob/develop/CHANGELOG.md';
+      changeLogUrl = 'https://github.com/mei-friend/mei-friend/blob/develop/CHANGELOG.md';
       break;
     case 'staging':
-      changeLogUrl = 'https://github.com/Signature-Sound-Vienna/mei-friend-online/blob/staging/CHANGELOG.md';
+      changeLogUrl = 'https://github.com/mei-friend/mei-friend/blob/staging/CHANGELOG.md';
       break;
     case 'production':
-      changeLogUrl = 'https://github.com/Signature-Sound-Vienna/mei-friend-online/blob/main/CHANGELOG.md';
+      changeLogUrl = 'https://github.com/mei-friend/mei-friend/blob/main/CHANGELOG.md';
   }
   const showChangeLogLink = document.getElementById('showChangelog');
   if (showChangeLogLink) showChangeLogLink.setAttribute('href', changeLogUrl);
@@ -1849,7 +1849,7 @@ function updateHtmlTitle() {
 function drawRightFooter() {
   let rf = document.querySelector(".rightfoot");
   rf.innerHTML =
-    "<a href='https://github.com/Signature-Sound-Vienna/mei-friend-online' target='_blank'>mei-friend " +
+    "<a href='https://github.com/mei-friend/mei-friend' target='_blank'>mei-friend " +
     (env === environments.production ? version : `${env}-${version}`) +
     "</a> (" + versionDate + ").&nbsp;";
   if (tkVersion) {
@@ -1867,10 +1867,10 @@ export function log(s, code = null) {
   s += "<div>"
   if (code) {
     s += " Error Code: " + code + "<br/>";
-    s += `<a id="bugReport" target="_blank" href="https://github.com/Signature-Sound-Vienna/mei-friend-online/issues/new?assignees=&labels=&template=bug_report.md&title=Error ${code}">Submit bug report</a>`;
+    s += `<a id="bugReport" target="_blank" href="https://github.com/mei-friend/mei-friend/issues/new?assignees=&labels=&template=bug_report.md&title=Error ${code}">Submit bug report</a>`;
     v.showAlert(s, 'error', 30000);
   } else {
-    s += `<a id="bugReport" target="_blank" href="https://github.com/Signature-Sound-Vienna/mei-friend-online/issues/new?assignees=&labels=&template=bug_report.md">Submit bug report</a>`;
+    s += `<a id="bugReport" target="_blank" href="https://github.com/mei-friend/mei-friend/issues/new?assignees=&labels=&template=bug_report.md">Submit bug report</a>`;
     v.showAlert(s, 'warning', 30000);
   }
   s += "</div>"
