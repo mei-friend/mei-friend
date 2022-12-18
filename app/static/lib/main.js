@@ -1,6 +1,6 @@
 // mei-friend version and date
-export const version = '0.7.0';
-export const versionDate = '4 Dec 2022';
+export const version = '0.7.1';
+export const versionDate = '18 Dec 2022';
 
 var vrvWorker;
 var spdWorker;
@@ -1430,10 +1430,10 @@ export let cmd = {
   'cleanAccid': () => e.cleanAccid(v, cm),
   'renumberMeasuresTest': () => e.renumberMeasures(v, cm, false),
   'renumberMeasures': () => e.renumberMeasures(v, cm, true),
-  // 'reRenderMei': () => v.reRenderMei(cm, false),
-  // 'reRenderMeiWithout': () => v.reRenderMei(cm, true),
-  'reRenderMei': () => e.manipulateXmlIds(v, cm, false),
-  'reRenderMeiWithout': () => e.manipulateXmlIds(v, cm, true),
+  'reRenderMei': () => v.reRenderMei(cm, false),
+  'reRenderMeiWithout': () => v.reRenderMei(cm, true),
+  'addIds': () => e.manipulateXmlIds(v, cm, false),
+  'removeIds': () => e.manipulateXmlIds(v, cm, true),
   'ingestFacsimile': () => ingestFacsimile(),
   'addFacsimile': () => e.addFacsimile(v, cm),
   'resetDefault': () => {
@@ -1660,9 +1660,12 @@ function addEventListeners(v, cm) {
   document.getElementById('cleanAccid').addEventListener('click', () => e.cleanAccid(v, cm));
   document.getElementById('renumTest').addEventListener('click', () => e.renumberMeasures(v, cm, false));
   document.getElementById('renumExec').addEventListener('click', () => e.renumberMeasures(v, cm, true));
-  // re-render through Verovio
+  // rerender through Verovio
   document.getElementById('reRenderMei').addEventListener('click', cmd.reRenderMei);
   document.getElementById('reRenderMeiWithout').addEventListener('click', cmd.reRenderMeiWithout);
+  // add/remove ids
+  document.getElementById('addIds').addEventListener('click', cmd.addIds);
+  document.getElementById('removeIds').addEventListener('click', cmd.removeIds);
   // ingest facsimile sekelton into currently loaded MEI file
   document.getElementById('ingestFacsimile').addEventListener('click', cmd.ingestFacsimile);
   document.getElementById('addFacsimile').addEventListener('click', cmd.addFacsimile);
