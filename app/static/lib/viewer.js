@@ -331,6 +331,7 @@ export default class Viewer {
     };
   }
 
+  // re-render MEI through Verovio, while removing or adding xml:ids
   reRenderMei(cm, removeIds = false) {
     let message = {
       'cmd': 'reRenderMei',

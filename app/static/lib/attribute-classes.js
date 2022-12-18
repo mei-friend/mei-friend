@@ -57,3 +57,13 @@ export const attFacsimile = ['abbr', 'accid', 'add',
   'staffGrp', 'stem', 'supplied', 'syl', 'syllable', 'symbol', 'tempo',
   'tie', 'trill', 'tuplet', 'turn', 'unclear', 'verse'
 ];
+
+// attributes using data.URI (according to 4.0.1), most popular moved to front
+export const dataURI = [
+  'startid', 'endid', 'plist', 'target', 'source', 'sameas', 'next', 'prev',
+  'glyph.uri', 'facs', 'state', 'chordref', 'outer.recto', 'inner.verso',
+  'recto', 'verso', 'instr', 'when', 'auth.uri', 'xml:base', 'class',
+  'data', 'decls', 'hand', 'join', 'def', 'copyof', 'corresp', 'follows',
+  'precedes', 'synch', 'nymref', 'head.altsym', 'origin.startid',
+  'origin.endid', 'xlink:role', 'resp', 'def', 'altsym'
+];

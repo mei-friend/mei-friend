@@ -11,6 +11,7 @@ import {
 } from './facsimile.js';
 import Viewer from './viewer.js';
 import {
+  loadDataInEditor,
   version,
   versionDate
 } from './main.js';
@@ -98,11 +99,11 @@ export function deleteElement(v, cm, modifyerKey = false) {
       // remove zone; with CMD remove pointing element; without just remove @facs from pointing element
       removeZone(v, cm, element, modifyerKey);
     } else if (!document.getElementById('editFacsimileZones').checked) {
-    v.show
-  } else {
-    console.info('Element ' + id + ' not supported for deletion.');
-    return;
-  }
+      v.show
+    } else {
+      console.info('Element ' + id + ' not supported for deletion.');
+      return;
+    }
   element.remove();
   loadFacsimile(v.xmlDoc);
   // buffer.groupChangesSinceCheckpoint(checkPoint); TODO
@@ -281,7 +282,7 @@ export function invertPlacement(v, cm, modifier = false) {
       }
       if (el.nodeName === 'fermata')
         val === 'below' ?
-        el.setAttribute('form', 'inv') : el.removeAttribute('form');
+          el.setAttribute('form', 'inv') : el.removeAttribute('form');
       el.setAttribute(attr, val);
       range = replaceInEditor(cm, el, true);
       // txtEdr.autoIndentSelectedRows();
@@ -728,6 +729,70 @@ export function renumberMeasures(v, cm, change) {
   v.updateData(cm, false, true);
   v.updateNotation = true;
 } // renumberMeasures()
+
+// function for adding/removing xml:ids in xmlDoc & reloading MEI into cm
+export function manipulateXmlIds(v, cm, removeIds = false) {
+  let startTime = Date.now();
+  let report = { added: 0, removed: 0 };
+  let skipList = []; // list of xml:ids that will not be removed
+
+  v.updateNotation = false;
+  v.loadXml(cm.getValue(), true);
+
+  // start from these elements
+  let selector = 'body > mdiv';
+  let rootList = v.xmlDoc.querySelectorAll(selector);
+
+  // determine skipList to securely remove ids
+  if (removeIds) {
+    rootList.forEach(e => dig(e, true));
+  }
+
+  // manipulate xml tree starting from selector
+  rootList.forEach(e => dig(e));
+
+  addApplicationInfo(v, cm)
+  cm.setValue(new XMLSerializer().serializeToString(v.xmlDoc));
+  v.updateData(cm, false, true);
+  let msg;
+  if (removeIds) {
+    msg = report.removed + ' xml:ids removed from encoding, ';
+    msg += skipList.length + ' xml:ids kept, because they are pointed to. ';
+  } else {
+    msg = report.added + ' new xml:ids added to encoding. ';
+  }
+  msg += '(Processing time: ' + (Date.now() - startTime) / 1000 + ' s)';
+  console.log(msg);
+  v.showAlert(msg, 'success');
+  v.updateNotation = true;
+
+  // digs through xml tree recursively, when explore=true, just adding ids that are pointed to
+  function dig(el, explore = false) {
+    if (el.nodeType === Node.ELEMENT_NODE) {
+      if (explore) { // just go through xml structure and search for pointing ids
+        for (let attribute of att.dataURI) {
+          let value = el.getAttribute(attribute);
+          if (value) { // split value string by whitespace
+            value.split(/[\s]+/).forEach(v => skipList.push(utils.rmHash(v)));
+          }
+        }
+      } else {
+        if (!removeIds && !el.hasAttribute('xml:id')) { // add xml:id when missing
+          el.setAttributeNS(dutils.xmlNameSpace,
+            'xml:id', utils.generateXmlId(el.nodeName, v.xmlIdStyle));
+          report.added++;
+        } else if (removeIds && el.hasAttribute('xml:id')) { // remove xml:id, unless pointed to
+          if (!skipList.includes(el.getAttribute('xml:id'))) {
+            el.removeAttribute('xml:id');
+            report.removed++;
+          }
+        }
+      }
+      // recursively through the xml tree
+      el.childNodes.forEach(e => dig(e, explore));
+    }
+  }
+} // manipulateXmlIds()
 
 /**
  * Add zone element in editor (called from source-imager.js), 
