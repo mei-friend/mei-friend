@@ -1,6 +1,6 @@
 // mei-friend version and date
-export const version = '0.7.0';
-export const versionDate = '4 Dec 2022';
+export const version = '0.7.1';
+export const versionDate = '19 Dec 2022';
 
 var vrvWorker;
 var spdWorker;
@@ -496,13 +496,13 @@ document.addEventListener('DOMContentLoaded', function () {
   let changeLogUrl;
   switch (env) {
     case 'develop':
-      changeLogUrl = 'https://github.com/Signature-Sound-Vienna/mei-friend-online/blob/develop/CHANGELOG.md';
+      changeLogUrl = 'https://github.com/mei-friend/mei-friend/blob/develop/CHANGELOG.md';
       break;
     case 'staging':
-      changeLogUrl = 'https://github.com/Signature-Sound-Vienna/mei-friend-online/blob/staging/CHANGELOG.md';
+      changeLogUrl = 'https://github.com/mei-friend/mei-friend/blob/staging/CHANGELOG.md';
       break;
     case 'production':
-      changeLogUrl = 'https://github.com/Signature-Sound-Vienna/mei-friend-online/blob/main/CHANGELOG.md';
+      changeLogUrl = 'https://github.com/mei-friend/mei-friend/blob/main/CHANGELOG.md';
   }
   const showChangeLogLink = document.getElementById('showChangelog');
   if (showChangeLogLink) showChangeLogLink.setAttribute('href', changeLogUrl);
@@ -1432,6 +1432,8 @@ export let cmd = {
   'renumberMeasures': () => e.renumberMeasures(v, cm, true),
   'reRenderMei': () => v.reRenderMei(cm, false),
   'reRenderMeiWithout': () => v.reRenderMei(cm, true),
+  'addIds': () => e.manipulateXmlIds(v, cm, false),
+  'removeIds': () => e.manipulateXmlIds(v, cm, true),
   'ingestFacsimile': () => ingestFacsimile(),
   'addFacsimile': () => e.addFacsimile(v, cm),
   'resetDefault': () => {
@@ -1658,9 +1660,12 @@ function addEventListeners(v, cm) {
   document.getElementById('cleanAccid').addEventListener('click', () => e.cleanAccid(v, cm));
   document.getElementById('renumTest').addEventListener('click', () => e.renumberMeasures(v, cm, false));
   document.getElementById('renumExec').addEventListener('click', () => e.renumberMeasures(v, cm, true));
-  // re-render through Verovio
+  // rerender through Verovio
   document.getElementById('reRenderMei').addEventListener('click', cmd.reRenderMei);
-  document.getElementById('reRenderMeiWithout').addEventListener('click', cmd.reRenderMeiWithout);
+  // document.getElementById('reRenderMeiWithout').addEventListener('click', cmd.reRenderMeiWithout);
+  // add/remove ids
+  document.getElementById('addIds').addEventListener('click', cmd.addIds);
+  document.getElementById('removeIds').addEventListener('click', cmd.removeIds);
   // ingest facsimile sekelton into currently loaded MEI file
   document.getElementById('ingestFacsimile').addEventListener('click', cmd.ingestFacsimile);
   document.getElementById('addFacsimile').addEventListener('click', cmd.addFacsimile);
@@ -1849,7 +1854,7 @@ function updateHtmlTitle() {
 function drawRightFooter() {
   let rf = document.querySelector(".rightfoot");
   rf.innerHTML =
-    "<a href='https://github.com/Signature-Sound-Vienna/mei-friend-online' target='_blank'>mei-friend " +
+    "<a href='https://github.com/mei-friend/mei-friend' target='_blank'>mei-friend " +
     (env === environments.production ? version : `${env}-${version}`) +
     "</a> (" + versionDate + ").&nbsp;";
   if (tkVersion) {
@@ -1867,10 +1872,10 @@ export function log(s, code = null) {
   s += "<div>"
   if (code) {
     s += " Error Code: " + code + "<br/>";
-    s += `<a id="bugReport" target="_blank" href="https://github.com/Signature-Sound-Vienna/mei-friend-online/issues/new?assignees=&labels=&template=bug_report.md&title=Error ${code}">Submit bug report</a>`;
+    s += `<a id="bugReport" target="_blank" href="https://github.com/mei-friend/mei-friend/issues/new?assignees=&labels=&template=bug_report.md&title=Error ${code}">Submit bug report</a>`;
     v.showAlert(s, 'error', 30000);
   } else {
-    s += `<a id="bugReport" target="_blank" href="https://github.com/Signature-Sound-Vienna/mei-friend-online/issues/new?assignees=&labels=&template=bug_report.md">Submit bug report</a>`;
+    s += `<a id="bugReport" target="_blank" href="https://github.com/mei-friend/mei-friend/issues/new?assignees=&labels=&template=bug_report.md">Submit bug report</a>`;
     v.showAlert(s, 'warning', 30000);
   }
   s += "</div>"

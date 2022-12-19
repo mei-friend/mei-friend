@@ -1,6 +1,7 @@
 # mei-friend-online CHANGELOG.md
 
-
+### 0.7.1
+* Adding and removing xml:ids to and from encoding done natively inside mei-friend
 ## 0.7.0 Consolidate speed mode
 * Support for time-spanning elements with `@startid/endid` that start before and end after current page (thus, spanning across current page)
 * Support for time-spanning elements with `@tstamp/tstamp2` attributes, starting or ending on current page as well as those spanning across current page (start before and end afterwards)
@@ -10,7 +11,7 @@
 * Insert application statement with name, version, and date information
 * Settings checkbox for managing application statement insertion
 * Flag user that they are still logged in to GitHub (due to OAuth) when logging out of mei-friend
-* Fix for #9 to correctly handle breaks within endings in speed mode
+* Fix for `#9` to correctly handle breaks within endings in speed mode
 ### 0.6.8 patch: enhance facsimile functionality
 * Support for inserting facsimile element with `pb@facs` references to new surface elements
 * Support for displaying empty surface images
@@ -29,7 +30,7 @@
 ### 0.6.6 patch: small fixes and refinements
 * Correctly reset GitHub menu when switching to local file (via menu or drag'n'drop)
 * Make filename in file status display editable when working locally
-* Make undo and redo graphically available via 'Code' menu
+* Make undo and redo graphically available via `Code` menu
 ### 0.6.5 patch: code refinements
 * Show link to changelog to the branch corresponding to `env`
 * Reduce verbosity and fix small glitches
@@ -46,11 +47,12 @@
 * Annotation list layout fixes
 * Support autoValidate (true|false) as URL parameter
 ### 0.6.2 patch: small bug fixes
-* Bugfix: create valid <ptr/> objects for linking annotations
+* Bugfix: create valid `<ptr/>` objects for linking annotations
 * Bugfix: guard against edge-cases when switching vrvTk versions
 ### 0.6.1 Verovio toolkit version selection
 * Added Verovio toolkit versions before 3.11.0 with warning for a refresh upon memory slip.
-* Bugfix: ensure <annot>s are generated in a valid location within the MEI
+* Bugfix: ensure `<annot>`s are generated in a valid location within the MEI
+
 ## 0.6.0 XML code validation (based on Laurent Pugin's code from the Verovio editor and Gnome xmllint)
 * Automatically derive schema URL from MEI (upon each text change)
 * Fetch (new) schema and load it both for code completion and schema validation
@@ -65,6 +67,7 @@
 * Fix font selector
 ### 0.5.1 patch: forkAndOpen
 * Implement 'fork' parameter that directs user to fork and open raw github resources specified via 'file' param
+
 ## 0.5.0: Support for source image display
 * Parsing facsimile information and display source image zones
 * Providing options to activate, position, resize and zoom source image pane
@@ -80,7 +83,7 @@
 ## 0.4.0: Initial support for annotations
 * Implement annotation panel (activate from mei-friend settings)
 * Annotation tools for highlight, describe, link 
-* Reading and writing of <annot> elements
+* Reading and writing of `<annot>` elements
 * Listing of annotations in annotation panel
 * Loading and interpreting simple Web Annotations
 ### 0.3.13 patch: hotfix

@@ -331,6 +331,7 @@ export default class Viewer {
     };
   }
 
+  // re-render MEI through Verovio, while removing or adding xml:ids
   reRenderMei(cm, removeIds = false) {
     let message = {
       'cmd': 'reRenderMei',
@@ -884,6 +885,7 @@ export default class Viewer {
           'mei-friend style: "note-ophl5o"',
         type: 'select',
         values: ['Original', 'Base36', 'mei-friend'],
+        valuesDescriptions: ['note-0000001018877033', 'n34z4wz2', 'note-34z4wz2'],
         default: 'Base36'
       },
       addApplicationNote: {

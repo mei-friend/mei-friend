@@ -1,15 +1,15 @@
-<img src="https://raw.githubusercontent.com/Signature-Sound-Vienna/mei-friend-online/main/app/static/owl/menu-logo.svg" title="mei-friend" width="33%">
+<img src="https://raw.githubusercontent.com/mei-friend/mei-friend/main/app/static/owl/menu-logo.svg" title="mei-friend" width="33%">
 
 #  [The *mei-friend* Web Application: Editing MEI in the Browser](https://mei-friend.mdw.ac.at)
 
 *mei-friend* is a ‘last mile’ editor for [MEI music encodings](https://music-encoding.org) intended to alleviate the common task of cleaning up encodings generated via optical music recognition, or via conversion from other formats, originally implemented as a [plugin package for the Atom text editor](https://atom.io/packages/mei-friend). The [*mei-friend* Web Application](https://mei-friend.mdw.ac.at) is a reworking of the tool as a full-featured, cross-browser compatible Web application, with optimised performance and an extended set of features. The application is available online at https://mei-friend.mdw.ac.at.
 
 ### Fundamental functionalities
-![mei-friend fundamental functionalities](https://github.com/Signature-Sound-Vienna/mei-friend-online/blob/develop/demo/mei-friend-01.gif)
+![mei-friend fundamental functionalities](https://github.com/mei-friend/mei-friend/blob/develop/demo/mei-friend-01.gif)
 
 
 ### Github workflow
-![mei-friend github workflow](https://github.com/Signature-Sound-Vienna/mei-friend-online/blob/develop/demo/mei-friend-02.gif)
+![mei-friend github workflow](https://github.com/mei-friend/mei-friend/blob/develop/demo/mei-friend-02.gif)
 
 ## Components
 We use [CodeMirror](https://codemirror.net) as our text editor, and [Verovio](https://www.verovio.org) as our music engraving engine. [GitHub](https://github.org) integration is provided using [jsgit](https://github.com/creationix/jsgit), [jsgit-browser](https://github.com/LivelyKernel/js-git-browser), and the [GitHub REST API](https://docs.github.com/en/rest). XML-DOM manipulations are performed using [tXml](https://github.com/TobiasNickel/tXml) by Tobias Nickel. The MEI validation and RNG loading code is adapted from the implementation in the [Verovio editor](https://editor.verovio.org), kindly contributed by Laurent Pugin. It makes use of [libxml2](https://gitlab.gnome.org/GNOME/libxml2/). Icons are taken from GitHub's [Octicons repository](https://github.com/primer/octicons).
