@@ -1662,7 +1662,7 @@ function addEventListeners(v, cm) {
   document.getElementById('renumExec').addEventListener('click', () => e.renumberMeasures(v, cm, true));
   // rerender through Verovio
   document.getElementById('reRenderMei').addEventListener('click', cmd.reRenderMei);
-  document.getElementById('reRenderMeiWithout').addEventListener('click', cmd.reRenderMeiWithout);
+  // document.getElementById('reRenderMeiWithout').addEventListener('click', cmd.reRenderMeiWithout);
   // add/remove ids
   document.getElementById('addIds').addEventListener('click', cmd.addIds);
   document.getElementById('removeIds').addEventListener('click', cmd.removeIds);
