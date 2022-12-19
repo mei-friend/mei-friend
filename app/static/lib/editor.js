@@ -757,11 +757,16 @@ export function manipulateXmlIds(v, cm, removeIds = false) {
   let msg;
   if (removeIds) {
     msg = report.removed + ' xml:ids removed from encoding, ';
-    msg += skipList.length + ' xml:ids kept, because they are pointed to. ';
+    msg += skipList.length + ' xml:ids kept, because they are pointed to.';
   } else {
-    msg = report.added + ' new xml:ids added to encoding. ';
+    msg = report.added + ' new xml:ids added to encoding';
+    if (report.added > 0) {
+      let el = document.getElementById('selectIdStyle');
+      msg += ' (xml:id style: ' + el.value + '; e.g., "' + el.options[el.options.selectedIndex].title + '")';
+    }
+    msg += '.';
   }
-  msg += '(Processing time: ' + (Date.now() - startTime) / 1000 + ' s)';
+  msg += ' (Processing time: ' + (Date.now() - startTime) / 1000 + ' s)';
   console.log(msg);
   v.showAlert(msg, 'success');
   v.updateNotation = true;
