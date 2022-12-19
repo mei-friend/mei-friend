@@ -49,8 +49,8 @@ export function setOrientation(cm,
   const facsimileDragger = document.getElementById('facsimile-dragger');
   const facsimileContainer = document.getElementById('facsimile-container');
   const facsimilePanel = document.getElementById('facsimile-panel');
-  const verovioControlMenu = document.getElementById('verovio-control-menu');
-  const facsimileControlMenu = document.getElementById('facsimile-control-menu');
+  const verovioControlMenu = document.getElementById('notation-control-bar');
+  const facsimileControlMenu = document.getElementById('facsimile-control-bar');
   const annotationPanel = document.getElementById('annotationPanel');
   const showAnnotationPanelCheckbox = document.getElementById('showAnnotationPanel');
   const showFacsimile = document.getElementById('showFacsimilePanel').checked;
@@ -164,7 +164,7 @@ export function calcSizeOfContainer() {
 
 export function getVerovioContainerSize() {
   let v = document.getElementById('notation');
-  let c = document.getElementById('verovio-control-menu');
+  let c = document.getElementById('notation-control-bar');
   if (!c || !v) return false;
   let vbox = v.getBoundingClientRect();
   let cbox = c.getBoundingClientRect();
