@@ -2,6 +2,8 @@
 
 ### 0.7.1
 * Adding and removing xml:ids to and from encoding done natively inside mei-friend
+* Bug fixes: Reduce processing time while indenting code; sync tabSize & indentUnit
+* Skip git branch selection when only one branch exists in repository
 ## 0.7.0 Consolidate speed mode
 * Support for time-spanning elements with `@startid/endid` that start before and end after current page (thus, spanning across current page)
 * Support for time-spanning elements with `@tstamp/tstamp2` attributes, starting or ending on current page as well as those spanning across current page (start before and end afterwards)
