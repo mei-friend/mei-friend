@@ -13,7 +13,7 @@ export function createNotationDiv(parentElement, scale) {
   let verovioContainer = document.createElement('div');
   verovioContainer.id = 'verovio-container';
 
-  createVerovioControlMenu(verovioContainer, scale);
+  createNotationControlBar(verovioContainer, scale);
 
   // Create container element for Verovio SVG
   let verovioPanel = document.createElement('div');
@@ -30,7 +30,7 @@ export function createNotationDiv(parentElement, scale) {
   let facsimileContainer = document.createElement('div');
   facsimileContainer.id = 'facsimile-container';
 
-  createFacsilimieControlMenu(facsimileContainer);
+  createFacsimileControlBar(facsimileContainer);
 
   // Create container element for Facsimile Image
   let facsimilePanel = document.createElement('div');
@@ -65,12 +65,12 @@ export function createNotationDiv(parentElement, scale) {
 
 } // createNotationDiv()
 
-export function createVerovioControlMenu(parentElement, scale) {
+export function createNotationControlBar(parentElement, scale) {
 
   // Create control form
   let vrvCtrlMenu = document.createElement('div');
   vrvCtrlMenu.classList.add('control-menu');
-  vrvCtrlMenu.id = 'verovio-control-menu';
+  vrvCtrlMenu.id = 'notation-control-bar';
 
   // Verovio spinning icon
   let verovioIcon = document.createElement('div');
@@ -361,27 +361,27 @@ export function createVerovioControlMenu(parentElement, scale) {
 
   parentElement.appendChild(vrvCtrlMenu);
 
-} // createVerovioControlMenu()
+} // createNotationControlBar()
 
-export function createFacsilimieControlMenu(parentElement) {
+export function createFacsimileControlBar(parentElement) {
   // Create control form
-  let facsCtrlMenu = document.createElement('div');
-  facsCtrlMenu.classList.add('control-menu');
-  facsCtrlMenu.id = 'facsimile-control-menu';
-  parentElement.appendChild(facsCtrlMenu);
+  let facsCtrlBar = document.createElement('div');
+  facsCtrlBar.classList.add('control-menu');
+  facsCtrlBar.id = 'facsimile-control-bar';
+  parentElement.appendChild(facsCtrlBar);
 
   // facsimile icon (octicon log)
   let facsimileIcon = document.createElement('div');
   facsimileIcon.innerHTML = icon.log;
   facsimileIcon.id = 'facsimile-icon';
   facsimileIcon.title = 'Facsimile panel';
-  facsCtrlMenu.appendChild(facsimileIcon);
+  facsCtrlBar.appendChild(facsimileIcon);
 
   // Zoom controls
   let zoomCtrls = document.createElement('div');
   zoomCtrls.id = 'facimile-zoom-ctrls';
   zoomCtrls.classList.add('controls');
-  facsCtrlMenu.appendChild(zoomCtrls);
+  facsCtrlBar.appendChild(zoomCtrls);
 
   let decreaseBtn = document.createElement('button');
   decreaseBtn.id = 'facs-decrease-scale-btn';
@@ -434,7 +434,7 @@ export function createFacsilimieControlMenu(parentElement) {
   fullPageCheckbox.disabled = false;
   fullPageDiv.appendChild(fullPageCheckbox);
 
-  facsCtrlMenu.appendChild(fullPageDiv);
+  facsCtrlBar.appendChild(fullPageDiv);
 
   // edit zones
   let editZonesDiv = document.createElement('div');
@@ -458,20 +458,20 @@ export function createFacsilimieControlMenu(parentElement) {
   editZonesCheckbox.disabled = false;
   editZonesDiv.appendChild(editZonesCheckbox);
 
-  facsCtrlMenu.appendChild(editZonesDiv);
+  facsCtrlBar.appendChild(editZonesDiv);
 
   let filler = document.createElement('div');
   filler.classList.add('fillSpace');
-  facsCtrlMenu.appendChild(filler);
+  facsCtrlBar.appendChild(filler);
 
   let facsimileCloseButton = document.createElement('div');
   facsimileCloseButton.id = 'facsimile-close-button';
   facsimileCloseButton.title = 'Close facsimile panel';
   facsimileCloseButton.classList.add('topright');
   facsimileCloseButton.innerHTML = '&times;'; // icon.xCircle;
-  facsCtrlMenu.appendChild(facsimileCloseButton);
+  facsCtrlBar.appendChild(facsimileCloseButton);
 
-} // createFacsilimieControlMenu()
+} // createFacsimileControlBar()
 
 
 export function manualCurrentPage(v, cm, ev) {

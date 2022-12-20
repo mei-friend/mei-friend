@@ -11,7 +11,7 @@ import {
 } from './facsimile.js';
 import Viewer from './viewer.js';
 import {
-  loadDataInEditor,
+  handleEditorChanges,
   version,
   versionDate
 } from './main.js';
@@ -19,6 +19,7 @@ import {
 // smart indent selected region in editor, if none, do all
 export function indentSelection(v, cm) {
   v.updateNotation = false;
+  cm.blockChanges = true;
   let selections = cm.listSelections();
   selections.forEach(s => {
     let l1 = s.anchor.line;
@@ -28,14 +29,18 @@ export function indentSelection(v, cm) {
       l1 = l2;
       l2 = tmp;
     }
-    if (l1 === l2) {
+    if (l1 === l2) { // do all if nothing selected
       l1 = 0;
       l2 = cm.lastLine()
     }
-    for (let l = l1; l <= l2; l++) cm.indentLine(l, 'smart');
+    for (let l = l1; l <= l2; l++) {
+      cm.indentLine(l, 'smart');
+    }
   });
+  cm.blockChanges = false;
+  handleEditorChanges();
   v.updateNotation = true;
-}
+} // indentSelection()
 
 // delete selected elements
 export function deleteElement(v, cm, modifyerKey = false) {

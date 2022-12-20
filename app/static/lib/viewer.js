@@ -869,7 +869,7 @@ export default class Viewer {
           .map(key => supportedVerovioVersions[key].description)
       },
       toggleSpeedMode: {
-        title: 'Speed Mode',
+        title: 'Speedmode',
         description: 'Toggle Verovio Speed Mode. ' +
           'In Speedmode, only the current page ' +
           'is sent to Verovio to reduce rendering ' +
@@ -896,33 +896,6 @@ export default class Viewer {
           'and last edit',
         type: 'bool',
         default: true
-      },
-      titleAnnotations: {
-        title: 'Annotations',
-        description: 'Annotation settings',
-        type: 'header',
-        default: true
-      },
-      showAnnotations: {
-        title: 'Show annotations',
-        description: 'Show annotations in notation',
-        type: 'bool',
-        default: true
-      },
-      showAnnotationPanel: {
-        title: 'Show annotation panel',
-        description: 'Show annotation panel',
-        type: 'bool',
-        default: false
-      },
-      annotationDisplayLimit: {
-        title: 'Maximum number of annotations',
-        description: 'Maximum number of annotations to display ' +
-          '(large numbers may slow mei-friend)',
-        type: 'int',
-        min: 0,
-        step: 100,
-        default: 100
       },
       dragSelection: {
         title: 'Drag select',
@@ -963,7 +936,7 @@ export default class Viewer {
         default: false
       },
       controlMenuSettings: {
-        title: 'Control menu',
+        title: 'Notation control bar',
         description: 'Define items to be shown in control menu above the notation',
         type: 'header',
         default: true
@@ -1022,6 +995,33 @@ export default class Viewer {
       //   title: 'options-line', // class name of hr element
       //   type: 'line'
       // },
+      titleAnnotations: {
+        title: 'Annotations',
+        description: 'Annotation settings',
+        type: 'header',
+        default: true
+      },
+      showAnnotations: {
+        title: 'Show annotations',
+        description: 'Show annotations in notation',
+        type: 'bool',
+        default: true
+      },
+      showAnnotationPanel: {
+        title: 'Show annotation panel',
+        description: 'Show annotation panel',
+        type: 'bool',
+        default: false
+      },
+      annotationDisplayLimit: {
+        title: 'Maximum number of annotations',
+        description: 'Maximum number of annotations to display ' +
+          '(large numbers may slow mei-friend)',
+        type: 'int',
+        min: 0,
+        step: 100,
+        default: 100
+      },
       titleFacsimilePanel: {
         title: 'Facsimile panel',
         description: 'Show the facsimile imiages of the source edition, if available',
@@ -1621,6 +1621,10 @@ export default class Viewer {
           bothTags: true
         } : {});
         break;
+      case 'tabSize':
+        cm.setOption('indentUnit', value); // sync tabSize and indentUnit
+        cm.setOption(option, value);
+        break;
       default:
         if (value === 'true' || value === 'false') value = (value === 'true');
         cm.setOption(option, value);
@@ -1629,7 +1633,7 @@ export default class Viewer {
           this.setNotationColors(matchTheme);
         }
     }
-  }
+  } // applyEditorOption()
 
   // creates an option div with a label and input/select depending of o.keys
   createOptionsItem(opt, o, optDefault) {

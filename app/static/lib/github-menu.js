@@ -122,7 +122,7 @@ function contentsHeaderClicked(ev) {
   });
 }
 
-function userRepoClicked(ev) {
+async function userRepoClicked(ev) {
   // re-init github object with selected repo
   const author = github.author;
   setGithubInstance(new Github(
@@ -135,7 +135,16 @@ function userRepoClicked(ev) {
     author.name,
     author.email
   ))
-  fillInRepoBranches(ev);
+  const per_page = 100;
+  const page = 1;
+  const repoBranches = await github.getRepoBranches(per_page, page);
+  if (repoBranches.length === 1) { // skip branch menu if only one branch
+    github.branch = repoBranches[0].name;
+    github.filepath = "/";
+    fillInBranchContents(ev);
+  } else {
+    fillInRepoBranches(ev, repoBranches);
+  }
 }
 
 function repoBranchClicked(ev) {
@@ -308,9 +317,9 @@ export async function fillInUserRepos(per_page = 30, page = 1) {
   assignGithubMenuClickHandlers();
 }
 
-export async function fillInRepoBranches(e, per_page = 100, page = 1) {
+export async function fillInRepoBranches(e, repoBranches = null, per_page = 100, page = 1) {
   // TODO handle > per_page branches (similar to userRepos)
-  const repoBranches = await github.getRepoBranches(per_page, page);
+  repoBranches = repoBranches || await github.getRepoBranches(per_page, page);
   let githubMenu = document.getElementById("GithubMenu");
   githubMenu.innerHTML = `
   <a id="GithubLogout" href="#">Log out</a>
@@ -398,7 +407,7 @@ async function proposeFileName(fname) {
 export async function fillInBranchContents(e) {
   // TODO handle > per_page files (similar to userRepos)
   let target = document.getElementById("contentsHeader");
-  const branchContents = await github.getBranchContents(github.filepath);
+  let branchContents = await github.getBranchContents(github.filepath);
   let githubMenu = document.getElementById("GithubMenu");
   githubMenu.innerHTML = `
   <a id="GithubLogout" href="#">Log out</a>
