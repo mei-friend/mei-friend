@@ -1621,6 +1621,10 @@ export default class Viewer {
           bothTags: true
         } : {});
         break;
+      case 'tabSize':
+        cm.setOption('indentUnit', value); // sync tabSize and indentUnit
+        cm.setOption(option, value);
+        break;
       default:
         if (value === 'true' || value === 'false') value = (value === 'true');
         cm.setOption(option, value);
@@ -1629,7 +1633,7 @@ export default class Viewer {
           this.setNotationColors(matchTheme);
         }
     }
-  }
+  } // applyEditorOption()
 
   // creates an option div with a label and input/select depending of o.keys
   createOptionsItem(opt, o, optDefault) {
