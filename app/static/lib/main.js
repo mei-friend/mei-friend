@@ -252,6 +252,7 @@ const defaultCodeMirrorOptions = {
   indentUnit: 3,
   smartIndent: true,
   tabSize: 3,
+  indentWithTabs: false,
   autoCloseBrackets: true,
   autoCloseTags: true,
   matchTags: {
@@ -619,7 +620,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // if (selectParam && selectParam.length > 0) storage.select = selectParam;
     if (speedParam !== null) storage.speed = speedParam;
     if (breaksParam !== null) storage.breaks = breaksParam;
-    if(storage.githubLogoutRequested) { 
+    if (storage.githubLogoutRequested) {
       v.showAlert(`You have logged out of mei-friend's GitHub integration, but your browser is still logged in to GitHub!
       <a href="https://github.com/logout" target="_blank">Click here to logout from GitHub</a>.`, 'warning', 30000);
       storage.removeItem("githubLogoutRequested");
@@ -1468,10 +1469,10 @@ function addEventListeners(v, cm) {
   // register global event listeners
   let body = document.querySelector('body')
   body.addEventListener('mousedown', (ev) => {
-    if(ev.target.matches("#alertMessage a")) {
+    if (ev.target.matches("#alertMessage a")) {
       // user clicked on link in message. Open link (before the DOM element disappears in the next conditional...)
       window.open(ev.target.href, "_blank");
-    } 
+    }
     if (ev.target.id !== 'alertOverlay' && ev.target.id !== 'alertMessage') {
       v.hideAlerts();
     }
@@ -1739,30 +1740,10 @@ function addEventListeners(v, cm) {
 
   // editor reports changes
   cm.on('changes', () => {
-    const commitUI = document.querySelector("#commitUI");
-    let changeIndicator = false;
-    let meiXml = cm.getValue();
-    if (isLoggedIn && github.filepath && commitUI) {
-      // fileChanged flag may have been set from storage - if so, run with it
-      // otherwise set it to true if we've changed the file content this session
-      changeIndicator = fileChanged || meiXml !== github.content;
-    } else {
-      // interpret any CodeMirror change as a file changed state
-      changeIndicator = true;
+    if (!cm.blockChanges) {
+      handleEditorChanges();
     }
-    if (freshlyLoaded) {
-      // ignore changes resulting from fresh file load
-      freshlyLoaded = false;
-    } else {
-      setFileChangedState(changeIndicator);
-    }
-    v.notationUpdated(cm);
-    if (storage.supported) {
-      // on every set of changes, save editor content
-      updateLocalStorage(meiXml);
-    }
-    readAnnots(); // from annotation.js
-  })
+  }); // cm.on() change listener
 
   // Editor font size zooming
   document.getElementById('encoding').addEventListener('wheel', ev => {
@@ -1867,6 +1848,33 @@ function drawRightFooter() {
       `&nbsp;<a href="${githubUrl}" target="_blank" title="${tkUrl}">Verovio ${tkVersion}</a>.`;
   }
 }
+
+// handles any changes in CodeMirror
+export function handleEditorChanges() {
+  const commitUI = document.querySelector("#commitUI");
+  let changeIndicator = false;
+  let meiXml = cm.getValue();
+  if (isLoggedIn && github.filepath && commitUI) {
+    // fileChanged flag may have been set from storage - if so, run with it
+    // otherwise set it to true if we've changed the file content this session
+    changeIndicator = fileChanged || meiXml !== github.content;
+  } else {
+    // interpret any CodeMirror change as a file changed state
+    changeIndicator = true;
+  }
+  if (freshlyLoaded) {
+    // ignore changes resulting from fresh file load
+    freshlyLoaded = false;
+  } else {
+    setFileChangedState(changeIndicator);
+  }
+  v.notationUpdated(cm);
+  if (storage.supported) {
+    // on every set of changes, save editor content
+    updateLocalStorage(meiXml);
+  }
+  readAnnots(); // from annotation.js
+} // handleEditorChanges()
 
 export function log(s, code = null) {
   s += "<div>"
