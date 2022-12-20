@@ -269,7 +269,7 @@ const defaultCodeMirrorOptions = {
     "Ctrl-Space": "autocomplete",
     "Alt-.": consultGuidelines,
     "Shift-Alt-f": indentSelection,
-    "Shift-Alt-ï": indentSelection // TODO: overcome strange bindings on MAC
+    "'Ï'": indentSelection // TODO: overcome strange bindings on MAC
   },
   lint: {
     "caller": cm,
@@ -1255,10 +1255,10 @@ function consultGuidelines() {
   }
 }
 
+// wrapper for indentSelection to be called inside CodeMirror
 function indentSelection() {
   e.indentSelection(v, cm);
-}
-
+} // indentSelection()
 
 // object of interface command functions for buttons and key bindings
 export let cmd = {
@@ -1811,7 +1811,7 @@ function moveProgressBar() {
   var id = setInterval(frame, 10);
 
   function frame() {
-    (width < 100) ? elem.style.width = (++width) + '%' : clearInterval(id);
+    (width < 100) ? elem.style.width = (++width) + '%': clearInterval(id);
   }
 }
 
@@ -1894,10 +1894,10 @@ export function log(s, code = null) {
 
 function fillInSampleEncodings() {
   fetch(sampleEncodingsCSV, {
-    headers: {
-      'content-type': 'text/csv'
-    }
-  })
+      headers: {
+        'content-type': 'text/csv'
+      }
+    })
     .then((response) => response.text())
     .then((csv) => {
       const lines = csv.split("\n");
@@ -1963,6 +1963,6 @@ function setKeyMap(keyMapFilePath) {
 // returns true, if event is a CMD (Mac) or a CTRL (Windows, Linux) event
 export function isCtrlOrCmd(ev) {
   return ev ?
-    ((platform.startsWith('mac') && ev.metaKey) || (!platform.startsWith('mac') && ev.ctrlKey))
-    : false;
+    ((platform.startsWith('mac') && ev.metaKey) || (!platform.startsWith('mac') && ev.ctrlKey)) :
+    false;
 }
