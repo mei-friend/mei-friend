@@ -103,12 +103,12 @@
     _paq.push(["setDoNotTrack", true]);
     _paq.push(["requireCookieConsent"]);
     if ((function () {
-        try {
-          return JSON.parse(unescape(("; " + document.cookie).split("; consent=").pop().split(";").shift())).tracking;
-        } catch (e) {
-          return false;
-        }
-      })()) {
+      try {
+        return JSON.parse(unescape(("; " + document.cookie).split("; consent=").pop().split(";").shift())).tracking;
+      } catch (e) {
+        return false;
+      }
+    })()) {
       _paq.push(["setCookieConsentGiven"]);
     } else {
       _paq.push(["forgetCookieConsentGiven"]);
@@ -182,6 +182,8 @@
           <a id="replaceAll" href="#">Replace all<span class="keyShortCut mac altKey shiftKey cmdKey">F</span><span
               class="keyShortCut nonmac shiftKey ctrlKey">R</span></a>
           <hr class="dropdown-line">
+          <a id="indentSelection" href="#">Indent selection<span class="keyShortCut altKey shiftKey">F</span></a>
+          <hr class="dropdown-line">
           <a id="jumpToLine" href="#">Jump to line<span class="keyShortCut altKey">G</span></a>
           <hr class="dropdown-line">
           <a id="manualValidate" href="#">Validate<span class="keyShortCut shiftKey cmdKey">V</span></a>
@@ -226,9 +228,13 @@
           <a id="renumTest" href="#">Renumber measures (test)<span class="keyShortCut shiftKey">R</span></a>
           <a id="renumExec" href="#">Renumber measures (exec)<span class="keyShortCut shiftKey cmdKey">R</span></a>
           <hr class="dropdown-line">
-          <a id="reRenderMei" href="#">Re-render MEI (with ids)<span class="keyShortCut cmdKey">M</span></a>
-          <a id="reRenderMeiWithout" href="#">Re-render MEI (remove ids)<span
-              class="keyShortCut shiftKey cmdKey">M</span></a>
+          <a id="addIds" href="#">Add ids to MEI<span class="keyShortCut cmdKey">M</span></a>
+          <a id="removeIds" href="#">Remove ids from MEI<span class="keyShortCut shiftKey cmdKey">M</span></a>
+          <hr class="dropdown-line">
+          <a id="reRenderMei" href="#">Rerender via Verovio</a>
+          <!-- <a id="reRenderMeiWithout" href="#">Rerender via Verovio (remove ids)</a> -->
+          <hr class="dropdown-line">
+          <a id="addFacsimile" href="#">Add facsimile element</a>
           <a id="ingestFacsimile" href="#">Ingest facsimile<span class="keyShortCut cmdKey">I</span></a>
         </div>
       </div>
@@ -288,7 +294,7 @@
           <a id="consultGuidelines" href="#">Consult Guidelines for current element<span
               class="keyShortCut altKey">.</span></a>
           <hr class="dropdown-line">
-          <a id="Feedback" href="https://github.com/Signature-Sound-Vienna/mei-friend-online/issues/new/choose"
+          <a id="Feedback" href="https://github.com/mei-friend/mei-friend/issues/new/choose"
             target="_blank">
             Provide feedback</a>
           <hr class="dropdown-line">
@@ -361,7 +367,7 @@
           </div>
           <span id="openUrlStatus"></span>
           <p id="proposePublicRepertoire">We welcome proposals for <a target="_blank"
-              href="https://github.com/Signature-Sound-Vienna/mei-friend-online/issues/new?template=public_repertoire.md">additions
+              href="https://github.com/mei-friend/mei-friend/issues/new?template=public_repertoire.md">additions
               to the public repertoire</a>.</p>
         </div>
       </div>
@@ -369,7 +375,8 @@
     <div class="forkRepositoryOverlay" id="forkAndOpenOverlay">
       <div class="forkRepositoryUI">
         <div class="forkRepositoryUIGrouping">
-          <h3><img id="forkRepoGithubLogo" class="forkRepoGithubLogo" src="{{ url_for('static', filename='img/GitHub-Mark-32px.png') }}" />
+          <h3><img id="forkRepoGithubLogo" class="forkRepoGithubLogo"
+              src="{{ url_for('static', filename='img/GitHub-Mark-32px.png') }}" />
             Fork Github Repository</h3>
           <p>
             The link you have followed will create a GitHub fork of the following repository for editing in mei-friend:
@@ -433,7 +440,7 @@
           </div>
           <span id="forkRepositoryStatus" class="forkRepositoryStatus"></span>
           <p id="forkProposePublicRepertoire">We welcome proposals for <a target="_blank"
-              href="https://github.com/Signature-Sound-Vienna/mei-friend-online/issues/new?template=public_repertoire.md">additions
+              href="https://github.com/mei-friend/mei-friend/issues/new?template=public_repertoire.md">additions
               to the public repertoire</a>.</p>
         </div>
       </div>
@@ -581,13 +588,13 @@
       // ... the GitHub menu should stay open on clicks (=> navigation)
       // ... UNLESS a file is opened or commit button is clicked.
       let targetAfterClick = "";
-      if(ev.target.hasAttribute('id')) { 
-      // During navigation, GitHub menu rebuilds itself, so the ev.target 
-      // might be lost by the time we get to this handler.
-      // For these cases (e.g., click on repositoriesHeader), we fetch the newly-built
-      // version of the target, below, if it has an ID.
+      if (ev.target.hasAttribute('id')) {
+        // During navigation, GitHub menu rebuilds itself, so the ev.target 
+        // might be lost by the time we get to this handler.
+        // For these cases (e.g., click on repositoriesHeader), we fetch the newly-built
+        // version of the target, below, if it has an ID.
         targetAfterClick = document.getElementById(ev.target.id);
-      } else { 
+      } else {
         // otherwise, we just use the target as is.
         targetAfterClick = ev.target;
       }
@@ -622,7 +629,7 @@
         // remove class "active" from tablinks except for current target
         for (let tab of containingElement.getElementsByClassName("tablink"))
           (tab === ev.currentTarget) ? tab.classList.add('active') :
-          tab.classList.remove('active');
+            tab.classList.remove('active');
       }
     }
 

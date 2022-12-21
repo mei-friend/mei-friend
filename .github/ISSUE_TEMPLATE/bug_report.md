@@ -7,7 +7,7 @@ assignees: ''
 
 ---
 Your issue may already be reported!
-Please search on the [issue tracker](https://github.com/Signature-Sound-Vienna/mei-friend-online/issues) before creating a new bug report.
+Please search on the [issue tracker](https://github.com/mei-friend/mei-friend/issues) before creating a new bug report.
 
 **Error Code**
 If mei-friend has given you an error code, please copy it here:

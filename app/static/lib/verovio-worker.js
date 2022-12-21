@@ -63,7 +63,7 @@ addEventListener('message', function (e) {
         }
         result.mei = '';
         if (result.xmlId && !result.speedMode) {
-          result.pageNo = parseInt(tk.getPageWithElement(result.xmlId));
+          result.pageNo = Math.max(1, parseInt(tk.getPageWithElement(result.xmlId)));
           result.forceUpdate = true;
         }
         if (!result.speedMode) {
@@ -93,7 +93,7 @@ addEventListener('message', function (e) {
         }
         result.mei = '';
         if (result.xmlId && !result.speedMode) {
-          result.pageNo = parseInt(tk.getPageWithElement(result.xmlId));
+          result.pageNo = Math.max(1, parseInt(tk.getPageWithElement(result.xmlId)));
           result.forceUpdate = true;
         }
         let pg = (result.speedMode && result.pageNo > 1) ? 2 : result.pageNo;
@@ -108,7 +108,7 @@ addEventListener('message', function (e) {
       try {
         result.setCursorToPageBeginning = true;
         if (result.xmlId && !result.speedMode) {
-          result.pageNo = parseInt(tk.getPageWithElement(result.xmlId));
+          result.pageNo = Math.max(1, parseInt(tk.getPageWithElement(result.xmlId)));
           result.setCursorToPageBeginning = false;
           result.forceUpdate = true;
         }
@@ -127,7 +127,7 @@ addEventListener('message', function (e) {
         tk.redoLayout();
         result.setCursorToPageBeginning = true;
         if (result.xmlId && !result.speedMode) {
-          result.pageNo = parseInt(tk.getPageWithElement(result.xmlId));
+          result.pageNo = Math.max(1, parseInt(tk.getPageWithElement(result.xmlId)));
           result.forceUpdate = true;
         }
         if (result.xmlId) result.setCursorToPageBeginning = false;
@@ -147,7 +147,7 @@ addEventListener('message', function (e) {
         tk.setOptions(tkOptions);
         result.setCursorToPageBeginning = true;
         if (result.xmlId && !result.speedMode) {
-          result.pageNo = parseInt(tk.getPageWithElement(result.xmlId));
+          result.pageNo = Math.max(1, parseInt(tk.getPageWithElement(result.xmlId)));
           result.forceUpdate = true;
         }
         if (result.xmlId) result.setCursorToPageBeginning = false;
@@ -214,7 +214,7 @@ addEventListener('message', function (e) {
         }
         result.setCursorToPageBeginning = true;
         if (result.xmlId && !result.removeIds) {
-          result.pageNo = parseInt(tk.getPageWithElement(result.xmlId));
+          result.pageNo = Math.max(1, parseInt(tk.getPageWithElement(result.xmlId)));
           result.setCursorToPageBeginning = false;
         }
         result.svg = tk.renderToSVG(result.pageNo);

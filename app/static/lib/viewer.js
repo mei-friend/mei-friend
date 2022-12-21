@@ -40,6 +40,9 @@ import {
   unverified,
   xCircleFill
 } from '../css/icons.js';
+import {
+  selectMarkup
+} from './markup.js';
 
 export default class Viewer {
 
@@ -49,6 +52,7 @@ export default class Viewer {
     this.validatorInitialized = false;
     this.validatorWithSchema = false;
     this.currentSchema = '';
+    this.xmlIdStyle; // xml:id style (Original, Base36, mei-friend)
     this.updateLinting; // CodeMirror function for linting
     this.currentPage = 1;
     this.pageCount = 0;
@@ -69,6 +73,7 @@ export default class Viewer {
     this.meiHeadRange = [];
     this.vrvOptions; // all verovio options
     this.verovioIcon = document.getElementById('verovio-icon');
+    this.breaksSelect = /** @type HTMLSelectElement */ (document.getElementById('breaks-select'));
     this.respId = '';
     this.alertCloser;
   }
@@ -79,12 +84,13 @@ export default class Viewer {
     let computePageBreaks = false;
     let p = this.currentPage;
     if (this.speedMode && Object.keys(this.pageBreaks).length === 0 &&
-      document.getElementById('breaks-select').value === 'auto') {
+      this.breaksSelect.value === 'auto') {
       computePageBreaks = true;
       p = 1; // request page one, but leave currentPage unchanged
     }
     if (this.speedMode && xmlId) {
-      p = speed.getPageWithElement(this.xmlDoc, this.breaksValue(), xmlId);
+      const breaksOption = this.breaksSelect.value;
+      p = speed.getPageWithElement(this.xmlDoc, this.breaksValue(), xmlId, breaksOption);
       this.changeCurrentPage(p);
     }
     let message = {
@@ -109,7 +115,7 @@ export default class Viewer {
       'setCursorToPageBeginning': setCursorToPageBeg,
       'setFocusToVerovioPane': setFocusToVerovioPane,
       'speedMode': this.speedMode,
-      'breaks': document.getElementById('breaks-select').value
+      'breaks': this.breaksSelect.value
     };
     this.busy();
     this.vrvWorker.postMessage(message);
@@ -129,7 +135,8 @@ export default class Viewer {
       } else { // speed mode
         if (this.encodingHasChanged) this.loadXml(cm.getValue());
         if (xmlId) {
-          this.changeCurrentPage(speed.getPageWithElement(this.xmlDoc, this.breaksValue(), xmlId));
+          const pageNumber = speed.getPageWithElement(this.xmlDoc, this.breaksValue(), xmlId, this.breaksSelect.value);
+          this.changeCurrentPage(pageNumber);
           console.info('UpdatePage(speedMode=true): page: ' +
             this.currentPage + ', xmlId: ' + xmlId);
         }
@@ -178,7 +185,7 @@ export default class Viewer {
     let that = this;
     // console.log('getPageWithElement(' + xmlId + '), speedMode: ' + this.speedMode);
     if (this.speedMode) {
-      pageNumber = speed.getPageWithElement(this.xmlDoc, this.breaksValue(), xmlId);
+      pageNumber = speed.getPageWithElement(this.xmlDoc, this.breaksValue(), xmlId, this.breaksSelect.value);
     } else {
       let promise = new Promise(function (resolve) {
         let taskId = Math.random();
@@ -239,8 +246,9 @@ export default class Viewer {
     // update DOM only if encoding has been edited or
     this.loadXml(mei);
     let breaks = this.breaksValue();
-    let breaksSelectVal = document.getElementById('breaks-select').value;
+    let breaksSelectVal = this.breaksSelect.value;
     if (!this.speedMode || breaksSelectVal === 'none') return mei;
+    this.xmlDoc = selectMarkup(this.xmlDoc); // select markup
     // count pages from system/pagebreaks
     if (Array.isArray(breaks)) {
       let music = this.xmlDoc.querySelector('music score');
@@ -323,6 +331,7 @@ export default class Viewer {
     };
   }
 
+  // re-render MEI through Verovio, while removing or adding xml:ids
   reRenderMei(cm, removeIds = false) {
     let message = {
       'cmd': 'reRenderMei',
@@ -357,7 +366,7 @@ export default class Viewer {
     if (zoom) this.vrvOptions.scale = parseInt(zoom.value);
     let fontSel = document.getElementById('font-select');
     if (fontSel) this.vrvOptions.font = fontSel.value;
-    let bs = document.getElementById('breaks-select');
+    let bs = this.breaksSelect;
     if (bs) this.vrvOptions.breaks = bs.value;
     let dimensions = getVerovioContainerSize();
     let vp = document.getElementById('verovio-panel');
@@ -397,13 +406,14 @@ export default class Viewer {
         }
       }
     }
-    if (targetpage > 0 && targetpage <= this.pageCount &&
-      targetpage != this.currentPage) {
+    // if within a sensible range, update and return true
+    if (targetpage > 0 && targetpage <= this.pageCount && targetpage != this.currentPage) {
       this.currentPage = targetpage;
       if (storage && storage.supported) storage.page = this.currentPage;
       this.updatePageNumDisplay();
       return true;
     }
+    // dont update and return false otherwise
     return false;
   }
 
@@ -767,7 +777,7 @@ export default class Viewer {
   toggleAnnotationPanel() {
     setOrientation(cm);
     if (this.speedMode &&
-      document.getElementById('breaks-select').value === 'auto') {
+      this.breaksSelect.value === 'auto') {
       this.pageBreaks = {};
       this.updateAll(cm);
     } else {
@@ -849,9 +859,9 @@ export default class Viewer {
       },
       selectToolkitVersion: {
         title: 'Verovio version',
-        description: `Select Verovio toolkit version 
-                      (* Switching to older versions before 3.11.0
-                      might require a refresh due to memory issues.)`,
+        description: 'Select Verovio toolkit version ' +
+          '(* Switching to older versions before 3.11.0 ' +
+          'might require a refresh due to memory issues.)',
         type: 'select',
         default: defaultVerovioVersion,
         values: Object.keys(supportedVerovioVersions),
@@ -859,40 +869,33 @@ export default class Viewer {
           .map(key => supportedVerovioVersions[key].description)
       },
       toggleSpeedMode: {
-        title: 'Speed Mode',
-        description: `Toggle Verovio Speed Mode. 
-                      In Speedmode, only the current page
-                      is sent to Verovio to reduce rendering
-                      time with large files`,
+        title: 'Speedmode',
+        description: 'Toggle Verovio Speed Mode. ' +
+          'In Speedmode, only the current page ' +
+          'is sent to Verovio to reduce rendering ' +
+          'time with large files',
         type: 'bool',
         default: true
       },
-      titleAnnotations: {
-        title: 'Annotations',
-        description: 'Annotation settings',
-        type: 'header',
-        default: true
+      selectIdStyle: {
+        title: 'Style of generated xml:ids',
+        description: 'Style of newly generated xml:ids (existing xml:ids are not changed)' +
+          'e.g., Verovio original: "note-0000001318117900", ' +
+          'Verovio base 36: "nophl5o", ' +
+          'mei-friend style: "note-ophl5o"',
+        type: 'select',
+        values: ['Original', 'Base36', 'mei-friend'],
+        valuesDescriptions: ['note-0000001018877033', 'n34z4wz2', 'note-34z4wz2'],
+        default: 'Base36'
       },
-      showAnnotations: {
-        title: 'Show annotations',
-        description: 'Show annotations in notation',
+      addApplicationNote: {
+        title: 'Insert application statement',
+        description: 'Insert an application statement to the encoding ' +
+          'description in the MEI header, identifying ' +
+          'application name, version, date of first ' +
+          'and last edit',
         type: 'bool',
         default: true
-      },
-      showAnnotationPanel: {
-        title: 'Show annotation panel',
-        description: 'Show annotation panel',
-        type: 'bool',
-        default: false
-      },
-      annotationDisplayLimit: {
-        title: 'Maximum number of annotations',
-        description: `Maximum number of annotations to display 
-                      (large numbers may slow mei-friend)`,
-        type: 'int',
-        min: 0,
-        step: 100,
-        default: 100
       },
       dragSelection: {
         title: 'Drag select',
@@ -932,12 +935,8 @@ export default class Viewer {
         type: 'bool',
         default: false
       },
-      // controlMenuLineSeparator: {
-      //   title: 'options-line', // class name of hr element
-      //   type: 'line'
-      // },
       controlMenuSettings: {
-        title: 'Control menu',
+        title: 'Notation control bar',
         description: 'Define items to be shown in control menu above the notation',
         type: 'header',
         default: true
@@ -960,10 +959,6 @@ export default class Viewer {
         type: 'bool',
         default: true
       },
-      // renumberMeasuresLineSeparator: {
-      //   title: 'options-line', // class name of hr element
-      //   type: 'line'
-      // },
       renumberMeasuresHeading: {
         title: 'Renumber measures',
         description: 'Settings for renumbering measures',
@@ -1000,6 +995,33 @@ export default class Viewer {
       //   title: 'options-line', // class name of hr element
       //   type: 'line'
       // },
+      titleAnnotations: {
+        title: 'Annotations',
+        description: 'Annotation settings',
+        type: 'header',
+        default: true
+      },
+      showAnnotations: {
+        title: 'Show annotations',
+        description: 'Show annotations in notation',
+        type: 'bool',
+        default: true
+      },
+      showAnnotationPanel: {
+        title: 'Show annotation panel',
+        description: 'Show annotation panel',
+        type: 'bool',
+        default: false
+      },
+      annotationDisplayLimit: {
+        title: 'Maximum number of annotations',
+        description: 'Maximum number of annotations to display ' +
+          '(large numbers may slow mei-friend)',
+        type: 'int',
+        min: 0,
+        step: 100,
+        default: 100
+      },
       titleFacsimilePanel: {
         title: 'Facsimile panel',
         description: 'Show the facsimile imiages of the source edition, if available',
@@ -1013,7 +1035,6 @@ export default class Viewer {
         type: 'bool',
         default: false
       },
-      // deleteme
       selectFacsimilePanelOrientation: {
         title: 'Facsimile panel position',
         description: 'Select facsimile panel position relative to notation',
@@ -1106,6 +1127,9 @@ export default class Viewer {
               supportedVerovioVersions[optDefault].url : supportedVerovioVersions[o.default].url
           });
           break;
+        case 'selectIdStyle':
+          v.xmlIdStyle = optDefault;
+          break;
         case 'toggleSpeedMode':
           break;
         case 'showSupplied':
@@ -1177,6 +1201,9 @@ export default class Viewer {
               'msg': value,
               'url': supportedVerovioVersions[value].url
             });
+            break;
+          case 'selectIdStyle':
+            v.xmlIdStyle = value;
             break;
           case 'toggleSpeedMode':
             let sb = document.getElementById('speed-checkbox');
@@ -1594,6 +1621,10 @@ export default class Viewer {
           bothTags: true
         } : {});
         break;
+      case 'tabSize':
+        cm.setOption('indentUnit', value); // sync tabSize and indentUnit
+        cm.setOption(option, value);
+        break;
       default:
         if (value === 'true' || value === 'false') value = (value === 'true');
         cm.setOption(option, value);
@@ -1602,7 +1633,7 @@ export default class Viewer {
           this.setNotationColors(matchTheme);
         }
     }
-  }
+  } // applyEditorOption()
 
   // creates an option div with a label and input/select depending of o.keys
   createOptionsItem(opt, o, optDefault) {
@@ -1728,6 +1759,7 @@ export default class Viewer {
       id = this.lastNoteId;
       element = document.querySelector('g#' + utils.escapeXmlId(id));
     }
+    if (!element) return;
     console.info('Navigate ' + dir + ' ' + incElName + '-wise for: ', element);
     let x = dutils.getX(element);
     let y = dutils.getY(element);
@@ -1866,7 +1898,7 @@ export default class Viewer {
   }
 
   breaksValue() {
-    let breaksSelectVal = document.getElementById('breaks-select').value;
+    let breaksSelectVal = this.breaksSelect.value;
     switch (breaksSelectVal) {
       case 'auto':
         return {

@@ -68,7 +68,9 @@
     "shift-c": "addCClefChangeBefore",
     "shift-f": "addFClefChangeBefore",
 
-    "escape": "escapeKeyPressed"
+    "escape": "escapeKeyPressed",
+
+    "shift-alt-f": "indentSelection"
   },
 
   ".platform-darwin": {
@@ -84,8 +86,8 @@
     "cmd-shift-f": "addFClefChangeAfter",
     "cmd-alt-up": "moveElementStaffUp",
     "cmd-alt-down": "moveElementStaffDown",
-    "cmd-m": "reRenderMei",
-    "cmd-shift-m": "reRenderMeiWithout",
+    "cmd-m": "addIds",
+    "cmd-shift-m": "removeIds",
     "cmd-shift-v": "validate",
     "cmd-z": "undo",
     "cmd-shift-z": "redo",
@@ -95,12 +97,17 @@
     "cmd--": "zoomOut",
     "cmd-o": "open",
     "cmd-s": "downloadMei",
+    "cmd-shift-s": "downloadSpeedMei",
     "cmd-shift-c": "cleanAccid",
     "cmd-shift-r": "renumberMeasures",
+    "cmd-?": "openHelp",
+    "cmd-ß": "openHelp",
     "alt-.": "consultGuidelines",
     "alt-…": "consultGuidelines",
     "cmd-,": "toggleSettingsPanel",
-    "cmd-a": "toggleAnnotationPanel"
+    "cmd-a": "toggleAnnotationPanel",
+    "shift-alt-ï": "indentSelection",
+    "cmd-delete": "cmdDelete"
   },
 
   ".platform-win32, .platform-linux": {
@@ -116,8 +123,8 @@
     "ctrl-shift-f": "addFClefChangeAfter",
     "ctrl-alt-up": "moveElementStaffUp",
     "ctrl-alt-down": "moveElementStaffDown",
-    "ctrl-m": "reRenderMei",
-    "ctrl-shift-m": "reRenderMeiWithout",
+    "ctrl-m": "addIds",
+    "ctrl-shift-m": "removeIds",
     "ctrl-shift-v": "validate",
     "ctrl-z": "undo",
     "ctrl-shift-z": "redo",
@@ -127,10 +134,14 @@
     "ctrl--": "zoomOut",
     "ctrl-o": "open",
     "ctrl-s": "downloadMei",
+    "ctrl-shift-s": "downloadSpeedMei",
     "ctrl-shift-c": "cleanAccid",
     "ctrl-shift-r": "renumberMeasures",
+    "ctrl-?": "openHelp",
+    "ctrl-ß": "openHelp",
     "alt-.": "consultGuidelines",
     "ctrl-,": "toggleSettingsPanel",
-    "ctrl-a": "toggleAnnotationPanel"
+    "ctrl-a": "toggleAnnotationPanel",
+    "ctrl-delete": "cmdDelete"
   }
 }

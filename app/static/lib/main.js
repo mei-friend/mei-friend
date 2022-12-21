@@ -1,6 +1,6 @@
 // mei-friend version and date
-const version = '0.6.7';
-const versionDate = '25 Oct 2022';
+export const version = '0.7.1';
+export const versionDate = '20 Dec 2022';
 
 var vrvWorker;
 var spdWorker;
@@ -17,6 +17,11 @@ export const isSafari = !!navigator.userAgent.match(/Version\/[\d\.]+.*Safari/);
 // TODO ideally determine version part automatically
 const guidelinesBase = 'https://music-encoding.org/guidelines/v4/';
 
+/**
+ * Object of common MEI schemas, 
+ * by meiProfile ('CMN', 'Mensural', 'Neumes', 'All', 'Any') 
+ * and meiVersion ('4.0.1', etc.)
+ */
 export const commonSchemas = {
   'CMN': {
     '2.1.1': 'https://music-encoding.org/schema/2.1.1/mei-CMN.rng',
@@ -54,7 +59,9 @@ export const commonSchemas = {
     '5.0.0-dev': 'https://music-encoding.org/schema/dev/mei-all_anyStart.rng'
   }
 };
-const defaultSchema = commonSchemas['CMN']['4.0.1'];
+export const defaultMeiVersion = '4.0.1';
+export const defaultMeiProfile = 'CMN';
+export const defaultSchema = commonSchemas[defaultMeiProfile][defaultMeiVersion];
 
 // exports
 export var cm;
@@ -80,6 +87,14 @@ export let supportedVerovioVersions = {
   'latest': {
     'url': 'https://www.verovio.org/javascript/latest/verovio-toolkit-hum.js',
     'description': 'Current Verovio release'
+  },
+  '3.13.1': {
+    'url': 'https://www.verovio.org/javascript/3.13.1/verovio-toolkit-hum.js',
+    'description': 'Verovio release 3.13.1'
+  },
+  '3.13.0': {
+    'url': 'https://www.verovio.org/javascript/3.13.0/verovio-toolkit-hum.js',
+    'description': 'Verovio release 3.13.0'
   },
   '3.12.1': {
     'url': 'https://www.verovio.org/javascript/3.12.1/verovio-toolkit-hum.js',
@@ -171,6 +186,7 @@ import {
 import * as att from './attribute-classes.js';
 import * as e from './editor.js';
 import Viewer from './viewer.js';
+import * as speed from './speed.js';
 import Github from './github.js';
 import Storage from './storage.js';
 import {
@@ -223,8 +239,7 @@ const defaultVerovioOptions = {
   minLastJustification: 0,
   // clefChangeFactor: .83, // option removed in Verovio 3.10.0
   svgAdditionalAttribute: ["layer@n", "staff@n",
-    "dir@vgrp", "dynam@vgrp", "hairpin@vgrp", "pedal@vgrp",
-    "measure@facs", "measure@n"
+    "dir@vgrp", "dynam@vgrp", "hairpin@vgrp", "pedal@vgrp", "measure@n"
   ],
   bottomMarginArtic: 1.2,
   topMarginArtic: 1.2
@@ -237,6 +252,7 @@ const defaultCodeMirrorOptions = {
   indentUnit: 3,
   smartIndent: true,
   tabSize: 3,
+  indentWithTabs: false,
   autoCloseBrackets: true,
   autoCloseTags: true,
   matchTags: {
@@ -252,6 +268,8 @@ const defaultCodeMirrorOptions = {
     "'='": completeIfInTag,
     "Ctrl-Space": "autocomplete",
     "Alt-.": consultGuidelines,
+    "Shift-Alt-f": indentSelection,
+    "'Ï'": indentSelection // TODO: overcome strange bindings on MAC
   },
   lint: {
     "caller": cm,
@@ -268,6 +286,8 @@ const defaultCodeMirrorOptions = {
   defaultBrightTheme: 'default', // default theme for OS bright mode
   defaultDarkTheme: 'paraiso-dark' // 'base16-dark', // default theme for OS dark mode
 };
+// add all possible facsimile elements
+att.attFacsimile.forEach(e => defaultVerovioOptions.svgAdditionalAttribute.push(e + '@facs'));
 const defaultKeyMap = `${root}keymaps/default-keymap.json`;
 const sampleEncodingsCSV = `${root}sampleEncodings/sampleEncodings.csv`;
 let freshlyLoaded = false; // flag to ignore a cm.on("changes") event on file load
@@ -463,7 +483,7 @@ export async function validate(mei, updateLinting, options) {
       v.highlightValidation(mei, validation);
     } else if (v.validatorWithSchema && !document.getElementById('autoValidate').checked) {
       v.setValidationStatusToManual();
-    } 
+    }
   }
 }
 
@@ -477,13 +497,13 @@ document.addEventListener('DOMContentLoaded', function () {
   let changeLogUrl;
   switch (env) {
     case 'develop':
-      changeLogUrl = 'https://github.com/Signature-Sound-Vienna/mei-friend-online/blob/develop/CHANGELOG.md';
+      changeLogUrl = 'https://github.com/mei-friend/mei-friend/blob/develop/CHANGELOG.md';
       break;
     case 'staging':
-      changeLogUrl = 'https://github.com/Signature-Sound-Vienna/mei-friend-online/blob/staging/CHANGELOG.md';
+      changeLogUrl = 'https://github.com/mei-friend/mei-friend/blob/staging/CHANGELOG.md';
       break;
     case 'production':
-      changeLogUrl = 'https://github.com/Signature-Sound-Vienna/mei-friend-online/blob/main/CHANGELOG.md';
+      changeLogUrl = 'https://github.com/mei-friend/mei-friend/blob/main/CHANGELOG.md';
   }
   const showChangeLogLink = document.getElementById('showChangelog');
   if (showChangeLogLink) showChangeLogLink.setAttribute('href', changeLogUrl);
@@ -600,6 +620,12 @@ document.addEventListener('DOMContentLoaded', function () {
     // if (selectParam && selectParam.length > 0) storage.select = selectParam;
     if (speedParam !== null) storage.speed = speedParam;
     if (breaksParam !== null) storage.breaks = breaksParam;
+    if (storage.githubLogoutRequested) {
+      v.showAlert(`You have logged out of mei-friend's GitHub integration, but your browser is still logged in to GitHub!
+      <a href="https://github.com/logout" target="_blank">Click here to logout from GitHub</a>.`, 'warning', 30000);
+      storage.removeItem("githubLogoutRequested");
+    }
+
     setFileChangedState(storage.fileChanged);
     if (!urlFileName) {
       // no URI param specified - try to restore from storage
@@ -807,6 +833,10 @@ function speedWorkerEventsHandler(ev) {
   console.log('main.speedWorkerEventsHandler received: ' + ev.data.cmd);
   if (ev.data.cmd === 'listPageSpanningElements') {
     console.log('main() speedWorkerHandler pageSpanners: ', ev.data.pageSpanners);
+    if (!ev.data.pageSpanners) {
+      // MEI file is malformed and pageSpanners could not be extracted
+      return;
+    }
     v.pageSpanners = {
       ...ev.data.pageSpanners
     };
@@ -1170,6 +1200,18 @@ function downloadMei() {
   setFileChangedState(false);
 }
 
+function downloadSpeedMei() {
+  let blob = new Blob([speed.getPageFromDom(v.xmlDoc, v.currentPage, v.breaksValue(), v.pageSpanners)], {
+    type: 'text/plain'
+  });
+  let a = document.createElement('a');
+  a.download = meiFileName
+    .substring(meiFileName.lastIndexOf("/") + 1)
+    .replace(/\.[^/.]+$/, '_page-' + v.currentPage + '-speedMode.mei');
+  a.href = window.URL.createObjectURL(blob);
+  a.click();
+}
+
 function downloadMidi() {
   let message = {
     'cmd': 'exportMidi',
@@ -1213,6 +1255,10 @@ function consultGuidelines() {
   }
 }
 
+// wrapper for indentSelection to be called inside CodeMirror
+function indentSelection() {
+  e.indentSelection(v, cm);
+} // indentSelection()
 
 // object of interface command functions for buttons and key bindings
 export let cmd = {
@@ -1260,7 +1306,7 @@ export let cmd = {
   'checkFacsimile': () => {
     let tf = document.getElementById('titleFacsimilePanel');
     if (v.xmlDoc.querySelector('facsimile')) {
-      if (tf) tf.setAttribute('open','true');
+      if (tf) tf.setAttribute('open', 'true');
       cmd.showFacsimilePanel();
     } else {
       if (tf) tf.removeAttribute('open');
@@ -1298,6 +1344,8 @@ export let cmd = {
   'openHumdrum': () => openFileDialog('.krn,.hum'),
   'openPae': () => openFileDialog('.pae,.abc'),
   'downloadMei': () => downloadMei(),
+  'downloadSpeedMei': () => downloadSpeedMei(),
+  'indentSelection': () => indentSelection(),
   'validate': () => v.manualValidate(),
   'zoomIn': () => v.zoom(+1, storage),
   'zoomOut': () => v.zoom(-1, storage),
@@ -1352,6 +1400,7 @@ export let cmd = {
   'addMordentBelowUpper': () => e.addControlElement(v, cm, 'mordent', 'below', 'upper'),
   //
   'delete': () => e.deleteElement(v, cm),
+  'cmdDelete': () => e.deleteElement(v, cm, true),
   'invertPlacement': () => e.invertPlacement(v, cm),
   'addVerticalGroup': () => e.addVerticalGroup(v, cm),
   'toggleStacc': () => e.toggleArtic(v, cm, 'stacc'),
@@ -1384,7 +1433,10 @@ export let cmd = {
   'renumberMeasures': () => e.renumberMeasures(v, cm, true),
   'reRenderMei': () => v.reRenderMei(cm, false),
   'reRenderMeiWithout': () => v.reRenderMei(cm, true),
+  'addIds': () => e.manipulateXmlIds(v, cm, false),
+  'removeIds': () => e.manipulateXmlIds(v, cm, true),
   'ingestFacsimile': () => ingestFacsimile(),
+  'addFacsimile': () => e.addFacsimile(v, cm),
   'resetDefault': () => {
     // we're in a clickhandler, so our storage object is out of scope
     // but we only need to clear it, so just grab the window's storage
@@ -1394,6 +1446,7 @@ export let cmd = {
     }
     logoutFromGithub();
   },
+  'openHelp': () => window.open(`./help`, '_blank'),
   'consultGuidelines': () => consultGuidelines(),
   'escapeKeyPressed': () => {
     // reset settings filter, if settings have focus
@@ -1416,8 +1469,13 @@ function addEventListeners(v, cm) {
   // register global event listeners
   let body = document.querySelector('body')
   body.addEventListener('mousedown', (ev) => {
-    if (ev.target.id !== 'alertOverlay' && ev.target.id !== 'alertMessage')
+    if (ev.target.matches("#alertMessage a")) {
+      // user clicked on link in message. Open link (before the DOM element disappears in the next conditional...)
+      window.open(ev.target.href, "_blank");
+    }
+    if (ev.target.id !== 'alertOverlay' && ev.target.id !== 'alertMessage') {
       v.hideAlerts();
+    }
   });
   body.addEventListener('keydown', (ev) => {
     if (ev.key === 'Escape')
@@ -1488,6 +1546,7 @@ function addEventListeners(v, cm) {
   document.getElementById('findPrevious').addEventListener('click', () => CodeMirror.commands.findPrev(cm));
   document.getElementById('replace').addEventListener('click', () => CodeMirror.commands.replace(cm));
   document.getElementById('replaceAll').addEventListener('click', () => CodeMirror.commands.replaceAll(cm));
+  document.getElementById('indentSelection').addEventListener('click', cmd.indentSelection);
   document.getElementById('jumpToLine').addEventListener('click', () => CodeMirror.commands.jumpToLine(cm));
   document.getElementById('manualValidate').addEventListener('click', cmd.validate);
   document.querySelectorAll('.keyShortCut').forEach(e => e.classList.add(platform.startsWith('Mac') ? 'platform-mac' : 'platform-nonmac'));
@@ -1602,11 +1661,15 @@ function addEventListeners(v, cm) {
   document.getElementById('cleanAccid').addEventListener('click', () => e.cleanAccid(v, cm));
   document.getElementById('renumTest').addEventListener('click', () => e.renumberMeasures(v, cm, false));
   document.getElementById('renumExec').addEventListener('click', () => e.renumberMeasures(v, cm, true));
-  // re-render through Verovio
+  // rerender through Verovio
   document.getElementById('reRenderMei').addEventListener('click', cmd.reRenderMei);
-  document.getElementById('reRenderMeiWithout').addEventListener('click', cmd.reRenderMeiWithout);
+  // document.getElementById('reRenderMeiWithout').addEventListener('click', cmd.reRenderMeiWithout);
+  // add/remove ids
+  document.getElementById('addIds').addEventListener('click', cmd.addIds);
+  document.getElementById('removeIds').addEventListener('click', cmd.removeIds);
   // ingest facsimile sekelton into currently loaded MEI file
   document.getElementById('ingestFacsimile').addEventListener('click', cmd.ingestFacsimile);
+  document.getElementById('addFacsimile').addEventListener('click', cmd.addFacsimile);
   // insert control elements
   document.getElementById('addTempo').addEventListener('click', cmd.addTempo);
   document.getElementById('addDirective').addEventListener('click', cmd.addDirective);
@@ -1677,30 +1740,10 @@ function addEventListeners(v, cm) {
 
   // editor reports changes
   cm.on('changes', () => {
-    const commitUI = document.querySelector("#commitUI");
-    let changeIndicator = false;
-    let meiXml = cm.getValue();
-    if (isLoggedIn && github.filepath && commitUI) {
-      // fileChanged flag may have been set from storage - if so, run with it
-      // otherwise set it to true if we've changed the file content this session
-      changeIndicator = fileChanged || meiXml !== github.content;
-    } else {
-      // interpret any CodeMirror change as a file changed state
-      changeIndicator = true;
+    if (!cm.blockChanges) {
+      handleEditorChanges();
     }
-    if (freshlyLoaded) {
-      // ignore changes resulting from fresh file load
-      freshlyLoaded = false;
-    } else {
-      setFileChangedState(changeIndicator);
-    }
-    v.notationUpdated(cm);
-    if (storage.supported) {
-      // on every set of changes, save editor content
-      updateLocalStorage(meiXml);
-    }
-    readAnnots(); // from annotation.js
-  })
+  }); // cm.on() change listener
 
   // Editor font size zooming
   document.getElementById('encoding').addEventListener('wheel', ev => {
@@ -1792,7 +1835,7 @@ function updateHtmlTitle() {
 function drawRightFooter() {
   let rf = document.querySelector(".rightfoot");
   rf.innerHTML =
-    "<a href='https://github.com/Signature-Sound-Vienna/mei-friend-online' target='_blank'>mei-friend " +
+    "<a href='https://github.com/mei-friend/mei-friend' target='_blank'>mei-friend " +
     (env === environments.production ? version : `${env}-${version}`) +
     "</a> (" + versionDate + ").&nbsp;";
   if (tkVersion) {
@@ -1806,14 +1849,41 @@ function drawRightFooter() {
   }
 }
 
+// handles any changes in CodeMirror
+export function handleEditorChanges() {
+  const commitUI = document.querySelector("#commitUI");
+  let changeIndicator = false;
+  let meiXml = cm.getValue();
+  if (isLoggedIn && github.filepath && commitUI) {
+    // fileChanged flag may have been set from storage - if so, run with it
+    // otherwise set it to true if we've changed the file content this session
+    changeIndicator = fileChanged || meiXml !== github.content;
+  } else {
+    // interpret any CodeMirror change as a file changed state
+    changeIndicator = true;
+  }
+  if (freshlyLoaded) {
+    // ignore changes resulting from fresh file load
+    freshlyLoaded = false;
+  } else {
+    setFileChangedState(changeIndicator);
+  }
+  v.notationUpdated(cm);
+  if (storage.supported) {
+    // on every set of changes, save editor content
+    updateLocalStorage(meiXml);
+  }
+  readAnnots(); // from annotation.js
+} // handleEditorChanges()
+
 export function log(s, code = null) {
   s += "<div>"
   if (code) {
     s += " Error Code: " + code + "<br/>";
-    s += `<a id="bugReport" target="_blank" href="https://github.com/Signature-Sound-Vienna/mei-friend-online/issues/new?assignees=&labels=&template=bug_report.md&title=Error ${code}">Submit bug report</a>`;
+    s += `<a id="bugReport" target="_blank" href="https://github.com/mei-friend/mei-friend/issues/new?assignees=&labels=&template=bug_report.md&title=Error ${code}">Submit bug report</a>`;
     v.showAlert(s, 'error', 30000);
   } else {
-    s += `<a id="bugReport" target="_blank" href="https://github.com/Signature-Sound-Vienna/mei-friend-online/issues/new?assignees=&labels=&template=bug_report.md">Submit bug report</a>`;
+    s += `<a id="bugReport" target="_blank" href="https://github.com/mei-friend/mei-friend/issues/new?assignees=&labels=&template=bug_report.md">Submit bug report</a>`;
     v.showAlert(s, 'warning', 30000);
   }
   s += "</div>"
@@ -1891,7 +1961,8 @@ function setKeyMap(keyMapFilePath) {
 }
 
 // returns true, if event is a CMD (Mac) or a CTRL (Windows, Linux) event
-function isCtrlOrCmd(ev) {
-  return (platform.startsWith('mac') && ev.metaKey) ||
-    (!platform.startsWith('mac') && ev.ctrlKey);
+export function isCtrlOrCmd(ev) {
+  return ev ?
+    ((platform.startsWith('mac') && ev.metaKey) || (!platform.startsWith('mac') && ev.ctrlKey)) :
+    false;
 }

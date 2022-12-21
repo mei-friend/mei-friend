@@ -21,7 +21,7 @@ export default class Storage {
         this.override = true;
         console.warn("Disabling local storage for current file - " +
           "could not save file content. Content may be too big? ",
-          meiXml.length, err);
+          err);
         this.clear();
         this.read();
       }
@@ -50,6 +50,7 @@ export default class Storage {
       this._speed = this.storage.getItem("speed");
       this._breaks = this.storage.getItem("breaks");
       this._forkAndOpen = this.storage.getItem("forkAndOpen");
+      this._githubLogoutRequested = this.storage.getItem("githubLogoutRequested");
       //fileChangedFromStorage = fileChangedFromStorage ? parseInt(storage.getItem("fileChanged")) : 0;
     }
   }
@@ -172,6 +173,15 @@ export default class Storage {
   set github(github) {
     this.safelySetStorageItem("github", github);
     this._github = github;
+  }
+
+  get githubLogoutRequested() { 
+    return this._githubLogoutRequested;
+  }
+
+  set githubLogoutRequested(githubLogoutRequested) {
+    this.safelySetStorageItem("githubLogoutRequested", githubLogoutRequested);
+    this._githubLogoutRequested = githubLogoutRequested;
   }
 
   get fileChanged() {

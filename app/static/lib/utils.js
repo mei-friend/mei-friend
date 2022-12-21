@@ -289,7 +289,7 @@ export function getElementIdAtCursor(cm) {
       continue;
     }
     if (line.includes('<measure') || (line.includes('<staff') &&
-        !outsideParentStaff)) {
+      !outsideParentStaff)) {
       result = line.match(xmlIdString);
       if (result !== null) return result[1];
       // if this line is parent <measure>, stop looking
@@ -334,15 +334,45 @@ export function findElementBelow(textEditor, elementName = 'measure', point = [1
   else return null;
 }
 
-// creates a random ID value in Verovio style
-export function generateUUID() {
-  let tmp = Math.round((Math.random() * 32768) * (Math.random() * 32768)).toString();
-  let uuid = '',
-    lgt = tmp.length;
-  for (let i = 0; i < 16 - lgt; i++) {
-    uuid += '0';
+const base62Chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+/**
+ * Creates an xml:id in different styles:
+ * 'Original' Verovio style: "note-0000001318117900",
+ * Verovio 'Base36' (since mid-2021): "nophl5o",
+ * 'mei-friend' style (node name with base 36): "note-ophl5o"
+ * @param {string} style 
+ * @param {string} nodeName 
+ * @returns {string} xml:id 
+ */
+export function generateXmlId(nodeName = '', style = 'mei-friend') {
+  let rnd = Math.round(Math.random() * Math.pow(2, 32));
+  // let rnd = Math.round((Math.random() * 32768) * (Math.random() * 32768));
+  let id = '';
+  let base = 36;
+  let zeros = '';
+  switch (style) {
+    case 'Base36':
+    case 'mei-friend':
+      while (rnd) {
+        id += base62Chars[rnd % base];
+        rnd = Math.round(rnd / base);
+      }
+      break;
+    case 'Original':
+      let lgt = rnd.toString().length;
+      for (let i = 0; i < 16 - lgt; i++) {
+        zeros += '0';
+      }
+      id = zeros + rnd;
+      break;
   }
-  return uuid + tmp;
+  if (style === 'mei-friend' || style === 'Original') {
+    id = nodeName + '-' + id; // add full node name
+  } else if (style === 'Base36') {
+    id = nodeName[0] + id; // add first character
+  }
+  return id;
 }
 
 // add n tabs to current cursor position in textEditor
@@ -390,7 +420,7 @@ export function sortElementsByScorePosition(arr, includeY = false) {
       if (Xs[i] > Xs[i + 1]) {
         [arr[i], arr[i + 1]] = [arr[i + 1], arr[i]];
         [Xs[i], Xs[i + 1]] = [Xs[i + 1], Xs[i]];
-        if (includeY)[Ys[i], Ys[i + 1]] = [Ys[i + 1], Ys[i]];
+        if (includeY) [Ys[i], Ys[i + 1]] = [Ys[i + 1], Ys[i]];
       }
       // swap elements for Y, if X equal 
       if (includeY && Xs[i] === Xs[i + 1] && Ys[i] > Ys[i + 1]) {
@@ -580,7 +610,7 @@ export function brighter(rgbString, deltaPercent, alpha = 1) {
 
 function hexToRgb(hex) {
   return hex.replace(/^#?([a-f\d])([a-f\d])([a-f\d])$/i,
-      (m, r, g, b) => '#' + r + r + g + g + b + b)
+    (m, r, g, b) => '#' + r + r + g + g + b + b)
     .substring(1).match(/.{2}/g)
     .map(x => parseInt(x, 16))
 }
@@ -625,12 +655,59 @@ export function convertCoords(elem) {
 }
 
 export function rmHash(hashedString) {
+  if (!hashedString) return '';
   return (hashedString.startsWith('#')) ?
     hashedString.split('#')[1] : hashedString;
 }
 
 // escape special characters '.' and ':' for usagage in queryselectors 
 export function escapeXmlId(str) {
-  if (str == null) return '';
+  if (str === null) return '';
+  if (/^\d/.test(str)) str = 'a' + str;
   return str.replace(/\./g, '\\.').replace(/\:/g, '\\:');
+}
+
+/** 
+ * Returns an ISO 8601 string in lokal timezone
+ * @param {Date} d - date to create string for
+ * @returns {string} formatted string
+ */
+export function toISOStringLocal(d) {
+  function z(n) {
+    return (n < 10 ? '0' : '') + n
+  }
+  return d.getFullYear() + '-' + z(d.getMonth() + 1) + '-' +
+    z(d.getDate()) + 'T' + z(d.getHours()) + ':' +
+    z(d.getMinutes()) + ':' + z(d.getSeconds())
+} // toISOStringLocal()
+
+/** @typedef { measure: Number, beat: Number } MeasureBeat */
+
+/**
+ * Returns object with measure and beat count from @tstamp2 
+ * (according to data.MEASUREBEAT)
+ * @param {string} tstamp2 
+ * @returns {MeasureBeat}
+ */
+export function readMeasureBeat(tstamp2) {
+  let measure = 0;
+  let beat = 0;
+  if (tstamp2.includes('m')) {
+    let split = tstamp2.split('m');
+    measure = parseInt(split.at(0));
+    beat = parseFloat(split.at(1));
+  } else {
+    beat = parseFloat(tstamp2);
+  }
+  return { 'measure': measure, 'beat': beat };
+} // readMeasureBeat()
+
+/**
+ * Returns a data.MEASUREBEAT string
+ * @param {Number} measure 
+ * @param {Number} beat 
+ * @returns {string} 
+ */
+export function writeMeasureBeat(measure, beat) {
+  return measure + 'm+' + beat;
 }
