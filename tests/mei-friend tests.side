@@ -334,6 +334,40 @@
       "targets": [],
       "value": "2000"
     }]
+  }, {
+    "id": "2d2710a2-f3eb-456b-b47e-4fc166878bd5",
+    "name": "Navigate to next page",
+    "commands": [{
+      "id": "8d35c65f-0628-432a-b450-869caeefbff7",
+      "comment": "",
+      "command": "open",
+      "target": "https://mei-friend.mdw.ac.at",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "7b636d9a-e949-4b34-a90f-6376d060cb81",
+      "comment": "",
+      "command": "setWindowSize",
+      "target": "1262x875",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "29d8ef82-94b7-43af-bba0-3401ce2f7a8a",
+      "comment": "",
+      "command": "click",
+      "target": "css=#next-page-btn > svg",
+      "targets": [
+        ["css=#next-page-btn > svg", "css:finder"]
+      ],
+      "value": ""
+    }, {
+      "id": "454e10bd-78c9-4448-b175-98a3e9e170ff",
+      "comment": "",
+      "command": "verifyText",
+      "target": "id=pagination2",
+      "targets": [],
+      "value": " 2 "
+    }]
   }],
   "suites": [{
     "id": "9c54e416-7160-4aaf-bc1a-8c3a7c836993",
