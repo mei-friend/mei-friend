@@ -501,11 +501,6 @@ a:active {
   color: var(--annotationPanelTextColor);
 }
 
-#midiPanel { 
-  height:20px;
-  flex-shrink:0;
-}
-
 /* .CodeMirror {
     border: 1px solid #eee;
     height: auto;
@@ -1254,4 +1249,13 @@ select>option {
 #filterReset svg {
   width: 14px;
   height: 14px;
+}
+
+#midiPlaybackControlBar { 
+  border-bottom: 3px solid var(--dropdownHeadingColor);
+  border-left: 3px solid var(--dropdownHeadingColor);
+  border-right: 3px solid var(--dropdownHeadingColor);
+  background: var(--settingsBackgroundColor);
+  color: var(--textColor);
+  height: 30px;
 }
