@@ -501,6 +501,11 @@ a:active {
   color: var(--annotationPanelTextColor);
 }
 
+#midiPanel { 
+  height:20px;
+  flex-shrink:0;
+}
+
 /* .CodeMirror {
     border: 1px solid #eee;
     height: auto;

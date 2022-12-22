@@ -1321,6 +1321,19 @@ export let cmd = {
     document.getElementById('filterSettings').value = '';
     document.getElementById('filterSettings').dispatchEvent(new Event("input"));
   },
+  'showMidiPlaybackControlBar': () => {
+    document.getElementById('showMidiPlaybackControlBar').checked = true; // TODO: remove?
+    v.toggleMidiPlaybackControlBar();
+  },
+  'hideMidiPlaybackControlBar': () => {
+    document.getElementById('showMidiPlaybackControlBar').checked = false; // TODO: remove?
+    v.toggleMidiPlaybackControlBar();
+  },
+  'toggleMidiPlaybackControlBar': () => {
+    let status = document.getElementById('showMidiPlaybackControlBar').checked;
+    document.getElementById('showMidiPlaybackControlBar').checked = !status;
+    v.toggleMidiPlaybackControlBar();
+  },
   'showAnnotationPanel': () => {
     document.getElementById('showAnnotationPanel').checked = true; // TODO: remove?
     v.toggleAnnotationPanel();
@@ -1518,6 +1531,7 @@ function addEventListeners(v, cm) {
   document.getElementById('filterSettings').addEventListener('input', cmd.filterSettings);
   document.getElementById('filterSettings').value = "";
   document.getElementById('filterReset').addEventListener('click', cmd.filterReset)
+  document.getElementById('showMidiPlaybackControlBarButton').addEventListener('click', cmd.toggleMidiPlaybackControlBar);
   document.getElementById('showAnnotationMenu').addEventListener('click', cmd.showAnnotationPanel);
   document.getElementById('showAnnotationsButton').addEventListener('click', cmd.toggleAnnotationPanel);
   document.getElementById('showFacsimileButton').addEventListener('click', cmd.toggleFacsimilePanel);

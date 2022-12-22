@@ -774,6 +774,16 @@ export default class Viewer {
     }
   }
 
+  toggleMidiPlaybackControlBar(ev = null) { 
+    const midiPlaybackControlBar = document.getElementById("midiPlaybackControlBar");
+    const showMidiPlaybackControlBar = document.getElementById("showMidiPlaybackControlBar");
+    midiPlaybackControlBar.style.display = showMidiPlaybackControlBar.checked ? 
+      "unset" : "none";
+      console.log("toggle: ", midiPlaybackControlBar)
+    setOrientation(cm);
+
+  }
+
   toggleAnnotationPanel() {
     setOrientation(cm);
     if (this.speedMode &&
@@ -995,6 +1005,18 @@ export default class Viewer {
       //   title: 'options-line', // class name of hr element
       //   type: 'line'
       // },
+      titleMidiPlayback: {
+        title: 'MIDI playback',
+        description: 'MIDI playback settings',
+        type: 'header',
+        default: true
+      },
+      showMidiPlaybackControlBar: {
+        title: 'Show MIDI playback control bar',
+        description: 'Show MIDI playback control bar',
+        type: 'bool',
+        default: false
+      },
       titleAnnotations: {
         title: 'Annotations',
         description: 'Annotation settings',

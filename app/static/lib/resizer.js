@@ -151,8 +151,9 @@ export function calcSizeOfContainer() {
   let friendSz = document.getElementById("friendContainer").getBoundingClientRect();
   let headerSz = document.querySelector('.header').getBoundingClientRect();
   //let sizerSz = document.querySelector('.resizer').getBoundingClientRect();
+  const midiPanelSz = document.getElementById("midiPlaybackControlBar").getBoundingClientRect();
   let footerSz = document.querySelector('.footer').getBoundingClientRect();
-  friendSz.height = bodySz.height - headerSz.height - footerSz.height - notationResizerWidth;
+  friendSz.height = bodySz.height - headerSz.height - footerSz.height - notationResizerWidth - midiPanelSz.height;
   friendSz.width = bodySz.width - notationResizerWidth + 2; // TODO: hack for missing 2-px-width (21 April 2022)
   // console.log('calcSizeOfContainer(' + notationOrientation + ') bodySz, header, sizer, footer: ' +
   // Math.round(bodySz.width) + '/' + Math.round(bodySz.height) + ', ' +
