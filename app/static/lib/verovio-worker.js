@@ -278,7 +278,9 @@ addEventListener('message', function (e) {
         tk.setOptions(tkOptions);
         tk.loadData(result.mei);
         result.midi = tk.renderToMIDI();
-        result.cmd = 'midi';
+        if(result.requestTimemap)
+          result.timemap = tk.renderToTimemap();
+        result.cmd = result.requestTimemap ? 'midiPlayback' : 'downloadMidiFile';
       } catch (err) {
         log('exportMidi: ' + err);
       }

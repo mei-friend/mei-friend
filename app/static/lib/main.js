@@ -955,7 +955,7 @@ async function vrvWorkerEventsHandler(ev) {
       v.setFocusToVerovioPane();
       v.busy(false);
       break;
-    case 'midi': // export MIDI file
+    case 'downloadMidiFile': // export MIDI file
       const byteCharacters = atob(ev.data.midi);
       const byteNumbers = new Array(byteCharacters.length);
       for (let i = 0; i < byteCharacters.length; i++) {
@@ -972,6 +972,10 @@ async function vrvWorkerEventsHandler(ev) {
       a.click();
       v.busy(false);
       break;
+    case 'midiPlayback': // export MIDI file
+      console.log("RECEIVED MIDI AND TIMEMAP:", ev.data.midi, ev.data.timemap)
+      break;
+    
     case 'computePageBreaks':
       v.pageBreaks = ev.data.pageBreaks;
       v.pageCount = ev.data.pageCount;
@@ -1212,11 +1216,12 @@ function downloadSpeedMei() {
   a.click();
 }
 
-function downloadMidi() {
+function getMidiRendering(ev, requestTimemap=false) {
   let message = {
     'cmd': 'exportMidi',
     'options': v.vrvOptions,
-    'mei': cm.getValue()
+    'mei': cm.getValue(),
+    'requestTimemap': requestTimemap
   };
   vrvWorker.postMessage(message);
 }
@@ -1550,7 +1555,7 @@ function addEventListeners(v, cm) {
   document.getElementById('ImportPae').addEventListener('click', cmd.openPae);
   document.getElementById('SaveMei').addEventListener('click', downloadMei);
   document.getElementById('SaveSvg').addEventListener('click', downloadSvg);
-  document.getElementById('SaveMidi').addEventListener('click', downloadMidi);
+  document.getElementById('SaveMidi').addEventListener('click', getMidiRendering);
 
   // edit dialogs
   document.getElementById('undo').addEventListener('click', cmd.undo);

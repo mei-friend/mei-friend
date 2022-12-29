@@ -90,6 +90,8 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/keymap/vim.min.js"
     integrity="sha512-px+d4ezEJ2hi3SHqwRziL871LTHSqfj1GxV1Cp78Sp/SAMEIJwxKNDGcQz96FEv/IqRPLcJ848BWhSUM7msEGQ=="
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdn.jsdelivr.net/combine/npm/tone@14.7.58,npm/@magenta/music@1.23.1/es6/core.js,npm/focus-visible@5,npm/html-midi-player@1.5.0">
+  </script>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/default.css') }}" />
   <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}" />
   <link rel="stylesheet" href="{{ url_for('static', filename='css/annotationPanel.css') }}" />
@@ -545,7 +547,10 @@
   </div>
 
   <div id="midiPlaybackControlBar">
-    This is where the MIDI playback control bar will live
+    <midi-player
+    src="https://magenta.github.io/magenta-js/music/demos/melody.mid"
+    sound-font">
+  </midi-player>
   </div>
 
   <div class="footer">

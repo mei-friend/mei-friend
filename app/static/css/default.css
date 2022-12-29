@@ -1259,3 +1259,7 @@ select>option {
   color: var(--textColor);
   height: 30px;
 }
+
+midi-player { 
+  height: 90%;
+}
