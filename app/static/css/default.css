@@ -1255,11 +1255,18 @@ select>option {
   border-bottom: 3px solid var(--dropdownHeadingColor);
   border-left: 3px solid var(--dropdownHeadingColor);
   border-right: 3px solid var(--dropdownHeadingColor);
-  background: var(--settingsBackgroundColor);
+  background: var(--controlMenuBackgroundColor);
   color: var(--textColor);
   height: 30px;
 }
+midi-player::part(control-panel) {
+  background: var(--controlMenuBackgroundColor);
+  /*border: 1px solid var(--dropdownBorderColor);
+  border-radius:7px;*/
+  font-size: 10pt;
+  width: 150%;
+}
 
-midi-player { 
+#midiPlaybackControlBar midi-player { 
   height: 90%;
 }
