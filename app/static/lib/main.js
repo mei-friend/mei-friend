@@ -848,6 +848,7 @@ function speedWorkerEventsHandler(ev) {
 }
 
 async function vrvWorkerEventsHandler(ev) {
+  let blob; // houses blob for MIDI download or playback
   console.log('main.vrvWorkerEventsHandler() received: ' + ev.data.cmd); // , ev.data
   switch (ev.data.cmd) {
     case 'vrvLoaded':
@@ -956,14 +957,7 @@ async function vrvWorkerEventsHandler(ev) {
       v.busy(false);
       break;
     case 'downloadMidiFile': // export MIDI file
-      const byteCharacters = atob(ev.data.midi);
-      const byteNumbers = new Array(byteCharacters.length);
-      for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i);
-      }
-      const blob = new Blob([new Uint8Array(byteNumbers)], {
-        type: 'audio/midi'
-      });
+      blob = midiDataToBlob(ev.data.midi);
       var a = document.createElement('a');
       a.download = meiFileName
         .substring(meiFileName.lastIndexOf("/") + 1)
@@ -974,6 +968,13 @@ async function vrvWorkerEventsHandler(ev) {
       break;
     case 'midiPlayback': // export MIDI file
       console.log("RECEIVED MIDI AND TIMEMAP:", ev.data.midi, ev.data.timemap)
+      blob = midiDataToBlob(ev.data.midi);
+      console.log("THIS IS BLOB: ", blob)
+      core.blobToNoteSequence(blob).then((noteSequence) => { 
+        document.querySelector("midi-player").noteSequence = noteSequence;
+        console.log("GOT NOTESEQUENCE: ", noteSequence);
+        console.log("GOT PLAYER: ", document.querySelector("midi-player")); 
+      })
       break;
     
     case 'computePageBreaks':
@@ -1338,6 +1339,10 @@ export let cmd = {
     let status = document.getElementById('showMidiPlaybackControlBar').checked;
     document.getElementById('showMidiPlaybackControlBar').checked = !status;
     v.toggleMidiPlaybackControlBar();
+    if(document.getElementById('showMidiPlaybackControlBar').checked) { 
+      // render MIDI and load into player
+      getMidiRendering(null, true);
+    }
   },
   'showAnnotationPanel': () => {
     document.getElementById('showAnnotationPanel').checked = true; // TODO: remove?
@@ -1984,4 +1989,15 @@ export function isCtrlOrCmd(ev) {
   return ev ?
     ((platform.startsWith('mac') && ev.metaKey) || (!platform.startsWith('mac') && ev.ctrlKey)) :
     false;
+}
+
+function midiDataToBlob(data) { 
+  const byteCharacters = atob(data);
+  const byteNumbers = new Array(byteCharacters.length);
+  for (let i = 0; i < byteCharacters.length; i++) {
+    byteNumbers[i] = byteCharacters.charCodeAt(i);
+  }
+  return new Blob([new Uint8Array(byteNumbers)], {
+    type: 'audio/midi'
+  });
 }

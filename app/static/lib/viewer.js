@@ -781,7 +781,6 @@ export default class Viewer {
       "unset" : "none";
       console.log("toggle: ", midiPlaybackControlBar)
     setOrientation(cm);
-
   }
 
   toggleAnnotationPanel() {
