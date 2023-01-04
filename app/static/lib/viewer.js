@@ -778,7 +778,7 @@ export default class Viewer {
     const midiPlaybackControlBar = document.getElementById("midiPlaybackControlBar");
     const showMidiPlaybackControlBar = document.getElementById("showMidiPlaybackControlBar");
     midiPlaybackControlBar.style.display = showMidiPlaybackControlBar.checked ? 
-      "unset" : "none";
+      "block" : "none";
       console.log("toggle: ", midiPlaybackControlBar)
     setOrientation(cm);
   }

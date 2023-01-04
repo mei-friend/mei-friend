@@ -6,6 +6,8 @@ var vrvWorker;
 var spdWorker;
 var tkAvailableOptions;
 var mei;
+var timemap;
+var rerenderMidiForPlayback = true; // if true, update MIDI and timemap before next MIDI playback
 var breaksParam; // (string) the breaks parameter given through URL
 var pageParam; // (int) page parameter given through URL
 var selectParam; // (array) select ids given through multiple instances in URL
@@ -548,6 +550,23 @@ document.addEventListener('DOMContentLoaded', function () {
   });
   spdWorker.onmessage = speedWorkerEventsHandler;
 
+  document.getElementById("midi-player").addEventListener("note", (e) => {
+    if(rerenderMidiForPlayback) { 
+      // prevent playback and instead re-render if MIDI has gone stale
+      // FIXME: attaching to 'note' will always play one note / chord before stopping
+      // (attaching to 'start' is worse, plays several before stopping...)
+      e.target.player.stop(); // prevent playback of stale MIDI
+      getMidiRendering(null, true); // this will commence playback after rerender
+    }
+  })
+  document.getElementById("midi-player").addEventListener("load", (e) => {
+    let mp = e.target;
+    if(mp.player) { 
+      // HACK
+      mp.shadowRoot.children[1].children[0].click()
+    }
+  });
+
   v = new Viewer(vrvWorker, spdWorker);
   v.vrvOptions = {
     ...defaultVerovioOptions
@@ -968,12 +987,14 @@ async function vrvWorkerEventsHandler(ev) {
       break;
     case 'midiPlayback': // export MIDI file
       console.log("RECEIVED MIDI AND TIMEMAP:", ev.data.midi, ev.data.timemap)
+      timemap = ev.data.timemap;
       blob = midiDataToBlob(ev.data.midi);
-      console.log("THIS IS BLOB: ", blob)
       core.blobToNoteSequence(blob).then((noteSequence) => { 
-        document.querySelector("midi-player").noteSequence = noteSequence;
+        let mp = document.getElementById("midi-player");
+        mp.noteSequence = noteSequence;
         console.log("GOT NOTESEQUENCE: ", noteSequence);
         console.log("GOT PLAYER: ", document.querySelector("midi-player")); 
+        rerenderMidiForPlayback = false;
       })
       break;
     
@@ -1340,7 +1361,7 @@ export let cmd = {
     document.getElementById('showMidiPlaybackControlBar').checked = !status;
     v.toggleMidiPlaybackControlBar();
     if(document.getElementById('showMidiPlaybackControlBar').checked) { 
-      // render MIDI and load into player
+      // request MIDI rendering from Verovio worker
       getMidiRendering(null, true);
     }
   },
@@ -1897,7 +1918,12 @@ export function handleEditorChanges() {
     // on every set of changes, save editor content
     updateLocalStorage(meiXml);
   }
-  readAnnots(); // from annotation.js
+  if(document.getElementById('showAnnotations').checked || document.getElementById('showAnnotationPanel').checked) {
+    readAnnots(); // from annotation.js
+  }
+  if(document.getElementById('showMidiPlaybackControlBar').checked) { 
+    rerenderMidiForPlayback = true; // flag that we need to recalculate timemap on next MIDI play request
+  }
 } // handleEditorChanges()
 
 export function log(s, code = null) {
