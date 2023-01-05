@@ -718,6 +718,12 @@ svg text {
   user-select: none;
 }
 
+#verovio-container .currently-playing { 
+  fill:orange !important;
+  stroke:orange !important;
+  color: orange !important;
+}
+
 #verovio-container .highlighted {
   color: var(--highlightColor);
   stroke: var(--highlightColor);

@@ -173,6 +173,7 @@ import {
 } from './control-menu.js';
 import {
   clock,
+  highlight,
   unverified,
   xCircleFill
 } from '../css/icons.js';
@@ -596,6 +597,10 @@ document.addEventListener('DOMContentLoaded', function () {
   if (av && !av.checked) {
     v.setValidationStatusToManual();
   }
+
+  // set up midi-player event listeners
+  mp.addEventListener("note", highlightNotesAtMidiPlaybackTime)
+  mp.addEventListener("load", handleMidiPlayerLoaded);
 
   let urlFileName = searchParams.get('file');
   // fork parameter: if true AND ?fileParam is set to a URL,
@@ -1340,17 +1345,10 @@ export let cmd = {
     document.getElementById('filterSettings').dispatchEvent(new Event("input"));
   },
   'toggleMidiPlaybackControlBar': () => {
-    let mp = document.getElementById('midi-player');
-    if(mp) { 
-      mp.removeEventListener("load", handleMidiPlayerLoaded);
-      console.log("REMOVED", mp)
-    }
     let status = document.getElementById('showMidiPlaybackControlBar').checked;
     document.getElementById('showMidiPlaybackControlBar').checked = !status;
     v.toggleMidiPlaybackControlBar();
     if(document.getElementById('showMidiPlaybackControlBar').checked) { 
-      mp.addEventListener("load", handleMidiPlayerLoaded);
-      console.log("ADDED", mp)
       // request MIDI rendering from Verovio worker
       getMidiRendering(null, true);
     }
@@ -2039,4 +2037,25 @@ function seekMidiPlaybackTo(t) {
   if(mp) { 
     mp.playing ? mp.seekTo(t) : mp.currentTime = t;
   } 
+}
+
+function highlightNotesAtMidiPlaybackTime() { 
+  let t = mp.currentTime / 1000;
+  console.log("~~ trying to highlight:", t, timemap)
+  const closestTimemapTime = Object.keys(timemap)
+    // ignore times later than the requested target 
+    .filter(time => t <= time) 
+    // find closest time to target
+    .reduce((prev, curr) => Math.abs(curr - t) < Math.abs(prev - t) ? curr : prev);
+  if("on" in timemap[closestTimemapTime]) { 
+    timemap[closestTimemapTime]["on"].forEach(id => {
+      let el = document.getElementById(id);
+      if(el) { 
+        console.log("Highlight this one: ", el);
+        el.classList.add("currently-playing");
+      } else { 
+        console.warn("Expected to highlight currently playing note, but couldn't find it:", id);
+      }
+    })
+  }
 }
