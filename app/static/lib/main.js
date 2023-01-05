@@ -7,7 +7,8 @@ var spdWorker;
 var tkAvailableOptions;
 var mei;
 var timemap;
-var rerenderMidiForPlayback = true; // if true, update MIDI and timemap before next MIDI playback
+var rerenderMidiTimeout; // javascript timeout between last edit and MIDI re-render
+var rerenderMidiDelay = 500; // in ms, delay between last edit and MIDI re-render
 var breaksParam; // (string) the breaks parameter given through URL
 var pageParam; // (int) page parameter given through URL
 var selectParam; // (array) select ids given through multiple instances in URL
@@ -550,23 +551,6 @@ document.addEventListener('DOMContentLoaded', function () {
   });
   spdWorker.onmessage = speedWorkerEventsHandler;
 
-  document.getElementById("midi-player").addEventListener("note", (e) => {
-    if(rerenderMidiForPlayback) { 
-      // prevent playback and instead re-render if MIDI has gone stale
-      // FIXME: attaching to 'note' will always play one note / chord before stopping
-      // (attaching to 'start' is worse, plays several before stopping...)
-      e.target.player.stop(); // prevent playback of stale MIDI
-      getMidiRendering(null, true); // this will commence playback after rerender
-    }
-  })
-  document.getElementById("midi-player").addEventListener("load", (e) => {
-    let mp = e.target;
-    if(mp.player) { 
-      // HACK
-      mp.shadowRoot.children[1].children[0].click()
-    }
-  });
-
   v = new Viewer(vrvWorker, spdWorker);
   v.vrvOptions = {
     ...defaultVerovioOptions
@@ -994,7 +978,6 @@ async function vrvWorkerEventsHandler(ev) {
         mp.noteSequence = noteSequence;
         console.log("GOT NOTESEQUENCE: ", noteSequence);
         console.log("GOT PLAYER: ", document.querySelector("midi-player")); 
-        rerenderMidiForPlayback = false;
       })
       break;
     
@@ -1922,7 +1905,10 @@ export function handleEditorChanges() {
     readAnnots(); // from annotation.js
   }
   if(document.getElementById('showMidiPlaybackControlBar').checked) { 
-    rerenderMidiForPlayback = true; // flag that we need to recalculate timemap on next MIDI play request
+    // clear a possible pre-existing timeout
+    window.clearTimeout(rerenderMidiTimeout);
+    // start a new time-out 
+    rerenderMidiTimeout = window.setTimeout(() => getMidiRendering(null, true), rerenderMidiDelay);
   }
 } // handleEditorChanges()
 
