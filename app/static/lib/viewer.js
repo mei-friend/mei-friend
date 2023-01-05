@@ -1239,6 +1239,9 @@ export default class Viewer {
           case 'showAnnotationPanel':
             this.toggleAnnotationPanel();
             break;
+          case 'showMidiPlaybackControlBar':
+            this.toggleMidiPlaybackControlBar();
+            break;
           case 'editFacsimileZones':
             document.getElementById('facsimile-edit-zones-checkbox').checked = value;
             drawFacsimile();
@@ -1872,12 +1875,13 @@ export default class Viewer {
     this.vrvWorker.postMessage(message);
   }
 
-  getTimeForElement(id) {
+  getTimeForElement(id, triggerMidiSeekTo = false) {
     let that = this;
     let promise = new Promise(function (resolve) {
       let message = {
         'cmd': 'getTimeForElement',
-        'msg': id
+        'msg': id,
+        'triggerMidiSeekTo': triggerMidiSeekTo
       };
       that.vrvWorker.addEventListener('message', function handle(ev) {
         if (ev.data.cmd = message.cmd) {
@@ -1892,6 +1896,24 @@ export default class Viewer {
         return time;
       }
     );
+  }
+
+  findFirstNoteInSelection() {
+    let firstNote;
+    for(const elId of v.selectedElements) { 
+      let el = document.getElementById(elId);
+      if(el && el.classList.contains("note")) { 
+        firstNote = el;
+        break;
+      } else { 
+        const childNotes = el.getElementsByClassName("note");
+        if(childNotes.length) { 
+          firstNote = childNotes[0];
+          break;
+        }
+      }
+    }
+    return firstNote;
   }
 
   findClosestNoteInChord(id, y) {

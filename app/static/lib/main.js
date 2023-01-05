@@ -69,6 +69,7 @@ export const defaultSchema = commonSchemas[defaultMeiProfile][defaultMeiVersion]
 // exports
 export var cm;
 export var v; // viewer instance
+export let mp = document.getElementById("midi-player"); // midi player
 export var validator; // validator object
 export var rngLoader; // object for loading a relaxNG schema for hinting
 export let github; // github API wrapper object
@@ -972,13 +973,20 @@ async function vrvWorkerEventsHandler(ev) {
     case 'midiPlayback': // export MIDI file
       console.log("RECEIVED MIDI AND TIMEMAP:", ev.data.midi, ev.data.timemap)
       timemap = ev.data.timemap;
-      blob = midiDataToBlob(ev.data.midi);
-      core.blobToNoteSequence(blob).then((noteSequence) => { 
-        let mp = document.getElementById("midi-player");
-        mp.noteSequence = noteSequence;
-        console.log("GOT NOTESEQUENCE: ", noteSequence);
-        console.log("GOT PLAYER: ", document.querySelector("midi-player")); 
-      })
+      if(mp) { 
+        blob = midiDataToBlob(ev.data.midi);
+        core.blobToNoteSequence(blob).then((noteSequence) => { 
+          mp.noteSequence = noteSequence;
+          console.log("GOT NOTESEQUENCE: ", noteSequence);
+          console.log("GOT PLAYER: ", document.querySelector("midi-player")); 
+        })
+      }
+      break;
+    case 'timeForElement': // receive time for element to start midi playback
+      console.log("RECEIVED TIME FOR ELEMENT: ", ev.data);
+      if(ev.data.triggerMidiSeekTo) { 
+        seekMidiPlaybackTo(ev.data.msg / 1000);
+      }
       break;
     
     case 'computePageBreaks':
@@ -1331,19 +1339,18 @@ export let cmd = {
     document.getElementById('filterSettings').value = '';
     document.getElementById('filterSettings').dispatchEvent(new Event("input"));
   },
-  'showMidiPlaybackControlBar': () => {
-    document.getElementById('showMidiPlaybackControlBar').checked = true; // TODO: remove?
-    v.toggleMidiPlaybackControlBar();
-  },
-  'hideMidiPlaybackControlBar': () => {
-    document.getElementById('showMidiPlaybackControlBar').checked = false; // TODO: remove?
-    v.toggleMidiPlaybackControlBar();
-  },
   'toggleMidiPlaybackControlBar': () => {
+    let mp = document.getElementById('midi-player');
+    if(mp) { 
+      mp.removeEventListener("load", handleMidiPlayerLoaded);
+      console.log("REMOVED", mp)
+    }
     let status = document.getElementById('showMidiPlaybackControlBar').checked;
     document.getElementById('showMidiPlaybackControlBar').checked = !status;
     v.toggleMidiPlaybackControlBar();
     if(document.getElementById('showMidiPlaybackControlBar').checked) { 
+      mp.addEventListener("load", handleMidiPlayerLoaded);
+      console.log("ADDED", mp)
       // request MIDI rendering from Verovio worker
       getMidiRendering(null, true);
     }
@@ -2012,4 +2019,24 @@ function midiDataToBlob(data) {
   return new Blob([new Uint8Array(byteNumbers)], {
     type: 'audio/midi'
   });
+}
+
+function handleMidiPlayerLoaded() { 
+  console.log("~~HANDLE MIDI PLAYER LOADED")
+  // on load, seek to first currently selected element (or first note on page)
+  let seekToNote = v.findFirstNoteInSelection() || document.querySelector(".note");
+  if(seekToNote) {
+    console.log("~~ TRYING TO SEEK THIS: ", seekToNote); 
+    v.getTimeForElement(seekToNote.id, true); // will trigger a seekMidiPlaybackTo
+  }
+  else { 
+    console.warn("Can't find a note to seek MIDI playback to");
+  }
+}
+
+function seekMidiPlaybackTo(t) {
+  // seek MIDI playback to time (in seconds)
+  if(mp) { 
+    mp.playing ? mp.seekTo(t) : mp.currentTime = t;
+  } 
 }

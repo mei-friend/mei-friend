@@ -289,7 +289,8 @@ addEventListener('message', function (e) {
       try {
         result = {
           'cmd': 'timeForElement',
-          'msg': tk.getTimeForElement(result.mei)
+          'msg': tk.getTimeForElement(result.msg),
+          'triggerMidiSeekTo': result.triggerMidiSeekTo
         };
       } catch (err) {
         log('getTimeForElement: ' + err);
