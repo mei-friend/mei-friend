@@ -251,6 +251,7 @@ const defaultVerovioOptions = {
   spacingLinear: .2,
   spacingNonLinear: .5,
   minLastJustification: 0,
+  transposeToSoundingPitch: true,
   // clefChangeFactor: .83, // option removed in Verovio 3.10.0
   svgAdditionalAttribute: ["layer@n", "staff@n",
     "dir@vgrp", "dynam@vgrp", "hairpin@vgrp", "pedal@vgrp", "measure@n"
