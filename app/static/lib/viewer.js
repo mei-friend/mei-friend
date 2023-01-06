@@ -866,7 +866,13 @@ export default class Viewer {
         default: defaultVerovioVersion,
         values: Object.keys(supportedVerovioVersions),
         valuesDescriptions: Object.keys(supportedVerovioVersions)
-          .map(key => supportedVerovioVersions[key].description)
+          .map(key => {
+            let desc = supportedVerovioVersions[key].description;
+            if (supportedVerovioVersions[key].hasOwnProperty('releaseDate')) {
+              desc += ' (' + supportedVerovioVersions[key].releaseDate + ')';
+            }
+            return desc
+          })
       },
       toggleSpeedMode: {
         title: 'Speedmode',
@@ -1146,7 +1152,7 @@ export default class Viewer {
         case 'respSelect':
           if (this.xmlDoc)
             o.values = Array.from(this.xmlDoc.querySelectorAll('corpName[*|id]'))
-            .map(e => e.getAttribute('xml:id'));
+              .map(e => e.getAttribute('xml:id'));
           break;
         case 'controlMenuFontSelector':
           document.getElementById('font-ctrls').style.display = optDefault ? 'inherit' : 'none';
@@ -1462,11 +1468,11 @@ export default class Viewer {
         if (ev.target.type === 'number') value = parseFloat(value);
         this.applyEditorOption(cm, option, value,
           storage.hasOwnProperty('cm-matchTheme') ?
-          storage['cm-matchTheme'] : mfDefaults['matchTheme']);
+            storage['cm-matchTheme'] : mfDefaults['matchTheme']);
         if (option === 'theme' && storage.hasOwnProperty('cm-matchTheme')) {
           this.setNotationColors(
             storage.hasOwnProperty('cm-matchTheme') ?
-            storage['cm-matchTheme'] : mfDefaults['matchTheme']);
+              storage['cm-matchTheme'] : mfDefaults['matchTheme']);
         }
         if ((mfDefaults.hasOwnProperty(option) && option !== 'theme' && mfDefaults[option].toString() === value.toString()) ||
           (option === 'theme' && (window.matchMedia('(prefers-color-scheme: dark)').matches ?
@@ -1654,7 +1660,7 @@ export default class Viewer {
     div.classList.add('optionsItem');
     let label = document.createElement('label');
     let title = o.description;
-    if (o.default) title += ' (default: ' + o.default+')';
+    if (o.default) title += ' (default: ' + o.default + ')';
     label.setAttribute('title', title);
     label.setAttribute('for', opt);
     label.innerText = o.title;
@@ -2076,7 +2082,7 @@ export default class Viewer {
     let msg = '';
     if (msgObj.hasOwnProperty('response'))
       msg = 'Schema not found (' + msgObj.response.status + ' ' +
-      msgObj.response.statusText + '): ';
+        msgObj.response.statusText + '): ';
     if (msgObj.hasOwnProperty('err'))
       msg = msgObj.err + ' ';
     if (msgObj.hasOwnProperty('schemaFile'))
