@@ -2040,6 +2040,11 @@ function seekMidiPlaybackTo(t) {
 }
 
 function highlightNotesAtMidiPlaybackTime() { 
+  // clear previous
+  document.querySelectorAll(".currently-playing").forEach(g => 
+    g.classList.remove("currently-playing")
+  );
+  // TODO modify based on tempo
   let t = mp.currentTime * 4;
   console.log("~~ trying to highlight:", t, timemap)
   const closestTimemapTime = Object.keys(timemap)
