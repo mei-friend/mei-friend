@@ -2040,7 +2040,7 @@ function seekMidiPlaybackTo(t) {
 }
 
 function highlightNotesAtMidiPlaybackTime() { 
-  let t = mp.currentTime / 1000;
+  let t = mp.currentTime * 4;
   console.log("~~ trying to highlight:", t, timemap)
   const closestTimemapTime = Object.keys(timemap)
     // ignore times later than the requested target 
@@ -2053,6 +2053,7 @@ function highlightNotesAtMidiPlaybackTime() {
       if(el) { 
         console.log("Highlight this one: ", el);
         el.classList.add("currently-playing");
+        el.querySelectorAll("g").forEach(g => g.classList.add("currently-playing"))
       } else { 
         console.warn("Expected to highlight currently playing note, but couldn't find it:", id);
       }
