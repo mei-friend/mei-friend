@@ -599,7 +599,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   // set up midi-player event listeners
-  mp.addEventListener("note", highlightNotesAtMidiPlaybackTime)
+  mp.addEventListener("note", (e) => highlightNotesAtMidiPlaybackTime(e))
   mp.addEventListener("load", handleMidiPlayerLoaded);
 
   let urlFileName = searchParams.get('file');
@@ -2039,13 +2039,14 @@ function seekMidiPlaybackTo(t) {
   } 
 }
 
-function highlightNotesAtMidiPlaybackTime() { 
+function highlightNotesAtMidiPlaybackTime(e) {
+  console.log("NOTE EVENT: ", e); 
   // clear previous
   document.querySelectorAll(".currently-playing").forEach(g => 
     g.classList.remove("currently-playing")
   );
   // TODO modify based on tempo
-  let t = mp.currentTime * 4;
+  let t = e.detail.note.startTime * 4;
   console.log("~~ trying to highlight:", t, timemap)
   const closestTimemapTime = Object.keys(timemap)
     // ignore times later than the requested target 
