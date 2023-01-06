@@ -1016,6 +1016,12 @@ export default class Viewer {
         type: 'bool',
         default: false
       },
+      pageFollowMidiPlayback: {
+        title: 'Page-follow MIDI playback',
+        description: 'Automatically flip pages to follow MIDI playback',
+        type: 'bool',
+        default: true 
+      },
       titleAnnotations: {
         title: 'Annotations',
         description: 'Annotation settings',

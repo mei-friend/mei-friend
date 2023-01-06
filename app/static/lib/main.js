@@ -2040,7 +2040,6 @@ function seekMidiPlaybackTo(t) {
 }
 
 function highlightNotesAtMidiPlaybackTime(e) {
-  console.log("NOTE EVENT: ", e); 
   // clear previous
   document.querySelectorAll(".currently-playing").forEach(g => 
     g.classList.remove("currently-playing")
@@ -2060,8 +2059,13 @@ function highlightNotesAtMidiPlaybackTime(e) {
         console.log("Highlight this one: ", el);
         el.classList.add("currently-playing");
         el.querySelectorAll("g").forEach(g => g.classList.add("currently-playing"))
-      } else { 
-        console.warn("Expected to highlight currently playing note, but couldn't find it:", id);
+      } else if (document.getElementById("pageFollowMidiPlayback").checked) {
+        const flipToPage = v.getPageWithElement(id);
+        if(flipToPage) {
+          v.updatePage(cm, flipToPage);
+        } else { 
+          console.warn("Expected to highlight currently playing note, but couldn't find it:", id);
+        }
       }
     })
   }
