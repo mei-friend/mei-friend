@@ -123,7 +123,7 @@ export default class Viewer {
     this.vrvWorker.postMessage(message);
   }
 
-  updatePage(cm, page, xmlId = '', setFocusToVerovioPane = true) {
+  updatePage(cm, page, xmlId = '', setFocusToVerovioPane = true, withMidiSeek = true) {
     if (this.changeCurrentPage(page) || xmlId) {
       if (!this.speedMode) {
         let message = {
@@ -145,7 +145,7 @@ export default class Viewer {
         this.updateData(cm, xmlId ? false : true, setFocusToVerovioPane);
       }
     }
-    if(document.getElementById('showMidiPlaybackControlBar').checked) { 
+    if(withMidiSeek && document.getElementById('showMidiPlaybackControlBar').checked) { 
       // clear a possible pre-existing timeout
       window.clearTimeout(rerenderMidiTimeout);
       // start a new time-out 
@@ -1916,15 +1916,19 @@ export default class Viewer {
     let firstNote;
     for(const elId of v.selectedElements) { 
       let el = document.getElementById(elId);
-      if(el && el.classList.contains("note")) { 
-        firstNote = el;
-        break;
-      } else { 
-        const childNotes = el.getElementsByClassName("note");
-        if(childNotes.length) { 
-          firstNote = childNotes[0];
+      if(el) { 
+        if(el.classList.contains("note")) { 
+          firstNote = el;
           break;
+        } else { 
+          const childNotes = el.getElementsByClassName("note");
+          if(childNotes.length) { 
+            firstNote = childNotes[0];
+            break;
+          }
         }
+      } else { 
+        console.warn("Couldn't find selected element on page: ", elId, v.selectedElements)
       }
     }
     return firstNote;

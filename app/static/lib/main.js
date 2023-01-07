@@ -2060,7 +2060,7 @@ function highlightNotesAtMidiPlaybackTime(e) {
       } else if (document.getElementById("pageFollowMidiPlayback").checked) {
         const flipToPage = v.getPageWithElement(id);
         if(flipToPage) {
-          v.updatePage(cm, flipToPage);
+          v.updatePage(cm, flipToPage, '', true, false); // disable midi seek after page-flip
         } else { 
           console.warn("Expected to highlight currently playing note, but couldn't find it:", id);
         }
