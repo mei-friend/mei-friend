@@ -15,6 +15,8 @@ import {
   isSafari,
   rngLoader,
   platform,
+  rerenderMidiTimeout,
+  startMidiRerenderTimeout,
   storage,
   supportedVerovioVersions,
   tkVersion,
@@ -142,6 +144,12 @@ export default class Viewer {
         }
         this.updateData(cm, xmlId ? false : true, setFocusToVerovioPane);
       }
+    }
+    if(document.getElementById('showMidiPlaybackControlBar').checked) { 
+      // clear a possible pre-existing timeout
+      window.clearTimeout(rerenderMidiTimeout);
+      // start a new time-out 
+      startMidiRerenderTimeout();
     }
   }
 

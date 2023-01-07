@@ -7,11 +7,11 @@ var spdWorker;
 var tkAvailableOptions;
 var mei;
 var timemap;
-var rerenderMidiTimeout; // javascript timeout between last edit and MIDI re-render
 var rerenderMidiDelay = 500; // in ms, delay between last edit and MIDI re-render
 var breaksParam; // (string) the breaks parameter given through URL
 var pageParam; // (int) page parameter given through URL
 var selectParam; // (array) select ids given through multiple instances in URL
+export let rerenderMidiTimeout; // javascript timeout between last edit and MIDI re-render
 export let platform = navigator.platform.toLowerCase(); // TODO
 // let platform = (navigator?.userAgentData?.platform || navigator?.platform || 'unknown').toLowerCase();
 export const isSafari = !!navigator.userAgent.match(/Version\/[\d\.]+.*Safari/);
@@ -1913,7 +1913,7 @@ export function handleEditorChanges() {
     // clear a possible pre-existing timeout
     window.clearTimeout(rerenderMidiTimeout);
     // start a new time-out 
-    rerenderMidiTimeout = window.setTimeout(() => getMidiRendering(null, true), rerenderMidiDelay);
+    startMidiRerenderTimeout();
   }
 } // handleEditorChanges()
 
@@ -2020,11 +2020,9 @@ function midiDataToBlob(data) {
 }
 
 function handleMidiPlayerLoaded() { 
-  console.log("~~HANDLE MIDI PLAYER LOADED")
   // on load, seek to first currently selected element (or first note on page)
   let seekToNote = v.findFirstNoteInSelection() || document.querySelector(".note");
   if(seekToNote) {
-    console.log("~~ TRYING TO SEEK THIS: ", seekToNote); 
     v.getTimeForElement(seekToNote.id, true); // will trigger a seekMidiPlaybackTo
   }
   else { 
@@ -2040,13 +2038,13 @@ function seekMidiPlaybackTo(t) {
 }
 
 function highlightNotesAtMidiPlaybackTime(e) {
+  console.log("event:", e)
   // clear previous
   document.querySelectorAll(".currently-playing").forEach(g => 
     g.classList.remove("currently-playing")
   );
   // TODO modify based on tempo
   let t = e.detail.note.startTime * 4;
-  console.log("~~ trying to highlight:", t, timemap)
   const closestTimemapTime = Object.keys(timemap)
     // ignore times later than the requested target 
     .filter(time => t <= time) 
@@ -2069,4 +2067,8 @@ function highlightNotesAtMidiPlaybackTime(e) {
       }
     })
   }
+}
+
+export function startMidiRerenderTimeout() {
+  rerenderMidiTimeout = window.setTimeout(() => getMidiRendering(null, true), rerenderMidiDelay);
 }
