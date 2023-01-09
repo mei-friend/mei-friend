@@ -1,6 +1,6 @@
 // mei-friend version and date
-export const version = '0.7.1';
-export const versionDate = '20 Dec 2022';
+export const version = '0.7.2';
+export const versionDate = '6 Jan 2023';
 
 var vrvWorker;
 var spdWorker;
@@ -92,41 +92,55 @@ export let supportedVerovioVersions = {
     'url': 'https://www.verovio.org/javascript/latest/verovio-toolkit-hum.js',
     'description': 'Current Verovio release'
   },
+  '3.14.0': {
+    'url': 'https://www.verovio.org/javascript/3.14.0/verovio-toolkit-hum.js',
+    'description': 'Verovio release 3.14.0',
+    'releaseDate': '23 Dec 2022'
+  },
   '3.13.1': {
     'url': 'https://www.verovio.org/javascript/3.13.1/verovio-toolkit-hum.js',
-    'description': 'Verovio release 3.13.1'
+    'description': 'Verovio release 3.13.1',
+    'releaseDate': '28 Nov 2022'
   },
   '3.13.0': {
     'url': 'https://www.verovio.org/javascript/3.13.0/verovio-toolkit-hum.js',
-    'description': 'Verovio release 3.13.0'
+    'description': 'Verovio release 3.13.0',
+    'releaseDate': '23 Nov 2022'
   },
   '3.12.1': {
     'url': 'https://www.verovio.org/javascript/3.12.1/verovio-toolkit-hum.js',
-    'description': 'Verovio release 3.12.1'
+    'description': 'Verovio release 3.12.1',
+    'releaseDate': '6 Oct 2022'
   },
   '3.12.0': {
     'url': 'https://www.verovio.org/javascript/3.12.0/verovio-toolkit-hum.js',
-    'description': 'Verovio release 3.12.0'
+    'description': 'Verovio release 3.12.0',
+    'releaseDate': '29 Sept 2022'
   },
   '3.11.0': {
     'url': 'https://www.verovio.org/javascript/3.11.0/verovio-toolkit-hum.js',
-    'description': 'Verovio release 3.11.0'
+    'description': 'Verovio release 3.11.0',
+    'releaseDate': '15 Jul 2022'
   },
   '3.10.0*': {
     'url': 'https://www.verovio.org/javascript/3.10.0/verovio-toolkit-hum.js',
-    'description': 'Verovio release 3.10.0. *ATTENTION: Switching to this version might require a refresh due to memory issues.'
+    'description': 'Verovio release 3.10.0. *ATTENTION: Switching to this version might require a refresh due to memory issues.',
+    'releaseDate': '25 May 2022'
   },
   '3.9.0*': {
     'url': 'https://www.verovio.org/javascript/3.9.0/verovio-toolkit-hum.js',
-    'description': 'Verovio release 3.9.0. *ATTENTION: Switching to this version might require a refresh due to memory issues.'
+    'description': 'Verovio release 3.9.0. *ATTENTION: Switching to this version might require a refresh due to memory issues.',
+    'releaseDate': '22 Feb 2022'
   },
   '3.8.1*': {
     'url': 'https://www.verovio.org/javascript/3.8.1/verovio-toolkit-hum.js',
-    'description': 'Verovio release 3.8.1. *ATTENTION: Switching to this version might require a refresh due to memory issues.'
+    'description': 'Verovio release 3.8.1. *ATTENTION: Switching to this version might require a refresh due to memory issues.',
+    'releaseDate': '10 Jan 2022'
   },
   '3.7.0*': {
     'url': 'https://www.verovio.org/javascript/3.7.0/verovio-toolkit-hum.js',
-    'description': 'Verovio release 3.7.0. *ATTENTION: Switching to this version might require a refresh due to memory issues.'
+    'description': 'Verovio release 3.7.0. *ATTENTION: Switching to this version might require a refresh due to memory issues.',
+    'releaseDate': '22 Nov 2021'
   }
 };
 
@@ -242,6 +256,7 @@ const defaultVerovioOptions = {
   spacingLinear: .2,
   spacingNonLinear: .5,
   minLastJustification: 0,
+  transposeToSoundingPitch: true,
   // clefChangeFactor: .83, // option removed in Verovio 3.10.0
   svgAdditionalAttribute: ["layer@n", "staff@n",
     "dir@vgrp", "dynam@vgrp", "hairpin@vgrp", "pedal@vgrp", "measure@n"
