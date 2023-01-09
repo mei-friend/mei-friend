@@ -2053,20 +2053,22 @@ function seekMidiPlaybackTo(t) {
 }
 
 function highlightNotesAtMidiPlaybackTime(e) {
-  console.log("event:", e)
+  console.log("event:", e.detail)
   // clear previous
   document.querySelectorAll(".currently-playing").forEach(g => 
     g.classList.remove("currently-playing")
   );
   // TODO modify based on tempo
-  let t = e.detail.note.startTime * 4;
-  const closestTimemapTime = Object.keys(timemap)
+  let t = e.detail.note.startTime * 2;
+  const notAfterThisNote = timemap
     // ignore times later than the requested target 
-    .filter(time => t <= time) 
+    .filter((tm) => t >= tm.qstamp);
     // find closest time to target
-    .reduce((prev, curr) => Math.abs(curr - t) < Math.abs(prev - t) ? curr : prev);
-  if("on" in timemap[closestTimemapTime]) { 
-    timemap[closestTimemapTime]["on"].forEach(id => {
+    // Verovio returns a sorted timemap, so just choose the last one 
+  let closestTimemapTime = notAfterThisNote[notAfterThisNote.length-1];
+  console.log("CLOSEST: ", closestTimemapTime)
+  if("on" in closestTimemapTime) { 
+    closestTimemapTime["on"].forEach(id => {
       let el = document.getElementById(id);
       if(el) { 
         console.log("Highlight this one: ", el);
