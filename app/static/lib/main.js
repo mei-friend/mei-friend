@@ -2058,8 +2058,11 @@ function highlightNotesAtMidiPlaybackTime(e) {
   document.querySelectorAll(".currently-playing").forEach(g => 
     g.classList.remove("currently-playing")
   );
-  // TODO modify based on tempo
-  let t = e.detail.note.startTime * 2;
+  // modify based on tempo 
+  // (n.b. core comes from magenta.js via html-midi-player)
+  // (... and 120 is the default tempo)
+  const currentTempoModifier = 2 * core.Player.tone.Transport.bpm.value / 120;
+  let t = e.detail.note.startTime * currentTempoModifier;
   const notAfterThisNote = timemap
     // ignore times later than the requested target 
     .filter((tm) => t >= tm.qstamp);
