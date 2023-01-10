@@ -186,7 +186,7 @@ export default class Viewer {
     if (this.speedMode) {
       pageNumber = speed.getPageWithElement(this.xmlDoc, this.breaksValue(), xmlId, this.breaksSelect.value);
     } else {
-      pageNumber = parseFloat(await this.getPageWithElementFromToolkit(xmlId));
+      pageNumber = await this.getPageWithElementFromToolkit(xmlId);
     }
     console.log('XXXXXXX getPageWithElement(): ' , pageNumber);
     return pageNumber;
