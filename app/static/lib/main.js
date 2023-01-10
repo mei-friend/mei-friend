@@ -993,22 +993,22 @@ async function vrvWorkerEventsHandler(ev) {
     case 'midiPlayback': // export MIDI file
       console.log("RECEIVED MIDI AND TIMEMAP:", ev.data.midi, ev.data.timemap)
       timemap = ev.data.timemap;
-      if(mp) { 
+      if (mp) {
         blob = midiDataToBlob(ev.data.midi);
-        core.blobToNoteSequence(blob).then((noteSequence) => { 
+        core.blobToNoteSequence(blob).then((noteSequence) => {
           mp.noteSequence = noteSequence;
           console.log("GOT NOTESEQUENCE: ", noteSequence);
-          console.log("GOT PLAYER: ", document.querySelector("midi-player")); 
+          console.log("GOT PLAYER: ", document.querySelector("midi-player"));
         })
       }
       break;
     case 'timeForElement': // receive time for element to start midi playback
       console.log("RECEIVED TIME FOR ELEMENT: ", ev.data);
-      if(ev.data.triggerMidiSeekTo) { 
+      if (ev.data.triggerMidiSeekTo) {
         seekMidiPlaybackTo(ev.data.msg / 1000);
       }
       break;
-    
+
     case 'computePageBreaks':
       v.pageBreaks = ev.data.pageBreaks;
       v.pageCount = ev.data.pageCount;
@@ -1249,7 +1249,7 @@ function downloadSpeedMei() {
   a.click();
 }
 
-function getMidiRendering(ev, requestTimemap=false) {
+function getMidiRendering(ev, requestTimemap = false) {
   let message = {
     'cmd': 'exportMidi',
     'options': v.vrvOptions,
@@ -1363,7 +1363,7 @@ export let cmd = {
     let status = document.getElementById('showMidiPlaybackControlBar').checked;
     document.getElementById('showMidiPlaybackControlBar').checked = !status;
     v.toggleMidiPlaybackControlBar();
-    if(document.getElementById('showMidiPlaybackControlBar').checked) { 
+    if (document.getElementById('showMidiPlaybackControlBar').checked) {
       // request MIDI rendering from Verovio worker
       getMidiRendering(null, true);
     }
@@ -1859,7 +1859,7 @@ function moveProgressBar() {
   var id = setInterval(frame, 10);
 
   function frame() {
-    (width < 100) ? elem.style.width = (++width) + '%': clearInterval(id);
+    (width < 100) ? elem.style.width = (++width) + '%' : clearInterval(id);
   }
 }
 
@@ -1921,10 +1921,10 @@ export function handleEditorChanges() {
     // on every set of changes, save editor content
     updateLocalStorage(meiXml);
   }
-  if(document.getElementById('showAnnotations').checked || document.getElementById('showAnnotationPanel').checked) {
+  if (document.getElementById('showAnnotations').checked || document.getElementById('showAnnotationPanel').checked) {
     readAnnots(); // from annotation.js
   }
-  if(document.getElementById('showMidiPlaybackControlBar').checked) { 
+  if (document.getElementById('showMidiPlaybackControlBar').checked) {
     // clear a possible pre-existing timeout
     window.clearTimeout(rerenderMidiTimeout);
     // start a new time-out 
@@ -1950,10 +1950,10 @@ export function log(s, code = null) {
 
 function fillInSampleEncodings() {
   fetch(sampleEncodingsCSV, {
-      headers: {
-        'content-type': 'text/csv'
-      }
-    })
+    headers: {
+      'content-type': 'text/csv'
+    }
+  })
     .then((response) => response.text())
     .then((csv) => {
       const lines = csv.split("\n");
@@ -2023,7 +2023,7 @@ export function isCtrlOrCmd(ev) {
     false;
 }
 
-function midiDataToBlob(data) { 
+function midiDataToBlob(data) {
   const byteCharacters = atob(data);
   const byteNumbers = new Array(byteCharacters.length);
   for (let i = 0; i < byteCharacters.length; i++) {
@@ -2034,22 +2034,22 @@ function midiDataToBlob(data) {
   });
 }
 
-function handleMidiPlayerLoaded() { 
+function handleMidiPlayerLoaded() {
   // on load, seek to first currently selected element (or first note on page)
   let seekToNote = v.findFirstNoteInSelection() || document.querySelector(".note");
-  if(seekToNote) {
+  if (seekToNote) {
     v.getTimeForElement(seekToNote.id, true); // will trigger a seekMidiPlaybackTo
   }
-  else { 
+  else {
     console.warn("Can't find a note to seek MIDI playback to");
   }
 }
 
 function seekMidiPlaybackTo(t) {
   // seek MIDI playback to time (in seconds)
-  if(mp) { 
+  if (mp) {
     mp.playing ? mp.seekTo(t) : mp.currentTime = t;
-  } 
+  }
 }
 
 function highlightNotesAtMidiPlaybackTime(e) {
@@ -2059,35 +2059,37 @@ function highlightNotesAtMidiPlaybackTime(e) {
   const notAfterThisNote = timemap
     // ignore times later than the requested target 
     .filter((tm) => t >= tm.tstamp / 1000);
-    // find closest time to target
-    // Verovio returns a sorted timemap, so just choose the last one 
-  let closestTimemapTime = notAfterThisNote[notAfterThisNote.length-1];
+  // find closest time to target
+  // Verovio returns a sorted timemap, so just choose the last one 
+  let closestTimemapTime = notAfterThisNote[notAfterThisNote.length - 1];
   console.log("CLOSEST: ", closestTimemapTime)
-  
-  if (closestTimemapTime && "off" in closestTimemapTime) { 
+
+  if (closestTimemapTime && "off" in closestTimemapTime) {
     closestTimemapTime["off"].forEach(off => {
       const el = document.getElementById(off);
-      if (el) { 
+      if (el) {
         el.classList.remove("currently-playing");
         el.querySelectorAll(".currently-playing").forEach(e => e.classList.remove("currently-playing"))
       }
     })
   }
 
-  if(closestTimemapTime && "on" in closestTimemapTime) { 
+  if (closestTimemapTime && "on" in closestTimemapTime) {
     closestTimemapTime["on"].forEach(id => {
       let el = document.getElementById(id);
-      if(el) { 
+      if (el) {
         console.log("Highlight this one: ", el);
         el.classList.add("currently-playing");
         el.querySelectorAll("g").forEach(g => g.classList.add("currently-playing"))
       } else if (document.getElementById("pageFollowMidiPlayback").checked) {
-        const flipToPage = v.getPageWithElement(id);
-        if(flipToPage) {
-          v.updatePage(cm, flipToPage, '', true, false); // disable midi seek after page-flip
-        } else { 
-          console.warn("Expected to highlight currently playing note, but couldn't find it:", id);
-        }
+        v.getPageWithElement(id).then(flipToPage => {
+          console.log("Highlight flipToPage: ", flipToPage);
+          if (flipToPage) {
+            v.updatePage(cm, flipToPage, '', true, false); // disable midi seek after page-flip
+          } else {
+            console.warn("Expected to highlight currently playing note, but couldn't find it:", id);
+          }
+        });
       }
     })
   }

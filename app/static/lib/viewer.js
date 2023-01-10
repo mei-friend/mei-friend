@@ -145,7 +145,7 @@ export default class Viewer {
         this.updateData(cm, xmlId ? false : true, setFocusToVerovioPane);
       }
     }
-    if(withMidiSeek && document.getElementById('showMidiPlaybackControlBar').checked) { 
+    if (withMidiSeek && document.getElementById('showMidiPlaybackControlBar').checked) {
       // clear a possible pre-existing timeout
       window.clearTimeout(rerenderMidiTimeout);
       // start a new time-out 
@@ -180,63 +180,39 @@ export default class Viewer {
     this.vrvWorker.postMessage(message);
   }
 
-  getPageWithElement(xmlId, situateAnno = null) {
-    /* optional param situateAnno: expects an object like
-    { 
-      id: annotationXmlId,
-      type: ['first'|'last']
-    }
-    purpose: allow asynchronous supply of page numbers by web worker
-    compare: situateAnnotations() in annotation.js
-    */
+  async getPageWithElement(xmlId, situateAnno = null) {
     let pageNumber = -1;
-    let that = this;
-    // console.log('getPageWithElement(' + xmlId + '), speedMode: ' + this.speedMode);
+    console.log('BEGIN getPageWithElement(' + xmlId + '), speedMode: ' + this.speedMode);
     if (this.speedMode) {
       pageNumber = speed.getPageWithElement(this.xmlDoc, this.breaksValue(), xmlId, this.breaksSelect.value);
     } else {
-      let promise = new Promise(function (resolve) {
-        let taskId = Math.random();
-        const msg = {
-          'cmd': 'getPageWithElement',
-          'msg': xmlId,
-          'taskId': taskId,
-        };
-        if (situateAnno && 'type' in situateAnno) {
-          msg.type = situateAnno.type;
-        }
-        that.vrvWorker.addEventListener('message', function handle(ev) {
-          if (ev.data.cmd === 'pageWithElement' && ev.data.taskId === taskId) {
-            resolve(ev.data.msg);
-            that.vrvWorker.removeEventListener('message', handle);
-          }
-        });
-        that.vrvWorker.postMessage(msg);
-      }.bind(that));
-      promise.then(function (p) {
-        if (situateAnno && 'id' in situateAnno) {
-          const ix = annotations.findIndex(a => a.id === situateAnno.id);
-          if (ix >= 0) { // found it
-            switch (situateAnno.type) {
-              case 'first':
-                annotations[ix].firstPage = p;
-                break;
-              case 'last':
-                annotations[ix].lastPage = p;
-                break;
-              default:
-                console.error("Called getPageWithElement on Verovio worker with invalid situateAnno: ", situateAnno);
-            }
-            const annotationLocationLabelElement = document.querySelector(`.annotationLocationLabel[data-id=${situateAnno.id}`);
-            if (annotationLocationLabelElement) {
-              annotationLocationLabelElement.innerHTML = generateAnnotationLocationLabel(annotations[ix]).innerHTML;
-            }
-          }
+      pageNumber = parseFloat(await this.getPageWithElementFromToolkit(xmlId));
+    }
+    console.log('XXXXXXX getPageWithElement(): ' , pageNumber);
+    return pageNumber;
+  } 
+
+  getPageWithElementFromToolkit(xmlId, situateAnno = null) {
+    let that = this;
+    return new Promise(function (resolve, reject) {
+      let taskId = Math.random();
+      const msg = {
+        'cmd': 'getPageWithElement',
+        'msg': xmlId,
+        'taskId': taskId,
+      };
+      if (situateAnno && 'type' in situateAnno) {
+        msg.type = situateAnno.type;
+      }
+      that.vrvWorker.addEventListener('message', function handle(ev) {
+        if (ev.data.cmd === 'pageWithElement' && ev.data.taskId === taskId) {
+          let p = ev.data.msg;
+          that.vrvWorker.removeEventListener('message', handle);
+          resolve(p);
         }
       });
-    }
-    // console.log('pageNumber: ', pageNumber);
-    return pageNumber;
+      that.vrvWorker.postMessage(msg);
+    }.bind(that));
   }
 
   gotPageNumber(ev) {
@@ -782,12 +758,12 @@ export default class Viewer {
     }
   }
 
-  toggleMidiPlaybackControlBar(ev = null) { 
+  toggleMidiPlaybackControlBar(ev = null) {
     const midiPlaybackControlBar = document.getElementById("midiPlaybackControlBar");
     const showMidiPlaybackControlBar = document.getElementById("showMidiPlaybackControlBar");
-    midiPlaybackControlBar.style.display = showMidiPlaybackControlBar.checked ? 
+    midiPlaybackControlBar.style.display = showMidiPlaybackControlBar.checked ?
       "block" : "none";
-      console.log("toggle: ", midiPlaybackControlBar)
+    console.log("toggle: ", midiPlaybackControlBar)
     setOrientation(cm);
   }
 
@@ -1034,7 +1010,7 @@ export default class Viewer {
         title: 'Page-follow MIDI playback',
         description: 'Automatically flip pages to follow MIDI playback',
         type: 'bool',
-        default: true 
+        default: true
       },
       titleAnnotations: {
         title: 'Annotations',
@@ -1920,20 +1896,20 @@ export default class Viewer {
 
   findFirstNoteInSelection() {
     let firstNote;
-    for(const elId of v.selectedElements) { 
+    for (const elId of v.selectedElements) {
       let el = document.getElementById(elId);
-      if(el) { 
-        if(el.classList.contains("note")) { 
+      if (el) {
+        if (el.classList.contains("note")) {
           firstNote = el;
           break;
-        } else { 
+        } else {
           const childNotes = el.getElementsByClassName("note");
-          if(childNotes.length) { 
+          if (childNotes.length) {
             firstNote = childNotes[0];
             break;
           }
         }
-      } else { 
+      } else {
         console.warn("Couldn't find selected element on page: ", elId, v.selectedElements)
       }
     }
