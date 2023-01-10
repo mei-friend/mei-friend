@@ -2054,23 +2054,27 @@ function seekMidiPlaybackTo(t) {
 
 function highlightNotesAtMidiPlaybackTime(e) {
   console.log("event:", e.detail)
+  const t = e.detail.note.startTime;
   // clear previous
-  document.querySelectorAll(".currently-playing").forEach(g => 
-    g.classList.remove("currently-playing")
-  );
-  // modify based on tempo 
-  // (n.b. core comes from magenta.js via html-midi-player)
-  // (... and 120 is the default tempo)
-  const currentTempoModifier = 2 * core.Player.tone.Transport.bpm.value / 120;
-  let t = e.detail.note.startTime * currentTempoModifier;
   const notAfterThisNote = timemap
     // ignore times later than the requested target 
-    .filter((tm) => t >= tm.qstamp);
+    .filter((tm) => t >= tm.tstamp / 1000);
     // find closest time to target
     // Verovio returns a sorted timemap, so just choose the last one 
   let closestTimemapTime = notAfterThisNote[notAfterThisNote.length-1];
   console.log("CLOSEST: ", closestTimemapTime)
-  if("on" in closestTimemapTime) { 
+  
+  if (closestTimemapTime && "off" in closestTimemapTime) { 
+    closestTimemapTime["off"].forEach(off => {
+      const el = document.getElementById(off);
+      if (el) { 
+        el.classList.remove("currently-playing");
+        el.querySelectorAll(".currently-playing").forEach(e => e.classList.remove("currently-playing"))
+      }
+    })
+  }
+
+  if(closestTimemapTime && "on" in closestTimemapTime) { 
     closestTimemapTime["on"].forEach(id => {
       let el = document.getElementById(id);
       if(el) { 
