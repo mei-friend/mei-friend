@@ -1,0 +1,122 @@
+<html>
+
+<head>
+    <title>Test PDFKIT</title>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script> -->
+    <script src="./pdfkit/pdfkit.standalone.js"></script>
+    <script src="./pdfkit/blob-stream.js"></script>
+    <script src="./pdfkit/svgtopdf.js"></script>
+    <script src="http://www.verovio.org/javascript/latest/verovio-toolkit-wasm.js" defer></script>
+</head>
+
+<body>
+    <h1>Test PDFKit</h1>
+    <div id="outDiv"></div>
+    <div id="notation"></div>
+    <div id="preview-pane"></div>
+
+    <script>
+        // import { jsPDF } from "jspdf";
+        document.addEventListener("DOMContentLoaded", (event) => {
+            let fileName = "https://raw.githubusercontent.com/trompamusic-encodings/Beethoven_Op53_HenleUrtext/master/Beethoven_Op53_1-HenleUrtext.mei";
+            let output = document.getElementById('outDiv');
+            let pdfFormat = "B4";
+            let pdfOrientation = "portrait";
+            // A4 210 x 297
+            // B4 250 x 353
+            // C4 229 x 324
+
+            verovio.module.onRuntimeInitialized = async _ => {
+                let tk = new verovio.toolkit();
+                output.innerHTML = "Verovio has loaded!";
+                tk.setOptions({
+                    scaleToPageSize: true,
+                    landscape: false,
+                    adjustPageWidth: false,
+                    adjustPageHeight: false,
+                    justifyVertically: true,
+                    mmOutput: true,
+                    pageWidth: 2500,
+                    pageHeight: 3530,
+                    pageMarginLeft: 210,
+                    pageMarginRight: 210,
+                    pageMarginTop: 210,
+                    pageMarginBottom: 110,
+                    scale: 100
+                });
+                output.innerHTML = "Verovio options: " + tk.getOptions();
+
+                // Font callback and buffer for pdfkit
+                let fontCallback = function (family, bold, italic, fontOptions) {
+                    if (family === "VerovioText") {
+                        return family;
+                    }
+                    if (family.match(/(?:^|,)\s*sans-serif\s*$/) || true) {
+                        if (bold && italic) { return 'Times-BoldItalic'; }
+                        if (bold && !italic) { return 'Times-Bold'; }
+                        if (!bold && italic) { return 'Times-Italic'; }
+                        if (!bold && !italic) { return 'Times-Roman'; }
+                    }
+                };
+                let options = {};
+                options.fontCallback = fontCallback;
+
+                fetch(fileName)
+                    .then((response) => response.text())
+                    .then((meiXML) => {
+                        tk.loadData(meiXML);
+                        let pageCount = tk.getPageCount();
+                        output.innerHTML = fileName + ' has loaded with ' + pageCount + ' pages.';
+
+                        // jsPDF package
+                        // var doc = new jspdf.jsPDF();
+                        // doc.setFontSize(40);
+                        // doc.text("Octonyan loves jsPDF", 35, 25);
+
+                        const doc = new PDFDocument({ autoFirstPage: false, compress: true, useCSS: true });
+
+                        doc.info = {
+                            Title: 'Super Test PDF',
+                            Author: 'Created by mei-friend.mdw.ac.at',
+                            CreationDate: new Date()
+                        };
+
+                         doc.registerFont('Times-Roman', './fonts/Edwin-Roman.otf');
+                        // SVGElemText: failed to open font "Times-Roman" in PDFKit: fs.readFileSync is not a function
+
+                        const stream = doc.pipe(blobStream());
+
+                        // add stuff to PDF here using methods described below...
+
+                        for (let p = 1; p <= pageCount; p++) {
+                            let svg = tk.renderToSVG(p);
+                            document.getElementById("notation").innerHTML = svg;
+                            doc.addPage({ size: pdfFormat, layout: pdfOrientation });
+                            SVGtoPDF(doc, svg, 0, 0, options);
+                            console.log('Page ' + p + ' added.');
+                            if (p >= 3) break;
+                        }
+
+                        // get a blob when you're done
+                        doc.end();
+                        stream.on('finish', function () {
+                            // get a blob you can do whatever you like with
+                            const blob = stream.toBlob('application/pdf');
+
+                            let a = document.createElement('a');
+                            a.download = 'test-pdfkit.pdf';
+                            a.href = window.URL.createObjectURL(blob);
+                            a.click();
+                            // or get a blob URL for display in the browser
+                            // const url = stream.toBlobURL('application/pdf');
+                            // iframe.src = url;
+                        });
+
+                    });
+            }
+        });
+
+    </script>
+</body>
+
+</html>
