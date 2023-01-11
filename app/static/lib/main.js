@@ -2053,7 +2053,6 @@ function seekMidiPlaybackTo(t) {
 }
 
 function highlightNotesAtMidiPlaybackTime(e) {
-  console.log("event:", e.detail)
   const t = e.detail.note.startTime;
   // clear previous
   const relevantTimemapElements = timemap
@@ -2061,24 +2060,41 @@ function highlightNotesAtMidiPlaybackTime(e) {
     .filter((tm) => t >= tm.tstamp / 1000);
   // find closest time to target
   // Verovio returns a sorted timemap, so just choose the last one 
-  let closestTimemapTime = relevantTimemapElements[relevantTimemapElements.length - 1];
-  console.log("CLOSEST: ", closestTimemapTime)
 
-  if (closestTimemapTime && "off" in closestTimemapTime) {
-    closestTimemapTime["off"].forEach(off => {
-      const el = document.getElementById(off);
-      if (el) {
-        el.classList.remove("currently-playing");
-        el.querySelectorAll(".currently-playing").forEach(e => e.classList.remove("currently-playing"))
+
+  let closestTimemapTime = relevantTimemapElements[relevantTimemapElements.length - 1];
+  const currentlyHighlightedNotes = document.querySelectorAll(".currently-playing");
+  const firstNoteOnPage = document.querySelector(".note");
+  currentlyHighlightedNotes.forEach(note => {
+    // go backwards through all relevant timemap elements
+    // look for highlighted notes to close
+    // if we reach the onset of the first note on page, give up.
+    let toClose;
+    let ix = relevantTimemapElements.length - 1;
+    while(ix >= 0) { 
+      if("off" in relevantTimemapElements[ix] && relevantTimemapElements[ix].off.includes(note.id)) { 
+        toClose = note.id;
+        break;
       }
-    })
-  }
+      if("on" in relevantTimemapElements[ix] && relevantTimemapElements[ix].on.includes(firstNoteOnPage.id)) { 
+        break;
+      }
+      ix--;
+    }
+    /*
+    const toClose = relevantTimemapElements.find((timemapElement) => {
+      return "off" in timemapElement && timemapElement.off.includes(note.id);
+    });*/
+    if(toClose) { 
+      note.classList.remove("currently-playing");
+      note.querySelectorAll(".currently-playing").forEach(g => g.classList.remove("currently-playing"));
+    }
+  })
 
   if (closestTimemapTime && "on" in closestTimemapTime) {
     closestTimemapTime["on"].forEach(id => {
       let el = document.getElementById(id);
       if (el) {
-        console.log("Highlight this one: ", el);
         el.classList.add("currently-playing");
         el.querySelectorAll("g").forEach(g => g.classList.add("currently-playing"))
       } else if (document.getElementById("pageFollowMidiPlayback").checked) {
