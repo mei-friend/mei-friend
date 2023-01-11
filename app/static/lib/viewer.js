@@ -15,7 +15,6 @@ import {
   isSafari,
   rngLoader,
   platform,
-  startMidiTimeout,
   storage,
   supportedVerovioVersions,
   tkVersion,
@@ -23,6 +22,9 @@ import {
   validator,
   v
 } from './main.js';
+import { 
+  startMidiTimeout
+} from './midi.js'
 import {
   getVerovioContainerSize,
   setOrientation
