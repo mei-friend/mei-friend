@@ -1265,15 +1265,22 @@ select>option {
   color: var(--textColor);
   height: 30px;
   display: none;
+  align-items: baseline;
 }
 midi-player::part(control-panel) {
   background: var(--controlMenuBackgroundColor);
   /*border: 1px solid var(--dropdownBorderColor);
   border-radius:7px;*/
   font-size: 10pt;
-  width: 150%;
+  width: 100%;
 }
 
 #midiPlaybackControlBar midi-player { 
   height: 90%;
+  width: 500px;
+  max-width: 70%;
+}
+
+#midi-speedmode-indicator { 
+  display:none;
 }

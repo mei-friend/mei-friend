@@ -775,7 +775,7 @@ export default class Viewer {
     const midiPlaybackControlBar = document.getElementById("midiPlaybackControlBar");
     const showMidiPlaybackControlBar = document.getElementById("showMidiPlaybackControlBar");
     midiPlaybackControlBar.style.display = showMidiPlaybackControlBar.checked ?
-      "block" : "none";
+      "flex" : "none";
     console.log("toggle: ", midiPlaybackControlBar)
     setOrientation(cm);
   }
@@ -1161,6 +1161,7 @@ export default class Viewer {
           v.xmlIdStyle = optDefault;
           break;
         case 'toggleSpeedMode':
+          document.getElementById('midi-speedmode-indicator').style.display = this.speedMode ? 'inline' : 'none';
           break;
         case 'showSupplied':
           rt.style.setProperty('--suppliedColor', (optDefault) ? 'var(--defaultSuppliedColor)' : 'var(--notationColor)')
@@ -1192,6 +1193,9 @@ export default class Viewer {
           break;
         case 'editFacsimileZones':
           document.getElementById('facsimile-edit-zones-checkbox').checked = optDefault;
+          break;
+        case 'showMidiPlaybackControlBar': 
+          // XXXX Werner TODO this.toggleMidiPlaybackControlBar();
           break;
       }
       let div = this.createOptionsItem(opt, o, optDefault)

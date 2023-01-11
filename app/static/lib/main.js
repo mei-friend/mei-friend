@@ -1851,6 +1851,7 @@ function addEventListeners(v, cm) {
     if (sm) sm.checked = v.speedMode;
     if(document.getElementById('showMidiPlaybackControlBar').checked) { 
       startMidiTimeout(true);
+      document.getElementById('midi-speedmode-indicator').style.display = v.speedMode ? 'inline' : 'none';
     }
     v.updateAll(cm, {}, v.selectedElements[0]);
   });
