@@ -2,7 +2,6 @@ import * as speed from './speed.js';
 import * as utils from './utils.js';
 import * as dutils from './dom-utils.js';
 import * as att from './attribute-classes.js';
-import { annotations, generateAnnotationLocationLabel } from './annotation.js';
 import {
   cm,
   cmd,
@@ -482,7 +481,7 @@ export default class Viewer {
     }
     this.updateHighlight(cm);
     if (document.getElementById('showMidiPlaybackControlBar').checked) {
-      console.log('HANDLE CLICK MIDI TIMEOUT');
+      console.log('v.handleClickOnNotation(): HANDLE CLICK MIDI TIMEOUT');
       startMidiTimeout();
     }
     this.setFocusToVerovioPane();
@@ -1146,10 +1145,10 @@ export default class Viewer {
       let o = optionsToShow[opt];
       let value = o.default;
       if (storage.hasOwnProperty('mf-' + opt)) {
-        if (restoreFromLocalStorage && opt !== 'showMidiPlaybackControlBar') { // TODO: showMidiPlaybackControlBar always default 
+        if (restoreFromLocalStorage && opt !== 'showMidiPlaybackControlBar') {
+          // WG: showMidiPlaybackControlBar always default
           value = storage['mf-' + opt];
-          if (typeof value === 'string' && (value === 'true' || value === 'false'))
-            value = value === 'true';
+          if (typeof value === 'string' && (value === 'true' || value === 'false')) value = value === 'true';
         } else {
           delete storage['mf-' + opt];
         }
