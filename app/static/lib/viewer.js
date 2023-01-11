@@ -182,33 +182,7 @@ export default class Viewer {
     this.vrvWorker.postMessage(message);
   }
 
-  async test_getPageWithElement(xmlId, situateAnno = null) {
-    let pageNumber = -1;
-    let that = this;
-    // console.log('getPageWithElement(' + xmlId + '), speedMode: ' + this.speedMode);
-    if (this.speedMode) {
-      pageNumber = speed.getPageWithElement(this.xmlDoc, this.breaksValue(), xmlId, this.breaksSelect.value);
-    } else {
-      pageNumber = new Promise(function (resolve) {
-        let taskId = Math.random();
-        const msg = {
-          'cmd': 'getPageWithElement',
-          'msg': xmlId,
-          'taskId': taskId,
-        };
-        that.vrvWorker.addEventListener('message', function handle(ev) {
-          if (ev.data.cmd === 'pageWithElement' && ev.data.taskId === taskId) {
-            resolve(ev.data.msg);
-            that.vrvWorker.removeEventListener('message', handle);
-          }
-        });
-        that.vrvWorker.postMessage(msg);
-      }.bind(that));
-    }
-    return pageNumber;
-  }
-
-  async getPageWithElement(xmlId, situateAnno = null) {
+  getPageWithElement(xmlId, situateAnno = null) {
     /* optional param situateAnno: expects an object like
     { 
       id: annotationXmlId,

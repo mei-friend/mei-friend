@@ -795,10 +795,6 @@ document.addEventListener('DOMContentLoaded', function () {
   setKeyMap(defaultKeyMap);
 }); // DOMContentLoaded listener
 
-export async function getPageWithElement(xmlId, payload) { 
-  return await v.getPageWithElement(xmlId, payload);
-}
-
 export async function openUrlFetch(url = '', updateAfterLoading = true) {
   let urlInput = document.querySelector("#openUrlInput");
   let urlStatus = document.querySelector("#openUrlStatus");
@@ -2091,7 +2087,7 @@ function highlightNotesAtMidiPlaybackTime(e) {
         el.classList.add("currently-playing");
         el.querySelectorAll("g").forEach(g => g.classList.add("currently-playing"))
       } else if (document.getElementById("pageFollowMidiPlayback").checked) {
-        const flipToPage = getPageWithElement(id);
+        const flipToPage = v.getPageWithElement(id);
         console.log("FLIP TO PAGE", flipToPage, id)
         if(flipToPage) {
           v.updatePage(cm, flipToPage, '', true); 

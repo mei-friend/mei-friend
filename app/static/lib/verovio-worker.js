@@ -307,7 +307,7 @@ addEventListener('message', function (e) {
           'msg': pageNo,
           'xmlId': result.msg,
           'taskId': result.taskId,
-          'type': result.type || "notype"
+          'type': result.type 
         };
       } catch (err) {
         log('getPageWithElement: ' + err);
