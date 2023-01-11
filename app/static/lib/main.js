@@ -2056,12 +2056,12 @@ function highlightNotesAtMidiPlaybackTime(e) {
   console.log("event:", e.detail)
   const t = e.detail.note.startTime;
   // clear previous
-  const notAfterThisNote = timemap
+  const relevantTimemapElements = timemap
     // ignore times later than the requested target 
     .filter((tm) => t >= tm.tstamp / 1000);
   // find closest time to target
   // Verovio returns a sorted timemap, so just choose the last one 
-  let closestTimemapTime = notAfterThisNote[notAfterThisNote.length - 1];
+  let closestTimemapTime = relevantTimemapElements[relevantTimemapElements.length - 1];
   console.log("CLOSEST: ", closestTimemapTime)
 
   if (closestTimemapTime && "off" in closestTimemapTime) {
