@@ -1144,12 +1144,12 @@ export default class Viewer {
     let currentHeader;
     Object.keys(optionsToShow).forEach((opt) => {
       let o = optionsToShow[opt];
-      let optDefault = o.default;
+      let value = o.default;
       if (storage.hasOwnProperty('mf-' + opt)) {
-        if (restoreFromLocalStorage) {
-          optDefault = storage['mf-' + opt];
-          if (typeof optDefault === 'string' && (optDefault === 'true' || optDefault === 'false'))
-            optDefault = optDefault === 'true';
+        if (restoreFromLocalStorage && opt !== 'showMidiPlaybackControlBar') { // TODO: showMidiPlaybackControlBar always default 
+          value = storage['mf-' + opt];
+          if (typeof value === 'string' && (value === 'true' || value === 'false'))
+            value = value === 'true';
         } else {
           delete storage['mf-' + opt];
         }
@@ -1159,37 +1159,37 @@ export default class Viewer {
         case 'selectToolkitVersion':
           this.vrvWorker.postMessage({
             cmd: 'loadVerovio',
-            msg: optDefault,
+            msg: value,
             url:
-              optDefault in supportedVerovioVersions
-                ? supportedVerovioVersions[optDefault].url
+              value in supportedVerovioVersions
+                ? supportedVerovioVersions[value].url
                 : supportedVerovioVersions[o.default].url,
           });
           break;
         case 'selectIdStyle':
-          v.xmlIdStyle = optDefault;
+          v.xmlIdStyle = value;
           break;
         case 'toggleSpeedMode':
           document.getElementById('midi-speedmode-indicator').style.display = this.speedMode ? 'inline' : 'none';
           break;
         case 'showSupplied':
-          rt.style.setProperty('--suppliedColor', optDefault ? 'var(--defaultSuppliedColor)' : 'var(--notationColor)');
+          rt.style.setProperty('--suppliedColor', value ? 'var(--defaultSuppliedColor)' : 'var(--notationColor)');
           rt.style.setProperty(
             '--suppliedHighlightedColor',
-            optDefault ? 'var(--defaultSuppliedHighlightedColor)' : 'var(--highlightColor)'
+            value ? 'var(--defaultSuppliedHighlightedColor)' : 'var(--highlightColor)'
           );
           break;
         case 'suppliedColor':
           let checked = document.getElementById('showSupplied').checked;
-          rt.style.setProperty('--defaultSuppliedColor', checked ? optDefault : 'var(--notationColor)');
+          rt.style.setProperty('--defaultSuppliedColor', checked ? value : 'var(--notationColor)');
           rt.style.setProperty(
             '--defaultSuppliedHighlightedColor',
-            checked ? utils.brighter(optDefault, -50) : 'var(--highlightColor)'
+            checked ? utils.brighter(value, -50) : 'var(--highlightColor)'
           );
-          rt.style.setProperty('--suppliedColor', checked ? optDefault : 'var(--notationColor)');
+          rt.style.setProperty('--suppliedColor', checked ? value : 'var(--notationColor)');
           rt.style.setProperty(
             '--suppliedHighlightedColor',
-            checked ? utils.brighter(optDefault, -50) : 'var(--highlightColor)'
+            checked ? utils.brighter(value, -50) : 'var(--highlightColor)'
           );
           break;
         case 'respSelect':
@@ -1197,25 +1197,25 @@ export default class Viewer {
             o.values = Array.from(this.xmlDoc.querySelectorAll('corpName[*|id]')).map((e) => e.getAttribute('xml:id'));
           break;
         case 'controlMenuFontSelector':
-          document.getElementById('font-ctrls').style.display = optDefault ? 'inherit' : 'none';
+          document.getElementById('font-ctrls').style.display = value ? 'inherit' : 'none';
           break;
         case 'controlMenuNavigateArrows':
-          document.getElementById('navigate-ctrls').style.display = optDefault ? 'inherit' : 'none';
+          document.getElementById('navigate-ctrls').style.display = value ? 'inherit' : 'none';
           break;
         case 'controlMenuUpdateNotation':
-          document.getElementById('update-ctrls').style.display = optDefault ? 'inherit' : 'none';
+          document.getElementById('update-ctrls').style.display = value ? 'inherit' : 'none';
           break;
         case 'showFacsimileFullPage':
-          document.getElementById('facsimile-full-page-checkbox').checked = optDefault;
+          document.getElementById('facsimile-full-page-checkbox').checked = value;
           break;
         case 'editFacsimileZones':
-          document.getElementById('facsimile-edit-zones-checkbox').checked = optDefault;
+          document.getElementById('facsimile-edit-zones-checkbox').checked = value;
           break;
         case 'showMidiPlaybackControlBar':
-          // XXXX Werner TODO this.toggleMidiPlaybackControlBar();
+          // do nothing, as it is always the default display: none
           break;
       }
-      let div = this.createOptionsItem(opt, o, optDefault);
+      let div = this.createOptionsItem(opt, o, value);
       if (div) {
         if (div.classList.contains('optionsSubHeading')) {
           currentHeader = div;
@@ -1524,19 +1524,19 @@ export default class Viewer {
     cmsp.innerHTML = '<div class="settingsHeader">Editor Settings</div>';
     Object.keys(optionsToShow).forEach((opt) => {
       let o = optionsToShow[opt];
-      let optDefault = o.default;
+      let value = o.default;
       if (mfDefaults.hasOwnProperty(opt)) {
-        optDefault = mfDefaults[opt];
-        if (opt === 'matchTags' && typeof optDefault === 'object') optDefault = true;
+        value = mfDefaults[opt];
+        if (opt === 'matchTags' && typeof value === 'object') value = true;
       }
       if (window.matchMedia('(prefers-color-scheme: dark)').matches && opt === 'theme') {
-        optDefault = mfDefaults['defaultDarkTheme']; // take a dark scheme for dark mode
+        value = mfDefaults['defaultDarkTheme']; // take a dark scheme for dark mode
       }
       if (storage.hasOwnProperty('cm-' + opt)) {
-        if (restoreFromLocalStorage) optDefault = storage['cm-' + opt];
+        if (restoreFromLocalStorage) value = storage['cm-' + opt];
         else delete storage['cm-' + opt];
       }
-      let div = this.createOptionsItem(opt, o, optDefault);
+      let div = this.createOptionsItem(opt, o, value);
       if (div) {
         if (div.classList.contains('optionsSubHeading')) {
           currentHeader = div;
@@ -1547,7 +1547,7 @@ export default class Viewer {
           cmsp.appendChild(div);
         }
       }
-      this.applyEditorOption(cm, opt, optDefault);
+      this.applyEditorOption(cm, opt, value);
     });
     cmsp.innerHTML +=
       '<input type="button" title="Reset to mei-friend defaults" id="cmReset" class="resetButton" value="Default" />';
