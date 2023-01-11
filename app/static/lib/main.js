@@ -2104,13 +2104,13 @@ function highlightNotesAtMidiPlaybackTime(e) {
         el.classList.add("currently-playing");
         el.querySelectorAll("g").forEach(g => g.classList.add("currently-playing"))
       } else if (document.getElementById("pageFollowMidiPlayback").checked) {
-        const flipToPage = v.getPageWithElement(id);
-        console.log("FLIP TO PAGE", flipToPage, id)
-        if(flipToPage) {
-          v.updatePage(cm, flipToPage, '', true); 
-        } else { 
-          console.warn("Expected to highlight currently playing note, but couldn't find it:", id);
-        }
+        v.getPageWithElement(id).then(flipToPage => {
+          if (flipToPage) {
+            v.updatePage(cm, flipToPage, '', true, false); // disable midi seek after page-flip
+          }
+        }) 
+      } else { 
+        console.warn("Expected to highlight currently playing note, but couldn't find it:", id);
       }
     })
   }
