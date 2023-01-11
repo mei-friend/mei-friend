@@ -719,9 +719,9 @@ svg text {
 }
 
 #verovio-container .currently-playing { 
-  fill:orange;
-  stroke:orange;
-  color: orange;
+  fill:orange !important;
+  stroke:orange !important;
+  color: orange !important;
 }
 
 #verovio-container .highlighted {
