@@ -1648,21 +1648,21 @@ export default class Viewer {
         details.innerHTML += `<summary id="vrv-${groupId}">${group.name}</summary>`;
         Object.keys(group.options).forEach((opt) => {
           let o = group.options[opt]; // vrv available options
-          let optDefault = o.default; // available options defaults
+          let value = o.default; // available options defaults
           if (defaultVrvOptions.hasOwnProperty(opt))
             // mei-friend vrv defaults
-            optDefault = defaultVrvOptions[opt];
+            value = defaultVrvOptions[opt];
           if (storage.hasOwnProperty(opt)) {
-            if (restoreFromLocalStorage) optDefault = storage[opt];
+            if (restoreFromLocalStorage) value = storage[opt];
             else delete storage[opt];
           }
           if (!skipList.includes(opt)) {
-            let div = this.createOptionsItem('vrv-' + opt, o, optDefault);
+            let div = this.createOptionsItem('vrv-' + opt, o, value);
             if (div) details.appendChild(div);
           }
           // set all options so that toolkit is always completely cleared
           if (['bool', 'int', 'double', 'std::string-list', 'array'].includes(o.type)) {
-            this.vrvOptions[opt.split('vrv-').pop()] = optDefault;
+            this.vrvOptions[opt.split('vrv-').pop()] = value;
           }
         });
         if (i === 1) details.setAttribute('open', 'true');
@@ -1702,7 +1702,7 @@ export default class Viewer {
     }
   }
 
-  // TODO: does not get called for unknown reasons (WG., 12 Okt 2022)
+  // TODO: does not get called (WG., 12 Okt 2022)
   // adds an event listener to the targetNode, to listen to 'header' elements (details/summary)
   // and storing this information in local storage, using the storageSuffix in the variable name
   addToggleListener(targetNode, optionsToShow, storageSuffix = 'mf-') {
