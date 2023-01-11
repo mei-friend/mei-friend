@@ -2,6 +2,7 @@ import { getX, getY, svgNameSpace } from './dom-utils.js';
 import * as att from './attribute-classes.js';
 import { setCursorToId } from './utils.js';
 import { cm, platform } from './main.js';
+import { startMidiTimeout } from './midi-player.js';
 
 export function addDragSelector(v, vp) {
   let dragging = false;
@@ -172,6 +173,10 @@ export function addDragSelector(v, vp) {
   });
 
   vp.addEventListener('mouseup', () => {
+    if (document.getElementById('showMidiPlaybackControlBar').checked) {
+      console.log('drag-selector: HANDLE CLICK MIDI TIMEOUT');
+      startMidiTimeout();
+    }
     dragging = false;
     let svgPm = document.querySelector('g.page-margin');
     if (svgPm && Array.from(svgPm.childNodes).includes(rect)) svgPm.removeChild(rect);
