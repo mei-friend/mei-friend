@@ -91,9 +91,17 @@ export default class Viewer {
     }
     if (this.speedMode && xmlId) {
       const breaksOption = this.breaksSelect.value;
-      p = speed.getPageWithElement(this.xmlDoc, this.breaksValue(), xmlId, breaksOption);
-      this.changeCurrentPage(p);
+      speed.getPageWithElement(this.xmlDoc, this.breaksValue(), xmlId, breaksOption).then((p) => {
+        this.changeCurrentPage(p);
+        this.postUpdateAllMessage(xmlId, p, computePageBreaks);
+      });
+    } else {
+      this.postUpdateAllMessage(xmlId, p, computePageBreaks);
     }
+  }
+
+  // helper function to send a message to the worker
+  postUpdateAllMessage(xmlId, p, computePageBreaks) {
     let message = {
       'cmd': 'updateAll',
       'options': this.vrvOptions,
@@ -138,17 +146,18 @@ export default class Viewer {
       } else { // speed mode
         if (this.encodingHasChanged) this.loadXml(cm.getValue());
         if (xmlId) {
-          const pageNumber = speed.getPageWithElement(this.xmlDoc, this.breaksValue(), xmlId, this.breaksSelect.value);
-          this.changeCurrentPage(pageNumber);
-          console.info('UpdatePage(speedMode=true): page: ' +
-            this.currentPage + ', xmlId: ' + xmlId);
+          speed.getPageWithElement(this.xmlDoc, this.breaksValue(), xmlId, this.breaksSelect.value).then((pageNumber) => {
+            this.changeCurrentPage(pageNumber);
+            console.info('UpdatePage(speedMode=true): page: ' + this.currentPage + ', xmlId: ' + xmlId);
+            this.updateData(cm, xmlId ? false : true, setFocusToVerovioPane);
+          });
+        } else {
+          withMidiSeek = withMidiSeek && document.getElementById('showMidiPlaybackControlBar').checked;
+          this.updateData(cm, xmlId ? false : true, setFocusToVerovioPane, withMidiSeek);
         }
-        withMidiSeek = withMidiSeek && document.getElementById('showMidiPlaybackControlBar').checked;
-
-        this.updateData(cm, xmlId ? false : true, setFocusToVerovioPane, withMidiSeek);
       }
     }
-    if(withMidiSeek && document.getElementById('showMidiPlaybackControlBar').checked) { 
+    if (withMidiSeek && document.getElementById('showMidiPlaybackControlBar').checked) {
       // start a new time-out 
       console.log("CHECK 2")
       startMidiTimeout();
@@ -182,63 +191,34 @@ export default class Viewer {
     this.vrvWorker.postMessage(message);
   }
 
-  getPageWithElement(xmlId, situateAnno = null) {
-    /* optional param situateAnno: expects an object like
-    { 
-      id: annotationXmlId,
-      type: ['first'|'last']
-    }
-    purpose: allow asynchronous supply of page numbers by web worker
-    compare: situateAnnotations() in annotation.js
-    */
+  async getPageWithElement(xmlId) {
     let pageNumber = -1;
-    let that = this;
-    // console.log('getPageWithElement(' + xmlId + '), speedMode: ' + this.speedMode);
     if (this.speedMode) {
       pageNumber = speed.getPageWithElement(this.xmlDoc, this.breaksValue(), xmlId, this.breaksSelect.value);
     } else {
-      let promise = new Promise(function (resolve) {
-        let taskId = Math.random();
-        const msg = {
-          'cmd': 'getPageWithElement',
-          'msg': xmlId,
-          'taskId': taskId,
-        };
-        if (situateAnno && 'type' in situateAnno) {
-          msg.type = situateAnno.type;
-        }
-        that.vrvWorker.addEventListener('message', function handle(ev) {
-          if (ev.data.cmd === 'pageWithElement' && ev.data.taskId === taskId) {
-            resolve(ev.data.msg);
-            that.vrvWorker.removeEventListener('message', handle);
-          }
-        });
-        that.vrvWorker.postMessage(msg);
-      }.bind(that));
-      promise.then(function (p) {
-        if (situateAnno && 'id' in situateAnno) {
-          const ix = annotations.findIndex(a => a.id === situateAnno.id);
-          if (ix >= 0) { // found it
-            switch (situateAnno.type) {
-              case 'first':
-                annotations[ix].firstPage = p;
-                break;
-              case 'last':
-                annotations[ix].lastPage = p;
-                break;
-              default:
-                console.error("Called getPageWithElement on Verovio worker with invalid situateAnno: ", situateAnno);
-            }
-            const annotationLocationLabelElement = document.querySelector(`.annotationLocationLabel[data-id=${situateAnno.id}`);
-            if (annotationLocationLabelElement) {
-              annotationLocationLabelElement.innerHTML = generateAnnotationLocationLabel(annotations[ix]).innerHTML;
-            }
-          }
+      pageNumber = await this.getPageWithElementFromVrvWorker(xmlId);
+    }
+    return pageNumber;
+  }
+
+  getPageWithElementFromVrvWorker(xmlId) {
+    let that = this;
+    return new Promise(function (resolve, reject) {
+      let taskId = Math.random();
+      const msg = {
+        'cmd': 'getPageWithElement',
+        'msg': xmlId,
+        'taskId': taskId,
+      };
+      that.vrvWorker.addEventListener('message', function handle(ev) {
+        if (ev.data.cmd === 'pageWithElement' && ev.data.taskId === taskId) {
+          let p = ev.data.msg;
+          that.vrvWorker.removeEventListener('message', handle);
+          resolve(p);
         }
       });
-    }
-    // console.log('pageNumber: ', pageNumber);
-    return pageNumber;
+      that.vrvWorker.postMessage(msg);
+    }.bind(that));
   }
 
   //TODO remove?
@@ -789,12 +769,12 @@ export default class Viewer {
     }
   }
 
-  toggleMidiPlaybackControlBar(ev = null) { 
+  toggleMidiPlaybackControlBar(ev = null) {
     const midiPlaybackControlBar = document.getElementById("midiPlaybackControlBar");
     const showMidiPlaybackControlBar = document.getElementById("showMidiPlaybackControlBar");
-    midiPlaybackControlBar.style.display = showMidiPlaybackControlBar.checked ? 
+    midiPlaybackControlBar.style.display = showMidiPlaybackControlBar.checked ?
       "block" : "none";
-      console.log("toggle: ", midiPlaybackControlBar)
+    console.log("toggle: ", midiPlaybackControlBar)
     setOrientation(cm);
   }
 
@@ -1041,7 +1021,7 @@ export default class Viewer {
         title: 'Page-follow MIDI playback',
         description: 'Automatically flip pages to follow MIDI playback',
         type: 'bool',
-        default: true 
+        default: true
       },
       titleAnnotations: {
         title: 'Annotations',
@@ -1930,20 +1910,20 @@ export default class Viewer {
 
   findFirstNoteInSelection() {
     let firstNote;
-    for(const elId of v.selectedElements) { 
+    for (const elId of v.selectedElements) {
       let el = document.getElementById(elId);
-      if(el) { 
-        if(el.classList.contains("note")) { 
+      if (el) {
+        if (el.classList.contains("note")) {
           firstNote = el;
           break;
-        } else { 
+        } else {
           const childNotes = el.getElementsByClassName("note");
-          if(childNotes.length) { 
+          if (childNotes.length) {
             firstNote = childNotes[0];
             break;
           }
         }
-      } else { 
+      } else {
         console.warn("Couldn't find selected element on page: ", elId, v.selectedElements)
       }
     }

@@ -996,9 +996,9 @@ async function vrvWorkerEventsHandler(ev) {
     case 'midiPlayback': // export MIDI file
       console.log("RECEIVED MIDI AND TIMEMAP:", ev.data.midi, ev.data.timemap)
       timemap = ev.data.timemap;
-      if(mp) { 
+      if (mp) {
         blob = midiDataToBlob(ev.data.midi);
-        core.blobToNoteSequence(blob).then((noteSequence) => { 
+        core.blobToNoteSequence(blob).then((noteSequence) => {
           mp.noteSequence = noteSequence;
         })
       }
@@ -1009,7 +1009,7 @@ async function vrvWorkerEventsHandler(ev) {
         seekMidiPlaybackToTime(ev.data.msg / 1000);
       }
       break;
-    
+
     case 'computePageBreaks':
       v.pageBreaks = ev.data.pageBreaks;
       v.pageCount = ev.data.pageCount;
@@ -1250,7 +1250,7 @@ function downloadSpeedMei() {
   a.click();
 }
 
-function getMidiRendering(ev, requestTimemap=false) {
+function getMidiRendering(ev, requestTimemap = false) {
   let message = {
     'cmd': 'exportMidi',
     'options': v.vrvOptions,
@@ -1364,7 +1364,7 @@ export let cmd = {
     let status = document.getElementById('showMidiPlaybackControlBar').checked;
     document.getElementById('showMidiPlaybackControlBar').checked = !status;
     v.toggleMidiPlaybackControlBar();
-    if(document.getElementById('showMidiPlaybackControlBar').checked) { 
+    if (document.getElementById('showMidiPlaybackControlBar').checked) {
       // request MIDI rendering from Verovio worker
       getMidiRendering(null, true);
     }
@@ -1860,7 +1860,7 @@ function moveProgressBar() {
   var id = setInterval(frame, 10);
 
   function frame() {
-    (width < 100) ? elem.style.width = (++width) + '%': clearInterval(id);
+    (width < 100) ? elem.style.width = (++width) + '%' : clearInterval(id);
   }
 }
 
@@ -1922,7 +1922,7 @@ export function handleEditorChanges() {
     // on every set of changes, save editor content
     updateLocalStorage(meiXml);
   }
-  if(document.getElementById('showAnnotations').checked || document.getElementById('showAnnotationPanel').checked) {
+  if (document.getElementById('showAnnotations').checked || document.getElementById('showAnnotationPanel').checked) {
     readAnnots(); // from annotation.js
   }
   if(document.getElementById('showMidiPlaybackControlBar').checked) { 
@@ -1949,10 +1949,10 @@ export function log(s, code = null) {
 
 function fillInSampleEncodings() {
   fetch(sampleEncodingsCSV, {
-      headers: {
-        'content-type': 'text/csv'
-      }
-    })
+    headers: {
+      'content-type': 'text/csv'
+    }
+  })
     .then((response) => response.text())
     .then((csv) => {
       const lines = csv.split("\n");
@@ -2022,7 +2022,7 @@ export function isCtrlOrCmd(ev) {
     false;
 }
 
-function midiDataToBlob(data) { 
+function midiDataToBlob(data) {
   const byteCharacters = atob(data);
   const byteNumbers = new Array(byteCharacters.length);
   for (let i = 0; i < byteCharacters.length; i++) {
@@ -2037,11 +2037,10 @@ export function seekMidiPlaybackToSelectionOrPage() {
   // on load, seek to first currently selected element (or first note on page)
   console.log("seekMidiPlaybackToSelectionOrPage", v.findFirstNoteInSelection(), document.querySelector(".note"))
   let seekToNote = v.findFirstNoteInSelection() || document.querySelector(".note");
-  if(seekToNote) {
-    console.log("YO: ", seekToNote)
-    v.getTimeForElement(seekToNote.id, true); // will trigger a seekMidiPlaybackToTime
+  if (seekToNote) {
+    v.getTimeForElement(seekToNote.id, true); // will trigger a seekMidiPlaybackTo
   }
-  else { 
+  else {
     console.warn("Can't find a note to seek MIDI playback to");
   }
 }
@@ -2062,27 +2061,29 @@ export function seekMidiPlaybackToTime(t) {
 function highlightNotesAtMidiPlaybackTime(e) {
   console.log("event:", e.detail)
   const t = e.detail.note.startTime;
-  // ignore times later than the requested target 
-  const notAfterThisNote = timemap.filter((tm) => t >= tm.tstamp / 1000);
-    // find closest time to target
-    // Verovio returns a sorted timemap, so just choose the last one 
-  let closestTimemapTime = notAfterThisNote[notAfterThisNote.length-1];
+  // clear previous
+  const relevantTimemapElements = timemap
+    // ignore times later than the requested target 
+    .filter((tm) => t >= tm.tstamp / 1000);
+  // find closest time to target
+  // Verovio returns a sorted timemap, so just choose the last one 
+  let closestTimemapTime = relevantTimemapElements[relevantTimemapElements.length - 1];
   console.log("CLOSEST: ", closestTimemapTime)
-  
-  if (closestTimemapTime && "off" in closestTimemapTime) { 
+
+  if (closestTimemapTime && "off" in closestTimemapTime) {
     closestTimemapTime["off"].forEach(off => {
       const el = document.getElementById(off);
-      if (el) { 
+      if (el) {
         el.classList.remove("currently-playing");
         el.querySelectorAll(".currently-playing").forEach(e => e.classList.remove("currently-playing"))
       }
     })
   }
 
-  if(closestTimemapTime && "on" in closestTimemapTime) { 
+  if (closestTimemapTime && "on" in closestTimemapTime) {
     closestTimemapTime["on"].forEach(id => {
       let el = document.getElementById(id);
-      if(el) { 
+      if (el) {
         console.log("Highlight this one: ", el);
         el.classList.add("currently-playing");
         el.querySelectorAll("g").forEach(g => g.classList.add("currently-playing"))
