@@ -111,6 +111,7 @@ addEventListener('message', function (e) {
           result.pageNo = Math.max(1, parseInt(tk.getPageWithElement(result.xmlId)));
           result.setCursorToPageBeginning = false;
           result.forceUpdate = true;
+          result.withMidiSeek = result.true;
         }
         result.svg = tk.renderToSVG(result.pageNo);
         result.cmd = 'updated';
@@ -286,10 +287,12 @@ addEventListener('message', function (e) {
       }
       break;
     case 'getTimeForElement':
+      console.log("worker: getTimeForElement: ", result.msg)
       try {
         result = {
           'cmd': 'timeForElement',
           'msg': tk.getTimeForElement(result.msg),
+          'id': result.msg,
           'triggerMidiSeekTo': result.triggerMidiSeekTo
         };
       } catch (err) {
@@ -299,13 +302,12 @@ addEventListener('message', function (e) {
     case 'getPageWithElement':
       try {
         const pageNo = tk.getPageWithElement(result.msg);
-        const aVariableWithAnInt = 99;
         result = {
           'cmd': 'pageWithElement',
           'msg': pageNo,
           'xmlId': result.msg,
           'taskId': result.taskId,
-          'type': result.type
+          'type': result.type || "notype"
         };
       } catch (err) {
         log('getPageWithElement: ' + err);

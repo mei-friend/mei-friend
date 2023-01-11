@@ -15,8 +15,7 @@ import {
   isSafari,
   rngLoader,
   platform,
-  rerenderMidiTimeout,
-  startMidiRerenderTimeout,
+  startMidiTimeout,
   storage,
   supportedVerovioVersions,
   tkVersion,
@@ -108,7 +107,7 @@ export default class Viewer {
     this.vrvWorker.postMessage(message);
   }
 
-  updateData(cm, setCursorToPageBeg = true, setFocusToVerovioPane = true) {
+  updateData(cm, setCursorToPageBeg = true, setFocusToVerovioPane = true, withMidiSeek = false) {
     let message = {
       'cmd': 'updateData',
       'mei': this.speedFilter(cm.getValue()),
@@ -117,7 +116,8 @@ export default class Viewer {
       'setCursorToPageBeginning': setCursorToPageBeg,
       'setFocusToVerovioPane': setFocusToVerovioPane,
       'speedMode': this.speedMode,
-      'breaks': this.breaksSelect.value
+      'breaks': this.breaksSelect.value,
+      'withMidiSeek': withMidiSeek 
     };
     this.busy();
     this.vrvWorker.postMessage(message);
@@ -125,6 +125,7 @@ export default class Viewer {
 
   updatePage(cm, page, xmlId = '', setFocusToVerovioPane = true, withMidiSeek = true) {
     if (this.changeCurrentPage(page) || xmlId) {
+      console.log("CHECK 1")
       if (!this.speedMode) {
         let message = {
           'cmd': 'updatePage',
@@ -142,14 +143,15 @@ export default class Viewer {
           console.info('UpdatePage(speedMode=true): page: ' +
             this.currentPage + ', xmlId: ' + xmlId);
         }
-        this.updateData(cm, xmlId ? false : true, setFocusToVerovioPane);
+        withMidiSeek = withMidiSeek && document.getElementById('showMidiPlaybackControlBar').checked;
+
+        this.updateData(cm, xmlId ? false : true, setFocusToVerovioPane, withMidiSeek);
       }
     }
     if(withMidiSeek && document.getElementById('showMidiPlaybackControlBar').checked) { 
-      // clear a possible pre-existing timeout
-      window.clearTimeout(rerenderMidiTimeout);
       // start a new time-out 
-      startMidiRerenderTimeout();
+      console.log("CHECK 2")
+      startMidiTimeout();
     }
   }
 
@@ -180,7 +182,33 @@ export default class Viewer {
     this.vrvWorker.postMessage(message);
   }
 
-  getPageWithElement(xmlId, situateAnno = null) {
+  async test_getPageWithElement(xmlId, situateAnno = null) {
+    let pageNumber = -1;
+    let that = this;
+    // console.log('getPageWithElement(' + xmlId + '), speedMode: ' + this.speedMode);
+    if (this.speedMode) {
+      pageNumber = speed.getPageWithElement(this.xmlDoc, this.breaksValue(), xmlId, this.breaksSelect.value);
+    } else {
+      pageNumber = new Promise(function (resolve) {
+        let taskId = Math.random();
+        const msg = {
+          'cmd': 'getPageWithElement',
+          'msg': xmlId,
+          'taskId': taskId,
+        };
+        that.vrvWorker.addEventListener('message', function handle(ev) {
+          if (ev.data.cmd === 'pageWithElement' && ev.data.taskId === taskId) {
+            resolve(ev.data.msg);
+            that.vrvWorker.removeEventListener('message', handle);
+          }
+        });
+        that.vrvWorker.postMessage(msg);
+      }.bind(that));
+    }
+    return pageNumber;
+  }
+
+  async getPageWithElement(xmlId, situateAnno = null) {
     /* optional param situateAnno: expects an object like
     { 
       id: annotationXmlId,
@@ -239,6 +267,7 @@ export default class Viewer {
     return pageNumber;
   }
 
+  //TODO remove?
   gotPageNumber(ev) {
     if (ev.cmd === 'pageWithElement') {
       this.vrvWorker.removeEventListener('message', handle);
@@ -511,6 +540,10 @@ export default class Viewer {
         ', size now: ' + this.selectedElements.length);
     }
     this.updateHighlight(cm);
+    if(document.getElementById('showMidiPlaybackControlBar').checked) {
+      console.log("HANDLE CLICK MIDI TIMEOUT")
+      startMidiTimeout();
+    }
     this.setFocusToVerovioPane();
     // set lastNoteId to @startid or @staff of control element
     let startid = utils.getAttributeById(cm, itemId, "startid");
@@ -1868,6 +1901,9 @@ export default class Viewer {
       this.selectedElements = [];
       this.selectedElements.push(id);
       this.lastNoteId = id;
+      if(document.getElementById('showMidiPlaybackControlBar').checked) {
+        startMidiTimeout();
+      }
     }
     this.updateNotation = true;
     this.scrollSvg(cm);
@@ -2333,5 +2369,4 @@ export default class Viewer {
       }
     }
   }
-
 }
