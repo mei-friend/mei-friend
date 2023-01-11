@@ -38,7 +38,7 @@ import {
  * cross-page spanners. For page 1, no preceding dummy page is added, only a
  * following one.
  */
-export function getPageFromDom(xmlDoc, pageNo = 1, breaks, pageSpanners) {
+export function getPageFromDom(xmlDoc, pageNo = 1, breaks, pageSpanners, includeDummyMeasures = true) {
   const meiHeader = xmlDoc.querySelector('meiHead');
   if (!meiHeader) {
     console.info('getPageFromDom(): no meiHeader');
@@ -82,7 +82,7 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks, pageSpanners) {
   baseSection.setAttributeNS(xmlNameSpace, 'xml:id', 'baseSection');
   // console.info('section: ', baseSection);
 
-  if (pageNo > 1) {
+  if (pageNo > 1 && includeDummyMeasures) {
     let measure = dummyMeasure(xmlDoc, countStaves(scoreDef));
     measure.setAttributeNS(xmlNameSpace, 'xml:id', 'startingMeasure');
     baseSection.appendChild(measure);
@@ -106,14 +106,16 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks, pageSpanners) {
   });
 
   // add third measure (even if last page)
-  let m = dummyMeasure(xmlDoc, countStaves(scoreDef));
-  m.setAttributeNS(xmlNameSpace, 'xml:id', 'endingMeasure');
-  baseSection.appendChild(xmlDoc.createElementNS(meiNameSpace, 'pb'));
-  baseSection.appendChild(m);
+  if(includeDummyMeasures) { 
+    let m = dummyMeasure(xmlDoc, countStaves(scoreDef));
+    m.setAttributeNS(xmlNameSpace, 'xml:id', 'endingMeasure');
+    baseSection.appendChild(xmlDoc.createElementNS(meiNameSpace, 'pb'));
+    baseSection.appendChild(m);
+  }
 
   // matchTimespanningElements(xmlScore, spdScore, pageNo);
 
-  if (Object.keys(pageSpanners.start).length > 0) {
+  if (includeDummyMeasures && Object.keys(pageSpanners.start).length > 0) {
     addPageSpanningElements(xmlScore, spdScore, pageSpanners, pageNo, breaks);
   }
 

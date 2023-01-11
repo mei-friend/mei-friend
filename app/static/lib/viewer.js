@@ -24,7 +24,7 @@ import {
 } from './main.js';
 import { 
   startMidiTimeout
-} from './midi.js'
+} from './midi-player.js'
 import {
   getVerovioContainerSize,
   setOrientation
@@ -160,9 +160,8 @@ export default class Viewer {
       }
     }
     if (withMidiSeek && document.getElementById('showMidiPlaybackControlBar').checked) {
-      // start a new time-out 
-      console.log("CHECK 2")
-      startMidiTimeout();
+      // start a new midi playback time-out (re-rendering if we're in speedmode)
+      startMidiTimeout(this.speedMode ? true : false);
     }
   }
 
@@ -235,7 +234,8 @@ export default class Viewer {
   // with normal mode: load DOM and pass-through the MEI code;
   // with speed mode: load into DOM (if encodingHasChanged) and
   // return MEI excerpt of currentPage page
-  speedFilter(mei) {
+  // (including dummy measures before and after current page by default)
+  speedFilter(mei, includeDummyMeasures = true) {
     // update DOM only if encoding has been edited or
     this.loadXml(mei);
     let breaks = this.breaksValue();
@@ -287,7 +287,7 @@ export default class Viewer {
       // else console.log('pageSpanners empty: ', this.pageSpanners);
     }
     // retrieve requested MEI page from DOM
-    return speed.getPageFromDom(this.xmlDoc, this.currentPage, breaks, this.pageSpanners);
+    return speed.getPageFromDom(this.xmlDoc, this.currentPage, breaks, this.pageSpanners, includeDummyMeasures);
   }
 
   loadXml(mei, forceReload = false) {

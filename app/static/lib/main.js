@@ -206,7 +206,7 @@ import {
   seekMidiPlaybackToTime,
   setTimemap,
   startMidiTimeout,
-} from './midi.js';
+} from './midi-player.js';
 import * as att from './attribute-classes.js';
 import * as e from './editor.js';
 import Viewer from './viewer.js';
@@ -1255,11 +1255,11 @@ function downloadSpeedMei() {
   a.click();
 }
 
-function requestMidiFromVrvWorker(ev, requestTimemap = false) {
+export function requestMidiFromVrvWorker(ev, requestTimemap = false) {
   let message = {
     'cmd': 'exportMidi',
     'options': v.vrvOptions,
-    'mei': cm.getValue(),
+    'mei': v.speedFilter(cm.getValue(), false), // exclude dummy measures in speed mode
     'requestTimemap': requestTimemap
   };
   vrvWorker.postMessage(message);
@@ -1849,6 +1849,9 @@ function addEventListeners(v, cm) {
     //   v.pageBreaks = {};
     let sm = document.getElementById('toggleSpeedMode');
     if (sm) sm.checked = v.speedMode;
+    if(document.getElementById('showMidiPlaybackControlBar').checked) { 
+      startMidiTimeout(true);
+    }
     v.updateAll(cm, {}, v.selectedElements[0]);
   });
 

@@ -1,6 +1,7 @@
 import {
     cm,
-    v
+    v,
+    requestMidiFromVrvWorker
 } from './main.js'
 
 export let midiTimeout; // javascript timeout between last edit and MIDI re-render
