@@ -851,9 +851,9 @@ function addMeterSigElement(staffDefs, meterCountValue, meterUnitValue) {
  * @param {Breaks} breaks
  * @param {string} id
  * @param {BreaksOption} breaksOption
- * @returns {number} pageNumber
+ * @returns {Promise} pageNumber
  */
-export function getPageWithElement(xmlDoc, breaks, id, breaksOption) {
+export async function getPageWithElement(xmlDoc, breaks, id, breaksOption) {
   let sel = '';
   let page = 1;
   switch (breaksOption) {

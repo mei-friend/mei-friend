@@ -92,9 +92,17 @@ export default class Viewer {
     }
     if (this.speedMode && xmlId) {
       const breaksOption = this.breaksSelect.value;
-      p = speed.getPageWithElement(this.xmlDoc, this.breaksValue(), xmlId, breaksOption);
-      this.changeCurrentPage(p);
+      speed.getPageWithElement(this.xmlDoc, this.breaksValue(), xmlId, breaksOption).then((p) => {
+        this.changeCurrentPage(p);
+        this.postUpdateAllMessage(xmlId, p, computePageBreaks);
+      });
+    } else {
+      this.postUpdateAllMessage(xmlId, p, computePageBreaks);
     }
+  }
+
+  // helper function to send a message to the worker
+  postUpdateAllMessage(xmlId, p, computePageBreaks) {
     let message = {
       'cmd': 'updateAll',
       'options': this.vrvOptions,
@@ -137,12 +145,14 @@ export default class Viewer {
       } else { // speed mode
         if (this.encodingHasChanged) this.loadXml(cm.getValue());
         if (xmlId) {
-          const pageNumber = speed.getPageWithElement(this.xmlDoc, this.breaksValue(), xmlId, this.breaksSelect.value);
-          this.changeCurrentPage(pageNumber);
-          console.info('UpdatePage(speedMode=true): page: ' +
-            this.currentPage + ', xmlId: ' + xmlId);
+          speed.getPageWithElement(this.xmlDoc, this.breaksValue(), xmlId, this.breaksSelect.value).then((pageNumber) => {
+            this.changeCurrentPage(pageNumber);
+            console.info('UpdatePage(speedMode=true): page: ' + this.currentPage + ', xmlId: ' + xmlId);
+            this.updateData(cm, xmlId ? false : true, setFocusToVerovioPane);
+          });
+        } else {
+          this.updateData(cm, xmlId ? false : true, setFocusToVerovioPane);
         }
-        this.updateData(cm, xmlId ? false : true, setFocusToVerovioPane);
       }
     }
     if (withMidiSeek && document.getElementById('showMidiPlaybackControlBar').checked) {
@@ -180,19 +190,17 @@ export default class Viewer {
     this.vrvWorker.postMessage(message);
   }
 
-  async getPageWithElement(xmlId, situateAnno = null) {
+  async getPageWithElement(xmlId) {
     let pageNumber = -1;
-    console.log('BEGIN getPageWithElement(' + xmlId + '), speedMode: ' + this.speedMode);
     if (this.speedMode) {
       pageNumber = speed.getPageWithElement(this.xmlDoc, this.breaksValue(), xmlId, this.breaksSelect.value);
     } else {
-      pageNumber = await this.getPageWithElementFromToolkit(xmlId);
+      pageNumber = await this.getPageWithElementFromVrvWorker(xmlId);
     }
-    console.log('XXXXXXX getPageWithElement(): ' , pageNumber);
     return pageNumber;
-  } 
+  }
 
-  getPageWithElementFromToolkit(xmlId, situateAnno = null) {
+  getPageWithElementFromVrvWorker(xmlId) {
     let that = this;
     return new Promise(function (resolve, reject) {
       let taskId = Math.random();
@@ -201,9 +209,6 @@ export default class Viewer {
         'msg': xmlId,
         'taskId': taskId,
       };
-      if (situateAnno && 'type' in situateAnno) {
-        msg.type = situateAnno.type;
-      }
       that.vrvWorker.addEventListener('message', function handle(ev) {
         if (ev.data.cmd === 'pageWithElement' && ev.data.taskId === taskId) {
           let p = ev.data.msg;

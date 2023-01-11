@@ -2083,7 +2083,6 @@ function highlightNotesAtMidiPlaybackTime(e) {
         el.querySelectorAll("g").forEach(g => g.classList.add("currently-playing"))
       } else if (document.getElementById("pageFollowMidiPlayback").checked) {
         v.getPageWithElement(id).then(flipToPage => {
-          console.log("Highlight flipToPage: ", flipToPage);
           if (flipToPage) {
             v.updatePage(cm, flipToPage, '', true, false); // disable midi seek after page-flip
           } else {
