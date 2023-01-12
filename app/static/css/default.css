@@ -1292,5 +1292,6 @@ midi-player::part(control-panel) {
   border-color:#555;
   padding: 2px;
   max-height: calc(1em + 2px);
+  cursor: default;
   color:#555;
 }
