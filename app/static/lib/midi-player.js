@@ -27,6 +27,9 @@ export function seekMidiPlaybackToTime(t) {
       mp.currentTime = t;
     }
   }
+
+  // close all highlighted notes
+  unHighlightNotes();
 } // seekMidiPlaybackToTime()
 
 export function highlightNotesAtMidiPlaybackTime(e) {
@@ -36,9 +39,7 @@ export function highlightNotesAtMidiPlaybackTime(e) {
     // ignore times later than the requested target
     .filter((tm) => t >= tm.tstamp / 1000);
 
-  // find closest time to target
-  let closestTimemapTime = relevantTimemapElements[relevantTimemapElements.length - 1];
-  const currentlyHighlightedNotes = document.querySelectorAll('.currently-playing');
+  const currentlyHighlightedNotes = document.querySelectorAll('g.note.currently-playing');
   const firstNoteOnPage = document.querySelector('.note');
   currentlyHighlightedNotes.forEach((note) => {
     // go backwards through all relevant timemap elements
@@ -57,12 +58,15 @@ export function highlightNotesAtMidiPlaybackTime(e) {
       ix--;
     }
 
+    // unhighlight note and all its children
     if (toClose) {
       note.classList.remove('currently-playing');
       note.querySelectorAll('.currently-playing').forEach((g) => g.classList.remove('currently-playing'));
     }
   });
 
+  // find closest time to target
+  let closestTimemapTime = relevantTimemapElements[relevantTimemapElements.length - 1];
   if (closestTimemapTime && 'on' in closestTimemapTime) {
     closestTimemapTime['on'].forEach((id) => {
       let el = document.getElementById(id);
@@ -100,4 +104,9 @@ export function setTimemap(tm) {
 
 export function getTimemap() {
   return timemap;
+}
+
+// close/unhighlight all midi-highlighted notes
+function unHighlightNotes() {
+  document.querySelectorAll('.currently-playing').forEach((g) => g.classList.remove('currently-playing'));
 }
