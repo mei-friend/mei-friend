@@ -39,18 +39,47 @@ export function highlightNotesAtMidiPlaybackTime(e) {
     // ignore times later than the requested target
     .filter((tm) => t >= tm.tstamp / 1000);
 
-  const currentlyHighlightedNotes = document.querySelectorAll('g.note.currently-playing');
+  const currentlyHighlightedNotes = Array.from(document.querySelectorAll('g.note.currently-playing'));
   const firstNoteOnPage = document.querySelector('.note');
-  currentlyHighlightedNotes.forEach((note) => {
-    // go backwards through all relevant timemap elements
-    // look for highlighted notes to close
-    // if we reach the onset of the first note on page, give up.
-    let toClose;
+
+  // needs 339 ms at last two systems of Op.120
+  if (false) {
+    currentlyHighlightedNotes.forEach((note) => {
+      // go backwards through all relevant timemap elements
+      // look for highlighted notes to close
+      // if we reach the onset of the first note on page, give up.
+      let toClose;
+      let ix = relevantTimemapElements.length - 1;
+      while (ix >= 0) {
+        if ('off' in relevantTimemapElements[ix] && relevantTimemapElements[ix].off.includes(note.id)) {
+          toClose = note.id;
+          break;
+        }
+        if ('on' in relevantTimemapElements[ix] && relevantTimemapElements[ix].on.includes(firstNoteOnPage.id)) {
+          break;
+        }
+        ix--;
+      }
+      // unhighlight note and all its children
+      if (toClose) {
+        note.classList.remove('currently-playing');
+        note.querySelectorAll('.currently-playing').forEach((g) => g.classList.remove('currently-playing'));
+      }
+    });
+  } else {
+    // 129 ms
     let ix = relevantTimemapElements.length - 1;
     while (ix >= 0) {
-      if ('off' in relevantTimemapElements[ix] && relevantTimemapElements[ix].off.includes(note.id)) {
-        toClose = note.id;
-        break;
+      if ('off' in relevantTimemapElements[ix]) {
+        let i = currentlyHighlightedNotes.length - 1;
+        while (i >= 0) {
+          if (relevantTimemapElements[ix].off.includes(currentlyHighlightedNotes[i].id)) {
+            closeNote(currentlyHighlightedNotes[i]);
+            currentlyHighlightedNotes.splice(i, 1);
+          }
+          i--;
+        }
+        if (i < 0) break;
       }
       if ('on' in relevantTimemapElements[ix] && relevantTimemapElements[ix].on.includes(firstNoteOnPage.id)) {
         break;
@@ -58,12 +87,11 @@ export function highlightNotesAtMidiPlaybackTime(e) {
       ix--;
     }
 
-    // unhighlight note and all its children
-    if (toClose) {
+    function closeNote(note) {
       note.classList.remove('currently-playing');
       note.querySelectorAll('.currently-playing').forEach((g) => g.classList.remove('currently-playing'));
     }
-  });
+  }
 
   // find closest time to target
   let closestTimemapTime = relevantTimemapElements[relevantTimemapElements.length - 1];
