@@ -778,8 +778,10 @@ export default class Viewer {
   toggleMidiPlaybackControlBar(ev = null) {
     const midiPlaybackControlBar = document.getElementById('midiPlaybackControlBar');
     const showMidiPlaybackControlBar = document.getElementById('showMidiPlaybackControlBar');
+    const midiSpeedmodeIndicator = document.getElementById('midi-speedmode-indicator');
     midiPlaybackControlBar.style.display = showMidiPlaybackControlBar.checked ? 'flex' : 'none';
-    console.log('toggle: ', midiPlaybackControlBar);
+    midiSpeedmodeIndicator.style.display = this.speedMode ? 'inline' : 'none';
+    // console.log('toggle: ', midiPlaybackControlBar);
     setOrientation(cm);
   }
 
