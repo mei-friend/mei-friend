@@ -362,7 +362,7 @@ export default class Viewer {
     let targetpage = -1;
     if (Number.isInteger(newPage)) {
       targetpage = newPage;
-      console.info('targetPage: ', targetpage);
+      // console.info('targetPage: ', targetpage);
     } else if (typeof newPage === 'string') {
       newPage = newPage.toLowerCase();
       if (newPage === 'first') {
