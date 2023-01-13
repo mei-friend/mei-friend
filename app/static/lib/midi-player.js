@@ -73,12 +73,15 @@ export function highlightNotesAtMidiPlaybackTime(e) {
     });
   } else {
     // increment to current element in timemap
-    if (t < lastReportedTime) timemapIdx = 0;
+    if (t < lastReportedTime) {
+      timemapIdx = 0;
+    }
     lastReportedTime = t;
     // let oldIdx = timemapIdx;
-    while (timemap[timemapIdx].tstamp / 1000 <= t && timemapIdx < timemap.length) {
+    while (timemap[timemapIdx].tstamp / 1000 < t && timemapIdx < timemap.length) {
       timemapIdx++;
     }
+    // console.log('t: ' + t + '; tstamp: ' + timemap[timemapIdx].tstamp / 1000);
     closestTimemapTime = timemap[timemapIdx];
     // console.log('timemap index (old/new): ' + oldIdx + '/' + timemapIdx);
 
@@ -94,7 +97,9 @@ export function highlightNotesAtMidiPlaybackTime(e) {
           }
           i--;
         }
-        if (currentlyHighlightedNotes.length <= 0) break;
+        if (currentlyHighlightedNotes.length <= 0) {
+          break;
+        }
       }
       if ('on' in timemap[ix] && timemap[ix].on.includes(firstNoteOnPage.id)) {
         break;
