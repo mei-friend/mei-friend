@@ -4,6 +4,8 @@ export let midiTimeout; // javascript timeout between last edit and MIDI re-rend
 export const midiDelay = 400; // in ms, delay between last edit and MIDI re-render
 export let mp = document.getElementById('midi-player'); // midi player
 let timemap;
+let timemapIdx = 0;
+let lastReportedTime = 0; // time (s) of last reported note fired (used to check slider shifts)
 
 export function seekMidiPlaybackToSelectionOrPage() {
   // on load, seek to first currently selected element (or first note on page)
@@ -14,6 +16,7 @@ export function seekMidiPlaybackToSelectionOrPage() {
   } else {
     console.warn("Can't find a note to seek MIDI playback to");
   }
+  timemapIdx = 0;
 }
 
 export function seekMidiPlaybackToTime(t) {
@@ -27,23 +30,25 @@ export function seekMidiPlaybackToTime(t) {
       mp.currentTime = t;
     }
   }
-
+  timemapIdx = 0;
   // close all highlighted notes
   unHighlightNotes();
 } // seekMidiPlaybackToTime()
 
 export function highlightNotesAtMidiPlaybackTime(e) {
-  const t = e.detail.note.startTime;
-  // clear previous
-  const relevantTimemapElements = timemap
-    // ignore times later than the requested target
-    .filter((tm) => t >= tm.tstamp / 1000);
-
+  const t = e.detail.note.startTime; // in seconds
   const currentlyHighlightedNotes = Array.from(document.querySelectorAll('g.note.currently-playing'));
   const firstNoteOnPage = document.querySelector('.note');
+  let closestTimemapTime;
 
   // needs 339 ms at last two systems of Op.120
   if (false) {
+    // clear previous
+    const relevantTimemapElements = timemap
+      // ignore times later than the requested target
+      .filter((tm) => t >= tm.tstamp / 1000);
+    closestTimemapTime = relevantTimemapElements[relevantTimemapElements.length - 1];
+
     currentlyHighlightedNotes.forEach((note) => {
       // go backwards through all relevant timemap elements
       // look for highlighted notes to close
@@ -67,21 +72,31 @@ export function highlightNotesAtMidiPlaybackTime(e) {
       }
     });
   } else {
-    // 129 ms
-    let ix = relevantTimemapElements.length - 1;
+    // increment to current element in timemap
+    if (t < lastReportedTime) timemapIdx = 0;
+    lastReportedTime = t;
+    // let oldIdx = timemapIdx;
+    while (timemap[timemapIdx].tstamp / 1000 <= t && timemapIdx < timemap.length) {
+      timemapIdx++;
+    }
+    closestTimemapTime = timemap[timemapIdx];
+    // console.log('timemap index (old/new): ' + oldIdx + '/' + timemapIdx);
+
+    // 129 ms; with timemapIdx reduced to 66 ms with Op. 120 last two pages
+    let ix = timemapIdx;
     while (ix >= 0) {
-      if ('off' in relevantTimemapElements[ix]) {
+      if ('off' in timemap[ix]) {
         let i = currentlyHighlightedNotes.length - 1;
         while (i >= 0) {
-          if (relevantTimemapElements[ix].off.includes(currentlyHighlightedNotes[i].id)) {
+          if (timemap[ix].off.includes(currentlyHighlightedNotes[i].id)) {
             closeNote(currentlyHighlightedNotes[i]);
-            currentlyHighlightedNotes.splice(i, 1);
+            currentlyHighlightedNotes.splice(i, 1); // remove unhighlighted notes
           }
           i--;
         }
-        if (i < 0) break;
+        if (currentlyHighlightedNotes.length <= 0) break;
       }
-      if ('on' in relevantTimemapElements[ix] && relevantTimemapElements[ix].on.includes(firstNoteOnPage.id)) {
+      if ('on' in timemap[ix] && timemap[ix].on.includes(firstNoteOnPage.id)) {
         break;
       }
       ix--;
@@ -93,8 +108,6 @@ export function highlightNotesAtMidiPlaybackTime(e) {
     }
   }
 
-  // find closest time to target
-  let closestTimemapTime = relevantTimemapElements[relevantTimemapElements.length - 1];
   if (closestTimemapTime && 'on' in closestTimemapTime) {
     closestTimemapTime['on'].forEach((id) => {
       let el = document.getElementById(id);
