@@ -1332,6 +1332,15 @@ export let cmd = {
     if (document.getElementById('showMidiPlaybackControlBar').checked) {
       // request MIDI rendering from Verovio worker
       requestMidiFromVrvWorker(null, true);
+    } else {
+      if(mp.playing) { 
+        // stop player when control bar is closed
+        mp.stop();
+      }
+      if(document.getElementById('highlightCurrentlySoundingNotes').checked) {
+        // tidy up any highlighted notes when control bar is closed
+        document.querySelectorAll('.currently-playing').forEach(e => e.classList.remove('currently-playing'));
+      }
     }
   },
   showAnnotationPanel: () => {
@@ -1528,12 +1537,19 @@ function addEventListeners(v, cm) {
   document.getElementById('showSettingsButton').addEventListener('click', cmd.showSettingsPanel);
   document.getElementById('hideSettingsButton').addEventListener('click', cmd.hideSettingsPanel);
   document.getElementById('closeSettingsButton').addEventListener('click', cmd.hideSettingsPanel);
-  document.getElementById('filterSettings').addEventListener('input', cmd.filterSettings);
+    document.getElementById('filterSettings').addEventListener('input', cmd.filterSettings);
   document.getElementById('filterSettings').value = '';
   document.getElementById('filterReset').addEventListener('click', cmd.filterReset);
   document
     .getElementById('showMidiPlaybackControlBarButton')
     .addEventListener('click', cmd.toggleMidiPlaybackControlBar);
+  document.getElementById('highlightCurrentlySoundingNotes')
+    .addEventListener('change', (e) => {
+      // clean up any currently highlighted notes when highlighting is turned off
+        if(!e.target.checked) {
+          document.querySelectorAll('.currently-playing').forEach(el => el.classList.remove('currently-playing'));
+        }
+    })
   document.getElementById('showAnnotationMenu').addEventListener('click', cmd.showAnnotationPanel);
   document.getElementById('showAnnotationsButton').addEventListener('click', cmd.toggleAnnotationPanel);
   document.getElementById('showFacsimileButton').addEventListener('click', cmd.toggleFacsimilePanel);

@@ -1034,6 +1034,12 @@ export default class Viewer {
         type: 'bool',
         default: true,
       },
+      highlightCurrentlySoundingNotes: {
+        title: 'Highlight currently-sounding notes',
+        description: 'Visually highlight currently-sounding notes in the notation panel during MIDI playback ',
+        type: 'bool',
+        default: true,
+      },
       titleAnnotations: {
         title: 'Annotations',
         description: 'Annotation settings',
