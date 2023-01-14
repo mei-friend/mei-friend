@@ -276,7 +276,9 @@ addEventListener(
           //
           tkOptions = result.options;
           tk.setOptions(tkOptions);
-          tk.loadData(result.mei);
+          if (result.encodingChanged || result.speedMode) { // only load data if encoding has changed
+            tk.loadData(result.mei);
+          }
           result.midi = tk.renderToMIDI();
           if (result.requestTimemap) result.timemap = tk.renderToTimemap();
           result.cmd = result.requestTimemap ? 'midiPlayback' : 'downloadMidiFile';

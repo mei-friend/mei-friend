@@ -1223,6 +1223,8 @@ export function requestMidiFromVrvWorker(ev, requestTimemap = false) {
     options: v.vrvOptions,
     mei: v.speedFilter(cm.getValue(), false), // exclude dummy measures in speed mode
     requestTimemap: requestTimemap,
+    encodingChanged: v.encodingChanged,
+    speedMode: v.speedMode
   };
   vrvWorker.postMessage(message);
 }
