@@ -25,6 +25,7 @@ import { commonSchemas, defaultMeiProfile, defaultMeiVersion } from './main.js';
  * @param {number} pageNo  Page number, starting at 1
  * @param {Breaks} breaks
  * @param {PageSpanners} pageSpanners
+ * @param {Boolean} includeDummyMeasures
  * @returns {string|undefined} The page specified by `pageNo`, with preceding
  * and following dummy pages added with one meashre on each for anchoring
  * cross-page spanners. For page 1, no preceding dummy page is added, only a
@@ -206,7 +207,7 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
         if (
           countNow &&
           currentNodeName !== 'ending' &&
-          ( /** @type {string[]} */ (breaks).includes(currentNodeName) ||
+          /** @type {string[]} */ ((breaks).includes(currentNodeName) ||
             (sb = /** @type {Element} */ (currentNode).querySelector(breaksSelector)))
         ) {
           if (dutils.countAsBreak(sb ? sb : currentNode)) p++;
@@ -227,7 +228,20 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
         if (count && unit) {
           addMeterSigElement(staffDefs, count, unit);
         }
+        const midiBpm = scoreDef.getAttribute('midi.bpm');
+        if (midiBpm) {
+          spdScore.querySelector('scoreDef')?.setAttribute('midi.bpm', midiBpm);
+        }
       }
+
+      // remember tempo@midi.bpm and save it in global scoreDef
+      if (p < pageNo) {
+        currentNode.querySelectorAll('tempo').forEach((t) => {
+          let midiBpm = t.getAttribute('midi.bpm');
+          if (midiBpm) spdScore.querySelector('scoreDef')?.setAttribute('midi.bpm', midiBpm);
+        });
+      }
+
       // scoreDef with staffDef@key.sig or keySig@sig and meter@count/@unit
       let staffDefList = currentNode.querySelectorAll(breaksSelector ? breaksSelector + ', staffDef' : 'staffDef');
       if (staffDefList && staffDefList.length > 0 && p < pageNo) {
