@@ -207,7 +207,7 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
         if (
           countNow &&
           currentNodeName !== 'ending' &&
-          /** @type {string[]} */ ((breaks).includes(currentNodeName) ||
+          ( /** @type {string[]} */ (breaks).includes(currentNodeName) ||
             (sb = /** @type {Element} */ (currentNode).querySelector(breaksSelector)))
         ) {
           if (dutils.countAsBreak(sb ? sb : currentNode)) p++;
