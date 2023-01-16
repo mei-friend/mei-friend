@@ -20,14 +20,14 @@ export function seekMidiPlaybackToSelectionOrPage() {
 }
 
 export function seekMidiPlaybackToTime(t) {
-  // seek MIDI playback to time (in seconds)
+  // seek MIDI playback to time (in milliseconds)
   if (mp) {
     if (mp.playing) {
       mp.stop();
-      mp.currentTime = t;
+      mp.currentTime = t / 1000;
       mp.start();
     } else {
-      mp.currentTime = t;
+      mp.currentTime = t / 1000;
     }
   }
   timemapIdx = 0;
@@ -39,7 +39,7 @@ export function highlightNotesAtMidiPlaybackTime(e) {
   let highlightCheckbox = document.getElementById('highlightCurrentlySoundingNotes');
   let pageFollowCheckbox = document.getElementById('pageFollowMidiPlayback');
   if(highlightCheckbox.checked || pageFollowCheckbox.checked) {
-    const t = e.detail.note.startTime; // in seconds
+    const t = e.detail.note.startTime * 1000; // convert to milliseconds
     const currentlyHighlightedNotes = Array.from(document.querySelectorAll('g.note.currently-playing'));
     const firstNoteOnPage = document.querySelector('.note');
     let closestTimemapTime;
@@ -49,7 +49,7 @@ export function highlightNotesAtMidiPlaybackTime(e) {
       // clear previous
       const relevantTimemapElements = timemap
         // ignore times later than the requested target
-        .filter((tm) => t >= tm.tstamp / 1000);
+        .filter((tm) => Math.round(t) >= Math.round(tm.tstamp));
       closestTimemapTime = relevantTimemapElements[relevantTimemapElements.length - 1];
 
       currentlyHighlightedNotes.forEach((note) => {
@@ -81,10 +81,10 @@ export function highlightNotesAtMidiPlaybackTime(e) {
       }
       lastReportedTime = t;
       // let oldIdx = timemapIdx;
-      while (timemap[timemapIdx].tstamp / 1000 < t && timemapIdx < timemap.length) {
+      while (Math.round(timemap[timemapIdx].tstamp) < Math.round(t) && timemapIdx < timemap.length) {
         timemapIdx++;
       }
-      // console.log('t: ' + t + '; tstamp: ' + timemap[timemapIdx].tstamp / 1000);
+      // console.log('t: ' + t + '; tstamp: ' + timemap[timemapIdx].tstamp);
       closestTimemapTime = timemap[timemapIdx];
       // console.log('timemap index (old/new): ' + oldIdx + '/' + timemapIdx);
 

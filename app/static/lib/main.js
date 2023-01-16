@@ -972,7 +972,7 @@ async function vrvWorkerEventsHandler(ev) {
     case 'timeForElement': // receive time for element to start midi playback
       // console.log('RECEIVED TIME FOR ELEMENT: ', ev.data);
       if (ev.data.triggerMidiSeekTo) {
-        seekMidiPlaybackToTime(ev.data.msg / 1000);
+        seekMidiPlaybackToTime(ev.data.msg); // time in ms
       }
       break;
     case 'computePageBreaks':
