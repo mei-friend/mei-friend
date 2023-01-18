@@ -33,7 +33,7 @@ export function seekMidiPlaybackToTime(t) {
   }
   timemapIdx = 0;
   // close all highlighted notes
-  unHighlightNotes();
+  unHighlightAllElements();
 } // seekMidiPlaybackToTime()
 
 export function highlightNotesAtMidiPlaybackTime(e) {
@@ -97,7 +97,7 @@ export function highlightNotesAtMidiPlaybackTime(e) {
           let i = currentlyHighlightedNotes.length - 1;
           while (i >= 0) {
             if (timemap[ix].off.includes(currentlyHighlightedNotes[i].id)) {
-              closeNote(currentlyHighlightedNotes[i]);
+              unhighlightNote(currentlyHighlightedNotes[i]);
               currentlyHighlightedNotes.splice(i, 1); // remove unhighlighted notes
             }
             i--;
@@ -119,13 +119,17 @@ export function highlightNotesAtMidiPlaybackTime(e) {
           if ('off' in timemap[j]) {
             timemap[j].off.forEach((id) => {
               let note = document.getElementById(id);
-              setTimeout(() => closeNote(note), timemap[j].tstamp - t, note);
+              setTimeout(() => unhighlightNote(note), timemap[j].tstamp - t, note);
             });
+          }
+          // last item in timemap, stop player
+          if (j === timemap.length - 1) {
+            setTimeout(() => mp.stop(), timemap[j].tstamp - t, mp);
           }
         }
       }
 
-      function closeNote(note) {
+      function unhighlightNote(note) {
         note.classList.remove('currently-playing');
         note.querySelectorAll('.currently-playing').forEach((g) => g.classList.remove('currently-playing'));
       }
@@ -174,8 +178,8 @@ export function getTimemap() {
   return timemap;
 }
 
-// close/unhighlight all midi-highlighted notes
-function unHighlightNotes() {
+// close/unhighlight all midi-highlighted notes/graphical elements
+function unHighlightAllElements() {
   document.querySelectorAll('.currently-playing').forEach((g) => g.classList.remove('currently-playing'));
 }
 
