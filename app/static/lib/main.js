@@ -551,6 +551,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   console.log('DOMContentLoaded. Trying now to load Verovio...');
   document.querySelector(".statusbar").innerHTML = "Loading Verovio.";
+  drawLeftFooter();
   drawRightFooter();
 
   vrvWorker = new Worker(`${root}lib/verovio-worker.js`);
@@ -1845,6 +1846,11 @@ function updateStatusBar() {
 function updateHtmlTitle() {
   document.querySelector('head > title').innerHTML = 'mei-friend: ' +
     meiFileName.substring(meiFileName.lastIndexOf("/") + 1);
+}
+
+function drawLeftFooter() {
+  let lf = document.querySelector(".leftfoot");
+  lf.innerHTML = envMsg;
 }
 
 function drawRightFooter() {
