@@ -589,7 +589,6 @@ document.addEventListener('DOMContentLoaded', function () {
   // If user is logged in, open a pre-populated fork-repository menu
   // Else, remember we are in remote fork request mode, log user in, and then proceed as above.
   let forkParam = searchParams.get('fork');
-  // console.log("Fork param: ", forkParam, typeof forkParam);
   if (urlFileName && !(forkParam === 'true')) {
     // normally open the file from URL
     openUrlFetch(new URL(urlFileName));
@@ -926,9 +925,6 @@ async function vrvWorkerEventsHandler(ev) {
       if (!'setFocusToVerovioPane' in ev.data || ev.data.setFocusToVerovioPane) v.setFocusToVerovioPane();
       if (ev.data.computePageBreaks) v.computePageBreaks(cm);
       else v.busy(false);
-      if (ev.data.withMidiSeek) {
-        console.log('FOUND WITH MIDI SEEK');
-      }
       break;
     case 'navigatePage': // resolve navigation with page turning
       updateStatusBar();
@@ -960,7 +956,7 @@ async function vrvWorkerEventsHandler(ev) {
       v.busy(false);
       break;
     case 'midiPlayback': // export MIDI file
-      console.log('RECEIVED MIDI AND TIMEMAP:', ev.data.midi, ev.data.timemap);
+      console.log('Received MIDI and Timemap:', ev.data.midi, ev.data.timemap);
       setTimemap(ev.data.timemap);
       if (mp) {
         blob = midiDataToBlob(ev.data.midi);
@@ -970,7 +966,7 @@ async function vrvWorkerEventsHandler(ev) {
       }
       break;
     case 'timeForElement': // receive time for element to start midi playback
-      // console.log('RECEIVED TIME FOR ELEMENT: ', ev.data);
+      // console.log('Received time for element: ', ev.data);
       if (ev.data.triggerMidiSeekTo) {
         seekMidiPlaybackToTime(ev.data.msg / 1000);
       }

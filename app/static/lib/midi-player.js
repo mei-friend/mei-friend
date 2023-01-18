@@ -9,7 +9,6 @@ let lastReportedTime = 0; // time (s) of last reported note fired (used to check
 
 export function seekMidiPlaybackToSelectionOrPage() {
   // on load, seek to first currently selected element (or first note on page)
-  console.log('seekMidiPlaybackToSelectionOrPage', v.findFirstNoteInSelection(), document.querySelector('.note'));
   let seekToNote = v.findFirstNoteInSelection() || document.querySelector('.note');
   if (seekToNote) {
     v.getTimeForElement(seekToNote.id, true); // will trigger a seekMidiPlaybackTo
