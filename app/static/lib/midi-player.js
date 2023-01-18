@@ -5,6 +5,7 @@ export const midiDelay = 400; // in ms, delay between last edit and MIDI re-rend
 export let mp = document.getElementById('midi-player'); // midi player
 let timemap;
 let timemapIdx = 0;
+let lastOnsetIdx = 0; // index in timemap of last onset
 let lastReportedTime = 0; // time (s) of last reported note fired (used to check slider shifts)
 
 export function seekMidiPlaybackToSelectionOrPage() {
@@ -38,7 +39,7 @@ export function seekMidiPlaybackToTime(t) {
 export function highlightNotesAtMidiPlaybackTime(e) {
   let highlightCheckbox = document.getElementById('highlightCurrentlySoundingNotes');
   let pageFollowCheckbox = document.getElementById('pageFollowMidiPlayback');
-  if(highlightCheckbox.checked || pageFollowCheckbox.checked) {
+  if (highlightCheckbox.checked || pageFollowCheckbox.checked) {
     const t = e.detail.note.startTime * 1000; // convert to milliseconds
     const currentlyHighlightedNotes = Array.from(document.querySelectorAll('g.note.currently-playing'));
     const firstNoteOnPage = document.querySelector('.note');
@@ -89,6 +90,7 @@ export function highlightNotesAtMidiPlaybackTime(e) {
       // console.log('timemap index (old/new): ' + oldIdx + '/' + timemapIdx);
 
       // 129 ms; with timemapIdx reduced to 66 ms with Op. 120 last two pages
+      // go back from current timemapIdx to 'close' highlighted notes
       let ix = timemapIdx;
       while (ix >= 0) {
         if ('off' in timemap[ix]) {
@@ -110,6 +112,19 @@ export function highlightNotesAtMidiPlaybackTime(e) {
         ix--;
       }
 
+      // at last onset, program the closing of events in the future
+      if (timemapIdx === lastOnsetIdx) {
+        let j = timemapIdx;
+        while (j++ < timemap.length - 1) {
+          if ('off' in timemap[j]) {
+            timemap[j].off.forEach((id) => {
+              let note = document.getElementById(id);
+              setTimeout(() => closeNote(note), timemap[j].tstamp - t, note);
+            });
+          }
+        }
+      }
+
       function closeNote(note) {
         note.classList.remove('currently-playing');
         note.querySelectorAll('.currently-playing').forEach((g) => g.classList.remove('currently-playing'));
@@ -123,14 +138,16 @@ export function highlightNotesAtMidiPlaybackTime(e) {
           el.classList.add('currently-playing');
           el.querySelectorAll('g').forEach((g) => g.classList.add('currently-playing'));
         } else if (pageFollowCheckbox.checked) {
-          v.getPageWithElement(id).then((flipToPage) => {
-            if (flipToPage) {
-              v.updatePage(cm, flipToPage, '', true, false); // disable midi seek after page-flip
-            }
-          }).catch((e) => { 
-            console.warn("Expected to highlight currently playing note, but couldn't find it:", id, e);
-          });
-        }       
+          v.getPageWithElement(id)
+            .then((flipToPage) => {
+              if (flipToPage) {
+                v.updatePage(cm, flipToPage, '', true, false); // disable midi seek after page-flip
+              }
+            })
+            .catch((e) => {
+              console.warn("Expected to highlight currently playing note, but couldn't find it:", id, e);
+            });
+        }
       });
     }
   }
@@ -150,6 +167,7 @@ export function startMidiTimeout(rerender = false) {
 
 export function setTimemap(tm) {
   timemap = tm;
+  determineLastOnsetIdx();
 }
 
 export function getTimemap() {
@@ -159,4 +177,15 @@ export function getTimemap() {
 // close/unhighlight all midi-highlighted notes
 function unHighlightNotes() {
   document.querySelectorAll('.currently-playing').forEach((g) => g.classList.remove('currently-playing'));
+}
+
+// find index of last onset array in timemap
+function determineLastOnsetIdx() {
+  let i = timemap.length;
+  while (i-- >= 0) {
+    if ('on' in timemap[i]) {
+      lastOnsetIdx = i;
+      break;
+    }
+  }
 }
