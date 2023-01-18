@@ -5,6 +5,7 @@ export const midiDelay = 400; // in ms, delay between last edit and MIDI re-rend
 export let mp = document.getElementById('midi-player'); // midi player
 let timemap;
 let timemapIdx = 0;
+let lastOnsetIdx = 0; // index in timemap of last onset
 let lastReportedTime = 0; // time (s) of last reported note fired (used to check slider shifts)
 
 export function seekMidiPlaybackToSelectionOrPage() {
@@ -19,26 +20,26 @@ export function seekMidiPlaybackToSelectionOrPage() {
 }
 
 export function seekMidiPlaybackToTime(t) {
-  // seek MIDI playback to time (in seconds)
+  // seek MIDI playback to time (in milliseconds)
   if (mp) {
     if (mp.playing) {
       mp.stop();
-      mp.currentTime = t;
+      mp.currentTime = t / 1000;
       mp.start();
     } else {
-      mp.currentTime = t;
+      mp.currentTime = t / 1000;
     }
   }
   timemapIdx = 0;
   // close all highlighted notes
-  unHighlightNotes();
+  unHighlightAllElements();
 } // seekMidiPlaybackToTime()
 
 export function highlightNotesAtMidiPlaybackTime(e) {
   let highlightCheckbox = document.getElementById('highlightCurrentlySoundingNotes');
   let pageFollowCheckbox = document.getElementById('pageFollowMidiPlayback');
-  if(highlightCheckbox.checked || pageFollowCheckbox.checked) {
-    const t = e.detail.note.startTime; // in seconds
+  if (highlightCheckbox.checked || pageFollowCheckbox.checked) {
+    const t = e.detail.note.startTime * 1000; // convert to milliseconds
     const currentlyHighlightedNotes = Array.from(document.querySelectorAll('g.note.currently-playing'));
     const firstNoteOnPage = document.querySelector('.note');
     let closestTimemapTime;
@@ -48,7 +49,7 @@ export function highlightNotesAtMidiPlaybackTime(e) {
       // clear previous
       const relevantTimemapElements = timemap
         // ignore times later than the requested target
-        .filter((tm) => t >= tm.tstamp / 1000);
+        .filter((tm) => Math.round(t) >= Math.round(tm.tstamp));
       closestTimemapTime = relevantTimemapElements[relevantTimemapElements.length - 1];
 
       currentlyHighlightedNotes.forEach((note) => {
@@ -80,21 +81,22 @@ export function highlightNotesAtMidiPlaybackTime(e) {
       }
       lastReportedTime = t;
       // let oldIdx = timemapIdx;
-      while (timemap[timemapIdx].tstamp / 1000 < t && timemapIdx < timemap.length) {
+      while (Math.round(timemap[timemapIdx].tstamp) < Math.round(t) && timemapIdx < timemap.length) {
         timemapIdx++;
       }
-      // console.log('t: ' + t + '; tstamp: ' + timemap[timemapIdx].tstamp / 1000);
+      // console.log('t: ' + t + '; tstamp: ' + timemap[timemapIdx].tstamp);
       closestTimemapTime = timemap[timemapIdx];
       // console.log('timemap index (old/new): ' + oldIdx + '/' + timemapIdx);
 
       // 129 ms; with timemapIdx reduced to 66 ms with Op. 120 last two pages
+      // go back from current timemapIdx to 'close' highlighted notes
       let ix = timemapIdx;
       while (ix >= 0) {
         if ('off' in timemap[ix]) {
           let i = currentlyHighlightedNotes.length - 1;
           while (i >= 0) {
             if (timemap[ix].off.includes(currentlyHighlightedNotes[i].id)) {
-              closeNote(currentlyHighlightedNotes[i]);
+              unhighlightNote(currentlyHighlightedNotes[i]);
               currentlyHighlightedNotes.splice(i, 1); // remove unhighlighted notes
             }
             i--;
@@ -109,7 +111,24 @@ export function highlightNotesAtMidiPlaybackTime(e) {
         ix--;
       }
 
-      function closeNote(note) {
+      // at last onset, program the closing of events in the future
+      if (timemapIdx === lastOnsetIdx) {
+        let j = timemapIdx;
+        while (j++ < timemap.length - 1) {
+          if ('off' in timemap[j]) {
+            timemap[j].off.forEach((id) => {
+              let note = document.getElementById(id);
+              setTimeout(() => unhighlightNote(note), timemap[j].tstamp - t, note);
+            });
+          }
+          // last item in timemap, stop player
+          if (j === timemap.length - 1) {
+            setTimeout(() => mp.stop(), timemap[j].tstamp - t, mp);
+          }
+        }
+      }
+
+      function unhighlightNote(note) {
         note.classList.remove('currently-playing');
         note.querySelectorAll('.currently-playing').forEach((g) => g.classList.remove('currently-playing'));
       }
@@ -122,14 +141,16 @@ export function highlightNotesAtMidiPlaybackTime(e) {
           el.classList.add('currently-playing');
           el.querySelectorAll('g').forEach((g) => g.classList.add('currently-playing'));
         } else if (pageFollowCheckbox.checked) {
-          v.getPageWithElement(id).then((flipToPage) => {
-            if (flipToPage) {
-              v.updatePage(cm, flipToPage, '', true, false); // disable midi seek after page-flip
-            }
-          }).catch((e) => { 
-            console.warn("Expected to highlight currently playing note, but couldn't find it:", id, e);
-          });
-        }       
+          v.getPageWithElement(id)
+            .then((flipToPage) => {
+              if (flipToPage) {
+                v.updatePage(cm, flipToPage, '', true, false); // disable midi seek after page-flip
+              }
+            })
+            .catch((e) => {
+              console.warn("Expected to highlight currently playing note, but couldn't find it:", id, e);
+            });
+        }
       });
     }
   }
@@ -149,13 +170,25 @@ export function startMidiTimeout(rerender = false) {
 
 export function setTimemap(tm) {
   timemap = tm;
+  determineLastOnsetIdx();
 }
 
 export function getTimemap() {
   return timemap;
 }
 
-// close/unhighlight all midi-highlighted notes
-function unHighlightNotes() {
+// close/unhighlight all midi-highlighted notes/graphical elements
+function unHighlightAllElements() {
   document.querySelectorAll('.currently-playing').forEach((g) => g.classList.remove('currently-playing'));
+}
+
+// find index of last onset array in timemap
+function determineLastOnsetIdx() {
+  let i = timemap.length;
+  while (i-- >= 0) {
+    if ('on' in timemap[i]) {
+      lastOnsetIdx = i;
+      break;
+    }
+  }
 }
