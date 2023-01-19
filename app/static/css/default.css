@@ -521,6 +521,10 @@ a:active {
   min-width: 240px;
 }
 
+.leftfoot #heart {
+  fill:var(--highlightColor);
+}
+
 .middlefoot {
   /* background-color: Tomato; */
   min-width: 250px;
