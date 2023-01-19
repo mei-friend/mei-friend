@@ -111,7 +111,6 @@ export default class Viewer {
 
   updatePage(cm, page, xmlId = '', setFocusToVerovioPane = true, withMidiSeek = true) {
     if (this.changeCurrentPage(page) || xmlId) {
-      console.log('CHECK 1');
       if (!this.speedMode) {
         let message = {
           cmd: 'updatePage',
