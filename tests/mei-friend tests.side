@@ -1,0 +1,389 @@
+{
+  "id": "0e614633-a5cd-4040-a504-4b275f8cb419",
+  "version": "2.0",
+  "name": "mei-friend tests",
+  "url": "https://mei-friend.mdw.ac.at",
+  "tests": [{
+    "id": "e7e263b7-29b0-47d3-bd57-9735fc74959b",
+    "name": "file menu pops up on click",
+    "commands": [{
+      "id": "41118d1f-bd02-420b-9a2c-18e0849cd016",
+      "comment": "",
+      "command": "open",
+      "target": "/",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "155fea4a-699a-4def-b778-2033870e8472",
+      "comment": "",
+      "command": "setWindowSize",
+      "target": "1440x875",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "227eed87-f77b-49ee-8e23-192350d31a89",
+      "comment": "",
+      "command": "",
+      "target": "",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "8c070644-f975-4ee6-878c-944a02b0c4fb",
+      "comment": "",
+      "command": "click",
+      "target": "css=.dropdown:nth-child(2) > .dropbtn",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "a29ffbc5-0ab9-48c3-8e0a-7bfdad7b5691",
+      "comment": "",
+      "command": "mouseOver",
+      "target": "css=.dropdown:nth-child(2) > .dropbtn",
+      "targets": [],
+      "value": "2000"
+    }, {
+      "id": "c49fe295-ff75-48b7-bfc4-d8f7987cc13c",
+      "comment": "",
+      "command": "mouseOver",
+      "target": "id=OpenMei",
+      "targets": [
+        ["id=OpenMei", "id"],
+        ["css=#OpenMei", "css:finder"],
+        ["xpath=//a[@id='OpenMei']", "xpath:attributes"],
+        ["xpath=//div[@id='FileMenu']/a", "xpath:idRelative"],
+        ["xpath=//a[contains(@href, '#')]", "xpath:href"],
+        ["xpath=//div[2]/div/a", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "efce4007-84e5-47a3-8b6e-11078c7c0247",
+      "comment": "",
+      "command": "waitForElementVisible",
+      "target": "id=OpenMei",
+      "targets": [
+        ["id=OpenMei", "id"],
+        ["css=#OpenMei", "css:finder"],
+        ["xpath=//a[@id='OpenMei']", "xpath:attributes"],
+        ["xpath=//div[@id='FileMenu']/a", "xpath:idRelative"],
+        ["xpath=//a[contains(@href, '#')]", "xpath:href"],
+        ["xpath=//div[2]/div/a", "xpath:position"]
+      ],
+      "value": "1"
+    }]
+  }, {
+    "id": "d5d15a95-010e-41ba-8114-31fb78fa0dec",
+    "name": "default MEI loads after reset",
+    "commands": [{
+      "id": "56ef71e9-0f40-40d5-b9c2-280e75bf2ff5",
+      "comment": "",
+      "command": "open",
+      "target": "/",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "8f69377d-acf8-4ad1-81f3-40a74abc6f45",
+      "comment": "",
+      "command": "setWindowSize",
+      "target": "1440x875",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "aa45b8b2-9341-4bef-95a8-64ab064f7b73",
+      "comment": "",
+      "command": "click",
+      "target": "css=.dropdown:nth-child(7) > .dropbtn",
+      "targets": [
+        ["css=.dropdown:nth-child(7) > .dropbtn", "css:finder"],
+        ["xpath=//div[7]/button", "xpath:position"],
+        ["xpath=//button[contains(.,'Help')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "50127224-1599-454f-a564-f762effb774f",
+      "comment": "",
+      "command": "mouseOver",
+      "target": "css=.dropdown:nth-child(7) > .dropbtn",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "69e1bff5-e914-4a1d-a56d-fb5ff1fe3867",
+      "comment": "",
+      "command": "waitForElementVisible",
+      "target": "id=resetDefault",
+      "targets": [],
+      "value": "2000"
+    }, {
+      "id": "d8419cf0-7d02-4595-89dc-06c76d2903c0",
+      "comment": "",
+      "command": "click",
+      "target": "id=resetDefault",
+      "targets": [
+        ["id=resetDefault", "id"],
+        ["linkText=Reset to default", "linkText"],
+        ["css=#resetDefault", "css:finder"],
+        ["xpath=//a[contains(text(),'Reset to default')]", "xpath:link"],
+        ["xpath=//a[@id='resetDefault']", "xpath:attributes"],
+        ["xpath=//div[@id='HelpMenu']/a[6]", "xpath:idRelative"],
+        ["xpath=(//a[contains(@href, '#')])[77]", "xpath:href"],
+        ["xpath=//div[7]/div/a[6]", "xpath:position"],
+        ["xpath=//a[contains(.,'Reset to default')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "b4c9d432-eb86-4e9d-b262-dc78aa2d1447",
+      "comment": "",
+      "command": "mouseUp",
+      "target": "css=textarea:nth-child(1)",
+      "targets": [
+        ["css=textarea:nth-child(1)", "css:finder"],
+        ["xpath=//div[@id='encoding']/div/div/textarea", "xpath:idRelative"],
+        ["xpath=//div[5]/div/div/textarea", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "baa9bcda-36e1-4389-aa04-d4ba60481f2b",
+      "comment": "",
+      "command": "waitForElementPresent",
+      "target": "css=.CodeMirror-line",
+      "targets": [],
+      "value": "2000"
+    }]
+  }, {
+    "id": "1ce4266b-d229-4518-9b24-644f3e07d0d0",
+    "name": "default MEI renders after reset",
+    "commands": [{
+      "id": "9c715ce5-6a8b-480c-85d6-c2624556f2f4",
+      "comment": "",
+      "command": "open",
+      "target": "/",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "1e05b24b-f634-468a-a894-ff7f981e84c6",
+      "comment": "",
+      "command": "setWindowSize",
+      "target": "1440x875",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "0e10fbe5-c4b6-4031-850d-3dcd62c8e28d",
+      "comment": "",
+      "command": "click",
+      "target": "css=.dropdown:nth-child(7) > .dropbtn",
+      "targets": [
+        ["css=.dropdown:nth-child(7) > .dropbtn", "css:finder"],
+        ["xpath=//div[7]/button", "xpath:position"],
+        ["xpath=//button[contains(.,'Help')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "de5ad147-8622-4384-b87b-639879cde87a",
+      "comment": "",
+      "command": "mouseOver",
+      "target": "css=.dropdown:nth-child(7) > .dropbtn",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "8f110659-19e4-486e-ba2b-c2e73186c814",
+      "comment": "",
+      "command": "waitForElementVisible",
+      "target": "id=resetDefault",
+      "targets": [],
+      "value": "2000"
+    }, {
+      "id": "a92293c8-2bf8-48ca-8f8f-055bea2b151e",
+      "comment": "",
+      "command": "click",
+      "target": "id=resetDefault",
+      "targets": [
+        ["id=resetDefault", "id"],
+        ["linkText=Reset to default", "linkText"],
+        ["css=#resetDefault", "css:finder"],
+        ["xpath=//a[contains(text(),'Reset to default')]", "xpath:link"],
+        ["xpath=//a[@id='resetDefault']", "xpath:attributes"],
+        ["xpath=//div[@id='HelpMenu']/a[6]", "xpath:idRelative"],
+        ["xpath=(//a[contains(@href, '#')])[77]", "xpath:href"],
+        ["xpath=//div[7]/div/a[6]", "xpath:position"],
+        ["xpath=//a[contains(.,'Reset to default')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "f75a1245-52c3-46db-bfbf-a9c87c3e29c6",
+      "comment": "",
+      "command": "mouseUp",
+      "target": "css=textarea:nth-child(1)",
+      "targets": [
+        ["css=textarea:nth-child(1)", "css:finder"],
+        ["xpath=//div[@id='encoding']/div/div/textarea", "xpath:idRelative"],
+        ["xpath=//div[5]/div/div/textarea", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "bc7622c6-3f96-43a7-ab9b-d5a3e294678d",
+      "comment": "",
+      "command": "waitForElementPresent",
+      "target": "id=note-0000001631474113",
+      "targets": [],
+      "value": "2000"
+    }]
+  }, {
+    "id": "4f8bc70a-f5d6-4018-8fdd-4a6f0ea0d3d8",
+    "name": "settings menu opens and closes",
+    "commands": [{
+      "id": "dce3c9a4-ea0f-4eea-95a0-87b2cba34a7c",
+      "comment": "",
+      "command": "open",
+      "target": "/",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "5c138863-e20b-402e-8520-50ba1034fcbf",
+      "comment": "",
+      "command": "setWindowSize",
+      "target": "1440x900",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "f34f51fa-bdb4-4ea8-85d8-171d8c3107cf",
+      "comment": "",
+      "command": "click",
+      "target": "css=#showSettingsButton > svg",
+      "targets": [
+        ["css=#showSettingsButton > svg", "css:finder"]
+      ],
+      "value": ""
+    }, {
+      "id": "0ab0e229-8745-4c29-a151-ca352e024f49",
+      "comment": "",
+      "command": "assertElementPresent",
+      "target": "id=closeSettingsButton",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "8269168e-0b85-413e-8ccc-e6a45e45c407",
+      "comment": "",
+      "command": "click",
+      "target": "id=closeSettingsButton",
+      "targets": [
+        ["id=closeSettingsButton", "id"],
+        ["css=#closeSettingsButton", "css:finder"],
+        ["xpath=//span[@id='closeSettingsButton']", "xpath:attributes"],
+        ["xpath=//div[@id='settingsPanel']/div/span", "xpath:idRelative"],
+        ["xpath=//div[4]/div/span", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "ddf5ec10-52cd-42f8-91e2-373a70fe5795",
+      "comment": "",
+      "command": "",
+      "target": "id=hideSettingsButton",
+      "targets": [],
+      "value": "2000"
+    }]
+  }, {
+    "id": "9a45b313-0365-43b1-90a8-2d50b6622d9b",
+    "name": "annotations menu opens and closes",
+    "commands": [{
+      "id": "3ec69266-9b56-4be0-a222-c97524867584",
+      "comment": "",
+      "command": "open",
+      "target": "/",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "066c7970-a5f6-4c16-8a00-7c465d6db32e",
+      "comment": "",
+      "command": "setWindowSize",
+      "target": "1440x900",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "a8077eac-8bbf-4b0c-8535-d9ba2e90d4e4",
+      "comment": "",
+      "command": "click",
+      "target": "css=#showAnnotationsButton > svg",
+      "targets": [
+        ["css=#showSettingsButton > svg", "css:finder"]
+      ],
+      "value": ""
+    }, {
+      "id": "4d975724-45c7-40c9-a64c-a6263aafb3d9",
+      "comment": "",
+      "command": "assertElementPresent",
+      "target": "id=closeAnnotationPanelButton",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "388dd787-eef2-4f9b-b675-36125aa2962b",
+      "comment": "",
+      "command": "click",
+      "target": "id=closeAnnotationPanelButton",
+      "targets": [
+        ["id=closeSettingsButton", "id"],
+        ["css=#closeSettingsButton", "css:finder"],
+        ["xpath=//span[@id='closeSettingsButton']", "xpath:attributes"],
+        ["xpath=//div[@id='settingsPanel']/div/span", "xpath:idRelative"],
+        ["xpath=//div[4]/div/span", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "c74d2a10-3b7d-492d-9a0f-0fd7fcee292d",
+      "comment": "",
+      "command": "waitForElementNotVisible",
+      "target": "id=closeAnnotationPanelButton",
+      "targets": [],
+      "value": "2000"
+    }]
+  }, {
+    "id": "2d2710a2-f3eb-456b-b47e-4fc166878bd5",
+    "name": "Navigate to next page",
+    "commands": [{
+      "id": "8d35c65f-0628-432a-b450-869caeefbff7",
+      "comment": "",
+      "command": "open",
+      "target": "https://mei-friend.mdw.ac.at",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "7b636d9a-e949-4b34-a90f-6376d060cb81",
+      "comment": "",
+      "command": "setWindowSize",
+      "target": "1262x875",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "29d8ef82-94b7-43af-bba0-3401ce2f7a8a",
+      "comment": "",
+      "command": "click",
+      "target": "css=#next-page-btn > svg",
+      "targets": [
+        ["css=#next-page-btn > svg", "css:finder"]
+      ],
+      "value": ""
+    }, {
+      "id": "454e10bd-78c9-4448-b175-98a3e9e170ff",
+      "comment": "",
+      "command": "verifyText",
+      "target": "id=pagination2",
+      "targets": [],
+      "value": " 2 "
+    }]
+  }],
+  "suites": [{
+    "id": "9c54e416-7160-4aaf-bc1a-8c3a7c836993",
+    "name": "Navigation",
+    "persistSession": false,
+    "parallel": false,
+    "timeout": 300,
+    "tests": ["e7e263b7-29b0-47d3-bd57-9735fc74959b"]
+  }, {
+    "id": "f9c5944f-7d43-4b94-98df-030a8aca1855",
+    "name": "Loading and rendering",
+    "persistSession": false,
+    "parallel": false,
+    "timeout": 300,
+    "tests": ["d5d15a95-010e-41ba-8114-31fb78fa0dec", "1ce4266b-d229-4518-9b24-644f3e07d0d0"]
+  }],
+  "urls": ["https://mei-friend.mdw.ac.at/"],
+  "plugins": []
+}

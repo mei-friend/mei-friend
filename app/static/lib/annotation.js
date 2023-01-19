@@ -150,7 +150,7 @@ export function generateAnnotationLocationLabel(a) {
     annotationLocationLabel.innerHTML = 'Unsituated';
   } else {
     annotationLocationLabel.innerHTML = 'p.&nbsp;' + (a.firstPage === a.lastPage ?
-        a.firstPage : a.firstPage + "&ndash;" + a.lastPage) +
+      a.firstPage : a.firstPage + "&ndash;" + a.lastPage) +
       ` (${a.selection.length}&nbsp;elements)`;
   }
   annotationLocationLabel.classList.add("annotationLocationLabel");
@@ -160,27 +160,26 @@ export function generateAnnotationLocationLabel(a) {
 
 // call whenever layout reflows to re-situate annotations appropriately
 export function situateAnnotations() {
-  annotations.forEach(a => {
+  annotations.forEach(async (a) => {
     // for each element in a.selection, ask Verovio for the page number
     // set a.firstPage and a.lastPage to min/max page numbers returned
     a.firstPage = 'unsituated';
     a.lastPage = -1;
     if ('selection' in a) {
-      a.firstPage = v.getPageWithElement(a.selection[0], {
-        id: a.id,
-        type: 'first'
-      });
-      a.lastPage = v.getPageWithElement(a.selection[a.selection.length - 1], {
-        id: a.id,
-        type: 'last'
-      });
+      a.firstPage = await v.getPageWithElement(a.selection[0]);
+      a.lastPage = await v.getPageWithElement(a.selection[a.selection.length - 1]);
       if (a.firstPage < 0 && v.speedMode) {
         if (v.xmlDoc.querySelector('[*|id=' + a.selection[0] + ']')?.closest('meiHead')) a.firstPage = 'meiHead';
         else console.warn('Cannot locate annotation ', a);
-      } // if not speedmode, asynchronous return of page numbers after we are finished here
+      } else { // if not speedmode, asynchronous return of page numbers after we are finished here
+        const annotationLocationLabelElement = document.querySelector(`.annotationLocationLabel[data-id=${a.id}`);
+        if (annotationLocationLabelElement) {
+          annotationLocationLabelElement.innerHTML = generateAnnotationLocationLabel(a).innerHTML;
+        }
+      }
     }
   })
-}
+} // situateAnnotations()
 
 export function deleteAnnotation(uuid) {
   const ix = annotations.findIndex(a => a.id === uuid);
@@ -432,7 +431,7 @@ export function readAnnots(flagLimit = false) {
       // only if not already included
       // FIXME: will ignore all but the first annotation without xml:id
       annotations.push(annotation);
-    } else {}
+    } else { }
   });
   refreshAnnotations();
 }

@@ -1,10 +1,17 @@
 # mei-friend-online CHANGELOG.md
 
+### 0.8.0 MIDI playback
+* Add MIDI playback control bar and settings
+* Implement playback using html-midi-player
+* Support configurable automatic page-following during playback
+* Support configurable highlighting of currently-sounding notes
+* Modification to getPageWithElement to work with and without speedmode
+* Modularise and adapt left footer message
 ### 0.7.1
 * Adding and removing xml:ids to and from encoding done natively inside mei-friend
 * Bug fixes: Reduce processing time while indenting code; sync tabSize & indentUnit
 * Skip git branch selection when only one branch exists in repository
-## 0.7.0 Consolidate speed mode
+## 0.7.0 Complete speedmode improvements
 * Support for time-spanning elements with `@startid/endid` that start before and end after current page (thus, spanning across current page)
 * Support for time-spanning elements with `@tstamp/tstamp2` attributes, starting or ending on current page as well as those spanning across current page (start before and end afterwards)
 * Download current speed mode page triple (current page with a dummy page before and after, normally not shown) with `CTRL-SHIFT-S` (or on MacOS `CMD-SHIFT-S`)

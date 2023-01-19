@@ -1,19 +1,10 @@
-import {
-  getX,
-  getY,
-  svgNameSpace
-} from './dom-utils.js'
+import { getX, getY, svgNameSpace } from './dom-utils.js';
 import * as att from './attribute-classes.js';
-import {
-  setCursorToId
-} from './utils.js';
-import {
-  cm,
-  platform
-} from './main.js';
+import { setCursorToId } from './utils.js';
+import { cm, platform } from './main.js';
+import { startMidiTimeout } from './midi-player.js';
 
 export function addDragSelector(v, vp) {
-
   let dragging = false;
   var svgEls;
   var obobj = {}; // object storing x, y coordinates of svg elements
@@ -29,7 +20,7 @@ export function addDragSelector(v, vp) {
   let slurSelector = '.' + att.attCurvature.join(',.');
   let measureSelector = '.measure';
 
-  vp.addEventListener('mousedown', ev => {
+  vp.addEventListener('mousedown', (ev) => {
     dragging = true;
     // clear selected elements, if no CMD/CTRL key is pressed
     if (!(platform.startsWith('mac') && ev.metaKey) && !ev.ctrlKey) {
@@ -38,7 +29,7 @@ export function addDragSelector(v, vp) {
     }
     oldEls = [];
     obobj = {};
-    v.selectedElements.forEach(el => oldEls.push(el)); // remember selected els
+    v.selectedElements.forEach((el) => oldEls.push(el)); // remember selected els
     // create selection rectangle
     rect = document.createElementNS(svgNameSpace, 'rect');
     let pm = document.querySelector('g.page-margin');
@@ -71,13 +62,14 @@ export function addDragSelector(v, vp) {
       first = false;
     }
     svgEls = document.querySelectorAll(sel);
-    svgEls.forEach(el => {
+    svgEls.forEach((el) => {
       let bb = el.getBBox();
       if (Array.from(el.classList).includes('note')) {
         let noteHead = el.querySelector('.notehead');
         if (noteHead) bb = noteHead.getBBox();
       }
-      if (Array.from(el.classList).includes('measure')) { // take boundingbox
+      if (Array.from(el.classList).includes('measure')) {
+        // take boundingbox
         let staves = el.querySelectorAll('.staff'); //for  measures from staves
         if (staves.length > 0) {
           bb.width = staves.item(0).getBBox().width;
@@ -88,8 +80,7 @@ export function addDragSelector(v, vp) {
       let x = Math.round((bb.x + bb.width / 2) * 1000); // center of element
       let y = Math.round((bb.y + bb.height / 2) * 1000);
       if (!Object.keys(obobj).includes(x.toString())) obobj[x] = {};
-      if (Object.keys(obobj).includes(x.toString()) &&
-        Object.keys(obobj[x]).includes(y.toString())) {
+      if (Object.keys(obobj).includes(x.toString()) && Object.keys(obobj[x]).includes(y.toString())) {
         obobj[x][y].push(el);
       } else {
         obobj[x][y] = [el];
@@ -97,7 +88,7 @@ export function addDragSelector(v, vp) {
     });
   });
 
-  vp.addEventListener('mousemove', ev => {
+  vp.addEventListener('mousemove', (ev) => {
     if (dragging) {
       newEls = [];
 
@@ -127,8 +118,7 @@ export function addDragSelector(v, vp) {
       if (p) strokeWidth = parseFloat(p.getAttribute('stroke-width'));
 
       // draw drag-select rectangle
-      updateRect(rect, x, y, width, height, window.getComputedStyle(pm).color,
-        strokeWidth, strokeWidth * 5);
+      updateRect(rect, x, y, width, height, window.getComputedStyle(pm).color, strokeWidth, strokeWidth * 5);
 
       // without Firefox support:
       // svgEls.forEach(el => {
@@ -142,30 +132,35 @@ export function addDragSelector(v, vp) {
       let yy = Math.round(y * 1000);
       let yy2 = Math.round((y + height) * 1000);
       let latest = {};
-      let selX = Object.keys(obobj).filter(kx => (parseInt(kx) >= xx && parseInt(kx) <= xx2));
+      let selX = Object.keys(obobj).filter((kx) => parseInt(kx) >= xx && parseInt(kx) <= xx2);
       if (selX.length > 0) {
-        selX.forEach(xKey => {
-          let yKeys = Object.keys(obobj[xKey]).filter(ky => (parseInt(ky) >= yy && parseInt(ky) <= yy2));
-          if (yKeys) yKeys.forEach(yKey => {
-            let els = obobj[xKey][yKey];
-            if (els) els.forEach(el => {
-              if (!newEls.includes(el.id)) {
-                newEls.push(el.id);
-              }
-              let x = getX(el);
-              let y = getY(el);
-              // keep the element closest to the cursor position (whilst disburdening Pythagoras from exponential load)
-              if (Object.keys(latest).length === 0 || (Object.keys(latest).length > 0 &&
-                  ((Math.abs(x - e.x) + Math.abs(y - e.y)) < (Math.abs(latest.x - e.x) + Math.abs(latest.y - e.y))))) {
-                latest.el = el;
-                latest.x = x;
-                latest.y = y;
-              }
+        selX.forEach((xKey) => {
+          let yKeys = Object.keys(obobj[xKey]).filter((ky) => parseInt(ky) >= yy && parseInt(ky) <= yy2);
+          if (yKeys)
+            yKeys.forEach((yKey) => {
+              let els = obobj[xKey][yKey];
+              if (els)
+                els.forEach((el) => {
+                  if (!newEls.includes(el.id)) {
+                    newEls.push(el.id);
+                  }
+                  let x = getX(el);
+                  let y = getY(el);
+                  // keep the element closest to the cursor position (whilst disburdening Pythagoras from exponential load)
+                  if (
+                    Object.keys(latest).length === 0 ||
+                    (Object.keys(latest).length > 0 &&
+                      Math.abs(x - e.x) + Math.abs(y - e.y) < Math.abs(latest.x - e.x) + Math.abs(latest.y - e.y))
+                  ) {
+                    latest.el = el;
+                    latest.x = x;
+                    latest.y = y;
+                  }
+                });
             });
-          });
         });
       }
-      oldEls.forEach(el => newEls.push(el));
+      oldEls.forEach((el) => newEls.push(el));
       v.updateNotation = false;
       if (latest && Object.keys(latest).length > 0) {
         setCursorToId(cm, latest.el.id);
@@ -178,24 +173,25 @@ export function addDragSelector(v, vp) {
   });
 
   vp.addEventListener('mouseup', () => {
+    if (document.getElementById('showMidiPlaybackControlBar').checked) {
+      console.log('drag-selector: HANDLE CLICK MIDI TIMEOUT');
+      startMidiTimeout();
+    }
     dragging = false;
     let svgPm = document.querySelector('g.page-margin');
-    if (svgPm && Array.from(svgPm.childNodes).includes(rect))
-      svgPm.removeChild(rect);
+    if (svgPm && Array.from(svgPm.childNodes).includes(rect)) svgPm.removeChild(rect);
     oldEls = [];
   });
-
-}
+} // addDragSelector()
 
 export function transformCTM(point, matrix) {
   let r = {};
   r.x = matrix.a * point.x + matrix.c * point.y + matrix.e;
   r.y = matrix.b * point.x + matrix.d * point.y + matrix.f;
   return r;
-}
+} // transformCTM()
 
-export function updateRect(rect, x, y, width, height, color = "black",
-  strokeWidth = 13, strokeDashArray = 50) {
+export function updateRect(rect, x, y, width, height, color = 'black', strokeWidth = 13, strokeDashArray = 50) {
   rect.setAttribute('x', x);
   rect.setAttribute('y', y);
   rect.setAttribute('width', width);
@@ -204,4 +200,4 @@ export function updateRect(rect, x, y, width, height, color = "black",
   rect.setAttribute('stroke-dasharray', strokeDashArray);
   rect.setAttribute('stroke', color);
   rect.setAttribute('fill', 'none');
-}
+} // updateRect()

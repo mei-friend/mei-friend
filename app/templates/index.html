@@ -90,6 +90,8 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/keymap/vim.min.js"
     integrity="sha512-px+d4ezEJ2hi3SHqwRziL871LTHSqfj1GxV1Cp78Sp/SAMEIJwxKNDGcQz96FEv/IqRPLcJ848BWhSUM7msEGQ=="
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdn.jsdelivr.net/combine/npm/tone@14.7.58,npm/@magenta/music@1.23.1/es6/core.js,npm/focus-visible@5,npm/html-midi-player@1.5.0">
+  </script>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/default.css') }}" />
   <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}" />
   <link rel="stylesheet" href="{{ url_for('static', filename='css/annotationPanel.css') }}" />
@@ -310,7 +312,14 @@
       <span id="fileStorageExceeded"></span>
     </div>
     <div class="fillSpace"></div>
-    <div id="showFacsimileButton" class="settingsButton" title="Toggle facsimile panel">
+    <div id="showMidiPlaybackControlBarButton" class="settingsButton" title="Toggle MIDI Playback Control Bar">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
+          <path 
+            d="M7.563 2.069A.75.75 0 018 2.75v10.5a.751.751 0 01-1.238.57L3.472 11H1.75A1.75 1.75 0 010 9.25v-2.5C0 5.784.784 5 1.75 5h1.723l3.289-2.82a.75.75 0 01.801-.111zM6.5 4.38L4.238 6.319a.748.748 0 01-.488.181h-2a.25.25 0 00-.25.25v2.5c0 .138.112.25.25.25h2c.179 0 .352.064.488.18L6.5 11.62zm6.096-2.038a.75.75 0 011.06 0 8 8 0 010 11.314.751.751 0 01-1.042-.018.751.751 0 01-.018-1.042 6.5 6.5 0 000-9.193.75.75 0 010-1.06zm-1.06 2.121l-.001.001a5 5 0 010 7.07.749.749 0 01-1.275-.326.749.749 0 01.215-.734 3.5 3.5 0 000-4.95.75.75 0 111.061-1.061z">
+          </path>
+        </svg>
+    </div>
+    <div id="showFacsimileButton" class="settingsButton" title="Toggle Facsimile Panel">
       <!-- log octicon -->
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
         <path
@@ -535,6 +544,11 @@
       <div id="listAnnotations" class="tabcontent">No annotations present.</div>
       <!-- DW HACK ESWC <div id="externalLinks" class="tabcontent">Links</div>-->
     </div>
+  </div>
+
+  <div id="midiPlaybackControlBar">
+    <midi-player id="midi-player" sound-font> </midi-player>
+    <span id="midi-speedmode-indicator" title="Speedmode is active; only playing MIDI for current page. To play the entire encoding, disable speedmode.">Speedmode</span>
   </div>
 
   <div class="footer">

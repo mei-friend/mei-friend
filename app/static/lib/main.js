@@ -1,6 +1,6 @@
 // mei-friend version and date
-export const version = '0.7.1';
-export const versionDate = '20 Dec 2022';
+export const version = '0.8.0';
+export const versionDate = '19 Jan 2023';
 
 var vrvWorker;
 var spdWorker;
@@ -18,46 +18,46 @@ export const isSafari = !!navigator.userAgent.match(/Version\/[\d\.]+.*Safari/);
 const guidelinesBase = 'https://music-encoding.org/guidelines/v4/';
 
 /**
- * Object of common MEI schemas, 
- * by meiProfile ('CMN', 'Mensural', 'Neumes', 'All', 'Any') 
+ * Object of common MEI schemas,
+ * by meiProfile ('CMN', 'Mensural', 'Neumes', 'All', 'Any')
  * and meiVersion ('4.0.1', etc.)
  */
 export const commonSchemas = {
-  'CMN': {
+  CMN: {
     '2.1.1': 'https://music-encoding.org/schema/2.1.1/mei-CMN.rng',
     '3.0.0': 'https://music-encoding.org/schema/3.0.0/mei-CMN.rng',
     '4.0.0': 'https://music-encoding.org/schema/4.0.0/mei-CMN.rng',
     '4.0.1': 'https://music-encoding.org/schema/4.0.1/mei-CMN.rng',
-    '5.0.0-dev': 'https://music-encoding.org/schema/dev/mei-CMN.rng'
+    '5.0.0-dev': 'https://music-encoding.org/schema/dev/mei-CMN.rng',
   },
-  'Mensural': {
+  Mensural: {
     '2.1.1': 'https://music-encoding.org/schema/2.1.1/mei-Mensural.rng',
     '3.0.0': 'https://music-encoding.org/schema/3.0.0/mei-Mensural.rng',
     '4.0.0': 'https://music-encoding.org/schema/4.0.0/mei-Mensural.rng',
     '4.0.1': 'https://music-encoding.org/schema/4.0.1/mei-Mensural.rng',
-    '5.0.0-dev': 'https://music-encoding.org/schema/dev/mei-Mensural.rng'
+    '5.0.0-dev': 'https://music-encoding.org/schema/dev/mei-Mensural.rng',
   },
-  'Neumes': {
+  Neumes: {
     '2.1.1': 'https://music-encoding.org/schema/2.1.1/mei-Neumes.rng',
     '3.0.0': 'https://music-encoding.org/schema/3.0.0/mei-Neumes.rng',
     '4.0.0': 'https://music-encoding.org/schema/4.0.0/mei-Neumes.rng',
     '4.0.1': 'https://music-encoding.org/schema/4.0.1/mei-Neumes.rng',
-    '5.0.0-dev': 'https://music-encoding.org/schema/dev/mei-Neumes.rng'
+    '5.0.0-dev': 'https://music-encoding.org/schema/dev/mei-Neumes.rng',
   },
-  'All': {
+  All: {
     '2.1.1': 'https://music-encoding.org/schema/2.1.1/mei-all.rng',
     '3.0.0': 'https://music-encoding.org/schema/3.0.0/mei-all.rng',
     '4.0.0': 'https://music-encoding.org/schema/4.0.0/mei-all.rng',
     '4.0.1': 'https://music-encoding.org/schema/4.0.1/mei-all.rng',
-    '5.0.0-dev': 'https://music-encoding.org/schema/dev/mei-all.rng'
+    '5.0.0-dev': 'https://music-encoding.org/schema/dev/mei-all.rng',
   },
-  'Any': {
+  Any: {
     '2.1.1': 'https://music-encoding.org/schema/2.1.1/mei-all_anyStart.rng',
     '3.0.0': 'https://music-encoding.org/schema/3.0.0/mei-all_anyStart.rng',
     '4.0.0': 'https://music-encoding.org/schema/4.0.0/mei-all_anyStart.rng',
     '4.0.1': 'https://music-encoding.org/schema/4.0.1/mei-all_anyStart.rng',
-    '5.0.0-dev': 'https://music-encoding.org/schema/dev/mei-all_anyStart.rng'
-  }
+    '5.0.0-dev': 'https://music-encoding.org/schema/dev/mei-all_anyStart.rng',
+  },
 };
 export const defaultMeiVersion = '4.0.1';
 export const defaultMeiProfile = 'CMN';
@@ -80,50 +80,68 @@ export let isMEI; // is the currently edited file native MEI?
 export let fileChanged = false; // flag to track whether unsaved changes to file exist
 export const defaultVerovioVersion = 'latest'; // 'develop', '3.10.0'
 export let supportedVerovioVersions = {
-  'develop': {
-    'url': 'https://www.verovio.org/javascript/develop/verovio-toolkit-wasm.js',
-    'description': 'Current Verovio develop version'
+  develop: {
+    url: 'https://www.verovio.org/javascript/develop/verovio-toolkit-wasm.js',
+    description: 'Current Verovio develop version',
   },
-  'latest': {
-    'url': 'https://www.verovio.org/javascript/latest/verovio-toolkit-hum.js',
-    'description': 'Current Verovio release'
+  latest: {
+    url: 'https://www.verovio.org/javascript/latest/verovio-toolkit-hum.js',
+    description: 'Current Verovio release',
+  },
+  '3.14.0': {
+    url: 'https://www.verovio.org/javascript/3.14.0/verovio-toolkit-hum.js',
+    description: 'Verovio release 3.14.0',
+    releaseDate: '23 Dec 2022',
   },
   '3.13.1': {
-    'url': 'https://www.verovio.org/javascript/3.13.1/verovio-toolkit-hum.js',
-    'description': 'Verovio release 3.13.1'
+    url: 'https://www.verovio.org/javascript/3.13.1/verovio-toolkit-hum.js',
+    description: 'Verovio release 3.13.1',
+    releaseDate: '28 Nov 2022',
   },
   '3.13.0': {
-    'url': 'https://www.verovio.org/javascript/3.13.0/verovio-toolkit-hum.js',
-    'description': 'Verovio release 3.13.0'
+    url: 'https://www.verovio.org/javascript/3.13.0/verovio-toolkit-hum.js',
+    description: 'Verovio release 3.13.0',
+    releaseDate: '23 Nov 2022',
   },
   '3.12.1': {
-    'url': 'https://www.verovio.org/javascript/3.12.1/verovio-toolkit-hum.js',
-    'description': 'Verovio release 3.12.1'
+    url: 'https://www.verovio.org/javascript/3.12.1/verovio-toolkit-hum.js',
+    description: 'Verovio release 3.12.1',
+    releaseDate: '6 Oct 2022',
   },
   '3.12.0': {
-    'url': 'https://www.verovio.org/javascript/3.12.0/verovio-toolkit-hum.js',
-    'description': 'Verovio release 3.12.0'
+    url: 'https://www.verovio.org/javascript/3.12.0/verovio-toolkit-hum.js',
+    description: 'Verovio release 3.12.0',
+    releaseDate: '29 Sept 2022',
   },
   '3.11.0': {
-    'url': 'https://www.verovio.org/javascript/3.11.0/verovio-toolkit-hum.js',
-    'description': 'Verovio release 3.11.0'
+    url: 'https://www.verovio.org/javascript/3.11.0/verovio-toolkit-hum.js',
+    description: 'Verovio release 3.11.0',
+    releaseDate: '15 Jul 2022',
   },
   '3.10.0*': {
-    'url': 'https://www.verovio.org/javascript/3.10.0/verovio-toolkit-hum.js',
-    'description': 'Verovio release 3.10.0. *ATTENTION: Switching to this version might require a refresh due to memory issues.'
+    url: 'https://www.verovio.org/javascript/3.10.0/verovio-toolkit-hum.js',
+    description:
+      'Verovio release 3.10.0. *ATTENTION: Switching to this version might require a refresh due to memory issues.',
+    releaseDate: '25 May 2022',
   },
   '3.9.0*': {
-    'url': 'https://www.verovio.org/javascript/3.9.0/verovio-toolkit-hum.js',
-    'description': 'Verovio release 3.9.0. *ATTENTION: Switching to this version might require a refresh due to memory issues.'
+    url: 'https://www.verovio.org/javascript/3.9.0/verovio-toolkit-hum.js',
+    description:
+      'Verovio release 3.9.0. *ATTENTION: Switching to this version might require a refresh due to memory issues.',
+    releaseDate: '22 Feb 2022',
   },
   '3.8.1*': {
-    'url': 'https://www.verovio.org/javascript/3.8.1/verovio-toolkit-hum.js',
-    'description': 'Verovio release 3.8.1. *ATTENTION: Switching to this version might require a refresh due to memory issues.'
+    url: 'https://www.verovio.org/javascript/3.8.1/verovio-toolkit-hum.js',
+    description:
+      'Verovio release 3.8.1. *ATTENTION: Switching to this version might require a refresh due to memory issues.',
+    releaseDate: '10 Jan 2022',
   },
   '3.7.0*': {
-    'url': 'https://www.verovio.org/javascript/3.7.0/verovio-toolkit-hum.js',
-    'description': 'Verovio release 3.7.0. *ATTENTION: Switching to this version might require a refresh due to memory issues.'
-  }
+    url: 'https://www.verovio.org/javascript/3.7.0/verovio-toolkit-hum.js',
+    description:
+      'Verovio release 3.7.0. *ATTENTION: Switching to this version might require a refresh due to memory issues.',
+    releaseDate: '22 Nov 2021',
+  },
 };
 
 export const sampleEncodings = [];
@@ -133,87 +151,53 @@ export const samp = {
   REPO: 2,
   FILE: 3,
   TITLE: 4,
-  COMPOSER: 5
-}
+  COMPOSER: 5,
+};
 export const fontList = ['Leipzig', 'Bravura', 'Gootville', 'Leland', 'Petaluma'];
 
-
-import {
-  setOrientation,
-  addNotationResizerHandlers,
-  addFacsimilerResizerHandlers
-} from './resizer.js';
-import {
-  addAnnotationHandlers,
-  clearAnnotations,
-  readAnnots,
-  refreshAnnotations
-} from './annotation.js';
-import {
-  dropHandler,
-  dragEnter,
-  dragOverHandler,
-  dragLeave
-} from './dragger.js';
-import {
-  openUrl,
-  openUrlCancel
-} from './open-url.js';
+import { setOrientation, addNotationResizerHandlers, addFacsimilerResizerHandlers } from './resizer.js';
+import { addAnnotationHandlers, clearAnnotations, readAnnots, refreshAnnotations } from './annotation.js';
+import { dropHandler, dragEnter, dragOverHandler, dragLeave } from './dragger.js';
+import { openUrl, openUrlCancel } from './open-url.js';
 import {
   createNotationDiv,
   setBreaksOptions,
   handleSmartBreaksOption,
   addModifyerKeys,
   manualCurrentPage,
-  generateSectionSelect
+  generateSectionSelect,
 } from './control-menu.js';
+import { clock, highlight, unverified, xCircleFill } from '../css/icons.js';
+import { setCursorToId } from './utils.js';
+import { getInMeasure, navElsSelector, getElementAtCursor } from './dom-utils.js';
+import { addDragSelector } from './drag-selector.js';
 import {
-  clock,
-  unverified,
-  xCircleFill
-} from '../css/icons.js';
-import {
-  setCursorToId
-} from './utils.js';
-import {
-  getInMeasure,
-  navElsSelector,
-  getElementAtCursor,
-} from './dom-utils.js';
-import {
-  addDragSelector
-} from './drag-selector.js';
+  getTimemap,
+  highlightNotesAtMidiPlaybackTime,
+  mp,
+  seekMidiPlaybackToSelectionOrPage,
+  seekMidiPlaybackToTime,
+  setTimemap,
+  startMidiTimeout,
+} from './midi-player.js';
 import * as att from './attribute-classes.js';
 import * as e from './editor.js';
 import Viewer from './viewer.js';
 import * as speed from './speed.js';
 import Github from './github.js';
 import Storage from './storage.js';
-import {
-  fillInBranchContents,
-  logoutFromGithub,
-  refreshGithubMenu,
-  setCommitUIEnabledStatus
-} from './github-menu.js';
-import {
-  forkAndOpen,
-  forkRepositoryCancel
-} from './fork-repository.js';
+import { fillInBranchContents, logoutFromGithub, refreshGithubMenu, setCommitUIEnabledStatus } from './github-menu.js';
+import { forkAndOpen, forkRepositoryCancel } from './fork-repository.js';
 import {
   addZoneDrawer,
   clearFacsimile,
   drawFacsimile,
   ingestFacsimile,
   loadFacsimile,
-  zoomFacsimile
+  zoomFacsimile,
 } from './facsimile.js';
-import {
-  WorkerProxy
-} from './worker-proxy.js';
-import {
-  RNGLoader
-} from './rng-loader.js';
-
+import { WorkerProxy } from './worker-proxy.js';
+import { RNGLoader } from './rng-loader.js';
 
 // const defaultMeiFileName = `${root}Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei`;
 const defaultMeiFileName = `${root}Beethoven_WoO70-Breitkopf.mei`;
@@ -223,10 +207,10 @@ const defaultFacsimileOrientation = 'left'; // default facsimile position in not
 const defaultFacsimilePorportion = 0.5; // default facsimile panel size relative to notation
 const defaultVerovioOptions = {
   scale: 55,
-  breaks: "line",
-  header: "encoded",
-  footer: "encoded",
-  inputFrom: "mei",
+  breaks: 'line',
+  header: 'encoded',
+  footer: 'encoded',
+  inputFrom: 'mei',
   adjustPageHeight: true,
   mdivAll: true,
   outputIndent: 3,
@@ -234,21 +218,20 @@ const defaultVerovioOptions = {
   pageMarginRight: 25,
   pageMarginBottom: 10,
   pageMarginTop: 25,
-  spacingLinear: .2,
-  spacingNonLinear: .5,
+  spacingLinear: 0.2,
+  spacingNonLinear: 0.5,
   minLastJustification: 0,
+  transposeToSoundingPitch: true,
   // clefChangeFactor: .83, // option removed in Verovio 3.10.0
-  svgAdditionalAttribute: ["layer@n", "staff@n",
-    "dir@vgrp", "dynam@vgrp", "hairpin@vgrp", "pedal@vgrp", "measure@n"
-  ],
+  svgAdditionalAttribute: ['layer@n', 'staff@n', 'dir@vgrp', 'dynam@vgrp', 'hairpin@vgrp', 'pedal@vgrp', 'measure@n'],
   bottomMarginArtic: 1.2,
-  topMarginArtic: 1.2
+  topMarginArtic: 1.2,
 };
 const defaultCodeMirrorOptions = {
   lineNumbers: true,
   lineWrapping: false,
   styleActiveLine: true,
-  mode: "xml",
+  mode: 'xml',
   indentUnit: 3,
   smartIndent: true,
   tabSize: 3,
@@ -256,38 +239,38 @@ const defaultCodeMirrorOptions = {
   autoCloseBrackets: true,
   autoCloseTags: true,
   matchTags: {
-    bothTags: true
+    bothTags: true,
   },
   showTrailingSpace: true,
   foldGutter: true,
-  gutters: ["CodeMirror-lint-markers", "CodeMirror-linenumbers", "CodeMirror-foldgutter"],
+  gutters: ['CodeMirror-lint-markers', 'CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
   extraKeys: {
     "'<'": completeAfter,
     "'/'": completeIfAfterLt,
     "' '": completeIfInTag,
     "'='": completeIfInTag,
-    "Ctrl-Space": "autocomplete",
-    "Alt-.": consultGuidelines,
-    "Shift-Alt-f": indentSelection,
-    "'Ï'": indentSelection // TODO: overcome strange bindings on MAC
+    'Ctrl-Space': 'autocomplete',
+    'Alt-.': consultGuidelines,
+    'Shift-Alt-f': indentSelection,
+    "'Ï'": indentSelection, // TODO: overcome strange bindings on MAC
   },
   lint: {
-    "caller": cm,
-    "getAnnotations": validate,
-    "async": true
+    caller: cm,
+    getAnnotations: validate,
+    async: true,
   },
   hintOptions: {
-    schemaInfo: null
+    schemaInfo: null,
   },
   // hintOptions: 'schema_meiCMN_401', // not cm conform: just provide schema name
   theme: 'default',
   zoomFont: 100, // my own option
   matchTheme: false, // notation matches editor theme (my option)
   defaultBrightTheme: 'default', // default theme for OS bright mode
-  defaultDarkTheme: 'paraiso-dark' // 'base16-dark', // default theme for OS dark mode
+  defaultDarkTheme: 'paraiso-dark', // 'base16-dark', // default theme for OS dark mode
 };
 // add all possible facsimile elements
-att.attFacsimile.forEach(e => defaultVerovioOptions.svgAdditionalAttribute.push(e + '@facs'));
+att.attFacsimile.forEach((e) => defaultVerovioOptions.svgAdditionalAttribute.push(e + '@facs'));
 const defaultKeyMap = `${root}keymaps/default-keymap.json`;
 const sampleEncodingsCSV = `${root}sampleEncodings/sampleEncodings.csv`;
 let freshlyLoaded = false; // flag to ignore a cm.on("changes") event on file load
@@ -298,16 +281,16 @@ export function setIsMEI(bool) {
 
 export function setFileChangedState(fileChangedState) {
   fileChanged = fileChangedState;
-  const fileStatusElement = document.querySelector(".fileStatus");
-  const fileChangedIndicatorElement = document.querySelector("#fileChanged");
-  const fileStorageExceededIndicatorElement = document.querySelector("#fileStorageExceeded");
-  const commitUI = document.querySelector("#commitUI");
+  const fileStatusElement = document.querySelector('.fileStatus');
+  const fileChangedIndicatorElement = document.querySelector('#fileChanged');
+  const fileStorageExceededIndicatorElement = document.querySelector('#fileStorageExceeded');
+  const commitUI = document.querySelector('#commitUI');
   if (fileChanged) {
-    fileStatusElement.classList.add("changed");
-    fileChangedIndicatorElement.innerText = "*";
+    fileStatusElement.classList.add('changed');
+    fileChangedIndicatorElement.innerText = '*';
   } else {
-    fileStatusElement.classList.remove("changed");
-    fileChangedIndicatorElement.innerText = "";
+    fileStatusElement.classList.remove('changed');
+    fileChangedIndicatorElement.innerText = '';
   }
   if (isLoggedIn && github && github.filepath && commitUI) {
     setCommitUIEnabledStatus();
@@ -317,18 +300,19 @@ export function setFileChangedState(fileChangedState) {
     if (storage.override) {
       // unable to write to local storage, probably because quota exceeded
       // warn user...
-      fileStatusElement.classList.add("warn");
-      fileStorageExceededIndicatorElement.innerText = "LOCAL-STORAGE DISABLED!";
-      fileStorageExceededIndicatorElement.classList.add("warn");
-      fileStorageExceededIndicatorElement.title = "Your MEI content exceeds " +
+      fileStatusElement.classList.add('warn');
+      fileStorageExceededIndicatorElement.innerText = 'LOCAL-STORAGE DISABLED!';
+      fileStorageExceededIndicatorElement.classList.add('warn');
+      fileStorageExceededIndicatorElement.title =
+        'Your MEI content exceeds ' +
         "the browser's local storage space. Please ensure changes are saved " +
-        "manually or committed to Github before refreshing or leaving " +
-        "the page!";
+        'manually or committed to Github before refreshing or leaving ' +
+        'the page!';
     } else {
-      fileStatusElement.classList.remove("warn");
-      fileStorageExceededIndicatorElement.innerText = "";
-      fileStorageExceededIndicatorElement.classList.remove("warn");
-      fileStorageExceededIndicatorElement.title = "";
+      fileStatusElement.classList.remove('warn');
+      fileStorageExceededIndicatorElement.innerText = '';
+      fileStorageExceededIndicatorElement.classList.remove('warn');
+      fileStorageExceededIndicatorElement.title = '';
     }
   }
 }
@@ -345,16 +329,12 @@ export function setMeiFileInfo(fName, fLocation, fLocationPrintable) {
 }
 
 export function updateFileStatusDisplay() {
-  document.querySelector("#fileName").innerText =
-    meiFileName.substring(meiFileName.lastIndexOf("/") + 1);
-  document.querySelector("#fileLocation").innerText = meiFileLocationPrintable || "";
-  document.querySelector("#fileLocation").title = meiFileLocation || "";
-  if (fileLocationType === "file")
-    document.querySelector("#fileName").setAttribute("contenteditable", "")
-  else
-    document.querySelector("#fileName").removeAttribute("contenteditable", "");
+  document.querySelector('#fileName').innerText = meiFileName.substring(meiFileName.lastIndexOf('/') + 1);
+  document.querySelector('#fileLocation').innerText = meiFileLocationPrintable || '';
+  document.querySelector('#fileLocation').title = meiFileLocation || '';
+  if (fileLocationType === 'file') document.querySelector('#fileName').setAttribute('contenteditable', '');
+  else document.querySelector('#fileName').removeAttribute('contenteditable', '');
 }
-
 
 export function loadDataInEditor(mei, setFreshlyLoaded = true) {
   if (storage && storage.supported) {
@@ -367,16 +347,14 @@ export function loadDataInEditor(mei, setFreshlyLoaded = true) {
   loadFacsimile(v.xmlDoc); // load all facsimila data of MEI
   let bs = document.getElementById('breaks-select');
   if (bs) {
-    if (breaksParam)
-      bs.value = breaksParam
-    else if (storage && storage.supported && storage.hasItem('breaks'))
-      bs.value = storage.breaks;
-    else
-      bs.value = v.containsBreaks() ? 'line' : 'auto';
+    if (breaksParam) bs.value = breaksParam;
+    else if (storage && storage.supported && storage.hasItem('breaks')) bs.value = storage.breaks;
+    else bs.value = v.containsBreaks() ? 'line' : 'auto';
   }
   v.setRespSelectOptions();
   v.setMenuColors();
-  if (!isSafari) { // disable validation on Safari because of this strange error: "RangeError: Maximum call stack size exceeded" (WG, 1 Oct 2022)
+  if (!isSafari) {
+    // disable validation on Safari because of this strange error: "RangeError: Maximum call stack size exceeded" (WG, 1 Oct 2022)
     v.checkSchema(mei);
   }
   clearAnnotations();
@@ -397,7 +375,11 @@ export function updateLocalStorage(meiXml) {
         updateGithubInLocalStorage();
       }
     } catch (err) {
-      console.warn("Could not save file content to local storage. Content may be too big? Content length: ", meiXml.length, err);
+      console.warn(
+        'Could not save file content to local storage. Content may be too big? Content length: ',
+        meiXml.length,
+        err
+      );
       setFileChangedState(fileChanged); // flags any storage-exceeded issues
       storage.clear();
     }
@@ -417,39 +399,40 @@ export function updateGithubInLocalStorage() {
       filepath: github.filepath,
       userLogin: github.userLogin,
       userName: name,
-      userEmail: email
-    }
+      userEmail: email,
+    };
     if (github.filepath) {
-      storage.fileLocationType = "github";
+      storage.fileLocationType = 'github';
     }
   }
   if (isLoggedIn && github.filepath) {
-    fileLocationType = "github";
+    fileLocationType = 'github';
   }
 }
 
-
 function completeAfter(cm, pred) {
-  if (!pred || pred()) setTimeout(function () {
-    if (!cm.state.completionActive)
-      cm.showHint({
-        completeSingle: false
-      });
-  }, 100);
+  if (!pred || pred())
+    setTimeout(function () {
+      if (!cm.state.completionActive)
+        cm.showHint({
+          completeSingle: false,
+        });
+    }, 100);
   return CodeMirror.Pass;
 }
 
 function completeIfAfterLt(cm) {
   return completeAfter(cm, function () {
     var cur = cm.getCursor();
-    return cm.getRange(CodeMirror.Pos(cur.line, cur.ch - 1), cur) === "<";
+    return cm.getRange(CodeMirror.Pos(cur.line, cur.ch - 1), cur) === '<';
   });
 }
 
 function completeIfInTag(cm) {
   return completeAfter(cm, function () {
     var tok = cm.getTokenAt(cm.getCursor());
-    if (tok.type === "string" && (!/['"]/.test(tok.string.charAt(tok.string.length - 1)) || tok.string.length === 1)) return false;
+    if (tok.type === 'string' && (!/['"]/.test(tok.string.charAt(tok.string.length - 1)) || tok.string.length === 1))
+      return false;
     var inner = CodeMirror.innerMode(cm.getMode(), tok.state).state;
     return inner.tagName;
   });
@@ -462,8 +445,7 @@ export async function validate(mei, updateLinting, options) {
       v.updateLinting = updateLinting;
     }
 
-    if (v.validatorWithSchema &&
-      (document.getElementById('autoValidate').checked || options.forceValidate)) {
+    if (v.validatorWithSchema && (document.getElementById('autoValidate').checked || options.forceValidate)) {
       let reportDiv = document.getElementById('validation-report');
       if (reportDiv) reportDiv.style.visibility = 'hidden';
       let vs = document.getElementById('validation-status');
@@ -476,10 +458,10 @@ export async function validate(mei, updateLinting, options) {
       try {
         validation = JSON.parse(validationString);
       } catch (err) {
-        console.error("Could not parse validation json:", err);
+        console.error('Could not parse validation json:', err);
         return;
       }
-      console.log('Validation complete: ', (validation === []) ? 'no errors.' : (validation.length + ' errors found.'));
+      console.log('Validation complete: ', validation === [] ? 'no errors.' : validation.length + ' errors found.');
       v.highlightValidation(mei, validation);
     } else if (v.validatorWithSchema && !document.getElementById('autoValidate').checked) {
       v.setValidationStatusToManual();
@@ -508,10 +490,10 @@ document.addEventListener('DOMContentLoaded', function () {
   const showChangeLogLink = document.getElementById('showChangelog');
   if (showChangeLogLink) showChangeLogLink.setAttribute('href', changeLogUrl);
 
-  cm = CodeMirror.fromTextArea(document.getElementById("editor"), defaultCodeMirrorOptions);
+  cm = CodeMirror.fromTextArea(document.getElementById('editor'), defaultCodeMirrorOptions);
   CodeMirror.normalizeKeyMap();
 
-  // set validation status icon to unverified 
+  // set validation status icon to unverified
   let vs = document.getElementById('validation-status');
   vs.innerHTML = unverified;
 
@@ -527,7 +509,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // ?select=note1,chord2,note3 and/or ?select=note1&select=chord2&select=note3
   selectParam = searchParams.getAll('select');
   if (selectParam && selectParam.length > 0)
-    selectParam = selectParam.map(e => e.split(',')).reduce((a1, a2) => a1.concat(a2));
+    selectParam = selectParam.map((e) => e.split(',')).reduce((a1, a2) => a1.concat(a2));
   let speedParam = searchParams.get('speed');
   breaksParam = searchParams.get('breaks');
 
@@ -535,7 +517,8 @@ document.addEventListener('DOMContentLoaded', function () {
   addModifyerKeys(document); //
 
   console.log('DOMContentLoaded. Trying now to load Verovio...');
-  document.querySelector(".statusbar").innerHTML = "Loading Verovio.";
+  document.querySelector('.statusbar').innerHTML = 'Loading Verovio.';
+  drawLeftFooter();
   drawRightFooter();
 
   vrvWorker = new Worker(`${root}lib/verovio-worker.js`);
@@ -544,17 +527,21 @@ document.addEventListener('DOMContentLoaded', function () {
   spdWorker = new Worker(`${root}lib/speed-worker.js`);
   spdWorker.postMessage({
     cmd: 'variables',
-    var: att.timeSpanningElements
+    var: att.timeSpanningElements,
   });
   spdWorker.onmessage = speedWorkerEventsHandler;
 
   v = new Viewer(vrvWorker, spdWorker);
   v.vrvOptions = {
-    ...defaultVerovioOptions
+    ...defaultVerovioOptions,
   };
 
   if (isSafari) {
-    v.showAlert("It seems that you are using Safari as your browser, on which mei-friend unfortunately does not currently support schema validation. Please use another browser for full validation support.", 'error', -1);
+    v.showAlert(
+      'It seems that you are using Safari as your browser, on which mei-friend unfortunately does not currently support schema validation. Please use another browser for full validation support.',
+      'error',
+      -1
+    );
   }
 
   const validatorWorker = new Worker(`${root}lib/validator-worker.js`);
@@ -581,7 +568,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // check autoValidate as URL param
   let autoValidateParam = searchParams.get('autoValidate');
-  let av = document.getElementById('autoValidate')
+  let av = document.getElementById('autoValidate');
   if (autoValidateParam !== null && av) {
     av.checked = autoValidateParam === 'true';
   }
@@ -593,14 +580,18 @@ document.addEventListener('DOMContentLoaded', function () {
     v.setValidationStatusToManual();
   }
 
+  // set up midi-player event listeners
+  mp.addEventListener('note', (e) => highlightNotesAtMidiPlaybackTime(e));
+  mp.addEventListener('load', seekMidiPlaybackToSelectionOrPage);
+
   let urlFileName = searchParams.get('file');
   // fork parameter: if true AND ?fileParam is set to a URL,
   // then put mei-friend into "remote fork request" mode:
   // If user is logged in, open a pre-populated fork-repository menu
   // Else, remember we are in remote fork request mode, log user in, and then proceed as above.
   let forkParam = searchParams.get('fork');
-  // console.log("Fork param: ", forkParam, typeof forkParam);
-  if (urlFileName && !(forkParam === "true")) { // normally open the file from URL
+  if (urlFileName && !(forkParam === 'true')) {
+    // normally open the file from URL
     openUrlFetch(new URL(urlFileName));
   }
 
@@ -621,9 +612,13 @@ document.addEventListener('DOMContentLoaded', function () {
     if (speedParam !== null) storage.speed = speedParam;
     if (breaksParam !== null) storage.breaks = breaksParam;
     if (storage.githubLogoutRequested) {
-      v.showAlert(`You have logged out of mei-friend's GitHub integration, but your browser is still logged in to GitHub!
-      <a href="https://github.com/logout" target="_blank">Click here to logout from GitHub</a>.`, 'warning', 30000);
-      storage.removeItem("githubLogoutRequested");
+      v.showAlert(
+        `You have logged out of mei-friend's GitHub integration, but your browser is still logged in to GitHub!
+      <a href="https://github.com/logout" target="_blank">Click here to logout from GitHub</a>.`,
+        'warning',
+        30000
+      );
+      storage.removeItem('githubLogoutRequested');
     }
 
     setFileChangedState(storage.fileChanged);
@@ -643,8 +638,8 @@ document.addEventListener('DOMContentLoaded', function () {
         // hence the "false" on the following line:
         loadDataInEditor(storage.content, false);
       } else {
-        meiFileLocation = "";
-        meiFileLocationPrintable = "";
+        meiFileLocation = '';
+        meiFileLocationPrintable = '';
         setIsMEI(true); // default MEI
         openFile(undefined, false, false); // default MEI, skip freshly loaded (see comment above)
         setFileChangedState(false);
@@ -662,11 +657,11 @@ document.addEventListener('DOMContentLoaded', function () {
         storage.github.userLogin,
         storage.github.userName,
         storage.github.userEmail
-      )
+      );
       //document.querySelector("#fileLocation").innerText = meiFileLocationPrintable;
     } else if (isLoggedIn) {
       // initialise and store new github object
-      github = new Github("", githubToken, "", "", "", userLogin, userName, userEmail);
+      github = new Github('', githubToken, '', '', '', userLogin, userName, userEmail);
       storage.github = {
         githubRepo: github.githubRepo,
         githubToken: github.githubToken,
@@ -675,21 +670,23 @@ document.addEventListener('DOMContentLoaded', function () {
         filepath: github.filepath,
         userLogin: github.userLogin,
         userName: userName,
-        userEmail: userEmail
+        userEmail: userEmail,
       };
     }
     if (storage.forkAndOpen && github) {
       // we've arrived back after an automated log-in request
       // now fork and open the supplied URL, and remove it from storage
       forkAndOpen(github, storage.forkAndOpen);
-      storage.removeItem("forkAndOpen");
+      storage.removeItem('forkAndOpen');
     }
-  } else { // no local storage
-    if (isLoggedIn) { // initialise new github object
-      github = new Github("", githubToken, "", "", "", userLogin, userName, userEmail);
+  } else {
+    // no local storage
+    if (isLoggedIn) {
+      // initialise new github object
+      github = new Github('', githubToken, '', '', '', userLogin, userName, userEmail);
     }
-    meiFileLocation = "";
-    meiFileLocationPrintable = "";
+    meiFileLocation = '';
+    meiFileLocationPrintable = '';
     openFile(undefined, false, false); // default MEI
   }
   if (isLoggedIn) {
@@ -701,13 +698,13 @@ document.addEventListener('DOMContentLoaded', function () {
       fillInBranchContents();
     }
   }
-  if (forkParam === "true" && urlFileName) {
+  if (forkParam === 'true' && urlFileName) {
     if (isLoggedIn && github) {
       forkAndOpen(github, urlFileName);
     } else {
       if (storage.supported) {
-        storage.safelySetStorageItem("forkAndOpen", urlFileName);
-        document.getElementById("GithubLoginLink").click();
+        storage.safelySetStorageItem('forkAndOpen', urlFileName);
+        document.getElementById('GithubLoginLink').click();
       }
     }
   }
@@ -718,7 +715,7 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('verovio-zoom').value = storage.scale;
   }
   if (speedParam !== null) {
-    v.speedMode = (speedParam === 'true');
+    v.speedMode = speedParam === 'true';
     document.getElementById('speed-checkbox').checked = v.speedMode;
   } else if (storage && storage.supported && storage.hasItem('speed')) {
     v.speedMode = storage.speed;
@@ -772,35 +769,33 @@ document.addEventListener('DOMContentLoaded', function () {
 }); // DOMContentLoaded listener
 
 export async function openUrlFetch(url = '', updateAfterLoading = true) {
-  let urlInput = document.querySelector("#openUrlInput");
-  let urlStatus = document.querySelector("#openUrlStatus");
+  let urlInput = document.querySelector('#openUrlInput');
+  let urlStatus = document.querySelector('#openUrlStatus');
   try {
     if (!url) url = new URL(urlInput.value);
     const response = await fetch(url, {
       method: 'GET',
       headers: {
-        'Accept': 'application/xml, text/xml, application/mei+xml'
-      }
+        Accept: 'application/xml, text/xml, application/mei+xml',
+      },
     });
     if (response.status >= 400) {
-      console.warn("Fetching URL produced error status: ", response.status);
-      urlStatus.innerHTML =
-        `${response.status}: ${response.statusText.toLowerCase()}`
-      urlStatus.classList.add("warn");
-      urlInput.classList.add("warn");
+      console.warn('Fetching URL produced error status: ', response.status);
+      urlStatus.innerHTML = `${response.status}: ${response.statusText.toLowerCase()}`;
+      urlStatus.classList.add('warn');
+      urlInput.classList.add('warn');
     } else {
-      urlStatus.innerHTML = "";
-      urlStatus.classList.remove("warn");
-      urlInput.classList.remove("warn");
+      urlStatus.innerHTML = '';
+      urlStatus.classList.remove('warn');
+      urlInput.classList.remove('warn');
       response.text().then((data) => {
         meiFileLocation = url.href;
         meiFileLocationPrintable = url.hostname;
-        meiFileName =
-          url.pathname.substring(url.pathname.lastIndexOf("/") + 1);
+        meiFileName = url.pathname.substring(url.pathname.lastIndexOf('/') + 1);
         if (storage.github && isLoggedIn) {
           // re-initialise github menu since we're now working from a URL
-          github.filepath = "";
-          github.branch = "";
+          github.filepath = '';
+          github.branch = '';
           if (storage.supported) {
             updateGithubInLocalStorage();
           }
@@ -809,23 +804,23 @@ export async function openUrlFetch(url = '', updateAfterLoading = true) {
         updateFileStatusDisplay();
         handleEncoding(data, true, updateAfterLoading);
         if (storage.supported) {
-          storage.fileLocationType = "url";
+          storage.fileLocationType = 'url';
         }
-        fileLocationType = "url";
+        fileLocationType = 'url';
         openUrlCancel(); //hide open URL UI elements
-        const fnStatus = document.getElementById("fileName");
-        if (fnStatus) fnStatus.removeAttribute("contenteditable");
+        const fnStatus = document.getElementById('fileName');
+        if (fnStatus) fnStatus.removeAttribute('contenteditable');
       });
     }
   } catch (err) {
-    console.warn("Error opening URL provided by user: ", err);
+    console.warn('Error opening URL provided by user: ', err);
     if (err instanceof TypeError) {
-      urlStatus.innerHTML = "CORS error";
+      urlStatus.innerHTML = 'CORS error';
     } else {
-      urlStatus.innerHTML = "Invalid URL, please fix..."
+      urlStatus.innerHTML = 'Invalid URL, please fix...';
     }
-    urlInput.classList.add("warn");
-    urlStatus.classList.add("warn");
+    urlInput.classList.add('warn');
+    urlStatus.classList.add('warn');
   }
 }
 
@@ -838,7 +833,7 @@ function speedWorkerEventsHandler(ev) {
       return;
     }
     v.pageSpanners = {
-      ...ev.data.pageSpanners
+      ...ev.data.pageSpanners,
     };
     if (Object.keys(v.pageSpanners.start).length > 0) {
       v.updateAll(cm, {}, v.selectedElements[0]);
@@ -848,6 +843,7 @@ function speedWorkerEventsHandler(ev) {
 }
 
 async function vrvWorkerEventsHandler(ev) {
+  let blob; // houses blob for MIDI download or playback
   console.log('main.vrvWorkerEventsHandler() received: ' + ev.data.cmd); // , ev.data
   switch (ev.data.cmd) {
     case 'vrvLoaded':
@@ -860,8 +856,7 @@ async function vrvWorkerEventsHandler(ev) {
 
       // v.addMeiFriendOptionsToSettingsPanel();
       drawRightFooter();
-      document.querySelector(".statusbar").innerHTML =
-        `Verovio ${tkVersion} loaded.`;
+      document.querySelector('.statusbar').innerHTML = `Verovio ${tkVersion} loaded.`;
       setBreaksOptions(tkAvailableOptions, defaultVerovioOptions.breaks);
       if (!storage.supported || !meiFileName) {
         // open default mei file
@@ -888,7 +883,8 @@ async function vrvWorkerEventsHandler(ev) {
       //v.busy(false);
       break;
     case 'updated': // display SVG data on site
-      if (ev.data.mei) { // from reRenderMEI
+      if (ev.data.mei) {
+        // from reRenderMEI
         v.updateNotation = false;
         loadDataInEditor(ev.data.mei);
         setFileChangedState(false);
@@ -902,14 +898,13 @@ async function vrvWorkerEventsHandler(ev) {
       while (ss.options.length > 0) ss.remove(0); // clear existing options
       let sections = generateSectionSelect(v.xmlDoc);
       if (sections.length > 1) {
-        sections.forEach(opt => ss.options.add(new Option(opt[0], opt[1])));
+        sections.forEach((opt) => ss.options.add(new Option(opt[0], opt[1])));
         ss.style.display = 'block';
       } else {
         ss.style.display = 'none';
       }
       let bs = document.getElementById('breaks-select').value;
-      if (ev.data.pageCount && !v.speedMode)
-        v.pageCount = ev.data.pageCount;
+      if (ev.data.pageCount && !v.speedMode) v.pageCount = ev.data.pageCount;
       else if (bs === 'none') v.pageCount = 1;
       else if (v.speedMode && bs === 'auto' && Object.keys(v.pageBreaks).length > 0)
         v.pageCount = Object.keys(v.pageBreaks).length;
@@ -919,8 +914,8 @@ async function vrvWorkerEventsHandler(ev) {
         updateStatusBar();
         updateHtmlTitle();
         document.getElementById('verovio-panel').innerHTML = ev.data.svg;
-        if (document.getElementById('showFacsimilePanel') &&
-          document.getElementById('showFacsimilePanel').checked) await drawFacsimile();
+        if (document.getElementById('showFacsimilePanel') && document.getElementById('showFacsimilePanel').checked)
+          await drawFacsimile();
         if (ev.data.setCursorToPageBeginning) v.setCursorToPageBeginning(cm);
         v.updatePageNumDisplay();
         v.addNotationEventListeners(cm);
@@ -928,8 +923,7 @@ async function vrvWorkerEventsHandler(ev) {
         refreshAnnotations(false);
         v.scrollSvg(cm);
       }
-      if (!"setFocusToVerovioPane" in ev.data || ev.data.setFocusToVerovioPane)
-        v.setFocusToVerovioPane();
+      if (!'setFocusToVerovioPane' in ev.data || ev.data.setFocusToVerovioPane) v.setFocusToVerovioPane();
       if (ev.data.computePageBreaks) v.computePageBreaks(cm);
       else v.busy(false);
       break;
@@ -940,8 +934,7 @@ async function vrvWorkerEventsHandler(ev) {
       if (ms.length > 0) {
         let m = ms[0];
         if (ev.data.dir === 'backwards') m = ms[ms.length - 1]; // last measure
-        let id = getInMeasure(m, navElsSelector,
-          ev.data.stNo, ev.data.lyNo, ev.data.what);
+        let id = getInMeasure(m, navElsSelector, ev.data.stNo, ev.data.lyNo, ev.data.what);
         if (id) v.findClosestNoteInChord(id, ev.data.y);
         setCursorToId(cm, id);
         v.selectedElements = [];
@@ -955,22 +948,29 @@ async function vrvWorkerEventsHandler(ev) {
       v.setFocusToVerovioPane();
       v.busy(false);
       break;
-    case 'midi': // export MIDI file
-      const byteCharacters = atob(ev.data.midi);
-      const byteNumbers = new Array(byteCharacters.length);
-      for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i);
-      }
-      const blob = new Blob([new Uint8Array(byteNumbers)], {
-        type: 'audio/midi'
-      });
+    case 'downloadMidiFile': // export MIDI file
+      blob = midiDataToBlob(ev.data.midi);
       var a = document.createElement('a');
-      a.download = meiFileName
-        .substring(meiFileName.lastIndexOf("/") + 1)
-        .replace(/\.[^/.]+$/, '.mid');
+      a.download = meiFileName.substring(meiFileName.lastIndexOf('/') + 1).replace(/\.[^/.]+$/, '.mid');
       a.href = window.URL.createObjectURL(blob);
       a.click();
       v.busy(false);
+      break;
+    case 'midiPlayback': // export MIDI file
+      console.log('Received MIDI and Timemap:', ev.data.midi, ev.data.timemap);
+      setTimemap(ev.data.timemap);
+      if (mp) {
+        blob = midiDataToBlob(ev.data.midi);
+        core.blobToNoteSequence(blob).then((noteSequence) => {
+          mp.noteSequence = noteSequence;
+        });
+      }
+      break;
+    case 'timeForElement': // receive time for element to start midi playback
+      // console.log('Received time for element: ', ev.data);
+      if (ev.data.triggerMidiSeekTo) {
+        seekMidiPlaybackToTime(ev.data.msg); // time in ms
+      }
       break;
     case 'computePageBreaks':
       v.pageBreaks = ev.data.pageBreaks;
@@ -984,14 +984,12 @@ async function vrvWorkerEventsHandler(ev) {
       v.busy(false);
       break;
     case 'updateProgressbar':
-      document.querySelector(".statusbar").innerHTML =
-        "Compute page breaks: " + Math.round(ev.data.percentage) + "%";
+      document.querySelector('.statusbar').innerHTML = 'Compute page breaks: ' + Math.round(ev.data.percentage) + '%';
       setProgressBar(ev.data.percentage);
       break;
     case 'error':
       document.getElementById('verovio-panel').innerHTML =
-        "<h3>Invalid MEI in " + meiFileName +
-        " (" + ev.data.msg + ")</h3>";
+        '<h3>Invalid MEI in ' + meiFileName + ' (' + ev.data.msg + ')</h3>';
       v.busy(false);
       break;
   }
@@ -1014,19 +1012,18 @@ function handleURLParamSelect() {
 
 // key is the input-from option in Verovio, value the distinctive string
 let inputFormats = {
-  mei: "<mei",
-  xml: "<score-partwise", // the only musicXML flavor supported by Verovio
+  mei: '<mei',
+  xml: '<score-partwise', // the only musicXML flavor supported by Verovio
   // xml: "<score-timewise", // does Verovio import timewise musicXML?
-  humdrum: "**kern",
-  pae: "@clef",
+  humdrum: '**kern',
+  pae: '@clef',
 };
 
-export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true,
-  updateAfterLoading = true) {
+export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true, updateAfterLoading = true) {
   if (storage.github && isLoggedIn) {
-    // re-initialise github menu since we're now working from a file 
-    github.filepath = "";
-    github.branch = "";
+    // re-initialise github menu since we're now working from a file
+    github.filepath = '';
+    github.branch = '';
     if (storage.supported) {
       updateGithubInLocalStorage();
     }
@@ -1036,11 +1033,12 @@ export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true,
   // remove any URL parameters, because we open a file locally or through github
   window.history.replaceState(null, null, window.location.pathname);
   if (storage.supported) {
-    storage.fileLocationType = "file";
+    storage.fileLocationType = 'file';
   }
-  fileLocationType = "file";
+  fileLocationType = 'file';
   if (github) github.filepath = '';
-  if (typeof file === "string") { // with fileName string
+  if (typeof file === 'string') {
+    // with fileName string
     meiFileName = file;
     console.info('openMei ' + meiFileName + ', ', cm);
     fetch(meiFileName)
@@ -1058,7 +1056,8 @@ export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true,
           v.updateAll(cm, {}, handleURLParamSelect());
         }
       });
-  } else { // if a file
+  } else {
+    // if a file
     let readingPromise = new Promise(function (loaded, notLoaded) {
       meiFileName = file.name;
       console.info('openMei ' + meiFileName + ', ', cm);
@@ -1069,7 +1068,7 @@ export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true,
         console.info('Reader read ' + meiFileName); // + ', mei: ', mei);
         if (mei) loaded(mei);
         else notLoaded();
-      }
+      };
       if (meiFileName.endsWith('.mxl')) {
         reader.readAsArrayBuffer(file);
       } else {
@@ -1098,30 +1097,35 @@ export function handleEncoding(mei, setFreshlyLoaded = true, updateAfterLoading 
   if (pageParam === null) storage.removeItem('page');
   v.clear();
   v.busy();
-  if (meiFileName.endsWith('.mxl')) { // compressed MusicXML file
+  if (meiFileName.endsWith('.mxl')) {
+    // compressed MusicXML file
     console.log('Load compressed XML file.', mei.slice(0, 128));
     vrvWorker.postMessage({
-      'cmd': 'importBinaryData',
-      'format': 'xml',
-      'mei': mei
+      cmd: 'importBinaryData',
+      format: 'xml',
+      mei: mei,
     });
     found = true;
     setIsMEI(false);
-  } else if (meiFileName.endsWith('.abc')) { // abc notation file
+  } else if (meiFileName.endsWith('.abc')) {
+    // abc notation file
     console.log('Load ABC file.', mei.slice(0, 128));
     vrvWorker.postMessage({
-      'cmd': 'importData',
-      'format': 'abc',
-      'mei': mei
+      cmd: 'importData',
+      format: 'abc',
+      mei: mei,
     });
     found = true;
     setIsMEI(false);
-  } else { // all other formats are found by search term in text file
+  } else {
+    // all other formats are found by search term in text file
     for (const [key, value] of Object.entries(inputFormats)) {
-      if (mei.includes(value)) { // a hint that it is a MEI file
+      if (mei.includes(value)) {
+        // a hint that it is a MEI file
         found = true;
         console.log(key + ' file loading: ' + meiFileName);
-        if (key === "mei") { // if already a mei file
+        if (key === 'mei') {
+          // if already a mei file
           setIsMEI(true);
           v.updateNotation = false;
           loadDataInEditor(mei, setFreshlyLoaded);
@@ -1132,12 +1136,13 @@ export function handleEncoding(mei, setFreshlyLoaded = true, updateAfterLoading 
             v.updateAll(cm, defaultVerovioOptions, handleURLParamSelect());
           }
           break;
-        } else { // all other formats that Verovio imports
+        } else {
+          // all other formats that Verovio imports
           setIsMEI(false);
           vrvWorker.postMessage({
-            'cmd': 'importData',
-            'format': key,
-            'mei': mei
+            cmd: 'importData',
+            format: key,
+            mei: mei,
           });
           break;
         }
@@ -1146,8 +1151,7 @@ export function handleEncoding(mei, setFreshlyLoaded = true, updateAfterLoading 
   }
   if (!found) {
     if (mei.includes('<score-timewise'))
-      log('Loading ' + meiFileName + 'did not succeed. ' +
-        'No support for timewise MusicXML files.');
+      log('Loading ' + meiFileName + 'did not succeed. ' + 'No support for timewise MusicXML files.');
     else {
       log('Format not recognized: ' + meiFileName + '.', 1649499359728);
     }
@@ -1162,18 +1166,18 @@ function openFileDialog(accept = '*') {
   let input = document.createElement('input');
   input.type = 'file';
   if (accept !== '*') input.accept = accept;
-  input.onchange = _ => {
+  input.onchange = (_) => {
     let files = Array.from(input.files);
     console.log('OpenFile Dialog: ', files);
     if (files.length === 1) {
       meiFileName = files[0].name;
-      meiFileLocation = "";
-      meiFileLocationPrintable = "";
+      meiFileLocation = '';
+      meiFileLocationPrintable = '';
       openFile(files[0]);
       if (isLoggedIn) {
         // re-initialise github menu since we're now working locally
-        github.filepath = "";
-        github.branch = "";
+        github.filepath = '';
+        github.branch = '';
         if (storage.supported) {
           updateGithubInLocalStorage();
         }
@@ -1188,12 +1192,10 @@ function openFileDialog(accept = '*') {
 
 function downloadMei() {
   let blob = new Blob([cm.getValue()], {
-    type: 'text/plain'
+    type: 'text/plain',
   });
   let a = document.createElement('a');
-  a.download = meiFileName
-    .substring(meiFileName.lastIndexOf("/") + 1)
-    .replace(/\.[^/.]+$/, '.mei');
+  a.download = meiFileName.substring(meiFileName.lastIndexOf('/') + 1).replace(/\.[^/.]+$/, '.mei');
   a.href = window.URL.createObjectURL(blob);
   a.click();
   // Now that the user has "saved" the MEI, clear the file change indicator
@@ -1202,21 +1204,24 @@ function downloadMei() {
 
 function downloadSpeedMei() {
   let blob = new Blob([speed.getPageFromDom(v.xmlDoc, v.currentPage, v.breaksValue(), v.pageSpanners)], {
-    type: 'text/plain'
+    type: 'text/plain',
   });
   let a = document.createElement('a');
   a.download = meiFileName
-    .substring(meiFileName.lastIndexOf("/") + 1)
+    .substring(meiFileName.lastIndexOf('/') + 1)
     .replace(/\.[^/.]+$/, '_page-' + v.currentPage + '-speedMode.mei');
   a.href = window.URL.createObjectURL(blob);
   a.click();
 }
 
-function downloadMidi() {
+export function requestMidiFromVrvWorker(ev, requestTimemap = false) {
   let message = {
-    'cmd': 'exportMidi',
-    'options': v.vrvOptions,
-    'mei': cm.getValue()
+    cmd: 'exportMidi',
+    options: v.vrvOptions,
+    mei: v.speedFilter(cm.getValue(), false), // exclude dummy measures in speed mode
+    requestTimemap: requestTimemap,
+    encodingChanged: v.encodingChanged,
+    speedMode: v.speedMode
   };
   vrvWorker.postMessage(message);
 }
@@ -1224,12 +1229,10 @@ function downloadMidi() {
 function downloadSvg() {
   let svg = document.getElementById('verovio-panel').innerHTML;
   let blob = new Blob([svg], {
-    type: 'image/svg+xml'
+    type: 'image/svg+xml',
   });
   let a = document.createElement('a');
-  a.download = meiFileName
-    .substring(meiFileName.lastIndexOf("/") + 1)
-    .replace(/\.[^/.]+$/, '.svg');
+  a.download = meiFileName.substring(meiFileName.lastIndexOf('/') + 1).replace(/\.[^/.]+$/, '.svg');
   a.href = window.URL.createObjectURL(blob);
   a.click();
 }
@@ -1242,14 +1245,13 @@ function consultGuidelines() {
     const presentation = elementAtCursor.closest('span[role="presentation"]');
     if (presentation) {
       // choose the first XML element (a "tag" that isn't a "bracket")
-      const xmlEls = presentation.querySelectorAll(".cm-tag:not(.cm-bracket)");
-      let xmlElName = Array.from(xmlEls).map(e => e.innerText).join('');
-      if (xmlElName && !(xmlElName.includes(":"))) {
+      const xmlEls = presentation.querySelectorAll('.cm-tag:not(.cm-bracket)');
+      let xmlElName = Array.from(xmlEls)
+        .map((e) => e.innerText)
+        .join('');
+      if (xmlElName && !xmlElName.includes(':')) {
         // it's an element in the default (hopefully MEI...) namespace
-        window.open(
-          guidelinesBase + "elements/" + xmlElName.toLowerCase(),
-          "_blank"
-        );
+        window.open(guidelinesBase + 'elements/' + xmlElName.toLowerCase(), '_blank');
       }
     }
   }
@@ -1262,48 +1264,47 @@ function indentSelection() {
 
 // object of interface command functions for buttons and key bindings
 export let cmd = {
-  'fileNameChange': () => {
+  fileNameChange: () => {
     if (fileLocationType === 'file') {
-      meiFileName = document.getElementById("fileName").innerText;
+      meiFileName = document.getElementById('fileName').innerText;
       updateStatusBar();
       updateHtmlTitle();
-      if (storage.supported && !storage.override)
-        storage.safelySetStorageItem('meiFileName', meiFileName);
+      if (storage.supported && !storage.override) storage.safelySetStorageItem('meiFileName', meiFileName);
     } else {
-      console.warn("Attempted to change file name on non-local file");
+      console.warn('Attempted to change file name on non-local file');
     }
   },
-  'firstPage': () => v.updatePage(cm, 'first'),
-  'previousPage': () => v.updatePage(cm, 'backwards'),
-  'nextPage': () => v.updatePage(cm, 'forwards'),
-  'lastPage': () => v.updatePage(cm, 'last'),
-  'nextNote': () => v.navigate(cm, 'note', 'forwards'),
-  'previousNote': () => v.navigate(cm, 'note', 'backwards'),
-  'nextMeasure': () => v.navigate(cm, 'measure', 'forwards'),
-  'previousMeasure': () => v.navigate(cm, 'measure', 'backwards'),
-  'layerUp': () => v.navigate(cm, 'layer', 'upwards'),
-  'layerDown': () => v.navigate(cm, 'layer', 'downwards'),
-  'notationTop': () => setOrientation(cm, 'top', '', -1, -1, v, storage),
-  'notationBottom': () => setOrientation(cm, 'bottom', '', -1, -1, v, storage),
-  'notationLeft': () => setOrientation(cm, 'left', '', -1, -1, v, storage),
-  'notationRight': () => setOrientation(cm, 'right', '', -1, -1, v, storage),
-  'facsimileTop': () => setOrientation(cm, '', 'top', -1, -1, v, storage),
-  'facsimileBottom': () => setOrientation(cm, '', 'bottom', -1, -1, v, storage),
-  'facsimileLeft': () => setOrientation(cm, '', 'left', -1, -1, v, storage),
-  'facsimileRight': () => setOrientation(cm, '', 'right', -1, -1, v, storage),
-  'showFacsimilePanel': () => {
+  firstPage: () => v.updatePage(cm, 'first'),
+  previousPage: () => v.updatePage(cm, 'backwards'),
+  nextPage: () => v.updatePage(cm, 'forwards'),
+  lastPage: () => v.updatePage(cm, 'last'),
+  nextNote: () => v.navigate(cm, 'note', 'forwards'),
+  previousNote: () => v.navigate(cm, 'note', 'backwards'),
+  nextMeasure: () => v.navigate(cm, 'measure', 'forwards'),
+  previousMeasure: () => v.navigate(cm, 'measure', 'backwards'),
+  layerUp: () => v.navigate(cm, 'layer', 'upwards'),
+  layerDown: () => v.navigate(cm, 'layer', 'downwards'),
+  notationTop: () => setOrientation(cm, 'top', '', -1, -1, v, storage),
+  notationBottom: () => setOrientation(cm, 'bottom', '', -1, -1, v, storage),
+  notationLeft: () => setOrientation(cm, 'left', '', -1, -1, v, storage),
+  notationRight: () => setOrientation(cm, 'right', '', -1, -1, v, storage),
+  facsimileTop: () => setOrientation(cm, '', 'top', -1, -1, v, storage),
+  facsimileBottom: () => setOrientation(cm, '', 'bottom', -1, -1, v, storage),
+  facsimileLeft: () => setOrientation(cm, '', 'left', -1, -1, v, storage),
+  facsimileRight: () => setOrientation(cm, '', 'right', -1, -1, v, storage),
+  showFacsimilePanel: () => {
     document.getElementById('showFacsimilePanel').checked = true;
     setOrientation(cm, '', '', -1, -1, v);
   },
-  'hideFacsimilePanel': () => {
+  hideFacsimilePanel: () => {
     document.getElementById('showFacsimilePanel').checked = false;
     setOrientation(cm, '', '', -1, -1, v);
   },
-  'toggleFacsimilePanel': () => {
+  toggleFacsimilePanel: () => {
     document.getElementById('showFacsimilePanel').checked = !document.getElementById('showFacsimilePanel').checked;
     setOrientation(cm, '', '', -1, -1, v);
   },
-  'checkFacsimile': () => {
+  checkFacsimile: () => {
     let tf = document.getElementById('titleFacsimilePanel');
     if (v.xmlDoc.querySelector('facsimile')) {
       if (tf) tf.setAttribute('open', 'true');
@@ -1313,52 +1314,70 @@ export let cmd = {
       cmd.hideFacsimilePanel();
     }
   },
-  'showSettingsPanel': () => v.showSettingsPanel(),
-  'hideSettingsPanel': () => v.hideSettingsPanel(),
-  'toggleSettingsPanel': (ev) => v.toggleSettingsPanel(ev),
-  'filterSettings': () => v.applySettingsFilter(),
-  'filterReset': () => {
+  showSettingsPanel: () => v.showSettingsPanel(),
+  hideSettingsPanel: () => v.hideSettingsPanel(),
+  toggleSettingsPanel: (ev) => v.toggleSettingsPanel(ev),
+  filterSettings: () => v.applySettingsFilter(),
+  filterReset: () => {
     document.getElementById('filterSettings').value = '';
-    document.getElementById('filterSettings').dispatchEvent(new Event("input"));
+    document.getElementById('filterSettings').dispatchEvent(new Event('input'));
   },
-  'showAnnotationPanel': () => {
+  toggleMidiPlaybackControlBar: () => {
+    let status = document.getElementById('showMidiPlaybackControlBar').checked;
+    document.getElementById('showMidiPlaybackControlBar').checked = !status;
+    v.toggleMidiPlaybackControlBar();
+    if (document.getElementById('showMidiPlaybackControlBar').checked) {
+      // request MIDI rendering from Verovio worker
+      requestMidiFromVrvWorker(null, true);
+    } else {
+      if(mp.playing) { 
+        // stop player when control bar is closed
+        mp.stop();
+      }
+      if(document.getElementById('highlightCurrentlySoundingNotes').checked) {
+        // tidy up any highlighted notes when control bar is closed
+        document.querySelectorAll('.currently-playing').forEach(e => e.classList.remove('currently-playing'));
+      }
+    }
+  },
+  showAnnotationPanel: () => {
     document.getElementById('showAnnotationPanel').checked = true; // TODO: remove?
     v.toggleAnnotationPanel();
   },
-  'hideAnnotationPanel': () => {
+  hideAnnotationPanel: () => {
     document.getElementById('showAnnotationPanel').checked = false; // TODO: remove?
     v.toggleAnnotationPanel();
   },
-  'toggleAnnotationPanel': () => {
+  toggleAnnotationPanel: () => {
     let status = document.getElementById('showAnnotationPanel').checked;
     document.getElementById('showAnnotationPanel').checked = !status;
     v.toggleAnnotationPanel();
   },
-  'moveProgBar': () => moveProgressBar(),
-  'open': () => openFileDialog(),
-  'openUrl': () => openUrl(),
-  'openUrlFetch': () => openUrlFetch(),
-  'openUrlCancel': () => openUrlCancel(),
-  'openExample': () => openUrl(true),
-  'openMusicXml': () => openFileDialog('.xml,.musicxml,.mxl'),
-  'openHumdrum': () => openFileDialog('.krn,.hum'),
-  'openPae': () => openFileDialog('.pae,.abc'),
-  'downloadMei': () => downloadMei(),
-  'downloadSpeedMei': () => downloadSpeedMei(),
-  'indentSelection': () => indentSelection(),
-  'validate': () => v.manualValidate(),
-  'zoomIn': () => v.zoom(+1, storage),
-  'zoomOut': () => v.zoom(-1, storage),
-  'zoom50': () => v.zoom(50, storage),
-  'zoom100': () => v.zoom(100, storage),
-  'zoomSlider': () => {
+  moveProgBar: () => moveProgressBar(),
+  open: () => openFileDialog(),
+  openUrl: () => openUrl(),
+  openUrlFetch: () => openUrlFetch(),
+  openUrlCancel: () => openUrlCancel(),
+  openExample: () => openUrl(true),
+  openMusicXml: () => openFileDialog('.xml,.musicxml,.mxl'),
+  openHumdrum: () => openFileDialog('.krn,.hum'),
+  openPae: () => openFileDialog('.pae,.abc'),
+  downloadMei: () => downloadMei(),
+  downloadSpeedMei: () => downloadSpeedMei(),
+  indentSelection: () => indentSelection(),
+  validate: () => v.manualValidate(),
+  zoomIn: () => v.zoom(+1, storage),
+  zoomOut: () => v.zoom(-1, storage),
+  zoom50: () => v.zoom(50, storage),
+  zoom100: () => v.zoom(100, storage),
+  zoomSlider: () => {
     let zoomCtrl = document.getElementById('verovio-zoom');
     if (zoomCtrl && storage && storage.supported) storage.scale = zoomCtrl.value;
-    v.updateLayout()
+    v.updateLayout();
   },
-  'facsZoomIn': () => zoomFacsimile(+5),
-  'facsZoomOut': () => zoomFacsimile(-5),
-  'facsZoomSlider': () => {
+  facsZoomIn: () => zoomFacsimile(+5),
+  facsZoomOut: () => zoomFacsimile(-5),
+  facsZoomSlider: () => {
     let facsZoom = document.getElementById('facsimile-zoom');
     let facsZoomInput = document.getElementById('facsimileZoomInput');
     if (facsZoom && facsZoomInput) {
@@ -1366,78 +1385,78 @@ export let cmd = {
       zoomFacsimile();
     }
   },
-  'undo': () => cm.undo(),
-  'redo': () => cm.redo(),
+  undo: () => cm.undo(),
+  redo: () => cm.redo(),
   // add control elements
-  'addSlur': () => e.addControlElement(v, cm, 'slur', ''),
-  'addSlurBelow': () => e.addControlElement(v, cm, 'slur', 'below'),
-  'addTie': () => e.addControlElement(v, cm, 'tie', ''),
-  'addTieBelow': () => e.addControlElement(v, cm, 'tie', 'below'),
-  'addCresHairpin': () => e.addControlElement(v, cm, 'hairpin', '', 'cres'),
-  'addDimHairpin': () => e.addControlElement(v, cm, 'hairpin', '', 'dim'),
-  'addCresHairpinBelow': () => e.addControlElement(v, cm, 'hairpin', 'below', 'cres'),
-  'addDimHairpinBelow': () => e.addControlElement(v, cm, 'hairpin', 'below', 'dim'),
-  'addFermata': () => e.addControlElement(v, cm, 'fermata', 'above', 'norm'),
-  'addFermataBelow': () => e.addControlElement(v, cm, 'fermata', 'below', 'inv'),
-  'addDirective': () => e.addControlElement(v, cm, 'dir', 'above', 'dolce'),
-  'addDirectiveBelow': () => e.addControlElement(v, cm, 'dir', 'below', 'dolce'),
-  'addDynamics': () => e.addControlElement(v, cm, 'dynam', 'above', 'mf'),
-  'addDnamicsBelow': () => e.addControlElement(v, cm, 'dynam', 'below', 'mf'),
-  'addTempo': () => e.addControlElement(v, cm, 'tempo', 'above', 'Allegro'),
-  'addArpeggio': () => e.addControlElement(v, cm, 'arpeg'),
-  'addGlissando': () => e.addControlElement(v, cm, 'gliss'),
-  'addPedalDown': () => e.addControlElement(v, cm, 'pedal', 'down'),
-  'addPedalUp': () => e.addControlElement(v, cm, 'pedal', 'up'),
-  'addTrillAbove': () => e.addControlElement(v, cm, 'trill', 'above'),
-  'addTrillBelow': () => e.addControlElement(v, cm, 'trill', 'below'),
-  'addTurnAbove': () => e.addControlElement(v, cm, 'turn', 'above', 'upper'),
-  'addTurnBelow': () => e.addControlElement(v, cm, 'turn', 'below', 'upper'),
-  'addTurnAboveLower': () => e.addControlElement(v, cm, 'turn', 'above', 'lower'),
-  'addTurnBelowLower': () => e.addControlElement(v, cm, 'turn', 'below', 'lower'),
-  'addMordentAbove': () => e.addControlElement(v, cm, 'mordent', 'above', 'lower'),
-  'addMordentBelow': () => e.addControlElement(v, cm, 'mordent', 'below', 'lower'),
-  'addMordentAboveUpper': () => e.addControlElement(v, cm, 'mordent', 'above', 'upper'),
-  'addMordentBelowUpper': () => e.addControlElement(v, cm, 'mordent', 'below', 'upper'),
+  addSlur: () => e.addControlElement(v, cm, 'slur', ''),
+  addSlurBelow: () => e.addControlElement(v, cm, 'slur', 'below'),
+  addTie: () => e.addControlElement(v, cm, 'tie', ''),
+  addTieBelow: () => e.addControlElement(v, cm, 'tie', 'below'),
+  addCresHairpin: () => e.addControlElement(v, cm, 'hairpin', '', 'cres'),
+  addDimHairpin: () => e.addControlElement(v, cm, 'hairpin', '', 'dim'),
+  addCresHairpinBelow: () => e.addControlElement(v, cm, 'hairpin', 'below', 'cres'),
+  addDimHairpinBelow: () => e.addControlElement(v, cm, 'hairpin', 'below', 'dim'),
+  addFermata: () => e.addControlElement(v, cm, 'fermata', 'above', 'norm'),
+  addFermataBelow: () => e.addControlElement(v, cm, 'fermata', 'below', 'inv'),
+  addDirective: () => e.addControlElement(v, cm, 'dir', 'above', 'dolce'),
+  addDirectiveBelow: () => e.addControlElement(v, cm, 'dir', 'below', 'dolce'),
+  addDynamics: () => e.addControlElement(v, cm, 'dynam', 'above', 'mf'),
+  addDnamicsBelow: () => e.addControlElement(v, cm, 'dynam', 'below', 'mf'),
+  addTempo: () => e.addControlElement(v, cm, 'tempo', 'above', 'Allegro'),
+  addArpeggio: () => e.addControlElement(v, cm, 'arpeg'),
+  addGlissando: () => e.addControlElement(v, cm, 'gliss'),
+  addPedalDown: () => e.addControlElement(v, cm, 'pedal', 'down'),
+  addPedalUp: () => e.addControlElement(v, cm, 'pedal', 'up'),
+  addTrillAbove: () => e.addControlElement(v, cm, 'trill', 'above'),
+  addTrillBelow: () => e.addControlElement(v, cm, 'trill', 'below'),
+  addTurnAbove: () => e.addControlElement(v, cm, 'turn', 'above', 'upper'),
+  addTurnBelow: () => e.addControlElement(v, cm, 'turn', 'below', 'upper'),
+  addTurnAboveLower: () => e.addControlElement(v, cm, 'turn', 'above', 'lower'),
+  addTurnBelowLower: () => e.addControlElement(v, cm, 'turn', 'below', 'lower'),
+  addMordentAbove: () => e.addControlElement(v, cm, 'mordent', 'above', 'lower'),
+  addMordentBelow: () => e.addControlElement(v, cm, 'mordent', 'below', 'lower'),
+  addMordentAboveUpper: () => e.addControlElement(v, cm, 'mordent', 'above', 'upper'),
+  addMordentBelowUpper: () => e.addControlElement(v, cm, 'mordent', 'below', 'upper'),
   //
-  'delete': () => e.deleteElement(v, cm),
-  'cmdDelete': () => e.deleteElement(v, cm, true),
-  'invertPlacement': () => e.invertPlacement(v, cm),
-  'addVerticalGroup': () => e.addVerticalGroup(v, cm),
-  'toggleStacc': () => e.toggleArtic(v, cm, 'stacc'),
-  'toggleAccent': () => e.toggleArtic(v, cm, 'acc'),
-  'toggleTenuto': () => e.toggleArtic(v, cm, 'ten'),
-  'toggleMarcato': () => e.toggleArtic(v, cm, 'marc'),
-  'toggleStacciss': () => e.toggleArtic(v, cm, 'stacciss'),
-  'toggleSpicc': () => e.toggleArtic(v, cm, 'spicc'),
-  'shiftPitchNameUp': () => e.shiftPitch(v, cm, 1),
-  'shiftPitchNameDown': () => e.shiftPitch(v, cm, -1),
-  'shiftOctaveUp': () => e.shiftPitch(v, cm, 7),
-  'shiftOctaveDown': () => e.shiftPitch(v, cm, -7),
-  'moveElementStaffUp': () => e.moveElementToNextStaff(v, cm, true),
-  'moveElementStaffDown': () => e.moveElementToNextStaff(v, cm, false),
-  'addOctave8Above': () => e.addOctaveElement(v, cm, 'above', 8),
-  'addOctave8Below': () => e.addOctaveElement(v, cm, 'below', 8),
-  'addOctave15Above': () => e.addOctaveElement(v, cm, 'above', 15),
-  'addOctave15Below': () => e.addOctaveElement(v, cm, 'below', 15),
-  'addGClefChangeBefore': () => e.addClefChange(v, cm, 'G', '2', true),
-  'addCClefChangeBefore': () => e.addClefChange(v, cm, 'C', '3', true),
-  'addFClefChangeBefore': () => e.addClefChange(v, cm, 'F', '4', true),
-  'addGClefChangeAfter': () => e.addClefChange(v, cm, 'G', '2', false),
-  'addCClefChangeAfter': () => e.addClefChange(v, cm, 'C', '3', false),
-  'addFClefChangeAfter': () => e.addClefChange(v, cm, 'F', '4', false),
-  'addBeam': () => e.addBeamElement(v, cm),
-  'addBeamSpan': () => e.addBeamSpan(v, cm),
-  'addSupplied': () => e.addSuppliedElement(v, cm),
-  'cleanAccid': () => e.cleanAccid(v, cm),
-  'renumberMeasuresTest': () => e.renumberMeasures(v, cm, false),
-  'renumberMeasures': () => e.renumberMeasures(v, cm, true),
-  'reRenderMei': () => v.reRenderMei(cm, false),
-  'reRenderMeiWithout': () => v.reRenderMei(cm, true),
-  'addIds': () => e.manipulateXmlIds(v, cm, false),
-  'removeIds': () => e.manipulateXmlIds(v, cm, true),
-  'ingestFacsimile': () => ingestFacsimile(),
-  'addFacsimile': () => e.addFacsimile(v, cm),
-  'resetDefault': () => {
+  delete: () => e.deleteElement(v, cm),
+  cmdDelete: () => e.deleteElement(v, cm, true),
+  invertPlacement: () => e.invertPlacement(v, cm),
+  addVerticalGroup: () => e.addVerticalGroup(v, cm),
+  toggleStacc: () => e.toggleArtic(v, cm, 'stacc'),
+  toggleAccent: () => e.toggleArtic(v, cm, 'acc'),
+  toggleTenuto: () => e.toggleArtic(v, cm, 'ten'),
+  toggleMarcato: () => e.toggleArtic(v, cm, 'marc'),
+  toggleStacciss: () => e.toggleArtic(v, cm, 'stacciss'),
+  toggleSpicc: () => e.toggleArtic(v, cm, 'spicc'),
+  shiftPitchNameUp: () => e.shiftPitch(v, cm, 1),
+  shiftPitchNameDown: () => e.shiftPitch(v, cm, -1),
+  shiftOctaveUp: () => e.shiftPitch(v, cm, 7),
+  shiftOctaveDown: () => e.shiftPitch(v, cm, -7),
+  moveElementStaffUp: () => e.moveElementToNextStaff(v, cm, true),
+  moveElementStaffDown: () => e.moveElementToNextStaff(v, cm, false),
+  addOctave8Above: () => e.addOctaveElement(v, cm, 'above', 8),
+  addOctave8Below: () => e.addOctaveElement(v, cm, 'below', 8),
+  addOctave15Above: () => e.addOctaveElement(v, cm, 'above', 15),
+  addOctave15Below: () => e.addOctaveElement(v, cm, 'below', 15),
+  addGClefChangeBefore: () => e.addClefChange(v, cm, 'G', '2', true),
+  addCClefChangeBefore: () => e.addClefChange(v, cm, 'C', '3', true),
+  addFClefChangeBefore: () => e.addClefChange(v, cm, 'F', '4', true),
+  addGClefChangeAfter: () => e.addClefChange(v, cm, 'G', '2', false),
+  addCClefChangeAfter: () => e.addClefChange(v, cm, 'C', '3', false),
+  addFClefChangeAfter: () => e.addClefChange(v, cm, 'F', '4', false),
+  addBeam: () => e.addBeamElement(v, cm),
+  addBeamSpan: () => e.addBeamSpan(v, cm),
+  addSupplied: () => e.addSuppliedElement(v, cm),
+  cleanAccid: () => e.cleanAccid(v, cm),
+  renumberMeasuresTest: () => e.renumberMeasures(v, cm, false),
+  renumberMeasures: () => e.renumberMeasures(v, cm, true),
+  reRenderMei: () => v.reRenderMei(cm, false),
+  reRenderMeiWithout: () => v.reRenderMei(cm, true),
+  addIds: () => e.manipulateXmlIds(v, cm, false),
+  removeIds: () => e.manipulateXmlIds(v, cm, true),
+  ingestFacsimile: () => ingestFacsimile(),
+  addFacsimile: () => e.addFacsimile(v, cm),
+  resetDefault: () => {
     // we're in a clickhandler, so our storage object is out of scope
     // but we only need to clear it, so just grab the window's storage
     storage = window.localStorage;
@@ -1446,20 +1465,21 @@ export let cmd = {
     }
     logoutFromGithub();
   },
-  'openHelp': () => window.open(`./help`, '_blank'),
-  'consultGuidelines': () => consultGuidelines(),
-  'escapeKeyPressed': () => {
+  openHelp: () => window.open(`./help`, '_blank'),
+  consultGuidelines: () => consultGuidelines(),
+  escapeKeyPressed: () => {
     // reset settings filter, if settings have focus
-    if (document.getElementById('settingsPanel') &&
-      document.getElementById('settingsPanel') ===
-      document.activeElement.closest('#settingsPanel')) {
+    if (
+      document.getElementById('settingsPanel') &&
+      document.getElementById('settingsPanel') === document.activeElement.closest('#settingsPanel')
+    ) {
       cmd.filterReset();
     } else {
       v.hideAlerts();
       v.toggleValidationReportVisibility('hidden');
       // TODO: close all other overlays too...
     }
-  }
+  },
 };
 
 // add event listeners when controls menu has been instantiated
@@ -1467,36 +1487,35 @@ function addEventListeners(v, cm) {
   let vp = document.getElementById('verovio-panel');
 
   // register global event listeners
-  let body = document.querySelector('body')
+  let body = document.querySelector('body');
   body.addEventListener('mousedown', (ev) => {
-    if (ev.target.matches("#alertMessage a")) {
+    if (ev.target.matches('#alertMessage a')) {
       // user clicked on link in message. Open link (before the DOM element disappears in the next conditional...)
-      window.open(ev.target.href, "_blank");
+      window.open(ev.target.href, '_blank');
     }
     if (ev.target.id !== 'alertOverlay' && ev.target.id !== 'alertMessage') {
       v.hideAlerts();
     }
   });
   body.addEventListener('keydown', (ev) => {
-    if (ev.key === 'Escape')
-      cmd.escapeKeyPressed();
+    if (ev.key === 'Escape') cmd.escapeKeyPressed();
   });
 
   // Register key handlers to #encoding rather than giving it to CodeMirror directly
   let enc = document.getElementById('encoding');
-  if (enc) enc.addEventListener('keydown', (ev) => {
-    // Ctrl-Shift-V or Cmd-Shift-V for validation
-    if (isCtrlOrCmd(ev) && ev.shiftKey && ev.key === 'v') {
-      ev.preventDefault();
-      cmd.validate();
-    }
-  });
+  if (enc)
+    enc.addEventListener('keydown', (ev) => {
+      // Ctrl-Shift-V or Cmd-Shift-V for validation
+      if (isCtrlOrCmd(ev) && ev.shiftKey && ev.key === 'v') {
+        ev.preventDefault();
+        cmd.validate();
+      }
+    });
 
   // file status file name display
   document.getElementById('fileName').addEventListener('input', cmd.fileNameChange);
-  document.getElementById('fileName').addEventListener('keydown', ev => {
-    if (ev.key === "Escape" || ev.key === "Enter")
-      ev.target.blur(); //remove focus
+  document.getElementById('fileName').addEventListener('keydown', (ev) => {
+    if (ev.key === 'Escape' || ev.key === 'Enter') ev.target.blur(); //remove focus
   });
 
   // layout notation position
@@ -1515,9 +1534,19 @@ function addEventListeners(v, cm) {
   document.getElementById('showSettingsButton').addEventListener('click', cmd.showSettingsPanel);
   document.getElementById('hideSettingsButton').addEventListener('click', cmd.hideSettingsPanel);
   document.getElementById('closeSettingsButton').addEventListener('click', cmd.hideSettingsPanel);
-  document.getElementById('filterSettings').addEventListener('input', cmd.filterSettings);
-  document.getElementById('filterSettings').value = "";
-  document.getElementById('filterReset').addEventListener('click', cmd.filterReset)
+    document.getElementById('filterSettings').addEventListener('input', cmd.filterSettings);
+  document.getElementById('filterSettings').value = '';
+  document.getElementById('filterReset').addEventListener('click', cmd.filterReset);
+  document
+    .getElementById('showMidiPlaybackControlBarButton')
+    .addEventListener('click', cmd.toggleMidiPlaybackControlBar);
+  document.getElementById('highlightCurrentlySoundingNotes')
+    .addEventListener('change', (e) => {
+      // clean up any currently highlighted notes when highlighting is turned off
+        if(!e.target.checked) {
+          document.querySelectorAll('.currently-playing').forEach(el => el.classList.remove('currently-playing'));
+        }
+    })
   document.getElementById('showAnnotationMenu').addEventListener('click', cmd.showAnnotationPanel);
   document.getElementById('showAnnotationsButton').addEventListener('click', cmd.toggleAnnotationPanel);
   document.getElementById('showFacsimileButton').addEventListener('click', cmd.toggleFacsimilePanel);
@@ -1525,7 +1554,7 @@ function addEventListeners(v, cm) {
   document.getElementById('hideAnnotationPanelButton').addEventListener('click', cmd.hideAnnotationPanel);
   document.getElementById('showFacsimileMenu').addEventListener('click', cmd.showFacsimilePanel);
   // re-apply settings filtering when switching settings tabs
-  document.querySelectorAll('#settingsPanel .tablink').forEach(t => t.addEventListener('click', cmd.filterSettings))
+  document.querySelectorAll('#settingsPanel .tablink').forEach((t) => t.addEventListener('click', cmd.filterSettings));
 
   // open dialogs
   document.getElementById('OpenMei').addEventListener('click', cmd.open);
@@ -1536,7 +1565,7 @@ function addEventListeners(v, cm) {
   document.getElementById('ImportPae').addEventListener('click', cmd.openPae);
   document.getElementById('SaveMei').addEventListener('click', downloadMei);
   document.getElementById('SaveSvg').addEventListener('click', downloadSvg);
-  document.getElementById('SaveMidi').addEventListener('click', downloadMidi);
+  document.getElementById('SaveMidi').addEventListener('click', requestMidiFromVrvWorker);
 
   // edit dialogs
   document.getElementById('undo').addEventListener('click', cmd.undo);
@@ -1549,24 +1578,26 @@ function addEventListeners(v, cm) {
   document.getElementById('indentSelection').addEventListener('click', cmd.indentSelection);
   document.getElementById('jumpToLine').addEventListener('click', () => CodeMirror.commands.jumpToLine(cm));
   document.getElementById('manualValidate').addEventListener('click', cmd.validate);
-  document.querySelectorAll('.keyShortCut').forEach(e => e.classList.add(platform.startsWith('Mac') ? 'platform-mac' : 'platform-nonmac'));
+  document
+    .querySelectorAll('.keyShortCut')
+    .forEach((e) => e.classList.add(platform.startsWith('Mac') ? 'platform-mac' : 'platform-nonmac'));
 
   // open URL interface
   document.getElementById('openUrlButton').addEventListener('click', cmd.openUrlFetch);
   document.getElementById('openUrlCancel').addEventListener('click', cmd.openUrlCancel);
   document.getElementById('openUrlInput').addEventListener('input', (e) => {
-    e.target.classList.remove("warn");
-    document.getElementById("openUrlStatus").classList.remove("warn");
+    e.target.classList.remove('warn');
+    document.getElementById('openUrlStatus').classList.remove('warn');
   });
 
   // drag'n'drop handlers
   let fc = document.querySelector('.dragContainer');
   fc.addEventListener('drop', () => dropHandler(event));
   fc.addEventListener('dragover', () => dragOverHandler(event));
-  fc.addEventListener("dragenter", () => dragEnter(event));
-  fc.addEventListener("dragleave", () => dragLeave(event));
-  fc.addEventListener("dragstart", (ev) => console.log('Drag Start', ev));
-  fc.addEventListener("dragend", (ev) => console.log('Drag End', ev));
+  fc.addEventListener('dragenter', () => dragEnter(event));
+  fc.addEventListener('dragleave', () => dragLeave(event));
+  fc.addEventListener('dragstart', (ev) => console.log('Drag Start', ev));
+  fc.addEventListener('dragend', (ev) => console.log('Drag End', ev));
 
   // Zooming notation with buttons
   document.getElementById('decrease-scale-btn').addEventListener('click', cmd.zoomOut);
@@ -1574,7 +1605,7 @@ function addEventListeners(v, cm) {
   document.getElementById('verovio-zoom').addEventListener('input', cmd.zoomSlider);
 
   // Zooming notation with mouse wheel
-  vp.addEventListener('wheel', ev => {
+  vp.addEventListener('wheel', (ev) => {
     if (isCtrlOrCmd(ev)) {
       ev.preventDefault();
       ev.stopPropagation();
@@ -1589,7 +1620,7 @@ function addEventListeners(v, cm) {
 
   // Zooming facsimile with mouse wheel
   let ip = document.getElementById('facsimile-panel');
-  ip.addEventListener('wheel', ev => {
+  ip.addEventListener('wheel', (ev) => {
     if (isCtrlOrCmd(ev)) {
       ev.preventDefault();
       ev.stopPropagation();
@@ -1599,13 +1630,13 @@ function addEventListeners(v, cm) {
   });
 
   // facsimile full-page
-  document.getElementById('facsimile-full-page-checkbox').addEventListener('click', e => {
+  document.getElementById('facsimile-full-page-checkbox').addEventListener('click', (e) => {
     document.getElementById('showFacsimileFullPage').checked = e.target.checked;
     drawFacsimile();
   });
 
   // facsimile edit zones
-  document.getElementById('facsimile-edit-zones-checkbox').addEventListener('click', e => {
+  document.getElementById('facsimile-edit-zones-checkbox').addEventListener('click', (e) => {
     document.getElementById('editFacsimileZones').checked = e.target.checked;
     setOrientation(cm, '', '', -1, -1, v);
   });
@@ -1626,8 +1657,8 @@ function addEventListeners(v, cm) {
   document.getElementById('next-page-btn').addEventListener('click', cmd.nextPage);
   document.getElementById('last-page-btn').addEventListener('click', cmd.lastPage);
   // manual page entering
-  document.getElementById('pagination2').addEventListener('keydown', ev => manualCurrentPage(v, cm, ev));
-  document.getElementById('pagination2').addEventListener('blur', ev => manualCurrentPage(v, cm, ev));
+  document.getElementById('pagination2').addEventListener('keydown', (ev) => manualCurrentPage(v, cm, ev));
+  document.getElementById('pagination2').addEventListener('blur', (ev) => manualCurrentPage(v, cm, ev));
   // font selector
   document.getElementById('font-select').addEventListener('change', () => {
     document.getElementById('vrv-font').value = document.getElementById('font-select').value;
@@ -1638,7 +1669,7 @@ function addEventListeners(v, cm) {
     if (storage && storage.supported) storage.breaks = ev.srcElement.value;
     v.pageSpanners = {
       start: {},
-      end: {}
+      end: {},
     };
     v.updateAll(cm, {}, v.selectedElements[0]);
   });
@@ -1712,8 +1743,7 @@ function addEventListeners(v, cm) {
   document.getElementById('toggleSpicc').addEventListener('click', cmd.toggleSpicc);
 
   // consult guidelines
-  document.getElementById('consultGuidelines')
-    .addEventListener('click', cmd.consultGuidelines);
+  document.getElementById('consultGuidelines').addEventListener('click', cmd.consultGuidelines);
 
   // reset application
   document.getElementById('resetDefault').addEventListener('click', cmd.resetDefault);
@@ -1729,7 +1759,7 @@ function addEventListeners(v, cm) {
   // when activated, update notation location once
   let fl = document.getElementById('flip-checkbox');
   fl.addEventListener('change', () => {
-    if (fl.checked) v.cursorActivity(cm, true)
+    if (fl.checked) v.cursorActivity(cm, true);
   });
 
   // forkAndOpen cancel button
@@ -1746,14 +1776,14 @@ function addEventListeners(v, cm) {
   }); // cm.on() change listener
 
   // Editor font size zooming
-  document.getElementById('encoding').addEventListener('wheel', ev => {
+  document.getElementById('encoding').addEventListener('wheel', (ev) => {
     if (isCtrlOrCmd(ev)) {
       ev.preventDefault();
       ev.stopPropagation();
       v.changeEditorFontSize(Math.sign(ev.deltaY) * -5);
     }
   });
-  document.getElementById('encoding').addEventListener('keydown', ev => {
+  document.getElementById('encoding').addEventListener('keydown', (ev) => {
     if (isCtrlOrCmd(ev)) {
       if (ev.key === '-') {
         ev.preventDefault();
@@ -1789,12 +1819,15 @@ function addEventListeners(v, cm) {
     v.speedMode = ev.target.checked;
     if (storage && storage.supported) storage.speed = v.speedMode;
     handleSmartBreaksOption(v.speedMode);
-    if (v.speedMode && Object.keys(v.pageBreaks).length > 0)
-      v.pageCount = Object.keys(v.pageBreaks).length;
+    if (v.speedMode && Object.keys(v.pageBreaks).length > 0) v.pageCount = Object.keys(v.pageBreaks).length;
     // else
     //   v.pageBreaks = {};
     let sm = document.getElementById('toggleSpeedMode');
     if (sm) sm.checked = v.speedMode;
+    if (document.getElementById('showMidiPlaybackControlBar').checked) {
+      startMidiTimeout(true);
+      document.getElementById('midi-speedmode-indicator').style.display = v.speedMode ? 'inline' : 'none';
+    }
     v.updateAll(cm, {}, v.selectedElements[0]);
   });
 
@@ -1803,55 +1836,63 @@ function addEventListeners(v, cm) {
   addZoneDrawer();
 } // addEventListeners()
 
-
 // progress bar demo
 function moveProgressBar() {
-  var elem = document.querySelector(".progressbar");
+  var elem = document.querySelector('.progressbar');
   var width = 0; // % progress
   var id = setInterval(frame, 10);
 
   function frame() {
-    (width < 100) ? elem.style.width = (++width) + '%': clearInterval(id);
+    width < 100 ? (elem.style.width = ++width + '%') : clearInterval(id);
   }
 }
 
 // control progress bar progress/width (in percent)
 function setProgressBar(percentage) {
-  document.querySelector(".progressbar").style.width = percentage + '%';
+  document.querySelector('.progressbar').style.width = percentage + '%';
 }
 
 function updateStatusBar() {
-  document.querySelector(".statusbar").innerHTML =
-    meiFileName.substring(meiFileName.lastIndexOf("/") + 1) +
-    ", page " + v.currentPage + " of " +
-    ((v.pageCount < 0) ? '?' : v.pageCount) + " loaded.";
+  document.querySelector('.statusbar').innerHTML =
+    meiFileName.substring(meiFileName.lastIndexOf('/') + 1) +
+    ', page ' +
+    v.currentPage +
+    ' of ' +
+    (v.pageCount < 0 ? '?' : v.pageCount) +
+    ' loaded.';
 }
 
 function updateHtmlTitle() {
   document.querySelector('head > title').innerHTML = 'mei-friend: ' +
-    meiFileName.substring(meiFileName.lastIndexOf("/") + 1);
+    meiFileName.substring(meiFileName.lastIndexOf('/') + 1);
+}
+
+function drawLeftFooter() {
+  let lf = document.querySelector('.leftfoot');
+  lf.innerHTML = envMsg;
 }
 
 function drawRightFooter() {
-  let rf = document.querySelector(".rightfoot");
+  let rf = document.querySelector('.rightfoot');
   rf.innerHTML =
     "<a href='https://github.com/mei-friend/mei-friend' target='_blank'>mei-friend " +
     (env === environments.production ? version : `${env}-${version}`) +
-    "</a> (" + versionDate + ").&nbsp;";
+    '</a> (' +
+    versionDate +
+    ').&nbsp;';
   if (tkVersion) {
     let githubUrl = 'https://github.com/rism-digital/verovio/releases/tag/version-' + tkVersion.split('-')[0];
-    if (tkVersion.includes("dev")) {
+    if (tkVersion.includes('dev')) {
       // current develop version, no release yet...
       githubUrl = 'https://github.com/rism-digital/verovio/tree/develop';
     }
-    rf.innerHTML +=
-      `&nbsp;<a href="${githubUrl}" target="_blank" title="${tkUrl}">Verovio ${tkVersion}</a>.`;
+    rf.innerHTML += `&nbsp;<a href="${githubUrl}" target="_blank" title="${tkUrl}">Verovio ${tkVersion}</a>.`;
   }
 }
 
 // handles any changes in CodeMirror
 export function handleEditorChanges() {
-  const commitUI = document.querySelector("#commitUI");
+  const commitUI = document.querySelector('#commitUI');
   let changeIndicator = false;
   let meiXml = cm.getValue();
   if (isLoggedIn && github.filepath && commitUI) {
@@ -1873,48 +1914,54 @@ export function handleEditorChanges() {
     // on every set of changes, save editor content
     updateLocalStorage(meiXml);
   }
-  readAnnots(); // from annotation.js
+  if (document.getElementById('showAnnotations').checked || document.getElementById('showAnnotationPanel').checked) {
+    readAnnots(); // from annotation.js
+  }
+  if (document.getElementById('showMidiPlaybackControlBar').checked) {
+    // start a new time-out to midi-rerender
+    startMidiTimeout(true);
+  }
 } // handleEditorChanges()
 
 export function log(s, code = null) {
-  s += "<div>"
+  s += '<div>';
   if (code) {
-    s += " Error Code: " + code + "<br/>";
+    s += ' Error Code: ' + code + '<br/>';
     s += `<a id="bugReport" target="_blank" href="https://github.com/mei-friend/mei-friend/issues/new?assignees=&labels=&template=bug_report.md&title=Error ${code}">Submit bug report</a>`;
     v.showAlert(s, 'error', 30000);
   } else {
     s += `<a id="bugReport" target="_blank" href="https://github.com/mei-friend/mei-friend/issues/new?assignees=&labels=&template=bug_report.md">Submit bug report</a>`;
     v.showAlert(s, 'warning', 30000);
   }
-  s += "</div>"
-  document.querySelector(".statusbar").innerHTML = s;
-  document.getElementById("verovio-panel").innerHTML = s;
+  s += '</div>';
+  document.querySelector('.statusbar').innerHTML = s;
+  document.getElementById('verovio-panel').innerHTML = s;
   console.log(s);
 }
 
 function fillInSampleEncodings() {
   fetch(sampleEncodingsCSV, {
-      headers: {
-        'content-type': 'text/csv'
-      }
-    })
+    headers: {
+      'content-type': 'text/csv',
+    },
+  })
     .then((response) => response.text())
     .then((csv) => {
-      const lines = csv.split("\n");
-      lines.forEach(l => {
+      const lines = csv.split('\n');
+      lines.forEach((l) => {
         if (l) {
-          const tuple = l.trim().split("|");
+          const tuple = l.trim().split('|');
           sampleEncodings.push([
             tuple[samp.URL],
             tuple[samp.ORG],
             tuple[samp.REPO],
             tuple[samp.FILE],
             tuple[samp.TITLE],
-            tuple[samp.COMPOSER]
-          ])
+            tuple[samp.COMPOSER],
+          ]);
         }
-      })
-    })
+      });
+    });
 }
 
 // sets keyMap.json to target element and defines listeners
@@ -1962,7 +2009,16 @@ function setKeyMap(keyMapFilePath) {
 
 // returns true, if event is a CMD (Mac) or a CTRL (Windows, Linux) event
 export function isCtrlOrCmd(ev) {
-  return ev ?
-    ((platform.startsWith('mac') && ev.metaKey) || (!platform.startsWith('mac') && ev.ctrlKey)) :
-    false;
+  return ev ? (platform.startsWith('mac') && ev.metaKey) || (!platform.startsWith('mac') && ev.ctrlKey) : false;
+}
+
+function midiDataToBlob(data) {
+  const byteCharacters = atob(data);
+  const byteNumbers = new Array(byteCharacters.length);
+  for (let i = 0; i < byteCharacters.length; i++) {
+    byteNumbers[i] = byteCharacters.charCodeAt(i);
+  }
+  return new Blob([new Uint8Array(byteNumbers)], {
+    type: 'audio/midi',
+  });
 }
