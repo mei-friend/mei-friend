@@ -1,5 +1,12 @@
 # mei-friend-online CHANGELOG.md
 
+### 0.8.0 MIDI playback
+* Add MIDI playback control bar and settings
+* Implement playback using html-midi-player
+* Support configurable automatic page-following during playback
+* Support configurable highlighting of currently-sounding notes
+* Modification to getPageWithElement to work with and without speedmode
+* Modularise and adapt left footer message
 ### 0.7.1
 * Adding and removing xml:ids to and from encoding done natively inside mei-friend
 * Bug fixes: Reduce processing time while indenting code; sync tabSize & indentUnit

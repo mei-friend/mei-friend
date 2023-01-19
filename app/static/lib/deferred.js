@@ -3,10 +3,10 @@
  * (author: Laurent Pugin)
  */
 export class Deferred {
-    constructor() {
-        this.promise = new Promise((resolve, reject) => {
-            this.reject = reject
-            this.resolve = resolve
-        });
-    }
+  constructor() {
+    this.promise = new Promise((resolve, reject) => {
+      this.reject = reject;
+      this.resolve = resolve;
+    });
+  }
 }
