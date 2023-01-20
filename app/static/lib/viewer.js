@@ -520,9 +520,9 @@ export default class Viewer {
   }
 
   // Scroll notation SVG into view, both vertically and horizontally
-  scrollSvg(cm) {
+  scrollSvg(cmOrId) {
     let vp = document.getElementById('verovio-panel');
-    let id = utils.getElementIdAtCursor(cm);
+    let id = typeof cmOrId === "string" ? cmOrId : utils.getElementIdAtCursor(cmOrId);
     if (!id) return;
     let el = document.querySelector('g#' + utils.escapeXmlId(id));
     if (el) {
@@ -530,7 +530,7 @@ export default class Viewer {
       let elRect = el.getBBox();
       var mx = el.getScreenCTM();
       // adjust scrolling only when element (close to or completely) outside
-      const closeToPerc = 0.1;
+      const closeToPerc = .3;
       let sx = mx.a * elRect.x + mx.c * elRect.y + mx.e;
       // kind-of page-wise flipping for x
       if (sx < vpRect.x + vpRect.width * closeToPerc) vp.scrollLeft -= vpRect.x + vpRect.width * (1 - closeToPerc) - sx;
@@ -539,7 +539,7 @@ export default class Viewer {
       // y flipping
       let sy = mx.b * elRect.x + mx.d * elRect.y + mx.f;
       if (sy < vpRect.y + vpRect.height * closeToPerc || sy > vpRect.y + vpRect.height * (1 - closeToPerc))
-        vp.scrollTop -= vpRect.y + vpRect.height / 2 - sy;
+        vp.scrollTop -= vpRect.y + vpRect.height / 3 - sy;
     }
   }
 
@@ -1026,6 +1026,12 @@ export default class Viewer {
         description: 'Show MIDI playback control bar',
         type: 'bool',
         default: false,
+      },
+      scrollFollowMidiPlayback: {
+        title: 'Scroll-follow MIDI playback',
+        description: 'Scroll notation panel to follow MIDI playback on current page',
+        type: 'bool',
+        default: true,
       },
       pageFollowMidiPlayback: {
         title: 'Page-follow MIDI playback',

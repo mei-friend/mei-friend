@@ -38,7 +38,9 @@ export function seekMidiPlaybackToTime(t) {
 export function highlightNotesAtMidiPlaybackTime(e) {
   let highlightCheckbox = document.getElementById('highlightCurrentlySoundingNotes');
   let pageFollowCheckbox = document.getElementById('pageFollowMidiPlayback');
-  if (highlightCheckbox.checked || pageFollowCheckbox.checked) {
+  let scrollFollowCheckbox = document.getElementById('scrollFollowMidiPlayback');
+  // Only if user has requested at least one of the features that track currently sounding notes...
+  if (highlightCheckbox.checked || scrollFollowMidiPlayback.checked || pageFollowCheckbox.checked) {
     const t = e.detail.note.startTime * 1000; // convert to milliseconds
     const currentlyHighlightedNotes = Array.from(document.querySelectorAll('g.note.currently-playing'));
     const firstNoteOnPage = document.querySelector('.note');
@@ -152,6 +154,16 @@ export function highlightNotesAtMidiPlaybackTime(e) {
             });
         }
       });
+      if(scrollFollowCheckbox.checked && closestTimemapTime && 'on' in closestTimemapTime) {
+        // find parent measure
+        let el = document.getElementById(closestTimemapTime['on'][0]);
+        let measure = el ? el.closest('.measure') : null;
+        if(measure) { 
+          // scroll to its ID
+          v.scrollSvg(measure.id);
+        }
+
+      }
     }
   }
 } // highlightNotesAtMidiPlaybackTime()
