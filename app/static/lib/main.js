@@ -1,6 +1,6 @@
 // mei-friend version and date
 export const version = '0.8.0';
-export const versionDate = '19 Jan 2023';
+export const versionDate = '20 Jan 2023';
 
 var vrvWorker;
 var spdWorker;
