@@ -522,24 +522,37 @@ export default class Viewer {
   // Scroll notation SVG into view, both vertically and horizontally
   scrollSvg(cmOrId) {
     let vp = document.getElementById('verovio-panel');
-    let id = typeof cmOrId === "string" ? cmOrId : utils.getElementIdAtCursor(cmOrId);
+    let id = typeof cmOrId === 'string' ? cmOrId : utils.getElementIdAtCursor(cmOrId);
     if (!id) return;
     let el = document.querySelector('g#' + utils.escapeXmlId(id));
     if (el) {
+      let changed = false;
+      let scrollLeft, scrollTop;
       let vpRect = vp.getBoundingClientRect();
       let elRect = el.getBBox();
       var mx = el.getScreenCTM();
       // adjust scrolling only when element (close to or completely) outside
-      const closeToPerc = .3;
-      let sx = mx.a * elRect.x + mx.c * elRect.y + mx.e;
+      const closeToPerc = 0.1;
+      let sx = mx.a * (elRect.x + elRect.width / 2) + mx.c * (elRect.y + elRect.height / 2) + mx.e;
       // kind-of page-wise flipping for x
-      if (sx < vpRect.x + vpRect.width * closeToPerc) vp.scrollLeft -= vpRect.x + vpRect.width * (1 - closeToPerc) - sx;
-      else if (sx > vpRect.x + vpRect.width * (1 - closeToPerc))
-        vp.scrollLeft -= vpRect.x + vpRect.width * closeToPerc - sx;
+      if (sx < vpRect.x + vpRect.width * closeToPerc) {
+        scrollLeft = vp.scrollLeft - (vpRect.x + vpRect.width * (1 - closeToPerc) - sx);
+        changed = true;
+      } else if (sx > vpRect.x + vpRect.width * (1 - closeToPerc)) {
+        scrollLeft = vp.scrollLeft - (vpRect.x + vpRect.width * closeToPerc - sx);
+        changed = true;
+      }
+
       // y flipping
-      let sy = mx.b * elRect.x + mx.d * elRect.y + mx.f;
-      if (sy < vpRect.y + vpRect.height * closeToPerc || sy > vpRect.y + vpRect.height * (1 - closeToPerc))
-        vp.scrollTop -= vpRect.y + vpRect.height / 3 - sy;
+      let sy = mx.b * (elRect.x + elRect.width / 2) + mx.d * (elRect.y + elRect.height / 2) + mx.f;
+      if (sy < vpRect.y + vpRect.height * closeToPerc || sy > vpRect.y + vpRect.height * (1 - closeToPerc)) {
+        scrollTop = vp.scrollTop - (vpRect.y + vpRect.height / 2 - sy);
+        changed = true;
+      }
+
+      if (changed) {
+        vp.scrollTo({ top: scrollTop, left: scrollLeft, behavior: 'smooth' });
+      }
     }
   }
 
