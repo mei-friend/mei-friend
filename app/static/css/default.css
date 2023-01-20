@@ -527,6 +527,7 @@ a:active {
   opacity: .6;
   border: 1px solid var(--dropdownBorderColor);
   cursor:pointer;
+  display: none;
 }
 
 .footer .midi-player-contextual:hover {
