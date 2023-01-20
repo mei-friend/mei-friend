@@ -2,6 +2,7 @@
 
 ### 0.8.1 patch
 * Support automatic scroll-following of midi playback (feature request by @annplaksin)
+* Improve scroll-to-element behavior (during playback and navigation)
 ## 0.8.0 MIDI playback
 * Add MIDI playback control bar and settings
 * Implement playback using html-midi-player
