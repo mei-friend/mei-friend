@@ -1,9 +1,11 @@
 # mei-friend-online CHANGELOG.md
 
-### 0.8.0 MIDI playback
+### 0.8.1 patch
+* Support automatic scroll-following of midi playback (feature request by @annplaksin)
+## 0.8.0 MIDI playback
 * Add MIDI playback control bar and settings
 * Implement playback using html-midi-player
-* Support configurable automatic scroll- and page-following during playback
+* Support configurable automatic page-following during playback
 * Support configurable highlighting of currently-sounding notes
 * Modification to getPageWithElement to work with and without speedmode
 * Modularise and adapt left footer message
