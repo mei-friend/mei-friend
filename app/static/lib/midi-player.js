@@ -7,6 +7,7 @@ let timemap;
 let timemapIdx = 0;
 let lastOnsetIdx = 0; // index in timemap of last onset
 let lastReportedTime = 0; // time (s) of last reported note fired (used to check slider shifts)
+let playbackOnLoad = false; // request immediate play on load
 
 export function seekMidiPlaybackToSelectionOrPage() {
   // on load, seek to first currently selected element (or first note on page)
@@ -33,6 +34,10 @@ export function seekMidiPlaybackToTime(t) {
   timemapIdx = 0;
   // close all highlighted notes
   unHighlightAllElements();
+  if(playbackOnLoad) { 
+    playbackOnLoad = false;
+    mp.start();
+  }
 } // seekMidiPlaybackToTime()
 
 export function highlightNotesAtMidiPlaybackTime(e) {
@@ -187,6 +192,10 @@ export function setTimemap(tm) {
 
 export function getTimemap() {
   return timemap;
+}
+
+export function requestPlaybackOnLoad() {
+  playbackOnLoad = true;
 }
 
 // close/unhighlight all midi-highlighted notes/graphical elements

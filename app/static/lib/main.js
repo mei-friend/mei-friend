@@ -172,9 +172,9 @@ import { setCursorToId } from './utils.js';
 import { getInMeasure, navElsSelector, getElementAtCursor } from './dom-utils.js';
 import { addDragSelector } from './drag-selector.js';
 import {
-  getTimemap,
   highlightNotesAtMidiPlaybackTime,
   mp,
+  requestPlaybackOnLoad,
   seekMidiPlaybackToSelectionOrPage,
   seekMidiPlaybackToTime,
   setTimemap,
@@ -1329,7 +1329,9 @@ export let cmd = {
     if (document.getElementById('showMidiPlaybackControlBar').checked) {
       // request MIDI rendering from Verovio worker
       requestMidiFromVrvWorker(null, true);
+      document.getElementById("midi-player-contextual").style.display = "none";
     } else {
+      document.getElementById("midi-player-contextual").style.display = "unset";
       if (mp.playing) {
         // stop player when control bar is closed
         mp.stop();
@@ -1540,6 +1542,12 @@ function addEventListeners(v, cm) {
   document
     .getElementById('showMidiPlaybackControlBarButton')
     .addEventListener('click', cmd.toggleMidiPlaybackControlBar);
+  document
+    .getElementById('midi-player-contextual')
+    .addEventListener('click', () => {
+      requestPlaybackOnLoad();
+      cmd.toggleMidiPlaybackControlBar();
+    })
   document.getElementById('highlightCurrentlySoundingNotes').addEventListener('change', (e) => {
     // clean up any currently highlighted notes when highlighting is turned off
     if (!e.target.checked) {

@@ -516,7 +516,7 @@ a:active {
   height: 20px;
 }
 
-.footer .midi-player-contextual {
+.footer #midi-player-contextual {
   position: fixed;
   bottom: 1.5em;
   left: 1em;
@@ -527,10 +527,9 @@ a:active {
   opacity: .6;
   border: 1px solid var(--dropdownBorderColor);
   cursor:pointer;
-  display: none;
 }
 
-.footer .midi-player-contextual:hover {
+.footer #midi-player-contextual:hover {
   background: var(--backgroundColor);
 }
 
