@@ -18,7 +18,8 @@
     altKey = 'ALT';
     cmdKey = 'CTRL';
     cmd2Key = 'ALT';
-    if (navigator.platform.startsWith('Mac')) {
+    let platform = (navigator?.userAgentData?.platform || navigator?.platform || 'unknown').toLowerCase();
+    if (platform.startsWith('Mac')) {
       cmdKey = "&#8984;"; // CMD
       cmd2Key = "&#8963;"; // CTRL
       cmdKey = 'CMD';

@@ -9,8 +9,8 @@ var mei;
 var breaksParam; // (string) the breaks parameter given through URL
 var pageParam; // (int) page parameter given through URL
 var selectParam; // (array) select ids given through multiple instances in URL
-export let platform = navigator.platform.toLowerCase(); // TODO
-// let platform = (navigator?.userAgentData?.platform || navigator?.platform || 'unknown').toLowerCase();
+// export let platform = navigator.platform.toLowerCase(); // TODO
+export let platform = (navigator?.userAgentData?.platform || navigator?.platform || 'unknown').toLowerCase();
 export const isSafari = !!navigator.userAgent.match(/Version\/[\d\.]+.*Safari/);
 
 // guidelines base URL, needed to construct element / attribute URLs
@@ -1221,7 +1221,7 @@ export function requestMidiFromVrvWorker(ev, requestTimemap = false) {
     mei: v.speedFilter(cm.getValue(), false), // exclude dummy measures in speed mode
     requestTimemap: requestTimemap,
     encodingChanged: v.encodingChanged,
-    speedMode: v.speedMode
+    speedMode: v.speedMode,
   };
   vrvWorker.postMessage(message);
 }
@@ -1330,13 +1330,13 @@ export let cmd = {
       // request MIDI rendering from Verovio worker
       requestMidiFromVrvWorker(null, true);
     } else {
-      if(mp.playing) { 
+      if (mp.playing) {
         // stop player when control bar is closed
         mp.stop();
       }
-      if(document.getElementById('highlightCurrentlySoundingNotes').checked) {
+      if (document.getElementById('highlightCurrentlySoundingNotes').checked) {
         // tidy up any highlighted notes when control bar is closed
-        document.querySelectorAll('.currently-playing').forEach(e => e.classList.remove('currently-playing'));
+        document.querySelectorAll('.currently-playing').forEach((e) => e.classList.remove('currently-playing'));
       }
     }
   },
@@ -1534,19 +1534,18 @@ function addEventListeners(v, cm) {
   document.getElementById('showSettingsButton').addEventListener('click', cmd.showSettingsPanel);
   document.getElementById('hideSettingsButton').addEventListener('click', cmd.hideSettingsPanel);
   document.getElementById('closeSettingsButton').addEventListener('click', cmd.hideSettingsPanel);
-    document.getElementById('filterSettings').addEventListener('input', cmd.filterSettings);
+  document.getElementById('filterSettings').addEventListener('input', cmd.filterSettings);
   document.getElementById('filterSettings').value = '';
   document.getElementById('filterReset').addEventListener('click', cmd.filterReset);
   document
     .getElementById('showMidiPlaybackControlBarButton')
     .addEventListener('click', cmd.toggleMidiPlaybackControlBar);
-  document.getElementById('highlightCurrentlySoundingNotes')
-    .addEventListener('change', (e) => {
-      // clean up any currently highlighted notes when highlighting is turned off
-        if(!e.target.checked) {
-          document.querySelectorAll('.currently-playing').forEach(el => el.classList.remove('currently-playing'));
-        }
-    })
+  document.getElementById('highlightCurrentlySoundingNotes').addEventListener('change', (e) => {
+    // clean up any currently highlighted notes when highlighting is turned off
+    if (!e.target.checked) {
+      document.querySelectorAll('.currently-playing').forEach((el) => el.classList.remove('currently-playing'));
+    }
+  });
   document.getElementById('showAnnotationMenu').addEventListener('click', cmd.showAnnotationPanel);
   document.getElementById('showAnnotationsButton').addEventListener('click', cmd.toggleAnnotationPanel);
   document.getElementById('showFacsimileButton').addEventListener('click', cmd.toggleFacsimilePanel);
@@ -1863,8 +1862,8 @@ function updateStatusBar() {
 }
 
 function updateHtmlTitle() {
-  document.querySelector('head > title').innerHTML = 'mei-friend: ' +
-    meiFileName.substring(meiFileName.lastIndexOf('/') + 1);
+  document.querySelector('head > title').innerHTML =
+    'mei-friend: ' + meiFileName.substring(meiFileName.lastIndexOf('/') + 1);
 }
 
 function drawLeftFooter() {
