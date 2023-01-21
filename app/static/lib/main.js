@@ -1331,7 +1331,9 @@ export let cmd = {
       requestMidiFromVrvWorker(null, true);
       document.getElementById("midi-player-contextual").style.display = "none";
     } else {
-      document.getElementById("midi-player-contextual").style.display = "unset";
+      if(document.getElementById('showMidiPlaybackContextualBubble').checked) { 
+        document.getElementById("midi-player-contextual").style.display = "block";
+      }
       if (mp.playing) {
         // stop player when control bar is closed
         mp.stop();
@@ -1542,6 +1544,17 @@ function addEventListeners(v, cm) {
   document
     .getElementById('showMidiPlaybackControlBarButton')
     .addEventListener('click', cmd.toggleMidiPlaybackControlBar);
+  document
+    .getElementById('showMidiPlaybackContextualBubble')
+    .addEventListener('click', (e) => { 
+      // if MIDI control bar not showing, update (show or hide) bubble
+      if(!document.getElementById('showMidiPlaybackControlBarButton').checked) {
+        if(e.target.checked)
+          document.getElementById('midi-player-contextual').style.display = "block";
+        else 
+          document.getElementById('midi-player-contextual').style.display = "none";
+      }
+    })
   document
     .getElementById('midi-player-contextual')
     .addEventListener('click', () => {
