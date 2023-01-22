@@ -80,6 +80,10 @@ export let isMEI; // is the currently edited file native MEI?
 export let fileChanged = false; // flag to track whether unsaved changes to file exist
 export const defaultVerovioVersion = 'latest'; // 'develop', '3.10.0'
 export let supportedVerovioVersions = {
+  // local: {
+  //   url: `${root}local/verovio-toolkit-hum.js`,
+  //   description: 'Locally compiled Verovio toolkit version for debugging',
+  // },
   develop: {
     url: 'https://www.verovio.org/javascript/develop/verovio-toolkit-wasm.js',
     description: 'Current Verovio develop version',
@@ -1329,10 +1333,10 @@ export let cmd = {
     if (document.getElementById('showMidiPlaybackControlBar').checked) {
       // request MIDI rendering from Verovio worker
       requestMidiFromVrvWorker(null, true);
-      document.getElementById("midi-player-contextual").style.display = "none";
+      document.getElementById('midi-player-contextual').style.display = 'none';
     } else {
-      if(document.getElementById('showMidiPlaybackContextualBubble').checked) { 
-        document.getElementById("midi-player-contextual").style.display = "block";
+      if (document.getElementById('showMidiPlaybackContextualBubble').checked) {
+        document.getElementById('midi-player-contextual').style.display = 'block';
       }
       if (mp.playing) {
         // stop player when control bar is closed
@@ -1541,26 +1545,24 @@ function addEventListeners(v, cm) {
   document.getElementById('filterSettings').addEventListener('input', cmd.filterSettings);
   document.getElementById('filterSettings').value = '';
   document.getElementById('filterReset').addEventListener('click', cmd.filterReset);
+  // MIDI playback button and top-left bubble
   document
     .getElementById('showMidiPlaybackControlBarButton')
     .addEventListener('click', cmd.toggleMidiPlaybackControlBar);
-  document
-    .getElementById('showMidiPlaybackContextualBubble')
-    .addEventListener('click', (e) => { 
-      // if MIDI control bar not showing, update (show or hide) bubble
-      if(!document.getElementById('showMidiPlaybackControlBarButton').checked) {
-        if(e.target.checked)
-          document.getElementById('midi-player-contextual').style.display = "block";
-        else 
-          document.getElementById('midi-player-contextual').style.display = "none";
+  document.getElementById('showMidiPlaybackContextualBubble').addEventListener('click', (e) => {
+    // if MIDI control bar not showing, update (show or hide) bubble
+    if (!document.getElementById('showMidiPlaybackControlBarButton').checked) {
+      if (e.target.checked) {
+        document.getElementById('midi-player-contextual').style.display = 'block';
+      } else {
+        document.getElementById('midi-player-contextual').style.display = 'none';
       }
-    })
-  document
-    .getElementById('midi-player-contextual')
-    .addEventListener('click', () => {
-      requestPlaybackOnLoad();
-      cmd.toggleMidiPlaybackControlBar();
-    })
+    }
+  });
+  document.getElementById('midi-player-contextual').addEventListener('click', () => {
+    requestPlaybackOnLoad();
+    cmd.toggleMidiPlaybackControlBar();
+  });
   document.getElementById('highlightCurrentlySoundingNotes').addEventListener('change', (e) => {
     // clean up any currently highlighted notes when highlighting is turned off
     if (!e.target.checked) {
