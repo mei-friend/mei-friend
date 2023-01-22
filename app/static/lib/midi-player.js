@@ -87,11 +87,11 @@ export function highlightNotesAtMidiPlaybackTime(e) {
         timemapIdx = 0;
       }
       lastReportedTime = t;
-      // let oldIdx = timemapIdx;
-      while (Math.round(timemap[timemapIdx].tstamp) < Math.round(t) && timemapIdx < timemap.length) {
+      // increment timemapIdx to current event, ignore 1-ms diff
+      while (Math.round(timemap[timemapIdx].tstamp) + 1 < Math.round(t) && timemapIdx < timemap.length) {
         timemapIdx++;
       }
-      // console.log('t: ' + t + '; tstamp: ' + timemap[timemapIdx].tstamp);
+      // console.log('timemap tstamp: ' + timemap[timemapIdx].tstamp + '; midi t: ' + t);
       closestTimemapTime = timemap[timemapIdx];
       // console.log('timemap index (old/new): ' + oldIdx + '/' + timemapIdx);
 
