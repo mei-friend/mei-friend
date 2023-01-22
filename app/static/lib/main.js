@@ -587,6 +587,9 @@ document.addEventListener('DOMContentLoaded', function () {
   // set up midi-player event listeners
   mp.addEventListener('note', (e) => highlightNotesAtMidiPlaybackTime(e));
   mp.addEventListener('load', seekMidiPlaybackToSelectionOrPage);
+  // decide whether to show MIDI playback shortcut (bubble), based on setting
+  document.getElementById('midi-player-contextual').style.display = 
+    document.getElementById('showMidiPlaybackContextualBubble').checked ? 'block' : 'none';
 
   let urlFileName = searchParams.get('file');
   // fork parameter: if true AND ?fileParam is set to a URL,
