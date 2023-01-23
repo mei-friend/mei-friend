@@ -1052,6 +1052,12 @@ export default class Viewer {
         type: 'bool',
         default: true,
       },
+      showMidiPlaybackContextualBubble: {
+        title: 'Show playback shortcut',
+        description: 'Causes a shortcut (bubble in bottom left corner; click to immediately start playback) to appear when the MIDI playback control bar is closed',
+        type: 'bool',
+        default: true
+      },
       highlightCurrentlySoundingNotes: {
         title: 'Highlight currently-sounding notes',
         description: 'Visually highlight currently-sounding notes in the notation panel during MIDI playback ',

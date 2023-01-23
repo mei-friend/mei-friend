@@ -516,27 +516,27 @@ a:active {
   height: 20px;
 }
 
-.footer .midi-player-contextual {
+.footer #midi-player-contextual {
   position: fixed;
   bottom: 1.5em;
   left: 1em;
   z-index: 100;
   background: var(--dropdownBackgroundColor);
+  fill: var(--textColor);
   border-radius: 100px;
   padding: 5px;
   opacity: .6;
   border: 1px solid var(--dropdownBorderColor);
   cursor:pointer;
-  display: none;
 }
 
-.footer .midi-player-contextual:hover {
+.footer #midi-player-contextual:hover {
   background: var(--backgroundColor);
 }
 
 .leftfoot {
   padding: 3px 6px;
-  min-width: 240px;
+  min-width: 250px;
 }
 
 .leftfoot #heart {

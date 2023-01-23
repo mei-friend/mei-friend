@@ -16,8 +16,6 @@
     "pageup": "previousPage",
     "home": "firstPage",
     "end": "lastPage",
-    "space": "nextPage",
-    "shift-space": "previousPage",
 
     "s": "addSlur",
     "ctrl-s": "addSlurBelow",
@@ -70,7 +68,9 @@
 
     "escape": "escapeKeyPressed",
 
-    "shift-alt-f": "indentSelection"
+    "shift-alt-f": "indentSelection",
+
+    "space": "playPauseMidiPlayback"
   },
 
   ".platform-darwin": {

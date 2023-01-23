@@ -1,6 +1,7 @@
 import * as icon from './../css/icons.js';
 import {
-  fontList
+  fontList,
+  platform
 } from './main.js';
 import {
   svgNameSpace
@@ -583,7 +584,7 @@ export function addModifyerKeys(root) {
     }, // CTRL
   }
   // MAC key mapping
-  if (navigator.platform.startsWith('Mac')) {
+  if (platform.startsWith('Mac')) {
     modifierKeys.cmdKey = {
       symbol: "&#8984;",
       text: 'Cmd',

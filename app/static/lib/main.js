@@ -1,6 +1,6 @@
 // mei-friend version and date
-export const version = '0.8.1';
-export const versionDate = '20 Jan 2023';
+export const version = '0.8.2';
+export const versionDate = '23 Jan 2023';
 
 var vrvWorker;
 var spdWorker;
@@ -9,8 +9,8 @@ var mei;
 var breaksParam; // (string) the breaks parameter given through URL
 var pageParam; // (int) page parameter given through URL
 var selectParam; // (array) select ids given through multiple instances in URL
-export let platform = navigator.platform.toLowerCase(); // TODO
-// let platform = (navigator?.userAgentData?.platform || navigator?.platform || 'unknown').toLowerCase();
+// export let platform = navigator.platform.toLowerCase(); // TODO
+export let platform = (navigator?.userAgentData?.platform || navigator?.platform || 'unknown').toLowerCase();
 export const isSafari = !!navigator.userAgent.match(/Version\/[\d\.]+.*Safari/);
 
 // guidelines base URL, needed to construct element / attribute URLs
@@ -80,6 +80,10 @@ export let isMEI; // is the currently edited file native MEI?
 export let fileChanged = false; // flag to track whether unsaved changes to file exist
 export const defaultVerovioVersion = 'latest'; // 'develop', '3.10.0'
 export let supportedVerovioVersions = {
+  // local: {
+  //   url: `${root}local/verovio-toolkit-hum.js`,
+  //   description: 'Locally compiled Verovio toolkit version for debugging',
+  // },
   develop: {
     url: 'https://www.verovio.org/javascript/develop/verovio-toolkit-wasm.js',
     description: 'Current Verovio develop version',
@@ -172,9 +176,9 @@ import { setCursorToId } from './utils.js';
 import { getInMeasure, navElsSelector, getElementAtCursor } from './dom-utils.js';
 import { addDragSelector } from './drag-selector.js';
 import {
-  getTimemap,
   highlightNotesAtMidiPlaybackTime,
   mp,
+  requestPlaybackOnLoad,
   seekMidiPlaybackToSelectionOrPage,
   seekMidiPlaybackToTime,
   setTimemap,
@@ -583,6 +587,9 @@ document.addEventListener('DOMContentLoaded', function () {
   // set up midi-player event listeners
   mp.addEventListener('note', (e) => highlightNotesAtMidiPlaybackTime(e));
   mp.addEventListener('load', seekMidiPlaybackToSelectionOrPage);
+  // decide whether to show MIDI playback shortcut (bubble), based on setting
+  document.getElementById('midi-player-contextual').style.display = 
+    document.getElementById('showMidiPlaybackContextualBubble').checked ? 'block' : 'none';
 
   let urlFileName = searchParams.get('file');
   // fork parameter: if true AND ?fileParam is set to a URL,
@@ -1221,7 +1228,7 @@ export function requestMidiFromVrvWorker(ev, requestTimemap = false) {
     mei: v.speedFilter(cm.getValue(), false), // exclude dummy measures in speed mode
     requestTimemap: requestTimemap,
     encodingChanged: v.encodingChanged,
-    speedMode: v.speedMode
+    speedMode: v.speedMode,
   };
   vrvWorker.postMessage(message);
 }
@@ -1329,14 +1336,18 @@ export let cmd = {
     if (document.getElementById('showMidiPlaybackControlBar').checked) {
       // request MIDI rendering from Verovio worker
       requestMidiFromVrvWorker(null, true);
+      document.getElementById('midi-player-contextual').style.display = 'none';
     } else {
-      if(mp.playing) { 
+      if (document.getElementById('showMidiPlaybackContextualBubble').checked) {
+        document.getElementById('midi-player-contextual').style.display = 'block';
+      }
+      if (mp.playing) {
         // stop player when control bar is closed
         mp.stop();
       }
-      if(document.getElementById('highlightCurrentlySoundingNotes').checked) {
+      if (document.getElementById('highlightCurrentlySoundingNotes').checked) {
         // tidy up any highlighted notes when control bar is closed
-        document.querySelectorAll('.currently-playing').forEach(e => e.classList.remove('currently-playing'));
+        document.querySelectorAll('.currently-playing').forEach((e) => e.classList.remove('currently-playing'));
       }
     }
   },
@@ -1477,9 +1488,25 @@ export let cmd = {
     } else {
       v.hideAlerts();
       v.toggleValidationReportVisibility('hidden');
+      // hide midi playback control bar if it was open 
+      if(document.getElementById('showMidiPlaybackControlBar').checked) {
+        cmd.toggleMidiPlaybackControlBar();
+      }
       // TODO: close all other overlays too...
     }
   },
+  playPauseMidiPlayback: () => {
+    if(document.getElementById("showMidiPlaybackControlBar").checked) {
+      if(mp.playing) { 
+        mp.stop();
+      } else { 
+        mp.start();
+      }
+    } else { 
+      requestPlaybackOnLoad();
+      cmd.toggleMidiPlaybackControlBar();
+    }
+  }
 };
 
 // add event listeners when controls menu has been instantiated
@@ -1534,19 +1561,33 @@ function addEventListeners(v, cm) {
   document.getElementById('showSettingsButton').addEventListener('click', cmd.showSettingsPanel);
   document.getElementById('hideSettingsButton').addEventListener('click', cmd.hideSettingsPanel);
   document.getElementById('closeSettingsButton').addEventListener('click', cmd.hideSettingsPanel);
-    document.getElementById('filterSettings').addEventListener('input', cmd.filterSettings);
+  document.getElementById('filterSettings').addEventListener('input', cmd.filterSettings);
   document.getElementById('filterSettings').value = '';
   document.getElementById('filterReset').addEventListener('click', cmd.filterReset);
+  // MIDI playback button and top-left bubble
   document
     .getElementById('showMidiPlaybackControlBarButton')
     .addEventListener('click', cmd.toggleMidiPlaybackControlBar);
-  document.getElementById('highlightCurrentlySoundingNotes')
-    .addEventListener('change', (e) => {
-      // clean up any currently highlighted notes when highlighting is turned off
-        if(!e.target.checked) {
-          document.querySelectorAll('.currently-playing').forEach(el => el.classList.remove('currently-playing'));
-        }
-    })
+  document.getElementById('showMidiPlaybackContextualBubble').addEventListener('click', (e) => {
+    // if MIDI control bar not showing, update (show or hide) bubble
+    if (!document.getElementById('showMidiPlaybackControlBarButton').checked) {
+      if (e.target.checked) {
+        document.getElementById('midi-player-contextual').style.display = 'block';
+      } else {
+        document.getElementById('midi-player-contextual').style.display = 'none';
+      }
+    }
+  });
+  document.getElementById('midi-player-contextual').addEventListener('click', () => {
+    requestPlaybackOnLoad();
+    cmd.toggleMidiPlaybackControlBar();
+  });
+  document.getElementById('highlightCurrentlySoundingNotes').addEventListener('change', (e) => {
+    // clean up any currently highlighted notes when highlighting is turned off
+    if (!e.target.checked) {
+      document.querySelectorAll('.currently-playing').forEach((el) => el.classList.remove('currently-playing'));
+    }
+  });
   document.getElementById('showAnnotationMenu').addEventListener('click', cmd.showAnnotationPanel);
   document.getElementById('showAnnotationsButton').addEventListener('click', cmd.toggleAnnotationPanel);
   document.getElementById('showFacsimileButton').addEventListener('click', cmd.toggleFacsimilePanel);
@@ -1863,8 +1904,8 @@ function updateStatusBar() {
 }
 
 function updateHtmlTitle() {
-  document.querySelector('head > title').innerHTML = 'mei-friend: ' +
-    meiFileName.substring(meiFileName.lastIndexOf('/') + 1);
+  document.querySelector('head > title').innerHTML =
+    'mei-friend: ' + meiFileName.substring(meiFileName.lastIndexOf('/') + 1);
 }
 
 function drawLeftFooter() {

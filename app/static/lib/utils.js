@@ -601,10 +601,6 @@ export function attrAsElements(xmlNote) {
   return xmlNote;
 }
 
-export function getOS() {
-  return navigator.userAgentData.platform;
-}
-
 // accepts color as string: "rgb(100,12,255)" and hex string "#ffee10" or
 export function brighter(rgbString, deltaPercent, alpha = 1) {
   let rgb = [];
