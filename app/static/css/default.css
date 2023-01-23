@@ -522,6 +522,7 @@ a:active {
   left: 1em;
   z-index: 100;
   background: var(--dropdownBackgroundColor);
+  fill: var(--textColor);
   border-radius: 100px;
   padding: 5px;
   opacity: .6;
