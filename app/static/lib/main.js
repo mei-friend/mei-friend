@@ -1488,9 +1488,25 @@ export let cmd = {
     } else {
       v.hideAlerts();
       v.toggleValidationReportVisibility('hidden');
+      // hide midi playback control bar if it was open 
+      if(document.getElementById('showMidiPlaybackControlBar').checked) {
+        cmd.toggleMidiPlaybackControlBar();
+      }
       // TODO: close all other overlays too...
     }
   },
+  playPauseMidiPlayback: () => {
+    if(document.getElementById("showMidiPlaybackControlBar").checked) {
+      if(mp.playing) { 
+        mp.stop();
+      } else { 
+        mp.start();
+      }
+    } else { 
+      requestPlaybackOnLoad();
+      cmd.toggleMidiPlaybackControlBar();
+    }
+  }
 };
 
 // add event listeners when controls menu has been instantiated

@@ -68,7 +68,9 @@
 
     "escape": "escapeKeyPressed",
 
-    "shift-alt-f": "indentSelection"
+    "shift-alt-f": "indentSelection",
+
+    "space": "playPauseMidiPlayback"
   },
 
   ".platform-darwin": {
