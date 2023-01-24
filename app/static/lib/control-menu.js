@@ -338,12 +338,12 @@ export function createNotationControlBar(parentElement, scale) {
   speedDiv.classList.add('controls');
 
   let speedLabel = document.createElement('label');
-  speedLabel.innerText = 'Speedmode:';
+  speedLabel.innerText = 'Speed mode:';
   speedLabel.id = 'speed-label';
   speedLabel.classList.add('label');
   speedDiv.appendChild(speedLabel);
   speedLabel.title =
-    `In Speedmode, only the current page
+    `In speed mode, only the current page
      is sent to Verovio to reduce rendering
      time with large files`;
 
@@ -352,7 +352,7 @@ export function createNotationControlBar(parentElement, scale) {
   speedCheckbox.setAttribute('type', 'checkbox');
   speedCheckbox.setAttribute('checked', 'false');
   speedCheckbox.classList.add('checkbox');
-  speedCheckbox.title = 'Activate speedmode';
+  speedCheckbox.title = 'Activate speed mode';
   speedLabel.setAttribute('for', speedCheckbox.id);
   speedCheckbox.checked = true;
   speedCheckbox.disabled = false;
@@ -429,7 +429,7 @@ export function createFacsimileControlBar(parentElement) {
   fullPageCheckbox.id = 'facsimile-full-page-checkbox';
   fullPageCheckbox.setAttribute('type', 'checkbox');
   fullPageCheckbox.classList.add('checkbox');
-  fullPageCheckbox.title = 'Activate speedmode';
+  fullPageCheckbox.title = 'Activate speed mode';
   fullPageLabel.setAttribute('for', fullPageCheckbox.id);
   fullPageCheckbox.checked = false;
   fullPageCheckbox.disabled = false;

@@ -1,6 +1,6 @@
 /*
  * Worker to pre-compute time-spanning elements per page for accelerating
- * interaction in speedMode.
+ * interaction in speed mode.
  *
  * We use tXml by Tobias Nickel to parse the MEI encoding and recursive
  * operations for traversing the DOM structure.

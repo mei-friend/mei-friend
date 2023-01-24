@@ -1855,7 +1855,7 @@ function addEventListeners(v, cm) {
     if (ch.checked) v.notationUpdated(cm, true);
   });
 
-  // speedmode checkbox
+  // speed mode checkbox
   document.getElementById('speed-checkbox').addEventListener('change', (ev) => {
     v.speedMode = ev.target.checked;
     if (storage && storage.supported) storage.speed = v.speedMode;

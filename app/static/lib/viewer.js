@@ -900,10 +900,10 @@ export default class Viewer {
         }),
       },
       toggleSpeedMode: {
-        title: 'Speedmode',
+        title: 'Speed mode',
         description:
           'Toggle Verovio Speed Mode. ' +
-          'In Speedmode, only the current page ' +
+          'In speed mode, only the current page ' +
           'is sent to Verovio to reduce rendering ' +
           'time with large files',
         type: 'bool',

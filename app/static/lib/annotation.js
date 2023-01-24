@@ -171,7 +171,7 @@ export function situateAnnotations() {
       if (a.firstPage < 0 && v.speedMode) {
         if (v.xmlDoc.querySelector('[*|id=' + a.selection[0] + ']')?.closest('meiHead')) a.firstPage = 'meiHead';
         else console.warn('Cannot locate annotation ', a);
-      } else { // if not speedmode, asynchronous return of page numbers after we are finished here
+      } else { // if not speed mode, asynchronous return of page numbers after we are finished here
         const annotationLocationLabelElement = document.querySelector(`.annotationLocationLabel[data-id=${a.id}`);
         if (annotationLocationLabelElement) {
           annotationLocationLabelElement.innerHTML = generateAnnotationLocationLabel(a).innerHTML;

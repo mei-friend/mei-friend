@@ -847,7 +847,7 @@ export async function getPageWithElement(xmlDoc, breaks, id, breaksOption) {
   switch (breaksOption) {
     case 'none':
       return page;
-    // for speedMode: selector for all last measures and requested id
+    // for speed mode: selector for all last measures and requested id
     case 'auto':
       if (!Array.isArray(breaks) && Object.keys(breaks).length > 0) {
         for (const br of Object.values(breaks)) {
