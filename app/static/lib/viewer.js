@@ -42,7 +42,8 @@ export default class Viewer {
     this.speedMode = true; // speed mode (just feeds on page to Verovio to reduce drawing time)
     this.parser = new DOMParser();
     this.xmlDoc;
-    this.xmlDocOutdated = true; // to recalculate DOM or pageLists
+    this.xmlDocOutdated = true; // to limit recalculation of DOM or pageLists
+    this.toolkitDataOutdated = true; // to control re-loading of toolkit data in the worker
     this.pageBreaks = {}; // object of page number and last measure id '1': 'measure-000423', ...
     this.pageSpanners = {
       // object storing all time-spannind elements spanning across pages
@@ -122,7 +123,7 @@ export default class Viewer {
         this.vrvWorker.postMessage(message);
       } else {
         // speed mode
-        if (this.xmlDocOutdated) this.loadXml(cm.getValue());
+        this.loadXml(cm.getValue());
         if (xmlId) {
           speed
             .getPageWithElement(this.xmlDoc, this.breaksValue(), xmlId, this.breaksSelect.value)
@@ -560,6 +561,7 @@ export default class Viewer {
   notationUpdated(cm, forceUpdate = false) {
     // console.log('NotationUpdated forceUpdate:' + forceUpdate);
     this.xmlDocOutdated = true;
+    this.toolkitDataOutdated = true;
     if (!isSafari) this.checkSchema(cm.getValue());
     let ch = document.getElementById('live-update-checkbox');
     if ((this.updateNotation && ch && ch.checked) || forceUpdate) {

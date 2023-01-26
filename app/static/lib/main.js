@@ -588,8 +588,11 @@ document.addEventListener('DOMContentLoaded', function () {
   mp.addEventListener('note', (e) => highlightNotesAtMidiPlaybackTime(e));
   mp.addEventListener('load', seekMidiPlaybackToSelectionOrPage);
   // decide whether to show MIDI playback shortcut (bubble), based on setting
-  document.getElementById('midi-player-contextual').style.display = 
-    document.getElementById('showMidiPlaybackContextualBubble').checked ? 'block' : 'none';
+  document.getElementById('midi-player-contextual').style.display = document.getElementById(
+    'showMidiPlaybackContextualBubble'
+  ).checked
+    ? 'block'
+    : 'none';
 
   let urlFileName = searchParams.get('file');
   // fork parameter: if true AND ?fileParam is set to a URL,
@@ -890,6 +893,9 @@ async function vrvWorkerEventsHandler(ev) {
       //v.busy(false);
       break;
     case 'updated': // display SVG data on site
+      if ('toolkitDataOutdated' in ev.data) {
+        v.toolkitDataOutdated = ev.data.toolkitDataOutdated;
+      }
       if (ev.data.mei) {
         // from reRenderMEI
         v.updateNotation = false;
@@ -911,18 +917,24 @@ async function vrvWorkerEventsHandler(ev) {
         ss.style.display = 'none';
       }
       let bs = document.getElementById('breaks-select').value;
-      if (ev.data.pageCount && !v.speedMode) v.pageCount = ev.data.pageCount;
-      else if (bs === 'none') v.pageCount = 1;
-      else if (v.speedMode && bs === 'auto' && Object.keys(v.pageBreaks).length > 0)
+      if (ev.data.pageCount && !v.speedMode) {
+        v.pageCount = ev.data.pageCount;
+      } else if (bs === 'none') {
+        v.pageCount = 1;
+      } else if (v.speedMode && bs === 'auto' && Object.keys(v.pageBreaks).length > 0) {
         v.pageCount = Object.keys(v.pageBreaks).length;
+      }
       // update only if still same page
       if (v.currentPage === ev.data.pageNo || ev.data.forceUpdate || ev.data.computePageBreaks) {
-        if (ev.data.forceUpdate) v.currentPage = ev.data.pageNo;
+        if (ev.data.forceUpdate) {
+          v.currentPage = ev.data.pageNo;
+        }
         updateStatusBar();
         updateHtmlTitle();
         document.getElementById('verovio-panel').innerHTML = ev.data.svg;
-        if (document.getElementById('showFacsimilePanel') && document.getElementById('showFacsimilePanel').checked)
+        if (document.getElementById('showFacsimilePanel') && document.getElementById('showFacsimilePanel').checked) {
           await drawFacsimile();
+        }
         if (ev.data.setCursorToPageBeginning) v.setCursorToPageBeginning(cm);
         v.updatePageNumDisplay();
         v.addNotationEventListeners(cm);
@@ -930,9 +942,14 @@ async function vrvWorkerEventsHandler(ev) {
         refreshAnnotations(false);
         v.scrollSvg(cm);
       }
-      if (!'setFocusToVerovioPane' in ev.data || ev.data.setFocusToVerovioPane) v.setFocusToVerovioPane();
-      if (ev.data.computePageBreaks) v.computePageBreaks(cm);
-      else v.busy(false);
+      if (!'setFocusToVerovioPane' in ev.data || ev.data.setFocusToVerovioPane) {
+        v.setFocusToVerovioPane();
+      }
+      if (ev.data.computePageBreaks) {
+        v.computePageBreaks(cm);
+      } else {
+        v.busy(false);
+      }
       break;
     case 'navigatePage': // resolve navigation with page turning
       updateStatusBar();
@@ -1227,7 +1244,7 @@ export function requestMidiFromVrvWorker(ev, requestTimemap = false) {
     options: v.vrvOptions,
     mei: v.speedFilter(cm.getValue(), false), // exclude dummy measures in speed mode
     requestTimemap: requestTimemap,
-    xmlDocOutdated: v.xmlDocOutdated,
+    toolkitDataOutdated: v.toolkitDataOutdated,
     speedMode: v.speedMode,
   };
   vrvWorker.postMessage(message);
@@ -1488,25 +1505,25 @@ export let cmd = {
     } else {
       v.hideAlerts();
       v.toggleValidationReportVisibility('hidden');
-      // hide midi playback control bar if it was open 
-      if(document.getElementById('showMidiPlaybackControlBar').checked) {
+      // hide midi playback control bar if it was open
+      if (document.getElementById('showMidiPlaybackControlBar').checked) {
         cmd.toggleMidiPlaybackControlBar();
       }
       // TODO: close all other overlays too...
     }
   },
   playPauseMidiPlayback: () => {
-    if(document.getElementById("showMidiPlaybackControlBar").checked) {
-      if(mp.playing) { 
+    if (document.getElementById('showMidiPlaybackControlBar').checked) {
+      if (mp.playing) {
         mp.stop();
-      } else { 
+      } else {
         mp.start();
       }
-    } else { 
+    } else {
       requestPlaybackOnLoad();
       cmd.toggleMidiPlaybackControlBar();
     }
-  }
+  },
 };
 
 // add event listeners when controls menu has been instantiated
