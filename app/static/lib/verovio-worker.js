@@ -110,7 +110,6 @@ addEventListener(
             result.pageNo = Math.max(1, parseInt(tk.getPageWithElement(result.xmlId)));
             result.setCursorToPageBeginning = false;
             result.forceUpdate = true;
-            result.withMidiSeek = result.true;
           }
           result.svg = tk.renderToSVG(result.pageNo);
           result.cmd = 'updated';

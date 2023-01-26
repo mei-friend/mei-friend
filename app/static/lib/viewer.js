@@ -1728,7 +1728,9 @@ export default class Viewer {
         if (opt === 'vrv-font') {
           document.getElementById('font-select').value = value;
         } else if (opt.startsWith('vrv-midi')) {
-          startMidiTimeout(true);
+          if (document.getElementById('showMidiPlaybackControlBar').checked) {
+            startMidiTimeout(true);
+          }
           return; // skip updating notation when midi options changed
         }
         this.updateLayout(this.vrvOptions);
@@ -1741,6 +1743,9 @@ export default class Viewer {
           this.addVrvOptionsToSettingsPanel(tkAvailableOptions, defaultVrvOptions, false);
           this.updateLayout(this.vrvOptions);
           this.applySettingsFilter();
+          if (document.getElementById('showMidiPlaybackControlBar').checked) {
+            startMidiTimeout(true);
+          }
         }
       });
     }
