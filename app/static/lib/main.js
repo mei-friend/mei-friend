@@ -942,6 +942,9 @@ async function vrvWorkerEventsHandler(ev) {
         refreshAnnotations(false);
         v.scrollSvg(cm);
       }
+      if (mp.playing) {
+        highlightNotesAtMidiPlaybackTime();
+      }
       if (!'setFocusToVerovioPane' in ev.data || ev.data.setFocusToVerovioPane) {
         v.setFocusToVerovioPane();
       }
