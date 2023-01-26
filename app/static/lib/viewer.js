@@ -42,7 +42,7 @@ export default class Viewer {
     this.speedMode = true; // speed mode (just feeds on page to Verovio to reduce drawing time)
     this.parser = new DOMParser();
     this.xmlDoc;
-    this.encodingHasChanged = true; // to recalculate DOM or pageLists
+    this.xmlDocOutdated = true; // to recalculate DOM or pageLists
     this.pageBreaks = {}; // object of page number and last measure id '1': 'measure-000423', ...
     this.pageSpanners = {
       // object storing all time-spannind elements spanning across pages
@@ -122,7 +122,7 @@ export default class Viewer {
         this.vrvWorker.postMessage(message);
       } else {
         // speed mode
-        if (this.encodingHasChanged) this.loadXml(cm.getValue());
+        if (this.xmlDocOutdated) this.loadXml(cm.getValue());
         if (xmlId) {
           speed
             .getPageWithElement(this.xmlDoc, this.breaksValue(), xmlId, this.breaksSelect.value)
@@ -211,7 +211,7 @@ export default class Viewer {
   }
 
   // with normal mode: load DOM and pass-through the MEI code;
-  // with speed mode: load into DOM (if encodingHasChanged) and
+  // with speed mode: load into DOM (if xmlDocOutdated) and
   // return MEI excerpt of currentPage page
   // (including dummy measures before and after current page by default)
   speedFilter(mei, includeDummyMeasures = true) {
@@ -273,9 +273,9 @@ export default class Viewer {
   }
 
   loadXml(mei, forceReload = false) {
-    if (this.encodingHasChanged || forceReload) {
+    if (this.xmlDocOutdated || forceReload) {
       this.xmlDoc = this.parser.parseFromString(mei, 'text/xml');
-      this.encodingHasChanged = false;
+      this.xmlDocOutdated = false;
     }
   }
 
@@ -559,10 +559,12 @@ export default class Viewer {
   // when editor emits changes, update notation rendering
   notationUpdated(cm, forceUpdate = false) {
     // console.log('NotationUpdated forceUpdate:' + forceUpdate);
-    this.encodingHasChanged = true;
+    this.xmlDocOutdated = true;
     if (!isSafari) this.checkSchema(cm.getValue());
     let ch = document.getElementById('live-update-checkbox');
-    if ((this.updateNotation && ch && ch.checked) || forceUpdate) this.updateData(cm, false, false);
+    if ((this.updateNotation && ch && ch.checked) || forceUpdate) {
+      this.updateData(cm, false, false);
+    }
   }
 
   // highlight currently selected elements, if cm left out, all are cleared
@@ -1054,9 +1056,10 @@ export default class Viewer {
       },
       showMidiPlaybackContextualBubble: {
         title: 'Show playback shortcut',
-        description: 'Causes a shortcut (bubble in bottom left corner; click to immediately start playback) to appear when the MIDI playback control bar is closed',
+        description:
+          'Causes a shortcut (bubble in bottom left corner; click to immediately start playback) to appear when the MIDI playback control bar is closed',
         type: 'bool',
-        default: true
+        default: true,
       },
       highlightCurrentlySoundingNotes: {
         title: 'Highlight currently-sounding notes',

@@ -110,7 +110,7 @@ export function deleteElement(v, cm, modifyerKey = false) {
   // buffer.groupChangesSinceCheckpoint(checkPoint); TODO
   v.selectedElements = selectedElements;
   v.lastNoteId = v.selectedElements[v.selectedElements.length - 1];
-  v.encodingHasChanged = true;
+  v.xmlDocOutdated = true;
   addApplicationInfo(v, cm);
   v.updateData(cm, false, true);
   v.updateNotation = true;
@@ -231,7 +231,7 @@ export function addClefChange(v, cm, shape = 'G', line = '2', before = true) {
   newElement.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
   newElement.setAttribute('shape', shape);
   newElement.setAttribute('line', line);
-  v.encodingHasChanged = true;
+  v.xmlDocOutdated = true;
   if (before) {
     cm.replaceRange(dutils.xmlToString(newElement) + '\n', cm.getCursor());
     // cm.execCommand('newLineAndIndent');

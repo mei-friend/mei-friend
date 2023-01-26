@@ -276,8 +276,12 @@ addEventListener(
           //
           tkOptions = result.options;
           tk.setOptions(tkOptions);
-          if (result.encodingChanged || result.speedMode) { // only load data if encoding has changed
+          // only load data if encoding has changed
+          if (result.xmlDocOutdated || result.speedMode) {
+            let breakOption = tkOptions.breaks;
+            tk.setOptions({ breaks: 'none' }); // if reloading data, skip rendering layout
             tk.loadData(result.mei);
+            tk.setOptions({ breaks: breakOption }); // ... and re-set breaks option
           }
           result.midi = tk.renderToMIDI();
           if (result.requestTimemap) result.timemap = tk.renderToTimemap();
