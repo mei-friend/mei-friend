@@ -287,7 +287,6 @@ addEventListener(
             tk.setOptions({ breaks: 'none' }); // if reloading data, skip rendering layout
             tk.loadData(result.mei);
             tk.setOptions({ breaks: breakOption }); // ... and re-set breaks option
-            result.toolkitDataOutdated = false;
           }
           result.midi = tk.renderToMIDI();
           if (result.requestTimemap) result.timemap = tk.renderToTimemap();

@@ -1238,7 +1238,7 @@ function downloadSpeedMei() {
   a.click();
 }
 
-export function requestMidiFromVrvWorker(ev, requestTimemap = false) {
+export function requestMidiFromVrvWorker(requestTimemap = false) {
   let message = {
     cmd: 'exportMidi',
     options: v.vrvOptions,
@@ -1352,7 +1352,7 @@ export let cmd = {
     v.toggleMidiPlaybackControlBar();
     if (document.getElementById('showMidiPlaybackControlBar').checked) {
       // request MIDI rendering from Verovio worker
-      requestMidiFromVrvWorker(null, true);
+      requestMidiFromVrvWorker(true);
       document.getElementById('midi-player-contextual').style.display = 'none';
     } else {
       if (document.getElementById('showMidiPlaybackContextualBubble').checked) {
@@ -1623,7 +1623,7 @@ function addEventListeners(v, cm) {
   document.getElementById('ImportPae').addEventListener('click', cmd.openPae);
   document.getElementById('SaveMei').addEventListener('click', downloadMei);
   document.getElementById('SaveSvg').addEventListener('click', downloadSvg);
-  document.getElementById('SaveMidi').addEventListener('click', requestMidiFromVrvWorker);
+  document.getElementById('SaveMidi').addEventListener('click', () => requestMidiFromVrvWorker());
 
   // edit dialogs
   document.getElementById('undo').addEventListener('click', cmd.undo);

@@ -178,7 +178,7 @@ export function startMidiTimeout(rerender = false) {
   window.clearTimeout(midiTimeout);
   if (rerender) {
     // fully rerender MIDI and timemap, then trigger a seek
-    midiTimeout = window.setTimeout(() => requestMidiFromVrvWorker(null, true), midiDelay);
+    midiTimeout = window.setTimeout(() => requestMidiFromVrvWorker(true), midiDelay);
   } else {
     // only trigger a seek
     midiTimeout = window.setTimeout(() => seekMidiPlaybackToSelectionOrPage(), midiDelay);

@@ -17,6 +17,7 @@ import {
   validate,
   validator,
   v,
+  requestMidiFromVrvWorker,
 } from './main.js';
 import { startMidiTimeout } from './midi-player.js';
 import { getVerovioContainerSize, setOrientation } from './resizer.js';
@@ -1719,10 +1720,17 @@ export default class Viewer {
         if (
           defaultVrvOptions.hasOwnProperty(opt) && // TODO check vrv default values
           defaultVrvOptions[opt].toString() === value.toString()
-        )
+        ) {
           delete storage[opt]; // remove from storage object when default value
-        else storage[opt] = value; // save changes in localStorage object
-        if (opt === 'vrv-font') document.getElementById('font-select').value = value;
+        } else {
+          storage[opt] = value; // save changes in localStorage object
+        }
+        if (opt === 'vrv-font') {
+          document.getElementById('font-select').value = value;
+        } else if (opt.startsWith('vrv-midi')) {
+          startMidiTimeout(true);
+          return; // skip updating notation when midi options changed
+        }
         this.updateLayout(this.vrvOptions);
       });
       // add event listener for details toggling
