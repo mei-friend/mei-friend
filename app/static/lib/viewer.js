@@ -17,6 +17,7 @@ import {
   validate,
   validator,
   v,
+  requestMidiFromVrvWorker,
 } from './main.js';
 import { startMidiTimeout } from './midi-player.js';
 import { getVerovioContainerSize, setOrientation } from './resizer.js';
@@ -42,7 +43,8 @@ export default class Viewer {
     this.speedMode = true; // speed mode (just feeds on page to Verovio to reduce drawing time)
     this.parser = new DOMParser();
     this.xmlDoc;
-    this.encodingHasChanged = true; // to recalculate DOM or pageLists
+    this.xmlDocOutdated = true; // to limit recalculation of DOM or pageLists
+    this.toolkitDataOutdated = true; // to control re-loading of toolkit data in the worker
     this.pageBreaks = {}; // object of page number and last measure id '1': 'measure-000423', ...
     this.pageSpanners = {
       // object storing all time-spannind elements spanning across pages
@@ -122,7 +124,7 @@ export default class Viewer {
         this.vrvWorker.postMessage(message);
       } else {
         // speed mode
-        if (this.encodingHasChanged) this.loadXml(cm.getValue());
+        this.loadXml(cm.getValue());
         if (xmlId) {
           speed
             .getPageWithElement(this.xmlDoc, this.breaksValue(), xmlId, this.breaksSelect.value)
@@ -211,7 +213,7 @@ export default class Viewer {
   }
 
   // with normal mode: load DOM and pass-through the MEI code;
-  // with speed mode: load into DOM (if encodingHasChanged) and
+  // with speed mode: load into DOM (if xmlDocOutdated) and
   // return MEI excerpt of currentPage page
   // (including dummy measures before and after current page by default)
   speedFilter(mei, includeDummyMeasures = true) {
@@ -273,9 +275,9 @@ export default class Viewer {
   }
 
   loadXml(mei, forceReload = false) {
-    if (this.encodingHasChanged || forceReload) {
+    if (this.xmlDocOutdated || forceReload) {
       this.xmlDoc = this.parser.parseFromString(mei, 'text/xml');
-      this.encodingHasChanged = false;
+      this.xmlDocOutdated = false;
     }
   }
 
@@ -559,10 +561,13 @@ export default class Viewer {
   // when editor emits changes, update notation rendering
   notationUpdated(cm, forceUpdate = false) {
     // console.log('NotationUpdated forceUpdate:' + forceUpdate);
-    this.encodingHasChanged = true;
+    this.xmlDocOutdated = true;
+    this.toolkitDataOutdated = true;
     if (!isSafari) this.checkSchema(cm.getValue());
     let ch = document.getElementById('live-update-checkbox');
-    if ((this.updateNotation && ch && ch.checked) || forceUpdate) this.updateData(cm, false, false);
+    if ((this.updateNotation && ch && ch.checked) || forceUpdate) {
+      this.updateData(cm, false, false);
+    }
   }
 
   // highlight currently selected elements, if cm left out, all are cleared
@@ -900,10 +905,10 @@ export default class Viewer {
         }),
       },
       toggleSpeedMode: {
-        title: 'Speedmode',
+        title: 'Speed mode',
         description:
           'Toggle Verovio Speed Mode. ' +
-          'In Speedmode, only the current page ' +
+          'In speed mode, only the current page ' +
           'is sent to Verovio to reduce rendering ' +
           'time with large files',
         type: 'bool',
@@ -1054,9 +1059,10 @@ export default class Viewer {
       },
       showMidiPlaybackContextualBubble: {
         title: 'Show playback shortcut',
-        description: 'Causes a shortcut (bubble in bottom left corner; click to immediately start playback) to appear when the MIDI playback control bar is closed',
+        description:
+          'Causes a shortcut (bubble in bottom left corner; click to immediately start playback) to appear when the MIDI playback control bar is closed',
         type: 'bool',
-        default: true
+        default: true,
       },
       highlightCurrentlySoundingNotes: {
         title: 'Highlight currently-sounding notes',
@@ -1714,10 +1720,19 @@ export default class Viewer {
         if (
           defaultVrvOptions.hasOwnProperty(opt) && // TODO check vrv default values
           defaultVrvOptions[opt].toString() === value.toString()
-        )
+        ) {
           delete storage[opt]; // remove from storage object when default value
-        else storage[opt] = value; // save changes in localStorage object
-        if (opt === 'vrv-font') document.getElementById('font-select').value = value;
+        } else {
+          storage[opt] = value; // save changes in localStorage object
+        }
+        if (opt === 'vrv-font') {
+          document.getElementById('font-select').value = value;
+        } else if (opt.startsWith('vrv-midi')) {
+          if (document.getElementById('showMidiPlaybackControlBar').checked) {
+            startMidiTimeout(true);
+          }
+          return; // skip updating notation when midi options changed
+        }
         this.updateLayout(this.vrvOptions);
       });
       // add event listener for details toggling
@@ -1728,6 +1743,9 @@ export default class Viewer {
           this.addVrvOptionsToSettingsPanel(tkAvailableOptions, defaultVrvOptions, false);
           this.updateLayout(this.vrvOptions);
           this.applySettingsFilter();
+          if (document.getElementById('showMidiPlaybackControlBar').checked) {
+            startMidiTimeout(true);
+          }
         }
       });
     }

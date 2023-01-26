@@ -60,6 +60,7 @@ addEventListener(
             break;
           }
           result.mei = '';
+          result.toolkitDataOutdated = false;
           if (result.xmlId && !result.speedMode) {
             result.pageNo = Math.max(1, parseInt(tk.getPageWithElement(result.xmlId)));
             result.forceUpdate = true;
@@ -89,6 +90,7 @@ addEventListener(
             break;
           }
           result.mei = '';
+          result.toolkitDataOutdated = false;
           if (result.xmlId && !result.speedMode) {
             result.pageNo = Math.max(1, parseInt(tk.getPageWithElement(result.xmlId)));
             result.forceUpdate = true;
@@ -108,7 +110,6 @@ addEventListener(
             result.pageNo = Math.max(1, parseInt(tk.getPageWithElement(result.xmlId)));
             result.setCursorToPageBeginning = false;
             result.forceUpdate = true;
-            result.withMidiSeek = result.true;
           }
           result.svg = tk.renderToSVG(result.pageNo);
           result.cmd = 'updated';
@@ -170,6 +171,7 @@ addEventListener(
             cmd: 'mei',
             mei: tk.getMEI(),
             pageCount: tk.getPageCount(),
+            toolkitDataOutdated: false
           };
           if (tkOptions) tk.setOptions(tkOptions);
         } catch (err) {
@@ -220,6 +222,7 @@ addEventListener(
             });
           else result.mei = tk.getMEI();
           result.cmd = 'updated';
+          result.toolkitDataOutdated = false;
         } catch (err) {
           log('reRenderMei: ' + err);
         }
@@ -233,6 +236,7 @@ addEventListener(
             });
             tk.loadData(result.mei);
             result.mei = '';
+            result.toolkitDataOutdated = false;
           }
           let pg = result.speedMode && result.pageNo > 1 ? 2 : result.pageNo;
           result.svg = tk.renderToSVG(pg);
@@ -276,8 +280,12 @@ addEventListener(
           //
           tkOptions = result.options;
           tk.setOptions(tkOptions);
-          if (result.encodingChanged || result.speedMode) { // only load data if encoding has changed
+          // only load data if encoding has changed
+          if (result.toolkitDataOutdated || result.speedMode) {
+            let breakOption = tkOptions.breaks;
+            tk.setOptions({ breaks: 'none' }); // if reloading data, skip rendering layout
             tk.loadData(result.mei);
+            tk.setOptions({ breaks: breakOption }); // ... and re-set breaks option
           }
           result.midi = tk.renderToMIDI();
           if (result.requestTimemap) result.timemap = tk.renderToTimemap();
