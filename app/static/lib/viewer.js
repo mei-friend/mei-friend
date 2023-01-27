@@ -792,7 +792,7 @@ export default class Viewer {
     }
   }
 
-  toggleMidiPlaybackControlBar(ev = null) {
+  toggleMidiPlaybackControlBar() {
     const midiPlaybackControlBar = document.getElementById('midiPlaybackControlBar');
     const showMidiPlaybackControlBar = document.getElementById('showMidiPlaybackControlBar');
     const midiSpeedmodeIndicator = document.getElementById('midi-speedmode-indicator');
@@ -1313,7 +1313,7 @@ export default class Viewer {
             this.toggleAnnotationPanel();
             break;
           case 'showMidiPlaybackControlBar':
-            this.toggleMidiPlaybackControlBar();
+            cmd.toggleMidiPlaybackControlBar(false);
             break;
           case 'editFacsimileZones':
             document.getElementById('facsimile-edit-zones-checkbox').checked = value;

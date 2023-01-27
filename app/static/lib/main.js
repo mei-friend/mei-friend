@@ -1349,9 +1349,11 @@ export let cmd = {
     document.getElementById('filterSettings').value = '';
     document.getElementById('filterSettings').dispatchEvent(new Event('input'));
   },
-  toggleMidiPlaybackControlBar: () => {
-    let status = document.getElementById('showMidiPlaybackControlBar').checked;
-    document.getElementById('showMidiPlaybackControlBar').checked = !status;
+  toggleMidiPlaybackControlBar: (toggleCheckbox = true) => {
+    if(toggleCheckbox) { 
+      let status = document.getElementById('showMidiPlaybackControlBar').checked;
+      document.getElementById('showMidiPlaybackControlBar').checked = !status;
+    }
     v.toggleMidiPlaybackControlBar();
     if (document.getElementById('showMidiPlaybackControlBar').checked) {
       // request MIDI rendering from Verovio worker
