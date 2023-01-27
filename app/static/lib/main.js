@@ -1602,6 +1602,12 @@ function addEventListeners(v, cm) {
     requestPlaybackOnLoad();
     cmd.toggleMidiPlaybackControlBar();
   });
+  document.getElementById('closeMidiPlaybackControlBarButton').addEventListener('click', () => {
+    if(mp.playing) { 
+      mp.stop();
+    }
+    cmd.toggleMidiPlaybackControlBar();
+  });
   document.getElementById('highlightCurrentlySoundingNotes').addEventListener('change', (e) => {
     // clean up any currently highlighted notes when highlighting is turned off
     if (!e.target.checked) {
