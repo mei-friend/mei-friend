@@ -40,15 +40,15 @@ export function seekMidiPlaybackToTime(t) {
   }
 } // seekMidiPlaybackToTime()
 
-export function highlightNotesAtMidiPlaybackTime(e = false) {
+export function highlightNotesAtMidiPlaybackTime(ev = false) {
   let highlightCheckbox = document.getElementById('highlightCurrentlySoundingNotes');
   let pageFollowCheckbox = document.getElementById('pageFollowMidiPlayback');
   let scrollFollowCheckbox = document.getElementById('scrollFollowMidiPlayback');
   // Only if user has requested at least one of the features that track currently sounding notes...
   if (highlightCheckbox.checked || scrollFollowMidiPlayback.checked || pageFollowCheckbox.checked) {
     let t;
-    if (e) {
-      t = e.detail.note.startTime * 1000; // convert to milliseconds
+    if (ev) {
+      t = ev.detail.note.startTime * 1000; // convert to milliseconds
     } else {
       t = lastReportedTime;
     }
