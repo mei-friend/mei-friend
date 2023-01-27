@@ -3,6 +3,7 @@
 * Fixes to highlight synchronization edge-cases caused by rounding issues
 * Implement MIDI playback shortcut (bubble) to open control bar and start playback immediately
 * Implement space-bar and esc keyboard shortcuts
+* Implement close button on control bar
 * Improve highlighting after page turn
 * Re-render MIDI after Verovio MIDI options change (or when default button clicked)
 ### 0.8.1 patch
