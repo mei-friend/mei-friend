@@ -139,19 +139,13 @@ export function highlightNotesAtMidiPlaybackTime(ev = false) {
           }
         }
       }
-
-      function unhighlightNote(note) {
-        note.classList.remove('currently-playing');
-        note.querySelectorAll('.currently-playing').forEach((g) => g.classList.remove('currently-playing'));
-      }
     }
 
     if (closestTimemapTime && 'on' in closestTimemapTime) {
-      closestTimemapTime['on'].forEach((id) => {
+      for (let id of closestTimemapTime['on']) {
         let el = document.getElementById(id);
         if (el && highlightCheckbox.checked) {
-          el.classList.add('currently-playing');
-          el.querySelectorAll('g').forEach((g) => g.classList.add('currently-playing'));
+          highlightNote(el);
         } else if (pageFollowCheckbox.checked) {
           v.getPageWithElement(id)
             .then((flipToPage) => {
@@ -162,8 +156,9 @@ export function highlightNotesAtMidiPlaybackTime(ev = false) {
             .catch((e) => {
               console.warn("Expected to highlight currently playing note, but couldn't find it:", id, e);
             });
+          break;
         }
-      });
+      }
       if (scrollFollowCheckbox.checked && closestTimemapTime && 'on' in closestTimemapTime) {
         // find parent measure
         let el = document.getElementById(closestTimemapTime['on'][0]);
@@ -200,6 +195,16 @@ export function getTimemap() {
 
 export function requestPlaybackOnLoad() {
   playbackOnLoad = true;
+}
+
+function unhighlightNote(note) {
+  note.classList.remove('currently-playing');
+  note.querySelectorAll('.currently-playing').forEach((g) => g.classList.remove('currently-playing'));
+}
+
+function highlightNote(note) {
+  note.classList.add('currently-playing');
+  note.querySelectorAll('g').forEach((g) => g.classList.add('currently-playing'));
 }
 
 // close/unhighlight all midi-highlighted notes/graphical elements
