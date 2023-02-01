@@ -1070,6 +1070,14 @@ export default class Viewer {
         type: 'bool',
         default: true,
       },
+      selectMidiExpansion: {
+        title: 'Expansion for MIDI playback',
+        description: 'Select expansion element to be used for MIDI playback',
+        type: 'select',
+        values: ['none'],
+        // valuesDescriptions: ['note-0000001018877033', 'n34z4wz2', 'note-34z4wz2'],
+        default: 'none',
+      },
       titleAnnotations: {
         title: 'Annotations',
         description: 'Annotation settings',
@@ -1903,7 +1911,7 @@ export default class Viewer {
     }
     if (input) div.appendChild(input);
     return input || o.type === 'header' || o.type === 'line' ? div : null;
-  }
+  } // createOptionsItem()
 
   // add responsibility statement to resp select dropdown
   setRespSelectOptions() {
@@ -1919,7 +1927,28 @@ export default class Viewer {
         }
       });
     }
-  }
+  } // setRespSelectOptions()
+
+  // add MIDI playback expansion to select input
+  setMidiExpansionOptions() {
+    let expandSelect = document.getElementById('selectMidiExpansion');
+    if (expandSelect) {
+      while (expandSelect.options.length > 0) expandSelect.remove(0); // clear existing options
+    }
+    let vrvOption = false; // TODO if a second select is added to the GUI (i.e., MIDI playback control bar)
+    // let vrvOption = document.getElementById('expand');
+    // if (vrvOption) {
+    //   while (vrvOption.options.length > 0) vrvOption.remove(0); // clear existing options
+    // }
+    dutils.generateExpansionList(this.xmlDoc).forEach((str, i) => {
+      if (expandSelect) {
+        expandSelect.add(new Option(str[0], str[1]));
+      }
+      if (vrvOption) {
+        vrvOption.add(new Option(str[0], str[1]));
+      }
+    });
+  } // setMidiExpansionOptions()
 
   // navigate forwards/backwards/upwards/downwards in the DOM, as defined
   // by 'dir' an by 'incrementElementName'

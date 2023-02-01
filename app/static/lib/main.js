@@ -1,6 +1,6 @@
 // mei-friend version and date
-export const version = '0.8.2';
-export const versionDate = '27 Jan 2023';
+export const version = '0.8.3';
+export const versionDate = '1 Feb 2023';
 
 var vrvWorker;
 var spdWorker;
@@ -80,10 +80,10 @@ export let isMEI; // is the currently edited file native MEI?
 export let fileChanged = false; // flag to track whether unsaved changes to file exist
 export const defaultVerovioVersion = 'latest'; // 'develop', '3.10.0'
 export let supportedVerovioVersions = {
-  // local: {
-  //   url: `${root}local/verovio-toolkit-hum.js`,
-  //   description: 'Locally compiled Verovio toolkit version for debugging',
-  // },
+  local: {
+    url: `${root}local/verovio-toolkit-hum.js`,
+    description: 'Locally compiled Verovio toolkit version for debugging',
+  },
   develop: {
     url: 'https://www.verovio.org/javascript/develop/verovio-toolkit-wasm.js',
     description: 'Current Verovio develop version',
@@ -356,6 +356,7 @@ export function loadDataInEditor(mei, setFreshlyLoaded = true) {
     else bs.value = v.containsBreaks() ? 'line' : 'auto';
   }
   v.setRespSelectOptions();
+  v.setMidiExpansionOptions();
   v.setMenuColors();
   if (!isSafari) {
     // disable validation on Safari because of this strange error: "RangeError: Maximum call stack size exceeded" (WG, 1 Oct 2022)
