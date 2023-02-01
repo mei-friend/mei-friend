@@ -96,9 +96,8 @@ export function highlightNotesAtMidiPlaybackTime(ev = false) {
       while (Math.round(timemap[timemapIdx].tstamp) + 1 < Math.round(t) && timemapIdx < timemap.length) {
         timemapIdx++;
       }
+
       // console.log('timemap tstamp: ' + timemap[timemapIdx].tstamp + '; midi t: ' + t);
-      closestTimemapTime = timemap[timemapIdx];
-      // console.log('timemap index (old/new): ' + oldIdx + '/' + timemapIdx);
 
       // 129 ms; with timemapIdx reduced to 66 ms with Op. 120 last two pages
       // go back from current timemapIdx to 'close' highlighted notes
@@ -139,18 +138,19 @@ export function highlightNotesAtMidiPlaybackTime(ev = false) {
           }
         }
       }
+      closestTimemapTime = timemap[timemapIdx];
     }
 
     if (closestTimemapTime && 'on' in closestTimemapTime) {
       for (let id of closestTimemapTime['on']) {
-        let el = document.getElementById(id);
-        if (el && highlightCheckbox.checked) {
-          highlightNote(el);
+        let note = document.getElementById(id);
+        if (note && highlightCheckbox.checked) {
+          highlightNote(note);
           // search for corresponding note-off and check whether onset there
           for (let i = timemapIdx + 1; i < timemap.length - 1; i++) {
             if ('off' in timemap[i] && timemap[i].off.includes(id)) {
-              if (!('on' in timemap[i])) { // if no onset, time unhighlightening
-                setTimeout(() => unhighlightNote(el), timemap[i].tstamp - t);
+              if (!('on' in timemap[i])) { // if no onset, program unhighlightening of that note
+                setTimeout(() => unhighlightNote(note), timemap[i].tstamp - t, note);
               }
               break;
             }
