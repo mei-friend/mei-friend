@@ -146,6 +146,15 @@ export function highlightNotesAtMidiPlaybackTime(ev = false) {
         let el = document.getElementById(id);
         if (el && highlightCheckbox.checked) {
           highlightNote(el);
+          // search for corresponding note-off and check whether onset there
+          for (let i = timemapIdx + 1; i < timemap.length - 1; i++) {
+            if ('off' in timemap[i] && timemap[i].off.includes(id)) {
+              if (!('on' in timemap[i])) { // if no onset, time unhighlightening
+                setTimeout(() => unhighlightNote(el), timemap[i].tstamp - t);
+              }
+              break;
+            }
+          }
         } else if (pageFollowCheckbox.checked) {
           v.getPageWithElement(id)
             .then((flipToPage) => {
@@ -156,7 +165,7 @@ export function highlightNotesAtMidiPlaybackTime(ev = false) {
             .catch((e) => {
               console.warn("Expected to highlight currently playing note, but couldn't find it:", id, e);
             });
-          break;
+          break; // one trigger for page turning is enough
         }
       }
       if (scrollFollowCheckbox.checked && closestTimemapTime && 'on' in closestTimemapTime) {
