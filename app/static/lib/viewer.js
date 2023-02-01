@@ -19,7 +19,7 @@ import {
   v,
   requestMidiFromVrvWorker,
 } from './main.js';
-import { startMidiTimeout } from './midi-player.js';
+import { mp, startMidiTimeout } from './midi-player.js';
 import { getVerovioContainerSize, setOrientation } from './resizer.js';
 import { drawFacsimile, highlightZone, zoomFacsimile } from './facsimile.js';
 import { alert, download, info, success, verified, unverified, xCircleFill } from '../css/icons.js';
@@ -1323,6 +1323,12 @@ export default class Viewer {
           case 'showMidiPlaybackControlBar':
             cmd.toggleMidiPlaybackControlBar(false);
             break;
+            case 'selectMidiExpansion': 
+            v.vrvOptions['expand'] = document.getElementById('selectMidiExpansion').value;
+            if (mp) {
+              startMidiTimeout(true);
+            }
+            break;
           case 'editFacsimileZones':
             document.getElementById('facsimile-edit-zones-checkbox').checked = value;
             drawFacsimile();
@@ -1672,7 +1678,7 @@ export default class Viewer {
   clearVrvOptionsSettingsPanel() {
     this.vrvOptions = {};
     document.getElementById('verovioSettings').innerHTML = '';
-  }
+  } // clearVrvOptionsSettingsPanel()
 
   // initializes the settings panel by filling it with content
   addVrvOptionsToSettingsPanel(tkAvailableOptions, defaultVrvOptions, restoreFromLocalStorage = true) {
@@ -1757,7 +1763,7 @@ export default class Viewer {
         }
       });
     }
-  }
+  } // addVrvOptionsToSettingsPanel()
 
   // TODO: does not get called (WG., 12 Okt 2022)
   // adds an event listener to the targetNode, to listen to 'header' elements (details/summary)
