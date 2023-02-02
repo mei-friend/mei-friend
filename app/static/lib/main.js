@@ -480,9 +480,12 @@ document.addEventListener('DOMContentLoaded', function () {
   switch (env) {
     case 'develop':
       changeLogUrl = 'https://github.com/mei-friend/mei-friend/blob/develop/CHANGELOG.md';
-      supportedVerovioVersions.local = {
-        url: `${root}local/verovio-toolkit-hum.js`,
-        description: 'Locally compiled Verovio toolkit version for debugging',
+      supportedVerovioVersions = {
+        local: {
+          url: `${root}local/verovio-toolkit-hum.js`,
+          description: 'Locally compiled Verovio toolkit version for debugging',
+        },
+        ...supportedVerovioVersions,
       };
       break;
     case 'staging':
@@ -1350,7 +1353,7 @@ export let cmd = {
     document.getElementById('filterSettings').dispatchEvent(new Event('input'));
   },
   toggleMidiPlaybackControlBar: (toggleCheckbox = true) => {
-    if(toggleCheckbox) { 
+    if (toggleCheckbox) {
       let status = document.getElementById('showMidiPlaybackControlBar').checked;
       document.getElementById('showMidiPlaybackControlBar').checked = !status;
     }
