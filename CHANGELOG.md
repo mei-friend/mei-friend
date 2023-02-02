@@ -6,6 +6,7 @@
 * Implement close button on control bar
 * Improve highlighting after page turn
 * Re-render MIDI after Verovio MIDI options change (or when default button clicked)
+* Unhighlight notes before rests
 ### 0.8.1 patch
 * Support automatic scroll-following of midi playback (feature request by @annplaksin)
 * Improve scroll-to-element behavior (during playback and navigation)
