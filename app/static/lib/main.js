@@ -80,10 +80,6 @@ export let isMEI; // is the currently edited file native MEI?
 export let fileChanged = false; // flag to track whether unsaved changes to file exist
 export const defaultVerovioVersion = 'latest'; // 'develop', '3.10.0'
 export let supportedVerovioVersions = {
-  // local: {
-  //   url: `${root}local/verovio-toolkit-hum.js`,
-  //   description: 'Locally compiled Verovio toolkit version for debugging',
-  // },
   develop: {
     url: 'https://www.verovio.org/javascript/develop/verovio-toolkit-wasm.js',
     description: 'Current Verovio develop version',
@@ -484,6 +480,10 @@ document.addEventListener('DOMContentLoaded', function () {
   switch (env) {
     case 'develop':
       changeLogUrl = 'https://github.com/mei-friend/mei-friend/blob/develop/CHANGELOG.md';
+      supportedVerovioVersions.local = {
+        url: `${root}local/verovio-toolkit-hum.js`,
+        description: 'Locally compiled Verovio toolkit version for debugging',
+      };
       break;
     case 'staging':
       changeLogUrl = 'https://github.com/mei-friend/mei-friend/blob/staging/CHANGELOG.md';
