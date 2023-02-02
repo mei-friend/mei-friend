@@ -238,7 +238,7 @@ export function xmlToString(xmlNode) {
 // checks xmlDoc for expand elements and returns an array of arrays
 export function generateExpansionList(xmlDoc, baseSelector = 'music score') {
   let selector = 'section,ending,lem,rdg';
-  let expansions = [['No expansions', '']];
+  let expansions = [['No expansion', '']];
   let baseSection = xmlDoc.querySelector(baseSelector);
   if (baseSection) {
     baseSection.querySelectorAll('expansion').forEach((el) => {

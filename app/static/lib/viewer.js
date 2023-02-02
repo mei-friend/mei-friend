@@ -17,7 +17,6 @@ import {
   validate,
   validator,
   v,
-  requestMidiFromVrvWorker,
 } from './main.js';
 import { mp, startMidiTimeout } from './midi-player.js';
 import { getVerovioContainerSize, setOrientation } from './resizer.js';
@@ -58,7 +57,7 @@ export default class Viewer {
     this.breaksSelect = /** @type HTMLSelectElement */ (document.getElementById('breaks-select'));
     this.respId = '';
     this.alertCloser;
-  }
+  } // constructor()
 
   // change options, load new data, render current page, add listeners, highlight
   updateAll(cm, options = {}, xmlId = '') {
@@ -78,7 +77,7 @@ export default class Viewer {
     } else {
       this.postUpdateAllMessage(xmlId, p, computePageBreaks);
     }
-  }
+  } // postUpdateAllMessage()
 
   // helper function to send a message to the worker
   postUpdateAllMessage(xmlId, p, computePageBreaks) {
@@ -93,7 +92,7 @@ export default class Viewer {
     };
     this.busy();
     this.vrvWorker.postMessage(message);
-  }
+  } // postUpdateAllMessage()
 
   updateData(cm, setCursorToPageBeg = true, setFocusToVerovioPane = true, withMidiSeek = false) {
     let message = {
@@ -109,7 +108,7 @@ export default class Viewer {
     };
     this.busy();
     this.vrvWorker.postMessage(message);
-  }
+  } // updateData()
 
   updatePage(cm, page, xmlId = '', setFocusToVerovioPane = true, withMidiSeek = true) {
     if (this.changeCurrentPage(page) || xmlId) {
@@ -143,17 +142,17 @@ export default class Viewer {
       // start a new midi playback time-out (re-rendering if we're in speedmode)
       startMidiTimeout(this.speedMode ? true : false);
     }
-  }
+  } // updatePage()
 
   // update: options, redoLayout, page/xml:id, render page
   updateLayout(options = {}) {
     this.updateQuick(options, 'updateLayout');
-  }
+  } // updateLayout()
 
   // update: options, page/xml:id, render page
   updateOption(options = {}) {
     this.updateQuick(options, 'updateOption');
-  }
+  } // updateOption()
 
   // updateLayout and updateOption
   updateQuick(options, what) {
@@ -170,8 +169,9 @@ export default class Viewer {
     };
     this.busy();
     this.vrvWorker.postMessage(message);
-  }
+  } // updateQuick()
 
+  // central wrapper function for both speed mode and normal mode
   async getPageWithElement(xmlId) {
     let pageNumber = -1;
     if (this.speedMode) {
@@ -180,12 +180,13 @@ export default class Viewer {
       pageNumber = await this.getPageWithElementFromVrvWorker(xmlId);
     }
     return pageNumber;
-  }
+  } // v.getPageWithElement()
 
+  // for normal mode
   getPageWithElementFromVrvWorker(xmlId) {
     let that = this;
     return new Promise(
-      function (resolve, reject) {
+      function (resolve) {
         let taskId = Math.random();
         const msg = {
           cmd: 'getPageWithElement',
@@ -202,15 +203,7 @@ export default class Viewer {
         that.vrvWorker.postMessage(msg);
       }.bind(that)
     );
-  }
-
-  //TODO remove?
-  gotPageNumber(ev) {
-    if (ev.cmd === 'pageWithElement') {
-      this.vrvWorker.removeEventListener('message', handle);
-      resolve(ev.msg);
-    }
-  }
+  } // getPageWithElementFromVrvWorker()
 
   // with normal mode: load DOM and pass-through the MEI code;
   // with speed mode: load into DOM (if xmlDocOutdated) and
@@ -1323,7 +1316,7 @@ export default class Viewer {
           case 'showMidiPlaybackControlBar':
             cmd.toggleMidiPlaybackControlBar(false);
             break;
-            case 'selectMidiExpansion': 
+          case 'selectMidiExpansion':
             v.vrvOptions['expand'] = document.getElementById('selectMidiExpansion').value;
             if (mp) {
               startMidiTimeout(true);
