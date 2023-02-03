@@ -198,6 +198,7 @@ import {
 } from './facsimile.js';
 import { WorkerProxy } from './worker-proxy.js';
 import { RNGLoader } from './rng-loader.js';
+import * as expansionMap from './expansion-map.js';
 
 // const defaultMeiFileName = `${root}Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei`;
 const defaultMeiFileName = `${root}Beethoven_WoO70-Breitkopf.mei`;
@@ -1243,10 +1244,20 @@ function downloadSpeedMei() {
 }
 
 export function requestMidiFromVrvWorker(requestTimemap = false) {
+  let mei;
+  if (v.expansionId) {
+    let expansionEl = v.xmlDoc.querySelector('[*|id=' + v.expansionId + ']');
+    let existingList = [];
+    let expandedDoc = expansionMap.expand(expansionEl, existingList, v.xmlDoc.cloneNode(true));
+    mei = v.speedFilter(new XMLSerializer().serializeToString(expandedDoc), false, true);
+    if (v.speedMode) v.loadXml(cm.getValue(), true); // reload xmlDoc
+  } else {
+    mei = v.speedFilter(cm.getValue(), false);
+  }
   let message = {
     cmd: 'exportMidi',
     options: v.vrvOptions,
-    mei: v.speedFilter(cm.getValue(), false), // exclude dummy measures in speed mode
+    mei: mei, // exclude dummy measures in speed mode
     requestTimemap: requestTimemap,
     toolkitDataOutdated: v.toolkitDataOutdated,
     speedMode: v.speedMode,

@@ -1,4 +1,5 @@
 import { cm, v, requestMidiFromVrvWorker } from './main.js';
+import * as expansionMap from './expansion-map.js';
 
 export let midiTimeout; // javascript timeout between last edit and MIDI re-render
 export const midiDelay = 400; // in ms, delay between last edit and MIDI re-render
@@ -143,7 +144,7 @@ export function highlightNotesAtMidiPlaybackTime(ev = false) {
 
     if (closestTimemapTime && 'on' in closestTimemapTime) {
       for (let id of closestTimemapTime['on']) {
-        let note = document.getElementById(id);
+        let note = document.getElementById(expansionMap.getNotatedIdForElement(id));
         if (note && highlightCheckbox.checked) {
           highlightNote(note);
           // search for corresponding note-off and check whether onset there
@@ -207,13 +208,13 @@ export function requestPlaybackOnLoad() {
 }
 
 function unhighlightNote(note) {
-  note.classList.remove('currently-playing');
-  note.querySelectorAll('.currently-playing').forEach((g) => g.classList.remove('currently-playing'));
+  note?.classList.remove('currently-playing');
+  note?.querySelectorAll('.currently-playing').forEach((g) => g.classList.remove('currently-playing'));
 }
 
 function highlightNote(note) {
-  note.classList.add('currently-playing');
-  note.querySelectorAll('g').forEach((g) => g.classList.add('currently-playing'));
+  note?.classList.add('currently-playing');
+  note?.querySelectorAll('g').forEach((g) => g.classList.add('currently-playing'));
 }
 
 // close/unhighlight all midi-highlighted notes/graphical elements

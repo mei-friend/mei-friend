@@ -57,6 +57,7 @@ export default class Viewer {
     this.breaksSelect = /** @type HTMLSelectElement */ (document.getElementById('breaks-select'));
     this.respId = '';
     this.alertCloser;
+    this.expansionId = ''; // id string of currently selected expansion element
   } // constructor()
 
   // change options, load new data, render current page, add listeners, highlight
@@ -209,12 +210,14 @@ export default class Viewer {
   // with speed mode: load into DOM (if xmlDocOutdated) and
   // return MEI excerpt of currentPage page
   // (including dummy measures before and after current page by default)
-  speedFilter(mei, includeDummyMeasures = true) {
-    // update DOM only if encoding has been edited or
-    this.loadXml(mei);
+  speedFilter(mei, includeDummyMeasures = true, forceReload = false) {
     let breaks = this.breaksValue();
     let breaksSelectVal = this.breaksSelect.value;
-    if (!this.speedMode || breaksSelectVal === 'none') return mei;
+    if (!this.speedMode || breaksSelectVal === 'none') {
+      return mei;
+    }
+    // update DOM only if encoding has been edited or
+    this.loadXml(mei, forceReload);
     this.xmlDoc = selectMarkup(this.xmlDoc); // select markup
     // count pages from system/pagebreaks
     if (Array.isArray(breaks)) {
@@ -1317,8 +1320,8 @@ export default class Viewer {
             cmd.toggleMidiPlaybackControlBar(false);
             break;
           case 'selectMidiExpansion':
-            v.vrvOptions['expand'] = document.getElementById('selectMidiExpansion').value;
-            if (mp) {
+            this.updateSelectMidiExpansion();
+            if (document.getElementById('showMidiPlaybackControlBar').checked ) {
               startMidiTimeout(true);
             }
             break;
@@ -2121,6 +2124,10 @@ export default class Viewer {
         });
       }
     }
+  }
+
+  updateSelectMidiExpansion() {
+    this.expansionId = document.getElementById('selectMidiExpansion').value;
   }
 
   busy(active = true, speedWorker = false) {

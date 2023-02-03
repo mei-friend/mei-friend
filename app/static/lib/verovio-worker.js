@@ -281,11 +281,7 @@ addEventListener(
         try {
           //
           tkOptions = result.options;
-          if ('expand' in tkOptions) {
-            console.log('vrvWorker: tkOptions.expand=' + tkOptions.expand);
-          }
-          // tk.setOptions(tkOptions);
-          tk.setOptions({ expand: tkOptions.expand });
+          tk.setOptions(tkOptions);
           // only load data if encoding has changed
           if (result.toolkitDataOutdated || result.speedMode || 'expand' in tkOptions) {
             // tk.setOptions({ breaks: 'none' }); // if reloading data, skip rendering layout
