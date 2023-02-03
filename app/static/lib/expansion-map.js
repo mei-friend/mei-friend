@@ -152,26 +152,18 @@ function addExpandedIdToExpansionMap(origXmlId, newXmlId) {
  * @returns {array}
  */
 export function getExpansionIdsForElement(id) {
-  if (id in map) {
-    return map[id];
-  } else {
-    return [id];
-  }
+  return id in map ? map[id] : [id];
 } // getExpansionIdsForElement()
 
 /**
- * Returns id string of notated element, based on expansion map
+ * Returns id string of notated (=first) element, based on expansion map
  * @param {string} id
  * @returns {string}
  */
 export function getNotatedIdForElement(id) {
-  if (id in map) {
-    return map[id][0];
-  } else {
-    return id;
-  }
+  return id in map ? map[id][0] : [id];
 } // getNotatedIdForElement()
 
 function reset() {
   map = {};
-}
+} // reset()
