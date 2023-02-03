@@ -1,4 +1,7 @@
 # mei-friend-online CHANGELOG.md
+### 0.8.3 patch
+* Expansion selection for MIDI playback in settings (TODO: and MIDI playback control bar)
+* Expansion elements expanded in mei-friend
 ### 0.8.2 patch
 * Fixes to highlight synchronization edge-cases caused by rounding issues
 * Implement MIDI playback shortcut (bubble) to open control bar and start playback immediately
