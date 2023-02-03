@@ -1921,6 +1921,15 @@ function addEventListeners(v, cm) {
   addDragSelector(v, vp);
 
   addZoneDrawer();
+
+  // MIDI control bar expansion selector change listener
+  document.getElementById('controlbar-midi-expansion-selector').addEventListener('change', (ev) => {
+    v.expansionId = ev.target.value;
+    document.getElementById('selectMidiExpansion').value = v.expansionId;
+    if (document.getElementById('showMidiPlaybackControlBar').checked) {
+      startMidiTimeout(true);
+    }
+  });
 } // addEventListeners()
 
 // progress bar demo

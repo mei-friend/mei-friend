@@ -1288,6 +1288,7 @@ select>option {
   height: 30px;
   display: none;
   align-items: baseline;
+  gap: .5em;
 }
 
 midi-player::part(control-panel) {

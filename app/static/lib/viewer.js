@@ -1937,11 +1937,11 @@ export default class Viewer {
     if (expandSelect) {
       while (expandSelect.options.length > 0) expandSelect.remove(0); // clear existing options
     }
-    let vrvOption = false; // TODO if a second select is added to the GUI (i.e., MIDI playback control bar)
-    // let vrvOption = document.getElementById('expand');
-    // if (vrvOption) {
-    //   while (vrvOption.options.length > 0) vrvOption.remove(0); // clear existing options
-    // }
+    // add options to midi controlbar expansion selector
+    let vrvOption = document.getElementById('controlbar-midi-expansion-selector');
+     if (vrvOption) {
+       while (vrvOption.options.length > 0) vrvOption.remove(0); // clear existing options
+     }
     dutils.generateExpansionList(this.xmlDoc).forEach((str, i) => {
       if (expandSelect) {
         expandSelect.add(new Option(str[0], str[1]));
@@ -2128,6 +2128,8 @@ export default class Viewer {
 
   updateSelectMidiExpansion() {
     this.expansionId = document.getElementById('selectMidiExpansion').value;
+    let mes = document.getElementById('controlbar-midi-expansion-selector');
+    if (mes) mes.value = this.expansionId;
   }
 
   busy(active = true, speedWorker = false) {
