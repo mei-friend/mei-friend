@@ -985,7 +985,7 @@ async function vrvWorkerEventsHandler(ev) {
       a.click();
       v.busy(false);
       break;
-    case 'midiPlayback': // export MIDI file
+    case 'midiPlayback': // play MIDI file
       console.log('Received MIDI and Timemap:', ev.data.midi, ev.data.timemap);
       setTimemap(ev.data.timemap);
       if (mp) {
@@ -993,6 +993,9 @@ async function vrvWorkerEventsHandler(ev) {
         core.blobToNoteSequence(blob).then((noteSequence) => {
           mp.noteSequence = noteSequence;
         });
+        if ('expand' in ev.data && ev.data.expand && !v.speedMode) {
+          v.updateAll(cm); // update vrv worker, if expand, no speed mode
+        }
       }
       break;
     case 'timeForElement': // receive time for element to start midi playback
@@ -1250,12 +1253,17 @@ export function requestMidiFromVrvWorker(requestTimemap = false) {
     let existingList = [];
     let expandedDoc = expansionMap.expand(expansionEl, existingList, v.xmlDoc.cloneNode(true));
     mei = v.speedFilter(new XMLSerializer().serializeToString(expandedDoc), false, true);
-    if (v.speedMode) v.loadXml(cm.getValue(), true); // reload xmlDoc
+    if (v.speedMode) {
+      v.loadXml(cm.getValue(), true); // reload xmlDoc when in speed mode
+    } else {
+      v.toolkitDataOutdated = true; // force load data for MIDI playback
+    }
   } else {
     mei = v.speedFilter(cm.getValue(), false);
   }
   let message = {
     cmd: 'exportMidi',
+    expand: v.expansionId,
     options: v.vrvOptions,
     mei: mei, // exclude dummy measures in speed mode
     requestTimemap: requestTimemap,

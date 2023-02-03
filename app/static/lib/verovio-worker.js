@@ -283,7 +283,7 @@ addEventListener(
           tkOptions = result.options;
           tk.setOptions(tkOptions);
           // only load data if encoding has changed
-          if (result.toolkitDataOutdated || result.speedMode || 'expand' in tkOptions) {
+          if (result.toolkitDataOutdated || result.speedMode) {
             // tk.setOptions({ breaks: 'none' }); // if reloading data, skip rendering layout
             tk.loadData(result.mei);
             // tk.setOptions(tkOptions); // ... and re-set breaks option

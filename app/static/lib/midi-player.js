@@ -144,7 +144,8 @@ export function highlightNotesAtMidiPlaybackTime(ev = false) {
 
     if (closestTimemapTime && 'on' in closestTimemapTime) {
       for (let id of closestTimemapTime['on']) {
-        let note = document.getElementById(expansionMap.getNotatedIdForElement(id));
+        id = expansionMap.getNotatedIdForElement(id);
+        let note = document.getElementById(id);
         if (note && highlightCheckbox.checked) {
           highlightNote(note);
           // search for corresponding note-off and check whether onset there
