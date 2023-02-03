@@ -1,3 +1,5 @@
+// @ts-check
+
 import { xmlNameSpace } from './dom-utils.js';
 import { rmHash } from './utils.js';
 
@@ -5,7 +7,7 @@ import { rmHash } from './utils.js';
  * Handles expansion elements
  */
 
-let map; // expansion map object
+let map = {}; // expansion map object
 
 /**
  *
@@ -21,6 +23,7 @@ export function expand(expansionElement, existingList, xmlDoc) {
   expansionSiblings?.forEach((o) => {
     if (['section', 'ending', 'lem', 'rdg'].includes(o.nodeName)) {
       console.log('expansionsSibling o: ', o);
+      // @ts-ignore
       reductionList.push(o.getAttribute('xml:id'));
     }
   });
@@ -46,13 +49,15 @@ export function expand(expansionElement, existingList, xmlDoc) {
       // section exists in list
       if (existingList.includes(s)) {
         // clone current section/ending/rdg/lem and rename it, adding -"rend2" for the first repetition etc.
-        let clonedNode = currSect.cloneNode(true);
+        let clonedNode = /** @type {Element} */ currSect.cloneNode(true);
+        // @ts-ignore
         generatePredictableIds(currSect, clonedNode);
 
         let oldIds = [];
         oldIds.push(s);
         getIdList(currSect, oldIds);
         let clonedIds = [];
+        // @ts-ignore
         clonedIds.push(clonedNode.getAttribute('xml:id'));
         getIdList(clonedNode, clonedIds);
         for (let j = 0; j < oldIds.length; j++) {
@@ -61,9 +66,11 @@ export function expand(expansionElement, existingList, xmlDoc) {
 
         // go through cloned objects, find TimePointing/SpanningInterface, PListInterface, LinkingInterface
         // TODO this->UpdateIDs(clonedObject);
+        // Add this method as in Verovio::ExpansionMap::UpdateIds(). This is only required when used for notation; fine for MIDI
 
         // insert cloned node after previous section
-        prevSect.after(clonedNode);
+        // @ts-ignore
+        prevSect?.after(clonedNode);
         prevSect = clonedNode;
       } else {
         // add to existingList, remember previous element, but do nothing else
@@ -99,18 +106,17 @@ function getIdList(obj, idList) {
       getIdList(o, idList);
     }
   });
-}
+} // getIdList()
 
 /**
- *
+ * Generate ids of a cloned object in the form of <id-rendx>,
+ * assuming that both source and target are identical
  * @param {Element} source
  * @param {Element} target
- * @returns
  */
 function generatePredictableIds(source, target) {
-  let sourceId = source.getAttribute('xml:id');
+  let sourceId = source.getAttribute('xml:id') || '';
   target.setAttributeNS(xmlNameSpace, 'xml:id', sourceId + '-rend' + (getExpansionIdsForElement(sourceId).length + 1));
-  // std::to_string(this->GetExpansionIDsForElement(source->GetID()).size() + 1));
 
   let sourceNodes = source.childNodes;
   let targetNodes = target.childNodes;
@@ -119,6 +125,7 @@ function generatePredictableIds(source, target) {
   let i = 0;
   for (let s of sourceNodes) {
     if (s.nodeType === Node.ELEMENT_NODE) {
+      // @ts-ignore
       generatePredictableIds(s, targetNodes[i++]);
     } else {
       i++;
@@ -126,6 +133,11 @@ function generatePredictableIds(source, target) {
   }
 } // generatePredictableIDs()
 
+/**
+ * Add pair of xml:id strings (old, new) to expansion map
+ * @param {string} origXmlId
+ * @param {string} newXmlId
+ */
 function addExpandedIdToExpansionMap(origXmlId, newXmlId) {
   if (origXmlId in map) {
     // if entry exists, add to array
@@ -161,7 +173,7 @@ export function getExpansionIdsForElement(id) {
  * @returns {string}
  */
 export function getNotatedIdForElement(id) {
-  return id in map ? map[id][0] : [id];
+  return id in map ? map[id][0] : id;
 } // getNotatedIdForElement()
 
 function reset() {
