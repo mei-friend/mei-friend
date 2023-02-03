@@ -245,7 +245,7 @@ export function generateExpansionList(xmlDoc, baseSelector = 'music score') {
       let str = '';
       let parent = el.parentElement.closest(selector);
       if (parent) {
-        str += '│ ';
+        // str += '│ ';
         while ((parent = parent.parentElement.closest(selector))) str += '│ '; // &#9474;&nbsp; for indentation
       }
       expansions.push([str + el.getAttribute('xml:id'), el.getAttribute('xml:id')]);
