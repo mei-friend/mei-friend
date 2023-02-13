@@ -481,7 +481,7 @@
           </svg>
         </button>
         <button id="solidButton" class="tablink" title="Login to Solid" 
-          onclick="switchTab(event, 'annotationPanel')" data-tab="solid">
+          onclick="switchTab(event, 'annotationPanel')" data-tab="solidTab">
           <!-- Solid logo SVG: Andrei Sambra, CC BY-SA 4.0 
             https://en.wikipedia.org/wiki/Solid_(web_decentralization_project)#/media/File:MIT's_Solid_project_logo.svg-->
           <svg version="1.1" id="solid_logo" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 1200 1200" style="enable-background:new 0 0 1200 1200;" xml:space="preserve">
@@ -508,9 +508,7 @@
           title="Links" data-tab="externalLinks">Links</button>-->
         <span id="closeAnnotationPanelButton" class="topright" title="Close Annotations Panel">&times;</span>
       </div>
-      <div id="solid" class="tabcontent">
-        You are not currently logged in to Solid. Log in here: <span id="solidLogin">MOOP</span>
-      </div>
+      <div id="solidTab" class="tabcontent"></div>
       <div id="annotationTools" class="tabcontent">
         <menu id="annotationToolsMenu">
           <div class="annotationToolsDomainSelection" style="display:none;">

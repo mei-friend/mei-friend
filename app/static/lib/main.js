@@ -186,7 +186,8 @@ import Viewer from './viewer.js';
 import * as speed from './speed.js';
 import Github from './github.js';
 import { 
-  loginAndFetch
+  loginAndFetch,
+  populateSolidTab
 } from './solid.js';
 import Storage from './storage.js';
 import { fillInBranchContents, logoutFromGithub, refreshGithubMenu, setCommitUIEnabledStatus } from './github-menu.js';
@@ -613,6 +614,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // fill sample encodings
   fillInSampleEncodings();
+
+  // populate the Solid tab in the annotations panel
+  populateSolidTab();
 
   // restore localStorage if we have it
   if (storage.supported) {

@@ -1,5 +1,14 @@
 const solid = solidClientAuthentication.default;
 
+export async function populateSolidTab() { 
+  const solidTab = document.getElementById("solidTab");
+  if(solid.getDefaultSession().info.isLoggedIn) {
+    solidTab.innerHTML = "You are logged in! Welcome!";
+  } else {
+    solidTab.innerHTML = 'Please <a id="solidLogin">Click here to log in!</a>';
+  }
+}
+
 export async function loginAndFetch() {
   // 1. Call `handleIncomingRedirect()` to complete the authentication process.
   //    If called after the user has logged in with the Solid Identity Provider, 
@@ -21,7 +30,7 @@ export async function loginAndFetch() {
       clientName: "mei-friend"
     });
   } else { 
-    console.log("I'm logged in! ", solid.getDefaultSession());
+    populateSolidTab();
     solid.fetch("https://musicog.solidcommunity.net/private/")
         .then(resp => resp.text())
         .then(data => console.log("GOT DATA: ", data))
