@@ -2,6 +2,8 @@ local
 verovio
 app/static/CodeMirror
 app/static/lib/env.js
+app/static/npm/package-lock.json
+app/static/npm/node_modules/
 .DS_Store
 .env
 venv
