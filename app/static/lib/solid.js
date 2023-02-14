@@ -1,12 +1,47 @@
 const solid = solidClientAuthentication.default;
 
+const FOAF = "http://xmlns.com/foaf/0.1/";
+
 export async function populateSolidTab() { 
   const solidTab = document.getElementById("solidTab");
   if(solid.getDefaultSession().info.isLoggedIn) {
-    solidTab.innerHTML = "You are logged in! Welcome!";
+    console.log("HELLO!")
+    solidTab.innerHTML = await populateLoggedInSolidTab();
   } else {
-    solidTab.innerHTML = 'Please <a id="solidLogin">Click here to log in!</a>';
+    solidTab.innerHTML = await populateLoggedOutSolidTab();
+    document.getElementById('solidLogin').addEventListener('click', loginAndFetch)
   }
+}
+
+async function populateLoggedInSolidTab() { 
+  const webId = solid.getDefaultSession().info.webId;
+  const profile = await solid.fetch(webId, { 
+    headers: { 
+      Accept: "application/ld+json"
+    }
+  }).then(resp => resp.json());
+  let name = webId;
+  // try to find entry for 'me' (i.e. the user's webId) in profile:
+  let me = profile.filter(e => "@id" in e && e["@id"] === webId);
+  if(me.length) { 
+    if(me.length > 1) { 
+      console.warn("User's solid profile has multiple entries for their webId!");
+    }
+    if(`${FOAF}name` in me[0]) {
+      let foafName = me[0][`${FOAF}name`][0]; // TODO decide what to do in case of multiple foaf:names
+      if(typeof foafName === "string") { 
+        name = foafName;
+      } else if(typeof foafName === "object" && "@value" in foafName) { 
+        name = foafName["@value"];
+      }
+    }     
+  }
+  
+  return `Welcome, <span id='welcomeName' title='${webId}'>${name}</span>!`;
+}
+
+function populateLoggedOutSolidTab() {
+  return 'Please <a id="solidLogin">Click here to log in!</a>';
 }
 
 export async function loginAndFetch() {
@@ -31,9 +66,11 @@ export async function loginAndFetch() {
     });
   } else { 
     populateSolidTab();
+    /*
     solid.fetch("https://musicog.solidcommunity.net/private/")
         .then(resp => resp.text())
         .then(data => console.log("GOT DATA: ", data))
+        */
   }
 
   /*
