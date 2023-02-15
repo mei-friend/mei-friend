@@ -34,6 +34,7 @@
     "shift-t": "addTempo",
     "alt-shift-t": "addTempoTstamp",
     "a": "addArpeggio",
+    "ctrl-a": "addArpeggioDown",
     "g": "addGlissando",
     "p": "addPedalDown",
     "ctrl-p": "addPedalUp",

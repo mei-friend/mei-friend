@@ -1440,6 +1440,7 @@ export let cmd = {
   addDnamicsBelow: () => e.addControlElement(v, cm, 'dynam', 'below', 'mf'),
   addTempo: () => e.addControlElement(v, cm, 'tempo', 'above', 'Allegro'),
   addArpeggio: () => e.addControlElement(v, cm, 'arpeg', 'up'),
+  addArpeggioDown: () => e.addControlElement(v, cm, 'arpeg', 'down'),
   addGlissando: () => e.addControlElement(v, cm, 'gliss'),
   addPedalDown: () => e.addControlElement(v, cm, 'pedal', 'down'),
   addPedalUp: () => e.addControlElement(v, cm, 'pedal', 'up'),
