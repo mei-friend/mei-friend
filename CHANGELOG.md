@@ -1,6 +1,9 @@
 # mei-friend-online CHANGELOG.md
 ### 0.8.3 patch
 * Show modifyer keys as text (ALT, CTRL...) on Windows/Linux systems
+* Insert `arpeg` with `@order="up"` per default (or `@order="down"` with `CTRL + A`)
+* Fix trailing space in `arpeg@plist`(fix for #13)
+* Do not save and insert slur below with `CTRL + S` on Windows/Linux (fix for #15)
 
 ### 0.8.2 patch
 * Fixes to highlight synchronization edge-cases caused by rounding issues

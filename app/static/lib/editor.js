@@ -181,15 +181,14 @@ export function addControlElement(v, cm, elName, placement, form) {
   if (placement) {
     if (['slur', 'tie', 'phrase'].includes(elName)) {
       newElement.setAttribute('curvedir', placement);
+    } else if (elName === 'arpeg') {
+      newElement.setAttribute('order', placement);
     } else {
       newElement.setAttribute('place', placement);
     }
   }
   if (['arpeg'].includes(elName)) {
-    let plistString = '';
-    for (let e of v.selectedElements) {
-      plistString += '#' + e + ' ';
-    }
+    let plistString = v.selectedElements.join(' #');
     newElement.setAttribute('plist', plistString);
   }
   if (form && ['dir', 'dynam', 'tempo'].includes(elName)) {
