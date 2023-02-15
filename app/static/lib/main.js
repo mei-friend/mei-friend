@@ -1650,7 +1650,7 @@ function addEventListeners(v, cm) {
   document.getElementById('manualValidate').addEventListener('click', cmd.validate);
   document
     .querySelectorAll('.keyShortCut')
-    .forEach((e) => e.classList.add(platform.startsWith('Mac') ? 'platform-mac' : 'platform-nonmac'));
+    .forEach((e) => e.classList.add(platform.startsWith('mac') ? 'platform-mac' : 'platform-nonmac'));
 
   // open URL interface
   document.getElementById('openUrlButton').addEventListener('click', cmd.openUrlFetch);
