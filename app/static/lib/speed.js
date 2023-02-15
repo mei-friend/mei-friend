@@ -206,8 +206,8 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
         // For 'encodedBreaks', `breaks` is an Array
         if (
           countNow &&
-          currentNodeName !== 'ending' &&
-          ( /** @type {string[]} */ (breaks).includes(currentNodeName) ||
+          currentNodeName !== 'ending' && 
+         ( /** @type {string[]} */ (breaks).includes(currentNodeName) ||
             (sb = /** @type {Element} */ (currentNode).querySelector(breaksSelector)))
         ) {
           if (dutils.countAsBreak(sb ? sb : currentNode)) p++;
@@ -228,17 +228,13 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
         if (count && unit) {
           addMeterSigElement(staffDefs, count, unit);
         }
-        const midiBpm = scoreDef.getAttribute('midi.bpm');
-        if (midiBpm) {
-          spdScore.querySelector('scoreDef')?.setAttribute('midi.bpm', midiBpm);
-        }
+        copyTempoInfo(scoreDef, spdScore);
       }
 
-      // remember tempo@midi.bpm and save it in global scoreDef
+      // remember tempo@midi.bpm, mm, mm.unit, mm.dots and save it in global scoreDef
       if (p < pageNo) {
         currentNode.querySelectorAll('tempo').forEach((t) => {
-          let midiBpm = t.getAttribute('midi.bpm');
-          if (midiBpm) spdScore.querySelector('scoreDef')?.setAttribute('midi.bpm', midiBpm);
+          copyTempoInfo(t, spdScore);
         });
       }
 
@@ -609,6 +605,21 @@ function getMeter(scoreDef) {
 
   return meter;
 }
+
+/**
+ * Copies all tempo-related attributes (midi.bpm, mm, mm.unit, mm.dots)
+ * from sourceNode into the scoreDef element of targetElement
+ * @param {Element} sourceNode
+ * @param {Element} targetNode
+ */
+function copyTempoInfo(sourceNode, targetNode) {
+  ['midi.bpm', 'mm', 'mm.unit', 'mm.dots'].forEach((attrStr) => {
+    const attrValue = sourceNode.getAttribute(attrStr);
+    if (attrValue) {
+      targetNode.querySelector('scoreDef')?.setAttribute(attrStr, attrValue);
+    }
+  });
+} // copyTempoInfo()
 
 /**
  * Add time-spanning elements spanning across pages to `spdScore`

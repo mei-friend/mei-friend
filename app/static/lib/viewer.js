@@ -792,7 +792,7 @@ export default class Viewer {
     }
   }
 
-  toggleMidiPlaybackControlBar(ev = null) {
+  toggleMidiPlaybackControlBar() {
     const midiPlaybackControlBar = document.getElementById('midiPlaybackControlBar');
     const showMidiPlaybackControlBar = document.getElementById('showMidiPlaybackControlBar');
     const midiSpeedmodeIndicator = document.getElementById('midi-speedmode-indicator');
@@ -1039,6 +1039,13 @@ export default class Viewer {
         type: 'header',
         default: true,
       },
+      showMidiPlaybackContextualBubble: {
+        title: 'Show playback shortcut',
+        description:
+          'Causes a shortcut (bubble in bottom left corner; click to immediately start playback) to appear when the MIDI playback control bar is closed',
+        type: 'bool',
+        default: true,
+      },
       showMidiPlaybackControlBar: {
         title: 'Show MIDI playback control bar',
         description: 'Show MIDI playback control bar',
@@ -1054,13 +1061,6 @@ export default class Viewer {
       pageFollowMidiPlayback: {
         title: 'Page-follow MIDI playback',
         description: 'Automatically flip pages to follow MIDI playback',
-        type: 'bool',
-        default: true,
-      },
-      showMidiPlaybackContextualBubble: {
-        title: 'Show playback shortcut',
-        description:
-          'Causes a shortcut (bubble in bottom left corner; click to immediately start playback) to appear when the MIDI playback control bar is closed',
         type: 'bool',
         default: true,
       },
@@ -1313,7 +1313,7 @@ export default class Viewer {
             this.toggleAnnotationPanel();
             break;
           case 'showMidiPlaybackControlBar':
-            this.toggleMidiPlaybackControlBar();
+            cmd.toggleMidiPlaybackControlBar(false);
             break;
           case 'editFacsimileZones':
             document.getElementById('facsimile-edit-zones-checkbox').checked = value;

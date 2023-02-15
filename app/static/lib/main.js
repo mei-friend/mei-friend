@@ -1,6 +1,6 @@
 // mei-friend version and date
-export const version = '0.8.2';
-export const versionDate = '26 Jan 2023';
+export const version = '0.8.3';
+export const versionDate = '15 Feb 2023';
 
 var vrvWorker;
 var spdWorker;
@@ -80,10 +80,6 @@ export let isMEI; // is the currently edited file native MEI?
 export let fileChanged = false; // flag to track whether unsaved changes to file exist
 export const defaultVerovioVersion = 'latest'; // 'develop', '3.10.0'
 export let supportedVerovioVersions = {
-  // local: {
-  //   url: `${root}local/verovio-toolkit-hum.js`,
-  //   description: 'Locally compiled Verovio toolkit version for debugging',
-  // },
   develop: {
     url: 'https://www.verovio.org/javascript/develop/verovio-toolkit-wasm.js',
     description: 'Current Verovio develop version',
@@ -484,6 +480,13 @@ document.addEventListener('DOMContentLoaded', function () {
   switch (env) {
     case 'develop':
       changeLogUrl = 'https://github.com/mei-friend/mei-friend/blob/develop/CHANGELOG.md';
+      supportedVerovioVersions = {
+        local: {
+          url: `${root}local/verovio-toolkit-hum.js`,
+          description: 'Locally compiled Verovio toolkit version for debugging',
+        },
+        ...supportedVerovioVersions,
+      };
       break;
     case 'staging':
       changeLogUrl = 'https://github.com/mei-friend/mei-friend/blob/staging/CHANGELOG.md';
@@ -1349,9 +1352,11 @@ export let cmd = {
     document.getElementById('filterSettings').value = '';
     document.getElementById('filterSettings').dispatchEvent(new Event('input'));
   },
-  toggleMidiPlaybackControlBar: () => {
-    let status = document.getElementById('showMidiPlaybackControlBar').checked;
-    document.getElementById('showMidiPlaybackControlBar').checked = !status;
+  toggleMidiPlaybackControlBar: (toggleCheckbox = true) => {
+    if (toggleCheckbox) {
+      let status = document.getElementById('showMidiPlaybackControlBar').checked;
+      document.getElementById('showMidiPlaybackControlBar').checked = !status;
+    }
     v.toggleMidiPlaybackControlBar();
     if (document.getElementById('showMidiPlaybackControlBar').checked) {
       // request MIDI rendering from Verovio worker
@@ -1602,6 +1607,9 @@ function addEventListeners(v, cm) {
     requestPlaybackOnLoad();
     cmd.toggleMidiPlaybackControlBar();
   });
+  document.getElementById('closeMidiPlaybackControlBarButton').addEventListener('click', () => {
+    cmd.toggleMidiPlaybackControlBar();
+  });
   document.getElementById('highlightCurrentlySoundingNotes').addEventListener('change', (e) => {
     // clean up any currently highlighted notes when highlighting is turned off
     if (!e.target.checked) {
@@ -1614,6 +1622,7 @@ function addEventListeners(v, cm) {
   document.getElementById('closeAnnotationPanelButton').addEventListener('click', cmd.hideAnnotationPanel);
   document.getElementById('hideAnnotationPanelButton').addEventListener('click', cmd.hideAnnotationPanel);
   document.getElementById('showFacsimileMenu').addEventListener('click', cmd.showFacsimilePanel);
+  document.getElementById('showPlaybackControls').addEventListener('click', cmd.toggleMidiPlaybackControlBar);
   // re-apply settings filtering when switching settings tabs
   document.querySelectorAll('#settingsPanel .tablink').forEach((t) => t.addEventListener('click', cmd.filterSettings));
 
@@ -1641,7 +1650,7 @@ function addEventListeners(v, cm) {
   document.getElementById('manualValidate').addEventListener('click', cmd.validate);
   document
     .querySelectorAll('.keyShortCut')
-    .forEach((e) => e.classList.add(platform.startsWith('Mac') ? 'platform-mac' : 'platform-nonmac'));
+    .forEach((e) => e.classList.add(platform.startsWith('mac') ? 'platform-mac' : 'platform-nonmac'));
 
   // open URL interface
   document.getElementById('openUrlButton').addEventListener('click', cmd.openUrlFetch);

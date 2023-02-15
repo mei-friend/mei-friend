@@ -40,15 +40,15 @@ export function seekMidiPlaybackToTime(t) {
   }
 } // seekMidiPlaybackToTime()
 
-export function highlightNotesAtMidiPlaybackTime(e = false) {
+export function highlightNotesAtMidiPlaybackTime(ev = false) {
   let highlightCheckbox = document.getElementById('highlightCurrentlySoundingNotes');
   let pageFollowCheckbox = document.getElementById('pageFollowMidiPlayback');
   let scrollFollowCheckbox = document.getElementById('scrollFollowMidiPlayback');
   // Only if user has requested at least one of the features that track currently sounding notes...
   if (highlightCheckbox.checked || scrollFollowMidiPlayback.checked || pageFollowCheckbox.checked) {
     let t;
-    if (e) {
-      t = e.detail.note.startTime * 1000; // convert to milliseconds
+    if (ev) {
+      t = ev.detail.note.startTime * 1000; // convert to milliseconds
     } else {
       t = lastReportedTime;
     }
@@ -96,9 +96,8 @@ export function highlightNotesAtMidiPlaybackTime(e = false) {
       while (Math.round(timemap[timemapIdx].tstamp) + 1 < Math.round(t) && timemapIdx < timemap.length) {
         timemapIdx++;
       }
+
       // console.log('timemap tstamp: ' + timemap[timemapIdx].tstamp + '; midi t: ' + t);
-      closestTimemapTime = timemap[timemapIdx];
-      // console.log('timemap index (old/new): ' + oldIdx + '/' + timemapIdx);
 
       // 129 ms; with timemapIdx reduced to 66 ms with Op. 120 last two pages
       // go back from current timemapIdx to 'close' highlighted notes
@@ -139,19 +138,23 @@ export function highlightNotesAtMidiPlaybackTime(e = false) {
           }
         }
       }
-
-      function unhighlightNote(note) {
-        note.classList.remove('currently-playing');
-        note.querySelectorAll('.currently-playing').forEach((g) => g.classList.remove('currently-playing'));
-      }
+      closestTimemapTime = timemap[timemapIdx];
     }
 
     if (closestTimemapTime && 'on' in closestTimemapTime) {
-      closestTimemapTime['on'].forEach((id) => {
-        let el = document.getElementById(id);
-        if (el && highlightCheckbox.checked) {
-          el.classList.add('currently-playing');
-          el.querySelectorAll('g').forEach((g) => g.classList.add('currently-playing'));
+      for (let id of closestTimemapTime['on']) {
+        let note = document.getElementById(id);
+        if (note && highlightCheckbox.checked) {
+          highlightNote(note);
+          // search for corresponding note-off and check whether onset there
+          for (let i = timemapIdx + 1; i < timemap.length - 1; i++) {
+            if ('off' in timemap[i] && timemap[i].off.includes(id)) {
+              if (!('on' in timemap[i])) { // if no onset, program unhighlightening of that note
+                setTimeout(() => unhighlightNote(note), timemap[i].tstamp - t, note);
+              }
+              break;
+            }
+          }
         } else if (pageFollowCheckbox.checked) {
           v.getPageWithElement(id)
             .then((flipToPage) => {
@@ -162,8 +165,9 @@ export function highlightNotesAtMidiPlaybackTime(e = false) {
             .catch((e) => {
               console.warn("Expected to highlight currently playing note, but couldn't find it:", id, e);
             });
+          break; // one trigger for page turning is enough
         }
-      });
+      }
       if (scrollFollowCheckbox.checked && closestTimemapTime && 'on' in closestTimemapTime) {
         // find parent measure
         let el = document.getElementById(closestTimemapTime['on'][0]);
@@ -200,6 +204,16 @@ export function getTimemap() {
 
 export function requestPlaybackOnLoad() {
   playbackOnLoad = true;
+}
+
+function unhighlightNote(note) {
+  note.classList.remove('currently-playing');
+  note.querySelectorAll('.currently-playing').forEach((g) => g.classList.remove('currently-playing'));
+}
+
+function highlightNote(note) {
+  note.classList.add('currently-playing');
+  note.querySelectorAll('g').forEach((g) => g.classList.add('currently-playing'));
 }
 
 // close/unhighlight all midi-highlighted notes/graphical elements

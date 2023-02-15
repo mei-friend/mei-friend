@@ -79,7 +79,9 @@ addEventListener(
         break;
       case 'updateData':
         try {
-          if (result.speedMode && result.breaks != 'none') result.breaks = 'encoded';
+          if (result.speedMode && result.breaks != 'none') {
+            result.breaks = 'encoded';
+          }
           tk.setOptions({
             breaks: result.breaks,
           });
@@ -171,7 +173,7 @@ addEventListener(
             cmd: 'mei',
             mei: tk.getMEI(),
             pageCount: tk.getPageCount(),
-            toolkitDataOutdated: false
+            toolkitDataOutdated: false,
           };
           if (tkOptions) tk.setOptions(tkOptions);
         } catch (err) {
@@ -282,10 +284,9 @@ addEventListener(
           tk.setOptions(tkOptions);
           // only load data if encoding has changed
           if (result.toolkitDataOutdated || result.speedMode) {
-            let breakOption = tkOptions.breaks;
-            tk.setOptions({ breaks: 'none' }); // if reloading data, skip rendering layout
+            // tk.setOptions({ breaks: 'none' }); // if reloading data, skip rendering layout
             tk.loadData(result.mei);
-            tk.setOptions({ breaks: breakOption }); // ... and re-set breaks option
+            // tk.setOptions(tkOptions); // ... and re-set breaks option
           }
           result.midi = tk.renderToMIDI();
           if (result.requestTimemap) result.timemap = tk.renderToTimemap();
