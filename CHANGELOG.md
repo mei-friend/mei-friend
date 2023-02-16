@@ -2,8 +2,10 @@
 ### 0.8.3 patch
 * Show modifyer keys as text (ALT, CTRL...) on Windows/Linux systems
 * Insert `arpeg` with `@order="up"` per default (or `@order="down"` with `CTRL + A`)
+* Insert control elements with @staff attribute of selected elements (fix for #12)
 * Fix trailing space in `arpeg@plist`(fix for #13)
 * Do not save and insert slur below with `CTRL + S` on Windows/Linux (fix for #15)
+* Support for `@place="between"` on control elements (fix for #16)
 
 ### 0.8.2 patch
 * Fixes to highlight synchronization edge-cases caused by rounding issues

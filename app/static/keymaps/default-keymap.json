@@ -1,7 +1,7 @@
 {
   "#notation": {
     "x": "invertPlacement",
-    "ctrl-x": "betweenPlacement",
+    "shift-x": "betweenPlacement",
     "v": "addVerticalGroup",
     "right": "nextNote",
     "left": "previousNote",

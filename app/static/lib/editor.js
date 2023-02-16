@@ -130,6 +130,10 @@ export function addControlElement(v, cm, elName, placement, form) {
     console.info('addControlElement: Cannot add new element to start element' + startEl.nodeName + '.');
     return;
   }
+  // staveArray lists staff numbers of all selected elements
+  let staveArray = [];
+  let startStaffNumber = startEl.closest('staff')?.getAttribute('n'); // get staff number for start element
+  if (startStaffNumber) staveArray.push(startStaffNumber);
   // find and validate end element
   let endId = '';
   let sc = cm.getSearchCursor('xml:id="' + startId + '"');
@@ -148,6 +152,16 @@ export function addControlElement(v, cm, elName, placement, form) {
       console.info('addControlElement: Cannot add new element to end element ' + endEl.nodeName);
       return;
     }
+    const endStaffNumber = endEl.closest('staff')?.getAttribute('n');
+    if (endStaffNumber && !staveArray.includes(endStaffNumber)) {
+      staveArray.push(endStaffNumber);
+    }
+  }
+  // check inner elements (without start/end) for staff numbers and add them, if missing in staveArray
+  for (let i = 1; i < v.selectedElements.length - 2; i++) {
+    let el = v.xmlDoc.querySelector("[*|id='" + v.selectedElements[i] + "']");
+    let n = el?.closest('staff')?.getAttribute('n');
+    if (!staveArray.includes(n)) staveArray.push(n);
   }
   // create element to be inserted
   let newElement = v.xmlDoc.createElementNS(dutils.meiNameSpace, elName);
@@ -171,6 +185,9 @@ export function addControlElement(v, cm, elName, placement, form) {
       newElement.setAttribute('extender', 'true');
     }
   }
+  // handle @staff attribute of start element
+  if (staveArray.length > 0) newElement.setAttribute('staff', staveArray.sort().join(' '));
+  // handle @form attribute
   if (form && ['hairpin', 'fermata', 'mordent', 'trill', 'turn'].includes(elName)) {
     newElement.setAttribute('form', form);
   }
@@ -188,8 +205,7 @@ export function addControlElement(v, cm, elName, placement, form) {
     }
   }
   if (['arpeg'].includes(elName)) {
-    let plistString = v.selectedElements.join(' #');
-    newElement.setAttribute('plist', plistString);
+    newElement.setAttribute('plist', '#' + v.selectedElements.join(' #'));
   }
   if (form && ['dir', 'dynam', 'tempo'].includes(elName)) {
     newElement.appendChild(v.xmlDoc.createTextNode(form));
@@ -272,12 +288,41 @@ export function invertPlacement(v, cm, modifier = false) {
     let val = 'above';
     // placement above/below as in dir, dynam...
     if (att.attPlacement.includes(el.nodeName)) {
-      //|| el.nodeName === 'beamSpan') {
       attr = 'place';
-      if (el.hasAttribute(attr) && att.dataPlacement.includes(val) && el.getAttribute(attr) != 'below') {
+      if (el.getAttribute(attr) === 'between' && el.hasAttribute('staff')) {
+        let staves = el.getAttribute('staff');
+        el.setAttribute('staff', staves.split(' ')[0]);
+      }
+      if (
+        el.hasAttribute(attr) &&
+        att.dataPlacement.includes(el.getAttribute(attr)) &&
+        el.getAttribute(attr) !== 'below'
+      ) {
         val = 'below';
       }
-      if (el.nodeName === 'fermata') val === 'below' ? el.setAttribute('form', 'inv') : el.removeAttribute('form');
+      if (modifier) {
+        let staffList = getStaffNumbersForClosestStaffGroup(v, el);
+        if (staffList.length === 2) {
+          if (el.hasAttribute(attr)) {
+            if (['above', 'below'].includes(el.getAttribute(attr))) {
+              val = 'between';
+              el.setAttribute('staff', staffList.sort().join(' '));
+            } else {
+              val = 'above';
+              el.setAttribute('staff', staffList[0]);
+            }
+          }
+        } else {
+          let msg =
+            'Editor invertPlacement: Cannot change placement to "between", as selected element does not sit in a staff group with two staves.';
+          console.log(msg);
+          v.showAlert(msg, 'warning');
+        }
+      }
+      // for fermata, change form from inv to nothing or back
+      if (el.nodeName === 'fermata') {
+        val === 'below' ? el.setAttribute('form', 'inv') : el.removeAttribute('form');
+      }
       el.setAttribute(attr, val);
       range = replaceInEditor(cm, el, true);
       // txtEdr.autoIndentSelectedRows();
@@ -1234,4 +1279,45 @@ function findAndModifyOctaveElements(cm, xmlDoc, id1, id2, disPlace, dis, add = 
     }
   }
   return;
-}
+} // findAndModifyOctaveElements()
+
+/**
+ * Determines an array of staff numbers for a given element that spans
+ * the relevant staff group that the element is inside.
+ * @param {Viewer} v
+ * @param {Element} element
+ * @returns {Array[]} staffNumbers
+ */
+function getStaffNumbersForClosestStaffGroup(v, element) {
+  if (!element) return null;
+  let staffNumber;
+  if (element.hasAttribute('startid')) {
+    const startElement = v.xmlDoc.querySelector('[*|id=' + utils.rmHash(element.getAttribute('startid')) + ']');
+    if (startElement) {
+      staffNumber = startElement.closest('staff')?.getAttribute('n');
+    }
+  } else if (element.hasAttribute('staff') && element.hasAttribute('n')) {
+    staffNumber = element.getAttribute('n');
+  }
+  if (staffNumber) {
+    const staffList = v.xmlDoc.querySelector('scoreDef')?.querySelectorAll('staffDef');
+    let staff;
+    staffList.forEach((st) => {
+      if (st.getAttribute('n') === staffNumber) {
+        staff = st;
+      }
+    });
+    if (staff) {
+      const staffGroup = staff.closest('staffGrp');
+      if (staffGroup) {
+        let staffNumbers = [];
+        staffGroup.querySelectorAll('staffDef').forEach((st) => {
+          const n = st.getAttribute('n');
+          if (n) staffNumbers.push(n);
+        });
+        return staffNumbers;
+      }
+    }
+    return [];
+  }
+} // findClosestStaffGroup()
