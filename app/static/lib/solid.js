@@ -24,7 +24,7 @@ export async function establishResource(uri, resource) {
       Accept: 'application/ld+json'
     }
    }).then(async headResp=> { 
-    console.log("GOT OPTIONS RESPONSE:", headResp)
+    console.log("GOT HEAD RESPONSE:", headResp)
     if(headResp.ok) { 
       return headResp;
     } else if(headResp.status === 404) {
