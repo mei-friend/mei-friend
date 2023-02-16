@@ -130,6 +130,10 @@ export function addControlElement(v, cm, elName, placement, form) {
     console.info('addControlElement: Cannot add new element to start element' + startEl.nodeName + '.');
     return;
   }
+  // staveArray lists staff numbers of all selected elements
+  let staveArray = [];
+  let startStaffNumber = startEl.closest('staff')?.getAttribute('n'); // get staff number for start element
+  if (startStaffNumber) staveArray.push(startStaffNumber);
   // find and validate end element
   let endId = '';
   let sc = cm.getSearchCursor('xml:id="' + startId + '"');
@@ -148,6 +152,16 @@ export function addControlElement(v, cm, elName, placement, form) {
       console.info('addControlElement: Cannot add new element to end element ' + endEl.nodeName);
       return;
     }
+    const endStaffNumber = endEl.closest('staff')?.getAttribute('n');
+    if (endStaffNumber && !staveArray.includes(endStaffNumber)) {
+      staveArray.push(endStaffNumber);
+    }
+  }
+  // check inner elements (without start/end) for staff numbers and add them, if missing in staveArray
+  for (let i = 1; i < v.selectedElements.length - 2; i++) {
+    let el = v.xmlDoc.querySelector("[*|id='" + v.selectedElements[i] + "']");
+    let n = el?.closest('staff')?.getAttribute('n');
+    if (!staveArray.includes(n)) staveArray.push(n);
   }
   // create element to be inserted
   let newElement = v.xmlDoc.createElementNS(dutils.meiNameSpace, elName);
@@ -171,6 +185,9 @@ export function addControlElement(v, cm, elName, placement, form) {
       newElement.setAttribute('extender', 'true');
     }
   }
+  // handle @staff attribute of start element
+  if (staveArray.length > 0) newElement.setAttribute('staff', staveArray.sort().join(' '));
+  // handle @form attribute
   if (form && ['hairpin', 'fermata', 'mordent', 'trill', 'turn'].includes(elName)) {
     newElement.setAttribute('form', form);
   }
