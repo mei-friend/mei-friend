@@ -188,8 +188,7 @@ export function addControlElement(v, cm, elName, placement, form) {
     }
   }
   if (['arpeg'].includes(elName)) {
-    let plistString = v.selectedElements.join(' #');
-    newElement.setAttribute('plist', plistString);
+    newElement.setAttribute('plist', '#' + v.selectedElements.join(' #'));
   }
   if (form && ['dir', 'dynam', 'tempo'].includes(elName)) {
     newElement.appendChild(v.xmlDoc.createTextNode(form));
