@@ -624,12 +624,13 @@ export function addOctaveElement(v, cm, disPlace = 'above', dis = '8') {
 
 // surround selected elements with a supplied element (and a responsibility
 // statement from v.respId
-export function addSuppliedElement(v, cm) {
+export function addSuppliedElement(v, cm, attrName = 'none') {
   v.loadXml(cm.getValue());
   v.selectedElements = speed.filterElements(v.selectedElements, v.xmlDoc);
   v.selectedElements = utils.sortElementsByScorePosition(v.selectedElements);
   if (v.selectedElements.length < 1) return;
   v.updateNotation = false;
+
   let uuids = [];
   v.selectedElements.forEach((id) => {
     let el = v.xmlDoc.querySelector("[*|id='" + id + "']");
@@ -637,8 +638,30 @@ export function addSuppliedElement(v, cm) {
       console.warn('No such element in xml document: ' + id);
     } else {
       let parent = el.parentNode;
+
+      // convert attrName to element and surround that
+      if (attrName === 'artic' || attrName === 'accid') {
+        if (!el.hasAttribute(attrName)) {
+          const msg = 'No ' + attrName + ' attribute in element ' + el.nodeName + '.';
+          console.log(msg);
+          v.showAlert(msg, 'warning');
+          return;
+        }
+        let attrValue = el.getAttribute(attrName);
+        let attrEl = document.createElementNS(dutils.meiNameSpace, attrName);
+        let uuid = mintSuppliedId(id, attrName);
+        attrEl.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
+        attrEl.setAttribute(attrName, attrValue);
+        el.removeAttribute(attrName);
+        el.appendChild(attrEl);
+        replaceInEditor(cm, el, true);
+        cm.execCommand('indentAuto');
+        parent = el;
+        el = attrEl;
+      }
+
       let sup = document.createElementNS(dutils.meiNameSpace, 'supplied');
-      let uuid = utils.generateXmlId('supplied', v.xmlIdStyle);
+      let uuid = mintSuppliedId(id, 'supplied');
       sup.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
       if (v.respId) sup.setAttribute('resp', '#' + v.respId);
       parent.replaceChild(sup, el);
@@ -654,6 +677,15 @@ export function addSuppliedElement(v, cm) {
   addApplicationInfo(v, cm);
   v.updateData(cm, false, true);
   v.updateNotation = true; // update notation again
+
+  function mintSuppliedId(id, nodeName) {
+    // follow the Mozarteum schema, keep numbers (for @o-sapov)
+    let underscoreId = id.match(/_\d+$/);
+    if (underscoreId) {
+      return nodeName + underscoreId[0];
+    }
+    return utils.generateXmlId(nodeName, v.xmlIdStyle);
+  }
 } // addSuppliedElement()
 
 export function addVerticalGroup(v, cm) {
@@ -817,8 +849,8 @@ export function manipulateXmlIds(v, cm, removeIds = false) {
     if (el.nodeType === Node.ELEMENT_NODE) {
       if (explore) {
         // just go through xml structure and search for pointing ids
-        for (let attribute of att.dataURI) {
-          let value = el.getAttribute(attribute);
+        for (let attrName of att.dataURI) {
+          let value = el.getAttribute(attrName);
           if (value) {
             // split value string by whitespace
             value.split(/[\s]+/).forEach((v) => skipList.push(utils.rmHash(v)));

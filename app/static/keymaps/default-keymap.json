@@ -57,6 +57,8 @@
     "b": "addBeam",
     "shift-b": "addBeamSpan",
     "u": "addSupplied",
+    "ctrl-u": "addSuppliedArtic",
+    "ctrl-shift-u": "addSuppliedAccid",
     "o": "addOctave8Above",
     "ctrl-o": "addOctave8Below",
     "shift-o": "addOctave15Above",
