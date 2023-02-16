@@ -27,6 +27,16 @@ import {
 import {
   removeInEditor
 } from './editor.js';
+import { 
+  establishResource,
+  getProfile,
+  resource,
+  solid,
+  FOAF,
+  OA,
+  PIM,
+  RDF
+ } from './solid.js';
 
 export let annotations = [];
 
@@ -343,6 +353,7 @@ export function addAnnotationHandlers() {
     }
     annotations.push(a);
     writeInlineIfRequested(a);
+    writeStandoffIfRequested(a);
   }
   const createCircle = (e) => {
     const a = {
@@ -352,6 +363,7 @@ export function addAnnotationHandlers() {
     }
     annotations.push(a);
     writeInlineIfRequested(a);
+    writeStandoffIfRequested(a);
   }
   const createDescribe = (e => {
     // TODO improve UX!
@@ -364,6 +376,7 @@ export function addAnnotationHandlers() {
     };
     annotations.push(a);
     writeInlineIfRequested(a);
+    writeStandoffIfRequested(a);
   })
   const createLink = (e => {
     // TODO improve UX!
@@ -378,6 +391,7 @@ export function addAnnotationHandlers() {
     }
     annotations.push(a);
     writeInlineIfRequested(a);
+    writeStandoffIfRequested(a);
   })
 
   document.querySelectorAll(".annotationToolsIcon").forEach(a => a.removeEventListener("click", annotationHandler));
@@ -536,7 +550,9 @@ export function fetchWebAnnotations(url, userProvided = true, jumps = 10) {
   const icon = document.getElementById("addWebAnnotationIcon");
   const svgs = Array.from(icon.getElementsByTagName("svg"));
   svgs.forEach(t => t.classList.add("clockwise"));
-  fetch(url, {
+  let fetchAppropriately = solid.getDefaultSession().info.isLoggedIn ? 
+    solid.fetch : fetch;
+  fetchAppropriately(url, {
     headers: {
       'Accept': 'application/ld+json'
     }
@@ -626,21 +642,21 @@ export function ingestWebAnnotation(webAnno) {
           anno.url = firstBody["@id"];
           anno.type = "annotateLink";
         } else if ("@type" in firstBody &&
-          "http://www.w3.org/1999/02/22-rdf-syntax-ns#value" in firstBody &&
-          "http://www.w3.org/ns/oa#TextualBody" in firstBody["@type"]) {
+          RDF+value in firstBody &&
+          OA+"TextualBody" in firstBody["@type"]) {
           // declare a describing annotation
           console.log("Declaring a describing annotation!");
-          anno.description = firstBody["http://www.w3.org/1999/02/22-rdf-syntax-ns#"];
+          anno.description = firstBody[RDF+value];
           anno.type = "annotateDescribe";
         } else {
           console.log("Don't know how to handle body of this annotation: ", anno);
         }
       }
-    } else if ("http://www.w3.org/ns/oa#bodyValue" in webAnno) {
+    } else if (OA+"bodyValue" in webAnno) {
       // declare describing annotation
       console.log("Declaring a describing annotation!");
       // TODO decide what to do for multiple bodies
-      anno.description = webAnno["http://www.w3.org/ns/oa#bodyValue"][0]["@value"];
+      anno.description = webAnno[OA+"bodyValue"][0]["@value"];
       anno.type = "annotateDescribe";
     }
 
@@ -658,7 +674,7 @@ export function ingestWebAnnotation(webAnno) {
 
 function writeInlineIfRequested(a) {
   // write annotation to inline <annot> if the user has requested this
-  if (document.getElementById('writeAnnotInline').checked) {
+  if (document.getElementById('writeAnnotationInline').checked) {
     let el = v.xmlDoc.querySelector('[*|id="' + v.selectedElements[0] + '"]');
     if (el) {
       let payload;
@@ -672,6 +688,63 @@ function writeInlineIfRequested(a) {
       a.isInline = true;
     } else
       console.warn('writeInlineIfRequested: Cannot find beforeThis element for ' + a.id);
+  }
+}
+
+async function writeStandoffIfRequested(a) { 
+  // write to a stand-off Web Annotation in the user's Solid Pod if requested
+  if(document.getElementById('writeAnnotationStandoff').checked) {
+    if(solid.getDefaultSession().info.isLoggedIn) {
+      // generate a web annotation JSON-LD object
+      let webAnno = new Object(); 
+      let body = new Object();
+      webAnno["@type"] = [OA+"Annotation"];
+      webAnno[OA+"hasTarget"] = a.selection.map(s => { return {"@id": s} });
+      switch(a.type) { 
+        case "annotateHighlight":
+          webAnno[OA+"motivatedBy"] = [{ "@id": OA+"highlighting" }];
+          break;
+        case "annotateDescribe":
+          body["@type"] = [OA+"TextualBody"];
+          if('description' in a) {
+            body[RDF+"value"] = a.description;
+          } else { 
+            console.warn("Describing annotation without a description: ", a);
+          }
+          webAnno[OA+"motivatedBy"] = [{ "@id": OA+"describing" }];
+          webAnno[OA+"hasBody"] = [body];
+          break;
+        case "annotateLink":
+          webAnno[OA+"motivatedBy"] = [{ "@id": OA+"linking" }];
+          webAnno[OA+"hasBody"] = [{ "@id": a.url }]
+          break;
+        default:
+          console.warn("Trying to write standoff annotation with unknown annotation type:", a);
+          break;
+      }
+      //TODO error handling below!
+      getProfile().then(async (profile) => {
+        if(PIM+"storage" in profile) {
+          let storage = Array.isArray(profile[PIM+"storage"])
+            ? profile[PIM+"storage"][0] // TODO what if more than one storage?
+            : profile[PIM+"storage"];
+          if(typeof storage === "object") { 
+            if("@id" in storage) { 
+              storage = storage["@id"];
+            }
+            else { 
+             console.warn("Unexpected pim:storage object in your Solid Pod profile: ", profile);
+            }
+          }
+          let resp = await establishResource(storage + "at.ac.mdw.mei-friend/", resource.container);
+          console.log("Finished establishing friend container: ", resp);
+        } else { 
+          log("Sorry, couldn't establish storage location from your Solid Pod's profile", profile);
+        }
+      });
+    }
+  } else { 
+    log("Cannot write standoff annotation: Please ensure you are logged in to a Solid Pod");
   }
 }
 

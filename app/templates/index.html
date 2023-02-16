@@ -511,15 +511,14 @@
       <div id="solidTab" class="tabcontent"></div>
       <div id="annotationTools" class="tabcontent">
         <menu id="annotationToolsMenu">
-          <div class="annotationToolsDomainSelection" style="display:none;">
+          <div class="annotationToolsDomainSelection">
             <div class="annotationToolsDomainSelectionItem">
-              <input type="checkbox" checked id="writeAnnotInline" />
-              <label for="#writeAnnotInline">&lt;annot&gt;</label>
-            </div>
-            <div class="annotationToolsDomainSelectionItem">
-              <input type="checkbox" id="writeAnnotStandoff" />
-              <label for="#writeAnnotStandoff">Web Annotation</label>
-              <!-- <script>document.querySelector('label[for="#writeAnnotStandoff"]').innerHTML = rdf;</script> -->
+              <fieldset>
+                <input type="radio" checked id="writeAnnotationInline" value="writeAnnotationInline" name="annotationToolDomainSelector">
+                <label for="#writeAnnotionInline">&lt;annot&gt;</label>
+                <input type="radio" id="writeAnnotationStandoff" value="writeAnnotationStandoff" name="annotationToolDomainSelector">
+                <label for="#writeAnnotionStandoff">Web Annotation</label>
+              </fieldset>
             </div>
           </div>
           <li>
