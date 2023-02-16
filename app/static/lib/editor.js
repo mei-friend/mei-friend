@@ -288,12 +288,41 @@ export function invertPlacement(v, cm, modifier = false) {
     let val = 'above';
     // placement above/below as in dir, dynam...
     if (att.attPlacement.includes(el.nodeName)) {
-      //|| el.nodeName === 'beamSpan') {
       attr = 'place';
-      if (el.hasAttribute(attr) && att.dataPlacement.includes(val) && el.getAttribute(attr) != 'below') {
+      if (el.getAttribute(attr) === 'between' && el.hasAttribute('staff')) {
+        let staves = el.getAttribute('staff');
+        el.setAttribute('staff', staves.split(' ')[0]);
+      }
+      if (
+        el.hasAttribute(attr) &&
+        att.dataPlacement.includes(el.getAttribute(attr)) &&
+        el.getAttribute(attr) !== 'below'
+      ) {
         val = 'below';
       }
-      if (el.nodeName === 'fermata') val === 'below' ? el.setAttribute('form', 'inv') : el.removeAttribute('form');
+      if (modifier) {
+        let staffList = getStaffNumbersForClosestStaffGroup(v, el);
+        if (staffList.length === 2) {
+          if (el.hasAttribute(attr)) {
+            if (['above', 'below'].includes(el.getAttribute(attr))) {
+              val = 'between';
+              el.setAttribute('staff', staffList.sort().join(' '));
+            } else {
+              val = 'above';
+              el.setAttribute('staff', staffList[0]);
+            }
+          }
+        } else {
+          let msg =
+            'Editor invertPlacement: Cannot change placement to "between", as selected element does not sit in a staff group with two staves.';
+          console.log(msg);
+          v.showAlert(msg, 'warning');
+        }
+      }
+      // for fermata, change form from inv to nothing or back
+      if (el.nodeName === 'fermata') {
+        val === 'below' ? el.setAttribute('form', 'inv') : el.removeAttribute('form');
+      }
       el.setAttribute(attr, val);
       range = replaceInEditor(cm, el, true);
       // txtEdr.autoIndentSelectedRows();
@@ -1250,4 +1279,45 @@ function findAndModifyOctaveElements(cm, xmlDoc, id1, id2, disPlace, dis, add = 
     }
   }
   return;
-}
+} // findAndModifyOctaveElements()
+
+/**
+ * Determines an array of staff numbers for a given element that spans
+ * the relevant staff group that the element is inside.
+ * @param {Viewer} v
+ * @param {Element} element
+ * @returns {Array[]} staffNumbers
+ */
+function getStaffNumbersForClosestStaffGroup(v, element) {
+  if (!element) return null;
+  let staffNumber;
+  if (element.hasAttribute('startid')) {
+    const startElement = v.xmlDoc.querySelector('[*|id=' + utils.rmHash(element.getAttribute('startid')) + ']');
+    if (startElement) {
+      staffNumber = startElement.closest('staff')?.getAttribute('n');
+    }
+  } else if (element.hasAttribute('staff') && element.hasAttribute('n')) {
+    staffNumber = element.getAttribute('n');
+  }
+  if (staffNumber) {
+    const staffList = v.xmlDoc.querySelector('scoreDef')?.querySelectorAll('staffDef');
+    let staff;
+    staffList.forEach((st) => {
+      if (st.getAttribute('n') === staffNumber) {
+        staff = st;
+      }
+    });
+    if (staff) {
+      const staffGroup = staff.closest('staffGrp');
+      if (staffGroup) {
+        let staffNumbers = [];
+        staffGroup.querySelectorAll('staffDef').forEach((st) => {
+          const n = st.getAttribute('n');
+          if (n) staffNumbers.push(n);
+        });
+        return staffNumbers;
+      }
+    }
+    return [];
+  }
+} // findClosestStaffGroup()

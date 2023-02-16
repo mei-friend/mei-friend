@@ -1458,6 +1458,7 @@ export let cmd = {
   delete: () => e.deleteElement(v, cm),
   cmdDelete: () => e.deleteElement(v, cm, true),
   invertPlacement: () => e.invertPlacement(v, cm),
+  betweenPlacement: () => e.invertPlacement(v, cm, true),
   addVerticalGroup: () => e.addVerticalGroup(v, cm),
   toggleStacc: () => e.toggleArtic(v, cm, 'stacc'),
   toggleAccent: () => e.toggleArtic(v, cm, 'acc'),
