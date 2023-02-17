@@ -10,7 +10,11 @@ import { loadFacsimile } from './facsimile.js';
 import Viewer from './viewer.js';
 import { handleEditorChanges, version, versionDate } from './main.js';
 
-// smart indent selected region in editor, if none, do all
+/**
+ * Smart indents selected region in editor, if none, do all
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
+ */
 export function indentSelection(v, cm) {
   v.updateNotation = false;
   cm.blockChanges = true;
@@ -37,7 +41,13 @@ export function indentSelection(v, cm) {
   v.updateNotation = true;
 } // indentSelection()
 
-// delete selected elements
+/**
+ * Deletes selected elements
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
+ * @param {boolean} modifyerKey
+ * @returns
+ */
 export function deleteElement(v, cm, modifyerKey = false) {
   v.loadXml(cm.getValue(), true);
   let id = v.selectedElements[0]; // TODO: iterate over selectedElements
@@ -116,6 +126,15 @@ export function deleteElement(v, cm, modifyerKey = false) {
   v.updateNotation = true;
 } // deleteElement()
 
+/**
+ * Inserts a new control element to DOM and editor
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
+ * @param {string} elName ('slur', 'dynam', ...)
+ * @param {string} placement ('below', 'up', ...)
+ * @param {string} form ('cres', 'inv', depending on element type)
+ * @returns
+ */
 export function addControlElement(v, cm, elName, placement, form) {
   if (v.selectedElements.length === undefined || v.selectedElements.length < 1) return;
   v.selectedElements = utils.sortElementsByScorePosition(v.selectedElements);
@@ -231,6 +250,15 @@ export function addControlElement(v, cm, elName, placement, form) {
   v.updateNotation = true;
 } // addControlElement()
 
+/**
+ * Inserts a clef change element before/after the current selection
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
+ * @param {string} shape ('G', 'F', 'C')
+ * @param {string} line ('2', ...)
+ * @param {boolean} before element, or after (false)
+ * @returns
+ */
 export function addClefChange(v, cm, shape = 'G', line = '2', before = true) {
   if (v.selectedElements.length === 0) return;
   v.updateNotation = false; // stop update notation
@@ -262,9 +290,14 @@ export function addClefChange(v, cm, shape = 'G', line = '2', before = true) {
   v.updatePage(cm, '', uuid);
 } // addClefChange()
 
-// Reverse or insert att:placement (artic, ...), att.curvature (slur, tie,
-// phrase) and att.stems (note, chord) of current element
-// (or its children, such as all notes/chords within a beam).
+/**
+ * Reverses or inserts att:placement (artic, ...), att.curvature (slur, tie,
+ * phrase) and att.stems (note, chord) of current element
+ * (or its children, such as all notes/chords within a beam).
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
+ * @param {boolean} modifier
+ */
 export function invertPlacement(v, cm, modifier = false) {
   v.loadXml(cm.getValue());
   let ids = utils.sortElementsByScorePosition(v.selectedElements);
@@ -412,7 +445,12 @@ export function invertPlacement(v, cm, modifier = false) {
   v.updateNotation = true; // update notation again
 } // invertPlacement()
 
-// toggle (switch on/off) artic to selected elements
+/**
+ * Toggles (switches on/off) artic at selected elements
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
+ * @param {string} artic ('stacc', ...)
+ */
 export function toggleArtic(v, cm, artic = 'stacc') {
   v.loadXml(cm.getValue());
   let ids = speed.filterElements(v.selectedElements, v.xmlDoc);
@@ -451,8 +489,13 @@ export function toggleArtic(v, cm, artic = 'stacc') {
   v.updateNotation = true; // update notation again
 } // toggleArtic()
 
-// shift element (rests, note) up/down by pitch name (1 or 7 steps)
-export function shiftPitch(v, cm, deltaPitch) {
+/**
+ * Shifts element (rests, note) up/down by pitch name (1 or 7 steps)
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
+ * @param {int} deltaPitch (-1, -12, +2)
+ */
+export function shiftPitch(v, cm, deltaPitch = 0) {
   v.loadXml(cm.getValue());
   let ids = speed.filterElements(v.selectedElements, v.xmlDoc);
   v.updateNotation = false;
@@ -474,6 +517,12 @@ export function shiftPitch(v, cm, deltaPitch) {
   v.updateNotation = true; // update notation again
 } // shiftPitch()
 
+/**
+ * Moves selected elements to next staff (without checking boundaries)
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
+ * @param {boolean} upwards
+ */
 export function moveElementToNextStaff(v, cm, upwards = true) {
   console.info('moveElementToNextStaff(' + (upwards ? 'up' : 'down') + ')');
   v.loadXml(cm.getValue());
@@ -502,7 +551,13 @@ export function moveElementToNextStaff(v, cm, upwards = true) {
   v.updateNotation = true; // update notation again
 } // moveElementToNextStaff()
 
-// add beam, only speed mode
+/**
+ * Adds beam element
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
+ * @param {string} elementName
+ * @returns
+ */
 export function addBeamElement(v, cm, elementName = 'beam') {
   v.loadXml(cm.getValue());
   v.selectedElements = speed.filterElements(v.selectedElements, v.xmlDoc);
@@ -555,7 +610,12 @@ export function addBeamElement(v, cm, elementName = 'beam') {
   v.updateNotation = true; // update notation again
 } // addBeamElement()
 
-// add beamSpan element
+/**
+ * Adds beamSpan element to selected elements
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
+ * @returns
+ */
 export function addBeamSpan(v, cm) {
   v.loadXml(cm.getValue());
   if (v.selectedElements.length < 1) return;
@@ -597,7 +657,14 @@ export function addBeamSpan(v, cm) {
   v.updateNotation = true; // update notation again
 } // addBeamSpan()
 
-// add octave element and modify notes inside selected elements
+/**
+ * Adds an octave element and modifies notes inside selected elements
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
+ * @param {string} disPlace ('above', 'below')
+ * @param {string} dis (8, 15, 22)
+ * @returns
+ */
 export function addOctaveElement(v, cm, disPlace = 'above', dis = '8') {
   v.loadXml(cm.getValue());
   if (v.selectedElements.length < 1) return;
@@ -636,8 +703,18 @@ export function addOctaveElement(v, cm, disPlace = 'above', dis = '8') {
   v.updateNotation = true; // update notation again
 } // addOctaveElement()
 
-// surround selected elements with a supplied element (and a responsibility
-// statement from v.respId
+/**
+ * Surrounds selected elements with a supplied element
+ * (and a responsibility statement from v.respId derived
+ * from mei-friend settings.
+ *
+ * If attrName is specified, it searches for those attributes,
+ * inserts them as new elements, and surrounds them with supplied elements.
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
+ * @param {string} attrName ('artic', 'accid')
+ * @returns
+ */
 export function addSuppliedElement(v, cm, attrName = 'none') {
   v.loadXml(cm.getValue());
   v.selectedElements = speed.filterElements(v.selectedElements, v.xmlDoc);
@@ -702,6 +779,12 @@ export function addSuppliedElement(v, cm, attrName = 'none') {
   }
 } // addSuppliedElement()
 
+/**
+ * Adds a vertical group attribute (vgrp) to all selected elements
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
+ * @returns
+ */
 export function addVerticalGroup(v, cm) {
   v.loadXml(cm.getValue());
   v.selectedElements = speed.filterElements(v.selectedElements, v.xmlDoc);
@@ -798,7 +881,12 @@ export function addApplicationInfo(v, cm) {
   }
 } // addApplicationInfo()
 
-// wrapper for cleaning superfluous @accid.ges attributes
+/**
+ * Wrapper function to utils.cleanAccid() for cleaning
+ * superfluous @accid.ges attributes
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
+ */
 export function cleanAccid(v, cm) {
   v.updateNotation = false;
   v.loadXml(cm.getValue(), true);
@@ -806,8 +894,13 @@ export function cleanAccid(v, cm) {
   v.updateNotation = true;
 }
 
-// wrapper for renumbering measure numberlike string
-export function renumberMeasures(v, cm, change) {
+/**
+ * Wrapper function for renumbering measure numberlike attribute (@n)
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
+ * @param {boolean} change
+ */
+export function renumberMeasures(v, cm, change = false) {
   v.updateNotation = false;
   v.loadXml(cm.getValue(), true);
   utils.renumberMeasures(v, cm, 1, change);
@@ -817,7 +910,12 @@ export function renumberMeasures(v, cm, change) {
   v.updateNotation = true;
 } // renumberMeasures()
 
-// function for adding/removing xml:ids in xmlDoc & reloading MEI into cm
+/**
+ * Function for adding/removing xml:ids in xmlDoc & reloading MEI into cm
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
+ * @param {boolean} removeIds
+ */
 export function manipulateXmlIds(v, cm, removeIds = false) {
   let startTime = Date.now();
   let report = { added: 0, removed: 0 };
@@ -1015,11 +1113,11 @@ export function addZone(v, cm, rect, addMeasure = true) {
 
 /**
  * Removes a zone in editor, called from editor.js
- * @param {Viewer} v 
- * @param {CodeMirror} cm 
- * @param {Element} zone 
- * @param {boolean} removeMeasure 
- * @returns 
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
+ * @param {Element} zone
+ * @param {boolean} removeMeasure
+ * @returns
  */
 export function removeZone(v, cm, zone, removeMeasure = false) {
   if (!zone) return;
