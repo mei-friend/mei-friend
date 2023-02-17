@@ -314,9 +314,10 @@ export function invertPlacement(v, cm, modifier = false) {
           }
         } else {
           let msg =
-            'Editor invertPlacement: Cannot change placement to "between", as selected element does not sit in a staff group with two staves.';
+            'Editor between placement: Cannot change placement to "between", as selected element does not sit in a staff group with two staves.';
           console.log(msg);
           v.showAlert(msg, 'warning');
+          return;
         }
       }
       // for fermata, change form from inv to nothing or back
