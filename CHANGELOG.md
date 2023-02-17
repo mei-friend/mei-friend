@@ -8,7 +8,8 @@
 * Do not save and insert slur below with `CTRL + S` on Windows/Linux (fix for #15)
 * Support for `@place="between"` on control elements (fix for #16)
 * Several improvements and harmonization in editor code
-
+* Change keyboard shortcut for tenuto to `SHIFT + E`
+* Insert control elements without placement by default
 ### 0.8.2 patch
 * Fixes to highlight synchronization edge-cases caused by rounding issues
 * Implement MIDI playback shortcut (bubble) to open control bar and start playback immediately
