@@ -1754,6 +1754,7 @@ function addEventListeners(v, cm) {
   document.getElementById('downwards-btn').addEventListener('click', cmd.layerDown);
   // manipulation
   document.getElementById('invertPlacement').addEventListener('click', cmd.invertPlacement);
+  document.getElementById('betweenPlacement').addEventListener('click', cmd.betweenPlacement);
   document.getElementById('addVerticalGroup').addEventListener('click', cmd.addVerticalGroup);
   document.getElementById('delete').addEventListener('click', cmd.delete);
   document.getElementById('pitchUp').addEventListener('click', cmd.shiftPitchNameUp);
