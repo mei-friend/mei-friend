@@ -19,17 +19,11 @@
 
     "s": "addSlur",
     "t": "addTie",
-    "ctrl-t": "addTieBelow",
     "h": "addCresHairpin",
     "shift-h": "addDimHairpin",
-    "ctrl-h": "addCresHairpinBelow",
-    "ctrl-shift-h": "addDimHairpinBelow",
     "f": "addFermata",
-    "ctrl-f": "addFermataBelow",
     "i": "addDirective",
-    "ctrl-i": "addDirectiveBelow",
     "d": "addDynamics",
-    "ctrl-d": "addDynamicsBelow",
     "shift-t": "addTempo",
     "alt-shift-t": "addTempoTstamp",
     "a": "addArpeggio",
@@ -38,15 +32,11 @@
     "p": "addPedalDown",
     "ctrl-p": "addPedalUp",
     "m": "addMordent",
-    "ctrl-m": "addMordentBelow",
     "shift-m": "addMordentUpper",
-    "shift-ctrl-m": "addMordentBelowUpper",
     "l": "addTrill",
-    "ctrl-l": "addTrillBelow",
     "n": "addTurn",
     "shift-n": "addTurnLower",
-    "shift-ctrl-n": "addTurnBelowLower",
-
+    
     "shift-s": "toggleStacc",
     "shift-v": "toggleAccent",
     "shift-e": "toggleTenuto",
@@ -76,7 +66,6 @@
   },
 
   ".platform-darwin": {
-    "ctrl-s": "addSlurBelow",
     "cmd-right": "nextMeasure",
     "cmd-left": "previousMeasure",
     "ctrl-cmd-right": "nextPage",
