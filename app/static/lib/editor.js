@@ -431,7 +431,7 @@ export function toggleArtic(v, cm, artic = 'stacc') {
     let uuid;
     let noteList;
     if (['note', 'chord'].includes(note.nodeName)) {
-      uuid = toggleArticForNote(v, note, artic);
+      uuid = toggleArticForNote(note, artic, v.xmlIdStyle);
       uuid ? (ids[i] = uuid) : (ids[i] = id);
       range = replaceInEditor(cm, note, true);
       cm.execCommand('indentAuto');
@@ -439,7 +439,7 @@ export function toggleArtic(v, cm, artic = 'stacc') {
       let noteId;
       for (noteId of noteList) {
         note = v.xmlDoc.querySelector("[*|id='" + noteId + "']");
-        uuid = toggleArticForNote(v, note, artic);
+        uuid = toggleArticForNote(note, artic, v.xmlIdStyle);
         range = replaceInEditor(cm, note, true);
         cm.execCommand('indentAuto');
       }
@@ -464,9 +464,9 @@ export function shiftPitch(v, cm, deltaPitch) {
     let chs = Array.from(el.querySelectorAll('note,rest,mRest,multiRest'));
     if (chs.length > 0)
       // shift many elements
-      chs.forEach((ele) => replaceInEditor(cm, pitchMover(ele, deltaPitch)));
+      chs.forEach((ele) => replaceInEditor(cm, pitchMover(ele, deltaPitch)), true);
     // shift one element
-    else replaceInEditor(cm, pitchMover(el, deltaPitch));
+    else replaceInEditor(cm, pitchMover(el, deltaPitch), true);
   }
   v.selectedElements = ids;
   addApplicationInfo(v, cm);
@@ -587,7 +587,7 @@ export function addBeamSpan(v, cm) {
     cm.replaceRange(dutils.xmlToString(beamSpan) + '\n', cm.getCursor());
     cm.indentLine(p1.line, 'smart'); // TODO
     cm.indentLine(p1.line + 1, 'smart');
-    cm.setSelection(p1);
+    utils.setCursorToId(cm, uuid);
   }
   v.selectedElements = [];
   v.selectedElements.push(uuid);
@@ -623,7 +623,7 @@ export function addOctaveElement(v, cm, disPlace = 'above', dis = '8') {
     cm.replaceRange(dutils.xmlToString(octave) + '\n', cm.getCursor());
     cm.indentLine(p1.line, 'smart'); // TODO
     cm.indentLine(p1.line + 1, 'smart');
-    cm.setSelection(p1);
+    utils.setCursorToId(cm, uuid);
   }
   // find plist and modify elements
   findAndModifyOctaveElements(cm, v.xmlDoc, id1, id2, disPlace, dis);
@@ -737,7 +737,7 @@ export function addVerticalGroup(v, cm) {
 /**
  * Adds an application element to appInfo or updates its date, if already there
  * @param {Viewer} v
- * @param {object} cm
+ * @param {CodeMirror} cm
  */
 export function addApplicationInfo(v, cm) {
   if (document.getElementById('addApplicationNote').checked) {
@@ -890,7 +890,7 @@ export function manipulateXmlIds(v, cm, removeIds = false) {
 } // manipulateXmlIds()
 
 /**
- * Add zone element in editor (called from source-imager.js),
+ * Adds a zone element in editor (called from source-imager.js),
  * places it
  * @param {Viewer} v
  * @param {CodeMirror} cm
@@ -1013,7 +1013,14 @@ export function addZone(v, cm, rect, addMeasure = true) {
   }
 } // addZone()
 
-// remove zone in editor, called from editor.js
+/**
+ * Removes a zone in editor, called from editor.js
+ * @param {Viewer} v 
+ * @param {CodeMirror} cm 
+ * @param {Element} zone 
+ * @param {boolean} removeMeasure 
+ * @returns 
+ */
 export function removeZone(v, cm, zone, removeMeasure = false) {
   if (!zone) return;
   removeInEditor(cm, zone);
@@ -1108,7 +1115,11 @@ export function addFacsimile(v, cm) {
   v.updateNotation = true;
 } // addFacsimile()
 
-// find xmlNode in textBuffer and remove it (including empty line)
+/**
+ * Finds xmlNode in textBuffer and removes it (including empty line)
+ * @param {CodeMirror} cm
+ * @param {Element} xmlNode
+ */
 export function removeInEditor(cm, xmlNode) {
   let itemId = xmlNode.getAttribute('xml:id');
   let searchSelfClosing = '(?:<' + xmlNode.nodeName + `)(\\s+?)([^>]*?)(?:xml:id=["']` + itemId + `['"])([^>]*?)(?:/>)`;
@@ -1141,13 +1152,20 @@ export function removeInEditor(cm, xmlNode) {
       }
     }
   } else console.info('removeInEditor(): nothing removed for ' + itemId + '.');
-}
+} // removeInEditor()
 
 function isEmpty(str) {
   return !/\S/g.test(str);
-}
+} // isEmpty()
 
-// find xmlNode in textBuffer and replace it with new serialized content
+/**
+ * Finds xmlNode in textBuffer and replaces it with new serialized content
+ * @param {CodeMirror} cm
+ * @param {Element} xmlNode
+ * @param {boolean} select
+ * @param {Element} newNode
+ * @returns
+ */
 export function replaceInEditor(cm, xmlNode, select = false, newNode = null) {
   let newMEI = newNode ? dutils.xmlToString(newNode) : dutils.xmlToString(xmlNode);
   // search in buffer
@@ -1189,13 +1207,20 @@ export function replaceInEditor(cm, xmlNode, select = false, newNode = null) {
     start: sc.from(),
     end: sc.to(),
   };
-}
+} // replaceInEditor()
 
 // ############################################################################
 // # (mostly) private functions                                               #
 // ############################################################################
 
-function toggleArticForNote(v, note, artic) {
+/**
+ * Toggles and articulation for a given element (note)
+ * @param {Element} note
+ * @param {string} artic
+ * @param {string} xmlIdStyle (Original, Base36, mei-friend, see viewer.js)
+ * @returns
+ */
+function toggleArticForNote(note, artic, xmlIdStyle) {
   note = utils.attrAsElements(note);
   let articChildren;
   let add = false;
@@ -1218,15 +1243,20 @@ function toggleArticForNote(v, note, artic) {
   if (add) {
     // add artic as element
     let articElement = document.createElementNS(dutils.meiNameSpace, 'artic');
-    uuid = utils.generateXmlId('artic', v.xmlIdStyle);
+    uuid = utils.generateXmlId('artic', xmlIdStyle);
     articElement.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
     articElement.setAttribute('artic', artic);
     note.appendChild(articElement);
   }
-  // console.info('modified element: ', note);
   return uuid;
-}
+} // toggleArticForNote()
 
+/**
+ * Modifies an element's pitch up and down (i.e. manipulating @oct, @pname)
+ * @param {Element} el
+ * @param {number} deltaPitch
+ * @returns
+ */
 function pitchMover(el, deltaPitch) {
   let oct = 4;
   let pname = 'c';
@@ -1252,9 +1282,15 @@ function pitchMover(el, deltaPitch) {
   el.setAttribute(o, oct);
   el.setAttribute(p, att.pnames[pi]);
   return el;
-}
+} // pitchMover()
 
-function staffMover(cm, el, upwards) {
+/**
+ * Moves an element across staves.
+ * @param {CodeMirror} cm
+ * @param {Element} el
+ * @param {boolean} upwards
+ */
+function staffMover(cm, el, upwards = true) {
   let staff = el.closest('staff');
   let staffNo = -1;
   if (staff) staffNo = parseInt(staff.getAttribute('n'));
@@ -1274,12 +1310,22 @@ function staffMover(cm, el, upwards) {
   }
   if (staffNo === newStaffNo) el.removeAttribute('staff');
   else el.setAttribute('staff', newStaffNo);
-  replaceInEditor(cm, el);
-}
+  replaceInEditor(cm, el, true);
+} // staffMover()
 
-// find all notes between two ids in the same staff and set @oct.ges and
-// modify @oct with deltaOct (1,-1, 2,...);
-// or, if set=false: remove @oct.ges and reset @oct
+/**
+ * Finds all notes between two ids in the same staff and
+ * sets @oct.ges and modifies @oct with deltaOct (1,-1, 2,...);
+ * or, if set=false: remove @oct.ges and reset @oct
+ * @param {CodeMirror} cm
+ * @param {Document} xmlDoc
+ * @param {string} id1
+ * @param {string} id2
+ * @param {string} disPlace ('below|above')
+ * @param {string} dis (e.g. 8, 15, 22)
+ * @param {boolean} add
+ * @returns
+ */
 function findAndModifyOctaveElements(cm, xmlDoc, id1, id2, disPlace, dis, add = true) {
   let deltaOct = (parseInt(dis) - 1) / 7;
   if (disPlace === 'below') deltaOct *= -1; // normal logic: minus 1 when below
@@ -1328,11 +1374,11 @@ function findAndModifyOctaveElements(cm, xmlDoc, id1, id2, disPlace, dis, add = 
 } // findAndModifyOctaveElements()
 
 /**
- * Determines an array of staff numbers for a given element that spans
+ * Determines staff numbers for a given element that spans
  * the relevant staff group that the element is inside.
  * @param {Viewer} v
  * @param {Element} element
- * @returns {Array[]} staffNumbers
+ * @returns {Object} with staffNumbers and staffNumber as keys
  */
 function getStaffNumbersForClosestStaffGroup(v, element) {
   if (!element) return null;
