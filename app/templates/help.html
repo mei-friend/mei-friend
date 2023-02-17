@@ -12,10 +12,12 @@
       let altKey = '&#8997;'; // ALT
       let cmdKey = '&#8963;'; // CTRL
       let cmd2Key = '&#8997;'; // ALT
+      let ctrlKey; // always CTRL on all OS
       shiftKey = 'SHIFT';
       altKey = 'ALT';
       cmdKey = 'CTRL';
       cmd2Key = 'ALT';
+      ctrlKey = 'CTRL';
       let platform = (navigator?.userAgentData?.platform || navigator?.platform || 'unknown').toLowerCase();
       if (platform.startsWith('mac')) {
         cmdKey = '&#8984;'; // CMD
@@ -27,6 +29,7 @@
       document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.cmdKey').forEach((e) => (e.innerHTML = cmdKey));
         document.querySelectorAll('.cmd2Key').forEach((e) => (e.innerHTML = cmd2Key));
+        document.querySelectorAll('.ctrlKey').forEach((e) => (e.innerHTML = ctrlKey));
         document.querySelectorAll('.shiftKey').forEach((e) => (e.innerHTML = shiftKey));
         document.querySelectorAll('.altKey').forEach((e) => (e.innerHTML = altKey));
       });
@@ -134,7 +137,8 @@
           <tr>
             <td><span class="keyIcon shiftKey"></span><span class="keyIcon">X</span></td>
             <td>
-              Set att.placement (dir, dynam, trill, ...) to @place="between" and determine staff attribute from staff group of selected element (has to contain exactly two staves)
+              Set att.placement (dir, dynam, trill, ...) to @place="between" and determine staff attribute from staff
+              group of selected element (has to contain exactly two staves)
             </td>
           </tr>
           <tr>
@@ -225,9 +229,9 @@
       <div class="text-info">
         <h3 class="text-highlight">Inserting elements</h3>
         <p>
-          Key bindings insert elements without a placement attribute. To insert or invert the placement,
-          use <span class="keyIcon">X</span> shortcut after inserting the element.
-          The elements are inserted using @startid and @endid attributes.
+          Key bindings insert elements without a placement attribute. To insert or invert the placement, use
+          <span class="keyIcon">X</span> shortcut after inserting the element. The elements are inserted using @startid
+          and @endid attributes.
           <!--To insert elements with @tstamp and @tstamp2 attributes,
         use the <span class="keyIcon">ALT &#8997;</span> key additionally.-->
         </p>
@@ -277,6 +281,20 @@
             <td class="icons"><span class="keyIcon">U</span></td>
             <td class="explanation">
               Surround selected elements with a supplied element; responsibility attribute to be selected in settings
+            </td>
+          </tr>
+          <tr>
+            <td class="icons"><span class="keyIcon ctrlKey"></span><span class="keyIcon">U</span></td>
+            <td class="explanation">
+              Make artic attribute a separate element and surround it with a supplied element; responsibility attribute
+              to be selected in settings
+            </td>
+          </tr>
+          <tr>
+            <td class="icons"><span class="keyIcon ctrlKey"></span><span class="keyIcon shiftKey"></span><span class="keyIcon">U</span></td>
+            <td class="explanation">
+              Make accid attribute a separate element and surround it with a supplied element; responsibility attribute
+              to be selected in settings
             </td>
           </tr>
         </table>
