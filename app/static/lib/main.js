@@ -1,6 +1,6 @@
 // mei-friend version and date
 export const version = '0.8.3';
-export const versionDate = '16 Feb 2023';
+export const versionDate = '17 Feb 2023';
 
 var vrvWorker;
 var spdWorker;
@@ -1754,6 +1754,7 @@ function addEventListeners(v, cm) {
   document.getElementById('downwards-btn').addEventListener('click', cmd.layerDown);
   // manipulation
   document.getElementById('invertPlacement').addEventListener('click', cmd.invertPlacement);
+  document.getElementById('betweenPlacement').addEventListener('click', cmd.betweenPlacement);
   document.getElementById('addVerticalGroup').addEventListener('click', cmd.addVerticalGroup);
   document.getElementById('delete').addEventListener('click', cmd.delete);
   document.getElementById('pitchUp').addEventListener('click', cmd.shiftPitchNameUp);
@@ -1786,6 +1787,8 @@ function addEventListeners(v, cm) {
   document.getElementById('addBeam').addEventListener('click', cmd.addBeam);
   document.getElementById('addBeamSpan').addEventListener('click', cmd.addBeamSpan);
   document.getElementById('addSupplied').addEventListener('click', cmd.addSupplied);
+  document.getElementById('addSuppliedArtic').addEventListener('click', cmd.addSuppliedArtic);
+  document.getElementById('addSuppliedAccid').addEventListener('click', cmd.addSuppliedAccid);
   document.getElementById('addArpeggio').addEventListener('click', cmd.addArpeggio);
   // more control elements
   document.getElementById('addFermata').addEventListener('click', cmd.addFermata);

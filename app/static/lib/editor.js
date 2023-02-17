@@ -158,7 +158,7 @@ export function addControlElement(v, cm, elName, placement, form) {
     }
   }
   // check inner elements (without start/end) for staff numbers and add them, if missing in staveArray
-  for (let i = 1; i < v.selectedElements.length - 2; i++) {
+  for (let i = 1; i < v.selectedElements.length - 1; i++) {
     let el = v.xmlDoc.querySelector("[*|id='" + v.selectedElements[i] + "']");
     let n = el?.closest('staff')?.getAttribute('n');
     if (!staveArray.includes(n)) staveArray.push(n);
@@ -314,9 +314,10 @@ export function invertPlacement(v, cm, modifier = false) {
           }
         } else {
           let msg =
-            'Editor invertPlacement: Cannot change placement to "between", as selected element does not sit in a staff group with two staves.';
+            'Editor between placement: Cannot change placement to "between", as selected element does not sit in a staff group with two staves.';
           console.log(msg);
           v.showAlert(msg, 'warning');
+          return;
         }
       }
       // for fermata, change form from inv to nothing or back
