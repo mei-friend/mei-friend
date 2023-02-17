@@ -1786,6 +1786,8 @@ function addEventListeners(v, cm) {
   document.getElementById('addBeam').addEventListener('click', cmd.addBeam);
   document.getElementById('addBeamSpan').addEventListener('click', cmd.addBeamSpan);
   document.getElementById('addSupplied').addEventListener('click', cmd.addSupplied);
+  document.getElementById('addSuppliedArtic').addEventListener('click', cmd.addSuppliedArtic);
+  document.getElementById('addSuppliedAccid').addEventListener('click', cmd.addSuppliedAccid);
   document.getElementById('addArpeggio').addEventListener('click', cmd.addArpeggio);
   // more control elements
   document.getElementById('addFermata').addEventListener('click', cmd.addFermata);
