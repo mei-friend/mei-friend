@@ -1,10 +1,37 @@
 # mei-friend-online CHANGELOG.md
+### 0.8.3 patch
+* Show modifyer keys as text (ALT, CTRL...) on Windows/Linux systems
+* Insert `arpeg` with `@order="up"` per default (or `@order="down"` with `CTRL + A`)
+* Insert control elements with @staff attribute of selected elements (fix for #12)
+* Fix trailing space in `arpeg@plist`(fix for #13)
+* Support for inserting supplied elements around artic/accid attributes (that get converted to elements) (fix for #14)
+* Do not save and insert slur below with `CTRL + S` on Windows/Linux (fix for #15)
+* Support for `@place="between"` on control elements (fix for #16)
+* Several improvements and harmonization in editor code
 
+### 0.8.2 patch
+* Fixes to highlight synchronization edge-cases caused by rounding issues
+* Implement MIDI playback shortcut (bubble) to open control bar and start playback immediately
+* Implement space-bar and esc keyboard shortcuts
+* Implement close button on control bar
+* Improve highlighting after page turn
+* Re-render MIDI after Verovio MIDI options change (or when default button clicked)
+* Unhighlight notes before rests
+### 0.8.1 patch
+* Support automatic scroll-following of midi playback (feature request by @annplaksin)
+* Improve scroll-to-element behavior (during playback and navigation)
+## 0.8.0 MIDI playback
+* Add MIDI playback control bar and settings
+* Implement playback using html-midi-player
+* Support configurable automatic page-following during playback
+* Support configurable highlighting of currently-sounding notes
+* Modification to getPageWithElement to work with and without speed mode
+* Modularise and adapt left footer message
 ### 0.7.1
 * Adding and removing xml:ids to and from encoding done natively inside mei-friend
 * Bug fixes: Reduce processing time while indenting code; sync tabSize & indentUnit
 * Skip git branch selection when only one branch exists in repository
-## 0.7.0 Complete speedmode improvements
+## 0.7.0 Complete speed mode improvements
 * Support for time-spanning elements with `@startid/endid` that start before and end after current page (thus, spanning across current page)
 * Support for time-spanning elements with `@tstamp/tstamp2` attributes, starting or ending on current page as well as those spanning across current page (start before and end afterwards)
 * Download current speed mode page triple (current page with a dummy page before and after, normally not shown) with `CTRL-SHIFT-S` (or on MacOS `CMD-SHIFT-S`)
@@ -139,7 +166,7 @@ in control menu through mei-friend settings pane
 * Add 'Show MEI Guidelines' in Help menu
 * Implement 'Consult Guidelines' feature ('alt-.')
 ### 0.3.2 patch: Accelerating speed mode
-* Accelerate speedMode using tXml in a separate worker for pre-computing time-spanning elements with @startid/@endid attributes
+* Accelerate speed mode using tXml in a separate worker for pre-computing time-spanning elements with @startid/@endid attributes
 * Support for toggling *spiccato* articulation with Shift+P
 ### 0.3.1 patch
 * Implement fork repository functionality
@@ -173,9 +200,9 @@ in control menu through mei-friend settings pane
 * Implement file status and change tracking
 * Implement OpenUrl function
 ## 0.2.0 minor: Speed mode support
-* Support for speedMode to be en/disabled through checkbox
-* SpeedMode support also for breaks='auto|smart' by computing breaks upon loading
-* Quick first page view when opening file in speedMode with automatic breaks
+* Support for speed mode to be en/disabled through checkbox
+* Speed mode support also for breaks='auto|smart' by computing breaks upon loading
+* Quick first page view when opening file in speed mode with automatic breaks
 * Verovio icon animation during worker activity
 * Center selected elements in editor upon notation click
 * Shift pitch of notes/rests inside selected parent elements (e.g., beams)
@@ -187,7 +214,7 @@ in control menu through mei-friend settings pane
 ### 0.1.5 patch
 * Fix github commit behaviour
 ### 0.1.4 patch
-* Verovio label removed and speedmode checkbox added (still disabled)
+* Verovio label removed and speed mode checkbox added (still disabled)
 * Some editor code optimizations
 * Open and download keyboard shortcuts added
 * Incorporate new .env variables for production deployment
