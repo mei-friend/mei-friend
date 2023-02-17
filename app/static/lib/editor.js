@@ -709,7 +709,9 @@ export function addOctaveElement(v, cm, disPlace = 'above', dis = '8') {
  * from mei-friend settings.
  *
  * If attrName is specified, it searches for those attributes,
- * inserts them as new elements, and surrounds them with supplied elements.
+ * inserts them as new elements, and surrounds them with supplied
+ * elements. If there is already such a artic/accid child element,
+ * take it and surround it.
  * @param {Viewer} v
  * @param {CodeMirror} cm
  * @param {string} attrName ('artic', 'accid')
@@ -733,22 +735,33 @@ export function addSuppliedElement(v, cm, attrName = 'none') {
       // convert attrName to element and surround that
       if (attrName === 'artic' || attrName === 'accid') {
         if (!el.hasAttribute(attrName)) {
-          const msg = 'No ' + attrName + ' attribute in element ' + el.nodeName + '.';
-          console.log(msg);
-          v.showAlert(msg, 'warning');
-          return;
+          let childElement;
+          el.childNodes.forEach((ch) => {
+            if (ch.nodeName === attrName) childElement = ch;
+          });
+          if (childElement) {
+            parent = el;
+            el = childElement;
+          } else {
+            const msg =
+              'No ' + attrName + ' attribute or child node found in element ' + el.nodeName + ' (' + id + ').';
+            console.log(msg);
+            v.showAlert(msg, 'warning');
+            return;
+          }
+        } else {
+          let attrValue = el.getAttribute(attrName);
+          let attrEl = document.createElementNS(dutils.meiNameSpace, attrName);
+          let uuid = mintSuppliedId(id, attrName);
+          attrEl.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
+          attrEl.setAttribute(attrName, attrValue);
+          el.removeAttribute(attrName);
+          el.appendChild(attrEl);
+          replaceInEditor(cm, el, true);
+          cm.execCommand('indentAuto');
+          parent = el;
+          el = attrEl;
         }
-        let attrValue = el.getAttribute(attrName);
-        let attrEl = document.createElementNS(dutils.meiNameSpace, attrName);
-        let uuid = mintSuppliedId(id, attrName);
-        attrEl.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
-        attrEl.setAttribute(attrName, attrValue);
-        el.removeAttribute(attrName);
-        el.appendChild(attrEl);
-        replaceInEditor(cm, el, true);
-        cm.execCommand('indentAuto');
-        parent = el;
-        el = attrEl;
       }
 
       let sup = document.createElementNS(dutils.meiNameSpace, 'supplied');
