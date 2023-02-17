@@ -218,8 +218,7 @@ export function addControlElement(v, cm, elName, placement, form) {
     cm.replaceRange(dutils.xmlToString(newElement) + '\n', cm.getCursor());
     cm.indentLine(p1.line, 'smart');
     cm.indentLine(p1.line + 1, 'smart');
-    cm.setSelection(p1);
-    console.log('Cursor pos: ', cm.getCursor());
+    utils.setCursorToId(cm, uuid); // to select new element
   }
   // add new element to DOM
   var measureId = startEl.closest('measure').getAttribute('xml:id');
@@ -227,7 +226,6 @@ export function addControlElement(v, cm, elName, placement, form) {
   v.lastNoteId = startId;
   v.selectedElements = [];
   v.selectedElements.push(uuid);
-  addApplicationInfo(v, cm);
   addApplicationInfo(v, cm);
   v.updateData(cm, false, true);
   v.updateNotation = true;
@@ -255,7 +253,8 @@ export function addClefChange(v, cm, shape = 'G', line = '2', before = true) {
     cm.execCommand('goLineEnd');
     cm.replaceRange('\n' + dutils.xmlToString(newElement), cm.getCursor());
   }
-  cm.execCommand('indentAuto');
+  cm.execCommand('indentAuto'); // auto indent current line or selection
+  utils.setCursorToId(cm, uuid); // to select new element
   v.updateNotation = true; // update notation again
   v.selectedElements = [];
   v.selectedElements.push(uuid);
@@ -446,7 +445,6 @@ export function toggleArtic(v, cm, artic = 'stacc') {
       }
     }
   }
-  if (range) cm.setCursor(range.end);
   v.selectedElements = ids;
   addApplicationInfo(v, cm);
   v.updateData(cm, false, true);

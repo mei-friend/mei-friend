@@ -2009,7 +2009,7 @@ export default class Viewer {
     this.updateNotation = true;
     this.scrollSvg(cm);
     this.updateHighlight(cm);
-  }
+  } // navigate()
 
   // turn page for navigation and return svg directly
   navigateBeyondPage(cm, dir = 'forwards', what = 'first', stNo = 1, lyNo = 1, y = 0) {
