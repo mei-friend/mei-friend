@@ -703,22 +703,21 @@ async function writeStandoffIfRequested(a) {
             }
           }
           let resp = await establishResource(storage + 'at.ac.mdw.mei-friend/', resource.container);
-          if(resp.ok) {
-            console.log('Finished establishing friend container: ', resp);
-            webAnno["@id"] = storage + 'at.ac.mdw.mei-friend/' + a.id;
-            console.log("TRYING TO SET UP ANNO", a, webAnno)
-            let webAnnoResp = establishResource(webAnno["@id"], webAnno);
-            if(webAnnoResp.ok) { 
-              console.log("Success! Posted Web Annotation:", webAnno);
-            } else { 
-              console.warn("Couldn't post WebAnno: ", webAnno);
-              log("Sorry, couldn't post annotation to your Solid Pod's mei-friend container" +  webAnno["@id"]);
-            }
-          } else {
-            log("Sorry, couldn't establish storage location from your Solid Pod's profile", profile);
-          }
+          if(resp) {
+            if(resp.ok) {
+              console.log('Finished establishing friend container: ', resp);
+              webAnno["@id"] = storage + 'at.ac.mdw.mei-friend/' + a.id;
+              console.log("TRYING TO SET UP ANNO", a, webAnno)
+              let webAnnoResp = establishResource(webAnno["@id"], webAnno);
+              if(webAnnoResp.ok) { 
+                console.log("Success! Posted Web Annotation:", webAnno);
+                a.isStandoff = true;
+              } else { 
+                console.warn("Couldn't post WebAnno: ", webAnno);
+              }
+            }           }
         } else {
-          log("Sorry, couldn't establish storage location from your Solid Pod's profile", profile);
+          log("Sorry, couldn't establish storage location from your Solid Pod's profile ", profile);
         }
       });
     }

@@ -621,6 +621,10 @@ document.addEventListener('DOMContentLoaded', function () {
   // restore localStorage if we have it
   if (storage.supported) {
     storage.read();
+    if(storage.restoreSolidSession) { 
+      // attempt to restore Solid session if user had one going
+      loginAndFetch();
+    }
     // save (most) URL parameters in storage
     if (orientationParam !== null) storage.notationOrientation = orientationParam;
     if (notationProportionParam !== null) storage.notationProportion = notationProportionParam;

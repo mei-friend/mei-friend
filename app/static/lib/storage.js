@@ -51,6 +51,7 @@ export default class Storage {
       this._breaks = this.storage.getItem("breaks");
       this._forkAndOpen = this.storage.getItem("forkAndOpen");
       this._githubLogoutRequested = this.storage.getItem("githubLogoutRequested");
+      this._restoreSolidSession = this.storage.getItem("restoreSolidSession");
       //fileChangedFromStorage = fileChangedFromStorage ? parseInt(storage.getItem("fileChanged")) : 0;
     }
   }
@@ -298,6 +299,15 @@ export default class Storage {
   set forkAndOpen(forkAndOpen) {
     this.safelySetStorageItem('forkAndOpen', forkAndOpen);
     this._forkAndOpen = forkAndOpen;
+  }
+
+  get restoreSolidSession() {
+    return this._restoreSolidSession;
+  }
+
+  set restoreSolidSession(restoreSolidSession) {
+    this.safelySetStorageItem('restoreSolidSession', restoreSolidSession);
+    this._restoreSolidSession = restoreSolidSession;
   }
 
 }

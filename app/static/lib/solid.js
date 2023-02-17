@@ -1,3 +1,8 @@
+import {
+  log,
+  storage
+} from './main.js';
+
 export const solid = solidClientAuthentication.default;
 
 // namespace definitions
@@ -39,6 +44,13 @@ export async function establishResource(uri, resource) {
         log("Sorry, network error while trying to initialize resource at ", uri, e);
       });
       return putResp;
+    } else if(headResp.status === 403) { 
+      // user needs to authorize mei-friend application to access their Pod
+      log("Unauthorized - please provide mei-friend application access to your Solid Pod: " + headResp.status + " " + headResp.statusText);
+      return headResp;
+    } else { 
+      // another problem...
+      log("Sorry, unable to establish resource in your Solid Pod: " + headResp.status + " " + headResp.statusText)
     }
   })
   return resp;
@@ -47,8 +59,8 @@ export async function establishResource(uri, resource) {
 export async function populateSolidTab() { 
   const solidTab = document.getElementById("solidTab");
   if(solid.getDefaultSession().info.isLoggedIn) {
-    console.log("HELLO!")
     solidTab.innerHTML = await populateLoggedInSolidTab();
+    document.getElementById('solidLogout').addEventListener('click', solidLogout)
   } else {
     solidTab.innerHTML = await populateLoggedOutSolidTab();
     document.getElementById('solidLogin').addEventListener('click', loginAndFetch)
@@ -102,7 +114,9 @@ async function populateLoggedInSolidTab() {
     }     
   }
   
-  return `Welcome, <span id='welcomeName' title='${webId}'>${name}</span>!`;
+  return `
+  <div>Welcome, <span id='welcomeName' title='${webId}'>${name}</span>!</div>
+  <div><a id="solidLogout">Log out</a></div>`;
 }
 
 function populateLoggedOutSolidTab() {
@@ -115,10 +129,11 @@ export async function loginAndFetch() {
   //      the user's credentials are stored in-memory, and
   //      the login process is complete. 
   //   Otherwise, no-op.  
-  await solid.handleIncomingRedirect();
+  await solid.handleIncomingRedirect({ restorePreviousSession: true });
 
   // 2. Start the Login Process if not already logged in.
   if (!solid.getDefaultSession().info.isLoggedIn) {
+    storage.restoreSolidSession = true;
     await solid.login({
       // Specify the URL of the user's Solid Identity Provider;
       // e.g., "https://login.inrupt.com".
@@ -129,6 +144,7 @@ export async function loginAndFetch() {
       // Provide a name for the application when sending to the Solid Identity Provider
       clientName: "mei-friend"
     });
+    
   } else { 
     populateSolidTab();
     /*
@@ -137,23 +153,11 @@ export async function loginAndFetch() {
         .then(data => console.log("GOT DATA: ", data))
         */
   }
+}
 
-  /*
-  // 3. Make authenticated requests by passing `fetch` to the solid-client functions.
-  // The user must have logged in as someone with the appropriate access to the specified URL.
-  
-  // For example, the user must be someone with Read access to the specified URL.
-  const myDataset = await solid.getSolidDataset(
-    "https://musicog.solidcommunity.net",
-    { fetch: solid.fetch }
-  );
-
-  // ...
-  
-  // For example, the user must be someone with Write access to the specified URL.
-  const savedSolidDataset = await saveSolidDatasetAt(
-    "https://storage.inrupt.com/somepod/todolist",
-    myChangedDataset,
-    { fetch: fetch }
-  );*/
+export function solidLogout() { 
+  solid.logout().then(() => {
+    storage.removeItem("restoreSolidSession")
+    populateSolidTab();
+  });
 }
