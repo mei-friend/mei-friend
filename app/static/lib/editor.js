@@ -261,7 +261,7 @@ export function addClefChange(v, cm, shape = 'G', line = '2', before = true) {
   v.selectedElements.push(uuid);
   v.lastNoteId = uuid;
   v.updatePage(cm, '', uuid);
-}
+} // addClefChange()
 
 // Reverse or insert att:placement (artic, ...), att.curvature (slur, tie,
 // phrase) and att.stems (note, chord) of current element
@@ -301,23 +301,39 @@ export function invertPlacement(v, cm, modifier = false) {
         val = 'below';
       }
       if (modifier) {
-        let staffList = getStaffNumbersForClosestStaffGroup(v, el);
-        if (staffList.length === 2) {
-          if (el.hasAttribute(attr)) {
-            if (['above', 'below'].includes(el.getAttribute(attr))) {
-              val = 'between';
-              el.setAttribute('staff', staffList.sort().join(' '));
+        let response = getStaffNumbersForClosestStaffGroup(v, el);
+        if (response) {
+          let staffNumbers = []; // relevant two staves for @place='between'
+          if (response.staffNumbers.length === 2) {
+            staffNumbers = response.staffNumbers.sort();
+          } else {
+            // try to guess the relevant two staves
+            staffNumbers = [response.staffNumber];
+            const i = response.staffNumbers.indexOf(response.staffNumber);
+            if (i === response.staffNumbers.length - 1) {
+              staffNumbers.push(response.staffNumbers[i - 1]);
             } else {
-              val = 'above';
-              el.setAttribute('staff', staffList[0]);
+              staffNumbers.push(response.staffNumbers[i + 1]);
             }
+            let msg =
+              'Editor between placement: Please check staff numbers of ' +
+              el.nodeName +
+              ' (' +
+              id +
+              ') ' +
+              ' as it does not sit in a staff group with two staves' +
+              ' and relevant staves cannot be clearly determined.';
+            console.log(msg);
+            v.showAlert(msg, 'info');
           }
-        } else {
-          let msg =
-            'Editor between placement: Cannot change placement to "between", as selected element does not sit in a staff group with two staves.';
-          console.log(msg);
-          v.showAlert(msg, 'warning');
-          return;
+          // set @place and @staff attribute
+          if (!el.hasAttribute(attr) || (el.hasAttribute(attr) && el.getAttribute(attr) !== 'between')) {
+            val = 'between'; // set to between, if no or other @place attribute
+            el.setAttribute('staff', staffNumbers.sort().join(' '));
+          } else {
+            val = 'above'; // default value
+            el.setAttribute('staff', staffNumbers[0]);
+          }
         }
       }
       // for fermata, change form from inv to nothing or back
@@ -391,7 +407,6 @@ export function invertPlacement(v, cm, modifier = false) {
     }
   }
   // console.info('TextCursor: ', txtEdr.getCursorBufferPosition());
-  if (range) cm.setCursor(range.end);
   v.selectedElements = ids;
   addApplicationInfo(v, cm);
   v.updateData(cm, false, true);
@@ -1348,9 +1363,9 @@ function getStaffNumbersForClosestStaffGroup(v, element) {
           const n = st.getAttribute('n');
           if (n) staffNumbers.push(n);
         });
-        return staffNumbers;
+        return { staffNumber: staffNumber, staffNumbers: staffNumbers };
       }
     }
-    return [];
+    return { staffNumber: staffNumber, staffNumbers: [] };
   }
 } // findClosestStaffGroup()
