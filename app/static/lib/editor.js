@@ -146,7 +146,7 @@ export function addControlElement(v, cm, elName, placement, form) {
   var startEl = v.xmlDoc.querySelector("[*|id='" + startId + "']");
   if (!startEl) return;
   if (!['note', 'chord', 'rest', 'mRest', 'multiRest'].includes(startEl.nodeName)) {
-    console.info('addControlElement: Cannot add new element to start element' + startEl.nodeName + '.');
+    console.info('addControlElement: Cannot add new element to ' + startEl.nodeName + '.');
     return;
   }
   // staveArray lists staff numbers of all selected elements
