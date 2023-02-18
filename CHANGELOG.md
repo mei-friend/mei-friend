@@ -5,6 +5,7 @@
 * Insert control elements with @staff attribute of selected elements (fix for #12)
 * Fix trailing space in `arpeg@plist`(fix for #13)
 * Support for inserting supplied elements around artic/accid attributes (that get converted to elements) (fix for #14)
+* Support for inserting supplied elements around artic/accid child elements of selected elements
 * Do not save and insert slur below with `CTRL + S` on Windows/Linux (fix for #15)
 * Support for `@place="between"` on control elements (fix for #16)
 * Several improvements and harmonization in editor code
