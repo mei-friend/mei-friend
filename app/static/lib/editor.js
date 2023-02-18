@@ -732,8 +732,11 @@ export function addSuppliedElement(v, cm, attrName = 'none') {
     } else {
       let parent = el.parentNode;
 
-      // convert attrName to element and surround that
-      if (attrName === 'artic' || attrName === 'accid') {
+      // convert attrName artic|accid to note|chord element and surround that
+      if (
+        (['note', 'chord'].includes(el.nodeName) && attrName === 'artic') ||
+        (el.nodeName === 'note' && attrName === 'accid')
+      ) {
         if (!el.hasAttribute(attrName)) {
           let childElement;
           el.childNodes.forEach((ch) => {
@@ -750,6 +753,7 @@ export function addSuppliedElement(v, cm, attrName = 'none') {
             return;
           }
         } else {
+          // make new element out of attribute and handle it as element to be surrounded
           let attrValue = el.getAttribute(attrName);
           let attrEl = document.createElementNS(dutils.meiNameSpace, attrName);
           let uuid = mintSuppliedId(id, attrName);
@@ -762,6 +766,10 @@ export function addSuppliedElement(v, cm, attrName = 'none') {
           parent = el;
           el = attrEl;
         }
+      } else if (['accid', 'artic'].includes(attrName)) {
+        const msg = 'Only chord and note elements are allowed for this command (you selected ' + el.nodeName + ').';
+        console.log(msg);
+        v.showAlert(msg, 'warning');
       }
 
       let sup = document.createElementNS(dutils.meiNameSpace, 'supplied');
