@@ -210,10 +210,10 @@ export function addControlElement(v, cm, elName, placement, form) {
   if (form && ['hairpin', 'fermata', 'mordent', 'trill', 'turn'].includes(elName)) {
     newElement.setAttribute('form', form);
   }
-  if (placement && ['pedal'].includes(elName)) {
-    newElement.setAttribute('dir', placement);
-    newElement.setAttribute('vgrp', '100');
-  }
+  // if (placement && ['pedal'].includes(elName)) {
+  //   newElement.setAttribute('dir', placement);
+  //   newElement.setAttribute('vgrp', '100');
+  // }
   if (placement) {
     if (['slur', 'tie', 'phrase'].includes(elName)) {
       newElement.setAttribute('curvedir', placement);
