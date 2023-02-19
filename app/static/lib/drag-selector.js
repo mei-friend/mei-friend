@@ -161,14 +161,14 @@ export function addDragSelector(v, vp) {
         });
       }
       oldEls.forEach((el) => newEls.push(el));
-      v.updateNotation = false;
+      v.allowCursorActivity = false;
       if (latest && Object.keys(latest).length > 0) {
         setCursorToId(cm, latest.el.id);
         v.lastNoteId = latest.el.id;
       }
       v.selectedElements = newEls;
       v.updateHighlight();
-      v.updateNotation = true;
+      v.allowCursorActivity = true;
     }
   });
 

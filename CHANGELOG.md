@@ -12,6 +12,7 @@
 * Change keyboard shortcut for tenuto to `SHIFT + E`
 * Insert control elements without placement by default
 * Remove `CTRL + ` for inserting control elements below
+* On multiple selected elements, insert pedal up on first and pedal down on last 
 ### 0.8.2 patch
 * Fixes to highlight synchronization edge-cases caused by rounding issues
 * Implement MIDI playback shortcut (bubble) to open control bar and start playback immediately
