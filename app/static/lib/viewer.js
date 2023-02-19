@@ -39,7 +39,7 @@ export default class Viewer {
     this.selectedElements = [];
     this.lastNoteId = '';
     this.notationNightMode = false;
-    this.updateNotation = true; // whether or not notation gets re-rendered after text changes
+    this.allowCursorActivity = true; // whether or not notation gets re-rendered after text changes
     this.speedMode = true; // speed mode (just feeds on page to Verovio to reduce drawing time)
     this.parser = new DOMParser();
     this.xmlDoc;
@@ -450,7 +450,7 @@ export default class Viewer {
     r.y = matrix.b * point.x + matrix.d * point.y + matrix.f;
     console.log('Click on ' + e.srcElement.id + ', x/y: ' + r.x + '/' + r.y);
 
-    this.updateNotation = false;
+    this.allowCursorActivity = false;
     // console.info('click: ', e);
     let itemId = String(e.currentTarget.id);
     if (itemId === 'undefined') return;
@@ -497,26 +497,28 @@ export default class Viewer {
     // }
     if (startid) this.lastNoteId = startid;
     else this.lastNoteId = itemId;
-    this.updateNotation = true;
+    this.allowCursorActivity = true;
   } // handleClickOnNotation()
 
   // when cursor pos in editor changed, update notation location / highlight
   cursorActivity(cm, forceFlip = false) {
-    let id = utils.getElementIdAtCursor(cm);
-    // console.log('cursorActivity forceFlip: ' + forceFlip + ' to: ' + id);
-    this.selectedElements = [];
-    if (id) {
-      this.selectedElements.push(id);
-      let fl = document.getElementById('flip-checkbox');
-      if (
-        !document.querySelector('g#' + utils.escapeXmlId(id)) && // when not on current page
-        ((this.updateNotation && fl && fl.checked) || forceFlip)
-      ) {
-        this.updatePage(cm, '', id, false);
-      } else if (this.updateNotation) {
-        // on current page
-        this.scrollSvg(cm);
-        this.updateHighlight(cm);
+    if (this.allowCursorActivity) {
+      let id = utils.getElementIdAtCursor(cm);
+      // console.log('cursorActivity forceFlip: ' + forceFlip + ' to: ' + id);
+      this.selectedElements = [];
+      if (id) {
+        this.selectedElements.push(id);
+        let fl = document.getElementById('flip-checkbox');
+        if (
+          !document.querySelector('g#' + utils.escapeXmlId(id)) && // when not on current page
+          ((fl && fl.checked) || forceFlip)
+        ) {
+          this.updatePage(cm, '', id, false);
+        } else {
+          // on current page
+          this.scrollSvg(cm);
+          this.updateHighlight(cm);
+        }
       }
     }
   }
@@ -565,7 +567,7 @@ export default class Viewer {
     this.toolkitDataOutdated = true;
     if (!isSafari) this.checkSchema(cm.getValue());
     let ch = document.getElementById('live-update-checkbox');
-    if ((this.updateNotation && ch && ch.checked) || forceUpdate) {
+    if ((this.allowCursorActivity && ch && ch.checked) || forceUpdate) {
       this.updateData(cm, false, false);
     }
   }
@@ -1925,7 +1927,7 @@ export default class Viewer {
   // by 'dir' an by 'incrementElementName'
   navigate(cm, incElName = 'note', dir = 'forwards') {
     console.info('navigate(): lastNoteId: ', this.lastNoteId);
-    this.updateNotation = false;
+    this.allowCursorActivity = false;
     let id = this.lastNoteId;
     if (id === '') {
       // empty note id
@@ -1997,7 +1999,7 @@ export default class Viewer {
     }
     // update cursor position in MEI file (buffer)
     utils.setCursorToId(cm, id);
-    // this.updateNotationToTextposition(txtEdr); TODO
+    // this.allowCursorActivityToTextposition(txtEdr); TODO
     if (id) {
       this.selectedElements = [];
       this.selectedElements.push(id);
@@ -2006,7 +2008,7 @@ export default class Viewer {
         startMidiTimeout();
       }
     }
-    this.updateNotation = true;
+    this.allowCursorActivity = true;
     this.scrollSvg(cm);
     this.updateHighlight(cm);
   } // navigate()

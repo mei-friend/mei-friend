@@ -877,9 +877,9 @@ async function vrvWorkerEventsHandler(ev) {
       } else {
         // open stored data, setting vrv options first
         v.clear();
-        v.updateNotation = false;
+        v.allowCursorActivity = false;
         loadDataInEditor(storage.content);
-        v.updateNotation = true;
+        v.allowCursorActivity = true;
         v.updateAll(cm, {}, handleURLParamSelect());
       }
       v.busy(false);
@@ -887,11 +887,11 @@ async function vrvWorkerEventsHandler(ev) {
     case 'mei': // returned from importData, importBinaryData
       mei = ev.data.mei;
       v.pageCount = ev.data.pageCount;
-      v.updateNotation = false;
+      v.allowCursorActivity = false;
       loadDataInEditor(mei);
       setFileChangedState(false);
       updateLocalStorage(mei);
-      v.updateNotation = true;
+      v.allowCursorActivity = true;
       v.updateAll(cm, defaultVerovioOptions, handleURLParamSelect());
       //v.busy(false);
       break;
@@ -901,11 +901,11 @@ async function vrvWorkerEventsHandler(ev) {
       }
       if (ev.data.mei) {
         // from reRenderMEI
-        v.updateNotation = false;
+        v.allowCursorActivity = false;
         loadDataInEditor(ev.data.mei);
         setFileChangedState(false);
         updateLocalStorage(ev.data.mei);
-        v.updateNotation = true;
+        v.allowCursorActivity = true;
         v.selectedElements = [];
         if (!ev.data.removeIds) v.selectedElements.push(ev.data.xmlId);
       }
@@ -1077,12 +1077,12 @@ export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true, upd
         console.log('MEI file ' + meiFileName + ' loaded.');
         mei = meiXML;
         v.clear();
-        v.updateNotation = false;
+        v.allowCursorActivity = false;
         loadDataInEditor(mei, setFreshlyLoaded);
         setFileChangedState(false);
         updateLocalStorage(mei);
         if (updateAfterLoading) {
-          v.updateNotation = true;
+          v.allowCursorActivity = true;
           v.updateAll(cm, {}, handleURLParamSelect());
         }
       });
@@ -1157,12 +1157,12 @@ export function handleEncoding(mei, setFreshlyLoaded = true, updateAfterLoading 
         if (key === 'mei') {
           // if already a mei file
           setIsMEI(true);
-          v.updateNotation = false;
+          v.allowCursorActivity = false;
           loadDataInEditor(mei, setFreshlyLoaded);
           setFileChangedState(false);
           updateLocalStorage(mei);
           if (updateAfterLoading) {
-            v.updateNotation = true;
+            v.allowCursorActivity = true;
             v.updateAll(cm, defaultVerovioOptions, handleURLParamSelect());
           }
           break;
@@ -1721,10 +1721,10 @@ function addEventListeners(v, cm) {
   // Page turning
   let ss = document.getElementById('section-selector');
   ss.addEventListener('change', () => {
-    v.updateNotation = false;
+    v.allowCursorActivity = false;
     setCursorToId(cm, ss.value);
     v.updatePage(cm, '', ss.value);
-    v.updateNotation = true;
+    v.allowCursorActivity = true;
   });
   document.getElementById('first-page-btn').addEventListener('click', cmd.firstPage);
   document.getElementById('prev-page-btn').addEventListener('click', cmd.previousPage);

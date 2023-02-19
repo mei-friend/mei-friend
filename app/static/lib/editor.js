@@ -16,7 +16,7 @@ import { handleEditorChanges, version, versionDate } from './main.js';
  * @param {CodeMirror} cm
  */
 export function indentSelection(v, cm) {
-  v.updateNotation = false;
+  v.allowCursorActivity = false;
   cm.blockChanges = true;
   let selections = cm.listSelections();
   selections.forEach((s) => {
@@ -38,7 +38,7 @@ export function indentSelection(v, cm) {
   });
   cm.blockChanges = false;
   handleEditorChanges();
-  v.updateNotation = true;
+  v.allowCursorActivity = true;
 } // indentSelection()
 
 /**
@@ -60,7 +60,7 @@ export function deleteElement(v, cm, modifyerKey = false) {
     return;
   }
   let selectedElements = [];
-  v.updateNotation = false;
+  v.allowCursorActivity = false;
   // let checkPoint = buffer.createCheckpoint(); TODO
 
   if (att.modelControlEvents.concat(['accid', 'artic', 'clef', 'octave', 'beamSpan']).includes(element.nodeName)) {
@@ -123,7 +123,7 @@ export function deleteElement(v, cm, modifyerKey = false) {
   v.xmlDocOutdated = true;
   addApplicationInfo(v, cm);
   v.updateData(cm, false, true);
-  v.updateNotation = true;
+  v.allowCursorActivity = true;
 } // deleteElement()
 
 /**
@@ -185,6 +185,7 @@ export function addControlElement(v, cm, elName, placement, form) {
   // create element to be inserted
   let newElement = v.xmlDoc.createElementNS(dutils.meiNameSpace, elName);
   let uuid = utils.generateXmlId(elName, v.xmlIdStyle);
+  let uuid2, newElement2;
   newElement.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
   // elements with both startid and endid
   if (['slur', 'tie', 'phrase', 'hairpin', 'gliss'].includes(elName)) {
@@ -210,10 +211,21 @@ export function addControlElement(v, cm, elName, placement, form) {
   if (form && ['hairpin', 'fermata', 'mordent', 'trill', 'turn'].includes(elName)) {
     newElement.setAttribute('form', form);
   }
-  // if (placement && ['pedal'].includes(elName)) {
-  //   newElement.setAttribute('dir', placement);
-  //   newElement.setAttribute('vgrp', '100');
-  // }
+  // placemenet for pedal is @dir=up|down
+  if (placement && ['pedal'].includes(elName)) {
+    newElement.setAttribute('dir', placement);
+
+    // add dir=up element to endEl
+    if (endEl && endId && placement === 'down') {
+      newElement2 = v.xmlDoc.createElementNS(dutils.meiNameSpace, elName);
+      uuid2 = utils.generateXmlId(elName, v.xmlIdStyle);
+      newElement2.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid2);
+      newElement2.setAttribute('startid', '#' + endId);
+      if (staveArray.length > 0) newElement2.setAttribute('staff', staveArray.sort().join(' '));
+      newElement2.setAttribute('dir', 'up');
+    }
+    placement = '';
+  }
   if (placement) {
     if (['slur', 'tie', 'phrase'].includes(elName)) {
       newElement.setAttribute('curvedir', placement);
@@ -229,25 +241,38 @@ export function addControlElement(v, cm, elName, placement, form) {
   if (form && ['dir', 'dynam', 'tempo'].includes(elName)) {
     newElement.appendChild(v.xmlDoc.createTextNode(form));
   }
-  // add new element to txtEdr at end of measure
-  v.updateNotation = false; // to prevent reloading after each edit
+
+  // add new element(s) to DOM
+  startEl.closest('measure').appendChild(newElement); //.cloneNode(true));
+  
+  // add new element to editor at end of measure
+  v.allowCursorActivity = false; // to prevent reloading after each edit
   if (p) {
     let p1 = utils.moveCursorToEndOfMeasure(cm, p); // resets selectedElements!!
     console.log('p1: ', p);
-    cm.replaceRange(dutils.xmlToString(newElement) + '\n', cm.getCursor());
+    cm.replaceRange(dutils.xmlToString(newElement) + '\n', p1);
     cm.indentLine(p1.line, 'smart');
     cm.indentLine(p1.line + 1, 'smart');
-    utils.setCursorToId(cm, uuid); // to select new element
   }
-  // add new element to DOM
-  var measureId = startEl.closest('measure').getAttribute('xml:id');
-  v.xmlDoc.querySelector("[*|id='" + measureId + "']").appendChild(newElement); //.cloneNode(true));
+  
+  if (newElement2) {
+    endEl.closest('measure').appendChild(newElement2);
+    utils.setCursorToId(cm, endId);
+    let p1 = utils.moveCursorToEndOfMeasure(cm); // resets selectedElements!!
+    cm.replaceRange(dutils.xmlToString(newElement2) + '\n', p1);
+    cm.indentLine(p1.line, 'smart');
+    cm.indentLine(p1.line + 1, 'smart');
+  }
+  utils.setCursorToId(cm, uuid); // to select new element
+
+  // prepare final state
   v.lastNoteId = startId;
   v.selectedElements = [];
   v.selectedElements.push(uuid);
+  if (uuid2) v.selectedElements.push(uuid2);
   addApplicationInfo(v, cm);
   v.updateData(cm, false, true);
-  v.updateNotation = true;
+  v.allowCursorActivity = true;
 } // addControlElement()
 
 /**
@@ -261,7 +286,7 @@ export function addControlElement(v, cm, elName, placement, form) {
  */
 export function addClefChange(v, cm, shape = 'G', line = '2', before = true) {
   if (v.selectedElements.length === 0) return;
-  v.updateNotation = false; // stop update notation
+  v.allowCursorActivity = false; // stop update notation
   let id = v.selectedElements[0];
   var el = v.xmlDoc.querySelector("[*|id='" + id + "']");
   let chord = el.closest('chord');
@@ -283,7 +308,7 @@ export function addClefChange(v, cm, shape = 'G', line = '2', before = true) {
   }
   cm.execCommand('indentAuto'); // auto indent current line or selection
   utils.setCursorToId(cm, uuid); // to select new element
-  v.updateNotation = true; // update notation again
+  v.allowCursorActivity = true; // update notation again
   v.selectedElements = [];
   v.selectedElements.push(uuid);
   v.lastNoteId = uuid;
@@ -303,7 +328,7 @@ export function invertPlacement(v, cm, modifier = false) {
   let ids = utils.sortElementsByScorePosition(v.selectedElements);
   ids = speed.filterElements(ids, v.xmlDoc);
   console.info('invertPlacement ids: ', ids);
-  v.updateNotation = false; // no need to redraw notation
+  v.allowCursorActivity = false; // no need to redraw notation
   let noteList, range;
   for (let id of ids) {
     var el = v.xmlDoc.querySelector("[*|id='" + id + "']");
@@ -415,7 +440,7 @@ export function invertPlacement(v, cm, modifier = false) {
             }
             note.setAttribute(attr, val);
           }
-          v.updateNotation = false; // no need to redraw notation
+          v.allowCursorActivity = false; // no need to redraw notation
           range = replaceInEditor(cm, note, true);
         });
       }
@@ -430,7 +455,7 @@ export function invertPlacement(v, cm, modifier = false) {
           val = 'down';
         }
         note.setAttribute(attr, val);
-        v.updateNotation = false; // no need to redraw notation
+        v.allowCursorActivity = false; // no need to redraw notation
         range = replaceInEditor(cm, note, true);
         // txtEdr.autoIndentSelectedRows();
       }
@@ -442,7 +467,7 @@ export function invertPlacement(v, cm, modifier = false) {
   v.selectedElements = ids;
   addApplicationInfo(v, cm);
   v.updateData(cm, false, true);
-  v.updateNotation = true; // update notation again
+  v.allowCursorActivity = true; // update notation again
 } // invertPlacement()
 
 /**
@@ -454,7 +479,7 @@ export function invertPlacement(v, cm, modifier = false) {
 export function toggleArtic(v, cm, artic = 'stacc') {
   v.loadXml(cm.getValue());
   let ids = speed.filterElements(v.selectedElements, v.xmlDoc);
-  v.updateNotation = false;
+  v.allowCursorActivity = false;
   let i, range;
   for (i = 0; i < ids.length; i++) {
     let id = ids[i];
@@ -486,7 +511,7 @@ export function toggleArtic(v, cm, artic = 'stacc') {
   v.selectedElements = ids;
   addApplicationInfo(v, cm);
   v.updateData(cm, false, true);
-  v.updateNotation = true; // update notation again
+  v.allowCursorActivity = true; // update notation again
 } // toggleArtic()
 
 /**
@@ -498,7 +523,7 @@ export function toggleArtic(v, cm, artic = 'stacc') {
 export function shiftPitch(v, cm, deltaPitch = 0) {
   v.loadXml(cm.getValue());
   let ids = speed.filterElements(v.selectedElements, v.xmlDoc);
-  v.updateNotation = false;
+  v.allowCursorActivity = false;
   let i;
   for (i = 0; i < ids.length; i++) {
     let id = ids[i];
@@ -514,7 +539,7 @@ export function shiftPitch(v, cm, deltaPitch = 0) {
   v.selectedElements = ids;
   addApplicationInfo(v, cm);
   v.updateData(cm, false, true);
-  v.updateNotation = true; // update notation again
+  v.allowCursorActivity = true; // update notation again
 } // shiftPitch()
 
 /**
@@ -527,7 +552,7 @@ export function moveElementToNextStaff(v, cm, upwards = true) {
   console.info('moveElementToNextStaff(' + (upwards ? 'up' : 'down') + ')');
   v.loadXml(cm.getValue());
   let ids = speed.filterElements(v.selectedElements, v.xmlDoc);
-  v.updateNotation = false;
+  v.allowCursorActivity = false;
   let i;
   let noteList;
   for (i = 0; i < ids.length; i++) {
@@ -548,7 +573,7 @@ export function moveElementToNextStaff(v, cm, upwards = true) {
   v.selectedElements = ids;
   addApplicationInfo(v, cm);
   v.updateData(cm, false, true);
-  v.updateNotation = true; // update notation again
+  v.allowCursorActivity = true; // update notation again
 } // moveElementToNextStaff()
 
 /**
@@ -573,7 +598,7 @@ export function addBeamElement(v, cm, elementName = 'beam') {
   let n1 = v.xmlDoc.querySelector("[*|id='" + id1 + "']");
   let n2 = v.xmlDoc.querySelector("[*|id='" + id2 + "']");
   let par1 = n1.parentNode;
-  v.updateNotation = false;
+  v.allowCursorActivity = false;
   // let checkPoint = buffer.createCheckpoint(); TODO
   // add beam element, if selected elements have same parent
   // TODO check whether inside tuplets and accept that as well
@@ -607,7 +632,7 @@ export function addBeamElement(v, cm, elementName = 'beam') {
   } else {
     console.log('Cannot add ' + elementName + ' element, selected elements have different parents.');
   }
-  v.updateNotation = true; // update notation again
+  v.allowCursorActivity = true; // update notation again
 } // addBeamElement()
 
 /**
@@ -640,7 +665,7 @@ export function addBeamSpan(v, cm) {
   beamSpan.setAttribute('plist', v.selectedElements.map((e) => '#' + e).join(' '));
   let n1 = v.xmlDoc.querySelector("[*|id='" + id1 + "']");
   n1.closest('measure').appendChild(beamSpan);
-  v.updateNotation = false;
+  v.allowCursorActivity = false;
   let sc = cm.getSearchCursor('xml:id="' + id1 + '"');
   if (sc.findNext()) {
     let p1 = utils.moveCursorToEndOfMeasure(cm, sc.from());
@@ -654,7 +679,7 @@ export function addBeamSpan(v, cm) {
   v.lastNoteId = id2;
   addApplicationInfo(v, cm);
   v.updateData(cm, false, true);
-  v.updateNotation = true; // update notation again
+  v.allowCursorActivity = true; // update notation again
 } // addBeamSpan()
 
 /**
@@ -682,7 +707,7 @@ export function addOctaveElement(v, cm, disPlace = 'above', dis = '8') {
   octave.setAttribute('dis.place', disPlace);
   n1.closest('measure').appendChild(octave);
   // add it to the txtEdr
-  v.updateNotation = false;
+  v.allowCursorActivity = false;
   // let checkPoint = buffer.createCheckpoint(); TODO
   let sc = cm.getSearchCursor('xml:id="' + id1 + '"');
   if (sc.findNext()) {
@@ -700,7 +725,7 @@ export function addOctaveElement(v, cm, disPlace = 'above', dis = '8') {
   v.lastNoteId = id2;
   addApplicationInfo(v, cm);
   v.updateData(cm, false, true);
-  v.updateNotation = true; // update notation again
+  v.allowCursorActivity = true; // update notation again
 } // addOctaveElement()
 
 /**
@@ -722,7 +747,7 @@ export function addSuppliedElement(v, cm, attrName = 'none') {
   v.selectedElements = speed.filterElements(v.selectedElements, v.xmlDoc);
   v.selectedElements = utils.sortElementsByScorePosition(v.selectedElements);
   if (v.selectedElements.length < 1) return;
-  v.updateNotation = false;
+  v.allowCursorActivity = false;
 
   let uuids = [];
   v.selectedElements.forEach((id) => {
@@ -788,7 +813,7 @@ export function addSuppliedElement(v, cm, attrName = 'none') {
   uuids.forEach((u) => v.selectedElements.push(u));
   addApplicationInfo(v, cm);
   v.updateData(cm, false, true);
-  v.updateNotation = true; // update notation again
+  v.allowCursorActivity = true; // update notation again
 
   function mintSuppliedId(id, nodeName) {
     // follow the Mozarteum schema, keep numbers (for @o-sapov)
@@ -810,7 +835,7 @@ export function addVerticalGroup(v, cm) {
   v.loadXml(cm.getValue());
   v.selectedElements = speed.filterElements(v.selectedElements, v.xmlDoc);
   if (v.selectedElements.length < 1) return;
-  v.updateNotation = false;
+  v.allowCursorActivity = false;
   let value = 1;
   let existingValues = []; // search for existing vgrp values on SVG page
   // look to current page SVG dynam@vgrp, dir@vgrp, hairpin@vgrp, pedal@vgrp
@@ -825,9 +850,8 @@ export function addVerticalGroup(v, cm) {
     if (!el) {
       console.warn('No such element in xml document: ' + id);
     } else if (att.attVerticalGroup.includes(el.nodeName)) {
-      let oldEl = el.cloneNode(true);
       el.setAttribute('vgrp', value);
-      replaceInEditor(cm, oldEl, true, el);
+      replaceInEditor(cm, el, true);
       cm.execCommand('indentAuto');
     } else {
       console.warn('Vertical group not supported for ', el);
@@ -835,7 +859,7 @@ export function addVerticalGroup(v, cm) {
   });
   addApplicationInfo(v, cm);
   v.updateData(cm, false, true);
-  v.updateNotation = true; // update notation again
+  v.allowCursorActivity = true; // update notation again
 } // addVerticalGroup()
 
 /**
@@ -909,10 +933,10 @@ export function addApplicationInfo(v, cm) {
  * @param {CodeMirror} cm
  */
 export function cleanAccid(v, cm) {
-  v.updateNotation = false;
+  v.allowCursorActivity = false;
   v.loadXml(cm.getValue(), true);
   utils.cleanAccid(v.xmlDoc, cm);
-  v.updateNotation = true;
+  v.allowCursorActivity = true;
 }
 
 /**
@@ -922,13 +946,13 @@ export function cleanAccid(v, cm) {
  * @param {boolean} change
  */
 export function renumberMeasures(v, cm, change = false) {
-  v.updateNotation = false;
+  v.allowCursorActivity = false;
   v.loadXml(cm.getValue(), true);
   utils.renumberMeasures(v, cm, 1, change);
   if (document.getElementById('showFacsimilePanel').checked) loadFacsimile(v.xmlDoc);
   addApplicationInfo(v, cm);
   v.updateData(cm, false, true);
-  v.updateNotation = true;
+  v.allowCursorActivity = true;
 } // renumberMeasures()
 
 /**
@@ -942,7 +966,7 @@ export function manipulateXmlIds(v, cm, removeIds = false) {
   let report = { added: 0, removed: 0 };
   let skipList = []; // list of xml:ids that will not be removed
 
-  v.updateNotation = false;
+  v.allowCursorActivity = false;
   v.loadXml(cm.getValue(), true);
 
   // start from these elements
@@ -975,7 +999,7 @@ export function manipulateXmlIds(v, cm, removeIds = false) {
   msg += ' (Processing time: ' + (Date.now() - startTime) / 1000 + ' s)';
   console.log(msg);
   v.showAlert(msg, 'success');
-  v.updateNotation = true;
+  v.allowCursorActivity = true;
 
   // digs through xml tree recursively, when explore=true, just adding ids that are pointed to
   function dig(el, explore = false) {
@@ -1018,12 +1042,12 @@ export function manipulateXmlIds(v, cm, removeIds = false) {
  * @returns
  */
 export function addZone(v, cm, rect, addMeasure = true) {
-  v.updateNotation = false;
+  v.allowCursorActivity = false;
   // get current element id and nodeName from editor
   let selectedId = utils.getElementIdAtCursor(cm);
   let selectedElement = v.xmlDoc.querySelector('[*|id=' + selectedId + ']');
   if (!selectedElement) {
-    v.updateNotation = true;
+    v.allowCursorActivity = true;
     return false;
   }
 
@@ -1078,7 +1102,7 @@ export function addZone(v, cm, rect, addMeasure = true) {
     addApplicationInfo(v, cm);
     v.updateData(cm, false, false);
     console.log('Editor: new zone ' + uuid + 'added.', rect);
-    v.updateNotation = true;
+    v.allowCursorActivity = true;
     return true;
 
     // only add zone and a @facs for the selected element
@@ -1091,7 +1115,7 @@ export function addZone(v, cm, rect, addMeasure = true) {
     console.log('addZone() referenceNode: ', referenceNode);
     if (!referenceNode) {
       console.log('addZone(): no reference element found with xml:id="' + referenceNodeId + '"');
-      v.updateNotation = true;
+      v.allowCursorActivity = true;
       return false;
     }
     if (referenceNode.nodeName === 'surface') {
@@ -1124,10 +1148,10 @@ export function addZone(v, cm, rect, addMeasure = true) {
     addApplicationInfo(v, cm);
     v.updateData(cm, false, false);
     console.log('Editor: new zone ' + uuid + 'added.', rect);
-    v.updateNotation = true;
+    v.allowCursorActivity = true;
     return true;
   } else {
-    v.updateNotation = true;
+    v.allowCursorActivity = true;
     return false;
   }
 } // addZone()
@@ -1176,7 +1200,7 @@ export function removeZone(v, cm, zone, removeMeasure = false) {
  * @param {object} cm
  */
 export function addFacsimile(v, cm) {
-  v.updateNotation = false;
+  v.allowCursorActivity = false;
   let facsimile = v.xmlDoc.querySelector('facsimile');
   let facsimileId;
   if (facsimile) {
@@ -1231,7 +1255,7 @@ export function addFacsimile(v, cm) {
   addApplicationInfo(v, cm);
   v.updateData(cm, false, false);
   console.log('Editor: new facsimile added', facsimile);
-  v.updateNotation = true;
+  v.allowCursorActivity = true;
 } // addFacsimile()
 
 /**

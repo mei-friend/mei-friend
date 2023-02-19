@@ -87,8 +87,9 @@ export function getElementAttributeBelow(
 }
 
 // move encoding cursor to end of current measure
-export function moveCursorToEndOfMeasure(cm, p) {
+export function moveCursorToEndOfMeasure(cm, p = null) {
   const measureEnd = '</measure';
+  if (!p) p = cm.getCursor();
   for (; p.line < cm.lineCount(); p.line++) {
     let line = cm.getLine(p.line);
     if (line.includes(measureEnd)) {
@@ -101,7 +102,7 @@ export function moveCursorToEndOfMeasure(cm, p) {
     line: null,
     ch: null,
   };
-}
+} // moveCursorToEndOfMeasure()
 
 // find item by id in buffer
 // NEW: let sc = cm.getSearchCursor('xml:id="' + id + '"');
