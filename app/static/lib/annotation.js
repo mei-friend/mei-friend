@@ -708,22 +708,22 @@ async function writeStandoffIfRequested(a) {
               console.log('Finished establishing friend container: ', resp);
               webAnno["@id"] = storage + 'at.ac.mdw.mei-friend/' + a.id;
               console.log("TRYING TO SET UP ANNO", a, webAnno)
-              let webAnnoResp = establishResource(webAnno["@id"], webAnno);
+              let webAnnoResp = await establishResource(webAnno["@id"], webAnno);
               if(webAnnoResp.ok) { 
                 console.log("Success! Posted Web Annotation:", webAnno);
                 a.isStandoff = true;
               } else { 
-                console.warn("Couldn't post WebAnno: ", webAnno);
+                console.warn("Couldn't post WebAnno: ", webAnno, webAnnoResp);
               }
             }           }
         } else {
           log("Sorry, couldn't establish storage location from your Solid Pod's profile ", profile);
         }
       });
+    } else {
+      log('Cannot write standoff annotation: Please ensure you are logged in to a Solid Pod');
     }
-  } else {
-    log('Cannot write standoff annotation: Please ensure you are logged in to a Solid Pod');
-  }
+  } 
 }
 
 export function copyIdToClipboard(e) {
