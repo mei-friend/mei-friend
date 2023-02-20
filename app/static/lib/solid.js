@@ -23,6 +23,8 @@ export async function establishResource(uri, resource) {
   resource["@id"] = uri;
   // check whether a resource exists at uri
   // if not, create one initialised to the supplied resource
+  const solidButton = document.getElementById('solidButton');
+  solidButton.classList.add('clockwise');
   let resp = await solid.fetch(uri, { 
     method: 'HEAD',
     headers: { 
@@ -52,7 +54,7 @@ export async function establishResource(uri, resource) {
       // another problem...
       log("Sorry, unable to establish resource in your Solid Pod: " + headResp.status + " " + headResp.statusText)
     }
-  })
+  }).finally(() => solidButton.classList.remove("clockwise"));
   return resp;
 }
 
@@ -69,6 +71,8 @@ export async function populateSolidTab() {
 
 export async function getProfile() { 
   const webId = solid.getDefaultSession().info.webId;
+  const solidButton = document.getElementById('solidButton');
+  solidButton.classList.add('clockwise');
   const profile = await solid.fetch(webId, { 
     headers: { 
       Accept: "application/ld+json"
@@ -86,17 +90,20 @@ export async function getProfile() {
       // TODO proper error handling
       console.warn("User profile contains no entry matching their webId: ", profile, webId);
     }
-  });
+  }).finally(() => solidButton.classList.remove("clockwise"));
   return profile;
 }
 
 async function populateLoggedInSolidTab() { 
   const webId = solid.getDefaultSession().info.webId;
+  const solidButton = document.getElementById('solidButton');
+  solidButton.classList.add('clockwise');
   const profile = await solid.fetch(webId, { 
     headers: { 
       Accept: "application/ld+json"
     }
-  }).then(resp => resp.json());
+  }).then(resp => resp.json())
+    .finally(() => solidButton.classList.remove("clockwise"));
   let name = webId;
   // try to find entry for 'me' (i.e. the user's webId) in profile:
   let me = profile.filter(e => "@id" in e && e["@id"] === webId);
