@@ -187,7 +187,8 @@ import * as speed from './speed.js';
 import Github from './github.js';
 import { 
   loginAndFetch,
-  populateSolidTab
+  populateSolidTab,
+  solid
 } from './solid.js';
 import Storage from './storage.js';
 import { fillInBranchContents, logoutFromGithub, refreshGithubMenu, setCommitUIEnabledStatus } from './github-menu.js';
@@ -361,6 +362,7 @@ export function loadDataInEditor(mei, setFreshlyLoaded = true) {
     // disable validation on Safari because of this strange error: "RangeError: Maximum call stack size exceeded" (WG, 1 Oct 2022)
     v.checkSchema(mei);
   }
+  setStandoffAnnotationEnabledStatus();
   clearAnnotations();
   readAnnots(true); // from annotation.js
   setCursorToId(cm, handleURLParamSelect());
@@ -1201,6 +1203,7 @@ export function handleEncoding(mei, setFreshlyLoaded = true, updateAfterLoading 
     clearAnnotations();
     v.busy(false);
   }
+  setStandoffAnnotationEnabledStatus();
 }
 
 function openFileDialog(accept = '*') {
@@ -1969,6 +1972,18 @@ function drawRightFooter() {
     }
     rf.innerHTML += `&nbsp;<a href="${githubUrl}" target="_blank" title="${tkUrl}">Verovio ${tkVersion}</a>.`;
   }
+}
+
+function setStandoffAnnotationEnabledStatus() { 
+  // Annotations: can only write standoff if a) not working locally (need URI) and b) isMEI (need stable identifiers)
+  if(fileLocationType === "file" || !isMEI || !solid.getDefaultSession().info.isLoggedIn) { 
+    document.getElementById("writeAnnotationStandoff").setAttribute("disabled", true);
+    document.getElementById("writeAnnotationStandoff").removeAttribute("selected");
+    document.getElementById("writeAnnotationInline").setAttribute("selected", true)
+  } else { 
+    document.getElementById("writeAnnotationStandoff").removeAttribute("disabled");
+  }
+
 }
 
 // handles any changes in CodeMirror
