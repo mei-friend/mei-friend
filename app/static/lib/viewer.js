@@ -335,7 +335,9 @@ export default class Viewer {
     if (fontSel) this.vrvOptions.font = fontSel.value;
     let bs = this.breaksSelect;
     if (bs) this.vrvOptions.breaks = bs.value;
-    let dimensions = getVerovioContainerSize();
+
+    // update page dimensions
+    let dimensions = {}; // = getVerovioContainerSize();
     let vp = document.getElementById('verovio-panel');
     dimensions.width = vp.clientWidth;
     dimensions.height = vp.clientHeight;
@@ -344,6 +346,8 @@ export default class Viewer {
       this.vrvOptions.pageWidth = Math.max(Math.round(dimensions.width * (100 / this.vrvOptions.scale)), 100);
       this.vrvOptions.pageHeight = Math.max(Math.round(dimensions.height * (100 / this.vrvOptions.scale)), 100);
     }
+    // console.info('Vrv pageWidth/Height: ' + this.vrvOptions.pageWidth + '/' + this.vrvOptions.pageHeight);
+
     // overwrite existing options if new ones are passed in
     // for (let key in newOptions) { this.vrvOptions[key] = newOptions[key]; }
     console.info('Verovio options updated: ', this.vrvOptions);
