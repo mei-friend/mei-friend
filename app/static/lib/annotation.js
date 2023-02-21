@@ -1,4 +1,4 @@
-import { v, cm, log } from './main.js';
+import { v, cm, log, meiFileLocation, fileLocationType } from './main.js';
 import { convertCoords, generateXmlId, rmHash, setCursorToId } from './utils.js';
 import { meiNameSpace, xmlNameSpace, xmlToString } from './dom-utils.js';
 import { circle, diffRemoved, highlight, fileCode, link, pencil, rdf, symLinkFile } from '../css/icons.js';
@@ -665,7 +665,8 @@ async function writeStandoffIfRequested(a) {
       let body = new Object();
       webAnno['@type'] = [OA + 'Annotation'];
       webAnno[OA + 'hasTarget'] = a.selection.map((s) => {
-        return { '@id': s };
+        // TODO: do something clever if fileLocationType = "file" (local)
+        return { '@id':  meiFileLocation + "#" + s };
       });
       switch (a.type) {
         case 'annotateHighlight':
