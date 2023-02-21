@@ -620,7 +620,7 @@
     <div id="midiPlaybackControlBar">
       <midi-player id="midi-player" sound-font> </midi-player>
       <span
-        id="midi-speedmode-indicator"
+        id="midiSpeedmodeIndicator"
         title="Speed mode is active; only playing MIDI for current page. To play the entire encoding, disable speed mode."
         >Speed mode</span
       >
@@ -628,7 +628,7 @@
     </div>
 
     <div class="footer">
-      <div id="midi-player-contextual">
+      <div id="midiPlayerContextual">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
           <path
             d="M7.563 2.069A.75.75 0 018 2.75v10.5a.751.751 0 01-1.238.57L3.472 11H1.75A1.75 1.75 0 010 9.25v-2.5C0 5.784.784 5 1.75 5h1.723l3.289-2.82a.75.75 0 01.801-.111zM6.5 4.38L4.238 6.319a.748.748 0 01-.488.181h-2a.25.25 0 00-.25.25v2.5c0 .138.112.25.25.25h2c.179 0 .352.064.488.18L6.5 11.62zm6.096-2.038a.75.75 0 011.06 0 8 8 0 010 11.314.751.751 0 01-1.042-.018.751.751 0 01-.018-1.042 6.5 6.5 0 000-9.193.75.75 0 010-1.06zm-1.06 2.121l-.001.001a5 5 0 010 7.07.749.749 0 01-1.275-.326.749.749 0 01.215-.734 3.5 3.5 0 000-4.95.75.75 0 111.061-1.061z"
@@ -654,6 +654,7 @@
           </svg>
         </button>
         <button
+          id="meifriendOptionsTab"
           class="tablink"
           onclick="switchTab(event, 'settingsPanel')"
           title="mei-friend Settings"
@@ -662,6 +663,7 @@
           mei-friend
         </button>
         <button
+          id="editorOptionsTab"
           class="tablink defaultOpen"
           onclick="switchTab(event, 'settingsPanel')"
           title="Editor Settings"
@@ -670,6 +672,7 @@
           Editor
         </button>
         <button
+          id="verovioOptionsTab"
           class="tablink"
           onclick="switchTab(event, 'settingsPanel')"
           title="Verovio Options"
@@ -696,6 +699,9 @@
         <div id="editorSettings" class="tabcontent"></div>
         <div id="verovioSettings" class="tabcontent"></div>
       </div>
+    </div>
+
+    <div id="pdfPanel" class="pdfOff">
     </div>
 
     <script>
@@ -747,16 +753,20 @@
       // switch tabs in settings menu
       function switchTab(ev, containingElementId) {
         const tabId = ev.target.dataset.tab;
-        // console.log('switchTab: ', containingElementId, tabId);
-        // console.log('switchTab: ', ev);
+        console.log('switchTab: ', containingElementId, tabId);
+        console.log('switchTab: ', ev);
         let containingElement = document.getElementById(containingElementId);
         if (containingElement) {
           // hide all tab contents except tabId
-          for (let cont of containingElement.getElementsByClassName('tabcontent'))
+          for (let cont of containingElement.getElementsByClassName('tabcontent')) {
             cont.style.display = cont.id === tabId ? 'block' : 'none';
+          }
           // remove class "active" from tablinks except for current target
-          for (let tab of containingElement.getElementsByClassName('tablink'))
+          for (let tab of containingElement.getElementsByClassName('tablink')) {
+            console.log('tab: ', tab);
+            console.log('ev.currentTarget: ', ev.currentTarget);
             tab === ev.currentTarget ? tab.classList.add('active') : tab.classList.remove('active');
+          }
         }
       }
 

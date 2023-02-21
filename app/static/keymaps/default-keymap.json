@@ -36,7 +36,7 @@
     "l": "addTrill",
     "n": "addTurn",
     "shift-n": "addTurnLower",
-    
+
     "shift-s": "toggleStacc",
     "shift-v": "toggleAccent",
     "shift-e": "toggleTenuto",
@@ -99,7 +99,8 @@
     "cmd-,": "toggleSettingsPanel",
     "cmd-a": "toggleAnnotationPanel",
     "shift-alt-ï": "indentSelection",
-    "cmd-delete": "cmdDelete"
+    "cmd-delete": "cmdDelete",
+    "cmd-p": "showPdfPanel"
   },
 
   ".platform-win32, .platform-linux": {

@@ -57,6 +57,7 @@ export default class Viewer {
     this.breaksSelect = /** @type HTMLSelectElement */ (document.getElementById('breaks-select'));
     this.respId = '';
     this.alertCloser;
+    this.pdfPanel = false;
   } // constructor()
 
   // change options, load new data, render current page, add listeners, highlight
@@ -336,18 +337,19 @@ export default class Viewer {
     let bs = this.breaksSelect;
     if (bs) this.vrvOptions.breaks = bs.value;
 
-    // update page dimensions
-    let dimensions = {}; // = getVerovioContainerSize();
-    let vp = document.getElementById('verovio-panel');
-    dimensions.width = vp.clientWidth;
-    dimensions.height = vp.clientHeight;
-    // console.info('client size: ' + dimensions.width + '/' + dimensions.height);
-    if (this.vrvOptions.breaks !== 'none') {
-      this.vrvOptions.pageWidth = Math.max(Math.round(dimensions.width * (100 / this.vrvOptions.scale)), 100);
-      this.vrvOptions.pageHeight = Math.max(Math.round(dimensions.height * (100 / this.vrvOptions.scale)), 100);
+    // update page dimensions, only if not in pdf mode
+    if (!this.pdfPanel) {
+      let dimensions = {}; // = getVerovioContainerSize();
+      let vp = document.getElementById('verovio-panel');
+      dimensions.width = vp.clientWidth;
+      dimensions.height = vp.clientHeight;
+      // console.info('client size: ' + dimensions.width + '/' + dimensions.height);
+      if (this.vrvOptions.breaks !== 'none') {
+        this.vrvOptions.pageWidth = Math.max(Math.round(dimensions.width * (100 / this.vrvOptions.scale)), 100);
+        this.vrvOptions.pageHeight = Math.max(Math.round(dimensions.height * (100 / this.vrvOptions.scale)), 100);
+      }
+      // console.info('Vrv pageWidth/Height: ' + this.vrvOptions.pageWidth + '/' + this.vrvOptions.pageHeight);
     }
-    // console.info('Vrv pageWidth/Height: ' + this.vrvOptions.pageWidth + '/' + this.vrvOptions.pageHeight);
-
     // overwrite existing options if new ones are passed in
     // for (let key in newOptions) { this.vrvOptions[key] = newOptions[key]; }
     console.info('Verovio options updated: ', this.vrvOptions);
@@ -766,14 +768,14 @@ export default class Viewer {
     sp.classList.remove('out');
     sp.classList.add('in');
     document.getElementById('showSettingsButton').style.visibility = 'hidden';
-  }
+  } // showSettingsPanel()
 
   hideSettingsPanel() {
     let sp = document.getElementById('settingsPanel');
     sp.classList.add('out');
     sp.classList.remove('in');
     document.getElementById('showSettingsButton').style.visibility = 'visible';
-  }
+  } // hideSettingsPanel()
 
   toggleSettingsPanel(ev = null) {
     if (ev) {
@@ -787,12 +789,42 @@ export default class Viewer {
     } else {
       this.showSettingsPanel();
     }
-  }
+  } // toggleSettingsPanel()
+
+  // same as showSettingsPanel, but with Verovio tab activated
+  showVerovioTabInSettingsPanel() {
+    let containingElement = document.getElementById('settingsPanel');
+    const tabId = 'verovioSettings';
+    for (let cont of containingElement.getElementsByClassName('tabcontent')) {
+      cont.style.display = cont.id === tabId ? 'block' : 'none';
+    }
+    // remove class "active" from tablinks except for current target
+    for (let tab of containingElement.getElementsByClassName('tablink')) {
+      tab.id === 'verovioOptionsTab' ? tab.classList.add('active') : tab.classList.remove('active');
+    }
+    this.showSettingsPanel();
+  } // showVerovioTabInSettingsPanel()
+
+  showPdfPanel() {
+    let pp = document.getElementById('pdfPanel');
+    pp.classList.remove('pdfOff');
+    pp.classList.add('pdfOn');
+    this.showVerovioTabInSettingsPanel();
+    this.pdfPanel = true;
+  } // showPdfPanel()
+
+  hidePdfPanel() {
+    let pp = document.getElementById('pdfPanel');
+    pp.classList.remove('pdfOn');
+    pp.classList.add('pdfOff');
+    this.hideSettingsPanel();
+    this.pdfPanel = close;
+  } // hidePdfPanel()
 
   toggleMidiPlaybackControlBar() {
     const midiPlaybackControlBar = document.getElementById('midiPlaybackControlBar');
     const showMidiPlaybackControlBar = document.getElementById('showMidiPlaybackControlBar');
-    const midiSpeedmodeIndicator = document.getElementById('midi-speedmode-indicator');
+    const midiSpeedmodeIndicator = document.getElementById('midiSpeedmodeIndicator');
     midiPlaybackControlBar.style.display = showMidiPlaybackControlBar.checked ? 'flex' : 'none';
     midiSpeedmodeIndicator.style.display = this.speedMode ? 'inline' : 'none';
     // console.log('toggle: ', midiPlaybackControlBar);
@@ -1204,7 +1236,7 @@ export default class Viewer {
           v.xmlIdStyle = value;
           break;
         case 'toggleSpeedMode':
-          document.getElementById('midi-speedmode-indicator').style.display = this.speedMode ? 'inline' : 'none';
+          document.getElementById('midiSpeedmodeIndicator').style.display = this.speedMode ? 'inline' : 'none';
           break;
         case 'showSupplied':
           rt.style.setProperty('--suppliedColor', value ? 'var(--defaultSuppliedColor)' : 'var(--notationColor)');

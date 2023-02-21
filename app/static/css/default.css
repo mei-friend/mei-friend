@@ -516,7 +516,7 @@ a:active {
   height: 20px;
 }
 
-.footer #midi-player-contextual {
+.footer #midiPlayerContextual {
   position: fixed;
   bottom: 1.5em;
   left: 1em;
@@ -530,7 +530,7 @@ a:active {
   cursor:pointer;
 }
 
-.footer #midi-player-contextual:hover {
+.footer #midiPlayerContextual:hover {
   background: var(--backgroundColor);
 }
 
@@ -870,7 +870,7 @@ svg text {
   stroke-width: 1.5px;
 }
 
-#facsimile-icon {
+#facsimile-icon, #pdf-icon {
   margin-left: 3px;
   margin-right: 3px;
   width: 16px;
@@ -1049,7 +1049,7 @@ span.keyIcon {
   border-bottom: var(--settingsBackgroundColor) solid 2px;
   border-bottom-right-radius: 5px;
   border-bottom-left-radius: 5px;
-  height: 95%;
+  height: calc(100% - 50px);
   overflow: auto;
 }
 
@@ -1309,7 +1309,7 @@ midi-player::part(play-button) {
   max-width: 70%;
 }
 
-#midi-speedmode-indicator { 
+#midiSpeedmodeIndicator { 
   display:none;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 6pt;
@@ -1337,4 +1337,27 @@ midi-player::part(play-button) {
 
 #closeMidiPlaybackControlBarButton:hover { 
   background-color:var(--settingsLinkHoverColor);
+}
+
+.pdfOff {
+  display: none;
+}
+
+.pdfOn {
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin-top: 50px;
+  margin-bottom: 25px;
+  margin-left: 5px;
+  margin-right: 365px;
+  border: 2px solid var(--overlayBorderColor);
+  border-radius: 4px;
+  background-color: var(--backgroundColor);
+  background-blend-mode: difference;
+  opacity: .98;
+  z-index: 200; 
 }

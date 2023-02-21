@@ -166,6 +166,7 @@ import {
   addModifyerKeys,
   manualCurrentPage,
   generateSectionSelect,
+  createPdfControlBar,
 } from './control-menu.js';
 import { clock, highlight, unverified, xCircleFill } from '../css/icons.js';
 import { setCursorToId } from './utils.js';
@@ -521,6 +522,7 @@ document.addEventListener('DOMContentLoaded', function () {
   breaksParam = searchParams.get('breaks');
 
   createNotationDiv(document.getElementById('notation'), defaultVerovioOptions.scale);
+  createPdfControlBar(document.getElementById('pdfPanel'));
   addModifyerKeys(document); //
 
   console.log('DOMContentLoaded. Trying now to load Verovio...');
@@ -591,7 +593,7 @@ document.addEventListener('DOMContentLoaded', function () {
   mp.addEventListener('note', (e) => highlightNotesAtMidiPlaybackTime(e));
   mp.addEventListener('load', seekMidiPlaybackToSelectionOrPage);
   // decide whether to show MIDI playback shortcut (bubble), based on setting
-  document.getElementById('midi-player-contextual').style.display = document.getElementById(
+  document.getElementById('midiPlayerContextual').style.display = document.getElementById(
     'showMidiPlaybackContextualBubble'
   ).checked
     ? 'block'
@@ -1347,6 +1349,8 @@ export let cmd = {
   showSettingsPanel: () => v.showSettingsPanel(),
   hideSettingsPanel: () => v.hideSettingsPanel(),
   toggleSettingsPanel: (ev) => v.toggleSettingsPanel(ev),
+  showPdfPanel: () => v.showPdfPanel(),
+  hidePdfPanel: () => v.hidePdfPanel(),
   filterSettings: () => v.applySettingsFilter(),
   filterReset: () => {
     document.getElementById('filterSettings').value = '';
@@ -1361,10 +1365,10 @@ export let cmd = {
     if (document.getElementById('showMidiPlaybackControlBar').checked) {
       // request MIDI rendering from Verovio worker
       requestMidiFromVrvWorker(true);
-      document.getElementById('midi-player-contextual').style.display = 'none';
+      document.getElementById('midiPlayerContextual').style.display = 'none';
     } else {
       if (document.getElementById('showMidiPlaybackContextualBubble').checked) {
-        document.getElementById('midi-player-contextual').style.display = 'block';
+        document.getElementById('midiPlayerContextual').style.display = 'block';
       }
       if (mp.playing) {
         // stop player when control bar is closed
@@ -1601,13 +1605,13 @@ function addEventListeners(v, cm) {
     // if MIDI control bar not showing, update (show or hide) bubble
     if (!document.getElementById('showMidiPlaybackControlBarButton').checked) {
       if (e.target.checked) {
-        document.getElementById('midi-player-contextual').style.display = 'block';
+        document.getElementById('midiPlayerContextual').style.display = 'block';
       } else {
-        document.getElementById('midi-player-contextual').style.display = 'none';
+        document.getElementById('midiPlayerContextual').style.display = 'none';
       }
     }
   });
-  document.getElementById('midi-player-contextual').addEventListener('click', () => {
+  document.getElementById('midiPlayerContextual').addEventListener('click', () => {
     requestPlaybackOnLoad();
     cmd.toggleMidiPlaybackControlBar();
   });
@@ -1717,6 +1721,9 @@ function addEventListeners(v, cm) {
 
   // facsimile close button
   document.getElementById('facsimile-close-button').addEventListener('click', cmd.hideFacsimilePanel);
+
+  // pdf close button
+  document.getElementById('pdf-close-button').addEventListener('click', cmd.hidePdfPanel);
 
   // Page turning
   let ss = document.getElementById('section-selector');
@@ -1903,7 +1910,7 @@ function addEventListeners(v, cm) {
     if (sm) sm.checked = v.speedMode;
     if (document.getElementById('showMidiPlaybackControlBar').checked) {
       startMidiTimeout(true);
-      document.getElementById('midi-speedmode-indicator').style.display = v.speedMode ? 'inline' : 'none';
+      document.getElementById('midiSpeedmodeIndicator').style.display = v.speedMode ? 'inline' : 'none';
     }
     v.updateAll(cm, {}, v.selectedElements[0]);
   });
