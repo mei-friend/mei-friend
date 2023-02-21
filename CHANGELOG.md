@@ -5,10 +5,14 @@
 * Insert control elements with @staff attribute of selected elements (fix for #12)
 * Fix trailing space in `arpeg@plist`(fix for #13)
 * Support for inserting supplied elements around artic/accid attributes (that get converted to elements) (fix for #14)
+* Support for inserting supplied elements around artic/accid child elements of selected elements
 * Do not save and insert slur below with `CTRL + S` on Windows/Linux (fix for #15)
 * Support for `@place="between"` on control elements (fix for #16)
 * Several improvements and harmonization in editor code
-
+* Change keyboard shortcut for tenuto to `SHIFT + E`
+* Insert control elements without placement by default
+* Remove `CTRL + ` for inserting control elements below
+* On multiple selected elements, insert pedal up on first and pedal down on last 
 ### 0.8.2 patch
 * Fixes to highlight synchronization edge-cases caused by rounding issues
 * Implement MIDI playback shortcut (bubble) to open control bar and start playback immediately

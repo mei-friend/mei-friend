@@ -191,7 +191,7 @@ function loadFile(fileName, ev = null) {
     cm.readOnly = false;
     document.querySelector(".statusbar").innerText = "Loading from Github...";
     v.clear();
-    v.updateNotation = false;
+    v.allowCursorActivity = false;
     setMeiFileInfo(
       github.filepath, // meiFileName
       github.githubRepo, // meiFileLocation
@@ -205,6 +205,7 @@ function loadFile(fileName, ev = null) {
     fillInCommitLog("withRefresh");
     const fnStatus = document.getElementById("fileName");
     if (fnStatus) fnStatus.removeAttribute("contenteditable");
+    v.allowCursorActivity = false;
   }).catch((err) => {
     console.error("Couldn't read Github repo to fill in branch contents:", err);
     githubLoadingIndicator.classList.remove("clockwise");

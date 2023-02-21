@@ -1,6 +1,6 @@
 // mei-friend version and date
 export const version = '0.8.3';
-export const versionDate = '17 Feb 2023';
+export const versionDate = '19 Feb 2023';
 
 var vrvWorker;
 var spdWorker;
@@ -877,9 +877,9 @@ async function vrvWorkerEventsHandler(ev) {
       } else {
         // open stored data, setting vrv options first
         v.clear();
-        v.updateNotation = false;
+        v.allowCursorActivity = false;
         loadDataInEditor(storage.content);
-        v.updateNotation = true;
+        v.allowCursorActivity = true;
         v.updateAll(cm, {}, handleURLParamSelect());
       }
       v.busy(false);
@@ -887,11 +887,11 @@ async function vrvWorkerEventsHandler(ev) {
     case 'mei': // returned from importData, importBinaryData
       mei = ev.data.mei;
       v.pageCount = ev.data.pageCount;
-      v.updateNotation = false;
+      v.allowCursorActivity = false;
       loadDataInEditor(mei);
       setFileChangedState(false);
       updateLocalStorage(mei);
-      v.updateNotation = true;
+      v.allowCursorActivity = true;
       v.updateAll(cm, defaultVerovioOptions, handleURLParamSelect());
       //v.busy(false);
       break;
@@ -901,11 +901,11 @@ async function vrvWorkerEventsHandler(ev) {
       }
       if (ev.data.mei) {
         // from reRenderMEI
-        v.updateNotation = false;
+        v.allowCursorActivity = false;
         loadDataInEditor(ev.data.mei);
         setFileChangedState(false);
         updateLocalStorage(ev.data.mei);
-        v.updateNotation = true;
+        v.allowCursorActivity = true;
         v.selectedElements = [];
         if (!ev.data.removeIds) v.selectedElements.push(ev.data.xmlId);
       }
@@ -1077,12 +1077,12 @@ export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true, upd
         console.log('MEI file ' + meiFileName + ' loaded.');
         mei = meiXML;
         v.clear();
-        v.updateNotation = false;
+        v.allowCursorActivity = false;
         loadDataInEditor(mei, setFreshlyLoaded);
         setFileChangedState(false);
         updateLocalStorage(mei);
         if (updateAfterLoading) {
-          v.updateNotation = true;
+          v.allowCursorActivity = true;
           v.updateAll(cm, {}, handleURLParamSelect());
         }
       });
@@ -1157,12 +1157,12 @@ export function handleEncoding(mei, setFreshlyLoaded = true, updateAfterLoading 
         if (key === 'mei') {
           // if already a mei file
           setIsMEI(true);
-          v.updateNotation = false;
+          v.allowCursorActivity = false;
           loadDataInEditor(mei, setFreshlyLoaded);
           setFileChangedState(false);
           updateLocalStorage(mei);
           if (updateAfterLoading) {
-            v.updateNotation = true;
+            v.allowCursorActivity = true;
             v.updateAll(cm, defaultVerovioOptions, handleURLParamSelect());
           }
           break;
@@ -1432,27 +1432,27 @@ export let cmd = {
   addDimHairpin: () => e.addControlElement(v, cm, 'hairpin', '', 'dim'),
   addCresHairpinBelow: () => e.addControlElement(v, cm, 'hairpin', 'below', 'cres'),
   addDimHairpinBelow: () => e.addControlElement(v, cm, 'hairpin', 'below', 'dim'),
-  addFermata: () => e.addControlElement(v, cm, 'fermata', 'above', 'norm'),
+  addFermata: () => e.addControlElement(v, cm, 'fermata', '', ''),
   addFermataBelow: () => e.addControlElement(v, cm, 'fermata', 'below', 'inv'),
-  addDirective: () => e.addControlElement(v, cm, 'dir', 'above', 'dolce'),
+  addDirective: () => e.addControlElement(v, cm, 'dir', '', 'dolce'),
   addDirectiveBelow: () => e.addControlElement(v, cm, 'dir', 'below', 'dolce'),
-  addDynamics: () => e.addControlElement(v, cm, 'dynam', 'above', 'mf'),
-  addDnamicsBelow: () => e.addControlElement(v, cm, 'dynam', 'below', 'mf'),
-  addTempo: () => e.addControlElement(v, cm, 'tempo', 'above', 'Allegro'),
+  addDynamics: () => e.addControlElement(v, cm, 'dynam', '', 'mf'),
+  addDynamicsBelow: () => e.addControlElement(v, cm, 'dynam', 'below', 'mf'),
+  addTempo: () => e.addControlElement(v, cm, 'tempo', '', 'Allegro'),
   addArpeggio: () => e.addControlElement(v, cm, 'arpeg', 'up'),
   addArpeggioDown: () => e.addControlElement(v, cm, 'arpeg', 'down'),
   addGlissando: () => e.addControlElement(v, cm, 'gliss'),
   addPedalDown: () => e.addControlElement(v, cm, 'pedal', 'down'),
   addPedalUp: () => e.addControlElement(v, cm, 'pedal', 'up'),
-  addTrillAbove: () => e.addControlElement(v, cm, 'trill', 'above'),
+  addTrill: () => e.addControlElement(v, cm, 'trill', ''),
   addTrillBelow: () => e.addControlElement(v, cm, 'trill', 'below'),
-  addTurnAbove: () => e.addControlElement(v, cm, 'turn', 'above', 'upper'),
-  addTurnBelow: () => e.addControlElement(v, cm, 'turn', 'below', 'upper'),
-  addTurnAboveLower: () => e.addControlElement(v, cm, 'turn', 'above', 'lower'),
+  addTurn: () => e.addControlElement(v, cm, 'turn', '', ''), // 'upper'
+  addTurnBelow: () => e.addControlElement(v, cm, 'turn', 'below', ''),
+  addTurnLower: () => e.addControlElement(v, cm, 'turn', '', 'lower'),
   addTurnBelowLower: () => e.addControlElement(v, cm, 'turn', 'below', 'lower'),
-  addMordentAbove: () => e.addControlElement(v, cm, 'mordent', 'above', 'lower'),
-  addMordentBelow: () => e.addControlElement(v, cm, 'mordent', 'below', 'lower'),
-  addMordentAboveUpper: () => e.addControlElement(v, cm, 'mordent', 'above', 'upper'),
+  addMordent: () => e.addControlElement(v, cm, 'mordent', '', ''),
+  addMordentBelow: () => e.addControlElement(v, cm, 'mordent', 'below', ''),
+  addMordentUpper: () => e.addControlElement(v, cm, 'mordent', '', 'upper'),
   addMordentBelowUpper: () => e.addControlElement(v, cm, 'mordent', 'below', 'upper'),
   //
   delete: () => e.deleteElement(v, cm),
@@ -1721,10 +1721,10 @@ function addEventListeners(v, cm) {
   // Page turning
   let ss = document.getElementById('section-selector');
   ss.addEventListener('change', () => {
-    v.updateNotation = false;
+    v.allowCursorActivity = false;
     setCursorToId(cm, ss.value);
     v.updatePage(cm, '', ss.value);
-    v.updateNotation = true;
+    v.allowCursorActivity = true;
   });
   document.getElementById('first-page-btn').addEventListener('click', cmd.firstPage);
   document.getElementById('prev-page-btn').addEventListener('click', cmd.previousPage);
@@ -1795,11 +1795,11 @@ function addEventListeners(v, cm) {
   document.getElementById('addGlissando').addEventListener('click', cmd.addGlissando);
   document.getElementById('addPedalDown').addEventListener('click', cmd.addPedalDown);
   document.getElementById('addPedalUp').addEventListener('click', cmd.addPedalUp);
-  document.getElementById('addTrillAbove').addEventListener('click', cmd.addTrillAbove);
-  document.getElementById('addTurnAbove').addEventListener('click', cmd.addTurnAbove);
-  document.getElementById('addTurnAboveLower').addEventListener('click', cmd.addTurnAboveLower);
-  document.getElementById('addMordentAbove').addEventListener('click', cmd.addMordentAbove);
-  document.getElementById('addMordentAboveUpper').addEventListener('click', cmd.addMordentAboveUpper);
+  document.getElementById('addTrill').addEventListener('click', cmd.addTrill);
+  document.getElementById('addTurn').addEventListener('click', cmd.addTurn);
+  document.getElementById('addTurnLower').addEventListener('click', cmd.addTurnLower);
+  document.getElementById('addMordent').addEventListener('click', cmd.addMordent);
+  document.getElementById('addMordentUpper').addEventListener('click', cmd.addMordentUpper);
   document.getElementById('addOctave8Above').addEventListener('click', cmd.addOctave8Above);
   document.getElementById('addOctave15Above').addEventListener('click', cmd.addOctave15Above);
   document.getElementById('addOctave8Below').addEventListener('click', cmd.addOctave8Below);
