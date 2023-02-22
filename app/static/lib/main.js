@@ -1349,8 +1349,8 @@ export let cmd = {
   showSettingsPanel: () => v.showSettingsPanel(),
   hideSettingsPanel: () => v.hideSettingsPanel(),
   toggleSettingsPanel: (ev) => v.toggleSettingsPanel(ev),
-  showPdfPanel: () => v.showPdfPanel(),
-  hidePdfPanel: () => v.hidePdfPanel(),
+  showPdfPanel: () => v.pdfModeOn(),
+  hidePdfPanel: () => v.pdfModeOff(),
   filterSettings: () => v.applySettingsFilter(),
   filterReset: () => {
     document.getElementById('filterSettings').value = '';
@@ -1723,7 +1723,7 @@ function addEventListeners(v, cm) {
   document.getElementById('facsimile-close-button').addEventListener('click', cmd.hideFacsimilePanel);
 
   // pdf close button
-  document.getElementById('pdf-close-button').addEventListener('click', cmd.hidePdfPanel);
+  // document.getElementById('pdf-close-button').addEventListener('click', cmd.hidePdfPanel);
 
   // Page turning
   let ss = document.getElementById('section-selector');

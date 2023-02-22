@@ -58,7 +58,7 @@ export default class Viewer {
     this.respId = '';
     this.alertCloser;
     this.pdfMode = false;
-    this.settingsReplaceFriendContainer = true; // whether or not the settings panel is over the mei-friend window (false) or replaces it (true)
+    this.settingsReplaceFriendContainer = false; // whether or not the settings panel is over the mei-friend window (false) or replaces it (true)
   } // constructor()
 
   // change options, load new data, render current page, add listeners, highlight
@@ -808,21 +808,35 @@ export default class Viewer {
     this.showSettingsPanel();
   } // showVerovioTabInSettingsPanel()
 
-  showPdfPanel() {
-    let pp = document.getElementById('pdfPanel');
-    pp.classList.remove('pdfOff');
-    pp.classList.add('pdfOn');
+  pdfModeOn() {
+    this.settingsReplaceFriendContainer = true;
+    cmd.hideFacsimilePanel;
+    cmd.hideAnnotationPanel;
+    this.hideEditorPanel();
     this.showVerovioTabInSettingsPanel();
     this.pdfMode = true;
-  } // showPdfPanel()
+  } // pdfModeOn()
 
-  hidePdfPanel() {
-    let pp = document.getElementById('pdfPanel');
-    pp.classList.remove('pdfOn');
-    pp.classList.add('pdfOff');
+  pdfModeOff() {
+    this.settingsReplaceFriendContainer = true;
     this.hideSettingsPanel();
+    this.showEditorPanel();
     this.pdfMode = close;
-  } // hidePdfPanel()
+  } // pdfModeOff()
+
+  showEditorPanel() {
+    const encPanel = document.getElementById('encoding');
+    if (encPanel) encPanel.style.display = 'flex';
+    const rzr = document.getElementById('dragMe');
+    if (rzr) rzr.style.display = 'flex';
+  } // showEditorPanel()
+
+  hideEditorPanel() {
+    const encPanel = document.getElementById('encoding');
+    if (encPanel) encPanel.style.display = 'none';
+    const rzr = document.getElementById('dragMe');
+    if (rzr) rzr.style.display = 'none';
+  } // hideEditorPanel()
 
   toggleMidiPlaybackControlBar() {
     const midiPlaybackControlBar = document.getElementById('midiPlaybackControlBar');
