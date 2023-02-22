@@ -1025,7 +1025,7 @@ async function vrvWorkerEventsHandler(ev) {
       v.busy(false);
       break;
   }
-}
+} // vrvWorkerEventsHandler()
 
 // handles select (& page) input parameter from URL arguments ".../?select=..."
 function handleURLParamSelect() {

@@ -57,7 +57,8 @@ export default class Viewer {
     this.breaksSelect = /** @type HTMLSelectElement */ (document.getElementById('breaks-select'));
     this.respId = '';
     this.alertCloser;
-    this.pdfPanel = false;
+    this.pdfMode = false;
+    this.settingsReplaceFriendContainer = true; // whether or not the settings panel is over the mei-friend window (false) or replaces it (true)
   } // constructor()
 
   // change options, load new data, render current page, add listeners, highlight
@@ -338,7 +339,7 @@ export default class Viewer {
     if (bs) this.vrvOptions.breaks = bs.value;
 
     // update page dimensions, only if not in pdf mode
-    if (!this.pdfPanel) {
+    if (!this.pdfMode) {
       let dimensions = {}; // = getVerovioContainerSize();
       let vp = document.getElementById('verovio-panel');
       dimensions.width = vp.clientWidth;
@@ -768,6 +769,7 @@ export default class Viewer {
     sp.classList.remove('out');
     sp.classList.add('in');
     document.getElementById('showSettingsButton').style.visibility = 'hidden';
+    if (this.settingsReplaceFriendContainer) setOrientation(cm, '', '', -1, -1, this);
   } // showSettingsPanel()
 
   hideSettingsPanel() {
@@ -775,6 +777,7 @@ export default class Viewer {
     sp.classList.add('out');
     sp.classList.remove('in');
     document.getElementById('showSettingsButton').style.visibility = 'visible';
+    if (this.settingsReplaceFriendContainer) setOrientation(cm, '', '', -1, -1, this);
   } // hideSettingsPanel()
 
   toggleSettingsPanel(ev = null) {
@@ -810,7 +813,7 @@ export default class Viewer {
     pp.classList.remove('pdfOff');
     pp.classList.add('pdfOn');
     this.showVerovioTabInSettingsPanel();
-    this.pdfPanel = true;
+    this.pdfMode = true;
   } // showPdfPanel()
 
   hidePdfPanel() {
@@ -818,7 +821,7 @@ export default class Viewer {
     pp.classList.remove('pdfOn');
     pp.classList.add('pdfOff');
     this.hideSettingsPanel();
-    this.pdfPanel = close;
+    this.pdfMode = close;
   } // hidePdfPanel()
 
   toggleMidiPlaybackControlBar() {
