@@ -100,7 +100,7 @@
     "cmd-a": "toggleAnnotationPanel",
     "shift-alt-ï": "indentSelection",
     "cmd-delete": "cmdDelete",
-    "cmd-p": "showPdfPanel"
+    "cmd-p": "togglePdfMode"
   },
 
   ".platform-win32, .platform-linux": {

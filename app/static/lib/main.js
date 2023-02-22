@@ -954,6 +954,10 @@ async function vrvWorkerEventsHandler(ev) {
         v.updateHighlight(cm);
         refreshAnnotations(false);
         v.scrollSvg(cm);
+        if (v.pdfMode) { // switch on frame, when in pdf mode
+          const svg = document.querySelector('#verovio-panel svg');
+          if (svg) svg.classList.add('showFrame');
+        }
       }
       if (mp.playing) {
         highlightNotesAtMidiPlaybackTime();
@@ -1357,8 +1361,9 @@ export let cmd = {
   showSettingsPanel: () => v.showSettingsPanel(),
   hideSettingsPanel: () => v.hideSettingsPanel(),
   toggleSettingsPanel: (ev) => v.toggleSettingsPanel(ev),
-  showPdfPanel: () => v.pdfModeOn(),
-  hidePdfPanel: () => v.pdfModeOff(),
+  togglePdfMode: () => (v.pdfMode ? v.pdfModeOff() : v.pdfModeOn()),
+  pdfModeOn: () => v.pdfModeOff(),
+  pdfModeOff: () => v.pdfModeOff(),
   filterSettings: () => v.applySettingsFilter(),
   filterReset: () => {
     document.getElementById('filterSettings').value = '';

@@ -19,7 +19,7 @@ import {
   v,
 } from './main.js';
 import { startMidiTimeout } from './midi-player.js';
-import { getVerovioContainerSize, setOrientation } from './resizer.js';
+import { getNotationProportion, getVerovioContainerSize, setNotationProportion, setOrientation } from './resizer.js';
 import { drawFacsimile, highlightZone, zoomFacsimile } from './facsimile.js';
 import { alert, download, info, success, verified, unverified, xCircleFill } from '../css/icons.js';
 import { selectMarkup } from './markup.js';
@@ -59,6 +59,7 @@ export default class Viewer {
     this.alertCloser;
     this.pdfMode = false;
     this.settingsReplaceFriendContainer = false; // whether or not the settings panel is over the mei-friend window (false) or replaces it (true)
+    this.notationProportion = .5; // remember proportion during pdf mode
   } // constructor()
 
   // change options, load new data, render current page, add listeners, highlight
@@ -339,7 +340,12 @@ export default class Viewer {
     if (bs) this.vrvOptions.breaks = bs.value;
 
     // update page dimensions, only if not in pdf mode
-    if (!this.pdfMode) {
+    if (this.pdfMode) {
+      let vpw = document.getElementById('vrv-pageWidth');
+      if (vpw) this.vrvOptions.pageWidth = vpw.value;
+      let vph = document.getElementById('vrv-pageHeight');
+      if (vph) this.vrvOptions.pageHeight = vph.value;
+    } else {
       let dimensions = {}; // = getVerovioContainerSize();
       let vp = document.getElementById('verovio-panel');
       dimensions.width = vp.clientWidth;
@@ -809,19 +815,25 @@ export default class Viewer {
   } // showVerovioTabInSettingsPanel()
 
   pdfModeOn() {
+    this.pdfMode = true;
     this.settingsReplaceFriendContainer = true;
-    cmd.hideFacsimilePanel;
-    cmd.hideAnnotationPanel;
+    this.notationProportion = getNotationProportion();
+    setNotationProportion(1);
+    cmd.hideFacsimilePanel();
+    cmd.hideAnnotationPanel();
     this.hideEditorPanel();
     this.showVerovioTabInSettingsPanel();
-    this.pdfMode = true;
+    // this.updateOption();
   } // pdfModeOn()
 
   pdfModeOff() {
-    this.settingsReplaceFriendContainer = true;
+    this.pdfMode = false;
+    this.settingsReplaceFriendContainer = false;
+    setNotationProportion(this.notationProportion);
     this.hideSettingsPanel();
     this.showEditorPanel();
-    this.pdfMode = close;
+    // this.updateLayout();
+    setOrientation(cm, '', '', v);
   } // pdfModeOff()
 
   showEditorPanel() {
