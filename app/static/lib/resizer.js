@@ -13,23 +13,13 @@ let minProportion = 0.05; // mimimum proportion of both notationProportion, facs
 let maxProportion = 0.95;
 let storage;
 
-export function setOrientation(
-  cm,
-  _notationOrientation = '',
-  _facsimileOrientation = '',
-  _notationProportion = -1,
-  _facsimileProportion = -1,
-  v = null,
-  _storage = null
-) {
+export function setOrientation(cm, _notationOrientation = '', _facsimileOrientation = '', v = null, _storage = null) {
   // store arguments
   if (_notationOrientation) notationOrientation = _notationOrientation;
   if (_facsimileOrientation) {
     facsimileOrientation = _facsimileOrientation;
     document.getElementById('selectFacsimilePanelOrientation').value = facsimileOrientation;
   }
-  if (_notationProportion > 0) notationProportion = _notationProportion;
-  if (_facsimileProportion > 0) facsimileProportion = _facsimileProportion;
   if (_storage !== null) storage = _storage;
 
   // save in local storage
@@ -60,13 +50,13 @@ export function setOrientation(
   const showFacsimile = document.getElementById('showFacsimilePanel').checked;
   let sz = calcSizeOfContainer(); // friendContainer
   // console.log('setOrientation(' + _notationOrientation + ') container size:', sz);
-  
+
   // make container smaller, if settings panel should take space from friend container
   const settingsPanel = document.getElementById('settingsPanel');
   if (v && v.settingsReplaceFriendContainer && settingsPanel && settingsPanel.classList.contains('in')) {
     sz.width -= document.getElementById('settingsPanel').getBoundingClientRect().width;
   }
-  
+
   // check for notation orientation
   if (notationOrientation === 'top' || notationOrientation === 'bottom') {
     if (showAnnotationPanelCheckbox && showAnnotationPanelCheckbox.checked) {
@@ -163,6 +153,22 @@ export function setOrientation(
 
 export function getOrientation() {
   return notationOrientation;
+}
+
+export function setNotationProportion(prop) {
+  notationProportion = prop;
+}
+
+export function getNotationProportion() {
+  return notationProportion;
+}
+
+export function setFacsimileProportion(prop) {
+  facsimileProportion = prop;
+}
+
+export function getFacsimileProportion() {
+  return facsimileProportion;
 }
 
 export function calcSizeOfContainer() {
@@ -286,7 +292,7 @@ export function addNotationResizerHandlers(v, cm) {
     document.removeEventListener('mousemove', mouseMoveHandler);
     document.removeEventListener('mouseup', mouseUpHandler);
     if (v) {
-      setOrientation(cm, '', '', -1, -1, v);
+      setOrientation(cm, '', '', v);
     }
     // save notationPorportion in local storage
     if (storage && storage.supported) {
@@ -374,7 +380,7 @@ export function addFacsimilerResizerHandlers(v, cm) {
     document.removeEventListener('mousemove', mouseMoveHandler);
     document.removeEventListener('mouseup', mouseUpHandler);
     if (v) {
-      setOrientation(cm, '', '', -1, -1, v);
+      setOrientation(cm, '', '', v);
     }
     // save facsimileProportion in local storage
     if (storage && storage.supported) {

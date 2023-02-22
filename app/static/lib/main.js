@@ -155,7 +155,13 @@ export const samp = {
 };
 export const fontList = ['Leipzig', 'Bravura', 'Gootville', 'Leland', 'Petaluma'];
 
-import { setOrientation, addNotationResizerHandlers, addFacsimilerResizerHandlers } from './resizer.js';
+import {
+  setOrientation,
+  addNotationResizerHandlers,
+  addFacsimilerResizerHandlers,
+  setNotationProportion,
+  setFacsimileProportion,
+} from './resizer.js';
 import { addAnnotationHandlers, clearAnnotations, readAnnots, refreshAnnotations } from './annotation.js';
 import { dropHandler, dragEnter, dragOverHandler, dragLeave } from './dragger.js';
 import { openUrl, openUrlCancel } from './open-url.js';
@@ -168,7 +174,7 @@ import {
   generateSectionSelect,
   createPdfControlBar,
 } from './control-menu.js';
-import { clock, highlight, unverified, xCircleFill } from '../css/icons.js';
+import { clock, unverified, xCircleFill } from '../css/icons.js';
 import { setCursorToId } from './utils.js';
 import { getInMeasure, navElsSelector, getElementAtCursor } from './dom-utils.js';
 import { addDragSelector } from './drag-selector.js';
@@ -768,7 +774,9 @@ document.addEventListener('DOMContentLoaded', function () {
   } else {
     fp = defaultFacsimilePorportion;
   }
-  setOrientation(cm, o, fo, np, fp, v, storage);
+  setNotationProportion(np);
+  setFacsimileProportion(fp);
+  setOrientation(cm, o, fo, v, storage);
 
   addEventListeners(v, cm);
   addAnnotationHandlers();
@@ -777,7 +785,7 @@ document.addEventListener('DOMContentLoaded', function () {
   let doit;
   window.onresize = () => {
     clearTimeout(doit); // wait half a second before re-calculating orientation
-    doit = setTimeout(() => setOrientation(cm, '', '', -1, -1, v, storage), 500);
+    doit = setTimeout(() => setOrientation(cm, '', '', v, storage), 500);
   };
 
   setKeyMap(defaultKeyMap);
@@ -1316,25 +1324,25 @@ export let cmd = {
   previousMeasure: () => v.navigate(cm, 'measure', 'backwards'),
   layerUp: () => v.navigate(cm, 'layer', 'upwards'),
   layerDown: () => v.navigate(cm, 'layer', 'downwards'),
-  notationTop: () => setOrientation(cm, 'top', '', -1, -1, v, storage),
-  notationBottom: () => setOrientation(cm, 'bottom', '', -1, -1, v, storage),
-  notationLeft: () => setOrientation(cm, 'left', '', -1, -1, v, storage),
-  notationRight: () => setOrientation(cm, 'right', '', -1, -1, v, storage),
-  facsimileTop: () => setOrientation(cm, '', 'top', -1, -1, v, storage),
-  facsimileBottom: () => setOrientation(cm, '', 'bottom', -1, -1, v, storage),
-  facsimileLeft: () => setOrientation(cm, '', 'left', -1, -1, v, storage),
-  facsimileRight: () => setOrientation(cm, '', 'right', -1, -1, v, storage),
+  notationTop: () => setOrientation(cm, 'top', '', v, storage),
+  notationBottom: () => setOrientation(cm, 'bottom', '', v, storage),
+  notationLeft: () => setOrientation(cm, 'left', '', v, storage),
+  notationRight: () => setOrientation(cm, 'right', '', v, storage),
+  facsimileTop: () => setOrientation(cm, '', 'top', v, storage),
+  facsimileBottom: () => setOrientation(cm, '', 'bottom', v, storage),
+  facsimileLeft: () => setOrientation(cm, '', 'left', v, storage),
+  facsimileRight: () => setOrientation(cm, '', 'right', v, storage),
   showFacsimilePanel: () => {
     document.getElementById('showFacsimilePanel').checked = true;
-    setOrientation(cm, '', '', -1, -1, v);
+    setOrientation(cm, '', '', v);
   },
   hideFacsimilePanel: () => {
     document.getElementById('showFacsimilePanel').checked = false;
-    setOrientation(cm, '', '', -1, -1, v);
+    setOrientation(cm, '', '', v);
   },
   toggleFacsimilePanel: () => {
     document.getElementById('showFacsimilePanel').checked = !document.getElementById('showFacsimilePanel').checked;
-    setOrientation(cm, '', '', -1, -1, v);
+    setOrientation(cm, '', '', v);
   },
   checkFacsimile: () => {
     let tf = document.getElementById('titleFacsimilePanel');
@@ -1716,7 +1724,7 @@ function addEventListeners(v, cm) {
   // facsimile edit zones
   document.getElementById('facsimile-edit-zones-checkbox').addEventListener('click', (e) => {
     document.getElementById('editFacsimileZones').checked = e.target.checked;
-    setOrientation(cm, '', '', -1, -1, v);
+    setOrientation(cm, '', '', v);
   });
 
   // facsimile close button

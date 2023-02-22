@@ -769,7 +769,7 @@ export default class Viewer {
     sp.classList.remove('out');
     sp.classList.add('in');
     document.getElementById('showSettingsButton').style.visibility = 'hidden';
-    if (this.settingsReplaceFriendContainer) setOrientation(cm, '', '', -1, -1, this);
+    if (this.settingsReplaceFriendContainer) setOrientation(cm, '', '', this);
   } // showSettingsPanel()
 
   hideSettingsPanel() {
@@ -777,7 +777,7 @@ export default class Viewer {
     sp.classList.add('out');
     sp.classList.remove('in');
     document.getElementById('showSettingsButton').style.visibility = 'visible';
-    if (this.settingsReplaceFriendContainer) setOrientation(cm, '', '', -1, -1, this);
+    if (this.settingsReplaceFriendContainer) setOrientation(cm, '', '', this);
   } // hideSettingsPanel()
 
   toggleSettingsPanel(ev = null) {
