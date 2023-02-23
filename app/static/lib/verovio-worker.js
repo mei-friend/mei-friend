@@ -362,6 +362,10 @@ addEventListener(
         try {
           tk.setOptions(tkOptions);
 
+          if (result.speedMode) {
+            tk.loadData(result.msg);
+          }
+
           // add pages to the file
           for (let p = result.startPage; p <= result.endPage; p++) {
             let svg = tk.renderToSVG(p);

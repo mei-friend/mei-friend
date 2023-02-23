@@ -869,6 +869,7 @@ export default class Viewer {
       version: version,
       versionDate: versionDate,
       options: this.vrvOptions,
+      speedMode: this.speedMode,
       startPage: 1,
       endPage: this.pageCount,
     });
