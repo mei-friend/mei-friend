@@ -1704,7 +1704,7 @@ function addEventListeners(v, cm) {
   // Zooming notation with buttons
   document.getElementById('decrease-scale-btn').addEventListener('click', cmd.zoomOut);
   document.getElementById('increase-scale-btn').addEventListener('click', cmd.zoomIn);
-  document.getElementById('verovio-zoom').addEventListener('input', cmd.zoomSlider);
+  document.getElementById('verovio-zoom').addEventListener('change', cmd.zoomSlider);
 
   // Zooming notation with mouse wheel
   vp.addEventListener('wheel', (ev) => {
@@ -1718,7 +1718,7 @@ function addEventListeners(v, cm) {
   // Zooming facsimile with buttons
   document.getElementById('facs-decrease-scale-btn').addEventListener('click', cmd.facsZoomOut);
   document.getElementById('facs-increase-scale-btn').addEventListener('click', cmd.facsZoomIn);
-  document.getElementById('facsimile-zoom').addEventListener('input', cmd.facsZoomSlider);
+  document.getElementById('facsimile-zoom').addEventListener('change', cmd.facsZoomSlider);
 
   // Zooming facsimile with mouse wheel
   let ip = document.getElementById('facsimile-panel');
