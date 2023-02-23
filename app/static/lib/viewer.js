@@ -816,31 +816,40 @@ export default class Viewer {
 
   pdfModeOn() {
     this.pdfMode = true;
+    // modify vrv options
     this.vrvOptions.mmOutput = true;
+    document.getElementById('vrv-mmOutput').checked = true;
     this.vrvOptions.adjustPageHeight = false;
+    document.getElementById('vrv-adjustPageHeight').checked = false;
+    // behavior of settings panel
     this.settingsReplaceFriendContainer = true;
+    // hide editor and other panels
     this.notationProportion = getNotationProportion();
-    document.getElementById('friendContainer')?.classList.add('pdfMode');
-
     setNotationProportion(1);
     cmd.hideFacsimilePanel();
     cmd.hideAnnotationPanel();
     this.hideEditorPanel();
-    this.showVerovioTabInSettingsPanel();
-    // this.updateOption();
+    this.showVerovioTabInSettingsPanel(); // make vrv settings visible
+
+    document.getElementById('friendContainer')?.classList.add('pdfMode');
   } // pdfModeOn()
 
   pdfModeOff() {
     this.pdfMode = false;
+    // set vrv options back
     this.vrvOptions.mmOutput = false;
+    document.getElementById('vrv-mmOutput').checked = false;
     this.vrvOptions.adjustPageHeight = true;
+    document.getElementById('vrv-adjustPageHeight').checked = true;
+    // settings behavior to default
     this.settingsReplaceFriendContainer = false;
-    document.getElementById('friendContainer')?.classList.remove('pdfMode');
 
+    // show editor panel with previous proportion
     setNotationProportion(this.notationProportion);
     this.hideSettingsPanel();
     this.showEditorPanel();
-    // this.updateLayout();
+
+    document.getElementById('friendContainer')?.classList.remove('pdfMode');
     setOrientation(cm, '', '', v);
   } // pdfModeOff()
 
