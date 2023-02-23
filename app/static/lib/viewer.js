@@ -59,7 +59,7 @@ export default class Viewer {
     this.alertCloser;
     this.pdfMode = false;
     this.settingsReplaceFriendContainer = false; // whether or not the settings panel is over the mei-friend window (false) or replaces it (true)
-    this.notationProportion = .5; // remember proportion during pdf mode
+    this.notationProportion = 0.5; // remember proportion during pdf mode
   } // constructor()
 
   // change options, load new data, render current page, add listeners, highlight
@@ -820,6 +820,8 @@ export default class Viewer {
     this.vrvOptions.adjustPageHeight = false;
     this.settingsReplaceFriendContainer = true;
     this.notationProportion = getNotationProportion();
+    document.getElementById('friendContainer')?.classList.add('pdfMode');
+
     setNotationProportion(1);
     cmd.hideFacsimilePanel();
     cmd.hideAnnotationPanel();
@@ -833,6 +835,8 @@ export default class Viewer {
     this.vrvOptions.mmOutput = false;
     this.vrvOptions.adjustPageHeight = true;
     this.settingsReplaceFriendContainer = false;
+    document.getElementById('friendContainer')?.classList.remove('pdfMode');
+    
     setNotationProportion(this.notationProportion);
     this.hideSettingsPanel();
     this.showEditorPanel();

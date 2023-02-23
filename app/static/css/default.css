@@ -297,6 +297,10 @@ a:active {
   width: 100%;
 }
 
+#friendContainer.pdfMode {
+  border-color: #cb0606;
+}
+
 #notation {
   overflow: hidden;
   display: flex;
