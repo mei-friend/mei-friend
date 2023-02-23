@@ -764,8 +764,8 @@
           }
           // remove class "active" from tablinks except for current target
           for (let tab of containingElement.getElementsByClassName('tablink')) {
-            console.log('tab: ', tab);
-            console.log('ev.currentTarget: ', ev.currentTarget);
+            // console.log('tab: ', tab);
+            // console.log('ev.currentTarget: ', ev.currentTarget);
             tab === ev.currentTarget ? tab.classList.add('active') : tab.classList.remove('active');
           }
         }
