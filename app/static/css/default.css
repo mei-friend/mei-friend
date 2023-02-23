@@ -298,7 +298,8 @@ a:active {
 }
 
 #friendContainer.pdfMode {
-  border-color: #cb0606;
+  /* border-color: #cb0606; */
+  border-color: var(--dropdownBorderColor);
 }
 
 #notation {
@@ -620,6 +621,7 @@ a:active {
   min-height: 21px;
   min-width: 21px;
   max-height: 21px;
+  color: var(--textColor);
   background-color: var(--controlMenuBackgroundColor);
 }
 
