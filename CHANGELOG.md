@@ -1,4 +1,7 @@
 # mei-friend-online CHANGELOG.md
+### 0.8.4 patch
+* Add @staff to clef change element
+* Change of keyboard shortcuts (for inserting C clef, tenuto, spiccato)
 ### 0.8.3 patch
 * Show modifyer keys as text (ALT, CTRL...) on Windows/Linux systems
 * Insert `arpeg` with `@order="up"` per default (or `@order="down"` with `CTRL + A`)
