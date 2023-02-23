@@ -30,7 +30,7 @@
     "ctrl-a": "addArpeggioDown",
     "g": "addGlissando",
     "p": "addPedalDown",
-    "ctrl-p": "addPedalUp",
+    "shift-p": "addPedalUp",
     "m": "addMordent",
     "shift-m": "addMordentUpper",
     "l": "addTrill",
@@ -42,7 +42,7 @@
     "shift-e": "toggleTenuto",
     "shift-a": "toggleMarcato",
     "shift-i": "toggleStacciss",
-    "shift-p": "toggleSpicc",
+    "shift-c": "toggleSpicc",
 
     "b": "addBeam",
     "shift-b": "addBeamSpan",
@@ -55,7 +55,7 @@
     "ctrl-shift-o": "addOctave15Below",
 
     "shift-g": "addGClefChangeBefore",
-    "shift-c": "addCClefChangeBefore",
+    "ctrl-shift-c": "addCClefChangeBefore",
     "shift-f": "addFClefChangeBefore",
 
     "escape": "escapeKeyPressed",
