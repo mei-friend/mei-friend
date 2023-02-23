@@ -836,7 +836,7 @@ export default class Viewer {
     this.vrvOptions.adjustPageHeight = true;
     this.settingsReplaceFriendContainer = false;
     document.getElementById('friendContainer')?.classList.remove('pdfMode');
-    
+
     setNotationProportion(this.notationProportion);
     this.hideSettingsPanel();
     this.showEditorPanel();
@@ -1060,6 +1060,12 @@ export default class Viewer {
       controlMenuUpdateNotation: {
         title: 'Show notation update controls',
         description: 'Show notation update behavior controls in control menu',
+        type: 'bool',
+        default: true,
+      },
+      controlMenuSpeedmodeCheckbox: {
+        title: 'Show speed mode checkbox',
+        description: 'Show speed mode checkbox in control menu',
         type: 'bool',
         default: true,
       },
@@ -1302,6 +1308,9 @@ export default class Viewer {
         case 'controlMenuFontSelector':
           document.getElementById('font-ctrls').style.display = value ? 'inherit' : 'none';
           break;
+        case 'controlMenuSpeedmodeCheckbox':
+          document.getElementById('speed-div').style.display = value ? 'inherit' : 'none';
+          break;
         case 'controlMenuNavigateArrows':
           document.getElementById('navigate-ctrls').style.display = value ? 'inherit' : 'none';
           break;
@@ -1420,6 +1429,12 @@ export default class Viewer {
             break;
           case 'controlMenuFontSelector':
             document.getElementById('font-ctrls').style.display = document.getElementById('controlMenuFontSelector')
+              .checked
+              ? 'inherit'
+              : 'none';
+            break;
+          case 'controlMenuSpeedmodeCheckbox':
+            document.getElementById('speed-div').style.display = document.getElementById('controlMenuSpeedmodeCheckbox')
               .checked
               ? 'inherit'
               : 'none';
