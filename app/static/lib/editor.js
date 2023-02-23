@@ -187,6 +187,10 @@ export function addControlElement(v, cm, elName, placement, form) {
   let uuid = utils.generateXmlId(elName, v.xmlIdStyle);
   let uuid2, newElement2;
   newElement.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
+
+  // add @staff attribute of start element
+  if (staveArray.length > 0) newElement.setAttribute('staff', staveArray.sort().join(' '));
+
   // elements with both startid and endid
   if (['slur', 'tie', 'phrase', 'hairpin', 'gliss'].includes(elName)) {
     newElement.setAttribute('startid', '#' + startId);
@@ -205,8 +209,7 @@ export function addControlElement(v, cm, elName, placement, form) {
       newElement.setAttribute('extender', 'true');
     }
   }
-  // handle @staff attribute of start element
-  if (staveArray.length > 0) newElement.setAttribute('staff', staveArray.sort().join(' '));
+  
   // handle @form attribute
   if (form && ['hairpin', 'fermata', 'mordent', 'trill', 'turn'].includes(elName)) {
     newElement.setAttribute('form', form);
