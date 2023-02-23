@@ -1361,8 +1361,8 @@ export let cmd = {
   showSettingsPanel: () => v.showSettingsPanel(),
   hideSettingsPanel: () => v.hideSettingsPanel(),
   toggleSettingsPanel: (ev) => v.toggleSettingsPanel(ev),
-  togglePdfMode: () => (v.pdfMode ? v.pdfModeOff() : v.pdfModeOn()),
-  pdfModeOn: () => v.pdfModeOff(),
+  togglePdfMode: () => v.pdfMode ? v.pdfModeOff() : v.pdfModeOn(),
+  pdfModeOn: () => v.pdfModeOn(),
   pdfModeOff: () => v.pdfModeOff(),
   filterSettings: () => v.applySettingsFilter(),
   filterReset: () => {
@@ -1531,6 +1531,8 @@ export let cmd = {
       document.getElementById('settingsPanel') === document.activeElement.closest('#settingsPanel')
     ) {
       cmd.filterReset();
+    } else if(v.pdfMode) {
+      cmd.pdfModeOff();
     } else {
       v.hideAlerts();
       v.toggleValidationReportVisibility('hidden');
@@ -1657,6 +1659,7 @@ function addEventListeners(v, cm) {
   document.getElementById('SaveMei').addEventListener('click', downloadMei);
   document.getElementById('SaveSvg').addEventListener('click', downloadSvg);
   document.getElementById('SaveMidi').addEventListener('click', () => requestMidiFromVrvWorker());
+  document.getElementById('SavePdf').addEventListener('click', cmd.pdfModeOn);
 
   // edit dialogs
   document.getElementById('undo').addEventListener('click', cmd.undo);
