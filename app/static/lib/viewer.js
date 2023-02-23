@@ -816,6 +816,8 @@ export default class Viewer {
 
   pdfModeOn() {
     this.pdfMode = true;
+    this.vrvOptions.mmOutput = true;
+    this.vrvOptions.adjustPageHeight = false;
     this.settingsReplaceFriendContainer = true;
     this.notationProportion = getNotationProportion();
     setNotationProportion(1);
@@ -828,6 +830,8 @@ export default class Viewer {
 
   pdfModeOff() {
     this.pdfMode = false;
+    this.vrvOptions.mmOutput = false;
+    this.vrvOptions.adjustPageHeight = true;
     this.settingsReplaceFriendContainer = false;
     setNotationProportion(this.notationProportion);
     this.hideSettingsPanel();
