@@ -9,14 +9,17 @@ import {
   defaultVerovioVersion,
   fontList,
   isSafari,
+  meiFileName,
   rngLoader,
   platform,
   storage,
   supportedVerovioVersions,
   tkVersion,
+  v,
   validate,
   validator,
-  v,
+  version,
+  versionDate,
 } from './main.js';
 import { startMidiTimeout } from './midi-player.js';
 import { getNotationProportion, setNotationProportion, setOrientation } from './resizer.js';
@@ -862,8 +865,12 @@ export default class Viewer {
     this.vrvWorker.postMessage({
       cmd: 'renderPdf',
       msg: cm.getValue(),
+      title: meiFileName,
+      version: version,
+      versionDate: versionDate,
+      options: this.vrvOptions,
       startPage: 1,
-      endPage: 2,
+      endPage: this.pageCount,
     });
   } // saveAsPdf()
 

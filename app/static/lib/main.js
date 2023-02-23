@@ -952,7 +952,8 @@ async function vrvWorkerEventsHandler(ev) {
         v.updateHighlight(cm);
         refreshAnnotations(false);
         v.scrollSvg(cm);
-        if (v.pdfMode) { // switch on frame, when in pdf mode
+        if (v.pdfMode) {
+          // switch on frame, when in pdf mode
           const svg = document.querySelector('#verovio-panel svg');
           if (svg) svg.classList.add('showFrame');
         }
@@ -992,7 +993,7 @@ async function vrvWorkerEventsHandler(ev) {
       break;
     case 'downloadMidiFile': // export MIDI file
       blob = midiDataToBlob(ev.data.midi);
-      var a = document.createElement('a');
+      let a = document.createElement('a');
       a.download = meiFileName.substring(meiFileName.lastIndexOf('/') + 1).replace(/\.[^/.]+$/, '.mid');
       a.href = window.URL.createObjectURL(blob);
       a.click();
@@ -1007,6 +1008,12 @@ async function vrvWorkerEventsHandler(ev) {
           mp.noteSequence = noteSequence;
         });
       }
+      break;
+    case 'pdfBlob':
+      let aa = document.createElement('a');
+      aa.download = meiFileName.substring(meiFileName.lastIndexOf('/') + 1).replace(/\.[^/.]+$/, '.pdf');;
+      aa.href = window.URL.createObjectURL(ev.data.blob);
+      aa.click();
       break;
     case 'timeForElement': // receive time for element to start midi playback
       // console.log('Received time for element: ', ev.data);
@@ -1359,7 +1366,7 @@ export let cmd = {
   showSettingsPanel: () => v.showSettingsPanel(),
   hideSettingsPanel: () => v.hideSettingsPanel(),
   toggleSettingsPanel: (ev) => v.toggleSettingsPanel(ev),
-  togglePdfMode: () => v.pdfMode ? v.pdfModeOff() : v.pdfModeOn(),
+  togglePdfMode: () => (v.pdfMode ? v.pdfModeOff() : v.pdfModeOn()),
   pdfModeOn: () => v.pdfModeOn(),
   pdfModeOff: () => v.pdfModeOff(),
   saveAsPdf: () => v.saveAsPdf(),
@@ -1530,7 +1537,7 @@ export let cmd = {
       document.getElementById('settingsPanel') === document.activeElement.closest('#settingsPanel')
     ) {
       cmd.filterReset();
-    } else if(v.pdfMode) {
+    } else if (v.pdfMode) {
       cmd.pdfModeOff();
     } else {
       v.hideAlerts();

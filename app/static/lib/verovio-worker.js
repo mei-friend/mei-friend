@@ -292,21 +292,44 @@ addEventListener(
         break;
       case 'renderPdf':
         if (typeof PDFDocument === 'undefined') {
-          importScripts('https://github.com/foliojs/pdfkit/releases/download/v0.12.1/pdfkit.standalone.js');
+          // importScripts('https://github.com/foliojs/pdfkit/releases/download/v0.12.1/pdfkit.standalone.js');
+          importScripts('../pdfkit/pdfkit.standalone.js');
         }
         if (typeof SVGtoPDF === 'undefined') {
-          importScripts('https://alafr.github.io/SVG-to-PDFKit/examples/pdfkit.js');
+          // importScripts('https://alafr.github.io/SVG-to-PDFKit/examples/pdfkit.js');
+          importScripts('../pdfkit/svgtopdf.js');
         }
         if (typeof blobStream === 'undefined') {
-          importScripts('https://alafr.github.io/SVG-to-PDFKit/examples/blobstream.js');
+          // importScripts('https://alafr.github.io/SVG-to-PDFKit/examples/blobstream.js');
+          importScripts('../pdfkit/blob-stream.js');
         }
 
-        const doc = new PDFDocument({ autoFirstPage: false, compress: true, useCSS: true });
+        tkOptions = result.options;
+        tkOptions.scale = 100;
+        const mm2pt = 1 / (0.352777778 * 10);
+        // Verovio has tenth of mm
+        // const fact = 10 / (25.4 / 72); // inch in mm per 72 PostScript points
+
+        let pdfFormat = [];
+        pdfFormat.push(tkOptions.pageWidth * mm2pt);
+        pdfFormat.push(tkOptions.pageHeight * mm2pt);
+        let pdfOrientation = tkOptions.pageWidth < tkOptions.pageHeight ? 'portrait' : 'landscape';
+        console.log('Width/Height: ' + pdfFormat[0] + '/' + pdfFormat[1] + ', ' + pdfOrientation);
+
+        const doc = new PDFDocument({
+          autoFirstPage: false,
+          compress: true,
+          useCSS: true,
+          size: pdfFormat,
+          layout: pdfOrientation,
+        });
 
         // create PDF file
         doc.info = {
-          Title: 'Super Test PDF',
-          Author: 'Created by mei-friend.mdw.ac.at',
+          Title: result.title.split('/').pop(),
+          Author: 'Created by mei-friend',
+          Subject: 'Version ' + result.version + ' (' + result.versionDate + ')',
+          Keywords: 'Music encoding, MEI, mei-friend, public-domain',
           CreationDate: new Date(),
         };
 
@@ -337,31 +360,27 @@ addEventListener(
         options.fontCallback = fontCallback;
 
         try {
-          tkOptions = result.options;
           tk.setOptions(tkOptions);
 
           // add pages to the file
-          for (let p = results.startPage; p <= results.endPage; p++) {
+          for (let p = result.startPage; p <= result.endPage; p++) {
             let svg = tk.renderToSVG(p);
-            doc.addPage({ size: pdfFormat, layout: pdfOrientation });
+            doc.addPage();
             SVGtoPDF(doc, svg, 0, 0, options);
-            console.log('vrvWorker adding page ' + p + '/' + results.endPage + '.');
+            console.log('vrvWorker adding page ' + p + '/' + result.endPage + '.');
           }
         } catch (err) {
           log('saveAsPdf: ' + err);
         }
         doc.end();
+        result.cmd = '';
 
         stream.on('finish', function () {
           // get a blob you can do whatever you like with
-          const blob = stream.toBlob('application/pdf');
-
-          let a = document.createElement('a');
-          a.download = 'test-pdfkit.pdf';
-          a.href = window.URL.createObjectURL(blob);
-          a.click();
+          result.blob = stream.toBlob('application/pdf');
+          result.cmd = 'pdfBlob';
+          postMessage(result);
         });
-        results.cmd = 'pdfBlob';
         break;
       case 'getTimeForElement':
         console.log('worker: getTimeForElement: ', result.msg);
