@@ -46,7 +46,10 @@ addEventListener(
       case 'updateAll':
         try {
           tkOptions = result.options;
-          if (result.speedMode && !result.computePageBreaks && tkOptions.breaks != 'none') tkOptions.breaks = 'encoded';
+          let breaks = tkOptions.breaks;
+          if (result.speedMode && !result.computePageBreaks && tkOptions.breaks != 'none') {
+            tkOptions.breaks = 'encoded';
+          }
           tk.setOptions(tkOptions);
           let r = tk.loadData(result.mei);
           if (!r) {
@@ -68,12 +71,17 @@ addEventListener(
           let pg = result.speedMode && result.pageNo > 1 ? 2 : result.pageNo;
           result.svg = tk.renderToSVG(pg);
           result.cmd = 'updated';
+          if (result.speedMode) {
+            tkOptions.breaks = breaks;
+            tk.setOptions({ breaks: breaks }); // reset breaks options
+          }
         } catch (err) {
           log('updateAll: ' + err);
         }
         break;
       case 'updateData':
         try {
+          let breaks = result.breaks;
           if (result.speedMode && result.breaks != 'none') {
             result.breaks = 'encoded';
           }
@@ -96,6 +104,10 @@ addEventListener(
           result.svg = tk.renderToSVG(pg);
           result.pageCount = tk.getPageCount();
           result.cmd = 'updated';
+          if (result.speedMode) {
+            tkOptions.breaks = breaks;
+            tk.setOptions({ breaks: breaks }); // reset breaks options
+          }
         } catch (err) {
           log('updateData: ' + err);
         }
@@ -117,7 +129,10 @@ addEventListener(
       case 'updateLayout':
         try {
           tkOptions = result.options;
-          if (result.speedMode && result.breaks != 'none') tkOptions.breaks = 'encoded';
+          let breaks = tkOptions.breaks;
+          if (result.speedMode && tkOptions.breaks != 'none') {
+            tkOptions.breaks = 'encoded';
+          }
           tk.setOptions(tkOptions);
           tk.redoLayout();
           result.setCursorToPageBeginning = true;
@@ -130,6 +145,10 @@ addEventListener(
           result.svg = tk.renderToSVG(pg);
           result.pageCount = tk.getPageCount();
           result.cmd = 'updated';
+          if (result.speedMode) {
+            tkOptions.breaks = breaks;
+            tk.setOptions({ breaks: breaks }); // reset breaks options
+          }
         } catch (err) {
           log('updateLayout: ' + err);
         }
@@ -137,7 +156,10 @@ addEventListener(
       case 'updateOption': // just update option without redoing layout
         try {
           tkOptions = result.options;
-          if (result.speedMode && result.breaks != 'none') tkOptions.breaks = 'encoded';
+          let breaks = tkOptions.breaks;
+          if (result.speedMode && tkOptions.breaks != 'none') {
+            tkOptions.breaks = 'encoded';
+          }
           tk.setOptions(tkOptions);
           result.setCursorToPageBeginning = true;
           if (result.xmlId && !result.speedMode) {
@@ -149,6 +171,10 @@ addEventListener(
           result.svg = tk.renderToSVG(pg);
           result.pageCount = tk.getPageCount();
           result.cmd = 'updated';
+          if (result.speedMode) {
+            tkOptions.breaks = breaks;
+            tk.setOptions({ breaks: breaks }); // reset breaks options
+          }
         } catch (err) {
           log('updateOption: ' + err);
         }
@@ -170,7 +196,9 @@ addEventListener(
             pageCount: tk.getPageCount(),
             toolkitDataOutdated: false,
           };
-          if (tkOptions) tk.setOptions(tkOptions);
+          if (tkOptions) {
+            tk.setOptions(tkOptions);
+          }
         } catch (err) {
           log('importData: ' + err);
         }
@@ -193,7 +221,9 @@ addEventListener(
             mei: tk.getMEI(),
             pageCount: tk.getPageCount(),
           };
-          if (tkOptions) tk.setOptions(tkOptions);
+          if (tkOptions) {
+            tk.setOptions(tkOptions);
+          }
         } catch (err) {
           log('importBinaryData: ' + err);
         }
@@ -228,12 +258,12 @@ addEventListener(
         try {
           // returns original message plus svg
           if (result.speedMode) {
-            tk.setOptions({
-              breaks: 'encoded',
-            });
+            let breaks = result.breaks;
+            tk.setOptions({ breaks: 'encoded' });
             tk.loadData(result.mei);
             result.mei = '';
             result.toolkitDataOutdated = false;
+            tk.setOptions({ breaks: breaks });
           }
           let pg = result.speedMode && result.pageNo > 1 ? 2 : result.pageNo;
           result.svg = tk.renderToSVG(pg);
@@ -251,7 +281,7 @@ addEventListener(
           result.pageBreaks = {};
           for (let p = 1; p <= result.pageCount; p++) {
             // one-based page numbers
-            updateProgressbar((p / result.pageCount) * 100);
+            updateProgressbar((p / result.pageCount) * 100, 'pageBreaks');
             // console.log('Progress: ' + p / result.pageCount * 100 + '%')
             let svgText = tk.renderToSVG(p);
             let it = svgText // find all measures
@@ -303,6 +333,7 @@ addEventListener(
           // importScripts('https://alafr.github.io/SVG-to-PDFKit/examples/blobstream.js');
           importScripts('../pdfkit/blob-stream.js');
         }
+        updateProgressbar((1 / result.endPage) * 100, 'PDF');
 
         tkOptions = result.options;
         tkOptions.scale = 100;
@@ -364,10 +395,13 @@ addEventListener(
 
           if (result.speedMode) {
             tk.loadData(result.msg);
+            result.startPage = result.startPage > 1 ? 2 : 1;
+            result.endPage = result.startPage;
           }
 
           // add pages to the file
           for (let p = result.startPage; p <= result.endPage; p++) {
+            updateProgressbar((100 * p) / result.endPage, 'PDF');
             let svg = tk.renderToSVG(p);
             doc.addPage();
             SVGtoPDF(doc, svg, 0, 0, options);
@@ -448,9 +482,10 @@ function log(e) {
   return;
 }
 
-function updateProgressbar(perc) {
+function updateProgressbar(percentage, fileFormat) {
   postMessage({
     cmd: 'updateProgressbar',
-    percentage: perc,
+    percentage: percentage,
+    fileFormat: fileFormat,
   });
 }

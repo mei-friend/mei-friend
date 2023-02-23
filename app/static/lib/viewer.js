@@ -103,6 +103,7 @@ export default class Viewer {
 
   updateData(cm, setCursorToPageBeg = true, setFocusToVerovioPane = true, withMidiSeek = false) {
     let message = {
+      breaks: this.breaksSelect.value,
       cmd: 'updateData',
       mei: this.speedFilter(cm.getValue()),
       pageNo: this.currentPage,
@@ -110,7 +111,6 @@ export default class Viewer {
       setCursorToPageBeginning: setCursorToPageBeg,
       setFocusToVerovioPane: setFocusToVerovioPane,
       speedMode: this.speedMode,
-      breaks: this.breaksSelect.value,
       withMidiSeek: withMidiSeek,
     };
     this.busy();
@@ -2127,6 +2127,7 @@ export default class Viewer {
   navigateBeyondPage(cm, dir = 'forwards', what = 'first', stNo = 1, lyNo = 1, y = 0) {
     if (!this.changeCurrentPage(dir)) return; // turn page
     let message = {
+      breaks: this.vrvOptions.breaks,
       cmd: 'navigatePage',
       pageNo: this.currentPage,
       dir: dir,

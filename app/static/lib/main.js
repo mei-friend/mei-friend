@@ -1010,8 +1010,9 @@ async function vrvWorkerEventsHandler(ev) {
       }
       break;
     case 'pdfBlob':
+      document.querySelector('.statusbar').innerHTML = meiFileName.split('/').pop() + ' converted to PDF.';
       let aa = document.createElement('a');
-      aa.download = meiFileName.substring(meiFileName.lastIndexOf('/') + 1).replace(/\.[^/.]+$/, '.pdf');;
+      aa.download = meiFileName.substring(meiFileName.lastIndexOf('/') + 1).replace(/\.[^/.]+$/, '.pdf');
       aa.href = window.URL.createObjectURL(ev.data.blob);
       aa.click();
       break;
@@ -1033,7 +1034,8 @@ async function vrvWorkerEventsHandler(ev) {
       v.busy(false);
       break;
     case 'updateProgressbar':
-      document.querySelector('.statusbar').innerHTML = 'Compute page breaks: ' + Math.round(ev.data.percentage) + '%';
+      document.querySelector('.statusbar').innerHTML =
+        'Compute ' + ev.data.fileFormat + ': ' + Math.round(ev.data.percentage) + '%';
       setProgressBar(ev.data.percentage);
       break;
     case 'error':
