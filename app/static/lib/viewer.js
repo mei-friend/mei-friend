@@ -858,6 +858,15 @@ export default class Viewer {
     setOrientation(cm, '', '', v);
   } // pdfModeOff()
 
+  saveAsPdf() {
+    this.vrvWorker.postMessage({
+      cmd: 'renderPdf',
+      msg: cm.getValue(),
+      startPage: 1,
+      endPage: 2,
+    });
+  } // saveAsPdf()
+
   showEditorPanel() {
     const encPanel = document.getElementById('encoding');
     if (encPanel) encPanel.style.display = 'flex';

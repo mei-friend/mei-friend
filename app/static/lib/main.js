@@ -1362,6 +1362,7 @@ export let cmd = {
   togglePdfMode: () => v.pdfMode ? v.pdfModeOff() : v.pdfModeOn(),
   pdfModeOn: () => v.pdfModeOn(),
   pdfModeOff: () => v.pdfModeOff(),
+  saveAsPdf: () => v.saveAsPdf(),
   filterSettings: () => v.applySettingsFilter(),
   filterReset: () => {
     document.getElementById('filterSettings').value = '';
@@ -1736,9 +1737,6 @@ function addEventListeners(v, cm) {
   // facsimile close button
   document.getElementById('facsimile-close-button').addEventListener('click', cmd.hideFacsimilePanel);
 
-  // pdf close button
-  // document.getElementById('pdf-close-button').addEventListener('click', cmd.hidePdfPanel);
-
   // Page turning
   let ss = document.getElementById('section-selector');
   ss.addEventListener('change', () => {
@@ -1774,7 +1772,7 @@ function addEventListeners(v, cm) {
   document.getElementById('upwards-btn').addEventListener('click', cmd.layerUp);
   document.getElementById('downwards-btn').addEventListener('click', cmd.layerDown);
   // pdf functionality
-  document.getElementById('pdf-save-button').addEventListener('click', cmd.savePdf);
+  document.getElementById('pdf-save-button').addEventListener('click', cmd.saveAsPdf);
   document.getElementById('pdf-close-button').addEventListener('click', cmd.pdfModeOff);
   // manipulation
   document.getElementById('invertPlacement').addEventListener('click', cmd.invertPlacement);

@@ -35,18 +35,13 @@ addEventListener(
         if (tk) tk.destroy();
         // here we attempt to delete/destroy the toolkit module...
         if (typeof verovio !== 'undefined' && 'module' in verovio) delete verovio.module;
-        // if (typeof verovio !== 'undefined')
-        //   verovio = {};
-        // if (typeof Module !== 'undefined') {
-        //   console.log('MODULE: ', Module);
-        //   Module = {};
-        //   console.log('MODULE: ', Module);
-        // }
         importScripts(tkUrl);
         if (['3.7.0*', '3.8.1*', '3.9.0*', '3.10.0*'].includes(result.msg)) {
           console.log('Load Verovio 3.10.0 or earlier');
           Module.onRuntimeInitialized = loadVerovio;
-        } else verovio.module.onRuntimeInitialized = loadVerovio;
+        } else {
+          verovio.module.onRuntimeInitialized = loadVerovio;
+        }
         return;
       case 'updateAll':
         try {
@@ -294,6 +289,79 @@ addEventListener(
         } catch (err) {
           log('exportMidi: ' + err);
         }
+        break;
+      case 'renderPdf':
+        if (typeof PDFDocument === 'undefined') {
+          importScripts('https://github.com/foliojs/pdfkit/releases/download/v0.12.1/pdfkit.standalone.js');
+        }
+        if (typeof SVGtoPDF === 'undefined') {
+          importScripts('https://alafr.github.io/SVG-to-PDFKit/examples/pdfkit.js');
+        }
+        if (typeof blobStream === 'undefined') {
+          importScripts('https://alafr.github.io/SVG-to-PDFKit/examples/blobstream.js');
+        }
+
+        const doc = new PDFDocument({ autoFirstPage: false, compress: true, useCSS: true });
+
+        // create PDF file
+        doc.info = {
+          Title: 'Super Test PDF',
+          Author: 'Created by mei-friend.mdw.ac.at',
+          CreationDate: new Date(),
+        };
+
+        // create stream
+        const stream = doc.pipe(blobStream());
+
+        // Font callback and buffer for pdfkit
+        let fontCallback = function (family, bold, italic, fontOptions) {
+          if (family === 'VerovioText') {
+            return family;
+          }
+          if (family.match(/(?:^|,)\s*sans-serif\s*$/) || true) {
+            if (bold && italic) {
+              return 'Times-BoldItalic';
+            }
+            if (bold && !italic) {
+              return 'Times-Bold';
+            }
+            if (!bold && italic) {
+              return 'Times-Italic';
+            }
+            if (!bold && !italic) {
+              return 'Times-Roman';
+            }
+          }
+        };
+        let options = {};
+        options.fontCallback = fontCallback;
+
+        try {
+          tkOptions = result.options;
+          tk.setOptions(tkOptions);
+
+          // add pages to the file
+          for (let p = results.startPage; p <= results.endPage; p++) {
+            let svg = tk.renderToSVG(p);
+            doc.addPage({ size: pdfFormat, layout: pdfOrientation });
+            SVGtoPDF(doc, svg, 0, 0, options);
+            console.log('vrvWorker adding page ' + p + '/' + results.endPage + '.');
+          }
+        } catch (err) {
+          log('saveAsPdf: ' + err);
+        }
+        doc.end();
+
+        stream.on('finish', function () {
+          // get a blob you can do whatever you like with
+          const blob = stream.toBlob('application/pdf');
+
+          let a = document.createElement('a');
+          a.download = 'test-pdfkit.pdf';
+          a.href = window.URL.createObjectURL(blob);
+          a.click();
+        });
+        results.cmd = 'pdfBlob';
         break;
       case 'getTimeForElement':
         console.log('worker: getTimeForElement: ', result.msg);
