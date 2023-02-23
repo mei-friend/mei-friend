@@ -19,10 +19,11 @@ import {
   v,
 } from './main.js';
 import { startMidiTimeout } from './midi-player.js';
-import { getNotationProportion, getVerovioContainerSize, setNotationProportion, setOrientation } from './resizer.js';
+import { getNotationProportion, setNotationProportion, setOrientation } from './resizer.js';
 import { drawFacsimile, highlightZone, zoomFacsimile } from './facsimile.js';
 import { alert, download, info, success, verified, unverified, xCircleFill } from '../css/icons.js';
 import { selectMarkup } from './markup.js';
+import { showPdfButtons } from './control-menu.js';
 
 export default class Viewer {
   constructor(vrvWorker, spdWorker) {
@@ -831,6 +832,8 @@ export default class Viewer {
     this.hideEditorPanel();
     this.showVerovioTabInSettingsPanel(); // make vrv settings visible
 
+    showPdfButtons(true);
+
     document.getElementById('friendContainer')?.classList.add('pdfMode');
   } // pdfModeOn()
 
@@ -846,8 +849,10 @@ export default class Viewer {
 
     // show editor panel with previous proportion
     setNotationProportion(this.notationProportion);
-    this.hideSettingsPanel();
     this.showEditorPanel();
+    // hide panels
+    this.hideSettingsPanel();
+    showPdfButtons(false);
 
     document.getElementById('friendContainer')?.classList.remove('pdfMode');
     setOrientation(cm, '', '', v);

@@ -172,7 +172,6 @@ import {
   addModifyerKeys,
   manualCurrentPage,
   generateSectionSelect,
-  createPdfControlBar,
 } from './control-menu.js';
 import { clock, unverified, xCircleFill } from '../css/icons.js';
 import { setCursorToId } from './utils.js';
@@ -528,7 +527,6 @@ document.addEventListener('DOMContentLoaded', function () {
   breaksParam = searchParams.get('breaks');
 
   createNotationDiv(document.getElementById('notation'), defaultVerovioOptions.scale);
-  createPdfControlBar(document.getElementById('pdfPanel'));
   addModifyerKeys(document); //
 
   console.log('DOMContentLoaded. Trying now to load Verovio...');
@@ -1775,6 +1773,9 @@ function addEventListeners(v, cm) {
   document.getElementById('forwards-btn').addEventListener('click', cmd.nextNote);
   document.getElementById('upwards-btn').addEventListener('click', cmd.layerUp);
   document.getElementById('downwards-btn').addEventListener('click', cmd.layerDown);
+  // pdf functionality
+  document.getElementById('pdf-save-button').addEventListener('click', cmd.savePdf);
+  document.getElementById('pdf-close-button').addEventListener('click', cmd.pdfModeOff);
   // manipulation
   document.getElementById('invertPlacement').addEventListener('click', cmd.invertPlacement);
   document.getElementById('betweenPlacement').addEventListener('click', cmd.betweenPlacement);

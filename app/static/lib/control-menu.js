@@ -348,6 +348,34 @@ export function createNotationControlBar(parentElement, scale) {
 
   vrvCtrlMenu.appendChild(speedDiv);
 
+  let filler = document.createElement('div');
+  filler.classList.add('fillSpace');
+  vrvCtrlMenu.appendChild(filler);
+
+  // pdf functionality, display none
+  let pdfCtrlDiv = document.createElement('div');
+  pdfCtrlDiv.id = 'pdf-control-div';
+  pdfCtrlDiv.classList.add('controls');
+  pdfCtrlDiv.style.display = 'none';
+  vrvCtrlMenu.appendChild(pdfCtrlDiv);
+
+  let savePdfButton = document.createElement('button');
+  savePdfButton.id = 'pdf-save-button';
+  savePdfButton.classList.add('btn');
+  // savePdfButton.classList.add('icon');
+  savePdfButton.innerHTML = 'Save PDF'; // icon.pdfIcon;
+  savePdfButton.classList.add('inline-block-tight');
+  savePdfButton.title = 'Save as PDF';
+  pdfCtrlDiv.appendChild(savePdfButton);
+
+  let pdfCloseButton = document.createElement('div');
+  pdfCloseButton.id = 'pdf-close-button';
+  pdfCloseButton.title = 'Close print view';
+  pdfCloseButton.style.display = 'none';
+  pdfCloseButton.classList.add('topright');
+  pdfCloseButton.innerHTML = '&times;'; // icon.xCircle;
+  vrvCtrlMenu.appendChild(pdfCloseButton);
+
   parentElement.appendChild(vrvCtrlMenu);
 } // createNotationControlBar()
 
@@ -460,127 +488,10 @@ export function createFacsimileControlBar(parentElement) {
   facsCtrlBar.appendChild(facsimileCloseButton);
 } // createFacsimileControlBar()
 
-export function createPdfControlBar(parentElement) {
-  let pdfCtrlBar = document.createElement('div');
-  pdfCtrlBar.id = 'pdf-control-bar';
-  pdfCtrlBar.classList.add('control-menu');
-  parentElement.appendChild(pdfCtrlBar);
-
-  // pdf icon (octicon file)
-  let facsimileIcon = document.createElement('div');
-  facsimileIcon.innerHTML = icon.file; // TODO to be improved
-  facsimileIcon.id = 'pdf-icon';
-  facsimileIcon.title = 'Pdf panel';
-  pdfCtrlBar.appendChild(facsimileIcon);
-
-  // Zoom controls
-  let zoomCtrls = document.createElement('div');
-  zoomCtrls.id = 'pdf-zoom-ctrls';
-  zoomCtrls.classList.add('controls');
-  pdfCtrlBar.appendChild(zoomCtrls);
-
-  let decreaseBtn = document.createElement('button');
-  decreaseBtn.id = 'pdf-decrease-scale-btn';
-  decreaseBtn.classList.add('btn');
-  decreaseBtn.classList.add('icon');
-  decreaseBtn.innerHTML = icon.diffRemoved;
-  decreaseBtn.classList.add('inline-block-tight');
-  decreaseBtn.title = 'Decrease PDF';
-  zoomCtrls.appendChild(decreaseBtn);
-
-  let zoomCtrl = document.createElement('input');
-  zoomCtrl.id = 'pdf-zoom';
-  zoomCtrl.classList.add('input-range');
-  zoomCtrl.setAttribute('type', 'range');
-  zoomCtrl.setAttribute('min', 10);
-  zoomCtrl.setAttribute('max', 300);
-  zoomCtrl.setAttribute('step', 5);
-  zoomCtrl.setAttribute('value', 100);
-  zoomCtrls.appendChild(zoomCtrl);
-  zoomCtrl.title = 'Scale size of PDF';
-
-  let increaseBtn = document.createElement('button');
-  increaseBtn.id = 'pdf-increase-scale-btn';
-  increaseBtn.classList.add('btn');
-  increaseBtn.classList.add('icon');
-  increaseBtn.innerHTML = icon.diffAdded;
-  increaseBtn.classList.add('inline-block-tight');
-  increaseBtn.title = 'Increase PDF';
-  zoomCtrls.appendChild(increaseBtn);
-
-  // full page
-  // let fullPageDiv = document.createElement('div');
-  // fullPageDiv.id = 'pdf-full-page';
-  // fullPageDiv.classList.add('controls');
-
-  // let fullPageLabel = document.createElement('label');
-  // fullPageLabel.innerText = 'Full page:';
-  // fullPageLabel.id = 'pdf-full-page-label';
-  // fullPageLabel.classList.add('label');
-  // fullPageDiv.appendChild(fullPageLabel);
-  // fullPageLabel.title = 'Show full page of PDF image';
-
-  // let fullPageCheckbox = document.createElement('input');
-  // fullPageCheckbox.id = 'pdf-full-page-checkbox';
-  // fullPageCheckbox.setAttribute('type', 'checkbox');
-  // fullPageCheckbox.classList.add('checkbox');
-  // fullPageCheckbox.title = 'Do something';
-  // fullPageLabel.setAttribute('for', fullPageCheckbox.id);
-  // fullPageCheckbox.checked = false;
-  // fullPageCheckbox.disabled = false;
-  // fullPageDiv.appendChild(fullPageCheckbox);
-
-  // pdfCtrlBar.appendChild(fullPageDiv);
-
-  // edit zones
-  // let editZonesDiv = document.createElement('div');
-  // editZonesDiv.id = 'pdf-edit-zones';
-  // editZonesDiv.classList.add('controls');
-
-  // let editZonesLabel = document.createElement('label');
-  // editZonesLabel.innerText = 'Edit zones:';
-  // editZonesLabel.id = 'pdf-edit-zones-label';
-  // editZonesLabel.classList.add('label');
-  // editZonesDiv.appendChild(editZonesLabel);
-  // editZonesLabel.title = 'Edit zones of PDF';
-
-  // let editZonesCheckbox = document.createElement('input');
-  // editZonesCheckbox.id = 'pdf-edit-zones-checkbox';
-  // editZonesCheckbox.setAttribute('type', 'checkbox');
-  // editZonesCheckbox.classList.add('checkbox');
-  // editZonesCheckbox.title = 'Edit zones of PDF';
-  // editZonesLabel.setAttribute('for', editZonesCheckbox.id);
-  // editZonesCheckbox.checked = false;
-  // editZonesCheckbox.disabled = false;
-  // editZonesDiv.appendChild(editZonesCheckbox);
-
-  // pdfCtrlBar.appendChild(editZonesDiv);
-
-  let filler = document.createElement('div');
-  filler.classList.add('fillSpace');
-  pdfCtrlBar.appendChild(filler);
-
-  let savePdfButton = document.createElement('button');
-  savePdfButton.id = 'pdf-save-button';
-  savePdfButton.classList.add('btn');
-  savePdfButton.classList.add('icon');
-  savePdfButton.innerHTML = icon.file;
-  savePdfButton.classList.add('inline-block-tight');
-  savePdfButton.title = 'Save as PDF';
-  pdfCtrlBar.appendChild(savePdfButton);
-
-  let pdfCloseButton = document.createElement('div');
-  pdfCloseButton.id = 'pdf-close-button';
-  pdfCloseButton.title = 'Close PDF panel';
-  pdfCloseButton.classList.add('topright');
-  pdfCloseButton.innerHTML = '&times;'; // icon.xCircle;
-  pdfCtrlBar.appendChild(pdfCloseButton);
-
-  let pdfCanvas = document.createElement('div');
-  pdfCanvas.id = 'pdf-canvas';
-  parentElement.appendChild(pdfCanvas);
-
-} // createPdfControlBar()
+export function showPdfButtons(show = true) {
+  document.getElementById('pdf-control-div').style.display = show ? 'inherit' : 'none';
+  document.getElementById('pdf-close-button').style.display = show ? 'inherit' : 'none';
+} // showPdfButtons()
 
 export function manualCurrentPage(v, cm, ev) {
   console.debug('manualCurrentPage: ', ev);
