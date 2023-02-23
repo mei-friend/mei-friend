@@ -1077,6 +1077,12 @@ export default class Viewer {
         type: 'header',
         default: true,
       },
+      controlMenuUpdateNotation: {
+        title: 'Show notation update controls',
+        description: 'Show notation update behavior controls in control menu',
+        type: 'bool',
+        default: true,
+      },
       controlMenuFontSelector: {
         title: 'Show notation font selector',
         description: 'Show notation font (SMuFL) selector in control menu',
@@ -1088,12 +1094,6 @@ export default class Viewer {
         description: 'Show notation navigation arrows in control menu',
         type: 'bool',
         default: false,
-      },
-      controlMenuUpdateNotation: {
-        title: 'Show notation update controls',
-        description: 'Show notation update behavior controls in control menu',
-        type: 'bool',
-        default: true,
       },
       controlMenuSpeedmodeCheckbox: {
         title: 'Show speed mode checkbox',
