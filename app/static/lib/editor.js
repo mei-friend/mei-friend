@@ -209,7 +209,7 @@ export function addControlElement(v, cm, elName, placement, form) {
       newElement.setAttribute('extender', 'true');
     }
   }
-  
+
   // handle @form attribute
   if (form && ['hairpin', 'fermata', 'mordent', 'trill', 'turn'].includes(elName)) {
     newElement.setAttribute('form', form);
@@ -247,7 +247,7 @@ export function addControlElement(v, cm, elName, placement, form) {
 
   // add new element(s) to DOM
   startEl.closest('measure').appendChild(newElement); //.cloneNode(true));
-  
+
   // add new element to editor at end of measure
   v.allowCursorActivity = false; // to prevent reloading after each edit
   if (p) {
@@ -257,7 +257,7 @@ export function addControlElement(v, cm, elName, placement, form) {
     cm.indentLine(p1.line, 'smart');
     cm.indentLine(p1.line + 1, 'smart');
   }
-  
+
   if (newElement2) {
     endEl.closest('measure').appendChild(newElement2);
     utils.setCursorToId(cm, endId);
@@ -294,16 +294,20 @@ export function addClefChange(v, cm, shape = 'G', line = '2', before = true) {
   var el = v.xmlDoc.querySelector("[*|id='" + id + "']");
   let chord = el.closest('chord');
   if (chord) id = chord.getAttribute('xml:id');
-  utils.setCursorToId(cm, id);
+  let staffNumber = el.closest('staff')?.getAttribute('n');
+
+  // create new DOM element
   let newElement = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'clef');
   let uuid = utils.generateXmlId('clef', v.xmlIdStyle);
   newElement.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
-  newElement.setAttribute('shape', shape);
   newElement.setAttribute('line', line);
+  newElement.setAttribute('shape', shape);
+  if (staffNumber) newElement.setAttribute('staff', staffNumber);
   v.xmlDocOutdated = true;
+
+  utils.setCursorToId(cm, id);
   if (before) {
     cm.replaceRange(dutils.xmlToString(newElement) + '\n', cm.getCursor());
-    // cm.execCommand('newLineAndIndent');
   } else {
     cm.execCommand('toMatchingTag');
     cm.execCommand('goLineEnd');
