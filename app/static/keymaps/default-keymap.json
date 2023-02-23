@@ -135,6 +135,7 @@
     "alt-.": "consultGuidelines",
     "ctrl-,": "toggleSettingsPanel",
     "ctrl-a": "toggleAnnotationPanel",
-    "ctrl-delete": "cmdDelete"
+    "ctrl-delete": "cmdDelete",
+    "ctrl-p": "togglePdfMode"
   }
 }
