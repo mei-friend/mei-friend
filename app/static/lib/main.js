@@ -1667,7 +1667,7 @@ function addEventListeners(v, cm) {
   document.getElementById('SaveMei').addEventListener('click', downloadMei);
   document.getElementById('SaveSvg').addEventListener('click', downloadSvg);
   document.getElementById('SaveMidi').addEventListener('click', () => requestMidiFromVrvWorker());
-  document.getElementById('SavePdf').addEventListener('click', cmd.pdfModeOn);
+  document.getElementById('PrintPreview').addEventListener('click', cmd.pdfModeOn);
 
   // edit dialogs
   document.getElementById('undo').addEventListener('click', cmd.undo);
