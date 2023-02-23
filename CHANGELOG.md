@@ -1,5 +1,7 @@
 # mei-friend-online CHANGELOG.md
 ### 0.8.4 patch
+* Print mode with page-view of notation
+* Download PDF file based on page-view 
 * Add @staff to clef change element
 * Change of keyboard shortcuts (for inserting C clef, tenuto, spiccato)
 ### 0.8.3 patch
