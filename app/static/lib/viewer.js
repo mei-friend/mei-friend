@@ -864,7 +864,7 @@ export default class Viewer {
   saveAsPdf() {
     this.vrvWorker.postMessage({
       cmd: 'renderPdf',
-      msg: cm.getValue(),
+      msg: v.speedFilter(cm.getValue()),
       title: meiFileName,
       version: version,
       versionDate: versionDate,
@@ -872,6 +872,7 @@ export default class Viewer {
       speedMode: this.speedMode,
       startPage: 1,
       endPage: this.pageCount,
+      currentPage: this.currentPage,
     });
   } // saveAsPdf()
 

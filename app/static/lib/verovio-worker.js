@@ -392,10 +392,12 @@ addEventListener(
 
         try {
           tk.setOptions(tkOptions);
+          let breaks = tkOptions.breaks;
 
           if (result.speedMode) {
+            tk.setOptions({ breaks: 'encoded' });
             tk.loadData(result.msg);
-            result.startPage = result.startPage > 1 ? 2 : 1;
+            result.startPage = Math.min(2, result.currentPage);
             result.endPage = result.startPage;
           }
 
@@ -406,6 +408,9 @@ addEventListener(
             doc.addPage();
             SVGtoPDF(doc, svg, 0, 0, options);
             console.log('vrvWorker adding page ' + p + '/' + result.endPage + '.');
+          }
+          if (result.speedMode) {
+            tk.setOptions({ breaks: breaks });
           }
         } catch (err) {
           log('saveAsPdf: ' + err);
