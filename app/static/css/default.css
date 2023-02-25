@@ -420,7 +420,7 @@ a:active {
 
 .manual {
   color: grey;
-  fill: grey
+  fill: grey;
 }
 
 /* Overriding Codemirror Defaults */
@@ -1088,7 +1088,6 @@ span.keyIcon {
   font-size: 10pt;
   display: none;
   padding: 6px 12px;
-  overflow: none;
   height: calc(100% - 50px);
   width: calc(100% - 2em);
 }
@@ -1231,7 +1230,6 @@ select>option {
   border-width: 2px; */
   border-radius: 8px;
   color: white;
-  font-size: normal;
   z-index: 20;
   overflow-y: auto;
 }
