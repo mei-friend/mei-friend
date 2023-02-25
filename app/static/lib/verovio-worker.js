@@ -281,7 +281,7 @@ addEventListener(
           result.pageBreaks = {};
           for (let p = 1; p <= result.pageCount; p++) {
             // one-based page numbers
-            updateProgressbar((p / result.pageCount) * 100, 'pageBreaks');
+            updateProgressbar((100 * p) / result.pageCount, 'pageBreaks');
             // console.log('Progress: ' + p / result.pageCount * 100 + '%')
             let svgText = tk.renderToSVG(p);
             let it = svgText // find all measures
@@ -333,13 +333,14 @@ addEventListener(
           // importScripts('https://alafr.github.io/SVG-to-PDFKit/examples/blobstream.js');
           importScripts('../pdfkit/blob-stream.js');
         }
-        updateProgressbar((1 / result.endPage) * 100, 'PDF');
+        updateProgressbar(100 / result.endPage, 'PDF');
 
         tkOptions = result.options;
         tkOptions.scale = 100;
-        const mm2pt = 1 / (0.352777778 * 10);
-        // Verovio has tenth of mm
-        // const fact = 10 / (25.4 / 72); // inch in mm per 72 PostScript points
+        tkOptions.svgViewBox = true;
+        // const mm2pt = 1 / (0.352777778 * 10);
+        const mm2pt = 1 / (254 / 72);
+        // Verovio has tenth of mm as SVG unit (unless mmOption is set)
 
         let pdfFormat = [];
         pdfFormat.push(tkOptions.pageWidth * mm2pt);
