@@ -26,7 +26,7 @@ import { getNotationProportion, setNotationProportion, setOrientation } from './
 import { drawFacsimile, highlightZone, zoomFacsimile } from './facsimile.js';
 import { alert, download, info, success, verified, unverified, xCircleFill } from '../css/icons.js';
 import { selectMarkup } from './markup.js';
-import { getControlMenuState, showPdfButtons, setControlMenuState } from './control-menu.js';
+import { getControlMenuState, showPdfButtons, setControlMenuState, setCheckbox } from './control-menu.js';
 
 export default class Viewer {
   constructor(vrvWorker, spdWorker) {
@@ -824,22 +824,18 @@ export default class Viewer {
     this.controlMenuState = getControlMenuState();
     console.log('pdfModeOn: state ', this.controlMenuState);
 
-    document.getElementById('controlMenuFlipToPageControls').checked = false;
-    document.getElementById('controlMenuFlipToPageControls').dispatchEvent(new Event('input'));
-    document.getElementById('controlMenuUpdateNotation').checked = false;
-    document.getElementById('controlMenuUpdateNotation').dispatchEvent(new Event('input'));
-    document.getElementById('controlMenuFontSelector').checked = true;
-    document.getElementById('controlMenuFontSelector').dispatchEvent(new Event('input'));
-    document.getElementById('controlMenuNavigateArrows').checked = false;
-    document.getElementById('controlMenuNavigateArrows').dispatchEvent(new Event('input'));
-    document.getElementById('toggleSpeedMode').checked = false;
-    document.getElementById('toggleSpeedMode').dispatchEvent(new Event('input'));
-  
+    setCheckbox('controlMenuFlipToPageControls', false);
+    setCheckbox('controlMenuUpdateNotation', false);
+    setCheckbox('controlMenuFontSelector', true);
+    setCheckbox('controlMenuNavigateArrows', false);
+    setCheckbox('toggleSpeedMode', false);
+    
     // modify vrv options
     this.vrvOptions.mmOutput = true;
     document.getElementById('vrv-mmOutput').checked = true;
     this.vrvOptions.adjustPageHeight = false;
     document.getElementById('vrv-adjustPageHeight').checked = false;
+    
     // behavior of settings panel
     this.settingsReplaceFriendContainer = true;
     // hide editor and other panels

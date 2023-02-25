@@ -519,16 +519,18 @@ export function getControlMenuState() {
 /**
  * Sets the state of the notation control menu
  * @param {object} state
- * @returns
  */
 export function setControlMenuState(state) {
-  let success = false;
-  listOfObjects.forEach((obj) => {
-    document.getElementById(obj).checked = state[obj];
-    document.getElementById(obj).dispatchEvent(new Event('Input'));
-  });
-  return success;
+  listOfObjects.forEach((obj) => setCheckbox(obj, state));
 } // setControlMenuState()
+
+export function setCheckbox(id, state) {
+  let el = document.getElementById(id);
+  if (el) {
+    el.checked = state;
+    el.dispatchEvent(new Event('input', { bubbles: true }));
+  }
+} // setCheckbox()
 
 export function manualCurrentPage(v, cm, ev) {
   console.debug('manualCurrentPage: ', ev);
