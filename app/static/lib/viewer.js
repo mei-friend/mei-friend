@@ -1077,27 +1077,34 @@ export default class Viewer {
         type: 'header',
         default: true,
       },
+      // flip-checkbox, flip-btn
+      controlMenuFlipToPageControls: {
+        title: 'Show flip to page controls',
+        description: 'Show flip to page controls in notation control menu',
+        type: 'bool',
+        default: true,
+      },
       controlMenuUpdateNotation: {
         title: 'Show notation update controls',
-        description: 'Show notation update behavior controls in control menu',
+        description: 'Show notation update behavior controls in notation control menu',
         type: 'bool',
         default: true,
       },
       controlMenuFontSelector: {
         title: 'Show notation font selector',
-        description: 'Show notation font (SMuFL) selector in control menu',
+        description: 'Show notation font (SMuFL) selector in notation control menu',
         type: 'bool',
         default: false,
       },
       controlMenuNavigateArrows: {
         title: 'Show navigation arrows',
-        description: 'Show notation navigation arrows in control menu',
+        description: 'Show notation navigation arrows in notation control menu',
         type: 'bool',
         default: false,
       },
       controlMenuSpeedmodeCheckbox: {
         title: 'Show speed mode checkbox',
-        description: 'Show speed mode checkbox in control menu',
+        description: 'Show speed mode checkbox in notation control menu',
         type: 'bool',
         default: true,
       },
@@ -1346,6 +1353,10 @@ export default class Viewer {
         case 'controlMenuNavigateArrows':
           document.getElementById('navigate-ctrls').style.display = value ? 'inherit' : 'none';
           break;
+        case 'controlMenuFlipToPageControls':
+          document.getElementById('flip-checkbox').style.display = value ? 'inherit' : 'none';
+          document.getElementById('flip-btn').style.display = value ? 'inherit' : 'none';
+          break;
         case 'controlMenuUpdateNotation':
           document.getElementById('update-ctrls').style.display = value ? 'inherit' : 'none';
           break;
@@ -1478,11 +1489,14 @@ export default class Viewer {
               ? 'inherit'
               : 'none';
             break;
+          case 'controlMenuFlipToPageControls':
+            const v = document.getElementById('controlMenuFlipToPageControls').checked;
+            document.getElementById('flip-checkbox').style.display = v ? 'inherit' : 'none';
+            document.getElementById('flip-btn').style.display = v ? 'inherit' : 'none';
+            break;
           case 'controlMenuUpdateNotation':
-            document.getElementById('update-ctrls').style.display = document.getElementById('controlMenuUpdateNotation')
-              .checked
-              ? 'inherit'
-              : 'none';
+            const u = document.getElementById('controlMenuUpdateNotation').checked;
+            document.getElementById('update-ctrls').style.display = u ? 'inherit' : 'none';
             break;
           case 'renumberMeasuresContinueAcrossEndings':
             this.disableElementThroughCheckbox(
