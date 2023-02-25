@@ -502,6 +502,7 @@ const listOfObjects = [
   'controlMenuNavigateArrows',
   'controlMenuSpeedmodeCheckbox',
   'toggleSpeedMode',
+  'speed-label',
 ];
 
 /**
@@ -511,7 +512,16 @@ const listOfObjects = [
 export function getControlMenuState() {
   let state = {};
   listOfObjects.forEach((obj) => {
-    state[obj] = document.getElementById(obj).checked;
+    let el = document.getElementById(obj);
+    if (el) {
+      if (obj === 'speed-label') {
+        state[obj] = {};
+        state[obj]['textContent'] = el.textContent;
+        state[obj]['title'] = el.title;
+      } else {
+        state[obj] = el.checked;
+      }
+    }
   });
   return state;
 } // getControlMenuState()
@@ -521,7 +531,15 @@ export function getControlMenuState() {
  * @param {object} state
  */
 export function setControlMenuState(state) {
-  listOfObjects.forEach((obj) => setCheckbox(obj, state));
+  listOfObjects.forEach((obj) => {
+    if (obj === 'speed-label') {
+      let el = document.getElementById(obj);
+      el.textContent = state[obj].textContent;
+      el.title = state[obj].title;
+    } else {
+      setCheckbox(obj, state[obj]);
+    }
+  });
 } // setControlMenuState()
 
 export function setCheckbox(id, state) {

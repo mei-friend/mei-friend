@@ -819,6 +819,7 @@ export default class Viewer {
     this.showSettingsPanel();
   } // showVerovioTabInSettingsPanel()
 
+  // Switches Viewer to pdfMode
   pdfModeOn() {
     this.pdfMode = true;
     this.controlMenuState = getControlMenuState();
@@ -829,13 +830,17 @@ export default class Viewer {
     setCheckbox('controlMenuFontSelector', true);
     setCheckbox('controlMenuNavigateArrows', false);
     setCheckbox('toggleSpeedMode', false);
+
+    let sl = document.getElementById('speed-label');
+    sl.textContent = 'Current page:'
+    sl.title = 'Saves only current page in PDF file.'
     
     // modify vrv options
     this.vrvOptions.mmOutput = true;
     document.getElementById('vrv-mmOutput').checked = true;
     this.vrvOptions.adjustPageHeight = false;
     document.getElementById('vrv-adjustPageHeight').checked = false;
-    
+
     // behavior of settings panel
     this.settingsReplaceFriendContainer = true;
     // hide editor and other panels
@@ -851,6 +856,7 @@ export default class Viewer {
     document.getElementById('friendContainer')?.classList.add('pdfMode');
   } // pdfModeOn()
 
+  // Switches back from pdfMode
   pdfModeOff() {
     this.pdfMode = false;
     setControlMenuState(this.controlMenuState);
@@ -1413,7 +1419,7 @@ export default class Viewer {
     if (addListeners) {
       // add change listeners
       mfs.addEventListener('input', (ev) => {
-        console.log('meiFriend settings event listener: ', ev);
+        // console.log('meiFriend settings event listener: ', ev);
         let option = ev.target.id;
         let value = ev.target.value;
         if (ev.target.type === 'checkbox') value = ev.target.checked;
