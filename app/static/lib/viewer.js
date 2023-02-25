@@ -1108,6 +1108,37 @@ export default class Viewer {
         type: 'bool',
         default: true,
       },
+      titleMidiPlayback: {
+        title: 'MIDI playback',
+        description: 'MIDI playback settings',
+        type: 'header',
+        default: true,
+      },
+      showMidiPlaybackContextualBubble: {
+        title: 'Show playback shortcut',
+        description:
+          'Causes a shortcut (bubble in bottom left corner; click to immediately start playback) to appear when the MIDI playback control bar is closed',
+        type: 'bool',
+        default: true,
+      },
+      showMidiPlaybackControlBar: {
+        title: 'Show MIDI playback control bar',
+        description: 'Show MIDI playback control bar',
+        type: 'bool',
+        default: false,
+      },
+      scrollFollowMidiPlayback: {
+        title: 'Scroll-follow MIDI playback',
+        description: 'Scroll notation panel to follow MIDI playback on current page',
+        type: 'bool',
+        default: true,
+      },
+      pageFollowMidiPlayback: {
+        title: 'Page-follow MIDI playback',
+        description: 'Automatically flip pages to follow MIDI playback',
+        type: 'bool',
+        default: true,
+      },
       renumberMeasuresHeading: {
         title: 'Renumber measures',
         description: 'Settings for renumbering measures',
@@ -1144,37 +1175,6 @@ export default class Viewer {
       //   title: 'options-line', // class name of hr element
       //   type: 'line'
       // },
-      titleMidiPlayback: {
-        title: 'MIDI playback',
-        description: 'MIDI playback settings',
-        type: 'header',
-        default: true,
-      },
-      showMidiPlaybackContextualBubble: {
-        title: 'Show playback shortcut',
-        description:
-          'Causes a shortcut (bubble in bottom left corner; click to immediately start playback) to appear when the MIDI playback control bar is closed',
-        type: 'bool',
-        default: true,
-      },
-      showMidiPlaybackControlBar: {
-        title: 'Show MIDI playback control bar',
-        description: 'Show MIDI playback control bar',
-        type: 'bool',
-        default: false,
-      },
-      scrollFollowMidiPlayback: {
-        title: 'Scroll-follow MIDI playback',
-        description: 'Scroll notation panel to follow MIDI playback on current page',
-        type: 'bool',
-        default: true,
-      },
-      pageFollowMidiPlayback: {
-        title: 'Page-follow MIDI playback',
-        description: 'Automatically flip pages to follow MIDI playback',
-        type: 'bool',
-        default: true,
-      },
       highlightCurrentlySoundingNotes: {
         title: 'Highlight currently-sounding notes',
         description: 'Visually highlight currently-sounding notes in the notation panel during MIDI playback ',
