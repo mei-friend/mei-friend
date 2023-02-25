@@ -493,6 +493,43 @@ export function showPdfButtons(show = true) {
   document.getElementById('pdf-close-button').style.display = show ? 'inherit' : 'none';
 } // showPdfButtons()
 
+// list of DOM object id string that will be saved and restored
+// with getControlMenuState() and setControlMenuState()
+const listOfObjects = [
+  'controlMenuFlipToPageControls',
+  'controlMenuUpdateNotation',
+  'controlMenuFontSelector',
+  'controlMenuNavigateArrows',
+  'controlMenuSpeedmodeCheckbox',
+  'toggleSpeedMode',
+];
+
+/**
+ * Returns a state object of the notation control menu
+ * @returns {object}
+ */
+export function getControlMenuState() {
+  let state = {};
+  listOfObjects.forEach((obj) => {
+    state[obj] = document.getElementById(obj).checked;
+  });
+  return state;
+} // getControlMenuState()
+
+/**
+ * Sets the state of the notation control menu
+ * @param {object} state
+ * @returns
+ */
+export function setControlMenuState(state) {
+  let success = false;
+  listOfObjects.forEach((obj) => {
+    document.getElementById(obj).checked = state[obj];
+    document.getElementById(obj).dispatchEvent(new Event('Input'));
+  });
+  return success;
+} // setControlMenuState()
+
 export function manualCurrentPage(v, cm, ev) {
   console.debug('manualCurrentPage: ', ev);
   ev.stopPropagation();
@@ -502,7 +539,7 @@ export function manualCurrentPage(v, cm, ev) {
     if (pageInput) v.updatePage(cm, pageInput);
     v.updatePageNumDisplay();
   }
-}
+} // manualCurrentPage()
 
 export function setBreaksOptions(tkAvailableOptions, defaultValue = 'auto') {
   if (defaultValue === '') defaultValue = 'auto';
@@ -520,20 +557,7 @@ export function setBreaksOptions(tkAvailableOptions, defaultValue = 'auto') {
     breaksEl[breaksEl.options.length] = new Option(breaksOpts[key], key);
     if (key === 'smart') breaksEl[breaksEl.length - 1].disabled = true;
   }
-  // var breaks = utils.findKey('breaks', tkAvailableOptions);
-  // for (let index of breaks.values) {
-  //   if (breaksOpts[index]) {
-  //     breaksEl[breaksEl.options.length] = new Option(breaksOpts[index], index);
-  //     if (index === defaultValue) {
-  //       breaksEl[breaksEl.options.length - 1].selected = 'selected';
-  //     }
-  //   } else {
-  //     breaksEl[breaksEl.options.length] = new Option(index, index);
-  //   }
-  // disable breaks=smart by default; only enabled with speedMode=false
-  //   if (index === 'smart') breaksEl[breaksEl.length - 1].disabled = true;
-  // }
-}
+} // setBreaksOptions()
 
 export function handleSmartBreaksOption(speedMode) {
   let options = Array.from(document.getElementById('breaks-select').options);
@@ -547,7 +571,7 @@ export function handleSmartBreaksOption(speedMode) {
       o.disabled = speedMode;
     }
   });
-}
+} // handleSmartBreaksOption()
 
 // checks xmlDoc for section, ending, lem, rdg elements for quick navigation
 export function generateSectionSelect(xmlDoc) {
@@ -571,7 +595,7 @@ export function generateSectionSelect(xmlDoc) {
     if (sections.length === 2) sections.pop(); // remove if only the one section
   }
   return sections;
-}
+} // generateSectionSelect()
 
 export function addModifyerKeys(root) {
   let modifierKeys = {
@@ -627,4 +651,4 @@ export function addModifyerKeys(root) {
       else e.innerHTML = span + e.innerHTML;
     });
   });
-}
+} // addModifyerKeys()

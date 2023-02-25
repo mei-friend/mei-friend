@@ -26,7 +26,7 @@ import { getNotationProportion, setNotationProportion, setOrientation } from './
 import { drawFacsimile, highlightZone, zoomFacsimile } from './facsimile.js';
 import { alert, download, info, success, verified, unverified, xCircleFill } from '../css/icons.js';
 import { selectMarkup } from './markup.js';
-import { showPdfButtons } from './control-menu.js';
+import { getControlMenuState, showPdfButtons, setControlMenuState } from './control-menu.js';
 
 export default class Viewer {
   constructor(vrvWorker, spdWorker) {
@@ -62,6 +62,7 @@ export default class Viewer {
     this.respId = '';
     this.alertCloser;
     this.pdfMode = false;
+    this.controlMenuState = {};
     this.settingsReplaceFriendContainer = false; // whether or not the settings panel is over the mei-friend window (false) or replaces it (true)
     this.notationProportion = 0.5; // remember proportion during pdf mode
   } // constructor()
@@ -820,6 +821,20 @@ export default class Viewer {
 
   pdfModeOn() {
     this.pdfMode = true;
+    this.controlMenuState = getControlMenuState();
+    console.log('pdfModeOn: state ', this.controlMenuState);
+
+    document.getElementById('controlMenuFlipToPageControls').checked = false;
+    document.getElementById('controlMenuFlipToPageControls').dispatchEvent(new Event('input'));
+    document.getElementById('controlMenuUpdateNotation').checked = false;
+    document.getElementById('controlMenuUpdateNotation').dispatchEvent(new Event('input'));
+    document.getElementById('controlMenuFontSelector').checked = true;
+    document.getElementById('controlMenuFontSelector').dispatchEvent(new Event('input'));
+    document.getElementById('controlMenuNavigateArrows').checked = false;
+    document.getElementById('controlMenuNavigateArrows').dispatchEvent(new Event('input'));
+    document.getElementById('toggleSpeedMode').checked = false;
+    document.getElementById('toggleSpeedMode').dispatchEvent(new Event('input'));
+  
     // modify vrv options
     this.vrvOptions.mmOutput = true;
     document.getElementById('vrv-mmOutput').checked = true;
@@ -842,6 +857,7 @@ export default class Viewer {
 
   pdfModeOff() {
     this.pdfMode = false;
+    setControlMenuState(this.controlMenuState);
     // set vrv options back
     this.vrvOptions.mmOutput = false;
     document.getElementById('vrv-mmOutput').checked = false;
@@ -1401,6 +1417,7 @@ export default class Viewer {
     if (addListeners) {
       // add change listeners
       mfs.addEventListener('input', (ev) => {
+        console.log('meiFriend settings event listener: ', ev);
         let option = ev.target.id;
         let value = ev.target.value;
         if (ev.target.type === 'checkbox') value = ev.target.checked;
