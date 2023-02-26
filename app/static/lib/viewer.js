@@ -825,6 +825,12 @@ export default class Viewer {
     this.controlMenuState = getControlMenuState();
     console.log('pdfModeOn: state ', this.controlMenuState);
 
+    // modify vrv options
+    this.vrvOptions.mmOutput = true;
+    document.getElementById('vrv-mmOutput').checked = true;
+    this.vrvOptions.adjustPageHeight = false;
+    document.getElementById('vrv-adjustPageHeight').checked = false;
+
     setCheckbox('controlMenuFlipToPageControls', false);
     setCheckbox('controlMenuUpdateNotation', false);
     setCheckbox('controlMenuFontSelector', true);
@@ -832,14 +838,8 @@ export default class Viewer {
     setCheckbox('toggleSpeedMode', false);
 
     let sl = document.getElementById('speed-label');
-    sl.textContent = 'Current page:'
-    sl.title = 'Saves only current page in PDF file.'
-    
-    // modify vrv options
-    this.vrvOptions.mmOutput = true;
-    document.getElementById('vrv-mmOutput').checked = true;
-    this.vrvOptions.adjustPageHeight = false;
-    document.getElementById('vrv-adjustPageHeight').checked = false;
+    sl.textContent = 'Current page:';
+    sl.title = 'Saves only current page in PDF file.';
 
     // behavior of settings panel
     this.settingsReplaceFriendContainer = true;
@@ -1948,7 +1948,13 @@ export default class Viewer {
     }
   } // applyEditorOption()
 
-  // creates an option div with a label and input/select depending of o.keys
+  /**
+   * Creates an option div with a label and input/select depending of o.keys
+   * @param {string} opt (e.g. 'vrv-pageHeight', 'controlMenuFlipToPageControls')
+   * @param {object} o
+   * @param {string} optDefault
+   * @returns {Element}
+   */
   createOptionsItem(opt, o, optDefault) {
     if (o.type === 'header') {
       // create a details>summary structure instead of header
