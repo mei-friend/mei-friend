@@ -27,6 +27,7 @@ import { drawFacsimile, highlightZone, zoomFacsimile } from './facsimile.js';
 import { alert, download, info, success, verified, unverified, xCircleFill } from '../css/icons.js';
 import { selectMarkup } from './markup.js';
 import { getControlMenuState, showPdfButtons, setControlMenuState, setCheckbox } from './control-menu.js';
+import { updatePageRangeSelector } from './page-range-selector.js';
 
 export default class Viewer {
   constructor(vrvWorker, spdWorker) {
@@ -405,6 +406,7 @@ export default class Viewer {
     document.getElementById('pagination1').innerHTML = 'Page&nbsp;';
     document.getElementById('pagination2').innerHTML = `&nbsp;${this.currentPage}&nbsp;`;
     document.getElementById('pagination3').innerHTML = `&nbsp;of ${pg}`;
+    updatePageRangeSelector(this);
   } // updatePageNumDisplay()
 
   // set cursor to first note id in page, taking st/ly of id, if possible

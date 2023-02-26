@@ -2089,10 +2089,12 @@ function setKeyMap(keyMapFilePath) {
         if (el) {
           el.setAttribute('tabindex', '-1');
           el.addEventListener('keydown', (ev) => {
-            if (document.activeElement.id !== 'pagination2') {
-              ev.stopPropagation();
-              ev.preventDefault();
+            if (['pagination2', 'selectTo', 'selectFrom', 'selectRange'].includes(document.activeElement.id)) {
+              return;
             }
+            ev.stopPropagation();
+            ev.preventDefault();
+
             let keyName = ev.key;
             if (ev.code.toLowerCase() === 'space') keyName = 'space';
             // arrowdown -> down
