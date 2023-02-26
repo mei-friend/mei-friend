@@ -109,8 +109,6 @@ export function deleteElement(v, cm, modifyerKey = false) {
   else if (element.nodeName === 'zone' && document.getElementById('editFacsimileZones').checked) {
     // remove zone; with CMD remove pointing element; without just remove @facs from pointing element
     removeZone(v, cm, element, modifyerKey);
-  } else if (!document.getElementById('editFacsimileZones').checked) {
-    v.show;
   } else {
     console.info('Element ' + id + ' not supported for deletion.');
     return;

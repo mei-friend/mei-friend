@@ -1,6 +1,7 @@
 import * as icon from './../css/icons.js';
 import { fontList, platform } from './main.js';
 import { svgNameSpace } from './dom-utils.js';
+import { createPageRangeSelector } from './page-range-selector.js';
 
 // constructs the div structure of #notation parent
 export function createNotationDiv(parentElement, scale) {
@@ -347,6 +348,8 @@ export function createNotationControlBar(parentElement, scale) {
   speedDiv.appendChild(speedCheckbox);
 
   vrvCtrlMenu.appendChild(speedDiv);
+
+  vrvCtrlMenu.appendChild(createPageRangeSelector());
 
   let filler = document.createElement('div');
   filler.classList.add('fillSpace');
