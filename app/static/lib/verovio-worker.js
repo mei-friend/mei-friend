@@ -398,17 +398,15 @@ addEventListener(
           if (result.speedMode) {
             tk.setOptions({ breaks: 'encoded' });
             tk.loadData(result.msg);
-            result.startPage = Math.min(2, result.currentPage);
-            result.endPage = result.startPage;
           }
 
           // add pages to the file
-          for (let p = result.startPage; p <= result.endPage; p++) {
+          for (p of result.pages) {
             updateProgressbar((100 * p) / result.endPage, 'PDF');
             let svg = tk.renderToSVG(p);
             doc.addPage();
             SVGtoPDF(doc, svg, 0, 0, options);
-            console.log('vrvWorker adding page ' + p + '/' + result.endPage + '.');
+            console.log('vrvWorker adding page ' + p + '/' + result.pages.length + '.');
           }
           if (result.speedMode) {
             tk.setOptions({ breaks: breaks });

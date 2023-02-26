@@ -6,6 +6,13 @@ let pageCount = 1;
 let currentPage = 1;
 
 /**
+ * @returns pages array
+ */
+export function getPages() {
+  return pages;
+} // getPages()
+
+/**
  *
  * @returns {Element} pageRangeDiv
  */
@@ -13,7 +20,10 @@ export function createPageRangeSelector() {
   let pageRangeDiv = document.createElement('div');
   pageRangeDiv.setAttribute('id', 'pageRangeSelectorDiv');
   pageRangeDiv.classList.add('dropdown');
-  pageRangeDiv.innerHTML = `<div id="pagesLegend" class="controls">Pages: </div>
+  pageRangeDiv.innerHTML = `
+    <div class="controls">
+        <div id="pagesLegend" class="label">Page range</div>
+    </div>
     <div id="pageRangeItems" class="dropdown-content show">
         <div>
             <input type="radio" id="selectAllPages" name="pagesSelect" value="all" checked/>

@@ -505,7 +505,7 @@ const listOfObjects = [
   'controlMenuNavigateArrows',
   'controlMenuSpeedmodeCheckbox',
   'toggleSpeedMode',
-  'speed-label',
+  // 'speed-label',
 ];
 
 /**

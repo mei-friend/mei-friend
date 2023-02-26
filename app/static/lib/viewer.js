@@ -27,7 +27,7 @@ import { drawFacsimile, highlightZone, zoomFacsimile } from './facsimile.js';
 import { alert, download, info, success, verified, unverified, xCircleFill } from '../css/icons.js';
 import { selectMarkup } from './markup.js';
 import { getControlMenuState, showPdfButtons, setControlMenuState, setCheckbox } from './control-menu.js';
-import { updatePageRangeSelector } from './page-range-selector.js';
+import { getPages, updatePageRangeSelector } from './page-range-selector.js';
 
 export default class Viewer {
   constructor(vrvWorker, spdWorker) {
@@ -839,9 +839,9 @@ export default class Viewer {
     setCheckbox('controlMenuNavigateArrows', false);
     setCheckbox('toggleSpeedMode', false);
 
-    let sl = document.getElementById('speed-label');
-    sl.textContent = 'Current page:';
-    sl.title = 'Saves only current page in PDF file.';
+    // let sl = document.getElementById('speed-label');
+    // sl.textContent = 'Current page:';
+    // sl.title = 'Saves only current page in PDF file.';
 
     // behavior of settings panel
     this.settingsReplaceFriendContainer = true;
@@ -890,9 +890,7 @@ export default class Viewer {
       versionDate: versionDate,
       options: this.vrvOptions,
       speedMode: this.speedMode,
-      startPage: 1,
-      endPage: this.pageCount,
-      currentPage: this.currentPage,
+      pages: getPages(),
     });
   } // saveAsPdf()
 
