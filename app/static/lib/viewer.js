@@ -58,6 +58,8 @@ export default class Viewer {
     // this.scoreDefList = []; // list of xmlNodes, one for each change, referenced by 5th element of pageList
     this.meiHeadRange = [];
     this.vrvOptions; // all verovio options
+    this.vrvTimeout; // time out task for updating verovio settings
+    this.timeoutDelay = 300; // ms, window in which concurrent clicks are treated as one update
     this.verovioIcon = document.getElementById('verovio-icon');
     this.breaksSelect = /** @type HTMLSelectElement */ (document.getElementById('breaks-select'));
     this.respId = '';
@@ -1879,7 +1881,8 @@ export default class Viewer {
           }
           return; // skip updating notation when midi options changed
         }
-        this.updateLayout(this.vrvOptions);
+        window.clearTimeout(this.vrvTimeout);
+        this.vrvTimeout = window.setTimeout(() => this.updateLayout(this.vrvOptions), this.timeoutDelay);
       });
       // add event listener for details toggling
       // this.addToggleListener(vsp, 'vrv-');
