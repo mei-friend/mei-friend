@@ -158,7 +158,7 @@
           ><img src="{{ url_for('static', filename='owl/menu-logo.svg') }}" alt="mei-friend" id="mei-friend-logo"
         /></a>
       </div>
-      <div class="navbar">
+      <div class="navbar" id="navigationBar">
         <div class="dropdown">
           <button class="dropbtn GithubButton" id="GithubButton">
             <svg id="GithubLogo" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
@@ -707,7 +707,7 @@
     <script>
       // menu bar behavior like MacOS menu bars
       let show = false;
-      document.querySelector('.navbar').addEventListener('click', (ev) => {
+      document.getElementById('navigationBar').addEventListener('click', (ev) => {
         // Notes on menu switching behaviour:
         // We want menu bars to work like Mac OS bars, EXCEPT that
         // ... the GitHub menu should stay open on clicks (=> navigation)
@@ -723,7 +723,7 @@
           // otherwise, we just use the target as is.
           targetAfterClick = ev.target;
         }
-        var menuList = document.querySelectorAll('.dropdown-content');
+        var menuList = document.getElementById('navigationBar').querySelectorAll('.dropdown-content');
         menuList.forEach((e) => {
           if (
             show &&
