@@ -5,8 +5,9 @@ let lastPage = 1;
 let pageCount = 1;
 let currentPage = 1;
 
-let speedModeWarning =
-  'In speed mode, only current page is rendered to PDF. Uncheck speed mode to select from all pages.';
+let speedModeWarning = `Only the current page is rendered to PDF, 
+because speed mode is activated. Uncheck 
+speed mode to select from all pages.`;
 let normalTitle = 'Select page range to be saved in PDF.';
 
 /**
@@ -76,6 +77,7 @@ export function updatePageRangeSelector(v) {
     pages = [currentPage];
     disablePageRangeMenu(true);
     document.getElementById('pagesLegend').title = speedModeWarning;
+    document.getElementById('pageRangeItems').classList.remove('show');
   } else {
     disablePageRangeMenu(false);
     document.getElementById('selectTo').max = pageCount;
@@ -86,6 +88,7 @@ export function updatePageRangeSelector(v) {
     if (document.getElementById('selectFrom').value > lastPage) document.getElementById('selectFrom').value = lastPage;
     readValues();
     document.getElementById('pagesLegend').title = normalTitle;
+    document.getElementById('pageRangeItems').classList.add('show');
   }
   redrawTitle();
 } // updatePageRangeSelector()
