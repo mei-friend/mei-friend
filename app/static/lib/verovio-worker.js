@@ -333,7 +333,7 @@ addEventListener(
           // importScripts('https://alafr.github.io/SVG-to-PDFKit/examples/blobstream.js');
           importScripts('../pdfkit/blob-stream.js');
         }
-        updateProgressbar(100 / result.endPage, 'PDF');
+        updateProgressbar(100 / result.pages.length, 'PDF');
 
         tkOptions = result.options;
         tkOptions.scale = 100;
@@ -401,8 +401,9 @@ addEventListener(
           }
 
           // add pages to the file
+          let c = 0;
           for (p of result.pages) {
-            updateProgressbar((100 * p) / result.endPage, 'PDF');
+            updateProgressbar((100 * ++c) / result.pages.length, 'PDF');
             let svg = tk.renderToSVG(p);
             doc.addPage();
             SVGtoPDF(doc, svg, 0, 0, options);
