@@ -1,5 +1,6 @@
 # mei-friend-online CHANGELOG.md
 ### 0.8.4 patch
+* Drag-select chord instead of note with `ALT`
 * Add @staff to clef change element
 * Change of keyboard shortcuts (for inserting C clef, tenuto, spiccato)
 ### 0.8.3 patch
