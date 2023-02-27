@@ -349,11 +349,12 @@ export function createNotationControlBar(parentElement, scale) {
 
   vrvCtrlMenu.appendChild(speedDiv);
 
-  vrvCtrlMenu.appendChild(createPageRangeSelector());
-
   let filler = document.createElement('div');
   filler.classList.add('fillSpace');
   vrvCtrlMenu.appendChild(filler);
+
+  // page range selector for PDF export
+  vrvCtrlMenu.appendChild(createPageRangeSelector('none'));
 
   // pdf functionality, display none
   let pdfCtrlDiv = document.createElement('div');
@@ -492,8 +493,9 @@ export function createFacsimileControlBar(parentElement) {
 } // createFacsimileControlBar()
 
 export function showPdfButtons(show = true) {
-  document.getElementById('pdf-control-div').style.display = show ? 'inherit' : 'none';
-  document.getElementById('pdf-close-button').style.display = show ? 'inherit' : 'none';
+  document.getElementById('pageRangeSelectorDiv').style.display = show ? '' : 'none';
+  document.getElementById('pdf-control-div').style.display = show ? '' : 'none';
+  document.getElementById('pdf-close-button').style.display = show ? '' : 'none';
 } // showPdfButtons()
 
 // list of DOM object id string that will be saved and restored

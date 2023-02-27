@@ -16,7 +16,7 @@ export function getPages() {
  *
  * @returns {Element} pageRangeDiv
  */
-export function createPageRangeSelector() {
+export function createPageRangeSelector(display = 'none') {
   let pageRangeDiv = document.createElement('div');
   pageRangeDiv.setAttribute('id', 'pageRangeSelectorDiv');
   pageRangeDiv.classList.add('dropdown');
@@ -51,9 +51,10 @@ export function createPageRangeSelector() {
         </div>
 
         <div>
-            <input type="text" id="selectRange" value="selectRange" name="selectRange" placeholder="2, 5-8" />
+            <input type="text" id="selectRange" value="2, 4-7" name="selectRange" placeholder="2, 5-8" />
         </div>
     </div>`;
+  if (display) pageRangeDiv.style.display = display;
   pageRangeDiv.addEventListener('input', (ev) => clicked(ev));
   return pageRangeDiv;
 } // createPageRangeSelector()
