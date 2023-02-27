@@ -1,5 +1,6 @@
 # mei-friend-online CHANGELOG.md
 ### 0.8.4 patch
+* Drag-select chord instead of note with `ALT`
 * Print mode with page-view of notation
 * Download PDF file based on page-view 
 * Add @staff to clef change element
