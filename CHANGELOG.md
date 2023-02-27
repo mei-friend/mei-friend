@@ -1,8 +1,11 @@
 # mei-friend-online CHANGELOG.md
+### 0.8.5 PDF export
+* Preview PDF mode with page-view of notation, triggered via menu item or `CMD/CTRL + P`
+* Page range selector for selecting all, current, or individual pages
+* Download PDF file based on page-view 
+
 ### 0.8.4 patch
 * Drag-select chord instead of note with `ALT`
-* Print mode with page-view of notation
-* Download PDF file based on page-view 
 * Add @staff to clef change element
 * Change of keyboard shortcuts (for inserting C clef, tenuto, spiccato)
 ### 0.8.3 patch
