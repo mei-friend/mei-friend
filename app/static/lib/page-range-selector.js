@@ -5,6 +5,10 @@ let lastPage = 1;
 let pageCount = 1;
 let currentPage = 1;
 
+let speedModeWarning =
+  'In speed mode, only current page is rendered to PDF. Uncheck speed mode to select from all pages.';
+let normalTitle = 'Select page range to be saved in PDF.';
+
 /**
  * @returns pages array
  */
@@ -51,7 +55,7 @@ export function createPageRangeSelector(display = 'none') {
         </div>
 
         <div>
-            <input type="text" id="selectRange" value="2, 4-7" name="selectRange" placeholder="2, 5-8" />
+            <input type="text" id="selectRange" value="2, 5-8" name="selectRange" placeholder="2, 5-8" />
         </div>
     </div>`;
   if (display) pageRangeDiv.style.display = display;
@@ -66,13 +70,23 @@ export function createPageRangeSelector(display = 'none') {
 export function updatePageRangeSelector(v) {
   pageCount = v.pageCount;
   currentPage = v.currentPage;
-  document.getElementById('selectTo').max = pageCount;
-  lastPage = Math.min(lastPage, pageCount);
-  if (document.getElementById('selectTo').value > pageCount) document.getElementById('selectTo').value = pageCount;
-  document.getElementById('selectFrom').max = Math.min(document.getElementById('selectTo').value, pageCount);
-  firstPage = Math.min(firstPage, lastPage);
-  if (document.getElementById('selectFrom').value > lastPage) document.getElementById('selectFrom').value = lastPage;
-  readValues();
+
+  // in speed mode, only current page is possible
+  if (v.speedMode) {
+    pages = [currentPage];
+    disablePageRangeMenu(true);
+    document.getElementById('pagesLegend').title = speedModeWarning;
+  } else {
+    disablePageRangeMenu(false);
+    document.getElementById('selectTo').max = pageCount;
+    lastPage = Math.min(lastPage, pageCount);
+    if (document.getElementById('selectTo').value > pageCount) document.getElementById('selectTo').value = pageCount;
+    document.getElementById('selectFrom').max = Math.min(document.getElementById('selectTo').value, pageCount);
+    firstPage = Math.min(firstPage, lastPage);
+    if (document.getElementById('selectFrom').value > lastPage) document.getElementById('selectFrom').value = lastPage;
+    readValues();
+    document.getElementById('pagesLegend').title = normalTitle;
+  }
   redrawTitle();
 } // updatePageRangeSelector()
 
@@ -155,3 +169,10 @@ function generatePageRangeString(arr) {
   });
   return str;
 } // generatePageRangeString()
+
+function disablePageRangeMenu(disable = true) {
+  document
+    .getElementById('pageRangeItems')
+    .querySelectorAll('input')
+    .forEach((e) => (e.disabled = disable));
+} // activatePageRangeMenu()
