@@ -19,7 +19,6 @@ import {
   storage,
   supportedVerovioVersions,
   tkVersion,
-  v,
   validate,
   validator,
   version,
@@ -415,7 +414,7 @@ export default class Viewer {
   // set cursor to first note id in page, taking st/ly of id, if possible
   setCursorToPageBeginning(cm) {
     this.selectedElements = [];
-    if (!v.allowNotationInteraction) return;
+    if (!this.allowNotationInteraction) return;
     let id = this.lastNoteId;
     let stNo, lyNo;
     let sc;
@@ -498,7 +497,7 @@ export default class Viewer {
     }
     this.updateHighlight(cm);
     if (document.getElementById('showMidiPlaybackControlBar').checked) {
-      console.log('v.handleClickOnNotation(): HANDLE CLICK MIDI TIMEOUT');
+      console.log('Viewer.handleClickOnNotation(): HANDLE CLICK MIDI TIMEOUT');
       startMidiTimeout();
     }
     this.setFocusToVerovioPane();
@@ -891,7 +890,7 @@ export default class Viewer {
   saveAsPdf() {
     this.vrvWorker.postMessage({
       cmd: 'renderPdf',
-      msg: v.speedFilter(cm.getValue()),
+      msg: this.speedFilter(cm.getValue()),
       title: meiFileName,
       version: version,
       versionDate: versionDate,
@@ -1340,7 +1339,7 @@ export default class Viewer {
           });
           break;
         case 'selectIdStyle':
-          v.xmlIdStyle = value;
+          this.xmlIdStyle = value;
           break;
         case 'toggleSpeedMode':
           document.getElementById('midiSpeedmodeIndicator').style.display = this.speedMode ? 'inline' : 'none';
@@ -1441,7 +1440,7 @@ export default class Viewer {
             });
             break;
           case 'selectIdStyle':
-            v.xmlIdStyle = value;
+            this.xmlIdStyle = value;
             break;
           case 'toggleSpeedMode':
             let sb = document.getElementById('speed-checkbox');
@@ -1451,7 +1450,7 @@ export default class Viewer {
             }
             break;
           case 'showAnnotations':
-            v.updateLayout();
+            this.updateLayout();
             break;
           case 'showAnnotationPanel':
             this.toggleAnnotationPanel();
@@ -2219,7 +2218,7 @@ export default class Viewer {
 
   findFirstNoteInSelection() {
     let firstNote;
-    for (const elId of v.selectedElements) {
+    for (const elId of this.selectedElements) {
       let el = document.getElementById(elId);
       if (el) {
         if (el.classList.contains('note')) {
@@ -2233,7 +2232,7 @@ export default class Viewer {
           }
         }
       } else {
-        console.warn("Couldn't find selected element on page: ", elId, v.selectedElements);
+        console.warn("Couldn't find selected element on page: ", elId, this.selectedElements);
       }
     }
     return firstNote;
