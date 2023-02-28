@@ -827,10 +827,10 @@ export default class Viewer {
   } // showVerovioTabInSettingsPanel()
 
   // Switches Viewer to pdfMode
-  pdfModeOn() {
-    this.pdfMode = true;
+  pageModeOn(pdfMode = true) {
+    this.pdfMode = pdfMode;
     this.controlMenuState = getControlMenuState();
-    console.log('pdfModeOn: state ', this.controlMenuState);
+    console.log('pageModeOn: state ', this.controlMenuState);
 
     // modify vrv options
     this.vrvOptions.mmOutput = true;
@@ -838,34 +838,32 @@ export default class Viewer {
     this.vrvOptions.adjustPageHeight = false;
     document.getElementById('vrv-adjustPageHeight').checked = false;
 
-    setCheckbox('controlMenuFlipToPageControls', false);
-    setCheckbox('controlMenuUpdateNotation', false);
-    setCheckbox('controlMenuFontSelector', true);
-    setCheckbox('controlMenuNavigateArrows', false);
-    setCheckbox('toggleSpeedMode', false);
+    if (this.pdfMode) {
+      setCheckbox('controlMenuFlipToPageControls', false);
+      setCheckbox('controlMenuUpdateNotation', false);
+      setCheckbox('controlMenuFontSelector', true);
+      setCheckbox('controlMenuNavigateArrows', false);
+      setCheckbox('toggleSpeedMode', false);
 
-    // let sl = document.getElementById('speed-label');
-    // sl.textContent = 'Current page:';
-    // sl.title = 'Saves only current page in PDF file.';
+      // hide editor and other panels
+      this.notationProportion = getNotationProportion();
+      setNotationProportion(1);
+      this.hideEditorPanel();
 
-    // behavior of settings panel
-    this.settingsReplaceFriendContainer = true;
-    // hide editor and other panels
-    this.notationProportion = getNotationProportion();
-    setNotationProportion(1);
-    cmd.hideFacsimilePanel();
-    cmd.hideAnnotationPanel();
-    this.hideEditorPanel();
-    this.showVerovioTabInSettingsPanel(); // make vrv settings visible
+      // behavior of settings panel
+      this.settingsReplaceFriendContainer = true;
+      cmd.hideFacsimilePanel();
+      cmd.hideAnnotationPanel();
+      this.showVerovioTabInSettingsPanel(); // make vrv settings visible
 
-    showPdfButtons(true);
-
-    document.getElementById('friendContainer')?.classList.add('pdfMode');
-  } // pdfModeOn()
+      showPdfButtons(true);
+      this.allowNotationInteraction = false;
+      document.getElementById('friendContainer')?.classList.add('pdfMode');
+    }
+  } // pageModeOn()
 
   // Switches back from pdfMode
-  pdfModeOff() {
-    this.pdfMode = false;
+  pageModeOff() {
     setControlMenuState(this.controlMenuState);
     // set vrv options back
     this.vrvOptions.mmOutput = false;
@@ -875,16 +873,20 @@ export default class Viewer {
     // settings behavior to default
     this.settingsReplaceFriendContainer = false;
 
-    // show editor panel with previous proportion
-    setNotationProportion(this.notationProportion);
-    this.showEditorPanel();
-    // hide panels
-    this.hideSettingsPanel();
-    showPdfButtons(false);
+    if (this.pdfMode) {
+      // show editor panel with previous proportion
+      setNotationProportion(this.notationProportion);
+      this.showEditorPanel();
+      // hide panels
+      this.hideSettingsPanel();
+      showPdfButtons(false);
 
-    document.getElementById('friendContainer')?.classList.remove('pdfMode');
-    setOrientation(cm, '', '', v);
-  } // pdfModeOff()
+      document.getElementById('friendContainer')?.classList.remove('pdfMode');
+      setOrientation(cm, '', '', v);
+      this.allowNotationInteraction = true;
+    }
+    this.pdfMode = false;
+  } // pageModeOff()
 
   saveAsPdf() {
     this.vrvWorker.postMessage({

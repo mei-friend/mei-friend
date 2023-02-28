@@ -1368,9 +1368,9 @@ export let cmd = {
   showSettingsPanel: () => v.showSettingsPanel(),
   hideSettingsPanel: () => v.hideSettingsPanel(),
   toggleSettingsPanel: (ev) => v.toggleSettingsPanel(ev),
-  togglePdfMode: () => (v.pdfMode ? v.saveAsPdf() : v.pdfModeOn()),
-  pdfModeOn: () => v.pdfModeOn(),
-  pdfModeOff: () => v.pdfModeOff(),
+  togglePdfMode: () => (v.pdfMode ? v.saveAsPdf() : v.pageModeOn()),
+  pageModeOn: () => v.pageModeOn(),
+  pageModeOff: () => v.pageModeOff(),
   saveAsPdf: () => v.saveAsPdf(),
   filterSettings: () => v.applySettingsFilter(),
   filterReset: () => {
@@ -1540,7 +1540,7 @@ export let cmd = {
     ) {
       cmd.filterReset();
     } else if (v.pdfMode) {
-      cmd.pdfModeOff();
+      cmd.pageModeOff();
     } else {
       v.hideAlerts();
       v.toggleValidationReportVisibility('hidden');
@@ -1667,7 +1667,7 @@ function addEventListeners(v, cm) {
   document.getElementById('SaveMei').addEventListener('click', downloadMei);
   document.getElementById('SaveSvg').addEventListener('click', downloadSvg);
   document.getElementById('SaveMidi').addEventListener('click', () => requestMidiFromVrvWorker());
-  document.getElementById('PrintPreview').addEventListener('click', cmd.pdfModeOn);
+  document.getElementById('PrintPreview').addEventListener('click', cmd.pageModeOn);
 
   // edit dialogs
   document.getElementById('undo').addEventListener('click', cmd.undo);
@@ -1782,7 +1782,7 @@ function addEventListeners(v, cm) {
   document.getElementById('downwards-btn').addEventListener('click', cmd.layerDown);
   // pdf functionality
   document.getElementById('pdf-save-button').addEventListener('click', cmd.saveAsPdf);
-  document.getElementById('pdf-close-button').addEventListener('click', cmd.pdfModeOff);
+  document.getElementById('pdf-close-button').addEventListener('click', cmd.pageModeOff);
   // manipulation
   document.getElementById('invertPlacement').addEventListener('click', cmd.invertPlacement);
   document.getElementById('betweenPlacement').addEventListener('click', cmd.betweenPlacement);
