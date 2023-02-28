@@ -27,6 +27,7 @@ export function addDragSelector(v, vp) {
   const measureSelector = '.measure';
 
   vp.addEventListener('mousedown', (ev) => {
+    if (!v.allowNotationInteraction) return;
     dragging = true;
     // clear selected elements, if no CMD/CTRL key is pressed
     if (!(platform.startsWith('mac') && ev.metaKey) && !ev.ctrlKey) {
@@ -95,6 +96,7 @@ export function addDragSelector(v, vp) {
   }); // mouse down event listener
 
   vp.addEventListener('mousemove', (ev) => {
+    if (!v.allowNotationInteraction) return;
     if (dragging) {
       newEls = [];
 
@@ -153,7 +155,7 @@ export function addDragSelector(v, vp) {
                     id = el.closest('.chord').id;
                   }
                   if (!newEls.includes(id)) {
-                      newEls.push(id);
+                    newEls.push(id);
                   }
                   const x = getX(el);
                   const y = getY(el);
@@ -184,6 +186,7 @@ export function addDragSelector(v, vp) {
   }); // mouse move event listener
 
   vp.addEventListener('mouseup', () => {
+    if (!v.allowNotationInteraction) return;
     if (document.getElementById('showMidiPlaybackControlBar')?.checked) {
       console.log('drag-selector: HANDLE CLICK MIDI TIMEOUT');
       startMidiTimeout();

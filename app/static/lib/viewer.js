@@ -44,6 +44,7 @@ export default class Viewer {
     this.lastNoteId = '';
     this.notationNightMode = false;
     this.allowCursorActivity = true; // whether or not notation gets re-rendered after text changes
+    this.allowNotationInteraction = true; // allow mouse drag-select and click on notation
     this.speedMode = true; // speed mode (just feeds on page to Verovio to reduce drawing time)
     this.parser = new DOMParser();
     this.xmlDoc;
@@ -452,6 +453,7 @@ export default class Viewer {
   } // addNotationEventListeners()
 
   handleClickOnNotation(e, cm) {
+    if (!this.allowNotationInteraction) return;
     e.stopImmediatePropagation();
     this.hideAlerts();
     let point = {};
