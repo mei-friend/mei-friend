@@ -881,7 +881,7 @@ export default class Viewer {
       showPdfButtons(false);
 
       document.getElementById('friendContainer')?.classList.remove('pdfMode');
-      setOrientation(cm, '', '', v);
+      setOrientation(cm, '', '', this);
       this.allowNotationInteraction = true;
     }
     this.pdfMode = false;
