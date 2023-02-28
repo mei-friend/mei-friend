@@ -155,16 +155,7 @@ export const samp = {
 };
 export const fontList = ['Leipzig', 'Bravura', 'Gootville', 'Leland', 'Petaluma'];
 
-import {
-  setOrientation,
-  addNotationResizerHandlers,
-  addFacsimilerResizerHandlers,
-  setNotationProportion,
-  setFacsimileProportion,
-} from './resizer.js';
 import { addAnnotationHandlers, clearAnnotations, readAnnots, refreshAnnotations } from './annotation.js';
-import { dropHandler, dragEnter, dragOverHandler, dragLeave } from './dragger.js';
-import { openUrl, openUrlCancel } from './open-url.js';
 import {
   createNotationDiv,
   setBreaksOptions,
@@ -173,10 +164,19 @@ import {
   manualCurrentPage,
   generateSectionSelect,
 } from './control-menu.js';
-import { clock, unverified, xCircleFill } from '../css/icons.js';
-import { setCursorToId } from './utils.js';
 import { getInMeasure, navElsSelector, getElementAtCursor } from './dom-utils.js';
+import { dropHandler, dragEnter, dragOverHandler, dragLeave } from './dragger.js';
 import { addDragSelector } from './drag-selector.js';
+import { clock, unverified, xCircleFill } from '../css/icons.js';
+import { openUrl, openUrlCancel } from './open-url.js';
+import {
+  setOrientation,
+  addNotationResizerHandlers,
+  addFacsimilerResizerHandlers,
+  setNotationProportion,
+  setFacsimileProportion,
+} from './resizer.js';
+import { setCursorToId } from './utils.js';
 import {
   highlightNotesAtMidiPlaybackTime,
   mp,
@@ -190,6 +190,7 @@ import * as att from './attribute-classes.js';
 import * as e from './editor.js';
 import Viewer from './viewer.js';
 import * as speed from './speed.js';
+import * as s from './settings.js';
 import Github from './github.js';
 import Storage from './storage.js';
 import { fillInBranchContents, logoutFromGithub, refreshGithubMenu, setCommitUIEnabledStatus } from './github-menu.js';
@@ -575,9 +576,9 @@ document.addEventListener('DOMContentLoaded', function () {
     resetButton.innerHTML = xCircleFill;
     resetButton.style.visibility = 'hidden';
   }
-  v.addCmOptionsToSettingsPanel(defaultCodeMirrorOptions);
-  v.addMeiFriendOptionsToSettingsPanel();
-  v.applySettingsFilter();
+  s.addCmOptionsToSettingsPanel(v, defaultCodeMirrorOptions);
+  s.addMeiFriendOptionsToSettingsPanel(v);
+  s.applySettingsFilter();
 
   // check autoValidate as URL param
   let autoValidateParam = searchParams.get('autoValidate');
@@ -872,10 +873,9 @@ async function vrvWorkerEventsHandler(ev) {
       tkVersion = ev.data.version;
       tkUrl = ev.data.url;
       tkAvailableOptions = ev.data.availableOptions;
-      v.clearVrvOptionsSettingsPanel();
-      v.addVrvOptionsToSettingsPanel(tkAvailableOptions, defaultVerovioOptions);
+      s.clearVrvOptionsSettingsPanel(v);
+      s.addVrvOptionsToSettingsPanel(v, tkAvailableOptions, defaultVerovioOptions);
 
-      // v.addMeiFriendOptionsToSettingsPanel();
       drawRightFooter();
       document.querySelector('.statusbar').innerHTML = `Verovio ${tkVersion} loaded.`;
       setBreaksOptions(tkAvailableOptions, defaultVerovioOptions.breaks);
@@ -1372,7 +1372,7 @@ export let cmd = {
   pageModeOn: () => v.pageModeOn(),
   pageModeOff: () => v.pageModeOff(),
   saveAsPdf: () => v.saveAsPdf(),
-  filterSettings: () => v.applySettingsFilter(),
+  filterSettings: () => s.applySettingsFilter(),
   filterReset: () => {
     document.getElementById('filterSettings').value = '';
     document.getElementById('filterSettings').dispatchEvent(new Event('input'));
