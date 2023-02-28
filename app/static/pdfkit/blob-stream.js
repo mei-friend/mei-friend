@@ -1,5 +1,5 @@
 // MIT LICENSE Copyright (c) 2014 Devon Govett (version Jan 2023)
-// https://github.com/devongovett/blob-stream,
+// https://github.com/devongovett/blob-stream
 
 !(function (e) {
   if ('object' == typeof exports && 'undefined' != typeof module) module.exports = e();

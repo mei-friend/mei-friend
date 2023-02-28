@@ -1,5 +1,5 @@
 // from: https://github.com/alafr/SVG-to-PDFKit
-// Copyright (c) 2019 SVG-to-PDFKit contributors (Jan 2023)
+// MIT License, Copyright (c) 2019 SVG-to-PDFKit contributors (Jan 2023)
 
 var SVGtoPDF = function (doc, svg, x, y, options) {
   'use strict';
