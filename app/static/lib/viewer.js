@@ -414,6 +414,8 @@ export default class Viewer {
 
   // set cursor to first note id in page, taking st/ly of id, if possible
   setCursorToPageBeginning(cm) {
+    this.selectedElements = [];
+    if (!v.allowNotationInteraction) return;
     let id = this.lastNoteId;
     let stNo, lyNo;
     let sc;
@@ -436,7 +438,6 @@ export default class Viewer {
     }
     utils.setCursorToId(cm, id);
     // console.info('setCrsrToPgBeg(): lastNoteId: ' + this.lastNoteId + ', new id: ' + id);
-    this.selectedElements = [];
     this.selectedElements.push(id);
     this.lastNoteId = id;
     return id;
@@ -2087,14 +2088,16 @@ export default class Viewer {
     if (id === '') {
       // empty note id
       id = this.setCursorToPageBeginning(cm); // re-defines lastNotId
-      if (id === '') return;
+      if (!id) return;
     }
-    let element = document.querySelector('g#' + utils.escapeXmlId(id));
+    let element;
+    id = utils.escapeXmlId(id);
+    if (id) element = document.querySelector('g#' + id);
     if (!element) {
       // element off-screen
       this.setCursorToPageBeginning(cm); // re-defines lastNotId
-      id = this.lastNoteId;
-      element = document.querySelector('g#' + utils.escapeXmlId(id));
+      id = utils.escapeXmlId(this.lastNoteId);
+      element = document.querySelector('g#' + id);
     }
     if (!element) return;
     console.info('Navigate ' + dir + ' ' + incElName + '-wise for: ', element);
