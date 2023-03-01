@@ -62,6 +62,16 @@ export default class Storage {
     }
   }
 
+  clearSolid() { 
+    // remove data related to Solid credentials from local storage after successful login
+    let keys = Object.keys(this.storage);
+    keys.forEach(k => { 
+      if(k.startsWith("solidClient") || k.startsWith("issuerConfig")) {
+        this.storage.removeItem(k);
+      }
+    })
+  }
+
   removeItem(item) {
     if (this.supported) {
       this.storage.removeItem(item);

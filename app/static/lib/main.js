@@ -481,6 +481,7 @@ async function suspendedValidate(text, updateLinting, options) {
 
 // when initial page content has been loaded
 document.addEventListener('DOMContentLoaded', function () {
+  // clear previous Solid authn data to prevent mismatches
   // link to changelog page according to env settings (develop/staging/production)
   let changeLogUrl;
   switch (env) {
@@ -624,7 +625,7 @@ document.addEventListener('DOMContentLoaded', function () {
   if (storage.supported) {
     storage.read();
     if(storage.restoreSolidSession) { 
-      // attempt to restore Solid session if user had one going
+      // attempt to restore Solid session with fresh data
       loginAndFetch();
     }
     // save (most) URL parameters in storage
