@@ -52,13 +52,17 @@ export function findNotes(elId) {
 
 // look for elementname (e.g., 'staff') upwards in the xml file and return
 // attribute value (searchString defaults to the "@n" attribute).
-export function getElementAttributeAbove(cm, row, elementName = 'staff',
-  searchString = /(?:n=)(?:['"])(\d+?)(?:['"])/) {
+export function getElementAttributeAbove(
+  cm,
+  row,
+  elementName = 'staff',
+  searchString = /(?:n=)(?:['"])(\d+?)(?:['"])/
+) {
   let line;
-  while (line = cm.getLine(--row)) {
+  while ((line = cm.getLine(--row))) {
     if (line.includes('<' + elementName)) {
       let match = line.match(searchString);
-      return [(match && match.length > 0) ? match[1] : 1, row];
+      return [match && match.length > 0 ? match[1] : 1, row];
     }
   }
   return [null, null];
@@ -66,21 +70,26 @@ export function getElementAttributeAbove(cm, row, elementName = 'staff',
 
 // look for elementname (e.g., 'staff') downwards in the xml file and return
 // attribute value (searchString defaults to the "@n" attribute).
-export function getElementAttributeBelow(cm, row, elementName = 'staff',
-  searchString = /(?:n=)(?:['"])(\d+?)(?:['"])/) {
+export function getElementAttributeBelow(
+  cm,
+  row,
+  elementName = 'staff',
+  searchString = /(?:n=)(?:['"])(\d+?)(?:['"])/
+) {
   let line;
-  while (line = cm.getLine(++row)) {
+  while ((line = cm.getLine(++row))) {
     if (line.includes('<' + elementName)) {
       let match = line.match(searchString);
-      return [(match && match.length > 0) ? match[1] : 1, row];
+      return [match && match.length > 0 ? match[1] : 1, row];
     }
   }
   return [null, null];
 }
 
 // move encoding cursor to end of current measure
-export function moveCursorToEndOfMeasure(cm, p) {
+export function moveCursorToEndOfMeasure(cm, p = null) {
   const measureEnd = '</measure';
+  if (!p) p = cm.getCursor();
   for (; p.line < cm.lineCount(); p.line++) {
     let line = cm.getLine(p.line);
     if (line.includes(measureEnd)) {
@@ -91,10 +100,9 @@ export function moveCursorToEndOfMeasure(cm, p) {
   }
   return {
     line: null,
-    ch: null
-  }
-}
-
+    ch: null,
+  };
+} // moveCursorToEndOfMeasure()
 
 // find item by id in buffer
 // NEW: let sc = cm.getSearchCursor('xml:id="' + id + '"');
@@ -166,18 +174,15 @@ export function getAttributeById(cm, itemId, attribute = 'startid') {
 
 // scans through text from cursorPosition to find next element elementName
 // (e.g. 'note'), also matching staff and layer
-export function getIdOfNextElement(cm, rw, elementNames = dutils.navElsArray,
-  direction = 'forwards') {
+export function getIdOfNextElement(cm, rw, elementNames = dutils.navElsArray, direction = 'forwards') {
   let row = rw;
   let line;
-  let layerNo = parseInt(getElementAttributeAbove(cm, row, 'layer',
-    numberLikeString)[0]);
-  let staffNo = parseInt(getElementAttributeAbove(cm, row, 'staff',
-    numberLikeString)[0]);
+  let layerNo = parseInt(getElementAttributeAbove(cm, row, 'layer', numberLikeString)[0]);
+  let staffNo = parseInt(getElementAttributeAbove(cm, row, 'staff', numberLikeString)[0]);
   // console.info('getIdOfNextElement("' + elementNames + '", "' + direction + '").');
 
   if (direction === 'forwards') {
-    while (line = cm.getLine(++row)) {
+    while ((line = cm.getLine(++row))) {
       let found = false;
       for (let el of elementNames) {
         if (line.includes('<' + el)) {
@@ -185,16 +190,17 @@ export function getIdOfNextElement(cm, rw, elementNames = dutils.navElsArray,
           break;
         }
       }
-      if (found &&
-        (staffNo === parseInt(getElementAttributeAbove(cm, row,
-          'staff', numberLikeString)[0])) &&
-        (layerNo === parseInt(getElementAttributeAbove(cm, row,
-          'layer', numberLikeString)[0]))) { // && (layerNo === layerN)
+      if (
+        found &&
+        staffNo === parseInt(getElementAttributeAbove(cm, row, 'staff', numberLikeString)[0]) &&
+        layerNo === parseInt(getElementAttributeAbove(cm, row, 'layer', numberLikeString)[0])
+      ) {
+        // && (layerNo === layerN)
         break;
       }
     }
   } else if (direction === 'backwards') {
-    while (line = cm.getLine(--row)) {
+    while ((line = cm.getLine(--row))) {
       let found = false;
       for (let el of elementNames) {
         if (line.includes('<' + el)) {
@@ -202,11 +208,12 @@ export function getIdOfNextElement(cm, rw, elementNames = dutils.navElsArray,
           break;
         }
       }
-      if (found &&
-        (staffNo === parseInt(getElementAttributeAbove(cm, row,
-          'staff', numberLikeString)[0])) &&
-        (layerNo === parseInt(getElementAttributeAbove(cm, row,
-          'layer', numberLikeString)[0]))) { // && (layerNo === layerN)
+      if (
+        found &&
+        staffNo === parseInt(getElementAttributeAbove(cm, row, 'staff', numberLikeString)[0]) &&
+        layerNo === parseInt(getElementAttributeAbove(cm, row, 'layer', numberLikeString)[0])
+      ) {
+        // && (layerNo === layerN)
         break;
       }
     }
@@ -233,7 +240,7 @@ export function getElementIdAtCursor(cm) {
   let line = cm.getLine(cursor.line);
   // check if cursor is on a closing tag by stepping backwards
   for (let j = cursor.ch; j > 0; j--) {
-    if (line[j] === "/" && line[j - 1] === "<") {
+    if (line[j] === '/' && line[j - 1] === '<') {
       // if closing tag is found, find the name of the tag with regex
       tag = line.slice(j - 1).match(closingTag);
       if (tag && Array.isArray(tag)) {
@@ -244,16 +251,17 @@ export function getElementIdAtCursor(cm) {
   }
   // if closing tag identified, find opening and closing tag
   let from = {
-    'line': 0,
-    'ch': 0
+    line: 0,
+    ch: 0,
   };
   let to = {
-    'line': 0,
-    'ch': 0
+    line: 0,
+    ch: 0,
   };
   let startRegEx = /(<\S+?\s+?)/; // self-closing elements
   let endRegEx = /\/>/;
-  if (tag) { // element tag with closing tag
+  if (tag) {
+    // element tag with closing tag
     startRegEx = `<${tag}`;
     endRegEx = `</${tag}`;
   }
@@ -265,7 +273,7 @@ export function getElementIdAtCursor(cm) {
   }
   for (let k = cursor.line; k < cm.lineCount(); k++) {
     let m;
-    if (m = cm.getLine(k).match(endRegEx)) {
+    if ((m = cm.getLine(k).match(endRegEx))) {
       to.line = k;
       to.ch = m.index;
       break;
@@ -288,8 +296,7 @@ export function getElementIdAtCursor(cm) {
       outsideParentStaff = true;
       continue;
     }
-    if (line.includes('<measure') || (line.includes('<staff') &&
-      !outsideParentStaff)) {
+    if (line.includes('<measure') || (line.includes('<staff') && !outsideParentStaff)) {
       result = line.match(xmlIdString);
       if (result !== null) return result[1];
       // if this line is parent <measure>, stop looking
@@ -334,16 +341,16 @@ export function findElementBelow(textEditor, elementName = 'measure', point = [1
   else return null;
 }
 
-const base62Chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const base62Chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
 /**
  * Creates an xml:id in different styles:
  * 'Original' Verovio style: "note-0000001318117900",
  * Verovio 'Base36' (since mid-2021): "nophl5o",
  * 'mei-friend' style (node name with base 36): "note-ophl5o"
- * @param {string} style 
- * @param {string} nodeName 
- * @returns {string} xml:id 
+ * @param {string} style
+ * @param {string} nodeName
+ * @returns {string} xml:id
  */
 export function generateXmlId(nodeName = '', style = 'mei-friend') {
   let rnd = Math.round(Math.random() * Math.pow(2, 32));
@@ -379,14 +386,14 @@ export function generateXmlId(nodeName = '', style = 'mei-friend') {
 export function insertTabs(textEditor, n = 1) {
   // let tabText = textEditor.getTabText();
   for (let i = 0; i < n; i++) {
-    textEditor.insertText(" ");
+    textEditor.insertText(' ');
   }
 }
 
 // find tag in buffer of textEditor to identify file type
 export function hasTag(textEditor, tag = '<mei') {
   let range = null;
-  let searchTerm = "(?:" + tag + ")";
+  let searchTerm = '(?:' + tag + ')';
   // console.info('hasTag: ', searchTerm);
   textEditor.getBuffer().scan(new RegExp(searchTerm), (obj) => {
     range = obj.range;
@@ -401,13 +408,13 @@ export function sortElementsByScorePosition(arr, includeY = false) {
   let j, i;
   let Xs = []; // create array of x values of the ids in arr
   let Ys = []; // create array of y values of the ids in arr
-  arr.forEach(item => {
+  arr.forEach((item) => {
     let el = document.querySelector('g#' + escapeXmlId(item));
     Xs.push(dutils.getX(el));
     if (includeY) Ys.push(dutils.getY(el));
   });
   for (j = arr.length; j > 1; --j) {
-    for (i = 0; i < (j - 1); ++i) {
+    for (i = 0; i < j - 1; ++i) {
       if (Xs[i] <= 0) {
         console.info('Utils.sortElementsByScoreTime(): zero t: ' + arr[i]);
         continue;
@@ -422,7 +429,7 @@ export function sortElementsByScorePosition(arr, includeY = false) {
         [Xs[i], Xs[i + 1]] = [Xs[i + 1], Xs[i]];
         if (includeY) [Ys[i], Ys[i + 1]] = [Ys[i + 1], Ys[i]];
       }
-      // swap elements for Y, if X equal 
+      // swap elements for Y, if X equal
       if (includeY && Xs[i] === Xs[i + 1] && Ys[i] > Ys[i + 1]) {
         [arr[i], arr[i + 1]] = [arr[i + 1], arr[i]];
         [Xs[i], Xs[i + 1]] = [Xs[i + 1], Xs[i]];
@@ -440,8 +447,7 @@ export function cleanAccid(xmlDoc, cm) {
   // let checkPoint = buffer.createCheckpoint(); TODO
   let i = 0;
   for (let el of accidGesList) {
-    if (el.hasAttribute('accid.ges') &&
-      el.getAttribute('accid') === el.getAttribute('accid.ges')) {
+    if (el.hasAttribute('accid.ges') && el.getAttribute('accid') === el.getAttribute('accid.ges')) {
       i++;
       console.log(i + ' @accid.ges removed from ', el);
       el.removeAttribute('accid.ges');
@@ -455,8 +461,7 @@ export function cleanAccid(xmlDoc, cm) {
 // renumber measure@n starting with startNumber
 export function renumberMeasures(v, cm, startNum = 1, change = false) {
   let measureList = v.xmlDoc.querySelectorAll('measure');
-  if (!change) v.showAlert(`<b>Renumber measures ${change ? '' : 'TEST'}</b>`,
-    change ? 'success' : 'info', 120000);
+  if (!change) v.showAlert(`<b>Renumber measures ${change ? '' : 'TEST'}</b>`, change ? 'success' : 'info', 120000);
   console.info('renumber Measures list: ', measureList);
   let i;
   let lgt = measureList.length;
@@ -472,14 +477,14 @@ export function renumberMeasures(v, cm, startNum = 1, change = false) {
   for (i = 0; i < lgt; i++) {
     let suffix = '';
     if (measureList[i].closest('incip')) continue; // ignore incipit
-    if (!change)
-      console.info(i + '/' + lgt + ': measure ', measureList[i]);
+    if (!change) console.info(i + '/' + lgt + ': measure ', measureList[i]);
     if (measureList[i].hasAttribute('metcon')) {
       metcon = measureList[i].getAttribute('metcon');
     }
     let contMeas = document.getElementById('renumberMeasureContinueAcrossIncompleteMeasures');
     // 1) first measure with @metcon="false" is upbeat => @n=0
-    if (contMeas && !contMeas.checked && isFirstMeasure && metcon === 'false') { // first measure upbeat
+    if (contMeas && !contMeas.checked && isFirstMeasure && metcon === 'false') {
+      // first measure upbeat
       n--;
       isFirstMeasure = false;
     }
@@ -504,14 +509,14 @@ export function renumberMeasures(v, cm, startNum = 1, change = false) {
     let cont = document.getElementById('renumberMeasuresContinueAcrossEndings');
     if (cont && !cont.checked) {
       let ending = measureList[i].closest('ending');
-      if (ending && endingStart > 0 && ending.hasAttribute('n') &&
-        ending.getAttribute('n') != endingN) endingEnd = n; // compare ending ns
+      if (ending && endingStart > 0 && ending.hasAttribute('n') && ending.getAttribute('n') != endingN) endingEnd = n; // compare ending ns
       if (ending && ending.hasAttribute('n')) endingN = ending.getAttribute('n');
       if (ending && endingStart < 0) {
         endingStart = n; // remember start number
         endingCount++; // increment ending count
       }
-      if (ending && endingStart > 0 && endingEnd > 0) { // set @n to start number
+      if (ending && endingStart > 0 && endingEnd > 0) {
+        // set @n to start number
         n = endingStart;
         endingEnd = -1;
         endingCount++; // increment ending count
@@ -538,7 +543,8 @@ export function renumberMeasures(v, cm, startNum = 1, change = false) {
             break;
         }
       }
-      if (!ending) { // reset both measure numbers
+      if (!ending) {
+        // reset both measure numbers
         endingStart = -1;
         endingEnd = -1;
         endingCount = 0;
@@ -546,12 +552,18 @@ export function renumberMeasures(v, cm, startNum = 1, change = false) {
     }
     // 4) No increment after bars with invisible barline (@right="invis")
     let right = '';
-    if (measureList[i].hasAttribute('right'))
-      right = measureList[i].getAttribute('right');
+    if (measureList[i].hasAttribute('right')) right = measureList[i].getAttribute('right');
 
-    let msg = 'measure n="' + measureList[i].getAttribute('n') + '" ' +
-      (change ? '' : 'would be ') + 'changed to n="' + (n + suffix) + '"' +
-      (right ? (', right:' + right) : '') + (metcons ? (', metcons:' + metcons) : '');
+    let msg =
+      'measure n="' +
+      measureList[i].getAttribute('n') +
+      '" ' +
+      (change ? '' : 'would be ') +
+      'changed to n="' +
+      (n + suffix) +
+      '"' +
+      (right ? ', right:' + right : '') +
+      (metcons ? ', metcons:' + metcons : '');
     console.info(msg);
     if (!change) v.updateAlert(msg);
     // change measure@n
@@ -561,11 +573,11 @@ export function renumberMeasures(v, cm, startNum = 1, change = false) {
     }
     // 5) handle increment from multiRest@num
     let multiRest;
-    if (multiRest = measureList[i].querySelector('multiRest')) {
+    if ((multiRest = measureList[i].querySelector('multiRest'))) {
       let num = multiRest.getAttribute('num');
       if (num) n += parseInt(num);
       else n++; // should not happen...
-    } else if (right !== 'invis' || metcon === "false") {
+    } else if (right !== 'invis' || metcon === 'false') {
       n++;
     }
     metcon = '';
@@ -573,7 +585,7 @@ export function renumberMeasures(v, cm, startNum = 1, change = false) {
   // let re = buffer.groupChangesSinceCheckpoint(checkPoint);
   let str = 'renumberMeasures: ' + i + ' measures renumbered';
   console.info(str);
-  if (!change) v.updateAlert(str)
+  if (!change) v.updateAlert(str);
   //, grouped ', re);
 }
 
@@ -590,10 +602,6 @@ export function attrAsElements(xmlNote) {
   return xmlNote;
 }
 
-export function getOS() {
-  return navigator.userAgentData.platform;
-}
-
 // accepts color as string: "rgb(100,12,255)" and hex string "#ffee10" or
 export function brighter(rgbString, deltaPercent, alpha = 1) {
   let rgb = [];
@@ -603,16 +611,17 @@ export function brighter(rgbString, deltaPercent, alpha = 1) {
   } else {
     rgb = rgbString.slice(4, -1).split(',');
   }
-  rgb = rgb.map(i => Math.max(0, Math.min(parseInt(i) + deltaPercent, 255)));
+  rgb = rgb.map((i) => Math.max(0, Math.min(parseInt(i) + deltaPercent, 255)));
   if (alpha < 1) rgb.push(alpha);
   return 'rgb(' + rgb.join(', ') + ')';
 }
 
 function hexToRgb(hex) {
-  return hex.replace(/^#?([a-f\d])([a-f\d])([a-f\d])$/i,
-    (m, r, g, b) => '#' + r + r + g + g + b + b)
-    .substring(1).match(/.{2}/g)
-    .map(x => parseInt(x, 16))
+  return hex
+    .replace(/^#?([a-f\d])([a-f\d])([a-f\d])$/i, (m, r, g, b) => '#' + r + r + g + g + b + b)
+    .substring(1)
+    .match(/.{2}/g)
+    .map((x) => parseInt(x, 16));
 }
 
 // supports "rgb(123,234,0)" format
@@ -621,72 +630,88 @@ export function complementary(rgbString) {
   if (rgbString.startsWith('#')) {
     rgb = hexToRgb(rgbString);
   } else {
-    rgbString.slice(4, -1).split(',').forEach(i => rgb.push(i));
+    rgbString
+      .slice(4, -1)
+      .split(',')
+      .forEach((i) => rgb.push(i));
   }
-  rgb = rgb.map(i => 255 - i);
+  rgb = rgb.map((i) => 255 - i);
   return 'rgb(' + rgb.join(', ') + ')';
 }
 
 // input Verovio-SVG element, return bounding box coords in default screen coordinate space
 export function convertCoords(elem) {
-  if (!!elem && document.getElementById(elem.getAttribute("id")) &&
-    elem.style.display !== "none" && (elem.getBBox().x !== 0 || elem.getBBox().y !== 0)) {
+  if (
+    !!elem &&
+    document.getElementById(elem.getAttribute('id')) &&
+    elem.style.display !== 'none' &&
+    (elem.getBBox().x !== 0 || elem.getBBox().y !== 0)
+  ) {
     const x = elem.getBBox().x;
     const width = elem.getBBox().width;
     const y = elem.getBBox().y;
     const height = elem.getBBox().height;
-    const offset = elem.closest("svg").parentElement.getBoundingClientRect();
+    const offset = elem.closest('svg').parentElement.getBoundingClientRect();
     const matrix = elem.getScreenCTM();
     return {
-      x: (matrix.a * x) + (matrix.c * y) + matrix.e - offset.left,
-      y: (matrix.b * x) + (matrix.d * y) + matrix.f - offset.top,
-      x2: (matrix.a * (x + width)) + (matrix.c * y) + matrix.e - offset.left,
-      y2: (matrix.b * x) + (matrix.d * (y + height)) + matrix.f - offset.top
+      x: matrix.a * x + matrix.c * y + matrix.e - offset.left,
+      y: matrix.b * x + matrix.d * y + matrix.f - offset.top,
+      x2: matrix.a * (x + width) + matrix.c * y + matrix.e - offset.left,
+      y2: matrix.b * x + matrix.d * (y + height) + matrix.f - offset.top,
     };
   } else {
-    console.warn("Element unavailable on page: ", elem ? elem.getAttribute("id") : 'none');
+    console.warn('Element unavailable on page: ', elem ? elem.getAttribute('id') : 'none');
     return {
       x: 0,
       y: 0,
       x2: 0,
-      y2: 0
-    }
+      y2: 0,
+    };
   }
 }
 
 export function rmHash(hashedString) {
   if (!hashedString) return '';
-  return (hashedString.startsWith('#')) ?
-    hashedString.split('#')[1] : hashedString;
+  return hashedString.startsWith('#') ? hashedString.split('#')[1] : hashedString;
 }
 
-// escape special characters '.' and ':' for usagage in queryselectors 
+// escape special characters '.' and ':' for usagage in queryselectors
 export function escapeXmlId(str) {
   if (str === null) return '';
   if (/^\d/.test(str)) str = 'a' + str;
   return str.replace(/\./g, '\\.').replace(/\:/g, '\\:');
 }
 
-/** 
+/**
  * Returns an ISO 8601 string in lokal timezone
  * @param {Date} d - date to create string for
  * @returns {string} formatted string
  */
 export function toISOStringLocal(d) {
   function z(n) {
-    return (n < 10 ? '0' : '') + n
+    return (n < 10 ? '0' : '') + n;
   }
-  return d.getFullYear() + '-' + z(d.getMonth() + 1) + '-' +
-    z(d.getDate()) + 'T' + z(d.getHours()) + ':' +
-    z(d.getMinutes()) + ':' + z(d.getSeconds())
+  return (
+    d.getFullYear() +
+    '-' +
+    z(d.getMonth() + 1) +
+    '-' +
+    z(d.getDate()) +
+    'T' +
+    z(d.getHours()) +
+    ':' +
+    z(d.getMinutes()) +
+    ':' +
+    z(d.getSeconds())
+  );
 } // toISOStringLocal()
 
 /** @typedef { measure: Number, beat: Number } MeasureBeat */
 
 /**
- * Returns object with measure and beat count from @tstamp2 
+ * Returns object with measure and beat count from @tstamp2
  * (according to data.MEASUREBEAT)
- * @param {string} tstamp2 
+ * @param {string} tstamp2
  * @returns {MeasureBeat}
  */
 export function readMeasureBeat(tstamp2) {
@@ -699,14 +724,14 @@ export function readMeasureBeat(tstamp2) {
   } else {
     beat = parseFloat(tstamp2);
   }
-  return { 'measure': measure, 'beat': beat };
+  return { measure: measure, beat: beat };
 } // readMeasureBeat()
 
 /**
  * Returns a data.MEASUREBEAT string
- * @param {Number} measure 
- * @param {Number} beat 
- * @returns {string} 
+ * @param {Number} measure
+ * @param {Number} beat
+ * @returns {string}
  */
 export function writeMeasureBeat(measure, beat) {
   return measure + 'm+' + beat;

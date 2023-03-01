@@ -1,0 +1,84 @@
+{
+  "id": "0e614633-a5cd-4040-a504-4b275f8cb419",
+  "version": "2.0",
+  "name": "mei-friend tests",
+  "url": "https://mei-friend.mdw.ac.at",
+  "tests": [{
+    "id": "e7e263b7-29b0-47d3-bd57-9735fc74959b",
+    "name": "file menu pops up on click",
+    "commands": [{
+      "id": "41118d1f-bd02-420b-9a2c-18e0849cd016",
+      "comment": "",
+      "command": "open",
+      "target": "/",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "155fea4a-699a-4def-b778-2033870e8472",
+      "comment": "",
+      "command": "setWindowSize",
+      "target": "1440x875",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "227eed87-f77b-49ee-8e23-192350d31a89",
+      "comment": "",
+      "command": "",
+      "target": "",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "8c070644-f975-4ee6-878c-944a02b0c4fb",
+      "comment": "",
+      "command": "click",
+      "target": "css=.dropdown:nth-child(2) > .dropbtn",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "a29ffbc5-0ab9-48c3-8e0a-7bfdad7b5691",
+      "comment": "",
+      "command": "mouseOver",
+      "target": "css=.dropdown:nth-child(2) > .dropbtn",
+      "targets": [],
+      "value": "50000"
+    }, {
+      "id": "c49fe295-ff75-48b7-bfc4-d8f7987cc13c",
+      "comment": "",
+      "command": "mouseOver",
+      "target": "id=OpenMei",
+      "targets": [
+        ["id=OpenMei", "id"],
+        ["css=#OpenMei", "css:finder"],
+        ["xpath=//a[@id='OpenMei']", "xpath:attributes"],
+        ["xpath=//div[@id='FileMenu']/a", "xpath:idRelative"],
+        ["xpath=//a[contains(@href, '#')]", "xpath:href"],
+        ["xpath=//div[2]/div/a", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "efce4007-84e5-47a3-8b6e-11078c7c0247",
+      "comment": "",
+      "command": "waitForElementVisible",
+      "target": "id=OpenMei",
+      "targets": [
+        ["id=OpenMei", "id"],
+        ["css=#OpenMei", "css:finder"],
+        ["xpath=//a[@id='OpenMei']", "xpath:attributes"],
+        ["xpath=//div[@id='FileMenu']/a", "xpath:idRelative"],
+        ["xpath=//a[contains(@href, '#')]", "xpath:href"],
+        ["xpath=//div[2]/div/a", "xpath:position"]
+      ],
+      "value": "1"
+    }]
+  }],
+  "suites": [{
+    "id": "f15e0f73-033a-44a8-8633-5ea68fd8bcb2",
+    "name": "Default Suite",
+    "persistSession": false,
+    "parallel": false,
+    "timeout": 300,
+    "tests": ["e7e263b7-29b0-47d3-bd57-9735fc74959b"]
+  }],
+  "urls": ["https://mei-friend.mdw.ac.at/"],
+  "plugins": []
+}

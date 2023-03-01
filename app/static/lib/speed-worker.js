@@ -1,7 +1,7 @@
-/* 
+/*
  * Worker to pre-compute time-spanning elements per page for accelerating
- * interaction in speedMode.
- * 
+ * interaction in speed mode.
+ *
  * We use tXml by Tobias Nickel to parse the MEI encoding and recursive
  * operations for traversing the DOM structure.
  */
@@ -16,7 +16,7 @@ var timeSpanningElements; // elements with @tstamp2; from attribute-classes.js
 onmessage = function (e) {
   let result = {};
   let t1 = performance.now();
-  console.info("SpeedWorker received: " + Math.random() + '; ' + e.data.cmd + '. ');
+  console.info('SpeedWorker received: ' + Math.random() + '; ' + e.data.cmd + '. ');
   // console.info("SpeedWorker received: " + e.data.cmd + ', ', e.data);
   switch (e.data.cmd) {
     case 'variables': // receive const from attribute-classes.js
@@ -25,14 +25,13 @@ onmessage = function (e) {
       break;
     case 'listPageSpanningElements':
       result.cmd = 'listPageSpanningElements';
-      result.pageSpanners =
-        listPageSpanningElements(e.data.mei, e.data.breaks, e.data.breaksOpt);
+      result.pageSpanners = listPageSpanningElements(e.data.mei, e.data.breaks, e.data.breaksOpt);
       break;
   }
   let t2 = performance.now();
   console.log('SpeedWorker finished in ' + (t2 - t1) + ' ms.');
   if (result) postMessage(result);
-} // onmessage()
+}; // onmessage()
 
 /**
  * @param {string} mei
@@ -45,13 +44,13 @@ onmessage = function (e) {
 function listPageSpanningElements(mei, breaks, breaksOption) {
   let pageSpanners = {
     start: {},
-    end: {}
+    end: {},
   };
   let xmlDoc = parse(mei); // txml is very fast!
   let music; // expecting mei > music
   music = getElementByTagName(xmlDoc, 'music', music);
   if (!music) {
-    console.log('Invalid MEI file. ')
+    console.log('Invalid MEI file. ');
     return undefined;
   }
   let score;
@@ -74,7 +73,7 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
   let p = 1;
   let measureCount = 0;
   let tmp = {}; // list of unpaged tstamp2 elements (with xml:id as keys and endMeasure as value)
-  let timeStamp2Pages = {}; // list of elements with @tstamp2 and end page 
+  let timeStamp2Pages = {}; // list of elements with @tstamp2 and end page
 
   noteTable = getPageNumberForElements(score.children, noteTable, idList);
 
@@ -85,7 +84,8 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
     p1 = noteTable[tsTable[spannerIds][0]];
     if (tsTable[spannerIds].length == 2) {
       p2 = noteTable[tsTable[spannerIds][1]];
-    } else { // find page number for spannerIds[0] from timeStamp2Pages
+    } else {
+      // find page number for spannerIds[0] from timeStamp2Pages
       p2 = timeStamp2Pages[spannerIds];
     }
     if (p1 > 0 && p2 > 0 && p1 != p2) {
@@ -106,13 +106,13 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
   /**
    * Find time-spanning elements and store their @startid/@endids in object tsTable
    * and additionally in one aggregated array idList
-   * @param {array} nodeArray 
-   * @param {object} tsTable 
-   * @param {array} idList 
+   * @param {array} nodeArray
+   * @param {object} tsTable
+   * @param {array} idList
    * @returns {object} tsTable
    */
   function findTimeSpanningElements(nodeArray, tsTable, idList) {
-    nodeArray.forEach(el => {
+    nodeArray.forEach((el) => {
       if (timeSpanningElements.includes(el.tagName)) {
         const startid = rmHash(el.attributes['startid']);
         const endid = rmHash(el.attributes['endid']);
@@ -121,7 +121,8 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
           tsTable[el.attributes['xml:id']] = [startid, endid];
           idList.push(startid);
           idList.push(endid);
-        } else if (tstamp2) { // store element xml:id
+        } else if (tstamp2) {
+          // store element xml:id
           tsTable[el.attributes['xml:id']] = [el.attributes['xml:id']];
           idList.push(el.attributes['xml:id']);
         }
@@ -133,17 +134,18 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
   } // findTimeSpanningElements()
 
   /**
-   * Determine the page number for each element in nodeArray recursively, 
+   * Determine the page number for each element in nodeArray recursively,
    * store it in noteTable[id] = p; and delete it from idList
-   * @param {array} nodeArray 
-   * @param {object} noteTable 
-   * @param {array} idList 
-   * @param {boolean} childOfMeasure 
-   * @returns 
+   * @param {array} nodeArray
+   * @param {object} noteTable
+   * @param {array} idList
+   * @param {boolean} childOfMeasure
+   * @returns
    */
   function getPageNumberForElements(nodeArray, noteTable, idList, childOfMeasure = false) {
     if (breaksOption === 'line' || breaksOption === 'encoded') {
-      nodeArray.forEach(el => { // el obj w/ tagName, children, attributes
+      nodeArray.forEach((el) => {
+        // el obj w/ tagName, children, attributes
         if (el.hasOwnProperty('tagName')) {
           if (el.tagName === 'measure') {
             count = true;
@@ -160,7 +162,8 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
           const id = el.attributes['xml:id'];
           if (id) {
             let i = idList.indexOf(id);
-            if (i >= 0) { // found an id pointed to, so remember it
+            if (i >= 0) {
+              // found an id pointed to, so remember it
               noteTable[id] = p;
               delete idList[i];
               // check for time stamp 2
@@ -176,7 +179,8 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
         }
       });
     } else if (breaksOption === 'auto') {
-      nodeArray.forEach(el => { // el obj w/ tagName, children, attributes
+      nodeArray.forEach((el) => {
+        // el obj w/ tagName, children, attributes
         if (el.hasOwnProperty('tagName')) {
           if (el.tagName === 'measure') {
             childOfMeasure = false;
@@ -189,15 +193,15 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
               }
             }
           }
-          if (p < Object.keys(breaks).length &&
-            el.attributes['xml:id'] === breaks[p][breaks[p].length - 1]) {
+          if (p < Object.keys(breaks).length && el.attributes['xml:id'] === breaks[p][breaks[p].length - 1]) {
             childOfMeasure = true; // for children of last measure on page
             p++;
           }
           const id = el.attributes['xml:id'];
           if (id) {
             let i = idList.indexOf(id);
-            if (i >= 0) { // found an id pointed to, so remember it
+            if (i >= 0) {
+              // found an id pointed to, so remember it
               noteTable[id] = childOfMeasure ? p - 1 : p;
               delete idList[i];
               // check for time stamp 2
@@ -215,9 +219,7 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
     }
     return noteTable;
   } // getPageNumberForElements()
-
 } // listPageSpanningElements()
-
 
 // Return first element with tagName elName
 function getElementByTagName(nodeArray, elName, el) {
@@ -226,35 +228,31 @@ function getElementByTagName(nodeArray, elName, el) {
     return null;
   }
   for (let e of nodeArray) {
-    if (e.hasOwnProperty("tagName") && e.tagName === elName) {
+    if (e.hasOwnProperty('tagName') && e.tagName === elName) {
       el = e;
       break;
     }
-    if (e.hasOwnProperty("children")) {
+    if (e.hasOwnProperty('children')) {
       el = getElementByTagName(e.children, elName, el);
     }
   }
   return el;
 } // getElementByTagName()
 
-
 // same as in ./utils.js, but importScripts do not seem to do the job...
 function rmHash(hashedString) {
   if (!hashedString) return '';
-  return (hashedString.startsWith('#')) ?
-    hashedString.split('#')[1] : hashedString;
+  return hashedString.startsWith('#') ? hashedString.split('#')[1] : hashedString;
 } // rmHash()
-
 
 // returns measure count from tstamp2 (according to data.MEASUREBEAT)
 function getMeasureCount(tstamp2) {
-  return (tstamp2.includes('m')) ? parseInt(tstamp2.split('m').at(0)) : 0;
+  return tstamp2.includes('m') ? parseInt(tstamp2.split('m').at(0)) : 0;
 }
 
-
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// 
+//
 // ACKNOWLEDGEMENTS
 //
 // The below code is taken from https://github.com/TobiasNickel/tXml,
@@ -287,8 +285,6 @@ function getMeasureCount(tstamp2) {
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-
-
 /**
  * @author: Tobias Nickel
  * @created: 06.04.2015
@@ -302,25 +298,24 @@ function getMeasureCount(tstamp2) {
  * @return {(tNode | string)[]}
  */
 function parse(S, options) {
-  "txml";
+  'txml';
   options = options || {};
 
   var pos = options.pos || 0;
   var keepComments = !!options.keepComments;
-  var keepWhitespace = !!options.keepWhitespace
+  var keepWhitespace = !!options.keepWhitespace;
 
-  var openBracket = "<";
-  var openBracketCC = "<".charCodeAt(0);
-  var closeBracket = ">";
-  var closeBracketCC = ">".charCodeAt(0);
-  var minusCC = "-".charCodeAt(0);
-  var slashCC = "/".charCodeAt(0);
+  var openBracket = '<';
+  var openBracketCC = '<'.charCodeAt(0);
+  var closeBracket = '>';
+  var closeBracketCC = '>'.charCodeAt(0);
+  var minusCC = '-'.charCodeAt(0);
+  var slashCC = '/'.charCodeAt(0);
   var exclamationCC = '!'.charCodeAt(0);
   var singleQuoteCC = "'".charCodeAt(0);
   var doubleQuoteCC = '"'.charCodeAt(0);
   var openCornerBracketCC = '['.charCodeAt(0);
   var closeCornerBracketCC = ']'.charCodeAt(0);
-
 
   /**
    * parsing a list of entries
@@ -333,29 +328,40 @@ function parse(S, options) {
           var closeStart = pos + 2;
           pos = S.indexOf(closeBracket, pos);
 
-          var closeTag = S.substring(closeStart, pos)
+          var closeTag = S.substring(closeStart, pos);
           if (closeTag.indexOf(tagName) === -1) {
             var parsedText = S.substring(0, pos).split('\n');
             console.error(
               'SpeedWorker Parsing Error: Unexpected close tag:' +
-              ' Line ' + (parsedText.length - 1) +
-              ', Column ' + (parsedText[parsedText.length - 1].length + 1) +
-              ', Char ' + S[pos]
+                ' Line ' +
+                (parsedText.length - 1) +
+                ', Column ' +
+                (parsedText[parsedText.length - 1].length + 1) +
+                ', Char ' +
+                S[pos]
             );
           }
 
-          if (pos + 1) pos += 1
+          if (pos + 1) pos += 1;
 
           return children;
         } else if (S.charCodeAt(pos + 1) === exclamationCC) {
           if (S.charCodeAt(pos + 2) === minusCC) {
             //comment support
             const startCommentPos = pos;
-            while (pos !== -1 && !(S.charCodeAt(pos) === closeBracketCC && S.charCodeAt(pos - 1) === minusCC && S.charCodeAt(pos - 2) === minusCC && pos != -1)) {
+            while (
+              pos !== -1 &&
+              !(
+                S.charCodeAt(pos) === closeBracketCC &&
+                S.charCodeAt(pos - 1) === minusCC &&
+                S.charCodeAt(pos - 2) === minusCC &&
+                pos != -1
+              )
+            ) {
               pos = S.indexOf(closeBracket, pos + 1);
             }
             if (pos === -1) {
-              pos = S.length
+              pos = S.length;
             }
             if (keepComments) {
               children.push(S.substring(startCommentPos, pos + 1));
@@ -423,8 +429,7 @@ function parse(S, options) {
   function parseText() {
     var start = pos;
     pos = S.indexOf(openBracket, pos) - 1;
-    if (pos === -2)
-      pos = S.length;
+    if (pos === -2) pos = S.length;
     return S.slice(start, pos + 1);
   }
   /**
@@ -459,8 +464,13 @@ function parse(S, options) {
         var name = parseName();
         // search beginning of the string
         var code = S.charCodeAt(pos);
-        while (code && code !== singleQuoteCC && code !== doubleQuoteCC &&
-          !((code > 64 && code < 91) || (code > 96 && code < 123)) && code !== closeBracketCC) {
+        while (
+          code &&
+          code !== singleQuoteCC &&
+          code !== doubleQuoteCC &&
+          !((code > 64 && code < 91) || (code > 96 && code < 123)) &&
+          code !== closeBracketCC
+        ) {
           pos++;
           code = S.charCodeAt(pos);
         }
@@ -483,12 +493,12 @@ function parse(S, options) {
     }
     // optional parsing of children
     if (S.charCodeAt(pos - 1) !== slashCC) {
-      if (tagName === "script") {
+      if (tagName === 'script') {
         var start = pos + 1;
         pos = S.indexOf('</script>', pos);
         children = [S.slice(start, pos)];
         pos += 9;
-      } else if (tagName === "style") {
+      } else if (tagName === 'style') {
         var start = pos + 1;
         pos = S.indexOf('</style>', pos);
         children = [S.slice(start, pos)];
@@ -497,7 +507,7 @@ function parse(S, options) {
         pos++;
         children = parseChildren(tagName);
       } else {
-        pos++
+        pos++;
       }
     } else {
       pos++;
@@ -516,7 +526,7 @@ function parse(S, options) {
   function parseString() {
     var startChar = S[pos];
     var startpos = pos + 1;
-    pos = S.indexOf(startChar, startpos)
+    pos = S.indexOf(startChar, startpos);
     return S.slice(startpos, pos);
   }
 
@@ -524,8 +534,7 @@ function parse(S, options) {
    *
    */
   function findElements() {
-    var r = new RegExp('\\s' + options.attrName + '\\s*=[\'"]' +
-      options.attrValue + '[\'"]').exec(S)
+    var r = new RegExp('\\s' + options.attrName + '\\s*=[\'"]' + options.attrValue + '[\'"]').exec(S);
     if (r) {
       return r.index;
     } else {
@@ -547,7 +556,7 @@ function parse(S, options) {
       pos = 0;
     }
   } else if (options.parseNode) {
-    out = parseNode()
+    out = parseNode();
   } else {
     out = parseChildren('');
   }
@@ -589,8 +598,7 @@ function simplify(children) {
     if (typeof child !== 'object') {
       return;
     }
-    if (!out[child.tagName])
-      out[child.tagName] = [];
+    if (!out[child.tagName]) out[child.tagName] = [];
     var kids = simplify(child.children);
     out[child.tagName].push(kids);
     if (Object.keys(child.attributes).length && typeof kids !== 'string') {
@@ -605,8 +613,7 @@ function simplify(children) {
   }
 
   return out;
-};
-
+}
 
 /**
  * similar to simplify, but lost less
@@ -620,18 +627,19 @@ function simplifyLostLess(children, parentAttributes = {}) {
   }
 
   if (children.length === 1 && typeof children[0] === 'string') {
-    return Object.keys(parentAttributes).length ? {
-      _attributes: parentAttributes,
-      value: children[0]
-    } : children[0];
+    return Object.keys(parentAttributes).length
+      ? {
+          _attributes: parentAttributes,
+          value: children[0],
+        }
+      : children[0];
   }
   // map each object
   children.forEach(function (child) {
     if (typeof child !== 'object') {
       return;
     }
-    if (!out[child.tagName])
-      out[child.tagName] = [];
+    if (!out[child.tagName]) out[child.tagName] = [];
     var kids = simplifyLostLess(child.children || [], child.attributes);
     out[child.tagName].push(kids);
     if (Object.keys(child.attributes).length) {
@@ -640,7 +648,7 @@ function simplifyLostLess(children, parentAttributes = {}) {
   });
 
   return out;
-};
+}
 
 /**
  * behaves the same way as Array.filter, if the filter method return true, the element is in the resultList
@@ -650,14 +658,14 @@ function simplifyLostLess(children, parentAttributes = {}) {
 function filter(children, f, dept = 0, path = '') {
   var out = [];
   children.forEach(function (child, i) {
-    if (typeof (child) === 'object' && f(child, i, dept, path)) out.push(child);
+    if (typeof child === 'object' && f(child, i, dept, path)) out.push(child);
     if (child.children) {
       var kids = filter(child.children, f, dept + 1, (path ? path + '.' : '') + i + '.' + child.tagName);
       out = out.concat(kids);
     }
   });
   return out;
-};
+}
 
 /**
  * stringify a previously parsed string object.
@@ -682,7 +690,7 @@ function stringify(O) {
   }
 
   function writeNode(N) {
-    out += "<" + N.tagName;
+    out += '<' + N.tagName;
     for (var i in N.attributes) {
       if (N.attributes[i] === null) {
         out += ' ' + i;
@@ -703,8 +711,7 @@ function stringify(O) {
   writeChildren(O);
 
   return out;
-};
-
+}
 
 /**
  * use this method to read the text content, of some node.
@@ -721,34 +728,34 @@ function toContentString(tDom) {
     });
     return out;
   } else if (typeof tDom === 'object') {
-    return toContentString(tDom.children)
+    return toContentString(tDom.children);
   } else {
     return ' ' + tDom;
   }
-};
+}
 
 // S is xml text
 function getElementById(S, id, simplified) {
   var out = parse(S, {
-    attrValue: id
+    attrValue: id,
   });
   return simplified ? simplify(out) : out[0];
-};
+}
 
 // S is xml text (function by @wergo)
 function getElementByXmlId(S, id, simplified) {
   var out = parse(S, {
     attrName: 'xml:id',
-    attrValue: id
+    attrValue: id,
   });
   return simplified ? simplify(out) : out[0];
-};
+}
 
 // S is xml text
 function getElementsByClassName(S, classname, simplified) {
   const out = parse(S, {
     attrName: 'class',
-    attrValue: '[a-zA-Z0-9- ]*' + classname + '[a-zA-Z0-9- ]*'
+    attrValue: '[a-zA-Z0-9- ]*' + classname + '[a-zA-Z0-9- ]*',
   });
   return simplified ? simplify(out) : out;
-};
+}
