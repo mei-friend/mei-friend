@@ -35,23 +35,21 @@ addEventListener(
         if (tk) tk.destroy();
         // here we attempt to delete/destroy the toolkit module...
         if (typeof verovio !== 'undefined' && 'module' in verovio) delete verovio.module;
-        // if (typeof verovio !== 'undefined')
-        //   verovio = {};
-        // if (typeof Module !== 'undefined') {
-        //   console.log('MODULE: ', Module);
-        //   Module = {};
-        //   console.log('MODULE: ', Module);
-        // }
         importScripts(tkUrl);
         if (['3.7.0*', '3.8.1*', '3.9.0*', '3.10.0*'].includes(result.msg)) {
           console.log('Load Verovio 3.10.0 or earlier');
           Module.onRuntimeInitialized = loadVerovio;
-        } else verovio.module.onRuntimeInitialized = loadVerovio;
+        } else {
+          verovio.module.onRuntimeInitialized = loadVerovio;
+        }
         return;
       case 'updateAll':
         try {
           tkOptions = result.options;
-          if (result.speedMode && !result.computePageBreaks && tkOptions.breaks != 'none') tkOptions.breaks = 'encoded';
+          let breaks = tkOptions.breaks;
+          if (result.speedMode && !result.computePageBreaks && tkOptions.breaks != 'none') {
+            tkOptions.breaks = 'encoded';
+          }
           tk.setOptions(tkOptions);
           let r = tk.loadData(result.mei);
           if (!r) {
@@ -73,12 +71,17 @@ addEventListener(
           let pg = result.speedMode && result.pageNo > 1 ? 2 : result.pageNo;
           result.svg = tk.renderToSVG(pg);
           result.cmd = 'updated';
+          if (result.speedMode) {
+            tkOptions.breaks = breaks;
+            tk.setOptions({ breaks: breaks }); // reset breaks options
+          }
         } catch (err) {
           log('updateAll: ' + err);
         }
         break;
       case 'updateData':
         try {
+          let breaks = result.breaks;
           if (result.speedMode && result.breaks != 'none') {
             result.breaks = 'encoded';
           }
@@ -101,6 +104,10 @@ addEventListener(
           result.svg = tk.renderToSVG(pg);
           result.pageCount = tk.getPageCount();
           result.cmd = 'updated';
+          if (result.speedMode) {
+            tkOptions.breaks = breaks;
+            tk.setOptions({ breaks: breaks }); // reset breaks options
+          }
         } catch (err) {
           log('updateData: ' + err);
         }
@@ -122,7 +129,10 @@ addEventListener(
       case 'updateLayout':
         try {
           tkOptions = result.options;
-          if (result.speedMode && result.breaks != 'none') tkOptions.breaks = 'encoded';
+          let breaks = tkOptions.breaks;
+          if (result.speedMode && tkOptions.breaks != 'none') {
+            tkOptions.breaks = 'encoded';
+          }
           tk.setOptions(tkOptions);
           tk.redoLayout();
           result.setCursorToPageBeginning = true;
@@ -135,6 +145,10 @@ addEventListener(
           result.svg = tk.renderToSVG(pg);
           result.pageCount = tk.getPageCount();
           result.cmd = 'updated';
+          if (result.speedMode) {
+            tkOptions.breaks = breaks;
+            tk.setOptions({ breaks: breaks }); // reset breaks options
+          }
         } catch (err) {
           log('updateLayout: ' + err);
         }
@@ -142,7 +156,10 @@ addEventListener(
       case 'updateOption': // just update option without redoing layout
         try {
           tkOptions = result.options;
-          if (result.speedMode && result.breaks != 'none') tkOptions.breaks = 'encoded';
+          let breaks = tkOptions.breaks;
+          if (result.speedMode && tkOptions.breaks != 'none') {
+            tkOptions.breaks = 'encoded';
+          }
           tk.setOptions(tkOptions);
           result.setCursorToPageBeginning = true;
           if (result.xmlId && !result.speedMode) {
@@ -154,6 +171,10 @@ addEventListener(
           result.svg = tk.renderToSVG(pg);
           result.pageCount = tk.getPageCount();
           result.cmd = 'updated';
+          if (result.speedMode) {
+            tkOptions.breaks = breaks;
+            tk.setOptions({ breaks: breaks }); // reset breaks options
+          }
         } catch (err) {
           log('updateOption: ' + err);
         }
@@ -175,7 +196,9 @@ addEventListener(
             pageCount: tk.getPageCount(),
             toolkitDataOutdated: false,
           };
-          if (tkOptions) tk.setOptions(tkOptions);
+          if (tkOptions) {
+            tk.setOptions(tkOptions);
+          }
         } catch (err) {
           log('importData: ' + err);
         }
@@ -198,7 +221,9 @@ addEventListener(
             mei: tk.getMEI(),
             pageCount: tk.getPageCount(),
           };
-          if (tkOptions) tk.setOptions(tkOptions);
+          if (tkOptions) {
+            tk.setOptions(tkOptions);
+          }
         } catch (err) {
           log('importBinaryData: ' + err);
         }
@@ -233,12 +258,12 @@ addEventListener(
         try {
           // returns original message plus svg
           if (result.speedMode) {
-            tk.setOptions({
-              breaks: 'encoded',
-            });
+            let breaks = result.breaks;
+            tk.setOptions({ breaks: 'encoded' });
             tk.loadData(result.mei);
             result.mei = '';
             result.toolkitDataOutdated = false;
+            tk.setOptions({ breaks: breaks });
           }
           let pg = result.speedMode && result.pageNo > 1 ? 2 : result.pageNo;
           result.svg = tk.renderToSVG(pg);
@@ -256,7 +281,7 @@ addEventListener(
           result.pageBreaks = {};
           for (let p = 1; p <= result.pageCount; p++) {
             // one-based page numbers
-            updateProgressbar((p / result.pageCount) * 100);
+            updateProgressbar((100 * p) / result.pageCount, 'pageBreaks');
             // console.log('Progress: ' + p / result.pageCount * 100 + '%')
             let svgText = tk.renderToSVG(p);
             let it = svgText // find all measures
@@ -294,6 +319,111 @@ addEventListener(
         } catch (err) {
           log('exportMidi: ' + err);
         }
+        break;
+      case 'renderPdf':
+        if (typeof PDFDocument === 'undefined') {
+          // importScripts('https://github.com/foliojs/pdfkit/releases/download/v0.12.1/pdfkit.standalone.js');
+          importScripts('../pdfkit/pdfkit.standalone.js');
+        }
+        if (typeof SVGtoPDF === 'undefined') {
+          // importScripts('https://alafr.github.io/SVG-to-PDFKit/examples/pdfkit.js');
+          importScripts('../pdfkit/svgtopdf.js');
+        }
+        if (typeof blobStream === 'undefined') {
+          // importScripts('https://alafr.github.io/SVG-to-PDFKit/examples/blobstream.js');
+          importScripts('../pdfkit/blob-stream.js');
+        }
+        updateProgressbar(100 / result.pages.length, 'PDF');
+
+        tkOptions = result.options;
+        tkOptions.scale = 100;
+        tkOptions.svgViewBox = true;
+        // const mm2pt = 1 / (0.352777778 * 10);
+        const mm2pt = 1 / (254 / 72);
+        // Verovio has tenth of mm as SVG unit (unless mmOption is set)
+
+        let pdfFormat = [];
+        pdfFormat.push(tkOptions.pageWidth * mm2pt);
+        pdfFormat.push(tkOptions.pageHeight * mm2pt);
+        let pdfOrientation = tkOptions.pageWidth < tkOptions.pageHeight ? 'portrait' : 'landscape';
+        console.log('Width/Height: ' + pdfFormat[0] + '/' + pdfFormat[1] + ', ' + pdfOrientation);
+
+        const doc = new PDFDocument({
+          autoFirstPage: false,
+          compress: true,
+          useCSS: true,
+          size: pdfFormat,
+          layout: pdfOrientation,
+        });
+
+        // create PDF file
+        doc.info = {
+          Title: result.title.split('/').pop(),
+          Author: 'Created by mei-friend',
+          Subject: 'Version ' + result.version + ' (' + result.versionDate + ')',
+          Keywords: 'Music encoding, MEI, mei-friend, public-domain',
+          CreationDate: new Date(),
+        };
+
+        // create stream
+        const stream = doc.pipe(blobStream());
+
+        // Font callback and buffer for pdfkit
+        let fontCallback = function (family, bold, italic, fontOptions) {
+          if (family === 'VerovioText') {
+            return family;
+          }
+          if (family.match(/(?:^|,)\s*sans-serif\s*$/) || true) {
+            if (bold && italic) {
+              return 'Times-BoldItalic';
+            }
+            if (bold && !italic) {
+              return 'Times-Bold';
+            }
+            if (!bold && italic) {
+              return 'Times-Italic';
+            }
+            if (!bold && !italic) {
+              return 'Times-Roman';
+            }
+          }
+        };
+        let options = {};
+        options.fontCallback = fontCallback;
+
+        try {
+          tk.setOptions(tkOptions);
+          let breaks = tkOptions.breaks;
+
+          if (result.speedMode) {
+            tk.setOptions({ breaks: 'encoded' });
+            tk.loadData(result.msg);
+          }
+
+          // add pages to the file
+          let c = 0;
+          for (p of result.pages) {
+            updateProgressbar((100 * ++c) / result.pages.length, 'PDF');
+            let svg = tk.renderToSVG(p);
+            doc.addPage();
+            SVGtoPDF(doc, svg, 0, 0, options);
+            console.log('vrvWorker adding page ' + p + '/' + result.pages.length + '.');
+          }
+          if (result.speedMode) {
+            tk.setOptions({ breaks: breaks });
+          }
+        } catch (err) {
+          log('saveAsPdf: ' + err);
+        }
+        doc.end();
+        result.cmd = '';
+
+        stream.on('finish', function () {
+          // get a blob you can do whatever you like with
+          result.blob = stream.toBlob('application/pdf');
+          result.cmd = 'pdfBlob';
+          postMessage(result);
+        });
         break;
       case 'getTimeForElement':
         console.log('worker: getTimeForElement: ', result.msg);
@@ -357,9 +487,10 @@ function log(e) {
   return;
 }
 
-function updateProgressbar(perc) {
+function updateProgressbar(percentage, fileFormat) {
   postMessage({
     cmd: 'updateProgressbar',
-    percentage: perc,
+    percentage: percentage,
+    fileFormat: fileFormat,
   });
 }

@@ -158,7 +158,7 @@
           ><img src="{{ url_for('static', filename='owl/menu-logo.svg') }}" alt="mei-friend" id="mei-friend-logo"
         /></a>
       </div>
-      <div class="navbar">
+      <div class="navbar" id="navigationBar">
         <div class="dropdown">
           <button class="dropbtn GithubButton" id="GithubButton">
             <svg id="GithubLogo" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
@@ -184,6 +184,7 @@
             <a id="SaveMei" href="#">Save MEI<span class="keyShortCut cmdKey">S</span></a>
             <a id="SaveSvg" href="#">Save SVG</a>
             <a id="SaveMidi" href="#">Save MIDI</a>
+            <a id="PrintPreview" href="#">Preview PDF<span class="keyShortCut cmdKey">P</span></a>
           </div>
         </div>
         <div class="dropdown">
@@ -620,7 +621,7 @@
     <div id="midiPlaybackControlBar">
       <midi-player id="midi-player" sound-font> </midi-player>
       <span
-        id="midi-speedmode-indicator"
+        id="midiSpeedmodeIndicator"
         title="Speed mode is active; only playing MIDI for current page. To play the entire encoding, disable speed mode."
         >Speed mode</span
       >
@@ -628,7 +629,7 @@
     </div>
 
     <div class="footer">
-      <div id="midi-player-contextual">
+      <div id="midiPlayerContextual">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
           <path
             d="M7.563 2.069A.75.75 0 018 2.75v10.5a.751.751 0 01-1.238.57L3.472 11H1.75A1.75 1.75 0 010 9.25v-2.5C0 5.784.784 5 1.75 5h1.723l3.289-2.82a.75.75 0 01.801-.111zM6.5 4.38L4.238 6.319a.748.748 0 01-.488.181h-2a.25.25 0 00-.25.25v2.5c0 .138.112.25.25.25h2c.179 0 .352.064.488.18L6.5 11.62zm6.096-2.038a.75.75 0 011.06 0 8 8 0 010 11.314.751.751 0 01-1.042-.018.751.751 0 01-.018-1.042 6.5 6.5 0 000-9.193.75.75 0 010-1.06zm-1.06 2.121l-.001.001a5 5 0 010 7.07.749.749 0 01-1.275-.326.749.749 0 01.215-.734 3.5 3.5 0 000-4.95.75.75 0 111.061-1.061z"
@@ -654,6 +655,7 @@
           </svg>
         </button>
         <button
+          id="meifriendOptionsTab"
           class="tablink"
           onclick="switchTab(event, 'settingsPanel')"
           title="mei-friend Settings"
@@ -662,6 +664,7 @@
           mei-friend
         </button>
         <button
+          id="editorOptionsTab"
           class="tablink defaultOpen"
           onclick="switchTab(event, 'settingsPanel')"
           title="Editor Settings"
@@ -670,6 +673,7 @@
           Editor
         </button>
         <button
+          id="verovioOptionsTab"
           class="tablink"
           onclick="switchTab(event, 'settingsPanel')"
           title="Verovio Options"
@@ -701,7 +705,7 @@
     <script>
       // menu bar behavior like MacOS menu bars
       let show = false;
-      document.querySelector('.navbar').addEventListener('click', (ev) => {
+      document.getElementById('navigationBar').addEventListener('click', (ev) => {
         // Notes on menu switching behaviour:
         // We want menu bars to work like Mac OS bars, EXCEPT that
         // ... the GitHub menu should stay open on clicks (=> navigation)
@@ -717,7 +721,7 @@
           // otherwise, we just use the target as is.
           targetAfterClick = ev.target;
         }
-        var menuList = document.querySelectorAll('.dropdown-content');
+        var menuList = document.getElementById('navigationBar').querySelectorAll('.dropdown-content');
         menuList.forEach((e) => {
           if (
             show &&
@@ -752,11 +756,15 @@
         let containingElement = document.getElementById(containingElementId);
         if (containingElement) {
           // hide all tab contents except tabId
-          for (let cont of containingElement.getElementsByClassName('tabcontent'))
+          for (let cont of containingElement.getElementsByClassName('tabcontent')) {
             cont.style.display = cont.id === tabId ? 'block' : 'none';
+          }
           // remove class "active" from tablinks except for current target
-          for (let tab of containingElement.getElementsByClassName('tablink'))
+          for (let tab of containingElement.getElementsByClassName('tablink')) {
+            // console.log('tab: ', tab);
+            // console.log('ev.currentTarget: ', ev.currentTarget);
             tab === ev.currentTarget ? tab.classList.add('active') : tab.classList.remove('active');
+          }
         }
       }
 

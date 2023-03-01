@@ -1,6 +1,6 @@
 // mei-friend version and date
-export const version = '0.8.4';
-export const versionDate = '27 Feb 2023';
+export const version = '0.8.5';
+export const versionDate = '28 Feb 2023';
 
 var vrvWorker;
 var spdWorker;
@@ -155,7 +155,13 @@ export const samp = {
 };
 export const fontList = ['Leipzig', 'Bravura', 'Gootville', 'Leland', 'Petaluma'];
 
-import { setOrientation, addNotationResizerHandlers, addFacsimilerResizerHandlers } from './resizer.js';
+import {
+  setOrientation,
+  addNotationResizerHandlers,
+  addFacsimilerResizerHandlers,
+  setNotationProportion,
+  setFacsimileProportion,
+} from './resizer.js';
 import { addAnnotationHandlers, clearAnnotations, readAnnots, refreshAnnotations } from './annotation.js';
 import { dropHandler, dragEnter, dragOverHandler, dragLeave } from './dragger.js';
 import { openUrl, openUrlCancel } from './open-url.js';
@@ -167,7 +173,7 @@ import {
   manualCurrentPage,
   generateSectionSelect,
 } from './control-menu.js';
-import { clock, highlight, unverified, xCircleFill } from '../css/icons.js';
+import { clock, unverified, xCircleFill } from '../css/icons.js';
 import { setCursorToId } from './utils.js';
 import { getInMeasure, navElsSelector, getElementAtCursor } from './dom-utils.js';
 import { addDragSelector } from './drag-selector.js';
@@ -215,9 +221,9 @@ const defaultVerovioOptions = {
   mdivAll: true,
   outputIndent: 3,
   pageMarginLeft: 50,
-  pageMarginRight: 25,
-  pageMarginBottom: 10,
-  pageMarginTop: 25,
+  pageMarginRight: 50,
+  pageMarginBottom: 15,
+  pageMarginTop: 50,
   spacingLinear: 0.2,
   spacingNonLinear: 0.5,
   minLastJustification: 0,
@@ -591,7 +597,7 @@ document.addEventListener('DOMContentLoaded', function () {
   mp.addEventListener('note', (e) => highlightNotesAtMidiPlaybackTime(e));
   mp.addEventListener('load', seekMidiPlaybackToSelectionOrPage);
   // decide whether to show MIDI playback shortcut (bubble), based on setting
-  document.getElementById('midi-player-contextual').style.display = document.getElementById(
+  document.getElementById('midiPlayerContextual').style.display = document.getElementById(
     'showMidiPlaybackContextualBubble'
   ).checked
     ? 'block'
@@ -766,7 +772,9 @@ document.addEventListener('DOMContentLoaded', function () {
   } else {
     fp = defaultFacsimilePorportion;
   }
-  setOrientation(cm, o, fo, np, fp, v, storage);
+  setNotationProportion(np);
+  setFacsimileProportion(fp);
+  setOrientation(cm, o, fo, v, storage);
 
   addEventListeners(v, cm);
   addAnnotationHandlers();
@@ -775,7 +783,7 @@ document.addEventListener('DOMContentLoaded', function () {
   let doit;
   window.onresize = () => {
     clearTimeout(doit); // wait half a second before re-calculating orientation
-    doit = setTimeout(() => setOrientation(cm, '', '', -1, -1, v, storage), 500);
+    doit = setTimeout(() => setOrientation(cm, '', '', v, storage), 500);
   };
 
   setKeyMap(defaultKeyMap);
@@ -928,7 +936,7 @@ async function vrvWorkerEventsHandler(ev) {
         v.pageCount = Object.keys(v.pageBreaks).length;
       }
       // update only if still same page
-      if (v.currentPage === ev.data.pageNo || ev.data.forceUpdate || ev.data.computePageBreaks) {
+      if (v.currentPage === ev.data.pageNo || ev.data.forceUpdate || ev.data.computePageBreaks || v.pdfMode) {
         if (ev.data.forceUpdate) {
           v.currentPage = ev.data.pageNo;
         }
@@ -944,6 +952,11 @@ async function vrvWorkerEventsHandler(ev) {
         v.updateHighlight(cm);
         refreshAnnotations(false);
         v.scrollSvg(cm);
+        if (v.pdfMode) {
+          // switch on frame, when in pdf mode
+          const svg = document.querySelector('#verovio-panel svg');
+          if (svg) svg.classList.add('showFrame');
+        }
       }
       if (mp.playing) {
         highlightNotesAtMidiPlaybackTime();
@@ -980,7 +993,7 @@ async function vrvWorkerEventsHandler(ev) {
       break;
     case 'downloadMidiFile': // export MIDI file
       blob = midiDataToBlob(ev.data.midi);
-      var a = document.createElement('a');
+      let a = document.createElement('a');
       a.download = meiFileName.substring(meiFileName.lastIndexOf('/') + 1).replace(/\.[^/.]+$/, '.mid');
       a.href = window.URL.createObjectURL(blob);
       a.click();
@@ -995,6 +1008,13 @@ async function vrvWorkerEventsHandler(ev) {
           mp.noteSequence = noteSequence;
         });
       }
+      break;
+    case 'pdfBlob':
+      document.querySelector('.statusbar').innerHTML = meiFileName.split('/').pop() + ' converted to PDF.';
+      let aa = document.createElement('a');
+      aa.download = meiFileName.substring(meiFileName.lastIndexOf('/') + 1).replace(/\.[^/.]+$/, '.pdf');
+      aa.href = window.URL.createObjectURL(ev.data.blob);
+      aa.click();
       break;
     case 'timeForElement': // receive time for element to start midi playback
       // console.log('Received time for element: ', ev.data);
@@ -1014,7 +1034,8 @@ async function vrvWorkerEventsHandler(ev) {
       v.busy(false);
       break;
     case 'updateProgressbar':
-      document.querySelector('.statusbar').innerHTML = 'Compute page breaks: ' + Math.round(ev.data.percentage) + '%';
+      document.querySelector('.statusbar').innerHTML =
+        'Compute ' + ev.data.fileFormat + ': ' + Math.round(ev.data.percentage) + '%';
       setProgressBar(ev.data.percentage);
       break;
     case 'error':
@@ -1023,7 +1044,7 @@ async function vrvWorkerEventsHandler(ev) {
       v.busy(false);
       break;
   }
-}
+} // vrvWorkerEventsHandler()
 
 // handles select (& page) input parameter from URL arguments ".../?select=..."
 function handleURLParamSelect() {
@@ -1314,25 +1335,25 @@ export let cmd = {
   previousMeasure: () => v.navigate(cm, 'measure', 'backwards'),
   layerUp: () => v.navigate(cm, 'layer', 'upwards'),
   layerDown: () => v.navigate(cm, 'layer', 'downwards'),
-  notationTop: () => setOrientation(cm, 'top', '', -1, -1, v, storage),
-  notationBottom: () => setOrientation(cm, 'bottom', '', -1, -1, v, storage),
-  notationLeft: () => setOrientation(cm, 'left', '', -1, -1, v, storage),
-  notationRight: () => setOrientation(cm, 'right', '', -1, -1, v, storage),
-  facsimileTop: () => setOrientation(cm, '', 'top', -1, -1, v, storage),
-  facsimileBottom: () => setOrientation(cm, '', 'bottom', -1, -1, v, storage),
-  facsimileLeft: () => setOrientation(cm, '', 'left', -1, -1, v, storage),
-  facsimileRight: () => setOrientation(cm, '', 'right', -1, -1, v, storage),
+  notationTop: () => setOrientation(cm, 'top', '', v, storage),
+  notationBottom: () => setOrientation(cm, 'bottom', '', v, storage),
+  notationLeft: () => setOrientation(cm, 'left', '', v, storage),
+  notationRight: () => setOrientation(cm, 'right', '', v, storage),
+  facsimileTop: () => setOrientation(cm, '', 'top', v, storage),
+  facsimileBottom: () => setOrientation(cm, '', 'bottom', v, storage),
+  facsimileLeft: () => setOrientation(cm, '', 'left', v, storage),
+  facsimileRight: () => setOrientation(cm, '', 'right', v, storage),
   showFacsimilePanel: () => {
     document.getElementById('showFacsimilePanel').checked = true;
-    setOrientation(cm, '', '', -1, -1, v);
+    setOrientation(cm, '', '', v);
   },
   hideFacsimilePanel: () => {
     document.getElementById('showFacsimilePanel').checked = false;
-    setOrientation(cm, '', '', -1, -1, v);
+    setOrientation(cm, '', '', v);
   },
   toggleFacsimilePanel: () => {
     document.getElementById('showFacsimilePanel').checked = !document.getElementById('showFacsimilePanel').checked;
-    setOrientation(cm, '', '', -1, -1, v);
+    setOrientation(cm, '', '', v);
   },
   checkFacsimile: () => {
     let tf = document.getElementById('titleFacsimilePanel');
@@ -1347,6 +1368,10 @@ export let cmd = {
   showSettingsPanel: () => v.showSettingsPanel(),
   hideSettingsPanel: () => v.hideSettingsPanel(),
   toggleSettingsPanel: (ev) => v.toggleSettingsPanel(ev),
+  togglePdfMode: () => (v.pdfMode ? v.saveAsPdf() : v.pageModeOn()),
+  pageModeOn: () => v.pageModeOn(),
+  pageModeOff: () => v.pageModeOff(),
+  saveAsPdf: () => v.saveAsPdf(),
   filterSettings: () => v.applySettingsFilter(),
   filterReset: () => {
     document.getElementById('filterSettings').value = '';
@@ -1361,10 +1386,10 @@ export let cmd = {
     if (document.getElementById('showMidiPlaybackControlBar').checked) {
       // request MIDI rendering from Verovio worker
       requestMidiFromVrvWorker(true);
-      document.getElementById('midi-player-contextual').style.display = 'none';
+      document.getElementById('midiPlayerContextual').style.display = 'none';
     } else {
       if (document.getElementById('showMidiPlaybackContextualBubble').checked) {
-        document.getElementById('midi-player-contextual').style.display = 'block';
+        document.getElementById('midiPlayerContextual').style.display = 'block';
       }
       if (mp.playing) {
         // stop player when control bar is closed
@@ -1514,6 +1539,8 @@ export let cmd = {
       document.getElementById('settingsPanel') === document.activeElement.closest('#settingsPanel')
     ) {
       cmd.filterReset();
+    } else if (v.pdfMode) {
+      cmd.pageModeOff();
     } else {
       v.hideAlerts();
       v.toggleValidationReportVisibility('hidden');
@@ -1601,13 +1628,13 @@ function addEventListeners(v, cm) {
     // if MIDI control bar not showing, update (show or hide) bubble
     if (!document.getElementById('showMidiPlaybackControlBarButton').checked) {
       if (e.target.checked) {
-        document.getElementById('midi-player-contextual').style.display = 'block';
+        document.getElementById('midiPlayerContextual').style.display = 'block';
       } else {
-        document.getElementById('midi-player-contextual').style.display = 'none';
+        document.getElementById('midiPlayerContextual').style.display = 'none';
       }
     }
   });
-  document.getElementById('midi-player-contextual').addEventListener('click', () => {
+  document.getElementById('midiPlayerContextual').addEventListener('click', () => {
     requestPlaybackOnLoad();
     cmd.toggleMidiPlaybackControlBar();
   });
@@ -1640,6 +1667,7 @@ function addEventListeners(v, cm) {
   document.getElementById('SaveMei').addEventListener('click', downloadMei);
   document.getElementById('SaveSvg').addEventListener('click', downloadSvg);
   document.getElementById('SaveMidi').addEventListener('click', () => requestMidiFromVrvWorker());
+  document.getElementById('PrintPreview').addEventListener('click', cmd.pageModeOn);
 
   // edit dialogs
   document.getElementById('undo').addEventListener('click', cmd.undo);
@@ -1676,7 +1704,7 @@ function addEventListeners(v, cm) {
   // Zooming notation with buttons
   document.getElementById('decrease-scale-btn').addEventListener('click', cmd.zoomOut);
   document.getElementById('increase-scale-btn').addEventListener('click', cmd.zoomIn);
-  document.getElementById('verovio-zoom').addEventListener('input', cmd.zoomSlider);
+  document.getElementById('verovio-zoom').addEventListener('change', cmd.zoomSlider);
 
   // Zooming notation with mouse wheel
   vp.addEventListener('wheel', (ev) => {
@@ -1690,7 +1718,7 @@ function addEventListeners(v, cm) {
   // Zooming facsimile with buttons
   document.getElementById('facs-decrease-scale-btn').addEventListener('click', cmd.facsZoomOut);
   document.getElementById('facs-increase-scale-btn').addEventListener('click', cmd.facsZoomIn);
-  document.getElementById('facsimile-zoom').addEventListener('input', cmd.facsZoomSlider);
+  document.getElementById('facsimile-zoom').addEventListener('change', cmd.facsZoomSlider);
 
   // Zooming facsimile with mouse wheel
   let ip = document.getElementById('facsimile-panel');
@@ -1712,7 +1740,7 @@ function addEventListeners(v, cm) {
   // facsimile edit zones
   document.getElementById('facsimile-edit-zones-checkbox').addEventListener('click', (e) => {
     document.getElementById('editFacsimileZones').checked = e.target.checked;
-    setOrientation(cm, '', '', -1, -1, v);
+    setOrientation(cm, '', '', v);
   });
 
   // facsimile close button
@@ -1752,6 +1780,9 @@ function addEventListeners(v, cm) {
   document.getElementById('forwards-btn').addEventListener('click', cmd.nextNote);
   document.getElementById('upwards-btn').addEventListener('click', cmd.layerUp);
   document.getElementById('downwards-btn').addEventListener('click', cmd.layerDown);
+  // pdf functionality
+  document.getElementById('pdf-save-button').addEventListener('click', cmd.saveAsPdf);
+  document.getElementById('pdf-close-button').addEventListener('click', cmd.pageModeOff);
   // manipulation
   document.getElementById('invertPlacement').addEventListener('click', cmd.invertPlacement);
   document.getElementById('betweenPlacement').addEventListener('click', cmd.betweenPlacement);
@@ -1903,7 +1934,7 @@ function addEventListeners(v, cm) {
     if (sm) sm.checked = v.speedMode;
     if (document.getElementById('showMidiPlaybackControlBar').checked) {
       startMidiTimeout(true);
-      document.getElementById('midi-speedmode-indicator').style.display = v.speedMode ? 'inline' : 'none';
+      document.getElementById('midiSpeedmodeIndicator').style.display = v.speedMode ? 'inline' : 'none';
     }
     v.updateAll(cm, {}, v.selectedElements[0]);
   });
@@ -2058,10 +2089,12 @@ function setKeyMap(keyMapFilePath) {
         if (el) {
           el.setAttribute('tabindex', '-1');
           el.addEventListener('keydown', (ev) => {
-            if (document.activeElement.id !== 'pagination2') {
-              ev.stopPropagation();
-              ev.preventDefault();
+            if (['pagination2', 'selectTo', 'selectFrom', 'selectRange'].includes(document.activeElement.id)) {
+              return;
             }
+            ev.stopPropagation();
+            ev.preventDefault();
+
             let keyName = ev.key;
             if (ev.code.toLowerCase() === 'space') keyName = 'space';
             // arrowdown -> down

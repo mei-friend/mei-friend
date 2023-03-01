@@ -1,4 +1,10 @@
 # mei-friend-online CHANGELOG.md
+### 0.8.5 PDF export
+* Preview PDF mode with page-view of notation, triggered via menu item or `CMD/CTRL + P`
+* PDF preview with click-select and drag-select disabled
+* Page range selector for selecting all, current, page range, or individual pages (e.g., 2,5-8)
+* Download PDF file (with pages as selected in page-range settings)
+
 ### 0.8.4 patch
 * Drag-select chord instead of note with `ALT`
 * Add @staff to clef change element

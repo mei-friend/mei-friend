@@ -115,7 +115,7 @@
 }
 
 /* Links inside the dropdown */
-.dropdown-content a {
+.dropdown-content a, .dropdown-content div {
   cursor: pointer;
   float: none;
   color: var(--textColor);
@@ -329,4 +329,48 @@
 #commitMessageInput[disabled],
 #commitButton[disabled] {
   cursor: not-allowed;
+}
+
+.pdfOff {
+  display: none;
+}
+
+.pdfOn {
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin-top: 50px;
+  margin-bottom: 25px;
+  margin-left: 5px;
+  margin-right: 365px;
+  border: 2px solid var(--overlayBorderColor);
+  border-radius: 4px;
+  background-color: var(--backgroundColor);
+  background-blend-mode: difference;
+  opacity: .98;
+  z-index: 200; 
+}
+
+#pageRangeSelectorDiv {
+  max-width: 160px;
+}
+
+#pageRangeItems, .dropdown-content div {
+  max-width: 160px;
+  float: left;
+}
+
+#pageRangeItems .floatRight {
+  float: right;
+}
+
+#pageRangeSelectorDiv input[type="number"] {
+  max-width: 45px;
+}
+
+#pageRangeSelectorDiv input[type="text"] {
+  max-width: 120px;
 }

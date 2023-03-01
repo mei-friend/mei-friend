@@ -1,6 +1,7 @@
 import * as icon from './../css/icons.js';
 import { fontList, platform } from './main.js';
 import { svgNameSpace } from './dom-utils.js';
+import { createPageRangeSelector } from './page-range-selector.js';
 
 // constructs the div structure of #notation parent
 export function createNotationDiv(parentElement, scale) {
@@ -348,6 +349,37 @@ export function createNotationControlBar(parentElement, scale) {
 
   vrvCtrlMenu.appendChild(speedDiv);
 
+  let filler = document.createElement('div');
+  filler.classList.add('fillSpace');
+  vrvCtrlMenu.appendChild(filler);
+
+  // page range selector for PDF export
+  vrvCtrlMenu.appendChild(createPageRangeSelector('none'));
+
+  // pdf functionality, display none
+  let pdfCtrlDiv = document.createElement('div');
+  pdfCtrlDiv.id = 'pdf-control-div';
+  pdfCtrlDiv.classList.add('controls');
+  pdfCtrlDiv.style.display = 'none';
+  vrvCtrlMenu.appendChild(pdfCtrlDiv);
+
+  let savePdfButton = document.createElement('button');
+  savePdfButton.id = 'pdf-save-button';
+  savePdfButton.classList.add('btn');
+  // savePdfButton.classList.add('icon');
+  savePdfButton.innerHTML = 'Save PDF'; // icon.pdfIcon;
+  savePdfButton.classList.add('inline-block-tight');
+  savePdfButton.title = 'Save as PDF';
+  pdfCtrlDiv.appendChild(savePdfButton);
+
+  let pdfCloseButton = document.createElement('div');
+  pdfCloseButton.id = 'pdf-close-button';
+  pdfCloseButton.title = 'Close print view';
+  pdfCloseButton.style.display = 'none';
+  pdfCloseButton.classList.add('topright');
+  pdfCloseButton.innerHTML = '&times;'; // icon.xCircle;
+  vrvCtrlMenu.appendChild(pdfCloseButton);
+
   parentElement.appendChild(vrvCtrlMenu);
 } // createNotationControlBar()
 
@@ -460,6 +492,69 @@ export function createFacsimileControlBar(parentElement) {
   facsCtrlBar.appendChild(facsimileCloseButton);
 } // createFacsimileControlBar()
 
+export function showPdfButtons(show = true) {
+  document.getElementById('pageRangeSelectorDiv').style.display = show ? '' : 'none';
+  document.getElementById('pdf-control-div').style.display = show ? '' : 'none';
+  document.getElementById('pdf-close-button').style.display = show ? '' : 'none';
+} // showPdfButtons()
+
+// list of DOM object id string that will be saved and restored
+// with getControlMenuState() and setControlMenuState()
+const listOfObjects = [
+  'controlMenuFlipToPageControls',
+  'controlMenuUpdateNotation',
+  'controlMenuFontSelector',
+  'controlMenuNavigateArrows',
+  'controlMenuSpeedmodeCheckbox',
+  'toggleSpeedMode',
+  // 'speed-label',
+];
+
+/**
+ * Returns a state object of the notation control menu
+ * @returns {object}
+ */
+export function getControlMenuState() {
+  let state = {};
+  listOfObjects.forEach((obj) => {
+    let el = document.getElementById(obj);
+    if (el) {
+      if (obj === 'speed-label') {
+        state[obj] = {};
+        state[obj]['textContent'] = el.textContent;
+        state[obj]['title'] = el.title;
+      } else {
+        state[obj] = el.checked;
+      }
+    }
+  });
+  return state;
+} // getControlMenuState()
+
+/**
+ * Sets the state of the notation control menu
+ * @param {object} state
+ */
+export function setControlMenuState(state) {
+  listOfObjects.forEach((obj) => {
+    if (obj === 'speed-label') {
+      let el = document.getElementById(obj);
+      el.textContent = state[obj].textContent;
+      el.title = state[obj].title;
+    } else {
+      setCheckbox(obj, state[obj]);
+    }
+  });
+} // setControlMenuState()
+
+export function setCheckbox(id, state) {
+  let el = document.getElementById(id);
+  if (el) {
+    el.checked = state;
+    el.dispatchEvent(new Event('input', { bubbles: true }));
+  }
+} // setCheckbox()
+
 export function manualCurrentPage(v, cm, ev) {
   console.debug('manualCurrentPage: ', ev);
   ev.stopPropagation();
@@ -469,7 +564,7 @@ export function manualCurrentPage(v, cm, ev) {
     if (pageInput) v.updatePage(cm, pageInput);
     v.updatePageNumDisplay();
   }
-}
+} // manualCurrentPage()
 
 export function setBreaksOptions(tkAvailableOptions, defaultValue = 'auto') {
   if (defaultValue === '') defaultValue = 'auto';
@@ -487,20 +582,7 @@ export function setBreaksOptions(tkAvailableOptions, defaultValue = 'auto') {
     breaksEl[breaksEl.options.length] = new Option(breaksOpts[key], key);
     if (key === 'smart') breaksEl[breaksEl.length - 1].disabled = true;
   }
-  // var breaks = utils.findKey('breaks', tkAvailableOptions);
-  // for (let index of breaks.values) {
-  //   if (breaksOpts[index]) {
-  //     breaksEl[breaksEl.options.length] = new Option(breaksOpts[index], index);
-  //     if (index === defaultValue) {
-  //       breaksEl[breaksEl.options.length - 1].selected = 'selected';
-  //     }
-  //   } else {
-  //     breaksEl[breaksEl.options.length] = new Option(index, index);
-  //   }
-  // disable breaks=smart by default; only enabled with speedMode=false
-  //   if (index === 'smart') breaksEl[breaksEl.length - 1].disabled = true;
-  // }
-}
+} // setBreaksOptions()
 
 export function handleSmartBreaksOption(speedMode) {
   let options = Array.from(document.getElementById('breaks-select').options);
@@ -514,7 +596,7 @@ export function handleSmartBreaksOption(speedMode) {
       o.disabled = speedMode;
     }
   });
-}
+} // handleSmartBreaksOption()
 
 // checks xmlDoc for section, ending, lem, rdg elements for quick navigation
 export function generateSectionSelect(xmlDoc) {
@@ -538,7 +620,7 @@ export function generateSectionSelect(xmlDoc) {
     if (sections.length === 2) sections.pop(); // remove if only the one section
   }
   return sections;
-}
+} // generateSectionSelect()
 
 export function addModifyerKeys(root) {
   let modifierKeys = {
@@ -589,10 +671,9 @@ export function addModifyerKeys(root) {
   Object.keys(modifierKeys).forEach((k) => {
     root.querySelectorAll('.' + k).forEach((e) => {
       const icon = platform.startsWith('mac') ? modifierKeys[k].symbol : modifierKeys[k].text;
-      const span =
-        '<span class="keyIcon" title="' + modifierKeys[k].description + '">' + icon + '</span>';
+      const span = '<span class="keyIcon" title="' + modifierKeys[k].description + '">' + icon + '</span>';
       if (!e.querySelector('span')) e.innerHTML = span + '<span class="keyIcon">' + e.innerHTML + '</span>';
       else e.innerHTML = span + e.innerHTML;
     });
   });
-}
+} // addModifyerKeys()
