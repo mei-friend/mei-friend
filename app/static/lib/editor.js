@@ -1536,8 +1536,8 @@ function getStaffNumbersForClosestStaffGroup(v, element) {
     if (startElement) {
       staffNumber = startElement.closest('staff')?.getAttribute('n');
     }
-  } else if (element.hasAttribute('staff') && element.hasAttribute('n')) {
-    staffNumber = element.getAttribute('n');
+  } else if (element.hasAttribute('staff')) {
+    staffNumber = element.getAttribute('staff');
   }
   if (staffNumber) {
     const staffList = v.xmlDoc.querySelector('scoreDef')?.querySelectorAll('staffDef');
