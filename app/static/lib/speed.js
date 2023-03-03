@@ -206,9 +206,11 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
         // For 'encodedBreaks', `breaks` is an Array
         if (
           countNow &&
-          currentNodeName !== 'ending' && 
-         ( /** @type {string[]} */ (breaks).includes(currentNodeName) ||
-            (sb = /** @type {Element} */ (currentNode).querySelector(breaksSelector)))
+          currentNodeName !== 'ending' &&
+          /** @type {string[]} */ (
+            breaks.includes(currentNodeName) ||
+              (sb = /** @type {Element} */ (currentNode).querySelector(breaksSelector))
+          )
         ) {
           if (dutils.countAsBreak(sb ? sb : currentNode)) p++;
           continue;
@@ -582,17 +584,26 @@ export function listPageSpanningElements(xmlScore, breaks, breaksOption) {
  */
 function getStaffNumber(element) {
   return element.closest('staff,staffDef')?.getAttribute('n') || '';
-}
+} // getStaffNumber()
 
 /**
  * @param {Element} scoreDef
+ * @param {string} staffNumber
  * @returns {{count: string | null, unit: string | null}}
  */
-function getMeter(scoreDef) {
+function getMeter(scoreDef, staffNumber = '') {
   let meter = {
     count: scoreDef.getAttribute('meter.count'),
     unit: scoreDef.getAttribute('meter.unit'),
   };
+
+  // try to find staffDef by staffNumber
+  if (staffNumber) {
+    const staffDef = scoreDef.querySelector('staffDef[n=' + staffNumber + ']');
+    if (staffDef) {
+      return getMeter(staffDef);
+    }
+  }
 
   if (!meter.count || !meter.unit) {
     const meterSig = scoreDef.querySelector('meterSig');
@@ -602,9 +613,80 @@ function getMeter(scoreDef) {
       unit: meterSig.getAttribute('unit'),
     };
   }
-
   return meter;
-}
+} // getMeter()
+
+/**
+ * Finds and returns a scoreDef element before the element, null otherwise
+ * @param {Document} xmlDoc
+ * @param {Element} element
+ * @returns {Element | null}
+ */
+export function getScoreDefForElement(xmlDoc, element) {
+  // find meter.count/unit
+  let elId = element.id;
+  let scoreDef = null;
+  if (elId) {
+    let scoreDefList = xmlDoc.querySelectorAll('scoreDef,[*|id="' + elId + '"]');
+    let i = 0;
+    for (let e of scoreDefList) {
+      if (e.nodeName === element.nodeName) {
+        scoreDef = scoreDefList.item(Math.max(0, i - 1));
+        break;
+      }
+      i++;
+    }
+  }
+  return scoreDef;
+} // getScoreDef()
+
+/**
+ * Returns a @tstamp (beat position) of the element within the current measure
+ * @param {Document} xmlDoc
+ * @param {Element} element
+ */
+export function getTstampForElement(xmlDoc, element) {
+  let tstamp = -1;
+  let staffNumber = getStaffNumber(element);
+  let scoreDef = getScoreDefForElement(xmlDoc, element);
+  if (scoreDef && staffNumber) {
+    const { count, unit } = getMeter(scoreDef, staffNumber);
+    if (unit) {
+      // iterate over notes before element in current layer
+      let layer = element.closest('layer');
+      if (layer) {
+        let durList = layer.querySelectorAll(att.attDurationLogical.join(','));
+        tstamp = 1;
+        durList.forEach((e) => {
+          // exclude notes within a chord
+          // TODO if (e.nodeName === 'note' && e.closest('chord')?.id)
+          tstamp += getDurationOfElement(element) / parseInt(unit);
+        });
+      }
+    }
+  }
+  return tstamp;
+} // getTstampForElement()
+
+/**
+ * Returns the @dur of a note/chord including @dots
+ * @param {Element} element
+ * @returns {number}
+ */
+export function getDurationOfElement(element) {
+  let mmDuration = 0;
+  if (element) {
+    const dur = element.getAttribute('dur');
+    if (dur) mmDuration = parseFloat(dur);
+    const dots = element.getAttribute('dots');
+    if (dots) {
+      for (let d = 0; d < parseInt(dots); d++) {
+        mmDuration += mmDuration / Math.pow(2, d);
+      }
+    }
+  }
+  return mmDuration;
+} // getDurationOfElement()
 
 /**
  * Copies all tempo-related attributes (midi.bpm, mm, mm.unit, mm.dots)
