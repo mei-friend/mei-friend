@@ -1,8 +1,8 @@
 // @ts-check
 
 /* Speed mode: just feed the current page excerpt of the MEI encoding
- * to Verovio, to minimize loading times. Enclose the requested page 
- * with dummy pages to ensure context (time-spanning elements, key 
+ * to Verovio, to minimize loading times. Enclose the requested page
+ * with dummy pages to ensure context (time-spanning elements, key
  * signatures, tempo indications, etc.)
  */
 
@@ -665,7 +665,7 @@ export function getTstampForElement(xmlDoc, element) {
           if (e.nodeName === 'note' && parentChord && durList.includes(parentChord)) continue;
           // stop adding beats when requested element is reached
           if (e.getAttribute('xml:id') === element.getAttribute('xml:id')) break;
-          tstamp += getDurationOfElement(e) / parseInt(unit);
+          tstamp += getDurationOfElement(e, parseInt(unit));
         }
       }
     }
@@ -674,26 +674,32 @@ export function getTstampForElement(xmlDoc, element) {
 } // getTstampForElement()
 
 /**
- * Returns the @dur of a note/chord including @dots, e.g., 
- * dur="4" dots="1" returns 6 (outside then divided by 4 = 1.5)
- * dur="8" dots="2" returns 14 (outside then divided by 8 = 1.75)
+ * Returns the duration of a note/chord (in beats relative to the meter unit),
+ * computed from @dur and @dots and @meterUnit
+ * 
+ * For example:
+ * dur="4" dots="1" in a x/4 meter returns 1.5
+ * dur="8" dots="2" in a x/8 meter returns 1.75
+ * dur="4" dots="2" in a x/2 meter returns 0.825
  * 
  * @param {Element} element
- * @returns {number} to be divided by meter.unit
+ * @returns {number} duration in beats, or -1 if problems
  */
-export function getDurationOfElement(element) {
-  let mmDuration = 0;
+export function getDurationOfElement(element, meterUnit = 4.0) {
+  let beatDuration = -1;
   if (element) {
     const dur = element.getAttribute('dur');
-    if (dur) mmDuration = parseFloat(dur);
+    if (dur) beatDuration = meterUnit / parseFloat(dur);
     const dots = element.getAttribute('dots');
     if (dots) {
-      for (let d = 0; d < parseInt(dots); d++) {
-        mmDuration += mmDuration / Math.pow(2, d);
+      let dotsDuration = 0;
+      for (let d = 1; d <= parseInt(dots); d++) {
+        dotsDuration += beatDuration / Math.pow(2, d);
       }
+      beatDuration += dotsDuration;
     }
   }
-  return mmDuration;
+  return beatDuration;
 } // getDurationOfElement()
 
 /**
