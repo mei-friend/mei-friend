@@ -139,6 +139,8 @@ export function addControlElement(v, cm, elName, placement, form) {
   v.selectedElements = speed.filterElements(v.selectedElements, v.xmlDoc);
   console.info('addControlElement() ', elName, placement, form);
 
+  let useTstamps = true; // TODO: introduce modifyer
+
   // find and validate startEl with @startId
   let startId = v.selectedElements[0];
   var startEl = v.xmlDoc.querySelector("[*|id='" + startId + "']");
@@ -191,17 +193,37 @@ export function addControlElement(v, cm, elName, placement, form) {
 
   // elements with both startid and endid
   if (['slur', 'tie', 'phrase', 'hairpin', 'gliss'].includes(elName)) {
-    newElement.setAttribute('startid', '#' + startId);
-    newElement.setAttribute('endid', '#' + endId);
+    if (useTstamps) {
+      newElement.setAttribute('tstamp', speed.getTstampForElement(v.xmlDoc, startEl));
+    } else {
+      newElement.setAttribute('startid', '#' + startId);
+    }
+    if (useTstamps) {
+      const m = speed.getMeasureDistanceBetweenElements(v.xmlDoc, startEl, endEl);
+      const t2 = speed.getTstampForElement(v.xmlDoc, endEl);
+      newElement.setAttribute('tstamp2', utils.writeMeasureBeat(m, t2));
+    } else {
+      newElement.setAttribute('endid', '#' + endId);
+    }
   } else if (
     // only a @startid
     ['fermata', 'dir', 'dynam', 'tempo', 'pedal', 'mordent', 'trill', 'turn'].includes(elName)
   ) {
-    newElement.setAttribute('startid', '#' + startId);
+    if (useTstamps) {
+      newElement.setAttribute('tstamp', speed.getTstampForElement(v.xmlDoc, startEl));
+    } else {
+      newElement.setAttribute('startid', '#' + startId);
+    }
   }
   // add an optional endid
   if (endId && ['dir', 'dynam', 'mordent', 'trill', 'turn'].includes(elName)) {
-    newElement.setAttribute('endid', '#' + endId);
+    if (useTstamps) {
+      const m = speed.getMeasureDistanceBetweenElements(v.xmlDoc, startEl, endEl);
+      const t2 = speed.getTstampForElement(v.xmlDoc, endEl);
+      newElement.setAttribute('tstamp2', utils.writeMeasureBeat(m, t2));
+    } else {
+      newElement.setAttribute('endid', '#' + endId);
+    }
     if (['trill'].includes(elName)) {
       // @extender for endid
       newElement.setAttribute('extender', 'true');
@@ -221,7 +243,11 @@ export function addControlElement(v, cm, elName, placement, form) {
       newElement2 = v.xmlDoc.createElementNS(dutils.meiNameSpace, elName);
       uuid2 = utils.generateXmlId(elName, v.xmlIdStyle);
       newElement2.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid2);
-      newElement2.setAttribute('startid', '#' + endId);
+      if (useTstamps) {
+        newElement.setAttribute('tstamp', speed.getTstampForElement(v.xmlDoc, endEl));
+      } else {
+        newElement.setAttribute('startid', '#' + endId);
+      }
       if (staveArray.length > 0) newElement2.setAttribute('staff', staveArray.sort().join(' '));
       newElement2.setAttribute('dir', 'up');
     }
@@ -257,6 +283,7 @@ export function addControlElement(v, cm, elName, placement, form) {
   }
 
   if (newElement2) {
+    // only for pedal up case
     endEl.closest('measure').appendChild(newElement2);
     utils.setCursorToId(cm, endId);
     let p1 = utils.moveCursorToEndOfMeasure(cm); // resets selectedElements!!

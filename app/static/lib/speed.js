@@ -210,6 +210,7 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
           countNow &&
           currentNodeName !== 'ending' &&
           /** @type {string[]} */ (
+            // @ts-ignore
             breaks.includes(currentNodeName) ||
               (sb = /** @type {Element} */ (currentNode).querySelector(breaksSelector))
           )
@@ -602,10 +603,11 @@ export function getMeter(scoreDef, staffNumber = '') {
   if (staffNumber) {
     const staffDef = scoreDef.querySelector('staffDef[n="' + staffNumber + '"]');
     if (staffDef) {
-      return getMeter(staffDef);
+      let m = getMeter(staffDef);
+      if (m.count && m.unit) return m;
     }
   }
-  // try to find a meterSig somewhere in
+  // try to find a meterSig somewhere inside scoreDef
   if (!meter.count || !meter.unit) {
     const meterSig = scoreDef.querySelector('meterSig');
     if (!meterSig) return meter;
@@ -617,25 +619,36 @@ export function getMeter(scoreDef, staffNumber = '') {
   return meter;
 } // getMeter()
 
+/** @typedef { 'meter' | 'key' | '' } property */
+
 /**
  * Finds and returns a scoreDef element before the element, null otherwise
  * @param {Document} xmlDoc
  * @param {Element} element
+ * @param {string} property
  * @returns {Element | null}
  */
-export function getScoreDefForElement(xmlDoc, element) {
+export function getScoreDefForElement(xmlDoc, element, property = '') {
   // find meter.count/unit
   let elId = element.getAttribute('xml:id');
   let scoreDef = null;
   if (elId) {
     let scoreDefList = xmlDoc.querySelectorAll('scoreDef,[*|id="' + elId + '"]');
-    let i = 0;
-    for (let e of scoreDefList) {
-      if (e.nodeName === element.nodeName) {
-        scoreDef = scoreDefList.item(Math.max(0, i - 1));
-        break;
+    let search = false;
+    for (let i = scoreDefList.length - 1; i >= 0; i--) {
+      if (search) {
+        let found =
+          scoreDefList.item(i).querySelector('[meter],meterSig') ||
+          scoreDefList.item(i).hasAttribute('meter.unit') ||
+          scoreDefList.item(i).hasAttribute('meter.count');
+        if (found) {
+          scoreDef = scoreDefList.item(i);
+          break;
+        }
       }
-      i++;
+      if (scoreDefList.item(i).nodeName === element.nodeName) {
+        search = true;
+      }
     }
   }
   return scoreDef;
@@ -676,12 +689,12 @@ export function getTstampForElement(xmlDoc, element) {
 /**
  * Returns the duration of a note/chord (in beats relative to the meter unit),
  * computed from @dur and @dots and @meterUnit
- * 
+ *
  * For example:
  * dur="4" dots="1" in a x/4 meter returns 1.5
  * dur="8" dots="2" in a x/8 meter returns 1.75
  * dur="4" dots="2" in a x/2 meter returns 0.825
- * 
+ *
  * @param {Element} element
  * @returns {number} duration in beats, or -1 if problems
  */
@@ -701,6 +714,31 @@ export function getDurationOfElement(element, meterUnit = 4.0) {
   }
   return beatDuration;
 } // getDurationOfElement()
+
+/**
+ *
+ * @param {Document} xmlDoc
+ * @param {Element} el1
+ * @param {Element} el2
+ * @returns {number}
+ */
+export function getMeasureDistanceBetweenElements(xmlDoc, el1, el2) {
+  let measureDistance = 0;
+  if (el1 && el2) {
+    const m1 = el1.closest('measure');
+    const m2 = el2.closest('measure');
+    if (m1 !== m2) {
+      let measureList = xmlDoc.querySelectorAll('measure');
+      let count = false;
+      measureList.forEach((m) => {
+        if (count) measureDistance++;
+        if (m === m1) count = true;
+        if (m === m2) count = false;
+      });
+    }
+  }
+  return measureDistance;
+} // getMeasureDistanceBetweenElements()
 
 /**
  * Copies all tempo-related attributes (midi.bpm, mm, mm.unit, mm.dots)
