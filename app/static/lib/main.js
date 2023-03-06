@@ -648,7 +648,7 @@ document.addEventListener('DOMContentLoaded', function () {
     setFileChangedState(storage.fileChanged);
     if (!urlFileName) {
       // no URI param specified - try to restore from storage
-      if (storage.content) {
+      if (storage.content && storage.fileName) {
         // restore file name and content from storage
         // unless a URI param was specified
         setIsMEI(storage.isMEI);

@@ -537,12 +537,10 @@ export function logoutFromGithub() {
     storage.githubLogoutRequested = "true";
     // remove github object from local storage
     storage.removeItem("github");
-    if(storage.fileLocationType === "github") { 
-      // set up recovery of current file via URL interface
-      storage.fileLocationType = "url";
-      storage.fileName = github.filepath;
-      storage.fileLocation = `https://raw.githubusercontent.com/${github.githubRepo}/${github.branch}${github.filepath}`;
-    }
+    // remove file information to reset to default on reload
+    storage.removeItem("fileLocationType");
+    storage.removeItem("meiFileName");
+    storage.removeItem("meiFileLocation");
   }
   // redirect to /logout to remove session cookie
   let url = window.location.href;
