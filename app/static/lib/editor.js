@@ -139,7 +139,7 @@ export function addControlElement(v, cm, elName, placement, form) {
   v.selectedElements = speed.filterElements(v.selectedElements, v.xmlDoc);
   console.info('addControlElement() ', elName, placement, form);
 
-  let useTstamps = true; // TODO: introduce modifyer
+  let useTstamps = v.altKeyPressed; // ALT modifyer key
 
   // find and validate startEl with @startId
   let startId = v.selectedElements[0];
