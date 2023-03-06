@@ -217,7 +217,7 @@ export function addControlElement(v, cm, elName, placement, form) {
     }
   }
   // add an optional endid
-  if (endId && ['dir', 'dynam', 'mordent', 'trill', 'turn'].includes(elName)) {
+  if (endId && ['dir', 'dynam', 'mordent', 'trill'].includes(elName)) {
     if (useTstamps) {
       const m = speed.getMeasureDistanceBetweenElements(v.xmlDoc, startEl, endEl);
       const t2 = speed.getTstampForElement(v.xmlDoc, endEl);
@@ -235,7 +235,7 @@ export function addControlElement(v, cm, elName, placement, form) {
   if (form && ['hairpin', 'fermata', 'mordent', 'trill', 'turn'].includes(elName)) {
     newElement.setAttribute('form', form);
   }
-  // placemenet for pedal is @dir=up|down
+  // placement for pedal is @dir=up|down
   if (placement && ['pedal'].includes(elName)) {
     newElement.setAttribute('dir', placement);
 
@@ -245,9 +245,9 @@ export function addControlElement(v, cm, elName, placement, form) {
       uuid2 = utils.generateXmlId(elName, v.xmlIdStyle);
       newElement2.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid2);
       if (useTstamps) {
-        newElement.setAttribute('tstamp', speed.getTstampForElement(v.xmlDoc, endEl));
+        newElement2.setAttribute('tstamp', speed.getTstampForElement(v.xmlDoc, endEl));
       } else {
-        newElement.setAttribute('startid', '#' + endId);
+        newElement2.setAttribute('startid', '#' + endId);
       }
       if (staveArray.length > 0) newElement2.setAttribute('staff', staveArray.sort().join(' '));
       newElement2.setAttribute('dir', 'up');
