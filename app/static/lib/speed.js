@@ -662,6 +662,8 @@ export function getScoreDefForElement(xmlDoc, element, property = '') {
  */
 export function getTstampForElement(xmlDoc, element) {
   let tstamp = -1;
+  let chord = element.closest('chord'); // take chord as element, if exists
+  if (chord) element = chord;
   let staffNumber = getStaffNumber(element);
   let scoreDef = getScoreDefForElement(xmlDoc, element);
   if (scoreDef && staffNumber) {
@@ -671,13 +673,19 @@ export function getTstampForElement(xmlDoc, element) {
       let layer = element.closest('layer');
       if (layer) {
         tstamp = 1;
+        let chordList = []; // list of chords that have been counted
         let durList = Array.from(layer.querySelectorAll(att.attDurationLogical.join(',')));
         for (let e of durList) {
           // exclude notes within a chord
           let parentChord = e.closest('chord');
-          if (e.nodeName === 'note' && parentChord && durList.includes(parentChord)) continue;
+          if (e.nodeName === 'note' && parentChord && chordList.includes(parentChord)) {
+            continue;
+          }
+          if (parentChord) chordList.push(parentChord);
           // stop adding beats when requested element is reached
-          if (e.getAttribute('xml:id') === element.getAttribute('xml:id')) break;
+          if (e === element) {
+            break;
+          }
           tstamp += getDurationOfElement(e, parseInt(unit));
         }
       }
