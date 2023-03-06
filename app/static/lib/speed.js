@@ -725,6 +725,20 @@ export function getDurationOfElement(element, meterUnit = 4.0) {
       }
       beatDuration += dotsDuration;
     }
+    // look for (nested) tuplets
+    let tuplet = element.closest('tuplet');
+    while (tuplet) {
+      const num = parseFloat(tuplet.getAttribute('num') || '-1');
+      const numBase = parseFloat(tuplet.getAttribute('numbase') || '-1');
+      if (num > 0 && numBase > 0) {
+        beatDuration = (beatDuration * numBase) / num;
+      }
+      if (tuplet.parentElement) {
+        tuplet = tuplet.parentElement.closest('tuplet');
+      } else {
+        break;
+      }
+    }
   }
   return beatDuration;
 } // getDurationOfElement()
