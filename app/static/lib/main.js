@@ -2100,8 +2100,9 @@ function setKeyMap(keyMapFilePath) {
             ev.stopPropagation();
             ev.preventDefault();
 
-            v.altKeyPressed = ev.altKey;
-console.log('PRESSED: ', ev);
+            v.cmd2KeyPressed = platform.startsWith('mac') ? ev.ctrlKey : ev.altKey;
+            console.log('CMD2 pressed ' + v.cmd2KeyPressed + '; ', ev);
+            
             let keyName = ev.key;
             if (ev.code.toLowerCase() === 'space') keyName = 'space';
             // arrowdown -> down

@@ -8,7 +8,7 @@ import * as dutils from './dom-utils.js';
 import * as att from './attribute-classes.js';
 import { loadFacsimile } from './facsimile.js';
 import Viewer from './viewer.js';
-import { handleEditorChanges, version, versionDate } from './main.js';
+import { handleEditorChanges, platform, version, versionDate } from './main.js';
 
 /**
  * Smart indents selected region in editor, if none, do all
@@ -139,7 +139,7 @@ export function addControlElement(v, cm, elName, placement, form) {
   v.selectedElements = speed.filterElements(v.selectedElements, v.xmlDoc);
   console.info('addControlElement() ', elName, placement, form);
 
-  let useTstamps = v.altKeyPressed; // ALT modifyer key
+  let useTstamps = v.cmd2KeyPressed; // whether tstamps are inserted rather than start/endids
 
   // find and validate startEl with @startId
   let startId = v.selectedElements[0];
