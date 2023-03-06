@@ -701,6 +701,12 @@ export function getTstampForElement(xmlDoc, element) {
 export function getDurationOfElement(element, meterUnit = 4.0) {
   let beatDuration = -1;
   if (element) {
+    if (element.hasAttribute('grace')) {
+      let graceValue = element.getAttribute('grace');
+      if (graceValue && ['acc', 'unacc', 'unknown'].includes(graceValue)) {
+        return 0;
+      }
+    }
     const dur = element.getAttribute('dur');
     if (dur) beatDuration = meterUnit / parseFloat(dur);
     const dots = element.getAttribute('dots');
