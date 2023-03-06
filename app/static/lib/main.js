@@ -1148,10 +1148,12 @@ export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true, upd
 
 // checks format of encoding string and imports or loads data/notation
 // mei argument may be MEI or any other supported format (text/binary)
-export function handleEncoding(mei, setFreshlyLoaded = true, updateAfterLoading = true) {
+export function handleEncoding(mei, setFreshlyLoaded = true, updateAfterLoading = true, clearBeforeLoading = true) {
   let found = false;
-  if (pageParam === null) storage.removeItem('page');
-  v.clear();
+  if(clearBeforeLoading) { 
+    if (pageParam === null) storage.removeItem('page');
+    v.clear();
+  }
   v.busy();
   if (meiFileName.endsWith('.mxl')) {
     // compressed MusicXML file
