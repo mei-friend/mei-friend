@@ -11,12 +11,10 @@ import {
   meiFileName,
   setFileChangedState,
   setGithubInstance, // github instance setter
-  setIsMEI,
   setMeiFileInfo,
   storage,
   updateFileStatusDisplay,
   updateGithubInLocalStorage,
-  updateLocalStorage,
   v
 } from './main.js';
 import * as icon from './../css/icons.js';
@@ -536,9 +534,15 @@ export function renderCommitLog() {
 
 export function logoutFromGithub() {
   if (storage.supported) {
+    storage.githubLogoutRequested = "true";
     // remove github object from local storage
     storage.removeItem("github");
-    storage.githubLogoutRequested = "true";
+    if(storage.fileLocationType === "github") { 
+      // set up recovery of current file via URL interface
+      storage.fileLocationType = "url";
+      storage.fileName = github.filepath;
+      storage.fileLocation = `https://raw.githubusercontent.com/${github.githubRepo}/${github.branch}${github.filepath}`;
+    }
   }
   // redirect to /logout to remove session cookie
   let url = window.location.href;
