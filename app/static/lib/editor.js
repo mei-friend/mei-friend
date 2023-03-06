@@ -139,7 +139,8 @@ export function addControlElement(v, cm, elName, placement, form) {
   v.selectedElements = speed.filterElements(v.selectedElements, v.xmlDoc);
   console.info('addControlElement() ', elName, placement, form);
 
-  let useTstamps = v.cmd2KeyPressed; // whether tstamps are inserted rather than start/endids
+  // modifier key for inserting tstamps rather than start/endids
+  let useTstamps = v.cmd2KeyPressed; 
 
   // find and validate startEl with @startId
   let startId = v.selectedElements[0];
