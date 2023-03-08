@@ -1,6 +1,6 @@
 // mei-friend version and date
 export const version = '0.8.6';
-export const versionDate = '3 Mar 2023';
+export const versionDate = '6 Mar 2023';
 
 var vrvWorker;
 var spdWorker;
@@ -2100,6 +2100,9 @@ function setKeyMap(keyMapFilePath) {
             ev.stopPropagation();
             ev.preventDefault();
 
+            v.cmd2KeyPressed = platform.startsWith('mac') ? ev.ctrlKey : ev.altKey;
+            console.log('CMD2 pressed ' + v.cmd2KeyPressed + '; ', ev);
+            
             let keyName = ev.key;
             if (ev.code.toLowerCase() === 'space') keyName = 'space';
             // arrowdown -> down

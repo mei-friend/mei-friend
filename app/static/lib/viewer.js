@@ -65,6 +65,7 @@ export default class Viewer {
     this.respId = '';
     this.alertCloser;
     this.pdfMode = false;
+    this.cmd2KeyPressed = false;
     this.controlMenuState = {};
     this.settingsReplaceFriendContainer = false; // whether or not the settings panel is over the mei-friend window (false) or replaces it (true)
     this.notationProportion = 0.5; // remember proportion during pdf mode

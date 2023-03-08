@@ -233,4 +233,4 @@ export function xmlToString(xmlNode) {
   str = str.replace(/(?:><)/g, '>\n<');
   // console.info('xmlToString: ' + str);
   return str.replace(' xmlns="' + meiNameSpace + '"', '');
-}
+} // xmlToString()
