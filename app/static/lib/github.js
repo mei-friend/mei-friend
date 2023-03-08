@@ -255,6 +255,16 @@ export default class Github {
     this.headHash = await this.repo.readRef(`refs/heads/${this.branch}`);
   }
 
+  async loadGitFileContent(hash) { 
+    if(this.filepath.endsWith(".mxl")) { 
+      // file suffix suggests compressed musicxml => binary blob
+      let blob = await this.repo.loadAs("blob", hash);
+      this.content = blob.buffer; // convert from Uint8array to arraybuffer
+    } else { 
+      this.content = await this.repo.loadAs("text", hash);
+    }
+  }
+
   async readGithubRepo() { 
     try { 
       // Retrieve content of file
@@ -270,11 +280,11 @@ export default class Github {
       }
       const treesFiltered = trees.filter(o => o.path === this.filepath)
       if(treesFiltered.length === 1) { 
-        this.content = await this.repo.loadAs("text", treesFiltered[0].hash);
+        this.loadGitFileContent(treesFiltered[0].hash);
       } else { 
         if(this.filepath && this.filepath !== "/") {
           // remove leading slash
-          this.content = await this.repo.loadAs("text", this.entry.hash);
+          this.loadGitFileContent(this.entry.hash)
           this.tree = tree;
         }
       }

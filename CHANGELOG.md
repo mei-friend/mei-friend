@@ -1,4 +1,9 @@
 # mei-friend-online CHANGELOG.md
+### 0.8.6 patch
+* Insert control elements with time stamps (`@tstamp`/`tstamp2`) instead of ids (`startid`/`endid`) through `ALT` (Mac: `Ctrl`) modifier key
+* Fix between placement (`SHIFT + X`) with control elements without `@startid`. 
+* Various GitHub fixes, incl. loading compressed MusicXML via Git
+
 ### 0.8.5 PDF export
 * Preview PDF mode with page-view of notation, triggered via menu item or `CMD/CTRL + P`
 * PDF preview with click-select and drag-select disabled

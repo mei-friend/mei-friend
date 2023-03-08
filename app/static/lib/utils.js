@@ -734,5 +734,6 @@ export function readMeasureBeat(tstamp2) {
  * @returns {string}
  */
 export function writeMeasureBeat(measure, beat) {
+  if (parseInt(measure) === 0) return '' + beat;
   return measure + 'm+' + beat;
 } // writeMeasureBeat()

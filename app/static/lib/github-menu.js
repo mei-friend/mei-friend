@@ -11,12 +11,10 @@ import {
   meiFileName,
   setFileChangedState,
   setGithubInstance, // github instance setter
-  setIsMEI,
   setMeiFileInfo,
   storage,
   updateFileStatusDisplay,
   updateGithubInLocalStorage,
-  updateLocalStorage,
   v
 } from './main.js';
 import * as icon from './../css/icons.js';
@@ -180,7 +178,7 @@ function branchContentsFileClicked(ev) {
   document.getElementById("GithubMenu").classList.remove("forceShow");
 }
 
-function loadFile(fileName, ev = null) {
+function loadFile(fileName, clearBeforeLoading=true, ev = null) {
   const githubLoadingIndicator = document.getElementById("GithubLogo");
   github.filepath += fileName;
   console.debug(`Loading file: https://github.com/${github.githubRepo}${github.filepath}`);
@@ -190,14 +188,13 @@ function loadFile(fileName, ev = null) {
     githubLoadingIndicator.classList.remove("clockwise");
     cm.readOnly = false;
     document.querySelector(".statusbar").innerText = "Loading from Github...";
-    v.clear();
     v.allowCursorActivity = false;
     setMeiFileInfo(
       github.filepath, // meiFileName
       github.githubRepo, // meiFileLocation
       github.githubRepo + ":" // meiFileLocationPrintable
     );
-    handleEncoding(github.content);
+    handleEncoding(github.content, true, true, clearBeforeLoading); // retains current page and selection after commit 
     setFileNameAfterLoad();
     updateFileStatusDisplay();
     setFileChangedState(false);
@@ -537,9 +534,13 @@ export function renderCommitLog() {
 
 export function logoutFromGithub() {
   if (storage.supported) {
+    storage.githubLogoutRequested = "true";
     // remove github object from local storage
     storage.removeItem("github");
-    storage.githubLogoutRequested = "true";
+    // remove file information to reset to default on reload
+    storage.removeItem("fileLocationType");
+    storage.removeItem("meiFileName");
+    storage.removeItem("meiFileLocation");
   }
   // redirect to /logout to remove session cookie
   let url = window.location.href;
@@ -637,8 +638,8 @@ function handleCommitButtonClicked(e) {
           // switch to new filepath
           github.filepath = github.filepath.substring(0, github.filepath.lastIndexOf('/') + 1) + newfile;
         }
-        // load after write
-        loadFile("");
+        // load after write (without clearing viewer metadata since we're loading same file again)
+        loadFile("", false);
       })
       .catch((e) => {
         cm.readOnly = false;

@@ -25,7 +25,6 @@
     "i": "addDirective",
     "d": "addDynamics",
     "shift-t": "addTempo",
-    "alt-shift-t": "addTempoTstamp",
     "a": "addArpeggio",
     "ctrl-a": "addArpeggioDown",
     "g": "addGlissando",
@@ -100,7 +99,24 @@
     "cmd-a": "toggleAnnotationPanel",
     "shift-alt-ï": "indentSelection",
     "cmd-delete": "cmdDelete",
-    "cmd-p": "togglePdfMode"
+    "cmd-p": "togglePdfMode",
+
+    "ctrl-s": "addSlur",
+    "ctrl-t": "addTie",
+    "ctrl-h": "addCresHairpin",
+    "ctrl-shift-h": "addDimHairpin",
+    "ctrl-f": "addFermata",
+    "ctrl-i": "addDirective",
+    "ctrl-d": "addDynamics",
+    "ctrl-shift-t": "addTempo",
+    "ctrl-g": "addGlissando",
+    "ctrl-p": "addPedalDown",
+    "ctrl-shift-p": "addPedalUp",
+    "ctrl-m": "addMordent",
+    "ctrl-shift-m": "addMordentUpper",
+    "ctrl-l": "addTrill",
+    "ctrl-n": "addTurn",
+    "ctrl-shift-n": "addTurnLower"
   },
 
   ".platform-win32, .platform-linux": {
@@ -136,6 +152,23 @@
     "ctrl-,": "toggleSettingsPanel",
     "ctrl-a": "toggleAnnotationPanel",
     "ctrl-delete": "cmdDelete",
-    "ctrl-p": "togglePdfMode"
+    "ctrl-p": "togglePdfMode",
+
+    "alt-s": "addSlur",
+    "alt-t": "addTie",
+    "alt-h": "addCresHairpin",
+    "alt-shift-h": "addDimHairpin",
+    "alt-f": "addFermata",
+    "alt-i": "addDirective",
+    "alt-d": "addDynamics",
+    "alt-shift-t": "addTempo",
+    "alt-g": "addGlissando",
+    "alt-p": "addPedalDown",
+    "alt-shift-p": "addPedalUp",
+    "alt-m": "addMordent",
+    "alt-shift-m": "addMordentUpper",
+    "alt-l": "addTrill",
+    "alt-n": "addTurn",
+    "alt-shift-n": "addTurnLower"
   }
 }

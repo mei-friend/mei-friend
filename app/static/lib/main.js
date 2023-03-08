@@ -1,6 +1,6 @@
 // mei-friend version and date
-export const version = '0.8.5';
-export const versionDate = '28 Feb 2023';
+export const version = '0.8.6';
+export const versionDate = '8 Mar 2023';
 
 var vrvWorker;
 var spdWorker;
@@ -87,6 +87,11 @@ export let supportedVerovioVersions = {
   latest: {
     url: 'https://www.verovio.org/javascript/latest/verovio-toolkit-hum.js',
     description: 'Current Verovio release',
+  },
+  '3.15.0': {
+    url: 'https://www.verovio.org/javascript/3.15.0/verovio-toolkit-hum.js',
+    description: 'Verovio release 3.15.0',
+    releaseDate: '1 Mar 2023',
   },
   '3.14.0': {
     url: 'https://www.verovio.org/javascript/3.14.0/verovio-toolkit-hum.js',
@@ -643,7 +648,7 @@ document.addEventListener('DOMContentLoaded', function () {
     setFileChangedState(storage.fileChanged);
     if (!urlFileName) {
       // no URI param specified - try to restore from storage
-      if (storage.content) {
+      if (storage.content && storage.fileName) {
         // restore file name and content from storage
         // unless a URI param was specified
         setIsMEI(storage.isMEI);
@@ -1143,10 +1148,12 @@ export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true, upd
 
 // checks format of encoding string and imports or loads data/notation
 // mei argument may be MEI or any other supported format (text/binary)
-export function handleEncoding(mei, setFreshlyLoaded = true, updateAfterLoading = true) {
+export function handleEncoding(mei, setFreshlyLoaded = true, updateAfterLoading = true, clearBeforeLoading = true) {
   let found = false;
-  if (pageParam === null) storage.removeItem('page');
-  v.clear();
+  if(clearBeforeLoading) { 
+    if (pageParam === null) storage.removeItem('page');
+    v.clear();
+  }
   v.busy();
   if (meiFileName.endsWith('.mxl')) {
     // compressed MusicXML file
@@ -2095,6 +2102,9 @@ function setKeyMap(keyMapFilePath) {
             ev.stopPropagation();
             ev.preventDefault();
 
+            v.cmd2KeyPressed = platform.startsWith('mac') ? ev.ctrlKey : ev.altKey;
+            console.log('CMD2 pressed ' + v.cmd2KeyPressed + '; ', ev);
+            
             let keyName = ev.key;
             if (ev.code.toLowerCase() === 'space') keyName = 'space';
             // arrowdown -> down
