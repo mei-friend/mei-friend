@@ -40,6 +40,11 @@ On Windows, if your browser blocks .js files because they are served wrongly as 
 import mimetypes
 mimetypes.add_type('application/javascript', '.js')
 ```
-
 ### Production deployment:
 * Use wsgi and gunicorn (instructions tbc)
+
+### To update Python dependencies:
+* The `cryptography` module requires rust, which may need updating
+    - E.g., on Debian-based systems: `apt install rustc`
+* Ensure current pip version: `pip install --upgrade pip`
+* Run upgrade of dependencies: `pip install -r requirements.txt`
