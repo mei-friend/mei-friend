@@ -280,11 +280,11 @@ export default class Github {
       }
       const treesFiltered = trees.filter(o => o.path === this.filepath)
       if(treesFiltered.length === 1) { 
-        this.loadGitFileContent(treesFiltered[0].hash);
+        await this.loadGitFileContent(treesFiltered[0].hash);
       } else { 
         if(this.filepath && this.filepath !== "/") {
           // remove leading slash
-          this.loadGitFileContent(this.entry.hash)
+          await this.loadGitFileContent(this.entry.hash)
           this.tree = tree;
         }
       }
