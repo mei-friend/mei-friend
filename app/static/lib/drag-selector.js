@@ -173,13 +173,24 @@ export function addDragSelector(v, vp) {
             });
         });
       }
-      oldEls.forEach((el) => newEls.push(el));
+      
+      // select latest element in editor
       v.allowCursorActivity = false;
       if (latest && Object.keys(latest).length > 0) {
         setCursorToId(cm, latest.el.id);
         v.lastNoteId = latest.el.id;
       }
-      v.selectedElements = newEls;
+
+      // add new element to selected elements when new, remove otherwise
+      v.selectedElements = [...oldEls];
+      newEls.forEach((newEl) => {
+        if (oldEls.includes(newEl)) {
+          v.selectedElements.splice(v.selectedElements.indexOf(newEl), 1);
+        } else {
+          v.selectedElements.push(newEl);
+        }
+      });
+
       v.updateHighlight();
       v.allowCursorActivity = true;
     }
@@ -192,8 +203,12 @@ export function addDragSelector(v, vp) {
       startMidiTimeout();
     }
     dragging = false;
+
+    // remove dragging rectangle
     let svgPm = document.querySelector('g.page-margin');
-    if (svgPm && Array.from(svgPm.childNodes).includes(rect)) svgPm.removeChild(rect);
+    if (svgPm && Array.from(svgPm.childNodes).includes(rect)) {
+      svgPm.removeChild(rect);
+    }
     oldEls = [];
   }); // mouse up event listener
 } // addDragSelector()
