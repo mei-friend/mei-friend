@@ -242,3 +242,33 @@ export const dataURI = [
   'def',
   'altsym',
 ];
+
+// data.DURATION.cmn
+export const dataDurationCMN = [
+  'long',
+  'breve',
+  '1',
+  '2',
+  '4',
+  '8',
+  '16',
+  '32',
+  '64',
+  '128',
+  '256',
+  '512',
+  '1024',
+  '2048',
+];
+
+// data.DURATION.mensural
+export const dataDurationMensural = [
+  'maxima',
+  'longa',
+  'brevis',
+  'semibrevis',
+  'minima',
+  'semiminima',
+  'fusa',
+  'semifusa',
+];

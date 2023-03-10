@@ -1150,7 +1150,7 @@ export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true, upd
 // mei argument may be MEI or any other supported format (text/binary)
 export function handleEncoding(mei, setFreshlyLoaded = true, updateAfterLoading = true, clearBeforeLoading = true) {
   let found = false;
-  if(clearBeforeLoading) { 
+  if (clearBeforeLoading) {
     if (pageParam === null) storage.removeItem('page');
     v.clear();
   }
@@ -2103,8 +2103,7 @@ function setKeyMap(keyMapFilePath) {
             ev.preventDefault();
 
             v.cmd2KeyPressed = platform.startsWith('mac') ? ev.ctrlKey : ev.altKey;
-            console.log('CMD2 pressed ' + v.cmd2KeyPressed + '; ', ev);
-            
+
             let keyName = ev.key;
             if (ev.code.toLowerCase() === 'space') keyName = 'space';
             // arrowdown -> down
