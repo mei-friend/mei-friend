@@ -1,9 +1,9 @@
 # mei-friend-online CHANGELOG.md
 ### 0.8.6 patch
-* Insert control elements with time stamps (`@tstamp`/`tstamp2`) instead of ids (`startid`/`endid`) through `ALT` (Mac: `Ctrl`) modifier key
+* Insert control elements with time stamps (`@tstamp`/`tstamp2`) instead of ids (`startid`/`endid`) through `ALT` (Mac: `CTRL`) modifier key
+* Check time stamps when inserting control elements, handle elements on the same time stamp correctly and throw warning (e.g., for slur, tie)
 * Fix between placement (`SHIFT + X`) with control elements without `@startid`. 
 * Various GitHub fixes, incl. loading compressed MusicXML via Git
-* Check time stamps when inserting control elements, through warning for slur etc.
 * Unselect element(s) when `CTRL/CMD` clicking or drag-selecting already selected element(s)
 * `SHIFT LEFT/RIGHT` de/increases duration (`@dur`) of selected element(s), if they have such attribute
 
