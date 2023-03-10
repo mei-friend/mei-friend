@@ -605,7 +605,7 @@ export function modifyDuration(v, cm, what = 'increase') {
       let dur = el.getAttribute('dur');
       if (dur) {
         let i = att.dataDurationCMN.indexOf(dur);
-        i = what === 'increase' ? i + 1 : i - 1;
+        i = what === 'increase' ? i - 1 : i + 1; // increase: go up the array to the longer values
         i = Math.min(Math.max(0, i), att.dataDurationCMN.length - 1);
         el.setAttribute('dur', att.dataDurationCMN.at(i));
         replaceInEditor(cm, el);

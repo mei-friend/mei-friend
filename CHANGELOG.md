@@ -1,7 +1,7 @@
 # mei-friend-online CHANGELOG.md
 ### 0.8.6 patch
-* Insert control elements with time stamps (`@tstamp`/`tstamp2`) instead of ids (`startid`/`endid`) through `ALT` (Mac: `CTRL`) modifier key
-* Check time stamps when inserting control elements, handle elements on the same time stamp correctly and throw warning (e.g., for slur, tie)
+* Insert control elements with time stamps (`@tstamp`/`tstamp2`) instead of ids (`startid`/`endid`) by using the  `ALT` (Mac: `CTRL`) modifier key with keyboard shortcut
+* Check time stamps when inserting control elements, handle selected elements on the same time stamp correctly (by omitting `@tstamp2`) or throw warning, if no fix is possible
 * Fix between placement (`SHIFT + X`) with control elements without `@startid`. 
 * Various GitHub fixes, incl. loading compressed MusicXML via Git
 * Unselect element(s) when `CTRL/CMD` clicking or drag-selecting already selected element(s)
@@ -14,8 +14,8 @@
 * Download PDF file (with pages as selected in page-range settings)
 
 ### 0.8.4 patch
-* Drag-select chord instead of note with `ALT`
-* Add @staff to clef change element
+* Drag-select and click-select chord instead of note with `ALT` modifier
+* Add `@staff` to clef change element
 * Change of keyboard shortcuts (for inserting C clef, tenuto, spiccato)
 ### 0.8.3 patch
 * Show modifyer keys as text (ALT, CTRL...) on Windows/Linux systems
