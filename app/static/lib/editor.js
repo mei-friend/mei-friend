@@ -50,74 +50,76 @@ export function indentSelection(v, cm) {
  */
 export function deleteElement(v, cm, modifyerKey = false) {
   v.loadXml(cm.getValue(), true);
-  let id = v.selectedElements[0]; // TODO: iterate over selectedElements
-  let cursor = cm.getCursor();
-  let nextId = utils.getIdOfNextElement(cm, cursor.line)[0]; // TODO necessary?
-  let element = v.xmlDoc.querySelector("[*|id='" + id + "']");
-  console.info('Deleting: ', element);
-  if (!element) {
-    console.info(id + ' not found for deletion.');
-    return;
-  }
-  let selectedElements = [];
-  v.allowCursorActivity = false;
-  // let checkPoint = buffer.createCheckpoint(); TODO
+  let selectedElements = []; // store selected elements for later
+  // iterate all selected elements
+  v.selectedElements.forEach((id) => {
+    let cursor = cm.getCursor();
+    let nextId = utils.getIdOfNextElement(cm, cursor.line)[0]; // TODO necessary?
+    let element = v.xmlDoc.querySelector("[*|id='" + id + "']");
+    console.info('Deleting: ', element);
+    if (!element) {
+      console.info(id + ' not found for deletion.');
+      return;
+    }
+    v.allowCursorActivity = false;
+    // let checkPoint = buffer.createCheckpoint(); TODO
 
-  if (att.modelControlEvents.concat(['accid', 'artic', 'clef', 'octave', 'beamSpan']).includes(element.nodeName)) {
-    if (element.nodeName === 'octave') {
-      // reset notes inside octave range
-      let disPlace = element.getAttribute('dis.place');
-      let dis = element.getAttribute('dis');
-      let id1 = utils.rmHash(element.getAttribute('startid'));
-      let id2 = utils.rmHash(element.getAttribute('endid'));
-      findAndModifyOctaveElements(cm, v.xmlDoc, id1, id2, disPlace, dis, false);
-      removeInEditor(cm, element);
-      selectedElements.push(id2);
-    } else {
-      removeInEditor(cm, element);
-      // place cursor at a sensible place...
-      let m = utils.getElementIdAtCursor(cm);
-      let el = document.getElementById(m).querySelector(dutils.navElsSelector);
-      if (el) selectedElements.push(el.getAttribute('id'));
-      else selectedElements.push(nextId);
-    }
-  } else if (['beam'].includes(element.nodeName)) {
-    // delete beam
-    let p;
-    let first = true;
-    let childList = element.childNodes;
-    for (let i = 0; i < childList.length; i++) {
-      if (childList[i].nodeType === Node.TEXT_NODE) continue;
-      if (first) {
-        p = replaceInEditor(cm, element, false, childList[i]);
-        p.end.line += 1;
-        p.end.ch = 0;
-        cm.setCursor(p.end);
-        first = false;
+    if (att.modelControlEvents.concat(['accid', 'artic', 'clef', 'octave', 'beamSpan']).includes(element.nodeName)) {
+      if (element.nodeName === 'octave') {
+        // reset notes inside octave range
+        let disPlace = element.getAttribute('dis.place');
+        let dis = element.getAttribute('dis');
+        let id1 = utils.rmHash(element.getAttribute('startid'));
+        let id2 = utils.rmHash(element.getAttribute('endid'));
+        findAndModifyOctaveElements(cm, v.xmlDoc, id1, id2, disPlace, dis, false);
+        removeInEditor(cm, element);
+        selectedElements.push(id2);
       } else {
-        // txtEdr.insertNewline();
-        let newMEI = dutils.xmlToString(childList[i]);
-        cm.replaceRange(newMEI + '\n', p.end);
-        let cursor = cm.getCursor();
-        for (let l = p.end.line; l < cursor.line; l++) cm.indentLine(l);
-        p.end = cursor;
+        removeInEditor(cm, element);
+        // place cursor at a sensible place...
+        let m = utils.getElementIdAtCursor(cm);
+        let el = document.getElementById(m).querySelector(dutils.navElsSelector);
+        if (el) selectedElements.push(el.getAttribute('id'));
+        else selectedElements.push(nextId);
       }
-      selectedElements.push(childList[i].getAttribute('xml:id'));
-      element.parentNode.insertBefore(childList[i--], element);
+    } else if (['beam'].includes(element.nodeName)) {
+      // delete beam
+      let p;
+      let first = true;
+      let childList = element.childNodes;
+      for (let i = 0; i < childList.length; i++) {
+        if (childList[i].nodeType === Node.TEXT_NODE) continue;
+        if (first) {
+          p = replaceInEditor(cm, element, false, childList[i]);
+          p.end.line += 1;
+          p.end.ch = 0;
+          cm.setCursor(p.end);
+          first = false;
+        } else {
+          // txtEdr.insertNewline();
+          let newMEI = dutils.xmlToString(childList[i]);
+          cm.replaceRange(newMEI + '\n', p.end);
+          let cursor = cm.getCursor();
+          for (let l = p.end.line; l < cursor.line; l++) cm.indentLine(l);
+          p.end = cursor;
+        }
+        selectedElements.push(childList[i].getAttribute('xml:id'));
+        element.parentNode.insertBefore(childList[i--], element);
+      }
+    } else if (element.nodeName === 'zone' && document.getElementById('editFacsimileZones').checked) {
+      // delete Zone in source image display
+      // remove zone; with CMD remove pointing element; without just remove @facs from pointing element
+      removeZone(v, cm, element, modifyerKey);
+    } else {
+      console.info('Element ' + id + ' not supported for deletion.');
+      return;
     }
-  } // delete Zone in source image display
-  else if (element.nodeName === 'zone' && document.getElementById('editFacsimileZones').checked) {
-    // remove zone; with CMD remove pointing element; without just remove @facs from pointing element
-    removeZone(v, cm, element, modifyerKey);
-  } else {
-    console.info('Element ' + id + ' not supported for deletion.');
-    return;
-  }
-  element.remove();
+    element.remove();
+  });
   loadFacsimile(v.xmlDoc);
   // buffer.groupChangesSinceCheckpoint(checkPoint); TODO
   v.selectedElements = selectedElements;
-  v.lastNoteId = v.selectedElements[v.selectedElements.length - 1];
+  v.lastNoteId = v.selectedElements.at(-1);
   v.xmlDocOutdated = true;
   addApplicationInfo(v, cm);
   v.updateData(cm, false, true);
@@ -140,7 +142,7 @@ export function addControlElement(v, cm, elName, placement, form) {
   console.info('addControlElement() ', elName, placement, form);
 
   // modifier key for inserting tstamps rather than start/endids
-  let useTstamps = v.cmd2KeyPressed; 
+  let useTstamps = v.cmd2KeyPressed;
 
   // find and validate startEl with @startId
   let startId = v.selectedElements[0];
