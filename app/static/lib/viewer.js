@@ -1003,7 +1003,7 @@ export default class Viewer {
   }
 
   addMeiFriendOptionsToSettingsPanel(restoreFromLocalStorage = true) {
-    let optionsToShow = {
+    let meiFriendSettingsOptions = {
       titleGeneral: {
         title: 'General',
         description: 'General mei-friend settings',
@@ -1315,8 +1315,8 @@ export default class Viewer {
     mfs.innerHTML = '<div class="settingsHeader">mei-friend Settings</div>';
     let storage = window.localStorage;
     let currentHeader;
-    Object.keys(optionsToShow).forEach((opt) => {
-      let o = optionsToShow[opt];
+    Object.keys(meiFriendSettingsOptions).forEach((opt) => {
+      let o = meiFriendSettingsOptions[opt];
       let value = o.default;
       if (storage.hasOwnProperty('mf-' + opt)) {
         if (restoreFromLocalStorage && opt !== 'showMidiPlaybackControlBar') {
@@ -1537,7 +1537,7 @@ export default class Viewer {
             );
             break;
         }
-        if (value === optionsToShow[option].default) {
+        if (value === meiFriendSettingsOptions[option].default) {
           delete storage['mf-' + option]; // remove from storage object when default value
         } else {
           storage['mf-' + option] = value; // save changes in localStorage object
@@ -1569,7 +1569,7 @@ export default class Viewer {
   } // addMeiFriendOptionsToSettingsPanel()
 
   addCmOptionsToSettingsPanel(mfDefaults, restoreFromLocalStorage = true) {
-    let optionsToShow = {
+    let codeMirrorSettingsOptions = {
       // key as in CodeMirror
       titleAppearance: {
         title: 'Editor appearance',
@@ -1712,8 +1712,8 @@ export default class Viewer {
     let currentHeader;
     if (!/\w/g.test(cmsp.innerHTML)) addListeners = true;
     cmsp.innerHTML = '<div class="settingsHeader">Editor Settings</div>';
-    Object.keys(optionsToShow).forEach((opt) => {
-      let o = optionsToShow[opt];
+    Object.keys(codeMirrorSettingsOptions).forEach((opt) => {
+      let o = codeMirrorSettingsOptions[opt];
       let value = o.default;
       if (mfDefaults.hasOwnProperty(opt)) {
         value = mfDefaults[opt];
