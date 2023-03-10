@@ -258,7 +258,7 @@ export const dataDurationCMN = [
   '256',
   '512',
   '1024',
-  '2048',
+  // '2048', not supported by Verovio
 ];
 
 // data.DURATION.mensural

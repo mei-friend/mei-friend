@@ -590,6 +590,35 @@ export function shiftPitch(v, cm, deltaPitch = 0) {
 } // shiftPitch()
 
 /**
+ * In/decrease duration of selected element (ignore, when no duration)
+ * @param {Viewer} v 
+ * @param {CodeMirror} cm 
+ * @param {string} what ('increase', 'decrease')
+ */
+export function modifyDuration(v, cm, what = 'increase') {
+  v.loadXml(cm.getValue());
+  let ids = speed.filterElements(v.selectedElements, v.xmlDoc);
+  v.allowCursorActivity = false;
+  ids.forEach((id) => {
+    let el = v.xmlDoc.querySelector("[*|id='" + id + "']");
+    if (el) {
+      let dur = el.getAttribute('dur');
+      if (dur) {
+        let i = att.dataDurationCMN.indexOf(dur);
+        i = what === 'increase' ? i + 1 : i - 1;
+        i = Math.min(Math.max(0, i), att.dataDurationCMN.length - 1);
+        el.setAttribute('dur', att.dataDurationCMN.at(i));
+        replaceInEditor(cm, el);
+      }
+    }
+  });
+  v.selectedElements = ids;
+  addApplicationInfo(v, cm);
+  v.updateData(cm, false, true);
+  v.allowCursorActivity = true;
+} // modifyDuration()
+
+/**
  * Moves selected elements to next staff (without checking boundaries)
  * @param {Viewer} v
  * @param {CodeMirror} cm

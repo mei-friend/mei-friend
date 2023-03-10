@@ -1502,6 +1502,8 @@ export let cmd = {
   shiftPitchNameDown: () => e.shiftPitch(v, cm, -1),
   shiftOctaveUp: () => e.shiftPitch(v, cm, 7),
   shiftOctaveDown: () => e.shiftPitch(v, cm, -7),
+  increaseDuration: () => e.modifyDuration(v, cm, 'increase'),
+  decreaseDuration: () => e.modifyDuration(v, cm, 'decrease'),
   moveElementStaffUp: () => e.moveElementToNextStaff(v, cm, true),
   moveElementStaffDown: () => e.moveElementToNextStaff(v, cm, false),
   addOctave8Above: () => e.addOctaveElement(v, cm, 'above', 8),
@@ -1801,6 +1803,8 @@ function addEventListeners(v, cm) {
   document.getElementById('pitchOctaveDown').addEventListener('click', cmd.shiftOctaveDown);
   document.getElementById('staffUp').addEventListener('click', cmd.moveElementStaffUp);
   document.getElementById('staffDown').addEventListener('click', cmd.moveElementStaffDown);
+  document.getElementById('increaseDur').addEventListener('click', cmd.increaseDuration);
+  document.getElementById('decreaseDur').addEventListener('click', cmd.decreaseDuration);
   // Manipulate encoding methods
   document.getElementById('cleanAccid').addEventListener('click', () => e.cleanAccid(v, cm));
   document.getElementById('renumTest').addEventListener('click', () => e.renumberMeasures(v, cm, false));
