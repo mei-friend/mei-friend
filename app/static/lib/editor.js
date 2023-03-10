@@ -188,24 +188,38 @@ export function addControlElement(v, cm, elName, placement, form) {
   // create element to be inserted
   let newElement = v.xmlDoc.createElementNS(dutils.meiNameSpace, elName);
   let uuid = utils.generateXmlId(elName, v.xmlIdStyle);
-  let uuid2, newElement2;
   newElement.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
+
+  // potential second new element for pedal
+  let uuid2, newElement2;
 
   // add @staff attribute of start element
   if (staveArray.length > 0) newElement.setAttribute('staff', staveArray.sort().join(' '));
 
+  // always compute time stamps for checking
+  let tstamp = speed.getTstampForElement(v.xmlDoc, startEl);
+  let m = 0;
+  let tstamp2 = '';
+  if (endEl) {
+    m = speed.getMeasureDistanceBetweenElements(v.xmlDoc, startEl, endEl);
+    tstamp2 = speed.getTstampForElement(v.xmlDoc, endEl);
+  }
+
   // elements with both startid and endid
   if (['slur', 'tie', 'phrase', 'hairpin', 'gliss'].includes(elName)) {
-    if (useTstamps) {
-      newElement.setAttribute('tstamp', speed.getTstampForElement(v.xmlDoc, startEl));
-    } else {
-      newElement.setAttribute('startid', '#' + startId);
+    // stop, if selected elements are on the same beat position and through warning.
+    if (m === 0 && tstamp2 === tstamp) {
+      let msg = 'Cannot insert ' + elName;
+      msg += ', because ' + startId + ' and ' + endId + ' are on the same beat position ' + tstamp + '.';
+      console.log(msg);
+      v.showAlert(msg, 'warning');
+      return;
     }
     if (useTstamps) {
-      const m = speed.getMeasureDistanceBetweenElements(v.xmlDoc, startEl, endEl);
-      const t2 = speed.getTstampForElement(v.xmlDoc, endEl);
-      newElement.setAttribute('tstamp2', utils.writeMeasureBeat(m, t2));
+      newElement.setAttribute('tstamp', tstamp);
+      newElement.setAttribute('tstamp2', utils.writeMeasureBeat(m, tstamp2));
     } else {
+      newElement.setAttribute('startid', '#' + startId);
       newElement.setAttribute('endid', '#' + endId);
     }
   } else if (
@@ -213,17 +227,15 @@ export function addControlElement(v, cm, elName, placement, form) {
     ['fermata', 'dir', 'dynam', 'tempo', 'pedal', 'mordent', 'trill', 'turn'].includes(elName)
   ) {
     if (useTstamps) {
-      newElement.setAttribute('tstamp', speed.getTstampForElement(v.xmlDoc, startEl));
+      newElement.setAttribute('tstamp', tstamp);
     } else {
       newElement.setAttribute('startid', '#' + startId);
     }
   }
-  // add an optional endid
-  if (endId && ['dir', 'dynam', 'mordent', 'trill'].includes(elName)) {
+  // add an optional endid (but only if tstamps are different)
+  if (endId && ['dir', 'dynam', 'mordent', 'trill'].includes(elName) && (m !== 0 || tstamp !== tstamp2)) {
     if (useTstamps) {
-      const m = speed.getMeasureDistanceBetweenElements(v.xmlDoc, startEl, endEl);
-      const t2 = speed.getTstampForElement(v.xmlDoc, endEl);
-      newElement.setAttribute('tstamp2', utils.writeMeasureBeat(m, t2));
+      newElement.setAttribute('tstamp2', utils.writeMeasureBeat(m, tstamp2));
     } else {
       newElement.setAttribute('endid', '#' + endId);
     }
@@ -237,17 +249,18 @@ export function addControlElement(v, cm, elName, placement, form) {
   if (form && ['hairpin', 'fermata', 'mordent', 'trill', 'turn'].includes(elName)) {
     newElement.setAttribute('form', form);
   }
+
   // placement for pedal is @dir=up|down
   if (placement && ['pedal'].includes(elName)) {
     newElement.setAttribute('dir', placement);
 
-    // add dir=up element to endEl
-    if (endEl && endId && placement === 'down') {
+    // add dir=up element to endEl (only if tstamps are different)
+    if (endEl && endId && placement === 'down' && (m !== 0 || tstamp !== tstamp2)) {
       newElement2 = v.xmlDoc.createElementNS(dutils.meiNameSpace, elName);
       uuid2 = utils.generateXmlId(elName, v.xmlIdStyle);
       newElement2.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid2);
       if (useTstamps) {
-        newElement2.setAttribute('tstamp', speed.getTstampForElement(v.xmlDoc, endEl));
+        newElement2.setAttribute('tstamp', tstamp2);
       } else {
         newElement2.setAttribute('startid', '#' + endId);
       }
@@ -284,7 +297,6 @@ export function addControlElement(v, cm, elName, placement, form) {
     cm.indentLine(p1.line, 'smart');
     cm.indentLine(p1.line + 1, 'smart');
   }
-
   if (newElement2) {
     // only for pedal up case
     endEl.closest('measure').appendChild(newElement2);
