@@ -67,7 +67,10 @@ addEventListener(
             result.pageCount = tk.getPageCount();
             if (result.pageNo > result.pageCount) result.pageNo = result.pageCount;
           }
-          result.pageNo = Math.max(1, result.pageNo);
+          if (!result.speedMode && result.pageNo > tk.getPageCount()) {
+            result.pageNo = Math.min(result.pageNo, tk.getPageCount());
+            result.forceUpdate = true;
+          }
           let pg = result.speedMode && result.pageNo > 1 ? 2 : result.pageNo;
           result.svg = tk.renderToSVG(pg);
           result.cmd = 'updated';
@@ -100,6 +103,10 @@ addEventListener(
             result.pageNo = Math.max(1, parseInt(tk.getPageWithElement(result.xmlId)));
             result.forceUpdate = true;
           }
+          if (!result.speedMode && result.pageNo > tk.getPageCount()) {
+            result.pageNo = Math.min(result.pageNo, tk.getPageCount());
+            result.forceUpdate = true;
+          }
           let pg = result.speedMode && result.pageNo > 1 ? 2 : result.pageNo;
           result.svg = tk.renderToSVG(pg);
           result.pageCount = tk.getPageCount();
@@ -118,6 +125,10 @@ addEventListener(
           if (result.xmlId && !result.speedMode) {
             result.pageNo = Math.max(1, parseInt(tk.getPageWithElement(result.xmlId)));
             result.setCursorToPageBeginning = false;
+            result.forceUpdate = true;
+          }
+          if (!result.speedMode && result.pageNo > tk.getPageCount()) {
+            result.pageNo = Math.min(result.pageNo, tk.getPageCount());
             result.forceUpdate = true;
           }
           result.svg = tk.renderToSVG(result.pageNo);
@@ -141,6 +152,10 @@ addEventListener(
             result.forceUpdate = true;
           }
           if (result.xmlId) result.setCursorToPageBeginning = false;
+          if (!result.speedMode && result.pageNo > tk.getPageCount()) {
+            result.pageNo = Math.min(result.pageNo, tk.getPageCount());
+            result.forceUpdate = true;
+          }
           let pg = result.speedMode && result.pageNo > 1 ? 2 : result.pageNo;
           result.svg = tk.renderToSVG(pg);
           result.pageCount = tk.getPageCount();
@@ -166,7 +181,11 @@ addEventListener(
             result.pageNo = Math.max(1, parseInt(tk.getPageWithElement(result.xmlId)));
             result.forceUpdate = true;
           }
-          if (result.xmlId) result.setCursorToPageBeginning = false;
+          if (!result.speedMode && result.pageNo > tk.getPageCount()) {
+            result.pageNo = Math.min(result.pageNo, tk.getPageCount());
+            result.forceUpdate = true;
+          }
+          result.pageNo = Math.min(Math.max(1, result.pageNo), tk.getPageCount());
           let pg = result.speedMode && result.pageNo > 1 ? 2 : result.pageNo;
           result.svg = tk.renderToSVG(pg);
           result.pageCount = tk.getPageCount();
