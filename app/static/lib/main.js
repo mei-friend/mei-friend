@@ -1,6 +1,6 @@
 // mei-friend version and date
 export const version = '0.8.6';
-export const versionDate = '8 Mar 2023';
+export const versionDate = '10 Mar 2023';
 
 var vrvWorker;
 var spdWorker;
@@ -1150,7 +1150,7 @@ export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true, upd
 // mei argument may be MEI or any other supported format (text/binary)
 export function handleEncoding(mei, setFreshlyLoaded = true, updateAfterLoading = true, clearBeforeLoading = true) {
   let found = false;
-  if(clearBeforeLoading) { 
+  if (clearBeforeLoading) {
     if (pageParam === null) storage.removeItem('page');
     v.clear();
   }
@@ -1502,6 +1502,8 @@ export let cmd = {
   shiftPitchNameDown: () => e.shiftPitch(v, cm, -1),
   shiftOctaveUp: () => e.shiftPitch(v, cm, 7),
   shiftOctaveDown: () => e.shiftPitch(v, cm, -7),
+  increaseDuration: () => e.modifyDuration(v, cm, 'increase'),
+  decreaseDuration: () => e.modifyDuration(v, cm, 'decrease'),
   moveElementStaffUp: () => e.moveElementToNextStaff(v, cm, true),
   moveElementStaffDown: () => e.moveElementToNextStaff(v, cm, false),
   addOctave8Above: () => e.addOctaveElement(v, cm, 'above', 8),
@@ -1801,6 +1803,8 @@ function addEventListeners(v, cm) {
   document.getElementById('pitchOctaveDown').addEventListener('click', cmd.shiftOctaveDown);
   document.getElementById('staffUp').addEventListener('click', cmd.moveElementStaffUp);
   document.getElementById('staffDown').addEventListener('click', cmd.moveElementStaffDown);
+  document.getElementById('increaseDur').addEventListener('click', cmd.increaseDuration);
+  document.getElementById('decreaseDur').addEventListener('click', cmd.decreaseDuration);
   // Manipulate encoding methods
   document.getElementById('cleanAccid').addEventListener('click', () => e.cleanAccid(v, cm));
   document.getElementById('renumTest').addEventListener('click', () => e.renumberMeasures(v, cm, false));
@@ -2103,8 +2107,7 @@ function setKeyMap(keyMapFilePath) {
             ev.preventDefault();
 
             v.cmd2KeyPressed = platform.startsWith('mac') ? ev.ctrlKey : ev.altKey;
-            console.log('CMD2 pressed ' + v.cmd2KeyPressed + '; ', ev);
-            
+
             let keyName = ev.key;
             if (ev.code.toLowerCase() === 'space') keyName = 'space';
             // arrowdown -> down

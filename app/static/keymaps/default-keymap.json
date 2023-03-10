@@ -9,6 +9,8 @@
     "down": "layerDown",
     "shift-up": "shiftPitchNameUp",
     "shift-down": "shiftPitchNameDown",
+    "shift-left": "decreaseDuration",
+    "shift-right": "increaseDuration",
     "delete": "delete",
     "backspace": "delete",
     "shift-r": "renumberMeasuresTest",

@@ -3,6 +3,9 @@
 * Insert control elements with time stamps (`@tstamp`/`tstamp2`) instead of ids (`startid`/`endid`) through `ALT` (Mac: `Ctrl`) modifier key
 * Fix between placement (`SHIFT + X`) with control elements without `@startid`. 
 * Various GitHub fixes, incl. loading compressed MusicXML via Git
+* Check time stamps when inserting control elements, through warning for slur etc.
+* Unselect element(s) when `CTRL/CMD` clicking or drag-selecting already selected element(s)
+* `SHIFT LEFT/RIGHT` de/increases duration (`@dur`) of selected element(s), if they have such attribute
 
 ### 0.8.5 PDF export
 * Preview PDF mode with page-view of notation, triggered via menu item or `CMD/CTRL + P`

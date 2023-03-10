@@ -476,43 +476,33 @@ export default class Viewer {
     // select tuplet when clicking on tupletNum
     if (e.currentTarget.getAttribute('class') === 'tupletNum') itemId = utils.insideParent(itemId, 'tuplet');
 
+    let msg = 'handleClickOnNotation() ';
     if ((platform.startsWith('mac') && e.metaKey) || e.ctrlKey) {
-      this.selectedElements.push(itemId);
-      console.info(
-        'handleClickOnNotation() added: ' +
-          this.selectedElements[this.selectedElements.length - 1] +
-          ', size now: ' +
-          this.selectedElements.length
-      );
+      if (this.selectedElements.includes(itemId)) {
+        this.selectedElements.splice(this.selectedElements.indexOf(itemId), 1);
+        msg += 'removed: ' + itemId + ', size: ' + this.selectedElements.length;
+      } else {
+        this.selectedElements.push(itemId);
+        msg += 'added: ' + itemId + ', size: ' + this.selectedElements.length;
+      }
     } else {
       // set cursor position in buffer
       utils.setCursorToId(cm, itemId);
       this.selectedElements = [];
       this.selectedElements.push(itemId);
-      console.info(
-        'handleClickOnNotation() newly created: ' +
-          this.selectedElements[this.selectedElements.length - 1] +
-          ', size now: ' +
-          this.selectedElements.length
-      );
+      msg += 'newly created: ' + itemId + ', size: ' + this.selectedElements.length;
     }
+    console.log(msg);
     this.updateHighlight(cm);
     if (document.getElementById('showMidiPlaybackControlBar').checked) {
       console.log('Viewer.handleClickOnNotation(): HANDLE CLICK MIDI TIMEOUT');
       startMidiTimeout();
     }
     this.setFocusToVerovioPane();
-    // set lastNoteId to @startid or @staff of control element
-    let startid = utils.getAttributeById(cm, itemId, 'startid');
-    if (startid && startid.startsWith('#')) startid = startid.split('#')[1];
 
-    // if (!startid) { // work around for tstamp/staff
-    // TODO: find note corresponding to @staff/@tstamp
-    // startid = utils.getAttributeById(txtEdr.getBuffer(), itemId, attribute = 'tstamp');
-    // console.info('staff: ', startid);
-    // }
-    if (startid) this.lastNoteId = startid;
-    else this.lastNoteId = itemId;
+    // set lastNoteId to @startid of control element
+    let startid = this.xmlDoc.querySelector('[*|id=' + itemId + ']')?.getAttribute('startid');
+    this.lastNoteId = startid ? utils.rmHash(startid) : itemId;
     this.allowCursorActivity = true;
   } // handleClickOnNotation()
 
@@ -1003,7 +993,7 @@ export default class Viewer {
   }
 
   addMeiFriendOptionsToSettingsPanel(restoreFromLocalStorage = true) {
-    let optionsToShow = {
+    let meiFriendSettingsOptions = {
       titleGeneral: {
         title: 'General',
         description: 'General mei-friend settings',
@@ -1315,8 +1305,8 @@ export default class Viewer {
     mfs.innerHTML = '<div class="settingsHeader">mei-friend Settings</div>';
     let storage = window.localStorage;
     let currentHeader;
-    Object.keys(optionsToShow).forEach((opt) => {
-      let o = optionsToShow[opt];
+    Object.keys(meiFriendSettingsOptions).forEach((opt) => {
+      let o = meiFriendSettingsOptions[opt];
       let value = o.default;
       if (storage.hasOwnProperty('mf-' + opt)) {
         if (restoreFromLocalStorage && opt !== 'showMidiPlaybackControlBar') {
@@ -1537,7 +1527,7 @@ export default class Viewer {
             );
             break;
         }
-        if (value === optionsToShow[option].default) {
+        if (value === meiFriendSettingsOptions[option].default) {
           delete storage['mf-' + option]; // remove from storage object when default value
         } else {
           storage['mf-' + option] = value; // save changes in localStorage object
@@ -1569,7 +1559,7 @@ export default class Viewer {
   } // addMeiFriendOptionsToSettingsPanel()
 
   addCmOptionsToSettingsPanel(mfDefaults, restoreFromLocalStorage = true) {
-    let optionsToShow = {
+    let codeMirrorSettingsOptions = {
       // key as in CodeMirror
       titleAppearance: {
         title: 'Editor appearance',
@@ -1712,8 +1702,8 @@ export default class Viewer {
     let currentHeader;
     if (!/\w/g.test(cmsp.innerHTML)) addListeners = true;
     cmsp.innerHTML = '<div class="settingsHeader">Editor Settings</div>';
-    Object.keys(optionsToShow).forEach((opt) => {
-      let o = optionsToShow[opt];
+    Object.keys(codeMirrorSettingsOptions).forEach((opt) => {
+      let o = codeMirrorSettingsOptions[opt];
       let value = o.default;
       if (mfDefaults.hasOwnProperty(opt)) {
         value = mfDefaults[opt];
