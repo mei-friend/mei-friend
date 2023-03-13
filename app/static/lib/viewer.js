@@ -1154,6 +1154,112 @@ export default class Viewer {
         type: 'bool',
         default: true,
       },
+      titleTransposition: {
+        title: 'Transpose',
+        description: 'Transpose score information',
+        type: 'header',
+        default: true,
+      },
+      transposeKey: {
+        title: 'Transpose to key',
+        description: 'Transpose to key',
+        type: 'select',
+        labels: [
+          'C# major / A# minor',
+          'F# major / D# minor',
+          'B major / G# minor',
+          'E major / C# minor',
+          'A major / F# minor',
+          'D major / B minor',
+          'G major / E minor',
+          'C major / E minor',
+          'F major / D minor',
+          'Bb major / G minor',
+          'Eb major / C minor',
+          'Ab major / F minor',
+          'Db major / Bb minor',
+          'Gb major / Eb minor',
+          'Cb major / Ab minor',
+        ],
+        values: ['cs', 'fs', 'b', 'e', 'a', 'd', 'g', 'c', 'f', 'bf', 'ef', 'af', 'df', 'gf', 'cf'],
+        default: 'ef',
+        radioId: 'toKey',
+        radioName: 'transposeMode',
+      },
+      transposeInterval: {
+        title: 'Transpose by interval',
+        description:
+          'Transpose encoding by chromatic interval by the most common intervals (Verovio supports the base-40 system)',
+        type: 'select',
+        labels: [
+          'Perfect Unison',
+          'Augmented Unison',
+          'Diminished Second',
+          'Minor Second',
+          'Major Second',
+          'Augmented Second',
+          'Diminished Third',
+          'Minor Third',
+          'Major Third',
+          'Augmented Third',
+          'Diminished Fourth',
+          'Perfect Fourth',
+          'Augmented Fourth',
+          'Diminished Fifth',
+          'Perfect Fifth',
+          'Augmented Fifth',
+          'Diminished Sixth',
+          'Minor Sixth',
+          'Major Sixth',
+          'Augmented Sixth',
+          'Diminished Seventh',
+          'Minor Seventh',
+          'Major Seventh',
+          'Augmented Seventh',
+          'Diminished Octave',
+          'Perfect Octave',
+        ],
+        values: [
+          'P1',
+          'A1',
+          'd2',
+          'm2',
+          'M2',
+          'A2',
+          'd3',
+          'm3',
+          'M3',
+          'A3',
+          'd4',
+          'P4',
+          'A4',
+          'd5',
+          'P5',
+          'A5',
+          'd6',
+          'm6',
+          'M6',
+          'A6',
+          'd7',
+          'm7',
+          'M7',
+          'A7',
+          'd8',
+          'P8',
+        ],
+        default: 'P1',
+        radioId: 'byInterval',
+        radioName: 'transposeMode',
+        radioChecked: 'true',
+      },
+      transposeDirection: {
+        title: 'Direction',
+        description: 'Direction',
+        type: 'select',
+        labels: ['Up', 'Down', 'Closest'],
+        values: ['+', '-', ''],
+        default: '+', // refers to values
+      },
       renumberMeasuresHeading: {
         title: 'Renumber measures',
         description: 'Settings for renumbering measures',
@@ -1527,7 +1633,7 @@ export default class Viewer {
             );
             break;
         }
-        if (value === meiFriendSettingsOptions[option].default) {
+        if (meiFriendSettingsOptions[option] && value === meiFriendSettingsOptions[option].default) {
           delete storage['mf-' + option]; // remove from storage object when default value
         } else {
           storage['mf-' + option] = value; // save changes in localStorage object
@@ -1969,6 +2075,18 @@ export default class Viewer {
     }
     let div = document.createElement('div');
     div.classList.add('optionsItem');
+    // add radio button for current options item
+    if ('radioId' in o && 'radioName' in o) {
+      let radio = document.createElement('input');
+      radio.setAttribute('type', 'radio');
+      radio.setAttribute('name', o.radioName);
+      radio.setAttribute('id', o.radioId);
+      radio.classList.add('radio');
+      div.appendChild(radio);
+      if ('radioChecked' in o && o.radioChecked) {
+        radio.setAttribute('checked', 'true');
+      }
+    }
     let label = document.createElement('label');
     let title = o.description;
     if (o.default) title += ' (default: ' + o.default + ')';
@@ -2018,8 +2136,9 @@ export default class Viewer {
         input = document.createElement('select');
         input.setAttribute('name', opt);
         input.setAttribute('id', opt);
-        o.values.forEach((str, i) => {
-          let option = new Option(str, str, o.values.indexOf(optDefault) === i ? true : false);
+        o.values.forEach((value, i) => {
+          let label = 'labels' in o ? o.labels.at(i) : value;
+          let option = new Option(label, value, o.values.indexOf(optDefault) === i ? true : false);
           if ('valuesDescriptions' in o) option.title = o.valuesDescriptions[i];
           input.add(option);
         });
