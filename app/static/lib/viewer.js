@@ -1254,11 +1254,16 @@ export default class Viewer {
       },
       transposeDirection: {
         title: 'Direction',
-        description: 'Direction',
+        description: 'Pitch direction of transposition (up/down)',
         type: 'select',
         labels: ['Up', 'Down', 'Closest'],
         values: ['+', '-', ''],
         default: '+', // refers to values
+      },
+      transposeButton: {
+        title: 'Transpose',
+        description: 'Execute transposition with above settings',
+        type: 'button',
       },
       renumberMeasuresHeading: {
         title: 'Renumber measures',
@@ -1566,6 +1571,11 @@ export default class Viewer {
             break;
           case 'byInterval':
             this.setDisplayInOptionsItem('transposeInterval', 'transposeKey');
+            break;
+          case 'transposeKey':
+          case 'transposeInterval':
+          case 'transposeDirection':
+            document.getElementById('transposeButton').previousSibling.textContent = this.getTranspositionOption();
             break;
           case 'editFacsimileZones':
             document.getElementById('facsimile-edit-zones-checkbox').checked = value;
@@ -2174,6 +2184,17 @@ export default class Viewer {
         line.classList.add(o.title);
         div.appendChild(line);
         break;
+      case 'button':
+        label.textContent = this.getTranspositionOption();
+
+        label.setAttribute('title', '');
+        input = document.createElement('input');
+        input.setAttribute('type', 'button');
+        input.setAttribute('name', opt);
+        input.setAttribute('id', opt);
+        input.setAttribute('value', o.title);
+        input.setAttribute('title', o.description);
+        break;
       default:
         console.log(
           'Creating Verovio Options: Unhandled data type: ' +
@@ -2205,6 +2226,17 @@ export default class Viewer {
         }
       });
     }
+  }
+
+  getTranspositionOption() {
+    let dir = document.getElementById('transposeDirection');
+    let key = document.getElementById('transposeKey');
+    let int = document.getElementById('transposeInterval');
+    if (!dir || !key || !int) return;
+    let optionString = dir.value;
+    if (!key.disabled) optionString += key.value;
+    if (!int.disabled) optionString += int.value;
+    return optionString;
   }
 
   // navigate forwards/backwards/upwards/downwards in the DOM, as defined
