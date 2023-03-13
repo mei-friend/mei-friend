@@ -1160,32 +1160,6 @@ export default class Viewer {
         type: 'header',
         default: true,
       },
-      transposeKey: {
-        title: 'Transpose to key',
-        description: 'Transpose to key',
-        type: 'select',
-        labels: [
-          'C# major / A# minor',
-          'F# major / D# minor',
-          'B major / G# minor',
-          'E major / C# minor',
-          'A major / F# minor',
-          'D major / B minor',
-          'G major / E minor',
-          'C major / E minor',
-          'F major / D minor',
-          'Bb major / G minor',
-          'Eb major / C minor',
-          'Ab major / F minor',
-          'Db major / Bb minor',
-          'Gb major / Eb minor',
-          'Cb major / Ab minor',
-        ],
-        values: ['cs', 'fs', 'b', 'e', 'a', 'd', 'g', 'c', 'f', 'bf', 'ef', 'af', 'df', 'gf', 'cf'],
-        default: 'ef',
-        radioId: 'toKey',
-        radioName: 'transposeMode',
-      },
       transposeInterval: {
         title: 'Transpose by interval',
         description:
@@ -1250,6 +1224,32 @@ export default class Viewer {
         default: 'P1',
         radioId: 'byInterval',
         radioName: 'transposeMode',
+      },
+      transposeKey: {
+        title: 'Transpose to key',
+        description: 'Transpose to key',
+        type: 'select',
+        labels: [
+          'C# major / A# minor',
+          'F# major / D# minor',
+          'B major / G# minor',
+          'E major / C# minor',
+          'A major / F# minor',
+          'D major / B minor',
+          'G major / E minor',
+          'C major / E minor',
+          'F major / D minor',
+          'Bb major / G minor',
+          'Eb major / C minor',
+          'Ab major / F minor',
+          'Db major / Bb minor',
+          'Gb major / Eb minor',
+          'Cb major / Ab minor',
+        ],
+        values: ['cs', 'fs', 'b', 'e', 'a', 'd', 'g', 'c', 'f', 'bf', 'ef', 'af', 'df', 'gf', 'cf'],
+        default: 'c',
+        radioId: 'toKey',
+        radioName: 'transposeMode',
         radioChecked: 'true',
       },
       transposeDirection: {
@@ -1273,7 +1273,7 @@ export default class Viewer {
         default: false,
       },
       renumberMeasuresUseSuffixAtMeasures: {
-        title: 'Use suffix at incomplete measures',
+        title: 'Suffix at incomplete measures',
         description: 'Use number suffix at incomplete measures (e.g., 23-cont)',
         type: 'select',
         values: ['none', '-cont'],
@@ -1286,7 +1286,7 @@ export default class Viewer {
         default: false,
       },
       renumberMeasuresUseSuffixAtEndings: {
-        title: 'Use suffix at endings',
+        title: 'Suffix at endings',
         description: 'Use number suffix at endings (e.g., 23-a)',
         type: 'select',
         values: ['none', 'ending@n', 'a/b/c', 'A/B/C', '-a/-b/-c', '-A/-B/-C'],
@@ -1490,6 +1490,12 @@ export default class Viewer {
         case 'showMidiPlaybackControlBar':
           // do nothing, as it is always the default display: none
           break;
+        case 'transposeKey':
+          if (o.radioChecked) this.setDisplayInOptionsItem('transposeKey', 'transposeInterval');
+          break;
+        case 'transposeInterval':
+          if (o.radioChecked) this.setDisplayInOptionsItem('transposeInterval', 'transposeKey');
+          break;
       }
       let div = this.createOptionsItem(opt, o, value);
       if (div) {
@@ -1554,6 +1560,12 @@ export default class Viewer {
             break;
           case 'showMidiPlaybackControlBar':
             cmd.toggleMidiPlaybackControlBar(false);
+            break;
+          case 'toKey':
+            this.setDisplayInOptionsItem('transposeKey', 'transposeInterval');
+            break;
+          case 'byInterval':
+            this.setDisplayInOptionsItem('transposeInterval', 'transposeKey');
             break;
           case 'editFacsimileZones':
             document.getElementById('facsimile-edit-zones-checkbox').checked = value;
@@ -1999,7 +2011,7 @@ export default class Viewer {
         }
       });
     }
-  }
+  } // addVrvOptionsToSettingsPanel()
 
   // TODO: does not get called (WG., 12 Okt 2022)
   // adds an event listener to the targetNode, to listen to 'header' elements (details/summary)
@@ -2075,6 +2087,7 @@ export default class Viewer {
     }
     let div = document.createElement('div');
     div.classList.add('optionsItem');
+
     // add radio button for current options item
     if ('radioId' in o && 'radioName' in o) {
       let radio = document.createElement('input');
@@ -2087,13 +2100,17 @@ export default class Viewer {
         radio.setAttribute('checked', 'true');
       }
     }
+
+    // label
     let label = document.createElement('label');
     let title = o.description;
     if (o.default) title += ' (default: ' + o.default + ')';
     label.setAttribute('title', title);
-    label.setAttribute('for', opt);
+    label.setAttribute('for', 'radioId' in o ? o.radioId : opt);
     label.innerText = o.title;
     div.appendChild(label);
+
+    // input
     let input;
     let step = 0.05;
     switch (o.type) {
@@ -2397,6 +2414,21 @@ export default class Viewer {
     if (cont) el.parentNode.classList.add('disabled');
     else el.parentNode.classList.remove('disabled');
   }
+
+  setDisplayInOptionsItem(onItem, offItem) {
+    let off = document.getElementById(offItem);
+    if (off) {
+      off.disabled = true;
+      off.classList.add('disabled');
+      off.previousSibling?.classList.add('disabled');
+    }
+    let on = document.getElementById(onItem);
+    if (on) {
+      on.disabled = false;
+      on.classList.remove('disabled');
+      on.previousSibling?.classList.remove('disabled');
+    }
+  } // setDisplayInOptionsItem()
 
   // show alert to user in #alertOverlay
   // type: ['error'] 'warning' 'info' 'success'
