@@ -1163,7 +1163,7 @@ export default class Viewer {
       enableTransposition: {
         title: 'Enable transposition',
         description:
-          'Enable transposition settings, to be applied through the transpose button below. The encoding remains unchanged, unless you click the item "Rerender via Verovio" in the dropdown menu.',
+          'Enable transposition settings, to be applied through the transpose button below. The transposition will be applied to the notation only, the encoding remains unchanged, unless you click the item "Rerender via Verovio" in the "Manipulate" dropdown menu.',
         type: 'bool',
         default: false,
       },
@@ -1270,7 +1270,7 @@ export default class Viewer {
       transposeButton: {
         title: 'Transpose',
         description:
-          'Apply transposition with above settings; MEI encoding remains unchanged. To transpose the encoding as well, use "Rerender via Verovio" in the dropdown menu.',
+          'Apply transposition with above settings to the notation, while the MEI encoding remains unchanged. To also transpose the MEI encoding with the current settings, use "Rerender via Verovio" in the "Manipulate" dropdown menu.',
         type: 'button',
       },
       renumberMeasuresHeading: {
