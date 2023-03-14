@@ -1160,6 +1160,13 @@ export default class Viewer {
         type: 'header',
         default: true,
       },
+      enableTransposition: {
+        title: 'Enable transposition',
+        description:
+          'Enable transposition settings, to be applied through the transpose button below. The encoding remains unchanged, unless you click the item "Rerender via Verovio" in the dropdown menu.',
+        type: 'bool',
+        default: false,
+      },
       transposeInterval: {
         title: 'Transpose by interval',
         description:
@@ -1262,7 +1269,8 @@ export default class Viewer {
       },
       transposeButton: {
         title: 'Transpose',
-        description: 'Execute transposition with above settings',
+        description:
+          'Apply transposition with above settings; MEI encoding remains unchanged. To transpose the encoding as well, use "Rerender via Verovio" in the dropdown menu.',
         type: 'button',
       },
       renumberMeasuresHeading: {
@@ -1495,11 +1503,19 @@ export default class Viewer {
         case 'showMidiPlaybackControlBar':
           // do nothing, as it is always the default display: none
           break;
-        case 'transposeKey':
-          if (o.radioChecked) this.setDisplayInOptionsItem('transposeKey', 'transposeInterval');
-          break;
-        case 'transposeInterval':
-          if (o.radioChecked) this.setDisplayInOptionsItem('transposeInterval', 'transposeKey');
+        case 'enableTransposition':
+          // switch on
+          if (value) {
+            let onList = ['transposeDirection', 'transposeButton'];
+            if (document.getElementById('toKey')?.checked) onList.push('transposeKey');
+            if (document.getElementById('byInterval')?.checked) onList.push('transposeInterval');
+            this.setDisablednessInOptionsItem(onList, ['']);
+          } else {
+            this.setDisablednessInOptionsItem(
+              [''],
+              ['transposeKey', 'transposeInterval', 'transposeDirection', 'transposeButton']
+            );
+          }
           break;
       }
       let div = this.createOptionsItem(opt, o, value);
@@ -1513,18 +1529,50 @@ export default class Viewer {
           mfs.appendChild(div);
         }
       }
-      if (opt === 'respSelect') this.respId = document.getElementById('respSelect').value;
-      if (opt === 'renumberMeasuresUseSuffixAtEndings') {
-        this.disableElementThroughCheckbox(
-          'renumberMeasuresContinueAcrossEndings',
-          'renumberMeasuresUseSuffixAtEndings'
-        );
-      }
-      if (opt === 'renumberMeasuresUseSuffixAtMeasures') {
-        this.disableElementThroughCheckbox(
-          'renumberMeasureContinueAcrossIncompleteMeasures',
-          'renumberMeasuresUseSuffixAtMeasures'
-        );
+      switch (opt) {
+        case 'respSelect':
+          this.respId = document.getElementById('respSelect').value;
+          break;
+        case 'renumberMeasuresUseSuffixAtEndings':
+          this.disableElementThroughCheckbox(
+            'renumberMeasuresContinueAcrossEndings',
+            'renumberMeasuresUseSuffixAtEndings'
+          );
+          break;
+        case 'renumberMeasuresUseSuffixAtMeasures':
+          this.disableElementThroughCheckbox(
+            'renumberMeasureContinueAcrossIncompleteMeasures',
+            'renumberMeasuresUseSuffixAtMeasures'
+          );
+          break;
+        case 'transposeKey':
+          if (o.radioChecked && document.getElementById('enableTransposition').checked) {
+            this.setDisablednessInOptionsItem(['transposeKey'], ['']);
+          } else {
+            this.setDisablednessInOptionsItem([''], ['transposeKey']);
+          }
+          break;
+        case 'transposeInterval':
+          if (o.radioChecked && document.getElementById('enableTransposition').checked) {
+            this.setDisablednessInOptionsItem(['transposeInterval'], ['']);
+          } else {
+            this.setDisablednessInOptionsItem([''], ['transposeInterval']);
+          }
+          break;
+        case 'transposeDirection':
+          if (document.getElementById('enableTransposition').checked) {
+            this.setDisablednessInOptionsItem(['transposeDirection'], ['']);
+          } else {
+            this.setDisablednessInOptionsItem([''], ['transposeDirection']);
+          }
+          break;
+        case 'transposeButton':
+          if (document.getElementById('enableTransposition').checked) {
+            this.setDisablednessInOptionsItem(['transposeButton'], ['']);
+          } else {
+            this.setDisablednessInOptionsItem([''], ['transposeButton']);
+          }
+          break;
       }
     });
     mfs.innerHTML +=
@@ -1566,18 +1614,38 @@ export default class Viewer {
           case 'showMidiPlaybackControlBar':
             cmd.toggleMidiPlaybackControlBar(false);
             break;
+          case 'enableTransposition':
+            // switch on
+            if (value) {
+              let onList = ['transposeDirection', 'transposeButton'];
+              if (document.getElementById('toKey')?.checked) onList.push('transposeKey');
+              if (document.getElementById('byInterval')?.checked) onList.push('transposeInterval');
+              this.setDisablednessInOptionsItem(onList, ['']);
+            } else {
+              this.setDisablednessInOptionsItem(
+                [''],
+                ['transposeKey', 'transposeInterval', 'transposeDirection', 'transposeButton']
+              );
+              this.vrvOptions.transpose = '';
+              this.updateAll(cm);
+            }
+            if (document.getElementById('showMidiPlaybackControlBar').checked) {
+              cmd.toggleMidiPlaybackControlBar();
+            }
+            break;
           case 'toKey':
-            this.setDisplayInOptionsItem('transposeKey', 'transposeInterval');
-            document.getElementById('transposeButton').previousSibling.textContent = this.getTranspositionOption();
+            if (document.getElementById('enableTransposition').checked) {
+              this.setDisablednessInOptionsItem(['transposeKey'], ['transposeInterval']);
+            }
             break;
           case 'byInterval':
-            this.setDisplayInOptionsItem('transposeInterval', 'transposeKey');
-            document.getElementById('transposeButton').previousSibling.textContent = this.getTranspositionOption();
+            if (document.getElementById('enableTransposition').checked) {
+              this.setDisablednessInOptionsItem(['transposeInterval'], ['transposeKey']);
+            }
             break;
           case 'transposeKey':
           case 'transposeInterval':
           case 'transposeDirection':
-            document.getElementById('transposeButton').previousSibling.textContent = this.getTranspositionOption();
             break;
           case 'editFacsimileZones':
             document.getElementById('facsimile-edit-zones-checkbox').checked = value;
@@ -1691,6 +1759,9 @@ export default class Viewer {
             this.vrvOptions.transpose = msg;
             // this.updateOption({ transpose: msg });
             this.updateAll(cm);
+            if (document.getElementById('showMidiPlaybackControlBar').checked) {
+              cmd.toggleMidiPlaybackControlBar();
+            }
             break;
         }
       });
@@ -2196,7 +2267,7 @@ export default class Viewer {
         div.appendChild(line);
         break;
       case 'button':
-        label.textContent = this.getTranspositionOption();
+        label.textContent = ''; // '--transpose ' + this.getTranspositionOption();
 
         label.setAttribute('title', '');
         input = document.createElement('input');
@@ -2221,7 +2292,7 @@ export default class Viewer {
     }
     if (input) div.appendChild(input);
     return input || o.type === 'header' || o.type === 'line' ? div : null;
-  }
+  } // createOptionsItem()
 
   // add responsibility statement to resp select dropdown
   setRespSelectOptions() {
@@ -2237,7 +2308,7 @@ export default class Viewer {
         }
       });
     }
-  }
+  } // setRespSelectOptions()
 
   getTranspositionOption() {
     let dir = document.getElementById('transposeDirection');
@@ -2248,7 +2319,7 @@ export default class Viewer {
     if (!key.disabled) optionString += key.value;
     if (!int.disabled) optionString += int.value;
     return optionString;
-  }
+  } // getTranspositionOption()
 
   // navigate forwards/backwards/upwards/downwards in the DOM, as defined
   // by 'dir' an by 'incrementElementName'
@@ -2456,21 +2527,31 @@ export default class Viewer {
     el.disabled = cont;
     if (cont) el.parentNode.classList.add('disabled');
     else el.parentNode.classList.remove('disabled');
-  }
+  } // disableElementThroughCheckbox()
 
-  setDisplayInOptionsItem(onItem, offItem) {
-    let off = document.getElementById(offItem);
-    if (off) {
-      off.disabled = true;
-      off.classList.add('disabled');
-      off.previousSibling?.classList.add('disabled');
-    }
-    let on = document.getElementById(onItem);
-    if (on) {
-      on.disabled = false;
-      on.classList.remove('disabled');
-      on.previousSibling?.classList.remove('disabled');
-    }
+  /**
+   * Sets disabled to offItems (and removes it to onItems) of
+   * current element and its previous sibling (label)
+   * @param {Array[string]} onItems (array of ids)
+   * @param {Array[string]} offItems (array of ids)
+   */
+  setDisablednessInOptionsItem(onItems, offItems) {
+    offItems.forEach((offItem) => {
+      let off = document.getElementById(offItem);
+      if (off) {
+        off.disabled = true;
+        off.classList.add('disabled');
+        off.previousSibling?.classList.add('disabled');
+      }
+    });
+    onItems.forEach((onItem) => {
+      let on = document.getElementById(onItem);
+      if (on) {
+        on.disabled = false;
+        on.classList.remove('disabled');
+        on.previousSibling?.classList.remove('disabled');
+      }
+    });
   } // setDisplayInOptionsItem()
 
   // show alert to user in #alertOverlay
