@@ -913,7 +913,7 @@ export default class Viewer {
     midiSpeedmodeIndicator.style.display = this.speedMode ? 'inline' : 'none';
     // console.log('toggle: ', midiPlaybackControlBar);
     setOrientation(cm);
-  }
+  } // toggleMidiPlaybackControlBar()
 
   toggleAnnotationPanel() {
     setOrientation(cm);
@@ -923,7 +923,7 @@ export default class Viewer {
     } else {
       this.updateLayout();
     }
-  }
+  } // toggleAnnotationPanel()
 
   // go through current active tab of settings menu and filter option items (make invisible)
   applySettingsFilter() {
@@ -990,7 +990,7 @@ export default class Viewer {
         }
       }
     }
-  }
+  } // applySettingsFilter()
 
   addMeiFriendOptionsToSettingsPanel(restoreFromLocalStorage = true) {
     let meiFriendSettingsOptions = {
@@ -1253,7 +1253,7 @@ export default class Viewer {
         radioChecked: 'true',
       },
       transposeDirection: {
-        title: 'Direction',
+        title: 'Pitch direction',
         description: 'Pitch direction of transposition (up/down)',
         type: 'select',
         labels: ['Up', 'Down', 'Closest'],
@@ -1530,10 +1530,10 @@ export default class Viewer {
     mfs.innerHTML +=
       '<input type="button" title="Reset to mei-friend defaults" id="mfReset" class="resetButton" value="Default" />';
 
+    // add change listeners to mei-friend settings
     if (addListeners) {
-      // add change listeners
       mfs.addEventListener('input', (ev) => {
-        // console.log('meiFriend settings event listener: ', ev);
+        console.log('meiFriend settings event listener: ', ev);
         let option = ev.target.id;
         let value = ev.target.value;
         if (ev.target.type === 'checkbox') value = ev.target.checked;
@@ -1568,9 +1568,11 @@ export default class Viewer {
             break;
           case 'toKey':
             this.setDisplayInOptionsItem('transposeKey', 'transposeInterval');
+            document.getElementById('transposeButton').previousSibling.textContent = this.getTranspositionOption();
             break;
           case 'byInterval':
             this.setDisplayInOptionsItem('transposeInterval', 'transposeKey');
+            document.getElementById('transposeButton').previousSibling.textContent = this.getTranspositionOption();
             break;
           case 'transposeKey':
           case 'transposeInterval':
@@ -1678,9 +1680,18 @@ export default class Viewer {
       // });
       // add event listener for reset button
       mfs.addEventListener('click', (ev) => {
-        if (ev.target.id === 'mfReset') {
-          this.addMeiFriendOptionsToSettingsPanel(false);
-          this.applySettingsFilter();
+        switch (ev.target.id) {
+          case 'mfReset':
+            this.addMeiFriendOptionsToSettingsPanel(false);
+            this.applySettingsFilter();
+            break;
+          case 'transposeButton':
+            let msg = this.getTranspositionOption();
+            console.log('Transpose: ' + msg);
+            this.vrvOptions.transpose = msg;
+            // this.updateOption({ transpose: msg });
+            this.updateAll(cm);
+            break;
         }
       });
     }
