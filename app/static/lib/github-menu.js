@@ -470,6 +470,16 @@ export async function fillInBranchContents(e) {
     commitMessageInput.addEventListener("input", onMessageInput);
     commitFileName.removeEventListener("input", onFileNameEdit);
     commitFileName.addEventListener("input", onFileNameEdit);
+
+    // add "Report issue with encoding" link
+    const reportIssue = document.createElement("a");
+    reportIssue.style.display = "block";
+    reportIssue.id = "reportIssueWithEncoding";
+    reportIssue.innerText = "Report issue with encoding";
+    const openInMeiFriendUrl = `[Click to open in mei-friend](https://mei-friend.mdw.ac.at/?file=https://raw.githubusercontent.com/${github.githubRepo}/${github.branch}${github.filepath}?token=${github.githubToken})`;
+    reportIssue.href = `https://github.com/${github.githubRepo}/issues/new?title=Issue+with+${meiFileName}&body=${encodeURI(openInMeiFriendUrl)}`;
+    commitUI.appendChild(document.createElement("hr"));
+    commitUI.appendChild(reportIssue);
   }
   fillInCommitLog("withRefresh");
   // GitHub menu interactions

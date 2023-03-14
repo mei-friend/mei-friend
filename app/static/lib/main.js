@@ -608,6 +608,37 @@ document.addEventListener('DOMContentLoaded', function () {
     ? 'block'
     : 'none';
 
+  if(storage.supported) { 
+    if (storage.github) {
+      // use github object from local storage if available
+      isLoggedIn = true;
+      github = new Github(
+        storage.github.githubRepo,
+        storage.github.githubToken,
+        storage.github.branch,
+        storage.github.commit,
+        storage.github.filepath,
+        storage.github.userLogin,
+        storage.github.userName,
+        storage.github.userEmail
+      );
+      //document.querySelector("#fileLocation").innerText = meiFileLocationPrintable;
+    } else if (isLoggedIn) {
+      // initialise and store new github object
+      github = new Github('', githubToken, '', '', '', userLogin, userName, userEmail);
+      storage.github = {
+        githubRepo: github.githubRepo,
+        githubToken: github.githubToken,
+        branch: github.branch,
+        commit: github.commit,
+        filepath: github.filepath,
+        userLogin: github.userLogin,
+        userName: userName,
+        userEmail: userEmail,
+      };
+    }
+  }
+
   let urlFileName = searchParams.get('file');
   // fork parameter: if true AND ?fileParam is set to a URL,
   // then put mei-friend into "remote fork request" mode:
@@ -668,34 +699,6 @@ document.addEventListener('DOMContentLoaded', function () {
         openFile(undefined, false, false); // default MEI, skip freshly loaded (see comment above)
         setFileChangedState(false);
       }
-    }
-    if (storage.github) {
-      // use github object from local storage if available
-      isLoggedIn = true;
-      github = new Github(
-        storage.github.githubRepo,
-        storage.github.githubToken,
-        storage.github.branch,
-        storage.github.commit,
-        storage.github.filepath,
-        storage.github.userLogin,
-        storage.github.userName,
-        storage.github.userEmail
-      );
-      //document.querySelector("#fileLocation").innerText = meiFileLocationPrintable;
-    } else if (isLoggedIn) {
-      // initialise and store new github object
-      github = new Github('', githubToken, '', '', '', userLogin, userName, userEmail);
-      storage.github = {
-        githubRepo: github.githubRepo,
-        githubToken: github.githubToken,
-        branch: github.branch,
-        commit: github.commit,
-        filepath: github.filepath,
-        userLogin: github.userLogin,
-        userName: userName,
-        userEmail: userEmail,
-      };
     }
     if (storage.forkAndOpen && github) {
       // we've arrived back after an automated log-in request
@@ -799,11 +802,16 @@ export async function openUrlFetch(url = '', updateAfterLoading = true) {
   let urlStatus = document.querySelector('#openUrlStatus');
   try {
     if (!url) url = new URL(urlInput.value);
+    const headers = { Accept: 'application/xml, text/xml, application/mei+xml' };
+    if (isLoggedIn && url.href.trim().startsWith("https://raw.githubusercontent.com")) { 
+      // GitHub URL - use GitHub credentials to enable URL fetch from private repos
+      await github.directlyReadFileContents(url.href)
+    }
+    console.log("REquesting with headers: ", headers)
     const response = await fetch(url, {
       method: 'GET',
-      headers: {
-        Accept: 'application/xml, text/xml, application/mei+xml',
-      },
+      headers: headers,
+      credentials: "omit"
     });
     if (response.status >= 400) {
       console.warn('Fetching URL produced error status: ', response.status);

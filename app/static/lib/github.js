@@ -14,6 +14,10 @@ export default class Github {
       'Authorization': 'Basic ' + btoa(userLogin + ":" + githubToken), 
       'Accept': 'application/vnd.github.v3+json'
     });
+    this.directReadHeaders = new Headers({
+      'Authorization': 'Basic ' + btoa(userLogin + ":" + githubToken), 
+      'Accept': 'application/vnd.github.raw'
+    })
     // remember this as our 'upstream' repo in case we need to fork
     this.upstreamRepoName = this.githubRepoName;
     this.upstreamRepoOwner = this.githubRepoOwner;
@@ -262,6 +266,25 @@ export default class Github {
       this.content = blob.buffer; // convert from Uint8array to arraybuffer
     } else { 
       this.content = await this.repo.loadAs("text", hash);
+    }
+  }
+
+  async directlyReadFileContents(rawGithubUri) { 
+    const components = rawGithubUri.match(/https:\/\/raw.githubusercontent.com\/([^/]+)\/([^/]+)\/([^/]+)(.*)$/);
+    if(components) { 
+      try { 
+        const fileContentsUrl = `https://api.github.com/repos/${components[1]}/${components[2]}/contents${components[4]}`;
+        await fetch(fileContentsUrl, {
+          method: 'GET',
+          headers: this.directReadHeaders
+        }).then(res => res.text())
+        .then(data => console.log("GOT DATA> ", data));
+      }
+      catch(e) { 
+        console.error("Couldn't directly read file contents: ", e);
+      }
+    } else { 
+      console.warn("Called github.directlyReadfileContents with invalid rawGithubUri: ", rawGithubUri);
     }
   }
 
