@@ -281,26 +281,20 @@ export default class Github {
           // if image or blob, read base64 encoding
           // otherwise read text
           if(isImageUri(rawGithubUri) || isBlobUri(rawGithubUri)) {  
-            return {
-              type: 'blob',
-              payload: res.blob()
-            }
-          } else return { 
-            type: 'text', 
-            payload: res.text()
+            return res.blob()
+          } else { 
+            return res.text()
           }
         }).then(data => {
-          if(data.type === 'text') { 
-            return new Promise((resolve) => resolve(data.payload));
+          if(typeof data === "string") {
+            return new Promise((resolve) => resolve(data));
           } else { 
             console.log("GOT DATA: ", data);
-            return data.payload.then(() => {
-              return new Promise((resolve) => {
-                const reader = new FileReader();
-                reader.onloadend = () => resolve(reader.result);
-                console.log("WORKING WITH: ", data.payload)
-                reader.readAsDataURL(data.payload.value);
-              })
+            return new Promise((resolve) => {
+              const reader = new FileReader();
+              reader.onloadend = () => resolve(reader.result);
+              console.log("WORKING WITH: ", data)
+              reader.readAsDataURL(data);
             })
           }
         });
