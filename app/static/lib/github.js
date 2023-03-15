@@ -274,11 +274,36 @@ export default class Github {
     if(components) { 
       try { 
         const fileContentsUrl = `https://api.github.com/repos/${components[1]}/${components[2]}/contents${components[4]}`;
-        await fetch(fileContentsUrl, {
+        return await fetch(fileContentsUrl, {
           method: 'GET',
           headers: this.directReadHeaders
-        }).then(res => res.text())
-        .then(data => console.log("GOT DATA> ", data));
+        }).then(res => { 
+          // if image or blob, read base64 encoding
+          // otherwise read text
+          if(isImageUri(rawGithubUri) || isBlobUri(rawGithubUri)) {  
+            return {
+              type: 'blob',
+              payload: res.blob()
+            }
+          } else return { 
+            type: 'text', 
+            payload: res.text()
+          }
+        }).then(data => {
+          if(data.type === 'text') { 
+            return new Promise((resolve) => resolve(data.payload));
+          } else { 
+            console.log("GOT DATA: ", data);
+            return data.payload.then(() => {
+              return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result);
+                console.log("WORKING WITH: ", data.payload)
+                reader.readAsDataURL(data.payload.value);
+              })
+            })
+          }
+        });
       }
       catch(e) { 
         console.error("Couldn't directly read file contents: ", e);
@@ -453,3 +478,20 @@ export default class Github {
   }
 }
 
+function isImageUri (uri) { 
+  // images
+  const imgSuffices = ['gif', 'jpg', 'jpeg', 'png', 'tif', 'tif', 'webp'];
+  return isUriWithSuffix(uri, imgSuffices);
+}
+
+function isBlobUri (uri) { 
+  // binary objects (currently: compressed musicxml files)
+  const blobSuffices =['mxl', 'zip'];
+  return isUriWithSuffix(uri, blobSuffices);
+}
+
+function isUriWithSuffix(uri, suffices) { 
+  // return true if uri has a suffix and it matches one of the provided ones (case-insensitively)
+  const suffix = uri.substring(uri.lastIndexOf(".")+1); 
+  return suffices.filter(s => suffix.localeCompare(s, undefined, { sensitivity: 'base' }) == 0).length;
+}

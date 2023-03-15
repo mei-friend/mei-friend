@@ -805,7 +805,8 @@ export async function openUrlFetch(url = '', updateAfterLoading = true) {
     const headers = { Accept: 'application/xml, text/xml, application/mei+xml' };
     if (isLoggedIn && url.href.trim().startsWith("https://raw.githubusercontent.com")) { 
       // GitHub URL - use GitHub credentials to enable URL fetch from private repos
-      await github.directlyReadFileContents(url.href)
+      const data = await github.directlyReadFileContents(url.href)
+      console.log("GOT DATA IN MAIN:", data)
     }
     console.log("REquesting with headers: ", headers)
     const response = await fetch(url, {
