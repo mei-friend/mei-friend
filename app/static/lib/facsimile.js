@@ -227,14 +227,16 @@
              if (fileLocationType === 'github') {
                  let url = new URL('https://raw.githubusercontent.com/' + github.githubRepo + '/' +
                      github.branch + '/' + facs[zoneId].target);
-                 url.searchParams.append('token', github.githubToken);
+                // url.searchParams.append('token', github.githubToken);
                  imgName = url.href;
-                 img = await loadImage(imgName);
+                 //img = await loadImage(imgName);
+                 img = await embedImage(imgName);
                  if (!img) { // try to find images in the 'img' folder on github repo
                      url = new URL('https://raw.githubusercontent.com/' + github.githubRepo + '/' +
                          github.branch + '/img/' + facs[zoneId].target);
-                     url.searchParams.append('token', github.githubToken);
+                    // url.searchParams.append('token', github.githubToken);
                      imgName = url.href;
+                     img = await embedImage(imgName)
                  } else {
                      sourceImages[imgName] = img;
                  }
@@ -261,6 +263,7 @@
              img = sourceImages[imgName]
          }
          if (img) {
+            console.log("Appending chld:", img)
              svg.appendChild(img);
          } else {
              showWarningText('Could not load image \n(' + imgName + ').');
@@ -381,6 +384,28 @@
          }
      });
  } // loadImage()
+
+
+ /**
+  * Asynchronously load and embed the image from url through GitHub API
+  * returns a promise with an svg image object upon resolving
+  * @param {string} url 
+  * @returns {Promise}
+  */
+ async function embedImage(url) {
+     return new Promise((resolve) => {
+         const img = document.createElementNS(svgNameSpace, 'image');
+         img.setAttribute('id', 'source-image');
+         github.directlyReadFileContents(url).then((dataUrl) => {
+            img.setAttributeNS('http://www.w3.org/1999/xlink', 'href', dataUrl);
+            resolve(img);
+         })
+         img.onerror = (err) => {
+             console.log('Cannot embed image file ' + url + ', error: ', err);
+             resolve(null);
+         }
+     });
+ } // embedImage()
  
  
  /**

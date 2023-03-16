@@ -292,7 +292,11 @@ export default class Github {
             console.log("GOT DATA: ", data);
             return new Promise((resolve) => {
               const reader = new FileReader();
-              reader.onloadend = () => resolve(reader.result);
+              reader.onloadend = () => {
+                const dataUrl = reader.result;
+                dataUrl.replace('application/vnd.github.raw', uriSuffixToMimetype(rawGithubUri));
+                resolve(dataUrl)
+              };
               console.log("WORKING WITH: ", data)
               reader.readAsDataURL(data);
             })
@@ -488,4 +492,30 @@ function isUriWithSuffix(uri, suffices) {
   // return true if uri has a suffix and it matches one of the provided ones (case-insensitively)
   const suffix = uri.substring(uri.lastIndexOf(".")+1); 
   return suffices.filter(s => suffix.localeCompare(s, undefined, { sensitivity: 'base' }) == 0).length;
+}
+
+function uriSuffixToMimetype(uri) {
+  const types = {
+    mei: 'application/xml',
+    xml: 'application/xml',
+    mxl: 'application/vnd.recordare.musicxml',
+    abc: 'text/plain',
+    krn: 'text/plain',
+    pae: 'text/plain',
+    gif: 'image/gif',
+    jpg: 'image/jpeg',
+    jpeg:'image/jpeg',
+    png: 'image/png',
+    tif: 'image/tiff',
+    tiff:'image/tiff',
+    svg: 'image/svg+xml',
+    webp:'image/webp'
+  }
+  const tkeys = Object.keys(types);
+  const suffix = uri.substring(uri.lastIndexOf(".")+1);
+  const matches = tkeys.filter(k => suffix.localeCompare(k, undefined, { sensitivity: 'base' }) == 0);
+  if(matches.length) {
+    return types[matches[0]];
+  }
+  return 'application/octet-stream'; //default type
 }
