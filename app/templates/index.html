@@ -35,7 +35,7 @@
   </script> -->
     <script src="{{ url_for('static', filename='lib/env.js') }}"></script>
     <script src="{{ url_for('static', filename='lib/jsgit.js') }}"></script>
-    <script src="{{ url_for('static', filename='lib/github.js') }}" type="module"></script>
+    <script src="{{ url_for('static', filename='lib/git.js') }}" type="module"></script>
     <script>
       let isLoggedIn;
       let root = "{{ url_for('static', filename='') }}";
@@ -44,7 +44,7 @@
     {% if isLoggedIn %}
     <script>
       isLoggedIn = true;
-      const githubToken = '{{ githubToken }}';
+      const gitToken = '{{ gitToken }}';
       const userLogin = '{{ userLogin }}';
       const userName = '{{ userName }}';
       const userEmail = '{{ userEmail }}';

@@ -4,11 +4,11 @@ import {
 import { 
   sampleEncodings,
   samp, 
-  github
+  git
 } from './main.js';
 import {
   forkRepoClicked
-} from './github-menu.js';
+} from './git-menu.js';
 
 const seperator = "|MEI-FRIEND|"; 
 
@@ -78,7 +78,7 @@ async function fillInUserOrgRepos(per_page = 30, page = 1) {
   });
   if(userOrg) { // user or org specified
     const prevRepos = userOrgRepos.childNodes;
-    const repos = await github.getSpecifiedUserOrgRepos(userOrg, per_page, page);
+    const repos = await git.getSpecifiedUserOrgRepos(userOrg, per_page, page);
     if(Array.isArray(repos)) { 
       repos.forEach((repo) => {
         const repoOpt = document.createElement("option");

@@ -21,10 +21,10 @@ github = oauth.register(
 
 @app.route('/')
 def index():
-    if 'githubToken' in session:
+    if 'gitToken' in session:
         return render_template('index.html', 
                 isLoggedIn = "true", # for Javascript, not Python...
-                githubToken = session['githubToken'],
+                gitToken = session['gitToken'],
                 userLogin = session['userLogin'],
                 userName = session['userName'] if session['userName'] else session['userLogin'],
                 userEmail = session['userEmail'])
@@ -50,7 +50,7 @@ def authorize():
     token = github.authorize_access_token()
     resp = github.get('user', token=token)
     profile = resp.json()
-    session['githubToken'] = token["access_token"]
+    session['gitToken'] = token["access_token"]
     session['userLogin'] = profile["login"]
     session['userName'] = profile["name"]
     session['userEmail'] = profile["login"] + "@users.noreply.github.com"

@@ -68,7 +68,7 @@ export var cm;
 export var v; // viewer instance
 export var validator; // validator object
 export var rngLoader; // object for loading a relaxNG schema for hinting
-export let github; // github API wrapper object
+export let git; // gitAPI wrapper object
 export let storage = new Storage();
 export var tkVersion = ''; // string of the currently loaded toolkit version
 export var tkUrl = ''; // string of the currently loaded toolkit origin
@@ -195,9 +195,9 @@ import * as att from './attribute-classes.js';
 import * as e from './editor.js';
 import Viewer from './viewer.js';
 import * as speed from './speed.js';
-import Github from './github.js';
+import Git from './git.js';
 import Storage from './storage.js';
-import { fillInBranchContents, logoutFromGithub, refreshGithubMenu, setCommitUIEnabledStatus } from './github-menu.js';
+import { fillInBranchContents, logoutFromGithub, refreshGitMenu, setCommitUIEnabledStatus } from './git-menu.js';
 import { forkAndOpen, forkRepositoryCancel } from './fork-repository.js';
 import {
   addZoneDrawer,
@@ -303,7 +303,7 @@ export function setFileChangedState(fileChangedState) {
     fileStatusElement.classList.remove('changed');
     fileChangedIndicatorElement.innerText = '';
   }
-  if (isLoggedIn && github && github.filepath && commitUI) {
+  if (isLoggedIn && git && git.filepath && commitUI) {
     setCommitUIEnabledStatus();
   }
   if (storage.supported) {
@@ -328,9 +328,9 @@ export function setFileChangedState(fileChangedState) {
   }
 }
 
-export function setGithubInstance(new_github) {
+export function setGitInstance(new_git) {
   // update github instance (from other modules)
-  github = new_github;
+  git = new_git;
 }
 
 export function setMeiFileInfo(fName, fLocation, fLocationPrintable) {
@@ -399,24 +399,24 @@ export function updateLocalStorage(meiXml) {
 
 export function updateGithubInLocalStorage() {
   if (storage.supported && !storage.override && isLoggedIn) {
-    const author = github.author;
+    const author = git.author;
     const name = author.name;
     const email = author.email;
     storage.github = {
-      githubRepo: github.githubRepo,
-      githubToken: github.githubToken,
-      branch: github.branch,
-      commit: github.commit,
-      filepath: github.filepath,
-      userLogin: github.userLogin,
+      githubRepo: git.githubRepo,
+      githubToken: git.githubToken,
+      branch: git.branch,
+      commit: git.commit,
+      filepath: git.filepath,
+      userLogin: git.userLogin,
       userName: name,
       userEmail: email,
     };
-    if (github.filepath) {
+    if (git.filepath) {
       storage.fileLocationType = 'github';
     }
   }
-  if (isLoggedIn && github.filepath) {
+  if (isLoggedIn && git.filepath) {
     fileLocationType = 'github';
   }
 }
@@ -672,9 +672,9 @@ document.addEventListener('DOMContentLoaded', function () {
     if (storage.github) {
       // use github object from local storage if available
       isLoggedIn = true;
-      github = new Github(
-        storage.github.githubRepo,
-        storage.github.githubToken,
+      git = new Git(
+        storage.github.gitRepo,
+        storage.github.gitToken,
         storage.github.branch,
         storage.github.commit,
         storage.github.filepath,
@@ -685,29 +685,29 @@ document.addEventListener('DOMContentLoaded', function () {
       //document.querySelector("#fileLocation").innerText = meiFileLocationPrintable;
     } else if (isLoggedIn) {
       // initialise and store new github object
-      github = new Github('', githubToken, '', '', '', userLogin, userName, userEmail);
+      git = new Git('', gitToken, '', '', '', userLogin, userName, userEmail);
       storage.github = {
-        githubRepo: github.githubRepo,
-        githubToken: github.githubToken,
-        branch: github.branch,
-        commit: github.commit,
-        filepath: github.filepath,
-        userLogin: github.userLogin,
+        gitRepo: git.gitRepo,
+        gitToken: git.gitToken,
+        branch: git.branch,
+        commit: git.commit,
+        filepath: git.filepath,
+        userLogin: git.userLogin,
         userName: userName,
         userEmail: userEmail,
       };
     }
-    if (storage.forkAndOpen && github) {
+    if (storage.forkAndOpen && git) {
       // we've arrived back after an automated log-in request
       // now fork and open the supplied URL, and remove it from storage
-      forkAndOpen(github, storage.forkAndOpen);
+      forkAndOpen(git, storage.forkAndOpen);
       storage.removeItem('forkAndOpen');
     }
   } else {
     // no local storage
     if (isLoggedIn) {
       // initialise new github object
-      github = new Github('', githubToken, '', '', '', userLogin, userName, userEmail);
+      git = new Git('', githubToken, '', '', '', userLogin, userName, userEmail);
     }
     meiFileLocation = '';
     meiFileLocationPrintable = '';
@@ -716,15 +716,15 @@ document.addEventListener('DOMContentLoaded', function () {
   if (isLoggedIn) {
     // regardless of storage availability:
     // if we are logged in, refresh github menu
-    refreshGithubMenu();
-    if (github.githubRepo && github.branch && github.filepath) {
+    refreshGitMenu();
+    if (git.githubRepo && git.branch && git.filepath) {
       // preset github menu to where the user left off, if we can
       fillInBranchContents();
     }
   }
   if (forkParam === 'true' && urlFileName) {
-    if (isLoggedIn && github) {
-      forkAndOpen(github, urlFileName);
+    if (isLoggedIn && git) {
+      forkAndOpen(git, urlFileName);
     } else {
       if (storage.supported) {
         storage.safelySetStorageItem('forkAndOpen', urlFileName);
@@ -820,12 +820,12 @@ export async function openUrlFetch(url = '', updateAfterLoading = true) {
         meiFileName = url.pathname.substring(url.pathname.lastIndexOf('/') + 1);
         if (storage.github && isLoggedIn) {
           // re-initialise github menu since we're now working from a URL
-          github.filepath = '';
-          github.branch = '';
+          git.filepath = '';
+          git.branch = '';
           if (storage.supported) {
             updateGithubInLocalStorage();
           }
-          refreshGithubMenu();
+          refreshGitMenu();
         }
         updateFileStatusDisplay();
         handleEncoding(data, true, updateAfterLoading);
@@ -1078,12 +1078,12 @@ let inputFormats = {
 export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true, updateAfterLoading = true) {
   if (storage.github && isLoggedIn) {
     // re-initialise github menu since we're now working from a file
-    github.filepath = '';
-    github.branch = '';
+    git.filepath = '';
+    git.branch = '';
     if (storage.supported) {
       updateGithubInLocalStorage();
     }
-    refreshGithubMenu();
+    refreshGitMenu();
   }
   if (pageParam === null) storage.removeItem('page');
   // remove any URL parameters, because we open a file locally or through github
@@ -1092,7 +1092,7 @@ export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true, upd
     storage.fileLocationType = 'file';
   }
   fileLocationType = 'file';
-  if (github) github.filepath = '';
+  if (git) git.filepath = '';
   if (typeof file === 'string') {
     // with fileName string
     meiFileName = file;
@@ -1234,12 +1234,12 @@ function openFileDialog(accept = '*') {
       openFile(files[0]);
       if (isLoggedIn) {
         // re-initialise github menu since we're now working locally
-        github.filepath = '';
-        github.branch = '';
+        git.filepath = '';
+        git.branch = '';
         if (storage.supported) {
           updateGithubInLocalStorage();
         }
-        refreshGithubMenu();
+        refreshGitMenu();
       }
     } else {
       log('OpenFile Dialog: Multiple files not supported.');
@@ -2010,10 +2010,10 @@ export function handleEditorChanges() {
   const commitUI = document.querySelector('#commitUI');
   let changeIndicator = false;
   let meiXml = cm.getValue();
-  if (isLoggedIn && github.filepath && commitUI) {
+  if (isLoggedIn && git.filepath && commitUI) {
     // fileChanged flag may have been set from storage - if so, run with it
     // otherwise set it to true if we've changed the file content this session
-    changeIndicator = fileChanged || meiXml !== github.content;
+    changeIndicator = fileChanged || meiXml !== git.content;
   } else {
     // interpret any CodeMirror change as a file changed state
     changeIndicator = true;

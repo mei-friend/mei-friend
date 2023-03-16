@@ -27,7 +27,7 @@
  import {
      cm,
      fileLocationType,
-     github,
+     git,
      isCtrlOrCmd,
      meiFileLocation,
      v
@@ -225,15 +225,15 @@
          let imgName = facs[zoneId].target;
          if (!imgName.startsWith('http')) { // relative file paths in surface@target
              if (fileLocationType === 'github') {
-                 let url = new URL('https://raw.githubusercontent.com/' + github.githubRepo + '/' +
-                     github.branch + '/' + facs[zoneId].target);
-                 url.searchParams.append('token', github.githubToken);
+                 let url = new URL('https://raw.githubusercontent.com/' + git.githubRepo + '/' +
+                     git.branch + '/' + facs[zoneId].target);
+                 url.searchParams.append('token', git.githubToken);
                  imgName = url.href;
                  img = await loadImage(imgName);
                  if (!img) { // try to find images in the 'img' folder on github repo
-                     url = new URL('https://raw.githubusercontent.com/' + github.githubRepo + '/' +
-                         github.branch + '/img/' + facs[zoneId].target);
-                     url.searchParams.append('token', github.githubToken);
+                     url = new URL('https://raw.githubusercontent.com/' + git.githubRepo + '/' +
+                         git.branch + '/img/' + facs[zoneId].target);
+                     url.searchParams.append('token', git.githubToken);
                      imgName = url.href;
                  } else {
                      sourceImages[imgName] = img;
@@ -245,10 +245,10 @@
                  imgName = `${root}local/` + facs[zoneId].target;
                  imgName = imgName.replace('.tif', '.jpg'); // hack for some DIME files...
              }
-         } else if (imgName.startsWith('https://raw.githubusercontent.com/') && github.githubToken) { // absolute file paths
-             let url = new URL('https://raw.githubusercontent.com/' + github.githubRepo + '/' +
-                 github.branch + github.filepath);
-             url.searchParams.append('token', github.githubToken);
+         } else if (imgName.startsWith('https://raw.githubusercontent.com/') && git.githubToken) { // absolute file paths
+             let url = new URL('https://raw.githubusercontent.com/' + git.githubRepo + '/' +
+                 git.branch + git.filepath);
+             url.searchParams.append('token', git.githubToken);
              imgName = url.href;
          }
  

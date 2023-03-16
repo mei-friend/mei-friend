@@ -1,7 +1,7 @@
-export default class Github { 
-  constructor(githubRepo, githubToken, branch, commit, filepath, userLogin, authorName, authorEmail) {
-    this.githubToken = githubToken;
-    this.githubRepo = githubRepo;
+export default class Git { 
+  constructor(gitRepo, gitToken, branch, commit, filepath, userLogin, authorName, authorEmail) {
+    this.gitToken = gitToken;
+    this.gitRepo = gitRepo;
     this.branch = branch;
     this.commit = commit;
     this.filepath = filepath;
@@ -11,12 +11,12 @@ export default class Github {
       email: authorEmail
     };
     this.apiHeaders = new Headers({
-      'Authorization': 'Basic ' + btoa(userLogin + ":" + githubToken), 
+      'Authorization': 'Basic ' + btoa(userLogin + ":" + gitToken), 
       'Accept': 'application/vnd.github.v3+json'
     });
     // remember this as our 'upstream' repo in case we need to fork
-    this.upstreamRepoName = this.githubRepoName;
-    this.upstreamRepoOwner = this.githubRepoOwner;
+    this.upstreamRepoName = this.gitRepoName;
+    this.upstreamRepoOwner = this.gitRepoOwner;
   }
 
   set content(content) {
@@ -76,13 +76,13 @@ export default class Github {
     return this._userLogin;
   }
 
-  set githubRepo(githubRepo) {
-    this._githubRepo = githubRepo;
+  set gitRepo(gitRepo) {
+    this._githubRepo = gitRepo;
     // also set repo owner and repo name
-    [this._githubRepoOwner, this._githubRepoName] = githubRepo.split('/');
+    [this._gitRepoOwner, this._gitRepoName] = gitRepo.split('/');
     // initialise jsgit repo object
     const repo = {};
-    jsgit.mixins.github(repo, this.githubRepo, this.githubToken);
+    jsgit.mixins.github(repo, this.gitRepo, this.gitToken);
     jsgit.mixins.createTree(repo);
     jsgit.mixins.packOps(repo);
     jsgit.mixins.walkers(repo);
@@ -92,34 +92,34 @@ export default class Github {
     this.repo = repo;
   }
 
-  get githubRepo() {
+  get gitRepo() {
     return this._githubRepo;
   }
 
-  set githubRepoName(githubRepoName) {
+  set gitRepoName(gitRepoName) {
     // not allowed: needs to be set via githubRepo
-    console.warn("githubRepoName cannot be set directly - please set githubRepo");
+    console.warn("gitRepoName cannot be set directly - please set githubRepo or gitlabRepo");
   }
 
-  get githubRepoName() {
-    return this._githubRepoName;
+  get gitRepoName() {
+    return this._gitRepoName;
   }
 
-  set githubRepoOwner(githubRepoOwner) { 
+  set gitRepoOwner(gitRepoOwner) { 
     // not allowed: needs to be set via githubRepo
-    console.warn("githubRepoOwner cannot be set directly - please set githubRepo");
+    console.warn("gitRepoOwner cannot be set directly - please set githubRepo or gitlabRepo");
   }
 
-  get githubRepoOwner() { 
-    return this._githubRepoOwner;
+  get gitRepoOwner() { 
+    return this._gitRepoOwner;
   }
 
-  set githubToken(githubToken) { 
-    this._githubToken = githubToken;
+  set gitToken(gitToken) { 
+    this._gitToken = gitToken;
   }
 
-  get githubToken(){
-    return this._githubToken;
+  get gitToken(){
+    return this._gitToken;
   }
   
   set upstreamRepoName(upstreamRepoName) { 
@@ -183,7 +183,7 @@ export default class Github {
   }
 
   get isFork() { 
-    return this.githubRepoOwner !== this.upstreamRepoOwner;
+    return this.gitRepoOwner !== this.upstreamRepoOwner;
   }
 
 
@@ -238,7 +238,7 @@ export default class Github {
     }
   }
 
-  async writeGithubRepo(content, message, newfile = null) { 
+  async writeGitRepo(content, message, newfile = null) { 
     this.headHash = await this.repo.readRef(`refs/heads/${this.branch}`);
     this.commit = await this.repo.loadAs("commit", this.headHash);  
     let tree = await this.repo.loadAs("tree", this.commit.tree);
@@ -265,7 +265,7 @@ export default class Github {
     }
   }
 
-  async readGithubRepo() { 
+  async readGitRepo() { 
     try { 
       // Retrieve content of file
       this.headHash = await this.repo.readRef(`refs/heads/${this.branch}`);
@@ -289,7 +289,7 @@ export default class Github {
         }
       }
       // Retrieve git commit log
-      const commitsUrl = `https://api.github.com/repos/${this.githubRepo}/commits`;
+      const commitsUrl = `https://api.github.com/repos/${this.gitRepo}/commits`;
       await fetch(commitsUrl, {
         method: 'GET',
         headers: this.apiHeaders
@@ -330,7 +330,7 @@ export default class Github {
 
   async fork(callback, forkTo = this.userLogin) {
     // switch to a user's fork, creating it first if necessary
-    const forksUrl = `https://api.github.com/repos/${this.githubRepo}/forks`;
+    const forksUrl = `https://api.github.com/repos/${this.gitRepo}/forks`;
     await fetch(forksUrl, {
       method: 'GET',
       headers: this.apiHeaders
@@ -361,13 +361,13 @@ export default class Github {
               if(res.status <= 400) {
                 res.json().then(userFork => { 
                   // switch to newly created fork
-                  this.githubRepo = userFork.full_name; 
+                  this.gitRepo = userFork.full_name; 
                 })
               }
               else throw res;
             })
         } else { 
-          this.githubRepo = userFork.full_name;
+          this.gitRepo = userFork.full_name;
         }
         // initialise page with user's fork
         callback(this);
@@ -385,7 +385,7 @@ export default class Github {
         method: 'POST',
         headers: this.apiHeaders,
         body: JSON.stringify({
-          head: this.githubRepoOwner + ":" + this.branch,
+          head: this.gitRepoOwner + ":" + this.branch,
           base: this.branch,
           body: 'Programmatic Pull-Request created using prositCommit',
           title: 'Programmatic Pull-Request created using prositCommit'
@@ -414,7 +414,7 @@ export default class Github {
   }
 
   async getRepoBranches(per_page=30, page=1) {
-    const branchesUrl = `https://api.github.com/repos/${this.githubRepo}/branches?per_page=${per_page}&page=${page}`;
+    const branchesUrl = `https://api.github.com/repos/${this.gitRepo}/branches?per_page=${per_page}&page=${page}`;
     return fetch(branchesUrl, {
       method: 'GET',
       headers: this.apiHeaders
@@ -422,7 +422,7 @@ export default class Github {
   }
   
   async getBranchContents(path="/") {
-    const contentsUrl = `https://api.github.com/repos/${this.githubRepo}/contents${path}`;
+    const contentsUrl = `https://api.github.com/repos/${this.gitRepo}/contents${path}`;
     return fetch(contentsUrl, {
       method: 'GET',
       headers: this.apiHeaders
