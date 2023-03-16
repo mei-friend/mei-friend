@@ -227,16 +227,13 @@
              if (fileLocationType === 'github') {
                  let url = new URL('https://raw.githubusercontent.com/' + github.githubRepo + '/' +
                      github.branch + '/' + facs[zoneId].target);
-                // url.searchParams.append('token', github.githubToken);
                  imgName = url.href;
-                 //img = await loadImage(imgName);
-                 img = await embedImage(imgName);
+                 img = await loadImage(imgName);
                  if (!img) { // try to find images in the 'img' folder on github repo
                      url = new URL('https://raw.githubusercontent.com/' + github.githubRepo + '/' +
                          github.branch + '/img/' + facs[zoneId].target);
-                    // url.searchParams.append('token', github.githubToken);
                      imgName = url.href;
-                     img = await embedImage(imgName)
+                     img = await loadImage(imgName)
                  } else {
                      sourceImages[imgName] = img;
                  }
@@ -250,7 +247,6 @@
          } else if (imgName.startsWith('https://raw.githubusercontent.com/') && github.githubToken) { // absolute file paths
              let url = new URL('https://raw.githubusercontent.com/' + github.githubRepo + '/' +
                  github.branch + github.filepath);
-             url.searchParams.append('token', github.githubToken);
              imgName = url.href;
          }
  
@@ -373,16 +369,20 @@
   * @returns {Promise}
   */
  async function loadImage(url) {
-     return new Promise((resolve) => {
-         const img = document.createElementNS(svgNameSpace, 'image');
-         img.setAttribute('id', 'source-image');
-         img.setAttributeNS('http://www.w3.org/1999/xlink', 'href', url);
-         img.onload = () => resolve(img);
-         img.onerror = (err) => {
-             console.log('Cannot load image file ' + url + ', error: ', err);
-             resolve(null);
-         }
-     });
+    if(isLoggedIn && url.startsWith("https://raw.githubusercontent.com")) {
+        return embedImage(url);
+    } else { 
+        return new Promise((resolve) => {
+            const img = document.createElementNS(svgNameSpace, 'image');
+            img.setAttribute('id', 'source-image');
+            img.setAttributeNS('http://www.w3.org/1999/xlink', 'href', url);
+            img.onload = () => resolve(img);
+            img.onerror = (err) => {
+                console.log('Cannot load image file ' + url + ', error: ', err);
+                resolve(null);
+            }
+        })
+    }
  } // loadImage()
 
 

@@ -289,7 +289,6 @@ export default class Github {
           if(typeof data === "string") {
             return new Promise((resolve) => resolve(data));
           } else { 
-            console.log("GOT DATA: ", data);
             return new Promise((resolve) => {
               const reader = new FileReader();
               reader.onloadend = () => {
@@ -307,7 +306,7 @@ export default class Github {
         console.error("Couldn't directly read file contents: ", e);
       }
     } else { 
-      console.warn("Called github.directlyReadfileContents with invalid rawGithubUri: ", rawGithubUri);
+      console.warn("Called github.directlyReadFileContents with invalid rawGithubUri: ", rawGithubUri);
     }
   }
 

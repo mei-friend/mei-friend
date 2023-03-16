@@ -609,6 +609,7 @@ document.addEventListener('DOMContentLoaded', function () {
     : 'none';
 
   if(storage.supported) { 
+    storage.read();
     if (storage.github) {
       // use github object from local storage if available
       isLoggedIn = true;
@@ -655,7 +656,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // restore localStorage if we have it
   if (storage.supported) {
-    storage.read();
     // save (most) URL parameters in storage
     if (orientationParam !== null) storage.notationOrientation = orientationParam;
     if (notationProportionParam !== null) storage.notationProportion = notationProportionParam;
@@ -805,10 +805,8 @@ export async function openUrlFetch(url = '', updateAfterLoading = true) {
     const headers = { Accept: 'application/xml, text/xml, application/mei+xml' };
     if (isLoggedIn && url.href.trim().startsWith("https://raw.githubusercontent.com")) { 
       // GitHub URL - use GitHub credentials to enable URL fetch from private repos
-      const data = await github.directlyReadFileContents(url.href)
-      console.log("GOT DATA IN MAIN:", data)
+      openUrlProcess(await github.directlyReadFileContents(url.href), url, updateAfterLoading);
     }
-    console.log("REquesting with headers: ", headers)
     const response = await fetch(url, {
       method: 'GET',
       headers: headers,
@@ -820,31 +818,8 @@ export async function openUrlFetch(url = '', updateAfterLoading = true) {
       urlStatus.classList.add('warn');
       urlInput.classList.add('warn');
     } else {
-      urlStatus.innerHTML = '';
-      urlStatus.classList.remove('warn');
-      urlInput.classList.remove('warn');
       response.text().then((data) => {
-        meiFileLocation = url.href;
-        meiFileLocationPrintable = url.hostname;
-        meiFileName = url.pathname.substring(url.pathname.lastIndexOf('/') + 1);
-        if (storage.github && isLoggedIn) {
-          // re-initialise github menu since we're now working from a URL
-          github.filepath = '';
-          github.branch = '';
-          if (storage.supported) {
-            updateGithubInLocalStorage();
-          }
-          refreshGithubMenu();
-        }
-        updateFileStatusDisplay();
-        handleEncoding(data, true, updateAfterLoading);
-        if (storage.supported) {
-          storage.fileLocationType = 'url';
-        }
-        fileLocationType = 'url';
-        openUrlCancel(); //hide open URL UI elements
-        const fnStatus = document.getElementById('fileName');
-        if (fnStatus) fnStatus.removeAttribute('contenteditable');
+        openUrlProcess(data, url, updateAfterLoading);
       });
     }
   } catch (err) {
@@ -857,6 +832,35 @@ export async function openUrlFetch(url = '', updateAfterLoading = true) {
     urlInput.classList.add('warn');
     urlStatus.classList.add('warn');
   }
+}
+
+function openUrlProcess(content, url, updateAfterLoading) {
+  let urlInput = document.querySelector('#openUrlInput');
+  let urlStatus = document.querySelector('#openUrlStatus');
+  urlStatus.innerHTML = '';
+  urlStatus.classList.remove('warn');
+  urlInput.classList.remove('warn');
+  meiFileLocation = url.href;
+  meiFileLocationPrintable = url.hostname;
+  meiFileName = url.pathname.substring(url.pathname.lastIndexOf('/') + 1);
+  if (storage.github && isLoggedIn) {
+    // re-initialise github menu since we're now working from a URL
+    github.filepath = '';
+    github.branch = '';
+    if (storage.supported) {
+      updateGithubInLocalStorage();
+    }
+    refreshGithubMenu();
+  }
+  updateFileStatusDisplay();
+  handleEncoding(content, true, updateAfterLoading);
+  if (storage.supported) {
+    storage.fileLocationType = 'url';
+  }
+  fileLocationType = 'url';
+  openUrlCancel(); //hide open URL UI elements
+  const fnStatus = document.getElementById('fileName');
+  if (fnStatus) fnStatus.removeAttribute('contenteditable');
 }
 
 function speedWorkerEventsHandler(ev) {
