@@ -64,7 +64,7 @@ export function selectChoice(xmlDoc, sourceId) {
   // Go through all choice elements replace it by first child
   while ((choice = xmlDoc.querySelector('choice'))) {
     let parent = choice.parentElement;
-    let firstChild = choice.childNodes[0];
+    let firstChild = firstChildElement(choice);
     if (parent && firstChild) {
       // add clones of child nodes before choice...
       firstChild.childNodes.forEach((child) => {
@@ -77,3 +77,17 @@ export function selectChoice(xmlDoc, sourceId) {
   }
   return xmlDoc;
 } // selectChoice()
+
+/**
+ * Returns first child element, ignoring text and other nodes
+ * @param {Element} parent
+ * @returns
+ */
+function firstChildElement(parent) {
+  for (let node of parent.childNodes) {
+    if (node.nodeType === Node.ELEMENT_NODE) {
+      return node;
+    }
+  }
+  return null;
+} // firstChildElement()
