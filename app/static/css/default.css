@@ -1100,12 +1100,6 @@ span.keyIcon {
   cursor: pointer;
 }
 
-.tabcontent input[type="button"] {
-  float: right;
-  margin-top: 10px;
-  margin-right: 2px;
-}
-
 /* Style the close button */
 .topright {
   color: var(--textcolor);
@@ -1161,7 +1155,7 @@ span.keyIcon {
   margin-right: 3px;
   margin-top: 2px;
   margin-bottom: 2px;
-  min-width: 220px;
+  min-width: 175px;
   float: left;
 }
 
@@ -1189,7 +1183,15 @@ select {
   padding: 2px;
 }
 
+.disabled {
+  opacity: 50%;
+}
+
 .resetButton {
+  float: right;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  margin-right: 2px;
   border-radius: 4px;
 }
 

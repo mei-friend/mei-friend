@@ -1,5 +1,6 @@
 # mei-friend-online CHANGELOG.md
-### 0.8.7 patch
+### 0.8.7 transposition
+* Add transposition settings panel to the mei-friend settings to specify transposition by key, by interval, and pitch direction.
 * Enable ?file= param to open files from private repos (when logged in)
 * Add "Report issue with encoding" feature (creates issue with reciprocal mei-friend link)
 ### 0.8.6 patch
