@@ -284,13 +284,15 @@ addEventListener(
           tk.setOptions(tkOptions);
           // only load data if encoding has changed
           if (result.toolkitDataOutdated || result.speedMode) {
-            // tk.setOptions({ breaks: 'none' }); // if reloading data, skip rendering layout
+            tk.setOptions({ breaks: 'none' }); // if reloading data, skip rendering layout
             tk.loadData(result.mei);
-            // tk.setOptions(tkOptions); // ... and re-set breaks option
           }
           result.midi = tk.renderToMIDI();
           if (result.requestTimemap) result.timemap = tk.renderToTimemap();
           result.cmd = result.requestTimemap ? 'midiPlayback' : 'downloadMidiFile';
+          if (result.toolkitDataOutdated || result.speedMode) {
+            tk.setOptions(tkOptions); // ... and re-set breaks option
+          }
         } catch (err) {
           log('exportMidi: ' + err);
         }
