@@ -561,9 +561,9 @@
              zone.setAttribute('lrx', c.x + c.width);
              zone.setAttribute('lry', c.y + c.height);
              // edit in CodeMirror
-             v.updateNotation = false;
+             v.allowCursorActivity = false;
              replaceInEditor(cm, zone, true);
-             v.updateNotation = true;
+             v.allowCursorActivity = true;
              // console.log('Dragging: ' + resize + ' ' + dx + '/' + dy);
          }
      };
@@ -746,7 +746,7 @@
      let zones = facsimile.querySelectorAll('zone');
      let music = v.xmlDoc.querySelector('music');
      if (!music) return;
-     v.updateNotation = false;
+     v.allowCursorActivity = false;
      zones.forEach(z => {
          let zoneId = '';
          if (z.hasAttribute('xml:id')) zoneId = z.getAttribute('xml:id');
@@ -792,7 +792,7 @@
      // uncheck edit zones after ingest
      document.getElementById('editFacsimileZones').checked = false;
      v.updateData(cm, false, true);
-     v.updateNotation = true;
+     v.allowCursorActivity = true;
      busy(false);
  } // handleFacsimileIngestion()
  

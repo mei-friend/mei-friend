@@ -233,7 +233,7 @@ export function xmlToString(xmlNode) {
   str = str.replace(/(?:><)/g, '>\n<');
   // console.info('xmlToString: ' + str);
   return str.replace(' xmlns="' + meiNameSpace + '"', '');
-}
+} // xmlToString()
 
 // checks xmlDoc for expand elements and returns an array of arrays
 export function generateExpansionList(xmlDoc, baseSelector = 'music score') {

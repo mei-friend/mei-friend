@@ -1,7 +1,9 @@
 // @ts-check
 
 /* Speed mode: just feed the current page excerpt of the MEI encoding
- *  to Verovio, to minimize loading times.
+ * to Verovio, to minimize loading times. Enclose the requested page
+ * with dummy pages to ensure context (time-spanning elements, key
+ * signatures, tempo indications, etc.)
  */
 
 import * as utils from './utils.js';
@@ -135,7 +137,7 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks, pageSpanners, include
   let mei = xmlDefs(meiVersion) + serializer.serializeToString(spdNode);
   // console.info('Speed() MEI: ', mei);
   return mei;
-}
+} // getPageFromDom()
 
 /**
  * @param {number} pageNo  Page number, starting at 1
@@ -206,9 +208,12 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
         // For 'encodedBreaks', `breaks` is an Array
         if (
           countNow &&
-          currentNodeName !== 'ending' && 
-         ( /** @type {string[]} */ (breaks).includes(currentNodeName) ||
-            (sb = /** @type {Element} */ (currentNode).querySelector(breaksSelector)))
+          currentNodeName !== 'ending' &&
+          /** @type {string[]} */ (
+            // @ts-ignore
+            breaks.includes(currentNodeName) ||
+              (sb = /** @type {Element} */ (currentNode).querySelector(breaksSelector))
+          )
         ) {
           if (dutils.countAsBreak(sb ? sb : currentNode)) p++;
           continue;
@@ -362,7 +367,7 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
     } // for loop across child nodes
     return newSection;
   }; // digDeeper()
-}
+} // readSection()
 
 /**
  * List all notes/chords to check whether they are pointed to from outside the
@@ -465,7 +470,7 @@ function matchTimespanningElements(xmlScore, spdScore, pageNo) {
   } // 2) if
 
   // console.log('adding slurs took ' + (performance.now() - t4) + ' ms.');
-} // matchTimespanningElements
+} // matchTimespanningElements()
 
 /**
  * List all timespanning elements with `@startid`/`@endid` attributes on
@@ -572,7 +577,7 @@ export function listPageSpanningElements(xmlScore, breaks, breaksOption) {
   console.log('listPageSpanningElements pageSpanners: ' + (t2 - t1) + ' ms.');
 
   return pageSpanners;
-}
+} // listPageSpanningElements()
 
 /**
  * Finds out which staff number the element belongs to.
@@ -582,18 +587,27 @@ export function listPageSpanningElements(xmlScore, breaks, breaksOption) {
  */
 function getStaffNumber(element) {
   return element.closest('staff,staffDef')?.getAttribute('n') || '';
-}
+} // getStaffNumber()
 
 /**
  * @param {Element} scoreDef
+ * @param {string} staffNumber
  * @returns {{count: string | null, unit: string | null}}
  */
-function getMeter(scoreDef) {
+export function getMeter(scoreDef, staffNumber = '') {
   let meter = {
     count: scoreDef.getAttribute('meter.count'),
     unit: scoreDef.getAttribute('meter.unit'),
   };
-
+  // try to find staffDef by staffNumber
+  if (staffNumber) {
+    const staffDef = scoreDef.querySelector('staffDef[n="' + staffNumber + '"]');
+    if (staffDef) {
+      let m = getMeter(staffDef);
+      if (m.count && m.unit) return m;
+    }
+  }
+  // try to find a meterSig somewhere inside scoreDef
   if (!meter.count || !meter.unit) {
     const meterSig = scoreDef.querySelector('meterSig');
     if (!meterSig) return meter;
@@ -602,9 +616,157 @@ function getMeter(scoreDef) {
       unit: meterSig.getAttribute('unit'),
     };
   }
-
   return meter;
-}
+} // getMeter()
+
+/** @typedef { 'meter' | 'key' | '' } property */
+
+/**
+ * Finds and returns a scoreDef element before the element, null otherwise
+ * @param {Document} xmlDoc
+ * @param {Element} element
+ * @param {string} property
+ * @returns {Element | null}
+ */
+export function getScoreDefForElement(xmlDoc, element, property = '') {
+  // find meter.count/unit
+  let elId = element.getAttribute('xml:id');
+  let scoreDef = null;
+  if (elId) {
+    let scoreDefList = xmlDoc.querySelectorAll('scoreDef,[*|id="' + elId + '"]');
+    let search = false;
+    for (let i = scoreDefList.length - 1; i >= 0; i--) {
+      if (search) {
+        let found =
+          scoreDefList.item(i).querySelector('[meter],meterSig') ||
+          scoreDefList.item(i).hasAttribute('meter.unit') ||
+          scoreDefList.item(i).hasAttribute('meter.count');
+        if (found) {
+          scoreDef = scoreDefList.item(i);
+          break;
+        }
+      }
+      if (scoreDefList.item(i).nodeName === element.nodeName) {
+        search = true;
+      }
+    }
+  }
+  return scoreDef;
+} // getScoreDefForElement()
+
+/**
+ * Returns a @tstamp (beat position) of the element within the current measure
+ * @param {Document} xmlDoc
+ * @param {Element} element
+ * @returns {number} tstamp (-1 if nothing found)
+ */
+export function getTstampForElement(xmlDoc, element) {
+  let tstamp = -1;
+  let chord = element.closest('chord'); // take chord as element, if exists
+  if (chord) element = chord;
+  let staffNumber = getStaffNumber(element);
+  let scoreDef = getScoreDefForElement(xmlDoc, element);
+  if (scoreDef && staffNumber) {
+    const { count, unit } = getMeter(scoreDef, staffNumber);
+    if (unit) {
+      // iterate over notes before element in current layer
+      let layer = element.closest('layer');
+      if (layer) {
+        tstamp = 1;
+        let chordList = []; // list of chords that have been counted
+        let durList = Array.from(layer.querySelectorAll(att.attDurationLogical.join(',')));
+        for (let e of durList) {
+          // exclude notes within a chord
+          let parentChord = e.closest('chord');
+          if (e.nodeName === 'note' && parentChord && chordList.includes(parentChord)) {
+            continue;
+          }
+          if (parentChord) chordList.push(parentChord);
+          // stop adding beats when requested element is reached
+          if (e === element) {
+            break;
+          }
+          tstamp += getDurationOfElement(e, parseInt(unit));
+        }
+      }
+    }
+  }
+  return tstamp;
+} // getTstampForElement()
+
+/**
+ * Returns the duration of a note/chord (in beats relative to the meter unit),
+ * computed from @dur and @dots and @meterUnit
+ *
+ * For example:
+ * dur="4" dots="1" in a x/4 meter returns 1.5
+ * dur="8" dots="2" in a x/8 meter returns 1.75
+ * dur="4" dots="2" in a x/2 meter returns 0.825
+ *
+ * @param {Element} element
+ * @returns {number} duration in beats, or -1 if problems
+ */
+export function getDurationOfElement(element, meterUnit = 4.0) {
+  let beatDuration = -1;
+  if (element) {
+    if (element.hasAttribute('grace')) {
+      let graceValue = element.getAttribute('grace');
+      if (graceValue && ['acc', 'unacc', 'unknown'].includes(graceValue)) {
+        return 0;
+      }
+    }
+    const dur = element.getAttribute('dur');
+    if (dur) beatDuration = meterUnit / parseFloat(dur);
+    const dots = element.getAttribute('dots');
+    if (dots) {
+      let dotsDuration = 0;
+      for (let d = 1; d <= parseInt(dots); d++) {
+        dotsDuration += beatDuration / Math.pow(2, d);
+      }
+      beatDuration += dotsDuration;
+    }
+    // look for (nested) tuplets
+    let tuplet = element.closest('tuplet');
+    while (tuplet) {
+      const num = parseFloat(tuplet.getAttribute('num') || '-1');
+      const numBase = parseFloat(tuplet.getAttribute('numbase') || '-1');
+      if (num > 0 && numBase > 0) {
+        beatDuration = (beatDuration * numBase) / num;
+      }
+      if (tuplet.parentElement) {
+        tuplet = tuplet.parentElement.closest('tuplet');
+      } else {
+        break;
+      }
+    }
+  }
+  return beatDuration;
+} // getDurationOfElement()
+
+/**
+ *
+ * @param {Document} xmlDoc
+ * @param {Element} el1
+ * @param {Element} el2
+ * @returns {number}
+ */
+export function getMeasureDistanceBetweenElements(xmlDoc, el1, el2) {
+  let measureDistance = 0;
+  if (el1 && el2) {
+    const m1 = el1.closest('measure');
+    const m2 = el2.closest('measure');
+    if (m1 !== m2) {
+      let measureList = xmlDoc.querySelectorAll('measure');
+      let count = false;
+      measureList.forEach((m) => {
+        if (count) measureDistance++;
+        if (m === m1) count = true;
+        if (m === m2) count = false;
+      });
+    }
+  }
+  return measureDistance;
+} // getMeasureDistanceBetweenElements()
 
 /**
  * Copies all tempo-related attributes (midi.bpm, mm, mm.unit, mm.dots)
@@ -819,7 +981,7 @@ function addKeySigElement(staffDefs, keysigValue) {
       staffDef.appendChild(keySigElement);
     }
   }
-}
+} // addKeySigElement()
 
 /**
  * Helper function to `readSection()`; adds `@meter.sig` to `spdScore`.
@@ -842,7 +1004,7 @@ function addMeterSigElement(staffDefs, meterCountValue, meterUnitValue) {
       staffDef.appendChild(meterSigElement);
     }
   }
-}
+} // addMeterSigElement()
 
 /**
  * Retrieve page number of element with `@xml:id` `id`
@@ -882,7 +1044,7 @@ export async function getPageWithElement(xmlDoc, breaks, id, breaksOption) {
   let els = Array.from(music.querySelectorAll(sel));
   for (let i = els.length - 1; i >= 0; i--) {
     if (!dutils.countAsBreak(els[i])) els.splice(i, 1);
-  }
+  } // getPageWithElement()
 
   page = els.findIndex((el) => el.getAttribute('xml:id') === id) + 1;
   // if element is within last measure, ...
@@ -907,7 +1069,7 @@ export async function getPageWithElement(xmlDoc, breaks, id, breaksOption) {
 function minimalMEIFile(xmlNode) {
   var mei = xmlNode.createElementNS(meiNameSpace, 'mei');
   return mei;
-}
+} // minimalMEIFile()
 
 /**
  * @param {Document} xmlNode
@@ -923,9 +1085,10 @@ function minimalMEIMusicTree(xmlNode) {
   body.appendChild(mdiv);
   music.appendChild(body);
   return music;
-}
+} // minimalMEIMusicTree()
 
 /**
+ * Currently unused. Let's keep it for later.
  * @param {Document} xmlNode
  * @returns {Element} A minimal `<meiHead>`
  */
@@ -947,7 +1110,7 @@ function minimalMEIHeader(xmlNode) {
   fileDesc.appendChild(pubStmt);
   meiHead.appendChild(fileDesc);
   return meiHead;
-}
+} // minimalMEIHeader()
 
 // Standard XML prolog
 export const xmlProlog = '<?xml version="1.0" encoding="UTF-8"?>';
@@ -969,7 +1132,7 @@ export function xmlDefs(meiVersion = defaultMeiVersion, meiProfile = defaultMeiP
     commonSchemas[meiProfile][meiVersion] +
     '" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>';
   return xml;
-}
+} // xmlDefs()
 
 /**
  * @param {Document} document  Any Document. Is only needed for
@@ -996,7 +1159,7 @@ export function dummyMeasure(document, staves = 2) {
     m.appendChild(staff);
   }
   return m;
-}
+} // dummyMeasure()
 
 /**
  * @param {Element} dummyMeasure
@@ -1012,7 +1175,7 @@ export function getIdsForDummyMeasure(dummyMeasure) {
     uuids[i] = notes[i].getAttribute('xml:id') || '';
   }
   return uuids;
-}
+} // getIdsForDummyMeasure()
 
 /**
  * @param {Element} scoreDef
@@ -1020,7 +1183,7 @@ export function getIdsForDummyMeasure(dummyMeasure) {
  */
 export function countStaves(scoreDef) {
   return scoreDef.querySelectorAll('staffDef').length;
-}
+} // countStaves()
 
 /**
  * Filter selected elements and keep only highest in DOM
@@ -1040,4 +1203,4 @@ export function filterElements(ids, xmlDoc) {
     }
   }
   return ids;
-}
+} // filterElements()

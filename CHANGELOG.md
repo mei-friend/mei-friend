@@ -1,7 +1,39 @@
 # mei-friend-online CHANGELOG.md
+### 0.8.7 transposition
+* Add transposition settings panel to the mei-friend settings to specify transposition by key, by interval, and pitch direction.
+  
+### 0.8.6 patch
+* Insert control elements with time stamps (`@tstamp`/`tstamp2`) instead of ids (`startid`/`endid`) by using the  `ALT` (Mac: `CTRL`) modifier key with keyboard shortcut
+* Check time stamps when inserting control elements, handle selected elements on the same time stamp correctly (by omitting `@tstamp2`) or throw warning, if no fix is possible
+* Fix between placement (`SHIFT + X`) with control elements without `@startid`. 
+* Various GitHub fixes, incl. loading compressed MusicXML via Git
+* Unselect element(s) when `CTRL/CMD` clicking or drag-selecting already selected element(s)
+* `SHIFT LEFT/RIGHT` de/increases duration (`@dur`) of selected element(s), if they have such attribute
+
+### 0.8.5 PDF export
+* Preview PDF mode with page-view of notation, triggered via menu item or `CMD/CTRL + P`
+* PDF preview with click-select and drag-select disabled
+* Page range selector for selecting all, current, page range, or individual pages (e.g., 2,5-8)
+* Download PDF file (with pages as selected in page-range settings)
+
+### 0.8.4 patch
+* Drag-select and click-select chord instead of note with `ALT` modifier
+* Add `@staff` to clef change element
+* Change of keyboard shortcuts (for inserting C clef, tenuto, spiccato)
 ### 0.8.3 patch
-* Expansion selection for MIDI playback in settings (TODO: and MIDI playback control bar)
-* Expansion elements expanded in mei-friend
+* Show modifyer keys as text (ALT, CTRL...) on Windows/Linux systems
+* Insert `arpeg` with `@order="up"` per default (or `@order="down"` with `CTRL + A`)
+* Insert control elements with @staff attribute of selected elements (fix for #12)
+* Fix trailing space in `arpeg@plist`(fix for #13)
+* Support for inserting supplied elements around artic/accid attributes (that get converted to elements) (fix for #14)
+* Support for inserting supplied elements around artic/accid child elements of selected elements
+* Do not save and insert slur below with `CTRL + S` on Windows/Linux (fix for #15)
+* Support for `@place="between"` on control elements (fix for #16)
+* Several improvements and harmonization in editor code
+* Change keyboard shortcut for tenuto to `SHIFT + E`
+* Insert control elements without placement by default
+* Remove `CTRL + ` for inserting control elements below
+* On multiple selected elements, insert pedal up on first and pedal down on last 
 ### 0.8.2 patch
 * Fixes to highlight synchronization edge-cases caused by rounding issues
 * Implement MIDI playback shortcut (bubble) to open control bar and start playback immediately
@@ -9,6 +41,7 @@
 * Implement close button on control bar
 * Improve highlighting after page turn
 * Re-render MIDI after Verovio MIDI options change (or when default button clicked)
+* Unhighlight notes before rests
 ### 0.8.1 patch
 * Support automatic scroll-following of midi playback (feature request by @annplaksin)
 * Improve scroll-to-element behavior (during playback and navigation)

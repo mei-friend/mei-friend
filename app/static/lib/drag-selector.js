@@ -1,9 +1,15 @@
-import { getX, getY, svgNameSpace } from './dom-utils.js';
 import * as att from './attribute-classes.js';
-import { setCursorToId } from './utils.js';
+import { getX, getY, svgNameSpace } from './dom-utils.js';
 import { cm, platform } from './main.js';
 import { startMidiTimeout } from './midi-player.js';
+import { setCursorToId } from './utils.js';
+import Viewer from './viewer.js';
 
+/**
+ * Add drag-selector to vp element (i.e., verovio-panel)
+ * @param {Viewer} v
+ * @param {Element} vp
+ */
 export function addDragSelector(v, vp) {
   let dragging = false;
   var svgEls;
@@ -14,13 +20,14 @@ export function addDragSelector(v, vp) {
   var end = {};
   var rect;
 
-  let noteSelector = '.note';
-  let restSelector = '.rest,.mRest,.beatRpt,.halfmRpt,.mRpt';
-  let controlSelector = '.' + att.attPlacement.join(',.');
-  let slurSelector = '.' + att.attCurvature.join(',.');
-  let measureSelector = '.measure';
+  const noteSelector = '.note';
+  const restSelector = '.rest,.mRest,.beatRpt,.halfmRpt,.mRpt';
+  const controlSelector = '.' + att.attPlacement.join(',.');
+  const slurSelector = '.' + att.attCurvature.join(',.');
+  const measureSelector = '.measure';
 
   vp.addEventListener('mousedown', (ev) => {
+    if (!v.allowNotationInteraction) return;
     dragging = true;
     // clear selected elements, if no CMD/CTRL key is pressed
     if (!(platform.startsWith('mac') && ev.metaKey) && !ev.ctrlKey) {
@@ -70,15 +77,15 @@ export function addDragSelector(v, vp) {
       }
       if (Array.from(el.classList).includes('measure')) {
         // take boundingbox
-        let staves = el.querySelectorAll('.staff'); //for  measures from staves
+        const staves = el.querySelectorAll('.staff'); //for  measures from staves
         if (staves.length > 0) {
           bb.width = staves.item(0).getBBox().width;
           let sbb = staves.item(staves.length - 1).getBBox();
           bb.height = sbb.y + sbb.height - bb.y;
         }
       }
-      let x = Math.round((bb.x + bb.width / 2) * 1000); // center of element
-      let y = Math.round((bb.y + bb.height / 2) * 1000);
+      const x = Math.round((bb.x + bb.width / 2) * 1000); // center of element
+      const y = Math.round((bb.y + bb.height / 2) * 1000);
       if (!Object.keys(obobj).includes(x.toString())) obobj[x] = {};
       if (Object.keys(obobj).includes(x.toString()) && Object.keys(obobj[x]).includes(y.toString())) {
         obobj[x][y].push(el);
@@ -86,9 +93,10 @@ export function addDragSelector(v, vp) {
         obobj[x][y] = [el];
       }
     });
-  });
+  }); // mouse down event listener
 
   vp.addEventListener('mousemove', (ev) => {
+    if (!v.allowNotationInteraction) return;
     if (dragging) {
       newEls = [];
 
@@ -102,13 +110,13 @@ export function addDragSelector(v, vp) {
       if (!pm) return;
 
       // transform mouse/screen coordinates to SVG coordinates
-      var mx = pm.getScreenCTM().inverse();
-      let s = transformCTM(thisStart, mx);
-      let e = transformCTM(end, mx);
+      const mx = pm.getScreenCTM().inverse();
+      const s = transformCTM(thisStart, mx);
+      const e = transformCTM(end, mx);
       let x = s.x;
-      let width = Math.abs(e.x - s.x);
+      const width = Math.abs(e.x - s.x);
       let y = s.y;
-      let height = Math.abs(e.y - s.y);
+      const height = Math.abs(e.y - s.y);
       if (e.x < s.x) x = e.x;
       if (e.y < s.y) y = e.y;
 
@@ -127,12 +135,12 @@ export function addDragSelector(v, vp) {
       // });
 
       // filter selected elements that are inside rectangle
-      let xx = Math.round(x * 1000);
-      let xx2 = Math.round((x + width) * 1000);
-      let yy = Math.round(y * 1000);
-      let yy2 = Math.round((y + height) * 1000);
+      const xx = Math.round(x * 1000);
+      const xx2 = Math.round((x + width) * 1000);
+      const yy = Math.round(y * 1000);
+      const yy2 = Math.round((y + height) * 1000);
       let latest = {};
-      let selX = Object.keys(obobj).filter((kx) => parseInt(kx) >= xx && parseInt(kx) <= xx2);
+      const selX = Object.keys(obobj).filter((kx) => parseInt(kx) >= xx && parseInt(kx) <= xx2);
       if (selX.length > 0) {
         selX.forEach((xKey) => {
           let yKeys = Object.keys(obobj[xKey]).filter((ky) => parseInt(ky) >= yy && parseInt(ky) <= yy2);
@@ -141,11 +149,16 @@ export function addDragSelector(v, vp) {
               let els = obobj[xKey][yKey];
               if (els)
                 els.forEach((el) => {
-                  if (!newEls.includes(el.id)) {
-                    newEls.push(el.id);
+                  let id = el.id;
+                  // select chord instead of note with ALT modifyer key
+                  if (ev.altKey && el.classList.contains('note') && el.closest('.chord')) {
+                    id = el.closest('.chord').id;
                   }
-                  let x = getX(el);
-                  let y = getY(el);
+                  if (!newEls.includes(id)) {
+                    newEls.push(id);
+                  }
+                  const x = getX(el);
+                  const y = getY(el);
                   // keep the element closest to the cursor position (whilst disburdening Pythagoras from exponential load)
                   if (
                     Object.keys(latest).length === 0 ||
@@ -160,30 +173,68 @@ export function addDragSelector(v, vp) {
             });
         });
       }
-      oldEls.forEach((el) => newEls.push(el));
-      v.updateNotation = false;
+      
+      // select latest element in editor
+      v.allowCursorActivity = false;
       if (latest && Object.keys(latest).length > 0) {
         setCursorToId(cm, latest.el.id);
         v.lastNoteId = latest.el.id;
       }
-      v.selectedElements = newEls;
+
+      // add new element to selected elements when new, remove otherwise
+      v.selectedElements = [...oldEls];
+      newEls.forEach((newEl) => {
+        if (oldEls.includes(newEl)) {
+          v.selectedElements.splice(v.selectedElements.indexOf(newEl), 1);
+        } else {
+          v.selectedElements.push(newEl);
+        }
+      });
+
       v.updateHighlight();
-      v.updateNotation = true;
+      v.allowCursorActivity = true;
     }
-  });
+  }); // mouse move event listener
 
   vp.addEventListener('mouseup', () => {
-    if (document.getElementById('showMidiPlaybackControlBar').checked) {
+    if (!v.allowNotationInteraction) return;
+    if (document.getElementById('showMidiPlaybackControlBar')?.checked) {
       console.log('drag-selector: HANDLE CLICK MIDI TIMEOUT');
       startMidiTimeout();
     }
     dragging = false;
+
+    // remove dragging rectangle
     let svgPm = document.querySelector('g.page-margin');
-    if (svgPm && Array.from(svgPm.childNodes).includes(rect)) svgPm.removeChild(rect);
+    if (svgPm && Array.from(svgPm.childNodes).includes(rect)) {
+      svgPm.removeChild(rect);
+    }
     oldEls = [];
-  });
+  }); // mouse up event listener
 } // addDragSelector()
 
+/** @typedef {{
+ *   x: number,
+ *   y: number
+ * }} Point;
+ */
+
+/** @typedef {{
+ *   a: number,
+ *   b: number
+ *   c: number,
+ *   d: number
+ *   e: number,
+ *   f: number
+ * }} Matrix;
+ */
+
+/**
+ * Transforms point (x/y) through matrix from element coordinate system to screen coordinates
+ * @param {Point} point
+ * @param {Matrix} matrix
+ * @returns
+ */
 export function transformCTM(point, matrix) {
   let r = {};
   r.x = matrix.a * point.x + matrix.c * point.y + matrix.e;
@@ -191,7 +242,18 @@ export function transformCTM(point, matrix) {
   return r;
 } // transformCTM()
 
-export function updateRect(rect, x, y, width, height, color = 'black', strokeWidth = 13, strokeDashArray = 50) {
+/**
+ * Updates existing SVG rectangle with coordinates and design parameters
+ * @param {SVGElement} rect
+ * @param {string} x
+ * @param {string} y
+ * @param {string} width
+ * @param {string} height
+ * @param {string} color
+ * @param {string} strokeWidth
+ * @param {string} strokeDashArray
+ */
+export function updateRect(rect, x, y, width, height, color = 'black', strokeWidth = '13', strokeDashArray = '50') {
   rect.setAttribute('x', x);
   rect.setAttribute('y', y);
   rect.setAttribute('width', width);

@@ -1,7 +1,11 @@
+import * as att from './attribute-classes.js';
+import * as dutils from './dom-utils.js';
+import * as prs from './page-range-selector.js';
 import * as speed from './speed.js';
 import * as utils from './utils.js';
-import * as dutils from './dom-utils.js';
-import * as att from './attribute-classes.js';
+import { getControlMenuState, showPdfButtons, setControlMenuState, setCheckbox } from './control-menu.js';
+import { alert, download, info, success, verified, unverified, xCircleFill } from '../css/icons.js';
+import { drawFacsimile, highlightZone, zoomFacsimile } from './facsimile.js';
 import {
   cm,
   cmd,
@@ -9,6 +13,7 @@ import {
   defaultVerovioVersion,
   fontList,
   isSafari,
+  meiFileName,
   rngLoader,
   platform,
   storage,
@@ -16,13 +21,16 @@ import {
   tkVersion,
   validate,
   validator,
-  v,
+  version,
+  versionDate,
 } from './main.js';
 import { mp, startMidiTimeout } from './midi-player.js';
 import { getVerovioContainerSize, setOrientation } from './resizer.js';
 import { drawFacsimile, highlightZone, zoomFacsimile } from './facsimile.js';
 import { alert, download, info, success, verified, unverified, xCircleFill } from '../css/icons.js';
 import { selectMarkup } from './markup.js';
+import { startMidiTimeout } from './midi-player.js';
+import { getNotationProportion, setNotationProportion, setOrientation } from './resizer.js';
 
 export default class Viewer {
   constructor(vrvWorker, spdWorker) {
@@ -38,7 +46,8 @@ export default class Viewer {
     this.selectedElements = [];
     this.lastNoteId = '';
     this.notationNightMode = false;
-    this.updateNotation = true; // whether or not notation gets re-rendered after text changes
+    this.allowCursorActivity = true; // whether or not notation gets re-rendered after text changes
+    this.allowNotationInteraction = true; // allow mouse drag-select and click on notation
     this.speedMode = true; // speed mode (just feeds on page to Verovio to reduce drawing time)
     this.parser = new DOMParser();
     this.xmlDoc;
@@ -53,12 +62,19 @@ export default class Viewer {
     // this.scoreDefList = []; // list of xmlNodes, one for each change, referenced by 5th element of pageList
     this.meiHeadRange = [];
     this.vrvOptions; // all verovio options
+    this.vrvTimeout; // time out task for updating verovio settings
+    this.timeoutDelay = 300; // ms, window in which concurrent clicks are treated as one update
     this.verovioIcon = document.getElementById('verovio-icon');
     this.breaksSelect = /** @type HTMLSelectElement */ (document.getElementById('breaks-select'));
     this.respId = '';
     this.alertCloser;
+    this.pdfMode = false;
+    this.cmd2KeyPressed = false;
+    this.controlMenuState = {};
+    this.settingsReplaceFriendContainer = false; // whether or not the settings panel is over the mei-friend window (false) or replaces it (true)
+    this.notationProportion = 0.5; // remember proportion during pdf mode
     this.expansionId = ''; // id string of currently selected expansion element
-  } // constructor()
+  } // constructor() // constructor()
 
   // change options, load new data, render current page, add listeners, highlight
   updateAll(cm, options = {}, xmlId = '') {
@@ -78,7 +94,7 @@ export default class Viewer {
     } else {
       this.postUpdateAllMessage(xmlId, p, computePageBreaks);
     }
-  } // postUpdateAllMessage()
+  } // updateAll()
 
   // helper function to send a message to the worker
   postUpdateAllMessage(xmlId, p, computePageBreaks) {
@@ -97,6 +113,7 @@ export default class Viewer {
 
   updateData(cm, setCursorToPageBeg = true, setFocusToVerovioPane = true, withMidiSeek = false) {
     let message = {
+      breaks: this.breaksSelect.value,
       cmd: 'updateData',
       mei: this.speedFilter(cm.getValue()),
       pageNo: this.currentPage,
@@ -104,7 +121,6 @@ export default class Viewer {
       setCursorToPageBeginning: setCursorToPageBeg,
       setFocusToVerovioPane: setFocusToVerovioPane,
       speedMode: this.speedMode,
-      breaks: this.breaksSelect.value,
       withMidiSeek: withMidiSeek,
     };
     this.busy();
@@ -181,7 +197,7 @@ export default class Viewer {
       pageNumber = await this.getPageWithElementFromVrvWorker(xmlId);
     }
     return pageNumber;
-  } // v.getPageWithElement()
+  } // getPageWithElement()
 
   // for normal mode
   getPageWithElementFromVrvWorker(xmlId) {
@@ -317,7 +333,7 @@ export default class Viewer {
     if (false && !removeIds) message.xmlId = this.selectedElements[0]; // TODO
     this.busy();
     this.vrvWorker.postMessage(message);
-  }
+  } // reRenderMei()
 
   computePageBreaks(cm) {
     let message = {
@@ -328,7 +344,7 @@ export default class Viewer {
     };
     this.busy();
     this.vrvWorker.postMessage(message);
-  }
+  } // computePageBreaks()
 
   // update options in viewer from user interface
   setVerovioOptions(newOptions = {}) {
@@ -342,19 +358,29 @@ export default class Viewer {
     if (fontSel) this.vrvOptions.font = fontSel.value;
     let bs = this.breaksSelect;
     if (bs) this.vrvOptions.breaks = bs.value;
-    let dimensions = getVerovioContainerSize();
-    let vp = document.getElementById('verovio-panel');
-    dimensions.width = vp.clientWidth;
-    dimensions.height = vp.clientHeight;
-    // console.info('client size: ' + dimensions.width + '/' + dimensions.height);
-    if (this.vrvOptions.breaks !== 'none') {
-      this.vrvOptions.pageWidth = Math.max(Math.round(dimensions.width * (100 / this.vrvOptions.scale)), 100);
-      this.vrvOptions.pageHeight = Math.max(Math.round(dimensions.height * (100 / this.vrvOptions.scale)), 100);
+
+    // update page dimensions, only if not in pdf mode
+    if (this.pdfMode) {
+      let vpw = document.getElementById('vrv-pageWidth');
+      if (vpw) this.vrvOptions.pageWidth = vpw.value;
+      let vph = document.getElementById('vrv-pageHeight');
+      if (vph) this.vrvOptions.pageHeight = vph.value;
+    } else {
+      let dimensions = {}; // = getVerovioContainerSize();
+      let vp = document.getElementById('verovio-panel');
+      dimensions.width = vp.clientWidth;
+      dimensions.height = vp.clientHeight;
+      // console.info('client size: ' + dimensions.width + '/' + dimensions.height);
+      if (this.vrvOptions.breaks !== 'none') {
+        this.vrvOptions.pageWidth = Math.max(Math.round(dimensions.width * (100 / this.vrvOptions.scale)), 100);
+        this.vrvOptions.pageHeight = Math.max(Math.round(dimensions.height * (100 / this.vrvOptions.scale)), 100);
+      }
+      // console.info('Vrv pageWidth/Height: ' + this.vrvOptions.pageWidth + '/' + this.vrvOptions.pageHeight);
     }
     // overwrite existing options if new ones are passed in
     // for (let key in newOptions) { this.vrvOptions[key] = newOptions[key]; }
     console.info('Verovio options updated: ', this.vrvOptions);
-  }
+  } // setVerovioOptions()
 
   // accepts number or string (first, last, forwards, backwards)
   changeCurrentPage(newPage) {
@@ -387,17 +413,20 @@ export default class Viewer {
     }
     // dont update and return false otherwise
     return false;
-  }
+  } // changeCurrentPage()
 
   updatePageNumDisplay() {
     let pg = this.pageCount < 0 ? '?' : this.pageCount;
     document.getElementById('pagination1').innerHTML = 'Page&nbsp;';
     document.getElementById('pagination2').innerHTML = `&nbsp;${this.currentPage}&nbsp;`;
     document.getElementById('pagination3').innerHTML = `&nbsp;of ${pg}`;
-  }
+    prs.updatePageRangeSelector(this);
+  } // updatePageNumDisplay()
 
   // set cursor to first note id in page, taking st/ly of id, if possible
   setCursorToPageBeginning(cm) {
+    this.selectedElements = [];
+    if (!this.allowNotationInteraction) return;
     let id = this.lastNoteId;
     let stNo, lyNo;
     let sc;
@@ -420,11 +449,10 @@ export default class Viewer {
     }
     utils.setCursorToId(cm, id);
     // console.info('setCrsrToPgBeg(): lastNoteId: ' + this.lastNoteId + ', new id: ' + id);
-    this.selectedElements = [];
     this.selectedElements.push(id);
     this.lastNoteId = id;
     return id;
-  }
+  } // setCursorToPageBeginning()
 
   addNotationEventListeners(cm) {
     let vp = document.getElementById('verovio-panel');
@@ -434,9 +462,10 @@ export default class Viewer {
         item.addEventListener('click', (event) => this.handleClickOnNotation(event, cm));
       });
     }
-  }
+  } // addNotationEventListeners()
 
   handleClickOnNotation(e, cm) {
+    if (!this.allowNotationInteraction) return;
     e.stopImmediatePropagation();
     this.hideAlerts();
     let point = {};
@@ -448,7 +477,7 @@ export default class Viewer {
     r.y = matrix.b * point.x + matrix.d * point.y + matrix.f;
     console.log('Click on ' + e.srcElement.id + ', x/y: ' + r.x + '/' + r.y);
 
-    this.updateNotation = false;
+    this.allowCursorActivity = false;
     // console.info('click: ', e);
     let itemId = String(e.currentTarget.id);
     if (itemId === 'undefined') return;
@@ -458,66 +487,58 @@ export default class Viewer {
     // select tuplet when clicking on tupletNum
     if (e.currentTarget.getAttribute('class') === 'tupletNum') itemId = utils.insideParent(itemId, 'tuplet');
 
+    let msg = 'handleClickOnNotation() ';
     if ((platform.startsWith('mac') && e.metaKey) || e.ctrlKey) {
-      this.selectedElements.push(itemId);
-      console.info(
-        'handleClickOnNotation() added: ' +
-          this.selectedElements[this.selectedElements.length - 1] +
-          ', size now: ' +
-          this.selectedElements.length
-      );
+      if (this.selectedElements.includes(itemId)) {
+        this.selectedElements.splice(this.selectedElements.indexOf(itemId), 1);
+        msg += 'removed: ' + itemId + ', size: ' + this.selectedElements.length;
+      } else {
+        this.selectedElements.push(itemId);
+        msg += 'added: ' + itemId + ', size: ' + this.selectedElements.length;
+      }
     } else {
       // set cursor position in buffer
       utils.setCursorToId(cm, itemId);
       this.selectedElements = [];
       this.selectedElements.push(itemId);
-      console.info(
-        'handleClickOnNotation() newly created: ' +
-          this.selectedElements[this.selectedElements.length - 1] +
-          ', size now: ' +
-          this.selectedElements.length
-      );
+      msg += 'newly created: ' + itemId + ', size: ' + this.selectedElements.length;
     }
+    console.log(msg);
     this.updateHighlight(cm);
     if (document.getElementById('showMidiPlaybackControlBar').checked) {
-      console.log('v.handleClickOnNotation(): HANDLE CLICK MIDI TIMEOUT');
+      console.log('Viewer.handleClickOnNotation(): HANDLE CLICK MIDI TIMEOUT');
       startMidiTimeout();
     }
     this.setFocusToVerovioPane();
-    // set lastNoteId to @startid or @staff of control element
-    let startid = utils.getAttributeById(cm, itemId, 'startid');
-    if (startid && startid.startsWith('#')) startid = startid.split('#')[1];
 
-    // if (!startid) { // work around for tstamp/staff
-    // TODO: find note corresponding to @staff/@tstamp
-    // startid = utils.getAttributeById(txtEdr.getBuffer(), itemId, attribute = 'tstamp');
-    // console.info('staff: ', startid);
-    // }
-    if (startid) this.lastNoteId = startid;
-    else this.lastNoteId = itemId;
-    this.updateNotation = true;
+    // set lastNoteId to @startid of control element
+    let startid = this.xmlDoc.querySelector('[*|id=' + itemId + ']')?.getAttribute('startid');
+    this.lastNoteId = startid ? utils.rmHash(startid) : itemId;
+    this.allowCursorActivity = true;
   } // handleClickOnNotation()
 
   // when cursor pos in editor changed, update notation location / highlight
   cursorActivity(cm, forceFlip = false) {
-    let id = utils.getElementIdAtCursor(cm);
-    // console.log('cursorActivity forceFlip: ' + forceFlip + ' to: ' + id);
-    this.selectedElements = [];
-    if (id) {
-      this.selectedElements.push(id);
-      let fl = document.getElementById('flip-checkbox');
-      if (
-        !document.querySelector('g#' + utils.escapeXmlId(id)) && // when not on current page
-        ((this.updateNotation && fl && fl.checked) || forceFlip)
-      ) {
-        this.updatePage(cm, '', id, false);
-      } else if (this.updateNotation) {
-        // on current page
-        this.scrollSvg(cm);
-        this.updateHighlight(cm);
+    if (this.allowCursorActivity) {
+      let id = utils.getElementIdAtCursor(cm);
+      // console.log('cursorActivity forceFlip: ' + forceFlip + ' to: ' + id);
+      this.selectedElements = [];
+      if (id) {
+        this.selectedElements.push(id);
+        let fl = document.getElementById('flip-checkbox');
+        if (
+          !document.querySelector('g#' + utils.escapeXmlId(id)) && // when not on current page
+          ((fl && fl.checked) || forceFlip)
+        ) {
+          this.updatePage(cm, '', id, false);
+        } else {
+          // on current page
+          this.scrollSvg(cm);
+          this.updateHighlight(cm);
+        }
       }
     }
-  }
+  } // cursorActivity()
 
   // Scroll notation SVG into view, both vertically and horizontally
   scrollSvg(cmOrId) {
@@ -554,7 +575,7 @@ export default class Viewer {
         vp.scrollTo({ top: scrollTop, left: scrollLeft, behavior: 'smooth' });
       }
     }
-  }
+  } // scrollSvg()
 
   // when editor emits changes, update notation rendering
   notationUpdated(cm, forceUpdate = false) {
@@ -563,10 +584,10 @@ export default class Viewer {
     this.toolkitDataOutdated = true;
     if (!isSafari) this.checkSchema(cm.getValue());
     let ch = document.getElementById('live-update-checkbox');
-    if ((this.updateNotation && ch && ch.checked) || forceUpdate) {
+    if ((this.allowCursorActivity && ch && ch.checked) || forceUpdate) {
       this.updateData(cm, false, false);
     }
-  }
+  } // notationUpdated()
 
   // highlight currently selected elements, if cm left out, all are cleared
   updateHighlight(cm) {
@@ -591,7 +612,7 @@ export default class Viewer {
         }
       }
     }
-  }
+  } // updateHighlight()
 
   setNotationColors(matchTheme = false, alwaysBW = false) {
     // work-around that booleans retrieved from storage are strings
@@ -615,7 +636,7 @@ export default class Viewer {
       rt.style.setProperty('--notationColor', 'var(--defaultTextColor)');
       rt.style.setProperty('--highlightColor', 'var(--defaultHighlightColor)');
     }
-  }
+  } // setNotationColors()
 
   // sets the color scheme of the active theme
   setMenuColors() {
@@ -740,7 +761,7 @@ export default class Viewer {
       if (storage && storage.supported) storage.scale = zoomCtrl.value;
       this.updateLayout();
     }
-  }
+  } // zoom()
 
   // change font size of editor panel (sign is direction
   // or percent when larger than 30)
@@ -752,14 +773,14 @@ export default class Viewer {
     document.getElementById('encoding').style.fontSize = value + '%';
     zf.value = value;
     cm.refresh(); // to align selections with new font size (24 Sept 2022)
-  }
+  } // changeEditorFontSize()
 
   // set focus to verovioPane in order to ensure working key bindings
   setFocusToVerovioPane() {
     let el = document.getElementById('verovio-panel');
     el.setAttribute('tabindex', '-1');
     el.focus();
-  }
+  } // setFocusToVerovioPane()
 
   showSettingsPanel() {
     let sp = document.getElementById('settingsPanel');
@@ -767,14 +788,16 @@ export default class Viewer {
     sp.classList.remove('out');
     sp.classList.add('in');
     document.getElementById('showSettingsButton').style.visibility = 'hidden';
-  }
+    if (this.settingsReplaceFriendContainer) setOrientation(cm, '', '', this);
+  } // showSettingsPanel()
 
   hideSettingsPanel() {
     let sp = document.getElementById('settingsPanel');
     sp.classList.add('out');
     sp.classList.remove('in');
     document.getElementById('showSettingsButton').style.visibility = 'visible';
-  }
+    if (this.settingsReplaceFriendContainer) setOrientation(cm, '', '', this);
+  } // hideSettingsPanel()
 
   toggleSettingsPanel(ev = null) {
     if (ev) {
@@ -788,17 +811,120 @@ export default class Viewer {
     } else {
       this.showSettingsPanel();
     }
-  }
+  } // toggleSettingsPanel()
+
+  // same as showSettingsPanel, but with Verovio tab activated
+  showVerovioTabInSettingsPanel() {
+    let containingElement = document.getElementById('settingsPanel');
+    const tabId = 'verovioSettings';
+    for (let cont of containingElement.getElementsByClassName('tabcontent')) {
+      cont.style.display = cont.id === tabId ? 'block' : 'none';
+    }
+    // remove class "active" from tablinks except for current target
+    for (let tab of containingElement.getElementsByClassName('tablink')) {
+      tab.id === 'verovioOptionsTab' ? tab.classList.add('active') : tab.classList.remove('active');
+    }
+    this.showSettingsPanel();
+  } // showVerovioTabInSettingsPanel()
+
+  // Switches Viewer to pdfMode
+  pageModeOn(pdfMode = true) {
+    this.pdfMode = pdfMode;
+    this.controlMenuState = getControlMenuState();
+    console.log('pageModeOn: state ', this.controlMenuState);
+
+    // modify vrv options
+    this.vrvOptions.mmOutput = true;
+    document.getElementById('vrv-mmOutput').checked = true;
+    this.vrvOptions.adjustPageHeight = false;
+    document.getElementById('vrv-adjustPageHeight').checked = false;
+
+    if (this.pdfMode) {
+      setCheckbox('controlMenuFlipToPageControls', false);
+      setCheckbox('controlMenuUpdateNotation', false);
+      setCheckbox('controlMenuFontSelector', true);
+      setCheckbox('controlMenuNavigateArrows', false);
+      setCheckbox('toggleSpeedMode', false);
+
+      // hide editor and other panels
+      this.notationProportion = getNotationProportion();
+      setNotationProportion(1);
+      this.hideEditorPanel();
+
+      // behavior of settings panel
+      this.settingsReplaceFriendContainer = true;
+      cmd.hideFacsimilePanel();
+      cmd.hideAnnotationPanel();
+      this.showVerovioTabInSettingsPanel(); // make vrv settings visible
+
+      showPdfButtons(true);
+      this.allowNotationInteraction = false;
+      document.getElementById('friendContainer')?.classList.add('pdfMode');
+    }
+  } // pageModeOn()
+
+  // Switches back from pdfMode
+  pageModeOff() {
+    setControlMenuState(this.controlMenuState);
+    // set vrv options back
+    this.vrvOptions.mmOutput = false;
+    document.getElementById('vrv-mmOutput').checked = false;
+    this.vrvOptions.adjustPageHeight = true;
+    document.getElementById('vrv-adjustPageHeight').checked = true;
+    // settings behavior to default
+    this.settingsReplaceFriendContainer = false;
+
+    if (this.pdfMode) {
+      // show editor panel with previous proportion
+      setNotationProportion(this.notationProportion);
+      this.showEditorPanel();
+      // hide panels
+      this.hideSettingsPanel();
+      showPdfButtons(false);
+
+      document.getElementById('friendContainer')?.classList.remove('pdfMode');
+      setOrientation(cm, '', '', this);
+      this.allowNotationInteraction = true;
+    }
+    this.pdfMode = false;
+  } // pageModeOff()
+
+  saveAsPdf() {
+    this.vrvWorker.postMessage({
+      cmd: 'renderPdf',
+      msg: this.speedFilter(cm.getValue()),
+      title: meiFileName,
+      version: version,
+      versionDate: versionDate,
+      options: this.vrvOptions,
+      speedMode: this.speedMode,
+      pages: prs.getPages(),
+    });
+  } // saveAsPdf()
+
+  showEditorPanel() {
+    const encPanel = document.getElementById('encoding');
+    if (encPanel) encPanel.style.display = 'flex';
+    const rzr = document.getElementById('dragMe');
+    if (rzr) rzr.style.display = 'flex';
+  } // showEditorPanel()
+
+  hideEditorPanel() {
+    const encPanel = document.getElementById('encoding');
+    if (encPanel) encPanel.style.display = 'none';
+    const rzr = document.getElementById('dragMe');
+    if (rzr) rzr.style.display = 'none';
+  } // hideEditorPanel()
 
   toggleMidiPlaybackControlBar() {
     const midiPlaybackControlBar = document.getElementById('midiPlaybackControlBar');
     const showMidiPlaybackControlBar = document.getElementById('showMidiPlaybackControlBar');
-    const midiSpeedmodeIndicator = document.getElementById('midi-speedmode-indicator');
+    const midiSpeedmodeIndicator = document.getElementById('midiSpeedmodeIndicator');
     midiPlaybackControlBar.style.display = showMidiPlaybackControlBar.checked ? 'flex' : 'none';
     midiSpeedmodeIndicator.style.display = this.speedMode ? 'inline' : 'none';
     // console.log('toggle: ', midiPlaybackControlBar);
     setOrientation(cm);
-  }
+  } // toggleMidiPlaybackControlBar()
 
   toggleAnnotationPanel() {
     setOrientation(cm);
@@ -808,7 +934,7 @@ export default class Viewer {
     } else {
       this.updateLayout();
     }
-  }
+  } // toggleAnnotationPanel()
 
   // go through current active tab of settings menu and filter option items (make invisible)
   applySettingsFilter() {
@@ -875,10 +1001,10 @@ export default class Viewer {
         }
       }
     }
-  }
+  } // applySettingsFilter()
 
   addMeiFriendOptionsToSettingsPanel(restoreFromLocalStorage = true) {
-    let optionsToShow = {
+    let meiFriendSettingsOptions = {
       titleGeneral: {
         title: 'General',
         description: 'General mei-friend settings',
@@ -977,60 +1103,37 @@ export default class Viewer {
         type: 'header',
         default: true,
       },
+      // flip-checkbox, flip-btn
+      controlMenuFlipToPageControls: {
+        title: 'Show flip to page controls',
+        description: 'Show flip to page controls in notation control menu',
+        type: 'bool',
+        default: true,
+      },
+      controlMenuUpdateNotation: {
+        title: 'Show notation update controls',
+        description: 'Show notation update behavior controls in notation control menu',
+        type: 'bool',
+        default: true,
+      },
       controlMenuFontSelector: {
         title: 'Show notation font selector',
-        description: 'Show notation font (SMuFL) selector in control menu',
+        description: 'Show notation font (SMuFL) selector in notation control menu',
         type: 'bool',
         default: false,
       },
       controlMenuNavigateArrows: {
         title: 'Show navigation arrows',
-        description: 'Show notation navigation arrows in control menu',
+        description: 'Show notation navigation arrows in notation control menu',
         type: 'bool',
         default: false,
       },
-      controlMenuUpdateNotation: {
-        title: 'Show notation update controls',
-        description: 'Show notation update behavior controls in control menu',
+      controlMenuSpeedmodeCheckbox: {
+        title: 'Show speed mode checkbox',
+        description: 'Show speed mode checkbox in notation control menu',
         type: 'bool',
         default: true,
       },
-      renumberMeasuresHeading: {
-        title: 'Renumber measures',
-        description: 'Settings for renumbering measures',
-        type: 'header',
-        default: true,
-      },
-      renumberMeasureContinueAcrossIncompleteMeasures: {
-        title: 'Continue across incomplete measures',
-        description: 'Continue measure numbers across incomplete measures (@metcon="false")',
-        type: 'bool',
-        default: false,
-      },
-      renumberMeasuresUseSuffixAtMeasures: {
-        title: 'Use suffix at incomplete measures',
-        description: 'Use number suffix at incomplete measures (e.g., 23-cont)',
-        type: 'select',
-        values: ['none', '-cont'],
-        default: false,
-      },
-      renumberMeasuresContinueAcrossEndings: {
-        title: 'Continue across endings',
-        description: 'Continue measure numbers across endings',
-        type: 'bool',
-        default: false,
-      },
-      renumberMeasuresUseSuffixAtEndings: {
-        title: 'Use suffix at endings',
-        description: 'Use number suffix at endings (e.g., 23-a)',
-        type: 'select',
-        values: ['none', 'ending@n', 'a/b/c', 'A/B/C', '-a/-b/-c', '-A/-B/-C'],
-        default: 'a/b/c',
-      },
-      // annotationPanelSeparator: {
-      //   title: 'options-line', // class name of hr element
-      //   type: 'line'
-      // },
       titleMidiPlayback: {
         title: 'MIDI playback',
         description: 'MIDI playback settings',
@@ -1062,6 +1165,161 @@ export default class Viewer {
         type: 'bool',
         default: true,
       },
+      titleTransposition: {
+        title: 'Transpose',
+        description: 'Transpose score information',
+        type: 'header',
+        default: true,
+      },
+      enableTransposition: {
+        title: 'Enable transposition',
+        description:
+          'Enable transposition settings, to be applied through the transpose button below. The transposition will be applied to the notation only, the encoding remains unchanged, unless you click the item "Rerender via Verovio" in the "Manipulate" dropdown menu.',
+        type: 'bool',
+        default: false,
+      },
+      transposeInterval: {
+        title: 'Transpose by interval',
+        description:
+          'Transpose encoding by chromatic interval by the most common intervals (Verovio supports the base-40 system)',
+        type: 'select',
+        labels: [
+          'Perfect Unison',
+          'Augmented Unison',
+          'Diminished Second',
+          'Minor Second',
+          'Major Second',
+          'Augmented Second',
+          'Diminished Third',
+          'Minor Third',
+          'Major Third',
+          'Augmented Third',
+          'Diminished Fourth',
+          'Perfect Fourth',
+          'Augmented Fourth',
+          'Diminished Fifth',
+          'Perfect Fifth',
+          'Augmented Fifth',
+          'Diminished Sixth',
+          'Minor Sixth',
+          'Major Sixth',
+          'Augmented Sixth',
+          'Diminished Seventh',
+          'Minor Seventh',
+          'Major Seventh',
+          'Augmented Seventh',
+          'Diminished Octave',
+          'Perfect Octave',
+        ],
+        values: [
+          'P1',
+          'A1',
+          'd2',
+          'm2',
+          'M2',
+          'A2',
+          'd3',
+          'm3',
+          'M3',
+          'A3',
+          'd4',
+          'P4',
+          'A4',
+          'd5',
+          'P5',
+          'A5',
+          'd6',
+          'm6',
+          'M6',
+          'A6',
+          'd7',
+          'm7',
+          'M7',
+          'A7',
+          'd8',
+          'P8',
+        ],
+        default: 'P1',
+        radioId: 'byInterval',
+        radioName: 'transposeMode',
+      },
+      transposeKey: {
+        title: 'Transpose to key',
+        description: 'Transpose to key',
+        type: 'select',
+        labels: [
+          'C# major / A# minor',
+          'F# major / D# minor',
+          'B major / G# minor',
+          'E major / C# minor',
+          'A major / F# minor',
+          'D major / B minor',
+          'G major / E minor',
+          'C major / E minor',
+          'F major / D minor',
+          'Bb major / G minor',
+          'Eb major / C minor',
+          'Ab major / F minor',
+          'Db major / Bb minor',
+          'Gb major / Eb minor',
+          'Cb major / Ab minor',
+        ],
+        values: ['cs', 'fs', 'b', 'e', 'a', 'd', 'g', 'c', 'f', 'bf', 'ef', 'af', 'df', 'gf', 'cf'],
+        default: 'c',
+        radioId: 'toKey',
+        radioName: 'transposeMode',
+        radioChecked: 'true',
+      },
+      transposeDirection: {
+        title: 'Pitch direction',
+        description: 'Pitch direction of transposition (up/down)',
+        type: 'select',
+        labels: ['Up', 'Down', 'Closest'],
+        values: ['+', '-', ''],
+        default: '+', // refers to values
+      },
+      transposeButton: {
+        title: 'Transpose',
+        description:
+          'Apply transposition with above settings to the notation, while the MEI encoding remains unchanged. To also transpose the MEI encoding with the current settings, use "Rerender via Verovio" in the "Manipulate" dropdown menu.',
+        type: 'button',
+      },
+      renumberMeasuresHeading: {
+        title: 'Renumber measures',
+        description: 'Settings for renumbering measures',
+        type: 'header',
+        default: true,
+      },
+      renumberMeasureContinueAcrossIncompleteMeasures: {
+        title: 'Continue across incomplete measures',
+        description: 'Continue measure numbers across incomplete measures (@metcon="false")',
+        type: 'bool',
+        default: false,
+      },
+      renumberMeasuresUseSuffixAtMeasures: {
+        title: 'Suffix at incomplete measures',
+        description: 'Use number suffix at incomplete measures (e.g., 23-cont)',
+        type: 'select',
+        values: ['none', '-cont'],
+        default: false,
+      },
+      renumberMeasuresContinueAcrossEndings: {
+        title: 'Continue across endings',
+        description: 'Continue measure numbers across endings',
+        type: 'bool',
+        default: false,
+      },
+      renumberMeasuresUseSuffixAtEndings: {
+        title: 'Suffix at endings',
+        description: 'Use number suffix at endings (e.g., 23-a)',
+        type: 'select',
+        values: ['none', 'ending@n', 'a/b/c', 'A/B/C', '-a/-b/-c', '-A/-B/-C'],
+        default: 'a/b/c',
+      },
+      // annotationPanelSeparator: {
+      //   title: 'options-line', // class name of hr element
+      //   type: 'line'
+      // },
       highlightCurrentlySoundingNotes: {
         title: 'Highlight currently-sounding notes',
         description: 'Visually highlight currently-sounding notes in the notation panel during MIDI playback ',
@@ -1185,8 +1443,8 @@ export default class Viewer {
     mfs.innerHTML = '<div class="settingsHeader">mei-friend Settings</div>';
     let storage = window.localStorage;
     let currentHeader;
-    Object.keys(optionsToShow).forEach((opt) => {
-      let o = optionsToShow[opt];
+    Object.keys(meiFriendSettingsOptions).forEach((opt) => {
+      let o = meiFriendSettingsOptions[opt];
       let value = o.default;
       if (storage.hasOwnProperty('mf-' + opt)) {
         if (restoreFromLocalStorage && opt !== 'showMidiPlaybackControlBar') {
@@ -1210,10 +1468,10 @@ export default class Viewer {
           });
           break;
         case 'selectIdStyle':
-          v.xmlIdStyle = value;
+          this.xmlIdStyle = value;
           break;
         case 'toggleSpeedMode':
-          document.getElementById('midi-speedmode-indicator').style.display = this.speedMode ? 'inline' : 'none';
+          document.getElementById('midiSpeedmodeIndicator').style.display = this.speedMode ? 'inline' : 'none';
           break;
         case 'showSupplied':
           rt.style.setProperty('--suppliedColor', value ? 'var(--defaultSuppliedColor)' : 'var(--notationColor)');
@@ -1242,8 +1500,15 @@ export default class Viewer {
         case 'controlMenuFontSelector':
           document.getElementById('font-ctrls').style.display = value ? 'inherit' : 'none';
           break;
+        case 'controlMenuSpeedmodeCheckbox':
+          document.getElementById('speed-div').style.display = value ? 'inherit' : 'none';
+          break;
         case 'controlMenuNavigateArrows':
           document.getElementById('navigate-ctrls').style.display = value ? 'inherit' : 'none';
+          break;
+        case 'controlMenuFlipToPageControls':
+          document.getElementById('flip-checkbox').style.display = value ? 'inherit' : 'none';
+          document.getElementById('flip-btn').style.display = value ? 'inherit' : 'none';
           break;
         case 'controlMenuUpdateNotation':
           document.getElementById('update-ctrls').style.display = value ? 'inherit' : 'none';
@@ -1257,6 +1522,20 @@ export default class Viewer {
         case 'showMidiPlaybackControlBar':
           // do nothing, as it is always the default display: none
           break;
+        case 'enableTransposition':
+          // switch on
+          if (value) {
+            let onList = ['transposeDirection', 'transposeButton'];
+            if (document.getElementById('toKey')?.checked) onList.push('transposeKey');
+            if (document.getElementById('byInterval')?.checked) onList.push('transposeInterval');
+            this.setDisablednessInOptionsItem(onList, ['']);
+          } else {
+            this.setDisablednessInOptionsItem(
+              [''],
+              ['transposeKey', 'transposeInterval', 'transposeDirection', 'transposeButton']
+            );
+          }
+          break;
       }
       let div = this.createOptionsItem(opt, o, value);
       if (div) {
@@ -1269,26 +1548,59 @@ export default class Viewer {
           mfs.appendChild(div);
         }
       }
-      if (opt === 'respSelect') this.respId = document.getElementById('respSelect').value;
-      if (opt === 'renumberMeasuresUseSuffixAtEndings') {
-        this.disableElementThroughCheckbox(
-          'renumberMeasuresContinueAcrossEndings',
-          'renumberMeasuresUseSuffixAtEndings'
-        );
-      }
-      if (opt === 'renumberMeasuresUseSuffixAtMeasures') {
-        this.disableElementThroughCheckbox(
-          'renumberMeasureContinueAcrossIncompleteMeasures',
-          'renumberMeasuresUseSuffixAtMeasures'
-        );
+      switch (opt) {
+        case 'respSelect':
+          this.respId = document.getElementById('respSelect').value;
+          break;
+        case 'renumberMeasuresUseSuffixAtEndings':
+          this.disableElementThroughCheckbox(
+            'renumberMeasuresContinueAcrossEndings',
+            'renumberMeasuresUseSuffixAtEndings'
+          );
+          break;
+        case 'renumberMeasuresUseSuffixAtMeasures':
+          this.disableElementThroughCheckbox(
+            'renumberMeasureContinueAcrossIncompleteMeasures',
+            'renumberMeasuresUseSuffixAtMeasures'
+          );
+          break;
+        case 'transposeKey':
+          if (o.radioChecked && document.getElementById('enableTransposition').checked) {
+            this.setDisablednessInOptionsItem(['transposeKey'], ['']);
+          } else {
+            this.setDisablednessInOptionsItem([''], ['transposeKey']);
+          }
+          break;
+        case 'transposeInterval':
+          if (o.radioChecked && document.getElementById('enableTransposition').checked) {
+            this.setDisablednessInOptionsItem(['transposeInterval'], ['']);
+          } else {
+            this.setDisablednessInOptionsItem([''], ['transposeInterval']);
+          }
+          break;
+        case 'transposeDirection':
+          if (document.getElementById('enableTransposition').checked) {
+            this.setDisablednessInOptionsItem(['transposeDirection'], ['']);
+          } else {
+            this.setDisablednessInOptionsItem([''], ['transposeDirection']);
+          }
+          break;
+        case 'transposeButton':
+          if (document.getElementById('enableTransposition').checked) {
+            this.setDisablednessInOptionsItem(['transposeButton'], ['']);
+          } else {
+            this.setDisablednessInOptionsItem([''], ['transposeButton']);
+          }
+          break;
       }
     });
     mfs.innerHTML +=
       '<input type="button" title="Reset to mei-friend defaults" id="mfReset" class="resetButton" value="Default" />';
 
+    // add change listeners to mei-friend settings
     if (addListeners) {
-      // add change listeners
       mfs.addEventListener('input', (ev) => {
+        console.log('meiFriend settings event listener: ', ev);
         let option = ev.target.id;
         let value = ev.target.value;
         if (ev.target.type === 'checkbox') value = ev.target.checked;
@@ -1303,7 +1615,7 @@ export default class Viewer {
             });
             break;
           case 'selectIdStyle':
-            v.xmlIdStyle = value;
+            this.xmlIdStyle = value;
             break;
           case 'toggleSpeedMode':
             let sb = document.getElementById('speed-checkbox');
@@ -1313,13 +1625,46 @@ export default class Viewer {
             }
             break;
           case 'showAnnotations':
-            v.updateLayout();
+            this.updateLayout();
             break;
           case 'showAnnotationPanel':
             this.toggleAnnotationPanel();
             break;
           case 'showMidiPlaybackControlBar':
             cmd.toggleMidiPlaybackControlBar(false);
+            break;
+          case 'enableTransposition':
+            // switch on
+            if (value) {
+              let onList = ['transposeDirection', 'transposeButton'];
+              if (document.getElementById('toKey')?.checked) onList.push('transposeKey');
+              if (document.getElementById('byInterval')?.checked) onList.push('transposeInterval');
+              this.setDisablednessInOptionsItem(onList, ['']);
+            } else {
+              this.setDisablednessInOptionsItem(
+                [''],
+                ['transposeKey', 'transposeInterval', 'transposeDirection', 'transposeButton']
+              );
+              this.vrvOptions.transpose = '';
+              this.updateAll(cm);
+            }
+            if (document.getElementById('showMidiPlaybackControlBar').checked) {
+              cmd.toggleMidiPlaybackControlBar();
+            }
+            break;
+          case 'toKey':
+            if (document.getElementById('enableTransposition').checked) {
+              this.setDisablednessInOptionsItem(['transposeKey'], ['transposeInterval']);
+            }
+            break;
+          case 'byInterval':
+            if (document.getElementById('enableTransposition').checked) {
+              this.setDisablednessInOptionsItem(['transposeInterval'], ['transposeKey']);
+            }
+            break;
+          case 'transposeKey':
+          case 'transposeInterval':
+          case 'transposeDirection':
             break;
           case 'selectMidiExpansion':
             this.updateSelectMidiExpansion();
@@ -1370,6 +1715,12 @@ export default class Viewer {
               ? 'inherit'
               : 'none';
             break;
+          case 'controlMenuSpeedmodeCheckbox':
+            document.getElementById('speed-div').style.display = document.getElementById('controlMenuSpeedmodeCheckbox')
+              .checked
+              ? 'inherit'
+              : 'none';
+            break;
           case 'controlMenuNavigateArrows':
             document.getElementById('navigate-ctrls').style.display = document.getElementById(
               'controlMenuNavigateArrows'
@@ -1377,11 +1728,14 @@ export default class Viewer {
               ? 'inherit'
               : 'none';
             break;
+          case 'controlMenuFlipToPageControls':
+            const v = document.getElementById('controlMenuFlipToPageControls').checked;
+            document.getElementById('flip-checkbox').style.display = v ? 'inherit' : 'none';
+            document.getElementById('flip-btn').style.display = v ? 'inherit' : 'none';
+            break;
           case 'controlMenuUpdateNotation':
-            document.getElementById('update-ctrls').style.display = document.getElementById('controlMenuUpdateNotation')
-              .checked
-              ? 'inherit'
-              : 'none';
+            const u = document.getElementById('controlMenuUpdateNotation').checked;
+            document.getElementById('update-ctrls').style.display = u ? 'inherit' : 'none';
             break;
           case 'renumberMeasuresContinueAcrossEndings':
             this.disableElementThroughCheckbox(
@@ -1396,7 +1750,7 @@ export default class Viewer {
             );
             break;
         }
-        if (value === optionsToShow[option].default) {
+        if (meiFriendSettingsOptions[option] && value === meiFriendSettingsOptions[option].default) {
           delete storage['mf-' + option]; // remove from storage object when default value
         } else {
           storage['mf-' + option] = value; // save changes in localStorage object
@@ -1419,16 +1773,28 @@ export default class Viewer {
       // });
       // add event listener for reset button
       mfs.addEventListener('click', (ev) => {
-        if (ev.target.id === 'mfReset') {
-          this.addMeiFriendOptionsToSettingsPanel(false);
-          this.applySettingsFilter();
+        switch (ev.target.id) {
+          case 'mfReset':
+            this.addMeiFriendOptionsToSettingsPanel(false);
+            this.applySettingsFilter();
+            break;
+          case 'transposeButton':
+            let msg = this.getTranspositionOption();
+            console.log('Transpose: ' + msg);
+            this.vrvOptions.transpose = msg;
+            // this.updateOption({ transpose: msg });
+            this.updateAll(cm);
+            if (document.getElementById('showMidiPlaybackControlBar').checked) {
+              cmd.toggleMidiPlaybackControlBar();
+            }
+            break;
         }
       });
     }
   } // addMeiFriendOptionsToSettingsPanel()
 
   addCmOptionsToSettingsPanel(mfDefaults, restoreFromLocalStorage = true) {
-    let optionsToShow = {
+    let codeMirrorSettingsOptions = {
       // key as in CodeMirror
       titleAppearance: {
         title: 'Editor appearance',
@@ -1571,8 +1937,8 @@ export default class Viewer {
     let currentHeader;
     if (!/\w/g.test(cmsp.innerHTML)) addListeners = true;
     cmsp.innerHTML = '<div class="settingsHeader">Editor Settings</div>';
-    Object.keys(optionsToShow).forEach((opt) => {
-      let o = optionsToShow[opt];
+    Object.keys(codeMirrorSettingsOptions).forEach((opt) => {
+      let o = codeMirrorSettingsOptions[opt];
       let value = o.default;
       if (mfDefaults.hasOwnProperty(opt)) {
         value = mfDefaults[opt];
@@ -1745,7 +2111,8 @@ export default class Viewer {
           }
           return; // skip updating notation when midi options changed
         }
-        this.updateLayout(this.vrvOptions);
+        window.clearTimeout(this.vrvTimeout);
+        this.vrvTimeout = window.setTimeout(() => this.updateLayout(this.vrvOptions), this.timeoutDelay);
       });
       // add event listener for details toggling
       // this.addToggleListener(vsp, 'vrv-');
@@ -1814,7 +2181,13 @@ export default class Viewer {
     }
   } // applyEditorOption()
 
-  // creates an option div with a label and input/select depending of o.keys
+  /**
+   * Creates an option div with a label and input/select depending of o.keys
+   * @param {string} opt (e.g. 'vrv-pageHeight', 'controlMenuFlipToPageControls')
+   * @param {object} o
+   * @param {string} optDefault
+   * @returns {Element}
+   */
   createOptionsItem(opt, o, optDefault) {
     if (o.type === 'header') {
       // create a details>summary structure instead of header
@@ -1831,13 +2204,30 @@ export default class Viewer {
     }
     let div = document.createElement('div');
     div.classList.add('optionsItem');
+
+    // add radio button for current options item
+    if ('radioId' in o && 'radioName' in o) {
+      let radio = document.createElement('input');
+      radio.setAttribute('type', 'radio');
+      radio.setAttribute('name', o.radioName);
+      radio.setAttribute('id', o.radioId);
+      radio.classList.add('radio');
+      div.appendChild(radio);
+      if ('radioChecked' in o && o.radioChecked) {
+        radio.setAttribute('checked', 'true');
+      }
+    }
+
+    // label
     let label = document.createElement('label');
     let title = o.description;
     if (o.default) title += ' (default: ' + o.default + ')';
     label.setAttribute('title', title);
-    label.setAttribute('for', opt);
+    label.setAttribute('for', 'radioId' in o ? o.radioId : opt);
     label.innerText = o.title;
     div.appendChild(label);
+
+    // input
     let input;
     let step = 0.05;
     switch (o.type) {
@@ -1880,8 +2270,9 @@ export default class Viewer {
         input = document.createElement('select');
         input.setAttribute('name', opt);
         input.setAttribute('id', opt);
-        o.values.forEach((str, i) => {
-          let option = new Option(str, str, o.values.indexOf(optDefault) === i ? true : false);
+        o.values.forEach((value, i) => {
+          let label = 'labels' in o ? o.labels.at(i) : value;
+          let option = new Option(label, value, o.values.indexOf(optDefault) === i ? true : false);
           if ('valuesDescriptions' in o) option.title = o.valuesDescriptions[i];
           input.add(option);
         });
@@ -1899,6 +2290,17 @@ export default class Viewer {
         let line = document.createElement('hr');
         line.classList.add(o.title);
         div.appendChild(line);
+        break;
+      case 'button':
+        label.textContent = ''; // '--transpose ' + this.getTranspositionOption();
+
+        label.setAttribute('title', '');
+        input = document.createElement('input');
+        input.setAttribute('type', 'button');
+        input.setAttribute('name', opt);
+        input.setAttribute('id', opt);
+        input.setAttribute('value', o.title);
+        input.setAttribute('title', o.description);
         break;
       default:
         console.log(
@@ -1933,12 +2335,23 @@ export default class Viewer {
     }
   } // setRespSelectOptions()
 
+  getTranspositionOption() {
+    let dir = document.getElementById('transposeDirection');
+    let key = document.getElementById('transposeKey');
+    let int = document.getElementById('transposeInterval');
+    if (!dir || !key || !int) return;
+    let optionString = dir.value;
+    if (!key.disabled) optionString += key.value;
+    if (!int.disabled) optionString += int.value;
+    return optionString;
+  } // setRespSelectOptions()
+
   // add MIDI playback expansion to select input
   setMidiExpansionOptions() {
     let expandSelect = document.getElementById('selectMidiExpansion');
     if (expandSelect) {
       while (expandSelect.options.length > 0) expandSelect.remove(0); // clear existing options
-    }
+    } // getTranspositionOption()
     // add options to midi controlbar expansion selector
     let vrvOption = document.getElementById('controlbar-midi-expansion-selector');
     if (vrvOption) {
@@ -1958,19 +2371,21 @@ export default class Viewer {
   // by 'dir' an by 'incrementElementName'
   navigate(cm, incElName = 'note', dir = 'forwards') {
     console.info('navigate(): lastNoteId: ', this.lastNoteId);
-    this.updateNotation = false;
+    this.allowCursorActivity = false;
     let id = this.lastNoteId;
     if (id === '') {
       // empty note id
       id = this.setCursorToPageBeginning(cm); // re-defines lastNotId
-      if (id === '') return;
+      if (!id) return;
     }
-    let element = document.querySelector('g#' + utils.escapeXmlId(id));
+    let element;
+    id = utils.escapeXmlId(id);
+    if (id) element = document.querySelector('g#' + id);
     if (!element) {
       // element off-screen
       this.setCursorToPageBeginning(cm); // re-defines lastNotId
-      id = this.lastNoteId;
-      element = document.querySelector('g#' + utils.escapeXmlId(id));
+      id = utils.escapeXmlId(this.lastNoteId);
+      element = document.querySelector('g#' + id);
     }
     if (!element) return;
     console.info('Navigate ' + dir + ' ' + incElName + '-wise for: ', element);
@@ -2030,7 +2445,7 @@ export default class Viewer {
     }
     // update cursor position in MEI file (buffer)
     utils.setCursorToId(cm, id);
-    // this.updateNotationToTextposition(txtEdr); TODO
+    // this.allowCursorActivityToTextposition(txtEdr); TODO
     if (id) {
       this.selectedElements = [];
       this.selectedElements.push(id);
@@ -2039,15 +2454,16 @@ export default class Viewer {
         startMidiTimeout();
       }
     }
-    this.updateNotation = true;
+    this.allowCursorActivity = true;
     this.scrollSvg(cm);
     this.updateHighlight(cm);
-  }
+  } // navigate()
 
   // turn page for navigation and return svg directly
   navigateBeyondPage(cm, dir = 'forwards', what = 'first', stNo = 1, lyNo = 1, y = 0) {
     if (!this.changeCurrentPage(dir)) return; // turn page
     let message = {
+      breaks: this.vrvOptions.breaks,
       cmd: 'navigatePage',
       pageNo: this.currentPage,
       dir: dir,
@@ -2089,7 +2505,7 @@ export default class Viewer {
 
   findFirstNoteInSelection() {
     let firstNote;
-    for (const elId of v.selectedElements) {
+    for (const elId of this.selectedElements) {
       let el = document.getElementById(elId);
       if (el) {
         if (el.classList.contains('note')) {
@@ -2103,7 +2519,7 @@ export default class Viewer {
           }
         }
       } else {
-        console.warn("Couldn't find selected element on page: ", elId, v.selectedElements);
+        console.warn("Couldn't find selected element on page: ", elId, this.selectedElements);
       }
     }
     return firstNote;
@@ -2163,7 +2579,32 @@ export default class Viewer {
     el.disabled = cont;
     if (cont) el.parentNode.classList.add('disabled');
     else el.parentNode.classList.remove('disabled');
-  }
+  } // disableElementThroughCheckbox()
+
+  /**
+   * Sets disabled to offItems (and removes it to onItems) of
+   * current element and its previous sibling (label)
+   * @param {Array[string]} onItems (array of ids)
+   * @param {Array[string]} offItems (array of ids)
+   */
+  setDisablednessInOptionsItem(onItems, offItems) {
+    offItems.forEach((offItem) => {
+      let off = document.getElementById(offItem);
+      if (off) {
+        off.disabled = true;
+        off.classList.add('disabled');
+        off.previousSibling?.classList.add('disabled');
+      }
+    });
+    onItems.forEach((onItem) => {
+      let on = document.getElementById(onItem);
+      if (on) {
+        on.disabled = false;
+        on.classList.remove('disabled');
+        on.previousSibling?.classList.remove('disabled');
+      }
+    });
+  } // setDisplayInOptionsItem()
 
   // show alert to user in #alertOverlay
   // type: ['error'] 'warning' 'info' 'success'
