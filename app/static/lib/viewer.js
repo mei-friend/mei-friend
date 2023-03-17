@@ -515,9 +515,6 @@ export default class Viewer {
 
   // when cursor pos in editor changed, update notation location / highlight
   cursorActivity(cm, forceFlip = false) {
-    if (document.getElementById('showMidiPlaybackControlBar').checked) {
-      cmd.toggleMidiPlaybackControlBar();
-    }
     if (this.allowCursorActivity) {
       let id = utils.getElementIdAtCursor(cm);
       // console.log('cursorActivity forceFlip: ' + forceFlip + ' to: ' + id);
@@ -578,6 +575,9 @@ export default class Viewer {
 
   // when editor emits changes, update notation rendering
   notationUpdated(cm, forceUpdate = false) {
+    if (document.getElementById('showMidiPlaybackControlBar').checked) {
+      cmd.toggleMidiPlaybackControlBar();
+    }
     // console.log('NotationUpdated forceUpdate:' + forceUpdate);
     this.xmlDocOutdated = true;
     this.toolkitDataOutdated = true;
