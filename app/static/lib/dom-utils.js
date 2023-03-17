@@ -250,9 +250,6 @@ export function generateExpansionList(xmlDoc, baseSelector = 'music score') {
       }
       expansions.push([str + el.getAttribute('xml:id'), el.getAttribute('xml:id')]);
     });
-    if (expansions.length == 2) {
-      expansions.pop(); // remove if only the one expansion
-    }
   }
   return expansions;
 } // generateExpansionList()
