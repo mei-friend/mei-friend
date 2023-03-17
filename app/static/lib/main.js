@@ -805,22 +805,25 @@ export async function openUrlFetch(url = '', updateAfterLoading = true) {
     const headers = { Accept: 'application/xml, text/xml, application/mei+xml' };
     if (isLoggedIn && url.href.trim().startsWith("https://raw.githubusercontent.com")) { 
       // GitHub URL - use GitHub credentials to enable URL fetch from private repos
-      openUrlProcess(await github.directlyReadFileContents(url.href), url, updateAfterLoading);
-    }
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: headers,
-      credentials: "omit"
-    });
-    if (response.status >= 400) {
-      console.warn('Fetching URL produced error status: ', response.status);
-      urlStatus.innerHTML = `${response.status}: ${response.statusText.toLowerCase()}`;
-      urlStatus.classList.add('warn');
-      urlInput.classList.add('warn');
-    } else {
-      response.text().then((data) => {
-        openUrlProcess(data, url, updateAfterLoading);
+      github.directlyReadFileContents(url.href).then((data) => { 
+        openUrlProcess(data, url, updateAfterLoading)
+      })
+    } else { 
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: headers,
+        credentials: "omit"
       });
+      if (response.status >= 400) {
+        console.warn('Fetching URL produced error status: ', response.status);
+        urlStatus.innerHTML = `${response.status}: ${response.statusText.toLowerCase()}`;
+        urlStatus.classList.add('warn');
+        urlInput.classList.add('warn');
+      } else {
+        response.text().then((data) => {
+          openUrlProcess(data, url, updateAfterLoading);
+        });
+      }
     }
   } catch (err) {
     console.warn('Error opening URL provided by user: ', err);
@@ -835,6 +838,7 @@ export async function openUrlFetch(url = '', updateAfterLoading = true) {
 }
 
 function openUrlProcess(content, url, updateAfterLoading) {
+  console.log("openUrlProcess called with: ", content)
   let urlInput = document.querySelector('#openUrlInput');
   let urlStatus = document.querySelector('#openUrlStatus');
   urlStatus.innerHTML = '';

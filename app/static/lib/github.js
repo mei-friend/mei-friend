@@ -292,12 +292,18 @@ export default class Github {
             return new Promise((resolve) => {
               const reader = new FileReader();
               reader.onloadend = () => {
-                const dataUrl = reader.result;
-                dataUrl.replace('application/vnd.github.raw', uriSuffixToMimetype(rawGithubUri));
-                resolve(dataUrl)
+                const result = reader.result;
+                if(typeof result == "string") { 
+                  // result is a dataUrl; replace default raw github content-type with correct one for resource
+                  result.replace('application/vnd.github.raw', uriSuffixToMimetype(rawGithubUri));
+                }
+                resolve(result)
               };
-              console.log("WORKING WITH: ", data)
-              reader.readAsDataURL(data);
+              if(isBlobUri(rawGithubUri)) {  
+                reader.readAsArrayBuffer(data);
+              } else { // image - read as data URL to allow inline embedding
+                reader.readAsDataURL(data);
+              }
             })
           }
         });
