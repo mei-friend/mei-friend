@@ -115,7 +115,7 @@
 }
 
 /* Links inside the dropdown */
-.dropdown-content a, .dropdown-content div {
+.dropdown-content a {
   cursor: pointer;
   float: none;
   color: var(--textColor);
@@ -358,7 +358,7 @@
   max-width: 160px;
 }
 
-#pageRangeItems, .dropdown-content div {
+#pageRangeItems{
   max-width: 160px;
   float: left;
 }
