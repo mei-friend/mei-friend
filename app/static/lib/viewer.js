@@ -268,14 +268,14 @@ export default class Viewer {
     }
     // retrieve requested MEI page from DOM
     return speed.getPageFromDom(this.xmlDoc, this.currentPage, breaks, this.pageSpanners, includeDummyMeasures);
-  }
+  } // speedFilter()
 
   loadXml(mei, forceReload = false) {
     if (this.xmlDocOutdated || forceReload) {
       this.xmlDoc = this.parser.parseFromString(mei, 'text/xml');
       this.xmlDocOutdated = false;
     }
-  }
+  } // loadXml()
 
   // returns true if sb/pb elements are contained (more than the leading pb)
   containsBreaks() {
@@ -289,7 +289,7 @@ export default class Viewer {
       if (countBreaks && ['sb', 'pb'].includes(e.nodeName)) return true;
     }
     return false;
-  }
+  } // containsBreaks()
 
   clear() {
     this.selectedElements = [];
@@ -301,7 +301,9 @@ export default class Viewer {
       start: {},
       end: {},
     };
-  }
+    this.respId = '';
+    this.expansionId = '';
+  } // clear()
 
   // re-render MEI through Verovio, while removing or adding xml:ids
   reRenderMei(cm, removeIds = false) {
@@ -1321,7 +1323,7 @@ export default class Viewer {
             break;
           case 'selectMidiExpansion':
             this.updateSelectMidiExpansion();
-            if (document.getElementById('showMidiPlaybackControlBar').checked ) {
+            if (document.getElementById('showMidiPlaybackControlBar').checked) {
               startMidiTimeout(true);
             }
             break;
@@ -1939,9 +1941,9 @@ export default class Viewer {
     }
     // add options to midi controlbar expansion selector
     let vrvOption = document.getElementById('controlbar-midi-expansion-selector');
-     if (vrvOption) {
-       while (vrvOption.options.length > 0) vrvOption.remove(0); // clear existing options
-     }
+    if (vrvOption) {
+      while (vrvOption.options.length > 0) vrvOption.remove(0); // clear existing options
+    }
     dutils.generateExpansionList(this.xmlDoc).forEach((str, i) => {
       if (expandSelect) {
         expandSelect.add(new Option(str[0], str[1]));
