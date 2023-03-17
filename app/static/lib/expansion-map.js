@@ -66,7 +66,8 @@ export function expand(expansionElement, existingList, xmlDoc) {
 
         // go through cloned objects, find TimePointing/SpanningInterface, PListInterface, LinkingInterface
         // TODO this->UpdateIDs(clonedObject);
-        // Add this method as in Verovio::ExpansionMap::UpdateIds(). This is only required when used for notation; fine for MIDI
+        // Add this method as in Verovio::ExpansionMap::UpdateIds(). This is only required when used for notation; 
+        // almost fine for MIDI except for missing ties (TODO!!!)
 
         // insert cloned node after previous section
         // @ts-ignore
@@ -81,8 +82,8 @@ export function expand(expansionElement, existingList, xmlDoc) {
       // remove s from reductionList
       let idx = reductionList.indexOf(s);
       if (idx >= 0) reductionList.splice(idx, 1);
-    }
-  }
+    } 
+  } // for expansionList
 
   // remove unused sections from reductionList
   reductionList.forEach((r) => {
@@ -94,13 +95,14 @@ export function expand(expansionElement, existingList, xmlDoc) {
 } // expand()
 
 /**
- * Recursively determine list of xml:ids
- * @param {*} obj
- * @param {*} idList
+ * Recursively create a list of xml:ids (idList) of all elements contained in obj
+ * @param {Node} obj
+ * @param {Array} idList
  */
 function getIdList(obj, idList) {
   obj.childNodes.forEach((o) => {
     if (o.nodeType === Node.ELEMENT_NODE) {
+      // @ts-ignore
       let id = o.getAttribute('xml:id');
       if (id) idList.push(id);
       getIdList(o, idList);
