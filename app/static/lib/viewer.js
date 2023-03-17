@@ -24,12 +24,8 @@ import {
   version,
   versionDate,
 } from './main.js';
-import { mp, startMidiTimeout } from './midi-player.js';
-import { getVerovioContainerSize, setOrientation } from './resizer.js';
-import { drawFacsimile, highlightZone, zoomFacsimile } from './facsimile.js';
-import { alert, download, info, success, verified, unverified, xCircleFill } from '../css/icons.js';
 import { selectMarkup } from './markup.js';
-import { startMidiTimeout } from './midi-player.js';
+import { mp, startMidiTimeout } from './midi-player.js';
 import { getNotationProportion, setNotationProportion, setOrientation } from './resizer.js';
 
 export default class Viewer {
