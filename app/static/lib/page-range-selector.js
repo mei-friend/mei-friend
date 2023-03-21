@@ -44,7 +44,7 @@ export function createPageRangeSelector(display = 'none') {
             <label for="selectFromTo">from:</label>
             <input type="number" id="selectFrom" name="firstPage" value="1" min="1"/>
         </div>
-        <div class="floatRight">
+        <div>
             <div class="fillSpace"></div>
             <label for="selectFromTo">to:</label>
             <input type="number" id="selectTo" name="endPage" value="1" min="1" />

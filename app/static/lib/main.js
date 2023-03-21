@@ -1,6 +1,6 @@
 // mei-friend version and date
-export const version = '0.8.6';
-export const versionDate = '10 Mar 2023';
+export const version = '0.8.7';
+export const versionDate = '21 Mar 2023';
 
 var vrvWorker;
 var spdWorker;
@@ -608,6 +608,38 @@ document.addEventListener('DOMContentLoaded', function () {
     ? 'block'
     : 'none';
 
+  if(storage.supported) { 
+    storage.read();
+    if (storage.github) {
+      // use github object from local storage if available
+      isLoggedIn = true;
+      github = new Github(
+        storage.github.githubRepo,
+        storage.github.githubToken,
+        storage.github.branch,
+        storage.github.commit,
+        storage.github.filepath,
+        storage.github.userLogin,
+        storage.github.userName,
+        storage.github.userEmail
+      );
+      //document.querySelector("#fileLocation").innerText = meiFileLocationPrintable;
+    } else if (isLoggedIn) {
+      // initialise and store new github object
+      github = new Github('', githubToken, '', '', '', userLogin, userName, userEmail);
+      storage.github = {
+        githubRepo: github.githubRepo,
+        githubToken: github.githubToken,
+        branch: github.branch,
+        commit: github.commit,
+        filepath: github.filepath,
+        userLogin: github.userLogin,
+        userName: userName,
+        userEmail: userEmail,
+      };
+    }
+  }
+
   let urlFileName = searchParams.get('file');
   // fork parameter: if true AND ?fileParam is set to a URL,
   // then put mei-friend into "remote fork request" mode:
@@ -624,7 +656,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // restore localStorage if we have it
   if (storage.supported) {
-    storage.read();
     // save (most) URL parameters in storage
     if (orientationParam !== null) storage.notationOrientation = orientationParam;
     if (notationProportionParam !== null) storage.notationProportion = notationProportionParam;
@@ -668,34 +699,6 @@ document.addEventListener('DOMContentLoaded', function () {
         openFile(undefined, false, false); // default MEI, skip freshly loaded (see comment above)
         setFileChangedState(false);
       }
-    }
-    if (storage.github) {
-      // use github object from local storage if available
-      isLoggedIn = true;
-      github = new Github(
-        storage.github.githubRepo,
-        storage.github.githubToken,
-        storage.github.branch,
-        storage.github.commit,
-        storage.github.filepath,
-        storage.github.userLogin,
-        storage.github.userName,
-        storage.github.userEmail
-      );
-      //document.querySelector("#fileLocation").innerText = meiFileLocationPrintable;
-    } else if (isLoggedIn) {
-      // initialise and store new github object
-      github = new Github('', githubToken, '', '', '', userLogin, userName, userEmail);
-      storage.github = {
-        githubRepo: github.githubRepo,
-        githubToken: github.githubToken,
-        branch: github.branch,
-        commit: github.commit,
-        filepath: github.filepath,
-        userLogin: github.userLogin,
-        userName: userName,
-        userEmail: userEmail,
-      };
     }
     if (storage.forkAndOpen && github) {
       // we've arrived back after an automated log-in request
@@ -799,44 +802,28 @@ export async function openUrlFetch(url = '', updateAfterLoading = true) {
   let urlStatus = document.querySelector('#openUrlStatus');
   try {
     if (!url) url = new URL(urlInput.value);
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        Accept: 'application/xml, text/xml, application/mei+xml',
-      },
-    });
-    if (response.status >= 400) {
-      console.warn('Fetching URL produced error status: ', response.status);
-      urlStatus.innerHTML = `${response.status}: ${response.statusText.toLowerCase()}`;
-      urlStatus.classList.add('warn');
-      urlInput.classList.add('warn');
-    } else {
-      urlStatus.innerHTML = '';
-      urlStatus.classList.remove('warn');
-      urlInput.classList.remove('warn');
-      response.text().then((data) => {
-        meiFileLocation = url.href;
-        meiFileLocationPrintable = url.hostname;
-        meiFileName = url.pathname.substring(url.pathname.lastIndexOf('/') + 1);
-        if (storage.github && isLoggedIn) {
-          // re-initialise github menu since we're now working from a URL
-          github.filepath = '';
-          github.branch = '';
-          if (storage.supported) {
-            updateGithubInLocalStorage();
-          }
-          refreshGithubMenu();
-        }
-        updateFileStatusDisplay();
-        handleEncoding(data, true, updateAfterLoading);
-        if (storage.supported) {
-          storage.fileLocationType = 'url';
-        }
-        fileLocationType = 'url';
-        openUrlCancel(); //hide open URL UI elements
-        const fnStatus = document.getElementById('fileName');
-        if (fnStatus) fnStatus.removeAttribute('contenteditable');
+    const headers = { Accept: 'application/xml, text/xml, application/mei+xml' };
+    if (isLoggedIn && url.href.trim().startsWith("https://raw.githubusercontent.com")) { 
+      // GitHub URL - use GitHub credentials to enable URL fetch from private repos
+      github.directlyReadFileContents(url.href).then((data) => { 
+        openUrlProcess(data, url, updateAfterLoading)
+      })
+    } else { 
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: headers,
+        credentials: "omit"
       });
+      if (response.status >= 400) {
+        console.warn('Fetching URL produced error status: ', response.status);
+        urlStatus.innerHTML = `${response.status}: ${response.statusText.toLowerCase()}`;
+        urlStatus.classList.add('warn');
+        urlInput.classList.add('warn');
+      } else {
+        response.text().then((data) => {
+          openUrlProcess(data, url, updateAfterLoading);
+        });
+      }
     }
   } catch (err) {
     console.warn('Error opening URL provided by user: ', err);
@@ -848,6 +835,36 @@ export async function openUrlFetch(url = '', updateAfterLoading = true) {
     urlInput.classList.add('warn');
     urlStatus.classList.add('warn');
   }
+}
+
+function openUrlProcess(content, url, updateAfterLoading) {
+  console.log("openUrlProcess called with: ", content)
+  let urlInput = document.querySelector('#openUrlInput');
+  let urlStatus = document.querySelector('#openUrlStatus');
+  urlStatus.innerHTML = '';
+  urlStatus.classList.remove('warn');
+  urlInput.classList.remove('warn');
+  meiFileLocation = url.href;
+  meiFileLocationPrintable = url.hostname;
+  meiFileName = url.pathname.substring(url.pathname.lastIndexOf('/') + 1);
+  if (storage.github && isLoggedIn) {
+    // re-initialise github menu since we're now working from a URL
+    github.filepath = '';
+    github.branch = '';
+    if (storage.supported) {
+      updateGithubInLocalStorage();
+    }
+    refreshGithubMenu();
+  }
+  updateFileStatusDisplay();
+  handleEncoding(content, true, updateAfterLoading);
+  if (storage.supported) {
+    storage.fileLocationType = 'url';
+  }
+  fileLocationType = 'url';
+  openUrlCancel(); //hide open URL UI elements
+  const fnStatus = document.getElementById('fileName');
+  if (fnStatus) fnStatus.removeAttribute('contenteditable');
 }
 
 function speedWorkerEventsHandler(ev) {

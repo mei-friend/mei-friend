@@ -913,7 +913,7 @@ export default class Viewer {
     midiSpeedmodeIndicator.style.display = this.speedMode ? 'inline' : 'none';
     // console.log('toggle: ', midiPlaybackControlBar);
     setOrientation(cm);
-  }
+  } // toggleMidiPlaybackControlBar()
 
   toggleAnnotationPanel() {
     setOrientation(cm);
@@ -923,7 +923,7 @@ export default class Viewer {
     } else {
       this.updateLayout();
     }
-  }
+  } // toggleAnnotationPanel()
 
   // go through current active tab of settings menu and filter option items (make invisible)
   applySettingsFilter() {
@@ -990,7 +990,7 @@ export default class Viewer {
         }
       }
     }
-  }
+  } // applySettingsFilter()
 
   addMeiFriendOptionsToSettingsPanel(restoreFromLocalStorage = true) {
     let meiFriendSettingsOptions = {
@@ -1154,6 +1154,125 @@ export default class Viewer {
         type: 'bool',
         default: true,
       },
+      titleTransposition: {
+        title: 'Transpose',
+        description: 'Transpose score information',
+        type: 'header',
+        default: true,
+      },
+      enableTransposition: {
+        title: 'Enable transposition',
+        description:
+          'Enable transposition settings, to be applied through the transpose button below. The transposition will be applied to the notation only, the encoding remains unchanged, unless you click the item "Rerender via Verovio" in the "Manipulate" dropdown menu.',
+        type: 'bool',
+        default: false,
+      },
+      transposeInterval: {
+        title: 'Transpose by interval',
+        description:
+          'Transpose encoding by chromatic interval by the most common intervals (Verovio supports the base-40 system)',
+        type: 'select',
+        labels: [
+          'Perfect Unison',
+          'Augmented Unison',
+          'Diminished Second',
+          'Minor Second',
+          'Major Second',
+          'Augmented Second',
+          'Diminished Third',
+          'Minor Third',
+          'Major Third',
+          'Augmented Third',
+          'Diminished Fourth',
+          'Perfect Fourth',
+          'Augmented Fourth',
+          'Diminished Fifth',
+          'Perfect Fifth',
+          'Augmented Fifth',
+          'Diminished Sixth',
+          'Minor Sixth',
+          'Major Sixth',
+          'Augmented Sixth',
+          'Diminished Seventh',
+          'Minor Seventh',
+          'Major Seventh',
+          'Augmented Seventh',
+          'Diminished Octave',
+          'Perfect Octave',
+        ],
+        values: [
+          'P1',
+          'A1',
+          'd2',
+          'm2',
+          'M2',
+          'A2',
+          'd3',
+          'm3',
+          'M3',
+          'A3',
+          'd4',
+          'P4',
+          'A4',
+          'd5',
+          'P5',
+          'A5',
+          'd6',
+          'm6',
+          'M6',
+          'A6',
+          'd7',
+          'm7',
+          'M7',
+          'A7',
+          'd8',
+          'P8',
+        ],
+        default: 'P1',
+        radioId: 'byInterval',
+        radioName: 'transposeMode',
+      },
+      transposeKey: {
+        title: 'Transpose to key',
+        description: 'Transpose to key',
+        type: 'select',
+        labels: [
+          'C# major / A# minor',
+          'F# major / D# minor',
+          'B major / G# minor',
+          'E major / C# minor',
+          'A major / F# minor',
+          'D major / B minor',
+          'G major / E minor',
+          'C major / E minor',
+          'F major / D minor',
+          'Bb major / G minor',
+          'Eb major / C minor',
+          'Ab major / F minor',
+          'Db major / Bb minor',
+          'Gb major / Eb minor',
+          'Cb major / Ab minor',
+        ],
+        values: ['cs', 'fs', 'b', 'e', 'a', 'd', 'g', 'c', 'f', 'bf', 'ef', 'af', 'df', 'gf', 'cf'],
+        default: 'c',
+        radioId: 'toKey',
+        radioName: 'transposeMode',
+        radioChecked: 'true',
+      },
+      transposeDirection: {
+        title: 'Pitch direction',
+        description: 'Pitch direction of transposition (up/down)',
+        type: 'select',
+        labels: ['Up', 'Down', 'Closest'],
+        values: ['+', '-', ''],
+        default: '+', // refers to values
+      },
+      transposeButton: {
+        title: 'Transpose',
+        description:
+          'Apply transposition with above settings to the notation, while the MEI encoding remains unchanged. To also transpose the MEI encoding with the current settings, use "Rerender via Verovio" in the "Manipulate" dropdown menu.',
+        type: 'button',
+      },
       renumberMeasuresHeading: {
         title: 'Renumber measures',
         description: 'Settings for renumbering measures',
@@ -1167,7 +1286,7 @@ export default class Viewer {
         default: false,
       },
       renumberMeasuresUseSuffixAtMeasures: {
-        title: 'Use suffix at incomplete measures',
+        title: 'Suffix at incomplete measures',
         description: 'Use number suffix at incomplete measures (e.g., 23-cont)',
         type: 'select',
         values: ['none', '-cont'],
@@ -1180,7 +1299,7 @@ export default class Viewer {
         default: false,
       },
       renumberMeasuresUseSuffixAtEndings: {
-        title: 'Use suffix at endings',
+        title: 'Suffix at endings',
         description: 'Use number suffix at endings (e.g., 23-a)',
         type: 'select',
         values: ['none', 'ending@n', 'a/b/c', 'A/B/C', '-a/-b/-c', '-A/-B/-C'],
@@ -1384,6 +1503,20 @@ export default class Viewer {
         case 'showMidiPlaybackControlBar':
           // do nothing, as it is always the default display: none
           break;
+        case 'enableTransposition':
+          // switch on
+          if (value) {
+            let onList = ['transposeDirection', 'transposeButton'];
+            if (document.getElementById('toKey')?.checked) onList.push('transposeKey');
+            if (document.getElementById('byInterval')?.checked) onList.push('transposeInterval');
+            this.setDisablednessInOptionsItem(onList, ['']);
+          } else {
+            this.setDisablednessInOptionsItem(
+              [''],
+              ['transposeKey', 'transposeInterval', 'transposeDirection', 'transposeButton']
+            );
+          }
+          break;
       }
       let div = this.createOptionsItem(opt, o, value);
       if (div) {
@@ -1396,27 +1529,59 @@ export default class Viewer {
           mfs.appendChild(div);
         }
       }
-      if (opt === 'respSelect') this.respId = document.getElementById('respSelect').value;
-      if (opt === 'renumberMeasuresUseSuffixAtEndings') {
-        this.disableElementThroughCheckbox(
-          'renumberMeasuresContinueAcrossEndings',
-          'renumberMeasuresUseSuffixAtEndings'
-        );
-      }
-      if (opt === 'renumberMeasuresUseSuffixAtMeasures') {
-        this.disableElementThroughCheckbox(
-          'renumberMeasureContinueAcrossIncompleteMeasures',
-          'renumberMeasuresUseSuffixAtMeasures'
-        );
+      switch (opt) {
+        case 'respSelect':
+          this.respId = document.getElementById('respSelect').value;
+          break;
+        case 'renumberMeasuresUseSuffixAtEndings':
+          this.disableElementThroughCheckbox(
+            'renumberMeasuresContinueAcrossEndings',
+            'renumberMeasuresUseSuffixAtEndings'
+          );
+          break;
+        case 'renumberMeasuresUseSuffixAtMeasures':
+          this.disableElementThroughCheckbox(
+            'renumberMeasureContinueAcrossIncompleteMeasures',
+            'renumberMeasuresUseSuffixAtMeasures'
+          );
+          break;
+        case 'transposeKey':
+          if (o.radioChecked && document.getElementById('enableTransposition').checked) {
+            this.setDisablednessInOptionsItem(['transposeKey'], ['']);
+          } else {
+            this.setDisablednessInOptionsItem([''], ['transposeKey']);
+          }
+          break;
+        case 'transposeInterval':
+          if (o.radioChecked && document.getElementById('enableTransposition').checked) {
+            this.setDisablednessInOptionsItem(['transposeInterval'], ['']);
+          } else {
+            this.setDisablednessInOptionsItem([''], ['transposeInterval']);
+          }
+          break;
+        case 'transposeDirection':
+          if (document.getElementById('enableTransposition').checked) {
+            this.setDisablednessInOptionsItem(['transposeDirection'], ['']);
+          } else {
+            this.setDisablednessInOptionsItem([''], ['transposeDirection']);
+          }
+          break;
+        case 'transposeButton':
+          if (document.getElementById('enableTransposition').checked) {
+            this.setDisablednessInOptionsItem(['transposeButton'], ['']);
+          } else {
+            this.setDisablednessInOptionsItem([''], ['transposeButton']);
+          }
+          break;
       }
     });
     mfs.innerHTML +=
       '<input type="button" title="Reset to mei-friend defaults" id="mfReset" class="resetButton" value="Default" />';
 
+    // add change listeners to mei-friend settings
     if (addListeners) {
-      // add change listeners
       mfs.addEventListener('input', (ev) => {
-        // console.log('meiFriend settings event listener: ', ev);
+        console.log('meiFriend settings event listener: ', ev);
         let option = ev.target.id;
         let value = ev.target.value;
         if (ev.target.type === 'checkbox') value = ev.target.checked;
@@ -1448,6 +1613,39 @@ export default class Viewer {
             break;
           case 'showMidiPlaybackControlBar':
             cmd.toggleMidiPlaybackControlBar(false);
+            break;
+          case 'enableTransposition':
+            // switch on
+            if (value) {
+              let onList = ['transposeDirection', 'transposeButton'];
+              if (document.getElementById('toKey')?.checked) onList.push('transposeKey');
+              if (document.getElementById('byInterval')?.checked) onList.push('transposeInterval');
+              this.setDisablednessInOptionsItem(onList, ['']);
+            } else {
+              this.setDisablednessInOptionsItem(
+                [''],
+                ['transposeKey', 'transposeInterval', 'transposeDirection', 'transposeButton']
+              );
+              this.vrvOptions.transpose = '';
+              this.updateAll(cm);
+            }
+            if (document.getElementById('showMidiPlaybackControlBar').checked) {
+              cmd.toggleMidiPlaybackControlBar();
+            }
+            break;
+          case 'toKey':
+            if (document.getElementById('enableTransposition').checked) {
+              this.setDisablednessInOptionsItem(['transposeKey'], ['transposeInterval']);
+            }
+            break;
+          case 'byInterval':
+            if (document.getElementById('enableTransposition').checked) {
+              this.setDisablednessInOptionsItem(['transposeInterval'], ['transposeKey']);
+            }
+            break;
+          case 'transposeKey':
+          case 'transposeInterval':
+          case 'transposeDirection':
             break;
           case 'editFacsimileZones':
             document.getElementById('facsimile-edit-zones-checkbox').checked = value;
@@ -1527,7 +1725,7 @@ export default class Viewer {
             );
             break;
         }
-        if (value === meiFriendSettingsOptions[option].default) {
+        if (meiFriendSettingsOptions[option] && value === meiFriendSettingsOptions[option].default) {
           delete storage['mf-' + option]; // remove from storage object when default value
         } else {
           storage['mf-' + option] = value; // save changes in localStorage object
@@ -1550,9 +1748,21 @@ export default class Viewer {
       // });
       // add event listener for reset button
       mfs.addEventListener('click', (ev) => {
-        if (ev.target.id === 'mfReset') {
-          this.addMeiFriendOptionsToSettingsPanel(false);
-          this.applySettingsFilter();
+        switch (ev.target.id) {
+          case 'mfReset':
+            this.addMeiFriendOptionsToSettingsPanel(false);
+            this.applySettingsFilter();
+            break;
+          case 'transposeButton':
+            let msg = this.getTranspositionOption();
+            console.log('Transpose: ' + msg);
+            this.vrvOptions.transpose = msg;
+            // this.updateOption({ transpose: msg });
+            this.updateAll(cm);
+            if (document.getElementById('showMidiPlaybackControlBar').checked) {
+              cmd.toggleMidiPlaybackControlBar();
+            }
+            break;
         }
       });
     }
@@ -1893,7 +2103,7 @@ export default class Viewer {
         }
       });
     }
-  }
+  } // addVrvOptionsToSettingsPanel()
 
   // TODO: does not get called (WG., 12 Okt 2022)
   // adds an event listener to the targetNode, to listen to 'header' elements (details/summary)
@@ -1969,13 +2179,30 @@ export default class Viewer {
     }
     let div = document.createElement('div');
     div.classList.add('optionsItem');
+
+    // add radio button for current options item
+    if ('radioId' in o && 'radioName' in o) {
+      let radio = document.createElement('input');
+      radio.setAttribute('type', 'radio');
+      radio.setAttribute('name', o.radioName);
+      radio.setAttribute('id', o.radioId);
+      radio.classList.add('radio');
+      div.appendChild(radio);
+      if ('radioChecked' in o && o.radioChecked) {
+        radio.setAttribute('checked', 'true');
+      }
+    }
+
+    // label
     let label = document.createElement('label');
     let title = o.description;
     if (o.default) title += ' (default: ' + o.default + ')';
     label.setAttribute('title', title);
-    label.setAttribute('for', opt);
+    label.setAttribute('for', 'radioId' in o ? o.radioId : opt);
     label.innerText = o.title;
     div.appendChild(label);
+
+    // input
     let input;
     let step = 0.05;
     switch (o.type) {
@@ -2018,8 +2245,9 @@ export default class Viewer {
         input = document.createElement('select');
         input.setAttribute('name', opt);
         input.setAttribute('id', opt);
-        o.values.forEach((str, i) => {
-          let option = new Option(str, str, o.values.indexOf(optDefault) === i ? true : false);
+        o.values.forEach((value, i) => {
+          let label = 'labels' in o ? o.labels.at(i) : value;
+          let option = new Option(label, value, o.values.indexOf(optDefault) === i ? true : false);
           if ('valuesDescriptions' in o) option.title = o.valuesDescriptions[i];
           input.add(option);
         });
@@ -2038,6 +2266,17 @@ export default class Viewer {
         line.classList.add(o.title);
         div.appendChild(line);
         break;
+      case 'button':
+        label.textContent = ''; // '--transpose ' + this.getTranspositionOption();
+
+        label.setAttribute('title', '');
+        input = document.createElement('input');
+        input.setAttribute('type', 'button');
+        input.setAttribute('name', opt);
+        input.setAttribute('id', opt);
+        input.setAttribute('value', o.title);
+        input.setAttribute('title', o.description);
+        break;
       default:
         console.log(
           'Creating Verovio Options: Unhandled data type: ' +
@@ -2053,7 +2292,7 @@ export default class Viewer {
     }
     if (input) div.appendChild(input);
     return input || o.type === 'header' || o.type === 'line' ? div : null;
-  }
+  } // createOptionsItem()
 
   // add responsibility statement to resp select dropdown
   setRespSelectOptions() {
@@ -2069,7 +2308,18 @@ export default class Viewer {
         }
       });
     }
-  }
+  } // setRespSelectOptions()
+
+  getTranspositionOption() {
+    let dir = document.getElementById('transposeDirection');
+    let key = document.getElementById('transposeKey');
+    let int = document.getElementById('transposeInterval');
+    if (!dir || !key || !int) return;
+    let optionString = dir.value;
+    if (!key.disabled) optionString += key.value;
+    if (!int.disabled) optionString += int.value;
+    return optionString;
+  } // getTranspositionOption()
 
   // navigate forwards/backwards/upwards/downwards in the DOM, as defined
   // by 'dir' an by 'incrementElementName'
@@ -2277,7 +2527,32 @@ export default class Viewer {
     el.disabled = cont;
     if (cont) el.parentNode.classList.add('disabled');
     else el.parentNode.classList.remove('disabled');
-  }
+  } // disableElementThroughCheckbox()
+
+  /**
+   * Sets disabled to offItems (and removes it to onItems) of
+   * current element and its previous sibling (label)
+   * @param {Array[string]} onItems (array of ids)
+   * @param {Array[string]} offItems (array of ids)
+   */
+  setDisablednessInOptionsItem(onItems, offItems) {
+    offItems.forEach((offItem) => {
+      let off = document.getElementById(offItem);
+      if (off) {
+        off.disabled = true;
+        off.classList.add('disabled');
+        off.previousSibling?.classList.add('disabled');
+      }
+    });
+    onItems.forEach((onItem) => {
+      let on = document.getElementById(onItem);
+      if (on) {
+        on.disabled = false;
+        on.classList.remove('disabled');
+        on.previousSibling?.classList.remove('disabled');
+      }
+    });
+  } // setDisplayInOptionsItem()
 
   // show alert to user in #alertOverlay
   // type: ['error'] 'warning' 'info' 'success'

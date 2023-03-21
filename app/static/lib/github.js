@@ -14,6 +14,10 @@ export default class Github {
       'Authorization': 'Basic ' + btoa(userLogin + ":" + githubToken), 
       'Accept': 'application/vnd.github.v3+json'
     });
+    this.directReadHeaders = new Headers({
+      'Authorization': 'Basic ' + btoa(userLogin + ":" + githubToken), 
+      'Accept': 'application/vnd.github.raw'
+    })
     // remember this as our 'upstream' repo in case we need to fork
     this.upstreamRepoName = this.githubRepoName;
     this.upstreamRepoOwner = this.githubRepoOwner;
@@ -265,6 +269,53 @@ export default class Github {
     }
   }
 
+  async directlyReadFileContents(rawGithubUri) { 
+    const components = rawGithubUri.match(/https:\/\/raw.githubusercontent.com\/([^/]+)\/([^/]+)\/([^/]+)(.*)$/);
+    if(components) { 
+      try { 
+        const fileContentsUrl = `https://api.github.com/repos/${components[1]}/${components[2]}/contents${components[4]}`;
+        return await fetch(fileContentsUrl, {
+          method: 'GET',
+          headers: this.directReadHeaders
+        }).then(res => { 
+          // if image or blob, read base64 encoding
+          // otherwise read text
+          if(isImageUri(rawGithubUri) || isBlobUri(rawGithubUri)) {  
+            return res.blob()
+          } else { 
+            return res.text()
+          }
+        }).then(data => {
+          if(typeof data === "string") {
+            return new Promise((resolve) => resolve(data));
+          } else { 
+            return new Promise((resolve) => {
+              const reader = new FileReader();
+              reader.onloadend = () => {
+                const result = reader.result;
+                if(typeof result == "string") { 
+                  // result is a dataUrl; replace default raw github content-type with correct one for resource
+                  result.replace('application/vnd.github.raw', uriSuffixToMimetype(rawGithubUri));
+                }
+                resolve(result)
+              };
+              if(isBlobUri(rawGithubUri)) {  
+                reader.readAsArrayBuffer(data);
+              } else { // image - read as data URL to allow inline embedding
+                reader.readAsDataURL(data);
+              }
+            })
+          }
+        });
+      }
+      catch(e) { 
+        console.error("Couldn't directly read file contents: ", e);
+      }
+    } else { 
+      console.warn("Called github.directlyReadFileContents with invalid rawGithubUri: ", rawGithubUri);
+    }
+  }
+
   async readGithubRepo() { 
     try { 
       // Retrieve content of file
@@ -430,3 +481,46 @@ export default class Github {
   }
 }
 
+function isImageUri (uri) { 
+  // images
+  const imgSuffices = ['gif', 'jpg', 'jpeg', 'png', 'tif', 'tif', 'webp'];
+  return isUriWithSuffix(uri, imgSuffices);
+}
+
+function isBlobUri (uri) { 
+  // binary objects (currently: compressed musicxml files)
+  const blobSuffices =['mxl', 'zip'];
+  return isUriWithSuffix(uri, blobSuffices);
+}
+
+function isUriWithSuffix(uri, suffices) { 
+  // return true if uri has a suffix and it matches one of the provided ones (case-insensitively)
+  const suffix = uri.substring(uri.lastIndexOf(".")+1); 
+  return suffices.filter(s => suffix.localeCompare(s, undefined, { sensitivity: 'base' }) == 0).length;
+}
+
+function uriSuffixToMimetype(uri) {
+  const types = {
+    mei: 'application/xml',
+    xml: 'application/xml',
+    mxl: 'application/vnd.recordare.musicxml',
+    abc: 'text/plain',
+    krn: 'text/plain',
+    pae: 'text/plain',
+    gif: 'image/gif',
+    jpg: 'image/jpeg',
+    jpeg:'image/jpeg',
+    png: 'image/png',
+    tif: 'image/tiff',
+    tiff:'image/tiff',
+    svg: 'image/svg+xml',
+    webp:'image/webp'
+  }
+  const tkeys = Object.keys(types);
+  const suffix = uri.substring(uri.lastIndexOf(".")+1);
+  const matches = tkeys.filter(k => suffix.localeCompare(k, undefined, { sensitivity: 'base' }) == 0);
+  if(matches.length) {
+    return types[matches[0]];
+  }
+  return 'application/octet-stream'; //default type
+}
