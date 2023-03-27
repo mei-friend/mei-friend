@@ -1,7 +1,25 @@
 # mei-friend-online CHANGELOG.md
+### 0.8.7 transposition
+* Add transposition settings panel to the mei-friend settings to specify transposition by key, by interval, and pitch direction.
+* Enable ?file= param to open files from private repos (when logged in)
+* Add "Report issue with encoding" feature (creates issue with reciprocal mei-friend link)
+### 0.8.6 patch
+* Insert control elements with time stamps (`@tstamp`/`tstamp2`) instead of ids (`startid`/`endid`) by using the  `ALT` (Mac: `CTRL`) modifier key with keyboard shortcut
+* Check time stamps when inserting control elements, handle selected elements on the same time stamp correctly (by omitting `@tstamp2`) or throw warning, if no fix is possible
+* Fix between placement (`SHIFT + X`) with control elements without `@startid`. 
+* Various GitHub fixes, incl. loading compressed MusicXML via Git
+* Unselect element(s) when `CTRL/CMD` clicking or drag-selecting already selected element(s)
+* `SHIFT LEFT/RIGHT` de/increases duration (`@dur`) of selected element(s), if they have such attribute
+
+### 0.8.5 PDF export
+* Preview PDF mode with page-view of notation, triggered via menu item or `CMD/CTRL + P`
+* PDF preview with click-select and drag-select disabled
+* Page range selector for selecting all, current, page range, or individual pages (e.g., 2,5-8)
+* Download PDF file (with pages as selected in page-range settings)
+
 ### 0.8.4 patch
-* Drag-select chord instead of note with `ALT`
-* Add @staff to clef change element
+* Drag-select and click-select chord instead of note with `ALT` modifier
+* Add `@staff` to clef change element
 * Change of keyboard shortcuts (for inserting C clef, tenuto, spiccato)
 ### 0.8.3 patch
 * Show modifyer keys as text (ALT, CTRL...) on Windows/Linux systems

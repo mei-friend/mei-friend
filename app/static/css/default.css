@@ -297,6 +297,11 @@ a:active {
   width: 100%;
 }
 
+#friendContainer.pdfMode {
+  /* border-color: #cb0606; */
+  border-color: var(--dropdownBorderColor);
+}
+
 #notation {
   overflow: hidden;
   display: flex;
@@ -415,7 +420,7 @@ a:active {
 
 .manual {
   color: grey;
-  fill: grey
+  fill: grey;
 }
 
 /* Overriding Codemirror Defaults */
@@ -516,7 +521,7 @@ a:active {
   height: 20px;
 }
 
-.footer #midi-player-contextual {
+.footer #midiPlayerContextual {
   position: fixed;
   bottom: 1.5em;
   left: 1em;
@@ -530,7 +535,7 @@ a:active {
   cursor:pointer;
 }
 
-.footer #midi-player-contextual:hover {
+.footer #midiPlayerContextual:hover {
   background: var(--backgroundColor);
 }
 
@@ -611,11 +616,12 @@ a:active {
   border: 2px solid rgb(0, 0, 0, 0);
   border-radius: 4px;
   font-size: 10pt;
-  line-height: 1.5em;
+  /* line-height: 1.5em; */
   padding: 0px;
   min-height: 21px;
   min-width: 21px;
   max-height: 21px;
+  color: var(--textColor);
   background-color: var(--controlMenuBackgroundColor);
 }
 
@@ -638,6 +644,7 @@ a:active {
   min-height: 21px;
   min-width: 21px;
   white-space: nowrap;
+  cursor: default;
 }
 
 #pagination2 {
@@ -728,8 +735,15 @@ https://www.w3schools.com/css/css_tooltip.asp
   width: 100%;
   height: 100%;
   text-align: center;
-  z-index: 9;
+  z-index: 1;
   background-color: var(--notationBackgroundColor);
+}
+
+.showFrame {
+  border-color: var(--notationColor);
+  border-style: solid;
+  border-width: 1px;
+  border-radius: 2px;
 }
 
 /* prevent text from being selectable in SVG */
@@ -870,11 +884,21 @@ svg text {
   stroke-width: 1.5px;
 }
 
-#facsimile-icon {
+#facsimile-icon, #pdf-icon {
   margin-left: 3px;
   margin-right: 3px;
   width: 16px;
   fill: var(--textColor);
+}
+
+.pdfRed {
+  color: #cb0606;
+  fill: #cb0606;
+  background-color: var(--backgroundColor);
+}
+
+.background {
+  color: var(--backgroundColor);
 }
 
 .code {
@@ -1049,7 +1073,7 @@ span.keyIcon {
   border-bottom: var(--settingsBackgroundColor) solid 2px;
   border-bottom-right-radius: 5px;
   border-bottom-left-radius: 5px;
-  height: 95%;
+  height: calc(100% - 50px);
   overflow: auto;
 }
 
@@ -1065,7 +1089,6 @@ span.keyIcon {
   font-size: 10pt;
   display: none;
   padding: 6px 12px;
-  overflow: none;
   height: calc(100% - 50px);
   width: calc(100% - 2em);
 }
@@ -1075,12 +1098,6 @@ span.keyIcon {
   font-weight: bold;
   padding: 9px 6px 6px 6px;
   cursor: pointer;
-}
-
-.tabcontent input[type="button"] {
-  float: right;
-  margin-top: 10px;
-  margin-right: 2px;
 }
 
 /* Style the close button */
@@ -1138,7 +1155,7 @@ span.keyIcon {
   margin-right: 3px;
   margin-top: 2px;
   margin-bottom: 2px;
-  min-width: 220px;
+  min-width: 175px;
   float: left;
 }
 
@@ -1166,7 +1183,15 @@ select {
   padding: 2px;
 }
 
+.disabled {
+  opacity: 50%;
+}
+
 .resetButton {
+  float: right;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  margin-right: 2px;
   border-radius: 4px;
 }
 
@@ -1208,7 +1233,6 @@ select>option {
   border-width: 2px; */
   border-radius: 8px;
   color: white;
-  font-size: normal;
   z-index: 20;
   overflow-y: auto;
 }
@@ -1309,7 +1333,7 @@ midi-player::part(play-button) {
   max-width: 70%;
 }
 
-#midi-speedmode-indicator { 
+#midiSpeedmodeIndicator { 
   display:none;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 6pt;
@@ -1338,3 +1362,4 @@ midi-player::part(play-button) {
 #closeMidiPlaybackControlBarButton:hover { 
   background-color:var(--settingsLinkHoverColor);
 }
+

@@ -84,7 +84,7 @@
   background-color: var(--dropdownBackgroundColor);
   /* filter: brightness(140%); */
   /* background-color: #edf2f7; // lightsteelblue 90%: #dbe4f0 // 95%: #edf2f7 */
-  opacity: .99;
+  opacity: 0.99;
   min-width: 160px;
   border: 1px solid darkgray;
   border-top-right-radius: 4px;
@@ -161,8 +161,8 @@
   display: block;
 }
 
-.dropdown-content.forceShow { 
-  display:block;
+.dropdown-content.forceShow {
+  display: block;
 }
 
 #logTable {
@@ -182,8 +182,8 @@
 #GithubLogo,
 #forkRepoGithubLogo {
   fill: var(--textColor);
-  height: .75em;
-  margin-right: -.2em;
+  height: 0.75em;
+  margin-right: -0.2em;
 }
 
 #forkRepoGithubLogo {
@@ -193,11 +193,11 @@
 
 @keyframes spinning {
   from {
-    transform: rotate(0deg)
+    transform: rotate(0deg);
   }
 
   to {
-    transform: rotate(359deg)
+    transform: rotate(359deg);
   }
 }
 
@@ -210,11 +210,11 @@
 
 @keyframes reversing {
   from {
-    transform: rotate(0deg)
+    transform: rotate(0deg);
   }
 
   to {
-    transform: rotate(-359deg)
+    transform: rotate(-359deg);
   }
 }
 
@@ -249,7 +249,7 @@
   align-content: center;
   align-items: center;
   gap: 0.2em;
-  cursor:default;
+  cursor: default;
 }
 
 .fileStatus #schemaStatus {
@@ -268,8 +268,8 @@
 }
 
 .fileStatus #fileChanged {
-  margin-left: -.2em;
-  margin-right: .5em;
+  margin-left: -0.2em;
+  margin-right: 0.5em;
 }
 
 .fileStatus.changed {
@@ -300,10 +300,10 @@
   text-align: left;
 }
 
-#fileName[contenteditable] { 
+#fileName[contenteditable] {
   padding: 2px 2px;
   border-width: 1px;
-  border-style: dotted; 
+  border-style: dotted;
   border-radius: 4px;
   cursor: text;
 }
@@ -329,4 +329,55 @@
 #commitMessageInput[disabled],
 #commitButton[disabled] {
   cursor: not-allowed;
+}
+
+.pdfOff {
+  display: none;
+}
+
+.pdfOn {
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin-top: 50px;
+  margin-bottom: 25px;
+  margin-left: 5px;
+  margin-right: 365px;
+  border: 2px solid var(--overlayBorderColor);
+  border-radius: 4px;
+  background-color: var(--backgroundColor);
+  background-blend-mode: difference;
+  opacity: 0.98;
+  z-index: 200;
+}
+
+#pageRangeSelectorDiv {
+  max-width: 160px;
+}
+
+#pageRangeItems {
+  max-width: 160px;
+  float: left;
+}
+
+#pageRangeItems div {
+  cursor: pointer;
+  float: none;
+  color: var(--textColor);
+  padding: 2px 12px;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+#pageRangeSelectorDiv input[type='number'] {
+  max-width: 45px;
+}
+
+#pageRangeSelectorDiv input[type='text'] {
+  max-width: 120px;
 }

@@ -27,6 +27,7 @@ export function addDragSelector(v, vp) {
   const measureSelector = '.measure';
 
   vp.addEventListener('mousedown', (ev) => {
+    if (!v.allowNotationInteraction) return;
     dragging = true;
     // clear selected elements, if no CMD/CTRL key is pressed
     if (!(platform.startsWith('mac') && ev.metaKey) && !ev.ctrlKey) {
@@ -95,6 +96,7 @@ export function addDragSelector(v, vp) {
   }); // mouse down event listener
 
   vp.addEventListener('mousemove', (ev) => {
+    if (!v.allowNotationInteraction) return;
     if (dragging) {
       newEls = [];
 
@@ -153,7 +155,7 @@ export function addDragSelector(v, vp) {
                     id = el.closest('.chord').id;
                   }
                   if (!newEls.includes(id)) {
-                      newEls.push(id);
+                    newEls.push(id);
                   }
                   const x = getX(el);
                   const y = getY(el);
@@ -171,26 +173,42 @@ export function addDragSelector(v, vp) {
             });
         });
       }
-      oldEls.forEach((el) => newEls.push(el));
+      
+      // select latest element in editor
       v.allowCursorActivity = false;
       if (latest && Object.keys(latest).length > 0) {
         setCursorToId(cm, latest.el.id);
         v.lastNoteId = latest.el.id;
       }
-      v.selectedElements = newEls;
+
+      // add new element to selected elements when new, remove otherwise
+      v.selectedElements = [...oldEls];
+      newEls.forEach((newEl) => {
+        if (oldEls.includes(newEl)) {
+          v.selectedElements.splice(v.selectedElements.indexOf(newEl), 1);
+        } else {
+          v.selectedElements.push(newEl);
+        }
+      });
+
       v.updateHighlight();
       v.allowCursorActivity = true;
     }
   }); // mouse move event listener
 
   vp.addEventListener('mouseup', () => {
+    if (!v.allowNotationInteraction) return;
     if (document.getElementById('showMidiPlaybackControlBar')?.checked) {
       console.log('drag-selector: HANDLE CLICK MIDI TIMEOUT');
       startMidiTimeout();
     }
     dragging = false;
+
+    // remove dragging rectangle
     let svgPm = document.querySelector('g.page-margin');
-    if (svgPm && Array.from(svgPm.childNodes).includes(rect)) svgPm.removeChild(rect);
+    if (svgPm && Array.from(svgPm.childNodes).includes(rect)) {
+      svgPm.removeChild(rect);
+    }
     oldEls = [];
   }); // mouse up event listener
 } // addDragSelector()

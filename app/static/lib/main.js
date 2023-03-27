@@ -1,6 +1,6 @@
 // mei-friend version and date
-export const version = '0.8.4';
-export const versionDate = '27 Feb 2023';
+export const version = '0.8.7';
+export const versionDate = '21 Mar 2023';
 
 var vrvWorker;
 var spdWorker;
@@ -88,6 +88,11 @@ export let supportedVerovioVersions = {
     url: 'https://www.verovio.org/javascript/latest/verovio-toolkit-hum.js',
     description: 'Current Verovio release',
   },
+  '3.15.0': {
+    url: 'https://www.verovio.org/javascript/3.15.0/verovio-toolkit-hum.js',
+    description: 'Verovio release 3.15.0',
+    releaseDate: '1 Mar 2023',
+  },
   '3.14.0': {
     url: 'https://www.verovio.org/javascript/3.14.0/verovio-toolkit-hum.js',
     description: 'Verovio release 3.14.0',
@@ -155,7 +160,13 @@ export const samp = {
 };
 export const fontList = ['Leipzig', 'Bravura', 'Gootville', 'Leland', 'Petaluma'];
 
-import { setOrientation, addNotationResizerHandlers, addFacsimilerResizerHandlers } from './resizer.js';
+import {
+  setOrientation,
+  addNotationResizerHandlers,
+  addFacsimilerResizerHandlers,
+  setNotationProportion,
+  setFacsimileProportion,
+} from './resizer.js';
 import { addAnnotationHandlers, clearAnnotations, readAnnots, refreshAnnotations } from './annotation.js';
 import { dropHandler, dragEnter, dragOverHandler, dragLeave } from './dragger.js';
 import { openUrl, openUrlCancel } from './open-url.js';
@@ -167,7 +178,7 @@ import {
   manualCurrentPage,
   generateSectionSelect,
 } from './control-menu.js';
-import { clock, highlight, unverified, xCircleFill } from '../css/icons.js';
+import { clock, unverified, xCircleFill } from '../css/icons.js';
 import { setCursorToId } from './utils.js';
 import { getInMeasure, navElsSelector, getElementAtCursor } from './dom-utils.js';
 import { addDragSelector } from './drag-selector.js';
@@ -215,9 +226,9 @@ const defaultVerovioOptions = {
   mdivAll: true,
   outputIndent: 3,
   pageMarginLeft: 50,
-  pageMarginRight: 25,
-  pageMarginBottom: 10,
-  pageMarginTop: 25,
+  pageMarginRight: 50,
+  pageMarginBottom: 15,
+  pageMarginTop: 50,
   spacingLinear: 0.2,
   spacingNonLinear: 0.5,
   minLastJustification: 0,
@@ -591,73 +602,14 @@ document.addEventListener('DOMContentLoaded', function () {
   mp.addEventListener('note', (e) => highlightNotesAtMidiPlaybackTime(e));
   mp.addEventListener('load', seekMidiPlaybackToSelectionOrPage);
   // decide whether to show MIDI playback shortcut (bubble), based on setting
-  document.getElementById('midi-player-contextual').style.display = document.getElementById(
+  document.getElementById('midiPlayerContextual').style.display = document.getElementById(
     'showMidiPlaybackContextualBubble'
   ).checked
     ? 'block'
     : 'none';
 
-  let urlFileName = searchParams.get('file');
-  // fork parameter: if true AND ?fileParam is set to a URL,
-  // then put mei-friend into "remote fork request" mode:
-  // If user is logged in, open a pre-populated fork-repository menu
-  // Else, remember we are in remote fork request mode, log user in, and then proceed as above.
-  let forkParam = searchParams.get('fork');
-  if (urlFileName && !(forkParam === 'true')) {
-    // normally open the file from URL
-    openUrlFetch(new URL(urlFileName));
-  }
-
-  // fill sample encodings
-  fillInSampleEncodings();
-
-  // restore localStorage if we have it
-  if (storage.supported) {
+  if(storage.supported) { 
     storage.read();
-    // save (most) URL parameters in storage
-    if (orientationParam !== null) storage.notationOrientation = orientationParam;
-    if (notationProportionParam !== null) storage.notationProportion = notationProportionParam;
-    if (facsimileOrientationParam !== null) storage.facsimileOrientation = facsimileOrientationParam;
-    if (facsimileProportionParam !== null) storage.facsimileProportion = facsimileProportionParam;
-    if (pageParam !== null) storage.page = pageParam;
-    if (scaleParam !== null) storage.scale = scaleParam;
-    // if (selectParam && selectParam.length > 0) storage.select = selectParam;
-    if (speedParam !== null) storage.speed = speedParam;
-    if (breaksParam !== null) storage.breaks = breaksParam;
-    if (storage.githubLogoutRequested) {
-      v.showAlert(
-        `You have logged out of mei-friend's GitHub integration, but your browser is still logged in to GitHub!
-      <a href="https://github.com/logout" target="_blank">Click here to logout from GitHub</a>.`,
-        'warning',
-        30000
-      );
-      storage.removeItem('githubLogoutRequested');
-    }
-
-    setFileChangedState(storage.fileChanged);
-    if (!urlFileName) {
-      // no URI param specified - try to restore from storage
-      if (storage.content) {
-        // restore file name and content from storage
-        // unless a URI param was specified
-        setIsMEI(storage.isMEI);
-        meiFileName = storage.fileName;
-        meiFileLocation = storage.fileLocation;
-        meiFileLocationPrintable = storage.fileLocationPrintable;
-        fileLocationType = storage.fileLocationType;
-        updateFileStatusDisplay();
-        // on initial page load, CM doesn't fire a "changes" event
-        // so we don't need to skip the "freshly loaded" change
-        // hence the "false" on the following line:
-        loadDataInEditor(storage.content, false);
-      } else {
-        meiFileLocation = '';
-        meiFileLocationPrintable = '';
-        setIsMEI(true); // default MEI
-        openFile(undefined, false, false); // default MEI, skip freshly loaded (see comment above)
-        setFileChangedState(false);
-      }
-    }
     if (storage.github) {
       // use github object from local storage if available
       isLoggedIn = true;
@@ -685,6 +637,68 @@ document.addEventListener('DOMContentLoaded', function () {
         userName: userName,
         userEmail: userEmail,
       };
+    }
+  }
+
+  let urlFileName = searchParams.get('file');
+  // fork parameter: if true AND ?fileParam is set to a URL,
+  // then put mei-friend into "remote fork request" mode:
+  // If user is logged in, open a pre-populated fork-repository menu
+  // Else, remember we are in remote fork request mode, log user in, and then proceed as above.
+  let forkParam = searchParams.get('fork');
+  if (urlFileName && !(forkParam === 'true')) {
+    // normally open the file from URL
+    openUrlFetch(new URL(urlFileName));
+  }
+
+  // fill sample encodings
+  fillInSampleEncodings();
+
+  // restore localStorage if we have it
+  if (storage.supported) {
+    // save (most) URL parameters in storage
+    if (orientationParam !== null) storage.notationOrientation = orientationParam;
+    if (notationProportionParam !== null) storage.notationProportion = notationProportionParam;
+    if (facsimileOrientationParam !== null) storage.facsimileOrientation = facsimileOrientationParam;
+    if (facsimileProportionParam !== null) storage.facsimileProportion = facsimileProportionParam;
+    if (pageParam !== null) storage.page = pageParam;
+    if (scaleParam !== null) storage.scale = scaleParam;
+    // if (selectParam && selectParam.length > 0) storage.select = selectParam;
+    if (speedParam !== null) storage.speed = speedParam;
+    if (breaksParam !== null) storage.breaks = breaksParam;
+    if (storage.githubLogoutRequested) {
+      v.showAlert(
+        `You have logged out of mei-friend's GitHub integration, but your browser is still logged in to GitHub!
+      <a href="https://github.com/logout" target="_blank">Click here to logout from GitHub</a>.`,
+        'warning',
+        30000
+      );
+      storage.removeItem('githubLogoutRequested');
+    }
+
+    setFileChangedState(storage.fileChanged);
+    if (!urlFileName) {
+      // no URI param specified - try to restore from storage
+      if (storage.content && storage.fileName) {
+        // restore file name and content from storage
+        // unless a URI param was specified
+        setIsMEI(storage.isMEI);
+        meiFileName = storage.fileName;
+        meiFileLocation = storage.fileLocation;
+        meiFileLocationPrintable = storage.fileLocationPrintable;
+        fileLocationType = storage.fileLocationType;
+        updateFileStatusDisplay();
+        // on initial page load, CM doesn't fire a "changes" event
+        // so we don't need to skip the "freshly loaded" change
+        // hence the "false" on the following line:
+        loadDataInEditor(storage.content, false);
+      } else {
+        meiFileLocation = '';
+        meiFileLocationPrintable = '';
+        setIsMEI(true); // default MEI
+        openFile(undefined, false, false); // default MEI, skip freshly loaded (see comment above)
+        setFileChangedState(false);
+      }
     }
     if (storage.forkAndOpen && github) {
       // we've arrived back after an automated log-in request
@@ -766,7 +780,9 @@ document.addEventListener('DOMContentLoaded', function () {
   } else {
     fp = defaultFacsimilePorportion;
   }
-  setOrientation(cm, o, fo, np, fp, v, storage);
+  setNotationProportion(np);
+  setFacsimileProportion(fp);
+  setOrientation(cm, o, fo, v, storage);
 
   addEventListeners(v, cm);
   addAnnotationHandlers();
@@ -775,7 +791,7 @@ document.addEventListener('DOMContentLoaded', function () {
   let doit;
   window.onresize = () => {
     clearTimeout(doit); // wait half a second before re-calculating orientation
-    doit = setTimeout(() => setOrientation(cm, '', '', -1, -1, v, storage), 500);
+    doit = setTimeout(() => setOrientation(cm, '', '', v, storage), 500);
   };
 
   setKeyMap(defaultKeyMap);
@@ -786,44 +802,28 @@ export async function openUrlFetch(url = '', updateAfterLoading = true) {
   let urlStatus = document.querySelector('#openUrlStatus');
   try {
     if (!url) url = new URL(urlInput.value);
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        Accept: 'application/xml, text/xml, application/mei+xml',
-      },
-    });
-    if (response.status >= 400) {
-      console.warn('Fetching URL produced error status: ', response.status);
-      urlStatus.innerHTML = `${response.status}: ${response.statusText.toLowerCase()}`;
-      urlStatus.classList.add('warn');
-      urlInput.classList.add('warn');
-    } else {
-      urlStatus.innerHTML = '';
-      urlStatus.classList.remove('warn');
-      urlInput.classList.remove('warn');
-      response.text().then((data) => {
-        meiFileLocation = url.href;
-        meiFileLocationPrintable = url.hostname;
-        meiFileName = url.pathname.substring(url.pathname.lastIndexOf('/') + 1);
-        if (storage.github && isLoggedIn) {
-          // re-initialise github menu since we're now working from a URL
-          github.filepath = '';
-          github.branch = '';
-          if (storage.supported) {
-            updateGithubInLocalStorage();
-          }
-          refreshGithubMenu();
-        }
-        updateFileStatusDisplay();
-        handleEncoding(data, true, updateAfterLoading);
-        if (storage.supported) {
-          storage.fileLocationType = 'url';
-        }
-        fileLocationType = 'url';
-        openUrlCancel(); //hide open URL UI elements
-        const fnStatus = document.getElementById('fileName');
-        if (fnStatus) fnStatus.removeAttribute('contenteditable');
+    const headers = { Accept: 'application/xml, text/xml, application/mei+xml' };
+    if (isLoggedIn && url.href.trim().startsWith("https://raw.githubusercontent.com")) { 
+      // GitHub URL - use GitHub credentials to enable URL fetch from private repos
+      github.directlyReadFileContents(url.href).then((data) => { 
+        openUrlProcess(data, url, updateAfterLoading)
+      })
+    } else { 
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: headers,
+        credentials: "omit"
       });
+      if (response.status >= 400) {
+        console.warn('Fetching URL produced error status: ', response.status);
+        urlStatus.innerHTML = `${response.status}: ${response.statusText.toLowerCase()}`;
+        urlStatus.classList.add('warn');
+        urlInput.classList.add('warn');
+      } else {
+        response.text().then((data) => {
+          openUrlProcess(data, url, updateAfterLoading);
+        });
+      }
     }
   } catch (err) {
     console.warn('Error opening URL provided by user: ', err);
@@ -835,6 +835,36 @@ export async function openUrlFetch(url = '', updateAfterLoading = true) {
     urlInput.classList.add('warn');
     urlStatus.classList.add('warn');
   }
+}
+
+function openUrlProcess(content, url, updateAfterLoading) {
+  console.log("openUrlProcess called with: ", content)
+  let urlInput = document.querySelector('#openUrlInput');
+  let urlStatus = document.querySelector('#openUrlStatus');
+  urlStatus.innerHTML = '';
+  urlStatus.classList.remove('warn');
+  urlInput.classList.remove('warn');
+  meiFileLocation = url.href;
+  meiFileLocationPrintable = url.hostname;
+  meiFileName = url.pathname.substring(url.pathname.lastIndexOf('/') + 1);
+  if (storage.github && isLoggedIn) {
+    // re-initialise github menu since we're now working from a URL
+    github.filepath = '';
+    github.branch = '';
+    if (storage.supported) {
+      updateGithubInLocalStorage();
+    }
+    refreshGithubMenu();
+  }
+  updateFileStatusDisplay();
+  handleEncoding(content, true, updateAfterLoading);
+  if (storage.supported) {
+    storage.fileLocationType = 'url';
+  }
+  fileLocationType = 'url';
+  openUrlCancel(); //hide open URL UI elements
+  const fnStatus = document.getElementById('fileName');
+  if (fnStatus) fnStatus.removeAttribute('contenteditable');
 }
 
 function speedWorkerEventsHandler(ev) {
@@ -928,7 +958,7 @@ async function vrvWorkerEventsHandler(ev) {
         v.pageCount = Object.keys(v.pageBreaks).length;
       }
       // update only if still same page
-      if (v.currentPage === ev.data.pageNo || ev.data.forceUpdate || ev.data.computePageBreaks) {
+      if (v.currentPage === ev.data.pageNo || ev.data.forceUpdate || ev.data.computePageBreaks || v.pdfMode) {
         if (ev.data.forceUpdate) {
           v.currentPage = ev.data.pageNo;
         }
@@ -944,6 +974,11 @@ async function vrvWorkerEventsHandler(ev) {
         v.updateHighlight(cm);
         refreshAnnotations(false);
         v.scrollSvg(cm);
+        if (v.pdfMode) {
+          // switch on frame, when in pdf mode
+          const svg = document.querySelector('#verovio-panel svg');
+          if (svg) svg.classList.add('showFrame');
+        }
       }
       if (mp.playing) {
         highlightNotesAtMidiPlaybackTime();
@@ -980,7 +1015,7 @@ async function vrvWorkerEventsHandler(ev) {
       break;
     case 'downloadMidiFile': // export MIDI file
       blob = midiDataToBlob(ev.data.midi);
-      var a = document.createElement('a');
+      let a = document.createElement('a');
       a.download = meiFileName.substring(meiFileName.lastIndexOf('/') + 1).replace(/\.[^/.]+$/, '.mid');
       a.href = window.URL.createObjectURL(blob);
       a.click();
@@ -995,6 +1030,13 @@ async function vrvWorkerEventsHandler(ev) {
           mp.noteSequence = noteSequence;
         });
       }
+      break;
+    case 'pdfBlob':
+      document.querySelector('.statusbar').innerHTML = meiFileName.split('/').pop() + ' converted to PDF.';
+      let aa = document.createElement('a');
+      aa.download = meiFileName.substring(meiFileName.lastIndexOf('/') + 1).replace(/\.[^/.]+$/, '.pdf');
+      aa.href = window.URL.createObjectURL(ev.data.blob);
+      aa.click();
       break;
     case 'timeForElement': // receive time for element to start midi playback
       // console.log('Received time for element: ', ev.data);
@@ -1014,7 +1056,8 @@ async function vrvWorkerEventsHandler(ev) {
       v.busy(false);
       break;
     case 'updateProgressbar':
-      document.querySelector('.statusbar').innerHTML = 'Compute page breaks: ' + Math.round(ev.data.percentage) + '%';
+      document.querySelector('.statusbar').innerHTML =
+        'Compute ' + ev.data.fileFormat + ': ' + Math.round(ev.data.percentage) + '%';
       setProgressBar(ev.data.percentage);
       break;
     case 'error':
@@ -1023,7 +1066,7 @@ async function vrvWorkerEventsHandler(ev) {
       v.busy(false);
       break;
   }
-}
+} // vrvWorkerEventsHandler()
 
 // handles select (& page) input parameter from URL arguments ".../?select=..."
 function handleURLParamSelect() {
@@ -1122,10 +1165,12 @@ export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true, upd
 
 // checks format of encoding string and imports or loads data/notation
 // mei argument may be MEI or any other supported format (text/binary)
-export function handleEncoding(mei, setFreshlyLoaded = true, updateAfterLoading = true) {
+export function handleEncoding(mei, setFreshlyLoaded = true, updateAfterLoading = true, clearBeforeLoading = true) {
   let found = false;
-  if (pageParam === null) storage.removeItem('page');
-  v.clear();
+  if (clearBeforeLoading) {
+    if (pageParam === null) storage.removeItem('page');
+    v.clear();
+  }
   v.busy();
   if (meiFileName.endsWith('.mxl')) {
     // compressed MusicXML file
@@ -1314,25 +1359,25 @@ export let cmd = {
   previousMeasure: () => v.navigate(cm, 'measure', 'backwards'),
   layerUp: () => v.navigate(cm, 'layer', 'upwards'),
   layerDown: () => v.navigate(cm, 'layer', 'downwards'),
-  notationTop: () => setOrientation(cm, 'top', '', -1, -1, v, storage),
-  notationBottom: () => setOrientation(cm, 'bottom', '', -1, -1, v, storage),
-  notationLeft: () => setOrientation(cm, 'left', '', -1, -1, v, storage),
-  notationRight: () => setOrientation(cm, 'right', '', -1, -1, v, storage),
-  facsimileTop: () => setOrientation(cm, '', 'top', -1, -1, v, storage),
-  facsimileBottom: () => setOrientation(cm, '', 'bottom', -1, -1, v, storage),
-  facsimileLeft: () => setOrientation(cm, '', 'left', -1, -1, v, storage),
-  facsimileRight: () => setOrientation(cm, '', 'right', -1, -1, v, storage),
+  notationTop: () => setOrientation(cm, 'top', '', v, storage),
+  notationBottom: () => setOrientation(cm, 'bottom', '', v, storage),
+  notationLeft: () => setOrientation(cm, 'left', '', v, storage),
+  notationRight: () => setOrientation(cm, 'right', '', v, storage),
+  facsimileTop: () => setOrientation(cm, '', 'top', v, storage),
+  facsimileBottom: () => setOrientation(cm, '', 'bottom', v, storage),
+  facsimileLeft: () => setOrientation(cm, '', 'left', v, storage),
+  facsimileRight: () => setOrientation(cm, '', 'right', v, storage),
   showFacsimilePanel: () => {
     document.getElementById('showFacsimilePanel').checked = true;
-    setOrientation(cm, '', '', -1, -1, v);
+    setOrientation(cm, '', '', v);
   },
   hideFacsimilePanel: () => {
     document.getElementById('showFacsimilePanel').checked = false;
-    setOrientation(cm, '', '', -1, -1, v);
+    setOrientation(cm, '', '', v);
   },
   toggleFacsimilePanel: () => {
     document.getElementById('showFacsimilePanel').checked = !document.getElementById('showFacsimilePanel').checked;
-    setOrientation(cm, '', '', -1, -1, v);
+    setOrientation(cm, '', '', v);
   },
   checkFacsimile: () => {
     let tf = document.getElementById('titleFacsimilePanel');
@@ -1347,6 +1392,10 @@ export let cmd = {
   showSettingsPanel: () => v.showSettingsPanel(),
   hideSettingsPanel: () => v.hideSettingsPanel(),
   toggleSettingsPanel: (ev) => v.toggleSettingsPanel(ev),
+  togglePdfMode: () => (v.pdfMode ? v.saveAsPdf() : v.pageModeOn()),
+  pageModeOn: () => v.pageModeOn(),
+  pageModeOff: () => v.pageModeOff(),
+  saveAsPdf: () => v.saveAsPdf(),
   filterSettings: () => v.applySettingsFilter(),
   filterReset: () => {
     document.getElementById('filterSettings').value = '';
@@ -1361,10 +1410,10 @@ export let cmd = {
     if (document.getElementById('showMidiPlaybackControlBar').checked) {
       // request MIDI rendering from Verovio worker
       requestMidiFromVrvWorker(true);
-      document.getElementById('midi-player-contextual').style.display = 'none';
+      document.getElementById('midiPlayerContextual').style.display = 'none';
     } else {
       if (document.getElementById('showMidiPlaybackContextualBubble').checked) {
-        document.getElementById('midi-player-contextual').style.display = 'block';
+        document.getElementById('midiPlayerContextual').style.display = 'block';
       }
       if (mp.playing) {
         // stop player when control bar is closed
@@ -1470,6 +1519,8 @@ export let cmd = {
   shiftPitchNameDown: () => e.shiftPitch(v, cm, -1),
   shiftOctaveUp: () => e.shiftPitch(v, cm, 7),
   shiftOctaveDown: () => e.shiftPitch(v, cm, -7),
+  increaseDuration: () => e.modifyDuration(v, cm, 'increase'),
+  decreaseDuration: () => e.modifyDuration(v, cm, 'decrease'),
   moveElementStaffUp: () => e.moveElementToNextStaff(v, cm, true),
   moveElementStaffDown: () => e.moveElementToNextStaff(v, cm, false),
   addOctave8Above: () => e.addOctaveElement(v, cm, 'above', 8),
@@ -1514,6 +1565,8 @@ export let cmd = {
       document.getElementById('settingsPanel') === document.activeElement.closest('#settingsPanel')
     ) {
       cmd.filterReset();
+    } else if (v.pdfMode) {
+      cmd.pageModeOff();
     } else {
       v.hideAlerts();
       v.toggleValidationReportVisibility('hidden');
@@ -1601,13 +1654,13 @@ function addEventListeners(v, cm) {
     // if MIDI control bar not showing, update (show or hide) bubble
     if (!document.getElementById('showMidiPlaybackControlBarButton').checked) {
       if (e.target.checked) {
-        document.getElementById('midi-player-contextual').style.display = 'block';
+        document.getElementById('midiPlayerContextual').style.display = 'block';
       } else {
-        document.getElementById('midi-player-contextual').style.display = 'none';
+        document.getElementById('midiPlayerContextual').style.display = 'none';
       }
     }
   });
-  document.getElementById('midi-player-contextual').addEventListener('click', () => {
+  document.getElementById('midiPlayerContextual').addEventListener('click', () => {
     requestPlaybackOnLoad();
     cmd.toggleMidiPlaybackControlBar();
   });
@@ -1640,6 +1693,7 @@ function addEventListeners(v, cm) {
   document.getElementById('SaveMei').addEventListener('click', downloadMei);
   document.getElementById('SaveSvg').addEventListener('click', downloadSvg);
   document.getElementById('SaveMidi').addEventListener('click', () => requestMidiFromVrvWorker());
+  document.getElementById('PrintPreview').addEventListener('click', cmd.pageModeOn);
 
   // edit dialogs
   document.getElementById('undo').addEventListener('click', cmd.undo);
@@ -1676,7 +1730,7 @@ function addEventListeners(v, cm) {
   // Zooming notation with buttons
   document.getElementById('decrease-scale-btn').addEventListener('click', cmd.zoomOut);
   document.getElementById('increase-scale-btn').addEventListener('click', cmd.zoomIn);
-  document.getElementById('verovio-zoom').addEventListener('input', cmd.zoomSlider);
+  document.getElementById('verovio-zoom').addEventListener('change', cmd.zoomSlider);
 
   // Zooming notation with mouse wheel
   vp.addEventListener('wheel', (ev) => {
@@ -1690,7 +1744,7 @@ function addEventListeners(v, cm) {
   // Zooming facsimile with buttons
   document.getElementById('facs-decrease-scale-btn').addEventListener('click', cmd.facsZoomOut);
   document.getElementById('facs-increase-scale-btn').addEventListener('click', cmd.facsZoomIn);
-  document.getElementById('facsimile-zoom').addEventListener('input', cmd.facsZoomSlider);
+  document.getElementById('facsimile-zoom').addEventListener('change', cmd.facsZoomSlider);
 
   // Zooming facsimile with mouse wheel
   let ip = document.getElementById('facsimile-panel');
@@ -1712,7 +1766,7 @@ function addEventListeners(v, cm) {
   // facsimile edit zones
   document.getElementById('facsimile-edit-zones-checkbox').addEventListener('click', (e) => {
     document.getElementById('editFacsimileZones').checked = e.target.checked;
-    setOrientation(cm, '', '', -1, -1, v);
+    setOrientation(cm, '', '', v);
   });
 
   // facsimile close button
@@ -1752,6 +1806,9 @@ function addEventListeners(v, cm) {
   document.getElementById('forwards-btn').addEventListener('click', cmd.nextNote);
   document.getElementById('upwards-btn').addEventListener('click', cmd.layerUp);
   document.getElementById('downwards-btn').addEventListener('click', cmd.layerDown);
+  // pdf functionality
+  document.getElementById('pdf-save-button').addEventListener('click', cmd.saveAsPdf);
+  document.getElementById('pdf-close-button').addEventListener('click', cmd.pageModeOff);
   // manipulation
   document.getElementById('invertPlacement').addEventListener('click', cmd.invertPlacement);
   document.getElementById('betweenPlacement').addEventListener('click', cmd.betweenPlacement);
@@ -1763,6 +1820,8 @@ function addEventListeners(v, cm) {
   document.getElementById('pitchOctaveDown').addEventListener('click', cmd.shiftOctaveDown);
   document.getElementById('staffUp').addEventListener('click', cmd.moveElementStaffUp);
   document.getElementById('staffDown').addEventListener('click', cmd.moveElementStaffDown);
+  document.getElementById('increaseDur').addEventListener('click', cmd.increaseDuration);
+  document.getElementById('decreaseDur').addEventListener('click', cmd.decreaseDuration);
   // Manipulate encoding methods
   document.getElementById('cleanAccid').addEventListener('click', () => e.cleanAccid(v, cm));
   document.getElementById('renumTest').addEventListener('click', () => e.renumberMeasures(v, cm, false));
@@ -1903,7 +1962,7 @@ function addEventListeners(v, cm) {
     if (sm) sm.checked = v.speedMode;
     if (document.getElementById('showMidiPlaybackControlBar').checked) {
       startMidiTimeout(true);
-      document.getElementById('midi-speedmode-indicator').style.display = v.speedMode ? 'inline' : 'none';
+      document.getElementById('midiSpeedmodeIndicator').style.display = v.speedMode ? 'inline' : 'none';
     }
     v.updateAll(cm, {}, v.selectedElements[0]);
   });
@@ -2058,10 +2117,14 @@ function setKeyMap(keyMapFilePath) {
         if (el) {
           el.setAttribute('tabindex', '-1');
           el.addEventListener('keydown', (ev) => {
-            if (document.activeElement.id !== 'pagination2') {
-              ev.stopPropagation();
-              ev.preventDefault();
+            if (['pagination2', 'selectTo', 'selectFrom', 'selectRange'].includes(document.activeElement.id)) {
+              return;
             }
+            ev.stopPropagation();
+            ev.preventDefault();
+
+            v.cmd2KeyPressed = platform.startsWith('mac') ? ev.ctrlKey : ev.altKey;
+
             let keyName = ev.key;
             if (ev.code.toLowerCase() === 'space') keyName = 'space';
             // arrowdown -> down

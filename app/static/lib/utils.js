@@ -19,7 +19,7 @@ export function findKey(key, obj) {
       }
     }
   }
-}
+} // findKey()
 
 // checks whether note noteId is inside a chord. Returns false or the chord id.
 export function insideParent(noteId, what = 'chord') {
@@ -30,7 +30,7 @@ export function insideParent(noteId, what = 'chord') {
     if (chord) return chord.getAttribute('id');
   }
   return false;
-}
+} // insideParent()
 
 // finds all chords/notes inside an element and return array of id strings
 export function findNotes(elId) {
@@ -48,7 +48,7 @@ export function findNotes(elId) {
     }
   }
   return idArray;
-}
+} // findNotes()
 
 // look for elementname (e.g., 'staff') upwards in the xml file and return
 // attribute value (searchString defaults to the "@n" attribute).
@@ -66,7 +66,7 @@ export function getElementAttributeAbove(
     }
   }
   return [null, null];
-}
+} // getElementAttributeAbove()
 
 // look for elementname (e.g., 'staff') downwards in the xml file and return
 // attribute value (searchString defaults to the "@n" attribute).
@@ -84,7 +84,7 @@ export function getElementAttributeBelow(
     }
   }
   return [null, null];
-}
+} // getElementAttributeBelow()
 
 // move encoding cursor to end of current measure
 export function moveCursorToEndOfMeasure(cm, p = null) {
@@ -137,7 +137,7 @@ export function setCursorToId(cm, id) {
     goTagStart(cm);
     if (enc) cm.scrollIntoView(null, Math.round(enc.clientHeight / 2));
   }
-}
+} // setCursorToId()
 
 // moves cursor of CodeMirror to start of tag
 export function goTagStart(cm) {
@@ -155,7 +155,7 @@ export function goTagStart(cm) {
   } else {
     console.warn('Cannot find tag start.');
   }
-}
+} // goTagStart()
 
 // find attribute (@startid) of element with itemId in textEditor.getBuffer()
 // returns value of attribute ('note-00123') or null, if nothing found
@@ -170,7 +170,7 @@ export function getAttributeById(cm, itemId, attribute = 'startid') {
   if (attVal && attVal.length > 0) attVal = attVal[1];
   // console.info('startid: |' + startid + '|')
   return attVal;
-}
+} // getAttributeById()
 
 // scans through text from cursorPosition to find next element elementName
 // (e.g. 'note'), also matching staff and layer
@@ -229,7 +229,7 @@ export function getIdOfNextElement(cm, rw, elementNames = dutils.navElsArray, di
   } else {
     return ['', row.toString()];
   }
-}
+} // getIdOfNextElement()
 
 // returns xml:id of current element (at encoding cursor position). If empty,
 // search for next higher staff or measure xml:id
@@ -304,7 +304,7 @@ export function getElementIdAtCursor(cm) {
     }
   }
   return null; // if no xml:id is found, return null
-}
+} // getElementIdAtCursor()
 
 // returns range of element, starting at cursorPosition
 // this function assumes full xml tags (<measure>....</measure>)
@@ -339,7 +339,7 @@ export function findElementBelow(textEditor, elementName = 'measure', point = [1
 
   if (found1 && found2) return [row1, col1, row2, col2];
   else return null;
-}
+} // findElementBelow()
 
 const base62Chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
@@ -380,7 +380,7 @@ export function generateXmlId(nodeName = '', style = 'mei-friend') {
     id = nodeName[0] + id; // add first character
   }
   return id;
-}
+} // generateXmlId()
 
 // add n tabs to current cursor position in textEditor
 export function insertTabs(textEditor, n = 1) {
@@ -388,7 +388,7 @@ export function insertTabs(textEditor, n = 1) {
   for (let i = 0; i < n; i++) {
     textEditor.insertText(' ');
   }
-}
+} // insertTabs()
 
 // find tag in buffer of textEditor to identify file type
 export function hasTag(textEditor, tag = '<mei') {
@@ -400,7 +400,7 @@ export function hasTag(textEditor, tag = '<mei') {
     obj.stop();
   });
   return range;
-}
+} // hasTag()
 
 // sort note elements in array (of xml:ids) by x coordinate of element
 export function sortElementsByScorePosition(arr, includeY = false) {
@@ -438,7 +438,7 @@ export function sortElementsByScorePosition(arr, includeY = false) {
     }
   }
   return arr;
-}
+} // sortElementsByScorePosition()
 
 // remove @accid.ges if @accid is present
 export function cleanAccid(xmlDoc, cm) {
@@ -456,7 +456,7 @@ export function cleanAccid(xmlDoc, cm) {
   }
   // let re = buffer.groupChangesSinceCheckpoint(checkPoint); TODO
   // console.info('cleanAccid: ' + i + ' accid.ges removed, grouped ', re);
-}
+} // cleanAccid()
 
 // renumber measure@n starting with startNumber
 export function renumberMeasures(v, cm, startNum = 1, change = false) {
@@ -587,7 +587,7 @@ export function renumberMeasures(v, cm, startNum = 1, change = false) {
   console.info(str);
   if (!change) v.updateAlert(str);
   //, grouped ', re);
-}
+} // renumberMeasures()
 
 // convert all
 export function attrAsElements(xmlNote) {
@@ -600,7 +600,7 @@ export function attrAsElements(xmlNote) {
     }
   }
   return xmlNote;
-}
+} // attrAsElements()
 
 // accepts color as string: "rgb(100,12,255)" and hex string "#ffee10" or
 export function brighter(rgbString, deltaPercent, alpha = 1) {
@@ -614,7 +614,7 @@ export function brighter(rgbString, deltaPercent, alpha = 1) {
   rgb = rgb.map((i) => Math.max(0, Math.min(parseInt(i) + deltaPercent, 255)));
   if (alpha < 1) rgb.push(alpha);
   return 'rgb(' + rgb.join(', ') + ')';
-}
+} // brighter()
 
 function hexToRgb(hex) {
   return hex
@@ -622,7 +622,7 @@ function hexToRgb(hex) {
     .substring(1)
     .match(/.{2}/g)
     .map((x) => parseInt(x, 16));
-}
+} // hexToRgb()
 
 // supports "rgb(123,234,0)" format
 export function complementary(rgbString) {
@@ -637,7 +637,7 @@ export function complementary(rgbString) {
   }
   rgb = rgb.map((i) => 255 - i);
   return 'rgb(' + rgb.join(', ') + ')';
-}
+} // complementary()
 
 // input Verovio-SVG element, return bounding box coords in default screen coordinate space
 export function convertCoords(elem) {
@@ -677,7 +677,7 @@ export function rmHash(hashedString) {
 
 // escape special characters '.' and ':' for usagage in queryselectors
 export function escapeXmlId(str) {
-  if (str === null) return '';
+  if (!str || str === null) return '';
   if (/^\d/.test(str)) str = 'a' + str;
   return str.replace(/\./g, '\\.').replace(/\:/g, '\\:');
 }
@@ -710,7 +710,7 @@ export function toISOStringLocal(d) {
 
 /**
  * Returns object with measure and beat count from @tstamp2
- * (according to data.MEASUREBEAT)
+ * (according to data.MEASUREBEAT, e.g., '2m+4')
  * @param {string} tstamp2
  * @returns {MeasureBeat}
  */
@@ -734,5 +734,6 @@ export function readMeasureBeat(tstamp2) {
  * @returns {string}
  */
 export function writeMeasureBeat(measure, beat) {
+  if (parseInt(measure) === 0) return '' + beat;
   return measure + 'm+' + beat;
-}
+} // writeMeasureBeat()
