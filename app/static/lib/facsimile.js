@@ -232,10 +232,11 @@ export async function drawFacsimile() {
       img = await loadImage(imgName);
       sourceImages[imgName] = img;
     } else {
+      console.log('Using existing image from ' + imgName);
       img = sourceImages[imgName];
     }
     if (img) {
-      console.log('Appending chld:', img);
+      console.log('Appending child image:', img);
       svg.appendChild(img);
     } else {
       showWarningText('Could not load image \n(' + imgName + ').');
@@ -281,15 +282,17 @@ export async function drawFacsimile() {
     }
 
     // go through displayed zones and draw bounding boxes with number-like label
-    if (fullPage) {
-      for (let z in facs) {
-        if (facs[z]['target'] === facs[zoneId]['target']) drawBoundingBox(z);
+    if (document.getElementById('facsimile-show-zones-checkbox')?.checked) {
+      if (fullPage) {
+        for (let z in facs) {
+          if (facs[z]['target'] === facs[zoneId]['target']) drawBoundingBox(z);
+        }
+      } else {
+        svgFacs.forEach((m) => {
+          if (m.hasAttribute('data-facs')) zoneId = rmHash(m.getAttribute('data-facs'));
+          drawBoundingBox(zoneId);
+        });
       }
-    } else {
-      svgFacs.forEach((m) => {
-        if (m.hasAttribute('data-facs')) zoneId = rmHash(m.getAttribute('data-facs'));
-        drawBoundingBox(zoneId);
-      });
     }
     // console.log('ulx/uly//lrx/lry;w/h: ' + ulx + '/' + uly + '; ' + lrx + '/' + lry + '; ' + width + '/' + height);
   } else {

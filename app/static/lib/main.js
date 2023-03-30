@@ -608,7 +608,7 @@ document.addEventListener('DOMContentLoaded', function () {
     ? 'block'
     : 'none';
 
-  if(storage.supported) { 
+  if (storage.supported) {
     storage.read();
     if (storage.github) {
       // use github object from local storage if available
@@ -803,16 +803,16 @@ export async function openUrlFetch(url = '', updateAfterLoading = true) {
   try {
     if (!url) url = new URL(urlInput.value);
     const headers = { Accept: 'application/xml, text/xml, application/mei+xml' };
-    if (isLoggedIn && url.href.trim().startsWith("https://raw.githubusercontent.com")) { 
+    if (isLoggedIn && url.href.trim().startsWith('https://raw.githubusercontent.com')) {
       // GitHub URL - use GitHub credentials to enable URL fetch from private repos
-      github.directlyReadFileContents(url.href).then((data) => { 
-        openUrlProcess(data, url, updateAfterLoading)
-      })
-    } else { 
+      github.directlyReadFileContents(url.href).then((data) => {
+        openUrlProcess(data, url, updateAfterLoading);
+      });
+    } else {
       const response = await fetch(url, {
         method: 'GET',
         headers: headers,
-        credentials: "omit"
+        credentials: 'omit',
       });
       if (response.status >= 400) {
         console.warn('Fetching URL produced error status: ', response.status);
@@ -838,7 +838,7 @@ export async function openUrlFetch(url = '', updateAfterLoading = true) {
 }
 
 function openUrlProcess(content, url, updateAfterLoading) {
-  console.log("openUrlProcess called with: ", content)
+  console.log('openUrlProcess called with: ', content);
   let urlInput = document.querySelector('#openUrlInput');
   let urlStatus = document.querySelector('#openUrlStatus');
   urlStatus.innerHTML = '';
@@ -1763,9 +1763,25 @@ function addEventListeners(v, cm) {
     drawFacsimile();
   });
 
+  // show facsimile zone bounding boxes
+  document.getElementById('facsimile-show-zones-checkbox').addEventListener('click', (e) => {
+    document.getElementById('showFacsimileZones').checked = e.target.checked;
+    // uncheck edit option when hiding bounding boxes
+    if (!e.target.checked) {
+      document.getElementById('editFacsimileZones').checked = false;
+      document.getElementById('facsimile-edit-zones-checkbox').checked = false;
+    }
+    setOrientation(cm, '', '', v);
+  });
+
   // facsimile edit zones
   document.getElementById('facsimile-edit-zones-checkbox').addEventListener('click', (e) => {
     document.getElementById('editFacsimileZones').checked = e.target.checked;
+    // show bounding boxes for editing
+    if (e.target.checked && !document.getElementById('facsimile-show-zones-checkbox').checked) {
+      document.getElementById('showFacsimileZones').checked = true;
+      document.getElementById('facsimile-show-zones-checkbox').checked = true;
+    }
     setOrientation(cm, '', '', v);
   });
 

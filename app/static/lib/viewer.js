@@ -1376,6 +1376,12 @@ export default class Viewer {
         type: 'bool',
         default: false,
       },
+      showFacsimileZones: {
+        title: 'Show facsimile zone boxes',
+        description: 'Show facsimile zone bounding boxes',
+        type: 'bool',
+        default: true,
+      },
       editFacsimileZones: {
         title: 'Edit facsimile zones',
         description: 'Edit facsimile zones (will link bounding boxes to facsimile zones)',
@@ -1499,6 +1505,9 @@ export default class Viewer {
           break;
         case 'editFacsimileZones':
           document.getElementById('facsimile-edit-zones-checkbox').checked = value;
+          break;
+        case 'showFacsimileZones':
+          document.getElementById('facsimile-show-zones-checkbox').checked = value;
           break;
         case 'showMidiPlaybackControlBar':
           // do nothing, as it is always the default display: none
@@ -1647,8 +1656,20 @@ export default class Viewer {
           case 'transposeInterval':
           case 'transposeDirection':
             break;
+          case 'showFacsimileZones':
+            document.getElementById('facsimile-show-zones-checkbox').checked = value;
+            if (!value) {
+              document.getElementById('editFacsimileZones').checked = false;
+              document.getElementById('facsimile-edit-zones-checkbox').checked = false;
+            }
+            drawFacsimile();
+            break;
           case 'editFacsimileZones':
             document.getElementById('facsimile-edit-zones-checkbox').checked = value;
+            if (value) {
+              document.getElementById('showFacsimileZones').checked = true;
+              document.getElementById('facsimile-show-zones-checkbox').checked = true;
+            }
             drawFacsimile();
             break;
           case 'showFacsimilePanel':

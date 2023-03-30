@@ -456,6 +456,30 @@ export function createFacsimileControlBar(parentElement) {
 
   facsCtrlBar.appendChild(fullPageDiv);
 
+  // show zone rectangles
+  let showZonesDiv = document.createElement('div');
+  showZonesDiv.id = 'facsimile-show-zones';
+  showZonesDiv.classList.add('controls');
+
+  let showZonesLabel = document.createElement('label');
+  showZonesLabel.innerText = 'Show zone boxes:';
+  showZonesLabel.id = 'facsimile-show-zones-label';
+  showZonesLabel.classList.add('label');
+  showZonesDiv.appendChild(showZonesLabel);
+  showZonesLabel.title = 'Show zone boxes of facsimile';
+
+  let showZonesCheckbox = document.createElement('input');
+  showZonesCheckbox.id = 'facsimile-show-zones-checkbox';
+  showZonesCheckbox.setAttribute('type', 'checkbox');
+  showZonesCheckbox.classList.add('checkbox');
+  showZonesCheckbox.title = 'Show zone boxes of facsimile';
+  showZonesLabel.setAttribute('for', showZonesCheckbox.id);
+  showZonesCheckbox.checked = false;
+  showZonesCheckbox.disabled = false;
+  showZonesDiv.appendChild(showZonesCheckbox);
+
+  facsCtrlBar.appendChild(showZonesDiv);
+
   // edit zones
   let editZonesDiv = document.createElement('div');
   editZonesDiv.id = 'facsimile-edit-zones';
