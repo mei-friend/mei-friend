@@ -795,6 +795,10 @@ document.addEventListener('DOMContentLoaded', function () {
   };
 
   setKeyMap(defaultKeyMap);
+
+  // remove URL parameters from URL
+  window.history.pushState({}, '', '/');
+  // TODO: check handleURLParamSelect() occurrences, whether removing search parameters has an effect there.
 }); // DOMContentLoaded listener
 
 export async function openUrlFetch(url = '', updateAfterLoading = true) {
