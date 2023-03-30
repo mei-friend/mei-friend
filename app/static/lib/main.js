@@ -1,6 +1,6 @@
 // mei-friend version and date
-export const version = '0.8.7';
-export const versionDate = '21 Mar 2023';
+export const version = '0.8.8';
+export const versionDate = '30 Mar 2023';
 
 var vrvWorker;
 var spdWorker;
@@ -1161,7 +1161,7 @@ export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true, upd
   meiFileLocation = '';
   meiFileLocationPrintable = '';
   updateFileStatusDisplay();
-}
+} // openFile()
 
 // checks format of encoding string and imports or loads data/notation
 // mei argument may be MEI or any other supported format (text/binary)
@@ -1235,7 +1235,7 @@ export function handleEncoding(mei, setFreshlyLoaded = true, updateAfterLoading 
     clearAnnotations();
     v.busy(false);
   }
-}
+} // handleEncoding()
 
 function openFileDialog(accept = '*') {
   let input = document.createElement('input');
@@ -1263,7 +1263,7 @@ function openFileDialog(accept = '*') {
     }
   };
   input.click();
-}
+} // openFileDialog()
 
 function downloadMei() {
   let blob = new Blob([cm.getValue()], {

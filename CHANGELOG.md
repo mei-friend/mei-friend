@@ -1,4 +1,6 @@
 # mei-friend-online CHANGELOG.md
+### 0.8.8 patch
+* Control display of zone bounding boxes through checkbox
 ### 0.8.7 transposition
 * Add transposition settings panel to the mei-friend settings to specify transposition by key, by interval, and pitch direction.
 * Enable ?file= param to open files from private repos (when logged in)
