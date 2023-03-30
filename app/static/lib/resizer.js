@@ -1,11 +1,20 @@
+import {
+  defaultNotationResizerWidth,
+  defaultFacsimileOrientation,
+  defaultNotationOrientation,
+  defaultNotationProportion,
+  defaultFacsimileProportion,
+  defaultFacsimileResizerWidth,
+} from './defaults.js';
+
 // notation variables (verovio-container)
-let notationOrientation = 'bottom'; // position of notation
-let notationProportion = 0.5; // proportion notation div takes from container
-let notationResizerWidth = 8; // 8 px, Attention: hard-coded also in left.css, right.css, top.css, bottom.css
+let notationOrientation = defaultNotationOrientation; // position of notation
+let notationProportion = defaultNotationProportion; // proportion notation div takes from container
+let notationResizerWidth = defaultNotationResizerWidth; // 8 px, Attention: hard-coded also in left.css, right.css, top.css, bottom.css
 // facsimile variables (facsimile-container)
-let facsimileResizerWidth = 8; // px, compare to css facsimile-[left/right/top/bottom].css
-let facsimileOrientation = 'bottom'; // notationOrientation of facsimile relative to notation
-let facsimileProportion = 0.65;
+let facsimileOrientation = defaultFacsimileOrientation; // notationOrientation of facsimile relative to notation
+let facsimileProportion = defaultFacsimileProportion;
+let facsimileResizerWidth = defaultFacsimileResizerWidth; // px, compare to css facsimile-[left/right/top/bottom].css
 // annotation panel size
 let annotationPanelExtent = 250; // px, taken away from width of friendContainer
 // general settings
@@ -169,6 +178,10 @@ export function setFacsimileProportion(prop) {
 
 export function getFacsimileProportion() {
   return facsimileProportion;
+}
+
+export function getFacsimileOrientation() {
+  return facsimileOrientation;
 }
 
 export function calcSizeOfContainer() {

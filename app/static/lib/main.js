@@ -161,11 +161,15 @@ export const samp = {
 export const fontList = ['Leipzig', 'Bravura', 'Gootville', 'Leland', 'Petaluma'];
 
 import {
-  setOrientation,
-  addNotationResizerHandlers,
   addFacsimilerResizerHandlers,
-  setNotationProportion,
+  addNotationResizerHandlers,
+  getFacsimileOrientation,
+  getFacsimileProportion,
+  getNotationProportion,
+  getOrientation,
   setFacsimileProportion,
+  setNotationProportion,
+  setOrientation,
 } from './resizer.js';
 import { addAnnotationHandlers, clearAnnotations, readAnnots, refreshAnnotations } from './annotation.js';
 import { dropHandler, dragEnter, dragOverHandler, dragLeave } from './dragger.js';
@@ -209,6 +213,7 @@ import {
 } from './facsimile.js';
 import { WorkerProxy } from './worker-proxy.js';
 import { RNGLoader } from './rng-loader.js';
+import { defaultNotationOrientation } from './defaults.js';
 
 // const defaultMeiFileName = `${root}Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei`;
 const defaultMeiFileName = `${root}Beethoven_WoO70-Breitkopf.mei`;
@@ -995,6 +1000,8 @@ async function vrvWorkerEventsHandler(ev) {
       } else {
         v.busy(false);
       }
+      // TODO JUST FOR DEBUGGING
+      generateUrl();
       break;
     case 'navigatePage': // resolve navigation with page turning
       updateStatusBar();
@@ -2185,8 +2192,52 @@ function midiDataToBlob(data) {
 
 /**
  * Generates a long URL with all parameters
+ * file, scale, breaks, select (multiples), page, speed, autoValidate, notationOrientation, notationProportion, facsimileOrientation, facsimileProportion
  */
 function generateUrl() {
+  let msg = '';
   let url = document.location;
-  // file, scale, breaks, select (multiples), page, speed, autoValidate, notationOrientation, notationProportion, facsimileOrientation, facsimileProportion
+  while (['/', '#'].includes(url[url.length - 1])) url.slice(0, -1);
+  url += '/?';
+  if (['github', 'url'].includes(fileLocationType)) {
+    url += 'file=' + meiFileLocation;
+  } else {
+    msg = 'Cannot generate URL for local file ' + meiFileName;
+    v.showAlert(msg, 'warning');
+    console.log(msg);
+    return '';
+  }
+  let scale = v.vrvOptions.scale;
+  if (scale !== defaultVerovioOptions.scale) {
+    url += '&scale=' + scale;
+  }
+  let breaks = document.getElementById('breaks-select').value;
+  if (breaks !== defaultVerovioOptions.breaks) {
+    url += '&breaks=' + breaks;
+  }
+  if (v.selectedElements.length > 0) {
+    url += '&select=' + v.selectedElements.join(',');
+  }
+  let page = v.currentPage;
+  if (page > 1) {
+    url += '&=page=' + page;
+  }
+  let notationOrientation = getOrientation();
+  if (notationOrientation !== defaultNotationOrientation) {
+    url += '&notationOrientation=' + notationOrientation;
+  }
+  let notationProportion = getNotationProportion();
+  if (notationProportion !== defaultNotationPorportion) {
+    url += '&notationProportion=' + notationProportion;
+  }
+  let facsimileOrientation = getFacsimileOrientation();
+  if (facsimileOrientation !== defaultFacsimileOrientation) {
+    url += '&facsimileOrientation=' + facsimileOrientation;
+  }
+  let facsimileProportion = getFacsimileProportion();
+  if (facsimileProportion !== defaultFacsimilePorportion) {
+    url += '&facsimileProportion=' + facsimileProportion;
+  }
+  //
+  v.showAlert(url, 'info', -1);
 } // generateUrl()
