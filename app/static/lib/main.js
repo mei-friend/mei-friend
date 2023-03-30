@@ -2165,12 +2165,12 @@ function setKeyMap(keyMapFilePath) {
         }
       }
     });
-}
+} // setKeyMap()
 
 // returns true, if event is a CMD (Mac) or a CTRL (Windows, Linux) event
 export function isCtrlOrCmd(ev) {
   return ev ? (platform.startsWith('mac') && ev.metaKey) || (!platform.startsWith('mac') && ev.ctrlKey) : false;
-}
+} // isCtrlOrCmd()
 
 function midiDataToBlob(data) {
   const byteCharacters = atob(data);
@@ -2181,4 +2181,12 @@ function midiDataToBlob(data) {
   return new Blob([new Uint8Array(byteNumbers)], {
     type: 'audio/midi',
   });
-}
+} // midiDataToBlob()
+
+/**
+ * Generates a long URL with all parameters
+ */
+function generateUrl() {
+  let url = document.location;
+  // file, scale, breaks, select (multiples), page, speed, autoValidate, notationOrientation, notationProportion, facsimileOrientation, facsimileProportion
+} // generateUrl()
