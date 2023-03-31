@@ -2195,12 +2195,17 @@ function midiDataToBlob(data) {
  * file, scale, breaks, select (multiples), page, speed, autoValidate, notationOrientation, notationProportion, facsimileOrientation, facsimileProportion
  */
 function generateUrl() {
+  const amp = '&amp;';
   let msg = '';
-  let url = document.location;
-  while (['/', '#'].includes(url[url.length - 1])) url.slice(0, -1);
+  let url = document.URL;
+  // remove some characters from end of href
+  while (['/', '#'].includes(url[url.length - 1])) url = url.slice(0, -1);
+  msg += 'FileLocationType: ' + fileLocationType + '<br/>';
   url += '/?';
-  if (['github', 'url'].includes(fileLocationType)) {
+  if (fileLocationType === 'url') {
     url += 'file=' + meiFileLocation;
+  } else if (fileLocationType === 'github') {
+    url += 'file=https://raw.githubusercontent.com/' + github.githubRepo + '/' + github.branch + github.filepath;
   } else {
     msg = 'Cannot generate URL for local file ' + meiFileName;
     v.showAlert(msg, 'warning');
@@ -2209,35 +2214,35 @@ function generateUrl() {
   }
   let scale = v.vrvOptions.scale;
   if (scale !== defaultVerovioOptions.scale) {
-    url += '&scale=' + scale;
+    url += amp + 'scale=' + scale;
   }
   let breaks = document.getElementById('breaks-select').value;
   if (breaks !== defaultVerovioOptions.breaks) {
-    url += '&breaks=' + breaks;
+    url += amp + 'breaks=' + breaks;
   }
   if (v.selectedElements.length > 0) {
-    url += '&select=' + v.selectedElements.join(',');
+    url += amp + 'select=' + v.selectedElements.join(',');
   }
   let page = v.currentPage;
   if (page > 1) {
-    url += '&=page=' + page;
+    url += amp + 'page=' + page;
   }
   let notationOrientation = getOrientation();
   if (notationOrientation !== defaultNotationOrientation) {
-    url += '&notationOrientation=' + notationOrientation;
+    url += amp + 'notationOrientation=' + notationOrientation;
   }
   let notationProportion = getNotationProportion();
   if (notationProportion !== defaultNotationPorportion) {
-    url += '&notationProportion=' + notationProportion;
+    url += amp + 'notationProportion=' + notationProportion;
   }
   let facsimileOrientation = getFacsimileOrientation();
   if (facsimileOrientation !== defaultFacsimileOrientation) {
-    url += '&facsimileOrientation=' + facsimileOrientation;
+    url += amp + 'facsimileOrientation=' + facsimileOrientation;
   }
   let facsimileProportion = getFacsimileProportion();
   if (facsimileProportion !== defaultFacsimilePorportion) {
-    url += '&facsimileProportion=' + facsimileProportion;
+    url += amp + 'facsimileProportion=' + facsimileProportion;
   }
   //
-  v.showAlert(url, 'info', -1);
+  v.showAlert(msg + url, 'info', -1);
 } // generateUrl()
