@@ -4,20 +4,21 @@
  * through zone and surface elements.
  */
 
-var facs = {}; // facsimile structure in MEI file
-var sourceImages = {}; // object of source images
-const rectangleLineWidth = 6; // width of bounding box rectangles in px
-const rectangleColor = 'darkred'; // color of zone rectangles
-var listenerHandles = {};
-var resize = ''; // west, east, north, south, northwest, southeast etc
-var ulx, uly;
-
 import { rmHash, setCursorToId } from './utils.js';
 import { svgNameSpace, xmlToString } from './dom-utils.js';
 import { transformCTM, updateRect } from './drag-selector.js';
 import { cm, fileLocationType, github, isCtrlOrCmd, meiFileLocation, v } from './main.js';
 import { addZone, replaceInEditor } from './editor.js';
 import { attFacsimile } from './attribute-classes.js';
+import { defaultFacsimileRectangleColor, defaultFacsimileRectangleLineWidth } from './defaults.js';
+
+var facs = {}; // facsimile structure in MEI file
+var sourceImages = {}; // object of source images
+const rectangleLineWidth = defaultFacsimileRectangleLineWidth; // width of bounding box rectangles in px
+const rectangleColor = defaultFacsimileRectangleColor; // color of zone rectangles
+var listenerHandles = {};
+var resize = ''; // west, east, north, south, northwest, southeast etc
+var ulx, uly;
 
 /**
  * Show warning text to facsimile panel (as svg text element) and
@@ -232,10 +233,11 @@ export async function drawFacsimile() {
       img = await loadImage(imgName);
       sourceImages[imgName] = img;
     } else {
+      console.log('Using existing image from ' + imgName);
       img = sourceImages[imgName];
     }
     if (img) {
-      console.log('Appending chld:', img);
+      console.log('Appending child image:', img);
       svg.appendChild(img);
     } else {
       showWarningText('Could not load image \n(' + imgName + ').');
@@ -281,15 +283,17 @@ export async function drawFacsimile() {
     }
 
     // go through displayed zones and draw bounding boxes with number-like label
-    if (fullPage) {
-      for (let z in facs) {
-        if (facs[z]['target'] === facs[zoneId]['target']) drawBoundingBox(z);
+    if (document.getElementById('facsimile-show-zones-checkbox')?.checked) {
+      if (fullPage) {
+        for (let z in facs) {
+          if (facs[z]['target'] === facs[zoneId]['target']) drawBoundingBox(z);
+        }
+      } else {
+        svgFacs.forEach((m) => {
+          if (m.hasAttribute('data-facs')) zoneId = rmHash(m.getAttribute('data-facs'));
+          drawBoundingBox(zoneId);
+        });
       }
-    } else {
-      svgFacs.forEach((m) => {
-        if (m.hasAttribute('data-facs')) zoneId = rmHash(m.getAttribute('data-facs'));
-        drawBoundingBox(zoneId);
-      });
     }
     // console.log('ulx/uly//lrx/lry;w/h: ' + ulx + '/' + uly + '; ' + lrx + '/' + lry + '; ' + width + '/' + height);
   } else {

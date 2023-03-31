@@ -1,9 +1,5 @@
-import {
-  calcSizeOfContainer
-} from './resizer.js';
-import {
-  openFile
-} from './main.js';
+import { calcSizeOfContainer } from './resizer.js';
+import { openFile } from './main.js';
 
 export function dropHandler(ev) {
   ev.stopPropagation();
@@ -23,7 +19,8 @@ export function dropHandler(ev) {
         console.log('Unrecognized item ' + i + ':', ev.dataTransfer.items[i]);
       }
     }
-  } else { // Use DataTransfer interface to access the file(s)
+  } else {
+    // Use DataTransfer interface to access the file(s)
     let l = ev.dataTransfer.files.length;
     console.log('dropHandler(): ' + l + ' file(s) dropped.');
     for (var i = 0; i < l; i++) {
@@ -67,11 +64,11 @@ function on() {
   let fc = document.querySelector('.dragOverlay');
   fc.width = sz.width;
   fc.height = sz.height;
-  fc.style.display = "block";
+  fc.style.display = 'block';
 }
 
 function off() {
   // console.log('off()');
   let fc = document.querySelector('.dragOverlay');
-  fc.style.display = "none";
+  fc.style.display = 'none';
 }

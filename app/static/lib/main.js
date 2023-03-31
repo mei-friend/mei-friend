@@ -1,6 +1,6 @@
 // mei-friend version and date
-export const version = '0.8.7';
-export const versionDate = '21 Mar 2023';
+export const version = '0.8.8';
+export const versionDate = '31 Mar 2023';
 
 var vrvWorker;
 var spdWorker;
@@ -9,59 +9,6 @@ var mei;
 var breaksParam; // (string) the breaks parameter given through URL
 var pageParam; // (int) page parameter given through URL
 var selectParam; // (array) select ids given through multiple instances in URL
-// export let platform = navigator.platform.toLowerCase(); // TODO
-export let platform = (navigator?.userAgentData?.platform || navigator?.platform || 'unknown').toLowerCase();
-export const isSafari = !!navigator.userAgent.match(/Version\/[\d\.]+.*Safari/);
-
-// guidelines base URL, needed to construct element / attribute URLs
-// TODO ideally determine version part automatically
-const guidelinesBase = 'https://music-encoding.org/guidelines/v4/';
-
-/**
- * Object of common MEI schemas,
- * by meiProfile ('CMN', 'Mensural', 'Neumes', 'All', 'Any')
- * and meiVersion ('4.0.1', etc.)
- */
-export const commonSchemas = {
-  CMN: {
-    '2.1.1': 'https://music-encoding.org/schema/2.1.1/mei-CMN.rng',
-    '3.0.0': 'https://music-encoding.org/schema/3.0.0/mei-CMN.rng',
-    '4.0.0': 'https://music-encoding.org/schema/4.0.0/mei-CMN.rng',
-    '4.0.1': 'https://music-encoding.org/schema/4.0.1/mei-CMN.rng',
-    '5.0.0-dev': 'https://music-encoding.org/schema/dev/mei-CMN.rng',
-  },
-  Mensural: {
-    '2.1.1': 'https://music-encoding.org/schema/2.1.1/mei-Mensural.rng',
-    '3.0.0': 'https://music-encoding.org/schema/3.0.0/mei-Mensural.rng',
-    '4.0.0': 'https://music-encoding.org/schema/4.0.0/mei-Mensural.rng',
-    '4.0.1': 'https://music-encoding.org/schema/4.0.1/mei-Mensural.rng',
-    '5.0.0-dev': 'https://music-encoding.org/schema/dev/mei-Mensural.rng',
-  },
-  Neumes: {
-    '2.1.1': 'https://music-encoding.org/schema/2.1.1/mei-Neumes.rng',
-    '3.0.0': 'https://music-encoding.org/schema/3.0.0/mei-Neumes.rng',
-    '4.0.0': 'https://music-encoding.org/schema/4.0.0/mei-Neumes.rng',
-    '4.0.1': 'https://music-encoding.org/schema/4.0.1/mei-Neumes.rng',
-    '5.0.0-dev': 'https://music-encoding.org/schema/dev/mei-Neumes.rng',
-  },
-  All: {
-    '2.1.1': 'https://music-encoding.org/schema/2.1.1/mei-all.rng',
-    '3.0.0': 'https://music-encoding.org/schema/3.0.0/mei-all.rng',
-    '4.0.0': 'https://music-encoding.org/schema/4.0.0/mei-all.rng',
-    '4.0.1': 'https://music-encoding.org/schema/4.0.1/mei-all.rng',
-    '5.0.0-dev': 'https://music-encoding.org/schema/dev/mei-all.rng',
-  },
-  Any: {
-    '2.1.1': 'https://music-encoding.org/schema/2.1.1/mei-all_anyStart.rng',
-    '3.0.0': 'https://music-encoding.org/schema/3.0.0/mei-all_anyStart.rng',
-    '4.0.0': 'https://music-encoding.org/schema/4.0.0/mei-all_anyStart.rng',
-    '4.0.1': 'https://music-encoding.org/schema/4.0.1/mei-all_anyStart.rng',
-    '5.0.0-dev': 'https://music-encoding.org/schema/dev/mei-all_anyStart.rng',
-  },
-};
-export const defaultMeiVersion = '4.0.1';
-export const defaultMeiProfile = 'CMN';
-export const defaultSchema = commonSchemas[defaultMeiProfile][defaultMeiVersion];
 
 // exports
 export var cm;
@@ -78,76 +25,6 @@ export let meiFileLocationPrintable = '';
 export let fileLocationType = ''; // file, github, url
 export let isMEI; // is the currently edited file native MEI?
 export let fileChanged = false; // flag to track whether unsaved changes to file exist
-export const defaultVerovioVersion = 'latest'; // 'develop', '3.10.0'
-export let supportedVerovioVersions = {
-  develop: {
-    url: 'https://www.verovio.org/javascript/develop/verovio-toolkit-wasm.js',
-    description: 'Current Verovio develop version',
-  },
-  latest: {
-    url: 'https://www.verovio.org/javascript/latest/verovio-toolkit-hum.js',
-    description: 'Current Verovio release',
-  },
-  '3.15.0': {
-    url: 'https://www.verovio.org/javascript/3.15.0/verovio-toolkit-hum.js',
-    description: 'Verovio release 3.15.0',
-    releaseDate: '1 Mar 2023',
-  },
-  '3.14.0': {
-    url: 'https://www.verovio.org/javascript/3.14.0/verovio-toolkit-hum.js',
-    description: 'Verovio release 3.14.0',
-    releaseDate: '23 Dec 2022',
-  },
-  '3.13.1': {
-    url: 'https://www.verovio.org/javascript/3.13.1/verovio-toolkit-hum.js',
-    description: 'Verovio release 3.13.1',
-    releaseDate: '28 Nov 2022',
-  },
-  '3.13.0': {
-    url: 'https://www.verovio.org/javascript/3.13.0/verovio-toolkit-hum.js',
-    description: 'Verovio release 3.13.0',
-    releaseDate: '23 Nov 2022',
-  },
-  '3.12.1': {
-    url: 'https://www.verovio.org/javascript/3.12.1/verovio-toolkit-hum.js',
-    description: 'Verovio release 3.12.1',
-    releaseDate: '6 Oct 2022',
-  },
-  '3.12.0': {
-    url: 'https://www.verovio.org/javascript/3.12.0/verovio-toolkit-hum.js',
-    description: 'Verovio release 3.12.0',
-    releaseDate: '29 Sept 2022',
-  },
-  '3.11.0': {
-    url: 'https://www.verovio.org/javascript/3.11.0/verovio-toolkit-hum.js',
-    description: 'Verovio release 3.11.0',
-    releaseDate: '15 Jul 2022',
-  },
-  '3.10.0*': {
-    url: 'https://www.verovio.org/javascript/3.10.0/verovio-toolkit-hum.js',
-    description:
-      'Verovio release 3.10.0. *ATTENTION: Switching to this version might require a refresh due to memory issues.',
-    releaseDate: '25 May 2022',
-  },
-  '3.9.0*': {
-    url: 'https://www.verovio.org/javascript/3.9.0/verovio-toolkit-hum.js',
-    description:
-      'Verovio release 3.9.0. *ATTENTION: Switching to this version might require a refresh due to memory issues.',
-    releaseDate: '22 Feb 2022',
-  },
-  '3.8.1*': {
-    url: 'https://www.verovio.org/javascript/3.8.1/verovio-toolkit-hum.js',
-    description:
-      'Verovio release 3.8.1. *ATTENTION: Switching to this version might require a refresh due to memory issues.',
-    releaseDate: '10 Jan 2022',
-  },
-  '3.7.0*': {
-    url: 'https://www.verovio.org/javascript/3.7.0/verovio-toolkit-hum.js',
-    description:
-      'Verovio release 3.7.0. *ATTENTION: Switching to this version might require a refresh due to memory issues.',
-    releaseDate: '22 Nov 2021',
-  },
-};
 
 export const sampleEncodings = [];
 export const samp = {
@@ -158,14 +35,17 @@ export const samp = {
   TITLE: 4,
   COMPOSER: 5,
 };
-export const fontList = ['Leipzig', 'Bravura', 'Gootville', 'Leland', 'Petaluma'];
 
 import {
-  setOrientation,
-  addNotationResizerHandlers,
   addFacsimilerResizerHandlers,
-  setNotationProportion,
+  addNotationResizerHandlers,
+  getFacsimileOrientation,
+  getFacsimileProportion,
+  getNotationProportion,
+  getOrientation,
   setFacsimileProportion,
+  setNotationProportion,
+  setOrientation,
 } from './resizer.js';
 import { addAnnotationHandlers, clearAnnotations, readAnnots, refreshAnnotations } from './annotation.js';
 import { dropHandler, dragEnter, dragOverHandler, dragLeave } from './dragger.js';
@@ -209,35 +89,19 @@ import {
 } from './facsimile.js';
 import { WorkerProxy } from './worker-proxy.js';
 import { RNGLoader } from './rng-loader.js';
+import {
+  defaultFacsimileOrientation,
+  defaultFacsimileProportion,
+  defaultMeiFileName,
+  defaultNotationOrientation,
+  defaultNotationProportion,
+  defaultSpeedMode,
+  defaultVerovioOptions,
+  guidelinesBase,
+  platform,
+  isSafari,
+} from './defaults.js';
 
-// const defaultMeiFileName = `${root}Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei`;
-const defaultMeiFileName = `${root}Beethoven_WoO70-Breitkopf.mei`;
-const defaultOrientation = 'bottom'; // default notation position in window
-const defaultNotationPorportion = 0.5; // default notation size relative to window
-const defaultFacsimileOrientation = 'left'; // default facsimile position in notation window
-const defaultFacsimilePorportion = 0.5; // default facsimile panel size relative to notation
-const defaultVerovioOptions = {
-  scale: 55,
-  breaks: 'line',
-  header: 'encoded',
-  footer: 'encoded',
-  inputFrom: 'mei',
-  adjustPageHeight: true,
-  mdivAll: true,
-  outputIndent: 3,
-  pageMarginLeft: 50,
-  pageMarginRight: 50,
-  pageMarginBottom: 15,
-  pageMarginTop: 50,
-  spacingLinear: 0.2,
-  spacingNonLinear: 0.5,
-  minLastJustification: 0,
-  transposeToSoundingPitch: true,
-  // clefChangeFactor: .83, // option removed in Verovio 3.10.0
-  svgAdditionalAttribute: ['layer@n', 'staff@n', 'dir@vgrp', 'dynam@vgrp', 'hairpin@vgrp', 'pedal@vgrp', 'measure@n'],
-  bottomMarginArtic: 1.2,
-  topMarginArtic: 1.2,
-};
 const defaultCodeMirrorOptions = {
   lineNumbers: true,
   lineWrapping: false,
@@ -280,6 +144,7 @@ const defaultCodeMirrorOptions = {
   defaultBrightTheme: 'default', // default theme for OS bright mode
   defaultDarkTheme: 'paraiso-dark', // 'base16-dark', // default theme for OS dark mode
 };
+
 // add all possible facsimile elements
 att.attFacsimile.forEach((e) => defaultVerovioOptions.svgAdditionalAttribute.push(e + '@facs'));
 const defaultKeyMap = `${root}keymaps/default-keymap.json`;
@@ -491,13 +356,6 @@ document.addEventListener('DOMContentLoaded', function () {
   switch (env) {
     case 'develop':
       changeLogUrl = 'https://github.com/mei-friend/mei-friend/blob/develop/CHANGELOG.md';
-      supportedVerovioVersions = {
-        local: {
-          url: `${root}local/verovio-toolkit-hum.js`,
-          description: 'Locally compiled Verovio toolkit version for debugging',
-        },
-        ...supportedVerovioVersions,
-      };
       break;
     case 'staging':
       changeLogUrl = 'https://github.com/mei-friend/mei-friend/blob/staging/CHANGELOG.md';
@@ -608,7 +466,7 @@ document.addEventListener('DOMContentLoaded', function () {
     ? 'block'
     : 'none';
 
-  if(storage.supported) { 
+  if (storage.supported) {
     storage.read();
     if (storage.github) {
       // use github object from local storage if available
@@ -754,7 +612,7 @@ document.addEventListener('DOMContentLoaded', function () {
   } else if (storage && storage.supported && storage.hasItem('notationOrientation')) {
     o = storage.notationOrientation;
   } else {
-    o = defaultOrientation;
+    o = defaultNotationOrientation;
   }
   let fo = ''; // facsimile orientation from URLparam, storage or default (in this order)
   if (facsimileOrientationParam !== null) {
@@ -770,7 +628,7 @@ document.addEventListener('DOMContentLoaded', function () {
   } else if (storage && storage.supported && storage.hasItem('notationProportion')) {
     np = storage.notationProportion;
   } else {
-    np = defaultNotationPorportion;
+    np = defaultNotationProportion;
   }
   let fp = -1;
   if (facsimileProportionParam !== null) {
@@ -778,7 +636,7 @@ document.addEventListener('DOMContentLoaded', function () {
   } else if (storage && storage.supported && storage.hasItem('facsimileProportion')) {
     fp = storage.facsimileProportion;
   } else {
-    fp = defaultFacsimilePorportion;
+    fp = defaultFacsimileProportion;
   }
   setNotationProportion(np);
   setFacsimileProportion(fp);
@@ -795,6 +653,10 @@ document.addEventListener('DOMContentLoaded', function () {
   };
 
   setKeyMap(defaultKeyMap);
+
+  // remove URL parameters from URL
+  window.history.pushState({}, '', '/');
+  // TODO: check handleURLParamSelect() occurrences, whether removing search parameters has an effect there.
 }); // DOMContentLoaded listener
 
 export async function openUrlFetch(url = '', updateAfterLoading = true) {
@@ -803,16 +665,16 @@ export async function openUrlFetch(url = '', updateAfterLoading = true) {
   try {
     if (!url) url = new URL(urlInput.value);
     const headers = { Accept: 'application/xml, text/xml, application/mei+xml' };
-    if (isLoggedIn && url.href.trim().startsWith("https://raw.githubusercontent.com")) { 
+    if (isLoggedIn && url.href.trim().startsWith('https://raw.githubusercontent.com')) {
       // GitHub URL - use GitHub credentials to enable URL fetch from private repos
-      github.directlyReadFileContents(url.href).then((data) => { 
-        openUrlProcess(data, url, updateAfterLoading)
-      })
-    } else { 
+      github.directlyReadFileContents(url.href).then((data) => {
+        openUrlProcess(atob(JSON.parse(data).content), url, updateAfterLoading);
+      });
+    } else {
       const response = await fetch(url, {
         method: 'GET',
         headers: headers,
-        credentials: "omit"
+        credentials: 'omit',
       });
       if (response.status >= 400) {
         console.warn('Fetching URL produced error status: ', response.status);
@@ -838,7 +700,7 @@ export async function openUrlFetch(url = '', updateAfterLoading = true) {
 }
 
 function openUrlProcess(content, url, updateAfterLoading) {
-  console.log("openUrlProcess called with: ", content)
+  console.log('openUrlProcess called with: ', content);
   let urlInput = document.querySelector('#openUrlInput');
   let urlStatus = document.querySelector('#openUrlStatus');
   urlStatus.innerHTML = '';
@@ -1161,7 +1023,7 @@ export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true, upd
   meiFileLocation = '';
   meiFileLocationPrintable = '';
   updateFileStatusDisplay();
-}
+} // openFile()
 
 // checks format of encoding string and imports or loads data/notation
 // mei argument may be MEI or any other supported format (text/binary)
@@ -1235,7 +1097,7 @@ export function handleEncoding(mei, setFreshlyLoaded = true, updateAfterLoading 
     clearAnnotations();
     v.busy(false);
   }
-}
+} // handleEncoding()
 
 function openFileDialog(accept = '*') {
   let input = document.createElement('input');
@@ -1263,7 +1125,7 @@ function openFileDialog(accept = '*') {
     }
   };
   input.click();
-}
+} // openFileDialog()
 
 function downloadMei() {
   let blob = new Blob([cm.getValue()], {
@@ -1396,6 +1258,7 @@ export let cmd = {
   pageModeOn: () => v.pageModeOn(),
   pageModeOff: () => v.pageModeOff(),
   saveAsPdf: () => v.saveAsPdf(),
+  generateUrl: () => generateUrlUI(),
   filterSettings: () => v.applySettingsFilter(),
   filterReset: () => {
     document.getElementById('filterSettings').value = '';
@@ -1694,6 +1557,7 @@ function addEventListeners(v, cm) {
   document.getElementById('SaveSvg').addEventListener('click', downloadSvg);
   document.getElementById('SaveMidi').addEventListener('click', () => requestMidiFromVrvWorker());
   document.getElementById('PrintPreview').addEventListener('click', cmd.pageModeOn);
+  document.getElementById('GenerateURL').addEventListener('click', cmd.generateUrl);
 
   // edit dialogs
   document.getElementById('undo').addEventListener('click', cmd.undo);
@@ -1763,9 +1627,25 @@ function addEventListeners(v, cm) {
     drawFacsimile();
   });
 
+  // show facsimile zone bounding boxes
+  document.getElementById('facsimile-show-zones-checkbox').addEventListener('click', (e) => {
+    document.getElementById('showFacsimileZones').checked = e.target.checked;
+    // uncheck edit option when hiding bounding boxes
+    if (!e.target.checked) {
+      document.getElementById('editFacsimileZones').checked = false;
+      document.getElementById('facsimile-edit-zones-checkbox').checked = false;
+    }
+    setOrientation(cm, '', '', v);
+  });
+
   // facsimile edit zones
   document.getElementById('facsimile-edit-zones-checkbox').addEventListener('click', (e) => {
     document.getElementById('editFacsimileZones').checked = e.target.checked;
+    // show bounding boxes for editing
+    if (e.target.checked && !document.getElementById('facsimile-show-zones-checkbox').checked) {
+      document.getElementById('showFacsimileZones').checked = true;
+      document.getElementById('facsimile-show-zones-checkbox').checked = true;
+    }
     setOrientation(cm, '', '', v);
   });
 
@@ -1790,7 +1670,7 @@ function addEventListeners(v, cm) {
   // font selector
   document.getElementById('font-select').addEventListener('change', () => {
     document.getElementById('vrv-font').value = document.getElementById('font-select').value;
-    v.updateOption();
+    v.updateLayout();
   });
   // breaks selector
   document.getElementById('breaks-select').addEventListener('change', (ev) => {
@@ -2145,12 +2025,12 @@ function setKeyMap(keyMapFilePath) {
         }
       }
     });
-}
+} // setKeyMap()
 
 // returns true, if event is a CMD (Mac) or a CTRL (Windows, Linux) event
 export function isCtrlOrCmd(ev) {
   return ev ? (platform.startsWith('mac') && ev.metaKey) || (!platform.startsWith('mac') && ev.ctrlKey) : false;
-}
+} // isCtrlOrCmd()
 
 function midiDataToBlob(data) {
   const byteCharacters = atob(data);
@@ -2161,4 +2041,101 @@ function midiDataToBlob(data) {
   return new Blob([new Uint8Array(byteNumbers)], {
     type: 'audio/midi',
   });
-}
+} // midiDataToBlob()
+
+/**
+ * Returns a long URL with all parameters
+ * file, scale, breaks, select (multiples), page, speed, autoValidate,
+ * notationOrientation, notationProportion, facsimileOrientation, facsimileProportion
+ */
+export function generateUrl() {
+  const amp = '&';
+  let url = document.URL;
+  // remove some characters from end of href
+  while (['/', '#'].includes(url[url.length - 1])) url = url.slice(0, -1);
+  url += '/?';
+
+  // generate file parameter
+  if (fileLocationType === 'url') {
+    url += 'file=' + meiFileLocation;
+  } else if (fileLocationType === 'github') {
+    url += 'file=' + 'https://raw.githubusercontent.com/' + github.githubRepo + '/' + github.branch + github.filepath;
+  } 
+  // generate other parameters, if different from default value
+  let scale = v.vrvOptions.scale;
+  if (scale !== defaultVerovioOptions.scale) {
+    url += amp + 'scale=' + scale;
+  }
+  let breaks = document.getElementById('breaks-select').value;
+  if (breaks && breaks !== defaultVerovioOptions.breaks) {
+    url += amp + 'breaks=' + breaks;
+  }
+  if (v.selectedElements.length > 0) {
+    url += amp + 'select=' + v.selectedElements.join(',');
+  }
+  let page = v.currentPage;
+  if (page > 1) {
+    url += amp + 'page=' + page;
+  }
+  let speed = v.speedMode;
+  if (speed !== defaultSpeedMode) {
+    url += amp + 'speed=' + speed;
+  }
+
+  // TODO: document.getElementById('autoValidate').checked
+
+  let notationOrientation = getOrientation();
+  if (notationOrientation !== defaultNotationOrientation) {
+    url += amp + 'notationOrientation=' + notationOrientation;
+  }
+  let notationProportion = getNotationProportion();
+  if (notationProportion !== defaultNotationProportion) {
+    url += amp + 'notationProportion=' + notationProportion;
+  }
+
+  if (document.getElementById('showFacsimilePanel').checked) {
+    let facsimileOrientation = getFacsimileOrientation();
+    if (facsimileOrientation !== defaultFacsimileOrientation) {
+      url += amp + 'facsimileOrientation=' + facsimileOrientation;
+    }
+    let facsimileProportion = getFacsimileProportion();
+    if (facsimileProportion !== defaultFacsimileProportion) {
+      url += amp + 'facsimileProportion=' + facsimileProportion;
+    }
+  }
+
+  return url;
+} // generateUrl()
+
+/**
+ * URI actions around a call to generateUrl(): Show alert modal displaying generated URL,
+ * (attempt to) copy it to clipboard
+ */
+function generateUrlUI() { 
+  let msg = '';
+  const url = generateUrl();
+  if(fileLocationType === 'file') {
+    msg = 'Cannot generate URL for local file ' + meiFileName;
+    v.showAlert(msg, 'warning');
+    console.log(msg);
+    return '';
+  }
+
+  // show as alert
+  let html = '<a href="' + url + '" target="_blank">' + url + '</a>';
+  html = html.replace(/&/g, '&amp;');
+  v.showAlert(msg + html, 'info', -1);
+
+  // and copy url text to clipboard
+  navigator.clipboard.writeText(url).then(
+    function () {
+      let m = 'URL successfully copied to clipboard';
+      v.updateAlert('<b>' + m + '!</b>');
+      console.log(m + ': ' + url);
+    },
+    function (err) {
+      console.error('Could not copy URL to clipboard.', err);
+      v.updateAlert('<b>URL not copied to clipboard, please try again!</b>');
+    }
+  );
+} // generateUrlUI()
