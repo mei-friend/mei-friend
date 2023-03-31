@@ -23,12 +23,13 @@ import { startMidiTimeout } from './midi-player.js';
 import { getNotationProportion, setNotationProportion, setOrientation } from './resizer.js';
 import {
   commonSchemas,
+  codeMirrorSettingsOptions,
   defaultNotationProportion,
   defaultSpeedMode,
   defaultViewerTimeoutDelay,
   fontList,
-  meiFriendSettingsOptions,
   isSafari,
+  meiFriendSettingsOptions,
   platform,
   supportedVerovioVersions,
 } from './defaults.js';
@@ -1366,143 +1367,7 @@ export default class Viewer {
   } // addMeiFriendOptionsToSettingsPanel()
 
   addCmOptionsToSettingsPanel(mfDefaults, restoreFromLocalStorage = true) {
-    let codeMirrorSettingsOptions = {
-      // key as in CodeMirror
-      titleAppearance: {
-        title: 'Editor appearance',
-        description: 'Controls the appearance of the editor',
-        type: 'header',
-        open: true,
-        default: true,
-      },
-      zoomFont: {
-        title: 'Font size (%)',
-        description: 'Change font size of editor (in percent)',
-        type: 'int',
-        default: 100,
-        min: 45,
-        max: 300,
-        step: 5,
-      },
-      theme: {
-        title: 'Theme',
-        description: 'Select the theme of the editor',
-        type: 'select',
-        default: 'default',
-        values: [
-          'default',
-          'abbott',
-          'base16-dark',
-          'base16-light',
-          'cobalt',
-          'darcula',
-          'dracula',
-          'eclipse',
-          'elegant',
-          'monokai',
-          'idea',
-          'juejin',
-          'mdn-like',
-          'neo',
-          'paraiso-dark',
-          'paraiso-light',
-          'pastel-on-dark',
-          'solarized dark',
-          'solarized light',
-          'xq-dark',
-          'xq-light',
-          'yeti',
-          'yonce',
-          'zenburn',
-        ],
-      },
-      matchTheme: {
-        title: 'Notation matches theme',
-        description: 'Match notation to editor color theme',
-        type: 'bool',
-        default: false,
-      },
-      tabSize: {
-        title: 'Indentation size',
-        description: 'Number of space characters for each indentation level',
-        type: 'int',
-        min: 1,
-        max: 12,
-        step: 1,
-        default: 3,
-      },
-      lineWrapping: {
-        title: 'Line wrapping',
-        description: 'Whether or not lines are wrapped at end of panel',
-        type: 'bool',
-        default: false,
-      },
-      lineNumbers: {
-        title: 'Line numbers',
-        description: 'Show line numbers',
-        type: 'bool',
-        default: true,
-      },
-      firstLineNumber: {
-        title: 'First line number',
-        description: 'Set first line number',
-        type: 'int',
-        min: 0,
-        max: 1,
-        step: 1,
-        default: 1,
-      },
-      foldGutter: {
-        title: 'Code folding',
-        description: 'Enable code folding through fold gutters',
-        type: 'bool',
-        default: true,
-      },
-      titleEditorOptions: {
-        title: 'Editor behavior',
-        description: 'Controls the behavior of the editor',
-        type: 'header',
-        open: true,
-        default: true,
-      },
-      autoValidate: {
-        title: 'Auto validation',
-        description: 'Validate encoding against schema automatically after each edit',
-        type: 'bool',
-        default: true,
-      },
-      autoCloseBrackets: {
-        title: 'Auto close brackets',
-        description: 'Automatically close brackets at input',
-        type: 'bool',
-        default: true,
-      },
-      autoCloseTags: {
-        title: 'Auto close tags',
-        description: 'Automatically close tags at input',
-        type: 'bool',
-        default: true,
-      },
-      matchTags: {
-        title: 'Match tags',
-        description: 'Highlights matched tags around editor cursor',
-        type: 'bool',
-        default: true,
-      },
-      showTrailingSpace: {
-        title: 'Highlight trailing spaces',
-        description: 'Highlights unnecessary trailing spaces at end of lines',
-        type: 'bool',
-        default: true,
-      },
-      keyMap: {
-        title: 'Key map',
-        description: 'Select key map',
-        type: 'select',
-        default: 'default',
-        values: ['default', 'vim', 'emacs'],
-      },
-    };
+    // NOTE: codeMirrorSettingsOptions in defaults.js
     let storage = window.localStorage;
     let cmsp = document.getElementById('editorSettings');
     let addListeners = false; // add event listeners only the first time

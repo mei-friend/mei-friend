@@ -1,6 +1,6 @@
 // mei-friend version and date
 export const version = '0.8.8';
-export const versionDate = '30 Mar 2023';
+export const versionDate = '31 Mar 2023';
 
 var vrvWorker;
 var spdWorker;
@@ -89,36 +89,19 @@ import {
 } from './facsimile.js';
 import { WorkerProxy } from './worker-proxy.js';
 import { RNGLoader } from './rng-loader.js';
-import { defaultNotationOrientation, defaultSpeedMode, guidelinesBase, platform, isSafari } from './defaults.js';
+import {
+  defaultFacsimileOrientation,
+  defaultFacsimileProportion,
+  defaultMeiFileName,
+  defaultNotationOrientation,
+  defaultNotationProportion,
+  defaultSpeedMode,
+  defaultVerovioOptions,
+  guidelinesBase,
+  platform,
+  isSafari,
+} from './defaults.js';
 
-// const defaultMeiFileName = `${root}Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei`;
-const defaultMeiFileName = `${root}Beethoven_WoO70-Breitkopf.mei`;
-const defaultOrientation = 'bottom'; // default notation position in window
-const defaultNotationPorportion = 0.5; // default notation size relative to window
-const defaultFacsimileOrientation = 'left'; // default facsimile position in notation window
-const defaultFacsimilePorportion = 0.5; // default facsimile panel size relative to notation
-const defaultVerovioOptions = {
-  scale: 55,
-  breaks: 'line',
-  header: 'encoded',
-  footer: 'encoded',
-  inputFrom: 'mei',
-  adjustPageHeight: true,
-  mdivAll: true,
-  outputIndent: 3,
-  pageMarginLeft: 50,
-  pageMarginRight: 50,
-  pageMarginBottom: 15,
-  pageMarginTop: 50,
-  spacingLinear: 0.2,
-  spacingNonLinear: 0.5,
-  minLastJustification: 0,
-  transposeToSoundingPitch: true,
-  // clefChangeFactor: .83, // option removed in Verovio 3.10.0
-  svgAdditionalAttribute: ['layer@n', 'staff@n', 'dir@vgrp', 'dynam@vgrp', 'hairpin@vgrp', 'pedal@vgrp', 'measure@n'],
-  bottomMarginArtic: 1.2,
-  topMarginArtic: 1.2,
-};
 const defaultCodeMirrorOptions = {
   lineNumbers: true,
   lineWrapping: false,
@@ -161,6 +144,7 @@ const defaultCodeMirrorOptions = {
   defaultBrightTheme: 'default', // default theme for OS bright mode
   defaultDarkTheme: 'paraiso-dark', // 'base16-dark', // default theme for OS dark mode
 };
+
 // add all possible facsimile elements
 att.attFacsimile.forEach((e) => defaultVerovioOptions.svgAdditionalAttribute.push(e + '@facs'));
 const defaultKeyMap = `${root}keymaps/default-keymap.json`;
@@ -628,7 +612,7 @@ document.addEventListener('DOMContentLoaded', function () {
   } else if (storage && storage.supported && storage.hasItem('notationOrientation')) {
     o = storage.notationOrientation;
   } else {
-    o = defaultOrientation;
+    o = defaultNotationOrientation;
   }
   let fo = ''; // facsimile orientation from URLparam, storage or default (in this order)
   if (facsimileOrientationParam !== null) {
@@ -644,7 +628,7 @@ document.addEventListener('DOMContentLoaded', function () {
   } else if (storage && storage.supported && storage.hasItem('notationProportion')) {
     np = storage.notationProportion;
   } else {
-    np = defaultNotationPorportion;
+    np = defaultNotationProportion;
   }
   let fp = -1;
   if (facsimileProportionParam !== null) {
@@ -652,7 +636,7 @@ document.addEventListener('DOMContentLoaded', function () {
   } else if (storage && storage.supported && storage.hasItem('facsimileProportion')) {
     fp = storage.facsimileProportion;
   } else {
-    fp = defaultFacsimilePorportion;
+    fp = defaultFacsimileProportion;
   }
   setNotationProportion(np);
   setFacsimileProportion(fp);
@@ -2111,7 +2095,7 @@ function generateUrl() {
     url += amp + 'notationOrientation=' + notationOrientation;
   }
   let notationProportion = getNotationProportion();
-  if (notationProportion !== defaultNotationPorportion) {
+  if (notationProportion !== defaultNotationProportion) {
     url += amp + 'notationProportion=' + notationProportion;
   }
   let facsimileOrientation = getFacsimileOrientation();
@@ -2119,7 +2103,7 @@ function generateUrl() {
     url += amp + 'facsimileOrientation=' + facsimileOrientation;
   }
   let facsimileProportion = getFacsimileProportion();
-  if (facsimileProportion !== defaultFacsimilePorportion) {
+  if (facsimileProportion !== defaultFacsimileProportion) {
     url += amp + 'facsimileProportion=' + facsimileProportion;
   }
 

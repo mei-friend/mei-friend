@@ -592,8 +592,8 @@ export function shiftPitch(v, cm, deltaPitch = 0) {
 
 /**
  * In/decrease duration of selected element (ignore, when no duration)
- * @param {Viewer} v 
- * @param {CodeMirror} cm 
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
  * @param {string} what ('increase', 'decrease')
  */
 export function modifyDuration(v, cm, what = 'increase') {

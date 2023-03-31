@@ -1,4 +1,5 @@
 import {
+  annotationPanelExtent,
   defaultNotationResizerWidth,
   defaultFacsimileOrientation,
   defaultNotationOrientation,
@@ -15,8 +16,6 @@ let notationResizerWidth = defaultNotationResizerWidth; // 8 px, Attention: hard
 let facsimileOrientation = defaultFacsimileOrientation; // notationOrientation of facsimile relative to notation
 let facsimileProportion = defaultFacsimileProportion;
 let facsimileResizerWidth = defaultFacsimileResizerWidth; // px, compare to css facsimile-[left/right/top/bottom].css
-// annotation panel size
-let annotationPanelExtent = 250; // px, taken away from width of friendContainer
 // general settings
 let minProportion = 0.05; // mimimum proportion of both notationProportion, facsimileProportion
 let maxProportion = 0.95;

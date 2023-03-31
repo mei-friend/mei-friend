@@ -1,10 +1,11 @@
-import * as att from './attribute-classes.js';
-
 /**
  * Default values for mei-friend
  */
+
+import * as att from './attribute-classes.js';
+
 // export let platform = navigator.platform.toLowerCase(); // TODO
-export let platform = (navigator?.userAgentData?.platform || navigator?.platform || 'unknown').toLowerCase();
+export const platform = (navigator?.userAgentData?.platform || navigator?.platform || 'unknown').toLowerCase();
 export const isSafari = !!navigator.userAgent.match(/Version\/[\d\.]+.*Safari/);
 
 // guidelines base URL, needed to construct element / attribute URLs
@@ -135,6 +136,32 @@ supportedVerovioVersions['3.7.0*'] = {
 };
 
 export const fontList = ['Leipzig', 'Bravura', 'Gootville', 'Leland', 'Petaluma'];
+
+// const defaultMeiFileName = `${root}Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei`;
+export const defaultMeiFileName = `${root}Beethoven_WoO70-Breitkopf.mei`;
+
+export const defaultVerovioOptions = {
+  scale: 55,
+  breaks: 'line',
+  header: 'encoded',
+  footer: 'encoded',
+  inputFrom: 'mei',
+  adjustPageHeight: true,
+  mdivAll: true,
+  outputIndent: 3,
+  pageMarginLeft: 50,
+  pageMarginRight: 50,
+  pageMarginBottom: 15,
+  pageMarginTop: 50,
+  spacingLinear: 0.2,
+  spacingNonLinear: 0.5,
+  minLastJustification: 0,
+  transposeToSoundingPitch: true,
+  // clefChangeFactor: .83, // option removed in Verovio 3.10.0
+  svgAdditionalAttribute: ['layer@n', 'staff@n', 'dir@vgrp', 'dynam@vgrp', 'hairpin@vgrp', 'pedal@vgrp', 'measure@n'],
+  bottomMarginArtic: 1.2,
+  topMarginArtic: 1.2,
+};
 
 // Viewer
 export const defaultSpeedMode = true;
@@ -570,6 +597,148 @@ export const meiFriendSettingsOptions = {
   // },
 };
 
+export const codeMirrorSettingsOptions = {
+  // key as in CodeMirror
+  titleAppearance: {
+    title: 'Editor appearance',
+    description: 'Controls the appearance of the editor',
+    type: 'header',
+    open: true,
+    default: true,
+  },
+  zoomFont: {
+    title: 'Font size (%)',
+    description: 'Change font size of editor (in percent)',
+    type: 'int',
+    default: 100,
+    min: 45,
+    max: 300,
+    step: 5,
+  },
+  theme: {
+    title: 'Theme',
+    description: 'Select the theme of the editor',
+    type: 'select',
+    default: 'default',
+    values: [
+      'default',
+      'abbott',
+      'base16-dark',
+      'base16-light',
+      'cobalt',
+      'darcula',
+      'dracula',
+      'eclipse',
+      'elegant',
+      'monokai',
+      'idea',
+      'juejin',
+      'mdn-like',
+      'neo',
+      'paraiso-dark',
+      'paraiso-light',
+      'pastel-on-dark',
+      'solarized dark',
+      'solarized light',
+      'xq-dark',
+      'xq-light',
+      'yeti',
+      'yonce',
+      'zenburn',
+    ],
+  },
+  matchTheme: {
+    title: 'Notation matches theme',
+    description: 'Match notation to editor color theme',
+    type: 'bool',
+    default: false,
+  },
+  tabSize: {
+    title: 'Indentation size',
+    description: 'Number of space characters for each indentation level',
+    type: 'int',
+    min: 1,
+    max: 12,
+    step: 1,
+    default: 3,
+  },
+  lineWrapping: {
+    title: 'Line wrapping',
+    description: 'Whether or not lines are wrapped at end of panel',
+    type: 'bool',
+    default: false,
+  },
+  lineNumbers: {
+    title: 'Line numbers',
+    description: 'Show line numbers',
+    type: 'bool',
+    default: true,
+  },
+  firstLineNumber: {
+    title: 'First line number',
+    description: 'Set first line number',
+    type: 'int',
+    min: 0,
+    max: 1,
+    step: 1,
+    default: 1,
+  },
+  foldGutter: {
+    title: 'Code folding',
+    description: 'Enable code folding through fold gutters',
+    type: 'bool',
+    default: true,
+  },
+  titleEditorOptions: {
+    title: 'Editor behavior',
+    description: 'Controls the behavior of the editor',
+    type: 'header',
+    open: true,
+    default: true,
+  },
+  autoValidate: {
+    title: 'Auto validation',
+    description: 'Validate encoding against schema automatically after each edit',
+    type: 'bool',
+    default: true,
+  },
+  autoCloseBrackets: {
+    title: 'Auto close brackets',
+    description: 'Automatically close brackets at input',
+    type: 'bool',
+    default: true,
+  },
+  autoCloseTags: {
+    title: 'Auto close tags',
+    description: 'Automatically close tags at input',
+    type: 'bool',
+    default: true,
+  },
+  matchTags: {
+    title: 'Match tags',
+    description: 'Highlights matched tags around editor cursor',
+    type: 'bool',
+    default: true,
+  },
+  showTrailingSpace: {
+    title: 'Highlight trailing spaces',
+    description: 'Highlights unnecessary trailing spaces at end of lines',
+    type: 'bool',
+    default: true,
+  },
+  keyMap: {
+    title: 'Key map',
+    description: 'Select key map',
+    type: 'select',
+    default: 'default',
+    values: ['default', 'vim', 'emacs'],
+  },
+};
+
+// for facsimile
+export const defaultFacsimileRectangleLineWidth = 6; // px facsimile zone bounding box line width
+export const defaultFacsimileRectangleColor = 'darkred'; // facsimile zone bounding box color
+
 // for resizer
 export const defaultNotationResizerWidth = 8; // pixel
 export const defaultNotationOrientation = 'bottom';
@@ -577,3 +746,4 @@ export const defaultNotationProportion = 0.5;
 export const defaultFacsimileResizerWidth = 8; // px, compare to css facsimile-[left/right/top/bottom].css
 export const defaultFacsimileOrientation = 'bottom'; // notationOrientation of facsimile relative to notation
 export const defaultFacsimileProportion = 0.65;
+export const annotationPanelExtent = 250; // px, width/height of annotation panel, taken away from width of friendContainer

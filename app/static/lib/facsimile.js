@@ -4,20 +4,21 @@
  * through zone and surface elements.
  */
 
-var facs = {}; // facsimile structure in MEI file
-var sourceImages = {}; // object of source images
-const rectangleLineWidth = 6; // width of bounding box rectangles in px
-const rectangleColor = 'darkred'; // color of zone rectangles
-var listenerHandles = {};
-var resize = ''; // west, east, north, south, northwest, southeast etc
-var ulx, uly;
-
 import { rmHash, setCursorToId } from './utils.js';
 import { svgNameSpace, xmlToString } from './dom-utils.js';
 import { transformCTM, updateRect } from './drag-selector.js';
 import { cm, fileLocationType, github, isCtrlOrCmd, meiFileLocation, v } from './main.js';
 import { addZone, replaceInEditor } from './editor.js';
 import { attFacsimile } from './attribute-classes.js';
+import { defaultFacsimileRectangleColor, defaultFacsimileRectangleLineWidth } from './defaults.js';
+
+var facs = {}; // facsimile structure in MEI file
+var sourceImages = {}; // object of source images
+const rectangleLineWidth = defaultFacsimileRectangleLineWidth; // width of bounding box rectangles in px
+const rectangleColor = defaultFacsimileRectangleColor; // color of zone rectangles
+var listenerHandles = {};
+var resize = ''; // west, east, north, south, northwest, southeast etc
+var ulx, uly;
 
 /**
  * Show warning text to facsimile panel (as svg text element) and
