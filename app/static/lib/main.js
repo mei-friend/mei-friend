@@ -521,6 +521,7 @@ document.addEventListener('DOMContentLoaded', function () {
   let notationProportionParam = searchParams.get('notationProportion');
   let facsimileOrientationParam = searchParams.get('facsimileOrientation');
   let facsimileProportionParam = searchParams.get('facsimileProportion');
+  let verovioSeedParam = searchParams.get('seed'); //sets random seed to generate predictable XML:IDs
   pageParam = searchParams.get('page');
   let scaleParam = searchParams.get('scale');
   // select parameter: both syntax versions allowed (also mixed):
@@ -553,6 +554,10 @@ document.addEventListener('DOMContentLoaded', function () {
   v.vrvOptions = {
     ...defaultVerovioOptions,
   };
+
+  if(verovioSeedParam) {
+    v.vrvOptions[XmlIdSeed] = verovioSeedParam;
+  }
 
   if (isSafari) {
     v.showAlert(

@@ -477,7 +477,11 @@ export async function fillInBranchContents(e) {
     reportIssue.id = "reportIssueWithEncoding";
     reportIssue.value = "Report issue with encoding";
     reportIssue.addEventListener("click", () => {
-      const openInMeiFriendUrl = `[Click to open in mei-friend](https://mei-friend.mdw.ac.at/?file=https://raw.githubusercontent.com/${github.githubRepo}/${github.branch}${github.filepath}`;
+      // convey selection into URL - if there is none, use first note on page
+      const selectedEls = v.selectedElements || document.querySelector('.note');
+      const selection = selectedEls.map(e => e.id).join();
+
+      const openInMeiFriendUrl = `[Click to TEST open in mei-friend](https://mei-friend.mdw.ac.at/?file=https://raw.githubusercontent.com/${github.githubRepo}/${github.branch}${github.filepath}%26select=${selection}%26seed=${v.vrvOptions['XmlIdSeed']}}`;
       window.open(
         `https://github.com/${github.githubRepo}/issues/new?title=Issue+with+${meiFileName}&body=${encodeURI(openInMeiFriendUrl)})`,
         "_blank"
