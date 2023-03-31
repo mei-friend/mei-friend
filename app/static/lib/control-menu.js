@@ -1,5 +1,5 @@
 import * as icon from './../css/icons.js';
-import { fontList, platform } from './main.js';
+import { fontList,platform } from './defaults.js';
 import { svgNameSpace } from './dom-utils.js';
 import { createPageRangeSelector } from './page-range-selector.js';
 

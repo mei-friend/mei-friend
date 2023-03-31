@@ -1,6 +1,7 @@
 import * as att from './attribute-classes.js';
 import { getX, getY, svgNameSpace } from './dom-utils.js';
-import { cm, platform } from './main.js';
+import { platform } from './defaults.js';
+import { cm } from './main.js';
 import { startMidiTimeout } from './midi-player.js';
 import { setCursorToId } from './utils.js';
 import Viewer from './viewer.js';

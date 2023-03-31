@@ -10,7 +10,7 @@ import * as utils from './utils.js';
 import * as dutils from './dom-utils.js';
 import * as att from './attribute-classes.js';
 import { meiNameSpace, xmlNameSpace } from './dom-utils.js';
-import { commonSchemas, defaultMeiProfile, defaultMeiVersion } from './main.js';
+import { commonSchemas, defaultMeiProfile, defaultMeiVersion } from './defaults.js';
 
 /** @typedef {('sb' | 'pb')[] | {[pageNum: string]: string[]}} Breaks */
 /** @typedef {{

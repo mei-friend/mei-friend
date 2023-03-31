@@ -9,59 +9,6 @@ var mei;
 var breaksParam; // (string) the breaks parameter given through URL
 var pageParam; // (int) page parameter given through URL
 var selectParam; // (array) select ids given through multiple instances in URL
-// export let platform = navigator.platform.toLowerCase(); // TODO
-export let platform = (navigator?.userAgentData?.platform || navigator?.platform || 'unknown').toLowerCase();
-export const isSafari = !!navigator.userAgent.match(/Version\/[\d\.]+.*Safari/);
-
-// guidelines base URL, needed to construct element / attribute URLs
-// TODO ideally determine version part automatically
-const guidelinesBase = 'https://music-encoding.org/guidelines/v4/';
-
-/**
- * Object of common MEI schemas,
- * by meiProfile ('CMN', 'Mensural', 'Neumes', 'All', 'Any')
- * and meiVersion ('4.0.1', etc.)
- */
-export const commonSchemas = {
-  CMN: {
-    '2.1.1': 'https://music-encoding.org/schema/2.1.1/mei-CMN.rng',
-    '3.0.0': 'https://music-encoding.org/schema/3.0.0/mei-CMN.rng',
-    '4.0.0': 'https://music-encoding.org/schema/4.0.0/mei-CMN.rng',
-    '4.0.1': 'https://music-encoding.org/schema/4.0.1/mei-CMN.rng',
-    '5.0.0-dev': 'https://music-encoding.org/schema/dev/mei-CMN.rng',
-  },
-  Mensural: {
-    '2.1.1': 'https://music-encoding.org/schema/2.1.1/mei-Mensural.rng',
-    '3.0.0': 'https://music-encoding.org/schema/3.0.0/mei-Mensural.rng',
-    '4.0.0': 'https://music-encoding.org/schema/4.0.0/mei-Mensural.rng',
-    '4.0.1': 'https://music-encoding.org/schema/4.0.1/mei-Mensural.rng',
-    '5.0.0-dev': 'https://music-encoding.org/schema/dev/mei-Mensural.rng',
-  },
-  Neumes: {
-    '2.1.1': 'https://music-encoding.org/schema/2.1.1/mei-Neumes.rng',
-    '3.0.0': 'https://music-encoding.org/schema/3.0.0/mei-Neumes.rng',
-    '4.0.0': 'https://music-encoding.org/schema/4.0.0/mei-Neumes.rng',
-    '4.0.1': 'https://music-encoding.org/schema/4.0.1/mei-Neumes.rng',
-    '5.0.0-dev': 'https://music-encoding.org/schema/dev/mei-Neumes.rng',
-  },
-  All: {
-    '2.1.1': 'https://music-encoding.org/schema/2.1.1/mei-all.rng',
-    '3.0.0': 'https://music-encoding.org/schema/3.0.0/mei-all.rng',
-    '4.0.0': 'https://music-encoding.org/schema/4.0.0/mei-all.rng',
-    '4.0.1': 'https://music-encoding.org/schema/4.0.1/mei-all.rng',
-    '5.0.0-dev': 'https://music-encoding.org/schema/dev/mei-all.rng',
-  },
-  Any: {
-    '2.1.1': 'https://music-encoding.org/schema/2.1.1/mei-all_anyStart.rng',
-    '3.0.0': 'https://music-encoding.org/schema/3.0.0/mei-all_anyStart.rng',
-    '4.0.0': 'https://music-encoding.org/schema/4.0.0/mei-all_anyStart.rng',
-    '4.0.1': 'https://music-encoding.org/schema/4.0.1/mei-all_anyStart.rng',
-    '5.0.0-dev': 'https://music-encoding.org/schema/dev/mei-all_anyStart.rng',
-  },
-};
-export const defaultMeiVersion = '4.0.1';
-export const defaultMeiProfile = 'CMN';
-export const defaultSchema = commonSchemas[defaultMeiProfile][defaultMeiVersion];
 
 // exports
 export var cm;
@@ -78,76 +25,6 @@ export let meiFileLocationPrintable = '';
 export let fileLocationType = ''; // file, github, url
 export let isMEI; // is the currently edited file native MEI?
 export let fileChanged = false; // flag to track whether unsaved changes to file exist
-export const defaultVerovioVersion = 'latest'; // 'develop', '3.10.0'
-export let supportedVerovioVersions = {
-  develop: {
-    url: 'https://www.verovio.org/javascript/develop/verovio-toolkit-wasm.js',
-    description: 'Current Verovio develop version',
-  },
-  latest: {
-    url: 'https://www.verovio.org/javascript/latest/verovio-toolkit-hum.js',
-    description: 'Current Verovio release',
-  },
-  '3.15.0': {
-    url: 'https://www.verovio.org/javascript/3.15.0/verovio-toolkit-hum.js',
-    description: 'Verovio release 3.15.0',
-    releaseDate: '1 Mar 2023',
-  },
-  '3.14.0': {
-    url: 'https://www.verovio.org/javascript/3.14.0/verovio-toolkit-hum.js',
-    description: 'Verovio release 3.14.0',
-    releaseDate: '23 Dec 2022',
-  },
-  '3.13.1': {
-    url: 'https://www.verovio.org/javascript/3.13.1/verovio-toolkit-hum.js',
-    description: 'Verovio release 3.13.1',
-    releaseDate: '28 Nov 2022',
-  },
-  '3.13.0': {
-    url: 'https://www.verovio.org/javascript/3.13.0/verovio-toolkit-hum.js',
-    description: 'Verovio release 3.13.0',
-    releaseDate: '23 Nov 2022',
-  },
-  '3.12.1': {
-    url: 'https://www.verovio.org/javascript/3.12.1/verovio-toolkit-hum.js',
-    description: 'Verovio release 3.12.1',
-    releaseDate: '6 Oct 2022',
-  },
-  '3.12.0': {
-    url: 'https://www.verovio.org/javascript/3.12.0/verovio-toolkit-hum.js',
-    description: 'Verovio release 3.12.0',
-    releaseDate: '29 Sept 2022',
-  },
-  '3.11.0': {
-    url: 'https://www.verovio.org/javascript/3.11.0/verovio-toolkit-hum.js',
-    description: 'Verovio release 3.11.0',
-    releaseDate: '15 Jul 2022',
-  },
-  '3.10.0*': {
-    url: 'https://www.verovio.org/javascript/3.10.0/verovio-toolkit-hum.js',
-    description:
-      'Verovio release 3.10.0. *ATTENTION: Switching to this version might require a refresh due to memory issues.',
-    releaseDate: '25 May 2022',
-  },
-  '3.9.0*': {
-    url: 'https://www.verovio.org/javascript/3.9.0/verovio-toolkit-hum.js',
-    description:
-      'Verovio release 3.9.0. *ATTENTION: Switching to this version might require a refresh due to memory issues.',
-    releaseDate: '22 Feb 2022',
-  },
-  '3.8.1*': {
-    url: 'https://www.verovio.org/javascript/3.8.1/verovio-toolkit-hum.js',
-    description:
-      'Verovio release 3.8.1. *ATTENTION: Switching to this version might require a refresh due to memory issues.',
-    releaseDate: '10 Jan 2022',
-  },
-  '3.7.0*': {
-    url: 'https://www.verovio.org/javascript/3.7.0/verovio-toolkit-hum.js',
-    description:
-      'Verovio release 3.7.0. *ATTENTION: Switching to this version might require a refresh due to memory issues.',
-    releaseDate: '22 Nov 2021',
-  },
-};
 
 export const sampleEncodings = [];
 export const samp = {
@@ -158,7 +35,6 @@ export const samp = {
   TITLE: 4,
   COMPOSER: 5,
 };
-export const fontList = ['Leipzig', 'Bravura', 'Gootville', 'Leland', 'Petaluma'];
 
 import {
   addFacsimilerResizerHandlers,
@@ -213,7 +89,7 @@ import {
 } from './facsimile.js';
 import { WorkerProxy } from './worker-proxy.js';
 import { RNGLoader } from './rng-loader.js';
-import { defaultNotationOrientation, defaultSpeedMode } from './defaults.js';
+import { defaultNotationOrientation, defaultSpeedMode, guidelinesBase, platform, isSafari } from './defaults.js';
 
 // const defaultMeiFileName = `${root}Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei`;
 const defaultMeiFileName = `${root}Beethoven_WoO70-Breitkopf.mei`;
@@ -496,13 +372,6 @@ document.addEventListener('DOMContentLoaded', function () {
   switch (env) {
     case 'develop':
       changeLogUrl = 'https://github.com/mei-friend/mei-friend/blob/develop/CHANGELOG.md';
-      supportedVerovioVersions = {
-        local: {
-          url: `${root}local/verovio-toolkit-hum.js`,
-          description: 'Locally compiled Verovio toolkit version for debugging',
-        },
-        ...supportedVerovioVersions,
-      };
       break;
     case 'staging':
       changeLogUrl = 'https://github.com/mei-friend/mei-friend/blob/staging/CHANGELOG.md';
@@ -1817,7 +1686,7 @@ function addEventListeners(v, cm) {
   // font selector
   document.getElementById('font-select').addEventListener('change', () => {
     document.getElementById('vrv-font').value = document.getElementById('font-select').value;
-    v.updateOption();
+    v.updateLayout();
   });
   // breaks selector
   document.getElementById('breaks-select').addEventListener('change', (ev) => {
@@ -2236,6 +2105,7 @@ function generateUrl() {
   if (speed !== defaultSpeedMode) {
     url += amp + 'speed=' + speed;
   }
+  // document.getElementById('autoValidate').checked
   let notationOrientation = getOrientation();
   if (notationOrientation !== defaultNotationOrientation) {
     url += amp + 'notationOrientation=' + notationOrientation;
