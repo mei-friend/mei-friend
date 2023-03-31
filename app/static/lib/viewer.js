@@ -444,7 +444,7 @@ export default class Viewer {
     }
     utils.setCursorToId(cm, id);
     // console.info('setCrsrToPgBeg(): lastNoteId: ' + this.lastNoteId + ', new id: ' + id);
-    this.selectedElements.push(id);
+    if (!this.selectedElements.includes(id)) this.selectedElements.push(id);
     this.lastNoteId = id;
     return id;
   } // setCursorToPageBeginning()
@@ -519,7 +519,7 @@ export default class Viewer {
       // console.log('cursorActivity forceFlip: ' + forceFlip + ' to: ' + id);
       this.selectedElements = [];
       if (id) {
-        this.selectedElements.push(id);
+        if (!this.selectedElements.includes(id)) this.selectedElements.push(id);
         let fl = document.getElementById('flip-checkbox');
         if (
           !document.querySelector('g#' + utils.escapeXmlId(id)) && // when not on current page
@@ -1864,7 +1864,7 @@ export default class Viewer {
     // this.allowCursorActivityToTextposition(txtEdr); TODO
     if (id) {
       this.selectedElements = [];
-      this.selectedElements.push(id);
+      if (!this.selectedElements.includes(id)) this.selectedElements.push(id);
       this.lastNoteId = id;
       if (document.getElementById('showMidiPlaybackControlBar').checked) {
         startMidiTimeout();
