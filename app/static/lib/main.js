@@ -1000,8 +1000,6 @@ async function vrvWorkerEventsHandler(ev) {
       } else {
         v.busy(false);
       }
-      // TODO JUST FOR DEBUGGING
-      generateUrl();
       break;
     case 'navigatePage': // resolve navigation with page turning
       updateStatusBar();
@@ -1407,6 +1405,7 @@ export let cmd = {
   pageModeOn: () => v.pageModeOn(),
   pageModeOff: () => v.pageModeOff(),
   saveAsPdf: () => v.saveAsPdf(),
+  generateUrl: () => generateUrl(),
   filterSettings: () => v.applySettingsFilter(),
   filterReset: () => {
     document.getElementById('filterSettings').value = '';
@@ -1705,6 +1704,7 @@ function addEventListeners(v, cm) {
   document.getElementById('SaveSvg').addEventListener('click', downloadSvg);
   document.getElementById('SaveMidi').addEventListener('click', () => requestMidiFromVrvWorker());
   document.getElementById('PrintPreview').addEventListener('click', cmd.pageModeOn);
+  document.getElementById('GenerateURL').addEventListener('click', cmd.generateUrl);
 
   // edit dialogs
   document.getElementById('undo').addEventListener('click', cmd.undo);
@@ -2202,6 +2202,8 @@ function generateUrl() {
   while (['/', '#'].includes(url[url.length - 1])) url = url.slice(0, -1);
   msg += 'FileLocationType: ' + fileLocationType + '<br/>';
   url += '/?';
+
+  // generate file parameter
   if (fileLocationType === 'url') {
     url += 'file=' + meiFileLocation;
   } else if (fileLocationType === 'github') {
@@ -2212,6 +2214,8 @@ function generateUrl() {
     console.log(msg);
     return '';
   }
+
+  // generate other parameters, if different from default value
   let scale = v.vrvOptions.scale;
   if (scale !== defaultVerovioOptions.scale) {
     url += amp + 'scale=' + scale;
@@ -2243,6 +2247,8 @@ function generateUrl() {
   if (facsimileProportion !== defaultFacsimilePorportion) {
     url += amp + 'facsimileProportion=' + facsimileProportion;
   }
-  //
-  v.showAlert(msg + url, 'info', -1);
+
+  // show as alert (TODO: store in clipboard)
+  url = '<a href="' + url + '" target="_blank">' + url + '</a>';
+  v.showAlert(url, 'info', -1);
 } // generateUrl()
