@@ -2,6 +2,7 @@
 ### 0.8.8 patch
 * Control display of zone bounding boxes through checkbox
 * Menu item to generate mei-friend URL with all search parameters deviating from default values
+* Use same generate URL feature to build a full backlink with params for 'Report issue with encoding'
 * Code refactoring with separate defaults.js file
 ### 0.8.7 transposition
 * Add transposition settings panel to the mei-friend settings to specify transposition by key, by interval, and pitch direction.
