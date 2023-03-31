@@ -2098,13 +2098,15 @@ function generateUrl() {
   if (notationProportion !== defaultNotationProportion) {
     url += amp + 'notationProportion=' + notationProportion;
   }
-  let facsimileOrientation = getFacsimileOrientation();
-  if (facsimileOrientation !== defaultFacsimileOrientation) {
-    url += amp + 'facsimileOrientation=' + facsimileOrientation;
-  }
-  let facsimileProportion = getFacsimileProportion();
-  if (facsimileProportion !== defaultFacsimileProportion) {
-    url += amp + 'facsimileProportion=' + facsimileProportion;
+  if (document.getElementById('showFacsimilePanel').checked) {
+    let facsimileOrientation = getFacsimileOrientation();
+    if (facsimileOrientation !== defaultFacsimileOrientation) {
+      url += amp + 'facsimileOrientation=' + facsimileOrientation;
+    }
+    let facsimileProportion = getFacsimileProportion();
+    if (facsimileProportion !== defaultFacsimileProportion) {
+      url += amp + 'facsimileProportion=' + facsimileProportion;
+    }
   }
 
   // show as alert (TODO: store in clipboard)
