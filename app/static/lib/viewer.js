@@ -2048,13 +2048,13 @@ export default class Viewer {
     if (disappearAfter > 0) {
       this.alertCloser = setTimeout(() => (alertOverlay.style.display = 'none'), disappearAfter);
     }
-  }
+  } // showAlert()
 
   // Update alert message of #alertOverlay
   updateAlert(newMsg) {
     let alertOverlay = document.getElementById('alertOverlay');
-    alertOverlay.querySelector('span').innerHTML += '<br />' + newMsg;
-  }
+    alertOverlay.querySelector('span#alertMessage').innerHTML += '<br />' + newMsg;
+  } // updateAlert()
 
   // Hide all alert windows, such as alert overlay
   hideAlerts() {
@@ -2063,7 +2063,7 @@ export default class Viewer {
       if (this.alertCloser) clearTimeout(this.alertCloser);
       b.parentElement.style.display = 'none';
     }
-  }
+  } // hideAlerts()
 
   // Method to check from MEI whether the XML schema filename has changed
   async checkSchema(mei) {

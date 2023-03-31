@@ -2054,7 +2054,7 @@ function generateUrl() {
   let url = document.URL;
   // remove some characters from end of href
   while (['/', '#'].includes(url[url.length - 1])) url = url.slice(0, -1);
-  msg += 'FileLocationType: ' + fileLocationType + '<br/>';
+  // msg += 'FileLocationType: ' + fileLocationType + '<br/>';
   url += '/?';
 
   // generate file parameter
@@ -2089,7 +2089,9 @@ function generateUrl() {
   if (speed !== defaultSpeedMode) {
     url += amp + 'speed=' + speed;
   }
-  // document.getElementById('autoValidate').checked
+
+  // TODO: document.getElementById('autoValidate').checked
+
   let notationOrientation = getOrientation();
   if (notationOrientation !== defaultNotationOrientation) {
     url += amp + 'notationOrientation=' + notationOrientation;
@@ -2098,6 +2100,7 @@ function generateUrl() {
   if (notationProportion !== defaultNotationProportion) {
     url += amp + 'notationProportion=' + notationProportion;
   }
+
   if (document.getElementById('showFacsimilePanel').checked) {
     let facsimileOrientation = getFacsimileOrientation();
     if (facsimileOrientation !== defaultFacsimileOrientation) {
@@ -2111,5 +2114,17 @@ function generateUrl() {
 
   // show as alert (TODO: store in clipboard)
   url = '<a href="' + url + '" target="_blank">' + url + '</a>';
-  v.showAlert(url, 'info', -1);
+  v.showAlert(msg + url, 'info', -1);
+
+  navigator.clipboard.writeText(url).then(
+    function () {
+      let m = 'URL successfully copied to clipboard';
+      v.updateAlert('<b>' + m + '!</b>');
+      console.log(m + ': ' + url);
+    },
+    function (err) {
+      console.error('Could not copy URL to clipboard.', err);
+      v.updateAlert('<b>URL not copied to clipboard, please try again!</b>');
+    }
+  );
 } // generateUrl()
