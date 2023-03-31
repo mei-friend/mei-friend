@@ -2075,7 +2075,7 @@ function generateUrl() {
     url += amp + 'scale=' + scale;
   }
   let breaks = document.getElementById('breaks-select').value;
-  if (breaks !== defaultVerovioOptions.breaks) {
+  if (breaks && breaks !== defaultVerovioOptions.breaks) {
     url += amp + 'breaks=' + breaks;
   }
   if (v.selectedElements.length > 0) {
