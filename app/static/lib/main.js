@@ -2049,7 +2049,7 @@ function midiDataToBlob(data) {
  * notationOrientation, notationProportion, facsimileOrientation, facsimileProportion
  */
 function generateUrl() {
-  const amp = '&amp;';
+  const amp = '&';
   let msg = '';
   let url = document.URL;
   // remove some characters from end of href
@@ -2114,6 +2114,7 @@ function generateUrl() {
 
   // show as alert
   let html = '<a href="' + url + '" target="_blank">' + url + '</a>';
+  html = html.replace(/&/g, '&amp;');
   v.showAlert(msg + html, 'info', -1);
 
   // and copy url text to clipboard
