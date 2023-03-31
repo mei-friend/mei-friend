@@ -2059,9 +2059,9 @@ function generateUrl() {
 
   // generate file parameter
   if (fileLocationType === 'url') {
-    url += 'file=' + meiFileLocation;
+    url += 'file=' + encodeURI(meiFileLocation);
   } else if (fileLocationType === 'github') {
-    url += 'file=https://raw.githubusercontent.com/' + github.githubRepo + '/' + github.branch + github.filepath;
+    url += 'file=' + encodeURI('https://raw.githubusercontent.com/' + github.githubRepo + '/' + github.branch + github.filepath);
   } else {
     msg = 'Cannot generate URL for local file ' + meiFileName;
     v.showAlert(msg, 'warning');
