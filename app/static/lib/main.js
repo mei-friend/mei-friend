@@ -668,7 +668,7 @@ export async function openUrlFetch(url = '', updateAfterLoading = true) {
     if (isLoggedIn && url.href.trim().startsWith('https://raw.githubusercontent.com')) {
       // GitHub URL - use GitHub credentials to enable URL fetch from private repos
       github.directlyReadFileContents(url.href).then((data) => {
-        openUrlProcess(data, url, updateAfterLoading);
+        openUrlProcess(atob(JSON.parse(data).content), url, updateAfterLoading);
       });
     } else {
       const response = await fetch(url, {
@@ -1258,7 +1258,7 @@ export let cmd = {
   pageModeOn: () => v.pageModeOn(),
   pageModeOff: () => v.pageModeOff(),
   saveAsPdf: () => v.saveAsPdf(),
-  generateUrl: () => generateUrl(),
+  generateUrl: () => generateUrlUI(),
   filterSettings: () => v.applySettingsFilter(),
   filterReset: () => {
     document.getElementById('filterSettings').value = '';
@@ -2044,31 +2044,23 @@ function midiDataToBlob(data) {
 } // midiDataToBlob()
 
 /**
- * Generates a long URL with all parameters
+ * Returns a long URL with all parameters
  * file, scale, breaks, select (multiples), page, speed, autoValidate,
  * notationOrientation, notationProportion, facsimileOrientation, facsimileProportion
  */
-function generateUrl() {
+export function generateUrl() {
   const amp = '&';
-  let msg = '';
   let url = document.URL;
   // remove some characters from end of href
   while (['/', '#'].includes(url[url.length - 1])) url = url.slice(0, -1);
-  // msg += 'FileLocationType: ' + fileLocationType + '<br/>';
   url += '/?';
 
   // generate file parameter
   if (fileLocationType === 'url') {
-    url += 'file=' + encodeURI(meiFileLocation);
+    url += 'file=' + meiFileLocation;
   } else if (fileLocationType === 'github') {
-    url += 'file=' + encodeURI('https://raw.githubusercontent.com/' + github.githubRepo + '/' + github.branch + github.filepath);
-  } else {
-    msg = 'Cannot generate URL for local file ' + meiFileName;
-    v.showAlert(msg, 'warning');
-    console.log(msg);
-    return '';
-  }
-
+    url += 'file=' + 'https://raw.githubusercontent.com/' + github.githubRepo + '/' + github.branch + github.filepath;
+  } 
   // generate other parameters, if different from default value
   let scale = v.vrvOptions.scale;
   if (scale !== defaultVerovioOptions.scale) {
@@ -2112,6 +2104,23 @@ function generateUrl() {
     }
   }
 
+  return url;
+} // generateUrl()
+
+/**
+ * URI actions around a call to generateUrl(): Show alert modal displaying generated URL,
+ * (attempt to) copy it to clipboard
+ */
+function generateUrlUI() { 
+  let msg = '';
+  const url = generateUrl();
+  if(fileLocationType === 'file') {
+    msg = 'Cannot generate URL for local file ' + meiFileName;
+    v.showAlert(msg, 'warning');
+    console.log(msg);
+    return '';
+  }
+
   // show as alert
   let html = '<a href="' + url + '" target="_blank">' + url + '</a>';
   html = html.replace(/&/g, '&amp;');
@@ -2129,4 +2138,4 @@ function generateUrl() {
       v.updateAlert('<b>URL not copied to clipboard, please try again!</b>');
     }
   );
-} // generateUrl()
+} // generateUrlUI()

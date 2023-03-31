@@ -5,6 +5,7 @@ import {
 import {
   cm,
   fileChanged,
+  generateUrl,
   github, // github instance
   handleEncoding,
   isMEI,
@@ -477,9 +478,10 @@ export async function fillInBranchContents(e) {
     reportIssue.id = "reportIssueWithEncoding";
     reportIssue.value = "Report issue with encoding";
     reportIssue.addEventListener("click", () => {
-      const openInMeiFriendUrl = `[Click to open in mei-friend](https://mei-friend.mdw.ac.at/?file=https://raw.githubusercontent.com/${github.githubRepo}/${github.branch}${github.filepath}`;
+      const openInMeiFriendUrl = `[Click to open in mei-friend](${encodeURIComponent(generateUrl())})`;
+      const fullOpenIssueUrl = `https://github.com/${github.githubRepo}/issues/new?title=Issue+with+${meiFileName}&body=${openInMeiFriendUrl}`;
       window.open(
-        `https://github.com/${github.githubRepo}/issues/new?title=Issue+with+${meiFileName}&body=${encodeURI(openInMeiFriendUrl)})`,
+        fullOpenIssueUrl,
         "_blank"
       ); 
     })
