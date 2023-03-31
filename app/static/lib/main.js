@@ -2112,10 +2112,11 @@ function generateUrl() {
     }
   }
 
-  // show as alert (TODO: store in clipboard)
-  url = '<a href="' + url + '" target="_blank">' + url + '</a>';
-  v.showAlert(msg + url, 'info', -1);
+  // show as alert
+  let html = '<a href="' + url + '" target="_blank">' + url + '</a>';
+  v.showAlert(msg + html, 'info', -1);
 
+  // and copy url text to clipboard
   navigator.clipboard.writeText(url).then(
     function () {
       let m = 'URL successfully copied to clipboard';
