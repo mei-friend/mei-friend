@@ -213,7 +213,7 @@ import {
 } from './facsimile.js';
 import { WorkerProxy } from './worker-proxy.js';
 import { RNGLoader } from './rng-loader.js';
-import { defaultNotationOrientation } from './defaults.js';
+import { defaultNotationOrientation, defaultSpeedMode } from './defaults.js';
 
 // const defaultMeiFileName = `${root}Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei`;
 const defaultMeiFileName = `${root}Beethoven_WoO70-Breitkopf.mei`;
@@ -2192,7 +2192,8 @@ function midiDataToBlob(data) {
 
 /**
  * Generates a long URL with all parameters
- * file, scale, breaks, select (multiples), page, speed, autoValidate, notationOrientation, notationProportion, facsimileOrientation, facsimileProportion
+ * file, scale, breaks, select (multiples), page, speed, autoValidate,
+ * notationOrientation, notationProportion, facsimileOrientation, facsimileProportion
  */
 function generateUrl() {
   const amp = '&amp;';
@@ -2230,6 +2231,10 @@ function generateUrl() {
   let page = v.currentPage;
   if (page > 1) {
     url += amp + 'page=' + page;
+  }
+  let speed = v.speedMode;
+  if (speed !== defaultSpeedMode) {
+    url += amp + 'speed=' + speed;
   }
   let notationOrientation = getOrientation();
   if (notationOrientation !== defaultNotationOrientation) {

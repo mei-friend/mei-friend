@@ -27,6 +27,7 @@ import {
 import { selectMarkup } from './markup.js';
 import { startMidiTimeout } from './midi-player.js';
 import { getNotationProportion, setNotationProportion, setOrientation } from './resizer.js';
+import { defaultSpeedMode } from './defaults.js';
 
 export default class Viewer {
   constructor(vrvWorker, spdWorker) {
@@ -44,7 +45,7 @@ export default class Viewer {
     this.notationNightMode = false;
     this.allowCursorActivity = true; // whether or not notation gets re-rendered after text changes
     this.allowNotationInteraction = true; // allow mouse drag-select and click on notation
-    this.speedMode = true; // speed mode (just feeds on page to Verovio to reduce drawing time)
+    this.speedMode = defaultSpeedMode; // speed mode (just feeds on page to Verovio to reduce drawing time)
     this.parser = new DOMParser();
     this.xmlDoc;
     this.xmlDocOutdated = true; // to limit recalculation of DOM or pageLists

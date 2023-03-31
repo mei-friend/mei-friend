@@ -2,6 +2,12 @@
  * Default values for mei-friend
  */
 
+// main
+
+
+// Viewer
+export const defaultSpeedMode = true;
+
 // for resizer
 export const defaultNotationResizerWidth = 8; // pixel
 export const defaultNotationOrientation = 'bottom';
