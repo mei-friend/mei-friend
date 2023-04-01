@@ -1,6 +1,7 @@
 import * as att from './attribute-classes.js';
 import { getX, getY, svgNameSpace } from './dom-utils.js';
-import { cm, platform } from './main.js';
+import { platform } from './defaults.js';
+import { cm } from './main.js';
 import { startMidiTimeout } from './midi-player.js';
 import { setCursorToId } from './utils.js';
 import Viewer from './viewer.js';
@@ -173,7 +174,7 @@ export function addDragSelector(v, vp) {
             });
         });
       }
-      
+
       // select latest element in editor
       v.allowCursorActivity = false;
       if (latest && Object.keys(latest).length > 0) {
@@ -254,12 +255,12 @@ export function transformCTM(point, matrix) {
  * @param {string} strokeDashArray
  */
 export function updateRect(rect, x, y, width, height, color = 'black', strokeWidth = '13', strokeDashArray = '50') {
-  rect.setAttribute('x', x);
-  rect.setAttribute('y', y);
-  rect.setAttribute('width', width);
-  rect.setAttribute('height', height);
-  rect.setAttribute('stroke-width', strokeWidth);
-  rect.setAttribute('stroke-dasharray', strokeDashArray);
-  rect.setAttribute('stroke', color);
+  if (x) rect.setAttribute('x', x);
+  if (y) rect.setAttribute('y', y);
+  if (width) rect.setAttribute('width', width);
+  if (height) rect.setAttribute('height', height);
+  if (strokeWidth) rect.setAttribute('stroke-width', strokeWidth);
+  if (strokeDashArray) rect.setAttribute('stroke-dasharray', strokeDashArray);
+  if (color) rect.setAttribute('stroke', color);
   rect.setAttribute('fill', 'none');
 } // updateRect()

@@ -6,9 +6,10 @@ import * as speed from './speed.js';
 import * as utils from './utils.js';
 import * as dutils from './dom-utils.js';
 import * as att from './attribute-classes.js';
+import { platform } from './defaults.js';
 import { loadFacsimile } from './facsimile.js';
 import Viewer from './viewer.js';
-import { handleEditorChanges, platform, version, versionDate } from './main.js';
+import { handleEditorChanges, version, versionDate } from './main.js';
 
 /**
  * Smart indents selected region in editor, if none, do all
@@ -208,7 +209,7 @@ export function addControlElement(v, cm, elName, placement, form) {
   // elements with both startid and endid
   if (['slur', 'tie', 'phrase', 'hairpin', 'gliss'].includes(elName)) {
     // stop, if selected elements are on the same beat position and through warning.
-    if (m === 0 && tstamp2 === tstamp) {
+    if (m === 0 && tstamp2 === tstamp && !startEl.hasAttribute('grace') && !endEl.hasAttribute('grace')) {
       let msg = 'Cannot insert ' + elName;
       msg += ', because ' + startId + ' and ' + endId + ' are on the same beat position ' + tstamp + '.';
       console.log(msg);
@@ -591,8 +592,8 @@ export function shiftPitch(v, cm, deltaPitch = 0) {
 
 /**
  * In/decrease duration of selected element (ignore, when no duration)
- * @param {Viewer} v 
- * @param {CodeMirror} cm 
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
  * @param {string} what ('increase', 'decrease')
  */
 export function modifyDuration(v, cm, what = 'increase') {

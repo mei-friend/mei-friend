@@ -1,7 +1,13 @@
 # mei-friend-online CHANGELOG.md
+### 0.8.8 patch
+* Control display of zone bounding boxes through checkbox
+* Menu item to generate mei-friend URL with all search parameters deviating from default values
+* Use same generate URL feature to build a full backlink with params for 'Report issue with encoding'
+* Code refactoring with separate defaults.js file
 ### 0.8.7 transposition
 * Add transposition settings panel to the mei-friend settings to specify transposition by key, by interval, and pitch direction.
-  
+* Enable ?file= param to open files from private repos (when logged in)
+* Add "Report issue with encoding" feature (creates issue with reciprocal mei-friend link)
 ### 0.8.6 patch
 * Insert control elements with time stamps (`@tstamp`/`tstamp2`) instead of ids (`startid`/`endid`) by using the  `ALT` (Mac: `CTRL`) modifier key with keyboard shortcut
 * Check time stamps when inserting control elements, handle selected elements on the same time stamp correctly (by omitting `@tstamp2`) or throw warning, if no fix is possible

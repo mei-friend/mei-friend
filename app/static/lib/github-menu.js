@@ -5,6 +5,7 @@ import {
 import {
   cm,
   fileChanged,
+  generateUrl,
   github, // github instance
   handleEncoding,
   isMEI,
@@ -470,6 +471,25 @@ export async function fillInBranchContents(e) {
     commitMessageInput.addEventListener("input", onMessageInput);
     commitFileName.removeEventListener("input", onFileNameEdit);
     commitFileName.addEventListener("input", onFileNameEdit);
+
+    // add "Report issue with encoding" link
+    const reportIssue = document.createElement("input");
+    reportIssue.setAttribute("type", "submit");
+    reportIssue.id = "reportIssueWithEncoding";
+    reportIssue.value = "Report issue with encoding";
+    reportIssue.addEventListener("click", () => {
+      const openInMeiFriendUrl = `[Click to open in mei-friend](${encodeURIComponent(generateUrl())})`;
+      const fullOpenIssueUrl = `https://github.com/${github.githubRepo}/issues/new?title=Issue+with+${meiFileName}&body=${openInMeiFriendUrl}`;
+      window.open(
+        fullOpenIssueUrl,
+        "_blank"
+      ); 
+    })
+    const reportIssueDivider = document.createElement("hr");
+    reportIssueDivider.classList.add("dropdown-line");
+    commitUI.appendChild(reportIssueDivider);
+    reportIssue.target = "_blank";
+    commitUI.appendChild(reportIssue);
   }
   fillInCommitLog("withRefresh");
   // GitHub menu interactions
