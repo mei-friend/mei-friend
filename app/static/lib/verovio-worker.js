@@ -137,15 +137,23 @@ addEventListener(
           log('updatePage: ' + err);
         }
         break;
-      case 'updateLayout':
+      // updateOption, updateLayout
+      case 'updateOption': // just update option without redoing layout
+      case 'updateLayout': // update option and layout
         try {
           tkOptions = result.options;
           let breaks = tkOptions.breaks;
-          if (result.speedMode && tkOptions.breaks != 'none') {
+          if (result.speedMode && tkOptions.breaks !== 'none') {
             tkOptions.breaks = 'encoded';
           }
           tk.setOptions(tkOptions);
-          tk.redoLayout();
+          if (result.toolkitDataOutdated) {
+            console.log('!!!Verovio Worker ' + result.cmd + ': re-loading MEI because toolkitDataOutdated!!!');
+            tk.loadData(result.mei);
+            result.toolkitDataOutdated = false;
+          }
+          result.mei = '';
+          if (result.cmd === 'updateLayout') tk.redoLayout();
           result.setCursorToPageBeginning = true;
           if (result.xmlId && !result.speedMode) {
             result.pageNo = Math.max(1, parseInt(tk.getPageWithElement(result.xmlId)));
@@ -165,37 +173,7 @@ addEventListener(
             tk.setOptions({ breaks: breaks }); // reset breaks options
           }
         } catch (err) {
-          log('updateLayout: ' + err);
-        }
-        break;
-      case 'updateOption': // just update option without redoing layout
-        try {
-          tkOptions = result.options;
-          let breaks = tkOptions.breaks;
-          if (result.speedMode && tkOptions.breaks != 'none') {
-            tkOptions.breaks = 'encoded';
-          }
-          tk.setOptions(tkOptions);
-          result.setCursorToPageBeginning = true;
-          if (result.xmlId && !result.speedMode) {
-            result.pageNo = Math.max(1, parseInt(tk.getPageWithElement(result.xmlId)));
-            result.forceUpdate = true;
-          }
-          if (!result.speedMode && result.pageNo > tk.getPageCount()) {
-            result.pageNo = Math.min(result.pageNo, tk.getPageCount());
-            result.forceUpdate = true;
-          }
-          result.pageNo = Math.min(Math.max(1, result.pageNo), tk.getPageCount());
-          let pg = result.speedMode && result.pageNo > 1 ? 2 : result.pageNo;
-          result.svg = tk.renderToSVG(pg);
-          result.pageCount = tk.getPageCount();
-          result.cmd = 'updated';
-          if (result.speedMode) {
-            tkOptions.breaks = breaks;
-            tk.setOptions({ breaks: breaks }); // reset breaks options
-          }
-        } catch (err) {
-          log('updateOption: ' + err);
+          log(result.cmd + ': ' + err);
         }
         break;
       case 'importData': // all non-MEI formats
@@ -328,8 +306,12 @@ addEventListener(
           tk.setOptions(tkOptions);
           // only load data if encoding has changed
           if (result.toolkitDataOutdated || result.speedMode) {
+            let bOpt = tkOptions.breaks;
             tk.setOptions({ breaks: 'none' }); // if reloading data, skip rendering layout
             tk.loadData(result.mei);
+            console.log('!!!Verovio Worker ' + result.cmd + ': setting breaks back to ' + bOpt + '!!!');
+            tk.setOptions({ breaks: bOpt }); // ... and re-set breaks option
+            result.toolkitDataOutdated = result.speedMode ? true : false;
           }
           result.midi = tk.renderToMIDI();
           if (result.requestTimemap) result.timemap = tk.renderToTimemap();

@@ -1,4 +1,6 @@
 # mei-friend-online CHANGELOG.md
+### 0.8.9 patch
+* Fix bug when notation zooming resulted in missing notation when MIDI manu bar is activated
 ### 0.8.8 patch
 * Control display of zone bounding boxes through checkbox
 * Menu item to generate mei-friend URL with all search parameters deviating from default values
