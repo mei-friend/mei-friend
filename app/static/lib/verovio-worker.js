@@ -148,6 +148,7 @@ addEventListener(
           }
           tk.setOptions(tkOptions);
           if (result.toolkitDataOutdated) {
+            console.log('!!!Verovio Worker ' + result.cmd + ': re-loading MEI because toolkitDataOutdated!!!');
             tk.loadData(result.mei);
             result.toolkitDataOutdated = false;
           }
@@ -305,10 +306,12 @@ addEventListener(
           tk.setOptions(tkOptions);
           // only load data if encoding has changed
           if (result.toolkitDataOutdated || result.speedMode) {
-            // tk.setOptions({ breaks: 'none' }); // if reloading data, skip rendering layout
+            let bOpt = tkOptions.breaks;
+            tk.setOptions({ breaks: 'none' }); // if reloading data, skip rendering layout
             tk.loadData(result.mei);
-            // tk.setOptions(tkOptions); // ... and re-set breaks option
-            result.toolkitDataOutdated = true;
+            console.log('!!!Verovio Worker ' + result.cmd + ': setting breaks back to ' + bOpt + '!!!');
+            tk.setOptions({ breaks: bOpt }); // ... and re-set breaks option
+            result.toolkitDataOutdated = result.speedMode ? true : false;
           }
           result.midi = tk.renderToMIDI();
           if (result.requestTimemap) result.timemap = tk.renderToTimemap();
