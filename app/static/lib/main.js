@@ -68,6 +68,7 @@ import {
   requestPlaybackOnLoad,
   seekMidiPlaybackToSelectionOrPage,
   seekMidiPlaybackToTime,
+  setExpansionMap,
   setTimemap,
   startMidiTimeout,
 } from './midi-player.js';
@@ -888,6 +889,9 @@ async function vrvWorkerEventsHandler(ev) {
     case 'midiPlayback': // play MIDI file
       console.log('Received MIDI and Timemap:', ev.data.midi, ev.data.timemap);
       setTimemap(ev.data.timemap);
+      if (ev.data.expansionMap) {
+        setExpansionMap(ev.data.expansionMap);
+      }
       if (mp) {
         blob = midiDataToBlob(ev.data.midi);
         core.blobToNoteSequence(blob).then((noteSequence) => {
@@ -1158,30 +1162,30 @@ function downloadSpeedMei() {
 
 export function requestMidiFromVrvWorker(requestTimemap = false) {
   let mei;
-  if (v.expansionId) {
-    let expansionEl = v.xmlDoc.querySelector('[*|id=' + v.expansionId + ']');
-    let existingList = [];
-    let expandedDoc = expansionMap.expand(expansionEl, existingList, v.xmlDoc.cloneNode(true));
-    mei = v.speedFilter(new XMLSerializer().serializeToString(expandedDoc), false, true);
-    if (v.speedMode) {
-      v.loadXml(cm.getValue(), true); // reload xmlDoc when in speed mode
-    } else {
-      v.toolkitDataOutdated = true; // force load data for MIDI playback
-    }
-  } else {
-    mei = v.speedFilter(cm.getValue(), false);
-  }
+  // if (v.expansionId) {
+  //   let expansionEl = v.xmlDoc.querySelector('[*|id=' + v.expansionId + ']');
+  //   let existingList = [];
+  //   let expandedDoc = expansionMap.expand(expansionEl, existingList, v.xmlDoc.cloneNode(true));
+  //   mei = v.speedFilter(new XMLSerializer().serializeToString(expandedDoc), false, true);
+  //   if (v.speedMode) {
+  //     v.loadXml(cm.getValue(), true); // reload xmlDoc when in speed mode
+  //   } else {
+  //     v.toolkitDataOutdated = true; // force load data for MIDI playback
+  //   }
+  // } else {
+  // }
+  mei = v.speedFilter(cm.getValue(), false);
   let message = {
     cmd: 'exportMidi',
     expand: v.expansionId,
     options: v.vrvOptions,
     mei: mei, // exclude dummy measures in speed mode
     requestTimemap: requestTimemap,
-    toolkitDataOutdated: v.toolkitDataOutdated,
     speedMode: v.speedMode,
+    toolkitDataOutdated: v.toolkitDataOutdated,
   };
   vrvWorker.postMessage(message);
-}
+} // requestMidiFromVrvWorker()
 
 function downloadSvg() {
   let svg = document.getElementById('verovio-panel').innerHTML;
@@ -1878,6 +1882,7 @@ function addEventListeners(v, cm) {
     if (document.getElementById('showMidiPlaybackControlBar').checked) {
       startMidiTimeout(true);
     }
+    console.log('Main EEEEExpansion selector set to: ' + v.expansionId);
   });
 } // addEventListeners()
 

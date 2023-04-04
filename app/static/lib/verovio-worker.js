@@ -305,16 +305,19 @@ addEventListener(
           tkOptions = result.options;
           tk.setOptions(tkOptions);
           // only load data if encoding has changed
-          if (result.toolkitDataOutdated || result.speedMode) {
+          if (result.toolkitDataOutdated || result.speedMode || result.expand) {
             let bOpt = tkOptions.breaks;
-            tk.setOptions({ breaks: 'none' }); // if reloading data, skip rendering layout
+            // console.log('!!! 1 Verovio Worker ' + result.cmd + ': breaks to none, expand to: "' + result.expand + '"!!!');
+            tk.setOptions({ breaks: 'none', expand: result.expand }); // if reloading data, skip rendering layout
+            // console.log('!!! 2 Verovio Worker ' + result.cmd + ': loading data!!!', result.mei);
             tk.loadData(result.mei);
-            console.log('!!!Verovio Worker ' + result.cmd + ': setting breaks back to ' + bOpt + '!!!');
-            tk.setOptions({ breaks: bOpt }); // ... and re-set breaks option
-            result.toolkitDataOutdated = result.speedMode ? true : false;
+            // console.log('!!! 3 Verovio Worker ' + result.cmd + ': setting breaks back to ' + bOpt + '!!!');
+            tk.setOptions({ breaks: bOpt, expand: '' }); // ... and re-set breaks option
+            result.toolkitDataOutdated = result.speedMode ? true : result.expand ? true : false;
           }
           result.midi = tk.renderToMIDI();
           if (result.requestTimemap) result.timemap = tk.renderToTimemap();
+          if (result.expand) result.expansionMap = tk.renderToExpansionMap(); // TODO: only, if PR #3360 gets merged on Verovio (2. April 2023)
           result.cmd = result.requestTimemap ? 'midiPlayback' : 'downloadMidiFile';
           if (result.toolkitDataOutdated || result.speedMode) {
             tk.setOptions(tkOptions); // ... and re-set breaks option

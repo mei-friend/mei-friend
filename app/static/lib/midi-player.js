@@ -1,5 +1,5 @@
 import { cm, v, requestMidiFromVrvWorker } from './main.js';
-import * as expansionMap from './expansion-map.js';
+// import * as expansionMap from './expansion-map.js';
 
 export let midiTimeout; // javascript timeout between last edit and MIDI re-render
 export const midiDelay = 400; // in ms, delay between last edit and MIDI re-render
@@ -9,6 +9,7 @@ let timemapIdx = 0;
 let lastOnsetIdx = 0; // index in timemap of last onset
 let lastReportedTime = 0; // time (s) of last reported note fired (used to check slider shifts)
 let playbackOnLoad = false; // request immediate play on load
+let expansionMap;
 
 export function seekMidiPlaybackToSelectionOrPage() {
   // on load, seek to first currently selected element (or first note on page)
@@ -144,14 +145,18 @@ export function highlightNotesAtMidiPlaybackTime(ev = false) {
 
     if (closestTimemapTime && 'on' in closestTimemapTime) {
       for (let id of closestTimemapTime['on']) {
-        id = expansionMap.getNotatedIdForElement(id);
+        if (expansionMap && id in expansionMap) {
+          id = expansionMap[id][0];
+          // id = expansionMap.getNotatedIdForElement(id);
+        }
         let note = document.getElementById(id);
         if (note && highlightCheckbox.checked) {
           highlightNote(note);
           // search for corresponding note-off and check whether onset there
           for (let i = timemapIdx + 1; i < timemap.length - 1; i++) {
             if ('off' in timemap[i] && timemap[i].off.includes(id)) {
-              if (!('on' in timemap[i])) { // if no onset, program unhighlightening of that note
+              if (!('on' in timemap[i])) {
+                // if no onset, program unhighlightening of that note
                 setTimeout(() => unhighlightNote(note), timemap[i].tstamp - t, note);
               }
               break;
@@ -202,6 +207,10 @@ export function setTimemap(tm) {
 
 export function getTimemap() {
   return timemap;
+}
+
+export function setExpansionMap(em) {
+  expansionMap = em;
 }
 
 export function requestPlaybackOnLoad() {

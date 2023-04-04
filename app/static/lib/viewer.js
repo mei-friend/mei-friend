@@ -2006,6 +2006,7 @@ export default class Viewer {
     this.expansionId = document.getElementById('selectMidiExpansion').value;
     let mes = document.getElementById('controlbar-midi-expansion-selector');
     if (mes) mes.value = this.expansionId;
+    console.log('EEEEExpansion selector set to: ' + this.expansionId);
   }
 
   busy(active = true, speedWorker = false) {
