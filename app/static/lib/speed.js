@@ -183,8 +183,11 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
       // console.info('digDeeper(' + pageNo + '): p: ' + p +
       //   ', i: ' + i + ', ', currentNode);
       let currentNodeName = currentNode.nodeName;
-      // ignore expansion lists
-      if (['expansion'].includes(currentNodeName)) continue;
+      // copy expansion elements to new section
+      if (currentNodeName === 'expansion') {
+        newSection.appendChild(currentNode.cloneNode(true));
+        continue;
+      }
       // console.info('digDeeper currentNodeName: ', currentNodeName + ', '
       // + currentNode.getAttribute('xml:id'));
       if (currentNodeName === 'section') {
