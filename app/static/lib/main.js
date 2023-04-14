@@ -655,7 +655,8 @@ document.addEventListener('DOMContentLoaded', function () {
   setKeyMap(defaultKeyMap);
 
   // remove URL parameters from URL
-  window.history.pushState({}, '', '/');
+  const shortUrl = new URL(window.location);
+  window.history.pushState({}, '', shortUrl.origin + shortUrl.pathname);
   // TODO: check handleURLParamSelect() occurrences, whether removing search parameters has an effect there.
 }); // DOMContentLoaded listener
 
