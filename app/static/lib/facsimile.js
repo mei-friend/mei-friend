@@ -196,22 +196,6 @@ export async function drawFacsimile() {
           'https://raw.githubusercontent.com/' + github.githubRepo + '/' + github.branch + '/' + facs[zoneId].target
         );
         imgName = url.href;
-        img = await loadImage(imgName);
-        if (!img) {
-          // try to find images in the 'img' folder on github repo
-          url = new URL(
-            'https://raw.githubusercontent.com/' +
-              github.githubRepo +
-              '/' +
-              github.branch +
-              '/img/' +
-              facs[zoneId].target
-          );
-          imgName = url.href;
-          img = await loadImage(imgName);
-        } else {
-          sourceImages[imgName] = img;
-        }
       } else if (fileLocationType === 'url') {
         let url = new URL(meiFileLocation);
         imgName = url.origin + url.pathname.substring(0, url.pathname.lastIndexOf('/') + 1) + imgName;
@@ -227,15 +211,17 @@ export async function drawFacsimile() {
       imgName = url.href;
     }
 
-    // load image asynchronously
-    if (!sourceImages.hasOwnProperty(imgName)) {
+    // retrieve image from object, if already there...
+    if (sourceImages.hasOwnProperty(imgName)) {
+      console.log('Using existing image from ' + imgName);
+      img = sourceImages[imgName];
+      // or load it freshly from source, if not
+    } else {
       console.log('Loading image from ' + imgName);
       img = await loadImage(imgName);
       sourceImages[imgName] = img;
-    } else {
-      console.log('Using existing image from ' + imgName);
-      img = sourceImages[imgName];
     }
+    //
     if (img) {
       console.log('Appending child image:', img);
       svg.appendChild(img);

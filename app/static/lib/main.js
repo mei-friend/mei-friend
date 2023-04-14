@@ -1,5 +1,5 @@
 // mei-friend version and date
-export const version = '0.8.8';
+export const version = '0.8.9';
 export const versionDate = '14 April 2023';
 
 var vrvWorker;
@@ -655,7 +655,8 @@ document.addEventListener('DOMContentLoaded', function () {
   setKeyMap(defaultKeyMap);
 
   // remove URL parameters from URL
-  window.history.pushState({}, '', '/');
+  const shortUrl = new URL(window.location);
+  window.history.pushState({}, '', shortUrl.origin + shortUrl.pathname);
   // TODO: check handleURLParamSelect() occurrences, whether removing search parameters has an effect there.
 }); // DOMContentLoaded listener
 
@@ -750,6 +751,9 @@ function speedWorkerEventsHandler(ev) {
 async function vrvWorkerEventsHandler(ev) {
   let blob; // houses blob for MIDI download or playback
   console.log('main.vrvWorkerEventsHandler() received: ' + ev.data.cmd); // , ev.data
+  if ('toolkitDataOutdated' in ev.data) {
+    v.toolkitDataOutdated = ev.data.toolkitDataOutdated;
+  }
   switch (ev.data.cmd) {
     case 'vrvLoaded':
       console.info('main(). Handler vrvLoaded: ', this);
@@ -788,9 +792,6 @@ async function vrvWorkerEventsHandler(ev) {
       //v.busy(false);
       break;
     case 'updated': // display SVG data on site
-      if ('toolkitDataOutdated' in ev.data) {
-        v.toolkitDataOutdated = ev.data.toolkitDataOutdated;
-      }
       if (ev.data.mei) {
         // from reRenderMEI
         v.allowCursorActivity = false;
@@ -2060,7 +2061,7 @@ export function generateUrl() {
     url += 'file=' + meiFileLocation;
   } else if (fileLocationType === 'github') {
     url += 'file=' + 'https://raw.githubusercontent.com/' + github.githubRepo + '/' + github.branch + github.filepath;
-  } 
+  }
   // generate other parameters, if different from default value
   let scale = v.vrvOptions.scale;
   if (scale !== defaultVerovioOptions.scale) {
@@ -2111,10 +2112,10 @@ export function generateUrl() {
  * URI actions around a call to generateUrl(): Show alert modal displaying generated URL,
  * (attempt to) copy it to clipboard
  */
-function generateUrlUI() { 
+function generateUrlUI() {
   let msg = '';
   const url = generateUrl();
-  if(fileLocationType === 'file') {
+  if (fileLocationType === 'file') {
     msg = 'Cannot generate URL for local file ' + meiFileName;
     v.showAlert(msg, 'warning');
     console.log(msg);

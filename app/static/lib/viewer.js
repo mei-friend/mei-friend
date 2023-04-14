@@ -180,11 +180,16 @@ export default class Viewer {
     this.setVerovioOptions(options);
     let message = {
       cmd: what,
-      options: this.vrvOptions,
       pageNo: this.currentPage,
-      xmlId: id,
+      options: this.vrvOptions,
       speedMode: this.speedMode,
+      toolkitDataOutdated: this.toolkitDataOutdated,
+      xmlId: id,
     };
+    // pass MEI through to worker, if tk is outDated or in speed mode
+    if (this.speedMode || this.toolkitDataOutdated) {
+      message.mei = this.speedFilter(cm.getValue());
+    }
     this.busy();
     this.vrvWorker.postMessage(message);
   } // updateQuick()
