@@ -148,7 +148,7 @@ export const defaultVerovioOptions = {
   inputFrom: 'mei',
   adjustPageHeight: true,
   mdivAll: true,
-  graceFactor: .66,
+  graceFactor: 0.66,
   hairpinSize: 2,
   outputIndent: 3,
   pageMarginLeft: 50,

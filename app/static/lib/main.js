@@ -137,13 +137,12 @@ const defaultCodeMirrorOptions = {
   hintOptions: {
     schemaInfo: null,
   },
-  // hintOptions: 'schema_meiCMN_401', // not cm conform: just provide schema name
-  theme: 'default',
-  zoomFont: 100, // my own option
-  matchTheme: false, // notation matches editor theme (my option)
-  defaultBrightTheme: 'default', // default theme for OS bright mode
-  defaultDarkTheme: 'paraiso-dark', // 'base16-dark', // default theme for OS dark mode
-};
+  theme: 'default', // m-f option
+  zoomFont: 100, // m-f own option
+  matchTheme: false, // notation matches editor theme (m-f option)
+  defaultBrightTheme: 'default', // default theme for OS bright mode, m-f option
+  defaultDarkTheme: 'paraiso-dark', // 'base16-dark', // default theme for OS dark mode, m-f option
+}; // defaultCodeMirrorOptions
 
 // add all possible facsimile elements
 att.attFacsimile.forEach((e) => defaultVerovioOptions.svgAdditionalAttribute.push(e + '@facs'));
