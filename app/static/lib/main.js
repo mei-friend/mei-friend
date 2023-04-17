@@ -668,7 +668,7 @@ export async function openUrlFetch(url = '', updateAfterLoading = true) {
     if (isLoggedIn && url.href.trim().startsWith('https://raw.githubusercontent.com')) {
       // GitHub URL - use GitHub credentials to enable URL fetch from private repos
       github.directlyReadFileContents(url.href).then((data) => {
-        openUrlProcess(atob(JSON.parse(data).content), url, updateAfterLoading);
+        openUrlProcess(data, url, updateAfterLoading);
       });
     } else {
       const response = await fetch(url, {
