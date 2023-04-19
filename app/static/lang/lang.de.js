@@ -48,4 +48,37 @@ export const lang = {
   FacsimileRight: { text: 'Faksimile rechts' },
 
   // mei-friend SETTINGS MENU
+//   titleGeneral: { text: 'Allgemein' },
+  selectToolkitVersion: {
+    text: 'Verovio Version',
+    description:
+      'Wählen Sie die Toolkit Version von Verovio aus.' +
+      '(* Versionsnummern älter als 3.11.0 ' +
+      'benötigen unter Umständen ein Neuladen des Browserfensters.)',
+  },
+  toggleSpeedMode: {
+    text: 'Speed mode',
+    description:
+      'Verovio Speed Mode umschalten. ' +
+      'Im Speed Mode wird nur die aktuelle Seite ' +
+      'an Verovio gesendet, um die Renderingzeit ' +
+      'bei großen Dateien zu reduzieren',
+  },
+  selectIdStyle: {
+    text: 'Form der erzeugten xml:ids',
+    description:
+      'Form der neu erzeugten xml:ids (bestehende xml:ids werden nicht verändert)' +
+      'e.g., Verovio original: "note-0000001318117900", ' +
+      'Verovio base 36: "nophl5o", ' +
+      'mei-friend stil: "note-ophl5o"',
+  },
+  addApplicationNote: {
+    text: 'Application statement einfügen',
+    description:
+      'Einfügen eines Application Statements in die ' +
+      'Kodierungsbeschreibung im MEI-Header mit Angabe ' +
+      'von Anwendungsname, Version, sowie Datum der ersten ' +
+      'und letzten Bearbeitung,',
+  },
+  selectLanguage: { text: 'Sprache', description: 'Wählen Sie die Sprache des mei-friend Interface.' },
 };
