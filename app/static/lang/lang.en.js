@@ -1,7 +1,7 @@
 /**
  * Language file for English
  */
-lang = {
+export const lang = {
   // Main menu bar
   GithubLoginLink: { text: 'Login' },
 
@@ -42,5 +42,10 @@ lang = {
   ShowAnnotationMenuText: { text: 'Annotations panel' },
   ShowFacsimileMenuText: { text: 'Facsimile panel' },
   ShowPlaybackControlsText: { text: 'Playback controls' },
-  ShowSettingsMenuText: { text: 'Settings panel' },
+  FacsimileTop: { text: 'Facsimile top' },
+  FacsimileBottom: { text: 'Facsimile bottom' },
+  FacsimileLeft: { text: 'Facsimile left' },
+  FacsimileRight: { text: 'Facsimile right' },
+
+  // mei-friend SETTINGS MENU
 };

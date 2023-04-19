@@ -33,6 +33,7 @@ import {
   platform,
   supportedVerovioVersions,
 } from './defaults.js';
+import { changeLanguage, translateGui } from './translator.js';
 
 export default class Viewer {
   constructor(vrvWorker, spdWorker) {
@@ -1039,6 +1040,10 @@ export default class Viewer {
         case 'selectIdStyle':
           this.xmlIdStyle = value;
           break;
+        case 'selectLanguage':
+          let langCode = value.slice(0, 2).toLowerCase();
+          changeLanguage(langCode);
+          break;
         case 'toggleSpeedMode':
           document.getElementById('midiSpeedmodeIndicator').style.display = this.speedMode ? 'inline' : 'none';
           break;
@@ -1188,6 +1193,10 @@ export default class Viewer {
             break;
           case 'selectIdStyle':
             this.xmlIdStyle = value;
+            break;
+          case 'selectLanguage':
+            let langCode = value.slice(0, 2).toLowerCase();
+            changeLanguage(langCode);
             break;
           case 'toggleSpeedMode':
             let sb = document.getElementById('speed-checkbox');

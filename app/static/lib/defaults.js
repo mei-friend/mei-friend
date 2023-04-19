@@ -225,6 +225,15 @@ export const meiFriendSettingsOptions = {
     type: 'bool',
     default: true,
   },
+  selectLanguage: {
+    title: 'Language',
+    description:
+      'Select language of mei-friend interface.',
+    type: 'select',
+    values: ['English', 'Deutsch'],
+    valuesDescriptions: ['English', 'Deutsch'],
+    default: 'English',
+  },
   dragSelection: {
     title: 'Drag select',
     description: 'Select elements in notation with mouse drag',
