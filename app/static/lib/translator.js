@@ -3,7 +3,7 @@
  *
  */
 
-var lang;
+var lang; // global lang object from language pack files
 
 /**
  * Change language of mei-friend GUI and refresh all menu items
@@ -24,17 +24,20 @@ export function changeLanguage(languageCode) {
  */
 export function translateGui() {
   for (let key in lang) {
-    // console.log('key: ' + key + ': ', lang[key]);
     let el = document.getElementById(key);
+    console.log('key: ' + key + ': el: ', el);
     if (el) {
+      // for settings items
       if (el.closest('div.optionsItem')) {
-        let label = el.parentElement.querySelector('label');
-        if (label) {
-          if ('text' in lang[key]) label.textContent = lang[key].text;
-          if ('description' in lang[key]) label.title = lang[key].description;
-        }
-        // TODO: if details, take summary
-      } else {
+        el = el.parentElement.querySelector('label');
+        console.log('Found label: ', el);
+        // for settings headers with details and summary
+      } else if (el.nodeName.toLowerCase() === 'details') {
+        el = el.querySelector('summary');
+        console.log('Found summary: ', el);
+      }
+      // plus for all other items (and those above)
+      if (el) {
         if ('text' in lang[key]) el.textContent = lang[key].text;
         if ('description' in lang[key]) el.title = lang[key].description;
       }
