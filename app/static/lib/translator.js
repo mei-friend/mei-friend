@@ -35,16 +35,26 @@ export function translateGui() {
             if (i < lang[key].labels.length) opt.textContent = lang[key].labels[i];
           });
         }
-        el = el.parentElement.querySelector('label');
-        console.log('Found label: ', el);
+        if (el.nodeName.toLowerCase() === 'input' && el.getAttribute('type') === 'button') {
+          console.log('Found button: ', el);
+        } else {
+          el = el.parentElement.querySelector('label');
+          console.log('Found label: ', el);
+        }
       } else if (el.nodeName.toLowerCase() === 'details') {
         // for settings headers with details and summary
         el = el.querySelector('summary');
         console.log('Found summary: ', el);
       }
-      // plus for all other items (and those above)
+      // plus for all other items (menu items etc.)
       if (el) {
-        if ('text' in lang[key]) el.textContent = lang[key].text;
+        if ('text' in lang[key]) {
+          if (el.nodeName.toLowerCase() === 'input' && el.getAttribute('type') === 'button') {
+            el.value = lang[key].text;
+          } else {
+            el.textContent = lang[key].text;
+          }
+        }
         if ('description' in lang[key]) el.title = lang[key].description;
       }
     }
