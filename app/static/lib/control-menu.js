@@ -256,7 +256,6 @@ export function createNotationControlBar(parentElement, scale) {
   codeUpdateBtn.innerHTML = icon.symLinkFile; // icon-alignment-aligned-to
   codeUpdateBtn.classList.add('inline-block-tight');
   codeUpdateBtn.title = 'Update notation manually';
-  // codeUpdateBtn.innerHTML = 'Redo';
   codeUpdateBtn.setAttribute('type', 'button');
   codeUpdateBtn.setAttribute('value', 'codeUpdate');
   codeUpdateBtn.disabled = true;

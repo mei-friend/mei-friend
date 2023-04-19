@@ -1490,22 +1490,22 @@ function addEventListeners(v, cm) {
     if (ev.key === 'Escape' || ev.key === 'Enter') ev.target.blur(); //remove focus
   });
 
-  // layout notation position
-  document.getElementById('top').addEventListener('click', cmd.notationTop);
-  document.getElementById('bottom').addEventListener('click', cmd.notationBottom);
-  document.getElementById('left').addEventListener('click', cmd.notationLeft);
-  document.getElementById('right').addEventListener('click', cmd.notationRight);
-  // facsimile position
-  document.getElementById('facstop').addEventListener('click', cmd.facsimileTop);
-  document.getElementById('facsbottom').addEventListener('click', cmd.facsimileBottom);
-  document.getElementById('facsleft').addEventListener('click', cmd.facsimileLeft);
-  document.getElementById('facsright').addEventListener('click', cmd.facsimileRight);
-
-  // show settings panel
+  // VIEW layout notation position
+  document.getElementById('NotationTop').addEventListener('click', cmd.notationTop);
+  document.getElementById('NotationBottom').addEventListener('click', cmd.notationBottom);
+  document.getElementById('NotationLeft').addEventListener('click', cmd.notationLeft);
+  document.getElementById('NotationRight').addEventListener('click', cmd.notationRight);
+  // VIEW show settings panel
   document.getElementById('showSettingsMenu').addEventListener('click', cmd.showSettingsPanel);
   document.getElementById('showSettingsButton').addEventListener('click', cmd.showSettingsPanel);
   document.getElementById('hideSettingsButton').addEventListener('click', cmd.hideSettingsPanel);
   document.getElementById('closeSettingsButton').addEventListener('click', cmd.hideSettingsPanel);
+  // VIEW facsimile position
+  document.getElementById('FacsimileTop').addEventListener('click', cmd.facsimileTop);
+  document.getElementById('FacsimileBottom').addEventListener('click', cmd.facsimileBottom);
+  document.getElementById('FacsimileLeft').addEventListener('click', cmd.facsimileLeft);
+  document.getElementById('FacsimileRight').addEventListener('click', cmd.facsimileRight);
+
   document.getElementById('filterSettings').addEventListener('input', cmd.filterSettings);
   document.getElementById('filterSettings').value = '';
   document.getElementById('filterReset').addEventListener('click', cmd.filterReset);
@@ -1557,19 +1557,19 @@ function addEventListeners(v, cm) {
   document.getElementById('SaveSvg').addEventListener('click', downloadSvg);
   document.getElementById('SaveMidi').addEventListener('click', () => requestMidiFromVrvWorker());
   document.getElementById('PrintPreview').addEventListener('click', cmd.pageModeOn);
-  document.getElementById('GenerateURL').addEventListener('click', cmd.generateUrl);
+  document.getElementById('GenerateUrlMenu').addEventListener('click', cmd.generateUrl);
 
   // edit dialogs
-  document.getElementById('undo').addEventListener('click', cmd.undo);
-  document.getElementById('redo').addEventListener('click', cmd.redo);
-  document.getElementById('startSearch').addEventListener('click', () => CodeMirror.commands.find(cm));
-  document.getElementById('findNext').addEventListener('click', () => CodeMirror.commands.findNext(cm));
-  document.getElementById('findPrevious').addEventListener('click', () => CodeMirror.commands.findPrev(cm));
-  document.getElementById('replace').addEventListener('click', () => CodeMirror.commands.replace(cm));
-  document.getElementById('replaceAll').addEventListener('click', () => CodeMirror.commands.replaceAll(cm));
-  document.getElementById('indentSelection').addEventListener('click', cmd.indentSelection);
-  document.getElementById('jumpToLine').addEventListener('click', () => CodeMirror.commands.jumpToLine(cm));
-  document.getElementById('manualValidate').addEventListener('click', cmd.validate);
+  document.getElementById('UndoMenu').addEventListener('click', cmd.undo);
+  document.getElementById('RedoMenu').addEventListener('click', cmd.redo);
+  document.getElementById('StartSearch').addEventListener('click', () => CodeMirror.commands.find(cm));
+  document.getElementById('FindNext').addEventListener('click', () => CodeMirror.commands.findNext(cm));
+  document.getElementById('FindPrevious').addEventListener('click', () => CodeMirror.commands.findPrev(cm));
+  document.getElementById('ReplaceMenu').addEventListener('click', () => CodeMirror.commands.replace(cm));
+  document.getElementById('ReplaceAllMenu').addEventListener('click', () => CodeMirror.commands.replaceAll(cm));
+  document.getElementById('IndentSelection').addEventListener('click', cmd.indentSelection);
+  document.getElementById('JumpToLine').addEventListener('click', () => CodeMirror.commands.jumpToLine(cm));
+  document.getElementById('ManualValidate').addEventListener('click', cmd.validate);
   document
     .querySelectorAll('.keyShortCut')
     .forEach((e) => e.classList.add(platform.startsWith('mac') ? 'platform-mac' : 'platform-nonmac'));
