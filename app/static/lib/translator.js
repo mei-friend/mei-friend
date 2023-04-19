@@ -25,14 +25,20 @@ export function changeLanguage(languageCode) {
 export function translateGui() {
   for (let key in lang) {
     let el = document.getElementById(key);
-    console.log('key: ' + key + ': el: ', el);
     if (el) {
-      // for settings items
+      console.log('key: ' + key + ' nodeName: ' + el.nodeName + ', el: ', el);
       if (el.closest('div.optionsItem')) {
+        // for settings items
+        if (el.nodeName.toLowerCase() === 'select' && 'labels' in lang[key]) {
+          // modify values for select inputs
+          el.childNodes.forEach((opt, i) => {
+            if (i < lang[key].labels.length) opt.textContent = lang[key].labels[i];
+          });
+        }
         el = el.parentElement.querySelector('label');
         console.log('Found label: ', el);
-        // for settings headers with details and summary
       } else if (el.nodeName.toLowerCase() === 'details') {
+        // for settings headers with details and summary
         el = el.querySelector('summary');
         console.log('Found summary: ', el);
       }

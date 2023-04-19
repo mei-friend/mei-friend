@@ -106,11 +106,11 @@ export const lang = {
   dragSelectControlElements: {
     text: 'Platzierungs-Elemente auswählen',
     description:
-      'Platzierungs-Elemente auswählen (d.h. jene mit einem @placement Attribut: ' + att.attPlacement.join(', ') + ')',
+      'Platzierungs-Elemente auswählen (d.h. jene mit einem @placement-Attribut: ' + att.attPlacement.join(', ') + ')',
   },
   dragSelectSlurs: {
     text: 'Bögen auswählen ',
-    description: 'Bögen auswählen (d.h. Elemente mit einem @curvature Attribut: ' + att.attCurvature.join(', ') + ')',
+    description: 'Bögen auswählen (d.h. Elemente mit einem @curvature-Attribut: ' + att.attCurvature.join(', ') + ')',
   },
   dragSelectMeasures: {
     text: 'Takte auswählen ',
