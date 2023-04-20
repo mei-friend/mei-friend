@@ -9,6 +9,7 @@ var mei;
 var breaksParam; // (string) the breaks parameter given through URL
 var pageParam; // (int) page parameter given through URL
 var selectParam; // (array) select ids given through multiple instances in URL
+let safariWarningShown = false; // show Safari warning only once
 
 // exports
 export var cm;
@@ -434,10 +435,6 @@ document.addEventListener('DOMContentLoaded', function () {
   v.addMeiFriendOptionsToSettingsPanel();
   v.applySettingsFilter();
 
-  // if (isSafari) { TODO RESTART HERE
-  //   v.showAlert(lang.isSafariWarning.text, 'error', -1);
-  // }
-
   // check autoValidate as URL param
   let autoValidateParam = searchParams.get('autoValidate');
   let av = document.getElementById('autoValidate');
@@ -521,6 +518,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (speedParam !== null) storage.speed = speedParam;
     if (breaksParam !== null) storage.breaks = breaksParam;
     if (storage.githubLogoutRequested) {
+      // TODO translate && check asynch issues
       v.showAlert(
         `You have logged out of mei-friend's GitHub integration, but your browser is still logged in to GitHub!
       <a href="https://github.com/logout" target="_blank">Click here to logout from GitHub</a>.`,
@@ -798,6 +796,12 @@ async function vrvWorkerEventsHandler(ev) {
         v.selectedElements = [];
         if (!ev.data.removeIds) v.selectedElements.push(ev.data.xmlId);
       }
+
+      if (isSafari && Object.keys(lang).length > 0 && !safariWarningShown) {
+        safariWarningShown = true;
+        v.showAlert(lang.isSafariWarning.text, 'error', -1);
+      }
+
       // add section selector
       let ss = document.getElementById('section-selector');
       while (ss.options.length > 0) ss.remove(0); // clear existing options
@@ -2112,7 +2116,7 @@ function generateUrlUI() {
   let msg = '';
   const url = generateUrl();
   if (fileLocationType === 'file') {
-    msg = 'Cannot generate URL for local file ' + meiFileName;
+    msg = lang.generateUrlError.text + meiFileName;
     v.showAlert(msg, 'warning');
     console.log(msg);
     return '';
@@ -2126,13 +2130,14 @@ function generateUrlUI() {
   // and copy url text to clipboard
   navigator.clipboard.writeText(url).then(
     function () {
-      let m = 'URL successfully copied to clipboard';
+      let m = lang.generateUrlSuccess.text; // success message
       v.updateAlert('<b>' + m + '!</b>');
       console.log(m + ': ' + url);
     },
     function (err) {
-      console.error('Could not copy URL to clipboard.', err);
-      v.updateAlert('<b>URL not copied to clipboard, please try again!</b>');
+      let m = lang.generateUrlNotCopied;
+      console.error(m, err);
+      v.updateAlert('<b>' + m + '</b>');
     }
   );
 } // generateUrlUI()

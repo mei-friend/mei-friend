@@ -8,6 +8,9 @@ var defaultLang; // global object for default (English) language pack
 var langCode = '';
 export var lang = {}; // global lang object from language pack files
 
+import * as l from '../lang/lang.en.js';
+lang = { ...l.lang };
+
 /**
  * Change language of mei-friend GUI and refresh all menu items
  * @param {string} languageCode
@@ -18,8 +21,7 @@ export function changeLanguage(languageCode) {
   } else {
     // change language, only if not default and different from current lang pack
     if (languageCode !== defaultLangCode && languageCode !== langCode) {
-      langCode = languageCode;
-      const languagePack = '../lang/lang.' + langCode + '.js';
+      const languagePack = '../lang/lang.' + languageCode + '.js';
       console.log('Loading language pack: ', languagePack);
       import(languagePack).then((p) => {
         for (let key in p.lang) lang[key] = p.lang[key];
@@ -31,8 +33,18 @@ export function changeLanguage(languageCode) {
       console.log('Translating back to default language: ' + defaultLangCode);
       translateGui();
     }
+    langCode = languageCode;
   }
 } // changeLanguage()
+
+// export function requestLanguageKey(key) {
+//   if (!lang) {
+
+//   } else {
+//     if (key in lang) return lang[key];
+//   }
+//   return '';
+// }
 
 /**
  * Load default language pack (English), and change language thereafter (if second argument provided)

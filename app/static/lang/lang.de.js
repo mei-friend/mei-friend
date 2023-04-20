@@ -433,4 +433,25 @@ export const lang = {
     text: 'Select <supplied> responsibility',
     description: 'Select responsibility id',
   },
+   
+  // main.js alert messages
+   isSafariWarning: {
+    text:
+      'Es scheint, dass Sie Safari als Browser verwenden, auf dem derzeit leider ' +
+      'keine Schema-Validierung durch mei-friend unterstützt wird. Bitte verwenden ' +
+      'Sie einen anderen Browser für volle Validierungsunterstützung.',
+  },
+  githubLoggedOutWarning: {
+    text: `Sie haben sich bei der GitHub-Integration von mei-friend abgemeldet, aber Ihr Browser ist noch bei GitHub angemeldet!
+      <a href="https://github.com/logout" target="_blank">Bitte hier klicken, um sich von GitHub abzumelden</a>.`,
+  },
+  generateUrlError: {
+    text: 'URL für lokale Datei kann nicht erzeugt werden. ',
+  },
+  generateUrlSuccess: {
+    text: 'URL erfolgreich in die Zwischenablage kopiert. ',
+  },
+  generateUrlNotCopied: {
+    text: 'URL nicht in die Zwischenablage kopiert, bitte versuchen Sie es erneut!',
+  },
 };

@@ -407,4 +407,17 @@ export const lang = {
       'mei-friend unfortunately does not currently support schema validation. ' +
       'Please use another browser for full validation support.',
   },
+  githubLoggedOutWarning: {
+    text: `You have logged out of mei-friend's GitHub integration, but your browser is still logged in to GitHub!
+      <a href="https://github.com/logout" target="_blank">Click here to logout from GitHub</a>.`,
+  },
+  generateUrlError: {
+    text: 'Cannot generate URL for local file ',
+  },
+  generateUrlSuccess: {
+    text: 'URL successfully copied to clipboard',
+  },
+  generateUrlNotCopied: {
+    text: 'URL not copied to clipboard, please try again!',
+  },
 };
