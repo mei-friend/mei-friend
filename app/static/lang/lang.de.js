@@ -114,6 +114,15 @@ export const lang = {
   toggleStaccissText: { text: 'Staccatissimo' },
   toggleSpiccText: { text: 'Spiccato' },
 
+  // HELP MENU ITEM
+  helpMenuTitle: { text: 'Hilfe' },
+  goToHelpPage: { text: 'mei-friend Hilfeseiten' },
+  showChangelog: { text: 'mei-friend Änderungsliste anzeigen' },
+  goToGuidelines: { text: 'MEI Guidelines anzeigen' },
+  consultGuidelinesForElementText: { text: 'Guidelines für aktuelles Element anzeigen' },
+  provideFeedback: { text: 'Feedback geben' },
+  resetDefault: { text: 'Auf Standardwerte zurücksetzen' },
+
   // mei-friend SETTINGS MENU
   titleGeneral: {
     text: 'Allgemein',

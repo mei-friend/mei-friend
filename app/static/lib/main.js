@@ -1759,7 +1759,7 @@ function addEventListeners(v, cm) {
   document.getElementById('toggleSpicc').addEventListener('click', cmd.toggleSpicc);
 
   // consult guidelines
-  document.getElementById('consultGuidelines').addEventListener('click', cmd.consultGuidelines);
+  document.getElementById('consultGuidelinesForElement').addEventListener('click', cmd.consultGuidelines);
 
   // reset application
   document.getElementById('resetDefault').addEventListener('click', cmd.resetDefault);
