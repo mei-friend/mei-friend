@@ -49,6 +49,29 @@ export const lang = {
   FacsimileLeft: { text: 'Facsimile left' },
   FacsimileRight: { text: 'Facsimile right' },
 
+  // MANIPULATE MENU ITEM
+  manipulateMenuTitle: { text: 'Manipulate' },
+  invertPlacementText: { text: 'Invert placement' },
+  betweenPlacementText: { text: 'Between placement' },
+  addVerticalGroupText: { text: 'Add vertical group' },
+  deleteText: { text: 'Delete element' },
+  pitchUpText: { text: 'Pitch 1 tone up' },
+  pitchDownText: { text: 'Pitch 1 tone down' },
+  pitchOctaveUpText: { text: 'Pitch 1 octave up' },
+  pitchOctaveDownText: { text: 'Pitch 1 octave down' },
+  staffUpText: { text: 'Element 1 staff up' },
+  staffDownText: { text: 'Element 1 staff down' },
+  increaseDurText: { text: 'Increase duration' },
+  decreaseDurText: { text: 'Decrease duration' },
+  cleanAccidText: { text: 'Clean @accid.ges' },
+  renumberMeasuresTestText: { text: ' Renumber measures (test)' },
+  renumberMeasuresExecText: { text: ' Renumber measures (exec)' },
+  addIdsText: { text: 'Add ids to MEI' },
+  removeIdsText: { text: 'Remove ids from MEI' },
+  reRenderMeiVerovio: { text: ' Rerender via Verovio' },
+  addFacsimile: { text: 'Add facsimile element' },
+  ingestFacsimileText: { text: 'Ingest facsimile' },
+
   // mei-friend SETTINGS MENU
   titleGeneral: {
     text: 'General',

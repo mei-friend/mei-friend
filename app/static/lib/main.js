@@ -1704,10 +1704,10 @@ function addEventListeners(v, cm) {
   document.getElementById('decreaseDur').addEventListener('click', cmd.decreaseDuration);
   // Manipulate encoding methods
   document.getElementById('cleanAccid').addEventListener('click', () => e.cleanAccid(v, cm));
-  document.getElementById('renumTest').addEventListener('click', () => e.renumberMeasures(v, cm, false));
-  document.getElementById('renumExec').addEventListener('click', () => e.renumberMeasures(v, cm, true));
+  document.getElementById('renumberMeasuresTest').addEventListener('click', () => e.renumberMeasures(v, cm, false));
+  document.getElementById('renumberMeasuresExec').addEventListener('click', () => e.renumberMeasures(v, cm, true));
   // rerender through Verovio
-  document.getElementById('reRenderMei').addEventListener('click', cmd.reRenderMei);
+  document.getElementById('reRenderMeiVerovio').addEventListener('click', cmd.reRenderMei);
   // document.getElementById('reRenderMeiWithout').addEventListener('click', cmd.reRenderMeiWithout);
   // add/remove ids
   document.getElementById('addIds').addEventListener('click', cmd.addIds);

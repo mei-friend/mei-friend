@@ -50,6 +50,29 @@ export const lang = {
   FacsimileLeft: { text: 'Faksimile links' },
   FacsimileRight: { text: 'Faksimile rechts' },
 
+  // MANIPULATE MENU ITEM
+  manipulateMenuTitle: { text: 'Verändern' },
+  invertPlacementText: { text: 'Platzierung invertieren' },
+  betweenPlacementText: { text: 'Platzierung dazwischen' },
+  addVerticalGroupText: { text: 'Vertikale Gruppe hinzufügen' },
+  deleteText: { text: 'Element löschen' },
+  pitchUpText: { text: 'Tonhöhe um Halbton höher' },
+  pitchDownText: { text: 'Tonhöhe um Halbton niedriger' },
+  pitchOctaveUpText: { text: 'Tonhöhe eine Oktave höher' },
+  pitchOctaveDownText: { text: 'Tonhöhe eine Oktave niedriger' },
+  staffUpText: { text: 'Element eine Notenzeile höher' },
+  staffDownText: { text: 'Element eine Notenzeile niedriger' },
+  increaseDurText: { text: 'Notendauer erhöhen' },
+  decreaseDurText: { text: 'Notendauer verringern' },
+  cleanAccidText: { text: '@accid.ges putzen' },
+  renumberMeasuresTestText: { text: ' Takte neu nummerieren (test)' },
+  renumberMeasuresExecText: { text: ' Takte neu nummerieren (exec)' },
+  addIdsText: { text: 'Ids zu MEI hinzufügen' },
+  removeIdsText: { text: 'Ids von MEI entfernen' },
+  reRenderMeiVerovio: { text: 'Mit Verovio neu rendern' },
+  addFacsimile: { text: 'Faksimile-Element hinzufügen' },
+  ingestFacsimileText: { text: 'Faksimile-Information einlesen' },
+
   // mei-friend SETTINGS MENU
   titleGeneral: {
     text: 'Allgemein',
@@ -201,16 +224,16 @@ export const lang = {
   enableTransposition: {
     text: 'Transposition aktivieren',
     description:
-      'Transposition aktivieren, die über die Schaltfläche ' + 
+      'Transposition aktivieren, die über die Schaltfläche ' +
       '"Transponieren" weiter unten angewendet werden soll. ' +
-      'Die Transposition wird nur auf die Notation angewendet, ' + 
-      'die Kodierung bleibt unverändert, es sei denn, Sie klicken ' + 
+      'Die Transposition wird nur auf die Notation angewendet, ' +
+      'die Kodierung bleibt unverändert, es sei denn, Sie klicken ' +
       'im Dropdown-Menü "Manipulieren" auf den Eintrag "Mit Verovio neu rendern".',
   },
   transposeInterval: {
     text: 'Nach Intervallen',
     description:
-      'Transponieren der Kodierung nach chromatischen Intervallen ' + 
+      'Transponieren der Kodierung nach chromatischen Intervallen ' +
       'durch die gebräuchlichsten Intervalle (Verovio unterstützt das Basis-40-System)',
     labels: [
       'Reine Prim',
@@ -270,9 +293,9 @@ export const lang = {
   transposeButton: {
     text: 'Transponieren',
     description:
-      'Transposition mit obigen Einstellungen auf die Notation anwenden, ' + 
-      'die MEI-Kodierung bleibt unverändert. Um auch die MEI-Kodierung ' + 
-      'mit den aktuellen Einstellungen zu transponieren, verwenden Sie ' + 
+      'Transposition mit obigen Einstellungen auf die Notation anwenden, ' +
+      'die MEI-Kodierung bleibt unverändert. Um auch die MEI-Kodierung ' +
+      'mit den aktuellen Einstellungen zu transponieren, verwenden Sie ' +
       '"Mit Verovio neu rendern" im Dropdown-Menü "Manipulieren".',
   },
   // Renumber measures
