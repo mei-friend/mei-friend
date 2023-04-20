@@ -350,24 +350,25 @@ export const lang = {
   },
   // Renumber measures
   renumberMeasuresHeading: {
-    text: 'Renumber measures',
-    description: 'Settings for renumbering measures',
+    text: 'Takte neu nummerieren',
+    description: 'Einstellungen für Takte neu nummerieren',
   },
   renumberMeasureContinueAcrossIncompleteMeasures: {
-    text: 'Continue across incomplete measures',
-    description: 'Continue measure numbers across incomplete measures (@metcon="false")',
+    text: 'Weiter bei unvollständigen Takten',
+    description: 'Taktnummer wird bei unvollständigen Takten erhöht (@metcon="false")',
   },
   renumberMeasuresUseSuffixAtMeasures: {
-    text: 'Suffix at incomplete measures',
-    description: 'Use number suffix at incomplete measures (e.g., 23-cont)',
+    text: 'Suffix bei unvollständigen Takten',
+    description: 'Suffix bei Taktnummern von unvollständigen Takten verwenden (z.B. 23-cont)',
+    labels: ['kein', '-cont'],
   },
   renumberMeasuresContinueAcrossEndings: {
-    text: 'Continue across endings',
-    description: 'Continue measure numbers across endings',
+    text: 'Weiter bei Volten',
+    description: 'Taktnummern werden bei Volten (endings) erhöht',
   },
   renumberMeasuresUseSuffixAtEndings: {
-    text: 'Suffix at endings',
-    description: 'Use number suffix at endings (e.g., 23-a)',
+    text: 'Suffix bei Volten',
+    description: 'Suffix zu Taktnummern bei Volten (endings) verwenden (z.B. 23-a)',
   },
   // Annotations
   titleAnnotations: {

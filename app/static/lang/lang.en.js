@@ -326,6 +326,7 @@ export const lang = {
   renumberMeasuresUseSuffixAtMeasures: {
     text: 'Suffix at incomplete measures',
     description: 'Use number suffix at incomplete measures (e.g., 23-cont)',
+    labels: ['none', '-cont'],
   },
   renumberMeasuresContinueAcrossEndings: {
     text: 'Continue across endings',
