@@ -101,6 +101,7 @@ import {
   platform,
   isSafari,
 } from './defaults.js';
+import { lang } from './translator.js';
 
 const defaultCodeMirrorOptions = {
   lineNumbers: true,
@@ -411,14 +412,6 @@ document.addEventListener('DOMContentLoaded', function () {
     ...defaultVerovioOptions,
   };
 
-  if (isSafari) {
-    v.showAlert(
-      'It seems that you are using Safari as your browser, on which mei-friend unfortunately does not currently support schema validation. Please use another browser for full validation support.',
-      'error',
-      -1
-    );
-  }
-
   const validatorWorker = new Worker(`${root}lib/validator-worker.js`);
   validator = new WorkerProxy(validatorWorker);
   rngLoader = new RNGLoader();
@@ -440,6 +433,10 @@ document.addEventListener('DOMContentLoaded', function () {
   v.addCmOptionsToSettingsPanel(defaultCodeMirrorOptions);
   v.addMeiFriendOptionsToSettingsPanel();
   v.applySettingsFilter();
+
+  // if (isSafari) { TODO RESTART HERE
+  //   v.showAlert(lang.isSafariWarning.text, 'error', -1);
+  // }
 
   // check autoValidate as URL param
   let autoValidateParam = searchParams.get('autoValidate');

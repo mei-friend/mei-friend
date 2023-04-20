@@ -399,4 +399,12 @@ export const lang = {
     text: 'Select <supplied> responsibility',
     description: 'Select responsibility id',
   },
+
+  // main.js alert messages
+  isSafariWarning: {
+    text:
+      'It seems that you are using Safari as your browser, on which ' +
+      'mei-friend unfortunately does not currently support schema validation. ' +
+      'Please use another browser for full validation support.',
+  },
 };
