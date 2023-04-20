@@ -2013,19 +2013,23 @@ export default class Viewer {
    */
   setDisablednessInOptionsItem(onItems, offItems) {
     offItems.forEach((offItem) => {
-      let off = document.getElementById(offItem);
-      if (off) {
-        off.disabled = true;
-        off.classList.add('disabled');
-        off.previousSibling?.classList.add('disabled');
+      if (offItem) {
+        let off = document.getElementById(offItem);
+        if (off) {
+          off.disabled = true;
+          off.classList.add('disabled');
+          off.previousSibling?.classList.add('disabled');
+        }
       }
     });
     onItems.forEach((onItem) => {
-      let on = document.getElementById(onItem);
-      if (on) {
-        on.disabled = false;
-        on.classList.remove('disabled');
-        on.previousSibling?.classList.remove('disabled');
+      if (onItem) {
+        let on = document.getElementById(onItem);
+        if (on) {
+          on.disabled = false;
+          on.classList.remove('disabled');
+          on.previousSibling?.classList.remove('disabled');
+        }
       }
     });
   } // setDisplayInOptionsItem()
