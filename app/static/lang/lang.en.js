@@ -123,6 +123,9 @@ export const lang = {
   resetDefault: { text: 'Reset to default' },
 
   // mei-friend SETTINGS MENU
+  meiFriendSettingsHeader: { text: 'mei-friend Settings' },
+  mfReset: { text: 'Default', description: 'Reset to mei-friend defaults' },
+
   titleGeneral: {
     text: 'General',
     description: 'General mei-friend settings',
@@ -399,6 +402,80 @@ export const lang = {
   respSelect: {
     text: 'Select <supplied> responsibility',
     description: 'Select responsibility id',
+  },
+
+  //  EDITOR SETTINGS / CODEMIRROR SETTINGS
+  editorSettingsHeader: {
+    text: 'Editor Settings',
+  },
+  cmReset: {
+    text: 'Default',
+    description: 'Reset to mei-friend defaults',
+  },
+  titleAppearance: {
+    title: 'Editor appearance',
+    description: 'Controls the appearance of the editor',
+  },
+  zoomFont: {
+    title: 'Font size (%)',
+    description: 'Change font size of editor (in percent)',
+  },
+  theme: {
+    title: 'Theme',
+    description: 'Select the theme of the editor',
+  },
+  matchTheme: {
+    title: 'Notation matches theme',
+    description: 'Match notation to editor color theme',
+  },
+  tabSize: {
+    title: 'Indentation size',
+    description: 'Number of space characters for each indentation level',
+  },
+  lineWrapping: {
+    title: 'Line wrapping',
+    description: 'Whether or not lines are wrapped at end of panel',
+  },
+  lineNumbers: {
+    title: 'Line numbers',
+    description: 'Show line numbers',
+  },
+  firstLineNumber: {
+    title: 'First line number',
+    description: 'Set first line number',
+  },
+  foldGutter: {
+    title: 'Code folding',
+    description: 'Enable code folding through fold gutters',
+  },
+  titleEditorOptions: {
+    title: 'Editor behavior',
+    description: 'Controls the behavior of the editor',
+  },
+  autoValidate: {
+    title: 'Auto validation',
+    description: 'Validate encoding against schema automatically after each edit',
+  },
+  autoCloseBrackets: {
+    title: 'Auto close brackets',
+    description: 'Automatically close brackets at input',
+  },
+  autoCloseTags: {
+    title: 'Auto close tags',
+    description: 'Automatically close tags at input',
+    type: 'bool',
+  },
+  matchTags: {
+    title: 'Match tags',
+    description: 'Highlights matched tags around editor cursor',
+  },
+  showTrailingSpace: {
+    title: 'Highlight trailing spaces',
+    description: 'Highlights unnecessary trailing spaces at end of lines',
+  },
+  keyMap: {
+    title: 'Key map',
+    description: 'Select key map',
   },
 
   // main.js alert messages

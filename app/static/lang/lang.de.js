@@ -124,6 +124,14 @@ export const lang = {
   resetDefault: { text: 'Auf Standardwerte zurücksetzen' },
 
   // mei-friend SETTINGS MENU
+  meiFriendSettingsHeader: {
+    text: 'mf-Einstellungen',
+    description: 'mei-friend-Einstellungen',
+  },
+  mfReset: {
+    text: 'Zurücksetzen',
+    description: 'mei-friend Einstellungen auf Standard zurücksetzen',
+  },
   titleGeneral: {
     text: 'Allgemein',
     description: 'Allgemeine mei-friend Einstellungen',
@@ -433,6 +441,80 @@ export const lang = {
   respSelect: {
     text: 'Responsibility wählen',
     description: 'Responsibility id für Supplied-Element auswählen',
+  },
+
+  //  EDITOR SETTINGS / CODEMIRROR SETTINGS
+  editorSettingsHeader: {
+    text: 'Editor-Einstellungen',
+  },
+  cmReset: {
+    text: 'Zurücksetzen',
+    description: 'Editor-Einstllungen zu Grundeinstellungen zurücksetzen',
+  },
+  titleAppearance: {
+    text: 'Aussehen des Editors',
+    description: 'Aussehen des Editors anpassen.',
+  },
+  zoomFont: {
+    text: 'Schriftgröße (%)',
+    description: 'Größe der Notenschrift anpassen (in Prozent)',
+  },
+  theme: {
+    text: 'Farbschema',
+    description: 'Farbschema (theme) des Editors auswählen',
+  },
+  matchTheme: {
+    text: 'Notation an Farbschema anpassen',
+    description: 'Notation an Farbschema anpassen',
+  },
+  tabSize: {
+    text: 'Größe des Einzugs',
+    description: 'Anzahl der Leerzeichen pro Einzugsebene',
+  },
+  lineWrapping: {
+    text: 'Zeilenumbruch',
+    description: 'Harter Zeilenumbruch am Fenster',
+  },
+  lineNumbers: {
+    text: 'Zeilennummern',
+    description: 'Zeilennummern anzeigen',
+  },
+  firstLineNumber: {
+    text: 'Erste Zeilennummer',
+    description: 'Erste Zeilennummer festlegen',
+  },
+  foldGutter: {
+    text: 'Code-Faltung',
+    description: 'Code-Faltung aktivieren',
+  },
+  titleEditorOptions: {
+    text: 'Verhalten des Editors',
+    description: 'Editor-Verhalten einstellen',
+  },
+  autoValidate: {
+    text: 'Automatische Validatierung',
+    description: 'Automatische Validierung der Kodierung nach jeder Eingabe',
+  },
+  autoCloseBrackets: {
+    text: 'Klammern schließen',
+    description: 'Klammern automatisch schließen',
+  },
+  autoCloseTags: {
+    text: 'XML-Tags schließen',
+    description: 'XML-Tags automatisch schließen',
+    type: 'bool',
+  },
+  matchTags: {
+    text: 'Passende Tags hervorheben',
+    description: 'Passende XML-Tags hervorheben',
+  },
+  showTrailingSpace: {
+    text: 'Nachstehende Leerzeichen',
+    description: 'Überflüssige nachstehende Leerzeichen hervorheben',
+  },
+  keyMap: {
+    text: 'Tastenbelegung',
+    description: 'Tastaturbelegung auswählen',
   },
 
   // main.js alert messages

@@ -544,6 +544,9 @@ export const meiFriendSettingsOptions = {
   },
 }; // meiFriendSettingsOptions object
 
+/**
+ * Please note: title & description will be overridden by language packs lang.XX.js
+ */
 export const codeMirrorSettingsOptions = {
   // key as in CodeMirror
   titleAppearance: {

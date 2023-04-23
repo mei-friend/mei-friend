@@ -1010,7 +1010,7 @@ export default class Viewer {
     let addListeners = false; // add event listeners only the first time
     let rt = document.querySelector(':root');
     if (!/\w/g.test(mfs.innerHTML)) addListeners = true;
-    mfs.innerHTML = '<div class="settingsHeader">mei-friend Settings</div>';
+    mfs.innerHTML = '<div class="settingsHeader" id="meiFriendSettingsHeader">' + lang.meiFriendSettingsHeader.text + '</div>';
     let storage = window.localStorage;
     let currentHeader;
     Object.keys(meiFriendSettingsOptions).forEach((opt) => {
@@ -1387,7 +1387,7 @@ export default class Viewer {
     let addListeners = false; // add event listeners only the first time
     let currentHeader;
     if (!/\w/g.test(cmsp.innerHTML)) addListeners = true;
-    cmsp.innerHTML = '<div class="settingsHeader">Editor Settings</div>';
+    cmsp.innerHTML = '<div class="settingsHeader" id="editorSettingsHeader">' + lang.editorSettingsHeader.text + '</div>';
     Object.keys(codeMirrorSettingsOptions).forEach((opt) => {
       let o = codeMirrorSettingsOptions[opt];
       let value = o.default;
