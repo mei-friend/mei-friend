@@ -585,7 +585,7 @@ document.addEventListener('DOMContentLoaded', function () {
     } else {
       if (storage.supported) {
         storage.safelySetStorageItem('forkAndOpen', urlFileName);
-        document.getElementById('GithubLoginLink').click();
+        document.getElementById('githubLoginLink').click();
       }
     }
   }
@@ -1494,20 +1494,20 @@ function addEventListeners(v, cm) {
   });
 
   // VIEW layout notation position
-  document.getElementById('NotationTop').addEventListener('click', cmd.notationTop);
-  document.getElementById('NotationBottom').addEventListener('click', cmd.notationBottom);
-  document.getElementById('NotationLeft').addEventListener('click', cmd.notationLeft);
-  document.getElementById('NotationRight').addEventListener('click', cmd.notationRight);
+  document.getElementById('notationTop').addEventListener('click', cmd.notationTop);
+  document.getElementById('notationBottom').addEventListener('click', cmd.notationBottom);
+  document.getElementById('notationLeft').addEventListener('click', cmd.notationLeft);
+  document.getElementById('notationRight').addEventListener('click', cmd.notationRight);
   // VIEW show settings panel
   document.getElementById('showSettingsMenu').addEventListener('click', cmd.showSettingsPanel);
   document.getElementById('showSettingsButton').addEventListener('click', cmd.showSettingsPanel);
   document.getElementById('hideSettingsButton').addEventListener('click', cmd.hideSettingsPanel);
   document.getElementById('closeSettingsButton').addEventListener('click', cmd.hideSettingsPanel);
   // VIEW facsimile position
-  document.getElementById('FacsimileTop').addEventListener('click', cmd.facsimileTop);
-  document.getElementById('FacsimileBottom').addEventListener('click', cmd.facsimileBottom);
-  document.getElementById('FacsimileLeft').addEventListener('click', cmd.facsimileLeft);
-  document.getElementById('FacsimileRight').addEventListener('click', cmd.facsimileRight);
+  document.getElementById('facsimileTop').addEventListener('click', cmd.facsimileTop);
+  document.getElementById('facsimileBottom').addEventListener('click', cmd.facsimileBottom);
+  document.getElementById('facsimileLeft').addEventListener('click', cmd.facsimileLeft);
+  document.getElementById('facsimileRight').addEventListener('click', cmd.facsimileRight);
 
   document.getElementById('filterSettings').addEventListener('input', cmd.filterSettings);
   document.getElementById('filterSettings').value = '';
@@ -1553,12 +1553,12 @@ function addEventListeners(v, cm) {
   document.getElementById('OpenMei').addEventListener('click', cmd.open);
   document.getElementById('OpenUrl').addEventListener('click', cmd.openUrl);
   document.getElementById('OpenExample').addEventListener('click', cmd.openExample);
-  document.getElementById('ImportMusicXml').addEventListener('click', cmd.openMusicXml);
-  document.getElementById('ImportHumdrum').addEventListener('click', cmd.openHumdrum);
-  document.getElementById('ImportPae').addEventListener('click', cmd.openPae);
+  document.getElementById('importMusicXml').addEventListener('click', cmd.openMusicXml);
+  document.getElementById('importHumdrum').addEventListener('click', cmd.openHumdrum);
+  document.getElementById('importPae').addEventListener('click', cmd.openPae);
   document.getElementById('SaveMei').addEventListener('click', downloadMei);
-  document.getElementById('SaveSvg').addEventListener('click', downloadSvg);
-  document.getElementById('SaveMidi').addEventListener('click', () => requestMidiFromVrvWorker());
+  document.getElementById('saveSvg').addEventListener('click', downloadSvg);
+  document.getElementById('saveMidi').addEventListener('click', () => requestMidiFromVrvWorker());
   document.getElementById('PrintPreview').addEventListener('click', cmd.pageModeOn);
   document.getElementById('GenerateUrlMenu').addEventListener('click', cmd.generateUrl);
 

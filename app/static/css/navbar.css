@@ -139,7 +139,7 @@
   justify-content: flex-start;
 }
 
-#GithubLoginLink {
+#githubLoginLink {
   float: unset;
   color: unset;
   text-align: unset;
