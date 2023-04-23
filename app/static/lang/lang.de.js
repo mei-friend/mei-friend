@@ -12,7 +12,7 @@ export const lang = {
   fileMenuTitle: { text: 'Datei' },
   openMeiText: { text: 'Datei öffnen' },
   openUrlText: { text: 'URL öffnen' },
-  openExpample: { text: 'Öffentliches Repertoire' },
+  openExpample: { text: 'Öffentliches Repertoire', description: 'Liste von öffentlich lizensiertem Repertoire' },
   importMusicXml: { text: 'MusicXML importieren' },
   importHumdrum: { text: 'Humdrum importieren' },
   importPae: { text: 'PAE, ABC importieren' },
@@ -372,67 +372,67 @@ export const lang = {
   },
   // Annotations
   titleAnnotations: {
-    text: 'Annotations',
-    description: 'Annotation settings',
+    text: 'Annotationen',
+    description: 'Einstellungen für Annotationen',
   },
   showAnnotations: {
-    text: 'Show annotations',
-    description: 'Show annotations in notation',
+    text: 'Annotationen anzeigen',
+    description: 'Zeige Annotationen in der Notation',
   },
   showAnnotationPanel: {
-    text: 'Show annotation panel',
-    description: 'Show annotation panel',
+    text: 'Annotationenbedienfeld anzeigen',
+    description: 'Annotationenbedienfeld anzeigen',
   },
   annotationDisplayLimit: {
-    text: 'Maximum number of annotations',
-    description: 'Maximum number of annotations to display ' + '(large numbers may slow mei-friend)',
+    text: 'Maximale Anzahl von Annotationen',
+    description: 'Maximale Anzahl der anzuzeigenden Anmerkungen (eine große Anzahl könnte mei-friend verlangsamen)',
   },
   // Facsimile
   titleFacsimilePanel: {
-    text: 'Facsimile panel',
-    description: 'Show the facsimile imiages of the source edition, if available',
+    text: 'Faksimile-Panel',
+    description: 'Faksimile-Panel',
   },
   showFacsimilePanel: {
-    text: 'Show facsimile panel',
-    description: 'Show the score images of the source edition provided in the facsimile element',
+    text: 'Faksimile-Panel anzeigen',
+    description: 'Faksimile-Bilder der Quelledition anzeigen, falls vorhanden',
   },
   selectFacsimilePanelOrientation: {
-    text: 'Facsimile panel position',
-    description: 'Select facsimile panel position relative to notation',
-    labels: ['left', 'right', 'top', 'bottom'],
+    text: 'Position des Faksimile-Panel',
+    description: 'Position des Faksimile-Panel relativ zur Notation auswählen',
+    labels: ['Links', 'Rechts', 'Oben', 'Unten'],
   },
   facsimileZoomInput: {
-    text: 'Facsimile image zoom (%)',
-    description: 'Zoom level of facsimile image (in percent)',
+    text: 'Größe der Faksimile-Bilder (%)',
+    description: 'Größe der Faksimile-Bilder verändern (in Prozent)',
   },
   showFacsimileFullPage: {
-    text: 'Show full page',
-    description: 'Show facsimile image on full page',
+    text: 'Ganze Seite anzeigen',
+    description: 'Zeige die gesamten Faksimile-Bilder',
   },
   showFacsimileZones: {
-    text: 'Show facsimile zone boxes',
-    description: 'Show facsimile zone bounding boxes',
+    text: 'Faksimile-Zonenfelder anzeigen',
+    description: 'Faksimile-Zonenbegrenzungsfelder anzeigen',
   },
   editFacsimileZones: {
-    text: 'Edit facsimile zones',
-    description: 'Edit facsimile zones (will link bounding boxes to facsimile zones)',
+    text: 'Faksimile-Zonenfelder bearbeiten',
+    description: 'Faksimile-Zonenfelder bearbeiten',
   },
   // Supplied element
   titleSupplied: {
-    text: 'Handle editorial content',
-    description: 'Control handling of <supplied> elements',
+    text: 'Editorische Inhalte',
+    description: 'Editorische Inhalte im MEI',
   },
   showSupplied: {
-    text: 'Show <supplied> elements',
-    description: 'Highlight all elements contained by a <supplied> element',
+    text: 'Zeige Supplied-Element',
+    description: 'Hebe Inhalte, die von <supplied>-Elementen umgeben sind, hervor',
   },
   suppliedColor: {
-    text: 'Select <supplied> highlight color',
-    description: 'Select <supplied> highlight color',
+    text: 'Farbe für Supplied',
+    description: 'Farbe für Supplied auswählen',
   },
   respSelect: {
-    text: 'Select <supplied> responsibility',
-    description: 'Select responsibility id',
+    text: 'Responsibility wählen',
+    description: 'Responsibility id für Supplied-Element auswählen',
   },
 
   // main.js alert messages

@@ -11,7 +11,7 @@ export const lang = {
   fileMenuTitle: { text: 'File' },
   openMeiText: { text: 'Open file' },
   openUrlText: { text: 'Open URL' },
-  openExpample: { text: 'Public repertoire' },
+  openExpample: { text: 'Public repertoire', description: 'Open a list of public-domain repertoire' },
   importMusicXml: { text: 'Import MusicXML' },
   importHumdrum: { text: 'Import Humdrum' },
   importPae: { text: 'Import PAE, ABC' },
@@ -356,7 +356,7 @@ export const lang = {
   // Facsimile
   titleFacsimilePanel: {
     text: 'Facsimile panel',
-    description: 'Show the facsimile imiages of the source edition, if available',
+    description: 'Show the facsimile images of the source edition, if available',
   },
   showFacsimilePanel: {
     text: 'Show facsimile panel',
@@ -460,5 +460,5 @@ export const lang = {
   reportIssueWithEncoding: { text: 'Report issue with encoding' },
   clickToOpenInMeiFriend: { text: 'Click to open in mei-friend' },
   repoAccessError: { text: 'Sorry, cannot access repositories for supplied user or organisation' },
-  allComposers: {text: 'All composers'}, // fork-repository.js
+  allComposers: { text: 'All composers' }, // fork-repository.js
 };
