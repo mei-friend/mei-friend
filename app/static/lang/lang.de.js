@@ -457,8 +457,17 @@ export const lang = {
   },
   errorCode: { text: 'Fehlerkode' },
   submitBugReport: { text: 'Fehlerbericht übermitteln' },
+  loadingSchema: {text: 'Lade Schema'},
+  schemaLoaded: {text: 'Schema geladen'},
+  noSchemaFound: { text: 'Keine Schema-Information in MEI gefunden.' },
+  schemaNotFound: { text: 'Schema nicht gefunden' },
+  errorLoadingSchema: {text: 'Fehler beim Laden des Schemas'},
+  notValidated: {text: 'Nicht validiert. Zum Validieren hier klicken.'},
   validatingAgainst: { text: 'Validieren gegen' },
+  validatedAgainst: { text: 'Validiert gegen' },
+  validationMessages: { text: 'Validierungsmeldungen' },
   validationComplete: { text: 'Validierung abgeschlossen' },
+  validationFailed: { text: 'Validierung fehlgeschlagen' },
   noErrors: { text: 'keine Fehler' },
   errorsFound: { text: 'Fehler gefunden' }, // 5 errors found
 };

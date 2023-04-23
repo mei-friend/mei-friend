@@ -33,7 +33,7 @@ import {
   platform,
   supportedVerovioVersions,
 } from './defaults.js';
-import { changeLanguage, translateGui } from './translator.js';
+import { changeLanguage, lang } from './translator.js';
 
 export default class Viewer {
   constructor(vrvWorker, spdWorker) {
@@ -2107,11 +2107,9 @@ export default class Viewer {
           }
         }
       }
-      console.log('Validation: No schema information found in MEI.');
+      console.log(lang.noSchemaFound.text);
       this.currentSchema = '';
-      this.throwSchemaError({
-        schemaFile: 'No schema information found in MEI.',
-      });
+      this.throwSchemaError({ schemaFile: lang.noSchemaFound.text });
       return;
     }
     const schema = /<\?xml-model.*href="([^"]*).*/;
@@ -2132,7 +2130,7 @@ export default class Viewer {
     if (!this.validatorInitialized) return;
     let vs = document.getElementById('validation-status');
     vs.innerHTML = download;
-    let msg = 'Loading schema ' + schemaFile;
+    let msg = lang.loadingSchema.text + ' ' + schemaFile;
     vs.setAttribute('title', msg);
     this.changeStatus(vs, 'wait', ['error', 'ok', 'manual']);
     this.updateSchemaStatusDisplay('wait', schemaFile, msg);
@@ -2153,12 +2151,12 @@ export default class Viewer {
       const res = await validator.setRelaxNGSchema(data);
     } catch (err) {
       this.throwSchemaError({
-        err: 'Schema error at replacing schema: ' + err,
+        err: lang.errorLoadingSchema.text + ': ' + err,
         schemaFile: schemaFile,
       });
       return;
     }
-    msg = 'Schema loaded ' + schemaFile;
+    msg = lang.schemaLoaded.text + ' ' + schemaFile;
     vs.setAttribute('title', msg);
     vs.innerHTML = unverified;
     this.validatorWithSchema = true;
@@ -2184,7 +2182,7 @@ export default class Viewer {
     // construct error message
     let msg = '';
     if (msgObj.hasOwnProperty('response'))
-      msg = 'Schema not found (' + msgObj.response.status + ' ' + msgObj.response.statusText + '): ';
+      msg = lang.schemaNotFound.text + ' (' + msgObj.response.status + ' ' + msgObj.response.statusText + '): ';
     if (msgObj.hasOwnProperty('err')) msg = msgObj.err + ' ';
     if (msgObj.hasOwnProperty('schemaFile')) msg += msgObj.schemaFile;
     // set icon to unverified and error color
@@ -2242,7 +2240,7 @@ export default class Viewer {
     let vs = document.getElementById('validation-status');
     vs.innerHTML = unverified;
     vs.style.cursor = 'pointer';
-    vs.setAttribute('title', 'Not validated. Press here to validate.');
+    vs.setAttribute('title', lang.notValidated.text);
     vs.removeEventListener('click', this.manualValidate);
     vs.removeEventListener('click', this.toggleValidationReportVisibility);
     vs.addEventListener('click', this.manualValidate);
@@ -2327,7 +2325,8 @@ export default class Viewer {
       reportDiv.appendChild(closeButton);
       let p = document.createElement('div');
       p.classList.add('validation-title');
-      p.innerHTML = 'Validation failed. ' + Object.keys(messages).length + ' validation messages:';
+      p.innerHTML =
+        lang.validationFailed.text + '. ' + Object.keys(messages).length + ' ' + lang.validationMessages.text + ':';
       reportDiv.appendChild(p);
       messages.forEach((m, i) => {
         let p = document.createElement('div');
@@ -2351,14 +2350,21 @@ export default class Viewer {
     }
     vs.setAttribute(
       'title',
-      'Validated against ' + this.currentSchema + ': ' + Object.keys(messages).length + ' validation messages.'
+      lang.validatedAgainst.text +
+        ' ' +
+        this.currentSchema +
+        ': ' +
+        Object.keys(messages).length +
+        ' ' +
+        lang.validationMessages.text +
+        '.'
     );
     if (reportDiv) {
       vs.removeEventListener('click', this.manualValidate);
       vs.removeEventListener('click', this.toggleValidationReportVisibility);
       vs.addEventListener('click', this.toggleValidationReportVisibility);
     }
-  }
+  } // highlightValidation()
 
   // Show/hide #validation-report panel, or force visibility (by string)
   toggleValidationReportVisibility(forceVisibility = '') {
@@ -2373,4 +2379,4 @@ export default class Viewer {
       }
     }
   }
-}
+} // toggleValidationReportVisibility()

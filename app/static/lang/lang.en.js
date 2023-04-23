@@ -423,8 +423,17 @@ export const lang = {
   },
   errorCode: { text: 'Error Code' },
   submitBugReport: { text: 'Submit bug report' },
+  loadingSchema: { text: 'Loading Schema' },
+  schemaLoaded: { text: 'Schema loaded' },
+  noSchemaFound: { text: 'No schema information found in MEI.' },
+  schemaNotFound: { text: 'Schema not found' },
+  errorLoadingSchema: {text: 'Error at loading schema'},
+  notValidated: { text: 'Not validated. Press here to validate.' },
   validatingAgainst: { text: 'Validating against' },
+  validatedAgainst: { text: 'Validated against' },
+  validationMessages: { text: 'validation messages' },
   validationComplete: { text: 'Validation complete' },
+  validationFailed: { text: 'Validation failed' },
   noErrors: { text: 'no errors' },
   errorsFound: { text: 'errors found' }, // 5 errors found
 };
