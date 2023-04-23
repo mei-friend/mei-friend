@@ -3,9 +3,9 @@
  *
  */
 
-var defaultLangCode = 'en';
-var defaultLang; // global object for default (English) language pack
-var langCode = '';
+export var defaultLangCode = 'en';
+export var defaultLang; // global object for default (English) language pack
+export var langCode = '';
 export var lang = {}; // global lang object from language pack files
 
 import * as l from '../lang/lang.en.js';
@@ -37,14 +37,15 @@ export function changeLanguage(languageCode) {
   }
 } // changeLanguage()
 
-// export function requestLanguageKey(key) {
-//   if (!lang) {
-
-//   } else {
-//     if (key in lang) return lang[key];
-//   }
-//   return '';
-// }
+/**
+ * Returns promise for importing the language pack for the language code
+ * @param {string} languageCode 
+ */
+export async function requestLanguagePack(languageCode) {
+  const languagePack = '../lang/lang.' + languageCode + '.js';
+  console.log('Loading language pack: ', languagePack);
+  return import(languagePack);
+} // 
 
 /**
  * Load default language pack (English), and change language thereafter (if second argument provided)

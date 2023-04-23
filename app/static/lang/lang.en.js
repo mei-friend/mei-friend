@@ -421,4 +421,10 @@ export const lang = {
   generateUrlNotCopied: {
     text: 'URL not copied to clipboard, please try again!',
   },
+  errorCode: { text: 'Error Code' },
+  submitBugReport: { text: 'Submit bug report' },
+  validatingAgainst: { text: 'Validating against' },
+  validationComplete: { text: 'Validation complete' },
+  noErrors: { text: 'no errors' },
+  errorsFound: { text: 'errors found' }, // 5 errors found
 };

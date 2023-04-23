@@ -102,7 +102,7 @@ import {
   platform,
   isSafari,
 } from './defaults.js';
-import { lang } from './translator.js';
+import { defaultLangCode, lang, requestLanguagePack } from './translator.js';
 
 const defaultCodeMirrorOptions = {
   lineNumbers: true,
@@ -329,7 +329,7 @@ export async function validate(mei, updateLinting, options) {
       vs.innerHTML = clock;
       v.changeStatus(vs, 'wait', ['error', 'ok', 'manual']); // darkorange
       vs.querySelector('svg').classList.add('clockwise');
-      vs.setAttribute('title', 'Validating against ' + v.currentSchema);
+      vs.setAttribute('title', lang.validatingAgainst.text + ' ' + v.currentSchema);
       const validationString = await validator.validateNG(mei);
       let validation;
       try {
@@ -338,7 +338,10 @@ export async function validate(mei, updateLinting, options) {
         console.error('Could not parse validation json:', err);
         return;
       }
-      console.log('Validation complete: ', validation === [] ? 'no errors.' : validation.length + ' errors found.');
+      console.log(
+        lang.validationComplete.text + ': ',
+        validation === [] ? lang.noErrors.text + '.' : validation.length + ' ' + lang.errorsFound.text + '.'
+      );
       v.highlightValidation(mei, validation);
     } else if (v.validatorWithSchema && !document.getElementById('autoValidate').checked) {
       v.setValidationStatusToManual();
@@ -518,13 +521,12 @@ document.addEventListener('DOMContentLoaded', function () {
     if (speedParam !== null) storage.speed = speedParam;
     if (breaksParam !== null) storage.breaks = breaksParam;
     if (storage.githubLogoutRequested) {
-      // TODO translate && check asynch issues
-      v.showAlert(
-        `You have logged out of mei-friend's GitHub integration, but your browser is still logged in to GitHub!
-      <a href="https://github.com/logout" target="_blank">Click here to logout from GitHub</a>.`,
-        'warning',
-        30000
-      );
+      // we need to look directly to local storage, because it will 
+      let language = window.localStorage['mf-selectLanguage'];
+      let langCode = language ? language.slice(0, 2).toLowerCase() : defaultLangCode;
+      requestLanguagePack(langCode).then((p) => {
+        v.showAlert(p.lang.githubLoggedOutWarning.text, 'warning', 30000);
+      });
       storage.removeItem('githubLogoutRequested');
     }
 
@@ -1943,11 +1945,11 @@ export function handleEditorChanges() {
 export function log(s, code = null) {
   s += '<div>';
   if (code) {
-    s += ' Error Code: ' + code + '<br/>';
-    s += `<a id="bugReport" target="_blank" href="https://github.com/mei-friend/mei-friend/issues/new?assignees=&labels=&template=bug_report.md&title=Error ${code}">Submit bug report</a>`;
+    s += ' ' + lang.errorCode.text + ': ' + code + '<br/>';
+    s += `<a id="bugReport" target="_blank" href="https://github.com/mei-friend/mei-friend/issues/new?assignees=&labels=&template=bug_report.md&title=Error ${code}">${lang.submitBugReport.text}</a>`;
     v.showAlert(s, 'error', 30000);
   } else {
-    s += `<a id="bugReport" target="_blank" href="https://github.com/mei-friend/mei-friend/issues/new?assignees=&labels=&template=bug_report.md">Submit bug report</a>`;
+    s += `<a id="bugReport" target="_blank" href="https://github.com/mei-friend/mei-friend/issues/new?assignees=&labels=&template=bug_report.md">${lang.submitBugReport.text}</a>`;
     v.showAlert(s, 'warning', 30000);
   }
   s += '</div>';
