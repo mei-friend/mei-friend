@@ -427,7 +427,7 @@ export const lang = {
   schemaLoaded: { text: 'Schema loaded' },
   noSchemaFound: { text: 'No schema information found in MEI.' },
   schemaNotFound: { text: 'Schema not found' },
-  errorLoadingSchema: {text: 'Error at loading schema'},
+  errorLoadingSchema: { text: 'Error at loading schema' },
   notValidated: { text: 'Not validated. Press here to validate.' },
   validatingAgainst: { text: 'Validating against' },
   validatedAgainst: { text: 'Validated against' },
@@ -436,4 +436,29 @@ export const lang = {
   validationFailed: { text: 'Validation failed' },
   noErrors: { text: 'no errors' },
   errorsFound: { text: 'errors found' }, // 5 errors found
+
+  // github-menu.js
+  repository: { text: 'Repository' },
+  branch: { text: 'Branch' },
+  path: { text: 'Path' },
+  commit: { text: 'Commit' },
+  commitLog: { text: 'Commit log' },
+  commitAsNewFile: { text: 'Commit as new file' },
+  date: { text: 'Date' },
+  author: { text: 'Author' },
+  message: { text: 'Message' },
+  none: { text: 'None' },
+  fileName: { text: 'File name' },
+  forkRepository: { text: 'Fork repository' },
+  forkError: { text: 'Sorry, could not fork repository' },
+  loadingFile: { text: 'Loading file' },
+  loadingFromGithub: { text: 'Loading from Github' },
+  logOut: { text: 'Log out' },
+  selectRepository: { text: 'Select repository' },
+  selectBranch: { text: 'Select branch' },
+  commitPlaceholder: { text: 'Updated using mei-friend online' },
+  reportIssueWithEncoding: { text: 'Report issue with encoding' },
+  clickToOpenInMeiFriend: { text: 'Click to open in mei-friend' },
+  repoAccessError: { text: 'Sorry, cannot access repositories for supplied user or organisation' },
+  allComposers: {text: 'All composers'}, // fork-repository.js
 };
