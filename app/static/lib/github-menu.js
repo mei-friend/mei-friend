@@ -424,41 +424,50 @@ export async function fillInBranchContents(e) {
     <a id="branchesHeader" href="#"><span class="btn icon inline-block-tight">${icon.arrowLeft}</span>Branch: ${github.branch}</a>
     <hr class="dropdown-line">
     <a id="contentsHeader" href="#"><span class="btn icon inline-block-tight filepath">${icon.arrowLeft}</span>Path: <span class="filepath">${github.filepath}</span></a>
-    <hr class="dropdown-line">
-    <a id="actionsHeader" href="#">GitHub actions</a>
-    <hr class="dropdown-line">
+    <hr class="dropdown-line" id="actionsDivider">
     `;
-  github.getActionWorkflowsList().then(resp => {
-    console.log("Repository has workflows list: ", resp)
-    const actionsHeader = document.getElementById("actionsHeader");
-    if(actionsHeader && 'workflows' in resp) { 
-      resp.workflows.forEach((wf) => {
-        if(wf.state === "active") {
-          let workflowSpan = document.createElement("span");
-          workflowSpan.id = wf.id;
-          workflowSpan.dataset.node_id = wf.node_id;
-          workflowSpan.dataset.path = wf.path;
-          workflowSpan.dataset.state = wf.state;
-          workflowSpan.dataset.url = wf.url;
-          workflowSpan.title = wf.url;
-          workflowSpan.innerText = wf.name;
-          workflowSpan.classList.add("inline-block-tight", "workflow");
-          let workflowSpanContainer = document.createElement("a");
-          workflowSpanContainer.onclick = (e) => { 
-            githubLoadingIndicator.classList.add("clockwise");
-            github.requestActionWorkflowRun(e).then(workflowRunResp => { 
-              console.log("Got workflow run response: ", workflowRunResp);
-            }).finally(() => githubLoadingIndicator.classList.remove("clockwise"));
+  if(document.getElementById("enableGitHubActions").checked) { 
+    github.getActionWorkflowsList().then(resp => {
+      console.log("Repository has workflows list: ", resp)
+      const actionsDivider = document.getElementById("actionsDivider");
+      if(actionsDivider && 'workflows' in resp) { 
+        resp.workflows.forEach((wf) => {
+          if(wf.state === "active") {
+            let workflowSpan = document.createElement("span");
+            workflowSpan.id = wf.id;
+            workflowSpan.dataset.node_id = wf.node_id;
+            workflowSpan.dataset.path = wf.path;
+            workflowSpan.dataset.state = wf.state;
+            workflowSpan.dataset.url = wf.url;
+            workflowSpan.title = wf.url;
+            workflowSpan.innerText = "GH Action: " + wf.name;
+            workflowSpan.classList.add("inline-block-tight", "workflow");
+            let workflowSpanContainer = document.createElement("a");
+            workflowSpanContainer.onclick = (e) => { 
+              githubLoadingIndicator.classList.add("clockwise");
+              github.requestActionWorkflowRun(e).then(workflowRunResp => { 
+                console.log("Got workflow run response: ", workflowRunResp);
+              }).finally(() => githubLoadingIndicator.classList.remove("clockwise"));
+            }
+            workflowSpanContainer.insertAdjacentElement("beforeend", workflowSpan);
+            actionsDivider.insertAdjacentElement("afterend", workflowSpanContainer);
+          } else { 
+            console.warn("Skipping inactive GitHub Actions workflow: ", wf);
           }
-          workflowSpanContainer.insertAdjacentElement("beforeend", workflowSpan);
-          actionsHeader.insertAdjacentElement("afterend", workflowSpanContainer);
-        } else { 
-          console.warn("Skipping inactive GitHub Actions workflow: ", wf);
+        });
+        if(resp.workflows.length) { 
+          // add lower dividing line below final action
+          let firstBranchContents = document.querySelector(".branchContents");
+          if(firstBranchContents) {
+            let actionsContentDivider = document.createElement("hr");
+            actionsContentDivider.classList.add("dropdown-line");
+            firstBranchContents.insertAdjacentElement("beforebegin", actionsContentDivider)
+          }
         }
-      });
-    }
-    console.log("Received actions list response: ", resp);
-  });
+      }
+      console.log("Received actions list response: ", resp);
+    });
+  }
   if (e) {
     Array.from(branchContents).forEach((content) => {
       const isDir = content.type === 'dir';
