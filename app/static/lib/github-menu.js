@@ -446,7 +446,7 @@ export async function fillInBranchContents(e) {
           let workflowSpanContainer = document.createElement("a");
           workflowSpanContainer.onclick = (e) => { 
             githubLoadingIndicator.classList.add("clockwise");
-            github.requestWorkflowRun(e).then(workflowRunResp => { 
+            github.requestActionWorkflowRun(e).then(workflowRunResp => { 
               console.log("Got workflow run response: ", workflowRunResp);
             }).finally(() => githubLoadingIndicator.classList.remove("clockwise"));
           }

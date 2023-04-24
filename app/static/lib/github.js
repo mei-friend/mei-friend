@@ -494,7 +494,7 @@ export default class Github {
     }).then((res) => res.json());
   }
 
-  async requestWorkflowRun(e) { 
+  async requestActionWorkflowRun(e) { 
     let target = e.target;
     if(target.nodeName === "A") { 
       target = target.firstChild;
