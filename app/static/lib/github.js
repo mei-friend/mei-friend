@@ -18,6 +18,11 @@ export default class Github {
       Authorization: 'Basic ' + btoa(userLogin + ':' + githubToken),
       Accept: 'application/vnd.github.raw',
     });
+    this.actionsHeaders = new Headers({
+      Authorization: 'Basic ' + btoa(userLogin + ':' + githubToken),
+      Accept: 'application/vnd.github+json',
+      'X-GitHub-Api-Version': '2022-11-28'
+    })
     // remember this as our 'upstream' repo in case we need to fork
     this.upstreamRepoName = this.githubRepoName;
     this.upstreamRepoOwner = this.githubRepoOwner;
@@ -479,6 +484,32 @@ export default class Github {
       method: 'GET',
       headers: this.apiHeaders,
     }).then((res) => res.json());
+  }
+
+  async getActionWorkflowsList(per_page = 30, page = 1) { 
+    const actionsUrl = `https://api.github.com/repos/${this.githubRepo}/actions/workflows?per_page=${per_page}&page=${page}`;
+    return fetch(actionsUrl, { 
+      method: 'GET', 
+      headers: this.actionsHeaders,
+    }).then((res) => res.json());
+  }
+
+  async requestWorkflowRun(e) { 
+    let target = e.target;
+    if(target.nodeName === "A") { 
+      target = target.firstChild;
+    }
+    const dispatchUrl = `https://api.github.com/repos/${this.githubRepo}/actions/workflows/${target.id}/dispatches`;
+    return fetch(dispatchUrl, {
+      method: 'POST',
+      headers: this.actionsHeaders,
+      body: JSON.stringify({ 
+        ref: this.branch,
+        inputs: { 
+          filepath: this.filepath
+        }
+      })
+    }).then((res => res.json()))
   }
 }
 
