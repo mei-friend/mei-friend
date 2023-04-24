@@ -2,6 +2,7 @@
  * Language file for English
  */
 import * as att from '../lib/attribute-classes.js';
+import { heart } from '../css/icons.js';
 
 export const lang = {
   // Main menu bar
@@ -121,6 +122,16 @@ export const lang = {
   consultGuidelinesForElementText: { text: 'Consult Guidelines for current element' },
   provideFeedback: { text: 'Provide feedback' },
   resetDefault: { text: 'Reset to default' },
+
+  // Footer texts
+  leftFooter: {
+    html:
+      'Hosted by <a href="https://iwk.mdw.ac.at">IWK</a> ' +
+      'at <a href="https://mdw.ac.at">mdw</a>, with ' +
+      heart +
+      ' from Vienna.' +
+      '<a href="https://iwk.mdw.ac.at/impressum">Imprint</a>.',
+  },
 
   // mei-friend SETTINGS MENU
   meiFriendSettingsHeader: { text: 'mei-friend Settings' },

@@ -1906,8 +1906,8 @@ function updateHtmlTitle() {
 }
 
 function drawLeftFooter() {
-  let lf = document.querySelector('.leftfoot');
-  lf.innerHTML = envMsg;
+  let lf = document.getElementById('leftFooter');
+  lf.innerHTML = translator.lang.leftFooter.text;
 }
 
 function drawRightFooter() {

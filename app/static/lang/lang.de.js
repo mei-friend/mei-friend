@@ -123,6 +123,16 @@ export const lang = {
   provideFeedback: { text: 'Feedback geben' },
   resetDefault: { text: 'Auf Standardwerte zurücksetzen' },
 
+  // Footer texts
+  leftFooter: {
+    html:
+      'Gehosted von <a href="https://iwk.mdw.ac.at">IWK</a> ' +
+      'der <a href="https://mdw.ac.at">mdw</a>, mit ' +
+      heart +
+      ' aus Wien.' +
+      '<a href="https://iwk.mdw.ac.at/impressum">Impressum</a>.',
+  },
+
   // mei-friend SETTINGS MENU
   meiFriendSettingsHeader: {
     text: 'mf-Einstellungen',
@@ -499,7 +509,7 @@ export const lang = {
   },
   vrvReset: {
     text: 'Zurücksetzen',
-    description: 'Verovio zu mei-friend Standardwerten zurücksetzen',
+    description: 'Verovio auf mei-friend Standardwerte zurücksetzen',
   },
 
   // main.js alert messages

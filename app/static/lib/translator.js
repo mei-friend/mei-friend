@@ -90,6 +90,7 @@ export default class Translator {
             }
           }
           if ('description' in this.lang[key]) el.title = this.lang[key].description;
+          if ('html' in this.lang[key]) el.innerHTML = this.lang[key].html;
         }
       }
     }
