@@ -376,7 +376,7 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 /**
- *
+ * Do all the heavy GUI lifting after DOMCOntentLoaded event was fired
  */
 function onLanguageLoaded() {
   // link to changelog page according to env settings (develop/staging/production)

@@ -1504,7 +1504,7 @@ export default class Viewer {
     let vsp = document.getElementById('verovioSettings');
     let addListeners = false; // add event listeners only the first time
     if (!/\w/g.test(vsp.innerHTML)) addListeners = true;
-    vsp.innerHTML = '<div class="settingsHeader">Verovio Settings</div>';
+    vsp.innerHTML = '<div class="settingsHeader" id="verovioSettingsHeader">Verovio Settings</div>';
     let storage = window.localStorage;
 
     Object.keys(tkAvailableOptions.groups).forEach((grp, i) => {

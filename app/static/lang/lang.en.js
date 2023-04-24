@@ -478,6 +478,15 @@ export const lang = {
     description: 'Select key map',
   },
 
+  // Verovio settings
+  verovioSettingsHeader: {
+    text: 'Verovio Settings',
+  },
+  vrvReset: {
+    text: 'Default',
+    description: 'Reset Verovio to mei-friend defaults',
+  },
+
   // main.js alert messages
   isSafariWarning: {
     text:

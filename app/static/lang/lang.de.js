@@ -211,8 +211,8 @@ export const lang = {
     description: 'Steuerung anzeigen zur automatischen Notationsaktualisierung',
   },
   controlMenuFontSelector: {
-    text: 'Auswahl der Notenschrift',
-    description: 'Auswahl der Notenschrift (SMuFL font) in der Notationskontrollleiste anzeigen',
+    text: 'Auswahl der Notationsschrift',
+    description: 'Auswahl der Notationsschrift (SMuFL font) in der Notationskontrollleiste anzeigen',
   },
   controlMenuNavigateArrows: {
     text: 'Navigationspfeile anzeigen',
@@ -221,30 +221,6 @@ export const lang = {
   controlMenuSpeedmodeCheckbox: {
     text: 'Speed Mode Auswahl anzeigen',
     description: 'Speed Mode Auswahl anzeigen in der Notationskontrollleiste',
-  },
-  controlMenuSettings: {
-    text: 'D Notation control bar',
-    description: 'Define items to be shown in control menu above the notation',
-  },
-  controlMenuFlipToPageControls: {
-    text: 'D Show flip to page controls',
-    description: 'Show flip to page controls in notation control menu',
-  },
-  controlMenuUpdateNotation: {
-    text: 'D Show notation update controls',
-    description: 'Show notation update behavior controls in notation control menu',
-  },
-  controlMenuFontSelector: {
-    text: 'Show notation font selector',
-    description: 'Show notation font (SMuFL) selector in notation control menu',
-  },
-  controlMenuNavigateArrows: {
-    text: 'Show navigation arrows',
-    description: 'Show notation navigation arrows in notation control menu',
-  },
-  controlMenuSpeedmodeCheckbox: {
-    text: 'Show speed mode checkbox',
-    description: 'Show speed mode checkbox in notation control menu',
   },
   // MIDI Playback
   titleMidiPlayback: {
@@ -515,6 +491,15 @@ export const lang = {
   keyMap: {
     text: 'Tastenbelegung',
     description: 'Tastaturbelegung auswählen',
+  },
+
+  // Verovio settings
+  verovioSettingsHeader: {
+    text: 'Verovio-Einstellungen',
+  },
+  vrvReset: {
+    text: 'Zurücksetzen',
+    description: 'Verovio zu mei-friend Standardwerten zurücksetzen',
   },
 
   // main.js alert messages
