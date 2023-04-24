@@ -13,6 +13,7 @@ import {
   rngLoader,
   storage,
   tkVersion,
+  translator,
   validate,
   validator,
   version,
@@ -33,7 +34,6 @@ import {
   platform,
   supportedVerovioVersions,
 } from './defaults.js';
-import { changeLanguage, lang } from './translator.js';
 
 export default class Viewer {
   constructor(vrvWorker, spdWorker) {
@@ -1010,7 +1010,8 @@ export default class Viewer {
     let addListeners = false; // add event listeners only the first time
     let rt = document.querySelector(':root');
     if (!/\w/g.test(mfs.innerHTML)) addListeners = true;
-    mfs.innerHTML = '<div class="settingsHeader" id="meiFriendSettingsHeader">' + lang.meiFriendSettingsHeader.text + '</div>';
+    mfs.innerHTML =
+      '<div class="settingsHeader" id="meiFriendSettingsHeader">' + translator.lang.meiFriendSettingsHeader.text + '</div>';
     let storage = window.localStorage;
     let currentHeader;
     Object.keys(meiFriendSettingsOptions).forEach((opt) => {
@@ -1042,7 +1043,7 @@ export default class Viewer {
           break;
         case 'selectLanguage':
           let langCode = value.slice(0, 2).toLowerCase();
-          changeLanguage(langCode);
+          translator.changeLanguage(langCode);
           break;
         case 'toggleSpeedMode':
           document.getElementById('midiSpeedmodeIndicator').style.display = this.speedMode ? 'inline' : 'none';
@@ -1196,7 +1197,7 @@ export default class Viewer {
             break;
           case 'selectLanguage':
             let langCode = value.slice(0, 2).toLowerCase();
-            changeLanguage(langCode);
+            translator.changeLanguage(langCode);
             break;
           case 'toggleSpeedMode':
             let sb = document.getElementById('speed-checkbox');
@@ -1387,7 +1388,8 @@ export default class Viewer {
     let addListeners = false; // add event listeners only the first time
     let currentHeader;
     if (!/\w/g.test(cmsp.innerHTML)) addListeners = true;
-    cmsp.innerHTML = '<div class="settingsHeader" id="editorSettingsHeader">' + lang.editorSettingsHeader.text + '</div>';
+    cmsp.innerHTML =
+      '<div class="settingsHeader" id="editorSettingsHeader">' + translator.lang.editorSettingsHeader.text + '</div>';
     Object.keys(codeMirrorSettingsOptions).forEach((opt) => {
       let o = codeMirrorSettingsOptions[opt];
       let value = o.default;
@@ -2109,7 +2111,7 @@ export default class Viewer {
       }
       console.log(lang.noSchemaFound.text);
       this.currentSchema = '';
-      this.throwSchemaError({ schemaFile: lang.noSchemaFound.text });
+      this.throwSchemaError({ schemaFile: translator.lang.noSchemaFound.text });
       return;
     }
     const schema = /<\?xml-model.*href="([^"]*).*/;
@@ -2130,7 +2132,7 @@ export default class Viewer {
     if (!this.validatorInitialized) return;
     let vs = document.getElementById('validation-status');
     vs.innerHTML = download;
-    let msg = lang.loadingSchema.text + ' ' + schemaFile;
+    let msg = translator.lang.loadingSchema.text + ' ' + schemaFile;
     vs.setAttribute('title', msg);
     this.changeStatus(vs, 'wait', ['error', 'ok', 'manual']);
     this.updateSchemaStatusDisplay('wait', schemaFile, msg);
@@ -2151,12 +2153,12 @@ export default class Viewer {
       const res = await validator.setRelaxNGSchema(data);
     } catch (err) {
       this.throwSchemaError({
-        err: lang.errorLoadingSchema.text + ': ' + err,
+        err: translator.lang.errorLoadingSchema.text + ': ' + err,
         schemaFile: schemaFile,
       });
       return;
     }
-    msg = lang.schemaLoaded.text + ' ' + schemaFile;
+    msg = translator.lang.schemaLoaded.text + ' ' + schemaFile;
     vs.setAttribute('title', msg);
     vs.innerHTML = unverified;
     this.validatorWithSchema = true;
@@ -2182,7 +2184,7 @@ export default class Viewer {
     // construct error message
     let msg = '';
     if (msgObj.hasOwnProperty('response'))
-      msg = lang.schemaNotFound.text + ' (' + msgObj.response.status + ' ' + msgObj.response.statusText + '): ';
+      msg = translator.lang.schemaNotFound.text + ' (' + msgObj.response.status + ' ' + msgObj.response.statusText + '): ';
     if (msgObj.hasOwnProperty('err')) msg = msgObj.err + ' ';
     if (msgObj.hasOwnProperty('schemaFile')) msg += msgObj.schemaFile;
     // set icon to unverified and error color
@@ -2240,7 +2242,7 @@ export default class Viewer {
     let vs = document.getElementById('validation-status');
     vs.innerHTML = unverified;
     vs.style.cursor = 'pointer';
-    vs.setAttribute('title', lang.notValidated.text);
+    vs.setAttribute('title', translator.lang.notValidated.text);
     vs.removeEventListener('click', this.manualValidate);
     vs.removeEventListener('click', this.toggleValidationReportVisibility);
     vs.addEventListener('click', this.manualValidate);
@@ -2326,7 +2328,7 @@ export default class Viewer {
       let p = document.createElement('div');
       p.classList.add('validation-title');
       p.innerHTML =
-        lang.validationFailed.text + '. ' + Object.keys(messages).length + ' ' + lang.validationMessages.text + ':';
+        translator.lang.validationFailed.text + '. ' + Object.keys(messages).length + ' ' + translator.lang.validationMessages.text + ':';
       reportDiv.appendChild(p);
       messages.forEach((m, i) => {
         let p = document.createElement('div');
@@ -2350,13 +2352,13 @@ export default class Viewer {
     }
     vs.setAttribute(
       'title',
-      lang.validatedAgainst.text +
+      translator.lang.validatedAgainst.text +
         ' ' +
         this.currentSchema +
         ': ' +
         Object.keys(messages).length +
         ' ' +
-        lang.validationMessages.text +
+        translator.lang.validationMessages.text +
         '.'
     );
     if (reportDiv) {
@@ -2378,5 +2380,5 @@ export default class Viewer {
         else reportDiv.style.visibility = 'visible';
       }
     }
-  }
-} // toggleValidationReportVisibility()
+  } // toggleValidationReportVisibility()
+} // class Viewer

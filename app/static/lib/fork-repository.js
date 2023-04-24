@@ -1,14 +1,13 @@
 import { calcSizeOfContainer } from './resizer.js';
-import { sampleEncodings, samp, github } from './main.js';
+import { sampleEncodings, samp, github, translator } from './main.js';
 import { forkRepoClicked } from './github-menu.js';
-import { lang } from './translator.js';
 
 const seperator = '|MEI-FRIEND|';
 
 function onOrganizationInputChange(e) {
   if (e.target.value) {
     const userOrgRepos = document.getElementById('forkRepositoryInputRepo');
-    userOrgRepos.innerHTML = '<option value="" disabled selected hidden>' + lang.selectRepository.text + '</option>';
+    userOrgRepos.innerHTML = '<option value="" disabled selected hidden>' + translator.lang.selectRepository.text + '</option>';
     document.getElementById('forkRepoGithubLogo').classList.add('clockwise');
     let repos = fillInUserOrgRepos();
   }
@@ -21,7 +20,7 @@ function onSelectComposer(e) {
   orgSelector.addEventListener('change', onSelectOrganization);
   const repoSelector = document.querySelector('#forkRepertoireRepository');
   // clear repository selector
-  repoSelector.innerHTML = '<option value="" disabled selected hidden>' + lang.selectRepository.text + '</option>';
+  repoSelector.innerHTML = '<option value="" disabled selected hidden>' + translator.lang.selectRepository.text + '</option>';
   repoSelector.removeEventListener('change', onSelectRepository);
   repoSelector.addEventListener('change', onSelectRepository);
   let composer = false;
@@ -94,9 +93,9 @@ async function fillInUserOrgRepos(per_page = 30, page = 1) {
     } else {
       // give up!
       document.getElementById('forkRepoGithubLogo').classList.remove('clockwise');
-      status.forEach((s) => (s.innerHTML = lang.repoAccessError.text));
+      status.forEach((s) => (s.innerHTML = translator.lang.repoAccessError.text));
       if ('message' in repos) {
-        status.forEach((s) => (s.innerHTML += ' Github ' + lang.message.text + ': <i>' + repos['message'] + '</i>'));
+        status.forEach((s) => (s.innerHTML += ' Github ' + translator.lang.message.text + ': <i>' + repos['message'] + '</i>'));
       }
     }
   }
@@ -211,7 +210,7 @@ export function forkRepository(github, components) {
   let forkRepoSelector = document.querySelector('#forkRepositoryInputRepo');
   let forkToSelector = document.querySelector('#forkRepositoryToSelector');
   // initialise public repertoire dropdowns
-  composerSelector.innerHTML = '<option value="" >' + lang.allComposers.text + '</option>';
+  composerSelector.innerHTML = '<option value="" >' + translator.lang.allComposers.text + '</option>';
   let composers = new Set(sampleEncodings.map((s) => s[samp.COMPOSER]));
   Array.from(composers)
     .sort()

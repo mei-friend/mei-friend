@@ -2,108 +2,96 @@
  * Applies language packs to GUI elements
  *
  */
+import * as l from '../lang/lang.en.js'; // default language
 
-export var defaultLangCode = 'en';
-export var defaultLang; // global object for default (English) language pack
-export var langCode = '';
-export var lang = {}; // global lang object from language pack files
+export default class Translator {
+  constructor() {
+    this.defaultLangCode = 'en';
+    this.defaultLang = { ...l.lang }; // global object for default (English) language pack
+    this.langCode = this.defaultLangCode;
+    this.lang = { ...l.lang }; // global lang object from language pack files
+  } // constructor()
 
-import * as l from '../lang/lang.en.js';
-lang = { ...l.lang };
-
-/**
- * Change language of mei-friend GUI and refresh all menu items
- * @param {string} languageCode
- */
-export function changeLanguage(languageCode) {
-  if (!defaultLang) {
-    loadDefaultLanguage('en', languageCode);
-  } else {
+  /**
+   * Change language of mei-friend GUI and refresh all menu items
+   * @param {string} languageCode
+   */
+  changeLanguage(languageCode) {
     // change language, only if not default and different from current lang pack
-    if (languageCode !== defaultLangCode && languageCode !== langCode) {
+    if (languageCode !== this.defaultLangCode && languageCode !== this.langCode) {
       const languagePack = '../lang/lang.' + languageCode + '.js';
       console.log('Loading language pack: ', languagePack);
       import(languagePack).then((p) => {
-        for (let key in p.lang) lang[key] = p.lang[key];
+        for (let key in p.lang) this.lang[key] = p.lang[key];
         console.log('Language pack loaded: ' + languageCode + ', now translating.');
-        translateGui();
+        this.translateGui();
       });
-    } else if (languageCode === defaultLangCode) {
-      for (let key in defaultLang) lang[key] = defaultLang[key];
-      console.log('Translating back to default language: ' + defaultLangCode);
-      translateGui();
+    } else if (languageCode === this.defaultLangCode) {
+      for (let key in this.defaultLang) this.lang[key] = this.defaultLang[key];
+      console.log('Translating back to default language: ' + this.defaultLangCode);
+      this.translateGui();
     }
-    langCode = languageCode;
-  }
-} // changeLanguage()
+    this.langCode = languageCode;
+  } // changeLanguage()
 
-/**
- * Returns promise for importing the language pack for the language code
- * @param {string} languageCode 
- */
-export async function requestLanguagePack(languageCode) {
-  const languagePack = '../lang/lang.' + languageCode + '.js';
-  console.log('Loading language pack: ', languagePack);
-  return import(languagePack);
-} // 
+  /**
+   * Returns promise for importing the language pack for the language code
+   * @param {string} languageCode
+   */
+  async requestLanguagePack(languageCode) {
+    const languagePack = '../lang/lang.' + languageCode + '.js';
+    console.log('Loading language pack: ', languagePack);
+    return import(languagePack);
+  } //
 
-/**
- * Load default language pack (English), and change language thereafter (if second argument provided)
- * @param {string} languageCode
- * @param {string} languageCodeToloadThereafter
- */
-function loadDefaultLanguage(languageCode = defaultLangCode, languageCodeToloadThereafter = '') {
-  const languagePack = '../lang/lang.' + languageCode + '.js';
-  console.log('Loading default language pack: ', languagePack);
-  import(languagePack).then((p) => {
-    defaultLang = p.lang;
-    console.log('Default language pack loaded: ', languagePack);
-    // change to language after loading, if provided
-    if (languageCodeToloadThereafter) {
-      changeLanguage(languageCodeToloadThereafter);
-    }
-  });
-} // loadDefaultLanguage()
+  /**
+   * Copy all keys of language object to internal translator.lang
+   * @param {object} language
+   */
+  setLang(language) {
+    for (let key in language) this.lang[key] = language[key];
+  } // setLang()
 
-/**
- * Refresh language of all mei-friend GUI items
- */
-export function translateGui() {
-  const v = false; // debug verbosity
-  for (let key in lang) {
-    let el = document.getElementById(key);
-    if (el) {
-      if (v) console.log('key: ' + key + ' nodeName: ' + el.nodeName + ', el: ', el);
-      if (el.closest('div.optionsItem')) {
-        // for settings items
-        if (el.nodeName.toLowerCase() === 'select' && 'labels' in lang[key]) {
-          // modify values for select inputs
-          el.childNodes.forEach((opt, i) => {
-            if (i < lang[key].labels.length) opt.textContent = lang[key].labels[i];
-          });
-        }
-        if (el.nodeName.toLowerCase() === 'input' && el.getAttribute('type') === 'button') {
-          if (v) console.log('Found button: ', el);
-        } else {
-          el = el.parentElement.querySelector('label');
-          if (v) console.log('Found label: ', el);
-        }
-      } else if (el.nodeName.toLowerCase() === 'details') {
-        // for settings headers with details and summary
-        el = el.querySelector('summary');
-        if (v) console.log('Found summary: ', el);
-      }
-      // plus for all other items (menu items etc.)
+  /**
+   * Refresh language of all mei-friend GUI items
+   */
+  translateGui() {
+    const v = false; // debug verbosity
+    for (let key in this.lang) {
+      let el = document.getElementById(key);
       if (el) {
-        if ('text' in lang[key]) {
-          if (el.nodeName.toLowerCase() === 'input' && el.getAttribute('type') === 'button') {
-            el.value = lang[key].text;
-          } else {
-            el.textContent = lang[key].text;
+        if (v) console.log('key: ' + key + ' nodeName: ' + el.nodeName + ', el: ', el);
+        if (el.closest('div.optionsItem')) {
+          // for settings items
+          if (el.nodeName.toLowerCase() === 'select' && 'labels' in this.lang[key]) {
+            // modify values for select inputs
+            el.childNodes.forEach((opt, i) => {
+              if (i < this.lang[key].labels.length) opt.textContent = this.lang[key].labels[i];
+            });
           }
+          if (el.nodeName.toLowerCase() === 'input' && el.getAttribute('type') === 'button') {
+            if (v) console.log('Found button: ', el);
+          } else {
+            el = el.parentElement.querySelector('label');
+            if (v) console.log('Found label: ', el);
+          }
+        } else if (el.nodeName.toLowerCase() === 'details') {
+          // for settings headers with details and summary
+          el = el.querySelector('summary');
+          if (v) console.log('Found summary: ', el);
         }
-        if ('description' in lang[key]) el.title = lang[key].description;
+        // plus for all other items (menu items etc.)
+        if (el) {
+          if ('text' in this.lang[key]) {
+            if (el.nodeName.toLowerCase() === 'input' && el.getAttribute('type') === 'button') {
+              el.value = this.lang[key].text;
+            } else {
+              el.textContent = this.lang[key].text;
+            }
+          }
+          if ('description' in this.lang[key]) el.title = this.lang[key].description;
+        }
       }
     }
-  }
-} // translateGui()
+  } // translateGui()
+} // class Translator()

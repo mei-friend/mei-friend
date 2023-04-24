@@ -223,15 +223,15 @@ export const lang = {
     description: 'Speed Mode Auswahl anzeigen in der Notationskontrollleiste',
   },
   controlMenuSettings: {
-    text: 'Notation control bar',
+    text: 'D Notation control bar',
     description: 'Define items to be shown in control menu above the notation',
   },
   controlMenuFlipToPageControls: {
-    text: 'Show flip to page controls',
+    text: 'D Show flip to page controls',
     description: 'Show flip to page controls in notation control menu',
   },
   controlMenuUpdateNotation: {
-    text: 'Show notation update controls',
+    text: 'D Show notation update controls',
     description: 'Show notation update behavior controls in notation control menu',
   },
   controlMenuFontSelector: {
@@ -449,7 +449,7 @@ export const lang = {
   },
   cmReset: {
     text: 'Zurücksetzen',
-    description: 'Editor-Einstllungen zu Grundeinstellungen zurücksetzen',
+    description: 'Editor-Einstellungen zu Grundeinstellungen zurücksetzen',
   },
   titleAppearance: {
     text: 'Aussehen des Editors',

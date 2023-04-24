@@ -26,6 +26,7 @@ export let meiFileLocationPrintable = '';
 export let fileLocationType = ''; // file, github, url
 export let isMEI; // is the currently edited file native MEI?
 export let fileChanged = false; // flag to track whether unsaved changes to file exist
+export let translator; // translator object for language support
 
 export const sampleEncodings = [];
 export const samp = {
@@ -102,7 +103,7 @@ import {
   platform,
   isSafari,
 } from './defaults.js';
-import { defaultLangCode, lang, requestLanguagePack } from './translator.js';
+import Translator from './translator.js';
 
 const defaultCodeMirrorOptions = {
   lineNumbers: true,
@@ -329,7 +330,7 @@ export async function validate(mei, updateLinting, options) {
       vs.innerHTML = clock;
       v.changeStatus(vs, 'wait', ['error', 'ok', 'manual']); // darkorange
       vs.querySelector('svg').classList.add('clockwise');
-      vs.setAttribute('title', lang.validatingAgainst.text + ' ' + v.currentSchema);
+      vs.setAttribute('title', translator.lang.validatingAgainst.text + ' ' + v.currentSchema);
       const validationString = await validator.validateNG(mei);
       let validation;
       try {
@@ -339,8 +340,10 @@ export async function validate(mei, updateLinting, options) {
         return;
       }
       console.log(
-        lang.validationComplete.text + ': ',
-        validation === [] ? lang.noErrors.text + '.' : validation.length + ' ' + lang.errorsFound.text + '.'
+        translator.lang.validationComplete.text + ': ',
+        validation === []
+          ? translator.lang.noErrors.text + '.'
+          : validation.length + ' ' + translator.lang.errorsFound.text + '.'
       );
       v.highlightValidation(mei, validation);
     } else if (v.validatorWithSchema && !document.getElementById('autoValidate').checked) {
@@ -355,6 +358,27 @@ async function suspendedValidate(text, updateLinting, options) {
 
 // when initial page content has been loaded
 document.addEventListener('DOMContentLoaded', function () {
+  translator = new Translator();
+  // we need to look directly to local storage, because it will
+  let language = window.localStorage['mf-selectLanguage'];
+  let langCode = language ? language.slice(0, 2).toLowerCase() : translator.defaultLangCode;
+  if (langCode !== translator.langCode) {
+    // load other language...
+    translator.requestLanguagePack(langCode).then((p) => {
+      translator.setLang(p.lang);
+      translator.translateGui();
+      onLanguageLoaded();
+    });
+  } else {
+    // ...or go on with default language
+    onLanguageLoaded();
+  }
+});
+
+/**
+ *
+ */
+function onLanguageLoaded() {
   // link to changelog page according to env settings (develop/staging/production)
   let changeLogUrl;
   switch (env) {
@@ -521,12 +545,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (speedParam !== null) storage.speed = speedParam;
     if (breaksParam !== null) storage.breaks = breaksParam;
     if (storage.githubLogoutRequested) {
-      // we need to look directly to local storage, because it will 
-      let language = window.localStorage['mf-selectLanguage'];
-      let langCode = language ? language.slice(0, 2).toLowerCase() : defaultLangCode;
-      requestLanguagePack(langCode).then((p) => {
-        v.showAlert(p.lang.githubLoggedOutWarning.text, 'warning', 30000);
-      });
+      v.showAlert(translator.lang.githubLoggedOutWarning.text, 'warning', 30000);
       storage.removeItem('githubLogoutRequested');
     }
 
@@ -654,7 +673,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const shortUrl = new URL(window.location);
   window.history.pushState({}, '', shortUrl.origin + shortUrl.pathname);
   // TODO: check handleURLParamSelect() occurrences, whether removing search parameters has an effect there.
-}); // DOMContentLoaded listener
+} // onLanguageLoaded
 
 export async function openUrlFetch(url = '', updateAfterLoading = true) {
   let urlInput = document.querySelector('#openUrlInput');
@@ -801,7 +820,7 @@ async function vrvWorkerEventsHandler(ev) {
 
       if (isSafari && Object.keys(lang).length > 0 && !safariWarningShown) {
         safariWarningShown = true;
-        v.showAlert(lang.isSafariWarning.text, 'error', -1);
+        v.showAlert(translator.lang.isSafariWarning.text, 'error', -1);
       }
 
       // add section selector
@@ -1945,7 +1964,7 @@ export function handleEditorChanges() {
 export function log(s, code = null) {
   s += '<div>';
   if (code) {
-    s += ' ' + lang.errorCode.text + ': ' + code + '<br/>';
+    s += ' ' + translator.lang.errorCode.text + ': ' + code + '<br/>';
     s += `<a id="bugReport" target="_blank" href="https://github.com/mei-friend/mei-friend/issues/new?assignees=&labels=&template=bug_report.md&title=Error ${code}">${lang.submitBugReport.text}</a>`;
     v.showAlert(s, 'error', 30000);
   } else {
@@ -2118,7 +2137,7 @@ function generateUrlUI() {
   let msg = '';
   const url = generateUrl();
   if (fileLocationType === 'file') {
-    msg = lang.generateUrlError.text + meiFileName;
+    msg = translator.lang.generateUrlError.text + meiFileName;
     v.showAlert(msg, 'warning');
     console.log(msg);
     return '';
@@ -2132,12 +2151,12 @@ function generateUrlUI() {
   // and copy url text to clipboard
   navigator.clipboard.writeText(url).then(
     function () {
-      let m = lang.generateUrlSuccess.text; // success message
+      let m = translator.lang.generateUrlSuccess.text; // success message
       v.updateAlert('<b>' + m + '!</b>');
       console.log(m + ': ' + url);
     },
     function (err) {
-      let m = lang.generateUrlNotCopied;
+      let m = translator.lang.generateUrlNotCopied;
       console.error(m, err);
       v.updateAlert('<b>' + m + '</b>');
     }

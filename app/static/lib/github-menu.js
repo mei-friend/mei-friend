@@ -11,13 +11,14 @@ import {
   setGithubInstance, // github instance setter
   setMeiFileInfo,
   storage,
+  translator,
   updateFileStatusDisplay,
   updateGithubInLocalStorage,
   v,
 } from './main.js';
 import * as icon from './../css/icons.js';
 import Github from './github.js'; // github class
-import { lang } from './translator.js';
+
 function forkRepo() {
   forkRepository(github);
 }
@@ -48,7 +49,7 @@ export function forkRepoClicked() {
       .catch((e) => {
         forkRepositoryStatus.forEach((s) => {
           s.classList.add('warn');
-          s.innerHTML = lang.forkError.text;
+          s.innerHTML = translator.lang.forkError.text;
           if (typeof e === 'object' && 'status' in e) {
             s.innerHTML = e.status + ' ' + e.statusText;
             if (e.status !== 404) {
@@ -188,7 +189,7 @@ function branchContentsFileClicked(ev) {
 function loadFile(fileName, clearBeforeLoading = true, ev = null) {
   const githubLoadingIndicator = document.getElementById('GithubLogo');
   github.filepath += fileName;
-  console.debug(`${lang.loadingFile.text}: https://github.com/${github.githubRepo}${github.filepath}`);
+  console.debug(`${translator.lang.loadingFile.text}: https://github.com/${github.githubRepo}${github.filepath}`);
   fillInBranchContents(ev);
   githubLoadingIndicator.classList.add('clockwise');
   github
@@ -196,7 +197,7 @@ function loadFile(fileName, clearBeforeLoading = true, ev = null) {
     .then(() => {
       githubLoadingIndicator.classList.remove('clockwise');
       cm.readOnly = false;
-      document.querySelector('.statusbar').innerText = lang.loadingFromGithub.text + '...';
+      document.querySelector('.statusbar').innerText = translator.lang.loadingFromGithub.text + '...';
       v.allowCursorActivity = false;
       setMeiFileInfo(
         github.filepath, // meiFileName
@@ -329,11 +330,11 @@ export async function fillInRepoBranches(e, repoBranches = null, per_page = 100,
   repoBranches = repoBranches || (await github.getRepoBranches(per_page, page));
   let githubMenu = document.getElementById('GithubMenu');
   githubMenu.innerHTML = `
-    <a id="GithubLogout" href="#">${lang.logOut.text}</a>
+    <a id="GithubLogout" href="#">${translator.lang.logOut.text}</a>
     <hr class="dropdown-line">
-    <a id="repositoriesHeader" href="#"><span class="btn icon inline-block-tight">${icon.arrowLeft}</span>${lang.repository.text}: ${github.githubRepo}</a>
+    <a id="repositoriesHeader" href="#"><span class="btn icon inline-block-tight">${icon.arrowLeft}</span>${translator.lang.repository.text}: ${github.githubRepo}</a>
     <hr class="dropdown-line">
-    <a id="branchesHeader" class="dropdown-head" href="#"><b>${lang.selectBranch.text}:</b></a>
+    <a id="branchesHeader" class="dropdown-head" href="#"><b>${translator.lang.selectBranch.text}:</b></a>
     `;
   Array.from(repoBranches).forEach((branch) => {
     githubMenu.innerHTML += `<a class="repoBranch" href="#">${branch.name}</a>`;
@@ -416,13 +417,13 @@ export async function fillInBranchContents(e) {
   let branchContents = await github.getBranchContents(github.filepath);
   let githubMenu = document.getElementById('GithubMenu');
   githubMenu.innerHTML = `
-    <a id="GithubLogout" href="#">${lang.logOut.text}</a>
+    <a id="GithubLogout" href="#">${translator.lang.logOut.text}</a>
     <hr class="dropdown-line">
-    <a id="repositoriesHeader" href="#"><span class="btn icon inline-block-tight">${icon.arrowLeft}</span>${lang.repository.text}: ${github.githubRepo}</a>
+    <a id="repositoriesHeader" href="#"><span class="btn icon inline-block-tight">${icon.arrowLeft}</span>${translator.lang.repository.text}: ${github.githubRepo}</a>
     <hr class="dropdown-line">
-    <a id="branchesHeader" href="#"><span class="btn icon inline-block-tight">${icon.arrowLeft}</span>${lang.branch.text}: ${github.branch}</a>
+    <a id="branchesHeader" href="#"><span class="btn icon inline-block-tight">${icon.arrowLeft}</span>${translator.lang.branch.text}: ${github.branch}</a>
     <hr class="dropdown-line">
-    <a id="contentsHeader" href="#"><span class="btn icon inline-block-tight filepath">${icon.arrowLeft}</span>${lang.path.text}: <span class="filepath">${github.filepath}</span></a>
+    <a id="contentsHeader" href="#"><span class="btn icon inline-block-tight filepath">${icon.arrowLeft}</span>${translator.lang.path.text}: <span class="filepath">${github.filepath}</span></a>
     <hr class="dropdown-line">
     `;
 
@@ -457,13 +458,13 @@ export async function fillInBranchContents(e) {
 
     const commitFileNameEdit = document.createElement('div');
     commitFileNameEdit.setAttribute('id', 'commitFileNameEdit');
-    commitFileNameEdit.innerHTML = lang.fileName.text + ': ';
+    commitFileNameEdit.innerHTML = translator.lang.fileName.text + ': ';
     commitFileNameEdit.appendChild(commitFileName);
 
     const commitMessageInput = document.createElement('input');
     commitMessageInput.setAttribute('type', 'text');
     commitMessageInput.setAttribute('id', 'commitMessageInput');
-    commitMessageInput.setAttribute('placeholder', lang.commitPlaceholder.text);
+    commitMessageInput.setAttribute('placeholder', translator.lang.commitPlaceholder.text);
     const commitButton = document.createElement('input');
     commitButton.setAttribute('id', 'commitButton');
     commitButton.setAttribute('type', 'submit');
@@ -484,9 +485,9 @@ export async function fillInBranchContents(e) {
     const reportIssue = document.createElement('input');
     reportIssue.setAttribute('type', 'submit');
     reportIssue.id = 'reportIssueWithEncoding';
-    reportIssue.value = lang.reportIssueWithEncoding.text;
+    reportIssue.value = translator.lang.reportIssueWithEncoding.text;
     reportIssue.addEventListener('click', () => {
-      const openInMeiFriendUrl = `[${lang.clickToOpenInMeiFriend.text}](${encodeURIComponent(generateUrl())})`;
+      const openInMeiFriendUrl = `[${translator.lang.clickToOpenInMeiFriend.text}](${encodeURIComponent(generateUrl())})`;
       const fullOpenIssueUrl = `https://github.com/${github.githubRepo}/issues/new?title=Issue+with+${meiFileName}&body=${openInMeiFriendUrl}`;
       window.open(fullOpenIssueUrl, '_blank');
     });
@@ -538,7 +539,7 @@ export function renderCommitLog() {
   logTable.setAttribute('id', 'logTable');
   let githubMenu = document.getElementById('GithubMenu');
   const headerRow = document.createElement('tr');
-  headerRow.innerHTML = `<th>${lang.date.text}</th><th>${lang.author.text}</th><th>${lang.message.text}</th><th>${lang.commit.text}</th>`;
+  headerRow.innerHTML = `<th>${translator.lang.date.text}</th><th>${translator.lang.author.text}</th><th>${translator.lang.message.text}</th><th>${translator.lang.commit.text}</th>`;
   logTable.appendChild(headerRow);
   github.commitLog.forEach((c) => {
     const commitRow = document.createElement('tr');
@@ -554,7 +555,7 @@ export function renderCommitLog() {
   });
   const commitLogHeader = document.createElement('a');
   commitLogHeader.setAttribute('id', 'commitLogHeader');
-  commitLogHeader.innerText = lang.commitLog.text;
+  commitLogHeader.innerText = translator.lang.commitLog.text;
   const hr = document.createElement('hr');
   hr.classList.add('dropdown-line');
   hr.setAttribute('id', 'commitLogSeperator');
@@ -588,13 +589,13 @@ export function refreshGithubMenu() {
   // populate Github menu
   let githubMenu = document.getElementById('GithubMenu');
   githubMenu.classList.remove('loggedOut');
-  githubMenu.innerHTML = `<a id="GithubLogout" href="#">${lang.logOut.text}</a>`;
+  githubMenu.innerHTML = `<a id="GithubLogout" href="#">${translator.lang.logOut.text}</a>`;
   if (!github.filepath) {
     githubMenu.innerHTML += `
       <hr class="dropdown-line">
-      <a id="forkRepository" href="#">${lang.forkRepository.text}...</b></a>
+      <a id="forkRepository" href="#">${translator.lang.forkRepository.text}...</b></a>
       <hr class="dropdown-line">
-      <a id="repositoriesHeader" class="dropdown-head" href="#"><b>${lang.selectRepository.text}:</b></a>
+      <a id="repositoriesHeader" class="dropdown-head" href="#"><b>${translator.lang.selectRepository.text}:</b></a>
     `;
     fillInUserRepos();
   }
@@ -606,7 +607,7 @@ export function setCommitUIEnabledStatus() {
     const commitFileName = document.getElementById('commitFileName');
     if (commitFileName.innerText === stripMeiFileName()) {
       // no name change => button reads "Commit"
-      commitButton.setAttribute('value', lang.commit.text);
+      commitButton.setAttribute('value', translator.lang.commit.text);
       if (fileChanged) {
         // enable commit UI if file has changed
         commitButton.removeAttribute('disabled');
@@ -619,7 +620,7 @@ export function setCommitUIEnabledStatus() {
       }
     } else {
       // file name has changed => button reads "Commit as new file"
-      commitButton.setAttribute('value', lang.commitAsNewFile.text);
+      commitButton.setAttribute('value', translator.lang.commitAsNewFile.text);
       // enable commit UI regardless of fileChanged state
       commitButton.removeAttribute('disabled');
       commitMessageInput.removeAttribute('disabled');
@@ -634,7 +635,7 @@ function setFileNameAfterLoad(ev) {
     if (isMEI) {
       // trim preceding slash
       commitFileName.innerText = stripMeiFileName();
-      commitButton.setAttribute('value', lang.commit.text);
+      commitButton.setAttribute('value', translator.lang.commit.text);
     } else {
       commitFileName.innerText = '...';
       commitButton.setAttribute('value', '...');
