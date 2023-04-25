@@ -207,6 +207,15 @@ export const lang = {
   annotationToolsLinkSpan: { text: 'Verlinken' },
   listAnnotations: { text: 'Keine Anmerkungen gefunden.' },
 
+  // MIDI
+  midiSpeedmodeIndicator: {
+    text: 'Speed mode',
+    description:
+      'Der Speed Mode ist aktiv, es werden nur die MIDI-Daten der aktuellen Seite abgespielt. ' +
+      'Um die gesamte Codierung abzuspielen, bitte Speed Mode deaktivieren.',
+  },
+  closeMidiPlaybackControlBarButton: { description: 'MIDI-Wiedergabe-Steuerleiste ausblenden' },
+
   // mei-friend SETTINGS MENU
   meiFriendSettingsHeader: {
     text: 'mf-Einstellungen',

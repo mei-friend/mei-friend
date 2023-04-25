@@ -205,6 +205,14 @@ export const lang = {
   annotationToolsLinkSpan: { text: 'Link' },
   listAnnotations: { text: 'No annotations present.' },
 
+  // MIDI
+  midiSpeedmodeIndicator: {
+    text: 'Speed mode',
+    description:
+      'Speed mode is active; only playing MIDI for current page. To play the entire encoding, disable speed mode.',
+  },
+  closeMidiPlaybackControlBarButton: { description: 'Hide MIDI Playback Control Bar' },
+
   // mei-friend SETTINGS MENU
   meiFriendSettingsHeader: { text: 'mei-friend Settings' },
   mfReset: { text: 'Default', description: 'Reset to mei-friend defaults' },
