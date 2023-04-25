@@ -567,27 +567,27 @@
 
   <div class="dragContainer">
     <div class="dragOverlay">
-      <div class="dragOverlayText">Drag your input file here.</div>
+      <div class="dragOverlayText" id="dragOverlayText">Drag your input file here.</div>
     </div>
     <div class="openUrlOverlay">
       <div class="openUrlUI">
         <div id="openUrlUIGrouping">
-          <h3>Open Web-hosted encoding by URL</h3>
+          <h3 id="openUrlHeading">Open Web-hosted encoding by URL</h3>
           <p id="openUrlInstructions">
             Please choose from the public repertoire or enter the URL of a Web-hosted music encoding, below. Note:
             Host server must support cross-origin resource sharing (CORS).
           </p>
           <details>
-            <summary>Public repertoire</summary>
+            <summary id="publicRepertoireSummary">Public repertoire</summary>
             <div>
               <div>
-                <label for="sampleEncodingsComposer">Composer:</label>
+                <label for="sampleEncodingsComposer" id="sampleEncodingsComposerLabel">Composer:</label>
                 <select id="sampleEncodingsComposer" name="sampleEncodingsComposer"></select>
               </div>
               <div>
-                <label for="sampleEncodingsEncoding">Encoding:</label>
+                <label for="sampleEncodingsEncoding" id="sampleEncodingsEncodingLabel">Encoding:</label>
                 <select id="sampleEncodingsEncoding" name="sampleEncodingsEncoding">
-                  <option value="">Choose an encoding...</option>
+                  <option value="" id="sampleEncodingsOptionLabel">Choose an encoding...</option>
                 </select>
               </div>
             </div>
@@ -613,16 +613,16 @@
           <h3>
             <img id="forkRepoGithubLogo" class="forkRepoGithubLogo"
               src="{{ url_for('static', filename='img/GitHub-Mark-32px.png') }}" />
-            Fork Github Repository
+            <span id="forkRepoGithubText">Fork Github Repository</span>
           </h3>
-          <p>
+          <p id="forkRepoGithubExplanation">
             The link you have followed will create a GitHub fork of the following repository for editing in
             mei-friend:
           </p>
           <p id="forkRepoRequested" />
-          <p>Is this OK?</p>
+          <p id="forkRepoGithubConfirm">Is this OK?</p>
           <div id="forkAndOpenInputWrapper">
-            <label for="forkAndOpenSelector">Fork to: </label>
+            <label for="forkAndOpenSelector" id="forkRepositoryToSelectorText">Fork to: </label>
             <select id="forkAndOpenSelector" name="forkAndOpenSelector"></select>
             <button id="forkAndOpenButton" class="forkRepositoryButton">Fork repository</button>
             <button id="forkAndOpenCancel">Cancel</button>
@@ -635,8 +635,8 @@
       <div class="forkRepositoryUI">
         <div class="forkRepositoryUIGrouping">
           <h3>
-            <img class="forkRepoGithubLogo" src="{{ url_for('static', filename='img/GitHub-Mark-32px.png') }}" /> Fork
-            Github Repository
+            <img class="forkRepoGithubLogo" src="{{ url_for('static', filename='img/GitHub-Mark-32px.png') }}" /> 
+            <span id="forkRepositoryGithubText">Fork Github Repository</span>
           </h3>
           <p id="forkRepositoryInstructions">
             Please choose from the public repertoire or enter the Github (user or organization) name and the
@@ -644,22 +644,22 @@
             the Github menu.
           </p>
           <details>
-            <summary>Public repertoire</summary>
+            <summary id="forkRepertoireSummary">Public repertoire</summary>
             <div>
               <div>
-                <label for="forkRepertoireComposer">Composer:</label>
+                <label for="forkRepertoireComposer" id="forkRepertoireComposerLabel">Composer:</label>
                 <select id="forkRepertoireComposer" name="forkRepertoireComposer"></select>
               </div>
               <div>
-                <label for="forkRepertoireOrganization">Organization:</label>
+                <label for="forkRepertoireOrganization" id="forkRepertoireOrganizationLabel">Organization:</label>
                 <select id="forkRepertoireOrganization" name="forkRepertoireOrganization">
-                  <option value="">Choose a GitHub Organization...</option>
+                  <option value="" id="forkRepertoireOrganizationOption">Choose a GitHub Organization...</option>
                 </select>
               </div>
               <div>
-                <label for="forkRepertoireRepository">Repository:</label>
+                <label for="forkRepertoireRepository" id="forkRepertoireRepositoryLabel">Repository:</label>
                 <select id="forkRepertoireRepository" name="forkRepertoireRepository">
-                  <option value="">Choose an encoding...</option>
+                  <option value="" id="forkRepertoireRepositoryOption">Choose an encoding...</option>
                 </select>
               </div>
             </div>
@@ -672,7 +672,7 @@
             <select id="forkRepositoryInputRepo" name="forkRepositoryInputRepo">
               <option value="" disabled selected hidden>Choose a repository</option>
             </select>
-            <label for="forkRepositoryToSelector">Fork to: </label>
+            <label for="forkRepositoryToSelector" id="forkRepositoryToSelectorText">Fork to: </label>
             <select id="forkRepositoryToSelector" name="forkRepositoryToSelector"></select>
             <button id="forkRepositoryButton" class="forkRepositoryButton">Fork repository</button>
             <button id="forkRepositoryCancel">Cancel</button>
@@ -680,13 +680,14 @@
           <span id="forkRepositoryStatus" class="forkRepositoryStatus"></span>
           <p id="forkProposePublicRepertoire">
             We welcome proposals for
-            <a target="_blank"
-              href="https://github.com/mei-friend/mei-friend/issues/new?template=public_repertoire.md">additions to the
-              public repertoire</a>.
+            <a target="_blank" href="https://github.com/mei-friend/mei-friend/issues/new?template=public_repertoire.md">
+              additions to the public repertoire
+            </a>.
           </p>
         </div>
       </div>
     </div>
+
     <div id="friendContainer">
       <div id="alertOverlay" class="alert" style="display: none">
         <span id="alertIcon"></span>
@@ -701,6 +702,7 @@
         <textarea id="editor"></textarea>
       </div>
     </div>
+
     <div id="annotationPanel" style="display: none">
       <div class="tab">
         <button id="hideAnnotationPanelButton" class="tabstart" title="Close Annotations Panel">
@@ -710,12 +712,10 @@
               d="M15.14 2.27a1 1 0 0 0-1.41 0l-10 10a1 1 0 0 0 0 1.41L4 14l-3 4h5l1-1 .29.29a1 1 0 0 0 1.41 0l10-10a1 1 0 0 0 .03-1.43zM7 15l-2-2 9-9 2 2z" />
           </svg>
         </button>
-        <button class="tablink defaultOpen" onclick="switchTab(event, 'annotationPanel')" title="Annotation tools"
-          data-tab="annotationTools">
+        <button class="tablink defaultOpen" onclick="switchTab(event, 'annotationPanel')" title="Annotation tools" data-tab="annotationTools">
           Tools
         </button>
-        <button class="tablink" onclick="switchTab(event, 'annotationPanel')" title="List annotations"
-          data-tab="listAnnotations">
+        <button class="tablink" onclick="switchTab(event, 'annotationPanel')" title="List annotations" data-tab="listAnnotations">
           List
         </button>
         <!--        <button class="tablink" onclick="switchTab(event, 'annotationPanel')"
@@ -786,8 +786,8 @@
   <div id="midiPlaybackControlBar">
     <midi-player id="midi-player" sound-font> </midi-player>
     <span id="midiSpeedmodeIndicator"
-      title="Speed mode is active; only playing MIDI for current page. To play the entire encoding, disable speed mode.">Speed
-      mode</span>
+      title="Speed mode is active; only playing MIDI for current page. To play the entire encoding, disable speed mode.">
+      Speed mode</span>
     <span id="closeMidiPlaybackControlBarButton" title="Hide MIDI Playback Control Bar">×</span>
   </div>
 

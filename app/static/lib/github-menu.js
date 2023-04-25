@@ -244,7 +244,7 @@ function assignGithubMenuClickHandlers() {
   }
 
   const githubLoadingIndicator = document.getElementById('GithubLogo');
-  const logoutButton = document.getElementById('GithubLogout');
+  const logoutButton = document.getElementById('githubLogout');
   if (logoutButton) {
     logoutButton.removeEventListener('click', logoutFromGithub);
     logoutButton.addEventListener('click', logoutFromGithub);
@@ -330,7 +330,7 @@ export async function fillInRepoBranches(e, repoBranches = null, per_page = 100,
   repoBranches = repoBranches || (await github.getRepoBranches(per_page, page));
   let githubMenu = document.getElementById('GithubMenu');
   githubMenu.innerHTML = `
-    <a id="GithubLogout" href="#">${translator.lang.logOut.text}</a>
+    <a id="githubLogout" href="#">${translator.lang.logOut.text}</a>
     <hr class="dropdown-line">
     <a id="repositoriesHeader" href="#"><span class="btn icon inline-block-tight">${icon.arrowLeft}</span>${translator.lang.repository.text}: ${github.githubRepo}</a>
     <hr class="dropdown-line">
@@ -417,7 +417,7 @@ export async function fillInBranchContents(e) {
   let branchContents = await github.getBranchContents(github.filepath);
   let githubMenu = document.getElementById('GithubMenu');
   githubMenu.innerHTML = `
-    <a id="GithubLogout" href="#">${translator.lang.logOut.text}</a>
+    <a id="githubLogout" href="#">${translator.lang.logOut.text}</a>
     <hr class="dropdown-line">
     <a id="repositoriesHeader" href="#"><span class="btn icon inline-block-tight">${icon.arrowLeft}</span>${translator.lang.repository.text}: ${github.githubRepo}</a>
     <hr class="dropdown-line">
@@ -589,7 +589,7 @@ export function refreshGithubMenu() {
   // populate Github menu
   let githubMenu = document.getElementById('GithubMenu');
   githubMenu.classList.remove('loggedOut');
-  githubMenu.innerHTML = `<a id="GithubLogout" href="#">${translator.lang.logOut.text}</a>`;
+  githubMenu.innerHTML = `<a id="githubLogout" href="#">${translator.lang.logOut.text}</a>`;
   if (!github.filepath) {
     githubMenu.innerHTML += `
       <hr class="dropdown-line">

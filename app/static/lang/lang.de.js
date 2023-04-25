@@ -134,6 +134,66 @@ export const lang = {
       '<a href="https://iwk.mdw.ac.at/impressum">Impressum</a>.',
   },
 
+  // drag'n'drop
+  dragOverlayText: { text: 'Input-Datei hierher ziehen.' },
+
+  // public repertoire
+  openUrlHeading: { text: 'Web-gehostete Kodierung per URL öffnen' },
+  openUrlInstructions: {
+    text:
+      'Bitte wählen Sie aus dem öffentlichen Repertoire oder geben Sie die URL von ' +
+      'einer im Web gehosteten Musikkodierung ein, siehe unten. Hinweis: Der Host-Server muss ' +
+      'Cross-origin Resource Sharing (CORS) unterstützen.',
+  },
+  publicRepertoireSummary: { text: 'Öffentliches Repertoire' },
+  sampleEncodingsComposerLabel: { text: 'Komponist:' },
+  sampleEncodingsEncodingLabel: { text: 'Kodierung:' },
+  sampleEncodingsOptionLabel: { text: 'Kodierung wählen...' },
+  openUrlButton: { text: 'URL Öffenen' },
+  openUrlCancel: { text: 'Abbrechen' },
+  proposePublicRepertoire: {
+    html:
+      'Wir begrüßen Vorschläge für ' +
+      '<a href="https://github.com/mei-friend/mei-friend/issues/new?template=public_repertoire.md" target="_blank" >' +
+      'Ergänzungen des öffentlichen Repertoires' +
+      '</a>.',
+  },
+
+  // fork modals
+  forkRepoGithubText: { text: 'Github Repositorium Forken' },
+  forkRepoGithubExplanation: {
+    text:
+      'Der Link, dem Sie gefolgt sind, ' +
+      'erzeugt einen GitHub-Branch des folgenden Repositoriums zur Bearbeitung in mei-friend:',
+  },
+  forkRepoGithubConfirm: { text: 'Ist das OK?' },
+  forkRepositoryInstructions: {
+    text:
+      'Bitte wählen Sie aus dem öffentlichen Repertoire oder geben Sie den ' +
+      'Namen des Github-Benutzers oder der Github-Organisation und den Repository-Namen ' +
+      'eines von Github gehosteten Repositorys ein. ' +
+      'Ihr geforktes Repository wird im Github-Menü verfügbar sein.',
+  },
+  forkRepositoryGithubText: { text: 'Github Repositorium Forken' },
+  forkRepertoireSummary: { text: 'Öffentliches Repertoire' },
+  forkRepertoireComposerLabel: { text: 'Komponist:' },
+  forkRepertoireOrganizationLabel: { text: 'Organisation:' },
+  forkRepertoireOrganizationOption: { text: 'GitHub Organisation wählen...' },
+  forkRepertoireRepositoryLabel: { text: 'Repo:' },
+  forkRepertoireRepositoryOption: { text: 'Kodierung wählen...' },
+  forkRepositoryInputName: { placeholder: 'Github Benutzer oder Organisation' },
+  forkRepositoryInputRepoOption: { text: 'Repo wählen' },
+  forkRepositoryToSelectorText: { text: 'Forken zu: ' },
+  forkRepositoryButton: { text: 'Repo forken' },
+  forkRepositoryCancel: { text: 'Abbrechen' },
+  forkProposePublicRepertoire: {
+    html:
+      'Wir begrüßen Vorschläge für ' +
+      '<a target="_blank" href="https://github.com/mei-friend/mei-friend/issues/new?template=public_repertoire.md">' +
+      'Ergänzungen des öffentlichen Repertoires' +
+      '</a>.',
+  },
+
   // mei-friend SETTINGS MENU
   meiFriendSettingsHeader: {
     text: 'mf-Einstellungen',
@@ -550,7 +610,7 @@ export const lang = {
   errorsFound: { text: 'Fehler gefunden' }, // 5 errors found
 
   // github-menu.js
-  repository: { text: 'Repositorium' },
+  repository: { text: 'Repo' },
   branch: { text: 'Branch' },
   path: { text: 'Pfad' },
   commit: { text: 'Commit' },
@@ -561,12 +621,13 @@ export const lang = {
   message: { text: 'Nachricht' },
   none: { text: 'Kein' },
   fileName: { text: 'Dateiname' },
-  forkRepository: { text: 'Fork Repositorium' },
-  forkError: { text: 'Konnte Repositorium leider nicht forken' },
+  forkRepository: { text: 'Repo forken' },
+  forkError: { text: 'Konnte Repo leider nicht forken' },
   loadingFile: { text: 'Lade Datei' },
   loadingFromGithub: { text: 'Lade von Github' },
   logOut: { text: 'Abmelden' },
-  selectRepository: { text: 'Repositorium auswählen' },
+  githubLogout: {text:'Abmelden'},
+  selectRepository: { text: 'Repo auswählen' },
   selectBranch: { text: 'Branch auswählen' },
   commitPlaceholder: { text: 'Mit mei-friend online aktualisiert' },
   reportIssueWithEncoding: { text: 'Problem mit Kodierung melden' },

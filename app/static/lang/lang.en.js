@@ -133,6 +133,65 @@ export const lang = {
       '<a href="https://iwk.mdw.ac.at/impressum">Imprint</a>.',
   },
 
+  // drag'n'drop
+  dragOverlayText: { text: 'Drag your input file here.' },
+
+  // public repertoire
+  openUrlHeading: { text: 'Open Web-hosted encoding by URL' },
+  openUrlInstructions: {
+    text:
+      'Please choose from the public repertoire or enter the URL of ' +
+      'a Web-hosted music encoding, below. Note:  Host server must ' +
+      'support cross-origin resource sharing (CORS).',
+  },
+  publicRepertoireSummary: { text: 'Public repertoire' },
+  sampleEncodingsComposerLabel: { text: 'Composer:' },
+  sampleEncodingsEncodingLabel: { text: 'Encoding:' },
+  sampleEncodingsOptionLabel: { text: 'Choose an encoding...' },
+  openUrlButton: { text: 'Open URL' },
+  openUrlCancel: { text: 'Cancel' },
+  proposePublicRepertoire: {
+    html:
+      'We welcome proposals for ' +
+      '<a href="https://github.com/mei-friend/mei-friend/issues/new?template=public_repertoire.md" target="_blank" >' +
+      'additions to the public repertoire' +
+      '</a>.',
+  },
+
+  // fork modals
+  forkRepoGithubText: { text: 'Fork Github Repository' },
+  forkRepoGithubExplanation: {
+    text:
+      'The link you have followed ' +
+      'will create a GitHub fork of the following repository for editing in mei-friend:',
+  },
+  forkRepoGithubConfirm: { text: 'Is this OK?' },
+  forkRepositoryInstructions: {
+    text:
+      'Please choose from the public repertoire or enter the ' +
+      'Github (user or organization) name and the repository name of a Github-hosted repository, below. ' +
+      'Your forked repository will become available from  the Github menu.',
+  },
+  forkRepositoryGithubText: { text: 'Fork Github Repository' },
+  forkRepertoireSummary: { text: 'Public repertoire' },
+  forkRepertoireComposerLabel: { text: 'Composer:' },
+  forkRepertoireOrganizationLabel: { text: 'Organization:' },
+  forkRepertoireOrganizationOption: { text: 'Choose a GitHub Organization...' },
+  forkRepertoireRepositoryLabel: { text: 'Repository:' },
+  forkRepertoireRepositoryOption: { text: 'Choose an encoding...' },
+  forkRepositoryInputName: { placeholder: 'Github user or organization' },
+  forkRepositoryInputRepoOption: { text: 'Choose a repository' },
+  forkRepositoryToSelectorText: { text: 'Fork to: ' },
+  forkRepositoryButton: { text: 'Fork repository' },
+  forkRepositoryCancel: { text: 'Cancel' },
+  forkProposePublicRepertoire: {
+    html:
+      'We welcome proposals for ' +
+      '<a target="_blank" href="https://github.com/mei-friend/mei-friend/issues/new?template=public_repertoire.md">' +
+      'additions to the public repertoire' +
+      '</a>.',
+  },
+
   // mei-friend SETTINGS MENU
   meiFriendSettingsHeader: { text: 'mei-friend Settings' },
   mfReset: { text: 'Default', description: 'Reset to mei-friend defaults' },
@@ -551,6 +610,7 @@ export const lang = {
   loadingFile: { text: 'Loading file' },
   loadingFromGithub: { text: 'Loading from Github' },
   logOut: { text: 'Log out' },
+  githubLogout: { text: 'Log out' },
   selectRepository: { text: 'Select repository' },
   selectBranch: { text: 'Select branch' },
   commitPlaceholder: { text: 'Updated using mei-friend online' },
