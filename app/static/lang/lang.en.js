@@ -192,6 +192,19 @@ export const lang = {
       '</a>.',
   },
 
+  // annotation panel
+  annotationCloseButtonText: { text: 'Close Annotations Panel' },
+  annotationToolsButton: { text: 'Tools', title: 'Annotation tools' },
+  annotationListButton: { text: 'List', title: 'List annotations' },
+  writeAnnotStandoffText: { text: 'Web Annotation' },
+  annotationToolsHighlightTitle: { text: 'Highlight' },
+  annotationToolsHighlightSpan: { text: 'Highlight' },
+  annotationToolsDescribeTitle: { text: 'Describe' },
+  annotationToolsDescribeSpan: { text: 'Describe' },
+  annotationToolsLinkTitle: { text: 'Link' },
+  annotationToolsLinkSpan: { text: 'Link' },
+  listAnnotations: { text: 'No annotations present.' },
+
   // mei-friend SETTINGS MENU
   meiFriendSettingsHeader: { text: 'mei-friend Settings' },
   mfReset: { text: 'Default', description: 'Reset to mei-friend defaults' },

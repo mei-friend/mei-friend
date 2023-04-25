@@ -194,6 +194,19 @@ export const lang = {
       '</a>.',
   },
 
+  // annotation panel
+  annotationCloseButtonText: { text: 'Panel für Anmerkungen schließen' },
+  annotationToolsButton: { text: 'Werkzeuge', title: 'Anmerkungswerkzeuge' },
+  annotationListButton: { text: 'Liste', title: 'Anmerkungen auflisten' },
+  writeAnnotStandoffText: { text: 'Web Anmerkungen' },
+  annotationToolsHighlightTitle: { text: 'Hervorheben' },
+  annotationToolsHighlightSpan: { text: 'Hervorheben' },
+  annotationToolsDescribeTitle: { text: 'Beschreiben' },
+  annotationToolsDescribeSpan: { text: 'Beschreiben' },
+  annotationToolsLinkTitle: { text: 'Verlinken' },
+  annotationToolsLinkSpan: { text: 'Verlinken' },
+  listAnnotations: { text: 'Keine Anmerkungen gefunden.' },
+
   // mei-friend SETTINGS MENU
   meiFriendSettingsHeader: {
     text: 'mf-Einstellungen',
@@ -626,7 +639,7 @@ export const lang = {
   loadingFile: { text: 'Lade Datei' },
   loadingFromGithub: { text: 'Lade von Github' },
   logOut: { text: 'Abmelden' },
-  githubLogout: {text:'Abmelden'},
+  githubLogout: { text: 'Abmelden' },
   selectRepository: { text: 'Repo auswählen' },
   selectBranch: { text: 'Branch auswählen' },
   commitPlaceholder: { text: 'Mit mei-friend online aktualisiert' },
