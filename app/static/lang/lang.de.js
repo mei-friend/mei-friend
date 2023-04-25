@@ -140,6 +140,31 @@ export const lang = {
       '<a href="https://iwk.mdw.ac.at/impressum">Impressum</a>.',
   },
 
+  // control menu
+  verovioIcon: {
+    description: `mei-friend Worker-Aktivitäten:
+    Drehung im Uhrzeigersinn bedeutet Verovio-Aktivität,,
+    Drehung gegen den Uhrzeigersinn bedeutet Speed-Mode-Aktivität,`,
+  },
+  decreaseScaleButton: { description: 'Notation vergrößern' },
+  verovioZoom: { description: 'Skalierung der Notation verändern' },
+  increaseScaleButton: { description: 'Notation verkleinern' },
+  pagination1: { html: 'Seite&nbsp;' },
+  pagination3: { html: '&nbsp;von' },
+  sectionSelect: { description: 'Durch die Section/Endings-Struktur navigieren' },
+  firstPageButton: { description: 'Zur ersten Seite springen' },
+  previousPageButton: { description: 'Zur vorherigen Seite blättern' },
+  paginationLabel: { description: 'Seitennavigation: Klicken, um die anzuzeigende Seitennummer manuell einzugeben.' },
+  nextPageButton: { description: 'Zur nächsten Seite blättern' },
+  lastPageButton: { description: 'Zur letzten Seite springen' },
+  flipCheckbox: { description: 'Automatisches Umblättern der Notation zur Position des Editor-Kursors' },
+  flipButton: { description: 'Manuelles Umblättern der Notation zur Position des Editor-Kursors' },
+  breaksSelect: { description: 'System-/Seitenumbruch-Einstellungen' },
+  updateControlsLabel: { description: 'Aktualisierungsverhalten der Notation nach Änderungen in der Kodierung' },
+  liveUpdateCheckbox: { description: 'Automatische Aktualisierung der Notation nach Änderungen in der Kodierung' },
+  codeManualUpdateButton: { description: 'Manuelle Aktualisierung der Notation' },
+  engravingFontSelect: { description: 'Musikfont auswählen' },
+
   // drag'n'drop
   dragOverlayText: { text: 'Input-Datei hierher ziehen.' },
 

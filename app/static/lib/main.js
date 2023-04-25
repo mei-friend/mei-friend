@@ -223,7 +223,7 @@ export function loadDataInEditor(mei, setFreshlyLoaded = true) {
   v.loadXml(mei);
   cmd.checkFacsimile();
   loadFacsimile(v.xmlDoc); // load all facsimila data of MEI
-  let bs = document.getElementById('breaks-select');
+  let bs = document.getElementById('breaksSelect');
   if (bs) {
     if (breaksParam) bs.value = breaksParam;
     else if (storage && storage.supported && storage.hasItem('breaks')) bs.value = storage.breaks;
@@ -610,9 +610,9 @@ function onLanguageLoaded() {
   }
   // Retrieve parameters from URL params, from storage, or default values
   if (scaleParam !== null) {
-    document.getElementById('verovio-zoom').value = scaleParam;
+    document.getElementById('verovioZoom').value = scaleParam;
   } else if (storage && storage.supported && storage.hasItem('scale')) {
-    document.getElementById('verovio-zoom').value = storage.scale;
+    document.getElementById('verovioZoom').value = storage.scale;
   }
   if (speedParam !== null) {
     v.speedMode = speedParam === 'true';
@@ -824,7 +824,7 @@ async function vrvWorkerEventsHandler(ev) {
       }
 
       // add section selector
-      let ss = document.getElementById('section-selector');
+      let ss = document.getElementById('sectionSelect');
       while (ss.options.length > 0) ss.remove(0); // clear existing options
       let sections = generateSectionSelect(v.xmlDoc);
       if (sections.length > 1) {
@@ -833,7 +833,7 @@ async function vrvWorkerEventsHandler(ev) {
       } else {
         ss.style.display = 'none';
       }
-      let bs = document.getElementById('breaks-select').value;
+      let bs = document.getElementById('breaksSelect').value;
       if (ev.data.pageCount && !v.speedMode) {
         v.pageCount = ev.data.pageCount;
       } else if (bs === 'none') {
@@ -1341,7 +1341,7 @@ export let cmd = {
   zoom50: () => v.zoom(50, storage),
   zoom100: () => v.zoom(100, storage),
   zoomSlider: () => {
-    let zoomCtrl = document.getElementById('verovio-zoom');
+    let zoomCtrl = document.getElementById('verovioZoom');
     if (zoomCtrl && storage && storage.supported) storage.scale = zoomCtrl.value;
     v.updateLayout();
   },
@@ -1614,9 +1614,9 @@ function addEventListeners(v, cm) {
   fc.addEventListener('dragend', (ev) => console.log('Drag End', ev));
 
   // Zooming notation with buttons
-  document.getElementById('decrease-scale-btn').addEventListener('click', cmd.zoomOut);
-  document.getElementById('increase-scale-btn').addEventListener('click', cmd.zoomIn);
-  document.getElementById('verovio-zoom').addEventListener('change', cmd.zoomSlider);
+  document.getElementById('decreaseScaleButton').addEventListener('click', cmd.zoomOut);
+  document.getElementById('increaseScaleButton').addEventListener('click', cmd.zoomIn);
+  document.getElementById('verovioZoom').addEventListener('change', cmd.zoomSlider);
 
   // Zooming notation with mouse wheel
   vp.addEventListener('wheel', (ev) => {
@@ -1628,8 +1628,8 @@ function addEventListeners(v, cm) {
   });
 
   // Zooming facsimile with buttons
-  document.getElementById('facs-decrease-scale-btn').addEventListener('click', cmd.facsZoomOut);
-  document.getElementById('facs-increase-scale-btn').addEventListener('click', cmd.facsZoomIn);
+  document.getElementById('facs-decreaseScaleButton').addEventListener('click', cmd.facsZoomOut);
+  document.getElementById('facs-increaseScaleButton').addEventListener('click', cmd.facsZoomIn);
   document.getElementById('facsimile-zoom').addEventListener('change', cmd.facsZoomSlider);
 
   // Zooming facsimile with mouse wheel
@@ -1675,27 +1675,27 @@ function addEventListeners(v, cm) {
   document.getElementById('facsimile-close-button').addEventListener('click', cmd.hideFacsimilePanel);
 
   // Page turning
-  let ss = document.getElementById('section-selector');
+  let ss = document.getElementById('sectionSelect');
   ss.addEventListener('change', () => {
     v.allowCursorActivity = false;
     setCursorToId(cm, ss.value);
     v.updatePage(cm, '', ss.value);
     v.allowCursorActivity = true;
   });
-  document.getElementById('first-page-btn').addEventListener('click', cmd.firstPage);
-  document.getElementById('prev-page-btn').addEventListener('click', cmd.previousPage);
-  document.getElementById('next-page-btn').addEventListener('click', cmd.nextPage);
-  document.getElementById('last-page-btn').addEventListener('click', cmd.lastPage);
+  document.getElementById('firstPageButton').addEventListener('click', cmd.firstPage);
+  document.getElementById('previousPageButton').addEventListener('click', cmd.previousPage);
+  document.getElementById('nextPageButton').addEventListener('click', cmd.nextPage);
+  document.getElementById('lastPageButton').addEventListener('click', cmd.lastPage);
   // manual page entering
   document.getElementById('pagination2').addEventListener('keydown', (ev) => manualCurrentPage(v, cm, ev));
   document.getElementById('pagination2').addEventListener('blur', (ev) => manualCurrentPage(v, cm, ev));
   // font selector
-  document.getElementById('font-select').addEventListener('change', () => {
-    document.getElementById('vrv-font').value = document.getElementById('font-select').value;
+  document.getElementById('engravingFontSelect').addEventListener('change', () => {
+    document.getElementById('vrv-font').value = document.getElementById('engravingFontSelect').value;
     v.updateLayout();
   });
   // breaks selector
-  document.getElementById('breaks-select').addEventListener('change', (ev) => {
+  document.getElementById('breaksSelect').addEventListener('change', (ev) => {
     if (storage && storage.supported) storage.breaks = ev.srcElement.value;
     v.pageSpanners = {
       start: {},
@@ -1790,12 +1790,12 @@ function addEventListeners(v, cm) {
   cm.on('cursorActivity', () => v.cursorActivity(cm));
 
   // flip button updates manually notation location to cursor pos in encoding
-  document.getElementById('flip-btn').addEventListener('click', () => {
+  document.getElementById('flipButton').addEventListener('click', () => {
     v.cursorActivity(cm, true);
   });
 
   // when activated, update notation location once
-  let fl = document.getElementById('flip-checkbox');
+  let fl = document.getElementById('flipCheckbox');
   fl.addEventListener('change', () => {
     if (fl.checked) v.cursorActivity(cm, true);
   });
@@ -1842,12 +1842,12 @@ function addEventListeners(v, cm) {
   });
 
   // manually update notation rendering from encoding
-  document.getElementById('code-update-btn').addEventListener('click', () => {
+  document.getElementById('codeManualUpdateButton').addEventListener('click', () => {
     v.notationUpdated(cm, true);
   });
 
   // when activated, update notation once
-  let ch = document.getElementById('live-update-checkbox');
+  let ch = document.getElementById('liveUpdateCheckbox');
   ch.addEventListener('change', () => {
     if (ch.checked) v.notationUpdated(cm, true);
   });
@@ -2088,7 +2088,7 @@ export function generateUrl() {
   if (scale !== defaultVerovioOptions.scale) {
     url += amp + 'scale=' + scale;
   }
-  let breaks = document.getElementById('breaks-select').value;
+  let breaks = document.getElementById('breaksSelect').value;
   if (breaks && breaks !== defaultVerovioOptions.breaks) {
     url += amp + 'breaks=' + breaks;
   }

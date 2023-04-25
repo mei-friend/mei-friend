@@ -139,6 +139,31 @@ export const lang = {
       '<a href="https://iwk.mdw.ac.at/impressum">Imprint</a>.',
   },
 
+  // control menu
+  verovioIcon: {
+    description: `mei-friend worker activity:
+                  clockwise rotation denotes Verovio activity,
+                  anticlockwise rotation speed worker activity`,
+  },
+  decreaseScaleButton: { description: 'Decrease notation' },
+  verovioZoom: { description: 'Scale size of notation' },
+  increaseScaleButton: { description: 'Increase notation' },
+  pagination1: { html: 'Page&nbsp;' },
+  pagination3: { html: '&nbsp;of' },
+  sectionSelect: { description: 'Navigate encoded section/ending structure' },
+  firstPageButton: { description: 'Flip to first page' },
+  previousPageButton: { description: 'Flip to previous page' },
+  paginationLabel: { description: 'Page navigation: click to manually enter page number to be displayed' },
+  nextPageButton: { description: 'Flip to next page' },
+  lastPageButton: { description: 'Flip to last page' },
+  flipCheckbox: { description: 'Automatically flip page to encoding cursor position' },
+  flipButton: { description: 'Flip page manually to encoding cursor position' },
+  breaksSelect: { description: 'Define system/page breaks behavior of notation' },
+  updateControlsLabel: { description: 'Control update behavior of notation after changes in encoding' },
+  liveUpdateCheckbox: { description: 'Automatically update notation after changes in encoding' },
+  codeManualUpdateButton: { description: 'Update notation manually' },
+  engravingFontSelect: { description: 'Select engraving font' },
+
   // drag'n'drop
   dragOverlayText: { text: 'Drag your input file here.' },
 

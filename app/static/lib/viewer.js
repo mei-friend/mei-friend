@@ -67,8 +67,8 @@ export default class Viewer {
     this.vrvOptions; // all verovio options
     this.vrvTimeout; // time out task for updating verovio settings
     this.timeoutDelay = defaultViewerTimeoutDelay; // ms, window in which concurrent clicks are treated as one update
-    this.verovioIcon = document.getElementById('verovio-icon');
-    this.breaksSelect = /** @type HTMLSelectElement */ (document.getElementById('breaks-select'));
+    this.verovioIcon = document.getElementById('verovioIcon');
+    this.breaksSelect = /** @type HTMLSelectElement */ (document.getElementById('breaksSelect'));
     this.respId = '';
     this.alertCloser;
     this.pdfMode = false;
@@ -353,9 +353,9 @@ export default class Viewer {
       this.vrvOptions = {
         ...newOptions,
       };
-    let zoom = document.getElementById('verovio-zoom');
+    let zoom = document.getElementById('verovioZoom');
     if (zoom) this.vrvOptions.scale = parseInt(zoom.value);
-    let fontSel = document.getElementById('font-select');
+    let fontSel = document.getElementById('engravingFontSelect');
     if (fontSel) this.vrvOptions.font = fontSel.value;
     let bs = this.breaksSelect;
     if (bs) this.vrvOptions.breaks = bs.value;
@@ -418,9 +418,10 @@ export default class Viewer {
 
   updatePageNumDisplay() {
     let pg = this.pageCount < 0 ? '?' : this.pageCount;
-    document.getElementById('pagination1').innerHTML = 'Page&nbsp;';
+    document.getElementById('pagination1').innerHTML = translator.lang.pagination1.html;
     document.getElementById('pagination2').innerHTML = `&nbsp;${this.currentPage}&nbsp;`;
-    document.getElementById('pagination3').innerHTML = `&nbsp;of ${pg}`;
+    document.getElementById('pagination3').innerHTML = translator.lang.pagination3.html;
+    document.getElementById('pagination4').innerHTML = `&nbsp;${pg}`;
     prs.updatePageRangeSelector(this);
   } // updatePageNumDisplay()
 
@@ -526,7 +527,7 @@ export default class Viewer {
       this.selectedElements = [];
       if (id) {
         if (!this.selectedElements.includes(id)) this.selectedElements.push(id);
-        let fl = document.getElementById('flip-checkbox');
+        let fl = document.getElementById('flipCheckbox');
         if (
           !document.querySelector('g#' + utils.escapeXmlId(id)) && // when not on current page
           ((fl && fl.checked) || forceFlip)
@@ -584,7 +585,7 @@ export default class Viewer {
     this.xmlDocOutdated = true;
     this.toolkitDataOutdated = true;
     if (!isSafari) this.checkSchema(cm.getValue());
-    let ch = document.getElementById('live-update-checkbox');
+    let ch = document.getElementById('liveUpdateCheckbox');
     if ((this.allowCursorActivity && ch && ch.checked) || forceUpdate) {
       this.updateData(cm, false, false);
     }
@@ -752,7 +753,7 @@ export default class Viewer {
 
   // Control zoom of notation display and update Verovio layout
   zoom(delta, storage = null) {
-    let zoomCtrl = document.getElementById('verovio-zoom');
+    let zoomCtrl = document.getElementById('verovioZoom');
     if (zoomCtrl) {
       if (delta <= 30)
         // delta only up to 30% difference
@@ -1011,7 +1012,9 @@ export default class Viewer {
     let rt = document.querySelector(':root');
     if (!/\w/g.test(mfs.innerHTML)) addListeners = true;
     mfs.innerHTML =
-      '<div class="settingsHeader" id="meiFriendSettingsHeader">' + translator.lang.meiFriendSettingsHeader.text + '</div>';
+      '<div class="settingsHeader" id="meiFriendSettingsHeader">' +
+      translator.lang.meiFriendSettingsHeader.text +
+      '</div>';
     let storage = window.localStorage;
     let currentHeader;
     Object.keys(meiFriendSettingsOptions).forEach((opt) => {
@@ -1073,7 +1076,7 @@ export default class Viewer {
             o.values = Array.from(this.xmlDoc.querySelectorAll('corpName[*|id]')).map((e) => e.getAttribute('xml:id'));
           break;
         case 'controlMenuFontSelector':
-          document.getElementById('font-ctrls').style.display = value ? 'inherit' : 'none';
+          document.getElementById('engravingFontControls').style.display = value ? 'inherit' : 'none';
           break;
         case 'controlMenuSpeedmodeCheckbox':
           document.getElementById('speed-div').style.display = value ? 'inherit' : 'none';
@@ -1082,11 +1085,11 @@ export default class Viewer {
           document.getElementById('navigate-ctrls').style.display = value ? 'inherit' : 'none';
           break;
         case 'controlMenuFlipToPageControls':
-          document.getElementById('flip-checkbox').style.display = value ? 'inherit' : 'none';
-          document.getElementById('flip-btn').style.display = value ? 'inherit' : 'none';
+          document.getElementById('flipCheckbox').style.display = value ? 'inherit' : 'none';
+          document.getElementById('flipButton').style.display = value ? 'inherit' : 'none';
           break;
         case 'controlMenuUpdateNotation':
-          document.getElementById('update-ctrls').style.display = value ? 'inherit' : 'none';
+          document.getElementById('updateControls').style.display = value ? 'inherit' : 'none';
           break;
         case 'showFacsimileFullPage':
           document.getElementById('facsimile-full-page-checkbox').checked = value;
@@ -1298,7 +1301,7 @@ export default class Viewer {
             this.respId = document.getElementById('respSelect').value;
             break;
           case 'controlMenuFontSelector':
-            document.getElementById('font-ctrls').style.display = document.getElementById('controlMenuFontSelector')
+            document.getElementById('engravingFontControls').style.display = document.getElementById('controlMenuFontSelector')
               .checked
               ? 'inherit'
               : 'none';
@@ -1318,12 +1321,12 @@ export default class Viewer {
             break;
           case 'controlMenuFlipToPageControls':
             const v = document.getElementById('controlMenuFlipToPageControls').checked;
-            document.getElementById('flip-checkbox').style.display = v ? 'inherit' : 'none';
-            document.getElementById('flip-btn').style.display = v ? 'inherit' : 'none';
+            document.getElementById('flipCheckbox').style.display = v ? 'inherit' : 'none';
+            document.getElementById('flipButton').style.display = v ? 'inherit' : 'none';
             break;
           case 'controlMenuUpdateNotation':
             const u = document.getElementById('controlMenuUpdateNotation').checked;
-            document.getElementById('update-ctrls').style.display = u ? 'inherit' : 'none';
+            document.getElementById('updateControls').style.display = u ? 'inherit' : 'none';
             break;
           case 'renumberMeasuresContinueAcrossEndings':
             this.disableElementThroughCheckbox(
@@ -1557,7 +1560,7 @@ export default class Viewer {
           storage[opt] = value; // save changes in localStorage object
         }
         if (opt === 'vrv-font') {
-          document.getElementById('font-select').value = value;
+          document.getElementById('engravingFontSelect').value = value;
         } else if (opt.startsWith('vrv-midi')) {
           if (document.getElementById('showMidiPlaybackControlBar').checked) {
             startMidiTimeout(true);
@@ -2184,7 +2187,8 @@ export default class Viewer {
     // construct error message
     let msg = '';
     if (msgObj.hasOwnProperty('response'))
-      msg = translator.lang.schemaNotFound.text + ' (' + msgObj.response.status + ' ' + msgObj.response.statusText + '): ';
+      msg =
+        translator.lang.schemaNotFound.text + ' (' + msgObj.response.status + ' ' + msgObj.response.statusText + '): ';
     if (msgObj.hasOwnProperty('err')) msg = msgObj.err + ' ';
     if (msgObj.hasOwnProperty('schemaFile')) msg += msgObj.schemaFile;
     // set icon to unverified and error color
@@ -2328,7 +2332,12 @@ export default class Viewer {
       let p = document.createElement('div');
       p.classList.add('validation-title');
       p.innerHTML =
-        translator.lang.validationFailed.text + '. ' + Object.keys(messages).length + ' ' + translator.lang.validationMessages.text + ':';
+        translator.lang.validationFailed.text +
+        '. ' +
+        Object.keys(messages).length +
+        ' ' +
+        translator.lang.validationMessages.text +
+        ':';
       reportDiv.appendChild(p);
       messages.forEach((m, i) => {
         let p = document.createElement('div');

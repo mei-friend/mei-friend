@@ -265,7 +265,7 @@ export const meiFriendSettingsOptions = {
     type: 'header',
     default: true,
   },
-  // flip-checkbox, flip-btn
+  // flipCheckbox, flipButton
   controlMenuFlipToPageControls: {
     title: 'Show flip to page controls',
     description: 'filled in by language packs',

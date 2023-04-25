@@ -149,7 +149,7 @@ export function setOrientation(cm, _notationOrientation = '', _facsimileOrientat
 
   // redoLayout when done with loading, only when viewer object (v) present
   if (v) {
-    if (v.speedMode && document.getElementById('breaks-select').value === 'auto') {
+    if (v.speedMode && document.getElementById('breaksSelect').value === 'auto') {
       v.pageBreaks = {};
       v.pageSpanners = { start: {}, end: {} };
       setTimeout(() => v.updateAll(cm), 33);

@@ -1,5 +1,5 @@
 import * as icon from './../css/icons.js';
-import { fontList,platform } from './defaults.js';
+import { fontList, platform } from './defaults.js';
 import { svgNameSpace } from './dom-utils.js';
 import { createPageRangeSelector } from './page-range-selector.js';
 
@@ -69,7 +69,7 @@ export function createNotationControlBar(parentElement, scale) {
   // Verovio spinning icon
   let verovioIcon = document.createElement('div');
   verovioIcon.innerHTML = icon.verovioV;
-  verovioIcon.id = 'verovio-icon';
+  verovioIcon.id = 'verovioIcon';
   verovioIcon.title = `mei-friend worker activity:
      clockwise rotation denotes Verovio activity,
      anticlockwise rotation speed worker activity`;
@@ -77,12 +77,12 @@ export function createNotationControlBar(parentElement, scale) {
 
   // Zoom controls
   let zoomCtrls = document.createElement('div');
-  zoomCtrls.id = 'zoom-ctrls';
+  zoomCtrls.id = 'zoomCtrls';
   zoomCtrls.classList.add('controls');
   vrvCtrlMenu.appendChild(zoomCtrls);
 
   let decreaseBtn = document.createElement('button');
-  decreaseBtn.id = 'decrease-scale-btn';
+  decreaseBtn.id = 'decreaseScaleButton';
   decreaseBtn.classList.add('btn');
   decreaseBtn.classList.add('icon');
   decreaseBtn.innerHTML = icon.diffRemoved;
@@ -91,7 +91,7 @@ export function createNotationControlBar(parentElement, scale) {
   zoomCtrls.appendChild(decreaseBtn);
 
   let zoomCtrl = document.createElement('input');
-  zoomCtrl.id = 'verovio-zoom';
+  zoomCtrl.id = 'verovioZoom';
   zoomCtrl.classList.add('input-range');
   zoomCtrl.setAttribute('type', 'range');
   zoomCtrl.setAttribute('min', 10);
@@ -102,7 +102,7 @@ export function createNotationControlBar(parentElement, scale) {
   zoomCtrl.title = 'Scale size of notation';
 
   let increaseBtn = document.createElement('button');
-  increaseBtn.id = 'increase-scale-btn';
+  increaseBtn.id = 'increaseScaleButton';
   increaseBtn.classList.add('btn');
   increaseBtn.classList.add('icon');
   increaseBtn.innerHTML = icon.diffAdded;
@@ -112,12 +112,12 @@ export function createNotationControlBar(parentElement, scale) {
 
   // Pagination, page navigation
   let paginationCtrls = document.createElement('div');
-  paginationCtrls.id = 'pagination-ctrls';
+  paginationCtrls.id = 'paginationControls';
   paginationCtrls.classList.add('controls');
   vrvCtrlMenu.appendChild(paginationCtrls);
 
   let sectionSelector = document.createElement('select');
-  sectionSelector.id = 'section-selector';
+  sectionSelector.id = 'sectionSelect';
   sectionSelector.classList.add('icon');
   sectionSelector.classList.add('btn');
   // sectionSelector.classList.add('icon-multi-select');
@@ -127,7 +127,7 @@ export function createNotationControlBar(parentElement, scale) {
   paginationCtrls.appendChild(sectionSelector);
 
   let firstBtn = document.createElement('button');
-  firstBtn.id = 'first-page-btn';
+  firstBtn.id = 'firstPageButton';
   firstBtn.classList.add('icon');
   firstBtn.classList.add('btn');
   firstBtn.innerHTML = icon.chevronFirst;
@@ -138,7 +138,7 @@ export function createNotationControlBar(parentElement, scale) {
   paginationCtrls.appendChild(firstBtn);
 
   let prevBtn = document.createElement('button');
-  prevBtn.id = 'prev-page-btn';
+  prevBtn.id = 'previousPageButton';
   prevBtn.classList.add('icon');
   prevBtn.classList.add('btn');
   prevBtn.innerHTML = icon.chevronLeft;
@@ -149,7 +149,7 @@ export function createNotationControlBar(parentElement, scale) {
   paginationCtrls.appendChild(prevBtn);
 
   let paginationLabel = document.createElement('label');
-  paginationLabel.id = 'pagination-label';
+  paginationLabel.id = 'paginationLabel';
   paginationLabel.classList.add('label');
   paginationLabel.title = 'Page navigation: click to manually enter page number to be displayed';
 
@@ -162,13 +162,16 @@ export function createNotationControlBar(parentElement, scale) {
   pagination2.title = 'Click to enter page number';
   let pagination3 = document.createElement('div');
   pagination3.id = 'pagination3';
+  let pagination4 = document.createElement('div');
+  pagination4.id = 'pagination4';
   paginationLabel.appendChild(pagination1);
   paginationLabel.appendChild(pagination2);
   paginationLabel.appendChild(pagination3);
+  paginationLabel.appendChild(pagination4);
   paginationCtrls.appendChild(paginationLabel);
 
   let nextBtn = document.createElement('button');
-  nextBtn.id = 'next-page-btn';
+  nextBtn.id = 'nextPageButton';
   nextBtn.classList.add('btn');
   nextBtn.classList.add('icon');
   nextBtn.innerHTML = icon.chevronRight;
@@ -179,7 +182,7 @@ export function createNotationControlBar(parentElement, scale) {
   paginationCtrls.appendChild(nextBtn);
 
   let lastBtn = document.createElement('button');
-  lastBtn.id = 'last-page-btn';
+  lastBtn.id = 'lastPageButton';
   lastBtn.classList.add('btn');
   lastBtn.classList.add('icon');
   lastBtn.innerHTML = icon.chevronLast;
@@ -191,7 +194,7 @@ export function createNotationControlBar(parentElement, scale) {
 
   // Flips notation automatically to cursor position in encoding
   let flipCheckbox = document.createElement('input');
-  flipCheckbox.id = 'flip-checkbox';
+  flipCheckbox.id = 'flipCheckbox';
   flipCheckbox.setAttribute('type', 'checkbox');
   flipCheckbox.setAttribute('value', 'autoFlip');
   flipCheckbox.setAttribute('checked', 'true');
@@ -199,7 +202,7 @@ export function createNotationControlBar(parentElement, scale) {
   paginationCtrls.appendChild(flipCheckbox);
   // manually flip to cursor position
   let flipBtn = document.createElement('button');
-  flipBtn.id = 'flip-btn';
+  flipBtn.id = 'flipButton';
   flipBtn.classList.add('btn');
   flipBtn.classList.add('icon');
   flipBtn.innerHTML = icon.flipToEncoding; // icon-alignment-aligned-to
@@ -216,13 +219,13 @@ export function createNotationControlBar(parentElement, scale) {
 
   // breaks selector
   let breaksCtrls = document.createElement('div');
-  breaksCtrls.id = 'breaks-ctrls';
+  breaksCtrls.id = 'breaksControls';
   // breaksCtrls.classList.add('block');
   breaksCtrls.classList.add('controls');
   vrvCtrlMenu.appendChild(breaksCtrls);
 
   let breaksSelector = document.createElement('select');
-  breaksSelector.id = 'breaks-select';
+  breaksSelector.id = 'breaksSelect';
   breaksSelector.classList.add('btn');
   breaksSelector.classList.add('input-select');
   breaksCtrls.title = 'Define system/page breaks behavior of notation';
@@ -230,19 +233,20 @@ export function createNotationControlBar(parentElement, scale) {
 
   // MEI encoding update behavior
   let updateCtrls = document.createElement('div');
-  updateCtrls.id = 'update-ctrls';
+  updateCtrls.id = 'updateControls';
   // updateCtrls.classList.add('block');
   updateCtrls.classList.add('controls');
   vrvCtrlMenu.appendChild(updateCtrls);
 
   let updateLabel = document.createElement('label');
+  updateLabel.id = 'updateControlsLabel';
   updateLabel.innerText = 'Update: ';
   updateLabel.classList.add('label');
   updateCtrls.appendChild(updateLabel);
   updateLabel.title = 'Control update behavior of notation after changes in encoding';
 
   let codeUpdateCheckbox = document.createElement('input');
-  codeUpdateCheckbox.id = 'live-update-checkbox';
+  codeUpdateCheckbox.id = 'liveUpdateCheckbox';
   codeUpdateCheckbox.setAttribute('type', 'checkbox');
   codeUpdateCheckbox.setAttribute('checked', 'true');
   codeUpdateCheckbox.title = 'Automatically update notation after changes in encoding';
@@ -250,7 +254,7 @@ export function createNotationControlBar(parentElement, scale) {
   updateCtrls.appendChild(codeUpdateCheckbox);
 
   let codeUpdateBtn = document.createElement('button');
-  codeUpdateBtn.id = 'code-update-btn';
+  codeUpdateBtn.id = 'codeManualUpdateButton';
   codeUpdateBtn.classList.add('btn');
   codeUpdateBtn.classList.add('icon');
   codeUpdateBtn.innerHTML = icon.symLinkFile; // icon-alignment-aligned-to
@@ -267,12 +271,12 @@ export function createNotationControlBar(parentElement, scale) {
 
   // font selector
   let fontCtrls = document.createElement('div');
-  fontCtrls.id = 'font-ctrls';
+  fontCtrls.id = 'engravingFontControls';
   fontCtrls.classList.add('controls');
   vrvCtrlMenu.appendChild(fontCtrls);
 
   let fontSelector = document.createElement('select');
-  fontSelector.id = 'font-select';
+  fontSelector.id = 'engravingFontSelect';
   fontSelector.classList.add('btn');
   fontCtrls.title = 'Select engraving font';
   fontSelector.classList.add('input-select');
@@ -398,12 +402,12 @@ export function createFacsimileControlBar(parentElement) {
 
   // Zoom controls
   let zoomCtrls = document.createElement('div');
-  zoomCtrls.id = 'facimile-zoom-ctrls';
+  zoomCtrls.id = 'facimile-zoomCtrls';
   zoomCtrls.classList.add('controls');
   facsCtrlBar.appendChild(zoomCtrls);
 
   let decreaseBtn = document.createElement('button');
-  decreaseBtn.id = 'facs-decrease-scale-btn';
+  decreaseBtn.id = 'facs-decreaseScaleButton';
   decreaseBtn.classList.add('btn');
   decreaseBtn.classList.add('icon');
   decreaseBtn.innerHTML = icon.diffRemoved;
@@ -423,7 +427,7 @@ export function createFacsimileControlBar(parentElement) {
   zoomCtrl.title = 'Scale size of notation';
 
   let increaseBtn = document.createElement('button');
-  increaseBtn.id = 'facs-increase-scale-btn';
+  increaseBtn.id = 'facs-increaseScaleButton';
   increaseBtn.classList.add('btn');
   increaseBtn.classList.add('icon');
   increaseBtn.innerHTML = icon.diffAdded;
@@ -591,7 +595,7 @@ export function manualCurrentPage(v, cm, ev) {
 
 export function setBreaksOptions(tkAvailableOptions, defaultValue = 'auto') {
   if (defaultValue === '') defaultValue = 'auto';
-  let breaksEl = document.getElementById('breaks-select');
+  let breaksEl = document.getElementById('breaksSelect');
   while (breaksEl.hasChildNodes()) breaksEl.remove(0);
   var breaksOpts = {
     none: 'None',
@@ -608,7 +612,7 @@ export function setBreaksOptions(tkAvailableOptions, defaultValue = 'auto') {
 } // setBreaksOptions()
 
 export function handleSmartBreaksOption(speedMode) {
-  let options = Array.from(document.getElementById('breaks-select').options);
+  let options = Array.from(document.getElementById('breaksSelect').options);
   options.forEach((o) => {
     if (o.value === 'smart') {
       if (speedMode && o.selected) {
