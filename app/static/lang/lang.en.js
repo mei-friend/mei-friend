@@ -194,8 +194,10 @@ export const lang = {
 
   // annotation panel
   annotationCloseButtonText: { text: 'Close Annotations Panel' },
-  annotationToolsButton: { text: 'Tools', title: 'Annotation tools' },
-  annotationListButton: { text: 'List', title: 'List annotations' },
+  hideAnnotationPanelButton: { description: 'Close Annotations Panel' },
+  closeAnnotationPanelButton: { description: 'Close Annotations Panel' },
+  annotationToolsButton: { text: 'Tools', description: 'Annotation tools' },
+  annotationListButton: { text: 'List', description: 'List annotations' },
   writeAnnotStandoffText: { text: 'Web Annotation' },
   annotationToolsHighlightTitle: { text: 'Highlight' },
   annotationToolsHighlightSpan: { text: 'Highlight' },
@@ -204,6 +206,23 @@ export const lang = {
   annotationToolsLinkTitle: { text: 'Link' },
   annotationToolsLinkSpan: { text: 'Link' },
   listAnnotations: { text: 'No annotations present.' },
+  addWebAnnotation: { text: 'Load Web Annotation(s)' },
+  loadWebAnnotationMessage: { text: 'Enter URL of Web Annotation or Web Annotation Container' },
+  loadWebAnnotationMessage1: { text: 'Could not load URL provided' },
+  loadWebAnnotationMessage2: { text: 'please try again' },
+  noAnnotationsToDisplay: { text: 'No annotations to display' },
+  flipPageToAnnotationText: { description: 'Flip page to this annotation' },
+  deleteAnnotation: { description: 'Delete this annotation' },
+  deleteAnnotationConfirmation: { text: 'Are you sure you wish to delete this annotation?' },
+  makeStandOffAnnotation: {
+    description: 'Stand-off status (Web Annotation)',
+    descriptionSolid: 'Write to Solid as Web Annotation',
+    descriptionToLocal: 'Copy Web Annotation URI to clipboard',
+  },
+  makeInlineAnnotation: {
+    description: 'Click to in-line annotation',
+    descriptionCopy: 'Copy <annot> xml:id to clipboard',
+  },
 
   // MIDI
   midiSpeedmodeIndicator: {

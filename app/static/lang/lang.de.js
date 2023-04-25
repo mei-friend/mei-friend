@@ -196,8 +196,10 @@ export const lang = {
 
   // annotation panel
   annotationCloseButtonText: { text: 'Panel für Anmerkungen schließen' },
-  annotationToolsButton: { text: 'Werkzeuge', title: 'Anmerkungswerkzeuge' },
-  annotationListButton: { text: 'Liste', title: 'Anmerkungen auflisten' },
+  hideAnnotationPanelButton: { description: 'Panel für Anmerkungen schließen' },
+  closeAnnotationPanelButton: { description: 'Panel für Anmerkungen schließen' },
+  annotationToolsButton: { text: 'Werkzeuge', description: 'Anmerkungswerkzeuge' },
+  annotationListButton: { text: 'Liste', description: 'Anmerkungen auflisten' },
   writeAnnotStandoffText: { text: 'Web Anmerkungen' },
   annotationToolsHighlightTitle: { text: 'Hervorheben' },
   annotationToolsHighlightSpan: { text: 'Hervorheben' },
@@ -206,6 +208,23 @@ export const lang = {
   annotationToolsLinkTitle: { text: 'Verlinken' },
   annotationToolsLinkSpan: { text: 'Verlinken' },
   listAnnotations: { text: 'Keine Anmerkungen gefunden.' },
+  addWebAnnotation: { text: 'Web-Anmerkungen laden' },
+  loadWebAnnotationMessage: { text: 'URL der Web-Anmerkung oder des Web-Anmerkungs-Containers eingeben' },
+  loadWebAnnotationMessage1: { text: 'Die angegebene URL konnte nicht geladen werden' },
+  loadWebAnnotationMessage2: { text: 'bitte nochmal versuchen' },
+  noAnnotationsToDisplay: { text: 'Keine Anmerkungen zum Anzeigen' },
+  flipPageToAnnotationText: { description: 'Zu dieser Anmerkung blättern' },
+  deleteAnnotation: { description: 'Diese Anmerkung löschen' },
+  deleteAnnotationConfirmation: { text: 'Diese Anmerkung wirklich löschen?' },
+  makeStandOffAnnotation: {
+    description: 'Stand-off-Status (Web-Anmerkung)',
+    descriptionSolid: 'Als Web-Anmerkung zu Solid schreiben',
+    descriptionToLocal: 'Web-Anmerkung-URI in die Zwischenablage kopieren',
+  },
+  makeInlineAnnotation: {
+    description: 'Auf Inline-Anmerkung klicken',
+    descriptionCopy: '<annot> xml:id in die Zwischenablage kopieren',
+  },
 
   // MIDI
   midiSpeedmodeIndicator: {
