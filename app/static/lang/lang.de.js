@@ -43,7 +43,7 @@ export const lang = {
   notationLeft: { text: 'Notation links' },
   notationRight: { text: 'Notation rechts' },
   showSettingsMenuText: { text: 'Einstellungen' },
-  showAnnotationMenuText: { text: 'Anmerkungen' },
+  showAnnotationMenuText: { text: 'Annotationen' },
   showFacsimileMenuText: { text: 'Faksimile' },
   showPlaybackControlsText: { text: 'Wiedergabe' },
   facsimileTop: { text: 'Faksimile oben' },
@@ -124,6 +124,12 @@ export const lang = {
   provideFeedback: { text: 'Feedback geben' },
   resetDefault: { text: 'Auf Standardwerte zurücksetzen' },
 
+  // panel icons
+  showMidiPlaybackControlBarButton: { description: 'MIDI-Wiedergabe-Steuerleiste ein-/ausblenden' },
+  showFacsimileButton: { description: 'Faksimile-Steuerleiste ein-/ausblenden' },
+  showAnnotationsButton: { description: 'Annotations-Steuerleiste ein-/ausblenden' },
+  showSettingsButton: { description: 'Einstellungs-Steuerleiste einblenden' },
+
   // Footer texts
   leftFooter: {
     html:
@@ -195,35 +201,52 @@ export const lang = {
   },
 
   // annotation panel
-  annotationCloseButtonText: { text: 'Panel für Anmerkungen schließen' },
-  hideAnnotationPanelButton: { description: 'Panel für Anmerkungen schließen' },
-  closeAnnotationPanelButton: { description: 'Panel für Anmerkungen schließen' },
-  annotationToolsButton: { text: 'Werkzeuge', description: 'Anmerkungswerkzeuge' },
-  annotationListButton: { text: 'Liste', description: 'Anmerkungen auflisten' },
-  writeAnnotStandoffText: { text: 'Web Anmerkungen' },
+  annotationCloseButtonText: { text: 'Panel für Annotationen schließen' },
+  hideAnnotationPanelButton: { description: 'Panel für Annotationen schließen' },
+  closeAnnotationPanelButton: { description: 'Panel für Annotationen schließen' },
+  annotationToolsButton: { text: 'Werkzeuge', description: 'Annotationswerkzeuge' },
+  annotationListButton: { text: 'Liste', description: 'Annotationen auflisten' },
+  writeAnnotStandoffText: { text: 'Web Annotationen' },
   annotationToolsHighlightTitle: { text: 'Hervorheben' },
   annotationToolsHighlightSpan: { text: 'Hervorheben' },
   annotationToolsDescribeTitle: { text: 'Beschreiben' },
   annotationToolsDescribeSpan: { text: 'Beschreiben' },
   annotationToolsLinkTitle: { text: 'Verlinken' },
   annotationToolsLinkSpan: { text: 'Verlinken' },
-  listAnnotations: { text: 'Keine Anmerkungen gefunden.' },
-  addWebAnnotation: { text: 'Web-Anmerkungen laden' },
-  loadWebAnnotationMessage: { text: 'URL der Web-Anmerkung oder des Web-Anmerkungs-Containers eingeben' },
+  listAnnotations: { text: 'Keine Annotationen gefunden.' },
+  addWebAnnotation: { text: 'Web-Annotationen laden' },
+  loadWebAnnotationMessage: { text: 'URL der Web-Annotation oder des Web-Annotations-Containers eingeben' },
   loadWebAnnotationMessage1: { text: 'Die angegebene URL konnte nicht geladen werden' },
   loadWebAnnotationMessage2: { text: 'bitte nochmal versuchen' },
-  noAnnotationsToDisplay: { text: 'Keine Anmerkungen zum Anzeigen' },
-  flipPageToAnnotationText: { description: 'Zu dieser Anmerkung blättern' },
-  deleteAnnotation: { description: 'Diese Anmerkung löschen' },
-  deleteAnnotationConfirmation: { text: 'Diese Anmerkung wirklich löschen?' },
+  noAnnotationsToDisplay: { text: 'Keine Annotationen zum Anzeigen' },
+  flipPageToAnnotationText: { description: 'Zu dieser Annotation blättern' },
+  deleteAnnotation: { description: 'Diese Annotation löschen' },
+  deleteAnnotationConfirmation: { text: 'Diese Annotation wirklich löschen?' },
   makeStandOffAnnotation: {
-    description: 'Stand-off-Status (Web-Anmerkung)',
-    descriptionSolid: 'Als Web-Anmerkung zu Solid schreiben',
-    descriptionToLocal: 'Web-Anmerkung-URI in die Zwischenablage kopieren',
+    description: 'Stand-off-Status (Web-Annotation)',
+    descriptionSolid: 'Als Web-Annotation zu Solid schreiben',
+    descriptionToLocal: 'Web-Annotation-URI in die Zwischenablage kopieren',
   },
   makeInlineAnnotation: {
-    description: 'Auf Inline-Anmerkung klicken',
+    description: 'Auf Inline-Annotation klicken',
     descriptionCopy: '<annot> xml:id in die Zwischenablage kopieren',
+  },
+  pageAbbreviation: { text: 'S.' },
+  elementsPlural: { text: 'Elemente' },
+  drawLinkUrl: { text: 'In neuem Tab öffnen' },
+  askForLinkUrl: { text: 'Bitte eine URL eingeben, auf die verlinkt werden soll' },
+  askForDescription: { text: 'Bitte eine textliche Beschreibung eingeben' },
+  maxNumberOfAnnotationAlert: {
+    text1: 'Anzahl der Annotationselemente übersteigt konfigurierbare "Maximale Anzahl von Annotationen"',
+    text2:
+      'Neue Annotationen können weiterhin erstellt werden und werden angezeigt, wenn "Annotationen anzeigen" eingestellt ist.',
+  },
+  annotationsOutsideScoreWarning: {
+    text: 'Leider können derzeit keine Annotationen außerhalb von &lt;score&gt; geschrieben werden',
+  },
+  annotationWithoutIdWarning: {
+    text1: 'Annotation kann nicht geschrieben werden, da MEI-Ankerpunkt kein xml:id Attribut hat.',
+    text2: 'Bitte xml:ids zuweisen ("Verändern" -> "Ids zu MEI hinzufügen") und erneut versuchen.',
   },
 
   // MIDI
@@ -481,7 +504,7 @@ export const lang = {
   },
   annotationDisplayLimit: {
     text: 'Maximale Anzahl von Annotationen',
-    description: 'Maximale Anzahl der anzuzeigenden Anmerkungen (eine große Anzahl könnte mei-friend verlangsamen)',
+    description: 'Maximale Anzahl der anzuzeigenden Annotationen (eine große Anzahl könnte mei-friend verlangsamen)',
   },
   // Facsimile
   titleFacsimilePanel: {

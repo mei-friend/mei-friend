@@ -127,14 +127,15 @@ export function refreshAnnotationsList() {
 export function generateAnnotationLocationLabel(a) {
   const annotationLocationLabel = document.createElement('span');
   if (a.firstPage === 'meiHead') {
-    annotationLocationLabel.innerHTML = `MEI&nbsp;head&nbsp;(${a.selection.length}&nbsp;elements)`;
+    annotationLocationLabel.innerHTML = `MEI&nbsp;head&nbsp;(${a.selection.length}&nbsp;${translator.lang.elementsPlural.text})`;
   } else if (a.firstPage === 'unsituated' || a.firstPage < 0) {
     annotationLocationLabel.innerHTML = 'Unsituated';
   } else {
     annotationLocationLabel.innerHTML =
-      'p.&nbsp;' +
+      translator.lang.pageAbbreviation.text +
+      '&nbsp;' +
       (a.firstPage === a.lastPage ? a.firstPage : a.firstPage + '&ndash;' + a.lastPage) +
-      ` (${a.selection.length}&nbsp;elements)`;
+      ` (${a.selection.length}&nbsp;${translator.lang.elementsPlural.text})`;
   }
   annotationLocationLabel.classList.add('annotationLocationLabel');
   annotationLocationLabel.dataset.id = a.id;
@@ -241,7 +242,7 @@ function drawLink(a) {
         e.classList.add('annotationLink');
         // create a title element within the linked element to house the url (which will be available on hover)
         const title = document.createElementNS('http://www.w3.org/2000/svg', 'title');
-        title.innerHTML = 'Open in new tab: ' + a.url;
+        title.innerHTML = translator.lang.drawLinkUrl.text + ': ' + a.url;
         // slot it in as the first child of the selected element
         e.insertBefore(title, e.firstChild);
         // make the element clickable
@@ -341,7 +342,7 @@ export function addAnnotationHandlers() {
   };
   const createDescribe = (e) => {
     // TODO improve UX!
-    const desc = window.prompt('Please enter a textual description to apply');
+    const desc = window.prompt(translator.lang.askForDescription.text);
     const a = {
       id: generateXmlId('annot', v.xmlIdStyle),
       type: 'annotateDescribe',
@@ -353,7 +354,7 @@ export function addAnnotationHandlers() {
   };
   const createLink = (e) => {
     // TODO improve UX!
-    let url = window.prompt('Please enter a url to link to');
+    let url = window.prompt(translator.lang.askForLinkUrl.text);
     if (!url.startsWith('http')) url = 'https://' + url;
     const a = {
       id: generateXmlId('annot', v.xmlIdStyle),
@@ -378,9 +379,11 @@ export function readAnnots(flagLimit = false) {
   if (limit && annots.length > limit.value) {
     if (flagLimit) {
       v.showAlert(
-        'Number of annot elements exceeds configurable "Maximum number of annotations" (' +
+        translator.lang.maxNumberOfAnnotationAlert.text1 +
+          ' (' +
           limit.value +
-          '). New annotations can still be generated and will be displayed if "Show annotations" is set.',
+          '). ' +
+          translator.lang.maxNumberOfAnnotationAlert.text2,
         'warning',
         -1
       );
@@ -441,7 +444,7 @@ export function writeAnnot(anchor, xmlId, plist, payload) {
   else if (anchor.closest('score')) insertHere = anchor.closest('score');
   else {
     console.error('Sorry, cannot currently write annotations placed outside <score>');
-    v.showAlert('Sorry, cannot currently write annotations placed outside &lt;score&gt;', 'warning', 5000);
+    v.showAlert(translator.lang.annotationsOutsideScoreWarning.text, 'warning', 5000);
     // remove from list
     deleteAnnotation(xmlId);
     return;
@@ -477,7 +480,12 @@ export function writeAnnot(anchor, xmlId, plist, payload) {
       setCursorToId(cm, xmlId);
     } else {
       let errMsg =
-        '<p>Cannot write annotation as MEI anchor-point lacks xml:id.</p><p>Please assign identifiers by selecting "Manipulate" -> "Re-render MEI (with ids)" and try again.</p>';
+        '<p>' +
+        translator.lang.annotationWithoutIdWarning.text1 +
+        '</p>' +
+        '<p>' +
+        translator.lang.annotationWithoutIdWarning.text2 +
+        '</p>';
       console.warn(errMsg);
       log(errMsg);
     }

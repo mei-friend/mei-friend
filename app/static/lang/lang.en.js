@@ -123,6 +123,12 @@ export const lang = {
   provideFeedback: { text: 'Provide feedback' },
   resetDefault: { text: 'Reset to default' },
 
+  // panel icons
+  showMidiPlaybackControlBarButton: { description: 'Toggle MIDI Playback Control Bar' },
+  showFacsimileButton: { description: 'Toggle Facsimile Panel' },
+  showAnnotationsButton: { description: 'Toggle Annotations Panel' },
+  showSettingsButton: { description: 'Show Settings Panel' },
+
   // Footer texts
   leftFooter: {
     html:
@@ -222,6 +228,22 @@ export const lang = {
   makeInlineAnnotation: {
     description: 'Click to in-line annotation',
     descriptionCopy: 'Copy <annot> xml:id to clipboard',
+  },
+  pageAbbreviation: { text: 'p.' },
+  elementsPlural: { text: 'elements' },
+  askForLinkUrl: { text: 'Please enter a URL to link to' },
+  drawLinkUrl: { text: 'Open in new tab' },
+  askForDescription: { text: 'Please enter a textual description to apply' },
+  maxNumberOfAnnotationAlert: {
+    text1: 'Number of annot elements exceeds configurable "Maximum number of annotations"',
+    text2: 'New annotations can still be generated and will be displayed if "Show annotations" is set.',
+  },
+  annotationsOutsideScoreWarning: {
+    text: 'Sorry, cannot currently write annotations placed outside &lt;score&gt;',
+  },
+  annotationWithoutIdWarning: {
+    text1: 'Cannot write annotation as MEI anchor-point lacks xml:id.',
+    text2: 'Please assign identifiers by selecting "Manipulate" -> "Re-render MEI (with ids)" and try again.',
   },
 
   // MIDI
