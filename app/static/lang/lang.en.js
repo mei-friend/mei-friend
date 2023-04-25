@@ -129,7 +129,7 @@ export const lang = {
       'Hosted by <a href="https://iwk.mdw.ac.at">IWK</a> ' +
       'at <a href="https://mdw.ac.at">mdw</a>, with ' +
       heart +
-      ' from Vienna.' +
+      ' from Vienna. ' +
       '<a href="https://iwk.mdw.ac.at/impressum">Imprint</a>.',
   },
 

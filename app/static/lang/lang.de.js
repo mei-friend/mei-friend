@@ -3,6 +3,7 @@
  */
 
 import * as att from '../lib/attribute-classes.js';
+import { heart } from '../css/icons.js';
 
 export const lang = {
   // Main menu bar
@@ -127,9 +128,9 @@ export const lang = {
   leftFooter: {
     html:
       'Gehosted von <a href="https://iwk.mdw.ac.at">IWK</a> ' +
-      'der <a href="https://mdw.ac.at">mdw</a>, mit ' +
+      '@ <a href="https://mdw.ac.at">mdw</a>, mit ' +
       heart +
-      ' aus Wien.' +
+      ' aus Wien. ' +
       '<a href="https://iwk.mdw.ac.at/impressum">Impressum</a>.',
   },
 
