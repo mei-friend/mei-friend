@@ -179,6 +179,7 @@ export const lang = {
     description:
       'Im Speed-Modus wird nur die aktuelle Seite an Verovio gesendet, um die Rendering-Zeit bei großen Dateien zu reduzieren.',
   },
+  
   // Print preview PDF
   pdfSaveButton: { text: 'PDF speichern', description: 'Als PDF speichern' },
   pdfCloseButton: { description: 'PDF-Vorschau schließen' },

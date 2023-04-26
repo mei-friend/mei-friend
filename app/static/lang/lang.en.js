@@ -149,8 +149,8 @@ export const lang = {
   // control menu
   verovioIcon: {
     description: `mei-friend worker activity:
-                  clockwise rotation denotes Verovio activity,
-                  anticlockwise rotation speed worker activity`,
+    clockwise rotation denotes Verovio activity,
+    anticlockwise rotation speed worker activity`,
   },
   decreaseScaleButton: { description: 'Decrease notation' },
   verovioZoom: { description: 'Scale size of notation' },
@@ -177,6 +177,7 @@ export const lang = {
   speedLabel: {
     description: 'In speed mode, only the current page is sent to Verovio to reduce rendering time with large files',
   },
+
   // PDF/print preview panel
   pdfSaveButton: { text: 'Save PDF', description: 'Save as PDF' },
   pdfCloseButton: { description: 'Close print view' },

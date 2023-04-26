@@ -219,8 +219,8 @@ export const meiFriendSettingsOptions = {
     title: 'Language',
     description: 'filled in by language packs.',
     type: 'select',
-    values: ['English', 'Deutsch'],
-    valuesDescriptions: ['English', 'Deutsch'],
+    values: ['Deutsch', 'English', 'Español'],
+    valuesDescriptions: ['Deutsch | German', 'English', 'Español | Spanish'],
     default: 'English',
   },
   dragSelection: {
