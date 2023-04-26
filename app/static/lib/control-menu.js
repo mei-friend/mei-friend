@@ -370,7 +370,7 @@ export function createNotationControlBar(parentElement, scale) {
   savePdfButton.id = 'pdfSaveButton';
   savePdfButton.classList.add('btn');
   // savePdfButton.classList.add('icon');
-  savePdfButton.innerHTML = 'Save PDF'; // icon.pdfIcon;
+  savePdfButton.textContent = 'Save PDF'; // icon.pdfIcon;
   savePdfButton.classList.add('inline-block-tight');
   savePdfButton.title = 'Save as PDF';
   pdfCtrlDiv.appendChild(savePdfButton);

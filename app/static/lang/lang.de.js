@@ -172,8 +172,23 @@ export const lang = {
     description:
       'Im Speed-Modus wird nur die aktuelle Seite an Verovio gesendet, um die Rendering-Zeit bei großen Dateien zu reduzieren.',
   },
-  pdfSaveButton: { description: 'Als PDF speichern' },
+  // Print preview PDF
+  pdfSaveButton: { text: 'PDF speichern', description: 'Als PDF speichern' },
   pdfCloseButton: { description: 'PDF-Vorschau schließen' },
+  pagesLegendLabel: { text: 'Seitenbereich', singlePage: 'Seite', multiplePages: 'Seiten' },
+  selectAllPagesLabel: { text: 'Alle' },
+  selectCurrentPageLabel: { text: 'Akutelle Seite' },
+  selectFromLabel: { text: 'von:' },
+  selectToLabel: { text: 'bis:' },
+  selectPageRangeLabel: { text: 'Seitenbereich:' },
+  pdfPreviewSpeedModeWarning: {
+    text:
+      'Nur die aktuelle Seite wird als PDF gerendert, da der Speed-Modus aktiviert ist. ' +
+      'Deaktivieren Sie den Speed-Modus, um aus allen Seiten auszuwählen.',
+  },
+  pdfPreviewNormalModeTitle: { text: 'Seitenbereich auswählen, der im PDF gespeichert werden soll.' },
+
+  // Facsimile panel
   facsimileIcon: { description: 'Faksimile-Panel' },
   facsimileDecreaseZoomButton: { description: 'Notationsbild verkleinern' },
   facsimileZoom: { description: 'Größe des Notationsbildes einstellen' },

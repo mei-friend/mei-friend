@@ -170,8 +170,23 @@ export const lang = {
   speedLabel: {
     description: 'In speed mode, only the current page is sent to Verovio to reduce rendering time with large files',
   },
-  pdfSaveButton: { description: 'Save as PDF' },
+  // PDF/print preview panel
+  pdfSaveButton: { text: 'Save PDF', description: 'Save as PDF' },
   pdfCloseButton: { description: 'Close print view' },
+  pagesLegendLabel: { text: 'Page range', singlePage: 'page', multiplePages: 'Pages' },
+  selectAllPagesLabel: { text: 'All' },
+  selectCurrentPageLabel: { text: 'Current page' },
+  selectFromLabel: { text: 'from:' },
+  selectToLabel: { text: 'to:' },
+  selectPageRangeLabel: { text: 'Page range:' },
+  pdfPreviewSpeedModeWarning: {
+    text:
+      'Only the current page is rendered to PDF, because speed mode is activated. ' +
+      'Uncheck speed mode to select from all pages.',
+  },
+  pdfPreviewNormalModeTitle: { text: 'Select page range to be saved in PDF.' },
+
+  // facsimile panel
   facsimileIcon: { description: 'Facsimile panel' },
   facsimileDecreaseZoomButton: { description: 'Decrease notation image' },
   facsimileZoom: { description: 'Adjust size of notation image' },
