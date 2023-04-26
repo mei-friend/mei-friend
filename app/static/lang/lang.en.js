@@ -138,6 +138,13 @@ export const lang = {
       ' from Vienna. ' +
       '<a href="https://iwk.mdw.ac.at/impressum">Imprint</a>.',
   },
+  loadingVerovio: { text: 'Loading Verovio' },
+  verovioLoaded: { text: 'loaded' },
+  convertedToPdf: { text: 'converted to PDF' },
+  statusBarCompute: { text: 'Compute' },
+  middleFooterPage: { text: 'page' },
+  middleFooterOf: { text: 'of' },
+  middleFooterLoaded: { text: 'loaded' },
 
   // control menu
   verovioIcon: {
@@ -749,4 +756,12 @@ export const lang = {
   clickToOpenInMeiFriend: { text: 'Click to open in mei-friend' },
   repoAccessError: { text: 'Sorry, cannot access repositories for supplied user or organisation' },
   allComposers: { text: 'All composers' }, // fork-repository.js
+
+  // utils renumber measures
+  renumberMeasuresModalText: { text: 'Renumber measures' },
+  renumberMeasuresModalTest: { text: 'Test' },
+  renumberMeasuresWillBe: { text: '' },
+  renumberMeasuresWouldBe: { text: 'would be' },
+  renumberMeasuresChangedTo: { text: 'changed to' },
+  renumberMeasureMeasuresRenumbered: { text: 'measures renumbered' },
 };

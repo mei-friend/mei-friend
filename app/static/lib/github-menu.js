@@ -197,7 +197,7 @@ function loadFile(fileName, clearBeforeLoading = true, ev = null) {
     .then(() => {
       githubLoadingIndicator.classList.remove('clockwise');
       cm.readOnly = false;
-      document.querySelector('.statusbar').innerText = translator.lang.loadingFromGithub.text + '...';
+      document.getElementById('statusBar').innerText = translator.lang.loadingFromGithub.text + '...';
       v.allowCursorActivity = false;
       setMeiFileInfo(
         github.filepath, // meiFileName

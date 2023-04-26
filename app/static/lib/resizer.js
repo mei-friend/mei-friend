@@ -8,11 +8,11 @@ import {
   defaultFacsimileResizerWidth,
 } from './defaults.js';
 
-// notation variables (verovio-container)
+// notation variables (verovioContainer)
 let notationOrientation = defaultNotationOrientation; // position of notation
 let notationProportion = defaultNotationProportion; // proportion notation div takes from container
 let notationResizerWidth = defaultNotationResizerWidth; // 8 px, Attention: hard-coded also in left.css, right.css, top.css, bottom.css
-// facsimile variables (facsimile-container)
+// facsimile variables (facsimileContainer)
 let facsimileOrientation = defaultFacsimileOrientation; // notationOrientation of facsimile relative to notation
 let facsimileProportion = defaultFacsimileProportion;
 let facsimileResizerWidth = defaultFacsimileResizerWidth; // px, compare to css facsimile-[left/right/top/bottom].css
@@ -46,12 +46,12 @@ export function setOrientation(cm, _notationOrientation = '', _facsimileOrientat
 
   const friendSz = document.getElementById('friendContainer');
   const notationDiv = document.getElementById('notation');
-  const verovioContainer = document.getElementById('verovio-container');
+  const verovioContainer = document.getElementById('verovioContainer');
   const verovioPanel = document.getElementById('verovio-panel');
   const facsimileDragger = document.getElementById('facsimile-dragger');
-  const facsimileContainer = document.getElementById('facsimile-container');
+  const facsimileContainer = document.getElementById('facsimileContainer');
   const facsimilePanel = document.getElementById('facsimile-panel');
-  const verovioControlMenu = document.getElementById('notation-control-bar');
+  const verovioControlMenu = document.getElementById('notationControlBar');
   const facsimileControlMenu = document.getElementById('facsimileControlBar');
   const annotationPanel = document.getElementById('annotationPanel');
   const showAnnotationPanelCheckbox = document.getElementById('showAnnotationPanel');
@@ -202,7 +202,7 @@ export function calcSizeOfContainer() {
 
 export function getVerovioContainerSize() {
   let v = document.getElementById('notation');
-  let c = document.getElementById('notation-control-bar');
+  let c = document.getElementById('notationControlBar');
   if (!c || !v) return false;
   let vbox = v.getBoundingClientRect();
   let cbox = c.getBoundingClientRect();
@@ -215,8 +215,8 @@ export function addNotationResizerHandlers(v, cm) {
   const resizer = document.getElementById('dragMe');
   const notation = resizer.previousElementSibling;
   const encoding = resizer.nextElementSibling;
-  const verovioContainer = document.getElementById('verovio-container');
-  const facsimileContainer = document.getElementById('facsimile-container');
+  const verovioContainer = document.getElementById('verovioContainer');
+  const facsimileContainer = document.getElementById('facsimileContainer');
   let x = 0;
   let y = 0;
   let notationSize = 0;
@@ -318,8 +318,8 @@ export function addNotationResizerHandlers(v, cm) {
 // resizer handlers for resizing the facsimile panel
 export function addFacsimilerResizerHandlers(v, cm) {
   const resizer = document.getElementById('facsimile-dragger');
-  const verovioContainer = document.getElementById('verovio-container');
-  const facsimileContainer = document.getElementById('facsimile-container');
+  const verovioContainer = document.getElementById('verovioContainer');
+  const facsimileContainer = document.getElementById('facsimileContainer');
   let x = 0;
   let y = 0;
   let facsimileContainerSize = 0;

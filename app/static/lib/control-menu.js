@@ -7,7 +7,7 @@ import { createPageRangeSelector } from './page-range-selector.js';
 export function createNotationDiv(parentElement, scale) {
   // container for Verovio
   let verovioContainer = document.createElement('div');
-  verovioContainer.id = 'verovio-container';
+  verovioContainer.id = 'verovioContainer';
 
   createNotationControlBar(verovioContainer, scale);
 
@@ -24,7 +24,7 @@ export function createNotationDiv(parentElement, scale) {
 
   // Create container element for pixel content (svg and jpg)
   let facsimileContainer = document.createElement('div');
-  facsimileContainer.id = 'facsimile-container';
+  facsimileContainer.id = 'facsimileContainer';
 
   createFacsimileControlBar(facsimileContainer);
 
@@ -64,7 +64,7 @@ export function createNotationControlBar(parentElement, scale) {
   // Create control form
   let vrvCtrlMenu = document.createElement('div');
   vrvCtrlMenu.classList.add('control-menu');
-  vrvCtrlMenu.id = 'notation-control-bar';
+  vrvCtrlMenu.id = 'notationControlBar';
 
   // Verovio spinning icon
   let verovioIcon = document.createElement('div');

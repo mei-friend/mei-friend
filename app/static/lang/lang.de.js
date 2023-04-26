@@ -139,6 +139,13 @@ export const lang = {
       ' aus Wien. ' +
       '<a href="https://iwk.mdw.ac.at/impressum">Impressum</a>.',
   },
+  loadingVerovio: { text: 'Lade Verovio' },
+  verovioLoaded: { text: 'geladen' },
+  convertedToPdf: { text: 'Konvertiere PDF' },
+  statusBarCompute: { text: 'Berechne' },
+  middleFooterPage: { text: 'Seite' },
+  middleFooterOf: { text: 'von' },
+  middleFooterLoaded: { text: 'geladen' },
 
   // control menu
   verovioIcon: {
@@ -770,4 +777,12 @@ export const lang = {
     text: 'Auf die Repositories der angegebenen Benutzer oder Organisationen kann nicht zugegriffen werden.',
   },
   allComposers: { text: 'Alle Komponisten' }, // fork-repository.js (TODO: wohl nicht Komponisten, was sonst?)
+
+  // utils renumber measures
+  renumberMeasuresModalText: { text: 'Takte neu nummerieren' },
+  renumberMeasuresModalTest: { text: 'Test' },
+  renumberMeasuresWillBe: { text: '' },
+  renumberMeasuresWouldBe: { text: 'würde' },
+  renumberMeasuresChangedTo: { text: 'geändert in' },
+  renumberMeasureMeasuresRenumbered: { text: 'Takte nummeriert' },
 };

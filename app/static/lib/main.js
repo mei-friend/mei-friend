@@ -421,7 +421,7 @@ function onLanguageLoaded() {
   addModifyerKeys(document); //
 
   console.log('DOMContentLoaded. Trying now to load Verovio...');
-  document.querySelector('.statusbar').innerHTML = 'Loading Verovio.';
+  document.getElementById('statusBar').innerHTML = translator.lang.loadingVerovio.text + '.';
   drawLeftFooter();
   drawRightFooter();
 
@@ -780,7 +780,7 @@ async function vrvWorkerEventsHandler(ev) {
 
       // v.addMeiFriendOptionsToSettingsPanel();
       drawRightFooter();
-      document.querySelector('.statusbar').innerHTML = `Verovio ${tkVersion} loaded.`;
+      document.getElementById('statusBar').innerHTML = `Verovio ${tkVersion} ${translator.lang.verovioLoaded.text}.`;
       setBreaksOptions(tkAvailableOptions, defaultVerovioOptions.breaks);
       if (!storage.supported || !meiFileName) {
         // open default mei file
@@ -916,7 +916,8 @@ async function vrvWorkerEventsHandler(ev) {
       }
       break;
     case 'pdfBlob':
-      document.querySelector('.statusbar').innerHTML = meiFileName.split('/').pop() + ' converted to PDF.';
+      document.getElementById('statusBar').innerHTML =
+        meiFileName.split('/').pop() + ' ' + translator.lang.convertedToPdf + '.';
       let aa = document.createElement('a');
       aa.download = meiFileName.substring(meiFileName.lastIndexOf('/') + 1).replace(/\.[^/.]+$/, '.pdf');
       aa.href = window.URL.createObjectURL(ev.data.blob);
@@ -940,8 +941,8 @@ async function vrvWorkerEventsHandler(ev) {
       v.busy(false);
       break;
     case 'updateProgressbar':
-      document.querySelector('.statusbar').innerHTML =
-        'Compute ' + ev.data.fileFormat + ': ' + Math.round(ev.data.percentage) + '%';
+      document.getElementById('statusBar').innerHTML =
+        translator.lang.statusBarCompute + ' ' + ev.data.fileFormat + ': ' + Math.round(ev.data.percentage) + '%';
       setProgressBar(ev.data.percentage);
       break;
     case 'error':
@@ -1891,13 +1892,19 @@ function setProgressBar(percentage) {
 }
 
 function updateStatusBar() {
-  document.querySelector('.statusbar').innerHTML =
+  document.getElementById('statusBar').innerHTML =
     meiFileName.substring(meiFileName.lastIndexOf('/') + 1) +
-    ', page ' +
+    ', ' +
+    translator.lang.middleFooterPage.text +
+    ' ' +
     v.currentPage +
-    ' of ' +
+    ' ' +
+    translator.lang.middleFooterOf.text +
+    ' ' +
     (v.pageCount < 0 ? '?' : v.pageCount) +
-    ' loaded.';
+    ' ' +
+    translator.lang.middleFooterLoaded.text +
+    '.';
 }
 
 function updateHtmlTitle() {
@@ -1972,7 +1979,7 @@ export function log(s, code = null) {
     v.showAlert(s, 'warning', 30000);
   }
   s += '</div>';
-  document.querySelector('.statusbar').innerHTML = s;
+  document.getElementById('statusBar').innerHTML = s;
   document.getElementById('verovio-panel').innerHTML = s;
   console.log(s);
 }
