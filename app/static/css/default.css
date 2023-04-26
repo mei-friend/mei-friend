@@ -571,7 +571,7 @@ a:active {
   z-index: 10;
 }
 
-.progressbar {
+#progressBar {
   width: 0%;
   height: 100%;
   background-color: var(--dropdownBackgroundColor);

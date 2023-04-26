@@ -1877,7 +1877,7 @@ function addEventListeners(v, cm) {
 
 // progress bar demo
 function moveProgressBar() {
-  var elem = document.querySelector('.progressbar');
+  var elem = document.getElementById('progressBar');
   var width = 0; // % progress
   var id = setInterval(frame, 10);
 
@@ -1888,7 +1888,7 @@ function moveProgressBar() {
 
 // control progress bar progress/width (in percent)
 function setProgressBar(percentage) {
-  document.querySelector('.progressbar').style.width = percentage + '%';
+  document.getElementById('progressBar').style.width = percentage + '%';
 }
 
 function updateStatusBar() {
