@@ -333,7 +333,7 @@ a:active {
   height: 100%;
 }
 
-#facsimile-message-panel {
+#facsimileMessagePanel {
   padding: 8px;
   color: var(--textColor);
   background-color: var(--backgroundColor);
@@ -815,7 +815,7 @@ svg text {
   fill-opacity: 40%;
 }
 
-/* #source-image-svg text {
+/* #sourceImageSvg text {
   fill: var(--dropdownHeadingColor);
   stroke: var(--dropdownHeadingColor);
   fill-opacity: 1;

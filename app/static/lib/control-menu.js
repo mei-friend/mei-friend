@@ -33,16 +33,16 @@ export function createNotationDiv(parentElement, scale) {
   facsimilePanel.id = 'facsimile-panel';
 
   let facsimileMessagePanel = document.createElement('div');
-  facsimileMessagePanel.id = 'facsimile-message-panel';
+  facsimileMessagePanel.id = 'facsimileMessagePanel';
 
   // SVG: facsimile image container
   var svgContainer = document.createElementNS(svgNameSpace, 'svg');
-  svgContainer.id = 'source-image-container';
+  svgContainer.id = 'sourceImageContainer';
   svgContainer.setAttribute('width', '500px');
 
   // SVG: facsimile image svg
   var svg = document.createElementNS(svgNameSpace, 'svg');
-  svg.id = 'source-image-svg';
+  svg.id = 'sourceImageSvg';
 
   // append everything
   svgContainer.appendChild(svg);

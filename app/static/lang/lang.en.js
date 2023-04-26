@@ -183,6 +183,12 @@ export const lang = {
   facsimileEditZonesCheckbox: { description: 'Edit zones of facsimile' },
   facsimileEditZonesLabel: { text: 'Edit zones', description: 'Edit zones of facsimile' },
   facsimileCloseButton: { description: 'Close facsimile panel' },
+  facsimileDefaultWarning: { text: 'No facsimile content to display.' },
+  facsimileNoSurfaceWarning: {
+    text: 'No surface element found for this page.\n(An initial pb element might be missing.)',
+  },
+  facsimileNoZonesFullPageWarning: { text: 'Facsimile without zones only visible in full page mode.' },
+  facsimileImgeNotLoadedWarning: { text: 'Could not load image' },
 
   // drag'n'drop
   dragOverlayText: { text: 'Drag your input file here.' },

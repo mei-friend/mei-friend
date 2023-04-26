@@ -608,7 +608,7 @@ export default class Viewer {
         if (el) {
           el.forEach((e) => {
             e.classList.add('highlighted');
-            if (e.nodeName === 'rect' && e.closest('#source-image-svg')) highlightZone(e);
+            if (e.nodeName === 'rect' && e.closest('#sourceImageSvg')) highlightZone(e);
             e.querySelectorAll('g').forEach((g) => g.classList.add('highlighted'));
           });
         }

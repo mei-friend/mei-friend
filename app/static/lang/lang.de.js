@@ -185,6 +185,12 @@ export const lang = {
   facsimileEditZonesLabel: { text: 'Zonenfelder bearbeiten', description: 'Zonenfelder bearbeiten' },
   facsimileEditZonesCheckbox: { description: 'Zonenfelder bearbeiten' },
   facsimileCloseButton: { description: 'Faksimile-Panel schließen' },
+  facsimileDefaultWarning: { text: 'Kein Faksimile-Inhalt zum Anzeigen.' },
+  facsimileNoSurfaceWarning: {
+    text: 'Kein Surface-Element für diese Seite gefunden.\n(Ein anfängliches pb-Element könnte fehlen.)',
+  },
+  facsimileNoZonesFullPageWarning: { text: 'Faksimile ohne Zonenfelder nur im Ganzseitenmodus sichtbar.' },
+  facsimileImgeNotLoadedWarning: { text: 'Konnte Bild nicht laden' },
 
   // drag'n'drop
   dragOverlayText: { text: 'Input-Datei hierher ziehen.' },
