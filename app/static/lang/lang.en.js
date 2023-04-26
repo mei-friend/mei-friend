@@ -214,6 +214,9 @@ export const lang = {
       'additions to the public repertoire' +
       '</a>.',
   },
+  openUrlChooseEncodingText: { text: 'Choose an encoding...' },
+  openUrlChooseComposerText: { text: 'Choose a composer...' },
+  openUrlOpenEncodingByUrlText: { text: 'Open Web-hosted encoding by URL' },
 
   // fork modals
   forkRepoGithubText: { text: 'Fork Github Repository' },

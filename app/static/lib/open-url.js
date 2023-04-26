@@ -1,5 +1,5 @@
 import { calcSizeOfContainer } from './resizer.js';
-import { sampleEncodings, samp } from './main.js';
+import { sampleEncodings, samp, translator } from './main.js';
 
 function fillInSampleUrl(e) {
   document.getElementById('openUrlInput').value = e.target.value;
@@ -11,7 +11,8 @@ function fillInComposerEncodings(e) {
   let encodingSelector = fc.querySelector('#sampleEncodingsEncoding');
   encodingSelector.innerHTML = '';
   const dummyOpt = document.createElement('option');
-  dummyOpt.text = 'Choose an encoding...';
+  dummyOpt.id = 'openUrlChooseEncodingText';
+  dummyOpt.text = translator.lang.openUrlChooseEncodingText.text;
   dummyOpt.value = '';
   dummyOpt.classList.add('sampleEntry');
   dummyOpt.setAttribute('selected', '');
@@ -45,16 +46,16 @@ export function openUrl(showSamples = false) {
   let sampleEncodingsDetails = fc.querySelector('details');
   let popupHeader = fc.querySelector('h3');
   if (showSamples) {
-    popupHeader.innerText = 'Public repertoire';
+    popupHeader.innerText = translator.lang.publicRepertoireSummary.text;
     sampleEncodingsDetails.setAttribute('open', '');
   } else {
-    popupHeader.innerText = 'Open Web-hosted encoding by URL';
+    popupHeader.innerText = translator.lang.openUrlOpenEncodingByUrlText.text;
     sampleEncodingsDetails.removeAttribute('open');
   }
   let composerSelector = fc.querySelector('#sampleEncodingsComposer');
   composerSelector.innerHTML = '';
   let encodingSelector = fc.querySelector('#sampleEncodingsEncoding');
-  encodingSelector.innerHTML = '<option value="">Choose an encoding...</option>';
+  encodingSelector.innerHTML = '<option value="">' + translator.lang.openUrlChooseEncodingText.text + '</option>';
   // arrange by composer
   let byComposer = {};
   sampleEncodings.forEach((s) => {
@@ -66,7 +67,8 @@ export function openUrl(showSamples = false) {
   });
 
   const dummyOpt = document.createElement('option');
-  dummyOpt.text = 'Choose a composer...';
+  dummyOpt.id = 'openUrlChooseComposerText';
+  dummyOpt.text = translator.lang.openUrlChooseComposerText.text;
   dummyOpt.value = '';
   dummyOpt.classList.add('sampleEntry');
   dummyOpt.setAttribute('selected', '');

@@ -216,6 +216,9 @@ export const lang = {
       'Ergänzungen des öffentlichen Repertoires' +
       '</a>.',
   },
+  openUrlChooseEncodingText: { text: 'Kodierung auswählen...' },
+  openUrlChooseComposerText: { text: 'Komponist auswählen...' },
+  openUrlOpenEncodingByUrlText: { text: 'Im Web gehostete Kodierung per URL öffnen' },
 
   // fork modals
   forkRepoGithubText: { text: 'Github Repositorium Forken' },
