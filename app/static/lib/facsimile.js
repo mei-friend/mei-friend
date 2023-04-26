@@ -269,7 +269,7 @@ export async function drawFacsimile() {
     }
 
     // go through displayed zones and draw bounding boxes with number-like label
-    if (document.getElementById('facsimile-show-zones-checkbox')?.checked) {
+    if (document.getElementById('facsimileShowZonesCheckbox')?.checked) {
       if (fullPage) {
         for (let z in facs) {
           if (facs[z]['target'] === facs[zoneId]['target']) drawBoundingBox(z);
@@ -377,7 +377,7 @@ async function embedImage(url) {
  */
 export function zoomFacsimile(deltaPercent) {
   let facsimileZoomInput = document.getElementById('facsimileZoomInput');
-  let facsZoom = document.getElementById('facsimile-zoom');
+  let facsZoom = document.getElementById('facsimileZoom');
   if (facsimileZoomInput && deltaPercent) {
     facsimileZoomInput.value = Math.min(
       parseInt(facsimileZoomInput.max),
@@ -813,7 +813,7 @@ function handleFacsimileIngestion(reply) {
  * @param {boolean} active
  */
 function busy(active = true) {
-  let facsimileIcon = document.getElementById('facsimile-icon');
+  let facsimileIcon = document.getElementById('facsimileIcon');
   if (facsimileIcon && active) {
     facsimileIcon.classList.add('clockwise');
   } else if (facsimileIcon && !active) facsimileIcon.classList.remove('clockwise');

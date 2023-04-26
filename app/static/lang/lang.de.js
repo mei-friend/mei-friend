@@ -20,7 +20,7 @@ export const lang = {
   saveMeiText: { text: 'MEI speichern' },
   saveSvg: { text: 'SVG speichern' },
   saveMidi: { text: 'MIDI speichern' },
-  printPreviewText: { text: 'PDF Vorschau' },
+  printPreviewText: { text: 'PDF-Vorschau' },
   generateUrlText: { text: 'mei-friend URL erzeugen' },
 
   // EDIT/CODE MENU ITEM
@@ -164,6 +164,27 @@ export const lang = {
   liveUpdateCheckbox: { description: 'Automatische Aktualisierung der Notation nach Änderungen in der Kodierung' },
   codeManualUpdateButton: { description: 'Manuelle Aktualisierung der Notation' },
   engravingFontSelect: { description: 'Musikfont auswählen' },
+  backwardsButton: { description: 'In der Notation nach links navigieren' },
+  forwardsButton: { description: 'In der Notation nach rechts navigieren' },
+  upwardsButton: { description: 'In der Notation nach oben navigieren' },
+  downwardsButton: { description: 'In der Notation nach unten navigieren' },
+  speedLabel: {
+    description:
+      'Im Speed-Modus wird nur die aktuelle Seite an Verovio gesendet, um die Rendering-Zeit bei großen Dateien zu reduzieren.',
+  },
+  pdfSaveButton: { description: 'Als PDF speichern' },
+  pdfCloseButton: { description: 'PDF-Vorschau schließen' },
+  facsimileIcon: { description: 'Faksimile-Panel' },
+  facsimileDecreaseZoomButton: { description: 'Notationsbild verkleinern' },
+  facsimileZoom: { description: 'Größe des Notationsbildes einstellen' },
+  facsimileIncreaseZoomButton: { description: 'Notationsbild vergrößern' },
+  facsimileFullPageLabel: { text: 'Ganze Seite', description: 'Ganze Seite des Faksimilebildes anzeigen' },
+  facsimileFullPageCheckbox: { description: 'Ganze Seite des Faksimilebildes anzeigen' },
+  facsimileShowZonesLabel: { text: 'Zonenfelder anzeigen', description: 'Zonenfelder im Faksimilebild anzeigen' },
+  facsimileShowZonesCheckbox: { description: 'Zonenfelder im Faksimilebild anzeigen' },
+  facsimileEditZonesLabel: { text: 'Zonenfelder bearbeiten', description: 'Zonenfelder bearbeiten' },
+  facsimileEditZonesCheckbox: { description: 'Zonenfelder bearbeiten' },
+  facsimileCloseButton: { description: 'Faksimile-Panel schließen' },
 
   // drag'n'drop
   dragOverlayText: { text: 'Input-Datei hierher ziehen.' },

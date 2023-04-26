@@ -1079,10 +1079,10 @@ export default class Viewer {
           document.getElementById('engravingFontControls').style.display = value ? 'inherit' : 'none';
           break;
         case 'controlMenuSpeedmodeCheckbox':
-          document.getElementById('speed-div').style.display = value ? 'inherit' : 'none';
+          document.getElementById('speedDiv').style.display = value ? 'inherit' : 'none';
           break;
         case 'controlMenuNavigateArrows':
-          document.getElementById('navigate-ctrls').style.display = value ? 'inherit' : 'none';
+          document.getElementById('navigationControls').style.display = value ? 'inherit' : 'none';
           break;
         case 'controlMenuFlipToPageControls':
           document.getElementById('flipCheckbox').style.display = value ? 'inherit' : 'none';
@@ -1092,13 +1092,13 @@ export default class Viewer {
           document.getElementById('updateControls').style.display = value ? 'inherit' : 'none';
           break;
         case 'showFacsimileFullPage':
-          document.getElementById('facsimile-full-page-checkbox').checked = value;
+          document.getElementById('facsimileFullPageCheckbox').checked = value;
           break;
         case 'editFacsimileZones':
-          document.getElementById('facsimile-edit-zones-checkbox').checked = value;
+          document.getElementById('facsimileEditZonesCheckbox').checked = value;
           break;
         case 'showFacsimileZones':
-          document.getElementById('facsimile-show-zones-checkbox').checked = value;
+          document.getElementById('facsimileShowZonesCheckbox').checked = value;
           break;
         case 'showMidiPlaybackControlBar':
           // do nothing, as it is always the default display: none
@@ -1203,7 +1203,7 @@ export default class Viewer {
             translator.changeLanguage(langCode);
             break;
           case 'toggleSpeedMode':
-            let sb = document.getElementById('speed-checkbox');
+            let sb = document.getElementById('speedCheckbox');
             if (sb) {
               sb.checked = value;
               sb.dispatchEvent(new Event('change'));
@@ -1252,18 +1252,18 @@ export default class Viewer {
           case 'transposeDirection':
             break;
           case 'showFacsimileZones':
-            document.getElementById('facsimile-show-zones-checkbox').checked = value;
+            document.getElementById('facsimileShowZonesCheckbox').checked = value;
             if (!value) {
               document.getElementById('editFacsimileZones').checked = false;
-              document.getElementById('facsimile-edit-zones-checkbox').checked = false;
+              document.getElementById('facsimileEditZonesCheckbox').checked = false;
             }
             drawFacsimile();
             break;
           case 'editFacsimileZones':
-            document.getElementById('facsimile-edit-zones-checkbox').checked = value;
+            document.getElementById('facsimileEditZonesCheckbox').checked = value;
             if (value) {
               document.getElementById('showFacsimileZones').checked = true;
-              document.getElementById('facsimile-show-zones-checkbox').checked = true;
+              document.getElementById('facsimileShowZonesCheckbox').checked = true;
             }
             drawFacsimile();
             break;
@@ -1274,12 +1274,12 @@ export default class Viewer {
             drawFacsimile();
             break;
           case 'showFacsimileFullPage':
-            document.getElementById('facsimile-full-page-checkbox').checked = value;
+            document.getElementById('facsimileFullPageCheckbox').checked = value;
             drawFacsimile();
             break;
           case 'facsimileZoomInput':
             zoomFacsimile();
-            let facsZoom = document.getElementById('facsimile-zoom');
+            let facsZoom = document.getElementById('facsimileZoom');
             if (facsZoom) facsZoom.value = value;
             break;
           case 'showSupplied':
@@ -1307,13 +1307,13 @@ export default class Viewer {
               : 'none';
             break;
           case 'controlMenuSpeedmodeCheckbox':
-            document.getElementById('speed-div').style.display = document.getElementById('controlMenuSpeedmodeCheckbox')
+            document.getElementById('speedDiv').style.display = document.getElementById('controlMenuSpeedmodeCheckbox')
               .checked
               ? 'inherit'
               : 'none';
             break;
           case 'controlMenuNavigateArrows':
-            document.getElementById('navigate-ctrls').style.display = document.getElementById(
+            document.getElementById('navigationControls').style.display = document.getElementById(
               'controlMenuNavigateArrows'
             ).checked
               ? 'inherit'

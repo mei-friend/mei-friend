@@ -616,10 +616,10 @@ function onLanguageLoaded() {
   }
   if (speedParam !== null) {
     v.speedMode = speedParam === 'true';
-    document.getElementById('speed-checkbox').checked = v.speedMode;
+    document.getElementById('speedCheckbox').checked = v.speedMode;
   } else if (storage && storage.supported && storage.hasItem('speed')) {
     v.speedMode = storage.speed;
-    document.getElementById('speed-checkbox').checked = v.speedMode;
+    document.getElementById('speedCheckbox').checked = v.speedMode;
   }
   let o = ''; // orientation from URLparam, storage or default (in this order)
   if (orientationParam !== null) {
@@ -1348,7 +1348,7 @@ export let cmd = {
   facsZoomIn: () => zoomFacsimile(+5),
   facsZoomOut: () => zoomFacsimile(-5),
   facsZoomSlider: () => {
-    let facsZoom = document.getElementById('facsimile-zoom');
+    let facsZoom = document.getElementById('facsimileZoom');
     let facsZoomInput = document.getElementById('facsimileZoomInput');
     if (facsZoom && facsZoomInput) {
       facsZoomInput.value = facsZoom.value;
@@ -1628,9 +1628,9 @@ function addEventListeners(v, cm) {
   });
 
   // Zooming facsimile with buttons
-  document.getElementById('facs-decreaseScaleButton').addEventListener('click', cmd.facsZoomOut);
-  document.getElementById('facs-increaseScaleButton').addEventListener('click', cmd.facsZoomIn);
-  document.getElementById('facsimile-zoom').addEventListener('change', cmd.facsZoomSlider);
+  document.getElementById('facsimileDecreaseZoomButton').addEventListener('click', cmd.facsZoomOut);
+  document.getElementById('facsimileIncreaseZoomButton').addEventListener('click', cmd.facsZoomIn);
+  document.getElementById('facsimileZoom').addEventListener('change', cmd.facsZoomSlider);
 
   // Zooming facsimile with mouse wheel
   let ip = document.getElementById('facsimile-panel');
@@ -1639,40 +1639,40 @@ function addEventListeners(v, cm) {
       ev.preventDefault();
       ev.stopPropagation();
       zoomFacsimile(Math.sign(ev.deltaY) * -5); // scrolling towards user = increase
-      document.getElementById('facsimile-zoom').value = document.getElementById('facsimileZoomInput').value;
+      document.getElementById('facsimileZoom').value = document.getElementById('facsimileZoomInput').value;
     }
   });
 
   // facsimile full-page
-  document.getElementById('facsimile-full-page-checkbox').addEventListener('click', (e) => {
+  document.getElementById('facsimileFullPageCheckbox').addEventListener('click', (e) => {
     document.getElementById('showFacsimileFullPage').checked = e.target.checked;
     drawFacsimile();
   });
 
   // show facsimile zone bounding boxes
-  document.getElementById('facsimile-show-zones-checkbox').addEventListener('click', (e) => {
+  document.getElementById('facsimileShowZonesCheckbox').addEventListener('click', (e) => {
     document.getElementById('showFacsimileZones').checked = e.target.checked;
     // uncheck edit option when hiding bounding boxes
     if (!e.target.checked) {
       document.getElementById('editFacsimileZones').checked = false;
-      document.getElementById('facsimile-edit-zones-checkbox').checked = false;
+      document.getElementById('facsimileEditZonesCheckbox').checked = false;
     }
     setOrientation(cm, '', '', v);
   });
 
   // facsimile edit zones
-  document.getElementById('facsimile-edit-zones-checkbox').addEventListener('click', (e) => {
+  document.getElementById('facsimileEditZonesCheckbox').addEventListener('click', (e) => {
     document.getElementById('editFacsimileZones').checked = e.target.checked;
     // show bounding boxes for editing
-    if (e.target.checked && !document.getElementById('facsimile-show-zones-checkbox').checked) {
+    if (e.target.checked && !document.getElementById('facsimileShowZonesCheckbox').checked) {
       document.getElementById('showFacsimileZones').checked = true;
-      document.getElementById('facsimile-show-zones-checkbox').checked = true;
+      document.getElementById('facsimileShowZonesCheckbox').checked = true;
     }
     setOrientation(cm, '', '', v);
   });
 
   // facsimile close button
-  document.getElementById('facsimile-close-button').addEventListener('click', cmd.hideFacsimilePanel);
+  document.getElementById('facsimileCloseButton').addEventListener('click', cmd.hideFacsimilePanel);
 
   // Page turning
   let ss = document.getElementById('sectionSelect');
@@ -1704,13 +1704,13 @@ function addEventListeners(v, cm) {
     v.updateAll(cm, {}, v.selectedElements[0]);
   });
   // navigation
-  document.getElementById('backwards-btn').addEventListener('click', cmd.previousNote);
-  document.getElementById('forwards-btn').addEventListener('click', cmd.nextNote);
-  document.getElementById('upwards-btn').addEventListener('click', cmd.layerUp);
-  document.getElementById('downwards-btn').addEventListener('click', cmd.layerDown);
+  document.getElementById('backwardsButton').addEventListener('click', cmd.previousNote);
+  document.getElementById('forwardsButton').addEventListener('click', cmd.nextNote);
+  document.getElementById('upwardsButton').addEventListener('click', cmd.layerUp);
+  document.getElementById('downwardsButton').addEventListener('click', cmd.layerDown);
   // pdf functionality
-  document.getElementById('pdf-save-button').addEventListener('click', cmd.saveAsPdf);
-  document.getElementById('pdf-close-button').addEventListener('click', cmd.pageModeOff);
+  document.getElementById('pdfSaveButton').addEventListener('click', cmd.saveAsPdf);
+  document.getElementById('pdfCloseButton').addEventListener('click', cmd.pageModeOff);
   // manipulation
   document.getElementById('invertPlacement').addEventListener('click', cmd.invertPlacement);
   document.getElementById('betweenPlacement').addEventListener('click', cmd.betweenPlacement);
@@ -1853,7 +1853,7 @@ function addEventListeners(v, cm) {
   });
 
   // speed mode checkbox
-  document.getElementById('speed-checkbox').addEventListener('change', (ev) => {
+  document.getElementById('speedCheckbox').addEventListener('change', (ev) => {
     v.speedMode = ev.target.checked;
     if (storage && storage.supported) storage.speed = v.speedMode;
     handleSmartBreaksOption(v.speedMode);

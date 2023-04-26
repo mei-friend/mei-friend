@@ -285,13 +285,13 @@ export function createNotationControlBar(parentElement, scale) {
 
   // navigation controls
   let navigateCtrls = document.createElement('div');
-  navigateCtrls.id = 'navigate-ctrls';
+  navigateCtrls.id = 'navigationControls';
   // navigateCtrls.classList.add('block');
   navigateCtrls.classList.add('controls');
   vrvCtrlMenu.appendChild(navigateCtrls);
 
   let backwardsBtn = document.createElement('button');
-  backwardsBtn.id = 'backwards-btn';
+  backwardsBtn.id = 'backwardsButton';
   backwardsBtn.classList.add('btn');
   backwardsBtn.classList.add('icon');
   backwardsBtn.innerHTML = icon.arrowLeft;
@@ -300,7 +300,7 @@ export function createNotationControlBar(parentElement, scale) {
   navigateCtrls.appendChild(backwardsBtn);
 
   let forwardsBtn = document.createElement('button');
-  forwardsBtn.id = 'forwards-btn';
+  forwardsBtn.id = 'forwardsButton';
   forwardsBtn.classList.add('btn');
   forwardsBtn.classList.add('icon');
   forwardsBtn.innerHTML = icon.arrowRight;
@@ -309,7 +309,7 @@ export function createNotationControlBar(parentElement, scale) {
   navigateCtrls.appendChild(forwardsBtn);
 
   let upwardsBtn = document.createElement('button');
-  upwardsBtn.id = 'upwards-btn';
+  upwardsBtn.id = 'upwardsButton';
   upwardsBtn.classList.add('btn');
   upwardsBtn.classList.add('icon');
   upwardsBtn.innerHTML = icon.arrowUp;
@@ -318,7 +318,7 @@ export function createNotationControlBar(parentElement, scale) {
   navigateCtrls.appendChild(upwardsBtn);
 
   let downwardsBtn = document.createElement('button');
-  downwardsBtn.id = 'downwards-btn';
+  downwardsBtn.id = 'downwardsButton';
   downwardsBtn.classList.add('btn');
   downwardsBtn.classList.add('icon');
   downwardsBtn.innerHTML = icon.arrowDown;
@@ -327,12 +327,12 @@ export function createNotationControlBar(parentElement, scale) {
   navigateCtrls.appendChild(downwardsBtn);
 
   let speedDiv = document.createElement('div');
-  speedDiv.id = 'speed-div';
+  speedDiv.id = 'speedDiv';
   speedDiv.classList.add('controls');
 
   let speedLabel = document.createElement('label');
   speedLabel.innerText = 'Speed mode:';
-  speedLabel.id = 'speed-label';
+  speedLabel.id = 'speedLabel';
   speedLabel.classList.add('label');
   speedDiv.appendChild(speedLabel);
   speedLabel.title = `In speed mode, only the current page
@@ -340,7 +340,7 @@ export function createNotationControlBar(parentElement, scale) {
      time with large files`;
 
   let speedCheckbox = document.createElement('input');
-  speedCheckbox.id = 'speed-checkbox';
+  speedCheckbox.id = 'speedCheckbox';
   speedCheckbox.setAttribute('type', 'checkbox');
   speedCheckbox.setAttribute('checked', 'false');
   speedCheckbox.classList.add('checkbox');
@@ -361,13 +361,13 @@ export function createNotationControlBar(parentElement, scale) {
 
   // pdf functionality, display none
   let pdfCtrlDiv = document.createElement('div');
-  pdfCtrlDiv.id = 'pdf-control-div';
+  pdfCtrlDiv.id = 'pdfControlsDiv';
   pdfCtrlDiv.classList.add('controls');
   pdfCtrlDiv.style.display = 'none';
   vrvCtrlMenu.appendChild(pdfCtrlDiv);
 
   let savePdfButton = document.createElement('button');
-  savePdfButton.id = 'pdf-save-button';
+  savePdfButton.id = 'pdfSaveButton';
   savePdfButton.classList.add('btn');
   // savePdfButton.classList.add('icon');
   savePdfButton.innerHTML = 'Save PDF'; // icon.pdfIcon;
@@ -376,7 +376,7 @@ export function createNotationControlBar(parentElement, scale) {
   pdfCtrlDiv.appendChild(savePdfButton);
 
   let pdfCloseButton = document.createElement('div');
-  pdfCloseButton.id = 'pdf-close-button';
+  pdfCloseButton.id = 'pdfCloseButton';
   pdfCloseButton.title = 'Close print view';
   pdfCloseButton.style.display = 'none';
   pdfCloseButton.classList.add('topright');
@@ -390,24 +390,24 @@ export function createFacsimileControlBar(parentElement) {
   // Create control form
   let facsCtrlBar = document.createElement('div');
   facsCtrlBar.classList.add('control-menu');
-  facsCtrlBar.id = 'facsimile-control-bar';
+  facsCtrlBar.id = 'facsimileControlBar';
   parentElement.appendChild(facsCtrlBar);
 
   // facsimile icon (octicon log)
   let facsimileIcon = document.createElement('div');
   facsimileIcon.innerHTML = icon.log;
-  facsimileIcon.id = 'facsimile-icon';
+  facsimileIcon.id = 'facsimileIcon';
   facsimileIcon.title = 'Facsimile panel';
   facsCtrlBar.appendChild(facsimileIcon);
 
   // Zoom controls
   let zoomCtrls = document.createElement('div');
-  zoomCtrls.id = 'facimile-zoomCtrls';
+  zoomCtrls.id = 'facsimileZoomControls';
   zoomCtrls.classList.add('controls');
   facsCtrlBar.appendChild(zoomCtrls);
 
   let decreaseBtn = document.createElement('button');
-  decreaseBtn.id = 'facs-decreaseScaleButton';
+  decreaseBtn.id = 'facsimileDecreaseZoomButton';
   decreaseBtn.classList.add('btn');
   decreaseBtn.classList.add('icon');
   decreaseBtn.innerHTML = icon.diffRemoved;
@@ -416,7 +416,7 @@ export function createFacsimileControlBar(parentElement) {
   zoomCtrls.appendChild(decreaseBtn);
 
   let zoomCtrl = document.createElement('input');
-  zoomCtrl.id = 'facsimile-zoom';
+  zoomCtrl.id = 'facsimileZoom';
   zoomCtrl.classList.add('input-range');
   zoomCtrl.setAttribute('type', 'range');
   zoomCtrl.setAttribute('min', 10);
@@ -424,10 +424,10 @@ export function createFacsimileControlBar(parentElement) {
   zoomCtrl.setAttribute('step', 5);
   zoomCtrl.setAttribute('value', 100);
   zoomCtrls.appendChild(zoomCtrl);
-  zoomCtrl.title = 'Scale size of notation';
+  zoomCtrl.title = 'Adjust size of notation';
 
   let increaseBtn = document.createElement('button');
-  increaseBtn.id = 'facs-increaseScaleButton';
+  increaseBtn.id = 'facsimileIncreaseZoomButton';
   increaseBtn.classList.add('btn');
   increaseBtn.classList.add('icon');
   increaseBtn.innerHTML = icon.diffAdded;
@@ -437,21 +437,21 @@ export function createFacsimileControlBar(parentElement) {
 
   // full page
   let fullPageDiv = document.createElement('div');
-  fullPageDiv.id = 'facsimile-full-page';
+  fullPageDiv.id = 'facsimileFullPageDiv';
   fullPageDiv.classList.add('controls');
 
   let fullPageLabel = document.createElement('label');
   fullPageLabel.innerText = 'Full page:';
-  fullPageLabel.id = 'facsimile-full-page-label';
+  fullPageLabel.id = 'facsimileFullPageLabel';
   fullPageLabel.classList.add('label');
   fullPageDiv.appendChild(fullPageLabel);
   fullPageLabel.title = 'Show full page of facsimile image';
 
   let fullPageCheckbox = document.createElement('input');
-  fullPageCheckbox.id = 'facsimile-full-page-checkbox';
+  fullPageCheckbox.id = 'facsimileFullPageCheckbox';
   fullPageCheckbox.setAttribute('type', 'checkbox');
   fullPageCheckbox.classList.add('checkbox');
-  fullPageCheckbox.title = 'Activate speed mode';
+  fullPageCheckbox.title = 'Display full page of facsimile image';
   fullPageLabel.setAttribute('for', fullPageCheckbox.id);
   fullPageCheckbox.checked = false;
   fullPageCheckbox.disabled = false;
@@ -461,18 +461,18 @@ export function createFacsimileControlBar(parentElement) {
 
   // show zone rectangles
   let showZonesDiv = document.createElement('div');
-  showZonesDiv.id = 'facsimile-show-zones';
+  showZonesDiv.id = 'facsimileShowZones';
   showZonesDiv.classList.add('controls');
 
   let showZonesLabel = document.createElement('label');
   showZonesLabel.innerText = 'Show zone boxes:';
-  showZonesLabel.id = 'facsimile-show-zones-label';
+  showZonesLabel.id = 'facsimileShowZonesLabel';
   showZonesLabel.classList.add('label');
   showZonesDiv.appendChild(showZonesLabel);
   showZonesLabel.title = 'Show zone boxes of facsimile';
 
   let showZonesCheckbox = document.createElement('input');
-  showZonesCheckbox.id = 'facsimile-show-zones-checkbox';
+  showZonesCheckbox.id = 'facsimileShowZonesCheckbox';
   showZonesCheckbox.setAttribute('type', 'checkbox');
   showZonesCheckbox.classList.add('checkbox');
   showZonesCheckbox.title = 'Show zone boxes of facsimile';
@@ -485,18 +485,18 @@ export function createFacsimileControlBar(parentElement) {
 
   // edit zones
   let editZonesDiv = document.createElement('div');
-  editZonesDiv.id = 'facsimile-edit-zones';
+  editZonesDiv.id = 'facsimileEditZones';
   editZonesDiv.classList.add('controls');
 
   let editZonesLabel = document.createElement('label');
   editZonesLabel.innerText = 'Edit zones:';
-  editZonesLabel.id = 'facsimile-edit-zones-label';
+  editZonesLabel.id = 'facsimileEditZonesLabel';
   editZonesLabel.classList.add('label');
   editZonesDiv.appendChild(editZonesLabel);
   editZonesLabel.title = 'Edit zones of facsimile';
 
   let editZonesCheckbox = document.createElement('input');
-  editZonesCheckbox.id = 'facsimile-edit-zones-checkbox';
+  editZonesCheckbox.id = 'facsimileEditZonesCheckbox';
   editZonesCheckbox.setAttribute('type', 'checkbox');
   editZonesCheckbox.classList.add('checkbox');
   editZonesCheckbox.title = 'Edit zones of facsimile';
@@ -512,7 +512,7 @@ export function createFacsimileControlBar(parentElement) {
   facsCtrlBar.appendChild(filler);
 
   let facsimileCloseButton = document.createElement('div');
-  facsimileCloseButton.id = 'facsimile-close-button';
+  facsimileCloseButton.id = 'facsimileCloseButton';
   facsimileCloseButton.title = 'Close facsimile panel';
   facsimileCloseButton.classList.add('topright');
   facsimileCloseButton.innerHTML = '&times;'; // icon.xCircle;
@@ -521,8 +521,8 @@ export function createFacsimileControlBar(parentElement) {
 
 export function showPdfButtons(show = true) {
   document.getElementById('pageRangeSelectorDiv').style.display = show ? '' : 'none';
-  document.getElementById('pdf-control-div').style.display = show ? '' : 'none';
-  document.getElementById('pdf-close-button').style.display = show ? '' : 'none';
+  document.getElementById('pdfControlsDiv').style.display = show ? '' : 'none';
+  document.getElementById('pdfCloseButton').style.display = show ? '' : 'none';
 } // showPdfButtons()
 
 // list of DOM object id string that will be saved and restored
@@ -534,7 +534,7 @@ const listOfObjects = [
   'controlMenuNavigateArrows',
   'controlMenuSpeedmodeCheckbox',
   'toggleSpeedMode',
-  // 'speed-label',
+  // 'speedLabel',
 ];
 
 /**
@@ -546,7 +546,7 @@ export function getControlMenuState() {
   listOfObjects.forEach((obj) => {
     let el = document.getElementById(obj);
     if (el) {
-      if (obj === 'speed-label') {
+      if (obj === 'speedLabel') {
         state[obj] = {};
         state[obj]['textContent'] = el.textContent;
         state[obj]['title'] = el.title;
@@ -564,7 +564,7 @@ export function getControlMenuState() {
  */
 export function setControlMenuState(state) {
   listOfObjects.forEach((obj) => {
-    if (obj === 'speed-label') {
+    if (obj === 'speedLabel') {
       let el = document.getElementById(obj);
       el.textContent = state[obj].textContent;
       el.title = state[obj].title;
