@@ -1,4 +1,7 @@
 # mei-friend-online CHANGELOG.md
+### 0.8.10 Internationalization
+* Multi-language support with separate language pack files per language
+* Language packs currently available for English and German, more language packs to come
 ### 0.8.9 patch
 * Fix bug when notation zooming resulted in missing notation when MIDI manu bar is activated
 ### 0.8.8 patch
