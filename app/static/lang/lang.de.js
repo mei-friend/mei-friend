@@ -125,7 +125,7 @@ export const lang = {
   resetDefault: { text: 'Auf Standardwerte zurücksetzen' },
 
   // panel icons
-  showLanguageSelectionButton: { description: 'Sprachauswahl einblenden'},
+  showLanguageSelectionButton: { description: 'Sprachauswahl einblenden' },
   showMidiPlaybackControlBarButton: { description: 'MIDI-Wiedergabe-Steuerleiste ein-/ausblenden' },
   showFacsimileButton: { description: 'Faksimile-Steuerleiste ein-/ausblenden' },
   showAnnotationsButton: { description: 'Annotations-Steuerleiste ein-/ausblenden' },
@@ -181,7 +181,7 @@ export const lang = {
     description:
       'Im Speed-Modus wird nur die aktuelle Seite an Verovio gesendet, um die Rendering-Zeit bei großen Dateien zu reduzieren.',
   },
-  
+
   // Print preview PDF
   pdfSaveButton: { text: 'PDF speichern', description: 'Als PDF speichern' },
   pdfCloseButton: { description: 'PDF-Vorschau schließen' },

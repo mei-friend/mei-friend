@@ -2,7 +2,23 @@
  * Default values for mei-friend
  */
 
-import * as att from './attribute-classes.js';
+export const supportedLanguages = {
+  german: {
+    languageCode: 'de', // after ISO-639-1
+    originalName: 'Deutsch',
+    allLanguages: ['Deutsch', 'Englisch', 'Spanisch'],
+  },
+  english: {
+    languageCode: 'en',
+    originalName: 'English',
+    allLanguages: ['German', 'English', 'Spanish'],
+  },
+  spanish: {
+    languageCode: 'es',
+    originalName: 'Español',
+    allLanguages: ['Alemán', 'Inglés', 'Español'],
+  },
+};
 
 // export let platform = navigator.platform.toLowerCase(); // TODO
 export const platform = (navigator?.userAgentData?.platform || navigator?.platform || 'unknown').toLowerCase();
