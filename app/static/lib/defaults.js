@@ -3,21 +3,21 @@
  */
 
 export const supportedLanguages = {
-  german: {
-    languageCode: 'de', // after ISO-639-1
-    originalName: 'Deutsch',
-    allLanguages: ['Deutsch', 'Englisch', 'Spanisch'],
+  de: { // after ISO-639-1, please enter new codes alphabetically
+    de: 'Deutsch',
+    en: 'Englisch',
+    es: 'Spanisch',
   },
-  english: {
-    languageCode: 'en',
-    originalName: 'English',
-    allLanguages: ['German', 'English', 'Spanish'],
+  en: {
+    de: 'German',
+    en: 'English',
+    es: 'Spanish',
   },
-  spanish: {
-    languageCode: 'es',
-    originalName: 'Español',
-    allLanguages: ['Alemán', 'Inglés', 'Español'],
-  },
+  es: {
+    de: 'Alemán',
+    en: 'Inglés',
+    es: 'Español'
+  }
 };
 
 // export let platform = navigator.platform.toLowerCase(); // TODO

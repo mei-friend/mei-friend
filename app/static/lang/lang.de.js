@@ -125,7 +125,6 @@ export const lang = {
   resetDefault: { text: 'Auf Standardwerte zurücksetzen' },
 
   // panel icons
-  showLanguageSelectionButton: { description: 'Sprachauswahl einblenden' },
   showMidiPlaybackControlBarButton: { description: 'MIDI-Wiedergabe-Steuerleiste ein-/ausblenden' },
   showFacsimileButton: { description: 'Faksimile-Steuerleiste ein-/ausblenden' },
   showAnnotationsButton: { description: 'Annotations-Steuerleiste ein-/ausblenden' },

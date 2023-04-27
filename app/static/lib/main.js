@@ -104,6 +104,7 @@ import {
   isSafari,
 } from './defaults.js';
 import Translator from './translator.js';
+import { buildLanguageSelection } from './language-selector.js';
 
 const defaultCodeMirrorOptions = {
   lineNumbers: true,
@@ -379,6 +380,8 @@ document.addEventListener('DOMContentLoaded', function () {
  * Do all the heavy GUI lifting after DOMCOntentLoaded event was fired
  */
 function onLanguageLoaded() {
+  // build language selection menu
+  buildLanguageSelection();
   // link to changelog page according to env settings (develop/staging/production)
   let changeLogUrl;
   switch (env) {
@@ -1312,10 +1315,12 @@ export let cmd = {
     }
   },
   showLanguageSelection: () => { 
-    console.log("SHOW LANGUAGE SELECTION")
+    const langSel = document.getElementById("languageSelectionList");
+    langSel.style.display = "block";
   },
   hideLanguageSelection: () => { 
-    console.log("HIDE LANGUAGE SELECTION")
+    const langSel = document.getElementById("languageSelectionList");
+    langSel.style.display = "none";
   },
   showAnnotationPanel: () => {
     document.getElementById('showAnnotationPanel').checked = true; // TODO: remove?

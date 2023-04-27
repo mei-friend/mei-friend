@@ -131,8 +131,13 @@
   background-color: var(--settingsBackgroundAlternativeColor);
 }
 
-.dropdown-content a:hover .btn {
+.dropdown-content a:hover .btn, .dropdown-content tr:hover {
   background-color: var(--settingsBackgroundColor);
+}
+
+.dropdown-content table { 
+  border: 0px;
+  border-collapse:collapse;
 }
 
 #GithubMenu.dropdown-content a {
@@ -380,4 +385,18 @@
 
 #pageRangeSelectorDiv input[type='text'] {
   max-width: 120px;
+}
+
+/* language selection list */
+#languageSelectionList {
+  display:none;
+  position:relative;
+  min-height:5em;
+  min-width:fit-content;
+  left:-100px;
+}
+
+#languageSelectionList td { 
+  padding-left:.5em;
+  padding-right:.5em;
 }

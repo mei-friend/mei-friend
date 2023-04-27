@@ -3,6 +3,7 @@
  *
  */
 import * as l from '../lang/lang.en.js'; // default language
+import { translateLanguageSelection } from './language-selector.js';
 
 export default class Translator {
   constructor() {
@@ -56,6 +57,7 @@ export default class Translator {
    * Refresh language of all mei-friend GUI items
    */
   translateGui() {
+    translateLanguageSelection(this.langCode);
     const v = false; // debug verbosity
     for (let key in this.lang) {
       let el = document.getElementById(key);
