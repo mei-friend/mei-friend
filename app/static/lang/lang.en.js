@@ -124,6 +124,7 @@ export const lang = {
   resetDefault: { text: 'Reset to default' },
 
   // panel icons
+  showLanguageSelectionButton: { description: 'Show Language Selection'},
   showMidiPlaybackControlBarButton: { description: 'Toggle MIDI Playback Control Bar' },
   showFacsimileButton: { description: 'Toggle Facsimile Panel' },
   showAnnotationsButton: { description: 'Toggle Annotations Panel' },

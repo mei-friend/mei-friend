@@ -1311,6 +1311,12 @@ export let cmd = {
       }
     }
   },
+  showLanguageSelection: () => { 
+    console.log("SHOW LANGUAGE SELECTION")
+  },
+  hideLanguageSelection: () => { 
+    console.log("HIDE LANGUAGE SELECTION")
+  },
   showAnnotationPanel: () => {
     document.getElementById('showAnnotationPanel').checked = true; // TODO: remove?
     v.toggleAnnotationPanel();
@@ -1560,6 +1566,8 @@ function addEventListeners(v, cm) {
     }
   });
   document.getElementById('showAnnotationMenu').addEventListener('click', cmd.showAnnotationPanel);
+  document.getElementById('showLanguageSelectionButton').addEventListener('mouseenter', () => { cmd.showLanguageSelection(); });
+  document.getElementById('showLanguageSelectionButton').addEventListener('mouseleave', () => { cmd.hideLanguageSelection(); });
   document.getElementById('showAnnotationsButton').addEventListener('click', cmd.toggleAnnotationPanel);
   document.getElementById('showFacsimileButton').addEventListener('click', cmd.toggleFacsimilePanel);
   document.getElementById('closeAnnotationPanelButton').addEventListener('click', cmd.hideAnnotationPanel);

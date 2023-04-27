@@ -125,6 +125,7 @@ export const lang = {
   resetDefault: { text: 'Restablecer valores predeterminados' },
 
   // panel icons
+  showLanguageSelectionButton: { description: 'Mostrar selección de idiomas'},
   showMidiPlaybackControlBarButton: { description: 'Mostrar/Ocultar barra de control de reproducción MIDI' },
   showFacsimileButton: { description: 'Mostrar/Ocultar barra de control de faksímil' },
   showAnnotationsButton: { description: 'Mostrar/Ocultar barra de control de anotaciones' },
