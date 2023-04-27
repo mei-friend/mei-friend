@@ -177,6 +177,7 @@ export const lang = {
   upwardsButton: { description: 'In der Notation nach oben navigieren' },
   downwardsButton: { description: 'In der Notation nach unten navigieren' },
   speedLabel: {
+    text: 'Speed Mode',
     description:
       'Im Speed-Modus wird nur die aktuelle Seite an Verovio gesendet, um die Rendering-Zeit bei großen Dateien zu reduzieren.',
   },
@@ -339,7 +340,7 @@ export const lang = {
 
   // mei-friend SETTINGS MENU
   meiFriendSettingsHeader: {
-    text: 'mf-Einstellungen',
+    text: 'Einstellungen',
     description: 'mei-friend-Einstellungen',
   },
   mfReset: {

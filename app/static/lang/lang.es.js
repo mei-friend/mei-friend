@@ -125,7 +125,7 @@ export const lang = {
   resetDefault: { text: 'Restablecer valores predeterminados' },
 
   // panel icons
-  showLanguageSelectionButton: { description: 'Mostrar selección de idiomas'},
+  showLanguageSelectionButton: { description: 'Mostrar selección de idiomas' },
   showMidiPlaybackControlBarButton: { description: 'Mostrar/Ocultar barra de control de reproducción MIDI' },
   showFacsimileButton: { description: 'Mostrar/Ocultar barra de control de faksímil' },
   showAnnotationsButton: { description: 'Mostrar/Ocultar barra de control de anotaciones' },
@@ -181,8 +181,9 @@ export const lang = {
   upwardsButton: { description: 'Navegar hacia arriba en la notación' },
   downwardsButton: { description: 'Navegar hacia abajo en la notación' },
   speedLabel: {
+    text: 'Modo de velocidad',
     description:
-      'En modo de velocidad, solo se envía la página actual a Verovio para reducir el tiempo de renderización con archivos grandes',
+      'En modo de velocidad (speed mode), solo se envía la página actual a Verovio para reducir el tiempo de renderización con archivos grandes',
   },
 
   // Print preview PDF / Panel de vista previa de impresión/PDF
@@ -338,7 +339,7 @@ export const lang = {
   closeMidiPlaybackControlBarButton: { description: 'Ocultar la barra de control de reproducción de MIDI' },
 
   // mei-friend SETTINGS MENU / MEI-FRIEND MENU DE CONFIGURACIÓN
-  meiFriendSettingsHeader: { text: 'Configuración de mei-friend' },
+  meiFriendSettingsHeader: { text: 'Configuración' },
   mfReset: { text: 'Predeterminado', description: 'Restablecer a los valores predeterminados de mei-friend' },
 
   titleGeneral: {
@@ -457,327 +458,315 @@ export const lang = {
     description:
       'Destacar visualmente las notas que suenan actualmente en el panel de notación durante la reproducción MIDI',
   },
-  // Transposition
+
+  // Transposition / Transposición
   titleTransposition: {
-    text: 'Transposition',
-    description: 'Notation transponieren',
+    text: 'Transposición',
+    description: 'Transponer la notación',
   },
   enableTransposition: {
-    text: 'Transposition aktivieren',
+    text: 'Activar transposición',
     description:
-      'Transposition aktivieren, die über die Schaltfläche ' +
-      '"Transponieren" weiter unten angewendet werden soll. ' +
-      'Die Transposition wird nur auf die Notation angewendet, ' +
-      'die Kodierung bleibt unverändert, es sei denn, Sie klicken ' +
-      'im Dropdown-Menü "Manipulieren" auf den Eintrag "Mit Verovio neu rendern".',
+      'Activar la transposición que se aplicará mediante el botón "Transponer" debajo. ' +
+      'La transposición solo se aplicará a la notación, la codificación permanecerá sin cambios, ' +
+      'a menos que haga clic en la opción "Renderizar nuevamente con Verovio" en el menú desplegable "Manipular".',
   },
   transposeInterval: {
-    text: 'Nach Intervallen',
+    text: 'Por intervalos',
     description:
-      'Transponieren der Kodierung nach chromatischen Intervallen ' +
-      'durch die gebräuchlichsten Intervalle (Verovio unterstützt das Basis-40-System)',
+      'Transponer la codificación por intervalos cromáticos utilizando los intervalos más comunes ' +
+      '(Verovio admite el sistema base 40)',
     labels: [
-      'Reine Prim',
-      'Übermässige Prim',
-      'Verminderte Sekund',
-      'Kleine Sekund',
-      'Große Sekund',
-      'Übermässige Sekund',
-      'Verminderte Terz',
-      'Kleine Terz',
-      'Große Terz',
-      'Übermässige Terz',
-      'Verminderte Quart',
-      'Reine Quart',
-      'Übermässige Quart',
-      'Verminderte Quint',
-      'Reine Quint',
-      'Übermässige Quint',
-      'Verminderte Sext',
-      'Kleine Sext',
-      'Große Sext',
-      'Übermässige Sext',
-      'Verminderte Sept',
-      'Kleine Sept',
-      'Große Sept',
-      'Übermässige Sept',
-      'Verminderte Oktav',
-      'Reine Oktav',
+      'Unísono',
+      'Segunda mayor',
+      'Segunda menor',
+      'Tercera mayor',
+      'Tercera menor',
+      'Cuarta justa',
+      'Cuarta aumentada',
+      'Quinta disminuida',
+      'Quinta justa',
+      'Quinta aumentada',
+      'Sexta menor',
+      'Sexta mayor',
+      'Séptima menor',
+      'Séptima mayor',
+      'Octava justa',
+      'Octava aumentada',
     ],
   },
   transposeKey: {
-    text: 'Transponieren zur Tonart',
-    description: 'Transponieren zur Tonart',
+    text: 'Transponer a la tonalidad',
+    description: 'Transponer a la tonalidad',
     labels: [
-      'Cis-Dur / ais-Moll',
-      'Fis-Dur / dis-Moll',
-      'H-Dur / gis-Moll',
-      'E-Dur / cis-Moll',
-      'A-Dur / fis-Moll',
-      'D-Dur / h-Moll',
-      'G-Dur / e-Moll',
-      'C-Dur / a-Moll',
-      'F-Dur / d-Moll',
-      'B-Dur / g-Moll',
-      'Es-Dur / c-Moll',
-      'As-Dur / f-Moll',
-      'Des-Dur / b-Moll',
-      'Ges-Dur / es-Moll',
-      'Ces-Dur / as-Moll',
+      'Do sostenido mayor / la bemol menor',
+      'Fa sostenido mayor / re bemol menor',
+      'Si mayor / sol sostenido menor',
+      'Mi mayor / do sostenido menor',
+      'La mayor / fa sostenido menor',
+      'Re mayor / si menor',
+      'Sol mayor / mi menor',
+      'Do mayor / la menor',
+      'Fa mayor / re menor',
+      'Si bemol mayor / sol menor',
+      'Mi bemol mayor / do menor',
+      'La bemol mayor / fa menor',
+      'Re bemol mayor / si bemol menor',
+      'Sol bemol mayor / mi bemol menor',
+      'Do bemol mayor / la bemol menor',
     ],
   },
   transposeDirection: {
-    text: 'Transpositionsrichtung',
-    description: 'Transpositionsrichtung (Hinauf/hinunter)',
-    labels: ['Hinauf', 'Hinunter', 'Näheste'],
+    text: 'Dirección de transposición',
+    description: 'Dirección de transposición (arriba/abajo)',
+    labels: ['Arriba', 'Abajo', 'Más cercano'],
   },
   transposeButton: {
-    text: 'Transponieren',
+    text: 'Transponer',
     description:
-      'Transposition mit obigen Einstellungen auf die Notation anwenden, ' +
-      'die MEI-Kodierung bleibt unverändert. Um auch die MEI-Kodierung ' +
-      'mit den aktuellen Einstellungen zu transponieren, verwenden Sie ' +
-      '"Mit Verovio neu rendern" im Dropdown-Menü "Manipulieren".',
-  },
-  // Renumber measures
-  renumberMeasuresHeading: {
-    text: 'Takte neu nummerieren',
-    description: 'Einstellungen für Takte neu nummerieren',
-  },
-  renumberMeasureContinueAcrossIncompleteMeasures: {
-    text: 'Weiter bei unvollständigen Takten',
-    description: 'Taktnummer wird bei unvollständigen Takten erhöht (@metcon="false")',
-  },
-  renumberMeasuresUseSuffixAtMeasures: {
-    text: 'Suffix bei unvollständigen Takten',
-    description: 'Suffix bei Taktnummern von unvollständigen Takten verwenden (z.B. 23-cont)',
-    labels: ['kein', '-cont'],
-  },
-  renumberMeasuresContinueAcrossEndings: {
-    text: 'Weiter bei Volten',
-    description: 'Taktnummern werden bei Volten (endings) erhöht',
-  },
-  renumberMeasuresUseSuffixAtEndings: {
-    text: 'Suffix bei Volten',
-    description: 'Suffix zu Taktnummern bei Volten (endings) verwenden (z.B. 23-a)',
-  },
-  // Annotations
-  titleAnnotations: {
-    text: 'Annotationen',
-    description: 'Einstellungen für Annotationen',
-  },
-  showAnnotations: {
-    text: 'Annotationen anzeigen',
-    description: 'Zeige Annotationen in der Notation',
-  },
-  showAnnotationPanel: {
-    text: 'Annotationenbedienfeld anzeigen',
-    description: 'Annotationenbedienfeld anzeigen',
-  },
-  annotationDisplayLimit: {
-    text: 'Maximale Anzahl von Annotationen',
-    description: 'Maximale Anzahl der anzuzeigenden Annotationen (eine große Anzahl könnte mei-friend verlangsamen)',
-  },
-  // Facsimile
-  titleFacsimilePanel: {
-    text: 'Faksimile-Panel',
-    description: 'Faksimile-Panel',
-  },
-  showFacsimilePanel: {
-    text: 'Faksimile-Panel anzeigen',
-    description: 'Faksimile-Bilder der Quelledition anzeigen, falls vorhanden',
-  },
-  selectFacsimilePanelOrientation: {
-    text: 'Position des Faksimile-Panel',
-    description: 'Position des Faksimile-Panel relativ zur Notation auswählen',
-    labels: ['Links', 'Rechts', 'Oben', 'Unten'],
-  },
-  facsimileZoomInput: {
-    text: 'Größe der Faksimile-Bilder (%)',
-    description: 'Größe der Faksimile-Bilder verändern (in Prozent)',
-  },
-  showFacsimileFullPage: {
-    text: 'Ganze Seite anzeigen',
-    description: 'Zeige die gesamten Faksimile-Bilder',
-  },
-  showFacsimileZones: {
-    text: 'Faksimile-Zonenfelder anzeigen',
-    description: 'Faksimile-Zonenbegrenzungsfelder anzeigen',
-  },
-  editFacsimileZones: {
-    text: 'Faksimile-Zonenfelder bearbeiten',
-    description: 'Faksimile-Zonenfelder bearbeiten',
-  },
-  // Supplied element
-  titleSupplied: {
-    text: 'Editorische Inhalte',
-    description: 'Editorische Inhalte im MEI',
-  },
-  showSupplied: {
-    text: 'Zeige Supplied-Element',
-    description: 'Hebe Inhalte, die von <supplied>-Elementen umgeben sind, hervor',
-  },
-  suppliedColor: {
-    text: 'Farbe für Supplied',
-    description: 'Farbe für Supplied auswählen',
-  },
-  respSelect: {
-    text: 'Responsibility wählen',
-    description: 'Responsibility id für Supplied-Element auswählen',
+      'Aplicar la transposición con las configuraciones anteriores a la notación, ' +
+      'la codificación MEI permanecerá sin cambios. Para transponer también la codificación MEI ' +
+      'con las configuraciones actuales, utilice "Renderizar nuevamente con Verovio" en el menú desplegable "Manipular".',
   },
 
-  //  EDITOR SETTINGS / CODEMIRROR SETTINGS
+  // Renumber measures / Renumerar medidas
+  renumberMeasuresHeading: {
+    text: 'Renumerar medidas',
+    description: 'Configuraciones para renumerar medidas',
+  },
+  renumberMeasureContinueAcrossIncompleteMeasures: {
+    text: 'Continuar en medidas incompletas',
+    description: 'Continuar los números de las medidas en medidas incompletas (@metcon="false")',
+  },
+  renumberMeasuresUseSuffixAtMeasures: {
+    text: 'Sufijo en medidas incompletas',
+    description: 'Usar un sufijo numérico en medidas incompletas (por ejemplo, 23-cont)',
+    labels: ['ninguno', '-cont'],
+  },
+  renumberMeasuresContinueAcrossEndings: {
+    text: 'Continuar en los finales',
+    description: 'Continuar los números de las medidas en los finales',
+  },
+  renumberMeasuresUseSuffixAtEndings: {
+    text: 'Sufijo en los finales',
+    description: 'Usar un sufijo numérico en los finales (por ejemplo, 23-a)',
+  },
+
+  // Annotations / Anotaciones
+  titleAnnotations: {
+    text: 'Anotaciones',
+    description: 'Configuraciones de anotaciones',
+  },
+  showAnnotations: {
+    text: 'Mostrar anotaciones',
+    description: 'Mostrar anotaciones en la notación',
+  },
+  showAnnotationPanel: {
+    text: 'Mostrar panel de anotaciones',
+    description: 'Mostrar el panel de anotaciones',
+  },
+  annotationDisplayLimit: {
+    text: 'Número máximo de anotaciones',
+    description: 'Número máximo de anotaciones para mostrar (números grandes pueden ralentizar a mei-friend)',
+  },
+
+  // Facsimile/ Facsímil
+  titleFacsimilePanel: {
+    text: 'Panel de facsímil',
+    description: 'Mostrar las imágenes de facsímil de la edición fuente, si están disponibles',
+  },
+  showFacsimilePanel: {
+    text: 'Mostrar panel de facsímil',
+    description: 'Mostrar las imágenes de partituras de la edición fuente proporcionadas en el elemento de facsímil',
+  },
+  selectFacsimilePanelOrientation: {
+    text: 'Posición del panel de facsímil',
+    description: 'Seleccionar la posición del panel de facsímil en relación a la notación',
+    labels: ['izquierda', 'derecha', 'arriba', 'abajo'],
+  },
+  facsimileZoomInput: {
+    text: 'Zoom de la imagen de facsímil (%)',
+    description: 'Nivel de zoom de la imagen de facsímil (en porcentaje)',
+  },
+  showFacsimileFullPage: {
+    text: 'Mostrar página completa',
+    description: 'Mostrar la imagen de facsímil en la página completa',
+  },
+  showFacsimileZones: {
+    text: 'Mostrar cuadros de zona de facsímil',
+    description: 'Mostrar los cuadros delimitadores de zona de facsímil',
+  },
+  editFacsimileZones: {
+    text: 'Editar zonas de facsímil',
+    description: 'Editar zonas de facsímil (vinculará los recuadros delimitadores a las zonas de facsímil)',
+  },
+
+  // Supplied element / Elemento suministrado
+  titleSupplied: {
+    text: 'Manejar contenido editorial',
+    description: 'Controlar el manejo de elementos <supplied>',
+  },
+  showSupplied: {
+    text: 'Mostrar elementos <supplied>',
+    description: 'Destacar todos los elementos contenidos por un elemento <supplied>',
+  },
+  suppliedColor: {
+    text: 'Seleccionar color de resaltado <supplied>',
+    description: 'Seleccionar color de resaltado <supplied>',
+  },
+  respSelect: {
+    text: 'Seleccionar responsabilidad <supplied>',
+    description: 'Seleccionar ID de responsabilidad',
+  },
+
+  //  EDITOR SETTINGS / CODEMIRROR SETTINGS // CONFIGURACIÓN DEL EDITOR / CONFIGURACIÓN DE CODEMIRROR
   editorSettingsHeader: {
-    text: 'Editor-Einstellungen',
+    text: 'Configuración',
   },
   cmReset: {
-    text: 'Zurücksetzen',
-    description: 'Editor-Einstellungen zu Grundeinstellungen zurücksetzen',
+    text: 'Restaurar valores predeterminados',
+    description: 'Restablecer a los valores predeterminados de mei-friend',
   },
   titleAppearance: {
-    text: 'Aussehen des Editors',
-    description: 'Aussehen des Editors anpassen.',
+    title: 'Apariencia del editor',
+    description: 'Controla la apariencia del editor',
   },
   zoomFont: {
-    text: 'Schriftgröße (%)',
-    description: 'Größe der Notenschrift anpassen (in Prozent)',
+    title: 'Tamaño de fuente (%)',
+    description: 'Cambiar el tamaño de fuente del editor (en porcentaje)',
   },
   theme: {
-    text: 'Farbschema',
-    description: 'Farbschema (theme) des Editors auswählen',
+    title: 'Tema',
+    description: 'Seleccione el tema del editor',
   },
   matchTheme: {
-    text: 'Notation an Farbschema anpassen',
-    description: 'Notation an Farbschema anpassen',
+    title: 'La notación coincide con el tema',
+    description: 'Coincidir la notación con el tema de color del editor',
   },
   tabSize: {
-    text: 'Größe des Einzugs',
-    description: 'Anzahl der Leerzeichen pro Einzugsebene',
+    title: 'Tamaño de sangría',
+    description: 'Número de caracteres de espacio para cada nivel de sangría',
   },
   lineWrapping: {
-    text: 'Zeilenumbruch',
-    description: 'Harter Zeilenumbruch am Fenster',
+    title: 'Ajuste de línea',
+    description: 'Si las líneas se ajustan o no al final del panel',
   },
   lineNumbers: {
-    text: 'Zeilennummern',
-    description: 'Zeilennummern anzeigen',
+    title: 'Números de línea',
+    description: 'Mostrar números de línea',
   },
   firstLineNumber: {
-    text: 'Erste Zeilennummer',
-    description: 'Erste Zeilennummer festlegen',
+    title: 'Número de primera línea',
+    description: 'Establecer el número de primera línea',
   },
   foldGutter: {
-    text: 'Code-Faltung',
-    description: 'Code-Faltung aktivieren',
+    title: 'Plegado de código',
+    description: 'Permite plegar el código a través de los separadores de plegado',
   },
   titleEditorOptions: {
-    text: 'Verhalten des Editors',
-    description: 'Editor-Verhalten einstellen',
+    title: 'Comportamiento del editor',
+    description: 'Controla el comportamiento del editor',
   },
   autoValidate: {
-    text: 'Automatische Validatierung',
-    description: 'Automatische Validierung der Kodierung nach jeder Eingabe',
+    title: 'Validación automática',
+    description: 'Validar la codificación automáticamente después de cada edición',
   },
   autoCloseBrackets: {
-    text: 'Klammern schließen',
-    description: 'Klammern automatisch schließen',
+    title: 'Cerrar corchetes automáticamente',
+    description: 'Cerrar automáticamente los corchetes al escribir',
   },
   autoCloseTags: {
-    text: 'XML-Tags schließen',
-    description: 'XML-Tags automatisch schließen',
+    title: 'Cerrar etiquetas automáticamente',
+    description: 'Cerrar automáticamente las etiquetas al escribir',
     type: 'bool',
   },
   matchTags: {
-    text: 'Passende Tags hervorheben',
-    description: 'Passende XML-Tags hervorheben',
+    title: 'Coincidir etiquetas',
+    description: 'Resalta las etiquetas coincidentes alrededor del cursor del editor',
   },
   showTrailingSpace: {
-    text: 'Nachstehende Leerzeichen',
-    description: 'Überflüssige nachstehende Leerzeichen hervorheben',
+    title: 'Resaltar espacios finales',
+    description: 'Resalta los espacios innecesarios al final de las líneas',
   },
   keyMap: {
-    text: 'Tastenbelegung',
-    description: 'Tastaturbelegung auswählen',
+    title: 'Mapa de teclas',
+    description: 'Seleccione el mapa de teclas',
   },
 
-  // Verovio settings
+  // Verovio settings / Configuraciones de Verovio
   verovioSettingsHeader: {
-    text: 'Verovio-Einstellungen',
+    text: 'Configuraciones de Verovio',
   },
   vrvReset: {
-    text: 'Zurücksetzen',
-    description: 'Verovio auf mei-friend Standardwerte zurücksetzen',
+    text: 'Predeterminado',
+    description: 'Restablece Verovio a los valores predeterminados de mei-friend',
   },
 
-  // main.js alert messages
+  //  main.js alert messages / Mensajes de alerta de main.js
   isSafariWarning: {
-    text:
-      'Es scheint, dass Sie Safari als Browser verwenden, auf dem derzeit leider ' +
-      'keine Schema-Validierung durch mei-friend unterstützt wird. Bitte verwenden ' +
-      'Sie einen anderen Browser für volle Validierungsunterstützung.',
+    text: 'Parece que estás utilizando Safari como navegador, en el que desafortunadamente mei-friend aún no admite la validación de esquemas. Utilice otro navegador para obtener soporte completo de validación.',
   },
   githubLoggedOutWarning: {
-    text: `Sie haben sich bei mei-friend von Github abgemeldet, aber Ihr Browser ist noch bei GitHub angemeldet!
-      <a href="https://github.com/logout" target="_blank">Bitte hier klicken, um sich von GitHub abzumelden</a>.`,
+    text: 'Ha cerrado la sesión de integración de GitHub de mei-friend, ¡pero su navegador todavía tiene la sesión iniciada en GitHub! <a href="https://github.com/logout" target="_blank">Haga clic aquí para cerrar la sesión de GitHub</a>.',
   },
   generateUrlError: {
-    text: 'URL für lokale Datei kann nicht erzeugt werden. ',
+    text: 'No se puede generar URL para el archivo local ',
   },
   generateUrlSuccess: {
-    text: 'URL erfolgreich in die Zwischenablage kopiert. ',
+    text: 'URL copiada con éxito al portapapeles',
   },
   generateUrlNotCopied: {
-    text: 'URL nicht in die Zwischenablage kopiert, bitte versuchen Sie es erneut!',
+    text: 'La URL no se copió al portapapeles, ¡inténtelo de nuevo!',
   },
-  errorCode: { text: 'Fehlerkode' },
-  submitBugReport: { text: 'Fehlerbericht übermitteln' },
-  loadingSchema: { text: 'Lade Schema' },
-  schemaLoaded: { text: 'Schema geladen' },
-  noSchemaFound: { text: 'Keine Schema-Information in MEI gefunden.' },
-  schemaNotFound: { text: 'Schema nicht gefunden' },
-  errorLoadingSchema: { text: 'Fehler beim Laden des Schemas' },
-  notValidated: { text: 'Nicht validiert. Zum Validieren hier klicken.' },
-  validatingAgainst: { text: 'Validieren gegen' },
-  validatedAgainst: { text: 'Validiert gegen' },
-  validationMessages: { text: 'Validierungsmeldungen' },
-  validationComplete: { text: 'Validierung abgeschlossen' },
-  validationFailed: { text: 'Validierung fehlgeschlagen' },
-  noErrors: { text: 'keine Fehler' },
-  errorsFound: { text: 'Fehler gefunden' }, // 5 errors found
+  errorCode: { text: 'Código de error' },
+  submitBugReport: { text: 'Enviar informe de error' },
+  loadingSchema: { text: 'Cargando esquema' },
+  schemaLoaded: { text: 'Esquema cargado' },
+  noSchemaFound: { text: 'No se encontró información de esquema en MEI.' },
+  schemaNotFound: { text: 'Esquema no encontrado' },
+  errorLoadingSchema: { text: 'Error al cargar el esquema' },
+  notValidated: { text: 'No validado. Haga clic aquí para validar.' },
+  validatingAgainst: { text: 'Validando contra' },
+  validatedAgainst: { text: 'Validado contra' },
+  validationMessages: { text: 'Mensajes de validación' },
+  validationComplete: { text: 'Validación completa' },
+  validationFailed: { text: 'Validación fallida' },
+  noErrors: { text: 'ningún error' },
+  errorsFound: { text: 'Errores encontrados' }, // 5 errores encontrados
 
-  // github-menu.js
-  repository: { text: 'Repo' },
-  branch: { text: 'Branch' },
-  path: { text: 'Pfad' },
-  commit: { text: 'Commit' },
-  commitLog: { text: 'Commit-Log' },
-  commitAsNewFile: { text: 'Commit als neue Datei' },
-  date: { text: 'Datum' },
-  author: { text: 'Author' },
-  message: { text: 'Nachricht' },
-  none: { text: 'Kein' },
-  fileName: { text: 'Dateiname' },
-  forkRepository: { text: 'Repo forken' },
-  forkError: { text: 'Konnte Repo leider nicht forken' },
-  loadingFile: { text: 'Lade Datei' },
-  loadingFromGithub: { text: 'Lade von Github' },
-  logOut: { text: 'Abmelden' },
-  githubLogout: { text: 'Abmelden' },
-  selectRepository: { text: 'Repo auswählen' },
-  selectBranch: { text: 'Branch auswählen' },
-  commitPlaceholder: { text: 'Mit mei-friend online aktualisiert' },
-  reportIssueWithEncoding: { text: 'Problem mit Kodierung melden' },
-  clickToOpenInMeiFriend: { text: 'Klicken, um mit mei-friend zu öffnen' },
+  // github-menu.js / github-menu.js
+  repository: { text: 'Repositorio' },
+  branch: { text: 'Rama' },
+  path: { text: 'Ruta' },
+  commit: { text: 'Confirmar' },
+  commitLog: { text: 'Registro de confirmaciones' },
+  commitAsNewFile: { text: 'Confirmar como nuevo archivo' },
+  date: { text: 'Fecha' },
+  author: { text: 'Autor' },
+  message: { text: 'Mensaje' },
+  none: { text: 'Ninguno' },
+  fileName: { text: 'Nombre del archivo' },
+  forkRepository: { text: 'Forkar repositorio' },
+  forkError: { text: 'Lo siento, no se pudo forkar el repositorio' },
+  loadingFile: { text: 'Cargando archivo' },
+  loadingFromGithub: { text: 'Cargando desde Github' },
+  logOut: { text: 'Cerrar sesión' },
+  githubLogout: { text: 'Cerrar sesión' },
+  selectRepository: { text: 'Seleccionar repositorio' },
+  selectBranch: { text: 'Seleccionar rama' },
+  commitPlaceholder: { text: 'Actualizado utilizando mei-friend en línea' },
+  reportIssueWithEncoding: { text: 'Informar problema con la codificación' },
+  clickToOpenInMeiFriend: { text: 'Haga clic para abrir en mei-friend' },
   repoAccessError: {
-    text: 'Auf die Repositories der angegebenen Benutzer oder Organisationen kann nicht zugegriffen werden.',
+    text: 'Lo siento, no se pueden acceder a los repositorios para el usuario u organización suministrados',
   },
-  allComposers: { text: 'Alle Komponisten' }, // fork-repository.js (TODO: wohl nicht Komponisten, was sonst?)
+  allComposers: { text: 'Todos los compositores' }, // fork-repository.js
 
   // utils renumber measures
-  renumberMeasuresModalText: { text: 'Takte neu nummerieren' },
-  renumberMeasuresModalTest: { text: 'Test' },
+  renumberMeasuresModalText: { text: 'Renumerar compases' },
+  renumberMeasuresModalTest: { text: 'Prueba' },
   renumberMeasuresWillBe: { text: '' },
-  renumberMeasuresWouldBe: { text: 'würde' },
-  renumberMeasuresChangedTo: { text: 'geändert in' },
-  renumberMeasureMeasuresRenumbered: { text: 'Takte nummeriert' },
+  renumberMeasuresWouldBe: { text: 'sería' },
+  renumberMeasuresChangedTo: { text: 'cambiado a' },
+  renumberMeasureMeasuresRenumbered: { text: 'compases renumerados' },
 };

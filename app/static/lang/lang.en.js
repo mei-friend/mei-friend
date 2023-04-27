@@ -176,6 +176,7 @@ export const lang = {
   upwardsButton: { description: 'Navigate upwards in notation' },
   downwardsButton: { description: 'Navigate downwards in notation' },
   speedLabel: {
+    text: 'Speed mode',
     description: 'In speed mode, only the current page is sent to Verovio to reduce rendering time with large files',
   },
 
@@ -453,6 +454,7 @@ export const lang = {
     text: 'Highlight currently-sounding notes',
     description: 'Visually highlight currently-sounding notes in the notation panel during MIDI playback ',
   },
+
   // Transposition
   titleTransposition: {
     text: 'Transpose',
@@ -527,6 +529,7 @@ export const lang = {
     description:
       'Apply transposition with above settings to the notation, while the MEI encoding remains unchanged. To also transpose the MEI encoding with the current settings, use "Rerender via Verovio" in the "Manipulate" dropdown menu.',
   },
+
   // Renumber measures
   renumberMeasuresHeading: {
     text: 'Renumber measures',
@@ -549,6 +552,7 @@ export const lang = {
     text: 'Suffix at endings',
     description: 'Use number suffix at endings (e.g., 23-a)',
   },
+
   // Annotations
   titleAnnotations: {
     text: 'Annotations',
@@ -564,8 +568,9 @@ export const lang = {
   },
   annotationDisplayLimit: {
     text: 'Maximum number of annotations',
-    description: 'Maximum number of annotations to display ' + '(large numbers may slow mei-friend)',
+    description: 'Maximum number of annotations to display (large numbers may slow mei-friend)',
   },
+
   // Facsimile
   titleFacsimilePanel: {
     text: 'Facsimile panel',
@@ -596,6 +601,7 @@ export const lang = {
     text: 'Edit facsimile zones',
     description: 'Edit facsimile zones (will link bounding boxes to facsimile zones)',
   },
+
   // Supplied element
   titleSupplied: {
     text: 'Handle editorial content',
