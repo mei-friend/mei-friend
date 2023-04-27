@@ -12,7 +12,7 @@ export const lang = {
   fileMenuTitle: { text: 'File' },
   openMeiText: { text: 'Open file' },
   openUrlText: { text: 'Open URL' },
-  openExpample: { text: 'Public repertoire', description: 'Open a list of public-domain repertoire' },
+  openExample: { text: 'Public repertoire', description: 'Open a list of public-domain repertoire' },
   importMusicXml: { text: 'Import MusicXML' },
   importHumdrum: { text: 'Import Humdrum' },
   importPae: { text: 'Import PAE, ABC' },

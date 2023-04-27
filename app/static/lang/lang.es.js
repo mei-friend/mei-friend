@@ -13,7 +13,7 @@ export const lang = {
   fileMenuTitle: { text: 'Archivo' },
   openMeiText: { text: 'Abrir archivo' },
   openUrlText: { text: 'Abrir URL' },
-  openExpample: { text: 'Repositorio público', description: 'Lista de repertorio con licencia pública' },
+  openExample: { text: 'Repositorio público', description: 'Lista de repertorio con licencia pública' },
   importMusicXml: { text: 'Importar MusicXML' },
   importHumdrum: { text: 'Importar Humdrum' },
   importPae: { text: 'Importar PAE, ABC' },
