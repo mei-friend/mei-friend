@@ -400,3 +400,8 @@
   padding-left:.5em;
   padding-right:.5em;
 }
+
+#languageSelectionList .selectedLang { 
+  border:1px solid black;
+  background-color: var(--settingsBackgroundColor);
+}
