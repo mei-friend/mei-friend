@@ -34,6 +34,7 @@ import {
   platform,
   supportedVerovioVersions,
 } from './defaults.js';
+import { translateLanguageSelection } from './language-selector.js';
 
 export default class Viewer {
   constructor(vrvWorker, spdWorker) {
@@ -1047,6 +1048,7 @@ export default class Viewer {
         case 'selectLanguage':
           let langCode = value.slice(0, 2).toLowerCase();
           translator.changeLanguage(langCode);
+          translateLanguageSelection();
           break;
         case 'toggleSpeedMode':
           document.getElementById('midiSpeedmodeIndicator').style.display = this.speedMode ? 'inline' : 'none';

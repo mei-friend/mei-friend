@@ -36,12 +36,13 @@ function selectLanguage(e) {
    const langSettings = document.getElementById("selectLanguage");
    const target = e.target.nodeName === "TR" ? e.target : e.target.closest("tr");
    if(target) { 
-      // set value to native language text (2nd cell in row)
+      // set value in settings to native language text (2nd cell in row)
       langSettings.value = target.querySelector(":nth-child(2)").innerText;
-      // fire input event on language select in settings, to trigger translator
-      const inputEvent = new Event('input');
-      // FIXME the following dispatch does not appear to be working
-      langSettings.dispatchEvent(inputEvent);
+      // trigger translator (1st cell == language code)
+      const code = target.querySelector(":nth-child(1)").innerText;
+      translator.changeLanguage(code);
+      // translate language selection drop-down
+      translateLanguageSelection(code);
    } else { 
       console.warn("Couldn't locate target language row on click: ", e);
    }

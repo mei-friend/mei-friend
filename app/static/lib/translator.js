@@ -18,6 +18,8 @@ export default class Translator {
    * @param {string} languageCode
    */
   changeLanguage(languageCode) {
+    // update language selection
+    translateLanguageSelection(languageCode);
     // change language, only if not default and different from current lang pack
     if (languageCode !== this.defaultLangCode && languageCode !== this.langCode) {
       const languagePack = '../lang/lang.' + languageCode + '.js';
@@ -57,7 +59,6 @@ export default class Translator {
    * Refresh language of all mei-friend GUI items
    */
   translateGui() {
-    translateLanguageSelection(this.langCode);
     const v = false; // debug verbosity
     for (let key in this.lang) {
       let el = document.getElementById(key);
