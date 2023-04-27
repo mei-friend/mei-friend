@@ -443,12 +443,7 @@ export async function fillInBranchContents(e) {
             workflowSpan.innerText = "GH Action: " + wf.name;
             workflowSpan.classList.add("inline-block-tight", "workflow");
             let workflowSpanContainer = document.createElement("a");
-            workflowSpanContainer.onclick = (e) => { 
-              githubLoadingIndicator.classList.add("clockwise");
-              github.requestActionWorkflowRun(e).then(workflowRunResp => { 
-                console.log("Got workflow run response: ", workflowRunResp);
-              }).finally(() => githubLoadingIndicator.classList.remove("clockwise"));
-            }
+            workflowSpanContainer.onclick = handleClickGithubAction; 
             workflowSpanContainer.insertAdjacentElement("beforeend", workflowSpan);
             actionsDivider.insertAdjacentElement("afterend", workflowSpanContainer);
           } else { 
@@ -545,6 +540,7 @@ export async function fillInBranchContents(e) {
   githubLoadingIndicator.classList.remove("clockwise");
 }
 
+
 async function fillInCommitLog(refresh = false) {
   if (refresh) {
     const githubLoadingIndicator = document.getElementById('GithubLogo');
@@ -603,6 +599,18 @@ export function renderCommitLog() {
   hr.setAttribute('id', 'commitLogSeperator');
   githubMenu.appendChild(hr);
   githubMenu.appendChild(logTable);
+}
+async function handleClickGithubAction(e) {
+  let target = e.target;
+  if(target.nodeName === "A") { 
+    target = target.firstChild;
+  }
+  const githubLoadingIndicator = document.getElementById('GithubLogo');
+  githubLoadingIndicator.classList.add("clockwise");
+  github.requestActionWorkflowRun(target.id, { filepath: github.filepath })
+  .then(workflowRunResp => { 
+    console.log("Got workflow run response: ", workflowRunResp);
+  }).finally(() => githubLoadingIndicator.classList.remove("clockwise"));
 }
 
 export function logoutFromGithub() {

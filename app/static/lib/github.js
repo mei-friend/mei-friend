@@ -494,20 +494,14 @@ export default class Github {
     }).then((res) => res.json());
   }
 
-  async requestActionWorkflowRun(e) { 
-    let target = e.target;
-    if(target.nodeName === "A") { 
-      target = target.firstChild;
-    }
-    const dispatchUrl = `https://api.github.com/repos/${this.githubRepo}/actions/workflows/${target.id}/dispatches`;
+  async requestActionWorkflowRun(workflowId, inputs = {}) { 
+    const dispatchUrl = `https://api.github.com/repos/${this.githubRepo}/actions/workflows/${workflowId}/dispatches`;
     return fetch(dispatchUrl, {
       method: 'POST',
       headers: this.actionsHeaders,
       body: JSON.stringify({ 
         ref: this.branch,
-        inputs: { 
-          filepath: this.filepath
-        }
+        inputs: inputs
       })
     }).then((res => res.json()))
   }
