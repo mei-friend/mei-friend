@@ -772,7 +772,7 @@ export const lang = {
   author: { text: 'Author' },
   message: { text: 'Nachricht' },
   none: { text: 'Kein' },
-  fileName: { text: 'Dateiname' },
+  fileName: { description: 'Dateiname' },
   forkRepository: { text: 'Repo forken' },
   forkError: { text: 'Konnte Repo leider nicht forken' },
   loadingFile: { text: 'Lade Datei' },

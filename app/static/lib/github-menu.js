@@ -458,7 +458,7 @@ export async function fillInBranchContents(e) {
 
     const commitFileNameEdit = document.createElement('div');
     commitFileNameEdit.setAttribute('id', 'commitFileNameEdit');
-    commitFileNameEdit.innerHTML = translator.lang.fileName.text + ': ';
+    commitFileNameEdit.innerHTML = translator.lang.fileName.description + ': ';
     commitFileNameEdit.appendChild(commitFileName);
 
     const commitMessageInput = document.createElement('input');

@@ -751,7 +751,7 @@ export const lang = {
   author: { text: 'Autor' },
   message: { text: 'Mensaje' },
   none: { text: 'Ninguno' },
-  fileName: { text: 'Nombre del archivo' },
+  fileName: { description: 'Nombre del archivo' },
   forkRepository: { text: 'Forkar repositorio' },
   forkError: { text: 'Lo siento, no se pudo forkar el repositorio' },
   loadingFile: { text: 'Cargando archivo' },

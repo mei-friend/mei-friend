@@ -755,7 +755,7 @@ export const lang = {
   author: { text: 'Author' },
   message: { text: 'Message' },
   none: { text: 'None' },
-  fileName: { text: 'File name' },
+  fileName: { description: 'File name' },
   forkRepository: { text: 'Fork repository' },
   forkError: { text: 'Sorry, could not fork repository' },
   loadingFile: { text: 'Loading file' },
