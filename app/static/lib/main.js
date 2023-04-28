@@ -104,7 +104,7 @@ import {
   isSafari,
 } from './defaults.js';
 import Translator from './translator.js';
-import { buildLanguageSelection } from './language-selector.js';
+import { buildLanguageSelection, translateLanguageSelection } from './language-selector.js';
 
 const defaultCodeMirrorOptions = {
   lineNumbers: true,
@@ -362,11 +362,12 @@ document.addEventListener('DOMContentLoaded', function () {
   translator = new Translator();
   // we need to look directly to local storage, because it will
   let language = window.localStorage['mf-selectLanguage'];
-  let langCode = language ? language.slice(0, 2).toLowerCase() : translator.defaultLangCode;
+  let langCode = language || translator.defaultLangCode;
   if (langCode !== translator.langCode) {
     // load other language...
     translator.requestLanguagePack(langCode).then((p) => {
       translator.setLang(p.lang);
+      translator.setLangCode(langCode);
       translator.translateGui();
       onLanguageLoaded();
     });
@@ -780,6 +781,9 @@ async function vrvWorkerEventsHandler(ev) {
       tkAvailableOptions = ev.data.availableOptions;
       v.clearVrvOptionsSettingsPanel();
       v.addVrvOptionsToSettingsPanel(tkAvailableOptions, defaultVerovioOptions);
+
+      translator.translateGui();
+      translateLanguageSelection(translator.langCode);
 
       // v.addMeiFriendOptionsToSettingsPanel();
       drawRightFooter();
@@ -1314,13 +1318,13 @@ export let cmd = {
       }
     }
   },
-  showLanguageSelection: () => { 
-    const langSel = document.getElementById("languageSelectionList");
-    langSel.style.display = "block";
+  showLanguageSelection: () => {
+    const langSel = document.getElementById('languageSelectionList');
+    langSel.style.display = 'block';
   },
-  hideLanguageSelection: () => { 
-    const langSel = document.getElementById("languageSelectionList");
-    langSel.style.display = "none";
+  hideLanguageSelection: () => {
+    const langSel = document.getElementById('languageSelectionList');
+    langSel.style.display = 'none';
   },
   showAnnotationPanel: () => {
     document.getElementById('showAnnotationPanel').checked = true; // TODO: remove?
@@ -1571,8 +1575,12 @@ function addEventListeners(v, cm) {
     }
   });
   document.getElementById('showAnnotationMenu').addEventListener('click', cmd.showAnnotationPanel);
-  document.getElementById('showLanguageSelectionButton').addEventListener('mouseenter', () => { cmd.showLanguageSelection(); });
-  document.getElementById('showLanguageSelectionButton').addEventListener('mouseleave', () => { cmd.hideLanguageSelection(); });
+  document.getElementById('showLanguageSelectionButton').addEventListener('mouseenter', () => {
+    cmd.showLanguageSelection();
+  });
+  document.getElementById('showLanguageSelectionButton').addEventListener('mouseleave', () => {
+    cmd.hideLanguageSelection();
+  });
   document.getElementById('showAnnotationsButton').addEventListener('click', cmd.toggleAnnotationPanel);
   document.getElementById('showFacsimileButton').addEventListener('click', cmd.toggleFacsimilePanel);
   document.getElementById('closeAnnotationPanelButton').addEventListener('click', cmd.hideAnnotationPanel);
@@ -1927,7 +1935,7 @@ function updateHtmlTitle() {
 
 function drawLeftFooter() {
   let lf = document.getElementById('leftFooter');
-  lf.innerHTML = translator.lang.leftFooter.text;
+  lf.innerHTML = translator.lang.leftFooter.html;
 }
 
 function drawRightFooter() {

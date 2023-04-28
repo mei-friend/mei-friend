@@ -131,13 +131,14 @@
   background-color: var(--settingsBackgroundAlternativeColor);
 }
 
-.dropdown-content a:hover .btn, .dropdown-content tr:hover {
+.dropdown-content a:hover .btn,
+.dropdown-content tr:hover {
   background-color: var(--settingsBackgroundColor);
 }
 
-.dropdown-content table { 
+.dropdown-content table {
   border: 0px;
-  border-collapse:collapse;
+  border-collapse: collapse;
 }
 
 #GithubMenu.dropdown-content a {
@@ -389,19 +390,22 @@
 
 /* language selection list */
 #languageSelectionList {
-  display:none;
-  position:relative;
-  min-height:5em;
-  min-width:fit-content;
-  left:-100px;
+  display: none;
+  position: relative;
+  min-height: 5em;
+  min-width: fit-content;
+  left: -100px;
+  border-radius: 4px;
+  color: var(--textColor);
 }
 
-#languageSelectionList td { 
-  padding-left:.5em;
-  padding-right:.5em;
+#languageSelectionList td {
+  padding-left: 0.5em;
+  padding-right: 0.5em;
 }
 
-#languageSelectionList .selectedLang { 
-  border:1px solid black;
+#languageSelectionList .selectedLang {
+  border: 1px solid var(--textColor);
+  border-radius: 4px;
   background-color: var(--settingsBackgroundColor);
 }

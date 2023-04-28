@@ -2,11 +2,13 @@
  * Default values for mei-friend
  */
 
+import { translator } from './main.js';
+
 /**
  * language codes after ISO-639-1, please enter new codes alphabetically
  */
 export const supportedLanguages = {
-  de: { 
+  de: {
     de: 'Deutsch',
     en: 'Englisch',
     es: 'Spanisch',
@@ -19,8 +21,8 @@ export const supportedLanguages = {
   es: {
     de: 'Alemán',
     en: 'Inglés',
-    es: 'Español'
-  }
+    es: 'Español',
+  },
 };
 
 // export let platform = navigator.platform.toLowerCase(); // TODO
@@ -238,9 +240,13 @@ export const meiFriendSettingsOptions = {
     title: 'Language',
     description: 'filled in by language packs.',
     type: 'select',
-    values: ['Deutsch', 'English', 'Español'],
-    valuesDescriptions: ['Deutsch | German', 'English', 'Español | Spanish'],
-    default: 'English',
+    //['Deutsch', 'English', 'Español'],
+    values: Object.keys(supportedLanguages),
+    // ['Deutsch | German', 'English', 'Español | Spanish'],
+    labels: Object.keys(supportedLanguages).map(
+      (l) => supportedLanguages[l][l] + ' / ' + supportedLanguages['en'][l]
+    ),
+    default: 'en',
   },
   dragSelection: {
     title: 'Drag select',

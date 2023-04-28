@@ -26,15 +26,16 @@ export default class Translator {
       console.log('Loading language pack: ', languagePack);
       import(languagePack).then((p) => {
         for (let key in p.lang) this.lang[key] = p.lang[key];
+        this.langCode = languageCode;
         console.log('Language pack loaded: ' + languageCode + ', now translating.');
         this.translateGui();
       });
     } else if (languageCode === this.defaultLangCode) {
       for (let key in this.defaultLang) this.lang[key] = this.defaultLang[key];
       console.log('Translating back to default language: ' + this.defaultLangCode);
+      this.langCode = languageCode;
       this.translateGui();
     }
-    this.langCode = languageCode;
   } // changeLanguage()
 
   /**
@@ -54,6 +55,14 @@ export default class Translator {
   setLang(language) {
     for (let key in language) this.lang[key] = language[key];
   } // setLang()
+
+  /**
+   * Sets the class variable langCode
+   * @param {string} langCode
+   */
+  setLangCode(langCode) {
+    this.langCode = langCode;
+  } // setLangCode()
 
   /**
    * Refresh language of all mei-friend GUI items
