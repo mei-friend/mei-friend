@@ -167,7 +167,10 @@ export const lang = {
   flipCheckbox: { description: 'Automatisches Umblättern der Notation zur Position des Editor-Kursors' },
   flipButton: { description: 'Manuelles Umblättern der Notation zur Position des Editor-Kursors' },
   breaksSelect: { description: 'System-/Seitenumbruch-Einstellungen' },
-  updateControlsLabel: { description: 'Aktualisierungsverhalten der Notation nach Änderungen in der Kodierung' },
+  updateControlsLabel: {
+    text: 'Aktualisieren',
+    description: 'Aktualisierungsverhalten der Notation nach Änderungen in der Kodierung',
+  },
   liveUpdateCheckbox: { description: 'Automatische Aktualisierung der Notation nach Änderungen in der Kodierung' },
   codeManualUpdateButton: { description: 'Manuelle Aktualisierung der Notation' },
   engravingFontSelect: { description: 'Musikfont auswählen' },

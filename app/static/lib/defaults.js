@@ -2,8 +2,11 @@
  * Default values for mei-friend
  */
 
+/**
+ * language codes after ISO-639-1, please enter new codes alphabetically
+ */
 export const supportedLanguages = {
-  de: { // after ISO-639-1, please enter new codes alphabetically
+  de: { 
     de: 'Deutsch',
     en: 'Englisch',
     es: 'Spanisch',

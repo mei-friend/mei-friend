@@ -170,6 +170,7 @@ export const lang = {
   flipButton: { description: 'Voltear la página manualmente a la posición del cursor de codificación' },
   breaksSelect: { description: 'Definir el comportamiento de los saltos de sistema/página en la notación' },
   updateControlsLabel: {
+    text: 'Actualizar',
     description: 'Controlar el comportamiento de actualización de la notación después de cambios en la codificación',
   },
   liveUpdateCheckbox: { description: 'Actualizar automáticamente la notación después de cambios en la codificación' },
