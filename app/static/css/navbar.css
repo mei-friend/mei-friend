@@ -138,7 +138,7 @@
 
 .dropdown-content table {
   border: 0px;
-  border-collapse: collapse;
+  border-spacing:0;
 }
 
 #GithubMenu.dropdown-content a {
@@ -405,7 +405,22 @@
 }
 
 #languageSelectionList .selectedLang {
-  border: 1px solid var(--textColor);
-  border-radius: 4px;
   background-color: var(--settingsBackgroundColor);
+}
+
+#languageSelectionList .selectedLang td { 
+  border-top: 1px solid var(--textColor);
+  border-bottom: 1px solid var(--textColor);
+}
+
+#languageSelectionList .selectedLang td:first-child {
+  border-left: 1px solid var(--textColor);
+  border-top-left-radius: 4px;
+  border-bottom-left-radius: 4px;
+}
+
+#languageSelectionList .selectedLang td:last-child {
+  border-right: 1px solid var(--textColor);
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
 }
