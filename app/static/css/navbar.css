@@ -396,12 +396,12 @@
   min-width: fit-content;
   left: -100px;
   border-radius: 4px;
-  color: var(--textColor);
 }
 
 #languageSelectionList td {
   padding-left: 0.5em;
   padding-right: 0.5em;
+  color: var(--textColor);
 }
 
 #languageSelectionList .selectedLang {
