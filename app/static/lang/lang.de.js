@@ -167,6 +167,12 @@ export const lang = {
   flipCheckbox: { description: 'Automatisches Umblättern der Notation zur Position des Editor-Kursors' },
   flipButton: { description: 'Manuelles Umblättern der Notation zur Position des Editor-Kursors' },
   breaksSelect: { description: 'System-/Seitenumbruch-Einstellungen' },
+  breaksSelectNone: { text: 'Kein' },
+  breaksSelectAuto: { text: 'Automatisch' },
+  breaksSelectMeasure: { text: 'Takt' },
+  breaksSelectLine: { text: 'System' },
+  breaksSelectEncoded: { text: 'System und Seite' },
+  breaksSelectSmart: { text: 'Smart' },
   updateControlsLabel: {
     text: 'Aktualisieren',
     description: 'Aktualisierungsverhalten der Notation nach Änderungen in der Kodierung',

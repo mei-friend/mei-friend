@@ -169,6 +169,12 @@ export const lang = {
   flipCheckbox: { description: 'Voltear automáticamente la página a la posición del cursor de codificación' },
   flipButton: { description: 'Voltear la página manualmente a la posición del cursor de codificación' },
   breaksSelect: { description: 'Definir el comportamiento de los saltos de sistema/página en la notación' },
+  breaksSelectNone: { text: 'Ninguno' },
+  breaksSelectAuto: { text: 'Automático' },
+  breaksSelectLine: { text: 'Sistema' },
+  breaksSelectMeasure: { text: 'Medida' },
+  breaksSelectEncoded: { text: 'Sistema y página' },
+  breaksSelectSmart: { text: 'Smart' },
   updateControlsLabel: {
     text: 'Actualizar',
     description: 'Controlar el comportamiento de actualización de la notación después de cambios en la codificación',

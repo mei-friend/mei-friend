@@ -1,6 +1,7 @@
 import * as icon from './../css/icons.js';
 import { fontList, platform } from './defaults.js';
 import { svgNameSpace } from './dom-utils.js';
+import { translator } from './main.js';
 import { createPageRangeSelector } from './page-range-selector.js';
 
 // constructs the div structure of #notation parent
@@ -598,15 +599,18 @@ export function setBreaksOptions(tkAvailableOptions, defaultValue = 'auto') {
   let breaksEl = document.getElementById('breaksSelect');
   while (breaksEl.hasChildNodes()) breaksEl.remove(0);
   var breaksOpts = {
-    none: 'None',
-    auto: 'Automatic',
+    none: translator.lang.breaksSelectNone.text,
+    auto: translator.lang.breaksSelectAuto.text,
     // measure: 'Measure',
-    line: 'System',
-    encoded: 'System and page',
-    smart: 'Smart',
+    line: translator.lang.breaksSelectLine.text,
+    encoded: translator.lang.breaksSelectEncoded.text,
+    smart: translator.lang.breaksSelectSmart.text,
   };
   for (let key of Object.keys(breaksOpts)) {
-    breaksEl[breaksEl.options.length] = new Option(breaksOpts[key], key);
+    let o = new Option(breaksOpts[key], key);
+    // generate ids in the form of breaksSelectNone, breaksSelectAuto etc.
+    o.id = 'breaksSelect' + key.charAt(0).toUpperCase() + key.slice(1);
+    breaksEl[breaksEl.options.length] = o;
     if (key === 'smart') breaksEl[breaksEl.length - 1].disabled = true;
   }
 } // setBreaksOptions()

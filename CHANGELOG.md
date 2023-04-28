@@ -3,7 +3,7 @@
 * Multi-language support with separate language pack files per language
 * Language packs currently available for English and German, more language packs to come
 * First draft of spanish language pack
-* Remove transposeTosoundingPitch flag
+* Remove transposeTosoundingPitch default flag for Verovio
 ### 0.8.9 patch
 * Fix bug when notation zooming resulted in missing notation when MIDI manu bar is activated
 ### 0.8.8 patch
