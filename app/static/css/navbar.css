@@ -390,12 +390,11 @@
 
 /* language selection list */
 #languageSelectionList {
-  display: none;
-  position: relative;
-  min-height: 5em;
-  min-width: fit-content;
-  left: -100px;
+  position:absolute;
+  right: 0px;
   border-radius: 4px;
+  overflow: auto;
+  padding-top:.2em;
 }
 
 #languageSelectionList td {
