@@ -339,9 +339,17 @@ export const lang = {
   closeMidiPlaybackControlBarButton: { description: 'Hide MIDI Playback Control Bar' },
 
   // mei-friend SETTINGS MENU
-  meiFriendSettingsHeader: { text: 'mei-friend Settings' },
-  mfReset: { text: 'Default', description: 'Reset to mei-friend defaults' },
-
+  meiFriendSettingsHeader: {
+    text: 'mei-friend Settings',
+  },
+  mfReset: {
+    text: 'Default',
+    description: 'Reset to mei-friend defaults',
+  },
+  filterSettings: {
+    placeholder: 'Filter settings',
+    description: 'Type here to filter settings',
+  },
   titleGeneral: {
     text: 'General',
     description: 'General mei-friend settings',

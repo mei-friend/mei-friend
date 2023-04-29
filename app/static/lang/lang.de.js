@@ -355,6 +355,10 @@ export const lang = {
     text: 'Zurücksetzen',
     description: 'mei-friend Einstellungen auf Standard zurücksetzen',
   },
+  filterSettings: {
+    placeholder: 'Einstellungen filtern',
+    description: 'Hier tippen, um die Einstellungen zu filtern',
+  },
   titleGeneral: {
     text: 'Allgemein',
     description: 'Allgemeine mei-friend Einstellungen',

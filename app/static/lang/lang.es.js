@@ -345,9 +345,17 @@ export const lang = {
   closeMidiPlaybackControlBarButton: { description: 'Ocultar la barra de control de reproducción de MIDI' },
 
   // mei-friend SETTINGS MENU / MEI-FRIEND MENU DE CONFIGURACIÓN
-  meiFriendSettingsHeader: { text: 'Configuración' },
-  mfReset: { text: 'Predeterminado', description: 'Restablecer a los valores predeterminados de mei-friend' },
-
+  meiFriendSettingsHeader: {
+    text: 'Configuración',
+  },
+  mfReset: {
+    text: 'Predeterminado',
+    description: 'Restablecer a los valores predeterminados de mei-friend',
+  },
+  filterSettings: {
+    placeholder: 'Ajustes del filtro',
+    description: 'Escriba aquí para filtrar los ajustes',
+  },
   titleGeneral: {
     text: 'General',
     description: 'Configuraciones generales de mei-friend',
