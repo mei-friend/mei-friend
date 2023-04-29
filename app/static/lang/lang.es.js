@@ -356,7 +356,13 @@ export const lang = {
     placeholder: 'Ajustes del filtro',
     description: 'Escriba aquí para filtrar los ajustes',
   },
-  titleGeneral: {
+  closeSettingsButton: {
+    description: 'Cerrar panel de configuración',
+  },
+  hideSettingsButton: {
+    description: 'Cerrar panel de configuración',
+  },
+titleGeneral: {
     text: 'General',
     description: 'Configuraciones generales de mei-friend',
   },
@@ -709,7 +715,7 @@ export const lang = {
 
   // Verovio settings / Configuraciones de Verovio
   verovioSettingsHeader: {
-    text: 'Configuraciones de Verovio',
+    text: 'Configuraciones',
   },
   vrvReset: {
     text: 'Predeterminado',

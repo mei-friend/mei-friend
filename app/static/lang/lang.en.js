@@ -350,6 +350,12 @@ export const lang = {
     placeholder: 'Filter settings',
     description: 'Type here to filter settings',
   },
+  closeSettingsButton: {
+    description: 'Close settings panel',
+  },
+  hideSettingsButton: {
+    description: 'Close settings panel',
+  },
   titleGeneral: {
     text: 'General',
     description: 'General mei-friend settings',

@@ -359,6 +359,12 @@ export const lang = {
     placeholder: 'Einstellungen filtern',
     description: 'Hier tippen, um die Einstellungen zu filtern',
   },
+  closeSettingsButton: {
+    description: 'Einstellungen schließen',
+  },
+  hideSettingsButton: {
+    description: 'Einstellungen schließen',
+  },
   titleGeneral: {
     text: 'Allgemein',
     description: 'Allgemeine mei-friend Einstellungen',
