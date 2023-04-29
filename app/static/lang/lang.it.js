@@ -353,7 +353,7 @@ export const lang = {
 
   // mei-friend SETTINGS MENU// MENU IMPOSTAZIONI di mei-friend
   meiFriendSettingsHeader: {
-    text: 'Impostazioni di mei-friend',
+    text: 'Impostazioni',
   },
   mfReset: {
     text: 'Predefinito',
@@ -407,400 +407,411 @@ export const lang = {
     description: "Seleziona la lingua dell'interfaccia di mei-friend.",
   },
 
-  // Drag select
+  // Drag select / Selezione tramite trascinamento
   dragSelection: {
-    text: 'Drag select',
-    description: 'Select elements in notation with mouse drag',
+    text: 'Selezione tramite trascinamento',
+    description: 'Seleziona gli elementi nella notazione con il trascinamento del mouse',
   },
   dragSelectNotes: {
-    text: 'Select notes',
-    description: 'Select notes',
+    text: 'Seleziona le note',
+    description: 'Seleziona le note',
   },
   dragSelectRests: {
-    text: 'Select rests',
-    description: 'Select rests and repeats (rest, mRest, beatRpt, halfmRpt, mRpt)',
+    text: 'Seleziona le pause',
+    description: 'Seleziona le pause e le ripetizioni (rest, mRest, beatRpt, halfmRpt, mRpt)',
   },
   dragSelectControlElements: {
-    text: 'Select placement elements ',
-    description: 'Select placement elements (i.e., with a @placement attribute: ' + att.attPlacement.join(', ') + ')',
+    text: 'Seleziona gli elementi di posizionamento',
+    description:
+      'Seleziona gli elementi di posizionamento (cioè con un attributo @placement: ' +
+      att.attPlacement.join(', ') +
+      ')',
   },
   dragSelectSlurs: {
-    text: 'Select slurs ',
-    description: 'Select slurs (i.e., elements with @curvature attribute: ' + att.attCurvature.join(', ') + ')',
+    text: 'Seleziona le legature',
+    description:
+      "Seleziona le legature (cioè gli elementi con l'attributo @curvature: " + att.attCurvature.join(', ') + ')',
   },
   dragSelectMeasures: {
-    text: 'Select measures ',
-    description: 'Select measures',
-  },
-  // Control menu
-  controlMenuSettings: {
-    text: 'Notation control bar',
-    description: 'Define items to be shown in control menu above the notation',
-  },
-  controlMenuFlipToPageControls: {
-    text: 'Show flip to page controls',
-    description: 'Show flip to page controls in notation control menu',
-  },
-  controlMenuUpdateNotation: {
-    text: 'Show notation update controls',
-    description: 'Show notation update behavior controls in notation control menu',
-  },
-  controlMenuFontSelector: {
-    text: 'Show notation font selector',
-    description: 'Show notation font (SMuFL) selector in notation control menu',
-  },
-  controlMenuNavigateArrows: {
-    text: 'Show navigation arrows',
-    description: 'Show notation navigation arrows in notation control menu',
-  },
-  controlMenuSpeedmodeCheckbox: {
-    text: 'Show speed mode checkbox',
-    description: 'Show speed mode checkbox in notation control menu',
-  },
-  // MIDI Playback
-  titleMidiPlayback: {
-    text: 'MIDI playback',
-    description: 'MIDI playback settings',
-  },
-  showMidiPlaybackContextualBubble: {
-    text: 'Show playback shortcut',
-    description:
-      'Causes a shortcut (bubble in bottom left corner; ' +
-      'click to immediately start playback) to appear ' +
-      'when the MIDI playback control bar is closed',
-  },
-  showMidiPlaybackControlBar: {
-    text: 'Show MIDI playback control bar',
-    description: 'Show MIDI playback control bar',
-  },
-  scrollFollowMidiPlayback: {
-    text: 'Scroll-follow MIDI playback',
-    description: 'Scroll notation panel to follow MIDI playback on current page',
-  },
-  pageFollowMidiPlayback: {
-    text: 'Page-follow MIDI playback',
-    description: 'Automatically flip pages to follow MIDI playback',
-  },
-  highlightCurrentlySoundingNotes: {
-    text: 'Highlight currently-sounding notes',
-    description: 'Visually highlight currently-sounding notes in the notation panel during MIDI playback ',
+    text: 'Seleziona le misure',
+    description: 'Seleziona le misure',
   },
 
-  // Transposition
+  // Control menu / Menu di controllo
+  controlMenuSettings: {
+    text: 'Barra di controllo della notazione',
+    description: 'Definisci gli elementi da mostrare nel menu di controllo sopra la notazione',
+  },
+  controlMenuFlipToPageControls: {
+    text: 'Mostra i controlli per girare la pagina',
+    description: 'Mostra i controlli per girare la pagina nel menu di controllo della notazione',
+  },
+  controlMenuUpdateNotation: {
+    text: "Mostra i controlli per l'aggiornamento della notazione",
+    description:
+      'Mostra i controlli per il comportamento di aggiornamento della notazione nel menu di controllo della notazione',
+  },
+  controlMenuFontSelector: {
+    text: 'Mostra il selettore del carattere di notazione',
+    description: 'Mostra il selettore del carattere di notazione (SMuFL) nel menu di controllo della notazione',
+  },
+  controlMenuNavigateArrows: {
+    text: 'Mostra le frecce di navigazione',
+    description: 'Mostra le frecce di navigazione nella notazione nel menu di controllo della notazione',
+  },
+  controlMenuSpeedmodeCheckbox: {
+    text: 'Mostra la casella di controllo della modalità di velocità',
+    description: 'Mostra la casella di controllo della modalità di velocità nel menu di controllo della notazione',
+  },
+
+  // MIDI Playback / Riproduzione MIDI
+  titleMidiPlayback: {
+    text: 'Riproduzione MIDI',
+    description: 'Impostazioni riproduzione MIDI',
+  },
+  showMidiPlaybackContextualBubble: {
+    text: 'Mostra scorciatoia riproduzione',
+    description:
+      "Fa apparire una scorciatoia (una bolla nell'angolo in basso a sinistra; " +
+      'clicca per avviare immediatamente la riproduzione) quando la barra di controllo della riproduzione MIDI è chiusa',
+  },
+  showMidiPlaybackControlBar: {
+    text: 'Mostra barra di controllo riproduzione MIDI',
+    description: 'Mostra barra di controllo riproduzione MIDI',
+  },
+  scrollFollowMidiPlayback: {
+    text: 'Scorrimento segui riproduzione MIDI',
+    description: 'Scorri il pannello di notazione per seguire la riproduzione MIDI sulla pagina corrente',
+  },
+  pageFollowMidiPlayback: {
+    text: 'Pagina segue riproduzione MIDI',
+    description: 'Passa automaticamente alle pagine per seguire la riproduzione MIDI',
+  },
+  highlightCurrentlySoundingNotes: {
+    text: 'Evidenzia note attualmente suonate',
+    description:
+      'Evidenzia visivamente le note attualmente suonate nel pannello di notazione durante la riproduzione MIDI',
+  },
+
+  // Transposition // Trasposizione
   titleTransposition: {
-    text: 'Transpose',
-    description: 'Transpose score information',
+    text: 'Trasposizione',
+    description: 'Trasponi informazioni di punteggio',
   },
   enableTransposition: {
-    text: 'Enable transposition',
+    text: 'Abilita la trasposizione',
     description:
-      'Enable transposition settings, to be applied through the transpose button below. The transposition will be applied to the notation only, the encoding remains unchanged, unless you click the item "Rerender via Verovio" in the "Manipulate" dropdown menu.',
+      'Abilita le impostazioni di trasposizione, da applicare tramite il pulsante di trasposizione sottostante. La trasposizione verrà applicata solo alla notazione, la codifica rimane inalterata, a meno che non si clicchi su "Rerender via Verovio" nel menu a discesa "Manipulate".',
   },
   transposeInterval: {
-    text: 'Transpose by interval',
+    text: 'Trasponi per intervallo',
     description:
-      'Transpose encoding by chromatic interval by the most common intervals (Verovio supports the base-40 system)',
+      'Trasponi la codifica per intervallo cromatico attraverso gli intervalli più comuni (Verovio supporta il sistema base-40)',
     labels: [
-      'Perfect Unison',
-      'Augmented Unison',
-      'Diminished Second',
-      'Minor Second',
-      'Major Second',
-      'Augmented Second',
-      'Diminished Third',
-      'Minor Third',
-      'Major Third',
-      'Augmented Third',
-      'Diminished Fourth',
-      'Perfect Fourth',
-      'Augmented Fourth',
-      'Diminished Fifth',
-      'Perfect Fifth',
-      'Augmented Fifth',
-      'Diminished Sixth',
-      'Minor Sixth',
-      'Major Sixth',
-      'Augmented Sixth',
-      'Diminished Seventh',
-      'Minor Seventh',
-      'Major Seventh',
-      'Augmented Seventh',
-      'Diminished Octave',
-      'Perfect Octave',
+      'Unisono Perfetto',
+      'Unisono Aumentato',
+      'Seconda diminuita',
+      'Seconda minore',
+      'Seconda maggiore',
+      'Seconda aumentata',
+      'Terza diminuita',
+      'Terza minore',
+      'Terza maggiore',
+      'Terza aumentata',
+      'Quarta diminuita',
+      'Quarta Perfetta',
+      'Quarta aumentata',
+      'Quinta diminuita',
+      'Quinta Perfetta',
+      'Quinta aumentata',
+      'Sesta diminuita',
+      'Sesta minore',
+      'Sesta maggiore',
+      'Sesta aumentata',
+      'Settima diminuita',
+      'Settima minore',
+      'Settima maggiore',
+      'Settima aumentata',
+      'Ottava diminuita',
+      'Ottava Perfetta',
     ],
   },
   transposeKey: {
-    text: 'Transpose to key',
-    description: 'Transpose to key',
+    text: 'Trasponi per tonalità',
+    description: 'Trasponi per tonalità',
     labels: [
-      'C# major / A# minor',
-      'F# major / D# minor',
-      'B major / G# minor',
-      'E major / C# minor',
-      'A major / F# minor',
-      'D major / B minor',
-      'G major / E minor',
-      'C major / A minor',
-      'F major / D minor',
-      'Bb major / G minor',
-      'Eb major / C minor',
-      'Ab major / F minor',
-      'Db major / Bb minor',
-      'Gb major / Eb minor',
-      'Cb major / Ab minor',
+      'Do# maggiore / La# minore',
+      'Fa# maggiore / Re# minore',
+      'Si maggiore / Sol# minore',
+      'Mi maggiore / Do# minore',
+      'La maggiore / Fa# minore',
+      'Re maggiore / Si minore',
+      'Sol maggiore / Mi minore',
+      'Do maggiore / La minore',
+      'Fa maggiore / Re minore',
+      'Si♭ maggiore / Sol minore',
+      'Mi♭ maggiore / Do minore',
+      'La♭ maggiore / Fa minore',
+      'Re♭ maggiore / Si♭ minore',
+      'Sol♭ maggiore / Mi♭ minore',
+      'Do♭ maggiore / La♭ minore',
     ],
   },
   transposeDirection: {
-    text: 'Pitch direction',
-    description: 'Pitch direction of transposition (up/down)',
-    labels: ['Up', 'Down', 'Closest'],
+    text: 'Direzione di trasposizione',
+    description: 'Direzione di trasposizione (su/giù)',
+    labels: ['Su', 'Giù', 'Più vicino'],
   },
   transposeButton: {
-    text: 'Transpose',
+    text: 'Trasponi',
     description:
-      'Apply transposition with above settings to the notation, while the MEI encoding remains unchanged. To also transpose the MEI encoding with the current settings, use "Rerender via Verovio" in the "Manipulate" dropdown menu.',
+      'Applica la trasposizione con le impostazioni sopra indicate alla notazione, mantenendo invariata la codifica MEI. Per trasporre anche la codifica MEI con le attuali impostazioni, utilizzare "Rerender via Verovio" nel menu a tendina "Manipulate".',
   },
 
-  // Renumber measures
+  // Renumber measures / Rinumerazione misure
   renumberMeasuresHeading: {
-    text: 'Renumber measures',
-    description: 'Settings for renumbering measures',
+    text: 'Rinumera misure',
+    description: 'Impostazioni per la rinumerazione delle misure',
   },
   renumberMeasureContinueAcrossIncompleteMeasures: {
-    text: 'Continue across incomplete measures',
-    description: 'Continue measure numbers across incomplete measures (@metcon="false")',
+    text: 'Continua tra le misure incomplete',
+    description: 'Continua i numeri delle misure tra le misure incomplete (@metcon="false")',
   },
   renumberMeasuresUseSuffixAtMeasures: {
-    text: 'Suffix at incomplete measures',
-    description: 'Use number suffix at incomplete measures (e.g., 23-cont)',
-    labels: ['none', '-cont'],
+    text: 'Aggiungi suffisso alle misure incomplete',
+    description: 'Aggiungi un suffisso numerico alle misure incomplete (ad esempio, 23-cont)',
+    labels: ['nessuno', '-cont'],
   },
   renumberMeasuresContinueAcrossEndings: {
-    text: 'Continue across endings',
-    description: 'Continue measure numbers across endings',
+    text: 'Continua tra le chiusure',
+    description: 'Continua i numeri delle misure tra le chiusure',
   },
   renumberMeasuresUseSuffixAtEndings: {
-    text: 'Suffix at endings',
-    description: 'Use number suffix at endings (e.g., 23-a)',
+    text: 'Aggiungi suffisso alle chiusure',
+    description: 'Aggiungi un suffisso numerico alle chiusure (ad esempio, 23-a)',
   },
 
-  // Annotations
+  // Annotations / Annotazioni
   titleAnnotations: {
-    text: 'Annotations',
-    description: 'Annotation settings',
+    text: 'Annotazioni',
+    description: 'Impostazioni delle annotazioni',
   },
   showAnnotations: {
-    text: 'Show annotations',
-    description: 'Show annotations in notation',
+    text: 'Mostra annotazioni',
+    description: 'Mostra le annotazioni nella notazione',
   },
   showAnnotationPanel: {
-    text: 'Show annotation panel',
-    description: 'Show annotation panel',
+    text: 'Mostra pannello annotazioni',
+    description: 'Mostra il pannello delle annotazioni',
   },
   annotationDisplayLimit: {
-    text: 'Maximum number of annotations',
-    description: 'Maximum number of annotations to display (large numbers may slow mei-friend)',
+    text: 'Numero massimo di annotazioni',
+    description: 'Numero massimo di annotazioni da visualizzare (numeri elevati possono rallentare mei-friend)',
   },
 
-  // Facsimile
+  // Facsimile / Facsimile
   titleFacsimilePanel: {
-    text: 'Facsimile panel',
-    description: 'Show the facsimile images of the source edition, if available',
+    text: 'Pannello di facsimile',
+    description: "Mostra le immagini di facsimile dell'edizione originale, se disponibili",
   },
   showFacsimilePanel: {
-    text: 'Show facsimile panel',
-    description: 'Show the score images of the source edition provided in the facsimile element',
+    text: 'Mostra il pannello di facsimile',
+    description: "Mostra le immagini dello spartito dell'edizione originale fornite nell'elemento di facsimile",
   },
   selectFacsimilePanelOrientation: {
-    text: 'Facsimile panel position',
-    description: 'Select facsimile panel position relative to notation',
-    labels: ['left', 'right', 'top', 'bottom'],
+    text: 'Posizione del pannello di facsimile',
+    description: 'Seleziona la posizione del pannello di facsimile rispetto alla notazione',
+    labels: ['sinistra', 'destra', 'alto', 'basso'],
   },
   facsimileZoomInput: {
-    text: 'Facsimile image zoom (%)',
-    description: 'Zoom level of facsimile image (in percent)',
+    text: 'Zoom immagine di facsimile (%)',
+    description: "Livello di zoom dell'immagine di facsimile (in percentuale)",
   },
   showFacsimileFullPage: {
-    text: 'Show full page',
-    description: 'Show facsimile image on full page',
+    text: 'Mostra pagina intera',
+    description: "Mostra l'immagine di facsimile su tutta la pagina",
   },
   showFacsimileZones: {
-    text: 'Show facsimile zone boxes',
-    description: 'Show facsimile zone bounding boxes',
+    text: 'Mostra le zone del facsimile',
+    description: 'Mostra le zone di delimitazione del facsimile',
   },
   editFacsimileZones: {
-    text: 'Edit facsimile zones',
-    description: 'Edit facsimile zones (will link bounding boxes to facsimile zones)',
+    text: 'Modifica le zone del facsimile',
+    description: 'Modifica le zone del facsimile (collegando le zone delimitate ai facsimile)',
   },
 
-  // Supplied element
+  // Supplied element // Supplied element
   titleSupplied: {
-    text: 'Handle editorial content',
-    description: 'Control handling of <supplied> elements',
+    text: 'Gestisci il contenuto editoriale',
+    description: 'Controlla la gestione degli elementi <supplied>',
   },
   showSupplied: {
-    text: 'Show <supplied> elements',
-    description: 'Highlight all elements contained by a <supplied> element',
+    text: 'Mostra gli elementi <supplied>',
+    description: "Evidenzia tutti gli elementi contenuti nell'elemento <supplied>",
   },
   suppliedColor: {
-    text: 'Select <supplied> highlight color',
-    description: 'Select <supplied> highlight color',
+    text: "Seleziona il colore per l'evidenziazione di <supplied>",
+    description: "Seleziona il colore per l'evidenziazione di <supplied>",
   },
   respSelect: {
-    text: 'Select <supplied> responsibility',
-    description: 'Select responsibility id',
+    text: 'Seleziona la responsabilità di <supplied>',
+    description: "Seleziona l'id della responsabilità",
   },
 
-  //  EDITOR SETTINGS / CODEMIRROR SETTINGS
+  // EDITOR SETTINGS / CODEMIRROR SETTINGS
   editorSettingsHeader: {
-    text: 'Editor Settings',
+    text: "Impostazioni dell'editor",
   },
   cmReset: {
-    text: 'Default',
-    description: 'Reset to mei-friend defaults',
+    text: 'Predefinito',
+    description: 'Reimposta alle impostazioni predefinite di mei-friend',
   },
   titleAppearance: {
-    title: 'Editor appearance',
-    description: 'Controls the appearance of the editor',
+    title: "Aspetto dell'editor",
+    description: "Controlla l'aspetto dell'editor",
   },
   zoomFont: {
-    title: 'Font size (%)',
-    description: 'Change font size of editor (in percent)',
+    title: 'Dimensione del carattere (%)',
+    description: "Cambia la dimensione del carattere dell'editor (in percentuale)",
   },
   theme: {
-    title: 'Theme',
-    description: 'Select the theme of the editor',
+    title: 'Tema',
+    description: "Seleziona il tema dell'editor",
   },
   matchTheme: {
-    title: 'Notation matches theme',
-    description: 'Match notation to editor color theme',
+    title: 'La notazione corrisponde al tema',
+    description: "Corrispondenza della notazione al tema di colore dell'editor",
   },
   tabSize: {
-    title: 'Indentation size',
-    description: 'Number of space characters for each indentation level',
+    title: 'Dimensione indentazione',
+    description: 'Numero di spazi per ogni livello di indentazione',
   },
   lineWrapping: {
-    title: 'Line wrapping',
-    description: 'Whether or not lines are wrapped at end of panel',
+    title: 'Rientro righe',
+    description: 'Indica se le righe vengono spezzate a fine pannello',
   },
   lineNumbers: {
-    title: 'Line numbers',
-    description: 'Show line numbers',
+    title: 'Numeri di riga',
+    description: 'Mostra i numeri di riga',
   },
   firstLineNumber: {
-    title: 'First line number',
-    description: 'Set first line number',
+    title: 'Primo numero di riga',
+    description: 'Imposta il primo numero di riga',
   },
   foldGutter: {
-    title: 'Code folding',
-    description: 'Enable code folding through fold gutters',
+    title: 'Piegatura codice',
+    description: 'Abilita la piegatura del codice attraverso la piega delle linee',
   },
   titleEditorOptions: {
-    title: 'Editor behavior',
-    description: 'Controls the behavior of the editor',
+    title: "Comportamento dell'editor",
+    description: "Controlla il comportamento dell'editor",
   },
   autoValidate: {
-    title: 'Auto validation',
-    description: 'Validate encoding against schema automatically after each edit',
+    title: 'Validazione automatica',
+    description: 'Valida automaticamente la codifica rispetto allo schema dopo ogni modifica',
   },
   autoCloseBrackets: {
-    title: 'Auto close brackets',
-    description: 'Automatically close brackets at input',
+    title: 'Chiusura parentesi automatica',
+    description: 'Chiude automaticamente le parentesi quando vengono inserite',
   },
   autoCloseTags: {
-    title: 'Auto close tags',
-    description: 'Automatically close tags at input',
+    title: 'Chiusura tag automatica',
+    description: 'Chiude automaticamente i tag quando vengono inseriti',
     type: 'bool',
   },
   matchTags: {
-    title: 'Match tags',
-    description: 'Highlights matched tags around editor cursor',
+    title: 'Corrispondenza tag',
+    description: "Evidenzia i tag corrispondenti intorno al cursore dell'editor",
   },
   showTrailingSpace: {
-    title: 'Highlight trailing spaces',
-    description: 'Highlights unnecessary trailing spaces at end of lines',
+    title: 'Evidenzia spazi finali',
+    description: 'Evidenzia gli spazi inutili alla fine delle righe',
   },
   keyMap: {
-    title: 'Key map',
-    description: 'Select key map',
+    title: 'Mappa tasti',
+    description: 'Seleziona la mappa tasti',
   },
 
-  // Verovio settings
+  // Verovio settings / Impostazioni di Verovio
   verovioSettingsHeader: {
-    text: 'Verovio Settings',
+    text: 'Impostazioni',
   },
   vrvReset: {
-    text: 'Default',
-    description: 'Reset Verovio to mei-friend defaults',
+    text: 'Predefinito',
+    description: 'Ripristina Verovio ai valori predefiniti di mei-friend',
   },
 
-  // main.js alert messages
+  // main.js alert messages / messaggi di avviso di main.js
   isSafariWarning: {
     text:
-      'It seems that you are using Safari as your browser, on which ' +
-      'mei-friend unfortunately does not currently support schema validation. ' +
-      'Please use another browser for full validation support.',
+      'Sembra che stai utilizzando Safari come browser, su cui ' +
+      'mei-friend attualmente non supporta la validazione dello schema. ' +
+      'Per il pieno supporto alla validazione, utilizza un altro browser.',
   },
   githubLoggedOutWarning: {
-    text: `You have logged out of mei-friend's GitHub integration, but your browser is still logged in to GitHub!
-      <a href="https://github.com/logout" target="_blank">Click here to logout from GitHub</a>.`,
+    text:
+      "Hai effettuato il logout dall'integrazione di GitHub di mei-friend, " +
+      'ma il tuo browser è ancora connesso a GitHub! ' +
+      '<a href="https://github.com/logout" target="_blank">Clicca qui per effettuare il logout da GitHub</a>.',
   },
   generateUrlError: {
-    text: 'Cannot generate URL for local file ',
+    text: "Impossibile generare l'URL per il file locale ",
   },
   generateUrlSuccess: {
-    text: 'URL successfully copied to clipboard',
+    text: 'URL copiato negli appunti con successo',
   },
   generateUrlNotCopied: {
-    text: 'URL not copied to clipboard, please try again!',
+    text: 'URL non copiato negli appunti, riprova!',
   },
-  errorCode: { text: 'Error Code' },
-  submitBugReport: { text: 'Submit bug report' },
-  loadingSchema: { text: 'Loading Schema' },
-  schemaLoaded: { text: 'Schema loaded' },
-  noSchemaFound: { text: 'No schema information found in MEI.' },
-  schemaNotFound: { text: 'Schema not found' },
-  errorLoadingSchema: { text: 'Error at loading schema' },
-  notValidated: { text: 'Not validated. Press here to validate.' },
-  validatingAgainst: { text: 'Validating against' },
-  validatedAgainst: { text: 'Validated against' },
-  validationMessages: { text: 'validation messages' },
-  validationComplete: { text: 'Validation complete' },
-  validationFailed: { text: 'Validation failed' },
-  noErrors: { text: 'no errors' },
-  errorsFound: { text: 'errors found' }, // 5 errors found
+  errorCode: { text: 'Codice errore' },
+  submitBugReport: { text: 'Invia segnalazione di bug' },
+  loadingSchema: { text: 'Caricamento schema' },
+  schemaLoaded: { text: 'Schema caricato' },
+  noSchemaFound: { text: 'Nessuna informazione di schema trovata in MEI.' },
+  schemaNotFound: { text: 'Schema non trovato' },
+  errorLoadingSchema: { text: 'Errore nel caricamento dello schema' },
+  notValidated: { text: 'Non validato. Premere qui per validare.' },
+  validatingAgainst: { text: 'Validazione contro' },
+  validatedAgainst: { text: 'Validato contro' },
+  validationMessages: { text: 'messaggi di validazione' },
+  validationComplete: { text: 'Validazione completa' },
+  validationFailed: { text: 'Validazione fallita' },
+  noErrors: { text: 'nessun errore' },
+  errorsFound: { text: 'errori trovati' }, // 5 errori trovati
 
-  // github-menu.js
+  // github-menu.js / github-menu.js
   repository: { text: 'Repository' },
-  branch: { text: 'Branch' },
-  path: { text: 'Path' },
+  branch: { text: 'Ramo' },
+  path: { text: 'Percorso' },
   commit: { text: 'Commit' },
-  commitLog: { text: 'Commit log' },
-  commitAsNewFile: { text: 'Commit as new file' },
-  date: { text: 'Date' },
-  author: { text: 'Author' },
-  message: { text: 'Message' },
-  none: { text: 'None' },
-  fileName: { description: 'File name' },
-  forkRepository: { text: 'Fork repository' },
-  forkError: { text: 'Sorry, could not fork repository' },
-  loadingFile: { text: 'Loading file' },
-  loadingFromGithub: { text: 'Loading from Github' },
-  logOut: { text: 'Log out' },
-  githubLogout: { text: 'Log out' },
-  selectRepository: { text: 'Select repository' },
-  selectBranch: { text: 'Select branch' },
-  commitPlaceholder: { text: 'Updated using mei-friend online' },
-  reportIssueWithEncoding: { text: 'Report issue with encoding' },
-  clickToOpenInMeiFriend: { text: 'Click to open in mei-friend' },
-  repoAccessError: { text: 'Sorry, cannot access repositories for supplied user or organisation' },
-  allComposers: { text: 'All composers' }, // fork-repository.js
+  commitLog: { text: 'Registro commit' },
+  commitAsNewFile: { text: 'Commit come nuovo file' },
+  date: { text: 'Data' },
+  author: { text: 'Autore' },
+  message: { text: 'Messaggio' },
+  none: { text: 'Nessuno' },
+  fileName: { description: 'Nome del file' },
+  forkRepository: { text: 'Fork del repository' },
+  forkError: { text: 'Spiacenti, non è possibile eseguire il fork del repository' },
+  loadingFile: { text: 'Caricamento file' },
+  loadingFromGithub: { text: 'Caricamento da Github' },
+  logOut: { text: 'Esci' },
+  githubLogout: { text: 'Esci' },
+  selectRepository: { text: 'Seleziona repository' },
+  selectBranch: { text: 'Seleziona ramo' },
+  commitPlaceholder: { text: 'Aggiornato usando mei-friend online' },
+  reportIssueWithEncoding: { text: 'Segnala problema di codifica' },
+  clickToOpenInMeiFriend: { text: 'Clicca per aprire in mei-friend' },
+  repoAccessError: {
+    text: "Spiacenti, non è possibile accedere ai repository per l'utente o l'organizzazione forniti",
+  },
+  allComposers: { text: 'Tutti i compositori' }, // fork-repository.js
 
   // utils renumber measures
-  renumberMeasuresModalText: { text: 'Renumber measures' },
+  renumberMeasuresModalText: { text: 'Rinumera misure' },
   renumberMeasuresModalTest: { text: 'Test' },
   renumberMeasuresWillBe: { text: '' },
-  renumberMeasuresWouldBe: { text: 'would be' },
-  renumberMeasuresChangedTo: { text: 'changed to' },
-  renumberMeasureMeasuresRenumbered: { text: 'measures renumbered' },
+  renumberMeasuresWouldBe: { text: 'sarebbe' },
+  renumberMeasuresChangedTo: { text: 'cambiato in' },
+  renumberMeasureMeasuresRenumbered: { text: 'misure rinumerate' },
 };
