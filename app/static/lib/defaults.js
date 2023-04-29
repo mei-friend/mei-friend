@@ -12,17 +12,37 @@ export const supportedLanguages = {
     de: 'Deutsch',
     en: 'Englisch',
     es: 'Spanisch',
+    // fr: 'Französisch',
+    // it: 'Italienisch',
   },
   en: {
     de: 'German',
     en: 'English',
     es: 'Spanish',
+    // fr: 'French',
+    // it: 'Italian',
   },
   es: {
     de: 'Alemán',
     en: 'Inglés',
     es: 'Español',
+    // fr: 'Francés',
+    // it: 'Italiano',
   },
+  // fr: {
+  //   de: 'Allemand',
+  //   en: 'Anglais',
+  //   es: 'Espagnol',
+  //   fr: 'Français',
+  //   it: 'Italien',
+  // },
+  // it: {
+  //   de: 'Tedesco',
+  //   en: 'Inglese',
+  //   es: 'Spagnolo',
+  //   fr: 'Francese',
+  //   it: 'Italiano',
+  // },
 };
 
 // export let platform = navigator.platform.toLowerCase(); // TODO
@@ -243,9 +263,7 @@ export const meiFriendSettingsOptions = {
     //['Deutsch', 'English', 'Español'],
     values: Object.keys(supportedLanguages),
     // ['Deutsch | German', 'English', 'Español | Spanish'],
-    labels: Object.keys(supportedLanguages).map(
-      (l) => supportedLanguages[l][l] + ' / ' + supportedLanguages['en'][l]
-    ),
+    labels: Object.keys(supportedLanguages).map((l) => supportedLanguages[l][l] + ' / ' + supportedLanguages['en'][l]),
     default: 'en',
   },
   dragSelection: {
