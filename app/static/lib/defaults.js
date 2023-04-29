@@ -8,7 +8,16 @@ import { translator } from './main.js';
  * language codes after ISO-639-1, please enter new codes alphabetically
  */
 export const supportedLanguages = {
+  ca: {
+    ca: 'Català',
+    de: 'Alemany',
+    en: 'Anglès',
+    es: 'Espanyol',
+    // fr: 'Francès',
+    it: 'Italià',
+  },
   de: {
+    ca: 'Katalanisch',
     de: 'Deutsch',
     en: 'Englisch',
     es: 'Spanisch',
@@ -16,6 +25,7 @@ export const supportedLanguages = {
     it: 'Italienisch',
   },
   en: {
+    ca: 'Catalan',
     de: 'German',
     en: 'English',
     es: 'Spanish',
@@ -23,6 +33,7 @@ export const supportedLanguages = {
     it: 'Italian',
   },
   es: {
+    ca: 'Catalán',
     de: 'Alemán',
     en: 'Inglés',
     es: 'Español',
@@ -30,6 +41,7 @@ export const supportedLanguages = {
     it: 'Italiano',
   },
   // fr: {
+  //   ca: 'catalan',
   //   de: 'Allemand',
   //   en: 'Anglais',
   //   es: 'Espagnol',
@@ -37,6 +49,7 @@ export const supportedLanguages = {
   //   it: 'Italien',
   // },
   it: {
+    ca: 'Catalano',
     de: 'Tedesco',
     en: 'Inglese',
     es: 'Spagnolo',
