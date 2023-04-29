@@ -13,21 +13,21 @@ export const supportedLanguages = {
     en: 'Englisch',
     es: 'Spanisch',
     // fr: 'Französisch',
-    // it: 'Italienisch',
+    it: 'Italienisch',
   },
   en: {
     de: 'German',
     en: 'English',
     es: 'Spanish',
     // fr: 'French',
-    // it: 'Italian',
+    it: 'Italian',
   },
   es: {
     de: 'Alemán',
     en: 'Inglés',
     es: 'Español',
     // fr: 'Francés',
-    // it: 'Italiano',
+    it: 'Italiano',
   },
   // fr: {
   //   de: 'Allemand',
@@ -36,13 +36,13 @@ export const supportedLanguages = {
   //   fr: 'Français',
   //   it: 'Italien',
   // },
-  // it: {
-  //   de: 'Tedesco',
-  //   en: 'Inglese',
-  //   es: 'Spagnolo',
-  //   fr: 'Francese',
-  //   it: 'Italiano',
-  // },
+  it: {
+    de: 'Tedesco',
+    en: 'Inglese',
+    es: 'Spagnolo',
+    // fr: 'Francese',
+    it: 'Italiano',
+  },
 };
 
 // export let platform = navigator.platform.toLowerCase(); // TODO

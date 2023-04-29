@@ -132,272 +132,281 @@ export const lang = {
   showAnnotationsButton: { description: 'Attiva/Disattiva pannello Annotazioni' },
   showSettingsButton: { description: 'Mostra il pannello delle impostazioni' },
 
-  // Footer texts
+  // Footer texts/ Testi di piè di pagina
   leftFooter: {
     html:
-      'Hosted by <a href="https://iwk.mdw.ac.at">IWK</a> ' +
-      'at <a href="https://mdw.ac.at">mdw</a>, with ' +
+      'Ospitato da <a href="https://iwk.mdw.ac.at">IWK</a> ' +
+      'a <a href="https://mdw.ac.at">mdw</a>, con ' +
       heart +
-      ' from Vienna. ' +
+      ' da Vienna. ' +
       '<a href="https://iwk.mdw.ac.at/impressum">Imprint</a>.',
   },
-  loadingVerovio: { text: 'Loading Verovio' },
-  verovioLoaded: { text: 'loaded' },
-  convertedToPdf: { text: 'converted to PDF' },
-  statusBarCompute: { text: 'Compute' },
-  middleFooterPage: { text: 'page' },
-  middleFooterOf: { text: 'of' },
-  middleFooterLoaded: { text: 'loaded' },
+  loadingVerovio: { text: 'Caricamento Verovio' },
+  verovioLoaded: { text: 'caricato' },
+  convertedToPdf: { text: 'convertito in PDF' },
+  statusBarCompute: { text: 'Calcola' },
+  middleFooterPage: { text: 'pagina' },
+  middleFooterOf: { text: 'di' },
+  middleFooterLoaded: { text: 'caricato' },
 
-  // control menu
+  // control menu/ menu di controllo
   verovioIcon: {
-    description: `mei-friend worker activity:
-    clockwise rotation denotes Verovio activity,
-    anticlockwise rotation speed worker activity`,
+    description: `attività del worker di mei-friend: 
+    la rotazione in senso orario indica l'attività di Verovio, 
+    la velocità di rotazione in senso antiorario indica l'attività del worker`,
   },
-  decreaseScaleButton: { description: 'Decrease notation' },
-  verovioZoom: { description: 'Scale size of notation' },
-  increaseScaleButton: { description: 'Increase notation' },
-  pagination1: { html: 'Page&nbsp;' },
-  pagination3: { html: '&nbsp;of' },
-  sectionSelect: { description: 'Navigate encoded section/ending structure' },
-  firstPageButton: { description: 'Flip to first page' },
-  previousPageButton: { description: 'Flip to previous page' },
-  paginationLabel: { description: 'Page navigation: click to manually enter page number to be displayed' },
-  nextPageButton: { description: 'Flip to next page' },
-  lastPageButton: { description: 'Flip to last page' },
-  flipCheckbox: { description: 'Automatically flip page to encoding cursor position' },
-  flipButton: { description: 'Flip page manually to encoding cursor position' },
-  breaksSelect: { description: 'Define system/page breaks behavior of notation' },
-  breaksSelectNone: { text: 'None' },
-  breaksSelectAuto: { text: 'Automatic' },
-  breaksSelectMeasure: { text: 'Measure' },
-  breaksSelectLine: { text: 'System' },
-  breaksSelectEncoded: { text: 'System and page' },
-  breaksSelectSmart: { text: 'Smart' },
-  updateControlsLabel: { text: 'Update', description: 'Control update behavior of notation after changes in encoding' },
-  liveUpdateCheckbox: { description: 'Automatically update notation after changes in encoding' },
-  codeManualUpdateButton: { description: 'Update notation manually' },
-  engravingFontSelect: { description: 'Select engraving font' },
-  backwardsButton: { description: 'Navigate to left in notation' },
-  forwardsButton: { description: 'Navigate to right in notation' },
-  upwardsButton: { description: 'Navigate upwards in notation' },
-  downwardsButton: { description: 'Navigate downwards in notation' },
+  decreaseScaleButton: { description: 'Riduci notazione' },
+  verovioZoom: { description: 'Scala dimensioni della notazione' },
+  increaseScaleButton: { description: 'Aumenta notazione' },
+  pagination1: { html: 'Pagina ' },
+  pagination3: { html: ' di' },
+  sectionSelect: { description: 'Naviga la struttura di sezione/finale codificata' },
+  firstPageButton: { description: 'Vai alla prima pagina' },
+  previousPageButton: { description: 'Vai alla pagina precedente' },
+  paginationLabel: {
+    description: 'Navigazione della pagina: fai clic per inserire manualmente il numero di pagina da visualizzare',
+  },
+  nextPageButton: { description: 'Vai alla pagina successiva' },
+  lastPageButton: { description: "Vai all'ultima pagina" },
+  flipCheckbox: { description: 'Passa automaticamente alla posizione del cursore di codifica' },
+  flipButton: { description: 'Passa manualmente alla posizione del cursore di codifica' },
+  breaksSelect: { description: 'Definisci il comportamento degli intervalli/pagine di sistema nella notazione' },
+  breaksSelectNone: { text: 'Nessuno' },
+  breaksSelectAuto: { text: 'Automatico' },
+  breaksSelectMeasure: { text: 'Misura' },
+  breaksSelectLine: { text: 'Sistema' },
+  breaksSelectEncoded: { text: 'Sistema e pagina' },
+  breaksSelectSmart: { text: 'Intelligente' },
+  updateControlsLabel: {
+    text: 'Aggiorna',
+    description: 'Aggiorna il comportamento di controllo della notazione dopo le modifiche nella codifica',
+  },
+  liveUpdateCheckbox: { description: 'Aggiorna automaticamente la notazione dopo le modifiche nella codifica' },
+  codeManualUpdateButton: { description: 'Aggiorna manualmente la notazione' },
+  engravingFontSelect: { description: 'Seleziona il carattere di incisione' },
+  backwardsButton: { description: 'Vai a sinistra nella notazione' },
+  forwardsButton: { description: 'Vai a destra nella notazione' },
+  upwardsButton: { description: "Naviga verso l'alto nella notazione" },
+  downwardsButton: { description: 'Naviga verso il basso nella notazione' },
   speedLabel: {
-    text: 'Speed mode',
-    description: 'In speed mode, only the current page is sent to Verovio to reduce rendering time with large files',
+    text: 'Modalità di velocità',
+    description:
+      'In modalità di velocità, solo la pagina corrente viene inviata a Verovio per ridurre i tempi di rendering con file di grandi dimensioni',
   },
 
-  // PDF/print preview panel
-  pdfSaveButton: { text: 'Save PDF', description: 'Save as PDF' },
-  pdfCloseButton: { description: 'Close print view' },
-  pagesLegendLabel: { text: 'Page range', singlePage: 'page', multiplePages: 'Pages' },
-  selectAllPagesLabel: { text: 'All' },
-  selectCurrentPageLabel: { text: 'Current page' },
-  selectFromLabel: { text: 'from:' },
-  selectToLabel: { text: 'to:' },
-  selectPageRangeLabel: { text: 'Page range:' },
+  // PDF/print preview panel / Pannello di anteprima PDF/stampa
+  pdfSaveButton: { text: 'Salva PDF', description: 'Salva come PDF' },
+  pdfCloseButton: { description: 'Chiudi vista di stampa' },
+  pagesLegendLabel: { text: 'Intervallo di pagine', singlePage: 'pagina', multiplePages: 'Pagine' },
+  selectAllPagesLabel: { text: 'Tutte' },
+  selectCurrentPageLabel: { text: 'Pagina corrente' },
+  selectFromLabel: { text: 'da:' },
+  selectToLabel: { text: 'a:' },
+  selectPageRangeLabel: { text: 'Intervallo di pagine:' },
   pdfPreviewSpeedModeWarning: {
     text:
-      'Only the current page is rendered to PDF, because speed mode is activated. ' +
-      'Uncheck speed mode to select from all pages.',
+      'Solo la pagina corrente viene renderizzata in PDF, poiché è attivata la modalità di velocità. ' +
+      'Deseleziona la modalità di velocità per selezionare tutte le pagine.',
   },
-  pdfPreviewNormalModeTitle: { text: 'Select page range to be saved in PDF.' },
+  pdfPreviewNormalModeTitle: { text: "Seleziona l'intervallo di pagine da salvare in PDF." },
 
-  // facsimile panel
-  facsimileIcon: { description: 'Facsimile panel' },
-  facsimileDecreaseZoomButton: { description: 'Decrease notation image' },
-  facsimileZoom: { description: 'Adjust size of notation image' },
-  facsimileIncreaseZoomButton: { description: 'Increase notation image' },
-  facsimileFullPageLabel: { text: 'Full page', description: 'Display full page of facsimile image' },
-  facsimileFullPageCheckbox: { description: 'Display full page of facsimile image' },
-  facsimileShowZonesLabel: { text: 'Show zone boxes', description: 'Show zone boxes of facsimile' },
-  facsimileShowZonesCheckbox: { description: 'Show zone boxes of facsimile' },
-  facsimileEditZonesCheckbox: { description: 'Edit zones of facsimile' },
-  facsimileEditZonesLabel: { text: 'Edit zones', description: 'Edit zones of facsimile' },
-  facsimileCloseButton: { description: 'Close facsimile panel' },
-  facsimileDefaultWarning: { text: 'No facsimile content to display.' },
+  // facsimile panel/ pannello facsimile
+  facsimileIcon: { description: 'Pannello facsimile' },
+  facsimileDecreaseZoomButton: { description: "Riduci l'immagine della notazione" },
+  facsimileZoom: { description: "Regola la dimensione dell'immagine della notazione" },
+  facsimileIncreaseZoomButton: { description: "Ingrandisci l'immagine della notazione" },
+  facsimileFullPageLabel: {
+    text: 'Pagina intera',
+    description: "Mostra l'intera pagina dell'immagine del facsimile",
+  },
+  facsimileFullPageCheckbox: { description: "Mostra l'intera pagina dell'immagine del facsimile" },
+  facsimileShowZonesLabel: {
+    text: 'Mostra riquadri delle zone',
+    description: 'Mostra i riquadri delle zone del facsimile',
+  },
+  facsimileShowZonesCheckbox: { description: 'Mostra i riquadri delle zone del facsimile' },
+  facsimileEditZonesCheckbox: { description: 'Modifica le zone del facsimile' },
+  facsimileEditZonesLabel: {
+    text: 'Modifica le zone',
+    description: 'Modifica le zone del facsimile',
+  },
+  facsimileCloseButton: { description: 'Chiudi il pannello facsimile' },
+  facsimileDefaultWarning: { text: 'Nessun contenuto facsimile da visualizzare.' },
   facsimileNoSurfaceWarning: {
-    text: 'No surface element found for this page.\n(An initial pb element might be missing.)',
+    text: 'Nessun elemento di superficie trovato per questa pagina.\n(Potrebbe mancare un elemento pb iniziale.)',
   },
-  facsimileNoZonesFullPageWarning: { text: 'Facsimile without zones only visible in full page mode.' },
-  facsimileImgeNotLoadedWarning: { text: 'Could not load image' },
+  facsimileNoZonesFullPageWarning: { text: 'Facsimile senza zone visibile solo in modalità pagina intera.' },
+  facsimileImgeNotLoadedWarning: { text: "Impossibile caricare l'immagine" },
 
-  // drag'n'drop
-  dragOverlayText: { text: 'Drag your input file here.' },
+  // drag'n'drop / trascina e rilascia
+  dragOverlayText: { text: 'Trascina il file di input qui.' },
 
-  // public repertoire
-  openUrlHeading: { text: 'Open Web-hosted encoding by URL' },
+  // public repertoire / repertorio pubblico
+  openUrlHeading: { text: "Apri l'encoding ospitato sul Web tramite URL" },
   openUrlInstructions: {
-    text:
-      'Please choose from the public repertoire or enter the URL of ' +
-      'a Web-hosted music encoding, below. Note:  Host server must ' +
-      'support cross-origin resource sharing (CORS).',
+    text: "Scegli tra il repertorio pubblico o inserisci l'URL dell'encoding musicale ospitato sul Web, di seguito. Nota: il server di hosting deve supportare la condivisione di risorse tra origini diverse (CORS).",
   },
-  publicRepertoireSummary: { text: 'Public repertoire' },
-  sampleEncodingsComposerLabel: { text: 'Composer:' },
+  publicRepertoireSummary: { text: 'Repertorio pubblico' },
+  sampleEncodingsComposerLabel: { text: 'Compositore:' },
   sampleEncodingsEncodingLabel: { text: 'Encoding:' },
-  sampleEncodingsOptionLabel: { text: 'Choose an encoding...' },
-  openUrlButton: { text: 'Open URL' },
-  openUrlCancel: { text: 'Cancel' },
+  sampleEncodingsOptionLabel: { text: 'Scegli un encoding...' },
+  openUrlButton: { text: 'Apri URL' },
+  openUrlCancel: { text: 'Annulla' },
   proposePublicRepertoire: {
     html:
-      'We welcome proposals for ' +
+      'Accettiamo proposte per ' +
       '<a href="https://github.com/mei-friend/mei-friend/issues/new?template=public_repertoire.md" target="_blank" >' +
-      'additions to the public repertoire' +
+      'aggiunte al repertorio pubblico' +
       '</a>.',
   },
-  openUrlChooseEncodingText: { text: 'Choose an encoding...' },
-  openUrlChooseComposerText: { text: 'Choose a composer...' },
-  openUrlOpenEncodingByUrlText: { text: 'Open Web-hosted encoding by URL' },
+  openUrlChooseEncodingText: { text: 'Scegli un encoding...' },
+  openUrlChooseComposerText: { text: 'Scegli un compositore...' },
+  openUrlOpenEncodingByUrlText: { text: "Apri l'encoding ospitato sul Web tramite URL" },
 
-  // fork modals
-  forkRepoGithubText: { text: 'Fork Github Repository' },
+  // fork modals / fork modals
+  forkRepoGithubText: { text: 'Fork Repository Github' },
   forkRepoGithubExplanation: {
-    text:
-      'The link you have followed ' +
-      'will create a GitHub fork of the following repository for editing in mei-friend:',
+    text: 'Il link che hai seguito ' + 'creerà una fork del seguente repository GitHub per la modifica in mei-friend:',
   },
-  forkRepoGithubConfirm: { text: 'Is this OK?' },
+  forkRepoGithubConfirm: { text: 'Va bene?' },
   forkRepositoryInstructions: {
     text:
-      'Please choose from the public repertoire or enter the ' +
-      'Github (user or organization) name and the repository name of a Github-hosted repository, below. ' +
-      'Your forked repository will become available from  the Github menu.',
+      'Scegli dal repertorio pubblico o inserisci il nome Github (utente o organizzazione) e il nome del repository di un repository ospitato su Github, qui sotto. ' +
+      'La tua repository forked sarà disponibile dal menu di Github.',
   },
-  forkRepositoryGithubText: { text: 'Fork Github Repository' },
-  forkRepertoireSummary: { text: 'Public repertoire' },
-  forkRepertoireComposerLabel: { text: 'Composer:' },
-  forkRepertoireOrganizationLabel: { text: 'Organization:' },
-  forkRepertoireOrganizationOption: { text: 'Choose a GitHub Organization...' },
+  forkRepositoryGithubText: { text: 'Fork Repository Github' },
+  forkRepertoireSummary: { text: 'Repertorio pubblico' },
+  forkRepertoireComposerLabel: { text: 'Compositore:' },
+  forkRepertoireOrganizationLabel: { text: 'Organizzazione:' },
+  forkRepertoireOrganizationOption: { text: "Scegli un'organizzazione GitHub..." },
   forkRepertoireRepositoryLabel: { text: 'Repository:' },
-  forkRepertoireRepositoryOption: { text: 'Choose an encoding...' },
-  forkRepositoryInputName: { placeholder: 'Github user or organization' },
-  forkRepositoryInputRepoOption: { text: 'Choose a repository' },
-  forkRepositoryToSelectorText: { text: 'Fork to: ' },
+  forkRepertoireRepositoryOption: { text: 'Scegli una codifica...' },
+  forkRepositoryInputName: { placeholder: 'Nome utente o organizzazione Github' },
+  forkRepositoryInputRepoOption: { text: 'Scegli un repository' },
+  forkRepositoryToSelectorText: { text: 'Fork a: ' },
   forkRepositoryButton: { text: 'Fork repository' },
-  forkRepositoryCancel: { text: 'Cancel' },
+  forkRepositoryCancel: { text: 'Annulla' },
   forkProposePublicRepertoire: {
     html:
-      'We welcome proposals for ' +
+      'Accettiamo proposte per ' +
       '<a target="_blank" href="https://github.com/mei-friend/mei-friend/issues/new?template=public_repertoire.md">' +
-      'additions to the public repertoire' +
+      'aggiunte al repertorio pubblico' +
       '</a>.',
   },
 
-  // annotation panel
-  annotationCloseButtonText: { text: 'Close Annotations Panel' },
-  hideAnnotationPanelButton: { description: 'Close Annotations Panel' },
-  closeAnnotationPanelButton: { description: 'Close Annotations Panel' },
-  annotationToolsButton: { text: 'Tools', description: 'Annotation tools' },
-  annotationListButton: { text: 'List', description: 'List annotations' },
-  writeAnnotStandoffText: { text: 'Web Annotation' },
-  annotationToolsHighlightTitle: { text: 'Highlight' },
-  annotationToolsHighlightSpan: { text: 'Highlight' },
-  annotationToolsDescribeTitle: { text: 'Describe' },
-  annotationToolsDescribeSpan: { text: 'Describe' },
+  // annotation panel / annotation panel
+  annotationCloseButtonText: { text: 'Chiudi pannello di annotazione' },
+  hideAnnotationPanelButton: { description: 'Chiudi pannello di annotazione' },
+  closeAnnotationPanelButton: { description: 'Chiudi pannello di annotazione' },
+  annotationToolsButton: { text: 'Strumenti', description: 'Strumenti di annotazione' },
+  annotationListButton: { text: 'Lista', description: 'Elenco delle annotazioni' },
+  writeAnnotStandoffText: { text: 'Annotazione Web' },
+  annotationToolsHighlightTitle: { text: 'Evidenzia' },
+  annotationToolsHighlightSpan: { text: 'Evidenzia' },
+  annotationToolsDescribeTitle: { text: 'Descrivi' },
+  annotationToolsDescribeSpan: { text: 'Descrivi' },
   annotationToolsLinkTitle: { text: 'Link' },
   annotationToolsLinkSpan: { text: 'Link' },
-  listAnnotations: { text: 'No annotations present.' },
-  addWebAnnotation: { text: 'Load Web Annotation(s)' },
-  loadWebAnnotationMessage: { text: 'Enter URL of Web Annotation or Web Annotation Container' },
-  loadWebAnnotationMessage1: { text: 'Could not load URL provided' },
-  loadWebAnnotationMessage2: { text: 'please try again' },
-  noAnnotationsToDisplay: { text: 'No annotations to display' },
-  flipPageToAnnotationText: { description: 'Flip page to this annotation' },
-  deleteAnnotation: { description: 'Delete this annotation' },
-  deleteAnnotationConfirmation: { text: 'Are you sure you wish to delete this annotation?' },
+  listAnnotations: { text: 'Nessuna annotazione presente.' },
+  addWebAnnotation: { text: 'Carica annotazione/i Web' },
+  loadWebAnnotationMessage: { text: "Inserisci l'URL dell'annotazione Web o del contenitore dell'annotazione Web" },
+  loadWebAnnotationMessage1: { text: "Impossibile caricare l'URL fornito" },
+  loadWebAnnotationMessage2: { text: 'per favore riprova' },
+  noAnnotationsToDisplay: { text: 'Nessuna annotazione da visualizzare' },
+  flipPageToAnnotationText: { description: 'Passa alla pagina di questa annotazione' },
+  deleteAnnotation: { description: 'Elimina questa annotazione' },
+  deleteAnnotationConfirmation: { text: 'Sei sicuro di voler eliminare questa annotazione?' },
   makeStandOffAnnotation: {
-    description: 'Stand-off status (Web Annotation)',
-    descriptionSolid: 'Write to Solid as Web Annotation',
-    descriptionToLocal: 'Copy Web Annotation URI to clipboard',
+    description: 'Stato di stand-off (Web Annotation)',
+    descriptionSolid: 'Scrivi su Solid come Web Annotation',
+    descriptionToLocal: "Copia l'URI della Web Annotation negli appunti",
   },
   makeInlineAnnotation: {
-    description: 'Click to in-line annotation',
-    descriptionCopy: 'Copy <annot> xml:id to clipboard',
+    description: 'Clicca per annotazione in-linea',
+    descriptionCopy: "Copia l'xml:id di <annot> negli appunti",
   },
   pageAbbreviation: { text: 'p.' },
-  elementsPlural: { text: 'elements' },
-  askForLinkUrl: { text: 'Please enter a URL to link to' },
-  drawLinkUrl: { text: 'Open in new tab' },
-  askForDescription: { text: 'Please enter a textual description to apply' },
+  elementsPlural: { text: 'elementi' },
+  askForLinkUrl: { text: "Inserisci l'URL a cui collegare" },
+  drawLinkUrl: { text: 'Apri in una nuova scheda' },
+  askForDescription: { text: 'Inserisci una descrizione testuale da applicare' },
   maxNumberOfAnnotationAlert: {
-    text1: 'Number of annot elements exceeds configurable "Maximum number of annotations"',
-    text2: 'New annotations can still be generated and will be displayed if "Show annotations" is set.',
+    text1: 'Il numero di elementi <annot> supera il valore massimo configurabile di "Numero massimo di annotazioni"',
+    text2:
+      'Nuove annotazioni possono ancora essere generate e saranno visualizzate se "Mostra annotazioni" è attivato.',
   },
   annotationsOutsideScoreWarning: {
-    text: 'Sorry, cannot currently write annotations placed outside &lt;score&gt;',
+    text: 'Spiacente, non è possibile scrivere annotazioni al di fuori del tag <score>',
   },
   annotationWithoutIdWarning: {
-    text1: 'Cannot write annotation as MEI anchor-point lacks xml:id.',
-    text2: 'Please assign identifiers by selecting "Manipulate" -> "Re-render MEI (with ids)" and try again.',
+    text1: "Impossibile scrivere l'annotazione perché il punto di ancoraggio MEI non ha un xml:id.",
+    text2: 'Assegna un identificativo selezionando "Manipola" -> "Rendi il MEI di nuovo con id" e riprova.',
   },
 
   // MIDI
   midiSpeedmodeIndicator: {
-    text: 'Speed mode',
+    text: 'Modalità di velocità',
     description:
-      'Speed mode is active; only playing MIDI for current page. To play the entire encoding, disable speed mode.',
+      "La modalità di velocità è attiva; viene riprodotto solo il MIDI per la pagina corrente. Per riprodurre l'intera codifica, disabilita la modalità di velocità.",
   },
-  closeMidiPlaybackControlBarButton: { description: 'Hide MIDI Playback Control Bar' },
+  closeMidiPlaybackControlBarButton: { description: 'Nascondi la barra di controllo della riproduzione MIDI' },
 
-  // mei-friend SETTINGS MENU
+  // mei-friend SETTINGS MENU// MENU IMPOSTAZIONI di mei-friend
   meiFriendSettingsHeader: {
-    text: 'mei-friend Settings',
+    text: 'Impostazioni di mei-friend',
   },
   mfReset: {
-    text: 'Default',
-    description: 'Reset to mei-friend defaults',
+    text: 'Predefinito',
+    description: 'Reimposta ai valori predefiniti di mei-friend',
   },
   filterSettings: {
-    placeholder: 'Filter settings',
-    description: 'Type here to filter settings',
+    placeholder: 'Filtra le impostazioni',
+    description: 'Digita qui per filtrare le impostazioni',
   },
   closeSettingsButton: {
-    description: 'Close settings panel',
+    description: 'Chiudi il pannello delle impostazioni',
   },
   hideSettingsButton: {
-    description: 'Close settings panel',
+    description: 'Chiudi il pannello delle impostazioni',
   },
   titleGeneral: {
-    text: 'General',
-    description: 'General mei-friend settings',
+    text: 'Generale',
+    description: 'Impostazioni generali di mei-friend',
   },
   selectToolkitVersion: {
-    text: 'Verovio version',
+    text: 'Versione di Verovio',
     description:
-      'Select Verovio toolkit version ' +
-      '(* Switching to older versions before 3.11.0 ' +
-      'might require a refresh due to memory issues.)',
+      'Seleziona la versione del toolkit Verovio ' +
+      '(*Passare a versioni precedenti alla 3.11.0 ' +
+      'potrebbe richiedere un aggiornamento a causa di problemi di memoria.)',
   },
   toggleSpeedMode: {
-    text: 'Speed mode',
+    text: 'Modalità di velocità',
     description:
-      'Toggle Verovio Speed Mode. ' +
-      'In speed mode, only the current page ' +
-      'is sent to Verovio to reduce rendering ' +
-      'time with large files',
+      'Attiva/Disattiva la modalità di velocità di Verovio. ' +
+      'In modalità di velocità, solo la pagina corrente ' +
+      'viene inviata a Verovio per ridurre il tempo di rendering ' +
+      'con file di grandi dimensioni',
   },
   selectIdStyle: {
-    text: 'Style of generated xml:ids',
+    text: 'Stile degli xml:id generati',
     description:
-      'Style of newly generated xml:ids (existing xml:ids are not changed)' +
-      'e.g., Verovio original: "note-0000001318117900", ' +
-      'Verovio base 36: "nophl5o", ' +
-      'mei-friend style: "note-ophl5o"',
+      'Stile degli xml:id appena generati (gli xml:id esistenti non vengono modificati)' +
+      'ad esempio, originale di Verovio: "note-0000001318117900", ' +
+      'base 36 di Verovio: "nophl5o", ' +
+      'stile di mei-friend: "note-ophl5o"',
   },
   addApplicationNote: {
-    text: 'Insert application statement',
+    text: "Inserisci dichiarazione dell'applicazione",
     description:
-      'Insert an application statement to the encoding ' +
-      'description in the MEI header, identifying ' +
-      'application name, version, date of first ' +
-      'and last edit',
+      "Inserisci una dichiarazione dell'applicazione nell'intestazione MEI, identificando" +
+      "nome dell'applicazione, versione, data della prima e ultima modifica",
   },
   selectLanguage: {
-    text: 'Language',
-    description: 'Select language of mei-friend interface.',
+    text: 'Lingua',
+    description: "Seleziona la lingua dell'interfaccia di mei-friend.",
   },
+
   // Drag select
   dragSelection: {
     text: 'Drag select',
