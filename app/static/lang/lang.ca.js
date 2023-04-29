@@ -256,153 +256,151 @@ export const lang = {
   openUrlChooseComposerText: { text: 'Tria un compositor...' },
   openUrlOpenEncodingByUrlText: { text: 'Obre la codificació allotjada a la web per URL' },
 
-  // fork modals
-  forkRepoGithubText: { text: 'Fork Github Repository' },
+  // fork modals // forquilles modals
+  forkRepoGithubText: { text: 'Fer una forquilla del repositori de Github' },
   forkRepoGithubExplanation: {
-    text:
-      'The link you have followed ' +
-      'will create a GitHub fork of the following repository for editing in mei-friend:',
+    text: "L'enllaç que has seguit crearà una forquilla de Github del següent repositori per a la seva edició en mei-friend:",
   },
-  forkRepoGithubConfirm: { text: 'Is this OK?' },
+  forkRepoGithubConfirm: { text: 'Està bé això?' },
   forkRepositoryInstructions: {
     text:
-      'Please choose from the public repertoire or enter the ' +
-      'Github (user or organization) name and the repository name of a Github-hosted repository, below. ' +
-      'Your forked repository will become available from  the Github menu.',
+      "Si us plau, trieu del repertori públic o introduïu el nom de l'usuari o organització de Github " +
+      'i el nom del repositori allotjat a Github, a continuació. ' +
+      'La vostra forquilla del repositori estarà disponible des del menú Github.',
   },
-  forkRepositoryGithubText: { text: 'Fork Github Repository' },
-  forkRepertoireSummary: { text: 'Public repertoire' },
-  forkRepertoireComposerLabel: { text: 'Composer:' },
-  forkRepertoireOrganizationLabel: { text: 'Organization:' },
-  forkRepertoireOrganizationOption: { text: 'Choose a GitHub Organization...' },
-  forkRepertoireRepositoryLabel: { text: 'Repository:' },
-  forkRepertoireRepositoryOption: { text: 'Choose an encoding...' },
-  forkRepositoryInputName: { placeholder: 'Github user or organization' },
-  forkRepositoryInputRepoOption: { text: 'Choose a repository' },
-  forkRepositoryToSelectorText: { text: 'Fork to: ' },
-  forkRepositoryButton: { text: 'Fork repository' },
-  forkRepositoryCancel: { text: 'Cancel' },
+  forkRepositoryGithubText: { text: 'Fer una forquilla del repositori de Github' },
+  forkRepertoireSummary: { text: 'Repertori públic' },
+  forkRepertoireComposerLabel: { text: 'Compositor:' },
+  forkRepertoireOrganizationLabel: { text: 'Organització:' },
+  forkRepertoireOrganizationOption: { text: 'Tria una Organització de GitHub...' },
+  forkRepertoireRepositoryLabel: { text: 'Repositori:' },
+  forkRepertoireRepositoryOption: { text: 'Tria una codificació...' },
+  forkRepositoryInputName: { placeholder: 'Usuari o organització de Github' },
+  forkRepositoryInputRepoOption: { text: 'Tria un repositori' },
+  forkRepositoryToSelectorText: { text: 'Fer una forquilla a: ' },
+  forkRepositoryButton: { text: 'Fer una forquilla del repositori' },
+  forkRepositoryCancel: { text: 'Cancel·la' },
   forkProposePublicRepertoire: {
     html:
-      'We welcome proposals for ' +
+      'Donem la benvinguda a les propostes per a ' +
       '<a target="_blank" href="https://github.com/mei-friend/mei-friend/issues/new?template=public_repertoire.md">' +
-      'additions to the public repertoire' +
+      'afegir al repertori públic' +
       '</a>.',
   },
 
-  // annotation panel
-  annotationCloseButtonText: { text: 'Close Annotations Panel' },
-  hideAnnotationPanelButton: { description: 'Close Annotations Panel' },
-  closeAnnotationPanelButton: { description: 'Close Annotations Panel' },
-  annotationToolsButton: { text: 'Tools', description: 'Annotation tools' },
-  annotationListButton: { text: 'List', description: 'List annotations' },
-  writeAnnotStandoffText: { text: 'Web Annotation' },
-  annotationToolsHighlightTitle: { text: 'Highlight' },
-  annotationToolsHighlightSpan: { text: 'Highlight' },
-  annotationToolsDescribeTitle: { text: 'Describe' },
-  annotationToolsDescribeSpan: { text: 'Describe' },
-  annotationToolsLinkTitle: { text: 'Link' },
-  annotationToolsLinkSpan: { text: 'Link' },
-  listAnnotations: { text: 'No annotations present.' },
-  addWebAnnotation: { text: 'Load Web Annotation(s)' },
-  loadWebAnnotationMessage: { text: 'Enter URL of Web Annotation or Web Annotation Container' },
-  loadWebAnnotationMessage1: { text: 'Could not load URL provided' },
-  loadWebAnnotationMessage2: { text: 'please try again' },
-  noAnnotationsToDisplay: { text: 'No annotations to display' },
-  flipPageToAnnotationText: { description: 'Flip page to this annotation' },
-  deleteAnnotation: { description: 'Delete this annotation' },
-  deleteAnnotationConfirmation: { text: 'Are you sure you wish to delete this annotation?' },
+  // annotation panel  / panell d'annotacions
+  annotationCloseButtonText: { text: "Tanca el panell d'annotacions" },
+  hideAnnotationPanelButton: { description: "Tanca el panell d'annotacions" },
+  closeAnnotationPanelButton: { description: "Tanca el panell d'annotacions" },
+  annotationToolsButton: { text: 'Eines', description: "Eines d'annotació" },
+  annotationListButton: { text: 'Llista', description: "Llista d'anotacions" },
+  writeAnnotStandoffText: { text: 'Anotació web' },
+  annotationToolsHighlightTitle: { text: 'Resalta' },
+  annotationToolsHighlightSpan: { text: 'Resalta' },
+  annotationToolsDescribeTitle: { text: 'Descriu' },
+  annotationToolsDescribeSpan: { text: 'Descriu' },
+  annotationToolsLinkTitle: { text: 'Enllaç' },
+  annotationToolsLinkSpan: { text: 'Enllaç' },
+  listAnnotations: { text: 'No hi ha cap anotació present.' },
+  addWebAnnotation: { text: 'Carrega anotació(s) web' },
+  loadWebAnnotationMessage: { text: "Introdueix l'URL de l'anotació web o del contenidor d'anotacions web" },
+  loadWebAnnotationMessage1: { text: "No s'ha pogut carregar l'URL proporcionada" },
+  loadWebAnnotationMessage2: { text: 'Si us plau, intenta-ho de nou' },
+  noAnnotationsToDisplay: { text: 'No hi ha cap anotació per mostrar' },
+  flipPageToAnnotationText: { description: 'Gira la pàgina fins a aquesta anotació' },
+  deleteAnnotation: { description: 'Elimina aquesta anotació' },
+  deleteAnnotationConfirmation: { text: 'Esteu segur que voleu eliminar aquesta anotació?' },
   makeStandOffAnnotation: {
-    description: 'Stand-off status (Web Annotation)',
-    descriptionSolid: 'Write to Solid as Web Annotation',
-    descriptionToLocal: 'Copy Web Annotation URI to clipboard',
+    description: 'Estat de separació (anotació web)',
+    descriptionSolid: 'Escriu a Solid com a anotació web',
+    descriptionToLocal: "Copia l'URI de l'anotació web al porta-retalls",
   },
   makeInlineAnnotation: {
-    description: 'Click to in-line annotation',
-    descriptionCopy: 'Copy <annot> xml:id to clipboard',
+    description: 'Feu clic per a una anotació en línia',
+    descriptionCopy: "Copia la id de l'etiqueta <annot> al porta-retalls",
   },
   pageAbbreviation: { text: 'p.' },
   elementsPlural: { text: 'elements' },
-  askForLinkUrl: { text: 'Please enter a URL to link to' },
-  drawLinkUrl: { text: 'Open in new tab' },
-  askForDescription: { text: 'Please enter a textual description to apply' },
+  askForLinkUrl: { text: 'Si us plau, introdueix una URL per enllaçar' },
+  drawLinkUrl: { text: 'Obre en una nova pestanya' },
+  askForDescription: { text: 'Si us plau, introdueix una descripció textual per aplicar' },
   maxNumberOfAnnotationAlert: {
-    text1: 'Number of annot elements exceeds configurable "Maximum number of annotations"',
-    text2: 'New annotations can still be generated and will be displayed if "Show annotations" is set.',
+    text1: `El nombre d'elements d'anotació supera la "quantitat màxima d'anotacions" configurable`,
+    text2: 'Les noves anotacions encara es poden generar i es mostraran si es configura "Mostra anotacions".',
   },
   annotationsOutsideScoreWarning: {
-    text: 'Sorry, cannot currently write annotations placed outside &lt;score&gt;',
+    text: 'Ho sentim, actualment no es poden escriure anotacions situades fora de <score>',
   },
   annotationWithoutIdWarning: {
-    text1: 'Cannot write annotation as MEI anchor-point lacks xml:id.',
-    text2: 'Please assign identifiers by selecting "Manipulate" -> "Re-render MEI (with ids)" and try again.',
+    text1: "No es pot escriure l'annotació perquè el punt d'ancoratge MEI no té xml:id.",
+    text2:
+      'Assigneu identificadors seleccionant "Manipula" -> "Torna a renderitzar MEI (amb ids)" i torneu-ho a intentar.',
   },
 
   // MIDI
   midiSpeedmodeIndicator: {
-    text: 'Speed mode',
+    text: 'Mode de velocitat',
     description:
-      'Speed mode is active; only playing MIDI for current page. To play the entire encoding, disable speed mode.',
+      'El mode de velocitat està actiu; només es reprodueix el MIDI per a la pàgina actual. Per reproduir tota la codificació, desactiveu el mode de velocitat.',
   },
-  closeMidiPlaybackControlBarButton: { description: 'Hide MIDI Playback Control Bar' },
+  closeMidiPlaybackControlBarButton: { description: 'Amaga la barra de control de reproducció MIDI' },
 
-  // mei-friend SETTINGS MENU
+  // mei-friend SETTINGS MENU / MEI-FRIEND MENU DE CONFIGURACIÓ
   meiFriendSettingsHeader: {
-    text: 'mei-friend Settings',
+    text: 'Configuració de mei-friend',
   },
   mfReset: {
-    text: 'Default',
-    description: 'Reset to mei-friend defaults',
+    text: 'Per defecte',
+    description: 'Restableix els valors per defecte de mei-friend',
   },
   filterSettings: {
-    placeholder: 'Filter settings',
-    description: 'Type here to filter settings',
+    placeholder: 'Filtra les opcions',
+    description: 'Escriviu aquí per filtrar les opcions',
   },
   closeSettingsButton: {
-    description: 'Close settings panel',
+    description: 'Tanca el panell de configuració',
   },
   hideSettingsButton: {
-    description: 'Close settings panel',
+    description: 'Amaga el panell de configuració',
   },
   titleGeneral: {
     text: 'General',
-    description: 'General mei-friend settings',
+    description: 'Configuració general de mei-friend',
   },
   selectToolkitVersion: {
-    text: 'Verovio version',
+    text: 'Versió de Verovio',
     description:
-      'Select Verovio toolkit version ' +
-      '(* Switching to older versions before 3.11.0 ' +
-      'might require a refresh due to memory issues.)',
+      "Seleccioneu la versió de l'eina Verovio " +
+      '(* Canviar a versions anteriors a la 3.11.0 ' +
+      'podria requerir un refrescament per qüestions de memòria.)',
   },
   toggleSpeedMode: {
-    text: 'Speed mode',
+    text: 'Mode de velocitat',
     description:
-      'Toggle Verovio Speed Mode. ' +
-      'In speed mode, only the current page ' +
-      'is sent to Verovio to reduce rendering ' +
-      'time with large files',
+      'Activa o desactiva el mode de velocitat de Verovio. ' +
+      'En el mode de velocitat, només es processa la pàgina actual ' +
+      'per reduir el temps de renderització amb fitxers grans',
   },
   selectIdStyle: {
-    text: 'Style of generated xml:ids',
+    text: 'Estil dels xml:ids generats',
     description:
-      'Style of newly generated xml:ids (existing xml:ids are not changed)' +
-      'e.g., Verovio original: "note-0000001318117900", ' +
-      'Verovio base 36: "nophl5o", ' +
-      'mei-friend style: "note-ophl5o"',
+      'Estil dels xml:ids generats (els xml:ids existents no es canviaran)' +
+      'p. ex., original de Verovio: "note-0000001318117900", ' +
+      'base 36 de Verovio: "nophl5o", ' +
+      'estil de mei-friend: "note-ophl5o"',
   },
   addApplicationNote: {
-    text: 'Insert application statement',
+    text: "Inserir declaració d'aplicació",
     description:
-      'Insert an application statement to the encoding ' +
-      'description in the MEI header, identifying ' +
-      'application name, version, date of first ' +
-      'and last edit',
+      "Inseriu una declaració d'aplicació a la descripció " +
+      "de la codificació al capçalera MEI, identificant el nom de l'aplicació, " +
+      'la versió, la data de la primera i última edició',
   },
   selectLanguage: {
-    text: 'Language',
-    description: 'Select language of mei-friend interface.',
+    text: 'Idioma',
+    description: "Seleccioneu l'idioma de la interfície de mei-friend.",
   },
+
   // Drag select
   dragSelection: {
     text: 'Drag select',
@@ -427,7 +425,8 @@ export const lang = {
   dragSelectMeasures: {
     text: 'Select measures ',
     description: 'Select measures',
-  },
+  }, 
+  
   // Control menu
   controlMenuSettings: {
     text: 'Notation control bar',
