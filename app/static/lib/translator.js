@@ -1,10 +1,13 @@
 /**
  * Applies language packs to GUI elements
- *
+ * Language packs need to be listed in supportedLanguages in defaults.js
  */
 import * as l from '../lang/lang.en.js'; // default language
 import { translateLanguageSelection } from './language-selector.js';
 
+/**
+ * Translator class
+ */
 export default class Translator {
   constructor() {
     this.defaultLangCode = 'en';
@@ -92,7 +95,7 @@ export default class Translator {
           el = el.querySelector('summary');
           if (v) console.log('Found summary: ', el);
         }
-        // plus for all other items (menu items etc.)
+        // plus for all other items (menu items etc.) with IDs
         if (el) {
           if ('text' in this.lang[key]) {
             if (el.nodeName.toLowerCase() === 'input' && el.getAttribute('type') === 'button') {
