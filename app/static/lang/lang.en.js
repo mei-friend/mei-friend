@@ -398,6 +398,7 @@ export const lang = {
     text: 'Language',
     description: 'Select language of mei-friend interface.',
   },
+
   // Drag select
   dragSelection: {
     text: 'Drag select',
@@ -423,6 +424,7 @@ export const lang = {
     text: 'Select measures ',
     description: 'Select measures',
   },
+
   // Control menu
   controlMenuSettings: {
     text: 'Notation control bar',
@@ -448,6 +450,7 @@ export const lang = {
     text: 'Show speed mode checkbox',
     description: 'Show speed mode checkbox in notation control menu',
   },
+  
   // MIDI Playback
   titleMidiPlayback: {
     text: 'MIDI playback',
