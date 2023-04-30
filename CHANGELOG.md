@@ -2,7 +2,7 @@
 ### 0.8.10 Internationalization
 * Multi-language support with separate language pack files per language
 * Language packs currently available for English and German, more language packs to come
-* First draft of spanish language pack
+* First draft of spanish, italian, french, and catalan language pack
 * Remove transposeTosoundingPitch default flag for Verovio
 ### 0.8.9 patch
 * Fix bug when notation zooming resulted in missing notation when MIDI manu bar is activated

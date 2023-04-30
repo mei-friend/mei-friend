@@ -6,6 +6,7 @@ import { translator } from './main.js';
 
 /**
  * language codes after ISO-639-1, please enter new codes alphabetically
+ * TODO: Japanese, Chinese, Polish
  */
 export const supportedLanguages = {
   ca: {
