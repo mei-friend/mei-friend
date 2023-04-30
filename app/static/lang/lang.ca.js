@@ -401,401 +401,404 @@ export const lang = {
     description: "Seleccioneu l'idioma de la interfície de mei-friend.",
   },
 
-  // Drag select
+  // Drag select / Selecció per arrossegament
   dragSelection: {
-    text: 'Drag select',
-    description: 'Select elements in notation with mouse drag',
+    text: 'Selecciona per arrossegament',
+    description: 'Selecciona elements de la notació amb arrossegament del ratolí',
   },
   dragSelectNotes: {
-    text: 'Select notes',
-    description: 'Select notes',
+    text: 'Selecciona notes',
+    description: 'Selecciona notes',
   },
   dragSelectRests: {
-    text: 'Select rests',
-    description: 'Select rests and repeats (rest, mRest, beatRpt, halfmRpt, mRpt)',
+    text: 'Selecciona pauses',
+    description: 'Selecciona pauses i repeticions (rest, mRest, beatRpt, halfmRpt, mRpt)',
   },
   dragSelectControlElements: {
-    text: 'Select placement elements ',
-    description: 'Select placement elements (i.e., with a @placement attribute: ' + att.attPlacement.join(', ') + ')',
+    text: 'Selecciona elements de posició',
+    description:
+      'Selecciona elements de posició (és a dir, amb un atribut @placement: ' + att.attPlacement.join(', ') + ')',
   },
   dragSelectSlurs: {
-    text: 'Select slurs ',
-    description: 'Select slurs (i.e., elements with @curvature attribute: ' + att.attCurvature.join(', ') + ')',
+    text: 'Selecciona lligadures',
+    description:
+      "Selecciona lligadures (és a dir, elements amb l'atribut @curvature: " + att.attCurvature.join(', ') + ')',
   },
   dragSelectMeasures: {
-    text: 'Select measures ',
-    description: 'Select measures',
-  }, 
-  
-  // Control menu
-  controlMenuSettings: {
-    text: 'Notation control bar',
-    description: 'Define items to be shown in control menu above the notation',
-  },
-  controlMenuFlipToPageControls: {
-    text: 'Show flip to page controls',
-    description: 'Show flip to page controls in notation control menu',
-  },
-  controlMenuUpdateNotation: {
-    text: 'Show notation update controls',
-    description: 'Show notation update behavior controls in notation control menu',
-  },
-  controlMenuFontSelector: {
-    text: 'Show notation font selector',
-    description: 'Show notation font (SMuFL) selector in notation control menu',
-  },
-  controlMenuNavigateArrows: {
-    text: 'Show navigation arrows',
-    description: 'Show notation navigation arrows in notation control menu',
-  },
-  controlMenuSpeedmodeCheckbox: {
-    text: 'Show speed mode checkbox',
-    description: 'Show speed mode checkbox in notation control menu',
-  },
-  // MIDI Playback
-  titleMidiPlayback: {
-    text: 'MIDI playback',
-    description: 'MIDI playback settings',
-  },
-  showMidiPlaybackContextualBubble: {
-    text: 'Show playback shortcut',
-    description:
-      'Causes a shortcut (bubble in bottom left corner; ' +
-      'click to immediately start playback) to appear ' +
-      'when the MIDI playback control bar is closed',
-  },
-  showMidiPlaybackControlBar: {
-    text: 'Show MIDI playback control bar',
-    description: 'Show MIDI playback control bar',
-  },
-  scrollFollowMidiPlayback: {
-    text: 'Scroll-follow MIDI playback',
-    description: 'Scroll notation panel to follow MIDI playback on current page',
-  },
-  pageFollowMidiPlayback: {
-    text: 'Page-follow MIDI playback',
-    description: 'Automatically flip pages to follow MIDI playback',
-  },
-  highlightCurrentlySoundingNotes: {
-    text: 'Highlight currently-sounding notes',
-    description: 'Visually highlight currently-sounding notes in the notation panel during MIDI playback ',
+    text: 'Selecciona mesures',
+    description: 'Selecciona mesures',
   },
 
-  // Transposition
+  // Control menu / Menú de control
+  controlMenuSettings: {
+    text: 'Barra de control de la notació',
+    description: 'Defineix els elements que es mostraran en el menú de control sobre la notació',
+  },
+  controlMenuFlipToPageControls: {
+    text: 'Mostra controls per girar pàgina',
+    description: 'Mostra controls per girar pàgina en el menú de control de la notació',
+  },
+  controlMenuUpdateNotation: {
+    text: "Mostra controls d'actualització de la notació",
+    description: "Mostra controls de comportament d'actualització de la notació en el menú de control de la notació",
+  },
+  controlMenuFontSelector: {
+    text: 'Mostra selector de font de notació',
+    description: 'Mostra el selector de fonts de notació (SMuFL) en el menú de control de la notació',
+  },
+  controlMenuNavigateArrows: {
+    text: 'Mostra fletxes de navegació',
+    description: 'Mostra les fletxes de navegació de la notació en el menú de control de la notació',
+  },
+  controlMenuSpeedmodeCheckbox: {
+    text: 'Mostra casella de selecció de mode de velocitat',
+    description: 'Mostra la casella de selecció de mode de velocitat en el menú de control de la notació',
+  },
+
+  // MIDI Playback / Reproducció MIDI
+  titleMidiPlayback: {
+    text: 'Reproducció MIDI',
+    description: 'Configuració de reproducció MIDI',
+  },
+  showMidiPlaybackContextualBubble: {
+    text: 'Mostra la drecera de reproducció',
+    description:
+      'Fa que aparegui una drecera (bombolla a la cantonada inferior esquerra; ' +
+      'fes clic per iniciar immediatament la reproducció) ' +
+      'quan la barra de control de reproducció MIDI està tancada',
+  },
+  showMidiPlaybackControlBar: {
+    text: 'Mostra la barra de control de reproducció MIDI',
+    description: 'Mostra la barra de control de reproducció MIDI',
+  },
+  scrollFollowMidiPlayback: {
+    text: 'Segueix la reproducció MIDI al desplaçament',
+    description: 'Desplaça el panell de notació per seguir la reproducció MIDI a la pàgina actual',
+  },
+  pageFollowMidiPlayback: {
+    text: 'Segueix la reproducció MIDI a la pàgina',
+    description: 'Gira les pàgines automàticament per seguir la reproducció MIDI',
+  },
+  highlightCurrentlySoundingNotes: {
+    text: 'Destaca les notes que sonen actualment',
+    description: 'Destaca visualment les notes que sonen actualment al panell de notació durant la reproducció MIDI',
+  },
+
+  // Transposition / Transposició
   titleTransposition: {
-    text: 'Transpose',
-    description: 'Transpose score information',
+    text: 'Transposició',
+    description: 'Transposa la informació de la partitura',
   },
   enableTransposition: {
-    text: 'Enable transposition',
+    text: 'Activa la transposició',
     description:
-      'Enable transposition settings, to be applied through the transpose button below. The transposition will be applied to the notation only, the encoding remains unchanged, unless you click the item "Rerender via Verovio" in the "Manipulate" dropdown menu.',
+      "Activa la configuració de transposició, per aplicar-la a través del botó de transposició que hi ha a sota. La transposició només s'aplica a la notació, l'encodatge es manté sense canvis, llevat que facis clic a l'element 'Torna a renderitzar via Verovio' al menú desplegable 'Manipular'.",
   },
   transposeInterval: {
-    text: 'Transpose by interval',
+    text: 'Transposa per interval',
     description:
-      'Transpose encoding by chromatic interval by the most common intervals (Verovio supports the base-40 system)',
+      "Transposa l'encodatge per interval cromàtic, amb els intervals més comuns (Verovio suporta el sistema base-40)",
     labels: [
-      'Perfect Unison',
-      'Augmented Unison',
-      'Diminished Second',
-      'Minor Second',
-      'Major Second',
-      'Augmented Second',
-      'Diminished Third',
-      'Minor Third',
-      'Major Third',
-      'Augmented Third',
-      'Diminished Fourth',
-      'Perfect Fourth',
-      'Augmented Fourth',
-      'Diminished Fifth',
-      'Perfect Fifth',
-      'Augmented Fifth',
-      'Diminished Sixth',
-      'Minor Sixth',
-      'Major Sixth',
-      'Augmented Sixth',
-      'Diminished Seventh',
-      'Minor Seventh',
-      'Major Seventh',
-      'Augmented Seventh',
-      'Diminished Octave',
-      'Perfect Octave',
+      'Uníson perfecte',
+      'Uníson augmentat',
+      'Segona disminuïda',
+      'Segona menor',
+      'Segona major',
+      'Segona augmentada',
+      'Tercera disminuïda',
+      'Tercera menor',
+      'Tercera major',
+      'Tercera augmentada',
+      'Quarta disminuïda',
+      'Quarta perfecta',
+      'Quarta augmentada',
+      'Cinquena disminuïda',
+      'Cinquena perfecta',
+      'Cinquena augmentada',
+      'Sisena disminuïda',
+      'Sisena menor',
+      'Sisena major',
+      'Sisena augmentada',
+      'Setena disminuïda',
+      'Setena menor',
+      'Setena major',
+      'Setena augmentada',
+      'Octava disminuïda',
+      'Octava perfecta',
     ],
   },
   transposeKey: {
-    text: 'Transpose to key',
-    description: 'Transpose to key',
+    text: 'Transposar a tonalitat',
+    description: 'Transposar a tonalitat',
     labels: [
-      'C# major / A# minor',
-      'F# major / D# minor',
-      'B major / G# minor',
-      'E major / C# minor',
-      'A major / F# minor',
-      'D major / B minor',
-      'G major / E minor',
-      'C major / A minor',
-      'F major / D minor',
-      'Bb major / G minor',
-      'Eb major / C minor',
-      'Ab major / F minor',
-      'Db major / Bb minor',
-      'Gb major / Eb minor',
-      'Cb major / Ab minor',
+      'Do# major / La# menor',
+      'Fa# major / Re# menor',
+      'Si major / Sol# menor',
+      'Mi major / Do# menor',
+      'La major / Fa# menor',
+      'Re major / Si menor',
+      'Sol major / Mi menor',
+      'Do major / La menor',
+      'Fa major / Re menor',
+      'Sib major / Sol menor',
+      'Mib major / Do menor',
+      'Lab major / Fa menor',
+      'Reb major / Sib menor',
+      'Solb major / Mib menor',
+      'Dob major / Lab menor',
     ],
   },
   transposeDirection: {
-    text: 'Pitch direction',
-    description: 'Pitch direction of transposition (up/down)',
-    labels: ['Up', 'Down', 'Closest'],
+    text: 'Direcció de transposició',
+    description: 'Direcció de transposició (amunt/avall)',
+    labels: ['Amunt', 'Avall', 'Més proper'],
   },
   transposeButton: {
-    text: 'Transpose',
+    text: 'Transposar',
     description:
-      'Apply transposition with above settings to the notation, while the MEI encoding remains unchanged. To also transpose the MEI encoding with the current settings, use "Rerender via Verovio" in the "Manipulate" dropdown menu.',
+      "Aplicar transposició amb les opcions anteriors a la notació, mentre que l'encodatge MEI roman inalterat. Per transposar també l'encodatge MEI amb les opcions actuals, utilitzeu 'Tornar a renderitzar via Verovio' al menú desplegable 'Manipular'.",
   },
 
-  // Renumber measures
+  // Renumber measures / Renumber measures
   renumberMeasuresHeading: {
-    text: 'Renumber measures',
-    description: 'Settings for renumbering measures',
+    text: 'Reenumerar compàsos',
+    description: 'Opcions per reenumerar els compàsos',
   },
   renumberMeasureContinueAcrossIncompleteMeasures: {
-    text: 'Continue across incomplete measures',
-    description: 'Continue measure numbers across incomplete measures (@metcon="false")',
+    text: 'Continuar a través de compàsos incomplets',
+    description: "Continuar la numeració de compàsos a través de compàsos incomplets (@metcon='false')",
   },
   renumberMeasuresUseSuffixAtMeasures: {
-    text: 'Suffix at incomplete measures',
-    description: 'Use number suffix at incomplete measures (e.g., 23-cont)',
-    labels: ['none', '-cont'],
+    text: 'Sufix als compàsos incomplets',
+    description: 'Utilitzar sufix numèric als compàsos incomplets (p. ex. 23-cont)',
+    labels: ['cap', '-cont'],
   },
   renumberMeasuresContinueAcrossEndings: {
-    text: 'Continue across endings',
-    description: 'Continue measure numbers across endings',
+    text: 'Continuar a través de finals',
+    description: 'Continuar la numeració de compàsos a través de finals',
   },
   renumberMeasuresUseSuffixAtEndings: {
-    text: 'Suffix at endings',
-    description: 'Use number suffix at endings (e.g., 23-a)',
+    text: 'Sufix als finals',
+    description: 'Utilitzar sufix numèric als finals (p. ex. 23-a)',
   },
 
-  // Annotations
+  // Annotations / Annotations
   titleAnnotations: {
-    text: 'Annotations',
-    description: 'Annotation settings',
+    text: 'Anotacions',
+    description: "Opcions d'annotació",
   },
   showAnnotations: {
-    text: 'Show annotations',
-    description: 'Show annotations in notation',
+    text: 'Mostrar anotacions',
+    description: 'Mostrar anotacions a la notació',
   },
   showAnnotationPanel: {
-    text: 'Show annotation panel',
-    description: 'Show annotation panel',
+    text: "Mostrar panell d'annotació",
+    description: "Mostrar panell d'annotació",
   },
   annotationDisplayLimit: {
-    text: 'Maximum number of annotations',
-    description: 'Maximum number of annotations to display (large numbers may slow mei-friend)',
+    text: "Nombre màxim d'anotacions",
+    description: "Nombre màxim d'anotacions a mostrar (nombres grans poden afectar el rendiment de mei-friend)",
   },
 
-  // Facsimile
+  // Facsimile / / Facsímil
   titleFacsimilePanel: {
-    text: 'Facsimile panel',
-    description: 'Show the facsimile images of the source edition, if available',
+    text: 'Panell de facsímil',
+    description: "Mostra les imatges de facsímil de l'edició font, si estan disponibles",
   },
   showFacsimilePanel: {
-    text: 'Show facsimile panel',
-    description: 'Show the score images of the source edition provided in the facsimile element',
+    text: 'Mostra el panell de facsímil',
+    description: "Mostra les imatges de partitura de l'edició font proporcionades a l'element de facsímil",
   },
   selectFacsimilePanelOrientation: {
-    text: 'Facsimile panel position',
-    description: 'Select facsimile panel position relative to notation',
-    labels: ['left', 'right', 'top', 'bottom'],
+    text: 'Posició del panell de facsímil',
+    description: 'Selecciona la posició del panell de facsímil en relació amb la notació',
+    labels: ['esquerra', 'dreta', 'superior', 'inferior'],
   },
   facsimileZoomInput: {
-    text: 'Facsimile image zoom (%)',
-    description: 'Zoom level of facsimile image (in percent)',
+    text: "Zoom d'imatge de facsímil (%)",
+    description: 'Nivell de zoom de la imatge de facsímil (en percentatge)',
   },
   showFacsimileFullPage: {
-    text: 'Show full page',
-    description: 'Show facsimile image on full page',
+    text: 'Mostra la pàgina completa',
+    description: 'Mostra la imatge de facsímil a la pàgina completa',
   },
   showFacsimileZones: {
-    text: 'Show facsimile zone boxes',
-    description: 'Show facsimile zone bounding boxes',
+    text: 'Mostra les caixes de zona de facsímil',
+    description: 'Mostra les caixes delimitadores de zona de facsímil',
   },
   editFacsimileZones: {
-    text: 'Edit facsimile zones',
-    description: 'Edit facsimile zones (will link bounding boxes to facsimile zones)',
+    text: 'Edita les zones de facsímil',
+    description: 'Edita les zones de facsímil (vincularà les caixes delimitadores a les zones de facsímil)',
   },
 
-  // Supplied element
+  // Supplied element / Element subministrat
   titleSupplied: {
-    text: 'Handle editorial content',
-    description: 'Control handling of <supplied> elements',
+    text: 'Gestiona contingut editorial',
+    description: 'Control·la el tractament dels elements <supplied>',
   },
   showSupplied: {
-    text: 'Show <supplied> elements',
-    description: 'Highlight all elements contained by a <supplied> element',
+    text: 'Mostra els elements <supplied>',
+    description: 'Destaca tots els elements continguts per un element <supplied>',
   },
   suppliedColor: {
-    text: 'Select <supplied> highlight color',
-    description: 'Select <supplied> highlight color',
+    text: 'Selecciona el color de ressaltat per <supplied>',
+    description: 'Selecciona el color de ressaltat per <supplied>',
   },
   respSelect: {
-    text: 'Select <supplied> responsibility',
-    description: 'Select responsibility id',
+    text: 'Selecciona la responsabilitat per <supplied>',
+    description: 'Selecciona la identificació de la responsabilitat',
   },
 
-  //  EDITOR SETTINGS / CODEMIRROR SETTINGS
+  //  EDITOR SETTINGS / CODEMIRROR SETTINGS // CONFIGURACIÓ DE L'EDITOR / CONFIGURACIÓ DE CODEMIRROR
   editorSettingsHeader: {
-    text: 'Editor Settings',
+    text: "Configuració de l'editor",
   },
   cmReset: {
-    text: 'Default',
-    description: 'Reset to mei-friend defaults',
+    text: 'Per defecte',
+    description: 'Restableix els valors per defecte de mei-friend',
   },
   titleAppearance: {
-    title: 'Editor appearance',
-    description: 'Controls the appearance of the editor',
+    title: "Aparença de l'editor",
+    description: "Controla l'aparença de l'editor",
   },
   zoomFont: {
-    title: 'Font size (%)',
-    description: 'Change font size of editor (in percent)',
+    title: 'Mida de la font (%)',
+    description: "Canvia la mida de la font de l'editor (en percentatge)",
   },
   theme: {
-    title: 'Theme',
-    description: 'Select the theme of the editor',
+    title: 'Tema',
+    description: "Selecciona el tema de l'editor",
   },
   matchTheme: {
-    title: 'Notation matches theme',
-    description: 'Match notation to editor color theme',
+    title: 'La notació coincideix amb el tema',
+    description: "Fes que la notació coincideixi amb el tema de colors de l'editor",
   },
   tabSize: {
-    title: 'Indentation size',
-    description: 'Number of space characters for each indentation level',
+    title: 'Mida de la tabulació',
+    description: "Nombre de caràcters d'espai per cada nivell de tabulació",
   },
   lineWrapping: {
-    title: 'Line wrapping',
-    description: 'Whether or not lines are wrapped at end of panel',
+    title: 'Salt de línia',
+    description: "Indica si les línies s'han de tallar al final del panell",
   },
   lineNumbers: {
-    title: 'Line numbers',
-    description: 'Show line numbers',
+    title: 'Nombres de línia',
+    description: 'Mostra els nombres de línia',
   },
   firstLineNumber: {
-    title: 'First line number',
-    description: 'Set first line number',
+    title: 'Primer número de línia',
+    description: 'Estableix el primer número de línia',
   },
   foldGutter: {
-    title: 'Code folding',
-    description: 'Enable code folding through fold gutters',
+    title: 'Plegament de codi',
+    description: 'Permet plegar el codi a través de les barres de plegament',
   },
   titleEditorOptions: {
-    title: 'Editor behavior',
-    description: 'Controls the behavior of the editor',
+    title: "Comportament de l'editor",
+    description: "Controla el comportament de l'editor",
   },
   autoValidate: {
-    title: 'Auto validation',
-    description: 'Validate encoding against schema automatically after each edit',
+    title: 'Validació automàtica',
+    description: 'Valida la codificació automàticament després de cada edició',
   },
   autoCloseBrackets: {
-    title: 'Auto close brackets',
-    description: 'Automatically close brackets at input',
+    title: 'Tancament automàtic de claudàtors',
+    description: 'Tanca els claudàtors automàticament en introduir-los',
   },
   autoCloseTags: {
-    title: 'Auto close tags',
-    description: 'Automatically close tags at input',
+    title: 'Tancament automàtic de etiquetes',
+    description: 'Tanca les etiquetes automàticament en introduir-les',
     type: 'bool',
   },
   matchTags: {
-    title: 'Match tags',
-    description: 'Highlights matched tags around editor cursor',
+    title: "Coincidència d'etiquetes",
+    description: "Resalta les etiquetes coincidents al voltant del cursor de l'editor",
   },
   showTrailingSpace: {
-    title: 'Highlight trailing spaces',
-    description: 'Highlights unnecessary trailing spaces at end of lines',
+    title: 'Resalta els espais finals',
+    description: 'Resalta els espais innecessaris al final de les línies',
   },
   keyMap: {
-    title: 'Key map',
-    description: 'Select key map',
+    title: 'Mapa de tecles',
+    description: 'Selecciona el mapa de tecles',
   },
 
-  // Verovio settings
+  // Verovio settings / Configuració de Verovio
   verovioSettingsHeader: {
-    text: 'Verovio Settings',
+    text: 'Configuració de Verovio',
   },
   vrvReset: {
-    text: 'Default',
-    description: 'Reset Verovio to mei-friend defaults',
+    text: 'Predeterminat',
+    description: 'Restableix Verovio als valors per defecte de mei-friend',
   },
 
-  // main.js alert messages
+  // main.js alert messages / Missatges d'alerta del fitxer main.js
   isSafariWarning: {
-    text:
-      'It seems that you are using Safari as your browser, on which ' +
-      'mei-friend unfortunately does not currently support schema validation. ' +
-      'Please use another browser for full validation support.',
+    text: "Sembla que esteu utilitzant Safari com a navegador, el qual, desafortunadament, no és compatible actualment amb la validació de l'esquema de mei-friend. Si us plau, utilitzeu un altre navegador per obtenir suport complet de validació.",
   },
   githubLoggedOutWarning: {
-    text: `You have logged out of mei-friend's GitHub integration, but your browser is still logged in to GitHub!
-      <a href="https://github.com/logout" target="_blank">Click here to logout from GitHub</a>.`,
+    text: `Heu tancat la sessió d'integració de mei-friend amb GitHub, 
+    però el vostre navegador encara té oberta la sessió a GitHub! 
+    <a href="https://github.com/logout" target="_blank">Cliqueu aquí per tancar la sessió a GitHub</a>.`,
   },
   generateUrlError: {
-    text: 'Cannot generate URL for local file ',
+    text: 'No es pot generar la URL per al fitxer local ',
   },
   generateUrlSuccess: {
-    text: 'URL successfully copied to clipboard',
+    text: 'URL copiada al porta-retalls correctament',
   },
   generateUrlNotCopied: {
-    text: 'URL not copied to clipboard, please try again!',
+    text: "La URL no s'ha copiat al porta-retalls, si us plau, torneu-ho a provar!",
   },
-  errorCode: { text: 'Error Code' },
-  submitBugReport: { text: 'Submit bug report' },
-  loadingSchema: { text: 'Loading Schema' },
-  schemaLoaded: { text: 'Schema loaded' },
-  noSchemaFound: { text: 'No schema information found in MEI.' },
-  schemaNotFound: { text: 'Schema not found' },
-  errorLoadingSchema: { text: 'Error at loading schema' },
-  notValidated: { text: 'Not validated. Press here to validate.' },
-  validatingAgainst: { text: 'Validating against' },
-  validatedAgainst: { text: 'Validated against' },
-  validationMessages: { text: 'validation messages' },
-  validationComplete: { text: 'Validation complete' },
-  validationFailed: { text: 'Validation failed' },
-  noErrors: { text: 'no errors' },
-  errorsFound: { text: 'errors found' }, // 5 errors found
+  errorCode: { text: "Codi d'error" },
+  submitBugReport: { text: 'Enviar informe d’error' },
+  loadingSchema: { text: 'Carregant esquema' },
+  schemaLoaded: { text: 'Esquema carregat' },
+  noSchemaFound: { text: "No s'ha trobat informació d'esquema a MEI." },
+  schemaNotFound: { text: "No s'ha trobat l'esquema" },
+  errorLoadingSchema: { text: 'Error en carregar l’esquema' },
+  notValidated: { text: 'No validat. Cliqueu aquí per validar.' },
+  validatingAgainst: { text: 'Validant contra' },
+  validatedAgainst: { text: 'Validat contra' },
+  validationMessages: { text: 'missatges de validació' },
+  validationComplete: { text: 'Validació completa' },
+  validationFailed: { text: 'Validació fallida' },
+  noErrors: { text: 'sense errors' },
+  errorsFound: { text: `s’han trobat errors` }, // 5 errors trobats // 5 errors found
 
-  // github-menu.js
-  repository: { text: 'Repository' },
-  branch: { text: 'Branch' },
-  path: { text: 'Path' },
-  commit: { text: 'Commit' },
-  commitLog: { text: 'Commit log' },
-  commitAsNewFile: { text: 'Commit as new file' },
-  date: { text: 'Date' },
-  author: { text: 'Author' },
-  message: { text: 'Message' },
-  none: { text: 'None' },
-  fileName: { description: 'File name' },
-  forkRepository: { text: 'Fork repository' },
-  forkError: { text: 'Sorry, could not fork repository' },
-  loadingFile: { text: 'Loading file' },
-  loadingFromGithub: { text: 'Loading from Github' },
-  logOut: { text: 'Log out' },
-  githubLogout: { text: 'Log out' },
-  selectRepository: { text: 'Select repository' },
-  selectBranch: { text: 'Select branch' },
-  commitPlaceholder: { text: 'Updated using mei-friend online' },
-  reportIssueWithEncoding: { text: 'Report issue with encoding' },
-  clickToOpenInMeiFriend: { text: 'Click to open in mei-friend' },
-  repoAccessError: { text: 'Sorry, cannot access repositories for supplied user or organisation' },
-  allComposers: { text: 'All composers' }, // fork-repository.js
+  // github-menu.js / github-menu.js
+  repository: { text: 'Repositori' },
+  branch: { text: 'Branca' },
+  path: { text: 'Camí' },
+  commit: { text: 'Confirmar' },
+  commitLog: { text: 'Registre de confirmacions' },
+  commitAsNewFile: { text: 'Confirmar com a nou fitxer' },
+  date: { text: 'Data' },
+  author: { text: 'Autor' },
+  message: { text: 'Missatge' },
+  none: { text: 'Cap' },
+  fileName: { description: 'Nom del fitxer' },
+  forkRepository: { text: 'Bifurcar el repositori' },
+  forkError: { text: "Ho sentim, no s'ha pogut bifurcar el repositori" },
+  loadingFile: { text: 'Carregant fitxer' },
+  loadingFromGithub: { text: 'Carregant des de Github' },
+  logOut: { text: 'Tancar sessió' },
+  githubLogout: { text: 'Tancar sessió' },
+  selectRepository: { text: 'Seleccionar repositori' },
+  selectBranch: { text: 'Seleccionar branca' },
+  commitPlaceholder: { text: 'Actualitzat amb mei-friend en línia' },
+  reportIssueWithEncoding: { text: "Informar d'un problema amb la codificació" },
+  clickToOpenInMeiFriend: { text: 'Feu clic per obrir a mei-friend' },
+  repoAccessError: {
+    text: "Ho sentim, no es poden accedir als repositoris per a l'usuari o organització subministrada",
+  },
+  allComposers: { text: 'Tots els compositors' },
 
-  // utils renumber measures
-  renumberMeasuresModalText: { text: 'Renumber measures' },
-  renumberMeasuresModalTest: { text: 'Test' },
+  // utils renumber measures / fork-repository.js
+  renumberMeasuresModalText: { text: 'Reenumerar mesures' },
+  renumberMeasuresModalTest: { text: 'Prova' },
   renumberMeasuresWillBe: { text: '' },
-  renumberMeasuresWouldBe: { text: 'would be' },
-  renumberMeasuresChangedTo: { text: 'changed to' },
-  renumberMeasureMeasuresRenumbered: { text: 'measures renumbered' },
+  renumberMeasuresWouldBe: { text: 'seria' },
+  renumberMeasuresChangedTo: { text: 'canviat a' },
+  renumberMeasureMeasuresRenumbered: { text: 'mesures reenumerades' },
 };
