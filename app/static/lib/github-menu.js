@@ -519,6 +519,7 @@ function handleWorkflowsListReceived(resp) {
         workflowSpan.dataset.path = wf.path;
         workflowSpan.dataset.state = wf.state;
         workflowSpan.dataset.url = wf.url;
+        workflowSpan.dataset.name = wf.name;
         workflowSpan.title = wf.url;
         workflowSpan.innerText = "GH Action: " + wf.name;
         workflowSpan.classList.add("inline-block-tight", "workflow");
@@ -605,18 +606,59 @@ export function renderCommitLog() {
   githubMenu.appendChild(hr);
   githubMenu.appendChild(logTable);
 } // renderCommitLog()
+
 async function handleClickGithubAction(e) {
+  const overlay = document.getElementById("githubActionsOverlay")
+  const workflowName = document.getElementById("requestedWorkflowName");
+  const statusMsg = document.getElementById("githubActionsStatus")
+  const cancelBtn = document.getElementById("githubActionsCancelButton");
+  const runBtn = document.getElementById("githubActionsRunButton");
   let target = e.target;
   if(target.nodeName === "A") { 
     target = target.firstChild;
   }
+  overlay.style.display = "block";
+  workflowName.innerText = target.dataset.name;
+  workflowName.dataset.node_id = target.dataset.node_id;
+  cancelBtn.onclick = () => { 
+    overlay.style.display = "none";
+    statusMsg.innerHTML = "";
+  }
+  runBtn.onclick = () => { 
+    cancelBtn.setAttribute("disabled", true);
+    runBtn.setAttribute("disabled", true);
+    const githubLoadingIndicator = document.getElementById('GithubLogo');
+    githubLoadingIndicator.classList.add("clockwise");
+    github.requestActionWorkflowRun(workflowName.dataset.node_id, { 
+      filepath: github.filepath 
+    }).then(workflowRunResp => { 
+      console.log("Got workflow run response: ", workflowRunResp);
+      if("documentation_url" in workflowRunResp) { 
+        // error
+        statusMsg.innerHTML = `<span id="githubActionErrMsg">${translator.lang.githubActionErrMsg.text}</span>: <a href="${workflowRunResp.documentation_url}" target="_blank">${workflowRunResp.message}</a>`;
+      } else { 
+        statusMsg.innerHTML = "Yay";
+        // success
+      }
+    }).catch(e => {
+     // network error
+      statusMsg.innerHTML = "Error";
+      console.error(e);
+    }).finally(() => { 
+      githubLoadingIndicator.classList.remove("clockwise");
+      cancelBtn.removeAttribute("disabled");
+      runBtn.removeAttribute("disabled");
+    });
+  }
+  /*
   const githubLoadingIndicator = document.getElementById('GithubLogo');
   githubLoadingIndicator.classList.add("clockwise");
   github.requestActionWorkflowRun(target.id, { filepath: github.filepath })
   .then(workflowRunResp => { 
     console.log("Got workflow run response: ", workflowRunResp);
   }).finally(() => githubLoadingIndicator.classList.remove("clockwise"));
-}
+  */
+} // handleClickGithubAction()
 
 export function logoutFromGithub() {
   if (storage.supported) {

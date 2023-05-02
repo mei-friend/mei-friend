@@ -251,6 +251,11 @@ export const lang = {
   openUrlChooseComposerText: { text: 'Choose a composer...' },
   openUrlOpenEncodingByUrlText: { text: 'Open Web-hosted encoding by URL' },
 
+  // github actions modal
+  githubActionErrMsg: { text: 'Could not run workflow - GitHub says'},
+  githubActionsRunBtn: { text: 'Run workflow'},
+  githubActionsCancelBtn: { text: 'Cancel'},
+
   // fork modals
   forkRepoGithubText: { text: 'Fork Github Repository' },
   forkRepoGithubExplanation: {

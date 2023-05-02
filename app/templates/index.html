@@ -580,7 +580,26 @@
     <div class="dragOverlay">
       <div class="dragOverlayText" id="dragOverlayText">Drag your input file here.</div>
     </div>
-    <div class="githubActionsOverlay">
+    <div id="githubActionsOverlay">
+      <div id="githubActionsUI">
+        <h3 id="githubActionsHeading">
+          Request GitHub Action workflow: <span id="requestedWorkflowName"></span>
+        </h3>
+        <p id="githubActionsDescription">
+          Click on "Run workflow" to ask the GitHub API to run the above workflow for you, using the input configuration specified below. Your encoding will be reloaded in its latest version once the workflow run completes.
+          <details>
+            <summary id="githubActionsInputConfig">Input configuration</summary>
+            <input type="checkbox" name="githubActionsInputFilepath" id="githubActionsInputFilepath"/>
+            <label title="If checked, sends the filepath incl. filename of the currently opened encoding as an input named 'filepath'"
+              for="githubActionsInputFilepath">filepath</label>
+          </details>
+        </p>
+        <p id="githubActionsStatus"></p>
+        <div id="githubActionsButtons">
+          <button id="githubActionsRunButton">Run workflow</button>
+          <button id="githubActionsCancelButton">Cancel</button>
+        </div>
+      </div>
     </div>
     <div class="openUrlOverlay">
       <div class="openUrlUI">
