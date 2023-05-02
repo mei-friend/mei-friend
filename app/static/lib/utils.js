@@ -1,5 +1,6 @@
 import * as e from './editor.js';
 import * as dutils from './dom-utils.js';
+import { translator } from './main.js';
 
 const xmlIdString = /(?:xml:id=)(?:['"])(\S+?)(?:['"])/;
 const numberLikeString = /(?:n=)(?:['"])(\d+?)(?:['"])/;
@@ -461,7 +462,14 @@ export function cleanAccid(xmlDoc, cm) {
 // renumber measure@n starting with startNumber
 export function renumberMeasures(v, cm, startNum = 1, change = false) {
   let measureList = v.xmlDoc.querySelectorAll('measure');
-  if (!change) v.showAlert(`<b>Renumber measures ${change ? '' : 'TEST'}</b>`, change ? 'success' : 'info', 120000);
+  //if (!change)
+  v.showAlert(
+    `<b>${translator.lang.renumberMeasuresModalText.text} ${
+      change ? ' ' : ' (' + translator.lang.renumberMeasuresModalTest.text + ')'
+    }</b>`,
+    change ? 'success' : 'info',
+    180000
+  );
   console.info('renumber Measures list: ', measureList);
   let i;
   let lgt = measureList.length;
@@ -555,17 +563,21 @@ export function renumberMeasures(v, cm, startNum = 1, change = false) {
     if (measureList[i].hasAttribute('right')) right = measureList[i].getAttribute('right');
 
     let msg =
-      'measure n="' +
+      'measure@n="' +
       measureList[i].getAttribute('n') +
       '" ' +
-      (change ? '' : 'would be ') +
-      'changed to n="' +
+      (change
+        ? translator.lang.renumberMeasuresWillBe.text + ' '
+        : translator.lang.renumberMeasuresWouldBe.text + ' ') +
+      translator.lang.renumberMeasuresChangedTo.text +
+      ' @n="' +
       (n + suffix) +
       '"' +
-      (right ? ', right:' + right : '') +
-      (metcons ? ', metcons:' + metcons : '');
+      (right ? ', @right:' + right : '') +
+      (metcons ? ', @metcons:' + metcons : '');
     console.info(msg);
-    if (!change) v.updateAlert(msg);
+    //if (!change)
+    v.updateAlert(msg);
     // change measure@n
     if (change) {
       measureList[i].setAttribute('n', n + suffix);
@@ -583,10 +595,17 @@ export function renumberMeasures(v, cm, startNum = 1, change = false) {
     metcon = '';
   }
   // let re = buffer.groupChangesSinceCheckpoint(checkPoint);
-  let str = 'renumberMeasures: ' + i + ' measures renumbered';
+  let str =
+    '<b>' +
+    translator.lang.renumberMeasuresModalText.text +
+    ': ' +
+    i +
+    ' ' +
+    translator.lang.renumberMeasureMeasuresRenumbered.text +
+    '</b><br><br>';
   console.info(str);
-  if (!change) v.updateAlert(str);
-  //, grouped ', re);
+  //if (!change)
+  v.updateAlert(str);
 } // renumberMeasures()
 
 // convert all

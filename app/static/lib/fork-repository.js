@@ -1,5 +1,5 @@
 import { calcSizeOfContainer } from './resizer.js';
-import { sampleEncodings, samp, github } from './main.js';
+import { sampleEncodings, samp, github, translator } from './main.js';
 import { forkRepoClicked } from './github-menu.js';
 
 const seperator = '|MEI-FRIEND|';
@@ -7,11 +7,11 @@ const seperator = '|MEI-FRIEND|';
 function onOrganizationInputChange(e) {
   if (e.target.value) {
     const userOrgRepos = document.getElementById('forkRepositoryInputRepo');
-    userOrgRepos.innerHTML = '<option value="" disabled selected hidden>Choose a repository</option>';
+    userOrgRepos.innerHTML = '<option value="" disabled selected hidden>' + translator.lang.selectRepository.text + '</option>';
     document.getElementById('forkRepoGithubLogo').classList.add('clockwise');
     let repos = fillInUserOrgRepos();
   }
-}
+} // onOrganizationInputChange()
 
 function onSelectComposer(e) {
   const orgSelector = document.querySelector('#forkRepertoireOrganization');
@@ -20,7 +20,7 @@ function onSelectComposer(e) {
   orgSelector.addEventListener('change', onSelectOrganization);
   const repoSelector = document.querySelector('#forkRepertoireRepository');
   // clear repository selector
-  repoSelector.innerHTML = '<option value="" disabled selected hidden>Choose a repository</option>';
+  repoSelector.innerHTML = '<option value="" disabled selected hidden>' + translator.lang.selectRepository.text + '</option>';
   repoSelector.removeEventListener('change', onSelectRepository);
   repoSelector.addEventListener('change', onSelectRepository);
   let composer = false;
@@ -58,7 +58,7 @@ function onSelectComposer(e) {
       repoOpt.value = r;
       repoSelector.appendChild(repoOpt);
     });
-}
+} // onSelectComposer()
 
 async function fillInUserOrgRepos(per_page = 30, page = 1) {
   // read a page of repos from the specified user or organisation
@@ -93,13 +93,13 @@ async function fillInUserOrgRepos(per_page = 30, page = 1) {
     } else {
       // give up!
       document.getElementById('forkRepoGithubLogo').classList.remove('clockwise');
-      status.forEach((s) => (s.innerHTML = "Sorry, can't access repositories for supplied user" + ' or organization.'));
+      status.forEach((s) => (s.innerHTML = translator.lang.repoAccessError.text));
       if ('message' in repos) {
-        status.forEach((s) => (s.innerHTML += ' GitHub message: <i>' + repos['message'] + '</i>'));
+        status.forEach((s) => (s.innerHTML += ' Github ' + translator.lang.message.text + ': <i>' + repos['message'] + '</i>'));
       }
     }
   }
-}
+} // fillInUserOrgRepos()
 
 function onSelectOrganization(e) {
   const orgInput = document.querySelector('#forkRepositoryInputName');
@@ -133,7 +133,7 @@ function onSelectOrganization(e) {
       repoOpt.value = r;
       repoSelector.appendChild(repoOpt);
     });
-}
+} // onSelectOrganization()
 
 function onSelectRepository(e) {
   if (e.target.value) {
@@ -143,7 +143,7 @@ function onSelectRepository(e) {
     orgInput.value = orgRepo[0];
     repoInput.value = orgRepo[1];
   }
-}
+} // onSelectRepository()
 
 export function forkAndOpen(github, url) {
   // ensure URL matches our expectations
@@ -183,7 +183,7 @@ export function forkAndOpen(github, url) {
   } else {
     console.warn("'fork' parameter specified but supplied URL violates raw GitHub URL expectations");
   }
-}
+} // forkAndOpen()
 
 export function forkAndOpenClicked(github, components) {
   // set up values for forkRepoClicked():
@@ -193,7 +193,7 @@ export function forkAndOpenClicked(github, components) {
   document.getElementById('forkRepositoryInputFilepathOverride').value = '/' + components[4];
   document.getElementById('GithubLogo').classList.add('clockwise');
   forkRepoClicked();
-}
+} // forkAndOpenClicked()
 
 export function forkRepository(github, components) {
   let sz = calcSizeOfContainer();
@@ -210,7 +210,7 @@ export function forkRepository(github, components) {
   let forkRepoSelector = document.querySelector('#forkRepositoryInputRepo');
   let forkToSelector = document.querySelector('#forkRepositoryToSelector');
   // initialise public repertoire dropdowns
-  composerSelector.innerHTML = '<option value="" >All composers</option>';
+  composerSelector.innerHTML = '<option value="" >' + translator.lang.allComposers.text + '</option>';
   let composers = new Set(sampleEncodings.map((s) => s[samp.COMPOSER]));
   Array.from(composers)
     .sort()
@@ -249,7 +249,7 @@ export function forkRepository(github, components) {
     document.getElementById('forkRepoGithubLogo').classList.add('clockwise');
     fillInUserOrgRepos(); // initialise with pre-supplied name
   }
-}
+} // forkRepository()
 
 export function forkRepositoryCancel() {
   // user has cancelled the "fork repository" action
@@ -258,4 +258,4 @@ export function forkRepositoryCancel() {
   let forkRepositoryElements = Array.from(document.querySelectorAll('.forkRepositoryOverlay'));
   // show file status, hide forkRepository
   forkRepositoryElements.forEach((e) => (e.style.display = 'none'));
-}
+} // forkRepositoryCancel()

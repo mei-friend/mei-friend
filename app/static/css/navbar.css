@@ -131,15 +131,21 @@
   background-color: var(--settingsBackgroundAlternativeColor);
 }
 
-.dropdown-content a:hover .btn {
+.dropdown-content a:hover .btn,
+.dropdown-content tr:hover {
   background-color: var(--settingsBackgroundColor);
+}
+
+.dropdown-content table {
+  border: 0px;
+  border-spacing:0;
 }
 
 #GithubMenu.dropdown-content a {
   justify-content: flex-start;
 }
 
-#GithubLoginLink {
+#githubLoginLink {
   float: unset;
   color: unset;
   text-align: unset;
@@ -380,4 +386,40 @@
 
 #pageRangeSelectorDiv input[type='text'] {
   max-width: 120px;
+}
+
+/* language selection list */
+#languageSelectionList {
+  position:absolute;
+  right: 0px;
+  border-radius: 4px;
+  overflow: auto;
+  padding-top:.2em;
+}
+
+#languageSelectionList td {
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+  color: var(--textColor);
+}
+
+#languageSelectionList .selectedLang {
+  background-color: var(--settingsBackgroundColor);
+}
+
+#languageSelectionList .selectedLang td { 
+  border-top: 1px solid var(--textColor);
+  border-bottom: 1px solid var(--textColor);
+}
+
+#languageSelectionList .selectedLang td:first-child {
+  border-left: 1px solid var(--textColor);
+  border-top-left-radius: 4px;
+  border-bottom-left-radius: 4px;
+}
+
+#languageSelectionList .selectedLang td:last-child {
+  border-right: 1px solid var(--textColor);
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
 }

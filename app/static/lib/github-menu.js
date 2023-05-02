@@ -11,12 +11,14 @@ import {
   setGithubInstance, // github instance setter
   setMeiFileInfo,
   storage,
+  translator,
   updateFileStatusDisplay,
   updateGithubInLocalStorage,
   v,
 } from './main.js';
 import * as icon from './../css/icons.js';
 import Github from './github.js'; // github class
+
 function forkRepo() {
   forkRepository(github);
 }
@@ -47,7 +49,7 @@ export function forkRepoClicked() {
       .catch((e) => {
         forkRepositoryStatus.forEach((s) => {
           s.classList.add('warn');
-          s.innerHTML = "Sorry, couldn't fork repository";
+          s.innerHTML = translator.lang.forkError.text;
           if (typeof e === 'object' && 'status' in e) {
             s.innerHTML = e.status + ' ' + e.statusText;
             if (e.status !== 404) {
@@ -78,13 +80,13 @@ export function forkRepoClicked() {
         document.getElementById('forkRepositoryInputFilepathOverride').value = '';
       });
   }
-}
+} // forkRepoClicked()
 
 function forkRepoCancelClicked() {
   let menuList = document.querySelectorAll('.dropdown-content');
   menuList.forEach((e) => e.classList.remove('show'));
   forkRepositoryCancel();
-}
+} // forkRepoCancelClicked()
 
 function repoHeaderClicked() {
   github.filepath = '';
@@ -92,12 +94,12 @@ function repoHeaderClicked() {
   let githubMenu = document.getElementById('GithubMenu');
   githubMenu.classList.add('forceShow');
   githubMenu.classList.add('show');
-}
+} // repoHeaderClicked()
 
 function branchesHeaderClicked(ev) {
   github.filepath = '';
   fillInRepoBranches(ev.target);
-}
+} // branchesHeaderClicked()
 
 function contentsHeaderClicked(ev) {
   // strip trailing slash (in case our filepath is a subdir)
@@ -118,7 +120,7 @@ function contentsHeaderClicked(ev) {
       console.warn("Couldn't read Github repo to fill in branch contents");
       githubLoadingIndicator.classList.remove('clockwise');
     });
-}
+} // contentsHeaderClicked()
 
 async function userRepoClicked(ev) {
   // re-init github object with selected repo
@@ -146,7 +148,7 @@ async function userRepoClicked(ev) {
   } else {
     fillInRepoBranches(ev, repoBranches);
   }
-}
+} // userRepoClicked()
 
 function repoBranchClicked(ev) {
   const githubLoadingIndicator = document.getElementById('GithubLogo');
@@ -163,7 +165,7 @@ function repoBranchClicked(ev) {
       console.warn("Couldn't read Github repo to fill in branch contents");
       githubLoadingIndicator.classList.remove('clockwise');
     });
-}
+} // repoBranchClicked()
 
 function branchContentsDirClicked(ev) {
   let target = ev.target;
@@ -177,17 +179,17 @@ function branchContentsDirClicked(ev) {
     github.filepath += '/' + target.innerText + '/';
   }
   fillInBranchContents(ev);
-}
+} // branchContentsDirClicked()
 
 function branchContentsFileClicked(ev) {
   loadFile(ev.target.innerText);
   document.getElementById('GithubMenu').classList.remove('forceShow');
-}
+} // branchContentsFileClicked()
 
 function loadFile(fileName, clearBeforeLoading = true, ev = null) {
   const githubLoadingIndicator = document.getElementById('GithubLogo');
   github.filepath += fileName;
-  console.debug(`Loading file: https://github.com/${github.githubRepo}${github.filepath}`);
+  console.debug(`${translator.lang.loadingFile.text}: https://github.com/${github.githubRepo}${github.filepath}`);
   fillInBranchContents(ev);
   githubLoadingIndicator.classList.add('clockwise');
   github
@@ -195,7 +197,7 @@ function loadFile(fileName, clearBeforeLoading = true, ev = null) {
     .then(() => {
       githubLoadingIndicator.classList.remove('clockwise');
       cm.readOnly = false;
-      document.querySelector('.statusbar').innerText = 'Loading from Github...';
+      document.getElementById('statusBar').innerText = translator.lang.loadingFromGithub.text + '...';
       v.allowCursorActivity = false;
       setMeiFileInfo(
         github.filepath, // meiFileName
@@ -216,11 +218,11 @@ function loadFile(fileName, clearBeforeLoading = true, ev = null) {
       console.error("Couldn't read Github repo to fill in branch contents:", err);
       githubLoadingIndicator.classList.remove('clockwise');
     });
-}
+} // loadFile()
 
 function onFileNameEdit(e) {
   setCommitUIEnabledStatus();
-}
+} // onFileNameEdit()
 
 function onMessageInput(e) {
   e.target.classList.remove('warn');
@@ -229,7 +231,7 @@ function onMessageInput(e) {
   } else {
     document.getElementById('commitButton').removeAttribute('disabled');
   }
-}
+} // onMessageInput()
 
 function assignGithubMenuClickHandlers() {
   // This function is called repeatedly during runtime as the content of the
@@ -242,7 +244,7 @@ function assignGithubMenuClickHandlers() {
   }
 
   const githubLoadingIndicator = document.getElementById('GithubLogo');
-  const logoutButton = document.getElementById('GithubLogout');
+  const logoutButton = document.getElementById('githubLogout');
   if (logoutButton) {
     logoutButton.removeEventListener('click', logoutFromGithub);
     logoutButton.addEventListener('click', logoutFromGithub);
@@ -302,7 +304,7 @@ function assignGithubMenuClickHandlers() {
       e.addEventListener('click', branchContentsFileClicked);
     }
   });
-}
+} // assignGithubMenuClickHandlers()
 
 export async function fillInUserRepos(per_page = 30, page = 1) {
   const repos = await github.getUserRepos(per_page, page);
@@ -321,18 +323,18 @@ export async function fillInUserRepos(per_page = 30, page = 1) {
   }
   // GitHub menu interactions
   assignGithubMenuClickHandlers();
-}
+} // fillInUserRepos()
 
 export async function fillInRepoBranches(e, repoBranches = null, per_page = 100, page = 1) {
   // TODO handle > per_page branches (similar to userRepos)
   repoBranches = repoBranches || (await github.getRepoBranches(per_page, page));
   let githubMenu = document.getElementById('GithubMenu');
   githubMenu.innerHTML = `
-  <a id="GithubLogout" href="#">Log out</a>
-  <hr class="dropdown-line">
-  <a id="repositoriesHeader" href="#"><span class="btn icon inline-block-tight">${icon.arrowLeft}</span>Repository:${github.githubRepo}</a>
+    <a id="githubLogout" href="#">${translator.lang.logOut.text}</a>
     <hr class="dropdown-line">
-    <a id="branchesHeader" class="dropdown-head" href="#"><b>Select branch:</b></a>
+    <a id="repositoriesHeader" href="#"><span class="btn icon inline-block-tight">${icon.arrowLeft}</span>${translator.lang.repository.text}: ${github.githubRepo}</a>
+    <hr class="dropdown-line">
+    <a id="branchesHeader" class="dropdown-head" href="#"><b>${translator.lang.selectBranch.text}:</b></a>
     `;
   Array.from(repoBranches).forEach((branch) => {
     githubMenu.innerHTML += `<a class="repoBranch" href="#">${branch.name}</a>`;
@@ -340,14 +342,14 @@ export async function fillInRepoBranches(e, repoBranches = null, per_page = 100,
   // GitHub menu interactions
   assignGithubMenuClickHandlers();
   v.setMenuColors();
-}
+} // fillInRepoBranches()
 
 async function markFileName(fname) {
   // purpose: assign markers like "~1" before the suffix
   // to differentiate from existing files
   // e.g. "meifile.mei" => "myfile~1.mei"
   if (!fname.endsWith('.mei')) {
-    console.warn('markFileName called on non-mei suffix: ', fname);
+    console.warn('markFileName() called on non-mei suffix: ', fname);
   }
   const without = fname.substring(0, fname.lastIndexOf('.'));
   const match = without.match('(.*)~\\d+$');
@@ -367,7 +369,7 @@ async function markFileName(fname) {
     } else marked = `${unmarked}~1.mei`;
     return marked;
   });
-}
+} // markFileName()
 
 async function proposeFileName(fname) {
   // if we're here, the original file wasn't MEI
@@ -407,7 +409,7 @@ async function proposeFileName(fname) {
       });
     }
   });
-}
+} // proposeFileName()
 
 export async function fillInBranchContents(e) {
   const githubLoadingIndicator = document.getElementById('GithubLogo');
@@ -417,13 +419,13 @@ export async function fillInBranchContents(e) {
   let branchContents = await github.getBranchContents(github.filepath);
   let githubMenu = document.getElementById('GithubMenu');
   githubMenu.innerHTML = `
-  <a id="GithubLogout" href="#">Log out</a>
-  <hr class="dropdown-line">
-  <a id="repositoriesHeader" href="#"><span class="btn icon inline-block-tight">${icon.arrowLeft}</span>Repository:${github.githubRepo}</a>
+    <a id="githubLogout" href="#">${translator.lang.logOut.text}</a>
     <hr class="dropdown-line">
-    <a id="branchesHeader" href="#"><span class="btn icon inline-block-tight">${icon.arrowLeft}</span>Branch: ${github.branch}</a>
+    <a id="repositoriesHeader" href="#"><span class="btn icon inline-block-tight">${icon.arrowLeft}</span>${translator.lang.repository.text}: ${github.githubRepo}</a>
     <hr class="dropdown-line">
-    <a id="contentsHeader" href="#"><span class="btn icon inline-block-tight filepath">${icon.arrowLeft}</span>Path: <span class="filepath">${github.filepath}</span></a>
+    <a id="branchesHeader" href="#"><span class="btn icon inline-block-tight">${icon.arrowLeft}</span>${translator.lang.branch.text}: ${github.branch}</a>
+    <hr class="dropdown-line">
+    <a id="contentsHeader" href="#"><span class="btn icon inline-block-tight filepath">${icon.arrowLeft}</span>${translator.lang.path.text}: <span class="filepath">${github.filepath}</span></a>
     <hr class="dropdown-line" id="actionsDivider">
     `;
   if(document.getElementById("enableGitHubActions").checked) { 
@@ -494,13 +496,13 @@ export async function fillInBranchContents(e) {
 
     const commitFileNameEdit = document.createElement('div');
     commitFileNameEdit.setAttribute('id', 'commitFileNameEdit');
-    commitFileNameEdit.innerHTML = 'Filename: ';
+    commitFileNameEdit.innerHTML = translator.lang.fileName.description + ': ';
     commitFileNameEdit.appendChild(commitFileName);
 
     const commitMessageInput = document.createElement('input');
     commitMessageInput.setAttribute('type', 'text');
     commitMessageInput.setAttribute('id', 'commitMessageInput');
-    commitMessageInput.setAttribute('placeholder', 'Updated using mei-friend online');
+    commitMessageInput.setAttribute('placeholder', translator.lang.commitPlaceholder.text);
     const commitButton = document.createElement('input');
     commitButton.setAttribute('id', 'commitButton');
     commitButton.setAttribute('type', 'submit');
@@ -521,9 +523,9 @@ export async function fillInBranchContents(e) {
     const reportIssue = document.createElement('input');
     reportIssue.setAttribute('type', 'submit');
     reportIssue.id = 'reportIssueWithEncoding';
-    reportIssue.value = 'Report issue with encoding';
+    reportIssue.value = translator.lang.reportIssueWithEncoding.text;
     reportIssue.addEventListener('click', () => {
-      const openInMeiFriendUrl = `[Click to open in mei-friend](${encodeURIComponent(generateUrl())})`;
+      const openInMeiFriendUrl = `[${translator.lang.clickToOpenInMeiFriend.text}](${encodeURIComponent(generateUrl())})`;
       const fullOpenIssueUrl = `https://github.com/${github.githubRepo}/issues/new?title=Issue+with+${meiFileName}&body=${openInMeiFriendUrl}`;
       window.open(fullOpenIssueUrl, '_blank');
     });
@@ -538,7 +540,7 @@ export async function fillInBranchContents(e) {
   assignGithubMenuClickHandlers();
   v.setMenuColors();
   githubLoadingIndicator.classList.remove("clockwise");
-}
+} // fillInBranchContents()
 
 
 async function fillInCommitLog(refresh = false) {
@@ -558,7 +560,7 @@ async function fillInCommitLog(refresh = false) {
   } else {
     renderCommitLog();
   }
-}
+} // fillInCommitLog()
 
 export function renderCommitLog() {
   let branchesHeader = document.getElementById('branchesHeader');
@@ -577,7 +579,7 @@ export function renderCommitLog() {
   logTable.setAttribute('id', 'logTable');
   let githubMenu = document.getElementById('GithubMenu');
   const headerRow = document.createElement('tr');
-  headerRow.innerHTML = '<th>Date</th><th>Author</th><th>Message</th><th>Commit</th>';
+  headerRow.innerHTML = `<th>${translator.lang.date.text}</th><th>${translator.lang.author.text}</th><th>${translator.lang.message.text}</th><th>${translator.lang.commit.text}</th>`;
   logTable.appendChild(headerRow);
   github.commitLog.forEach((c) => {
     const commitRow = document.createElement('tr');
@@ -593,13 +595,13 @@ export function renderCommitLog() {
   });
   const commitLogHeader = document.createElement('a');
   commitLogHeader.setAttribute('id', 'commitLogHeader');
-  commitLogHeader.innerText = 'Commit Log';
+  commitLogHeader.innerText = translator.lang.commitLog.text;
   const hr = document.createElement('hr');
   hr.classList.add('dropdown-line');
   hr.setAttribute('id', 'commitLogSeperator');
   githubMenu.appendChild(hr);
   githubMenu.appendChild(logTable);
-}
+} // renderCommitLog()
 async function handleClickGithubAction(e) {
   let target = e.target;
   if(target.nodeName === "A") { 
@@ -630,7 +632,7 @@ export function logoutFromGithub() {
   if (paramsStartIx > -1) url = url.substring(0, paramsStartIx);
   // now modify last slash to navigate to /logout
   window.location.replace(url.substring(0, url.lastIndexOf('/')) + '/logout');
-}
+} // logoutFromGithub()
 
 export function refreshGithubMenu() {
   // display Github name
@@ -639,16 +641,17 @@ export function refreshGithubMenu() {
   // populate Github menu
   let githubMenu = document.getElementById('GithubMenu');
   githubMenu.classList.remove('loggedOut');
-  githubMenu.innerHTML = `<a id="GithubLogout" href="#">Log out</a>`;
+  githubMenu.innerHTML = `<a id="githubLogout" href="#">${translator.lang.logOut.text}</a>`;
   if (!github.filepath) {
     githubMenu.innerHTML += `
-    <hr class="dropdown-line">
-    <a id="forkRepository" href="#">Fork repository...</b></a>
-    <hr class="dropdown-line">
-    <a id="repositoriesHeader" class="dropdown-head" href="#"><b>Select repository:</b></a>`;
+      <hr class="dropdown-line">
+      <a id="forkRepository" href="#">${translator.lang.forkRepository.text}...</b></a>
+      <hr class="dropdown-line">
+      <a id="repositoriesHeader" class="dropdown-head" href="#"><b>${translator.lang.selectRepository.text}:</b></a>
+    `;
     fillInUserRepos();
   }
-}
+} // refreshGithubMenu()
 
 export function setCommitUIEnabledStatus() {
   const commitButton = document.getElementById('commitButton');
@@ -656,7 +659,7 @@ export function setCommitUIEnabledStatus() {
     const commitFileName = document.getElementById('commitFileName');
     if (commitFileName.innerText === stripMeiFileName()) {
       // no name change => button reads "Commit"
-      commitButton.setAttribute('value', 'Commit');
+      commitButton.setAttribute('value', translator.lang.commit.text);
       if (fileChanged) {
         // enable commit UI if file has changed
         commitButton.removeAttribute('disabled');
@@ -669,13 +672,13 @@ export function setCommitUIEnabledStatus() {
       }
     } else {
       // file name has changed => button reads "Commit as new file"
-      commitButton.setAttribute('value', 'Commit as new file');
+      commitButton.setAttribute('value', translator.lang.commitAsNewFile.text);
       // enable commit UI regardless of fileChanged state
       commitButton.removeAttribute('disabled');
       commitMessageInput.removeAttribute('disabled');
     }
   }
-}
+} // setCommitUIEnabledStatus()
 
 function setFileNameAfterLoad(ev) {
   const commitButton = document.getElementById('commitButton');
@@ -684,7 +687,7 @@ function setFileNameAfterLoad(ev) {
     if (isMEI) {
       // trim preceding slash
       commitFileName.innerText = stripMeiFileName();
-      commitButton.setAttribute('value', 'Commit');
+      commitButton.setAttribute('value', translator.lang.commit.text);
     } else {
       commitFileName.innerText = '...';
       commitButton.setAttribute('value', '...');
@@ -693,7 +696,7 @@ function setFileNameAfterLoad(ev) {
     }
     setCommitUIEnabledStatus();
   }
-}
+} // setFileNameAfterLoad()
 
 // handle Github commit UI
 function handleCommitButtonClicked(e) {
@@ -731,7 +734,7 @@ function handleCommitButtonClicked(e) {
     document.getElementById('commitButton').setAttribute('disabled', '');
     e.stopPropagation(); // prevent bubbling to stop github menu closing
   }
-}
+} // handleCommitButtonClicked()
 
 function stripMeiFileName() {
   const stripped = meiFileName.match(/^.*\/([^\/]+)$/);
@@ -740,4 +743,4 @@ function stripMeiFileName() {
   } else {
     console.warn('stripMeiFileName called on invalid filename: ', meiFileName);
   }
-}
+} // stripMeiFileName()

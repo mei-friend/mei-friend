@@ -355,9 +355,9 @@
       "id": "29d8ef82-94b7-43af-bba0-3401ce2f7a8a",
       "comment": "",
       "command": "click",
-      "target": "css=#next-page-btn > svg",
+      "target": "css=#nextPageButton > svg",
       "targets": [
-        ["css=#next-page-btn > svg", "css:finder"]
+        ["css=#nextPageButton > svg", "css:finder"]
       ],
       "value": ""
     }, {

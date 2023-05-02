@@ -1,14 +1,11 @@
+import { translator } from './main.js';
+
 // array of selected page numbers
 let pages = [1];
 let firstPage = 1;
 let lastPage = 1;
 let pageCount = 1;
 let currentPage = 1;
-
-let speedModeWarning = `Only the current page is rendered to PDF, 
-because speed mode is activated. Uncheck 
-speed mode to select from all pages.`;
-let normalTitle = 'Select page range to be saved in PDF.';
 
 /**
  * @returns pages array
@@ -27,32 +24,32 @@ export function createPageRangeSelector(display = 'none') {
   pageRangeDiv.classList.add('dropdown');
   pageRangeDiv.innerHTML = `
     <div class="controls">
-        <div id="pagesLegend" class="label">Page range</div>
+        <div id="pagesLegendLabel" class="label">Page range</div>
     </div>
     <div id="pageRangeItems" class="dropdown-content show">
         <div>
             <input type="radio" id="selectAllPages" name="pagesSelect" value="all" checked/>
-            <label for="selectAllPages">All</label>
+            <label for="selectAllPages" id="selectAllPagesLabel">All</label>
         </div>
         <div>
             <input type="radio" id="selectCurrentPage" name="pagesSelect" value="current" />
-            <label for="selectCurrentPage">Current page</label>
+            <label for="selectCurrentPage" id="selectCurrentPageLabel">Current page</label>
         </div>
 
         <div>
             <input type="radio" id="selectFromTo" name="pagesSelect" value="fromto" />
-            <label for="selectFromTo">from:</label>
+            <label for="selectFromTo" id="selectFromLabel">from:</label>
             <input type="number" id="selectFrom" name="firstPage" value="1" min="1"/>
         </div>
         <div>
             <div class="fillSpace"></div>
-            <label for="selectFromTo">to:</label>
+            <label for="selectFromTo" id="selectToLabel">to:</label>
             <input type="number" id="selectTo" name="endPage" value="1" min="1" />
         </div>
 
         <div>
             <input type="radio" id="selectPageRange" name="pagesSelect" value="range" />
-            <label for="selectPageRange">Page range:</label>
+            <label for="selectPageRange" id="selectPageRangeLabel">Page range:</label>
         </div>
 
         <div>
@@ -76,7 +73,7 @@ export function updatePageRangeSelector(v) {
   if (v.speedMode) {
     pages = [currentPage];
     disablePageRangeMenu(true);
-    document.getElementById('pagesLegend').title = speedModeWarning;
+    document.getElementById('pagesLegendLabel').title = translator.lang.pdfPreviewSpeedModeWarning.text;
     document.getElementById('pageRangeItems').classList.remove('show');
   } else {
     disablePageRangeMenu(false);
@@ -87,7 +84,7 @@ export function updatePageRangeSelector(v) {
     firstPage = Math.min(firstPage, lastPage);
     if (document.getElementById('selectFrom').value > lastPage) document.getElementById('selectFrom').value = lastPage;
     readValues();
-    document.getElementById('pagesLegend').title = normalTitle;
+    document.getElementById('pagesLegendLabel').title = translator.lang.pdfPreviewNormalModeTitle.text;
     document.getElementById('pageRangeItems').classList.add('show');
   }
   redrawTitle();
@@ -129,8 +126,12 @@ function readValues() {
 } // readValues()
 
 function redrawTitle() {
-  let pl = document.getElementById('pagesLegend');
-  if (pl) pl.innerHTML = (pages.length > 1 ? 'Pages: ' : 'Page: ') + generatePageRangeString(pages);
+  let pl = document.getElementById('pagesLegendLabel');
+  if (pl)
+    pl.innerHTML =
+      (pages.length > 1
+        ? translator.lang.pagesLegendLabel.multiplePages + ': '
+        : translator.lang.pagesLegendLabel.singlePage + ': ') + generatePageRangeString(pages);
 } // redrawTitle()
 
 function seq(i1, i2) {

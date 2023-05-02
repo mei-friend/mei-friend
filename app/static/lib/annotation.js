@@ -1,4 +1,4 @@
-import { v, cm, log } from './main.js';
+import { v, cm, log, translator } from './main.js';
 import { convertCoords, generateXmlId, rmHash, setCursorToId } from './utils.js';
 import { meiNameSpace, xmlNameSpace, xmlToString } from './dom-utils.js';
 import { circle, diffRemoved, highlight, fileCode, link, pencil, rdf, symLinkFile } from '../css/icons.js';
@@ -22,14 +22,17 @@ export function refreshAnnotationsList() {
   // add web annotation button
   const addWebAnnotation = document.createElement('span');
   const rdfIcon = document.createElement('span');
-  addWebAnnotation.textContent = 'Load Web Annotation(s)';
+  addWebAnnotation.textContent = translator.lang.addWebAnnotation.text;
   rdfIcon.id = 'addWebAnnotationIcon';
   rdfIcon.insertAdjacentHTML('beforeend', rdf);
   addWebAnnotation.appendChild(rdfIcon);
   addWebAnnotation.id = 'addWebAnnotation';
   addWebAnnotation.addEventListener('click', () => loadWebAnnotation());
   list.appendChild(addWebAnnotation);
-  list.insertAdjacentHTML('beforeend', annotations.length ? '' : '<p>No annotations to display.</p>');
+  list.insertAdjacentHTML(
+    'beforeend',
+    annotations.length ? '' : '<p>' + translator.lang.noAnnotationsToDisplay.text + '.</p>'
+  );
   annotations.forEach((a, aix) => {
     const annoDiv = document.createElement('div');
     annoDiv.classList.add('annotationListItem');
@@ -40,34 +43,38 @@ export function refreshAnnotationsList() {
     annoListItemButtons.classList.add('annotationListItemButtons');
     const flipToAnno = document.createElement('a');
     flipToAnno.insertAdjacentHTML('afterbegin', symLinkFile); //flipToEncoding;
-    flipToAnno.title = 'Flip page to this annotation';
+    flipToAnno.id = 'flipPageToAnnotationText';
+    flipToAnno.title = translator.lang.flipPageToAnnotationText.description;
     flipToAnno.classList.add('icon');
     if (!'selection' in a) flipToAnno.classList.add('disabled');
     const deleteAnno = document.createElement('a');
+    deleteAnno.id = 'deleteAnnotation';
     deleteAnno.insertAdjacentHTML('afterbegin', diffRemoved);
-    deleteAnno.title = 'Delete this annotation';
+    deleteAnno.title = translator.lang.deleteAnnotation.description;
     const isStandoff = document.createElement('a');
+    isStandoff.id = 'makeStandOffAnnotation';
     isStandoff.insertAdjacentHTML('afterbegin', rdf);
-    isStandoff.title = 'Stand-off status (Web Annotation)';
+    isStandoff.title = translator.lang.makeStandOffAnnotation.description;
     isStandoff.classList.add('icon');
     isStandoff.style.filter = 'grayscale(100%)';
     if (!a.isStandoff) {
-      isStandoff.title = 'Write to Solid as Web Annotation';
+      isStandoff.title = translator.lang.makeStandOffAnnotation.descriptionSolid;
       isStandoff.style.opacity = 0.3;
     } else {
-      (isStandoff.title = 'Copy Web Annotation URI to clipboard: '), a.id;
+      (isStandoff.title = translator.lang.makeStandOffAnnotation.descriptionToLocal + ': '), a.id;
       isStandoff.dataset.id = a.id;
       isStandoff.addEventListener('click', copyIdToClipboard);
     }
     const isInline = document.createElement('a');
+    isInline.id = 'makeInlineAnnotation';
     isInline.insertAdjacentHTML('afterbegin', fileCode);
     isInline.classList.add('icon');
     isInline.style.fontFamily = 'monospace';
     if (!a.isInline) {
-      isInline.title = 'Click to in-line annotation';
+      isInline.title = translator.lang.makeInlineAnnotation.description;
       isInline.style.opacity = 0.3;
     } else {
-      isInline.title = 'Copy <annot> xml:id to clipboard: [' + a.id + ']';
+      isInline.title = translator.lang.makeInlineAnnotation.descriptionCopy + ': [' + a.id + ']';
       isInline.dataset.id = a.id;
       isInline.addEventListener('click', copyIdToClipboard);
     }
@@ -97,7 +104,7 @@ export function refreshAnnotationsList() {
       setCursorToId(cm, a.id);
     });
     deleteAnno.addEventListener('click', (e) => {
-      const reallyDelete = confirm('Are you sure you wish to delete this annotation?');
+      const reallyDelete = confirm(translator.lang.deleteAnnotationConfirmation.text);
       if (reallyDelete) {
         deleteAnnotation(a.id);
       }
@@ -120,14 +127,15 @@ export function refreshAnnotationsList() {
 export function generateAnnotationLocationLabel(a) {
   const annotationLocationLabel = document.createElement('span');
   if (a.firstPage === 'meiHead') {
-    annotationLocationLabel.innerHTML = `MEI&nbsp;head&nbsp;(${a.selection.length}&nbsp;elements)`;
+    annotationLocationLabel.innerHTML = `MEI&nbsp;head&nbsp;(${a.selection.length}&nbsp;${translator.lang.elementsPlural.text})`;
   } else if (a.firstPage === 'unsituated' || a.firstPage < 0) {
     annotationLocationLabel.innerHTML = 'Unsituated';
   } else {
     annotationLocationLabel.innerHTML =
-      'p.&nbsp;' +
+      translator.lang.pageAbbreviation.text +
+      '&nbsp;' +
       (a.firstPage === a.lastPage ? a.firstPage : a.firstPage + '&ndash;' + a.lastPage) +
-      ` (${a.selection.length}&nbsp;elements)`;
+      ` (${a.selection.length}&nbsp;${translator.lang.elementsPlural.text})`;
   }
   annotationLocationLabel.classList.add('annotationLocationLabel');
   annotationLocationLabel.dataset.id = a.id;
@@ -234,7 +242,7 @@ function drawLink(a) {
         e.classList.add('annotationLink');
         // create a title element within the linked element to house the url (which will be available on hover)
         const title = document.createElementNS('http://www.w3.org/2000/svg', 'title');
-        title.innerHTML = 'Open in new tab: ' + a.url;
+        title.innerHTML = translator.lang.drawLinkUrl.text + ': ' + a.url;
         // slot it in as the first child of the selected element
         e.insertBefore(title, e.firstChild);
         // make the element clickable
@@ -334,7 +342,7 @@ export function addAnnotationHandlers() {
   };
   const createDescribe = (e) => {
     // TODO improve UX!
-    const desc = window.prompt('Please enter a textual description to apply');
+    const desc = window.prompt(translator.lang.askForDescription.text);
     const a = {
       id: generateXmlId('annot', v.xmlIdStyle),
       type: 'annotateDescribe',
@@ -346,7 +354,7 @@ export function addAnnotationHandlers() {
   };
   const createLink = (e) => {
     // TODO improve UX!
-    let url = window.prompt('Please enter a url to link to');
+    let url = window.prompt(translator.lang.askForLinkUrl.text);
     if (!url.startsWith('http')) url = 'https://' + url;
     const a = {
       id: generateXmlId('annot', v.xmlIdStyle),
@@ -371,9 +379,11 @@ export function readAnnots(flagLimit = false) {
   if (limit && annots.length > limit.value) {
     if (flagLimit) {
       v.showAlert(
-        'Number of annot elements exceeds configurable "Maximum number of annotations" (' +
+        translator.lang.maxNumberOfAnnotationAlert.text1 +
+          ' (' +
           limit.value +
-          '). New annotations can still be generated and will be displayed if "Show annotations" is set.',
+          '). ' +
+          translator.lang.maxNumberOfAnnotationAlert.text2,
         'warning',
         -1
       );
@@ -434,7 +444,7 @@ export function writeAnnot(anchor, xmlId, plist, payload) {
   else if (anchor.closest('score')) insertHere = anchor.closest('score');
   else {
     console.error('Sorry, cannot currently write annotations placed outside <score>');
-    v.showAlert('Sorry, cannot currently write annotations placed outside &lt;score&gt;', 'warning', 5000);
+    v.showAlert(translator.lang.annotationsOutsideScoreWarning.text, 'warning', 5000);
     // remove from list
     deleteAnnotation(xmlId);
     return;
@@ -470,7 +480,12 @@ export function writeAnnot(anchor, xmlId, plist, payload) {
       setCursorToId(cm, xmlId);
     } else {
       let errMsg =
-        '<p>Cannot write annotation as MEI anchor-point lacks xml:id.</p><p>Please assign identifiers by selecting "Manipulate" -> "Re-render MEI (with ids)" and try again.</p>';
+        '<p>' +
+        translator.lang.annotationWithoutIdWarning.text1 +
+        '</p>' +
+        '<p>' +
+        translator.lang.annotationWithoutIdWarning.text2 +
+        '</p>';
       console.warn(errMsg);
       log(errMsg);
     }
@@ -488,17 +503,22 @@ export function deleteAnnot(xmlId) {
 }
 
 export function loadWebAnnotation(prev = '') {
-  let msg = 'Enter URL of Web Annotation or Web Annotation Container';
+  let msg = translator.lang.loadWebAnnotationMessage.text;
   let prevurl = '';
   if (prev) {
     if (prev.status) {
       // response object received
-      msg = `Couldn't load URL provided (${prev.status}: ${prev.statusText}), please try again. ${msg}`;
+      msg = `${translator.lang.loadWebAnnotationMessage1.text} 
+            (${prev.status}: ${prev.statusText}), 
+             ${translator.lang.loadWebAnnotationMessage2.text}. 
+             ${msg}`;
       prevurl = prev.url;
     } else {
       // no response object received, e.g. due to CORS network error
       // we have been handed the url string instead
-      msg = `Couldn't load URL provided (network error), please try again. ${msg}`;
+      msg = `${translator.lang.loadWebAnnotationMessage1} (network error), 
+             ${translator.lang.loadWebAnnotationMessage2}. 
+             ${msg}`;
       prevurl = prev;
     }
   }
