@@ -426,45 +426,10 @@ export async function fillInBranchContents(e) {
     <a id="branchesHeader" href="#"><span class="btn icon inline-block-tight">${icon.arrowLeft}</span>${translator.lang.branch.text}: ${github.branch}</a>
     <hr class="dropdown-line">
     <a id="contentsHeader" href="#"><span class="btn icon inline-block-tight filepath">${icon.arrowLeft}</span>${translator.lang.path.text}: <span class="filepath">${github.filepath}</span></a>
-    <hr class="dropdown-line" id="actionsDivider">
+    <hr class="dropdown-line" class="actionsDivider" id="actionsDividerStart">
     `;
-  if(document.getElementById("enableGitHubActions").checked) { 
-    github.getActionWorkflowsList().then(resp => {
-      console.log("Repository has workflows list: ", resp)
-      const actionsDivider = document.getElementById("actionsDivider");
-      if(actionsDivider && 'workflows' in resp) { 
-        resp.workflows.forEach((wf) => {
-          if(wf.state === "active") {
-            let workflowSpan = document.createElement("span");
-            workflowSpan.id = wf.id;
-            workflowSpan.dataset.node_id = wf.node_id;
-            workflowSpan.dataset.path = wf.path;
-            workflowSpan.dataset.state = wf.state;
-            workflowSpan.dataset.url = wf.url;
-            workflowSpan.title = wf.url;
-            workflowSpan.innerText = "GH Action: " + wf.name;
-            workflowSpan.classList.add("inline-block-tight", "workflow");
-            let workflowSpanContainer = document.createElement("a");
-            workflowSpanContainer.onclick = handleClickGithubAction; 
-            workflowSpanContainer.insertAdjacentElement("beforeend", workflowSpan);
-            actionsDivider.insertAdjacentElement("afterend", workflowSpanContainer);
-          } else { 
-            console.warn("Skipping inactive GitHub Actions workflow: ", wf);
-          }
-        });
-        if(resp.workflows.length) { 
-          // add lower dividing line below final action
-          let firstBranchContents = document.querySelector(".branchContents");
-          if(firstBranchContents) {
-            let actionsContentDivider = document.createElement("hr");
-            actionsContentDivider.classList.add("dropdown-line");
-            firstBranchContents.insertAdjacentElement("beforebegin", actionsContentDivider)
-          }
-        }
-      }
-      console.log("Received actions list response: ", resp);
-    });
-  }
+  // request Githug Action workflows (if any) and handle them
+  github.getActionWorkflowsList().then(resp => handleWorkflowsListReceived(resp));
   if (e) {
     Array.from(branchContents).forEach((content) => {
       const isDir = content.type === 'dir';
@@ -542,6 +507,44 @@ export async function fillInBranchContents(e) {
   githubLoadingIndicator.classList.remove("clockwise");
 } // fillInBranchContents()
 
+function handleWorkflowsListReceived(resp) { 
+  console.log("Repository has workflows list: ", resp)
+  const actionsDivider = document.getElementById("actionsDividerStart");
+  if(actionsDivider && 'workflows' in resp) { 
+    resp.workflows.forEach((wf) => {
+      if(wf.state === "active") {
+        let workflowSpan = document.createElement("span");
+        workflowSpan.id = wf.id;
+        workflowSpan.dataset.node_id = wf.node_id;
+        workflowSpan.dataset.path = wf.path;
+        workflowSpan.dataset.state = wf.state;
+        workflowSpan.dataset.url = wf.url;
+        workflowSpan.title = wf.url;
+        workflowSpan.innerText = "GH Action: " + wf.name;
+        workflowSpan.classList.add("inline-block-tight", "workflow");
+        let workflowSpanContainer = document.createElement("a");
+        workflowSpanContainer.onclick = handleClickGithubAction; 
+        workflowSpanContainer.insertAdjacentElement("beforeend", workflowSpan);
+        actionsDivider.insertAdjacentElement("afterend", workflowSpanContainer);
+      } else { 
+        console.warn("Skipping inactive GitHub Actions workflow: ", wf);
+      }
+    });
+    if(resp.workflows.length) { 
+      // add lower dividing line below final action
+      let firstBranchContents = document.querySelector(".branchContents");
+      if(firstBranchContents) {
+        let actionsContentDivider = document.createElement("hr");
+        actionsContentDivider.classList.add("dropdown-line");
+        actionsContentDivider.classList.add("actionsDivider");
+        firstBranchContents.insertAdjacentElement("beforebegin", actionsContentDivider)
+      }
+    }
+  }
+  console.log("Received actions list response: ", resp);
+  // show or hide GitHub actions depending on user preference
+  v.setGithubActionsDisplay();
+}
 
 async function fillInCommitLog(refresh = false) {
   if (refresh) {

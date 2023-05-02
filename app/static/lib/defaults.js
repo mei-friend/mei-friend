@@ -603,14 +603,14 @@ export const meiFriendSettingsOptions = {
   //   title: 'options-line', // class name of hr element
   //   type: 'line'
   // },
-  titleGitHubActions: {
+  titleGithubActions: {
     title: 'Use GitHub Actions',
     description: 'Work with GitHub Actions when available in a repository',
     type: 'header',
     open: false,
     default: false,
   },
-  enableGitHubActions: {
+  enableGithubActions: {
     title: 'Show available GitHub Actions',
     description: 'List available GitHub Actions when navigating within repository in GitHub menu', 
     type: 'bool',

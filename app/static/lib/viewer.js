@@ -939,6 +939,19 @@ export default class Viewer {
     }
   } // toggleAnnotationPanel()
 
+  // show or hide GitHub actions (at the branch level in the GitHub menu) if they are available
+  setGithubActionsDisplay() { 
+    const els = [...document.querySelectorAll(".workflow"), ...document.querySelectorAll(".actionsDivider")]
+    const display = document.getElementById("enableGithubActions").checked ? "block" : "none";
+    els.forEach(e => { 
+      // check for e, as it will be null if no GH Actions currently exist 
+      // (e.g., none in repo, or we aren't at branch level in GH menu)
+      if(e) {
+        e.style.display = display;
+      }
+    })
+  }// setGithubActionsDisplay()
+
   // go through current active tab of settings menu and filter option items (make invisible)
   applySettingsFilter() {
     const filterSettingsString = document.getElementById('filterSettings').value;
@@ -1045,11 +1058,11 @@ export default class Viewer {
         case 'selectIdStyle':
           this.xmlIdStyle = value;
           break;
-        // case 'selectLanguage':
-        //   let langCode = value.slice(0, 2).toLowerCase();
-        //   translator.changeLanguage(langCode);
-        //   translateLanguageSelection();
-        //   break;
+        case 'selectLanguage':
+          let langCode = value.slice(0, 2).toLowerCase();
+          translator.changeLanguage(langCode);
+          translateLanguageSelection();
+          break;
         case 'toggleSpeedMode':
           document.getElementById('midiSpeedmodeIndicator').style.display = this.speedMode ? 'inline' : 'none';
           break;
@@ -1201,7 +1214,8 @@ export default class Viewer {
             this.xmlIdStyle = value;
             break;
           case 'selectLanguage':
-            translator.changeLanguage(value);
+            let langCode = value.slice(0, 2).toLowerCase();
+            translator.changeLanguage(langCode);
             break;
           case 'toggleSpeedMode':
             let sb = document.getElementById('speedCheckbox');
@@ -1218,6 +1232,9 @@ export default class Viewer {
             break;
           case 'showMidiPlaybackControlBar':
             cmd.toggleMidiPlaybackControlBar(false);
+            break;
+          case 'enableGithubActions': 
+            this.setGithubActionsDisplay();
             break;
           case 'enableTransposition':
             // switch on
