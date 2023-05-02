@@ -491,7 +491,7 @@ export default class Github {
     return fetch(actionsUrl, { 
       method: 'GET', 
       headers: this.actionsHeaders,
-    }).then((res) => res.json());
+    }).then((res => res.json()))
   }
 
   async requestActionWorkflowRun(workflowId, inputs = {}) { 
@@ -503,8 +503,68 @@ export default class Github {
         ref: this.branch,
         inputs: inputs
       })
-    }).then((res => res.json()))
+    }).then((res) =>  {
+      // return body as JSON object, but retain response status (for error detection)
+      console.log("::::::", res);
+      if(res.status === 204) {
+        // no body on github 204 responses
+        return res;
+      } else { 
+        res.json().then((data) => {
+          return {status: res.status, body: data}
+        });
+      }
+    })
   }
+
+  async awaitActionWorkflowCompletion(workflowId, runStartAt = null) { 
+    // Wait until the created workflow has completed or failed
+    // n.b.: unfortunately, because workflow dispatch is implemented as a Web Hook on the GitHub side,
+    // the job's run instance ID is not known at creation time. See https://github.com/orgs/community/discussions/9752
+    // As a work-around, we grab the latest run instance requested by the current user, of the requested workflow, 
+    // ... with the current head hash, immediately after dispatch
+    // ... then grab its start_at time, and use that to poll recursively
+    const runsUrl = `https://api.github.com/repos/${this.githubRepo}/actions/workflows/${workflowId}/runs`;
+    return fetch(runsUrl + "?" + new URLSearchParams({
+        actor: this.userLogin,
+        branch: this.branch,
+        head_sha: this.headHash
+      }), {
+        method: 'GET',
+        headers: this.actionsHeaders,
+      }).then((res) => res.json())
+      .then((resJson) => { 
+        let run;
+        if("workflow_runs" in resJson) { 
+          if(runStartAt) { 
+            // start time specified -- use it to find our run of interest
+            let runsAt = resJson.workflow_runs.filter(w => w.run_started_at === runStartAt);
+            if(runsAt.length) { 
+              run = runsAt[0];
+            }
+          } else { 
+            // no start time specified -- pick the most recent one
+            let runsSorted = resJson.workflow_runs.sort((a, b) => b.run_number - a.run_number)
+            if(runsSorted.length) {
+              run = runsSorted[0];
+            }
+          }
+          if("status" in run && run.status === "completed") { 
+            return run; // done
+          }
+          else if("status" in run){ 
+            // recur
+            return this.awaitActionWorkflowCompletion(workflowId, run.run_started_at);
+          } else { 
+            console.error("Received unexpected response to workflow runs request:", resJson);
+            return { status: 406 }
+          }
+        } else { 
+          console.error("Received unexpected response to workflow runs request:", resJson);
+          return { status: 406 }
+        }
+      })
+    }
 }
 
 function isImageUri(uri) {

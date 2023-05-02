@@ -252,9 +252,10 @@ export const lang = {
   openUrlOpenEncodingByUrlText: { text: 'Open Web-hosted encoding by URL' },
 
   // github actions modal
-  githubActionErrMsg: { text: 'Could not run workflow - GitHub says'},
-  githubActionsRunBtn: { text: 'Run workflow'},
-  githubActionsCancelBtn: { text: 'Cancel'},
+  githubActionStatusMsgPrompt: { text: 'Could not run workflow - GitHub says' },
+  githubActionStatusMsgWaiting: { text: 'Waiting for workflow to complete' },
+  githubActionsRunBtn: { text: 'Run workflow' },
+  githubActionsCancelBtn: { text: 'Cancel' },
 
   // fork modals
   forkRepoGithubText: { text: 'Fork Github Repository' },

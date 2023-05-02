@@ -514,8 +514,9 @@ function handleWorkflowsListReceived(resp) {
     resp.workflows.forEach((wf) => {
       if(wf.state === "active") {
         let workflowSpan = document.createElement("span");
-        workflowSpan.id = wf.id;
+        workflowSpan.id = "gha_" + wf.id;
         workflowSpan.dataset.node_id = wf.node_id;
+        workflowSpan.dataset.id = wf.id;
         workflowSpan.dataset.path = wf.path;
         workflowSpan.dataset.state = wf.state;
         workflowSpan.dataset.url = wf.url;
@@ -619,7 +620,7 @@ async function handleClickGithubAction(e) {
   }
   overlay.style.display = "block";
   workflowName.innerText = target.dataset.name;
-  workflowName.dataset.node_id = target.dataset.node_id;
+  workflowName.dataset.id = target.dataset.id;
   cancelBtn.onclick = () => { 
     overlay.style.display = "none";
     statusMsg.innerHTML = "";
@@ -629,15 +630,18 @@ async function handleClickGithubAction(e) {
     runBtn.setAttribute("disabled", true);
     const githubLoadingIndicator = document.getElementById('GithubLogo');
     githubLoadingIndicator.classList.add("clockwise");
-    github.requestActionWorkflowRun(workflowName.dataset.node_id, { 
+    github.requestActionWorkflowRun(workflowName.dataset.id, { 
       filepath: github.filepath 
     }).then(workflowRunResp => { 
       console.log("Got workflow run response: ", workflowRunResp);
-      if("documentation_url" in workflowRunResp) { 
+      if(workflowRunResp.status >= 400) { 
         // error
-        statusMsg.innerHTML = `<span id="githubActionErrMsg">${translator.lang.githubActionErrMsg.text}</span>: <a href="${workflowRunResp.documentation_url}" target="_blank">${workflowRunResp.message}</a>`;
+        statusMsg.innerHTML = `<span id="githubActionStatusMsgWaiting">${translator.lang.githubActionStatusMsgPrompt.text}</span>: <a href="${workflowRunResp.body.documentation_url}" target="_blank">${workflowRunResp.body.message}</a>`;
       } else { 
-        statusMsg.innerHTML = "Yay";
+        // poll on latest workflow run 
+        github.awaitActionWorkflowCompletion(workflowName.dataset.id)
+          .then( (workflowCompletionResp ) => { console.log("DONE!", workflowCompletionResp)});
+        //statusMsg.innerHTML = `<span id="githubActionStatusMsg">${translator.lang.githubActionStatusMsg.text}</span>`;
         // success
       }
     }).catch(e => {
