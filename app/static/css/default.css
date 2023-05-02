@@ -172,7 +172,7 @@ a:active {
   -ms-transform: translate(-50%, -50%);
 }
 
-.openUrlOverlay {
+.openUrlOverlay, #githubActionsOverlay {
   position: fixed;
   display: none;
   top: 0;
@@ -183,13 +183,20 @@ a:active {
   z-index: 190;
 }
 
+#githubActionsUI { 
+  display:flex;
+  flex-direction:column;
+  padding: 1em;
+}
+
 .openUrlOverlay a,
 .forkRepositoryOverlay a {
   color: var(--overlayLinkColor);
 }
 
 .openUrlOverlay .openUrlUI,
-.forkRepositoryOverlay .forkRepositoryUI {
+.forkRepositoryOverlay .forkRepositoryUI,
+#githubActionsUI {
   position: absolute;
   top: 20%;
   left: 20%;
@@ -212,10 +219,17 @@ a:active {
 }
 
 .openUrlOverlay .openUrlUI details,
-.forkRepositoryOverlay .forkRepositoryUI details {
+.forkRepositoryOverlay .forkRepositoryUI details,
+#githubActionsUI details, #githubActionsUI button {
   cursor: pointer;
   margin-bottom: 1em;
 }
+
+#githubActionsUI details label { 
+  font-family: monospace;
+  cursor: pointer;
+}
+
 
 .openUrlOverlay .openUrlUI details>div,
 .forkRepositoryOverlay .forkRepositoryUI details>div {
