@@ -654,68 +654,68 @@ export const lang = {
     description: 'Reset to mei-friend defaults',
   },
   titleAppearance: {
-    title: 'Editor appearance',
+    text: 'Editor appearance',
     description: 'Controls the appearance of the editor',
   },
   zoomFont: {
-    title: 'Font size (%)',
+    text: 'Font size (%)',
     description: 'Change font size of editor (in percent)',
   },
   theme: {
-    title: 'Theme',
+    text: 'Theme',
     description: 'Select the theme of the editor',
   },
   matchTheme: {
-    title: 'Notation matches theme',
+    text: 'Notation matches theme',
     description: 'Match notation to editor color theme',
   },
   tabSize: {
-    title: 'Indentation size',
+    text: 'Indentation size',
     description: 'Number of space characters for each indentation level',
   },
   lineWrapping: {
-    title: 'Line wrapping',
+    text: 'Line wrapping',
     description: 'Whether or not lines are wrapped at end of panel',
   },
   lineNumbers: {
-    title: 'Line numbers',
+    text: 'Line numbers',
     description: 'Show line numbers',
   },
   firstLineNumber: {
-    title: 'First line number',
+    text: 'First line number',
     description: 'Set first line number',
   },
   foldGutter: {
-    title: 'Code folding',
+    text: 'Code folding',
     description: 'Enable code folding through fold gutters',
   },
   titleEditorOptions: {
-    title: 'Editor behavior',
+    text: 'Editor behavior',
     description: 'Controls the behavior of the editor',
   },
   autoValidate: {
-    title: 'Auto validation',
+    text: 'Auto validation',
     description: 'Validate encoding against schema automatically after each edit',
   },
   autoCloseBrackets: {
-    title: 'Auto close brackets',
+    text: 'Auto close brackets',
     description: 'Automatically close brackets at input',
   },
   autoCloseTags: {
-    title: 'Auto close tags',
+    text: 'Auto close tags',
     description: 'Automatically close tags at input',
     type: 'bool',
   },
   matchTags: {
-    title: 'Match tags',
+    text: 'Match tags',
     description: 'Highlights matched tags around editor cursor',
   },
   showTrailingSpace: {
-    title: 'Highlight trailing spaces',
+    text: 'Highlight trailing spaces',
     description: 'Highlights unnecessary trailing spaces at end of lines',
   },
   keyMap: {
-    title: 'Key map',
+    text: 'Key map',
     description: 'Select key map',
   },
 

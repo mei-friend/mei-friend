@@ -658,68 +658,68 @@ export const lang = {
     description: 'Restableix els valors per defecte de mei-friend',
   },
   titleAppearance: {
-    title: "Aparença de l'editor",
+    text: "Aparença de l'editor",
     description: "Controla l'aparença de l'editor",
   },
   zoomFont: {
-    title: 'Mida de la font (%)',
+    text: 'Mida de la font (%)',
     description: "Canvia la mida de la font de l'editor (en percentatge)",
   },
   theme: {
-    title: 'Tema',
+    text: 'Tema',
     description: "Selecciona el tema de l'editor",
   },
   matchTheme: {
-    title: 'La notació coincideix amb el tema',
+    text: 'La notació coincideix amb el tema',
     description: "Fes que la notació coincideixi amb el tema de colors de l'editor",
   },
   tabSize: {
-    title: 'Mida de la tabulació',
+    text: 'Mida de la tabulació',
     description: "Nombre de caràcters d'espai per cada nivell de tabulació",
   },
   lineWrapping: {
-    title: 'Salt de línia',
+    text: 'Salt de línia',
     description: "Indica si les línies s'han de tallar al final del panell",
   },
   lineNumbers: {
-    title: 'Nombres de línia',
+    text: 'Nombres de línia',
     description: 'Mostra els nombres de línia',
   },
   firstLineNumber: {
-    title: 'Primer número de línia',
+    text: 'Primer número de línia',
     description: 'Estableix el primer número de línia',
   },
   foldGutter: {
-    title: 'Plegament de codi',
+    text: 'Plegament de codi',
     description: 'Permet plegar el codi a través de les barres de plegament',
   },
   titleEditorOptions: {
-    title: "Comportament de l'editor",
+    text: "Comportament de l'editor",
     description: "Controla el comportament de l'editor",
   },
   autoValidate: {
-    title: 'Validació automàtica',
+    text: 'Validació automàtica',
     description: 'Valida la codificació automàticament després de cada edició',
   },
   autoCloseBrackets: {
-    title: 'Tancament automàtic de claudàtors',
+    text: 'Tancament automàtic de claudàtors',
     description: 'Tanca els claudàtors automàticament en introduir-los',
   },
   autoCloseTags: {
-    title: 'Tancament automàtic de etiquetes',
+    text: 'Tancament automàtic de etiquetes',
     description: 'Tanca les etiquetes automàticament en introduir-les',
     type: 'bool',
   },
   matchTags: {
-    title: "Coincidència d'etiquetes",
+    text: "Coincidència d'etiquetes",
     description: "Resalta les etiquetes coincidents al voltant del cursor de l'editor",
   },
   showTrailingSpace: {
-    title: 'Resalta els espais finals',
+    text: 'Resalta els espais finals',
     description: 'Resalta els espais innecessaris al final de les línies',
   },
   keyMap: {
-    title: 'Mapa de tecles',
+    text: 'Mapa de tecles',
     description: 'Selecciona el mapa de tecles',
   },
 

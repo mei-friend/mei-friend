@@ -648,68 +648,68 @@ titleGeneral: {
     description: 'Restablecer a los valores predeterminados de mei-friend',
   },
   titleAppearance: {
-    title: 'Apariencia del editor',
+    text: 'Apariencia del editor',
     description: 'Controla la apariencia del editor',
   },
   zoomFont: {
-    title: 'Tamaño de fuente (%)',
+    text: 'Tamaño de fuente (%)',
     description: 'Cambiar el tamaño de fuente del editor (en porcentaje)',
   },
   theme: {
-    title: 'Tema',
+    text: 'Tema',
     description: 'Seleccione el tema del editor',
   },
   matchTheme: {
-    title: 'La notación coincide con el tema',
+    text: 'La notación coincide con el tema',
     description: 'Coincidir la notación con el tema de color del editor',
   },
   tabSize: {
-    title: 'Tamaño de sangría',
+    text: 'Tamaño de sangría',
     description: 'Número de caracteres de espacio para cada nivel de sangría',
   },
   lineWrapping: {
-    title: 'Ajuste de línea',
+    text: 'Ajuste de línea',
     description: 'Si las líneas se ajustan o no al final del panel',
   },
   lineNumbers: {
-    title: 'Números de línea',
+    text: 'Números de línea',
     description: 'Mostrar números de línea',
   },
   firstLineNumber: {
-    title: 'Número de primera línea',
+    text: 'Número de primera línea',
     description: 'Establecer el número de primera línea',
   },
   foldGutter: {
-    title: 'Plegado de código',
+    text: 'Plegado de código',
     description: 'Permite plegar el código a través de los separadores de plegado',
   },
   titleEditorOptions: {
-    title: 'Comportamiento del editor',
+    text: 'Comportamiento del editor',
     description: 'Controla el comportamiento del editor',
   },
   autoValidate: {
-    title: 'Validación automática',
+    text: 'Validación automática',
     description: 'Validar la codificación automáticamente después de cada edición',
   },
   autoCloseBrackets: {
-    title: 'Cerrar corchetes automáticamente',
+    text: 'Cerrar corchetes automáticamente',
     description: 'Cerrar automáticamente los corchetes al escribir',
   },
   autoCloseTags: {
-    title: 'Cerrar etiquetas automáticamente',
+    text: 'Cerrar etiquetas automáticamente',
     description: 'Cerrar automáticamente las etiquetas al escribir',
     type: 'bool',
   },
   matchTags: {
-    title: 'Coincidir etiquetas',
+    text: 'Coincidir etiquetas',
     description: 'Resalta las etiquetas coincidentes alrededor del cursor del editor',
   },
   showTrailingSpace: {
-    title: 'Resaltar espacios finales',
+    text: 'Resaltar espacios finales',
     description: 'Resalta los espacios innecesarios al final de las líneas',
   },
   keyMap: {
-    title: 'Mapa de teclas',
+    text: 'Mapa de teclas',
     description: 'Seleccione el mapa de teclas',
   },
 
