@@ -78,7 +78,7 @@
 }
 
 /* Dropdown content (hidden by default) */
-.dropdown-content {
+.dropdownContent {
   display: none;
   position: absolute;
   background-color: var(--dropdownBackgroundColor);
@@ -102,20 +102,20 @@
   min-height: 90%;
 }
 
-.dropdown-line {
+.dropdownLine {
   /* background-color: darkgray; */
   border: 1px solid var(--dropdownBorderColor);
   border-radius: 1px;
   margin: 4px 10px;
 }
 
-.dropdown-head {
+.dropdownHead {
   background-color: var(--dropdownBackgroundColor);
   font-weight: 900;
 }
 
 /* Links inside the dropdown */
-.dropdown-content a {
+.dropdownContent a {
   cursor: pointer;
   float: none;
   color: var(--textColor);
@@ -127,21 +127,21 @@
   text-align: left;
 }
 
-.dropdown-content a .btn {
+.dropdownContent a .btn {
   background-color: var(--settingsBackgroundAlternativeColor);
 }
 
-.dropdown-content a:hover .btn,
-.dropdown-content tr:hover {
+.dropdownContent a:hover .btn,
+.dropdownContent tr:hover {
   background-color: var(--settingsBackgroundColor);
 }
 
-.dropdown-content table {
+.dropdownContent table {
   border: 0px;
   border-spacing:0;
 }
 
-#GithubMenu.dropdown-content a {
+#GithubMenu.dropdownContent a {
   justify-content: flex-start;
 }
 
@@ -152,22 +152,22 @@
   padding: unset;
 }
 
-.dropdown-content input,
-.dropdown-content table {
+.dropdownContent input,
+.dropdownContent table {
   margin: 3px 12px;
 }
 
 /* Add a grey background color to dropdown links on hover */
-.dropdown-content a:hover {
+.dropdownContent a:hover {
   background-color: var(--dropdownHeadingColor);
 }
 
 /* Show the dropdown menu on hover */
-.dropdown:hover .dropdown-content.show {
+.dropdown:hover .dropdownContent.show {
   display: block;
 }
 
-.dropdown-content.forceShow {
+.dropdownContent.forceShow {
   display: block;
 }
 

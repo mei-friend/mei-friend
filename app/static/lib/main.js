@@ -1604,16 +1604,16 @@ function addEventListeners(v, cm) {
   document.getElementById('generateUrlMenu').addEventListener('click', cmd.generateUrl);
 
   // edit dialogs
-  document.getElementById('UndoMenu').addEventListener('click', cmd.undo);
-  document.getElementById('RedoMenu').addEventListener('click', cmd.redo);
-  document.getElementById('StartSearch').addEventListener('click', () => CodeMirror.commands.find(cm));
-  document.getElementById('FindNext').addEventListener('click', () => CodeMirror.commands.findNext(cm));
-  document.getElementById('FindPrevious').addEventListener('click', () => CodeMirror.commands.findPrev(cm));
-  document.getElementById('ReplaceMenu').addEventListener('click', () => CodeMirror.commands.replace(cm));
-  document.getElementById('ReplaceAllMenu').addEventListener('click', () => CodeMirror.commands.replaceAll(cm));
-  document.getElementById('IndentSelection').addEventListener('click', cmd.indentSelection);
-  document.getElementById('JumpToLine').addEventListener('click', () => CodeMirror.commands.jumpToLine(cm));
-  document.getElementById('ManualValidate').addEventListener('click', cmd.validate);
+  document.getElementById('undoMenu').addEventListener('click', cmd.undo);
+  document.getElementById('redoMenu').addEventListener('click', cmd.redo);
+  document.getElementById('startSearch').addEventListener('click', () => CodeMirror.commands.find(cm));
+  document.getElementById('findNext').addEventListener('click', () => CodeMirror.commands.findNext(cm));
+  document.getElementById('findPrevious').addEventListener('click', () => CodeMirror.commands.findPrev(cm));
+  document.getElementById('replaceMenu').addEventListener('click', () => CodeMirror.commands.replace(cm));
+  document.getElementById('replaceAllMenu').addEventListener('click', () => CodeMirror.commands.replaceAll(cm));
+  document.getElementById('indentSelection').addEventListener('click', cmd.indentSelection);
+  document.getElementById('jumpToLine').addEventListener('click', () => CodeMirror.commands.jumpToLine(cm));
+  document.getElementById('manualValidate').addEventListener('click', cmd.validate);
   document
     .querySelectorAll('.keyShortCut')
     .forEach((e) => e.classList.add(platform.startsWith('mac') ? 'platform-mac' : 'platform-nonmac'));

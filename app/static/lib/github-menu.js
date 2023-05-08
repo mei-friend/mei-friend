@@ -83,7 +83,7 @@ export function forkRepoClicked() {
 } // forkRepoClicked()
 
 function forkRepoCancelClicked() {
-  let menuList = document.querySelectorAll('.dropdown-content');
+  let menuList = document.querySelectorAll('.dropdownContent');
   menuList.forEach((e) => e.classList.remove('show'));
   forkRepositoryCancel();
 } // forkRepoCancelClicked()
@@ -331,10 +331,10 @@ export async function fillInRepoBranches(e, repoBranches = null, per_page = 100,
   let githubMenu = document.getElementById('GithubMenu');
   githubMenu.innerHTML = `
     <a id="githubLogout" href="#">${translator.lang.logOut.text}</a>
-    <hr class="dropdown-line">
+    <hr class="dropdownLine">
     <a id="repositoriesHeader" href="#"><span class="btn icon inline-block-tight">${icon.arrowLeft}</span>${translator.lang.repository.text}: ${github.githubRepo}</a>
-    <hr class="dropdown-line">
-    <a id="branchesHeader" class="dropdown-head" href="#"><b>${translator.lang.selectBranch.text}:</b></a>
+    <hr class="dropdownLine">
+    <a id="branchesHeader" class="dropdownHead" href="#"><b>${translator.lang.selectBranch.text}:</b></a>
     `;
   Array.from(repoBranches).forEach((branch) => {
     githubMenu.innerHTML += `<a class="repoBranch" href="#">${branch.name}</a>`;
@@ -418,13 +418,13 @@ export async function fillInBranchContents(e) {
   let githubMenu = document.getElementById('GithubMenu');
   githubMenu.innerHTML = `
     <a id="githubLogout" href="#">${translator.lang.logOut.text}</a>
-    <hr class="dropdown-line">
+    <hr class="dropdownLine">
     <a id="repositoriesHeader" href="#"><span class="btn icon inline-block-tight">${icon.arrowLeft}</span>${translator.lang.repository.text}: ${github.githubRepo}</a>
-    <hr class="dropdown-line">
+    <hr class="dropdownLine">
     <a id="branchesHeader" href="#"><span class="btn icon inline-block-tight">${icon.arrowLeft}</span>${translator.lang.branch.text}: ${github.branch}</a>
-    <hr class="dropdown-line">
+    <hr class="dropdownLine">
     <a id="contentsHeader" href="#"><span class="btn icon inline-block-tight filepath">${icon.arrowLeft}</span>${translator.lang.path.text}: <span class="filepath">${github.filepath}</span></a>
-    <hr class="dropdown-line">
+    <hr class="dropdownLine">
     `;
 
   if (e) {
@@ -492,7 +492,7 @@ export async function fillInBranchContents(e) {
       window.open(fullOpenIssueUrl, '_blank');
     });
     const reportIssueDivider = document.createElement('hr');
-    reportIssueDivider.classList.add('dropdown-line');
+    reportIssueDivider.classList.add('dropdownLine');
     commitUI.appendChild(reportIssueDivider);
     reportIssue.target = '_blank';
     commitUI.appendChild(reportIssue);
@@ -557,7 +557,7 @@ export function renderCommitLog() {
   commitLogHeader.setAttribute('id', 'commitLogHeader');
   commitLogHeader.innerText = translator.lang.commitLog.text;
   const hr = document.createElement('hr');
-  hr.classList.add('dropdown-line');
+  hr.classList.add('dropdownLine');
   hr.setAttribute('id', 'commitLogSeperator');
   githubMenu.appendChild(hr);
   githubMenu.appendChild(logTable);
@@ -592,10 +592,10 @@ export function refreshGithubMenu() {
   githubMenu.innerHTML = `<a id="githubLogout" href="#">${translator.lang.logOut.text}</a>`;
   if (!github.filepath) {
     githubMenu.innerHTML += `
-      <hr class="dropdown-line">
+      <hr class="dropdownLine">
       <a id="forkRepository" href="#">${translator.lang.forkRepository.text}...</b></a>
-      <hr class="dropdown-line">
-      <a id="repositoriesHeader" class="dropdown-head" href="#"><b>${translator.lang.selectRepository.text}:</b></a>
+      <hr class="dropdownLine">
+      <a id="repositoriesHeader" class="dropdownHead" href="#"><b>${translator.lang.selectRepository.text}:</b></a>
     `;
     fillInUserRepos();
   }
