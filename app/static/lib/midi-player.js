@@ -149,7 +149,8 @@ export function highlightNotesAtMidiPlaybackTime(ev = false) {
           // search for corresponding note-off and check whether onset there
           for (let i = timemapIdx + 1; i < timemap.length - 1; i++) {
             if ('off' in timemap[i] && timemap[i].off.includes(id)) {
-              if (!('on' in timemap[i])) { // if no onset, program unhighlightening of that note
+              if (!('on' in timemap[i])) {
+                // if no onset, program unhighlightening of that note
                 setTimeout(() => unhighlightNote(note), timemap[i].tstamp - t, note);
               }
               break;

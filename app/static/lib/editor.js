@@ -210,11 +210,11 @@ export function addControlElement(v, cm, elName, placement, form) {
   if (['slur', 'tie', 'phrase', 'hairpin', 'gliss'].includes(elName)) {
     // stop, if selected elements are on the same beat position and through warning.
     if (m === 0 && tstamp2 === tstamp && !startEl.hasAttribute('grace') && !endEl.hasAttribute('grace')) {
-      let msg = 'Cannot insert ' + elName;
-      msg += ', because ' + startId + ' and ' + endId + ' are on the same beat position ' + tstamp + '.';
+      let msg = useTstamps ? 'Cannot insert ' : 'Attention with ' + elName + ' (' + uuid + '): ';
+      msg += startId + ' and ' + endId + ' are on the same beat position ' + tstamp + '.';
       console.log(msg);
       v.showAlert(msg, 'warning');
-      return;
+      if (useTstamps) return;
     }
     if (useTstamps) {
       newElement.setAttribute('tstamp', tstamp);

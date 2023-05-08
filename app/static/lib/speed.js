@@ -744,7 +744,8 @@ export function getDurationOfElement(element, meterUnit = 4.0) {
 } // getDurationOfElement()
 
 /**
- *
+ * Returns the number of measures between two elements.
+ * It is zero, when in the same measure, one when in the next, etc.
  * @param {Document} xmlDoc
  * @param {Element} el1
  * @param {Element} el2
@@ -893,7 +894,9 @@ function addPageSpanningElements(xmlScore, spdScore, pageSpanners, pageNo, break
       let dmOfLastBreak = 0;
       let dmOfLastLastBreak = 0;
       let pageNumber = 1;
+      let i = -1;
       for (let n of nodeList) {
+        i++; // keep index
         if (n.getAttribute('xml:id') === elId) {
           count = true; // start counting after first occurrence of el
         }
@@ -911,13 +914,13 @@ function addPageSpanningElements(xmlScore, spdScore, pageSpanners, pageNo, break
         }
         // count pages and keep track of last and lastlast break for spanMode==='spanning'
         if (
-          (Array.isArray(breaks) && breaks.includes(n.nodeName)) ||
-          (!Array.isArray(breaks) &&
-            typeof breaks === 'object' &&
-            breaks[pageNumber].at(-1) === n.getAttribute('xml:id'))
+          i > 0 && // ignore first page beginning; // an array is also an object!
+          ((Array.isArray(breaks) && breaks.includes(n.nodeName)) ||
+            (!Array.isArray(breaks) &&
+              typeof breaks === 'object' &&
+              breaks[pageNumber].at(-1) === n.getAttribute('xml:id')))
         ) {
-          // an array is also an object!
-          pageNumber++;
+          pageNumber++; // count pages
           if (count && spanMode === 'starting') {
             break;
           } else {

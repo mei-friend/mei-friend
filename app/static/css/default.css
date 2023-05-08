@@ -138,7 +138,7 @@ a:active {
   fill: var(--textColor);
 }
 
-#facsimile-close-button {
+#facsimileCloseButton {
   fill: var(--dropdownBorderColor)
 }
 
@@ -319,7 +319,7 @@ a:active {
   fill: var(--textColor);
 }
 
-#verovio-container {
+#verovioContainer {
   height: 100%;
   width: 100%;
   overflow: inherit;
@@ -333,7 +333,7 @@ a:active {
   height: 100%;
 }
 
-#facsimile-message-panel {
+#facsimileMessagePanel {
   padding: 8px;
   color: var(--textColor);
   background-color: var(--backgroundColor);
@@ -561,7 +561,7 @@ a:active {
   position: relative;
 }
 
-.statusbar {
+#statusBar {
   width: 100%;
   height: 100%;
   position: absolute;
@@ -571,7 +571,7 @@ a:active {
   z-index: 10;
 }
 
-.progressbar {
+#progressBar {
   width: 0%;
   height: 100%;
   background-color: var(--dropdownBackgroundColor);
@@ -754,19 +754,19 @@ svg text {
   user-select: none;
 }
 
-#verovio-container .currently-playing { 
+#verovioContainer .currently-playing { 
   fill:orange !important;
   stroke:orange !important;
   color: orange !important;
 }
 
-#verovio-container .highlighted {
+#verovioContainer .highlighted {
   color: var(--highlightColor);
   stroke: var(--highlightColor);
 }
 
-#verovio-container g.highlighted,
-#verovio-container text.highlighted {
+#verovioContainer g.highlighted,
+#verovioContainer text.highlighted {
   fill: var(--highlightColor);
   fill-opacity: 100%;
 }
@@ -785,22 +785,22 @@ svg text {
   fill-opacity: 70%;
 }
 
-#verovio-container g.supplied g {
+#verovioContainer g.supplied g {
   fill: var(--suppliedColor);
   color: var(--suppliedColor);
   stroke: var(--suppliedColor);
 }
 
-#verovio-container .supplied .highlighted {
+#verovioContainer .supplied .highlighted {
   color: var(--suppliedHighlightedColor);
   stroke: var(--suppliedHighlightedColor);
 }
 
-#verovio-container g.supplied g.highlighted {
+#verovioContainer g.supplied g.highlighted {
   fill: var(--suppliedHighlightedColor);
 }
 
-#verovio-container g {
+#verovioContainer g {
   fill: var(--notationColor);
   color: var(--notationColor);
   stroke: var(--notationColor);
@@ -815,7 +815,7 @@ svg text {
   fill-opacity: 40%;
 }
 
-/* #source-image-svg text {
+/* #sourceImageSvg text {
   fill: var(--dropdownHeadingColor);
   stroke: var(--dropdownHeadingColor);
   fill-opacity: 1;
@@ -874,7 +874,7 @@ svg text {
   fill: var(--settingsBackgroundColor);
 }
 
-#verovio-icon {
+#verovioIcon {
   margin-left: 3px;
   margin-right: 3px;
   width: 22px;
@@ -884,7 +884,7 @@ svg text {
   stroke-width: 1.5px;
 }
 
-#facsimile-icon, #pdf-icon {
+#facsimileIcon, #pdf-icon {
   margin-left: 3px;
   margin-right: 3px;
   width: 16px;
