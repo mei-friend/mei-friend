@@ -1591,17 +1591,17 @@ function addEventListeners(v, cm) {
   document.querySelectorAll('#settingsPanel .tablink').forEach((t) => t.addEventListener('click', cmd.filterSettings));
 
   // open dialogs
-  document.getElementById('OpenMei').addEventListener('click', cmd.open);
-  document.getElementById('OpenUrl').addEventListener('click', cmd.openUrl);
-  document.getElementById('OpenExample').addEventListener('click', cmd.openExample);
+  document.getElementById('openMei').addEventListener('click', cmd.open);
+  document.getElementById('openUrl').addEventListener('click', cmd.openUrl);
+  document.getElementById('openExample').addEventListener('click', cmd.openExample);
   document.getElementById('importMusicXml').addEventListener('click', cmd.openMusicXml);
   document.getElementById('importHumdrum').addEventListener('click', cmd.openHumdrum);
   document.getElementById('importPae').addEventListener('click', cmd.openPae);
-  document.getElementById('SaveMei').addEventListener('click', downloadMei);
+  document.getElementById('saveMei').addEventListener('click', downloadMei);
   document.getElementById('saveSvg').addEventListener('click', downloadSvg);
   document.getElementById('saveMidi').addEventListener('click', () => requestMidiFromVrvWorker());
-  document.getElementById('PrintPreview').addEventListener('click', cmd.pageModeOn);
-  document.getElementById('GenerateUrlMenu').addEventListener('click', cmd.generateUrl);
+  document.getElementById('printPreview').addEventListener('click', cmd.pageModeOn);
+  document.getElementById('generateUrlMenu').addEventListener('click', cmd.generateUrl);
 
   // edit dialogs
   document.getElementById('UndoMenu').addEventListener('click', cmd.undo);
