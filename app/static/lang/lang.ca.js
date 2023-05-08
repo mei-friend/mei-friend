@@ -1,6 +1,7 @@
 /**
  * Language file for Catalan / Katalanisch
  */
+
 import * as att from '../lib/attribute-classes.js';
 import { heart } from '../css/icons.js';
 

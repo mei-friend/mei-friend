@@ -10,18 +10,18 @@ export const lang = {
   githubLoginLink: { text: 'Iniciar sesión en GitHub' },
 
   month: {
-    ene: 'Enero',
+    jan: 'Enero',
     feb: 'Febrero',
     mar: 'Marzo',
-    abr: 'Abril',
+    apr: 'Abril',
     may: 'Mayo',
     jun: 'Junio',
     jul: 'Julio',
-    ago: 'Agosto',
+    aug: 'Agosto',
     sep: 'Septiembre',
     oct: 'Octubre',
     nov: 'Noviembre',
-    dic: 'Diciembre',
+    dec: 'Diciembre',
   },
 
   // FILE MENU ITEM / ELEMENTOS DEL MENÚ ARCHIVO
