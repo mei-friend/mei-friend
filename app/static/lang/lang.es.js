@@ -9,6 +9,21 @@ export const lang = {
   // Main menu bar / Menú principal
   githubLoginLink: { text: 'Iniciar sesión en GitHub' },
 
+  month: {
+    jan: 'Enero',
+    feb: 'Febrero',
+    mar: 'Marzo',
+    apr: 'Abril',
+    may: 'Mayo',
+    jun: 'Junio',
+    jul: 'Julio',
+    aug: 'Agosto',
+    sep: 'Septiembre',
+    oct: 'Octubre',
+    nov: 'Noviembre',
+    dec: 'Diciembre',
+  },
+
   // FILE MENU ITEM / ELEMENTOS DEL MENÚ ARCHIVO
   fileMenuTitle: { text: 'Archivo' },
   openMeiText: { text: 'Abrir archivo' },
@@ -362,7 +377,7 @@ export const lang = {
   hideSettingsButton: {
     description: 'Cerrar panel de configuración',
   },
-titleGeneral: {
+  titleGeneral: {
     text: 'General',
     description: 'Configuraciones generales de mei-friend',
   },

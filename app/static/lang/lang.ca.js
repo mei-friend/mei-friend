@@ -1,12 +1,28 @@
 /**
  * Language file for Catalan / Katalanisch
  */
+
 import * as att from '../lib/attribute-classes.js';
 import { heart } from '../css/icons.js';
 
 export const lang = {
   // Main menu bar
   githubLoginLink: { text: 'Iniciar sessió' },
+
+  month: {
+    jan: 'Gener',
+    feb: 'Febrer',
+    mar: 'Març',
+    apr: 'Abril',
+    may: 'Maig',
+    jun: 'Juny',
+    jul: 'Juliol',
+    aug: 'Agost',
+    sep: 'Setembre',
+    oct: 'Octubre',
+    nov: 'Novembre',
+    dec: 'Desembre',
+  },
 
   // FILE MENU ITEM / ELEMENT DEL MENU DE FITXER
   fileMenuTitle: { text: 'Fitxer' },

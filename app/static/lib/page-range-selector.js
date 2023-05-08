@@ -26,7 +26,7 @@ export function createPageRangeSelector(display = 'none') {
     <div class="controls">
         <div id="pagesLegendLabel" class="label">Page range</div>
     </div>
-    <div id="pageRangeItems" class="dropdown-content show">
+    <div id="pageRangeItems" class="dropdownContent show">
         <div>
             <input type="radio" id="selectAllPages" name="pagesSelect" value="all" checked/>
             <label for="selectAllPages" id="selectAllPagesLabel">All</label>

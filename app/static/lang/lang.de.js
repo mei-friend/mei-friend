@@ -9,6 +9,21 @@ export const lang = {
   // Main menu bar
   githubLoginLink: { text: 'Anmelden' },
 
+  month: {
+    jan: 'Januar',
+    feb: 'Februar',
+    mar: 'März',
+    apr: 'April',
+    may: 'Mai',
+    jun: 'Juni',
+    jul: 'Juli',
+    aug: 'August',
+    sep: 'September',
+    oct: 'Oktober',
+    nov: 'November',
+    dec: 'Dezember',
+  },
+
   // FILE MENU ITEM
   fileMenuTitle: { text: 'Datei' },
   openMeiText: { text: 'Datei öffnen' },

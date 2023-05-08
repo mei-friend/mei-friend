@@ -1,12 +1,28 @@
 /**
  * Language file for French / Français
  */
+
 import * as att from '../lib/attribute-classes.js';
 import { heart } from '../css/icons.js';
 
 export const lang = {
   // Main menu bar
   githubLoginLink: { text: 'Connexion' },
+
+  month: {
+    jan: 'Janvier',
+    feb: 'Février',
+    mar: 'Mars',
+    apr: 'Avril',
+    may: 'Mai',
+    jun: 'Juin',
+    jul: 'Juillet',
+    aug: 'Août',
+    sep: 'Septembre',
+    oct: 'Octobre',
+    nov: 'Novembre',
+    dec: 'Décembre',
+  },
 
   // FILE MENU ITEM / ÉLÉMENT DE MENU FICHIER
   fileMenuTitle: { text: 'Fichier' },

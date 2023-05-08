@@ -1,12 +1,28 @@
 /**
  * Language file for Italian
  */
+
 import * as att from '../lib/attribute-classes.js';
 import { heart } from '../css/icons.js';
 
 export const lang = {
   // Main menu bar
   githubLoginLink: { text: 'Accesso' },
+
+  month: {
+    jan: 'Gennaio',
+    feb: 'Febbraio',
+    mar: 'Marzo',
+    apr: 'Aprile',
+    may: 'Maggio',
+    jun: 'Giugno',
+    jul: 'Luglio',
+    aug: 'Agosto',
+    sep: 'Settembre',
+    oct: 'Ottobre',
+    nov: 'Novembre',
+    dec: 'Dicembre',
+  },
 
   // FILE MENU ITEM// MENU FILE
   fileMenuTitle: { text: 'File' },
