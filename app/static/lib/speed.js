@@ -801,11 +801,13 @@ function addPageSpanningElements(xmlScore, spdScore, pageSpanners, pageNo, break
       let endingElement = xmlScore.querySelector('[*|id="' + endingElementId + '"]');
       if (endingElement) {
         let tstamp2 = computeTimeStamp2Attribute(endingElement, 'ending');
-        if (tstamp2) endingElement.setAttribute('tstamp2', tstamp2);
+        let clonedElement = endingElement.cloneNode(true);
+        // @ts-ignore
+        if (tstamp2) clonedElement.setAttribute('tstamp2', tstamp2);
+        startingMeasure.appendChild(clonedElement);
         if (endingElement.hasAttribute('startid')) {
           addPointingNote(endingElement, 'startid', startingMeasure);
         }
-        startingMeasure.appendChild(endingElement.cloneNode(true));
       }
     }
   } // 1) if
@@ -815,7 +817,8 @@ function addPageSpanningElements(xmlScore, spdScore, pageSpanners, pageNo, break
   let startingElementIds = pageSpanners.start[pageNo];
   if (startingElementIds) {
     for (let startingElementId of startingElementIds) {
-      let startingElement = xmlScore.querySelector('[*|id="' + startingElementId + '"]');
+      // find element in spdScore, not in xmlScore, because it gets modified without clone
+      let startingElement = spdScore.querySelector('[*|id="' + startingElementId + '"]');
       if (startingElement) {
         let tstamp2 = computeTimeStamp2Attribute(startingElement, 'starting');
         if (tstamp2) startingElement.setAttribute('tstamp2', tstamp2);
@@ -839,14 +842,16 @@ function addPageSpanningElements(xmlScore, spdScore, pageSpanners, pageNo, break
           let el = xmlScore.querySelector('[*|id="' + elId + '"]');
           if (el) {
             let tstamp2 = computeTimeStamp2Attribute(el, 'ending');
-            if (tstamp2) el.setAttribute('tstamp2', tstamp2);
+            let clonedElement = el.cloneNode(true);
+            // @ts-ignore
+            if (tstamp2) clonedElement.setAttribute('tstamp2', tstamp2);
             if (el.hasAttribute('startid')) {
               addPointingNote(el, 'startid', startingMeasure);
             }
             if (el.hasAttribute('endid')) {
               addPointingNote(el, 'endid', endingMeasure);
             }
-            startingMeasure.appendChild(el.cloneNode(true));
+            startingMeasure.appendChild(clonedElement);
           }
         }
       }
