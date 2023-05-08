@@ -815,7 +815,7 @@ function addPageSpanningElements(xmlScore, spdScore, pageSpanners, pageNo, break
   let startingElementIds = pageSpanners.start[pageNo];
   if (startingElementIds) {
     for (let startingElementId of startingElementIds) {
-      let startingElement = spdScore.querySelector('[*|id="' + startingElementId + '"]');
+      let startingElement = xmlScore.querySelector('[*|id="' + startingElementId + '"]');
       if (startingElement) {
         let tstamp2 = computeTimeStamp2Attribute(startingElement, 'starting');
         if (tstamp2) startingElement.setAttribute('tstamp2', tstamp2);
