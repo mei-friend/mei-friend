@@ -4,6 +4,7 @@
  */
 import * as l from '../lang/lang.en.js'; // default language
 import { translateLanguageSelection } from './language-selector.js';
+import { drawRightFooter } from './main.js';
 
 /**
  * Translator class
@@ -110,5 +111,6 @@ export default class Translator {
         }
       }
     }
+    drawRightFooter();
   } // translateGui()
 } // class Translator()

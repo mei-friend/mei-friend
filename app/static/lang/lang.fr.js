@@ -8,6 +8,21 @@ export const lang = {
   // Main menu bar
   githubLoginLink: { text: 'Connexion' },
 
+  month: {
+    jan: 'Janvier',
+    feb: 'Février',
+    mar: 'Mars',
+    apr: 'Avril',
+    may: 'Mai',
+    jun: 'Juin',
+    jul: 'Juillet',
+    aug: 'Août',
+    sep: 'Septembre',
+    oct: 'Octobre',
+    nov: 'Novembre',
+    dec: 'Décembre',
+  },
+
   // FILE MENU ITEM / ÉLÉMENT DE MENU FICHIER
   fileMenuTitle: { text: 'Fichier' },
   openMeiText: { text: 'Ouvrir le fichier' },

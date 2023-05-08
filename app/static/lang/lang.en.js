@@ -8,6 +8,21 @@ export const lang = {
   // Main menu bar
   githubLoginLink: { text: 'Login' },
 
+  month: {
+    jan: 'January',
+    feb: 'February',
+    mar: 'March',
+    apr: 'April',
+    may: 'May',
+    jun: 'June',
+    jul: 'July',
+    aug: 'August',
+    sep: 'September',
+    oct: 'October',
+    nov: 'November',
+    dec: 'December',
+  },
+
   // FILE MENU ITEM
   fileMenuTitle: { text: 'File' },
   openMeiText: { text: 'Open file' },
@@ -450,7 +465,7 @@ export const lang = {
     text: 'Show speed mode checkbox',
     description: 'Show speed mode checkbox in notation control menu',
   },
-  
+
   // MIDI Playback
   titleMidiPlayback: {
     text: 'MIDI playback',

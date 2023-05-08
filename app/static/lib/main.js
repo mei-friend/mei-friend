@@ -1,6 +1,6 @@
 // mei-friend version and date
 export const version = '0.8.10';
-export const versionDate = '30 April 2023';
+export const versionDate = '8 May 2023'; // use full or 3-digit english months, will be translated
 
 var vrvWorker;
 var spdWorker;
@@ -280,8 +280,8 @@ export function updateGithubInLocalStorage() {
       userName: name,
       userEmail: email,
     };
+    storage.fileLocationType = 'github';
     if (github.filepath) {
-      storage.fileLocationType = 'github';
     }
   }
   if (isLoggedIn && github.filepath) {
@@ -1938,13 +1938,27 @@ function drawLeftFooter() {
   lf.innerHTML = translator.lang.leftFooter.html;
 }
 
-function drawRightFooter() {
+export function drawRightFooter() {
+  // translate month in version date
+  let translatedVersioDate = versionDate;
+  for (let key of Object.keys(translator.lang.month)) {
+    let i = versionDate.search(translator.defaultLang.month[key]);
+    if (i > 0) {
+      translatedVersioDate = versionDate.replace(translator.defaultLang.month[key], translator.lang.month[key]);
+      break;
+    }
+    i = versionDate.search(translator.defaultLang.month[key].substring(0, 3));
+    if (i > 0) {
+      translatedVersioDate = versionDate.replace(translator.defaultLang.month[key].substring(0, 3), translator.lang.month[key]);
+      break;
+    }
+  }
   let rf = document.querySelector('.rightfoot');
   rf.innerHTML =
     "<a href='https://github.com/mei-friend/mei-friend' target='_blank'>mei-friend " +
     (env === environments.production ? version : `${env}-${version}`) +
     '</a> (' +
-    versionDate +
+    translatedVersioDate +
     ').&nbsp;';
   if (tkVersion) {
     let githubUrl = 'https://github.com/rism-digital/verovio/releases/tag/version-' + tkVersion.split('-')[0];
