@@ -4,7 +4,7 @@
 * Language packs currently available for English and German, more language packs to come
 * First draft of spanish, italian, french, and catalan language pack
 * Remove transposeTosoundingPitch default flag for Verovio
-* Fix #21 spanning elements with mixed startid/endid and tstamp/tstamp2 attributes
+* Fix #21 spanning elements with mixed `@startid/@endid` and `@tstamp/@tstamp2` attributes
 ### 0.8.9 patch
 * Fix bug when notation zooming resulted in missing notation when MIDI manu bar is activated
 ### 0.8.8 patch
