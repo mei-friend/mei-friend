@@ -1912,7 +1912,8 @@ function setProgressBar(percentage) {
   document.getElementById('progressBar').style.width = percentage + '%';
 }
 
-function updateStatusBar() {
+export function updateStatusBar() {
+  if (!v) return;
   document.getElementById('statusBar').innerHTML =
     meiFileName.substring(meiFileName.lastIndexOf('/') + 1) +
     ', ' +
@@ -1949,7 +1950,10 @@ export function drawRightFooter() {
     }
     i = versionDate.search(translator.defaultLang.month[key].substring(0, 3));
     if (i > 0) {
-      translatedVersioDate = versionDate.replace(translator.defaultLang.month[key].substring(0, 3), translator.lang.month[key]);
+      translatedVersioDate = versionDate.replace(
+        translator.defaultLang.month[key].substring(0, 3),
+        translator.lang.month[key]
+      );
       break;
     }
   }
