@@ -227,9 +227,9 @@ function onFileNameEdit(e) {
 function onMessageInput(e) {
   e.target.classList.remove('warn');
   if ((e.target.innerText = '')) {
-    document.getElementById('commitButton').setAttribute('disabled', '');
+    document.getElementById('githubCommitButton').setAttribute('disabled', '');
   } else {
-    document.getElementById('commitButton').removeAttribute('disabled');
+    document.getElementById('githubCommitButton').removeAttribute('disabled');
   }
 } // onMessageInput()
 
@@ -332,7 +332,7 @@ export async function fillInRepoBranches(e, repoBranches = null, per_page = 100,
   githubMenu.innerHTML = `
     <a id="githubLogout" href="#">${translator.lang.logOut.text}</a>
     <hr class="dropdownLine">
-    <a id="repositoriesHeader" href="#"><span class="btn icon inline-block-tight">${icon.arrowLeft}</span>${translator.lang.repository.text}: ${github.githubRepo}</a>
+    <a id="repositoriesHeader" href="#"><span class="btn icon inline-block-tight">${icon.arrowLeft}</span><span id="githubRepository">${translator.lang.githubRepository.text}</span>: ${github.githubRepo}</a>
     <hr class="dropdownLine">
     <a id="branchesHeader" class="dropdownHead" href="#"><b>${translator.lang.selectBranch.text}:</b></a>
     `;
@@ -419,11 +419,11 @@ export async function fillInBranchContents(e) {
   githubMenu.innerHTML = `
     <a id="githubLogout" href="#">${translator.lang.logOut.text}</a>
     <hr class="dropdownLine">
-    <a id="repositoriesHeader" href="#"><span class="btn icon inline-block-tight">${icon.arrowLeft}</span>${translator.lang.repository.text}: ${github.githubRepo}</a>
+    <a id="repositoriesHeader" href="#"><span class="btn icon inline-block-tight">${icon.arrowLeft}</span><span id="githubRepository">${translator.lang.githubRepository.text}</span>: ${github.githubRepo}</a>
     <hr class="dropdownLine">
-    <a id="branchesHeader" href="#"><span class="btn icon inline-block-tight">${icon.arrowLeft}</span>${translator.lang.branch.text}: ${github.branch}</a>
+    <a id="branchesHeader" href="#"><span class="btn icon inline-block-tight">${icon.arrowLeft}</span><span id="githubBranch">${translator.lang.githubBranch.text}</span>: ${github.branch}</a>
     <hr class="dropdownLine">
-    <a id="contentsHeader" href="#"><span class="btn icon inline-block-tight filepath">${icon.arrowLeft}</span>${translator.lang.path.text}: <span class="filepath">${github.filepath}</span></a>
+    <a id="contentsHeader" href="#"><span class="btn icon inline-block-tight filepath">${icon.arrowLeft}</span><span id="githubFilepath">${translator.lang.githubFilepath.text}</span>: <span class="filepath">${github.filepath}</span></a>
     <hr class="dropdownLine">
     `;
 
@@ -458,16 +458,16 @@ export async function fillInBranchContents(e) {
 
     const commitFileNameEdit = document.createElement('div');
     commitFileNameEdit.setAttribute('id', 'commitFileNameEdit');
-    commitFileNameEdit.innerHTML = translator.lang.fileName.description + ': ';
+    commitFileNameEdit.innerHTML ='<span id="commitFileNameText">' + translator.lang.commitFileNameText.text + '</span>: ';
     commitFileNameEdit.appendChild(commitFileName);
 
     const commitMessageInput = document.createElement('input');
     commitMessageInput.setAttribute('type', 'text');
     commitMessageInput.setAttribute('id', 'commitMessageInput');
-    commitMessageInput.setAttribute('placeholder', translator.lang.commitPlaceholder.text);
+    commitMessageInput.setAttribute('placeholder', translator.lang.commitMessageInput.placeholder);
     const commitButton = document.createElement('input');
-    commitButton.setAttribute('id', 'commitButton');
-    commitButton.setAttribute('type', 'submit');
+    commitButton.setAttribute('id', 'githubCommitButton');
+    commitButton.setAttribute('type', 'button');
     commitButton.classList.add('closeOnClick');
     commitButton.addEventListener('click', handleCommitButtonClicked);
     commitUI.appendChild(commitFileNameEdit);
@@ -483,9 +483,9 @@ export async function fillInBranchContents(e) {
 
     // add "Report issue with encoding" link
     const reportIssue = document.createElement('input');
-    reportIssue.setAttribute('type', 'submit');
+    reportIssue.setAttribute('type', 'button');
     reportIssue.id = 'reportIssueWithEncoding';
-    reportIssue.value = translator.lang.reportIssueWithEncoding.text;
+    reportIssue.value = translator.lang.reportIssueWithEncoding.value;
     reportIssue.addEventListener('click', () => {
       const openInMeiFriendUrl = `[${translator.lang.clickToOpenInMeiFriend.text}](${encodeURIComponent(generateUrl())})`;
       const fullOpenIssueUrl = `https://github.com/${github.githubRepo}/issues/new?title=Issue+with+${meiFileName}&body=${openInMeiFriendUrl}`;
@@ -539,7 +539,7 @@ export function renderCommitLog() {
   logTable.setAttribute('id', 'logTable');
   let githubMenu = document.getElementById('GithubMenu');
   const headerRow = document.createElement('tr');
-  headerRow.innerHTML = `<th>${translator.lang.date.text}</th><th>${translator.lang.author.text}</th><th>${translator.lang.message.text}</th><th>${translator.lang.commit.text}</th>`;
+  headerRow.innerHTML = `<th id="githubDate">${translator.lang.githubDate.text}</th><th id="githubAuthor">${translator.lang.githubAuthor.text}</th><th id="githubMessage">${translator.lang.githubMessage.text}</th><th id="githubCommit">${translator.lang.githubCommit.text}</th>`;
   logTable.appendChild(headerRow);
   github.commitLog.forEach((c) => {
     const commitRow = document.createElement('tr');
@@ -602,12 +602,13 @@ export function refreshGithubMenu() {
 } // refreshGithubMenu()
 
 export function setCommitUIEnabledStatus() {
-  const commitButton = document.getElementById('commitButton');
+  const commitButton = document.getElementById('githubCommitButton');
   if (commitButton) {
     const commitFileName = document.getElementById('commitFileName');
     if (commitFileName.innerText === stripMeiFileName()) {
       // no name change => button reads "Commit"
-      commitButton.setAttribute('value', translator.lang.commit.text);
+      commitButton.classList.remove('commitAsNewFile');
+      commitButton.setAttribute('value', translator.lang.githubCommitButton.value);
       if (fileChanged) {
         // enable commit UI if file has changed
         commitButton.removeAttribute('disabled');
@@ -620,7 +621,8 @@ export function setCommitUIEnabledStatus() {
       }
     } else {
       // file name has changed => button reads "Commit as new file"
-      commitButton.setAttribute('value', translator.lang.commitAsNewFile.text);
+      commitButton.setAttribute('value', translator.lang.githubCommitButton.classes.commitAsNewFile.value);
+      commitButton.classList.add('commitAsNewFile');
       // enable commit UI regardless of fileChanged state
       commitButton.removeAttribute('disabled');
       commitMessageInput.removeAttribute('disabled');
@@ -629,13 +631,14 @@ export function setCommitUIEnabledStatus() {
 } // setCommitUIEnabledStatus()
 
 function setFileNameAfterLoad(ev) {
-  const commitButton = document.getElementById('commitButton');
+  const commitButton = document.getElementById('githubCommitButton');
+  commitButton.classList.remove('commitAsNewFile');
   if (commitButton) {
     const commitFileName = document.getElementById('commitFileName');
     if (isMEI) {
       // trim preceding slash
       commitFileName.innerText = stripMeiFileName();
-      commitButton.setAttribute('value', translator.lang.commit.text);
+      commitButton.setAttribute('value', translator.lang.githubCommitButton.value);
     } else {
       commitFileName.innerText = '...';
       commitButton.setAttribute('value', '...');
@@ -679,7 +682,7 @@ function handleCommitButtonClicked(e) {
   } else {
     // no commit without a comit message!
     messageInput.classList.add('warn');
-    document.getElementById('commitButton').setAttribute('disabled', '');
+    document.getElementById('githubCommitButton').setAttribute('disabled', '');
     e.stopPropagation(); // prevent bubbling to stop github menu closing
   }
 } // handleCommitButtonClicked()

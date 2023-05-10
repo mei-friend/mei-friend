@@ -1,6 +1,6 @@
 // mei-friend version and date
 export const version = '0.8.10';
-export const versionDate = '8 May 2023'; // use full or 3-digit english months, will be translated
+export const versionDate = '10 May 2023'; // use full or 3-character english months, will be translated
 
 var vrvWorker;
 var spdWorker;
@@ -1912,7 +1912,8 @@ function setProgressBar(percentage) {
   document.getElementById('progressBar').style.width = percentage + '%';
 }
 
-function updateStatusBar() {
+export function updateStatusBar() {
+  if (!v) return;
   document.getElementById('statusBar').innerHTML =
     meiFileName.substring(meiFileName.lastIndexOf('/') + 1) +
     ', ' +
@@ -1949,7 +1950,10 @@ export function drawRightFooter() {
     }
     i = versionDate.search(translator.defaultLang.month[key].substring(0, 3));
     if (i > 0) {
-      translatedVersioDate = versionDate.replace(translator.defaultLang.month[key].substring(0, 3), translator.lang.month[key]);
+      translatedVersioDate = versionDate.replace(
+        translator.defaultLang.month[key].substring(0, 3),
+        translator.lang.month[key]
+      );
       break;
     }
   }
