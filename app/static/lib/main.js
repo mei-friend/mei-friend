@@ -105,6 +105,8 @@ import {
 } from './defaults.js';
 import Translator from './translator.js';
 import { buildLanguageSelection, translateLanguageSelection } from './language-selector.js';
+import { environments, env } from './env.js';
+import { runLanguageChecks } from '../tests/checkLangs.js';
 
 const defaultCodeMirrorOptions = {
   lineNumbers: true,
@@ -381,6 +383,12 @@ document.addEventListener('DOMContentLoaded', function () {
  * Do all the heavy GUI lifting after DOMCOntentLoaded event was fired
  */
 function onLanguageLoaded() {
+  // expose default language pack for debug
+  if(env && env === environments.develop) {
+    runLanguageChecks();
+    console.debug("Default language pack: ", 
+      JSON.stringify(translator.defaultLang, null, 2))
+  }
   // build language selection menu
   buildLanguageSelection();
   // link to changelog page according to env settings (develop/staging/production)

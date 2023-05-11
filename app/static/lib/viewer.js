@@ -6,6 +6,7 @@ import * as utils from './utils.js';
 import { getControlMenuState, showPdfButtons, setControlMenuState, setCheckbox } from './control-menu.js';
 import { alert, download, info, success, verified, unverified, xCircleFill } from '../css/icons.js';
 import { drawFacsimile, highlightZone, zoomFacsimile } from './facsimile.js';
+import { environments, env} from './env.js';
 import {
   cm,
   cmd,
