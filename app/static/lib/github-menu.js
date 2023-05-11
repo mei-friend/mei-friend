@@ -636,13 +636,23 @@ async function handleClickGithubAction(e) {
       console.log("Got workflow run response: ", workflowRunResp);
       if(workflowRunResp.status >= 400) { 
         // error
-        statusMsg.innerHTML = `<span id="githubActionStatusMsgWaiting">${translator.lang.githubActionStatusMsgPrompt.text}</span>: <a href="${workflowRunResp.body.documentation_url}" target="_blank">${workflowRunResp.body.message}</a>`;
+        statusMsg.innerHTML = `<span id="githubActionStatusMsgWaiting">${translator.lang.githubActionStatusMsgWaiting.text}</span>: <a href="${workflowRunResp.body.documentation_url}" target="_blank">${workflowRunResp.body.message}</a>`;
       } else { 
         // poll on latest workflow run 
         github.awaitActionWorkflowCompletion(workflowName.dataset.id)
-          .then( (workflowCompletionResp ) => { console.log("DONE!", workflowCompletionResp)});
+          .then( (workflowCompletionResp ) => { 
+            if("conclusion" in workflowCompletionResp) { 
+              if(workflowCompletionResp.conclusion === "success") { 
+                statusMsg.innerHTML = `<span id="githubActionStatusMsgSuccess">${translator.lang.githubActionStatusMsgSuccess.text}</span>" target="_blank">${workflowRunResp.body.message}</a>`;
+              } else { 
+                statusMsg.innerHTML = `<span id="githubActionStatusMsgFailure">${translator.lang.githubActionStatusMsgFailure.text}</span>: <a href="${workflowRunResp.body.documentation_url}" target="_blank">${workflowRunResp.body.message}</a>`;
+              }
+
+            } else { 
+              throw new Error("Invalid response received from GitHub API");
+            }
+          })
         //statusMsg.innerHTML = `<span id="githubActionStatusMsg">${translator.lang.githubActionStatusMsg.text}</span>`;
-        // success
       }
     }).catch(e => {
      // network error
