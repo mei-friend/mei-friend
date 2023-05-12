@@ -132,6 +132,8 @@ const defaultCodeMirrorOptions = {
     'Alt-.': consultGuidelines,
     'Shift-Alt-f': indentSelection,
     "'Ï'": indentSelection, // TODO: overcome strange bindings on MAC
+    'Cmd-E': encloseSelectionWithTag,
+    'Ctrl-E': encloseSelectionWithTag,
   },
   lint: {
     caller: cm,
@@ -1228,6 +1230,11 @@ function consultGuidelines() {
 function indentSelection() {
   e.indentSelection(v, cm);
 } // indentSelection()
+
+// wrapper for editor.encloseSelectionWithTag()
+function encloseSelectionWithTag() {
+  e.encloseSelectionWithTag(v, cm, 'span');
+}
 
 // object of interface command functions for buttons and key bindings
 export let cmd = {

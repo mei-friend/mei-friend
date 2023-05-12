@@ -1336,6 +1336,29 @@ export function addFacsimile(v, cm) {
 } // addFacsimile()
 
 /**
+ * Encloses selected text in CodeMirror with the given XML tag name.
+ * If tag name is not surrounded with left/right angle brackets, they will be added.
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
+ * @param {string} tagString
+ */
+export function encloseSelectionWithTag(v, cm, tagString = '') {
+  // remove brackets from beginning and end
+  tagString = tagString.trim();
+  if (tagString.startsWith('<')) tagString = tagString.substring(1);
+  if (tagString.endsWith('>')) tagString = tagString.slice(0, -1);
+  cm.getSelections().forEach((selection) => {
+    let newEncoding = '<' + tagString + '>';
+    if (selection.includes(cm.lineSeparator())) newEncoding += cm.lineSeparator();
+    newEncoding += selection;
+    if (selection.includes(cm.lineSeparator())) newEncoding += cm.lineSeparator();
+    newEncoding += '</' + tagString + '>';
+    cm.replaceSelection(newEncoding, 'around');
+    indentSelection(v, cm);
+  });
+} // encloseSelectionWithTag()
+
+/**
  * Finds xmlNode in textBuffer and removes it (including empty line)
  * @param {CodeMirror} cm
  * @param {Element} xmlNode
