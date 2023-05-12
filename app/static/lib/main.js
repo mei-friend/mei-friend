@@ -1818,7 +1818,10 @@ function addEventListeners(v, cm) {
   document.getElementById('resetDefault').addEventListener('click', cmd.resetDefault);
 
   // editor activity
-  cm.on('cursorActivity', () => v.cursorActivity(cm));
+  cm.on('cursorActivity', () => {
+    tagEncloserNode?.parentElement?.removeChild(tagEncloserNode);
+    v.cursorActivity(cm);
+  });
 
   // flip button updates manually notation location to cursor pos in encoding
   document.getElementById('flipButton').addEventListener('click', () => {
