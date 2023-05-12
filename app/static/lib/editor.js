@@ -1377,9 +1377,32 @@ export function showTagEncloserMenu(v, cm, node = null) {
     input = document.createElement('input');
     input.setAttribute('autofocus', true);
     input.setAttribute('isContentEditable', true);
+    let div = document.createElement('div');
+    let cancelButton = document.createElement('input');
+    cancelButton.setAttribute('type', 'button');
+    cancelButton.classList.add('btn');
+    cancelButton.classList.add('narrowButton');
+    cancelButton.value = 'Cancel';
+    cancelButton.addEventListener('click', (ev) => {
+      node.parentElement.removeChild(node);
+      cm.focus();
+    });
+    let okButton = document.createElement('input');
+    okButton.setAttribute('type', 'button');
+    okButton.classList.add('btn');
+    okButton.classList.add('narrowButton');
+    okButton.value = 'OK';
+    okButton.id = 'tagEncloserMenuOkButton';
+    okButton.addEventListener('click', (ev) => {
+      this.encloseSelectionWithTag(v, cm, input.value);
+      node.parentElement.removeChild(node);
+      cm.focus();
+    });
     node.appendChild(span);
     node.appendChild(input);
-    // TODO: add OK and Cancel buttons
+    div.appendChild(cancelButton);
+    div.appendChild(okButton);
+    node.appendChild(div);
   }
   cm.addWidget(cm.getCursor(), node, true);
   node.querySelector('input')?.focus();
@@ -1390,7 +1413,16 @@ export function showTagEncloserMenu(v, cm, node = null) {
     input.addEventListener('keyup', (event) => {
       let tagString = event.target.value;
       let validName = utils.isValidElementName(tagString);
-      validName ? input.classList.remove('error') : input.classList.add('error');
+      let okButton = document.getElementById('tagEncloserMenuOkButton');
+      if (validName) {
+        input.classList.remove('error');
+        okButton.disabled = false;
+        okButton.classList.remove('disabled');
+      } else {
+        input.classList.add('error');
+        okButton.disabled = true;
+        okButton.classList.add('disabled');
+      }
       if (event.key === 'Enter' && validName) {
         event.preventDefault();
         this.encloseSelectionWithTag(v, cm, tagString);

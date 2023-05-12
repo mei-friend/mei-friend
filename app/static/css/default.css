@@ -468,6 +468,7 @@ a:active {
   background-color: var(--dropdownBackgroundColor);
   display: flex;
   flex-direction: column;
+  align-content: stretch;
   align-items: center;
   gap: 3px;
   padding: 5px;
@@ -476,6 +477,19 @@ a:active {
 
 #tagEncloserMenu input {
   width: 150px;
+  font-weight: bold;
+  border-radius: 4px;
+}
+
+#tagEncloserMenu input:focus {
+  outline: none;
+}
+
+#tagEncloserMenu div {
+  font-weight: normal;
+  display: flex;
+  flex-direction: row;
+  gap: 15px;
 }
 
 .rightButton {
@@ -640,6 +654,10 @@ a:active {
   max-height: 21px;
   color: var(--textColor);
   background-color: var(--controlMenuBackgroundColor);
+}
+
+.narrowButton {
+  max-width: 60px;
 }
 
 .btn:hover {
@@ -1210,6 +1228,7 @@ select {
   margin-bottom: 10px;
   margin-right: 2px;
   border-radius: 4px;
+  max-width: 60px;
 }
 
 input,
