@@ -303,6 +303,11 @@ export const lang = {
       '</a>.',
   },
 
+  // CodeMirror editor
+  selectTagNameForEnclosure: { text: 'Mit Element umgeben' },
+  selectTagNameForEnclosureOkButton: { value: 'OK' },
+  selectTagNameForEnclosureCancelButton: { value: 'Abbrechen' },
+
   // annotation panel
   annotationCloseButtonText: { text: 'Panel für Annotationen schließen' },
   hideAnnotationPanelButton: { description: 'Panel für Annotationen schließen' },

@@ -302,7 +302,9 @@ export const lang = {
   },
 
   // CodeMirror editor
-  selectTagNameForEnclosure: { text: 'Select tag name' },
+  selectTagNameForEnclosure: { text: 'Enclose with tag name' },
+  selectTagNameForEnclosureOkButton: { value: 'OK' },
+  selectTagNameForEnclosureCancelButton: { value: 'Cancel' },
 
   // annotation panel
   annotationCloseButtonText: { text: 'Close Annotations Panel' },

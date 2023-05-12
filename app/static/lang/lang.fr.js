@@ -301,6 +301,11 @@ export const lang = {
       '</a>.',
   },
 
+  // CodeMirror editor
+  selectTagNameForEnclosure: { text: "Entourer du nom de l'élément" },
+  selectTagNameForEnclosureOkButton: { text: 'OK' },
+  selectTagNameForEnclosureCancelButton: { text: 'Annuller' },
+
   // annotation panel / panneau d'annotation
   annotationCloseButtonText: { text: "Fermer le panneau d'annotations" },
   hideAnnotationPanelButton: { description: "Fermer le panneau d'annotations" },

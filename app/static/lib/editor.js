@@ -1382,20 +1382,21 @@ export function showTagEncloserMenu(v, cm, node = null) {
     cancelButton.setAttribute('type', 'button');
     cancelButton.classList.add('btn');
     cancelButton.classList.add('narrowButton');
-    cancelButton.value = 'Cancel';
+    cancelButton.value = translator.lang.selectTagNameForEnclosureCancelButton.value;
+    cancelButton.id = 'selectTagNameForEnclosureCancelButton';
     cancelButton.addEventListener('click', (ev) => {
-      node.parentElement.removeChild(node);
+      node?.parentElement?.removeChild(node);
       cm.focus();
     });
     let okButton = document.createElement('input');
     okButton.setAttribute('type', 'button');
     okButton.classList.add('btn');
     okButton.classList.add('narrowButton');
-    okButton.value = 'OK';
-    okButton.id = 'tagEncloserMenuOkButton';
+    okButton.value = translator.lang.selectTagNameForEnclosureOkButton.value;
+    okButton.id = 'selectTagNameForEnclosureOkButton';
     okButton.addEventListener('click', (ev) => {
       this.encloseSelectionWithTag(v, cm, input.value);
-      node.parentElement.removeChild(node);
+      node?.parentElement?.removeChild(node);
       cm.focus();
     });
     node.appendChild(span);
@@ -1413,7 +1414,7 @@ export function showTagEncloserMenu(v, cm, node = null) {
     input.addEventListener('keyup', (event) => {
       let tagString = event.target.value;
       let validName = utils.isValidElementName(tagString);
-      let okButton = document.getElementById('tagEncloserMenuOkButton');
+      let okButton = document.getElementById('selectTagNameForEnclosureOkButton');
       if (validName) {
         input.classList.remove('error');
         okButton.disabled = false;
@@ -1426,10 +1427,10 @@ export function showTagEncloserMenu(v, cm, node = null) {
       if (event.key === 'Enter' && validName) {
         event.preventDefault();
         this.encloseSelectionWithTag(v, cm, tagString);
-        node.parentElement.removeChild(node);
+        node?.parentElement?.removeChild(node);
         cm.focus();
       } else if (event.key === 'Escape') {
-        node.parentElement.removeChild(node);
+        node?.parentElement?.removeChild(node);
         cm.focus();
       }
     });
