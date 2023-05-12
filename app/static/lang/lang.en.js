@@ -301,6 +301,9 @@ export const lang = {
       '</a>.',
   },
 
+  // CodeMirror editor
+  selectTagNameForEnclosure: { text: 'Select tag name' },
+
   // annotation panel
   annotationCloseButtonText: { text: 'Close Annotations Panel' },
   hideAnnotationPanelButton: { description: 'Close Annotations Panel' },

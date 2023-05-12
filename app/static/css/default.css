@@ -461,6 +461,23 @@ a:active {
   background-repeat: no-repeat;
 }
 
+#tagEncloserMenu {
+  z-index: 100;
+  border: 1px solid var(--dropdownBorderColor);
+  border-radius: 4px;
+  background-color: var(--dropdownBackgroundColor);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 5px;
+  font-weight: bold;
+}
+
+#tagEncloserMenu input {
+  width: 150px;
+}
+
 .rightButton {
   /* only for validation report close button */
   float: right;

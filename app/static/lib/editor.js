@@ -2,14 +2,13 @@
  * Provides all the editor functions
  */
 
+import * as att from './attribute-classes.js';
+import * as dutils from './dom-utils.js';
 import * as speed from './speed.js';
 import * as utils from './utils.js';
-import * as dutils from './dom-utils.js';
-import * as att from './attribute-classes.js';
-import { platform } from './defaults.js';
 import { loadFacsimile } from './facsimile.js';
+import { handleEditorChanges, translator, version, versionDate } from './main.js';
 import Viewer from './viewer.js';
-import { handleEditorChanges, version, versionDate } from './main.js';
 
 /**
  * Smart indents selected region in editor, if none, do all
@@ -1357,6 +1356,52 @@ export function encloseSelectionWithTag(v, cm, tagString = '') {
     indentSelection(v, cm);
   });
 } // encloseSelectionWithTag()
+
+/**
+ * Creates and adds context menu to enclose selection with a tag,
+ * the name of which is determined through that menu
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
+ * @param {Element} node
+ * @returns
+ */
+export function showTagEncloserMenu(v, cm, node = null) {
+  let input;
+  if (!node) {
+    // create menu, if not yet there
+    node = document.createElement('div');
+    node.id = 'tagEncloserMenu';
+    let span = document.createElement('span');
+    span.id = 'selectTagNameForEnclosure';
+    span.textContent = translator.lang.selectTagNameForEnclosure.text;
+    input = document.createElement('input');
+    input.setAttribute('autofocus', true);
+    input.setAttribute('isContentEditable', true);
+    node.appendChild(span);
+    node.appendChild(input);
+    // TODO: add OK and Cancel buttons 
+  }
+  cm.addWidget(cm.getCursor(), node, true);
+  node.querySelector('input')?.focus();
+  node.querySelector('input')?.select();
+
+  if (input) {
+    // add listener only first time
+    input.addEventListener('keyup', (event) => {
+      let tagString = event.target.value;
+      // TODO: check xml tag validity here
+      // Color text red, if invalid, or textColor, if ok
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        this.encloseSelectionWithTag(v, cm, tagString);
+        node.parentElement.removeChild(node);
+      } else if (event.key === 'Escape') {
+        node.parentElement.removeChild(node);
+      }
+    });
+  }
+  return node;
+} // showTagEncloserMenu()
 
 /**
  * Finds xmlNode in textBuffer and removes it (including empty line)

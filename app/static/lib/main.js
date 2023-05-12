@@ -1231,10 +1231,12 @@ function indentSelection() {
   e.indentSelection(v, cm);
 } // indentSelection()
 
+let tagEncloserNode; // context menu to choose node name to enclose selected text
+
 // wrapper for editor.encloseSelectionWithTag()
 function encloseSelectionWithTag() {
-  e.encloseSelectionWithTag(v, cm, 'span');
-}
+  tagEncloserNode = e.showTagEncloserMenu(v, cm, tagEncloserNode);
+} // encloseSelectionWithTag()
 
 // object of interface command functions for buttons and key bindings
 export let cmd = {
