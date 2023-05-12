@@ -1389,9 +1389,9 @@ export function showTagEncloserMenu(v, cm, node = null) {
     // add listener only first time
     input.addEventListener('keyup', (event) => {
       let tagString = event.target.value;
-      // TODO: check xml tag validity here
-      // Color text red, if invalid, or textColor, if ok
-      if (event.key === 'Enter') {
+      let validName = utils.isValidElementName(tagString);
+      validName ? input.classList.remove('error') : input.classList.add('error');
+      if (event.key === 'Enter' && validName) {
         event.preventDefault();
         this.encloseSelectionWithTag(v, cm, tagString);
         node.parentElement.removeChild(node);
