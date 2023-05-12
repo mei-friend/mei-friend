@@ -1379,7 +1379,7 @@ export function showTagEncloserMenu(v, cm, node = null) {
     input.setAttribute('isContentEditable', true);
     node.appendChild(span);
     node.appendChild(input);
-    // TODO: add OK and Cancel buttons 
+    // TODO: add OK and Cancel buttons
   }
   cm.addWidget(cm.getCursor(), node, true);
   node.querySelector('input')?.focus();
@@ -1395,8 +1395,10 @@ export function showTagEncloserMenu(v, cm, node = null) {
         event.preventDefault();
         this.encloseSelectionWithTag(v, cm, tagString);
         node.parentElement.removeChild(node);
+        cm.focus();
       } else if (event.key === 'Escape') {
         node.parentElement.removeChild(node);
+        cm.focus();
       }
     });
   }
