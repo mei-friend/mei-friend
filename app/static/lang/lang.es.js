@@ -362,6 +362,7 @@ export const lang = {
   // mei-friend SETTINGS MENU / MEI-FRIEND MENU DE CONFIGURACIÓN
   meiFriendSettingsHeader: {
     text: 'Configuración',
+    description: 'Configuración de mei-friend',
   },
   mfReset: {
     text: 'Predeterminado',
@@ -439,7 +440,10 @@ export const lang = {
     description:
       'Seleccionar ligaduras (es decir, elementos con el atributo @curvature: ' + att.attCurvature.join(', ') + ')',
   },
-
+  dragSelectMeasures: {
+    text: 'Seleccionar medidas',
+    description: 'Seleccionar medidas',
+  },
   // Control menu / Menú de control
   controlMenuSettings: {
     text: 'Barra de control de notación',
@@ -513,21 +517,31 @@ export const lang = {
       '(Verovio admite el sistema base 40)',
     labels: [
       'Unísono',
-      'Segunda mayor',
+      'Unísono aumentada',
+      'Segunda disminuida',
       'Segunda menor',
-      'Tercera mayor',
+      'Segunda mayor',
+      'Segunda aumentada',
+      'Tercera disminuida',
       'Tercera menor',
+      'Tercera mayor',
+      'Tercera aumentada',
+      'Cuarta disminuida',
       'Cuarta justa',
       'Cuarta aumentada',
       'Quinta disminuida',
       'Quinta justa',
       'Quinta aumentada',
+      'Sexta disminuida',
       'Sexta menor',
       'Sexta mayor',
+      'Sexta aumentada',
+      'Séptima disminuida',
       'Séptima menor',
       'Séptima mayor',
+      'Séptima aumentada',
+      'Octava disminuida',
       'Octava justa',
-      'Octava aumentada',
     ],
   },
   transposeKey: {

@@ -370,6 +370,7 @@ export const lang = {
   // mei-friend SETTINGS MENU// MENU IMPOSTAZIONI di mei-friend
   meiFriendSettingsHeader: {
     text: 'Impostazioni',
+    description: 'Impostazioni di mei-friend',
   },
   mfReset: {
     text: 'Predefinito',

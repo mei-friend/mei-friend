@@ -360,6 +360,7 @@ export const lang = {
   // mei-friend SETTINGS MENU
   meiFriendSettingsHeader: {
     text: 'mei-friend Settings',
+    description: 'mei-friend Settings',
   },
   mfReset: {
     text: 'Default',

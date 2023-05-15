@@ -363,6 +363,7 @@ export const lang = {
   // mei-friend SETTINGS MENU
   meiFriendSettingsHeader: {
     text: 'Paramètres mei-friend',
+    description: 'Paramètres mei-friend',
   },
   mfReset: {
     text: 'Réinitialiser',

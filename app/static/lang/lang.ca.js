@@ -364,6 +364,7 @@ export const lang = {
   // mei-friend SETTINGS MENU / MEI-FRIEND MENU DE CONFIGURACIÓ
   meiFriendSettingsHeader: {
     text: 'Configuració de mei-friend',
+    description: 'Configuració de mei-friend',
   },
   mfReset: {
     text: 'Per defecte',
