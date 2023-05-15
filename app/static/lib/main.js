@@ -385,8 +385,6 @@ function onLanguageLoaded() {
   // expose default language pack for debug
   if(env && env === environments.develop) {
     runLanguageChecks();
-    console.debug("Default language pack: ", 
-      JSON.stringify(translator.defaultLang, null, 2))
   }
   // build language selection menu
   buildLanguageSelection();
