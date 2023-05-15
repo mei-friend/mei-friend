@@ -3,7 +3,6 @@
  */
 
 import { translator } from './main.js';
-import { environments, env } from './env.js';
 
 /**
  * language codes after ISO-639-1, please enter new codes alphabetically

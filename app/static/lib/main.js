@@ -105,7 +105,6 @@ import {
 } from './defaults.js';
 import Translator from './translator.js';
 import { buildLanguageSelection, translateLanguageSelection } from './language-selector.js';
-import { environments, env } from './env.js';
 import { runLanguageChecks } from '../tests/checkLangs.js';
 
 const defaultCodeMirrorOptions = {
