@@ -3,6 +3,7 @@
 * Multi-language support with separate language pack files per language
 * Language packs currently available for English and German, more language packs to come
 * First draft of spanish, italian, french, and catalan language pack
+* Automatic test to check for key identity and completeness of language packs
 * Remove transposeTosoundingPitch default flag for Verovio
 * Fix #21 spanning elements with mixed `@startid/@endid` and `@tstamp/@tstamp2` attributes
 * Keyboard shortcut to enclose selection in editor with tag name, chosen in context menu
