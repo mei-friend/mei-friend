@@ -1346,11 +1346,26 @@ export function encloseSelectionWithTag(v, cm, tagString = '') {
   tagString = tagString.trim();
   if (tagString.startsWith('<')) tagString = tagString.substring(1);
   if (tagString.endsWith('>')) tagString = tagString.slice(0, -1);
-  cm.getSelections().forEach((selection) => {
+  cm.listSelections().forEach((selection) => {
+    let selectionText;
+    if (selection.anchor.line > selection.head.line || selection.anchor.ch > selection.head.ch) {
+      selectionText = cm.getRange(selection.head, selection.anchor);
+    } else {
+      selectionText = cm.getRange(selection.anchor, selection.head);
+    }
+    if (selection.anchor.line === selection.head.line && selection.anchor.ch === selection.head.ch) {
+      // get complete tag, if only a cursor is selected
+      let match = CodeMirror.findMatchingTag(cm, cm.getCursor());
+      if (match) {
+        let end = match.close ? match.close.to : match.open.to;
+        cm.extendSelection(match.open.from, end);
+        selectionText = cm.getRange(match.open.from, end);
+      }
+    }
     let newEncoding = '<' + tagString + '>';
-    if (selection.includes(cm.lineSeparator())) newEncoding += cm.lineSeparator();
-    newEncoding += selection;
-    if (selection.includes(cm.lineSeparator())) newEncoding += cm.lineSeparator();
+    if (selectionText.includes(cm.lineSeparator())) newEncoding += cm.lineSeparator();
+    newEncoding += selectionText;
+    if (selectionText.includes(cm.lineSeparator())) newEncoding += cm.lineSeparator();
     newEncoding += '</' + tagString + '>';
     cm.replaceSelection(newEncoding, 'around');
     indentSelection(v, cm);
