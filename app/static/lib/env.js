@@ -5,5 +5,4 @@ export const environments = {
   production: 'production',
 };
 
-// mei-friend version and date
 export const env = environments.develop;

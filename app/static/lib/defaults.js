@@ -2,7 +2,6 @@
  * Default values for mei-friend
  */
 
-import { translator } from './main.js';
 import { environments, env } from './env.js';
 
 /**
