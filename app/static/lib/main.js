@@ -134,8 +134,10 @@ const defaultCodeMirrorOptions = {
     'Alt-.': consultGuidelines,
     'Shift-Alt-f': indentSelection,
     "'Ï'": indentSelection, // TODO: overcome strange bindings on MAC
-    'Cmd-E': encloseSelectionWithTag,
+    'Cmd-E': encloseSelectionWithTag, // TODO: make OS modifier keys dynamic
     'Ctrl-E': encloseSelectionWithTag,
+    'Cmd-/': encloseSelectionWithLastTag,
+    'Ctrl-/': encloseSelectionWithLastTag,
   },
   lint: {
     caller: cm,
@@ -386,10 +388,9 @@ document.addEventListener('DOMContentLoaded', function () {
  */
 function onLanguageLoaded() {
   // expose default language pack for debug
-  if(env && env === environments.develop) {
+  if (env && env === environments.develop) {
     runLanguageChecks();
-    console.debug("Default language pack: ", 
-      JSON.stringify(translator.defaultLang, null, 2))
+    console.debug('Default language pack: ', JSON.stringify(translator.defaultLang, null, 2));
   }
   // build language selection menu
   buildLanguageSelection();
@@ -1245,6 +1246,12 @@ let tagEncloserNode; // context menu to choose node name to enclose selected tex
 function encloseSelectionWithTag() {
   tagEncloserNode = e.showTagEncloserMenu(v, cm, tagEncloserNode);
 } // encloseSelectionWithTag()
+
+function encloseSelectionWithLastTag() {
+  if (tagEncloserNode && tagEncloserNode.querySelector('input')?.value) {
+    e.encloseSelectionWithTag(v, cm, tagEncloserNode.querySelector('input')?.value);
+  }
+}
 
 // object of interface command functions for buttons and key bindings
 export let cmd = {
