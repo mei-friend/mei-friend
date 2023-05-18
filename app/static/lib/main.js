@@ -1832,11 +1832,21 @@ function addEventListeners(v, cm) {
   // reset application
   document.getElementById('resetDefault').addEventListener('click', cmd.resetDefault);
 
+  cm.on('beforeChange', () => e.updateMatch(cm));
+
   // editor activity
   cm.on('cursorActivity', () => {
     tagEncloserNode?.parentElement?.removeChild(tagEncloserNode);
     v.cursorActivity(cm);
   });
+
+  // editor reports changes
+  cm.on('changes', (cm, changeObj) => {
+    if (!cm.blockChanges) {
+      e.updateMatchingTagName(cm, changeObj);
+      handleEditorChanges();
+    }
+  }); // cm.on() change listener
 
   // flip button updates manually notation location to cursor pos in encoding
   document.getElementById('flipButton').addEventListener('click', () => {
@@ -1854,13 +1864,6 @@ function addEventListeners(v, cm) {
   if (forkAndOpenCancelButton) {
     forkAndOpenCancelButton.addEventListener('click', forkRepositoryCancel);
   }
-
-  // editor reports changes
-  cm.on('changes', () => {
-    if (!cm.blockChanges) {
-      handleEditorChanges();
-    }
-  }); // cm.on() change listener
 
   // Editor font size zooming
   document.getElementById('encoding').addEventListener('wheel', (ev) => {

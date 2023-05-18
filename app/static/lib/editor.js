@@ -1335,7 +1335,7 @@ export function addFacsimile(v, cm) {
 } // addFacsimile()
 
 /**
- * Encloses selected text in CodeMirror with the given XML tag name.
+ * Encloses/surrounds selected text in CodeMirror with the given XML tag name.
  * If tag name is not surrounded with left/right angle brackets, they will be added.
  * @param {Viewer} v
  * @param {CodeMirror} cm
@@ -1452,6 +1452,63 @@ export function showTagEncloserMenu(v, cm, node = null) {
   }
   return node;
 } // showTagEncloserMenu()
+
+let previousMatch; // match object retrieved from CodeMirror.findMatchingTag (with open/close keys, if present)
+
+/**
+ * Updates variable previousMatch to remember any xml tag matching at cursor position
+ * (called by beforeChange event emitted by CodeMirror)
+ * @param {CodeMirror} cm
+ */
+export function updateMatch(cm) {
+  previousMatch = CodeMirror.findMatchingTag(cm, cm.getCursor());
+} // updateMatch()
+
+/**
+ * Updates matching tag name, if edit is within a tag name
+ * @param {CodeMirror} cm
+ */
+export function updateMatchingTagName(cm, changeObj) {
+  let cursor = cm.getCursor();
+  let match = CodeMirror.findMatchingTag(cm, cursor);
+  console.debug('XXXXXX updateMatchingTagName(): changeObj: ', changeObj);
+  console.debug('XXXXXX updateMatchingTagName(): cursor: ', cursor);
+  console.debug('XXXXXX previousMatch: ', previousMatch);
+  if (!match || !previousMatch) return;
+  if (
+    match.close &&
+    match.close.from.ch < cursor.ch &&
+    match.close.to.ch > cursor.ch &&
+    match.close.from.line === cursor.line
+  ) {
+    // if within the ending tag
+    console.debug('XXXXXX within ending tag: ', match);
+    if (utils.isValidElementName(match.close.tag) && previousMatch.open) {
+      cm.blockChanges = true;
+      cm.replaceRange('<' + match.close.tag, previousMatch.open.from, {
+        ch: previousMatch.open.from.ch + previousMatch.open.tag.length + 1,
+        line: previousMatch.open.from.line,
+      });
+      cm.blockChanges = false;
+    }
+  } else if (
+    match.open &&
+    match.open.from.ch < cursor.ch &&
+    match.open.from.ch + match.open.tag.length + 1 >= cursor.ch &&
+    match.open.from.line === cursor.line &&
+    previousMatch &&
+    previousMatch.open.from.line === cursor.line
+  ) {
+    // if within opening tag
+    console.debug('XXXXXX within opening tag: ', match);
+    if (utils.isValidElementName(match.open.tag) && previousMatch.close) {
+      // TODO: previousMatch.close.line same as match.open.line, add changeObj[].text.length to coordinates
+      cm.blockChanges = true;
+      cm.replaceRange('</' + match.open.tag + '>', previousMatch.close.from, previousMatch.close.to);
+      cm.blockChanges = false;
+    }
+  }
+} // updateMatchingTagName()
 
 /**
  * Finds xmlNode in textBuffer and removes it (including empty line)
