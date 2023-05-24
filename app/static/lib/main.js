@@ -235,8 +235,8 @@ const defaultVerovioOptions = {
   // transposeToSoundingPitch: true,
   // clefChangeFactor: .83, // option removed in Verovio 3.10.0
   svgAdditionalAttribute: ['layer@n', 'staff@n', 'dir@vgrp', 'dynam@vgrp', 'hairpin@vgrp', 'pedal@vgrp', 'measure@n'],
-  bottomMarginArtic: 1.2,
-  topMarginArtic: 1.2,
+  // bottomMarginArtic: 1.2,
+  // topMarginArtic: 1.2,
 };
 const defaultCodeMirrorOptions = {
   lineNumbers: true,
