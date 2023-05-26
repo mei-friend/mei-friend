@@ -1636,6 +1636,8 @@ function addEventListeners(v, cm) {
   document.getElementById('replaceMenu').addEventListener('click', () => CodeMirror.commands.replace(cm));
   document.getElementById('replaceAllMenu').addEventListener('click', () => CodeMirror.commands.replaceAll(cm));
   document.getElementById('indentSelection').addEventListener('click', cmd.indentSelection);
+  document.getElementById('surroundWithTags').addEventListener('click', encloseSelectionWithTag);
+  document.getElementById('surroundWithLastTag').addEventListener('click', encloseSelectionWithLastTag);
   document.getElementById('jumpToLine').addEventListener('click', () => CodeMirror.commands.jumpToLine(cm));
   document.getElementById('manualValidate').addEventListener('click', cmd.validate);
   document
