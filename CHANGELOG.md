@@ -1,4 +1,8 @@
 # mei-friend-online CHANGELOG.md
+### 0.8.11 Editor functionality
+* Enclose selection in editor with tag `CTRL-E` or `CMD-E`: opens a user interface to enter tag name
+* `CTRL-/` or `CMD-/` encloses selection in editor with previously selected tag name
+* When editing a tag name in editor, matching tag will be modified as well
 ### 0.8.10 Internationalization
 * Multi-language support with separate language pack files per language
 * Language packs currently available for English and German, more language packs to come
