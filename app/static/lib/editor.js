@@ -1471,9 +1471,9 @@ export function updateMatch(cm) {
 export function updateMatchingTagName(cm, changeObj) {
   let cursor = cm.getCursor();
   let match = CodeMirror.findMatchingTag(cm, cursor);
-  console.debug('XXXXXX updateMatchingTagName(): changeObj: ', changeObj);
-  console.debug('XXXXXX updateMatchingTagName(): cursor: ', cursor);
-  console.debug('XXXXXX previousMatch: ', previousMatch);
+  // console.debug('XXXXXX updateMatchingTagName(): changeObj: ', changeObj);
+  // console.debug('XXXXXX updateMatchingTagName(): cursor: ', cursor);
+  // console.debug('XXXXXX previousMatch: ', previousMatch);
   if (!match || !previousMatch) return;
   if (
     match.close &&
@@ -1482,7 +1482,7 @@ export function updateMatchingTagName(cm, changeObj) {
     match.close.from.line === cursor.line
   ) {
     // if within the ending tag
-    console.debug('XXXXXX within ending tag: ', match);
+    // console.debug('XXXXXX within ending tag: ', match);
     if (utils.isValidElementName(match.close.tag) && previousMatch.open) {
       cm.blockChanges = true;
       cm.replaceRange('<' + match.close.tag, previousMatch.open.from, {
@@ -1500,11 +1500,18 @@ export function updateMatchingTagName(cm, changeObj) {
     previousMatch.open.from.line === cursor.line
   ) {
     // if within opening tag
-    console.debug('XXXXXX within opening tag: ', match);
+    // console.debug('XXXXXX within opening tag: ', match);
     if (utils.isValidElementName(match.open.tag) && previousMatch.close) {
-      // TODO: previousMatch.close.line same as match.open.line, add changeObj[].text.length to coordinates
+      let from = previousMatch.close.from;
+      let to = previousMatch.close.to;
+      // if in same line, correct x shift
+      if (previousMatch.close.from.line === match.open.from.line) {
+        let xShift = changeObj[0]?.text[0]?.length - changeObj[0]?.removed[0]?.length;
+        from.ch += xShift;
+        to.ch += xShift;
+      }
       cm.blockChanges = true;
-      cm.replaceRange('</' + match.open.tag + '>', previousMatch.close.from, previousMatch.close.to);
+      cm.replaceRange('</' + match.open.tag + '>', from, to);
       cm.blockChanges = false;
     }
   }
