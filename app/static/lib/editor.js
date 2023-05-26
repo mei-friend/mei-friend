@@ -1442,7 +1442,7 @@ export function showTagEncloserMenu(v, cm, node = null) {
       if (event.key === 'Enter' && validName) {
         event.preventDefault();
         this.encloseSelectionWithTag(v, cm, tagString);
-        document.getElementById('surroundWithLastTagName')?.innerHTML = tagString;
+        document.getElementById('surroundWithLastTagName').innerHTML = tagString;
         node?.parentElement?.removeChild(node);
         cm.focus();
       } else if (event.key === 'Escape') {

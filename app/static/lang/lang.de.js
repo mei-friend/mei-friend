@@ -48,6 +48,8 @@ export const lang = {
   replaceMenuText: { text: 'Ersetzen' },
   replaceAllMenuText: { text: 'Alles ersetzen' },
   indentSelectionText: { text: 'Auswahl einrücken' },
+  surroundWithTagsText: { text: 'Mit Tags umschließen' },
+  surroundWithLastTagText: { text: 'Umschließen mit ' },
   jumpToLineText: { text: 'Zu Zeile gehen' },
   manualValidateText: { text: 'Validieren' },
 

@@ -51,6 +51,8 @@ export const lang = {
   replaceMenuText: { text: 'Replace' },
   replaceAllMenuText: { text: 'Replace all' },
   indentSelectionText: { text: 'Indent selection' },
+  surroundWithTagsText: { text: 'Surround with tags' },
+  surroundWithLastTagText: { text: 'Surround with ' },
   jumpToLineText: { text: 'Jump to line' },
   manualValidateText: { text: 'Validate' },
 

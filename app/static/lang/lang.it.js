@@ -51,6 +51,8 @@ export const lang = {
   replaceMenuText: { text: 'Sostituisci' },
   replaceAllMenuText: { text: 'Sostituisci tutto' },
   indentSelectionText: { text: 'Indenta selezione' },
+  surroundWithTagsText: { text: 'Circondare con tags' },
+  surroundWithLastTagText: { text: 'Circondare con ' },
   jumpToLineText: { text: 'Vai alla riga' },
   manualValidateText: { text: 'Convalida' },
 
