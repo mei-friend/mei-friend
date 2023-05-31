@@ -22,6 +22,7 @@ import {
 import { selectMarkup } from './markup.js';
 import { startMidiTimeout } from './midi-player.js';
 import { getNotationProportion, setNotationProportion, setOrientation } from './resizer.js';
+import { environments, env } from './env.js';
 import {
   commonSchemas,
   codeMirrorSettingsOptions,
@@ -34,7 +35,6 @@ import {
   platform,
   supportedVerovioVersions,
 } from './defaults.js';
-import { translateLanguageSelection } from './language-selector.js';
 
 export default class Viewer {
   constructor(vrvWorker, spdWorker) {
@@ -1302,8 +1302,9 @@ export default class Viewer {
             this.respId = document.getElementById('respSelect').value;
             break;
           case 'controlMenuFontSelector':
-            document.getElementById('engravingFontControls').style.display = document.getElementById('controlMenuFontSelector')
-              .checked
+            document.getElementById('engravingFontControls').style.display = document.getElementById(
+              'controlMenuFontSelector'
+            ).checked
               ? 'inherit'
               : 'none';
             break;

@@ -1,6 +1,6 @@
 // mei-friend version and date
-export const version = '0.8.10';
-export const versionDate = '10 May 2023'; // use full or 3-character english months, will be translated
+export const version = '0.8.11';
+export const versionDate = '31 May 2023'; // use full or 3-character english months, will be translated
 
 var vrvWorker;
 var spdWorker;
@@ -75,6 +75,7 @@ import {
 } from './midi-player.js';
 import * as att from './attribute-classes.js';
 import * as e from './editor.js';
+import { environments, env } from './env.js';
 import Viewer from './viewer.js';
 import * as speed from './speed.js';
 import Github from './github.js';
@@ -105,6 +106,7 @@ import {
 } from './defaults.js';
 import Translator from './translator.js';
 import { buildLanguageSelection, translateLanguageSelection } from './language-selector.js';
+import { runLanguageChecks } from '../tests/checkLangs.js';
 
 const defaultCodeMirrorOptions = {
   lineNumbers: true,
@@ -132,6 +134,10 @@ const defaultCodeMirrorOptions = {
     'Alt-.': consultGuidelines,
     'Shift-Alt-f': indentSelection,
     "'Ï'": indentSelection, // TODO: overcome strange bindings on MAC
+    'Cmd-E': encloseSelectionWithTag, // TODO: make OS modifier keys dynamic
+    'Ctrl-E': encloseSelectionWithTag,
+    'Cmd-/': encloseSelectionWithLastTag,
+    'Ctrl-/': encloseSelectionWithLastTag,
   },
   lint: {
     caller: cm,
@@ -381,6 +387,11 @@ document.addEventListener('DOMContentLoaded', function () {
  * Do all the heavy GUI lifting after DOMCOntentLoaded event was fired
  */
 function onLanguageLoaded() {
+  // expose default language pack for debug
+  if (env && env === environments.develop) {
+    runLanguageChecks();
+    console.debug('Default language pack: ', JSON.stringify(translator.defaultLang, null, 2));
+  }
   // build language selection menu
   buildLanguageSelection();
   // link to changelog page according to env settings (develop/staging/production)
@@ -1229,6 +1240,19 @@ function indentSelection() {
   e.indentSelection(v, cm);
 } // indentSelection()
 
+let tagEncloserNode; // context menu to choose node name to enclose selected text
+
+// wrapper for editor.encloseSelectionWithTag()
+function encloseSelectionWithTag() {
+  tagEncloserNode = e.showTagEncloserMenu(v, cm, tagEncloserNode);
+} // encloseSelectionWithTag()
+
+function encloseSelectionWithLastTag() {
+  if (tagEncloserNode && tagEncloserNode.querySelector('input')?.value) {
+    e.encloseSelectionWithTag(v, cm, tagEncloserNode.querySelector('input')?.value);
+  }
+}
+
 // object of interface command functions for buttons and key bindings
 export let cmd = {
   fileNameChange: () => {
@@ -1612,6 +1636,8 @@ function addEventListeners(v, cm) {
   document.getElementById('replaceMenu').addEventListener('click', () => CodeMirror.commands.replace(cm));
   document.getElementById('replaceAllMenu').addEventListener('click', () => CodeMirror.commands.replaceAll(cm));
   document.getElementById('indentSelection').addEventListener('click', cmd.indentSelection);
+  document.getElementById('surroundWithTags').addEventListener('click', encloseSelectionWithTag);
+  document.getElementById('surroundWithLastTag').addEventListener('click', encloseSelectionWithLastTag);
   document.getElementById('jumpToLine').addEventListener('click', () => CodeMirror.commands.jumpToLine(cm));
   document.getElementById('manualValidate').addEventListener('click', cmd.validate);
   document
@@ -1808,8 +1834,21 @@ function addEventListeners(v, cm) {
   // reset application
   document.getElementById('resetDefault').addEventListener('click', cmd.resetDefault);
 
+  cm.on('beforeChange', () => e.updateMatch(cm));
+
   // editor activity
-  cm.on('cursorActivity', () => v.cursorActivity(cm));
+  cm.on('cursorActivity', () => {
+    tagEncloserNode?.parentElement?.removeChild(tagEncloserNode);
+    v.cursorActivity(cm);
+  });
+
+  // editor reports changes
+  cm.on('changes', (cm, changeObj) => {
+    if (!cm.blockChanges) {
+      e.updateMatchingTagName(cm, changeObj);
+      handleEditorChanges();
+    }
+  }); // cm.on() change listener
 
   // flip button updates manually notation location to cursor pos in encoding
   document.getElementById('flipButton').addEventListener('click', () => {
@@ -1827,13 +1866,6 @@ function addEventListeners(v, cm) {
   if (forkAndOpenCancelButton) {
     forkAndOpenCancelButton.addEventListener('click', forkRepositoryCancel);
   }
-
-  // editor reports changes
-  cm.on('changes', () => {
-    if (!cm.blockChanges) {
-      handleEditorChanges();
-    }
-  }); // cm.on() change listener
 
   // Editor font size zooming
   document.getElementById('encoding').addEventListener('wheel', (ev) => {

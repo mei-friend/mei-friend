@@ -1,9 +1,8 @@
 // global, loads before app
-const environments = {
+export const environments = {
   develop: 'develop',
   staging: 'staging',
   production: 'production',
 };
 
-// mei-friend version and date
-var env = environments.staging;
+export const env = environments.staging;

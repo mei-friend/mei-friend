@@ -702,6 +702,21 @@ export function escapeXmlId(str) {
 }
 
 /**
+ * Checks whether tagName is a valid XML element name
+ * @param {string} tagName 
+ * @returns 
+ */
+export function isValidElementName(tagName = '') {
+  if (!tagName) return false;
+  try {
+    document.createElement(tagName);
+    return true;
+  } catch (err) {
+    return false;
+  }
+} // isValidElementName()
+
+/**
  * Returns an ISO 8601 string in lokal timezone
  * @param {Date} d - date to create string for
  * @returns {string} formatted string

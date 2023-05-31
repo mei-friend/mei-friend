@@ -51,6 +51,8 @@ export const lang = {
   replaceMenuText: { text: 'Reemplaça' },
   replaceAllMenuText: { text: 'Reemplaça-ho tot' },
   indentSelectionText: { text: 'Indentar selecció' },
+  surroundWithTagsText: { text: 'Envoltar amb tags' },
+  surroundWithLastTagText: { text: 'Envoltar amb ' },
   jumpToLineText: { text: 'Salta a línia' },
   manualValidateText: { text: 'Valida' },
 
@@ -304,6 +306,11 @@ export const lang = {
       '</a>.',
   },
 
+  // CodeMirror editor
+  selectTagNameForEnclosure: { text: "Tancar amb el nom de l'element" },
+  selectTagNameForEnclosureOkButton: { value: "D'acord" },
+  selectTagNameForEnclosureCancelButton: { value: 'Cancel·la' },
+
   // annotation panel  / panell d'annotacions
   annotationCloseButtonText: { text: "Tanca el panell d'annotacions" },
   hideAnnotationPanelButton: { description: "Tanca el panell d'annotacions" },
@@ -364,6 +371,7 @@ export const lang = {
   // mei-friend SETTINGS MENU / MEI-FRIEND MENU DE CONFIGURACIÓ
   meiFriendSettingsHeader: {
     text: 'Configuració de mei-friend',
+    description: 'Configuració de mei-friend',
   },
   mfReset: {
     text: 'Per defecte',
