@@ -48,6 +48,8 @@ export const lang = {
   replaceMenuText: { text: 'Reemplazar' },
   replaceAllMenuText: { text: 'Reemplazar todo' },
   indentSelectionText: { text: 'Indentar selección' },
+  surroundWithTagsText: { text: 'Envolver con tags' },
+  surroundWithLastTagText: { text: 'Envolver con ' },
   jumpToLineText: { text: 'Ir a línea' },
   manualValidateText: { text: 'Validar' },
 
@@ -301,6 +303,11 @@ export const lang = {
       'añadir al repertorio público' +
       '</a>.',
   },
+
+  // CodeMirror editor
+  selectTagNameForEnclosure: { text: 'Encerrar con nombre de elemento' },
+  selectTagNameForEnclosureOkButton: { value: 'Vale' },
+  selectTagNameForEnclosureCancelButton: { value: 'Cancelar' },
 
   // annotation panel / panel de anotaciones
   annotationCloseButtonText: { text: 'Cerrar panel de anotaciones' },
