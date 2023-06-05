@@ -558,8 +558,8 @@ export default class Github {
             // recur
             return this.awaitActionWorkflowCompletion(workflowId, run.run_started_at);
           } else { 
-            console.error("Received unexpected response to workflow runs request:", resJson);
-            return { status: 406 }
+            console.error("Received unexpected response to workflow runs request, retrying:", resJson);
+            return this.awaitActionWorkflowCompletion(workflowId);
           }
         } else { 
           console.error("Received unexpected response to workflow runs request:", resJson);

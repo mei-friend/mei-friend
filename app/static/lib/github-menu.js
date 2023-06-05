@@ -186,7 +186,7 @@ function branchContentsFileClicked(ev) {
   document.getElementById('GithubMenu').classList.remove('forceShow');
 } // branchContentsFileClicked()
 
-function loadFile(fileName, clearBeforeLoading = true, ev = null) {
+function loadFile(fileName = "", clearBeforeLoading = true, ev = null) {
   const githubLoadingIndicator = document.getElementById('GithubLogo');
   github.filepath += fileName;
   console.debug(`${translator.lang.loadingFile.text}: https://github.com/${github.githubRepo}${github.filepath}`);
@@ -626,6 +626,7 @@ async function handleClickGithubAction(e) {
     statusMsg.innerHTML = "";
   }
   runBtn.onclick = () => { 
+    statusMsg.innerHTML = "";
     cancelBtn.setAttribute("disabled", true);
     runBtn.setAttribute("disabled", true);
     const githubLoadingIndicator = document.getElementById('GithubLogo');
@@ -645,24 +646,36 @@ async function handleClickGithubAction(e) {
             if("conclusion" in workflowCompletionResp) { 
               if(workflowCompletionResp.conclusion === "success") { 
                 statusMsg.innerHTML = `<span id="githubActionStatusMsgSuccess">${translator.lang.githubActionStatusMsgSuccess.text}</span>: <a href="${workflowCompletionResp.html_url}" target="_blank">${workflowCompletionResp.conclusion}</a>`;
-                
+                runBtn.innerText= "Reload MEI file";
+                runBtn.removeAttribute("disabled");
+                runBtn.onclick = () => {
+                  loadFile();
+                  overlay.style.display = "none";
+                  statusMsg.innerHTML = "";
+                }
+
               } else { 
                 statusMsg.innerHTML = `<span id="githubActionStatusMsgFailure">${translator.lang.githubActionStatusMsgFailure.text}</span>: <a href="${workflowCompletionResp.html_url}" target="_blank">${workflowCompletionResp.conclusion}</a>`;
+                cancelBtn.removeAttribute("disabled");
+                runBtn.removeAttribute("disabled");
               }
             } else { 
-              throw new Error("Invalid response received from GitHub API");
+              console.error("Invalid response received from GitHub API", workflowCompletionResp);
+              cancelBtn.removeAttribute("disabled");
+              runBtn.removeAttribute("disabled");
+              statusMsg.innerHTML = "Error - invalid response received from GitHub API (see console)";
             }
           })
         //statusMsg.innerHTML = `<span id="githubActionStatusMsg">${translator.lang.githubActionStatusMsg.text}</span>`;
       }
     }).catch(e => {
      // network error
+      console.error("Could not start workflow - perhaps network error?", e);
       statusMsg.innerHTML = "Error";
-      console.error(e);
-    }).finally(() => { 
-      githubLoadingIndicator.classList.remove("clockwise");
       cancelBtn.removeAttribute("disabled");
       runBtn.removeAttribute("disabled");
+    }).finally(() => { 
+      githubLoadingIndicator.classList.remove("clockwise");
     });
   }
   /*
