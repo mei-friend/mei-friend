@@ -75,7 +75,6 @@ import {
 } from './midi-player.js';
 import * as att from './attribute-classes.js';
 import * as e from './editor.js';
-import { environments, env } from './env.js';
 import Viewer from './viewer.js';
 import * as speed from './speed.js';
 import Github from './github.js';
