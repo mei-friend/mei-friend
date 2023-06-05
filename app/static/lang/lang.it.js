@@ -1,12 +1,28 @@
 /**
  * Language file for Italian
  */
+
 import * as att from '../lib/attribute-classes.js';
 import { heart } from '../css/icons.js';
 
 export const lang = {
   // Main menu bar
   githubLoginLink: { text: 'Accesso' },
+
+  month: {
+    jan: 'Gennaio',
+    feb: 'Febbraio',
+    mar: 'Marzo',
+    apr: 'Aprile',
+    may: 'Maggio',
+    jun: 'Giugno',
+    jul: 'Luglio',
+    aug: 'Agosto',
+    sep: 'Settembre',
+    oct: 'Ottobre',
+    nov: 'Novembre',
+    dec: 'Dicembre',
+  },
 
   // FILE MENU ITEM// MENU FILE
   fileMenuTitle: { text: 'File' },
@@ -35,6 +51,8 @@ export const lang = {
   replaceMenuText: { text: 'Sostituisci' },
   replaceAllMenuText: { text: 'Sostituisci tutto' },
   indentSelectionText: { text: 'Indenta selezione' },
+  surroundWithTagsText: { text: 'Circondare con tags' },
+  surroundWithLastTagText: { text: 'Circondare con ' },
   jumpToLineText: { text: 'Vai alla riga' },
   manualValidateText: { text: 'Convalida' },
 
@@ -294,6 +312,11 @@ export const lang = {
       '</a>.',
   },
 
+  // CodeMirror editor
+  selectTagNameForEnclosure: { text: "Acchiudere con il nome dell'elemento" },
+  selectTagNameForEnclosureOkButton: { value: 'OK' },
+  selectTagNameForEnclosureCancelButton: { value: 'Annulla' },
+
   // annotation panel / annotation panel
   annotationCloseButtonText: { text: 'Chiudi pannello di annotazione' },
   hideAnnotationPanelButton: { description: 'Chiudi pannello di annotazione' },
@@ -354,6 +377,7 @@ export const lang = {
   // mei-friend SETTINGS MENU// MENU IMPOSTAZIONI di mei-friend
   meiFriendSettingsHeader: {
     text: 'Impostazioni',
+    description: 'Impostazioni di mei-friend',
   },
   mfReset: {
     text: 'Predefinito',
@@ -667,68 +691,68 @@ export const lang = {
     description: 'Reimposta alle impostazioni predefinite di mei-friend',
   },
   titleAppearance: {
-    title: "Aspetto dell'editor",
+    text: "Aspetto dell'editor",
     description: "Controlla l'aspetto dell'editor",
   },
   zoomFont: {
-    title: 'Dimensione del carattere (%)',
+    text: 'Dimensione del carattere (%)',
     description: "Cambia la dimensione del carattere dell'editor (in percentuale)",
   },
   theme: {
-    title: 'Tema',
+    text: 'Tema',
     description: "Seleziona il tema dell'editor",
   },
   matchTheme: {
-    title: 'La notazione corrisponde al tema',
+    text: 'La notazione corrisponde al tema',
     description: "Corrispondenza della notazione al tema di colore dell'editor",
   },
   tabSize: {
-    title: 'Dimensione indentazione',
+    text: 'Dimensione indentazione',
     description: 'Numero di spazi per ogni livello di indentazione',
   },
   lineWrapping: {
-    title: 'Rientro righe',
+    text: 'Rientro righe',
     description: 'Indica se le righe vengono spezzate a fine pannello',
   },
   lineNumbers: {
-    title: 'Numeri di riga',
+    text: 'Numeri di riga',
     description: 'Mostra i numeri di riga',
   },
   firstLineNumber: {
-    title: 'Primo numero di riga',
+    text: 'Primo numero di riga',
     description: 'Imposta il primo numero di riga',
   },
   foldGutter: {
-    title: 'Piegatura codice',
+    text: 'Piegatura codice',
     description: 'Abilita la piegatura del codice attraverso la piega delle linee',
   },
   titleEditorOptions: {
-    title: "Comportamento dell'editor",
+    text: "Comportamento dell'editor",
     description: "Controlla il comportamento dell'editor",
   },
   autoValidate: {
-    title: 'Validazione automatica',
+    text: 'Validazione automatica',
     description: 'Valida automaticamente la codifica rispetto allo schema dopo ogni modifica',
   },
   autoCloseBrackets: {
-    title: 'Chiusura parentesi automatica',
+    text: 'Chiusura parentesi automatica',
     description: 'Chiude automaticamente le parentesi quando vengono inserite',
   },
   autoCloseTags: {
-    title: 'Chiusura tag automatica',
+    text: 'Chiusura tag automatica',
     description: 'Chiude automaticamente i tag quando vengono inseriti',
     type: 'bool',
   },
   matchTags: {
-    title: 'Corrispondenza tag',
+    text: 'Corrispondenza tag',
     description: "Evidenzia i tag corrispondenti intorno al cursore dell'editor",
   },
   showTrailingSpace: {
-    title: 'Evidenzia spazi finali',
+    text: 'Evidenzia spazi finali',
     description: 'Evidenzia gli spazi inutili alla fine delle righe',
   },
   keyMap: {
-    title: 'Mappa tasti',
+    text: 'Mappa tasti',
     description: 'Seleziona la mappa tasti',
   },
 
@@ -780,17 +804,17 @@ export const lang = {
   errorsFound: { text: 'errori trovati' }, // 5 errori trovati
 
   // github-menu.js / github-menu.js
-  repository: { text: 'Repository' },
-  branch: { text: 'Ramo' },
-  path: { text: 'Percorso' },
-  commit: { text: 'Commit' },
+  githubRepository: { text: 'Repository' },
+  githubBranch: { text: 'Ramo' },
+  githubFilepath: { text: 'Percorso' },
+  githubCommit: { text: 'Commit' },
+  githubCommitButton: { classes: { commitAsNewFile: { value: 'Commit come nuovo file' } }, value: 'Commit' },
   commitLog: { text: 'Registro commit' },
-  commitAsNewFile: { text: 'Commit come nuovo file' },
-  date: { text: 'Data' },
-  author: { text: 'Autore' },
-  message: { text: 'Messaggio' },
+  githubDate: { text: 'Data' },
+  githubAuthor: { text: 'Autore' },
+  githubMessage: { text: 'Messaggio' },
   none: { text: 'Nessuno' },
-  fileName: { description: 'Nome del file' },
+  commitFileNameText: { text: 'Nome del file' },
   forkRepository: { text: 'Fork del repository' },
   forkError: { text: 'Spiacenti, non è possibile eseguire il fork del repository' },
   loadingFile: { text: 'Caricamento file' },
@@ -799,8 +823,8 @@ export const lang = {
   githubLogout: { text: 'Esci' },
   selectRepository: { text: 'Seleziona repository' },
   selectBranch: { text: 'Seleziona ramo' },
-  commitPlaceholder: { text: 'Aggiornato usando mei-friend online' },
-  reportIssueWithEncoding: { text: 'Segnala problema di codifica' },
+  commitMessageInput: { placeholder: 'Aggiornato usando mei-friend online' },
+  reportIssueWithEncoding: { value: 'Segnala problema di codifica' },
   clickToOpenInMeiFriend: { text: 'Clicca per aprire in mei-friend' },
   repoAccessError: {
     text: "Spiacenti, non è possibile accedere ai repository per l'utente o l'organizzazione forniti",

@@ -1,12 +1,28 @@
 /**
  * Language file for English
  */
+
 import * as att from '../lib/attribute-classes.js';
 import { heart } from '../css/icons.js';
 
 export const lang = {
   // Main menu bar
   githubLoginLink: { text: 'Login' },
+
+  month: {
+    jan: 'January',
+    feb: 'February',
+    mar: 'March',
+    apr: 'April',
+    may: 'May',
+    jun: 'June',
+    jul: 'July',
+    aug: 'August',
+    sep: 'September',
+    oct: 'October',
+    nov: 'November',
+    dec: 'December',
+  },
 
   // FILE MENU ITEM
   fileMenuTitle: { text: 'File' },
@@ -35,6 +51,8 @@ export const lang = {
   replaceMenuText: { text: 'Replace' },
   replaceAllMenuText: { text: 'Replace all' },
   indentSelectionText: { text: 'Indent selection' },
+  surroundWithTagsText: { text: 'Surround with tags' },
+  surroundWithLastTagText: { text: 'Surround with ' },
   jumpToLineText: { text: 'Jump to line' },
   manualValidateText: { text: 'Validate' },
 
@@ -291,6 +309,11 @@ export const lang = {
       '</a>.',
   },
 
+  // CodeMirror editor
+  selectTagNameForEnclosure: { text: 'Enclose with tag name' },
+  selectTagNameForEnclosureOkButton: { value: 'OK' },
+  selectTagNameForEnclosureCancelButton: { value: 'Cancel' },
+
   // annotation panel
   annotationCloseButtonText: { text: 'Close Annotations Panel' },
   hideAnnotationPanelButton: { description: 'Close Annotations Panel' },
@@ -350,6 +373,7 @@ export const lang = {
   // mei-friend SETTINGS MENU
   meiFriendSettingsHeader: {
     text: 'mei-friend Settings',
+    description: 'mei-friend Settings',
   },
   mfReset: {
     text: 'Default',
@@ -456,7 +480,7 @@ export const lang = {
     text: 'Show speed mode checkbox',
     description: 'Show speed mode checkbox in notation control menu',
   },
-  
+
   // MIDI Playback
   titleMidiPlayback: {
     text: 'MIDI playback',
@@ -660,68 +684,68 @@ export const lang = {
     description: 'Reset to mei-friend defaults',
   },
   titleAppearance: {
-    title: 'Editor appearance',
+    text: 'Editor appearance',
     description: 'Controls the appearance of the editor',
   },
   zoomFont: {
-    title: 'Font size (%)',
+    text: 'Font size (%)',
     description: 'Change font size of editor (in percent)',
   },
   theme: {
-    title: 'Theme',
+    text: 'Theme',
     description: 'Select the theme of the editor',
   },
   matchTheme: {
-    title: 'Notation matches theme',
+    text: 'Notation matches theme',
     description: 'Match notation to editor color theme',
   },
   tabSize: {
-    title: 'Indentation size',
+    text: 'Indentation size',
     description: 'Number of space characters for each indentation level',
   },
   lineWrapping: {
-    title: 'Line wrapping',
+    text: 'Line wrapping',
     description: 'Whether or not lines are wrapped at end of panel',
   },
   lineNumbers: {
-    title: 'Line numbers',
+    text: 'Line numbers',
     description: 'Show line numbers',
   },
   firstLineNumber: {
-    title: 'First line number',
+    text: 'First line number',
     description: 'Set first line number',
   },
   foldGutter: {
-    title: 'Code folding',
+    text: 'Code folding',
     description: 'Enable code folding through fold gutters',
   },
   titleEditorOptions: {
-    title: 'Editor behavior',
+    text: 'Editor behavior',
     description: 'Controls the behavior of the editor',
   },
   autoValidate: {
-    title: 'Auto validation',
+    text: 'Auto validation',
     description: 'Validate encoding against schema automatically after each edit',
   },
   autoCloseBrackets: {
-    title: 'Auto close brackets',
+    text: 'Auto close brackets',
     description: 'Automatically close brackets at input',
   },
   autoCloseTags: {
-    title: 'Auto close tags',
+    text: 'Auto close tags',
     description: 'Automatically close tags at input',
     type: 'bool',
   },
   matchTags: {
-    title: 'Match tags',
+    text: 'Match tags',
     description: 'Highlights matched tags around editor cursor',
   },
   showTrailingSpace: {
-    title: 'Highlight trailing spaces',
+    text: 'Highlight trailing spaces',
     description: 'Highlights unnecessary trailing spaces at end of lines',
   },
   keyMap: {
-    title: 'Key map',
+    text: 'Key map',
     description: 'Select key map',
   },
 
@@ -771,17 +795,17 @@ export const lang = {
   errorsFound: { text: 'errors found' }, // 5 errors found
 
   // github-menu.js
-  repository: { text: 'Repository' },
-  branch: { text: 'Branch' },
-  path: { text: 'Path' },
-  commit: { text: 'Commit' },
+  githubRepository: { text: 'Repository' },
+  githubBranch: { text: 'Branch' },
+  githubFilepath: { text: 'Path' },
+  githubCommit: { text: 'Commit' },
+  githubCommitButton: { classes: { commitAsNewFile: { value: 'Commit as new file' } }, value: 'Commit' },
   commitLog: { text: 'Commit log' },
-  commitAsNewFile: { text: 'Commit as new file' },
-  date: { text: 'Date' },
-  author: { text: 'Author' },
-  message: { text: 'Message' },
+  githubDate: { text: 'Date' },
+  githubAuthor: { text: 'Author' },
+  githubMessage: { text: 'Message' },
   none: { text: 'None' },
-  fileName: { description: 'File name' },
+  commitFileNameText: { text: 'File name' },
   forkRepository: { text: 'Fork repository' },
   forkError: { text: 'Sorry, could not fork repository' },
   loadingFile: { text: 'Loading file' },
@@ -790,8 +814,8 @@ export const lang = {
   githubLogout: { text: 'Log out' },
   selectRepository: { text: 'Select repository' },
   selectBranch: { text: 'Select branch' },
-  commitPlaceholder: { text: 'Updated using mei-friend online' },
-  reportIssueWithEncoding: { text: 'Report issue with encoding' },
+  commitMessageInput: { placeholder: 'Updated using mei-friend online' },
+  reportIssueWithEncoding: { value: 'Report issue with encoding' },
   clickToOpenInMeiFriend: { text: 'Click to open in mei-friend' },
   repoAccessError: { text: 'Sorry, cannot access repositories for supplied user or organisation' },
   allComposers: { text: 'All composers' }, // fork-repository.js

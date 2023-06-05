@@ -9,6 +9,21 @@ export const lang = {
   // Main menu bar / Menú principal
   githubLoginLink: { text: 'Iniciar sesión en GitHub' },
 
+  month: {
+    jan: 'Enero',
+    feb: 'Febrero',
+    mar: 'Marzo',
+    apr: 'Abril',
+    may: 'Mayo',
+    jun: 'Junio',
+    jul: 'Julio',
+    aug: 'Agosto',
+    sep: 'Septiembre',
+    oct: 'Octubre',
+    nov: 'Noviembre',
+    dec: 'Diciembre',
+  },
+
   // FILE MENU ITEM / ELEMENTOS DEL MENÚ ARCHIVO
   fileMenuTitle: { text: 'Archivo' },
   openMeiText: { text: 'Abrir archivo' },
@@ -33,6 +48,8 @@ export const lang = {
   replaceMenuText: { text: 'Reemplazar' },
   replaceAllMenuText: { text: 'Reemplazar todo' },
   indentSelectionText: { text: 'Indentar selección' },
+  surroundWithTagsText: { text: 'Envolver con tags' },
+  surroundWithLastTagText: { text: 'Envolver con ' },
   jumpToLineText: { text: 'Ir a línea' },
   manualValidateText: { text: 'Validar' },
 
@@ -287,6 +304,11 @@ export const lang = {
       '</a>.',
   },
 
+  // CodeMirror editor
+  selectTagNameForEnclosure: { text: 'Encerrar con nombre de elemento' },
+  selectTagNameForEnclosureOkButton: { value: 'Vale' },
+  selectTagNameForEnclosureCancelButton: { value: 'Cancelar' },
+
   // annotation panel / panel de anotaciones
   annotationCloseButtonText: { text: 'Cerrar panel de anotaciones' },
   hideAnnotationPanelButton: { description: 'Cerrar panel de anotaciones' },
@@ -347,6 +369,7 @@ export const lang = {
   // mei-friend SETTINGS MENU / MEI-FRIEND MENU DE CONFIGURACIÓN
   meiFriendSettingsHeader: {
     text: 'Configuración',
+    description: 'Configuración de mei-friend',
   },
   mfReset: {
     text: 'Predeterminado',
@@ -362,7 +385,7 @@ export const lang = {
   hideSettingsButton: {
     description: 'Cerrar panel de configuración',
   },
-titleGeneral: {
+  titleGeneral: {
     text: 'General',
     description: 'Configuraciones generales de mei-friend',
   },
@@ -424,7 +447,10 @@ titleGeneral: {
     description:
       'Seleccionar ligaduras (es decir, elementos con el atributo @curvature: ' + att.attCurvature.join(', ') + ')',
   },
-
+  dragSelectMeasures: {
+    text: 'Seleccionar medidas',
+    description: 'Seleccionar medidas',
+  },
   // Control menu / Menú de control
   controlMenuSettings: {
     text: 'Barra de control de notación',
@@ -498,21 +524,31 @@ titleGeneral: {
       '(Verovio admite el sistema base 40)',
     labels: [
       'Unísono',
-      'Segunda mayor',
+      'Unísono aumentada',
+      'Segunda disminuida',
       'Segunda menor',
-      'Tercera mayor',
+      'Segunda mayor',
+      'Segunda aumentada',
+      'Tercera disminuida',
       'Tercera menor',
+      'Tercera mayor',
+      'Tercera aumentada',
+      'Cuarta disminuida',
       'Cuarta justa',
       'Cuarta aumentada',
       'Quinta disminuida',
       'Quinta justa',
       'Quinta aumentada',
+      'Sexta disminuida',
       'Sexta menor',
       'Sexta mayor',
+      'Sexta aumentada',
+      'Séptima disminuida',
       'Séptima menor',
       'Séptima mayor',
+      'Séptima aumentada',
+      'Octava disminuida',
       'Octava justa',
-      'Octava aumentada',
     ],
   },
   transposeKey: {
@@ -648,68 +684,68 @@ titleGeneral: {
     description: 'Restablecer a los valores predeterminados de mei-friend',
   },
   titleAppearance: {
-    title: 'Apariencia del editor',
+    text: 'Apariencia del editor',
     description: 'Controla la apariencia del editor',
   },
   zoomFont: {
-    title: 'Tamaño de fuente (%)',
+    text: 'Tamaño de fuente (%)',
     description: 'Cambiar el tamaño de fuente del editor (en porcentaje)',
   },
   theme: {
-    title: 'Tema',
+    text: 'Tema',
     description: 'Seleccione el tema del editor',
   },
   matchTheme: {
-    title: 'La notación coincide con el tema',
+    text: 'La notación coincide con el tema',
     description: 'Coincidir la notación con el tema de color del editor',
   },
   tabSize: {
-    title: 'Tamaño de sangría',
+    text: 'Tamaño de sangría',
     description: 'Número de caracteres de espacio para cada nivel de sangría',
   },
   lineWrapping: {
-    title: 'Ajuste de línea',
+    text: 'Ajuste de línea',
     description: 'Si las líneas se ajustan o no al final del panel',
   },
   lineNumbers: {
-    title: 'Números de línea',
+    text: 'Números de línea',
     description: 'Mostrar números de línea',
   },
   firstLineNumber: {
-    title: 'Número de primera línea',
+    text: 'Número de primera línea',
     description: 'Establecer el número de primera línea',
   },
   foldGutter: {
-    title: 'Plegado de código',
+    text: 'Plegado de código',
     description: 'Permite plegar el código a través de los separadores de plegado',
   },
   titleEditorOptions: {
-    title: 'Comportamiento del editor',
+    text: 'Comportamiento del editor',
     description: 'Controla el comportamiento del editor',
   },
   autoValidate: {
-    title: 'Validación automática',
+    text: 'Validación automática',
     description: 'Validar la codificación automáticamente después de cada edición',
   },
   autoCloseBrackets: {
-    title: 'Cerrar corchetes automáticamente',
+    text: 'Cerrar corchetes automáticamente',
     description: 'Cerrar automáticamente los corchetes al escribir',
   },
   autoCloseTags: {
-    title: 'Cerrar etiquetas automáticamente',
+    text: 'Cerrar etiquetas automáticamente',
     description: 'Cerrar automáticamente las etiquetas al escribir',
     type: 'bool',
   },
   matchTags: {
-    title: 'Coincidir etiquetas',
+    text: 'Coincidir etiquetas',
     description: 'Resalta las etiquetas coincidentes alrededor del cursor del editor',
   },
   showTrailingSpace: {
-    title: 'Resaltar espacios finales',
+    text: 'Resaltar espacios finales',
     description: 'Resalta los espacios innecesarios al final de las líneas',
   },
   keyMap: {
-    title: 'Mapa de teclas',
+    text: 'Mapa de teclas',
     description: 'Seleccione el mapa de teclas',
   },
 
@@ -755,17 +791,17 @@ titleGeneral: {
   errorsFound: { text: 'Errores encontrados' }, // 5 errores encontrados
 
   // github-menu.js / github-menu.js
-  repository: { text: 'Repositorio' },
-  branch: { text: 'Rama' },
-  path: { text: 'Ruta' },
-  commit: { text: 'Confirmar' },
+  githubRepository: { text: 'Repositorio' },
+  githubBranch: { text: 'Rama' },
+  githubFilepath: { text: 'Ruta' },
+  githubCommit: { text: 'Commit' },
+  githubCommitButton: { classes: { commitAsNewFile: { value: 'Confirmar como nuevo archivo' } }, value: 'Confirmar' },
   commitLog: { text: 'Registro de confirmaciones' },
-  commitAsNewFile: { text: 'Confirmar como nuevo archivo' },
-  date: { text: 'Fecha' },
-  author: { text: 'Autor' },
-  message: { text: 'Mensaje' },
+  githubDate: { text: 'Fecha' },
+  githubAuthor: { text: 'Autor' },
+  githubMessage: { text: 'Mensaje' },
   none: { text: 'Ninguno' },
-  fileName: { description: 'Nombre del archivo' },
+  commitFileNameText: { text: 'Nombre del archivo' },
   forkRepository: { text: 'Forkar repositorio' },
   forkError: { text: 'Lo siento, no se pudo forkar el repositorio' },
   loadingFile: { text: 'Cargando archivo' },
@@ -774,8 +810,8 @@ titleGeneral: {
   githubLogout: { text: 'Cerrar sesión' },
   selectRepository: { text: 'Seleccionar repositorio' },
   selectBranch: { text: 'Seleccionar rama' },
-  commitPlaceholder: { text: 'Actualizado utilizando mei-friend en línea' },
-  reportIssueWithEncoding: { text: 'Informar problema con la codificación' },
+  commitMessageInput: { placeholder: 'Actualizado utilizando mei-friend en línea' },
+  reportIssueWithEncoding: { value: 'Informar problema con la codificación' },
   clickToOpenInMeiFriend: { text: 'Haga clic para abrir en mei-friend' },
   repoAccessError: {
     text: 'Lo siento, no se pueden acceder a los repositorios para el usuario u organización suministrados',

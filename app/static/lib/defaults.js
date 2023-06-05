@@ -2,7 +2,7 @@
  * Default values for mei-friend
  */
 
-import { translator } from './main.js';
+import { environments, env } from './env.js';
 
 /**
  * language codes after ISO-639-1, please enter new codes alphabetically
@@ -116,7 +116,7 @@ export const defaultSchema = commonSchemas[defaultMeiProfile][defaultMeiVersion]
 export const defaultVerovioVersion = 'latest'; // 'develop', '3.10.0'
 
 export let supportedVerovioVersions = {};
-if (env === 'develop') {
+if (env === environments.develop) {
   supportedVerovioVersions.local = {
     url: `${root}local/verovio-toolkit-hum.js`,
     description: 'Locally compiled Verovio toolkit version for debugging',

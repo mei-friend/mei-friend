@@ -4,6 +4,7 @@
  */
 import * as l from '../lang/lang.en.js'; // default language
 import { translateLanguageSelection } from './language-selector.js';
+import { drawRightFooter, updateStatusBar } from './main.js';
 
 /**
  * Translator class
@@ -71,44 +72,74 @@ export default class Translator {
    * Refresh language of all mei-friend GUI items
    */
   translateGui() {
-    const v = false; // debug verbosity
     for (let key in this.lang) {
       let el = document.getElementById(key);
       if (el) {
-        if (v) console.log('key: ' + key + ' nodeName: ' + el.nodeName + ', el: ', el);
-        if (el.closest('div.optionsItem')) {
-          // for settings items
-          if (el.nodeName.toLowerCase() === 'select' && 'labels' in this.lang[key]) {
-            // modify values for select inputs
-            el.childNodes.forEach((opt, i) => {
-              if (i < this.lang[key].labels.length) opt.textContent = this.lang[key].labels[i];
-            });
-          }
-          if (el.nodeName.toLowerCase() === 'input' && el.getAttribute('type') === 'button') {
-            if (v) console.log('Found button: ', el);
-          } else {
-            el = el.parentElement.querySelector('label');
-            if (v) console.log('Found label: ', el);
-          }
-        } else if (el.nodeName.toLowerCase() === 'details') {
-          // for settings headers with details and summary
-          el = el.querySelector('summary');
-          if (v) console.log('Found summary: ', el);
-        }
-        // plus for all other items (menu items etc.) with IDs
-        if (el) {
-          if ('text' in this.lang[key]) {
-            if (el.nodeName.toLowerCase() === 'input' && el.getAttribute('type') === 'button') {
-              el.value = this.lang[key].text;
-            } else {
-              el.textContent = this.lang[key].text;
+        // check if we need to consider classes
+        if ('classes' in this.lang[key]) {
+          for (let c of Object.keys(this.lang[key]['classes'])) {
+            if (el.classList.contains(c)) {
+              this.doTranslation(el, key, c);
+              break;
             }
           }
-          if ('description' in this.lang[key]) el.title = this.lang[key].description;
-          if ('html' in this.lang[key]) el.innerHTML = this.lang[key].html;
-          if ('placeholder' in this.lang[key]) el.setAttribute('placeholder', this.lang[key].placeholder);
+        } else {
+          this.doTranslation(el, key);
         }
       }
     }
+    updateStatusBar();
+    drawRightFooter();
   } // translateGui()
+
+  /**
+   * 
+   * @param {Element} el
+   * @param {string} key
+   */
+  doTranslation(el, key, className = '') {
+    const v = false; // debug verbosity
+    if (v) console.log('key: ' + key + ' nodeName: ' + el.nodeName + ', el: ', el);
+    if (el.closest('div.optionsItem')) {
+      // for settings items
+      if (el.nodeName.toLowerCase() === 'select' && 'labels' in this.lang[key]) {
+        // modify values for select inputs
+        el.childNodes.forEach((opt, i) => {
+          if (i < this.lang[key].labels.length) opt.textContent = this.lang[key].labels[i];
+        });
+      }
+      if (el.nodeName.toLowerCase() === 'input' && el.getAttribute('type') === 'button') {
+        if (v) console.log('Found button: ', el);
+      } else {
+        el = el.parentElement.querySelector('label');
+        if (v) console.log('Found label: ', el);
+      }
+    } else if (el.nodeName.toLowerCase() === 'details') {
+      // for settings headers with details and summary
+      el = el.querySelector('summary');
+      if (v) console.log('Found summary: ', el);
+    }
+    // plus for all other items (menu items etc.) with IDs
+    if (el) {
+      let translationItem = this.lang[key];
+      if (className) {
+        if ('classes' in this.lang[key] && className in this.lang[key]['classes']) {
+          translationItem = this.lang[key]['classes'][className];
+        } else {
+          console.warning('doTranslation(): Called with className but cannot translate, reverting to default: ', el, key, className);
+        }
+      }
+      if ('text' in translationItem) {
+        if (el.nodeName.toLowerCase() === 'input' && el.getAttribute('type') === 'button') {
+          el.value = translationItem.text;
+        } else {
+          el.textContent = translationItem.text;
+        }
+      }
+      if ('value' in translationItem) el.value = translationItem.value;
+      if ('description' in translationItem) el.title = translationItem.description;
+      if ('html' in translationItem) el.innerHTML = translationItem.html;
+      if ('placeholder' in translationItem) el.setAttribute('placeholder', translationItem.placeholder);
+    }
+  }
 } // class Translator()

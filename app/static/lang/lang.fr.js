@@ -1,12 +1,28 @@
 /**
  * Language file for French / Français
  */
+
 import * as att from '../lib/attribute-classes.js';
 import { heart } from '../css/icons.js';
 
 export const lang = {
   // Main menu bar
   githubLoginLink: { text: 'Connexion' },
+
+  month: {
+    jan: 'Janvier',
+    feb: 'Février',
+    mar: 'Mars',
+    apr: 'Avril',
+    may: 'Mai',
+    jun: 'Juin',
+    jul: 'Juillet',
+    aug: 'Août',
+    sep: 'Septembre',
+    oct: 'Octobre',
+    nov: 'Novembre',
+    dec: 'Décembre',
+  },
 
   // FILE MENU ITEM / ÉLÉMENT DE MENU FICHIER
   fileMenuTitle: { text: 'Fichier' },
@@ -35,6 +51,8 @@ export const lang = {
   replaceMenuText: { text: 'Remplacer' },
   replaceAllMenuText: { text: 'Tout remplacer' },
   indentSelectionText: { text: "Sélection d'indentation" },
+  surroundWithTagsText: { text: 'Entourer de tags' },
+  surroundWithLastTagText: { text: 'Entourer de ' },
   jumpToLineText: { text: 'Aller à la ligne' },
   manualValidateText: { text: 'Valider' },
 
@@ -285,6 +303,11 @@ export const lang = {
       '</a>.',
   },
 
+  // CodeMirror editor
+  selectTagNameForEnclosure: { text: "Entourer du nom de l'élément" },
+  selectTagNameForEnclosureOkButton: { value: 'OK' },
+  selectTagNameForEnclosureCancelButton: { value: 'Annuller' },
+
   // annotation panel / panneau d'annotation
   annotationCloseButtonText: { text: "Fermer le panneau d'annotations" },
   hideAnnotationPanelButton: { description: "Fermer le panneau d'annotations" },
@@ -347,6 +370,7 @@ export const lang = {
   // mei-friend SETTINGS MENU
   meiFriendSettingsHeader: {
     text: 'Paramètres mei-friend',
+    description: 'Paramètres mei-friend',
   },
   mfReset: {
     text: 'Réinitialiser',
@@ -660,68 +684,68 @@ export const lang = {
     description: 'Réinitialiser aux valeurs par défaut de mei-friend',
   },
   titleAppearance: {
-    title: "Apparence de l'éditeur",
+    text: "Apparence de l'éditeur",
     description: "Contrôle l'apparence de l'éditeur",
   },
   zoomFont: {
-    title: 'Taille de police (%)',
+    text: 'Taille de police (%)',
     description: "Modifier la taille de la police de l'éditeur (en pourcentage)",
   },
   theme: {
-    title: 'Thème',
+    text: 'Thème',
     description: "Sélectionnez le thème de l'éditeur",
   },
   matchTheme: {
-    title: 'La notation correspond au thème',
+    text: 'La notation correspond au thème',
     description: "Fait correspondre la notation au thème de couleur de l'éditeur",
   },
   tabSize: {
-    title: "Taille de l'indentation",
+    text: "Taille de l'indentation",
     description: "Nombre de caractères d'espace pour chaque niveau d'indentation",
   },
   lineWrapping: {
-    title: 'Retour automatique à la ligne',
+    text: 'Retour automatique à la ligne',
     description: 'Indique si les lignes sont ou non renvoyées à la fin du panneau',
   },
   lineNumbers: {
-    title: 'Numéros de ligne',
+    text: 'Numéros de ligne',
     description: 'Affiche les numéros de ligne',
   },
   firstLineNumber: {
-    title: 'Numéro de la première ligne',
+    text: 'Numéro de la première ligne',
     description: 'Définir le numéro de la première ligne',
   },
   foldGutter: {
-    title: 'Pliage de code',
+    text: 'Pliage de code',
     description: 'Activer le pliage de code via les plis de la gouttière',
   },
   titleEditorOptions: {
-    title: "Comportement de l'éditeur",
+    text: "Comportement de l'éditeur",
     description: "Contrôle le comportement de l'éditeur",
   },
   autoValidate: {
-    title: 'Validation automatique',
+    text: 'Validation automatique',
     description: "Valide automatiquement l'encodage par rapport au schéma après chaque édition",
   },
   autoCloseBrackets: {
-    title: 'Fermeture automatique des crochets',
+    text: 'Fermeture automatique des crochets',
     description: "Ferme automatiquement les crochets à l'entrée",
   },
   autoCloseTags: {
-    title: 'Fermeture automatique des balises',
+    text: 'Fermeture automatique des balises',
     description: "Ferme automatiquement les balises à l'entrée",
     type: 'bool',
   },
   matchTags: {
-    title: 'Correspondance des balises',
+    text: 'Correspondance des balises',
     description: "Surligne les balises correspondantes autour du curseur de l'éditeur",
   },
   showTrailingSpace: {
-    title: 'Mettre en évidence les espaces en fin de ligne',
+    text: 'Mettre en évidence les espaces en fin de ligne',
     description: 'Met en évidence les espaces inutiles en fin de ligne',
   },
   keyMap: {
-    title: 'Carte des touches',
+    text: 'Carte des touches',
     description: 'Sélectionnez la carte des touches',
   },
 
@@ -772,17 +796,20 @@ export const lang = {
   errorsFound: { text: 'erreurs trouvées' }, // 5 erreurs trouvées / 5 errors found
 
   // github-menu.js // github-menu.js
-  repository: { text: 'Répertoire' },
-  branch: { text: 'Branche' },
-  path: { text: 'Chemin' },
-  commit: { text: 'Validation' },
+  githubRepository: { text: 'Répertoire' },
+  githubBranch: { text: 'Branche' },
+  githubFilepath: { text: 'Chemin' },
+  githubCommit: { text: 'Commit' },
+  githubCommitButton: {
+    classes: { commitAsNewFile: { value: 'Valider en tant que nouveau fichier' } },
+    value: 'Validation',
+  },
   commitLog: { text: 'Journal des validations' },
-  commitAsNewFile: { text: 'Valider en tant que nouveau fichier' },
-  date: { text: 'Date' },
-  author: { text: 'Auteur' },
-  message: { text: 'Message' },
+  githubDate: { text: 'Date' },
+  githubAuthor: { text: 'Auteur' },
+  githubMessage: { text: 'Message' },
   none: { text: 'Aucun' },
-  fileName: { description: 'Nom du fichier' },
+  commitFileNameText: { text: 'Nom du fichier' },
   forkRepository: { text: 'Créer une copie du répertoire' },
   forkError: { text: 'Désolé, impossible de créer une copie du répertoire' },
   loadingFile: { text: 'Chargement du fichier' },
@@ -791,8 +818,8 @@ export const lang = {
   githubLogout: { text: 'Déconnexion de Github' },
   selectRepository: { text: 'Sélectionner le répertoire' },
   selectBranch: { text: 'Sélectionner la branche' },
-  commitPlaceholder: { text: 'Mis à jour avec mei-friend en ligne' },
-  reportIssueWithEncoding: { text: "Signaler un problème d'encodage" },
+  commitMessageInput: { placeholder: 'Mis à jour avec mei-friend en ligne' },
+  reportIssueWithEncoding: { value: "Signaler un problème d'encodage" },
   clickToOpenInMeiFriend: { text: 'Cliquez pour ouvrir dans mei-friend' },
   repoAccessError: {
     text: "Désolé, impossible d'accéder aux répertoires pour l'utilisateur ou l'organisation fourni(e)",

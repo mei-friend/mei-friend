@@ -1,12 +1,28 @@
 /**
  * Language file for Catalan / Katalanisch
  */
+
 import * as att from '../lib/attribute-classes.js';
 import { heart } from '../css/icons.js';
 
 export const lang = {
   // Main menu bar
   githubLoginLink: { text: 'Iniciar sessió' },
+
+  month: {
+    jan: 'Gener',
+    feb: 'Febrer',
+    mar: 'Març',
+    apr: 'Abril',
+    may: 'Maig',
+    jun: 'Juny',
+    jul: 'Juliol',
+    aug: 'Agost',
+    sep: 'Setembre',
+    oct: 'Octubre',
+    nov: 'Novembre',
+    dec: 'Desembre',
+  },
 
   // FILE MENU ITEM / ELEMENT DEL MENU DE FITXER
   fileMenuTitle: { text: 'Fitxer' },
@@ -35,6 +51,8 @@ export const lang = {
   replaceMenuText: { text: 'Reemplaça' },
   replaceAllMenuText: { text: 'Reemplaça-ho tot' },
   indentSelectionText: { text: 'Indentar selecció' },
+  surroundWithTagsText: { text: 'Envoltar amb tags' },
+  surroundWithLastTagText: { text: 'Envoltar amb ' },
   jumpToLineText: { text: 'Salta a línia' },
   manualValidateText: { text: 'Valida' },
 
@@ -288,6 +306,11 @@ export const lang = {
       '</a>.',
   },
 
+  // CodeMirror editor
+  selectTagNameForEnclosure: { text: "Tancar amb el nom de l'element" },
+  selectTagNameForEnclosureOkButton: { value: "D'acord" },
+  selectTagNameForEnclosureCancelButton: { value: 'Cancel·la' },
+
   // annotation panel  / panell d'annotacions
   annotationCloseButtonText: { text: "Tanca el panell d'annotacions" },
   hideAnnotationPanelButton: { description: "Tanca el panell d'annotacions" },
@@ -348,6 +371,7 @@ export const lang = {
   // mei-friend SETTINGS MENU / MEI-FRIEND MENU DE CONFIGURACIÓ
   meiFriendSettingsHeader: {
     text: 'Configuració de mei-friend',
+    description: 'Configuració de mei-friend',
   },
   mfReset: {
     text: 'Per defecte',
@@ -658,68 +682,68 @@ export const lang = {
     description: 'Restableix els valors per defecte de mei-friend',
   },
   titleAppearance: {
-    title: "Aparença de l'editor",
+    text: "Aparença de l'editor",
     description: "Controla l'aparença de l'editor",
   },
   zoomFont: {
-    title: 'Mida de la font (%)',
+    text: 'Mida de la font (%)',
     description: "Canvia la mida de la font de l'editor (en percentatge)",
   },
   theme: {
-    title: 'Tema',
+    text: 'Tema',
     description: "Selecciona el tema de l'editor",
   },
   matchTheme: {
-    title: 'La notació coincideix amb el tema',
+    text: 'La notació coincideix amb el tema',
     description: "Fes que la notació coincideixi amb el tema de colors de l'editor",
   },
   tabSize: {
-    title: 'Mida de la tabulació',
+    text: 'Mida de la tabulació',
     description: "Nombre de caràcters d'espai per cada nivell de tabulació",
   },
   lineWrapping: {
-    title: 'Salt de línia',
+    text: 'Salt de línia',
     description: "Indica si les línies s'han de tallar al final del panell",
   },
   lineNumbers: {
-    title: 'Nombres de línia',
+    text: 'Nombres de línia',
     description: 'Mostra els nombres de línia',
   },
   firstLineNumber: {
-    title: 'Primer número de línia',
+    text: 'Primer número de línia',
     description: 'Estableix el primer número de línia',
   },
   foldGutter: {
-    title: 'Plegament de codi',
+    text: 'Plegament de codi',
     description: 'Permet plegar el codi a través de les barres de plegament',
   },
   titleEditorOptions: {
-    title: "Comportament de l'editor",
+    text: "Comportament de l'editor",
     description: "Controla el comportament de l'editor",
   },
   autoValidate: {
-    title: 'Validació automàtica',
+    text: 'Validació automàtica',
     description: 'Valida la codificació automàticament després de cada edició',
   },
   autoCloseBrackets: {
-    title: 'Tancament automàtic de claudàtors',
+    text: 'Tancament automàtic de claudàtors',
     description: 'Tanca els claudàtors automàticament en introduir-los',
   },
   autoCloseTags: {
-    title: 'Tancament automàtic de etiquetes',
+    text: 'Tancament automàtic de etiquetes',
     description: 'Tanca les etiquetes automàticament en introduir-les',
     type: 'bool',
   },
   matchTags: {
-    title: "Coincidència d'etiquetes",
+    text: "Coincidència d'etiquetes",
     description: "Resalta les etiquetes coincidents al voltant del cursor de l'editor",
   },
   showTrailingSpace: {
-    title: 'Resalta els espais finals',
+    text: 'Resalta els espais finals',
     description: 'Resalta els espais innecessaris al final de les línies',
   },
   keyMap: {
-    title: 'Mapa de tecles',
+    text: 'Mapa de tecles',
     description: 'Selecciona el mapa de tecles',
   },
 
@@ -767,17 +791,17 @@ export const lang = {
   errorsFound: { text: `s’han trobat errors` }, // 5 errors trobats // 5 errors found
 
   // github-menu.js / github-menu.js
-  repository: { text: 'Repositori' },
-  branch: { text: 'Branca' },
-  path: { text: 'Camí' },
-  commit: { text: 'Confirmar' },
+  githubRepository: { text: 'Repositori' },
+  githubBranch: { text: 'Branca' },
+  githubFilepath: { text: 'Camí' },
+  githubCommit: { text: 'Commit' },
+  githubCommitButton: { classes: { commitAsNewFile: { value: 'Confirmar com a nou fitxer' } }, value: 'Confirmar' },
   commitLog: { text: 'Registre de confirmacions' },
-  commitAsNewFile: { text: 'Confirmar com a nou fitxer' },
-  date: { text: 'Data' },
-  author: { text: 'Autor' },
-  message: { text: 'Missatge' },
+  githubDate: { text: 'Data' },
+  githubAuthor: { text: 'Autor' },
+  githubMessage: { text: 'Missatge' },
   none: { text: 'Cap' },
-  fileName: { description: 'Nom del fitxer' },
+  commitFileNameText: { text: 'Nom del fitxer' },
   forkRepository: { text: 'Bifurcar el repositori' },
   forkError: { text: "Ho sentim, no s'ha pogut bifurcar el repositori" },
   loadingFile: { text: 'Carregant fitxer' },
@@ -786,8 +810,8 @@ export const lang = {
   githubLogout: { text: 'Tancar sessió' },
   selectRepository: { text: 'Seleccionar repositori' },
   selectBranch: { text: 'Seleccionar branca' },
-  commitPlaceholder: { text: 'Actualitzat amb mei-friend en línia' },
-  reportIssueWithEncoding: { text: "Informar d'un problema amb la codificació" },
+  commitMessageInput: { placeholder: 'Actualitzat amb mei-friend en línia' },
+  reportIssueWithEncoding: { value: "Informar d'un problema amb la codificació" },
   clickToOpenInMeiFriend: { text: 'Feu clic per obrir a mei-friend' },
   repoAccessError: {
     text: "Ho sentim, no es poden accedir als repositoris per a l'usuari o organització subministrada",

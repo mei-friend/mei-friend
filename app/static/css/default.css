@@ -475,6 +475,37 @@ a:active {
   background-repeat: no-repeat;
 }
 
+#tagEncloserMenu {
+  z-index: 10;
+  border: 1px solid var(--dropdownBorderColor);
+  border-radius: 4px;
+  background-color: var(--dropdownBackgroundColor);
+  display: flex;
+  flex-direction: column;
+  align-content: stretch;
+  align-items: center;
+  gap: 3px;
+  padding: 5px;
+  font-weight: bold;
+}
+
+#tagEncloserMenu input {
+  width: 180px;
+  font-weight: bold;
+  border-radius: 4px;
+}
+
+#tagEncloserMenu input:focus {
+  outline: none;
+}
+
+#tagEncloserMenu div {
+  font-weight: normal;
+  display: flex;
+  flex-direction: row;
+  gap: 15px;
+}
+
 .rightButton {
   /* only for validation report close button */
   float: right;
@@ -637,6 +668,11 @@ a:active {
   max-height: 21px;
   color: var(--textColor);
   background-color: var(--controlMenuBackgroundColor);
+}
+
+.narrowButton {
+  width: 50px;
+  max-width: 80px;
 }
 
 .btn:hover {
@@ -1207,6 +1243,7 @@ select {
   margin-bottom: 10px;
   margin-right: 2px;
   border-radius: 4px;
+  max-width: 60px;
 }
 
 input,
