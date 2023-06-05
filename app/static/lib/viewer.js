@@ -1057,11 +1057,11 @@ export default class Viewer {
         case 'selectIdStyle':
           this.xmlIdStyle = value;
           break;
-        case 'selectLanguage':
-          let langCode = value.slice(0, 2).toLowerCase();
-          translator.changeLanguage(langCode);
-          translateLanguageSelection();
-          break;
+//        case 'selectLanguage':
+//          let langCode = value.slice(0, 2).toLowerCase();
+//          translator.changeLanguage(langCode);
+//          translateLanguageSelection();
+//          break;
         case 'toggleSpeedMode':
           document.getElementById('midiSpeedmodeIndicator').style.display = this.speedMode ? 'inline' : 'none';
           break;
