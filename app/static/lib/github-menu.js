@@ -641,13 +641,14 @@ async function handleClickGithubAction(e) {
         // poll on latest workflow run 
         github.awaitActionWorkflowCompletion(workflowName.dataset.id)
           .then( (workflowCompletionResp ) => { 
+            console.log("Got workflow completion resp: ", workflowCompletionResp);
             if("conclusion" in workflowCompletionResp) { 
               if(workflowCompletionResp.conclusion === "success") { 
-                statusMsg.innerHTML = `<span id="githubActionStatusMsgSuccess">${translator.lang.githubActionStatusMsgSuccess.text}</span>" target="_blank">${workflowRunResp.body.message}</a>`;
+                statusMsg.innerHTML = `<span id="githubActionStatusMsgSuccess">${translator.lang.githubActionStatusMsgSuccess.text}</span>: <a href="${workflowCompletionResp.html_url}" target="_blank">${workflowCompletionResp.conclusion}</a>`;
+                
               } else { 
-                statusMsg.innerHTML = `<span id="githubActionStatusMsgFailure">${translator.lang.githubActionStatusMsgFailure.text}</span>: <a href="${workflowRunResp.body.documentation_url}" target="_blank">${workflowRunResp.body.message}</a>`;
+                statusMsg.innerHTML = `<span id="githubActionStatusMsgFailure">${translator.lang.githubActionStatusMsgFailure.text}</span>: <a href="${workflowCompletionResp.html_url}" target="_blank">${workflowCompletionResp.conclusion}</a>`;
               }
-
             } else { 
               throw new Error("Invalid response received from GitHub API");
             }

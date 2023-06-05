@@ -541,18 +541,20 @@ export default class Github {
             let runsAt = resJson.workflow_runs.filter(w => w.run_started_at === runStartAt);
             if(runsAt.length) { 
               run = runsAt[0];
+              console.log("Got run with starttime specified, first entry of: ", runsAt)
             }
           } else { 
             // no start time specified -- pick the most recent one
             let runsSorted = resJson.workflow_runs.sort((a, b) => b.run_number - a.run_number)
+            console.log("Got run WITHOUT starttime specified, first entry of: ", runsSorted)
             if(runsSorted.length) {
               run = runsSorted[0];
             }
           }
-          if("status" in run && run.status === "completed") { 
+          if(run && "status" in run && run.status === "completed") { 
             return run; // done
           }
-          else if("status" in run){ 
+          else if(run && "status" in run){ 
             // recur
             return this.awaitActionWorkflowCompletion(workflowId, run.run_started_at);
           } else { 
@@ -564,6 +566,14 @@ export default class Github {
           return { status: 406 }
         }
       })
+    } // awaitActionWorkflowCompletion()
+
+    // obtain details for a specified workflow run
+    async getWorkflowRun(runUrl) { 
+      return fetch(runUrl, { 
+        method: 'GET',
+        headers: this.actionsHeaders
+      }).then((res) => res.json());
     }
 }
 
