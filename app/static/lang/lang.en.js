@@ -270,10 +270,10 @@ export const lang = {
   openUrlOpenEncodingByUrlText: { text: 'Open Web-hosted encoding by URL' },
 
   // github actions modal
-  githubActionStatusMsgPrompt: { text: 'Could not run workflow - GitHub says ' },
-  githubActionStatusMsgWaiting: { text: 'Waiting for workflow to complete' },
-  githubActionStatusMsgFailure: { text: 'Could not run workflow - GitHub says ' },
-  githubActionStatusMsgSuccess: { text: 'Workflow run completed - Github says ' },
+  githubActionStatusMsgPrompt: { text: 'Could not run workflow - GitHub says' },
+  githubActionStatusMsgWaiting: { text: 'Please be patient while GitHub is processing your workflow...' },
+  githubActionStatusMsgFailure: { text: 'Could not run workflow - GitHub says' },
+  githubActionStatusMsgSuccess: { text: 'Workflow run completed - GitHub says' },
   githubActionsRunBtn: { text: 'Run workflow' },
   githubActionsCancelBtn: { text: 'Cancel' },
 

@@ -626,7 +626,7 @@ async function handleClickGithubAction(e) {
     statusMsg.innerHTML = "";
   }
   runBtn.onclick = () => { 
-    statusMsg.innerHTML = "";
+    statusMsg.innerHTML = `<span id="githubActionStatusMsgWaiting">${translator.lang.githubActionStatusMsgWaiting.text}</span>`;
     cancelBtn.setAttribute("disabled", true);
     runBtn.setAttribute("disabled", true);
     const githubLoadingIndicator = document.getElementById('GithubLogo');
@@ -637,7 +637,7 @@ async function handleClickGithubAction(e) {
       console.log("Got workflow run response: ", workflowRunResp);
       if(workflowRunResp.status >= 400) { 
         // error
-        statusMsg.innerHTML = `<span id="githubActionStatusMsgWaiting">${translator.lang.githubActionStatusMsgWaiting.text}</span>: <a href="${workflowRunResp.body.documentation_url}" target="_blank">${workflowRunResp.body.message}</a>`;
+        statusMsg.innerHTML = `<span id="githubActionStatusMsgFailure">${translator.lang.githubActionStatusMsgFailure.text}</span>: <a href="${workflowRunResp.body.documentation_url}" target="_blank">${workflowRunResp.body.message}</a>`;
       } else { 
         // poll on latest workflow run 
         github.awaitActionWorkflowCompletion(workflowName.dataset.id)
