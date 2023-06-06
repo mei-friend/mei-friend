@@ -25,7 +25,7 @@ function forkRepo() {
 
 export function forkRepoClicked() {
   // inputRepoOverride is used to supply a repository via the forkAndOpen (?fork parameter) path
-  let inputName = document.getElementById('forkRepositoryInputName').value;
+  let lnputName = document.getElementById('forkRepositoryInputName').value;
   let inputRepo = document.getElementById('forkRepositoryInputRepo').value;
   let inputRepoOverride = document.getElementById('forkRepositoryInputRepoOverride').value;
   let inputBranchOverride = document.getElementById('forkRepositoryInputBranchOverride').value;
@@ -512,6 +512,11 @@ function handleWorkflowsListReceived(resp) {
   const actionsDivider = document.getElementById("actionsDividerStart");
   if(actionsDivider && 'workflows' in resp) { 
     resp.workflows.forEach((wf) => {
+      if(env === environments.develop) { 
+        github.getWorkflowInputs(wf).then( inputs => {
+          console.debug("Got workflow inputs: ", inputs)
+        });
+      }
       if(wf.state === "active") {
         let workflowSpan = document.createElement("span");
         workflowSpan.id = "gha_" + wf.id;

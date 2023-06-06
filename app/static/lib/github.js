@@ -575,6 +575,27 @@ export default class Github {
         headers: this.actionsHeaders
       }).then((res) => res.json());
     }
+
+    // obtain inputs for a specified workflow (if any)
+    async getWorkflowInputs(wf) { 
+      // rewrite to raw github URL
+      const rawUrl = "https://raw.githubusercontent.com/" + this.githubRepo + "/" + this.branch + "/" + wf.path;
+      return this.directlyReadFileContents(rawUrl, { 
+        method: 'GET',
+        headers: this.apiHeaders
+      }).then((yaml) => {
+          const asJson = jsyaml.load(yaml);
+          if(env === environments.develop) {
+            console.debug("Obtained workflow description: ", asJson, wf.url);
+          }
+          // repetition below to ensure that the value of e.g. asJson.on.workflow_dispatch is not null
+          if(asJson && "on" in asJson 
+            && "workflow_dispatch" in asJson.on && asJson.on.workflow_dispatch
+            && "inputs" in asJson.on.workflow_dispatch && asJson.on.workflow_dispatch.inputs) { 
+            return asJson.on.workflow_dispatch.inputs;
+          } else return null;
+        });
+    }
 }
 
 function isImageUri(uri) {
