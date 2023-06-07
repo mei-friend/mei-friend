@@ -276,6 +276,9 @@ export const lang = {
   githubActionStatusMsgSuccess: { text: 'Workflow run completed - GitHub says' },
   githubActionsRunBtn: { text: 'Run workflow' },
   githubActionsCancelBtn: { text: 'Cancel' },
+  githubActionsInputSetterFilepath: { text: "Copy current file path to input" },
+  githubActionsInputSetterSelection: { text: "Copy current MEI selection to input"},
+  githubActionsInputContainerHeader: { text: "Input configuration" },
 
   // fork modals
   forkRepoGithubText: { text: 'Fork Github Repository' },

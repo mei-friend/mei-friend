@@ -19,6 +19,24 @@ import {
 import * as icon from './../css/icons.js';
 import Github from './github.js'; // github class
 
+
+const ghActionsInputSetters = [
+  {
+    id: "githubActionsInputSetterFilepath",
+    icon: icon.fileCode,
+    func: () => {
+      return github.filepath;
+    }
+  },
+  {
+    id: "githubActionsInputSetterSelection",
+    icon: icon.projectTemplate,
+    func: () => { 
+      return v.selectedElements;
+    }
+  }
+]
+
 function forkRepo() {
   forkRepository(github);
 }
@@ -512,11 +530,6 @@ function handleWorkflowsListReceived(resp) {
   const actionsDivider = document.getElementById("actionsDividerStart");
   if(actionsDivider && 'workflows' in resp) { 
     resp.workflows.forEach((wf) => {
-      if(env === environments.develop) { 
-        github.getWorkflowInputs(wf).then( inputs => {
-          console.debug("Got workflow inputs: ", inputs)
-        });
-      }
       if(wf.state === "active") {
         let workflowSpan = document.createElement("span");
         workflowSpan.id = "gha_" + wf.id;
@@ -620,15 +633,45 @@ async function handleClickGithubAction(e) {
   const statusMsg = document.getElementById("githubActionsStatus")
   const cancelBtn = document.getElementById("githubActionsCancelButton");
   const runBtn = document.getElementById("githubActionsRunButton");
-  const ghLogoSpan = document.createElement("span");
-  ghLogoSpan.innerHTML = icon.githubLogo;
-  header.insertAdjacentElement('afterbegin', ghLogoSpan);
-  const ghLogo = ghLogoSpan.firstChild;
-  ghLogo.setAttribute("id", "ghActionsLogo");
+  let ghLogo = document.getElementById("ghActionsLogo");
+  if(!ghLogo) { 
+    // add gh logo to serve as workflow processing indicator (spinner)
+    const ghLogoSpan = document.createElement("span");
+    ghLogoSpan.innerHTML = icon.githubLogo;
+    header.insertAdjacentElement('afterbegin', ghLogoSpan);
+    ghLogo = ghLogoSpan.firstChild;
+    ghLogo.setAttribute("id", "ghActionsLogo");
+  }
   let target = e.target;
   if(target.nodeName === "A") { 
     target = target.firstChild;
   }
+  ghLogo.classList.add("clockwise");
+  console.log("dataset: ", target.dataset)
+  github.getWorkflowInputs(target.dataset.path).then( inputs => {
+    const inputContainerWrapper = document.getElementById("githubActionsInputConfigContainer");
+    let keys = Object.keys(inputs);
+    if(keys.length) { 
+      const inputContainer = document.createElement("div");
+      const inputContainerHeader = document.createElement("h3");
+      inputContainerHeader.innerText = translator.lang.githubActionsInputContainerHeader.text;
+      inputContainer.insertAdjacentElement("beforebegin", inputContainerHeader);
+      keys.forEach(k => {
+        const inputConfig = generateGithubActionsInputConfig(inputs, k);
+        inputContainer.insertAdjacentElement("beforeend", inputConfig);
+      })
+      inputContainerWrapper.insertAdjacentElement("beforeend", inputContainer)
+    } else { 
+      while(inputContainerWrapper.firstChild) {
+        // clear content of input container
+        // (don't just reset innerHTML, so that we also clear event handlers)
+        inputContainerWrapper.removeChild(inputContainerWrapper.firstChild);
+      }
+    }
+  })
+  .finally(() => { 
+    ghLogo.classList.remove("clockwise");
+  });
   overlay.style.display = "block";
   workflowName.innerText = target.dataset.name;
   workflowName.dataset.id = target.dataset.id;
@@ -690,14 +733,6 @@ async function handleClickGithubAction(e) {
       ghLogo.classList.remove("clockwise");
     })  
   }
-  /*
-  const githubLoadingIndicator = document.getElementById('GithubLogo');
-  githubLoadingIndicator.classList.add("clockwise");
-  github.requestActionWorkflowRun(target.id, { filepath: github.filepath })
-  .then(workflowRunResp => { 
-    console.log("Got workflow run response: ", workflowRunResp);
-  }).finally(() => githubLoadingIndicator.classList.remove("clockwise"));
-  */
 } // handleClickGithubAction()
 
 export function logoutFromGithub() {
@@ -832,3 +867,39 @@ function stripMeiFileName() {
     console.warn('stripMeiFileName called on invalid filename: ', meiFileName);
   }
 } // stripMeiFileName()
+
+function generateGithubActionsInputConfig(inputs, input) { 
+  console.log("ADAFASFDF", inputs, input)
+  const inputConfig = document.createElement("div");
+  inputConfig.setAttribute("id", "githubActionsInputConfig_" + input)
+  const inputName = document.createElement("span");
+  inputName.innerText = input;
+  if("description" in inputs[input])
+    inputName.setAttribute("title", inputs[input].description);
+  const inputFieldWrapper = document.createElement("div");
+  const inputField = document.createElement("input");
+  inputField.setAttribute("type", "text");
+  inputField.setAttribute("id", "githubActionsInputField_" + input);
+  inputField.setAttribute("size","100");
+  if("default" in inputs[input]) {
+    inputField.defaultValue = inputs[input].default;
+  }
+  const inputSetters = document.createElement("div");
+  ghActionsInputSetters.forEach((inp) => { 
+    // create "input setters" that copy useful content into the input field on user request
+    let setter = document.createElement("span");
+    setter.classList.add("githubActionsInputSetter")
+    setter.innerHTML = inp.icon + icon.arrowDown;
+    setter.setAttribute("title", translator.lang[inp.id].text);
+    setter.setAttribute("id", input + "-" + inp.id);
+    setter.addEventListener("click", () => { 
+      inputField.value = inp.func();
+    })
+    inputSetters.insertAdjacentElement("beforeend", setter);
+  })
+  inputFieldWrapper.insertAdjacentElement("beforeend", inputSetters);
+  inputFieldWrapper.insertAdjacentElement("beforeend", inputField);
+  inputConfig.insertAdjacentElement("beforeend", inputName);
+  inputConfig.insertAdjacentElement("beforeend", inputFieldWrapper);
+  return inputConfig;
+}

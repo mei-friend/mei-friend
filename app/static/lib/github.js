@@ -577,16 +577,16 @@ export default class Github {
     }
 
     // obtain inputs for a specified workflow (if any)
-    async getWorkflowInputs(wf) { 
+    async getWorkflowInputs(wfPath) { 
       // rewrite to raw github URL
-      const rawUrl = "https://raw.githubusercontent.com/" + this.githubRepo + "/" + this.branch + "/" + wf.path;
+      const rawUrl = "https://raw.githubusercontent.com/" + this.githubRepo + "/" + this.branch + "/" + wfPath;
       return this.directlyReadFileContents(rawUrl, { 
         method: 'GET',
         headers: this.apiHeaders
       }).then((yaml) => {
           const asJson = jsyaml.load(yaml);
           if(env === environments.develop) {
-            console.debug("Obtained workflow description: ", asJson, wf.url);
+            console.debug("Obtained workflow description: ", asJson, wfPath);
           }
           // repetition below to ensure that the value of e.g. asJson.on.workflow_dispatch is not null
           if(asJson && "on" in asJson 
