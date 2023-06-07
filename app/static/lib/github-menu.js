@@ -615,10 +615,16 @@ export function renderCommitLog() {
 
 async function handleClickGithubAction(e) {
   const overlay = document.getElementById("githubActionsOverlay")
+  const header = document.getElementById("githubActionsHeading");
   const workflowName = document.getElementById("requestedWorkflowName");
   const statusMsg = document.getElementById("githubActionsStatus")
   const cancelBtn = document.getElementById("githubActionsCancelButton");
   const runBtn = document.getElementById("githubActionsRunButton");
+  const ghLogoSpan = document.createElement("span");
+  ghLogoSpan.innerHTML = icon.githubLogo;
+  header.insertAdjacentElement('afterbegin', ghLogoSpan);
+  const ghLogo = ghLogoSpan.firstChild;
+  ghLogo.setAttribute("id", "ghActionsLogo");
   let target = e.target;
   if(target.nodeName === "A") { 
     target = target.firstChild;
@@ -634,8 +640,7 @@ async function handleClickGithubAction(e) {
     statusMsg.innerHTML = `<span id="githubActionStatusMsgWaiting">${translator.lang.githubActionStatusMsgWaiting.text}</span>`;
     cancelBtn.setAttribute("disabled", true);
     runBtn.setAttribute("disabled", true);
-    const githubLoadingIndicator = document.getElementById('GithubLogo');
-    githubLoadingIndicator.classList.add("clockwise");
+    ghLogo.classList.add("clockwise");
     github.requestActionWorkflowRun(workflowName.dataset.id, { 
       filepath: github.filepath 
     }).then(workflowRunResp => { 
@@ -653,6 +658,7 @@ async function handleClickGithubAction(e) {
                 statusMsg.innerHTML = `<span id="githubActionStatusMsgSuccess">${translator.lang.githubActionStatusMsgSuccess.text}</span>: <a href="${workflowCompletionResp.html_url}" target="_blank">${workflowCompletionResp.conclusion}</a>`;
                 runBtn.innerText= "Reload MEI file";
                 runBtn.removeAttribute("disabled");
+                ghLogo.classList.remove("clockwise");
                 runBtn.onclick = () => {
                   loadFile();
                   overlay.style.display = "none";
@@ -663,11 +669,13 @@ async function handleClickGithubAction(e) {
                 statusMsg.innerHTML = `<span id="githubActionStatusMsgFailure">${translator.lang.githubActionStatusMsgFailure.text}</span>: <a href="${workflowCompletionResp.html_url}" target="_blank">${workflowCompletionResp.conclusion}</a>`;
                 cancelBtn.removeAttribute("disabled");
                 runBtn.removeAttribute("disabled");
+                ghLogo.classList.remove("clockwise");
               }
             } else { 
               console.error("Invalid response received from GitHub API", workflowCompletionResp);
               cancelBtn.removeAttribute("disabled");
               runBtn.removeAttribute("disabled");
+              ghLogo.classList.remove("clockwise");
               statusMsg.innerHTML = "Error - invalid response received from GitHub API (see console)";
             }
           })
@@ -679,9 +687,8 @@ async function handleClickGithubAction(e) {
       statusMsg.innerHTML = "Error";
       cancelBtn.removeAttribute("disabled");
       runBtn.removeAttribute("disabled");
-    }).finally(() => { 
-      githubLoadingIndicator.classList.remove("clockwise");
-    });
+      ghLogo.classList.remove("clockwise");
+    })  
   }
   /*
   const githubLoadingIndicator = document.getElementById('GithubLogo');
