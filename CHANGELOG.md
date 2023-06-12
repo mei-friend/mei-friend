@@ -5,7 +5,8 @@
 * Configurably display any GitHub Actions available in the current repository / branch
 * List any configured inputs and set values from UI with shortcuts for 'current filepath' and 'current selection'
 * Launch Actions workflows from within mei-friend
-* Display workflow results, with link to detailed GitHub page
+* Display workflow results (success / failure), with link to detailed GitHub page
+* On success, reload encoding to update with Actions-modified version
 
 ### 0.8.11 Editor functionality
 * Surround selection in editor with tags (`CTRL-E` or `CMD-E`): opens a user interface to enter tag name
