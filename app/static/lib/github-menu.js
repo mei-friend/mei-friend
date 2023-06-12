@@ -555,7 +555,7 @@ function handleWorkflowsListReceived(resp) {
       let firstBranchContents = document.querySelector(".branchContents");
       if(firstBranchContents) {
         let actionsContentDivider = document.createElement("hr");
-        actionsContentDivider.classList.add("dropdown-line");
+        actionsContentDivider.classList.add("dropdownLine");
         actionsContentDivider.classList.add("actionsDivider");
         firstBranchContents.insertAdjacentElement("beforebegin", actionsContentDivider)
       }
