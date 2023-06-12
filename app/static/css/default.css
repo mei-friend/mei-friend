@@ -187,6 +187,30 @@ a:active {
   display:flex;
   flex-direction:column;
   padding: 1em;
+  height: fit-content !important;
+}
+
+.githubActionsInputConfig { 
+  display:flex;
+  flex-direction:row;
+  align-items: end;
+  background-color:var(--navbarBackgroundColor);
+  border-radius:1em;
+  width:fit-content;
+  padding:.5em;
+}
+
+.githubActionsInputConfig span { 
+  color: var(--textColor);
+}
+
+.githubActionsInputSetter svg {
+  fill: var(--textColor);
+}
+
+.githubActionsInputConfig div { 
+  padding-left: .5em;
+  padding-right:.5em;
 }
 
 .openUrlOverlay a,

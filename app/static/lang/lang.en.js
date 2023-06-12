@@ -275,6 +275,7 @@ export const lang = {
   githubActionStatusMsgFailure: { text: 'Could not run workflow - GitHub says' },
   githubActionStatusMsgSuccess: { text: 'Workflow run completed - GitHub says' },
   githubActionsRunBtn: { text: 'Run workflow' },
+  githubActionsRunBtnReload: { text: 'Reload MEI file' },
   githubActionsCancelBtn: { text: 'Cancel' },
   githubActionsInputSetterFilepath: { text: "Copy current file path to input" },
   githubActionsInputSetterSelection: { text: "Copy current MEI selection to input"},

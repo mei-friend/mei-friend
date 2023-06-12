@@ -648,25 +648,28 @@ async function handleClickGithubAction(e) {
   }
   ghLogo.classList.add("clockwise");
   console.log("dataset: ", target.dataset)
+  const inputContainerWrapper = document.getElementById("githubActionsInputConfigContainer");
+  while(inputContainerWrapper.firstChild) {
+    // clear content of input container
+    // (don't just reset innerHTML, so that we also clear event handlers)
+    inputContainerWrapper.removeChild(inputContainerWrapper.firstChild);
+  }
   github.getWorkflowInputs(target.dataset.path).then( inputs => {
-    const inputContainerWrapper = document.getElementById("githubActionsInputConfigContainer");
+    if(!inputs) { 
+      return;
+    }
     let keys = Object.keys(inputs);
     if(keys.length) { 
       const inputContainer = document.createElement("div");
-      const inputContainerHeader = document.createElement("h3");
+      const inputContainerHeader = document.createElement("h4");
+      inputContainerHeader.setAttribute("id", "githubActionsInputContainerHeader");
       inputContainerHeader.innerText = translator.lang.githubActionsInputContainerHeader.text;
-      inputContainer.insertAdjacentElement("beforebegin", inputContainerHeader);
+      inputContainer.insertAdjacentElement("afterbegin", inputContainerHeader);
       keys.forEach(k => {
         const inputConfig = generateGithubActionsInputConfig(inputs, k);
         inputContainer.insertAdjacentElement("beforeend", inputConfig);
       })
       inputContainerWrapper.insertAdjacentElement("beforeend", inputContainer)
-    } else { 
-      while(inputContainerWrapper.firstChild) {
-        // clear content of input container
-        // (don't just reset innerHTML, so that we also clear event handlers)
-        inputContainerWrapper.removeChild(inputContainerWrapper.firstChild);
-      }
     }
   })
   .finally(() => { 
@@ -684,44 +687,50 @@ async function handleClickGithubAction(e) {
     cancelBtn.setAttribute("disabled", true);
     runBtn.setAttribute("disabled", true);
     ghLogo.classList.add("clockwise");
-    github.requestActionWorkflowRun(workflowName.dataset.id, { 
-      filepath: github.filepath 
-    }).then(workflowRunResp => { 
-      console.log("Got workflow run response: ", workflowRunResp);
-      if(workflowRunResp.status >= 400) { 
-        // error
-        statusMsg.innerHTML = `<span id="githubActionStatusMsgFailure">${translator.lang.githubActionStatusMsgFailure.text}</span>: <a href="${workflowRunResp.body.documentation_url}" target="_blank">${workflowRunResp.body.message}</a>`;
-      } else { 
-        // poll on latest workflow run 
-        github.awaitActionWorkflowCompletion(workflowName.dataset.id)
-          .then( (workflowCompletionResp ) => { 
-            console.log("Got workflow completion resp: ", workflowCompletionResp);
-            if("conclusion" in workflowCompletionResp) { 
-              if(workflowCompletionResp.conclusion === "success") { 
-                statusMsg.innerHTML = `<span id="githubActionStatusMsgSuccess">${translator.lang.githubActionStatusMsgSuccess.text}</span>: <a href="${workflowCompletionResp.html_url}" target="_blank">${workflowCompletionResp.conclusion}</a>`;
-                runBtn.innerText= "Reload MEI file";
-                runBtn.removeAttribute("disabled");
-                ghLogo.classList.remove("clockwise");
-                runBtn.onclick = () => {
-                  loadFile();
-                  overlay.style.display = "none";
-                  statusMsg.innerHTML = "";
-                }
+    // gather inputs:
+    const specifiedInputs = {};
+    document.querySelectorAll(".githubActionsInputField").forEach((i) => {
+      specifiedInputs[i.dataset.input] = i.value;
+    })
+    github.requestActionWorkflowRun(workflowName.dataset.id, specifiedInputs)
+      .then(workflowRunResp => { 
+        console.log("Got workflow run response: ", workflowRunResp);
+        if(workflowRunResp.status >= 400) { 
+          // error
+          statusMsg.innerHTML = `<span id="githubActionStatusMsgFailure">${translator.lang.githubActionStatusMsgFailure.text}</span>: <a href="${workflowRunResp.body.documentation_url}" target="_blank">${workflowRunResp.body.message}</a>`;
+        } else { 
+          // poll on latest workflow run 
+          github.awaitActionWorkflowCompletion(workflowName.dataset.id)
+            .then( (workflowCompletionResp ) => { 
+              console.log("Got workflow completion resp: ", workflowCompletionResp);
+              if("conclusion" in workflowCompletionResp) { 
+                if(workflowCompletionResp.conclusion === "success") { 
+                  statusMsg.innerHTML = `<span id="githubActionStatusMsgSuccess">${translator.lang.githubActionStatusMsgSuccess.text}</span>: <a href="${workflowCompletionResp.html_url}" target="_blank">${workflowCompletionResp.conclusion}</a>`;
+                  runBtn.innerText = translator.lang.githubActionsRunBtnReload.text;
+                  runBtn.removeAttribute("disabled");
+                  ghLogo.classList.remove("clockwise");
+                  runBtn.onclick = () => {
+                    loadFile();
+                    overlay.style.display = "none";
+                    statusMsg.innerHTML = "";
+                    runBtn.innerText = translator.lang.githubActionsRunBtn.text;
+                    cancelBtn.removeAttribute("disabled");
+                  }
 
+                } else { 
+                  statusMsg.innerHTML = `<span id="githubActionStatusMsgFailure">${translator.lang.githubActionStatusMsgFailure.text}</span>: <a href="${workflowCompletionResp.html_url}" target="_blank">${workflowCompletionResp.conclusion}</a>`;
+                  cancelBtn.removeAttribute("disabled");
+                  runBtn.removeAttribute("disabled");
+                  ghLogo.classList.remove("clockwise");
+                }
               } else { 
-                statusMsg.innerHTML = `<span id="githubActionStatusMsgFailure">${translator.lang.githubActionStatusMsgFailure.text}</span>: <a href="${workflowCompletionResp.html_url}" target="_blank">${workflowCompletionResp.conclusion}</a>`;
+                console.error("Invalid response received from GitHub API", workflowCompletionResp);
                 cancelBtn.removeAttribute("disabled");
                 runBtn.removeAttribute("disabled");
                 ghLogo.classList.remove("clockwise");
+                statusMsg.innerHTML = "Error - invalid response received from GitHub API (see console)";
               }
-            } else { 
-              console.error("Invalid response received from GitHub API", workflowCompletionResp);
-              cancelBtn.removeAttribute("disabled");
-              runBtn.removeAttribute("disabled");
-              ghLogo.classList.remove("clockwise");
-              statusMsg.innerHTML = "Error - invalid response received from GitHub API (see console)";
-            }
-          })
+            })
         //statusMsg.innerHTML = `<span id="githubActionStatusMsg">${translator.lang.githubActionStatusMsg.text}</span>`;
       }
     }).catch(e => {
@@ -869,8 +878,8 @@ function stripMeiFileName() {
 } // stripMeiFileName()
 
 function generateGithubActionsInputConfig(inputs, input) { 
-  console.log("ADAFASFDF", inputs, input)
   const inputConfig = document.createElement("div");
+  inputConfig.classList.add("githubActionsInputConfig");
   inputConfig.setAttribute("id", "githubActionsInputConfig_" + input)
   const inputName = document.createElement("span");
   inputName.innerText = input;
@@ -879,6 +888,8 @@ function generateGithubActionsInputConfig(inputs, input) {
   const inputFieldWrapper = document.createElement("div");
   const inputField = document.createElement("input");
   inputField.setAttribute("type", "text");
+  inputField.classList.add("githubActionsInputField");
+  inputField.dataset.input = input;
   inputField.setAttribute("id", "githubActionsInputField_" + input);
   inputField.setAttribute("size","100");
   if("default" in inputs[input]) {
