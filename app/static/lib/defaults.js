@@ -2,8 +2,6 @@
  * Default values for mei-friend
  */
 
-import { translator } from './main.js';
-
 /**
  * language codes after ISO-639-1, please enter new codes alphabetically
  * TODO: Japanese, Chinese, Polish
@@ -116,7 +114,7 @@ export const defaultSchema = commonSchemas[defaultMeiProfile][defaultMeiVersion]
 export const defaultVerovioVersion = 'latest'; // 'develop', '3.10.0'
 
 export let supportedVerovioVersions = {};
-if (env === 'develop') {
+if (env === environments.develop) {
   supportedVerovioVersions.local = {
     url: `${root}local/verovio-toolkit-hum.js`,
     description: 'Locally compiled Verovio toolkit version for debugging',
@@ -598,6 +596,23 @@ export const meiFriendSettingsOptions = {
     type: 'select',
     default: 'none',
     values: [],
+  },
+  // dragLineSeparator: {
+  //   title: 'options-line', // class name of hr element
+  //   type: 'line'
+  // },
+  titleGithubActions: {
+    title: 'Use GitHub Actions',
+    description: 'Work with GitHub Actions when available in a repository',
+    type: 'header',
+    open: false,
+    default: false,
+  },
+  enableGithubActions: {
+    title: 'Show available GitHub Actions',
+    description: 'List available GitHub Actions when navigating within repository in GitHub menu', 
+    type: 'bool',
+    default: false,
   },
 }; // meiFriendSettingsOptions object
 

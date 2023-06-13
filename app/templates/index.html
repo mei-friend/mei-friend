@@ -1,3 +1,4 @@
+<!-- <!DOCTYPE html> -->
 <html>
 
 <head>
@@ -92,6 +93,8 @@
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script
     src="https://cdn.jsdelivr.net/combine/npm/tone@14.7.58,npm/@magenta/music@1.23.1/es6/core.js,npm/focus-visible@5,npm/html-midi-player@1.5.0"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
+
   <link rel="stylesheet" href="{{ url_for('static', filename='css/default.css') }}" />
   <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}" />
   <link rel="stylesheet" href="{{ url_for('static', filename='css/annotationPanel.css') }}" />
@@ -215,6 +218,15 @@
           <a id="indentSelection" href="#">
             <span id="indentSelectionText">Indent selection</span>
             <span class="keyShortCut altKey shiftKey">F</span>
+          </a>
+          <a id="surroundWithTags" href="#">
+            <span id="surroundWithTagsText">Surround with tag</span>
+            <span class="keyShortCut cmdKey">E</span>
+          </a>
+          <a id="surroundWithLastTag" href="#">
+            <span id="surroundWithLastTagText">Surround with</span>
+            <b><span id="surroundWithLastTagName"></span></b>
+            <span class="keyShortCut cmdKey">/</span>
           </a>
           <hr class="dropdownLine" />
           <a id="jumpToLine" href="#">
@@ -510,7 +522,7 @@
       <div class="dropdown">
         <button class="dropbtn" id="helpMenuTitle">Help</button>
         <div class="dropdownContent" id="HelpMenu">
-          <a id="goToHelpPage" href="help" target="_blank">Show help page</a>
+          <a id="goToHelpPage" href="https://mei-friend.github.io" target="_blank">Show help page</a>
           <a id="showChangelog" href="#" target="_blank">Show mei-friend changelog</a>
           <hr class="dropdownLine" />
           <a id="goToGuidelines" href="https://music-encoding.org/guidelines" target="_blank">Show MEI Guidelines</a>
@@ -579,6 +591,22 @@
   <div class="dragContainer">
     <div class="dragOverlay">
       <div class="dragOverlayText" id="dragOverlayText">Drag your input file here.</div>
+    </div>
+    <div id="githubActionsOverlay">
+      <div id="githubActionsUI">
+        <h3 id="githubActionsHeading">
+          Request GitHub Action workflow: <span id="requestedWorkflowName"></span>
+        </h3>
+        <p id="githubActionsDescription">
+          Click on "Run workflow" to ask the GitHub API to run the above workflow for you, using the input configuration specified below. Your encoding will be reloaded in its latest version once the workflow run completes.
+          <div id="githubActionsInputConfigContainer"></div>
+        </p>
+        <p id="githubActionsStatus"></p>
+        <div id="githubActionsButtons">
+          <button id="githubActionsRunButton">Run workflow</button>
+          <button id="githubActionsCancelButton">Cancel</button>
+        </div>
+      </div>
     </div>
     <div class="openUrlOverlay">
       <div class="openUrlUI">

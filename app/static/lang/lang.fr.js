@@ -51,6 +51,8 @@ export const lang = {
   replaceMenuText: { text: 'Remplacer' },
   replaceAllMenuText: { text: 'Tout remplacer' },
   indentSelectionText: { text: "Sélection d'indentation" },
+  surroundWithTagsText: { text: 'Entourer de tags' },
+  surroundWithLastTagText: { text: 'Entourer de ' },
   jumpToLineText: { text: 'Aller à la ligne' },
   manualValidateText: { text: 'Valider' },
 
@@ -301,6 +303,11 @@ export const lang = {
       '</a>.',
   },
 
+  // CodeMirror editor
+  selectTagNameForEnclosure: { text: "Entourer du nom de l'élément" },
+  selectTagNameForEnclosureOkButton: { value: 'OK' },
+  selectTagNameForEnclosureCancelButton: { value: 'Annuller' },
+
   // annotation panel / panneau d'annotation
   annotationCloseButtonText: { text: "Fermer le panneau d'annotations" },
   hideAnnotationPanelButton: { description: "Fermer le panneau d'annotations" },
@@ -363,6 +370,7 @@ export const lang = {
   // mei-friend SETTINGS MENU
   meiFriendSettingsHeader: {
     text: 'Paramètres mei-friend',
+    description: 'Paramètres mei-friend',
   },
   mfReset: {
     text: 'Réinitialiser',
@@ -788,17 +796,20 @@ export const lang = {
   errorsFound: { text: 'erreurs trouvées' }, // 5 erreurs trouvées / 5 errors found
 
   // github-menu.js // github-menu.js
-  repository: { text: 'Répertoire' },
-  branch: { text: 'Branche' },
-  path: { text: 'Chemin' },
-  commit: { text: 'Validation' },
+  githubRepository: { text: 'Répertoire' },
+  githubBranch: { text: 'Branche' },
+  githubFilepath: { text: 'Chemin' },
+  githubCommit: { text: 'Commit' },
+  githubCommitButton: {
+    classes: { commitAsNewFile: { value: 'Valider en tant que nouveau fichier' } },
+    value: 'Validation',
+  },
   commitLog: { text: 'Journal des validations' },
-  commitAsNewFile: { text: 'Valider en tant que nouveau fichier' },
-  date: { text: 'Date' },
-  author: { text: 'Auteur' },
-  message: { text: 'Message' },
+  githubDate: { text: 'Date' },
+  githubAuthor: { text: 'Auteur' },
+  githubMessage: { text: 'Message' },
   none: { text: 'Aucun' },
-  fileName: { description: 'Nom du fichier' },
+  commitFileNameText: { text: 'Nom du fichier' },
   forkRepository: { text: 'Créer une copie du répertoire' },
   forkError: { text: 'Désolé, impossible de créer une copie du répertoire' },
   loadingFile: { text: 'Chargement du fichier' },
@@ -807,8 +818,8 @@ export const lang = {
   githubLogout: { text: 'Déconnexion de Github' },
   selectRepository: { text: 'Sélectionner le répertoire' },
   selectBranch: { text: 'Sélectionner la branche' },
-  commitPlaceholder: { text: 'Mis à jour avec mei-friend en ligne' },
-  reportIssueWithEncoding: { text: "Signaler un problème d'encodage" },
+  commitMessageInput: { placeholder: 'Mis à jour avec mei-friend en ligne' },
+  reportIssueWithEncoding: { value: "Signaler un problème d'encodage" },
   clickToOpenInMeiFriend: { text: 'Cliquez pour ouvrir dans mei-friend' },
   repoAccessError: {
     text: "Désolé, impossible d'accéder aux répertoires pour l'utilisateur ou l'organisation fourni(e)",

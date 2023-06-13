@@ -51,6 +51,8 @@ export const lang = {
   replaceMenuText: { text: 'Replace' },
   replaceAllMenuText: { text: 'Replace all' },
   indentSelectionText: { text: 'Indent selection' },
+  surroundWithTagsText: { text: 'Surround with tags' },
+  surroundWithLastTagText: { text: 'Surround with ' },
   jumpToLineText: { text: 'Jump to line' },
   manualValidateText: { text: 'Validate' },
 
@@ -267,6 +269,18 @@ export const lang = {
   openUrlChooseComposerText: { text: 'Choose a composer...' },
   openUrlOpenEncodingByUrlText: { text: 'Open Web-hosted encoding by URL' },
 
+  // github actions modal
+  githubActionStatusMsgPrompt: { text: 'Could not run workflow - GitHub says' },
+  githubActionStatusMsgWaiting: { text: 'Please be patient while GitHub is processing your workflow...' },
+  githubActionStatusMsgFailure: { text: 'Could not run workflow - GitHub says' },
+  githubActionStatusMsgSuccess: { text: 'Workflow run completed - GitHub says' },
+  githubActionsRunBtn: { text: 'Run workflow' },
+  githubActionsRunBtnReload: { text: 'Reload MEI file' },
+  githubActionsCancelBtn: { text: 'Cancel' },
+  githubActionsInputSetterFilepath: { text: "Copy current file path to input" },
+  githubActionsInputSetterSelection: { text: "Copy current MEI selection to input"},
+  githubActionsInputContainerHeader: { text: "Input configuration" },
+
   // fork modals
   forkRepoGithubText: { text: 'Fork Github Repository' },
   forkRepoGithubExplanation: {
@@ -300,6 +314,11 @@ export const lang = {
       'additions to the public repertoire' +
       '</a>.',
   },
+
+  // CodeMirror editor
+  selectTagNameForEnclosure: { text: 'Enclose with tag name' },
+  selectTagNameForEnclosureOkButton: { value: 'OK' },
+  selectTagNameForEnclosureCancelButton: { value: 'Cancel' },
 
   // annotation panel
   annotationCloseButtonText: { text: 'Close Annotations Panel' },
@@ -360,6 +379,7 @@ export const lang = {
   // mei-friend SETTINGS MENU
   meiFriendSettingsHeader: {
     text: 'mei-friend Settings',
+    description: 'mei-friend Settings',
   },
   mfReset: {
     text: 'Default',
@@ -781,17 +801,17 @@ export const lang = {
   errorsFound: { text: 'errors found' }, // 5 errors found
 
   // github-menu.js
-  repository: { text: 'Repository' },
-  branch: { text: 'Branch' },
-  path: { text: 'Path' },
-  commit: { text: 'Commit' },
+  githubRepository: { text: 'Repository' },
+  githubBranch: { text: 'Branch' },
+  githubFilepath: { text: 'Path' },
+  githubCommit: { text: 'Commit' },
+  githubCommitButton: { classes: { commitAsNewFile: { value: 'Commit as new file' } }, value: 'Commit' },
   commitLog: { text: 'Commit log' },
-  commitAsNewFile: { text: 'Commit as new file' },
-  date: { text: 'Date' },
-  author: { text: 'Author' },
-  message: { text: 'Message' },
+  githubDate: { text: 'Date' },
+  githubAuthor: { text: 'Author' },
+  githubMessage: { text: 'Message' },
   none: { text: 'None' },
-  fileName: { description: 'File name' },
+  commitFileNameText: { text: 'File name' },
   forkRepository: { text: 'Fork repository' },
   forkError: { text: 'Sorry, could not fork repository' },
   loadingFile: { text: 'Loading file' },
@@ -800,8 +820,8 @@ export const lang = {
   githubLogout: { text: 'Log out' },
   selectRepository: { text: 'Select repository' },
   selectBranch: { text: 'Select branch' },
-  commitPlaceholder: { text: 'Updated using mei-friend online' },
-  reportIssueWithEncoding: { text: 'Report issue with encoding' },
+  commitMessageInput: { placeholder: 'Updated using mei-friend online' },
+  reportIssueWithEncoding: { value: 'Report issue with encoding' },
   clickToOpenInMeiFriend: { text: 'Click to open in mei-friend' },
   repoAccessError: { text: 'Sorry, cannot access repositories for supplied user or organisation' },
   allComposers: { text: 'All composers' }, // fork-repository.js

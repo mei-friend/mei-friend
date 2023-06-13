@@ -48,6 +48,8 @@ export const lang = {
   replaceMenuText: { text: 'Reemplazar' },
   replaceAllMenuText: { text: 'Reemplazar todo' },
   indentSelectionText: { text: 'Indentar selección' },
+  surroundWithTagsText: { text: 'Envolver con tags' },
+  surroundWithLastTagText: { text: 'Envolver con ' },
   jumpToLineText: { text: 'Ir a línea' },
   manualValidateText: { text: 'Validar' },
 
@@ -302,6 +304,11 @@ export const lang = {
       '</a>.',
   },
 
+  // CodeMirror editor
+  selectTagNameForEnclosure: { text: 'Encerrar con nombre de elemento' },
+  selectTagNameForEnclosureOkButton: { value: 'Vale' },
+  selectTagNameForEnclosureCancelButton: { value: 'Cancelar' },
+
   // annotation panel / panel de anotaciones
   annotationCloseButtonText: { text: 'Cerrar panel de anotaciones' },
   hideAnnotationPanelButton: { description: 'Cerrar panel de anotaciones' },
@@ -362,6 +369,7 @@ export const lang = {
   // mei-friend SETTINGS MENU / MEI-FRIEND MENU DE CONFIGURACIÓN
   meiFriendSettingsHeader: {
     text: 'Configuración',
+    description: 'Configuración de mei-friend',
   },
   mfReset: {
     text: 'Predeterminado',
@@ -439,7 +447,10 @@ export const lang = {
     description:
       'Seleccionar ligaduras (es decir, elementos con el atributo @curvature: ' + att.attCurvature.join(', ') + ')',
   },
-
+  dragSelectMeasures: {
+    text: 'Seleccionar medidas',
+    description: 'Seleccionar medidas',
+  },
   // Control menu / Menú de control
   controlMenuSettings: {
     text: 'Barra de control de notación',
@@ -513,21 +524,31 @@ export const lang = {
       '(Verovio admite el sistema base 40)',
     labels: [
       'Unísono',
-      'Segunda mayor',
+      'Unísono aumentada',
+      'Segunda disminuida',
       'Segunda menor',
-      'Tercera mayor',
+      'Segunda mayor',
+      'Segunda aumentada',
+      'Tercera disminuida',
       'Tercera menor',
+      'Tercera mayor',
+      'Tercera aumentada',
+      'Cuarta disminuida',
       'Cuarta justa',
       'Cuarta aumentada',
       'Quinta disminuida',
       'Quinta justa',
       'Quinta aumentada',
+      'Sexta disminuida',
       'Sexta menor',
       'Sexta mayor',
+      'Sexta aumentada',
+      'Séptima disminuida',
       'Séptima menor',
       'Séptima mayor',
+      'Séptima aumentada',
+      'Octava disminuida',
       'Octava justa',
-      'Octava aumentada',
     ],
   },
   transposeKey: {
@@ -770,17 +791,17 @@ export const lang = {
   errorsFound: { text: 'Errores encontrados' }, // 5 errores encontrados
 
   // github-menu.js / github-menu.js
-  repository: { text: 'Repositorio' },
-  branch: { text: 'Rama' },
-  path: { text: 'Ruta' },
-  commit: { text: 'Confirmar' },
+  githubRepository: { text: 'Repositorio' },
+  githubBranch: { text: 'Rama' },
+  githubFilepath: { text: 'Ruta' },
+  githubCommit: { text: 'Commit' },
+  githubCommitButton: { classes: { commitAsNewFile: { value: 'Confirmar como nuevo archivo' } }, value: 'Confirmar' },
   commitLog: { text: 'Registro de confirmaciones' },
-  commitAsNewFile: { text: 'Confirmar como nuevo archivo' },
-  date: { text: 'Fecha' },
-  author: { text: 'Autor' },
-  message: { text: 'Mensaje' },
+  githubDate: { text: 'Fecha' },
+  githubAuthor: { text: 'Autor' },
+  githubMessage: { text: 'Mensaje' },
   none: { text: 'Ninguno' },
-  fileName: { description: 'Nombre del archivo' },
+  commitFileNameText: { text: 'Nombre del archivo' },
   forkRepository: { text: 'Forkar repositorio' },
   forkError: { text: 'Lo siento, no se pudo forkar el repositorio' },
   loadingFile: { text: 'Cargando archivo' },
@@ -789,8 +810,8 @@ export const lang = {
   githubLogout: { text: 'Cerrar sesión' },
   selectRepository: { text: 'Seleccionar repositorio' },
   selectBranch: { text: 'Seleccionar rama' },
-  commitPlaceholder: { text: 'Actualizado utilizando mei-friend en línea' },
-  reportIssueWithEncoding: { text: 'Informar problema con la codificación' },
+  commitMessageInput: { placeholder: 'Actualizado utilizando mei-friend en línea' },
+  reportIssueWithEncoding: { value: 'Informar problema con la codificación' },
   clickToOpenInMeiFriend: { text: 'Haga clic para abrir en mei-friend' },
   repoAccessError: {
     text: 'Lo siento, no se pueden acceder a los repositorios para el usuario u organización suministrados',

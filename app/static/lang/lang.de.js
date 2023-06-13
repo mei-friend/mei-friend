@@ -48,6 +48,8 @@ export const lang = {
   replaceMenuText: { text: 'Ersetzen' },
   replaceAllMenuText: { text: 'Alles ersetzen' },
   indentSelectionText: { text: 'Auswahl einrücken' },
+  surroundWithTagsText: { text: 'Mit Tags umschließen' },
+  surroundWithLastTagText: { text: 'Umschließen mit ' },
   jumpToLineText: { text: 'Zu Zeile gehen' },
   manualValidateText: { text: 'Validieren' },
 
@@ -302,6 +304,11 @@ export const lang = {
       'Ergänzungen des öffentlichen Repertoires' +
       '</a>.',
   },
+
+  // CodeMirror editor
+  selectTagNameForEnclosure: { text: 'Mit Element umgeben' },
+  selectTagNameForEnclosureOkButton: { value: 'OK' },
+  selectTagNameForEnclosureCancelButton: { value: 'Abbrechen' },
 
   // annotation panel
   annotationCloseButtonText: { text: 'Panel für Annotationen schließen' },
@@ -787,17 +794,17 @@ export const lang = {
   errorsFound: { text: 'Fehler gefunden' }, // 5 errors found
 
   // github-menu.js
-  repository: { text: 'Repo' },
-  branch: { text: 'Branch' },
-  path: { text: 'Pfad' },
-  commit: { text: 'Commit' },
+  githubRepository: { text: 'Repo' },
+  githubBranch: { text: 'Branch' },
+  githubFilepath: { text: 'Pfad' },
+  githubCommit: { text: 'Commit' },
+  githubCommitButton: { classes: { commitAsNewFile: { value: 'Commit als neue Datei' } }, value: 'Commit' },
   commitLog: { text: 'Commit-Log' },
-  commitAsNewFile: { text: 'Commit als neue Datei' },
-  date: { text: 'Datum' },
-  author: { text: 'Author' },
-  message: { text: 'Nachricht' },
+  githubDate: { text: 'Datum' },
+  githubAuthor: { text: 'Author' },
+  githubMessage: { text: 'Nachricht' },
   none: { text: 'Kein' },
-  fileName: { description: 'Dateiname' },
+  commitFileNameText: { text: 'Dateiname' },
   forkRepository: { text: 'Repo forken' },
   forkError: { text: 'Konnte Repo leider nicht forken' },
   loadingFile: { text: 'Lade Datei' },
@@ -806,8 +813,8 @@ export const lang = {
   githubLogout: { text: 'Abmelden' },
   selectRepository: { text: 'Repo auswählen' },
   selectBranch: { text: 'Branch auswählen' },
-  commitPlaceholder: { text: 'Mit mei-friend online aktualisiert' },
-  reportIssueWithEncoding: { text: 'Problem mit Kodierung melden' },
+  commitMessageInput: { placeholder: 'Mit mei-friend online aktualisiert' },
+  reportIssueWithEncoding: { value: 'Problem mit Kodierung melden' },
   clickToOpenInMeiFriend: { text: 'Klicken, um mit mei-friend zu öffnen' },
   repoAccessError: {
     text: 'Auf die Repositories der angegebenen Benutzer oder Organisationen kann nicht zugegriffen werden.',

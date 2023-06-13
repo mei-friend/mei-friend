@@ -51,6 +51,8 @@ export const lang = {
   replaceMenuText: { text: 'Reemplaça' },
   replaceAllMenuText: { text: 'Reemplaça-ho tot' },
   indentSelectionText: { text: 'Indentar selecció' },
+  surroundWithTagsText: { text: 'Envoltar amb tags' },
+  surroundWithLastTagText: { text: 'Envoltar amb ' },
   jumpToLineText: { text: 'Salta a línia' },
   manualValidateText: { text: 'Valida' },
 
@@ -304,6 +306,11 @@ export const lang = {
       '</a>.',
   },
 
+  // CodeMirror editor
+  selectTagNameForEnclosure: { text: "Tancar amb el nom de l'element" },
+  selectTagNameForEnclosureOkButton: { value: "D'acord" },
+  selectTagNameForEnclosureCancelButton: { value: 'Cancel·la' },
+
   // annotation panel  / panell d'annotacions
   annotationCloseButtonText: { text: "Tanca el panell d'annotacions" },
   hideAnnotationPanelButton: { description: "Tanca el panell d'annotacions" },
@@ -364,6 +371,7 @@ export const lang = {
   // mei-friend SETTINGS MENU / MEI-FRIEND MENU DE CONFIGURACIÓ
   meiFriendSettingsHeader: {
     text: 'Configuració de mei-friend',
+    description: 'Configuració de mei-friend',
   },
   mfReset: {
     text: 'Per defecte',
@@ -783,17 +791,17 @@ export const lang = {
   errorsFound: { text: `s’han trobat errors` }, // 5 errors trobats // 5 errors found
 
   // github-menu.js / github-menu.js
-  repository: { text: 'Repositori' },
-  branch: { text: 'Branca' },
-  path: { text: 'Camí' },
-  commit: { text: 'Confirmar' },
+  githubRepository: { text: 'Repositori' },
+  githubBranch: { text: 'Branca' },
+  githubFilepath: { text: 'Camí' },
+  githubCommit: { text: 'Commit' },
+  githubCommitButton: { classes: { commitAsNewFile: { value: 'Confirmar com a nou fitxer' } }, value: 'Confirmar' },
   commitLog: { text: 'Registre de confirmacions' },
-  commitAsNewFile: { text: 'Confirmar com a nou fitxer' },
-  date: { text: 'Data' },
-  author: { text: 'Autor' },
-  message: { text: 'Missatge' },
+  githubDate: { text: 'Data' },
+  githubAuthor: { text: 'Autor' },
+  githubMessage: { text: 'Missatge' },
   none: { text: 'Cap' },
-  fileName: { description: 'Nom del fitxer' },
+  commitFileNameText: { text: 'Nom del fitxer' },
   forkRepository: { text: 'Bifurcar el repositori' },
   forkError: { text: "Ho sentim, no s'ha pogut bifurcar el repositori" },
   loadingFile: { text: 'Carregant fitxer' },
@@ -802,8 +810,8 @@ export const lang = {
   githubLogout: { text: 'Tancar sessió' },
   selectRepository: { text: 'Seleccionar repositori' },
   selectBranch: { text: 'Seleccionar branca' },
-  commitPlaceholder: { text: 'Actualitzat amb mei-friend en línia' },
-  reportIssueWithEncoding: { text: "Informar d'un problema amb la codificació" },
+  commitMessageInput: { placeholder: 'Actualitzat amb mei-friend en línia' },
+  reportIssueWithEncoding: { value: "Informar d'un problema amb la codificació" },
   clickToOpenInMeiFriend: { text: 'Feu clic per obrir a mei-friend' },
   repoAccessError: {
     text: "Ho sentim, no es poden accedir als repositoris per a l'usuari o organització subministrada",
