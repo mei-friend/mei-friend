@@ -79,8 +79,9 @@ export async function getProfile() {
     }
   })
   .then(resp => resp.json())
+  .then(json => jsonld.expand(json))
   .then((profile) => {
-    let me = profile.filter(e => "@id" in e && e["@id"] === webId);
+    let me = Array.from(profile).filter(e => "@id" in e && e["@id"] === webId);
     if(me.length) {
       if(me.length > 1) { 
         console.warn("User profile contains multiple entries for webId: ", me);
@@ -103,10 +104,11 @@ async function populateLoggedInSolidTab() {
       Accept: "application/ld+json"
     }
   }).then(resp => resp.json())
+    .then(json => jsonld.expand(json))
     .finally(() => solidButton.classList.remove("clockwise"));
   let name = webId;
   // try to find entry for 'me' (i.e. the user's webId) in profile:
-  let me = profile.filter(e => "@id" in e && e["@id"] === webId);
+  let me = Array.from(profile).filter(e => "@id" in e && e["@id"] === webId);
   if(me.length) { 
     if(me.length > 1) { 
       console.warn("User's solid profile has multiple entries for their webId!");
