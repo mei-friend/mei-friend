@@ -3,7 +3,7 @@ import { convertCoords, generateXmlId, rmHash, setCursorToId } from './utils.js'
 import { meiNameSpace, xmlNameSpace, xmlToString } from './dom-utils.js';
 import { circle, diffRemoved, highlight, fileCode, link, pencil, rdf, symLinkFile } from '../css/icons.js';
 import { removeInEditor } from './editor.js';
-import { establishResource, getProfile, resource, solid, FOAF, OA, PIM, RDF } from './solid.js';
+import { friendResourceContainer, establishResource, getProfile, resource, solid, MAO, FOAF, OA, PIM, RDF } from './solid.js';
 
 export let annotations = [];
 
@@ -724,11 +724,11 @@ async function writeStandoffIfRequested(a) {
               console.warn('Unexpected pim:storage object in your Solid Pod profile: ', profile);
             }
           }
-          let resp = await establishResource(storage + 'at.ac.mdw.mei-friend/', resource.container);
+          let resp = await establishResource(storage + friendResourceContainer, resource.container);
           if(resp) {
             if(resp.ok) {
               console.log('Finished establishing friend container: ', resp);
-              webAnno["@id"] = storage + 'at.ac.mdw.mei-friend/' + a.id;
+              webAnno["@id"] = storage + friendResourceContainer + a.id;
               console.log("TRYING TO SET UP ANNO", a, webAnno)
               let webAnnoResp = await establishResource(webAnno["@id"], webAnno);
               if(webAnnoResp.ok) { 
@@ -736,7 +736,8 @@ async function writeStandoffIfRequested(a) {
               } else { 
                 console.warn("Couldn't post WebAnno: ", webAnno, webAnnoResp);
               }
-            }           }
+            }           
+          }
         } else {
           log("Sorry, couldn't establish storage location from your Solid Pod's profile ", profile);
         }

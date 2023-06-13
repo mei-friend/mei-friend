@@ -11,6 +11,12 @@ export const LDP = "http://www.w3.org/ns/ldp#";
 export const OA = "http://www.w3.org/ns/oa#";
 export const PIM = "http://www.w3.org/ns/pim/space#";
 export const RDF = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
+export const MAO = "https://domestic-beethoven.eu/ontology/1.0/music-annotation-ontology.ttl#";
+
+
+// mei-friend resource container (internal path within Solid storage)
+export const friendResourceContainer = "at.ac.mdw.mei-friend/";
+
 
 // resource templates
 export const resource = {
@@ -56,6 +62,10 @@ export async function establishResource(uri, resource) {
     }
   }).finally(() => solidButton.classList.remove("clockwise"));
   return resp;
+}
+
+export async function createMusicalObject(obj){
+
 }
 
 export async function populateSolidTab() { 
@@ -163,7 +173,6 @@ export async function loginAndFetch() {
         */
   }
 }
-
 export function solidLogout() { 
   solid.logout().then(() => {
     storage.removeItem("restoreSolidSession")

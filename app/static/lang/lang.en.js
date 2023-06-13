@@ -327,6 +327,8 @@ export const lang = {
   annotationToolsButton: { text: 'Tools', description: 'Annotation tools' },
   annotationListButton: { text: 'List', description: 'List annotations' },
   writeAnnotStandoffText: { text: 'Web Annotation' },
+  annotationToolsIdentifyTitle: { text: 'Identify' },
+  annotationToolsIdentifySpan: { text: 'Identify Musical Object' },
   annotationToolsHighlightTitle: { text: 'Highlight' },
   annotationToolsHighlightSpan: { text: 'Highlight' },
   annotationToolsDescribeTitle: { text: 'Describe' },
