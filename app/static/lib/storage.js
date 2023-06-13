@@ -6,22 +6,23 @@ export default class Storage {
       this.supported = true;
     } catch (err) {
       this.supported = false;
-      console.warn("Unable to access local storage: ", err);
+      console.warn('Unable to access local storage: ', err);
     }
   }
 
   safelySetStorageItem(item, content) {
     if (this.supported && !this.override) {
       try {
-        if (content && typeof content === "object") {
+        if (content && typeof content === 'object') {
           content = JSON.stringify(content);
         }
         this.storage.setItem(item, content);
       } catch (err) {
         this.override = true;
-        console.warn("Disabling local storage for current file - " +
-          "could not save file content. Content may be too big? ",
-          err);
+        console.warn(
+          'Disabling local storage for current file - ' + 'could not save file content. Content may be too big? ',
+          err
+        );
         this.clear();
         this.read();
       }
@@ -32,26 +33,26 @@ export default class Storage {
     if (this.storage) {
       // write directly into private "_" vars to bypass
       // setter functions, avoiding needless writes to storage
-      this._content = this.storage.getItem("meiXml");
-      this._fileName = this.storage.getItem("meiFileName");
-      this._fileLocation = this.storage.getItem("meiFileLocation");
-      this._fileLocationType = this.storage.getItem("fileLocationType");
-      this._github = JSON.parse(this.storage.getItem("github"));
-      this._fileChanged = this.storage.getItem("fileChanged");
-      this._isMEI = this.storage.getItem("isMEI");
-      this._orientation = this.storage.getItem("orientation");
-      this._notationOrientation = this.storage.getItem("notationOrientation");
-      this._facsimileOrientation = this.storage.getItem("facsimileOrientation");
-      this._notationProportion = this.storage.getItem("notationProportion");
-      this._facsimileProportion = this.storage.getItem("facsimileProportion");
-      this._page = this.storage.getItem("page");
-      this._scale = this.storage.getItem("scale");
-      this._select = JSON.parse(this.storage.getItem("select")); // Array
-      this._speed = this.storage.getItem("speed");
-      this._breaks = this.storage.getItem("breaks");
-      this._forkAndOpen = this.storage.getItem("forkAndOpen");
-      this._githubLogoutRequested = this.storage.getItem("githubLogoutRequested");
-      this._restoreSolidSession = this.storage.getItem("restoreSolidSession");
+      this._content = this.storage.getItem('meiXml');
+      this._fileName = this.storage.getItem('meiFileName');
+      this._fileLocation = this.storage.getItem('meiFileLocation');
+      this._fileLocationType = this.storage.getItem('fileLocationType');
+      this._github = JSON.parse(this.storage.getItem('github'));
+      this._fileChanged = this.storage.getItem('fileChanged');
+      this._isMEI = this.storage.getItem('isMEI');
+      this._orientation = this.storage.getItem('orientation');
+      this._notationOrientation = this.storage.getItem('notationOrientation');
+      this._facsimileOrientation = this.storage.getItem('facsimileOrientation');
+      this._notationProportion = this.storage.getItem('notationProportion');
+      this._facsimileProportion = this.storage.getItem('facsimileProportion');
+      this._page = this.storage.getItem('page');
+      this._scale = this.storage.getItem('scale');
+      this._select = JSON.parse(this.storage.getItem('select')); // Array
+      this._speed = this.storage.getItem('speed');
+      this._breaks = this.storage.getItem('breaks');
+      this._forkAndOpen = this.storage.getItem('forkAndOpen');
+      this._githubLogoutRequested = this.storage.getItem('githubLogoutRequested');
+      this._restoreSolidSession = this.storage.getItem('restoreSolidSession');
       //fileChangedFromStorage = fileChangedFromStorage ? parseInt(storage.getItem("fileChanged")) : 0;
     }
   }
@@ -75,7 +76,7 @@ export default class Storage {
   removeItem(item) {
     if (this.supported) {
       this.storage.removeItem(item);
-      this["_" + item] = null;
+      this['_' + item] = null;
     }
   }
 
@@ -93,7 +94,7 @@ export default class Storage {
     if (this.supported) {
       return this._storage;
     } else {
-      console.warn("Unable to access local storage.");
+      console.warn('Unable to access local storage.');
       return null;
     }
   }
@@ -103,7 +104,7 @@ export default class Storage {
   }
 
   set content(content) {
-    this.safelySetStorageItem("meiXml", content);
+    this.safelySetStorageItem('meiXml', content);
     this._content = content;
   }
 
@@ -112,16 +113,16 @@ export default class Storage {
   }
 
   set fileName(fileName) {
-    this.safelySetStorageItem("meiFileName", fileName);
+    this.safelySetStorageItem('meiFileName', fileName);
     this._fileName = fileName;
   }
 
   get isMEI() {
-    return this._isMEI === "true";
+    return this._isMEI === 'true';
   }
 
   set isMEI(isMEI) {
-    this.safelySetStorageItem("isMEI", isMEI);
+    this.safelySetStorageItem('isMEI', isMEI);
     this._isMEI = isMEI;
   }
 
@@ -131,9 +132,9 @@ export default class Storage {
 
   set fileLocation(fileLocation) {
     if (!fileLocation) {
-      fileLocation = "";
+      fileLocation = '';
     }
-    this.safelySetStorageItem("meiFileLocation", fileLocation);
+    this.safelySetStorageItem('meiFileLocation', fileLocation);
     this._fileLocation = fileLocation;
   }
 
@@ -142,39 +143,38 @@ export default class Storage {
   }
 
   set fileLocationType(fileLocationType) {
-    this.safelySetStorageItem("fileLocationType", fileLocationType);
+    this.safelySetStorageItem('fileLocationType', fileLocationType);
     this._fileLocationType = fileLocationType;
   }
 
   get fileLocationPrintable() {
     if (!this.fileLocation || !this.fileLocationType) {
-      console.warn(
-        "fileLocationPrintable retrieved without fileLocation and " +
-        "fileLocationType:", this)
+      console.warn('fileLocationPrintable retrieved without fileLocation and ' + 'fileLocationType:', this);
     } else {
       switch (this.fileLocationType) {
-        case "url":
+        case 'url':
           return new URL(this.fileLocation).hostname;
-        case "github":
+        case 'github':
           if (this.github) {
-            return this.github.githubRepo + ":";
+            return this.github.githubRepo + ':';
           } else {
-            console.warn("fileLocationPrintable retrieved with " +
-              "fileLocationType 'github' but no github object", this);
+            console.warn(
+              'fileLocationPrintable retrieved with ' + "fileLocationType 'github' but no github object",
+              this
+            );
             return null;
           }
-          case "file":
-            return "File: ";
-          default:
-            console.warn("fileLocationPrintable called with invalid " +
-              "fileLocationType", this);
-            return null;
+        case 'file':
+          return 'File: ';
+        default:
+          console.warn('fileLocationPrintable called with invalid ' + 'fileLocationType', this);
+          return null;
       }
     }
   }
 
   set fileLocationPrintable(fileLocationPrintable) {
-    console.warn("Do not set fileLocationPrintable directly.");
+    console.warn('Do not set fileLocationPrintable directly.');
   }
 
   get github() {
@@ -182,16 +182,16 @@ export default class Storage {
   }
 
   set github(github) {
-    this.safelySetStorageItem("github", github);
+    this.safelySetStorageItem('github', github);
     this._github = github;
   }
 
-  get githubLogoutRequested() { 
+  get githubLogoutRequested() {
     return this._githubLogoutRequested;
   }
 
   set githubLogoutRequested(githubLogoutRequested) {
-    this.safelySetStorageItem("githubLogoutRequested", githubLogoutRequested);
+    this.safelySetStorageItem('githubLogoutRequested', githubLogoutRequested);
     this._githubLogoutRequested = githubLogoutRequested;
   }
 
@@ -200,7 +200,7 @@ export default class Storage {
   }
 
   set fileChanged(fileChanged) {
-    this.safelySetStorageItem("fileChanged", fileChanged);
+    this.safelySetStorageItem('fileChanged', fileChanged);
     this._fileChanged = fileChanged;
   }
 
@@ -217,7 +217,7 @@ export default class Storage {
   }
 
   set orientation(orientation) {
-    this.safelySetStorageItem("orientation", orientation);
+    this.safelySetStorageItem('orientation', orientation);
     this._orientation = orientation;
   }
 
@@ -226,7 +226,7 @@ export default class Storage {
   }
 
   set notationOrientation(orientation) {
-    this.safelySetStorageItem("notationOrientation", orientation);
+    this.safelySetStorageItem('notationOrientation', orientation);
     this._notationOrientation = orientation;
   }
 
@@ -235,7 +235,7 @@ export default class Storage {
   }
 
   set facsimileOrientation(orientation) {
-    this.safelySetStorageItem("facsimileOrientation", orientation);
+    this.safelySetStorageItem('facsimileOrientation', orientation);
     this._facsimileOrientation = orientation;
   }
 
@@ -244,7 +244,7 @@ export default class Storage {
   }
 
   set notationProportion(proportion) {
-    this.safelySetStorageItem("notationProportion", proportion);
+    this.safelySetStorageItem('notationProportion', proportion);
     this._notationProportion = proportion;
   }
 
@@ -253,7 +253,7 @@ export default class Storage {
   }
 
   set facsimileProportion(proportion) {
-    this.safelySetStorageItem("facsimileProportion", proportion);
+    this.safelySetStorageItem('facsimileProportion', proportion);
     this._facsimileProportion = proportion;
   }
 

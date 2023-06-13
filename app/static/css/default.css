@@ -138,7 +138,7 @@ a:active {
   fill: var(--textColor);
 }
 
-#facsimile-close-button {
+#facsimileCloseButton {
   fill: var(--dropdownBorderColor)
 }
 
@@ -172,7 +172,7 @@ a:active {
   -ms-transform: translate(-50%, -50%);
 }
 
-.openUrlOverlay {
+.openUrlOverlay, #githubActionsOverlay {
   position: fixed;
   display: none;
   top: 0;
@@ -183,13 +183,44 @@ a:active {
   z-index: 190;
 }
 
+#githubActionsUI { 
+  display:flex;
+  flex-direction:column;
+  padding: 1em;
+  height: fit-content !important;
+}
+
+.githubActionsInputConfig { 
+  display:flex;
+  flex-direction:row;
+  align-items: end;
+  background-color:var(--navbarBackgroundColor);
+  border-radius:1em;
+  width:fit-content;
+  padding:.5em;
+}
+
+.githubActionsInputConfig span { 
+  color: var(--textColor);
+}
+
+.githubActionsInputSetter svg {
+  fill: var(--textColor);
+}
+
+.githubActionsInputConfig div { 
+  padding-left: .5em;
+  padding-right:.5em;
+}
+
 .openUrlOverlay a,
 .forkRepositoryOverlay a {
   color: var(--overlayLinkColor);
 }
 
 .openUrlOverlay .openUrlUI,
-.forkRepositoryOverlay .forkRepositoryUI {
+.forkRepositoryOverlay .forkRepositoryUI,
+#githubActionsUI {
   position: absolute;
   top: 20%;
   left: 20%;
@@ -212,10 +243,17 @@ a:active {
 }
 
 .openUrlOverlay .openUrlUI details,
-.forkRepositoryOverlay .forkRepositoryUI details {
+.forkRepositoryOverlay .forkRepositoryUI details,
+#githubActionsUI details, #githubActionsUI button {
   cursor: pointer;
   margin-bottom: 1em;
 }
+
+#githubActionsUI details label { 
+  font-family: monospace;
+  cursor: pointer;
+}
+
 
 .openUrlOverlay .openUrlUI details>div,
 .forkRepositoryOverlay .forkRepositoryUI details>div {
@@ -297,6 +335,11 @@ a:active {
   width: 100%;
 }
 
+#friendContainer.pdfMode {
+  /* border-color: #cb0606; */
+  border-color: var(--dropdownBorderColor);
+}
+
 #notation {
   overflow: hidden;
   display: flex;
@@ -314,7 +357,7 @@ a:active {
   fill: var(--textColor);
 }
 
-#verovio-container {
+#verovioContainer {
   height: 100%;
   width: 100%;
   overflow: inherit;
@@ -328,7 +371,7 @@ a:active {
   height: 100%;
 }
 
-#facsimile-message-panel {
+#facsimileMessagePanel {
   padding: 8px;
   color: var(--textColor);
   background-color: var(--backgroundColor);
@@ -415,7 +458,7 @@ a:active {
 
 .manual {
   color: grey;
-  fill: grey
+  fill: grey;
 }
 
 /* Overriding Codemirror Defaults */
@@ -454,6 +497,37 @@ a:active {
   padding-left: 18px;
   background-position: top left;
   background-repeat: no-repeat;
+}
+
+#tagEncloserMenu {
+  z-index: 10;
+  border: 1px solid var(--dropdownBorderColor);
+  border-radius: 4px;
+  background-color: var(--dropdownBackgroundColor);
+  display: flex;
+  flex-direction: column;
+  align-content: stretch;
+  align-items: center;
+  gap: 3px;
+  padding: 5px;
+  font-weight: bold;
+}
+
+#tagEncloserMenu input {
+  width: 180px;
+  font-weight: bold;
+  border-radius: 4px;
+}
+
+#tagEncloserMenu input:focus {
+  outline: none;
+}
+
+#tagEncloserMenu div {
+  font-weight: normal;
+  display: flex;
+  flex-direction: row;
+  gap: 15px;
 }
 
 .rightButton {
@@ -516,7 +590,7 @@ a:active {
   height: 20px;
 }
 
-.footer #midi-player-contextual {
+.footer #midiPlayerContextual {
   position: fixed;
   bottom: 1.5em;
   left: 1em;
@@ -530,7 +604,7 @@ a:active {
   cursor:pointer;
 }
 
-.footer #midi-player-contextual:hover {
+.footer #midiPlayerContextual:hover {
   background: var(--backgroundColor);
 }
 
@@ -556,7 +630,7 @@ a:active {
   position: relative;
 }
 
-.statusbar {
+#statusBar {
   width: 100%;
   height: 100%;
   position: absolute;
@@ -566,7 +640,7 @@ a:active {
   z-index: 10;
 }
 
-.progressbar {
+#progressBar {
   width: 0%;
   height: 100%;
   background-color: var(--dropdownBackgroundColor);
@@ -611,12 +685,18 @@ a:active {
   border: 2px solid rgb(0, 0, 0, 0);
   border-radius: 4px;
   font-size: 10pt;
-  line-height: 1.5em;
+  /* line-height: 1.5em; */
   padding: 0px;
   min-height: 21px;
   min-width: 21px;
   max-height: 21px;
+  color: var(--textColor);
   background-color: var(--controlMenuBackgroundColor);
+}
+
+.narrowButton {
+  width: 50px;
+  max-width: 80px;
 }
 
 .btn:hover {
@@ -638,6 +718,7 @@ a:active {
   min-height: 21px;
   min-width: 21px;
   white-space: nowrap;
+  cursor: default;
 }
 
 #pagination2 {
@@ -728,8 +809,15 @@ https://www.w3schools.com/css/css_tooltip.asp
   width: 100%;
   height: 100%;
   text-align: center;
-  z-index: 9;
+  z-index: 1;
   background-color: var(--notationBackgroundColor);
+}
+
+.showFrame {
+  border-color: var(--notationColor);
+  border-style: solid;
+  border-width: 1px;
+  border-radius: 2px;
 }
 
 /* prevent text from being selectable in SVG */
@@ -740,19 +828,19 @@ svg text {
   user-select: none;
 }
 
-#verovio-container .currently-playing { 
+#verovioContainer .currently-playing { 
   fill:orange !important;
   stroke:orange !important;
   color: orange !important;
 }
 
-#verovio-container .highlighted {
+#verovioContainer .highlighted {
   color: var(--highlightColor);
   stroke: var(--highlightColor);
 }
 
-#verovio-container g.highlighted,
-#verovio-container text.highlighted {
+#verovioContainer g.highlighted,
+#verovioContainer text.highlighted {
   fill: var(--highlightColor);
   fill-opacity: 100%;
 }
@@ -771,22 +859,22 @@ svg text {
   fill-opacity: 70%;
 }
 
-#verovio-container g.supplied g {
+#verovioContainer g.supplied g {
   fill: var(--suppliedColor);
   color: var(--suppliedColor);
   stroke: var(--suppliedColor);
 }
 
-#verovio-container .supplied .highlighted {
+#verovioContainer .supplied .highlighted {
   color: var(--suppliedHighlightedColor);
   stroke: var(--suppliedHighlightedColor);
 }
 
-#verovio-container g.supplied g.highlighted {
+#verovioContainer g.supplied g.highlighted {
   fill: var(--suppliedHighlightedColor);
 }
 
-#verovio-container g {
+#verovioContainer g {
   fill: var(--notationColor);
   color: var(--notationColor);
   stroke: var(--notationColor);
@@ -801,7 +889,7 @@ svg text {
   fill-opacity: 40%;
 }
 
-/* #source-image-svg text {
+/* #sourceImageSvg text {
   fill: var(--dropdownHeadingColor);
   stroke: var(--dropdownHeadingColor);
   fill-opacity: 1;
@@ -860,7 +948,7 @@ svg text {
   fill: var(--settingsBackgroundColor);
 }
 
-#verovio-icon {
+#verovioIcon {
   margin-left: 3px;
   margin-right: 3px;
   width: 22px;
@@ -870,11 +958,21 @@ svg text {
   stroke-width: 1.5px;
 }
 
-#facsimile-icon {
+#facsimileIcon, #pdf-icon {
   margin-left: 3px;
   margin-right: 3px;
   width: 16px;
   fill: var(--textColor);
+}
+
+.pdfRed {
+  color: #cb0606;
+  fill: #cb0606;
+  background-color: var(--backgroundColor);
+}
+
+.background {
+  color: var(--backgroundColor);
 }
 
 .code {
@@ -1049,7 +1147,7 @@ span.keyIcon {
   border-bottom: var(--settingsBackgroundColor) solid 2px;
   border-bottom-right-radius: 5px;
   border-bottom-left-radius: 5px;
-  height: 95%;
+  height: calc(100% - 50px);
   overflow: auto;
 }
 
@@ -1065,7 +1163,6 @@ span.keyIcon {
   font-size: 10pt;
   display: none;
   padding: 6px 12px;
-  overflow: none;
   height: calc(100% - 50px);
   width: calc(100% - 2em);
 }
@@ -1075,12 +1172,6 @@ span.keyIcon {
   font-weight: bold;
   padding: 9px 6px 6px 6px;
   cursor: pointer;
-}
-
-.tabcontent input[type="button"] {
-  float: right;
-  margin-top: 10px;
-  margin-right: 2px;
 }
 
 /* Style the close button */
@@ -1138,7 +1229,7 @@ span.keyIcon {
   margin-right: 3px;
   margin-top: 2px;
   margin-bottom: 2px;
-  min-width: 220px;
+  min-width: 175px;
   float: left;
 }
 
@@ -1166,8 +1257,17 @@ select {
   padding: 2px;
 }
 
+.disabled {
+  opacity: 50%;
+}
+
 .resetButton {
+  float: right;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  margin-right: 2px;
   border-radius: 4px;
+  max-width: 60px;
 }
 
 input,
@@ -1208,7 +1308,6 @@ select>option {
   border-width: 2px; */
   border-radius: 8px;
   color: white;
-  font-size: normal;
   z-index: 20;
   overflow-y: auto;
 }
@@ -1309,7 +1408,7 @@ midi-player::part(play-button) {
   max-width: 70%;
 }
 
-#midi-speedmode-indicator { 
+#midiSpeedmodeIndicator { 
   display:none;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 6pt;
@@ -1338,3 +1437,4 @@ midi-player::part(play-button) {
 #closeMidiPlaybackControlBarButton:hover { 
   background-color:var(--settingsLinkHoverColor);
 }
+

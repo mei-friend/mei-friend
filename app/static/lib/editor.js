@@ -2,17 +2,21 @@
  * Provides all the editor functions
  */
 
+import * as att from './attribute-classes.js';
+import * as dutils from './dom-utils.js';
 import * as speed from './speed.js';
 import * as utils from './utils.js';
-import * as dutils from './dom-utils.js';
-import * as att from './attribute-classes.js';
 import { loadFacsimile } from './facsimile.js';
+import { handleEditorChanges, translator, version, versionDate } from './main.js';
 import Viewer from './viewer.js';
-import { handleEditorChanges, version, versionDate } from './main.js';
 
-// smart indent selected region in editor, if none, do all
+/**
+ * Smart indents selected region in editor, if none, do all
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
+ */
 export function indentSelection(v, cm) {
-  v.updateNotation = false;
+  v.allowCursorActivity = false;
   cm.blockChanges = true;
   let selections = cm.listSelections();
   selections.forEach((s) => {
@@ -34,102 +38,124 @@ export function indentSelection(v, cm) {
   });
   cm.blockChanges = false;
   handleEditorChanges();
-  v.updateNotation = true;
+  v.allowCursorActivity = true;
 } // indentSelection()
 
-// delete selected elements
+/**
+ * Deletes selected elements
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
+ * @param {boolean} modifyerKey
+ * @returns
+ */
 export function deleteElement(v, cm, modifyerKey = false) {
   v.loadXml(cm.getValue(), true);
-  let id = v.selectedElements[0]; // TODO: iterate over selectedElements
-  let cursor = cm.getCursor();
-  let nextId = utils.getIdOfNextElement(cm, cursor.line)[0]; // TODO necessary?
-  let element = v.xmlDoc.querySelector("[*|id='" + id + "']");
-  console.info('Deleting: ', element);
-  if (!element) {
-    console.info(id + ' not found for deletion.');
-    return;
-  }
-  let selectedElements = [];
-  v.updateNotation = false;
-  // let checkPoint = buffer.createCheckpoint(); TODO
+  let selectedElements = []; // store selected elements for later
+  // iterate all selected elements
+  v.selectedElements.forEach((id) => {
+    let cursor = cm.getCursor();
+    let nextId = utils.getIdOfNextElement(cm, cursor.line)[0]; // TODO necessary?
+    let element = v.xmlDoc.querySelector("[*|id='" + id + "']");
+    console.info('Deleting: ', element);
+    if (!element) {
+      console.info(id + ' not found for deletion.');
+      return;
+    }
+    v.allowCursorActivity = false;
+    // let checkPoint = buffer.createCheckpoint(); TODO
 
-  if (att.modelControlEvents.concat(['accid', 'artic', 'clef', 'octave', 'beamSpan']).includes(element.nodeName)) {
-    if (element.nodeName === 'octave') {
-      // reset notes inside octave range
-      let disPlace = element.getAttribute('dis.place');
-      let dis = element.getAttribute('dis');
-      let id1 = utils.rmHash(element.getAttribute('startid'));
-      let id2 = utils.rmHash(element.getAttribute('endid'));
-      findAndModifyOctaveElements(cm, v.xmlDoc, id1, id2, disPlace, dis, false);
-      removeInEditor(cm, element);
-      selectedElements.push(id2);
-    } else {
-      removeInEditor(cm, element);
-      // place cursor at a sensible place...
-      let m = utils.getElementIdAtCursor(cm);
-      let el = document.getElementById(m).querySelector(dutils.navElsSelector);
-      if (el) selectedElements.push(el.getAttribute('id'));
-      else selectedElements.push(nextId);
-    }
-  } else if (['beam'].includes(element.nodeName)) {
-    // delete beam
-    let p;
-    let first = true;
-    let childList = element.childNodes;
-    for (let i = 0; i < childList.length; i++) {
-      if (childList[i].nodeType === Node.TEXT_NODE) continue;
-      if (first) {
-        p = replaceInEditor(cm, element, false, childList[i]);
-        p.end.line += 1;
-        p.end.ch = 0;
-        cm.setCursor(p.end);
-        first = false;
+    if (att.modelControlEvents.concat(['accid', 'artic', 'clef', 'octave', 'beamSpan']).includes(element.nodeName)) {
+      if (element.nodeName === 'octave') {
+        // reset notes inside octave range
+        let disPlace = element.getAttribute('dis.place');
+        let dis = element.getAttribute('dis');
+        let id1 = utils.rmHash(element.getAttribute('startid'));
+        let id2 = utils.rmHash(element.getAttribute('endid'));
+        findAndModifyOctaveElements(cm, v.xmlDoc, id1, id2, disPlace, dis, false);
+        removeInEditor(cm, element);
+        selectedElements.push(id2);
       } else {
-        // txtEdr.insertNewline();
-        let newMEI = dutils.xmlToString(childList[i]);
-        cm.replaceRange(newMEI + '\n', p.end);
-        let cursor = cm.getCursor();
-        for (let l = p.end.line; l < cursor.line; l++) cm.indentLine(l);
-        p.end = cursor;
+        removeInEditor(cm, element);
+        // place cursor at a sensible place...
+        let m = utils.getElementIdAtCursor(cm);
+        let el = document.getElementById(m).querySelector(dutils.navElsSelector);
+        if (el) selectedElements.push(el.getAttribute('id'));
+        else selectedElements.push(nextId);
       }
-      selectedElements.push(childList[i].getAttribute('xml:id'));
-      element.parentNode.insertBefore(childList[i--], element);
+    } else if (['beam'].includes(element.nodeName)) {
+      // delete beam
+      let p;
+      let first = true;
+      let childList = element.childNodes;
+      for (let i = 0; i < childList.length; i++) {
+        if (childList[i].nodeType === Node.TEXT_NODE) continue;
+        if (first) {
+          p = replaceInEditor(cm, element, false, childList[i]);
+          p.end.line += 1;
+          p.end.ch = 0;
+          cm.setCursor(p.end);
+          first = false;
+        } else {
+          // txtEdr.insertNewline();
+          let newMEI = dutils.xmlToString(childList[i]);
+          cm.replaceRange(newMEI + '\n', p.end);
+          let cursor = cm.getCursor();
+          for (let l = p.end.line; l < cursor.line; l++) cm.indentLine(l);
+          p.end = cursor;
+        }
+        selectedElements.push(childList[i].getAttribute('xml:id'));
+        element.parentNode.insertBefore(childList[i--], element);
+      }
+    } else if (element.nodeName === 'zone' && document.getElementById('editFacsimileZones').checked) {
+      // delete Zone in source image display
+      // remove zone; with CMD remove pointing element; without just remove @facs from pointing element
+      removeZone(v, cm, element, modifyerKey);
+    } else {
+      console.info('Element ' + id + ' not supported for deletion.');
+      return;
     }
-  } // delete Zone in source image display
-  else if (element.nodeName === 'zone' && document.getElementById('editFacsimileZones').checked) {
-    // remove zone; with CMD remove pointing element; without just remove @facs from pointing element
-    removeZone(v, cm, element, modifyerKey);
-  } else if (!document.getElementById('editFacsimileZones').checked) {
-    v.show;
-  } else {
-    console.info('Element ' + id + ' not supported for deletion.');
-    return;
-  }
-  element.remove();
+    element.remove();
+  });
   loadFacsimile(v.xmlDoc);
   // buffer.groupChangesSinceCheckpoint(checkPoint); TODO
   v.selectedElements = selectedElements;
-  v.lastNoteId = v.selectedElements[v.selectedElements.length - 1];
+  v.lastNoteId = v.selectedElements.at(-1);
   v.xmlDocOutdated = true;
   addApplicationInfo(v, cm);
   v.updateData(cm, false, true);
-  v.updateNotation = true;
+  v.allowCursorActivity = true;
 } // deleteElement()
 
+/**
+ * Inserts a new control element to DOM and editor
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
+ * @param {string} elName ('slur', 'dynam', ...)
+ * @param {string} placement ('below', 'up', ...)
+ * @param {string} form ('cres', 'inv', depending on element type)
+ * @returns
+ */
 export function addControlElement(v, cm, elName, placement, form) {
   if (v.selectedElements.length === undefined || v.selectedElements.length < 1) return;
   v.selectedElements = utils.sortElementsByScorePosition(v.selectedElements);
   v.selectedElements = speed.filterElements(v.selectedElements, v.xmlDoc);
   console.info('addControlElement() ', elName, placement, form);
 
+  // modifier key for inserting tstamps rather than start/endids
+  let useTstamps = v.cmd2KeyPressed;
+
   // find and validate startEl with @startId
   let startId = v.selectedElements[0];
   var startEl = v.xmlDoc.querySelector("[*|id='" + startId + "']");
   if (!startEl) return;
   if (!['note', 'chord', 'rest', 'mRest', 'multiRest'].includes(startEl.nodeName)) {
-    console.info('addControlElement: Cannot add new element to start element' + startEl.nodeName + '.');
+    console.info('addControlElement: Cannot add new element to ' + startEl.nodeName + '.');
     return;
   }
+  // staveArray lists staff numbers of all selected elements
+  let staveArray = [];
+  let startStaffNumber = startEl.closest('staff')?.getAttribute('n'); // get staff number for start element
+  if (startStaffNumber) staveArray.push(startStaffNumber);
   // find and validate end element
   let endId = '';
   let sc = cm.getSearchCursor('xml:id="' + startId + '"');
@@ -148,115 +174,208 @@ export function addControlElement(v, cm, elName, placement, form) {
       console.info('addControlElement: Cannot add new element to end element ' + endEl.nodeName);
       return;
     }
+    const endStaffNumber = endEl.closest('staff')?.getAttribute('n');
+    if (endStaffNumber && !staveArray.includes(endStaffNumber)) {
+      staveArray.push(endStaffNumber);
+    }
+  }
+  // check inner elements (without start/end) for staff numbers and add them, if missing in staveArray
+  for (let i = 1; i < v.selectedElements.length - 1; i++) {
+    let el = v.xmlDoc.querySelector("[*|id='" + v.selectedElements[i] + "']");
+    let n = el?.closest('staff')?.getAttribute('n');
+    if (!staveArray.includes(n)) staveArray.push(n);
   }
   // create element to be inserted
   let newElement = v.xmlDoc.createElementNS(dutils.meiNameSpace, elName);
   let uuid = utils.generateXmlId(elName, v.xmlIdStyle);
   newElement.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
+
+  // potential second new element for pedal
+  let uuid2, newElement2;
+
+  // add @staff attribute of start element
+  if (staveArray.length > 0) newElement.setAttribute('staff', staveArray.sort().join(' '));
+
+  // always compute time stamps for checking
+  let tstamp = speed.getTstampForElement(v.xmlDoc, startEl);
+  let m = 0;
+  let tstamp2 = '';
+  if (endEl) {
+    m = speed.getMeasureDistanceBetweenElements(v.xmlDoc, startEl, endEl);
+    tstamp2 = speed.getTstampForElement(v.xmlDoc, endEl);
+  }
+
   // elements with both startid and endid
   if (['slur', 'tie', 'phrase', 'hairpin', 'gliss'].includes(elName)) {
-    newElement.setAttribute('startid', '#' + startId);
-    newElement.setAttribute('endid', '#' + endId);
+    // stop, if selected elements are on the same beat position and through warning.
+    if (m === 0 && tstamp2 === tstamp && !startEl.hasAttribute('grace') && !endEl.hasAttribute('grace')) {
+      let msg = useTstamps ? 'Cannot insert ' : 'Attention with ' + elName + ' (' + uuid + '): ';
+      msg += startId + ' and ' + endId + ' are on the same beat position ' + tstamp + '.';
+      console.log(msg);
+      v.showAlert(msg, 'warning');
+      if (useTstamps) return;
+    }
+    if (useTstamps) {
+      newElement.setAttribute('tstamp', tstamp);
+      newElement.setAttribute('tstamp2', utils.writeMeasureBeat(m, tstamp2));
+    } else {
+      newElement.setAttribute('startid', '#' + startId);
+      newElement.setAttribute('endid', '#' + endId);
+    }
   } else if (
     // only a @startid
     ['fermata', 'dir', 'dynam', 'tempo', 'pedal', 'mordent', 'trill', 'turn'].includes(elName)
   ) {
-    newElement.setAttribute('startid', '#' + startId);
+    if (useTstamps) {
+      newElement.setAttribute('tstamp', tstamp);
+    } else {
+      newElement.setAttribute('startid', '#' + startId);
+    }
   }
-  // add an optional endid
-  if (endId && ['dir', 'dynam', 'mordent', 'trill', 'turn'].includes(elName)) {
-    newElement.setAttribute('endid', '#' + endId);
+  // add an optional endid (but only if tstamps are different)
+  if (endId && ['dir', 'dynam', 'mordent', 'trill'].includes(elName) && (m !== 0 || tstamp !== tstamp2)) {
+    if (useTstamps) {
+      newElement.setAttribute('tstamp2', utils.writeMeasureBeat(m, tstamp2));
+    } else {
+      newElement.setAttribute('endid', '#' + endId);
+    }
     if (['trill'].includes(elName)) {
       // @extender for endid
       newElement.setAttribute('extender', 'true');
     }
   }
+
+  // handle @form attribute
   if (form && ['hairpin', 'fermata', 'mordent', 'trill', 'turn'].includes(elName)) {
     newElement.setAttribute('form', form);
   }
+
+  // placement for pedal is @dir=up|down
   if (placement && ['pedal'].includes(elName)) {
     newElement.setAttribute('dir', placement);
-    newElement.setAttribute('vgrp', '100');
+
+    // add dir=up element to endEl (only if tstamps are different)
+    if (endEl && endId && placement === 'down' && (m !== 0 || tstamp !== tstamp2)) {
+      newElement2 = v.xmlDoc.createElementNS(dutils.meiNameSpace, elName);
+      uuid2 = utils.generateXmlId(elName, v.xmlIdStyle);
+      newElement2.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid2);
+      if (useTstamps) {
+        newElement2.setAttribute('tstamp', tstamp2);
+      } else {
+        newElement2.setAttribute('startid', '#' + endId);
+      }
+      if (staveArray.length > 0) newElement2.setAttribute('staff', staveArray.sort().join(' '));
+      newElement2.setAttribute('dir', 'up');
+    }
+    placement = '';
   }
   if (placement) {
     if (['slur', 'tie', 'phrase'].includes(elName)) {
       newElement.setAttribute('curvedir', placement);
+    } else if (elName === 'arpeg') {
+      newElement.setAttribute('order', placement);
     } else {
       newElement.setAttribute('place', placement);
     }
   }
   if (['arpeg'].includes(elName)) {
-    let plistString = '';
-    for (let e of v.selectedElements) {
-      plistString += '#' + e + ' ';
-    }
-    newElement.setAttribute('plist', plistString);
+    newElement.setAttribute('plist', '#' + v.selectedElements.join(' #'));
   }
   if (form && ['dir', 'dynam', 'tempo'].includes(elName)) {
     newElement.appendChild(v.xmlDoc.createTextNode(form));
   }
-  // add new element to txtEdr at end of measure
-  v.updateNotation = false; // to prevent reloading after each edit
+
+  // add new element(s) to DOM
+  startEl.closest('measure').appendChild(newElement); //.cloneNode(true));
+
+  // add new element to editor at end of measure
+  v.allowCursorActivity = false; // to prevent reloading after each edit
   if (p) {
     let p1 = utils.moveCursorToEndOfMeasure(cm, p); // resets selectedElements!!
     console.log('p1: ', p);
-    cm.replaceRange(dutils.xmlToString(newElement) + '\n', cm.getCursor());
+    cm.replaceRange(dutils.xmlToString(newElement) + '\n', p1);
     cm.indentLine(p1.line, 'smart');
     cm.indentLine(p1.line + 1, 'smart');
-    cm.setSelection(p1);
-    console.log('Cursor pos: ', cm.getCursor());
   }
-  // add new element to DOM
-  var measureId = startEl.closest('measure').getAttribute('xml:id');
-  v.xmlDoc.querySelector("[*|id='" + measureId + "']").appendChild(newElement); //.cloneNode(true));
+  if (newElement2) {
+    // only for pedal up case
+    endEl.closest('measure').appendChild(newElement2);
+    utils.setCursorToId(cm, endId);
+    let p1 = utils.moveCursorToEndOfMeasure(cm); // resets selectedElements!!
+    cm.replaceRange(dutils.xmlToString(newElement2) + '\n', p1);
+    cm.indentLine(p1.line, 'smart');
+    cm.indentLine(p1.line + 1, 'smart');
+  }
+  utils.setCursorToId(cm, uuid); // to select new element
+
+  // prepare final state
   v.lastNoteId = startId;
   v.selectedElements = [];
   v.selectedElements.push(uuid);
-  addApplicationInfo(v, cm);
+  if (uuid2) v.selectedElements.push(uuid2);
   addApplicationInfo(v, cm);
   v.updateData(cm, false, true);
-  v.updateNotation = true;
+  v.allowCursorActivity = true;
 } // addControlElement()
 
+/**
+ * Inserts a clef change element before/after the current selection
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
+ * @param {string} shape ('G', 'F', 'C')
+ * @param {string} line ('2', ...)
+ * @param {boolean} before element, or after (false)
+ * @returns
+ */
 export function addClefChange(v, cm, shape = 'G', line = '2', before = true) {
   if (v.selectedElements.length === 0) return;
-  v.updateNotation = false; // stop update notation
+  v.allowCursorActivity = false; // stop update notation
   let id = v.selectedElements[0];
   var el = v.xmlDoc.querySelector("[*|id='" + id + "']");
   let chord = el.closest('chord');
   if (chord) id = chord.getAttribute('xml:id');
-  utils.setCursorToId(cm, id);
+  let staffNumber = el.closest('staff')?.getAttribute('n');
+
+  // create new DOM element
   let newElement = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'clef');
   let uuid = utils.generateXmlId('clef', v.xmlIdStyle);
   newElement.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
-  newElement.setAttribute('shape', shape);
   newElement.setAttribute('line', line);
+  newElement.setAttribute('shape', shape);
+  if (staffNumber) newElement.setAttribute('staff', staffNumber);
   v.xmlDocOutdated = true;
+
+  utils.setCursorToId(cm, id);
   if (before) {
     cm.replaceRange(dutils.xmlToString(newElement) + '\n', cm.getCursor());
-    // cm.execCommand('newLineAndIndent');
   } else {
     cm.execCommand('toMatchingTag');
     cm.execCommand('goLineEnd');
     cm.replaceRange('\n' + dutils.xmlToString(newElement), cm.getCursor());
   }
-  cm.execCommand('indentAuto');
-  v.updateNotation = true; // update notation again
+  cm.execCommand('indentAuto'); // auto indent current line or selection
+  utils.setCursorToId(cm, uuid); // to select new element
+  v.allowCursorActivity = true; // update notation again
   v.selectedElements = [];
   v.selectedElements.push(uuid);
   v.lastNoteId = uuid;
   v.updatePage(cm, '', uuid);
-}
+} // addClefChange()
 
-// Reverse or insert att:placement (artic, ...), att.curvature (slur, tie,
-// phrase) and att.stems (note, chord) of current element
-// (or its children, such as all notes/chords within a beam).
+/**
+ * Reverses or inserts att:placement (artic, ...), att.curvature (slur, tie,
+ * phrase) and att.stems (note, chord) of current element
+ * (or its children, such as all notes/chords within a beam).
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
+ * @param {boolean} modifier
+ */
 export function invertPlacement(v, cm, modifier = false) {
   v.loadXml(cm.getValue());
   let ids = utils.sortElementsByScorePosition(v.selectedElements);
   ids = speed.filterElements(ids, v.xmlDoc);
   console.info('invertPlacement ids: ', ids);
-  v.updateNotation = false; // no need to redraw notation
+  v.allowCursorActivity = false; // no need to redraw notation
   let noteList, range;
   for (let id of ids) {
     var el = v.xmlDoc.querySelector("[*|id='" + id + "']");
@@ -273,12 +392,58 @@ export function invertPlacement(v, cm, modifier = false) {
     let val = 'above';
     // placement above/below as in dir, dynam...
     if (att.attPlacement.includes(el.nodeName)) {
-      //|| el.nodeName === 'beamSpan') {
       attr = 'place';
-      if (el.hasAttribute(attr) && att.dataPlacement.includes(val) && el.getAttribute(attr) != 'below') {
+      if (el.getAttribute(attr) === 'between' && el.hasAttribute('staff')) {
+        let staves = el.getAttribute('staff');
+        el.setAttribute('staff', staves.split(' ')[0]);
+      }
+      if (
+        el.hasAttribute(attr) &&
+        att.dataPlacement.includes(el.getAttribute(attr)) &&
+        el.getAttribute(attr) !== 'below'
+      ) {
         val = 'below';
       }
-      if (el.nodeName === 'fermata') val === 'below' ? el.setAttribute('form', 'inv') : el.removeAttribute('form');
+      if (modifier) {
+        let response = getStaffNumbersForClosestStaffGroup(v, el);
+        if (response) {
+          let staffNumbers = []; // relevant two staves for @place='between'
+          if (response.staffNumbers.length === 2) {
+            staffNumbers = response.staffNumbers.sort();
+          } else {
+            // try to guess the relevant two staves
+            staffNumbers = [response.staffNumber];
+            const i = response.staffNumbers.indexOf(response.staffNumber);
+            if (i === response.staffNumbers.length - 1) {
+              staffNumbers.push(response.staffNumbers[i - 1]);
+            } else {
+              staffNumbers.push(response.staffNumbers[i + 1]);
+            }
+            let msg =
+              'Editor between placement: Please check staff numbers of ' +
+              el.nodeName +
+              ' (' +
+              id +
+              ') ' +
+              ' as it does not sit in a staff group with two staves' +
+              ' and relevant staves cannot be clearly determined.';
+            console.log(msg);
+            v.showAlert(msg, 'info');
+          }
+          // set @place and @staff attribute
+          if (!el.hasAttribute(attr) || (el.hasAttribute(attr) && el.getAttribute(attr) !== 'between')) {
+            val = 'between'; // set to between, if no or other @place attribute
+            el.setAttribute('staff', staffNumbers.sort().join(' '));
+          } else {
+            val = 'above'; // default value
+            el.setAttribute('staff', staffNumbers[0]);
+          }
+        }
+      }
+      // for fermata, change form from inv to nothing or back
+      if (el.nodeName === 'fermata') {
+        val === 'below' ? el.setAttribute('form', 'inv') : el.removeAttribute('form');
+      }
       el.setAttribute(attr, val);
       range = replaceInEditor(cm, el, true);
       // txtEdr.autoIndentSelectedRows();
@@ -322,7 +487,7 @@ export function invertPlacement(v, cm, modifier = false) {
             }
             note.setAttribute(attr, val);
           }
-          v.updateNotation = false; // no need to redraw notation
+          v.allowCursorActivity = false; // no need to redraw notation
           range = replaceInEditor(cm, note, true);
         });
       }
@@ -337,7 +502,7 @@ export function invertPlacement(v, cm, modifier = false) {
           val = 'down';
         }
         note.setAttribute(attr, val);
-        v.updateNotation = false; // no need to redraw notation
+        v.allowCursorActivity = false; // no need to redraw notation
         range = replaceInEditor(cm, note, true);
         // txtEdr.autoIndentSelectedRows();
       }
@@ -346,18 +511,22 @@ export function invertPlacement(v, cm, modifier = false) {
     }
   }
   // console.info('TextCursor: ', txtEdr.getCursorBufferPosition());
-  if (range) cm.setCursor(range.end);
   v.selectedElements = ids;
   addApplicationInfo(v, cm);
   v.updateData(cm, false, true);
-  v.updateNotation = true; // update notation again
+  v.allowCursorActivity = true; // update notation again
 } // invertPlacement()
 
-// toggle (switch on/off) artic to selected elements
+/**
+ * Toggles (switches on/off) artic at selected elements
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
+ * @param {string} artic ('stacc', ...)
+ */
 export function toggleArtic(v, cm, artic = 'stacc') {
   v.loadXml(cm.getValue());
   let ids = speed.filterElements(v.selectedElements, v.xmlDoc);
-  v.updateNotation = false;
+  v.allowCursorActivity = false;
   let i, range;
   for (i = 0; i < ids.length; i++) {
     let id = ids[i];
@@ -372,7 +541,7 @@ export function toggleArtic(v, cm, artic = 'stacc') {
     let uuid;
     let noteList;
     if (['note', 'chord'].includes(note.nodeName)) {
-      uuid = toggleArticForNote(v, note, artic);
+      uuid = toggleArticForNote(note, artic, v.xmlIdStyle);
       uuid ? (ids[i] = uuid) : (ids[i] = id);
       range = replaceInEditor(cm, note, true);
       cm.execCommand('indentAuto');
@@ -380,24 +549,28 @@ export function toggleArtic(v, cm, artic = 'stacc') {
       let noteId;
       for (noteId of noteList) {
         note = v.xmlDoc.querySelector("[*|id='" + noteId + "']");
-        uuid = toggleArticForNote(v, note, artic);
+        uuid = toggleArticForNote(note, artic, v.xmlIdStyle);
         range = replaceInEditor(cm, note, true);
         cm.execCommand('indentAuto');
       }
     }
   }
-  if (range) cm.setCursor(range.end);
   v.selectedElements = ids;
   addApplicationInfo(v, cm);
   v.updateData(cm, false, true);
-  v.updateNotation = true; // update notation again
+  v.allowCursorActivity = true; // update notation again
 } // toggleArtic()
 
-// shift element (rests, note) up/down by pitch name (1 or 7 steps)
-export function shiftPitch(v, cm, deltaPitch) {
+/**
+ * Shifts element (rests, note) up/down by pitch name (1 or 7 steps)
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
+ * @param {int} deltaPitch (-1, -12, +2)
+ */
+export function shiftPitch(v, cm, deltaPitch = 0) {
   v.loadXml(cm.getValue());
   let ids = speed.filterElements(v.selectedElements, v.xmlDoc);
-  v.updateNotation = false;
+  v.allowCursorActivity = false;
   let i;
   for (i = 0; i < ids.length; i++) {
     let id = ids[i];
@@ -406,21 +579,56 @@ export function shiftPitch(v, cm, deltaPitch) {
     let chs = Array.from(el.querySelectorAll('note,rest,mRest,multiRest'));
     if (chs.length > 0)
       // shift many elements
-      chs.forEach((ele) => replaceInEditor(cm, pitchMover(ele, deltaPitch)));
+      chs.forEach((ele) => replaceInEditor(cm, pitchMover(ele, deltaPitch)), true);
     // shift one element
-    else replaceInEditor(cm, pitchMover(el, deltaPitch));
+    else replaceInEditor(cm, pitchMover(el, deltaPitch), true);
   }
   v.selectedElements = ids;
   addApplicationInfo(v, cm);
   v.updateData(cm, false, true);
-  v.updateNotation = true; // update notation again
+  v.allowCursorActivity = true; // update notation again
 } // shiftPitch()
 
+/**
+ * In/decrease duration of selected element (ignore, when no duration)
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
+ * @param {string} what ('increase', 'decrease')
+ */
+export function modifyDuration(v, cm, what = 'increase') {
+  v.loadXml(cm.getValue());
+  let ids = speed.filterElements(v.selectedElements, v.xmlDoc);
+  v.allowCursorActivity = false;
+  ids.forEach((id) => {
+    let el = v.xmlDoc.querySelector("[*|id='" + id + "']");
+    if (el) {
+      let dur = el.getAttribute('dur');
+      if (dur) {
+        let i = att.dataDurationCMN.indexOf(dur);
+        i = what === 'increase' ? i - 1 : i + 1; // increase: go up the array to the longer values
+        i = Math.min(Math.max(0, i), att.dataDurationCMN.length - 1);
+        el.setAttribute('dur', att.dataDurationCMN.at(i));
+        replaceInEditor(cm, el);
+      }
+    }
+  });
+  v.selectedElements = ids;
+  addApplicationInfo(v, cm);
+  v.updateData(cm, false, true);
+  v.allowCursorActivity = true;
+} // modifyDuration()
+
+/**
+ * Moves selected elements to next staff (without checking boundaries)
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
+ * @param {boolean} upwards
+ */
 export function moveElementToNextStaff(v, cm, upwards = true) {
   console.info('moveElementToNextStaff(' + (upwards ? 'up' : 'down') + ')');
   v.loadXml(cm.getValue());
   let ids = speed.filterElements(v.selectedElements, v.xmlDoc);
-  v.updateNotation = false;
+  v.allowCursorActivity = false;
   let i;
   let noteList;
   for (i = 0; i < ids.length; i++) {
@@ -441,10 +649,16 @@ export function moveElementToNextStaff(v, cm, upwards = true) {
   v.selectedElements = ids;
   addApplicationInfo(v, cm);
   v.updateData(cm, false, true);
-  v.updateNotation = true; // update notation again
+  v.allowCursorActivity = true; // update notation again
 } // moveElementToNextStaff()
 
-// add beam, only speed mode
+/**
+ * Adds beam element
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
+ * @param {string} elementName
+ * @returns
+ */
 export function addBeamElement(v, cm, elementName = 'beam') {
   v.loadXml(cm.getValue());
   v.selectedElements = speed.filterElements(v.selectedElements, v.xmlDoc);
@@ -460,7 +674,7 @@ export function addBeamElement(v, cm, elementName = 'beam') {
   let n1 = v.xmlDoc.querySelector("[*|id='" + id1 + "']");
   let n2 = v.xmlDoc.querySelector("[*|id='" + id2 + "']");
   let par1 = n1.parentNode;
-  v.updateNotation = false;
+  v.allowCursorActivity = false;
   // let checkPoint = buffer.createCheckpoint(); TODO
   // add beam element, if selected elements have same parent
   // TODO check whether inside tuplets and accept that as well
@@ -494,10 +708,15 @@ export function addBeamElement(v, cm, elementName = 'beam') {
   } else {
     console.log('Cannot add ' + elementName + ' element, selected elements have different parents.');
   }
-  v.updateNotation = true; // update notation again
+  v.allowCursorActivity = true; // update notation again
 } // addBeamElement()
 
-// add beamSpan element
+/**
+ * Adds beamSpan element to selected elements
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
+ * @returns
+ */
 export function addBeamSpan(v, cm) {
   v.loadXml(cm.getValue());
   if (v.selectedElements.length < 1) return;
@@ -522,24 +741,31 @@ export function addBeamSpan(v, cm) {
   beamSpan.setAttribute('plist', v.selectedElements.map((e) => '#' + e).join(' '));
   let n1 = v.xmlDoc.querySelector("[*|id='" + id1 + "']");
   n1.closest('measure').appendChild(beamSpan);
-  v.updateNotation = false;
+  v.allowCursorActivity = false;
   let sc = cm.getSearchCursor('xml:id="' + id1 + '"');
   if (sc.findNext()) {
     let p1 = utils.moveCursorToEndOfMeasure(cm, sc.from());
     cm.replaceRange(dutils.xmlToString(beamSpan) + '\n', cm.getCursor());
     cm.indentLine(p1.line, 'smart'); // TODO
     cm.indentLine(p1.line + 1, 'smart');
-    cm.setSelection(p1);
+    utils.setCursorToId(cm, uuid);
   }
   v.selectedElements = [];
   v.selectedElements.push(uuid);
   v.lastNoteId = id2;
   addApplicationInfo(v, cm);
   v.updateData(cm, false, true);
-  v.updateNotation = true; // update notation again
+  v.allowCursorActivity = true; // update notation again
 } // addBeamSpan()
 
-// add octave element and modify notes inside selected elements
+/**
+ * Adds an octave element and modifies notes inside selected elements
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
+ * @param {string} disPlace ('above', 'below')
+ * @param {string} dis (8, 15, 22)
+ * @returns
+ */
 export function addOctaveElement(v, cm, disPlace = 'above', dis = '8') {
   v.loadXml(cm.getValue());
   if (v.selectedElements.length < 1) return;
@@ -557,7 +783,7 @@ export function addOctaveElement(v, cm, disPlace = 'above', dis = '8') {
   octave.setAttribute('dis.place', disPlace);
   n1.closest('measure').appendChild(octave);
   // add it to the txtEdr
-  v.updateNotation = false;
+  v.allowCursorActivity = false;
   // let checkPoint = buffer.createCheckpoint(); TODO
   let sc = cm.getSearchCursor('xml:id="' + id1 + '"');
   if (sc.findNext()) {
@@ -565,7 +791,7 @@ export function addOctaveElement(v, cm, disPlace = 'above', dis = '8') {
     cm.replaceRange(dutils.xmlToString(octave) + '\n', cm.getCursor());
     cm.indentLine(p1.line, 'smart'); // TODO
     cm.indentLine(p1.line + 1, 'smart');
-    cm.setSelection(p1);
+    utils.setCursorToId(cm, uuid);
   }
   // find plist and modify elements
   findAndModifyOctaveElements(cm, v.xmlDoc, id1, id2, disPlace, dis);
@@ -575,17 +801,30 @@ export function addOctaveElement(v, cm, disPlace = 'above', dis = '8') {
   v.lastNoteId = id2;
   addApplicationInfo(v, cm);
   v.updateData(cm, false, true);
-  v.updateNotation = true; // update notation again
+  v.allowCursorActivity = true; // update notation again
 } // addOctaveElement()
 
-// surround selected elements with a supplied element (and a responsibility
-// statement from v.respId
-export function addSuppliedElement(v, cm) {
+/**
+ * Surrounds selected elements with a supplied element
+ * (and a responsibility statement from v.respId derived
+ * from mei-friend settings.
+ *
+ * If attrName is specified, it searches for those attributes,
+ * inserts them as new elements, and surrounds them with supplied
+ * elements. If there is already such a artic/accid child element,
+ * take it and surround it.
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
+ * @param {string} attrName ('artic', 'accid')
+ * @returns
+ */
+export function addSuppliedElement(v, cm, attrName = 'none') {
   v.loadXml(cm.getValue());
   v.selectedElements = speed.filterElements(v.selectedElements, v.xmlDoc);
   v.selectedElements = utils.sortElementsByScorePosition(v.selectedElements);
   if (v.selectedElements.length < 1) return;
-  v.updateNotation = false;
+  v.allowCursorActivity = false;
+
   let uuids = [];
   v.selectedElements.forEach((id) => {
     let el = v.xmlDoc.querySelector("[*|id='" + id + "']");
@@ -593,8 +832,49 @@ export function addSuppliedElement(v, cm) {
       console.warn('No such element in xml document: ' + id);
     } else {
       let parent = el.parentNode;
+
+      // convert attrName artic|accid to note|chord element and surround that
+      if (
+        (['note', 'chord'].includes(el.nodeName) && attrName === 'artic') ||
+        (el.nodeName === 'note' && attrName === 'accid')
+      ) {
+        if (!el.hasAttribute(attrName)) {
+          let childElement;
+          el.childNodes.forEach((ch) => {
+            if (ch.nodeName === attrName) childElement = ch;
+          });
+          if (childElement) {
+            parent = el;
+            el = childElement;
+          } else {
+            const msg =
+              'No ' + attrName + ' attribute or child node found in element ' + el.nodeName + ' (' + id + ').';
+            console.log(msg);
+            v.showAlert(msg, 'warning');
+            return;
+          }
+        } else {
+          // make new element out of attribute and handle it as element to be surrounded
+          let attrValue = el.getAttribute(attrName);
+          let attrEl = document.createElementNS(dutils.meiNameSpace, attrName);
+          let uuid = mintSuppliedId(id, attrName);
+          attrEl.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
+          attrEl.setAttribute(attrName, attrValue);
+          el.removeAttribute(attrName);
+          el.appendChild(attrEl);
+          replaceInEditor(cm, el, true);
+          cm.execCommand('indentAuto');
+          parent = el;
+          el = attrEl;
+        }
+      } else if (['accid', 'artic'].includes(attrName)) {
+        const msg = 'Only chord and note elements are allowed for this command (you selected ' + el.nodeName + ').';
+        console.log(msg);
+        v.showAlert(msg, 'warning');
+      }
+
       let sup = document.createElementNS(dutils.meiNameSpace, 'supplied');
-      let uuid = utils.generateXmlId('supplied', v.xmlIdStyle);
+      let uuid = mintSuppliedId(id, 'supplied');
       sup.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
       if (v.respId) sup.setAttribute('resp', '#' + v.respId);
       parent.replaceChild(sup, el);
@@ -609,14 +889,29 @@ export function addSuppliedElement(v, cm) {
   uuids.forEach((u) => v.selectedElements.push(u));
   addApplicationInfo(v, cm);
   v.updateData(cm, false, true);
-  v.updateNotation = true; // update notation again
+  v.allowCursorActivity = true; // update notation again
+
+  function mintSuppliedId(id, nodeName) {
+    // follow the Mozarteum schema, keep numbers (for @o-sapov)
+    let underscoreId = id.match(/_\d+$/);
+    if (underscoreId) {
+      return nodeName + underscoreId[0];
+    }
+    return utils.generateXmlId(nodeName, v.xmlIdStyle);
+  }
 } // addSuppliedElement()
 
+/**
+ * Adds a vertical group attribute (vgrp) to all selected elements
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
+ * @returns
+ */
 export function addVerticalGroup(v, cm) {
   v.loadXml(cm.getValue());
   v.selectedElements = speed.filterElements(v.selectedElements, v.xmlDoc);
   if (v.selectedElements.length < 1) return;
-  v.updateNotation = false;
+  v.allowCursorActivity = false;
   let value = 1;
   let existingValues = []; // search for existing vgrp values on SVG page
   // look to current page SVG dynam@vgrp, dir@vgrp, hairpin@vgrp, pedal@vgrp
@@ -631,9 +926,8 @@ export function addVerticalGroup(v, cm) {
     if (!el) {
       console.warn('No such element in xml document: ' + id);
     } else if (att.attVerticalGroup.includes(el.nodeName)) {
-      let oldEl = el.cloneNode(true);
       el.setAttribute('vgrp', value);
-      replaceInEditor(cm, oldEl, true, el);
+      replaceInEditor(cm, el, true);
       cm.execCommand('indentAuto');
     } else {
       console.warn('Vertical group not supported for ', el);
@@ -641,13 +935,13 @@ export function addVerticalGroup(v, cm) {
   });
   addApplicationInfo(v, cm);
   v.updateData(cm, false, true);
-  v.updateNotation = true; // update notation again
+  v.allowCursorActivity = true; // update notation again
 } // addVerticalGroup()
 
 /**
  * Adds an application element to appInfo or updates its date, if already there
  * @param {Viewer} v
- * @param {object} cm
+ * @param {CodeMirror} cm
  */
 export function addApplicationInfo(v, cm) {
   if (document.getElementById('addApplicationNote').checked) {
@@ -708,32 +1002,47 @@ export function addApplicationInfo(v, cm) {
   }
 } // addApplicationInfo()
 
-// wrapper for cleaning superfluous @accid.ges attributes
+/**
+ * Wrapper function to utils.cleanAccid() for cleaning
+ * superfluous @accid.ges attributes
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
+ */
 export function cleanAccid(v, cm) {
-  v.updateNotation = false;
+  v.allowCursorActivity = false;
   v.loadXml(cm.getValue(), true);
   utils.cleanAccid(v.xmlDoc, cm);
-  v.updateNotation = true;
+  v.allowCursorActivity = true;
 }
 
-// wrapper for renumbering measure numberlike string
-export function renumberMeasures(v, cm, change) {
-  v.updateNotation = false;
+/**
+ * Wrapper function for renumbering measure numberlike attribute (@n)
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
+ * @param {boolean} change
+ */
+export function renumberMeasures(v, cm, change = false) {
+  v.allowCursorActivity = false;
   v.loadXml(cm.getValue(), true);
   utils.renumberMeasures(v, cm, 1, change);
   if (document.getElementById('showFacsimilePanel').checked) loadFacsimile(v.xmlDoc);
   addApplicationInfo(v, cm);
   v.updateData(cm, false, true);
-  v.updateNotation = true;
+  v.allowCursorActivity = true;
 } // renumberMeasures()
 
-// function for adding/removing xml:ids in xmlDoc & reloading MEI into cm
+/**
+ * Function for adding/removing xml:ids in xmlDoc & reloading MEI into cm
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
+ * @param {boolean} removeIds
+ */
 export function manipulateXmlIds(v, cm, removeIds = false) {
   let startTime = Date.now();
   let report = { added: 0, removed: 0 };
   let skipList = []; // list of xml:ids that will not be removed
 
-  v.updateNotation = false;
+  v.allowCursorActivity = false;
   v.loadXml(cm.getValue(), true);
 
   // start from these elements
@@ -766,15 +1075,15 @@ export function manipulateXmlIds(v, cm, removeIds = false) {
   msg += ' (Processing time: ' + (Date.now() - startTime) / 1000 + ' s)';
   console.log(msg);
   v.showAlert(msg, 'success');
-  v.updateNotation = true;
+  v.allowCursorActivity = true;
 
   // digs through xml tree recursively, when explore=true, just adding ids that are pointed to
   function dig(el, explore = false) {
     if (el.nodeType === Node.ELEMENT_NODE) {
       if (explore) {
         // just go through xml structure and search for pointing ids
-        for (let attribute of att.dataURI) {
-          let value = el.getAttribute(attribute);
+        for (let attrName of att.dataURI) {
+          let value = el.getAttribute(attrName);
           if (value) {
             // split value string by whitespace
             value.split(/[\s]+/).forEach((v) => skipList.push(utils.rmHash(v)));
@@ -800,7 +1109,7 @@ export function manipulateXmlIds(v, cm, removeIds = false) {
 } // manipulateXmlIds()
 
 /**
- * Add zone element in editor (called from source-imager.js),
+ * Adds a zone element in editor (called from source-imager.js),
  * places it
  * @param {Viewer} v
  * @param {CodeMirror} cm
@@ -809,12 +1118,12 @@ export function manipulateXmlIds(v, cm, removeIds = false) {
  * @returns
  */
 export function addZone(v, cm, rect, addMeasure = true) {
-  v.updateNotation = false;
+  v.allowCursorActivity = false;
   // get current element id and nodeName from editor
   let selectedId = utils.getElementIdAtCursor(cm);
   let selectedElement = v.xmlDoc.querySelector('[*|id=' + selectedId + ']');
   if (!selectedElement) {
-    v.updateNotation = true;
+    v.allowCursorActivity = true;
     return false;
   }
 
@@ -869,7 +1178,7 @@ export function addZone(v, cm, rect, addMeasure = true) {
     addApplicationInfo(v, cm);
     v.updateData(cm, false, false);
     console.log('Editor: new zone ' + uuid + 'added.', rect);
-    v.updateNotation = true;
+    v.allowCursorActivity = true;
     return true;
 
     // only add zone and a @facs for the selected element
@@ -882,7 +1191,7 @@ export function addZone(v, cm, rect, addMeasure = true) {
     console.log('addZone() referenceNode: ', referenceNode);
     if (!referenceNode) {
       console.log('addZone(): no reference element found with xml:id="' + referenceNodeId + '"');
-      v.updateNotation = true;
+      v.allowCursorActivity = true;
       return false;
     }
     if (referenceNode.nodeName === 'surface') {
@@ -915,15 +1224,22 @@ export function addZone(v, cm, rect, addMeasure = true) {
     addApplicationInfo(v, cm);
     v.updateData(cm, false, false);
     console.log('Editor: new zone ' + uuid + 'added.', rect);
-    v.updateNotation = true;
+    v.allowCursorActivity = true;
     return true;
   } else {
-    v.updateNotation = true;
+    v.allowCursorActivity = true;
     return false;
   }
 } // addZone()
 
-// remove zone in editor, called from editor.js
+/**
+ * Removes a zone in editor, called from editor.js
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
+ * @param {Element} zone
+ * @param {boolean} removeMeasure
+ * @returns
+ */
 export function removeZone(v, cm, zone, removeMeasure = false) {
   if (!zone) return;
   removeInEditor(cm, zone);
@@ -960,7 +1276,7 @@ export function removeZone(v, cm, zone, removeMeasure = false) {
  * @param {object} cm
  */
 export function addFacsimile(v, cm) {
-  v.updateNotation = false;
+  v.allowCursorActivity = false;
   let facsimile = v.xmlDoc.querySelector('facsimile');
   let facsimileId;
   if (facsimile) {
@@ -1015,10 +1331,198 @@ export function addFacsimile(v, cm) {
   addApplicationInfo(v, cm);
   v.updateData(cm, false, false);
   console.log('Editor: new facsimile added', facsimile);
-  v.updateNotation = true;
+  v.allowCursorActivity = true;
 } // addFacsimile()
 
-// find xmlNode in textBuffer and remove it (including empty line)
+/**
+ * Encloses/surrounds selected text in CodeMirror with the given XML tag name.
+ * If tag name is not surrounded with left/right angle brackets, they will be added.
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
+ * @param {string} tagString
+ */
+export function encloseSelectionWithTag(v, cm, tagString = '') {
+  // remove brackets from beginning and end
+  tagString = tagString.trim();
+  if (tagString.startsWith('<')) tagString = tagString.substring(1);
+  if (tagString.endsWith('>')) tagString = tagString.slice(0, -1);
+  cm.listSelections().forEach((selection) => {
+    let selectionText;
+    if (selection.anchor.line > selection.head.line || selection.anchor.ch > selection.head.ch) {
+      selectionText = cm.getRange(selection.head, selection.anchor);
+    } else {
+      selectionText = cm.getRange(selection.anchor, selection.head);
+    }
+    if (selection.anchor.line === selection.head.line && selection.anchor.ch === selection.head.ch) {
+      // get complete tag, if only a cursor is selected
+      let match = CodeMirror.findMatchingTag(cm, cm.getCursor());
+      if (match) {
+        let end = match.close ? match.close.to : match.open.to;
+        cm.extendSelection(match.open.from, end);
+        selectionText = cm.getRange(match.open.from, end);
+      }
+    }
+    let newEncoding = '<' + tagString + '>';
+    if (selectionText.includes(cm.lineSeparator())) newEncoding += cm.lineSeparator();
+    newEncoding += selectionText;
+    if (selectionText.includes(cm.lineSeparator())) newEncoding += cm.lineSeparator();
+    newEncoding += '</' + tagString + '>';
+    cm.replaceSelection(newEncoding, 'around');
+    indentSelection(v, cm);
+  });
+} // encloseSelectionWithTag()
+
+/**
+ * Creates and adds context menu to enclose selection with a tag,
+ * the name of which is determined through that menu
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
+ * @param {Element} node
+ * @returns
+ */
+export function showTagEncloserMenu(v, cm, node = null) {
+  let input;
+  if (!node) {
+    // create menu, if not yet there
+    node = document.createElement('div');
+    node.id = 'tagEncloserMenu';
+    let span = document.createElement('span');
+    span.id = 'selectTagNameForEnclosure';
+    span.textContent = translator.lang.selectTagNameForEnclosure.text;
+    input = document.createElement('input');
+    input.setAttribute('autofocus', true);
+    input.setAttribute('isContentEditable', true);
+    let div = document.createElement('div');
+    let cancelButton = document.createElement('input');
+    cancelButton.setAttribute('type', 'button');
+    cancelButton.classList.add('btn');
+    cancelButton.classList.add('narrowButton');
+    cancelButton.value = translator.lang.selectTagNameForEnclosureCancelButton.value;
+    cancelButton.id = 'selectTagNameForEnclosureCancelButton';
+    cancelButton.addEventListener('click', (ev) => {
+      node?.parentElement?.removeChild(node);
+      cm.focus();
+    });
+    let okButton = document.createElement('input');
+    okButton.setAttribute('type', 'button');
+    okButton.classList.add('btn');
+    okButton.classList.add('narrowButton');
+    okButton.value = translator.lang.selectTagNameForEnclosureOkButton.value;
+    okButton.id = 'selectTagNameForEnclosureOkButton';
+    okButton.addEventListener('click', (ev) => {
+      this.encloseSelectionWithTag(v, cm, input.value);
+      node?.parentElement?.removeChild(node);
+      cm.focus();
+    });
+    node.appendChild(span);
+    node.appendChild(input);
+    div.appendChild(cancelButton);
+    div.appendChild(okButton);
+    node.appendChild(div);
+  }
+  cm.addWidget(cm.getCursor(), node, true);
+  node.querySelector('input')?.focus();
+  node.querySelector('input')?.select();
+
+  if (input) {
+    // add listener only first time
+    input.addEventListener('keyup', (event) => {
+      let tagString = event.target.value;
+      let validName = utils.isValidElementName(tagString);
+      let okButton = document.getElementById('selectTagNameForEnclosureOkButton');
+      if (validName) {
+        input.classList.remove('error');
+        okButton.disabled = false;
+        okButton.classList.remove('disabled');
+      } else {
+        input.classList.add('error');
+        okButton.disabled = true;
+        okButton.classList.add('disabled');
+      }
+      if (event.key === 'Enter' && validName) {
+        event.preventDefault();
+        this.encloseSelectionWithTag(v, cm, tagString);
+        document.getElementById('surroundWithLastTagName').innerHTML = tagString;
+        node?.parentElement?.removeChild(node);
+        cm.focus();
+      } else if (event.key === 'Escape') {
+        node?.parentElement?.removeChild(node);
+        cm.focus();
+      }
+    });
+  }
+  return node;
+} // showTagEncloserMenu()
+
+let previousMatch; // match object retrieved from CodeMirror.findMatchingTag (with open/close keys, if present)
+
+/**
+ * Updates variable previousMatch to remember any xml tag matching at cursor position
+ * (called by beforeChange event emitted by CodeMirror)
+ * @param {CodeMirror} cm
+ */
+export function updateMatch(cm) {
+  previousMatch = CodeMirror.findMatchingTag(cm, cm.getCursor());
+} // updateMatch()
+
+/**
+ * Updates matching tag name, if edit is within a tag name
+ * @param {CodeMirror} cm
+ */
+export function updateMatchingTagName(cm, changeObj) {
+  let cursor = cm.getCursor();
+  let match = CodeMirror.findMatchingTag(cm, cursor);
+  // console.debug('XXXXXX updateMatchingTagName(): changeObj: ', changeObj);
+  // console.debug('XXXXXX updateMatchingTagName(): cursor: ', cursor);
+  // console.debug('XXXXXX previousMatch: ', previousMatch);
+  if (!match || !previousMatch) return;
+  if (
+    match.close &&
+    match.close.from.ch < cursor.ch &&
+    match.close.to.ch > cursor.ch &&
+    match.close.from.line === cursor.line
+  ) {
+    // if within the ending tag
+    // console.debug('XXXXXX within ending tag: ', match);
+    if (utils.isValidElementName(match.close.tag) && previousMatch.open) {
+      cm.blockChanges = true;
+      cm.replaceRange('<' + match.close.tag, previousMatch.open.from, {
+        ch: previousMatch.open.from.ch + previousMatch.open.tag.length + 1,
+        line: previousMatch.open.from.line,
+      });
+      cm.blockChanges = false;
+    }
+  } else if (
+    match.open &&
+    match.open.from.ch < cursor.ch &&
+    match.open.from.ch + match.open.tag.length + 1 >= cursor.ch &&
+    match.open.from.line === cursor.line &&
+    previousMatch &&
+    previousMatch.open.from.line === cursor.line
+  ) {
+    // if within opening tag
+    // console.debug('XXXXXX within opening tag: ', match);
+    if (utils.isValidElementName(match.open.tag) && previousMatch.close) {
+      let from = previousMatch.close.from;
+      let to = previousMatch.close.to;
+      // if in same line, correct x shift
+      if (previousMatch.close.from.line === match.open.from.line) {
+        let xShift = changeObj[0]?.text[0]?.length - changeObj[0]?.removed[0]?.length;
+        from.ch += xShift;
+        to.ch += xShift;
+      }
+      cm.blockChanges = true;
+      cm.replaceRange('</' + match.open.tag + '>', from, to);
+      cm.blockChanges = false;
+    }
+  }
+} // updateMatchingTagName()
+
+/**
+ * Finds xmlNode in textBuffer and removes it (including empty line)
+ * @param {CodeMirror} cm
+ * @param {Element} xmlNode
+ */
 export function removeInEditor(cm, xmlNode) {
   let itemId = xmlNode.getAttribute('xml:id');
   let searchSelfClosing = '(?:<' + xmlNode.nodeName + `)(\\s+?)([^>]*?)(?:xml:id=["']` + itemId + `['"])([^>]*?)(?:/>)`;
@@ -1051,13 +1555,20 @@ export function removeInEditor(cm, xmlNode) {
       }
     }
   } else console.info('removeInEditor(): nothing removed for ' + itemId + '.');
-}
+} // removeInEditor()
 
 function isEmpty(str) {
   return !/\S/g.test(str);
-}
+} // isEmpty()
 
-// find xmlNode in textBuffer and replace it with new serialized content
+/**
+ * Finds xmlNode in textBuffer and replaces it with new serialized content
+ * @param {CodeMirror} cm
+ * @param {Element} xmlNode
+ * @param {boolean} select
+ * @param {Element} newNode
+ * @returns
+ */
 export function replaceInEditor(cm, xmlNode, select = false, newNode = null) {
   let newMEI = newNode ? dutils.xmlToString(newNode) : dutils.xmlToString(xmlNode);
   // search in buffer
@@ -1099,13 +1610,20 @@ export function replaceInEditor(cm, xmlNode, select = false, newNode = null) {
     start: sc.from(),
     end: sc.to(),
   };
-}
+} // replaceInEditor()
 
 // ############################################################################
 // # (mostly) private functions                                               #
 // ############################################################################
 
-function toggleArticForNote(v, note, artic) {
+/**
+ * Toggles and articulation for a given element (note)
+ * @param {Element} note
+ * @param {string} artic
+ * @param {string} xmlIdStyle (Original, Base36, mei-friend, see viewer.js)
+ * @returns
+ */
+function toggleArticForNote(note, artic, xmlIdStyle) {
   note = utils.attrAsElements(note);
   let articChildren;
   let add = false;
@@ -1128,15 +1646,20 @@ function toggleArticForNote(v, note, artic) {
   if (add) {
     // add artic as element
     let articElement = document.createElementNS(dutils.meiNameSpace, 'artic');
-    uuid = utils.generateXmlId('artic', v.xmlIdStyle);
+    uuid = utils.generateXmlId('artic', xmlIdStyle);
     articElement.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
     articElement.setAttribute('artic', artic);
     note.appendChild(articElement);
   }
-  // console.info('modified element: ', note);
   return uuid;
-}
+} // toggleArticForNote()
 
+/**
+ * Modifies an element's pitch up and down (i.e. manipulating @oct, @pname)
+ * @param {Element} el
+ * @param {number} deltaPitch
+ * @returns
+ */
 function pitchMover(el, deltaPitch) {
   let oct = 4;
   let pname = 'c';
@@ -1162,9 +1685,15 @@ function pitchMover(el, deltaPitch) {
   el.setAttribute(o, oct);
   el.setAttribute(p, att.pnames[pi]);
   return el;
-}
+} // pitchMover()
 
-function staffMover(cm, el, upwards) {
+/**
+ * Moves an element across staves.
+ * @param {CodeMirror} cm
+ * @param {Element} el
+ * @param {boolean} upwards
+ */
+function staffMover(cm, el, upwards = true) {
   let staff = el.closest('staff');
   let staffNo = -1;
   if (staff) staffNo = parseInt(staff.getAttribute('n'));
@@ -1184,12 +1713,22 @@ function staffMover(cm, el, upwards) {
   }
   if (staffNo === newStaffNo) el.removeAttribute('staff');
   else el.setAttribute('staff', newStaffNo);
-  replaceInEditor(cm, el);
-}
+  replaceInEditor(cm, el, true);
+} // staffMover()
 
-// find all notes between two ids in the same staff and set @oct.ges and
-// modify @oct with deltaOct (1,-1, 2,...);
-// or, if set=false: remove @oct.ges and reset @oct
+/**
+ * Finds all notes between two ids in the same staff and
+ * sets @oct.ges and modifies @oct with deltaOct (1,-1, 2,...);
+ * or, if set=false: remove @oct.ges and reset @oct
+ * @param {CodeMirror} cm
+ * @param {Document} xmlDoc
+ * @param {string} id1
+ * @param {string} id2
+ * @param {string} disPlace ('below|above')
+ * @param {string} dis (e.g. 8, 15, 22)
+ * @param {boolean} add
+ * @returns
+ */
 function findAndModifyOctaveElements(cm, xmlDoc, id1, id2, disPlace, dis, add = true) {
   let deltaOct = (parseInt(dis) - 1) / 7;
   if (disPlace === 'below') deltaOct *= -1; // normal logic: minus 1 when below
@@ -1235,4 +1774,45 @@ function findAndModifyOctaveElements(cm, xmlDoc, id1, id2, disPlace, dis, add = 
     }
   }
   return;
-}
+} // findAndModifyOctaveElements()
+
+/**
+ * Determines staff numbers for a given element that spans
+ * the relevant staff group that the element is inside.
+ * @param {Viewer} v
+ * @param {Element} element
+ * @returns {Object} with staffNumbers and staffNumber as keys
+ */
+function getStaffNumbersForClosestStaffGroup(v, element) {
+  if (!element) return null;
+  let staffNumber;
+  if (element.hasAttribute('startid')) {
+    const startElement = v.xmlDoc.querySelector('[*|id=' + utils.rmHash(element.getAttribute('startid')) + ']');
+    if (startElement) {
+      staffNumber = startElement.closest('staff')?.getAttribute('n');
+    }
+  } else if (element.hasAttribute('staff')) {
+    staffNumber = element.getAttribute('staff');
+  }
+  if (staffNumber) {
+    const staffList = v.xmlDoc.querySelector('scoreDef')?.querySelectorAll('staffDef');
+    let staff;
+    staffList.forEach((st) => {
+      if (st.getAttribute('n') === staffNumber) {
+        staff = st;
+      }
+    });
+    if (staff) {
+      const staffGroup = staff.closest('staffGrp');
+      if (staffGroup) {
+        let staffNumbers = [];
+        staffGroup.querySelectorAll('staffDef').forEach((st) => {
+          const n = st.getAttribute('n');
+          if (n) staffNumbers.push(n);
+        });
+        return { staffNumber: staffNumber, staffNumbers: staffNumbers };
+      }
+    }
+    return { staffNumber: staffNumber, staffNumbers: [] };
+  }
+} // findClosestStaffGroup()

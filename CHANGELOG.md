@@ -1,4 +1,72 @@
 # mei-friend-online CHANGELOG.md
+
+
+### 0.9.0 GitHub Actions integration
+* Configurably display any GitHub Actions available in the current repository / branch
+* List any configured inputs and set values from UI with shortcuts for 'current filepath' and 'current selection'
+* Launch Actions workflows from within mei-friend
+* Display workflow results (success / failure), with link to detailed GitHub page
+* On success, reload encoding to update with Actions-modified version
+
+### 0.8.11 Editor functionality
+* Surround selection in editor with tags (`CTRL-E` or `CMD-E`): opens a user interface to enter tag name
+* `CTRL-/` or `CMD-/` surrounds selection in editor with previously selected tag name
+* When editing a tag name in editor (both starting or ending tag), matching tag will be modified accordingly
+
+### 0.8.10 Internationalization
+* Multi-language support with separate language pack files per language
+* Language packs currently available for English and German, more language packs to come
+* First draft of spanish, italian, french, and catalan language pack
+* Automatic test to check for key identity and completeness of language packs
+* Remove transposeTosoundingPitch default flag for Verovio
+* Fix #21 spanning elements with mixed `@startid/@endid` and `@tstamp/@tstamp2` attributes
+* Keyboard shortcut to enclose selection in editor with tag name, chosen in context menu
+
+### 0.8.9 patch
+* Fix bug when notation zooming resulted in missing notation when MIDI manu bar is activated
+
+### 0.8.8 patch
+* Control display of zone bounding boxes through checkbox
+* Menu item to generate mei-friend URL with all search parameters deviating from default values
+* Use same generate URL feature to build a full backlink with params for 'Report issue with encoding'
+* Code refactoring with separate defaults.js file
+
+### 0.8.7 transposition
+* Add transposition settings panel to the mei-friend settings to specify transposition by key, by interval, and pitch direction.
+* Enable ?file= param to open files from private repos (when logged in)
+* Add "Report issue with encoding" feature (creates issue with reciprocal mei-friend link)
+### 0.8.6 patch
+* Insert control elements with time stamps (`@tstamp`/`tstamp2`) instead of ids (`startid`/`endid`) by using the  `ALT` (Mac: `CTRL`) modifier key with keyboard shortcut
+* Check time stamps when inserting control elements, handle selected elements on the same time stamp correctly (by omitting `@tstamp2`) or throw warning, if no fix is possible
+* Fix between placement (`SHIFT + X`) with control elements without `@startid`. 
+* Various GitHub fixes, incl. loading compressed MusicXML via Git
+* Unselect element(s) when `CTRL/CMD` clicking or drag-selecting already selected element(s)
+* `SHIFT LEFT/RIGHT` de/increases duration (`@dur`) of selected element(s), if they have such attribute
+
+### 0.8.5 PDF export
+* Preview PDF mode with page-view of notation, triggered via menu item or `CMD/CTRL + P`
+* PDF preview with click-select and drag-select disabled
+* Page range selector for selecting all, current, page range, or individual pages (e.g., 2,5-8)
+* Download PDF file (with pages as selected in page-range settings)
+
+### 0.8.4 patch
+* Drag-select and click-select chord instead of note with `ALT` modifier
+* Add `@staff` to clef change element
+* Change of keyboard shortcuts (for inserting C clef, tenuto, spiccato)
+### 0.8.3 patch
+* Show modifyer keys as text (ALT, CTRL...) on Windows/Linux systems
+* Insert `arpeg` with `@order="up"` per default (or `@order="down"` with `CTRL + A`)
+* Insert control elements with @staff attribute of selected elements (fix for #12)
+* Fix trailing space in `arpeg@plist`(fix for #13)
+* Support for inserting supplied elements around artic/accid attributes (that get converted to elements) (fix for #14)
+* Support for inserting supplied elements around artic/accid child elements of selected elements
+* Do not save and insert slur below with `CTRL + S` on Windows/Linux (fix for #15)
+* Support for `@place="between"` on control elements (fix for #16)
+* Several improvements and harmonization in editor code
+* Change keyboard shortcut for tenuto to `SHIFT + E`
+* Insert control elements without placement by default
+* Remove `CTRL + ` for inserting control elements below
+* On multiple selected elements, insert pedal up on first and pedal down on last 
 ### 0.8.2 patch
 * Fixes to highlight synchronization edge-cases caused by rounding issues
 * Implement MIDI playback shortcut (bubble) to open control bar and start playback immediately

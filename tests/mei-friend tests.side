@@ -45,11 +45,11 @@
       "id": "c49fe295-ff75-48b7-bfc4-d8f7987cc13c",
       "comment": "",
       "command": "mouseOver",
-      "target": "id=OpenMei",
+      "target": "id=openMei",
       "targets": [
-        ["id=OpenMei", "id"],
-        ["css=#OpenMei", "css:finder"],
-        ["xpath=//a[@id='OpenMei']", "xpath:attributes"],
+        ["id=openMei", "id"],
+        ["css=#openMei", "css:finder"],
+        ["xpath=//a[@id='openMei']", "xpath:attributes"],
         ["xpath=//div[@id='FileMenu']/a", "xpath:idRelative"],
         ["xpath=//a[contains(@href, '#')]", "xpath:href"],
         ["xpath=//div[2]/div/a", "xpath:position"]
@@ -59,11 +59,11 @@
       "id": "efce4007-84e5-47a3-8b6e-11078c7c0247",
       "comment": "",
       "command": "waitForElementVisible",
-      "target": "id=OpenMei",
+      "target": "id=openMei",
       "targets": [
-        ["id=OpenMei", "id"],
-        ["css=#OpenMei", "css:finder"],
-        ["xpath=//a[@id='OpenMei']", "xpath:attributes"],
+        ["id=openMei", "id"],
+        ["css=#openMei", "css:finder"],
+        ["xpath=//a[@id='openMei']", "xpath:attributes"],
         ["xpath=//div[@id='FileMenu']/a", "xpath:idRelative"],
         ["xpath=//a[contains(@href, '#')]", "xpath:href"],
         ["xpath=//div[2]/div/a", "xpath:position"]
@@ -355,9 +355,9 @@
       "id": "29d8ef82-94b7-43af-bba0-3401ce2f7a8a",
       "comment": "",
       "command": "click",
-      "target": "css=#next-page-btn > svg",
+      "target": "css=#nextPageButton > svg",
       "targets": [
-        ["css=#next-page-btn > svg", "css:finder"]
+        ["css=#nextPageButton > svg", "css:finder"]
       ],
       "value": ""
     }, {
