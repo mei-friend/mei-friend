@@ -679,6 +679,7 @@ function writeInlineIfRequested(a) {
 async function writeStandoffIfRequested(a) {
   // write to a stand-off Web Annotation in the user's Solid Pod if requested
   if (document.getElementById('writeAnnotationStandoff').checked) {
+    a.isStandoff = true;
     if (solid.getDefaultSession().info.isLoggedIn) {
       // generate a web annotation JSON-LD object
       let webAnno = new Object();
@@ -732,7 +733,6 @@ async function writeStandoffIfRequested(a) {
               let webAnnoResp = await establishResource(webAnno["@id"], webAnno);
               if(webAnnoResp.ok) { 
                 console.log("Success! Posted Web Annotation:", webAnno);
-                a.isStandoff = true;
               } else { 
                 console.warn("Couldn't post WebAnno: ", webAnno, webAnnoResp);
               }
