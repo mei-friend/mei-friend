@@ -3,7 +3,7 @@ import { convertCoords, generateXmlId, rmHash, setCursorToId } from './utils.js'
 import { meiNameSpace, xmlNameSpace, xmlToString } from './dom-utils.js';
 import { circle, diffRemoved, highlight, fileCode, link, pencil, rdf, symLinkFile } from '../css/icons.js';
 import { removeInEditor } from './editor.js';
-import { friendResourceContainer, establishResource, getProfile, resource, solid, MAO, FOAF, OA, PIM, RDF } from './solid.js';
+import { friendContainer, annotationContainer, musicalObjectContainer, establishContainerResource, establishResource, solid, MAO, FOAF, OA, PIM, RDF } from './solid.js';
 
 export let annotations = [];
 
@@ -400,9 +400,7 @@ export function readAnnots(flagLimit = false) {
     if (annot.textContent) {
       const ptrs = annot.getElementsByTagNameNS(meiNameSpace, 'ptr');
       if (ptrs.length) {
-        console.log(ptrs);
         annotation.type = 'annotateLink';
-        console.log('ptrs: ', ptrs);
         annotation.url = ptrs[0].getAttribute('target');
       } else {
         annotation.type = 'annotateDescribe';
@@ -553,7 +551,6 @@ export function fetchWebAnnotations(url, userProvided = true, jumps = 10) {
       }
     })
     .then((json) => {
-      console.log('json response: ', json);
       let resourceDescription;
       if (Array.isArray(json)) {
         resourceDescription = json.find((o) => o['@id'] === url);
@@ -565,7 +562,6 @@ export function fetchWebAnnotations(url, userProvided = true, jumps = 10) {
         resourceDescription = json;
       }
       if (resourceDescription && '@type' in resourceDescription) {
-        console.log('found resource desc: ', resourceDescription);
         if (resourceDescription['@type'].includes('http://www.w3.org/ns/ldp#Container')) {
           // found a container, recurse on members
           if ('http://www.w3.org/ns/ldp#contains' in resourceDescription) {
@@ -582,7 +578,6 @@ export function fetchWebAnnotations(url, userProvided = true, jumps = 10) {
           }
         } else if (resourceDescription['@type'].includes('http://www.w3.org/ns/oa#Annotation')) {
           // found an annotation!
-          console.log('Found annotation!!', resourceDescription);
           ingestWebAnnotation(resourceDescription);
           return resourceDescription;
         } else {
@@ -646,8 +641,6 @@ export function ingestWebAnnotation(webAnno) {
       anno.type = 'annotateDescribe';
     }
 
-    console.log('Annotations: ', annotations);
-    console.log('Anno: ', anno);
     anno.selection = targets.map((t) => t['@id'].split('#')[1]);
     if (annotations.findIndex((a) => a.id === anno.id) < 0) {
       // add to list if we don't already have it
@@ -681,67 +674,57 @@ async function writeStandoffIfRequested(a) {
   if (document.getElementById('writeAnnotationStandoff').checked) {
     a.isStandoff = true;
     if (solid.getDefaultSession().info.isLoggedIn) {
-      // generate a web annotation JSON-LD object
-      let webAnno = new Object();
-      let body = new Object();
-      webAnno['@type'] = [OA + 'Annotation'];
-      webAnno[OA + 'hasTarget'] = a.selection.map((s) => {
-        // TODO: do something clever if fileLocationType = "file" (local)
-        return { '@id':  meiFileLocation + "#" + s };
-      });
-      switch (a.type) {
-        case 'annotateHighlight':
-          webAnno[OA + 'motivatedBy'] = [{ '@id': OA + 'highlighting' }];
-          break;
-        case 'annotateDescribe':
-          body['@type'] = [OA + 'TextualBody'];
-          if ('description' in a) {
-            body[RDF + 'value'] = a.description;
-          } else {
-            console.warn('Describing annotation without a description: ', a);
-          }
-          webAnno[OA + 'motivatedBy'] = [{ '@id': OA + 'describing' }];
-          webAnno[OA + 'hasBody'] = [body];
-          break;
-        case 'annotateLink':
-          webAnno[OA + 'motivatedBy'] = [{ '@id': OA + 'linking' }];
-          webAnno[OA + 'hasBody'] = [{ '@id': a.url }];
-          break;
-        default:
-          console.warn('Trying to write standoff annotation with unknown annotation type:', a);
-          break;
-      }
-      //TODO error handling below!
-      getProfile().then(async (profile) => {
-        if (PIM + 'storage' in profile) {
-          let storage = Array.isArray(profile[PIM + 'storage'])
-            ? profile[PIM + 'storage'][0] // TODO what if more than one storage?
-            : profile[PIM + 'storage'];
-          if (typeof storage === 'object') {
-            if ('@id' in storage) {
-              storage = storage['@id'];
-            } else {
-              console.warn('Unexpected pim:storage object in your Solid Pod profile: ', profile);
-            }
-          }
-          let resp = await establishResource(storage + friendResourceContainer, resource.container);
-          if(resp) {
-            if(resp.ok) {
-              console.log('Finished establishing friend container: ', resp);
-              webAnno["@id"] = storage + friendResourceContainer + a.id;
-              console.log("TRYING TO SET UP ANNO", a, webAnno)
-              let webAnnoResp = await establishResource(webAnno["@id"], webAnno);
-              if(webAnnoResp.ok) { 
-                console.log("Success! Posted Web Annotation:", webAnno);
-              } else { 
-                console.warn("Couldn't post WebAnno: ", webAnno, webAnnoResp);
+      document.getElementById("solid_logo").classList.add("clockwise");
+      // ensure mei-friend container exists
+      establishContainerResource(friendContainer).then((friendContainerResource) => { 
+        establishContainerResource(annotationContainer).then((annotationContainerResource) => { 
+          // generate a web annotation JSON-LD object
+          let webAnno = new Object();
+          let body = new Object();
+          webAnno['@type'] = [OA + 'Annotation'];
+          webAnno[OA + 'hasTarget'] = a.selection.map((s) => {
+            // TODO: do something clever if fileLocationType = "file" (local)
+            return { '@id':  meiFileLocation + "#" + s };
+          });
+          switch (a.type) {
+            case 'annotateHighlight':
+              webAnno[OA + 'motivatedBy'] = [{ '@id': OA + 'highlighting' }];
+              break;
+            case 'annotateDescribe':
+              body['@type'] = [OA + 'TextualBody'];
+              if ('description' in a) {
+                body[RDF + 'value'] = a.description;
+              } else {
+                console.warn('Describing annotation without a description: ', a);
               }
-            }           
+              webAnno[OA + 'motivatedBy'] = [{ '@id': OA + 'describing' }];
+              webAnno[OA + 'hasBody'] = [body];
+              break;
+            case 'annotateLink':
+              webAnno[OA + 'motivatedBy'] = [{ '@id': OA + 'linking' }];
+              webAnno[OA + 'hasBody'] = [{ '@id': a.url }];
+              break;
+            default:
+              console.warn('Trying to write standoff annotation with unknown annotation type:', a);
+              break;
           }
-        } else {
-          log("Sorry, couldn't establish storage location from your Solid Pod's profile ", profile);
-        }
-      });
+          webAnno["@id"] = annotationContainerResource + a.id;
+          establishResource(webAnno["@id"], webAnno).then((webAnnoResp) => { 
+            if(webAnnoResp.ok) { 
+              console.log("Success! Posted Web Annotation:", webAnno);
+            } else { 
+              console.warn("Couldn't post WebAnno: ", webAnno, webAnnoResp);
+              throw(webAnnoResp);
+            }
+          });
+        }).catch(e => { 
+          console.error("Couldn't post WebAnno:", e)
+        })
+      }).catch(() => {
+        console.error("Couldn't establish container:", friendContainer)
+      }).finally(() => { 
+        document.getElementById("solid_logo").classList.remove("clockwise");
+      })
     } else {
       log('Cannot write standoff annotation: Please ensure you are logged in to a Solid Pod');
     }

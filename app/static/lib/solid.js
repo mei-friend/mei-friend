@@ -14,15 +14,27 @@ export const RDF = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
 export const MAO = "https://domestic-beethoven.eu/ontology/1.0/music-annotation-ontology.ttl#";
 
 
-// mei-friend resource container (internal path within Solid storage)
-export const friendResourceContainer = "at.ac.mdw.mei-friend/";
+// mei-friend resource containers (internal path within Solid storage)
+export const friendContainer = "at.ac.mdw.mei-friend/";
+export const annotationContainer = friendContainer + "oa/";
+export const musicalObjectContainer = friendContainer + "mao/";
 
 
 // resource templates
-export const resource = {
-  container:  { 
+export const resources = {
+  ldpContainer:  { 
     "@type": [LDP+"Container", LDP+"BasicContainer"]
+  },
+  maoExtract:{ 
+    "@type": [MAO + "Extract"]
+  },
+  maoSelection:{ 
+    "@type": [MAO + "Selection"]
+  },
+  maoMusicalMaterial: { 
+    "@type": [MAO + "MusicalMaterial"]
   }
+
 }
 
 export async function establishResource(uri, resource) { 
@@ -64,8 +76,56 @@ export async function establishResource(uri, resource) {
   return resp;
 }
 
-export async function createMusicalObject(obj){
+export async function establishContainerResource(container){ 
+  return getProfile().then(async (profile) => {
+    if (PIM + 'storage' in profile) {
+      let storage = Array.isArray(profile[PIM + 'storage'])
+        ? profile[PIM + 'storage'][0] // TODO what if more than one storage?
+        : profile[PIM + 'storage'];
+      if (typeof storage === 'object') {
+        if ('@id' in storage) {
+          storage = storage['@id'];
+        } else {
+          console.warn('Unexpected pim:storage object in your Solid Pod profile: ', profile);
+        }
+      }
+      // establish container resource
+      let resource = structuredClone(resources.ldpContainer);
+      return establishResource(storage + container, resource).then((resp) => {
+        if(resp) {
+          if(resp.ok) {
+            console.log("Response OK:", resp, storage, container);
+            return storage + container;
+          } else { 
+            console.warn("Response not OK:", resp, storage, container);
+            return null;
+          }  
+        }
+      })
+      .catch(() => console.error("Couldn't establish resource:", storage + container, resource));
+    } else {
+      log("Sorry, couldn't establish storage location from your Solid Pod's profile ", profile);
+    }
+  });
+}
 
+
+
+export async function createMAOMusicalObject(selection) {
+  // Function to build a Musical Object according to the Music Annotation Ontology:
+  // https://dl.acm.org/doi/10.1145/3543882.3543891
+  // For the purposes of mei-friend, we want to build a composite structure encompassing MusicalMaterial, 
+  // Extract, and Selection (see paper)
+}
+
+
+export async function createMAOSelection(selection) {
+}
+
+export async function createMAOExtract(selection) {
+}
+
+export async function createMAOMusicalMaterial(selection) {
 }
 
 export async function populateSolidTab() { 
