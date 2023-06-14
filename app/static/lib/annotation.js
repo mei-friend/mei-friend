@@ -3,7 +3,7 @@ import { convertCoords, generateXmlId, rmHash, setCursorToId } from './utils.js'
 import { meiNameSpace, xmlNameSpace, xmlToString } from './dom-utils.js';
 import { circle, diffRemoved, highlight, fileCode, link, pencil, rdf, symLinkFile } from '../css/icons.js';
 import { removeInEditor } from './editor.js';
-import { friendContainer, annotationContainer, musicalObjectContainer, establishContainerResource, establishResource, solid, MAO, FOAF, OA, PIM, RDF } from './solid.js';
+import { friendContainer, annotationContainer, musicalObjectContainer, establishContainerResource, establishResource, solid, MAO, FOAF, OA, PIM, RDF, createMAOMusicalObject } from './solid.js';
 
 export let annotations = [];
 

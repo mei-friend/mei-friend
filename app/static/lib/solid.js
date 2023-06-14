@@ -18,7 +18,9 @@ export const MAO = "https://domestic-beethoven.eu/ontology/1.0/music-annotation-
 export const friendContainer = "at.ac.mdw.mei-friend/";
 export const annotationContainer = friendContainer + "oa/";
 export const musicalObjectContainer = friendContainer + "mao/";
-
+export const selectionContainer = musicalObjectContainer + "selection/";
+export const extractContainer = musicalObjectContainer + "extract/";
+export const musicalMaterialContainer = musicalObjectContainer + "musicalMaterial/";
 
 // resource templates
 export const resources = {
@@ -111,21 +113,32 @@ export async function establishContainerResource(container){
 
 
 
-export async function createMAOMusicalObject(selection) {
+export async function createMAOMusicalObject(selectedElements) {
   // Function to build a Musical Object according to the Music Annotation Ontology:
   // https://dl.acm.org/doi/10.1145/3543882.3543891
   // For the purposes of mei-friend, we want to build a composite structure encompassing MusicalMaterial, 
   // Extract, and Selection (see paper)
+  return establishContainerResource(friendContainer).then(() => { 
+    return establishContainerResource(musicalObjectContainer).then((musicalObjectContainer) => { 
+      return createMAOSelection(selectedElements).then(selectionResource => { 
+        return createMAOExtract(selectionResource).then(extractResource => { 
+          return createMAOMusicalMaterial(extractResource)
+        })
+      })
+    })
+  })
+  .catch(e => { console.error("Failed to create MAO Musical Object:", e) })
 }
 
+async function createMAOSelection(selection) {
+  establishContainerResource(d)
 
-export async function createMAOSelection(selection) {
 }
 
-export async function createMAOExtract(selection) {
+async function createMAOExtract(selection) {
 }
 
-export async function createMAOMusicalMaterial(selection) {
+async function createMAOMusicalMaterial(selection) {
 }
 
 export async function populateSolidTab() { 
