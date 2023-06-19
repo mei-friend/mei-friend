@@ -304,6 +304,9 @@ export function addAnnotationHandlers() {
     console.log('Clicked to make new annotation!', e);
     console.log('Selected elements: ', v.selectedElements);
     switch (e.target.getAttribute('id')) {
+      case 'annotateIdentify':
+        createIdentify(e);
+        break;
       case 'annotateHighlight':
         createHighlight(e);
         break;
@@ -323,6 +326,18 @@ export function addAnnotationHandlers() {
   };
 
   // functions to create annotations
+  const createIdentify = (e) => { 
+    const a = {
+      id: generateXmlId('maoMusicalObject', v.xmlIdStyle),
+      type: 'annotateIdentify',
+      selection: v.selectedElements,
+    }
+    solid.createMAOMusicalObject(a.selection).then(maoMusicalMaterial => { 
+      console.log("CREATED MUSICAL MATERIAL: ", maoMusicalMaterial);
+      //annotations.push(a);
+    })
+    // writing inline not supported 
+  };
   const createHighlight = (e) => {
     const a = {
       id: generateXmlId('annot', v.xmlIdStyle),
