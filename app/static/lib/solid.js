@@ -7,11 +7,13 @@ export const solid = solidClientAuthentication.default;
 
 // namespace definitions
 export const FOAF = "http://xmlns.com/foaf/0.1/";
+export const FRBR = "http://purl.org/vocab/frbr/core#";
 export const LDP = "http://www.w3.org/ns/ldp#";
+export const MAO = "https://domestic-beethoven.eu/ontology/1.0/music-annotation-ontology.ttl#";
 export const OA = "http://www.w3.org/ns/oa#";
 export const PIM = "http://www.w3.org/ns/pim/space#";
 export const RDF = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
-export const MAO = "https://domestic-beethoven.eu/ontology/1.0/music-annotation-ontology.ttl#";
+export const RDFS = "http://www.w3.org/2000/01/rdf-schema#";
 
 
 // mei-friend resource containers (internal path within Solid storage)
@@ -40,21 +42,23 @@ export const resources = {
 }
 
 export async function postResource(containerUri, resource) { 
-  establishContainerResource(containerUri).then((containerUriResource) => {
-    solid.fetch({
+  console.log("Call to postResource", containerUri, resource);
+  resource["@id"] = ""; // document base URI
+  return establishContainerResource(containerUri).then((containerUriResource) => {
+    return solid.fetch(containerUriResource, {
       method: 'POST',
       headers: { 
-        Accept: 'application/ld+json'
+        "Content-Type": 'application/ld+json'
       },
       body: JSON.stringify(resource)
     }).then(async postResp => {
       console.log("GOT POST RESPONSE:", postResp);
       return postResp;
     }).catch(e => { 
-      console.error("Couldn't post resource to container: ", containerUriResource, resource)
+      console.error("Couldn't post resource to container: ", e, containerUriResource, resource)
     })
   }).catch(e => {
-    console.error("Couldn't establish container: ", containerUri)
+    console.error("Couldn't establish container: ", e, containerUri)
   })
 }
 
@@ -112,7 +116,7 @@ export async function establishContainerResource(container){
       }
       // establish container resource
       let resource = structuredClone(resources.ldpContainer);
-      return establishResource(storage + container, resource).then((resp) => {
+      return establishResource(storage + container, resource).then(async (resp) => {
         if(resp) {
           if(resp.ok) {
             console.log("Response OK:", resp, storage, container);
@@ -131,17 +135,16 @@ export async function establishContainerResource(container){
 }
 
 
-
-export async function createMAOMusicalObject(selectedElements) {
+export async function createMAOMusicalObject(selectedElements, label = "") {
   // Function to build a Musical Object according to the Music Annotation Ontology:
   // https://dl.acm.org/doi/10.1145/3543882.3543891
   // For the purposes of mei-friend, we want to build a composite structure encompassing MusicalMaterial, 
   // Extract, and Selection (see paper)
-  return establishContainerResource(friendContainer).then(() => { 
-    return establishContainerResource(musicalObjectContainer).then(() => { 
-      return createMAOSelection(selectedElement).then(selectionResource => { 
-        return createMAOExtract(selectionResource).then(extractResource => { 
-          return createMAOMusicalMaterial(extractResource);
+  return establishContainerResource(friendContainer).then(async () => { 
+    return establishContainerResource(musicalObjectContainer).then(async (musicalObjectContainer) => { 
+      return createMAOSelection(selectedElements, label).then(async selectionResource => { 
+        return createMAOExtract(selectionResource, label).then(async extractResource => { 
+          return createMAOMusicalMaterial(extractResource, label)
         })
       })
     })
@@ -149,17 +152,39 @@ export async function createMAOMusicalObject(selectedElements) {
   .catch(e => { console.error("Failed to create MAO Musical Object:", e) })
 }
 
-async function createMAOSelection(selection) {
+async function createMAOSelection(selection, label = "") {
   // private function -- called *after* friendContainer and musicalObjectContainer already established
-  return postResource()
-  // TODO build selection obj
-  return postResource(selectionContainer, selectionObj);
+  console.log("createMAOSelection: ", selection);
+  let resource = structuredClone(resources.maoSelection);
+  resource[FRBR + "part"] = selection.map(s => { return {"@id": s } });
+  if(label) { 
+    resource[RDFS + "label"] = label;
+  }
+  let response = await postResource(selectionContainer, resource);
+  console.log("GOT RESPONSE: ", response);
+  return response;
+}
+ 
+async function createMAOExtract(postSelectionResponse, label = "") {
+  console.log("createMAOExtract: ", postSelectionResponse);
+  let selectionUri = postSelectionResponse.headers.get("location");
+  let resource = structuredClone(resources.maoExtract);
+  resource[FRBR + "embodiment"] = { "@id": selectionUri };
+  if(label) { 
+    resource[RDFS + "label"] = label;
+  }
+  return postResource(extractContainer, resource);
 }
 
-async function createMAOExtract(selection) {
-}
-
-async function createMAOMusicalMaterial(selection) {
+async function createMAOMusicalMaterial(postExtractResponse, label = "") {
+  console.log("createMAOMusicalMaterial: ", postExtractResponse);
+  let extractUri = postExtractResponse.headers.get("location");
+  let resource = structuredClone(resources.maoMusicalMaterial);
+  resource[MAO + "setting"] = { "@id": extractUri }
+  if(label) { 
+    resource[RDFS + "label"] = label;
+  }
+  return postResource(musicalMaterialContainer, resource);
 }
 
 export async function populateSolidTab() { 
