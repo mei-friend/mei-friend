@@ -39,6 +39,25 @@ export const resources = {
 
 }
 
+export async function postResource(containerUri, resource) { 
+  establishContainerResource(containerUri).then((containerUriResource) => {
+    solid.fetch({
+      method: 'POST',
+      headers: { 
+        Accept: 'application/ld+json'
+      },
+      body: JSON.stringify(resource)
+    }).then(async postResp => {
+      console.log("GOT POST RESPONSE:", postResp);
+      return postResp;
+    }).catch(e => { 
+      console.error("Couldn't post resource to container: ", containerUriResource, resource)
+    })
+  }).catch(e => {
+    console.error("Couldn't establish container: ", containerUri)
+  })
+}
+
 export async function establishResource(uri, resource) { 
   resource["@id"] = uri;
   // check whether a resource exists at uri
@@ -119,10 +138,10 @@ export async function createMAOMusicalObject(selectedElements) {
   // For the purposes of mei-friend, we want to build a composite structure encompassing MusicalMaterial, 
   // Extract, and Selection (see paper)
   return establishContainerResource(friendContainer).then(() => { 
-    return establishContainerResource(musicalObjectContainer).then((musicalObjectContainer) => { 
-      return createMAOSelection(selectedElements).then(selectionResource => { 
+    return establishContainerResource(musicalObjectContainer).then(() => { 
+      return createMAOSelection(selectedElement).then(selectionResource => { 
         return createMAOExtract(selectionResource).then(extractResource => { 
-          return createMAOMusicalMaterial(extractResource)
+          return createMAOMusicalMaterial(extractResource);
         })
       })
     })
@@ -131,8 +150,10 @@ export async function createMAOMusicalObject(selectedElements) {
 }
 
 async function createMAOSelection(selection) {
-  establishContainerResource(d)
-
+  // private function -- called *after* friendContainer and musicalObjectContainer already established
+  return postResource()
+  // TODO build selection obj
+  return postResource(selectionContainer, selectionObj);
 }
 
 async function createMAOExtract(selection) {
