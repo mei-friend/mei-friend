@@ -1,11 +1,17 @@
 import {
   log,
-  storage
+  meiFileName,
+  fileLocationType,
+  github, // instance
+  meiFileLocation,
+  storage,
+  version
 } from './main.js';
 
 export const solid = solidClientAuthentication.default;
 
 // namespace definitions
+export const DCT = "http://purl.org/dc/terms/";
 export const FOAF = "http://xmlns.com/foaf/0.1/";
 export const FRBR = "http://purl.org/vocab/frbr/core#";
 export const LDP = "http://www.w3.org/ns/ldp#";
@@ -44,6 +50,11 @@ export const resources = {
 export async function postResource(containerUri, resource) { 
   console.log("Call to postResource", containerUri, resource);
   resource["@id"] = ""; // document base URI
+  const webId = solid.getDefaultSession().info.webId;
+  resource[DCT + "creator"] = { "@id": webId};
+  resource[DCT + "created"] = new Date(Date.now()).toISOString();
+  const versionString = (env === environments.production ? version : `${env}-${version}`);
+  resource[DCT + "provenance"] = `Generated using mei-friend ${versionString}: https://mei-friend.mdw.ac.at`;
   return establishContainerResource(containerUri).then((containerUriResource) => {
     return solid.fetch(containerUriResource, {
       method: 'POST',
@@ -101,9 +112,9 @@ export async function establishResource(uri, resource) {
   return resp;
 }
 
-export async function establishContainerResource(container){ 
-  return getProfile().then(async (profile) => {
-    if (PIM + 'storage' in profile) {
+export async function getSolidStorage() { 
+  return getProfile().then(async (profile) => { 
+    if(PIM + 'storage' in profile) { 
       let storage = Array.isArray(profile[PIM + 'storage'])
         ? profile[PIM + 'storage'][0] // TODO what if more than one storage?
         : profile[PIM + 'storage'];
@@ -114,23 +125,30 @@ export async function establishContainerResource(container){
           console.warn('Unexpected pim:storage object in your Solid Pod profile: ', profile);
         }
       }
-      // establish container resource
-      let resource = structuredClone(resources.ldpContainer);
-      return establishResource(storage + container, resource).then(async (resp) => {
-        if(resp) {
-          if(resp.ok) {
-            console.log("Response OK:", resp, storage, container);
-            return storage + container;
-          } else { 
-            console.warn("Response not OK:", resp, storage, container);
-            return null;
-          }  
-        }
-      })
-      .catch(() => console.error("Couldn't establish resource:", storage + container, resource));
+      return storage;
     } else {
       log("Sorry, couldn't establish storage location from your Solid Pod's profile ", profile);
+      throw Error(profile);
     }
+  })
+}
+
+export async function establishContainerResource(container){ 
+  return getSolidStorage().then(async (storage) => {
+    // establish container resource
+    let resource = structuredClone(resources.ldpContainer);
+    return establishResource(storage + container, resource).then(async (resp) => {
+      if(resp) {
+        if(resp.ok) {
+          console.log("Response OK:", resp, storage, container);
+          return storage + container;
+        } else { 
+          console.warn("Response not OK:", resp, storage, container);
+          return null;
+        }  
+      }
+    })
+    .catch(() => console.error("Couldn't establish resource:", storage + container, resource));
   });
 }
 
@@ -154,9 +172,28 @@ export async function createMAOMusicalObject(selectedElements, label = "") {
 
 async function createMAOSelection(selection, label = "") {
   // private function -- called *after* friendContainer and musicalObjectContainer already established
-  console.log("createMAOSelection: ", selection);
+  console.log("createMAOSelection: ", selection, meiFileLocation, meiFileName, fileLocationType);
   let resource = structuredClone(resources.maoSelection);
-  resource[FRBR + "part"] = selection.map(s => { return {"@id": s } });
+  let baseFileUri;
+  switch(fileLocationType) { 
+    case 'file':
+      baseFileUri = "https://localhost"; // or should we just not allow local files at all?
+      break;
+    case 'url':
+      baseFileUri = meiFileLocation;
+      break;
+    case 'github':
+      baseFileUri = github.rawGithubUri;
+      break;
+    default: 
+      baseFileUri = meiFileLocation;
+      console.error("Unexpected fileLocationType: ", fileLocationType);
+  }
+  resource[FRBR + "part"] = selection.map(s => { 
+    return {
+      "@id": `${baseFileUri}#${s}` 
+    } 
+  });
   if(label) { 
     resource[RDFS + "label"] = label;
   }

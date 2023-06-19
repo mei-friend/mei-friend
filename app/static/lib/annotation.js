@@ -3,7 +3,7 @@ import { convertCoords, generateXmlId, rmHash, setCursorToId } from './utils.js'
 import { meiNameSpace, xmlNameSpace, xmlToString } from './dom-utils.js';
 import { circle, diffRemoved, highlight, fileCode, link, pencil, rdf, symLinkFile } from '../css/icons.js';
 import { removeInEditor } from './editor.js';
-import { friendContainer, annotationContainer, musicalObjectContainer, establishContainerResource, establishResource, solid, createMAOMusicalObject, MAO, FOAF, OA, PIM, RDF } from './solid.js';
+import { solid, getSolidStorage, friendContainer, annotationContainer, establishContainerResource, establishResource, createMAOMusicalObject, MAO, FOAF, OA, PIM, RDF } from './solid.js';
 
 export let annotations = [];
 
@@ -334,7 +334,10 @@ export function addAnnotationHandlers() {
     }
     document.getElementById("solid_logo").classList.add("clockwise");
     createMAOMusicalObject(a.selection).then(maoMusicalMaterial => { 
-      console.log("CREATED MUSICAL MATERIAL: ", maoMusicalMaterial.headers.get("location"));
+      getSolidStorage().then(solidStorage => { 
+        console.log("CREATED MUSICAL MATERIAL: ", solidStorage + 
+          maoMusicalMaterial.headers.get("location").substr(1));
+      })
       //annotations.push(a);
     }).finally(() => { 
       document.getElementById("solid_logo").classList.remove("clockwise");
@@ -560,15 +563,15 @@ export function fetchWebAnnotations(url, userProvided = true, jumps = 10) {
     headers: {
       Accept: 'application/ld+json',
     },
-  })
-    .then((resp) => {
+  }).then((resp) => {
       if (resp.status >= 400) {
         throw Error(resp);
       } else {
         return resp.json();
       }
     })
-    .then((json) => {
+    .then((json) => jsonld.expand(json))
+    .then((json) => { 
       let resourceDescription;
       if (Array.isArray(json)) {
         resourceDescription = json.find((o) => o['@id'] === url);

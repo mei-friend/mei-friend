@@ -195,6 +195,10 @@ export default class Github {
     return this.githubRepoOwner !== this.upstreamRepoOwner;
   }
 
+  get rawGithubUri() {
+    return `https://raw.githubusercontent.com/${this.githubRepo}/${this.branch}${this.filepath}`;
+  }
+
   // Recursively dive into tree until we find the file we're updating.
   // Update the file, then construct hashes all the way back up
   async generateModifiedTreeHash(tree, filepath, content, newfile) {
