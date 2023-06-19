@@ -54,7 +54,7 @@ export async function postResource(containerUri, resource) {
   resource[DCT + "creator"] = { "@id": webId};
   resource[DCT + "created"] = new Date(Date.now()).toISOString();
   const versionString = (env === environments.production ? version : `${env}-${version}`);
-  resource[DCT + "provenance"] = `Generated using mei-friend ${versionString}: https://mei-friend.mdw.ac.at`;
+  resource[DCT + "provenance"] = `Generated using mei-friend v.${versionString}: https://mei-friend.mdw.ac.at`;
   return establishContainerResource(containerUri).then((containerUriResource) => {
     return solid.fetch(containerUriResource, {
       method: 'POST',
@@ -77,7 +77,7 @@ export async function establishResource(uri, resource) {
   resource["@id"] = uri;
   // check whether a resource exists at uri
   // if not, create one initialised to the supplied resource
-  const solidButton = document.getElementById('solidButton');
+  const solidButton = document.getElementById('solid_logo');
   solidButton.classList.add('clockwise');
   let resp = await solid.fetch(uri, { 
     method: 'HEAD',
@@ -172,12 +172,11 @@ export async function createMAOMusicalObject(selectedElements, label = "") {
 
 async function createMAOSelection(selection, label = "") {
   // private function -- called *after* friendContainer and musicalObjectContainer already established
-  console.log("createMAOSelection: ", selection, meiFileLocation, meiFileName, fileLocationType);
   let resource = structuredClone(resources.maoSelection);
   let baseFileUri;
   switch(fileLocationType) { 
     case 'file':
-      baseFileUri = "https://localhost"; // or should we just not allow local files at all?
+      baseFileUri = "https://localhost" + meiFileName; // or should we just not allow local files at all?
       break;
     case 'url':
       baseFileUri = meiFileLocation;
