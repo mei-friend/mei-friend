@@ -3,7 +3,22 @@ import { convertCoords, generateXmlId, rmHash, setCursorToId } from './utils.js'
 import { meiNameSpace, xmlNameSpace, xmlToString } from './dom-utils.js';
 import { circle, diffRemoved, highlight, fileCode, link, pencil, rdf, symLinkFile } from '../css/icons.js';
 import { removeInEditor } from './editor.js';
-import { solid, getSolidStorage, friendContainer, annotationContainer, establishContainerResource, establishResource, createMAOMusicalObject, MAO, FOAF, OA, PIM, RDF } from './solid.js';
+import {
+  solid,
+  getSolidStorage,
+  friendContainer,
+  annotationContainer,
+  establishContainerResource,
+  establishResource,
+  createMAOMusicalObject,
+  politeness,
+  LDP,
+  MAO,
+  FOAF,
+  OA,
+  PIM,
+  RDF,
+} from './solid.js';
 
 export let annotations = [];
 
@@ -158,7 +173,9 @@ export function situateAnnotations() {
         else console.warn('Cannot locate annotation ', a);
       } else {
         // if not speed mode, asynchronous return of page numbers after we are finished here
-        const annotationLocationLabelElement = document.querySelector(`.annotationLocationLabel[data-id=${a.id}`);
+        const annotationLocationLabelElement = document.querySelector(
+          `.annotationLocationLabel[data-id=${CSS.escape(a.id)}`
+        );
         if (annotationLocationLabelElement) {
           annotationLocationLabelElement.innerHTML = generateAnnotationLocationLabel(a).innerHTML;
         }
@@ -178,6 +195,9 @@ export function deleteAnnotation(uuid) {
 }
 
 // functions to draw annotations
+
+async function drawIdentify(a) {}
+
 function drawHighlight(a) {
   if ('selection' in a) {
     const els = a.selection.map((s) => document.getElementById(s));
@@ -274,6 +294,9 @@ export function refreshAnnotations(forceListRefresh = false) {
     annotations.forEach((a) => {
       if ('type' in a) {
         switch (a.type) {
+          case 'annotateIdentify':
+            drawIdentify(a);
+            break;
           case 'annotateHighlight':
             drawHighlight(a);
             break;
@@ -326,23 +349,30 @@ export function addAnnotationHandlers() {
   };
 
   // functions to create annotations
-  const createIdentify = (e) => { 
-    const a = {
-      id: generateXmlId('maoMusicalObject', v.xmlIdStyle),
-      type: 'annotateIdentify',
-      selection: v.selectedElements,
-    }
-    document.getElementById("solid_logo").classList.add("clockwise");
-    createMAOMusicalObject(a.selection).then(maoMusicalMaterial => { 
-      getSolidStorage().then(solidStorage => { 
-        console.log("CREATED MUSICAL MATERIAL: ", solidStorage + 
-          maoMusicalMaterial.headers.get("location").substr(1));
+  const createIdentify = (e) => {
+    const selection = v.selectedElements;
+    document.getElementById('solid_logo').classList.add('clockwise');
+    createMAOMusicalObject(selection)
+      .then((maoMusicalMaterial) => {
+        getSolidStorage().then((solidStorage) => {
+          console.log(
+            'CREATED MUSICAL MATERIAL: ',
+            solidStorage + maoMusicalMaterial.headers.get('location').substr(1)
+          );
+          const a = {
+            id: solidStorage + maoMusicalMaterial.headers.get('location').substr(1),
+            type: 'annotateIdentify',
+            selection: selection,
+            isStandoff: true,
+          };
+          annotations.push(a);
+          refreshAnnotations(true);
+        });
       })
-      //annotations.push(a);
-    }).finally(() => { 
-      document.getElementById("solid_logo").classList.remove("clockwise");
-    })
-    // writing inline not supported 
+      .finally(() => {
+        document.getElementById('solid_logo').classList.remove('clockwise');
+      });
+    // writing inline not supported
   };
   const createHighlight = (e) => {
     const a = {
@@ -549,9 +579,136 @@ export function loadWebAnnotation(prev = '') {
   let urlstr = window.prompt(msg, prevurl);
   if (urlstr) {
     if (!(urlstr.startsWith('http://') || urlstr.startsWith('https://'))) urlstr = 'https://' + urlstr;
-    fetchWebAnnotations(urlstr);
+    try {
+      // ensure working URLs provided
+      fetchExternalResource(
+        new URL(urlstr), // traversal start
+        [new URL(OA + 'Annotation')], // target types
+        {
+          typeToHandlerMap: {
+            [OA + 'Annotation']: ingestWebAnnotation,
+          },
+          followList: [new URL(LDP + 'contains')], // predicates to traverse
+        }
+      );
+    } catch (e) {
+      // invalid URL
+      loadWebAnnotation();
+    }
   }
 }
+
+/**
+ * Recursively traverse a graph of linked data (JSON-LD documents) starting at url
+ * and searching for target entities matching type. Traverse only along followList predicates.
+ * Do not traverse to resources in blocklist.
+ * typeToHandlerMap object maps type strings to handler callbacks
+ * userProvided flag used to indicate whether to hand control back to user on error
+ * jumps counter used to define how many jumps left until traversal expires
+ * @param {URL} url
+ * @param {URL[]} targetTypes
+ * @param {object} typeToHandlerMap
+ * @param {URL[]} followList
+ * @param {URL[]} blockList
+ * @param {Boolean} userProvided,
+ * @param {number} jumps
+ */
+export function fetchExternalResource(
+  url,
+  targetTypes,
+  { typeToHandlerMap = {}, followList = [], blockList = [], userProvided = true, jumps = 10 } = {}
+) {
+  console.log('fetch external resource: ', url, targetTypes, typeToHandlerMap, followList, blockList, jumps);
+  // spin the icon to indicate loading activity
+  const icon = document.getElementById('addWebAnnotationIcon');
+  const svgs = Array.from(icon.getElementsByTagName('svg'));
+  svgs.forEach((t) => t.classList.add('clockwise'));
+  let fetchAppropriately = solid.getDefaultSession().info.isLoggedIn ? solid.fetch : fetch;
+  fetchAppropriately(url, {
+    headers: {
+      Accept: 'application/ld+json',
+    },
+  })
+    .then((resp) => {
+      if (resp.status >= 400) {
+        throw Error(resp);
+      } else {
+        return resp.json();
+      }
+    })
+    .then((json) => jsonld.expand(json))
+    .then((expanded) => {
+      let resourceDescription;
+      if (Array.isArray(expanded)) {
+        resourceDescription = expanded.find((o) => o['@id'] === url.href);
+        if (!resourceDescription && !url.href.endsWith('/')) {
+          // try again with trailing slash
+          resourceDescription = expanded.find((o) => o['@id'] === url.href + '/');
+        }
+      } else {
+        resourceDescription = expanded;
+      }
+      console.log('resource description: ', resourceDescription);
+      if (resourceDescription && '@type' in resourceDescription) {
+        if (!Array.isArray(resourceDescription['@type'])) {
+          // ensure array
+          resourceDescription['@type'] = [resourceDescription['@type']];
+        }
+        const targetUrlStrings = targetTypes.map((t) => t.href);
+        if (resourceDescription['@type'].filter((t) => targetUrlStrings.includes(t)).length) {
+          // found a target resource["@id"]!
+          ingestExternalResource(typeToHandlerMap, resourceDescription);
+        }
+        if (jumps >= 0) {
+          // attempt to continue traversal
+          const followUrlStrings = followList.map((l) => l.href);
+          let connectionsToFollow = Object.keys(resourceDescription).filter((predicate) =>
+            followUrlStrings.includes(predicate)
+          );
+          connectionsToFollow.forEach(async (pred) => {
+            // ensure array
+            const predObjects = Array.isArray(resourceDescription[pred])
+              ? resourceDescription[pred]
+              : [resourceDescription[pred]];
+
+            const blockUrlStrings = blockList.map((l) => l.href);
+            predObjects.forEach((obj) => {
+              try {
+                // recur if object is a URL and not in block list
+                if (!'@id' in obj || blockUrlStrings.includes(obj['@id'])) {
+                  throw Error('target is a literal or target URI on blockList');
+                }
+                let objUrl = new URL(obj['@id']);
+                // politely continue traversal
+                setTimeout(() => 
+                  fetchExternalResource(objUrl, targetTypes, {
+                    typeToHandlerMap,
+                    followList,
+                    blockList: [new URL(resourceDescription['@id']), ...blockList],
+                    userProvided: false,
+                    jumps: jumps - 1,
+                  }), politeness);
+              } catch {
+                // noop (non-URL or blocked object)
+              }
+            });
+          });
+        }
+      }
+    })
+    .catch((resp) => {
+      if (userProvided) {
+        console.error("Couldn't load external resource, error response: ", resp);
+        // user-provided url didn't work, so hand control back to user
+        if (resp.url) loadWebAnnotation(resp);
+        else loadWebAnnotation(url.href);
+      }
+    })
+    .finally(() => {
+      // notify that we've stopped loading
+      svgs.forEach((t) => t.classList.remove('clockwise'));
+    });
+} // fetchExternalResource()
 
 export function fetchWebAnnotations(url, userProvided = true, jumps = 10) {
   // spin the icon to indicate loading activity
@@ -563,7 +720,8 @@ export function fetchWebAnnotations(url, userProvided = true, jumps = 10) {
     headers: {
       Accept: 'application/ld+json',
     },
-  }).then((resp) => {
+  })
+    .then((resp) => {
       if (resp.status >= 400) {
         throw Error(resp);
       } else {
@@ -571,7 +729,7 @@ export function fetchWebAnnotations(url, userProvided = true, jumps = 10) {
       }
     })
     .then((json) => jsonld.expand(json))
-    .then((json) => { 
+    .then((json) => {
       let resourceDescription;
       if (Array.isArray(json)) {
         resourceDescription = json.find((o) => o['@id'] === url);
@@ -620,6 +778,25 @@ export function fetchWebAnnotations(url, userProvided = true, jumps = 10) {
       // notify that we've stopped loading
       svgs.forEach((t) => t.classList.remove('clockwise'));
     });
+}
+
+/**
+ * Call (a) predefined handler(s) on the provided resource to ingest it,
+ * depending on the resource's type(s). typeToHandlerMap should map type URI strings to callback functions.
+ * @param {object} typeToHandlerMap
+ * @param {object} resource
+ */
+export function ingestExternalResource(typeToHandlerMap, resource) {
+  try {
+    // ensure array
+    resource['@type'] = Array.isArray(resource['@type']) ? resource['@type'] : [resource['@type']];
+    const mappedTypes = Object.keys(typeToHandlerMap).filter((t) => resource['@type'].includes(t));
+    // call each relevant (type-matching) callback on the resource
+    console.log("ingest external resource: ", mappedTypes, typeToHandlerMap, resource)
+    mappedTypes.forEach((t) => typeToHandlerMap[t](resource));
+  } catch (e) {
+    console.error("Couldn't ingest external resource: ", e);
+  }
 }
 
 export function ingestWebAnnotation(webAnno) {
@@ -695,61 +872,66 @@ async function writeStandoffIfRequested(a) {
   if (document.getElementById('writeAnnotationStandoff').checked) {
     a.isStandoff = true;
     if (solid.getDefaultSession().info.isLoggedIn) {
-      document.getElementById("solid_logo").classList.add("clockwise");
+      document.getElementById('solid_logo').classList.add('clockwise');
       // ensure mei-friend container exists
-      establishContainerResource(friendContainer).then((friendContainerResource) => { 
-        establishContainerResource(annotationContainer).then((annotationContainerResource) => { 
-          // generate a web annotation JSON-LD object
-          let webAnno = new Object();
-          let body = new Object();
-          webAnno['@type'] = [OA + 'Annotation'];
-          webAnno[OA + 'hasTarget'] = a.selection.map((s) => {
-            // TODO: do something clever if fileLocationType = "file" (local)
-            return { '@id':  meiFileLocation + "#" + s };
-          });
-          switch (a.type) {
-            case 'annotateHighlight':
-              webAnno[OA + 'motivatedBy'] = [{ '@id': OA + 'highlighting' }];
-              break;
-            case 'annotateDescribe':
-              body['@type'] = [OA + 'TextualBody'];
-              if ('description' in a) {
-                body[RDF + 'value'] = a.description;
-              } else {
-                console.warn('Describing annotation without a description: ', a);
+      establishContainerResource(friendContainer)
+        .then((friendContainerResource) => {
+          establishContainerResource(annotationContainer)
+            .then((annotationContainerResource) => {
+              // generate a web annotation JSON-LD object
+              let webAnno = new Object();
+              let body = new Object();
+              webAnno['@type'] = [OA + 'Annotation'];
+              webAnno[OA + 'hasTarget'] = a.selection.map((s) => {
+                // TODO: do something clever if fileLocationType = "file" (local)
+                return { '@id': meiFileLocation + '#' + s };
+              });
+              switch (a.type) {
+                case 'annotateHighlight':
+                  webAnno[OA + 'motivatedBy'] = [{ '@id': OA + 'highlighting' }];
+                  break;
+                case 'annotateDescribe':
+                  body['@type'] = [OA + 'TextualBody'];
+                  if ('description' in a) {
+                    body[RDF + 'value'] = a.description;
+                  } else {
+                    console.warn('Describing annotation without a description: ', a);
+                  }
+                  webAnno[OA + 'motivatedBy'] = [{ '@id': OA + 'describing' }];
+                  webAnno[OA + 'hasBody'] = [body];
+                  break;
+                case 'annotateLink':
+                  webAnno[OA + 'motivatedBy'] = [{ '@id': OA + 'linking' }];
+                  webAnno[OA + 'hasBody'] = [{ '@id': a.url }];
+                  break;
+                default:
+                  console.warn('Trying to write standoff annotation with unknown annotation type:', a);
+                  break;
               }
-              webAnno[OA + 'motivatedBy'] = [{ '@id': OA + 'describing' }];
-              webAnno[OA + 'hasBody'] = [body];
-              break;
-            case 'annotateLink':
-              webAnno[OA + 'motivatedBy'] = [{ '@id': OA + 'linking' }];
-              webAnno[OA + 'hasBody'] = [{ '@id': a.url }];
-              break;
-            default:
-              console.warn('Trying to write standoff annotation with unknown annotation type:', a);
-              break;
-          }
-          webAnno["@id"] = annotationContainerResource + a.id;
-          establishResource(webAnno["@id"], webAnno).then((webAnnoResp) => { 
-            if(webAnnoResp.ok) { 
-              console.log("Success! Posted Web Annotation:", webAnno);
-            } else { 
-              console.warn("Couldn't post WebAnno: ", webAnno, webAnnoResp);
-              throw(webAnnoResp);
-            }
-          });
-        }).catch(e => { 
-          console.error("Couldn't post WebAnno:", e)
+              webAnno['@id'] = annotationContainerResource + a.id;
+              establishResource(webAnno['@id'], webAnno).then((webAnnoResp) => {
+                if (webAnnoResp.ok) {
+                  console.log('Success! Posted Web Annotation:', webAnno);
+                } else {
+                  console.warn("Couldn't post WebAnno: ", webAnno, webAnnoResp);
+                  throw webAnnoResp;
+                }
+              });
+            })
+            .catch((e) => {
+              console.error("Couldn't post WebAnno:", e);
+            });
         })
-      }).catch(() => {
-        console.error("Couldn't establish container:", friendContainer)
-      }).finally(() => { 
-        document.getElementById("solid_logo").classList.remove("clockwise");
-      })
+        .catch(() => {
+          console.error("Couldn't establish container:", friendContainer);
+        })
+        .finally(() => {
+          document.getElementById('solid_logo').classList.remove('clockwise');
+        });
     } else {
       log('Cannot write standoff annotation: Please ensure you are logged in to a Solid Pod');
     }
-  } 
+  }
 }
 
 export function copyIdToClipboard(e) {

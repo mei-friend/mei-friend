@@ -8,6 +8,8 @@ import {
   version
 } from './main.js';
 
+export const politeness=200; // milliseconds between network requests
+
 export const solid = solidClientAuthentication.default;
 
 // namespace definitions
