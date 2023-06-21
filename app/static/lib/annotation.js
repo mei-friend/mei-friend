@@ -16,7 +16,7 @@ import {
 import { 
   nsp,
   traverseAndFetch
-} from './linkedData.js'
+} from './linked-data.js'
 
 export let annotations = [];
 

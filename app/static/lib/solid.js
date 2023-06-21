@@ -10,7 +10,7 @@ import {
 
 import { 
   nsp
-} from './linkedData.js';
+} from './linked-data.js';
 
 export const politeness=200; // milliseconds between network requests
 
