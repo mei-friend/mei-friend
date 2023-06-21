@@ -12,13 +12,11 @@ import {
   establishResource,
   createMAOMusicalObject,
   politeness,
-  LDP,
-  MAO,
-  FOAF,
-  OA,
-  PIM,
-  RDF,
 } from './solid.js';
+import { 
+  nsp,
+  traverseAndFetch
+} from './linkedData.js'
 
 export let annotations = [];
 
@@ -556,6 +554,7 @@ export function deleteAnnot(xmlId) {
   }
 }
 
+// GUI function to set up 'Load linked data' UI
 export function loadWebAnnotation(prev = '') {
   let msg = translator.lang.loadWebAnnotationMessage.text;
   let prevurl = '';
@@ -581,14 +580,14 @@ export function loadWebAnnotation(prev = '') {
     if (!(urlstr.startsWith('http://') || urlstr.startsWith('https://'))) urlstr = 'https://' + urlstr;
     try {
       // ensure working URLs provided
-      fetchExternalResource(
+      attemptFetchExternalResource(
         new URL(urlstr), // traversal start
-        [new URL(OA + 'Annotation')], // target types
+        [new URL(nsp.OA + 'Annotation')], // target types
         {
           typeToHandlerMap: {
-            [OA + 'Annotation']: ingestWebAnnotation,
+            [nsp.OA + 'Annotation']: ingestWebAnnotation,
           },
-          followList: [new URL(LDP + 'contains')], // predicates to traverse
+          followList: [new URL(nsp.LDP + 'contains')], // predicates to traverse
         }
       );
     } catch (e) {
@@ -598,117 +597,27 @@ export function loadWebAnnotation(prev = '') {
   }
 }
 
-/**
- * Recursively traverse a graph of linked data (JSON-LD documents) starting at url
- * and searching for target entities matching type. Traverse only along followList predicates.
- * Do not traverse to resources in blocklist.
- * typeToHandlerMap object maps type strings to handler callbacks
- * userProvided flag used to indicate whether to hand control back to user on error
- * jumps counter used to define how many jumps left until traversal expires
- * @param {URL} url
- * @param {URL[]} targetTypes
- * @param {object} typeToHandlerMap
- * @param {URL[]} followList
- * @param {URL[]} blockList
- * @param {Boolean} userProvided,
- * @param {number} jumps
- */
-export function fetchExternalResource(
-  url,
-  targetTypes,
-  { typeToHandlerMap = {}, followList = [], blockList = [], userProvided = true, jumps = 10 } = {}
-) {
+// Wrapper around traverseAndFetch that reports back errors / progress to 'Loaaad linked data' UI
+export function attemptFetchExternalResource(url, targetTypes, configObj) { 
   console.log('fetch external resource: ', url, targetTypes, typeToHandlerMap, followList, blockList, jumps);
   // spin the icon to indicate loading activity
   const icon = document.getElementById('addWebAnnotationIcon');
   const svgs = Array.from(icon.getElementsByTagName('svg'));
   svgs.forEach((t) => t.classList.add('clockwise'));
-  let fetchAppropriately = solid.getDefaultSession().info.isLoggedIn ? solid.fetch : fetch;
-  fetchAppropriately(url, {
-    headers: {
-      Accept: 'application/ld+json',
-    },
-  })
-    .then((resp) => {
-      if (resp.status >= 400) {
-        throw Error(resp);
-      } else {
-        return resp.json();
-      }
-    })
-    .then((json) => jsonld.expand(json))
-    .then((expanded) => {
-      let resourceDescription;
-      if (Array.isArray(expanded)) {
-        resourceDescription = expanded.find((o) => o['@id'] === url.href);
-        if (!resourceDescription && !url.href.endsWith('/')) {
-          // try again with trailing slash
-          resourceDescription = expanded.find((o) => o['@id'] === url.href + '/');
-        }
-      } else {
-        resourceDescription = expanded;
-      }
-      console.log('resource description: ', resourceDescription);
-      if (resourceDescription && '@type' in resourceDescription) {
-        if (!Array.isArray(resourceDescription['@type'])) {
-          // ensure array
-          resourceDescription['@type'] = [resourceDescription['@type']];
-        }
-        const targetUrlStrings = targetTypes.map((t) => t.href);
-        if (resourceDescription['@type'].filter((t) => targetUrlStrings.includes(t)).length) {
-          // found a target resource["@id"]!
-          ingestExternalResource(typeToHandlerMap, resourceDescription);
-        }
-        if (jumps >= 0) {
-          // attempt to continue traversal
-          const followUrlStrings = followList.map((l) => l.href);
-          let connectionsToFollow = Object.keys(resourceDescription).filter((predicate) =>
-            followUrlStrings.includes(predicate)
-          );
-          connectionsToFollow.forEach(async (pred) => {
-            // ensure array
-            const predObjects = Array.isArray(resourceDescription[pred])
-              ? resourceDescription[pred]
-              : [resourceDescription[pred]];
-
-            const blockUrlStrings = blockList.map((l) => l.href);
-            predObjects.forEach((obj) => {
-              try {
-                // recur if object is a URL and not in block list
-                if (!'@id' in obj || blockUrlStrings.includes(obj['@id'])) {
-                  throw Error('target is a literal or target URI on blockList');
-                }
-                let objUrl = new URL(obj['@id']);
-                // politely continue traversal
-                setTimeout(() => 
-                  fetchExternalResource(objUrl, targetTypes, {
-                    typeToHandlerMap,
-                    followList,
-                    blockList: [new URL(resourceDescription['@id']), ...blockList],
-                    userProvided: false,
-                    jumps: jumps - 1,
-                  }), politeness);
-              } catch {
-                // noop (non-URL or blocked object)
-              }
-            });
-          });
-        }
-      }
-    })
+  traverseAndFetch(url, targetTypes, configObj)
     .catch((resp) => {
-      if (userProvided) {
-        console.error("Couldn't load external resource, error response: ", resp);
-        // user-provided url didn't work, so hand control back to user
-        if (resp.url) loadWebAnnotation(resp);
-        else loadWebAnnotation(url.href);
-      }
-    })
+        if (userProvided) {
+          console.error("Couldn't load external resource, error response: ", resp);
+          // user-provided url didn't work, so hand control back to user
+          if (resp.url) loadWebAnnotation(resp);
+          else loadWebAnnotation(url.href);
+        }
+      })
     .finally(() => {
       // notify that we've stopped loading
       svgs.forEach((t) => t.classList.remove('clockwise'));
     });
-} // fetchExternalResource()
+}
 
 export function fetchWebAnnotations(url, userProvided = true, jumps = 10) {
   // spin the icon to indicate loading activity
@@ -822,20 +731,20 @@ export function ingestWebAnnotation(webAnno) {
           // decare a linking annotation
           anno.url = firstBody['@id'];
           anno.type = 'annotateLink';
-        } else if ('@type' in firstBody && RDF + value in firstBody && OA + 'TextualBody' in firstBody['@type']) {
+        } else if ('@type' in firstBody && nsp.RDF + value in firstBody && nsp.OA + 'TextualBody' in firstBody['@type']) {
           // declare a describing annotation
           console.log('Declaring a describing annotation!');
-          anno.description = firstBody[RDF + value];
+          anno.description = firstBody[nsp.RDF + value];
           anno.type = 'annotateDescribe';
         } else {
           console.log("Don't know how to handle body of this annotation: ", anno);
         }
       }
-    } else if (OA + 'bodyValue' in webAnno) {
+    } else if (nsp.OA + 'bodyValue' in webAnno) {
       // declare describing annotation
       console.log('Declaring a describing annotation!');
       // TODO decide what to do for multiple bodies
-      anno.description = webAnno[OA + 'bodyValue'][0]['@value'];
+      anno.description = webAnno[nsp.OA + 'bodyValue'][0]['@value'];
       anno.type = 'annotateDescribe';
     }
 
@@ -881,28 +790,28 @@ async function writeStandoffIfRequested(a) {
               // generate a web annotation JSON-LD object
               let webAnno = new Object();
               let body = new Object();
-              webAnno['@type'] = [OA + 'Annotation'];
-              webAnno[OA + 'hasTarget'] = a.selection.map((s) => {
+              webAnno['@type'] = [nsp.OA + 'Annotation'];
+              webAnno[nsp.OA + 'hasTarget'] = a.selection.map((s) => {
                 // TODO: do something clever if fileLocationType = "file" (local)
                 return { '@id': meiFileLocation + '#' + s };
               });
               switch (a.type) {
                 case 'annotateHighlight':
-                  webAnno[OA + 'motivatedBy'] = [{ '@id': OA + 'highlighting' }];
+                  webAnno[nsp.OA + 'motivatedBy'] = [{ '@id': nsp.OA + 'highlighting' }];
                   break;
                 case 'annotateDescribe':
-                  body['@type'] = [OA + 'TextualBody'];
+                  body['@type'] = [nsp.OA + 'TextualBody'];
                   if ('description' in a) {
-                    body[RDF + 'value'] = a.description;
+                    body[nsp.RDF + 'value'] = a.description;
                   } else {
                     console.warn('Describing annotation without a description: ', a);
                   }
-                  webAnno[OA + 'motivatedBy'] = [{ '@id': OA + 'describing' }];
-                  webAnno[OA + 'hasBody'] = [body];
+                  webAnno[nsp.OA + 'motivatedBy'] = [{ '@id': nsp.OA + 'describing' }];
+                  webAnno[nsp.OA + 'hasBody'] = [body];
                   break;
                 case 'annotateLink':
-                  webAnno[OA + 'motivatedBy'] = [{ '@id': OA + 'linking' }];
-                  webAnno[OA + 'hasBody'] = [{ '@id': a.url }];
+                  webAnno[nsp.OA + 'motivatedBy'] = [{ '@id': nsp.OA + 'linking' }];
+                  webAnno[nsp.OA + 'hasBody'] = [{ '@id': a.url }];
                   break;
                 default:
                   console.warn('Trying to write standoff annotation with unknown annotation type:', a);

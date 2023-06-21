@@ -8,21 +8,13 @@ import {
   version
 } from './main.js';
 
+import { 
+  nsp
+} from './linkedData.js';
+
 export const politeness=200; // milliseconds between network requests
 
 export const solid = solidClientAuthentication.default;
-
-// namespace definitions
-export const DCT = "http://purl.org/dc/terms/";
-export const FOAF = "http://xmlns.com/foaf/0.1/";
-export const FRBR = "http://purl.org/vocab/frbr/core#";
-export const LDP = "http://www.w3.org/ns/ldp#";
-export const MAO = "https://domestic-beethoven.eu/ontology/1.0/music-annotation-ontology.ttl#";
-export const OA = "http://www.w3.org/ns/oa#";
-export const PIM = "http://www.w3.org/ns/pim/space#";
-export const RDF = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
-export const RDFS = "http://www.w3.org/2000/01/rdf-schema#";
-
 
 // mei-friend resource containers (internal path within Solid storage)
 export const friendContainer = "at.ac.mdw.mei-friend/";
@@ -35,16 +27,16 @@ export const musicalMaterialContainer = musicalObjectContainer + "musicalMateria
 // resource templates
 export const resources = {
   ldpContainer:  { 
-    "@type": [LDP+"Container", LDP+"BasicContainer"]
+    "@type": [nsp.LDP+"Container", nsp.LDP+"BasicContainer"]
   },
   maoExtract:{ 
-    "@type": [MAO + "Extract"]
+    "@type": [nsp.MAO + "Extract"]
   },
   maoSelection:{ 
-    "@type": [MAO + "Selection"]
+    "@type": [nsp.MAO + "Selection"]
   },
   maoMusicalMaterial: { 
-    "@type": [MAO + "MusicalMaterial"]
+    "@type": [nsp.MAO + "MusicalMaterial"]
   }
 
 }
@@ -53,10 +45,10 @@ export async function postResource(containerUri, resource) {
   console.log("Call to postResource", containerUri, resource);
   resource["@id"] = ""; // document base URI
   const webId = solid.getDefaultSession().info.webId;
-  resource[DCT + "creator"] = { "@id": webId};
-  resource[DCT + "created"] = new Date(Date.now()).toISOString();
+  resource[nsp.DCT + "creator"] = { "@id": webId};
+  resource[nsp.DCT + "created"] = new Date(Date.now()).toISOString();
   const versionString = (env === environments.production ? version : `${env}-${version}`);
-  resource[DCT + "provenance"] = `Generated using mei-friend v.${versionString}: https://mei-friend.mdw.ac.at`;
+  resource[nsp.DCT + "provenance"] = `Generated using mei-friend v.${versionString}: https://mei-friend.mdw.ac.at`;
   return establishContainerResource(containerUri).then((containerUriResource) => {
     return solid.fetch(containerUriResource, {
       method: 'POST',
@@ -116,10 +108,10 @@ export async function establishResource(uri, resource) {
 
 export async function getSolidStorage() { 
   return getProfile().then(async (profile) => { 
-    if(PIM + 'storage' in profile) { 
-      let storage = Array.isArray(profile[PIM + 'storage'])
-        ? profile[PIM + 'storage'][0] // TODO what if more than one storage?
-        : profile[PIM + 'storage'];
+    if(nsp.PIM + 'storage' in profile) { 
+      let storage = Array.isArray(profile[nsp.PIM + 'storage'])
+        ? profile[nsp.PIM + 'storage'][0] // TODO what if more than one storage?
+        : profile[nsp.PIM + 'storage'];
       if (typeof storage === 'object') {
         if ('@id' in storage) {
           storage = storage['@id'];
@@ -169,7 +161,7 @@ export async function createMAOMusicalObject(selectedElements, label = "") {
       })
     })
   })
-  .catch(e => { console.error("Failed to create MAO Musical Object:", e) })
+  .catch(e => { console.error("Failed to create nsp.MAO Musical Object:", e) })
 }
 
 async function createMAOSelection(selection, label = "") {
@@ -190,13 +182,13 @@ async function createMAOSelection(selection, label = "") {
       baseFileUri = meiFileLocation;
       console.error("Unexpected fileLocationType: ", fileLocationType);
   }
-  resource[FRBR + "part"] = selection.map(s => { 
+  resource[nsp.FRBR + "part"] = selection.map(s => { 
     return {
       "@id": `${baseFileUri}#${s}` 
     } 
   });
   if(label) { 
-    resource[RDFS + "label"] = label;
+    resource[nsp.RDFS + "label"] = label;
   }
   let response = await postResource(selectionContainer, resource);
   console.log("GOT RESPONSE: ", response);
@@ -207,9 +199,9 @@ async function createMAOExtract(postSelectionResponse, label = "") {
   console.log("createMAOExtract: ", postSelectionResponse);
   let selectionUri = postSelectionResponse.headers.get("location");
   let resource = structuredClone(resources.maoExtract);
-  resource[FRBR + "embodiment"] = { "@id": selectionUri };
+  resource[nsp.FRBR + "embodiment"] = { "@id": selectionUri };
   if(label) { 
-    resource[RDFS + "label"] = label;
+    resource[nsp.RDFS + "label"] = label;
   }
   return postResource(extractContainer, resource);
 }
@@ -218,9 +210,9 @@ async function createMAOMusicalMaterial(postExtractResponse, label = "") {
   console.log("createMAOMusicalMaterial: ", postExtractResponse);
   let extractUri = postExtractResponse.headers.get("location");
   let resource = structuredClone(resources.maoMusicalMaterial);
-  resource[MAO + "setting"] = { "@id": extractUri }
+  resource[nsp.MAO + "setting"] = { "@id": extractUri }
   if(label) { 
-    resource[RDFS + "label"] = label;
+    resource[nsp.RDFS + "label"] = label;
   }
   return postResource(musicalMaterialContainer, resource);
 }
@@ -280,8 +272,8 @@ async function populateLoggedInSolidTab() {
     if(me.length > 1) { 
       console.warn("User's solid profile has multiple entries for their webId!");
     }
-    if(`${FOAF}name` in me[0]) {
-      let foafName = me[0][`${FOAF}name`][0]; // TODO decide what to do in case of multiple foaf:names
+    if(`${nsp.FOAF}name` in me[0]) {
+      let foafName = me[0][`${nsp.FOAF}name`][0]; // TODO decide what to do in case of multiple foaf:names
       if(typeof foafName === "string") { 
         name = foafName;
       } else if(typeof foafName === "object" && "@value" in foafName) { 
