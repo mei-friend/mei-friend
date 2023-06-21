@@ -588,6 +588,7 @@ export function loadWebAnnotation(prev = '') {
             [nsp.OA + 'Annotation']: ingestWebAnnotation,
           },
           followList: [new URL(nsp.LDP + 'contains')], // predicates to traverse
+          fetchMethod: solid.getDefaultSession().info.isLoggedIn ? solid.fetch : fetch
         }
       );
     } catch (e) {

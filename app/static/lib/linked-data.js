@@ -19,21 +19,22 @@ export const nsp = {
  * typeToHandlerMap object maps type strings to handler callbacks
  * userProvided flag used to indicate whether to hand control back to user on error
  * jumps counter used to define how many jumps left until traversal expires
+ * fetchMethod may be used to override the default 'fetch' (e.g. for Solid authentication)
  * @param {URL} url
  * @param {URL[]} targetTypes
  * @param {object} typeToHandlerMap
  * @param {URL[]} followList
  * @param {URL[]} blockList
- * @param {Boolean} userProvided,
+ * @param {Boolean} userProvided
  * @param {number} jumps
+ * @param {function} fetchMethod
  */
 export async function traverseAndFetch(
   url,
   targetTypes,
-  { typeToHandlerMap = {}, followList = [], blockList = [], userProvided = true, jumps = 10 } = {}
+  { typeToHandlerMap = {}, followList = [], blockList = [], userProvided = true, jumps = 10, fetchMethod = fetch } = {}
 ) {
-  let fetchAppropriately = solid.getDefaultSession().info.isLoggedIn ? solid.fetch : fetch;
-  fetchAppropriately(url, {
+  fetchMethod(url, {
     headers: {
       Accept: 'application/ld+json',
     },
