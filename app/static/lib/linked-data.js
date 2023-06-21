@@ -106,4 +106,4 @@ export async function traverseAndFetch(
         }
       }
     })
-} // fetchExternalResource()
+} // traverseAndFetch()
