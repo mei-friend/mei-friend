@@ -1,7 +1,7 @@
 import { v, cm, log, translator, meiFileLocation, fileLocationType } from './main.js';
 import { convertCoords, generateXmlId, rmHash, setCursorToId } from './utils.js';
 import { meiNameSpace, xmlNameSpace, xmlToString } from './dom-utils.js';
-import { circle, diffRemoved, highlight, fileCode, link, pencil, rdf, symLinkFile } from '../css/icons.js';
+import { circle, diffRemoved, highlight, fileCode, identify, link, pencil, rdf, symLinkFile } from '../css/icons.js';
 import { removeInEditor } from './editor.js';
 import {
   solid,
@@ -106,6 +106,10 @@ export function refreshAnnotationsList() {
       case 'annotateDescribe':
         summary.insertAdjacentHTML('afterbegin', pencil);
         details.insertAdjacentHTML('afterbegin', a.description);
+        break;
+      case 'annotateIdentify':
+        summary.insertAdjacentHTML('afterbegin', identify);
+        details.insertAdjacentHTML('afterbegin', "<span>MUSIC EXCERPT HERE</span>");
         break;
       default:
         console.warn('Unknown type when drawing annotation in list: ', a);
