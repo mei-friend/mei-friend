@@ -129,7 +129,11 @@ export function ingestExternalResource(typeToHandlerMap, resource) {
     const mappedTypes = Object.keys(typeToHandlerMap).filter((t) => resource['@type'].includes(t));
     // call each relevant (type-matching) callback on the resource
     console.log("ingest external resource: ", mappedTypes, typeToHandlerMap, resource)
-    mappedTypes.forEach((t) => typeToHandlerMap[t](resource));
+    mappedTypes.forEach((t) => {
+      'args' in typeToHandlerMap[t] ? 
+        typeToHandlerMap[t].func(resource, ...typeToHandlerMap[t].args) : 
+        typeToHandlerMap[t].func(resource)  
+    });
   } catch (e) {
     console.error("Couldn't ingest external resource: ", e);
   }

@@ -109,7 +109,7 @@ export function refreshAnnotationsList() {
         break;
       case 'annotateIdentify':
         summary.insertAdjacentHTML('afterbegin', identify);
-        details.insertAdjacentHTML('afterbegin', `<div id="excerpts_${a.id}"></div>`);
+        details.insertAdjacentHTML('afterbegin', `<div id="extracts_${a.id}"></div>`);
         break;
       default:
         console.warn('Unknown type when drawing annotation in list: ', a);
@@ -183,15 +183,15 @@ export function situateAnnotations() {
         }
       }
     }
-    // for any identifying annotations, see if there are new excerpts associated with the musical material
+    // for any identifying annotations, see if there are new extracts associated with the musical material
     if(a.type == "annotateIdentify") { 
       // find it in the list
-      const excerptsDiv = document.querySelector('#excerpts_'+CSS.escape(a.id));
-      console.log("EXCERPTS DIV: ", excerptsDiv);
-      if(excerptsDiv && !excerptsDiv.innerHTML.length) { 
+      const extractsDiv = document.querySelector('#extracts_'+CSS.escape(a.id));
+      console.log("extracts DIV: ", extractsDiv);
+      if(extractsDiv && !extractsDiv.innerHTML.length) { 
         // draw "waiting" icon
-        excerptsDiv.innerHTML = `<span class="clockwise">${rdf}</span>`;
-        fetchExcerptsForIdentifiedObject(a.id)
+        extractsDiv.innerHTML = `<span class="clockwise">${rdf}</span>`;
+        fetchExtractsForIdentifiedObject(a.id)
       }
     }
   });
@@ -609,7 +609,9 @@ export function loadWebAnnotation(prev = '') {
         [new URL(nsp.OA + 'Annotation')], // target types
         {
           typeToHandlerMap: {
-            [nsp.OA + 'Annotation']: ingestWebAnnotation,
+            [nsp.OA + 'Annotation']: {
+              func: ingestWebAnnotation
+            }
           },
           followList: [new URL(nsp.LDP + 'contains')], // predicates to traverse
           fetchMethod: solid.getDefaultSession().info.isLoggedIn ? solid.fetch : fetch
@@ -782,27 +784,69 @@ function writeInlineIfRequested(a) {
   }
 }
 
-async function fetchExcerptsForIdentifiedObject(url) { 
+
+// fetch all components hanging off a musical material
+async function fetchMAOComponentsForIdentifiedObject(musMatUrl, typeToHandlerMap) {
   traverseAndFetch(
-    new URL(url), 
-    [new URL(nsp.MAO + "MusicalMaterial")],
+    new URL(musMatUrl), 
+    [new URL(typeUrl)],
     { 
       typeToHandlerMap: { 
-        [nsp.MAO + "MusicalMaterial"]: drawExcerptsForIdentifiedObject
+        [nsp.MAO + "MusicalMaterial"]: { 
+          func: drawMusicalMaterialForIdentifiedObject,
+          args: [url]
+        }, 
+        [nsp.MAO + "Extract"]: {
+          func: drawExtractsForIdentifiedObject, 
+          args: [url]
+        }, 
+        [nsp.MAO + "Selection"]: { 
+          func: drawSelectionForIdentifiedObject,
+          args: [url]
+        }
       },
       fetchMethod: solid.getDefaultSession().info.isLoggedIn ? solid.fetch : fetch
     }
   ).catch(e => { 
-    log("Couldn't load excerpts associated with identified musical object:", e);
-    const loadingIndicator = document.querySelector('#excerpts_'+CSS.escape(url)+' span');
+    log("Couldn't load extracts associated with identified musical object:", e);
+    const loadingIndicator = document.querySelector('#extracts_'+CSS.escape(url)+' span');
     if(loadingIndicator) { 
       loadingIndicator.classList.remove("clockwise");
     }
   })
 }
 
-function drawExcerptsForIdentifiedObject(obj) { 
-  console.log("Got excerpts: ", obj);
+async function fetchExtractsForIdentifiedObject(url) { 
+  traverseAndFetch(
+    new URL(url), 
+    [new URL(nsp.MAO + "MusicalMaterial")],
+    { 
+      typeToHandlerMap: { 
+        [nsp.MAO + "MusicalMaterial"]: { 
+          func: drawExtractsForIdentifiedObject,
+          args: [url]
+        }
+      },
+      fetchMethod: solid.getDefaultSession().info.isLoggedIn ? solid.fetch : fetch
+    }
+  ).catch(e => { 
+    log("Couldn't load extracts associated with identified musical object:", e);
+    const loadingIndicator = document.querySelector('#extracts_'+CSS.escape(url)+' span');
+    if(loadingIndicator) { 
+      loadingIndicator.classList.remove("clockwise");
+    }
+  })
+}
+
+
+async function drawExtractsForIdentifiedObject(obj, musMatUrl) { 
+  console.log("Got extracts: ", obj, musMatUrl);
+  if(`${nspMAO}setting` in obj) { 
+    fetchSettingsForIdentifiedObject(obj[`${nspMAO}setting`])
+        drawSettingsForIdentifiedObject(extractsDiv);
+  } else { 
+    console.warn("Extract without a setting:", obj, musMatUrl)
+  }
 }
 
 async function writeStandoffIfRequested(a) {

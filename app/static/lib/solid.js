@@ -208,7 +208,8 @@ async function createMAOExtract(postSelectionResponse, label = "") {
 
 async function createMAOMusicalMaterial(postExtractResponse, label = "") {
   console.log("createMAOMusicalMaterial: ", postExtractResponse);
-  let extractUri = postExtractResponse.headers.get("location");
+  let extractUri = new URL(postExtractResponse.url).origin + 
+    postExtractResponse.headers.get("location");
   let resource = structuredClone(resources.maoMusicalMaterial);
   resource[nsp.MAO + "setting"] = { "@id": extractUri }
   if(label) { 
@@ -223,7 +224,7 @@ export async function populateSolidTab() {
     solidTab.innerHTML = await populateLoggedInSolidTab();
     document.getElementById('solidLogout').addEventListener('click', solidLogout)
   } else {
-    solidTab.innerHTML = await populateLoggedOutSolidTab();
+    solidTab.innerHTML = populateLoggedOutSolidTab();
     document.getElementById('solidLogin').addEventListener('click', loginAndFetch)
   }
 }
@@ -288,6 +289,16 @@ async function populateLoggedInSolidTab() {
 }
 
 function populateLoggedOutSolidTab() {
+  // TODO finish
+  let provider = document.createElement("select");
+  provider.setAttribute("name", "provider");
+  provider.setAttribute("id", "providerSelect");
+  provider.innerHTML = `
+    <option value="https://solidcommunity.net">SolidCommunity.net</option>
+    <option value="https://login.inrupt.net">Inrupt</option>
+    <option value="https://trompa-solid.upf.edu">TROMPA @ UPF</option>
+    <option value="other">Other...</option>
+  `
   return 'Please <a id="solidLogin">Click here to log in!</a>';
 }
 
