@@ -11,7 +11,6 @@ import {
   establishContainerResource,
   establishResource,
   createMAOMusicalObject,
-  politeness,
 } from './solid.js';
 import { 
   nsp,
@@ -191,7 +190,7 @@ export function situateAnnotations() {
       if(extractsDiv && !extractsDiv.innerHTML.length) { 
         // draw "waiting" icon
         extractsDiv.innerHTML = `<span class="clockwise">${rdf}</span>`;
-        fetchExtractsForIdentifiedObject(a.id)
+        fetchMAOComponentsForIdentifiedObject(a.id);
       }
     }
   });
@@ -786,30 +785,31 @@ function writeInlineIfRequested(a) {
 
 
 // fetch all components hanging off a musical material
-async function fetchMAOComponentsForIdentifiedObject(musMatUrl, typeToHandlerMap) {
+async function fetchMAOComponentsForIdentifiedObject(musMatUrl) {
   traverseAndFetch(
     new URL(musMatUrl), 
-    [new URL(typeUrl)],
+    [new URL(nsp.MAO + "MusicalMaterial"), new URL(nsp.MAO + "Extract"), new URL(nsp.MAO + "Selection")],
     { 
       typeToHandlerMap: { 
         [nsp.MAO + "MusicalMaterial"]: { 
           func: drawMusicalMaterialForIdentifiedObject,
-          args: [url]
+          args: [musMatUrl]
         }, 
         [nsp.MAO + "Extract"]: {
           func: drawExtractsForIdentifiedObject, 
-          args: [url]
+          args: [musMatUrl]
         }, 
         [nsp.MAO + "Selection"]: { 
           func: drawSelectionForIdentifiedObject,
-          args: [url]
+          args: [musMatUrl]
         }
       },
+      followList: [new URL(nsp.FRBR + "embodiment"), new URL(nsp.MAO + "setting"), new URL(nsp.FRBR + "part")],
       fetchMethod: solid.getDefaultSession().info.isLoggedIn ? solid.fetch : fetch
     }
   ).catch(e => { 
     log("Couldn't load extracts associated with identified musical object:", e);
-    const loadingIndicator = document.querySelector('#extracts_'+CSS.escape(url)+' span');
+    const loadingIndicator = document.querySelector('#extracts_'+CSS.escape(musMatUrl)+' span');
     if(loadingIndicator) { 
       loadingIndicator.classList.remove("clockwise");
     }
@@ -839,15 +839,24 @@ async function fetchExtractsForIdentifiedObject(url) {
 }
 
 
+async function drawMusicalMaterialForIdentifiedObject(obj, musMatUrl){
+  console.log("drawMusMatForIdentifiedObject: ", obj, musMatUrl);
+}
+
 async function drawExtractsForIdentifiedObject(obj, musMatUrl) { 
-  console.log("Got extracts: ", obj, musMatUrl);
-  if(`${nspMAO}setting` in obj) { 
-    fetchSettingsForIdentifiedObject(obj[`${nspMAO}setting`])
+  console.log("drawExtractsForIdentifiedObject: ", obj, musMatUrl);/*
+  if(`${nsp.MAO}setting` in obj) { 
+    fetchSettingsForIdentifiedObject(obj[`${nsp.MAO}setting`])
         drawSettingsForIdentifiedObject(extractsDiv);
   } else { 
     console.warn("Extract without a setting:", obj, musMatUrl)
-  }
+  }*/
 }
+
+async function drawSelectionForIdentifiedObject(obj, musMatUrl) {
+  console.log("drawSelectionFOrIDentifiedObject: ", obj, musMatUrl);
+}
+
 
 async function writeStandoffIfRequested(a) {
   // write to a stand-off Web Annotation in the user's Solid Pod if requested

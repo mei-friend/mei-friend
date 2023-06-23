@@ -11,6 +11,8 @@ export const nsp = {
   RDFS: 'http://www.w3.org/2000/01/rdf-schema#',
 };
 
+export const politeness=200; // milliseconds between network requests
+
 /**
  * Recursively traverse a graph of linked data (JSON-LD documents) starting at url
  * and searching for target entities matching type. Traverse only along followList predicates.
@@ -98,7 +100,7 @@ export async function traverseAndFetch(
                     traverseAndFetch(objUrl, targetTypes, {
                       typeToHandlerMap,
                       followList,
-                      blockList: [new URL(resourceDescription['@id']), ...blockList],
+                      blockList: [new URL(url.href), ...blockList],
                       userProvided: false,
                       jumps: jumps - 1,
                     }),

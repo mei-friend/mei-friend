@@ -12,7 +12,6 @@ import {
   nsp
 } from './linked-data.js';
 
-export const politeness=200; // milliseconds between network requests
 
 export const solid = solidClientAuthentication.default;
 
@@ -197,7 +196,8 @@ async function createMAOSelection(selection, label = "") {
  
 async function createMAOExtract(postSelectionResponse, label = "") {
   console.log("createMAOExtract: ", postSelectionResponse);
-  let selectionUri = postSelectionResponse.headers.get("location");
+  let selectionUri = new URL(postSelectionResponse.url).origin +  
+    postSelectionResponse.headers.get("location");
   let resource = structuredClone(resources.maoExtract);
   resource[nsp.FRBR + "embodiment"] = { "@id": selectionUri };
   if(label) { 
