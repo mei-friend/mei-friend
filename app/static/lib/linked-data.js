@@ -72,7 +72,7 @@ export async function traverseAndFetch(
         const targetUrlStrings = targetTypes.map((t) => t.href);
         if (resourceDescription['@type'].filter((t) => targetUrlStrings.includes(t)).length) {
           // found a target resource["@id"]!
-          ingestExternalResource(typeToHandlerMap, resourceDescription);
+          ingestExternalResource(url, typeToHandlerMap, resourceDescription);
         }
         if (jumps >= 0) {
           // attempt to continue traversal
@@ -124,7 +124,7 @@ export async function traverseAndFetch(
  * @param {object} typeToHandlerMap
  * @param {object} resource
  */
-export function ingestExternalResource(typeToHandlerMap, resource) {
+export function ingestExternalResource(url, typeToHandlerMap, resource) {
   try {
     // ensure array
     resource['@type'] = Array.isArray(resource['@type']) ? resource['@type'] : [resource['@type']];
@@ -133,8 +133,8 @@ export function ingestExternalResource(typeToHandlerMap, resource) {
     console.log("ingest external resource: ", mappedTypes, typeToHandlerMap, resource)
     mappedTypes.forEach((t) => {
       'args' in typeToHandlerMap[t] ? 
-        typeToHandlerMap[t].func(resource, ...typeToHandlerMap[t].args) : 
-        typeToHandlerMap[t].func(resource)  
+        typeToHandlerMap[t].func(resource, url, ...typeToHandlerMap[t].args) : 
+        typeToHandlerMap[t].func(resource, url)  
     });
   } catch (e) {
     console.error("Couldn't ingest external resource: ", e);

@@ -108,7 +108,7 @@ export function refreshAnnotationsList() {
         break;
       case 'annotateIdentify':
         summary.insertAdjacentHTML('afterbegin', identify);
-        details.insertAdjacentHTML('afterbegin', `<div id="extracts_${a.id}"></div>`);
+        details.insertAdjacentHTML('afterbegin', `<div class="mao-musMat" id="musMat_${a.id}"></div>`);
         break;
       default:
         console.warn('Unknown type when drawing annotation in list: ', a);
@@ -185,7 +185,7 @@ export function situateAnnotations() {
     // for any identifying annotations, see if there are new extracts associated with the musical material
     if(a.type == "annotateIdentify") { 
       // find it in the list
-      const extractsDiv = document.querySelector('#extracts_'+CSS.escape(a.id));
+      const extractsDiv = document.querySelector('#musMat_'+CSS.escape(a.id));
       console.log("extracts DIV: ", extractsDiv);
       if(extractsDiv && !extractsDiv.innerHTML.length) { 
         // draw "waiting" icon
@@ -792,24 +792,21 @@ async function fetchMAOComponentsForIdentifiedObject(musMatUrl) {
     { 
       typeToHandlerMap: { 
         [nsp.MAO + "MusicalMaterial"]: { 
-          func: drawMusicalMaterialForIdentifiedObject,
-          args: [musMatUrl]
+          func: drawMusicalMaterialForIdentifiedObject
         }, 
         [nsp.MAO + "Extract"]: {
-          func: drawExtractsForIdentifiedObject, 
-          args: [musMatUrl]
+          func: drawExtractsForIdentifiedObject
         }, 
         [nsp.MAO + "Selection"]: { 
-          func: drawSelectionForIdentifiedObject,
-          args: [musMatUrl]
+          func: drawSelectionsForIdentifiedObject
         }
       },
-      followList: [new URL(nsp.FRBR + "embodiment"), new URL(nsp.MAO + "setting"), new URL(nsp.FRBR + "part")],
+      followList: [new URL(nsp.FRBR + "embodiment"), new URL(nsp.MAO + "setting")],
       fetchMethod: solid.getDefaultSession().info.isLoggedIn ? solid.fetch : fetch
     }
   ).catch(e => { 
     log("Couldn't load extracts associated with identified musical object:", e);
-    const loadingIndicator = document.querySelector('#extracts_'+CSS.escape(musMatUrl)+' span');
+    const loadingIndicator = document.querySelector('#musMat_'+CSS.escape(musMatUrl)+' span');
     if(loadingIndicator) { 
       loadingIndicator.classList.remove("clockwise");
     }
@@ -831,31 +828,81 @@ async function fetchExtractsForIdentifiedObject(url) {
     }
   ).catch(e => { 
     log("Couldn't load extracts associated with identified musical object:", e);
-    const loadingIndicator = document.querySelector('#extracts_'+CSS.escape(url)+' span');
+    const loadingIndicator = document.querySelector('#musMat_'+CSS.escape(url)+' span');
     if(loadingIndicator) { 
       loadingIndicator.classList.remove("clockwise");
     }
   })
 }
 
-
-async function drawMusicalMaterialForIdentifiedObject(obj, musMatUrl){
-  console.log("drawMusMatForIdentifiedObject: ", obj, musMatUrl);
-}
-
-async function drawExtractsForIdentifiedObject(obj, musMatUrl) { 
-  console.log("drawExtractsForIdentifiedObject: ", obj, musMatUrl);/*
-  if(`${nsp.MAO}setting` in obj) { 
-    fetchSettingsForIdentifiedObject(obj[`${nsp.MAO}setting`])
-        drawSettingsForIdentifiedObject(extractsDiv);
+/*
+* Draw placeholder for MAO setting into the musMat element corresponding to this url
+* Check first whether this setting is already included. Do not overwrite other settings.
+*/
+async function drawMusicalMaterialForIdentifiedObject(obj, url){
+  console.log("drawMusMatForIdentifiedObject: ", obj, url);
+  const musMat = document.getElementById("musMat_"+url.href);
+  if(musMat) { 
+    if(nsp.MAO+"setting" in obj) {
+      const alreadyIncluded = musMat.querySelectorAll(".mao-extract");
+      const alreadyIncludedUrls = alreadyIncluded.forEach(n => n.id.replace("extract", ""));
+      let extractsToAdd;
+      if(alreadyIncludedUrls) { 
+        extractsToAdd = obj[nsp.MAO+"setting"].filter(s => !alreadyIncludedUrls.includes(s["@id"]));
+      } else {
+        extractsToAdd = obj[nsp.MAO+"setting"];
+      }
+      console.debug("Trying to add extracts... ", extractsToAdd)
+      extractsToAdd.forEach(s => {
+        musMat.insertAdjacentHTML('beforeend', `<div class="mao-extract" id="extract_${s["@id"]}"></div>`);
+      })
+      console.debug("Done with musMat: ", musMat)
+    } else { 
+      console.warn("Can't draw a MusicalMaterial without a setting:", obj)
+    }
   } else { 
-    console.warn("Extract without a setting:", obj, musMatUrl)
-  }*/
+    console.warn("Trying to draw musical material for identified object but have no musMat div to hook it into", obj, url);
+  }
 }
 
-async function drawSelectionForIdentifiedObject(obj, musMatUrl) {
-  console.log("drawSelectionFOrIDentifiedObject: ", obj, musMatUrl);
+async function drawExtractsForIdentifiedObject(obj, url) { 
+  console.log("drawExtractsForIdentifiedObject: ", obj, url);
+  const extract = document.getElementById("extract_"+url.href);
+  if(extract) { 
+    if(nsp.FRBR + "embodiment" in obj) {
+      const alreadyIncluded = extract.querySelectorAll(".mao-selection");
+      const alreadyIncludedUrls = alreadyIncluded.forEach(n => n.id.replace("selection_", ""));
+      let selectionsToAdd;
+      if(alreadyIncludedUrls) { 
+        selectionsToAdd = obj[nsp.FRBR+"embodiment"].filter(s => !alreadyIncludedUrls.includes(s["@id"]));
+      } else { 
+        selectionsToAdd = obj[nsp.FRBR+"embodiment"];
+      }
+      selectionsToAdd.forEach(s => {
+        extract.insertAdjacentHTML('beforeend', `<div class="mao-selection" id="selection_${s["@id"]}"></div>`)
+      });
+    } else { 
+      console.warn("Can't draw an Extract without an embodiment:", obj)
+    }
+  } else { 
+    console.warn("Trying to draw extract for identified object but have no extract div to hook it into", obj, url);
+  }
 }
+
+async function drawSelectionsForIdentifiedObject(obj, url) { 
+  console.log("drawSelectionForIdentifiedObject: ", obj, url);
+  const selection = document.getElementById("selection_"+url.href);
+  if(selection){ 
+    if(nsp.FRBR+"part" in obj) {
+      selection.innerText = "Hooray!" + JSON.stringify(obj[nsp.FRBR+"part"]);
+    } else { 
+      console.warn("Can't draw a selection without parts: ", obj, url);
+    }
+  }else { 
+    console.warn("Trying to draw selection for identified object but have no selection div to hook it into", obj, url);
+  }
+}
+
 
 
 async function writeStandoffIfRequested(a) {
