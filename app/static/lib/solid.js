@@ -9,7 +9,7 @@ import {
 } from './main.js';
 
 import { 
-  nsp
+  nsp, politeness
 } from './linked-data.js';
 
 
@@ -63,6 +63,50 @@ export async function postResource(containerUri, resource) {
     })
   }).catch(e => {
     console.error("Couldn't establish container: ", e, containerUri)
+  })
+}
+
+/**
+ * Safely append to the specified resource:
+ * 1. Get fresh copy of resource from URI, noting its etag
+ * 2. Apply patch to the obtained resource copy
+ * 3. Conditionally PUT specifying if-match on the etag
+ *  - if it matches, do PUT
+ *  - if it doesn't match, GO TO 1
+ * n.b. in the glorious future, this should be done using HTTP PATCH.
+ * but while the implementation of this in Solid is still under discussion, 
+ * we do this instead.
+ */
+export async function safelyPatchResource(uri, patch) {
+  solid.fetch(uri, {
+    headers: { 
+      Accept: 'application/ld+json'
+    }
+  }).then(resp => {
+    let etag = resp.headers.get("ETag");
+    return resp.json();
+  }).then(freshlyFetched => {
+    console.log("Found freshlyFetched resource at URI: ", freshlyFetched, uri);
+    const patched = jsonpatch.applyPatch(freshlyFetched, patch).newDocument;
+    solid.fetch(uri, { 
+      method: 'PUT',   
+      headers: { 
+        "Content-Type": 'application/ld+json',
+        "If-Match": etag, 
+      },
+      body: JSON.stringify(patched)
+    }).then(putResp => { 
+      if(putResp.status === 412) { 
+        console.info("Precondition failed: resource has changed while we were trying to patch it. Retrying...");
+        setTimeout(safelyPatchResource(uri, patch), politeness)
+      } else if(putResp.status >= 400) {
+        throw Error(putResp)
+      } else { 
+        console.log("Patched successfully: ", uri);
+      }
+    }).catch(e => {
+      console.warn("Failed to apply patch to resource: ", uri, patch, e)
+    })
   })
 }
 
