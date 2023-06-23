@@ -57,16 +57,16 @@ export function refreshAnnotationsList() {
     annoListItemButtons.classList.add('annotationListItemButtons');
     const flipToAnno = document.createElement('a');
     flipToAnno.insertAdjacentHTML('afterbegin', symLinkFile); //flipToEncoding;
-    flipToAnno.id = 'flipPageToAnnotationText';
+    flipToAnno.classList.add('flipPageToAnnotationText');
     flipToAnno.title = translator.lang.flipPageToAnnotationText.description;
     flipToAnno.classList.add('icon');
     if (!'selection' in a) flipToAnno.classList.add('disabled');
     const deleteAnno = document.createElement('a');
-    deleteAnno.id = 'deleteAnnotation';
+    deleteAnno.classList.add('deleteAnnotation');
     deleteAnno.insertAdjacentHTML('afterbegin', diffRemoved);
     deleteAnno.title = translator.lang.deleteAnnotation.description;
     const isStandoff = document.createElement('a');
-    isStandoff.id = 'makeStandOffAnnotation';
+    isStandoff.classList.add('makeStandOffAnnotation');
     isStandoff.insertAdjacentHTML('afterbegin', rdf);
     isStandoff.title = translator.lang.makeStandOffAnnotation.description;
     isStandoff.classList.add('icon');
@@ -109,7 +109,7 @@ export function refreshAnnotationsList() {
         break;
       case 'annotateIdentify':
         summary.insertAdjacentHTML('afterbegin', identify);
-        details.insertAdjacentHTML('afterbegin', "<span>MUSIC EXCERPT HERE</span>");
+        details.insertAdjacentHTML('afterbegin', `<div id="excerpts_${a.id}"></div>`);
         break;
       default:
         console.warn('Unknown type when drawing annotation in list: ', a);
@@ -156,7 +156,7 @@ export function generateAnnotationLocationLabel(a) {
       ` (${a.selection.length}&nbsp;${translator.lang.elementsPlural.text})`;
   }
   annotationLocationLabel.classList.add('annotationLocationLabel');
-  annotationLocationLabel.dataset.id = a.id;
+  annotationLocationLabel.dataset.id = "loc-"+a.id;
   return annotationLocationLabel;
 }
 
@@ -183,6 +183,17 @@ export function situateAnnotations() {
         }
       }
     }
+    // for any identifying annotations, see if there are new excerpts associated with the musical material
+    if(a.type == "annotateIdentify") { 
+      // find it in the list
+      const excerptsDiv = document.querySelector('#excerpts_'+CSS.escape(a.id));
+      console.log("EXCERPTS DIV: ", excerptsDiv);
+      if(excerptsDiv && !excerptsDiv.innerHTML.length) { 
+        // draw "waiting" icon
+        excerptsDiv.innerHTML = `<span class="clockwise">${rdf}</span>`;
+        fetchExcerptsForIdentifiedObject(a.id)
+      }
+    }
   });
 } // situateAnnotations()
 
@@ -198,7 +209,16 @@ export function deleteAnnotation(uuid) {
 
 // functions to draw annotations
 
-async function drawIdentify(a) {}
+async function drawIdentify(a) {
+  if('selection' in a) { 
+    const els = a.selection.map((s) => document.getElementById(s));
+    els
+      .filter((e) => e !== null) // (null if not on current page)
+      .forEach((e) => e.classList.add('annotationIdentify'));
+  } else {
+    console.warn('failing to draw identify annotation without selection: ', a);
+  }
+}
 
 function drawHighlight(a) {
   if ('selection' in a) {
@@ -359,7 +379,7 @@ export function addAnnotationHandlers() {
         getSolidStorage().then((solidStorage) => {
           console.log(
             'CREATED MUSICAL MATERIAL: ',
-            solidStorage + maoMusicalMaterial.headers.get('location').substr(1)
+            solidStorage + maoMusicalMaterial.headers.get('location').substr(1), maoMusicalMaterial
           );
           const a = {
             id: solidStorage + maoMusicalMaterial.headers.get('location').substr(1),
@@ -602,7 +622,7 @@ export function loadWebAnnotation(prev = '') {
   }
 }
 
-// Wrapper around traverseAndFetch that reports back errors / progress to 'Loaaad linked data' UI
+// Wrapper around traverseAndFetch that reports back errors / progress to 'Load linked data' UI
 export function attemptFetchExternalResource(url, targetTypes, configObj) { 
   console.log('fetch external resource: ', url, targetTypes, typeToHandlerMap, followList, blockList, jumps);
   // spin the icon to indicate loading activity
@@ -694,25 +714,6 @@ export function fetchWebAnnotations(url, userProvided = true, jumps = 10) {
     });
 }
 
-/**
- * Call (a) predefined handler(s) on the provided resource to ingest it,
- * depending on the resource's type(s). typeToHandlerMap should map type URI strings to callback functions.
- * @param {object} typeToHandlerMap
- * @param {object} resource
- */
-export function ingestExternalResource(typeToHandlerMap, resource) {
-  try {
-    // ensure array
-    resource['@type'] = Array.isArray(resource['@type']) ? resource['@type'] : [resource['@type']];
-    const mappedTypes = Object.keys(typeToHandlerMap).filter((t) => resource['@type'].includes(t));
-    // call each relevant (type-matching) callback on the resource
-    console.log("ingest external resource: ", mappedTypes, typeToHandlerMap, resource)
-    mappedTypes.forEach((t) => typeToHandlerMap[t](resource));
-  } catch (e) {
-    console.error("Couldn't ingest external resource: ", e);
-  }
-}
-
 export function ingestWebAnnotation(webAnno) {
   // terminological note: 'webAnno' => the web annotation, 'anno' => internal mei-friend annotation we are generating
   if (!('http://www.w3.org/ns/oa#hasTarget' in webAnno)) {
@@ -779,6 +780,29 @@ function writeInlineIfRequested(a) {
       a.isInline = true;
     } else console.warn('writeInlineIfRequested: Cannot find beforeThis element for ' + a.id);
   }
+}
+
+async function fetchExcerptsForIdentifiedObject(url) { 
+  traverseAndFetch(
+    new URL(url), 
+    [new URL(nsp.MAO + "MusicalMaterial")],
+    { 
+      typeToHandlerMap: { 
+        [nsp.MAO + "MusicalMaterial"]: drawExcerptsForIdentifiedObject
+      },
+      fetchMethod: solid.getDefaultSession().info.isLoggedIn ? solid.fetch : fetch
+    }
+  ).catch(e => { 
+    log("Couldn't load excerpts associated with identified musical object:", e);
+    const loadingIndicator = document.querySelector('#excerpts_'+CSS.escape(url)+' span');
+    if(loadingIndicator) { 
+      loadingIndicator.classList.remove("clockwise");
+    }
+  })
+}
+
+function drawExcerptsForIdentifiedObject(obj) { 
+  console.log("Got excerpts: ", obj);
 }
 
 async function writeStandoffIfRequested(a) {
