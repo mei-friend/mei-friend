@@ -142,6 +142,7 @@ export function refreshAnnotationsList() {
 }
 
 export function generateAnnotationLocationLabel(a) {
+  console.log("generating anno label for ", a)
   const annotationLocationLabel = document.createElement('span');
   if (a.firstPage === 'meiHead') {
     annotationLocationLabel.innerHTML = `MEI&nbsp;head&nbsp;(${a.selection.length}&nbsp;${translator.lang.elementsPlural.text})`;
@@ -167,8 +168,13 @@ export function situateAnnotations() {
     a.firstPage = 'unsituated';
     a.lastPage = -1;
     if ('selection' in a) {
-      a.firstPage = await v.getPageWithElement(a.selection[0]);
-      a.lastPage = await v.getPageWithElement(a.selection[a.selection.length - 1]);
+      let selectionStart = a.selection[0].indexOf("#") < 0 
+        ? a.selection[0] : a.selection[0].substr(a.selection[0].indexOf("#")+1)
+      let selLen = a.selection.length-1;
+      let selectionEnd = a.selection[selLen].indexOf("#") < 0 
+        ? a.selection[selLen] : a.selection[selLen].substr(a.selection[selLen].indexOf("#")+1)
+      a.firstPage = await v.getPageWithElement(selectionStart);
+      a.lastPage = await v.getPageWithElement(selectionEnd);
       if (a.firstPage < 0 && v.speedMode) {
         if (v.xmlDoc.querySelector('[*|id=' + a.selection[0] + ']')?.closest('meiHead')) a.firstPage = 'meiHead';
         else console.warn('Cannot locate annotation ', a);
@@ -813,6 +819,7 @@ async function fetchMAOComponentsForIdentifiedObject(musMatUrl) {
   })
 }
 
+/*
 async function fetchExtractsForIdentifiedObject(url) { 
   traverseAndFetch(
     new URL(url), 
@@ -834,6 +841,7 @@ async function fetchExtractsForIdentifiedObject(url) {
     }
   })
 }
+*/
 
 /*
 * Draw placeholder for MAO setting into the musMat element corresponding to this url
@@ -894,7 +902,10 @@ async function drawSelectionsForIdentifiedObject(obj, url) {
   const selection = document.getElementById("selection_"+url.href);
   if(selection){ 
     if(nsp.FRBR+"part" in obj) {
-      selection.innerText = "Hooray!" + JSON.stringify(obj[nsp.FRBR+"part"]);
+      const a = {};
+      a.firstPage = await v.getPageWithElement(selection[0].substr(selection[0].indexOf("#")+1));
+      a.lastPage = await v.getPageWithElement(selection[selection.length-1].substr(selection[selection.length-1].indexOf("#")+1));
+      selection.innerText = `Selection with ${obj[nsp.FRBR+"part"].length} elements`;
     } else { 
       console.warn("Can't draw a selection without parts: ", obj, url);
     }
