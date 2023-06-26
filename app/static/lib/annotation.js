@@ -144,16 +144,23 @@ export function refreshAnnotationsList() {
 export function generateAnnotationLocationLabel(a) {
   console.log("generating anno label for ", a)
   const annotationLocationLabel = document.createElement('span');
-  if (a.firstPage === 'meiHead') {
-    annotationLocationLabel.innerHTML = `MEI&nbsp;head&nbsp;(${a.selection.length}&nbsp;${translator.lang.elementsPlural.text})`;
-  } else if (a.firstPage === 'unsituated' || a.firstPage < 0) {
-    annotationLocationLabel.innerHTML = 'Unsituated';
-  } else {
-    annotationLocationLabel.innerHTML =
-      translator.lang.pageAbbreviation.text +
-      '&nbsp;' +
-      (a.firstPage === a.lastPage ? a.firstPage : a.firstPage + '&ndash;' + a.lastPage) +
-      ` (${a.selection.length}&nbsp;${translator.lang.elementsPlural.text})`;
+  if(a.type === "annotateIdentify") { 
+    // special case: identified MAO objects
+    // just add a placeholder for a label and exit
+    // (since multiple selections may be situated at different locations, we deal with them elsewhere)
+    annotationLocationLabel.innerHTML = '<span class="label"></span>';
+  } else { 
+    if (a.firstPage === 'meiHead') {
+      annotationLocationLabel.innerHTML = `MEI&nbsp;head&nbsp;(${a.selection.length}&nbsp;${translator.lang.elementsPlural.text})`;
+    } else if (a.firstPage === 'unsituated' || a.firstPage < 0) {
+      annotationLocationLabel.innerHTML = 'Unsituated';
+    } else {
+      annotationLocationLabel.innerHTML =
+        translator.lang.pageAbbreviation.text +
+        '&nbsp;' +
+        (a.firstPage === a.lastPage ? a.firstPage : a.firstPage + '&ndash;' + a.lastPage) +
+        ` (${a.selection.length}&nbsp;${translator.lang.elementsPlural.text})`;
+    }
   }
   annotationLocationLabel.classList.add('annotationLocationLabel');
   annotationLocationLabel.dataset.id = "loc-"+a.id;
@@ -191,11 +198,12 @@ export function situateAnnotations() {
     // for any identifying annotations, see if there are new extracts associated with the musical material
     if(a.type == "annotateIdentify") { 
       // find it in the list
-      const extractsDiv = document.querySelector('#musMat_'+CSS.escape(a.id));
-      console.log("extracts DIV: ", extractsDiv);
-      if(extractsDiv && !extractsDiv.innerHTML.length) { 
-        // draw "waiting" icon
-        extractsDiv.innerHTML = `<span class="clockwise">${rdf}</span>`;
+      const musMatDiv = document.querySelector('#musMat_'+CSS.escape(a.id));
+      console.log("extracts DIV: ", musMatDiv);
+      if(musMatDiv && !musMatDiv.innerHTML.length) { 
+        // draw "waiting" icon 
+        musMatDiv.innerHTML = `<span class="rdfLoadingIndicator">${rdf}</span>`;
+        musMatDiv.getElementsByTagName("svg")[0].classList.add("clockwise");
         fetchMAOComponentsForIdentifiedObject(a.id);
       }
     }
@@ -377,9 +385,10 @@ export function addAnnotationHandlers() {
 
   // functions to create annotations
   const createIdentify = (e) => {
+    const label = window.prompt("Add label for identified object (optional)");
     const selection = v.selectedElements;
     document.getElementById('solid_logo').classList.add('clockwise');
-    createMAOMusicalObject(selection)
+    createMAOMusicalObject(selection, label)
       .then((maoMusicalMaterial) => {
         getSolidStorage().then((solidStorage) => {
           console.log(
@@ -851,6 +860,15 @@ async function drawMusicalMaterialForIdentifiedObject(obj, url){
   console.log("drawMusMatForIdentifiedObject: ", obj, url);
   const musMat = document.getElementById("musMat_"+url.href);
   if(musMat) { 
+    // if we have a label and haven't drawn one already...
+    const myListItem = musMat.closest(".annotationListItem");
+    const myLabel = myListItem.querySelector(".annotationLocationLabel")
+    console.log("LABEL: ", obj, myLabel)
+    if(nsp.RDFS+"label" in obj && !myLabel.innerText.length) { 
+      const label = Array.isArray(obj[nsp.RDFS+"label"]) ? 
+        obj[nsp.RDFS+"label"] : [obj[RDFS+"label"]];
+      myLabel.innerText = label[0]["@value"]; // TODO support multiple labels?
+    }
     if(nsp.MAO+"setting" in obj) {
       const alreadyIncluded = musMat.querySelectorAll(".mao-extract");
       const alreadyIncludedUrls = alreadyIncluded.forEach(n => n.id.replace("extract", ""));
@@ -902,12 +920,26 @@ async function drawSelectionsForIdentifiedObject(obj, url) {
   const selection = document.getElementById("selection_"+url.href);
   if(selection){ 
     if(nsp.FRBR+"part" in obj) {
-      const a = {};
-      a.firstPage = await v.getPageWithElement(selection[0].substr(selection[0].indexOf("#")+1));
-      a.lastPage = await v.getPageWithElement(selection[selection.length-1].substr(selection[selection.length-1].indexOf("#")+1));
-      selection.innerText = `Selection with ${obj[nsp.FRBR+"part"].length} elements`;
+      try { 
+        const a = {};
+        a.selection = obj[nsp.FRBR+"part"].map(
+          s => s["@id"].substr(s["@id"].lastIndexOf("#")+1)
+        )
+        a.firstPage = await v.getPageWithElement(a.selection[0]);
+        a.lastPage = await v.getPageWithElement(a.selection[a.selection.length-1]);
+        selection.innerText = generateAnnotationLocationLabel(a).innerText;
+      }
+      catch(e) { 
+        console.warn("Couldn't situate FRBR:parts of selection: ", e);
+      }
     } else { 
       console.warn("Can't draw a selection without parts: ", obj, url);
+    }
+    const myMusMat = selection.closest(".mao-musMat");
+    if(myMusMat) { 
+      const myLoadingIndicator = myMusMat.querySelector(".rdfLoadingIndicator svg");
+      if(myLoadingIndicator)
+        myLoadingIndicator.classList.remove("clockwise");
     }
   }else { 
     console.warn("Trying to draw selection for identified object but have no selection div to hook it into", obj, url);

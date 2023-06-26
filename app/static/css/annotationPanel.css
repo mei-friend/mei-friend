@@ -122,3 +122,17 @@ summary.noDetails {
   height: 1em;
 }
 
+.mao-selection { 
+  padding:2px;
+  padding-left:5px;
+}
+
+.mao-extract {
+  padding:2px;
+}
+
+.mao-musMat { 
+  background-color: var(--annotationPanelLinkBackgroundColor); 
+  padding: 2px;
+  border-radius:10px;
+}
