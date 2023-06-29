@@ -526,10 +526,9 @@ export async function fillInBranchContents(e) {
 } // fillInBranchContents()
 
 function handleWorkflowsListReceived(resp) { 
-  console.log("Repository has workflows list: ", resp)
   const actionsDivider = document.getElementById("actionsDividerStart");
-  if(actionsDivider && 'workflows' in resp) { 
-    resp.workflows.forEach((wf) => {
+  if(actionsDivider) { 
+    resp.forEach((wf) => {
       if(wf.state === "active") {
         let workflowSpan = document.createElement("span");
         workflowSpan.id = "gha_" + wf.id;
@@ -550,7 +549,7 @@ function handleWorkflowsListReceived(resp) {
         console.warn("Skipping inactive GitHub Actions workflow: ", wf);
       }
     });
-    if(resp.workflows.length) { 
+    if(resp.length) { 
       // add lower dividing line below final action
       let firstBranchContents = document.querySelector(".branchContents");
       if(firstBranchContents) {
@@ -561,7 +560,6 @@ function handleWorkflowsListReceived(resp) {
       }
     }
   }
-  console.log("Received actions list response: ", resp);
   // show or hide GitHub actions depending on user preference
   v.setGithubActionsDisplay();
 }
