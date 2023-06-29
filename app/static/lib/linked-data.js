@@ -9,6 +9,7 @@ export const nsp = {
   PIM: 'http://www.w3.org/ns/pim/space#',
   RDF: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
   RDFS: 'http://www.w3.org/2000/01/rdf-schema#',
+  SCHEMA: 'https://schema.org/'
 };
 
 export const politeness=200; // milliseconds between network requests
@@ -68,7 +69,6 @@ export async function traverseAndFetch(
           // ensure array
           resourceDescription['@type'] = [resourceDescription['@type']];
         }
-        console.log("TARGET TYPES: ", targetTypes);
         const targetUrlStrings = targetTypes.map((t) => t.href);
         if (resourceDescription['@type'].filter((t) => targetUrlStrings.includes(t)).length) {
           // found a target resource["@id"]!

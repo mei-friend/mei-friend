@@ -22,6 +22,7 @@ export const musicalObjectContainer = friendContainer + "mao/";
 export const selectionContainer = musicalObjectContainer + "selection/";
 export const extractContainer = musicalObjectContainer + "extract/";
 export const musicalMaterialContainer = musicalObjectContainer + "musicalMaterial/";
+export const discoveryFragment = "discovery/";
 
 // resource templates
 export const resources = {
@@ -38,6 +39,25 @@ export const resources = {
     "@type": [nsp.MAO + "MusicalMaterial"]
   }
 
+}
+
+export function getCurrentFileUri() { 
+  let fileUri;
+  switch(fileLocationType) { 
+    case 'file':
+      fileUri = "https://localhost" + meiFileName; // or should we just not allow local files at all?
+      break;
+    case 'url':
+      fileUri = meiFileLocation;
+      break;
+    case 'github':
+      fileUri = github.rawGithubUri;
+      break;
+    default: 
+      fileUri = meiFileLocation;
+      console.error("Unexpected fileLocationType: ", fileLocationType);
+  }
+  return fileUri;
 }
 
 export async function postResource(containerUri, resource) { 
@@ -78,16 +98,19 @@ export async function postResource(containerUri, resource) {
  * we do this instead.
  */
 export async function safelyPatchResource(uri, patch) {
+  let etag;
   solid.fetch(uri, {
     headers: { 
       Accept: 'application/ld+json'
     }
   }).then(resp => {
-    let etag = resp.headers.get("ETag");
+    etag = resp.headers.get("ETag");
     return resp.json();
   }).then(freshlyFetched => {
     console.log("Found freshlyFetched resource at URI: ", freshlyFetched, uri);
+    console.log("Applied patch: ", patch)
     const patched = jsonpatch.applyPatch(freshlyFetched, patch).newDocument;
+    console.log("applied patch!", patch, patched);
     solid.fetch(uri, { 
       method: 'PUT',   
       headers: { 
@@ -104,7 +127,7 @@ export async function safelyPatchResource(uri, patch) {
       } else { 
         console.log("Patched successfully: ", uri);
       }
-    }).catch(e => {
+    }).catch((e) => {
       console.warn("Failed to apply patch to resource: ", uri, patch, e)
     })
   })
@@ -195,11 +218,67 @@ export async function createMAOMusicalObject(selectedElements, label = "") {
   // https://dl.acm.org/doi/10.1145/3543882.3543891
   // For the purposes of mei-friend, we want to build a composite structure encompassing MusicalMaterial, 
   // Extract, and Selection (see paper)
-  return establishContainerResource(friendContainer).then(async () => { 
-    return establishContainerResource(musicalObjectContainer).then(async (musicalObjectContainer) => { 
-      return createMAOSelection(selectedElements, label).then(async selectionResource => { 
-        return createMAOExtract(selectionResource, label).then(async extractResource => { 
-          return createMAOMusicalMaterial(extractResource, label)
+  let currentFileUri = getCurrentFileUri();
+  return establishContainerResource(friendContainer).then(async (storageResource) => { 
+    // first, establish discovery resource for the current MEI file
+    let currentFileUriHash = encodeURIComponent(currentFileUri);
+    let discoveryUri = storageResource + discoveryFragment + currentFileUriHash;
+    console.log("Have current file and discovery URI", currentFileUri, discoveryUri)
+    return establishContainerResource(storageResource + discoveryFragment).then(async() => {
+      console.log("1: ", discoveryUri)
+      return establishContainerResource(musicalObjectContainer).then(async (musicalObjectContainer) => { 
+        console.log("2: ", discoveryUri)
+        return createMAOSelection(selectedElements, currentFileUri, discoveryUri, label).then(async selectionResource => { 
+            console.log("3: ", discoveryUri)
+          return createMAOExtract(selectionResource, currentFileUri, discoveryUri, label, ).then(async extractResource => { 
+            return createMAOMusicalMaterial(extractResource, currentFileUri, discoveryUri, label ).then( async musMatResource => {
+              // establish a discovery resource (if it doesn't already exist)
+              return establishResource(discoveryUri, {
+                "@type": nsp.SCHEMA+"ItemList",
+                [nsp.SCHEMA+"description"]: "List of resources about " + currentFileUri,
+                [nsp.SCHEMA+"itemListOrder"]: nsp.SCHEMA+"itemListUnordered",
+                [nsp.SCHEMA+"about"]: { "@id": currentFileUri },
+                [nsp.SCHEMA+"itemListElement"]: []
+              }).then(async() => { 
+                // patch the now-established discovery resource with our new MAO objects
+                return safelyPatchResource(discoveryUri, [
+                  {
+                    op: "add",
+                    // escape ~ and / characters according to JSON POINTER spec
+                    // use '-' at end of path specification to indicate new array item to be created
+                    path: `/${nsp.SCHEMA.replaceAll("~", "~0").replaceAll("/", "~1")}itemListElement/-`,
+                    value: {
+                      "@type": `${nsp.SCHEMA}listItem`,
+                      [`${nsp.SCHEMA}additionalType`]: { "@id":`${nsp.MAO}MusicalMaterial` },
+                      [`${nsp.SCHEMA}url`]: { "@id": new URL(storageResource).origin + musMatResource.headers.get("Location") }
+                    }
+                  },
+                  {
+                    op: "add",
+                    // escape ~ and / characters according to JSON POINTER spec
+                    // use '-' at end of path specification to indicate new array item to be created
+                    path: `/${nsp.SCHEMA.replaceAll("~", "~0").replaceAll("/", "~1")}itemListElement/-`,
+                    value: {
+                      "@type": `${nsp.SCHEMA}listItem`,
+                      [`${nsp.SCHEMA}additionalType`]: { "@id":`${nsp.MAO}Extract`},
+                      [`${nsp.SCHEMA}url`]: { "@id": storageResource + extractResource.headers.get("Location") }
+                    }
+                  },
+                  {
+                    op: "add",
+                    // escape ~ and / characters according to JSON POINTER spec
+                    // use '-' at end of path specification to indicate new array item to be created
+                    path: `/${nsp.SCHEMA.replaceAll("~", "~0").replaceAll("/", "~1")}itemListElement/-`,
+                    value: {
+                      "@type": `${nsp.SCHEMA}listItem`,
+                      [`${nsp.SCHEMA}additionalType`]: { "@id": `${nsp.MAO}Selection` },
+                      [`${nsp.SCHEMA}url`]: { "@id": storageResource + selectionResource.headers.get("Location") }
+                    }
+                  },
+                ]).then(() => { return musMatResource }) // finally, return the musMat resource to the UI
+              })
+            })
+          })
         })
       })
     })
@@ -207,24 +286,11 @@ export async function createMAOMusicalObject(selectedElements, label = "") {
   .catch(e => { console.error("Failed to create nsp.MAO Musical Object:", e) })
 }
 
-async function createMAOSelection(selection, label = "") {
+async function createMAOSelection(selection, aboutUri, discoveryUri, label = "") {
   // private function -- called *after* friendContainer and musicalObjectContainer already established
+  console.log("createMAOSelection: ", selection, aboutUri, discoveryUri, label);
   let resource = structuredClone(resources.maoSelection);
-  let baseFileUri;
-  switch(fileLocationType) { 
-    case 'file':
-      baseFileUri = "https://localhost" + meiFileName; // or should we just not allow local files at all?
-      break;
-    case 'url':
-      baseFileUri = meiFileLocation;
-      break;
-    case 'github':
-      baseFileUri = github.rawGithubUri;
-      break;
-    default: 
-      baseFileUri = meiFileLocation;
-      console.error("Unexpected fileLocationType: ", fileLocationType);
-  }
+  let baseFileUri = getCurrentFileUri();
   resource[nsp.FRBR + "part"] = selection.map(s => { 
     return {
       "@id": `${baseFileUri}#${s}` 
@@ -233,13 +299,20 @@ async function createMAOSelection(selection, label = "") {
   if(label) { 
     resource[nsp.RDFS + "label"] = label;
   }
+  // resource(s) this MAO object is about
+  aboutUri = Array.isArray(aboutUri) ? aboutUri : [aboutUri];
+  resource[nsp.SCHEMA + "about"] = aboutUri.map(uri => { return { "@id": uri} })
+  // itemList resource(s) in our discoveryContainer that point to this MAO object
+  discoveryUri = Array.isArray(discoveryUri) ? discoveryUri : [discoveryUri];
+  resource[nsp.SCHEMA + "subjectOf"] = discoveryUri.map(uri => { return { "@id": uri} })
+
   let response = await postResource(selectionContainer, resource);
   console.log("GOT RESPONSE: ", response);
   return response;
 }
  
-async function createMAOExtract(postSelectionResponse, label = "") {
-  console.log("createMAOExtract: ", postSelectionResponse);
+async function createMAOExtract(postSelectionResponse, aboutUri, discoveryUri, label = "") {
+  console.log("createMAOExtract: ", postSelectionResponse, aboutUri, discoveryUri, label);
   let selectionUri = new URL(postSelectionResponse.url).origin +  
     postSelectionResponse.headers.get("location");
   let resource = structuredClone(resources.maoExtract);
@@ -247,11 +320,17 @@ async function createMAOExtract(postSelectionResponse, label = "") {
   if(label) { 
     resource[nsp.RDFS + "label"] = label;
   }
+  // resource(s) this MAO object is about
+  aboutUri = Array.isArray(aboutUri) ? aboutUri : [aboutUri];
+  resource[nsp.SCHEMA + "about"] = aboutUri.map(uri => { return { "@id": uri} })
+  // itemList resource(s) in our discoveryContainer that point to this MAO object
+  discoveryUri = Array.isArray(discoveryUri) ? discoveryUri : [discoveryUri];
+  resource[nsp.SCHEMA + "subjectOf"] = discoveryUri.map(uri => { return { "@id": uri} })
   return postResource(extractContainer, resource);
 }
 
-async function createMAOMusicalMaterial(postExtractResponse, label = "") {
-  console.log("createMAOMusicalMaterial: ", postExtractResponse);
+async function createMAOMusicalMaterial(postExtractResponse, aboutUri, discoveryUri, label = "") {
+  console.log("createMAOMusicalMaterial: ", postExtractResponse, aboutUri, discoveryUri, label);
   let extractUri = new URL(postExtractResponse.url).origin + 
     postExtractResponse.headers.get("location");
   let resource = structuredClone(resources.maoMusicalMaterial);
@@ -259,6 +338,12 @@ async function createMAOMusicalMaterial(postExtractResponse, label = "") {
   if(label) { 
     resource[nsp.RDFS + "label"] = label;
   }
+  // resource(s) this MAO object is about
+  aboutUri = Array.isArray(aboutUri) ? aboutUri : [aboutUri];
+  resource[nsp.SCHEMA + "about"] = aboutUri.map(uri => { return { "@id": uri} })
+  // itemList resource(s) in our discoveryContainer that point to this MAO object
+  discoveryUri = Array.isArray(discoveryUri) ? discoveryUri : [discoveryUri];
+  resource[nsp.SCHEMA + "subjectOf"] = discoveryUri.map(uri => { return { "@id": uri} })
   return postResource(musicalMaterialContainer, resource);
 }
 
