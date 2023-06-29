@@ -25,7 +25,7 @@ const ghActionsInputSetters = [
     id: "githubActionsInputSetterFilepath",
     icon: icon.fileCode,
     func: () => {
-      return github.filepath;
+      return github.filepath.substr(1);
     }
   },
   {

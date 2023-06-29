@@ -492,6 +492,10 @@ export default class Github {
       method: 'GET', 
       headers: this.actionsHeaders,
     }).then((res => res.json()))
+    .then(data => {
+      console.log("GOT ACTUIONS WORKFLOWS: ", data);
+      return data;
+    })
   }
 
   async requestActionWorkflowRun(workflowId, inputs = {}) { 
