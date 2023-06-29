@@ -492,6 +492,19 @@ export default class Github {
       method: 'GET', 
       headers: this.actionsHeaders,
     }).then((res => res.json()))
+    .then(async data => {
+      let list = null;
+      // (longwinded) way to only show dispatch workflows
+      if("workflows" in data) { 
+        console.log("got data: ", data)
+        let promises = data.workflows.map(w => this.getWorkflow(w.path));
+        let fulfilled = await Promise.all(promises);
+        let filtered = fulfilled.filter(w => "on" in w && "workflow_dispatch" in w.on );
+        let pathsToKeep = filtered.map(f => f.path);
+        list = data.workflows.filter(d => pathsToKeep.includes(d.path))
+      }
+      return list;
+    })
   }
 
   async requestActionWorkflowRun(workflowId, inputs = {}) { 
@@ -595,6 +608,24 @@ export default class Github {
             return asJson.on.workflow_dispatch.inputs;
           } else return null;
         });
+    }
+
+    // TODO refactor so that this information is stored on getActionWorkflowsList
+    // to avoid extra fetch with getWorkflowInputs when workflow is clicked
+    async getWorkflow(wfPath) { 
+      // rewrite to raw github URL
+      const rawUrl = "https://raw.githubusercontent.com/" + this.githubRepo + "/" + this.branch + "/" + wfPath;
+      return this.directlyReadFileContents(rawUrl, { 
+        method: 'GET',
+        headers: this.apiHeaders
+      }).then((yaml) => {
+          const asJson = jsyaml.load(yaml);
+          asJson.path = wfPath;
+          if(env === environments.develop) {
+            console.debug("Obtained workflow description: ", asJson, wfPath);
+          }
+          return asJson;
+        })
     }
 }
 
