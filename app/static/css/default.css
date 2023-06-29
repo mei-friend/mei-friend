@@ -205,6 +205,10 @@ a:active {
   color: var(--textColor);
 }
 
+.githubActionsInputSetter { 
+  cursor: pointer;
+}
+
 .githubActionsInputSetter svg {
   fill: var(--textColor);
 }
