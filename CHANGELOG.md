@@ -2,9 +2,9 @@
 
 
 ### 0.9.0 GitHub Actions integration
-* Configurably display any GitHub Actions available in the current repository / branch
+* Configurably display any GitHub Actions (dispatch workflows) available in the current repository / branch
 * List any configured inputs and set values from UI with shortcuts for 'current filepath' and 'current selection'
-* Launch Actions workflows from within mei-friend
+* Launch Actions (dispatch) workflows from within mei-friend
 * Display workflow results (success / failure), with link to detailed GitHub page
 * On success, reload encoding to update with Actions-modified version
 
