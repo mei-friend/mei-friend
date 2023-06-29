@@ -196,12 +196,17 @@ a:active {
   align-items: end;
   background-color:var(--navbarBackgroundColor);
   border-radius:1em;
-  width:fit-content;
+  width:90%;
   padding:.5em;
+  margin-bottom:.5em;
 }
 
 .githubActionsInputConfig span { 
   color: var(--textColor);
+}
+
+.githubActionsInputSetter { 
+  cursor: pointer;
 }
 
 .githubActionsInputSetter svg {
