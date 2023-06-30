@@ -12,6 +12,7 @@
 * Surround selection in editor with tags (`CTRL-E` or `CMD-E`): opens a user interface to enter tag name
 * `CTRL-/` or `CMD-/` surrounds selection in editor with previously selected tag name
 * When editing a tag name in editor (both starting or ending tag), matching tag will be modified accordingly
+* Link to new documentation pages at https://mei-friend.github.io from help menu
 
 ### 0.8.10 Internationalization
 * Multi-language support with separate language pack files per language
@@ -20,7 +21,6 @@
 * Automatic test to check for key identity and completeness of language packs
 * Remove transposeTosoundingPitch default flag for Verovio
 * Fix #21 spanning elements with mixed `@startid/@endid` and `@tstamp/@tstamp2` attributes
-* Keyboard shortcut to enclose selection in editor with tag name, chosen in context menu
 
 ### 0.8.9 patch
 * Fix bug when notation zooming resulted in missing notation when MIDI manu bar is activated
