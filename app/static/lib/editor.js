@@ -2,13 +2,13 @@
  * Provides all the editor functions
  */
 
+import * as att from './attribute-classes.js';
+import * as dutils from './dom-utils.js';
 import * as speed from './speed.js';
 import * as utils from './utils.js';
-import * as dutils from './dom-utils.js';
-import * as att from './attribute-classes.js';
 import { loadFacsimile } from './facsimile.js';
+import { handleEditorChanges, translator, version, versionDate } from './main.js';
 import Viewer from './viewer.js';
-import { handleEditorChanges, platform, version, versionDate } from './main.js';
 
 /**
  * Smart indents selected region in editor, if none, do all
@@ -208,12 +208,12 @@ export function addControlElement(v, cm, elName, placement, form) {
   // elements with both startid and endid
   if (['slur', 'tie', 'phrase', 'hairpin', 'gliss'].includes(elName)) {
     // stop, if selected elements are on the same beat position and through warning.
-    if (m === 0 && tstamp2 === tstamp) {
-      let msg = 'Cannot insert ' + elName;
-      msg += ', because ' + startId + ' and ' + endId + ' are on the same beat position ' + tstamp + '.';
+    if (m === 0 && tstamp2 === tstamp && !startEl.hasAttribute('grace') && !endEl.hasAttribute('grace')) {
+      let msg = useTstamps ? 'Cannot insert ' : 'Attention with ' + elName + ' (' + uuid + '): ';
+      msg += startId + ' and ' + endId + ' are on the same beat position ' + tstamp + '.';
       console.log(msg);
       v.showAlert(msg, 'warning');
-      return;
+      if (useTstamps) return;
     }
     if (useTstamps) {
       newElement.setAttribute('tstamp', tstamp);
@@ -591,8 +591,8 @@ export function shiftPitch(v, cm, deltaPitch = 0) {
 
 /**
  * In/decrease duration of selected element (ignore, when no duration)
- * @param {Viewer} v 
- * @param {CodeMirror} cm 
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
  * @param {string} what ('increase', 'decrease')
  */
 export function modifyDuration(v, cm, what = 'increase') {
@@ -1333,6 +1333,190 @@ export function addFacsimile(v, cm) {
   console.log('Editor: new facsimile added', facsimile);
   v.allowCursorActivity = true;
 } // addFacsimile()
+
+/**
+ * Encloses/surrounds selected text in CodeMirror with the given XML tag name.
+ * If tag name is not surrounded with left/right angle brackets, they will be added.
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
+ * @param {string} tagString
+ */
+export function encloseSelectionWithTag(v, cm, tagString = '') {
+  // remove brackets from beginning and end
+  tagString = tagString.trim();
+  if (tagString.startsWith('<')) tagString = tagString.substring(1);
+  if (tagString.endsWith('>')) tagString = tagString.slice(0, -1);
+  cm.listSelections().forEach((selection) => {
+    let selectionText;
+    if (selection.anchor.line > selection.head.line || selection.anchor.ch > selection.head.ch) {
+      selectionText = cm.getRange(selection.head, selection.anchor);
+    } else {
+      selectionText = cm.getRange(selection.anchor, selection.head);
+    }
+    if (selection.anchor.line === selection.head.line && selection.anchor.ch === selection.head.ch) {
+      // get complete tag, if only a cursor is selected
+      let match = CodeMirror.findMatchingTag(cm, cm.getCursor());
+      if (match) {
+        let end = match.close ? match.close.to : match.open.to;
+        cm.extendSelection(match.open.from, end);
+        selectionText = cm.getRange(match.open.from, end);
+      }
+    }
+    let newEncoding = '<' + tagString + '>';
+    if (selectionText.includes(cm.lineSeparator())) newEncoding += cm.lineSeparator();
+    newEncoding += selectionText;
+    if (selectionText.includes(cm.lineSeparator())) newEncoding += cm.lineSeparator();
+    newEncoding += '</' + tagString + '>';
+    cm.replaceSelection(newEncoding, 'around');
+    indentSelection(v, cm);
+  });
+} // encloseSelectionWithTag()
+
+/**
+ * Creates and adds context menu to enclose selection with a tag,
+ * the name of which is determined through that menu
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
+ * @param {Element} node
+ * @returns
+ */
+export function showTagEncloserMenu(v, cm, node = null) {
+  let input;
+  if (!node) {
+    // create menu, if not yet there
+    node = document.createElement('div');
+    node.id = 'tagEncloserMenu';
+    let span = document.createElement('span');
+    span.id = 'selectTagNameForEnclosure';
+    span.textContent = translator.lang.selectTagNameForEnclosure.text;
+    input = document.createElement('input');
+    input.setAttribute('autofocus', true);
+    input.setAttribute('isContentEditable', true);
+    let div = document.createElement('div');
+    let cancelButton = document.createElement('input');
+    cancelButton.setAttribute('type', 'button');
+    cancelButton.classList.add('btn');
+    cancelButton.classList.add('narrowButton');
+    cancelButton.value = translator.lang.selectTagNameForEnclosureCancelButton.value;
+    cancelButton.id = 'selectTagNameForEnclosureCancelButton';
+    cancelButton.addEventListener('click', (ev) => {
+      node?.parentElement?.removeChild(node);
+      cm.focus();
+    });
+    let okButton = document.createElement('input');
+    okButton.setAttribute('type', 'button');
+    okButton.classList.add('btn');
+    okButton.classList.add('narrowButton');
+    okButton.value = translator.lang.selectTagNameForEnclosureOkButton.value;
+    okButton.id = 'selectTagNameForEnclosureOkButton';
+    okButton.addEventListener('click', (ev) => {
+      this.encloseSelectionWithTag(v, cm, input.value);
+      node?.parentElement?.removeChild(node);
+      cm.focus();
+    });
+    node.appendChild(span);
+    node.appendChild(input);
+    div.appendChild(cancelButton);
+    div.appendChild(okButton);
+    node.appendChild(div);
+  }
+  cm.addWidget(cm.getCursor(), node, true);
+  node.querySelector('input')?.focus();
+  node.querySelector('input')?.select();
+
+  if (input) {
+    // add listener only first time
+    input.addEventListener('keyup', (event) => {
+      let tagString = event.target.value;
+      let validName = utils.isValidElementName(tagString);
+      let okButton = document.getElementById('selectTagNameForEnclosureOkButton');
+      if (validName) {
+        input.classList.remove('error');
+        okButton.disabled = false;
+        okButton.classList.remove('disabled');
+      } else {
+        input.classList.add('error');
+        okButton.disabled = true;
+        okButton.classList.add('disabled');
+      }
+      if (event.key === 'Enter' && validName) {
+        event.preventDefault();
+        this.encloseSelectionWithTag(v, cm, tagString);
+        document.getElementById('surroundWithLastTagName').innerHTML = tagString;
+        node?.parentElement?.removeChild(node);
+        cm.focus();
+      } else if (event.key === 'Escape') {
+        node?.parentElement?.removeChild(node);
+        cm.focus();
+      }
+    });
+  }
+  return node;
+} // showTagEncloserMenu()
+
+let previousMatch; // match object retrieved from CodeMirror.findMatchingTag (with open/close keys, if present)
+
+/**
+ * Updates variable previousMatch to remember any xml tag matching at cursor position
+ * (called by beforeChange event emitted by CodeMirror)
+ * @param {CodeMirror} cm
+ */
+export function updateMatch(cm) {
+  previousMatch = CodeMirror.findMatchingTag(cm, cm.getCursor());
+} // updateMatch()
+
+/**
+ * Updates matching tag name, if edit is within a tag name
+ * @param {CodeMirror} cm
+ */
+export function updateMatchingTagName(cm, changeObj) {
+  let cursor = cm.getCursor();
+  let match = CodeMirror.findMatchingTag(cm, cursor);
+  // console.debug('XXXXXX updateMatchingTagName(): changeObj: ', changeObj);
+  // console.debug('XXXXXX updateMatchingTagName(): cursor: ', cursor);
+  // console.debug('XXXXXX previousMatch: ', previousMatch);
+  if (!match || !previousMatch) return;
+  if (
+    match.close &&
+    match.close.from.ch < cursor.ch &&
+    match.close.to.ch > cursor.ch &&
+    match.close.from.line === cursor.line
+  ) {
+    // if within the ending tag
+    // console.debug('XXXXXX within ending tag: ', match);
+    if (utils.isValidElementName(match.close.tag) && previousMatch.open) {
+      cm.blockChanges = true;
+      cm.replaceRange('<' + match.close.tag, previousMatch.open.from, {
+        ch: previousMatch.open.from.ch + previousMatch.open.tag.length + 1,
+        line: previousMatch.open.from.line,
+      });
+      cm.blockChanges = false;
+    }
+  } else if (
+    match.open &&
+    match.open.from.ch < cursor.ch &&
+    match.open.from.ch + match.open.tag.length + 1 >= cursor.ch &&
+    match.open.from.line === cursor.line &&
+    previousMatch &&
+    previousMatch.open.from.line === cursor.line
+  ) {
+    // if within opening tag
+    // console.debug('XXXXXX within opening tag: ', match);
+    if (utils.isValidElementName(match.open.tag) && previousMatch.close) {
+      let from = previousMatch.close.from;
+      let to = previousMatch.close.to;
+      // if in same line, correct x shift
+      if (previousMatch.close.from.line === match.open.from.line) {
+        let xShift = changeObj[0]?.text[0]?.length - changeObj[0]?.removed[0]?.length;
+        from.ch += xShift;
+        to.ch += xShift;
+      }
+      cm.blockChanges = true;
+      cm.replaceRange('</' + match.open.tag + '>', from, to);
+      cm.blockChanges = false;
+    }
+  }
+} // updateMatchingTagName()
 
 /**
  * Finds xmlNode in textBuffer and removes it (including empty line)

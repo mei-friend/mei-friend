@@ -138,7 +138,7 @@ a:active {
   fill: var(--textColor);
 }
 
-#facsimile-close-button {
+#facsimileCloseButton {
   fill: var(--dropdownBorderColor)
 }
 
@@ -172,7 +172,7 @@ a:active {
   -ms-transform: translate(-50%, -50%);
 }
 
-.openUrlOverlay {
+.openUrlOverlay, #githubActionsOverlay {
   position: fixed;
   display: none;
   top: 0;
@@ -183,13 +183,49 @@ a:active {
   z-index: 190;
 }
 
+#githubActionsUI { 
+  display:flex;
+  flex-direction:column;
+  padding: 1em;
+  height: fit-content !important;
+}
+
+.githubActionsInputConfig { 
+  display:flex;
+  flex-direction:row;
+  align-items: end;
+  background-color:var(--navbarBackgroundColor);
+  border-radius:1em;
+  width:90%;
+  padding:.5em;
+  margin-bottom:.5em;
+}
+
+.githubActionsInputConfig span { 
+  color: var(--textColor);
+}
+
+.githubActionsInputSetter { 
+  cursor: pointer;
+}
+
+.githubActionsInputSetter svg {
+  fill: var(--textColor);
+}
+
+.githubActionsInputConfig div { 
+  padding-left: .5em;
+  padding-right:.5em;
+}
+
 .openUrlOverlay a,
 .forkRepositoryOverlay a {
   color: var(--overlayLinkColor);
 }
 
 .openUrlOverlay .openUrlUI,
-.forkRepositoryOverlay .forkRepositoryUI {
+.forkRepositoryOverlay .forkRepositoryUI,
+#githubActionsUI {
   position: absolute;
   top: 20%;
   left: 20%;
@@ -212,10 +248,17 @@ a:active {
 }
 
 .openUrlOverlay .openUrlUI details,
-.forkRepositoryOverlay .forkRepositoryUI details {
+.forkRepositoryOverlay .forkRepositoryUI details,
+#githubActionsUI details, #githubActionsUI button {
   cursor: pointer;
   margin-bottom: 1em;
 }
+
+#githubActionsUI details label { 
+  font-family: monospace;
+  cursor: pointer;
+}
+
 
 .openUrlOverlay .openUrlUI details>div,
 .forkRepositoryOverlay .forkRepositoryUI details>div {
@@ -319,7 +362,7 @@ a:active {
   fill: var(--textColor);
 }
 
-#verovio-container {
+#verovioContainer {
   height: 100%;
   width: 100%;
   overflow: inherit;
@@ -333,7 +376,7 @@ a:active {
   height: 100%;
 }
 
-#facsimile-message-panel {
+#facsimileMessagePanel {
   padding: 8px;
   color: var(--textColor);
   background-color: var(--backgroundColor);
@@ -461,6 +504,37 @@ a:active {
   background-repeat: no-repeat;
 }
 
+#tagEncloserMenu {
+  z-index: 10;
+  border: 1px solid var(--dropdownBorderColor);
+  border-radius: 4px;
+  background-color: var(--dropdownBackgroundColor);
+  display: flex;
+  flex-direction: column;
+  align-content: stretch;
+  align-items: center;
+  gap: 3px;
+  padding: 5px;
+  font-weight: bold;
+}
+
+#tagEncloserMenu input {
+  width: 180px;
+  font-weight: bold;
+  border-radius: 4px;
+}
+
+#tagEncloserMenu input:focus {
+  outline: none;
+}
+
+#tagEncloserMenu div {
+  font-weight: normal;
+  display: flex;
+  flex-direction: row;
+  gap: 15px;
+}
+
 .rightButton {
   /* only for validation report close button */
   float: right;
@@ -561,7 +635,7 @@ a:active {
   position: relative;
 }
 
-.statusbar {
+#statusBar {
   width: 100%;
   height: 100%;
   position: absolute;
@@ -571,7 +645,7 @@ a:active {
   z-index: 10;
 }
 
-.progressbar {
+#progressBar {
   width: 0%;
   height: 100%;
   background-color: var(--dropdownBackgroundColor);
@@ -623,6 +697,11 @@ a:active {
   max-height: 21px;
   color: var(--textColor);
   background-color: var(--controlMenuBackgroundColor);
+}
+
+.narrowButton {
+  width: 50px;
+  max-width: 80px;
 }
 
 .btn:hover {
@@ -754,19 +833,19 @@ svg text {
   user-select: none;
 }
 
-#verovio-container .currently-playing { 
+#verovioContainer .currently-playing { 
   fill:orange !important;
   stroke:orange !important;
   color: orange !important;
 }
 
-#verovio-container .highlighted {
+#verovioContainer .highlighted {
   color: var(--highlightColor);
   stroke: var(--highlightColor);
 }
 
-#verovio-container g.highlighted,
-#verovio-container text.highlighted {
+#verovioContainer g.highlighted,
+#verovioContainer text.highlighted {
   fill: var(--highlightColor);
   fill-opacity: 100%;
 }
@@ -785,22 +864,22 @@ svg text {
   fill-opacity: 70%;
 }
 
-#verovio-container g.supplied g {
+#verovioContainer g.supplied g {
   fill: var(--suppliedColor);
   color: var(--suppliedColor);
   stroke: var(--suppliedColor);
 }
 
-#verovio-container .supplied .highlighted {
+#verovioContainer .supplied .highlighted {
   color: var(--suppliedHighlightedColor);
   stroke: var(--suppliedHighlightedColor);
 }
 
-#verovio-container g.supplied g.highlighted {
+#verovioContainer g.supplied g.highlighted {
   fill: var(--suppliedHighlightedColor);
 }
 
-#verovio-container g {
+#verovioContainer g {
   fill: var(--notationColor);
   color: var(--notationColor);
   stroke: var(--notationColor);
@@ -815,7 +894,7 @@ svg text {
   fill-opacity: 40%;
 }
 
-/* #source-image-svg text {
+/* #sourceImageSvg text {
   fill: var(--dropdownHeadingColor);
   stroke: var(--dropdownHeadingColor);
   fill-opacity: 1;
@@ -874,7 +953,7 @@ svg text {
   fill: var(--settingsBackgroundColor);
 }
 
-#verovio-icon {
+#verovioIcon {
   margin-left: 3px;
   margin-right: 3px;
   width: 22px;
@@ -884,7 +963,7 @@ svg text {
   stroke-width: 1.5px;
 }
 
-#facsimile-icon, #pdf-icon {
+#facsimileIcon, #pdf-icon {
   margin-left: 3px;
   margin-right: 3px;
   width: 16px;
@@ -1193,6 +1272,7 @@ select {
   margin-bottom: 10px;
   margin-right: 2px;
   border-radius: 4px;
+  max-width: 60px;
 }
 
 input,

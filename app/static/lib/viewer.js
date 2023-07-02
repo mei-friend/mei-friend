@@ -9,16 +9,11 @@ import { drawFacsimile, highlightZone, zoomFacsimile } from './facsimile.js';
 import {
   cm,
   cmd,
-  commonSchemas,
-  defaultVerovioVersion,
-  fontList,
-  isSafari,
   meiFileName,
   rngLoader,
-  platform,
   storage,
-  supportedVerovioVersions,
   tkVersion,
+  translator,
   validate,
   validator,
   version,
@@ -27,6 +22,18 @@ import {
 import { selectMarkup } from './markup.js';
 import { startMidiTimeout } from './midi-player.js';
 import { getNotationProportion, setNotationProportion, setOrientation } from './resizer.js';
+import {
+  commonSchemas,
+  codeMirrorSettingsOptions,
+  defaultNotationProportion,
+  defaultSpeedMode,
+  defaultViewerTimeoutDelay,
+  fontList,
+  isSafari,
+  meiFriendSettingsOptions,
+  platform,
+  supportedVerovioVersions,
+} from './defaults.js';
 
 export default class Viewer {
   constructor(vrvWorker, spdWorker) {
@@ -44,7 +51,7 @@ export default class Viewer {
     this.notationNightMode = false;
     this.allowCursorActivity = true; // whether or not notation gets re-rendered after text changes
     this.allowNotationInteraction = true; // allow mouse drag-select and click on notation
-    this.speedMode = true; // speed mode (just feeds on page to Verovio to reduce drawing time)
+    this.speedMode = defaultSpeedMode; // speed mode (just feeds on page to Verovio to reduce drawing time)
     this.parser = new DOMParser();
     this.xmlDoc;
     this.xmlDocOutdated = true; // to limit recalculation of DOM or pageLists
@@ -59,16 +66,16 @@ export default class Viewer {
     this.meiHeadRange = [];
     this.vrvOptions; // all verovio options
     this.vrvTimeout; // time out task for updating verovio settings
-    this.timeoutDelay = 300; // ms, window in which concurrent clicks are treated as one update
-    this.verovioIcon = document.getElementById('verovio-icon');
-    this.breaksSelect = /** @type HTMLSelectElement */ (document.getElementById('breaks-select'));
+    this.timeoutDelay = defaultViewerTimeoutDelay; // ms, window in which concurrent clicks are treated as one update
+    this.verovioIcon = document.getElementById('verovioIcon');
+    this.breaksSelect = /** @type HTMLSelectElement */ (document.getElementById('breaksSelect'));
     this.respId = '';
     this.alertCloser;
     this.pdfMode = false;
     this.cmd2KeyPressed = false;
     this.controlMenuState = {};
     this.settingsReplaceFriendContainer = false; // whether or not the settings panel is over the mei-friend window (false) or replaces it (true)
-    this.notationProportion = 0.5; // remember proportion during pdf mode
+    this.notationProportion = defaultNotationProportion; // remember proportion during pdf mode
   } // constructor()
 
   // change options, load new data, render current page, add listeners, highlight
@@ -174,11 +181,16 @@ export default class Viewer {
     this.setVerovioOptions(options);
     let message = {
       cmd: what,
-      options: this.vrvOptions,
       pageNo: this.currentPage,
-      xmlId: id,
+      options: this.vrvOptions,
       speedMode: this.speedMode,
+      toolkitDataOutdated: this.toolkitDataOutdated,
+      xmlId: id,
     };
+    // pass MEI through to worker, if tk is outDated or in speed mode
+    if (this.speedMode || this.toolkitDataOutdated) {
+      message.mei = this.speedFilter(cm.getValue());
+    }
     this.busy();
     this.vrvWorker.postMessage(message);
   } // updateQuick()
@@ -341,9 +353,9 @@ export default class Viewer {
       this.vrvOptions = {
         ...newOptions,
       };
-    let zoom = document.getElementById('verovio-zoom');
+    let zoom = document.getElementById('verovioZoom');
     if (zoom) this.vrvOptions.scale = parseInt(zoom.value);
-    let fontSel = document.getElementById('font-select');
+    let fontSel = document.getElementById('engravingFontSelect');
     if (fontSel) this.vrvOptions.font = fontSel.value;
     let bs = this.breaksSelect;
     if (bs) this.vrvOptions.breaks = bs.value;
@@ -406,9 +418,10 @@ export default class Viewer {
 
   updatePageNumDisplay() {
     let pg = this.pageCount < 0 ? '?' : this.pageCount;
-    document.getElementById('pagination1').innerHTML = 'Page&nbsp;';
+    document.getElementById('pagination1').innerHTML = translator.lang.pagination1.html;
     document.getElementById('pagination2').innerHTML = `&nbsp;${this.currentPage}&nbsp;`;
-    document.getElementById('pagination3').innerHTML = `&nbsp;of ${pg}`;
+    document.getElementById('pagination3').innerHTML = translator.lang.pagination3.html;
+    document.getElementById('pagination4').innerHTML = `&nbsp;${pg}`;
     prs.updatePageRangeSelector(this);
   } // updatePageNumDisplay()
 
@@ -438,7 +451,7 @@ export default class Viewer {
     }
     utils.setCursorToId(cm, id);
     // console.info('setCrsrToPgBeg(): lastNoteId: ' + this.lastNoteId + ', new id: ' + id);
-    this.selectedElements.push(id);
+    if (!this.selectedElements.includes(id)) this.selectedElements.push(id);
     this.lastNoteId = id;
     return id;
   } // setCursorToPageBeginning()
@@ -513,8 +526,8 @@ export default class Viewer {
       // console.log('cursorActivity forceFlip: ' + forceFlip + ' to: ' + id);
       this.selectedElements = [];
       if (id) {
-        this.selectedElements.push(id);
-        let fl = document.getElementById('flip-checkbox');
+        if (!this.selectedElements.includes(id)) this.selectedElements.push(id);
+        let fl = document.getElementById('flipCheckbox');
         if (
           !document.querySelector('g#' + utils.escapeXmlId(id)) && // when not on current page
           ((fl && fl.checked) || forceFlip)
@@ -572,7 +585,7 @@ export default class Viewer {
     this.xmlDocOutdated = true;
     this.toolkitDataOutdated = true;
     if (!isSafari) this.checkSchema(cm.getValue());
-    let ch = document.getElementById('live-update-checkbox');
+    let ch = document.getElementById('liveUpdateCheckbox');
     if ((this.allowCursorActivity && ch && ch.checked) || forceUpdate) {
       this.updateData(cm, false, false);
     }
@@ -595,7 +608,7 @@ export default class Viewer {
         if (el) {
           el.forEach((e) => {
             e.classList.add('highlighted');
-            if (e.nodeName === 'rect' && e.closest('#source-image-svg')) highlightZone(e);
+            if (e.nodeName === 'rect' && e.closest('#sourceImageSvg')) highlightZone(e);
             e.querySelectorAll('g').forEach((g) => g.classList.add('highlighted'));
           });
         }
@@ -740,7 +753,7 @@ export default class Viewer {
 
   // Control zoom of notation display and update Verovio layout
   zoom(delta, storage = null) {
-    let zoomCtrl = document.getElementById('verovio-zoom');
+    let zoomCtrl = document.getElementById('verovioZoom');
     if (zoomCtrl) {
       if (delta <= 30)
         // delta only up to 30% difference
@@ -925,6 +938,19 @@ export default class Viewer {
     }
   } // toggleAnnotationPanel()
 
+  // show or hide GitHub actions (at the branch level in the GitHub menu) if they are available
+  setGithubActionsDisplay() { 
+    const els = [...document.querySelectorAll(".workflow"), ...document.querySelectorAll(".actionsDivider")]
+    const display = document.getElementById("enableGithubActions").checked ? "block" : "none";
+    els.forEach(e => { 
+      // check for e, as it will be null if no GH Actions currently exist 
+      // (e.g., none in repo, or we aren't at branch level in GH menu)
+      if(e) {
+        e.style.display = display;
+      }
+    })
+  }// setGithubActionsDisplay()
+
   // go through current active tab of settings menu and filter option items (make invisible)
   applySettingsFilter() {
     const filterSettingsString = document.getElementById('filterSettings').value;
@@ -993,435 +1019,15 @@ export default class Viewer {
   } // applySettingsFilter()
 
   addMeiFriendOptionsToSettingsPanel(restoreFromLocalStorage = true) {
-    let meiFriendSettingsOptions = {
-      titleGeneral: {
-        title: 'General',
-        description: 'General mei-friend settings',
-        type: 'header',
-        default: true,
-      },
-      selectToolkitVersion: {
-        title: 'Verovio version',
-        description:
-          'Select Verovio toolkit version ' +
-          '(* Switching to older versions before 3.11.0 ' +
-          'might require a refresh due to memory issues.)',
-        type: 'select',
-        default: defaultVerovioVersion,
-        values: Object.keys(supportedVerovioVersions),
-        valuesDescriptions: Object.keys(supportedVerovioVersions).map((key) => {
-          let desc = supportedVerovioVersions[key].description;
-          if (supportedVerovioVersions[key].hasOwnProperty('releaseDate')) {
-            desc += ' (' + supportedVerovioVersions[key].releaseDate + ')';
-          }
-          return desc;
-        }),
-      },
-      toggleSpeedMode: {
-        title: 'Speed mode',
-        description:
-          'Toggle Verovio Speed Mode. ' +
-          'In speed mode, only the current page ' +
-          'is sent to Verovio to reduce rendering ' +
-          'time with large files',
-        type: 'bool',
-        default: true,
-      },
-      selectIdStyle: {
-        title: 'Style of generated xml:ids',
-        description:
-          'Style of newly generated xml:ids (existing xml:ids are not changed)' +
-          'e.g., Verovio original: "note-0000001318117900", ' +
-          'Verovio base 36: "nophl5o", ' +
-          'mei-friend style: "note-ophl5o"',
-        type: 'select',
-        values: ['Original', 'Base36', 'mei-friend'],
-        valuesDescriptions: ['note-0000001018877033', 'n34z4wz2', 'note-34z4wz2'],
-        default: 'Base36',
-      },
-      addApplicationNote: {
-        title: 'Insert application statement',
-        description:
-          'Insert an application statement to the encoding ' +
-          'description in the MEI header, identifying ' +
-          'application name, version, date of first ' +
-          'and last edit',
-        type: 'bool',
-        default: true,
-      },
-      dragSelection: {
-        title: 'Drag select',
-        description: 'Select elements in notation with mouse drag',
-        type: 'header',
-        default: true,
-      },
-      dragSelectNotes: {
-        title: 'Select notes',
-        description: 'Select notes',
-        type: 'bool',
-        default: true,
-      },
-      dragSelectRests: {
-        title: 'Select rests',
-        description: 'Select rests and repeats (rest, mRest, beatRpt, halfmRpt, mRpt)',
-        type: 'bool',
-        default: true,
-      },
-      dragSelectControlElements: {
-        title: 'Select placement elements ',
-        description:
-          'Select placement elements (i.e., with a @placement attribute: ' + att.attPlacement.join(', ') + ')',
-        type: 'bool',
-        default: false,
-      },
-      dragSelectSlurs: {
-        title: 'Select slurs ',
-        description: 'Select slurs (i.e., elements with @curvature attribute: ' + att.attCurvature.join(', ') + ')',
-        type: 'bool',
-        default: false,
-      },
-      dragSelectMeasures: {
-        title: 'Select measures ',
-        description: 'Select measures',
-        type: 'bool',
-        default: false,
-      },
-      controlMenuSettings: {
-        title: 'Notation control bar',
-        description: 'Define items to be shown in control menu above the notation',
-        type: 'header',
-        default: true,
-      },
-      // flip-checkbox, flip-btn
-      controlMenuFlipToPageControls: {
-        title: 'Show flip to page controls',
-        description: 'Show flip to page controls in notation control menu',
-        type: 'bool',
-        default: true,
-      },
-      controlMenuUpdateNotation: {
-        title: 'Show notation update controls',
-        description: 'Show notation update behavior controls in notation control menu',
-        type: 'bool',
-        default: true,
-      },
-      controlMenuFontSelector: {
-        title: 'Show notation font selector',
-        description: 'Show notation font (SMuFL) selector in notation control menu',
-        type: 'bool',
-        default: false,
-      },
-      controlMenuNavigateArrows: {
-        title: 'Show navigation arrows',
-        description: 'Show notation navigation arrows in notation control menu',
-        type: 'bool',
-        default: false,
-      },
-      controlMenuSpeedmodeCheckbox: {
-        title: 'Show speed mode checkbox',
-        description: 'Show speed mode checkbox in notation control menu',
-        type: 'bool',
-        default: true,
-      },
-      titleMidiPlayback: {
-        title: 'MIDI playback',
-        description: 'MIDI playback settings',
-        type: 'header',
-        default: true,
-      },
-      showMidiPlaybackContextualBubble: {
-        title: 'Show playback shortcut',
-        description:
-          'Causes a shortcut (bubble in bottom left corner; click to immediately start playback) to appear when the MIDI playback control bar is closed',
-        type: 'bool',
-        default: true,
-      },
-      showMidiPlaybackControlBar: {
-        title: 'Show MIDI playback control bar',
-        description: 'Show MIDI playback control bar',
-        type: 'bool',
-        default: false,
-      },
-      scrollFollowMidiPlayback: {
-        title: 'Scroll-follow MIDI playback',
-        description: 'Scroll notation panel to follow MIDI playback on current page',
-        type: 'bool',
-        default: true,
-      },
-      pageFollowMidiPlayback: {
-        title: 'Page-follow MIDI playback',
-        description: 'Automatically flip pages to follow MIDI playback',
-        type: 'bool',
-        default: true,
-      },
-      titleTransposition: {
-        title: 'Transpose',
-        description: 'Transpose score information',
-        type: 'header',
-        default: true,
-      },
-      enableTransposition: {
-        title: 'Enable transposition',
-        description:
-          'Enable transposition settings, to be applied through the transpose button below. The transposition will be applied to the notation only, the encoding remains unchanged, unless you click the item "Rerender via Verovio" in the "Manipulate" dropdown menu.',
-        type: 'bool',
-        default: false,
-      },
-      transposeInterval: {
-        title: 'Transpose by interval',
-        description:
-          'Transpose encoding by chromatic interval by the most common intervals (Verovio supports the base-40 system)',
-        type: 'select',
-        labels: [
-          'Perfect Unison',
-          'Augmented Unison',
-          'Diminished Second',
-          'Minor Second',
-          'Major Second',
-          'Augmented Second',
-          'Diminished Third',
-          'Minor Third',
-          'Major Third',
-          'Augmented Third',
-          'Diminished Fourth',
-          'Perfect Fourth',
-          'Augmented Fourth',
-          'Diminished Fifth',
-          'Perfect Fifth',
-          'Augmented Fifth',
-          'Diminished Sixth',
-          'Minor Sixth',
-          'Major Sixth',
-          'Augmented Sixth',
-          'Diminished Seventh',
-          'Minor Seventh',
-          'Major Seventh',
-          'Augmented Seventh',
-          'Diminished Octave',
-          'Perfect Octave',
-        ],
-        values: [
-          'P1',
-          'A1',
-          'd2',
-          'm2',
-          'M2',
-          'A2',
-          'd3',
-          'm3',
-          'M3',
-          'A3',
-          'd4',
-          'P4',
-          'A4',
-          'd5',
-          'P5',
-          'A5',
-          'd6',
-          'm6',
-          'M6',
-          'A6',
-          'd7',
-          'm7',
-          'M7',
-          'A7',
-          'd8',
-          'P8',
-        ],
-        default: 'P1',
-        radioId: 'byInterval',
-        radioName: 'transposeMode',
-      },
-      transposeKey: {
-        title: 'Transpose to key',
-        description: 'Transpose to key',
-        type: 'select',
-        labels: [
-          'C# major / A# minor',
-          'F# major / D# minor',
-          'B major / G# minor',
-          'E major / C# minor',
-          'A major / F# minor',
-          'D major / B minor',
-          'G major / E minor',
-          'C major / E minor',
-          'F major / D minor',
-          'Bb major / G minor',
-          'Eb major / C minor',
-          'Ab major / F minor',
-          'Db major / Bb minor',
-          'Gb major / Eb minor',
-          'Cb major / Ab minor',
-        ],
-        values: ['cs', 'fs', 'b', 'e', 'a', 'd', 'g', 'c', 'f', 'bf', 'ef', 'af', 'df', 'gf', 'cf'],
-        default: 'c',
-        radioId: 'toKey',
-        radioName: 'transposeMode',
-        radioChecked: 'true',
-      },
-      transposeDirection: {
-        title: 'Pitch direction',
-        description: 'Pitch direction of transposition (up/down)',
-        type: 'select',
-        labels: ['Up', 'Down', 'Closest'],
-        values: ['+', '-', ''],
-        default: '+', // refers to values
-      },
-      transposeButton: {
-        title: 'Transpose',
-        description:
-          'Apply transposition with above settings to the notation, while the MEI encoding remains unchanged. To also transpose the MEI encoding with the current settings, use "Rerender via Verovio" in the "Manipulate" dropdown menu.',
-        type: 'button',
-      },
-      renumberMeasuresHeading: {
-        title: 'Renumber measures',
-        description: 'Settings for renumbering measures',
-        type: 'header',
-        default: true,
-      },
-      renumberMeasureContinueAcrossIncompleteMeasures: {
-        title: 'Continue across incomplete measures',
-        description: 'Continue measure numbers across incomplete measures (@metcon="false")',
-        type: 'bool',
-        default: false,
-      },
-      renumberMeasuresUseSuffixAtMeasures: {
-        title: 'Suffix at incomplete measures',
-        description: 'Use number suffix at incomplete measures (e.g., 23-cont)',
-        type: 'select',
-        values: ['none', '-cont'],
-        default: false,
-      },
-      renumberMeasuresContinueAcrossEndings: {
-        title: 'Continue across endings',
-        description: 'Continue measure numbers across endings',
-        type: 'bool',
-        default: false,
-      },
-      renumberMeasuresUseSuffixAtEndings: {
-        title: 'Suffix at endings',
-        description: 'Use number suffix at endings (e.g., 23-a)',
-        type: 'select',
-        values: ['none', 'ending@n', 'a/b/c', 'A/B/C', '-a/-b/-c', '-A/-B/-C'],
-        default: 'a/b/c',
-      },
-      // annotationPanelSeparator: {
-      //   title: 'options-line', // class name of hr element
-      //   type: 'line'
-      // },
-      highlightCurrentlySoundingNotes: {
-        title: 'Highlight currently-sounding notes',
-        description: 'Visually highlight currently-sounding notes in the notation panel during MIDI playback ',
-        type: 'bool',
-        default: true,
-      },
-      titleAnnotations: {
-        title: 'Annotations',
-        description: 'Annotation settings',
-        type: 'header',
-        default: true,
-      },
-      showAnnotations: {
-        title: 'Show annotations',
-        description: 'Show annotations in notation',
-        type: 'bool',
-        default: true,
-      },
-      showAnnotationPanel: {
-        title: 'Show annotation panel',
-        description: 'Show annotation panel',
-        type: 'bool',
-        default: false,
-      },
-      annotationDisplayLimit: {
-        title: 'Maximum number of annotations',
-        description: 'Maximum number of annotations to display ' + '(large numbers may slow mei-friend)',
-        type: 'int',
-        min: 0,
-        step: 100,
-        default: 100,
-      },
-      titleFacsimilePanel: {
-        title: 'Facsimile panel',
-        description: 'Show the facsimile imiages of the source edition, if available',
-        type: 'header',
-        open: false,
-        default: false,
-      },
-      showFacsimilePanel: {
-        title: 'Show facsimile panel',
-        description: 'Show the score images of the source edition provided in the facsimile element',
-        type: 'bool',
-        default: false,
-      },
-      selectFacsimilePanelOrientation: {
-        title: 'Facsimile panel position',
-        description: 'Select facsimile panel position relative to notation',
-        type: 'select',
-        values: ['left', 'right', 'top', 'bottom'],
-        default: 'bottom',
-      },
-      facsimileZoomInput: {
-        title: 'Facsimile image zoom (%)',
-        description: 'Zoom level of facsimile image (in percent)',
-        type: 'int',
-        min: 10,
-        max: 300,
-        step: 5,
-        default: 100,
-      },
-      showFacsimileFullPage: {
-        title: 'Show full page',
-        description: 'Show facsimile image on full page',
-        type: 'bool',
-        default: false,
-      },
-      editFacsimileZones: {
-        title: 'Edit facsimile zones',
-        description: 'Edit facsimile zones (will link bounding boxes to facsimile zones)',
-        type: 'bool',
-        default: false,
-      },
-      // sourcefacsimilePanelSeparator: {
-      //   title: 'options-line', // class name of hr element
-      //   type: 'line'
-      // },
-      titleSupplied: {
-        title: 'Handle editorial content',
-        description: 'Control handling of <supplied> elements',
-        type: 'header',
-        open: false,
-        default: false,
-      },
-      showSupplied: {
-        title: 'Show <supplied> elements',
-        description: 'Highlight all elements contained by a <supplied> element',
-        type: 'bool',
-        default: true,
-      },
-      suppliedColor: {
-        title: 'Select <supplied> highlight color',
-        description: 'Select <supplied> highlight color',
-        type: 'color',
-        default: '#e69500',
-      },
-      respSelect: {
-        title: 'Select <supplied> responsibility',
-        description: 'Select responsibility id',
-        type: 'select',
-        default: 'none',
-        values: [],
-      },
-      // dragLineSeparator: {
-      //   title: 'options-line', // class name of hr element
-      //   type: 'line'
-      // },
-    };
+    // NOTE: object meiFriendSettingsOptions from defaults.js
     let mfs = document.getElementById('meiFriendSettings');
     let addListeners = false; // add event listeners only the first time
     let rt = document.querySelector(':root');
     if (!/\w/g.test(mfs.innerHTML)) addListeners = true;
-    mfs.innerHTML = '<div class="settingsHeader">mei-friend Settings</div>';
+    mfs.innerHTML =
+      '<div class="settingsHeader" id="meiFriendSettingsHeader">' +
+      translator.lang.meiFriendSettingsHeader.text +
+      '</div>';
     let storage = window.localStorage;
     let currentHeader;
     Object.keys(meiFriendSettingsOptions).forEach((opt) => {
@@ -1451,6 +1057,11 @@ export default class Viewer {
         case 'selectIdStyle':
           this.xmlIdStyle = value;
           break;
+//        case 'selectLanguage':
+//          let langCode = value.slice(0, 2).toLowerCase();
+//          translator.changeLanguage(langCode);
+//          translateLanguageSelection();
+//          break;
         case 'toggleSpeedMode':
           document.getElementById('midiSpeedmodeIndicator').style.display = this.speedMode ? 'inline' : 'none';
           break;
@@ -1479,26 +1090,29 @@ export default class Viewer {
             o.values = Array.from(this.xmlDoc.querySelectorAll('corpName[*|id]')).map((e) => e.getAttribute('xml:id'));
           break;
         case 'controlMenuFontSelector':
-          document.getElementById('font-ctrls').style.display = value ? 'inherit' : 'none';
+          document.getElementById('engravingFontControls').style.display = value ? 'inherit' : 'none';
           break;
         case 'controlMenuSpeedmodeCheckbox':
-          document.getElementById('speed-div').style.display = value ? 'inherit' : 'none';
+          document.getElementById('speedDiv').style.display = value ? 'inherit' : 'none';
           break;
         case 'controlMenuNavigateArrows':
-          document.getElementById('navigate-ctrls').style.display = value ? 'inherit' : 'none';
+          document.getElementById('navigationControls').style.display = value ? 'inherit' : 'none';
           break;
         case 'controlMenuFlipToPageControls':
-          document.getElementById('flip-checkbox').style.display = value ? 'inherit' : 'none';
-          document.getElementById('flip-btn').style.display = value ? 'inherit' : 'none';
+          document.getElementById('flipCheckbox').style.display = value ? 'inherit' : 'none';
+          document.getElementById('flipButton').style.display = value ? 'inherit' : 'none';
           break;
         case 'controlMenuUpdateNotation':
-          document.getElementById('update-ctrls').style.display = value ? 'inherit' : 'none';
+          document.getElementById('updateControls').style.display = value ? 'inherit' : 'none';
           break;
         case 'showFacsimileFullPage':
-          document.getElementById('facsimile-full-page-checkbox').checked = value;
+          document.getElementById('facsimileFullPageCheckbox').checked = value;
           break;
         case 'editFacsimileZones':
-          document.getElementById('facsimile-edit-zones-checkbox').checked = value;
+          document.getElementById('facsimileEditZonesCheckbox').checked = value;
+          break;
+        case 'showFacsimileZones':
+          document.getElementById('facsimileShowZonesCheckbox').checked = value;
           break;
         case 'showMidiPlaybackControlBar':
           // do nothing, as it is always the default display: none
@@ -1598,8 +1212,12 @@ export default class Viewer {
           case 'selectIdStyle':
             this.xmlIdStyle = value;
             break;
+          case 'selectLanguage':
+            let langCode = value.slice(0, 2).toLowerCase();
+            translator.changeLanguage(langCode);
+            break;
           case 'toggleSpeedMode':
-            let sb = document.getElementById('speed-checkbox');
+            let sb = document.getElementById('speedCheckbox');
             if (sb) {
               sb.checked = value;
               sb.dispatchEvent(new Event('change'));
@@ -1613,6 +1231,9 @@ export default class Viewer {
             break;
           case 'showMidiPlaybackControlBar':
             cmd.toggleMidiPlaybackControlBar(false);
+            break;
+          case 'enableGithubActions': 
+            this.setGithubActionsDisplay();
             break;
           case 'enableTransposition':
             // switch on
@@ -1647,8 +1268,20 @@ export default class Viewer {
           case 'transposeInterval':
           case 'transposeDirection':
             break;
+          case 'showFacsimileZones':
+            document.getElementById('facsimileShowZonesCheckbox').checked = value;
+            if (!value) {
+              document.getElementById('editFacsimileZones').checked = false;
+              document.getElementById('facsimileEditZonesCheckbox').checked = false;
+            }
+            drawFacsimile();
+            break;
           case 'editFacsimileZones':
-            document.getElementById('facsimile-edit-zones-checkbox').checked = value;
+            document.getElementById('facsimileEditZonesCheckbox').checked = value;
+            if (value) {
+              document.getElementById('showFacsimileZones').checked = true;
+              document.getElementById('facsimileShowZonesCheckbox').checked = true;
+            }
             drawFacsimile();
             break;
           case 'showFacsimilePanel':
@@ -1658,12 +1291,12 @@ export default class Viewer {
             drawFacsimile();
             break;
           case 'showFacsimileFullPage':
-            document.getElementById('facsimile-full-page-checkbox').checked = value;
+            document.getElementById('facsimileFullPageCheckbox').checked = value;
             drawFacsimile();
             break;
           case 'facsimileZoomInput':
             zoomFacsimile();
-            let facsZoom = document.getElementById('facsimile-zoom');
+            let facsZoom = document.getElementById('facsimileZoom');
             if (facsZoom) facsZoom.value = value;
             break;
           case 'showSupplied':
@@ -1685,19 +1318,20 @@ export default class Viewer {
             this.respId = document.getElementById('respSelect').value;
             break;
           case 'controlMenuFontSelector':
-            document.getElementById('font-ctrls').style.display = document.getElementById('controlMenuFontSelector')
-              .checked
+            document.getElementById('engravingFontControls').style.display = document.getElementById(
+              'controlMenuFontSelector'
+            ).checked
               ? 'inherit'
               : 'none';
             break;
           case 'controlMenuSpeedmodeCheckbox':
-            document.getElementById('speed-div').style.display = document.getElementById('controlMenuSpeedmodeCheckbox')
+            document.getElementById('speedDiv').style.display = document.getElementById('controlMenuSpeedmodeCheckbox')
               .checked
               ? 'inherit'
               : 'none';
             break;
           case 'controlMenuNavigateArrows':
-            document.getElementById('navigate-ctrls').style.display = document.getElementById(
+            document.getElementById('navigationControls').style.display = document.getElementById(
               'controlMenuNavigateArrows'
             ).checked
               ? 'inherit'
@@ -1705,12 +1339,12 @@ export default class Viewer {
             break;
           case 'controlMenuFlipToPageControls':
             const v = document.getElementById('controlMenuFlipToPageControls').checked;
-            document.getElementById('flip-checkbox').style.display = v ? 'inherit' : 'none';
-            document.getElementById('flip-btn').style.display = v ? 'inherit' : 'none';
+            document.getElementById('flipCheckbox').style.display = v ? 'inherit' : 'none';
+            document.getElementById('flipButton').style.display = v ? 'inherit' : 'none';
             break;
           case 'controlMenuUpdateNotation':
             const u = document.getElementById('controlMenuUpdateNotation').checked;
-            document.getElementById('update-ctrls').style.display = u ? 'inherit' : 'none';
+            document.getElementById('updateControls').style.display = u ? 'inherit' : 'none';
             break;
           case 'renumberMeasuresContinueAcrossEndings':
             this.disableElementThroughCheckbox(
@@ -1769,149 +1403,14 @@ export default class Viewer {
   } // addMeiFriendOptionsToSettingsPanel()
 
   addCmOptionsToSettingsPanel(mfDefaults, restoreFromLocalStorage = true) {
-    let codeMirrorSettingsOptions = {
-      // key as in CodeMirror
-      titleAppearance: {
-        title: 'Editor appearance',
-        description: 'Controls the appearance of the editor',
-        type: 'header',
-        open: true,
-        default: true,
-      },
-      zoomFont: {
-        title: 'Font size (%)',
-        description: 'Change font size of editor (in percent)',
-        type: 'int',
-        default: 100,
-        min: 45,
-        max: 300,
-        step: 5,
-      },
-      theme: {
-        title: 'Theme',
-        description: 'Select the theme of the editor',
-        type: 'select',
-        default: 'default',
-        values: [
-          'default',
-          'abbott',
-          'base16-dark',
-          'base16-light',
-          'cobalt',
-          'darcula',
-          'dracula',
-          'eclipse',
-          'elegant',
-          'monokai',
-          'idea',
-          'juejin',
-          'mdn-like',
-          'neo',
-          'paraiso-dark',
-          'paraiso-light',
-          'pastel-on-dark',
-          'solarized dark',
-          'solarized light',
-          'xq-dark',
-          'xq-light',
-          'yeti',
-          'yonce',
-          'zenburn',
-        ],
-      },
-      matchTheme: {
-        title: 'Notation matches theme',
-        description: 'Match notation to editor color theme',
-        type: 'bool',
-        default: false,
-      },
-      tabSize: {
-        title: 'Indentation size',
-        description: 'Number of space characters for each indentation level',
-        type: 'int',
-        min: 1,
-        max: 12,
-        step: 1,
-        default: 3,
-      },
-      lineWrapping: {
-        title: 'Line wrapping',
-        description: 'Whether or not lines are wrapped at end of panel',
-        type: 'bool',
-        default: false,
-      },
-      lineNumbers: {
-        title: 'Line numbers',
-        description: 'Show line numbers',
-        type: 'bool',
-        default: true,
-      },
-      firstLineNumber: {
-        title: 'First line number',
-        description: 'Set first line number',
-        type: 'int',
-        min: 0,
-        max: 1,
-        step: 1,
-        default: 1,
-      },
-      foldGutter: {
-        title: 'Code folding',
-        description: 'Enable code folding through fold gutters',
-        type: 'bool',
-        default: true,
-      },
-      titleEditorOptions: {
-        title: 'Editor behavior',
-        description: 'Controls the behavior of the editor',
-        type: 'header',
-        open: true,
-        default: true,
-      },
-      autoValidate: {
-        title: 'Auto validation',
-        description: 'Validate encoding against schema automatically after each edit',
-        type: 'bool',
-        default: true,
-      },
-      autoCloseBrackets: {
-        title: 'Auto close brackets',
-        description: 'Automatically close brackets at input',
-        type: 'bool',
-        default: true,
-      },
-      autoCloseTags: {
-        title: 'Auto close tags',
-        description: 'Automatically close tags at input',
-        type: 'bool',
-        default: true,
-      },
-      matchTags: {
-        title: 'Match tags',
-        description: 'Highlights matched tags around editor cursor',
-        type: 'bool',
-        default: true,
-      },
-      showTrailingSpace: {
-        title: 'Highlight trailing spaces',
-        description: 'Highlights unnecessary trailing spaces at end of lines',
-        type: 'bool',
-        default: true,
-      },
-      keyMap: {
-        title: 'Key map',
-        description: 'Select key map',
-        type: 'select',
-        default: 'default',
-        values: ['default', 'vim', 'emacs'],
-      },
-    };
+    // NOTE: codeMirrorSettingsOptions in defaults.js
     let storage = window.localStorage;
     let cmsp = document.getElementById('editorSettings');
     let addListeners = false; // add event listeners only the first time
     let currentHeader;
     if (!/\w/g.test(cmsp.innerHTML)) addListeners = true;
-    cmsp.innerHTML = '<div class="settingsHeader">Editor Settings</div>';
+    cmsp.innerHTML =
+      '<div class="settingsHeader" id="editorSettingsHeader">' + translator.lang.editorSettingsHeader.text + '</div>';
     Object.keys(codeMirrorSettingsOptions).forEach((opt) => {
       let o = codeMirrorSettingsOptions[opt];
       let value = o.default;
@@ -2026,7 +1525,7 @@ export default class Viewer {
     let vsp = document.getElementById('verovioSettings');
     let addListeners = false; // add event listeners only the first time
     if (!/\w/g.test(vsp.innerHTML)) addListeners = true;
-    vsp.innerHTML = '<div class="settingsHeader">Verovio Settings</div>';
+    vsp.innerHTML = '<div class="settingsHeader" id="verovioSettingsHeader">Verovio Settings</div>';
     let storage = window.localStorage;
 
     Object.keys(tkAvailableOptions.groups).forEach((grp, i) => {
@@ -2079,7 +1578,7 @@ export default class Viewer {
           storage[opt] = value; // save changes in localStorage object
         }
         if (opt === 'vrv-font') {
-          document.getElementById('font-select').value = value;
+          document.getElementById('engravingFontSelect').value = value;
         } else if (opt.startsWith('vrv-midi')) {
           if (document.getElementById('showMidiPlaybackControlBar').checked) {
             startMidiTimeout(true);
@@ -2402,7 +1901,7 @@ export default class Viewer {
     // this.allowCursorActivityToTextposition(txtEdr); TODO
     if (id) {
       this.selectedElements = [];
-      this.selectedElements.push(id);
+      if (!this.selectedElements.includes(id)) this.selectedElements.push(id);
       this.lastNoteId = id;
       if (document.getElementById('showMidiPlaybackControlBar').checked) {
         startMidiTimeout();
@@ -2537,19 +2036,23 @@ export default class Viewer {
    */
   setDisablednessInOptionsItem(onItems, offItems) {
     offItems.forEach((offItem) => {
-      let off = document.getElementById(offItem);
-      if (off) {
-        off.disabled = true;
-        off.classList.add('disabled');
-        off.previousSibling?.classList.add('disabled');
+      if (offItem) {
+        let off = document.getElementById(offItem);
+        if (off) {
+          off.disabled = true;
+          off.classList.add('disabled');
+          off.previousSibling?.classList.add('disabled');
+        }
       }
     });
     onItems.forEach((onItem) => {
-      let on = document.getElementById(onItem);
-      if (on) {
-        on.disabled = false;
-        on.classList.remove('disabled');
-        on.previousSibling?.classList.remove('disabled');
+      if (onItem) {
+        let on = document.getElementById(onItem);
+        if (on) {
+          on.disabled = false;
+          on.classList.remove('disabled');
+          on.previousSibling?.classList.remove('disabled');
+        }
       }
     });
   } // setDisplayInOptionsItem()
@@ -2586,13 +2089,13 @@ export default class Viewer {
     if (disappearAfter > 0) {
       this.alertCloser = setTimeout(() => (alertOverlay.style.display = 'none'), disappearAfter);
     }
-  }
+  } // showAlert()
 
   // Update alert message of #alertOverlay
   updateAlert(newMsg) {
     let alertOverlay = document.getElementById('alertOverlay');
-    alertOverlay.querySelector('span').innerHTML += '<br />' + newMsg;
-  }
+    alertOverlay.querySelector('span#alertMessage').innerHTML += '<br />' + newMsg;
+  } // updateAlert()
 
   // Hide all alert windows, such as alert overlay
   hideAlerts() {
@@ -2601,7 +2104,7 @@ export default class Viewer {
       if (this.alertCloser) clearTimeout(this.alertCloser);
       b.parentElement.style.display = 'none';
     }
-  }
+  } // hideAlerts()
 
   // Method to check from MEI whether the XML schema filename has changed
   async checkSchema(mei) {
@@ -2627,11 +2130,9 @@ export default class Viewer {
           }
         }
       }
-      console.log('Validation: No schema information found in MEI.');
+      console.log(lang.noSchemaFound.text);
       this.currentSchema = '';
-      this.throwSchemaError({
-        schemaFile: 'No schema information found in MEI.',
-      });
+      this.throwSchemaError({ schemaFile: translator.lang.noSchemaFound.text });
       return;
     }
     const schema = /<\?xml-model.*href="([^"]*).*/;
@@ -2652,7 +2153,7 @@ export default class Viewer {
     if (!this.validatorInitialized) return;
     let vs = document.getElementById('validation-status');
     vs.innerHTML = download;
-    let msg = 'Loading schema ' + schemaFile;
+    let msg = translator.lang.loadingSchema.text + ' ' + schemaFile;
     vs.setAttribute('title', msg);
     this.changeStatus(vs, 'wait', ['error', 'ok', 'manual']);
     this.updateSchemaStatusDisplay('wait', schemaFile, msg);
@@ -2673,12 +2174,12 @@ export default class Viewer {
       const res = await validator.setRelaxNGSchema(data);
     } catch (err) {
       this.throwSchemaError({
-        err: 'Schema error at replacing schema: ' + err,
+        err: translator.lang.errorLoadingSchema.text + ': ' + err,
         schemaFile: schemaFile,
       });
       return;
     }
-    msg = 'Schema loaded ' + schemaFile;
+    msg = translator.lang.schemaLoaded.text + ' ' + schemaFile;
     vs.setAttribute('title', msg);
     vs.innerHTML = unverified;
     this.validatorWithSchema = true;
@@ -2704,7 +2205,8 @@ export default class Viewer {
     // construct error message
     let msg = '';
     if (msgObj.hasOwnProperty('response'))
-      msg = 'Schema not found (' + msgObj.response.status + ' ' + msgObj.response.statusText + '): ';
+      msg =
+        translator.lang.schemaNotFound.text + ' (' + msgObj.response.status + ' ' + msgObj.response.statusText + '): ';
     if (msgObj.hasOwnProperty('err')) msg = msgObj.err + ' ';
     if (msgObj.hasOwnProperty('schemaFile')) msg += msgObj.schemaFile;
     // set icon to unverified and error color
@@ -2762,7 +2264,7 @@ export default class Viewer {
     let vs = document.getElementById('validation-status');
     vs.innerHTML = unverified;
     vs.style.cursor = 'pointer';
-    vs.setAttribute('title', 'Not validated. Press here to validate.');
+    vs.setAttribute('title', translator.lang.notValidated.text);
     vs.removeEventListener('click', this.manualValidate);
     vs.removeEventListener('click', this.toggleValidationReportVisibility);
     vs.addEventListener('click', this.manualValidate);
@@ -2847,7 +2349,13 @@ export default class Viewer {
       reportDiv.appendChild(closeButton);
       let p = document.createElement('div');
       p.classList.add('validation-title');
-      p.innerHTML = 'Validation failed. ' + Object.keys(messages).length + ' validation messages:';
+      p.innerHTML =
+        translator.lang.validationFailed.text +
+        '. ' +
+        Object.keys(messages).length +
+        ' ' +
+        translator.lang.validationMessages.text +
+        ':';
       reportDiv.appendChild(p);
       messages.forEach((m, i) => {
         let p = document.createElement('div');
@@ -2871,14 +2379,21 @@ export default class Viewer {
     }
     vs.setAttribute(
       'title',
-      'Validated against ' + this.currentSchema + ': ' + Object.keys(messages).length + ' validation messages.'
+      translator.lang.validatedAgainst.text +
+        ' ' +
+        this.currentSchema +
+        ': ' +
+        Object.keys(messages).length +
+        ' ' +
+        translator.lang.validationMessages.text +
+        '.'
     );
     if (reportDiv) {
       vs.removeEventListener('click', this.manualValidate);
       vs.removeEventListener('click', this.toggleValidationReportVisibility);
       vs.addEventListener('click', this.toggleValidationReportVisibility);
     }
-  }
+  } // highlightValidation()
 
   // Show/hide #validation-report panel, or force visibility (by string)
   toggleValidationReportVisibility(forceVisibility = '') {
@@ -2892,5 +2407,5 @@ export default class Viewer {
         else reportDiv.style.visibility = 'visible';
       }
     }
-  }
-}
+  } // toggleValidationReportVisibility()
+} // class Viewer

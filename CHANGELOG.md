@@ -1,4 +1,36 @@
 # mei-friend-online CHANGELOG.md
+
+
+### 0.9.0 GitHub Actions integration
+* Configurably display any GitHub Actions (dispatch workflows) available in the current repository / branch
+* List any configured inputs and set values from UI with shortcuts for 'current filepath' and 'current selection'
+* Launch Actions (dispatch) workflows from within mei-friend
+* Display workflow results (success / failure), with link to detailed GitHub page
+* On success, reload encoding to update with Actions-modified version
+
+### 0.8.11 Editor functionality
+* Surround selection in editor with tags (`CTRL-E` or `CMD-E`): opens a user interface to enter tag name
+* `CTRL-/` or `CMD-/` surrounds selection in editor with previously selected tag name
+* When editing a tag name in editor (both starting or ending tag), matching tag will be modified accordingly
+* Link to new documentation pages at https://mei-friend.github.io from help menu
+
+### 0.8.10 Internationalization
+* Multi-language support with separate language pack files per language
+* Language packs currently available for English and German, more language packs to come
+* First draft of spanish, italian, french, and catalan language pack
+* Automatic test to check for key identity and completeness of language packs
+* Remove transposeTosoundingPitch default flag for Verovio
+* Fix #21 spanning elements with mixed `@startid/@endid` and `@tstamp/@tstamp2` attributes
+
+### 0.8.9 patch
+* Fix bug when notation zooming resulted in missing notation when MIDI manu bar is activated
+
+### 0.8.8 patch
+* Control display of zone bounding boxes through checkbox
+* Menu item to generate mei-friend URL with all search parameters deviating from default values
+* Use same generate URL feature to build a full backlink with params for 'Report issue with encoding'
+* Code refactoring with separate defaults.js file
+
 ### 0.8.7 transposition
 * Add transposition settings panel to the mei-friend settings to specify transposition by key, by interval, and pitch direction.
 * Enable ?file= param to open files from private repos (when logged in)
