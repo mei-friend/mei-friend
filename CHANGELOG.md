@@ -1,6 +1,8 @@
 # mei-friend-online CHANGELOG.md
 
 
+### 0.9.1 patch
+* Fix bug with undefined lang variable under Safari (addresses #25)
 ### 0.9.0 GitHub Actions integration
 * Configurably display any GitHub Actions (dispatch workflows) available in the current repository / branch
 * List any configured inputs and set values from UI with shortcuts for 'current filepath' and 'current selection'
