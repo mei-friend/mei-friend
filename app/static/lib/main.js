@@ -1,6 +1,6 @@
 // mei-friend version and date
-export const version = '0.9.0';
-export const versionDate = '2 July 2023'; // use full or 3-character english months, will be translated
+export const version = '0.9.1';
+export const versionDate = '4 July 2023'; // use full or 3-character english months, will be translated
 
 var vrvWorker;
 var spdWorker;
@@ -835,7 +835,7 @@ async function vrvWorkerEventsHandler(ev) {
         if (!ev.data.removeIds) v.selectedElements.push(ev.data.xmlId);
       }
 
-      if (isSafari && Object.keys(lang).length > 0 && !safariWarningShown) {
+      if (isSafari && Object.keys(translator.lang).length > 0 && !safariWarningShown) {
         safariWarningShown = true;
         v.showAlert(translator.lang.isSafariWarning.text, 'error', -1);
       }
