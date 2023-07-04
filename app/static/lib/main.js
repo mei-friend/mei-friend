@@ -835,7 +835,7 @@ async function vrvWorkerEventsHandler(ev) {
         if (!ev.data.removeIds) v.selectedElements.push(ev.data.xmlId);
       }
 
-      if (isSafari && Object.keys(lang).length > 0 && !safariWarningShown) {
+      if (isSafari && Object.keys(translator.lang).length > 0 && !safariWarningShown) {
         safariWarningShown = true;
         v.showAlert(translator.lang.isSafariWarning.text, 'error', -1);
       }
