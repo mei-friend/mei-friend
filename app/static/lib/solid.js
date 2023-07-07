@@ -123,7 +123,7 @@ export async function safelyPatchResource(uri, patch) {
         console.info("Precondition failed: resource has changed while we were trying to patch it. Retrying...");
         setTimeout(safelyPatchResource(uri, patch), politeness)
       } else if(putResp.status >= 400) {
-        throw Error(putResp)
+        console.warn("Couldn't PUT patched resource: ", putResp);
       } else { 
         console.log("Patched successfully: ", uri);
       }
@@ -224,7 +224,7 @@ export async function createMAOMusicalObject(selectedElements, label = "") {
     let currentFileUriHash = encodeURIComponent(currentFileUri);
     let discoveryUri = storageResource + discoveryFragment + currentFileUriHash;
     console.log("Have current file and discovery URI", currentFileUri, storageResource + discoveryFragment, discoveryUri)
-    return establishContainerResource(storageResource + discoveryFragment).then(async() => {
+    return establishContainerResource(friendContainer + discoveryFragment).then(async() => {
       console.log("1: ", discoveryUri)
       return establishContainerResource(musicalObjectContainer).then(async (musicalObjectContainer) => { 
         console.log("2: ", discoveryUri)
@@ -261,7 +261,7 @@ export async function createMAOMusicalObject(selectedElements, label = "") {
                     value: {
                       "@type": `${nsp.SCHEMA}listItem`,
                       [`${nsp.SCHEMA}additionalType`]: { "@id":`${nsp.MAO}Extract`},
-                      [`${nsp.SCHEMA}url`]: { "@id": storageResource + extractResource.headers.get("Location") }
+                      [`${nsp.SCHEMA}url`]: { "@id": new URL(storageResource).origin + extractResource.headers.get("Location") }
                     }
                   },
                   {
@@ -272,7 +272,7 @@ export async function createMAOMusicalObject(selectedElements, label = "") {
                     value: {
                       "@type": `${nsp.SCHEMA}listItem`,
                       [`${nsp.SCHEMA}additionalType`]: { "@id": `${nsp.MAO}Selection` },
-                      [`${nsp.SCHEMA}url`]: { "@id": storageResource + selectionResource.headers.get("Location") }
+                      [`${nsp.SCHEMA}url`]: { "@id": new URL(storageResource).origin + selectionResource.headers.get("Location") }
                     }
                   },
                 ]).then(() => { return musMatResource }) // finally, return the musMat resource to the UI

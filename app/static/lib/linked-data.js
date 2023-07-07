@@ -43,7 +43,7 @@ export async function traverseAndFetch(
   })
     .then((resp) => {
       if (resp.status >= 400) {
-        throw Error(resp);
+        console.warn("Couldn't traverse and fetch: ", resp);
       } else {
         return resp.json();
       }
