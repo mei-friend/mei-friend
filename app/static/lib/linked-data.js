@@ -103,6 +103,7 @@ export async function traverseAndFetch(
                       blockList: [new URL(url.href), ...blockList],
                       userProvided: false,
                       jumps: jumps - 1,
+                      fetchMethod
                     }),
                   politeness
                 );
