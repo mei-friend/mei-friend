@@ -22,7 +22,6 @@
   align-content: center;
   gap: 6px;
   cursor: pointer;
-  pointer-events: none;
 }
 
 .annotationToolsIconGroup { 

@@ -359,9 +359,9 @@ export function addAnnotationHandlers() {
   // TODO extend this to allow app to consume (TROMPA-style) Annotation Toolkit descriptions
 
   const annotationHandler = (e) => {
-    console.log('Clicked to make new annotation!', e);
-    console.log('Selected elements: ', v.selectedElements);
-    switch (e.target.getAttribute('id')) {
+    console.log('annotation Handler: Clicked to make new annotation!', e);
+    console.log('annotation Handler: Selected elements: ', v.selectedElements);
+    switch (e.target.closest('.annotationToolsIcon')?.getAttribute('id')) {
       case 'annotateIdentify':
         createIdentify(e);
         break;
