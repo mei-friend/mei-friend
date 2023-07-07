@@ -22,6 +22,7 @@
   align-content: center;
   gap: 6px;
   cursor: pointer;
+  pointer-events: none;
 }
 
 .annotationToolsIconGroup { 
@@ -135,4 +136,8 @@ summary.noDetails {
   background-color: var(--annotationPanelLinkBackgroundColor); 
   padding: 2px;
   border-radius:10px;
+}
+
+#solid_logo {
+  pointer-events: none;
 }
