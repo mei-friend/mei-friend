@@ -223,7 +223,7 @@ export async function createMAOMusicalObject(selectedElements, label = "") {
     // first, establish discovery resource for the current MEI file
     let currentFileUriHash = encodeURIComponent(currentFileUri);
     let discoveryUri = storageResource + discoveryFragment + currentFileUriHash;
-    console.log("Have current file and discovery URI", currentFileUri, discoveryUri)
+    console.log("Have current file and discovery URI", currentFileUri, storageResource + discoveryFragment, discoveryUri)
     return establishContainerResource(storageResource + discoveryFragment).then(async() => {
       console.log("1: ", discoveryUri)
       return establishContainerResource(musicalObjectContainer).then(async (musicalObjectContainer) => { 
@@ -418,7 +418,7 @@ async function populateLoggedInSolidTab() {
 }
 
 function populateLoggedOutSolidTab() {
-  // TODO finish
+  let providerContainer = document.createElement("div");
   let provider = document.createElement("select");
   provider.setAttribute("name", "provider");
   provider.setAttribute("id", "providerSelect");
@@ -426,9 +426,12 @@ function populateLoggedOutSolidTab() {
     <option value="https://solidcommunity.net">SolidCommunity.net</option>
     <option value="https://login.inrupt.net">Inrupt</option>
     <option value="https://trompa-solid.upf.edu">TROMPA @ UPF</option>
-    <option value="other">Other...</option>
   `
-  return 'Please <a id="solidLogin">Click here to log in!</a>';
+  providerContainer.insertAdjacentElement("afterbegin", provider);
+  let msg = document.createElement("div");
+  msg.innerHTML = 'Please choose a provider and <a id="solidLogin">click here to log in!</a>';
+  msg.insertAdjacentElement("afterbegin", providerContainer);
+  return msg.outerHTML
 }
 
 export async function loginAndFetch() {
@@ -442,17 +445,22 @@ export async function loginAndFetch() {
   // 2. Start the Login Process if not already logged in.
   if (!solid.getDefaultSession().info.isLoggedIn) {
     storage.restoreSolidSession = true;
-    await solid.login({
-      // Specify the URL of the user's Solid Identity Provider;
-      // e.g., "https://login.inrupt.com".
-      oidcIssuer: "https://solidcommunity.net",
-      // Specify the URL the Solid Identity Provider should redirect the user once logged in,
-      // e.g., the current page for a single-page app.
-      redirectUrl: window.location.href,
-      // Provide a name for the application when sending to the Solid Identity Provider
-      clientName: "mei-friend"
-    });
-    
+    let providerEl = document.getElementById("providerSelect");
+    let provider = providerEl.value;
+    if(providerEl) { 
+      await solid.login({
+        // Specify the URL of the user's Solid Identity Provider;
+        // e.g., "https://login.inrupt.com".
+        oidcIssuer: provider,
+        // Specify the URL the Solid Identity Provider should redirect the user once logged in,
+        // e.g., the current page for a single-page app.
+        redirectUrl: window.location.href,
+        // Provide a name for the application when sending to the Solid Identity Provider
+        clientName: "mei-friend"
+      });
+    } else { 
+      console.warn("Couldn't handle incoming redirect from Solid: no provider element");
+    }
   } else { 
     populateSolidTab();
     /*
