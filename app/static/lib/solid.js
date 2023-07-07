@@ -446,8 +446,8 @@ export async function loginAndFetch() {
   if (!solid.getDefaultSession().info.isLoggedIn) {
     storage.restoreSolidSession = true;
     let providerEl = document.getElementById("providerSelect");
-    let provider = providerEl.value;
     if(providerEl) { 
+      let provider = providerEl.value;
       await solid.login({
         // Specify the URL of the user's Solid Identity Provider;
         // e.g., "https://login.inrupt.com".
