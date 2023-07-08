@@ -11,6 +11,7 @@
   display: flex;
   list-style: none;
   padding: 10px;
+  background-color:var(--annotationPanelBackgroundColor)
 }
 
 .annotationToolsIcon {
@@ -21,6 +22,25 @@
   align-content: center;
   gap: 6px;
   cursor: pointer;
+}
+
+.annotationToolsIconGroup { 
+  border-radius: 5px;
+  margin-bottom: 1em;
+}
+
+.annotationListItemButtons.icon {
+  cursor:pointer;
+}
+
+#annotateIdentify.disabled {
+  opacity:.6;
+  pointer-events: none;
+}
+
+.makeStandoffAnnotation svg.clockwise { 
+  pointer-events:none;
+  cursor:default;
 }
 
 .annotationToolsDomainSelection {
@@ -42,6 +62,11 @@
 
 .annotationLink {
   filter: drop-shadow(0px 0px 3em purple);
+  cursor: pointer;
+}
+
+.annotationIdentify { 
+  filter: drop-shadow(0px 0px 3em red);
   cursor: pointer;
 }
 
@@ -116,3 +141,21 @@ summary.noDetails {
   height: 1em;
 }
 
+.mao-selection { 
+  padding:2px;
+  padding-left:5px;
+}
+
+.mao-extract {
+  padding:2px;
+}
+
+.mao-musMat { 
+  background-color: var(--annotationPanelLinkBackgroundColor); 
+  padding: 2px;
+  border-radius:10px;
+}
+
+#solid_logo {
+  pointer-events: none;
+}

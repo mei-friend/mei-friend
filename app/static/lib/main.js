@@ -1,6 +1,6 @@
 // mei-friend version and date
-export const version = '0.9.1';
-export const versionDate = '4 July 2023'; // use full or 3-character english months, will be translated
+export const version = '0.10.0';
+export const versionDate = '8 July 2023'; // use full or 3-character english months, will be translated
 
 var vrvWorker;
 var spdWorker;
@@ -78,6 +78,11 @@ import * as e from './editor.js';
 import Viewer from './viewer.js';
 import * as speed from './speed.js';
 import Github from './github.js';
+import { 
+  loginAndFetch,
+  populateSolidTab,
+  solid
+} from './solid.js';
 import Storage from './storage.js';
 import { fillInBranchContents, logoutFromGithub, refreshGithubMenu, setCommitUIEnabledStatus } from './github-menu.js';
 import { forkAndOpen, forkRepositoryCancel } from './fork-repository.js';
@@ -241,6 +246,7 @@ export function loadDataInEditor(mei, setFreshlyLoaded = true) {
     // disable validation on Safari because of this strange error: "RangeError: Maximum call stack size exceeded" (WG, 1 Oct 2022)
     v.checkSchema(mei);
   }
+  setStandoffAnnotationEnabledStatus();
   clearAnnotations();
   readAnnots(true); // from annotation.js
   setCursorToId(cm, handleURLParamSelect());
@@ -546,8 +552,16 @@ function onLanguageLoaded() {
   // fill sample encodings
   fillInSampleEncodings();
 
+  // populate the Solid tab in the annotations panel
+  populateSolidTab();
+
   // restore localStorage if we have it
   if (storage.supported) {
+    storage.read();
+    if(storage.restoreSolidSession) { 
+      // attempt to restore Solid session with fresh data
+      loginAndFetch();
+    }
     // save (most) URL parameters in storage
     if (orientationParam !== null) storage.notationOrientation = orientationParam;
     if (notationProportionParam !== null) storage.notationProportion = notationProportionParam;
@@ -927,7 +941,7 @@ async function vrvWorkerEventsHandler(ev) {
       setTimemap(ev.data.timemap);
       if (mp) {
         blob = midiDataToBlob(ev.data.midi);
-        core.blobToNoteSequence(blob).then((noteSequence) => {
+        midiCore.blobToNoteSequence(blob).then((noteSequence) => {
           mp.noteSequence = noteSequence;
         });
       }
@@ -1137,7 +1151,8 @@ export function handleEncoding(mei, setFreshlyLoaded = true, updateAfterLoading 
     clearAnnotations();
     v.busy(false);
   }
-} // handleEncoding()
+  setStandoffAnnotationEnabledStatus();
+}
 
 function openFileDialog(accept = '*') {
   let input = document.createElement('input');
@@ -1607,7 +1622,7 @@ function addEventListeners(v, cm) {
   document.getElementById('showAnnotationsButton').addEventListener('click', cmd.toggleAnnotationPanel);
   document.getElementById('showFacsimileButton').addEventListener('click', cmd.toggleFacsimilePanel);
   document.getElementById('closeAnnotationPanelButton').addEventListener('click', cmd.hideAnnotationPanel);
-  document.getElementById('hideAnnotationPanelButton').addEventListener('click', cmd.hideAnnotationPanel);
+//  document.getElementById('hideAnnotationPanelButton').addEventListener('click', cmd.hideAnnotationPanel);
   document.getElementById('showFacsimileMenu').addEventListener('click', cmd.showFacsimilePanel);
   document.getElementById('showPlaybackControls').addEventListener('click', cmd.toggleMidiPlaybackControlBar);
   // re-apply settings filtering when switching settings tabs
@@ -2003,6 +2018,18 @@ export function drawRightFooter() {
     }
     rf.innerHTML += `&nbsp;<a href="${githubUrl}" target="_blank" title="${tkUrl}">Verovio ${tkVersion}</a>.`;
   }
+}
+
+function setStandoffAnnotationEnabledStatus() { 
+  // Annotations: can only write standoff if a) not working locally (need URI) and b) isMEI (need stable identifiers)
+  if(fileLocationType === "file" || !isMEI || !solid.getDefaultSession().info.isLoggedIn) { 
+    document.getElementById("writeAnnotationStandoff").setAttribute("disabled", true);
+    document.getElementById("writeAnnotationStandoff").removeAttribute("selected");
+    document.getElementById("writeAnnotationInline").setAttribute("selected", true)
+  } else { 
+    document.getElementById("writeAnnotationStandoff").removeAttribute("disabled");
+  }
+
 }
 
 // handles any changes in CodeMirror
