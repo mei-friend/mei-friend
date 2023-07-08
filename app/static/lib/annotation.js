@@ -13,11 +13,14 @@ import {
   createMAOMusicalObject,
 } from './solid.js';
 import { 
+  liveUpdateElement,
   nsp,
   traverseAndFetch
 } from './linked-data.js'
 
 export let annotations = [];
+
+let liveUpdateRate = 5000; // ms to wait between live update attempts
 
 export function situateAndRefreshAnnotationsList(forceRefresh = false) {
   situateAnnotations();
@@ -868,7 +871,7 @@ async function fetchExtractsForIdentifiedObject(url) {
 * Draw placeholder for MAO setting into the musMat element corresponding to this url
 * Check first whether this setting is already included. Do not overwrite other settings.
 */
-async function drawMusicalMaterialForIdentifiedObject(obj, url){
+async function drawMusicalMaterialForIdentifiedObject(obj, url, etag){
   console.log("drawMusMatForIdentifiedObject: ", obj, url);
   const musMat = document.getElementById("musMat_"+url.href);
   if(musMat) { 
@@ -903,10 +906,29 @@ async function drawMusicalMaterialForIdentifiedObject(obj, url){
   }
 }
 
-async function drawExtractsForIdentifiedObject(obj, url) { 
-  console.log("drawExtractsForIdentifiedObject: ", obj, url);
+async function drawExtractsForIdentifiedObject(obj, url, etag) { 
+  console.log("drawExtractsForIdentifiedObject: ", obj, url, etag);
   const extract = document.getElementById("extract_"+url.href);
   if(extract) { 
+    let fetchMethod = solid.getDefaultSession().info.isLoggedIn ? solid.fetch : fetch
+    setTimeout(() => liveUpdateElement(
+      url, 
+      etag, 
+      function() {
+        refreshAnnotations(true);
+        traverseAndFetch(url, [nsp.MAO+'Extract'], {
+          typeToHandlerMap: { 
+            [nsp.MAO + "Extract"]: {
+              func: drawExtractsForIdentifiedObject
+            }
+          },
+          followList: [],
+          fetchMethod
+        })
+      }, 
+      liveUpdateRate, 
+      fetchMethod), 
+    liveUpdateRate);
     if(nsp.FRBR + "embodiment" in obj) {
       const alreadyIncluded = extract.querySelectorAll(".mao-selection");
       const alreadyIncludedUrls = alreadyIncluded.forEach(n => n.id.replace("selection_", ""));
@@ -927,7 +949,7 @@ async function drawExtractsForIdentifiedObject(obj, url) {
   }
 }
 
-async function drawSelectionsForIdentifiedObject(obj, url) { 
+async function drawSelectionsForIdentifiedObject(obj, url, etag) { 
   console.log("drawSelectionForIdentifiedObject: ", obj, url);
   const selection = document.getElementById("selection_"+url.href);
   if(selection){ 

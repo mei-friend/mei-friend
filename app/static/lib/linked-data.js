@@ -36,21 +36,22 @@ export async function traverseAndFetch(
   targetTypes,
   { typeToHandlerMap = {}, followList = [], blockList = [], userProvided = true, jumps = 10, fetchMethod = fetch } = {}
 ) {
+  let etag = "";
   fetchMethod(url, {
+    method: "GET",
     headers: {
       Accept: 'application/ld+json',
     },
-  })
-    .then((resp) => {
+  }).then((resp) => {
       if (resp.status >= 400) {
         console.warn("Couldn't traverse and fetch: ", resp);
       } else {
+        etag = resp.headers.get("ETag");
         return resp.json();
       }
     })
     .then((json) => jsonld.expand(json))
     .then((expanded) => {
-      console.log('expanded: ', expanded);
       let resourceDescription;
       if (Array.isArray(expanded)) {
         // got an array back - find the node matching the current document (either absolute or relative URI)
@@ -72,7 +73,7 @@ export async function traverseAndFetch(
         const targetUrlStrings = targetTypes.map((t) => t.href);
         if (resourceDescription['@type'].filter((t) => targetUrlStrings.includes(t)).length) {
           // found a target resource["@id"]!
-          ingestExternalResource(url, typeToHandlerMap, resourceDescription);
+          ingestExternalResource(url, typeToHandlerMap, resourceDescription, etag);
         }
         if (jumps >= 0) {
           // attempt to continue traversal
@@ -125,7 +126,7 @@ export async function traverseAndFetch(
  * @param {object} typeToHandlerMap
  * @param {object} resource
  */
-export function ingestExternalResource(url, typeToHandlerMap, resource) {
+export function ingestExternalResource(url, typeToHandlerMap, resource, etag) {
   try {
     // ensure array
     resource['@type'] = Array.isArray(resource['@type']) ? resource['@type'] : [resource['@type']];
@@ -134,10 +135,37 @@ export function ingestExternalResource(url, typeToHandlerMap, resource) {
     console.log("ingest external resource: ", mappedTypes, typeToHandlerMap, resource)
     mappedTypes.forEach((t) => {
       'args' in typeToHandlerMap[t] ? 
-        typeToHandlerMap[t].func(resource, url, ...typeToHandlerMap[t].args) : 
-        typeToHandlerMap[t].func(resource, url)  
+        typeToHandlerMap[t].func(resource, url, etag, ...typeToHandlerMap[t].args) : 
+        typeToHandlerMap[t].func(resource, url, etag)  
     });
   } catch (e) {
     console.error("Couldn't ingest external resource: ", e);
   }
 }// ingestExternalResource()
+
+export async function liveUpdateElement(url, etag, onResourceChanged, liveUpdateRate, fetchMethod = fetch) {
+  console.log("Live updating element ", Date.now(), url, etag);
+  fetchMethod(url, { 
+    method: 'HEAD',
+    headers: { 
+      "If-None-Match": etag,
+      Accept: 'application/ld+json'
+    }
+   }).then(async headResp=> { 
+    let updatedEtag = headResp.headers.get("ETag");
+    if(!etag) {
+      etag = updatedEtag;
+    } else if(etag !== updatedEtag)  {
+        console.log("Live update - change detected to ", url, etag, updatedEtag)
+        // resource has changed! 
+        onResourceChanged();
+        etag = updatedEtag;
+    } else { 
+      console.log("Live update - no change to ", url, etag);
+    }
+  }).catch((e) => {
+    console.warn("Error attempting live update: ", e, url, etag);
+  }).finally(() => {
+    setTimeout(() => liveUpdateElement(url, etag, onResourceChanged, liveUpdateRate, fetchMethod), liveUpdateRate);
+  })
+}
