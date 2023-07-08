@@ -1,5 +1,8 @@
 # mei-friend-online CHANGELOG.md
 
+### 0.10.0 Solid integration and Music Annotation Ontology support
+* Enable log-in to Solid Pod
+* Allow creation of Music Annotation Ontology objects in response to selections
 
 ### 0.9.0 GitHub Actions integration
 * Configurably display any GitHub Actions (dispatch workflows) available in the current repository / branch
