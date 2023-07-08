@@ -76,7 +76,7 @@ export function refreshAnnotationsList() {
     } else {
       (isStandoff.title = translator.lang.makeStandOffAnnotation.descriptionToLocal + ': '), a.id;
       isStandoff.dataset.id = a.id;
-      isStandoff.addEventListener('click', copyIdToClipboard);
+      isStandoff.addEventListener('click', (e) => window.open(a.id, "_blank"));
     }
     const isInline = document.createElement('a');
     isInline.id = 'makeInlineAnnotation';
