@@ -29,6 +29,20 @@
   margin-bottom: 1em;
 }
 
+.annotationListItemButtons.icon {
+  cursor:pointer;
+}
+
+#annotateIdentify.disabled {
+  opacity:.6;
+  pointer-events: none;
+}
+
+.makeStandoffAnnotation svg.clockwise { 
+  pointer-events:none;
+  cursor:default;
+}
+
 .annotationToolsDomainSelection {
   display: flex;
 }
@@ -48,6 +62,11 @@
 
 .annotationLink {
   filter: drop-shadow(0px 0px 3em purple);
+  cursor: pointer;
+}
+
+.annotationIdentify { 
+  filter: drop-shadow(0px 0px 3em red);
   cursor: pointer;
 }
 

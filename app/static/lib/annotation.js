@@ -201,9 +201,7 @@ export function situateAnnotations() {
       const musMatDiv = document.querySelector('#musMat_'+CSS.escape(a.id));
       console.log("extracts DIV: ", musMatDiv);
       if(musMatDiv && !musMatDiv.innerHTML.length) { 
-        // draw "waiting" icon 
-        musMatDiv.innerHTML = `<span class="rdfLoadingIndicator">${rdf}</span>`;
-        musMatDiv.getElementsByTagName("svg")[0].classList.add("clockwise");
+        musMatDiv.closest(".annotationListItem").querySelector(".makeStandoffAnnotation svg").classList.add("clockwise");
         fetchMAOComponentsForIdentifiedObject(a.id);
       }
     }
@@ -460,6 +458,20 @@ export function addAnnotationHandlers() {
 
   document.querySelectorAll('.annotationToolsIcon').forEach((a) => a.removeEventListener('click', annotationHandler));
   document.querySelectorAll('.annotationToolsIcon').forEach((a) => a.addEventListener('click', annotationHandler));
+
+  // disable 'identify music object' unless 'linked data' domain selected
+  document.querySelectorAll('.annotationToolsDomainSelectionItem input').forEach((i) => i.removeEventListener('click', enableDisableIdentifyObject))
+  document.querySelectorAll('.annotationToolsDomainSelectionItem input').forEach((i) => i.addEventListener('click', enableDisableIdentifyObject))
+  enableDisableIdentifyObject(); // set initial status
+}
+
+function enableDisableIdentifyObject() { 
+  let identifyTool = document.getElementById("annotateIdentify");
+  if(document.getElementById("writeAnnotationInline").checked) { 
+    identifyTool.classList.add("disabled");
+  } else { 
+    identifyTool.classList.remove("disabled");
+  }
 }
 
 // reads <annot> elements from XML DOM and adds them into annotations array
@@ -935,9 +947,9 @@ async function drawSelectionsForIdentifiedObject(obj, url) {
     } else { 
       console.warn("Can't draw a selection without parts: ", obj, url);
     }
-    const myMusMat = selection.closest(".mao-musMat");
+    const myMusMat = selection.closest(".annotationListItem");
     if(myMusMat) { 
-      const myLoadingIndicator = myMusMat.querySelector(".rdfLoadingIndicator svg");
+      const myLoadingIndicator = myMusMat.querySelector(".makeStandoffAnnotation svg");
       if(myLoadingIndicator)
         myLoadingIndicator.classList.remove("clockwise");
     }
