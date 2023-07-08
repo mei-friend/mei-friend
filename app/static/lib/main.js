@@ -941,7 +941,7 @@ async function vrvWorkerEventsHandler(ev) {
       setTimemap(ev.data.timemap);
       if (mp) {
         blob = midiDataToBlob(ev.data.midi);
-        core.blobToNoteSequence(blob).then((noteSequence) => {
+        midiCore.blobToNoteSequence(blob).then((noteSequence) => {
           mp.noteSequence = noteSequence;
         });
       }

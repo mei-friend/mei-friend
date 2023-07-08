@@ -93,8 +93,13 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/keymap/vim.min.js"
     integrity="sha512-px+d4ezEJ2hi3SHqwRziL871LTHSqfj1GxV1Cp78Sp/SAMEIJwxKNDGcQz96FEv/IqRPLcJ848BWhSUM7msEGQ=="
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <script
-    src="https://cdn.jsdelivr.net/combine/npm/tone@14.7.58,npm/@magenta/music@1.23.1/es6/core.js,npm/focus-visible@5,npm/html-midi-player@1.5.0"></script>
+  <script src="https://cdn.jsdelivr.net/combine/npm/tone@14.7.58,npm/@magenta/music@1.23.1/es6/core.js,npm/focus-visible@5,npm/html-midi-player@1.5.0"></script>
+  <script type="text/javascript">
+    // get another handle on html-midi-player's 'core' variable to prevent namespace clash with 'core' defined by jsonld
+    var midiCore = core;
+  </script>
+
+  </script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jsonld/1.0.0/jsonld.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/fast-json-patch/3.1.1/fast-json-patch.min.js"></script>
