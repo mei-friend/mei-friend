@@ -558,10 +558,6 @@ function onLanguageLoaded() {
   // restore localStorage if we have it
   if (storage.supported) {
     storage.read();
-    if(storage.restoreSolidSession) { 
-      // attempt to restore Solid session with fresh data
-      loginAndFetch();
-    }
     // save (most) URL parameters in storage
     if (orientationParam !== null) storage.notationOrientation = orientationParam;
     if (notationProportionParam !== null) storage.notationProportion = notationProportionParam;
@@ -636,6 +632,12 @@ function onLanguageLoaded() {
       }
     }
   }
+
+  if(storage.supported && storage.restoreSolidSession) { 
+    // attempt to restore Solid session with fresh data
+    loginAndFetch();
+  }
+  
   // Retrieve parameters from URL params, from storage, or default values
   if (scaleParam !== null) {
     document.getElementById('verovioZoom').value = scaleParam;
@@ -681,6 +683,7 @@ function onLanguageLoaded() {
   } else {
     fp = defaultFacsimileProportion;
   }
+
   setNotationProportion(np);
   setFacsimileProportion(fp);
   setOrientation(cm, o, fo, v, storage);
