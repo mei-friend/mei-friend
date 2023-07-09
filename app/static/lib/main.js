@@ -246,6 +246,7 @@ export function loadDataInEditor(mei, setFreshlyLoaded = true) {
     // disable validation on Safari because of this strange error: "RangeError: Maximum call stack size exceeded" (WG, 1 Oct 2022)
     v.checkSchema(mei);
   }
+  console.log("file location type loadDataInEditor:", fileLocationType)
   setStandoffAnnotationEnabledStatus();
   clearAnnotations();
   readAnnots(true); // from annotation.js
@@ -766,11 +767,11 @@ function openUrlProcess(content, url, updateAfterLoading) {
     refreshGithubMenu();
   }
   updateFileStatusDisplay();
-  handleEncoding(content, true, updateAfterLoading);
   if (storage.supported) {
     storage.fileLocationType = 'url';
   }
   fileLocationType = 'url';
+  handleEncoding(content, true, updateAfterLoading);
   openUrlCancel(); //hide open URL UI elements
   const fnStatus = document.getElementById('fileName');
   if (fnStatus) fnStatus.removeAttribute('contenteditable');
@@ -1154,6 +1155,7 @@ export function handleEncoding(mei, setFreshlyLoaded = true, updateAfterLoading 
     clearAnnotations();
     v.busy(false);
   }
+  console.log("fileLocationType handleEncoding: ", fileLocationType)
   setStandoffAnnotationEnabledStatus();
 }
 
