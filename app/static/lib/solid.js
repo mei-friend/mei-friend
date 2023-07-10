@@ -354,7 +354,9 @@ export async function populateSolidTab() {
     document.getElementById('solidLogout').addEventListener('click', solidLogout)
   } else {
     solidTab.innerHTML = populateLoggedOutSolidTab();
-    document.getElementById('solidLogin').addEventListener('click', loginAndFetch)
+    document.getElementById('solidLogin').addEventListener('click', () => { 
+      loginAndFetch()
+    })
   }
 }
 
