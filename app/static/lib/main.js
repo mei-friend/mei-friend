@@ -1,6 +1,6 @@
 // mei-friend version and date
-export const version = '0.9.1';
-export const versionDate = '29 June 2023'; // use full or 3-character english months, will be translated
+export const version = '0.10.0';
+export const versionDate = '9 July 2023'; // use full or 3-character english months, will be translated
 
 var vrvWorker;
 var spdWorker;
@@ -255,12 +255,14 @@ export function loadDataInEditor(mei, setFreshlyLoaded = true) {
 export function updateLocalStorage(meiXml) {
   // if storage is available, save file name, location, content
   // if we're working with github, save github metadata
-  if (storage.supported && !storage.override) {
+  if (storage.supported) {
     try {
       storage.fileName = meiFileName;
       storage.fileLocation = meiFileLocation;
-      storage.content = meiXml;
       storage.isMEI = isMEI;
+      if(!storage.override) { 
+        storage.content = meiXml;
+      }
       if (isLoggedIn) {
         updateGithubInLocalStorage();
       }
@@ -271,7 +273,7 @@ export function updateLocalStorage(meiXml) {
         err
       );
       setFileChangedState(fileChanged); // flags any storage-exceeded issues
-      storage.clear();
+     // storage.clear();
     }
   }
 }
@@ -539,14 +541,42 @@ function onLanguageLoaded() {
   }
 
   let urlFileName = searchParams.get('file');
+
+  if(storage.supported && urlFileName) { 
+    // write url filename to storage so we can act upon it later, e.g. on return from solid login
+    let url = new URL(urlFileName);
+    storage.safelySetStorageItem("fileLocation", url.href);
+    storage.safelySetStorageItem("fileName", url.pathname.substring(url.pathname.lastIndexOf('/') + 1));
+    storage.safelySetStorageItem("fileLocationType", "url");
+    storage.read();
+    console.log("Have set local storage: ", storage);
+  }
+
+  if(storage.supported && storage.restoreSolidSession) { 
+    // attempt to restore Solid session with fresh data
+    loginAndFetch();
+  }
+
   // fork parameter: if true AND ?fileParam is set to a URL,
   // then put mei-friend into "remote fork request" mode:
   // If user is logged in, open a pre-populated fork-repository menu
   // Else, remember we are in remote fork request mode, log user in, and then proceed as above.
   let forkParam = searchParams.get('fork');
+
+  let urlFetchInProgress = false;
+
+  // if we have received a ?file= param (without ?fork which is a special case further down, OR
+  // ... if we have a fileLocationType 'url' with a fileLocation specified in storage, but NO meiXml
+  // ... (=> because storage was disabled, e.g., due to encoding size)...
+  // then, fetch and load the URL.
   if (urlFileName && !(forkParam === 'true')) {
     // normally open the file from URL
     openUrlFetch(new URL(urlFileName));
+    urlFetchInProgress = true;
+  } else if(storage.supported && storage.fileLocationType && storage.fileLocation && storage.fileLocationType === "url" && 
+      !storage.meiXml) { 
+    openUrlFetch(new URL(storage.fileLocation));
+    urlFetchInProgress = true;
   }
 
   // fill sample encodings
@@ -558,10 +588,6 @@ function onLanguageLoaded() {
   // restore localStorage if we have it
   if (storage.supported) {
     storage.read();
-    if(storage.restoreSolidSession) { 
-      // attempt to restore Solid session with fresh data
-      loginAndFetch();
-    }
     // save (most) URL parameters in storage
     if (orientationParam !== null) storage.notationOrientation = orientationParam;
     if (notationProportionParam !== null) storage.notationProportion = notationProportionParam;
@@ -578,7 +604,7 @@ function onLanguageLoaded() {
     }
 
     setFileChangedState(storage.fileChanged);
-    if (!urlFileName) {
+    if (!urlFileName && !urlFetchInProgress) {
       // no URI param specified - try to restore from storage
       if (storage.content && storage.fileName) {
         // restore file name and content from storage
@@ -636,6 +662,8 @@ function onLanguageLoaded() {
       }
     }
   }
+
+  
   // Retrieve parameters from URL params, from storage, or default values
   if (scaleParam !== null) {
     document.getElementById('verovioZoom').value = scaleParam;
@@ -681,6 +709,7 @@ function onLanguageLoaded() {
   } else {
     fp = defaultFacsimileProportion;
   }
+
   setNotationProportion(np);
   setFacsimileProportion(fp);
   setOrientation(cm, o, fo, v, storage);
@@ -849,7 +878,7 @@ async function vrvWorkerEventsHandler(ev) {
         if (!ev.data.removeIds) v.selectedElements.push(ev.data.xmlId);
       }
 
-      if (isSafari && Object.keys(lang).length > 0 && !safariWarningShown) {
+      if (isSafari && Object.keys(translator.lang).length > 0 && !safariWarningShown) {
         safariWarningShown = true;
         v.showAlert(translator.lang.isSafariWarning.text, 'error', -1);
       }
@@ -1274,7 +1303,7 @@ export let cmd = {
       meiFileName = document.getElementById('fileName').innerText;
       updateStatusBar();
       updateHtmlTitle();
-      if (storage.supported && !storage.override) storage.safelySetStorageItem('meiFileName', meiFileName);
+      if (storage.supported) storage.safelySetStorageItem('meiFileName', meiFileName);
     } else {
       console.warn('Attempted to change file name on non-local file');
     }
@@ -2022,7 +2051,8 @@ export function drawRightFooter() {
 
 function setStandoffAnnotationEnabledStatus() { 
   // Annotations: can only write standoff if a) not working locally (need URI) and b) isMEI (need stable identifiers)
-  if(fileLocationType === "file" || !isMEI || !solid.getDefaultSession().info.isLoggedIn) { 
+  // HACK DH 2023: loosen isMEI requirement. TODO fix. 
+  if(fileLocationType === "file" || /*!isMEI || */ !solid.getDefaultSession().info.isLoggedIn) { 
     document.getElementById("writeAnnotationStandoff").setAttribute("disabled", true);
     document.getElementById("writeAnnotationStandoff").removeAttribute("selected");
     document.getElementById("writeAnnotationInline").setAttribute("selected", true)

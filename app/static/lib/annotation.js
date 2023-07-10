@@ -386,30 +386,34 @@ export function addAnnotationHandlers() {
 
   // functions to create annotations
   const createIdentify = (e) => {
-    const label = window.prompt("Add label for identified object (optional)");
-    const selection = v.selectedElements;
-    document.getElementById('solid_logo').classList.add('clockwise');
-    createMAOMusicalObject(selection, label)
-      .then((maoMusicalMaterial) => {
-        getSolidStorage().then((solidStorage) => {
-          console.log(
-            'CREATED MUSICAL MATERIAL: ',
-            solidStorage + maoMusicalMaterial.headers.get('location').substr(1), maoMusicalMaterial
-          );
-          const a = {
-            id: solidStorage + maoMusicalMaterial.headers.get('location').substr(1),
-            type: 'annotateIdentify',
-            selection: selection,
-            isStandoff: true,
-          };
-          annotations.push(a);
-          refreshAnnotations(true);
+    if(solid.getDefaultSession().info.isLoggedIn) { 
+      const label = window.prompt("Add label for identified object (optional)");
+      const selection = v.selectedElements;
+      document.getElementById('solid_logo').classList.add('clockwise');
+      createMAOMusicalObject(selection, label)
+        .then((maoMusicalMaterial) => {
+          getSolidStorage().then((solidStorage) => {
+            console.log(
+              'CREATED MUSICAL MATERIAL: ',
+              solidStorage + maoMusicalMaterial.headers.get('location').substr(1), maoMusicalMaterial
+            );
+            const a = {
+              id: solidStorage + maoMusicalMaterial.headers.get('location').substr(1),
+              type: 'annotateIdentify',
+              selection: selection,
+              isStandoff: true,
+            };
+            annotations.push(a);
+            refreshAnnotations(true);
+          });
+        })
+        .finally(() => {
+          document.getElementById('solid_logo').classList.remove('clockwise');
         });
-      })
-      .finally(() => {
-        document.getElementById('solid_logo').classList.remove('clockwise');
-      });
     // writing inline not supported
+    } else { 
+      document.getElementById("solidButton").click();
+    }
   };
   const createHighlight = (e) => {
     const a = {
@@ -466,12 +470,15 @@ export function addAnnotationHandlers() {
   document.querySelectorAll('.annotationToolsDomainSelectionItem input').forEach((i) => i.removeEventListener('click', enableDisableIdentifyObject))
   document.querySelectorAll('.annotationToolsDomainSelectionItem input').forEach((i) => i.addEventListener('click', enableDisableIdentifyObject))
   enableDisableIdentifyObject(); // set initial status
+  document.getElementById("annotationToolsButton").removeEventListener('click', enableDisableIdentifyObject);
+  document.getElementById("annotationToolsButton").addEventListener('click', enableDisableIdentifyObject);
 }
 
 function enableDisableIdentifyObject() { 
   let identifyTool = document.getElementById("annotateIdentify");
   if(document.getElementById("writeAnnotationInline").checked) { 
-    identifyTool.classList.add("disabled");
+    // HACK DH 2023 fix this!
+  //  identifyTool.classList.add("disabled");
   } else { 
     identifyTool.classList.remove("disabled");
   }

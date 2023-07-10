@@ -11,20 +11,21 @@ export default class Storage {
   }
 
   safelySetStorageItem(item, content) {
-    if (this.supported && !this.override) {
-      try {
-        if (content && typeof content === 'object') {
-          content = JSON.stringify(content);
+    if (this.supported) { 
+      if(item !== "meiXml" || !this.override) {
+        try {
+          if (content && typeof content === 'object') {
+            content = JSON.stringify(content);
+          }
+          this.storage.setItem(item, content);
+        } catch (err) {
+          this.override = true;
+          console.warn(
+            'Disabling local storage for current file - ' + 'could not save file content. Content may be too big? ',
+            err
+          );
+          this.read();
         }
-        this.storage.setItem(item, content);
-      } catch (err) {
-        this.override = true;
-        console.warn(
-          'Disabling local storage for current file - ' + 'could not save file content. Content may be too big? ',
-          err
-        );
-        this.clear();
-        this.read();
       }
     }
   }
