@@ -143,7 +143,7 @@ export function ingestExternalResource(url, typeToHandlerMap, resource, etag) {
   }
 }// ingestExternalResource()
 
-export async function liveUpdateElement(url, etag, onResourceChanged, liveUpdateRate, fetchMethod = fetch) {
+export async function refetchElement(url, etag, onResourceChanged, liveUpdateRate, fetchMethod = fetch) {
   console.log("Live updating element ", Date.now(), url, etag);
   fetchMethod(url, { 
     method: 'HEAD',
@@ -166,6 +166,6 @@ export async function liveUpdateElement(url, etag, onResourceChanged, liveUpdate
   }).catch((e) => {
     console.warn("Error attempting live update: ", e, url, etag);
   }).finally(() => {
-    setTimeout(() => liveUpdateElement(url, etag, onResourceChanged, liveUpdateRate, fetchMethod), liveUpdateRate);
+    //setTimeout(() => liveUpdateElement(url, etag, onResourceChanged, liveUpdateRate, fetchMethod), liveUpdateRate);
   })
 }

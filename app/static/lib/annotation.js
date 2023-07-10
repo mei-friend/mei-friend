@@ -13,7 +13,7 @@ import {
   createMAOMusicalObject,
 } from './solid.js';
 import { 
-  liveUpdateElement,
+  refetchElement,
   nsp,
   traverseAndFetch
 } from './linked-data.js'
@@ -918,24 +918,6 @@ async function drawExtractsForIdentifiedObject(obj, url, etag) {
   const extract = document.getElementById("extract_"+url.href);
   if(extract) { 
     let fetchMethod = solid.getDefaultSession().info.isLoggedIn ? solid.fetch : fetch
-    setTimeout(() => liveUpdateElement(
-      url, 
-      etag, 
-      function() {
-        refreshAnnotations(true);
-        traverseAndFetch(url, [nsp.MAO+'Extract'], {
-          typeToHandlerMap: { 
-            [nsp.MAO + "Extract"]: {
-              func: drawExtractsForIdentifiedObject
-            }
-          },
-          followList: [],
-          fetchMethod
-        })
-      }, 
-      liveUpdateRate, 
-      fetchMethod), 
-    liveUpdateRate);
     if(nsp.FRBR + "embodiment" in obj) {
       const alreadyIncluded = extract.querySelectorAll(".mao-selection");
       const alreadyIncludedUrls = alreadyIncluded.forEach(n => n.id.replace("selection_", ""));
@@ -948,6 +930,27 @@ async function drawExtractsForIdentifiedObject(obj, url, etag) {
       selectionsToAdd.forEach(s => {
         extract.insertAdjacentHTML('beforeend', `<div class="mao-selection" id="selection_${s["@id"]}"></div>`)
       });
+      let updateBtn = document.createElement("div");
+      updateBtn.classList="refreshElementBtn";
+      updateBtn.innerText="Refresh";
+      updateBtn.addEventListener("click", () => refetchElement(
+        url, 
+        etag, 
+        function() {
+          refreshAnnotations(true);
+          traverseAndFetch(url, [nsp.MAO+'Extract'], {
+            typeToHandlerMap: { 
+              [nsp.MAO + "Extract"]: {
+                func: drawExtractsForIdentifiedObject
+              }
+            },
+            followList: [],
+            fetchMethod
+          })
+        }, 
+        liveUpdateRate, 
+        fetchMethod));
+      extract.insertAdjacentElement("afterend", updateBtn);
     } else { 
       console.warn("Can't draw an Extract without an embodiment:", obj)
     }
