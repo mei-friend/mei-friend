@@ -564,6 +564,8 @@ function onLanguageLoaded() {
   // Else, remember we are in remote fork request mode, log user in, and then proceed as above.
   let forkParam = searchParams.get('fork');
 
+  let urlFetchInProgress = false;
+
   // if we have received a ?file= param (without ?fork which is a special case further down, OR
   // ... if we have a fileLocationType 'url' with a fileLocation specified in storage, but NO meiXml
   // ... (=> because storage was disabled, e.g., due to encoding size)...
@@ -571,9 +573,11 @@ function onLanguageLoaded() {
   if (urlFileName && !(forkParam === 'true')) {
     // normally open the file from URL
     openUrlFetch(new URL(urlFileName));
+    urlFetchInProgress = true;
   } else if(storage.supported && storage.fileLocationType && storage.fileLocation && storage.fileLocationType === "url" && 
       !storage.meiXml) { 
     openUrlFetch(new URL(storage.fileLocation));
+    urlFetchInProgress = true;
   }
 
   // fill sample encodings
@@ -601,7 +605,7 @@ function onLanguageLoaded() {
     }
 
     setFileChangedState(storage.fileChanged);
-    if (!urlFileName) {
+    if (!urlFileName && !urlFetchInProgress) {
       // no URI param specified - try to restore from storage
       if (storage.content && storage.fileName) {
         // restore file name and content from storage
