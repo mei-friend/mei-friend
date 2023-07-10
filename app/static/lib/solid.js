@@ -316,7 +316,7 @@ async function createMAOExtract(postSelectionResponse, aboutUri, discoveryUri, l
   let selectionUri = new URL(postSelectionResponse.url).origin +  
     postSelectionResponse.headers.get("location");
   let resource = structuredClone(resources.maoExtract);
-  resource[nsp.FRBR + "embodiment"] = { "@id": selectionUri };
+  resource[nsp.FRBR + "embodiment"] = [{ "@id": selectionUri }];
   if(label) { 
     resource[nsp.RDFS + "label"] = label;
   }
@@ -354,7 +354,9 @@ export async function populateSolidTab() {
     document.getElementById('solidLogout').addEventListener('click', solidLogout)
   } else {
     solidTab.innerHTML = populateLoggedOutSolidTab();
-    document.getElementById('solidLogin').addEventListener('click', loginAndFetch)
+    document.getElementById('solidLogin').addEventListener('click', () => { 
+      loginAndFetch()
+    })
   }
 }
 
