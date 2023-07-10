@@ -173,6 +173,7 @@ export function generateAnnotationLocationLabel(a) {
 // call whenever layout reflows to re-situate annotations appropriately
 export function situateAnnotations() {
   annotations.forEach(async (a) => {
+    console.log("situating ", a);
     // for each element in a.selection, ask Verovio for the page number
     // set a.firstPage and a.lastPage to min/max page numbers returned
     a.firstPage = 'unsituated';

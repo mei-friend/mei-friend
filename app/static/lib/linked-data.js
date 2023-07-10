@@ -151,7 +151,9 @@ export async function refetchElement(url, etag, onResourceChanged, liveUpdateRat
       "If-None-Match": etag,
       Accept: 'application/ld+json'
     }
-   }).then(async headResp=> { 
+   }).then(async headResp=> {
+    onResourceChanged();
+    /*
     let updatedEtag = headResp.headers.get("ETag");
     if(!etag) {
       etag = updatedEtag;
@@ -162,7 +164,7 @@ export async function refetchElement(url, etag, onResourceChanged, liveUpdateRat
         etag = updatedEtag;
     } else { 
       console.log("Live update - no change to ", url, etag);
-    }
+    }*/
   }).catch((e) => {
     console.warn("Error attempting live update: ", e, url, etag);
   }).finally(() => {
