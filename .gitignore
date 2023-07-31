@@ -1,5 +1,6 @@
 local
 verovio
+gunicorn-log.conf 
 app/static/CodeMirror
 app/static/lib/env.js
 app/static/npm/
