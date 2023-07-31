@@ -1,7 +1,7 @@
 import { v, cm, log, translator, meiFileLocation, fileLocationType } from './main.js';
 import { convertCoords, generateXmlId, rmHash, setCursorToId } from './utils.js';
 import { meiNameSpace, xmlNameSpace, xmlToString } from './dom-utils.js';
-import { circle, diffRemoved, highlight, fileCode, identify, link, pencil, rdf, symLinkFile } from '../css/icons.js';
+import { circle, diffRemoved, highlight, fileCode, identify, link, pencil, rdf, speechBubble, symLinkFile } from '../css/icons.js';
 import { removeInEditor } from './editor.js';
 import {
   solid,
@@ -60,6 +60,14 @@ export function refreshAnnotationsList() {
     flipToAnno.title = translator.lang.flipPageToAnnotationText.description;
     flipToAnno.classList.add('icon');
     if (!'selection' in a) flipToAnno.classList.add('disabled');
+    const addObservation = document.createElement('a');
+    addObservation.insertAdjacentHTML('afterbegin', speechBubble);
+    addObservation.classList.add('addObservation');
+    addObservation.title = "Add observation to extract";
+    addObservation.classList.add('icon');
+    if(a.type !== !'annotateIdentify') { 
+      addObservation.classList.add('disabled');
+    }
     const deleteAnno = document.createElement('a');
     deleteAnno.classList.add('deleteAnnotation');
     deleteAnno.insertAdjacentHTML('afterbegin', diffRemoved);
