@@ -2,6 +2,7 @@ import { forkRepository, forkRepositoryCancel } from './fork-repository.js';
 import {
   cm,
   fileChanged,
+  fileLocationType,
   generateUrl,
   github, // github instance
   handleEncoding,
@@ -227,6 +228,7 @@ function loadFile(fileName = "", clearBeforeLoading = true, ev = null) {
       updateFileStatusDisplay();
       setFileChangedState(false);
       updateGithubInLocalStorage();
+      fileLocationType = "github";
       fillInCommitLog('withRefresh');
       const fnStatus = document.getElementById('fileName');
       if (fnStatus) fnStatus.removeAttribute('contenteditable');

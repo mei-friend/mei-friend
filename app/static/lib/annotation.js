@@ -482,8 +482,7 @@ export function addAnnotationHandlers() {
 function enableDisableIdentifyObject() { 
   let identifyTool = document.getElementById("annotateIdentify");
   if(document.getElementById("writeAnnotationInline").checked) { 
-    // HACK DH 2023 fix this!
-  //  identifyTool.classList.add("disabled");
+    identifyTool.classList.add("disabled");
   } else { 
     identifyTool.classList.remove("disabled");
   }
