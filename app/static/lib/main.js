@@ -554,7 +554,12 @@ function onLanguageLoaded() {
 
   if(storage.supported && storage.restoreSolidSession) { 
     // attempt to restore Solid session with fresh data
-    loginAndFetch();
+    let go = window.confirm("Continue logging in to your Solid Pod with mei-friend?");
+    if(go) {
+      loginAndFetch();
+    } else { 
+      storage.removeItem("restoreSolidSession");
+    }
   }
 
   // fork parameter: if true AND ?fileParam is set to a URL,
