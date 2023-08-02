@@ -9,8 +9,10 @@ import {
   isMEI,
   meiFileName,
   setFileChangedState,
+  setFileLocationType,
   setGithubInstance, // github instance setter
   setMeiFileInfo,
+  setStandoffAnnotationEnabledStatus,
   storage,
   translator,
   updateFileStatusDisplay,
@@ -228,7 +230,8 @@ function loadFile(fileName = "", clearBeforeLoading = true, ev = null) {
       updateFileStatusDisplay();
       setFileChangedState(false);
       updateGithubInLocalStorage();
-      fileLocationType = "github";
+      setFileLocationType("github");
+      setStandoffAnnotationEnabledStatus();
       fillInCommitLog('withRefresh');
       const fnStatus = document.getElementById('fileName');
       if (fnStatus) fnStatus.removeAttribute('contenteditable');
