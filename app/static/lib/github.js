@@ -549,6 +549,7 @@ export default class Github {
       }), {
         method: 'GET',
         headers: this.actionsHeaders,
+        cache: "no-store" // do not cache response to prevent delays to polling update
       }).then((res) => res.json())
       .then((resJson) => { 
         let run;
