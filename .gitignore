@@ -9,3 +9,4 @@ app/static/npm/
 venv
 *.swp
 app/__pycache__
+tmp
