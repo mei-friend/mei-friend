@@ -172,7 +172,7 @@ a:active {
   -ms-transform: translate(-50%, -50%);
 }
 
-.openUrlOverlay, #githubActionsOverlay {
+.openUrlOverlay, #githubActionsOverlay, #solidOverlay {
   position: fixed;
   display: none;
   top: 0;
@@ -181,6 +181,29 @@ a:active {
   bottom: 0;
   background-color: rgba(0, 0, 0, .8);
   z-index: 190;
+}
+
+#solidOverlay.active { 
+  display:flex; 
+  align-items:center;
+  justify-content:center;
+}
+
+#solidOverlayCancel span { 
+  font-family: monospace;
+}
+
+#solidLoadingIndicator { 
+  border-radius:32px;
+  background-color:rgba(255,255,255,.7);
+  width: 200px;
+  height:fit-content;
+  z-index:190;
+  text-align:center;
+}
+
+#solidLoadingIndicator svg { 
+  width: 200px;
 }
 
 #githubActionsUI { 

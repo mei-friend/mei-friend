@@ -497,35 +497,35 @@ export async function loginAndFetch() {
   //      the user's credentials are stored in-memory, and
   //      the login process is complete.
   //   Otherwise, no-op.
-  await solid.handleIncomingRedirect({ restorePreviousSession: true });
-
-  // 2. Start the Login Process if not already logged in.
-  if (!solid.getDefaultSession().info.isLoggedIn) {
-    storage.restoreSolidSession = true;
-    let providerEl = document.getElementById('providerSelect');
-    if (providerEl) {
-      let provider = providerEl.value;
-      await solid.login({
-        // Specify the URL of the user's Solid Identity Provider;
-        // e.g., "https://login.inrupt.com".
-        oidcIssuer: provider,
-        // Specify the URL the Solid Identity Provider should redirect the user once logged in,
-        // e.g., the current page for a single-page app.
-        redirectUrl: window.location.href,
-        // Provide a name for the application when sending to the Solid Identity Provider
-        clientName: 'mei-friend',
-      });
+  solid.handleIncomingRedirect({ restorePreviousSession: true }).then((info) => { 
+    console.log("SOLID: DONE HANDLING INCOMING REDIRECT", info)
+    // 2. Start the Login Process if not already logged in.
+    if (!info.isLoggedIn) {
+      console.log('SOLID: NOT LOGGED IN');
+      storage.restoreSolidSession = true;
+      let providerEl = document.getElementById('providerSelect');
+      if (providerEl) {
+        let provider = providerEl.value;
+        solid.login({
+          // Specify the URL of the user's Solid Identity Provider;
+          // e.g., "https://login.inrupt.com".
+          oidcIssuer: provider,
+          // Provide a name for the application when sending to the Solid Identity Provider
+          clientName: 'mei-friend',
+        });
+      } else {
+        console.warn("Couldn't handle incoming redirect from Solid: no provider element");
+      }
     } else {
-      console.warn("Couldn't handle incoming redirect from Solid: no provider element");
+      console.log('SOLID: LOGGED IN');
+      populateSolidTab();
+      /*
+      solid.fetch("https://musicog.solidcommunity.net/private/")
+          .then(resp => resp.text())
+          .then(data => console.log("GOT DATA: ", data))
+          */
     }
-  } else {
-    populateSolidTab();
-    /*
-    solid.fetch("https://musicog.solidcommunity.net/private/")
-        .then(resp => resp.text())
-        .then(data => console.log("GOT DATA: ", data))
-        */
-  }
+  });
 }
 export function solidLogout() {
   solid.logout().then(() => {

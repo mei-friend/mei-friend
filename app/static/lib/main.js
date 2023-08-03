@@ -10,6 +10,7 @@ var breaksParam; // (string) the breaks parameter given through URL
 var pageParam; // (int) page parameter given through URL
 var selectParam; // (array) select ids given through multiple instances in URL
 let safariWarningShown = false; // show Safari warning only once
+let restoreSolidTimeout; // JS timeout that allows users to 'esc' before restoring solid session
 
 // exports
 export var cm;
@@ -546,13 +547,20 @@ function onLanguageLoaded() {
   }
 
   if (storage.supported && storage.restoreSolidSession) {
-    // attempt to restore Solid session with fresh data
-    let go = window.confirm('Continue logging in to your Solid Pod with mei-friend?');
-    if (go) {
-      loginAndFetch();
-    } else {
-      storage.removeItem('restoreSolidSession');
-    }
+    // inform user they are about to restore their solid session
+    // and that they can press 'esc' to stop (see generalized esc handler)
+    let solidOverlay = document.getElementById('solidOverlay');
+    solidOverlay.classList.add('active');
+    solidOverlay.tabIndex = -1;
+    solidOverlay.focus();
+    console.debug('Active: ', document.activeElement);
+    restoreSolidTimeout = setTimeout(() => { 
+      if(confirm("Yes?")) {
+        loginAndFetch();
+      } else { 
+        storage.removeItem('restoreSolidSession');
+      }
+    }, 1000)
   }
 
   // fork parameter: if true AND ?fileParam is set to a URL,
@@ -1530,12 +1538,22 @@ export let cmd = {
   openHelp: () => window.open(`./help`, '_blank'),
   consultGuidelines: () => consultGuidelines(),
   escapeKeyPressed: () => {
+    console.debug('ESCAPE PRESSED!!!!', document.activeElement);
     // reset settings filter, if settings have focus
     if (
       document.getElementById('settingsPanel') &&
       document.getElementById('settingsPanel') === document.activeElement.closest('#settingsPanel')
     ) {
       cmd.filterReset();
+    } else if (
+      document.getElementById('solidOverlay') &&
+      document.getElementById('solidOverlay') === document.activeElement.closest('#solidOverlay')
+    ) {
+      document.getElementById('solidOverlay').classList.remove('active');
+      storage.removeItem('restoreSolidSession');
+      if (restoreSolidTimeout) {
+        clearTimeout(restoreSolidTimeout);
+      }
     } else if (v.pdfMode) {
       cmd.pageModeOff();
     } else {
