@@ -14,3 +14,4 @@ app/static/npm/node_modules/**/*
 venv
 *.swp
 app/__pycache__
+tmp
