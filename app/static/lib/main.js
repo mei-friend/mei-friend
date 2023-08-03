@@ -217,6 +217,10 @@ export function setMeiFileInfo(fName, fLocation, fLocationPrintable) {
   meiFileLocationPrintable = fLocationPrintable;
 }
 
+export function setFileLocationType(t) { 
+  fileLocationType = t; // wrap in function to facilitate external setting
+}
+
 export function updateFileStatusDisplay() {
   document.querySelector('#fileName').innerText = meiFileName.substring(meiFileName.lastIndexOf('/') + 1);
   document.querySelector('#fileLocation').innerText = meiFileLocationPrintable || '';
@@ -246,7 +250,6 @@ export function loadDataInEditor(mei, setFreshlyLoaded = true) {
     // disable validation on Safari because of this strange error: "RangeError: Maximum call stack size exceeded" (WG, 1 Oct 2022)
     v.checkSchema(mei);
   }
-  setStandoffAnnotationEnabledStatus();
   clearAnnotations();
   readAnnots(true); // from annotation.js
   setCursorToId(cm, handleURLParamSelect());
@@ -612,7 +615,7 @@ function onLanguageLoaded() {
         meiFileName = storage.fileName;
         meiFileLocation = storage.fileLocation;
         meiFileLocationPrintable = storage.fileLocationPrintable;
-        fileLocationType = storage.fileLocationType;
+        setFileLocationType(storage.fileLocationType);
         updateFileStatusDisplay();
         // on initial page load, CM doesn't fire a "changes" event
         // so we don't need to skip the "freshly loaded" change
@@ -795,7 +798,7 @@ function openUrlProcess(content, url, updateAfterLoading) {
   if (storage.supported) {
     storage.fileLocationType = 'url';
   }
-  fileLocationType = 'url';
+  setFileLocationType('url');
   openUrlCancel(); //hide open URL UI elements
   const fnStatus = document.getElementById('fileName');
   if (fnStatus) fnStatus.removeAttribute('contenteditable');
@@ -2048,15 +2051,15 @@ export function drawRightFooter() {
   }
 }
 
-function setStandoffAnnotationEnabledStatus() { 
+export function setStandoffAnnotationEnabledStatus() { 
   // Annotations: can only write standoff if a) not working locally (need URI) and b) isMEI (need stable identifiers)
-  // HACK DH 2023: loosen isMEI requirement. TODO fix. 
   if(fileLocationType === "file" || !isMEI || !solid.getDefaultSession().info.isLoggedIn) { 
-    document.getElementById("writeAnnotationStandoff").setAttribute("disabled", true);
-    document.getElementById("writeAnnotationStandoff").removeAttribute("selected");
-    document.getElementById("writeAnnotationInline").setAttribute("selected", true)
+    document.getElementById("writeAnnotationStandoff").setAttribute("disabled", "");
+    document.getElementById("writeAnnotationStandoffLabel").classList.add("disabled");
+    document.getElementById("writeAnnotationInline").checked = true;
   } else { 
     document.getElementById("writeAnnotationStandoff").removeAttribute("disabled");
+    document.getElementById("writeAnnotationStandoffLabel").classList.remove("disabled");
   }
 
 }

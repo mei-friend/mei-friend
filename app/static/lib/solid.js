@@ -4,6 +4,7 @@ import {
   fileLocationType,
   github, // instance
   meiFileLocation,
+  setStandoffAnnotationEnabledStatus,
   storage,
   version
 } from './main.js';
@@ -358,6 +359,7 @@ export async function populateSolidTab() {
       loginAndFetch()
     })
   }
+  setStandoffAnnotationEnabledStatus();
 }
 
 export async function getProfile() { 
