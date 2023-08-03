@@ -1,6 +1,6 @@
 // mei-friend version and date
-export const version = '0.10.0-p';
-export const versionDate = '31 July 2023'; // use full or 3-character english months, will be translated
+export const version = '0.10.1';
+export const versionDate = '3 August 2023'; // use full or 3-character english months, will be translated
 
 var vrvWorker;
 var spdWorker;
@@ -78,11 +78,7 @@ import * as e from './editor.js';
 import Viewer from './viewer.js';
 import * as speed from './speed.js';
 import Github from './github.js';
-import { 
-  loginAndFetch,
-  populateSolidTab,
-  solid
-} from './solid.js';
+import { loginAndFetch, populateSolidTab, solid } from './solid.js';
 import Storage from './storage.js';
 import { fillInBranchContents, logoutFromGithub, refreshGithubMenu, setCommitUIEnabledStatus } from './github-menu.js';
 import { forkAndOpen, forkRepositoryCancel } from './fork-repository.js';
@@ -217,6 +213,10 @@ export function setMeiFileInfo(fName, fLocation, fLocationPrintable) {
   meiFileLocationPrintable = fLocationPrintable;
 }
 
+export function setFileLocationType(t) {
+  fileLocationType = t; // wrap in function to facilitate external setting
+}
+
 export function updateFileStatusDisplay() {
   document.querySelector('#fileName').innerText = meiFileName.substring(meiFileName.lastIndexOf('/') + 1);
   document.querySelector('#fileLocation').innerText = meiFileLocationPrintable || '';
@@ -246,8 +246,6 @@ export function loadDataInEditor(mei, setFreshlyLoaded = true) {
     // disable validation on Safari because of this strange error: "RangeError: Maximum call stack size exceeded" (WG, 1 Oct 2022)
     v.checkSchema(mei);
   }
-  console.log("file location type loadDataInEditor:", fileLocationType)
-  setStandoffAnnotationEnabledStatus();
   clearAnnotations();
   readAnnots(true); // from annotation.js
   setCursorToId(cm, handleURLParamSelect());
@@ -261,7 +259,7 @@ export function updateLocalStorage(meiXml) {
       storage.fileName = meiFileName;
       storage.fileLocation = meiFileLocation;
       storage.isMEI = isMEI;
-      if(!storage.override) { 
+      if (!storage.override) {
         storage.content = meiXml;
       }
       if (isLoggedIn) {
@@ -274,7 +272,7 @@ export function updateLocalStorage(meiXml) {
         err
       );
       setFileChangedState(fileChanged); // flags any storage-exceeded issues
-     // storage.clear();
+      // storage.clear();
     }
   }
 }
@@ -294,12 +292,6 @@ export function updateGithubInLocalStorage() {
       userName: name,
       userEmail: email,
     };
-    storage.fileLocationType = 'github';
-    if (github.filepath) {
-    }
-  }
-  if (isLoggedIn && github.filepath) {
-    fileLocationType = 'github';
   }
 }
 
@@ -543,19 +535,24 @@ function onLanguageLoaded() {
 
   let urlFileName = searchParams.get('file');
 
-  if(storage.supported && urlFileName) { 
+  if (storage.supported && urlFileName) {
     // write url filename to storage so we can act upon it later, e.g. on return from solid login
     let url = new URL(urlFileName);
-    storage.safelySetStorageItem("fileLocation", url.href);
-    storage.safelySetStorageItem("fileName", url.pathname.substring(url.pathname.lastIndexOf('/') + 1));
-    storage.safelySetStorageItem("fileLocationType", "url");
+    storage.safelySetStorageItem('fileLocation', url.href);
+    storage.safelySetStorageItem('fileName', url.pathname.substring(url.pathname.lastIndexOf('/') + 1));
+    storage.safelySetStorageItem('fileLocationType', 'url');
     storage.read();
-    console.log("Have set local storage: ", storage);
+    console.log('Have set local storage: ', storage);
   }
 
-  if(storage.supported && storage.restoreSolidSession) { 
+  if (storage.supported && storage.restoreSolidSession) {
     // attempt to restore Solid session with fresh data
-    loginAndFetch();
+    let go = window.confirm('Continue logging in to your Solid Pod with mei-friend?');
+    if (go) {
+      loginAndFetch();
+    } else {
+      storage.removeItem('restoreSolidSession');
+    }
   }
 
   // fork parameter: if true AND ?fileParam is set to a URL,
@@ -574,8 +571,13 @@ function onLanguageLoaded() {
     // normally open the file from URL
     openUrlFetch(new URL(urlFileName));
     urlFetchInProgress = true;
-  } else if(storage.supported && storage.fileLocationType && storage.fileLocation && storage.fileLocationType === "url" && 
-      !storage.meiXml) { 
+  } else if (
+    storage.supported &&
+    storage.fileLocationType &&
+    storage.fileLocation &&
+    storage.fileLocationType === 'url' &&
+    !storage.meiXml
+  ) {
     openUrlFetch(new URL(storage.fileLocation));
     urlFetchInProgress = true;
   }
@@ -614,7 +616,7 @@ function onLanguageLoaded() {
         meiFileName = storage.fileName;
         meiFileLocation = storage.fileLocation;
         meiFileLocationPrintable = storage.fileLocationPrintable;
-        fileLocationType = storage.fileLocationType;
+        setFileLocationType(storage.fileLocationType);
         updateFileStatusDisplay();
         // on initial page load, CM doesn't fire a "changes" event
         // so we don't need to skip the "freshly loaded" change
@@ -664,7 +666,6 @@ function onLanguageLoaded() {
     }
   }
 
-  
   // Retrieve parameters from URL params, from storage, or default values
   if (scaleParam !== null) {
     document.getElementById('verovioZoom').value = scaleParam;
@@ -793,11 +794,12 @@ function openUrlProcess(content, url, updateAfterLoading) {
     refreshGithubMenu();
   }
   updateFileStatusDisplay();
+  handleEncoding(content, true, updateAfterLoading);
   if (storage.supported) {
     storage.fileLocationType = 'url';
   }
-  fileLocationType = 'url';
-  handleEncoding(content, true, updateAfterLoading);
+  setFileLocationType('url');
+  setStandoffAnnotationEnabledStatus();
   openUrlCancel(); //hide open URL UI elements
   const fnStatus = document.getElementById('fileName');
   if (fnStatus) fnStatus.removeAttribute('contenteditable');
@@ -1181,7 +1183,6 @@ export function handleEncoding(mei, setFreshlyLoaded = true, updateAfterLoading 
     clearAnnotations();
     v.busy(false);
   }
-  console.log("fileLocationType handleEncoding: ", fileLocationType)
   setStandoffAnnotationEnabledStatus();
 }
 
@@ -1653,7 +1654,7 @@ function addEventListeners(v, cm) {
   document.getElementById('showAnnotationsButton').addEventListener('click', cmd.toggleAnnotationPanel);
   document.getElementById('showFacsimileButton').addEventListener('click', cmd.toggleFacsimilePanel);
   document.getElementById('closeAnnotationPanelButton').addEventListener('click', cmd.hideAnnotationPanel);
-//  document.getElementById('hideAnnotationPanelButton').addEventListener('click', cmd.hideAnnotationPanel);
+  //  document.getElementById('hideAnnotationPanelButton').addEventListener('click', cmd.hideAnnotationPanel);
   document.getElementById('showFacsimileMenu').addEventListener('click', cmd.showFacsimilePanel);
   document.getElementById('showPlaybackControls').addEventListener('click', cmd.toggleMidiPlaybackControlBar);
   // re-apply settings filtering when switching settings tabs
@@ -2051,17 +2052,16 @@ export function drawRightFooter() {
   }
 }
 
-function setStandoffAnnotationEnabledStatus() { 
+export function setStandoffAnnotationEnabledStatus() {
   // Annotations: can only write standoff if a) not working locally (need URI) and b) isMEI (need stable identifiers)
-  // HACK DH 2023: loosen isMEI requirement. TODO fix. 
-  if(fileLocationType === "file" || /*!isMEI || */ !solid.getDefaultSession().info.isLoggedIn) { 
-    document.getElementById("writeAnnotationStandoff").setAttribute("disabled", true);
-    document.getElementById("writeAnnotationStandoff").removeAttribute("selected");
-    document.getElementById("writeAnnotationInline").setAttribute("selected", true)
-  } else { 
-    document.getElementById("writeAnnotationStandoff").removeAttribute("disabled");
+  if (fileLocationType === 'file' || !isMEI || !solid.getDefaultSession().info.isLoggedIn) {
+    document.getElementById('writeAnnotationStandoff').setAttribute('disabled', '');
+    document.getElementById('writeAnnotationStandoffLabel').classList.add('disabled');
+    document.getElementById('writeAnnotationInline').checked = true;
+  } else {
+    document.getElementById('writeAnnotationStandoff').removeAttribute('disabled');
+    document.getElementById('writeAnnotationStandoffLabel').classList.remove('disabled');
   }
-
 }
 
 // handles any changes in CodeMirror

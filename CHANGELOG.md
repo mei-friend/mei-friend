@@ -1,5 +1,9 @@
 # mei-friend-online CHANGELOG.md
 
+### 0.10.1
+* Fix contextual enabling / disabling of stand-off annotation interface
+* Improve responsiveness of polling for GitHub Action Workflow outcomes
+
 ### 0.10.0-p 
 * Patch gunicorn logging config
 

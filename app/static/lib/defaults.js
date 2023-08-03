@@ -132,7 +132,8 @@ supportedVerovioVersions['3.16.0'] = {
   url: 'https://www.verovio.org/javascript/3.16.0/verovio-toolkit-hum.js',
   description: 'Verovio release 3.16.0',
   releaseDate: '3 July 2023',
-};supportedVerovioVersions['3.15.0'] = {
+};
+supportedVerovioVersions['3.15.0'] = {
   url: 'https://www.verovio.org/javascript/3.15.0/verovio-toolkit-hum.js',
   description: 'Verovio release 3.15.0',
   releaseDate: '1 Mar 2023',
@@ -614,7 +615,7 @@ export const meiFriendSettingsOptions = {
   },
   enableGithubActions: {
     title: 'Show available GitHub Actions',
-    description: 'List available GitHub Actions when navigating within repository in GitHub menu', 
+    description: 'List available GitHub Actions when navigating within repository in GitHub menu',
     type: 'bool',
     default: false,
   },

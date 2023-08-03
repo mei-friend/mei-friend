@@ -7,7 +7,8 @@ const seperator = '|MEI-FRIEND|';
 function onOrganizationInputChange(e) {
   if (e.target.value) {
     const userOrgRepos = document.getElementById('forkRepositoryInputRepo');
-    userOrgRepos.innerHTML = '<option value="" disabled selected hidden>' + translator.lang.selectRepository.text + '</option>';
+    userOrgRepos.innerHTML =
+      '<option value="" disabled selected hidden>' + translator.lang.selectRepository.text + '</option>';
     document.getElementById('forkRepoGithubLogo').classList.add('clockwise');
     let repos = fillInUserOrgRepos();
   }
@@ -20,7 +21,8 @@ function onSelectComposer(e) {
   orgSelector.addEventListener('change', onSelectOrganization);
   const repoSelector = document.querySelector('#forkRepertoireRepository');
   // clear repository selector
-  repoSelector.innerHTML = '<option value="" disabled selected hidden>' + translator.lang.selectRepository.text + '</option>';
+  repoSelector.innerHTML =
+    '<option value="" disabled selected hidden>' + translator.lang.selectRepository.text + '</option>';
   repoSelector.removeEventListener('change', onSelectRepository);
   repoSelector.addEventListener('change', onSelectRepository);
   let composer = false;
@@ -95,7 +97,9 @@ async function fillInUserOrgRepos(per_page = 30, page = 1) {
       document.getElementById('forkRepoGithubLogo').classList.remove('clockwise');
       status.forEach((s) => (s.innerHTML = translator.lang.repoAccessError.text));
       if ('message' in repos) {
-        status.forEach((s) => (s.innerHTML += ' Github ' + translator.lang.message.text + ': <i>' + repos['message'] + '</i>'));
+        status.forEach(
+          (s) => (s.innerHTML += ' Github ' + translator.lang.message.text + ': <i>' + repos['message'] + '</i>')
+        );
       }
     }
   }
