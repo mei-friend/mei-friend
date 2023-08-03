@@ -799,6 +799,7 @@ function openUrlProcess(content, url, updateAfterLoading) {
     storage.fileLocationType = 'url';
   }
   setFileLocationType('url');
+  setStandoffAnnotationEnabledStatus();
   openUrlCancel(); //hide open URL UI elements
   const fnStatus = document.getElementById('fileName');
   if (fnStatus) fnStatus.removeAttribute('contenteditable');
