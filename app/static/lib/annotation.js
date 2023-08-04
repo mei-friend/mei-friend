@@ -1,7 +1,18 @@
 import { v, cm, log, translator, meiFileLocation, fileLocationType } from './main.js';
 import { convertCoords, generateXmlId, rmHash, setCursorToId } from './utils.js';
 import { meiNameSpace, xmlNameSpace, xmlToString } from './dom-utils.js';
-import { circle, diffRemoved, highlight, fileCode, identify, link, pencil, rdf, symLinkFile } from '../css/icons.js';
+import {
+  circle,
+  diffRemoved,
+  highlight,
+  fileCode,
+  identify,
+  link,
+  pencil,
+  rdf,
+  speechBubble,
+  symLinkFile,
+} from '../css/icons.js';
 import { removeInEditor } from './editor.js';
 import {
   solid,
@@ -63,6 +74,14 @@ export function refreshAnnotationsList() {
     flipToAnno.title = translator.lang.flipPageToAnnotationText.description;
     flipToAnno.classList.add('icon');
     if (!'selection' in a) flipToAnno.classList.add('disabled');
+    const addObservation = document.createElement('a');
+    addObservation.insertAdjacentHTML('afterbegin', speechBubble);
+    addObservation.classList.add('addObservation');
+    addObservation.title = 'Add observation to extract';
+    addObservation.classList.add('icon');
+    if (a.type !== !'annotateIdentify') {
+      addObservation.classList.add('disabled');
+    }
     const deleteAnno = document.createElement('a');
     deleteAnno.classList.add('deleteAnnotation');
     deleteAnno.insertAdjacentHTML('afterbegin', diffRemoved);
@@ -79,7 +98,7 @@ export function refreshAnnotationsList() {
     } else {
       (isStandoff.title = translator.lang.makeStandOffAnnotation.descriptionToLocal + ': '), a.id;
       isStandoff.dataset.id = a.id;
-      isStandoff.addEventListener('click', (e) => window.open(a.id, "_blank"));
+      isStandoff.addEventListener('click', (e) => window.open(a.id, '_blank'));
     }
     const isInline = document.createElement('a');
     isInline.id = 'makeInlineAnnotation';
@@ -145,14 +164,14 @@ export function refreshAnnotationsList() {
 }
 
 export function generateAnnotationLocationLabel(a) {
-  console.log("generating anno label for ", a)
+  console.log('generating anno label for ', a);
   const annotationLocationLabel = document.createElement('span');
-  if(a.type === "annotateIdentify") { 
+  if (a.type === 'annotateIdentify') {
     // special case: identified MAO objects
     // just add a placeholder for a label and exit
     // (since multiple selections may be situated at different locations, we deal with them elsewhere)
     annotationLocationLabel.innerHTML = '<span class="label"></span>';
-  } else { 
+  } else {
     if (a.firstPage === 'meiHead') {
       annotationLocationLabel.innerHTML = `MEI&nbsp;head&nbsp;(${a.selection.length}&nbsp;${translator.lang.elementsPlural.text})`;
     } else if (a.firstPage === 'unsituated' || a.firstPage < 0) {
@@ -166,7 +185,7 @@ export function generateAnnotationLocationLabel(a) {
     }
   }
   annotationLocationLabel.classList.add('annotationLocationLabel');
-  annotationLocationLabel.dataset.id = "loc-"+a.id;
+  annotationLocationLabel.dataset.id = 'loc-' + a.id;
   return annotationLocationLabel;
 }
 
@@ -179,11 +198,13 @@ export function situateAnnotations() {
     a.firstPage = 'unsituated';
     a.lastPage = -1;
     if ('selection' in a) {
-      let selectionStart = a.selection[0].indexOf("#") < 0 
-        ? a.selection[0] : a.selection[0].substr(a.selection[0].indexOf("#")+1)
-      let selLen = a.selection.length-1;
-      let selectionEnd = a.selection[selLen].indexOf("#") < 0 
-        ? a.selection[selLen] : a.selection[selLen].substr(a.selection[selLen].indexOf("#")+1)
+      let selectionStart =
+        a.selection[0].indexOf('#') < 0 ? a.selection[0] : a.selection[0].substr(a.selection[0].indexOf('#') + 1);
+      let selLen = a.selection.length - 1;
+      let selectionEnd =
+        a.selection[selLen].indexOf('#') < 0
+          ? a.selection[selLen]
+          : a.selection[selLen].substr(a.selection[selLen].indexOf('#') + 1);
       a.firstPage = await v.getPageWithElement(selectionStart);
       a.lastPage = await v.getPageWithElement(selectionEnd);
       if (a.firstPage < 0 && v.speedMode) {
@@ -200,12 +221,15 @@ export function situateAnnotations() {
       }
     }
     // for any identifying annotations, see if there are new extracts associated with the musical material
-    if(a.type == "annotateIdentify") { 
+    if (a.type == 'annotateIdentify') {
       // find it in the list
-      const musMatDiv = document.querySelector('#musMat_'+CSS.escape(a.id));
-      console.log("extracts DIV: ", musMatDiv);
-      if(musMatDiv && !musMatDiv.innerHTML.length) { 
-        musMatDiv.closest(".annotationListItem").querySelector(".makeStandoffAnnotation svg").classList.add("clockwise");
+      const musMatDiv = document.querySelector('#musMat_' + CSS.escape(a.id));
+      console.log('extracts DIV: ', musMatDiv);
+      if (musMatDiv && !musMatDiv.innerHTML.length) {
+        musMatDiv
+          .closest('.annotationListItem')
+          .querySelector('.makeStandoffAnnotation svg')
+          .classList.add('clockwise');
         fetchMAOComponentsForIdentifiedObject(a.id);
       }
     }
@@ -225,7 +249,7 @@ export function deleteAnnotation(uuid) {
 // functions to draw annotations
 
 async function drawIdentify(a) {
-  if('selection' in a) { 
+  if ('selection' in a) {
     const els = a.selection.map((s) => document.getElementById(s));
     els
       .filter((e) => e !== null) // (null if not on current page)
@@ -387,8 +411,8 @@ export function addAnnotationHandlers() {
 
   // functions to create annotations
   const createIdentify = (e) => {
-    if(solid.getDefaultSession().info.isLoggedIn) { 
-      const label = window.prompt("Add label for identified object (optional)");
+    if (solid.getDefaultSession().info.isLoggedIn) {
+      const label = window.prompt('Add label for identified object (optional)');
       const selection = v.selectedElements;
       document.getElementById('solid_logo').classList.add('clockwise');
       createMAOMusicalObject(selection, label)
@@ -396,7 +420,8 @@ export function addAnnotationHandlers() {
           getSolidStorage().then((solidStorage) => {
             console.log(
               'CREATED MUSICAL MATERIAL: ',
-              solidStorage + maoMusicalMaterial.headers.get('location').substr(1), maoMusicalMaterial
+              solidStorage + maoMusicalMaterial.headers.get('location').substr(1),
+              maoMusicalMaterial
             );
             const a = {
               id: solidStorage + maoMusicalMaterial.headers.get('location').substr(1),
@@ -411,9 +436,9 @@ export function addAnnotationHandlers() {
         .finally(() => {
           document.getElementById('solid_logo').classList.remove('clockwise');
         });
-    // writing inline not supported
-    } else { 
-      document.getElementById("solidButton").click();
+      // writing inline not supported
+    } else {
+      document.getElementById('solidButton').click();
     }
   };
   const createHighlight = (e) => {
@@ -468,20 +493,23 @@ export function addAnnotationHandlers() {
   document.querySelectorAll('.annotationToolsIcon').forEach((a) => a.addEventListener('click', annotationHandler));
 
   // disable 'identify music object' unless 'linked data' domain selected
-  document.querySelectorAll('.annotationToolsDomainSelectionItem input').forEach((i) => i.removeEventListener('click', enableDisableIdentifyObject))
-  document.querySelectorAll('.annotationToolsDomainSelectionItem input').forEach((i) => i.addEventListener('click', enableDisableIdentifyObject))
+  document
+    .querySelectorAll('.annotationToolsDomainSelectionItem input')
+    .forEach((i) => i.removeEventListener('click', enableDisableIdentifyObject));
+  document
+    .querySelectorAll('.annotationToolsDomainSelectionItem input')
+    .forEach((i) => i.addEventListener('click', enableDisableIdentifyObject));
   enableDisableIdentifyObject(); // set initial status
-  document.getElementById("annotationToolsButton").removeEventListener('click', enableDisableIdentifyObject);
-  document.getElementById("annotationToolsButton").addEventListener('click', enableDisableIdentifyObject);
+  document.getElementById('annotationToolsButton').removeEventListener('click', enableDisableIdentifyObject);
+  document.getElementById('annotationToolsButton').addEventListener('click', enableDisableIdentifyObject);
 }
 
-function enableDisableIdentifyObject() { 
-  let identifyTool = document.getElementById("annotateIdentify");
-  if(document.getElementById("writeAnnotationInline").checked) { 
-    // HACK DH 2023 fix this!
-  //  identifyTool.classList.add("disabled");
-  } else { 
-    identifyTool.classList.remove("disabled");
+function enableDisableIdentifyObject() {
+  let identifyTool = document.getElementById('annotateIdentify');
+  if (document.getElementById('writeAnnotationInline').checked) {
+    identifyTool.classList.add('disabled');
+  } else {
+    identifyTool.classList.remove('disabled');
   }
 }
 
@@ -647,11 +675,11 @@ export function loadWebAnnotation(prev = '') {
         {
           typeToHandlerMap: {
             [nsp.OA + 'Annotation']: {
-              func: ingestWebAnnotation
-            }
+              func: ingestWebAnnotation,
+            },
           },
           followList: [new URL(nsp.LDP + 'contains')], // predicates to traverse
-          fetchMethod: solid.getDefaultSession().info.isLoggedIn ? solid.fetch : fetch
+          fetchMethod: solid.getDefaultSession().info.isLoggedIn ? solid.fetch : fetch,
         }
       );
     } catch (e) {
@@ -662,7 +690,7 @@ export function loadWebAnnotation(prev = '') {
 }
 
 // Wrapper around traverseAndFetch that reports back errors / progress to 'Load linked data' UI
-export function attemptFetchExternalResource(url, targetTypes, configObj) { 
+export function attemptFetchExternalResource(url, targetTypes, configObj) {
   console.log('fetch external resource: ', url, targetTypes, typeToHandlerMap, followList, blockList, jumps);
   // spin the icon to indicate loading activity
   const icon = document.getElementById('addWebAnnotationIcon');
@@ -670,13 +698,13 @@ export function attemptFetchExternalResource(url, targetTypes, configObj) {
   svgs.forEach((t) => t.classList.add('clockwise'));
   traverseAndFetch(url, targetTypes, configObj)
     .catch((resp) => {
-        if (userProvided) {
-          console.error("Couldn't load external resource, error response: ", resp);
-          // user-provided url didn't work, so hand control back to user
-          if (resp.url) loadWebAnnotation(resp);
-          else loadWebAnnotation(url.href);
-        }
-      })
+      if (userProvided) {
+        console.error("Couldn't load external resource, error response: ", resp);
+        // user-provided url didn't work, so hand control back to user
+        if (resp.url) loadWebAnnotation(resp);
+        else loadWebAnnotation(url.href);
+      }
+    })
     .finally(() => {
       // notify that we've stopped loading
       svgs.forEach((t) => t.classList.remove('clockwise'));
@@ -776,7 +804,11 @@ export function ingestWebAnnotation(webAnno) {
           // decare a linking annotation
           anno.url = firstBody['@id'];
           anno.type = 'annotateLink';
-        } else if ('@type' in firstBody && nsp.RDF + value in firstBody && nsp.OA + 'TextualBody' in firstBody['@type']) {
+        } else if (
+          '@type' in firstBody &&
+          nsp.RDF + value in firstBody &&
+          nsp.OA + 'TextualBody' in firstBody['@type']
+        ) {
           // declare a describing annotation
           console.log('Declaring a describing annotation!');
           anno.description = firstBody[nsp.RDF + value];
@@ -821,34 +853,33 @@ function writeInlineIfRequested(a) {
   }
 }
 
-
 // fetch all components hanging off a musical material
 async function fetchMAOComponentsForIdentifiedObject(musMatUrl) {
   traverseAndFetch(
-    new URL(musMatUrl), 
-    [new URL(nsp.MAO + "MusicalMaterial"), new URL(nsp.MAO + "Extract"), new URL(nsp.MAO + "Selection")],
-    { 
-      typeToHandlerMap: { 
-        [nsp.MAO + "MusicalMaterial"]: { 
-          func: drawMusicalMaterialForIdentifiedObject
-        }, 
-        [nsp.MAO + "Extract"]: {
-          func: drawExtractsForIdentifiedObject
-        }, 
-        [nsp.MAO + "Selection"]: { 
-          func: drawSelectionsForIdentifiedObject
-        }
+    new URL(musMatUrl),
+    [new URL(nsp.MAO + 'MusicalMaterial'), new URL(nsp.MAO + 'Extract'), new URL(nsp.MAO + 'Selection')],
+    {
+      typeToHandlerMap: {
+        [nsp.MAO + 'MusicalMaterial']: {
+          func: drawMusicalMaterialForIdentifiedObject,
+        },
+        [nsp.MAO + 'Extract']: {
+          func: drawExtractsForIdentifiedObject,
+        },
+        [nsp.MAO + 'Selection']: {
+          func: drawSelectionsForIdentifiedObject,
+        },
       },
-      followList: [new URL(nsp.FRBR + "embodiment"), new URL(nsp.MAO + "setting")],
-      fetchMethod: solid.getDefaultSession().info.isLoggedIn ? solid.fetch : fetch
+      followList: [new URL(nsp.FRBR + 'embodiment'), new URL(nsp.MAO + 'setting')],
+      fetchMethod: solid.getDefaultSession().info.isLoggedIn ? solid.fetch : fetch,
     }
-  ).catch(e => { 
+  ).catch((e) => {
     log("Couldn't load extracts associated with identified musical object:", e);
-    const loadingIndicator = document.querySelector('#musMat_'+CSS.escape(musMatUrl)+' span');
-    if(loadingIndicator) { 
-      loadingIndicator.classList.remove("clockwise");
+    const loadingIndicator = document.querySelector('#musMat_' + CSS.escape(musMatUrl) + ' span');
+    if (loadingIndicator) {
+      loadingIndicator.classList.remove('clockwise');
     }
-  })
+  });
 }
 
 /*
@@ -884,33 +915,36 @@ async function drawMusicalMaterialForIdentifiedObject(obj, url, etag){
   const musMat = document.getElementById("musMat_"+url.href);
   if(musMat) { 
     // if we have a label and haven't drawn one already...
-    const myListItem = musMat.closest(".annotationListItem");
-    const myLabel = myListItem.querySelector(".annotationLocationLabel")
-    console.log("LABEL: ", obj, myLabel)
-    if(nsp.RDFS+"label" in obj && !myLabel.innerText.length) { 
-      const label = Array.isArray(obj[nsp.RDFS+"label"]) ? 
-        obj[nsp.RDFS+"label"] : [obj[RDFS+"label"]];
-      myLabel.innerText = label[0]["@value"]; // TODO support multiple labels?
+    const myListItem = musMat.closest('.annotationListItem');
+    const myLabel = myListItem.querySelector('.annotationLocationLabel');
+    console.log('LABEL: ', obj, myLabel);
+    if (nsp.RDFS + 'label' in obj && !myLabel.innerText.length) {
+      const label = Array.isArray(obj[nsp.RDFS + 'label']) ? obj[nsp.RDFS + 'label'] : [obj[RDFS + 'label']];
+      myLabel.innerText = label[0]['@value']; // TODO support multiple labels?
     }
-    if(nsp.MAO+"setting" in obj) {
-      const alreadyIncluded = musMat.querySelectorAll(".mao-extract");
-      const alreadyIncludedUrls = alreadyIncluded.forEach(n => n.id.replace("extract", ""));
+    if (nsp.MAO + 'setting' in obj) {
+      const alreadyIncluded = musMat.querySelectorAll('.mao-extract');
+      const alreadyIncludedUrls = alreadyIncluded.forEach((n) => n.id.replace('extract', ''));
       let extractsToAdd;
-      if(alreadyIncludedUrls) { 
-        extractsToAdd = obj[nsp.MAO+"setting"].filter(s => !alreadyIncludedUrls.includes(s["@id"]));
+      if (alreadyIncludedUrls) {
+        extractsToAdd = obj[nsp.MAO + 'setting'].filter((s) => !alreadyIncludedUrls.includes(s['@id']));
       } else {
-        extractsToAdd = obj[nsp.MAO+"setting"];
+        extractsToAdd = obj[nsp.MAO + 'setting'];
       }
-      console.debug("Trying to add extracts... ", extractsToAdd)
-      extractsToAdd.forEach(s => {
-        musMat.insertAdjacentHTML('beforeend', `<div class="mao-extract" id="extract_${s["@id"]}"></div>`);
-      })
-      console.debug("Done with musMat: ", musMat)
-    } else { 
-      console.warn("Can't draw a MusicalMaterial without a setting:", obj)
+      console.debug('Trying to add extracts... ', extractsToAdd);
+      extractsToAdd.forEach((s) => {
+        musMat.insertAdjacentHTML('beforeend', `<div class="mao-extract" id="extract_${s['@id']}"></div>`);
+      });
+      console.debug('Done with musMat: ', musMat);
+    } else {
+      console.warn("Can't draw a MusicalMaterial without a setting:", obj);
     }
-  } else { 
-    console.warn("Trying to draw musical material for identified object but have no musMat div to hook it into", obj, url);
+  } else {
+    console.warn(
+      'Trying to draw musical material for identified object but have no musMat div to hook it into',
+      obj,
+      url
+    );
   }
 }
 
@@ -923,13 +957,13 @@ async function drawExtractsForIdentifiedObject(obj, url, etag) {
       const alreadyIncluded = extract.querySelectorAll(".mao-selection");
       const alreadyIncludedUrls = alreadyIncluded.forEach(n => n.id.replace("selection_", ""));
       let selectionsToAdd;
-      if(alreadyIncludedUrls) { 
-        selectionsToAdd = obj[nsp.FRBR+"embodiment"].filter(s => !alreadyIncludedUrls.includes(s["@id"]));
-      } else { 
-        selectionsToAdd = obj[nsp.FRBR+"embodiment"];
+      if (alreadyIncludedUrls) {
+        selectionsToAdd = obj[nsp.FRBR + 'embodiment'].filter((s) => !alreadyIncludedUrls.includes(s['@id']));
+      } else {
+        selectionsToAdd = obj[nsp.FRBR + 'embodiment'];
       }
-      selectionsToAdd.forEach(s => {
-        extract.insertAdjacentHTML('beforeend', `<div class="mao-selection" id="selection_${s["@id"]}"></div>`)
+      selectionsToAdd.forEach((s) => {
+        extract.insertAdjacentHTML('beforeend', `<div class="mao-selection" id="selection_${s['@id']}"></div>`);
       });
       let updateBtn = document.createElement("div");
       updateBtn.classList="refreshElementBtn";
@@ -955,8 +989,8 @@ async function drawExtractsForIdentifiedObject(obj, url, etag) {
     } else { 
       console.warn("Can't draw an Extract without an embodiment:", obj)
     }
-  } else { 
-    console.warn("Trying to draw extract for identified object but have no extract div to hook it into", obj, url);
+  } else {
+    console.warn('Trying to draw extract for identified object but have no extract div to hook it into', obj, url);
   }
 }
 
@@ -967,31 +1001,25 @@ async function drawSelectionsForIdentifiedObject(obj, url, etag) {
     if(nsp.FRBR+"part" in obj) {
       try { 
         const a = {};
-        a.selection = obj[nsp.FRBR+"part"].map(
-          s => s["@id"].substr(s["@id"].lastIndexOf("#")+1)
-        )
+        a.selection = obj[nsp.FRBR + 'part'].map((s) => s['@id'].substr(s['@id'].lastIndexOf('#') + 1));
         a.firstPage = await v.getPageWithElement(a.selection[0]);
-        a.lastPage = await v.getPageWithElement(a.selection[a.selection.length-1]);
+        a.lastPage = await v.getPageWithElement(a.selection[a.selection.length - 1]);
         selection.innerText = generateAnnotationLocationLabel(a).innerText;
-      }
-      catch(e) { 
+      } catch (e) {
         console.warn("Couldn't situate FRBR:parts of selection: ", e);
       }
-    } else { 
+    } else {
       console.warn("Can't draw a selection without parts: ", obj, url);
     }
-    const myMusMat = selection.closest(".annotationListItem");
-    if(myMusMat) { 
-      const myLoadingIndicator = myMusMat.querySelector(".makeStandoffAnnotation svg");
-      if(myLoadingIndicator)
-        myLoadingIndicator.classList.remove("clockwise");
+    const myMusMat = selection.closest('.annotationListItem');
+    if (myMusMat) {
+      const myLoadingIndicator = myMusMat.querySelector('.makeStandoffAnnotation svg');
+      if (myLoadingIndicator) myLoadingIndicator.classList.remove('clockwise');
     }
-  }else { 
-    console.warn("Trying to draw selection for identified object but have no selection div to hook it into", obj, url);
+  } else {
+    console.warn('Trying to draw selection for identified object but have no selection div to hook it into', obj, url);
   }
 }
-
-
 
 async function writeStandoffIfRequested(a) {
   // write to a stand-off Web Annotation in the user's Solid Pod if requested

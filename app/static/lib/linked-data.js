@@ -9,10 +9,10 @@ export const nsp = {
   PIM: 'http://www.w3.org/ns/pim/space#',
   RDF: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
   RDFS: 'http://www.w3.org/2000/01/rdf-schema#',
-  SCHEMA: 'https://schema.org/'
+  SCHEMA: 'https://schema.org/',
 };
 
-export const politeness=200; // milliseconds between network requests
+export const politeness = 200; // milliseconds between network requests
 
 /**
  * Recursively traverse a graph of linked data (JSON-LD documents) starting at url
@@ -104,7 +104,7 @@ export async function traverseAndFetch(
                       blockList: [new URL(url.href), ...blockList],
                       userProvided: false,
                       jumps: jumps - 1,
-                      fetchMethod
+                      fetchMethod,
                     }),
                   politeness
                 );
@@ -132,7 +132,7 @@ export function ingestExternalResource(url, typeToHandlerMap, resource, etag) {
     resource['@type'] = Array.isArray(resource['@type']) ? resource['@type'] : [resource['@type']];
     const mappedTypes = Object.keys(typeToHandlerMap).filter((t) => resource['@type'].includes(t));
     // call each relevant (type-matching) callback on the resource
-    console.log("ingest external resource: ", mappedTypes, typeToHandlerMap, resource)
+    console.log('ingest external resource: ', mappedTypes, typeToHandlerMap, resource);
     mappedTypes.forEach((t) => {
       'args' in typeToHandlerMap[t] ? 
         typeToHandlerMap[t].func(resource, url, etag, ...typeToHandlerMap[t].args) : 

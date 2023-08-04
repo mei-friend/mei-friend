@@ -33,7 +33,7 @@
   cursor:pointer;
 }
 
-#annotateIdentify.disabled {
+#annotateIdentify.disabled, writeAnnotationStandoffLabel.disabled {
   opacity:.6;
   pointer-events: none;
 }

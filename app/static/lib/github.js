@@ -21,8 +21,8 @@ export default class Github {
     this.actionsHeaders = new Headers({
       Authorization: 'Basic ' + btoa(userLogin + ':' + githubToken),
       Accept: 'application/vnd.github+json',
-      'X-GitHub-Api-Version': '2022-11-28'
-    })
+      'X-GitHub-Api-Version': '2022-11-28',
+    });
     // remember this as our 'upstream' repo in case we need to fork
     this.upstreamRepoName = this.githubRepoName;
     this.upstreamRepoOwner = this.githubRepoOwner;
@@ -490,147 +490,159 @@ export default class Github {
     }).then((res) => res.json());
   }
 
-  async getActionWorkflowsList(per_page = 30, page = 1) { 
+  async getActionWorkflowsList(per_page = 30, page = 1) {
     const actionsUrl = `https://api.github.com/repos/${this.githubRepo}/actions/workflows?per_page=${per_page}&page=${page}`;
-    return fetch(actionsUrl, { 
-      method: 'GET', 
+    return fetch(actionsUrl, {
+      method: 'GET',
       headers: this.actionsHeaders,
-    }).then((res => res.json()))
-    .then(async data => {
-      let list = null;
-      // (longwinded) way to only show dispatch workflows
-      if("workflows" in data) { 
-        console.log("got data: ", data)
-        let promises = data.workflows.map(w => this.getWorkflow(w.path));
-        let fulfilled = await Promise.all(promises);
-        let filtered = fulfilled.filter(w => "on" in w && "workflow_dispatch" in w.on );
-        let pathsToKeep = filtered.map(f => f.path);
-        list = data.workflows.filter(d => pathsToKeep.includes(d.path))
-      }
-      return list;
     })
+      .then((res) => res.json())
+      .then(async (data) => {
+        let list = null;
+        // (longwinded) way to only show dispatch workflows
+        if ('workflows' in data) {
+          console.log('got data: ', data);
+          let promises = data.workflows.map((w) => this.getWorkflow(w.path));
+          let fulfilled = await Promise.all(promises);
+          let filtered = fulfilled.filter((w) => 'on' in w && 'workflow_dispatch' in w.on);
+          let pathsToKeep = filtered.map((f) => f.path);
+          list = data.workflows.filter((d) => pathsToKeep.includes(d.path));
+        }
+        return list;
+      });
   }
 
-  async requestActionWorkflowRun(workflowId, inputs = {}) { 
+  async requestActionWorkflowRun(workflowId, inputs = {}) {
     const dispatchUrl = `https://api.github.com/repos/${this.githubRepo}/actions/workflows/${workflowId}/dispatches`;
     return fetch(dispatchUrl, {
       method: 'POST',
       headers: this.actionsHeaders,
-      body: JSON.stringify({ 
+      body: JSON.stringify({
         ref: this.branch,
-        inputs: inputs
-      })
-    }).then((res) =>  {
+        inputs: inputs,
+      }),
+    }).then((res) => {
       // return body as JSON object, but retain response status (for error detection)
-      console.log("::::::", res);
-      if(res.status === 204) {
+      console.log('::::::', res);
+      if (res.status === 204) {
         // no body on github 204 responses
         return res;
-      } else { 
+      } else {
         res.json().then((data) => {
-          return {status: res.status, body: data}
+          return { status: res.status, body: data };
         });
       }
-    })
+    });
   }
 
-  async awaitActionWorkflowCompletion(workflowId, runStartAt = null) { 
+  async awaitActionWorkflowCompletion(workflowId, runStartAt = null) {
     // Wait until the created workflow has completed or failed
     // n.b.: unfortunately, because workflow dispatch is implemented as a Web Hook on the GitHub side,
     // the job's run instance ID is not known at creation time. See https://github.com/orgs/community/discussions/9752
-    // As a work-around, we grab the latest run instance requested by the current user, of the requested workflow, 
+    // As a work-around, we grab the latest run instance requested by the current user, of the requested workflow,
     // ... with the current head hash, immediately after dispatch
     // ... then grab its start_at time, and use that to poll recursively
     const runsUrl = `https://api.github.com/repos/${this.githubRepo}/actions/workflows/${workflowId}/runs`;
-    return fetch(runsUrl + "?" + new URLSearchParams({
-        actor: this.userLogin,
-        branch: this.branch,
-        head_sha: this.headHash
-      }), {
+    return fetch(
+      runsUrl +
+        '?' +
+        new URLSearchParams({
+          actor: this.userLogin,
+          branch: this.branch,
+          head_sha: this.headHash,
+        }),
+      {
         method: 'GET',
         headers: this.actionsHeaders,
-      }).then((res) => res.json())
-      .then((resJson) => { 
+        cache: 'no-store', // do not cache response to prevent delays to polling update
+      }
+    )
+      .then((res) => res.json())
+      .then((resJson) => {
         let run;
-        if("workflow_runs" in resJson) { 
-          if(runStartAt) { 
+        if ('workflow_runs' in resJson) {
+          if (runStartAt) {
             // start time specified -- use it to find our run of interest
-            let runsAt = resJson.workflow_runs.filter(w => w.run_started_at === runStartAt);
-            if(runsAt.length) { 
+            let runsAt = resJson.workflow_runs.filter((w) => w.run_started_at === runStartAt);
+            if (runsAt.length) {
               run = runsAt[0];
-              console.log("Got run with starttime specified, first entry of: ", runsAt)
+              console.log('Got run with starttime specified, first entry of: ', runsAt);
             }
-          } else { 
+          } else {
             // no start time specified -- pick the most recent one
-            let runsSorted = resJson.workflow_runs.sort((a, b) => b.run_number - a.run_number)
-            console.log("Got run WITHOUT starttime specified, first entry of: ", runsSorted)
-            if(runsSorted.length) {
+            let runsSorted = resJson.workflow_runs.sort((a, b) => b.run_number - a.run_number);
+            console.log('Got run WITHOUT starttime specified, first entry of: ', runsSorted);
+            if (runsSorted.length) {
               run = runsSorted[0];
             }
           }
-          if(run && "status" in run && run.status === "completed") { 
+          if (run && 'status' in run && run.status === 'completed') {
             return run; // done
-          }
-          else if(run && "status" in run){ 
+          } else if (run && 'status' in run) {
             // recur
             return this.awaitActionWorkflowCompletion(workflowId, run.run_started_at);
-          } else { 
-            console.error("Received unexpected response to workflow runs request, retrying:", resJson);
+          } else {
+            console.error('Received unexpected response to workflow runs request, retrying:', resJson);
             return this.awaitActionWorkflowCompletion(workflowId);
           }
-        } else { 
-          console.error("Received unexpected response to workflow runs request:", resJson);
-          return { status: 406 }
+        } else {
+          console.error('Received unexpected response to workflow runs request:', resJson);
+          return { status: 406 };
         }
-      })
-    } // awaitActionWorkflowCompletion()
+      });
+  } // awaitActionWorkflowCompletion()
 
-    // obtain details for a specified workflow run
-    async getWorkflowRun(runUrl) { 
-      return fetch(runUrl, { 
-        method: 'GET',
-        headers: this.actionsHeaders
-      }).then((res) => res.json());
-    }
+  // obtain details for a specified workflow run
+  async getWorkflowRun(runUrl) {
+    return fetch(runUrl, {
+      method: 'GET',
+      headers: this.actionsHeaders,
+    }).then((res) => res.json());
+  }
 
-    // obtain inputs for a specified workflow (if any)
-    async getWorkflowInputs(wfPath) { 
-      // rewrite to raw github URL
-      const rawUrl = "https://raw.githubusercontent.com/" + this.githubRepo + "/" + this.branch + "/" + wfPath;
-      return this.directlyReadFileContents(rawUrl, { 
-        method: 'GET',
-        headers: this.apiHeaders
-      }).then((yaml) => {
-          const asJson = jsyaml.load(yaml);
-          if(env === environments.develop) {
-            console.debug("Obtained workflow description: ", asJson, wfPath);
-          }
-          // repetition below to ensure that the value of e.g. asJson.on.workflow_dispatch is not null
-          if(asJson && "on" in asJson 
-            && "workflow_dispatch" in asJson.on && asJson.on.workflow_dispatch
-            && "inputs" in asJson.on.workflow_dispatch && asJson.on.workflow_dispatch.inputs) { 
-            return asJson.on.workflow_dispatch.inputs;
-          } else return null;
-        });
-    }
+  // obtain inputs for a specified workflow (if any)
+  async getWorkflowInputs(wfPath) {
+    // rewrite to raw github URL
+    const rawUrl = 'https://raw.githubusercontent.com/' + this.githubRepo + '/' + this.branch + '/' + wfPath;
+    return this.directlyReadFileContents(rawUrl, {
+      method: 'GET',
+      headers: this.apiHeaders,
+    }).then((yaml) => {
+      const asJson = jsyaml.load(yaml);
+      if (env === environments.develop) {
+        console.debug('Obtained workflow description: ', asJson, wfPath);
+      }
+      // repetition below to ensure that the value of e.g. asJson.on.workflow_dispatch is not null
+      if (
+        asJson &&
+        'on' in asJson &&
+        'workflow_dispatch' in asJson.on &&
+        asJson.on.workflow_dispatch &&
+        'inputs' in asJson.on.workflow_dispatch &&
+        asJson.on.workflow_dispatch.inputs
+      ) {
+        return asJson.on.workflow_dispatch.inputs;
+      } else return null;
+    });
+  }
 
-    // TODO refactor so that this information is stored on getActionWorkflowsList
-    // to avoid extra fetch with getWorkflowInputs when workflow is clicked
-    async getWorkflow(wfPath) { 
-      // rewrite to raw github URL
-      const rawUrl = "https://raw.githubusercontent.com/" + this.githubRepo + "/" + this.branch + "/" + wfPath;
-      return this.directlyReadFileContents(rawUrl, { 
-        method: 'GET',
-        headers: this.apiHeaders
-      }).then((yaml) => {
-          const asJson = jsyaml.load(yaml);
-          asJson.path = wfPath;
-          if(env === environments.develop) {
-            console.debug("Obtained workflow description: ", asJson, wfPath);
-          }
-          return asJson;
-        })
-    }
+  // TODO refactor so that this information is stored on getActionWorkflowsList
+  // to avoid extra fetch with getWorkflowInputs when workflow is clicked
+  async getWorkflow(wfPath) {
+    // rewrite to raw github URL
+    const rawUrl = 'https://raw.githubusercontent.com/' + this.githubRepo + '/' + this.branch + '/' + wfPath;
+    return this.directlyReadFileContents(rawUrl, {
+      method: 'GET',
+      headers: this.apiHeaders,
+    }).then((yaml) => {
+      const asJson = jsyaml.load(yaml);
+      asJson.path = wfPath;
+      if (env === environments.develop) {
+        console.debug('Obtained workflow description: ', asJson, wfPath);
+      }
+      return asJson;
+    });
+  }
 }
 
 function isImageUri(uri) {

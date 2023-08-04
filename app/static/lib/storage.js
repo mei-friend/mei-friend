@@ -11,8 +11,8 @@ export default class Storage {
   }
 
   safelySetStorageItem(item, content) {
-    if (this.supported) { 
-      if(item !== "meiXml" || !this.override) {
+    if (this.supported) {
+      if (item !== 'meiXml' || !this.override) {
         try {
           if (content && typeof content === 'object') {
             content = JSON.stringify(content);
@@ -64,14 +64,14 @@ export default class Storage {
     }
   }
 
-  clearSolid() { 
+  clearSolid() {
     // remove data related to Solid credentials from local storage after successful login
     let keys = Object.keys(this.storage);
-    keys.forEach(k => { 
-      if(k.startsWith("solidClient") || k.startsWith("issuerConfig")) {
+    keys.forEach((k) => {
+      if (k.startsWith('solidClient') || k.startsWith('issuerConfig')) {
         this.storage.removeItem(k);
       }
-    })
+    });
   }
 
   removeItem(item) {
@@ -320,5 +320,4 @@ export default class Storage {
     this.safelySetStorageItem('restoreSolidSession', restoreSolidSession);
     this._restoreSolidSession = restoreSolidSession;
   }
-
 }

@@ -1,11 +1,19 @@
 # mei-friend-online CHANGELOG.md
 
+### 0.10.1
+* Fix contextual enabling / disabling of stand-off annotation interface
+* Improve responsiveness of polling for GitHub Action Workflow outcomes
+
+### 0.10.0-p 
+* Patch gunicorn logging config
+
 ### 0.10.0 Solid integration and Music Annotation Ontology support
 * Enable log-in to Solid Pod
 * Allow creation of Music Annotation Ontology objects in response to selections
 
 ### 0.9.1 patch
 * Fix bug with undefined lang variable under Safari (addresses #25)
+
 ### 0.9.0 GitHub Actions integration
 * Configurably display any GitHub Actions (dispatch workflows) available in the current repository / branch
 * List any configured inputs and set values from UI with shortcuts for 'current filepath' and 'current selection'

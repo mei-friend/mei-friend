@@ -703,8 +703,8 @@ export function escapeXmlId(str) {
 
 /**
  * Checks whether tagName is a valid XML element name
- * @param {string} tagName 
- * @returns 
+ * @param {string} tagName
+ * @returns
  */
 export function isValidElementName(tagName = '') {
   if (!tagName) return false;
