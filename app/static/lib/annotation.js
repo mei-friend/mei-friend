@@ -965,10 +965,7 @@ async function drawExtractsForIdentifiedObject(obj, url, etag) {
       selectionsToAdd.forEach((s) => {
         extract.insertAdjacentHTML('beforeend', `<div class="mao-selection" id="selection_${s['@id']}"></div>`);
       });
-      let updateBtn = document.createElement("div");
-      updateBtn.classList="refreshElementBtn";
-      updateBtn.innerText="Refresh";
-      updateBtn.addEventListener("click", () => refetchElement(
+      setInterval(() => refetchElement(
         url, 
         etag, 
         function() {
@@ -984,8 +981,8 @@ async function drawExtractsForIdentifiedObject(obj, url, etag) {
           })
         }, 
         liveUpdateRate, 
-        fetchMethod));
-      extract.insertAdjacentElement("afterend", updateBtn);
+        fetchMethod), liveUpdateRate);
+      //extract.insertAdjacentElement("afterend", updateBtn);
     } else { 
       console.warn("Can't draw an Extract without an embodiment:", obj)
     }

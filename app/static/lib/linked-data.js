@@ -37,87 +37,102 @@ export async function traverseAndFetch(
   { typeToHandlerMap = {}, followList = [], blockList = [], userProvided = true, jumps = 10, fetchMethod = fetch } = {}
 ) {
   let etag = "";
-  fetchMethod(url, {
-    method: "GET",
+  fetchMethod(url, { 
+    method: "HEAD",
     headers: {
-      Accept: 'application/ld+json',
-    },
-  }).then((resp) => {
-      if (resp.status >= 400) {
-        console.warn("Couldn't traverse and fetch: ", resp);
-      } else {
-        etag = resp.headers.get("ETag");
-        return resp.json();
-      }
-    })
-    .then((json) => jsonld.expand(json))
-    .then((expanded) => {
-      let resourceDescription;
-      if (Array.isArray(expanded)) {
-        // got an array back - find the node matching the current document (either absolute or relative URI)
-        // (n.b. if there are multiple matches this will just return the first encountered - TODO consider alternatives)
-        resourceDescription = expanded.find((o) => o['@id'] === url.href || o['@id'] === '' || o['@id'] === './');
-        if (!resourceDescription && !url.href.endsWith('/')) {
-          // try again with trailing slash
-          resourceDescription = expanded.find((o) => o['@id'] === url.href + '/');
+      Accept: "application/ld+json",
+      cache: "no-store"
+    }
+  }).then(headresp => { 
+    if(headresp.status >= 400)  {
+      console.warn("Failed HEAD method in traverse and fetch: ", headresp);
+    } else { 
+      etag = headresp.headers.get("etag");
+      console.log("HEAD RESPONSE: ", headresp, etag)
+    }
+  }).then(() => {
+    fetchMethod(url, {
+      method: "GET",
+      headers: {
+        Accept: 'application/ld+json',
+      },
+    }).then((resp) => {
+        if (resp.status >= 400) {
+          console.warn("Couldn't traverse and fetch: ", resp);
+        } else {
+          console.log("~GOT RESPONSE: ", resp)
+          return resp.json();
         }
-      } else {
-        resourceDescription = expanded;
-      }
-      console.log('resource description: ', resourceDescription);
-      if (resourceDescription && '@type' in resourceDescription) {
-        if (!Array.isArray(resourceDescription['@type'])) {
-          // ensure array
-          resourceDescription['@type'] = [resourceDescription['@type']];
+      })
+      .then((json) => jsonld.expand(json))
+      .then((expanded) => {
+        let resourceDescription;
+        if (Array.isArray(expanded)) {
+          // got an array back - find the node matching the current document (either absolute or relative URI)
+          // (n.b. if there are multiple matches this will just return the first encountered - TODO consider alternatives)
+          resourceDescription = expanded.find((o) => o['@id'] === url.href || o['@id'] === '' || o['@id'] === './');
+          if (!resourceDescription && !url.href.endsWith('/')) {
+            // try again with trailing slash
+            resourceDescription = expanded.find((o) => o['@id'] === url.href + '/');
+          }
+        } else {
+          resourceDescription = expanded;
         }
-        const targetUrlStrings = targetTypes.map((t) => t.href);
-        if (resourceDescription['@type'].filter((t) => targetUrlStrings.includes(t)).length) {
-          // found a target resource["@id"]!
-          ingestExternalResource(url, typeToHandlerMap, resourceDescription, etag);
-        }
-        if (jumps >= 0) {
-          // attempt to continue traversal
-          const followUrlStrings = followList.map((l) => l.href);
-          let connectionsToFollow = Object.keys(resourceDescription).filter((predicate) =>
-            followUrlStrings.includes(predicate)
-          );
-          connectionsToFollow.forEach(async (pred) => {
+        console.log('resource description: ', resourceDescription);
+        if (resourceDescription && '@type' in resourceDescription) {
+          if (!Array.isArray(resourceDescription['@type'])) {
             // ensure array
-            const predObjects = Array.isArray(resourceDescription[pred])
-              ? resourceDescription[pred]
-              : [resourceDescription[pred]];
+            resourceDescription['@type'] = [resourceDescription['@type']];
+          }
+          const targetUrlStrings = targetTypes.map((t) => t.href);
+          if (resourceDescription['@type'].filter((t) => targetUrlStrings.includes(t)).length) {
+            // found a target resource["@id"]!
+            ingestExternalResource(url, typeToHandlerMap, resourceDescription, etag);
+          }
+          if (jumps >= 0) {
+            // attempt to continue traversal
+            const followUrlStrings = followList.map((l) => l.href);
+            let connectionsToFollow = Object.keys(resourceDescription).filter((predicate) =>
+              followUrlStrings.includes(predicate)
+            );
+            connectionsToFollow.forEach(async (pred) => {
+              // ensure array
+              const predObjects = Array.isArray(resourceDescription[pred])
+                ? resourceDescription[pred]
+                : [resourceDescription[pred]];
 
-            const blockUrlStrings = blockList.map((l) => l.href);
-            predObjects.forEach((obj) => {
-              try {
-                // recur if object is a URL and not in block list
-                if (!'@id' in obj || blockUrlStrings.includes(obj['@id'])) {
-                  throw Error('target is a literal or target URI on blockList');
+              const blockUrlStrings = blockList.map((l) => l.href);
+              predObjects.forEach((obj) => {
+                try {
+                  // recur if object is a URL and not in block list
+                  if (!'@id' in obj || blockUrlStrings.includes(obj['@id'])) {
+                    throw Error('target is a literal or target URI on blockList');
+                  }
+                  let objUrl = new URL(obj['@id']);
+                  // politely continue traversal
+                  setTimeout(
+                    () =>
+                      traverseAndFetch(objUrl, targetTypes, {
+                        typeToHandlerMap,
+                        followList,
+                        blockList: [new URL(url.href), ...blockList],
+                        userProvided: false,
+                        jumps: jumps - 1,
+                        fetchMethod,
+                      }),
+                    politeness
+                  );
+                } catch {
+                  // noop (non-URL or blocked object)
                 }
-                let objUrl = new URL(obj['@id']);
-                // politely continue traversal
-                setTimeout(
-                  () =>
-                    traverseAndFetch(objUrl, targetTypes, {
-                      typeToHandlerMap,
-                      followList,
-                      blockList: [new URL(url.href), ...blockList],
-                      userProvided: false,
-                      jumps: jumps - 1,
-                      fetchMethod,
-                    }),
-                  politeness
-                );
-              } catch {
-                // noop (non-URL or blocked object)
-              }
+              });
             });
-          });
+          }
+        } else {
+          console.warn('Found no matching resource description in ', url.href, resourceDescription);
         }
-      } else {
-        console.warn('Found no matching resource description in ', url.href, resourceDescription);
-      }
-    });
+      });
+    })
 } // traverseAndFetch()
 
 /**
@@ -132,7 +147,7 @@ export function ingestExternalResource(url, typeToHandlerMap, resource, etag) {
     resource['@type'] = Array.isArray(resource['@type']) ? resource['@type'] : [resource['@type']];
     const mappedTypes = Object.keys(typeToHandlerMap).filter((t) => resource['@type'].includes(t));
     // call each relevant (type-matching) callback on the resource
-    console.log('ingest external resource: ', mappedTypes, typeToHandlerMap, resource);
+    console.log('ingest external resource: ', mappedTypes, typeToHandlerMap, resource, etag);
     mappedTypes.forEach((t) => {
       'args' in typeToHandlerMap[t] ? 
         typeToHandlerMap[t].func(resource, url, etag, ...typeToHandlerMap[t].args) : 
@@ -149,12 +164,11 @@ export async function refetchElement(url, etag, onResourceChanged, liveUpdateRat
     method: 'HEAD',
     headers: { 
       "If-None-Match": etag,
-      Accept: 'application/ld+json'
+      Accept: 'application/ld+json',
+      cache: "no-store"
     }
    }).then(async headResp=> {
-    onResourceChanged();
-    /*
-    let updatedEtag = headResp.headers.get("ETag");
+    let updatedEtag = headResp.headers.get("etag");
     if(!etag) {
       etag = updatedEtag;
     } else if(etag !== updatedEtag)  {
@@ -164,7 +178,7 @@ export async function refetchElement(url, etag, onResourceChanged, liveUpdateRat
         etag = updatedEtag;
     } else { 
       console.log("Live update - no change to ", url, etag);
-    }*/
+    }
   }).catch((e) => {
     console.warn("Error attempting live update: ", e, url, etag);
   }).finally(() => {
