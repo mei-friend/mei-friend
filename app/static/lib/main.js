@@ -425,6 +425,8 @@ function onLanguageLoaded() {
   let facsimileProportionParam = searchParams.get('facsimileProportion');
   pageParam = searchParams.get('page');
   let scaleParam = searchParams.get('scale');
+  let solidCodeParam = searchParams.get('code');
+  let solidStateParam = searchParams.get('state');
   // select parameter: both syntax versions allowed (also mixed):
   // ?select=note1,chord2,note3 and/or ?select=note1&select=chord2&select=note3
   selectParam = searchParams.getAll('select');
@@ -553,14 +555,6 @@ function onLanguageLoaded() {
     solidOverlay.classList.add('active');
     solidOverlay.tabIndex = -1;
     solidOverlay.focus();
-    console.debug('Active: ', document.activeElement);
-    restoreSolidTimeout = setTimeout(() => { 
-      if(confirm("Yes?")) {
-        loginAndFetch();
-      } else { 
-        storage.removeItem('restoreSolidSession');
-      }
-    }, 1000)
   }
 
   // fork parameter: if true AND ?fileParam is set to a URL,
@@ -737,9 +731,20 @@ function onLanguageLoaded() {
   setKeyMap(defaultKeyMap);
 
   // remove URL parameters from URL
-  const shortUrl = new URL(window.location);
-  window.history.pushState({}, '', shortUrl.origin + shortUrl.pathname);
   // TODO: check handleURLParamSelect() occurrences, whether removing search parameters has an effect there.
+  console.log("BEFORE REMOVAL", window.location);
+  const currentUrl = new URL(window.location);
+  const shortUrl = new URL(currentUrl.origin + currentUrl.pathname);
+  if(solidCodeParam && solidStateParam) {
+    // restore Solid authentication parameters if required
+    shortUrl.searchParams.append("code", solidCodeParam);
+    shortUrl.searchParams.append("state", solidStateParam);
+  }
+  window.history.pushState({}, '', shortUrl.href);
+  restoreSolidTimeout = setTimeout(function() { 
+      solidOverlay.classList.remove('active');
+      loginAndFetch();
+  }, 3000);
 } // onLanguageLoaded
 
 export async function openUrlFetch(url = '', updateAfterLoading = true) {
@@ -1986,6 +1991,15 @@ function addEventListeners(v, cm) {
     }
     v.updateAll(cm, {}, v.selectedElements[0]);
   });
+
+  document.getElementById("solidLoadingIndicator").addEventListener("click", () => { 
+    // cancel Solid login procedure
+    document.getElementById('solidOverlay').classList.remove('active');
+    storage.removeItem('restoreSolidSession');
+    if (restoreSolidTimeout) {
+      clearTimeout(restoreSolidTimeout);
+    }
+  })
 
   addDragSelector(v, vp);
 

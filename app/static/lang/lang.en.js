@@ -321,7 +321,7 @@ export const lang = {
   selectTagNameForEnclosureCancelButton: { value: 'Cancel' },
 
   // restore Solid session overlay
-//  solidOverlayCancel: { html: 'Restoring Solid session - press <span>esc</span> to cancel' },
+//  solidOverlayCancel: { html: 'Restoring Solid session - press <span>esc</span> or click here to cancel' },
 
   // annotation panel
   annotationCloseButtonText: { text: 'Close Annotations Panel' },

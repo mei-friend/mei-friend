@@ -187,11 +187,17 @@ a:active {
   display:flex; 
   align-items:center;
   justify-content:center;
+  cursor: pointer;
+}
+
+#solidLoadingIndicator:hover { 
+  text-decoration: underline;
 }
 
 #solidOverlayCancel span { 
   font-family: monospace;
 }
+
 
 #solidLoadingIndicator { 
   border-radius:32px;
