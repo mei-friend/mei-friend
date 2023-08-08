@@ -313,6 +313,7 @@ export const lang = {
   // restore Solid session overlay
   solidOverlayCancel: { html: 'Solid-Sitzung wird wiederhergestellt - drücken Sie <span>Esc</span> oder klicken Sie hier, um abzubrechen.' },
   solidWelcomeMsg: { text: 'Willkommen, '},
+  solidLogout: { text: 'Abmelden' },
 
   // annotation panel
   annotationCloseButtonText: { text: 'Panel für Annotationen schließen' },

@@ -15,7 +15,9 @@ import {
 } from '../css/icons.js';
 import { removeInEditor } from './editor.js';
 import {
+  loginAndFetch,
   solid,
+  solidLogout,
   getSolidStorage,
   friendContainer,
   annotationContainer,
@@ -1074,7 +1076,9 @@ export async function populateSolidTab() {
   const solidTab = document.getElementById('solidTab');
   if (solid.getDefaultSession().info.isLoggedIn) {
     solidTab.innerHTML = await populateLoggedInSolidTab();
-    document.getElementById('solidLogout').addEventListener('click', solidLogout);
+    document.getElementById('solidLogout').addEventListener('click', () => { 
+      solidLogout(populateSolidTab)
+    })
   } else {
     solidTab.innerHTML = populateLoggedOutSolidTab();
     document.getElementById('solidLogin').addEventListener('click', () => {
@@ -1116,7 +1120,7 @@ async function populateLoggedInSolidTab() {
 
   return `
   <div><span id='solidWelcomeMsg'>${translator.lang.solidWelcomeMsg.text}<span><span id='solidWelcomeName' title='${webId}'>${name}</span>!</div>
-  <div><a id="solidLogout">Log out</a></div>`;
+  <div><button type="button" id="solidLogout">${translator.lang.solidLogout.text}</button></div>`;
 }
 
 function populateLoggedOutSolidTab() {
