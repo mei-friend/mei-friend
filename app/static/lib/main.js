@@ -50,7 +50,7 @@ import {
   setNotationProportion,
   setOrientation,
 } from './resizer.js';
-import { addAnnotationHandlers, clearAnnotations, readAnnots, refreshAnnotations } from './annotation.js';
+import { addAnnotationHandlers, clearAnnotations, readAnnots, refreshAnnotations, populateSolidTab } from './annotation.js';
 import { dropHandler, dragEnter, dragOverHandler, dragLeave } from './dragger.js';
 import { openUrl, openUrlCancel } from './open-url.js';
 import {
@@ -79,7 +79,7 @@ import * as e from './editor.js';
 import Viewer from './viewer.js';
 import * as speed from './speed.js';
 import Github from './github.js';
-import { loginAndFetch, populateSolidTab, solid } from './solid.js';
+import { loginAndFetch, solid } from './solid.js';
 import Storage from './storage.js';
 import { fillInBranchContents, logoutFromGithub, refreshGithubMenu, setCommitUIEnabledStatus } from './github-menu.js';
 import { forkAndOpen, forkRepositoryCancel } from './fork-repository.js';
@@ -277,6 +277,7 @@ export function updateLocalStorage(meiXml) {
     }
   }
 }
+
 
 export function updateGithubInLocalStorage() {
   if (storage.supported && !storage.override && isLoggedIn) {
@@ -742,7 +743,7 @@ function onLanguageLoaded() {
   window.history.pushState({}, '', shortUrl.href);
   restoreSolidTimeout = setTimeout(function () {
     solidOverlay.classList.remove('active');
-    loginAndFetch();
+    loginAndFetch(populateSolidTab);
   }, 3000);
 } // onLanguageLoaded
 
