@@ -497,11 +497,9 @@ export async function loginAndFetch() {
   //      the user's credentials are stored in-memory, and
   //      the login process is complete.
   //   Otherwise, no-op.
-  solid.handleIncomingRedirect({ restorePreviousSession: true }).then((info) => { 
-    console.log("SOLID: DONE HANDLING INCOMING REDIRECT", info)
+  solid.handleIncomingRedirect({ restorePreviousSession: true }).then((info) => {
     // 2. Start the Login Process if not already logged in.
     if (!info.isLoggedIn) {
-      console.log('SOLID: NOT LOGGED IN');
       storage.restoreSolidSession = true;
       let providerEl = document.getElementById('providerSelect');
       if (providerEl) {
@@ -517,13 +515,7 @@ export async function loginAndFetch() {
         console.warn("Couldn't handle incoming redirect from Solid: no provider element");
       }
     } else {
-      console.log('SOLID: LOGGED IN');
       populateSolidTab();
-      /*
-      solid.fetch("https://musicog.solidcommunity.net/private/")
-          .then(resp => resp.text())
-          .then(data => console.log("GOT DATA: ", data))
-          */
     }
   });
 }

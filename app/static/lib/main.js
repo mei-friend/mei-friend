@@ -1,6 +1,6 @@
 // mei-friend version and date
-export const version = '0.10.1';
-export const versionDate = '3 August 2023'; // use full or 3-character english months, will be translated
+export const version = '0.10.2';
+export const versionDate = '8 August 2023'; // use full or 3-character english months, will be translated
 
 var vrvWorker;
 var spdWorker;
@@ -732,18 +732,17 @@ function onLanguageLoaded() {
 
   // remove URL parameters from URL
   // TODO: check handleURLParamSelect() occurrences, whether removing search parameters has an effect there.
-  console.log("BEFORE REMOVAL", window.location);
   const currentUrl = new URL(window.location);
   const shortUrl = new URL(currentUrl.origin + currentUrl.pathname);
-  if(solidCodeParam && solidStateParam) {
+  if (solidCodeParam && solidStateParam) {
     // restore Solid authentication parameters if required
-    shortUrl.searchParams.append("code", solidCodeParam);
-    shortUrl.searchParams.append("state", solidStateParam);
+    shortUrl.searchParams.append('code', solidCodeParam);
+    shortUrl.searchParams.append('state', solidStateParam);
   }
   window.history.pushState({}, '', shortUrl.href);
-  restoreSolidTimeout = setTimeout(function() { 
-      solidOverlay.classList.remove('active');
-      loginAndFetch();
+  restoreSolidTimeout = setTimeout(function () {
+    solidOverlay.classList.remove('active');
+    loginAndFetch();
   }, 3000);
 } // onLanguageLoaded
 
@@ -1543,7 +1542,6 @@ export let cmd = {
   openHelp: () => window.open(`./help`, '_blank'),
   consultGuidelines: () => consultGuidelines(),
   escapeKeyPressed: () => {
-    console.debug('ESCAPE PRESSED!!!!', document.activeElement);
     // reset settings filter, if settings have focus
     if (
       document.getElementById('settingsPanel') &&
@@ -1992,14 +1990,14 @@ function addEventListeners(v, cm) {
     v.updateAll(cm, {}, v.selectedElements[0]);
   });
 
-  document.getElementById("solidLoadingIndicator").addEventListener("click", () => { 
+  document.getElementById('solidLoadingIndicator').addEventListener('click', () => {
     // cancel Solid login procedure
     document.getElementById('solidOverlay').classList.remove('active');
     storage.removeItem('restoreSolidSession');
     if (restoreSolidTimeout) {
       clearTimeout(restoreSolidTimeout);
     }
-  })
+  });
 
   addDragSelector(v, vp);
 
