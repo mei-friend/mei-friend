@@ -322,6 +322,7 @@ export const lang = {
 
   // restore Solid session overlay
   solidOverlayCancel: { html: 'Restoring Solid session - press <span>esc</span> or click here to cancel' },
+  solidWelcomeMsg: { text: 'Welcome, '},
 
   // annotation panel
   annotationCloseButtonText: { text: 'Close Annotations Panel' },

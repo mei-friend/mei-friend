@@ -1115,7 +1115,7 @@ async function populateLoggedInSolidTab() {
   }
 
   return `
-  <div>Welcome, <span id='welcomeName' title='${webId}'>${name}</span>!</div>
+  <div><span id='solidWelcomeMsg'>${translator.lang.solidWelcomeMsg.text}<span><span id='solidWelcomeName' title='${webId}'>${name}</span>!</div>
   <div><a id="solidLogout">Log out</a></div>`;
 }
 
