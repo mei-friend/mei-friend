@@ -310,6 +310,9 @@ export const lang = {
   selectTagNameForEnclosureOkButton: { value: 'OK' },
   selectTagNameForEnclosureCancelButton: { value: 'Abbrechen' },
 
+  // restore Solid session overlay
+  solidOverlayCancel: { html: 'Solid-Sitzung wird wiederhergestellt - drücken Sie <span>Esc</span> oder klicken Sie hier, um abzubrechen.' },
+
   // annotation panel
   annotationCloseButtonText: { text: 'Panel für Annotationen schließen' },
   hideAnnotationPanelButton: { description: 'Panel für Annotationen schließen' },

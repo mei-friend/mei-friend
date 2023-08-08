@@ -317,6 +317,9 @@ export const lang = {
   selectTagNameForEnclosureOkButton: { value: 'OK' },
   selectTagNameForEnclosureCancelButton: { value: 'Annulla' },
 
+  // restore Solid session overlay
+  solidOverlayCancel: { html: 'Ripristino della sessione Solid - premere <span>Esc</span> o fare clic qui per annullare.' },
+
   // annotation panel / annotation panel
   annotationCloseButtonText: { text: 'Chiudi pannello di annotazione' },
   hideAnnotationPanelButton: { description: 'Chiudi pannello di annotazione' },
