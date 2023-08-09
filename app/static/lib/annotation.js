@@ -1,4 +1,4 @@
-import { v, cm, log, translator, meiFileLocation, fileLocationType } from './main.js';
+import { v, cm, log, translator, meiFileLocation, setStandoffAnnotationEnabledStatus } from './main.js';
 import { convertCoords, generateXmlId, rmHash, setCursorToId } from './utils.js';
 import { meiNameSpace, xmlNameSpace, xmlToString } from './dom-utils.js';
 import {
@@ -15,7 +15,9 @@ import {
 } from '../css/icons.js';
 import { removeInEditor } from './editor.js';
 import {
+  loginAndFetch,
   solid,
+  solidLogout,
   getSolidStorage,
   friendContainer,
   annotationContainer,
@@ -1069,3 +1071,72 @@ export function copyIdToClipboard(e) {
 export function clearAnnotations() {
   annotations = [];
 }
+
+export async function populateSolidTab() {
+  const solidTab = document.getElementById('solidTab');
+  if (solid.getDefaultSession().info.isLoggedIn) {
+    solidTab.innerHTML = await populateLoggedInSolidTab();
+    document.getElementById('solidLogout').addEventListener('click', () => { 
+      solidLogout(populateSolidTab)
+    })
+  } else {
+    solidTab.innerHTML = populateLoggedOutSolidTab();
+    document.getElementById('solidLogin').addEventListener('click', () => {
+      loginAndFetch(populateSolidTab);
+    });
+  }
+  setStandoffAnnotationEnabledStatus();
+}
+
+async function populateLoggedInSolidTab() {
+  const webId = solid.getDefaultSession().info.webId;
+  const solidButton = document.getElementById('solidButton');
+  solidButton.classList.add('clockwise');
+  const profile = await solid
+    .fetch(webId, {
+      headers: {
+        Accept: 'application/ld+json',
+      },
+    })
+    .then((resp) => resp.json())
+    .then((json) => jsonld.expand(json))
+    .finally(() => solidButton.classList.remove('clockwise'));
+  let name = webId;
+  // try to find entry for 'me' (i.e. the user's webId) in profile:
+  let me = Array.from(profile).filter((e) => '@id' in e && e['@id'] === webId);
+  if (me.length) {
+    if (me.length > 1) {
+      console.warn("User's solid profile has multiple entries for their webId!");
+    }
+    if (`${nsp.FOAF}name` in me[0]) {
+      let foafName = me[0][`${nsp.FOAF}name`][0]; // TODO decide what to do in case of multiple foaf:names
+      if (typeof foafName === 'string') {
+        name = foafName;
+      } else if (typeof foafName === 'object' && '@value' in foafName) {
+        name = foafName['@value'];
+      }
+    }
+  }
+
+  return `
+  <div><span id='solidWelcomeMsg'>${translator.lang.solidWelcomeMsg.text}<span><span id='solidWelcomeName' title='${webId}'>${name}</span>!</div>
+  <div><button type="button" id="solidLogout">${translator.lang.solidLogout.text}</button></div>`;
+}
+
+function populateLoggedOutSolidTab() {
+  let providerContainer = document.createElement('div');
+  let provider = document.createElement('select');
+  provider.setAttribute('name', 'provider');
+  provider.setAttribute('id', 'providerSelect');
+  provider.innerHTML = `
+    <option value="https://solidcommunity.net">SolidCommunity.net</option>
+    <option value="https://login.inrupt.net">Inrupt</option>
+    <option value="https://trompa-solid.upf.edu">TROMPA @ UPF</option>
+  `;
+  providerContainer.insertAdjacentElement('afterbegin', provider);
+  let msg = document.createElement('div');
+  msg.innerHTML = 'Please choose a provider and <a id="solidLogin">click here to log in!</a>';
+  msg.insertAdjacentElement('afterbegin', providerContainer);
+  return msg.outerHTML;
+}
+

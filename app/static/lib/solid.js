@@ -4,7 +4,6 @@ import {
   fileLocationType,
   github, // instance
   meiFileLocation,
-  setStandoffAnnotationEnabledStatus,
   storage,
   version,
 } from './main.js';
@@ -397,20 +396,6 @@ async function createMAOMusicalMaterial(postExtractResponse, aboutUri, discovery
   return postResource(musicalMaterialContainer, resource);
 }
 
-export async function populateSolidTab() {
-  const solidTab = document.getElementById('solidTab');
-  if (solid.getDefaultSession().info.isLoggedIn) {
-    solidTab.innerHTML = await populateLoggedInSolidTab();
-    document.getElementById('solidLogout').addEventListener('click', solidLogout);
-  } else {
-    solidTab.innerHTML = populateLoggedOutSolidTab();
-    document.getElementById('solidLogin').addEventListener('click', () => {
-      loginAndFetch();
-    });
-  }
-  setStandoffAnnotationEnabledStatus();
-}
-
 export async function getProfile() {
   const webId = solid.getDefaultSession().info.webId;
   const solidButton = document.getElementById('solidButton');
@@ -439,59 +424,7 @@ export async function getProfile() {
   return profile;
 }
 
-async function populateLoggedInSolidTab() {
-  const webId = solid.getDefaultSession().info.webId;
-  const solidButton = document.getElementById('solidButton');
-  solidButton.classList.add('clockwise');
-  const profile = await solid
-    .fetch(webId, {
-      headers: {
-        Accept: 'application/ld+json',
-      },
-    })
-    .then((resp) => resp.json())
-    .then((json) => jsonld.expand(json))
-    .finally(() => solidButton.classList.remove('clockwise'));
-  let name = webId;
-  // try to find entry for 'me' (i.e. the user's webId) in profile:
-  let me = Array.from(profile).filter((e) => '@id' in e && e['@id'] === webId);
-  if (me.length) {
-    if (me.length > 1) {
-      console.warn("User's solid profile has multiple entries for their webId!");
-    }
-    if (`${nsp.FOAF}name` in me[0]) {
-      let foafName = me[0][`${nsp.FOAF}name`][0]; // TODO decide what to do in case of multiple foaf:names
-      if (typeof foafName === 'string') {
-        name = foafName;
-      } else if (typeof foafName === 'object' && '@value' in foafName) {
-        name = foafName['@value'];
-      }
-    }
-  }
-
-  return `
-  <div>Welcome, <span id='welcomeName' title='${webId}'>${name}</span>!</div>
-  <div><a id="solidLogout">Log out</a></div>`;
-}
-
-function populateLoggedOutSolidTab() {
-  let providerContainer = document.createElement('div');
-  let provider = document.createElement('select');
-  provider.setAttribute('name', 'provider');
-  provider.setAttribute('id', 'providerSelect');
-  provider.innerHTML = `
-    <option value="https://solidcommunity.net">SolidCommunity.net</option>
-    <option value="https://login.inrupt.net">Inrupt</option>
-    <option value="https://trompa-solid.upf.edu">TROMPA @ UPF</option>
-  `;
-  providerContainer.insertAdjacentElement('afterbegin', provider);
-  let msg = document.createElement('div');
-  msg.innerHTML = 'Please choose a provider and <a id="solidLogin">click here to log in!</a>';
-  msg.insertAdjacentElement('afterbegin', providerContainer);
-  return msg.outerHTML;
-}
-
-export async function loginAndFetch() {
+export async function loginAndFetch(onLogin) {
   // 1. Call `handleIncomingRedirect()` to complete the authentication process.
   //    If called after the user has logged in with the Solid Identity Provider,
   //      the user's credentials are stored in-memory, and
@@ -515,13 +448,13 @@ export async function loginAndFetch() {
         console.warn("Couldn't handle incoming redirect from Solid: no provider element");
       }
     } else {
-      populateSolidTab();
+      onLogin();
     }
   });
 }
-export function solidLogout() {
+export function solidLogout(onLogout) {
   solid.logout().then(() => {
     storage.removeItem('restoreSolidSession');
-    populateSolidTab();
+    onLogout();
   });
 }

@@ -310,11 +310,16 @@ export const lang = {
   selectTagNameForEnclosureOkButton: { value: 'OK' },
   selectTagNameForEnclosureCancelButton: { value: 'Abbrechen' },
 
+  // restore Solid session overlay
+  solidOverlayCancel: { html: 'Solid-Sitzung wird wiederhergestellt - drücken Sie <span>Esc</span> oder klicken Sie hier, um abzubrechen.' },
+  solidWelcomeMsg: { text: 'Willkommen, '},
+  solidLogout: { text: 'Abmelden' },
+
   // annotation panel
   annotationCloseButtonText: { text: 'Panel für Annotationen schließen' },
   hideAnnotationPanelButton: { description: 'Panel für Annotationen schließen' },
   closeAnnotationPanelButton: { description: 'Panel für Annotationen schließen' },
-  annotationToolsButton: { text: 'Werkzeuge', description: 'Annotationswerkzeuge' },
+  annotationToolsButton: { text: 'Tools', description: 'Annotationswerkzeuge' },
   annotationListButton: { text: 'Liste', description: 'Annotationen auflisten' },
   writeAnnotStandoffText: { text: 'Web Annotationen' },
   annotationToolsHighlightTitle: { text: 'Hervorheben' },
