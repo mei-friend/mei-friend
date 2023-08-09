@@ -740,10 +740,12 @@ function onLanguageLoaded() {
     shortUrl.searchParams.append('state', solidStateParam);
   }
   window.history.pushState({}, '', shortUrl.href);
-  restoreSolidTimeout = setTimeout(function () {
-    solidOverlay.classList.remove('active');
-    loginAndFetch();
-  }, 3000);
+  if(storage.supported && storage.restoreSolidSession)  {
+    restoreSolidTimeout = setTimeout(function () {
+      solidOverlay.classList.remove('active');
+      loginAndFetch();
+    }, 3000);
+  }
 } // onLanguageLoaded
 
 export async function openUrlFetch(url = '', updateAfterLoading = true) {
