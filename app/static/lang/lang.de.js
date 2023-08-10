@@ -51,6 +51,7 @@ export const lang = {
   surroundWithTagsText: { text: 'Mit Tags umschließen' },
   surroundWithLastTagText: { text: 'Umschließen mit ' },
   jumpToLineText: { text: 'Zu Zeile gehen' },
+  toMatchingTagText: { text: 'Zum passenden Tag gehen' },
   manualValidateText: { text: 'Validieren' },
 
   // VIEW MENU ITEM

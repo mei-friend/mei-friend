@@ -50,7 +50,13 @@ import {
   setNotationProportion,
   setOrientation,
 } from './resizer.js';
-import { addAnnotationHandlers, clearAnnotations, readAnnots, refreshAnnotations, populateSolidTab } from './annotation.js';
+import {
+  addAnnotationHandlers,
+  clearAnnotations,
+  readAnnots,
+  refreshAnnotations,
+  populateSolidTab,
+} from './annotation.js';
 import { dropHandler, dragEnter, dragOverHandler, dragLeave } from './dragger.js';
 import { openUrl, openUrlCancel } from './open-url.js';
 import {
@@ -134,6 +140,7 @@ const defaultCodeMirrorOptions = {
     'Ctrl-Space': 'autocomplete',
     'Alt-.': consultGuidelines,
     'Shift-Alt-f': indentSelection,
+    'Shift-Ctrl-G': toMatchingTag,
     "'Ï'": indentSelection, // TODO: overcome strange bindings on MAC
     'Cmd-E': encloseSelectionWithTag, // TODO: make OS modifier keys dynamic
     'Ctrl-E': encloseSelectionWithTag,
@@ -277,7 +284,6 @@ export function updateLocalStorage(meiXml) {
     }
   }
 }
-
 
 export function updateGithubInLocalStorage() {
   if (storage.supported && !storage.override && isLoggedIn) {
@@ -741,7 +747,7 @@ function onLanguageLoaded() {
     shortUrl.searchParams.append('state', solidStateParam);
   }
   window.history.pushState({}, '', shortUrl.href);
-  if(storage.supported && storage.restoreSolidSession)  {
+  if (storage.supported && storage.restoreSolidSession) {
     restoreSolidTimeout = setTimeout(function () {
       solidOverlay.classList.remove('active');
       loginAndFetch(populateSolidTab);
@@ -1301,6 +1307,11 @@ function indentSelection() {
   e.indentSelection(v, cm);
 } // indentSelection()
 
+// wrapper for toMatchingTag
+function toMatchingTag() {
+  e.toMatchingTag(v, cm);
+}
+
 let tagEncloserNode; // context menu to choose node name to enclose selected text
 
 // wrapper for editor.encloseSelectionWithTag()
@@ -1709,6 +1720,7 @@ function addEventListeners(v, cm) {
   document.getElementById('surroundWithTags').addEventListener('click', encloseSelectionWithTag);
   document.getElementById('surroundWithLastTag').addEventListener('click', encloseSelectionWithLastTag);
   document.getElementById('jumpToLine').addEventListener('click', () => CodeMirror.commands.jumpToLine(cm));
+  document.getElementById('toMatchingTag').addEventListener('click', toMatchingTag);
   document.getElementById('manualValidate').addEventListener('click', cmd.validate);
   document
     .querySelectorAll('.keyShortCut')

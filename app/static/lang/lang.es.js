@@ -51,6 +51,7 @@ export const lang = {
   surroundWithTagsText: { text: 'Envolver con tags' },
   surroundWithLastTagText: { text: 'Envolver con ' },
   jumpToLineText: { text: 'Ir a línea' },
+  toMatchingTagText: { text: 'Ir al tag correspondiente' },
   manualValidateText: { text: 'Validar' },
 
   // VIEW MENU ITEM / ELEMENTOS DEL MENÚ VER
