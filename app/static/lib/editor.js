@@ -821,7 +821,7 @@ export function addOctaveElement(v, cm, disPlace = 'above', dis = '8') {
 } // addOctaveElement()
 
 /**
- * Surrounds selected elements with a supplied element
+ * Surrounds selected elements with a markup element
  * (and a responsibility statement from v.respId derived
  * from mei-friend settings.
  *
@@ -829,16 +829,22 @@ export function addOctaveElement(v, cm, disPlace = 'above', dis = '8') {
  * inserts them as new elements, and surrounds them with supplied
  * elements. If there is already such a artic/accid child element,
  * take it and surround it.
+ * 
+ * mElName contains the element name for the element supplied.
+ * The element must be a member of att.modelTranscriptionLike.
+ * By default, the added markup element will be <supplied>.
  * @param {Viewer} v
  * @param {CodeMirror} cm
  * @param {string} attrName ('artic', 'accid')
+ * @param {string} mElName name of markup element to apply
  * @returns
  */
-export function addSuppliedElement(v, cm, attrName = 'none') {
+export function addSuppliedElement(v, cm, attrName = 'none', mElName = 'supplied') {
   v.loadXml(cm.getValue());
   v.selectedElements = speed.filterElements(v.selectedElements, v.xmlDoc);
   v.selectedElements = utils.sortElementsByScorePosition(v.selectedElements);
   if (v.selectedElements.length < 1) return;
+  if (!att.modelTranscriptionLike.includes(mElName)) return;
   v.allowCursorActivity = false;
 
   let uuids = [];
@@ -889,8 +895,8 @@ export function addSuppliedElement(v, cm, attrName = 'none') {
         v.showAlert(msg, 'warning');
       }
 
-      let sup = document.createElementNS(dutils.meiNameSpace, 'supplied');
-      let uuid = mintSuppliedId(id, 'supplied');
+      let sup = document.createElementNS(dutils.meiNameSpace, mElName);
+      let uuid = mintSuppliedId(id, mElName);
       sup.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
       let respId = document.getElementById('respSelect').value;
       if (respId) sup.setAttribute('resp', '#' + respId);
