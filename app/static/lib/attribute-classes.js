@@ -243,6 +243,22 @@ export const dataURI = [
   'altsym',
 ];
 
+// model.transcriptionLike
+export const modelTranscriptionLike = [
+  //'add',
+  //'corr',
+  //'damage', (leave out for now, no markup)
+  //'del',
+  //'gap', (leave out for now, no markup)
+  //'handShift', (leave out for now)
+  //'orig',
+  //'reg',
+  // 'restore' (leave out for now)
+  //'sic',
+  'supplied',
+  //'unclear',
+];
+
 // data.DURATION.cmn
 export const dataDurationCMN = [
   'long',
