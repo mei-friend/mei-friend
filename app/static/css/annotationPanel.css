@@ -43,7 +43,7 @@
   cursor:default;
 }
 
-.annotationToolsDomainSelection {
+#annotationToolsDomainSelection {
   display: flex;
 }
 
