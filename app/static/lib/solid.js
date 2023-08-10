@@ -11,6 +11,7 @@ import {
 import { nsp, politeness } from './linked-data.js';
 
 export const solid = solidClientAuthentication.default;
+export let provider;
 
 // mei-friend resource containers (internal path within Solid storage)
 export const friendContainer = 'at.ac.mdw.mei-friend/';
@@ -430,23 +431,24 @@ export async function loginAndFetch(onLogin) {
   //      the user's credentials are stored in-memory, and
   //      the login process is complete.
   //   Otherwise, no-op.
+  let providerEl = document.getElementById('providerSelect');
+  if (providerEl) {
+    provider = providerEl.value;
+  } else {
+    console.warn("Couldn't find Solid provider element");
+  }
   solid.handleIncomingRedirect({ restorePreviousSession: true }).then((info) => {
     // 2. Start the Login Process if not already logged in.
+    console.log('got Solid info: ', info);
     if (!info.isLoggedIn) {
       storage.restoreSolidSession = true;
-      let providerEl = document.getElementById('providerSelect');
-      if (providerEl) {
-        let provider = providerEl.value;
-        solid.login({
-          // Specify the URL of the user's Solid Identity Provider;
-          // e.g., "https://login.inrupt.com".
-          oidcIssuer: provider,
-          // Provide a name for the application when sending to the Solid Identity Provider
-          clientName: 'mei-friend',
-        });
-      } else {
-        console.warn("Couldn't handle incoming redirect from Solid: no provider element");
-      }
+      solid.login({
+        // Specify the URL of the user's Solid Identity Provider;
+        // e.g., "https://login.inrupt.com".
+        oidcIssuer: provider,
+        // Provide a name for the application when sending to the Solid Identity Provider
+        clientName: 'mei-friend',
+      });
     } else {
       onLogin();
     }

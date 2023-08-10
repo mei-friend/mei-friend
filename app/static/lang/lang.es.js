@@ -310,9 +310,15 @@ export const lang = {
   selectTagNameForEnclosureCancelButton: { value: 'Cancelar' },
 
   // restore Solid session overlay
-  solidOverlayCancel: { html: 'Restaurando sesión de Solid - presione <span>Esc</span> o haga clic aquí para cancelar.' },
+  solidOverlayCancel: {
+    html: 'Restaurando sesión de Solid - presione <span>Esc</span> o haga clic aquí para cancelar.',
+  },
   solidWelcomeMsg: { text: 'Bienvenido, ' },
   solidLogout: { text: 'Cerrar sesión' },
+  solidLoggedOutWarning: {
+    html: `Has cerrado sesión en la integración Solid de mei-friend, ¡pero tu navegador todavía está iniciado en Solid!
+    <a id="solidIdPLogoutLink" target="_blank">Haz clic aquí para cerrar sesión en Solid</a>.`,
+  },
 
   // annotation panel / panel de anotaciones
   annotationCloseButtonText: { text: 'Cerrar panel de anotaciones' },

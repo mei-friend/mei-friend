@@ -18,6 +18,7 @@ import {
   loginAndFetch,
   solid,
   solidLogout,
+  provider,
   getSolidStorage,
   friendContainer,
   annotationContainer,
@@ -1076,9 +1077,11 @@ export async function populateSolidTab() {
   const solidTab = document.getElementById('solidTab');
   if (solid.getDefaultSession().info.isLoggedIn) {
     solidTab.innerHTML = await populateLoggedInSolidTab();
-    document.getElementById('solidLogout').addEventListener('click', () => { 
-      solidLogout(populateSolidTab)
-    })
+    document.getElementById('solidLogout').addEventListener('click', () => {
+      solidLogout(populateSolidTab);
+      v.showAlert(translator.lang.solidLoggedOutWarning.html, 'warning', 30000);
+      document.getElementById('solidIdPLogoutLink').href = provider + '/logout';
+    });
   } else {
     solidTab.innerHTML = populateLoggedOutSolidTab();
     document.getElementById('solidLogin').addEventListener('click', () => {
@@ -1139,4 +1142,3 @@ function populateLoggedOutSolidTab() {
   msg.insertAdjacentElement('afterbegin', providerContainer);
   return msg.outerHTML;
 }
-
