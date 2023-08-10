@@ -324,7 +324,7 @@ export const lang = {
   annotationCloseButtonText: { text: 'Cerrar panel de anotaciones' },
   hideAnnotationPanelButton: { description: 'Cerrar panel de anotaciones' },
   closeAnnotationPanelButton: { description: 'Cerrar panel de anotaciones' },
-  annotationToolsButton: { text: 'Herramientas', description: 'Herramientas de anotación' },
+  annotationToolsButton: { text: 'Utilidades', description: 'Herramientas de anotación' },
   annotationListButton: { text: 'Lista', description: 'Listar anotaciones' },
   writeAnnotStandoffText: { text: 'Anotación Web' },
   annotationToolsHighlightTitle: { text: 'Resaltar' },
