@@ -50,7 +50,7 @@ import {
   setNotationProportion,
   setOrientation,
 } from './resizer.js';
-import { addAnnotationHandlers, clearAnnotations, readAnnots, refreshAnnotations, populateSolidTab } from './annotation.js';
+import { addAnnotationHandlers, clearAnnotations, getSolidIdP, readAnnots, refreshAnnotations, populateSolidTab } from './annotation.js';
 import { dropHandler, dragEnter, dragOverHandler, dragLeave } from './dragger.js';
 import { openUrl, openUrlCancel } from './open-url.js';
 import {
@@ -744,7 +744,7 @@ function onLanguageLoaded() {
   if(storage.supported && storage.restoreSolidSession)  {
     restoreSolidTimeout = setTimeout(function () {
       solidOverlay.classList.remove('active');
-      loginAndFetch(populateSolidTab);
+      loginAndFetch(getSolidIdP(), populateSolidTab);
     }, 3000);
   }
 } // onLanguageLoaded

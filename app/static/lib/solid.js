@@ -425,18 +425,12 @@ export async function getProfile() {
   return profile;
 }
 
-export async function loginAndFetch(onLogin) {
+export async function loginAndFetch(provider, onLogin) {
   // 1. Call `handleIncomingRedirect()` to complete the authentication process.
   //    If called after the user has logged in with the Solid Identity Provider,
   //      the user's credentials are stored in-memory, and
   //      the login process is complete.
   //   Otherwise, no-op.
-  let providerEl = document.getElementById('providerSelect');
-  if (providerEl) {
-    provider = providerEl.value;
-  } else {
-    console.warn("Couldn't find Solid provider element");
-  }
   solid.handleIncomingRedirect({ restorePreviousSession: true }).then((info) => {
     // 2. Start the Login Process if not already logged in.
     console.log('got Solid info: ', info);

@@ -321,6 +321,12 @@ export const lang = {
   selectTagNameForEnclosureCancelButton: { value: 'Cancel' },
 
   // restore Solid session overlay
+  solidExplanation: {
+    description:
+      'Solid is a decentralised platform for social linked data platform. Log in to Solid to create stand-off annotations using linked data (RDF).',
+  },
+  solidProvider: { description: 'Please choose a Solid identity provider (IdP) or specify your own.' },
+  solidLoginBtn: { text: 'Login' },
   solidOverlayCancel: { html: 'Restoring Solid session - press <span>esc</span> or click here to cancel' },
   solidWelcomeMsg: { text: 'Welcome, ' },
   solidLogout: { text: 'Log out' },
