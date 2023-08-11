@@ -54,6 +54,7 @@ export const lang = {
   surroundWithTagsText: { text: 'Entourer de tags' },
   surroundWithLastTagText: { text: 'Entourer de ' },
   jumpToLineText: { text: 'Aller à la ligne' },
+  toMatchingTagText: { text: 'Aller au tag correspondant' },
   manualValidateText: { text: 'Valider' },
 
   // VIEW MENU ITEM / ELEMENT DE MENU AFFICHAGE

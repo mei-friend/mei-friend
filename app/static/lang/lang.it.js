@@ -54,6 +54,7 @@ export const lang = {
   surroundWithTagsText: { text: 'Circondare con tags' },
   surroundWithLastTagText: { text: 'Circondare con ' },
   jumpToLineText: { text: 'Vai alla riga' },
+  toMatchingTagText: { text: 'Vai al tag corrispondente' },
   manualValidateText: { text: 'Convalida' },
 
   // VIEW MENU ITEM / MENU VISUALIZZA

@@ -54,6 +54,7 @@ export const lang = {
   surroundWithTagsText: { text: 'Envoltar amb tags' },
   surroundWithLastTagText: { text: 'Envoltar amb ' },
   jumpToLineText: { text: 'Salta a línia' },
+  toMatchingTagText: { text: "Anar al tag coincident" },
   manualValidateText: { text: 'Valida' },
 
   // VIEW MENU ITEM / ELEMENT DEL MENU DE VISUALITZACIÓ
