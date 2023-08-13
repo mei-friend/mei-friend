@@ -1,4 +1,4 @@
-import { v, cm, log, translator, meiFileLocation, fileLocationType } from './main.js';
+import { v, cm, log, translator, meiFileLocation, setStandoffAnnotationEnabledStatus } from './main.js';
 import { convertCoords, generateXmlId, rmHash, setCursorToId } from './utils.js';
 import { meiNameSpace, xmlNameSpace, xmlToString } from './dom-utils.js';
 import {
@@ -15,7 +15,10 @@ import {
 } from '../css/icons.js';
 import { removeInEditor } from './editor.js';
 import {
+  loginAndFetch,
   solid,
+  solidLogout,
+  provider,
   getSolidStorage,
   friendContainer,
   annotationContainer,
@@ -1068,4 +1071,104 @@ export function copyIdToClipboard(e) {
 
 export function clearAnnotations() {
   annotations = [];
+}
+
+/**
+ * getSolidIdP(): Determine user's prefered Solid identity provider (IdP), 
+ * either a provided custom value if "Other" is chosen or otherwise the 
+ * IdP currently selected from the dropdown menu.
+ */
+export function getSolidIdP() { 
+  const providerSelect = document.getElementById("providerSelect");
+  if(providerSelect) { 
+    if(providerSelect.value === "other") { 
+      return document.getElementById("customSolidIdP").value;
+    } else { 
+      return providerSelect.value;
+    }
+  }
+} // getSolidIdP()
+
+export async function populateSolidTab() {
+  const solidTab = document.getElementById('solidTab');
+  if (solid.getDefaultSession().info.isLoggedIn) {
+    solidTab.innerHTML = await populateLoggedInSolidTab();
+    document.getElementById('solidLogout').addEventListener('click', () => {
+      solidLogout(populateSolidTab);
+      v.showAlert(translator.lang.solidLoggedOutWarning.html, 'warning', 30000);
+      document.getElementById('solidIdPLogoutLink').href = provider + '/logout';
+    });
+  } else {
+    solidTab.innerHTML = populateLoggedOutSolidTab();
+    document.getElementById('solidLogin').addEventListener('click', () => {
+      loginAndFetch(getSolidIdP(), populateSolidTab);
+    });
+  }
+  setStandoffAnnotationEnabledStatus();
+}
+
+async function populateLoggedInSolidTab() {
+  const webId = solid.getDefaultSession().info.webId;
+  const solidButton = document.getElementById('solidButton');
+  solidButton.classList.add('clockwise');
+  const profile = await solid
+    .fetch(webId, {
+      headers: {
+        Accept: 'application/ld+json',
+      },
+    })
+    .then((resp) => resp.json())
+    .then((json) => jsonld.expand(json))
+    .finally(() => solidButton.classList.remove('clockwise'));
+  let name = webId;
+  // try to find entry for 'me' (i.e. the user's webId) in profile:
+  let me = Array.from(profile).filter((e) => '@id' in e && e['@id'] === webId);
+  if (me.length) {
+    if (me.length > 1) {
+      console.warn("User's solid profile has multiple entries for their webId!");
+    }
+    if (`${nsp.FOAF}name` in me[0]) {
+      let foafName = me[0][`${nsp.FOAF}name`][0]; // TODO decide what to do in case of multiple foaf:names
+      if (typeof foafName === 'string') {
+        name = foafName;
+      } else if (typeof foafName === 'object' && '@value' in foafName) {
+        name = foafName['@value'];
+      }
+    }
+  }
+
+  return `
+  <div><span id='solidWelcomeMsg'>${translator.lang.solidWelcomeMsg.text}<span><span id='solidWelcomeName' title='${webId}'>${name}</span>!</div>
+  <div><button type="button" id="solidLogout">${translator.lang.solidLogout.text}</button></div>`;
+}
+
+function populateLoggedOutSolidTab() {
+  let providerContainer = document.createElement('div');
+  let provider = document.createElement('select');
+  provider.setAttribute('name', 'provider');
+  provider.setAttribute('id', 'providerSelect');
+  provider.innerHTML = `
+    <option value="https://solidcommunity.net">SolidCommunity.net</option>
+    <option value="https://login.inrupt.net">Inrupt</option>
+    <option value="https://trompa-solid.upf.edu">TROMPA @ UPF</option>
+    <option value="other">Other...</option>
+  `;
+  provider.addEventListener("change", (e) => {
+    let customSolidIdP = document.getElementById("#customSolidIdP");
+    customSolidIdP.style.display = e.value === "other" ? 
+      "block" : "none";
+  })
+  provider.title = translator.lang.solidProvider.description;
+  let customSolidIdP = document.createElement("input");
+  customSolidIdP.type = "text";
+  customSolidIdP.placeholder = "https://...";
+  customSolidIdP.id = "customSolidIdP";
+  providerContainer.insertAdjacentElement('afterbegin', provider);
+  let solidLoginBtn = document.createElement('button');
+  solidLoginBtn.innerHTML = translator.lang.solidLoginBtn.text;
+  solidLoginBtn.id = 'solidLogin';
+  solidLoginBtn.title = translator.lang.solidExplanation.description;
+  providerContainer.insertAdjacentElement('beforeend', solidLoginBtn);
+  providerContainer.insertAdjacentElement('beforeend', customSolidIdP);
+  return providerContainer.outerHTML;
 }

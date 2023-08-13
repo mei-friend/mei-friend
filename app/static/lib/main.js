@@ -1,6 +1,6 @@
 // mei-friend version and date
-export const version = '0.10.1';
-export const versionDate = '7 August 2023'; // use full or 3-character english months, will be translated
+export const version = '0.10.2';
+export const versionDate = '12 August 2023'; // use full or 3-character english months, will be translated
 
 var vrvWorker;
 var spdWorker;
@@ -10,6 +10,7 @@ var breaksParam; // (string) the breaks parameter given through URL
 var pageParam; // (int) page parameter given through URL
 var selectParam; // (array) select ids given through multiple instances in URL
 let safariWarningShown = false; // show Safari warning only once
+let restoreSolidTimeout; // JS timeout that allows users to 'esc' before restoring solid session
 
 // exports
 export var cm;
@@ -49,7 +50,14 @@ import {
   setNotationProportion,
   setOrientation,
 } from './resizer.js';
-import { addAnnotationHandlers, clearAnnotations, readAnnots, refreshAnnotations } from './annotation.js';
+import {
+  addAnnotationHandlers,
+  clearAnnotations,
+  getSolidIdP,
+  readAnnots,
+  refreshAnnotations,
+  populateSolidTab,
+} from './annotation.js';
 import { dropHandler, dragEnter, dragOverHandler, dragLeave } from './dragger.js';
 import { openUrl, openUrlCancel } from './open-url.js';
 import {
@@ -78,7 +86,7 @@ import * as e from './editor.js';
 import Viewer from './viewer.js';
 import * as speed from './speed.js';
 import Github from './github.js';
-import { loginAndFetch, populateSolidTab, solid } from './solid.js';
+import { loginAndFetch, solid } from './solid.js';
 import Storage from './storage.js';
 import { fillInBranchContents, logoutFromGithub, refreshGithubMenu, setCommitUIEnabledStatus } from './github-menu.js';
 import { forkAndOpen, forkRepositoryCancel } from './fork-repository.js';
@@ -133,6 +141,7 @@ const defaultCodeMirrorOptions = {
     'Ctrl-Space': 'autocomplete',
     'Alt-.': consultGuidelines,
     'Shift-Alt-f': indentSelection,
+    'Shift-Ctrl-G': toMatchingTag,
     "'Ï'": indentSelection, // TODO: overcome strange bindings on MAC
     'Cmd-E': encloseSelectionWithTag, // TODO: make OS modifier keys dynamic
     'Ctrl-E': encloseSelectionWithTag,
@@ -424,6 +433,8 @@ function onLanguageLoaded() {
   let facsimileProportionParam = searchParams.get('facsimileProportion');
   pageParam = searchParams.get('page');
   let scaleParam = searchParams.get('scale');
+  let solidCodeParam = searchParams.get('code');
+  let solidStateParam = searchParams.get('state');
   // select parameter: both syntax versions allowed (also mixed):
   // ?select=note1,chord2,note3 and/or ?select=note1&select=chord2&select=note3
   selectParam = searchParams.getAll('select');
@@ -546,13 +557,12 @@ function onLanguageLoaded() {
   }
 
   if (storage.supported && storage.restoreSolidSession) {
-    // attempt to restore Solid session with fresh data
-    let go = window.confirm('Continue logging in to your Solid Pod with mei-friend?');
-    if (go) {
-      loginAndFetch();
-    } else {
-      storage.removeItem('restoreSolidSession');
-    }
+    // inform user they are about to restore their solid session
+    // and that they can press 'esc' to stop (see generalized esc handler)
+    let solidOverlay = document.getElementById('solidOverlay');
+    solidOverlay.classList.add('active');
+    solidOverlay.tabIndex = -1;
+    solidOverlay.focus();
   }
 
   // fork parameter: if true AND ?fileParam is set to a URL,
@@ -729,9 +739,21 @@ function onLanguageLoaded() {
   setKeyMap(defaultKeyMap);
 
   // remove URL parameters from URL
-  const shortUrl = new URL(window.location);
-  window.history.pushState({}, '', shortUrl.origin + shortUrl.pathname);
   // TODO: check handleURLParamSelect() occurrences, whether removing search parameters has an effect there.
+  const currentUrl = new URL(window.location);
+  const shortUrl = new URL(currentUrl.origin + currentUrl.pathname);
+  if (solidCodeParam && solidStateParam) {
+    // restore Solid authentication parameters if required
+    shortUrl.searchParams.append('code', solidCodeParam);
+    shortUrl.searchParams.append('state', solidStateParam);
+  }
+  window.history.pushState({}, '', shortUrl.href);
+  if (storage.supported && storage.restoreSolidSession) {
+    restoreSolidTimeout = setTimeout(function () {
+      solidOverlay.classList.remove('active');
+      loginAndFetch(getSolidIdP(), populateSolidTab);
+    }, 3000);
+  }
 } // onLanguageLoaded
 
 export async function openUrlFetch(url = '', updateAfterLoading = true) {
@@ -1286,6 +1308,11 @@ function indentSelection() {
   e.indentSelection(v, cm);
 } // indentSelection()
 
+// wrapper for toMatchingTag
+function toMatchingTag() {
+  e.toMatchingTag(v, cm);
+}
+
 let tagEncloserNode; // context menu to choose node name to enclose selected text
 
 // wrapper for editor.encloseSelectionWithTag()
@@ -1536,6 +1563,15 @@ export let cmd = {
       document.getElementById('settingsPanel') === document.activeElement.closest('#settingsPanel')
     ) {
       cmd.filterReset();
+    } else if (
+      document.getElementById('solidOverlay') &&
+      document.getElementById('solidOverlay') === document.activeElement.closest('#solidOverlay')
+    ) {
+      document.getElementById('solidOverlay').classList.remove('active');
+      storage.removeItem('restoreSolidSession');
+      if (restoreSolidTimeout) {
+        clearTimeout(restoreSolidTimeout);
+      }
     } else if (v.pdfMode) {
       cmd.pageModeOff();
     } else {
@@ -1685,6 +1721,7 @@ function addEventListeners(v, cm) {
   document.getElementById('surroundWithTags').addEventListener('click', encloseSelectionWithTag);
   document.getElementById('surroundWithLastTag').addEventListener('click', encloseSelectionWithLastTag);
   document.getElementById('jumpToLine').addEventListener('click', () => CodeMirror.commands.jumpToLine(cm));
+  document.getElementById('toMatchingTag').addEventListener('click', toMatchingTag);
   document.getElementById('manualValidate').addEventListener('click', cmd.validate);
   document
     .querySelectorAll('.keyShortCut')
@@ -1967,6 +2004,15 @@ function addEventListeners(v, cm) {
       document.getElementById('midiSpeedmodeIndicator').style.display = v.speedMode ? 'inline' : 'none';
     }
     v.updateAll(cm, {}, v.selectedElements[0]);
+  });
+
+  document.getElementById('solidLoadingIndicator').addEventListener('click', () => {
+    // cancel Solid login procedure
+    document.getElementById('solidOverlay').classList.remove('active');
+    storage.removeItem('restoreSolidSession');
+    if (restoreSolidTimeout) {
+      clearTimeout(restoreSolidTimeout);
+    }
   });
 
   addDragSelector(v, vp);

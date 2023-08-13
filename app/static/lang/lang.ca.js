@@ -54,6 +54,7 @@ export const lang = {
   surroundWithTagsText: { text: 'Envoltar amb tags' },
   surroundWithLastTagText: { text: 'Envoltar amb ' },
   jumpToLineText: { text: 'Salta a línia' },
+  toMatchingTagText: { text: "Anar al tag coincident" },
   manualValidateText: { text: 'Valida' },
 
   // VIEW MENU ITEM / ELEMENT DEL MENU DE VISUALITZACIÓ
@@ -310,6 +311,17 @@ export const lang = {
   selectTagNameForEnclosure: { text: "Tancar amb el nom de l'element" },
   selectTagNameForEnclosureOkButton: { value: "D'acord" },
   selectTagNameForEnclosureCancelButton: { value: 'Cancel·la' },
+
+  // restore Solid session overlay
+  solidOverlayCancel: {
+    html: 'Restaurant la sessió de Solid - premeu <span>Esc</span> o feu clic aquí per cancel·lar.',
+  },
+  solidWelcomeMsg: { text: 'Benvingut, ' },
+  solidLogout: { text: 'Tancar la sessió' },
+  solidLoggedOutWarning: {
+    html: `T'has desconnectat de la integració Solid de mei-friend, però el teu navegador encara està connectat a Solid!
+      <a id="solidIdPLogoutLink" target="_blank">Feu clic aquí per desconnectar-vos de Solid</a>.`,
+  },
 
   // annotation panel  / panell d'annotacions
   annotationCloseButtonText: { text: "Tanca el panell d'annotacions" },
