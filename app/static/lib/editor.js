@@ -957,6 +957,8 @@ export function addSuppliedElement(v, cm, attrName = 'none', mElName = 'supplied
     uuids.push(uuid);
   });
 
+  // TODO (nice to have): Add @corresp to elements if more than one is created at once
+
   // buffer.groupChangesSinceCheckpoint(checkPoint); // TODO
   v.selectedElements = [];
   uuids.forEach((u) => v.selectedElements.push(u));
