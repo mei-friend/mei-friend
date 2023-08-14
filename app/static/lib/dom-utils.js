@@ -226,6 +226,45 @@ export function countAsBreak(el, sourceId = '') {
   return false;
 }
 
+/**
+ * This function takes an element and a list of ids.
+ * It tries to detect adjacent siblings of the initial element
+ * which ids are listed in the idArray.
+ * It returns an array of adjacent ids.
+ * 
+ * @param {Element} xmlNode initial xml element to check 
+ * @param {Array} idArray array of possible target elements
+ * @param {Document} xmlDoc current xml document
+ */
+export function getAdjacentSiblingElements(xmlNode, idArray, xmlDoc) {
+  let adjacentElIds = [];
+  let directions = ['previous', 'next'];
+  
+  let id = xmlNode.getAttribute('xml:id');
+  adjacentElIds.push(id);
+  idArray.splice(id, 1);
+
+  directions.forEach((dir) => {
+    let node = eval('xmlNode.' + dir + 'ElementSibling');
+    if (node == null) return;
+
+    while (node) {
+      let currentNodeId = node.getAttribute('xml:id');
+      if (idArray.includes(currentNodeId)) {
+        adjacentElIds.push(currentNodeId);
+        idArray.splice(idArray.indexOf(currentNodeId), 1);
+        node = eval('node.' + dir + 'ElementSibling');
+      }
+      else {
+        break;
+      }
+
+    }
+  });
+
+  return {group: adjacentElIds, idList: idArray};
+}
+
 // convert xmlNode to string and remove meiNameSpace declaration from return string
 export function xmlToString(xmlNode) {
   let str = new XMLSerializer().serializeToString(xmlNode);
