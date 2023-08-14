@@ -1560,6 +1560,9 @@ export let cmd = {
   addSupplied: () => e.addTranscriptionLikeElement(v, cm, null, 'supplied'),
   addSuppliedAccid: () => e.addTranscriptionLikeElement(v, cm, 'accid', 'supplied'),
   addSuppliedArtic: () => e.addTranscriptionLikeElement(v, cm, 'artic', 'supplied'),
+  addUnclear: () => e.addTranscriptionLikeElement(v, cm, null, 'unclear'),
+  addUnclearAccid: () => e.addTranscriptionLikeElement(v, cm, 'accid', 'unclear'),
+  addUnclearArtic: () => e.addTranscriptionLikeElement(v, cm, 'artic', 'unclear'),
   cleanAccid: () => e.cleanAccid(v, cm),
   renumberMeasuresTest: () => e.renumberMeasures(v, cm, false),
   renumberMeasures: () => e.renumberMeasures(v, cm, true),
@@ -1905,6 +1908,9 @@ function addEventListeners(v, cm) {
   document.getElementById('addSupplied').addEventListener('click', cmd.addSupplied);
   document.getElementById('addSuppliedArtic').addEventListener('click', cmd.addSuppliedArtic);
   document.getElementById('addSuppliedAccid').addEventListener('click', cmd.addSuppliedAccid);
+  document.getElementById('addUnclear').addEventListener('click', cmd.addUnclear);
+  document.getElementById('addUnclearArtic').addEventListener('click', cmd.addUnclearArtic);
+  document.getElementById('addUnclearAccid').addEventListener('click', cmd.addUnclearAccid);
   document.getElementById('addArpeggio').addEventListener('click', cmd.addArpeggio);
   // more control elements
   document.getElementById('addFermata').addEventListener('click', cmd.addFermata);
