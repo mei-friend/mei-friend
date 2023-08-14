@@ -14,6 +14,7 @@ export const supportedLanguages = {
     es: 'Espanyol',
     fr: 'Francès',
     it: 'Italià',
+    pl: 'Polonès',
   },
   de: {
     ca: 'Katalanisch',
@@ -22,6 +23,7 @@ export const supportedLanguages = {
     es: 'Spanisch',
     fr: 'Französisch',
     it: 'Italienisch',
+    pl: 'Polnisch',
   },
   en: {
     ca: 'Catalan',
@@ -30,6 +32,7 @@ export const supportedLanguages = {
     es: 'Spanish',
     fr: 'French',
     it: 'Italian',
+    pl: 'Polish',
   },
   es: {
     ca: 'Catalán',
@@ -38,6 +41,7 @@ export const supportedLanguages = {
     es: 'Español',
     fr: 'Francés',
     it: 'Italiano',
+    pl: 'Polaco',
   },
   fr: {
     ca: 'Catalan',
@@ -46,6 +50,7 @@ export const supportedLanguages = {
     es: 'Espagnol',
     fr: 'Français',
     it: 'Italien',
+    pl: 'Polonais',
   },
   it: {
     ca: 'Catalano',
@@ -54,6 +59,16 @@ export const supportedLanguages = {
     es: 'Spagnolo',
     fr: 'Francese',
     it: 'Italiano',
+    pl: 'Polacco',
+  },
+  pl: {
+    ca: 'Kataloński',
+    de: 'Niemiecki',
+    en: 'Angielski',
+    es: 'Hiszpański',
+    fr: 'Francuski',
+    it: 'Włoski',
+    pl: 'Polski',
   },
 };
 
