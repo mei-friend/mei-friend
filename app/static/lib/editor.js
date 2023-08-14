@@ -839,7 +839,7 @@ export function addOctaveElement(v, cm, disPlace = 'above', dis = '8') {
  * @param {string} mElName name of markup element to apply
  * @returns
  */
-export function addSuppliedElement(v, cm, attrName = 'none', mElName = 'supplied') {
+export function addTranscriptionLikeElement(v, cm, attrName = 'none', mElName = 'supplied') {
   v.loadXml(cm.getValue());
   v.selectedElements = speed.filterElements(v.selectedElements, v.xmlDoc);
   v.selectedElements = utils.sortElementsByScorePosition(v.selectedElements);
