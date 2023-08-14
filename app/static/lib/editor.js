@@ -1586,10 +1586,10 @@ function isEmpty(str) {
 
 /**
  * Finds xmlNode in textBuffer and replaces it with new serialized content
- * @param {CodeMirror} cm
- * @param {Element} xmlNode
- * @param {boolean} select
- * @param {Element} newNode
+ * @param {CodeMirror} cm CodeMirror object
+ * @param {Element} xmlNode element to replace
+ * @param {boolean} select keep node in editor selected? (important for auto indentation)
+ * @param {Element} newNode new node to replace the old one with
  * @returns
  */
 export function replaceInEditor(cm, xmlNode, select = false, newNode = null) {
