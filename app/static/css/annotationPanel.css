@@ -43,8 +43,8 @@
   cursor:default;
 }
 
-.annotationToolsDomainSelection {
-  display: flex;
+fieldset { 
+  border: 0px;
 }
 
 .annotationToolsDomainSelectionItem {
@@ -103,6 +103,14 @@ summary svg {
 summary.noDetails {
   list-style: none;
   cursor: default;
+}
+
+.annotationToolsDomainSelectionItem {
+  border: 1px solid black;
+  border-radius: 5px;
+  width: 205px;
+  margin: .25em;
+  padding:0px !important;
 }
 
 .annotationListItem {

@@ -54,6 +54,7 @@ export const lang = {
   surroundWithTagsText: { text: 'Surround with tags' },
   surroundWithLastTagText: { text: 'Surround with ' },
   jumpToLineText: { text: 'Jump to line' },
+  toMatchingTagText: { text: 'Go to matching tag' },
   manualValidateText: { text: 'Validate' },
 
   // VIEW MENU ITEM
@@ -277,9 +278,9 @@ export const lang = {
   githubActionsRunBtn: { text: 'Run workflow' },
   githubActionsRunBtnReload: { text: 'Reload MEI file' },
   githubActionsCancelBtn: { text: 'Cancel' },
-  githubActionsInputSetterFilepath: { text: "Copy current file path to input" },
-  githubActionsInputSetterSelection: { text: "Copy current MEI selection to input"},
-  githubActionsInputContainerHeader: { text: "Input configuration" },
+  githubActionsInputSetterFilepath: { text: 'Copy current file path to input' },
+  githubActionsInputSetterSelection: { text: 'Copy current MEI selection to input' },
+  githubActionsInputContainerHeader: { text: 'Input configuration' },
 
   // fork modals
   forkRepoGithubText: { text: 'Fork Github Repository' },
@@ -321,10 +322,19 @@ export const lang = {
   selectTagNameForEnclosureCancelButton: { value: 'Cancel' },
 
   // restore Solid session overlay
+  solidExplanation: {
+    description:
+      'Solid is a decentralised platform for social linked data platform. Log in to Solid to create stand-off annotations using linked data (RDF).',
+  },
+  solidProvider: { description: 'Please choose a Solid identity provider (IdP) or specify your own.' },
+  solidLoginBtn: { text: 'Login' },
   solidOverlayCancel: { html: 'Restoring Solid session - press <span>esc</span> or click here to cancel' },
-  solidWelcomeMsg: { text: 'Welcome, '},
-  solidLogout: { text: 'Log out'},
-
+  solidWelcomeMsg: { text: 'Welcome, ' },
+  solidLogout: { text: 'Log out' },
+  solidLoggedOutWarning: {
+    html: `You have logged out of mei-friend's Solid integration, but your browser is still logged in to Solid!
+      <a id="solidIdPLogoutLink" target="_blank">Click here to logout from Solid</a>.`,
+  },
   // annotation panel
   annotationCloseButtonText: { text: 'Close Annotations Panel' },
   hideAnnotationPanelButton: { description: 'Close Annotations Panel' },

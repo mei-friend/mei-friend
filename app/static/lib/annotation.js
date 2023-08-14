@@ -18,6 +18,7 @@ import {
   loginAndFetch,
   solid,
   solidLogout,
+  provider,
   getSolidStorage,
   friendContainer,
   annotationContainer,
@@ -1072,17 +1073,35 @@ export function clearAnnotations() {
   annotations = [];
 }
 
+/**
+ * getSolidIdP(): Determine user's prefered Solid identity provider (IdP), 
+ * either a provided custom value if "Other" is chosen or otherwise the 
+ * IdP currently selected from the dropdown menu.
+ */
+export function getSolidIdP() { 
+  const providerSelect = document.getElementById("providerSelect");
+  if(providerSelect) { 
+    if(providerSelect.value === "other") { 
+      return document.getElementById("customSolidIdP").value;
+    } else { 
+      return providerSelect.value;
+    }
+  }
+} // getSolidIdP()
+
 export async function populateSolidTab() {
   const solidTab = document.getElementById('solidTab');
   if (solid.getDefaultSession().info.isLoggedIn) {
     solidTab.innerHTML = await populateLoggedInSolidTab();
-    document.getElementById('solidLogout').addEventListener('click', () => { 
-      solidLogout(populateSolidTab)
-    })
+    document.getElementById('solidLogout').addEventListener('click', () => {
+      solidLogout(populateSolidTab);
+      v.showAlert(translator.lang.solidLoggedOutWarning.html, 'warning', 30000);
+      document.getElementById('solidIdPLogoutLink').href = provider + '/logout';
+    });
   } else {
     solidTab.innerHTML = populateLoggedOutSolidTab();
     document.getElementById('solidLogin').addEventListener('click', () => {
-      loginAndFetch(populateSolidTab);
+      loginAndFetch(getSolidIdP(), populateSolidTab);
     });
   }
   setStandoffAnnotationEnabledStatus();
@@ -1132,11 +1151,24 @@ function populateLoggedOutSolidTab() {
     <option value="https://solidcommunity.net">SolidCommunity.net</option>
     <option value="https://login.inrupt.net">Inrupt</option>
     <option value="https://trompa-solid.upf.edu">TROMPA @ UPF</option>
+    <option value="other">Other...</option>
   `;
+  provider.addEventListener("change", (e) => {
+    let customSolidIdP = document.getElementById("#customSolidIdP");
+    customSolidIdP.style.display = e.value === "other" ? 
+      "block" : "none";
+  })
+  provider.title = translator.lang.solidProvider.description;
+  let customSolidIdP = document.createElement("input");
+  customSolidIdP.type = "text";
+  customSolidIdP.placeholder = "https://...";
+  customSolidIdP.id = "customSolidIdP";
   providerContainer.insertAdjacentElement('afterbegin', provider);
-  let msg = document.createElement('div');
-  msg.innerHTML = 'Please choose a provider and <a id="solidLogin">click here to log in!</a>';
-  msg.insertAdjacentElement('afterbegin', providerContainer);
-  return msg.outerHTML;
+  let solidLoginBtn = document.createElement('button');
+  solidLoginBtn.innerHTML = translator.lang.solidLoginBtn.text;
+  solidLoginBtn.id = 'solidLogin';
+  solidLoginBtn.title = translator.lang.solidExplanation.description;
+  providerContainer.insertAdjacentElement('beforeend', solidLoginBtn);
+  providerContainer.insertAdjacentElement('beforeend', customSolidIdP);
+  return providerContainer.outerHTML;
 }
-

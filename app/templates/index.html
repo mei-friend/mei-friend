@@ -242,6 +242,10 @@
             <span id="jumpToLineText">Jump to line</span>
             <span class="keyShortCut altKey">G</span>
           </a>
+          <a id="toMatchingTag" href="#">
+            <span id="toMatchingTagText">Go to matching tag</span>
+            <span class="keyShortCut shiftKey ctrlKey">G</span>
+          </a>
           <hr class="dropdownLine" />
           <a id="manualValidate" href="#">
             <span id="manualValidateText">Validate</span>
@@ -815,13 +819,13 @@
       <div id="solidTab" class="tabcontent"></div>
       <div id="annotationTools" class="tabcontent">
         <menu id="annotationToolsMenu">
-          <div class="annotationToolsDomainSelection">
+          <div id="annotationToolsDomainSelection">
             <div class="annotationToolsDomainSelectionItem">
               <fieldset>
                 <input type="radio" checked id="writeAnnotationInline" title="Generate in-line annotations." value="writeAnnotationInline" name="annotationToolDomainSelector">
                 <label for="writeAnnotionInline" title="Generate in-line annotations using MEI &lt;annot&gt; elements.">MEI</label>
                 <input type="radio" id="writeAnnotationStandoff" title="Generate stand-off annotations. Only possible if working on a native MEI file from URL or GitHub, and when logged into a Solid Pod." value="writeAnnotationStandoff" name="annotationToolDomainSelector">
-                <label id="writeAnnotationStandoffLabel" for="writeAnnotionStandoff" title="Generate stand-off annotations. Only possible if working on a native MEI file from URL or GitHub, and when logged into a Solid Pod.">Linked Data</label>
+                <label id="writeAnnotationStandoffLabel" for="writeAnnotionStandoff" title="Generate stand-off annotations. Only possible if working on a native MEI file from URL or GitHub, and when logged into a Solid Pod.">RDF</label>
               </fieldset>
             </div>
           </div>

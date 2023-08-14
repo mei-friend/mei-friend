@@ -18,8 +18,7 @@ import Viewer from './viewer.js';
 export function indentSelection(v, cm) {
   v.allowCursorActivity = false;
   cm.blockChanges = true;
-  let selections = cm.listSelections();
-  selections.forEach((s) => {
+  cm.listSelections().forEach((s) => {
     let l1 = s.anchor.line;
     let l2 = s.head.line;
     if (l1 > l2) {
@@ -40,6 +39,23 @@ export function indentSelection(v, cm) {
   handleEditorChanges();
   v.allowCursorActivity = true;
 } // indentSelection()
+
+/**
+ * Go from cursor position to matchin tag, and set new cursor position there.
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
+ */
+export function toMatchingTag(v, cm) {
+  v.allowCursorActivity = false;
+  cm.blockChanges = true;
+  cm.execCommand('toMatchingTag');
+  cm.listSelections().forEach((s) => {
+    cm.setCursor({ line: s.anchor.line, ch: s.anchor.ch + 1 }); // set cursor one right after tag opening bracket
+  });
+  cm.focus();
+  cm.blockChanges = false;
+  v.allowCursorActivity = true;
+} // toMatchingTag()
 
 /**
  * Deletes selected elements

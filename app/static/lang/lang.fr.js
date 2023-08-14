@@ -54,6 +54,7 @@ export const lang = {
   surroundWithTagsText: { text: 'Entourer de tags' },
   surroundWithLastTagText: { text: 'Entourer de ' },
   jumpToLineText: { text: 'Aller à la ligne' },
+  toMatchingTagText: { text: 'Aller au tag correspondant' },
   manualValidateText: { text: 'Valider' },
 
   // VIEW MENU ITEM / ELEMENT DE MENU AFFICHAGE
@@ -309,9 +310,15 @@ export const lang = {
   selectTagNameForEnclosureCancelButton: { value: 'Annuller' },
 
   // restore Solid session overlay
-  solidOverlayCancel: { html: 'Restauration de la session Solid - appuyez sur <span>Esc</span> ou cliquez ici pour annuler.' },
+  solidOverlayCancel: {
+    html: 'Restauration de la session Solid - appuyez sur <span>Esc</span> ou cliquez ici pour annuler.',
+  },
   solidWelcomeMsg: { text: 'Bienvenue, ' },
   solidLogout: { text: 'Déconnectez-vous' },
+  solidLoggedOutWarning: {
+    html: `Vous vous êtes déconnecté de l'intégration Solid de mei-friend, mais votre navigateur est toujours connecté à Solid !
+      <a id="solidIdPLogoutLink" target="_blank">Cliquez ici pour vous déconnecter de Solid</a>.`,
+  },
 
   // annotation panel / panneau d'annotation
   annotationCloseButtonText: { text: "Fermer le panneau d'annotations" },

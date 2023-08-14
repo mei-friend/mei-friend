@@ -51,6 +51,7 @@ export const lang = {
   surroundWithTagsText: { text: 'Mit Tags umschließen' },
   surroundWithLastTagText: { text: 'Umschließen mit ' },
   jumpToLineText: { text: 'Zu Zeile gehen' },
+  toMatchingTagText: { text: 'Zum passenden Tag gehen' },
   manualValidateText: { text: 'Validieren' },
 
   // VIEW MENU ITEM
@@ -311,9 +312,15 @@ export const lang = {
   selectTagNameForEnclosureCancelButton: { value: 'Abbrechen' },
 
   // restore Solid session overlay
-  solidOverlayCancel: { html: 'Solid-Sitzung wird wiederhergestellt - drücken Sie <span>Esc</span> oder klicken Sie hier, um abzubrechen.' },
-  solidWelcomeMsg: { text: 'Willkommen, '},
+  solidOverlayCancel: {
+    html: 'Solid-Sitzung wird wiederhergestellt - drücken Sie <span>Esc</span> oder klicken Sie hier, um abzubrechen.',
+  },
+  solidWelcomeMsg: { text: 'Willkommen, ' },
   solidLogout: { text: 'Abmelden' },
+  solidLoggedOutWarning: {
+    html: `Du hast dich von der Solid-Integration von mei-friend abgemeldet, aber dein Browser ist immer noch bei Solid angemeldet!
+      <a id="solidIdPLogoutLink" target="_blank">Klicke hier, um dich bei Solid abzumelden</a>.`,
+  },
 
   // annotation panel
   annotationCloseButtonText: { text: 'Panel für Annotationen schließen' },
