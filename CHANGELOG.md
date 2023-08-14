@@ -4,6 +4,7 @@
 * Improve UI around Solid handleIncomingRedirect
 * Provide translations for Solid UI
 * Set cursor position to matching tag name in editor
+* Add auto-translated draft of Polish language pack
 * Bug that did not show elements within a choice in speed mode fixed
 
 ### 0.10.1
