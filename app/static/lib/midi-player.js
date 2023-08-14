@@ -65,90 +65,62 @@ export function highlightNotesAtMidiPlaybackTime(ev = false) {
     const firstNoteOnPage = document.querySelector('.note');
     let closestTimemapTime;
 
-    // needs 339 ms at last two systems of Op.120
-    if (false) {
-      // clear previous
-      const relevantTimemapElements = timemap
-        // ignore times later than the requested target
-        .filter((tm) => Math.round(t) >= Math.round(tm.tstamp));
-      closestTimemapTime = relevantTimemapElements[relevantTimemapElements.length - 1];
+    // increment to current element in timemap
+    if (t < lastReportedTime) {
+      timemapIdx = 0;
+    }
+    lastReportedTime = t;
+    // increment timemapIdx to current event, ignore 1-ms diff
+    while (
+      timemap.length > 0 &&
+      Math.round(timemap[timemapIdx].tstamp) + 1 < Math.round(t) &&
+      timemapIdx < timemap.length
+    ) {
+      timemapIdx++;
+    }
 
-      currentlyHighlightedNotes.forEach((note) => {
-        // go backwards through all relevant timemap elements
-        // look for highlighted notes to close
-        // if we reach the onset of the first note on page, give up.
-        let toClose;
-        let ix = relevantTimemapElements.length - 1;
-        while (ix >= 0) {
-          if ('off' in relevantTimemapElements[ix] && relevantTimemapElements[ix].off.includes(note.id)) {
-            toClose = note.id;
-            break;
-          }
-          if ('on' in relevantTimemapElements[ix] && relevantTimemapElements[ix].on.includes(firstNoteOnPage.id)) {
-            break;
-          }
-          ix--;
-        }
-        // unhighlight note and all its children
-        if (toClose) {
-          note.classList.remove('currently-playing');
-          note.querySelectorAll('.currently-playing').forEach((g) => g.classList.remove('currently-playing'));
-        }
-      });
-    } else {
-      // increment to current element in timemap
-      if (t < lastReportedTime) {
-        timemapIdx = 0;
-      }
-      lastReportedTime = t;
-      // increment timemapIdx to current event, ignore 1-ms diff
-      while (timemap.length > 0 && Math.round(timemap[timemapIdx].tstamp) + 1 < Math.round(t) && timemapIdx < timemap.length) {
-        timemapIdx++;
-      }
+    // console.log('timemap tstamp: ' + timemap[timemapIdx].tstamp + '; midi t: ' + t);
 
-      // console.log('timemap tstamp: ' + timemap[timemapIdx].tstamp + '; midi t: ' + t);
-
-      // 129 ms; with timemapIdx reduced to 66 ms with Op. 120 last two pages
-      // go back from current timemapIdx to 'close' highlighted notes
-      let ix = timemapIdx;
-      while (ix >= 0 && timemap.length > 0) {
-        if ('off' in timemap[ix]) {
-          let i = currentlyHighlightedNotes.length - 1;
-          while (i >= 0) {
-            if (timemap[ix].off.includes(currentlyHighlightedNotes[i].id)) {
-              unhighlightNote(currentlyHighlightedNotes[i]);
-              currentlyHighlightedNotes.splice(i, 1); // remove unhighlighted notes
-            }
-            i--;
+    // 129 ms; with timemapIdx reduced to 66 ms with Op. 120 last two pages
+    // go back from current timemapIdx to 'close' highlighted notes
+    let ix = timemapIdx;
+    while (ix >= 0 && timemap.length > 0) {
+      if ('off' in timemap[ix]) {
+        let i = currentlyHighlightedNotes.length - 1;
+        while (i >= 0) {
+          if (timemap[ix].off.includes(currentlyHighlightedNotes[i].id)) {
+            unhighlightNote(currentlyHighlightedNotes[i]);
+            currentlyHighlightedNotes.splice(i, 1); // remove unhighlighted notes
           }
-          if (currentlyHighlightedNotes.length <= 0) {
-            break;
-          }
+          i--;
         }
-        if ('on' in timemap[ix] && timemap[ix].on.includes(firstNoteOnPage.id)) {
+        if (currentlyHighlightedNotes.length <= 0) {
           break;
         }
-        ix--;
       }
+      if ('on' in timemap[ix] && timemap[ix].on.includes(firstNoteOnPage.id)) {
+        break;
+      }
+      ix--;
+    }
 
-      // at last onset, program the closing of events in the future
-      if (timemapIdx === lastOnsetIdx) {
-        let j = timemapIdx;
-        while (j++ < timemap.length - 1) {
-          if ('off' in timemap[j]) {
-            timemap[j].off.forEach((id) => {
-              let note = document.getElementById(id);
-              setTimeout(() => unhighlightNote(note), timemap[j].tstamp - t, note);
-            });
-          }
-          // last item in timemap, stop player
-          if (j === timemap.length - 1) {
-            setTimeout(() => mp.stop(), timemap[j].tstamp - t, mp);
-          }
+    // at last onset, program the closing of events in the future
+    if (timemapIdx === lastOnsetIdx) {
+      let j = timemapIdx;
+      while (j++ < timemap.length - 1) {
+        if ('off' in timemap[j]) {
+          timemap[j].off.forEach((id) => {
+            let note = document.getElementById(id);
+            setTimeout(() => unhighlightNote(note), timemap[j].tstamp - t, note);
+          });
+        }
+        // last item in timemap, stop player
+        if (j === timemap.length - 1) {
+          setTimeout(() => mp.stop(), timemap[j].tstamp - t, mp);
         }
       }
-      closestTimemapTime = timemap[timemapIdx];
     }
+    closestTimemapTime = timemap[timemapIdx];
 
     if (closestTimemapTime && 'on' in closestTimemapTime) {
       for (let id of closestTimemapTime['on']) {
