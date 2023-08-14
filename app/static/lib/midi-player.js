@@ -102,7 +102,7 @@ export function highlightNotesAtMidiPlaybackTime(ev = false) {
       }
       lastReportedTime = t;
       // increment timemapIdx to current event, ignore 1-ms diff
-      while (Math.round(timemap[timemapIdx].tstamp) + 1 < Math.round(t) && timemapIdx < timemap.length) {
+      while (timemap.length > 0 && Math.round(timemap[timemapIdx].tstamp) + 1 < Math.round(t) && timemapIdx < timemap.length) {
         timemapIdx++;
       }
 
@@ -111,7 +111,7 @@ export function highlightNotesAtMidiPlaybackTime(ev = false) {
       // 129 ms; with timemapIdx reduced to 66 ms with Op. 120 last two pages
       // go back from current timemapIdx to 'close' highlighted notes
       let ix = timemapIdx;
-      while (ix >= 0) {
+      while (ix >= 0 && timemap.length > 0) {
         if ('off' in timemap[ix]) {
           let i = currentlyHighlightedNotes.length - 1;
           while (i >= 0) {
@@ -153,7 +153,7 @@ export function highlightNotesAtMidiPlaybackTime(ev = false) {
     if (closestTimemapTime && 'on' in closestTimemapTime) {
       for (let id of closestTimemapTime['on']) {
         if (expansionMap && id in expansionMap) {
-          id = expansionMap[id][0];
+          id = expansionMap[id][0]; // use local object for lookup
           // id = expansionMap.getNotatedIdForElement(id);
         }
         let note = document.getElementById(id);
@@ -242,7 +242,7 @@ function unHighlightAllElements() {
 // find index of last onset array in timemap
 function determineLastOnsetIdx() {
   let i = timemap.length;
-  while (i-- >= 0) {
+  while (i-- > 0) {
     if ('on' in timemap[i]) {
       lastOnsetIdx = i;
       break;
