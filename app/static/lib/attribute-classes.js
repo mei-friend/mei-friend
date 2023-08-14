@@ -245,18 +245,18 @@ export const dataURI = [
 
 // model.transcriptionLike
 export const modelTranscriptionLike = [
-  //'add',
-  //'corr',
+  'add',
+  'corr',
   //'damage', (leave out for now, no markup)
-  //'del',
+  'del',
   //'gap', (leave out for now, no markup)
   //'handShift', (leave out for now)
-  //'orig',
-  //'reg',
+  'orig',
+  'reg',
   // 'restore' (leave out for now)
-  //'sic',
+  'sic',
   'supplied',
-  //'unclear',
+  'unclear',
 ];
 
 // data.DURATION.cmn
