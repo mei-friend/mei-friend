@@ -15,12 +15,19 @@ export function seekMidiPlaybackToSelectionOrPage() {
   // on load, seek to first currently selected element (or first note on page)
   let seekToNote = v.findFirstNoteInSelection() || document.querySelector('.note');
   if (seekToNote) {
-    v.getTimeForElement(seekToNote.id, true); // will trigger a seekMidiPlaybackTo
+    // v.getTimeForElement(seekToNote.id, true); // will trigger a seekMidiPlaybackTo
+    // Instead of asking toolkit for element time, ask timemap (WG, 14 Aug 2023)
+    let t = getTimeFromTimemap(seekToNote.id);
+    if (t) {
+      seekMidiPlaybackToTime(t);
+    } else {
+      console.warn("midi-player: Can't find time stamp for note " + seekToNote.id + 'to seek MIDI playback to');
+    }
   } else {
-    console.warn("Can't find a note to seek MIDI playback to");
+    console.warn("midi-player: Can't find a note to seek MIDI playback to");
   }
   timemapIdx = 0;
-}
+} // seekMidiPlaybackToSelectionOrPage()
 
 export function seekMidiPlaybackToTime(t) {
   // seek MIDI playback to time (in milliseconds)
@@ -241,4 +248,18 @@ function determineLastOnsetIdx() {
       break;
     }
   }
-}
+} // determineLastOnsetIdx()
+
+/**
+ * Find tstamp (in milliseconds) of note id string from the timemap
+ * @param {string} id
+ * @returns {double} tstamp (in milliseconds)
+ */
+function getTimeFromTimemap(id) {
+  for (let e of timemap) {
+    if (e.hasOwnProperty('on') && e.on.includes(id)) {
+      return e.tstamp;
+    }
+  }
+  return null;
+} // getTimeFromTimemap()
