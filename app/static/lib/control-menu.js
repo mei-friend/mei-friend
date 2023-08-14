@@ -1,13 +1,14 @@
 import * as icon from './../css/icons.js';
-import { fontList,platform } from './defaults.js';
+import { fontList, platform } from './defaults.js';
 import { svgNameSpace } from './dom-utils.js';
+import { translator } from './main.js';
 import { createPageRangeSelector } from './page-range-selector.js';
 
 // constructs the div structure of #notation parent
 export function createNotationDiv(parentElement, scale) {
   // container for Verovio
   let verovioContainer = document.createElement('div');
-  verovioContainer.id = 'verovio-container';
+  verovioContainer.id = 'verovioContainer';
 
   createNotationControlBar(verovioContainer, scale);
 
@@ -24,7 +25,7 @@ export function createNotationDiv(parentElement, scale) {
 
   // Create container element for pixel content (svg and jpg)
   let facsimileContainer = document.createElement('div');
-  facsimileContainer.id = 'facsimile-container';
+  facsimileContainer.id = 'facsimileContainer';
 
   createFacsimileControlBar(facsimileContainer);
 
@@ -33,16 +34,16 @@ export function createNotationDiv(parentElement, scale) {
   facsimilePanel.id = 'facsimile-panel';
 
   let facsimileMessagePanel = document.createElement('div');
-  facsimileMessagePanel.id = 'facsimile-message-panel';
+  facsimileMessagePanel.id = 'facsimileMessagePanel';
 
   // SVG: facsimile image container
   var svgContainer = document.createElementNS(svgNameSpace, 'svg');
-  svgContainer.id = 'source-image-container';
+  svgContainer.id = 'sourceImageContainer';
   svgContainer.setAttribute('width', '500px');
 
   // SVG: facsimile image svg
   var svg = document.createElementNS(svgNameSpace, 'svg');
-  svg.id = 'source-image-svg';
+  svg.id = 'sourceImageSvg';
 
   // append everything
   svgContainer.appendChild(svg);
@@ -64,12 +65,12 @@ export function createNotationControlBar(parentElement, scale) {
   // Create control form
   let vrvCtrlMenu = document.createElement('div');
   vrvCtrlMenu.classList.add('control-menu');
-  vrvCtrlMenu.id = 'notation-control-bar';
+  vrvCtrlMenu.id = 'notationControlBar';
 
   // Verovio spinning icon
   let verovioIcon = document.createElement('div');
   verovioIcon.innerHTML = icon.verovioV;
-  verovioIcon.id = 'verovio-icon';
+  verovioIcon.id = 'verovioIcon';
   verovioIcon.title = `mei-friend worker activity:
      clockwise rotation denotes Verovio activity,
      anticlockwise rotation speed worker activity`;
@@ -77,12 +78,12 @@ export function createNotationControlBar(parentElement, scale) {
 
   // Zoom controls
   let zoomCtrls = document.createElement('div');
-  zoomCtrls.id = 'zoom-ctrls';
+  zoomCtrls.id = 'zoomCtrls';
   zoomCtrls.classList.add('controls');
   vrvCtrlMenu.appendChild(zoomCtrls);
 
   let decreaseBtn = document.createElement('button');
-  decreaseBtn.id = 'decrease-scale-btn';
+  decreaseBtn.id = 'decreaseScaleButton';
   decreaseBtn.classList.add('btn');
   decreaseBtn.classList.add('icon');
   decreaseBtn.innerHTML = icon.diffRemoved;
@@ -91,7 +92,7 @@ export function createNotationControlBar(parentElement, scale) {
   zoomCtrls.appendChild(decreaseBtn);
 
   let zoomCtrl = document.createElement('input');
-  zoomCtrl.id = 'verovio-zoom';
+  zoomCtrl.id = 'verovioZoom';
   zoomCtrl.classList.add('input-range');
   zoomCtrl.setAttribute('type', 'range');
   zoomCtrl.setAttribute('min', 10);
@@ -102,7 +103,7 @@ export function createNotationControlBar(parentElement, scale) {
   zoomCtrl.title = 'Scale size of notation';
 
   let increaseBtn = document.createElement('button');
-  increaseBtn.id = 'increase-scale-btn';
+  increaseBtn.id = 'increaseScaleButton';
   increaseBtn.classList.add('btn');
   increaseBtn.classList.add('icon');
   increaseBtn.innerHTML = icon.diffAdded;
@@ -112,12 +113,12 @@ export function createNotationControlBar(parentElement, scale) {
 
   // Pagination, page navigation
   let paginationCtrls = document.createElement('div');
-  paginationCtrls.id = 'pagination-ctrls';
+  paginationCtrls.id = 'paginationControls';
   paginationCtrls.classList.add('controls');
   vrvCtrlMenu.appendChild(paginationCtrls);
 
   let sectionSelector = document.createElement('select');
-  sectionSelector.id = 'section-selector';
+  sectionSelector.id = 'sectionSelect';
   sectionSelector.classList.add('icon');
   sectionSelector.classList.add('btn');
   // sectionSelector.classList.add('icon-multi-select');
@@ -127,7 +128,7 @@ export function createNotationControlBar(parentElement, scale) {
   paginationCtrls.appendChild(sectionSelector);
 
   let firstBtn = document.createElement('button');
-  firstBtn.id = 'first-page-btn';
+  firstBtn.id = 'firstPageButton';
   firstBtn.classList.add('icon');
   firstBtn.classList.add('btn');
   firstBtn.innerHTML = icon.chevronFirst;
@@ -138,7 +139,7 @@ export function createNotationControlBar(parentElement, scale) {
   paginationCtrls.appendChild(firstBtn);
 
   let prevBtn = document.createElement('button');
-  prevBtn.id = 'prev-page-btn';
+  prevBtn.id = 'previousPageButton';
   prevBtn.classList.add('icon');
   prevBtn.classList.add('btn');
   prevBtn.innerHTML = icon.chevronLeft;
@@ -149,7 +150,7 @@ export function createNotationControlBar(parentElement, scale) {
   paginationCtrls.appendChild(prevBtn);
 
   let paginationLabel = document.createElement('label');
-  paginationLabel.id = 'pagination-label';
+  paginationLabel.id = 'paginationLabel';
   paginationLabel.classList.add('label');
   paginationLabel.title = 'Page navigation: click to manually enter page number to be displayed';
 
@@ -162,13 +163,16 @@ export function createNotationControlBar(parentElement, scale) {
   pagination2.title = 'Click to enter page number';
   let pagination3 = document.createElement('div');
   pagination3.id = 'pagination3';
+  let pagination4 = document.createElement('div');
+  pagination4.id = 'pagination4';
   paginationLabel.appendChild(pagination1);
   paginationLabel.appendChild(pagination2);
   paginationLabel.appendChild(pagination3);
+  paginationLabel.appendChild(pagination4);
   paginationCtrls.appendChild(paginationLabel);
 
   let nextBtn = document.createElement('button');
-  nextBtn.id = 'next-page-btn';
+  nextBtn.id = 'nextPageButton';
   nextBtn.classList.add('btn');
   nextBtn.classList.add('icon');
   nextBtn.innerHTML = icon.chevronRight;
@@ -179,7 +183,7 @@ export function createNotationControlBar(parentElement, scale) {
   paginationCtrls.appendChild(nextBtn);
 
   let lastBtn = document.createElement('button');
-  lastBtn.id = 'last-page-btn';
+  lastBtn.id = 'lastPageButton';
   lastBtn.classList.add('btn');
   lastBtn.classList.add('icon');
   lastBtn.innerHTML = icon.chevronLast;
@@ -191,7 +195,7 @@ export function createNotationControlBar(parentElement, scale) {
 
   // Flips notation automatically to cursor position in encoding
   let flipCheckbox = document.createElement('input');
-  flipCheckbox.id = 'flip-checkbox';
+  flipCheckbox.id = 'flipCheckbox';
   flipCheckbox.setAttribute('type', 'checkbox');
   flipCheckbox.setAttribute('value', 'autoFlip');
   flipCheckbox.setAttribute('checked', 'true');
@@ -199,7 +203,7 @@ export function createNotationControlBar(parentElement, scale) {
   paginationCtrls.appendChild(flipCheckbox);
   // manually flip to cursor position
   let flipBtn = document.createElement('button');
-  flipBtn.id = 'flip-btn';
+  flipBtn.id = 'flipButton';
   flipBtn.classList.add('btn');
   flipBtn.classList.add('icon');
   flipBtn.innerHTML = icon.flipToEncoding; // icon-alignment-aligned-to
@@ -216,13 +220,13 @@ export function createNotationControlBar(parentElement, scale) {
 
   // breaks selector
   let breaksCtrls = document.createElement('div');
-  breaksCtrls.id = 'breaks-ctrls';
+  breaksCtrls.id = 'breaksControls';
   // breaksCtrls.classList.add('block');
   breaksCtrls.classList.add('controls');
   vrvCtrlMenu.appendChild(breaksCtrls);
 
   let breaksSelector = document.createElement('select');
-  breaksSelector.id = 'breaks-select';
+  breaksSelector.id = 'breaksSelect';
   breaksSelector.classList.add('btn');
   breaksSelector.classList.add('input-select');
   breaksCtrls.title = 'Define system/page breaks behavior of notation';
@@ -230,19 +234,20 @@ export function createNotationControlBar(parentElement, scale) {
 
   // MEI encoding update behavior
   let updateCtrls = document.createElement('div');
-  updateCtrls.id = 'update-ctrls';
+  updateCtrls.id = 'updateControls';
   // updateCtrls.classList.add('block');
   updateCtrls.classList.add('controls');
   vrvCtrlMenu.appendChild(updateCtrls);
 
   let updateLabel = document.createElement('label');
+  updateLabel.id = 'updateControlsLabel';
   updateLabel.innerText = 'Update: ';
   updateLabel.classList.add('label');
   updateCtrls.appendChild(updateLabel);
   updateLabel.title = 'Control update behavior of notation after changes in encoding';
 
   let codeUpdateCheckbox = document.createElement('input');
-  codeUpdateCheckbox.id = 'live-update-checkbox';
+  codeUpdateCheckbox.id = 'liveUpdateCheckbox';
   codeUpdateCheckbox.setAttribute('type', 'checkbox');
   codeUpdateCheckbox.setAttribute('checked', 'true');
   codeUpdateCheckbox.title = 'Automatically update notation after changes in encoding';
@@ -250,13 +255,12 @@ export function createNotationControlBar(parentElement, scale) {
   updateCtrls.appendChild(codeUpdateCheckbox);
 
   let codeUpdateBtn = document.createElement('button');
-  codeUpdateBtn.id = 'code-update-btn';
+  codeUpdateBtn.id = 'codeManualUpdateButton';
   codeUpdateBtn.classList.add('btn');
   codeUpdateBtn.classList.add('icon');
   codeUpdateBtn.innerHTML = icon.symLinkFile; // icon-alignment-aligned-to
   codeUpdateBtn.classList.add('inline-block-tight');
   codeUpdateBtn.title = 'Update notation manually';
-  // codeUpdateBtn.innerHTML = 'Redo';
   codeUpdateBtn.setAttribute('type', 'button');
   codeUpdateBtn.setAttribute('value', 'codeUpdate');
   codeUpdateBtn.disabled = true;
@@ -268,12 +272,12 @@ export function createNotationControlBar(parentElement, scale) {
 
   // font selector
   let fontCtrls = document.createElement('div');
-  fontCtrls.id = 'font-ctrls';
+  fontCtrls.id = 'engravingFontControls';
   fontCtrls.classList.add('controls');
   vrvCtrlMenu.appendChild(fontCtrls);
 
   let fontSelector = document.createElement('select');
-  fontSelector.id = 'font-select';
+  fontSelector.id = 'engravingFontSelect';
   fontSelector.classList.add('btn');
   fontCtrls.title = 'Select engraving font';
   fontSelector.classList.add('input-select');
@@ -282,13 +286,13 @@ export function createNotationControlBar(parentElement, scale) {
 
   // navigation controls
   let navigateCtrls = document.createElement('div');
-  navigateCtrls.id = 'navigate-ctrls';
+  navigateCtrls.id = 'navigationControls';
   // navigateCtrls.classList.add('block');
   navigateCtrls.classList.add('controls');
   vrvCtrlMenu.appendChild(navigateCtrls);
 
   let backwardsBtn = document.createElement('button');
-  backwardsBtn.id = 'backwards-btn';
+  backwardsBtn.id = 'backwardsButton';
   backwardsBtn.classList.add('btn');
   backwardsBtn.classList.add('icon');
   backwardsBtn.innerHTML = icon.arrowLeft;
@@ -297,7 +301,7 @@ export function createNotationControlBar(parentElement, scale) {
   navigateCtrls.appendChild(backwardsBtn);
 
   let forwardsBtn = document.createElement('button');
-  forwardsBtn.id = 'forwards-btn';
+  forwardsBtn.id = 'forwardsButton';
   forwardsBtn.classList.add('btn');
   forwardsBtn.classList.add('icon');
   forwardsBtn.innerHTML = icon.arrowRight;
@@ -306,7 +310,7 @@ export function createNotationControlBar(parentElement, scale) {
   navigateCtrls.appendChild(forwardsBtn);
 
   let upwardsBtn = document.createElement('button');
-  upwardsBtn.id = 'upwards-btn';
+  upwardsBtn.id = 'upwardsButton';
   upwardsBtn.classList.add('btn');
   upwardsBtn.classList.add('icon');
   upwardsBtn.innerHTML = icon.arrowUp;
@@ -315,7 +319,7 @@ export function createNotationControlBar(parentElement, scale) {
   navigateCtrls.appendChild(upwardsBtn);
 
   let downwardsBtn = document.createElement('button');
-  downwardsBtn.id = 'downwards-btn';
+  downwardsBtn.id = 'downwardsButton';
   downwardsBtn.classList.add('btn');
   downwardsBtn.classList.add('icon');
   downwardsBtn.innerHTML = icon.arrowDown;
@@ -324,12 +328,12 @@ export function createNotationControlBar(parentElement, scale) {
   navigateCtrls.appendChild(downwardsBtn);
 
   let speedDiv = document.createElement('div');
-  speedDiv.id = 'speed-div';
+  speedDiv.id = 'speedDiv';
   speedDiv.classList.add('controls');
 
   let speedLabel = document.createElement('label');
   speedLabel.innerText = 'Speed mode:';
-  speedLabel.id = 'speed-label';
+  speedLabel.id = 'speedLabel';
   speedLabel.classList.add('label');
   speedDiv.appendChild(speedLabel);
   speedLabel.title = `In speed mode, only the current page
@@ -337,7 +341,7 @@ export function createNotationControlBar(parentElement, scale) {
      time with large files`;
 
   let speedCheckbox = document.createElement('input');
-  speedCheckbox.id = 'speed-checkbox';
+  speedCheckbox.id = 'speedCheckbox';
   speedCheckbox.setAttribute('type', 'checkbox');
   speedCheckbox.setAttribute('checked', 'false');
   speedCheckbox.classList.add('checkbox');
@@ -358,22 +362,22 @@ export function createNotationControlBar(parentElement, scale) {
 
   // pdf functionality, display none
   let pdfCtrlDiv = document.createElement('div');
-  pdfCtrlDiv.id = 'pdf-control-div';
+  pdfCtrlDiv.id = 'pdfControlsDiv';
   pdfCtrlDiv.classList.add('controls');
   pdfCtrlDiv.style.display = 'none';
   vrvCtrlMenu.appendChild(pdfCtrlDiv);
 
   let savePdfButton = document.createElement('button');
-  savePdfButton.id = 'pdf-save-button';
+  savePdfButton.id = 'pdfSaveButton';
   savePdfButton.classList.add('btn');
   // savePdfButton.classList.add('icon');
-  savePdfButton.innerHTML = 'Save PDF'; // icon.pdfIcon;
+  savePdfButton.textContent = 'Save PDF'; // icon.pdfIcon;
   savePdfButton.classList.add('inline-block-tight');
   savePdfButton.title = 'Save as PDF';
   pdfCtrlDiv.appendChild(savePdfButton);
 
   let pdfCloseButton = document.createElement('div');
-  pdfCloseButton.id = 'pdf-close-button';
+  pdfCloseButton.id = 'pdfCloseButton';
   pdfCloseButton.title = 'Close print view';
   pdfCloseButton.style.display = 'none';
   pdfCloseButton.classList.add('topright');
@@ -387,24 +391,24 @@ export function createFacsimileControlBar(parentElement) {
   // Create control form
   let facsCtrlBar = document.createElement('div');
   facsCtrlBar.classList.add('control-menu');
-  facsCtrlBar.id = 'facsimile-control-bar';
+  facsCtrlBar.id = 'facsimileControlBar';
   parentElement.appendChild(facsCtrlBar);
 
   // facsimile icon (octicon log)
   let facsimileIcon = document.createElement('div');
   facsimileIcon.innerHTML = icon.log;
-  facsimileIcon.id = 'facsimile-icon';
+  facsimileIcon.id = 'facsimileIcon';
   facsimileIcon.title = 'Facsimile panel';
   facsCtrlBar.appendChild(facsimileIcon);
 
   // Zoom controls
   let zoomCtrls = document.createElement('div');
-  zoomCtrls.id = 'facimile-zoom-ctrls';
+  zoomCtrls.id = 'facsimileZoomControls';
   zoomCtrls.classList.add('controls');
   facsCtrlBar.appendChild(zoomCtrls);
 
   let decreaseBtn = document.createElement('button');
-  decreaseBtn.id = 'facs-decrease-scale-btn';
+  decreaseBtn.id = 'facsimileDecreaseZoomButton';
   decreaseBtn.classList.add('btn');
   decreaseBtn.classList.add('icon');
   decreaseBtn.innerHTML = icon.diffRemoved;
@@ -413,7 +417,7 @@ export function createFacsimileControlBar(parentElement) {
   zoomCtrls.appendChild(decreaseBtn);
 
   let zoomCtrl = document.createElement('input');
-  zoomCtrl.id = 'facsimile-zoom';
+  zoomCtrl.id = 'facsimileZoom';
   zoomCtrl.classList.add('input-range');
   zoomCtrl.setAttribute('type', 'range');
   zoomCtrl.setAttribute('min', 10);
@@ -421,10 +425,10 @@ export function createFacsimileControlBar(parentElement) {
   zoomCtrl.setAttribute('step', 5);
   zoomCtrl.setAttribute('value', 100);
   zoomCtrls.appendChild(zoomCtrl);
-  zoomCtrl.title = 'Scale size of notation';
+  zoomCtrl.title = 'Adjust size of notation';
 
   let increaseBtn = document.createElement('button');
-  increaseBtn.id = 'facs-increase-scale-btn';
+  increaseBtn.id = 'facsimileIncreaseZoomButton';
   increaseBtn.classList.add('btn');
   increaseBtn.classList.add('icon');
   increaseBtn.innerHTML = icon.diffAdded;
@@ -434,21 +438,21 @@ export function createFacsimileControlBar(parentElement) {
 
   // full page
   let fullPageDiv = document.createElement('div');
-  fullPageDiv.id = 'facsimile-full-page';
+  fullPageDiv.id = 'facsimileFullPageDiv';
   fullPageDiv.classList.add('controls');
 
   let fullPageLabel = document.createElement('label');
   fullPageLabel.innerText = 'Full page:';
-  fullPageLabel.id = 'facsimile-full-page-label';
+  fullPageLabel.id = 'facsimileFullPageLabel';
   fullPageLabel.classList.add('label');
   fullPageDiv.appendChild(fullPageLabel);
   fullPageLabel.title = 'Show full page of facsimile image';
 
   let fullPageCheckbox = document.createElement('input');
-  fullPageCheckbox.id = 'facsimile-full-page-checkbox';
+  fullPageCheckbox.id = 'facsimileFullPageCheckbox';
   fullPageCheckbox.setAttribute('type', 'checkbox');
   fullPageCheckbox.classList.add('checkbox');
-  fullPageCheckbox.title = 'Activate speed mode';
+  fullPageCheckbox.title = 'Display full page of facsimile image';
   fullPageLabel.setAttribute('for', fullPageCheckbox.id);
   fullPageCheckbox.checked = false;
   fullPageCheckbox.disabled = false;
@@ -458,18 +462,18 @@ export function createFacsimileControlBar(parentElement) {
 
   // show zone rectangles
   let showZonesDiv = document.createElement('div');
-  showZonesDiv.id = 'facsimile-show-zones';
+  showZonesDiv.id = 'facsimileShowZones';
   showZonesDiv.classList.add('controls');
 
   let showZonesLabel = document.createElement('label');
   showZonesLabel.innerText = 'Show zone boxes:';
-  showZonesLabel.id = 'facsimile-show-zones-label';
+  showZonesLabel.id = 'facsimileShowZonesLabel';
   showZonesLabel.classList.add('label');
   showZonesDiv.appendChild(showZonesLabel);
   showZonesLabel.title = 'Show zone boxes of facsimile';
 
   let showZonesCheckbox = document.createElement('input');
-  showZonesCheckbox.id = 'facsimile-show-zones-checkbox';
+  showZonesCheckbox.id = 'facsimileShowZonesCheckbox';
   showZonesCheckbox.setAttribute('type', 'checkbox');
   showZonesCheckbox.classList.add('checkbox');
   showZonesCheckbox.title = 'Show zone boxes of facsimile';
@@ -482,18 +486,18 @@ export function createFacsimileControlBar(parentElement) {
 
   // edit zones
   let editZonesDiv = document.createElement('div');
-  editZonesDiv.id = 'facsimile-edit-zones';
+  editZonesDiv.id = 'facsimileEditZones';
   editZonesDiv.classList.add('controls');
 
   let editZonesLabel = document.createElement('label');
   editZonesLabel.innerText = 'Edit zones:';
-  editZonesLabel.id = 'facsimile-edit-zones-label';
+  editZonesLabel.id = 'facsimileEditZonesLabel';
   editZonesLabel.classList.add('label');
   editZonesDiv.appendChild(editZonesLabel);
   editZonesLabel.title = 'Edit zones of facsimile';
 
   let editZonesCheckbox = document.createElement('input');
-  editZonesCheckbox.id = 'facsimile-edit-zones-checkbox';
+  editZonesCheckbox.id = 'facsimileEditZonesCheckbox';
   editZonesCheckbox.setAttribute('type', 'checkbox');
   editZonesCheckbox.classList.add('checkbox');
   editZonesCheckbox.title = 'Edit zones of facsimile';
@@ -509,7 +513,7 @@ export function createFacsimileControlBar(parentElement) {
   facsCtrlBar.appendChild(filler);
 
   let facsimileCloseButton = document.createElement('div');
-  facsimileCloseButton.id = 'facsimile-close-button';
+  facsimileCloseButton.id = 'facsimileCloseButton';
   facsimileCloseButton.title = 'Close facsimile panel';
   facsimileCloseButton.classList.add('topright');
   facsimileCloseButton.innerHTML = '&times;'; // icon.xCircle;
@@ -518,8 +522,8 @@ export function createFacsimileControlBar(parentElement) {
 
 export function showPdfButtons(show = true) {
   document.getElementById('pageRangeSelectorDiv').style.display = show ? '' : 'none';
-  document.getElementById('pdf-control-div').style.display = show ? '' : 'none';
-  document.getElementById('pdf-close-button').style.display = show ? '' : 'none';
+  document.getElementById('pdfControlsDiv').style.display = show ? '' : 'none';
+  document.getElementById('pdfCloseButton').style.display = show ? '' : 'none';
 } // showPdfButtons()
 
 // list of DOM object id string that will be saved and restored
@@ -531,7 +535,7 @@ const listOfObjects = [
   'controlMenuNavigateArrows',
   'controlMenuSpeedmodeCheckbox',
   'toggleSpeedMode',
-  // 'speed-label',
+  // 'speedLabel',
 ];
 
 /**
@@ -543,7 +547,7 @@ export function getControlMenuState() {
   listOfObjects.forEach((obj) => {
     let el = document.getElementById(obj);
     if (el) {
-      if (obj === 'speed-label') {
+      if (obj === 'speedLabel') {
         state[obj] = {};
         state[obj]['textContent'] = el.textContent;
         state[obj]['title'] = el.title;
@@ -561,7 +565,7 @@ export function getControlMenuState() {
  */
 export function setControlMenuState(state) {
   listOfObjects.forEach((obj) => {
-    if (obj === 'speed-label') {
+    if (obj === 'speedLabel') {
       let el = document.getElementById(obj);
       el.textContent = state[obj].textContent;
       el.title = state[obj].title;
@@ -592,24 +596,27 @@ export function manualCurrentPage(v, cm, ev) {
 
 export function setBreaksOptions(tkAvailableOptions, defaultValue = 'auto') {
   if (defaultValue === '') defaultValue = 'auto';
-  let breaksEl = document.getElementById('breaks-select');
+  let breaksEl = document.getElementById('breaksSelect');
   while (breaksEl.hasChildNodes()) breaksEl.remove(0);
   var breaksOpts = {
-    none: 'None',
-    auto: 'Automatic',
+    none: translator.lang.breaksSelectNone.text,
+    auto: translator.lang.breaksSelectAuto.text,
     // measure: 'Measure',
-    line: 'System',
-    encoded: 'System and page',
-    smart: 'Smart',
+    line: translator.lang.breaksSelectLine.text,
+    encoded: translator.lang.breaksSelectEncoded.text,
+    smart: translator.lang.breaksSelectSmart.text,
   };
   for (let key of Object.keys(breaksOpts)) {
-    breaksEl[breaksEl.options.length] = new Option(breaksOpts[key], key);
+    let o = new Option(breaksOpts[key], key);
+    // generate ids in the form of breaksSelectNone, breaksSelectAuto etc.
+    o.id = 'breaksSelect' + key.charAt(0).toUpperCase() + key.slice(1);
+    breaksEl[breaksEl.options.length] = o;
     if (key === 'smart') breaksEl[breaksEl.length - 1].disabled = true;
   }
 } // setBreaksOptions()
 
 export function handleSmartBreaksOption(speedMode) {
-  let options = Array.from(document.getElementById('breaks-select').options);
+  let options = Array.from(document.getElementById('breaksSelect').options);
   options.forEach((o) => {
     if (o.value === 'smart') {
       if (speedMode && o.selected) {

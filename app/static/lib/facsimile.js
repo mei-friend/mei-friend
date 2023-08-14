@@ -7,7 +7,7 @@
 import { rmHash, setCursorToId } from './utils.js';
 import { svgNameSpace, xmlToString } from './dom-utils.js';
 import { transformCTM, updateRect } from './drag-selector.js';
-import { cm, fileLocationType, github, isCtrlOrCmd, meiFileLocation, v } from './main.js';
+import { cm, fileLocationType, github, isCtrlOrCmd, meiFileLocation, translator, v } from './main.js';
 import { addZone, replaceInEditor } from './editor.js';
 import { attFacsimile } from './attribute-classes.js';
 import { defaultFacsimileRectangleColor, defaultFacsimileRectangleLineWidth } from './defaults.js';
@@ -26,9 +26,9 @@ var ulx, uly;
  * @param {String} txt
  * @returns void
  */
-function showWarningText(txt = 'No facsimile content to display.') {
-  let svgContainer = document.getElementById('source-image-container');
-  let svg = document.getElementById('source-image-svg');
+function showWarningText(txt = translator.lang.facsimileDefaultWarning.text) {
+  let svgContainer = document.getElementById('sourceImageContainer');
+  let svg = document.getElementById('sourceImageSvg');
   if (!svg || !svgContainer) return;
 
   // clear existing structures
@@ -37,7 +37,7 @@ function showWarningText(txt = 'No facsimile content to display.') {
   svg.removeAttribute('viewBox');
   svg.innerHTML = '';
 
-  let facsimileMessagePanel = document.getElementById('facsimile-message-panel');
+  let facsimileMessagePanel = document.getElementById('facsimileMessagePanel');
   facsimileMessagePanel.style.display = 'block';
   if (facsimileMessagePanel) {
     txt.split('\n').forEach((t, i) => {
@@ -140,10 +140,10 @@ export function loadFacsimile(xmlDoc) {
 export async function drawFacsimile() {
   busy();
   let fullPage = document.getElementById('showFacsimileFullPage').checked;
-  let facsimileMessagePanel = document.getElementById('facsimile-message-panel');
+  let facsimileMessagePanel = document.getElementById('facsimileMessagePanel');
   facsimileMessagePanel.style.display = 'none';
-  let svgContainer = document.getElementById('source-image-container');
-  let svg = document.getElementById('source-image-svg');
+  let svgContainer = document.getElementById('sourceImageContainer');
+  let svg = document.getElementById('sourceImageSvg');
   if (!svg || !svgContainer) return;
   ulx = Number.MAX_VALUE; // boundary values for image envelope (left-upper corner is global)
   uly = Number.MAX_VALUE;
@@ -170,7 +170,7 @@ export async function drawFacsimile() {
   if (!zoneId || !facs[zoneId]) {
     let pbId = getCurrentPbElement(v.xmlDoc); // id of current page beginning
     if (!pbId) {
-      showWarningText('No surface element found for this page.\n(An initial pb element might be missing.)');
+      showWarningText(translator.lang.facsimileNoSurfaceWarning.text);
       busy(false);
       return;
     }
@@ -179,7 +179,7 @@ export async function drawFacsimile() {
       zoneId = rmHash(pb.getAttribute('facs'));
     }
     if (zoneId && !fullPage) {
-      showWarningText('Facsimile without zones only visible in full page mode.');
+      showWarningText(translator.lang.facsimileNoZonesFullPageWarning.text);
       busy(false);
       return;
     }
@@ -226,7 +226,7 @@ export async function drawFacsimile() {
       console.log('Appending child image:', img);
       svg.appendChild(img);
     } else {
-      showWarningText('Could not load image \n(' + imgName + ').');
+      showWarningText(translator.lang.facsimileImgeNotLoadedWarning.text + ' \n(' + imgName + ').');
       busy(false);
       return;
     }
@@ -238,7 +238,7 @@ export async function drawFacsimile() {
       lrx = bb.width;
       lry = bb.height;
     } else if (facs[zoneId]['type'] === 'surface') {
-      showWarningText('Facsimile without zones only visible in full page mode.');
+      showWarningText(translator.lang.facsimileNoZonesFullPageWarning.text);
       busy(false);
       return;
     }
@@ -255,10 +255,10 @@ export async function drawFacsimile() {
 
     if (false) {
       // show page name on svg
-      let lbl = document.getElementById('source-image-svg-label');
+      let lbl = document.getElementById('sourceImageSvgLabel');
       if (!lbl) {
         lbl = document.createElementNS(svgNameSpace, 'text');
-        lbl.setAttribute('id', 'source-image-svg-label');
+        lbl.setAttribute('id', 'sourceImageSvgLabel');
       }
       lbl.textContent = imgName.split('\\').pop().split('/').pop();
       lbl.setAttribute('font-size', '28px');
@@ -269,7 +269,7 @@ export async function drawFacsimile() {
     }
 
     // go through displayed zones and draw bounding boxes with number-like label
-    if (document.getElementById('facsimile-show-zones-checkbox')?.checked) {
+    if (document.getElementById('facsimileShowZonesCheckbox')?.checked) {
       if (fullPage) {
         for (let z in facs) {
           if (facs[z]['target'] === facs[zoneId]['target']) drawBoundingBox(z);
@@ -303,7 +303,7 @@ function drawBoundingBox(zoneId) {
     rect.setAttribute('ry', rectangleLineWidth / 2);
     rect.addEventListener('click', (e) => v.handleClickOnNotation(e, cm));
     let editFacsimileZones = document.getElementById('editFacsimileZones').checked;
-    let svg = document.getElementById('source-image-svg');
+    let svg = document.getElementById('sourceImageSvg');
     svg.appendChild(rect);
     let x = parseFloat(facs[zoneId].ulx);
     let y = parseFloat(facs[zoneId].uly);
@@ -372,12 +372,12 @@ async function embedImage(url) {
 } // embedImage()
 
 /**
- * Zooms the facsimile surface image in the source-image-container svg.
+ * Zooms the facsimile surface image in the sourceImageContainer svg.
  * @param {float} deltaPercent
  */
 export function zoomFacsimile(deltaPercent) {
   let facsimileZoomInput = document.getElementById('facsimileZoomInput');
-  let facsZoom = document.getElementById('facsimile-zoom');
+  let facsZoom = document.getElementById('facsimileZoom');
   if (facsimileZoomInput && deltaPercent) {
     facsimileZoomInput.value = Math.min(
       parseInt(facsimileZoomInput.max),
@@ -387,7 +387,7 @@ export function zoomFacsimile(deltaPercent) {
   if (facsZoom && deltaPercent) {
     facsZoom.value = facsimileZoomInput.value;
   }
-  let svgContainer = document.getElementById('source-image-container');
+  let svgContainer = document.getElementById('sourceImageContainer');
   svgContainer.setAttribute('transform', 'scale(' + facsimileZoomInput.value / 100 + ')');
 } // zoomFacsimile()
 
@@ -397,7 +397,7 @@ export function zoomFacsimile(deltaPercent) {
  * @param {rect} rect
  */
 export function highlightZone(rect) {
-  let svg = document.getElementById('source-image-svg');
+  let svg = document.getElementById('sourceImageSvg');
   // remove event listerners
   for (let key in listenerHandles) {
     if (key === 'mousedown') {
@@ -429,7 +429,7 @@ export function addZoneResizer(v, rect) {
     txtY = parseFloat(txt.getAttribute('y'));
   }
   var ip = document.getElementById('facsimile-panel');
-  var svg = document.getElementById('source-image-svg');
+  var svg = document.getElementById('sourceImageSvg');
   var start = {}; // starting point start.x, start.y
   var end = {}; // ending point
   var bb;
@@ -566,12 +566,12 @@ export function addZoneResizer(v, rect) {
 } // addZoneResizer()
 
 /**
- * Adds eventlisteners to source-image-svg to enable
+ * Adds eventlisteners to sourceImageSvg to enable
  * drawing of new zones with mouse click-and-drag
  */
 export function addZoneDrawer() {
   let ip = document.getElementById('facsimile-panel');
-  let svg = document.getElementById('source-image-svg');
+  let svg = document.getElementById('sourceImageSvg');
   let start = {}; // starting point start.x, start.y
   let end = {}; // ending point
   let drawing = '';
@@ -813,7 +813,7 @@ function handleFacsimileIngestion(reply) {
  * @param {boolean} active
  */
 function busy(active = true) {
-  let facsimileIcon = document.getElementById('facsimile-icon');
+  let facsimileIcon = document.getElementById('facsimileIcon');
   if (facsimileIcon && active) {
     facsimileIcon.classList.add('clockwise');
   } else if (facsimileIcon && !active) facsimileIcon.classList.remove('clockwise');

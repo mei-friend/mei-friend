@@ -64,7 +64,14 @@ export function selectChoice(xmlDoc, sourceId) {
   // Go through all choice elements replace it by first child
   while ((choice = xmlDoc.querySelector('choice'))) {
     let parent = choice.parentElement;
-    let firstChild = firstChildElement(choice);
+    // this selects the first child inside <choice> by default, to be changed later (TODO)
+    let firstChild; // get first child element that is an ELEMENT_NODE
+    for (let node of choice.childNodes) {
+      if (node.nodeType === Node.ELEMENT_NODE) {
+        firstChild = node;
+        break;
+      }
+    }
     if (parent && firstChild) {
       // add clones of child nodes before choice...
       firstChild.childNodes.forEach((child) => {
