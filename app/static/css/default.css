@@ -6,9 +6,12 @@
   --defaultBackgroundColor: #eeeeee;
   --defaultNotationColor: #121212;
   --defaultNotationBackgroundColor: #eeeeee;
-  /* orange 45% darker */
+     /* orange 45% darker */
   --defaultSuppliedColor: #e69500;
   --defaultSuppliedHighlightedColor: #b37400;
+   /* some dark red */
+    --defaultUnclearColor: #964036;
+    --defaultUncleardHighlightedColor: #703c36;
   /* TODO use mdw blue */
   --defaultHighlightColor: #4e8bed;
   --defaultControlMenuBackgroundColor: lightgray;
@@ -48,6 +51,8 @@
   --notationBackgroundColor: var(--defaultBackgroundColor);
   --suppliedColor: var(--defaultSuppliedColor);
   --suppliedHighlightedColor: var(--defaultSuppliedHighlightedColor);
+  --unclearColor: var(--defaultUnclearColor);
+  --unclearHighlightedColor: var(--defaultUnclearHighlightedColor);
   --highlightColor: var(--defaultHighlightColor);
   --controlMenuBackgroundColor: var(--defaultControlMenuBackgroundColor);
   --navbarBackgroundColor: var(--defaultNavbarBackgroundColor);
@@ -899,13 +904,28 @@ svg text {
   stroke: var(--suppliedColor);
 }
 
-#verovioContainer .supplied .highlighted {
+#verovioContainer .unclear .highlighted {
   color: var(--suppliedHighlightedColor);
   stroke: var(--suppliedHighlightedColor);
 }
 
-#verovioContainer g.supplied g.highlighted {
-  fill: var(--suppliedHighlightedColor);
+#verovioContainer g.unclear g.highlighted {
+  fill: var(--unclearHighlightedColor);
+}
+
+#verovioContainer g.unclear g {
+  fill: var(--unclearColor);
+  color: var(--unclearColor);
+  stroke: var(--unclearColor);
+}
+
+#verovioContainer .unclear .highlighted {
+  color: var(--unclearHighlightedColor);
+  stroke: var(--unclearHighlightedColor);
+}
+
+#verovioContainer g.unclear g.highlighted {
+  fill: var(--unclearHighlightedColor);
 }
 
 #verovioContainer g {

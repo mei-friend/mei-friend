@@ -605,6 +605,13 @@ export const meiFriendSettingsOptions = {
     open: false,
     default: false,
   },
+  respSelect: {
+    title: 'Select markup responsibility',
+    description: 'filled in by language packs',
+    type: 'select',
+    default: 'none',
+    values: [],
+  },
   showSupplied: {
     title: 'Show <supplied> elements',
     description: 'filled in by language packs',
@@ -617,12 +624,17 @@ export const meiFriendSettingsOptions = {
     type: 'color',
     default: '#e69500',
   },
-  respSelect: {
-    title: 'Select <supplied> responsibility',
+  showUnclear: {
+    title: 'Show <unclear> elements',
     description: 'filled in by language packs',
-    type: 'select',
-    default: 'none',
-    values: [],
+    type: 'bool',
+    default: true,
+  },
+  unclearColor: {
+    title: 'Select <unclear> highlight color',
+    description: 'filled in by language packs',
+    type: 'color',
+    default: '#964036',
   },
   // dragLineSeparator: {
   //   title: 'options-line', // class name of hr element

@@ -1094,6 +1094,26 @@ export default class Viewer {
             checked ? utils.brighter(value, -50) : 'var(--highlightColor)'
           );
           break;
+        case 'showUnclear':
+          rt.style.setProperty('--unclearColor', value ? 'var(--defaultUnclearColor)' : 'var(--notationColor)');
+          rt.style.setProperty(
+            '--unclearHighlightedColor',
+            value ? 'var(--defaultUnclearHighlightedColor)' : 'var(--highlightColor)'
+          );
+          break;
+        case 'unclearColor':
+          let checkedUnclear = document.getElementById('showUnclear').checked;
+          rt.style.setProperty('--defaultUnclearColor', checkedUnclear ? value : 'var(--notationColor)');
+          rt.style.setProperty(
+            '--defaultUnclearHighlightedColor',
+            checkedUnclear ? utils.brighter(value, -50) : 'var(--highlightColor)'
+          );
+          rt.style.setProperty('--unclearColor', checkedUnclear ? value : 'var(--notationColor)');
+          rt.style.setProperty(
+            '--unclearHighlightedColor',
+            checkedUnclear ? utils.brighter(value, -50) : 'var(--highlightColor)'
+          );
+          break;
         case 'respSelect':
           if (this.xmlDoc)
             o.values = Array.from(this.xmlDoc.querySelectorAll('corpName[*|id]')).map((e) => e.getAttribute('xml:id'));
@@ -1207,6 +1227,7 @@ export default class Viewer {
         if (ev.target.type === 'checkbox') value = ev.target.checked;
         if (ev.target.type === 'number') value = parseFloat(value);
         let col = document.getElementById('suppliedColor').value;
+        let colUnclear = document.getElementById('unclearColor').value;
         switch (option) {
           case 'selectToolkitVersion':
             this.vrvWorker.postMessage({
@@ -1325,6 +1346,24 @@ export default class Viewer {
               '--suppliedHighlightedColor',
               checked ? utils.brighter(col, -50) : 'var(--highlightColor)'
             );
+            break;
+          case 'showUnclear':
+            rt.style.setProperty('--unclearColor', value ? colUnclear : 'var(--notationColor)');
+            rt.style.setProperty(
+              '--unclearHighlightedColor',
+              value ? utils.brighter(colUnclear, -50) : 'var(--highlightColor)'
+            );
+            break;
+          case 'unclearColor':
+            let checkedUnclear = document.getElementById('showUnclear').checked;
+            rt.style.setProperty('--unclearColor', checkedUnclear ? colUnclear : 'var(--notationColor)');
+            rt.style.setProperty(
+              '--unclearHighlightedColor',
+              checkedUnclear ? utils.brighter(colUnclear, -50) : 'var(--highlightColor)'
+            );
+            break;
+          case 'respSelect':
+            this.respId = document.getElementById('respSelect').value;
             break;
           case 'controlMenuFontSelector':
             document.getElementById('engravingFontControls').style.display = document.getElementById(

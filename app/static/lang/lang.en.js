@@ -695,7 +695,7 @@ export const lang = {
     description: 'Select <supplied> highlight color',
   },
   respSelect: {
-    text: 'Select <supplied> responsibility',
+    text: 'Select markup responsibility',
     description: 'Select responsibility id',
   },
 
