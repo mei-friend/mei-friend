@@ -10,6 +10,7 @@ let lastOnsetIdx = 0; // index in timemap of last onset
 let lastReportedTime = 0; // time (s) of last reported note fired (used to check slider shifts)
 let playbackOnLoad = false; // request immediate play on load
 let expansionMap;
+let highlightPrefix = 'highlight-id-';
 
 export function seekMidiPlaybackToSelectionOrPage() {
   // on load, seek to first currently selected element (or first note on page)
@@ -88,8 +89,12 @@ export function highlightNotesAtMidiPlaybackTime(ev = false) {
       if ('off' in timemap[ix]) {
         let i = currentlyHighlightedNotes.length - 1;
         while (i >= 0) {
-          if (timemap[ix].off.includes(currentlyHighlightedNotes[i].id)) {
-            unhighlightNote(currentlyHighlightedNotes[i]);
+          // if (timemap[ix].off.includes(currentlyHighlightedNotes[i].id)) {
+          // let result = timemap[ix].off.includes(currentlyHighlightedNotes[i].id);
+          let openId = classStartingWith(currentlyHighlightedNotes[i].classList, highlightPrefix);
+          let result = timemap[ix].off.filter((id) => id === openId);
+          if (result && result.length > 0) {
+            unhighlightNote(currentlyHighlightedNotes[i], highlightPrefix + openId);
             currentlyHighlightedNotes.splice(i, 1); // remove unhighlighted notes
           }
           i--;
@@ -122,15 +127,17 @@ export function highlightNotesAtMidiPlaybackTime(ev = false) {
     }
     closestTimemapTime = timemap[timemapIdx];
 
+    // highlight notes and turn pages
     if (closestTimemapTime && 'on' in closestTimemapTime) {
       for (let id of closestTimemapTime['on']) {
+        let origId = id;
         if (expansionMap && id in expansionMap) {
-          id = expansionMap[id][0]; // use local object for lookup
+          origId = expansionMap[id][0]; // use local object for lookup
           // id = expansionMap.getNotatedIdForElement(id);
         }
-        let note = document.getElementById(id);
+        let note = document.getElementById(origId);
         if (note && highlightCheckbox.checked) {
-          highlightNote(note);
+          highlightNote(note, id);
           // search for corresponding note-off and check whether onset there
           for (let i = timemapIdx + 1; i < timemap.length - 1; i++) {
             if ('off' in timemap[i] && timemap[i].off.includes(id)) {
@@ -142,14 +149,14 @@ export function highlightNotesAtMidiPlaybackTime(ev = false) {
             }
           }
         } else if (pageFollowCheckbox.checked) {
-          v.getPageWithElement(id)
+          v.getPageWithElement(origId)
             .then((flipToPage) => {
               if (flipToPage) {
                 v.updatePage(cm, flipToPage, '', true, false); // disable midi seek after page-flip
               }
             })
             .catch((e) => {
-              console.warn("Expected to highlight currently playing note, but couldn't find it:", id, e);
+              console.warn("Expected to highlight currently playing note, but couldn't find it:", origId, e);
             });
           break; // one trigger for page turning is enough
         }
@@ -196,14 +203,18 @@ export function requestPlaybackOnLoad() {
   playbackOnLoad = true;
 }
 
-function unhighlightNote(note) {
-  note?.classList.remove('currently-playing');
-  note?.querySelectorAll('.currently-playing').forEach((g) => g.classList.remove('currently-playing'));
+function unhighlightNote(note, id = '') {
+  if (!note) return;
+  note.classList.remove('currently-playing');
+  if (id) note.classList.remove(id);
+  note.querySelectorAll('.currently-playing').forEach((g) => g.classList.remove('currently-playing'));
 }
 
-function highlightNote(note) {
-  note?.classList.add('currently-playing');
-  note?.querySelectorAll('g').forEach((g) => g.classList.add('currently-playing'));
+function highlightNote(note, id = '') {
+  if (!note) return;
+  note.classList.add('currently-playing');
+  if (id) note.classList.add(highlightPrefix + id);
+  note.querySelectorAll('g').forEach((g) => g.classList.add('currently-playing'));
 }
 
 // close/unhighlight all midi-highlighted notes/graphical elements
@@ -235,3 +246,17 @@ function getTimeFromTimemap(id) {
   }
   return null;
 } // getTimeFromTimemap()
+
+/**
+ * Returns the className in the classList starting with `start`
+ * @param {classList} classList
+ * @param {string} start
+ * @returns {string}
+ */
+function classStartingWith(classList, start) {
+  let className = '';
+  classList.forEach((c) => {
+    if (c.startsWith(start)) className = c.split(start).at(-1);
+  });
+  return className;
+} // containsStartWith()
