@@ -262,7 +262,7 @@ export function getAdjacentSiblingElements(xmlNode, idArray, xmlDoc) {
     }
   });
 
-  return {group: adjacentElIds, idList: idArray};
+  return adjacentElIds;
 }
 
 // convert xmlNode to string and remove meiNameSpace declaration from return string

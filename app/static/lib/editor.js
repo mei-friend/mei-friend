@@ -907,10 +907,7 @@ export function addTranscriptionLikeElement(v, cm, attrName = 'none', mElName = 
         }
 
         // search for groups
-        //elementGroups.push([id]);
-        let groupResult = dutils.getAdjacentSiblingElements(el, v.selectedElements, v.xmlDoc);
-        elementGroups.push(groupResult.group);
-        v.selectedElements = groupResult.idList;
+        elementGroups.push(dutils.getAdjacentSiblingElements(el, v.selectedElements, v.xmlDoc));
       }
 
       // the supplied element per selected element used to be created here
