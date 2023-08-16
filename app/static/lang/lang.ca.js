@@ -672,7 +672,7 @@ export const lang = {
     text: 'Gestiona contingut editorial',
     description: 'Control·la el tractament dels elements <supplied>',
   },
-  showSupplied: {
+  showMarkup: {
     text: 'Mostra els elements <supplied>',
     description: 'Destaca tots els elements continguts per un element <supplied>',
   },

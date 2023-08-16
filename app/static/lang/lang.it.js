@@ -681,7 +681,7 @@ export const lang = {
     text: 'Gestisci il contenuto editoriale',
     description: 'Controlla la gestione degli elementi <supplied>',
   },
-  showSupplied: {
+  showMarkup: {
     text: 'Mostra gli elementi <supplied>',
     description: "Evidenzia tutti gli elementi contenuti nell'elemento <supplied>",
   },

@@ -673,9 +673,9 @@ export const lang = {
     text: 'Editorische Inhalte',
     description: 'Editorische Inhalte im MEI',
   },
-  showSupplied: {
+  showMarkup: {
     text: 'Zeige Supplied-Element',
-    description: 'Hebe Inhalte, die von <supplied>-Elementen umgeben sind, hervor',
+    description: 'Hebe Inhalte, die von editorischem Markup umgeben sind, hervor',
   },
   suppliedColor: {
     text: 'Farbe für Supplied',

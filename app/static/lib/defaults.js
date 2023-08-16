@@ -612,8 +612,8 @@ export const meiFriendSettingsOptions = {
     default: 'none',
     values: [],
   },
-  showSupplied: {
-    title: 'Show <supplied> elements',
+  showMarkup: {
+    title: 'Show editorial markup elements',
     description: 'filled in by language packs',
     type: 'bool',
     default: true,
@@ -624,17 +624,35 @@ export const meiFriendSettingsOptions = {
     type: 'color',
     default: '#e69500',
   },
-  showUnclear: {
-    title: 'Show <unclear> elements',
-    description: 'filled in by language packs',
-    type: 'bool',
-    default: true,
-  },
   unclearColor: {
     title: 'Select <unclear> highlight color',
     description: 'filled in by language packs',
     type: 'color',
     default: '#964036',
+  },
+  sicColor: {
+    title: 'Select <sic> highlight color',
+    description: 'filled in by language packs',
+    type: 'color',
+    default: '#b30000',
+  },
+  corrColor: {
+    title: 'Select <corr> highlight color',
+    description: 'filled in by language packs',
+    type: 'color',
+    default: '#408000',
+  },
+  origColor: {
+    title: 'Select <orig> highlight color',
+    description: 'filled in by language packs',
+    type: 'color',
+    default: '#993399',
+  },
+  regColor: {
+    title: 'Select <reg> highlight color',
+    description: 'filled in by language packs',
+    type: 'color',
+    default: '#3300cc',
   },
   // dragLineSeparator: {
   //   title: 'options-line', // class name of hr element

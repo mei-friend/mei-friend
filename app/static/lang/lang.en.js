@@ -686,9 +686,9 @@ export const lang = {
     text: 'Handle editorial content',
     description: 'Control handling of <supplied> elements',
   },
-  showSupplied: {
-    text: 'Show <supplied> elements',
-    description: 'Highlight all elements contained by a <supplied> element',
+  showMarkup: {
+    text: 'Show editorial markup elements',
+    description: 'Highlight all elements contained by editorial markup elements',
   },
   suppliedColor: {
     text: 'Select <supplied> highlight color',

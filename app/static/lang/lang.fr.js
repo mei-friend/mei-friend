@@ -674,7 +674,7 @@ export const lang = {
     text: 'Gérer le contenu éditorial',
     description: 'Contrôle la gestion des éléments <fournis>',
   },
-  showSupplied: {
+  showMarkup: {
     text: 'Afficher les éléments <fournis>',
     description: 'Surligne tous les éléments contenus par un élément <fourni>',
   },
