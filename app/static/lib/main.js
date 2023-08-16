@@ -1563,6 +1563,18 @@ export let cmd = {
   addUnclear: () => e.addTranscriptionLikeElement(v, cm, null, 'unclear'),
   addUnclearAccid: () => e.addTranscriptionLikeElement(v, cm, 'accid', 'unclear'),
   addUnclearArtic: () => e.addTranscriptionLikeElement(v, cm, 'artic', 'unclear'),
+  addSic: () => e.addTranscriptionLikeElement(v, cm, null, 'sic'),
+  addSicAccid: () => e.addTranscriptionLikeElement(v, cm, 'accid', 'sic'),
+  addSicArtic: () => e.addTranscriptionLikeElement(v, cm, 'artic', 'sic'),
+  addCorr: () => e.addTranscriptionLikeElement(v, cm, null, 'corr'),
+  addCorrAccid: () => e.addTranscriptionLikeElement(v, cm, 'accid', 'corr'),
+  addCorrArtic: () => e.addTranscriptionLikeElement(v, cm, 'artic', 'corr'),
+  addOrig: () => e.addTranscriptionLikeElement(v, cm, null, 'orig'),
+  addOrigAccid: () => e.addTranscriptionLikeElement(v, cm, 'accid', 'orig'),
+  addOrigArtic: () => e.addTranscriptionLikeElement(v, cm, 'artic', 'orig'),
+  addReg: () => e.addTranscriptionLikeElement(v, cm, null, 'reg'),
+  addRegAccid: () => e.addTranscriptionLikeElement(v, cm, 'accid', 'reg'),
+  addRegArtic: () => e.addTranscriptionLikeElement(v, cm, 'artic', 'reg'),
   cleanAccid: () => e.cleanAccid(v, cm),
   renumberMeasuresTest: () => e.renumberMeasures(v, cm, false),
   renumberMeasures: () => e.renumberMeasures(v, cm, true),
@@ -1911,6 +1923,18 @@ function addEventListeners(v, cm) {
   document.getElementById('addUnclear').addEventListener('click', cmd.addUnclear);
   document.getElementById('addUnclearArtic').addEventListener('click', cmd.addUnclearArtic);
   document.getElementById('addUnclearAccid').addEventListener('click', cmd.addUnclearAccid);
+  document.getElementById('addSic').addEventListener('click', cmd.addSic);
+  document.getElementById('addSicArtic').addEventListener('click', cmd.addSicArtic);
+  document.getElementById('addSicAccid').addEventListener('click', cmd.addSicAccid);
+  document.getElementById('addCorr').addEventListener('click', cmd.addCorr);
+  document.getElementById('addCorrArtic').addEventListener('click', cmd.addCorrArtic);
+  document.getElementById('addCorrAccid').addEventListener('click', cmd.addCorrAccid);
+  document.getElementById('addOrig').addEventListener('click', cmd.addOrig);
+  document.getElementById('addOrigArtic').addEventListener('click', cmd.addOrigArtic);
+  document.getElementById('addOrigAccid').addEventListener('click', cmd.addOrigAccid);
+  document.getElementById('addReg').addEventListener('click', cmd.addReg);
+  document.getElementById('addRegArtic').addEventListener('click', cmd.addRegArtic);
+  document.getElementById('addRegAccid').addEventListener('click', cmd.addRegAccid);
   document.getElementById('addArpeggio').addEventListener('click', cmd.addArpeggio);
   // more control elements
   document.getElementById('addFermata').addEventListener('click', cmd.addFermata);

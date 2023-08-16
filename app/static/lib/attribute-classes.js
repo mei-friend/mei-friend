@@ -245,10 +245,10 @@ export const dataURI = [
 
 // model.transcriptionLike
 export const modelTranscriptionLike = [
-  'add',
+  //'add',
   'corr',
   //'damage', (leave out for now, no markup)
-  'del',
+  //'del',
   //'gap', (leave out for now, no markup)
   //'handShift', (leave out for now)
   'orig',

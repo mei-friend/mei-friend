@@ -6,12 +6,24 @@
   --defaultBackgroundColor: #eeeeee;
   --defaultNotationColor: #121212;
   --defaultNotationBackgroundColor: #eeeeee;
-     /* orange 45% darker */
+  /* orange 45% darker */
   --defaultSuppliedColor: #e69500;
   --defaultSuppliedHighlightedColor: #b37400;
-   /* some dark red */
-    --defaultUnclearColor: #964036;
-    --defaultUncleardHighlightedColor: #703c36;
+  /* some red / brown */
+  --defaultUnclearColor: #964036;
+  --defaultUnclearHighlightedColor: #bb5044;
+  /* sic in red */
+  --defaultSicColor: #b30000;
+  --defaultSicHighlightedColor: #e60000;
+  /* corr in green */
+  --defaultCorrColor: #408000;
+  --defaultCorrHighlightedColor: #59b300;
+  /* orig in purple */
+  --defaultOrigColor: #993399;
+  --defaultOrigHighlightedColor: #bf40bf;
+  /* reg as blue purple */
+  --defaultRegColor: #3300cc;
+  --defaultRegHighlightedColor: #4000ff;
   /* TODO use mdw blue */
   --defaultHighlightColor: #4e8bed;
   --defaultControlMenuBackgroundColor: lightgray;
@@ -53,6 +65,14 @@
   --suppliedHighlightedColor: var(--defaultSuppliedHighlightedColor);
   --unclearColor: var(--defaultUnclearColor);
   --unclearHighlightedColor: var(--defaultUnclearHighlightedColor);
+  --sicColor: var(--defaultSicColor);
+  --sicHighlightedColor: var(--defaultSicHighlightedColor);
+  --corrColor: var(--defaultCorrColor);
+  --corrHighlightedColor: var(--defaultCorrHighlightedColor);
+  --origColor: var(--defaultOrigColor);
+  --origHighlightedColor: var(--defaultOrigHighlightedColor);
+  --regColor: var(--defaultRegColor);
+  --regHighlightedColor: var(--defaultRegHighlightedColor);
   --highlightColor: var(--defaultHighlightColor);
   --controlMenuBackgroundColor: var(--defaultControlMenuBackgroundColor);
   --navbarBackgroundColor: var(--defaultNavbarBackgroundColor);
@@ -904,13 +924,13 @@ svg text {
   stroke: var(--suppliedColor);
 }
 
-#verovioContainer .unclear .highlighted {
+#verovioContainer .supplied .highlighted {
   color: var(--suppliedHighlightedColor);
   stroke: var(--suppliedHighlightedColor);
 }
 
-#verovioContainer g.unclear g.highlighted {
-  fill: var(--unclearHighlightedColor);
+#verovioContainer g.supplied g.highlighted {
+  fill: var(--suppliedHighlightedColor);
 }
 
 #verovioContainer g.unclear g {
@@ -926,6 +946,66 @@ svg text {
 
 #verovioContainer g.unclear g.highlighted {
   fill: var(--unclearHighlightedColor);
+}
+
+#verovioContainer g.sic g {
+  fill: var(--sicColor);
+  color: var(--sicColor);
+  stroke: var(--sicColor);
+}
+
+#verovioContainer .sic .highlighted {
+  color: var(--sicHighlightedColor);
+  stroke: var(--sicHighlightedColor);
+}
+
+#verovioContainer g.sic g.highlighted {
+  fill: var(--sicHighlightedColor);
+}
+
+#verovioContainer g.corr g {
+  fill: var(--corrColor);
+  color: var(--corrColor);
+  stroke: var(--corrColor);
+}
+
+#verovioContainer .corr .highlighted {
+  color: var(--corrHighlightedColor);
+  stroke: var(--corrHighlightedColor);
+}
+
+#verovioContainer g.corr g.highlighted {
+  fill: var(--corrHighlightedColor);
+}
+
+#verovioContainer g.orig g {
+  fill: var(--origColor);
+  color: var(--origColor);
+  stroke: var(--origColor);
+}
+
+#verovioContainer .orig .highlighted {
+  color: var(--origHighlightedColor);
+  stroke: var(--origHighlightedColor);
+}
+
+#verovioContainer g.orig g.highlighted {
+  fill: var(--origHighlightedColor);
+}
+
+#verovioContainer g.reg g {
+  fill: var(--regColor);
+  color: var(--regColor);
+  stroke: var(--regColor);
+}
+
+#verovioContainer .reg .highlighted {
+  color: var(--regHighlightedColor);
+  stroke: var(--regHighlightedColor);
+}
+
+#verovioContainer g.reg g.highlighted {
+  fill: var(--regHighlightedColor);
 }
 
 #verovioContainer g {
