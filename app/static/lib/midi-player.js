@@ -10,9 +10,10 @@ let lastOnsetIdx = 0; // index in timemap of last onset
 let lastReportedTime = 0; // time (s) of last reported note fired (used to check slider shifts)
 let playbackOnLoad = false; // request immediate play on load
 let expansionMap;
-let highlightPrefix = 'highlight-id-';
+let highlightId = 'data-highlight';
 
 export function seekMidiPlaybackToSelectionOrPage() {
+  unHighlightAllElements(); // close all highlighted notes
   // on load, seek to first currently selected element (or first note on page)
   let seekToNote = v.findFirstNoteInSelection() || document.querySelector('.note');
   if (seekToNote) {
@@ -42,8 +43,7 @@ export function seekMidiPlaybackToTime(t) {
     }
   }
   timemapIdx = 0;
-  // close all highlighted notes
-  unHighlightAllElements();
+  unHighlightAllElements(); // close all highlighted notes
   if (playbackOnLoad) {
     playbackOnLoad = false;
     mp.start();
@@ -82,32 +82,25 @@ export function highlightNotesAtMidiPlaybackTime(ev = false) {
 
     // console.log('timemap tstamp: ' + timemap[timemapIdx].tstamp + '; midi t: ' + t);
 
-    // 129 ms; with timemapIdx reduced to 66 ms with Op. 120 last two pages
     // go back from current timemapIdx to 'close' highlighted notes
+    // 129 ms; with timemapIdx reduced to 66 ms with Op. 120 last two pages
     let ix = timemapIdx;
     while (ix >= 0 && timemap.length > 0) {
       if ('off' in timemap[ix]) {
         let i = currentlyHighlightedNotes.length - 1;
         while (i >= 0) {
-          // if (timemap[ix].off.includes(currentlyHighlightedNotes[i].id)) {
-          // let result = timemap[ix].off.includes(currentlyHighlightedNotes[i].id);
-          let openId = classStartingWith(currentlyHighlightedNotes[i].classList, highlightPrefix);
-          let result = timemap[ix].off.filter((id) => id === openId);
-          if (result && result.length > 0) {
-            unhighlightNote(currentlyHighlightedNotes[i], highlightPrefix + openId);
-            currentlyHighlightedNotes.splice(i, 1); // remove unhighlighted notes
+          if (timemap[ix].off.includes(currentlyHighlightedNotes[i].getAttribute(highlightId))) {
+            unhighlightNote(currentlyHighlightedNotes[i]);
+            currentlyHighlightedNotes.splice(i, 1);
           }
-          i--;
-        }
-        if (currentlyHighlightedNotes.length <= 0) {
-          break;
+          i = Math.min(currentlyHighlightedNotes.length - 1, --i);
         }
       }
       if ('on' in timemap[ix] && timemap[ix].on.includes(firstNoteOnPage.id)) {
         break;
       }
       ix--;
-    }
+    } // while()
 
     // at last onset, program the closing of events in the future
     if (timemapIdx === lastOnsetIdx) {
@@ -203,24 +196,24 @@ export function requestPlaybackOnLoad() {
   playbackOnLoad = true;
 }
 
-function unhighlightNote(note, id = '') {
+function unhighlightNote(note) {
   if (!note) return;
   note.classList.remove('currently-playing');
-  if (id) note.classList.remove(id);
+  note.removeAttribute(highlightId);
   note.querySelectorAll('.currently-playing').forEach((g) => g.classList.remove('currently-playing'));
-}
+} // unhighlightNote()
 
 function highlightNote(note, id = '') {
   if (!note) return;
   note.classList.add('currently-playing');
-  if (id) note.classList.add(highlightPrefix + id);
+  if (id) note.setAttribute(highlightId, id);
   note.querySelectorAll('g').forEach((g) => g.classList.add('currently-playing'));
-}
+} // highlightNote()
 
 // close/unhighlight all midi-highlighted notes/graphical elements
 function unHighlightAllElements() {
   document.querySelectorAll('.currently-playing').forEach((g) => g.classList.remove('currently-playing'));
-}
+} // unHighlightAllElements()
 
 // find index of last onset array in timemap
 function determineLastOnsetIdx() {
@@ -246,17 +239,3 @@ function getTimeFromTimemap(id) {
   }
   return null;
 } // getTimeFromTimemap()
-
-/**
- * Returns the className in the classList starting with `start`
- * @param {classList} classList
- * @param {string} start
- * @returns {string}
- */
-function classStartingWith(classList, start) {
-  let className = '';
-  classList.forEach((c) => {
-    if (c.startsWith(start)) className = c.split(start).at(-1);
-  });
-  return className;
-} // containsStartWith()
