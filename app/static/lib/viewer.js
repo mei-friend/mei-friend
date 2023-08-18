@@ -69,7 +69,6 @@ export default class Viewer {
     this.timeoutDelay = defaultViewerTimeoutDelay; // ms, window in which concurrent clicks are treated as one update
     this.verovioIcon = document.getElementById('verovioIcon');
     this.breaksSelect = /** @type HTMLSelectElement */ (document.getElementById('breaksSelect'));
-    this.respId = '';
     this.alertCloser;
     this.pdfMode = false;
     this.cmd2KeyPressed = false;
@@ -325,7 +324,6 @@ export default class Viewer {
       start: {},
       end: {},
     };
-    this.respId = '';
     this.expansionId = '';
   } // clear()
 
@@ -594,6 +592,7 @@ export default class Viewer {
     // console.log('NotationUpdated forceUpdate:' + forceUpdate);
     this.xmlDocOutdated = true;
     this.toolkitDataOutdated = true;
+    this.setRespSelectOptions();
     if (!isSafari) this.checkSchema(cm.getValue());
     let ch = document.getElementById('liveUpdateCheckbox');
     if ((this.allowCursorActivity && ch && ch.checked) || forceUpdate) {
@@ -1154,9 +1153,6 @@ export default class Viewer {
         }
       }
       switch (opt) {
-        case 'respSelect':
-          this.respId = document.getElementById('respSelect').value;
-          break;
         case 'renumberMeasuresUseSuffixAtEndings':
           this.disableElementThroughCheckbox(
             'renumberMeasuresContinueAcrossEndings',
@@ -1329,9 +1325,6 @@ export default class Viewer {
               '--suppliedHighlightedColor',
               checked ? utils.brighter(col, -50) : 'var(--highlightColor)'
             );
-            break;
-          case 'respSelect':
-            this.respId = document.getElementById('respSelect').value;
             break;
           case 'controlMenuFontSelector':
             document.getElementById('engravingFontControls').style.display = document.getElementById(
@@ -1811,15 +1804,17 @@ export default class Viewer {
 
   // add responsibility statement to resp select dropdown
   setRespSelectOptions() {
+    this.loadXml(cm.getValue()); // loads if outdated
     let rs = document.getElementById('respSelect');
     if (rs) {
+      let value = rs.value;
       while (rs.length > 0) rs.options.remove(0);
       let optEls = this.xmlDoc.querySelectorAll('corpName[*|id],persName[*|id]');
       optEls.forEach((el) => {
         if (el.closest('respStmt')) {
           // only if inside a respStmt
           let id = el.getAttribute('xml:id');
-          rs.add(new Option(id, id));
+          rs.add(new Option(id, id, id === value ? true : false, id === value ? true : false));
         }
       });
     }

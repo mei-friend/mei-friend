@@ -892,7 +892,8 @@ export function addSuppliedElement(v, cm, attrName = 'none') {
       let sup = document.createElementNS(dutils.meiNameSpace, 'supplied');
       let uuid = mintSuppliedId(id, 'supplied');
       sup.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
-      if (v.respId) sup.setAttribute('resp', '#' + v.respId);
+      let respId = document.getElementById('respSelect').value;
+      if (respId) sup.setAttribute('resp', '#' + respId);
       parent.replaceChild(sup, el);
       sup.appendChild(el);
       replaceInEditor(cm, el, true, sup);
