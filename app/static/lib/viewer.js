@@ -20,7 +20,7 @@ import {
   versionDate,
 } from './main.js';
 import { selectMarkup } from './markup.js';
-import { startMidiTimeout } from './midi-player.js';
+import { mp, startMidiTimeout } from './midi-player.js';
 import { getNotationProportion, setNotationProportion, setOrientation } from './resizer.js';
 import {
   commonSchemas,
@@ -76,7 +76,8 @@ export default class Viewer {
     this.controlMenuState = {};
     this.settingsReplaceFriendContainer = false; // whether or not the settings panel is over the mei-friend window (false) or replaces it (true)
     this.notationProportion = defaultNotationProportion; // remember proportion during pdf mode
-  } // constructor()
+    this.expansionId = ''; // id string of currently selected expansion element
+  } // constructor() // constructor()
 
   // change options, load new data, render current page, add listeners, highlight
   updateAll(cm, options = {}, xmlId = '') {
@@ -195,6 +196,7 @@ export default class Viewer {
     this.vrvWorker.postMessage(message);
   } // updateQuick()
 
+  // central wrapper function for both speed mode and normal mode
   async getPageWithElement(xmlId) {
     let pageNumber = -1;
     if (this.speedMode) {
@@ -205,10 +207,11 @@ export default class Viewer {
     return pageNumber;
   } // getPageWithElement()
 
+  // for normal mode
   getPageWithElementFromVrvWorker(xmlId) {
     let that = this;
     return new Promise(
-      function (resolve, reject) {
+      function (resolve) {
         let taskId = Math.random();
         const msg = {
           cmd: 'getPageWithElement',
@@ -231,12 +234,14 @@ export default class Viewer {
   // with speed mode: load into DOM (if xmlDocOutdated) and
   // return MEI excerpt of currentPage page
   // (including dummy measures before and after current page by default)
-  speedFilter(mei, includeDummyMeasures = true) {
-    // update DOM only if encoding has been edited or
-    this.loadXml(mei);
+  speedFilter(mei, includeDummyMeasures = true, forceReload = false) {
     let breaks = this.breaksValue();
     let breaksSelectVal = this.breaksSelect.value;
-    if (!this.speedMode || breaksSelectVal === 'none') return mei;
+    if (!this.speedMode || breaksSelectVal === 'none') {
+      return mei;
+    }
+    // update DOM only if encoding has been edited or
+    this.loadXml(mei, forceReload);
     this.xmlDoc = selectMarkup(this.xmlDoc); // select markup
     // count pages from system/pagebreaks
     if (Array.isArray(breaks)) {
@@ -320,6 +325,8 @@ export default class Viewer {
       start: {},
       end: {},
     };
+    this.respId = '';
+    this.expansionId = '';
   } // clear()
 
   // re-render MEI through Verovio, while removing or adding xml:ids
@@ -581,6 +588,9 @@ export default class Viewer {
 
   // when editor emits changes, update notation rendering
   notationUpdated(cm, forceUpdate = false) {
+    if (document.getElementById('showMidiPlaybackControlBar').checked) {
+      cmd.toggleMidiPlaybackControlBar();
+    }
     // console.log('NotationUpdated forceUpdate:' + forceUpdate);
     this.xmlDocOutdated = true;
     this.toolkitDataOutdated = true;
@@ -1276,6 +1286,12 @@ export default class Viewer {
             }
             drawFacsimile();
             break;
+          case 'selectMidiExpansion':
+            this.updateSelectMidiExpansion();
+            if (document.getElementById('showMidiPlaybackControlBar').checked) {
+              startMidiTimeout(true);
+            }
+            break;
           case 'editFacsimileZones':
             document.getElementById('facsimileEditZonesCheckbox').checked = value;
             if (value) {
@@ -1516,7 +1532,7 @@ export default class Viewer {
   clearVrvOptionsSettingsPanel() {
     this.vrvOptions = {};
     document.getElementById('verovioSettings').innerHTML = '';
-  }
+  } // clearVrvOptionsSettingsPanel()
 
   // initializes the settings panel by filling it with content
   addVrvOptionsToSettingsPanel(tkAvailableOptions, defaultVrvOptions, restoreFromLocalStorage = true) {
@@ -1818,7 +1834,28 @@ export default class Viewer {
     if (!key.disabled) optionString += key.value;
     if (!int.disabled) optionString += int.value;
     return optionString;
-  } // getTranspositionOption()
+  } // setRespSelectOptions()
+
+  // add MIDI playback expansion to select input
+  setMidiExpansionOptions() {
+    let expandSelect = document.getElementById('selectMidiExpansion');
+    if (expandSelect) {
+      while (expandSelect.options.length > 0) expandSelect.remove(0); // clear existing options
+    } // getTranspositionOption()
+    // add options to midi controlbar expansion selector
+    let vrvOption = document.getElementById('controlbar-midi-expansion-selector');
+    if (vrvOption) {
+      while (vrvOption.options.length > 0) vrvOption.remove(0); // clear existing options
+    }
+    dutils.generateExpansionList(this.xmlDoc).forEach((str, i) => {
+      if (expandSelect) {
+        expandSelect.add(new Option(str[0], str[1]));
+      }
+      if (vrvOption) {
+        vrvOption.add(new Option(str[0], str[1]));
+      }
+    });
+  } // setMidiExpansionOptions()
 
   // navigate forwards/backwards/upwards/downwards in the DOM, as defined
   // by 'dir' an by 'incrementElementName'
@@ -1995,6 +2032,13 @@ export default class Viewer {
         });
       }
     }
+  }
+
+  updateSelectMidiExpansion() {
+    this.expansionId = document.getElementById('selectMidiExpansion').value;
+    let mes = document.getElementById('controlbar-midi-expansion-selector');
+    if (mes) mes.value = this.expansionId;
+    console.log('EEEEExpansion selector set to: ' + this.expansionId);
   }
 
   busy(active = true, speedWorker = false) {

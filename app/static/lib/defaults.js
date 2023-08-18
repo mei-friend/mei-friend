@@ -404,11 +404,18 @@ export const meiFriendSettingsOptions = {
   },
   highlightCurrentlySoundingNotes: {
     title: 'Highlight currently-sounding notes',
-    description: 'filled in by language packs',
+    description: 'Visually highlight currently-sounding notes in the notation panel during MIDI playback ',
     type: 'bool',
     default: true,
   },
-  // Transposition
+  selectMidiExpansion: {
+    title: 'Playback expansion',
+    description: 'Select expansion element to be used for MIDI playback',
+    type: 'select',
+    values: ['none'],
+    // valuesDescriptions: ['note-0000001018877033', 'n34z4wz2', 'note-34z4wz2'],
+    default: 'none',
+  },
   titleTransposition: {
     title: 'Transpose',
     description: 'filled in by language packs',
