@@ -168,7 +168,7 @@ export const lang = {
   middleFooterOf: { text: 'of' },
   middleFooterLoaded: { text: 'loaded' },
 
-  // control menu
+  // Control menu
   verovioIcon: {
     description: `mei-friend worker activity:
     clockwise rotation denotes Verovio activity,
@@ -223,7 +223,7 @@ export const lang = {
   },
   pdfPreviewNormalModeTitle: { text: 'Select page range to be saved in PDF.' },
 
-  // facsimile panel
+  // Facsimile panel
   facsimileIcon: { description: 'Facsimile panel' },
   facsimileDecreaseZoomButton: { description: 'Decrease notation image' },
   facsimileZoom: { description: 'Adjust size of notation image' },
@@ -242,10 +242,10 @@ export const lang = {
   facsimileNoZonesFullPageWarning: { text: 'Facsimile without zones only visible in full page mode.' },
   facsimileImgeNotLoadedWarning: { text: 'Could not load image' },
 
-  // drag'n'drop
+  // Drag'n'drop
   dragOverlayText: { text: 'Drag your input file here.' },
 
-  // public repertoire
+  // Public repertoire
   openUrlHeading: { text: 'Open Web-hosted encoding by URL' },
   openUrlInstructions: {
     text:
@@ -270,7 +270,7 @@ export const lang = {
   openUrlChooseComposerText: { text: 'Choose a composer...' },
   openUrlOpenEncodingByUrlText: { text: 'Open Web-hosted encoding by URL' },
 
-  // github actions modal
+  // GitHub actions modal
   githubActionStatusMsgPrompt: { text: 'Could not run workflow - GitHub says' },
   githubActionStatusMsgWaiting: { text: 'Please be patient while GitHub is processing your workflow...' },
   githubActionStatusMsgFailure: { text: 'Could not run workflow - GitHub says' },
@@ -282,7 +282,7 @@ export const lang = {
   githubActionsInputSetterSelection: { text: 'Copy current MEI selection to input' },
   githubActionsInputContainerHeader: { text: 'Input configuration' },
 
-  // fork modals
+  // Fork modals
   forkRepoGithubText: { text: 'Fork Github Repository' },
   forkRepoGithubExplanation: {
     text:
@@ -321,7 +321,7 @@ export const lang = {
   selectTagNameForEnclosureOkButton: { value: 'OK' },
   selectTagNameForEnclosureCancelButton: { value: 'Cancel' },
 
-  // restore Solid session overlay
+  // Restore Solid session overlay
   solidExplanation: {
     description:
       'Solid is a decentralised platform for social linked data platform. Log in to Solid to create stand-off annotations using linked data (RDF).',
@@ -335,7 +335,8 @@ export const lang = {
     html: `You have logged out of mei-friend's Solid integration, but your browser is still logged in to Solid!
       <a id="solidIdPLogoutLink" target="_blank">Click here to logout from Solid</a>.`,
   },
-  // annotation panel
+
+  // Annotation panel
   annotationCloseButtonText: { text: 'Close Annotations Panel' },
   hideAnnotationPanelButton: { description: 'Close Annotations Panel' },
   closeAnnotationPanelButton: { description: 'Close Annotations Panel' },
@@ -817,7 +818,7 @@ export const lang = {
   noErrors: { text: 'no errors' },
   errorsFound: { text: 'errors found' }, // 5 errors found
 
-  // github-menu.js
+  // GitHub-menu.js
   githubRepository: { text: 'Repository' },
   githubBranch: { text: 'Branch' },
   githubFilepath: { text: 'Path' },
@@ -843,7 +844,7 @@ export const lang = {
   repoAccessError: { text: 'Sorry, cannot access repositories for supplied user or organisation' },
   allComposers: { text: 'All composers' }, // fork-repository.js
 
-  // utils renumber measures
+  // Utils renumber measures
   renumberMeasuresModalText: { text: 'Renumber measures' },
   renumberMeasuresModalTest: { text: 'Test' },
   renumberMeasuresWillBe: { text: '' },

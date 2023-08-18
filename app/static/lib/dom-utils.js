@@ -234,3 +234,22 @@ export function xmlToString(xmlNode) {
   // console.info('xmlToString: ' + str);
   return str.replace(' xmlns="' + meiNameSpace + '"', '');
 } // xmlToString()
+
+// checks xmlDoc for expand elements and returns an array of arrays
+export function generateExpansionList(xmlDoc, baseSelector = 'music score') {
+  let selector = 'section,ending,lem,rdg';
+  let expansions = [['No expansion', '']];
+  let baseSection = xmlDoc.querySelector(baseSelector);
+  if (baseSection) {
+    baseSection.querySelectorAll('expansion').forEach((el) => {
+      let str = '';
+      let parent = el.parentElement.closest(selector);
+      if (parent) {
+        // str += '│ ';
+        while ((parent = parent.parentElement.closest(selector))) str += '│ '; // &#9474;&nbsp; for indentation
+      }
+      expansions.push([str + el.getAttribute('xml:id'), el.getAttribute('xml:id')]);
+    });
+  }
+  return expansions;
+} // generateExpansionList()

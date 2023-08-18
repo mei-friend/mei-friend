@@ -84,3 +84,17 @@ export function selectChoice(xmlDoc, sourceId) {
   }
   return xmlDoc;
 } // selectChoice()
+
+/**
+ * Returns first child element, ignoring text and other nodes
+ * @param {Element} parent
+ * @returns
+ */
+function firstChildElement(parent) {
+  for (let node of parent.childNodes) {
+    if (node.nodeType === Node.ELEMENT_NODE) {
+      return node;
+    }
+  }
+  return null;
+} // firstChildElement()

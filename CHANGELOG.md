@@ -1,9 +1,16 @@
 # mei-friend-online CHANGELOG.md
 
+### 0.10.3 Expansion support for MIDI playback
+* Add drop-down GUI element to MIDI toolbar to select expansion element from encoding
+* Support for MIDI playback of selected expansion element (for handling repeated sections)
+* Improved MIDI playback handling in the background
+* MIDI toolbar disappears when editing encoding
+
 ### 0.10.2
 * Improve UI around Solid handleIncomingRedirect
 * Provide translations for Solid UI
 * Set cursor position to matching tag name in editor
+* Add auto-translated draft of Polish language pack
 * Bug that did not show elements within a choice in speed mode fixed
 
 ### 0.10.1

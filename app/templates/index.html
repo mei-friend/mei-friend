@@ -893,13 +893,16 @@
     </div>
   </div>
 
-  <div id="midiPlaybackControlBar">
-    <midi-player id="midi-player" sound-font> </midi-player>
-    <span id="midiSpeedmodeIndicator"
-      title="Speed mode is active; only playing MIDI for current page. To play the entire encoding, disable speed mode.">
-      Speed mode</span>
+    <div id="midiPlaybackControlBar">
+      <midi-player id="midi-player" sound-font> </midi-player>
+      <span
+        id="midiSpeedmodeIndicator"
+        title="Speed mode is active; only playing MIDI for current page. To play the entire encoding, disable speed mode."
+        >Speed mode</span
+      >
+      <select id="controlbar-midi-expansion-selector" name="expansion-select" title="Select expansion element for MIDI playback"><option value="">No expansion</option></select>
     <span id="closeMidiPlaybackControlBarButton" title="Hide MIDI Playback Control Bar">×</span>
-  </div>
+    </div>
 
   <div class="footer">
     <div id="midiPlayerContextual">

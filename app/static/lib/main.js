@@ -1,6 +1,6 @@
 // mei-friend version and date
-export const version = '0.10.2';
-export const versionDate = '12 August 2023'; // use full or 3-character english months, will be translated
+export const version = '0.10.3';
+export const versionDate = '18 August 2023'; // use full or 3-character english months, will be translated
 
 var vrvWorker;
 var spdWorker;
@@ -78,6 +78,7 @@ import {
   requestPlaybackOnLoad,
   seekMidiPlaybackToSelectionOrPage,
   seekMidiPlaybackToTime,
+  setExpansionMap,
   setTimemap,
   startMidiTimeout,
 } from './midi-player.js';
@@ -115,6 +116,7 @@ import {
 import Translator from './translator.js';
 import { buildLanguageSelection, translateLanguageSelection } from './language-selector.js';
 import { runLanguageChecks } from '../tests/checkLangs.js';
+import * as expansionMap from './expansion-map.js';
 
 const defaultCodeMirrorOptions = {
   lineNumbers: true,
@@ -250,6 +252,7 @@ export function loadDataInEditor(mei, setFreshlyLoaded = true) {
     else bs.value = v.containsBreaks() ? 'line' : 'auto';
   }
   v.setRespSelectOptions();
+  v.setMidiExpansionOptions();
   v.setMenuColors();
   if (!isSafari) {
     // disable validation on Safari because of this strange error: "RangeError: Maximum call stack size exceeded" (WG, 1 Oct 2022)
@@ -990,14 +993,20 @@ async function vrvWorkerEventsHandler(ev) {
       a.click();
       v.busy(false);
       break;
-    case 'midiPlayback': // export MIDI file
+    case 'midiPlayback': // play MIDI file
       console.log('Received MIDI and Timemap:', ev.data.midi, ev.data.timemap);
       setTimemap(ev.data.timemap);
+      if (ev.data.expansionMap) {
+        setExpansionMap(ev.data.expansionMap);
+      }
       if (mp) {
         blob = midiDataToBlob(ev.data.midi);
         midiCore.blobToNoteSequence(blob).then((noteSequence) => {
           mp.noteSequence = noteSequence;
         });
+        if ('expand' in ev.data && ev.data.expand && !v.speedMode) {
+          v.updateAll(cm); // update vrv worker, if expand, no speed mode
+        }
       }
       break;
     case 'pdfBlob':
@@ -1261,16 +1270,31 @@ function downloadSpeedMei() {
 }
 
 export function requestMidiFromVrvWorker(requestTimemap = false) {
+  let mei;
+  // if (v.expansionId) {
+  //   let expansionEl = v.xmlDoc.querySelector('[*|id=' + v.expansionId + ']');
+  //   let existingList = [];
+  //   let expandedDoc = expansionMap.expand(expansionEl, existingList, v.xmlDoc.cloneNode(true));
+  //   mei = v.speedFilter(new XMLSerializer().serializeToString(expandedDoc), false, true);
+  //   if (v.speedMode) {
+  //     v.loadXml(cm.getValue(), true); // reload xmlDoc when in speed mode
+  //   } else {
+  //     v.toolkitDataOutdated = true; // force load data for MIDI playback
+  //   }
+  // } else {
+  // }
+  mei = v.speedFilter(cm.getValue(), false);
   let message = {
     cmd: 'exportMidi',
+    expand: v.expansionId,
     options: v.vrvOptions,
-    mei: v.speedFilter(cm.getValue(), false), // exclude dummy measures in speed mode
+    mei: mei, // exclude dummy measures in speed mode
     requestTimemap: requestTimemap,
-    toolkitDataOutdated: v.toolkitDataOutdated,
     speedMode: v.speedMode,
+    toolkitDataOutdated: v.toolkitDataOutdated,
   };
   vrvWorker.postMessage(message);
-}
+} // requestMidiFromVrvWorker()
 
 function downloadSvg() {
   let svg = document.getElementById('verovio-panel').innerHTML;
@@ -2018,6 +2042,16 @@ function addEventListeners(v, cm) {
   addDragSelector(v, vp);
 
   addZoneDrawer();
+
+  // MIDI control bar expansion selector change listener
+  document.getElementById('controlbar-midi-expansion-selector').addEventListener('change', (ev) => {
+    v.expansionId = ev.target.value;
+    document.getElementById('selectMidiExpansion').value = v.expansionId;
+    if (document.getElementById('showMidiPlaybackControlBar').checked) {
+      startMidiTimeout(true);
+    }
+    console.log('Main EEEEExpansion selector set to: ' + v.expansionId);
+  });
 } // addEventListeners()
 
 // progress bar demo

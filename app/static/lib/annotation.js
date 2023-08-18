@@ -209,7 +209,7 @@ export function situateAnnotations() {
       } else {
         // if not speed mode, asynchronous return of page numbers after we are finished here
         const annotationLocationLabelElement = document.querySelector(
-          `.annotationLocationLabel[data-id=${CSS.escape(a.id)}`
+          `.annotationLocationLabel[data-id=loc-${CSS.escape(a.id)}`
         );
         if (annotationLocationLabelElement) {
           annotationLocationLabelElement.innerHTML = generateAnnotationLocationLabel(a).innerHTML;
