@@ -17,10 +17,11 @@ export function seekMidiPlaybackToSelectionOrPage() {
   // on load, seek to first currently selected element (or first note on page)
   let seekToNote = v.findFirstNoteInSelection() || document.querySelector('.note');
   if (seekToNote) {
+    console.log('MidiPlayer.seekMidiPlaybackToSelectionOrPage(): ', seekToNote);
     // v.getTimeForElement(seekToNote.id, true); // will trigger a seekMidiPlaybackTo
     // Instead of asking toolkit for element time, ask timemap (WG, 14 Aug 2023)
     let t = getTimeFromTimemap(seekToNote.id);
-    if (t) {
+    if (t >= 0) {
       seekMidiPlaybackToTime(t);
     } else {
       console.warn("midi-player: Can't find time stamp for note " + seekToNote.id + 'to seek MIDI playback to');
@@ -196,13 +197,16 @@ export function requestPlaybackOnLoad() {
   playbackOnLoad = true;
 }
 
-function unhighlightNote(note) {
-  if (!note) return;
-  note.classList.remove('currently-playing');
-  note.removeAttribute(highlightId);
-  note.querySelectorAll('.currently-playing').forEach((g) => g.classList.remove('currently-playing'));
-} // unhighlightNote()
-
+/**
+ * Highlights the note by adding the currently-playing class
+ * to it and its children. The highlighting id from the timemap#
+ * is added as separate "data-highligh" attribute, because it
+ * might be different from the element's id when playing an
+ * expanded section (e.g. 'note-0002332-rend1'). *
+ * @param {Element} note
+ * @param {string} id
+ * @returns nothing
+ */
 function highlightNote(note, id = '') {
   if (!note) return;
   note.classList.add('currently-playing');
@@ -210,7 +214,22 @@ function highlightNote(note, id = '') {
   note.querySelectorAll('g').forEach((g) => g.classList.add('currently-playing'));
 } // highlightNote()
 
-// close/unhighlight all midi-highlighted notes/graphical elements
+/**
+ * Unhighlight the note element by removing the currently-playing
+ * class and the "data-highlight" attribute.
+ * @param {Element} note
+ * @returns nothing
+ */
+function unhighlightNote(note) {
+  if (!note) return;
+  note.classList.remove('currently-playing');
+  note.removeAttribute(highlightId);
+  note.querySelectorAll('.currently-playing').forEach((g) => g.classList.remove('currently-playing'));
+} // unhighlightNote()
+
+/**
+ *  Close/unhighlight all midi-highlighted notes/graphical elements
+ */
 function unHighlightAllElements() {
   document.querySelectorAll('.currently-playing').forEach((g) => g.classList.remove('currently-playing'));
 } // unHighlightAllElements()
@@ -237,5 +256,5 @@ function getTimeFromTimemap(id) {
       return e.tstamp;
     }
   }
-  return null;
+  return -1;
 } // getTimeFromTimemap()
