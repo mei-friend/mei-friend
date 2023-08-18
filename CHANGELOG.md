@@ -2,7 +2,7 @@
 
 ### 0.10.3 Expansion support for MIDI playback
 * Add drop-down GUI element to MIDI toolbar to select expansion element from encoding
-* Support for MIDI playback of selected expansion element
+* Support for MIDI playback of selected expansion element (for handling repeated sections)
 * Improved MIDI playback handling in the background
 * MIDI toolbar disappears when editing encoding
 
