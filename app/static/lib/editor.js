@@ -1048,6 +1048,17 @@ export function correctAccidGes(v, cm, change = false) {
   let keySignatures = Array(noStaves).fill('0');
   if (d) console.debug('correctAccidGes. ' + noStaves + ' staves defined.');
 
+  // list all ties to handle those separately
+  let ties = {};
+  v.xmlDoc.querySelectorAll('tie').forEach((t) => {
+    let startId = utils.rmHash(t.getAttribute('startid')) || '';
+    let endId = utils.rmHash(t.getAttribute('endid')) || '';
+    if (endId) {
+      if (!startId) console.log('Tie ' + t.getAttribute('xml:id') + ' without startId. ');
+      else ties[endId] = startId;
+    }
+  });
+
   let count = 0;
   let measureAccid = {}; // accidentals within a measure
   let list = v.xmlDoc.querySelectorAll('[key\\.sig],keySig,measure,note');
@@ -1070,6 +1081,7 @@ export function correctAccidGes(v, cm, change = false) {
     } else if (e.nodeName === 'measure') {
       measureAccid = {};
     } else if (e.nodeName === 'note') {
+      let xmlId = e.getAttribute('xml:id') || '';
       // find staff number for note
       let staffNumber = parseInt(e.closest('staff')?.getAttribute('n'));
       let pName = e.getAttribute('pname') || '';
@@ -1089,15 +1101,47 @@ export function correctAccidGes(v, cm, change = false) {
       let accid = e.getAttribute('accid') || e.querySelector('[accid]')?.getAttribute('accid');
       let accidGes = e.getAttribute('accid.ges') || e.querySelector('[accid\\.ges]')?.getAttribute('accid.ges') || 'n';
 
-      // TODO: check whether note in a tie
-      
-      if (
+      if (xmlId && xmlId in ties) {
+        // Check whether note tied by starting note
+        let startingNote = v.xmlDoc.querySelector('[*|id=' + ties[xmlId] + ']');
+        if (pName !== startingNote.getAttribute('pname'))
+          console.log(
+            'Tied note ' +
+              xmlId +
+              ': ' +
+              pName +
+              ' not same pitch name as ' +
+              ties[xmlId] +
+              ': ' +
+              startingNote.getAttribute('pname')
+          );
+        if (oct !== startingNote.getAttribute('oct'))
+          console.log('Tied note ' + xmlId + ' not same octave number as ' + ties[xmlId]);
+        let startingAccid =
+          startingNote.getAttribute('accid') ||
+          startingNote.querySelector('[accid]')?.getAttribute('accid') ||
+          startingNote.getAttribute('accid.ges') ||
+          startingNote.querySelector('[accid\\.ges]')?.getAttribute('accid.ges') ||
+          'n';
+        if ((accid || accidGes) !== startingAccid)
+          console.log(
+            'Tied note ' +
+              xmlId +
+              ': ' +
+              (accid || accidGes) +
+              ' not same accid as in ' +
+              ties[xmlId] +
+              ': ' +
+              startingAccid
+          );
+        let a = 1234;
+      } else if (
         // check all accids having appeared in the current measure
         !accid &&
-        (staffNumber in measureAccid &&
+        staffNumber in measureAccid &&
         oct in measureAccid[staffNumber] &&
         pName in measureAccid[staffNumber][oct] &&
-        measureAccid[staffNumber][oct][pName] !== accidGes)
+        measureAccid[staffNumber][oct][pName] !== accidGes
       ) {
         console.debug(
           ++count +
@@ -1113,15 +1157,15 @@ export function correctAccidGes(v, cm, change = false) {
       } else if (affectedNotes.includes(pName)) {
         // a note, affected by key signature, either has @accid inside or as a child or has @accid.ges inside or as a child
         if (
-          accid ||
-          (accidGes === accidCharacter) ||
-          (staffNumber in measureAccid &&
+          !accid &&
+          accidGes !== accidCharacter &&
+          !(
+            staffNumber in measureAccid &&
             oct in measureAccid[staffNumber] &&
             pName in measureAccid[staffNumber][oct] &&
-            measureAccid[staffNumber][oct][pName] === accidGes)
+            measureAccid[staffNumber][oct][pName] === accidGes
+          )
         ) {
-          // ok
-        } else {
           console.debug(
             ++count +
               ' Measure ' +
@@ -1146,10 +1190,6 @@ export function correctAccidGes(v, cm, change = false) {
   });
 
   v.allowCursorActivity = true;
-
-  function newMeasureAccid(noStaves = 1) {
-    return Array(noStaves).fill({});
-  }
 } // correctAccidGes()
 
 /**
