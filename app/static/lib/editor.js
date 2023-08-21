@@ -848,13 +848,18 @@ export function addSuppliedElement(v, cm, attrName = 'none', mElName = 'supplied
   v.allowCursorActivity = false;
 
   let uuids = [];
-  v.selectedElements.forEach((id) => {
+  let elementGroups = [];
+
+  // this loop updated the list of selected elements to be wrapped by markup
+  // and will separate the list into groups of adjacent elements to be wrapped into a single markup element
+  while(v.selectedElements.length > 0) {
+    let id = v.selectedElements[0];
     let el = v.xmlDoc.querySelector("[*|id='" + id + "']");
     if (!el) {
       console.warn('No such element in xml document: ' + id);
+      // remove element from list of selected elements if it cannot be found
+      v.selectedElements.splice(v.selectedElements.indexOf(id), 1);
     } else {
-      let parent = el.parentNode;
-
       // convert attrName artic|accid to note|chord element and surround that
       if (
         (['note', 'chord'].includes(el.nodeName) && attrName === 'artic') ||
@@ -866,8 +871,10 @@ export function addSuppliedElement(v, cm, attrName = 'none', mElName = 'supplied
             if (ch.nodeName === attrName) childElement = ch;
           });
           if (childElement) {
-            parent = el;
-            el = childElement;
+            // push childElement to list of groups to wrap
+            // and remove element from selectedElements to avoid double processing
+            elementGroups.push([childElement.getAttribute('xml:id')]);
+            v.selectedElements.splice(v.selectedElements.indexOf(id), 1);
           } else {
             const msg =
               'No ' + attrName + ' attribute or child node found in element ' + el.nodeName + ' (' + id + ').';
@@ -886,27 +893,70 @@ export function addSuppliedElement(v, cm, attrName = 'none', mElName = 'supplied
           el.appendChild(attrEl);
           replaceInEditor(cm, el, true);
           cm.execCommand('indentAuto');
-          parent = el;
-          el = attrEl;
+
+          // push childElement to list of groups to wrap
+          // and remove element from selectedElements to avoid double processing
+          elementGroups.push([attrEl.getAttribute('xml:id')]);
+          v.selectedElements.splice(v.selectedElements.indexOf(id), 1);
         }
-      } else if (['accid', 'artic'].includes(attrName)) {
-        const msg = 'Only chord and note elements are allowed for this command (you selected ' + el.nodeName + ').';
-        console.log(msg);
-        v.showAlert(msg, 'warning');
+      } else {
+        if (['accid', 'artic'].includes(attrName)) {
+          const msg = 'Only chord and note elements are allowed for this command (you selected ' + el.nodeName + ').';
+          console.log(msg);
+          v.showAlert(msg, 'warning');
+        }
+
+        // search for groups
+        //elementGroups.push([id]);
+        let groupResult = dutils.getAdjacentSiblingElements(el, v.selectedElements, v.xmlDoc);
+        elementGroups.push(groupResult.group);
+        v.selectedElements = groupResult.idList;
       }
 
-      let sup = document.createElementNS(dutils.meiNameSpace, mElName);
-      let uuid = mintSuppliedId(id, mElName);
-      sup.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
-      let respId = document.getElementById('respSelect').value;
-      if (respId) sup.setAttribute('resp', '#' + respId);
-      parent.replaceChild(sup, el);
-      sup.appendChild(el);
-      replaceInEditor(cm, el, true, sup);
-      cm.execCommand('indentAuto');
-      uuids.push(uuid);
+      // the supplied element per selected element used to be created here
+      // this is moved to the next foreach loop
     }
+  }
+
+  // this loop iterates over the array of arrays of grouped ids
+  // and wraps the markup around a whole group
+  elementGroups.forEach((group) => {
+
+    let parent;
+    let sup = document.createElementNS(dutils.meiNameSpace, mElName);
+    let uuid;
+
+    let respId = document.getElementById('respSelect').value;
+    if (respId) sup.setAttribute('resp', '#' + respId);
+
+    for(let i = 0; i < group.length; i++) {
+      let id = group[i];
+      let el = v.xmlDoc.querySelector("[*|id='" + id + "']");
+      let currentParent = el.parentNode;
+      
+      // special treatment of the first element for id generation and to place sup within the tree (and a sanity check)
+      if(i === 0) {
+        uuid = mintSuppliedId(id, mElName);
+        sup.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid); 
+
+        currentParent.replaceChild(sup, el);
+        sup.appendChild(el);
+      }
+      else {
+        if(currentParent === parent) { 
+          sup.appendChild(el);
+        }
+        else {
+          //error
+        }
+      }
+      parent = currentParent;
+    }
+    replaceInEditor(cm, parent, true);
+    cm.execCommand('indentAuto');
+    uuids.push(uuid);
   });
+
   // buffer.groupChangesSinceCheckpoint(checkPoint); // TODO
   v.selectedElements = [];
   uuids.forEach((u) => v.selectedElements.push(u));
