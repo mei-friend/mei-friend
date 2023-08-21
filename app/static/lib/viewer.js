@@ -1858,7 +1858,8 @@ export default class Viewer {
         if (el.closest('respStmt')) {
           // only if inside a respStmt
           let id = el.getAttribute('xml:id');
-          rs.add(new Option(id, id, id === value ? true : false, id === value ? true : false));
+          let name = el.innerHTML;
+          rs.add(new Option(name, id, id === value ? true : false, id === value ? true : false));
         }
       });
     }
