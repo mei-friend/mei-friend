@@ -1033,6 +1033,126 @@ export function cleanAccid(v, cm) {
 }
 
 /**
+ *
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
+ * @param {boolean} change
+ */
+export function correctAccidGes(v, cm, change = false) {
+  let d = true;
+  v.allowCursorActivity = false;
+  v.loadXml(cm.getValue(), true); // force reload DOM
+
+  // define default key signatures per staff
+  let noStaves = v.xmlDoc.querySelector('scoreDef').querySelectorAll('staffDef').length;
+  let keySignatures = Array(noStaves).fill('0');
+  if (d) console.debug('correctAccidGes. ' + noStaves + ' staves defined.');
+
+  let count = 0;
+  let measureAccid = {}; // accidentals within a measure
+  let list = v.xmlDoc.querySelectorAll('[key\\.sig],keySig,measure,note');
+  list.forEach((e) => {
+    if (e.nodeName === 'scoreDef' && e.hasAttribute('key.sig')) {
+      // write @sig to all staves
+      let value = e.getAttribute('key.sig');
+      for (let k in keySignatures) keySignatures[k] = value;
+      if (d) console.debug('New key.sig in scoreDef: ' + value);
+    } else if (e.nodeName === 'staffDef' && e.hasAttribute('key.sig')) {
+      let n = parseInt(e.getAttribute('n'));
+      let value = e.getAttribute('key.sig');
+      if (n && n > 0 && n < keySignatures.length) keySignatures[n - 1] = value;
+      if (d) console.debug('New key.sig in staffDef(' + e.getAttribute('xml:id') + ', n=' + n + '): ' + value);
+    } else if (e.nodeName === 'keySig' && e.hasAttribute('sig')) {
+      let n = parseInt(e.closest('staffDef')?.getAttribute('n'));
+      let value = e.getAttribute('sig');
+      if (n && n > 0 && n < keySignatures.length) keySignatures[n - 1] = value;
+      if (d) console.debug('New keySig("' + e.getAttribute('xml:id') + '")@sig in staffDef(' + n + '): ' + value);
+    } else if (e.nodeName === 'measure') {
+      measureAccid = {};
+    } else if (e.nodeName === 'note') {
+      // find staff number for note
+      let staffNumber = parseInt(e.closest('staff')?.getAttribute('n'));
+      let pName = e.getAttribute('pname') || '';
+      let oct = e.getAttribute('oct') || '';
+      let value = keySignatures[staffNumber - 1];
+      let affectedNotes = []; // array of note names affected by keySig@sig or @key.sig
+      let accidCharacter = 'n'; // n, f, s
+      let splitS = value.split('s');
+      let splitF = value.split('f');
+      if (splitF.length > 1) {
+        accidCharacter = 'f';
+        affectedNotes = att.flats.slice(0, splitF[0]);
+      } else if (splitS.length > 1) {
+        accidCharacter = 's';
+        affectedNotes = att.sharps.slice(0, splitS[0]);
+      }
+      let accid = e.getAttribute('accid') || e.querySelector('[accid]')?.getAttribute('accid');
+      let accidGes = e.getAttribute('accid.ges') || e.querySelector('[accid\\.ges]')?.getAttribute('accid.ges') || 'n';
+
+      // TODO: check whether note in a tie
+      
+      if (
+        // check all accids having appeared in the current measure
+        !accid &&
+        (staffNumber in measureAccid &&
+        oct in measureAccid[staffNumber] &&
+        pName in measureAccid[staffNumber][oct] &&
+        measureAccid[staffNumber][oct][pName] !== accidGes)
+      ) {
+        console.debug(
+          ++count +
+            ' Measure ' +
+            e.closest('measure')?.getAttribute('n') +
+            ', Note ' +
+            e.getAttribute('xml:id') +
+            ' misses an accid.ges="' +
+            measureAccid[staffNumber][oct][pName] +
+            ', because it has been defined earlier in the measure."'
+        );
+        let a = 123;
+      } else if (affectedNotes.includes(pName)) {
+        // a note, affected by key signature, either has @accid inside or as a child or has @accid.ges inside or as a child
+        if (
+          accid ||
+          (accidGes === accidCharacter) ||
+          (staffNumber in measureAccid &&
+            oct in measureAccid[staffNumber] &&
+            pName in measureAccid[staffNumber][oct] &&
+            measureAccid[staffNumber][oct][pName] === accidGes)
+        ) {
+          // ok
+        } else {
+          console.debug(
+            ++count +
+              ' Measure ' +
+              e.closest('measure')?.getAttribute('n') +
+              ', Note ' +
+              e.getAttribute('xml:id') +
+              ' missing accid.ges="' +
+              accidCharacter +
+              '"'
+          );
+          let a = 123;
+        }
+      }
+
+      if (accid) {
+        if (!Object.hasOwn(measureAccid, staffNumber)) measureAccid[staffNumber] = {};
+        if (!Object.hasOwn(measureAccid[staffNumber], oct)) measureAccid[staffNumber][oct] = {};
+        if (!Object.hasOwn(measureAccid[staffNumber][oct], pName)) measureAccid[staffNumber][oct][pName] = {};
+        measureAccid[staffNumber][oct][pName] = accid;
+      }
+    }
+  });
+
+  v.allowCursorActivity = true;
+
+  function newMeasureAccid(noStaves = 1) {
+    return Array(noStaves).fill({});
+  }
+} // correctAccidGes()
+
+/**
  * Wrapper function for renumbering measure numberlike attribute (@n)
  * @param {Viewer} v
  * @param {CodeMirror} cm

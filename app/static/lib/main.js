@@ -1561,6 +1561,7 @@ export let cmd = {
   addSuppliedAccid: () => e.addSuppliedElement(v, cm, 'accid'),
   addSuppliedArtic: () => e.addSuppliedElement(v, cm, 'artic'),
   cleanAccid: () => e.cleanAccid(v, cm),
+  correctAccid: () => e.correctAccidGes(v, cm),
   renumberMeasuresTest: () => e.renumberMeasures(v, cm, false),
   renumberMeasures: () => e.renumberMeasures(v, cm, true),
   reRenderMei: () => v.reRenderMei(cm, false),

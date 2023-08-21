@@ -81,6 +81,10 @@ export const modelControlEvents = [
 // array of pitch names
 export const pnames = ['c', 'd', 'e', 'f', 'g', 'a', 'b'];
 
+// pitch names for sharps and flats, defined in keySig@sig or @key.sig
+export const sharps = ['f','c','g','d','a','e','b']
+export const flats = ['b','e','a','d','g','c','f']
+
 // according to Verovio 3.9's implementation of timeSpanningInterface()
 // better: att.startEndId and att.timestamp2.logical
 export const timeSpanningElements = [

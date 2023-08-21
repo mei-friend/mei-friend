@@ -93,6 +93,7 @@
     "cmd-shift-s": "downloadSpeedMei",
     "cmd-l": "generateUrl",
     "cmd-shift-c": "cleanAccid",
+    "cmd-shift-x": "correctAccid",
     "cmd-shift-r": "renumberMeasures",
     "cmd-?": "openHelp",
     "cmd-ß": "openHelp",
