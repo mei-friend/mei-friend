@@ -446,8 +446,8 @@ a:active {
   z-index: 12;
   left: 72px;
   top: 3px;
-  width: 480px;
-  margin-right: -480px;
+  width: 560px;
+  margin-right: -560px;
   max-height: 10.5em;
   padding: 2px;
   overflow-x: auto;
