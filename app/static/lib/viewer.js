@@ -1111,6 +1111,14 @@ export default class Viewer {
           checkedMarkup = document.getElementById('showMarkup').checked;
           setHighlightColorProperty('reg', checkedMarkup, value, true);
           break;
+        case 'addColor':
+          checkedMarkup = document.getElementById('showMarkup').checked;
+          setHighlightColorProperty('add', checkedMarkup, value, true);
+          break;
+        case 'delColor':
+          checkedMarkup = document.getElementById('showMarkup').checked;
+          setHighlightColorProperty('del', checkedMarkup, value, true);
+          break;
         case 'respSelect':
           if (this.xmlDoc)
             o.values = Array.from(this.xmlDoc.querySelectorAll('corpName[*|id]')).map((e) => e.getAttribute('xml:id'));
@@ -1351,6 +1359,12 @@ export default class Viewer {
             break;
           case 'regColor':
             setHighlightColorProperty('reg', checkedMarkup, document.getElementById(option).value, false);
+            break;
+          case 'addColor':
+            setHighlightColorProperty('add', checkedMarkup, document.getElementById(option).value, false);
+            break;
+          case 'delColor':
+            setHighlightColorProperty('del', checkedMarkup, document.getElementById(option).value, false);
             break;
           case 'respSelect':
             this.respId = document.getElementById('respSelect').value;

@@ -654,6 +654,18 @@ export const meiFriendSettingsOptions = {
     type: 'color',
     default: '#3300cc',
   },
+  addColor: {
+    title: 'Select <add> highlight color',
+    description: 'filled in by language packs',
+    type: 'color',
+    default: '#00cccc',
+  },
+  delColor: {
+    title: 'Select <del> highlight color',
+    description: 'filled in by language packs',
+    type: 'color',
+    default: '#8585ad',
+  },
   // dragLineSeparator: {
   //   title: 'options-line', // class name of hr element
   //   type: 'line'

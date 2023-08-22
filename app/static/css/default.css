@@ -24,6 +24,12 @@
   /* reg as blue purple */
   --defaultRegColor: #3300cc;
   --defaultRegHighlightedColor: #4000ff;
+  /* add in cyan */
+  --defaultAddColor: #00cccc;
+  --defaultAddHighlightedColor: #00ffff;
+  /* del as grey */
+  --defaultDelColor: #8585ad;
+  --defaultDelHighlightedColor: #a3a3c2;
   /* TODO use mdw blue */
   --defaultHighlightColor: #4e8bed;
   --defaultControlMenuBackgroundColor: lightgray;
@@ -73,6 +79,10 @@
   --origHighlightedColor: var(--defaultOrigHighlightedColor);
   --regColor: var(--defaultRegColor);
   --regHighlightedColor: var(--defaultRegHighlightedColor);
+  --addColor: var(--defaultAddColor);
+  --addHighlightedColor: var(--defaultAddHighlightedColor);
+  --delColor: var(--defaultDelColor);
+  --delHighlightedColor: var(--defaultDelHighlightedColor);
   --highlightColor: var(--defaultHighlightColor);
   --controlMenuBackgroundColor: var(--defaultControlMenuBackgroundColor);
   --navbarBackgroundColor: var(--defaultNavbarBackgroundColor);
@@ -1006,6 +1016,36 @@ svg text {
 
 #verovioContainer g.reg g.highlighted {
   fill: var(--regHighlightedColor);
+}
+
+#verovioContainer g.add g {
+  fill: var(--addColor);
+  color: var(--addColor);
+  stroke: var(--addColor);
+}
+
+#verovioContainer .add .highlighted {
+  color: var(--addHighlightedColor);
+  stroke: var(--addHighlightedColor);
+}
+
+#verovioContainer g.add g.highlighted {
+  fill: var(--addHighlightedColor);
+}
+
+#verovioContainer g.del g {
+  fill: var(--delColor);
+  color: var(--delColor);
+  stroke: var(--delColor);
+}
+
+#verovioContainer .del .highlighted {
+  color: var(--delHighlightedColor);
+  stroke: var(--delHighlightedColor);
+}
+
+#verovioContainer g.del g.highlighted {
+  fill: var(--delHighlightedColor);
 }
 
 #verovioContainer g {
