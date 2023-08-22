@@ -424,16 +424,21 @@ a:active {
 
 #codeChecker {
   min-width: 12em;
-  min-height: 12em;
+  min-height: 8em;
+  max-height: 10em;
   display: none;
   padding: 2px;
   overflow-x: auto;
   overflow-y: scroll;
   color: var(--textColor);
-  /* background-color: var(--settingsBackgroundColor); */
+  background-color: var(--settingsBackgroundColor);
   border: 2px solid var(--settingsBackgroundAlternativeColor);
   border-radius: 4px;
   font-family: monospace;
+}
+
+#codeChecker :nth-child(odd) {
+  background: var(--settingsBackgroundAlternativeColor);
 }
 
 #validation-status {

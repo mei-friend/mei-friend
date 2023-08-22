@@ -1039,8 +1039,8 @@ export function cleanAccid(v, cm) {
  * @param {boolean} change
  */
 export function correctAccidGes(v, cm, change = false) {
-  v.clearCodeCheckerPanel();
-  
+  v.initCodeCheckerPanel();
+
   let d = true;
   v.allowCursorActivity = false;
   v.loadXml(cm.getValue(), true); // force reload DOM
@@ -1062,7 +1062,7 @@ export function correctAccidGes(v, cm, change = false) {
   });
 
   let count = 0;
-  let measureAccid = {}; // accidentals within a measure
+  let measureAccids = {}; // accidentals within a measure
   let list = v.xmlDoc.querySelectorAll('[key\\.sig],keySig,measure,note');
   list.forEach((e) => {
     if (e.nodeName === 'scoreDef' && e.hasAttribute('key.sig')) {
@@ -1081,112 +1081,175 @@ export function correctAccidGes(v, cm, change = false) {
       if (n && n > 0 && n < keySignatures.length) keySignatures[n - 1] = value;
       if (d) console.debug('New keySig("' + e.getAttribute('xml:id') + '")@sig in staffDef(' + n + '): ' + value);
     } else if (e.nodeName === 'measure') {
-      measureAccid = {};
+      measureAccids = {};
     } else if (e.nodeName === 'note') {
-      let xmlId = e.getAttribute('xml:id') || '';
+      let data = {};
+      data.xmlId = e.getAttribute('xml:id') || '';
+      data.measure = e.closest('measure')?.getAttribute('n') || '';
       // find staff number for note
       let staffNumber = parseInt(e.closest('staff')?.getAttribute('n'));
       let pName = e.getAttribute('pname') || '';
       let oct = e.getAttribute('oct') || '';
       let value = keySignatures[staffNumber - 1];
       let affectedNotes = []; // array of note names affected by keySig@sig or @key.sig
-      let accidCharacter = 'n'; // n, f, s
+      data.keySigAccid = 'n'; // n, f, s
       let splitS = value.split('s');
       let splitF = value.split('f');
       if (splitF.length > 1) {
-        accidCharacter = 'f';
+        data.keySigAccid = 'f';
         affectedNotes = att.flats.slice(0, splitF[0]);
       } else if (splitS.length > 1) {
-        accidCharacter = 's';
+        data.keySigAccid = 's';
         affectedNotes = att.sharps.slice(0, splitS[0]);
       }
       let accid = e.getAttribute('accid') || e.querySelector('[accid]')?.getAttribute('accid');
       let accidGes = e.getAttribute('accid.ges') || e.querySelector('[accid\\.ges]')?.getAttribute('accid.ges') || 'n';
 
-      if (xmlId && xmlId in ties) {
+      // TODO: make logic simpler
+      
+      if (data.xmlId && data.xmlId in ties) {
         // Check whether note tied by starting note
-        let startingNote = v.xmlDoc.querySelector('[*|id=' + ties[xmlId] + ']');
-        if (pName !== startingNote.getAttribute('pname'))
-          console.log(
-            'Tied note ' +
-              xmlId +
-              ': ' +
-              pName +
-              ' not same pitch name as ' +
-              ties[xmlId] +
-              ': ' +
-              startingNote.getAttribute('pname')
-          );
-        if (oct !== startingNote.getAttribute('oct'))
-          console.log('Tied note ' + xmlId + ' not same octave number as ' + ties[xmlId]);
+        let startingNote = v.xmlDoc.querySelector('[*|id=' + ties[data.xmlId] + ']');
+        if (pName !== startingNote.getAttribute('pname')) {
+          data.html =
+            ++count +
+            ' Measure ' +
+            data.measure +
+            ' Tied note ' +
+            data.xmlId +
+            ': ' +
+            pName +
+            ' not same pitch name as ' +
+            ties[data.xmlId] +
+            ': ' +
+            startingNote.getAttribute('pname');
+          v.addCodeCheckerEntry(data);
+          console.log(data.html);
+        }
+        if (oct !== startingNote.getAttribute('oct')) {
+          data.html =
+            ++count +
+            ' Measure ' +
+            data.measure +
+            ' Tied note ' +
+            data.xmlId +
+            ' not same octave number as ' +
+            ties[data.xmlId];
+          v.addCodeCheckerEntry(data);
+          console.log(data.html);
+        }
         let startingAccid =
           startingNote.getAttribute('accid') ||
           startingNote.querySelector('[accid]')?.getAttribute('accid') ||
           startingNote.getAttribute('accid.ges') ||
           startingNote.querySelector('[accid\\.ges]')?.getAttribute('accid.ges') ||
           'n';
-        if ((accid || accidGes) !== startingAccid)
-          console.log(
-            'Tied note ' +
-              xmlId +
-              ': ' +
-              (accid || accidGes) +
-              ' not same accid as in ' +
-              ties[xmlId] +
-              ': ' +
-              startingAccid
-          );
+        if ((accid || accidGes) !== startingAccid) {
+          data.html =
+            ++count +
+            ' Measure ' +
+            data.measure +
+            ' Tied note ' +
+            data.xmlId +
+            ': ' +
+            (accid || accidGes) +
+            ' not same accid as in ' +
+            ties[data.xmlId] +
+            ': ' +
+            startingAccid;
+          v.addCodeCheckerEntry(data);
+          console.log(data.html);
+        }
         let a = 1234;
       } else if (
         // check all accids having appeared in the current measure
         !accid &&
-        staffNumber in measureAccid &&
-        oct in measureAccid[staffNumber] &&
-        pName in measureAccid[staffNumber][oct] &&
-        measureAccid[staffNumber][oct][pName] !== accidGes
+        staffNumber in measureAccids &&
+        oct in measureAccids[staffNumber] &&
+        pName in measureAccids[staffNumber][oct] &&
+        measureAccids[staffNumber][oct][pName] !== accidGes
       ) {
-        console.debug(
+        data.measureAccid = measureAccids[staffNumber][oct][pName];
+        data.html =
           ++count +
-            ' Measure ' +
-            e.closest('measure')?.getAttribute('n') +
-            ', Note ' +
-            e.getAttribute('xml:id') +
-            ' misses an accid.ges="' +
-            measureAccid[staffNumber][oct][pName] +
-            ', because it has been defined earlier in the measure."'
-        );
+          ' Measure ' +
+          data.measure +
+          ', Note ' +
+          data.xmlId +
+          ' lacks an accid.ges="' +
+          data.measureAccid +
+          ', because it has been defined earlier in the measure."';
+        data.correct = () => {
+          e.setAttribute('accid.ges', data.measureAccid);
+          replaceInEditor(cm, e, true);
+        };
+        v.addCodeCheckerEntry(data);
+        console.debug(data.html);
         let a = 123;
       } else if (affectedNotes.includes(pName)) {
         // a note, affected by key signature, either has @accid inside or as a child or has @accid.ges inside or as a child
         if (
           !accid &&
-          accidGes !== accidCharacter &&
+          accidGes !== data.keySigAccid &&
           !(
-            staffNumber in measureAccid &&
-            oct in measureAccid[staffNumber] &&
-            pName in measureAccid[staffNumber][oct] &&
-            measureAccid[staffNumber][oct][pName] === accidGes
+            staffNumber in measureAccids &&
+            oct in measureAccids[staffNumber] &&
+            pName in measureAccids[staffNumber][oct] &&
+            measureAccids[staffNumber][oct][pName] === accidGes
           )
         ) {
-          console.debug(
+          data.html =
             ++count +
-              ' Measure ' +
-              e.closest('measure')?.getAttribute('n') +
-              ', Note ' +
-              e.getAttribute('xml:id') +
-              ' missing accid.ges="' +
-              accidCharacter +
-              '"'
-          );
+            ' Measure ' +
+            data.measure +
+            ', Note ' +
+            data.xmlId +
+            ' lacks an accid.ges="' +
+            data.keySigAccid +
+            '"';
+          data.correct = () => {
+            e.setAttribute('accid.ges', data.keySigAccid);
+            replaceInEditor(cm, e, true);
+          };
+          v.addCodeCheckerEntry(data);
+          console.debug(data.html);
           let a = 123;
         }
+      } else if (
+        // Check if there is an accid.ges
+        // that has not been defined in keySig
+        // or earlier in the measure
+        !affectedNotes.includes(pName) &&
+        !accid &&
+        !(
+          staffNumber in measureAccids &&
+          oct in measureAccids[staffNumber] &&
+          pName in measureAccids[staffNumber][oct] &&
+          measureAccids[staffNumber][oct][pName] === accidGes
+        ) &&
+        accidGes !== 'n'
+      ) {
+        data.html =
+          ++count +
+          ' Measure ' +
+          data.measure +
+          ', Note ' +
+          data.xmlId +
+          ' has superfluous accid.ges="' +
+          accidGes +
+          '"';
+        data.correct = () => {
+          e.removeAttribute('accid.ges', accidGes);
+          replaceInEditor(cm, e, true);
+        };
+        v.addCodeCheckerEntry(data);
+        console.debug(data.html);
       }
-
       if (accid) {
-        if (!Object.hasOwn(measureAccid, staffNumber)) measureAccid[staffNumber] = {};
-        if (!Object.hasOwn(measureAccid[staffNumber], oct)) measureAccid[staffNumber][oct] = {};
-        if (!Object.hasOwn(measureAccid[staffNumber][oct], pName)) measureAccid[staffNumber][oct][pName] = {};
-        measureAccid[staffNumber][oct][pName] = accid;
+        if (!Object.hasOwn(measureAccids, staffNumber)) measureAccids[staffNumber] = {};
+        if (!Object.hasOwn(measureAccids[staffNumber], oct)) measureAccids[staffNumber][oct] = {};
+        if (!Object.hasOwn(measureAccids[staffNumber][oct], pName)) measureAccids[staffNumber][oct][pName] = {};
+        measureAccids[staffNumber][oct][pName] = accid;
       }
     }
   });

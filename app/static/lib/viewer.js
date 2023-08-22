@@ -2402,7 +2402,7 @@ export default class Viewer {
       messages.forEach((m, i) => {
         let p = document.createElement('div');
         p.classList.add('validation-item');
-        p.id = 'error' + i;
+        p.id = 'validationError' + i;
         p.innerHTML = 'Line ' + m.line + ': ' + m.message;
         p.addEventListener('click', (ev) => {
           cm.scrollIntoView({
@@ -2451,7 +2451,7 @@ export default class Viewer {
     }
   } // toggleValidationReportVisibility()
 
-  clearCodeCheckerPanel() {
+  initCodeCheckerPanel() {
     let codeChecker = document.getElementById('codeChecker');
     if (!codeChecker) return;
     codeChecker.innerHTML = '';
@@ -2469,7 +2469,25 @@ export default class Viewer {
 
     let p = document.createElement('div');
     p.classList.add('validation-title');
-    p.innerHTML = '<p>Code Checker</p>';
+    p.innerHTML = 'Code Checker';
     codeChecker.appendChild(p);
+  } // initCodeCheckerPanel()
+
+  addCodeCheckerEntry(data) {
+    let codeChecker = document.getElementById('codeChecker');
+    if (!codeChecker) return;
+    let div = document.createElement('div');
+    div.classList.add('validation-item');
+    div.innerHTML = data.html;
+    div.addEventListener('click', (ev) => {
+      utils.setCursorToId(cm, data.xmlId);
+    });
+    if (data.correct) {
+      let button = document.createElement('button');
+      button.innerHTML = 'Fix';
+      button.addEventListener('click', data.correct);
+      div.appendChild(button);
+    }
+    codeChecker.appendChild(div);
   }
 } // class Viewer
