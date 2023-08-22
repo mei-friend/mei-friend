@@ -2184,7 +2184,7 @@ export default class Viewer {
     //else {
     // console.log('Validation: same schema.');
     //}
-  }
+  } // checkSchema()
 
   // Loads and replaces XML schema; throws errors if not found/CORS error,
   // update validation-status icon
@@ -2357,7 +2357,10 @@ export default class Viewer {
     let vs = document.getElementById('validation-status');
     vs.querySelector('svg').classList.remove('clockwise');
     let reportDiv = document.getElementById('validation-report');
-    if (reportDiv) reportDiv.innerHTML = '';
+    if (reportDiv) {
+      reportDiv.innerHTML = '';
+      reportDiv.style.visibility = 'hidden';
+    }
 
     let msg = '';
     if (found.length === 0 && this.validatorWithSchema) {
