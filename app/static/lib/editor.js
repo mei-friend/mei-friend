@@ -1039,6 +1039,8 @@ export function cleanAccid(v, cm) {
  * @param {boolean} change
  */
 export function correctAccidGes(v, cm, change = false) {
+  v.clearCodeCheckerPanel();
+  
   let d = true;
   v.allowCursorActivity = false;
   v.loadXml(cm.getValue(), true); // force reload DOM

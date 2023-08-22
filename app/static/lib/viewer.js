@@ -2380,7 +2380,7 @@ export default class Viewer {
         reportDiv.id = 'validation-report';
         reportDiv.classList.add('validation-report');
         let CM = document.querySelector('.CodeMirror');
-        CM.parentElement.insertBefore(reportDiv, CM);
+        CM.parentElement?.appendChild(reportDiv);
       } else {
         reportDiv.style.visibility = 'visible';
       }
@@ -2450,4 +2450,26 @@ export default class Viewer {
       }
     }
   } // toggleValidationReportVisibility()
+
+  clearCodeCheckerPanel() {
+    let codeChecker = document.getElementById('codeChecker');
+    if (!codeChecker) return;
+    codeChecker.innerHTML = '';
+    codeChecker.style.display = 'block';
+    setOrientation(cm, '', '', this);
+
+    let closeButton = document.createElement('span');
+    closeButton.classList.add('rightButton');
+    closeButton.innerHTML = '&times';
+    closeButton.addEventListener('click', (ev) => {
+      codeChecker.style.display = 'none';
+      setOrientation(cm, '', '', this);
+    });
+    codeChecker.appendChild(closeButton);
+
+    let p = document.createElement('div');
+    p.classList.add('validation-title');
+    p.innerHTML = '<p>Code Checker</p>';
+    codeChecker.appendChild(p);
+  }
 } // class Viewer

@@ -415,11 +415,30 @@ a:active {
   justify-content: center;
 }
 
-/* #encoding {} */
+#encoding {
+  display: flex;
+  justify-content: left;
+  flex-direction: column;
+  position: relative;
+}
+
+#codeChecker {
+  min-width: 12em;
+  min-height: 12em;
+  display: none;
+  padding: 2px;
+  overflow-x: auto;
+  overflow-y: scroll;
+  color: var(--textColor);
+  /* background-color: var(--settingsBackgroundColor); */
+  border: 2px solid var(--settingsBackgroundAlternativeColor);
+  border-radius: 4px;
+  font-family: monospace;
+}
 
 #validation-status {
   z-index: 5;
-  position: relative;
+  position: absolute;
   width: 3.5em;
   margin-right: -3.5em;
   height: 1.2em;
@@ -442,7 +461,7 @@ a:active {
 .validation-report {
   font-size: 90%;
   display: block;
-  position: relative;
+  position: absolute;
   z-index: 12;
   left: 72px;
   top: 3px;
