@@ -86,7 +86,7 @@ export const lang = {
   staffDownText: { text: 'Element 1 pauta avall' },
   increaseDurText: { text: 'Augmenta duració' },
   decreaseDurText: { text: 'Disminueix duració' },
-  cleanAccidText: { text: 'Neteja @accid.ges' },
+  cleanAccidText: { text: 'Verificar @accid.ges' },
   renumberMeasuresTestText: { text: 'Reenumera mesures (prova)' },
   renumberMeasuresExecText: { text: 'Reenumera mesures (execució)' },
   addIdsText: { text: 'Afegeix IDs a MEI' },

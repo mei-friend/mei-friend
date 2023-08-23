@@ -86,7 +86,7 @@ export const lang = {
   staffDownText: { text: 'Element 1 staff down' },
   increaseDurText: { text: 'Increase duration' },
   decreaseDurText: { text: 'Decrease duration' },
-  cleanAccidText: { text: 'Clean @accid.ges' },
+  cleanAccidText: { text: 'Check @accid.ges' },
   renumberMeasuresTestText: { text: ' Renumber measures (test)' },
   renumberMeasuresExecText: { text: ' Renumber measures (exec)' },
   addIdsText: { text: 'Add ids to MEI' },

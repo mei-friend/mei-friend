@@ -1041,7 +1041,7 @@ export function cleanAccid(v, cm) {
  * @param {boolean} change
  */
 export function correctAccidGes(v, cm, change = false) {
-  v.initCodeCheckerPanel('Check @accid Attributes');
+  v.initCodeCheckerPanel('Check @accid.ges Attributes (against key signature, measure-wise accids, and ties).');
 
   let d = true;
   v.allowCursorActivity = false;

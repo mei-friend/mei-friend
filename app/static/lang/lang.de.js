@@ -83,7 +83,7 @@ export const lang = {
   staffDownText: { text: 'Element eine Notenzeile niedriger' },
   increaseDurText: { text: 'Notendauer erhöhen' },
   decreaseDurText: { text: 'Notendauer verringern' },
-  cleanAccidText: { text: '@accid.ges putzen' },
+  cleanAccidText: { text: '@accid.ges überprüfen' },
   renumberMeasuresTestText: { text: ' Takte neu nummerieren (test)' },
   renumberMeasuresExecText: { text: ' Takte neu nummerieren (exec)' },
   addIdsText: { text: 'Ids zu MEI hinzufügen' },
