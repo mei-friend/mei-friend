@@ -1,5 +1,7 @@
 # mei-friend-online CHANGELOG.md
 
+### 0.10.4
+* Add UI panel to editor to check and interactively fix all @accid.ges against key signature, measure accids, ties, and doubled information.
 ### 0.10.3 Expansion support for MIDI playback
 * Add drop-down GUI element to MIDI toolbar to select expansion element from encoding
 * Support for MIDI playback of selected expansion element (for handling repeated sections)
