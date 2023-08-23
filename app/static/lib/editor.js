@@ -1106,7 +1106,7 @@ export function correctAccidGes(v, cm, change = false) {
       let accidGes = e.getAttribute('accid.ges') || e.querySelector('[accid\\.ges]')?.getAttribute('accid.ges') || 'n';
 
       // TODO: make logic simpler
-      
+
       if (data.xmlId && data.xmlId in ties) {
         // Check whether note tied by starting note
         let startingNote = v.xmlDoc.querySelector('[*|id=' + ties[data.xmlId] + ']');
@@ -1151,12 +1151,16 @@ export function correctAccidGes(v, cm, change = false) {
             data.measure +
             ' Tied note ' +
             data.xmlId +
-            ': ' +
+            ': accid ' +
             (accid || accidGes) +
-            ' not same accid as in ' +
+            ' not same accid as in starting note ' +
             ties[data.xmlId] +
             ': ' +
             startingAccid;
+          data.correct = () => {
+            e.setAttribute('accid.ges', accid || accidGes);
+            replaceInEditor(cm, e, true);
+          };
           v.addCodeCheckerEntry(data);
           console.log(data.html);
         }

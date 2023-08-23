@@ -34,6 +34,7 @@ import {
   platform,
   supportedVerovioVersions,
 } from './defaults.js';
+import * as icon from './../css/icons.js';
 
 export default class Viewer {
   constructor(vrvWorker, spdWorker) {
@@ -2461,16 +2462,30 @@ export default class Viewer {
     let closeButton = document.createElement('span');
     closeButton.classList.add('rightButton');
     closeButton.innerHTML = '&times';
-    closeButton.addEventListener('click', (ev) => {
+    closeButton.addEventListener('click', () => {
       codeChecker.style.display = 'none';
       setOrientation(cm, '', '', this);
     });
     codeChecker.appendChild(closeButton);
 
-    let p = document.createElement('div');
-    p.classList.add('validation-title');
-    p.innerHTML = 'Code Checker';
-    codeChecker.appendChild(p);
+    let headerDiv = document.createElement('div');
+    headerDiv.classList.add('validation-title');
+    headerDiv.innerHTML = 'Code Checker';
+    codeChecker.appendChild(headerDiv);
+
+    // Correct/Fix all
+    let correctAllButton = document.createElement('button');
+    correctAllButton.innerHTML = 'Fix all';
+    correctAllButton.classList.add('btn');
+    correctAllButton.addEventListener('click', () => {
+      codeChecker.childNodes.forEach((ch) => {
+        if (ch.classList.contains('validation-item')) {
+          let button = ch.querySelector('button');
+          if (!button.disabled) button.click();
+        }
+      });
+    });
+    headerDiv.appendChild(correctAllButton);
   } // initCodeCheckerPanel()
 
   addCodeCheckerEntry(data) {
@@ -2478,16 +2493,55 @@ export default class Viewer {
     if (!codeChecker) return;
     let div = document.createElement('div');
     div.classList.add('validation-item');
-    div.innerHTML = data.html;
-    div.addEventListener('click', (ev) => {
+
+    // span for message
+    let span = document.createElement('span');
+    span.classList.add('codeCheckerMessage');
+    span.innerHTML = data.html;
+    span.addEventListener('click', (ev) => {
       utils.setCursorToId(cm, data.xmlId);
     });
+    div.appendChild(span);
+
+    // function to correct error
     if (data.correct) {
-      let button = document.createElement('button');
-      button.innerHTML = 'Fix';
-      button.addEventListener('click', data.correct);
-      div.appendChild(button);
+      // Correct/Fix Button
+      let correctButton = document.createElement('button');
+      correctButton.innerHTML = 'Fix';
+      correctButton.classList.add('btn');
+      correctButton.addEventListener('click', () => {
+        data.correct();
+        let checked = document.createElement('span');
+        checked.innerHTML = icon.check;
+        div.appendChild(checked);
+        correctButton.disabled = true;
+        correctButton.classList.add('disabled');
+        ignoreButton.disabled = true;
+        ignoreButton.classList.add('disabled');
+      });
+      div.appendChild(correctButton);
+
+      // Ignore Button
+      let ignoreButton = document.createElement('button');
+      ignoreButton.innerHTML = 'Ignore';
+      ignoreButton.classList.add('btn');
+      ignoreButton.addEventListener('click', () => {
+        // correctButton.removeEventListener('click', data.correct);
+        if (!span.classList.contains('strikethrough')) {
+          // active, not stroke through
+          correctButton.disabled = true;
+          correctButton.classList.add('disabled');
+          span.disabled = true;
+          span.classList.add('strikethrough');
+        } else {
+          correctButton.disabled = false;
+          correctButton.classList.remove('disabled');
+          span.disabled = false;
+          span.classList.remove('strikethrough');
+        }
+      });
+      div.appendChild(ignoreButton);
     }
     codeChecker.appendChild(div);
-  }
+  } // addCodeCheckerEntry()
 } // class Viewer
