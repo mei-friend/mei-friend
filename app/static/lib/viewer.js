@@ -2452,7 +2452,13 @@ export default class Viewer {
     }
   } // toggleValidationReportVisibility()
 
-  initCodeCheckerPanel() {
+  /**
+   * Initializes and shows code checker panel below the CodeMirror encoding.
+   * codeCheckerEntries to be added through addCodeCheckerEntry(data).
+   * @param {string} title
+   * @returns
+   */
+  initCodeCheckerPanel(title = 'Code Checker') {
     let codeChecker = document.getElementById('codeChecker');
     if (!codeChecker) return;
     codeChecker.innerHTML = '';
@@ -2470,7 +2476,7 @@ export default class Viewer {
 
     let headerDiv = document.createElement('div');
     headerDiv.classList.add('validation-title');
-    headerDiv.innerHTML = 'Code Checker';
+    headerDiv.innerHTML = title;
     codeChecker.appendChild(headerDiv);
 
     // Correct/Fix all
@@ -2480,14 +2486,33 @@ export default class Viewer {
     correctAllButton.addEventListener('click', () => {
       codeChecker.childNodes.forEach((ch) => {
         if (ch.classList.contains('validation-item')) {
-          let button = ch.querySelector('button');
+          let button = ch.querySelector('button.fix');
           if (!button.disabled) button.click();
         }
       });
     });
     headerDiv.appendChild(correctAllButton);
+
+    let ignoreAllButon = document.createElement('button');
+    ignoreAllButon.innerHTML = 'Ignore all';
+    ignoreAllButon.classList.add('btn');
+    ignoreAllButon.addEventListener('click', () => {
+      codeChecker.childNodes.forEach((ch) => {
+        if (ch.classList.contains('validation-item')) {
+          let button = ch.querySelector('button.ignore');
+          if (!button.disabled) button.click();
+        }
+      });
+    });
+    headerDiv.appendChild(ignoreAllButon);
   } // initCodeCheckerPanel()
 
+  /**
+   * Adds an entry to the code checker panel with a data structure,
+   * containing also the fix callback
+   * @param {Object} data
+   * @returns
+   */
   addCodeCheckerEntry(data) {
     let codeChecker = document.getElementById('codeChecker');
     if (!codeChecker) return;
@@ -2509,6 +2534,7 @@ export default class Viewer {
       let correctButton = document.createElement('button');
       correctButton.innerHTML = 'Fix';
       correctButton.classList.add('btn');
+      correctButton.classList.add('fix');
       correctButton.addEventListener('click', () => {
         data.correct();
         let checked = document.createElement('span');
@@ -2525,6 +2551,7 @@ export default class Viewer {
       let ignoreButton = document.createElement('button');
       ignoreButton.innerHTML = 'Ignore';
       ignoreButton.classList.add('btn');
+      ignoreButton.classList.add('ignore');
       ignoreButton.addEventListener('click', () => {
         // correctButton.removeEventListener('click', data.correct);
         if (!span.classList.contains('strikethrough')) {

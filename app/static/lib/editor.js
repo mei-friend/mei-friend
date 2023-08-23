@@ -1039,7 +1039,7 @@ export function cleanAccid(v, cm) {
  * @param {boolean} change
  */
 export function correctAccidGes(v, cm, change = false) {
-  v.initCodeCheckerPanel();
+  v.initCodeCheckerPanel('Check @accid Attributes');
 
   let d = true;
   v.allowCursorActivity = false;
