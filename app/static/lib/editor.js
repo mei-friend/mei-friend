@@ -1200,7 +1200,7 @@ export function correctAccidGes(v, cm, change = false) {
             ': ' +
             startingAccid;
           data.correct = () => {
-            e.setAttribute('accid.ges', accid || accidGes);
+            e.setAttribute('accid.ges', startingAccid);
             replaceInEditor(cm, e, true);
           };
           v.addCodeCheckerEntry(data);
@@ -1273,7 +1273,7 @@ export function correctAccidGes(v, cm, change = false) {
           pName in measureAccids[staffNumber][oct] &&
           measureAccids[staffNumber][oct][pName] === accidGes
         ) &&
-        accidGes !== 'n' 
+        accidGes !== 'n'
       ) {
         data.html =
           ++count +

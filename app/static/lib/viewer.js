@@ -2487,7 +2487,7 @@ export default class Viewer {
       codeChecker.childNodes.forEach((ch) => {
         if (ch.classList.contains('validation-item')) {
           let button = ch.querySelector('button.fix');
-          if (!button.disabled) button.click();
+          if (button && !button.disabled) button.click();
         }
       });
     });
@@ -2500,7 +2500,7 @@ export default class Viewer {
       codeChecker.childNodes.forEach((ch) => {
         if (ch.classList.contains('validation-item')) {
           let button = ch.querySelector('button.ignore');
-          if (!button.disabled) button.click();
+          if (button && !button.disabled) button.click();
         }
       });
     });
