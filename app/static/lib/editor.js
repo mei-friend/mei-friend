@@ -1033,7 +1033,9 @@ export function cleanAccid(v, cm) {
 }
 
 /**
- *
+ * Checks accid/accid.ges attributes of all notes against
+ * keySig/key.sig information and measure-wise accidentals,
+ * finds instances of double accid & accid.ges.
  * @param {Viewer} v
  * @param {CodeMirror} cm
  * @param {boolean} change
@@ -1062,27 +1064,31 @@ export function correctAccidGes(v, cm, change = false) {
   });
 
   let count = 0;
-  let measureAccids = {}; // accidentals within a measure
+  let measureAccids = {}; // accidentals within a measure[staff][oct][pname]
   let list = v.xmlDoc.querySelectorAll('[key\\.sig],keySig,measure,note');
   list.forEach((e) => {
     if (e.nodeName === 'scoreDef' && e.hasAttribute('key.sig')) {
-      // write @sig to all staves
+      // key.sig inside scoreDef: write @sig to all staves
       let value = e.getAttribute('key.sig');
       for (let k in keySignatures) keySignatures[k] = value;
       if (d) console.debug('New key.sig in scoreDef: ' + value);
     } else if (e.nodeName === 'staffDef' && e.hasAttribute('key.sig')) {
+      // key.sig inside staffDef: write @sig to that staff
       let n = parseInt(e.getAttribute('n'));
       let value = e.getAttribute('key.sig');
       if (n && n > 0 && n < keySignatures.length) keySignatures[n - 1] = value;
       if (d) console.debug('New key.sig in staffDef(' + e.getAttribute('xml:id') + ', n=' + n + '): ' + value);
     } else if (e.nodeName === 'keySig' && e.hasAttribute('sig')) {
+      // keySig element in a staffDef
       let n = parseInt(e.closest('staffDef')?.getAttribute('n'));
       let value = e.getAttribute('sig');
       if (n && n > 0 && n < keySignatures.length) keySignatures[n - 1] = value;
       if (d) console.debug('New keySig("' + e.getAttribute('xml:id') + '")@sig in staffDef(' + n + '): ' + value);
     } else if (e.nodeName === 'measure') {
+      // clear measureAccids object
       measureAccids = {};
     } else if (e.nodeName === 'note') {
+      // found a note to check!
       let data = {};
       data.xmlId = e.getAttribute('xml:id') || '';
       data.measure = e.closest('measure')?.getAttribute('n') || '';
@@ -1103,7 +1109,43 @@ export function correctAccidGes(v, cm, change = false) {
         affectedNotes = att.sharps.slice(0, splitS[0]);
       }
       let accid = e.getAttribute('accid') || e.querySelector('[accid]')?.getAttribute('accid');
-      let accidGes = e.getAttribute('accid.ges') || e.querySelector('[accid\\.ges]')?.getAttribute('accid.ges') || 'n';
+      let accidGes = e.getAttribute('accid.ges') || e.querySelector('[accid\\.ges]')?.getAttribute('accid.ges');
+
+      // find doubled accid/accid.ges information
+      if (accid && accidGes) {
+        if (accid === accidGes) {
+          // remove @accid.ges
+          data.html =
+            ++count +
+            ' Measure ' +
+            data.measure +
+            ', Note ' +
+            data.xmlId +
+            ' has both accid and accid.ges="' +
+            accid +
+            '". Remove accid.ges. ';
+          data.correct = () => {
+            e.removeAttribute('accid.ges');
+            replaceInEditor(cm, e, true);
+          };
+        } else {
+          data.html =
+            ++count +
+            ' Measure ' +
+            data.measure +
+            ', Note ' +
+            data.xmlId +
+            ' has both accid="' +
+            accid +
+            '" and accid.ges="' +
+            accidGes +
+            '" with different content. To be handled manually.';
+          data.correct = null;
+        }
+        v.addCodeCheckerEntry(data);
+      }
+
+      accidGes = e.getAttribute('accid.ges') || e.querySelector('[accid\\.ges]')?.getAttribute('accid.ges') || 'n';
 
       // TODO: make logic simpler
 
@@ -1182,7 +1224,7 @@ export function correctAccidGes(v, cm, change = false) {
           data.xmlId +
           ' lacks an accid.ges="' +
           data.measureAccid +
-          ', because it has been defined earlier in the measure."';
+          '", because it has been defined earlier in the measure.';
         data.correct = () => {
           e.setAttribute('accid.ges', data.measureAccid);
           replaceInEditor(cm, e, true);
@@ -1231,7 +1273,7 @@ export function correctAccidGes(v, cm, change = false) {
           pName in measureAccids[staffNumber][oct] &&
           measureAccids[staffNumber][oct][pName] === accidGes
         ) &&
-        accidGes !== 'n'
+        accidGes !== 'n' 
       ) {
         data.html =
           ++count +
@@ -1243,7 +1285,7 @@ export function correctAccidGes(v, cm, change = false) {
           accidGes +
           '"';
         data.correct = () => {
-          e.removeAttribute('accid.ges', accidGes);
+          e.removeAttribute('accid.ges');
           replaceInEditor(cm, e, true);
         };
         v.addCodeCheckerEntry(data);
