@@ -1100,6 +1100,28 @@ export async function populateSolidTab() {
     });
   } else {
     solidTab.innerHTML = populateLoggedOutSolidTab();
+    // add event listeners
+    const provider = document.getElementById("providerSelect");
+    provider.addEventListener('input', (e) => {
+      let customSolidIdP = document.getElementById("customSolidIdP");
+      switch(e.target.value) { 
+        case "other": 
+          customSolidIdP.value = "";
+          break;
+        default:
+          customSolidIdP.value = e.target.value;
+      }
+    });
+    const customSolidIdP = document.getElementById("customSolidIdP");
+    customSolidIdP.addEventListener('input', (e) => { 
+      let providerSelect = document.getElementById("providerSelect");
+      providerSelect.value = "other";
+    });
+    customSolidIdP.addEventListener('click', (e) => { 
+      if(e.target.value === "") { 
+        e.target.value = "https://"
+      }
+    })
     document.getElementById('solidLogin').addEventListener('click', () => {
       loginAndFetch(getSolidIdP(), populateSolidTab);
     });
@@ -1151,24 +1173,21 @@ function populateLoggedOutSolidTab() {
     <option value="https://solidcommunity.net">SolidCommunity.net</option>
     <option value="https://login.inrupt.net">Inrupt</option>
     <option value="https://trompa-solid.upf.edu">TROMPA @ UPF</option>
-    <option value="other">Other...</option>
+    <option value="other" selected>Other...</option>
   `;
-  provider.addEventListener("change", (e) => {
-    let customSolidIdP = document.getElementById("#customSolidIdP");
-    customSolidIdP.style.display = e.value === "other" ? 
-      "block" : "none";
-  })
   provider.title = translator.lang.solidProvider.description;
   let customSolidIdP = document.createElement("input");
   customSolidIdP.type = "text";
   customSolidIdP.placeholder = "https://...";
   customSolidIdP.id = "customSolidIdP";
-  providerContainer.insertAdjacentElement('afterbegin', provider);
+  customSolidIdP.setAttribute('size', '17');
   let solidLoginBtn = document.createElement('button');
   solidLoginBtn.innerHTML = translator.lang.solidLoginBtn.text;
   solidLoginBtn.id = 'solidLogin';
   solidLoginBtn.title = translator.lang.solidExplanation.description;
-  providerContainer.insertAdjacentElement('beforeend', solidLoginBtn);
-  providerContainer.insertAdjacentElement('beforeend', customSolidIdP);
+  // inject into DOM
+  providerContainer.insertAdjacentElement('afterbegin', provider);
+  providerContainer.insertAdjacentElement('afterbegin', solidLoginBtn);
+  providerContainer.insertAdjacentElement('afterbegin', customSolidIdP);
   return providerContainer.outerHTML;
 }

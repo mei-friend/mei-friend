@@ -167,3 +167,11 @@ summary.noDetails {
 #solid_logo {
   pointer-events: none;
 }
+
+#solidLogin { 
+  margin-left: .5em;
+}
+
+#providerSelect { 
+  display:block;
+}
