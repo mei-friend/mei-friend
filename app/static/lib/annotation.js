@@ -57,9 +57,10 @@ export function refreshAnnotationsList() {
     'beforeend',
     annotations.length ? '' : '<p>' + translator.lang.noAnnotationsToDisplay.text + '.</p>'
   );
-  annotations.forEach((a, aix) => {
+  annotations.forEach((a) => {
     const annoDiv = document.createElement('div');
     annoDiv.classList.add('annotationListItem');
+    annoDiv.id = a.id;
     const details = document.createElement('details');
     details.setAttribute('open', '');
     const summary = document.createElement('summary');
@@ -1040,6 +1041,9 @@ async function writeStandoffIfRequested(a) {
               establishResource(webAnno['@id'], webAnno).then((webAnnoResp) => {
                 if (webAnnoResp.ok) {
                   console.log('Success! Posted Web Annotation:', webAnno);
+                  let standoffIcon = document.querySelector(`#${a.id} .makeStandOffAnnotation`);
+                  standoffIcon.href = webAnno["@id"];
+                  standoffIcon.target = "_blank";
                 } else {
                   console.warn("Couldn't post WebAnno: ", webAnno, webAnnoResp);
                   throw webAnnoResp;
