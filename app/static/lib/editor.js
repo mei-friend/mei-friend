@@ -1147,6 +1147,15 @@ export function checkAccidGes(v, cm, change = false) {
       }
 
       accidGes = e.getAttribute('accid.ges') || e.querySelector('[accid\\.ges]')?.getAttribute('accid.ges') || 'n';
+      let mAccid = ''; // measure accid
+      if (
+        staffNumber in measureAccids &&
+        oct in measureAccids[staffNumber] &&
+        pName in measureAccids[staffNumber][oct]
+      ) {
+        let mTstamp = measureAccids[staffNumber][oct][pName].tstamp;
+        if (mTstamp >= 0 && mTstamp <= tstamp) mAccid = measureAccids[staffNumber][oct][pName].accid;
+      }
 
       // TODO: make logic simpler
 
@@ -1222,12 +1231,10 @@ export function checkAccidGes(v, cm, change = false) {
       } else if (
         // check all accids having appeared in the current measure
         !accid &&
-        staffNumber in measureAccids &&
-        oct in measureAccids[staffNumber] &&
-        pName in measureAccids[staffNumber][oct] &&
-        measureAccids[staffNumber][oct][pName].accid !== accidGes
+        mAccid &&
+        mAccid !== accidGes
       ) {
-        data.measureAccid = measureAccids[staffNumber][oct][pName].accid;
+        data.measureAccid = mAccid;
         data.html =
           ++count +
           ' Measure ' +
@@ -1245,52 +1252,27 @@ export function checkAccidGes(v, cm, change = false) {
         };
         v.addCodeCheckerEntry(data);
         console.debug(data.html);
-        let a = 123;
-      } else if (affectedNotes.includes(pName)) {
+      } else if (affectedNotes.includes(pName) && !accid && accidGes !== data.keySigAccid && mAccid !== accidGes) {
         // a note, affected by key signature, either has @accid inside or as a child or has @accid.ges inside or as a child
-        if (
-          !accid &&
-          accidGes !== data.keySigAccid &&
-          !(
-            staffNumber in measureAccids &&
-            oct in measureAccids[staffNumber] &&
-            pName in measureAccids[staffNumber][oct] &&
-            measureAccids[staffNumber][oct][pName].accid === accidGes
-          )
-        ) {
-          data.html =
-            ++count +
-            ' Measure ' +
-            data.measure +
-            ', Note ' +
-            data.xmlId +
-            ' lacks an accid.ges="' +
-            data.keySigAccid +
-            '"';
-          data.correct = () => {
-            v.allowCursorActivity = false;
-            e.setAttribute('accid.ges', data.keySigAccid);
-            replaceInEditor(cm, e, false);
-            v.allowCursorActivity = true;
-          };
-          v.addCodeCheckerEntry(data);
-          console.debug(data.html);
-          let a = 123;
-        }
-      } else if (
-        // Check if there is an accid.ges
-        // that has not been defined in keySig
-        // or earlier in the measure
-        !affectedNotes.includes(pName) &&
-        !accid &&
-        !(
-          staffNumber in measureAccids &&
-          oct in measureAccids[staffNumber] &&
-          pName in measureAccids[staffNumber][oct] &&
-          measureAccids[staffNumber][oct][pName].accid === accidGes
-        ) &&
-        accidGes !== 'n'
-      ) {
+        data.html =
+          ++count +
+          ' Measure ' +
+          data.measure +
+          ', Note ' +
+          data.xmlId +
+          ' lacks an accid.ges="' +
+          data.keySigAccid +
+          '"';
+        data.correct = () => {
+          v.allowCursorActivity = false;
+          e.setAttribute('accid.ges', data.keySigAccid);
+          replaceInEditor(cm, e, false);
+          v.allowCursorActivity = true;
+        };
+        v.addCodeCheckerEntry(data);
+        console.debug(data.html);
+      } else if (!affectedNotes.includes(pName) && !accid && mAccid !== accidGes && accidGes !== 'n') {
+        // Check if there is an accid.ges that has not been defined in keySig or earlier in the measure
         data.html =
           ++count +
           ' Measure ' +
@@ -1317,7 +1299,7 @@ export function checkAccidGes(v, cm, change = false) {
       }
     }
   });
-} // correctAccidGes()
+} // checkAccidGes()
 
 /**
  * Wrapper function for renumbering measure numberlike attribute (@n)
