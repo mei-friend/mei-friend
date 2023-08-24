@@ -1086,7 +1086,7 @@ export function checkAccidGes(v, cm, change = false) {
       if (d) console.debug('New keySig("' + e.getAttribute('xml:id') + '")@sig in staffDef(' + n + '): ' + value);
     } else if (e.nodeName === 'measure') {
       // clear measureAccids object
-      measureAccids = {};
+      measureAccids = getAccidsInMeasure(e);
     } else if (e.nodeName === 'note') {
       // found a note to check!
       let data = {};
@@ -1150,6 +1150,7 @@ export function checkAccidGes(v, cm, change = false) {
 
       let accidGesMeaning =
         e.getAttribute('accid.ges') || e.querySelector('[accid\\.ges]')?.getAttribute('accid.ges') || 'n';
+
       let mAccid = ''; // measure accid
       if (
         staffNumber in measureAccids &&
@@ -1298,7 +1299,7 @@ export function checkAccidGes(v, cm, change = false) {
         v.addCodeCheckerEntry(data);
         if (d) console.debug(data.html);
       }
-      if (accid) {
+      if (accid && false) {
         if (!Object.hasOwn(measureAccids, staffNumber)) measureAccids[staffNumber] = {};
         if (!Object.hasOwn(measureAccids[staffNumber], oct)) measureAccids[staffNumber][oct] = {};
         if (!Object.hasOwn(measureAccids[staffNumber][oct], pName)) measureAccids[staffNumber][oct][pName] = {};
@@ -1307,6 +1308,27 @@ export function checkAccidGes(v, cm, change = false) {
     }
   });
   v.allowCursorActivity = true;
+
+  // TODO: account for multiple accid on one pitch at different tstamps
+  function getAccidsInMeasure(measure) {
+    let measureAccids = {};
+    let elementsWithAccid = measure.querySelectorAll('[accid]');
+    elementsWithAccid.forEach((el) => {
+      let note = el.closest('note');
+      if (!note) return {};
+      let staffNumber = parseInt(el.closest('staff')?.getAttribute('n'));
+      let oct = note.getAttribute('oct') || '';
+      let pName = note.getAttribute('pname') || '';
+      let accid = el.getAttribute('accid');
+      let tstamp = speed.getTstampForElement(v.xmlDoc, note);
+
+      if (!Object.hasOwn(measureAccids, staffNumber)) measureAccids[staffNumber] = {};
+      if (!Object.hasOwn(measureAccids[staffNumber], oct)) measureAccids[staffNumber][oct] = {};
+      if (!Object.hasOwn(measureAccids[staffNumber][oct], pName)) measureAccids[staffNumber][oct][pName] = {};
+      measureAccids[staffNumber][oct][pName] = { accid: accid, tstamp: tstamp };
+    });
+    return measureAccids;
+  } // getAccidsInMeasure()
 } // checkAccidGes()
 
 /**
