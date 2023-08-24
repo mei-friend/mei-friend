@@ -1040,7 +1040,7 @@ export function cleanAccid(v, cm) {
  * @param {CodeMirror} cm
  * @param {boolean} change
  */
-export function correctAccidGes(v, cm, change = false) {
+export function checkAccidGes(v, cm, change = false) {
   v.initCodeCheckerPanel('Check @accid.ges attributes (against key signature, measure-wise accids, and ties).');
 
   let d = true;
