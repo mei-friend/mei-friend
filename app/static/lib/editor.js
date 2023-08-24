@@ -1176,7 +1176,7 @@ export function checkAccidGes(v, cm, change = false) {
             ': ' +
             startingNote.getAttribute('pname');
           v.addCodeCheckerEntry(data);
-          console.log(data.html);
+          if (d) console.debug(data.html);
         }
         if (oct !== startingNote.getAttribute('oct')) {
           data.html =
@@ -1188,7 +1188,7 @@ export function checkAccidGes(v, cm, change = false) {
             ' not same octave number as ' +
             ties[data.xmlId];
           v.addCodeCheckerEntry(data);
-          console.log(data.html);
+          if (d) console.debug(data.html);
         }
         let startingAccid =
           startingNote.getAttribute('accid') ||
@@ -1225,15 +1225,10 @@ export function checkAccidGes(v, cm, change = false) {
             };
           }
           v.addCodeCheckerEntry(data);
-          console.log(data.html);
+          if (d) console.debug(data.html);
         }
-        let a = 1234;
-      } else if (
+      } else if (!accid && mAccid && mAccid !== accidGes) {
         // check all accids having appeared in the current measure
-        !accid &&
-        mAccid &&
-        mAccid !== accidGes
-      ) {
         data.measureAccid = mAccid;
         data.html =
           ++count +
@@ -1251,8 +1246,8 @@ export function checkAccidGes(v, cm, change = false) {
           v.allowCursorActivity = true;
         };
         v.addCodeCheckerEntry(data);
-        console.debug(data.html);
-      } else if (affectedNotes.includes(pName) && !accid && accidGes !== data.keySigAccid && mAccid !== accidGes) {
+        if (d) console.debug(data.html);
+      } else if (!accid && affectedNotes.includes(pName) && mAccid !== accidGes && accidGes !== data.keySigAccid) {
         // a note, affected by key signature, either has @accid inside or as a child or has @accid.ges inside or as a child
         data.html =
           ++count +
@@ -1270,8 +1265,8 @@ export function checkAccidGes(v, cm, change = false) {
           v.allowCursorActivity = true;
         };
         v.addCodeCheckerEntry(data);
-        console.debug(data.html);
-      } else if (!affectedNotes.includes(pName) && !accid && mAccid !== accidGes && accidGes !== 'n') {
+        if (d) console.debug(data.html);
+      } else if (!accid && !affectedNotes.includes(pName) && mAccid !== accidGes && accidGes !== 'n') {
         // Check if there is an accid.ges that has not been defined in keySig or earlier in the measure
         data.html =
           ++count +
@@ -1289,7 +1284,7 @@ export function checkAccidGes(v, cm, change = false) {
           v.allowCursorActivity = true;
         };
         v.addCodeCheckerEntry(data);
-        console.debug(data.html);
+        if (d) console.debug(data.html);
       }
       if (accid) {
         if (!Object.hasOwn(measureAccids, staffNumber)) measureAccids[staffNumber] = {};
