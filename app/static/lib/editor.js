@@ -942,6 +942,8 @@ export function addTranscriptionLikeElement(v, cm, attrName = 'none', mElName = 
       else {
         if(currentParent === parent) { 
           sup.appendChild(el);
+          // remove following text node to prevent trailing newlines
+          sup.nextSibling.remove();
         }
         else {
           //error
