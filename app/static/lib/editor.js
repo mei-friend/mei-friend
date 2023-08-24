@@ -1194,7 +1194,7 @@ export function correctAccidGes(v, cm, change = false) {
             data.measure +
             ' Tied note ' +
             data.xmlId +
-            ' accid"' +
+            ' accid="' +
             (accid || accidGes) +
             '" not same as in starting note ' +
             ties[data.xmlId] +

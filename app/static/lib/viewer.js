@@ -2493,6 +2493,10 @@ export default class Viewer {
         console.log('Clicked on button ' + count + ' of ' + fixButtonList.length);
       });
       infoSpan.innerHTML = ' ' + count + ' issues fixed.';
+      correctAllButton.classList.add('disabled');
+      correctAllButton.disabled = true;
+      ignoreAllButton.classList.add('disabled');
+      ignoreAllButton.disabled = true;
     });
     headerDiv.appendChild(correctAllButton);
 
