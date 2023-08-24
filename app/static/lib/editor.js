@@ -1041,7 +1041,7 @@ export function cleanAccid(v, cm) {
  * @param {boolean} change
  */
 export function correctAccidGes(v, cm, change = false) {
-  v.initCodeCheckerPanel('Check @accid.ges Attributes (against key signature, measure-wise accids, and ties).');
+  v.initCodeCheckerPanel('Check @accid.ges attributes (against key signature, measure-wise accids, and ties).');
 
   let d = true;
   v.allowCursorActivity = false;
@@ -1127,7 +1127,8 @@ export function correctAccidGes(v, cm, change = false) {
           data.correct = () => {
             v.allowCursorActivity = false;
             e.removeAttribute('accid.ges');
-            replaceInEditor(cm, e, true);
+            replaceInEditor(cm, e, false);
+            v.allowCursorActivity = true;
           };
         } else {
           data.html =
@@ -1193,17 +1194,27 @@ export function correctAccidGes(v, cm, change = false) {
             data.measure +
             ' Tied note ' +
             data.xmlId +
-            ': accid ' +
+            ' accid"' +
             (accid || accidGes) +
-            ' not same accid as in starting note ' +
+            '" not same as in starting note ' +
             ties[data.xmlId] +
             ': ' +
             startingAccid;
-          data.correct = () => {
-            v.allowCursorActivity = false;
-            e.setAttribute('accid.ges', startingAccid);
-            replaceInEditor(cm, e, true);
-          };
+          if (startingAccid && startingAccid !== 'n') {
+            data.correct = () => {
+              v.allowCursorActivity = false;
+              e.setAttribute('accid.ges', startingAccid);
+              replaceInEditor(cm, e, false);
+              v.allowCursorActivity = true;
+            };
+          } else {
+            data.correct = () => {
+              v.allowCursorActivity = false;
+              e.removeAttribute('accid.ges');
+              replaceInEditor(cm, e, false);
+              v.allowCursorActivity = true;
+            };
+          }
           v.addCodeCheckerEntry(data);
           console.log(data.html);
         }
@@ -1229,7 +1240,8 @@ export function correctAccidGes(v, cm, change = false) {
         data.correct = () => {
           v.allowCursorActivity = false;
           e.setAttribute('accid.ges', data.measureAccid);
-          replaceInEditor(cm, e, true);
+          replaceInEditor(cm, e, false);
+          v.allowCursorActivity = true;
         };
         v.addCodeCheckerEntry(data);
         console.debug(data.html);
@@ -1258,7 +1270,8 @@ export function correctAccidGes(v, cm, change = false) {
           data.correct = () => {
             v.allowCursorActivity = false;
             e.setAttribute('accid.ges', data.keySigAccid);
-            replaceInEditor(cm, e, true);
+            replaceInEditor(cm, e, false);
+            v.allowCursorActivity = true;
           };
           v.addCodeCheckerEntry(data);
           console.debug(data.html);
@@ -1290,7 +1303,8 @@ export function correctAccidGes(v, cm, change = false) {
         data.correct = () => {
           v.allowCursorActivity = false;
           e.removeAttribute('accid.ges');
-          replaceInEditor(cm, e, true);
+          replaceInEditor(cm, e, false);
+          v.allowCursorActivity = true;
         };
         v.addCodeCheckerEntry(data);
         console.debug(data.html);

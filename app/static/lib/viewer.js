@@ -593,10 +593,10 @@ export default class Viewer {
     // console.log('NotationUpdated forceUpdate:' + forceUpdate);
     this.xmlDocOutdated = true;
     this.toolkitDataOutdated = true;
-    this.setRespSelectOptions();
     if (!isSafari) this.checkSchema(cm.getValue());
     let ch = document.getElementById('liveUpdateCheckbox');
     if ((this.allowCursorActivity && ch && ch.checked) || forceUpdate) {
+      this.setRespSelectOptions();
       this.updateData(cm, false, false);
     }
   } // notationUpdated()
@@ -2485,17 +2485,14 @@ export default class Viewer {
     correctAllButton.classList.add('btn');
     correctAllButton.addEventListener('click', () => {
       let count = 0;
-      codeChecker.childNodes.forEach((ch) => {
-        if (ch.classList.contains('validation-item')) {
-          let button = ch.querySelector('button.fix');
-          if (button && !button.disabled) {
-            infoSpan.innerHTML = ' ' + ++count + ' fixed.';
-            button.click();
-          }
-        }
+      let fixButtonList = codeChecker.querySelectorAll('button.fix:not(.disabled)');
+      fixButtonList.forEach((button) => {
+        count++;
+        // infoSpan.innerHTML = ' ' + count + ' of ' + fixButtonList.length + ' issues fixed.';
+        button.click();
+        console.log('Clicked on button ' + count + ' of ' + fixButtonList.length);
       });
-      infoSpan.innerHTML = ' ' + count + ' fixed.';
-      this.allowCursorActivity = true;
+      infoSpan.innerHTML = ' ' + count + ' issues fixed.';
     });
     headerDiv.appendChild(correctAllButton);
 
@@ -2503,13 +2500,11 @@ export default class Viewer {
     ignoreAllButton.innerHTML = 'Ignore all';
     ignoreAllButton.classList.add('btn');
     ignoreAllButton.addEventListener('click', () => {
-      codeChecker.childNodes.forEach((ch) => {
-        if (ch.classList.contains('validation-item')) {
-          let button = ch.querySelector('button.ignore');
-          let span = ch.querySelector('.codeCheckerMessage');
-          if (button && !button.disabled && span && !span.classList.contains('strikethrough')) {
-            button.click();
-          }
+      codeChecker.querySelectorAll('.validation-item').forEach((ch) => {
+        let button = ch.querySelector('button.ignore');
+        let span = ch.querySelector('.codeCheckerMessage');
+        if (button && !button.disabled && span && !span.classList.contains('strikethrough')) {
+          button.click();
         }
       });
     });
@@ -2545,6 +2540,7 @@ export default class Viewer {
     span.innerHTML = data.html;
     span.addEventListener('click', (ev) => {
       utils.setCursorToId(cm, data.xmlId);
+      cm.focus();
     });
     div.appendChild(span);
 
