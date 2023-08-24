@@ -1043,8 +1043,7 @@ export function cleanAccid(v, cm) {
 export function checkAccidGes(v, cm, change = false) {
   v.initCodeCheckerPanel('Check @accid.ges attributes (against key signature, measure-wise accids, and ties).');
 
-  let d = true;
-  v.allowCursorActivity = false;
+  let d = true; // send debug info to console
   v.loadXml(cm.getValue(), true); // force reload DOM
 
   // define default key signatures per staff
@@ -1094,6 +1093,7 @@ export function checkAccidGes(v, cm, change = false) {
       data.measure = e.closest('measure')?.getAttribute('n') || '';
       // find staff number for note
       let staffNumber = parseInt(e.closest('staff')?.getAttribute('n'));
+      let tstamp = speed.getTstampForElement(v.xmlDoc, e);
       let pName = e.getAttribute('pname') || '';
       let oct = e.getAttribute('oct') || '';
       let value = keySignatures[staffNumber - 1];
@@ -1225,9 +1225,9 @@ export function checkAccidGes(v, cm, change = false) {
         staffNumber in measureAccids &&
         oct in measureAccids[staffNumber] &&
         pName in measureAccids[staffNumber][oct] &&
-        measureAccids[staffNumber][oct][pName] !== accidGes
+        measureAccids[staffNumber][oct][pName].accid !== accidGes
       ) {
-        data.measureAccid = measureAccids[staffNumber][oct][pName];
+        data.measureAccid = measureAccids[staffNumber][oct][pName].accid;
         data.html =
           ++count +
           ' Measure ' +
@@ -1255,7 +1255,7 @@ export function checkAccidGes(v, cm, change = false) {
             staffNumber in measureAccids &&
             oct in measureAccids[staffNumber] &&
             pName in measureAccids[staffNumber][oct] &&
-            measureAccids[staffNumber][oct][pName] === accidGes
+            measureAccids[staffNumber][oct][pName].accid === accidGes
           )
         ) {
           data.html =
@@ -1287,7 +1287,7 @@ export function checkAccidGes(v, cm, change = false) {
           staffNumber in measureAccids &&
           oct in measureAccids[staffNumber] &&
           pName in measureAccids[staffNumber][oct] &&
-          measureAccids[staffNumber][oct][pName] === accidGes
+          measureAccids[staffNumber][oct][pName].accid === accidGes
         ) &&
         accidGes !== 'n'
       ) {
@@ -1313,12 +1313,10 @@ export function checkAccidGes(v, cm, change = false) {
         if (!Object.hasOwn(measureAccids, staffNumber)) measureAccids[staffNumber] = {};
         if (!Object.hasOwn(measureAccids[staffNumber], oct)) measureAccids[staffNumber][oct] = {};
         if (!Object.hasOwn(measureAccids[staffNumber][oct], pName)) measureAccids[staffNumber][oct][pName] = {};
-        measureAccids[staffNumber][oct][pName] = accid;
+        measureAccids[staffNumber][oct][pName] = { accid: accid, tstamp: tstamp };
       }
     }
   });
-
-  v.allowCursorActivity = true;
 } // correctAccidGes()
 
 /**
