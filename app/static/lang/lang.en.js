@@ -684,7 +684,11 @@ export const lang = {
   // Supplied element
   titleSupplied: {
     text: 'Handle editorial content',
-    description: 'Control handling of <supplied> elements',
+    description: 'Control handling of editorial markup',
+  },
+  respSelect: {
+    text: 'Select markup responsibility',
+    description: 'Select responsibility id',
   },
   showMarkup: {
     text: 'Show editorial markup elements',
@@ -694,9 +698,33 @@ export const lang = {
     text: 'Select <supplied> highlight color',
     description: 'Select <supplied> highlight color',
   },
-  respSelect: {
-    text: 'Select markup responsibility',
-    description: 'Select responsibility id',
+  unclearColor: {
+    title: 'Select <unclear> highlight color',
+    description: 'Select <unclear> highlight color',
+  },
+  sicColor: {
+    title: 'Select <sic> highlight color',
+    description: 'Select <sic> highlight color',
+  },
+  corrColor: {
+    title: 'Select <corr> highlight color',
+    description: 'Select <corr> highlight color',
+  },
+  origColor: {
+    title: 'Select <orig> highlight color',
+    description: 'Select <orig> highlight color',
+  },
+  regColor: {
+    title: 'Select <reg> highlight color',
+    description: 'Select <reg> highlight color',
+  },
+  addColor: {
+    title: 'Select <add> highlight color',
+    description: 'Select <add> highlight color',
+  },
+  delColor: {
+    title: 'Select <del> highlight color',
+    description: 'Select <del> highlight color',
   },
 
   //  EDITOR SETTINGS / CODEMIRROR SETTINGS
