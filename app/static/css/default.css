@@ -425,8 +425,7 @@ a:active {
 }
 
 #codeChecker {
-  min-width: 12em;
-  min-height: 8em;
+  min-height: 14em;
   max-height: 14em;
   display: none;
   padding: 2px;

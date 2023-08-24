@@ -2484,27 +2484,45 @@ export default class Viewer {
     correctAllButton.innerHTML = 'Fix all';
     correctAllButton.classList.add('btn');
     correctAllButton.addEventListener('click', () => {
+      let count = 0;
       codeChecker.childNodes.forEach((ch) => {
         if (ch.classList.contains('validation-item')) {
           let button = ch.querySelector('button.fix');
-          if (button && !button.disabled) button.click();
+          if (button && !button.disabled) {
+            infoSpan.innerHTML = ' ' + ++count + ' fixed.';
+            button.click();
+          }
         }
       });
+      infoSpan.innerHTML = ' ' + count + ' fixed.';
+      this.allowCursorActivity = true;
     });
     headerDiv.appendChild(correctAllButton);
 
-    let ignoreAllButon = document.createElement('button');
-    ignoreAllButon.innerHTML = 'Ignore all';
-    ignoreAllButon.classList.add('btn');
-    ignoreAllButon.addEventListener('click', () => {
+    let ignoreAllButton = document.createElement('button');
+    ignoreAllButton.innerHTML = 'Ignore all';
+    ignoreAllButton.classList.add('btn');
+    ignoreAllButton.addEventListener('click', () => {
       codeChecker.childNodes.forEach((ch) => {
         if (ch.classList.contains('validation-item')) {
           let button = ch.querySelector('button.ignore');
-          if (button && !button.disabled) button.click();
+          let span = ch.querySelector('.codeCheckerMessage');
+          if (button && !button.disabled && span && !span.classList.contains('strikethrough')) {
+            button.click();
+          }
         }
       });
     });
-    headerDiv.appendChild(ignoreAllButon);
+    headerDiv.appendChild(ignoreAllButton);
+
+    let infoSpan = document.createElement('span');
+    headerDiv.appendChild(infoSpan);
+
+    let noMessages = document.createElement('div');
+    noMessages.classList.add('validation-item');
+    noMessages.classList.add('noAccidMessagesFound');
+    noMessages.innerHTML = 'No inconsistent accid.ges attributes found.';
+    codeChecker.appendChild(noMessages);
   } // initCodeCheckerPanel()
 
   /**
@@ -2516,6 +2534,8 @@ export default class Viewer {
   addCodeCheckerEntry(data) {
     let codeChecker = document.getElementById('codeChecker');
     if (!codeChecker) return;
+    let noMessages = codeChecker.querySelector('.noAccidMessagesFound');
+    if (noMessages) noMessages.remove();
     let div = document.createElement('div');
     div.classList.add('validation-item');
 
