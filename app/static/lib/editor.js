@@ -1076,13 +1076,13 @@ export function correctAccidGes(v, cm, change = false) {
       // key.sig inside staffDef: write @sig to that staff
       let n = parseInt(e.getAttribute('n'));
       let value = e.getAttribute('key.sig');
-      if (n && n > 0 && n < keySignatures.length) keySignatures[n - 1] = value;
+      if (n && n > 0 && n <= keySignatures.length) keySignatures[n - 1] = value;
       if (d) console.debug('New key.sig in staffDef(' + e.getAttribute('xml:id') + ', n=' + n + '): ' + value);
     } else if (e.nodeName === 'keySig' && e.hasAttribute('sig')) {
       // keySig element in a staffDef
       let n = parseInt(e.closest('staffDef')?.getAttribute('n'));
       let value = e.getAttribute('sig');
-      if (n && n > 0 && n < keySignatures.length) keySignatures[n - 1] = value;
+      if (n && n > 0 && n <= keySignatures.length) keySignatures[n - 1] = value;
       if (d) console.debug('New keySig("' + e.getAttribute('xml:id') + '")@sig in staffDef(' + n + '): ' + value);
     } else if (e.nodeName === 'measure') {
       // clear measureAccids object
@@ -1125,6 +1125,7 @@ export function correctAccidGes(v, cm, change = false) {
             accid +
             '". Remove accid.ges. ';
           data.correct = () => {
+            v.allowCursorActivity = false;
             e.removeAttribute('accid.ges');
             replaceInEditor(cm, e, true);
           };
@@ -1140,7 +1141,6 @@ export function correctAccidGes(v, cm, change = false) {
             '" and accid.ges="' +
             accidGes +
             '" with different content. To be handled manually.';
-          data.correct = null;
         }
         v.addCodeCheckerEntry(data);
       }
@@ -1200,6 +1200,7 @@ export function correctAccidGes(v, cm, change = false) {
             ': ' +
             startingAccid;
           data.correct = () => {
+            v.allowCursorActivity = false;
             e.setAttribute('accid.ges', startingAccid);
             replaceInEditor(cm, e, true);
           };
@@ -1226,6 +1227,7 @@ export function correctAccidGes(v, cm, change = false) {
           data.measureAccid +
           '", because it has been defined earlier in the measure.';
         data.correct = () => {
+          v.allowCursorActivity = false;
           e.setAttribute('accid.ges', data.measureAccid);
           replaceInEditor(cm, e, true);
         };
@@ -1254,6 +1256,7 @@ export function correctAccidGes(v, cm, change = false) {
             data.keySigAccid +
             '"';
           data.correct = () => {
+            v.allowCursorActivity = false;
             e.setAttribute('accid.ges', data.keySigAccid);
             replaceInEditor(cm, e, true);
           };
@@ -1285,6 +1288,7 @@ export function correctAccidGes(v, cm, change = false) {
           accidGes +
           '"';
         data.correct = () => {
+          v.allowCursorActivity = false;
           e.removeAttribute('accid.ges');
           replaceInEditor(cm, e, true);
         };
