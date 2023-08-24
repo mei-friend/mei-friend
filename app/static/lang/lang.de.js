@@ -670,20 +670,48 @@ export const lang = {
   },
   // Supplied element
   titleSupplied: {
-    text: 'Editorische Inhalte',
-    description: 'Editorische Inhalte im MEI',
-  },
-  showMarkup: {
-    text: 'Zeige Supplied-Element',
-    description: 'Hebe Inhalte, die von editorischem Markup umgeben sind, hervor',
-  },
-  suppliedColor: {
-    text: 'Farbe für Supplied',
-    description: 'Farbe für Supplied auswählen',
+    text: 'Editorisches Markup',
+    description: 'Einstellungen für die Arbeit mit editorischem Markup',
   },
   respSelect: {
-    text: 'Responsibility wählen',
-    description: 'Responsibility id für Supplied-Element auswählen',
+    text: 'Responsibility auswählen',
+    description: 'Responsibility-ID für editorisches Markup auswählen',
+  },
+  showMarkup: {
+    text: 'Zeige Editorisches Markup',
+    description: 'Alle Elemente hervorheben, die mit editorischem Markup umschlossen sind',
+  },
+  suppliedColor: {
+    text: 'Farbe für <supplied>',
+    description: 'Farbe für <supplied> auswählen',
+  },
+  unclearColor: {
+    title: 'Farbe für <unclear>',
+    description: 'Farbe für <unclear> auswählen',
+  },
+  sicColor: {
+    title: 'Farbe für <sic>',
+    description: 'Farbe für <sic> auswählen',
+  },
+  corrColor: {
+    title: 'Farbe für <corr>',
+    description: 'Farbe für <corr> auswählen',
+  },
+  origColor: {
+    title: 'Farbe für <orig>',
+    description: 'Farbe für <orig> auswählen',
+  },
+  regColor: {
+    title: 'Farbe für <reg>',
+    description: 'Farbe für <reg> auswählen',
+  },
+  addColor: {
+    title: 'Farbe für <add>',
+    description: 'Farbe für <add> auswählen',
+  },
+  delColor: {
+    title: 'Farbe für <del>',
+    description: 'Farbe für <del> auswählen',
   },
 
   //  EDITOR SETTINGS / CODEMIRROR SETTINGS

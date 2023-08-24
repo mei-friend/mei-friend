@@ -676,23 +676,51 @@ export const lang = {
     description: 'Modifica le zone del facsimile (collegando le zone delimitate ai facsimile)',
   },
 
-  // Supplied element // Supplied element
-  titleSupplied: {
-    text: 'Gestisci il contenuto editoriale',
-    description: 'Controlla la gestione degli elementi <supplied>',
-  },
-  showMarkup: {
-    text: 'Mostra gli elementi <supplied>',
-    description: "Evidenzia tutti gli elementi contenuti nell'elemento <supplied>",
-  },
-  suppliedColor: {
-    text: "Seleziona il colore per l'evidenziazione di <supplied>",
-    description: "Seleziona il colore per l'evidenziazione di <supplied>",
-  },
-  respSelect: {
-    text: 'Seleziona la responsabilità di <supplied>',
-    description: "Seleziona l'id della responsabilità",
-  },
+  // Supplied element // Elemento fornito
+titleSupplied: {
+  text: 'Gestisci contenuto editoriale',
+  description: 'Controllo della gestione del markup editoriale',
+},
+respSelect: {
+  text: 'Seleziona responsabilità di markup',
+  description: 'Seleziona ID di responsabilità',
+},
+showMarkup: {
+  text: 'Mostra elementi di markup editoriale',
+  description: 'Evidenzia tutti gli elementi contenuti dagli elementi di markup editoriale',
+},
+suppliedColor: {
+  text: 'Seleziona colore di evidenziazione per <supplied>',
+  description: 'Seleziona colore di evidenziazione per <supplied>',
+},
+unclearColor: {
+  title: 'Seleziona colore di evidenziazione per <unclear>',
+  description: 'Seleziona colore di evidenziazione per <unclear>',
+},
+sicColor: {
+  title: 'Seleziona colore di evidenziazione per <sic>',
+  description: 'Seleziona colore di evidenziazione per <sic>',
+},
+corrColor: {
+  title: 'Seleziona colore di evidenziazione per <corr>',
+  description: 'Seleziona colore di evidenziazione per <corr>',
+},
+origColor: {
+  title: 'Seleziona colore di evidenziazione per <orig>',
+  description: 'Seleziona colore di evidenziazione per <orig>',
+},
+regColor: {
+  title: 'Seleziona colore di evidenziazione per <reg>',
+  description: 'Seleziona colore di evidenziazione per <reg>',
+},
+addColor: {
+  title: 'Seleziona colore di evidenziazione per <add>',
+  description: 'Seleziona colore di evidenziazione per <add>',
+},
+delColor: {
+  title: 'Seleziona colore di evidenziazione per <del>',
+  description: 'Seleziona colore di evidenziazione per <del>',
+},
 
   // EDITOR SETTINGS / CODEMIRROR SETTINGS
   editorSettingsHeader: {

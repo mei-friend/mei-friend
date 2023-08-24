@@ -668,22 +668,50 @@ export const lang = {
   },
 
   // Supplied element / Element subministrat
-  titleSupplied: {
-    text: 'Gestiona contingut editorial',
-    description: 'Control·la el tractament dels elements <supplied>',
-  },
-  showMarkup: {
-    text: 'Mostra els elements <supplied>',
-    description: 'Destaca tots els elements continguts per un element <supplied>',
-  },
-  suppliedColor: {
-    text: 'Selecciona el color de ressaltat per <supplied>',
-    description: 'Selecciona el color de ressaltat per <supplied>',
-  },
-  respSelect: {
-    text: 'Selecciona la responsabilitat per <supplied>',
-    description: 'Selecciona la identificació de la responsabilitat',
-  },
+titleSupplied: {
+  text: 'Gestionar el contingut editorial',
+  description: 'Controlar el tractament de la marca editorial',
+},
+respSelect: {
+  text: 'Seleccionar la responsabilitat de la marca',
+  description: 'Seleccionar l\'ID de la responsabilitat',
+},
+showMarkup: {
+  text: 'Mostrar elements de marca editorial',
+  description: 'Destacar tots els elements continguts per elements de marca editorial',
+},
+suppliedColor: {
+  text: 'Seleccionar el color d\'ús de <supplied>',
+  description: 'Seleccionar el color d\'ús de <supplied>',
+},
+unclearColor: {
+  title: 'Seleccionar el color d\'ús de <unclear>',
+  description: 'Seleccionar el color d\'ús de <unclear>',
+},
+sicColor: {
+  title: 'Seleccionar el color d\'ús de <sic>',
+  description: 'Seleccionar el color d\'ús de <sic>',
+},
+corrColor: {
+  title: 'Seleccionar el color d\'ús de <corr>',
+  description: 'Seleccionar el color d\'ús de <corr>',
+},
+origColor: {
+  title: 'Seleccionar el color d\'ús de <orig>',
+  description: 'Seleccionar el color d\'ús de <orig>',
+},
+regColor: {
+  title: 'Seleccionar el color d\'ús de <reg>',
+  description: 'Seleccionar el color d\'ús de <reg>',
+},
+addColor: {
+  title: 'Seleccionar el color d\'ús de <add>',
+  description: 'Seleccionar el color d\'ús de <add>',
+},
+delColor: {
+  title: 'Seleccionar el color d\'ús de <del>',
+  description: 'Seleccionar el color d\'ús de <del>',
+},
 
   //  EDITOR SETTINGS / CODEMIRROR SETTINGS // CONFIGURACIÓ DE L'EDITOR / CONFIGURACIÓ DE CODEMIRROR
   editorSettingsHeader: {

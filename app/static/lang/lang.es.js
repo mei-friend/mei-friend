@@ -670,22 +670,50 @@ export const lang = {
   },
 
   // Supplied element / Elemento suministrado
-  titleSupplied: {
-    text: 'Manejar contenido editorial',
-    description: 'Controlar el manejo de elementos <supplied>',
-  },
-  showMarkup: {
-    text: 'Mostrar elementos <supplied>',
-    description: 'Destacar todos los elementos contenidos por un elemento <supplied>',
-  },
-  suppliedColor: {
-    text: 'Seleccionar color de resaltado <supplied>',
-    description: 'Seleccionar color de resaltado <supplied>',
-  },
-  respSelect: {
-    text: 'Seleccionar responsabilidad <supplied>',
-    description: 'Seleccionar ID de responsabilidad',
-  },
+titleSupplied: {
+  text: 'Gestionar contenido editorial',
+  description: 'Controlar el manejo del marcado editorial',
+},
+respSelect: {
+  text: 'Seleccionar responsabilidad de marcado',
+  description: 'Seleccionar ID de responsabilidad',
+},
+showMarkup: {
+  text: 'Mostrar elementos de marcado editorial',
+  description: 'Resaltar todos los elementos contenidos por elementos de marcado editorial',
+},
+suppliedColor: {
+  text: 'Seleccionar color de resaltado para <supplied>',
+  description: 'Seleccionar color de resaltado para <supplied>',
+},
+unclearColor: {
+  title: 'Seleccionar color de resaltado para <unclear>',
+  description: 'Seleccionar color de resaltado para <unclear>',
+},
+sicColor: {
+  title: 'Seleccionar color de resaltado para <sic>',
+  description: 'Seleccionar color de resaltado para <sic>',
+},
+corrColor: {
+  title: 'Seleccionar color de resaltado para <corr>',
+  description: 'Seleccionar color de resaltado para <corr>',
+},
+origColor: {
+  title: 'Seleccionar color de resaltado para <orig>',
+  description: 'Seleccionar color de resaltado para <orig>',
+},
+regColor: {
+  title: 'Seleccionar color de resaltado para <reg>',
+  description: 'Seleccionar color de resaltado para <reg>',
+},
+addColor: {
+  title: 'Seleccionar color de resaltado para <add>',
+  description: 'Seleccionar color de resaltado para <add>',
+},
+delColor: {
+  title: 'Seleccionar color de resaltado para <del>',
+  description: 'Seleccionar color de resaltado para <del>',
+},
 
   //  EDITOR SETTINGS / CODEMIRROR SETTINGS // CONFIGURACIÓN DEL EDITOR / CONFIGURACIÓN DE CODEMIRROR
   editorSettingsHeader: {
