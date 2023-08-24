@@ -1041,6 +1041,7 @@ export function cleanAccid(v, cm) {
  * @param {boolean} change
  */
 export function checkAccidGes(v, cm, change = false) {
+  v.allowCursorActivity = false;
   v.initCodeCheckerPanel('Check @accid.ges attributes (against key signature, measure-wise accids, and ties).');
 
   let d = true; // send debug info to console
@@ -1108,12 +1109,13 @@ export function checkAccidGes(v, cm, change = false) {
         data.keySigAccid = 's';
         affectedNotes = att.sharps.slice(0, splitS[0]);
       }
+
       let accid = e.getAttribute('accid') || e.querySelector('[accid]')?.getAttribute('accid');
-      let accidGes = e.getAttribute('accid.ges') || e.querySelector('[accid\\.ges]')?.getAttribute('accid.ges');
+      let accidGesEncoded = e.getAttribute('accid.ges') || e.querySelector('[accid\\.ges]')?.getAttribute('accid.ges');
 
       // find doubled accid/accid.ges information
-      if (accid && accidGes) {
-        if (accid === accidGes) {
+      if (accidGesEncoded && accid) {
+        if (accidGesEncoded === accid) {
           // remove @accid.ges
           data.html =
             ++count +
@@ -1140,13 +1142,14 @@ export function checkAccidGes(v, cm, change = false) {
             ' has both accid="' +
             accid +
             '" and accid.ges="' +
-            accidGes +
+            accidGesEncoded +
             '" with different content. To be handled manually.';
         }
         v.addCodeCheckerEntry(data);
       }
 
-      accidGes = e.getAttribute('accid.ges') || e.querySelector('[accid\\.ges]')?.getAttribute('accid.ges') || 'n';
+      let accidGesMeaning =
+        e.getAttribute('accid.ges') || e.querySelector('[accid\\.ges]')?.getAttribute('accid.ges') || 'n';
       let mAccid = ''; // measure accid
       if (
         staffNumber in measureAccids &&
@@ -1190,33 +1193,33 @@ export function checkAccidGes(v, cm, change = false) {
           v.addCodeCheckerEntry(data);
           if (d) console.debug(data.html);
         }
-        let startingAccid =
+        let startingAccidMeaning =
           startingNote.getAttribute('accid') ||
           startingNote.querySelector('[accid]')?.getAttribute('accid') ||
           startingNote.getAttribute('accid.ges') ||
           startingNote.querySelector('[accid\\.ges]')?.getAttribute('accid.ges') ||
           'n';
-        if ((accid || accidGes) !== startingAccid) {
-          data.html =
-            ++count +
-            ' Measure ' +
-            data.measure +
-            ' Tied note ' +
-            data.xmlId +
-            ' accid="' +
-            (accid || accidGes) +
-            '" not same as in starting note ' +
-            ties[data.xmlId] +
-            ': ' +
-            startingAccid;
-          if (startingAccid && startingAccid !== 'n') {
+        if ((accid || accidGesMeaning) !== startingAccidMeaning) {
+          data.html = ++count + ' Measure ' + data.measure + ' Tied note "' + data.xmlId + '" ';
+          if (startingAccidMeaning !== 'n') {
+            data.html +=
+              (accid ? 'accid="' + accid + '"' : accidGesEncoded ? 'accid.ges="' + accidGesEncoded + '"' : '') +
+              (' not same as in starting note ' + ties[data.xmlId] + ': ') +
+              ('"' + startingAccidMeaning + '".') +
+              (' Fix attribute to accid.ges="' + startingAccidMeaning + '". ');
             data.correct = () => {
               v.allowCursorActivity = false;
-              e.setAttribute('accid.ges', startingAccid);
+              e.setAttribute('accid.ges', startingAccidMeaning);
               replaceInEditor(cm, e, false);
               v.allowCursorActivity = true;
             };
           } else {
+            data.html +=
+              'superfluous ' +
+              (accid ? 'accid="' + accid + '"' : accidGesEncoded ? 'accid.ges="' + accidGesEncoded + '"' : '') +
+              ('" not same as in starting note ' + ties[data.xmlId] + ': ') +
+              ('"' + startingAccidMeaning + '". ') +
+              'Remove attribute accid.ges. ';
             data.correct = () => {
               v.allowCursorActivity = false;
               e.removeAttribute('accid.ges');
@@ -1227,9 +1230,8 @@ export function checkAccidGes(v, cm, change = false) {
           v.addCodeCheckerEntry(data);
           if (d) console.debug(data.html);
         }
-      } else if (!accid && mAccid && mAccid !== accidGes) {
+      } else if (!accid && mAccid && mAccid !== accidGesMeaning) {
         // check all accids having appeared in the current measure
-        data.measureAccid = mAccid;
         data.html =
           ++count +
           ' Measure ' +
@@ -1237,17 +1239,22 @@ export function checkAccidGes(v, cm, change = false) {
           ', Note ' +
           data.xmlId +
           ' lacks an accid.ges="' +
-          data.measureAccid +
+          mAccid +
           '", because it has been defined earlier in the measure.';
         data.correct = () => {
           v.allowCursorActivity = false;
-          e.setAttribute('accid.ges', data.measureAccid);
+          e.setAttribute('accid.ges', mAccid);
           replaceInEditor(cm, e, false);
           v.allowCursorActivity = true;
         };
         v.addCodeCheckerEntry(data);
         if (d) console.debug(data.html);
-      } else if (!accid && affectedNotes.includes(pName) && mAccid !== accidGes && accidGes !== data.keySigAccid) {
+      } else if (
+        !accid &&
+        affectedNotes.includes(pName) &&
+        mAccid !== accidGesMeaning &&
+        data.keySigAccid !== accidGesMeaning
+      ) {
         // a note, affected by key signature, either has @accid inside or as a child or has @accid.ges inside or as a child
         data.html =
           ++count +
@@ -1266,7 +1273,12 @@ export function checkAccidGes(v, cm, change = false) {
         };
         v.addCodeCheckerEntry(data);
         if (d) console.debug(data.html);
-      } else if (!accid && !affectedNotes.includes(pName) && mAccid !== accidGes && accidGes !== 'n') {
+      } else if (
+        !accid &&
+        !affectedNotes.includes(pName) &&
+        mAccid !== accidGesMeaning &&
+        (accidGesMeaning !== 'n' || accidGesEncoded === 'n')
+      ) {
         // Check if there is an accid.ges that has not been defined in keySig or earlier in the measure
         data.html =
           ++count +
@@ -1275,7 +1287,7 @@ export function checkAccidGes(v, cm, change = false) {
           ', Note ' +
           data.xmlId +
           ' has superfluous accid.ges="' +
-          accidGes +
+          accidGesEncoded +
           '"';
         data.correct = () => {
           v.allowCursorActivity = false;
@@ -1294,6 +1306,7 @@ export function checkAccidGes(v, cm, change = false) {
       }
     }
   });
+  v.allowCursorActivity = true;
 } // checkAccidGes()
 
 /**
