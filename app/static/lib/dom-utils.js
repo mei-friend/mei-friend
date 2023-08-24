@@ -234,9 +234,8 @@ export function countAsBreak(el, sourceId = '') {
  * 
  * @param {Element} xmlNode initial xml element to check 
  * @param {Array} idArray array of possible target elements
- * @param {Document} xmlDoc current xml document
  */
-export function getAdjacentSiblingElements(xmlNode, idArray, xmlDoc) {
+export function getAdjacentSiblingElements(xmlNode, idArray) {
   let adjacentElIds = [];
   let directions = ['previous', 'next'];
   
