@@ -1112,6 +1112,23 @@ export function checkAccidGes(v, cm, change = false) {
 
       let accid = e.getAttribute('accid') || e.querySelector('[accid]')?.getAttribute('accid');
       let accidGesEncoded = e.getAttribute('accid.ges') || e.querySelector('[accid\\.ges]')?.getAttribute('accid.ges');
+      let accidGesMeaning =
+        e.getAttribute('accid.ges') || e.querySelector('[accid\\.ges]')?.getAttribute('accid.ges') || 'n';
+      let mAccid = ''; // measure accid for current note
+      if (
+        staffNumber in measureAccids &&
+        oct in measureAccids[staffNumber] &&
+        pName in measureAccids[staffNumber][oct]
+      ) {
+        // get accids for all tstamps, sort them, and remember last before current
+        let mTstamps = measureAccids[staffNumber][oct][pName];
+        Object.keys(mTstamps)
+          .map((v) => parseFloat(v))
+          .sort()
+          .forEach((t) => {
+            if (t <= tstamp) mAccid = mTstamps[t];
+          });
+      }
 
       // find doubled accid/accid.ges information
       if (accidGesEncoded && accid) {
@@ -1147,21 +1164,6 @@ export function checkAccidGes(v, cm, change = false) {
         }
         v.addCodeCheckerEntry(data);
       }
-
-      let accidGesMeaning =
-        e.getAttribute('accid.ges') || e.querySelector('[accid\\.ges]')?.getAttribute('accid.ges') || 'n';
-
-      let mAccid = ''; // measure accid
-      if (
-        staffNumber in measureAccids &&
-        oct in measureAccids[staffNumber] &&
-        pName in measureAccids[staffNumber][oct]
-      ) {
-        let mTstamp = measureAccids[staffNumber][oct][pName].tstamp;
-        if (mTstamp >= 0 && mTstamp <= tstamp) mAccid = measureAccids[staffNumber][oct][pName].accid;
-      }
-
-      // TODO: make logic simpler
 
       if (data.xmlId && data.xmlId in ties) {
         // Check whether note tied by starting note
@@ -1309,23 +1311,37 @@ export function checkAccidGes(v, cm, change = false) {
   });
   v.allowCursorActivity = true;
 
-  // TODO: account for multiple accid on one pitch at different tstamps
+  /**
+   * Search for @accid attributes in measure and store them in
+   * an object measureAccids[staffNumber][oct][pName][tstamp] = accid
+   * @param {Element} measure
+   * @returns {Object} measureAccids
+   */
   function getAccidsInMeasure(measure) {
     let measureAccids = {};
-    let elementsWithAccid = measure.querySelectorAll('[accid]');
-    elementsWithAccid.forEach((el) => {
+    // list all @accid attributes in measure
+    measure.querySelectorAll('[accid]').forEach((el) => {
       let note = el.closest('note');
-      if (!note) return {};
-      let staffNumber = parseInt(el.closest('staff')?.getAttribute('n'));
-      let oct = note.getAttribute('oct') || '';
-      let pName = note.getAttribute('pname') || '';
-      let accid = el.getAttribute('accid');
-      let tstamp = speed.getTstampForElement(v.xmlDoc, note);
+      if (note) {
+        let staffNumber = parseInt(el.closest('staff')?.getAttribute('n'));
+        let oct = note.getAttribute('oct') || '';
+        let pName = note.getAttribute('pname') || '';
+        let accid = el.getAttribute('accid');
+        let tstamp = speed.getTstampForElement(v.xmlDoc, note);
 
-      if (!Object.hasOwn(measureAccids, staffNumber)) measureAccids[staffNumber] = {};
-      if (!Object.hasOwn(measureAccids[staffNumber], oct)) measureAccids[staffNumber][oct] = {};
-      if (!Object.hasOwn(measureAccids[staffNumber][oct], pName)) measureAccids[staffNumber][oct][pName] = {};
-      measureAccids[staffNumber][oct][pName] = { accid: accid, tstamp: tstamp };
+        if (staffNumber && oct && pName && accid && tstamp >= 0) {
+          if (!Object.hasOwn(measureAccids, staffNumber)) {
+            measureAccids[staffNumber] = {};
+          }
+          if (!Object.hasOwn(measureAccids[staffNumber], oct)) {
+            measureAccids[staffNumber][oct] = {};
+          }
+          if (!Object.hasOwn(measureAccids[staffNumber][oct], pName)) {
+            measureAccids[staffNumber][oct][pName] = {};
+          }
+          measureAccids[staffNumber][oct][pName][tstamp] = accid;
+        }
+      }
     });
     return measureAccids;
   } // getAccidsInMeasure()
