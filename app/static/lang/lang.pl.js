@@ -69,8 +69,8 @@ export const lang = {
   showPlaybackControlsText: { text: 'Elementy sterowania odtwarzaniem' },
   facsimileTop: { text: 'Faksymile u góry' },
   facsimileBottom: { text: 'Faksymile na dole' },
-  facsimileLeft: { text: 'Faksymile po lewej' },
-  facsimileRight: { text: 'Faksymile po prawej' },
+  facsimileLeft: { text: 'Faksymile po lewej stronie' },
+  facsimileRight: { text: 'Faksymile po prawej stronie' },
 
   // INSERT MENU ITEM // ELEMENT MENU ITEM
   manipulateMenuTitle: { text: 'Manipuluj' },
