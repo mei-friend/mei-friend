@@ -2488,8 +2488,8 @@ export default class Viewer {
       let fixButtonList = codeChecker.querySelectorAll('button.fix:not(.disabled)');
       fixButtonList.forEach((button) => {
         count++;
-        // infoSpan.innerHTML = ' ' + count + ' of ' + fixButtonList.length + ' issues fixed.';
-        button.click();
+        infoSpan.innerHTML = ' ' + count + ' of ' + fixButtonList.length + ' issues fixed.';
+        setTimeout(() => button.click(), 0);
         console.log('Clicked on button ' + count + ' of ' + fixButtonList.length);
       });
       infoSpan.innerHTML = ' ' + count + ' issues fixed.';
