@@ -1305,7 +1305,9 @@ export function checkAccidGes(v, cm, change = false) {
         }
       }
     });
+    v.finalizeCodeCheckerPanel('All accid.ges attributes seem correct.');
   }, 0);
+
   v.allowCursorActivity = true;
 
   /**

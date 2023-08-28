@@ -507,6 +507,9 @@ a:active {
 
 .validation-title {
   font-weight: bold;
+  display: flex;
+  align-items: center;
+  line-height: 1.5em;
 }
 
 .validation-item {

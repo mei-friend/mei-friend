@@ -2488,11 +2488,11 @@ export default class Viewer {
       let fixButtonList = codeChecker.querySelectorAll('button.fix:not(.disabled)');
       fixButtonList.forEach((button) => {
         count++;
-        infoSpan.innerHTML = ' ' + count + ' of ' + fixButtonList.length + ' issues fixed.';
         setTimeout(() => button.click(), 0);
-        console.log('Clicked on button ' + count + ' of ' + fixButtonList.length);
       });
-      infoSpan.innerHTML = ' ' + count + ' issues fixed.';
+      infoSpanCurrent.innerHTML = '0';
+      infoSpanOf.innerHTML = '/';
+      infoSpanTotal.innerHTML = fixButtonList.length;
       correctAllButton.classList.add('disabled');
       correctAllButton.disabled = true;
       ignoreAllButton.classList.add('disabled');
@@ -2514,13 +2514,21 @@ export default class Viewer {
     });
     headerDiv.appendChild(ignoreAllButton);
 
-    let infoSpan = document.createElement('span');
-    headerDiv.appendChild(infoSpan);
+    let infoSpanCurrent = document.createElement('span');
+    infoSpanCurrent.id = 'codeCheckerInfoCurrent';
+    headerDiv.appendChild(infoSpanCurrent);
+    let infoSpanOf = document.createElement('span');
+    infoSpanOf.id = 'codeCheckerInfoOf';
+    headerDiv.appendChild(infoSpanOf);
+    let infoSpanTotal = document.createElement('span');
+    infoSpanTotal.id = 'codeCheckerInfoTotal';
+    headerDiv.appendChild(infoSpanTotal);
 
     let noMessages = document.createElement('div');
     noMessages.classList.add('validation-item');
+    noMessages.id = 'noAccidMessagesFound';
     noMessages.classList.add('noAccidMessagesFound');
-    noMessages.innerHTML = 'No inconsistent accid.ges attributes found.';
+    noMessages.innerHTML = 'Checking code...';
     codeChecker.appendChild(noMessages);
   } // initCodeCheckerPanel()
 
@@ -2535,6 +2543,8 @@ export default class Viewer {
     if (!codeChecker) return;
     let noMessages = codeChecker.querySelector('.noAccidMessagesFound');
     if (noMessages) noMessages.remove();
+    let codeCheckerInfoCurrent = document.getElementById('codeCheckerInfoCurrent');
+    let codeCheckerInfoTotal = document.getElementById('codeCheckerInfoTotal');
     let div = document.createElement('div');
     div.classList.add('validation-item');
 
@@ -2564,6 +2574,14 @@ export default class Viewer {
         correctButton.classList.add('disabled');
         ignoreButton.disabled = true;
         ignoreButton.classList.add('disabled');
+        let count = parseInt(codeCheckerInfoCurrent.innerHTML) || 0;
+        let total = parseInt(codeCheckerInfoTotal.innerHTML) || 0;
+        codeCheckerInfoCurrent.innerHTML = ++count;
+        if (count === total) {
+          let checked = document.createElement('span');
+          checked.innerHTML += icon.check;
+          codeCheckerInfoCurrent.parentElement.appendChild(checked);
+        }
       });
       div.appendChild(correctButton);
 
@@ -2573,6 +2591,7 @@ export default class Viewer {
       ignoreButton.classList.add('btn');
       ignoreButton.classList.add('ignore');
       ignoreButton.addEventListener('click', () => {
+        let total = parseInt(codeCheckerInfoTotal.innerHTML);
         // correctButton.removeEventListener('click', data.correct);
         if (!span.classList.contains('strikethrough')) {
           // active, not stroke through
@@ -2580,15 +2599,29 @@ export default class Viewer {
           correctButton.classList.add('disabled');
           span.disabled = true;
           span.classList.add('strikethrough');
+          total--;
         } else {
           correctButton.disabled = false;
           correctButton.classList.remove('disabled');
           span.disabled = false;
           span.classList.remove('strikethrough');
+          total++;
         }
+        codeCheckerInfoTotal.innerHTML = total;
       });
       div.appendChild(ignoreButton);
     }
     codeChecker.appendChild(div);
   } // addCodeCheckerEntry()
+
+  finalizeCodeCheckerPanel(message = '') {
+    let nothingFound = document.getElementById('noAccidMessagesFound');
+    if (nothingFound) {
+      nothingFound.innerHTML = 'All accid.ges attributes seem correct.';
+    } else {
+      document.getElementById('codeCheckerInfoCurrent').innerHTML = 0;
+      document.getElementById('codeCheckerInfoOf').innerHTML = '/';
+      document.getElementById('codeCheckerInfoTotal').innerHTML = document.querySelectorAll('.validation-item').length;
+    }
+  }
 } // class Viewer
