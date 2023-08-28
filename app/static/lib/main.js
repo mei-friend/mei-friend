@@ -11,6 +11,7 @@ var pageParam; // (int) page parameter given through URL
 var selectParam; // (array) select ids given through multiple instances in URL
 let safariWarningShown = false; // show Safari warning only once
 let restoreSolidTimeout; // JS timeout that allows users to 'esc' before restoring solid session
+const restoreSolidTimeoutDelay = 1500; // how long to wait for above timeout, in ms
 
 // exports
 export var cm;
@@ -755,7 +756,7 @@ function onLanguageLoaded() {
     restoreSolidTimeout = setTimeout(function () {
       solidOverlay.classList.remove('active');
       loginAndFetch(getSolidIdP(), populateSolidTab);
-    }, 3000);
+    }, restoreSolidTimeoutDelay);
   }
 } // onLanguageLoaded
 
