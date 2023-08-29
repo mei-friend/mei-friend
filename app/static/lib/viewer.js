@@ -20,7 +20,7 @@ import {
   versionDate,
 } from './main.js';
 import { selectMarkup } from './markup.js';
-import { mp, startMidiTimeout } from './midi-player.js';
+import { startMidiTimeout } from './midi-player.js';
 import { getNotationProportion, setNotationProportion, setOrientation } from './resizer.js';
 import {
   commonSchemas,
