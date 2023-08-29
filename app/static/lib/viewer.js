@@ -956,6 +956,8 @@ export default class Viewer {
       // (e.g., none in repo, or we aren't at branch level in GH menu)
       if (e) {
         e.style.display = display;
+        const container = e.closest('a');
+        if (container) container.style.display = display;
       }
     });
   } // setGithubActionsDisplay()
