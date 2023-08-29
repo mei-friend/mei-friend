@@ -25,15 +25,6 @@
   max-height: 16px;
 }
 
-#encoding {
-  /* Take the remaining width */
-  flex: 1;
-  /* Misc */
-  align-items: stretch;
-  display: flex;
-  justify-content: left;
-}
-
 #annotationToolsMenu {
   flex-direction: column;
 }

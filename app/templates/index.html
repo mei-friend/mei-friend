@@ -341,7 +341,7 @@
           </a>
           <hr class="dropdownLine" />
           <a id="cleanAccid" href="#">
-            <span id="cleanAccidText">Clean @accid.ges</span>
+            <span id="cleanAccidText">Check @accid.ges</span>
             <span class="keyShortCut shiftKey cmdKey">C</span>
           </a>
           <a id="renumberMeasuresTest" href="#">
@@ -628,7 +628,7 @@
     <div id="githubActionsOverlay">
       <div id="githubActionsUI">
         <h3 id="githubActionsHeading">
-          Request GitHub Action workflow: <span id="requestedWorkflowName"></span>
+          <span id="githubActionsHeadingText">Request GitHub Action workflow:</span> <span id="requestedWorkflowName"></span>
         </h3>
         <p id="githubActionsDescription">
           Click on "Run workflow" to ask the GitHub API to run the above workflow for you, using the input configuration specified below. Your encoding will be reloaded in its latest version once the workflow run completes.
@@ -770,8 +770,9 @@
       <div id="notation"></div>
       <div class="resizer" id="dragMe"></div>
       <div id="encoding">
-        <span id="validation-status"></span>
         <textarea id="editor"></textarea>
+        <span id="validation-status"></span>
+        <span id="codeChecker">Code Checker</span>
       </div>
     </div>
 

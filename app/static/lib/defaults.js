@@ -751,6 +751,12 @@ export const codeMirrorSettingsOptions = {
     type: 'bool',
     default: true,
   },
+  autoShowValidationReport: {
+    title: 'Auto show validation report',
+    description: 'Show validation report automatically after validation has been performed',
+    type: 'bool',
+    default: false,
+  },
   autoCloseBrackets: {
     title: 'Auto close brackets',
     description: 'Automatically close brackets at input',

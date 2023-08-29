@@ -25,6 +25,9 @@ import {
   establishContainerResource,
   establishResource,
   createMAOMusicalObject,
+  establishDiscoveryResource,
+  getCurrentFileUri,
+  safelyPatchResource
 } from './solid.js';
 import { nsp, traverseAndFetch } from './linked-data.js';
 
@@ -36,6 +39,7 @@ export function situateAndRefreshAnnotationsList(forceRefresh = false) {
 }
 
 export function refreshAnnotationsList() {
+  console.log('REFRESHING LIST', annotations);
   const list = document.getElementById('listAnnotations');
   // clear list
   while (list.firstChild) {
@@ -57,9 +61,10 @@ export function refreshAnnotationsList() {
     'beforeend',
     annotations.length ? '' : '<p>' + translator.lang.noAnnotationsToDisplay.text + '.</p>'
   );
-  annotations.forEach((a, aix) => {
+  annotations.forEach((a) => {
     const annoDiv = document.createElement('div');
     annoDiv.classList.add('annotationListItem');
+    annoDiv.id = a.id;
     const details = document.createElement('details');
     details.setAttribute('open', '');
     const summary = document.createElement('summary');
@@ -96,6 +101,12 @@ export function refreshAnnotationsList() {
       (isStandoff.title = translator.lang.makeStandOffAnnotation.descriptionToLocal + ': '), a.id;
       isStandoff.dataset.id = a.id;
       isStandoff.addEventListener('click', (e) => window.open(a.id, '_blank'));
+      if ('standoffUri' in a) {
+        isStandoff.href = a.standoffUri;
+        isStandoff.target = '_blank';
+      } else {
+        console.warn('Standoff annotation without standoffUri: ', a);
+      }
     }
     const isInline = document.createElement('a');
     isInline.id = 'makeInlineAnnotation';
@@ -1001,57 +1012,85 @@ async function writeStandoffIfRequested(a) {
     a.isStandoff = true;
     if (solid.getDefaultSession().info.isLoggedIn) {
       document.getElementById('solid_logo').classList.add('clockwise');
+      let currentFileUri = getCurrentFileUri();
+      let currentFileUriHash = encodeURIComponent(currentFileUri);
       // ensure mei-friend container exists
       establishContainerResource(friendContainer)
         .then((friendContainerResource) => {
-          establishContainerResource(annotationContainer)
-            .then((annotationContainerResource) => {
-              // generate a web annotation JSON-LD object
-              let webAnno = new Object();
-              let body = new Object();
-              webAnno['@type'] = [nsp.OA + 'Annotation'];
-              webAnno[nsp.OA + 'hasTarget'] = a.selection.map((s) => {
-                // TODO: do something clever if fileLocationType = "file" (local)
-                return { '@id': meiFileLocation + '#' + s };
-              });
-              switch (a.type) {
-                case 'annotateHighlight':
-                  webAnno[nsp.OA + 'motivatedBy'] = [{ '@id': nsp.OA + 'highlighting' }];
-                  break;
-                case 'annotateDescribe':
-                  body['@type'] = [nsp.OA + 'TextualBody'];
-                  if ('description' in a) {
-                    body[nsp.RDF + 'value'] = a.description;
-                  } else {
-                    console.warn('Describing annotation without a description: ', a);
-                  }
-                  webAnno[nsp.OA + 'motivatedBy'] = [{ '@id': nsp.OA + 'describing' }];
-                  webAnno[nsp.OA + 'hasBody'] = [body];
-                  break;
-                case 'annotateLink':
-                  webAnno[nsp.OA + 'motivatedBy'] = [{ '@id': nsp.OA + 'linking' }];
-                  webAnno[nsp.OA + 'hasBody'] = [{ '@id': a.url }];
-                  break;
-                default:
-                  console.warn('Trying to write standoff annotation with unknown annotation type:', a);
-                  break;
-              }
-              webAnno['@id'] = annotationContainerResource + a.id;
-              establishResource(webAnno['@id'], webAnno).then((webAnnoResp) => {
-                if (webAnnoResp.ok) {
-                  console.log('Success! Posted Web Annotation:', webAnno);
-                } else {
-                  console.warn("Couldn't post WebAnno: ", webAnno, webAnnoResp);
-                  throw webAnnoResp;
+          establishContainerResource(annotationContainer).then((annotationContainerResource) => {
+            establishDiscoveryResource(friendContainerResource, currentFileUri)
+              .then((discoveryResource) => {
+                let discoveryUri = discoveryResource + currentFileUriHash;
+                // generate a web annotation JSON-LD object
+                let webAnno = new Object();
+                let body = new Object();
+                webAnno['@type'] = [nsp.OA + 'Annotation', nsp.SCHEMA + 'Dataset'];
+                webAnno[nsp.SCHEMA + 'includedInDataCatalog'] = { '@id': discoveryUri };
+                webAnno[nsp.OA + 'hasTarget'] = a.selection.map((s) => {
+                  // TODO: do something clever if fileLocationType = "file" (local)
+                  return { '@id': meiFileLocation + '#' + s };
+                });
+                switch (a.type) {
+                  case 'annotateHighlight':
+                    webAnno[nsp.OA + 'motivatedBy'] = [{ '@id': nsp.OA + 'highlighting' }];
+                    break;
+                  case 'annotateDescribe':
+                    body['@type'] = [nsp.OA + 'TextualBody'];
+                    if ('description' in a) {
+                      body[nsp.RDF + 'value'] = a.description;
+                    } else {
+                      console.warn('Describing annotation without a description: ', a);
+                    }
+                    webAnno[nsp.OA + 'motivatedBy'] = [{ '@id': nsp.OA + 'describing' }];
+                    webAnno[nsp.OA + 'hasBody'] = [body];
+                    break;
+                  case 'annotateLink':
+                    webAnno[nsp.OA + 'motivatedBy'] = [{ '@id': nsp.OA + 'linking' }];
+                    webAnno[nsp.OA + 'hasBody'] = [{ '@id': a.url }];
+                    break;
+                  default:
+                    console.warn('Trying to write standoff annotation with unknown annotation type:', a);
+                    break;
                 }
+                webAnno['@id'] = annotationContainerResource + a.id;
+                establishResource(webAnno['@id'], webAnno).then((webAnnoResp) => {
+                  if (webAnnoResp.ok) {
+                    console.log('Success! Posted Web Annotation:', webAnno);
+                    // remember new resource URI within internal annotation, for use when refreshing annotation list
+                    a.standoffUri = webAnno['@id'];
+                    // update current annotation list item in DOM as well (so we can already click before anno list refresh required)
+                    let standoffIcon = document.querySelector(`#${a.id} .makeStandOffAnnotation`);
+                    standoffIcon.href = a.standoffUri;
+                    standoffIcon.target = '_blank';
+                    // patch the discovery resource to include the newly created annotation
+                    safelyPatchResource(discoveryUri, [
+                      {
+                        op: 'add',
+                        // escape ~ and / characters according to JSON POINTER spec
+                        // use '-' at end of path specification to indicate new array item to be created
+                        path: `/${nsp.SCHEMA.replaceAll('~', '~0').replaceAll('/', '~1')}dataset/-`,
+                        value: {
+                          '@type': `${nsp.SCHEMA}Dataset`,
+                          [`${nsp.SCHEMA}additionalType`]: { '@id': `${nsp.OA}Annotation` },
+                          [`${nsp.SCHEMA}url`]: {
+                            '@id': webAnno['@id'],
+                          },
+                        },
+                      },
+                    ]);
+                  } else {
+                    console.warn("Couldn't post WebAnno: ", webAnno, webAnnoResp);
+                    throw webAnnoResp;
+                  }
+                });
+              })
+              .catch((e) => {
+                console.error("Couldn't post WebAnno:", e);
               });
-            })
-            .catch((e) => {
-              console.error("Couldn't post WebAnno:", e);
-            });
+          });
         })
-        .catch(() => {
-          console.error("Couldn't establish container:", friendContainer);
+        .catch((e) => {
+          console.error("Couldn't establish container:", friendContainer, e);
         })
         .finally(() => {
           document.getElementById('solid_logo').classList.remove('clockwise');
@@ -1074,16 +1113,16 @@ export function clearAnnotations() {
 }
 
 /**
- * getSolidIdP(): Determine user's prefered Solid identity provider (IdP), 
- * either a provided custom value if "Other" is chosen or otherwise the 
+ * getSolidIdP(): Determine user's prefered Solid identity provider (IdP),
+ * either a provided custom value if "Other" is chosen or otherwise the
  * IdP currently selected from the dropdown menu.
  */
-export function getSolidIdP() { 
-  const providerSelect = document.getElementById("providerSelect");
-  if(providerSelect) { 
-    if(providerSelect.value === "other") { 
-      return document.getElementById("customSolidIdP").value;
-    } else { 
+export function getSolidIdP() {
+  const providerSelect = document.getElementById('providerSelect');
+  if (providerSelect) {
+    if (providerSelect.value === 'other') {
+      return document.getElementById('customSolidIdP').value;
+    } else {
       return providerSelect.value;
     }
   }
@@ -1100,6 +1139,28 @@ export async function populateSolidTab() {
     });
   } else {
     solidTab.innerHTML = populateLoggedOutSolidTab();
+    // add event listeners
+    const provider = document.getElementById('providerSelect');
+    provider.addEventListener('input', (e) => {
+      let customSolidIdP = document.getElementById('customSolidIdP');
+      switch (e.target.value) {
+        case 'other':
+          customSolidIdP.value = '';
+          break;
+        default:
+          customSolidIdP.value = e.target.value;
+      }
+    });
+    const customSolidIdP = document.getElementById('customSolidIdP');
+    customSolidIdP.addEventListener('input', (e) => {
+      let providerSelect = document.getElementById('providerSelect');
+      providerSelect.value = 'other';
+    });
+    customSolidIdP.addEventListener('click', (e) => {
+      if (e.target.value === '') {
+        e.target.value = 'https://';
+      }
+    });
     document.getElementById('solidLogin').addEventListener('click', () => {
       loginAndFetch(getSolidIdP(), populateSolidTab);
     });
@@ -1151,24 +1212,21 @@ function populateLoggedOutSolidTab() {
     <option value="https://solidcommunity.net">SolidCommunity.net</option>
     <option value="https://login.inrupt.net">Inrupt</option>
     <option value="https://trompa-solid.upf.edu">TROMPA @ UPF</option>
-    <option value="other">Other...</option>
+    <option value="other" selected>Other...</option>
   `;
-  provider.addEventListener("change", (e) => {
-    let customSolidIdP = document.getElementById("#customSolidIdP");
-    customSolidIdP.style.display = e.value === "other" ? 
-      "block" : "none";
-  })
   provider.title = translator.lang.solidProvider.description;
-  let customSolidIdP = document.createElement("input");
-  customSolidIdP.type = "text";
-  customSolidIdP.placeholder = "https://...";
-  customSolidIdP.id = "customSolidIdP";
-  providerContainer.insertAdjacentElement('afterbegin', provider);
+  let customSolidIdP = document.createElement('input');
+  customSolidIdP.type = 'text';
+  customSolidIdP.placeholder = 'https://...';
+  customSolidIdP.id = 'customSolidIdP';
+  customSolidIdP.setAttribute('size', '17');
   let solidLoginBtn = document.createElement('button');
   solidLoginBtn.innerHTML = translator.lang.solidLoginBtn.text;
   solidLoginBtn.id = 'solidLogin';
   solidLoginBtn.title = translator.lang.solidExplanation.description;
-  providerContainer.insertAdjacentElement('beforeend', solidLoginBtn);
-  providerContainer.insertAdjacentElement('beforeend', customSolidIdP);
+  // inject into DOM
+  providerContainer.insertAdjacentElement('afterbegin', provider);
+  providerContainer.insertAdjacentElement('afterbegin', solidLoginBtn);
+  providerContainer.insertAdjacentElement('afterbegin', customSolidIdP);
   return providerContainer.outerHTML;
 }

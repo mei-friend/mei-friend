@@ -20,7 +20,7 @@ import {
   versionDate,
 } from './main.js';
 import { selectMarkup } from './markup.js';
-import { mp, startMidiTimeout } from './midi-player.js';
+import { startMidiTimeout } from './midi-player.js';
 import { getNotationProportion, setNotationProportion, setOrientation } from './resizer.js';
 import {
   commonSchemas,
@@ -34,6 +34,7 @@ import {
   platform,
   supportedVerovioVersions,
 } from './defaults.js';
+import * as icon from './../css/icons.js';
 
 export default class Viewer {
   constructor(vrvWorker, spdWorker) {
@@ -69,7 +70,6 @@ export default class Viewer {
     this.timeoutDelay = defaultViewerTimeoutDelay; // ms, window in which concurrent clicks are treated as one update
     this.verovioIcon = document.getElementById('verovioIcon');
     this.breaksSelect = /** @type HTMLSelectElement */ (document.getElementById('breaksSelect'));
-    this.respId = '';
     this.alertCloser;
     this.pdfMode = false;
     this.cmd2KeyPressed = false;
@@ -325,7 +325,6 @@ export default class Viewer {
       start: {},
       end: {},
     };
-    this.respId = '';
     this.expansionId = '';
   } // clear()
 
@@ -597,6 +596,7 @@ export default class Viewer {
     if (!isSafari) this.checkSchema(cm.getValue());
     let ch = document.getElementById('liveUpdateCheckbox');
     if ((this.allowCursorActivity && ch && ch.checked) || forceUpdate) {
+      this.setRespSelectOptions();
       this.updateData(cm, false, false);
     }
   } // notationUpdated()
@@ -957,6 +957,8 @@ export default class Viewer {
       // (e.g., none in repo, or we aren't at branch level in GH menu)
       if (e) {
         e.style.display = display;
+        const container = e.closest('a');
+        if (container) container.style.display = display;
       }
     });
   } // setGithubActionsDisplay()
@@ -1154,9 +1156,6 @@ export default class Viewer {
         }
       }
       switch (opt) {
-        case 'respSelect':
-          this.respId = document.getElementById('respSelect').value;
-          break;
         case 'renumberMeasuresUseSuffixAtEndings':
           this.disableElementThroughCheckbox(
             'renumberMeasuresContinueAcrossEndings',
@@ -1329,9 +1328,6 @@ export default class Viewer {
               '--suppliedHighlightedColor',
               checked ? utils.brighter(col, -50) : 'var(--highlightColor)'
             );
-            break;
-          case 'respSelect':
-            this.respId = document.getElementById('respSelect').value;
             break;
           case 'controlMenuFontSelector':
             document.getElementById('engravingFontControls').style.display = document.getElementById(
@@ -1811,15 +1807,17 @@ export default class Viewer {
 
   // add responsibility statement to resp select dropdown
   setRespSelectOptions() {
+    this.loadXml(cm.getValue()); // loads if outdated
     let rs = document.getElementById('respSelect');
     if (rs) {
+      let value = rs.value;
       while (rs.length > 0) rs.options.remove(0);
       let optEls = this.xmlDoc.querySelectorAll('corpName[*|id],persName[*|id]');
       optEls.forEach((el) => {
         if (el.closest('respStmt')) {
           // only if inside a respStmt
           let id = el.getAttribute('xml:id');
-          rs.add(new Option(id, id));
+          rs.add(new Option(id, id, id === value ? true : false, id === value ? true : false));
         }
       });
     }
@@ -2150,11 +2148,14 @@ export default class Viewer {
     }
   } // hideAlerts()
 
-  // Method to check from MEI whether the XML schema filename has changed
+  /**
+   * Method to check from MEI header whether the XML schema filename
+   * has changed, as stored in this.currentSchema
+   * @param {string} mei
+   * @returns
+   */
   async checkSchema(mei) {
     // console.log('Validation: checking for schema...')
-    let vr = document.getElementById('validation-report');
-    if (vr) vr.style.visibility = 'hidden';
     const hasSchema = /<\?xml-model.*schematypens=\"http?:\/\/relaxng\.org\/ns\/structure\/1\.0\"/;
     const hasSchemaMatch = hasSchema.exec(mei);
     const meiVersion = /<mei.*meiversion="([^"]*).*/;
@@ -2186,31 +2187,32 @@ export default class Viewer {
       console.log('Validation: ...new schema ' + this.currentSchema);
       await this.replaceSchema(this.currentSchema);
     }
-    //else {
-    // console.log('Validation: same schema.');
-    //}
-  }
+  } // checkSchema()
 
-  // Loads and replaces XML schema; throws errors if not found/CORS error,
-  // update validation-status icon
-  async replaceSchema(schemaFile) {
+  /**
+   * Loads and replaces XML schema; throws errors if not found/CORS error,
+   * update validation-status icon
+   * @param {string*} schemaFileName
+   * @returns
+   */
+  async replaceSchema(schemaFileName) {
     if (!this.validatorInitialized) return;
     let vs = document.getElementById('validation-status');
     vs.innerHTML = download;
-    let msg = translator.lang.loadingSchema.text + ' ' + schemaFile;
+    let msg = translator.lang.loadingSchema.text + ' ' + schemaFileName;
     vs.setAttribute('title', msg);
     this.changeStatus(vs, 'wait', ['error', 'ok', 'manual']);
-    this.updateSchemaStatusDisplay('wait', schemaFile, msg);
+    this.updateSchemaStatusDisplay('wait', schemaFileName, msg);
 
-    console.log('Validation: Replace schema: ' + schemaFile);
+    console.log('Validation: Replace schema: ' + schemaFileName);
     let data; // content of schema file
     try {
-      const response = await fetch(schemaFile);
+      const response = await fetch(schemaFileName);
       if (!response.ok) {
         // schema not found
         this.throwSchemaError({
           response: response,
-          schemaFile: schemaFile,
+          schemaFile: schemaFileName,
         });
         return;
       }
@@ -2219,25 +2221,28 @@ export default class Viewer {
     } catch (err) {
       this.throwSchemaError({
         err: translator.lang.errorLoadingSchema.text + ': ' + err,
-        schemaFile: schemaFile,
+        schemaFile: schemaFileName,
       });
       return;
     }
-    msg = translator.lang.schemaLoaded.text + ' ' + schemaFile;
+    msg = translator.lang.schemaLoaded.text + ' ' + schemaFileName;
     vs.setAttribute('title', msg);
     vs.innerHTML = unverified;
     this.validatorWithSchema = true;
     const autoValidate = document.getElementById('autoValidate');
     if (autoValidate && autoValidate.checked) validate(cm.getValue(), this.updateLinting, true);
     else this.setValidationStatusToManual();
-    console.log('New schema loaded to validator', schemaFile);
+    console.log('New schema loaded to validator', schemaFileName);
     rngLoader.setRelaxNGSchema(data);
     cm.options.hintOptions.schemaInfo = rngLoader.tags;
-    console.log('New schema loaded for auto completion', schemaFile);
-    this.updateSchemaStatusDisplay('ok', schemaFile, msg);
-  }
+    console.log('New schema loaded for auto completion', schemaFileName);
+    this.updateSchemaStatusDisplay('ok', schemaFileName, msg);
+  } // replaceSchema()
 
-  // Throw an schema error and update validation-status icon
+  /**
+   * Throws an schema error and updates validation-status icon
+   * @param {Object} msgObj
+   */
   throwSchemaError(msgObj) {
     this.validatorWithSchema = false;
     if (this.updateLinting && typeof this.updateLinting === 'function') this.updateLinting(cm, []); // clear errors in CodeMirror
@@ -2260,17 +2265,26 @@ export default class Viewer {
     console.warn(msg);
     this.changeStatus(vs, 'error', ['wait', 'ok', 'manual']);
     this.updateSchemaStatusDisplay('error', '', msg);
-    return;
-  }
+  } // throwSchemaError()
 
-  // helper function that adds addedClass (string)
-  // after removing removedClasses (array of strings)
-  // from el (DOM element)
-  changeStatus(el, addedClass = '', removedClasses = []) {
+  /**
+   * Helper function that adds addedClassName (string) after having removed
+   * removedClasses (array of strings) from el (DOM element)
+   * @param {Element} el
+   * @param {string} addedClassName
+   * @param {Array<string>} removedClasses
+   */
+  changeStatus(el, addedClassName = '', removedClasses = []) {
     removedClasses.forEach((c) => el.classList.remove(c));
-    el.classList.add(addedClass);
-  }
+    el.classList.add(addedClassName);
+  } // changeStatus()
 
+  /**
+   * Updates schema status display
+   * @param {string} status
+   * @param {string} schemaName
+   * @param {string} msg
+   */
   updateSchemaStatusDisplay(status = 'ok', schemaName, msg = '') {
     let el = document.getElementById('schemaStatus');
     if (el) {
@@ -2301,9 +2315,11 @@ export default class Viewer {
           break;
       }
     }
-  }
+  } // updateSchemaStatusDisplay()
 
-  // Switch validation-status icon to manual mode and add click event handlers
+  /**
+   * Switch validation-status icon to manual mode and add click event handlers
+   */
   setValidationStatusToManual() {
     let vs = document.getElementById('validation-status');
     vs.innerHTML = unverified;
@@ -2316,16 +2332,23 @@ export default class Viewer {
     let reportDiv = document.getElementById('validation-report');
     if (reportDiv) reportDiv.style.visibility = 'hidden';
     if (this.updateLinting && typeof this.updateLinting === 'function') this.updateLinting(cm, []); // clear errors in CodeMirror
-  }
+  } // setValidationStatusToManual()
 
-  // Callback for manual validation
+  /**
+   * Callback for manual validation
+   */
   manualValidate() {
     validate(cm.getValue(), undefined, {
       forceValidate: true,
     });
-  }
+  } // manualValidate()
 
-  // Highlight validation results in CodeMirror editor linting system
+  /**
+   * Highlight validation results in CodeMirror editor linting system
+   * @param {string} mei
+   * @param {Object} messages
+   * @returns
+   */
   highlightValidation(mei, messages) {
     let lines;
     let found = [];
@@ -2362,7 +2385,10 @@ export default class Viewer {
     let vs = document.getElementById('validation-status');
     vs.querySelector('svg').classList.remove('clockwise');
     let reportDiv = document.getElementById('validation-report');
-    if (reportDiv) reportDiv.innerHTML = '';
+    if (reportDiv) {
+      reportDiv.innerHTML = '';
+      reportDiv.style.visibility = 'hidden';
+    }
 
     let msg = '';
     if (found.length === 0 && this.validatorWithSchema) {
@@ -2382,10 +2408,9 @@ export default class Viewer {
         reportDiv.id = 'validation-report';
         reportDiv.classList.add('validation-report');
         let CM = document.querySelector('.CodeMirror');
-        CM.parentElement.insertBefore(reportDiv, CM);
-      } else {
-        reportDiv.style.visibility = 'visible';
+        CM.parentElement?.appendChild(reportDiv);
       }
+
       let closeButton = document.createElement('span');
       closeButton.classList.add('rightButton');
       closeButton.innerHTML = '&times';
@@ -2404,7 +2429,7 @@ export default class Viewer {
       messages.forEach((m, i) => {
         let p = document.createElement('div');
         p.classList.add('validation-item');
-        p.id = 'error' + i;
+        p.id = 'validationError' + i;
         p.innerHTML = 'Line ' + m.line + ': ' + m.message;
         p.addEventListener('click', (ev) => {
           cm.scrollIntoView({
@@ -2436,10 +2461,22 @@ export default class Viewer {
       vs.removeEventListener('click', this.manualValidate);
       vs.removeEventListener('click', this.toggleValidationReportVisibility);
       vs.addEventListener('click', this.toggleValidationReportVisibility);
+
+      let currentVisibility = reportDiv.style.visibility;
+      // show or not validation report, if not already defined
+      if (!currentVisibility || !document.getElementById('autoValidate')?.checked)
+        reportDiv.style.visibility =
+          document.getElementById('autoShowValidationReport')?.checked ||
+          !document.getElementById('autoValidate')?.checked
+            ? 'visible'
+            : 'hidden';
     }
   } // highlightValidation()
 
-  // Show/hide #validation-report panel, or force visibility (by string)
+  /**
+   * Show/hide #validation-report panel, or force visibility (by string)
+   * @param {string} forceVisibility
+   */
   toggleValidationReportVisibility(forceVisibility = '') {
     let reportDiv = document.getElementById('validation-report');
     if (reportDiv) {
@@ -2452,4 +2489,178 @@ export default class Viewer {
       }
     }
   } // toggleValidationReportVisibility()
+
+  /**
+   * Initializes and shows code checker panel below the CodeMirror encoding.
+   * codeCheckerEntries to be added through addCodeCheckerEntry(data).
+   * @param {string} title
+   * @returns
+   */
+  initCodeCheckerPanel(title = 'Code Checker') {
+    let codeChecker = document.getElementById('codeChecker');
+    if (!codeChecker) return;
+    codeChecker.innerHTML = '';
+    codeChecker.style.display = 'block';
+    setOrientation(cm, '', '', this);
+
+    let closeButton = document.createElement('span');
+    closeButton.classList.add('rightButton');
+    closeButton.innerHTML = '&times';
+    closeButton.addEventListener('click', () => {
+      codeChecker.style.display = 'none';
+      setOrientation(cm, '', '', this);
+    });
+    codeChecker.appendChild(closeButton);
+
+    let headerDiv = document.createElement('div');
+    headerDiv.classList.add('validation-title');
+    headerDiv.id = 'codeCheckerTitle';
+    headerDiv.innerHTML = title;
+    codeChecker.appendChild(headerDiv);
+
+    // Correct/Fix all
+    let correctAllButton = document.createElement('button');
+    correctAllButton.innerHTML = translator.lang.codeCheckerFixAll.text;
+    correctAllButton.classList.add('btn');
+    correctAllButton.addEventListener('click', () => {
+      let count = 0;
+      let fixButtonList = codeChecker.querySelectorAll('button.fix:not(.disabled)');
+      fixButtonList.forEach((button) => {
+        count++;
+        setTimeout(() => button.click(), 0);
+      });
+      infoSpanCurrent.innerHTML = '0';
+      infoSpanOf.innerHTML = '/';
+      infoSpanTotal.innerHTML = fixButtonList.length;
+      correctAllButton.classList.add('disabled');
+      correctAllButton.disabled = true;
+      ignoreAllButton.classList.add('disabled');
+      ignoreAllButton.disabled = true;
+    });
+    headerDiv.appendChild(correctAllButton);
+
+    let ignoreAllButton = document.createElement('button');
+    ignoreAllButton.innerHTML = translator.lang.codeCheckerIgnoreAll.text;
+    ignoreAllButton.classList.add('btn');
+    ignoreAllButton.addEventListener('click', () => {
+      codeChecker.querySelectorAll('.validation-item').forEach((ch) => {
+        let button = ch.querySelector('button.ignore');
+        let span = ch.querySelector('.codeCheckerMessage');
+        if (button && !button.disabled && span && !span.classList.contains('strikethrough')) {
+          button.click();
+        }
+      });
+    });
+    headerDiv.appendChild(ignoreAllButton);
+
+    let infoSpanCurrent = document.createElement('span');
+    infoSpanCurrent.id = 'codeCheckerInfoCurrent';
+    headerDiv.appendChild(infoSpanCurrent);
+    let infoSpanOf = document.createElement('span');
+    infoSpanOf.id = 'codeCheckerInfoOf';
+    headerDiv.appendChild(infoSpanOf);
+    let infoSpanTotal = document.createElement('span');
+    infoSpanTotal.id = 'codeCheckerInfoTotal';
+    headerDiv.appendChild(infoSpanTotal);
+
+    let noMessages = document.createElement('div');
+    noMessages.classList.add('validation-item');
+    noMessages.id = 'codeCheckerCheckingCode';
+    noMessages.classList.add('noAccidMessagesFound');
+    noMessages.innerHTML = translator.lang.codeCheckerCheckingCode.text;
+    codeChecker.appendChild(noMessages);
+  } // initCodeCheckerPanel()
+
+  /**
+   * Adds an entry to the code checker panel with a data structure,
+   * containing also the fix callback
+   * @param {Object} data
+   * @returns
+   */
+  addCodeCheckerEntry(data) {
+    let codeChecker = document.getElementById('codeChecker');
+    if (!codeChecker) return;
+    let noMessages = codeChecker.querySelector('.noAccidMessagesFound');
+    if (noMessages) noMessages.remove();
+    let codeCheckerInfoCurrent = document.getElementById('codeCheckerInfoCurrent');
+    let codeCheckerInfoTotal = document.getElementById('codeCheckerInfoTotal');
+    let div = document.createElement('div');
+    div.classList.add('validation-item');
+
+    // span for message
+    let span = document.createElement('span');
+    span.classList.add('codeCheckerMessage');
+    span.innerHTML = data.html;
+    span.addEventListener('click', (ev) => {
+      utils.setCursorToId(cm, data.xmlId);
+      cm.focus();
+    });
+    div.appendChild(span);
+
+    // function to correct error
+    if (data.correct) {
+      // Correct/Fix Button
+      let correctButton = document.createElement('button');
+      correctButton.innerHTML = translator.lang.codeCheckerFix.text;
+      correctButton.classList.add('btn');
+      correctButton.classList.add('fix');
+      correctButton.addEventListener('click', () => {
+        data.correct();
+        let checked = document.createElement('span');
+        checked.innerHTML = icon.check;
+        div.appendChild(checked);
+        correctButton.disabled = true;
+        correctButton.classList.add('disabled');
+        ignoreButton.disabled = true;
+        ignoreButton.classList.add('disabled');
+        let count = parseInt(codeCheckerInfoCurrent.innerHTML) || 0;
+        let total = parseInt(codeCheckerInfoTotal.innerHTML) || 0;
+        codeCheckerInfoCurrent.innerHTML = ++count;
+        if (count === total) {
+          let checked = document.createElement('span');
+          checked.innerHTML += icon.check;
+          codeCheckerInfoCurrent.parentElement.appendChild(checked);
+        }
+      });
+      div.appendChild(correctButton);
+
+      // Ignore Button
+      let ignoreButton = document.createElement('button');
+      ignoreButton.innerHTML = translator.lang.codeCheckerIgnore.text;
+      ignoreButton.classList.add('btn');
+      ignoreButton.classList.add('ignore');
+      ignoreButton.addEventListener('click', () => {
+        let total = parseInt(codeCheckerInfoTotal.innerHTML);
+        // correctButton.removeEventListener('click', data.correct);
+        if (!span.classList.contains('strikethrough')) {
+          // active, not stroke through
+          correctButton.disabled = true;
+          correctButton.classList.add('disabled');
+          span.disabled = true;
+          span.classList.add('strikethrough');
+          total--;
+        } else {
+          correctButton.disabled = false;
+          correctButton.classList.remove('disabled');
+          span.disabled = false;
+          span.classList.remove('strikethrough');
+          total++;
+        }
+        codeCheckerInfoTotal.innerHTML = total;
+      });
+      div.appendChild(ignoreButton);
+    }
+    codeChecker.appendChild(div);
+  } // addCodeCheckerEntry()
+
+  finalizeCodeCheckerPanel() {
+    let nothingFound = document.getElementById('codeCheckerCheckingCode');
+    if (nothingFound) {
+      nothingFound.innerHTML = translator.lang.codeCheckerNoAccidMessagesFound.text;
+    } else {
+      document.getElementById('codeCheckerInfoCurrent').innerHTML = 0;
+      document.getElementById('codeCheckerInfoOf').innerHTML = '/';
+      document.getElementById('codeCheckerInfoTotal').innerHTML = document.querySelectorAll('.validation-item')?.length;
+    }
+  } // finalizeCodeCheckerPanel()
 } // class Viewer

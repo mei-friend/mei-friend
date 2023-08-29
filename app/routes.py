@@ -2,8 +2,11 @@ from flask import Flask, url_for, redirect, render_template, session
 from dotenv import load_dotenv
 from os import getenv
 from authlib.integrations.flask_client import OAuth
+import mimetypes
 
 from app import app
+
+mimetypes.add_type('application/javascript', '.js')
 
 oauth = OAuth(app)
 github = oauth.register(

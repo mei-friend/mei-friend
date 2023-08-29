@@ -86,7 +86,7 @@ export const lang = {
   staffDownText: { text: "Élément d'un personnel vers le bas" },
   increaseDurText: { text: 'Augmenter la durée' },
   decreaseDurText: { text: 'Réduire la durée' },
-  cleanAccidText: { text: 'Nettoyer les @accid.ges' },
+  cleanAccidText: { text: 'Vérifier les @accid.ges' },
   renumberMeasuresTestText: { text: 'Renommer les mesures (test)' },
   renumberMeasuresExecText: { text: 'Renommer les mesures (exécution)' },
   addIdsText: { text: 'Ajouter des identifiants à MEI' },
@@ -275,6 +275,22 @@ export const lang = {
   openUrlChooseComposerText: { text: 'Choisissez un compositeur...' },
   openUrlOpenEncodingByUrlText: { text: 'Ouvrir une encodage hébergée sur le Web via une URL' },
 
+  // Modal GitHub actions
+  githubActionsHeadingText: { text: 'Demander le flux de travail GitHub :' },
+  githubActionsDescription: {
+    text: "Cliquez sur \"Exécuter le flux de travail\" pour demander à l'API GitHub d'exécuter le flux de travail ci-dessus pour vous, en utilisant la configuration d'entrée spécifiée ci-dessous. Votre encodage sera rechargé dans sa dernière version une fois que l'exécution du flux de travail sera terminée.",
+  },
+  githubActionStatusMsgPrompt: { text: "Impossible d'exécuter le flux de travail - GitHub dit :" },
+  githubActionStatusMsgWaiting: { text: 'Veuillez patienter pendant que GitHub traite votre flux de travail...' },
+  githubActionStatusMsgFailure: { text: "Impossible d'exécuter le flux de travail - GitHub dit :" },
+  githubActionStatusMsgSuccess: { text: 'Exécution du flux de travail terminée - GitHub dit :' },
+  githubActionsRunButton: { text: 'Exécuter le flux de travail' },
+  githubActionsRunButtonReload: { text: 'Recharger le fichier MEI' },
+  githubActionsCancelButton: { text: 'Annuler' },
+  githubActionsInputSetterFilepath: { text: "Copier le chemin du fichier actuel dans l'entrée" },
+  githubActionsInputSetterSelection: { text: "Copier la sélection MEI actuelle dans l'entrée" },
+  githubActionsInputContainerHeader: { text: "Configuration d'entrée" },
+
   // fork modals / fenêtres modales de fork
   forkRepoGithubText: { text: 'Créer une copie du dépôt Github' },
   forkRepoGithubExplanation: {
@@ -310,6 +326,13 @@ export const lang = {
   selectTagNameForEnclosureCancelButton: { value: 'Annuller' },
 
   // restore Solid session overlay
+  solidExplanation: {
+    description:
+      'Solid est une plateforme décentralisée pour les données liées sociales. Connectez-vous à Solid pour créer des annotations stand-off en utilisant des données liées (RDF).',
+  },
+  solidProvider: { description: "Veuillez choisir un fournisseur d'identité Solid (IdP) ou spécifier le vôtre." },
+  solidLoginBtn: { text: 'Se connecter' },
+
   solidOverlayCancel: {
     html: 'Restauration de la session Solid - appuyez sur <span>Esc</span> ou cliquez ici pour annuler.',
   },
@@ -327,6 +350,8 @@ export const lang = {
   annotationToolsButton: { text: 'Outils', description: "Outils d'annotation" },
   annotationListButton: { text: 'Liste', description: 'Liste des annotations' },
   writeAnnotStandoffText: { text: 'Annotation Web' },
+  annotationToolsIdentifyTitle: { text: 'Identifier' },
+  annotationToolsIdentifySpan: { text: 'Identifier un objet musical' },
   annotationToolsHighlightTitle: { text: 'Surligner' },
   annotationToolsHighlightSpan: { text: 'Surligner' },
   annotationToolsDescribeTitle: { text: 'Décrire' },
@@ -343,9 +368,9 @@ export const lang = {
   deleteAnnotation: { description: 'Supprimer cette annotation' },
   deleteAnnotationConfirmation: { text: 'Êtes-vous sûr de vouloir supprimer cette annotation ?' },
   makeStandOffAnnotation: {
-    description: 'Statut stand-off (Annotation Web)',
-    descriptionSolid: "Écrire sur Solid en tant qu'annotation web",
-    descriptionToLocal: "Copier l'URI d'annotation web dans le presse-papiers",
+    description: 'Statut stand-off (RDF)',
+    descriptionSolid: 'Écrire sur Solid en RDF',
+    descriptionToLocal: "Ouvrir l'annotation stand-off (RDF) dans un nouvel onglet",
   },
   makeInlineAnnotation: {
     description: 'Cliquez pour une annotation en ligne',
@@ -739,6 +764,10 @@ export const lang = {
     text: 'Validation automatique',
     description: "Valide automatiquement l'encodage par rapport au schéma après chaque édition",
   },
+  autoShowValidationReport: {
+    text: 'Afficher le rapport de validation automatiquement',
+    description: 'Afficher automatiquement le rapport de validation après que la validation a été effectuée',
+  },
   autoCloseBrackets: {
     text: 'Fermeture automatique des crochets',
     description: "Ferme automatiquement les crochets à l'entrée",
@@ -845,4 +874,31 @@ export const lang = {
   renumberMeasuresWouldBe: { text: 'serait' },
   renumberMeasuresChangedTo: { text: 'changé en' },
   renumberMeasureMeasuresRenumbered: { text: 'mesures renommées' },
+
+  // Code checker panel (accid.ges)
+  codeCheckerTitle: {
+    text: 'Vérifiez les attributs @accid.ges (par rapport à la signature de clé, les accid. par mesure et les liaisons).',
+  },
+  codeCheckerFix: { text: 'Corriger' },
+  codeCheckerFixAll: { text: 'Tout corriger' },
+  codeCheckerIgnore: { text: 'Ignorer' },
+  codeCheckerIgnoreAll: { text: 'Tout ignorer' },
+  codeCheckerCheckingCode: { text: 'Vérification du code en cours...' },
+  codeCheckerNoAccidMessagesFound: { text: 'Tous les attributs accid.ges semblent corrects.' },
+  codeCheckerMeasure: { text: 'Mesure' },
+  codeCheckerNote: { text: 'Note' },
+  codeCheckerHasBoth: { text: 'possède les deux' },
+  codeCheckerAnd: { text: 'et' },
+  codeCheckerRemove: { text: 'Retirer' },
+  codeCheckerFixTo: { text: 'Corriger à' },
+  codeCheckerAdd: { text: 'Ajouter' },
+  codeCheckerWithContradictingContent: { text: 'avec un contenu contradictoire' },
+  codeCheckerTiedNote: { text: 'Note liée' },
+  codeCheckerNotSamePitchAs: { text: 'pas la même hauteur que' },
+  codeCheckerNotSameOctaveAs: { text: 'pas le même octave que' },
+  codeCheckerNotSameAsStartingNote: { text: 'pas identique à la note de départ' },
+  codeCheckerExtra: { text: 'supplémentaire' },
+  codeCheckerHasExtra: { text: 'possède un élément supplémentaire' },
+  codeCheckerLacksAn: { text: "manque d'un" },
+  codeCheckerBecauseAlreadyDefined: { text: 'car il a été défini plus tôt dans la mesure' },
 };

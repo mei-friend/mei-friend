@@ -1,5 +1,10 @@
 # mei-friend-online CHANGELOG.md
 
+### 0.10.4
+* Add UI panel inside editor panel to check and interactively fix all occurrences of @accid.ges against key signature, measure-wise accids, ties, and redundant information.
+* Settings checkbox for enabling automatic display of validation report (off by default)
+* Update data model for stand-off annotation discovery service to use schema.org DataCatalogs / Datasets
+
 ### 0.10.3 Expansion support for MIDI playback
 * Add drop-down GUI element to MIDI toolbar to select expansion element from encoding
 * Support for MIDI playback of selected expansion element (for handling repeated sections)
@@ -27,7 +32,7 @@
 ### 0.9.1 patch
 * Fix bug with undefined lang variable under Safari (addresses #25)
 
-### 0.9.0 GitHub Actions integration
+### 0.9.0 GitHub Actions integration (release 2 July 2023)
 * Configurably display any GitHub Actions (dispatch workflows) available in the current repository / branch
 * List any configured inputs and set values from UI with shortcuts for 'current filepath' and 'current selection'
 * Launch Actions (dispatch) workflows from within mei-friend
@@ -57,7 +62,7 @@
 * Use same generate URL feature to build a full backlink with params for 'Report issue with encoding'
 * Code refactoring with separate defaults.js file
 
-### 0.8.7 transposition
+### 0.8.7 transposition (release 27 Mar 2023)
 * Add transposition settings panel to the mei-friend settings to specify transposition by key, by interval, and pitch direction.
 * Enable ?file= param to open files from private repos (when logged in)
 * Add "Report issue with encoding" feature (creates issue with reciprocal mei-friend link)
@@ -75,7 +80,7 @@
 * Page range selector for selecting all, current, page range, or individual pages (e.g., 2,5-8)
 * Download PDF file (with pages as selected in page-range settings)
 
-### 0.8.4 patch
+### 0.8.4 patch (release 1 Mar 2023)
 * Drag-select and click-select chord instead of note with `ALT` modifier
 * Add `@staff` to clef change element
 * Change of keyboard shortcuts (for inserting C clef, tenuto, spiccato)
@@ -140,7 +145,7 @@
 * When facsimile element present/absent, facsimile panel automatically shown/hidden and facsimile settings details opened/folded away
 * Notation and facsimile orientation and proportion values as URL parameters and in local storage
 * Verovio icon (activity status) moved to beginning of notation control menu
-### 0.6.6 patch: small fixes and refinements
+### 0.6.6 patch: small fixes and refinements (26 Oct 2022)
 * Correctly reset GitHub menu when switching to local file (via menu or drag'n'drop)
 * Make filename in file status display editable when working locally
 * Make undo and redo graphically available via `Code` menu
@@ -255,7 +260,7 @@ in control menu through mei-friend settings pane
 ### 0.3.1 patch
 * Implement fork repository functionality
 * Support for `file`, `orientation`, and `scale` as URL parameters
-## 0.3.0 minor: Autocompletion
+## 0.3.0 minor: Autocompletion (first release 28 Jan 2022)
 * Incorporate CodeMirror's hint addons (show-hint, xml-hint)
 * Implement context-sensitive autocompletion
 * Supply mei-CMN and mei-all 4.0.1 RNGs as schemaInfo objects

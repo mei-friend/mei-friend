@@ -83,7 +83,7 @@ export const lang = {
   staffDownText: { text: 'Mover elemento una línea de pentagrama hacia abajo' },
   increaseDurText: { text: 'Aumentar duración de nota' },
   decreaseDurText: { text: 'Disminuir duración de nota' },
-  cleanAccidText: { text: 'Limpiar @accid.ges' },
+  cleanAccidText: { text: 'Verificar @accid.ges' },
   renumberMeasuresTestText: { text: 'Renumerar compases (prueba)' },
   renumberMeasuresExecText: { text: 'Renumerar compases (ejecutar)' },
   addIdsText: { text: 'Añadir IDs a MEI' },
@@ -273,6 +273,22 @@ export const lang = {
   openUrlChooseComposerText: { text: 'Elija un compositor...' },
   openUrlOpenEncodingByUrlText: { text: 'Abrir codificación alojada en la web por URL' },
 
+  // GitHub actions modal
+  githubActionsHeadingText: { text: 'Solicitar flujo de trabajo de GitHub:' },
+  githubActionsDescription: {
+    text: 'Haz clic en "Ejecutar flujo de trabajo" para solicitar a la API de GitHub que ejecute el flujo de trabajo mencionado arriba para ti, utilizando la configuración de entrada especificada a continuación. Tu codificación se recargará en su versión más reciente una vez que se complete la ejecución del flujo de trabajo.',
+  },
+  githubActionStatusMsgPrompt: { text: 'No se pudo ejecutar el flujo de trabajo: GitHub dice' },
+  githubActionStatusMsgWaiting: { text: 'Por favor, ten paciencia mientras GitHub procesa tu flujo de trabajo...' },
+  githubActionStatusMsgFailure: { text: 'No se pudo ejecutar el flujo de trabajo: GitHub dice' },
+  githubActionStatusMsgSuccess: { text: 'Ejecución del flujo de trabajo completada: GitHub dice' },
+  githubActionsRunButton: { text: 'Ejecutar flujo de trabajo' },
+  githubActionsRunButtonReload: { text: 'Recargar archivo MEI' },
+  githubActionsCancelButton: { text: 'Cancelar' },
+  githubActionsInputSetterFilepath: { text: 'Copiar la ruta actual del archivo a la entrada' },
+  githubActionsInputSetterSelection: { text: 'Copiar la selección actual de MEI a la entrada' },
+  githubActionsInputContainerHeader: { text: 'Configuración de entrada' },
+
   // modales de fork
   forkRepoGithubText: { text: 'Hacer un fork del repositorio de Github' },
   forkRepoGithubExplanation: {
@@ -311,6 +327,14 @@ export const lang = {
   selectTagNameForEnclosureCancelButton: { value: 'Cancelar' },
 
   // restore Solid session overlay
+  solidExplanation: {
+    description:
+      'Solid es una plataforma descentralizada para datos vinculados sociales. Inicie sesión en Solid para crear anotaciones de desacople utilizando datos vinculados (RDF).',
+  },
+  solidProvider: {
+    description: 'Por favor, elija un proveedor de identidad Solid (IdP) o especifique el suyo propio.',
+  },
+  solidLoginBtn: { text: 'Iniciar sesión' },
   solidOverlayCancel: {
     html: 'Restaurando sesión de Solid - presione <span>Esc</span> o haga clic aquí para cancelar.',
   },
@@ -328,6 +352,8 @@ export const lang = {
   annotationToolsButton: { text: 'Utilidades', description: 'Herramientas de anotación' },
   annotationListButton: { text: 'Lista', description: 'Listar anotaciones' },
   writeAnnotStandoffText: { text: 'Anotación Web' },
+  annotationToolsIdentifyTitle: { text: 'Identificar' },
+  annotationToolsIdentifySpan: { text: 'Identificar objeto musical' },
   annotationToolsHighlightTitle: { text: 'Resaltar' },
   annotationToolsHighlightSpan: { text: 'Resaltar' },
   annotationToolsDescribeTitle: { text: 'Describir' },
@@ -344,9 +370,9 @@ export const lang = {
   deleteAnnotation: { description: 'Eliminar esta anotación' },
   deleteAnnotationConfirmation: { text: '¿Estás seguro de que deseas eliminar esta anotación?' },
   makeStandOffAnnotation: {
-    description: 'Estado Stand-off (anotación web)',
-    descriptionSolid: 'Escribir en Solid como anotación web',
-    descriptionToLocal: 'Copiar URI de anotación web al portapapeles',
+    description: 'Estado stand-off (RDF)',
+    descriptionSolid: 'Escribir en Solid como RDF',
+    descriptionToLocal: 'Abrir anotación stand-off (RDF) en una nueva pestaña',
   },
   makeInlineAnnotation: {
     description: 'Hacer clic para anotación en línea',
@@ -739,6 +765,10 @@ export const lang = {
     text: 'Validación automática',
     description: 'Validar la codificación automáticamente después de cada edición',
   },
+  autoShowValidationReport: {
+    text: 'Mostrar informe de validación automáticamente',
+    description: 'Mostrar el informe de validación automáticamente después de que se haya realizado la validación',
+  },
   autoCloseBrackets: {
     text: 'Cerrar corchetes automáticamente',
     description: 'Cerrar automáticamente los corchetes al escribir',
@@ -837,4 +867,31 @@ export const lang = {
   renumberMeasuresWouldBe: { text: 'sería' },
   renumberMeasuresChangedTo: { text: 'cambiado a' },
   renumberMeasureMeasuresRenumbered: { text: 'compases renumerados' },
+
+  // Code checker panel (accid.ges)
+  codeCheckerTitle: {
+    text: 'Verificar los atributos @accid.ges (en relación con la armadura de clave, los accid. por compás y las ligaduras).',
+  },
+  codeCheckerFix: { text: 'Corregir' },
+  codeCheckerFixAll: { text: 'Corregir todo' },
+  codeCheckerIgnore: { text: 'Ignorar' },
+  codeCheckerIgnoreAll: { text: 'Ignorar todo' },
+  codeCheckerCheckingCode: { text: 'Verificando código...' },
+  codeCheckerNoAccidMessagesFound: { text: 'Todos los atributos accid.ges parecen correctos.' },
+  codeCheckerMeasure: { text: 'Compás' },
+  codeCheckerNote: { text: 'Nota' },
+  codeCheckerHasBoth: { text: 'tiene ambos' },
+  codeCheckerAnd: { text: 'y' },
+  codeCheckerRemove: { text: 'Eliminar' },
+  codeCheckerFixTo: { text: 'Corregir a' },
+  codeCheckerAdd: { text: 'Agregar' },
+  codeCheckerWithContradictingContent: { text: 'con contenido contradictorio' },
+  codeCheckerTiedNote: { text: 'Nota ligada' },
+  codeCheckerNotSamePitchAs: { text: 'no misma altura que' },
+  codeCheckerNotSameOctaveAs: { text: 'no mismo octavo que' },
+  codeCheckerNotSameAsStartingNote: { text: 'no es igual que la nota de inicio' },
+  codeCheckerExtra: { text: 'extra' },
+  codeCheckerHasExtra: { text: 'tiene extra' },
+  codeCheckerLacksAn: { text: 'carece de un' },
+  codeCheckerBecauseAlreadyDefined: { text: 'porque ya se ha definido anteriormente en el compás' },
 };

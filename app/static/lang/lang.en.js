@@ -86,7 +86,7 @@ export const lang = {
   staffDownText: { text: 'Element 1 staff down' },
   increaseDurText: { text: 'Increase duration' },
   decreaseDurText: { text: 'Decrease duration' },
-  cleanAccidText: { text: 'Clean @accid.ges' },
+  cleanAccidText: { text: 'Check @accid.ges' },
   renumberMeasuresTestText: { text: ' Renumber measures (test)' },
   renumberMeasuresExecText: { text: ' Renumber measures (exec)' },
   addIdsText: { text: 'Add ids to MEI' },
@@ -271,13 +271,17 @@ export const lang = {
   openUrlOpenEncodingByUrlText: { text: 'Open Web-hosted encoding by URL' },
 
   // GitHub actions modal
+  githubActionsHeadingText: { text: 'Request GitHub Action workflow:' },
+  githubActionsDescription: {
+    text: 'Click on "Run workflow" to ask the GitHub API to run the above workflow for you, using the input configuration specified below. Your encoding will be reloaded in its latest version once the workflow run completes. ',
+  },
   githubActionStatusMsgPrompt: { text: 'Could not run workflow - GitHub says' },
   githubActionStatusMsgWaiting: { text: 'Please be patient while GitHub is processing your workflow...' },
   githubActionStatusMsgFailure: { text: 'Could not run workflow - GitHub says' },
   githubActionStatusMsgSuccess: { text: 'Workflow run completed - GitHub says' },
-  githubActionsRunBtn: { text: 'Run workflow' },
-  githubActionsRunBtnReload: { text: 'Reload MEI file' },
-  githubActionsCancelBtn: { text: 'Cancel' },
+  githubActionsRunButton: { text: 'Run workflow' },
+  githubActionsRunButtonReload: { text: 'Reload MEI file' },
+  githubActionsCancelButton: { text: 'Cancel' },
   githubActionsInputSetterFilepath: { text: 'Copy current file path to input' },
   githubActionsInputSetterSelection: { text: 'Copy current MEI selection to input' },
   githubActionsInputContainerHeader: { text: 'Input configuration' },
@@ -361,9 +365,9 @@ export const lang = {
   deleteAnnotation: { description: 'Delete this annotation' },
   deleteAnnotationConfirmation: { text: 'Are you sure you wish to delete this annotation?' },
   makeStandOffAnnotation: {
-    description: 'Stand-off status (Web Annotation)',
-    descriptionSolid: 'Write to Solid as Web Annotation',
-    descriptionToLocal: 'Copy Web Annotation URI to clipboard',
+    description: 'Stand-off status (RDF)',
+    descriptionSolid: 'Write to Solid as RDF',
+    descriptionToLocal: 'Open stand-off (RDF) annotation in new tab',
   },
   makeInlineAnnotation: {
     description: 'Click to in-line annotation',
@@ -751,6 +755,10 @@ export const lang = {
     text: 'Auto validation',
     description: 'Validate encoding against schema automatically after each edit',
   },
+  autoShowValidationReport: {
+    text: 'Auto show validation report',
+    description: 'Show validation report automatically after validation has been performed',
+  },
   autoCloseBrackets: {
     text: 'Auto close brackets',
     description: 'Automatically close brackets at input',
@@ -851,4 +859,29 @@ export const lang = {
   renumberMeasuresWouldBe: { text: 'would be' },
   renumberMeasuresChangedTo: { text: 'changed to' },
   renumberMeasureMeasuresRenumbered: { text: 'measures renumbered' },
+
+  // Code checker @accid.ges
+  codeCheckerTitle: { text: 'Check @accid.ges attributes (against key signature, measure-wise accids, and ties).' },
+  codeCheckerFix: { text: 'Fix' },
+  codeCheckerFixAll: { text: 'Fix all' },
+  codeCheckerIgnore: { text: 'Ignore' },
+  codeCheckerIgnoreAll: { text: 'Ignore all' },
+  codeCheckerCheckingCode: { text: 'Checking code...' },
+  codeCheckerNoAccidMessagesFound: { text: 'All accid.ges attributes seem correct.' },
+  codeCheckerMeasure: { text: 'Measure' },
+  codeCheckerNote: { text: 'Note' },
+  codeCheckerHasBoth: { text: 'has both' },
+  codeCheckerAnd: { text: 'and' },
+  codeCheckerRemove: { text: 'Remove' },
+  codeCheckerFixTo: { text: 'Fix to' },
+  codeCheckerAdd: { text: 'Add' },
+  codeCheckerWithContradictingContent: { text: 'with contradicting content' },
+  codeCheckerTiedNote: { text: 'Tied note' },
+  codeCheckerNotSamePitchAs: { text: 'not same pitch as' },
+  codeCheckerNotSameOctaveAs: { text: 'not same octave as' },
+  codeCheckerNotSameAsStartingNote: { text: 'not same as in starting note' },
+  codeCheckerExtra: { text: 'extra' }, // superfluous
+  codeCheckerHasExtra: { text: 'has extra' }, // has superfluous
+  codeCheckerLacksAn: { text: 'lacks an' },
+  codeCheckerBecauseAlreadyDefined: { text: 'because it has been defined earlier in the measure' },
 };

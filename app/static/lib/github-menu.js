@@ -713,14 +713,14 @@ async function handleClickGithubAction(e) {
             if ('conclusion' in workflowCompletionResp) {
               if (workflowCompletionResp.conclusion === 'success') {
                 statusMsg.innerHTML = `<span id="githubActionStatusMsgSuccess">${translator.lang.githubActionStatusMsgSuccess.text}</span>: <a href="${workflowCompletionResp.html_url}" target="_blank">${workflowCompletionResp.conclusion}</a>`;
-                runBtn.innerText = translator.lang.githubActionsRunBtnReload.text;
+                runBtn.innerText = translator.lang.githubActionsRunButtonReload.text;
                 runBtn.removeAttribute('disabled');
                 ghLogo.classList.remove('clockwise');
                 runBtn.onclick = () => {
                   loadFile();
                   overlay.style.display = 'none';
                   statusMsg.innerHTML = '';
-                  runBtn.innerText = translator.lang.githubActionsRunBtn.text;
+                  runBtn.innerText = translator.lang.githubActionsRunButton.text;
                   cancelBtn.removeAttribute('disabled');
                 };
               } else {
@@ -892,12 +892,12 @@ function generateGithubActionsInputConfig(inputs, input) {
   inputName.innerText = input;
   if ('description' in inputs[input]) inputName.setAttribute('title', inputs[input].description);
   const inputFieldWrapper = document.createElement('div');
+  inputFieldWrapper.classList.add('githubActionsInputFieldWrapper');
   const inputField = document.createElement('input');
   inputField.setAttribute('type', 'text');
   inputField.classList.add('githubActionsInputField');
   inputField.dataset.input = input;
   inputField.setAttribute('id', 'githubActionsInputField_' + input);
-  inputField.setAttribute('size', '100');
   if ('default' in inputs[input]) {
     inputField.defaultValue = inputs[input].default;
   }

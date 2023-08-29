@@ -892,7 +892,8 @@ export function addSuppliedElement(v, cm, attrName = 'none') {
       let sup = document.createElementNS(dutils.meiNameSpace, 'supplied');
       let uuid = mintSuppliedId(id, 'supplied');
       sup.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
-      if (v.respId) sup.setAttribute('resp', '#' + v.respId);
+      let respId = document.getElementById('respSelect').value;
+      if (respId) sup.setAttribute('resp', '#' + respId);
       parent.replaceChild(sup, el);
       sup.appendChild(el);
       replaceInEditor(cm, el, true, sup);
@@ -1030,6 +1031,380 @@ export function cleanAccid(v, cm) {
   utils.cleanAccid(v.xmlDoc, cm);
   v.allowCursorActivity = true;
 }
+
+/**
+ * Checks accid/accid.ges attributes of all notes against
+ * keySig/key.sig information and measure-wise accidentals,
+ * finds instances of double accid & accid.ges.
+ *
+ * !!! TODO: make strings translatable and add to language packs !!!
+ *
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
+ * @param {boolean} change
+ */
+export function checkAccidGes(v, cm, change = false) {
+  v.allowCursorActivity = false;
+  v.initCodeCheckerPanel(translator.lang.codeCheckerTitle.text);
+
+  let d = true; // send debug info to console
+  setTimeout(() => {
+    v.loadXml(cm.getValue(), true); // force reload DOM
+
+    // define default key signatures per staff
+    let noStaves = v.xmlDoc.querySelector('scoreDef').querySelectorAll('staffDef').length;
+    let keySignatures = Array(noStaves).fill('0');
+    if (d) console.debug('correctAccidGes. ' + noStaves + ' staves defined.');
+
+    // list all ties to handle those separately
+    let ties = {};
+    v.xmlDoc.querySelectorAll('tie').forEach((t) => {
+      let startId = utils.rmHash(t.getAttribute('startid')) || '';
+      let endId = utils.rmHash(t.getAttribute('endid')) || '';
+      if (endId) {
+        if (!startId) console.log('Tie ' + t.getAttribute('xml:id') + ' without startId. ');
+        else ties[endId] = startId;
+      }
+    });
+
+    let count = 0;
+    let measureAccids = {}; // accidentals within a measure[staff][oct][pname]
+    let list = v.xmlDoc.querySelectorAll('[key\\.sig],keySig,measure,note');
+    list.forEach((e) => {
+      if (e.nodeName === 'scoreDef' && e.hasAttribute('key.sig')) {
+        // key.sig inside scoreDef: write @sig to all staves
+        let value = e.getAttribute('key.sig');
+        for (let k in keySignatures) keySignatures[k] = value;
+        if (d) console.debug('New key.sig in scoreDef: ' + value);
+      } else if (e.nodeName === 'staffDef' && e.hasAttribute('key.sig')) {
+        // key.sig inside staffDef: write @sig to that staff
+        let n = parseInt(e.getAttribute('n'));
+        let value = e.getAttribute('key.sig');
+        if (n && n > 0 && n <= keySignatures.length) keySignatures[n - 1] = value;
+        if (d) console.debug('New key.sig in staffDef(' + e.getAttribute('xml:id') + ', n=' + n + '): ' + value);
+      } else if (e.nodeName === 'keySig' && e.hasAttribute('sig')) {
+        // keySig element in a staffDef
+        let n = parseInt(e.closest('staffDef')?.getAttribute('n'));
+        let value = e.getAttribute('sig');
+        if (n && n > 0 && n <= keySignatures.length) keySignatures[n - 1] = value;
+        if (d) console.debug('New keySig("' + e.getAttribute('xml:id') + '")@sig in staffDef(' + n + '): ' + value);
+      } else if (e.nodeName === 'measure') {
+        // clear measureAccids object
+        measureAccids = getAccidsInMeasure(e);
+      } else if (e.nodeName === 'note') {
+        // found a note to check!
+        let data = {};
+        data.xmlId = e.getAttribute('xml:id') || '';
+        data.measure = e.closest('measure')?.getAttribute('n') || '';
+        // find staff number for note
+        let staffNumber = parseInt(e.closest('staff')?.getAttribute('n'));
+        let tstamp = speed.getTstampForElement(v.xmlDoc, e);
+        let pName = e.getAttribute('pname') || '';
+        let oct = e.getAttribute('oct') || '';
+        let value = keySignatures[staffNumber - 1];
+        let affectedNotes = []; // array of note names affected by keySig@sig or @key.sig
+        data.keySigAccid = 'n'; // n, f, s
+        let splitS = value.split('s');
+        let splitF = value.split('f');
+        if (splitF.length > 1) {
+          data.keySigAccid = 'f';
+          affectedNotes = att.flats.slice(0, splitF[0]);
+        } else if (splitS.length > 1) {
+          data.keySigAccid = 's';
+          affectedNotes = att.sharps.slice(0, splitS[0]);
+        }
+
+        let accid = e.getAttribute('accid') || e.querySelector('[accid]')?.getAttribute('accid');
+        let accidGesEncoded =
+          e.getAttribute('accid.ges') || e.querySelector('[accid\\.ges]')?.getAttribute('accid.ges');
+        let accidGesMeaning =
+          e.getAttribute('accid.ges') || e.querySelector('[accid\\.ges]')?.getAttribute('accid.ges') || 'n';
+        let mAccid = ''; // measure accid for current note
+        if (
+          staffNumber in measureAccids &&
+          oct in measureAccids[staffNumber] &&
+          pName in measureAccids[staffNumber][oct]
+        ) {
+          // get accids for all tstamps, sort them, and remember last before current
+          let mTstamps = measureAccids[staffNumber][oct][pName];
+          Object.keys(mTstamps)
+            .map((v) => parseFloat(v))
+            .sort()
+            .forEach((t) => {
+              if (t <= tstamp) mAccid = mTstamps[t];
+            });
+        }
+
+        // find doubled accid/accid.ges information
+        if (accidGesEncoded && accid) {
+          data.html =
+            ++count +
+            ' ' +
+            translator.lang.codeCheckerMeasure.text +
+            ' ' +
+            data.measure +
+            ', ' +
+            translator.lang.codeCheckerNote.text +
+            ' "' +
+            data.xmlId +
+            '" ' +
+            translator.lang.codeCheckerHasBoth +
+            ' accid="' +
+            accid +
+            '" ' +
+            translator.lang.codeCheckerAnd +
+            ' accid.ges="' +
+            accidGesEncoded +
+            '" ';
+          if (accidGesEncoded !== accid) {
+            data.html += translator.lang.codeCheckerWithContradictingContent.text;
+          }
+          data.html += '. ' + translator.lang.codeCheckerRemove + ' accid.ges';
+          // remove @accid.ges in all cases
+          data.correct = () => {
+            v.allowCursorActivity = false;
+            e.removeAttribute('accid.ges');
+            replaceInEditor(cm, e, false);
+            v.allowCursorActivity = true;
+          };
+          v.addCodeCheckerEntry(data);
+        }
+
+        if (data.xmlId && data.xmlId in ties) {
+          // Check whether note tied by starting note
+          let startingNote = v.xmlDoc.querySelector('[*|id=' + ties[data.xmlId] + ']');
+          if (startingNote) {
+            if (pName !== startingNote.getAttribute('pname')) {
+              data.html =
+                ++count +
+                ' ' +
+                translator.lang.codeCheckerMeasure.text +
+                ' ' +
+                data.measure +
+                ', ' +
+                translator.lang.codeCheckerTiedNote.text +
+                ' "' +
+                data.xmlId +
+                '": ' +
+                pName +
+                ' ' +
+                translator.lang.codeCheckerNotSamePitchAs.text +
+                ' ' +
+                ties[data.xmlId] +
+                ': ' +
+                startingNote.getAttribute('pname');
+              v.addCodeCheckerEntry(data);
+              if (d) console.debug(data.html);
+            }
+            if (oct !== startingNote.getAttribute('oct')) {
+              data.html =
+                ++count +
+                ' ' +
+                translator.lang.codeCheckerMeasure.text +
+                ' ' +
+                data.measure +
+                ', ' +
+                translator.lang.codeCheckerTiedNote.text +
+                ' "' +
+                data.xmlId +
+                '": ' +
+                pName +
+                ' ' +
+                translator.lang.codeCheckerNotSameOctaveAs.text +
+                ' ' +
+                ties[data.xmlId];
+              v.addCodeCheckerEntry(data);
+              if (d) console.debug(data.html);
+            }
+            let startingAccidMeaning =
+              startingNote.getAttribute('accid') ||
+              startingNote.querySelector('[accid]')?.getAttribute('accid') ||
+              startingNote.getAttribute('accid.ges') ||
+              startingNote.querySelector('[accid\\.ges]')?.getAttribute('accid.ges') ||
+              'n';
+            if ((accid || accidGesMeaning) !== startingAccidMeaning) {
+              data.html =
+                ++count +
+                ' ' +
+                translator.lang.codeCheckerMeasure.text +
+                ' ' +
+                data.measure +
+                ', ' +
+                translator.lang.codeCheckerTiedNote.text +
+                ' "' +
+                data.xmlId +
+                '": ';
+              if (startingAccidMeaning !== 'n') {
+                data.html +=
+                  (accid ? 'accid="' + accid + '"' : accidGesEncoded ? 'accid.ges="' + accidGesEncoded + '"' : '') +
+                  (' ' + translator.lang.codeCheckerNotSameAsStartingNote.text + ' ' + ties[data.xmlId] + ': ') +
+                  ('"' + startingAccidMeaning + '".') +
+                  (' ' + translator.lang.codeCheckerFixTo.text + ' accid.ges="' + startingAccidMeaning + '". ');
+                data.correct = () => {
+                  v.allowCursorActivity = false;
+                  e.setAttribute('accid.ges', startingAccidMeaning);
+                  replaceInEditor(cm, e, false);
+                  v.allowCursorActivity = true;
+                };
+              } else {
+                data.html +=
+                  translator.lang.codeCheckerExtra.text +
+                  ' ' +
+                  (accid ? 'accid="' + accid + '"' : accidGesEncoded ? 'accid.ges="' + accidGesEncoded + '"' : '') +
+                  (' ' + translator.lang.codeCheckerNotSameAsStartingNote.text + ' ' + ties[data.xmlId] + ': ') +
+                  ('"' + startingAccidMeaning + '". ') +
+                  (translator.lang.codeCheckerRemove.text + ' accid.ges. ');
+                data.correct = () => {
+                  v.allowCursorActivity = false;
+                  e.removeAttribute('accid.ges');
+                  replaceInEditor(cm, e, false);
+                  v.allowCursorActivity = true;
+                };
+              }
+              v.addCodeCheckerEntry(data);
+              if (d) console.debug(data.html);
+            }
+          } else {
+            console.log('No starting note found for tie ' + ties[data.xmlId]);
+          }
+        } else if (!accid && mAccid && mAccid !== accidGesMeaning) {
+          // check all accids having appeared in the current measure
+          data.html =
+            ++count +
+            ' ' +
+            translator.lang.codeCheckerMeasure.text +
+            ' ' +
+            data.measure +
+            ', ' +
+            translator.lang.codeCheckerNote.text +
+            ' "' +
+            data.xmlId +
+            '" ' +
+            translator.lang.codeCheckerLacksAn.text +
+            ' accid.ges="' +
+            mAccid +
+            '", ' +
+            translator.lang.codeCheckerBecauseAlreadyDefined.text +
+            '.';
+          data.correct = () => {
+            v.allowCursorActivity = false;
+            e.setAttribute('accid.ges', mAccid);
+            replaceInEditor(cm, e, false);
+            v.allowCursorActivity = true;
+          };
+          v.addCodeCheckerEntry(data);
+          if (d) console.debug(data.html);
+        } else if (
+          !accid &&
+          affectedNotes.includes(pName) &&
+          mAccid !== accidGesMeaning &&
+          data.keySigAccid !== accidGesMeaning
+        ) {
+          // a note, affected by key signature, either has @accid inside or as a child or has @accid.ges inside or as a child
+          data.html =
+            ++count +
+            ' ' +
+            translator.lang.codeCheckerMeasure.text +
+            ' ' +
+            data.measure +
+            ', ' +
+            translator.lang.codeCheckerNote.text +
+            ' "' +
+            data.xmlId +
+            '" ' +
+            translator.lang.codeCheckerLacksAn.text +
+            ' accid.ges="' +
+            data.keySigAccid +
+            '". ' +
+            translator.lang.codeCheckerAdd.text +
+            ' accid.ges="' +
+            data.keySigAccid +
+            '"';
+          data.correct = () => {
+            v.allowCursorActivity = false;
+            e.setAttribute('accid.ges', data.keySigAccid);
+            replaceInEditor(cm, e, false);
+            v.allowCursorActivity = true;
+          };
+          v.addCodeCheckerEntry(data);
+          if (d) console.debug(data.html);
+        } else if (
+          !accid &&
+          !affectedNotes.includes(pName) &&
+          mAccid !== accidGesMeaning &&
+          (accidGesMeaning !== 'n' || accidGesEncoded === 'n')
+        ) {
+          // Check if there is an accid.ges that has not been defined in keySig or earlier in the measure
+          data.html =
+            ++count +
+            ' ' +
+            translator.lang.codeCheckerMeasure.text +
+            ' ' +
+            data.measure +
+            ', ' +
+            translator.lang.codeCheckerNote.text +
+            ' "' +
+            data.xmlId +
+            '" ' +
+            translator.lang.codeCheckerHasExtra.text +
+            ' accid.ges="' +
+            accidGesEncoded +
+            '" ' +
+            translator.lang.codeCheckerRemove.text +
+            ' accid.ges="' +
+            accidGesEncoded +
+            '".';
+          data.correct = () => {
+            v.allowCursorActivity = false;
+            e.removeAttribute('accid.ges');
+            replaceInEditor(cm, e, false);
+            v.allowCursorActivity = true;
+          };
+          v.addCodeCheckerEntry(data);
+          if (d) console.debug(data.html);
+        }
+      }
+    });
+    v.finalizeCodeCheckerPanel('All accid.ges attributes seem correct.');
+  }, 0);
+
+  v.allowCursorActivity = true;
+
+  /**
+   * Search for @accid attributes in measure and store them in
+   * an object measureAccids[staffNumber][oct][pName][tstamp] = accid
+   * @param {Element} measure
+   * @returns {Object} measureAccids
+   */
+  function getAccidsInMeasure(measure) {
+    let measureAccids = {};
+    // list all @accid attributes in measure
+    measure.querySelectorAll('[accid]').forEach((el) => {
+      let note = el.closest('note');
+      if (note) {
+        let staffNumber = parseInt(el.closest('staff')?.getAttribute('n'));
+        let oct = note.getAttribute('oct') || '';
+        let pName = note.getAttribute('pname') || '';
+        let accid = el.getAttribute('accid');
+        let tstamp = speed.getTstampForElement(v.xmlDoc, note);
+
+        if (staffNumber && oct && pName && accid && tstamp >= 0) {
+          if (!Object.hasOwn(measureAccids, staffNumber)) {
+            measureAccids[staffNumber] = {};
+          }
+          if (!Object.hasOwn(measureAccids[staffNumber], oct)) {
+            measureAccids[staffNumber][oct] = {};
+          }
+          if (!Object.hasOwn(measureAccids[staffNumber][oct], pName)) {
+            measureAccids[staffNumber][oct][pName] = {};
+          }
+          measureAccids[staffNumber][oct][pName][tstamp] = accid;
+        }
+      }
+    });
+    return measureAccids;
+  } // getAccidsInMeasure()
+} // checkAccidGes()
 
 /**
  * Wrapper function for renumbering measure numberlike attribute (@n)
