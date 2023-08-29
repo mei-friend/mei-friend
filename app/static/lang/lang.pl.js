@@ -1,5 +1,5 @@
 /**
- * Language file for English
+ * Language file for Polish
  */
 
 import * as att from '../lib/attribute-classes.js';
@@ -277,7 +277,9 @@ export const lang = {
 
   // GitHub actions modal
   githubActionsHeadingText: { text: 'Zażądaj pracy akcji GitHub:' },
-  githubActionsDescription: { text: 'Kliknij "Uruchom pracę" aby poprosić o wykonanie przez API GitHuba pracy akcji powyżej, używając konfiguracji wejściowej podanej poniżej. Twoje kodowanie zostanie przeładowane do jego najnowszej wersji po zakończeniu pracy akcji.' },
+  githubActionsDescription: {
+    text: 'Kliknij "Uruchom pracę" aby poprosić o wykonanie przez API GitHuba pracy akcji powyżej, używając konfiguracji wejściowej podanej poniżej. Twoje kodowanie zostanie przeładowane do jego najnowszej wersji po zakończeniu pracy akcji.',
+  },
   githubActionStatusMsgPrompt: { text: 'Nie udało się uruchomić zadania - GitHub mówi' },
   githubActionStatusMsgWaiting: { text: 'Proszę być cierpliwym, GitHub przetwarza twoje zadanie...' },
   githubActionStatusMsgFailure: { text: 'Nie udało się uruchomić zadania - GitHub mówi' },
@@ -368,9 +370,9 @@ export const lang = {
   deleteAnnotation: { description: 'Usuń tę adnotację' },
   deleteAnnotationConfirmation: { text: 'Czy na pewno chcesz usunąć tę adnotację?' },
   makeStandOffAnnotation: {
-    description: "Status stand-off (RDF)",
-    descriptionSolid: "Zapisz w Solid jako RDF",
-    descriptionToLocal: "Otwórz adnotację stand-off (RDF) w nowej karcie"
+    description: 'Status stand-off (RDF)',
+    descriptionSolid: 'Zapisz w Solid jako RDF',
+    descriptionToLocal: 'Otwórz adnotację stand-off (RDF) w nowej karcie',
   },
   makeInlineAnnotation: {
     description: 'Kliknij, aby dodać adnotację w linii',
@@ -864,4 +866,31 @@ export const lang = {
   renumberMeasuresWouldBe: { text: 'byłyby' },
   renumberMeasuresChangedTo: { text: 'zmienione na' },
   renumberMeasureMeasuresRenumbered: { text: 'takty zostały ponumerowane' },
+
+  // Code checker panel (accid.ges)
+  codeCheckerTitle: {
+    text: 'Sprawdź atrybuty @accid.ges (w stosunku do znaku klucza, akcydenckie na takt oraz wiązania).',
+  },
+  codeCheckerFix: { text: 'Popraw' },
+  codeCheckerFixAll: { text: 'Popraw wszystko' },
+  codeCheckerIgnore: { text: 'Ignoruj' },
+  codeCheckerIgnoreAll: { text: 'Zignoruj wszystko' },
+  codeCheckerCheckingCode: { text: 'Sprawdzanie kodu...' },
+  codeCheckerNoAccidMessagesFound: { text: 'Wszystkie atrybuty accid.ges wydają się poprawne.' },
+  codeCheckerMeasure: { text: 'Takt' },
+  codeCheckerNote: { text: 'Nutę' },
+  codeCheckerHasBoth: { text: 'ma oba' },
+  codeCheckerAnd: { text: 'i' },
+  codeCheckerRemove: { text: 'Usuń' },
+  codeCheckerFixTo: { text: 'Popraw na' },
+  codeCheckerAdd: { text: 'Dodaj' },
+  codeCheckerWithContradictingContent: { text: 'z zawartością sprzeczną' },
+  codeCheckerTiedNote: { text: 'Połączona nuta' },
+  codeCheckerNotSamePitchAs: { text: 'nie tej samej wysokości co' },
+  codeCheckerNotSameOctaveAs: { text: 'nie tej samej oktawy co' },
+  codeCheckerNotSameAsStartingNote: { text: 'nie ta sama co w nutę początkową' },
+  codeCheckerExtra: { text: 'dodatkową' },
+  codeCheckerHasExtra: { text: 'ma dodatkowe' },
+  codeCheckerLacksAn: { text: 'brakuje' },
+  codeCheckerBecauseAlreadyDefined: { text: 'ponieważ zostało to już zdefiniowane wcześniej w takcie' },
 };
