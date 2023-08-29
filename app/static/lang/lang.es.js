@@ -739,6 +739,10 @@ export const lang = {
     text: 'Validación automática',
     description: 'Validar la codificación automáticamente después de cada edición',
   },
+  autoShowValidationReport: {
+    Texto: 'Mostrar informe de validación automáticamente',
+    Descripción: 'Mostrar el informe de validación automáticamente después de que se haya realizado la validación',
+  },
   autoCloseBrackets: {
     text: 'Cerrar corchetes automáticamente',
     description: 'Cerrar automáticamente los corchetes al escribir',

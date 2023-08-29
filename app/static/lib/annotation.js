@@ -36,6 +36,7 @@ export function situateAndRefreshAnnotationsList(forceRefresh = false) {
 }
 
 export function refreshAnnotationsList() {
+  console.log('REFRESHING LIST', annotations);
   const list = document.getElementById('listAnnotations');
   // clear list
   while (list.firstChild) {
@@ -57,9 +58,10 @@ export function refreshAnnotationsList() {
     'beforeend',
     annotations.length ? '' : '<p>' + translator.lang.noAnnotationsToDisplay.text + '.</p>'
   );
-  annotations.forEach((a, aix) => {
+  annotations.forEach((a) => {
     const annoDiv = document.createElement('div');
     annoDiv.classList.add('annotationListItem');
+    annoDiv.id = a.id;
     const details = document.createElement('details');
     details.setAttribute('open', '');
     const summary = document.createElement('summary');
@@ -96,6 +98,12 @@ export function refreshAnnotationsList() {
       (isStandoff.title = translator.lang.makeStandOffAnnotation.descriptionToLocal + ': '), a.id;
       isStandoff.dataset.id = a.id;
       isStandoff.addEventListener('click', (e) => window.open(a.id, '_blank'));
+      if ('standoffUri' in a) {
+        isStandoff.href = a.standoffUri;
+        isStandoff.target = '_blank';
+      } else {
+        console.warn('Standoff annotation without standoffUri: ', a);
+      }
     }
     const isInline = document.createElement('a');
     isInline.id = 'makeInlineAnnotation';
@@ -1040,6 +1048,12 @@ async function writeStandoffIfRequested(a) {
               establishResource(webAnno['@id'], webAnno).then((webAnnoResp) => {
                 if (webAnnoResp.ok) {
                   console.log('Success! Posted Web Annotation:', webAnno);
+                  // remember new resource URI within internal annotation, for use when refreshing annotation list
+                  a.standoffUri = webAnno['@id'];
+                  // update current annotation list item in DOM as well (so we can already click before anno list refresh required)
+                  let standoffIcon = document.querySelector(`#${a.id} .makeStandOffAnnotation`);
+                  standoffIcon.href = a.standoffUri;
+                  standoffIcon.target = '_blank';
                 } else {
                   console.warn("Couldn't post WebAnno: ", webAnno, webAnnoResp);
                   throw webAnnoResp;
@@ -1074,16 +1088,16 @@ export function clearAnnotations() {
 }
 
 /**
- * getSolidIdP(): Determine user's prefered Solid identity provider (IdP), 
- * either a provided custom value if "Other" is chosen or otherwise the 
+ * getSolidIdP(): Determine user's prefered Solid identity provider (IdP),
+ * either a provided custom value if "Other" is chosen or otherwise the
  * IdP currently selected from the dropdown menu.
  */
-export function getSolidIdP() { 
-  const providerSelect = document.getElementById("providerSelect");
-  if(providerSelect) { 
-    if(providerSelect.value === "other") { 
-      return document.getElementById("customSolidIdP").value;
-    } else { 
+export function getSolidIdP() {
+  const providerSelect = document.getElementById('providerSelect');
+  if (providerSelect) {
+    if (providerSelect.value === 'other') {
+      return document.getElementById('customSolidIdP').value;
+    } else {
       return providerSelect.value;
     }
   }
@@ -1100,6 +1114,28 @@ export async function populateSolidTab() {
     });
   } else {
     solidTab.innerHTML = populateLoggedOutSolidTab();
+    // add event listeners
+    const provider = document.getElementById('providerSelect');
+    provider.addEventListener('input', (e) => {
+      let customSolidIdP = document.getElementById('customSolidIdP');
+      switch (e.target.value) {
+        case 'other':
+          customSolidIdP.value = '';
+          break;
+        default:
+          customSolidIdP.value = e.target.value;
+      }
+    });
+    const customSolidIdP = document.getElementById('customSolidIdP');
+    customSolidIdP.addEventListener('input', (e) => {
+      let providerSelect = document.getElementById('providerSelect');
+      providerSelect.value = 'other';
+    });
+    customSolidIdP.addEventListener('click', (e) => {
+      if (e.target.value === '') {
+        e.target.value = 'https://';
+      }
+    });
     document.getElementById('solidLogin').addEventListener('click', () => {
       loginAndFetch(getSolidIdP(), populateSolidTab);
     });
@@ -1151,24 +1187,21 @@ function populateLoggedOutSolidTab() {
     <option value="https://solidcommunity.net">SolidCommunity.net</option>
     <option value="https://login.inrupt.net">Inrupt</option>
     <option value="https://trompa-solid.upf.edu">TROMPA @ UPF</option>
-    <option value="other">Other...</option>
+    <option value="other" selected>Other...</option>
   `;
-  provider.addEventListener("change", (e) => {
-    let customSolidIdP = document.getElementById("#customSolidIdP");
-    customSolidIdP.style.display = e.value === "other" ? 
-      "block" : "none";
-  })
   provider.title = translator.lang.solidProvider.description;
-  let customSolidIdP = document.createElement("input");
-  customSolidIdP.type = "text";
-  customSolidIdP.placeholder = "https://...";
-  customSolidIdP.id = "customSolidIdP";
-  providerContainer.insertAdjacentElement('afterbegin', provider);
+  let customSolidIdP = document.createElement('input');
+  customSolidIdP.type = 'text';
+  customSolidIdP.placeholder = 'https://...';
+  customSolidIdP.id = 'customSolidIdP';
+  customSolidIdP.setAttribute('size', '17');
   let solidLoginBtn = document.createElement('button');
   solidLoginBtn.innerHTML = translator.lang.solidLoginBtn.text;
   solidLoginBtn.id = 'solidLogin';
   solidLoginBtn.title = translator.lang.solidExplanation.description;
-  providerContainer.insertAdjacentElement('beforeend', solidLoginBtn);
-  providerContainer.insertAdjacentElement('beforeend', customSolidIdP);
+  // inject into DOM
+  providerContainer.insertAdjacentElement('afterbegin', provider);
+  providerContainer.insertAdjacentElement('afterbegin', solidLoginBtn);
+  providerContainer.insertAdjacentElement('afterbegin', customSolidIdP);
   return providerContainer.outerHTML;
 }

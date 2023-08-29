@@ -746,6 +746,10 @@ export const lang = {
     text: 'Validazione automatica',
     description: 'Valida automaticamente la codifica rispetto allo schema dopo ogni modifica',
   },
+  autoShowValidationReport: {
+    text: 'Mostra il rapporto di validazione automaticamente',
+    description: 'Mostra automaticamente il rapporto di validazione dopo che la convalida è stata eseguita',
+  },
   autoCloseBrackets: {
     text: 'Chiusura parentesi automatica',
     description: 'Chiude automaticamente le parentesi quando vengono inserite',

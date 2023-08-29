@@ -738,6 +738,10 @@ export const lang = {
     text: 'Automatische Validatierung',
     description: 'Automatische Validierung der Kodierung nach jeder Eingabe',
   },
+  autoShowValidationReport: {
+    text: 'Validierungsbericht automatisch anzeigen',
+    description: 'Validierungsbericht automatisch anzeigen, nachdem eine Validierung durchgeführt wurde.',
+  },
   autoCloseBrackets: {
     text: 'Klammern schließen',
     description: 'Klammern automatisch schließen',

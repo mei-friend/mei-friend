@@ -754,6 +754,10 @@ export const lang = {
     text: 'Automatyczna walidacja',
     description: 'Automatycznie waliduj kod przeciwko schematowi po każdej edycji',
   },
+  autoShowValidationReport: {
+    text: 'Automatycznie pokaż raport walidacji',
+    description: 'Automatycznie pokaż raport walidacji po przeprowadzeniu walidacji',
+  },
   autoCloseBrackets: {
     text: 'Automatyczne zamykanie nawiasów',
     description: 'Automatycznie zamykaj nawiasy po wprowadzeniu',

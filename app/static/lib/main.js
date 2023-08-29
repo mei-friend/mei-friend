@@ -1,6 +1,6 @@
 // mei-friend version and date
 export const version = '0.10.4';
-export const versionDate = '23 August 2023'; // use full or 3-character english months, will be translated
+export const versionDate = '29 August 2023'; // use full or 3-character english months, will be translated
 
 var vrvWorker;
 var spdWorker;
@@ -11,6 +11,7 @@ var pageParam; // (int) page parameter given through URL
 var selectParam; // (array) select ids given through multiple instances in URL
 let safariWarningShown = false; // show Safari warning only once
 let restoreSolidTimeout; // JS timeout that allows users to 'esc' before restoring solid session
+const restoreSolidTimeoutDelay = 1500; // how long to wait for above timeout, in ms
 
 // exports
 export var cm;
@@ -335,6 +336,14 @@ function completeIfInTag(cm) {
   });
 }
 
+/**
+ * Carries out code validation using validator.validateNG() and calls
+ * v.highlightValidation()
+ * @param {string} mei
+ * @param {Function} updateLinting
+ * @param {Object} options
+ * @returns
+ */
 export async function validate(mei, updateLinting, options) {
   if (options && mei) {
     // keep the callback (important for first call)
@@ -343,8 +352,6 @@ export async function validate(mei, updateLinting, options) {
     }
 
     if (v.validatorWithSchema && (document.getElementById('autoValidate').checked || options.forceValidate)) {
-      let reportDiv = document.getElementById('validation-report');
-      if (reportDiv) reportDiv.style.visibility = 'hidden';
       let vs = document.getElementById('validation-status');
       vs.innerHTML = clock;
       v.changeStatus(vs, 'wait', ['error', 'ok', 'manual']); // darkorange
@@ -369,7 +376,7 @@ export async function validate(mei, updateLinting, options) {
       v.setValidationStatusToManual();
     }
   }
-}
+} // validate()
 
 async function suspendedValidate(text, updateLinting, options) {
   // Do nothing...
@@ -755,7 +762,7 @@ function onLanguageLoaded() {
     restoreSolidTimeout = setTimeout(function () {
       solidOverlay.classList.remove('active');
       loginAndFetch(getSolidIdP(), populateSolidTab);
-    }, 3000);
+    }, restoreSolidTimeoutDelay);
   }
 } // onLanguageLoaded
 
