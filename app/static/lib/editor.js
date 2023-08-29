@@ -1036,6 +1036,9 @@ export function cleanAccid(v, cm) {
  * Checks accid/accid.ges attributes of all notes against
  * keySig/key.sig information and measure-wise accidentals,
  * finds instances of double accid & accid.ges.
+ * 
+ * !!! TODO: make strings translatable and add to language packs !!!
+ * 
  * @param {Viewer} v
  * @param {CodeMirror} cm
  * @param {boolean} change
@@ -1164,7 +1167,7 @@ export function checkAccidGes(v, cm, change = false) {
               accidGesEncoded +
               '" with different content. To be handled manually.';
           }
-          setTimeout(() => v.addCodeCheckerEntry(data), 0);
+          v.addCodeCheckerEntry(data);
         }
 
         if (data.xmlId && data.xmlId in ties) {
@@ -1183,7 +1186,7 @@ export function checkAccidGes(v, cm, change = false) {
               ties[data.xmlId] +
               ': ' +
               startingNote.getAttribute('pname');
-            setTimeout(() => v.addCodeCheckerEntry(data), 0);
+            v.addCodeCheckerEntry(data);
             if (d) console.debug(data.html);
           }
           if (oct !== startingNote.getAttribute('oct')) {
@@ -1195,7 +1198,7 @@ export function checkAccidGes(v, cm, change = false) {
               data.xmlId +
               ' not same octave number as ' +
               ties[data.xmlId];
-            setTimeout(() => v.addCodeCheckerEntry(data), 0);
+            v.addCodeCheckerEntry(data);
             if (d) console.debug(data.html);
           }
           let startingAccidMeaning =
@@ -1232,7 +1235,7 @@ export function checkAccidGes(v, cm, change = false) {
                 v.allowCursorActivity = true;
               };
             }
-            setTimeout(() => v.addCodeCheckerEntry(data), 0);
+            v.addCodeCheckerEntry(data);
             if (d) console.debug(data.html);
           }
         } else if (!accid && mAccid && mAccid !== accidGesMeaning) {
@@ -1252,7 +1255,7 @@ export function checkAccidGes(v, cm, change = false) {
             replaceInEditor(cm, e, false);
             v.allowCursorActivity = true;
           };
-          setTimeout(() => v.addCodeCheckerEntry(data), 0);
+          v.addCodeCheckerEntry(data);
           if (d) console.debug(data.html);
         } else if (
           !accid &&
@@ -1276,7 +1279,7 @@ export function checkAccidGes(v, cm, change = false) {
             replaceInEditor(cm, e, false);
             v.allowCursorActivity = true;
           };
-          setTimeout(() => v.addCodeCheckerEntry(data), 0);
+          v.addCodeCheckerEntry(data);
           if (d) console.debug(data.html);
         } else if (
           !accid &&
@@ -1300,7 +1303,7 @@ export function checkAccidGes(v, cm, change = false) {
             replaceInEditor(cm, e, false);
             v.allowCursorActivity = true;
           };
-          setTimeout(() => v.addCodeCheckerEntry(data), 0);
+          v.addCodeCheckerEntry(data);
           if (d) console.debug(data.html);
         }
       }

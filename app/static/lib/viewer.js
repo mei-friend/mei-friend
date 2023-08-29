@@ -2657,7 +2657,7 @@ export default class Viewer {
     } else {
       document.getElementById('codeCheckerInfoCurrent').innerHTML = 0;
       document.getElementById('codeCheckerInfoOf').innerHTML = '/';
-      document.getElementById('codeCheckerInfoTotal').innerHTML = document.querySelectorAll('.validation-item').length;
+      document.getElementById('codeCheckerInfoTotal').innerHTML = document.querySelectorAll('.validation-item')?.length;
     }
   }
 } // class Viewer
