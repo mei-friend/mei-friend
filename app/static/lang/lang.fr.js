@@ -343,9 +343,9 @@ export const lang = {
   deleteAnnotation: { description: 'Supprimer cette annotation' },
   deleteAnnotationConfirmation: { text: 'Êtes-vous sûr de vouloir supprimer cette annotation ?' },
   makeStandOffAnnotation: {
-    description: 'Statut stand-off (Annotation Web)',
-    descriptionSolid: "Écrire sur Solid en tant qu'annotation web",
-    descriptionToLocal: "Copier l'URI d'annotation web dans le presse-papiers",
+    description: "Statut stand-off (RDF)",
+    descriptionSolid: "Écrire sur Solid en RDF",
+    descriptionToLocal: "Ouvrir l'annotation stand-off (RDF) dans un nouvel onglet"
   },
   makeInlineAnnotation: {
     description: 'Cliquez pour une annotation en ligne',
