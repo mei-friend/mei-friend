@@ -25,6 +25,9 @@ import {
   establishContainerResource,
   establishResource,
   createMAOMusicalObject,
+  establishDiscoveryResource,
+  getCurrentFileUri,
+  safelyPatchResource
 } from './solid.js';
 import { nsp, traverseAndFetch } from './linked-data.js';
 
@@ -1009,63 +1012,86 @@ async function writeStandoffIfRequested(a) {
     a.isStandoff = true;
     if (solid.getDefaultSession().info.isLoggedIn) {
       document.getElementById('solid_logo').classList.add('clockwise');
+      let currentFileUri = getCurrentFileUri();
+      let currentFileUriHash = encodeURIComponent(currentFileUri);
       // ensure mei-friend container exists
       establishContainerResource(friendContainer)
         .then((friendContainerResource) => {
-          establishContainerResource(annotationContainer)
-            .then((annotationContainerResource) => {
-              // generate a web annotation JSON-LD object
-              let webAnno = new Object();
-              let body = new Object();
-              webAnno['@type'] = [nsp.OA + 'Annotation'];
-              webAnno[nsp.OA + 'hasTarget'] = a.selection.map((s) => {
-                // TODO: do something clever if fileLocationType = "file" (local)
-                return { '@id': meiFileLocation + '#' + s };
-              });
-              switch (a.type) {
-                case 'annotateHighlight':
-                  webAnno[nsp.OA + 'motivatedBy'] = [{ '@id': nsp.OA + 'highlighting' }];
-                  break;
-                case 'annotateDescribe':
-                  body['@type'] = [nsp.OA + 'TextualBody'];
-                  if ('description' in a) {
-                    body[nsp.RDF + 'value'] = a.description;
-                  } else {
-                    console.warn('Describing annotation without a description: ', a);
-                  }
-                  webAnno[nsp.OA + 'motivatedBy'] = [{ '@id': nsp.OA + 'describing' }];
-                  webAnno[nsp.OA + 'hasBody'] = [body];
-                  break;
-                case 'annotateLink':
-                  webAnno[nsp.OA + 'motivatedBy'] = [{ '@id': nsp.OA + 'linking' }];
-                  webAnno[nsp.OA + 'hasBody'] = [{ '@id': a.url }];
-                  break;
-                default:
-                  console.warn('Trying to write standoff annotation with unknown annotation type:', a);
-                  break;
-              }
-              webAnno['@id'] = annotationContainerResource + a.id;
-              establishResource(webAnno['@id'], webAnno).then((webAnnoResp) => {
-                if (webAnnoResp.ok) {
-                  console.log('Success! Posted Web Annotation:', webAnno);
-                  // remember new resource URI within internal annotation, for use when refreshing annotation list
-                  a.standoffUri = webAnno['@id'];
-                  // update current annotation list item in DOM as well (so we can already click before anno list refresh required)
-                  let standoffIcon = document.querySelector(`#${a.id} .makeStandOffAnnotation`);
-                  standoffIcon.href = a.standoffUri;
-                  standoffIcon.target = '_blank';
-                } else {
-                  console.warn("Couldn't post WebAnno: ", webAnno, webAnnoResp);
-                  throw webAnnoResp;
+          establishContainerResource(annotationContainer).then((annotationContainerResource) => {
+            establishDiscoveryResource(friendContainerResource, currentFileUri)
+              .then((discoveryResource) => {
+                let discoveryUri = discoveryResource + currentFileUriHash;
+                // generate a web annotation JSON-LD object
+                console.error('RESOURCE: ', discoveryResource);
+                let webAnno = new Object();
+                let body = new Object();
+                webAnno['@type'] = [nsp.OA + 'Annotation', nsp.SCHEMA + 'Dataset'];
+                webAnno[nsp.SCHEMA + 'includedInDataCatalog'] = { '@id': discoveryUri };
+                webAnno[nsp.OA + 'hasTarget'] = a.selection.map((s) => {
+                  // TODO: do something clever if fileLocationType = "file" (local)
+                  return { '@id': meiFileLocation + '#' + s };
+                });
+                switch (a.type) {
+                  case 'annotateHighlight':
+                    webAnno[nsp.OA + 'motivatedBy'] = [{ '@id': nsp.OA + 'highlighting' }];
+                    break;
+                  case 'annotateDescribe':
+                    body['@type'] = [nsp.OA + 'TextualBody'];
+                    if ('description' in a) {
+                      body[nsp.RDF + 'value'] = a.description;
+                    } else {
+                      console.warn('Describing annotation without a description: ', a);
+                    }
+                    webAnno[nsp.OA + 'motivatedBy'] = [{ '@id': nsp.OA + 'describing' }];
+                    webAnno[nsp.OA + 'hasBody'] = [body];
+                    break;
+                  case 'annotateLink':
+                    webAnno[nsp.OA + 'motivatedBy'] = [{ '@id': nsp.OA + 'linking' }];
+                    webAnno[nsp.OA + 'hasBody'] = [{ '@id': a.url }];
+                    break;
+                  default:
+                    console.warn('Trying to write standoff annotation with unknown annotation type:', a);
+                    break;
                 }
+                webAnno['@id'] = annotationContainerResource + a.id;
+                establishResource(webAnno['@id'], webAnno).then((webAnnoResp) => {
+                  if (webAnnoResp.ok) {
+                    console.log('Success! Posted Web Annotation:', webAnno);
+                    // remember new resource URI within internal annotation, for use when refreshing annotation list
+                    a.standoffUri = webAnno['@id'];
+                    // update current annotation list item in DOM as well (so we can already click before anno list refresh required)
+                    let standoffIcon = document.querySelector(`#${a.id} .makeStandOffAnnotation`);
+                    standoffIcon.href = a.standoffUri;
+                    standoffIcon.target = '_blank';
+                    // patch the discovery resource to include the newly created annotation
+                    safelyPatchResource(discoveryUri, [
+                      {
+                        op: 'add',
+                        // escape ~ and / characters according to JSON POINTER spec
+                        // use '-' at end of path specification to indicate new array item to be created
+                        path: `/${nsp.SCHEMA.replaceAll('~', '~0').replaceAll('/', '~1')}dataset/-`,
+                        value: {
+                          '@type': `${nsp.SCHEMA}Dataset`,
+                          [`${nsp.SCHEMA}additionalType`]: { '@id': `${nsp.OA}Annotation` },
+                          [`${nsp.SCHEMA}url`]: {
+                            '@id': webAnno['@id'],
+                          },
+                        },
+                      },
+                    ]);
+                  } else {
+                    console.warn("Couldn't post WebAnno: ", webAnno, webAnnoResp);
+                    throw webAnnoResp;
+                  }
+                });
+              })
+              .catch((e) => {
+                console.error("Couldn't post WebAnno:", e);
               });
-            })
-            .catch((e) => {
-              console.error("Couldn't post WebAnno:", e);
-            });
+          });
         })
-        .catch(() => {
-          console.error("Couldn't establish container:", friendContainer);
+        .catch((e) => {
+          console.error("Couldn't establish container:", friendContainer, e);
         })
         .finally(() => {
           document.getElementById('solid_logo').classList.remove('clockwise');
