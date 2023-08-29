@@ -247,6 +247,14 @@ a:active {
   padding-right:.5em;
 }
 
+.githubActionsInputFieldWrapper { 
+  flex:1;
+}
+
+.githubActionsInputField { 
+  width: 95%;
+}
+
 .openUrlOverlay a,
 .forkRepositoryOverlay a {
   color: var(--overlayLinkColor);

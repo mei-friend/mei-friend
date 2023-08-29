@@ -1022,7 +1022,6 @@ async function writeStandoffIfRequested(a) {
               .then((discoveryResource) => {
                 let discoveryUri = discoveryResource + currentFileUriHash;
                 // generate a web annotation JSON-LD object
-                console.error('RESOURCE: ', discoveryResource);
                 let webAnno = new Object();
                 let body = new Object();
                 webAnno['@type'] = [nsp.OA + 'Annotation', nsp.SCHEMA + 'Dataset'];
