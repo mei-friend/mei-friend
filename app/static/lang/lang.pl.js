@@ -274,13 +274,17 @@ export const lang = {
   openUrlOpenEncodingByUrlText: { text: 'Otwórz zakodowanie hostowane w sieci za pomocą adresu URL' },
 
   // GitHub actions modal // Okno modalne akcji GitHub
+
+  // GitHub actions modal
+  githubActionsHeadingText: { text: 'Zażądaj pracy akcji GitHub:' },
+  githubActionsDescription: { text: 'Kliknij "Uruchom pracę" aby poprosić o wykonanie przez API GitHuba pracy akcji powyżej, używając konfiguracji wejściowej podanej poniżej. Twoje kodowanie zostanie przeładowane do jego najnowszej wersji po zakończeniu pracy akcji.' },
   githubActionStatusMsgPrompt: { text: 'Nie udało się uruchomić zadania - GitHub mówi' },
   githubActionStatusMsgWaiting: { text: 'Proszę być cierpliwym, GitHub przetwarza twoje zadanie...' },
   githubActionStatusMsgFailure: { text: 'Nie udało się uruchomić zadania - GitHub mówi' },
   githubActionStatusMsgSuccess: { text: 'Zadanie wykonane pomyślnie - GitHub mówi' },
-  githubActionsRunBtn: { text: 'Uruchom zadanie' },
-  githubActionsRunBtnReload: { text: 'Przeładuj plik MEI' },
-  githubActionsCancelBtn: { text: 'Anuluj' },
+  githubActionsRunButton: { text: 'Uruchom zadanie' },
+  githubActionsRunButtonReload: { text: 'Przeładuj plik MEI' },
+  githubActionsCancelButton: { text: 'Anuluj' },
   githubActionsInputSetterFilepath: { text: 'Kopiuj bieżącą ścieżkę pliku do wejścia' },
   githubActionsInputSetterSelection: { text: 'Kopiuj bieżący wybór MEI do wejścia' },
   githubActionsInputContainerHeader: { text: 'Konfiguracja wejścia' },

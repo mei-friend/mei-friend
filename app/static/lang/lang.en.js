@@ -271,13 +271,17 @@ export const lang = {
   openUrlOpenEncodingByUrlText: { text: 'Open Web-hosted encoding by URL' },
 
   // GitHub actions modal
+  githubActionsHeadingText: { text: 'Request GitHub Action workflow:' },
+  githubActionsDescription: {
+    text: 'Click on "Run workflow" to ask the GitHub API to run the above workflow for you, using the input configuration specified below. Your encoding will be reloaded in its latest version once the workflow run completes. ',
+  },
   githubActionStatusMsgPrompt: { text: 'Could not run workflow - GitHub says' },
   githubActionStatusMsgWaiting: { text: 'Please be patient while GitHub is processing your workflow...' },
   githubActionStatusMsgFailure: { text: 'Could not run workflow - GitHub says' },
   githubActionStatusMsgSuccess: { text: 'Workflow run completed - GitHub says' },
-  githubActionsRunBtn: { text: 'Run workflow' },
-  githubActionsRunBtnReload: { text: 'Reload MEI file' },
-  githubActionsCancelBtn: { text: 'Cancel' },
+  githubActionsRunButton: { text: 'Run workflow' },
+  githubActionsRunButtonReload: { text: 'Reload MEI file' },
+  githubActionsCancelButton: { text: 'Cancel' },
   githubActionsInputSetterFilepath: { text: 'Copy current file path to input' },
   githubActionsInputSetterSelection: { text: 'Copy current MEI selection to input' },
   githubActionsInputContainerHeader: { text: 'Input configuration' },
@@ -363,7 +367,7 @@ export const lang = {
   makeStandOffAnnotation: {
     description: 'Stand-off status (RDF)',
     descriptionSolid: 'Write to Solid as RDF',
-    descriptionToLocal: 'Open stand-off (RDF) annotation in new tab'
+    descriptionToLocal: 'Open stand-off (RDF) annotation in new tab',
   },
   makeInlineAnnotation: {
     description: 'Click to in-line annotation',

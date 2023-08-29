@@ -275,6 +275,24 @@ export const lang = {
   openUrlChooseComposerText: { text: 'Tria un compositor...' },
   openUrlOpenEncodingByUrlText: { text: 'Obre la codificació allotjada a la web per URL' },
 
+  // GitHub actions modal
+  githubActionsHeadingText: { text: 'Sol·licita el flux de treball de GitHub:' },
+  githubActionsDescription: {
+    text: "Feu clic a \"Executa el flux de treball\" per demanar a l'API de GitHub que executi el flux de treball anterior, utilitzant la configuració d'entrada especificada a continuació. El vostre codi es recarregarà a la seva darrera versió una vegada que s'hagi completat la execució del flux de treball.",
+  },
+  githubActionStatusMsgPrompt: { text: "No s'ha pogut executar el flux de treball: GitHub diu" },
+  githubActionStatusMsgWaiting: {
+    text: 'Si us plau, tingueu paciència mentre GitHub processa el vostre flux de treball...',
+  },
+  githubActionStatusMsgFailure: { text: "No s'ha pogut executar el flux de treball: GitHub diu" },
+  githubActionStatusMsgSuccess: { text: 'Execució del flux de treball completada: GitHub diu' },
+  githubActionsRunButton: { text: 'Executa el flux de treball' },
+  githubActionsRunButtonReload: { text: "Torna a carregar l'arxiu MEI" },
+  githubActionsCancelButton: { text: 'Cancel·la' },
+  githubActionsInputSetterFilepath: { text: "Copia la ruta actual de l'arxiu a l'entrada" },
+  githubActionsInputSetterSelection: { text: "Copia la selecció actual de MEI a l'entrada" },
+  githubActionsInputContainerHeader: { text: "Configuració d'entrada" },
+
   // fork modals // forquilles modals
   forkRepoGithubText: { text: 'Fer una forquilla del repositori de Github' },
   forkRepoGithubExplanation: {
@@ -313,6 +331,14 @@ export const lang = {
   selectTagNameForEnclosureCancelButton: { value: 'Cancel·la' },
 
   // restore Solid session overlay
+  solidExplanation: {
+    description:
+      'Solid és una plataforma descentralitzada de dades enllaçades socials. Inicieu la sessió a Solid per crear anotacions de desacobrament utilitzant dades enllaçades (RDF).',
+  },
+  solidProvider: {
+    description: "Si us plau, escolliu un proveïdor d'identitat Solid (IdP) o especifiqueu el vostre propi.",
+  },
+  solidLoginBtn: { text: 'Iniciar sessió' },
   solidOverlayCancel: {
     html: 'Restaurant la sessió de Solid - premeu <span>Esc</span> o feu clic aquí per cancel·lar.',
   },
@@ -330,6 +356,8 @@ export const lang = {
   annotationToolsButton: { text: 'Eines', description: "Eines d'annotació" },
   annotationListButton: { text: 'Llista', description: "Llista d'anotacions" },
   writeAnnotStandoffText: { text: 'Anotació web' },
+  annotationToolsIdentifyTitle: { text: 'Identifica' },
+  annotationToolsIdentifySpan: { text: 'Identifica objecte musical' },
   annotationToolsHighlightTitle: { text: 'Resalta' },
   annotationToolsHighlightSpan: { text: 'Resalta' },
   annotationToolsDescribeTitle: { text: 'Descriu' },
@@ -346,9 +374,9 @@ export const lang = {
   deleteAnnotation: { description: 'Elimina aquesta anotació' },
   deleteAnnotationConfirmation: { text: 'Esteu segur que voleu eliminar aquesta anotació?' },
   makeStandOffAnnotation: {
-    description: "Estat stand-off (RDF)",
-    descriptionSolid: "Escriu a Solid com a RDF",
-    descriptionToLocal: "Obre l'anotació stand-off (RDF) en una pestanya nova"
+    description: 'Estat stand-off (RDF)',
+    descriptionSolid: 'Escriu a Solid com a RDF',
+    descriptionToLocal: "Obre l'anotació stand-off (RDF) en una pestanya nova",
   },
   makeInlineAnnotation: {
     description: 'Feu clic per a una anotació en línia',
