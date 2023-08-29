@@ -336,6 +336,14 @@ function completeIfInTag(cm) {
   });
 }
 
+/**
+ * Carries out code validation using validator.validateNG() and calls
+ * v.highlightValidation()
+ * @param {string} mei 
+ * @param {Function} updateLinting 
+ * @param {Object} options 
+ * @returns 
+ */
 export async function validate(mei, updateLinting, options) {
   if (options && mei) {
     // keep the callback (important for first call)
@@ -370,7 +378,7 @@ export async function validate(mei, updateLinting, options) {
       v.setValidationStatusToManual();
     }
   }
-}
+} // validate()
 
 async function suspendedValidate(text, updateLinting, options) {
   // Do nothing...
