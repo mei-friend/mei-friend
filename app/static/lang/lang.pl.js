@@ -86,7 +86,7 @@ export const lang = {
   staffDownText: { text: 'Element 1 pięciolinii w dół' },
   increaseDurText: { text: 'Zwiększ długość' },
   decreaseDurText: { text: 'Zmniejsz długość' },
-  cleanAccidText: { text: 'Usuń znaki akcydentalne @accid.ges' },
+  cleanAccidText: { text: 'Sprawdzić @accid.ges' },
   renumberMeasuresTestText: { text: 'Numeruj taktowania (test)' },
   renumberMeasuresExecText: { text: 'Numeruj taktowania (wykonaj)' },
   addIdsText: { text: 'Dodaj identyfikatory do MEI' },
