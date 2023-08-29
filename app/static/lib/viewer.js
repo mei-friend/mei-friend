@@ -34,6 +34,7 @@ import {
   platform,
   supportedVerovioVersions,
 } from './defaults.js';
+import * as icon from './../css/icons.js';
 
 export default class Viewer {
   constructor(vrvWorker, spdWorker) {
@@ -592,10 +593,10 @@ export default class Viewer {
     // console.log('NotationUpdated forceUpdate:' + forceUpdate);
     this.xmlDocOutdated = true;
     this.toolkitDataOutdated = true;
-    this.setRespSelectOptions();
     if (!isSafari) this.checkSchema(cm.getValue());
     let ch = document.getElementById('liveUpdateCheckbox');
     if ((this.allowCursorActivity && ch && ch.checked) || forceUpdate) {
+      this.setRespSelectOptions();
       this.updateData(cm, false, false);
     }
   } // notationUpdated()
@@ -2384,7 +2385,10 @@ export default class Viewer {
     let vs = document.getElementById('validation-status');
     vs.querySelector('svg').classList.remove('clockwise');
     let reportDiv = document.getElementById('validation-report');
-    if (reportDiv) reportDiv.innerHTML = '';
+    if (reportDiv) {
+      reportDiv.innerHTML = '';
+      reportDiv.style.visibility = 'hidden';
+    }
 
     let msg = '';
     if (found.length === 0 && this.validatorWithSchema) {
@@ -2404,7 +2408,7 @@ export default class Viewer {
         reportDiv.id = 'validation-report';
         reportDiv.classList.add('validation-report');
         let CM = document.querySelector('.CodeMirror');
-        CM.parentElement.insertBefore(reportDiv, CM);
+        CM.parentElement?.appendChild(reportDiv);
       }
 
       let closeButton = document.createElement('span');
@@ -2425,7 +2429,7 @@ export default class Viewer {
       messages.forEach((m, i) => {
         let p = document.createElement('div');
         p.classList.add('validation-item');
-        p.id = 'error' + i;
+        p.id = 'validationError' + i;
         p.innerHTML = 'Line ' + m.line + ': ' + m.message;
         p.addEventListener('click', (ev) => {
           cm.scrollIntoView({
@@ -2485,4 +2489,178 @@ export default class Viewer {
       }
     }
   } // toggleValidationReportVisibility()
+
+  /**
+   * Initializes and shows code checker panel below the CodeMirror encoding.
+   * codeCheckerEntries to be added through addCodeCheckerEntry(data).
+   * @param {string} title
+   * @returns
+   */
+  initCodeCheckerPanel(title = 'Code Checker') {
+    let codeChecker = document.getElementById('codeChecker');
+    if (!codeChecker) return;
+    codeChecker.innerHTML = '';
+    codeChecker.style.display = 'block';
+    setOrientation(cm, '', '', this);
+
+    let closeButton = document.createElement('span');
+    closeButton.classList.add('rightButton');
+    closeButton.innerHTML = '&times';
+    closeButton.addEventListener('click', () => {
+      codeChecker.style.display = 'none';
+      setOrientation(cm, '', '', this);
+    });
+    codeChecker.appendChild(closeButton);
+
+    let headerDiv = document.createElement('div');
+    headerDiv.classList.add('validation-title');
+    headerDiv.id = 'codeCheckerTitle';
+    headerDiv.innerHTML = title;
+    codeChecker.appendChild(headerDiv);
+
+    // Correct/Fix all
+    let correctAllButton = document.createElement('button');
+    correctAllButton.innerHTML = translator.lang.codeCheckerFixAll.text;
+    correctAllButton.classList.add('btn');
+    correctAllButton.addEventListener('click', () => {
+      let count = 0;
+      let fixButtonList = codeChecker.querySelectorAll('button.fix:not(.disabled)');
+      fixButtonList.forEach((button) => {
+        count++;
+        setTimeout(() => button.click(), 0);
+      });
+      infoSpanCurrent.innerHTML = '0';
+      infoSpanOf.innerHTML = '/';
+      infoSpanTotal.innerHTML = fixButtonList.length;
+      correctAllButton.classList.add('disabled');
+      correctAllButton.disabled = true;
+      ignoreAllButton.classList.add('disabled');
+      ignoreAllButton.disabled = true;
+    });
+    headerDiv.appendChild(correctAllButton);
+
+    let ignoreAllButton = document.createElement('button');
+    ignoreAllButton.innerHTML = translator.lang.codeCheckerIgnoreAll.text;
+    ignoreAllButton.classList.add('btn');
+    ignoreAllButton.addEventListener('click', () => {
+      codeChecker.querySelectorAll('.validation-item').forEach((ch) => {
+        let button = ch.querySelector('button.ignore');
+        let span = ch.querySelector('.codeCheckerMessage');
+        if (button && !button.disabled && span && !span.classList.contains('strikethrough')) {
+          button.click();
+        }
+      });
+    });
+    headerDiv.appendChild(ignoreAllButton);
+
+    let infoSpanCurrent = document.createElement('span');
+    infoSpanCurrent.id = 'codeCheckerInfoCurrent';
+    headerDiv.appendChild(infoSpanCurrent);
+    let infoSpanOf = document.createElement('span');
+    infoSpanOf.id = 'codeCheckerInfoOf';
+    headerDiv.appendChild(infoSpanOf);
+    let infoSpanTotal = document.createElement('span');
+    infoSpanTotal.id = 'codeCheckerInfoTotal';
+    headerDiv.appendChild(infoSpanTotal);
+
+    let noMessages = document.createElement('div');
+    noMessages.classList.add('validation-item');
+    noMessages.id = 'codeCheckerCheckingCode';
+    noMessages.classList.add('noAccidMessagesFound');
+    noMessages.innerHTML = translator.lang.codeCheckerCheckingCode.text;
+    codeChecker.appendChild(noMessages);
+  } // initCodeCheckerPanel()
+
+  /**
+   * Adds an entry to the code checker panel with a data structure,
+   * containing also the fix callback
+   * @param {Object} data
+   * @returns
+   */
+  addCodeCheckerEntry(data) {
+    let codeChecker = document.getElementById('codeChecker');
+    if (!codeChecker) return;
+    let noMessages = codeChecker.querySelector('.noAccidMessagesFound');
+    if (noMessages) noMessages.remove();
+    let codeCheckerInfoCurrent = document.getElementById('codeCheckerInfoCurrent');
+    let codeCheckerInfoTotal = document.getElementById('codeCheckerInfoTotal');
+    let div = document.createElement('div');
+    div.classList.add('validation-item');
+
+    // span for message
+    let span = document.createElement('span');
+    span.classList.add('codeCheckerMessage');
+    span.innerHTML = data.html;
+    span.addEventListener('click', (ev) => {
+      utils.setCursorToId(cm, data.xmlId);
+      cm.focus();
+    });
+    div.appendChild(span);
+
+    // function to correct error
+    if (data.correct) {
+      // Correct/Fix Button
+      let correctButton = document.createElement('button');
+      correctButton.innerHTML = translator.lang.codeCheckerFix.text;
+      correctButton.classList.add('btn');
+      correctButton.classList.add('fix');
+      correctButton.addEventListener('click', () => {
+        data.correct();
+        let checked = document.createElement('span');
+        checked.innerHTML = icon.check;
+        div.appendChild(checked);
+        correctButton.disabled = true;
+        correctButton.classList.add('disabled');
+        ignoreButton.disabled = true;
+        ignoreButton.classList.add('disabled');
+        let count = parseInt(codeCheckerInfoCurrent.innerHTML) || 0;
+        let total = parseInt(codeCheckerInfoTotal.innerHTML) || 0;
+        codeCheckerInfoCurrent.innerHTML = ++count;
+        if (count === total) {
+          let checked = document.createElement('span');
+          checked.innerHTML += icon.check;
+          codeCheckerInfoCurrent.parentElement.appendChild(checked);
+        }
+      });
+      div.appendChild(correctButton);
+
+      // Ignore Button
+      let ignoreButton = document.createElement('button');
+      ignoreButton.innerHTML = translator.lang.codeCheckerIgnore.text;
+      ignoreButton.classList.add('btn');
+      ignoreButton.classList.add('ignore');
+      ignoreButton.addEventListener('click', () => {
+        let total = parseInt(codeCheckerInfoTotal.innerHTML);
+        // correctButton.removeEventListener('click', data.correct);
+        if (!span.classList.contains('strikethrough')) {
+          // active, not stroke through
+          correctButton.disabled = true;
+          correctButton.classList.add('disabled');
+          span.disabled = true;
+          span.classList.add('strikethrough');
+          total--;
+        } else {
+          correctButton.disabled = false;
+          correctButton.classList.remove('disabled');
+          span.disabled = false;
+          span.classList.remove('strikethrough');
+          total++;
+        }
+        codeCheckerInfoTotal.innerHTML = total;
+      });
+      div.appendChild(ignoreButton);
+    }
+    codeChecker.appendChild(div);
+  } // addCodeCheckerEntry()
+
+  finalizeCodeCheckerPanel() {
+    let nothingFound = document.getElementById('codeCheckerCheckingCode');
+    if (nothingFound) {
+      nothingFound.innerHTML = translator.lang.codeCheckerNoAccidMessagesFound.text;
+    } else {
+      document.getElementById('codeCheckerInfoCurrent').innerHTML = 0;
+      document.getElementById('codeCheckerInfoOf').innerHTML = '/';
+      document.getElementById('codeCheckerInfoTotal').innerHTML = document.querySelectorAll('.validation-item')?.length;
+    }
+  } // finalizeCodeCheckerPanel()
 } // class Viewer

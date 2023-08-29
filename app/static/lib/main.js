@@ -1567,7 +1567,7 @@ export let cmd = {
   addSupplied: () => e.addSuppliedElement(v, cm),
   addSuppliedAccid: () => e.addSuppliedElement(v, cm, 'accid'),
   addSuppliedArtic: () => e.addSuppliedElement(v, cm, 'artic'),
-  cleanAccid: () => e.cleanAccid(v, cm),
+  correctAccid: () => e.checkAccidGes(v, cm),
   renumberMeasuresTest: () => e.renumberMeasures(v, cm, false),
   renumberMeasures: () => e.renumberMeasures(v, cm, true),
   reRenderMei: () => v.reRenderMei(cm, false),
@@ -1887,7 +1887,7 @@ function addEventListeners(v, cm) {
   document.getElementById('increaseDur').addEventListener('click', cmd.increaseDuration);
   document.getElementById('decreaseDur').addEventListener('click', cmd.decreaseDuration);
   // Manipulate encoding methods
-  document.getElementById('cleanAccid').addEventListener('click', () => e.cleanAccid(v, cm));
+  document.getElementById('cleanAccid').addEventListener('click', cmd.correctAccid);
   document.getElementById('renumberMeasuresTest').addEventListener('click', () => e.renumberMeasures(v, cm, false));
   document.getElementById('renumberMeasuresExec').addEventListener('click', () => e.renumberMeasures(v, cm, true));
   // rerender through Verovio
