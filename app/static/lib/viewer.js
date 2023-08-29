@@ -2145,7 +2145,12 @@ export default class Viewer {
     }
   } // hideAlerts()
 
-  // Method to check from MEI whether the XML schema filename has changed
+  /**
+   * Method to check from MEI header whether the XML schema filename 
+   * has changed, as stored in this.currentSchema
+   * @param {string} mei
+   * @returns
+   */
   async checkSchema(mei) {
     // console.log('Validation: checking for schema...')
     let vr = document.getElementById('validation-report');
@@ -2181,31 +2186,32 @@ export default class Viewer {
       console.log('Validation: ...new schema ' + this.currentSchema);
       await this.replaceSchema(this.currentSchema);
     }
-    //else {
-    // console.log('Validation: same schema.');
-    //}
-  }
+  } // checkSchema()
 
-  // Loads and replaces XML schema; throws errors if not found/CORS error,
-  // update validation-status icon
-  async replaceSchema(schemaFile) {
+  /**
+   * Loads and replaces XML schema; throws errors if not found/CORS error,
+   * update validation-status icon
+   * @param {string*} schemaFileName
+   * @returns
+   */
+  async replaceSchema(schemaFileName) {
     if (!this.validatorInitialized) return;
     let vs = document.getElementById('validation-status');
     vs.innerHTML = download;
-    let msg = translator.lang.loadingSchema.text + ' ' + schemaFile;
+    let msg = translator.lang.loadingSchema.text + ' ' + schemaFileName;
     vs.setAttribute('title', msg);
     this.changeStatus(vs, 'wait', ['error', 'ok', 'manual']);
-    this.updateSchemaStatusDisplay('wait', schemaFile, msg);
+    this.updateSchemaStatusDisplay('wait', schemaFileName, msg);
 
-    console.log('Validation: Replace schema: ' + schemaFile);
+    console.log('Validation: Replace schema: ' + schemaFileName);
     let data; // content of schema file
     try {
-      const response = await fetch(schemaFile);
+      const response = await fetch(schemaFileName);
       if (!response.ok) {
         // schema not found
         this.throwSchemaError({
           response: response,
-          schemaFile: schemaFile,
+          schemaFile: schemaFileName,
         });
         return;
       }
@@ -2214,25 +2220,28 @@ export default class Viewer {
     } catch (err) {
       this.throwSchemaError({
         err: translator.lang.errorLoadingSchema.text + ': ' + err,
-        schemaFile: schemaFile,
+        schemaFile: schemaFileName,
       });
       return;
     }
-    msg = translator.lang.schemaLoaded.text + ' ' + schemaFile;
+    msg = translator.lang.schemaLoaded.text + ' ' + schemaFileName;
     vs.setAttribute('title', msg);
     vs.innerHTML = unverified;
     this.validatorWithSchema = true;
     const autoValidate = document.getElementById('autoValidate');
     if (autoValidate && autoValidate.checked) validate(cm.getValue(), this.updateLinting, true);
     else this.setValidationStatusToManual();
-    console.log('New schema loaded to validator', schemaFile);
+    console.log('New schema loaded to validator', schemaFileName);
     rngLoader.setRelaxNGSchema(data);
     cm.options.hintOptions.schemaInfo = rngLoader.tags;
-    console.log('New schema loaded for auto completion', schemaFile);
-    this.updateSchemaStatusDisplay('ok', schemaFile, msg);
-  }
+    console.log('New schema loaded for auto completion', schemaFileName);
+    this.updateSchemaStatusDisplay('ok', schemaFileName, msg);
+  } // replaceSchema()
 
-  // Throw an schema error and update validation-status icon
+  /**
+   * Throws an schema error and updates validation-status icon
+   * @param {Object} msgObj
+   */
   throwSchemaError(msgObj) {
     this.validatorWithSchema = false;
     if (this.updateLinting && typeof this.updateLinting === 'function') this.updateLinting(cm, []); // clear errors in CodeMirror
@@ -2255,17 +2264,26 @@ export default class Viewer {
     console.warn(msg);
     this.changeStatus(vs, 'error', ['wait', 'ok', 'manual']);
     this.updateSchemaStatusDisplay('error', '', msg);
-    return;
-  }
+  } // throwSchemaError()
 
-  // helper function that adds addedClass (string)
-  // after removing removedClasses (array of strings)
-  // from el (DOM element)
-  changeStatus(el, addedClass = '', removedClasses = []) {
+  /**
+   * Helper function that adds addedClassName (string) after having removed
+   * removedClasses (array of strings) from el (DOM element)
+   * @param {Element} el
+   * @param {string} addedClassName
+   * @param {Array<string>} removedClasses
+   */
+  changeStatus(el, addedClassName = '', removedClasses = []) {
     removedClasses.forEach((c) => el.classList.remove(c));
-    el.classList.add(addedClass);
-  }
+    el.classList.add(addedClassName);
+  } // changeStatus()
 
+  /**
+   * Updates schema status display
+   * @param {string} status
+   * @param {string} schemaName
+   * @param {string} msg
+   */
   updateSchemaStatusDisplay(status = 'ok', schemaName, msg = '') {
     let el = document.getElementById('schemaStatus');
     if (el) {
@@ -2296,9 +2314,11 @@ export default class Viewer {
           break;
       }
     }
-  }
+  } // updateSchemaStatusDisplay()
 
-  // Switch validation-status icon to manual mode and add click event handlers
+  /**
+   * Switch validation-status icon to manual mode and add click event handlers
+   */
   setValidationStatusToManual() {
     let vs = document.getElementById('validation-status');
     vs.innerHTML = unverified;
@@ -2311,16 +2331,23 @@ export default class Viewer {
     let reportDiv = document.getElementById('validation-report');
     if (reportDiv) reportDiv.style.visibility = 'hidden';
     if (this.updateLinting && typeof this.updateLinting === 'function') this.updateLinting(cm, []); // clear errors in CodeMirror
-  }
+  } // setValidationStatusToManual()
 
-  // Callback for manual validation
+  /**
+   * Callback for manual validation
+   */
   manualValidate() {
     validate(cm.getValue(), undefined, {
       forceValidate: true,
     });
-  }
+  } // manualValidate()
 
-  // Highlight validation results in CodeMirror editor linting system
+  /**
+   * Highlight validation results in CodeMirror editor linting system
+   * @param {string} mei
+   * @param {Object} messages
+   * @returns
+   */
   highlightValidation(mei, messages) {
     let lines;
     let found = [];
@@ -2434,7 +2461,10 @@ export default class Viewer {
     }
   } // highlightValidation()
 
-  // Show/hide #validation-report panel, or force visibility (by string)
+  /**
+   * Show/hide #validation-report panel, or force visibility (by string)
+   * @param {string} forceVisibility
+   */
   toggleValidationReportVisibility(forceVisibility = '') {
     let reportDiv = document.getElementById('validation-report');
     if (reportDiv) {
