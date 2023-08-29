@@ -1,11 +1,8 @@
 # mei-friend-online CHANGELOG.md
 
-* Checkbox for enabling automatic display of validation report (off by default)
-
-
 ### 0.10.4
-* Add UI panel to editor to check and interactively fix all @accid.ges against key signature, measure accids, ties, and doubled information.
-* Checkbox for enabling automatic display of validation report (off by default)
+* Add UI panel inside editor panel to check and interactively fix all occurrences of @accid.ges against key signature, measure-wise accids, ties, and redundant information.
+* Settings checkbox for enabling automatic display of validation report (off by default)
 
 ### 0.10.3 Expansion support for MIDI playback
 * Add drop-down GUI element to MIDI toolbar to select expansion element from encoding
