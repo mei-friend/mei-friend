@@ -364,9 +364,9 @@ export const lang = {
   deleteAnnotation: { description: 'Usuń tę adnotację' },
   deleteAnnotationConfirmation: { text: 'Czy na pewno chcesz usunąć tę adnotację?' },
   makeStandOffAnnotation: {
-    description: 'Stan adnotacji (adnotacja sieci Web)',
-    descriptionSolid: 'Zapisz do Solid jako adnotacja sieci Web',
-    descriptionToLocal: 'Skopiuj identyfikator URI adnotacji sieci Web do schowka',
+    description: "Status stand-off (RDF)",
+    descriptionSolid: "Zapisz w Solid jako RDF",
+    descriptionToLocal: "Otwórz adnotację stand-off (RDF) w nowej karcie"
   },
   makeInlineAnnotation: {
     description: 'Kliknij, aby dodać adnotację w linii',
