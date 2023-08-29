@@ -54,7 +54,7 @@ export const lang = {
   surroundWithTagsText: { text: 'Envoltar amb tags' },
   surroundWithLastTagText: { text: 'Envoltar amb ' },
   jumpToLineText: { text: 'Salta a línia' },
-  toMatchingTagText: { text: "Anar al tag coincident" },
+  toMatchingTagText: { text: 'Anar al tag coincident' },
   manualValidateText: { text: 'Valida' },
 
   // VIEW MENU ITEM / ELEMENT DEL MENU DE VISUALITZACIÓ
@@ -736,6 +736,10 @@ export const lang = {
   autoValidate: {
     text: 'Validació automàtica',
     description: 'Valida la codificació automàticament després de cada edició',
+  },
+  autoShowValidationReport: {
+    text: 'Mostra el informe de validació automàticament',
+    description: "Mostra l'informe de validació automàticament després que s'hagi realitzat la validació",
   },
   autoCloseBrackets: {
     text: 'Tancament automàtic de claudàtors',

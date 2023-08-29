@@ -751,6 +751,10 @@ export const lang = {
     text: 'Auto validation',
     description: 'Validate encoding against schema automatically after each edit',
   },
+  autoShowValidationReport: {
+    text: 'Auto show validation report',
+    description: 'Show validation report automatically after validation has been performed',
+  },
   autoCloseBrackets: {
     text: 'Auto close brackets',
     description: 'Automatically close brackets at input',

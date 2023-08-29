@@ -739,6 +739,10 @@ export const lang = {
     text: 'Validation automatique',
     description: "Valide automatiquement l'encodage par rapport au schéma après chaque édition",
   },
+  autoShowValidationReport: {
+    text: 'Afficher le rapport de validation automatiquement',
+    description: 'Afficher automatiquement le rapport de validation après que la validation a été effectuée',
+  },
   autoCloseBrackets: {
     text: 'Fermeture automatique des crochets',
     description: "Ferme automatiquement les crochets à l'entrée",
