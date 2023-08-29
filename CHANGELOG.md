@@ -1,6 +1,7 @@
 # mei-friend-online CHANGELOG.md
 
 * Checkbox for enabling automatic display of validation report (off by default)
+* Update data model for stand-off annotation discovery service to use schema.org DataCatalogs / Datasets
 
 ### 0.10.3 Expansion support for MIDI playback
 * Add drop-down GUI element to MIDI toolbar to select expansion element from encoding
