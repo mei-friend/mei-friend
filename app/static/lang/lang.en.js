@@ -855,4 +855,29 @@ export const lang = {
   renumberMeasuresWouldBe: { text: 'would be' },
   renumberMeasuresChangedTo: { text: 'changed to' },
   renumberMeasureMeasuresRenumbered: { text: 'measures renumbered' },
+
+  // Code checker @accid.ges
+  codeCheckerTitle: { text: 'Check @accid.ges attributes (against key signature, measure-wise accids, and ties).' },
+  codeCheckerFix: { text: 'Fix' },
+  codeCheckerFixAll: { text: 'Fix all' },
+  codeCheckerIgnore: { text: 'Ignore' },
+  codeCheckerIgnoreAll: { text: 'Ignore all' },
+  codeCheckerCheckingCode: { text: 'Checking code...' },
+  codeCheckerNoAccidMessagesFound: { text: 'All accid.ges attributes seem correct.' },
+  codeCheckerMeasure: { text: 'Measure' },
+  codeCheckerNote: { text: 'Note' },
+  codeCheckerHasBoth: { text: 'has both' },
+  codeCheckerAnd: { text: 'and' },
+  codeCheckerRemove: { text: 'Remove' },
+  codeCheckerFixTo: { text: 'Fix to' },
+  codeCheckerAdd: { text: 'Add' },
+  codeCheckerWithContradictingContent: { text: 'with contradicting content' },
+  codeCheckerTiedNote: { text: 'Tied note' },
+  codeCheckerNotSamePitchAs: { text: 'not same pitch as' },
+  codeCheckerNotSameOctaveAs: { text: 'not same octave as' },
+  codeCheckerNotSameAsStartingNote: { text: 'not same as in starting note' },
+  codeCheckerExtra: { text: 'extra' }, // superfluous
+  codeCheckerHasExtra: { text: 'has extra' }, // has superfluous
+  codeCheckerLacksAn: { text: 'lacks an' },
+  codeCheckerBecauseAlreadyDefined: { text: 'because it has been defined earlier in the measure' },
 };

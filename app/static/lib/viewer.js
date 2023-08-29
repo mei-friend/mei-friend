@@ -2512,12 +2512,13 @@ export default class Viewer {
 
     let headerDiv = document.createElement('div');
     headerDiv.classList.add('validation-title');
+    headerDiv.id = 'codeCheckerTitle';
     headerDiv.innerHTML = title;
     codeChecker.appendChild(headerDiv);
 
     // Correct/Fix all
     let correctAllButton = document.createElement('button');
-    correctAllButton.innerHTML = 'Fix all';
+    correctAllButton.innerHTML = translator.lang.codeCheckerFixAll.text;
     correctAllButton.classList.add('btn');
     correctAllButton.addEventListener('click', () => {
       let count = 0;
@@ -2537,7 +2538,7 @@ export default class Viewer {
     headerDiv.appendChild(correctAllButton);
 
     let ignoreAllButton = document.createElement('button');
-    ignoreAllButton.innerHTML = 'Ignore all';
+    ignoreAllButton.innerHTML = translator.lang.codeCheckerIgnoreAll.text;
     ignoreAllButton.classList.add('btn');
     ignoreAllButton.addEventListener('click', () => {
       codeChecker.querySelectorAll('.validation-item').forEach((ch) => {
@@ -2562,9 +2563,9 @@ export default class Viewer {
 
     let noMessages = document.createElement('div');
     noMessages.classList.add('validation-item');
-    noMessages.id = 'noAccidMessagesFound';
+    noMessages.id = 'codeCheckerCheckingCode';
     noMessages.classList.add('noAccidMessagesFound');
-    noMessages.innerHTML = 'Checking code...';
+    noMessages.innerHTML = translator.lang.codeCheckerCheckingCode.text;
     codeChecker.appendChild(noMessages);
   } // initCodeCheckerPanel()
 
@@ -2598,7 +2599,7 @@ export default class Viewer {
     if (data.correct) {
       // Correct/Fix Button
       let correctButton = document.createElement('button');
-      correctButton.innerHTML = 'Fix';
+      correctButton.innerHTML = translator.lang.codeCheckerFix.text;
       correctButton.classList.add('btn');
       correctButton.classList.add('fix');
       correctButton.addEventListener('click', () => {
@@ -2623,7 +2624,7 @@ export default class Viewer {
 
       // Ignore Button
       let ignoreButton = document.createElement('button');
-      ignoreButton.innerHTML = 'Ignore';
+      ignoreButton.innerHTML = translator.lang.codeCheckerIgnore.text;
       ignoreButton.classList.add('btn');
       ignoreButton.classList.add('ignore');
       ignoreButton.addEventListener('click', () => {
@@ -2650,14 +2651,14 @@ export default class Viewer {
     codeChecker.appendChild(div);
   } // addCodeCheckerEntry()
 
-  finalizeCodeCheckerPanel(message = '') {
-    let nothingFound = document.getElementById('noAccidMessagesFound');
+  finalizeCodeCheckerPanel() {
+    let nothingFound = document.getElementById('codeCheckerCheckingCode');
     if (nothingFound) {
-      nothingFound.innerHTML = 'All accid.ges attributes seem correct.';
+      nothingFound.innerHTML = translator.lang.codeCheckerNoAccidMessagesFound.text;
     } else {
       document.getElementById('codeCheckerInfoCurrent').innerHTML = 0;
       document.getElementById('codeCheckerInfoOf').innerHTML = '/';
       document.getElementById('codeCheckerInfoTotal').innerHTML = document.querySelectorAll('.validation-item')?.length;
     }
-  }
+  } // finalizeCodeCheckerPanel()
 } // class Viewer

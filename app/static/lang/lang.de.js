@@ -844,4 +844,29 @@ export const lang = {
   renumberMeasuresWouldBe: { text: 'würde' },
   renumberMeasuresChangedTo: { text: 'geändert in' },
   renumberMeasureMeasuresRenumbered: { text: 'Takte nummeriert' },
+
+  // Code checker @accid.ges
+  codeCheckerTitle: { text: 'Alle @accid.ges-Attribute auf Tonart, taktweise Vorzeichen und Bindebögen überprüfen.' },
+  codeCheckerFix: { text: 'Korrigieren' },
+  codeCheckerFixAll: { text: 'Alle korrigieren' },
+  codeCheckerIgnore: { text: 'Ignorieren' },
+  codeCheckerIgnoreAll: { text: 'Alle ignorieren' },
+  codeCheckerCheckingCode: { text: 'Überprüfe Codierung...' },
+  codeCheckerNoAccidMessagesFound: { text: 'Alle accid.ges-Attribute sind korrekt.' },
+  codeCheckerMeasure: { text: 'Takt' },
+  codeCheckerNote: { text: 'Note' },
+  codeCheckerHasBoth: { text: 'hat' },
+  codeCheckerAnd: { text: 'und' },
+  codeCheckerRemove: { text: 'Entferne' },
+  codeCheckerFixTo: { text: 'Korrigiere zu' },
+  codeCheckerAdd: { text: 'Füge hinzu' },
+  codeCheckerWithContradictingContent: { text: 'mit unterschiedlichem Inhalt' },
+  codeCheckerTiedNote: { text: 'Gebundene Note' },
+  codeCheckerNotSamePitchAs: { text: 'nicht gleiche Tonhöhe wie' },
+  codeCheckerNotSameOctaveAs: { text: 'nicht gleiche Oktave wie' },
+  codeCheckerNotSameAsStartingNote: { text: 'abweichend von erster Note in Bindung' },
+  codeCheckerExtra: { text: 'extra' }, // superfluous
+  codeCheckerHasExtra: { text: 'hat extra' }, // has superfluous
+  codeCheckerLacksAn: { text: 'vermisst einen' },
+  codeCheckerBecauseAlreadyDefined: { text: 'weil es im gleichen Takt bereits definiert wurde' },
 };

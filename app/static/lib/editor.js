@@ -1036,16 +1036,16 @@ export function cleanAccid(v, cm) {
  * Checks accid/accid.ges attributes of all notes against
  * keySig/key.sig information and measure-wise accidentals,
  * finds instances of double accid & accid.ges.
- * 
+ *
  * !!! TODO: make strings translatable and add to language packs !!!
- * 
+ *
  * @param {Viewer} v
  * @param {CodeMirror} cm
  * @param {boolean} change
  */
 export function checkAccidGes(v, cm, change = false) {
   v.allowCursorActivity = false;
-  v.initCodeCheckerPanel('Check @accid.ges attributes (against key signature, measure-wise accids, and ties).');
+  v.initCodeCheckerPanel(translator.lang.codeCheckerTitle.text);
 
   let d = true; // send debug info to console
   setTimeout(() => {
@@ -1137,36 +1137,36 @@ export function checkAccidGes(v, cm, change = false) {
 
         // find doubled accid/accid.ges information
         if (accidGesEncoded && accid) {
-          if (accidGesEncoded === accid) {
-            // remove @accid.ges
-            data.html =
-              ++count +
-              ' Measure ' +
-              data.measure +
-              ', Note ' +
-              data.xmlId +
-              ' has both accid and accid.ges="' +
-              accid +
-              '". Remove accid.ges. ';
-            data.correct = () => {
-              v.allowCursorActivity = false;
-              e.removeAttribute('accid.ges');
-              replaceInEditor(cm, e, false);
-              v.allowCursorActivity = true;
-            };
-          } else {
-            data.html =
-              ++count +
-              ' Measure ' +
-              data.measure +
-              ', Note ' +
-              data.xmlId +
-              ' has both accid="' +
-              accid +
-              '" and accid.ges="' +
-              accidGesEncoded +
-              '" with different content. To be handled manually.';
+          data.html =
+            ++count +
+            ' ' +
+            translator.lang.codeCheckerMeasure.text +
+            ' ' +
+            data.measure +
+            ', ' +
+            translator.lang.codeCheckerNote.text +
+            ' "' +
+            data.xmlId +
+            '" ' +
+            translator.lang.codeCheckerHasBoth +
+            ' accid="' +
+            accid +
+            '" ' +
+            translator.lang.codeCheckerAnd +
+            ' accid.ges="' +
+            accidGesEncoded +
+            '" ';
+          if (accidGesEncoded !== accid) {
+            data.html += translator.lang.codeCheckerWithContradictingContent.text;
           }
+          data.html += '. ' + translator.lang.codeCheckerRemove + ' accid.ges';
+          // remove @accid.ges in all cases
+          data.correct = () => {
+            v.allowCursorActivity = false;
+            e.removeAttribute('accid.ges');
+            replaceInEditor(cm, e, false);
+            v.allowCursorActivity = true;
+          };
           v.addCodeCheckerEntry(data);
         }
 
@@ -1176,13 +1176,19 @@ export function checkAccidGes(v, cm, change = false) {
           if (pName !== startingNote.getAttribute('pname')) {
             data.html =
               ++count +
-              ' Measure ' +
+              ' ' +
+              translator.lang.codeCheckerMeasure.text +
+              ' ' +
               data.measure +
-              ' Tied note ' +
+              ', ' +
+              translator.lang.codeCheckerTiedNote.text +
+              ' "' +
               data.xmlId +
-              ': ' +
+              '": ' +
               pName +
-              ' not same pitch name as ' +
+              ' ' +
+              translator.lang.codeCheckerNotSamePitchAs.text +
+              ' ' +
               ties[data.xmlId] +
               ': ' +
               startingNote.getAttribute('pname');
@@ -1192,11 +1198,19 @@ export function checkAccidGes(v, cm, change = false) {
           if (oct !== startingNote.getAttribute('oct')) {
             data.html =
               ++count +
-              ' Measure ' +
+              ' ' +
+              translator.lang.codeCheckerMeasure.text +
+              ' ' +
               data.measure +
-              ' Tied note ' +
+              ', ' +
+              translator.lang.codeCheckerTiedNote.text +
+              ' "' +
               data.xmlId +
-              ' not same octave number as ' +
+              '": ' +
+              pName +
+              ' ' +
+              translator.lang.codeCheckerNotSameOctaveAs.text +
+              ' ' +
               ties[data.xmlId];
             v.addCodeCheckerEntry(data);
             if (d) console.debug(data.html);
@@ -1208,13 +1222,23 @@ export function checkAccidGes(v, cm, change = false) {
             startingNote.querySelector('[accid\\.ges]')?.getAttribute('accid.ges') ||
             'n';
           if ((accid || accidGesMeaning) !== startingAccidMeaning) {
-            data.html = ++count + ' Measure ' + data.measure + ' Tied note "' + data.xmlId + '" ';
+            data.html =
+              ++count +
+              ' ' +
+              translator.lang.codeCheckerMeasure.text +
+              ' ' +
+              data.measure +
+              ', ' +
+              translator.lang.codeCheckerTiedNote.text +
+              ' "' +
+              data.xmlId +
+              '": ';
             if (startingAccidMeaning !== 'n') {
               data.html +=
                 (accid ? 'accid="' + accid + '"' : accidGesEncoded ? 'accid.ges="' + accidGesEncoded + '"' : '') +
-                (' not same as in starting note ' + ties[data.xmlId] + ': ') +
+                (' ' + translator.lang.codeCheckerNotSameAsStartingNote.text + ' ' + ties[data.xmlId] + ': ') +
                 ('"' + startingAccidMeaning + '".') +
-                (' Fix attribute to accid.ges="' + startingAccidMeaning + '". ');
+                (' ' + translator.lang.codeCheckerFixTo.text + ' accid.ges="' + startingAccidMeaning + '". ');
               data.correct = () => {
                 v.allowCursorActivity = false;
                 e.setAttribute('accid.ges', startingAccidMeaning);
@@ -1223,11 +1247,12 @@ export function checkAccidGes(v, cm, change = false) {
               };
             } else {
               data.html +=
-                'superfluous ' +
+                translator.lang.codeCheckerExtra.text +
+                ' ' +
                 (accid ? 'accid="' + accid + '"' : accidGesEncoded ? 'accid.ges="' + accidGesEncoded + '"' : '') +
-                ('" not same as in starting note ' + ties[data.xmlId] + ': ') +
+                (' ' + translator.lang.codeCheckerNotSameAsStartingNote.text + ' ' + ties[data.xmlId] + ': ') +
                 ('"' + startingAccidMeaning + '". ') +
-                'Remove attribute accid.ges. ';
+                (translator.lang.codeCheckerRemove.text + ' accid.ges. ');
               data.correct = () => {
                 v.allowCursorActivity = false;
                 e.removeAttribute('accid.ges');
@@ -1242,13 +1267,21 @@ export function checkAccidGes(v, cm, change = false) {
           // check all accids having appeared in the current measure
           data.html =
             ++count +
-            ' Measure ' +
+            ' ' +
+            translator.lang.codeCheckerMeasure.text +
+            ' ' +
             data.measure +
-            ', Note ' +
+            ', ' +
+            translator.lang.codeCheckerNote.text +
+            ' "' +
             data.xmlId +
-            ' lacks an accid.ges="' +
+            '" ' +
+            translator.lang.codeCheckerLacksAn.text +
+            ' accid.ges="' +
             mAccid +
-            '", because it has been defined earlier in the measure.';
+            '", ' +
+            translator.lang.codeCheckerBecauseAlreadyDefined.text +
+            '.';
           data.correct = () => {
             v.allowCursorActivity = false;
             e.setAttribute('accid.ges', mAccid);
@@ -1266,11 +1299,21 @@ export function checkAccidGes(v, cm, change = false) {
           // a note, affected by key signature, either has @accid inside or as a child or has @accid.ges inside or as a child
           data.html =
             ++count +
-            ' Measure ' +
+            ' ' +
+            translator.lang.codeCheckerMeasure.text +
+            ' ' +
             data.measure +
-            ', Note ' +
+            ', ' +
+            translator.lang.codeCheckerNote.text +
+            ' "' +
             data.xmlId +
-            ' lacks an accid.ges="' +
+            '" ' +
+            translator.lang.codeCheckerLacksAn.text +
+            ' accid.ges="' +
+            data.keySigAccid +
+            '". ' +
+            translator.lang.codeCheckerAdd.text +
+            ' accid.ges="' +
             data.keySigAccid +
             '"';
           data.correct = () => {
@@ -1290,13 +1333,23 @@ export function checkAccidGes(v, cm, change = false) {
           // Check if there is an accid.ges that has not been defined in keySig or earlier in the measure
           data.html =
             ++count +
-            ' Measure ' +
+            ' ' +
+            translator.lang.codeCheckerMeasure.text +
+            ' ' +
             data.measure +
-            ', Note ' +
+            ', ' +
+            translator.lang.codeCheckerNote.text +
+            ' "' +
             data.xmlId +
-            ' has superfluous accid.ges="' +
+            '" ' +
+            translator.lang.codeCheckerHasExtra.text +
+            ' accid.ges="' +
             accidGesEncoded +
-            '"';
+            '" ' +
+            translator.lang.codeCheckerRemove.text +
+            ' accid.ges="' +
+            accidGesEncoded +
+            '".';
           data.correct = () => {
             v.allowCursorActivity = false;
             e.removeAttribute('accid.ges');
