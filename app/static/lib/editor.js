@@ -1173,95 +1173,99 @@ export function checkAccidGes(v, cm, change = false) {
         if (data.xmlId && data.xmlId in ties) {
           // Check whether note tied by starting note
           let startingNote = v.xmlDoc.querySelector('[*|id=' + ties[data.xmlId] + ']');
-          if (pName !== startingNote.getAttribute('pname')) {
-            data.html =
-              ++count +
-              ' ' +
-              translator.lang.codeCheckerMeasure.text +
-              ' ' +
-              data.measure +
-              ', ' +
-              translator.lang.codeCheckerTiedNote.text +
-              ' "' +
-              data.xmlId +
-              '": ' +
-              pName +
-              ' ' +
-              translator.lang.codeCheckerNotSamePitchAs.text +
-              ' ' +
-              ties[data.xmlId] +
-              ': ' +
-              startingNote.getAttribute('pname');
-            v.addCodeCheckerEntry(data);
-            if (d) console.debug(data.html);
-          }
-          if (oct !== startingNote.getAttribute('oct')) {
-            data.html =
-              ++count +
-              ' ' +
-              translator.lang.codeCheckerMeasure.text +
-              ' ' +
-              data.measure +
-              ', ' +
-              translator.lang.codeCheckerTiedNote.text +
-              ' "' +
-              data.xmlId +
-              '": ' +
-              pName +
-              ' ' +
-              translator.lang.codeCheckerNotSameOctaveAs.text +
-              ' ' +
-              ties[data.xmlId];
-            v.addCodeCheckerEntry(data);
-            if (d) console.debug(data.html);
-          }
-          let startingAccidMeaning =
-            startingNote.getAttribute('accid') ||
-            startingNote.querySelector('[accid]')?.getAttribute('accid') ||
-            startingNote.getAttribute('accid.ges') ||
-            startingNote.querySelector('[accid\\.ges]')?.getAttribute('accid.ges') ||
-            'n';
-          if ((accid || accidGesMeaning) !== startingAccidMeaning) {
-            data.html =
-              ++count +
-              ' ' +
-              translator.lang.codeCheckerMeasure.text +
-              ' ' +
-              data.measure +
-              ', ' +
-              translator.lang.codeCheckerTiedNote.text +
-              ' "' +
-              data.xmlId +
-              '": ';
-            if (startingAccidMeaning !== 'n') {
-              data.html +=
-                (accid ? 'accid="' + accid + '"' : accidGesEncoded ? 'accid.ges="' + accidGesEncoded + '"' : '') +
-                (' ' + translator.lang.codeCheckerNotSameAsStartingNote.text + ' ' + ties[data.xmlId] + ': ') +
-                ('"' + startingAccidMeaning + '".') +
-                (' ' + translator.lang.codeCheckerFixTo.text + ' accid.ges="' + startingAccidMeaning + '". ');
-              data.correct = () => {
-                v.allowCursorActivity = false;
-                e.setAttribute('accid.ges', startingAccidMeaning);
-                replaceInEditor(cm, e, false);
-                v.allowCursorActivity = true;
-              };
-            } else {
-              data.html +=
-                translator.lang.codeCheckerExtra.text +
+          if (startingNote) {
+            if (pName !== startingNote.getAttribute('pname')) {
+              data.html =
+                ++count +
                 ' ' +
-                (accid ? 'accid="' + accid + '"' : accidGesEncoded ? 'accid.ges="' + accidGesEncoded + '"' : '') +
-                (' ' + translator.lang.codeCheckerNotSameAsStartingNote.text + ' ' + ties[data.xmlId] + ': ') +
-                ('"' + startingAccidMeaning + '". ') +
-                (translator.lang.codeCheckerRemove.text + ' accid.ges. ');
-              data.correct = () => {
-                v.allowCursorActivity = false;
-                e.removeAttribute('accid.ges');
-                replaceInEditor(cm, e, false);
-                v.allowCursorActivity = true;
-              };
+                translator.lang.codeCheckerMeasure.text +
+                ' ' +
+                data.measure +
+                ', ' +
+                translator.lang.codeCheckerTiedNote.text +
+                ' "' +
+                data.xmlId +
+                '": ' +
+                pName +
+                ' ' +
+                translator.lang.codeCheckerNotSamePitchAs.text +
+                ' ' +
+                ties[data.xmlId] +
+                ': ' +
+                startingNote.getAttribute('pname');
+              v.addCodeCheckerEntry(data);
+              if (d) console.debug(data.html);
             }
-            v.addCodeCheckerEntry(data);
-            if (d) console.debug(data.html);
+            if (oct !== startingNote.getAttribute('oct')) {
+              data.html =
+                ++count +
+                ' ' +
+                translator.lang.codeCheckerMeasure.text +
+                ' ' +
+                data.measure +
+                ', ' +
+                translator.lang.codeCheckerTiedNote.text +
+                ' "' +
+                data.xmlId +
+                '": ' +
+                pName +
+                ' ' +
+                translator.lang.codeCheckerNotSameOctaveAs.text +
+                ' ' +
+                ties[data.xmlId];
+              v.addCodeCheckerEntry(data);
+              if (d) console.debug(data.html);
+            }
+            let startingAccidMeaning =
+              startingNote.getAttribute('accid') ||
+              startingNote.querySelector('[accid]')?.getAttribute('accid') ||
+              startingNote.getAttribute('accid.ges') ||
+              startingNote.querySelector('[accid\\.ges]')?.getAttribute('accid.ges') ||
+              'n';
+            if ((accid || accidGesMeaning) !== startingAccidMeaning) {
+              data.html =
+                ++count +
+                ' ' +
+                translator.lang.codeCheckerMeasure.text +
+                ' ' +
+                data.measure +
+                ', ' +
+                translator.lang.codeCheckerTiedNote.text +
+                ' "' +
+                data.xmlId +
+                '": ';
+              if (startingAccidMeaning !== 'n') {
+                data.html +=
+                  (accid ? 'accid="' + accid + '"' : accidGesEncoded ? 'accid.ges="' + accidGesEncoded + '"' : '') +
+                  (' ' + translator.lang.codeCheckerNotSameAsStartingNote.text + ' ' + ties[data.xmlId] + ': ') +
+                  ('"' + startingAccidMeaning + '".') +
+                  (' ' + translator.lang.codeCheckerFixTo.text + ' accid.ges="' + startingAccidMeaning + '". ');
+                data.correct = () => {
+                  v.allowCursorActivity = false;
+                  e.setAttribute('accid.ges', startingAccidMeaning);
+                  replaceInEditor(cm, e, false);
+                  v.allowCursorActivity = true;
+                };
+              } else {
+                data.html +=
+                  translator.lang.codeCheckerExtra.text +
+                  ' ' +
+                  (accid ? 'accid="' + accid + '"' : accidGesEncoded ? 'accid.ges="' + accidGesEncoded + '"' : '') +
+                  (' ' + translator.lang.codeCheckerNotSameAsStartingNote.text + ' ' + ties[data.xmlId] + ': ') +
+                  ('"' + startingAccidMeaning + '". ') +
+                  (translator.lang.codeCheckerRemove.text + ' accid.ges. ');
+                data.correct = () => {
+                  v.allowCursorActivity = false;
+                  e.removeAttribute('accid.ges');
+                  replaceInEditor(cm, e, false);
+                  v.allowCursorActivity = true;
+                };
+              }
+              v.addCodeCheckerEntry(data);
+              if (d) console.debug(data.html);
+            }
+          } else {
+            console.log('No starting note found for tie ' + ties[data.xmlId]);
           }
         } else if (!accid && mAccid && mAccid !== accidGesMeaning) {
           // check all accids having appeared in the current measure

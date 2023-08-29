@@ -619,8 +619,7 @@ a:active {
   cursor: pointer;
   font-size: 2em;
   padding-right: .01em;
-  margin-top: -.35em;
-  line-height: 1.2em;
+  margin-top: -.25em;
 }
 
 #annotationPanel {
