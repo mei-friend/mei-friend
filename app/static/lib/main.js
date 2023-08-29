@@ -339,10 +339,10 @@ function completeIfInTag(cm) {
 /**
  * Carries out code validation using validator.validateNG() and calls
  * v.highlightValidation()
- * @param {string} mei 
- * @param {Function} updateLinting 
- * @param {Object} options 
- * @returns 
+ * @param {string} mei
+ * @param {Function} updateLinting
+ * @param {Object} options
+ * @returns
  */
 export async function validate(mei, updateLinting, options) {
   if (options && mei) {
@@ -352,8 +352,6 @@ export async function validate(mei, updateLinting, options) {
     }
 
     if (v.validatorWithSchema && (document.getElementById('autoValidate').checked || options.forceValidate)) {
-      let reportDiv = document.getElementById('validation-report');
-      if (reportDiv) reportDiv.style.visibility = 'hidden';
       let vs = document.getElementById('validation-status');
       vs.innerHTML = clock;
       v.changeStatus(vs, 'wait', ['error', 'ok', 'manual']); // darkorange

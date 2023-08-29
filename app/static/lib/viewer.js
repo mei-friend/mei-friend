@@ -2146,15 +2146,13 @@ export default class Viewer {
   } // hideAlerts()
 
   /**
-   * Method to check from MEI header whether the XML schema filename 
+   * Method to check from MEI header whether the XML schema filename
    * has changed, as stored in this.currentSchema
    * @param {string} mei
    * @returns
    */
   async checkSchema(mei) {
     // console.log('Validation: checking for schema...')
-    let vr = document.getElementById('validation-report');
-    if (vr) vr.style.visibility = 'hidden';
     const hasSchema = /<\?xml-model.*schematypens=\"http?:\/\/relaxng\.org\/ns\/structure\/1\.0\"/;
     const hasSchemaMatch = hasSchema.exec(mei);
     const meiVersion = /<mei.*meiversion="([^"]*).*/;
@@ -2405,9 +2403,8 @@ export default class Viewer {
         reportDiv.classList.add('validation-report');
         let CM = document.querySelector('.CodeMirror');
         CM.parentElement.insertBefore(reportDiv, CM);
-      } else {
-        reportDiv.style.visibility = 'visible';
       }
+
       let closeButton = document.createElement('span');
       closeButton.classList.add('rightButton');
       closeButton.innerHTML = '&times';
@@ -2458,6 +2455,15 @@ export default class Viewer {
       vs.removeEventListener('click', this.manualValidate);
       vs.removeEventListener('click', this.toggleValidationReportVisibility);
       vs.addEventListener('click', this.toggleValidationReportVisibility);
+
+      let currentVisibility = reportDiv.style.visibility;
+      // show or not validation report, if not already defined
+      if (!currentVisibility || !document.getElementById('autoValidate')?.checked)
+        reportDiv.style.visibility =
+          document.getElementById('autoShowValidationReport')?.checked ||
+          !document.getElementById('autoValidate')?.checked
+            ? 'visible'
+            : 'hidden';
     }
   } // highlightValidation()
 
