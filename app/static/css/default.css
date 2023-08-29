@@ -440,14 +440,14 @@ a:active {
 }
 
 .validation-report {
-  font-size: 90%;
+  font-size: 95%;
   display: block;
   position: relative;
   z-index: 12;
   left: 72px;
   top: 3px;
-  width: 480px;
-  margin-right: -480px;
+  width: 560px;
+  margin-right: -560px;
   max-height: 10.5em;
   padding: 2px;
   overflow-x: auto;
@@ -457,6 +457,7 @@ a:active {
   border: 2px solid var(--settingsBackgroundAlternativeColor);
   border-radius: 4px;
   font-family: monospace;
+  line-height: 1.4em;
 }
 
 .validation-report div:nth-child(odd) {
@@ -571,6 +572,7 @@ a:active {
   font-size: 2em;
   padding-right: .01em;
   margin-top: -.35em;
+  line-height: 1.2em;
 }
 
 #annotationPanel {
