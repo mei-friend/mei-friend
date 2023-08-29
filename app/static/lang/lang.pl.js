@@ -155,7 +155,8 @@ export const lang = {
   leftFooter: {
     html:
       'Hostowany przez <a href="https://iwk.mdw.ac.at">IWK</a> ' +
-      'na <a href="https://mdw.ac.at">mdw</a>, z sercem ' +
+      'na <a href="https://mdw.ac.at">mdw</a>, z ' +
+      heart +
       'z Wiednia. ' +
       '<a href="https://iwk.mdw.ac.at/impressum">Oświadczenie</a>.',
   },
