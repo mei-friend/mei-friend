@@ -657,8 +657,6 @@ export default class Viewer {
     rt.style.setProperty('--backgroundColor', cm.backgroundColor);
     // rt.style.setProperty('color', cm.color);
     rt.style.setProperty('--textColor', cm.color);
-    let cmAtt = document.querySelector('.cm-attribute');
-    if (cmAtt) rt.style.setProperty('--highlightColor', window.getComputedStyle(cmAtt).color);
     let j = 0;
     cm.backgroundColor
       .slice(4, -1)
