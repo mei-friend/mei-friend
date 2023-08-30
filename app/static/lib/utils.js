@@ -105,37 +105,21 @@ export function moveCursorToEndOfMeasure(cm, p = null) {
   };
 } // moveCursorToEndOfMeasure()
 
-// find item by id in buffer
-// NEW: let sc = cm.getSearchCursor('xml:id="' + id + '"');
-// export function locateIdInBuffer(cm, itemId, searchRegExp = '') {
-//   // const searchString = new RegExp(`(?:xml:id="${itemId}")`);
-//   // var searchSelfClosing = '<[\\w.-]+?\\s+?(?:xml:id="' + itemId + '")(.*?)(\/[\\w.-]*?>)';
-//   // var searchElement = '(?:<' + elementName + ')\\s+?(?:xml:id="' + itemId + '")(.*?)(?:</' + elementName + ')*?>';
-//   if (searchRegExp === '') searchRegExp = '(?:xml:id="' + itemId + '")';
-//   let searchString = new RegExp(searchRegExp);
-//   let sc = cm.getSearchCursor(searchString);
-//   let foundString = mei.match(searchString);
-//   // searchRegExp = '<[\w.-]+?\s+?(?:xml:id="' + itemId + '")(.+?)(\/[\w.-]*?>)';
-//   let range;
-//   let index = mei.indexOf(foundString);
-//
-//   // TODO: replace with string.match() und string.indexOf()
-//   // buffer.scan(searchString, (obj) => {
-//   //   range = obj.range;
-//   //   obj.stop();
-//   // });
-//   return range;
-// }
-
+/**
+ * Searches position of id in encoding, puts cursor to the beginning
+ * of the corresponding tag start, and scrolls view there.
+ * @param {CodeMirror} cm
+ * @param {string} id
+ * @returns
+ */
 export function setCursorToId(cm, id) {
   if (id === '') return;
   let c = cm.getSearchCursor(new RegExp(`(?:['"])` + id + `(?:['"])`));
   if (c.findNext()) {
     cm.setCursor(c.from());
-    // console.info('setCursorToId cursor: ', c.from());
-    let enc = document.getElementById('encoding');
-    // cm.execCommand('goLineStartSmart');
     goTagStart(cm);
+    // scroll current cursor into view, vertically centering the view
+    let enc = document.querySelector('.CodeMirror'); // retrieve size of CodeMirror panel
     if (enc) cm.scrollIntoView(null, Math.round(enc.clientHeight / 2));
   }
 } // setCursorToId()
