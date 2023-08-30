@@ -547,6 +547,10 @@ export const lang = {
     text: 'Destaca les notes que sonen actualment',
     description: 'Destaca visualment les notes que sonen actualment al panell de notació durant la reproducció MIDI',
   },
+  selectMidiExpansion: {
+    text: 'Expansió de la reproducció',
+    description: "Seleccioneu l'element d'expansió a utilitzar per a la reproducció MIDI",
+  },
 
   // Transposition / Transposició
   titleTransposition: {

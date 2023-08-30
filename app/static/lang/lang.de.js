@@ -544,6 +544,11 @@ export const lang = {
     text: 'Klingende Noten hervorheben',
     description: 'Aktuell klingende Noten im Notationsfeld visuell hervorheben',
   },
+  selectMidiExpansion: {
+    text: 'Expansion für Wiedergabe',
+    description: 'Wählen Sie das expansion-Element aus, das für die MIDI-Wiedergabe verwendet werden soll',
+  },
+
   // Transposition
   titleTransposition: {
     text: 'Transposition',

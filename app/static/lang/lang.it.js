@@ -552,6 +552,10 @@ export const lang = {
     description:
       'Evidenzia visivamente le note attualmente suonate nel pannello di notazione durante la riproduzione MIDI',
   },
+  selectMidiExpansion: {
+    text: 'Espansione della riproduzione',
+    description: "Seleziona l'elemento di espansione da utilizzare per la riproduzione MIDI",
+  },
 
   // Transposition // Trasposizione
   titleTransposition: {

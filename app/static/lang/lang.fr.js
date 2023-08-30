@@ -547,6 +547,10 @@ export const lang = {
     description:
       'Surligner visuellement les notes actuellement en train de sonner dans le panneau de notation pendant la lecture MIDI',
   },
+  selectMidiExpansion: {
+    text: 'Extension de lecture',
+    description: "Sélectionnez l'élément d'extension à utiliser pour la lecture MIDI",
+  },
 
   // Transposition // Transposition
   titleTransposition: {

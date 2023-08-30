@@ -537,6 +537,10 @@ export const lang = {
     text: 'Highlight currently-sounding notes',
     description: 'Visually highlight currently-sounding notes in the notation panel during MIDI playback ',
   },
+  selectMidiExpansion: {
+    text: 'Playback expansion',
+    description: 'Select expansion element to be used for MIDI playback',
+  },
 
   // Transposition
   titleTransposition: {

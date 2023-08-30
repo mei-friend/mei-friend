@@ -541,6 +541,10 @@ export const lang = {
     text: 'Podświetl aktualnie brzmiące nuty',
     description: 'Podświetl wizualnie aktualnie brzmiące nuty w panelu notacji podczas odtwarzania MIDI',
   },
+  selectMidiExpansion: {
+    text: 'Expansion odtwarzania',
+    description: 'Wybierz element expansion, który ma być używany do odtwarzania MIDI',
+  },
 
   // Transposition
   titleTransposition: {
