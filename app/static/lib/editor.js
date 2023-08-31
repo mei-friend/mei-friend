@@ -150,7 +150,7 @@ export function addAccidental(v, cm, accidAttribute = 's', asElement = true) {
 
   v.selectedElements.forEach((xmlId, i) => {
     let el = v.xmlDoc.querySelector("[*|id='" + xmlId + "']");
-    if (el) {
+    if (el && el.nodeName === 'note') {
       let accid = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'accid');
       uuid = utils.generateXmlId('accid', v.xmlIdStyle);
       accid.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
@@ -163,7 +163,6 @@ export function addAccidental(v, cm, accidAttribute = 's', asElement = true) {
       if (i === v.selectedElements.length - 1) {
         utils.setCursorToId(cm, uuid);
         v.lastNoteId = xmlId;
-        // cm.execCommand('goCharRight')
       }
     }
   });
