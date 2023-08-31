@@ -7,7 +7,7 @@ import { heart } from '../css/icons.js';
 
 export const lang = {
   // Main menu bar
-  githubLoginLink: { text: 'Accesso' },
+  githubLoginLink: { text: 'Accedi' },
 
   month: {
     jan: 'Gennaio',
