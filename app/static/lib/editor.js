@@ -616,7 +616,7 @@ export function toggleArtic(v, cm, artic = 'stacc') {
  * @param {CodeMirror} cm
  * @param {int} deltaPitch (-1, -12, +2)
  */
-export function shiftPitch(v, cm, deltaPitch = 0) {
+export function shiftPitchDiatonically(v, cm, deltaPitch = 0) {
   v.loadXml(cm.getValue());
   let ids = speed.filterElements(v.selectedElements, v.xmlDoc);
   v.allowCursorActivity = false;
@@ -626,17 +626,21 @@ export function shiftPitch(v, cm, deltaPitch = 0) {
     let el = v.xmlDoc.querySelector("[*|id='" + id + "']");
     if (!el) continue;
     let chs = Array.from(el.querySelectorAll('note,rest,mRest,multiRest'));
-    if (chs.length > 0)
+    if (chs.length > 0) {
       // shift many elements
       chs.forEach((ele) => replaceInEditor(cm, pitchMover(ele, deltaPitch)), true);
-    // shift one element
-    else replaceInEditor(cm, pitchMover(el, deltaPitch), true);
+    } else {
+      // shift one element
+      replaceInEditor(cm, pitchMover(el, deltaPitch), true);
+    }
   }
   v.selectedElements = ids;
   addApplicationInfo(v, cm);
   v.updateData(cm, false, true);
   v.allowCursorActivity = true; // update notation again
-} // shiftPitch()
+} // shiftPitchDiatonically()
+
+export function shiftPitchChromatically(v, cm, deltaSemitones = 0) {}
 
 /**
  * In/decrease duration of selected element (ignore, when no duration)
