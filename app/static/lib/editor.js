@@ -1200,11 +1200,11 @@ export function checkAccidGes(v, cm, change = false) {
             translator.lang.codeCheckerAnd.text +
             ' accid.ges="' +
             accidGesEncoded +
-            '" ';
+            '"';
           if (accidGesEncoded !== accid) {
-            data.html += translator.lang.codeCheckerWithContradictingContent.text;
+            data.html += ' ' + translator.lang.codeCheckerWithContradictingContent.text;
           }
-          data.html += '. ' + translator.lang.codeCheckerRemove + ' accid.ges';
+          data.html += '. ' + translator.lang.codeCheckerRemove.text + ' accid.ges';
           // remove @accid.ges in all cases
           data.correct = () => {
             v.allowCursorActivity = false;
