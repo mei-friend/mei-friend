@@ -72,7 +72,7 @@ export const lang = {
   facsimileRight: { text: 'Facsimile a destra' },
 
   // MANIPULATE MENU ITEM/ MENU MANIPOLA
-  manipulateMenuTitle: { text: 'Manipola' },
+  manipulateMenuTitle: { text: 'Modifica' },
   invertPlacementText: { text: 'Inverti posizione' },
   betweenPlacementText: { text: 'Tra posizioni' },
   addVerticalGroupText: { text: 'Aggiungi gruppo verticale' },
