@@ -249,11 +249,11 @@ a:active {
   padding-right: 0.5em;
 }
 
-.githubActionsInputFieldWrapper { 
-  flex:1;
+.githubActionsInputFieldWrapper {
+  flex: 1;
 }
 
-.githubActionsInputField { 
+.githubActionsInputField {
   width: 95%;
 }
 
@@ -626,8 +626,8 @@ a:active {
   float: right;
   cursor: pointer;
   font-size: 2em;
-  padding-right: .01em;
-  margin-top: -.25em;
+  padding-right: 0.01em;
+  margin-top: -0.25em;
 }
 
 #annotationPanel {
@@ -918,19 +918,19 @@ svg text {
   user-select: none;
 }
 
-#verovioContainer .currently-playing {
+#verovio-panel .currently-playing {
   fill: orange !important;
   stroke: orange !important;
   color: orange !important;
 }
 
-#verovioContainer .highlighted {
+#verovio-panel .highlighted {
   color: var(--highlightColor);
   stroke: var(--highlightColor);
 }
 
-#verovioContainer g.highlighted,
-#verovioContainer text.highlighted {
+#verovio-panel g.highlighted,
+#verovio-panel text.highlighted {
   fill: var(--highlightColor);
   fill-opacity: 100%;
 }
@@ -949,22 +949,23 @@ svg text {
   fill-opacity: 70%;
 }
 
-#verovioContainer g.supplied g {
+#verovio-panel g.supplied g {
   fill: var(--suppliedColor);
   color: var(--suppliedColor);
   stroke: var(--suppliedColor);
 }
 
-#verovioContainer .supplied .highlighted {
+#verovio-panel .supplied .highlighted {
   color: var(--suppliedHighlightedColor);
   stroke: var(--suppliedHighlightedColor);
 }
 
-#verovioContainer g.supplied g.highlighted {
+#verovio-panel g.supplied g.highlighted {
   fill: var(--suppliedHighlightedColor);
 }
 
-#verovioContainer g {
+#verovio-panel:not(g[color], g[fill]),
+#verovio-panel path {
   fill: var(--notationColor);
   color: var(--notationColor);
   stroke: var(--notationColor);
