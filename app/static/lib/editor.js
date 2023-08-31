@@ -619,12 +619,13 @@ export function toggleArtic(v, cm, artic = 'stacc') {
 } // toggleArtic()
 
 /**
- * Shifts element (rests, note) up/down by pitch name (1 or 7 steps)
+ * Shifts element (rests, note) up/down diatonically by pitch name (1 or 7 diatonic steps)
  * @param {Viewer} v
  * @param {CodeMirror} cm
  * @param {int} deltaPitch (-1, -12, +2)
+ * @param {boolean} shiftChromatically
  */
-export function shiftPitchDiatonically(v, cm, deltaPitch = 0) {
+export function shiftPitch(v, cm, deltaPitch = 0, shiftChromatically = false) {
   v.loadXml(cm.getValue());
   let ids = speed.filterElements(v.selectedElements, v.xmlDoc);
   v.allowCursorActivity = false;
@@ -636,19 +637,17 @@ export function shiftPitchDiatonically(v, cm, deltaPitch = 0) {
     let chs = Array.from(el.querySelectorAll('note,rest,mRest,multiRest'));
     if (chs.length > 0) {
       // shift many elements
-      chs.forEach((ele) => replaceInEditor(cm, pitchMover(ele, deltaPitch)), true);
+      chs.forEach((ele) => replaceInEditor(cm, pitchMover(ele, deltaPitch, shiftChromatically)), true);
     } else {
       // shift one element
-      replaceInEditor(cm, pitchMover(el, deltaPitch), true);
+      replaceInEditor(cm, pitchMover(el, deltaPitch, shiftChromatically), true);
     }
   }
   v.selectedElements = ids;
   addApplicationInfo(v, cm);
   v.updateData(cm, false, true);
   v.allowCursorActivity = true; // update notation again
-} // shiftPitchDiatonically()
-
-export function shiftPitchChromatically(v, cm, deltaSemitones = 0) {}
+} // shiftPitch()
 
 /**
  * In/decrease duration of selected element (ignore, when no duration)
@@ -2095,12 +2094,15 @@ function toggleArticForNote(note, artic, xmlIdStyle) {
 /**
  * Modifies an element's pitch up and down (i.e. manipulating @oct, @pname)
  * @param {Element} el
- * @param {number} deltaPitch
- * @returns
+ * @param {number} deltaPitch (diatonic steps or chromatic steps)
+ * @param {boolean} shiftChromatically
+ * @returns {Element} element with modified attributes
+ * NOTE: when shifting chromatically, only semitones (+/-1) are done!
  */
-function pitchMover(el, deltaPitch) {
+function pitchMover(el, deltaPitch, shiftChromatically = false) {
   let oct = 4;
   let pname = 'c';
+  let accid = '';
   let o;
   let p;
   if (['note'].includes(el.nodeName)) {
@@ -2112,13 +2114,50 @@ function pitchMover(el, deltaPitch) {
   }
   if (el.hasAttribute(o)) oct = parseInt(el.getAttribute(o));
   if (el.hasAttribute(p)) pname = el.getAttribute(p);
-  let pi = att.pnames.indexOf(pname) + deltaPitch;
+  let pi;
+
+  if (!shiftChromatically) {
+    pi = att.pnames.indexOf(pname) + deltaPitch;
+  } else {
+    if (el.hasAttribute('accid.ges')) accid = el.getAttribute('accid.ges');
+    if (el.hasAttribute('accid')) accid = el.getAttribute('accid');
+    accid = accid.slice(0, 1); // take only first character
+    pi = att.pnames.indexOf(pname); // what
+    if (deltaPitch > 0) {
+      if (att.sharps.slice(0, 5).includes(pname)) {
+        if (accid === 's') {
+          pi++;
+          accid = '';
+        } else {
+          accid = 's';
+        }
+      } else {
+        pi++;
+      }
+    } else if (deltaPitch < 0) {
+      if (att.flats.slice(0, 5).includes(pname)) {
+        if (accid === 'f') {
+          pi--;
+          accid = '';
+        } else {
+          accid = 'f';
+        }
+      } else {
+        pi--;
+      }
+    }
+  }
   if (pi > att.pnames.length - 1) {
     pi -= att.pnames.length;
     oct++;
   } else if (pi < 0) {
     pi += att.pnames.length;
     oct--;
+  }
+  if (accid) {
+    el.setAttribute('accid', accid);
+  } else {
+    el.removeAttribute('accid');
   }
   el.setAttribute(o, oct);
   el.setAttribute(p, att.pnames[pi]);
