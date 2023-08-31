@@ -94,6 +94,11 @@ export const lang = {
 
   // INSERT MENU ITEM
   insertMenuTitle: { text: 'Insertar' },
+  addCroixText: { html: 'Doble stostenido &#119082;' },
+  addSharpText: { html: 'Sostenido &#9839;' },
+  addNaturalText: { html: 'Becuadro &#9838;' },
+  addFlatText: { html: 'Bemol &#9837;' },
+  addDoubleFlatText: { html: 'Doble bemol &#119083;' },
   addTempoText: { text: 'Tempo' },
   addDirectiveText: { text: 'Directiva de juego' },
   addDynamicsText: { text: 'Dinámica' },
@@ -546,7 +551,7 @@ export const lang = {
     text: 'Expansión de reproducción',
     description: 'Seleccione el elemento de expansión que se utilizará para la reproducción MIDI',
   },
-  
+
   // Transposition / Transposición
   titleTransposition: {
     text: 'Transposición',

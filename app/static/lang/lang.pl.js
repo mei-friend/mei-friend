@@ -97,6 +97,11 @@ export const lang = {
 
   // INSERT MENU ITEM // WSTAW ELEMENT MENU
   insertMenuTitle: { text: 'Wstaw' },
+  addCroixText: { html: 'Podwójny krzyżyk &#119082;' },
+  addSharpText: { html: 'Krzyżyk &#9839;' },
+  addNaturalText: { html: 'Kasownik &#9838;' },
+  addFlatText: { html: 'Bemol &#9837;' },
+  addDoubleFlatText: { html: 'Podwójny bemol &#119083;' },
   addTempoText: { text: 'Tempo' },
   addDirectiveText: { text: 'Dyrektywa' },
   addDynamicsText: { text: 'Dynamika' },

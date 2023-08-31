@@ -409,7 +409,7 @@ function onLanguageLoaded() {
   // expose default language pack for debug
   if (env && env === environments.develop) {
     runLanguageChecks();
-    console.debug('Default language pack: ', JSON.stringify(translator.defaultLang, null, 2));
+    // console.debug('Default language pack: ', JSON.stringify(translator.defaultLang, null, 2));
   }
   // build language selection menu
   buildLanguageSelection();
@@ -1921,6 +1921,12 @@ function addEventListeners(v, cm) {
   // ingest facsimile sekelton into currently loaded MEI file
   document.getElementById('ingestFacsimile').addEventListener('click', cmd.ingestFacsimile);
   document.getElementById('addFacsimile').addEventListener('click', cmd.addFacsimile);
+  // insert accidentals
+  document.getElementById('addCroix').addEventListener('click', cmd.addCroix);
+  document.getElementById('addSharp').addEventListener('click', cmd.addSharp);
+  document.getElementById('addNatural').addEventListener('click', cmd.addNatural);
+  document.getElementById('addFlat').addEventListener('click', cmd.addFlat);
+  document.getElementById('addDoubleFlat').addEventListener('click', cmd.addDoubleFlat);
   // insert control elements
   document.getElementById('addTempo').addEventListener('click', cmd.addTempo);
   document.getElementById('addDirective').addEventListener('click', cmd.addDirective);

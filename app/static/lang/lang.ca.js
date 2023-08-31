@@ -97,6 +97,11 @@ export const lang = {
 
   // INSERT MENU ITEM / INSERCIÓ DELS ELEMENTS DEL MENÚ
   insertMenuTitle: { text: 'Insereix' },
+  addCroixText: { html: 'Doble sostingut &#119082;' },
+  addSharpText: { html: 'Sostingut &#9839;' },
+  addNaturalText: { html: 'Becaire &#9838;' },
+  addFlatText: { html: 'Bemoll &#9837;' },
+  addDoubleFlatText: { html: 'Doble bemoll &#119083;' },
   addTempoText: { text: 'Tempo' },
   addDirectiveText: { text: 'Directiva' },
   addDynamicsText: { text: 'Dinàmica' },
