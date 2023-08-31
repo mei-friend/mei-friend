@@ -2097,70 +2097,70 @@ function toggleArticForNote(note, artic, xmlIdStyle) {
  * @param {number} deltaPitch (diatonic steps or chromatic steps)
  * @param {boolean} shiftChromatically
  * @returns {Element} element with modified attributes
- * NOTE: when shifting chromatically, only semitones (+/-1) are done!
+ * NOTE: when shifting chromatically, only semitones (+/-1) make sense!
  */
 function pitchMover(el, deltaPitch, shiftChromatically = false) {
-  let oct = 4;
-  let pname = 'c';
-  let accid = '';
-  let o;
-  let p;
+  let octValue = 4;
+  let pnameValue = 'c';
+  let accidValue = '';
+  let octAttr;
+  let pnameAttr;
   if (['note'].includes(el.nodeName)) {
-    o = 'oct';
-    p = 'pname';
+    octAttr = 'oct';
+    pnameAttr = 'pname';
   } else if (['rest', 'mRest', 'multiRest'].includes(el.nodeName)) {
-    o = 'oloc';
-    p = 'ploc';
+    octAttr = 'oloc';
+    pnameAttr = 'ploc';
+    shiftChromatically = false; // shifting chromatically with rests is non-sense
   }
-  if (el.hasAttribute(o)) oct = parseInt(el.getAttribute(o));
-  if (el.hasAttribute(p)) pname = el.getAttribute(p);
-  let pi;
+  if (el.hasAttribute(octAttr)) octValue = parseInt(el.getAttribute(octAttr));
+  if (el.hasAttribute(pnameAttr)) pnameValue = el.getAttribute(pnameAttr);
 
-  if (!shiftChromatically) {
-    pi = att.pnames.indexOf(pname) + deltaPitch;
-  } else {
-    if (el.hasAttribute('accid.ges')) accid = el.getAttribute('accid.ges');
-    if (el.hasAttribute('accid')) accid = el.getAttribute('accid');
-    accid = accid.slice(0, 1); // take only first character
-    pi = att.pnames.indexOf(pname); // what
-    if (deltaPitch > 0) {
-      if (att.sharps.slice(0, 5).includes(pname)) {
-        if (accid === 's') {
-          pi++;
-          accid = '';
-        } else {
-          accid = 's';
-        }
+  let pi;
+  if (shiftChromatically) {
+    if (el.hasAttribute('accid.ges')) accidValue = el.getAttribute('accid.ges');
+    if (el.hasAttribute('accid')) accidValue = el.getAttribute('accid');
+    accidValue = accidValue.slice(0, 1); // take only first character
+    pi = att.pnames.indexOf(pnameValue); // index in scale
+    let pitchesToBeAltered = att.sharps.slice(0, 5);
+    let accidSign = 's';
+    if (deltaPitch < 0) {
+      pitchesToBeAltered = att.flats.slice(0, 5);
+      accidSign = 'f';
+    }
+    if (pitchesToBeAltered.includes(pnameValue)) {
+      if (accidValue === accidSign) {
+        pi += deltaPitch;
+        accidValue = '';
       } else {
-        pi++;
+        accidValue = accidSign;
       }
-    } else if (deltaPitch < 0) {
-      if (att.flats.slice(0, 5).includes(pname)) {
-        if (accid === 'f') {
-          pi--;
-          accid = '';
-        } else {
-          accid = 'f';
-        }
+    } else {
+      if (accidValue) {
+        accidValue = '';
       } else {
-        pi--;
+        pi += deltaPitch;
       }
     }
+  } else {
+    pi = att.pnames.indexOf(pnameValue) + deltaPitch;
   }
+
+  // secure octave transistion
   if (pi > att.pnames.length - 1) {
     pi -= att.pnames.length;
-    oct++;
+    octValue++;
   } else if (pi < 0) {
     pi += att.pnames.length;
-    oct--;
+    octValue--;
   }
-  if (accid) {
-    el.setAttribute('accid', accid);
+  if (accidValue) {
+    el.setAttribute('accid', accidValue);
   } else {
     el.removeAttribute('accid');
   }
-  el.setAttribute(o, oct);
-  el.setAttribute(p, att.pnames[pi]);
+  el.setAttribute(octAttr, octValue);
+  el.setAttribute(pnameAttr, att.pnames[pi]);
   return el;
 } // pitchMover()
 
