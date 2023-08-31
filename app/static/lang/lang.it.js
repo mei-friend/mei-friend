@@ -97,7 +97,7 @@ export const lang = {
 
   // INSERT MENU ITEM / INSERISCI VOCE DI MENU
   insertMenuTitle: { text: 'Inserisci' },
-  addCroixText: { html: 'Doppio diesis &#119082;' },
+  addDoubleSharpText: { html: 'Doppio diesis &#119082;' },
   addSharpText: { html: 'Diesis &#9839;' },
   addNaturalText: { html: 'Bequadro &#9838;' },
   addFlatText: { html: 'Bemolle &#9837;' },
