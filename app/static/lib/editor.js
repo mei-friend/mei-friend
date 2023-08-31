@@ -127,8 +127,14 @@ export function deleteElement(v, cm, modifyerKey = false) {
       // delete Zone in source image display
       // remove zone; with CMD remove pointing element; without just remove @facs from pointing element
       removeZone(v, cm, element, modifyerKey);
+    } else if (['note', 'chord', 'rest', 'mRest', 'multiRest'].includes(element.nodeName)) {
+      // TODO check element last inside a chord, a tuplet, or a beam
+
+      // TODO check if element has been pointed to in a slur, tie (@startid, @endid, @plist)
+      removeInEditor(cm, element);
     } else {
       console.info('Element ' + id + ' not supported for deletion.');
+      v.allowCursorActivity = true;
       return;
     }
     element.remove();
