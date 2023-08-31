@@ -1,4 +1,4 @@
-import { v, cm, log, translator, meiFileLocation, setStandoffAnnotationEnabledStatus } from './main.js';
+import { v, cm, log, translator, setStandoffAnnotationEnabledStatus } from './main.js';
 import { convertCoords, generateXmlId, rmHash, setCursorToId } from './utils.js';
 import { meiNameSpace, xmlNameSpace, xmlToString } from './dom-utils.js';
 import {
@@ -1028,7 +1028,7 @@ async function writeStandoffIfRequested(a) {
                 webAnno[nsp.SCHEMA + 'includedInDataCatalog'] = { '@id': discoveryUri };
                 webAnno[nsp.OA + 'hasTarget'] = a.selection.map((s) => {
                   // TODO: do something clever if fileLocationType = "file" (local)
-                  return { '@id': meiFileLocation + '#' + s };
+                  return { '@id': currentFileUri + '#' + s };
                 });
                 switch (a.type) {
                   case 'annotateHighlight':
