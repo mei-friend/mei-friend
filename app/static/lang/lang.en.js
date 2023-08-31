@@ -97,7 +97,7 @@ export const lang = {
 
   // INSERT MENU ITEM
   insertMenuTitle: { text: 'Insert' },
-  addCroixText: { html: 'Double sharp &#119082;' },
+  addDoubleSharpText: { html: 'Double sharp &#119082;' },
   addSharpText: { html: 'Sharp &#9839;' },
   addNaturalText: { html: 'Natural &#9838;' },
   addFlatText: { html: 'Flat &#9837;' },

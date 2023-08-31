@@ -1517,9 +1517,8 @@ export let cmd = {
   undo: () => cm.undo(),
   redo: () => cm.redo(),
   // add accidentals
-  addCroix: () => e.addAccidental(v, cm, 'x'),
+  addDoubleSharp: () => e.addAccidental(v, cm, 'x'),
   addSharp: () => e.addAccidental(v, cm, 's'),
-  addDoubleSharp: () => e.addAccidental(v, cm, 'ss'),
   addNatural: () => e.addAccidental(v, cm, 'n'),
   addFlat: () => e.addAccidental(v, cm, 'f'),
   addDoubleFlat: () => e.addAccidental(v, cm, 'ff'),
@@ -1566,10 +1565,10 @@ export let cmd = {
   toggleMarcato: () => e.toggleArtic(v, cm, 'marc'),
   toggleStacciss: () => e.toggleArtic(v, cm, 'stacciss'),
   toggleSpicc: () => e.toggleArtic(v, cm, 'spicc'),
-  shiftPitchNameUp: () => e.shiftPitch(v, cm, 1),
-  shiftPitchNameDown: () => e.shiftPitch(v, cm, -1),
-  shiftOctaveUp: () => e.shiftPitch(v, cm, 7),
-  shiftOctaveDown: () => e.shiftPitch(v, cm, -7),
+  shiftPitchNameUp: () => e.shiftPitchDiatonically(v, cm, 1),
+  shiftPitchNameDown: () => e.shiftPitchDiatonically(v, cm, -1),
+  shiftOctaveUp: () => e.shiftPitchDiatonically(v, cm, 7),
+  shiftOctaveDown: () => e.shiftPitchDiatonically(v, cm, -7),
   increaseDuration: () => e.modifyDuration(v, cm, 'increase'),
   decreaseDuration: () => e.modifyDuration(v, cm, 'decrease'),
   moveElementStaffUp: () => e.moveElementToNextStaff(v, cm, true),
@@ -1922,7 +1921,7 @@ function addEventListeners(v, cm) {
   document.getElementById('ingestFacsimile').addEventListener('click', cmd.ingestFacsimile);
   document.getElementById('addFacsimile').addEventListener('click', cmd.addFacsimile);
   // insert accidentals
-  document.getElementById('addCroix').addEventListener('click', cmd.addCroix);
+  document.getElementById('addDoubleSharp').addEventListener('click', cmd.addDoubleSharp);
   document.getElementById('addSharp').addEventListener('click', cmd.addSharp);
   document.getElementById('addNatural').addEventListener('click', cmd.addNatural);
   document.getElementById('addFlat').addEventListener('click', cmd.addFlat);
