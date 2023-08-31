@@ -67,6 +67,8 @@ export function toMatchingTag(v, cm) {
 export function deleteElement(v, cm, modifyerKey = false) {
   v.loadXml(cm.getValue(), true);
   let selectedElements = []; // store selected elements for later
+  v.allowCursorActivity = false;
+
   // iterate all selected elements
   v.selectedElements.forEach((id) => {
     let cursor = cm.getCursor();
@@ -77,7 +79,6 @@ export function deleteElement(v, cm, modifyerKey = false) {
       console.info(id + ' not found for deletion.');
       return;
     }
-    v.allowCursorActivity = false;
     // let checkPoint = buffer.createCheckpoint(); TODO
 
     if (att.modelControlEvents.concat(['accid', 'artic', 'clef', 'octave', 'beamSpan']).includes(element.nodeName)) {
@@ -141,6 +142,39 @@ export function deleteElement(v, cm, modifyerKey = false) {
   v.updateData(cm, false, true);
   v.allowCursorActivity = true;
 } // deleteElement()
+
+export function addAccidental(v, cm, accidAttribute = 's', asElement = true) {
+  if (v.selectedElements.length === undefined || v.selectedElements.length < 1) return;
+  v.allowCursorActivity = false;
+  let uuid;
+
+  v.selectedElements.forEach((xmlId, i) => {
+    let el = v.xmlDoc.querySelector("[*|id='" + xmlId + "']");
+    if (el) {
+      let accid = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'accid');
+      uuid = utils.generateXmlId('accid', v.xmlIdStyle);
+      accid.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
+      accid.setAttribute('accid', accidAttribute);
+      el.appendChild(accid);
+
+      replaceInEditor(cm, el, true);
+
+      // select last element inserted
+      if (i === v.selectedElements.length - 1) {
+        utils.setCursorToId(cm, uuid);
+        v.lastNoteId = xmlId;
+        // cm.execCommand('goCharRight')
+      }
+    }
+  });
+
+  v.selectedElements = [];
+  v.selectedElements.push(uuid);
+  v.updateHighlight(cm);
+  addApplicationInfo(v, cm);
+  v.updateData(cm, false, true);
+  v.allowCursorActivity = true;
+} // addAccidental()
 
 /**
  * Inserts a new control element to DOM and editor
@@ -1995,6 +2029,7 @@ export function replaceInEditor(cm, xmlNode, select = false, newNode = null) {
         }
       }
       cm.setSelection(sc.from(), sc.to());
+      cm.execCommand('indentAuto');
     }
   }
   return {

@@ -19,6 +19,10 @@
     "home": "firstPage",
     "end": "lastPage",
 
+    "+": "addSharp",
+    "=": "addNatural",
+    "-": "addFlat",
+
     "s": "addSlur",
     "t": "addTie",
     "h": "addCresHairpin",

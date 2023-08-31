@@ -1516,6 +1516,13 @@ export let cmd = {
   },
   undo: () => cm.undo(),
   redo: () => cm.redo(),
+  // add accidentals
+  addCroix: () => e.addAccidental(v, cm, 'x'),
+  addSharp: () => e.addAccidental(v, cm, 's'),
+  addDoubleSharp: () => e.addAccidental(v, cm, 'ss'),
+  addNatural: () => e.addAccidental(v, cm, 'n'),
+  addFlat: () => e.addAccidental(v, cm, 'f'),
+  addDoubleFlat: () => e.addAccidental(v, cm, 'ff'),
   // add control elements
   addSlur: () => e.addControlElement(v, cm, 'slur', ''),
   addSlurBelow: () => e.addControlElement(v, cm, 'slur', 'below'),
