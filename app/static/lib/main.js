@@ -1,6 +1,6 @@
 // mei-friend version and date
 export const version = '0.10.4';
-export const versionDate = '30 August 2023'; // use full or 3-character english months, will be translated
+export const versionDate = '31 August 2023'; // use full or 3-character english months, will be translated
 
 var vrvWorker;
 var spdWorker;
@@ -1901,8 +1901,10 @@ function addEventListeners(v, cm) {
   document.getElementById('betweenPlacement').addEventListener('click', cmd.betweenPlacement);
   document.getElementById('addVerticalGroup').addEventListener('click', cmd.addVerticalGroup);
   document.getElementById('delete').addEventListener('click', cmd.delete);
-  document.getElementById('pitchUp').addEventListener('click', cmd.shiftPitchNameUp);
-  document.getElementById('pitchDown').addEventListener('click', cmd.shiftPitchNameDown);
+  document.getElementById('pitchChromUp').addEventListener('click', cmd.shiftPitchChromaticallyUp);
+  document.getElementById('pitchChromDown').addEventListener('click', cmd.shiftPitchChromaticallyDown);
+  document.getElementById('pitchUpDiat').addEventListener('click', cmd.shiftPitchNameUp);
+  document.getElementById('pitchDownDiat').addEventListener('click', cmd.shiftPitchNameDown);
   document.getElementById('pitchOctaveUp').addEventListener('click', cmd.shiftOctaveUp);
   document.getElementById('pitchOctaveDown').addEventListener('click', cmd.shiftOctaveDown);
   document.getElementById('staffUp').addEventListener('click', cmd.moveElementStaffUp);
