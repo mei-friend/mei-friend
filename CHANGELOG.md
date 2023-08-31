@@ -1,5 +1,12 @@
 # mei-friend-online CHANGELOG.md
 
+## 1.0.0 Version 1.0 release
+* Delete notes, chords, rests (TODO: together with enclosing elements such as beams, tuplets, as well as elements pointing towards them)
+* Move notes in pitch chromatically (`SHIFT + UP/DOWN`) with adding sharps when going upwards and flats when going downwards (enhancement #36)
+* Provide menu items and keyboard shortcuts to insert accidentals (+, -, =) (feature request #35)
+* Fix bug that prevented encoded @color to be shown (#34)
+* Fug bug that prevented MEI and SVG download in Safari (#33)
+
 ### 0.10.4
 * Add UI panel inside editor panel to check and interactively fix all occurrences of @accid.ges against key signature, measure-wise accids, ties, and redundant information.
 * Settings checkbox for enabling automatic display of validation report (off by default)

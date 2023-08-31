@@ -1,5 +1,5 @@
 // mei-friend version and date
-export const version = '0.10.4';
+export const version = '1.0.0';
 export const versionDate = '31 August 2023'; // use full or 3-character english months, will be translated
 
 var vrvWorker;
