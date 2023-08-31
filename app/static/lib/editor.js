@@ -1055,6 +1055,7 @@ export function addApplicationInfo(v, cm) {
 /**
  * Wrapper function to utils.cleanAccid() for cleaning
  * superfluous @accid.ges attributes
+ * Aug 2023: Replaced by checkAccidGes()
  * @param {Viewer} v
  * @param {CodeMirror} cm
  */
@@ -1063,7 +1064,7 @@ export function cleanAccid(v, cm) {
   v.loadXml(cm.getValue(), true);
   utils.cleanAccid(v.xmlDoc, cm);
   v.allowCursorActivity = true;
-}
+} // cleanAccid()
 
 /**
  * Checks accid/accid.ges attributes of all notes against
@@ -1181,11 +1182,11 @@ export function checkAccidGes(v, cm, change = false) {
             ' "' +
             data.xmlId +
             '" ' +
-            translator.lang.codeCheckerHasBoth +
+            translator.lang.codeCheckerHasBoth.text +
             ' accid="' +
             accid +
             '" ' +
-            translator.lang.codeCheckerAnd +
+            translator.lang.codeCheckerAnd.text +
             ' accid.ges="' +
             accidGesEncoded +
             '" ';
