@@ -29,8 +29,8 @@ export const lang = {
   openMeiText: { text: 'Apri file' },
   openUrlText: { text: 'Apri URL' },
   openExample: {
-    text: 'Repertorio pubblico',
-    description: 'Apri una lista di repertorio di pubblico dominio',
+    text: 'Repository pubblica',
+    description: 'Apri una lista della repository pubblica',
   },
   importMusicXml: { text: 'Importa MusicXML' },
   importHumdrum: { text: 'Importa Humdrum' },
