@@ -7,7 +7,7 @@ import { heart } from '../css/icons.js';
 
 export const lang = {
   // Main menu bar
-  githubLoginLink: { text: 'Iniciar sessió' },
+  githubLoginLink: { text: 'Inicia sessió' },
 
   month: {
     jan: 'Gener',
@@ -29,7 +29,7 @@ export const lang = {
   openMeiText: { text: 'Obre fitxer' },
   openUrlText: { text: 'Obre URL' },
   openExample: {
-    text: 'Repartori públic',
+    text: 'Repertori públic',
     description: 'Obre una llista de repertori de domini públic',
   },
   importMusicXml: { text: 'Importa MusicXML' },
@@ -192,7 +192,7 @@ export const lang = {
   breaksSelect: { description: 'Defineix el comportament de les ruptures de sistema/pàgina de la notació' },
   breaksSelectNone: { text: 'Cap' },
   breaksSelectAuto: { text: 'Automàtic' },
-  breaksSelectMeasure: { text: 'Mesura' },
+  breaksSelectMeasure: { text: 'Compàs' },
   breaksSelectLine: { text: 'Sistema' },
   breaksSelectEncoded: { text: 'Sistema i pàgina' },
   breaksSelectSmart: { text: 'Intel·ligent' },
@@ -629,21 +629,21 @@ export const lang = {
 
   // Renumber measures / Renumber measures
   renumberMeasuresHeading: {
-    text: 'Reenumerar compàsos',
-    description: 'Opcions per reenumerar els compàsos',
+    text: 'Reenumerar compasos',
+    description: 'Opcions per reenumerar els comaàsos',
   },
   renumberMeasureContinueAcrossIncompleteMeasures: {
-    text: 'Continuar a través de compàsos incomplets',
-    description: "Continuar la numeració de compàsos a través de compàsos incomplets (@metcon='false')",
+    text: 'Continuar a través de compasos incomplets',
+    description: "Continuar la numeració de compasos a través de compasos incomplets (@metcon='false')",
   },
   renumberMeasuresUseSuffixAtMeasures: {
-    text: 'Sufix als compàsos incomplets',
-    description: 'Utilitzar sufix numèric als compàsos incomplets (p. ex. 23-cont)',
+    text: 'Sufix als compasos incomplets',
+    description: 'Utilitzar sufix numèric als compasos incomplets (p. ex. 23-cont)',
     labels: ['cap', '-cont'],
   },
   renumberMeasuresContinueAcrossEndings: {
     text: 'Continuar a través de finals',
-    description: 'Continuar la numeració de compàsos a través de finals',
+    description: 'Continuar la numeració de compasos a través de finals',
   },
   renumberMeasuresUseSuffixAtEndings: {
     text: 'Sufix als finals',
