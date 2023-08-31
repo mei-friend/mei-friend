@@ -143,7 +143,15 @@ export function deleteElement(v, cm, modifyerKey = false) {
   v.allowCursorActivity = true;
 } // deleteElement()
 
-export function addAccidental(v, cm, accidAttribute = 's', asElement = true) {
+/**
+ * Adds accid element to note element.
+ * (Other allowed elements are ignored for the moment.)
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
+ * @param {string} accidAttribute
+ * @returns
+ */
+export function addAccidental(v, cm, accidAttribute = 's') {
   if (v.selectedElements.length === undefined || v.selectedElements.length < 1) return;
   v.allowCursorActivity = false;
   let uuid;
