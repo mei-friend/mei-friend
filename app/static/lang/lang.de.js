@@ -106,7 +106,7 @@ export const lang = {
   addSuppliedText: { text: 'Supplied' },
   addSuppliedArticText: { text: 'Supplied (Artic)' },
   addSuppliedAccidText: { text: 'Supplied (Accid)' },
-  addArpeggioText: { text: 'Arepggio' },
+  addArpeggioText: { text: 'Arpeggio' },
   addFermataText: { text: 'Fermate' },
   addGlissandoText: { text: 'Glissando' },
   addPedalDownText: { text: 'Pedal drücken' },
