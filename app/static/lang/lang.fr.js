@@ -146,9 +146,10 @@ export const lang = {
   // HELP MENU ITEM / ÉLÉMENT DE MENU D'AIDE
   helpMenuTitle: { text: 'Aide' },
   goToHelpPage: { text: "Pages d'aide de mei-friend" },
-  showChangelog: { text: 'Afficher le journal des modifications de mei-friend' },
-  goToGuidelines: { text: 'Afficher les lignes directrices MEI' },
-  consultGuidelinesForElementText: { text: "Consulter les lignes directrices pour l'élément actuel" },
+  goToCheatSheet: { text: 'Antisèche de mei-friend' },
+  showChangelog: { text: 'Journal des modifications de mei-friend' },
+  goToGuidelines: { text: 'Lignes directrices MEI' },
+  consultGuidelinesForElementText: { text: "Lignes directrices pour l'élément actuel" },
   provideFeedback: { text: 'Fournir des commentaires' },
   resetDefault: { text: 'Réinitialiser par défaut' },
 

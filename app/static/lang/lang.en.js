@@ -146,9 +146,10 @@ export const lang = {
   // HELP MENU ITEM
   helpMenuTitle: { text: 'Help' },
   goToHelpPage: { text: 'mei-friend help pages' },
-  showChangelog: { text: 'Show mei-friend changelog' },
-  goToGuidelines: { text: 'Show MEI Guidelines' },
-  consultGuidelinesForElementText: { text: 'Consult Guidelines for current element' },
+  goToCheatSheet: { text: 'mei-friend cheat sheet' },
+  showChangelog: { text: 'mei-friend changelog' },
+  goToGuidelines: { text: 'MEI Guidelines' },
+  consultGuidelinesForElementText: { text: "Guidelines' entry for current element" },
   provideFeedback: { text: 'Provide feedback' },
   resetDefault: { text: 'Reset to default' },
 

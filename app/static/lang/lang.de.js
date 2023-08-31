@@ -143,9 +143,10 @@ export const lang = {
   // HELP MENU ITEM
   helpMenuTitle: { text: 'Hilfe' },
   goToHelpPage: { text: 'mei-friend Hilfeseiten' },
-  showChangelog: { text: 'mei-friend Änderungsliste anzeigen' },
-  goToGuidelines: { text: 'MEI Guidelines anzeigen' },
-  consultGuidelinesForElementText: { text: 'Guidelines für aktuelles Element anzeigen' },
+  goToCheatSheet: {text: 'mei-friend Spickzettel'},
+  showChangelog: { text: 'mei-friend Änderungsliste (changelog)' },
+  goToGuidelines: { text: 'MEI Guidelines' },
+  consultGuidelinesForElementText: { text: 'Guideline-Eintrag für aktuelles Element' },
   provideFeedback: { text: 'Feedback geben' },
   resetDefault: { text: 'Auf Standardwerte zurücksetzen' },
 
