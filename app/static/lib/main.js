@@ -1256,25 +1256,35 @@ function downloadMei() {
   let blob = new Blob([cm.getValue()], {
     type: 'text/plain',
   });
-  let a = document.createElement('a');
-  a.download = meiFileName.substring(meiFileName.lastIndexOf('/') + 1).replace(/\.[^/.]+$/, '.mei');
-  a.href = window.URL.createObjectURL(blob);
-  a.click();
+  let url = URL.createObjectURL(blob);
+  let fileName = meiFileName.substring(meiFileName.lastIndexOf('/') + 1).replace(/\.[^/.]+$/, '.mei');
+  // buxfix for Safari (#33, 31. Aug 2023)
+  setTimeout(() => {
+    let a = document.createElement('a');
+    a.setAttribute('href', url);
+    a.setAttribute('download', fileName);
+    a.click();
+  }, 0);
   // Now that the user has "saved" the MEI, clear the file change indicator
   setFileChangedState(false);
-}
+} // downloadMei()
 
 function downloadSpeedMei() {
   let blob = new Blob([speed.getPageFromDom(v.xmlDoc, v.currentPage, v.breaksValue(), v.pageSpanners)], {
     type: 'text/plain',
   });
-  let a = document.createElement('a');
-  a.download = meiFileName
+  let url = URL.createObjectURL(blob);
+  let fileName = meiFileName
     .substring(meiFileName.lastIndexOf('/') + 1)
     .replace(/\.[^/.]+$/, '_page-' + v.currentPage + '-speedMode.mei');
-  a.href = window.URL.createObjectURL(blob);
-  a.click();
-}
+  // buxfix for Safari (#33, 31. Aug 2023)
+  setTimeout(() => {
+    let a = document.createElement('a');
+    a.setAttribute('href', url);
+    a.setAttribute('download', fileName);
+    a.click();
+  }, 0);
+} // downloadSpeedMei()
 
 export function requestMidiFromVrvWorker(requestTimemap = false) {
   let mei;
@@ -1308,11 +1318,16 @@ function downloadSvg() {
   let blob = new Blob([svg], {
     type: 'image/svg+xml',
   });
-  let a = document.createElement('a');
-  a.download = meiFileName.substring(meiFileName.lastIndexOf('/') + 1).replace(/\.[^/.]+$/, '.svg');
-  a.href = window.URL.createObjectURL(blob);
-  a.click();
-}
+  let url = URL.createObjectURL(blob);
+  let fileName = meiFileName.substring(meiFileName.lastIndexOf('/') + 1).replace(/\.[^/.]+$/, '.svg');
+  // buxfix for Safari (#33, 31. Aug 2023)
+  setTimeout(() => {
+    let a = document.createElement('a');
+    a.setAttribute('href', url);
+    a.setAttribute('download', fileName);
+    a.click();
+  }, 0);
+} // downloadSvg()
 
 function consultGuidelines() {
   const elementAtCursor = getElementAtCursor(cm);
