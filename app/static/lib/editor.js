@@ -128,16 +128,44 @@ export function deleteElement(v, cm, modifyerKey = false) {
       // remove zone; with CMD remove pointing element; without just remove @facs from pointing element
       removeZone(v, cm, element, modifyerKey);
     } else if (['note', 'chord', 'rest', 'mRest', 'multiRest'].includes(element.nodeName)) {
-      // TODO check element last inside a chord, a tuplet, or a beam
+      console.log('Removing <' + element.nodeName + '>: "' + id + '"');
+      // Check if element is last inside a chord, a tuplet, or a beam, and
+      // remember that element for later deletion
+      let closest;
+      while ((closest = element.parentElement.closest('chord,beam,tuplet,bTrem,fTrem'))) {
+        let children = Array.from(closest.childNodes).filter((el) => el.nodeType === Node.ELEMENT_NODE);
+        if (
+          children.length <= 1 ||
+          (closest.nodeName === 'chord' && children.filter((e) => e.nodeName === 'note').length <= 1)
+        ) {
+          // if just one child or just one note inside a chord (ignoring artic elements)
+          element = closest;
+        } else {
+          break;
+        }
+      }
 
-      // TODO check if element has been pointed to in a slur, tie (@startid, @endid, @plist)
+      // Check if element has been pointed to in a slur, tie (@startid, @endid); TODO: @plist?
+      let pointingElement =
+        v.xmlDoc.querySelector("[startid='#" + id + "']") || v.xmlDoc.querySelector("[endid='#" + id + "']") || '';
+      if (pointingElement) {
+        console.log(
+          'Removing pointing element <' +
+            pointingElement.nodeName +
+            '>: "' +
+            pointingElement.getAttribute('xml:id') +
+            '"'
+        );
+        removeInEditor(cm, pointingElement);
+        pointingElement.remove();
+      }
       removeInEditor(cm, element);
     } else {
       console.info('Element ' + id + ' not supported for deletion.');
       v.allowCursorActivity = true;
       return;
     }
-    element.remove();
+    if (element) element.remove();
   });
   loadFacsimile(v.xmlDoc);
   // buffer.groupChangesSinceCheckpoint(checkPoint); TODO
@@ -1970,8 +1998,19 @@ export function removeInEditor(cm, xmlNode) {
   let searchSelfClosing = '(?:<' + xmlNode.nodeName + `)(\\s+?)([^>]*?)(?:xml:id=["']` + itemId + `['"])([^>]*?)(?:/>)`;
   let sc = cm.getSearchCursor(new RegExp(searchSelfClosing));
   if (sc.findNext()) {
-    console.info('removeInEditor() self closing from: ', sc.from());
-    console.info('removeInEditor() self closing to: ', sc.to());
+    console.info(
+      'removeInEditor() self closing element "' +
+        itemId +
+        '" from ln:' +
+        sc.from().line +
+        '/ch:' +
+        sc.from().ch +
+        ' to ln:' +
+        sc.to().line +
+        '/ch:' +
+        sc.to().ch +
+        '.'
+    );
   } else {
     let searchFullElement =
       '(?:<' +
@@ -1983,8 +2022,19 @@ export function removeInEditor(cm, xmlNode) {
       '[ ]*?>)';
     sc = cm.getSearchCursor(new RegExp(searchFullElement));
     if (sc.findNext()) {
-      console.info('removeInEditor() full element from: ', sc.from());
-      console.info('removeInEditor() full element to: ', sc.to());
+      console.info(
+        'removeInEditor() full element "' +
+          itemId +
+          '" from ln:' +
+          sc.from().line +
+          '/ch:' +
+          sc.from().ch +
+          ' to ln:' +
+          sc.to().line +
+          '/ch:' +
+          sc.to().ch +
+          '.'
+      );
     }
   }
   if (sc.atOccurrence) {
@@ -1996,7 +2046,9 @@ export function removeInEditor(cm, xmlNode) {
         cm.execCommand('deleteLine');
       }
     }
-  } else console.info('removeInEditor(): nothing removed for ' + itemId + '.');
+  } else {
+    console.info('removeInEditor(): nothing removed for ' + itemId + '.');
+  }
 } // removeInEditor()
 
 function isEmpty(str) {
