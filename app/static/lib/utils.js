@@ -680,7 +680,7 @@ export function rmHash(hashedString) {
 
 // escape special characters '.' and ':' for usagage in queryselectors
 export function escapeXmlId(str) {
-  if (!str || str === null) return '';
+  if (!str || str === null || typeof str !== 'string') return '';
   if (/^\d/.test(str)) str = 'a' + str;
   return str.replace(/\./g, '\\.').replace(/\:/g, '\\:');
 }

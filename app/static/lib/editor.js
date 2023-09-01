@@ -67,17 +67,18 @@ export function toMatchingTag(v, cm) {
 export function deleteElement(v, cm, modifyerKey = false) {
   v.loadXml(cm.getValue(), true);
   let selectedElements = []; // store selected elements for later
+  v.allowCursorActivity = false;
+
   // iterate all selected elements
   v.selectedElements.forEach((id) => {
     let cursor = cm.getCursor();
     let nextId = utils.getIdOfNextElement(cm, cursor.line)[0]; // TODO necessary?
     let element = v.xmlDoc.querySelector("[*|id='" + id + "']");
-    console.info('Deleting: ', element);
+    console.debug('Deleting: ', element);
     if (!element) {
-      console.info(id + ' not found for deletion.');
+      console.log(id + ' not found for deletion.');
       return;
     }
-    v.allowCursorActivity = false;
     // let checkPoint = buffer.createCheckpoint(); TODO
 
     if (att.modelControlEvents.concat(['accid', 'artic', 'clef', 'octave', 'beamSpan']).includes(element.nodeName)) {
@@ -90,6 +91,12 @@ export function deleteElement(v, cm, modifyerKey = false) {
         findAndModifyOctaveElements(cm, v.xmlDoc, id1, id2, disPlace, dis, false);
         removeInEditor(cm, element);
         selectedElements.push(id2);
+        element.remove();
+      } else if (['accid', 'artic'].includes(element.nodeName)) {
+        let parent = removeWithTextnodes(element);
+        let parentId = parent.getAttribute('xml:id');
+        if (parentId) selectedElements.push(parentId);
+        replaceInEditor(cm, parent, true);
       } else {
         removeInEditor(cm, element);
         // place cursor at a sensible place...
@@ -97,6 +104,7 @@ export function deleteElement(v, cm, modifyerKey = false) {
         let el = document.getElementById(m).querySelector(dutils.navElsSelector);
         if (el) selectedElements.push(el.getAttribute('id'));
         else selectedElements.push(nextId);
+        element.remove();
       }
     } else if (['beam'].includes(element.nodeName)) {
       // delete beam
@@ -122,15 +130,54 @@ export function deleteElement(v, cm, modifyerKey = false) {
         selectedElements.push(childList[i].getAttribute('xml:id'));
         element.parentNode.insertBefore(childList[i--], element);
       }
+      element.remove();
     } else if (element.nodeName === 'zone' && document.getElementById('editFacsimileZones').checked) {
       // delete Zone in source image display
       // remove zone; with CMD remove pointing element; without just remove @facs from pointing element
       removeZone(v, cm, element, modifyerKey);
+      element.remove();
+    } else if (['note', 'chord', 'rest', 'mRest', 'multiRest'].includes(element.nodeName)) {
+      console.log('Removing <' + element.nodeName + '>: "' + id + '"');
+      // Check if element is last inside a chord, a tuplet, or a beam, and
+      // remember that element for later deletion
+      let closest;
+      while ((closest = element.parentElement.closest('chord,beam,tuplet,bTrem,fTrem'))) {
+        let children = Array.from(closest.childNodes).filter((el) => el.nodeType === Node.ELEMENT_NODE);
+        if (
+          children.length <= 1 ||
+          (closest.nodeName === 'chord' && children.filter((e) => e.nodeName === 'note').length <= 1)
+        ) {
+          // if just one child or just one note inside a chord (ignoring artic elements)
+          element = closest;
+        } else {
+          break;
+        }
+      }
+
+      // Check if element has been pointed to in a slur, tie (@startid, @endid); TODO: @plist?
+      let pointingElements = v.xmlDoc.querySelectorAll("[startid='#" + id + "'],[endid='#" + id + "']");
+      // v.xmlDoc.querySelector("[startid='#" + id + "']") || v.xmlDoc.querySelector("[endid='#" + id + "']") || '';
+      pointingElements.forEach((pointingElement) => {
+        console.log(
+          'Removing pointing element <' +
+            pointingElement.nodeName +
+            '>: "' +
+            pointingElement.getAttribute('xml:id') +
+            '"'
+        );
+        removeInEditor(cm, pointingElement);
+        pointingElement.remove();
+      });
+      let next = utils.getIdOfNextElement(cm, cursor.line)[0];
+      if (next) selectedElements.push(next);
+      // remove element and update parent in editor
+      removeInEditor(cm, element);
+      element.remove();
     } else {
       console.info('Element ' + id + ' not supported for deletion.');
+      v.allowCursorActivity = true;
       return;
     }
-    element.remove();
   });
   loadFacsimile(v.xmlDoc);
   // buffer.groupChangesSinceCheckpoint(checkPoint); TODO
@@ -143,6 +190,65 @@ export function deleteElement(v, cm, modifyerKey = false) {
 } // deleteElement()
 
 /**
+ * Removes element with text nodes around it and returns parent node.
+ * @param {Element} element
+ * @returns {Element} parent element with removed element
+ */
+function removeWithTextnodes(element) {
+  let parent = element.parentNode;
+  if (parent) {
+    // remove child element together with surrounding text nodes
+    let i = Array.from(parent.childNodes).indexOf(element);
+    if (i > 0 && i < parent.childNodes.length) {
+      parent.childNodes[i + 1].remove();
+      parent.childNodes[i].remove();
+      parent.childNodes[i - 1].remove();
+    }
+  }
+  return parent;
+} // removeWithTextnodes()
+
+/**
+ * Adds accid element to note element.
+ * (Other allowed elements are ignored for the moment.)
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
+ * @param {string} accidAttribute
+ * @returns
+ */
+export function addAccidental(v, cm, accidAttribute = 's') {
+  if (v.selectedElements.length === undefined || v.selectedElements.length < 1) return;
+  v.allowCursorActivity = false;
+  let uuid;
+
+  v.selectedElements.forEach((xmlId, i) => {
+    let el = v.xmlDoc.querySelector("[*|id='" + xmlId + "']");
+    if (el && el.nodeName === 'note') {
+      let accid = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'accid');
+      uuid = utils.generateXmlId('accid', v.xmlIdStyle);
+      accid.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
+      accid.setAttribute('accid', accidAttribute);
+      el.appendChild(accid);
+
+      replaceInEditor(cm, el, true);
+
+      // select last element inserted
+      if (i === v.selectedElements.length - 1) {
+        utils.setCursorToId(cm, uuid);
+        v.lastNoteId = xmlId;
+      }
+    }
+  });
+
+  v.selectedElements = [];
+  v.selectedElements.push(uuid);
+  v.updateHighlight(cm);
+  addApplicationInfo(v, cm);
+  v.updateData(cm, false, true);
+  v.allowCursorActivity = true;
+} // addAccidental()
+
+/**
  * Inserts a new control element to DOM and editor
  * @param {Viewer} v
  * @param {CodeMirror} cm
@@ -151,11 +257,11 @@ export function deleteElement(v, cm, modifyerKey = false) {
  * @param {string} form ('cres', 'inv', depending on element type)
  * @returns
  */
-export function addControlElement(v, cm, elName, placement, form) {
+export function addControlElement(v, cm, elName, placement = '', form = '') {
   if (v.selectedElements.length === undefined || v.selectedElements.length < 1) return;
   v.selectedElements = utils.sortElementsByScorePosition(v.selectedElements);
   v.selectedElements = speed.filterElements(v.selectedElements, v.xmlDoc);
-  console.info('addControlElement() ', elName, placement, form);
+  console.debug('addControlElement() ', elName, placement, form);
 
   // modifier key for inserting tstamps rather than start/endids
   let useTstamps = v.cmd2KeyPressed;
@@ -308,7 +414,7 @@ export function addControlElement(v, cm, elName, placement, form) {
   v.allowCursorActivity = false; // to prevent reloading after each edit
   if (p) {
     let p1 = utils.moveCursorToEndOfMeasure(cm, p); // resets selectedElements!!
-    console.log('p1: ', p);
+    console.debug('p1: ', p);
     cm.replaceRange(dutils.xmlToString(newElement) + '\n', p1);
     cm.indentLine(p1.line, 'smart');
     cm.indentLine(p1.line + 1, 'smart');
@@ -390,7 +496,7 @@ export function invertPlacement(v, cm, modifier = false) {
   v.loadXml(cm.getValue());
   let ids = utils.sortElementsByScorePosition(v.selectedElements);
   ids = speed.filterElements(ids, v.xmlDoc);
-  console.info('invertPlacement ids: ', ids);
+  console.debug('invertPlacement ids: ', ids);
   v.allowCursorActivity = false; // no need to redraw notation
   let noteList, range;
   for (let id of ids) {
@@ -401,7 +507,7 @@ export function invertPlacement(v, cm, modifier = false) {
       el = v.xmlDoc.querySelector("[*|id='" + id + "']");
     }
     if (!el) {
-      console.info('invertPlacement(): element not found', id);
+      console.log('invertPlacement(): element not found', id);
       continue;
     }
     let attr = '';
@@ -523,7 +629,7 @@ export function invertPlacement(v, cm, modifier = false) {
         // txtEdr.autoIndentSelectedRows();
       }
     } else {
-      console.info('invertPlacement(): ' + el.nodeName + ' contains no elements to invert.');
+      console.log('invertPlacement(): ' + el.nodeName + ' contains no elements to invert.');
     }
   }
   // console.info('TextCursor: ', txtEdr.getCursorBufferPosition());
@@ -578,12 +684,13 @@ export function toggleArtic(v, cm, artic = 'stacc') {
 } // toggleArtic()
 
 /**
- * Shifts element (rests, note) up/down by pitch name (1 or 7 steps)
+ * Shifts element (rests, note) up/down diatonically by pitch name (1 or 7 diatonic steps)
  * @param {Viewer} v
  * @param {CodeMirror} cm
  * @param {int} deltaPitch (-1, -12, +2)
+ * @param {boolean} shiftChromatically
  */
-export function shiftPitch(v, cm, deltaPitch = 0) {
+export function shiftPitch(v, cm, deltaPitch = 0, shiftChromatically = false) {
   v.loadXml(cm.getValue());
   let ids = speed.filterElements(v.selectedElements, v.xmlDoc);
   v.allowCursorActivity = false;
@@ -593,11 +700,13 @@ export function shiftPitch(v, cm, deltaPitch = 0) {
     let el = v.xmlDoc.querySelector("[*|id='" + id + "']");
     if (!el) continue;
     let chs = Array.from(el.querySelectorAll('note,rest,mRest,multiRest'));
-    if (chs.length > 0)
+    if (chs.length > 0) {
       // shift many elements
-      chs.forEach((ele) => replaceInEditor(cm, pitchMover(ele, deltaPitch)), true);
-    // shift one element
-    else replaceInEditor(cm, pitchMover(el, deltaPitch), true);
+      chs.forEach((ele) => replaceInEditor(cm, pitchMover(v, ele, deltaPitch, shiftChromatically)), true);
+    } else if (['note', 'rest', 'mRest', 'multiRest'].includes(el.nodeName)) {
+      // shift one element
+      replaceInEditor(cm, pitchMover(v, el, deltaPitch, shiftChromatically), true);
+    }
   }
   v.selectedElements = ids;
   addApplicationInfo(v, cm);
@@ -641,7 +750,7 @@ export function modifyDuration(v, cm, what = 'increase') {
  * @param {boolean} upwards
  */
 export function moveElementToNextStaff(v, cm, upwards = true) {
-  console.info('moveElementToNextStaff(' + (upwards ? 'up' : 'down') + ')');
+  console.debug('moveElementToNextStaff(' + (upwards ? 'up' : 'down') + ')');
   v.loadXml(cm.getValue());
   let ids = speed.filterElements(v.selectedElements, v.xmlDoc);
   v.allowCursorActivity = false;
@@ -656,7 +765,7 @@ export function moveElementToNextStaff(v, cm, upwards = true) {
     } else if ((noteList = utils.findNotes(id))) {
       let noteId;
       for (noteId of noteList) {
-        console.info('moving: ' + noteId);
+        console.debug('moving: ' + noteId);
         let sel = v.xmlDoc.querySelector("[*|id='" + noteId + "']");
         staffMover(cm, sel, upwards);
       }
@@ -1022,6 +1131,7 @@ export function addApplicationInfo(v, cm) {
 /**
  * Wrapper function to utils.cleanAccid() for cleaning
  * superfluous @accid.ges attributes
+ * Aug 2023: Replaced by checkAccidGes()
  * @param {Viewer} v
  * @param {CodeMirror} cm
  */
@@ -1030,7 +1140,7 @@ export function cleanAccid(v, cm) {
   v.loadXml(cm.getValue(), true);
   utils.cleanAccid(v.xmlDoc, cm);
   v.allowCursorActivity = true;
-}
+} // cleanAccid()
 
 /**
  * Checks accid/accid.ges attributes of all notes against
@@ -1148,18 +1258,18 @@ export function checkAccidGes(v, cm, change = false) {
             ' "' +
             data.xmlId +
             '" ' +
-            translator.lang.codeCheckerHasBoth +
+            translator.lang.codeCheckerHasBoth.text +
             ' accid="' +
             accid +
             '" ' +
-            translator.lang.codeCheckerAnd +
+            translator.lang.codeCheckerAnd.text +
             ' accid.ges="' +
             accidGesEncoded +
-            '" ';
+            '"';
           if (accidGesEncoded !== accid) {
-            data.html += translator.lang.codeCheckerWithContradictingContent.text;
+            data.html += ' ' + translator.lang.codeCheckerWithContradictingContent.text;
           }
-          data.html += '. ' + translator.lang.codeCheckerRemove + ' accid.ges';
+          data.html += '. ' + translator.lang.codeCheckerRemove.text + ' accid.ges';
           // remove @accid.ges in all cases
           data.correct = () => {
             v.allowCursorActivity = false;
@@ -1915,25 +2025,47 @@ export function updateMatchingTagName(cm, changeObj) {
  * @param {Element} xmlNode
  */
 export function removeInEditor(cm, xmlNode) {
-  let itemId = xmlNode.getAttribute('xml:id');
-  let searchSelfClosing = '(?:<' + xmlNode.nodeName + `)(\\s+?)([^>]*?)(?:xml:id=["']` + itemId + `['"])([^>]*?)(?:/>)`;
+  let id = xmlNode.getAttribute('xml:id');
+  let searchSelfClosing = '(?:<' + xmlNode.nodeName + `)(\\s+?)([^>]*?)(?:xml:id=["']` + id + `['"])([^>]*?)(?:/>)`;
   let sc = cm.getSearchCursor(new RegExp(searchSelfClosing));
   if (sc.findNext()) {
-    console.info('removeInEditor() self closing from: ', sc.from());
-    console.info('removeInEditor() self closing to: ', sc.to());
+    console.debug(
+      'removeInEditor() self closing element "' +
+        id +
+        '" from ln:' +
+        sc.from().line +
+        '/ch:' +
+        sc.from().ch +
+        ' to ln:' +
+        sc.to().line +
+        '/ch:' +
+        sc.to().ch +
+        '.'
+    );
   } else {
     let searchFullElement =
       '(?:<' +
       xmlNode.nodeName +
       `)(\\s+?)([^>]*?)(?:xml:id=["']` +
-      itemId +
+      id +
       `["'])([\\s\\S]*?)(?:</` +
       xmlNode.nodeName +
       '[ ]*?>)';
     sc = cm.getSearchCursor(new RegExp(searchFullElement));
     if (sc.findNext()) {
-      console.info('removeInEditor() full element from: ', sc.from());
-      console.info('removeInEditor() full element to: ', sc.to());
+      console.debug(
+        'removeInEditor() full element "' +
+          id +
+          '" from ln:' +
+          sc.from().line +
+          '/ch:' +
+          sc.from().ch +
+          ' to ln:' +
+          sc.to().line +
+          '/ch:' +
+          sc.to().ch +
+          '.'
+      );
     }
   }
   if (sc.atOccurrence) {
@@ -1945,7 +2077,9 @@ export function removeInEditor(cm, xmlNode) {
         cm.execCommand('deleteLine');
       }
     }
-  } else console.info('removeInEditor(): nothing removed for ' + itemId + '.');
+  } else {
+    console.info('removeInEditor(): nothing removed for ' + id + '.');
+  }
 } // removeInEditor()
 
 function isEmpty(str) {
@@ -1995,6 +2129,7 @@ export function replaceInEditor(cm, xmlNode, select = false, newNode = null) {
         }
       }
       cm.setSelection(sc.from(), sc.to());
+      cm.execCommand('indentAuto');
     }
   }
   return {
@@ -2012,13 +2147,13 @@ export function replaceInEditor(cm, xmlNode, select = false, newNode = null) {
  * @param {Element} note
  * @param {string} artic
  * @param {string} xmlIdStyle (Original, Base36, mei-friend, see viewer.js)
- * @returns
+ * @returns {string} uuid of new artic
  */
 function toggleArticForNote(note, artic, xmlIdStyle) {
   note = utils.attrAsElements(note);
   let articChildren;
   let add = false;
-  let uuid;
+  let uuid = '';
   // check if articulations exist, as elements or attributes
   if (note.hasChildNodes() && (articChildren = note.querySelectorAll('artic')).length > 0) {
     // console.info('toggleArtic check children: ', articChildren);
@@ -2041,6 +2176,13 @@ function toggleArticForNote(note, artic, xmlIdStyle) {
     articElement.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
     articElement.setAttribute('artic', artic);
     note.appendChild(articElement);
+  } else if (note.querySelectorAll('artic').length === 0) {
+    // remove text nodes when last artic in note/chord
+    for (let i = note.childNodes.length - 1; i >= 0; i--) {
+      if (note.childNodes[i].nodeType === Node.TEXT_NODE) {
+        note.removeChild(note.childNodes[i]);
+      }
+    }
   }
   return uuid;
 } // toggleArticForNote()
@@ -2048,33 +2190,86 @@ function toggleArticForNote(note, artic, xmlIdStyle) {
 /**
  * Modifies an element's pitch up and down (i.e. manipulating @oct, @pname)
  * @param {Element} el
- * @param {number} deltaPitch
- * @returns
+ * @param {number} deltaPitch (diatonic steps or chromatic steps)
+ * @param {boolean} shiftChromatically
+ * @returns {Element} element with modified attributes
+ * NOTE: when shifting chromatically, only semitones (+/-1) make sense!
  */
-function pitchMover(el, deltaPitch) {
-  let oct = 4;
-  let pname = 'c';
-  let o;
-  let p;
+function pitchMover(v, el, deltaPitch, shiftChromatically = false) {
+  let octValue = 4;
+  let pnameValue = 'c';
+  let accidValue = '';
+  let octAttr;
+  let pnameAttr;
   if (['note'].includes(el.nodeName)) {
-    o = 'oct';
-    p = 'pname';
+    octAttr = 'oct';
+    pnameAttr = 'pname';
   } else if (['rest', 'mRest', 'multiRest'].includes(el.nodeName)) {
-    o = 'oloc';
-    p = 'ploc';
+    octAttr = 'oloc';
+    pnameAttr = 'ploc';
+    shiftChromatically = false; // shifting chromatically with rests is non-sense
+  } else {
+    return el;
   }
-  if (el.hasAttribute(o)) oct = parseInt(el.getAttribute(o));
-  if (el.hasAttribute(p)) pname = el.getAttribute(p);
-  let pi = att.pnames.indexOf(pname) + deltaPitch;
+  if (el.hasAttribute(octAttr)) octValue = parseInt(el.getAttribute(octAttr));
+  if (el.hasAttribute(pnameAttr)) pnameValue = el.getAttribute(pnameAttr);
+
+  let pi;
+  if (shiftChromatically) {
+    accidValue =
+      el.getAttribute('accid') || el.querySelector('[accid]')?.getAttribute('accid') || el.getAttribute('accid.ges');
+    if (accidValue) accidValue = accidValue.slice(0, 1); // take only first character
+
+    // remove all possible accid information
+    el.removeAttribute('accid');
+    el.removeAttribute('accid.ges');
+    let accidChild = el.querySelector('accid');
+    if (accidChild) removeWithTextnodes(accidChild);
+
+    pi = att.pnames.indexOf(pnameValue); // index in scale
+    let pitchesToBeAltered = att.sharps.slice(0, 5);
+    let accidSign = 's';
+    if (deltaPitch < 0) {
+      pitchesToBeAltered = att.flats.slice(0, 5);
+      accidSign = 'f';
+    }
+    if (pitchesToBeAltered.includes(pnameValue)) {
+      if (accidValue === accidSign) {
+        pi += deltaPitch;
+        accidValue = '';
+      } else if (accidValue) {
+        accidValue = '';
+      } else {
+        accidValue = accidSign;
+      }
+    } else {
+      if (accidValue) {
+        accidValue = '';
+      } else {
+        pi += deltaPitch;
+      }
+    }
+  } else {
+    pi = att.pnames.indexOf(pnameValue) + deltaPitch;
+  }
+
+  // secure octave transistion
   if (pi > att.pnames.length - 1) {
     pi -= att.pnames.length;
-    oct++;
+    octValue++;
   } else if (pi < 0) {
     pi += att.pnames.length;
-    oct--;
+    octValue--;
   }
-  el.setAttribute(o, oct);
-  el.setAttribute(p, att.pnames[pi]);
+  if (accidValue) {
+    let a = document.createElementNS(dutils.meiNameSpace, 'accid');
+    let uuid = utils.generateXmlId('accid', v.xmlIdStyle);
+    a.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
+    a.setAttribute('accid', accidValue);
+    el.appendChild(a);
+  }
+  el.setAttribute(octAttr, octValue);
+  el.setAttribute(pnameAttr, att.pnames[pi]);
   return el;
 } // pitchMover()
 

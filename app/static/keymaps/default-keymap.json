@@ -7,8 +7,10 @@
     "left": "previousNote",
     "up": "layerUp",
     "down": "layerDown",
-    "shift-up": "shiftPitchNameUp",
-    "shift-down": "shiftPitchNameDown",
+    "shift-up": "shiftPitchChromaticallyUp",
+    "shift-down": "shiftPitchChromaticallyDown",
+    "shift-alt-up": "shiftPitchNameUp",
+    "shift-alt-down": "shiftPitchNameDown",
     "shift-left": "decreaseDuration",
     "shift-right": "increaseDuration",
     "delete": "delete",
@@ -18,6 +20,10 @@
     "pageup": "previousPage",
     "home": "firstPage",
     "end": "lastPage",
+
+    "+": "addSharp",
+    "=": "addNatural",
+    "-": "addFlat",
 
     "s": "addSlur",
     "t": "addTie",

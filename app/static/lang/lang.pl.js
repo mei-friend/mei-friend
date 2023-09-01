@@ -78,8 +78,10 @@ export const lang = {
   betweenPlacementText: { text: 'Pomiędzy umiejscowienie' },
   addVerticalGroupText: { text: 'Dodaj pionową grupę' },
   deleteText: { text: 'Usuń element' },
-  pitchUpText: { text: 'Podnieś dźwięk o pół tonu' },
-  pitchDownText: { text: 'Obniż dźwięk o pół tonu' },
+  pitchChromUpText: { text: 'Wyższa wysokość chromatyczna' },
+  pitchChromDownText: { text: 'Niższa wysokość chromatyczna' },
+  pitchUpDiatText: { text: 'Wyższa wysokość diatonicznie' },
+  pitchDownDiatText: { text: 'Niższa wysokość diatonicznie' },
   pitchOctaveUpText: { text: 'Podnieś dźwięk o oktawę' },
   pitchOctaveDownText: { text: 'Obniż dźwięk o oktawę' },
   staffUpText: { text: 'Element 1 pięciolinii w górę' },
@@ -97,6 +99,11 @@ export const lang = {
 
   // INSERT MENU ITEM // WSTAW ELEMENT MENU
   insertMenuTitle: { text: 'Wstaw' },
+  addDoubleSharpText: { html: 'Podwójny krzyżyk &#119082;' },
+  addSharpText: { html: 'Krzyżyk &#9839;' },
+  addNaturalText: { html: 'Kasownik &#9838;' },
+  addFlatText: { html: 'Bemol &#9837;' },
+  addDoubleFlatText: { html: 'Podwójny bemol &#119083;' },
   addTempoText: { text: 'Tempo' },
   addDirectiveText: { text: 'Dyrektywa' },
   addDynamicsText: { text: 'Dynamika' },
@@ -139,6 +146,7 @@ export const lang = {
   // HELP MENU ITEM // POMOC ELEMENT MENU
   helpMenuTitle: { text: 'Pomoc' },
   goToHelpPage: { text: 'Strony pomocy mei-friend' },
+  goToCheatSheet: { text: 'Ściągawka mei-friend' },
   showChangelog: { text: 'Pokaż dziennik zmian mei-friend' },
   goToGuidelines: { text: 'Pokaż Wytyczne MEI' },
   consultGuidelinesForElementText: { text: 'Sprawdź Wytyczne dla bieżącego elementu' },
@@ -541,6 +549,10 @@ export const lang = {
   highlightCurrentlySoundingNotes: {
     text: 'Podświetl aktualnie brzmiące nuty',
     description: 'Podświetl wizualnie aktualnie brzmiące nuty w panelu notacji podczas odtwarzania MIDI',
+  },
+  selectMidiExpansion: {
+    text: 'Expansion odtwarzania',
+    description: 'Wybierz element expansion, który ma być używany do odtwarzania MIDI',
   },
 
   // Transposition

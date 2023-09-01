@@ -7,7 +7,7 @@ import { heart } from '../css/icons.js';
 
 export const lang = {
   // Main menu bar
-  githubLoginLink: { text: 'Iniciar sessió' },
+  githubLoginLink: { text: 'Inicia sessió' },
 
   month: {
     jan: 'Gener',
@@ -29,7 +29,7 @@ export const lang = {
   openMeiText: { text: 'Obre fitxer' },
   openUrlText: { text: 'Obre URL' },
   openExample: {
-    text: 'Repartori públic',
+    text: 'Repertori públic',
     description: 'Obre una llista de repertori de domini públic',
   },
   importMusicXml: { text: 'Importa MusicXML' },
@@ -78,8 +78,10 @@ export const lang = {
   betweenPlacementText: { text: 'Posició entre' },
   addVerticalGroupText: { text: 'Afegeix grup vertical' },
   deleteText: { text: 'Esborra element' },
-  pitchUpText: { text: 'Augmenta 1 to' },
-  pitchDownText: { text: 'Disminueix 1 to' },
+  pitchChromUpText: { text: 'Tonalitat cromàtica més alta' },
+  pitchChromDownText: { text: 'Tonalitat cromàtica més baixa' },
+  pitchUpDiatText: { text: 'Tonalitat diatònica més alta' },
+  pitchDownDiatText: { text: 'Tonalitat diatònica més baixa' },
   pitchOctaveUpText: { text: 'Augmenta 1 octava' },
   pitchOctaveDownText: { text: 'Disminueix 1 octava' },
   staffUpText: { text: 'Element 1 pauta amunt' },
@@ -97,6 +99,11 @@ export const lang = {
 
   // INSERT MENU ITEM / INSERCIÓ DELS ELEMENTS DEL MENÚ
   insertMenuTitle: { text: 'Insereix' },
+  addDoubleSharpText: { html: 'Doble sostingut &#119082;' },
+  addSharpText: { html: 'Sostingut &#9839;' },
+  addNaturalText: { html: 'Becaire &#9838;' },
+  addFlatText: { html: 'Bemoll &#9837;' },
+  addDoubleFlatText: { html: 'Doble bemoll &#119083;' },
   addTempoText: { text: 'Tempo' },
   addDirectiveText: { text: 'Directiva' },
   addDynamicsText: { text: 'Dinàmica' },
@@ -139,6 +146,7 @@ export const lang = {
   // HELP MENU ITEM / ELEMENTS DEL MENÚ D'AJUDA
   helpMenuTitle: { text: 'Ajuda' },
   goToHelpPage: { text: "Pàgines d'ajuda de mei-friend" },
+  goToCheatSheet: {text: 'Full de trucs de mei-friend'},
   showChangelog: { text: 'Mostra el registre de canvis de mei-friend' },
   goToGuidelines: { text: 'Mostra les directrius MEI' },
   consultGuidelinesForElementText: { text: "Consulta les directrius per a l'element actual" },
@@ -192,7 +200,7 @@ export const lang = {
   breaksSelect: { description: 'Defineix el comportament de les ruptures de sistema/pàgina de la notació' },
   breaksSelectNone: { text: 'Cap' },
   breaksSelectAuto: { text: 'Automàtic' },
-  breaksSelectMeasure: { text: 'Mesura' },
+  breaksSelectMeasure: { text: 'Compàs' },
   breaksSelectLine: { text: 'Sistema' },
   breaksSelectEncoded: { text: 'Sistema i pàgina' },
   breaksSelectSmart: { text: 'Intel·ligent' },
@@ -547,6 +555,10 @@ export const lang = {
     text: 'Destaca les notes que sonen actualment',
     description: 'Destaca visualment les notes que sonen actualment al panell de notació durant la reproducció MIDI',
   },
+  selectMidiExpansion: {
+    text: 'Expansió de la reproducció',
+    description: "Seleccioneu l'element d'expansió a utilitzar per a la reproducció MIDI",
+  },
 
   // Transposition / Transposició
   titleTransposition: {
@@ -625,21 +637,21 @@ export const lang = {
 
   // Renumber measures / Renumber measures
   renumberMeasuresHeading: {
-    text: 'Reenumerar compàsos',
-    description: 'Opcions per reenumerar els compàsos',
+    text: 'Reenumerar compasos',
+    description: 'Opcions per reenumerar els comaàsos',
   },
   renumberMeasureContinueAcrossIncompleteMeasures: {
-    text: 'Continuar a través de compàsos incomplets',
-    description: "Continuar la numeració de compàsos a través de compàsos incomplets (@metcon='false')",
+    text: 'Continuar a través de compasos incomplets',
+    description: "Continuar la numeració de compasos a través de compasos incomplets (@metcon='false')",
   },
   renumberMeasuresUseSuffixAtMeasures: {
-    text: 'Sufix als compàsos incomplets',
-    description: 'Utilitzar sufix numèric als compàsos incomplets (p. ex. 23-cont)',
+    text: 'Sufix als compasos incomplets',
+    description: 'Utilitzar sufix numèric als compasos incomplets (p. ex. 23-cont)',
     labels: ['cap', '-cont'],
   },
   renumberMeasuresContinueAcrossEndings: {
     text: 'Continuar a través de finals',
-    description: 'Continuar la numeració de compàsos a través de finals',
+    description: 'Continuar la numeració de compasos a través de finals',
   },
   renumberMeasuresUseSuffixAtEndings: {
     text: 'Sufix als finals',

@@ -78,8 +78,10 @@ export const lang = {
   betweenPlacementText: { text: 'Between placement' },
   addVerticalGroupText: { text: 'Add vertical group' },
   deleteText: { text: 'Delete element' },
-  pitchUpText: { text: 'Pitch 1 tone up' },
-  pitchDownText: { text: 'Pitch 1 tone down' },
+  pitchChromUpText: { text: 'Pitch chromatically up' },
+  pitchChromDownText: { text: 'Pitch chromatically down' },
+  pitchUpDiatText: { text: 'Pitch diatonically up' },
+  pitchDownDiatText: { text: 'Pitch diatonically down' },
   pitchOctaveUpText: { text: 'Pitch 1 octave up' },
   pitchOctaveDownText: { text: 'Pitch 1 octave down' },
   staffUpText: { text: 'Element 1 staff up' },
@@ -97,6 +99,11 @@ export const lang = {
 
   // INSERT MENU ITEM
   insertMenuTitle: { text: 'Insert' },
+  addDoubleSharpText: { html: 'Double sharp &#119082;' },
+  addSharpText: { html: 'Sharp &#9839;' },
+  addNaturalText: { html: 'Natural &#9838;' },
+  addFlatText: { html: 'Flat &#9837;' },
+  addDoubleFlatText: { html: 'Double flat &#119083;' },
   addTempoText: { text: 'Tempo' },
   addDirectiveText: { text: 'Directive' },
   addDynamicsText: { text: 'Dynamics' },
@@ -109,7 +116,7 @@ export const lang = {
   addSuppliedText: { text: 'Supplied' },
   addSuppliedArticText: { text: 'Supplied (Artic)' },
   addSuppliedAccidText: { text: 'Supplied (Accid)' },
-  addArpeggioText: { text: 'Arepggio' },
+  addArpeggioText: { text: 'Arpeggio' },
   addFermataText: { text: 'Fermata' },
   addGlissandoText: { text: 'Glissando' },
   addPedalDownText: { text: 'Pedal down' },
@@ -139,9 +146,10 @@ export const lang = {
   // HELP MENU ITEM
   helpMenuTitle: { text: 'Help' },
   goToHelpPage: { text: 'mei-friend help pages' },
-  showChangelog: { text: 'Show mei-friend changelog' },
-  goToGuidelines: { text: 'Show MEI Guidelines' },
-  consultGuidelinesForElementText: { text: 'Consult Guidelines for current element' },
+  goToCheatSheet: { text: 'mei-friend cheat sheet' },
+  showChangelog: { text: 'mei-friend changelog' },
+  goToGuidelines: { text: 'MEI Guidelines' },
+  consultGuidelinesForElementText: { text: "Guidelines' entry for current element" },
   provideFeedback: { text: 'Provide feedback' },
   resetDefault: { text: 'Reset to default' },
 
@@ -536,6 +544,10 @@ export const lang = {
   highlightCurrentlySoundingNotes: {
     text: 'Highlight currently-sounding notes',
     description: 'Visually highlight currently-sounding notes in the notation panel during MIDI playback ',
+  },
+  selectMidiExpansion: {
+    text: 'Playback expansion',
+    description: 'Select expansion element to be used for MIDI playback',
   },
 
   // Transposition

@@ -1,4 +1,4 @@
-import { v, cm, log, translator, meiFileLocation, setStandoffAnnotationEnabledStatus } from './main.js';
+import { v, cm, log, translator, setStandoffAnnotationEnabledStatus } from './main.js';
 import { convertCoords, generateXmlId, rmHash, setCursorToId } from './utils.js';
 import { meiNameSpace, xmlNameSpace, xmlToString } from './dom-utils.js';
 import {
@@ -27,7 +27,7 @@ import {
   createMAOMusicalObject,
   establishDiscoveryResource,
   getCurrentFileUri,
-  safelyPatchResource
+  safelyPatchResource,
 } from './solid.js';
 import { nsp, traverseAndFetch } from './linked-data.js';
 
@@ -39,7 +39,6 @@ export function situateAndRefreshAnnotationsList(forceRefresh = false) {
 }
 
 export function refreshAnnotationsList() {
-  console.log('REFRESHING LIST', annotations);
   const list = document.getElementById('listAnnotations');
   // clear list
   while (list.firstChild) {
@@ -100,7 +99,6 @@ export function refreshAnnotationsList() {
     } else {
       (isStandoff.title = translator.lang.makeStandOffAnnotation.descriptionToLocal + ': '), a.id;
       isStandoff.dataset.id = a.id;
-      isStandoff.addEventListener('click', (e) => window.open(a.id, '_blank'));
       if ('standoffUri' in a) {
         isStandoff.href = a.standoffUri;
         isStandoff.target = '_blank';
@@ -357,7 +355,7 @@ export function refreshAnnotations(forceListRefresh = false) {
   annoSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
   annoSvg.setAttribute('xmlnsXlink', 'http://www.w3.org/1999/xlink');
   rac.appendChild(annoSvg);
-  if (document.getElementById('showAnnotations').checked) {
+  if (document.getElementById('showAnnotations')?.checked) {
     // drawing handlers can draw into renderedAnnotationsSvg if they need to
     annotations.forEach((a) => {
       if ('type' in a) {
@@ -385,7 +383,7 @@ export function refreshAnnotations(forceListRefresh = false) {
       }
     });
   }
-  situateAndRefreshAnnotationsList(forceListRefresh);
+  if (document.getElementById('showAnnotationPanel')?.checked) situateAndRefreshAnnotationsList(forceListRefresh);
 }
 
 export function addAnnotationHandlers() {
@@ -1018,9 +1016,9 @@ async function writeStandoffIfRequested(a) {
       establishContainerResource(friendContainer)
         .then((friendContainerResource) => {
           establishContainerResource(annotationContainer).then((annotationContainerResource) => {
-            establishDiscoveryResource(friendContainerResource, currentFileUri)
-              .then((discoveryResource) => {
-                let discoveryUri = discoveryResource + currentFileUriHash;
+            establishDiscoveryResource(currentFileUri)
+              .then((dataCatalogResource) => {
+                let discoveryUri = dataCatalogResource.url;
                 // generate a web annotation JSON-LD object
                 let webAnno = new Object();
                 let body = new Object();
@@ -1028,7 +1026,7 @@ async function writeStandoffIfRequested(a) {
                 webAnno[nsp.SCHEMA + 'includedInDataCatalog'] = { '@id': discoveryUri };
                 webAnno[nsp.OA + 'hasTarget'] = a.selection.map((s) => {
                   // TODO: do something clever if fileLocationType = "file" (local)
-                  return { '@id': meiFileLocation + '#' + s };
+                  return { '@id': currentFileUri + '#' + s };
                 });
                 switch (a.type) {
                   case 'annotateHighlight':

@@ -110,7 +110,7 @@ export function getFirstInMeasure(measure, list, stN, lyN) {
     if (el) foundElementId = el.getAttribute('id');
   }
   return foundElementId;
-}
+} // getFirstInMeasure()
 
 export function getLastInMeasure(measure, list, stN, lyN) {
   let foundElementId = '';
@@ -125,11 +125,11 @@ export function getLastInMeasure(measure, list, stN, lyN) {
     } else {
       els = staff.querySelectorAll(list);
     }
-    if (els) foundElementId = els[els.length - 1].getAttribute('id');
+    if (els && els.length > 0) foundElementId = els[els.length - 1].getAttribute('id');
     // console.info('els: ', els);
   }
   return foundElementId;
-}
+} // getLastInMeasure()
 
 export function getX(element, what = 'median') {
   if (!element) return false;

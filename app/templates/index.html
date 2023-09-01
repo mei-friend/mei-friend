@@ -307,13 +307,21 @@
             </span>
           </a>
           <hr class="dropdownLine" />
-          <a id="pitchUp" href="#">
-            <span id="pitchUpText">Pitch 1 tone up</span>
+          <a id="pitchChromUp" href="#">
+            <span id="pitchChromUpText">Pitch chromatically up</span>
             <span class="keyShortCut shiftKey">&uarr;</span>
           </a>
-          <a id="pitchDown" href="#">
-            <span id="pitchDownText">Pitch 1 tone down</span>
+          <a id="pitchChromDown" href="#">
+            <span id="pitchChromDownText">Pitch chromatically down</span>
             <span class="keyShortCut shiftKey">&darr;</span>
+          </a>
+          <a id="pitchUpDiat" href="#">
+            <span id="pitchUpDiatText">Pitch diatonically up</span>
+            <span class="keyShortCut altKey shiftKey">&uarr;</span>
+          </a>
+          <a id="pitchDownDiat" href="#">
+            <span id="pitchDownDiatText">Pitch diatonically down</span>
+            <span class="keyShortCut altKey shiftKey">&darr;</span>
           </a>
           <a id="pitchOctaveUp" href="#">
             <span id="pitchOctaveUpText">Pitch 1 octave up</span>
@@ -375,6 +383,25 @@
       <div class="dropdown">
         <button class="dropbtn" id="insertMenuTitle">Insert</button>
         <div class="dropdownContent" id="Insert">
+          <a id="addDoubleSharp" href="#">
+            <span id="addDoubleSharpText">Double sharp &#119082;</span>
+          </a>
+          <a id="addSharp" href="#">
+            <span id="addSharpText">Sharp &#9839;</span>
+            <span class="keyShortCut">+</span>
+          </a>
+          <a id="addNatural" href="#">
+            <span id="addNaturalText">Natural &#9838;</span>
+            <span class="keyShortCut">=</span>
+          </a>
+          <a id="addFlat" href="#">
+            <span id="addFlatText">Flat &#9837;</span>
+            <span class="keyShortCut">&ndash;</span>
+          </a>
+          <a id="addDoubleFlat" href="#">
+            <span id="addDoubleFlatText">Double flat &#119083;</span>
+          </a>
+          <hr class="dropdownLine" />
           <a id="addTempo" href="#">
             <span id="addTempoText">Tempo</span>
             <span class="keyShortCut shiftKey">T</span>
@@ -535,7 +562,8 @@
       <div class="dropdown">
         <button class="dropbtn" id="helpMenuTitle">Help</button>
         <div class="dropdownContent" id="HelpMenu">
-          <a id="goToHelpPage" href="https://mei-friend.github.io" target="_blank">Show help page</a>
+          <a id="goToHelpPage" href="https://mei-friend.github.io/" target="_blank">Show mei-friend help pages</a>
+          <a id="goToCheatSheet" href="https://mei-friend.github.io/cheatsheet/" target="_blank">Show mei-friend cheat sheet</a>
           <a id="showChangelog" href="#" target="_blank">Show mei-friend changelog</a>
           <hr class="dropdownLine" />
           <a id="goToGuidelines" href="https://music-encoding.org/guidelines" target="_blank">Show MEI Guidelines</a>

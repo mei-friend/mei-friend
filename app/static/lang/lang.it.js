@@ -78,8 +78,10 @@ export const lang = {
   betweenPlacementText: { text: 'Tra posizioni' },
   addVerticalGroupText: { text: 'Aggiungi gruppo verticale' },
   deleteText: { text: 'Elimina elemento' },
-  pitchUpText: { text: 'Alza di un tono' },
-  pitchDownText: { text: 'Abbassa di un tono' },
+  pitchChromUpText: { text: 'Alza cromatica' },
+  pitchChromDownText: { text: 'Abbassa cromatica' },
+  pitchUpDiatText: { text: 'Alza diatonica' },
+  pitchDownDiatText: { text: 'Abbassa diatonica' },
   pitchOctaveUpText: { text: "Alza di un'ottava" },
   pitchOctaveDownText: { text: "Abbassa di un'ottava" },
   staffUpText: { text: 'Elemento su 1 rigo' },
@@ -97,6 +99,11 @@ export const lang = {
 
   // INSERT MENU ITEM / INSERISCI VOCE DI MENU
   insertMenuTitle: { text: 'Inserisci' },
+  addDoubleSharpText: { html: 'Doppio diesis &#119082;' },
+  addSharpText: { html: 'Diesis &#9839;' },
+  addNaturalText: { html: 'Bequadro &#9838;' },
+  addFlatText: { html: 'Bemolle &#9837;' },
+  addDoubleFlatText: { html: 'Doppio bemolle &#119083;' },
   addTempoText: { text: 'Tempo' },
   addDirectiveText: { text: 'Direttiva' },
   addDynamicsText: { text: 'Dinamica' },
@@ -139,9 +146,10 @@ export const lang = {
   // HELP MENU ITEM / VOCE DI MENU AIUTO
   helpMenuTitle: { text: 'Aiuto' },
   goToHelpPage: { text: 'Pagina di aiuto di mei-friend' },
-  showChangelog: { text: 'Mostra il registro delle modifiche di mei-friend' },
-  goToGuidelines: { text: 'Mostra le linee guida MEI' },
-  consultGuidelinesForElementText: { text: "Consulta le linee guida per l'elemento corrente" },
+  goToCheatSheet: { text: 'Scheda informativa di mei-friend' },
+  showChangelog: { text: 'Registro delle modifiche di mei-friend' },
+  goToGuidelines: { text: 'Linee guida MEI' },
+  consultGuidelinesForElementText: { text: "Linee guida per l'elemento corrente" },
   provideFeedback: { text: 'Fornisci un feedback' },
   resetDefault: { text: 'Ripristina impostazioni predefinite' },
 
@@ -551,6 +559,10 @@ export const lang = {
     text: 'Evidenzia note attualmente suonate',
     description:
       'Evidenzia visivamente le note attualmente suonate nel pannello di notazione durante la riproduzione MIDI',
+  },
+  selectMidiExpansion: {
+    text: 'Espansione della riproduzione',
+    description: "Seleziona l'elemento di espansione da utilizzare per la riproduzione MIDI",
   },
 
   // Transposition // Trasposizione

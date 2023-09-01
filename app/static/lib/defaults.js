@@ -320,13 +320,13 @@ export const meiFriendSettingsOptions = {
     title: 'Select placement elements ',
     description: 'filled in by language packs',
     type: 'bool',
-    default: false,
+    default: true,
   },
   dragSelectSlurs: {
     title: 'Select slurs ',
     description: 'filled in by language packs',
     type: 'bool',
-    default: false,
+    default: true,
   },
   dragSelectMeasures: {
     title: 'Select measures ',

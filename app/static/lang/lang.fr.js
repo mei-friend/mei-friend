@@ -78,8 +78,10 @@ export const lang = {
   betweenPlacementText: { text: 'Placement entre deux' },
   addVerticalGroupText: { text: 'Ajouter un groupe vertical' },
   deleteText: { text: "Supprimer l'élément" },
-  pitchUpText: { text: "Monter d'un ton" },
-  pitchDownText: { text: "Descendre d'un ton" },
+  pitchChromUpText: { text: 'Monter chromatique' },
+  pitchChromDownText: { text: 'Descendre chromatique' },
+  pitchUpDiatText: { text: 'Monter diatonique' },
+  pitchDownDiatText: { text: 'Descendre diatonique' },
   pitchOctaveUpText: { text: "Monter d'une octave" },
   pitchOctaveDownText: { text: "Descendre d'une octave" },
   staffUpText: { text: "Élément d'un personnel vers le haut" },
@@ -97,6 +99,11 @@ export const lang = {
 
   // INSERT MENU ITEM  ELEMENT DE MENU INSERTION
   insertMenuTitle: { text: 'Insérer' },
+  addDoubleSharpText: { html: 'Double dièse &#119082;' },
+  addSharpText: { html: 'Dièse &#9839;' },
+  addNaturalText: { html: 'Bécarre &#9838;' },
+  addFlatText: { html: 'Bémol &#9837;' },
+  addDoubleFlatText: { html: 'Double bémol &#119083;' },
   addTempoText: { text: 'Tempo' },
   addDirectiveText: { text: 'Directive' },
   addDynamicsText: { text: 'Dynamique' },
@@ -139,9 +146,10 @@ export const lang = {
   // HELP MENU ITEM / ÉLÉMENT DE MENU D'AIDE
   helpMenuTitle: { text: 'Aide' },
   goToHelpPage: { text: "Pages d'aide de mei-friend" },
-  showChangelog: { text: 'Afficher le journal des modifications de mei-friend' },
-  goToGuidelines: { text: 'Afficher les lignes directrices MEI' },
-  consultGuidelinesForElementText: { text: "Consulter les lignes directrices pour l'élément actuel" },
+  goToCheatSheet: { text: 'Antisèche de mei-friend' },
+  showChangelog: { text: 'Journal des modifications de mei-friend' },
+  goToGuidelines: { text: 'Lignes directrices MEI' },
+  consultGuidelinesForElementText: { text: "Lignes directrices pour l'élément actuel" },
   provideFeedback: { text: 'Fournir des commentaires' },
   resetDefault: { text: 'Réinitialiser par défaut' },
 
@@ -546,6 +554,10 @@ export const lang = {
     text: 'Surligner les notes actuellement en train de sonner',
     description:
       'Surligner visuellement les notes actuellement en train de sonner dans le panneau de notation pendant la lecture MIDI',
+  },
+  selectMidiExpansion: {
+    text: 'Extension de lecture',
+    description: "Sélectionnez l'élément d'extension à utiliser pour la lecture MIDI",
   },
 
   // Transposition // Transposition

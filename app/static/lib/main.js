@@ -1,6 +1,6 @@
 // mei-friend version and date
-export const version = '0.10.4';
-export const versionDate = '30 August 2023'; // use full or 3-character english months, will be translated
+export const version = '1.0.0';
+export const versionDate = '1 September 2023'; // use full or 3-character english months, will be translated
 
 var vrvWorker;
 var spdWorker;
@@ -409,7 +409,7 @@ function onLanguageLoaded() {
   // expose default language pack for debug
   if (env && env === environments.develop) {
     runLanguageChecks();
-    console.debug('Default language pack: ', JSON.stringify(translator.defaultLang, null, 2));
+    // console.debug('Default language pack: ', JSON.stringify(translator.defaultLang, null, 2));
   }
   // build language selection menu
   buildLanguageSelection();
@@ -1256,25 +1256,35 @@ function downloadMei() {
   let blob = new Blob([cm.getValue()], {
     type: 'text/plain',
   });
-  let a = document.createElement('a');
-  a.download = meiFileName.substring(meiFileName.lastIndexOf('/') + 1).replace(/\.[^/.]+$/, '.mei');
-  a.href = window.URL.createObjectURL(blob);
-  a.click();
+  let url = URL.createObjectURL(blob);
+  let fileName = meiFileName.substring(meiFileName.lastIndexOf('/') + 1).replace(/\.[^/.]+$/, '.mei');
+  // buxfix for Safari (#33, 31. Aug 2023)
+  setTimeout(() => {
+    let a = document.createElement('a');
+    a.setAttribute('href', url);
+    a.setAttribute('download', fileName);
+    a.click();
+  }, 0);
   // Now that the user has "saved" the MEI, clear the file change indicator
   setFileChangedState(false);
-}
+} // downloadMei()
 
 function downloadSpeedMei() {
   let blob = new Blob([speed.getPageFromDom(v.xmlDoc, v.currentPage, v.breaksValue(), v.pageSpanners)], {
     type: 'text/plain',
   });
-  let a = document.createElement('a');
-  a.download = meiFileName
+  let url = URL.createObjectURL(blob);
+  let fileName = meiFileName
     .substring(meiFileName.lastIndexOf('/') + 1)
     .replace(/\.[^/.]+$/, '_page-' + v.currentPage + '-speedMode.mei');
-  a.href = window.URL.createObjectURL(blob);
-  a.click();
-}
+  // buxfix for Safari (#33, 31. Aug 2023)
+  setTimeout(() => {
+    let a = document.createElement('a');
+    a.setAttribute('href', url);
+    a.setAttribute('download', fileName);
+    a.click();
+  }, 0);
+} // downloadSpeedMei()
 
 export function requestMidiFromVrvWorker(requestTimemap = false) {
   let mei;
@@ -1308,11 +1318,16 @@ function downloadSvg() {
   let blob = new Blob([svg], {
     type: 'image/svg+xml',
   });
-  let a = document.createElement('a');
-  a.download = meiFileName.substring(meiFileName.lastIndexOf('/') + 1).replace(/\.[^/.]+$/, '.svg');
-  a.href = window.URL.createObjectURL(blob);
-  a.click();
-}
+  let url = URL.createObjectURL(blob);
+  let fileName = meiFileName.substring(meiFileName.lastIndexOf('/') + 1).replace(/\.[^/.]+$/, '.svg');
+  // buxfix for Safari (#33, 31. Aug 2023)
+  setTimeout(() => {
+    let a = document.createElement('a');
+    a.setAttribute('href', url);
+    a.setAttribute('download', fileName);
+    a.click();
+  }, 0);
+} // downloadSvg()
 
 function consultGuidelines() {
   const elementAtCursor = getElementAtCursor(cm);
@@ -1501,6 +1516,12 @@ export let cmd = {
   },
   undo: () => cm.undo(),
   redo: () => cm.redo(),
+  // add accidentals
+  addDoubleSharp: () => e.addAccidental(v, cm, 'x'),
+  addSharp: () => e.addAccidental(v, cm, 's'),
+  addNatural: () => e.addAccidental(v, cm, 'n'),
+  addFlat: () => e.addAccidental(v, cm, 'f'),
+  addDoubleFlat: () => e.addAccidental(v, cm, 'ff'),
   // add control elements
   addSlur: () => e.addControlElement(v, cm, 'slur', ''),
   addSlurBelow: () => e.addControlElement(v, cm, 'slur', 'below'),
@@ -1546,6 +1567,8 @@ export let cmd = {
   toggleSpicc: () => e.toggleArtic(v, cm, 'spicc'),
   shiftPitchNameUp: () => e.shiftPitch(v, cm, 1),
   shiftPitchNameDown: () => e.shiftPitch(v, cm, -1),
+  shiftPitchChromaticallyUp: () => e.shiftPitch(v, cm, 1, true),
+  shiftPitchChromaticallyDown: () => e.shiftPitch(v, cm, -1, true),
   shiftOctaveUp: () => e.shiftPitch(v, cm, 7),
   shiftOctaveDown: () => e.shiftPitch(v, cm, -7),
   increaseDuration: () => e.modifyDuration(v, cm, 'increase'),
@@ -1878,8 +1901,10 @@ function addEventListeners(v, cm) {
   document.getElementById('betweenPlacement').addEventListener('click', cmd.betweenPlacement);
   document.getElementById('addVerticalGroup').addEventListener('click', cmd.addVerticalGroup);
   document.getElementById('delete').addEventListener('click', cmd.delete);
-  document.getElementById('pitchUp').addEventListener('click', cmd.shiftPitchNameUp);
-  document.getElementById('pitchDown').addEventListener('click', cmd.shiftPitchNameDown);
+  document.getElementById('pitchChromUp').addEventListener('click', cmd.shiftPitchChromaticallyUp);
+  document.getElementById('pitchChromDown').addEventListener('click', cmd.shiftPitchChromaticallyDown);
+  document.getElementById('pitchUpDiat').addEventListener('click', cmd.shiftPitchNameUp);
+  document.getElementById('pitchDownDiat').addEventListener('click', cmd.shiftPitchNameDown);
   document.getElementById('pitchOctaveUp').addEventListener('click', cmd.shiftOctaveUp);
   document.getElementById('pitchOctaveDown').addEventListener('click', cmd.shiftOctaveDown);
   document.getElementById('staffUp').addEventListener('click', cmd.moveElementStaffUp);
@@ -1899,6 +1924,12 @@ function addEventListeners(v, cm) {
   // ingest facsimile sekelton into currently loaded MEI file
   document.getElementById('ingestFacsimile').addEventListener('click', cmd.ingestFacsimile);
   document.getElementById('addFacsimile').addEventListener('click', cmd.addFacsimile);
+  // insert accidentals
+  document.getElementById('addDoubleSharp').addEventListener('click', cmd.addDoubleSharp);
+  document.getElementById('addSharp').addEventListener('click', cmd.addSharp);
+  document.getElementById('addNatural').addEventListener('click', cmd.addNatural);
+  document.getElementById('addFlat').addEventListener('click', cmd.addFlat);
+  document.getElementById('addDoubleFlat').addEventListener('click', cmd.addDoubleFlat);
   // insert control elements
   document.getElementById('addTempo').addEventListener('click', cmd.addTempo);
   document.getElementById('addDirective').addEventListener('click', cmd.addDirective);

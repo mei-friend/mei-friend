@@ -269,7 +269,7 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
               }
             }
           } else {
-            console.info('No key.sig information in ', st);
+            // console.info('No key.sig information in ', st);
           }
           const { count, unit } = getMeter(st);
           if (count && unit) {
@@ -291,7 +291,7 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
               }
             }
           } else {
-            console.info('No meter.count/unit information in ', st);
+            // console.info('No meter.count/unit information in ', st);
           }
         }
       }

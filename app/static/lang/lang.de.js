@@ -75,8 +75,10 @@ export const lang = {
   betweenPlacementText: { text: 'Platzierung dazwischen' },
   addVerticalGroupText: { text: 'Vertikale Gruppe hinzufügen' },
   deleteText: { text: 'Element löschen' },
-  pitchUpText: { text: 'Tonhöhe um Halbton höher' },
-  pitchDownText: { text: 'Tonhöhe um Halbton niedriger' },
+  pitchChromUpText: { text: 'Tonhöhe chromatisch höher' },
+  pitchChromDownText: { text: 'Tonhöhe chromatisch niedriger' },
+  pitchUpDiatText: { text: 'Tonhöhe diatonisch höher' },
+  pitchDownDiatText: { text: 'Tonhöhe diatonisch niedriger' },
   pitchOctaveUpText: { text: 'Tonhöhe eine Oktave höher' },
   pitchOctaveDownText: { text: 'Tonhöhe eine Oktave niedriger' },
   staffUpText: { text: 'Element eine Notenzeile höher' },
@@ -94,6 +96,11 @@ export const lang = {
 
   // INSERT MENU ITEM
   insertMenuTitle: { text: 'Einfügen' },
+  addDoubleSharpText: { html: 'Doppelkreuz &#119082;' },
+  addSharpText: { html: 'Kreuz &#9839;' },
+  addNaturalText: { html: 'Auflösungszeichen &#9838;' },
+  addFlatText: { html: 'Einfaches b &#9837;' },
+  addDoubleFlatText: { html: 'Doppel-b &#119083;' },
   addTempoText: { text: 'Tempo' },
   addDirectiveText: { text: 'Spielanweisung' },
   addDynamicsText: { text: 'Dynamik' },
@@ -106,7 +113,7 @@ export const lang = {
   addSuppliedText: { text: 'Supplied' },
   addSuppliedArticText: { text: 'Supplied (Artic)' },
   addSuppliedAccidText: { text: 'Supplied (Accid)' },
-  addArpeggioText: { text: 'Arepggio' },
+  addArpeggioText: { text: 'Arpeggio' },
   addFermataText: { text: 'Fermate' },
   addGlissandoText: { text: 'Glissando' },
   addPedalDownText: { text: 'Pedal drücken' },
@@ -136,9 +143,10 @@ export const lang = {
   // HELP MENU ITEM
   helpMenuTitle: { text: 'Hilfe' },
   goToHelpPage: { text: 'mei-friend Hilfeseiten' },
-  showChangelog: { text: 'mei-friend Änderungsliste anzeigen' },
-  goToGuidelines: { text: 'MEI Guidelines anzeigen' },
-  consultGuidelinesForElementText: { text: 'Guidelines für aktuelles Element anzeigen' },
+  goToCheatSheet: {text: 'mei-friend Spickzettel'},
+  showChangelog: { text: 'mei-friend Änderungsliste (changelog)' },
+  goToGuidelines: { text: 'MEI Guidelines' },
+  consultGuidelinesForElementText: { text: 'Guideline-Eintrag für aktuelles Element' },
   provideFeedback: { text: 'Feedback geben' },
   resetDefault: { text: 'Auf Standardwerte zurücksetzen' },
 
@@ -544,6 +552,11 @@ export const lang = {
     text: 'Klingende Noten hervorheben',
     description: 'Aktuell klingende Noten im Notationsfeld visuell hervorheben',
   },
+  selectMidiExpansion: {
+    text: 'Expansion für Wiedergabe',
+    description: 'Wählen Sie das expansion-Element aus, das für die MIDI-Wiedergabe verwendet werden soll',
+  },
+
   // Transposition
   titleTransposition: {
     text: 'Transposition',

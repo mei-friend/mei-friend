@@ -75,8 +75,10 @@ export const lang = {
   betweenPlacementText: { text: 'Colocar en medio' },
   addVerticalGroupText: { text: 'Añadir grupo vertical' },
   deleteText: { text: 'Eliminar elemento' },
-  pitchUpText: { text: 'Aumentar altura en un semitono' },
-  pitchDownText: { text: 'Disminuir altura en un semitono' },
+  pitchChromUpText: { text: 'Tono cromático más alto' },
+  pitchChromDownText: { text: 'Tono cromático más bajo' },
+  pitchUpDiatText: { text: 'Tono diatónico más alto' },
+  pitchDownDiatText: { text: 'Tono diatónico más bajo' },
   pitchOctaveUpText: { text: 'Aumentar altura en una octava' },
   pitchOctaveDownText: { text: 'Disminuir altura en una octava' },
   staffUpText: { text: 'Mover elemento una línea de pentagrama hacia arriba' },
@@ -94,6 +96,11 @@ export const lang = {
 
   // INSERT MENU ITEM
   insertMenuTitle: { text: 'Insertar' },
+  addDoubleSharpText: { html: 'Doble stostenido &#119082;' },
+  addSharpText: { html: 'Sostenido &#9839;' },
+  addNaturalText: { html: 'Becuadro &#9838;' },
+  addFlatText: { html: 'Bemol &#9837;' },
+  addDoubleFlatText: { html: 'Doble bemol &#119083;' },
   addTempoText: { text: 'Tempo' },
   addDirectiveText: { text: 'Directiva de juego' },
   addDynamicsText: { text: 'Dinámica' },
@@ -136,9 +143,10 @@ export const lang = {
   // HELP MENU ITEM
   helpMenuTitle: { text: 'Ayuda' },
   goToHelpPage: { text: 'Páginas de ayuda de mei-friend' },
-  showChangelog: { text: 'Mostrar lista de cambios de mei-friend' },
-  goToGuidelines: { text: 'Mostrar directrices de MEI' },
-  consultGuidelinesForElementText: { text: 'Mostrar directrices para el elemento actual' },
+  goToCheatSheet: { text: 'Hoja de trucos de mei-friend' },
+  showChangelog: { text: 'Lista de cambios de mei-friend' },
+  goToGuidelines: { text: 'Directrices de MEI' },
+  consultGuidelinesForElementText: { text: 'Directrices para el elemento actual' },
   provideFeedback: { text: 'Proporcionar comentarios' },
   resetDefault: { text: 'Restablecer valores predeterminados' },
 
@@ -541,6 +549,10 @@ export const lang = {
     text: 'Resaltar notas que suenan actualmente',
     description:
       'Destacar visualmente las notas que suenan actualmente en el panel de notación durante la reproducción MIDI',
+  },
+  selectMidiExpansion: {
+    text: 'Expansión de reproducción',
+    description: 'Seleccione el elemento de expansión que se utilizará para la reproducción MIDI',
   },
 
   // Transposition / Transposición
