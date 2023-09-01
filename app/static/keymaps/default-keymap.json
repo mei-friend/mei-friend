@@ -21,9 +21,11 @@
     "home": "firstPage",
     "end": "lastPage",
 
+    "shift-+": "addDoubleSharp",
     "+": "addSharp",
     "=": "addNatural",
     "-": "addFlat",
+    "shift--": "addDoubleFlat",
 
     "s": "addSlur",
     "t": "addTie",
