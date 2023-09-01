@@ -1,7 +1,7 @@
 # mei-friend-online CHANGELOG.md
 
 ## 1.0.0 Version 1.0 release
-* Delete notes, chords, rests (TODO: together with enclosing elements such as beams, tuplets, as well as elements pointing towards them)
+* Delete notes, chords, rests (together with enclosing elements such as beams, tuplets, as well as elements pointing towards them, such as a slur through `@startid` or `@endid`) (#37)
 * Move notes in pitch chromatically (`SHIFT + UP/DOWN`) with adding sharps when going upwards and flats when going downwards (enhancement #36)
 * Provide menu items and keyboard shortcuts to insert accidentals (+, -, =) (feature request #35)
 * Fix bug that prevented encoded @color to be shown (#34)
