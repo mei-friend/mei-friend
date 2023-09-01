@@ -1871,7 +1871,7 @@ export default class Viewer {
       // element off-screen
       this.setCursorToPageBeginning(cm); // re-defines lastNotId
       id = utils.escapeXmlId(this.lastNoteId);
-      element = document.querySelector('g#' + id);
+      if (id) element = document.querySelector('g#' + id);
     }
     if (!element) return;
     console.info('Navigate ' + dir + ' ' + incElName + '-wise for: ', element);

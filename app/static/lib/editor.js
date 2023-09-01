@@ -91,6 +91,12 @@ export function deleteElement(v, cm, modifyerKey = false) {
         findAndModifyOctaveElements(cm, v.xmlDoc, id1, id2, disPlace, dis, false);
         removeInEditor(cm, element);
         selectedElements.push(id2);
+        element.remove();
+      } else if (['accid', 'artic'].includes(element.nodeName)) {
+        let parent = removeWithTextnodes(element);
+        let parentId = parent.getAttribute('xml:id');
+        if (parentId) selectedElements.push(parentId);
+        replaceInEditor(cm, parent, true);
       } else {
         removeInEditor(cm, element);
         // place cursor at a sensible place...
@@ -98,6 +104,7 @@ export function deleteElement(v, cm, modifyerKey = false) {
         let el = document.getElementById(m).querySelector(dutils.navElsSelector);
         if (el) selectedElements.push(el.getAttribute('id'));
         else selectedElements.push(nextId);
+        element.remove();
       }
     } else if (['beam'].includes(element.nodeName)) {
       // delete beam
@@ -123,10 +130,12 @@ export function deleteElement(v, cm, modifyerKey = false) {
         selectedElements.push(childList[i].getAttribute('xml:id'));
         element.parentNode.insertBefore(childList[i--], element);
       }
+      element.remove();
     } else if (element.nodeName === 'zone' && document.getElementById('editFacsimileZones').checked) {
       // delete Zone in source image display
       // remove zone; with CMD remove pointing element; without just remove @facs from pointing element
       removeZone(v, cm, element, modifyerKey);
+      element.remove();
     } else if (['note', 'chord', 'rest', 'mRest', 'multiRest'].includes(element.nodeName)) {
       console.log('Removing <' + element.nodeName + '>: "' + id + '"');
       // Check if element is last inside a chord, a tuplet, or a beam, and
@@ -159,14 +168,16 @@ export function deleteElement(v, cm, modifyerKey = false) {
         removeInEditor(cm, pointingElement);
         pointingElement.remove();
       });
-      
+      let next = utils.getIdOfNextElement(cm, cursor.line)[0];
+      if (next) selectedElements.push(next);
+    // remove element and update parent in editor
       removeInEditor(cm, element);
+      element.remove();
     } else {
       console.info('Element ' + id + ' not supported for deletion.');
       v.allowCursorActivity = true;
       return;
     }
-    if (element) element.remove();
   });
   loadFacsimile(v.xmlDoc);
   // buffer.groupChangesSinceCheckpoint(checkPoint); TODO
@@ -177,6 +188,25 @@ export function deleteElement(v, cm, modifyerKey = false) {
   v.updateData(cm, false, true);
   v.allowCursorActivity = true;
 } // deleteElement()
+
+/**
+ * Removes element with text nodes around it and returns parent node.
+ * @param {Element} element
+ * @returns {Element} parent element with removed element
+ */
+function removeWithTextnodes(element) {
+  let parent = element.parentNode;
+  if (parent) {
+    // remove child element together with surrounding text nodes
+    let i = Array.from(parent.childNodes).indexOf(element);
+    if (i > 0 && i < parent.childNodes.length) {
+      parent.childNodes[i + 1].remove();
+      parent.childNodes[i].remove();
+      parent.childNodes[i - 1].remove();
+    }
+  }
+  return parent;
+} // removeWithTextnodes()
 
 /**
  * Adds accid element to note element.
@@ -2187,15 +2217,7 @@ function pitchMover(v, el, deltaPitch, shiftChromatically = false) {
     el.removeAttribute('accid');
     el.removeAttribute('accid.ges');
     let accidChild = el.querySelector('accid');
-    if (accidChild) {
-      // remove child accid together with surrounding text nodes
-      let i = Array.from(el.childNodes).indexOf(accidChild);
-      if (i > 0 && i < el.childNodes.length) {
-        el.childNodes[i + 1].remove();
-        el.childNodes[i].remove();
-        el.childNodes[i - 1].remove();
-      }
-    }
+    if (accidChild) removeWithTextnodes(accidChild);
 
     pi = att.pnames.indexOf(pnameValue); // index in scale
     let pitchesToBeAltered = att.sharps.slice(0, 5);
