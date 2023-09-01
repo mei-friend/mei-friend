@@ -170,7 +170,7 @@ export function deleteElement(v, cm, modifyerKey = false) {
       });
       let next = utils.getIdOfNextElement(cm, cursor.line)[0];
       if (next) selectedElements.push(next);
-    // remove element and update parent in editor
+      // remove element and update parent in editor
       removeInEditor(cm, element);
       element.remove();
     } else {
@@ -2147,13 +2147,13 @@ export function replaceInEditor(cm, xmlNode, select = false, newNode = null) {
  * @param {Element} note
  * @param {string} artic
  * @param {string} xmlIdStyle (Original, Base36, mei-friend, see viewer.js)
- * @returns
+ * @returns {string} uuid of new artic
  */
 function toggleArticForNote(note, artic, xmlIdStyle) {
   note = utils.attrAsElements(note);
   let articChildren;
   let add = false;
-  let uuid;
+  let uuid = '';
   // check if articulations exist, as elements or attributes
   if (note.hasChildNodes() && (articChildren = note.querySelectorAll('artic')).length > 0) {
     // console.info('toggleArtic check children: ', articChildren);
@@ -2176,6 +2176,13 @@ function toggleArticForNote(note, artic, xmlIdStyle) {
     articElement.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
     articElement.setAttribute('artic', artic);
     note.appendChild(articElement);
+  } else if (note.querySelectorAll('artic').length === 0) {
+    // remove text nodes when last artic in note/chord
+    for (let i = note.childNodes.length - 1; i >= 0; i--) {
+      if (note.childNodes[i].nodeType === Node.TEXT_NODE) {
+        note.removeChild(note.childNodes[i]);
+      }
+    }
   }
   return uuid;
 } // toggleArticForNote()
