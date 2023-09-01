@@ -58,7 +58,6 @@ export function getCurrentFileUri() {
 }
 
 export async function postResource(containerUri, resource) {
-  console.log('Call to postResource', containerUri, resource);
   resource['@id'] = ''; // document base URI
   const webId = solid.getDefaultSession().info.webId;
   resource[nsp.DCT + 'creator'] = { '@id': webId };
@@ -76,7 +75,6 @@ export async function postResource(containerUri, resource) {
           body: JSON.stringify(resource),
         })
         .then(async (postResp) => {
-          console.log('GOT POST RESPONSE:', postResp);
           return postResp;
         })
         .catch((e) => {
@@ -112,10 +110,7 @@ export async function safelyPatchResource(uri, patch) {
       return resp.json();
     })
     .then((freshlyFetched) => {
-      console.log('Found freshlyFetched resource at URI: ', freshlyFetched, uri);
-      console.log('Applied patch: ', patch);
       const patched = jsonpatch.applyPatch(freshlyFetched, patch).newDocument;
-      console.log('applied patch!', patch, patched);
       solid
         .fetch(uri, {
           method: 'PUT',
@@ -155,7 +150,6 @@ export async function establishResource(uri, resource) {
       },
     })
     .then(async (headResp) => {
-      console.log('GOT HEAD RESPONSE:', headResp);
       if (headResp.ok) {
         return headResp;
       } else if (headResp.status === 404) {
@@ -259,7 +253,6 @@ export async function createMAOMusicalObject(selectedElements, label = '') {
       return establishDiscoveryResource(currentFileUri);
     })
     .then(async (dataCatalogResource) => {
-      console.log("Got data catalogue resource: ", dataCatalogResource)
       return establishContainerResource(musicalObjectContainer).then(async () => {
         return createMAOSelection(selectedElements, currentFileUri, dataCatalogResource.url, label).then(
           async (selectionResource) => {
@@ -326,7 +319,6 @@ export async function createMAOMusicalObject(selectedElements, label = '') {
 
 async function createMAOSelection(selection, aboutUri, discoveryUri, label = '') {
   // private function -- called *after* friendContainer and musicalObjectContainer already established
-  console.log('createMAOSelection: ', selection, aboutUri, discoveryUri, label);
   let resource = structuredClone(resources.maoSelection);
   let baseFileUri = getCurrentFileUri();
   resource[nsp.FRBR + 'part'] = selection.map((s) => {
@@ -349,12 +341,10 @@ async function createMAOSelection(selection, aboutUri, discoveryUri, label = '')
   });
 
   let response = await postResource(selectionContainer, resource);
-  console.log('GOT RESPONSE: ', response);
   return response;
 }
 
 async function createMAOExtract(postSelectionResponse, aboutUri, discoveryUri, label = '') {
-  console.log('createMAOExtract: ', postSelectionResponse, aboutUri, discoveryUri, label);
   let selectionUri = new URL(postSelectionResponse.url).origin + postSelectionResponse.headers.get('location');
   let resource = structuredClone(resources.maoExtract);
   resource[nsp.FRBR + 'embodiment'] = [{ '@id': selectionUri }];
@@ -375,7 +365,6 @@ async function createMAOExtract(postSelectionResponse, aboutUri, discoveryUri, l
 }
 
 async function createMAOMusicalMaterial(postExtractResponse, aboutUri, discoveryUri, label = '') {
-  console.log('createMAOMusicalMaterial: ', postExtractResponse, aboutUri, discoveryUri, label);
   let extractUri = new URL(postExtractResponse.url).origin + postExtractResponse.headers.get('location');
   let resource = structuredClone(resources.maoMusicalMaterial);
   resource[nsp.MAO + 'setting'] = { '@id': extractUri };
