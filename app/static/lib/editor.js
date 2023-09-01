@@ -74,9 +74,9 @@ export function deleteElement(v, cm, modifyerKey = false) {
     let cursor = cm.getCursor();
     let nextId = utils.getIdOfNextElement(cm, cursor.line)[0]; // TODO necessary?
     let element = v.xmlDoc.querySelector("[*|id='" + id + "']");
-    console.info('Deleting: ', element);
+    console.debug('Deleting: ', element);
     if (!element) {
-      console.info(id + ' not found for deletion.');
+      console.log(id + ' not found for deletion.');
       return;
     }
     // let checkPoint = buffer.createCheckpoint(); TODO
@@ -257,11 +257,11 @@ export function addAccidental(v, cm, accidAttribute = 's') {
  * @param {string} form ('cres', 'inv', depending on element type)
  * @returns
  */
-export function addControlElement(v, cm, elName, placement, form) {
+export function addControlElement(v, cm, elName, placement = '', form = '') {
   if (v.selectedElements.length === undefined || v.selectedElements.length < 1) return;
   v.selectedElements = utils.sortElementsByScorePosition(v.selectedElements);
   v.selectedElements = speed.filterElements(v.selectedElements, v.xmlDoc);
-  console.info('addControlElement() ', elName, placement, form);
+  console.debug('addControlElement() ', elName, placement, form);
 
   // modifier key for inserting tstamps rather than start/endids
   let useTstamps = v.cmd2KeyPressed;
@@ -414,7 +414,7 @@ export function addControlElement(v, cm, elName, placement, form) {
   v.allowCursorActivity = false; // to prevent reloading after each edit
   if (p) {
     let p1 = utils.moveCursorToEndOfMeasure(cm, p); // resets selectedElements!!
-    console.log('p1: ', p);
+    console.debug('p1: ', p);
     cm.replaceRange(dutils.xmlToString(newElement) + '\n', p1);
     cm.indentLine(p1.line, 'smart');
     cm.indentLine(p1.line + 1, 'smart');
@@ -496,7 +496,7 @@ export function invertPlacement(v, cm, modifier = false) {
   v.loadXml(cm.getValue());
   let ids = utils.sortElementsByScorePosition(v.selectedElements);
   ids = speed.filterElements(ids, v.xmlDoc);
-  console.info('invertPlacement ids: ', ids);
+  console.debug('invertPlacement ids: ', ids);
   v.allowCursorActivity = false; // no need to redraw notation
   let noteList, range;
   for (let id of ids) {
@@ -507,7 +507,7 @@ export function invertPlacement(v, cm, modifier = false) {
       el = v.xmlDoc.querySelector("[*|id='" + id + "']");
     }
     if (!el) {
-      console.info('invertPlacement(): element not found', id);
+      console.log('invertPlacement(): element not found', id);
       continue;
     }
     let attr = '';
@@ -629,7 +629,7 @@ export function invertPlacement(v, cm, modifier = false) {
         // txtEdr.autoIndentSelectedRows();
       }
     } else {
-      console.info('invertPlacement(): ' + el.nodeName + ' contains no elements to invert.');
+      console.log('invertPlacement(): ' + el.nodeName + ' contains no elements to invert.');
     }
   }
   // console.info('TextCursor: ', txtEdr.getCursorBufferPosition());
@@ -750,7 +750,7 @@ export function modifyDuration(v, cm, what = 'increase') {
  * @param {boolean} upwards
  */
 export function moveElementToNextStaff(v, cm, upwards = true) {
-  console.info('moveElementToNextStaff(' + (upwards ? 'up' : 'down') + ')');
+  console.debug('moveElementToNextStaff(' + (upwards ? 'up' : 'down') + ')');
   v.loadXml(cm.getValue());
   let ids = speed.filterElements(v.selectedElements, v.xmlDoc);
   v.allowCursorActivity = false;
@@ -765,7 +765,7 @@ export function moveElementToNextStaff(v, cm, upwards = true) {
     } else if ((noteList = utils.findNotes(id))) {
       let noteId;
       for (noteId of noteList) {
-        console.info('moving: ' + noteId);
+        console.debug('moving: ' + noteId);
         let sel = v.xmlDoc.querySelector("[*|id='" + noteId + "']");
         staffMover(cm, sel, upwards);
       }
@@ -2029,7 +2029,7 @@ export function removeInEditor(cm, xmlNode) {
   let searchSelfClosing = '(?:<' + xmlNode.nodeName + `)(\\s+?)([^>]*?)(?:xml:id=["']` + id + `['"])([^>]*?)(?:/>)`;
   let sc = cm.getSearchCursor(new RegExp(searchSelfClosing));
   if (sc.findNext()) {
-    console.info(
+    console.debug(
       'removeInEditor() self closing element "' +
         id +
         '" from ln:' +
@@ -2053,7 +2053,7 @@ export function removeInEditor(cm, xmlNode) {
       '[ ]*?>)';
     sc = cm.getSearchCursor(new RegExp(searchFullElement));
     if (sc.findNext()) {
-      console.info(
+      console.debug(
         'removeInEditor() full element "' +
           id +
           '" from ln:' +

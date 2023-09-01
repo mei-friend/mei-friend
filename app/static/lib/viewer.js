@@ -386,7 +386,7 @@ export default class Viewer {
     }
     // overwrite existing options if new ones are passed in
     // for (let key in newOptions) { this.vrvOptions[key] = newOptions[key]; }
-    console.info('Verovio options updated: ', this.vrvOptions);
+    console.debug('Verovio options updated: ', this.vrvOptions);
   } // setVerovioOptions()
 
   // accepts number or string (first, last, forwards, backwards)
@@ -483,7 +483,7 @@ export default class Viewer {
     let r = {};
     r.x = matrix.a * point.x + matrix.c * point.y + matrix.e;
     r.y = matrix.b * point.x + matrix.d * point.y + matrix.f;
-    console.log('Click on ' + e.srcElement.id + ', x/y: ' + r.x + '/' + r.y);
+    console.debug('Click on ' + e.srcElement.id + ', x/y: ' + r.x + '/' + r.y);
 
     this.allowCursorActivity = false;
     // console.info('click: ', e);
