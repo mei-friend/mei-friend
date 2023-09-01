@@ -39,7 +39,7 @@ export function situateAndRefreshAnnotationsList(forceRefresh = false) {
 }
 
 export function refreshAnnotationsList() {
-  console.log('REFRESHING LIST', annotations);
+  // console.log('REFRESHING LIST', annotations);
   const list = document.getElementById('listAnnotations');
   // clear list
   while (list.firstChild) {
