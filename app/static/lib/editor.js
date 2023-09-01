@@ -1994,13 +1994,13 @@ export function updateMatchingTagName(cm, changeObj) {
  * @param {Element} xmlNode
  */
 export function removeInEditor(cm, xmlNode) {
-  let itemId = xmlNode.getAttribute('xml:id');
-  let searchSelfClosing = '(?:<' + xmlNode.nodeName + `)(\\s+?)([^>]*?)(?:xml:id=["']` + itemId + `['"])([^>]*?)(?:/>)`;
+  let id = xmlNode.getAttribute('xml:id');
+  let searchSelfClosing = '(?:<' + xmlNode.nodeName + `)(\\s+?)([^>]*?)(?:xml:id=["']` + id + `['"])([^>]*?)(?:/>)`;
   let sc = cm.getSearchCursor(new RegExp(searchSelfClosing));
   if (sc.findNext()) {
     console.info(
       'removeInEditor() self closing element "' +
-        itemId +
+        id +
         '" from ln:' +
         sc.from().line +
         '/ch:' +
@@ -2016,7 +2016,7 @@ export function removeInEditor(cm, xmlNode) {
       '(?:<' +
       xmlNode.nodeName +
       `)(\\s+?)([^>]*?)(?:xml:id=["']` +
-      itemId +
+      id +
       `["'])([\\s\\S]*?)(?:</` +
       xmlNode.nodeName +
       '[ ]*?>)';
@@ -2024,7 +2024,7 @@ export function removeInEditor(cm, xmlNode) {
     if (sc.findNext()) {
       console.info(
         'removeInEditor() full element "' +
-          itemId +
+          id +
           '" from ln:' +
           sc.from().line +
           '/ch:' +
@@ -2047,7 +2047,7 @@ export function removeInEditor(cm, xmlNode) {
       }
     }
   } else {
-    console.info('removeInEditor(): nothing removed for ' + itemId + '.');
+    console.info('removeInEditor(): nothing removed for ' + id + '.');
   }
 } // removeInEditor()
 
@@ -2189,6 +2189,8 @@ function pitchMover(el, deltaPitch, shiftChromatically = false) {
     if (pitchesToBeAltered.includes(pnameValue)) {
       if (accidValue === accidSign) {
         pi += deltaPitch;
+        accidValue = '';
+      } else if (accidValue) {
         accidValue = '';
       } else {
         accidValue = accidSign;
