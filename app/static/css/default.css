@@ -964,7 +964,7 @@ svg text {
   fill: var(--suppliedHighlightedColor);
 }
 
-#verovio-panel:not(g[color], g[fill]),
+#verovio-panel:not(g[color]g[fill]),
 #verovio-panel path {
   fill: var(--notationColor);
   color: var(--notationColor);
