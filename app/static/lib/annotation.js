@@ -39,7 +39,6 @@ export function situateAndRefreshAnnotationsList(forceRefresh = false) {
 }
 
 export function refreshAnnotationsList() {
-  // console.log('REFRESHING LIST', annotations);
   const list = document.getElementById('listAnnotations');
   // clear list
   while (list.firstChild) {
@@ -1018,9 +1017,9 @@ async function writeStandoffIfRequested(a) {
       establishContainerResource(friendContainer)
         .then((friendContainerResource) => {
           establishContainerResource(annotationContainer).then((annotationContainerResource) => {
-            establishDiscoveryResource(friendContainerResource, currentFileUri)
-              .then((discoveryResource) => {
-                let discoveryUri = discoveryResource + currentFileUriHash;
+            establishDiscoveryResource(currentFileUri)
+              .then((dataCatalogResource) => {
+                let discoveryUri = dataCatalogResource.url;
                 // generate a web annotation JSON-LD object
                 let webAnno = new Object();
                 let body = new Object();
