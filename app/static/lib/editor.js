@@ -671,10 +671,10 @@ export function shiftPitch(v, cm, deltaPitch = 0, shiftChromatically = false) {
     let chs = Array.from(el.querySelectorAll('note,rest,mRest,multiRest'));
     if (chs.length > 0) {
       // shift many elements
-      chs.forEach((ele) => replaceInEditor(cm, pitchMover(ele, deltaPitch, shiftChromatically)), true);
-    } else {
+      chs.forEach((ele) => replaceInEditor(cm, pitchMover(v, ele, deltaPitch, shiftChromatically)), true);
+    } else if (['note', 'rest', 'mRest', 'multiRest'].includes(el.nodeName)) {
       // shift one element
-      replaceInEditor(cm, pitchMover(el, deltaPitch, shiftChromatically), true);
+      replaceInEditor(cm, pitchMover(v, el, deltaPitch, shiftChromatically), true);
     }
   }
   v.selectedElements = ids;
@@ -2157,7 +2157,7 @@ function toggleArticForNote(note, artic, xmlIdStyle) {
  * @returns {Element} element with modified attributes
  * NOTE: when shifting chromatically, only semitones (+/-1) make sense!
  */
-function pitchMover(el, deltaPitch, shiftChromatically = false) {
+function pitchMover(v, el, deltaPitch, shiftChromatically = false) {
   let octValue = 4;
   let pnameValue = 'c';
   let accidValue = '';
@@ -2170,15 +2170,32 @@ function pitchMover(el, deltaPitch, shiftChromatically = false) {
     octAttr = 'oloc';
     pnameAttr = 'ploc';
     shiftChromatically = false; // shifting chromatically with rests is non-sense
+  } else {
+    return el;
   }
   if (el.hasAttribute(octAttr)) octValue = parseInt(el.getAttribute(octAttr));
   if (el.hasAttribute(pnameAttr)) pnameValue = el.getAttribute(pnameAttr);
 
   let pi;
   if (shiftChromatically) {
-    if (el.hasAttribute('accid.ges')) accidValue = el.getAttribute('accid.ges');
-    if (el.hasAttribute('accid')) accidValue = el.getAttribute('accid');
-    accidValue = accidValue.slice(0, 1); // take only first character
+    accidValue =
+      el.getAttribute('accid') || el.querySelector('[accid]')?.getAttribute('accid') || el.getAttribute('accid.ges');
+    if (accidValue) accidValue = accidValue.slice(0, 1); // take only first character
+
+    // remove all possible accid information
+    el.removeAttribute('accid');
+    el.removeAttribute('accid.ges');
+    let accidChild = el.querySelector('accid');
+    if (accidChild) {
+      // remove child accid together with surrounding text nodes
+      let i = Array.from(el.childNodes).indexOf(accidChild);
+      if (i > 0 && i < el.childNodes.length) {
+        el.childNodes[i + 1].remove();
+        el.childNodes[i].remove();
+        el.childNodes[i - 1].remove();
+      }
+    }
+
     pi = att.pnames.indexOf(pnameValue); // index in scale
     let pitchesToBeAltered = att.sharps.slice(0, 5);
     let accidSign = 's';
@@ -2215,9 +2232,11 @@ function pitchMover(el, deltaPitch, shiftChromatically = false) {
     octValue--;
   }
   if (accidValue) {
-    el.setAttribute('accid', accidValue);
-  } else {
-    el.removeAttribute('accid');
+    let a = document.createElementNS(dutils.meiNameSpace, 'accid');
+    let uuid = utils.generateXmlId('accid', v.xmlIdStyle);
+    a.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
+    a.setAttribute('accid', accidValue);
+    el.appendChild(a);
   }
   el.setAttribute(octAttr, octValue);
   el.setAttribute(pnameAttr, att.pnames[pi]);
