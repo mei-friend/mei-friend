@@ -99,7 +99,6 @@ export function refreshAnnotationsList() {
     } else {
       (isStandoff.title = translator.lang.makeStandOffAnnotation.descriptionToLocal + ': '), a.id;
       isStandoff.dataset.id = a.id;
-      isStandoff.addEventListener('click', (e) => window.open(a.id, '_blank'));
       if ('standoffUri' in a) {
         isStandoff.href = a.standoffUri;
         isStandoff.target = '_blank';
