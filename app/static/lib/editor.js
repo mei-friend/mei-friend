@@ -146,9 +146,9 @@ export function deleteElement(v, cm, modifyerKey = false) {
       }
 
       // Check if element has been pointed to in a slur, tie (@startid, @endid); TODO: @plist?
-      let pointingElement =
-        v.xmlDoc.querySelector("[startid='#" + id + "']") || v.xmlDoc.querySelector("[endid='#" + id + "']") || '';
-      if (pointingElement) {
+      let pointingElements = v.xmlDoc.querySelectorAll("[startid='#" + id + "'],[endid='#" + id + "']");
+      // v.xmlDoc.querySelector("[startid='#" + id + "']") || v.xmlDoc.querySelector("[endid='#" + id + "']") || '';
+      pointingElements.forEach((pointingElement) => {
         console.log(
           'Removing pointing element <' +
             pointingElement.nodeName +
@@ -158,7 +158,8 @@ export function deleteElement(v, cm, modifyerKey = false) {
         );
         removeInEditor(cm, pointingElement);
         pointingElement.remove();
-      }
+      });
+      
       removeInEditor(cm, element);
     } else {
       console.info('Element ' + id + ' not supported for deletion.');
