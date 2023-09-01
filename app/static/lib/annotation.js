@@ -27,7 +27,7 @@ import {
   createMAOMusicalObject,
   establishDiscoveryResource,
   getCurrentFileUri,
-  safelyPatchResource
+  safelyPatchResource,
 } from './solid.js';
 import { nsp, traverseAndFetch } from './linked-data.js';
 
@@ -357,7 +357,7 @@ export function refreshAnnotations(forceListRefresh = false) {
   annoSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
   annoSvg.setAttribute('xmlnsXlink', 'http://www.w3.org/1999/xlink');
   rac.appendChild(annoSvg);
-  if (document.getElementById('showAnnotations').checked) {
+  if (document.getElementById('showAnnotations')?.checked) {
     // drawing handlers can draw into renderedAnnotationsSvg if they need to
     annotations.forEach((a) => {
       if ('type' in a) {
@@ -385,7 +385,7 @@ export function refreshAnnotations(forceListRefresh = false) {
       }
     });
   }
-  situateAndRefreshAnnotationsList(forceListRefresh);
+  if (document.getElementById('showAnnotationPanel')?.checked) situateAndRefreshAnnotationsList(forceListRefresh);
 }
 
 export function addAnnotationHandlers() {
