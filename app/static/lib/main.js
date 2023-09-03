@@ -367,7 +367,7 @@ export async function validate(mei, updateLinting, options) {
       }
       console.log(
         translator.lang.validationComplete.text + ': ',
-        validation === []
+        validation.length === 0
           ? translator.lang.noErrors.text + '.'
           : validation.length + ' ' + translator.lang.errorsFound.text + '.'
       );
