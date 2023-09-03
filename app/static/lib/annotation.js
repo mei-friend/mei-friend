@@ -794,6 +794,7 @@ export function ingestWebAnnotation(webAnno) {
   } else {
     let anno = {
       id: webAnno['@id'],
+      standoffUri: webAnno["@id"]
     };
     let targets = webAnno['http://www.w3.org/ns/oa#hasTarget'];
     if (!Array.isArray(targets)) targets = [targets];
