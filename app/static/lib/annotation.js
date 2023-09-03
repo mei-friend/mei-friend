@@ -696,7 +696,7 @@ export function loadWebAnnotation(prev = '') {
 
 // Wrapper around traverseAndFetch that reports back errors / progress to 'Load linked data' UI
 export function attemptFetchExternalResource(url, targetTypes, configObj) {
-  console.log('fetch external resource: ', url, targetTypes, typeToHandlerMap, followList, blockList, jumps);
+ // console.log('fetch external resource: ', url, targetTypes, typeToHandlerMap, followList, blockList, jumps);
   // spin the icon to indicate loading activity
   const icon = document.getElementById('addWebAnnotationIcon');
   const svgs = Array.from(icon.getElementsByTagName('svg'));
@@ -811,7 +811,7 @@ export function ingestWebAnnotation(webAnno) {
           anno.type = 'annotateLink';
         } else if (
           '@type' in firstBody &&
-          nsp.RDF + value in firstBody &&
+          nsp.RDF + 'value' in firstBody &&
           nsp.OA + 'TextualBody' in firstBody['@type']
         ) {
           // declare a describing annotation
