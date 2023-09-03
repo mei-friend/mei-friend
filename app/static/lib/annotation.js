@@ -696,7 +696,6 @@ export function loadWebAnnotation(prev = '') {
 
 // Wrapper around traverseAndFetch that reports back errors / progress to 'Load linked data' UI
 export function attemptFetchExternalResource(url, targetTypes, configObj) {
-  console.log('fetch external resource: ', url, targetTypes, typeToHandlerMap, followList, blockList, jumps);
   // spin the icon to indicate loading activity
   const icon = document.getElementById('addWebAnnotationIcon');
   const svgs = Array.from(icon.getElementsByTagName('svg'));
@@ -794,6 +793,7 @@ export function ingestWebAnnotation(webAnno) {
   } else {
     let anno = {
       id: webAnno['@id'],
+      standoffUri: webAnno['@id'],
     };
     let targets = webAnno['http://www.w3.org/ns/oa#hasTarget'];
     if (!Array.isArray(targets)) targets = [targets];
@@ -811,12 +811,12 @@ export function ingestWebAnnotation(webAnno) {
           anno.type = 'annotateLink';
         } else if (
           '@type' in firstBody &&
-          nsp.RDF + value in firstBody &&
-          nsp.OA + 'TextualBody' in firstBody['@type']
+          nsp.RDF + 'value' in firstBody &&
+          firstBody['@type'].includes(nsp.OA + 'TextualBody')
         ) {
           // declare a describing annotation
           console.log('Declaring a describing annotation!');
-          anno.description = firstBody[nsp.RDF + value];
+          anno.description = firstBody[nsp.RDF + 'value'][0]['@value'];
           anno.type = 'annotateDescribe';
         } else {
           console.log("Don't know how to handle body of this annotation: ", anno);
@@ -836,7 +836,7 @@ export function ingestWebAnnotation(webAnno) {
       anno.isStandoff = true;
       annotations.push(anno);
     }
-    refreshAnnotations();
+    refreshAnnotations(true);
   }
 }
 

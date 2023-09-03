@@ -1385,6 +1385,10 @@ select > option {
   padding: 20px;
 }
 
+#alertOverlay a {
+  color: white;
+}
+
 /* The alert message box */
 .alert {
   position: fixed;
