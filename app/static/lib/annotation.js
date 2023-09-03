@@ -836,7 +836,7 @@ export function ingestWebAnnotation(webAnno) {
       anno.isStandoff = true;
       annotations.push(anno);
     }
-    refreshAnnotations();
+    refreshAnnotations(true);
   }
 }
 
