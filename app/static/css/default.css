@@ -920,19 +920,19 @@ svg text {
 
 #verovio-panel .currently-playing {
   fill: orange !important;
-  stroke: orange !important;
   color: orange !important;
 }
 
-#verovio-panel .highlighted {
-  color: var(--highlightColor);
-  stroke: var(--highlightColor);
+#verovio-panel .highlighted,
+#verovio-panel .highlighted g {
+  color: var(--highlightColor) !important;
+  fill: var(--highlightColor) !important;
 }
 
 #verovio-panel g.highlighted,
 #verovio-panel text.highlighted {
-  fill: var(--highlightColor);
-  fill-opacity: 100%;
+  fill: var(--highlightColor) !important;
+  fill-opacity: 100% !important;
 }
 
 #facsimile-panel rect.highlighted {
@@ -950,25 +950,23 @@ svg text {
 }
 
 #verovio-panel g.supplied g {
-  fill: var(--suppliedColor);
-  color: var(--suppliedColor);
-  stroke: var(--suppliedColor);
+  fill: var(--suppliedColor) !important;
+  color: var(--suppliedColor) !important;
 }
 
 #verovio-panel .supplied .highlighted {
-  color: var(--suppliedHighlightedColor);
-  stroke: var(--suppliedHighlightedColor);
+  color: var(--suppliedHighlightedColor) !important;
+  fill: var(--suppliedHighlightedColor) !important;
 }
 
 #verovio-panel g.supplied g.highlighted {
-  fill: var(--suppliedHighlightedColor);
+  fill: var(--suppliedHighlightedColor) !important;
 }
 
-#verovio-panel:not(g[color]g[fill]),
-#verovio-panel path {
+/* #verovio-panel g:not(g[color]):not(g[fill]) { */
+#verovio-panel, #verovio-panel path {
   fill: var(--notationColor);
   color: var(--notationColor);
-  stroke: var(--notationColor);
 }
 
 #facsimile-panel rect {
