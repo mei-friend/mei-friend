@@ -1,11 +1,12 @@
 # mei-friend-online CHANGELOG.md
 
-## 1.0.0 Version 1.0 release
+## 1.0.0 Version 1.0 (released 4 September 2023)
 * Delete notes, chords, rests (together with enclosing elements such as beams, tuplets, as well as elements pointing towards them, such as a slur through `@startid` or `@endid`) (#37)
 * Move notes in pitch chromatically (`SHIFT + UP/DOWN`) with adding sharps when going upwards and flats when going downwards (enhancement #36)
 * Provide menu items and keyboard shortcuts to insert accidentals (+, -, =) (feature request #35)
 * Fix bug that prevented encoded @color to be shown (#34)
 * Fix bug that prevented MEI and SVG download in Safari (#33)
+* Implement loading of Web Annotations using DataCatalog discovery model
 
 ### 0.10.4
 * Add UI panel inside editor panel to check and interactively fix all occurrences of @accid.ges against key signature, measure-wise accids, ties, and redundant information.
