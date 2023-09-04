@@ -3,10 +3,16 @@ verovio
 gunicorn-log.conf 
 app/static/CodeMirror
 app/static/lib/env.js
-app/static/npm/
+app/static/npm/package-lock.json
+app/static/npm/node_modules/**/*
+!app/static/npm/node_modules/@inrupt
+!app/static/npm/node_modules/@inrupt/solid-client-authn-browser
+!app/static/npm/node_modules/@inrupt/solid-client-authn-browser/dist
+!app/static/npm/node_modules/@inrupt/solid-client-authn-browser/dist/solid-client-authn.bundle.js
 .DS_Store
 .env
 venv
 *.swp
 app/__pycache__
+__pycache__
 tmp

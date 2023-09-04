@@ -14,6 +14,7 @@ export const supportedLanguages = {
     es: 'Espanyol',
     fr: 'Francès',
     it: 'Italià',
+    pl: 'Polonès',
   },
   de: {
     ca: 'Katalanisch',
@@ -22,6 +23,7 @@ export const supportedLanguages = {
     es: 'Spanisch',
     fr: 'Französisch',
     it: 'Italienisch',
+    pl: 'Polnisch',
   },
   en: {
     ca: 'Catalan',
@@ -30,6 +32,7 @@ export const supportedLanguages = {
     es: 'Spanish',
     fr: 'French',
     it: 'Italian',
+    pl: 'Polish',
   },
   es: {
     ca: 'Catalán',
@@ -38,6 +41,7 @@ export const supportedLanguages = {
     es: 'Español',
     fr: 'Francés',
     it: 'Italiano',
+    pl: 'Polaco',
   },
   fr: {
     ca: 'Catalan',
@@ -46,6 +50,7 @@ export const supportedLanguages = {
     es: 'Espagnol',
     fr: 'Français',
     it: 'Italien',
+    pl: 'Polonais',
   },
   it: {
     ca: 'Catalano',
@@ -54,6 +59,16 @@ export const supportedLanguages = {
     es: 'Spagnolo',
     fr: 'Francese',
     it: 'Italiano',
+    pl: 'Polacco',
+  },
+  pl: {
+    ca: 'Kataloński',
+    de: 'Niemiecki',
+    en: 'Angielski',
+    es: 'Hiszpański',
+    fr: 'Francuski',
+    it: 'Włoski',
+    pl: 'Polski',
   },
 };
 
@@ -132,7 +147,8 @@ supportedVerovioVersions['3.16.0'] = {
   url: 'https://www.verovio.org/javascript/3.16.0/verovio-toolkit-hum.js',
   description: 'Verovio release 3.16.0',
   releaseDate: '3 July 2023',
-};supportedVerovioVersions['3.15.0'] = {
+};
+supportedVerovioVersions['3.15.0'] = {
   url: 'https://www.verovio.org/javascript/3.15.0/verovio-toolkit-hum.js',
   description: 'Verovio release 3.15.0',
   releaseDate: '1 Mar 2023',
@@ -304,13 +320,13 @@ export const meiFriendSettingsOptions = {
     title: 'Select placement elements ',
     description: 'filled in by language packs',
     type: 'bool',
-    default: false,
+    default: true,
   },
   dragSelectSlurs: {
     title: 'Select slurs ',
     description: 'filled in by language packs',
     type: 'bool',
-    default: false,
+    default: true,
   },
   dragSelectMeasures: {
     title: 'Select measures ',
@@ -388,11 +404,18 @@ export const meiFriendSettingsOptions = {
   },
   highlightCurrentlySoundingNotes: {
     title: 'Highlight currently-sounding notes',
-    description: 'filled in by language packs',
+    description: 'Visually highlight currently-sounding notes in the notation panel during MIDI playback ',
     type: 'bool',
     default: true,
   },
-  // Transposition
+  selectMidiExpansion: {
+    title: 'Playback expansion',
+    description: 'Select expansion element to be used for MIDI playback',
+    type: 'select',
+    values: ['none'],
+    // valuesDescriptions: ['note-0000001018877033', 'n34z4wz2', 'note-34z4wz2'],
+    default: 'none',
+  },
   titleTransposition: {
     title: 'Transpose',
     description: 'filled in by language packs',
@@ -614,7 +637,7 @@ export const meiFriendSettingsOptions = {
   },
   enableGithubActions: {
     title: 'Show available GitHub Actions',
-    description: 'List available GitHub Actions when navigating within repository in GitHub menu', 
+    description: 'List available GitHub Actions when navigating within repository in GitHub menu',
     type: 'bool',
     default: false,
   },
@@ -727,6 +750,12 @@ export const codeMirrorSettingsOptions = {
     description: 'Validate encoding against schema automatically after each edit',
     type: 'bool',
     default: true,
+  },
+  autoShowValidationReport: {
+    title: 'Auto show validation report',
+    description: 'Show validation report automatically after validation has been performed',
+    type: 'bool',
+    default: false,
   },
   autoCloseBrackets: {
     title: 'Auto close brackets',

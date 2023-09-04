@@ -56,6 +56,8 @@ export function setOrientation(cm, _notationOrientation = '', _facsimileOrientat
   const annotationPanel = document.getElementById('annotationPanel');
   const showAnnotationPanelCheckbox = document.getElementById('showAnnotationPanel');
   const showFacsimile = document.getElementById('showFacsimilePanel').checked;
+  const codeChecker = document.getElementById('codeChecker');
+  const codeCheckerHeight = codeChecker.getBoundingClientRect().height;
   let sz = calcSizeOfContainer(); // friendContainer
   // console.log('setOrientation(' + _notationOrientation + ') container size:', sz);
 
@@ -77,7 +79,7 @@ export function setOrientation(cm, _notationOrientation = '', _facsimileOrientat
     }
     notationDiv.style.width = sz.width; //- 6; // TODO: remove when border removed
     notationDiv.style.height = sz.height * notationProportion;
-    cm.setSize(sz.width, sz.height * (1 - notationProportion) - notationResizerWidth);
+    cm.setSize(sz.width, sz.height * (1 - notationProportion) - notationResizerWidth - codeCheckerHeight);
   }
   if (notationOrientation === 'left' || notationOrientation === 'right') {
     if (showAnnotationPanelCheckbox && showAnnotationPanelCheckbox.checked) {
@@ -90,7 +92,7 @@ export function setOrientation(cm, _notationOrientation = '', _facsimileOrientat
     }
     notationDiv.style.width = Math.ceil(sz.width * notationProportion);
     notationDiv.style.height = sz.height; //- 6; TODO: remove when border removed
-    cm.setSize(Math.floor(sz.width * (1 - notationProportion) - notationResizerWidth), sz.height);
+    cm.setSize(sz.width * (1 - notationProportion) - notationResizerWidth, sz.height - codeCheckerHeight);
   }
   friendSz.style.width = sz.width;
   friendSz.style.maxWidth = sz.width;
@@ -237,8 +239,9 @@ export function addNotationResizerHandlers(v, cm) {
     const dx = e.clientX - x;
     const dy = e.clientY - y;
     let sz = resizer.parentNode.getBoundingClientRect();
-    let szSz = resizer.getBoundingClientRect();
-    // console.log("Mouse move dx/dy: " + dx + "/" + dy + ', Container: ' + sz.width + '/' + sz.height);
+    const codeChecker = document.getElementById('codeChecker');
+    const codeCheckerHeight = codeChecker.getBoundingClientRect().height;
+      // console.log("Mouse move dx/dy: " + dx + "/" + dy + ', Container: ' + sz.width + '/' + sz.height);
     switch (notationOrientation) {
       case 'top':
         notationProportion = (notationSize + dy) / sz.height;
@@ -260,7 +263,7 @@ export function addNotationResizerHandlers(v, cm) {
       case 'top':
       case 'bottom':
         notation.style.height = notationProportion * sz.height;
-        cm.setSize(sz.width, sz.height * (1 - notationProportion) - notationResizerWidth);
+        cm.setSize(sz.width, sz.height * (1 - notationProportion) - notationResizerWidth - codeCheckerHeight);
         if (
           document.getElementById('showFacsimilePanel').checked &&
           (facsimileOrientation === 'top' || facsimileOrientation === 'bottom')
@@ -273,7 +276,7 @@ export function addNotationResizerHandlers(v, cm) {
       case 'left':
       case 'right':
         notation.style.width = notationProportion * sz.width;
-        cm.setSize(sz.width * (1 - notationProportion) - notationResizerWidth, sz.height);
+        cm.setSize(sz.width * (1 - notationProportion) - notationResizerWidth, sz.height - codeCheckerHeight);
         if (
           document.getElementById('showFacsimilePanel').checked &&
           (facsimileOrientation === 'left' || facsimileOrientation === 'right')

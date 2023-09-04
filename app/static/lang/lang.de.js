@@ -51,6 +51,7 @@ export const lang = {
   surroundWithTagsText: { text: 'Mit Tags umschließen' },
   surroundWithLastTagText: { text: 'Umschließen mit ' },
   jumpToLineText: { text: 'Zu Zeile gehen' },
+  toMatchingTagText: { text: 'Zum passenden Tag gehen' },
   manualValidateText: { text: 'Validieren' },
 
   // VIEW MENU ITEM
@@ -74,15 +75,17 @@ export const lang = {
   betweenPlacementText: { text: 'Platzierung dazwischen' },
   addVerticalGroupText: { text: 'Vertikale Gruppe hinzufügen' },
   deleteText: { text: 'Element löschen' },
-  pitchUpText: { text: 'Tonhöhe um Halbton höher' },
-  pitchDownText: { text: 'Tonhöhe um Halbton niedriger' },
+  pitchChromUpText: { text: 'Tonhöhe chromatisch höher' },
+  pitchChromDownText: { text: 'Tonhöhe chromatisch niedriger' },
+  pitchUpDiatText: { text: 'Tonhöhe diatonisch höher' },
+  pitchDownDiatText: { text: 'Tonhöhe diatonisch niedriger' },
   pitchOctaveUpText: { text: 'Tonhöhe eine Oktave höher' },
   pitchOctaveDownText: { text: 'Tonhöhe eine Oktave niedriger' },
   staffUpText: { text: 'Element eine Notenzeile höher' },
   staffDownText: { text: 'Element eine Notenzeile niedriger' },
   increaseDurText: { text: 'Notendauer erhöhen' },
   decreaseDurText: { text: 'Notendauer verringern' },
-  cleanAccidText: { text: '@accid.ges putzen' },
+  cleanAccidText: { text: '@accid.ges überprüfen' },
   renumberMeasuresTestText: { text: ' Takte neu nummerieren (test)' },
   renumberMeasuresExecText: { text: ' Takte neu nummerieren (exec)' },
   addIdsText: { text: 'Ids zu MEI hinzufügen' },
@@ -93,6 +96,11 @@ export const lang = {
 
   // INSERT MENU ITEM
   insertMenuTitle: { text: 'Einfügen' },
+  addDoubleSharpText: { html: 'Doppelkreuz &#119082;' },
+  addSharpText: { html: 'Kreuz &#9839;' },
+  addNaturalText: { html: 'Auflösungszeichen &#9838;' },
+  addFlatText: { html: 'Einfaches b &#9837;' },
+  addDoubleFlatText: { html: 'Doppel-b &#119083;' },
   addTempoText: { text: 'Tempo' },
   addDirectiveText: { text: 'Spielanweisung' },
   addDynamicsText: { text: 'Dynamik' },
@@ -105,7 +113,7 @@ export const lang = {
   addSuppliedText: { text: 'Supplied' },
   addSuppliedArticText: { text: 'Supplied (Artic)' },
   addSuppliedAccidText: { text: 'Supplied (Accid)' },
-  addArpeggioText: { text: 'Arepggio' },
+  addArpeggioText: { text: 'Arpeggio' },
   addFermataText: { text: 'Fermate' },
   addGlissandoText: { text: 'Glissando' },
   addPedalDownText: { text: 'Pedal drücken' },
@@ -135,9 +143,10 @@ export const lang = {
   // HELP MENU ITEM
   helpMenuTitle: { text: 'Hilfe' },
   goToHelpPage: { text: 'mei-friend Hilfeseiten' },
-  showChangelog: { text: 'mei-friend Änderungsliste anzeigen' },
-  goToGuidelines: { text: 'MEI Guidelines anzeigen' },
-  consultGuidelinesForElementText: { text: 'Guidelines für aktuelles Element anzeigen' },
+  goToCheatSheet: {text: 'mei-friend Spickzettel'},
+  showChangelog: { text: 'mei-friend Änderungsliste (changelog)' },
+  goToGuidelines: { text: 'MEI Guidelines' },
+  consultGuidelinesForElementText: { text: 'Guideline-Eintrag für aktuelles Element' },
   provideFeedback: { text: 'Feedback geben' },
   resetDefault: { text: 'Auf Standardwerte zurücksetzen' },
 
@@ -270,6 +279,22 @@ export const lang = {
   openUrlChooseComposerText: { text: 'Komponist auswählen...' },
   openUrlOpenEncodingByUrlText: { text: 'Im Web gehostete Kodierung per URL öffnen' },
 
+  // GitHub actions modal
+  githubActionsHeadingText: { text: 'GitHub-Action-Workflow anfordern:' },
+  githubActionsDescription: {
+    text: 'Klicken Sie auf "Workflow ausführen", um die GitHub-API aufzufordern, den oben genannten Workflow anhand der unten angegebenen Eingabekonfiguration für Sie auszuführen. Ihre Codierung wird nach Abschluss des Workflow-Laufs in ihrer neuesten Version neu geladen. ',
+  },
+  githubActionStatusMsgPrompt: { text: 'Workflow konnte nicht ausgeführt werden - GitHub meldet' },
+  githubActionStatusMsgWaiting: { text: 'Bitte haben Sie Geduld, während GitHub Ihren Workflow verarbeitet...' },
+  githubActionStatusMsgFailure: { text: 'Workflow konnte nicht ausgeführt werden - GitHub meldet' },
+  githubActionStatusMsgSuccess: { text: 'Workflow-Lauf abgeschlossen - GitHub meldet' },
+  githubActionsRunButton: { text: 'Workflow ausführen' },
+  githubActionsRunButtonReload: { text: 'MEI-Datei neu laden' },
+  githubActionsCancelButton: { text: 'Abbrechen' },
+  githubActionsInputSetterFilepath: { text: 'Aktuellen Dateipfad in Eingabe kopieren' },
+  githubActionsInputSetterSelection: { text: 'Aktuelle MEI-Auswahl in Eingabe kopieren' },
+  githubActionsInputContainerHeader: { text: 'Eingabekonfiguration' },
+
   // fork modals
   forkRepoGithubText: { text: 'Github Repositorium Forken' },
   forkRepoGithubExplanation: {
@@ -310,13 +335,35 @@ export const lang = {
   selectTagNameForEnclosureOkButton: { value: 'OK' },
   selectTagNameForEnclosureCancelButton: { value: 'Abbrechen' },
 
+  // restore Solid session overlay
+  solidExplanation: {
+    description:
+      'Solid ist eine dezentrale Plattform für soziale verknüpfte Daten. Melden Sie sich bei Solid an, um Stand-off-Anmerkungen unter Verwendung von verknüpften Daten (RDF) zu erstellen.',
+  },
+  solidProvider: {
+    description: 'Bitte wählen Sie einen Solid-Identitätsanbieter (IdP) aus oder geben Sie Ihren eigenen an.',
+  },
+  solidLoginBtn: { text: 'Anmelden' },
+
+  solidOverlayCancel: {
+    html: 'Solid-Sitzung wird wiederhergestellt - drücken Sie <span>Esc</span> oder klicken Sie hier, um abzubrechen.',
+  },
+  solidWelcomeMsg: { text: 'Willkommen, ' },
+  solidLogout: { text: 'Abmelden' },
+  solidLoggedOutWarning: {
+    html: `Du hast dich von der Solid-Integration von mei-friend abgemeldet, aber dein Browser ist immer noch bei Solid angemeldet!
+      <a id="solidIdPLogoutLink" target="_blank">Klicke hier, um dich bei Solid abzumelden</a>.`,
+  },
+
   // annotation panel
   annotationCloseButtonText: { text: 'Panel für Annotationen schließen' },
   hideAnnotationPanelButton: { description: 'Panel für Annotationen schließen' },
   closeAnnotationPanelButton: { description: 'Panel für Annotationen schließen' },
-  annotationToolsButton: { text: 'Werkzeuge', description: 'Annotationswerkzeuge' },
+  annotationToolsButton: { text: 'Tools', description: 'Annotationswerkzeuge' },
   annotationListButton: { text: 'Liste', description: 'Annotationen auflisten' },
   writeAnnotStandoffText: { text: 'Web Annotationen' },
+  annotationToolsIdentifyTitle: { text: 'Identifizieren' },
+  annotationToolsIdentifySpan: { text: 'Musikalisches Objekt identifizieren' },
   annotationToolsHighlightTitle: { text: 'Hervorheben' },
   annotationToolsHighlightSpan: { text: 'Hervorheben' },
   annotationToolsDescribeTitle: { text: 'Beschreiben' },
@@ -333,9 +380,9 @@ export const lang = {
   deleteAnnotation: { description: 'Diese Annotation löschen' },
   deleteAnnotationConfirmation: { text: 'Diese Annotation wirklich löschen?' },
   makeStandOffAnnotation: {
-    description: 'Stand-off-Status (Web-Annotation)',
-    descriptionSolid: 'Als Web-Annotation zu Solid schreiben',
-    descriptionToLocal: 'Web-Annotation-URI in die Zwischenablage kopieren',
+    description: 'Stand-off-Status (RDF)',
+    descriptionSolid: 'Als RDF in Solid schreiben',
+    descriptionToLocal: 'Stand-off- (RDF) Annotation in neuem Tab öffnen',
   },
   makeInlineAnnotation: {
     description: 'Auf Inline-Annotation klicken',
@@ -505,6 +552,11 @@ export const lang = {
     text: 'Klingende Noten hervorheben',
     description: 'Aktuell klingende Noten im Notationsfeld visuell hervorheben',
   },
+  selectMidiExpansion: {
+    text: 'Expansion für Wiedergabe',
+    description: 'Wählen Sie das expansion-Element aus, das für die MIDI-Wiedergabe verwendet werden soll',
+  },
+
   // Transposition
   titleTransposition: {
     text: 'Transposition',
@@ -726,6 +778,10 @@ export const lang = {
     text: 'Automatische Validatierung',
     description: 'Automatische Validierung der Kodierung nach jeder Eingabe',
   },
+  autoShowValidationReport: {
+    text: 'Validierungsbericht automatisch anzeigen',
+    description: 'Validierungsbericht automatisch anzeigen, nachdem eine Validierung durchgeführt wurde.',
+  },
   autoCloseBrackets: {
     text: 'Klammern schließen',
     description: 'Klammern automatisch schließen',
@@ -828,4 +884,29 @@ export const lang = {
   renumberMeasuresWouldBe: { text: 'würde' },
   renumberMeasuresChangedTo: { text: 'geändert in' },
   renumberMeasureMeasuresRenumbered: { text: 'Takte nummeriert' },
+
+  // Code checker @accid.ges
+  codeCheckerTitle: { text: 'Alle @accid.ges-Attribute auf Tonart, taktweise Vorzeichen und Bindebögen überprüfen.' },
+  codeCheckerFix: { text: 'Korrigieren' },
+  codeCheckerFixAll: { text: 'Alle korrigieren' },
+  codeCheckerIgnore: { text: 'Ignorieren' },
+  codeCheckerIgnoreAll: { text: 'Alle ignorieren' },
+  codeCheckerCheckingCode: { text: 'Überprüfe Codierung...' },
+  codeCheckerNoAccidMessagesFound: { text: 'Alle accid.ges-Attribute sind korrekt.' },
+  codeCheckerMeasure: { text: 'Takt' },
+  codeCheckerNote: { text: 'Note' },
+  codeCheckerHasBoth: { text: 'hat' },
+  codeCheckerAnd: { text: 'und' },
+  codeCheckerRemove: { text: 'Entferne' },
+  codeCheckerFixTo: { text: 'Korrigiere zu' },
+  codeCheckerAdd: { text: 'Füge hinzu' },
+  codeCheckerWithContradictingContent: { text: 'mit unterschiedlichem Inhalt' },
+  codeCheckerTiedNote: { text: 'Gebundene Note' },
+  codeCheckerNotSamePitchAs: { text: 'nicht gleiche Tonhöhe wie' },
+  codeCheckerNotSameOctaveAs: { text: 'nicht gleiche Oktave wie' },
+  codeCheckerNotSameAsStartingNote: { text: 'abweichend von erster Note in Bindung' },
+  codeCheckerExtra: { text: 'extra' }, // superfluous
+  codeCheckerHasExtra: { text: 'hat extra' }, // has superfluous
+  codeCheckerLacksAn: { text: 'vermisst einen' },
+  codeCheckerBecauseAlreadyDefined: { text: 'weil es im gleichen Takt bereits definiert wurde' },
 };

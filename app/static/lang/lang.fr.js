@@ -54,6 +54,7 @@ export const lang = {
   surroundWithTagsText: { text: 'Entourer de tags' },
   surroundWithLastTagText: { text: 'Entourer de ' },
   jumpToLineText: { text: 'Aller à la ligne' },
+  toMatchingTagText: { text: 'Aller au tag correspondant' },
   manualValidateText: { text: 'Valider' },
 
   // VIEW MENU ITEM / ELEMENT DE MENU AFFICHAGE
@@ -77,15 +78,17 @@ export const lang = {
   betweenPlacementText: { text: 'Placement entre deux' },
   addVerticalGroupText: { text: 'Ajouter un groupe vertical' },
   deleteText: { text: "Supprimer l'élément" },
-  pitchUpText: { text: "Monter d'un ton" },
-  pitchDownText: { text: "Descendre d'un ton" },
+  pitchChromUpText: { text: 'Monter chromatique' },
+  pitchChromDownText: { text: 'Descendre chromatique' },
+  pitchUpDiatText: { text: 'Monter diatonique' },
+  pitchDownDiatText: { text: 'Descendre diatonique' },
   pitchOctaveUpText: { text: "Monter d'une octave" },
   pitchOctaveDownText: { text: "Descendre d'une octave" },
   staffUpText: { text: "Élément d'un personnel vers le haut" },
   staffDownText: { text: "Élément d'un personnel vers le bas" },
   increaseDurText: { text: 'Augmenter la durée' },
   decreaseDurText: { text: 'Réduire la durée' },
-  cleanAccidText: { text: 'Nettoyer les @accid.ges' },
+  cleanAccidText: { text: 'Vérifier les @accid.ges' },
   renumberMeasuresTestText: { text: 'Renommer les mesures (test)' },
   renumberMeasuresExecText: { text: 'Renommer les mesures (exécution)' },
   addIdsText: { text: 'Ajouter des identifiants à MEI' },
@@ -96,6 +99,11 @@ export const lang = {
 
   // INSERT MENU ITEM  ELEMENT DE MENU INSERTION
   insertMenuTitle: { text: 'Insérer' },
+  addDoubleSharpText: { html: 'Double dièse &#119082;' },
+  addSharpText: { html: 'Dièse &#9839;' },
+  addNaturalText: { html: 'Bécarre &#9838;' },
+  addFlatText: { html: 'Bémol &#9837;' },
+  addDoubleFlatText: { html: 'Double bémol &#119083;' },
   addTempoText: { text: 'Tempo' },
   addDirectiveText: { text: 'Directive' },
   addDynamicsText: { text: 'Dynamique' },
@@ -138,9 +146,10 @@ export const lang = {
   // HELP MENU ITEM / ÉLÉMENT DE MENU D'AIDE
   helpMenuTitle: { text: 'Aide' },
   goToHelpPage: { text: "Pages d'aide de mei-friend" },
-  showChangelog: { text: 'Afficher le journal des modifications de mei-friend' },
-  goToGuidelines: { text: 'Afficher les lignes directrices MEI' },
-  consultGuidelinesForElementText: { text: "Consulter les lignes directrices pour l'élément actuel" },
+  goToCheatSheet: { text: 'Antisèche de mei-friend' },
+  showChangelog: { text: 'Journal des modifications de mei-friend' },
+  goToGuidelines: { text: 'Lignes directrices MEI' },
+  consultGuidelinesForElementText: { text: "Lignes directrices pour l'élément actuel" },
   provideFeedback: { text: 'Fournir des commentaires' },
   resetDefault: { text: 'Réinitialiser par défaut' },
 
@@ -274,6 +283,22 @@ export const lang = {
   openUrlChooseComposerText: { text: 'Choisissez un compositeur...' },
   openUrlOpenEncodingByUrlText: { text: 'Ouvrir une encodage hébergée sur le Web via une URL' },
 
+  // Modal GitHub actions
+  githubActionsHeadingText: { text: 'Demander le flux de travail GitHub :' },
+  githubActionsDescription: {
+    text: "Cliquez sur \"Exécuter le flux de travail\" pour demander à l'API GitHub d'exécuter le flux de travail ci-dessus pour vous, en utilisant la configuration d'entrée spécifiée ci-dessous. Votre encodage sera rechargé dans sa dernière version une fois que l'exécution du flux de travail sera terminée.",
+  },
+  githubActionStatusMsgPrompt: { text: "Impossible d'exécuter le flux de travail - GitHub dit :" },
+  githubActionStatusMsgWaiting: { text: 'Veuillez patienter pendant que GitHub traite votre flux de travail...' },
+  githubActionStatusMsgFailure: { text: "Impossible d'exécuter le flux de travail - GitHub dit :" },
+  githubActionStatusMsgSuccess: { text: 'Exécution du flux de travail terminée - GitHub dit :' },
+  githubActionsRunButton: { text: 'Exécuter le flux de travail' },
+  githubActionsRunButtonReload: { text: 'Recharger le fichier MEI' },
+  githubActionsCancelButton: { text: 'Annuler' },
+  githubActionsInputSetterFilepath: { text: "Copier le chemin du fichier actuel dans l'entrée" },
+  githubActionsInputSetterSelection: { text: "Copier la sélection MEI actuelle dans l'entrée" },
+  githubActionsInputContainerHeader: { text: "Configuration d'entrée" },
+
   // fork modals / fenêtres modales de fork
   forkRepoGithubText: { text: 'Créer une copie du dépôt Github' },
   forkRepoGithubExplanation: {
@@ -308,6 +333,24 @@ export const lang = {
   selectTagNameForEnclosureOkButton: { value: 'OK' },
   selectTagNameForEnclosureCancelButton: { value: 'Annuller' },
 
+  // restore Solid session overlay
+  solidExplanation: {
+    description:
+      'Solid est une plateforme décentralisée pour les données liées sociales. Connectez-vous à Solid pour créer des annotations stand-off en utilisant des données liées (RDF).',
+  },
+  solidProvider: { description: "Veuillez choisir un fournisseur d'identité Solid (IdP) ou spécifier le vôtre." },
+  solidLoginBtn: { text: 'Se connecter' },
+
+  solidOverlayCancel: {
+    html: 'Restauration de la session Solid - appuyez sur <span>Esc</span> ou cliquez ici pour annuler.',
+  },
+  solidWelcomeMsg: { text: 'Bienvenue, ' },
+  solidLogout: { text: 'Déconnectez-vous' },
+  solidLoggedOutWarning: {
+    html: `Vous vous êtes déconnecté de l'intégration Solid de mei-friend, mais votre navigateur est toujours connecté à Solid !
+      <a id="solidIdPLogoutLink" target="_blank">Cliquez ici pour vous déconnecter de Solid</a>.`,
+  },
+
   // annotation panel / panneau d'annotation
   annotationCloseButtonText: { text: "Fermer le panneau d'annotations" },
   hideAnnotationPanelButton: { description: "Fermer le panneau d'annotations" },
@@ -315,6 +358,8 @@ export const lang = {
   annotationToolsButton: { text: 'Outils', description: "Outils d'annotation" },
   annotationListButton: { text: 'Liste', description: 'Liste des annotations' },
   writeAnnotStandoffText: { text: 'Annotation Web' },
+  annotationToolsIdentifyTitle: { text: 'Identifier' },
+  annotationToolsIdentifySpan: { text: 'Identifier un objet musical' },
   annotationToolsHighlightTitle: { text: 'Surligner' },
   annotationToolsHighlightSpan: { text: 'Surligner' },
   annotationToolsDescribeTitle: { text: 'Décrire' },
@@ -331,9 +376,9 @@ export const lang = {
   deleteAnnotation: { description: 'Supprimer cette annotation' },
   deleteAnnotationConfirmation: { text: 'Êtes-vous sûr de vouloir supprimer cette annotation ?' },
   makeStandOffAnnotation: {
-    description: 'Statut stand-off (Annotation Web)',
-    descriptionSolid: "Écrire sur Solid en tant qu'annotation web",
-    descriptionToLocal: "Copier l'URI d'annotation web dans le presse-papiers",
+    description: 'Statut stand-off (RDF)',
+    descriptionSolid: 'Écrire sur Solid en RDF',
+    descriptionToLocal: "Ouvrir l'annotation stand-off (RDF) dans un nouvel onglet",
   },
   makeInlineAnnotation: {
     description: 'Cliquez pour une annotation en ligne',
@@ -509,6 +554,10 @@ export const lang = {
     text: 'Surligner les notes actuellement en train de sonner',
     description:
       'Surligner visuellement les notes actuellement en train de sonner dans le panneau de notation pendant la lecture MIDI',
+  },
+  selectMidiExpansion: {
+    text: 'Extension de lecture',
+    description: "Sélectionnez l'élément d'extension à utiliser pour la lecture MIDI",
   },
 
   // Transposition // Transposition
@@ -727,6 +776,10 @@ export const lang = {
     text: 'Validation automatique',
     description: "Valide automatiquement l'encodage par rapport au schéma après chaque édition",
   },
+  autoShowValidationReport: {
+    text: 'Afficher le rapport de validation automatiquement',
+    description: 'Afficher automatiquement le rapport de validation après que la validation a été effectuée',
+  },
   autoCloseBrackets: {
     text: 'Fermeture automatique des crochets',
     description: "Ferme automatiquement les crochets à l'entrée",
@@ -833,4 +886,31 @@ export const lang = {
   renumberMeasuresWouldBe: { text: 'serait' },
   renumberMeasuresChangedTo: { text: 'changé en' },
   renumberMeasureMeasuresRenumbered: { text: 'mesures renommées' },
+
+  // Code checker panel (accid.ges)
+  codeCheckerTitle: {
+    text: 'Vérifiez les attributs @accid.ges (par rapport à la signature de clé, les accid. par mesure et les liaisons).',
+  },
+  codeCheckerFix: { text: 'Corriger' },
+  codeCheckerFixAll: { text: 'Tout corriger' },
+  codeCheckerIgnore: { text: 'Ignorer' },
+  codeCheckerIgnoreAll: { text: 'Tout ignorer' },
+  codeCheckerCheckingCode: { text: 'Vérification du code en cours...' },
+  codeCheckerNoAccidMessagesFound: { text: 'Tous les attributs accid.ges semblent corrects.' },
+  codeCheckerMeasure: { text: 'Mesure' },
+  codeCheckerNote: { text: 'Note' },
+  codeCheckerHasBoth: { text: 'possède les deux' },
+  codeCheckerAnd: { text: 'et' },
+  codeCheckerRemove: { text: 'Retirer' },
+  codeCheckerFixTo: { text: 'Corriger à' },
+  codeCheckerAdd: { text: 'Ajouter' },
+  codeCheckerWithContradictingContent: { text: 'avec un contenu contradictoire' },
+  codeCheckerTiedNote: { text: 'Note liée' },
+  codeCheckerNotSamePitchAs: { text: 'pas la même hauteur que' },
+  codeCheckerNotSameOctaveAs: { text: 'pas le même octave que' },
+  codeCheckerNotSameAsStartingNote: { text: 'pas identique à la note de départ' },
+  codeCheckerExtra: { text: 'supplémentaire' },
+  codeCheckerHasExtra: { text: 'possède un élément supplémentaire' },
+  codeCheckerLacksAn: { text: "manque d'un" },
+  codeCheckerBecauseAlreadyDefined: { text: 'car il a été défini plus tôt dans la mesure' },
 };

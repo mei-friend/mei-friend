@@ -1,6 +1,6 @@
 // mei-friend version and date
-export const version = '0.9.1-p';
-export const versionDate = '7 August 2023'; // use full or 3-character english months, will be translated
+export const version = '1.0.0';
+export const versionDate = '4 September 2023'; // use full or 3-character english months, will be translated
 
 var vrvWorker;
 var spdWorker;
@@ -10,6 +10,8 @@ var breaksParam; // (string) the breaks parameter given through URL
 var pageParam; // (int) page parameter given through URL
 var selectParam; // (array) select ids given through multiple instances in URL
 let safariWarningShown = false; // show Safari warning only once
+let restoreSolidTimeout; // JS timeout that allows users to 'esc' before restoring solid session
+const restoreSolidTimeoutDelay = 1500; // how long to wait for above timeout, in ms
 
 // exports
 export var cm;
@@ -49,7 +51,14 @@ import {
   setNotationProportion,
   setOrientation,
 } from './resizer.js';
-import { addAnnotationHandlers, clearAnnotations, readAnnots, refreshAnnotations } from './annotation.js';
+import {
+  addAnnotationHandlers,
+  clearAnnotations,
+  getSolidIdP,
+  readAnnots,
+  refreshAnnotations,
+  populateSolidTab,
+} from './annotation.js';
 import { dropHandler, dragEnter, dragOverHandler, dragLeave } from './dragger.js';
 import { openUrl, openUrlCancel } from './open-url.js';
 import {
@@ -70,6 +79,7 @@ import {
   requestPlaybackOnLoad,
   seekMidiPlaybackToSelectionOrPage,
   seekMidiPlaybackToTime,
+  setExpansionMap,
   setTimemap,
   startMidiTimeout,
 } from './midi-player.js';
@@ -78,6 +88,7 @@ import * as e from './editor.js';
 import Viewer from './viewer.js';
 import * as speed from './speed.js';
 import Github from './github.js';
+import { loginAndFetch, solid } from './solid.js';
 import Storage from './storage.js';
 import { fillInBranchContents, logoutFromGithub, refreshGithubMenu, setCommitUIEnabledStatus } from './github-menu.js';
 import { forkAndOpen, forkRepositoryCancel } from './fork-repository.js';
@@ -106,6 +117,7 @@ import {
 import Translator from './translator.js';
 import { buildLanguageSelection, translateLanguageSelection } from './language-selector.js';
 import { runLanguageChecks } from '../tests/checkLangs.js';
+import * as expansionMap from './expansion-map.js';
 
 const defaultCodeMirrorOptions = {
   lineNumbers: true,
@@ -132,6 +144,7 @@ const defaultCodeMirrorOptions = {
     'Ctrl-Space': 'autocomplete',
     'Alt-.': consultGuidelines,
     'Shift-Alt-f': indentSelection,
+    'Shift-Ctrl-G': toMatchingTag,
     "'Ï'": indentSelection, // TODO: overcome strange bindings on MAC
     'Cmd-E': encloseSelectionWithTag, // TODO: make OS modifier keys dynamic
     'Ctrl-E': encloseSelectionWithTag,
@@ -212,6 +225,10 @@ export function setMeiFileInfo(fName, fLocation, fLocationPrintable) {
   meiFileLocationPrintable = fLocationPrintable;
 }
 
+export function setFileLocationType(t) {
+  fileLocationType = t; // wrap in function to facilitate external setting
+}
+
 export function updateFileStatusDisplay() {
   document.querySelector('#fileName').innerText = meiFileName.substring(meiFileName.lastIndexOf('/') + 1);
   document.querySelector('#fileLocation').innerText = meiFileLocationPrintable || '';
@@ -236,6 +253,7 @@ export function loadDataInEditor(mei, setFreshlyLoaded = true) {
     else bs.value = v.containsBreaks() ? 'line' : 'auto';
   }
   v.setRespSelectOptions();
+  v.setMidiExpansionOptions();
   v.setMenuColors();
   if (!isSafari) {
     // disable validation on Safari because of this strange error: "RangeError: Maximum call stack size exceeded" (WG, 1 Oct 2022)
@@ -249,12 +267,14 @@ export function loadDataInEditor(mei, setFreshlyLoaded = true) {
 export function updateLocalStorage(meiXml) {
   // if storage is available, save file name, location, content
   // if we're working with github, save github metadata
-  if (storage.supported && !storage.override) {
+  if (storage.supported) {
     try {
       storage.fileName = meiFileName;
       storage.fileLocation = meiFileLocation;
-      storage.content = meiXml;
       storage.isMEI = isMEI;
+      if (!storage.override) {
+        storage.content = meiXml;
+      }
       if (isLoggedIn) {
         updateGithubInLocalStorage();
       }
@@ -265,7 +285,7 @@ export function updateLocalStorage(meiXml) {
         err
       );
       setFileChangedState(fileChanged); // flags any storage-exceeded issues
-      storage.clear();
+      // storage.clear();
     }
   }
 }
@@ -285,12 +305,6 @@ export function updateGithubInLocalStorage() {
       userName: name,
       userEmail: email,
     };
-    storage.fileLocationType = 'github';
-    if (github.filepath) {
-    }
-  }
-  if (isLoggedIn && github.filepath) {
-    fileLocationType = 'github';
   }
 }
 
@@ -322,6 +336,14 @@ function completeIfInTag(cm) {
   });
 }
 
+/**
+ * Carries out code validation using validator.validateNG() and calls
+ * v.highlightValidation()
+ * @param {string} mei
+ * @param {Function} updateLinting
+ * @param {Object} options
+ * @returns
+ */
 export async function validate(mei, updateLinting, options) {
   if (options && mei) {
     // keep the callback (important for first call)
@@ -330,8 +352,6 @@ export async function validate(mei, updateLinting, options) {
     }
 
     if (v.validatorWithSchema && (document.getElementById('autoValidate').checked || options.forceValidate)) {
-      let reportDiv = document.getElementById('validation-report');
-      if (reportDiv) reportDiv.style.visibility = 'hidden';
       let vs = document.getElementById('validation-status');
       vs.innerHTML = clock;
       v.changeStatus(vs, 'wait', ['error', 'ok', 'manual']); // darkorange
@@ -347,7 +367,7 @@ export async function validate(mei, updateLinting, options) {
       }
       console.log(
         translator.lang.validationComplete.text + ': ',
-        validation === []
+        validation.length === 0
           ? translator.lang.noErrors.text + '.'
           : validation.length + ' ' + translator.lang.errorsFound.text + '.'
       );
@@ -356,7 +376,7 @@ export async function validate(mei, updateLinting, options) {
       v.setValidationStatusToManual();
     }
   }
-}
+} // validate()
 
 async function suspendedValidate(text, updateLinting, options) {
   // Do nothing...
@@ -389,7 +409,7 @@ function onLanguageLoaded() {
   // expose default language pack for debug
   if (env && env === environments.develop) {
     runLanguageChecks();
-    console.debug('Default language pack: ', JSON.stringify(translator.defaultLang, null, 2));
+    // console.debug('Default language pack: ', JSON.stringify(translator.defaultLang, null, 2));
   }
   // build language selection menu
   buildLanguageSelection();
@@ -423,6 +443,8 @@ function onLanguageLoaded() {
   let facsimileProportionParam = searchParams.get('facsimileProportion');
   pageParam = searchParams.get('page');
   let scaleParam = searchParams.get('scale');
+  let solidCodeParam = searchParams.get('code');
+  let solidStateParam = searchParams.get('state');
   // select parameter: both syntax versions allowed (also mixed):
   // ?select=note1,chord2,note3 and/or ?select=note1&select=chord2&select=note3
   selectParam = searchParams.getAll('select');
@@ -533,21 +555,62 @@ function onLanguageLoaded() {
   }
 
   let urlFileName = searchParams.get('file');
+
+  if (storage.supported && urlFileName) {
+    // write url filename to storage so we can act upon it later, e.g. on return from solid login
+    let url = new URL(urlFileName);
+    storage.safelySetStorageItem('fileLocation', url.href);
+    storage.safelySetStorageItem('fileName', url.pathname.substring(url.pathname.lastIndexOf('/') + 1));
+    storage.safelySetStorageItem('fileLocationType', 'url');
+    storage.read();
+    console.log('Have set local storage: ', storage);
+  }
+
+  if (storage.supported && storage.restoreSolidSession) {
+    // inform user they are about to restore their solid session
+    // and that they can press 'esc' to stop (see generalized esc handler)
+    let solidOverlay = document.getElementById('solidOverlay');
+    solidOverlay.classList.add('active');
+    solidOverlay.tabIndex = -1;
+    solidOverlay.focus();
+  }
+
   // fork parameter: if true AND ?fileParam is set to a URL,
   // then put mei-friend into "remote fork request" mode:
   // If user is logged in, open a pre-populated fork-repository menu
   // Else, remember we are in remote fork request mode, log user in, and then proceed as above.
   let forkParam = searchParams.get('fork');
+
+  let urlFetchInProgress = false;
+
+  // if we have received a ?file= param (without ?fork which is a special case further down, OR
+  // ... if we have a fileLocationType 'url' with a fileLocation specified in storage, but NO meiXml
+  // ... (=> because storage was disabled, e.g., due to encoding size)...
+  // then, fetch and load the URL.
   if (urlFileName && !(forkParam === 'true')) {
     // normally open the file from URL
     openUrlFetch(new URL(urlFileName));
+    urlFetchInProgress = true;
+  } else if (
+    storage.supported &&
+    storage.fileLocationType &&
+    storage.fileLocation &&
+    storage.fileLocationType === 'url' &&
+    !storage.meiXml
+  ) {
+    openUrlFetch(new URL(storage.fileLocation));
+    urlFetchInProgress = true;
   }
 
   // fill sample encodings
   fillInSampleEncodings();
 
+  // populate the Solid tab in the annotations panel
+  populateSolidTab();
+
   // restore localStorage if we have it
   if (storage.supported) {
+    storage.read();
     // save (most) URL parameters in storage
     if (orientationParam !== null) storage.notationOrientation = orientationParam;
     if (notationProportionParam !== null) storage.notationProportion = notationProportionParam;
@@ -564,7 +627,7 @@ function onLanguageLoaded() {
     }
 
     setFileChangedState(storage.fileChanged);
-    if (!urlFileName) {
+    if (!urlFileName && !urlFetchInProgress) {
       // no URI param specified - try to restore from storage
       if (storage.content && storage.fileName) {
         // restore file name and content from storage
@@ -573,7 +636,7 @@ function onLanguageLoaded() {
         meiFileName = storage.fileName;
         meiFileLocation = storage.fileLocation;
         meiFileLocationPrintable = storage.fileLocationPrintable;
-        fileLocationType = storage.fileLocationType;
+        setFileLocationType(storage.fileLocationType);
         updateFileStatusDisplay();
         // on initial page load, CM doesn't fire a "changes" event
         // so we don't need to skip the "freshly loaded" change
@@ -622,6 +685,7 @@ function onLanguageLoaded() {
       }
     }
   }
+
   // Retrieve parameters from URL params, from storage, or default values
   if (scaleParam !== null) {
     document.getElementById('verovioZoom').value = scaleParam;
@@ -667,6 +731,7 @@ function onLanguageLoaded() {
   } else {
     fp = defaultFacsimileProportion;
   }
+
   setNotationProportion(np);
   setFacsimileProportion(fp);
   setOrientation(cm, o, fo, v, storage);
@@ -684,9 +749,21 @@ function onLanguageLoaded() {
   setKeyMap(defaultKeyMap);
 
   // remove URL parameters from URL
-  const shortUrl = new URL(window.location);
-  window.history.pushState({}, '', shortUrl.origin + shortUrl.pathname);
   // TODO: check handleURLParamSelect() occurrences, whether removing search parameters has an effect there.
+  const currentUrl = new URL(window.location);
+  const shortUrl = new URL(currentUrl.origin + currentUrl.pathname);
+  if (solidCodeParam && solidStateParam) {
+    // restore Solid authentication parameters if required
+    shortUrl.searchParams.append('code', solidCodeParam);
+    shortUrl.searchParams.append('state', solidStateParam);
+  }
+  window.history.pushState({}, '', shortUrl.href);
+  if (storage.supported && storage.restoreSolidSession) {
+    restoreSolidTimeout = setTimeout(function () {
+      solidOverlay.classList.remove('active');
+      loginAndFetch(getSolidIdP(), populateSolidTab);
+    }, restoreSolidTimeoutDelay);
+  }
 } // onLanguageLoaded
 
 export async function openUrlFetch(url = '', updateAfterLoading = true) {
@@ -753,7 +830,8 @@ function openUrlProcess(content, url, updateAfterLoading) {
   if (storage.supported) {
     storage.fileLocationType = 'url';
   }
-  fileLocationType = 'url';
+  setFileLocationType('url');
+  setStandoffAnnotationEnabledStatus();
   openUrlCancel(); //hide open URL UI elements
   const fnStatus = document.getElementById('fileName');
   if (fnStatus) fnStatus.removeAttribute('contenteditable');
@@ -922,14 +1000,20 @@ async function vrvWorkerEventsHandler(ev) {
       a.click();
       v.busy(false);
       break;
-    case 'midiPlayback': // export MIDI file
+    case 'midiPlayback': // play MIDI file
       console.log('Received MIDI and Timemap:', ev.data.midi, ev.data.timemap);
       setTimemap(ev.data.timemap);
+      if (ev.data.expansionMap) {
+        setExpansionMap(ev.data.expansionMap);
+      }
       if (mp) {
         blob = midiDataToBlob(ev.data.midi);
-        core.blobToNoteSequence(blob).then((noteSequence) => {
+        midiCore.blobToNoteSequence(blob).then((noteSequence) => {
           mp.noteSequence = noteSequence;
         });
+        if ('expand' in ev.data && ev.data.expand && !v.speedMode) {
+          v.updateAll(cm); // update vrv worker, if expand, no speed mode
+        }
       }
       break;
     case 'pdfBlob':
@@ -1137,7 +1221,8 @@ export function handleEncoding(mei, setFreshlyLoaded = true, updateAfterLoading 
     clearAnnotations();
     v.busy(false);
   }
-} // handleEncoding()
+  setStandoffAnnotationEnabledStatus();
+}
 
 function openFileDialog(accept = '*') {
   let input = document.createElement('input');
@@ -1171,48 +1256,78 @@ function downloadMei() {
   let blob = new Blob([cm.getValue()], {
     type: 'text/plain',
   });
-  let a = document.createElement('a');
-  a.download = meiFileName.substring(meiFileName.lastIndexOf('/') + 1).replace(/\.[^/.]+$/, '.mei');
-  a.href = window.URL.createObjectURL(blob);
-  a.click();
+  let url = URL.createObjectURL(blob);
+  let fileName = meiFileName.substring(meiFileName.lastIndexOf('/') + 1).replace(/\.[^/.]+$/, '.mei');
+  // buxfix for Safari (#33, 31. Aug 2023)
+  setTimeout(() => {
+    let a = document.createElement('a');
+    a.setAttribute('href', url);
+    a.setAttribute('download', fileName);
+    a.click();
+  }, 0);
   // Now that the user has "saved" the MEI, clear the file change indicator
   setFileChangedState(false);
-}
+} // downloadMei()
 
 function downloadSpeedMei() {
   let blob = new Blob([speed.getPageFromDom(v.xmlDoc, v.currentPage, v.breaksValue(), v.pageSpanners)], {
     type: 'text/plain',
   });
-  let a = document.createElement('a');
-  a.download = meiFileName
+  let url = URL.createObjectURL(blob);
+  let fileName = meiFileName
     .substring(meiFileName.lastIndexOf('/') + 1)
     .replace(/\.[^/.]+$/, '_page-' + v.currentPage + '-speedMode.mei');
-  a.href = window.URL.createObjectURL(blob);
-  a.click();
-}
+  // buxfix for Safari (#33, 31. Aug 2023)
+  setTimeout(() => {
+    let a = document.createElement('a');
+    a.setAttribute('href', url);
+    a.setAttribute('download', fileName);
+    a.click();
+  }, 0);
+} // downloadSpeedMei()
 
 export function requestMidiFromVrvWorker(requestTimemap = false) {
+  let mei;
+  // if (v.expansionId) {
+  //   let expansionEl = v.xmlDoc.querySelector('[*|id=' + v.expansionId + ']');
+  //   let existingList = [];
+  //   let expandedDoc = expansionMap.expand(expansionEl, existingList, v.xmlDoc.cloneNode(true));
+  //   mei = v.speedFilter(new XMLSerializer().serializeToString(expandedDoc), false, true);
+  //   if (v.speedMode) {
+  //     v.loadXml(cm.getValue(), true); // reload xmlDoc when in speed mode
+  //   } else {
+  //     v.toolkitDataOutdated = true; // force load data for MIDI playback
+  //   }
+  // } else {
+  // }
+  mei = v.speedFilter(cm.getValue(), false);
   let message = {
     cmd: 'exportMidi',
+    expand: v.expansionId,
     options: v.vrvOptions,
-    mei: v.speedFilter(cm.getValue(), false), // exclude dummy measures in speed mode
+    mei: mei, // exclude dummy measures in speed mode
     requestTimemap: requestTimemap,
-    toolkitDataOutdated: v.toolkitDataOutdated,
     speedMode: v.speedMode,
+    toolkitDataOutdated: v.toolkitDataOutdated,
   };
   vrvWorker.postMessage(message);
-}
+} // requestMidiFromVrvWorker()
 
 function downloadSvg() {
   let svg = document.getElementById('verovio-panel').innerHTML;
   let blob = new Blob([svg], {
     type: 'image/svg+xml',
   });
-  let a = document.createElement('a');
-  a.download = meiFileName.substring(meiFileName.lastIndexOf('/') + 1).replace(/\.[^/.]+$/, '.svg');
-  a.href = window.URL.createObjectURL(blob);
-  a.click();
-}
+  let url = URL.createObjectURL(blob);
+  let fileName = meiFileName.substring(meiFileName.lastIndexOf('/') + 1).replace(/\.[^/.]+$/, '.svg');
+  // buxfix for Safari (#33, 31. Aug 2023)
+  setTimeout(() => {
+    let a = document.createElement('a');
+    a.setAttribute('href', url);
+    a.setAttribute('download', fileName);
+    a.click();
+  }, 0);
+} // downloadSvg()
 
 function consultGuidelines() {
   const elementAtCursor = getElementAtCursor(cm);
@@ -1239,6 +1354,11 @@ function indentSelection() {
   e.indentSelection(v, cm);
 } // indentSelection()
 
+// wrapper for toMatchingTag
+function toMatchingTag() {
+  e.toMatchingTag(v, cm);
+}
+
 let tagEncloserNode; // context menu to choose node name to enclose selected text
 
 // wrapper for editor.encloseSelectionWithTag()
@@ -1259,7 +1379,7 @@ export let cmd = {
       meiFileName = document.getElementById('fileName').innerText;
       updateStatusBar();
       updateHtmlTitle();
-      if (storage.supported && !storage.override) storage.safelySetStorageItem('meiFileName', meiFileName);
+      if (storage.supported) storage.safelySetStorageItem('meiFileName', meiFileName);
     } else {
       console.warn('Attempted to change file name on non-local file');
     }
@@ -1396,6 +1516,12 @@ export let cmd = {
   },
   undo: () => cm.undo(),
   redo: () => cm.redo(),
+  // add accidentals
+  addDoubleSharp: () => e.addAccidental(v, cm, 'x'),
+  addSharp: () => e.addAccidental(v, cm, 's'),
+  addNatural: () => e.addAccidental(v, cm, 'n'),
+  addFlat: () => e.addAccidental(v, cm, 'f'),
+  addDoubleFlat: () => e.addAccidental(v, cm, 'ff'),
   // add control elements
   addSlur: () => e.addControlElement(v, cm, 'slur', ''),
   addSlurBelow: () => e.addControlElement(v, cm, 'slur', 'below'),
@@ -1441,6 +1567,8 @@ export let cmd = {
   toggleSpicc: () => e.toggleArtic(v, cm, 'spicc'),
   shiftPitchNameUp: () => e.shiftPitch(v, cm, 1),
   shiftPitchNameDown: () => e.shiftPitch(v, cm, -1),
+  shiftPitchChromaticallyUp: () => e.shiftPitch(v, cm, 1, true),
+  shiftPitchChromaticallyDown: () => e.shiftPitch(v, cm, -1, true),
   shiftOctaveUp: () => e.shiftPitch(v, cm, 7),
   shiftOctaveDown: () => e.shiftPitch(v, cm, -7),
   increaseDuration: () => e.modifyDuration(v, cm, 'increase'),
@@ -1462,7 +1590,7 @@ export let cmd = {
   addSupplied: () => e.addSuppliedElement(v, cm),
   addSuppliedAccid: () => e.addSuppliedElement(v, cm, 'accid'),
   addSuppliedArtic: () => e.addSuppliedElement(v, cm, 'artic'),
-  cleanAccid: () => e.cleanAccid(v, cm),
+  correctAccid: () => e.checkAccidGes(v, cm),
   renumberMeasuresTest: () => e.renumberMeasures(v, cm, false),
   renumberMeasures: () => e.renumberMeasures(v, cm, true),
   reRenderMei: () => v.reRenderMei(cm, false),
@@ -1489,6 +1617,15 @@ export let cmd = {
       document.getElementById('settingsPanel') === document.activeElement.closest('#settingsPanel')
     ) {
       cmd.filterReset();
+    } else if (
+      document.getElementById('solidOverlay') &&
+      document.getElementById('solidOverlay') === document.activeElement.closest('#solidOverlay')
+    ) {
+      document.getElementById('solidOverlay').classList.remove('active');
+      storage.removeItem('restoreSolidSession');
+      if (restoreSolidTimeout) {
+        clearTimeout(restoreSolidTimeout);
+      }
     } else if (v.pdfMode) {
       cmd.pageModeOff();
     } else {
@@ -1607,7 +1744,7 @@ function addEventListeners(v, cm) {
   document.getElementById('showAnnotationsButton').addEventListener('click', cmd.toggleAnnotationPanel);
   document.getElementById('showFacsimileButton').addEventListener('click', cmd.toggleFacsimilePanel);
   document.getElementById('closeAnnotationPanelButton').addEventListener('click', cmd.hideAnnotationPanel);
-  document.getElementById('hideAnnotationPanelButton').addEventListener('click', cmd.hideAnnotationPanel);
+  //  document.getElementById('hideAnnotationPanelButton').addEventListener('click', cmd.hideAnnotationPanel);
   document.getElementById('showFacsimileMenu').addEventListener('click', cmd.showFacsimilePanel);
   document.getElementById('showPlaybackControls').addEventListener('click', cmd.toggleMidiPlaybackControlBar);
   // re-apply settings filtering when switching settings tabs
@@ -1638,6 +1775,7 @@ function addEventListeners(v, cm) {
   document.getElementById('surroundWithTags').addEventListener('click', encloseSelectionWithTag);
   document.getElementById('surroundWithLastTag').addEventListener('click', encloseSelectionWithLastTag);
   document.getElementById('jumpToLine').addEventListener('click', () => CodeMirror.commands.jumpToLine(cm));
+  document.getElementById('toMatchingTag').addEventListener('click', toMatchingTag);
   document.getElementById('manualValidate').addEventListener('click', cmd.validate);
   document
     .querySelectorAll('.keyShortCut')
@@ -1763,8 +1901,10 @@ function addEventListeners(v, cm) {
   document.getElementById('betweenPlacement').addEventListener('click', cmd.betweenPlacement);
   document.getElementById('addVerticalGroup').addEventListener('click', cmd.addVerticalGroup);
   document.getElementById('delete').addEventListener('click', cmd.delete);
-  document.getElementById('pitchUp').addEventListener('click', cmd.shiftPitchNameUp);
-  document.getElementById('pitchDown').addEventListener('click', cmd.shiftPitchNameDown);
+  document.getElementById('pitchChromUp').addEventListener('click', cmd.shiftPitchChromaticallyUp);
+  document.getElementById('pitchChromDown').addEventListener('click', cmd.shiftPitchChromaticallyDown);
+  document.getElementById('pitchUpDiat').addEventListener('click', cmd.shiftPitchNameUp);
+  document.getElementById('pitchDownDiat').addEventListener('click', cmd.shiftPitchNameDown);
   document.getElementById('pitchOctaveUp').addEventListener('click', cmd.shiftOctaveUp);
   document.getElementById('pitchOctaveDown').addEventListener('click', cmd.shiftOctaveDown);
   document.getElementById('staffUp').addEventListener('click', cmd.moveElementStaffUp);
@@ -1772,7 +1912,7 @@ function addEventListeners(v, cm) {
   document.getElementById('increaseDur').addEventListener('click', cmd.increaseDuration);
   document.getElementById('decreaseDur').addEventListener('click', cmd.decreaseDuration);
   // Manipulate encoding methods
-  document.getElementById('cleanAccid').addEventListener('click', () => e.cleanAccid(v, cm));
+  document.getElementById('cleanAccid').addEventListener('click', cmd.correctAccid);
   document.getElementById('renumberMeasuresTest').addEventListener('click', () => e.renumberMeasures(v, cm, false));
   document.getElementById('renumberMeasuresExec').addEventListener('click', () => e.renumberMeasures(v, cm, true));
   // rerender through Verovio
@@ -1784,6 +1924,12 @@ function addEventListeners(v, cm) {
   // ingest facsimile sekelton into currently loaded MEI file
   document.getElementById('ingestFacsimile').addEventListener('click', cmd.ingestFacsimile);
   document.getElementById('addFacsimile').addEventListener('click', cmd.addFacsimile);
+  // insert accidentals
+  document.getElementById('addDoubleSharp').addEventListener('click', cmd.addDoubleSharp);
+  document.getElementById('addSharp').addEventListener('click', cmd.addSharp);
+  document.getElementById('addNatural').addEventListener('click', cmd.addNatural);
+  document.getElementById('addFlat').addEventListener('click', cmd.addFlat);
+  document.getElementById('addDoubleFlat').addEventListener('click', cmd.addDoubleFlat);
   // insert control elements
   document.getElementById('addTempo').addEventListener('click', cmd.addTempo);
   document.getElementById('addDirective').addEventListener('click', cmd.addDirective);
@@ -1922,9 +2068,28 @@ function addEventListeners(v, cm) {
     v.updateAll(cm, {}, v.selectedElements[0]);
   });
 
+  document.getElementById('solidLoadingIndicator').addEventListener('click', () => {
+    // cancel Solid login procedure
+    document.getElementById('solidOverlay').classList.remove('active');
+    storage.removeItem('restoreSolidSession');
+    if (restoreSolidTimeout) {
+      clearTimeout(restoreSolidTimeout);
+    }
+  });
+
   addDragSelector(v, vp);
 
   addZoneDrawer();
+
+  // MIDI control bar expansion selector change listener
+  document.getElementById('controlbar-midi-expansion-selector').addEventListener('change', (ev) => {
+    v.expansionId = ev.target.value;
+    document.getElementById('selectMidiExpansion').value = v.expansionId;
+    if (document.getElementById('showMidiPlaybackControlBar').checked) {
+      startMidiTimeout(true);
+    }
+    console.log('Main EEEEExpansion selector set to: ' + v.expansionId);
+  });
 } // addEventListeners()
 
 // progress bar demo
@@ -2002,6 +2167,18 @@ export function drawRightFooter() {
       githubUrl = 'https://github.com/rism-digital/verovio/tree/develop';
     }
     rf.innerHTML += `&nbsp;<a href="${githubUrl}" target="_blank" title="${tkUrl}">Verovio ${tkVersion}</a>.`;
+  }
+}
+
+export function setStandoffAnnotationEnabledStatus() {
+  // Annotations: can only write standoff if a) not working locally (need URI) and b) isMEI (need stable identifiers)
+  if (fileLocationType === 'file' || !isMEI || !solid.getDefaultSession().info.isLoggedIn) {
+    document.getElementById('writeAnnotationStandoff').setAttribute('disabled', '');
+    document.getElementById('writeAnnotationStandoffLabel').classList.add('disabled');
+    document.getElementById('writeAnnotationInline').checked = true;
+  } else {
+    document.getElementById('writeAnnotationStandoff').removeAttribute('disabled');
+    document.getElementById('writeAnnotationStandoffLabel').classList.remove('disabled');
   }
 }
 

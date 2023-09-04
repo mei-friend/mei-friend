@@ -16,8 +16,8 @@ var timeSpanningElements; // elements with @tstamp2; from attribute-classes.js
 onmessage = function (e) {
   let result = {};
   let t1 = performance.now();
-  console.info('SpeedWorker received: ' + Math.random() + '; ' + e.data.cmd + '. ');
-  // console.info("SpeedWorker received: " + e.data.cmd + ', ', e.data);
+  console.info('Speed worker received: ' + Math.random() + '; ' + e.data.cmd + '. ');
+  // console.info("Speed worker received: " + e.data.cmd + ', ', e.data);
   switch (e.data.cmd) {
     case 'variables': // receive const from attribute-classes.js
       timeSpanningElements = e.data.var;
@@ -29,7 +29,7 @@ onmessage = function (e) {
       break;
   }
   let t2 = performance.now();
-  console.log('SpeedWorker finished in ' + (t2 - t1) + ' ms.');
+  console.log('Speed worker finished in ' + (t2 - t1) + ' ms.');
   if (result) postMessage(result);
 }; // onmessage()
 
@@ -50,16 +50,16 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
   let music; // expecting mei > music
   music = getElementByTagName(xmlDoc, 'music', music);
   if (!music) {
-    console.log('Invalid MEI file. ');
+    console.log('Speed worker: Invalid MEI file. ');
     return undefined;
   }
   let score;
   score = getElementByTagName(music.children, 'score', score);
   if (!score) {
-    console.log('Missing score element in MEI file.');
+    console.log('Speed worker: Missing score element in MEI file.');
     return undefined;
   } else {
-    console.log('xmlDoc music > score: ', score);
+    // console.log('Speed worker: xmlDoc music > score: ', score);
   }
 
   // collect all time-spanning elements with @startid and @endid
@@ -224,7 +224,7 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
 // Return first element with tagName elName
 function getElementByTagName(nodeArray, elName, el) {
   if (!Array.isArray(nodeArray)) {
-    console.error('getElementById(): not an array: ', nodeArray);
+    console.error('Speed worker: getElementById(): not an array: ', nodeArray);
     return null;
   }
   for (let e of nodeArray) {
@@ -332,7 +332,7 @@ function parse(S, options) {
           if (closeTag.indexOf(tagName) === -1) {
             var parsedText = S.substring(0, pos).split('\n');
             console.error(
-              'SpeedWorker Parsing Error: Unexpected close tag:' +
+              'Speed worker Parsing Error: Unexpected close tag:' +
                 ' Line ' +
                 (parsedText.length - 1) +
                 ', Column ' +

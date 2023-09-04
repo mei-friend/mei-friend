@@ -183,8 +183,11 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
       // console.info('digDeeper(' + pageNo + '): p: ' + p +
       //   ', i: ' + i + ', ', currentNode);
       let currentNodeName = currentNode.nodeName;
-      // ignore expansion lists
-      if (['expansion'].includes(currentNodeName)) continue;
+      // copy expansion elements to new section
+      if (currentNodeName === 'expansion') {
+        newSection.appendChild(currentNode.cloneNode(true));
+        continue;
+      }
       // console.info('digDeeper currentNodeName: ', currentNodeName + ', '
       // + currentNode.getAttribute('xml:id'));
       if (currentNodeName === 'section') {
@@ -266,7 +269,7 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
               }
             }
           } else {
-            console.info('No key.sig information in ', st);
+            // console.info('No key.sig information in ', st);
           }
           const { count, unit } = getMeter(st);
           if (count && unit) {
@@ -288,7 +291,7 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
               }
             }
           } else {
-            console.info('No meter.count/unit information in ', st);
+            // console.info('No meter.count/unit information in ', st);
           }
         }
       }

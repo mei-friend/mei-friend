@@ -26,9 +26,11 @@
   <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.64.0/codemirror.min.js" integrity="sha512-4DlmQ+aBOfYTZ3uzRKCDXdyL7y8IlopnVChhXG0pRFgyvhwONVQW3JX8e5DYoXUNr3evQpLZz7S3O1XxMH4WKA==" crossorigin="anonymous"
     referrerpolicy="no-referrer">
   </script> -->
+  <script src="{{ url_for('static', filename='npm/node_modules/@inrupt/solid-client-authn-browser/dist/solid-client-authn.bundle.js') }}"></script>
   <script src="{{ url_for('static', filename='lib/env.js') }}"></script>
   <script src="{{ url_for('static', filename='lib/jsgit.js') }}"></script>
   <script src="{{ url_for('static', filename='lib/github.js') }}" type="module"></script>
+  <script src="{{ url_for('static', filename='lib/solid.js') }}" type="module"></script>
   <script>
     let isLoggedIn;
     let root = "{{ url_for('static', filename='') }}";
@@ -91,9 +93,16 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/keymap/vim.min.js"
     integrity="sha512-px+d4ezEJ2hi3SHqwRziL871LTHSqfj1GxV1Cp78Sp/SAMEIJwxKNDGcQz96FEv/IqRPLcJ848BWhSUM7msEGQ=="
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <script
-    src="https://cdn.jsdelivr.net/combine/npm/tone@14.7.58,npm/@magenta/music@1.23.1/es6/core.js,npm/focus-visible@5,npm/html-midi-player@1.5.0"></script>
+  <script src="https://cdn.jsdelivr.net/combine/npm/tone@14.7.58,npm/@magenta/music@1.23.1/es6/core.js,npm/focus-visible@5,npm/html-midi-player@1.5.0"></script>
+  <script type="text/javascript">
+    // get another handle on html-midi-player's 'core' variable to prevent namespace clash with 'core' defined by jsonld
+    var midiCore = core;
+  </script>
+
+  </script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jsonld/1.0.0/jsonld.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fast-json-patch/3.1.1/fast-json-patch.min.js"></script>
 
   <link rel="stylesheet" href="{{ url_for('static', filename='css/default.css') }}" />
   <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}" />
@@ -233,6 +242,10 @@
             <span id="jumpToLineText">Jump to line</span>
             <span class="keyShortCut altKey">G</span>
           </a>
+          <a id="toMatchingTag" href="#">
+            <span id="toMatchingTagText">Go to matching tag</span>
+            <span class="keyShortCut shiftKey ctrlKey">G</span>
+          </a>
           <hr class="dropdownLine" />
           <a id="manualValidate" href="#">
             <span id="manualValidateText">Validate</span>
@@ -294,13 +307,21 @@
             </span>
           </a>
           <hr class="dropdownLine" />
-          <a id="pitchUp" href="#">
-            <span id="pitchUpText">Pitch 1 tone up</span>
+          <a id="pitchChromUp" href="#">
+            <span id="pitchChromUpText">Pitch chromatically up</span>
             <span class="keyShortCut shiftKey">&uarr;</span>
           </a>
-          <a id="pitchDown" href="#">
-            <span id="pitchDownText">Pitch 1 tone down</span>
+          <a id="pitchChromDown" href="#">
+            <span id="pitchChromDownText">Pitch chromatically down</span>
             <span class="keyShortCut shiftKey">&darr;</span>
+          </a>
+          <a id="pitchUpDiat" href="#">
+            <span id="pitchUpDiatText">Pitch diatonically up</span>
+            <span class="keyShortCut altKey shiftKey">&uarr;</span>
+          </a>
+          <a id="pitchDownDiat" href="#">
+            <span id="pitchDownDiatText">Pitch diatonically down</span>
+            <span class="keyShortCut altKey shiftKey">&darr;</span>
           </a>
           <a id="pitchOctaveUp" href="#">
             <span id="pitchOctaveUpText">Pitch 1 octave up</span>
@@ -328,7 +349,7 @@
           </a>
           <hr class="dropdownLine" />
           <a id="cleanAccid" href="#">
-            <span id="cleanAccidText">Clean @accid.ges</span>
+            <span id="cleanAccidText">Check @accid.ges</span>
             <span class="keyShortCut shiftKey cmdKey">C</span>
           </a>
           <a id="renumberMeasuresTest" href="#">
@@ -362,6 +383,27 @@
       <div class="dropdown">
         <button class="dropbtn" id="insertMenuTitle">Insert</button>
         <div class="dropdownContent" id="Insert">
+          <a id="addDoubleSharp" href="#">
+            <span id="addDoubleSharpText">Double sharp &#119082;</span>
+            <span class="keyShortCut shiftKey">+</span>
+          </a>
+          <a id="addSharp" href="#">
+            <span id="addSharpText">Sharp &#9839;</span>
+            <span class="keyShortCut">+</span>
+          </a>
+          <a id="addNatural" href="#">
+            <span id="addNaturalText">Natural &#9838;</span>
+            <span class="keyShortCut">=</span>
+          </a>
+          <a id="addFlat" href="#">
+            <span id="addFlatText">Flat &#9837;</span>
+            <span class="keyShortCut">&ndash;</span>
+          </a>
+          <a id="addDoubleFlat" href="#">
+            <span id="addDoubleFlatText">Double flat &#119083;</span>
+            <span class="keyShortCut shiftKey">&ndash;</span>
+          </a>
+          <hr class="dropdownLine" />
           <a id="addTempo" href="#">
             <span id="addTempoText">Tempo</span>
             <span class="keyShortCut shiftKey">T</span>
@@ -522,7 +564,8 @@
       <div class="dropdown">
         <button class="dropbtn" id="helpMenuTitle">Help</button>
         <div class="dropdownContent" id="HelpMenu">
-          <a id="goToHelpPage" href="https://mei-friend.github.io" target="_blank">Show help page</a>
+          <a id="goToHelpPage" href="https://mei-friend.github.io/" target="_blank">Show mei-friend help pages</a>
+          <a id="goToCheatSheet" href="https://mei-friend.github.io/cheatsheet/" target="_blank">Show mei-friend cheat sheet</a>
           <a id="showChangelog" href="#" target="_blank">Show mei-friend changelog</a>
           <hr class="dropdownLine" />
           <a id="goToGuidelines" href="https://music-encoding.org/guidelines" target="_blank">Show MEI Guidelines</a>
@@ -592,10 +635,30 @@
     <div class="dragOverlay">
       <div class="dragOverlayText" id="dragOverlayText">Drag your input file here.</div>
     </div>
+    <div id="solidOverlay">
+      <div id="solidLoadingIndicator">
+        <svg class="clockwise" version="1.1" id="solid_loading" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 1200 1200" style="enable-background:new 0 0 1200 1200;" xml:space="preserve">
+          <title>Restoring Solid session - press 'esc' to cancel</title>
+          <style type="text/css">
+            .st0{fill:#7C4DFF;}
+            .st1{fill:#F7F7F7;}
+            .st2{opacity:0.3;fill:#444444;}
+          </style>
+          <path class="st0" d="M321.1,983.5L128.8,650c-17.8-30.9-17.8-69,0-99.9l192.3-333.5c17.9-31,50.9-50,86.6-50h384.5  c35.7,0,68.8,19.1,86.6,50L1071.2,550c17.8,30.9,17.8,69,0,99.9L878.9,983.5c-17.9,31-50.9,50-86.6,50H407.8  C372,1033.5,339,1014.4,321.1,983.5z"/>
+          <path class="st1" d="M421.4,522.4H817c4.9,0,8.9-4,8.9-8.9v-74.1c0-49.3-40-89.3-89.3-89.3H499.1  C430,350,374,406,374,475.1v0C374,501.2,395.2,522.4,421.4,522.4z"/>
+          <path class="st1" d="M460.2,850h236.4c71.4,0,129.3-57.9,129.3-129.3v0c0-23.8-19.3-43.1-43.1-43.1H382.6  c-4.8,0-8.6,3.9-8.6,8.6v77.6C374,811.4,412.6,850,460.2,850z"/>
+          <path class="st1" d="M391.5,512.6l295,295c19.5,19.5,51.2,19.5,70.7,0l51.2-51.2c19.5-19.5,19.5-51.2,0-70.7l-295-295  c-19.5-19.5-51.2-19.5-70.7,0l-51.2,51.2C372,461.4,372,493.1,391.5,512.6z"/>
+          polygon class="st2" points="691.4,812.5 518.1,677.6 556.5,677.6 "/>
+          <polygon class="st2" points="508.6,385.8 645.2,522.4 691.4,522.4 "/>
+          <script xmlns=""/>
+        </svg>
+        <p id="solidOverlayCancel">Restoring Solid session - press <span>esc</span> or click here to cancel</p>
+      </div>
+    </div>
     <div id="githubActionsOverlay">
       <div id="githubActionsUI">
         <h3 id="githubActionsHeading">
-          Request GitHub Action workflow: <span id="requestedWorkflowName"></span>
+          <span id="githubActionsHeadingText">Request GitHub Action workflow:</span> <span id="requestedWorkflowName"></span>
         </h3>
         <p id="githubActionsDescription">
           Click on "Run workflow" to ask the GitHub API to run the above workflow for you, using the input configuration specified below. Your encoding will be reloaded in its latest version once the workflow run completes.
@@ -737,18 +800,41 @@
       <div id="notation"></div>
       <div class="resizer" id="dragMe"></div>
       <div id="encoding">
-        <span id="validation-status"></span>
         <textarea id="editor"></textarea>
+        <span id="validation-status"></span>
+        <span id="codeChecker">Code Checker</span>
       </div>
     </div>
 
     <div id="annotationPanel" style="display: none">
       <div class="tab">
+        <!--
         <button id="hideAnnotationPanelButton" class="tabstart" title="Close Annotations Panel">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" viewBox="0 0 19 21">
             <title id="annotationCloseButtonText">Close Annotations Panel</title>
             <path
               d="M15.14 2.27a1 1 0 0 0-1.41 0l-10 10a1 1 0 0 0 0 1.41L4 14l-3 4h5l1-1 .29.29a1 1 0 0 0 1.41 0l10-10a1 1 0 0 0 .03-1.43zM7 15l-2-2 9-9 2 2z" />
+          </svg>
+        </button>
+        -->
+        <button id="solidButton" class="tablink" title="Login to Solid" 
+          onclick="switchTab(event, 'annotationPanel')" data-tab="solidTab">
+          <!-- Solid logo SVG: Andrei Sambra, CC BY-SA 4.0 
+            https://en.wikipedia.org/wiki/Solid_(web_decentralization_project)#/media/File:MIT's_Solid_project_logo.svg-->
+          <svg version="1.1" id="solid_logo" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 1200 1200" style="enable-background:new 0 0 1200 1200;" xml:space="preserve">
+            <title>Login to Solid</title>
+            <style type="text/css">
+              .st0{fill:#7C4DFF;}
+              .st1{fill:#F7F7F7;}
+              .st2{opacity:0.3;fill:#444444;}
+            </style>
+            <path class="st0" d="M321.1,983.5L128.8,650c-17.8-30.9-17.8-69,0-99.9l192.3-333.5c17.9-31,50.9-50,86.6-50h384.5  c35.7,0,68.8,19.1,86.6,50L1071.2,550c17.8,30.9,17.8,69,0,99.9L878.9,983.5c-17.9,31-50.9,50-86.6,50H407.8  C372,1033.5,339,1014.4,321.1,983.5z"/>
+            <path class="st1" d="M421.4,522.4H817c4.9,0,8.9-4,8.9-8.9v-74.1c0-49.3-40-89.3-89.3-89.3H499.1  C430,350,374,406,374,475.1v0C374,501.2,395.2,522.4,421.4,522.4z"/>
+            <path class="st1" d="M460.2,850h236.4c71.4,0,129.3-57.9,129.3-129.3v0c0-23.8-19.3-43.1-43.1-43.1H382.6  c-4.8,0-8.6,3.9-8.6,8.6v77.6C374,811.4,412.6,850,460.2,850z"/>
+            <path class="st1" d="M391.5,512.6l295,295c19.5,19.5,51.2,19.5,70.7,0l51.2-51.2c19.5-19.5,19.5-51.2,0-70.7l-295-295  c-19.5-19.5-51.2-19.5-70.7,0l-51.2,51.2C372,461.4,372,493.1,391.5,512.6z"/>
+            polygon class="st2" points="691.4,812.5 518.1,677.6 556.5,677.6 "/>
+            <polygon class="st2" points="508.6,385.8 645.2,522.4 691.4,522.4 "/>
+            <script xmlns=""/>
           </svg>
         </button>
         <button id="annotationToolsButton" class="tablink defaultOpen" onclick="switchTab(event, 'annotationPanel')" title="Annotation tools" data-tab="annotationTools">
@@ -761,62 +847,76 @@
           title="Links" data-tab="externalLinks">Links</button>-->
         <span id="closeAnnotationPanelButton" class="topright" title="Close Annotations Panel">&times;</span>
       </div>
+      <div id="solidTab" class="tabcontent"></div>
       <div id="annotationTools" class="tabcontent">
         <menu id="annotationToolsMenu">
-          <div class="annotationToolsDomainSelection" style="display: none">
+          <div id="annotationToolsDomainSelection">
             <div class="annotationToolsDomainSelectionItem">
-              <input type="checkbox" checked id="writeAnnotInline" />
-              <label for="#writeAnnotInline">&lt;annot&gt;</label>
-            </div>
-            <div class="annotationToolsDomainSelectionItem">
-              <input type="checkbox" id="writeAnnotStandoff" />
-              <label id="writeAnnotStandoffText" for="#writeAnnotStandoff">Web Annotation</label>
-              <!-- <script>document.querySelector('label[for="#writeAnnotStandoff"]').innerHTML = rdf;</script> -->
+              <fieldset>
+                <input type="radio" checked id="writeAnnotationInline" title="Generate in-line annotations." value="writeAnnotationInline" name="annotationToolDomainSelector">
+                <label for="writeAnnotionInline" title="Generate in-line annotations using MEI &lt;annot&gt; elements.">MEI</label>
+                <input type="radio" id="writeAnnotationStandoff" title="Generate stand-off annotations. Only possible if working on a native MEI file from URL or GitHub, and when logged into a Solid Pod." value="writeAnnotationStandoff" name="annotationToolDomainSelector">
+                <label id="writeAnnotationStandoffLabel" for="writeAnnotionStandoff" title="Generate stand-off annotations. Only possible if working on a native MEI file from URL or GitHub, and when logged into a Solid Pod.">RDF</label>
+              </fieldset>
             </div>
           </div>
-          <li>
-            <div class="annotationToolsIcon" id="annotateHighlight">
-              <!--<svg xmlns="http://www.w3.org/2000/svg"  aria-hidden="true" role="img" id="footer-sample-full" width="16px" height="16px"  viewBox="0 0 1024 1024">
-                <path fill="currentColor"
-                  d="M957.6 507.4L603.2 158.2a7.9 7.9 0 0 0-11.2 0L353.3 393.4a8.03 8.03 0 0 0-.1 11.3l.1.1l40 39.4l-117.2 115.3a8.03 8.03 0 0 0-.1 11.3l.1.1l39.5 38.9l-189.1 187H72.1c-4.4 0-8.1 3.6-8.1 8V860c0 4.4 3.6 8 8 8h344.9c2.1 0 4.1-.8 5.6-2.3l76.1-75.6l40.4 39.8a7.9 7.9 0 0 0 11.2 0l117.1-115.6l40.1 39.5a7.9 7.9 0 0 0 11.2 0l238.7-235.2c3.4-3 3.4-8 .3-11.2zM389.8 796.2H229.6l134.4-133l80.1 78.9l-54.3 54.1zm154.8-62.1L373.2 565.2l68.6-67.6l171.4 168.9l-68.6 67.6zM713.1 658L450.3 399.1L597.6 254l262.8 259l-147.3 145z">
-                </path>
-              </svg>-->
-              <svg xmlns="http://www.w3.org/2000/svg" width="16px" height="16px" viewBox="0 0 20 20">
-                <title id="annotationToolsHighlightTitle">highlight</title>
-                <path
-                  d="M15.14 2.27a1 1 0 0 0-1.41 0l-10 10a1 1 0 0 0 0 1.41L4 14l-3 4h5l1-1 .29.29a1 1 0 0 0 1.41 0l10-10a1 1 0 0 0 .03-1.43zM7 15l-2-2 9-9 2 2z" />
-              </svg>
-              <span id="annotationToolsHighlightSpan">Highlight</span>
-            </div>
-          </li>
-          <!--DW HACK ESWC <li>
-            <div class="annotationToolsIcon" id="annotateCircle">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-                <path fill-rule="evenodd" d="M8 1.5a6.5 6.5 0 100 13 6.5 6.5 0 000-13zM0 8a8 8 0 1116 0A8 8 0 010 8z" />
-              </svg>
-              Circle
-            </div>
-          </li>-->
-          <li>
-            <div class="annotationToolsIcon" id="annotateDescribe">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-                <title id="annotationToolsDescribeTitle">Describe</title>
-                <path fill-rule="evenodd"
-                  d="M11.013 1.427a1.75 1.75 0 012.474 0l1.086 1.086a1.75 1.75 0 010 2.474l-8.61 8.61c-.21.21-.47.364-.756.445l-3.251.93a.75.75 0 01-.927-.928l.929-3.25a1.75 1.75 0 01.445-.758l8.61-8.61zm1.414 1.06a.25.25 0 00-.354 0L10.811 3.75l1.439 1.44 1.263-1.263a.25.25 0 000-.354l-1.086-1.086zM11.189 6.25L9.75 4.81l-6.286 6.287a.25.25 0 00-.064.108l-.558 1.953 1.953-.558a.249.249 0 00.108-.064l6.286-6.286z" />
-              </svg>
-              <span id="annotationToolsDescribeSpan">Describe</span>
-            </div>
-          </li>
-          <li>
-            <div class="annotationToolsIcon" id="annotateLink">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-                <title id="annotationToolsLinkTitle">Link</title>
-                <path fill-rule="evenodd"
-                  d="M7.775 3.275a.75.75 0 001.06 1.06l1.25-1.25a2 2 0 112.83 2.83l-2.5 2.5a2 2 0 01-2.83 0 .75.75 0 00-1.06 1.06 3.5 3.5 0 004.95 0l2.5-2.5a3.5 3.5 0 00-4.95-4.95l-1.25 1.25zm-4.69 9.64a2 2 0 010-2.83l2.5-2.5a2 2 0 012.83 0 .75.75 0 001.06-1.06 3.5 3.5 0 00-4.95 0l-2.5 2.5a3.5 3.5 0 004.95 4.95l1.25-1.25a.75.75 0 00-1.06-1.06l-1.25 1.25a2 2 0 01-2.83 0z" />
-              </svg>
-              <span id="annotationToolsLinkSpan">Link</span>
-            </div>
-          </li>
+          <div class="annotationToolsIconGroup">
+            <li>
+              <div class="annotationToolsIcon" id="annotateIdentify">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
+                  <title id=""annotationToolsIdentifyTitle">identify</title>
+                  <path 
+                    d="m12.596 11.596-3.535 3.536a1.5 1.5 0 0 1-2.122 0l-3.535-3.536a6.5 6.5 0 1 1 9.192-9.193 6.5 6.5 0 0 1 0 9.193Zm-1.06-8.132v-.001a5 5 0 1 0-7.072 7.072L8 14.07l3.536-3.534a5 5 0 0 0 0-7.072ZM8 9a2 2 0 1 1-.001-3.999A2 2 0 0 1 8 9Z"></path>
+                </svg>
+                <span id=""annotationToolsIdentifySpan">Identify musical object</span>
+              </div>
+            </li>
+          </div>
+          <div class="annotationToolsIconGroup">
+            <li>
+              <div class="annotationToolsIcon" id="annotateHighlight">
+                <!--<svg xmlns="http://www.w3.org/2000/svg"  aria-hidden="true" role="img" id="footer-sample-full" width="16px" height="16px"  viewBox="0 0 1024 1024">
+                  <path fill="currentColor"
+                    d="M957.6 507.4L603.2 158.2a7.9 7.9 0 0 0-11.2 0L353.3 393.4a8.03 8.03 0 0 0-.1 11.3l.1.1l40 39.4l-117.2 115.3a8.03 8.03 0 0 0-.1 11.3l.1.1l39.5 38.9l-189.1 187H72.1c-4.4 0-8.1 3.6-8.1 8V860c0 4.4 3.6 8 8 8h344.9c2.1 0 4.1-.8 5.6-2.3l76.1-75.6l40.4 39.8a7.9 7.9 0 0 0 11.2 0l117.1-115.6l40.1 39.5a7.9 7.9 0 0 0 11.2 0l238.7-235.2c3.4-3 3.4-8 .3-11.2zM389.8 796.2H229.6l134.4-133l80.1 78.9l-54.3 54.1zm154.8-62.1L373.2 565.2l68.6-67.6l171.4 168.9l-68.6 67.6zM713.1 658L450.3 399.1L597.6 254l262.8 259l-147.3 145z">
+                  </path>
+                </svg>-->
+                <svg xmlns="http://www.w3.org/2000/svg" width="16px" height="16px" viewBox="0 0 20 20">
+                  <title id="annotationToolsHighlightTitle">highlight</title>
+                  <path
+                    d="M15.14 2.27a1 1 0 0 0-1.41 0l-10 10a1 1 0 0 0 0 1.41L4 14l-3 4h5l1-1 .29.29a1 1 0 0 0 1.41 0l10-10a1 1 0 0 0 .03-1.43zM7 15l-2-2 9-9 2 2z" />
+                </svg>
+                <span id="annotationToolsHighlightSpan">Highlight</span>
+              </div>
+            </li>
+            <!--DW HACK ESWC <li>
+              <div class="annotationToolsIcon" id="annotateCircle">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                  <path fill-rule="evenodd" d="M8 1.5a6.5 6.5 0 100 13 6.5 6.5 0 000-13zM0 8a8 8 0 1116 0A8 8 0 010 8z" />
+                </svg>
+                Circle
+              </div>
+            </li>-->
+            <li>
+              <div class="annotationToolsIcon" id="annotateDescribe">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                  <title id="annotationToolsDescribeTitle">Describe</title>
+                  <path fill-rule="evenodd"
+                    d="M11.013 1.427a1.75 1.75 0 012.474 0l1.086 1.086a1.75 1.75 0 010 2.474l-8.61 8.61c-.21.21-.47.364-.756.445l-3.251.93a.75.75 0 01-.927-.928l.929-3.25a1.75 1.75 0 01.445-.758l8.61-8.61zm1.414 1.06a.25.25 0 00-.354 0L10.811 3.75l1.439 1.44 1.263-1.263a.25.25 0 000-.354l-1.086-1.086zM11.189 6.25L9.75 4.81l-6.286 6.287a.25.25 0 00-.064.108l-.558 1.953 1.953-.558a.249.249 0 00.108-.064l6.286-6.286z" />
+                </svg>
+                <span id="annotationToolsDescribeSpan">Describe</span>
+              </div>
+            </li>
+            <li>
+              <div class="annotationToolsIcon" id="annotateLink">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                  <title id="annotationToolsLinkTitle">Link</title>
+                  <path fill-rule="evenodd"
+                    d="M7.775 3.275a.75.75 0 001.06 1.06l1.25-1.25a2 2 0 112.83 2.83l-2.5 2.5a2 2 0 01-2.83 0 .75.75 0 00-1.06 1.06 3.5 3.5 0 004.95 0l2.5-2.5a3.5 3.5 0 00-4.95-4.95l-1.25 1.25zm-4.69 9.64a2 2 0 010-2.83l2.5-2.5a2 2 0 012.83 0 .75.75 0 001.06-1.06 3.5 3.5 0 00-4.95 0l-2.5 2.5a3.5 3.5 0 004.95 4.95l1.25-1.25a.75.75 0 00-1.06-1.06l-1.25 1.25a2 2 0 01-2.83 0z" />
+                </svg>
+                <span id="annotationToolsLinkSpan">Link</span>
+              </div>
+            </li>
+          </div>
         </menu>
       </div>
       <div id="listAnnotations" class="tabcontent">No annotations present.</div>
@@ -824,13 +924,16 @@
     </div>
   </div>
 
-  <div id="midiPlaybackControlBar">
-    <midi-player id="midi-player" sound-font> </midi-player>
-    <span id="midiSpeedmodeIndicator"
-      title="Speed mode is active; only playing MIDI for current page. To play the entire encoding, disable speed mode.">
-      Speed mode</span>
+    <div id="midiPlaybackControlBar">
+      <midi-player id="midi-player" sound-font> </midi-player>
+      <span
+        id="midiSpeedmodeIndicator"
+        title="Speed mode is active; only playing MIDI for current page. To play the entire encoding, disable speed mode."
+        >Speed mode</span
+      >
+      <select id="controlbar-midi-expansion-selector" name="expansion-select" title="Select expansion element for MIDI playback"><option value="">No expansion</option></select>
     <span id="closeMidiPlaybackControlBarButton" title="Hide MIDI Playback Control Bar">×</span>
-  </div>
+    </div>
 
   <div class="footer">
     <div id="midiPlayerContextual">
@@ -930,6 +1033,7 @@
 
     // switch tabs in settings menu
     function switchTab(ev, containingElementId) {
+      console.log("switchtab :", ev, containingElementId)
       const tabId = ev.target.dataset.tab;
       // console.log('switchTab: ', containingElementId, tabId);
       // console.log('switchTab: ', ev);

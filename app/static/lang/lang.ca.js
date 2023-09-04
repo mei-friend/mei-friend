@@ -7,7 +7,7 @@ import { heart } from '../css/icons.js';
 
 export const lang = {
   // Main menu bar
-  githubLoginLink: { text: 'Iniciar sessió' },
+  githubLoginLink: { text: 'Inicia sessió' },
 
   month: {
     jan: 'Gener',
@@ -29,7 +29,7 @@ export const lang = {
   openMeiText: { text: 'Obre fitxer' },
   openUrlText: { text: 'Obre URL' },
   openExample: {
-    text: 'Repartori públic',
+    text: 'Repertori públic',
     description: 'Obre una llista de repertori de domini públic',
   },
   importMusicXml: { text: 'Importa MusicXML' },
@@ -54,6 +54,7 @@ export const lang = {
   surroundWithTagsText: { text: 'Envoltar amb tags' },
   surroundWithLastTagText: { text: 'Envoltar amb ' },
   jumpToLineText: { text: 'Salta a línia' },
+  toMatchingTagText: { text: 'Anar al tag coincident' },
   manualValidateText: { text: 'Valida' },
 
   // VIEW MENU ITEM / ELEMENT DEL MENU DE VISUALITZACIÓ
@@ -77,15 +78,17 @@ export const lang = {
   betweenPlacementText: { text: 'Posició entre' },
   addVerticalGroupText: { text: 'Afegeix grup vertical' },
   deleteText: { text: 'Esborra element' },
-  pitchUpText: { text: 'Augmenta 1 to' },
-  pitchDownText: { text: 'Disminueix 1 to' },
+  pitchChromUpText: { text: 'Tonalitat cromàtica més alta' },
+  pitchChromDownText: { text: 'Tonalitat cromàtica més baixa' },
+  pitchUpDiatText: { text: 'Tonalitat diatònica més alta' },
+  pitchDownDiatText: { text: 'Tonalitat diatònica més baixa' },
   pitchOctaveUpText: { text: 'Augmenta 1 octava' },
   pitchOctaveDownText: { text: 'Disminueix 1 octava' },
   staffUpText: { text: 'Element 1 pauta amunt' },
   staffDownText: { text: 'Element 1 pauta avall' },
   increaseDurText: { text: 'Augmenta duració' },
   decreaseDurText: { text: 'Disminueix duració' },
-  cleanAccidText: { text: 'Neteja @accid.ges' },
+  cleanAccidText: { text: 'Verificar @accid.ges' },
   renumberMeasuresTestText: { text: 'Reenumera mesures (prova)' },
   renumberMeasuresExecText: { text: 'Reenumera mesures (execució)' },
   addIdsText: { text: 'Afegeix IDs a MEI' },
@@ -96,6 +99,11 @@ export const lang = {
 
   // INSERT MENU ITEM / INSERCIÓ DELS ELEMENTS DEL MENÚ
   insertMenuTitle: { text: 'Insereix' },
+  addDoubleSharpText: { html: 'Doble sostingut &#119082;' },
+  addSharpText: { html: 'Sostingut &#9839;' },
+  addNaturalText: { html: 'Becaire &#9838;' },
+  addFlatText: { html: 'Bemoll &#9837;' },
+  addDoubleFlatText: { html: 'Doble bemoll &#119083;' },
   addTempoText: { text: 'Tempo' },
   addDirectiveText: { text: 'Directiva' },
   addDynamicsText: { text: 'Dinàmica' },
@@ -138,6 +146,7 @@ export const lang = {
   // HELP MENU ITEM / ELEMENTS DEL MENÚ D'AJUDA
   helpMenuTitle: { text: 'Ajuda' },
   goToHelpPage: { text: "Pàgines d'ajuda de mei-friend" },
+  goToCheatSheet: {text: 'Full de trucs de mei-friend'},
   showChangelog: { text: 'Mostra el registre de canvis de mei-friend' },
   goToGuidelines: { text: 'Mostra les directrius MEI' },
   consultGuidelinesForElementText: { text: "Consulta les directrius per a l'element actual" },
@@ -191,7 +200,7 @@ export const lang = {
   breaksSelect: { description: 'Defineix el comportament de les ruptures de sistema/pàgina de la notació' },
   breaksSelectNone: { text: 'Cap' },
   breaksSelectAuto: { text: 'Automàtic' },
-  breaksSelectMeasure: { text: 'Mesura' },
+  breaksSelectMeasure: { text: 'Compàs' },
   breaksSelectLine: { text: 'Sistema' },
   breaksSelectEncoded: { text: 'Sistema i pàgina' },
   breaksSelectSmart: { text: 'Intel·ligent' },
@@ -274,6 +283,24 @@ export const lang = {
   openUrlChooseComposerText: { text: 'Tria un compositor...' },
   openUrlOpenEncodingByUrlText: { text: 'Obre la codificació allotjada a la web per URL' },
 
+  // GitHub actions modal
+  githubActionsHeadingText: { text: 'Sol·licita el flux de treball de GitHub:' },
+  githubActionsDescription: {
+    text: "Feu clic a \"Executa el flux de treball\" per demanar a l'API de GitHub que executi el flux de treball anterior, utilitzant la configuració d'entrada especificada a continuació. El vostre codi es recarregarà a la seva darrera versió una vegada que s'hagi completat la execució del flux de treball.",
+  },
+  githubActionStatusMsgPrompt: { text: "No s'ha pogut executar el flux de treball: GitHub diu" },
+  githubActionStatusMsgWaiting: {
+    text: 'Si us plau, tingueu paciència mentre GitHub processa el vostre flux de treball...',
+  },
+  githubActionStatusMsgFailure: { text: "No s'ha pogut executar el flux de treball: GitHub diu" },
+  githubActionStatusMsgSuccess: { text: 'Execució del flux de treball completada: GitHub diu' },
+  githubActionsRunButton: { text: 'Executa el flux de treball' },
+  githubActionsRunButtonReload: { text: "Torna a carregar l'arxiu MEI" },
+  githubActionsCancelButton: { text: 'Cancel·la' },
+  githubActionsInputSetterFilepath: { text: "Copia la ruta actual de l'arxiu a l'entrada" },
+  githubActionsInputSetterSelection: { text: "Copia la selecció actual de MEI a l'entrada" },
+  githubActionsInputContainerHeader: { text: "Configuració d'entrada" },
+
   // fork modals // forquilles modals
   forkRepoGithubText: { text: 'Fer una forquilla del repositori de Github' },
   forkRepoGithubExplanation: {
@@ -311,6 +338,25 @@ export const lang = {
   selectTagNameForEnclosureOkButton: { value: "D'acord" },
   selectTagNameForEnclosureCancelButton: { value: 'Cancel·la' },
 
+  // restore Solid session overlay
+  solidExplanation: {
+    description:
+      'Solid és una plataforma descentralitzada de dades enllaçades socials. Inicieu la sessió a Solid per crear anotacions de desacobrament utilitzant dades enllaçades (RDF).',
+  },
+  solidProvider: {
+    description: "Si us plau, escolliu un proveïdor d'identitat Solid (IdP) o especifiqueu el vostre propi.",
+  },
+  solidLoginBtn: { text: 'Iniciar sessió' },
+  solidOverlayCancel: {
+    html: 'Restaurant la sessió de Solid - premeu <span>Esc</span> o feu clic aquí per cancel·lar.',
+  },
+  solidWelcomeMsg: { text: 'Benvingut, ' },
+  solidLogout: { text: 'Tancar la sessió' },
+  solidLoggedOutWarning: {
+    html: `T'has desconnectat de la integració Solid de mei-friend, però el teu navegador encara està connectat a Solid!
+      <a id="solidIdPLogoutLink" target="_blank">Feu clic aquí per desconnectar-vos de Solid</a>.`,
+  },
+
   // annotation panel  / panell d'annotacions
   annotationCloseButtonText: { text: "Tanca el panell d'annotacions" },
   hideAnnotationPanelButton: { description: "Tanca el panell d'annotacions" },
@@ -318,6 +364,8 @@ export const lang = {
   annotationToolsButton: { text: 'Eines', description: "Eines d'annotació" },
   annotationListButton: { text: 'Llista', description: "Llista d'anotacions" },
   writeAnnotStandoffText: { text: 'Anotació web' },
+  annotationToolsIdentifyTitle: { text: 'Identifica' },
+  annotationToolsIdentifySpan: { text: 'Identifica objecte musical' },
   annotationToolsHighlightTitle: { text: 'Resalta' },
   annotationToolsHighlightSpan: { text: 'Resalta' },
   annotationToolsDescribeTitle: { text: 'Descriu' },
@@ -334,9 +382,9 @@ export const lang = {
   deleteAnnotation: { description: 'Elimina aquesta anotació' },
   deleteAnnotationConfirmation: { text: 'Esteu segur que voleu eliminar aquesta anotació?' },
   makeStandOffAnnotation: {
-    description: 'Estat de separació (anotació web)',
-    descriptionSolid: 'Escriu a Solid com a anotació web',
-    descriptionToLocal: "Copia l'URI de l'anotació web al porta-retalls",
+    description: 'Estat stand-off (RDF)',
+    descriptionSolid: 'Escriu a Solid com a RDF',
+    descriptionToLocal: "Obre l'anotació stand-off (RDF) en una pestanya nova",
   },
   makeInlineAnnotation: {
     description: 'Feu clic per a una anotació en línia',
@@ -507,6 +555,10 @@ export const lang = {
     text: 'Destaca les notes que sonen actualment',
     description: 'Destaca visualment les notes que sonen actualment al panell de notació durant la reproducció MIDI',
   },
+  selectMidiExpansion: {
+    text: 'Expansió de la reproducció',
+    description: "Seleccioneu l'element d'expansió a utilitzar per a la reproducció MIDI",
+  },
 
   // Transposition / Transposició
   titleTransposition: {
@@ -585,21 +637,21 @@ export const lang = {
 
   // Renumber measures / Renumber measures
   renumberMeasuresHeading: {
-    text: 'Reenumerar compàsos',
-    description: 'Opcions per reenumerar els compàsos',
+    text: 'Reenumerar compasos',
+    description: 'Opcions per reenumerar els comaàsos',
   },
   renumberMeasureContinueAcrossIncompleteMeasures: {
-    text: 'Continuar a través de compàsos incomplets',
-    description: "Continuar la numeració de compàsos a través de compàsos incomplets (@metcon='false')",
+    text: 'Continuar a través de compasos incomplets',
+    description: "Continuar la numeració de compasos a través de compasos incomplets (@metcon='false')",
   },
   renumberMeasuresUseSuffixAtMeasures: {
-    text: 'Sufix als compàsos incomplets',
-    description: 'Utilitzar sufix numèric als compàsos incomplets (p. ex. 23-cont)',
+    text: 'Sufix als compasos incomplets',
+    description: 'Utilitzar sufix numèric als compasos incomplets (p. ex. 23-cont)',
     labels: ['cap', '-cont'],
   },
   renumberMeasuresContinueAcrossEndings: {
     text: 'Continuar a través de finals',
-    description: 'Continuar la numeració de compàsos a través de finals',
+    description: 'Continuar la numeració de compasos a través de finals',
   },
   renumberMeasuresUseSuffixAtEndings: {
     text: 'Sufix als finals',
@@ -725,6 +777,10 @@ export const lang = {
     text: 'Validació automàtica',
     description: 'Valida la codificació automàticament després de cada edició',
   },
+  autoShowValidationReport: {
+    text: 'Mostra el informe de validació automàticament',
+    description: "Mostra l'informe de validació automàticament després que s'hagi realitzat la validació",
+  },
   autoCloseBrackets: {
     text: 'Tancament automàtic de claudàtors',
     description: 'Tanca els claudàtors automàticament en introduir-los',
@@ -825,4 +881,31 @@ export const lang = {
   renumberMeasuresWouldBe: { text: 'seria' },
   renumberMeasuresChangedTo: { text: 'canviat a' },
   renumberMeasureMeasuresRenumbered: { text: 'mesures reenumerades' },
+
+  // Code checker panel (accid.ges)
+  codeCheckerTitle: {
+    text: 'Verifica els atributs @accid.ges (en comparació amb la clau de sol, els accid. per compàs i les lligadures).',
+  },
+  codeCheckerFix: { text: 'Corregeix' },
+  codeCheckerFixAll: { text: 'Corregir tot' },
+  codeCheckerIgnore: { text: 'Ignora' },
+  codeCheckerIgnoreAll: { text: 'Ignora tot' },
+  codeCheckerCheckingCode: { text: 'Comprovant codi...' },
+  codeCheckerNoAccidMessagesFound: { text: 'Tots els atributs accid.ges semblen correctes.' },
+  codeCheckerMeasure: { text: 'Mesura' },
+  codeCheckerNote: { text: 'Nota' },
+  codeCheckerHasBoth: { text: 'té ambdós' },
+  codeCheckerAnd: { text: 'i' },
+  codeCheckerRemove: { text: 'Suprimeix' },
+  codeCheckerFixTo: { text: 'Corregir a' },
+  codeCheckerAdd: { text: 'Afegir' },
+  codeCheckerWithContradictingContent: { text: 'amb contingut contradictori' },
+  codeCheckerTiedNote: { text: 'Nota lligada' },
+  codeCheckerNotSamePitchAs: { text: 'no té la mateixa alçada que' },
+  codeCheckerNotSameOctaveAs: { text: 'no té el mateix octavatge que' },
+  codeCheckerNotSameAsStartingNote: { text: "no és la mateixa que la nota d'inici" },
+  codeCheckerExtra: { text: 'extra' },
+  codeCheckerHasExtra: { text: 'té extra' },
+  codeCheckerLacksAn: { text: 'li falta un' },
+  codeCheckerBecauseAlreadyDefined: { text: "perquè ja s'ha definit anteriorment a la mesura" },
 };
