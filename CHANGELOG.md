@@ -6,6 +6,7 @@
 * Provide menu items and keyboard shortcuts to insert accidentals (+, -, =) (feature request #35)
 * Fix bug that prevented encoded @color to be shown (#34)
 * Fix bug that prevented MEI and SVG download in Safari (#33)
+* Implement loading of Web Annotations using DataCatalog discovery model
 
 ### 0.10.4
 * Add UI panel inside editor panel to check and interactively fix all occurrences of @accid.ges against key signature, measure-wise accids, ties, and redundant information.

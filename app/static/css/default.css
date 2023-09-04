@@ -920,13 +920,13 @@ svg text {
 
 #verovio-panel .currently-playing {
   fill: orange !important;
-  stroke: orange !important;
   color: orange !important;
 }
 
-#verovio-panel .highlighted {
+#verovio-panel .highlighted,
+#verovio-panel .highlighted g {
   color: var(--highlightColor);
-  stroke: var(--highlightColor);
+  fill: var(--highlightColor);
 }
 
 #verovio-panel g.highlighted,
@@ -952,23 +952,25 @@ svg text {
 #verovio-panel g.supplied g {
   fill: var(--suppliedColor);
   color: var(--suppliedColor);
-  stroke: var(--suppliedColor);
 }
 
 #verovio-panel .supplied .highlighted {
   color: var(--suppliedHighlightedColor);
-  stroke: var(--suppliedHighlightedColor);
+  fill: var(--suppliedHighlightedColor);
 }
 
 #verovio-panel g.supplied g.highlighted {
   fill: var(--suppliedHighlightedColor);
 }
 
-#verovio-panel:not(g[color]g[fill]),
-#verovio-panel path {
+#verovio-panel {
   fill: var(--notationColor);
   color: var(--notationColor);
   stroke: var(--notationColor);
+}
+
+#verovio-panel svg.definition-scale {
+  color: unset;
 }
 
 #facsimile-panel rect {
