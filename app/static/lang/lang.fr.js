@@ -707,22 +707,50 @@ export const lang = {
   },
 
   // Supplied element / Élément fourni
-  titleSupplied: {
-    text: 'Gérer le contenu éditorial',
-    description: 'Contrôle la gestion des éléments <fournis>',
-  },
-  showSupplied: {
-    text: 'Afficher les éléments <fournis>',
-    description: 'Surligne tous les éléments contenus par un élément <fourni>',
-  },
-  suppliedColor: {
-    text: 'Sélectionner la couleur de surlignage <fourni>',
-    description: 'Sélectionnez la couleur de surlignage <fourni>',
-  },
-  respSelect: {
-    text: 'Sélectionner la responsabilité <fournie>',
-    description: "Sélectionner l'identifiant de responsabilité",
-  },
+titleSupplied: {
+  text: 'Gérer le contenu éditorial',
+  description: 'Contrôler la gestion de la mise en forme éditoriale',
+},
+respSelect: {
+  text: 'Sélectionner la responsabilité de la mise en forme',
+  description: 'Sélectionner l\'ID de la responsabilité',
+},
+showMarkup: {
+  text: 'Afficher les éléments de mise en forme éditoriale',
+  description: 'Surligner tous les éléments contenus dans les éléments de mise en forme éditoriale',
+},
+suppliedColor: {
+  text: 'Sélectionner la couleur de mise en évidence <supplied>',
+  description: 'Sélectionner la couleur de mise en évidence <supplied>',
+},
+unclearColor: {
+  title: 'Sélectionner la couleur de mise en évidence <unclear>',
+  description: 'Sélectionner la couleur de mise en évidence <unclear>',
+},
+sicColor: {
+  title: 'Sélectionner la couleur de mise en évidence <sic>',
+  description: 'Sélectionner la couleur de mise en évidence <sic>',
+},
+corrColor: {
+  title: 'Sélectionner la couleur de mise en évidence <corr>',
+  description: 'Sélectionner la couleur de mise en évidence <corr>',
+},
+origColor: {
+  title: 'Sélectionner la couleur de mise en évidence <orig>',
+  description: 'Sélectionner la couleur de mise en évidence <orig>',
+},
+regColor: {
+  title: 'Sélectionner la couleur de mise en évidence <reg>',
+  description: 'Sélectionner la couleur de mise en évidence <reg>',
+},
+addColor: {
+  title: 'Sélectionner la couleur de mise en évidence <add>',
+  description: 'Sélectionner la couleur de mise en évidence <add>',
+},
+delColor: {
+  title: 'Sélectionner la couleur de mise en évidence <del>',
+  description: 'Sélectionner la couleur de mise en évidence <del>',
+},
 
   //  EDITOR SETTINGS / CODEMIRROR SETTINGS / PARAMÈTRES DE L'ÉDITEUR / PARAMÈTRES DE CODEMIRROR
   editorSettingsHeader: {

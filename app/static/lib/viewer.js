@@ -1052,6 +1052,7 @@ export default class Viewer {
           delete storage['mf-' + opt];
         }
       }
+      let checkedMarkup;
       // set default values for mei-friend settings
       switch (opt) {
         case 'selectToolkitVersion':
@@ -1075,25 +1076,49 @@ export default class Viewer {
         case 'toggleSpeedMode':
           document.getElementById('midiSpeedmodeIndicator').style.display = this.speedMode ? 'inline' : 'none';
           break;
-        case 'showSupplied':
-          rt.style.setProperty('--suppliedColor', value ? 'var(--defaultSuppliedColor)' : 'var(--notationColor)');
-          rt.style.setProperty(
-            '--suppliedHighlightedColor',
-            value ? 'var(--defaultSuppliedHighlightedColor)' : 'var(--highlightColor)'
-          );
+        case 'showMarkup':
+          att.modelTranscriptionLike.forEach((element) => {
+            let upperCaseElementName = element.charAt(0).toUpperCase() + element.slice(1);
+            rt.style.setProperty(
+              '--' + element + 'Color', 
+              value ? 'var(--default' + upperCaseElementName + 'Color)' : 'var(--notationColor)');
+            rt.style.setProperty(
+              '--' + element + 'HighlightedColor',
+              value ? 'var(--default' + upperCaseElementName + 'HighlightedColor)' : 'var(--highlightColor)'
+            );
+          });
           break;
         case 'suppliedColor':
-          let checked = document.getElementById('showSupplied').checked;
-          rt.style.setProperty('--defaultSuppliedColor', checked ? value : 'var(--notationColor)');
-          rt.style.setProperty(
-            '--defaultSuppliedHighlightedColor',
-            checked ? utils.brighter(value, -50) : 'var(--highlightColor)'
-          );
-          rt.style.setProperty('--suppliedColor', checked ? value : 'var(--notationColor)');
-          rt.style.setProperty(
-            '--suppliedHighlightedColor',
-            checked ? utils.brighter(value, -50) : 'var(--highlightColor)'
-          );
+          checkedMarkup = document.getElementById('showMarkup').checked;
+          setHighlightColorProperty('supplied', checkedMarkup, value, true);
+          break;
+        case 'unclearColor':
+          checkedMarkup = document.getElementById('showMarkup').checked;
+          setHighlightColorProperty('unclear', checkedMarkup, value, true);
+          break;
+        case 'sicColor':
+          checkedMarkup = document.getElementById('showMarkup').checked;
+          setHighlightColorProperty('sic', checkedMarkup, value, true);
+          break;
+        case 'corrColor':
+          checkedMarkup = document.getElementById('showMarkup').checked;
+          setHighlightColorProperty('corr', checkedMarkup, value, true);
+          break;
+        case 'origColor':
+          checkedMarkup = document.getElementById('showMarkup').checked;
+          setHighlightColorProperty('orig', checkedMarkup, value, true);
+          break;
+        case 'regColor':
+          checkedMarkup = document.getElementById('showMarkup').checked;
+          setHighlightColorProperty('reg', checkedMarkup, value, true);
+          break;
+        case 'addColor':
+          checkedMarkup = document.getElementById('showMarkup').checked;
+          setHighlightColorProperty('add', checkedMarkup, value, true);
+          break;
+        case 'delColor':
+          checkedMarkup = document.getElementById('showMarkup').checked;
+          setHighlightColorProperty('del', checkedMarkup, value, true);
           break;
         case 'respSelect':
           if (this.xmlDoc)
@@ -1207,7 +1232,7 @@ export default class Viewer {
         let value = ev.target.value;
         if (ev.target.type === 'checkbox') value = ev.target.checked;
         if (ev.target.type === 'number') value = parseFloat(value);
-        let col = document.getElementById('suppliedColor').value;
+        let checkedMarkup = document.getElementById('showMarkup').checked;
         switch (option) {
           case 'selectToolkitVersion':
             this.vrvWorker.postMessage({
@@ -1312,20 +1337,38 @@ export default class Viewer {
             let facsZoom = document.getElementById('facsimileZoom');
             if (facsZoom) facsZoom.value = value;
             break;
-          case 'showSupplied':
-            rt.style.setProperty('--suppliedColor', value ? col : 'var(--notationColor)');
-            rt.style.setProperty(
-              '--suppliedHighlightedColor',
-              value ? utils.brighter(col, -50) : 'var(--highlightColor)'
-            );
+          case 'showMarkup':
+            att.modelTranscriptionLike.forEach((element) => {
+              let col = document.getElementById(element + 'Color').value;
+              setHighlightColorProperty(element, value, col, false);
+            });
             break;
           case 'suppliedColor':
-            let checked = document.getElementById('showSupplied').checked;
-            rt.style.setProperty('--suppliedColor', checked ? col : 'var(--notationColor)');
-            rt.style.setProperty(
-              '--suppliedHighlightedColor',
-              checked ? utils.brighter(col, -50) : 'var(--highlightColor)'
-            );
+            setHighlightColorProperty('supplied', checkedMarkup, document.getElementById(option).value, false);
+            break;
+          case 'unclearColor':
+            setHighlightColorProperty('unclear', checkedMarkup, document.getElementById(option).value, false);
+            break;
+          case 'sicColor':
+            setHighlightColorProperty('sic', checkedMarkup, document.getElementById(option).value, false);
+            break;
+          case 'corrColor':
+            setHighlightColorProperty('corr', checkedMarkup, document.getElementById(option).value, false);
+            break;
+          case 'origColor':
+            setHighlightColorProperty('orig', checkedMarkup, document.getElementById(option).value, false);
+            break;
+          case 'regColor':
+            setHighlightColorProperty('reg', checkedMarkup, document.getElementById(option).value, false);
+            break;
+          case 'addColor':
+            setHighlightColorProperty('add', checkedMarkup, document.getElementById(option).value, false);
+            break;
+          case 'delColor':
+            setHighlightColorProperty('del', checkedMarkup, document.getElementById(option).value, false);
+            break;
+          case 'respSelect':
+            this.respId = document.getElementById('respSelect').value;
             break;
           case 'controlMenuFontSelector':
             document.getElementById('engravingFontControls').style.display = document.getElementById(
@@ -1409,6 +1452,21 @@ export default class Viewer {
             break;
         }
       });
+    }
+
+    function setHighlightColorProperty(elementName, checkedMarkup, colorValue, setDefault = false) {
+      if(setDefault = true) {
+        let upperCaseElementName = elementName.charAt(0).toUpperCase() + elementName.slice(1);
+        rt.style.setProperty('--default' + upperCaseElementName + 'Color',
+          checkedMarkup ? colorValue :  'var(--notationColor)');
+        rt.style.setProperty('--default' + upperCaseElementName + 'HighlightedColor',
+          checkedMarkup ? utils.brighter(colorValue, -50) :  'var(--highlightColor)');
+      }
+
+      rt.style.setProperty('--' + elementName + 'Color', 
+        checkedMarkup ? colorValue : 'var(--notationColor)');
+      rt.style.setProperty('--' + elementName + 'HighlightedColor', 
+        checkedMarkup ? utils.brighter(colorValue, -50) : 'var(--highlightColor)');
     }
   } // addMeiFriendOptionsToSettingsPanel()
 
@@ -1815,7 +1873,8 @@ export default class Viewer {
         if (el.closest('respStmt')) {
           // only if inside a respStmt
           let id = el.getAttribute('xml:id');
-          rs.add(new Option(id, id, id === value ? true : false, id === value ? true : false));
+          let name = el.innerHTML;
+          rs.add(new Option(name, id, id === value ? true : false, id === value ? true : false));
         }
       });
     }

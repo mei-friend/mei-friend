@@ -702,23 +702,51 @@ export const lang = {
     description: 'Edytuj obszary facsimile (połączy ramki ograniczające z obszarami facsimile)',
   },
 
-  // Supplied element
-  titleSupplied: {
-    text: 'Obsługa treści redakcyjnych',
-    description: 'Kontroluj obsługę elementów <supplied>',
-  },
-  showSupplied: {
-    text: 'Pokaż elementy <supplied>',
-    description: 'Podświetl wszystkie elementy zawarte w elemencie <supplied>',
-  },
-  suppliedColor: {
-    text: 'Wybierz kolor podświetlenia <supplied>',
-    description: 'Wybierz kolor podświetlenia <supplied>',
-  },
-  respSelect: {
-    text: 'Wybierz odpowiedzialność <supplied>',
-    description: 'Wybierz identyfikator odpowiedzialności',
-  },
+  // Supplied element // Element dostarczony
+titleSupplied: {
+  text: 'Zarządzaj treścią redakcyjną',
+  description: 'Kontroluj obsługę znaczników redakcyjnych',
+},
+respSelect: {
+  text: 'Wybierz odpowiedzialność znacznika',
+  description: 'Wybierz identyfikator odpowiedzialności',
+},
+showMarkup: {
+  text: 'Pokaż elementy znacznika redakcyjnego',
+  description: 'Podświetl wszystkie elementy zawarte w elementach znacznika redakcyjnego',
+},
+suppliedColor: {
+  text: 'Wybierz kolor podświetlenia <supplied>',
+  description: 'Wybierz kolor podświetlenia <supplied>',
+},
+unclearColor: {
+  title: 'Wybierz kolor podświetlenia <unclear>',
+  description: 'Wybierz kolor podświetlenia <unclear>',
+},
+sicColor: {
+  title: 'Wybierz kolor podświetlenia <sic>',
+  description: 'Wybierz kolor podświetlenia <sic>',
+},
+corrColor: {
+  title: 'Wybierz kolor podświetlenia <corr>',
+  description: 'Wybierz kolor podświetlenia <corr>',
+},
+origColor: {
+  title: 'Wybierz kolor podświetlenia <orig>',
+  description: 'Wybierz kolor podświetlenia <orig>',
+},
+regColor: {
+  title: 'Wybierz kolor podświetlenia <reg>',
+  description: 'Wybierz kolor podświetlenia <reg>',
+},
+addColor: {
+  title: 'Wybierz kolor podświetlenia <add>',
+  description: 'Wybierz kolor podświetlenia <add>',
+},
+delColor: {
+  title: 'Wybierz kolor podświetlenia <del>',
+  description: 'Wybierz kolor podświetlenia <del>',
+},
 
   // EDITOR SETTINGS / CODEMIRROR SETTINGS
   editorSettingsHeader: {

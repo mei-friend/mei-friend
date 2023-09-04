@@ -605,8 +605,15 @@ export const meiFriendSettingsOptions = {
     open: false,
     default: false,
   },
-  showSupplied: {
-    title: 'Show <supplied> elements',
+  respSelect: {
+    title: 'Select markup responsibility',
+    description: 'filled in by language packs',
+    type: 'select',
+    default: 'none',
+    values: [],
+  },
+  showMarkup: {
+    title: 'Show editorial markup elements',
     description: 'filled in by language packs',
     type: 'bool',
     default: true,
@@ -617,12 +624,47 @@ export const meiFriendSettingsOptions = {
     type: 'color',
     default: '#e69500',
   },
-  respSelect: {
-    title: 'Select <supplied> responsibility',
+  unclearColor: {
+    title: 'Select <unclear> highlight color',
     description: 'filled in by language packs',
-    type: 'select',
-    default: 'none',
-    values: [],
+    type: 'color',
+    default: '#964036',
+  },
+  sicColor: {
+    title: 'Select <sic> highlight color',
+    description: 'filled in by language packs',
+    type: 'color',
+    default: '#b30000',
+  },
+  corrColor: {
+    title: 'Select <corr> highlight color',
+    description: 'filled in by language packs',
+    type: 'color',
+    default: '#408000',
+  },
+  origColor: {
+    title: 'Select <orig> highlight color',
+    description: 'filled in by language packs',
+    type: 'color',
+    default: '#993399',
+  },
+  regColor: {
+    title: 'Select <reg> highlight color',
+    description: 'filled in by language packs',
+    type: 'color',
+    default: '#3300cc',
+  },
+  addColor: {
+    title: 'Select <add> highlight color',
+    description: 'filled in by language packs',
+    type: 'color',
+    default: '#00cccc',
+  },
+  delColor: {
+    title: 'Select <del> highlight color',
+    description: 'filled in by language packs',
+    type: 'color',
+    default: '#8585ad',
   },
   // dragLineSeparator: {
   //   title: 'options-line', // class name of hr element
