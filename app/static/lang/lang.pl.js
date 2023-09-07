@@ -61,16 +61,16 @@ export const lang = {
   viewMenuTitle: { text: 'Widok' },
   notationTop: { text: 'Notacja u góry' },
   notationBottom: { text: 'Notacja na dole' },
-  notationLeft: { text: 'Notacja po lewej' },
-  notationRight: { text: 'Notacja po prawej' },
+  notationLeft: { text: 'Notacja po lewej stronie' },
+  notationRight: { text: 'Notacja po prawej stronie' },
   showSettingsMenuText: { text: 'Panel ustawień' },
   showAnnotationMenuText: { text: 'Panel adnotacji' },
   showFacsimileMenuText: { text: 'Panel faksymile' },
   showPlaybackControlsText: { text: 'Elementy sterowania odtwarzaniem' },
   facsimileTop: { text: 'Faksymile u góry' },
   facsimileBottom: { text: 'Faksymile na dole' },
-  facsimileLeft: { text: 'Faksymile po lewej' },
-  facsimileRight: { text: 'Faksymile po prawej' },
+  facsimileLeft: { text: 'Faksymile po lewej stronie' },
+  facsimileRight: { text: 'Faksymile po prawej stronie' },
 
   // INSERT MENU ITEM // ELEMENT MENU ITEM
   manipulateMenuTitle: { text: 'Manipuluj' },
@@ -163,7 +163,8 @@ export const lang = {
   leftFooter: {
     html:
       'Hostowany przez <a href="https://iwk.mdw.ac.at">IWK</a> ' +
-      'na <a href="https://mdw.ac.at">mdw</a>, z sercem ' +
+      'na <a href="https://mdw.ac.at">mdw</a>, z ' +
+      heart +
       'z Wiednia. ' +
       '<a href="https://iwk.mdw.ac.at/impressum">Oświadczenie</a>.',
   },
