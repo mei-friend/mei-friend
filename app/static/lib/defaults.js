@@ -216,8 +216,6 @@ export const defaultMeiFileName = `${root}Beethoven_WoO70-Breitkopf.mei`;
 export const defaultVerovioOptions = {
   scale: 55,
   breaks: 'line',
-  header: 'encoded',
-  footer: 'encoded',
   inputFrom: 'mei',
   adjustPageHeight: true,
   mdivAll: true,
