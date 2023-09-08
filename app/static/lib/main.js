@@ -1,6 +1,6 @@
 // mei-friend version and date
-export const version = '1.0.0';
-export const versionDate = '4 September 2023'; // use full or 3-character english months, will be translated
+export const version = '1.0.1';
+export const versionDate = '8 September 2023'; // use full or 3-character english months, will be translated
 
 var vrvWorker;
 var spdWorker;
@@ -408,6 +408,7 @@ document.addEventListener('DOMContentLoaded', function () {
 function onLanguageLoaded() {
   // expose default language pack for debug
   if (env && env === environments.develop) {
+    console.debug('Running language checks in develop environment:');
     runLanguageChecks();
     // console.debug('Default language pack: ', JSON.stringify(translator.defaultLang, null, 2));
   }
