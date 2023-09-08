@@ -2,36 +2,14 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   sodipodi:docname="testing-menu-logo.svg"
    id="svg442418"
    version="1.1"
    viewBox="0 0 281.24725 70.274609"
    height="70.274605mm"
    width="281.24725mm"
-   inkscape:version="1.2.2 (b0a84865, 2022-12-01)"
-   inkscape:export-filename="testing-menu-logo.png"
-   inkscape:export-xdpi="96"
-   inkscape:export-ydpi="96"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg">
-  <sodipodi:namedview
-     id="namedview6231"
-     pagecolor="#ffffff"
-     bordercolor="#000000"
-     borderopacity="0.25"
-     inkscape:showpageshadow="2"
-     inkscape:pageopacity="0.0"
-     inkscape:pagecheckerboard="0"
-     inkscape:deskcolor="#d1d1d1"
-     inkscape:document-units="mm"
-     showgrid="false"
-     inkscape:zoom="0.88853814"
-     inkscape:cx="499.13445"
-     inkscape:cy="108.60535"
-     inkscape:current-layer="layer1" />
   <defs
      id="defs442415">
     <rect
@@ -157,7 +135,6 @@
     </clipPath>
     <filter
        id="mask-powermask-path-effect10137_inverse"
-       inkscape:label="filtermask-powermask-path-effect10137"
        style="color-interpolation-filters:sRGB"
        height="100"
        width="100"
@@ -472,14 +449,12 @@
      y="0"><tspan
        x="244.2207"
        y="-57.750808"
-       id="tspan10749"><tspan
-         style="font-weight:bold;text-align:start;text-anchor:start"
-         id="tspan10747">TESTING VERSION (unstable)
+       id="tspan12574"><tspan
+         style="font-weight:bold;text-align:start"
+         id="tspan12572">TESTING VERSION (unstable)
 </tspan></tspan></text>
   <g
-     inkscape:groupmode="layer"
-     id="layer1"
-     inkscape:label="Layer 1">
+     id="layer1">
     <g
        transform="matrix(0.74206649,0,0,0.74206649,57.267668,-709.32225)"
        id="g2264">
@@ -492,12 +467,14 @@
          fill="none"
          stroke="#262626"
          stroke-width="3.705"
-         id="path2248" />
+         id="path2248"
+         style="stroke:#b3b3b3" />
       <path
          fill="#262626"
          color="#000000"
          d="m 12.699,995.11 h 24.1 v 3.554 h -24.1 z"
-         id="path2250" />
+         id="path2250"
+         style="stroke:#b3b3b3;fill:#b3b3b3" />
       <path
          d="m 31.03,980.33 c -1.23,0 -2.219,0.989 -2.219,2.219 0,1.23 0.989,2.25 2.219,2.25 1.23,0 2.25,-1.02 2.25,-2.25 0,-1.23 -1.02,-2.219 -2.25,-2.219 m -6.437,5.656 c -2.324,0 -4.219,1.864 -4.219,4.188 0,2.324 1.895,4.219 4.219,4.219 2.324,0 4.188,-1.895 4.188,-4.219 0,-2.324 -1.864,-4.188 -4.188,-4.188 m 4.844,40.531 c -1.977,0 -3.594,1.585 -3.594,3.563 0,1.977 1.617,3.594 3.594,3.594 1.977,0 3.562,-1.617 3.562,-3.594 0,-1.977 -1.585,-3.563 -3.563,-3.563 m 5.531,10.875 c -1.056,0 -1.906,0.85 -1.906,1.906 0,1.056 0.85,1.906 1.906,1.906 1.056,0 1.938,-0.85 1.938,-1.906 0,-1.056 -0.881,-1.906 -1.938,-1.906"
          fill="#f2b827"
