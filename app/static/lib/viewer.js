@@ -668,7 +668,8 @@ export default class Viewer {
     let owl = document.getElementById('mei-friend-logo');
     let owlSrc = owl.getAttribute('src');
     owlSrc = owlSrc.substring(0, owlSrc.lastIndexOf('/') + 1);
-    if (env === environments.staging) owlSrc += 'staging-';
+    if (env === environments.staging) { owlSrc += 'staging-' }
+    else if (env === environments.testing) { owlSrc += 'testing-' };
     if (j < 128) {
       // dark
       // wake up owl
