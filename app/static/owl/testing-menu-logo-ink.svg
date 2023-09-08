@@ -26,8 +26,8 @@
      inkscape:document-units="mm"
      showgrid="false"
      inkscape:zoom="0.88853814"
-     inkscape:cx="586.91909"
-     inkscape:cy="122.11068"
+     inkscape:cx="491.25635"
+     inkscape:cy="124.36157"
      inkscape:current-layer="layer1" />
   <defs
      id="defs442415">
@@ -469,9 +469,9 @@
      y="0"><tspan
        x="244.2207"
        y="-57.750808"
-       id="tspan10251"><tspan
-         style="font-weight:bold;text-align:start;text-anchor:start"
-         id="tspan10249">TESTING VERSION (unstable)
+       id="tspan12233"><tspan
+         style="font-weight:bold;text-align:start"
+         id="tspan12231">TESTING VERSION (unstable)
 </tspan></tspan></text>
   <g
      inkscape:groupmode="layer"
@@ -489,12 +489,14 @@
          fill="none"
          stroke="#262626"
          stroke-width="3.705"
-         id="path2248" />
+         id="path2248"
+         style="stroke:#b3b3b3" />
       <path
          fill="#262626"
          color="#000000"
          d="m 12.699,995.11 h 24.1 v 3.554 h -24.1 z"
-         id="path2250" />
+         id="path2250"
+         style="stroke:#b3b3b3;fill:#b3b3b3" />
       <path
          d="m 31.03,980.33 c -1.23,0 -2.219,0.989 -2.219,2.219 0,1.23 0.989,2.25 2.219,2.25 1.23,0 2.25,-1.02 2.25,-2.25 0,-1.23 -1.02,-2.219 -2.25,-2.219 m -6.437,5.656 c -2.324,0 -4.219,1.864 -4.219,4.188 0,2.324 1.895,4.219 4.219,4.219 2.324,0 4.188,-1.895 4.188,-4.219 0,-2.324 -1.864,-4.188 -4.188,-4.188 m 4.844,40.531 c -1.977,0 -3.594,1.585 -3.594,3.563 0,1.977 1.617,3.594 3.594,3.594 1.977,0 3.562,-1.617 3.562,-3.594 0,-1.977 -1.585,-3.563 -3.563,-3.563 m 5.531,10.875 c -1.056,0 -1.906,0.85 -1.906,1.906 0,1.056 0.85,1.906 1.906,1.906 1.056,0 1.938,-0.85 1.938,-1.906 0,-1.056 -0.881,-1.906 -1.938,-1.906"
          fill="#f2b827"
