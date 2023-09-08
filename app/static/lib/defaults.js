@@ -78,7 +78,7 @@ export const isSafari = !!navigator.userAgent.match(/Version\/[\d\.]+.*Safari/);
 
 // guidelines base URL, needed to construct element / attribute URLs
 // TODO ideally determine version part automatically
-export const guidelinesBase = 'https://music-encoding.org/guidelines/v4/';
+export const guidelinesBase = 'https://music-encoding.org/guidelines/v5/';
 
 /**
  * Object of common MEI schemas,
@@ -86,43 +86,51 @@ export const guidelinesBase = 'https://music-encoding.org/guidelines/v4/';
  * and meiVersion ('4.0.1', etc.)
  */
 export const commonSchemas = {
+  Basic: {
+    '5.0': 'https://music-encoding.org/schema/5.0/mei-basic.rng',
+  },
   CMN: {
     '2.1.1': 'https://music-encoding.org/schema/2.1.1/mei-CMN.rng',
     '3.0.0': 'https://music-encoding.org/schema/3.0.0/mei-CMN.rng',
     '4.0.0': 'https://music-encoding.org/schema/4.0.0/mei-CMN.rng',
     '4.0.1': 'https://music-encoding.org/schema/4.0.1/mei-CMN.rng',
-    '5.0.0-dev': 'https://music-encoding.org/schema/dev/mei-CMN.rng',
+    '5.0': 'https://music-encoding.org/schema/5.0/mei-CMN.rng',
+    // '5.0.0-dev': 'https://music-encoding.org/schema/dev/mei-CMN.rng',
   },
   Mensural: {
     '2.1.1': 'https://music-encoding.org/schema/2.1.1/mei-Mensural.rng',
     '3.0.0': 'https://music-encoding.org/schema/3.0.0/mei-Mensural.rng',
     '4.0.0': 'https://music-encoding.org/schema/4.0.0/mei-Mensural.rng',
     '4.0.1': 'https://music-encoding.org/schema/4.0.1/mei-Mensural.rng',
-    '5.0.0-dev': 'https://music-encoding.org/schema/dev/mei-Mensural.rng',
+    '5.0': 'https://music-encoding.org/schema/5.0/mei-Mensural.rng',
+    // '5.0.0-dev': 'https://music-encoding.org/schema/dev/mei-Mensural.rng',
   },
   Neumes: {
     '2.1.1': 'https://music-encoding.org/schema/2.1.1/mei-Neumes.rng',
     '3.0.0': 'https://music-encoding.org/schema/3.0.0/mei-Neumes.rng',
     '4.0.0': 'https://music-encoding.org/schema/4.0.0/mei-Neumes.rng',
     '4.0.1': 'https://music-encoding.org/schema/4.0.1/mei-Neumes.rng',
-    '5.0.0-dev': 'https://music-encoding.org/schema/dev/mei-Neumes.rng',
+    '5.0.': 'https://music-encoding.org/schema/5.0/mei-Neumes.rng',
+    // '5.0.0-dev': 'https://music-encoding.org/schema/dev/mei-Neumes.rng',
   },
   All: {
     '2.1.1': 'https://music-encoding.org/schema/2.1.1/mei-all.rng',
     '3.0.0': 'https://music-encoding.org/schema/3.0.0/mei-all.rng',
     '4.0.0': 'https://music-encoding.org/schema/4.0.0/mei-all.rng',
     '4.0.1': 'https://music-encoding.org/schema/4.0.1/mei-all.rng',
-    '5.0.0-dev': 'https://music-encoding.org/schema/dev/mei-all.rng',
+    '5.0': 'https://music-encoding.org/schema/5.0/mei-all.rng',
+    // '5.0.0-dev': 'https://music-encoding.org/schema/dev/mei-all.rng',
   },
   Any: {
     '2.1.1': 'https://music-encoding.org/schema/2.1.1/mei-all_anyStart.rng',
     '3.0.0': 'https://music-encoding.org/schema/3.0.0/mei-all_anyStart.rng',
     '4.0.0': 'https://music-encoding.org/schema/4.0.0/mei-all_anyStart.rng',
     '4.0.1': 'https://music-encoding.org/schema/4.0.1/mei-all_anyStart.rng',
-    '5.0.0-dev': 'https://music-encoding.org/schema/dev/mei-all_anyStart.rng',
+    '5.0': 'https://music-encoding.org/schema/5.0/mei-all_anyStart.rng',
+    // '5.0.0-dev': 'https://music-encoding.org/schema/dev/mei-all_anyStart.rng',
   },
 };
-export const defaultMeiVersion = '4.0.1';
+export const defaultMeiVersion = '5.0';
 export const defaultMeiProfile = 'CMN';
 export const defaultSchema = commonSchemas[defaultMeiProfile][defaultMeiVersion];
 
@@ -142,6 +150,11 @@ supportedVerovioVersions.develop = {
 supportedVerovioVersions.latest = {
   url: 'https://www.verovio.org/javascript/latest/verovio-toolkit-hum.js',
   description: 'Current Verovio release',
+};
+supportedVerovioVersions['4.0.1'] = {
+  url: 'https://www.verovio.org/javascript/4.0.1/verovio-toolkit-hum.js',
+  description: 'Verovio release 4.0.1',
+  releaseDate: '5 Sept 2023',
 };
 supportedVerovioVersions['3.16.0'] = {
   url: 'https://www.verovio.org/javascript/3.16.0/verovio-toolkit-hum.js',
