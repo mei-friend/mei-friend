@@ -958,6 +958,7 @@ export function addTranscriptionLikeElement(v, cm, attrName = 'none', mElName = 
 
   let uuids = [];
   let elementGroups = [];
+  let abort = false;
 
   // this loop updated the list of selected elements to be wrapped by markup
   // and will separate the list into groups of adjacent elements to be wrapped into a single markup element
@@ -1039,6 +1040,17 @@ export function addTranscriptionLikeElement(v, cm, attrName = 'none', mElName = 
       let id = group[i];
       let el = v.xmlDoc.querySelector("[*|id='" + id + "']");
       let currentParent = el.parentNode;
+
+      // warn and prevent if currentParrent has no xml:id because replacing in editor will fail
+      // TODO: add option to add xml:ids to the file before adding markup
+      // TODO: add setting to automatically add xml:ids to a file
+      if(currentParent && currentParent.getAttribute('xml:id') == null) {
+        const msg = "Action can only be performed if parent element has an xml:id. Please add xml:ids to the document before.";
+        console.log(msg);
+        v.showAlert(msg, 'warning');
+        abort = true;
+        return;
+      }
       
       // special treatment of the first element for id generation and to place sup within the tree (and a sanity check)
       if(i === 0) {
@@ -1068,6 +1080,7 @@ export function addTranscriptionLikeElement(v, cm, attrName = 'none', mElName = 
   // TODO (nice to have): Add @corresp to elements if more than one is created at once
 
   // buffer.groupChangesSinceCheckpoint(checkPoint); // TODO
+  if (abort === true) return;
   v.selectedElements = [];
   uuids.forEach((u) => v.selectedElements.push(u));
   addApplicationInfo(v, cm);
