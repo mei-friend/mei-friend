@@ -1344,7 +1344,10 @@ function consultGuidelines() {
         .join('');
       if (xmlElName && !xmlElName.includes(':')) {
         // it's an element in the default (hopefully MEI...) namespace
-        window.open(guidelinesBase + 'elements/' + xmlElName.toLowerCase(), '_blank');
+        // FIXME: For MEI 3.x and 4.x, guidelines have element name in all lower case
+        // for MEI 5.0, camelCase is required.
+        //window.open(guidelinesBase + 'elements/' + xmlElName.toLowerCase(), '_blank');
+        window.open(guidelinesBase + 'elements/' + xmlElName, '_blank');
       }
     }
   }
