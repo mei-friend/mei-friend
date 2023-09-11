@@ -5,4 +5,4 @@ var environments = {
   production: 'production',
 };
 
-var env = environments.develop;
+var env = environments.staging;
