@@ -89,8 +89,8 @@ export const lang = {
   increaseDurText: { text: 'Augmenta duració' },
   decreaseDurText: { text: 'Disminueix duració' },
   cleanAccidText: { text: 'Verificar @accid.ges' },
-  renumberMeasuresTestText: { text: 'Reenumera mesures (prova)' },
-  renumberMeasuresExecText: { text: 'Reenumera mesures (execució)' },
+  renumberMeasuresTestText: { text: 'Reenumera compassos (prova)' },
+  renumberMeasuresExecText: { text: 'Reenumera compassos (execució)' },
   addIdsText: { text: 'Afegeix IDs a MEI' },
   removeIdsText: { text: 'Elimina IDs de MEI' },
   reRenderMeiVerovio: { text: 'Torna a renderitzar via Verovio' },
@@ -497,8 +497,8 @@ export const lang = {
       "Selecciona lligadures (és a dir, elements amb l'atribut @curvature: " + att.attCurvature.join(', ') + ')',
   },
   dragSelectMeasures: {
-    text: 'Selecciona mesures',
-    description: 'Selecciona mesures',
+    text: 'Selecciona compassos',
+    description: 'Selecciona compassos',
   },
 
   // Control menu / Menú de control
@@ -637,21 +637,21 @@ export const lang = {
 
   // Renumber measures / Renumber measures
   renumberMeasuresHeading: {
-    text: 'Reenumerar compasos',
-    description: 'Opcions per reenumerar els comaàsos',
+    text: 'Reenumerar compassos',
+    description: 'Opcions per reenumerar els compassos',
   },
   renumberMeasureContinueAcrossIncompleteMeasures: {
-    text: 'Continuar a través de compasos incomplets',
-    description: "Continuar la numeració de compasos a través de compasos incomplets (@metcon='false')",
+    text: 'Continuar a través de compassos incomplets',
+    description: "Continuar la numeració de compassos a través de compassos incomplets (@metcon='false')",
   },
   renumberMeasuresUseSuffixAtMeasures: {
-    text: 'Sufix als compasos incomplets',
-    description: 'Utilitzar sufix numèric als compasos incomplets (p. ex. 23-cont)',
+    text: 'Sufix als compassos incomplets',
+    description: 'Utilitzar sufix numèric als compassos incomplets (p. ex. 23-cont)',
     labels: ['cap', '-cont'],
   },
   renumberMeasuresContinueAcrossEndings: {
     text: 'Continuar a través de finals',
-    description: 'Continuar la numeració de compasos a través de finals',
+    description: 'Continuar la numeració de compassos a través de finals',
   },
   renumberMeasuresUseSuffixAtEndings: {
     text: 'Sufix als finals',
@@ -875,12 +875,12 @@ export const lang = {
   allComposers: { text: 'Tots els compositors' },
 
   // utils renumber measures / fork-repository.js
-  renumberMeasuresModalText: { text: 'Reenumerar mesures' },
+  renumberMeasuresModalText: { text: 'Reenumerar compassos' },
   renumberMeasuresModalTest: { text: 'Prova' },
   renumberMeasuresWillBe: { text: '' },
   renumberMeasuresWouldBe: { text: 'seria' },
   renumberMeasuresChangedTo: { text: 'canviat a' },
-  renumberMeasureMeasuresRenumbered: { text: 'mesures reenumerades' },
+  compàscompàs  renumberMeasureMeasuresRenumbered: { text: 'compassos reenumerades' },
 
   // Code checker panel (accid.ges)
   codeCheckerTitle: {
@@ -892,7 +892,7 @@ export const lang = {
   codeCheckerIgnoreAll: { text: 'Ignora tot' },
   codeCheckerCheckingCode: { text: 'Comprovant codi...' },
   codeCheckerNoAccidMessagesFound: { text: 'Tots els atributs accid.ges semblen correctes.' },
-  codeCheckerMeasure: { text: 'Mesura' },
+  codeCheckerMeasure: { text: 'compàs' },
   codeCheckerNote: { text: 'Nota' },
   codeCheckerHasBoth: { text: 'té ambdós' },
   codeCheckerAnd: { text: 'i' },
@@ -907,5 +907,5 @@ export const lang = {
   codeCheckerExtra: { text: 'extra' },
   codeCheckerHasExtra: { text: 'té extra' },
   codeCheckerLacksAn: { text: 'li falta un' },
-  codeCheckerBecauseAlreadyDefined: { text: "perquè ja s'ha definit anteriorment a la mesura" },
+  codeCheckerBecauseAlreadyDefined: { text: "perquè ja s'ha definit anteriorment a la compàs" },
 };
