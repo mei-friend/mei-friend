@@ -880,7 +880,7 @@ export const lang = {
   renumberMeasuresWillBe: { text: '' },
   renumberMeasuresWouldBe: { text: 'seria' },
   renumberMeasuresChangedTo: { text: 'canviat a' },
-  compàscompàs  renumberMeasureMeasuresRenumbered: { text: 'compassos reenumerades' },
+  renumberMeasureMeasuresRenumbered: { text: 'compassos reenumerades' },
 
   // Code checker panel (accid.ges)
   codeCheckerTitle: {
