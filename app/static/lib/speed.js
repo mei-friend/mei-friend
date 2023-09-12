@@ -1228,10 +1228,10 @@ export function countStaves(scoreDef) {
  */
 export function filterElements(ids, xmlDoc) {
   for (let i = 0; i < ids.length; i++) {
-    for (let j = i + 1; j < ids.length; j++) {
+    for (let j = 0; j < ids.length; j++) {
       const elj = xmlDoc.querySelector('[*|id="' + ids[j] + '"]');
       if (!elj) continue;
-      if (elj.closest('[*|id="' + ids[i] + '"]')) {
+      if (elj.parentElement && elj.parentElement.closest('[*|id="' + ids[i] + '"]')) {
         ids.splice(j--, 1);
       }
     }
