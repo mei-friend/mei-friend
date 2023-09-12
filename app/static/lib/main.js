@@ -1,6 +1,6 @@
 // mei-friend version and date
 export const version = '1.1.0';
-export const versionDate = '11 September 2023'; // use full or 3-character english months, will be translated
+export const versionDate = '12 September 2023'; // use full or 3-character english months, will be translated
 
 var vrvWorker;
 var spdWorker;
@@ -408,6 +408,7 @@ document.addEventListener('DOMContentLoaded', function () {
 function onLanguageLoaded() {
   // expose default language pack for debug
   if (env && env === environments.develop) {
+    console.debug('Running language checks in develop environment:');
     runLanguageChecks();
     // console.debug('Default language pack: ', JSON.stringify(translator.defaultLang, null, 2));
   }
@@ -1343,7 +1344,10 @@ function consultGuidelines() {
         .join('');
       if (xmlElName && !xmlElName.includes(':')) {
         // it's an element in the default (hopefully MEI...) namespace
-        window.open(guidelinesBase + 'elements/' + xmlElName.toLowerCase(), '_blank');
+        // FIXME: For MEI 3.x and 4.x, guidelines have element name in all lower case
+        // for MEI 5.0, camelCase is required.
+        //window.open(guidelinesBase + 'elements/' + xmlElName.toLowerCase(), '_blank');
+        window.open(guidelinesBase + 'elements/' + xmlElName, '_blank');
       }
     }
   }

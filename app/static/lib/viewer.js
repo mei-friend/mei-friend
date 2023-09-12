@@ -2214,35 +2214,37 @@ export default class Viewer {
    */
   async checkSchema(mei) {
     // console.log('Validation: checking for schema...')
-    const hasSchema = /<\?xml-model.*schematypens=\"http?:\/\/relaxng\.org\/ns\/structure\/1\.0\"/;
-    const hasSchemaMatch = hasSchema.exec(mei);
-    const meiVersion = /<mei.*meiversion="([^"]*).*/;
-    const meiVersionMatch = meiVersion.exec(mei);
+    const hasNameSpacePattern = /<\?xml-model.*schematypens=\"http?:\/\/relaxng\.org\/ns\/structure\/1\.0\"/;
+    const hasSchemaMatch = hasNameSpacePattern.exec(mei);
+    const meiVersionPattern = /<mei.*meiversion="([^"]*).*/;
+    const meiVersionMatch = meiVersionPattern.exec(mei);
     if (!hasSchemaMatch) {
+      // if no schema namespace, but a version in the mei tag, load common schema
       if (meiVersionMatch && meiVersionMatch[1]) {
         let sch = commonSchemas['All'][meiVersionMatch[1]];
         if (sch) {
           if (sch !== this.currentSchema) {
             this.currentSchema = sch;
-            console.log('Validation: ...new schema from @meiversion ' + this.currentSchema);
+            console.log(
+              'Viewer.checkSchema(): No schema file, but @meiversion ' + meiVersionMatch[1] + '. Taking common schema.'
+            );
             await this.replaceSchema(this.currentSchema);
-            return;
           } else {
             // console.log('Validation: same schema.');
-            return;
           }
+          return;
         }
       }
-      console.log(lang.noSchemaFound.text);
+      console.error('Viewer.checkSchema(): ' + translator.lang.noSchemaFound.text);
       this.currentSchema = '';
       this.throwSchemaError({ schemaFile: translator.lang.noSchemaFound.text });
       return;
     }
-    const schema = /<\?xml-model.*href="([^"]*).*/;
-    const schemaMatch = schema.exec(mei);
-    if (schemaMatch && schemaMatch[1] !== this.currentSchema) {
-      this.currentSchema = schemaMatch[1];
-      console.log('Validation: ...new schema ' + this.currentSchema);
+    const schemaUrlPattern = /<\?xml-model.*href="([^"]*).*/;
+    const schemaUrlMatch = schemaUrlPattern.exec(mei);
+    if (schemaUrlMatch && schemaUrlMatch[1] !== this.currentSchema) {
+      this.currentSchema = schemaUrlMatch[1];
+      console.log('Viewer.checkSchema(): New schema ' + this.currentSchema);
       await this.replaceSchema(this.currentSchema);
     }
   } // checkSchema()
@@ -2262,7 +2264,7 @@ export default class Viewer {
     this.changeStatus(vs, 'wait', ['error', 'ok', 'manual']);
     this.updateSchemaStatusDisplay('wait', schemaFileName, msg);
 
-    console.log('Validation: Replace schema: ' + schemaFileName);
+    console.log('Viewer.replaceSchema(): ' + schemaFileName);
     let data; // content of schema file
     try {
       const response = await fetch(schemaFileName);
@@ -2288,8 +2290,11 @@ export default class Viewer {
     vs.innerHTML = unverified;
     this.validatorWithSchema = true;
     const autoValidate = document.getElementById('autoValidate');
-    if (autoValidate && autoValidate.checked) validate(cm.getValue(), this.updateLinting, true);
-    else this.setValidationStatusToManual();
+    if (autoValidate && autoValidate.checked) {
+      validate(cm.getValue(), this.updateLinting, true);
+    } else {
+      this.setValidationStatusToManual();
+    }
     console.log('New schema loaded to validator', schemaFileName);
     rngLoader.setRelaxNGSchema(data);
     cm.options.hintOptions.schemaInfo = rngLoader.tags;
