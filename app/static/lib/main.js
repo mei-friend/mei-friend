@@ -150,6 +150,12 @@ const defaultCodeMirrorOptions = {
     'Ctrl-E': encloseSelectionWithTag,
     'Cmd-/': encloseSelectionWithLastTag,
     'Ctrl-/': encloseSelectionWithLastTag,
+    'Cmd-O': openFileDialog,
+    'Ctrl-O': openFileDialog,
+    'Cmd-S': downloadMei,
+    'Ctrl-S': downloadMei,
+    'Cmd-P': togglePdfMode,
+    'Ctrl-P': togglePdfMode,
   },
   lint: {
     caller: cm,
@@ -1287,6 +1293,11 @@ function downloadSpeedMei() {
   }, 0);
 } // downloadSpeedMei()
 
+function togglePdfMode() {
+  console.log('Toggle PDF mode');
+  v.pdfMode ? v.saveAsPdf() : v.pageModeOn();
+} // togglePdfMode()
+
 export function requestMidiFromVrvWorker(requestTimemap = false) {
   let mei;
   // if (v.expansionId) {
@@ -1431,7 +1442,7 @@ export let cmd = {
   showSettingsPanel: () => v.showSettingsPanel(),
   hideSettingsPanel: () => v.hideSettingsPanel(),
   toggleSettingsPanel: (ev) => v.toggleSettingsPanel(ev),
-  togglePdfMode: () => (v.pdfMode ? v.saveAsPdf() : v.pageModeOn()),
+  togglePdfMode: () => togglePdfMode(),
   pageModeOn: () => v.pageModeOn(),
   pageModeOff: () => v.pageModeOff(),
   saveAsPdf: () => v.saveAsPdf(),
