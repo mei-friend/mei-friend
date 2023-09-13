@@ -1667,7 +1667,7 @@ select > option {
   background-color: #ff9800;
 }
 
-#alertIcon svg {
+.alertIcon svg {
   width: 2.2em;
   height: 2.2em;
   fill: white;
@@ -1688,6 +1688,21 @@ select > option {
 /* When moving the mouse over the close button */
 .alertCloseButton:hover {
   color: black;
+}
+
+#promptContent {
+  margin: auto;
+  text-align: center;
+}
+
+#promptButtons {
+  display: none;
+  text-align: center;
+  padding-top: 2.2em;
+}
+
+.promptButton {
+  margin: 0.5em;
 }
 
 #filterSettings {

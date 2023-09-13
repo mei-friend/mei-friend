@@ -2191,6 +2191,52 @@ export default class Viewer {
     }
   } // showAlert()
 
+  /**
+   * Show a user prompt in #alertOverlay
+   * Pretty similar to showAlert() but with buttons and returning user response
+   * @param {string} message user message
+   * @param {Array} buttons button labels and onclick functions
+   * @param {*} type ['error'] 'warning' 'info'
+   */
+  showUserPrompt(message, buttons, type = 'error') {
+    let promptOverlay = document.getElementById('promptOverlay');
+    let promptIcon = document.getElementById('promptIcon');
+    let promptMessage = document.getElementById('promptMessage');
+    let promptButtons = document.getElementById('promptButtons');
+    promptButtons.textContent = '';
+    promptIcon.innerHTML = xCircleFill; // error as default icon
+    promptOverlay.classList.remove('warning');
+    promptOverlay.classList.remove('info');
+    switch (type) {
+      case 'warning':
+        promptOverlay.classList.add('warning');
+        promptIcon.innerHTML = alert;
+        break;
+      case 'info':
+        promptOverlay.classList.add('info');
+        promptIcon.innerHTML = info;
+        break;
+    }
+    promptMessage.innerHTML = message;
+
+    buttons.forEach((button) => {
+      let newButton = document.createElement('button');
+      newButton.classList.add('promptButton');
+      newButton.textContent = button.label;
+      newButton.addEventListener('click', button.event);
+      promptButtons.appendChild(newButton);
+    });
+    promptButtons.style.display = 'block';
+
+    promptOverlay.style.display = 'flex';
+    this.setFocusToVerovioPane();
+    
+  } // showUserPrompt()
+
+  hideUserPrompt(modalid) {
+    document.getElementById(modalid).style.display = 'none';
+  }
+
   // Update alert message of #alertOverlay
   updateAlert(newMsg) {
     let alertOverlay = document.getElementById('alertOverlay');
