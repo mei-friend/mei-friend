@@ -14,6 +14,7 @@ export const supportedLanguages = {
     es: 'Espanyol',
     fr: 'Francès',
     it: 'Italià',
+    ja: 'Japonès',
     pl: 'Polonès',
   },
   de: {
@@ -23,6 +24,7 @@ export const supportedLanguages = {
     es: 'Spanisch',
     fr: 'Französisch',
     it: 'Italienisch',
+    ja: 'Japanisch',
     pl: 'Polnisch',
   },
   en: {
@@ -32,6 +34,7 @@ export const supportedLanguages = {
     es: 'Spanish',
     fr: 'French',
     it: 'Italian',
+    ja: 'Japanese',
     pl: 'Polish',
   },
   es: {
@@ -41,6 +44,7 @@ export const supportedLanguages = {
     es: 'Español',
     fr: 'Francés',
     it: 'Italiano',
+    ja: 'Japonés',
     pl: 'Polaco',
   },
   fr: {
@@ -50,6 +54,7 @@ export const supportedLanguages = {
     es: 'Espagnol',
     fr: 'Français',
     it: 'Italien',
+    ja: 'Japonais',
     pl: 'Polonais',
   },
   it: {
@@ -59,7 +64,18 @@ export const supportedLanguages = {
     es: 'Spagnolo',
     fr: 'Francese',
     it: 'Italiano',
+    ja: 'Giapponese',
     pl: 'Polacco',
+  },
+  ja: {
+    ca: 'カタロニア語',
+    de: 'ドイツ語',
+    en: '英語',
+    es: 'スペイン語',
+    fr: 'フランス語',
+    it: 'イタリア語',
+    ja: '日本語',
+    pl: 'ポーランド語',
   },
   pl: {
     ca: 'Kataloński',
@@ -68,6 +84,7 @@ export const supportedLanguages = {
     es: 'Hiszpański',
     fr: 'Francuski',
     it: 'Włoski',
+    ja: 'Japoński',
     pl: 'Polski',
   },
 };

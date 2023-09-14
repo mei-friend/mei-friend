@@ -198,7 +198,7 @@ export const lang = {
   breaksSelectNone: { text: 'Ninguno' },
   breaksSelectAuto: { text: 'Automático' },
   breaksSelectLine: { text: 'Sistema' },
-  breaksSelectMeasure: { text: 'Medida' },
+  breaksSelectMeasure: { text: 'Compás' },
   breaksSelectEncoded: { text: 'Sistema y página' },
   breaksSelectSmart: { text: 'Smart' },
   updateControlsLabel: {
@@ -494,8 +494,8 @@ export const lang = {
       'Seleccionar ligaduras (es decir, elementos con el atributo @curvature: ' + att.attCurvature.join(', ') + ')',
   },
   dragSelectMeasures: {
-    text: 'Seleccionar medidas',
-    description: 'Seleccionar medidas',
+    text: 'Seleccionar compases',
+    description: 'Seleccionar compases',
   },
   // Control menu / Menú de control
   controlMenuSettings: {
@@ -635,23 +635,23 @@ export const lang = {
       'con las configuraciones actuales, utilice "Renderizar nuevamente con Verovio" en el menú desplegable "Manipular".',
   },
 
-  // Renumber measures / Renumerar medidas
+  // Renumber measures / Renumerar compases
   renumberMeasuresHeading: {
-    text: 'Renumerar medidas',
-    description: 'Configuraciones para renumerar medidas',
+    text: 'Renumerar compases',
+    description: 'Configuraciones para renumerar compases',
   },
   renumberMeasureContinueAcrossIncompleteMeasures: {
-    text: 'Continuar en medidas incompletas',
-    description: 'Continuar los números de las medidas en medidas incompletas (@metcon="false")',
+    text: 'Continuar en compases incompletas',
+    description: 'Continuar los números de las compases en compases incompletas (@metcon="false")',
   },
   renumberMeasuresUseSuffixAtMeasures: {
-    text: 'Sufijo en medidas incompletas',
-    description: 'Usar un sufijo numérico en medidas incompletas (por ejemplo, 23-cont)',
+    text: 'Sufijo en compases incompletas',
+    description: 'Usar un sufijo numérico en compases incompletas (por ejemplo, 23-cont)',
     labels: ['ninguno', '-cont'],
   },
   renumberMeasuresContinueAcrossEndings: {
     text: 'Continuar en los finales',
-    description: 'Continuar los números de las medidas en los finales',
+    description: 'Continuar los números de las compases en los finales',
   },
   renumberMeasuresUseSuffixAtEndings: {
     text: 'Sufijo en los finales',

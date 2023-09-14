@@ -1,6 +1,6 @@
 // mei-friend version and date
 export const version = '1.0.1';
-export const versionDate = '8 September 2023'; // use full or 3-character english months, will be translated
+export const versionDate = '14 September 2023'; // use full or 3-character english months, will be translated
 
 var vrvWorker;
 var spdWorker;
@@ -150,6 +150,14 @@ const defaultCodeMirrorOptions = {
     'Ctrl-E': encloseSelectionWithTag,
     'Cmd-/': encloseSelectionWithLastTag,
     'Ctrl-/': encloseSelectionWithLastTag,
+    'Cmd-L': generateUrl,
+    'Ctrl-L': generateUrl,
+    'Cmd-O': openFileDialog,
+    'Ctrl-O': openFileDialog,
+    'Cmd-P': togglePdfMode,
+    'Ctrl-P': togglePdfMode,
+    'Cmd-S': downloadMei,
+    'Ctrl-S': downloadMei,
   },
   lint: {
     caller: cm,
@@ -1287,6 +1295,11 @@ function downloadSpeedMei() {
   }, 0);
 } // downloadSpeedMei()
 
+function togglePdfMode() {
+  console.log('Toggle PDF mode');
+  v.pdfMode ? v.saveAsPdf() : v.pageModeOn();
+} // togglePdfMode()
+
 export function requestMidiFromVrvWorker(requestTimemap = false) {
   let mei;
   // if (v.expansionId) {
@@ -1344,7 +1357,10 @@ function consultGuidelines() {
         .join('');
       if (xmlElName && !xmlElName.includes(':')) {
         // it's an element in the default (hopefully MEI...) namespace
-        window.open(guidelinesBase + 'elements/' + xmlElName.toLowerCase(), '_blank');
+        // FIXME: For MEI 3.x and 4.x, guidelines have element name in all lower case
+        // for MEI 5.0, camelCase is required.
+        //window.open(guidelinesBase + 'elements/' + xmlElName.toLowerCase(), '_blank');
+        window.open(guidelinesBase + 'elements/' + xmlElName, '_blank');
       }
     }
   }
@@ -1428,7 +1444,7 @@ export let cmd = {
   showSettingsPanel: () => v.showSettingsPanel(),
   hideSettingsPanel: () => v.hideSettingsPanel(),
   toggleSettingsPanel: (ev) => v.toggleSettingsPanel(ev),
-  togglePdfMode: () => (v.pdfMode ? v.saveAsPdf() : v.pageModeOn()),
+  togglePdfMode: () => togglePdfMode(),
   pageModeOn: () => v.pageModeOn(),
   pageModeOff: () => v.pageModeOff(),
   saveAsPdf: () => v.saveAsPdf(),
