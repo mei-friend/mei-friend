@@ -90,6 +90,12 @@ export default class Translator {
     }
     updateStatusBar();
     drawRightFooter();
+    if (this.langCode === 'ja') {
+      // apply custom font-family settings for japanese language
+      document.querySelector('body').classList.add('lang_ja');
+    } else {
+      document.querySelector('body').classList.remove('lang_ja');
+    }
   } // translateGui()
 
   /**
