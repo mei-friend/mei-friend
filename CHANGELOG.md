@@ -2,6 +2,7 @@
 
 ### 1.0.1 Version 1.0.1 patch
 * Reduce Verovio defaults
+* Add auto-translated draft of Japanese language pack
 
 ## 1.0.0 Version 1.0 (released 4 September 2023)
 * Delete notes, chords, rests (together with enclosing elements such as beams, tuplets, as well as elements pointing towards them, such as a slur through `@startid` or `@endid`) (#37)
