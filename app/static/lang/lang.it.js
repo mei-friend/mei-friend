@@ -29,8 +29,8 @@ export const lang = {
   openMeiText: { text: 'Apri file' },
   openUrlText: { text: 'Apri URL' },
   openExample: {
-    text: 'Repository pubblica',
-    description: 'Apri una lista della repository pubblica',
+    text: 'Repertorio pubblico',
+    description: 'Apri una lista del repertorio pubblico',
   },
   importMusicXml: { text: 'Importa MusicXML' },
   importHumdrum: { text: 'Importa Humdrum' },
@@ -52,7 +52,7 @@ export const lang = {
   replaceAllMenuText: { text: 'Sostituisci tutto' },
   indentSelectionText: { text: 'Indenta selezione' },
   surroundWithTagsText: { text: 'Circonda con tags' },
-  surroundWithLastTagText: { text: 'Circonda con ' },
+  surroundWithLastTagText: { text: 'Circonda con' },
   jumpToLineText: { text: 'Vai alla riga' },
   manualValidateText: { text: 'Convalida' },
 
@@ -74,7 +74,7 @@ export const lang = {
   // MANIPULATE MENU ITEM/ MENU MANIPOLA
   manipulateMenuTitle: { text: 'Modifica' },
   invertPlacementText: { text: 'Inverti posizione' },
-  betweenPlacementText: { text: 'Tra posizioni' },
+  betweenPlacementText: { text: 'Posiziona in mezzo' },
   addVerticalGroupText: { text: 'Aggiungi gruppo verticale' },
   deleteText: { text: 'Elimina elemento' },
   pitchUpText: { text: 'Alza di un tono' },
@@ -178,7 +178,7 @@ export const lang = {
   increaseScaleButton: { description: 'Aumenta notazione' },
   pagination1: { html: 'Pagina ' },
   pagination3: { html: ' di' },
-  sectionSelect: { description: 'Naviga la struttura di sezione/finale codificata' },
+  sectionSelect: { description: 'Naviga la struttura di sezione/finale del codice' },
   firstPageButton: { description: 'Vai alla prima pagina' },
   previousPageButton: { description: 'Vai alla pagina precedente' },
   paginationLabel: {
@@ -186,20 +186,20 @@ export const lang = {
   },
   nextPageButton: { description: 'Vai alla pagina successiva' },
   lastPageButton: { description: "Vai all'ultima pagina" },
-  flipCheckbox: { description: 'Passa automaticamente alla posizione del cursore di codifica' },
-  flipButton: { description: 'Passa manualmente alla posizione del cursore di codifica' },
+  flipCheckbox: { description: 'Passa automaticamente alla posizione del cursore di codice' },
+  flipButton: { description: 'Passa manualmente alla posizione del cursore di codice' },
   breaksSelect: { description: 'Definisci il comportamento degli intervalli/pagine di sistema nella notazione' },
   breaksSelectNone: { text: 'Nessuno' },
   breaksSelectAuto: { text: 'Automatico' },
   breaksSelectMeasure: { text: 'Misura' },
-  breaksSelectLine: { text: 'Sistema' },
-  breaksSelectEncoded: { text: 'Sistema e pagina' },
+  breaksSelectLine: { text: 'Rigo' },
+  breaksSelectEncoded: { text: 'Rigo e pagina' },
   breaksSelectSmart: { text: 'Intelligente' },
   updateControlsLabel: {
     text: 'Aggiorna',
-    description: 'Aggiorna il comportamento di controllo della notazione dopo le modifiche nella codifica',
+    description: 'Cambia il comportamento di controllo della notazione dopo le modifiche nel codice',
   },
-  liveUpdateCheckbox: { description: 'Aggiorna automaticamente la notazione dopo le modifiche nella codifica' },
+  liveUpdateCheckbox: { description: 'Aggiorna automaticamente la notazione dopo le modifiche nella codice' },
   codeManualUpdateButton: { description: 'Aggiorna manualmente la notazione' },
   engravingFontSelect: { description: 'Seleziona il carattere di incisione' },
   backwardsButton: { description: 'Vai a sinistra nella notazione' },
@@ -207,9 +207,9 @@ export const lang = {
   upwardsButton: { description: "Naviga verso l'alto nella notazione" },
   downwardsButton: { description: 'Naviga verso il basso nella notazione' },
   speedLabel: {
-    text: 'Modalità di velocità',
+    text: 'Modalità veloce',
     description:
-      'In modalità di velocità, solo la pagina corrente viene inviata a Verovio per ridurre i tempi di rendering con file di grandi dimensioni',
+      'Nella modalità veloce, solamente la pagina corrente viene inviata a Verovio per ridurre i tempi di rendering in caso di file di grandi dimensioni',
   },
 
   // PDF/print preview panel / Pannello di anteprima PDF/stampa
@@ -298,7 +298,7 @@ export const lang = {
   forkRepertoireOrganizationLabel: { text: 'Organizzazione:' },
   forkRepertoireOrganizationOption: { text: "Scegli un'organizzazione GitHub..." },
   forkRepertoireRepositoryLabel: { text: 'Repository:' },
-  forkRepertoireRepositoryOption: { text: 'Scegli una codifica...' },
+  forkRepertoireRepositoryOption: { text: 'Scegli una codice...' },
   forkRepositoryInputName: { placeholder: 'Nome utente o organizzazione Github' },
   forkRepositoryInputRepoOption: { text: 'Scegli un repository' },
   forkRepositoryToSelectorText: { text: 'Fork a: ' },
@@ -370,7 +370,7 @@ export const lang = {
   midiSpeedmodeIndicator: {
     text: 'Modalità di velocità',
     description:
-      "La modalità di velocità è attiva; viene riprodotto solo il MIDI per la pagina corrente. Per riprodurre l'intera codifica, disabilita la modalità di velocità.",
+      "La modalità di velocità è attiva; viene riprodotto solo il MIDI per la pagina corrente. Per riprodurre l'intero codice, disabilita la modalità di velocità.",
   },
   closeMidiPlaybackControlBarButton: { description: 'Nascondi la barra di controllo della riproduzione MIDI' },
 
@@ -384,8 +384,8 @@ export const lang = {
     description: 'Reimposta ai valori predefiniti di mei-friend',
   },
   filterSettings: {
-    placeholder: 'Filtra le impostazioni',
-    description: 'Digita qui per filtrare le impostazioni',
+    placeholder: 'Cerca',
+    description: 'Digita qui per cercare',
   },
   closeSettingsButton: {
     description: 'Chiudi il pannello delle impostazioni',
@@ -525,12 +525,12 @@ export const lang = {
   enableTransposition: {
     text: 'Abilita la trasposizione',
     description:
-      'Abilita le impostazioni di trasposizione, da applicare tramite il pulsante di trasposizione sottostante. La trasposizione verrà applicata solo alla notazione, la codifica rimane inalterata, a meno che non si clicchi su "Rerender via Verovio" nel menu a discesa "Manipulate".',
+      'Abilita le impostazioni di trasposizione, da applicare tramite il pulsante di trasposizione sottostante. La trasposizione verrà applicata solo alla notazione, il codice rimane inalterata, a meno che non si clicchi su "Rerender via Verovio" nel menu a discesa "Manipulate".',
   },
   transposeInterval: {
     text: 'Trasponi per intervallo',
     description:
-      'Trasponi la codifica per intervallo cromatico attraverso gli intervalli più comuni (Verovio supporta il sistema base-40)',
+      'Trasponi la codice per intervallo cromatico attraverso gli intervalli più comuni (Verovio supporta il sistema base-40)',
     labels: [
       'Unisono Perfetto',
       'Unisono Aumentato',
@@ -589,7 +589,7 @@ export const lang = {
   transposeButton: {
     text: 'Trasponi',
     description:
-      'Applica la trasposizione con le impostazioni sopra indicate alla notazione, mantenendo invariata la codifica MEI. Per trasporre anche la codifica MEI con le attuali impostazioni, utilizzare "Rerender via Verovio" nel menu a tendina "Manipulate".',
+      'Applica la trasposizione con le impostazioni sopra indicate alla notazione, mantenendo invariata la codice MEI. Per trasporre anche la codice MEI con le attuali impostazioni, utilizzare "Rerender via Verovio" nel menu a tendina "Manipulate".',
   },
 
   // Renumber measures / Rinumerazione misure
@@ -732,7 +732,7 @@ export const lang = {
   },
   autoValidate: {
     text: 'Validazione automatica',
-    description: 'Valida automaticamente la codifica rispetto allo schema dopo ogni modifica',
+    description: 'Valida automaticamente la codice rispetto allo schema dopo ogni modifica',
   },
   autoCloseBrackets: {
     text: 'Chiusura parentesi automatica',
@@ -824,7 +824,7 @@ export const lang = {
   selectRepository: { text: 'Seleziona repository' },
   selectBranch: { text: 'Seleziona ramo' },
   commitMessageInput: { placeholder: 'Aggiornato usando mei-friend online' },
-  reportIssueWithEncoding: { value: 'Segnala problema di codifica' },
+  reportIssueWithEncoding: { value: 'Segnala problema di codice' },
   clickToOpenInMeiFriend: { text: 'Clicca per aprire in mei-friend' },
   repoAccessError: {
     text: "Spiacenti, non è possibile accedere ai repository per l'utente o l'organizzazione forniti",
