@@ -73,7 +73,7 @@
   --annotationPanelTextColor: var(--defaultAnnotationPanelTextColor);
 }
 
-body.lang_ja { 
+body.lang_ja, #lang_ja_native { 
   /* recommended font stack for Japanese, as per https://mhdigital.llc/web-typography-in-japanese/ */
   font-family: 'ヒラギノ角ゴ ProN', 'Hiragino Kaku Gothic ProN', '游ゴシック', '游ゴシック体', YuGothic, 'Yu Gothic', 'メイリオ', Meiryo, 'ＭＳ ゴシック', 'MS Gothic', HiraKakuProN-W3, 'TakaoExゴシック', TakaoExGothic, 'MotoyaLCedar', 'Droid Sans Japanese', sans-serif;
 }
