@@ -71,7 +71,7 @@ export const lang = {
   facsimileLeft: { text: 'Facsimile a sinistra' },
   facsimileRight: { text: 'Facsimile a destra' },
 
-  // MANIPULATE MENU ITEM/ MENU MANIPOLA
+  // MANIPULATE MENU ITEM/ MENU MODIFICA
   manipulateMenuTitle: { text: 'Modifica' },
   invertPlacementText: { text: 'Inverti posizione' },
   betweenPlacementText: { text: 'Posiziona in mezzo' },
