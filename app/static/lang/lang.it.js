@@ -174,7 +174,7 @@ export const lang = {
     la velocità di rotazione in senso antiorario indica l'attività del worker`,
   },
   decreaseScaleButton: { description: 'Riduci notazione' },
-  verovioZoom: { description: 'Scala dimensioni della notazione' },
+  verovioZoom: { description: 'Scala dimensioni dello spartito' },
   increaseScaleButton: { description: 'Aumenta notazione' },
   pagination1: { html: 'Pagina ' },
   pagination3: { html: ' di' },
@@ -188,7 +188,7 @@ export const lang = {
   lastPageButton: { description: "Vai all'ultima pagina" },
   flipCheckbox: { description: 'Passa automaticamente alla posizione del cursore di codice' },
   flipButton: { description: 'Passa manualmente alla posizione del cursore di codice' },
-  breaksSelect: { description: 'Definisci il comportamento degli intervalli/pagine di sistema nella notazione' },
+  breaksSelect: { description: 'Definisci il comportamento degli intervalli/pagine di sistema nello spartito' },
   breaksSelectNone: { text: 'Nessuno' },
   breaksSelectAuto: { text: 'Automatico' },
   breaksSelectMeasure: { text: 'Misura' },
@@ -197,15 +197,15 @@ export const lang = {
   breaksSelectSmart: { text: 'Intelligente' },
   updateControlsLabel: {
     text: 'Aggiorna',
-    description: 'Cambia il comportamento di controllo della notazione dopo le modifiche nel codice',
+    description: 'Cambia il comportamento di controllo dello spartito dopo le modifiche nel codice',
   },
-  liveUpdateCheckbox: { description: 'Aggiorna automaticamente la notazione dopo le modifiche nella codice' },
-  codeManualUpdateButton: { description: 'Aggiorna manualmente la notazione' },
+  liveUpdateCheckbox: { description: 'Aggiorna automaticamente lo spartito dopo le modifiche nella codice' },
+  codeManualUpdateButton: { description: 'Aggiorna manualmente lo spartito' },
   engravingFontSelect: { description: 'Seleziona il carattere di incisione' },
-  backwardsButton: { description: 'Vai a sinistra nella notazione' },
-  forwardsButton: { description: 'Vai a destra nella notazione' },
-  upwardsButton: { description: "Naviga verso l'alto nella notazione" },
-  downwardsButton: { description: 'Naviga verso il basso nella notazione' },
+  backwardsButton: { description: 'Vai a sinistra nello spartito' },
+  forwardsButton: { description: 'Vai a destra nello spartito' },
+  upwardsButton: { description: "Naviga verso l'alto nello spartito" },
+  downwardsButton: { description: 'Naviga verso il basso nello spartito' },
   speedLabel: {
     text: 'Modalità veloce',
     description:
@@ -230,9 +230,9 @@ export const lang = {
 
   // facsimile panel/ pannello facsimile
   facsimileIcon: { description: 'Pannello facsimile' },
-  facsimileDecreaseZoomButton: { description: "Riduci l'immagine della notazione" },
-  facsimileZoom: { description: "Regola la dimensione dell'immagine della notazione" },
-  facsimileIncreaseZoomButton: { description: "Ingrandisci l'immagine della notazione" },
+  facsimileDecreaseZoomButton: { description: "Riduci l'immagine dello spartito" },
+  facsimileZoom: { description: "Regola la dimensione dell'immagine dello spartito" },
+  facsimileIncreaseZoomButton: { description: "Ingrandisci l'immagine dello spartito" },
   facsimileFullPageLabel: {
     text: 'Pagina intera',
     description: "Mostra l'intera pagina dell'immagine del facsimile",
@@ -434,7 +434,7 @@ export const lang = {
   // Drag select / Selezione tramite trascinamento
   dragSelection: {
     text: 'Selezione tramite trascinamento',
-    description: 'Seleziona gli elementi nella notazione con il trascinamento del mouse',
+    description: 'Seleziona gli elementi nello spartito con il trascinamento del mouse',
   },
   dragSelectNotes: {
     text: 'Seleziona le note',
@@ -463,29 +463,29 @@ export const lang = {
 
   // Control menu / Menu di controllo
   controlMenuSettings: {
-    text: 'Barra di controllo della notazione',
-    description: 'Definisci gli elementi da mostrare nel menu di controllo sopra la notazione',
+    text: 'Barra di controllo dello spartito',
+    description: 'Definisci gli elementi da mostrare nel menu di controllo sopra lo spartito',
   },
   controlMenuFlipToPageControls: {
-    text: 'Mostra i controlli per girare la pagina',
-    description: 'Mostra i controlli per girare la pagina nel menu di controllo della notazione',
+    text: 'Mostra i controlli per cambiare pagina',
+    description: 'Mostra i controlli per cambiare la pagina nel menu di controllo dello spartito',
   },
   controlMenuUpdateNotation: {
-    text: "Mostra i controlli per l'aggiornamento della notazione",
+    text: "Mostra i controlli per l'aggiornamento dello spartito",
     description:
-      'Mostra i controlli per il comportamento di aggiornamento della notazione nel menu di controllo della notazione',
+      'Mostra i controlli per il comportamento di aggiornamento dello spartito nel menu di controllo dello spartito',
   },
   controlMenuFontSelector: {
     text: 'Mostra il selettore del carattere di notazione',
-    description: 'Mostra il selettore del carattere di notazione (SMuFL) nel menu di controllo della notazione',
+    description: 'Mostra il selettore del carattere di notazione (SMuFL) nel menu di controllo dello spartito',
   },
   controlMenuNavigateArrows: {
     text: 'Mostra le frecce di navigazione',
-    description: 'Mostra le frecce di navigazione nella notazione nel menu di controllo della notazione',
+    description: 'Mostra le frecce di navigazione nello spartito nel menu di controllo dello spartito',
   },
   controlMenuSpeedmodeCheckbox: {
     text: 'Mostra la casella di controllo della modalità di velocità',
-    description: 'Mostra la casella di controllo della modalità di velocità nel menu di controllo della notazione',
+    description: 'Mostra la casella di controllo della modalità di velocità nel menu di controllo dello spartito',
   },
 
   // MIDI Playback / Riproduzione MIDI
@@ -494,27 +494,31 @@ export const lang = {
     description: 'Impostazioni riproduzione MIDI',
   },
   showMidiPlaybackContextualBubble: {
-    text: 'Mostra scorciatoia riproduzione',
+    text: 'Mostra icona di riproduzione',
     description:
-      "Fa apparire una scorciatoia (una bolla nell'angolo in basso a sinistra; " +
-      'clicca per avviare immediatamente la riproduzione) quando la barra di controllo della riproduzione MIDI è chiusa',
+      "Fa apparire un'icona nell'angolo in basso a sinistra " +
+      'per avviare immediatamente la riproduzione quando la barra di controllo della riproduzione MIDI è chiusa',
   },
   showMidiPlaybackControlBar: {
     text: 'Mostra barra di controllo riproduzione MIDI',
     description: 'Mostra barra di controllo riproduzione MIDI',
   },
   scrollFollowMidiPlayback: {
-    text: 'Scorrimento segui riproduzione MIDI',
-    description: 'Scorri il pannello di notazione per seguire la riproduzione MIDI sulla pagina corrente',
+    text: 'Scorrimento automatico',
+    description: 'Scorri il pannello dello spartito durante la riproduzione MIDI sulla pagina corrente',
   },
   pageFollowMidiPlayback: {
-    text: 'Pagina segue riproduzione MIDI',
-    description: 'Passa automaticamente alle pagine per seguire la riproduzione MIDI',
+    text: 'Cambio pagina automatico',
+    description: 'Cambia automaticamente la pagina durante la riproduzione MIDI',
   },
   highlightCurrentlySoundingNotes: {
     text: 'Evidenzia note attualmente suonate',
     description:
       'Evidenzia visivamente le note attualmente suonate nel pannello di notazione durante la riproduzione MIDI',
+  },
+  ﻿﻿﻿﻿  selectMidiExpansion: {
+    text: 'Espansione',
+    description: "Seleziona l'espansione da utilizzare perla riproduzione MIDI",
   },
 
   // Transposition // Trasposizione
@@ -525,7 +529,7 @@ export const lang = {
   enableTransposition: {
     text: 'Abilita la trasposizione',
     description:
-      'Abilita le impostazioni di trasposizione, da applicare tramite il pulsante di trasposizione sottostante. La trasposizione verrà applicata solo alla notazione, il codice rimane inalterata, a meno che non si clicchi su "Rerender via Verovio" nel menu a discesa "Manipulate".',
+      'Abilita le impostazioni di trasposizione, da applicare tramite il pulsante di trasposizione sottostante. La trasposizione verrà applicata solo allo spartito, il codice rimane inalterata, a meno che non si clicchi su "Rerender via Verovio" nel menu a discesa "Manipulate".',
   },
   transposeInterval: {
     text: 'Trasponi per intervallo',
@@ -589,7 +593,7 @@ export const lang = {
   transposeButton: {
     text: 'Trasponi',
     description:
-      'Applica la trasposizione con le impostazioni sopra indicate alla notazione, mantenendo invariata la codice MEI. Per trasporre anche la codice MEI con le attuali impostazioni, utilizzare "Rerender via Verovio" nel menu a tendina "Manipulate".',
+      'Applica la trasposizione con le impostazioni sopra indicate allo spartito, mantenendo invariata la codice MEI. Per trasporre anche la codice MEI con le attuali impostazioni, utilizzare "Rerender via Verovio" nel menu a tendina "Manipulate".',
   },
 
   // Renumber measures / Rinumerazione misure
@@ -622,7 +626,7 @@ export const lang = {
   },
   showAnnotations: {
     text: 'Mostra annotazioni',
-    description: 'Mostra le annotazioni nella notazione',
+    description: 'Mostra le annotazioni nello spartito',
   },
   showAnnotationPanel: {
     text: 'Mostra pannello annotazioni',
@@ -644,7 +648,7 @@ export const lang = {
   },
   selectFacsimilePanelOrientation: {
     text: 'Posizione del pannello di facsimile',
-    description: 'Seleziona la posizione del pannello di facsimile rispetto alla notazione',
+    description: 'Seleziona la posizione del pannello di facsimile rispetto allo spartito',
     labels: ['sinistra', 'destra', 'alto', 'basso'],
   },
   facsimileZoomInput: {
@@ -703,8 +707,8 @@ export const lang = {
     description: "Seleziona il tema dell'editor",
   },
   matchTheme: {
-    text: 'La notazione corrisponde al tema',
-    description: "Corrispondenza della notazione al tema di colore dell'editor",
+    text: 'lo spartito corrisponde al tema',
+    description: "Corrispondenza dello spartito al tema di colore dell'editor",
   },
   tabSize: {
     text: 'Dimensione indentazione',
