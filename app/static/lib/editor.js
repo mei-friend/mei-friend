@@ -1072,11 +1072,6 @@ export function addTranscriptionLikeElement(v, cm, attrName = 'none', mElName = 
       uuids.push(markupUuid);
 
       // buffer.groupChangesSinceCheckpoint(checkPoint); // TODO
-
-      // ChatGPT says, that I should put everything afterwards into a new function.
-      // I can call this function within this else statement if everything is fine
-      // and I can call this function within the successful resolution of the promise
-      // this is the way to prevent code from being processed if "Abort" has been clicked
     }
   });
 
