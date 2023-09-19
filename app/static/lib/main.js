@@ -2366,11 +2366,11 @@ export function generateUrl() {
   // TODO: document.getElementById('autoValidate').checked
 
   url += amp + 'notationOrientation=' + getOrientation();
-  url += amp + 'notationProportion=' + getNotationProportion().toFixed(2);
+  url += amp + 'notationProportion=' + parseFloat(getNotationProportion()).toFixed(2);
 
   if (document.getElementById('showFacsimilePanel').checked) {
     url += amp + 'facsimileOrientation=' + getFacsimileOrientation();
-    url += amp + 'facsimileProportion=' + getFacsimileProportion().toFixed(2);
+    url += amp + 'facsimileProportion=' + parseFloat(getFacsimileProportion()).toFixed(2);
   }
 
   return url;
