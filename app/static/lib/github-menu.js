@@ -289,7 +289,7 @@ function assignGithubMenuClickHandlers() {
     forkRepositoryCancelButton.addEventListener('click', forkRepoCancelClicked);
   }
 
-  const repoHeader = document.getElementById('repositoriesHeader');
+  const repoHeader = document.getElementById('selectRepository');
   if (repoHeader) {
     // on click, reload list of all repositories
     repoHeader.removeEventListener('click', repoHeaderClicked);
@@ -354,7 +354,7 @@ export async function fillInRepoBranches(e, repoBranches = null, per_page = 100,
   githubMenu.innerHTML = `
     <a id="githubLogout" href="#">${translator.lang.logOut.text}</a>
     <hr class="dropdownLine">
-    <a id="repositoriesHeader" href="#"><span class="btn icon inline-block-tight">${icon.arrowLeft}</span><span id="githubRepository">${translator.lang.githubRepository.text}</span>: ${github.githubRepo}</a>
+    <a id="selectRepository" href="#"><span class="btn icon inline-block-tight">${icon.arrowLeft}</span><span id="githubRepository">${translator.lang.githubRepository.text}</span>: ${github.githubRepo}</a>
     <hr class="dropdownLine">
     <a id="branchesHeader" class="dropdownHead" href="#"><b>${translator.lang.selectBranch.text}:</b></a>
     `;
@@ -443,7 +443,7 @@ export async function fillInBranchContents(e) {
   githubMenu.innerHTML = `
     <a id="githubLogout" href="#">${translator.lang.logOut.text}</a>
     <hr class="dropdownLine">
-    <a id="repositoriesHeader" href="#"><span class="btn icon inline-block-tight">${icon.arrowLeft}</span><span id="githubRepository">${translator.lang.githubRepository.text}</span>: ${github.githubRepo}</a>
+    <a id="selectRepository" href="#"><span class="btn icon inline-block-tight">${icon.arrowLeft}</span><span id="githubRepository">${translator.lang.githubRepository.text}</span>: ${github.githubRepo}</a>
     <hr class="dropdownLine">
     <a id="branchesHeader" href="#"><span class="btn icon inline-block-tight">${icon.arrowLeft}</span><span id="githubBranch">${translator.lang.githubBranch.text}</span>: ${github.branch}</a>
     <hr class="dropdownLine">
@@ -783,7 +783,7 @@ export function refreshGithubMenu() {
       <hr class="dropdownLine">
       <a id="forkRepository" href="#">${translator.lang.forkRepository.text}...</b></a>
       <hr class="dropdownLine">
-      <a id="repositoriesHeader" class="dropdownHead" href="#"><b>${translator.lang.selectRepository.text}:</b></a>
+      <a id="selectRepository" class="dropdownHead" href="#"><b>${translator.lang.selectRepository.text}:</b></a>
     `;
     fillInUserRepos();
   }
