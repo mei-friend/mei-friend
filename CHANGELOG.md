@@ -1,8 +1,11 @@
 # mei-friend-online CHANGELOG.md
 
 ### 1.0.1 Version 1.0.1 patch
-* Reduce Verovio defaults
+* Reduce mei-friend-specific Verovio defaults
 * Add auto-translated draft of Japanese language pack
+* Add keyboard shortcuts to editor for saving, loading and printing files
+* Generate URL with all available parameters and lower precision
+* Fix for facsimile images not loading without zone elements (#45)
 
 ## 1.0.0 Version 1.0 (released 4 September 2023)
 * Delete notes, chords, rests (together with enclosing elements such as beams, tuplets, as well as elements pointing towards them, such as a slur through `@startid` or `@endid`) (#37)
