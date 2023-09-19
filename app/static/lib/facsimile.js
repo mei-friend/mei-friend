@@ -168,13 +168,12 @@ export async function drawFacsimile() {
   }
   // display surface graphic if no data-facs are found in SVG
   if (!zoneId || !facs[zoneId]) {
-    let pbId = getCurrentPbElement(v.xmlDoc); // id of current page beginning
-    if (!pbId) {
+    let pb = getCurrentPbElement(v.xmlDoc); // id of current page beginning
+    if (!pb) {
       showWarningText(translator.lang.facsimileNoSurfaceWarning.text);
       busy(false);
       return;
     }
-    let pb = v.xmlDoc.querySelector('[*|id="' + pbId + '"]');
     if (pb && pb.hasAttribute('facs')) {
       zoneId = rmHash(pb.getAttribute('facs'));
     }
@@ -823,22 +822,20 @@ function busy(active = true) {
  * Retrieve current pb element with a @facs attribute for the currently
  * displayed page, based on first g.measure/g.barLine element in SVG
  * @param {Document} xmlDoc
- * @returns {string} id of page beginning or empty string, if none found
+ * @returns {Element} page beginning element (or null, if none found)
  */
 function getCurrentPbElement(xmlDoc) {
   let referenceElement = document.querySelector('g.measure,g.barLine');
+  let pb = null;
   if (referenceElement) {
     let elementList = xmlDoc.querySelectorAll('pb[facs],[*|id="' + referenceElement.id + '"');
-    let lastPb = '';
     for (let p of elementList) {
       if (p.nodeName === referenceElement.classList[0]) {
         break;
       } else {
-        lastPb = p.getAttribute('xml:id');
+        pb = p;
       }
     }
-    return lastPb;
-  } else {
-    return '';
   }
+  return pb;
 } // getCurrentPbElement()
