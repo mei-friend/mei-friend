@@ -1,6 +1,6 @@
 // mei-friend version and date
 export const version = '1.0.1';
-export const versionDate = '15 September 2023'; // use full or 3-character english months, will be translated
+export const versionDate = '19 September 2023'; // use full or 3-character english months, will be translated
 
 var vrvWorker;
 var spdWorker;
@@ -1001,6 +1001,20 @@ async function vrvWorkerEventsHandler(ev) {
       v.setFocusToVerovioPane();
       v.busy(false);
       break;
+    case 'meiBasicExported':
+      let blob = new Blob([ev.data.meiBasic], {
+        type: 'text/plain',
+      });
+      let url = URL.createObjectURL(blob);
+      let fileName = meiFileName.substring(meiFileName.lastIndexOf('/') + 1).replace(/\.[^/.]+$/, '-basic.mei');
+      // buxfix for Safari (#33, 31. Aug 2023)
+      setTimeout(() => {
+        let a = document.createElement('a');
+        a.setAttribute('href', url);
+        a.setAttribute('download', fileName);
+        a.click();
+      }, 0);
+      break;
     case 'downloadMidiFile': // export MIDI file
       blob = midiDataToBlob(ev.data.midi);
       let a = document.createElement('a');
@@ -1278,6 +1292,15 @@ function downloadMei() {
   setFileChangedState(false);
 } // downloadMei()
 
+function downloadMeiBasic() {
+  let message = {
+    cmd: 'exportMeiBasic',
+    options: v.vrvOptions,
+    mei: cm.getValue(), // exclude dummy measures in speed mode
+  };
+  vrvWorker.postMessage(message);
+} // downloadMeiBasic()
+
 function downloadSpeedMei() {
   let blob = new Blob([speed.getPageFromDom(v.xmlDoc, v.currentPage, v.breaksValue(), v.pageSpanners)], {
     type: 'text/plain',
@@ -1509,6 +1532,7 @@ export let cmd = {
   openHumdrum: () => openFileDialog('.krn,.hum'),
   openPae: () => openFileDialog('.pae,.abc'),
   downloadMei: () => downloadMei(),
+  downloadMeiBasic: () => downloadMeiBasic(),
   downloadSpeedMei: () => downloadSpeedMei(),
   indentSelection: () => indentSelection(),
   validate: () => v.manualValidate(),
@@ -1774,7 +1798,8 @@ function addEventListeners(v, cm) {
   document.getElementById('importMusicXml').addEventListener('click', cmd.openMusicXml);
   document.getElementById('importHumdrum').addEventListener('click', cmd.openHumdrum);
   document.getElementById('importPae').addEventListener('click', cmd.openPae);
-  document.getElementById('saveMei').addEventListener('click', downloadMei);
+  document.getElementById('saveMei').addEventListener('click', cmd.downloadMei);
+  document.getElementById('saveMeiBasic').addEventListener('click', cmd.downloadMeiBasic);
   document.getElementById('saveSvg').addEventListener('click', downloadSvg);
   document.getElementById('saveMidi').addEventListener('click', () => requestMidiFromVrvWorker());
   document.getElementById('printPreview').addEventListener('click', cmd.pageModeOn);
@@ -2354,47 +2379,23 @@ export function generateUrl() {
   } else if (fileLocationType === 'github') {
     url += 'file=' + 'https://raw.githubusercontent.com/' + github.githubRepo + '/' + github.branch + github.filepath;
   }
-  // generate other parameters, if different from default value
-  let scale = v.vrvOptions.scale;
-  if (scale !== defaultVerovioOptions.scale) {
-    url += amp + 'scale=' + scale;
-  }
-  let breaks = document.getElementById('breaksSelect').value;
-  if (breaks && breaks !== defaultVerovioOptions.breaks) {
-    url += amp + 'breaks=' + breaks;
-  }
+  // generate other parameters
+  url += amp + 'scale=' + v.vrvOptions.scale;
+  url += amp + 'breaks=' + document.getElementById('breaksSelect').value;
   if (v.selectedElements.length > 0) {
     url += amp + 'select=' + v.selectedElements.join(',');
   }
-  let page = v.currentPage;
-  if (page > 1) {
-    url += amp + 'page=' + page;
-  }
-  let speed = v.speedMode;
-  if (speed !== defaultSpeedMode) {
-    url += amp + 'speed=' + speed;
-  }
+  url += amp + 'page=' + v.currentPage;
+  url += amp + 'speed=' + v.speedMode;
 
   // TODO: document.getElementById('autoValidate').checked
 
-  let notationOrientation = getOrientation();
-  if (notationOrientation !== defaultNotationOrientation) {
-    url += amp + 'notationOrientation=' + notationOrientation;
-  }
-  let notationProportion = getNotationProportion();
-  if (notationProportion !== defaultNotationProportion) {
-    url += amp + 'notationProportion=' + notationProportion;
-  }
+  url += amp + 'notationOrientation=' + getOrientation();
+  url += amp + 'notationProportion=' + parseFloat(getNotationProportion()).toFixed(2);
 
   if (document.getElementById('showFacsimilePanel').checked) {
-    let facsimileOrientation = getFacsimileOrientation();
-    if (facsimileOrientation !== defaultFacsimileOrientation) {
-      url += amp + 'facsimileOrientation=' + facsimileOrientation;
-    }
-    let facsimileProportion = getFacsimileProportion();
-    if (facsimileProportion !== defaultFacsimileProportion) {
-      url += amp + 'facsimileProportion=' + facsimileProportion;
-    }
+    url += amp + 'facsimileOrientation=' + getFacsimileOrientation();
+    url += amp + 'facsimileProportion=' + parseFloat(getFacsimileProportion()).toFixed(2);
   }
 
   return url;

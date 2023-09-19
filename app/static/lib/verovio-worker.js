@@ -336,6 +336,15 @@ addEventListener(
           log('exportMidi: ' + err);
         }
         break;
+      case 'exportMeiBasic':
+        tk.setOptions(result.options);
+        tk.setOptions({ breaks: 'none' });
+        tk.loadData(result.mei);
+        result.meiBasic = tk.getMEI({ basic: true });
+        tk.setOptions({ breaks: result.options.breaks });
+        result.cmd = 'meiBasicExported';
+        result.toolkitDataOutdated = true;
+        break;
       case 'renderPdf':
         if (typeof PDFDocument === 'undefined') {
           // importScripts('https://github.com/foliojs/pdfkit/releases/download/v0.12.1/pdfkit.standalone.js');

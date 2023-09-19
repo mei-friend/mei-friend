@@ -33,6 +33,7 @@ export const lang = {
   importHumdrum: { text: 'Humdrum importieren' },
   importPae: { text: 'PAE, ABC importieren' },
   saveMeiText: { text: 'MEI speichern' },
+  saveMeiBasicText: { text: 'Als MEI Basic speichern' },
   saveSvg: { text: 'SVG speichern' },
   saveMidi: { text: 'MIDI speichern' },
   printPreviewText: { text: 'PDF-Vorschau' },
@@ -530,9 +531,9 @@ export const lang = {
     description: 'Einstellungen für MIDI-Wiedergabe',
   },
   showMidiPlaybackContextualBubble: {
-    text: 'Wiedergabeblase anzeigen',
+    text: 'MIDI-Icon anzeigen',
     description:
-      'Ein kleines Wiedergabe-Icon (kleine Blase in der Ecke links unten) ' +
+      'Ein kleines Lautsprecher-Icon in der Ecke links unten ' +
       'wird angezeigt; durck Mausklick (oder Leertaste) wird die ' +
       'MIDI-Wiedergabeleiste angezeigt und MIDI-die Wiedergabe gestartet.',
   },
@@ -818,7 +819,7 @@ export const lang = {
     text:
       'Es scheint, dass Sie Safari als Browser verwenden, auf dem derzeit leider ' +
       'keine Schema-Validierung durch mei-friend unterstützt wird. Bitte verwenden ' +
-      'Sie einen anderen Browser für volle Validierungsunterstützung.',
+      'Sie einen anderen Browser, um den vollen Leistungsumfang zu erhalten.',
   },
   githubLoggedOutWarning: {
     text: `Sie haben sich bei mei-friend von Github abgemeldet, aber Ihr Browser ist noch bei GitHub angemeldet!

@@ -7,7 +7,7 @@ import { heart } from '../css/icons.js';
 
 export const lang = {
   // Main menu bar
-  githubLoginLink: { text: 'Accesso' },
+  githubLoginLink: { text: 'Accedi' },
 
   month: {
     jan: 'Gennaio',
@@ -30,12 +30,13 @@ export const lang = {
   openUrlText: { text: 'Apri URL' },
   openExample: {
     text: 'Repertorio pubblico',
-    description: 'Apri una lista di repertorio di pubblico dominio',
+    description: 'Apri una lista del repertorio pubblico',
   },
   importMusicXml: { text: 'Importa MusicXML' },
   importHumdrum: { text: 'Importa Humdrum' },
   importPae: { text: 'Importa PAE, ABC' },
   saveMeiText: { text: 'Salva MEI' },
+  saveMeiBasicText: { text: 'Salva come MEI Basic' },
   saveSvg: { text: 'Salva SVG' },
   saveMidi: { text: 'Salva MIDI' },
   printPreviewText: { text: 'Anteprima PDF' },
@@ -51,8 +52,8 @@ export const lang = {
   replaceMenuText: { text: 'Sostituisci' },
   replaceAllMenuText: { text: 'Sostituisci tutto' },
   indentSelectionText: { text: 'Indenta selezione' },
-  surroundWithTagsText: { text: 'Circondare con tags' },
-  surroundWithLastTagText: { text: 'Circondare con ' },
+  surroundWithTagsText: { text: 'Circonda con tags' },
+  surroundWithLastTagText: { text: 'Circonda con' },
   jumpToLineText: { text: 'Vai alla riga' },
   toMatchingTagText: { text: 'Vai al tag corrispondente' },
   manualValidateText: { text: 'Convalida' },
@@ -72,10 +73,10 @@ export const lang = {
   facsimileLeft: { text: 'Facsimile a sinistra' },
   facsimileRight: { text: 'Facsimile a destra' },
 
-  // MANIPULATE MENU ITEM/ MENU MANIPOLA
-  manipulateMenuTitle: { text: 'Manipola' },
+  // MANIPULATE MENU ITEM/ MENU MODIFICA
+  manipulateMenuTitle: { text: 'Modifica' },
   invertPlacementText: { text: 'Inverti posizione' },
-  betweenPlacementText: { text: 'Tra posizioni' },
+  betweenPlacementText: { text: 'Posiziona in mezzo' },
   addVerticalGroupText: { text: 'Aggiungi gruppo verticale' },
   deleteText: { text: 'Elimina elemento' },
   pitchChromUpText: { text: 'Alza cromatica' },
@@ -183,11 +184,11 @@ export const lang = {
     la velocità di rotazione in senso antiorario indica l'attività del worker`,
   },
   decreaseScaleButton: { description: 'Riduci notazione' },
-  verovioZoom: { description: 'Scala dimensioni della notazione' },
+  verovioZoom: { description: 'Scala dimensioni dello spartito' },
   increaseScaleButton: { description: 'Aumenta notazione' },
   pagination1: { html: 'Pagina ' },
   pagination3: { html: ' di' },
-  sectionSelect: { description: 'Naviga la struttura di sezione/finale codificata' },
+  sectionSelect: { description: 'Naviga la struttura di sezione/finale del codice' },
   firstPageButton: { description: 'Vai alla prima pagina' },
   previousPageButton: { description: 'Vai alla pagina precedente' },
   paginationLabel: {
@@ -195,30 +196,30 @@ export const lang = {
   },
   nextPageButton: { description: 'Vai alla pagina successiva' },
   lastPageButton: { description: "Vai all'ultima pagina" },
-  flipCheckbox: { description: 'Passa automaticamente alla posizione del cursore di codifica' },
-  flipButton: { description: 'Passa manualmente alla posizione del cursore di codifica' },
-  breaksSelect: { description: 'Definisci il comportamento degli intervalli/pagine di sistema nella notazione' },
+  flipCheckbox: { description: 'Passa automaticamente alla posizione del cursore di codice' },
+  flipButton: { description: 'Passa manualmente alla posizione del cursore di codice' },
+  breaksSelect: { description: 'Definisci il comportamento degli intervalli/pagine di sistema nello spartito' },
   breaksSelectNone: { text: 'Nessuno' },
   breaksSelectAuto: { text: 'Automatico' },
   breaksSelectMeasure: { text: 'Misura' },
-  breaksSelectLine: { text: 'Sistema' },
-  breaksSelectEncoded: { text: 'Sistema e pagina' },
+  breaksSelectLine: { text: 'Rigo' },
+  breaksSelectEncoded: { text: 'Rigo e pagina' },
   breaksSelectSmart: { text: 'Intelligente' },
   updateControlsLabel: {
     text: 'Aggiorna',
-    description: 'Aggiorna il comportamento di controllo della notazione dopo le modifiche nella codifica',
+    description: 'Cambia il comportamento di controllo dello spartito dopo le modifiche nel codice',
   },
-  liveUpdateCheckbox: { description: 'Aggiorna automaticamente la notazione dopo le modifiche nella codifica' },
-  codeManualUpdateButton: { description: 'Aggiorna manualmente la notazione' },
+  liveUpdateCheckbox: { description: 'Aggiorna automaticamente lo spartito dopo le modifiche nella codice' },
+  codeManualUpdateButton: { description: 'Aggiorna manualmente lo spartito' },
   engravingFontSelect: { description: 'Seleziona il carattere di incisione' },
-  backwardsButton: { description: 'Vai a sinistra nella notazione' },
-  forwardsButton: { description: 'Vai a destra nella notazione' },
-  upwardsButton: { description: "Naviga verso l'alto nella notazione" },
-  downwardsButton: { description: 'Naviga verso il basso nella notazione' },
+  backwardsButton: { description: 'Vai a sinistra nello spartito' },
+  forwardsButton: { description: 'Vai a destra nello spartito' },
+  upwardsButton: { description: "Naviga verso l'alto nello spartito" },
+  downwardsButton: { description: 'Naviga verso il basso nello spartito' },
   speedLabel: {
-    text: 'Modalità di velocità',
+    text: 'Modalità veloce',
     description:
-      'In modalità di velocità, solo la pagina corrente viene inviata a Verovio per ridurre i tempi di rendering con file di grandi dimensioni',
+      'Nella modalità veloce, solamente la pagina corrente viene inviata a Verovio per ridurre i tempi di rendering in caso di file di grandi dimensioni',
   },
 
   // PDF/print preview panel / Pannello di anteprima PDF/stampa
@@ -239,9 +240,9 @@ export const lang = {
 
   // facsimile panel/ pannello facsimile
   facsimileIcon: { description: 'Pannello facsimile' },
-  facsimileDecreaseZoomButton: { description: "Riduci l'immagine della notazione" },
-  facsimileZoom: { description: "Regola la dimensione dell'immagine della notazione" },
-  facsimileIncreaseZoomButton: { description: "Ingrandisci l'immagine della notazione" },
+  facsimileDecreaseZoomButton: { description: "Riduci l'immagine dello spartito" },
+  facsimileZoom: { description: "Regola la dimensione dell'immagine dello spartito" },
+  facsimileIncreaseZoomButton: { description: "Ingrandisci l'immagine dello spartito" },
   facsimileFullPageLabel: {
     text: 'Pagina intera',
     description: "Mostra l'intera pagina dell'immagine del facsimile",
@@ -323,7 +324,7 @@ export const lang = {
   forkRepertoireOrganizationLabel: { text: 'Organizzazione:' },
   forkRepertoireOrganizationOption: { text: "Scegli un'organizzazione GitHub..." },
   forkRepertoireRepositoryLabel: { text: 'Repository:' },
-  forkRepertoireRepositoryOption: { text: 'Scegli una codifica...' },
+  forkRepertoireRepositoryOption: { text: 'Scegli una codice...' },
   forkRepositoryInputName: { placeholder: 'Nome utente o organizzazione Github' },
   forkRepositoryInputRepoOption: { text: 'Scegli un repository' },
   forkRepositoryToSelectorText: { text: 'Fork a: ' },
@@ -414,7 +415,7 @@ export const lang = {
   midiSpeedmodeIndicator: {
     text: 'Modalità di velocità',
     description:
-      "La modalità di velocità è attiva; viene riprodotto solo il MIDI per la pagina corrente. Per riprodurre l'intera codifica, disabilita la modalità di velocità.",
+      "La modalità di velocità è attiva; viene riprodotto solo il MIDI per la pagina corrente. Per riprodurre l'intero codice, disabilita la modalità di velocità.",
   },
   closeMidiPlaybackControlBarButton: { description: 'Nascondi la barra di controllo della riproduzione MIDI' },
 
@@ -428,8 +429,8 @@ export const lang = {
     description: 'Reimposta ai valori predefiniti di mei-friend',
   },
   filterSettings: {
-    placeholder: 'Filtra le impostazioni',
-    description: 'Digita qui per filtrare le impostazioni',
+    placeholder: 'Cerca',
+    description: 'Digita qui per cercare',
   },
   closeSettingsButton: {
     description: 'Chiudi il pannello delle impostazioni',
@@ -478,7 +479,7 @@ export const lang = {
   // Drag select / Selezione tramite trascinamento
   dragSelection: {
     text: 'Selezione tramite trascinamento',
-    description: 'Seleziona gli elementi nella notazione con il trascinamento del mouse',
+    description: 'Seleziona gli elementi nello spartito con il trascinamento del mouse',
   },
   dragSelectNotes: {
     text: 'Seleziona le note',
@@ -507,29 +508,29 @@ export const lang = {
 
   // Control menu / Menu di controllo
   controlMenuSettings: {
-    text: 'Barra di controllo della notazione',
-    description: 'Definisci gli elementi da mostrare nel menu di controllo sopra la notazione',
+    text: 'Barra di controllo dello spartito',
+    description: 'Definisci gli elementi da mostrare nel menu di controllo sopra lo spartito',
   },
   controlMenuFlipToPageControls: {
-    text: 'Mostra i controlli per girare la pagina',
-    description: 'Mostra i controlli per girare la pagina nel menu di controllo della notazione',
+    text: 'Mostra i controlli per cambiare pagina',
+    description: 'Mostra i controlli per cambiare la pagina nel menu di controllo dello spartito',
   },
   controlMenuUpdateNotation: {
-    text: "Mostra i controlli per l'aggiornamento della notazione",
+    text: "Mostra i controlli per l'aggiornamento dello spartito",
     description:
-      'Mostra i controlli per il comportamento di aggiornamento della notazione nel menu di controllo della notazione',
+      'Mostra i controlli per il comportamento di aggiornamento dello spartito nel menu di controllo dello spartito',
   },
   controlMenuFontSelector: {
     text: 'Mostra il selettore del carattere di notazione',
-    description: 'Mostra il selettore del carattere di notazione (SMuFL) nel menu di controllo della notazione',
+    description: 'Mostra il selettore del carattere di notazione (SMuFL) nel menu di controllo dello spartito',
   },
   controlMenuNavigateArrows: {
     text: 'Mostra le frecce di navigazione',
-    description: 'Mostra le frecce di navigazione nella notazione nel menu di controllo della notazione',
+    description: 'Mostra le frecce di navigazione nello spartito nel menu di controllo dello spartito',
   },
   controlMenuSpeedmodeCheckbox: {
     text: 'Mostra la casella di controllo della modalità di velocità',
-    description: 'Mostra la casella di controllo della modalità di velocità nel menu di controllo della notazione',
+    description: 'Mostra la casella di controllo della modalità di velocità nel menu di controllo dello spartito',
   },
 
   // MIDI Playback / Riproduzione MIDI
@@ -538,31 +539,32 @@ export const lang = {
     description: 'Impostazioni riproduzione MIDI',
   },
   showMidiPlaybackContextualBubble: {
-    text: 'Mostra scorciatoia riproduzione',
+    text: 'Mostra icona di riproduzione',
     description:
-      "Fa apparire una scorciatoia (una bolla nell'angolo in basso a sinistra; " +
-      'clicca per avviare immediatamente la riproduzione) quando la barra di controllo della riproduzione MIDI è chiusa',
+      "Fa apparire un'icona nell'angolo in basso a sinistra " +
+      'per avviare immediatamente la riproduzione quando la barra di controllo della riproduzione MIDI è chiusa',
   },
   showMidiPlaybackControlBar: {
     text: 'Mostra barra di controllo riproduzione MIDI',
     description: 'Mostra barra di controllo riproduzione MIDI',
   },
   scrollFollowMidiPlayback: {
-    text: 'Scorrimento segui riproduzione MIDI',
-    description: 'Scorri il pannello di notazione per seguire la riproduzione MIDI sulla pagina corrente',
+    text: 'Scorrimento automatico',
+    description: 'Scorri il pannello dello spartito durante la riproduzione MIDI sulla pagina corrente',
   },
   pageFollowMidiPlayback: {
-    text: 'Pagina segue riproduzione MIDI',
-    description: 'Passa automaticamente alle pagine per seguire la riproduzione MIDI',
+    text: 'Cambio pagina automatico',
+    description: 'Cambia automaticamente la pagina durante la riproduzione MIDI',
   },
   highlightCurrentlySoundingNotes: {
     text: 'Evidenzia note attualmente suonate',
     description:
       'Evidenzia visivamente le note attualmente suonate nel pannello di notazione durante la riproduzione MIDI',
   },
+
   selectMidiExpansion: {
-    text: 'Espansione della riproduzione',
-    description: "Seleziona l'elemento di espansione da utilizzare per la riproduzione MIDI",
+    text: 'Espansione',
+    description: "Seleziona l'espansione da utilizzare perla riproduzione MIDI",
   },
 
   // Transposition // Trasposizione
@@ -573,12 +575,12 @@ export const lang = {
   enableTransposition: {
     text: 'Abilita la trasposizione',
     description:
-      'Abilita le impostazioni di trasposizione, da applicare tramite il pulsante di trasposizione sottostante. La trasposizione verrà applicata solo alla notazione, la codifica rimane inalterata, a meno che non si clicchi su "Rerender via Verovio" nel menu a discesa "Manipulate".',
+      'Abilita le impostazioni di trasposizione, da applicare tramite il pulsante di trasposizione sottostante. La trasposizione verrà applicata solo allo spartito, il codice rimane inalterata, a meno che non si clicchi su "Rerender via Verovio" nel menu a discesa "Manipulate".',
   },
   transposeInterval: {
     text: 'Trasponi per intervallo',
     description:
-      'Trasponi la codifica per intervallo cromatico attraverso gli intervalli più comuni (Verovio supporta il sistema base-40)',
+      'Trasponi la codice per intervallo cromatico attraverso gli intervalli più comuni (Verovio supporta il sistema base-40)',
     labels: [
       'Unisono Perfetto',
       'Unisono Aumentato',
@@ -637,7 +639,7 @@ export const lang = {
   transposeButton: {
     text: 'Trasponi',
     description:
-      'Applica la trasposizione con le impostazioni sopra indicate alla notazione, mantenendo invariata la codifica MEI. Per trasporre anche la codifica MEI con le attuali impostazioni, utilizzare "Rerender via Verovio" nel menu a tendina "Manipulate".',
+      'Applica la trasposizione con le impostazioni sopra indicate allo spartito, mantenendo invariata la codice MEI. Per trasporre anche la codice MEI con le attuali impostazioni, utilizzare "Rerender via Verovio" nel menu a tendina "Manipulate".',
   },
 
   // Renumber measures / Rinumerazione misure
@@ -670,7 +672,7 @@ export const lang = {
   },
   showAnnotations: {
     text: 'Mostra annotazioni',
-    description: 'Mostra le annotazioni nella notazione',
+    description: 'Mostra le annotazioni nello spartito',
   },
   showAnnotationPanel: {
     text: 'Mostra pannello annotazioni',
@@ -692,7 +694,7 @@ export const lang = {
   },
   selectFacsimilePanelOrientation: {
     text: 'Posizione del pannello di facsimile',
-    description: 'Seleziona la posizione del pannello di facsimile rispetto alla notazione',
+    description: 'Seleziona la posizione del pannello di facsimile rispetto allo spartito',
     labels: ['sinistra', 'destra', 'alto', 'basso'],
   },
   facsimileZoomInput: {
@@ -751,8 +753,8 @@ export const lang = {
     description: "Seleziona il tema dell'editor",
   },
   matchTheme: {
-    text: 'La notazione corrisponde al tema',
-    description: "Corrispondenza della notazione al tema di colore dell'editor",
+    text: 'lo spartito corrisponde al tema',
+    description: "Corrispondenza dello spartito al tema di colore dell'editor",
   },
   tabSize: {
     text: 'Dimensione indentazione',
@@ -780,7 +782,7 @@ export const lang = {
   },
   autoValidate: {
     text: 'Validazione automatica',
-    description: 'Valida automaticamente la codifica rispetto allo schema dopo ogni modifica',
+    description: 'Valida automaticamente la codice rispetto allo schema dopo ogni modifica',
   },
   autoShowValidationReport: {
     text: 'Mostra il rapporto di validazione automaticamente',
@@ -876,7 +878,7 @@ export const lang = {
   selectRepository: { text: 'Seleziona repository' },
   selectBranch: { text: 'Seleziona ramo' },
   commitMessageInput: { placeholder: 'Aggiornato usando mei-friend online' },
-  reportIssueWithEncoding: { value: 'Segnala problema di codifica' },
+  reportIssueWithEncoding: { value: 'Segnala problema di codice' },
   clickToOpenInMeiFriend: { text: 'Clicca per aprire in mei-friend' },
   repoAccessError: {
     text: "Spiacenti, non è possibile accedere ai repository per l'utente o l'organizzazione forniti",
