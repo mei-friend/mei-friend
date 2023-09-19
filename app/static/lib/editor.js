@@ -939,7 +939,7 @@ export function addOctaveElement(v, cm, disPlace = 'above', dis = '8') {
  * inserts them as new elements, and surrounds them with supplied
  * elements. If there is already such a artic/accid child element,
  * take it and surround it.
- * 
+ *
  * mElName contains the element name for the element supplied.
  * The element must be a member of att.modelTranscriptionLike.
  * By default, the added markup element will be <supplied>.
@@ -962,7 +962,7 @@ export function addTranscriptionLikeElement(v, cm, attrName = 'none', mElName = 
 
   // this loop updated the list of selected elements to be wrapped by markup
   // and will separate the list into groups of adjacent elements to be wrapped into a single markup element
-  while(v.selectedElements.length > 0) {
+  while (v.selectedElements.length > 0) {
     let id = v.selectedElements[0];
     let el = v.xmlDoc.querySelector("[*|id='" + id + "']");
     if (!el) {
@@ -1029,41 +1029,45 @@ export function addTranscriptionLikeElement(v, cm, attrName = 'none', mElName = 
   // and wraps the markup around a whole group
   // TODO (nice to have): Add @corresp to elements if more than one is created at once
   elementGroups.forEach((group) => {
-
     let parent = v.xmlDoc.querySelector("[*|id='" + group[0] + "']").parentNode;
 
     // warn and prevent if currentParrent has no xml:id because replacing in editor will fail
     // added option to add xml:ids to the file before adding markup
-    if(parent && parent.getAttribute('xml:id') == null) {
-
+    if (parent && parent.getAttribute('xml:id') == null) {
       const handleMissigParentId = new Promise((resolve, reject) => {
-        const msg = "Action can only be performed if parent element has an xml:id. Please add xml:ids to the document before.";
+        const msg =
+          'Action can only be performed if parent element has an xml:id. Please add xml:ids to the document before.';
         console.log(msg);
 
         v.showUserPrompt(msg, [
-          {label: 'Abort action', event: (abort) => {reject('promptOverlay', abort);}},
-          {label: 'Add xml:ids to document', event: (abort) => { resolve('promptOverlay', abort);}}
-          ]);
+          {
+            label: 'Abort action',
+            event: (abort) => {
+              reject('promptOverlay', abort);
+            },
+          },
+          {
+            label: 'Add xml:ids to document',
+            event: (abort) => {
+              resolve('promptOverlay', abort);
+            },
+          },
+        ]);
       });
 
       handleMissigParentId
-      .then(
-        (resolveModal) => {
-          cmd.addIds(); 
+        .then((resolveModal) => {
+          cmd.addIds();
           v.hideUserPrompt(resolveModal);
           console.log('Added ids and proceed.');
           let markupUuid = wrapGroupWithMarkup(v, cm, group, mElName, parent);
           uuids.push(markupUuid);
-        }
-      )
-      .catch(
-        (resolveModal) => {
+        })
+        .catch((resolveModal) => {
           v.hideUserPrompt(resolveModal);
           console.log('Aborting action because of missing parent id.');
-        }
-      );
-    }
-    else {
+        });
+    } else {
       let markupUuid = wrapGroupWithMarkup(v, cm, group, mElName, parent);
       uuids.push(markupUuid);
 
@@ -1076,15 +1080,14 @@ export function addTranscriptionLikeElement(v, cm, attrName = 'none', mElName = 
     }
   });
 
-  if(uuids.length > 0) {
+  if (uuids.length > 0) {
     v.selectedElements = [];
     uuids.forEach((u) => v.selectedElements.push(u));
   }
-  
+
   addApplicationInfo(v, cm);
   v.updateData(cm, false, true);
   v.allowCursorActivity = true; // update notation again
-
 } // addSuppliedElement()
 
 /**

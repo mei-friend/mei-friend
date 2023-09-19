@@ -7,7 +7,7 @@
 
 import * as dutils from './dom-utils.js';
 import * as utils from './utils.js';
-import { replaceInEditor  } from './editor.js';
+import { replaceInEditor } from './editor.js';
 
 /**
  * [Wrapper for selectApparatus() and selectChoice().]
@@ -107,38 +107,36 @@ export function wrapGroupWithMarkup(v, cm, groupIds, mElName, parentEl) {
   let markupEl = document.createElementNS(dutils.meiNameSpace, mElName);
   let uuid;
 
-    let respId = document.getElementById('respSelect').value;
-    if (respId) markupEl.setAttribute('resp', '#' + respId);
+  let respId = document.getElementById('respSelect').value;
+  if (respId) markupEl.setAttribute('resp', '#' + respId);
 
-    for(let i = 0; i < groupIds.length; i++) {
-      let id = groupIds[i];
-      let el = v.xmlDoc.querySelector("[*|id='" + id + "']");
-      let currentParent = el.parentNode;
-      
-      // special treatment of the first element for id generation and to place sup within the tree (and a sanity check)
-      if(i === 0) {
-        uuid = mintSuppliedId(id, mElName, v);
-        markupEl.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid); 
+  for (let i = 0; i < groupIds.length; i++) {
+    let id = groupIds[i];
+    let el = v.xmlDoc.querySelector("[*|id='" + id + "']");
+    let currentParent = el.parentNode;
 
-        currentParent.replaceChild(markupEl, el);
+    // special treatment of the first element for id generation and to place sup within the tree (and a sanity check)
+    if (i === 0) {
+      uuid = mintSuppliedId(id, mElName, v);
+      markupEl.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
+
+      currentParent.replaceChild(markupEl, el);
+      markupEl.appendChild(el);
+    } else {
+      if (currentParent === parentEl) {
         markupEl.appendChild(el);
+        // remove following text node to prevent trailing newlines
+        markupEl.nextSibling.remove();
+      } else {
+        //error
       }
-      else {
-        if(currentParent === parentEl) { 
-          markupEl.appendChild(el);
-          // remove following text node to prevent trailing newlines
-          markupEl.nextSibling.remove();
-        }
-        else {
-          //error
-        }
-      }
-      parentEl = currentParent;
     }
-    replaceInEditor(cm, parentEl, true);
-    cm.execCommand('indentAuto');
+    parentEl = currentParent;
+  }
+  replaceInEditor(cm, parentEl, true);
+  cm.execCommand('indentAuto');
 
-    return uuid;
+  return uuid;
 }
 
 function mintSuppliedId(id, nodeName, v) {

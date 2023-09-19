@@ -668,8 +668,11 @@ export default class Viewer {
     let owl = document.getElementById('mei-friend-logo');
     let owlSrc = owl.getAttribute('src');
     owlSrc = owlSrc.substring(0, owlSrc.lastIndexOf('/') + 1);
-    if (env === environments.staging) { owlSrc += 'staging-' }
-    else if (env === environments.testing) { owlSrc += 'testing-' };
+    if (env === environments.staging) {
+      owlSrc += 'staging-';
+    } else if (env === environments.testing) {
+      owlSrc += 'testing-';
+    }
     if (j < 128) {
       // dark
       // wake up owl
@@ -1081,8 +1084,9 @@ export default class Viewer {
           att.modelTranscriptionLike.forEach((element) => {
             let upperCaseElementName = element.charAt(0).toUpperCase() + element.slice(1);
             rt.style.setProperty(
-              '--' + element + 'Color', 
-              value ? 'var(--default' + upperCaseElementName + 'Color)' : 'var(--notationColor)');
+              '--' + element + 'Color',
+              value ? 'var(--default' + upperCaseElementName + 'Color)' : 'var(--notationColor)'
+            );
             rt.style.setProperty(
               '--' + element + 'HighlightedColor',
               value ? 'var(--default' + upperCaseElementName + 'HighlightedColor)' : 'var(--highlightColor)'
@@ -1456,18 +1460,23 @@ export default class Viewer {
     }
 
     function setHighlightColorProperty(elementName, checkedMarkup, colorValue, setDefault = false) {
-      if(setDefault = true) {
+      if ((setDefault = true)) {
         let upperCaseElementName = elementName.charAt(0).toUpperCase() + elementName.slice(1);
-        rt.style.setProperty('--default' + upperCaseElementName + 'Color',
-          checkedMarkup ? colorValue :  'var(--notationColor)');
-        rt.style.setProperty('--default' + upperCaseElementName + 'HighlightedColor',
-          checkedMarkup ? utils.brighter(colorValue, -50) :  'var(--highlightColor)');
+        rt.style.setProperty(
+          '--default' + upperCaseElementName + 'Color',
+          checkedMarkup ? colorValue : 'var(--notationColor)'
+        );
+        rt.style.setProperty(
+          '--default' + upperCaseElementName + 'HighlightedColor',
+          checkedMarkup ? utils.brighter(colorValue, -50) : 'var(--highlightColor)'
+        );
       }
 
-      rt.style.setProperty('--' + elementName + 'Color', 
-        checkedMarkup ? colorValue : 'var(--notationColor)');
-      rt.style.setProperty('--' + elementName + 'HighlightedColor', 
-        checkedMarkup ? utils.brighter(colorValue, -50) : 'var(--highlightColor)');
+      rt.style.setProperty('--' + elementName + 'Color', checkedMarkup ? colorValue : 'var(--notationColor)');
+      rt.style.setProperty(
+        '--' + elementName + 'HighlightedColor',
+        checkedMarkup ? utils.brighter(colorValue, -50) : 'var(--highlightColor)'
+      );
     }
   } // addMeiFriendOptionsToSettingsPanel()
 
@@ -2230,7 +2239,6 @@ export default class Viewer {
 
     promptOverlay.style.display = 'flex';
     this.setFocusToVerovioPane();
-    
   } // showUserPrompt()
 
   hideUserPrompt(modalid) {
