@@ -2354,47 +2354,23 @@ export function generateUrl() {
   } else if (fileLocationType === 'github') {
     url += 'file=' + 'https://raw.githubusercontent.com/' + github.githubRepo + '/' + github.branch + github.filepath;
   }
-  // generate other parameters, if different from default value
-  let scale = v.vrvOptions.scale;
-  if (scale !== defaultVerovioOptions.scale) {
-    url += amp + 'scale=' + scale;
-  }
-  let breaks = document.getElementById('breaksSelect').value;
-  if (breaks && breaks !== defaultVerovioOptions.breaks) {
-    url += amp + 'breaks=' + breaks;
-  }
+  // generate other parameters
+  url += amp + 'scale=' + v.vrvOptions.scale;
+  url += amp + 'breaks=' + document.getElementById('breaksSelect').value;
   if (v.selectedElements.length > 0) {
     url += amp + 'select=' + v.selectedElements.join(',');
   }
-  let page = v.currentPage;
-  if (page > 1) {
-    url += amp + 'page=' + page;
-  }
-  let speed = v.speedMode;
-  if (speed !== defaultSpeedMode) {
-    url += amp + 'speed=' + speed;
-  }
+  url += amp + 'page=' + v.currentPage;
+  url += amp + 'speed=' + v.speedMode;
 
   // TODO: document.getElementById('autoValidate').checked
 
-  let notationOrientation = getOrientation();
-  if (notationOrientation !== defaultNotationOrientation) {
-    url += amp + 'notationOrientation=' + notationOrientation;
-  }
-  let notationProportion = getNotationProportion();
-  if (notationProportion !== defaultNotationProportion) {
-    url += amp + 'notationProportion=' + notationProportion;
-  }
+  url += amp + 'notationOrientation=' + getOrientation();
+  url += amp + 'notationProportion=' + getNotationProportion().toFixed(2);
 
   if (document.getElementById('showFacsimilePanel').checked) {
-    let facsimileOrientation = getFacsimileOrientation();
-    if (facsimileOrientation !== defaultFacsimileOrientation) {
-      url += amp + 'facsimileOrientation=' + facsimileOrientation;
-    }
-    let facsimileProportion = getFacsimileProportion();
-    if (facsimileProportion !== defaultFacsimileProportion) {
-      url += amp + 'facsimileProportion=' + facsimileProportion;
-    }
+    url += amp + 'facsimileOrientation=' + getFacsimileOrientation();
+    url += amp + 'facsimileProportion=' + getFacsimileProportion().toFixed(2);
   }
 
   return url;
