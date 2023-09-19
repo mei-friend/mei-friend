@@ -25,15 +25,6 @@
   transform: rotate(90deg);
 }
 
-#encoding {
-  /* Take the remaining width */
-  flex: 1;
-  /* Misc */
-  /* align-items: center; */
-  display: flex;
-  justify-content: left;
-}
-
 #annotationToolsMenu {
   flex-direction: row;
 }
@@ -42,7 +33,7 @@
   flex-direction: column;
 }
 
-.annotationToolsDomainSelection {
+#annotationToolsDomainSelection {
   flex-direction: column;
 }
 

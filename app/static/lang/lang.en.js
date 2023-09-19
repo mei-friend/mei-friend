@@ -54,6 +54,7 @@ export const lang = {
   surroundWithTagsText: { text: 'Surround with tags' },
   surroundWithLastTagText: { text: 'Surround with ' },
   jumpToLineText: { text: 'Jump to line' },
+  toMatchingTagText: { text: 'Go to matching tag' },
   manualValidateText: { text: 'Validate' },
 
   // VIEW MENU ITEM
@@ -77,15 +78,17 @@ export const lang = {
   betweenPlacementText: { text: 'Between placement' },
   addVerticalGroupText: { text: 'Add vertical group' },
   deleteText: { text: 'Delete element' },
-  pitchUpText: { text: 'Pitch 1 tone up' },
-  pitchDownText: { text: 'Pitch 1 tone down' },
+  pitchChromUpText: { text: 'Pitch chromatically up' },
+  pitchChromDownText: { text: 'Pitch chromatically down' },
+  pitchUpDiatText: { text: 'Pitch diatonically up' },
+  pitchDownDiatText: { text: 'Pitch diatonically down' },
   pitchOctaveUpText: { text: 'Pitch 1 octave up' },
   pitchOctaveDownText: { text: 'Pitch 1 octave down' },
   staffUpText: { text: 'Element 1 staff up' },
   staffDownText: { text: 'Element 1 staff down' },
   increaseDurText: { text: 'Increase duration' },
   decreaseDurText: { text: 'Decrease duration' },
-  cleanAccidText: { text: 'Clean @accid.ges' },
+  cleanAccidText: { text: 'Check @accid.ges' },
   renumberMeasuresTestText: { text: ' Renumber measures (test)' },
   renumberMeasuresExecText: { text: ' Renumber measures (exec)' },
   addIdsText: { text: 'Add ids to MEI' },
@@ -96,6 +99,11 @@ export const lang = {
 
   // INSERT MENU ITEM
   insertMenuTitle: { text: 'Insert' },
+  addDoubleSharpText: { html: 'Double sharp &#119082;' },
+  addSharpText: { html: 'Sharp &#9839;' },
+  addNaturalText: { html: 'Natural &#9838;' },
+  addFlatText: { html: 'Flat &#9837;' },
+  addDoubleFlatText: { html: 'Double flat &#119083;' },
   addTempoText: { text: 'Tempo' },
   addDirectiveText: { text: 'Directive' },
   addDynamicsText: { text: 'Dynamics' },
@@ -108,7 +116,7 @@ export const lang = {
   addSuppliedText: { text: 'Supplied' },
   addSuppliedArticText: { text: 'Supplied (Artic)' },
   addSuppliedAccidText: { text: 'Supplied (Accid)' },
-  addArpeggioText: { text: 'Arepggio' },
+  addArpeggioText: { text: 'Arpeggio' },
   addFermataText: { text: 'Fermata' },
   addGlissandoText: { text: 'Glissando' },
   addPedalDownText: { text: 'Pedal down' },
@@ -138,9 +146,10 @@ export const lang = {
   // HELP MENU ITEM
   helpMenuTitle: { text: 'Help' },
   goToHelpPage: { text: 'mei-friend help pages' },
-  showChangelog: { text: 'Show mei-friend changelog' },
-  goToGuidelines: { text: 'Show MEI Guidelines' },
-  consultGuidelinesForElementText: { text: 'Consult Guidelines for current element' },
+  goToCheatSheet: { text: 'mei-friend cheat sheet' },
+  showChangelog: { text: 'mei-friend changelog' },
+  goToGuidelines: { text: 'MEI Guidelines' },
+  consultGuidelinesForElementText: { text: "Guidelines' entry for current element" },
   provideFeedback: { text: 'Provide feedback' },
   resetDefault: { text: 'Reset to default' },
 
@@ -167,7 +176,7 @@ export const lang = {
   middleFooterOf: { text: 'of' },
   middleFooterLoaded: { text: 'loaded' },
 
-  // control menu
+  // Control menu
   verovioIcon: {
     description: `mei-friend worker activity:
     clockwise rotation denotes Verovio activity,
@@ -222,7 +231,7 @@ export const lang = {
   },
   pdfPreviewNormalModeTitle: { text: 'Select page range to be saved in PDF.' },
 
-  // facsimile panel
+  // Facsimile panel
   facsimileIcon: { description: 'Facsimile panel' },
   facsimileDecreaseZoomButton: { description: 'Decrease notation image' },
   facsimileZoom: { description: 'Adjust size of notation image' },
@@ -241,10 +250,10 @@ export const lang = {
   facsimileNoZonesFullPageWarning: { text: 'Facsimile without zones only visible in full page mode.' },
   facsimileImgeNotLoadedWarning: { text: 'Could not load image' },
 
-  // drag'n'drop
+  // Drag'n'drop
   dragOverlayText: { text: 'Drag your input file here.' },
 
-  // public repertoire
+  // Public repertoire
   openUrlHeading: { text: 'Open Web-hosted encoding by URL' },
   openUrlInstructions: {
     text:
@@ -269,19 +278,23 @@ export const lang = {
   openUrlChooseComposerText: { text: 'Choose a composer...' },
   openUrlOpenEncodingByUrlText: { text: 'Open Web-hosted encoding by URL' },
 
-  // github actions modal
+  // GitHub actions modal
+  githubActionsHeadingText: { text: 'Request GitHub Action workflow:' },
+  githubActionsDescription: {
+    text: 'Click on "Run workflow" to ask the GitHub API to run the above workflow for you, using the input configuration specified below. Your encoding will be reloaded in its latest version once the workflow run completes. ',
+  },
   githubActionStatusMsgPrompt: { text: 'Could not run workflow - GitHub says' },
   githubActionStatusMsgWaiting: { text: 'Please be patient while GitHub is processing your workflow...' },
   githubActionStatusMsgFailure: { text: 'Could not run workflow - GitHub says' },
   githubActionStatusMsgSuccess: { text: 'Workflow run completed - GitHub says' },
-  githubActionsRunBtn: { text: 'Run workflow' },
-  githubActionsRunBtnReload: { text: 'Reload MEI file' },
-  githubActionsCancelBtn: { text: 'Cancel' },
-  githubActionsInputSetterFilepath: { text: "Copy current file path to input" },
-  githubActionsInputSetterSelection: { text: "Copy current MEI selection to input"},
-  githubActionsInputContainerHeader: { text: "Input configuration" },
+  githubActionsRunButton: { text: 'Run workflow' },
+  githubActionsRunButtonReload: { text: 'Reload MEI file' },
+  githubActionsCancelButton: { text: 'Cancel' },
+  githubActionsInputSetterFilepath: { text: 'Copy current file path to input' },
+  githubActionsInputSetterSelection: { text: 'Copy current MEI selection to input' },
+  githubActionsInputContainerHeader: { text: 'Input configuration' },
 
-  // fork modals
+  // Fork modals
   forkRepoGithubText: { text: 'Fork Github Repository' },
   forkRepoGithubExplanation: {
     text:
@@ -320,13 +333,30 @@ export const lang = {
   selectTagNameForEnclosureOkButton: { value: 'OK' },
   selectTagNameForEnclosureCancelButton: { value: 'Cancel' },
 
-  // annotation panel
+  // Restore Solid session overlay
+  solidExplanation: {
+    description:
+      'Solid is a decentralised platform for social linked data platform. Log in to Solid to create stand-off annotations using linked data (RDF).',
+  },
+  solidProvider: { description: 'Please choose a Solid identity provider (IdP) or specify your own.' },
+  solidLoginBtn: { text: 'Login' },
+  solidOverlayCancel: { html: 'Restoring Solid session - press <span>esc</span> or click here to cancel' },
+  solidWelcomeMsg: { text: 'Welcome, ' },
+  solidLogout: { text: 'Log out' },
+  solidLoggedOutWarning: {
+    html: `You have logged out of mei-friend's Solid integration, but your browser is still logged in to Solid!
+      <a id="solidIdPLogoutLink" target="_blank">Click here to logout from Solid</a>.`,
+  },
+
+  // Annotation panel
   annotationCloseButtonText: { text: 'Close Annotations Panel' },
   hideAnnotationPanelButton: { description: 'Close Annotations Panel' },
   closeAnnotationPanelButton: { description: 'Close Annotations Panel' },
   annotationToolsButton: { text: 'Tools', description: 'Annotation tools' },
   annotationListButton: { text: 'List', description: 'List annotations' },
   writeAnnotStandoffText: { text: 'Web Annotation' },
+  annotationToolsIdentifyTitle: { text: 'Identify' },
+  annotationToolsIdentifySpan: { text: 'Identify Musical Object' },
   annotationToolsHighlightTitle: { text: 'Highlight' },
   annotationToolsHighlightSpan: { text: 'Highlight' },
   annotationToolsDescribeTitle: { text: 'Describe' },
@@ -343,9 +373,9 @@ export const lang = {
   deleteAnnotation: { description: 'Delete this annotation' },
   deleteAnnotationConfirmation: { text: 'Are you sure you wish to delete this annotation?' },
   makeStandOffAnnotation: {
-    description: 'Stand-off status (Web Annotation)',
-    descriptionSolid: 'Write to Solid as Web Annotation',
-    descriptionToLocal: 'Copy Web Annotation URI to clipboard',
+    description: 'Stand-off status (RDF)',
+    descriptionSolid: 'Write to Solid as RDF',
+    descriptionToLocal: 'Open stand-off (RDF) annotation in new tab',
   },
   makeInlineAnnotation: {
     description: 'Click to in-line annotation',
@@ -514,6 +544,10 @@ export const lang = {
   highlightCurrentlySoundingNotes: {
     text: 'Highlight currently-sounding notes',
     description: 'Visually highlight currently-sounding notes in the notation panel during MIDI playback ',
+  },
+  selectMidiExpansion: {
+    text: 'Playback expansion',
+    description: 'Select expansion element to be used for MIDI playback',
   },
 
   // Transposition
@@ -733,6 +767,10 @@ export const lang = {
     text: 'Auto validation',
     description: 'Validate encoding against schema automatically after each edit',
   },
+  autoShowValidationReport: {
+    text: 'Auto show validation report',
+    description: 'Show validation report automatically after validation has been performed',
+  },
   autoCloseBrackets: {
     text: 'Auto close brackets',
     description: 'Automatically close brackets at input',
@@ -800,7 +838,7 @@ export const lang = {
   noErrors: { text: 'no errors' },
   errorsFound: { text: 'errors found' }, // 5 errors found
 
-  // github-menu.js
+  // GitHub-menu.js
   githubRepository: { text: 'Repository' },
   githubBranch: { text: 'Branch' },
   githubFilepath: { text: 'Path' },
@@ -826,11 +864,36 @@ export const lang = {
   repoAccessError: { text: 'Sorry, cannot access repositories for supplied user or organisation' },
   allComposers: { text: 'All composers' }, // fork-repository.js
 
-  // utils renumber measures
+  // Utils renumber measures
   renumberMeasuresModalText: { text: 'Renumber measures' },
   renumberMeasuresModalTest: { text: 'Test' },
   renumberMeasuresWillBe: { text: '' },
   renumberMeasuresWouldBe: { text: 'would be' },
   renumberMeasuresChangedTo: { text: 'changed to' },
   renumberMeasureMeasuresRenumbered: { text: 'measures renumbered' },
+
+  // Code checker @accid.ges
+  codeCheckerTitle: { text: 'Check @accid.ges attributes (against key signature, measure-wise accids, and ties).' },
+  codeCheckerFix: { text: 'Fix' },
+  codeCheckerFixAll: { text: 'Fix all' },
+  codeCheckerIgnore: { text: 'Ignore' },
+  codeCheckerIgnoreAll: { text: 'Ignore all' },
+  codeCheckerCheckingCode: { text: 'Checking code...' },
+  codeCheckerNoAccidMessagesFound: { text: 'All accid.ges attributes seem correct.' },
+  codeCheckerMeasure: { text: 'Measure' },
+  codeCheckerNote: { text: 'Note' },
+  codeCheckerHasBoth: { text: 'has both' },
+  codeCheckerAnd: { text: 'and' },
+  codeCheckerRemove: { text: 'Remove' },
+  codeCheckerFixTo: { text: 'Fix to' },
+  codeCheckerAdd: { text: 'Add' },
+  codeCheckerWithContradictingContent: { text: 'with contradicting content' },
+  codeCheckerTiedNote: { text: 'Tied note' },
+  codeCheckerNotSamePitchAs: { text: 'not same pitch as' },
+  codeCheckerNotSameOctaveAs: { text: 'not same octave as' },
+  codeCheckerNotSameAsStartingNote: { text: 'not same as in starting note' },
+  codeCheckerExtra: { text: 'extra' }, // superfluous
+  codeCheckerHasExtra: { text: 'has extra' }, // has superfluous
+  codeCheckerLacksAn: { text: 'lacks an' },
+  codeCheckerBecauseAlreadyDefined: { text: 'because it has been defined earlier in the measure' },
 };

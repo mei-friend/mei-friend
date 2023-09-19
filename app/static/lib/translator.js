@@ -90,10 +90,16 @@ export default class Translator {
     }
     updateStatusBar();
     drawRightFooter();
+    if (this.langCode === 'ja') {
+      // apply custom font-family settings for japanese language
+      document.querySelector('body').classList.add('lang_ja');
+    } else {
+      document.querySelector('body').classList.remove('lang_ja');
+    }
   } // translateGui()
 
   /**
-   * 
+   *
    * @param {Element} el
    * @param {string} key
    */
@@ -126,7 +132,12 @@ export default class Translator {
         if ('classes' in this.lang[key] && className in this.lang[key]['classes']) {
           translationItem = this.lang[key]['classes'][className];
         } else {
-          console.warning('doTranslation(): Called with className but cannot translate, reverting to default: ', el, key, className);
+          console.warning(
+            'doTranslation(): Called with className but cannot translate, reverting to default: ',
+            el,
+            key,
+            className
+          );
         }
       }
       if ('text' in translationItem) {

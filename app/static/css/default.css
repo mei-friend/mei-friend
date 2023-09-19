@@ -54,7 +54,8 @@
   --keyboardShortCutColor: var(--defaultKeyboardShortCutColor);
   --dropdownHeadingColor: var(--defaultDropdownHeadingColor);
   --dropdownBackgroundColor: var(--defaultDropdownBackgroundColor);
-  --validationStatusBackgroundColor: var(--defaultValidationStatusBackgroundColor) --dropdownBorderColor: var(--defaultDropdownBorderColor);
+  --validationStatusBackgroundColor: var(--defaultValidationStatusBackgroundColor);
+  --dropdownBorderColor: var(--defaultDropdownBorderColor);
   --overlayBackgroundColor: var(--defaultOverlayBackgroundColor);
   --overlayTextColor: var(--defaultOverlayTextColor);
   --overlayBorderColor: var(--defaultOverlayBorderColor);
@@ -72,6 +73,10 @@
   --annotationPanelTextColor: var(--defaultAnnotationPanelTextColor);
 }
 
+body.lang_ja, #lang_ja_native { 
+  /* recommended font stack for Japanese, as per https://mhdigital.llc/web-typography-in-japanese/ */
+  font-family: 'ヒラギノ角ゴ ProN', 'Hiragino Kaku Gothic ProN', '游ゴシック', '游ゴシック体', YuGothic, 'Yu Gothic', 'メイリオ', Meiryo, 'ＭＳ ゴシック', 'MS Gothic', HiraKakuProN-W3, 'TakaoExゴシック', TakaoExGothic, 'MotoyaLCedar', 'Droid Sans Japanese', sans-serif;
+}
 body {
   font-family: Arial, Helvetica, sans-serif;
   width: 100%;
@@ -139,7 +144,7 @@ a:active {
 }
 
 #facsimileCloseButton {
-  fill: var(--dropdownBorderColor)
+  fill: var(--dropdownBorderColor);
 }
 
 .rightMargin {
@@ -158,7 +163,7 @@ a:active {
   border-radius: 32px;
   background-color: var(--overlayBackgroundColor);
   background-blend-mode: difference;
-  opacity: .95;
+  opacity: 0.95;
   z-index: 200;
 }
 
@@ -172,40 +177,70 @@ a:active {
   -ms-transform: translate(-50%, -50%);
 }
 
-.openUrlOverlay, #githubActionsOverlay {
+.openUrlOverlay,
+#githubActionsOverlay,
+#solidOverlay {
   position: fixed;
   display: none;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, .8);
+  background-color: rgba(0, 0, 0, 0.8);
   z-index: 190;
 }
 
-#githubActionsUI { 
-  display:flex;
-  flex-direction:column;
+#solidOverlay.active {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+#solidLoadingIndicator:hover {
+  text-decoration: underline;
+}
+
+#solidOverlayCancel span {
+  font-family: monospace;
+}
+
+#solidLoadingIndicator {
+  border-radius: 32px;
+  background-color: rgba(255, 255, 255, 0.7);
+  width: 200px;
+  height: fit-content;
+  z-index: 190;
+  text-align: center;
+}
+
+#solidLoadingIndicator svg {
+  width: 200px;
+}
+
+#githubActionsUI {
+  display: flex;
+  flex-direction: column;
   padding: 1em;
   height: fit-content !important;
 }
 
-.githubActionsInputConfig { 
-  display:flex;
-  flex-direction:row;
+.githubActionsInputConfig {
+  display: flex;
+  flex-direction: row;
   align-items: end;
-  background-color:var(--navbarBackgroundColor);
-  border-radius:1em;
-  width:90%;
-  padding:.5em;
-  margin-bottom:.5em;
+  background-color: var(--navbarBackgroundColor);
+  border-radius: 1em;
+  width: 90%;
+  padding: 0.5em;
+  margin-bottom: 0.5em;
 }
 
-.githubActionsInputConfig span { 
+.githubActionsInputConfig span {
   color: var(--textColor);
 }
 
-.githubActionsInputSetter { 
+.githubActionsInputSetter {
   cursor: pointer;
 }
 
@@ -213,9 +248,17 @@ a:active {
   fill: var(--textColor);
 }
 
-.githubActionsInputConfig div { 
-  padding-left: .5em;
-  padding-right:.5em;
+.githubActionsInputConfig div {
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+}
+
+.githubActionsInputFieldWrapper {
+  flex: 1;
+}
+
+.githubActionsInputField {
+  width: 95%;
 }
 
 .openUrlOverlay a,
@@ -238,8 +281,8 @@ a:active {
   z-index: 190;
 }
 
-.openUrlOverlay .openUrlUI>div,
-.forkRepositoryOverlay .forkRepositoryUI>div {
+.openUrlOverlay .openUrlUI > div,
+.forkRepositoryOverlay .forkRepositoryUI > div {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -249,19 +292,19 @@ a:active {
 
 .openUrlOverlay .openUrlUI details,
 .forkRepositoryOverlay .forkRepositoryUI details,
-#githubActionsUI details, #githubActionsUI button {
+#githubActionsUI details,
+#githubActionsUI button {
   cursor: pointer;
   margin-bottom: 1em;
 }
 
-#githubActionsUI details label { 
+#githubActionsUI details label {
   font-family: monospace;
   cursor: pointer;
 }
 
-
-.openUrlOverlay .openUrlUI details>div,
-.forkRepositoryOverlay .forkRepositoryUI details>div {
+.openUrlOverlay .openUrlUI details > div,
+.forkRepositoryOverlay .forkRepositoryUI details > div {
   margin-left: 1em;
 }
 
@@ -302,7 +345,7 @@ a:active {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, .8);
+  background-color: rgba(0, 0, 0, 0.8);
   z-index: 190;
 }
 
@@ -330,7 +373,7 @@ a:active {
   background: lightsteelblue;
   color: darkblue;
   width: fit-content;
-  padding: .5em;
+  padding: 0.5em;
   border-radius: 10px;
 }
 
@@ -386,11 +429,51 @@ a:active {
   justify-content: center;
 }
 
-/* #encoding {} */
+#encoding {
+  display: flex;
+  justify-content: left;
+  flex-direction: column;
+  position: relative;
+}
+
+#codeChecker {
+  min-height: 14em;
+  max-height: 14em;
+  display: none;
+  padding: 2px;
+  overflow-x: auto;
+  overflow-y: scroll;
+  color: var(--textColor);
+  background-color: var(--settingsBackgroundColor);
+  border: 2px solid var(--settingsBackgroundAlternativeColor);
+  border-radius: 4px;
+  font-family: monospace;
+}
+
+.strikethrough {
+  text-decoration: line-through;
+}
+
+#codeChecker div:nth-child(odd) {
+  background: var(--settingsBackgroundAlternativeColor);
+}
+
+#codeChecker button {
+  background-color: var(--backgroundColor) !important;
+  border-color: var(--dropdownBorderColor) !important;
+  padding-left: 2px;
+  padding-right: 2px;
+}
+
+#codeChecker svg {
+  width: 16px;
+  height: 16px;
+  stroke: darkgreen;
+}
 
 #validation-status {
   z-index: 5;
-  position: relative;
+  position: absolute;
   width: 3.5em;
   margin-right: -3.5em;
   height: 1.2em;
@@ -411,14 +494,14 @@ a:active {
 }
 
 .validation-report {
-  font-size: 90%;
+  font-size: 95%;
   display: block;
-  position: relative;
+  position: absolute;
   z-index: 12;
   left: 72px;
   top: 3px;
-  width: 480px;
-  margin-right: -480px;
+  width: 560px;
+  margin-right: -560px;
   max-height: 10.5em;
   padding: 2px;
   overflow-x: auto;
@@ -428,6 +511,7 @@ a:active {
   border: 2px solid var(--settingsBackgroundAlternativeColor);
   border-radius: 4px;
   font-family: monospace;
+  line-height: 1.4em;
 }
 
 .validation-report div:nth-child(odd) {
@@ -436,11 +520,17 @@ a:active {
 
 .validation-title {
   font-weight: bold;
+  display: flex;
+  align-items: center;
+  line-height: 1.5em;
 }
 
 .validation-item {
   cursor: pointer;
   flex-wrap: nowrap;
+  display: flex;
+  align-items: center;
+  line-height: 1.5em;
 }
 
 .wait {
@@ -540,8 +630,8 @@ a:active {
   float: right;
   cursor: pointer;
   font-size: 2em;
-  padding-right: .01em;
-  margin-top: -.35em;
+  padding-right: 0.01em;
+  margin-top: -0.25em;
 }
 
 #annotationPanel {
@@ -604,9 +694,9 @@ a:active {
   fill: var(--textColor);
   border-radius: 100px;
   padding: 5px;
-  opacity: .6;
+  opacity: 0.6;
   border: 1px solid var(--dropdownBorderColor);
-  cursor:pointer;
+  cursor: pointer;
 }
 
 .footer #midiPlayerContextual:hover {
@@ -619,7 +709,7 @@ a:active {
 }
 
 .leftfoot #heart {
-  fill:var(--highlightColor);
+  fill: var(--highlightColor);
 }
 
 .middlefoot {
@@ -649,7 +739,7 @@ a:active {
   width: 0%;
   height: 100%;
   background-color: var(--dropdownBackgroundColor);
-  opacity: .8;
+  opacity: 0.8;
   position: absolute;
   top: 0px;
   left: 0px;
@@ -673,7 +763,6 @@ a:active {
   z-index: 6;
   color: var(--textColor);
   background-color: var(--controlMenuBackgroundColor);
-  ;
 }
 
 .controls {
@@ -786,7 +875,7 @@ https://www.w3schools.com/css/css_tooltip.asp
 }
 
 .tooltip .tooltiptext::after {
-  content: "";
+  content: '';
   position: absolute;
   bottom: 100%;
   left: 50%;
@@ -833,19 +922,19 @@ svg text {
   user-select: none;
 }
 
-#verovioContainer .currently-playing { 
-  fill:orange !important;
-  stroke:orange !important;
+#verovio-panel .currently-playing {
+  fill: orange !important;
   color: orange !important;
 }
 
-#verovioContainer .highlighted {
+#verovio-panel .highlighted,
+#verovio-panel .highlighted g {
   color: var(--highlightColor);
-  stroke: var(--highlightColor);
+  fill: var(--highlightColor);
 }
 
-#verovioContainer g.highlighted,
-#verovioContainer text.highlighted {
+#verovio-panel g.highlighted,
+#verovio-panel text.highlighted {
   fill: var(--highlightColor);
   fill-opacity: 100%;
 }
@@ -864,25 +953,28 @@ svg text {
   fill-opacity: 70%;
 }
 
-#verovioContainer g.supplied g {
+#verovio-panel g.supplied g {
   fill: var(--suppliedColor);
   color: var(--suppliedColor);
-  stroke: var(--suppliedColor);
 }
 
-#verovioContainer .supplied .highlighted {
+#verovio-panel .supplied .highlighted {
   color: var(--suppliedHighlightedColor);
-  stroke: var(--suppliedHighlightedColor);
-}
-
-#verovioContainer g.supplied g.highlighted {
   fill: var(--suppliedHighlightedColor);
 }
 
-#verovioContainer g {
+#verovio-panel g.supplied g.highlighted {
+  fill: var(--suppliedHighlightedColor);
+}
+
+#verovio-panel {
   fill: var(--notationColor);
   color: var(--notationColor);
   stroke: var(--notationColor);
+}
+
+#verovio-panel svg.definition-scale {
+  color: unset;
 }
 
 #facsimile-panel rect {
@@ -963,7 +1055,8 @@ svg text {
   stroke-width: 1.5px;
 }
 
-#facsimileIcon, #pdf-icon {
+#facsimileIcon,
+#pdf-icon {
   margin-left: 3px;
   margin-right: 3px;
   width: 16px;
@@ -1016,7 +1109,7 @@ span.keyIcon {
 }
 
 .CodeMirror-foldgutter {
-  width: .7em;
+  width: 0.7em;
 }
 
 .CodeMirror-foldgutter-open,
@@ -1026,11 +1119,11 @@ span.keyIcon {
 }
 
 .CodeMirror-foldgutter-open:after {
-  content: "\25BE";
+  content: '\25BE';
 }
 
 .CodeMirror-foldgutter-folded:after {
-  content: "\25B8";
+  content: '\25B8';
 }
 
 .cm-trailingspace {
@@ -1052,19 +1145,19 @@ span.keyIcon {
 
 .in {
   right: 0px;
-  animation: moveInFromRight .4s;
+  animation: moveInFromRight 0.4s;
   display: block;
 }
 
 .out {
   right: -360px;
   /* display: none; */
-  animation: moveOutToRight .3s;
+  animation: moveOutToRight 0.3s;
 }
 
 @keyframes moveInFromRight {
   from {
-    opacity: .7;
+    opacity: 0.7;
     right: -360px;
   }
 
@@ -1081,7 +1174,7 @@ span.keyIcon {
   }
 
   to {
-    opacity: .7;
+    opacity: 0.7;
     right: -360px;
   }
 }
@@ -1107,7 +1200,7 @@ span.keyIcon {
   outline: none;
   cursor: pointer;
   padding: 2px 12px;
-  transition: .2s;
+  transition: 0.2s;
   min-height: 38px;
   min-width: 46px;
 }
@@ -1238,7 +1331,7 @@ span.keyIcon {
   float: left;
 }
 
-.optionsItem input[type="number"] {
+.optionsItem input[type='number'] {
   font-size: 9.5pt;
   min-width: 55px;
   max-width: 55px;
@@ -1281,7 +1374,7 @@ select {
   color: var(--textColor);
 }
 
-select>option {
+select > option {
   background-color: var(--dropdownBackgroundColor);
   color: var(--textColor);
 }
@@ -1298,6 +1391,10 @@ select>option {
   padding: 20px;
 }
 
+#alertOverlay a {
+  color: white;
+}
+
 /* The alert message box */
 .alert {
   position: fixed;
@@ -1306,7 +1403,7 @@ select>option {
   width: 80%;
   max-height: 70%;
   justify-content: space-between;
-  gap: .5em;
+  gap: 0.5em;
   padding: 20px;
   background-color: #f44336;
   /* border-style: solid;
@@ -1318,11 +1415,11 @@ select>option {
 }
 
 .alert.success {
-  background-color: #04AA6D;
+  background-color: #04aa6d;
 }
 
 .alert.info {
-  background-color: #2196F3;
+  background-color: #2196f3;
 }
 
 .alert.warning {
@@ -1373,7 +1470,7 @@ select>option {
   display: inline;
   cursor: pointer;
   float: right;
-  margin-top: .96em;
+  margin-top: 0.96em;
   padding-right: 2px;
   fill: var(--dropdownHeadingColor);
 }
@@ -1383,7 +1480,7 @@ select>option {
   height: 14px;
 }
 
-#midiPlaybackControlBar { 
+#midiPlaybackControlBar {
   border-bottom: 3px solid var(--dropdownHeadingColor);
   border-left: 3px solid var(--dropdownHeadingColor);
   border-right: 3px solid var(--dropdownHeadingColor);
@@ -1392,6 +1489,7 @@ select>option {
   height: 30px;
   display: none;
   align-items: baseline;
+  gap: 0.5em;
 }
 
 midi-player::part(control-panel) {
@@ -1404,17 +1502,17 @@ midi-player::part(control-panel) {
 
 midi-player::part(play-button) {
   background: var(--controlMenuBackgroundColor);
-  color:var(--textColor);
+  color: var(--textColor);
 }
 
-#midiPlaybackControlBar midi-player { 
+#midiPlaybackControlBar midi-player {
   height: 90%;
   width: 500px;
   max-width: 70%;
 }
 
-#midiSpeedmodeIndicator { 
-  display:none;
+#midiSpeedmodeIndicator {
+  display: none;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 6pt;
   font-weight: bold;
@@ -1425,21 +1523,20 @@ midi-player::part(play-button) {
   padding: 2px;
   max-height: calc(1em + 2px);
   cursor: default;
-  color:var(--textColor);
+  color: var(--textColor);
 }
 
-#closeMidiPlaybackControlBarButton { 
-   color: var(--textColor);
-   padding: 2px 8px;
-   cursor: pointer;
-   position:fixed;
-   right:.2em;
-   bottom:1.5em;
-   font-size: 14pt;
-   border-radius:100px;
+#closeMidiPlaybackControlBarButton {
+  color: var(--textColor);
+  padding: 2px 8px;
+  cursor: pointer;
+  position: fixed;
+  right: 0.2em;
+  bottom: 1.5em;
+  font-size: 14pt;
+  border-radius: 100px;
 }
 
-#closeMidiPlaybackControlBarButton:hover { 
-  background-color:var(--settingsLinkHoverColor);
+#closeMidiPlaybackControlBarButton:hover {
+  background-color: var(--settingsLinkHoverColor);
 }
-

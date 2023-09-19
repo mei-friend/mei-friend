@@ -14,6 +14,8 @@ export const supportedLanguages = {
     es: 'Espanyol',
     fr: 'Francès',
     it: 'Italià',
+    ja: 'Japonès',
+    pl: 'Polonès',
   },
   de: {
     ca: 'Katalanisch',
@@ -22,6 +24,8 @@ export const supportedLanguages = {
     es: 'Spanisch',
     fr: 'Französisch',
     it: 'Italienisch',
+    ja: 'Japanisch',
+    pl: 'Polnisch',
   },
   en: {
     ca: 'Catalan',
@@ -30,6 +34,8 @@ export const supportedLanguages = {
     es: 'Spanish',
     fr: 'French',
     it: 'Italian',
+    ja: 'Japanese',
+    pl: 'Polish',
   },
   es: {
     ca: 'Catalán',
@@ -38,6 +44,8 @@ export const supportedLanguages = {
     es: 'Español',
     fr: 'Francés',
     it: 'Italiano',
+    ja: 'Japonés',
+    pl: 'Polaco',
   },
   fr: {
     ca: 'Catalan',
@@ -46,6 +54,8 @@ export const supportedLanguages = {
     es: 'Espagnol',
     fr: 'Français',
     it: 'Italien',
+    ja: 'Japonais',
+    pl: 'Polonais',
   },
   it: {
     ca: 'Catalano',
@@ -54,6 +64,28 @@ export const supportedLanguages = {
     es: 'Spagnolo',
     fr: 'Francese',
     it: 'Italiano',
+    ja: 'Giapponese',
+    pl: 'Polacco',
+  },
+  ja: {
+    ca: 'カタロニア語',
+    de: 'ドイツ語',
+    en: '英語',
+    es: 'スペイン語',
+    fr: 'フランス語',
+    it: 'イタリア語',
+    ja: '日本語',
+    pl: 'ポーランド語',
+  },
+  pl: {
+    ca: 'Kataloński',
+    de: 'Niemiecki',
+    en: 'Angielski',
+    es: 'Hiszpański',
+    fr: 'Francuski',
+    it: 'Włoski',
+    ja: 'Japoński',
+    pl: 'Polski',
   },
 };
 
@@ -63,7 +95,7 @@ export const isSafari = !!navigator.userAgent.match(/Version\/[\d\.]+.*Safari/);
 
 // guidelines base URL, needed to construct element / attribute URLs
 // TODO ideally determine version part automatically
-export const guidelinesBase = 'https://music-encoding.org/guidelines/v4/';
+export const guidelinesBase = 'https://music-encoding.org/guidelines/v5/';
 
 /**
  * Object of common MEI schemas,
@@ -71,43 +103,51 @@ export const guidelinesBase = 'https://music-encoding.org/guidelines/v4/';
  * and meiVersion ('4.0.1', etc.)
  */
 export const commonSchemas = {
+  Basic: {
+    '5.0': 'https://music-encoding.org/schema/5.0/mei-basic.rng',
+  },
   CMN: {
     '2.1.1': 'https://music-encoding.org/schema/2.1.1/mei-CMN.rng',
     '3.0.0': 'https://music-encoding.org/schema/3.0.0/mei-CMN.rng',
     '4.0.0': 'https://music-encoding.org/schema/4.0.0/mei-CMN.rng',
     '4.0.1': 'https://music-encoding.org/schema/4.0.1/mei-CMN.rng',
-    '5.0.0-dev': 'https://music-encoding.org/schema/dev/mei-CMN.rng',
+    '5.0': 'https://music-encoding.org/schema/5.0/mei-CMN.rng',
+    // '5.0.0-dev': 'https://music-encoding.org/schema/dev/mei-CMN.rng',
   },
   Mensural: {
     '2.1.1': 'https://music-encoding.org/schema/2.1.1/mei-Mensural.rng',
     '3.0.0': 'https://music-encoding.org/schema/3.0.0/mei-Mensural.rng',
     '4.0.0': 'https://music-encoding.org/schema/4.0.0/mei-Mensural.rng',
     '4.0.1': 'https://music-encoding.org/schema/4.0.1/mei-Mensural.rng',
-    '5.0.0-dev': 'https://music-encoding.org/schema/dev/mei-Mensural.rng',
+    '5.0': 'https://music-encoding.org/schema/5.0/mei-Mensural.rng',
+    // '5.0.0-dev': 'https://music-encoding.org/schema/dev/mei-Mensural.rng',
   },
   Neumes: {
     '2.1.1': 'https://music-encoding.org/schema/2.1.1/mei-Neumes.rng',
     '3.0.0': 'https://music-encoding.org/schema/3.0.0/mei-Neumes.rng',
     '4.0.0': 'https://music-encoding.org/schema/4.0.0/mei-Neumes.rng',
     '4.0.1': 'https://music-encoding.org/schema/4.0.1/mei-Neumes.rng',
-    '5.0.0-dev': 'https://music-encoding.org/schema/dev/mei-Neumes.rng',
+    '5.0.': 'https://music-encoding.org/schema/5.0/mei-Neumes.rng',
+    // '5.0.0-dev': 'https://music-encoding.org/schema/dev/mei-Neumes.rng',
   },
   All: {
     '2.1.1': 'https://music-encoding.org/schema/2.1.1/mei-all.rng',
     '3.0.0': 'https://music-encoding.org/schema/3.0.0/mei-all.rng',
     '4.0.0': 'https://music-encoding.org/schema/4.0.0/mei-all.rng',
     '4.0.1': 'https://music-encoding.org/schema/4.0.1/mei-all.rng',
-    '5.0.0-dev': 'https://music-encoding.org/schema/dev/mei-all.rng',
+    '5.0': 'https://music-encoding.org/schema/5.0/mei-all.rng',
+    // '5.0.0-dev': 'https://music-encoding.org/schema/dev/mei-all.rng',
   },
   Any: {
     '2.1.1': 'https://music-encoding.org/schema/2.1.1/mei-all_anyStart.rng',
     '3.0.0': 'https://music-encoding.org/schema/3.0.0/mei-all_anyStart.rng',
     '4.0.0': 'https://music-encoding.org/schema/4.0.0/mei-all_anyStart.rng',
     '4.0.1': 'https://music-encoding.org/schema/4.0.1/mei-all_anyStart.rng',
-    '5.0.0-dev': 'https://music-encoding.org/schema/dev/mei-all_anyStart.rng',
+    '5.0': 'https://music-encoding.org/schema/5.0/mei-all_anyStart.rng',
+    // '5.0.0-dev': 'https://music-encoding.org/schema/dev/mei-all_anyStart.rng',
   },
 };
-export const defaultMeiVersion = '4.0.1';
+export const defaultMeiVersion = '5.0';
 export const defaultMeiProfile = 'CMN';
 export const defaultSchema = commonSchemas[defaultMeiProfile][defaultMeiVersion];
 
@@ -128,11 +168,17 @@ supportedVerovioVersions.latest = {
   url: 'https://www.verovio.org/javascript/latest/verovio-toolkit-hum.js',
   description: 'Current Verovio release',
 };
+supportedVerovioVersions['4.0.1'] = {
+  url: 'https://www.verovio.org/javascript/4.0.1/verovio-toolkit-hum.js',
+  description: 'Verovio release 4.0.1',
+  releaseDate: '5 Sept 2023',
+};
 supportedVerovioVersions['3.16.0'] = {
   url: 'https://www.verovio.org/javascript/3.16.0/verovio-toolkit-hum.js',
   description: 'Verovio release 3.16.0',
   releaseDate: '3 July 2023',
-};supportedVerovioVersions['3.15.0'] = {
+};
+supportedVerovioVersions['3.15.0'] = {
   url: 'https://www.verovio.org/javascript/3.15.0/verovio-toolkit-hum.js',
   description: 'Verovio release 3.15.0',
   releaseDate: '1 Mar 2023',
@@ -200,8 +246,6 @@ export const defaultMeiFileName = `${root}Beethoven_WoO70-Breitkopf.mei`;
 export const defaultVerovioOptions = {
   scale: 55,
   breaks: 'line',
-  header: 'encoded',
-  footer: 'encoded',
   inputFrom: 'mei',
   adjustPageHeight: true,
   mdivAll: true,
@@ -304,13 +348,13 @@ export const meiFriendSettingsOptions = {
     title: 'Select placement elements ',
     description: 'filled in by language packs',
     type: 'bool',
-    default: false,
+    default: true,
   },
   dragSelectSlurs: {
     title: 'Select slurs ',
     description: 'filled in by language packs',
     type: 'bool',
-    default: false,
+    default: true,
   },
   dragSelectMeasures: {
     title: 'Select measures ',
@@ -388,11 +432,18 @@ export const meiFriendSettingsOptions = {
   },
   highlightCurrentlySoundingNotes: {
     title: 'Highlight currently-sounding notes',
-    description: 'filled in by language packs',
+    description: 'Visually highlight currently-sounding notes in the notation panel during MIDI playback ',
     type: 'bool',
     default: true,
   },
-  // Transposition
+  selectMidiExpansion: {
+    title: 'Playback expansion',
+    description: 'Select expansion element to be used for MIDI playback',
+    type: 'select',
+    values: ['none'],
+    // valuesDescriptions: ['note-0000001018877033', 'n34z4wz2', 'note-34z4wz2'],
+    default: 'none',
+  },
   titleTransposition: {
     title: 'Transpose',
     description: 'filled in by language packs',
@@ -614,7 +665,7 @@ export const meiFriendSettingsOptions = {
   },
   enableGithubActions: {
     title: 'Show available GitHub Actions',
-    description: 'List available GitHub Actions when navigating within repository in GitHub menu', 
+    description: 'List available GitHub Actions when navigating within repository in GitHub menu',
     type: 'bool',
     default: false,
   },
@@ -727,6 +778,12 @@ export const codeMirrorSettingsOptions = {
     description: 'Validate encoding against schema automatically after each edit',
     type: 'bool',
     default: true,
+  },
+  autoShowValidationReport: {
+    title: 'Auto show validation report',
+    description: 'Show validation report automatically after validation has been performed',
+    type: 'bool',
+    default: false,
   },
   autoCloseBrackets: {
     title: 'Auto close brackets',

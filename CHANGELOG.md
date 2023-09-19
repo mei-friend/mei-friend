@@ -1,12 +1,50 @@
 # mei-friend-online CHANGELOG.md
 
-### 0.9.1-p 
+### 1.0.1 Version 1.0.1 patch
+* Reduce Verovio defaults
+* Add auto-translated draft of Japanese language pack
+
+## 1.0.0 Version 1.0 (released 4 September 2023)
+* Delete notes, chords, rests (together with enclosing elements such as beams, tuplets, as well as elements pointing towards them, such as a slur through `@startid` or `@endid`) (#37)
+* Move notes in pitch chromatically (`SHIFT + UP/DOWN`) with adding sharps when going upwards and flats when going downwards (enhancement #36)
+* Provide menu items and keyboard shortcuts to insert accidentals (+, -, =) (feature request #35)
+* Fix bug that prevented encoded @color to be shown (#34)
+* Fix bug that prevented MEI and SVG download in Safari (#33)
+* Implement loading of Web Annotations using DataCatalog discovery model
+
+### 0.10.4
+* Add UI panel inside editor panel to check and interactively fix all occurrences of @accid.ges against key signature, measure-wise accids, ties, and redundant information.
+* Settings checkbox for enabling automatic display of validation report (off by default)
+* Update data model for stand-off annotation discovery service to use schema.org DataCatalogs / Datasets
+
+### 0.10.3 Expansion support for MIDI playback
+* Add drop-down GUI element to MIDI toolbar to select expansion element from encoding
+* Support for MIDI playback of selected expansion element (for handling repeated sections)
+* Improved MIDI playback handling in the background
+* MIDI toolbar disappears when editing encoding
+
+### 0.10.2
+* Improve UI around Solid handleIncomingRedirect
+* Provide translations for Solid UI
+* Set cursor position to matching tag name in editor
+* Add auto-translated draft of Polish language pack
+* Bug that did not show elements within a choice in speed mode fixed
+
+### 0.10.1
+* Fix contextual enabling / disabling of stand-off annotation interface
+* Improve responsiveness of polling for GitHub Action Workflow outcomes
+
+### 0.10.0-p 
 * Patch gunicorn logging config
+
+### 0.10.0 Solid integration and Music Annotation Ontology support
+* Enable log-in to Solid Pod
+* Allow creation of Music Annotation Ontology objects in response to selections
 
 ### 0.9.1 patch
 * Fix bug with undefined lang variable under Safari (addresses #25)
 
-### 0.9.0 GitHub Actions integration
+### 0.9.0 GitHub Actions integration (release 2 July 2023)
 * Configurably display any GitHub Actions (dispatch workflows) available in the current repository / branch
 * List any configured inputs and set values from UI with shortcuts for 'current filepath' and 'current selection'
 * Launch Actions (dispatch) workflows from within mei-friend
@@ -36,7 +74,7 @@
 * Use same generate URL feature to build a full backlink with params for 'Report issue with encoding'
 * Code refactoring with separate defaults.js file
 
-### 0.8.7 transposition
+### 0.8.7 transposition (release 27 Mar 2023)
 * Add transposition settings panel to the mei-friend settings to specify transposition by key, by interval, and pitch direction.
 * Enable ?file= param to open files from private repos (when logged in)
 * Add "Report issue with encoding" feature (creates issue with reciprocal mei-friend link)
@@ -54,7 +92,7 @@
 * Page range selector for selecting all, current, page range, or individual pages (e.g., 2,5-8)
 * Download PDF file (with pages as selected in page-range settings)
 
-### 0.8.4 patch
+### 0.8.4 patch (release 1 Mar 2023)
 * Drag-select and click-select chord instead of note with `ALT` modifier
 * Add `@staff` to clef change element
 * Change of keyboard shortcuts (for inserting C clef, tenuto, spiccato)
@@ -119,7 +157,7 @@
 * When facsimile element present/absent, facsimile panel automatically shown/hidden and facsimile settings details opened/folded away
 * Notation and facsimile orientation and proportion values as URL parameters and in local storage
 * Verovio icon (activity status) moved to beginning of notation control menu
-### 0.6.6 patch: small fixes and refinements
+### 0.6.6 patch: small fixes and refinements (26 Oct 2022)
 * Correctly reset GitHub menu when switching to local file (via menu or drag'n'drop)
 * Make filename in file status display editable when working locally
 * Make undo and redo graphically available via `Code` menu
@@ -234,7 +272,7 @@ in control menu through mei-friend settings pane
 ### 0.3.1 patch
 * Implement fork repository functionality
 * Support for `file`, `orientation`, and `scale` as URL parameters
-## 0.3.0 minor: Autocompletion
+## 0.3.0 minor: Autocompletion (first release 28 Jan 2022)
 * Incorporate CodeMirror's hint addons (show-hint, xml-hint)
 * Implement context-sensitive autocompletion
 * Supply mei-CMN and mei-all 4.0.1 RNGs as schemaInfo objects
