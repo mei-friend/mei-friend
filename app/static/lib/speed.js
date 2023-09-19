@@ -1093,8 +1093,8 @@ export async function getPageWithElement(xmlDoc, breaks, id, breaksOption) {
     }
     page -= j;
   }
-  return page;
-}
+  return Math.max(page, 1);
+} // getPageWithElement()
 
 /**
  * @param {Document} xmlNode
