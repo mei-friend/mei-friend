@@ -36,6 +36,7 @@ export const lang = {
   importHumdrum: { text: 'Humdrumをインポート' },
   importPae: { text: 'PAE、ABCをインポート' },
   saveMeiText: { text: 'MEIを保存' },
+  saveMeiBasicText: { text: 'MEI Basicで保存' },
   saveSvg: { text: 'SVGを保存' },
   saveMidi: { text: 'MIDIを保存' },
   printPreviewText: { text: 'PDFプレビュー' },

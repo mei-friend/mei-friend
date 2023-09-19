@@ -1001,6 +1001,20 @@ async function vrvWorkerEventsHandler(ev) {
       v.setFocusToVerovioPane();
       v.busy(false);
       break;
+    case 'meiBasicExported':
+      let blob = new Blob([ev.data.meiBasic], {
+        type: 'text/plain',
+      });
+      let url = URL.createObjectURL(blob);
+      let fileName = meiFileName.substring(meiFileName.lastIndexOf('/') + 1).replace(/\.[^/.]+$/, '-basic.mei');
+      // buxfix for Safari (#33, 31. Aug 2023)
+      setTimeout(() => {
+        let a = document.createElement('a');
+        a.setAttribute('href', url);
+        a.setAttribute('download', fileName);
+        a.click();
+      }, 0);
+      break;
     case 'downloadMidiFile': // export MIDI file
       blob = midiDataToBlob(ev.data.midi);
       let a = document.createElement('a');
@@ -1278,6 +1292,15 @@ function downloadMei() {
   setFileChangedState(false);
 } // downloadMei()
 
+function downloadMeiBasic() {
+  let message = {
+    cmd: 'exportMeiBasic',
+    options: v.vrvOptions,
+    mei: cm.getValue(), // exclude dummy measures in speed mode
+  };
+  vrvWorker.postMessage(message);
+} // downloadMeiBasic()
+
 function downloadSpeedMei() {
   let blob = new Blob([speed.getPageFromDom(v.xmlDoc, v.currentPage, v.breaksValue(), v.pageSpanners)], {
     type: 'text/plain',
@@ -1509,6 +1532,7 @@ export let cmd = {
   openHumdrum: () => openFileDialog('.krn,.hum'),
   openPae: () => openFileDialog('.pae,.abc'),
   downloadMei: () => downloadMei(),
+  downloadMeiBasic: () => downloadMeiBasic(),
   downloadSpeedMei: () => downloadSpeedMei(),
   indentSelection: () => indentSelection(),
   validate: () => v.manualValidate(),
@@ -1774,7 +1798,8 @@ function addEventListeners(v, cm) {
   document.getElementById('importMusicXml').addEventListener('click', cmd.openMusicXml);
   document.getElementById('importHumdrum').addEventListener('click', cmd.openHumdrum);
   document.getElementById('importPae').addEventListener('click', cmd.openPae);
-  document.getElementById('saveMei').addEventListener('click', downloadMei);
+  document.getElementById('saveMei').addEventListener('click', cmd.downloadMei);
+  document.getElementById('saveMeiBasic').addEventListener('click', cmd.downloadMeiBasic);
   document.getElementById('saveSvg').addEventListener('click', downloadSvg);
   document.getElementById('saveMidi').addEventListener('click', () => requestMidiFromVrvWorker());
   document.getElementById('printPreview').addEventListener('click', cmd.pageModeOn);

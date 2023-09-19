@@ -36,6 +36,7 @@ export const lang = {
   importHumdrum: { text: 'Importa Humdrum' },
   importPae: { text: 'Importa PAE, ABC' },
   saveMeiText: { text: 'Desa MEI' },
+  saveMeiBasicText: { text: 'Desa come MEI Basic' },
   saveSvg: { text: 'Desa SVG' },
   saveMidi: { text: 'Desa MIDI' },
   printPreviewText: { text: 'Visualitza PDF' },

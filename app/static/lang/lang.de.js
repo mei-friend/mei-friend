@@ -33,6 +33,7 @@ export const lang = {
   importHumdrum: { text: 'Humdrum importieren' },
   importPae: { text: 'PAE, ABC importieren' },
   saveMeiText: { text: 'MEI speichern' },
+  saveMeiBasicText: { text: 'Als MEI Basic speichern' },
   saveSvg: { text: 'SVG speichern' },
   saveMidi: { text: 'MIDI speichern' },
   printPreviewText: { text: 'PDF-Vorschau' },
