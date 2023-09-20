@@ -1002,10 +1002,10 @@ async function vrvWorkerEventsHandler(ev) {
       v.busy(false);
       break;
     case 'meiBasicExported':
-      let blob = new Blob([ev.data.meiBasic], {
+      let meiBasicBlob = new Blob([ev.data.meiBasic], {
         type: 'text/plain',
       });
-      let url = URL.createObjectURL(blob);
+      let url = URL.createObjectURL(meiBasicBlob);
       let fileName = meiFileName.substring(meiFileName.lastIndexOf('/') + 1).replace(/\.[^/.]+$/, '-basic.mei');
       // buxfix for Safari (#33, 31. Aug 2023)
       setTimeout(() => {
