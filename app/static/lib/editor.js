@@ -7,8 +7,9 @@ import * as dutils from './dom-utils.js';
 import * as speed from './speed.js';
 import * as utils from './utils.js';
 import { loadFacsimile } from './facsimile.js';
-import { handleEditorChanges, translator, version, versionDate } from './main.js';
+import { cmd, handleEditorChanges, translator, version, versionDate } from './main.js';
 import Viewer from './viewer.js';
+import { wrapGroupWithMarkup } from './markup.js';
 
 /**
  * Smart indents selected region in editor, if none, do all
@@ -938,7 +939,7 @@ export function addOctaveElement(v, cm, disPlace = 'above', dis = '8') {
  * inserts them as new elements, and surrounds them with supplied
  * elements. If there is already such a artic/accid child element,
  * take it and surround it.
- * 
+ *
  * mElName contains the element name for the element supplied.
  * The element must be a member of att.modelTranscriptionLike.
  * By default, the added markup element will be <supplied>.
@@ -958,11 +959,10 @@ export function addTranscriptionLikeElement(v, cm, attrName = 'none', mElName = 
 
   let uuids = [];
   let elementGroups = [];
-  let abort = false;
 
   // this loop updated the list of selected elements to be wrapped by markup
   // and will separate the list into groups of adjacent elements to be wrapped into a single markup element
-  while(v.selectedElements.length > 0) {
+  while (v.selectedElements.length > 0) {
     let id = v.selectedElements[0];
     let el = v.xmlDoc.querySelector("[*|id='" + id + "']");
     if (!el) {
@@ -1027,74 +1027,62 @@ export function addTranscriptionLikeElement(v, cm, attrName = 'none', mElName = 
 
   // this loop iterates over the array of arrays of grouped ids
   // and wraps the markup around a whole group
+  // TODO (nice to have): Add @corresp to elements if more than one is created at once
   elementGroups.forEach((group) => {
+    let parent = v.xmlDoc.querySelector("[*|id='" + group[0] + "']").parentNode;
 
-    let parent;
-    let sup = document.createElementNS(dutils.meiNameSpace, mElName);
-    let uuid;
-
-    let respId = document.getElementById('respSelect').value;
-    if (respId) sup.setAttribute('resp', '#' + respId);
-
-    for(let i = 0; i < group.length; i++) {
-      let id = group[i];
-      let el = v.xmlDoc.querySelector("[*|id='" + id + "']");
-      let currentParent = el.parentNode;
-
-      // warn and prevent if currentParrent has no xml:id because replacing in editor will fail
-      // TODO: add option to add xml:ids to the file before adding markup
-      // TODO: add setting to automatically add xml:ids to a file
-      if(currentParent && currentParent.getAttribute('xml:id') == null) {
-        const msg = "Action can only be performed if parent element has an xml:id. Please add xml:ids to the document before.";
+    // warn and prevent if currentParrent has no xml:id because replacing in editor will fail
+    // added option to add xml:ids to the file before adding markup
+    if (parent && parent.getAttribute('xml:id') == null) {
+      const handleMissigParentId = new Promise((resolve, reject) => {
+        const msg =
+          'Action can only be performed if parent element has an xml:id. Please add xml:ids to the document before.';
         console.log(msg);
-        v.showAlert(msg, 'warning');
-        abort = true;
-        return;
-      }
-      
-      // special treatment of the first element for id generation and to place sup within the tree (and a sanity check)
-      if(i === 0) {
-        uuid = mintSuppliedId(id, mElName);
-        sup.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid); 
 
-        currentParent.replaceChild(sup, el);
-        sup.appendChild(el);
-      }
-      else {
-        if(currentParent === parent) { 
-          sup.appendChild(el);
-          // remove following text node to prevent trailing newlines
-          sup.nextSibling.remove();
-        }
-        else {
-          //error
-        }
-      }
-      parent = currentParent;
+        v.showUserPrompt(msg, [
+          {
+            label: 'Abort action',
+            event: (abort) => {
+              reject('promptOverlay', abort);
+            },
+          },
+          {
+            label: 'Add xml:ids to document',
+            event: (abort) => {
+              resolve('promptOverlay', abort);
+            },
+          },
+        ]);
+      });
+
+      handleMissigParentId
+        .then((resolveModal) => {
+          cmd.addIds();
+          v.hideUserPrompt(resolveModal);
+          console.log('Added ids and proceed.');
+          let markupUuid = wrapGroupWithMarkup(v, cm, group, mElName, parent);
+          uuids.push(markupUuid);
+        })
+        .catch((resolveModal) => {
+          v.hideUserPrompt(resolveModal);
+          console.log('Aborting action because of missing parent id.');
+        });
+    } else {
+      let markupUuid = wrapGroupWithMarkup(v, cm, group, mElName, parent);
+      uuids.push(markupUuid);
+
+      // buffer.groupChangesSinceCheckpoint(checkPoint); // TODO
     }
-    replaceInEditor(cm, parent, true);
-    cm.execCommand('indentAuto');
-    uuids.push(uuid);
   });
 
-  // TODO (nice to have): Add @corresp to elements if more than one is created at once
+  if (uuids.length > 0) {
+    v.selectedElements = [];
+    uuids.forEach((u) => v.selectedElements.push(u));
+  }
 
-  // buffer.groupChangesSinceCheckpoint(checkPoint); // TODO
-  if (abort === true) return;
-  v.selectedElements = [];
-  uuids.forEach((u) => v.selectedElements.push(u));
   addApplicationInfo(v, cm);
   v.updateData(cm, false, true);
   v.allowCursorActivity = true; // update notation again
-
-  function mintSuppliedId(id, nodeName) {
-    // follow the Mozarteum schema, keep numbers (for @o-sapov)
-    let underscoreId = id.match(/_\d+$/);
-    if (underscoreId) {
-      return nodeName + underscoreId[0];
-    }
-    return utils.generateXmlId(nodeName, v.xmlIdStyle);
-  }
 } // addSuppliedElement()
 
 /**

@@ -5,6 +5,10 @@
  * retrieve different options.
  */
 
+import * as dutils from './dom-utils.js';
+import * as utils from './utils.js';
+import { replaceInEditor } from './editor.js';
+
 /**
  * [Wrapper for selectApparatus() and selectChoice().]
  * Returns xmlDoc in which the app and choice elements are
@@ -98,3 +102,48 @@ function firstChildElement(parent) {
   }
   return null;
 } // firstChildElement()
+
+export function wrapGroupWithMarkup(v, cm, groupIds, mElName, parentEl) {
+  let markupEl = document.createElementNS(dutils.meiNameSpace, mElName);
+  let uuid;
+
+  let respId = document.getElementById('respSelect').value;
+  if (respId) markupEl.setAttribute('resp', '#' + respId);
+
+  for (let i = 0; i < groupIds.length; i++) {
+    let id = groupIds[i];
+    let el = v.xmlDoc.querySelector("[*|id='" + id + "']");
+    let currentParent = el.parentNode;
+
+    // special treatment of the first element for id generation and to place sup within the tree (and a sanity check)
+    if (i === 0) {
+      uuid = mintSuppliedId(id, mElName, v);
+      markupEl.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
+
+      currentParent.replaceChild(markupEl, el);
+      markupEl.appendChild(el);
+    } else {
+      if (currentParent === parentEl) {
+        markupEl.appendChild(el);
+        // remove following text node to prevent trailing newlines
+        markupEl.nextSibling.remove();
+      } else {
+        //error
+      }
+    }
+    parentEl = currentParent;
+  }
+  replaceInEditor(cm, parentEl, true);
+  cm.execCommand('indentAuto');
+
+  return uuid;
+}
+
+function mintSuppliedId(id, nodeName, v) {
+  // follow the Mozarteum schema, keep numbers (for @o-sapov)
+  let underscoreId = id.match(/_\d+$/);
+  if (underscoreId) {
+    return nodeName + underscoreId[0];
+  }
+  return utils.generateXmlId(nodeName, v.xmlIdStyle);
+}
