@@ -379,7 +379,7 @@ export async function validate(mei, updateLinting, options) {
           ? translator.lang.noErrors.text + '.'
           : validation.length + ' ' + translator.lang.errorsFound.text + '.'
       );
-      v.highlightValidation(mei, validation);
+      v.highlightValidation(mei, validation, options.forceValidate);
     } else if (v.validatorWithSchema && !document.getElementById('autoValidate').checked) {
       v.setValidationStatusToManual();
     }
