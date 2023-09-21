@@ -605,7 +605,7 @@ function onLanguageLoaded() {
     storage.fileLocationType &&
     storage.fileLocation &&
     storage.fileLocationType === 'url' &&
-    !storage.meiXml
+    !storage.content
   ) {
     openUrlFetch(new URL(storage.fileLocation));
     urlFetchInProgress = true;
