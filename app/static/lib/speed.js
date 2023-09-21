@@ -1005,13 +1005,11 @@ function addPageSpanningElements(xmlScore, spdScore, pageSpanners, pageNo, break
  */
 function addKeySigElement(staffDefs, keysigValue) {
   for (let staffDef of staffDefs) {
-    staffDef.removeAttribute('key.sig');
     let k = staffDef.querySelector('keySig');
     if (k) {
-      k.setAttribute('sig', keysigValue);
-    } else {
-      staffDef.setAttribute('key.sig', keysigValue);
-    }
+      k.remove();
+    } 
+    staffDef.setAttribute('key.sig', keysigValue);
   }
 } // addKeySigElement()
 
