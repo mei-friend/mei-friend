@@ -1,6 +1,6 @@
 // mei-friend version and date
 export const version = '1.0.1';
-export const versionDate = '19 September 2023'; // use full or 3-character english months, will be translated
+export const versionDate = '21 September 2023'; // use full or 3-character english months, will be translated
 
 var vrvWorker;
 var spdWorker;
@@ -379,7 +379,7 @@ export async function validate(mei, updateLinting, options) {
           ? translator.lang.noErrors.text + '.'
           : validation.length + ' ' + translator.lang.errorsFound.text + '.'
       );
-      v.highlightValidation(mei, validation);
+      v.highlightValidation(mei, validation, options.forceValidate);
     } else if (v.validatorWithSchema && !document.getElementById('autoValidate').checked) {
       v.setValidationStatusToManual();
     }
@@ -605,7 +605,7 @@ function onLanguageLoaded() {
     storage.fileLocationType &&
     storage.fileLocation &&
     storage.fileLocationType === 'url' &&
-    !storage.meiXml
+    !storage.content
   ) {
     openUrlFetch(new URL(storage.fileLocation));
     urlFetchInProgress = true;

@@ -668,8 +668,11 @@ export default class Viewer {
     let owl = document.getElementById('mei-friend-logo');
     let owlSrc = owl.getAttribute('src');
     owlSrc = owlSrc.substring(0, owlSrc.lastIndexOf('/') + 1);
-    if (env === environments.staging) { owlSrc += 'staging-' }
-    else if (env === environments.testing) { owlSrc += 'testing-' };
+    if (env === environments.staging) {
+      owlSrc += 'staging-';
+    } else if (env === environments.testing) {
+      owlSrc += 'testing-';
+    }
     if (j < 128) {
       // dark
       // wake up owl
@@ -2353,7 +2356,7 @@ export default class Viewer {
    * @param {Object} messages
    * @returns
    */
-  highlightValidation(mei, messages) {
+  highlightValidation(mei, messages, showValidation = false) {
     let lines;
     let found = [];
     let i = 0;
@@ -2468,10 +2471,11 @@ export default class Viewer {
 
       let currentVisibility = reportDiv.style.visibility;
       // show or not validation report, if not already defined
-      if (!currentVisibility || !document.getElementById('autoValidate')?.checked)
+      if (!currentVisibility || !document.getElementById('autoValidate')?.checked || showValidation)
         reportDiv.style.visibility =
           document.getElementById('autoShowValidationReport')?.checked ||
-          !document.getElementById('autoValidate')?.checked
+          !document.getElementById('autoValidate')?.checked ||
+          showValidation
             ? 'visible'
             : 'hidden';
     }
