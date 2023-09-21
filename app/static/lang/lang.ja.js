@@ -244,7 +244,7 @@ export const lang = {
   facsimileCloseButton: { description: 'ファクシミリパネルを閉じる' },
   facsimileDefaultWarning: { text: '表示するファクシミリコンテンツはありません。' },
   facsimileNoSurfaceWarning: {
-    text: 'このページにはsurface要素が見つかりません。\n(最初ののpb要素がない可能性があります。)',
+    text: 'このページにはsurface要素が見つかりません。\n(最初のpb要素がない可能性があります。)',
   },
   facsimileNoZonesFullPageWarning: { text: 'ゾーンのないファクシミリは全体表示モードでのみ表示されます。' },
   facsimileImgeNotLoadedWarning: { text: '画像を読み込めませんでした' },
