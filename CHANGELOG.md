@@ -6,6 +6,7 @@
 * Add keyboard shortcuts to editor for saving, loading and printing files
 * Generate URL with all available parameters and lower precision
 * Fix for facsimile images not loading without zone elements (#45)
+* Always show validation report upon manual validation, but not during auto validation
 
 ## 1.0.0 Version 1.0 (released 4 September 2023)
 * Delete notes, chords, rests (together with enclosing elements such as beams, tuplets, as well as elements pointing towards them, such as a slur through `@startid` or `@endid`) (#37)
