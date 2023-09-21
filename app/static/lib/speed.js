@@ -1010,9 +1010,7 @@ function addKeySigElement(staffDefs, keysigValue) {
     if (k) {
       k.setAttribute('sig', keysigValue);
     } else {
-      let keySigElement = staffDef.ownerDocument.createElementNS(meiNameSpace, 'keySig');
-      keySigElement.setAttribute('sig', keysigValue);
-      staffDef.appendChild(keySigElement);
+      staffDef.setAttribute('key.sig', keysigValue);
     }
   }
 } // addKeySigElement()
