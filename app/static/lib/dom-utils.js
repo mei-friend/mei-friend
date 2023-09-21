@@ -332,3 +332,20 @@ export function generateExpansionList(xmlDoc, baseSelector = 'music score') {
   }
   return expansions;
 } // generateExpansionList()
+
+/**
+ * Returns key signature string for a given note, after DOM traversal in xmlDoc.
+ * @param {Node} xmlDoc
+ * @param {Element} noteElement
+ * @returns {string} data.KEYFIFTHS, such as '3f', '0', or '7s'
+ */
+export function getKeySigForNote(xmlDoc, noteElement) {
+  if (!xmlDoc || !noteElement || !noteElement.hasAttribute('xml:id')) return '';
+  let keySigString = '0';
+  const sigList = xmlDoc.querySelectorAll('[key\\.sig],[sig],[*|id="' + noteElement.getAttribute('xml:id') + '"]');
+  for (const s of sigList) {
+    if (s === noteElement) break;
+    keySigString = s.getAttribute('key.sig') || s.getAttribute('sig') || '0';
+  }
+  return keySigString;
+} // getKeySigForNote()
