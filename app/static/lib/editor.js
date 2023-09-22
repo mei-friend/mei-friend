@@ -1183,19 +1183,19 @@ export function checkAccidGes(v, cm, change = false) {
     list.forEach((e) => {
       if (e.nodeName === 'scoreDef' && e.hasAttribute('key.sig')) {
         // key.sig inside scoreDef: write @sig to all staves
-        let value = e.getAttribute('key.sig');
+        const value = e.getAttribute('key.sig');
         for (let k in keySignatures) keySignatures[k] = value;
         if (d) console.debug('New key.sig in scoreDef: ' + value);
       } else if (e.nodeName === 'staffDef' && e.hasAttribute('key.sig')) {
         // key.sig inside staffDef: write @sig to that staff
-        let n = parseInt(e.getAttribute('n'));
-        let value = e.getAttribute('key.sig');
+        const n = parseInt(e.getAttribute('n'));
+        const value = e.getAttribute('key.sig');
         if (n && n > 0 && n <= keySignatures.length) keySignatures[n - 1] = value;
         if (d) console.debug('New key.sig in staffDef(' + e.getAttribute('xml:id') + ', n=' + n + '): ' + value);
       } else if (e.nodeName === 'keySig' && e.hasAttribute('sig')) {
         // keySig element in a staffDef
-        let n = parseInt(e.closest('staffDef')?.getAttribute('n'));
-        let value = e.getAttribute('sig');
+        const n = parseInt(e.closest('staffDef')?.getAttribute('n'));
+        const value = e.getAttribute('sig');
         if (n && n > 0 && n <= keySignatures.length) keySignatures[n - 1] = value;
         if (d) console.debug('New keySig("' + e.getAttribute('xml:id') + '")@sig in staffDef(' + n + '): ' + value);
       } else if (e.nodeName === 'measure') {
@@ -1207,22 +1207,13 @@ export function checkAccidGes(v, cm, change = false) {
         data.xmlId = e.getAttribute('xml:id') || '';
         data.measure = e.closest('measure')?.getAttribute('n') || '';
         // find staff number for note
-        let staffNumber = parseInt(e.closest('staff')?.getAttribute('n'));
-        let tstamp = speed.getTstampForElement(v.xmlDoc, e);
-        let pName = e.getAttribute('pname') || '';
-        let oct = e.getAttribute('oct') || '';
-        let value = keySignatures[staffNumber - 1];
-        let affectedNotes = []; // array of note names affected by keySig@sig or @key.sig
-        data.keySigAccid = 'n'; // n, f, s
-        let splitS = value.split('s');
-        let splitF = value.split('f');
-        if (splitF.length > 1) {
-          data.keySigAccid = 'f';
-          affectedNotes = att.flats.slice(0, splitF[0]);
-        } else if (splitS.length > 1) {
-          data.keySigAccid = 's';
-          affectedNotes = att.sharps.slice(0, splitS[0]);
-        }
+        const staffNumber = parseInt(e.closest('staff')?.getAttribute('n'));
+        const tstamp = speed.getTstampForElement(v.xmlDoc, e);
+        const pName = e.getAttribute('pname') || '';
+        const oct = e.getAttribute('oct') || '';
+
+        // array of note names affected by keySig@sig or @key.sig and keySigAccid 's', 'n', 'f'
+        const { affectedNotes, keySigAccid } = dutils.getAffectedNotesFromKeySig(keySignatures[staffNumber - 1]);
 
         let accid = e.getAttribute('accid') || e.querySelector('[accid]')?.getAttribute('accid');
         let accidGesEncoded =
@@ -1408,7 +1399,7 @@ export function checkAccidGes(v, cm, change = false) {
           !accid &&
           affectedNotes.includes(pName) &&
           mAccid !== accidGesMeaning &&
-          data.keySigAccid !== accidGesMeaning
+          keySigAccid !== accidGesMeaning
         ) {
           // a note, affected by key signature, either has @accid inside or as a child or has @accid.ges inside or as a child
           data.html =
@@ -1424,15 +1415,15 @@ export function checkAccidGes(v, cm, change = false) {
             '" ' +
             translator.lang.codeCheckerLacksAn.text +
             ' accid.ges="' +
-            data.keySigAccid +
+            keySigAccid +
             '". ' +
             translator.lang.codeCheckerAdd.text +
             ' accid.ges="' +
-            data.keySigAccid +
+            keySigAccid +
             '"';
           data.correct = () => {
             v.allowCursorActivity = false;
-            e.setAttribute('accid.ges', data.keySigAccid);
+            e.setAttribute('accid.ges', keySigAccid);
             replaceInEditor(cm, e, false);
             v.allowCursorActivity = true;
           };
@@ -1492,11 +1483,11 @@ export function checkAccidGes(v, cm, change = false) {
     measure.querySelectorAll('[accid]').forEach((el) => {
       let note = el.closest('note');
       if (note) {
-        let staffNumber = parseInt(el.closest('staff')?.getAttribute('n'));
-        let oct = note.getAttribute('oct') || '';
-        let pName = note.getAttribute('pname') || '';
-        let accid = el.getAttribute('accid');
-        let tstamp = speed.getTstampForElement(v.xmlDoc, note);
+        const staffNumber = parseInt(el.closest('staff')?.getAttribute('n'));
+        const oct = note.getAttribute('oct') || '';
+        const pName = note.getAttribute('pname') || '';
+        const accid = el.getAttribute('accid');
+        const tstamp = speed.getTstampForElement(v.xmlDoc, note);
 
         if (staffNumber && oct && pName && accid && tstamp >= 0) {
           if (!Object.hasOwn(measureAccids, staffNumber)) {

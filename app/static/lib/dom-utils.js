@@ -5,6 +5,7 @@ export const svgNameSpace = 'http://www.w3.org/2000/svg';
 export const navElsArray = ['note', 'rest', 'mRest', 'beatRpt', 'halfmRpt', 'mRpt', 'clef'];
 export const navElsSelector = '.' + navElsArray.join(',.');
 
+import * as att from './attribute-classes.js';
 import { escapeXmlId } from './utils.js';
 
 /**
@@ -349,3 +350,29 @@ export function getKeySigForNote(xmlDoc, noteElement) {
   }
   return keySigString;
 } // getKeySigForNote()
+
+/**
+ * Returns notes names affected by key signature and
+ * the accidental string ('s', 'f', 'n')
+ * @param {string} keySigString
+ * @returns {Object} affectedNotes, keySigAccid
+ * Usage:
+ * const { affectedNotes, keySigAccid } = getAffectedNotesFromKeySig('5f')
+ */
+export function getAffectedNotesFromKeySig(keySigString = '') {
+  let affectedNotes = [];
+  let keySigAccid = 'n';
+  let splitF = keySigString.split('f');
+  let splitS = keySigString.split('s');
+  if (splitF.length > 1) {
+    keySigAccid = 'f';
+    affectedNotes = att.flats.slice(0, splitF[0]);
+  } else if (splitS.length > 1) {
+    keySigAccid = 's';
+    affectedNotes = att.sharps.slice(0, splitS[0]);
+  }
+  return {
+    affectedNotes: affectedNotes,
+    keySigAccid: keySigAccid,
+  };
+} // getAffectedNotesFromKeySig()
