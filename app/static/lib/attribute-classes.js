@@ -89,6 +89,7 @@ export const sharps = ['f', 'c', 'g', 'd', 'a', 'e', 'b', 'f♯', 'c♯', 'g♯'
 export const flats = ['b', 'e', 'a', 'd', 'g', 'c', 'f', 'b♭', 'e♭', 'a♭', 'd♭', 'g♭'];
 
 export const dataAccidentalGestural = ['s', 'f', 'ss', 'ff', 'ts', 'tf', 'n'];
+export const dataAccidentalWritten = ['s', 'f', 'ss', 'x', 'ff', 'xs', 'sx', 'ts', 'tf', 'n', 'nf', 'ns'];
 
 // according to Verovio 3.9's implementation of timeSpanningInterface()
 // better: att.startEndId and att.timestamp2.logical
@@ -290,24 +291,60 @@ export const dataDurationMensural = [
 
 // base-40 constants
 const diatonicSteps = [2, 8, 14, 19, 25, 31, 37]; // numbers of diatonic steps in base-40 system
-const accidGesAndAlternation = {
-  '-3': 'tf',
-  '-2': 'ff',
-  '-1': 'f',
-  1: 's',
-  0: 'n',
-  2: 'ss',
-  3: 'ts',
+const accidGesturalAndAlternation = {
+  s: 1,
+  f: -1,
+  ss: 2,
+  ff: -2,
+  ts: 3,
+  tf: -3,
+  n: 0,
+};
+const accidWrittenAndAlternation = {
+  s: 1,
+  f: -1,
+  x: 2,
+  ss: 2,
+  ff: -2,
+  xs: 3,
+  sx: 3,
+  ts: 3,
+  tf: -3,
+  n: 0,
+  nf: -1,
+  ns: 1,
 };
 
 /**
- * Returns accid.ges conform string for alternation integer (in semi-tones)
- * @param {string|number} alternation (e.g., -3, -2, -1, 0, 1, 2, 3)
- * @returns
+ * Returns accid.ges conform string for alteration integer (in semi-tones)
+ * @param {string|number} alteration (e.g., -3, -2, -1, 0, 1, 2, 3)
+ * @returns {string|null}
  */
-export function alterationToAccidGes(alternation = 0) {
-  return accidGesAndAlternation[alternation];
+export function alterationToAccidGes(alteration = 0) {
+  if (alteration <= 3 && alteration >= -3) {
+    let i = Object.values(accidGesturalAndAlternation).indexOf(alteration);
+    return Object.keys(accidGesturalAndAlternation)[i];
+  } else {
+    console.log('Provide numbers between -2 and +2.');
+    return null;
+  }
 } // alterationToAccidGes()
+
+/**
+ * Returns accid.written conform string for alteration integer (in semi-tones). 
+ * For 2 it returns 'x', for 3 'xs' among the choices.
+ * @param {string|number} alteration (e.g., -3, -2, -1, 0, 1, 2, 3)
+ * @returns {string|null}
+ */
+export function alterationToAccidWritten(alteration = 0) {
+  if (alteration <= 3 && alteration >= -3) {
+    let i = Object.values(accidWrittenAndAlternation).indexOf(alteration);
+    return Object.keys(accidWrittenAndAlternation)[i];
+  } else {
+    console.log('Provide numbers between -3 and +3.');
+    return null;
+  }
+} // alterationToAccidWritten()
 
 /**
  * Returns alteration integer (-2 for 'ff', 1 for 's') for accid.ges values
@@ -316,13 +353,26 @@ export function alterationToAccidGes(alternation = 0) {
  */
 export function accidGesToAlteration(accidGes = 'n') {
   if (dataAccidentalGestural.includes(accidGes)) {
-    let i = Object.values(accidGesAndAlternation).indexOf(accidGes);
-    return parseInt(Object.keys(accidGesAndAlternation)[i]);
+    return accidGesturalAndAlternation[accidGes];
   } else {
     console.log('Please provide valid values for accid.ges.');
     return null;
   }
 } // accidGesToAlteration()
+
+/**
+ * Returns alteration integer (-2 for 'ff', 3 for 'xs') for accid.written values
+ * @param {string} accidGes
+ * @returns {number|null}
+ */
+export function accidWrittenToAlteration(accid = 'n') {
+  if (dataAccidentalWritten.includes(accid)) {
+    return accidWrittenAndAlternation[accid];
+  } else {
+    console.log('Please provide valid values for accid.written.');
+    return null;
+  }
+} // accidWrittenToAlteration()
 
 /**
  * Converts base-40 integer to object with keys: pname, accidGes, oct
