@@ -280,9 +280,15 @@ export const dataDurationMensural = [
   'semifusa',
 ];
 
+// See https://wiki.ccarh.org/wiki/Base_40 (accessed 23 Sept 2023)
+// C4 is 162
+// pitch = octave * 40 + chroma
+// octave = value / 40
+// chroma = value - octave * 40
+
 // base-40 constants
-const diatonicSteps = [2, 8, 14, 19, 25, 31, 37]; // numbers of diatonic steps in base-40 system
-const alterationToAccidGes = {
+export const diatonicSteps = [2, 8, 14, 19, 25, 31, 37]; // numbers of diatonic steps in base-40 system
+export const alterationToAccidGes = {
   '-3': 'tf',
   '-2': 'ff',
   '-1': 'f',
@@ -293,15 +299,39 @@ const alterationToAccidGes = {
 };
 
 /**
- * Converts base-40 integer to object with pname and accid
+ * Returns alteration integer (-2 for 'ff', 1 for 's') for accid.ges values
+ * @param {string} accidGes
+ * @returns {number|null}
+ */
+export function accidGesToAlteration(accidGes = '0') {
+  if (Object.values(alterationToAccidGes).includes(accidGes)) {
+    let i = Object.values(alterationToAccidGes).indexOf(accidGes);
+    return parseInt(Object.keys(alterationToAccidGes)[i]);
+  } else {
+    console.log('Please provide valid values for accid.ges.');
+    return null;
+  }
+} // accidGesToAlteration()
+
+/**
+ * Converts base-40 integer to object with keys: pname, accidGes, oct
  * @param {number} base40int
- * @returns {Object} with keys pname and accid.gestural.basic
+ * @returns {Object|null} with keys pname, accid.gestural.basic, and oct
+ * When extracting base-40 chroma, just ignore oct=0.
+ * Return null for negative input values.
  */
 export function base40ToPitch(base40int = 0) {
-  // go through steps and
+  if (base40int < 0) {
+    console.log('Cannot convert negative base-40 integer values to pitch.');
+    return null;
+  }
+  const oct = Math.floor(base40int / 40);
+  base40int = base40int % 40;
+  // go through diatonic steps and find correct pitch name
   for (const [i, step] of diatonicSteps.entries()) {
     if (base40int < step + 3) {
       return {
+        oct: oct,
         pname: pnames[i],
         accidGes: alterationToAccidGes[String(base40int - step)],
       };
@@ -313,10 +343,18 @@ export function base40ToPitch(base40int = 0) {
  * Converts pname and accid.ges into base-40 integer
  * @param {string} pname
  * @param {string} accidGes
- * @returns
+ * @param {number} oct (optional)
+ * @returns {number|null}
  */
-export function pitchToBase40(pname = 'c', accidGes = 'n') {
-  let i = Object.values(alterationToAccidGes).indexOf(accidGes);
-  let alteration = parseInt(Object.keys(alterationToAccidGes)[i]);
-  return diatonicSteps.at(pnames.indexOf(pname)) + alteration;
+export function pitchToBase40(pname, accidGes = 'n', oct = 0) {
+  if (!pnames.includes(pname)) {
+    console.log('Please provide a valid value for pname.');
+    return null;
+  }
+  if (Object.values(alterationToAccidGes).includes(accidGes) && !isNaN(oct) && oct >= 0) {
+    return 40 * oct + diatonicSteps.at(pnames.indexOf(pname)) + accidGesToAlteration(accidGes);
+  } else {
+    console.log('Please provide valid values for accid.ges and oct.');
+    return null;
+  }
 } // pitchToBase40()
