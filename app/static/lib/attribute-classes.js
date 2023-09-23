@@ -82,7 +82,7 @@ export const modelControlEvents = [
 export const pnames = ['c', 'd', 'e', 'f', 'g', 'a', 'b'];
 
 export const sharpSign = '♯';
-export const flatSign = '♭'
+export const flatSign = '♭';
 
 // pitch names for sharps and flats, defined in keySig@sig or @key.sig
 export const sharps = ['f', 'c', 'g', 'd', 'a', 'e', 'b', 'f♯', 'c♯', 'g♯', 'd♯', 'a♯'];
@@ -279,3 +279,44 @@ export const dataDurationMensural = [
   'fusa',
   'semifusa',
 ];
+
+// base-40 constants
+const diatonicSteps = [2, 8, 14, 19, 25, 31, 37]; // numbers of diatonic steps in base-40 system
+const alterationToAccidGes = {
+  '-3': 'tf',
+  '-2': 'ff',
+  '-1': 'f',
+  0: 'n',
+  1: 's',
+  2: 'ss',
+  3: 'ts',
+};
+
+/**
+ * Converts base-40 integer to object with pname and accid
+ * @param {number} base40int
+ * @returns {Object} with keys pname and accid.gestural.basic
+ */
+export function base40ToPitch(base40int = 0) {
+  // go through steps and
+  for (const [i, step] of diatonicSteps.entries()) {
+    if (base40int < step + 3) {
+      return {
+        pname: pnames[i],
+        accidGes: alterationToAccidGes[String(base40int - step)],
+      };
+    }
+  }
+} // base40ToPitch()
+
+/**
+ * Converts pname and accid.ges into base-40 integer
+ * @param {string} pname
+ * @param {string} accidGes
+ * @returns
+ */
+export function pitchToBase40(pname = 'c', accidGes = 'n') {
+  let i = Object.values(alterationToAccidGes).indexOf(accidGes);
+  let alteration = parseInt(Object.keys(alterationToAccidGes)[i]);
+  return diatonicSteps.at(pnames.indexOf(pname)) + alteration;
+} // pitchToBase40()
