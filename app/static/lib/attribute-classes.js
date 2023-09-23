@@ -88,6 +88,8 @@ export const flatSign = '♭';
 export const sharps = ['f', 'c', 'g', 'd', 'a', 'e', 'b', 'f♯', 'c♯', 'g♯', 'd♯', 'a♯'];
 export const flats = ['b', 'e', 'a', 'd', 'g', 'c', 'f', 'b♭', 'e♭', 'a♭', 'd♭', 'g♭'];
 
+export const dataAccidentalGestural = ['s', 'f', 'ss', 'ff', 'ts', 'tf', 'n'];
+
 // according to Verovio 3.9's implementation of timeSpanningInterface()
 // better: att.startEndId and att.timestamp2.logical
 export const timeSpanningElements = [
@@ -287,26 +289,35 @@ export const dataDurationMensural = [
 // chroma = value - octave * 40
 
 // base-40 constants
-export const diatonicSteps = [2, 8, 14, 19, 25, 31, 37]; // numbers of diatonic steps in base-40 system
-export const alterationToAccidGes = {
+const diatonicSteps = [2, 8, 14, 19, 25, 31, 37]; // numbers of diatonic steps in base-40 system
+const accidGesAndAlternation = {
   '-3': 'tf',
   '-2': 'ff',
   '-1': 'f',
-  0: 'n',
   1: 's',
+  0: 'n',
   2: 'ss',
   3: 'ts',
 };
+
+/**
+ * Returns accid.ges conform string for alternation integer (in semi-tones)
+ * @param {string|number} alternation (e.g., -3, -2, -1, 0, 1, 2, 3)
+ * @returns
+ */
+export function alterationToAccidGes(alternation = 0) {
+  return accidGesAndAlternation[alternation];
+} // alterationToAccidGes()
 
 /**
  * Returns alteration integer (-2 for 'ff', 1 for 's') for accid.ges values
  * @param {string} accidGes
  * @returns {number|null}
  */
-export function accidGesToAlteration(accidGes = '0') {
-  if (Object.values(alterationToAccidGes).includes(accidGes)) {
-    let i = Object.values(alterationToAccidGes).indexOf(accidGes);
-    return parseInt(Object.keys(alterationToAccidGes)[i]);
+export function accidGesToAlteration(accidGes = 'n') {
+  if (dataAccidentalGestural.includes(accidGes)) {
+    let i = Object.values(accidGesAndAlternation).indexOf(accidGes);
+    return parseInt(Object.keys(accidGesAndAlternation)[i]);
   } else {
     console.log('Please provide valid values for accid.ges.');
     return null;
@@ -319,6 +330,8 @@ export function accidGesToAlteration(accidGes = '0') {
  * @returns {Object|null} with keys pname, accid.gestural.basic, and oct
  * When extracting base-40 chroma, just ignore oct=0.
  * Return null for negative input values.
+ *
+ * Usage: const { oct, pname, accidGes } = base40ToPitch(value)
  */
 export function base40ToPitch(base40int = 0) {
   if (base40int < 0) {
@@ -333,7 +346,7 @@ export function base40ToPitch(base40int = 0) {
       return {
         oct: oct,
         pname: pnames[i],
-        accidGes: alterationToAccidGes[String(base40int - step)],
+        accidGes: alterationToAccidGes(base40int - step),
       };
     }
   }
@@ -351,7 +364,7 @@ export function pitchToBase40(pname, accidGes = 'n', oct = 0) {
     console.log('Please provide a valid value for pname.');
     return null;
   }
-  if (Object.values(alterationToAccidGes).includes(accidGes) && !isNaN(oct) && oct >= 0) {
+  if (dataAccidentalGestural.includes(accidGes) && !isNaN(oct) && oct >= 0) {
     return 40 * oct + diatonicSteps.at(pnames.indexOf(pname)) + accidGesToAlteration(accidGes);
   } else {
     console.log('Please provide valid values for accid.ges and oct.');
