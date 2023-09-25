@@ -3,6 +3,7 @@
  */
 
 import * as att from './attribute-classes.js';
+import * as b40 from './base40.js';
 import * as dutils from './dom-utils.js';
 import * as speed from './speed.js';
 import * as utils from './utils.js';
@@ -2205,10 +2206,13 @@ function pitchMover(v, el, deltaPitch, shiftChromatically = false) {
   if (el.hasAttribute(octAttr)) octValue = parseInt(el.getAttribute(octAttr));
   if (el.hasAttribute(pnameAttr)) pnameValue = el.getAttribute(pnameAttr);
 
+  let affectedNotes = dutils.getAffectedNotesFromKeySig(el);
+
   let pi;
   if (shiftChromatically) {
     accidValue =
       el.getAttribute('accid') || el.querySelector('[accid]')?.getAttribute('accid') || el.getAttribute('accid.ges');
+
     if (accidValue) accidValue = accidValue.slice(0, 1); // take only first character
 
     // remove all possible accid information
@@ -2216,6 +2220,8 @@ function pitchMover(v, el, deltaPitch, shiftChromatically = false) {
     el.removeAttribute('accid.ges');
     let accidChild = el.querySelector('accid');
     if (accidChild) removeWithTextnodes(accidChild);
+
+    let b40i = att.pitchToBase40(pnameValue, accidValue, octValue);
 
     pi = att.pnames.indexOf(pnameValue); // index in scale
     let pitchesToBeAltered = att.sharps.slice(0, 5);
@@ -2252,6 +2258,8 @@ function pitchMover(v, el, deltaPitch, shiftChromatically = false) {
     pi += att.pnames.length;
     octValue--;
   }
+
+  // if an accid value is there, create a new element for it
   if (accidValue) {
     let a = document.createElementNS(dutils.meiNameSpace, 'accid');
     let uuid = utils.generateXmlId('accid', v.xmlIdStyle);
@@ -2259,6 +2267,7 @@ function pitchMover(v, el, deltaPitch, shiftChromatically = false) {
     a.setAttribute('accid', accidValue);
     el.appendChild(a);
   }
+
   el.setAttribute(octAttr, octValue);
   el.setAttribute(pnameAttr, att.pnames[pi]);
   return el;
