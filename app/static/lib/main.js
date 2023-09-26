@@ -2196,12 +2196,14 @@ export function drawRightFooter() {
     }
   }
   let rf = document.querySelector('.rightfoot');
-  rf.innerHTML =
-    "<a href='https://github.com/mei-friend/mei-friend' target='_blank'>mei-friend " +
+  const versionHtml = "<a href='https://github.com/mei-friend/mei-friend' target='_blank'>mei-friend " +
     (env === environments.production ? version : `${env}-${version}`) +
     '</a> (' +
     translatedVersioDate +
     ').&nbsp;';
+  rf.innerHTML = versionHtml;
+  // also update version string in splash screen
+  document.getElementById("splashVersionNumber").innerHTML = versionHtml;
   if (tkVersion) {
     let githubUrl = 'https://github.com/rism-digital/verovio/releases/tag/version-' + tkVersion.split('-')[0];
     if (tkVersion.includes('dev')) {

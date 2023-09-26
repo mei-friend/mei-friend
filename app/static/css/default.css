@@ -179,7 +179,8 @@ a:active {
 
 .openUrlOverlay,
 #githubActionsOverlay,
-#solidOverlay {
+#solidOverlay,
+#splashOverlay {
   position: fixed;
   display: none;
   top: 0;
@@ -268,6 +269,7 @@ a:active {
 
 .openUrlOverlay .openUrlUI,
 .forkRepositoryOverlay .forkRepositoryUI,
+#splash,
 #githubActionsUI {
   position: absolute;
   top: 20%;
@@ -279,6 +281,47 @@ a:active {
   background-color: var(--overlayBackgroundColor);
   color: var(--overlayTextColor);
   z-index: 190;
+}
+
+#splash { 
+  padding: 1em 1em;
+  max-width: 600px;
+  max-height:400px;
+}
+
+#splashHeader { 
+  text-align: center;
+  margin-bottom:1em;
+}
+
+#splashHeader img { 
+  width:95%;
+  max-height:500px;
+}
+
+#splashBody { 
+  padding: 0em 1em;
+  height:45%;
+  overflow-y: auto;
+  color: black;
+  background-color: var(--overlayTextColor);
+  border-radius:10px;
+}
+
+#splashFooter { 
+  font-size: small;
+}
+
+#splashVersion { 
+  margin: 1em 1em;
+}
+
+#splashVersionNumber a { 
+  color: var(--overlayLinkColor);
+}
+
+#splashAlwaysShowCtrl { 
+  float:right;
 }
 
 .openUrlOverlay .openUrlUI > div,
