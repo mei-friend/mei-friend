@@ -1536,11 +1536,11 @@ export let cmd = {
   downloadSpeedMei: () => downloadSpeedMei(),
   indentSelection: () => indentSelection(),
   validate: () => v.manualValidate(),
-  zoomIn: () => v.zoom(+1, storage),
-  zoomOut: () => v.zoom(-1, storage),
-  zoom50: () => v.zoom(50, storage),
-  zoom100: () => v.zoom(100, storage),
-  zoomSlider: () => {
+  notesZoomIn: () => v.zoom(+1, storage),
+  notesZoomOut: () => v.zoom(-1, storage),
+  notesZoom50: () => v.zoom(50, storage),
+  notesZoom100: () => v.zoom(100, storage),
+  notesZoomSlider: () => {
     let zoomCtrl = document.getElementById('verovioZoom');
     if (zoomCtrl && storage && storage.supported) storage.scale = zoomCtrl.value;
     v.updateLayout();
@@ -1841,9 +1841,9 @@ function addEventListeners(v, cm) {
   fc.addEventListener('dragend', (ev) => console.log('Drag End', ev));
 
   // Zooming notation with buttons
-  document.getElementById('decreaseScaleButton').addEventListener('click', cmd.zoomOut);
-  document.getElementById('increaseScaleButton').addEventListener('click', cmd.zoomIn);
-  document.getElementById('verovioZoom').addEventListener('change', cmd.zoomSlider);
+  document.getElementById('decreaseScaleButton').addEventListener('click', cmd.notesZoomOut);
+  document.getElementById('increaseScaleButton').addEventListener('click', cmd.notesZoomIn);
+  document.getElementById('verovioZoom').addEventListener('change', cmd.notesZoomSlider);
 
   // Zooming notation with mouse wheel
   vp.addEventListener('wheel', (ev) => {
