@@ -249,7 +249,7 @@ export function addAccidental(v, cm, accidAttribute = 's') {
 } // addAccidental()
 
 /**
- * Inserts a new control element to DOM and editor
+ * Inserts a new control element (control event) to DOM and editor
  * @param {Viewer} v
  * @param {CodeMirror} cm
  * @param {string} elName ('slur', 'dynam', ...)
@@ -258,9 +258,12 @@ export function addAccidental(v, cm, accidAttribute = 's') {
  * @returns
  */
 export function addControlElement(v, cm, elName, placement = '', form = '') {
+  // elements to which control elements (control events) can be added
+  let allowedElements = ['note', 'chord', 'rest', 'mRest', 'multiRest'];
+
   if (v.selectedElements.length === undefined || v.selectedElements.length < 1) return;
   v.selectedElements = utils.sortElementsByScorePosition(v.selectedElements);
-  v.selectedElements = speed.filterElements(v.selectedElements, v.xmlDoc);
+  v.selectedElements = speed.filterElements(v.selectedElements, v.xmlDoc, allowedElements);
   console.debug('addControlElement() ', elName, placement, form);
 
   // modifier key for inserting tstamps rather than start/endids
@@ -270,7 +273,7 @@ export function addControlElement(v, cm, elName, placement = '', form = '') {
   let startId = v.selectedElements[0];
   var startEl = v.xmlDoc.querySelector("[*|id='" + startId + "']");
   if (!startEl) return;
-  if (!['note', 'chord', 'rest', 'mRest', 'multiRest'].includes(startEl.nodeName)) {
+  if (!allowedElements.includes(startEl.nodeName)) {
     console.info('addControlElement: Cannot add new element to ' + startEl.nodeName + '.');
     return;
   }
@@ -647,7 +650,7 @@ export function invertPlacement(v, cm, modifier = false) {
  */
 export function toggleArtic(v, cm, artic = 'stacc') {
   v.loadXml(cm.getValue());
-  let ids = speed.filterElements(v.selectedElements, v.xmlDoc);
+  let ids = speed.filterElements(v.selectedElements, v.xmlDoc, ['note', 'chord', 'beam', 'beamSpan', 'tuplet']);
   v.allowCursorActivity = false;
   let i, range;
   for (i = 0; i < ids.length; i++) {
@@ -894,10 +897,13 @@ export function addBeamSpan(v, cm) {
 export function addOctaveElement(v, cm, disPlace = 'above', dis = '8') {
   v.loadXml(cm.getValue());
   if (v.selectedElements.length < 1) return;
+  // allow only note and chord elements
+  v.selectedElements = speed.filterElements(v.selectedElements, v.xmlDoc, ['note', 'chord']);
   console.info('addOctaveElement selectedElements:', v.selectedElements);
+
   let id1 = v.selectedElements[0]; // xml:id string
   let id2 = v.selectedElements[v.selectedElements.length - 1];
-  let n1 = v.xmlDoc.querySelector("[*|id='" + id1 + "']");
+
   // add control like element <octave @startid @endid @dis @dis.place>
   let octave = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'octave');
   let uuid = utils.generateXmlId('octave', v.xmlIdStyle);
@@ -906,8 +912,10 @@ export function addOctaveElement(v, cm, disPlace = 'above', dis = '8') {
   octave.setAttribute('endid', '#' + id2);
   octave.setAttribute('dis', dis);
   octave.setAttribute('dis.place', disPlace);
-  n1.closest('measure').appendChild(octave);
-  // add it to the txtEdr
+  let n1 = v.xmlDoc.querySelector("[*|id='" + id1 + "']");
+  n1?.closest('measure').appendChild(octave);
+
+  // add it to CodeMirror
   v.allowCursorActivity = false;
   // let checkPoint = buffer.createCheckpoint(); TODO
   let sc = cm.getSearchCursor('xml:id="' + id1 + '"');
