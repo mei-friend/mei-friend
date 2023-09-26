@@ -30,7 +30,7 @@ export const lang = {
   openUrlText: { text: 'Apri URL' },
   openExample: {
     text: 'Repertorio pubblico',
-    description: 'Apri una lista del repertorio pubblico',
+    description: 'Apri un repertorio di pubblico dominio',
   },
   importMusicXml: { text: 'Importa MusicXML' },
   importHumdrum: { text: 'Importa Humdrum' },
@@ -78,14 +78,14 @@ export const lang = {
   betweenPlacementText: { text: 'Posiziona in mezzo' },
   addVerticalGroupText: { text: 'Aggiungi gruppo verticale' },
   deleteText: { text: 'Elimina elemento' },
-  pitchChromUpText: { text: 'Alza cromatica' },
-  pitchChromDownText: { text: 'Abbassa cromatica' },
-  pitchUpDiatText: { text: 'Alza diatonica' },
-  pitchDownDiatText: { text: 'Abbassa diatonica' },
+  pitchChromUpText: { text: 'Alza cromaticamente' },
+  pitchChromDownText: { text: 'Abbassa cromaticamente' },
+  pitchUpDiatText: { text: 'Alza diatonicamente' },
+  pitchDownDiatText: { text: 'Abbassa diatonicamente' },
   pitchOctaveUpText: { text: "Alza di un'ottava" },
   pitchOctaveDownText: { text: "Abbassa di un'ottava" },
-  staffUpText: { text: 'Elemento su 1 rigo' },
-  staffDownText: { text: 'Elemento giù 1 rigo' },
+  staffUpText: { text: 'Alza di un rigo' },
+  staffDownText: { text: 'Abbassa di un rigo' },
   increaseDurText: { text: 'Aumenta durata' },
   decreaseDurText: { text: 'Riduci durata' },
   cleanAccidText: { text: 'Verificare @accid.ges' },
@@ -146,10 +146,10 @@ export const lang = {
   // HELP MENU ITEM / VOCE DI MENU AIUTO
   helpMenuTitle: { text: 'Aiuto' },
   goToHelpPage: { text: 'Pagina di aiuto di mei-friend' },
-  goToCheatSheet: { text: 'Scheda informativa di mei-friend' },
+  goToCheatSheet: { text: 'Documentatione di mei-friend' },
   showChangelog: { text: 'Registro delle modifiche di mei-friend' },
   goToGuidelines: { text: 'Linee guida MEI' },
-  consultGuidelinesForElementText: { text: "Linee guida per l'elemento corrente" },
+  consultGuidelinesForElementText: { text: "Informazioni dell'elemento corrente" },
   provideFeedback: { text: 'Fornisci un feedback' },
   resetDefault: { text: 'Ripristina impostazioni predefinite' },
 
@@ -169,12 +169,12 @@ export const lang = {
       '<a href="https://iwk.mdw.ac.at/impressum">Imprint</a>.',
   },
   loadingVerovio: { text: 'Caricamento Verovio' },
-  verovioLoaded: { text: 'caricato' },
-  convertedToPdf: { text: 'convertito in PDF' },
+  verovioLoaded: { text: 'Caricato' },
+  convertedToPdf: { text: 'Convertito in PDF' },
   statusBarCompute: { text: 'Calcola' },
-  middleFooterPage: { text: 'pagina' },
-  middleFooterOf: { text: 'di' },
-  middleFooterLoaded: { text: 'caricato' },
+  middleFooterPage: { text: 'Pagina' },
+  middleFooterOf: { text: 'Di' },
+  middleFooterLoaded: { text: 'Caricato' },
 
   // control menu/ menu di controllo
   verovioIcon: {
@@ -184,10 +184,10 @@ export const lang = {
   },
   decreaseScaleButton: { description: 'Riduci notazione' },
   verovioZoom: { description: 'Scala dimensioni dello spartito' },
-  increaseScaleButton: { description: 'Aumenta notazione' },
+  increaseScaleButton: { description: 'Ingrandisci notazione' },
   pagination1: { html: 'Pagina ' },
   pagination3: { html: ' di' },
-  sectionSelect: { description: 'Naviga la struttura di sezione/finale del codice' },
+  sectionSelect: { description: 'Naviga la sezione/finale del codice' },
   firstPageButton: { description: 'Vai alla prima pagina' },
   previousPageButton: { description: 'Vai alla pagina precedente' },
   paginationLabel: {
@@ -195,8 +195,8 @@ export const lang = {
   },
   nextPageButton: { description: 'Vai alla pagina successiva' },
   lastPageButton: { description: "Vai all'ultima pagina" },
-  flipCheckbox: { description: 'Passa automaticamente alla posizione del cursore di codice' },
-  flipButton: { description: 'Passa manualmente alla posizione del cursore di codice' },
+  flipCheckbox: { description: 'Passa automaticamente alla posizione del cursore nel codice' },
+  flipButton: { description: 'Passa manualmente alla posizione del cursore nel codice' },
   breaksSelect: { description: 'Definisci il comportamento degli intervalli/pagine di sistema nello spartito' },
   breaksSelectNone: { text: 'Nessuno' },
   breaksSelectAuto: { text: 'Automatico' },
@@ -232,21 +232,21 @@ export const lang = {
   selectPageRangeLabel: { text: 'Intervallo di pagine:' },
   pdfPreviewSpeedModeWarning: {
     text:
-      'Solo la pagina corrente viene renderizzata in PDF, poiché è attivata la modalità di velocità. ' +
-      'Deseleziona la modalità di velocità per selezionare tutte le pagine.',
+      'Solamente la pagina corrente viene renderizzata in PDF, perché è attivata la modalità veloce. ' +
+      'Deseleziona la modalità veloce per selezionare tutte le pagine.',
   },
   pdfPreviewNormalModeTitle: { text: "Seleziona l'intervallo di pagine da salvare in PDF." },
 
   // facsimile panel/ pannello facsimile
   facsimileIcon: { description: 'Pannello facsimile' },
-  facsimileDecreaseZoomButton: { description: "Riduci l'immagine dello spartito" },
-  facsimileZoom: { description: "Regola la dimensione dell'immagine dello spartito" },
-  facsimileIncreaseZoomButton: { description: "Ingrandisci l'immagine dello spartito" },
+  facsimileDecreaseZoomButton: { description: "Riduci il pannello dello spartito" },
+  facsimileZoom: { description: "Regola la dimensione del pannello dello spartito" },
+  facsimileIncreaseZoomButton: { description: "Ingrandisci il pannello dello spartito" },
   facsimileFullPageLabel: {
     text: 'Pagina intera',
-    description: "Mostra l'intera pagina dell'immagine del facsimile",
+    description: "Mostra il pannello del facsimile a pagina intera",
   },
-  facsimileFullPageCheckbox: { description: "Mostra l'intera pagina dell'immagine del facsimile" },
+  facsimileFullPageCheckbox: { description: "Mostra il pannello del facsimile a pagina intera" },
   facsimileShowZonesLabel: {
     text: 'Mostra riquadri delle zone',
     description: 'Mostra i riquadri delle zone del facsimile',
@@ -260,9 +260,9 @@ export const lang = {
   facsimileCloseButton: { description: 'Chiudi il pannello facsimile' },
   facsimileDefaultWarning: { text: 'Nessun contenuto facsimile da visualizzare.' },
   facsimileNoSurfaceWarning: {
-    text: 'Nessun elemento di superficie trovato per questa pagina.\n(Potrebbe mancare un elemento pb iniziale.)',
+    text: 'Nessun elemento superficiale trovato in questa pagina.\n(Potrebbe mancare un elemento pb iniziale.)',
   },
-  facsimileNoZonesFullPageWarning: { text: 'Facsimile senza zone visibile solo in modalità pagina intera.' },
+  facsimileNoZonesFullPageWarning: { text: 'Facsimile senza zone visibili a pagina intera.' },
   facsimileImgeNotLoadedWarning: { text: "Impossibile caricare l'immagine" },
 
   // drag'n'drop / trascina e rilascia
@@ -281,7 +281,7 @@ export const lang = {
   openUrlCancel: { text: 'Annulla' },
   proposePublicRepertoire: {
     html:
-      'Accettiamo proposte per ' +
+      'Accettiamo proposte su ' +
       '<a href="https://github.com/mei-friend/mei-friend/issues/new?template=public_repertoire.md" target="_blank" >' +
       'aggiunte al repertorio pubblico' +
       '</a>.',
@@ -296,7 +296,7 @@ export const lang = {
     text: 'Clicca su "Esegui workflow" per richiedere all\'API di GitHub di eseguire il workflow sopra riportato per te, utilizzando la configurazione di input specificata di seguito. La tua codifica verrà ricaricata nella sua ultima versione una volta che l\'esecuzione del workflow sarà completa.',
   },
   githubActionStatusMsgPrompt: { text: 'Impossibile eseguire il workflow: GitHub dice' },
-  githubActionStatusMsgWaiting: { text: 'Sii paziente mentre GitHub sta elaborando il tuo workflow...' },
+  githubActionStatusMsgWaiting: { text: 'Attendi, GitHub sta elaborando il tuo workflow...' },
   githubActionStatusMsgFailure: { text: 'Impossibile eseguire il workflow: GitHub dice' },
   githubActionStatusMsgSuccess: { text: 'Esecuzione del workflow completata: GitHub dice' },
   githubActionsRunButton: { text: 'Esegui workflow' },
