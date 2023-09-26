@@ -142,22 +142,22 @@ const defaultCodeMirrorOptions = {
     "' '": completeIfInTag,
     "'='": completeIfInTag,
     'Ctrl-Space': 'autocomplete',
-    'Alt-.': consultGuidelines,
+    // 'Alt-.': consultGuidelines,
+    "'Ï'": indentSelection, // TODO: overcome strange bindings on MAC Shift-Alt-F
     'Shift-Alt-f': indentSelection,
     'Shift-Ctrl-G': toMatchingTag,
-    "'Ï'": indentSelection, // TODO: overcome strange bindings on MAC
-    'Cmd-E': encloseSelectionWithTag, // TODO: make OS modifier keys dynamic
-    'Ctrl-E': encloseSelectionWithTag,
-    'Cmd-/': encloseSelectionWithLastTag,
-    'Ctrl-/': encloseSelectionWithLastTag,
-    'Cmd-L': generateUrl,
-    'Ctrl-L': generateUrl,
-    'Cmd-O': openFileDialog,
-    'Ctrl-O': openFileDialog,
-    'Cmd-P': togglePdfMode,
-    'Ctrl-P': togglePdfMode,
-    'Cmd-S': downloadMei,
-    'Ctrl-S': downloadMei,
+    // 'Cmd-E': encloseSelectionWithTag, // TODO: make OS modifier keys dynamic
+    // 'Ctrl-E': encloseSelectionWithTag,
+    // 'Cmd-/': encloseSelectionWithLastTag,
+    // 'Ctrl-/': encloseSelectionWithLastTag,
+    // 'Cmd-L': generateUrl,
+    // 'Ctrl-L': generateUrl,
+    // 'Cmd-O': openFileDialog,
+    // 'Ctrl-O': openFileDialog,
+    // 'Cmd-P': togglePdfMode,
+    // 'Ctrl-P': togglePdfMode,
+    // 'Cmd-S': downloadMei,
+    // 'Ctrl-S': downloadMei,
   },
   lint: {
     caller: cm,
@@ -2298,12 +2298,17 @@ function fillInSampleEncodings() {
     });
 }
 
-// sets keyMap.json to target element and defines listeners
+/**
+ * Sets keymap JSON information to target element and defines listeners
+ * It loads all bindings in `#notation` to notation, and the platform-specific
+ * to both notation and editor panels (i.e. friendContainer).
+ * @param {string} keyMapFilePath
+ */
 function setKeyMap(keyMapFilePath) {
-  let vp = document.getElementById('notation');
-  if (platform.startsWith('mac')) vp.classList.add('platform-darwin');
-  if (platform.startsWith('win')) vp.classList.add('platform-win32');
-  if (platform.startsWith('linux')) vp.classList.add('platform-linux');
+  let keyMapParent = document.getElementById('notation');
+  if (platform.startsWith('mac')) keyMapParent.classList.add('platform-darwin');
+  if (platform.startsWith('win')) keyMapParent.classList.add('platform-win32');
+  if (platform.startsWith('linux')) keyMapParent.classList.add('platform-linux');
   fetch(keyMapFilePath)
     .then((resp) => {
       return resp.json();
@@ -2312,7 +2317,19 @@ function setKeyMap(keyMapFilePath) {
       // iterate all keys (element) in keymap.json
       for (const [key, value] of Object.entries(keyMap)) {
         let el = document.querySelector(key);
+
         if (el) {
+          if (key.startsWith('.platform')) {
+            // Add platform keys to CodeMirror
+            let extraKeys = cm.getOption('extraKeys');
+            for (const [k, v] of Object.entries(value)) {
+              console.log('Added ' + k + ', ', String(v));
+              extraKeys[k] = cmd[String(v)];
+              console.log('.');
+            }
+            cm.setOption('extraKeys', CodeMirror.normalizeKeyMap(extraKeys));
+          }
+
           el.setAttribute('tabindex', '-1');
           el.addEventListener('keydown', (ev) => {
             if (['pagination2', 'selectTo', 'selectFrom', 'selectRange'].includes(document.activeElement.id)) {
@@ -2328,6 +2345,7 @@ function setKeyMap(keyMapFilePath) {
             // arrowdown -> down
             keyName = keyName.toLowerCase().replace('arrow', '');
             let keyPress = '';
+            // TODO: use CodeMirror order: Shift-, Cmd-, Ctrl-, and Alt-
             if (ev.ctrlKey) keyPress += 'ctrl-';
             if (ev.metaKey) keyPress += 'cmd-';
             if (ev.shiftKey) keyPress += 'shift-';
