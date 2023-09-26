@@ -9,6 +9,7 @@
 * Fix bug when modified MEI encoding was not restored from local storage when working from GitHub
 * Always show validation report upon manual validation, but not during auto validation
 * Fix bug when drag-selected elements contain non-note elements and blocked inserting control elements on them (such as slurs) (#48)
+* Support for @meter.sym/@sym information (#49). No slur (spanning element) inserted when on same time stamps.
 
 ## 1.0.0 Version 1.0 (released 4 September 2023)
 * Delete notes, chords, rests (together with enclosing elements such as beams, tuplets, as well as elements pointing towards them, such as a slur through `@startid` or `@endid`) (#37)
