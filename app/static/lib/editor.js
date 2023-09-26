@@ -333,12 +333,19 @@ export function addControlElement(v, cm, elName, placement = '', form = '') {
   // elements with both startid and endid
   if (['slur', 'tie', 'phrase', 'hairpin', 'gliss'].includes(elName)) {
     // stop, if selected elements are on the same beat position and through warning.
-    if (m === 0 && tstamp2 === tstamp && !startEl.hasAttribute('grace') && !endEl.hasAttribute('grace')) {
-      let msg = useTstamps ? 'Cannot insert ' : 'Attention with ' + elName + ' (' + uuid + '): ';
+    if (
+      m === 0 &&
+      tstamp >= 0 &&
+      tstamp === tstamp2 &&
+      !startEl.hasAttribute('grace') &&
+      !endEl.hasAttribute('grace')
+    ) {
+      // let msg = useTstamps ? 'Cannot insert ' : 'Attention with ' + elName + ' (' + uuid + '): ';
+      let msg = 'Cannot insert ' + elName + ' (' + uuid + '): ';
       msg += startId + ' and ' + endId + ' are on the same beat position ' + tstamp + '.';
       console.log(msg);
       v.showAlert(msg, 'warning');
-      if (useTstamps) return;
+      return; // if (useTstamps) 26 Sept 2023: stop in all cases
     }
     if (useTstamps) {
       newElement.setAttribute('tstamp', tstamp);
