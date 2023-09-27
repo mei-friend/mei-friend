@@ -146,10 +146,11 @@ const defaultCodeMirrorOptions = {
     "'Ï'": indentSelection, // TODO: overcome strange bindings on MAC Shift-Alt-F
     'Shift-Alt-f': indentSelection,
     'Shift-Ctrl-G': toMatchingTag,
-    // 'Cmd-E': encloseSelectionWithTag, // TODO: make OS modifier keys dynamic
-    // 'Ctrl-E': encloseSelectionWithTag,
-    // 'Cmd-/': encloseSelectionWithLastTag,
-    // 'Ctrl-/': encloseSelectionWithLastTag,
+    'Cmd-E': encloseSelectionWithTag, // TODO: make OS modifier keys dynamic
+    'Ctrl-E': encloseSelectionWithTag,
+    'Cmd-/': encloseSelectionWithLastTag,
+    'Ctrl-/': encloseSelectionWithLastTag,
+    // 'Cmd-,': cmd.toggleSettingsPanel,
     // 'Cmd-L': generateUrl,
     // 'Ctrl-L': generateUrl,
     // 'Cmd-O': openFileDialog,
@@ -173,6 +174,24 @@ const defaultCodeMirrorOptions = {
   defaultBrightTheme: 'default', // default theme for OS bright mode, m-f option
   defaultDarkTheme: 'paraiso-dark', // 'base16-dark', // default theme for OS dark mode, m-f option
 }; // defaultCodeMirrorOptions
+
+let keyboardShortcutsForEditor = [
+  'addIds',
+  'removeIds',
+  'validate',
+  'open',
+  'downloadMei',
+  'downloadMeiBasic',
+  'downloadSpeedMei',
+  'generateUrl',
+  'correctAccid',
+  'renumberMeasures',
+  'toggleSettingsPanel',
+  'toggleAnnotationPanel',
+  'indentSelection',
+  'togglePdfMode',
+  'openHelp',
+];
 
 // add all possible facsimile elements
 att.attFacsimile.forEach((e) => defaultVerovioOptions.svgAdditionalAttribute.push(e + '@facs'));
@@ -1691,7 +1710,7 @@ export let cmd = {
       cmd.toggleMidiPlaybackControlBar();
     }
   },
-};
+}; // cmd{}
 
 // add event listeners when controls menu has been instantiated
 function addEventListeners(v, cm) {
@@ -2319,7 +2338,7 @@ function setKeyMap(keyMapFilePath) {
         let el = document.querySelector(key);
 
         if (el) {
-          if (key.startsWith('.platform')) {
+          if (key.startsWith('.platform') && false) {
             // Add platform keys to CodeMirror
             let extraKeys = cm.getOption('extraKeys');
             for (const [k, v] of Object.entries(value)) {
