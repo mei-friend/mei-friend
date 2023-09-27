@@ -51,7 +51,7 @@ export const lang = {
     <p>
       Mei-Friend wurde entwickelt von
       <a href="https://iwk.mdw.ac.at/werner-goebl" target="_blank">Werner Goebl</a> und
-      <a href="https://iwk.mdw.ac.at/david-weigl" target="_blank">David M. Weigl</a> am Institut für Musikakustik &ndash; 
+      <a href="https://iwk.mdw.ac.at/david-weigl" target="_blank">David M. Weigl</a> am Institut für musikalische Akustik &ndash; 
       Wiener Klangstil an der mdw &ndash; Universität für Musik und darstellende Kunst Wien und steht unter der
       <a href="https://spdx.org/licenses/AGPL-3.0-or-later.html" target="_blank"
         >GNU Affero General Public License v3.0</a
