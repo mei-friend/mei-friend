@@ -4,7 +4,7 @@
 
 /**
  * language codes after ISO-639-1, please enter new codes alphabetically
- * TODO: Japanese, Chinese, Polish
+ * TODO: Japanese, Chinese, ...
  */
 export const supportedLanguages = {
   ca: {
@@ -261,7 +261,16 @@ export const defaultVerovioOptions = {
   minLastJustification: 0,
   // transposeToSoundingPitch: true,
   // clefChangeFactor: .83, // option removed in Verovio 3.10.0
-  svgAdditionalAttribute: ['layer@n', 'staff@n', 'dir@vgrp', 'dynam@vgrp', 'hairpin@vgrp', 'pedal@vgrp', 'measure@n'],
+  svgAdditionalAttribute: [
+    'layer@n',
+    'staff@n',
+    'dir@vgrp',
+    'dynam@vgrp',
+    'hairpin@vgrp',
+    'pedal@vgrp',
+    'measure@n',
+    'beamSpan@plist',
+  ],
   bottomMarginArtic: 1.2,
   topMarginArtic: 1.2,
 };

@@ -1,6 +1,6 @@
 // mei-friend version and date
 export const version = '1.0.1';
-export const versionDate = '21 September 2023'; // use full or 3-character english months, will be translated
+export const versionDate = '27 September 2023'; // use full or 3-character english months, will be translated
 
 var vrvWorker;
 var spdWorker;
@@ -142,22 +142,23 @@ const defaultCodeMirrorOptions = {
     "' '": completeIfInTag,
     "'='": completeIfInTag,
     'Ctrl-Space': 'autocomplete',
-    'Alt-.': consultGuidelines,
+    // 'Alt-.': consultGuidelines,
+    "'Ï'": indentSelection, // TODO: overcome strange bindings on MAC Shift-Alt-F
     'Shift-Alt-f': indentSelection,
     'Shift-Ctrl-G': toMatchingTag,
-    "'Ï'": indentSelection, // TODO: overcome strange bindings on MAC
     'Cmd-E': encloseSelectionWithTag, // TODO: make OS modifier keys dynamic
     'Ctrl-E': encloseSelectionWithTag,
     'Cmd-/': encloseSelectionWithLastTag,
     'Ctrl-/': encloseSelectionWithLastTag,
-    'Cmd-L': generateUrl,
-    'Ctrl-L': generateUrl,
-    'Cmd-O': openFileDialog,
-    'Ctrl-O': openFileDialog,
-    'Cmd-P': togglePdfMode,
-    'Ctrl-P': togglePdfMode,
-    'Cmd-S': downloadMei,
-    'Ctrl-S': downloadMei,
+    // 'Cmd-,': cmd.toggleSettingsPanel,
+    // 'Cmd-L': generateUrl,
+    // 'Ctrl-L': generateUrl,
+    // 'Cmd-O': openFileDialog,
+    // 'Ctrl-O': openFileDialog,
+    // 'Cmd-P': togglePdfMode,
+    // 'Ctrl-P': togglePdfMode,
+    // 'Cmd-S': downloadMei,
+    // 'Ctrl-S': downloadMei,
   },
   lint: {
     caller: cm,
@@ -173,6 +174,24 @@ const defaultCodeMirrorOptions = {
   defaultBrightTheme: 'default', // default theme for OS bright mode, m-f option
   defaultDarkTheme: 'paraiso-dark', // 'base16-dark', // default theme for OS dark mode, m-f option
 }; // defaultCodeMirrorOptions
+
+let keyboardShortcutsForEditor = [
+  'addIds',
+  'removeIds',
+  'validate',
+  'open',
+  'downloadMei',
+  'downloadMeiBasic',
+  'downloadSpeedMei',
+  'generateUrl',
+  'correctAccid',
+  'renumberMeasures',
+  'toggleSettingsPanel',
+  'toggleAnnotationPanel',
+  'indentSelection',
+  'togglePdfMode',
+  'openHelp',
+];
 
 // add all possible facsimile elements
 att.attFacsimile.forEach((e) => defaultVerovioOptions.svgAdditionalAttribute.push(e + '@facs'));
@@ -1536,11 +1555,11 @@ export let cmd = {
   downloadSpeedMei: () => downloadSpeedMei(),
   indentSelection: () => indentSelection(),
   validate: () => v.manualValidate(),
-  zoomIn: () => v.zoom(+1, storage),
-  zoomOut: () => v.zoom(-1, storage),
-  zoom50: () => v.zoom(50, storage),
-  zoom100: () => v.zoom(100, storage),
-  zoomSlider: () => {
+  notesZoomIn: () => v.zoom(+1, storage),
+  notesZoomOut: () => v.zoom(-1, storage),
+  notesZoom50: () => v.zoom(50, storage),
+  notesZoom100: () => v.zoom(100, storage),
+  notesZoomSlider: () => {
     let zoomCtrl = document.getElementById('verovioZoom');
     if (zoomCtrl && storage && storage.supported) storage.scale = zoomCtrl.value;
     v.updateLayout();
@@ -1649,7 +1668,7 @@ export let cmd = {
     }
     logoutFromGithub();
   },
-  openHelp: () => window.open(`./help`, '_blank'),
+  openHelp: () => window.open(`https://mei-friend.github.io/`, '_blank'),
   consultGuidelines: () => consultGuidelines(),
   escapeKeyPressed: () => {
     // reset settings filter, if settings have focus
@@ -1691,7 +1710,7 @@ export let cmd = {
       cmd.toggleMidiPlaybackControlBar();
     }
   },
-};
+}; // cmd{}
 
 // add event listeners when controls menu has been instantiated
 function addEventListeners(v, cm) {
@@ -1841,9 +1860,9 @@ function addEventListeners(v, cm) {
   fc.addEventListener('dragend', (ev) => console.log('Drag End', ev));
 
   // Zooming notation with buttons
-  document.getElementById('decreaseScaleButton').addEventListener('click', cmd.zoomOut);
-  document.getElementById('increaseScaleButton').addEventListener('click', cmd.zoomIn);
-  document.getElementById('verovioZoom').addEventListener('change', cmd.zoomSlider);
+  document.getElementById('decreaseScaleButton').addEventListener('click', cmd.notesZoomOut);
+  document.getElementById('increaseScaleButton').addEventListener('click', cmd.notesZoomIn);
+  document.getElementById('verovioZoom').addEventListener('change', cmd.notesZoomSlider);
 
   // Zooming notation with mouse wheel
   vp.addEventListener('wheel', (ev) => {
@@ -2298,12 +2317,24 @@ function fillInSampleEncodings() {
     });
 }
 
-// sets keyMap.json to target element and defines listeners
+/**
+ * Sets keymap JSON information to target element and defines listeners
+ * It loads all bindings in `#notation` to notation, and the platform-specific
+ * to both notation and editor panels (i.e. friendContainer).
+ * @param {string} keyMapFilePath
+ */
 function setKeyMap(keyMapFilePath) {
-  let vp = document.getElementById('notation');
-  if (platform.startsWith('mac')) vp.classList.add('platform-darwin');
-  if (platform.startsWith('win')) vp.classList.add('platform-win32');
-  if (platform.startsWith('linux')) vp.classList.add('platform-linux');
+  // let keyMapParent = document.getElementById('notation');
+  let keyMapParent = document.getElementById('friendContainer');
+  if (platform.startsWith('mac')) {
+    keyMapParent.classList.add('platform-darwin');
+  }
+  if (platform.startsWith('win')) {
+    keyMapParent.classList.add('platform-win32');
+  }
+  if (platform.startsWith('linux')) {
+    keyMapParent.classList.add('platform-linux');
+  }
   fetch(keyMapFilePath)
     .then((resp) => {
       return resp.json();
@@ -2311,18 +2342,18 @@ function setKeyMap(keyMapFilePath) {
     .then((keyMap) => {
       // iterate all keys (element) in keymap.json
       for (const [key, value] of Object.entries(keyMap)) {
-        let el = document.querySelector(key);
-        if (el) {
+        document.querySelectorAll(key).forEach((el) => {
+
           el.setAttribute('tabindex', '-1');
           el.addEventListener('keydown', (ev) => {
             if (['pagination2', 'selectTo', 'selectFrom', 'selectRange'].includes(document.activeElement.id)) {
               return;
             }
-            ev.stopPropagation();
-            ev.preventDefault();
 
+            // at each keystroke: update cmd2key (CTRL on Mac, ALT on WIN/Linux)
             v.cmd2KeyPressed = platform.startsWith('mac') ? ev.ctrlKey : ev.altKey;
 
+            // construct keyPress and keyName from event
             let keyName = ev.key;
             if (ev.code.toLowerCase() === 'space') keyName = 'space';
             // arrowdown -> down
@@ -2334,13 +2365,17 @@ function setKeyMap(keyMapFilePath) {
             if (ev.altKey) keyPress += 'alt-';
             keyPress += keyName;
             console.info('keyPressString: "' + keyPress + '"');
+
+            // find method for keyPress and execute it, if existing
             let methodName = value[keyPress];
             if (methodName !== undefined) {
+              ev.stopPropagation();
+              ev.preventDefault();
               console.log('keyMap method ' + methodName + '.', cmd[methodName]);
-              cmd[methodName]();
+              cmd[methodName](); // execute the function
             }
           });
-        }
+        });
       }
     });
 } // setKeyMap()
@@ -2350,6 +2385,11 @@ export function isCtrlOrCmd(ev) {
   return ev ? (platform.startsWith('mac') && ev.metaKey) || (!platform.startsWith('mac') && ev.ctrlKey) : false;
 } // isCtrlOrCmd()
 
+/**
+ * Convert binary data to blob containing MIDI data an array of int8 byte numbers
+ * @param {BinaryData} data 
+ * @returns {Blob}
+ */
 function midiDataToBlob(data) {
   const byteCharacters = atob(data);
   const byteNumbers = new Array(byteCharacters.length);

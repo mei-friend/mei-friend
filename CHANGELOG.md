@@ -1,12 +1,16 @@
 # mei-friend-online CHANGELOG.md
 
-### 1.0.1 Version 1.0.1 patch
+### 1.0.1 patch
 * Reduce mei-friend-specific Verovio defaults
 * Add auto-translated draft of Japanese language pack
 * Add keyboard shortcuts to editor for saving, loading and printing files
 * Generate URL with all available parameters and lower precision
 * Fix for facsimile images not loading without zone elements (#45)
+* Fix bug when modified MEI encoding was not restored from local storage when working from GitHub
 * Always show validation report upon manual validation, but not during auto validation
+* Fix bug when drag-selected elements contain non-note elements and blocked inserting control elements on them (such as slurs) (#48)
+* Support for @meter.sym/@sym information (#49). No slur (spanning element) inserted when on same time stamps.
+* Support keyboard shortcuts (with os-dependent modifier keys) in encoding editor (#50)
 
 ## 1.0.0 Version 1.0 (released 4 September 2023)
 * Delete notes, chords, rests (together with enclosing elements such as beams, tuplets, as well as elements pointing towards them, such as a slur through `@startid` or `@endid`) (#37)

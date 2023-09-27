@@ -81,9 +81,12 @@ export const modelControlEvents = [
 // array o diatonic pitch names
 export const pnames = ['c', 'd', 'e', 'f', 'g', 'a', 'b'];
 
+export const sharpSign = '♯';
+export const flatSign = '♭'
+
 // pitch names for sharps and flats, defined in keySig@sig or @key.sig
-export const sharps = ['f', 'c', 'g', 'd', 'a', 'e', 'b'];
-export const flats = ['b', 'e', 'a', 'd', 'g', 'c', 'f'];
+export const sharps = ['f', 'c', 'g', 'd', 'a', 'e', 'b', 'f♯', 'c♯', 'g♯', 'd♯', 'a♯'];
+export const flats = ['b', 'e', 'a', 'd', 'g', 'c', 'f', 'b♭', 'e♭', 'a♭', 'd♭', 'g♭'];
 
 // according to Verovio 3.9's implementation of timeSpanningInterface()
 // better: att.startEndId and att.timestamp2.logical
