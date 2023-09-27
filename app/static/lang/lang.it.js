@@ -146,7 +146,7 @@ export const lang = {
 
   // HELP MENU ITEM / VOCE DI MENU AIUTO
   helpMenuTitle: { text: 'Aiuto' },
-  goToHelpPage: { text: 'Pagina di aiuto di mei-friend' },
+  goToHelpPageText: { text: 'Pagina di aiuto di mei-friend' },
   goToCheatSheet: { text: 'Scheda informativa di mei-friend' },
   showChangelog: { text: 'Registro delle modifiche di mei-friend' },
   goToGuidelines: { text: 'Linee guida MEI' },

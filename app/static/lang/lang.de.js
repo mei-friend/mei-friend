@@ -143,7 +143,7 @@ export const lang = {
 
   // HELP MENU ITEM
   helpMenuTitle: { text: 'Hilfe' },
-  goToHelpPage: { text: 'mei-friend Hilfeseiten' },
+  goToHelpPageText: { text: 'mei-friend Hilfeseiten' },
   goToCheatSheet: {text: 'mei-friend Spickzettel'},
   showChangelog: { text: 'mei-friend Änderungsliste (changelog)' },
   goToGuidelines: { text: 'MEI Guidelines' },

@@ -143,7 +143,7 @@ export const lang = {
   toggleSpiccText: { text: 'スピカート' },
   // HELP MENU ITEM
   helpMenuTitle: { text: 'ヘルプ' },
-  goToHelpPage: { text: 'mei-friendヘルプページ' },
+  goToHelpPageText: { text: 'mei-friendヘルプページ' },
   goToCheatSheet: { text: 'mei-friendチートシート' },
   showChangelog: { text: 'mei-friend変更履歴' },
   goToGuidelines: { text: 'MEIガイドライン' },
