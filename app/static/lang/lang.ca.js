@@ -147,7 +147,7 @@ export const lang = {
   // HELP MENU ITEM / ELEMENTS DEL MENÚ D'AJUDA
   helpMenuTitle: { text: 'Ajuda' },
   goToHelpPageText: { text: "Pàgines d'ajuda de mei-friend" },
-  goToCheatSheet: {text: 'Full de trucs de mei-friend'},
+  goToCheatSheet: { text: 'Full de trucs de mei-friend' },
   showChangelog: { text: 'Mostra el registre de canvis de mei-friend' },
   goToGuidelines: { text: 'Mostra les directrius MEI' },
   consultGuidelinesForElementText: { text: "Consulta les directrius per a l'element actual" },
@@ -909,4 +909,9 @@ export const lang = {
   codeCheckerHasExtra: { text: 'té extra' },
   codeCheckerLacksAn: { text: 'li falta un' },
   codeCheckerBecauseAlreadyDefined: { text: "perquè ja s'ha definit anteriorment a la compàs" },
+
+  // Warning for missing ids
+  missingIdsWarningAlert: {
+    text: 'mei-friend no pot fer scroll als elements seleccionats en la codificació. Si us plau, afegiu identificadors a la codificació.',
+  },
 };

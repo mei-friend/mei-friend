@@ -157,7 +157,7 @@ export function moveCursorToEndOfMeasure(cm, p = null) {
  * and scrolls view there.
  * @param {CodeMirror} cm
  * @param {string} id
- * @returns
+ * @returns {boolean} success in finding id
  */
 export function setCursorToId(cm, id) {
   if (id === '') return;
@@ -165,9 +165,15 @@ export function setCursorToId(cm, id) {
   if (c.findNext()) {
     cm.setCursor(c.from());
     goTagStart(cm);
+
     // scroll current cursor into view, vertically centering the view
     let enc = document.querySelector('.CodeMirror'); // retrieve size of CodeMirror panel
-    if (enc) cm.scrollIntoView(null, Math.round(enc.clientHeight / 2));
+    if (enc) {
+      cm.scrollIntoView(null, Math.round(enc.clientHeight / 2));
+    }
+    return true;
+  } else {
+    return false;
   }
 } // setCursorToId()
 
