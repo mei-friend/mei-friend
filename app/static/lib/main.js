@@ -1668,7 +1668,7 @@ export let cmd = {
     }
     logoutFromGithub();
   },
-  openHelp: () => window.open(`./help`, '_blank'),
+  openHelp: () => window.open(`https://mei-friend.github.io/`, '_blank'),
   consultGuidelines: () => consultGuidelines(),
   escapeKeyPressed: () => {
     // reset settings filter, if settings have focus
@@ -2324,10 +2324,17 @@ function fillInSampleEncodings() {
  * @param {string} keyMapFilePath
  */
 function setKeyMap(keyMapFilePath) {
-  let keyMapParent = document.getElementById('notation');
-  if (platform.startsWith('mac')) keyMapParent.classList.add('platform-darwin');
-  if (platform.startsWith('win')) keyMapParent.classList.add('platform-win32');
-  if (platform.startsWith('linux')) keyMapParent.classList.add('platform-linux');
+  // let keyMapParent = document.getElementById('notation');
+  let keyMapParent = document.getElementById('friendContainer');
+  if (platform.startsWith('mac')) {
+    keyMapParent.classList.add('platform-darwin');
+  }
+  if (platform.startsWith('win')) {
+    keyMapParent.classList.add('platform-win32');
+  }
+  if (platform.startsWith('linux')) {
+    keyMapParent.classList.add('platform-linux');
+  }
   fetch(keyMapFilePath)
     .then((resp) => {
       return resp.json();
@@ -2335,49 +2342,40 @@ function setKeyMap(keyMapFilePath) {
     .then((keyMap) => {
       // iterate all keys (element) in keymap.json
       for (const [key, value] of Object.entries(keyMap)) {
-        let el = document.querySelector(key);
-
-        if (el) {
-          if (key.startsWith('.platform') && false) {
-            // Add platform keys to CodeMirror
-            let extraKeys = cm.getOption('extraKeys');
-            for (const [k, v] of Object.entries(value)) {
-              console.log('Added ' + k + ', ', String(v));
-              extraKeys[k] = cmd[String(v)];
-              console.log('.');
-            }
-            cm.setOption('extraKeys', CodeMirror.normalizeKeyMap(extraKeys));
-          }
+        document.querySelectorAll(key).forEach((el) => {
 
           el.setAttribute('tabindex', '-1');
           el.addEventListener('keydown', (ev) => {
             if (['pagination2', 'selectTo', 'selectFrom', 'selectRange'].includes(document.activeElement.id)) {
               return;
             }
-            ev.stopPropagation();
-            ev.preventDefault();
 
+            // at each keystroke: update cmd2key (CTRL on Mac, ALT on WIN/Linux)
             v.cmd2KeyPressed = platform.startsWith('mac') ? ev.ctrlKey : ev.altKey;
 
+            // construct keyPress and keyName from event
             let keyName = ev.key;
             if (ev.code.toLowerCase() === 'space') keyName = 'space';
             // arrowdown -> down
             keyName = keyName.toLowerCase().replace('arrow', '');
             let keyPress = '';
-            // TODO: use CodeMirror order: Shift-, Cmd-, Ctrl-, and Alt-
             if (ev.ctrlKey) keyPress += 'ctrl-';
             if (ev.metaKey) keyPress += 'cmd-';
             if (ev.shiftKey) keyPress += 'shift-';
             if (ev.altKey) keyPress += 'alt-';
             keyPress += keyName;
             console.info('keyPressString: "' + keyPress + '"');
+
+            // find method for keyPress and execute it, if existing
             let methodName = value[keyPress];
             if (methodName !== undefined) {
+              ev.stopPropagation();
+              ev.preventDefault();
               console.log('keyMap method ' + methodName + '.', cmd[methodName]);
-              cmd[methodName]();
+              cmd[methodName](); // execute the function
             }
           });
-        }
+        });
       }
     });
 } // setKeyMap()
@@ -2387,6 +2385,11 @@ export function isCtrlOrCmd(ev) {
   return ev ? (platform.startsWith('mac') && ev.metaKey) || (!platform.startsWith('mac') && ev.ctrlKey) : false;
 } // isCtrlOrCmd()
 
+/**
+ * Convert binary data to blob containing MIDI data an array of int8 byte numbers
+ * @param {BinaryData} data 
+ * @returns {Blob}
+ */
 function midiDataToBlob(data) {
   const byteCharacters = atob(data);
   const byteNumbers = new Array(byteCharacters.length);
