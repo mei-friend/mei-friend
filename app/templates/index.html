@@ -734,12 +734,22 @@
             <div id="splashVersion">
               <span id="splashVersionText">Version: </span><span id="splashVersionNumber"></span>
             </div>
-            <button id="splashConfirmButton" onclick="document.getElementById('splashOverlay').style.display = 'none';">
+            <button
+              id="splashConfirmButton"
+              onclick="
+                document.getElementById('splashOverlay').style.display = 'none';
+                window.localStorage.setItem('splashAcknowledged', 'true');
+              ">
               Got it!
             </button>
             <span id="splashAlwaysShowCtrl">
-              <input id="splashAlwaysShow" type="checkbox" onchange="document.getElementById('showSplashScreen').click()" />
-              <label for="splashAlwaysShow">Always show this splashscreen</label>
+              <input
+                id="splashAlwaysShow"
+                type="checkbox"
+                title="Always show this splash screen on application load"
+                onchange="document.getElementById('showSplashScreen').click();"
+              />
+              <label for="splashAlwaysShow" title="Always show this splash screen on application load">Always show this splash screen</label>
             </span>
           </div>
         </div>

@@ -611,8 +611,9 @@ function onLanguageLoaded() {
     urlFetchInProgress = true;
   }
 
-  // show splash screen if requested
-  if(document.getElementById('showSplashScreen').checked) {
+  // show splash screen if required
+  if((storage.supported && !storage.splashAcknowledged) || 
+    document.getElementById('showSplashScreen').checked) {
     showSplashScreen();
   }
 
