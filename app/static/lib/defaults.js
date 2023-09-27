@@ -327,7 +327,7 @@ export const meiFriendSettingsOptions = {
     default: 'en',
   },
   showSplashScreen: {
-    title: 'Splash screen on load',
+    title: 'Show splash screen on load',
     description: 'Show the mei-friend splash screen when the application is loaded',
     type: 'bool',
     default: false,

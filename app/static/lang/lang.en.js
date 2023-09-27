@@ -7,6 +7,11 @@ import { heart } from '../css/icons.js';
 
 export const lang = {
   // Splash screen
+  aboutMeiFriend: { text: "About mei-friend "},
+  showSplashScreen: { 
+    text: "Show splash screen on load",
+    description: "Show the mei-friend splash screen when the application is loaded"
+   },
   splashBody: {
     html: `
       <p>
@@ -67,7 +72,7 @@ export const lang = {
   },
   splashGotItButtonText: { text: 'Got it!' },
   splashVersionText: { text: 'Version' },
-  splashAlwaysShow: {
+  splashAlwaysShowLabel: {
     text: 'Always show this splash screen',
     description: 'Always show this splash screen on application load',
   },

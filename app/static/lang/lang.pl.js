@@ -6,6 +6,69 @@ import * as att from '../lib/attribute-classes.js';
 import { heart } from '../css/icons.js';
 
 export const lang = {
+  // Ekran powitalny
+  aboutMeiFriend: { text: 'O mei-friend' },
+  showSplashScreen: {
+    text: 'Pokaż ekran powitalny przy ładowaniu',
+    description: 'Pokaż ekran powitalny mei-friend podczas ładowania aplikacji',
+  },
+  splashBody: {
+    html: `
+    <p>
+      mei-friend to edytor <a href="https://music-encoding.org">kodowania muzycznego</a>, hostowany na
+      <a href="https://mdw.ac.at" target="_blank">Uniwersytecie Muzycznym i Sztuk Scenicznych w Wiedniu</a>. Prosimy
+      o zapoznanie się z naszą <a href="https://mei-friend.github.io" target="_blank">rozszerzoną dokumentacją</a>
+      dla dalszych informacji.
+    </p>
+    <p>
+      Chociaż mei-friend to aplikacja oparta na przeglądarkę, żadne z Twoich danych osobowych (w tym kodowanie, które
+      edytujesz, ustawienia aplikacji i bieżące dane logowania, jeśli takie istnieją) nie są przechowywane na naszych
+      serwerach; są one zamiast tego przechowywane w
+      <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank">lokalnym
+      magazynie</a> Twojej przeglądarki.
+    </p>
+    <p>
+      Dane są przesyłane do GitHub tylko wtedy, gdy wyraźnie tego żądasz (na przykład, gdy logujesz się na GitHub,
+      ładujesz swoje kodowanie z repozytorium GitHub lub żądasz uruchomienia pracy GitHub Action). Podobnie dane są
+      przesyłane do wybranego dostawcy Solid tylko wtedy, gdy wyraźnie tego żądasz (na przykład, gdy logujesz się na
+      Solid lub wczytujesz/zapisujesz adnotacje stand-off).
+    </p>
+    <p>
+      Używamy <a href="https://matomo.org/" target="_blank">Matomo</a>, aby zbierać anonimowe statystyki użytkowania.
+      Obejmują one skrócony adres IP (umożliwiający geolokalizację na poziomie kraju, ale bez dalszej identyfikacji),
+      przeglądarkę i system operacyjny, skąd przybyłeś (czyli witrynę źródłową), czas i długość wizyty oraz odwiedzone
+      strony. Te informacje są przechowywane na instancji Matomo uruchomionej na serwerach Uniwersytetu Muzycznego i
+      Sztuk Scenicznych w Wiedniu i nie są udostępniane żadnym trzecim stronom.
+    </p>
+    <p>
+      Na koniec, odtwarzanie MIDI jest prezentowane przy użyciu dźwiękowej czcionki SGM_plus dostarczonej przez
+      Google Magenta i obsługiwanej przez googleapis.com. Twój adres IP jest przekazywany do Google w tym celu. Jeśli
+      nie chcesz, aby tak się działo, prosimy o powstrzymanie się od korzystania z funkcji odtwarzania MIDI.
+    </p>
+    <p>
+      mei-friend jest rozwijany przez
+      <a href="https://iwk.mdw.ac.at/werner-goebl" target="_blank">Wernera Goebla</a> i
+      <a href="https://iwk.mdw.ac.at/david-weigl" target="_blank">Davida M. Weigla</a> na Wydziale Akustyki Muzycznej -
+      Wiener Klangstil na Uniwersytecie Muzycznym i Sztuk Scenicznych w Wiedniu i jest licencjonowany na mocy
+      <a href="https://spdx.org/licenses/AGPL-3.0-or-later.html" target="_blank">GNU Affero General Public License
+      v3.0</a>. Prosimy o zapoznanie się z naszą <a href="https://mei-friend.github.io/about/" target="_blank">stroną
+      podziękowań</a> za więcej informacji o współpracownikach i komponentach open source używanych w naszym projekcie.
+      Dziękujemy naszym kolegom za ich wkład i wsparcie.
+    </p>
+    <p>
+      Rozwój aplikacji internetowej mei-friend jest finansowany przez
+      <a href="https://fwf.ac.at" target="_blank">Austriacki Fundusz Naukowy (FWF)</a> w ramach projektów
+      <a href="https://iwk.mdw.ac.at/signature-sound-vienna/" target="_blank">P 34664-G (Signature Sound Vienna)</a>
+      i <a href="https://e-laute.info">I 6019 (E-LAUTE)</a>.
+    </p>`,
+  },
+  splashGotItButtonText: { text: 'Rozumiem!' },
+  splashVersionText: { text: 'Wersja' },
+  splashAlwaysShowLabel: {
+    text: 'Zawsze wyświetl ten ekran powitalny',
+    description: 'Zawsze wyświetl ten ekran powitalny podczas ładowania aplikacji',
+  },
+
   // Main menu bar
   githubLoginLink: { text: 'Zaloguj się' },
 

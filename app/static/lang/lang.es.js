@@ -6,6 +6,69 @@ import * as att from '../lib/attribute-classes.js';
 import { heart } from '../css/icons.js';
 
 export const lang = {
+  // Pantalla de bienvenida
+  aboutMeiFriend: { text: 'Acerca de mei-friend' },
+  showSplashScreen: {
+    text: 'Mostrar pantalla de bienvenida al cargar',
+    description: 'Mostrar la pantalla de bienvenida de mei-friend cuando se carga la aplicación',
+  },
+  splashBody: {
+    html: `
+    <p>
+      mei-friend es un editor para <a href="https://music-encoding.org">codificaciones de música</a>, alojado en la
+      <a href="https://mdw.ac.at" target="_blank">Universidad de Música y Artes Escénicas de Viena</a>. Consulta nuestra
+      <a href="https://mei-friend.github.io" target="_blank">documentación extensa</a> para obtener más información.
+    </p>
+    <p>
+      Aunque mei-friend es una aplicación basada en el navegador, ninguno de tus datos personales (incluyendo la
+      codificación que estás editando, la configuración de tu aplicación y los detalles de inicio de sesión actuales,
+      si los hay) se almacena en nuestros servidores; en su lugar, se almacenan en el
+      <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank">almacenamiento
+      local</a> de tu navegador.
+    </p>
+    <p>
+      Los datos se transmiten a GitHub solo cuando lo solicitas explícitamente (por ejemplo, cuando inicias sesión en
+      GitHub, cargas tu codificación desde un repositorio de GitHub o solicitas la ejecución de un flujo de trabajo de
+      GitHub Action). De manera similar, los datos se transmiten a tu proveedor Solid elegido solo cuando lo solicitas
+      explícitamente (por ejemplo, cuando inicias sesión en Solid o cargas/guardas anotaciones stand-off).
+    </p>
+    <p>
+      Utilizamos <a href="https://matomo.org/" target="_blank">Matomo</a> para recopilar estadísticas de uso anónimas.
+      Estas incluyen tu dirección IP truncada (permitiendo la geolocalización a nivel de país pero sin identificación
+      adicional), tu navegador y sistema operativo, desde dónde llegaste (es decir, el sitio web de referencia), la hora
+      y la duración de tu visita y las páginas que visitaste. Esta información se almacena en la instancia de Matomo que
+      se ejecuta en los servidores de la Universidad de Música y Artes Escénicas de Viena y no se comparte con terceros.
+    </p>
+    <p>
+      Finalmente, la reproducción MIDI se presenta utilizando la fuente de sonido SGM_plus proporcionada por Google
+      Magenta y servida a través de googleapis.com. Tu dirección IP se transmite a Google con este propósito. Si no
+      deseas que esto ocurra, abstente de utilizar la función de reproducción MIDI.
+    </p>
+    <p>
+      mei-friend está desarrollado por
+      <a href="https://iwk.mdw.ac.at/werner-goebl" target="_blank">Werner Goebl</a> y
+      <a href="https://iwk.mdw.ac.at/david-weigl" target="_blank">David M. Weigl</a> en el Departamento de Acústica
+      Musical - Wiener Klangstil de la Universidad de Música y Artes Escénicas de Viena, y está licenciado bajo la
+      <a href="https://spdx.org/licenses/AGPL-3.0-or-later.html" target="_blank">Licencia Pública General Affero de GNU
+      v3.0</a>. Consulta nuestra <a href="https://mei-friend.github.io/about/" target="_blank">página de
+      agradecimientos</a> para obtener más información sobre los colaboradores y los componentes de código abierto
+      reutilizados en nuestro proyecto. Agradecemos a nuestros colegas por sus contribuciones y orientación.
+    </p>
+    <p>
+      El desarrollo de la aplicación web mei-friend está financiado por la
+      <a href="https://fwf.ac.at" target="_blank">Fundación Austriaca para la Investigación Científica (FWF)</a> en los
+      proyectos
+      <a href="https://iwk.mdw.ac.at/signature-sound-vienna/" target="_blank">P 34664-G (Signature Sound Vienna)</a> e
+      <a href="https://e-laute.info">I 6019 (E-LAUTE)</a>.
+    </p>`,
+  },
+  splashGotItButtonText: { text: '¡Entendido!' },
+  splashVersionText: { text: 'Versión' },
+  splashAlwaysShowLabel: {
+    text: 'Mostrar siempre esta pantalla de bienvenida',
+    description: 'Mostrar siempre esta pantalla de bienvenida al cargar la aplicación',
+  },
+
   // Main menu bar / Menú principal
   githubLoginLink: { text: 'Iniciar sesión en GitHub' },
 

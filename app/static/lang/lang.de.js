@@ -7,6 +7,11 @@ import { heart } from '../css/icons.js';
 
 export const lang = {
   // Splash screen
+  aboutMeiFriend: { text: 'Über mei-friend' },
+  showSplashScreen: {
+    text: 'Splash-Screen beim Laden anzeigen',
+    description: 'Beim laden von mei-friend den Splash-Screen anzeigen',
+  },
   splashBody: {
     html: `
     <p>
@@ -68,6 +73,10 @@ export const lang = {
   splashVersionText: { text: 'Version' },
   splashAlwaysShow: {
     text: 'Diese Meldung immer anzeigne',
+    description: 'Beim Öffnen von mei-friend diese Meldung anzeigen',
+  },
+  splashAlwaysShowLabel: {
+    text: 'Diese Meldung immer anzeigen',
     description: 'Beim Öffnen von mei-friend diese Meldung anzeigen',
   },
 
