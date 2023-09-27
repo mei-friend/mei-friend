@@ -6,6 +6,71 @@ import * as att from '../lib/attribute-classes.js';
 import { heart } from '../css/icons.js';
 
 export const lang = {
+  // Splash screen
+  splashBody: {
+    html: `
+    <p>
+      mei-friend ist ein Online-Editor für <a href="https://music-encoding.org">Musik-Codierungen</a>, gehostet an der
+      <a href="https://mdw.ac.at" target="_blank">mdw &ndash; Universität für Musik und darstellende Kunst Wien</a>. 
+      Bitte konsultieren Sie unsere
+      <a href="https://mei-friend.github.io" target="_blank">umfangreiche Dokumentation</a> für weitere
+      Informationen.
+    </p>
+    <p>
+      Obwohl mei-friend eine browserbasierte Anwendung ist, werden keine Ihrer persönlichen Daten (einschließlich der 
+      von Ihnen bearbeiteten Codierung, Ihrer Anwendungseinstellungen und Ihrer aktuellen Anmeldeinformationen, falls 
+      vorhanden) auf unseren Servern gespeichert. Stattdessen werden sie im 
+      <a href="https://developer.mozilla.org/de/docs/Web/API/Window/localStorage" target="_blank">lokalen Speicher 
+        Ihres Browsers gespeichert</a>.
+    </p>
+    <p>
+      Daten werden nur dann an GitHub übertragen, wenn Sie dies ausdrücklich anfordern (z. B. wenn Sie sich bei GitHub 
+      anmelden, Ihre Codierung aus einem GitHub-Repository laden oder an ein GitHub-Repository übertragen oder wenn 
+      Sie eine GitHub-Action-Workflow für Sie ausführen lassen). Ebenso werden Daten nur dann an Ihren ausgewählten 
+      Solid-Anbieter übertragen, wenn Sie dies ausdrücklich anfordern (z.B. wenn Sie sich bei Solid anmelden oder 
+      Stand-off-Anmerkungen laden oder speichern).
+    </p>
+    <p>
+      Wir verwenden <a href="https://matomo.org/" target="_blank">Matomo</a> zur Erfassung anonymer Nutzungsstatistiken. 
+      Dazu gehören Ihre gekürzte IP-Adresse (die Geolokalisierung auf Länderebene, aber keine weitere Identifizierung 
+      ermöglicht), Ihr Browser und Ihr Betriebssystem, von wo aus Sie gekommen sind (d.h. die verweisende Website), 
+      die Uhrzeit und Dauer Ihres Besuchs und die von Ihnen besuchten Seiten. Diese Informationen werden auf der 
+      Matomo-Instanz gespeichert, die auf den Servern der mdw &ndash; Universität für Musik und darstellende Kunst 
+      Wien läuft, und werden nicht an Dritte weitergegeben.
+    </p>
+    <p>
+      Schließlich wird die MIDI-Wiedergabe mit dem von Google Magenta bereitgestellten SGM_plus-Soundfont präsentiert 
+      und über googleapis.com bereitgestellt. Ihre IP-Adresse wird dabei automatisch an Google übertragen. Wenn Sie 
+      dies nicht möchten, verzichten Sie bitte auf die Verwendung der MIDI-Wiedergabefunktion.
+    </p>
+    <p>
+      Mei-Friend wurde entwickelt von
+      <a href="https://iwk.mdw.ac.at/werner-goebl" target="_blank">Werner Goebl</a> und
+      <a href="https://iwk.mdw.ac.at/david-weigl" target="_blank">David M. Weigl</a> am Institut für Musikakustik &ndash; 
+      Wiener Klangstil an der mdw &ndash; Universität für Musik und darstellende Kunst Wien und steht unter der
+      <a href="https://spdx.org/licenses/AGPL-3.0-or-later.html" target="_blank"
+        >GNU Affero General Public License v3.0</a
+      >. Bitte konsultieren Sie unsere
+      <a href="https://mei-friend.github.io/about/" target="_blank">Seite mit Danksagungen</a> für weitere
+      Informationen zu Mitwirkenden und den im Rahmen unseres Projekts wiederverwendeten Open-Source-Komponenten. 
+      Wir danken all unseren Kolleg:innen für ihre Beiträge und Unterstützung.
+    </p>
+    <p>
+      Die Entwicklung der Mei-Friend-Webanwendung wird finanziert von der
+      <a href="https://fwf.ac.at" target="_blank">Österreichischen Wissenschaftsfonds (FWF)</a> im Rahmen der Projekte
+      <a href="https://iwk.mdw.ac.at/signature-sound-vienna/" target="_blank"
+        >P 34664-G (Signature Sound Vienna)</a
+      >
+      und <a href="https://e-laute.info">I 6019 (E-LAUTE)</a>.
+    </p>`,
+  },
+  splashGotItButtonText: { text: 'Verstanden!' },
+  splashVersionText: { text: 'Version' },
+  splashAlwaysShow: {
+    text: 'Diese Meldung immer anzeigne',
+    description: 'Beim Öffnen von mei-friend diese Meldung anzeigen',
+  },
+
   // Main menu bar
   githubLoginLink: { text: 'Anmelden' },
 
@@ -144,7 +209,7 @@ export const lang = {
   // HELP MENU ITEM
   helpMenuTitle: { text: 'Hilfe' },
   goToHelpPage: { text: 'mei-friend Hilfeseiten' },
-  goToCheatSheet: {text: 'mei-friend Spickzettel'},
+  goToCheatSheet: { text: 'mei-friend Spickzettel' },
   showChangelog: { text: 'mei-friend Änderungsliste (changelog)' },
   goToGuidelines: { text: 'MEI Guidelines' },
   consultGuidelinesForElementText: { text: 'Guideline-Eintrag für aktuelles Element' },

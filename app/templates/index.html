@@ -679,71 +679,19 @@
           <div id="splashHeader">
             <img src="{{ url_for('static', filename='owl/menu-logo.svg') }}" alt="mei-friend" id="splashLogo" />
           </div>
-          <div id="splashBody">
-            <p>
-              mei-friend is an editor for <a href="https://music-encoding.org">music encodings</a>, hosted at the
-              <a href="https://mdw.ac.at" target="_blank">mdw - University of Music and Performing Arts Vienna</a>.
-              Please consult our <a href="https://mei-friend.github.io" target="_blank">extensive documentation</a> for
-              further information.
-            </p>
-            <p>
-              Though mei-friend is a browser-based application, none of your personal data (including the encoding you
-              are editing, your application settings, and current login details if any) are stored on our servers;
-              instead, they are stored in your browser's
-              <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank"
-                >local storage</a
-              >.
-            </p>
-            <p>
-              Data is transmitted to GitHub only when you explicitly request it (e.g., when you log in to GitHub, load
-              your encoding from or commit to a GitHub repository, or when you request a GitHub Action workflow to be
-              run for you). Similarly, data is transmitted to your chosen Solid provider only when you explicitly
-              request it (e.g., when you log in to Solid, or load or save stand-off annotations).
-            </p>
-            <p>
-              We use <a href="https://matomo.org/" target="_blank">Matomo</a>
-              to collect anonymous usage statistics. These include your truncated IP address (permitting geolocation on
-              the country level but no further identification), your browser and operating system, where you arrived
-              from (i.e., the referring website), the time and duration of your visit, and the pages you visited. This
-              information is stored on the Matomo instance running on servers of the mdw - University of Music and
-              Performing Arts Vienna, and is not shared with any third party.
-            </p>
-            <p>
-              Finally, MIDI playback is presented using the SGM_plus sound font provided by Google Magenta, and served via googleapis.com. Your IP address is transmitted to Google for this purpose. If you do not wish for this to happen, please refrain from using the MIDI playback feature.
-            </p>
-            <p>
-              mei-friend is developed by
-              <a href="https://iwk.mdw.ac.at/werner-goebl" target="_blank">Werner Goebl</a> and
-              <a href="https://iwk.mdw.ac.at/david-weigl" target="_blank">David M. Weigl</a> at the Dept. of Music
-              Acoustics - Wiener Klangstil at the mdw - University of Music and Performing Arts Vienna, and is licensed
-              under the
-              <a href="https://spdx.org/licenses/AGPL-3.0-or-later.html" target="_blank"
-                >GNU Affero General Public License v3.0</a
-              >. Please consult our
-              <a href="https://mei-friend.github.io/about/" target="_blank">acknowledgements page</a> for further
-              infomation about contributors and the open-source components reused within our project. We thank our
-              colleagues for their contributions and guidance.
-            </p>
-            <p>
-              Development of the mei-friend Web application is funded by the
-              <a href="https://fwf.ac.at" target="_blank">Austrian Science Fund (FWF)</a> under projects
-              <a href="https://iwk.mdw.ac.at/signature-sound-vienna/" target="_blank"
-                >P 34664-G (Signature Sound Vienna)</a
-              >
-              and <a href="https://e-laute.info">I 6019 (E-LAUTE)</a>.
-            </p>
-          </div>
+          <div id="splashBody"></div>
           <div id="splashFooter">
             <div id="splashVersion">
-              <span id="splashVersionText">Version: </span><span id="splashVersionNumber"></span>
+              <span id="splashVersionText">Version</span>: <span id="splashVersionNumber"></span>
             </div>
             <button
               id="splashConfirmButton"
               onclick="
                 document.getElementById('splashOverlay').style.display = 'none';
                 window.localStorage.setItem('splashAcknowledged', 'true');
-              ">
-              Got it!
+              "
+            >
+              <span id="splashGotItButtonText">Got it!</span>
             </button>
             <span id="splashAlwaysShowCtrl">
               <input
@@ -752,7 +700,12 @@
                 title="Always show this splash screen on application load"
                 onchange="document.getElementById('showSplashScreen').click();"
               />
-              <label for="splashAlwaysShow" title="Always show this splash screen on application load">Always show this splash screen</label>
+              <label
+                id="splashAlwaysShowLabel"
+                for="splashAlwaysShow"
+                title="Always show this splash screen on application load"
+                >Always show this splash screen</label
+              >
             </span>
           </div>
         </div>
