@@ -330,7 +330,7 @@ export const meiFriendSettingsOptions = {
     title: 'Splash screen on load',
     description: 'Show the mei-friend splash screen when the application is loaded',
     type: 'bool',
-    default: true,
+    default: false,
   },
   dragSelection: {
     title: 'Drag select',
