@@ -39,7 +39,7 @@
     referrerpolicy="no-referrer">
   </script> -->
 
-    <script src="{{ url_for('static', filename='npm/node_modules/@inrupt/solid-client-authn-browser/dist/solid-client-authn.bundle.js') }}"></script>
+    <script src="{{ url_for('static', filename='deps/solid-client-authn.bundle.js') }}"></script>
     <script src="{{ url_for('static', filename='lib/env.js') }}"></script>
     <script src="{{ url_for('static', filename='lib/jsgit.js') }}"></script>
     <script src="{{ url_for('static', filename='lib/github.js') }}" type="module"></script>
@@ -104,28 +104,28 @@
   <script src="{{ url_for('static', filename='CodeMirror/keymap/vim.js') }}"></script> -->
 
     <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/keymap/emacs.min.js"
+      src="{{ url_for('static', filename='deps/CodeMirror_emacs.min.js') }}"
       integrity="sha512-JRRAFgTvx2rg2AO6juzwLSqaBfA5MVnZAdnWNwgsLIAnjYsMI6liEnBjFgIbskM3oi5hHBLGCzwZUMd6Nsee8Q=="
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     ></script>
     <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/keymap/vim.min.js"
+      src="{{ url_for('static', filename='deps/CodeMirror_vim.min.js') }}"
       integrity="sha512-px+d4ezEJ2hi3SHqwRziL871LTHSqfj1GxV1Cp78Sp/SAMEIJwxKNDGcQz96FEv/IqRPLcJ848BWhSUM7msEGQ=="
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     ></script>
 
     <!-- Load Google Magenta html MIDI player  -->
-    <script src="https://cdn.jsdelivr.net/combine/npm/tone@14.7.58,npm/@magenta/music@1.23.1/es6/core.js,npm/focus-visible@5,npm/html-midi-player@1.5.0"></script>
+    <script src="{{ url_for('static', filename='deps/html-midi-player.bundle.js') }}"></script>
     <script type="text/javascript">
       // get another handle on html-midi-player's 'core' variable to prevent namespace clash with 'core' defined by jsonld
       var midiCore = core;
     </script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsonld/1.0.0/jsonld.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/fast-json-patch/3.1.1/fast-json-patch.min.js"></script>
+    <script src="{{ url_for('static', filename='deps/js-yaml.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='deps/jsonld.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='deps/fast-json-patch.min.js') }}"></script>
 
     <link rel="stylesheet" href="{{ url_for('static', filename='css/default.css') }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}" />
@@ -701,12 +701,15 @@
               request it (e.g., when you log in to Solid, or load or save stand-off annotations).
             </p>
             <p>
-              Finally, we use <a href="https://matomo.org/" target="_blank">Matomo</a>
+              We use <a href="https://matomo.org/" target="_blank">Matomo</a>
               to collect anonymous usage statistics. These include your truncated IP address (permitting geolocation on
               the country level but no further identification), your browser and operating system, where you arrived
               from (i.e., the referring website), the time and duration of your visit, and the pages you visited. This
               information is stored on the Matomo instance running on servers of the mdw - University of Music and
               Performing Arts Vienna, and is not shared with any third party.
+            </p>
+            <p>
+              Finally, MIDI playback is presented using the SGM_plus sound font provided by Google Magenta, and served via googleapis.com. Your IP address is transmitted to Google for this purpose. If you do not wish for this to happen, please refrain from using the MIDI playback feature.
             </p>
             <p>
               mei-friend is developed by
