@@ -897,4 +897,9 @@ export const lang = {
   codeCheckerHasExtra: { text: 'has extra' }, // has superfluous
   codeCheckerLacksAn: { text: 'lacks an' },
   codeCheckerBecauseAlreadyDefined: { text: 'because it has been defined earlier in the measure' },
+
+  // Warning for missing ids
+  missingIdsWarningAlert: {
+    text: 'mei-friend is unable to scroll to the selected elements in the encoding. Please add ids to the encoding.',
+  },
 };

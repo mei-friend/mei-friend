@@ -211,8 +211,7 @@ export const lang = {
   downwardsButton: { description: '楽譜内を下に移動' },
   speedLabel: {
     text: 'スピードモード',
-    description:
-      '大きなファイルのレンダリング時間を短縮するため、現在のページのみがVerovioに送信されます',
+    description: '大きなファイルのレンダリング時間を短縮するため、現在のページのみがVerovioに送信されます',
   },
 
   // PDF/印刷プレビューパネル
@@ -876,4 +875,9 @@ export const lang = {
   codeCheckerHasExtra: { text: '余分な' }, // 余分な
   codeCheckerLacksAn: { text: '持っていません' },
   codeCheckerBecauseAlreadyDefined: { text: '以前に同じ要素が定義されているため' },
+
+  // Warning for missing ids
+  missingIdsWarningAlert: {
+    text: '「メイフレンドはエンコーディング内の選択された要素にスクロールできません。エンコーディングにIDを追加してください。 (メイフレンドはエンコーディングないのせんたくされたようそにすくろーるできません。エンコーディングにIDをついかしてください。)',
+  },
 };

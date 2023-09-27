@@ -506,7 +506,8 @@ export default class Viewer {
       }
     } else {
       // set cursor position in buffer
-      utils.setCursorToId(cm, itemId);
+      let found = utils.setCursorToId(cm, itemId);
+      if (!found) this.showMissingIdsWarning();
       this.selectedElements = [];
       this.selectedElements.push(itemId);
       msg += 'newly created: ' + itemId + ', size: ' + this.selectedElements.length;
@@ -524,6 +525,18 @@ export default class Viewer {
     this.lastNoteId = startid ? utils.rmHash(startid) : itemId;
     this.allowCursorActivity = true;
   } // handleClickOnNotation()
+
+  showMissingIdsWarning() {
+    this.showAlert(
+      translator.lang.missingIdsWarningAlert.text +
+        ' (' +
+        translator.lang.manipulateMenuTitle.text +
+        '&mdash;' +
+        translator.lang.addIdsText.text +
+        ')',
+      'warning'
+    );
+  } // showMissingIdsWarning()
 
   // when cursor pos in editor changed, update notation location / highlight
   cursorActivity(cm, forceFlip = false) {

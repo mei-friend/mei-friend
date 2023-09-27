@@ -919,4 +919,9 @@ export const lang = {
   codeCheckerHasExtra: { text: 'ha extra' },
   codeCheckerLacksAn: { text: 'manca un' },
   codeCheckerBecauseAlreadyDefined: { text: 'poiché è già stato definito in precedenza nella misura' },
+
+  // Warning for missing ids
+  missingIdsWarningAlert: {
+    text: 'mei-friend non è in grado di scorrere gli elementi selezionati nella codifica. Aggiungere gli id alla codifica.',
+  },
 };

@@ -144,7 +144,7 @@ export const lang = {
   // HELP MENU ITEM
   helpMenuTitle: { text: 'Hilfe' },
   goToHelpPageText: { text: 'mei-friend Hilfeseiten' },
-  goToCheatSheet: {text: 'mei-friend Spickzettel'},
+  goToCheatSheet: { text: 'mei-friend Spickzettel' },
   showChangelog: { text: 'mei-friend Änderungsliste (changelog)' },
   goToGuidelines: { text: 'MEI Guidelines' },
   consultGuidelinesForElementText: { text: 'Guideline-Eintrag für aktuelles Element' },
@@ -910,4 +910,9 @@ export const lang = {
   codeCheckerHasExtra: { text: 'hat extra' }, // has superfluous
   codeCheckerLacksAn: { text: 'vermisst einen' },
   codeCheckerBecauseAlreadyDefined: { text: 'weil es im gleichen Takt bereits definiert wurde' },
+
+  // Warning for missing ids
+  missingIdsWarningAlert: {
+    text: 'mei-friend kann nicht zu den selektierten Elementen in der Enkodierung scrollen. Bitte xml:ids zur Kodierung hinzufügen.',
+  },
 };
