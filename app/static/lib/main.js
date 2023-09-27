@@ -611,6 +611,11 @@ function onLanguageLoaded() {
     urlFetchInProgress = true;
   }
 
+  // show splash screen if requested
+  if(document.getElementById('showSplashScreen').checked) {
+    showSplashScreen();
+  }
+
   // fill sample encodings
   fillInSampleEncodings();
 
@@ -1318,6 +1323,11 @@ function downloadSpeedMei() {
   }, 0);
 } // downloadSpeedMei()
 
+function showSplashScreen() {
+  document.getElementById('splashOverlay').style.display = 'block';
+  document.getElementById('splashAlwaysShow').checked = document.getElementById('showSplashScreen').checked;
+}  
+
 function togglePdfMode() {
   console.log('Toggle PDF mode');
   v.pdfMode ? v.saveAsPdf() : v.pageModeOn();
@@ -2014,6 +2024,9 @@ function addEventListeners(v, cm) {
   document.getElementById('toggleMarcato').addEventListener('click', cmd.toggleMarcato);
   document.getElementById('toggleStacciss').addEventListener('click', cmd.toggleStacciss);
   document.getElementById('toggleSpicc').addEventListener('click', cmd.toggleSpicc);
+
+  // show splash screen
+  document.getElementById('aboutMeiFriend').addEventListener('click', showSplashScreen)
 
   // consult guidelines
   document.getElementById('consultGuidelinesForElement').addEventListener('click', cmd.consultGuidelines);

@@ -326,6 +326,12 @@ export const meiFriendSettingsOptions = {
     labels: Object.keys(supportedLanguages).map((l) => supportedLanguages[l][l] + ' / ' + supportedLanguages['en'][l]),
     default: 'en',
   },
+  showSplashScreen: {
+    title: 'Splash screen on load',
+    description: 'Show the mei-friend splash screen when the application is loaded',
+    type: 'bool',
+    default: true,
+  },
   dragSelection: {
     title: 'Drag select',
     description: 'filled in by language packs',

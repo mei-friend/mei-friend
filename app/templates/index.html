@@ -597,6 +597,8 @@
         <div class="dropdown">
           <button class="dropbtn" id="helpMenuTitle">Help</button>
           <div class="dropdownContent" id="HelpMenu">
+            <a id="aboutMeiFriend" href="#">About mei-friend</a>
+            <hr class="dropdownLine" />
             <a id="goToHelpPage" href="https://mei-friend.github.io/" target="_blank">Show mei-friend help pages</a>
             <a id="goToCheatSheet" href="https://mei-friend.github.io/cheatsheet/" target="_blank"
               >Show mei-friend cheat sheet</a
@@ -732,16 +734,11 @@
             <div id="splashVersion">
               <span id="splashVersionText">Version: </span><span id="splashVersionNumber"></span>
             </div>
-            <button
-              id="splashConfirmButton"
-              onclick="() => {
-                document.getElementById('splashOverlay').style.display = 'none'; 
-              }"
-            >
+            <button id="splashConfirmButton" onclick="document.getElementById('splashOverlay').style.display = 'none';">
               Got it!
             </button>
             <span id="splashAlwaysShowCtrl">
-              <input id="splashAlwaysShow" type="checkbox" />
+              <input id="splashAlwaysShow" type="checkbox" onchange="document.getElementById('showSplashScreen').click()" />
               <label for="splashAlwaysShow">Always show this splashscreen</label>
             </span>
           </div>
