@@ -21,31 +21,32 @@ export const lang = {
       <a href="https://mei-friend.github.io" target="_blank">umfangreiche Dokumentationswebseite</a>.
     </p>
     <p>
-      Obwohl mei-friend eine browserbasierte Anwendung ist, werden keine Ihrer persönlichen Daten (einschließlich der 
-      von Ihnen bearbeiteten Kodierung, Ihrer Anwendungseinstellungen und Ihrer aktuellen Anmeldeinformationen, falls 
-      vorhanden) auf unseren Servern gespeichert. Stattdessen werden sie im 
+      Obwohl mei-friend eine browserbasierte Anwendung ist, werden Ihre Daten einschließlich der 
+      von Ihnen bearbeiteten Kodierungen, Ihrer Anwendungseinstellungen und Ihrer aktuellen Anmeldeinformationen bei 
+      GitHub oder Solid, falls vorhanden, im 
       <a href="https://developer.mozilla.org/de/docs/Web/API/Window/localStorage" target="_blank">lokalen Speicher 
-        Ihres Browsers gespeichert</a>.
+        Ihres Browsers gespeichert</a>, niemals jedoch auf unseren Servern.
     </p>
     <p>
-      Daten werden nur dann an GitHub übertragen, wenn Sie dies ausdrücklich anfordern (z. B. wenn Sie sich bei GitHub 
+      Daten werden nur dann an GitHub übertragen, wenn Sie dies ausdrücklich anfordern (z.B. wenn Sie sich bei GitHub 
       anmelden, Ihre Kodierung aus einem GitHub-Repository laden oder an ein GitHub-Repository übertragen oder wenn 
-      Sie eine GitHub-Action-Workflow für Sie ausführen lassen). Ebenso werden Daten nur dann an Ihren ausgewählten 
+      Sie eine GitHub-Action-Workflow für sich ausführen lassen). Ebenso werden Daten nur dann an Ihren ausgewählten 
       Solid-Anbieter übertragen, wenn Sie dies ausdrücklich anfordern (z.B. wenn Sie sich bei Solid anmelden oder 
-      Stand-off-Anmerkungen laden oder speichern).
+      Stand-off-Annotationen laden oder speichern).
     </p>
     <p>
       Wir verwenden <a href="https://matomo.org/" target="_blank">Matomo</a> zur Erfassung anonymer Nutzungsstatistiken. 
-      Dazu gehören Ihre gekürzte IP-Adresse (die Geolokalisierung auf Länderebene, aber keine weitere Identifizierung 
-      ermöglicht), Ihr Browser und Ihr Betriebssystem, die verweisende Website, 
+      Dazu gehören Ihre gekürzte IP-Adresse, die Geolokalisierung auf Länderebene, aber keine weitere Identifizierung 
+      ermöglicht, Ihr Browser und Ihr Betriebssystem, die verweisende Website, 
       die Uhrzeit und Dauer Ihres Besuchs und die von Ihnen besuchten Seiten. Diese Informationen werden auf der 
       Matomo-Instanz gespeichert, die auf den Servern der mdw &ndash; Universität für Musik und darstellende Kunst 
       Wien läuft, und werden nicht an Dritte weitergegeben.
     </p>
     <p>
       Schließlich wird die MIDI-Wiedergabe mit dem SGM_plus-Soundfont von Google Magenta abgespielt 
-      der über googleapis.com bereitgestellt wird. Ihre IP-Adresse wird dabei automatisch an Google übertragen. Wenn Sie 
-      dies nicht möchten, verzichten Sie bitte auf die Verwendung der MIDI-Wiedergabefunktion.
+      der über googleapis.com bereitgestellt wird. Ihre IP-Adresse wird beim Aktivieren der MIDI-Wiedergabefunktion 
+      daher für Google sichtbar. Wenn Sie dies nicht wünschen, verzichten Sie bitte auf die Verwendung der 
+      MIDI-Wiedergabefunktion.
     </p>
     <p>
       mei-friend wurde entwickelt von
@@ -71,7 +72,7 @@ export const lang = {
   splashGotItButtonText: { text: 'Verstanden!' },
   splashVersionText: { text: 'Version' },
   splashAlwaysShow: {
-    text: 'Diese Meldung immer anzeigne',
+    text: 'Diese Meldung immer anzeigen',
     description: 'Beim Öffnen von mei-friend diese Meldung anzeigen',
   },
   splashAlwaysShowLabel: {

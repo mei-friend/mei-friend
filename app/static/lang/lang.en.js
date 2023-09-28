@@ -7,27 +7,25 @@ import { heart } from '../css/icons.js';
 
 export const lang = {
   // Splash screen
-  aboutMeiFriend: { text: "About mei-friend "},
-  showSplashScreen: { 
-    text: "Show splash screen on load",
-    description: "Show the mei-friend splash screen when the application is loaded"
-   },
+  aboutMeiFriend: { text: 'About mei-friend ' },
+  showSplashScreen: {
+    text: 'Show splash screen on load',
+    description: 'Show the mei-friend splash screen when the application is loaded',
+  },
   splashBody: {
     html: `
       <p>
         mei-friend is an editor for <a href="https://music-encoding.org">music encodings</a>, hosted at the
-        <a href="https://mdw.ac.at" target="_blank">mdw &ndash; University of Music and Performing Arts Vienna</a
-        >. Please consult our
-        <a href="https://mei-friend.github.io" target="_blank">extensive documentation</a> for further
-        information.
+        <a href="https://mdw.ac.at" target="_blank">mdw &ndash; University of Music and Performing Arts Vienna</a>. 
+        Please consult our <a href="https://mei-friend.github.io" target="_blank">extensive documentation</a> for 
+        further information.
       </p>
       <p>
-        Though mei-friend is a browser-based application, none of your personal data (including the encoding you
-        are editing, your application settings, and current login details if any) are stored on our servers;
-        instead, they are stored in your browser's
+        Though mei-friend is a browser-based application, your personal data (including the encoding you
+        are editing, your application settings, and current login details if any) are stored in your browser's
         <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank"
           >local storage</a
-        >.
+        > and are not transmitted to or stored on our servers.
       </p>
       <p>
         Data is transmitted to GitHub only when you explicitly request it (e.g., when you log in to GitHub, load
@@ -45,8 +43,8 @@ export const lang = {
       </p>
       <p>
         Finally, MIDI playback is presented using the SGM_plus sound font provided by Google Magenta, and served
-        via googleapis.com. Your IP address is transmitted to Google for this purpose. If you do not wish for this
-        to happen, please refrain from using the MIDI playback feature.
+        via googleapis.com. Your IP address is therefore visible to Google when initiating MIDI playback. If you 
+        do not wish for this to happen, please refrain from using the MIDI playback feature.
       </p>
       <p>
         mei-friend is developed by

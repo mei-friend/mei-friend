@@ -309,7 +309,8 @@ a:active {
   border-radius:10px;
 }
 
-/** start loading animation for splash screen text */
+/** start loading animation for splash screen text (not used for now) */
+/* 
 #splashBodyLoading { 
   position:relative;
   left: calc(50% - 1em);
@@ -334,7 +335,8 @@ a:active {
     75% {
         content: '...';
     }
-}
+} 
+*/
 /** end loading animation for splash screen text **/
 
 #splashFooter { 
