@@ -405,7 +405,7 @@ document.addEventListener('DOMContentLoaded', function () {
       onLanguageLoaded();
     });
   } else {
-    // ...or go on with default language
+    translator.translateGui();
     onLanguageLoaded();
   }
 });
@@ -2032,7 +2032,7 @@ function addEventListeners(v, cm) {
   // show splash screen
   document.getElementById('aboutMeiFriend').addEventListener('click', showSplashScreen);
   document.getElementById('splashOverlay').addEventListener('click', (e) => {
-    if (e.target.id === 'splashOverlay') document.getElementById('splashOverlay').style.display = "none"; // dismiss splash when user clicks on black background
+    if (e.target.id === 'splashOverlay') document.getElementById('splashOverlay').style.display = 'none'; // dismiss splash when user clicks on black background
   });
 
   // consult guidelines
