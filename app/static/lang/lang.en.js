@@ -70,6 +70,10 @@ export const lang = {
   },
   splashGotItButtonText: { text: 'Got it!' },
   splashVersionText: { text: 'Version' },
+  splashAlwaysShow: {
+    text: 'Always show this splash screen',
+    description: 'Always show this splash screen on application load',
+  },
   splashAlwaysShowLabel: {
     text: 'Always show this splash screen',
     description: 'Always show this splash screen on application load',

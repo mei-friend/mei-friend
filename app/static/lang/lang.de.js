@@ -24,7 +24,7 @@ export const lang = {
       Obwohl mei-friend eine browserbasierte Anwendung ist, werden Ihre Daten einschließlich der 
       von Ihnen bearbeiteten Kodierungen, Ihrer Anwendungseinstellungen und Ihrer aktuellen Anmeldeinformationen bei 
       GitHub oder Solid, falls vorhanden, im 
-      <a href="https://developer.mozilla.org/de/docs/Web/API/Window/localStorage" target="_blank">lokalen Speicher 
+      <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank">lokalen Speicher 
         Ihres Browsers gespeichert</a>, niemals jedoch auf unseren Servern.
     </p>
     <p>

@@ -14,60 +14,66 @@ export const lang = {
   },
   splashBody: {
     html: `
-    <p>
-      mei-friend est un éditeur pour les <a href="https://music-encoding.org">encodages musicaux</a>, hébergé à
-      l'<a href="https://mdw.ac.at" target="_blank">Université de musique et des arts du spectacle de Vienne</a>.
-      Veuillez consulter notre <a href="https://mei-friend.github.io" target="_blank">documentation exhaustive</a>
-      pour plus d'informations.
-    </p>
-    <p>
-      Bien que mei-friend soit une application basée sur le navigateur, aucune de vos données personnelles (y compris
-      l'encodage que vous modifiez, vos paramètres d'application et les détails de connexion actuels le cas échéant)
-      n'est stockée sur nos serveurs ; elles sont plutôt stockées dans le
-      <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank">stockage local</a>
-      de votre navigateur.
-    </p>
-    <p>
-      Les données sont transmises à GitHub uniquement lorsque vous en faites explicitement la demande (par exemple,
-      lorsque vous vous connectez à GitHub, chargez votre encodage depuis ou le publiez dans un référentiel GitHub,
-      ou lorsque vous demandez l'exécution d'un flux de travail GitHub Action). De même, les données sont transmises
-      à votre fournisseur Solid choisi uniquement lorsque vous en faites explicitement la demande (par exemple,
-      lorsque vous vous connectez à Solid, ou chargez ou enregistrez des annotations stand-off).
-    </p>
-    <p>
-      Nous utilisons <a href="https://matomo.org/" target="_blank">Matomo</a> pour collecter des statistiques
-      d'utilisation anonymes. Celles-ci incluent votre adresse IP tronquée (permettant la géolocalisation au niveau
-      du pays mais aucune identification supplémentaire), votre navigateur et votre système d'exploitation, d'où vous
-      venez (c'est-à-dire le site web de référence), l'heure et la durée de votre visite, ainsi que les pages que
-      vous avez visitées. Ces informations sont stockées sur l'instance Matomo exécutée sur les serveurs de
-      l'Université de musique et des arts du spectacle de Vienne (mdw) et ne sont pas partagées avec des tiers.
-    </p>
-    <p>
-      Enfin, la lecture MIDI est présentée à l'aide de la police sonore SGM_plus fournie par Google Magenta et servie
-      via googleapis.com. Votre adresse IP est transmise à Google à cette fin. Si vous ne souhaitez pas que cela se
-      produise, veuillez vous abstenir d'utiliser la fonction de lecture MIDI.
-    </p>
-    <p>
-      mei-friend est développé par
-      <a href="https://iwk.mdw.ac.at/werner-goebl" target="_blank">Werner Goebl</a> et
-      <a href="https://iwk.mdw.ac.at/david-weigl" target="_blank">David M. Weigl</a> au Département de Musicologie -
-      Wiener Klangstil à l'Université de musique et des arts du spectacle de Vienne (mdw) et est sous licence de la
-      <a href="https://spdx.org/licenses/AGPL-3.0-or-later.html" target="_blank">GNU Affero General Public License
-      v3.0</a>. Veuillez consulter notre
-      <a href="https://mei-friend.github.io/about/" target="_blank">page de remerciements</a> pour plus
-      d'informations sur les contributeurs et les composants open source réutilisés dans notre projet. Nous remercions
-      nos collègues pour leurs contributions et leur orientation.
-    </p>
-    <p>
-      Le développement de l'application Web mei-friend est financé par le
-      <a href="https://fwf.ac.at" target="_blank">Fonds autrichien de la recherche scientifique (FWF)</a> dans le cadre
-      des projets
-      <a href="https://iwk.mdw.ac.at/signature-sound-vienna/" target="_blank">P 34664-G (Signature Sound Vienna)</a>
-      et <a href="https://e-laute.info">I 6019 (E-LAUTE)</a>.
-    </p>`,
+      <p>
+        mei-friend est un éditeur pour les <a href="https://music-encoding.org">encodages musicaux</a>, hébergé à l'
+        <a href="https://mdw.ac.at" target="_blank">Université de Musique et des Arts du Spectacle de Vienne</a>. 
+        Veuillez consulter notre <a href="https://mei-friend.github.io" target="_blank">documentation complète</a> pour 
+        plus d'informations.
+      </p>
+      <p>
+        Bien que mei-friend soit une application basée sur le navigateur, vos données personnelles (y compris l'encodage que vous
+        modifiez, les paramètres de votre application et les détails de connexion actuels, le cas échéant) sont stockés dans le
+        <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank"
+          >stockage local</a
+        > de votre navigateur et ne sont pas transmis ou stockés sur nos serveurs.
+      </p>
+      <p>
+        Les données sont transmises à GitHub uniquement lorsque vous le demandez explicitement (par exemple, lorsque vous vous
+        connectez à GitHub, chargez votre encodage depuis un référentiel GitHub ou demandez l'exécution d'un flux de travail
+        GitHub Action pour vous). De même, les données sont transmises à votre fournisseur Solid choisi uniquement lorsque vous
+        le demandez explicitement (par exemple, lorsque vous vous connectez à Solid, ou chargez ou enregistrez des annotations
+        stand-off).
+      </p>
+      <p>
+        Nous utilisons <a href="https://matomo.org/" target="_blank">Matomo</a>
+        pour collecter des statistiques d'utilisation anonymes. Celles-ci comprennent votre adresse IP tronquée (permettant
+        la géolocalisation au niveau du pays mais sans identification supplémentaire), votre navigateur et système
+        d'exploitation, d'où vous venez (c'est-à-dire le site Web de référence), l'heure et la durée de votre visite, et
+        les pages que vous avez visitées. Ces informations sont stockées sur l'instance Matomo fonctionnant sur les serveurs
+        de l'Université de musique et des arts du spectacle de Vienne et ne sont pas partagées avec des tiers.
+      </p>
+      <p>
+        Enfin, la lecture MIDI est présentée à l'aide de la police sonore SGM_plus fournie par Google Magenta et servie via
+        googleapis.com. Votre adresse IP est donc visible par Google lors du démarrage de la lecture MIDI. Si vous ne souhaitez
+        pas que cela se produise, veuillez vous abstenir d'utiliser la fonction de lecture MIDI.
+      </p>
+      <p>
+        mei-friend est développé par
+        <a href="https://iwk.mdw.ac.at/werner-goebl" target="_blank">Werner Goebl</a> et
+        <a href="https://iwk.mdw.ac.at/david-weigl" target="_blank">David M. Weigl</a> au Département d'acoustique musicale -
+        Wiener Klangstil de l'Université de musique et des arts du spectacle de Vienne, et est sous licence
+        <a href="https://spdx.org/licenses/AGPL-3.0-or-later.html" target="_blank"
+          >GNU Affero General Public License v3.0</a
+        >. Veuillez consulter notre <a href="https://mei-friend.github.io/about/" target="_blank">page de remerciements</a>
+        pour plus d'informations sur les contributeurs et les composants open source réutilisés dans notre projet. Nous
+        remercions nos collègues pour leurs contributions et leur orientation.
+      </p>
+      <p>
+        Le développement de l'application Web mei-friend est financé par le
+        <a href="https://fwf.ac.at" target="_blank">Fonds autrichien pour la science (FWF)</a> dans le cadre des projets
+        <a href="https://iwk.mdw.ac.at/signature-sound-vienna/" target="_blank"
+          >P 34664-G (Signature Sound Vienna)</a
+        >
+        et <a href="https://e-laute.info">I 6019 (E-LAUTE)</a>.
+      </p>
+    `,
   },
   splashGotItButtonText: { text: 'Compris !' },
   splashVersionText: { text: 'Version' },
+  splashAlwaysShow: {
+    text: 'Toujours afficher cet écran de démarrage',
+    description: "Toujours afficher cet écran de démarrage lors du chargement de l'application",
+  },
   splashAlwaysShowLabel: {
     text: 'Toujours afficher cet écran de démarrage',
     description: "Toujours afficher cet écran de démarrage lors du chargement de l'application",

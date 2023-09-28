@@ -14,57 +14,66 @@ export const lang = {
   },
   splashBody: {
     html: `
-    <p>
-      mei-friend és un editor per a les <a href="https://music-encoding.org">codificacions musicals</a>, allotjat a la
-      <a href="https://mdw.ac.at" target="_blank">Universitat de Música i Arts Escèniques de Viena</a>. Consulta la
-      nostra <a href="https://mei-friend.github.io" target="_blank">documentació exhaustiva</a> per a més informació.
-    </p>
-    <p>
-      Tot i que mei-friend és una aplicació basada en el navegador, cap de les teves dades personals (incloent la
-      codificació que estàs editant, la configuració de la teva aplicació i els detalls d'inici de sessió actuals, si hi
-      ha algun) es guarda als nostres servidors; en lloc d'això, es guarden al
-      <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank">magatzem local</a>
-      del teu navegador.
-    </p>
-    <p>
-      Les dades es transmeten a GitHub només quan ho sol·licites explícitament (per exemple, quan inicies la sessió a
-      GitHub, carreguis la teva codificació des d'un repositori de GitHub o demanis l'execució d'un flux de treball
-      GitHub Action). De manera similar, les dades es transmeten al teu proveïdor Solid triat només quan ho sol·licites
-      explícitament (per exemple, quan inicies la sessió a Solid o carreguis/guardis anotacions stand-off).
-    </p>
-    <p>
-      Fem servir <a href="https://matomo.org/" target="_blank">Matomo</a> per recopilar estadístiques d'ús anònimes.
-      Aquestes inclouen la teva adreça IP truncada (permetent la geolocalització a nivell de país però sense identificació
-      addicional), el teu navegador i sistema operatiu, des d'on vas arribar (és a dir, el lloc web de referència),
-      l'hora i la durada de la teva visita i les pàgines que vas visitar. Aquesta informació es guarda a la instància
-      de Matomo que s'executa als servidors de la Universitat de Música i Arts Escèniques de Viena i no es comparteix amb
-      tercers.
-    </p>
-    <p>
-      Finalment, la reproducció MIDI es presenta utilitzant la font sonora SGM_plus proporcionada per Google Magenta i
-      servida a través de googleapis.com. La teva adreça IP es transmet a Google amb aquest propòsit. Si no vols que això
-      passi, abstreu-te d'utilitzar la funció de reproducció MIDI.
-    </p>
-    <p>
-      mei-friend està desenvolupat per
-      <a href="https://iwk.mdw.ac.at/werner-goebl" target="_blank">Werner Goebl</a> i
-      <a href="https://iwk.mdw.ac.at/david-weigl" target="_blank">David M. Weigl</a> al Departament d'Acústica Musical -
-      Wiener Klangstil de la Universitat de Música i Arts Escèniques de Viena, i està llicenciat sota la
-      <a href="https://spdx.org/licenses/AGPL-3.0-or-later.html" target="_blank">Llicència Pública General Affero de GNU
-      v3.0</a>. Consulta la nostra <a href="https://mei-friend.github.io/about/" target="_blank">pàgina de
-      reconeixements</a> per a més informació sobre els col·laboradors i els components de codi obert reutilitzats en el
-      nostre projecte. Agraint així mateix als nostres companys pel seu contribut i orientació.
-    </p>
-    <p>
-      El desenvolupament de l'aplicació web mei-friend està finançat per la
-      <a href="https://fwf.ac.at" target="_blank">Fundació Austriaca per a la Recerca Científica (FWF)</a> en els
-      projectes
-      <a href="https://iwk.mdw.ac.at/signature-sound-vienna/" target="_blank">P 34664-G (Signature Sound Vienna)</a> i
-      <a href="https://e-laute.info">I 6019 (E-LAUTE)</a>.
-    </p>`,
+      <p>
+        mei-friend és un editor per a les <a href="https://music-encoding.org">codificacions musicals</a>, allotjat a
+        <a href="https://mdw.ac.at" target="_blank">la Universitat de Música i Arts Escèniques de Viena</a>. 
+        Consulta la nostra <a href="https://mei-friend.github.io" target="_blank">documentació extensa</a> per a
+        més informació.
+      </p>
+      <p>
+        Tot i que mei-friend és una aplicació basada en el navegador, les teves dades personals (incloent la codificació que
+        estàs editant, la configuració de l'aplicació i els detalls actuals de l'inici de sessió, si n'hi ha) es
+        emmagatzemen al
+        <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank"
+          >magatzematge local</a
+        > del teu navegador i no es transmeten ni es emmagatzemen als nostres servidors.
+      </p>
+      <p>
+        Les dades es transmeten a GitHub només quan ho demanes explícitament (per exemple, quan inicies la sessió a GitHub,
+        carreguis la teva codificació des d'un repositori GitHub o quan demanis que s'executi un flux de treball GitHub
+        Action). De manera similar, les dades es transmeten al teu proveïdor Solid escollit només quan ho demanes explícitament
+        (per exemple, quan inicies la sessió a Solid o carreguis o desis anotacions stand-off).
+      </p>
+      <p>
+        Fem servir <a href="https://matomo.org/" target="_blank">Matomo</a>
+        per recopilar estadístiques d'ús anònimes. Aquestes inclouen la teva adreça IP truncada (que permet la geolocalització a
+        nivell de país però sense identificació addicional), el teu navegador i sistema operatiu, d'on vas arribar (és a dir, el
+        lloc web de referència), l'hora i durada de la teva visita i les pàgines que vas visitar. Aquesta informació es
+        emmagatzema a la instància de Matomo que s'executa als servidors de la Universitat de Música i Arts Escèniques de
+        Viena i no es comparteix amb cap tercer.
+      </p>
+      <p>
+        Finalment, la reproducció MIDI es presenta utilitzant la font de so SGM_plus proporcionada per Google Magenta i
+        servida a través de googleapis.com. Per tant, la teva adreça IP és visible per a Google quan s'inicia la reproducció
+        MIDI. Si no vols que això passi, abstén-te d'utilitzar la funció de reproducció MIDI.
+      </p>
+      <p>
+        mei-friend està desenvolupat per
+        <a href="https://iwk.mdw.ac.at/werner-goebl" target="_blank">Werner Goebl</a> i
+        <a href="https://iwk.mdw.ac.at/david-weigl" target="_blank">David M. Weigl</a> al Departament d'Acústica Musical -
+        Wiener Klangstil de la Universitat de Música i Arts Escèniques de Viena i està llicenciat sota la
+        <a href="https://spdx.org/licenses/AGPL-3.0-or-later.html" target="_blank"
+          >Llicència Pública General Affero de GNU versió 3.0 (GNU AGPLv3)</a
+        >. Consulta la nostra <a href="https://mei-friend.github.io/about/" target="_blank">pàgina d'agraïments</a> per a
+        obtenir més informació sobre els col·laboradors i els components de codi obert reutilitzats en el nostre projecte.
+        Agraim als nostres companys pel seu contribut i orientació.
+      </p>
+      <p>
+        El desenvolupament de l'aplicació web de mei-friend està finançat per la
+        <a href="https://fwf.ac.at" target="_blank">Fons d'Investigació d'Àustria (FWF)</a> en els projectes
+        <a href="https://iwk.mdw.ac.at/signature-sound-vienna/" target="_blank"
+          >P 34664-G (Signature Sound Vienna)</a
+        >
+        i <a href="https://e-laute.info">I 6019 (E-LAUTE)</a>.
+      </p>
+    `,
   },
   splashGotItButtonText: { text: 'Ho entès!' },
   splashVersionText: { text: 'Versió' },
+  splashAlwaysShow: {
+    text: "Mostra sempre aquesta pantalla d'inici",
+    description: "Mostra sempre aquesta pantalla d'inici al carregar l'aplicació",
+  },
   splashAlwaysShowLabel: {
     text: "Mostra sempre aquesta pantalla d'inici",
     description: "Mostra sempre aquesta pantalla d'inici al carregar l'aplicació",
