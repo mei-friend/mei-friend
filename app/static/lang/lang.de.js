@@ -15,7 +15,7 @@ export const lang = {
   splashBody: {
     html: `
     <p>
-      mei-friend ist ein Online-Editor für <a href="https://music-encoding.org">Musik-Codierungen</a>, gehostet an der
+      mei-friend ist ein Online-Editor für <a href="https://music-encoding.org">Musik-Kodierungen</a>, gehostet an der
       <a href="https://mdw.ac.at" target="_blank">mdw &ndash; Universität für Musik und darstellende Kunst Wien</a>. 
       Bitte konsultieren Sie unsere
       <a href="https://mei-friend.github.io" target="_blank">umfangreiche Dokumentation</a> für weitere
@@ -23,14 +23,14 @@ export const lang = {
     </p>
     <p>
       Obwohl mei-friend eine browserbasierte Anwendung ist, werden keine Ihrer persönlichen Daten (einschließlich der 
-      von Ihnen bearbeiteten Codierung, Ihrer Anwendungseinstellungen und Ihrer aktuellen Anmeldeinformationen, falls 
+      von Ihnen bearbeiteten Kodierung, Ihrer Anwendungseinstellungen und Ihrer aktuellen Anmeldeinformationen, falls 
       vorhanden) auf unseren Servern gespeichert. Stattdessen werden sie im 
       <a href="https://developer.mozilla.org/de/docs/Web/API/Window/localStorage" target="_blank">lokalen Speicher 
         Ihres Browsers gespeichert</a>.
     </p>
     <p>
       Daten werden nur dann an GitHub übertragen, wenn Sie dies ausdrücklich anfordern (z. B. wenn Sie sich bei GitHub 
-      anmelden, Ihre Codierung aus einem GitHub-Repository laden oder an ein GitHub-Repository übertragen oder wenn 
+      anmelden, Ihre Kodierung aus einem GitHub-Repository laden oder an ein GitHub-Repository übertragen oder wenn 
       Sie eine GitHub-Action-Workflow für Sie ausführen lassen). Ebenso werden Daten nur dann an Ihren ausgewählten 
       Solid-Anbieter übertragen, wenn Sie dies ausdrücklich anfordern (z.B. wenn Sie sich bei Solid anmelden oder 
       Stand-off-Anmerkungen laden oder speichern).
@@ -357,7 +357,7 @@ export const lang = {
   // GitHub actions modal
   githubActionsHeadingText: { text: 'GitHub-Action-Workflow anfordern:' },
   githubActionsDescription: {
-    text: 'Klicken Sie auf "Workflow ausführen", um die GitHub-API aufzufordern, den oben genannten Workflow anhand der unten angegebenen Eingabekonfiguration für Sie auszuführen. Ihre Codierung wird nach Abschluss des Workflow-Laufs in ihrer neuesten Version neu geladen. ',
+    text: 'Klicken Sie auf "Workflow ausführen", um die GitHub-API aufzufordern, den oben genannten Workflow anhand der unten angegebenen Eingabekonfiguration für Sie auszuführen. Ihre Kodierung wird nach Abschluss des Workflow-Laufs in ihrer neuesten Version neu geladen. ',
   },
   githubActionStatusMsgPrompt: { text: 'Workflow konnte nicht ausgeführt werden - GitHub meldet' },
   githubActionStatusMsgWaiting: { text: 'Bitte haben Sie Geduld, während GitHub Ihren Workflow verarbeitet...' },
@@ -486,7 +486,7 @@ export const lang = {
     text: 'Speed mode',
     description:
       'Der Speed Mode ist aktiv, es werden nur die MIDI-Daten der aktuellen Seite abgespielt. ' +
-      'Um die gesamte Codierung abzuspielen, bitte Speed Mode deaktivieren.',
+      'Um die gesamte Kodierung abzuspielen, bitte Speed Mode deaktivieren.',
   },
   closeMidiPlaybackControlBarButton: { description: 'MIDI-Wiedergabe-Steuerleiste ausblenden' },
 
@@ -966,7 +966,7 @@ export const lang = {
   codeCheckerFixAll: { text: 'Alle korrigieren' },
   codeCheckerIgnore: { text: 'Ignorieren' },
   codeCheckerIgnoreAll: { text: 'Alle ignorieren' },
-  codeCheckerCheckingCode: { text: 'Überprüfe Codierung...' },
+  codeCheckerCheckingCode: { text: 'Überprüfe Kodierung...' },
   codeCheckerNoAccidMessagesFound: { text: 'Alle accid.ges-Attribute sind korrekt.' },
   codeCheckerMeasure: { text: 'Takt' },
   codeCheckerNote: { text: 'Note' },
