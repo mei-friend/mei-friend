@@ -1324,7 +1324,7 @@ function downloadSpeedMei() {
 } // downloadSpeedMei()
 
 function showSplashScreen() {
-  document.getElementById('splashOverlay').style.display = 'block';
+  document.getElementById('splashOverlay').style.display = 'flex';
   document.getElementById('splashAlwaysShow').checked = document.getElementById('showSplashScreen').checked;
 }
 

@@ -73,9 +73,12 @@
   --annotationPanelTextColor: var(--defaultAnnotationPanelTextColor);
 }
 
-body.lang_ja, #lang_ja_native { 
+body.lang_ja,
+#lang_ja_native {
   /* recommended font stack for Japanese, as per https://mhdigital.llc/web-typography-in-japanese/ */
-  font-family: 'ヒラギノ角ゴ ProN', 'Hiragino Kaku Gothic ProN', '游ゴシック', '游ゴシック体', YuGothic, 'Yu Gothic', 'メイリオ', Meiryo, 'ＭＳ ゴシック', 'MS Gothic', HiraKakuProN-W3, 'TakaoExゴシック', TakaoExGothic, 'MotoyaLCedar', 'Droid Sans Japanese', sans-serif;
+  font-family: 'ヒラギノ角ゴ ProN', 'Hiragino Kaku Gothic ProN', '游ゴシック', '游ゴシック体', YuGothic, 'Yu Gothic',
+    'メイリオ', Meiryo, 'ＭＳ ゴシック', 'MS Gothic', HiraKakuProN-W3, 'TakaoExゴシック', TakaoExGothic, 'MotoyaLCedar',
+    'Droid Sans Japanese', sans-serif;
 }
 body {
   font-family: Arial, Helvetica, sans-serif;
@@ -181,6 +184,8 @@ a:active {
 #githubActionsOverlay,
 #solidOverlay,
 #splashOverlay {
+  flex-direction: row;
+  justify-content: center;
   position: fixed;
   display: none;
   top: 0;
@@ -283,30 +288,31 @@ a:active {
   z-index: 190;
 }
 
-#splash { 
+#splash {
   padding: 1em 1em;
   max-width: 600px;
-  max-height:400px;
-  left: calc(50% - 300px);
+  min-width: 250px;
+  max-height: 400px;
+  left: unset;
 }
 
-#splashHeader { 
+#splashHeader {
   text-align: center;
-  margin-bottom:1em;
+  margin-bottom: 1em;
 }
 
-#splashHeader img { 
-  width:95%;
-  max-height:500px;
+#splashHeader img {
+  width: 95%;
+  max-height: 500px;
 }
 
-#splashBody { 
+#splashBody {
   padding: 0em 1em;
-  height:45%;
+  height: 45%;
   overflow-y: auto;
   color: black;
   background-color: var(--overlayTextColor);
-  border-radius:10px;
+  border-radius: 10px;
 }
 
 /** start loading animation for splash screen text (not used for now) */
@@ -339,20 +345,20 @@ a:active {
 */
 /** end loading animation for splash screen text **/
 
-#splashFooter { 
+#splashFooter {
   font-size: small;
 }
 
-#splashVersion { 
+#splashVersion {
   margin: 1em 1em;
 }
 
-#splashVersionNumber a { 
+#splashVersionNumber a {
   color: var(--overlayLinkColor);
 }
 
-#splashAlwaysShowCtrl { 
-  float:right;
+#splashAlwaysShowCtrl {
+  float: right;
 }
 
 .openUrlOverlay .openUrlUI > div,
