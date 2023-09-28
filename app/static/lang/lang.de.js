@@ -17,9 +17,8 @@ export const lang = {
     <p>
       mei-friend ist ein Online-Editor für <a href="https://music-encoding.org">Musik-Kodierungen</a>, gehostet an der
       <a href="https://mdw.ac.at" target="_blank">mdw &ndash; Universität für Musik und darstellende Kunst Wien</a>. 
-      Bitte konsultieren Sie unsere
-      <a href="https://mei-friend.github.io" target="_blank">umfangreiche Dokumentation</a> für weitere
-      Informationen.
+      Bitte besuchen Sie für weitere Informationen unsere
+      <a href="https://mei-friend.github.io" target="_blank">umfangreiche Dokumentationswebseite</a>.
     </p>
     <p>
       Obwohl mei-friend eine browserbasierte Anwendung ist, werden keine Ihrer persönlichen Daten (einschließlich der 
@@ -38,18 +37,18 @@ export const lang = {
     <p>
       Wir verwenden <a href="https://matomo.org/" target="_blank">Matomo</a> zur Erfassung anonymer Nutzungsstatistiken. 
       Dazu gehören Ihre gekürzte IP-Adresse (die Geolokalisierung auf Länderebene, aber keine weitere Identifizierung 
-      ermöglicht), Ihr Browser und Ihr Betriebssystem, von wo aus Sie gekommen sind (d.h. die verweisende Website), 
+      ermöglicht), Ihr Browser und Ihr Betriebssystem, die verweisende Website, 
       die Uhrzeit und Dauer Ihres Besuchs und die von Ihnen besuchten Seiten. Diese Informationen werden auf der 
       Matomo-Instanz gespeichert, die auf den Servern der mdw &ndash; Universität für Musik und darstellende Kunst 
       Wien läuft, und werden nicht an Dritte weitergegeben.
     </p>
     <p>
-      Schließlich wird die MIDI-Wiedergabe mit dem von Google Magenta bereitgestellten SGM_plus-Soundfont präsentiert 
-      und über googleapis.com bereitgestellt. Ihre IP-Adresse wird dabei automatisch an Google übertragen. Wenn Sie 
+      Schließlich wird die MIDI-Wiedergabe mit dem SGM_plus-Soundfont von Google Magenta abgespielt 
+      der über googleapis.com bereitgestellt wird. Ihre IP-Adresse wird dabei automatisch an Google übertragen. Wenn Sie 
       dies nicht möchten, verzichten Sie bitte auf die Verwendung der MIDI-Wiedergabefunktion.
     </p>
     <p>
-      Mei-Friend wurde entwickelt von
+      mei-friend wurde entwickelt von
       <a href="https://iwk.mdw.ac.at/werner-goebl" target="_blank">Werner Goebl</a> und
       <a href="https://iwk.mdw.ac.at/david-weigl" target="_blank">David M. Weigl</a> am Institut für musikalische Akustik &ndash; 
       Wiener Klangstil an der mdw &ndash; Universität für Musik und darstellende Kunst Wien und steht unter der
@@ -61,7 +60,7 @@ export const lang = {
       Wir danken all unseren Kolleg:innen für ihre Beiträge und Unterstützung.
     </p>
     <p>
-      Die Entwicklung der Mei-Friend-Webanwendung wird finanziert von der
+      Die Entwicklung der mei-friend-Webanwendung wird finanziert von der
       <a href="https://fwf.ac.at" target="_blank">Österreichischen Wissenschaftsfonds (FWF)</a> im Rahmen der Projekte
       <a href="https://iwk.mdw.ac.at/signature-sound-vienna/" target="_blank"
         >P 34664-G (Signature Sound Vienna)</a
