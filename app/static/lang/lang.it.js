@@ -6,6 +6,78 @@ import * as att from '../lib/attribute-classes.js';
 import { heart } from '../css/icons.js';
 
 export const lang = {
+  // Schermata iniziale
+  aboutMeiFriend: { text: 'Informazioni su mei-friend' },
+  showSplashScreen: {
+    text: "Mostra schermata iniziale all'avvio",
+    description: "Mostra la schermata iniziale di mei-friend quando l'applicazione viene caricata",
+  },
+  splashBody: {
+    html: `
+      <p>
+        mei-friend è un editor per le <a href="https://music-encoding.org">codifiche musicali</a>, ospitato presso
+        l'<a href="https://mdw.ac.at" target="_blank">Università di Musica e Arti dello Spettacolo di Vienna</a>. Si prega
+        di consultare la nostra <a href="https://mei-friend.github.io" target="_blank">documentazione completa</a> per ulteriori
+        informazioni.
+      </p>
+      <p>
+        Anche se mei-friend è un'applicazione basata su browser, i tuoi dati personali (compresa la codifica che stai
+        modificando, le impostazioni dell'applicazione e i dettagli di accesso attuali, se presenti) vengono archiviati nel
+        <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank"
+          >localStorage</a
+        > del tuo browser e non vengono trasmessi o memorizzati sui nostri server.
+      </p>
+      <p>
+        I dati vengono trasmessi a GitHub solo quando lo richiedi esplicitamente (ad esempio, quando effettui l'accesso a
+        GitHub, carichi la tua codifica da un repository GitHub o richiedi l'esecuzione di un flusso di lavoro GitHub Action
+        per te). Allo stesso modo, i dati vengono trasmessi al tuo provider Solid scelto solo quando lo richiedi esplicitamente
+        (ad esempio, quando effettui l'accesso a Solid o carichi o salvi annotazioni stand-off).
+      </p>
+      <p>
+        Utilizziamo <a href="https://matomo.org/" target="_blank">Matomo</a>
+        per raccogliere statistiche di utilizzo anonime. Queste includono il tuo indirizzo IP troncato (consentendo la
+        geolocalizzazione a livello di paese ma senza ulteriori identificazioni), il tuo browser e sistema operativo, da dove
+        provieni (cioè il sito Web di riferimento), l'ora e la durata della tua visita e le pagine che hai visitato. Queste
+        informazioni sono archiviate sull'istanza Matomo in esecuzione sui server dell'Università di Musica e Arti dello
+        Spettacolo di Vienna e non sono condivise con terze parti.
+      </p>
+      <p>
+        Infine, la riproduzione MIDI è presentata utilizzando il font sonoro SGM_plus fornito da Google Magenta e servito tramite
+        googleapis.com. Pertanto, il tuo indirizzo IP è visibile a Google durante l'avvio della riproduzione MIDI. Se non desideri
+        che ciò accada, ti preghiamo di astenerti dall'utilizzare la funzione di riproduzione MIDI.
+      </p>
+      <p>
+        mei-friend è sviluppato da
+        <a href="https://iwk.mdw.ac.at/werner-goebl" target="_blank">Werner Goebl</a> e
+        <a href="https://iwk.mdw.ac.at/david-weigl" target="_blank">David M. Weigl</a> presso il Dipartimento di Acustica
+        Musicale - Wiener Klangstil dell'Università di Musica e Arti dello Spettacolo di Vienna ed è distribuito con licenza
+        <a href="https://spdx.org/licenses/AGPL-3.0-or-later.html" target="_blank"
+          >GNU Affero General Public License v3.0</a
+        >. Si prega di consultare la nostra <a href="https://mei-friend.github.io/about/" target="_blank">pagina di
+        riconoscimenti</a> per ulteriori informazioni sui contributori e sui componenti open source riutilizzati nel nostro
+        progetto. Ringraziamo i nostri colleghi per il loro contributo e la loro guida.
+      </p>
+      <p>
+        Lo sviluppo dell'applicazione Web mei-friend è finanziato dal
+        <a href="https://fwf.ac.at" target="_blank">Fondo austriaco per la scienza (FWF)</a> nei progetti
+        <a href="https://iwk.mdw.ac.at/signature-sound-vienna/" target="_blank"
+          >P 34664-G (Signature Sound Vienna)</a
+        >
+        e <a href="https://e-laute.info">I 6019 (E-LAUTE)</a>.
+      </p>
+    `,
+  },
+  splashGotItButtonText: { text: 'Ho capito!' },
+  splashVersionText: { text: 'Versione' },
+  splashAlwaysShow: {
+    text: 'Mostra sempre questa schermata iniziale',
+    description: "Mostra sempre questa schermata iniziale al caricamento dell'applicazione",
+  },
+  splashAlwaysShowLabel: {
+    text: 'Mostra sempre questa schermata iniziale',
+    description: "Mostra sempre questa schermata iniziale al caricamento dell'applicazione",
+  },
+
   // Main menu bar
   githubLoginLink: { text: 'Accedi' },
 

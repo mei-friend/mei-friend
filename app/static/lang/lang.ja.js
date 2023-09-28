@@ -6,6 +6,69 @@ import * as att from '../lib/attribute-classes.js';
 import { heart } from '../css/icons.js';
 
 export const lang = {
+  // スプラッシュ画面
+  aboutMeiFriend: { text: 'mei-friendについて' },
+  showSplashScreen: {
+    text: 'アプリケーションの読み込み時にスプラッシュ画面を表示',
+    description: 'mei-friendの読み込み時にスプラッシュ画面を表示します',
+  },
+  splashBody: {
+    html: `
+      <p>
+        mei-friendは<a href="https://music-encoding.org">音楽エンコーディング</a>のエディタで、
+        <a href="https://mdw.ac.at" target="_blank">mdw - ウィーン音楽・演劇アート大学</a>でホストされています。
+        詳細な情報については<a href="https://mei-friend.github.io" target="_blank">詳細なドキュメンテーション</a>
+        をご覧ください。
+      </p>
+      <p>
+        mei-friendはブラウザベースのアプリケーションですが、個人データ（編集中のエンコード、アプリケーションの設定、および
+        ログイン詳細など）はブラウザの
+        <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank"
+          >ローカルストレージ</a
+        >に保存され、サーバーに送信または保存されません。
+      </p>
+      <p>
+        データはGitHubに明示的にリクエストした場合にのみ送信されます（たとえば、GitHubにログインし、GitHubのリポジトリからエンコードを読み込む、またはGitHub Actionのワークフローをリクエストする場合など）。同様に、選択したSolidプロバイダーに対しても、明示的にリクエストした場合にのみデータが送信されます（たとえば、Solidにログインし、スタンドオフの注釈を読み込むまたは保存する場合など）。
+      </p>
+      <p>
+        無記名の使用統計情報を収集するために<a href="https://matomo.org/" target="_blank">Matomo</a>
+        を使用しています。これには切り捨てられたIPアドレス（国のレベルでの地理的位置情報を許可しますが、それ以上の識別情報は含まれません）、ブラウザとオペレーティングシステム、リファリングウェブサイトからのアクセス先、訪問の時間と期間、および訪問したページが含まれます。この情報はmdw - ウィーン音楽・演劇アート大学のサーバーで実行されているMatomoインスタンスに保存され、第三者とは共有されません。
+      </p>
+      <p>
+        最後に、MIDI再生はGoogle Magentaが提供するSGM_plusサウンドフォントを使用し、googleapis.comを介して提供されます。そのため、MIDI再生を開始する際にGoogleに対してIPアドレスが表示されます。これを望まない場合は、MIDI再生機能の使用を避けてください。
+      </p>
+      <p>
+        mei-friendは、mdw - ウィーン音楽・演劇アート大学の音楽音響学部 - ヴィーナークランクシュティールで
+        <a href="https://iwk.mdw.ac.at/werner-goebl" target="_blank">Werner Goebl</a>および
+        <a href="https://iwk.mdw.ac.at/david-weigl" target="_blank">David M. Weigl</a>によって開発され、
+        <a href="https://spdx.org/licenses/AGPL-3.0-or-later.html" target="_blank"
+          >GNU Affero General Public License v3.0</a
+        >の下でライセンスされています。詳細な情報については、
+        <a href="https://mei-friend.github.io/about/" target="_blank">謝辞ページ</a>をご覧ください。
+        このプロジェクトで再利用されるオープンソースコンポーネントについての情報も提供しており、貢献者とガイダンスに感謝しています。
+      </p>
+      <p>
+        mei-friend Webアプリケーションの開発は、
+        <a href="https://fwf.ac.at" target="_blank">オーストリア科学振興基金（FWF）</a>のプロジェクト
+        <a href="https://iwk.mdw.ac.at/signature-sound-vienna/" target="_blank"
+          >P 34664-G（Signature Sound Vienna）</a
+        >
+        および<a href="https://e-laute.info">I 6019（E-LAUTE）</a>
+        によって資金提供されています。
+      </p>
+    `,
+  },
+  splashGotItButtonText: { text: '了解しました！' },
+  splashVersionText: { text: 'バージョン' },
+  splashAlwaysShow: {
+    text: '常にこのスプラッシュ画面を表示',
+    description: 'アプリケーションの読み込み時に常にこのスプラッシュ画面を表示',
+  },
+  splashAlwaysShowLabel: {
+    text: '常にこのスプラッシュ画面を表示',
+    description: 'アプリケーションの読み込み時に常にこのスプラッシュ画面を表示',
+  },
+
   // Main menu bar
   githubLoginLink: { text: 'ログイン' },
 

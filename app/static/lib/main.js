@@ -424,7 +424,7 @@ document.addEventListener('DOMContentLoaded', function () {
       onLanguageLoaded();
     });
   } else {
-    // ...or go on with default language
+    translator.translateGui();
     onLanguageLoaded();
   }
 });
@@ -628,6 +628,11 @@ function onLanguageLoaded() {
   ) {
     openUrlFetch(new URL(storage.fileLocation));
     urlFetchInProgress = true;
+  }
+
+  // show splash screen if required
+  if ((storage.supported && !storage.splashAcknowledged) || document.getElementById('showSplashScreen').checked) {
+    showSplashScreen();
   }
 
   // fill sample encodings
@@ -1337,6 +1342,11 @@ function downloadSpeedMei() {
   }, 0);
 } // downloadSpeedMei()
 
+function showSplashScreen() {
+  document.getElementById('splashOverlay').style.display = 'flex';
+  document.getElementById('splashAlwaysShow').checked = document.getElementById('showSplashScreen').checked;
+}
+
 function togglePdfMode() {
   console.log('Toggle PDF mode');
   v.pdfMode ? v.saveAsPdf() : v.pageModeOn();
@@ -1671,6 +1681,10 @@ export let cmd = {
   openHelp: () => window.open(`https://mei-friend.github.io/`, '_blank'),
   consultGuidelines: () => consultGuidelines(),
   escapeKeyPressed: () => {
+    // hide overlays
+    // TODO refactor logic for all overlays below. For now only splash overlay...
+    document.getElementById('splashOverlay').style.display = 'none';
+
     // reset settings filter, if settings have focus
     if (
       document.getElementById('settingsPanel') &&
@@ -2034,6 +2048,12 @@ function addEventListeners(v, cm) {
   document.getElementById('toggleStacciss').addEventListener('click', cmd.toggleStacciss);
   document.getElementById('toggleSpicc').addEventListener('click', cmd.toggleSpicc);
 
+  // show splash screen
+  document.getElementById('aboutMeiFriend').addEventListener('click', showSplashScreen);
+  document.getElementById('splashOverlay').addEventListener('click', (e) => {
+    if (e.target.id === 'splashOverlay') document.getElementById('splashOverlay').style.display = 'none'; // dismiss splash when user clicks on black background
+  });
+
   // consult guidelines
   document.getElementById('consultGuidelinesForElement').addEventListener('click', cmd.consultGuidelines);
 
@@ -2215,12 +2235,15 @@ export function drawRightFooter() {
     }
   }
   let rf = document.querySelector('.rightfoot');
-  rf.innerHTML =
+  const versionHtml =
     "<a href='https://github.com/mei-friend/mei-friend' target='_blank'>mei-friend " +
     (env === environments.production ? version : `${env}-${version}`) +
     '</a> (' +
     translatedVersioDate +
     ').&nbsp;';
+  rf.innerHTML = versionHtml;
+  // also update version string in splash screen
+  document.getElementById('splashVersionNumber').innerHTML = versionHtml;
   if (tkVersion) {
     let githubUrl = 'https://github.com/rism-digital/verovio/releases/tag/version-' + tkVersion.split('-')[0];
     if (tkVersion.includes('dev')) {

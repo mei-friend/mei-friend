@@ -686,10 +686,14 @@ export default class Viewer {
     } else if (env === environments.testing) {
       owlSrc += 'testing-';
     }
+    let splashOwl = document.getElementById('splashLogo');
+    let splashOwlSrc = splashOwl.getAttribute('src'); // splash logo does not adjust with environment
+    splashOwlSrc = splashOwlSrc.substring(0, splashOwlSrc.lastIndexOf('/') + 1);
     if (j < 128) {
       // dark
       // wake up owl
       owlSrc += 'menu-logo' + (isSafari ? '.png' : '.svg');
+      splashOwlSrc += 'menu-logo' + (isSafari ? '.png' : '.svg');
       els.forEach((el) => el.style.setProperty('filter', 'invert(.8)'));
       rt.style.setProperty('--settingsLinkBackgroundColor', utils.brighter(cm.backgroundColor, 21));
       rt.style.setProperty('--settingsLinkHoverColor', utils.brighter(cm.backgroundColor, 36));
@@ -732,6 +736,7 @@ export default class Viewer {
       // bright mode
       // sleepy owl
       owlSrc += 'menu-logo-asleep' + (isSafari ? '.png' : '.svg');
+      splashOwlSrc += 'menu-logo-asleep' + (isSafari ? '.png' : '.svg');
       els.forEach((el) => el.style.removeProperty('filter'));
       rt.style.setProperty('--settingsLinkBackgroundColor', utils.brighter(cm.backgroundColor, -16));
       rt.style.setProperty('--settingsLinkHoverColor', utils.brighter(cm.backgroundColor, -24));
@@ -774,6 +779,7 @@ export default class Viewer {
       );
     }
     owl.setAttribute('src', owlSrc);
+    splashOwl.setAttribute('src', splashOwlSrc);
   } // setMenuColors()
 
   // Control zoom of notation display and update Verovio layout
