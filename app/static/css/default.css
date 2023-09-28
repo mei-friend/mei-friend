@@ -309,6 +309,34 @@ a:active {
   border-radius:10px;
 }
 
+/** start loading animation for splash screen text */
+#splashBodyLoading { 
+  position:relative;
+  left: calc(50% - 1em);
+  top: 50%;
+}
+
+#splashBodyLoading:after {
+    content: '\00a0\00a0\00a0';
+    animation: progress-ellipsis 0.8s infinite;
+}
+
+@keyframes progress-ellipsis {
+    0% {
+        content: '\00a0\00a0\00a0';
+    }
+    25% {
+        content: '.\00a0\00a0';
+    }
+    50% {
+        content: '..\00a0';
+    }
+    75% {
+        content: '...';
+    }
+}
+/** end loading animation for splash screen text **/
+
 #splashFooter { 
   font-size: small;
 }
