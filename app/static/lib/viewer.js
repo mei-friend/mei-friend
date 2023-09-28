@@ -675,6 +675,7 @@ export default class Viewer {
     }
     let splashOwl = document.getElementById('splashLogo');
     let splashOwlSrc = splashOwl.getAttribute('src'); // splash logo does not adjust with environment
+    splashOwlSrc = splashOwlSrc.substring(0, splashOwlSrc.lastIndexOf('/') + 1);
     if (j < 128) {
       // dark
       // wake up owl
@@ -765,6 +766,7 @@ export default class Viewer {
       );
     }
     owl.setAttribute('src', owlSrc);
+    splashOwl.setAttribute('src', splashOwlSrc);
   } // setMenuColors()
 
   // Control zoom of notation display and update Verovio layout
