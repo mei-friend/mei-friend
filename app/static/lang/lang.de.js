@@ -6,6 +6,80 @@ import * as att from '../lib/attribute-classes.js';
 import { heart } from '../css/icons.js';
 
 export const lang = {
+  // Splash screen
+  aboutMeiFriend: { text: 'Über mei-friend' },
+  showSplashScreen: {
+    text: 'Splash-Screen beim Laden anzeigen',
+    description: 'Beim laden von mei-friend den Splash-Screen anzeigen',
+  },
+  splashBody: {
+    html: `
+    <p>
+      mei-friend ist ein Online-Editor für <a href="https://music-encoding.org">Musik-Kodierungen</a>, gehostet an der
+      <a href="https://mdw.ac.at" target="_blank">mdw &ndash; Universität für Musik und darstellende Kunst Wien</a>. 
+      Bitte besuchen Sie für weitere Informationen unsere
+      <a href="https://mei-friend.github.io" target="_blank">umfangreiche Dokumentationswebseite</a>.
+    </p>
+    <p>
+      Obwohl mei-friend eine browserbasierte Anwendung ist, werden Ihre Daten einschließlich der 
+      von Ihnen bearbeiteten Kodierungen, Ihrer Anwendungseinstellungen und Ihrer aktuellen Anmeldeinformationen bei 
+      GitHub oder Solid, falls vorhanden, im 
+      <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank">lokalen Speicher 
+        Ihres Browsers gespeichert</a>, niemals jedoch auf unseren Servern.
+    </p>
+    <p>
+      Daten werden nur dann an GitHub übertragen, wenn Sie dies ausdrücklich anfordern (z.B. wenn Sie sich bei GitHub 
+      anmelden, Ihre Kodierung aus einem GitHub-Repository laden oder an ein GitHub-Repository übertragen oder wenn 
+      Sie eine GitHub-Action-Workflow für sich ausführen lassen). Ebenso werden Daten nur dann an Ihren ausgewählten 
+      Solid-Anbieter übertragen, wenn Sie dies ausdrücklich anfordern (z.B. wenn Sie sich bei Solid anmelden oder 
+      Stand-off-Annotationen laden oder speichern).
+    </p>
+    <p>
+      Wir verwenden <a href="https://matomo.org/" target="_blank">Matomo</a> zur Erfassung anonymer Nutzungsstatistiken. 
+      Dazu gehören Ihre gekürzte IP-Adresse, die Geolokalisierung auf Länderebene, aber keine weitere Identifizierung 
+      ermöglicht, Ihr Browser und Ihr Betriebssystem, die verweisende Website, 
+      die Uhrzeit und Dauer Ihres Besuchs und die von Ihnen besuchten Seiten. Diese Informationen werden auf der 
+      Matomo-Instanz gespeichert, die auf den Servern der mdw &ndash; Universität für Musik und darstellende Kunst 
+      Wien läuft, und werden nicht an Dritte weitergegeben.
+    </p>
+    <p>
+      Schließlich wird die MIDI-Wiedergabe mit dem SGM_plus-Soundfont von Google Magenta abgespielt 
+      der über googleapis.com bereitgestellt wird. Ihre IP-Adresse wird beim Aktivieren der MIDI-Wiedergabefunktion 
+      daher für Google sichtbar. Wenn Sie dies nicht wünschen, verzichten Sie bitte auf die Verwendung der 
+      MIDI-Wiedergabefunktion.
+    </p>
+    <p>
+      mei-friend wurde entwickelt von
+      <a href="https://iwk.mdw.ac.at/werner-goebl" target="_blank">Werner Goebl</a> und
+      <a href="https://iwk.mdw.ac.at/david-weigl" target="_blank">David M. Weigl</a> am Institut für musikalische Akustik &ndash; 
+      Wiener Klangstil an der mdw &ndash; Universität für Musik und darstellende Kunst Wien und steht unter der
+      <a href="https://spdx.org/licenses/AGPL-3.0-or-later.html" target="_blank"
+        >GNU Affero General Public License v3.0</a
+      >. Bitte konsultieren Sie unsere
+      <a href="https://mei-friend.github.io/about/" target="_blank">Seite mit Danksagungen</a> für weitere
+      Informationen zu Mitwirkenden und den im Rahmen unseres Projekts wiederverwendeten Open-Source-Komponenten. 
+      Wir danken all unseren Kolleg:innen für ihre Beiträge und Unterstützung.
+    </p>
+    <p>
+      Die Entwicklung der mei-friend-Webanwendung wird finanziert von der
+      <a href="https://fwf.ac.at" target="_blank">Österreichischen Wissenschaftsfonds (FWF)</a> im Rahmen der Projekte
+      <a href="https://iwk.mdw.ac.at/signature-sound-vienna/" target="_blank"
+        >P 34664-G (Signature Sound Vienna)</a
+      >
+      und <a href="https://e-laute.info">I 6019 (E-LAUTE)</a>.
+    </p>`,
+  },
+  splashGotItButtonText: { text: 'Verstanden!' },
+  splashVersionText: { text: 'Version' },
+  splashAlwaysShow: {
+    text: 'Diese Meldung immer anzeigen',
+    description: 'Beim Öffnen von mei-friend diese Meldung anzeigen',
+  },
+  splashAlwaysShowLabel: {
+    text: 'Diese Meldung immer anzeigen',
+    description: 'Beim Öffnen von mei-friend diese Meldung anzeigen',
+  },
+
   // Main menu bar
   githubLoginLink: { text: 'Anmelden' },
 
@@ -283,7 +357,7 @@ export const lang = {
   // GitHub actions modal
   githubActionsHeadingText: { text: 'GitHub-Action-Workflow anfordern:' },
   githubActionsDescription: {
-    text: 'Klicken Sie auf "Workflow ausführen", um die GitHub-API aufzufordern, den oben genannten Workflow anhand der unten angegebenen Eingabekonfiguration für Sie auszuführen. Ihre Codierung wird nach Abschluss des Workflow-Laufs in ihrer neuesten Version neu geladen. ',
+    text: 'Klicken Sie auf "Workflow ausführen", um die GitHub-API aufzufordern, den oben genannten Workflow anhand der unten angegebenen Eingabekonfiguration für Sie auszuführen. Ihre Kodierung wird nach Abschluss des Workflow-Laufs in ihrer neuesten Version neu geladen. ',
   },
   githubActionStatusMsgPrompt: { text: 'Workflow konnte nicht ausgeführt werden - GitHub meldet' },
   githubActionStatusMsgWaiting: { text: 'Bitte haben Sie Geduld, während GitHub Ihren Workflow verarbeitet...' },
@@ -412,7 +486,7 @@ export const lang = {
     text: 'Speed mode',
     description:
       'Der Speed Mode ist aktiv, es werden nur die MIDI-Daten der aktuellen Seite abgespielt. ' +
-      'Um die gesamte Codierung abzuspielen, bitte Speed Mode deaktivieren.',
+      'Um die gesamte Kodierung abzuspielen, bitte Speed Mode deaktivieren.',
   },
   closeMidiPlaybackControlBarButton: { description: 'MIDI-Wiedergabe-Steuerleiste ausblenden' },
 
@@ -892,7 +966,7 @@ export const lang = {
   codeCheckerFixAll: { text: 'Alle korrigieren' },
   codeCheckerIgnore: { text: 'Ignorieren' },
   codeCheckerIgnoreAll: { text: 'Alle ignorieren' },
-  codeCheckerCheckingCode: { text: 'Überprüfe Codierung...' },
+  codeCheckerCheckingCode: { text: 'Überprüfe Kodierung...' },
   codeCheckerNoAccidMessagesFound: { text: 'Alle accid.ges-Attribute sind korrekt.' },
   codeCheckerMeasure: { text: 'Takt' },
   codeCheckerNote: { text: 'Note' },

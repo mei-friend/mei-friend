@@ -54,6 +54,7 @@ export default class Storage {
       this._forkAndOpen = this.storage.getItem('forkAndOpen');
       this._githubLogoutRequested = this.storage.getItem('githubLogoutRequested');
       this._restoreSolidSession = this.storage.getItem('restoreSolidSession');
+      this._splashAcknowledged = this.storage.getItem('splashAcknowledged');
       //fileChangedFromStorage = fileChangedFromStorage ? parseInt(storage.getItem("fileChanged")) : 0;
     }
   }
@@ -319,5 +320,13 @@ export default class Storage {
   set restoreSolidSession(restoreSolidSession) {
     this.safelySetStorageItem('restoreSolidSession', restoreSolidSession);
     this._restoreSolidSession = restoreSolidSession;
+  }
+
+  get splashAcknowledged() { 
+    return this._splashAcknowledged
+  }
+
+  set splashAcknowledged(x) { 
+    console.warn("splashAcknowledged is set automatically. Do not set it directly.");
   }
 }
