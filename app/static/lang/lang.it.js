@@ -315,7 +315,7 @@ export const lang = {
   forkRepositoryInstructions: {
     text:
       'Scegli dal repertorio pubblico o inserisci il nome Github (utente o organizzazione) e il nome del repository di un repository ospitato su Github, qui sotto. ' +
-      'La tua repository forked sarà disponibile dal menu di Github.',
+      'La tua forked repository sarà disponibile dal menu di Github.',
   },
   forkRepositoryGithubText: { text: 'Fork Repository Github' },
   forkRepertoireSummary: { text: 'Repertorio pubblico' },
@@ -323,7 +323,7 @@ export const lang = {
   forkRepertoireOrganizationLabel: { text: 'Organizzazione:' },
   forkRepertoireOrganizationOption: { text: "Scegli un'organizzazione GitHub..." },
   forkRepertoireRepositoryLabel: { text: 'Repository:' },
-  forkRepertoireRepositoryOption: { text: 'Scegli una codice...' },
+  forkRepertoireRepositoryOption: { text: 'Scegli un codice...' },
   forkRepositoryInputName: { placeholder: 'Nome utente o organizzazione Github' },
   forkRepositoryInputRepoOption: { text: 'Scegli un repository' },
   forkRepositoryToSelectorText: { text: 'Fork a: ' },
@@ -338,14 +338,14 @@ export const lang = {
   },
 
   // CodeMirror editor
-  selectTagNameForEnclosure: { text: "Acchiudere con il nome dell'elemento" },
+  selectTagNameForEnclosure: { text: "Racchiudere con il nome dell'elemento" },
   selectTagNameForEnclosureOkButton: { value: 'OK' },
   selectTagNameForEnclosureCancelButton: { value: 'Annulla' },
 
   // restore Solid session overlay
   solidExplanation: {
     description:
-      'Solid è una piattaforma decentralizzata per dati collegati sociali. Accedi a Solid per creare annotazioni stand-off utilizzando dati collegati (RDF).',
+      'Solid è una piattaforma decentralizzata per memorizzare i dati personali degli utenti. Accedi a Solid per creare annotazioni stand-off utilizzando dati collegati (RDF).',
   },
   solidProvider: { description: 'Per favore, scegli un provider di identità Solid (IdP) o specifica il tuo.' },
   solidLoginBtn: { text: 'Accedi' },
@@ -389,14 +389,14 @@ export const lang = {
     descriptionToLocal: "Apri l'annotazione stand-off (RDF) in una nuova scheda",
   },
   makeInlineAnnotation: {
-    description: 'Clicca per annotazione in-linea',
+    description: 'Clicca per annotazione in-line',
     descriptionCopy: "Copia l'xml:id di <annot> negli appunti",
   },
   pageAbbreviation: { text: 'p.' },
   elementsPlural: { text: 'elementi' },
   askForLinkUrl: { text: "Inserisci l'URL a cui collegare" },
   drawLinkUrl: { text: 'Apri in una nuova scheda' },
-  askForDescription: { text: 'Inserisci una descrizione testuale da applicare' },
+  askForDescription: { text: 'Inserisci una descrizione' },
   maxNumberOfAnnotationAlert: {
     text1: 'Il numero di elementi <annot> supera il valore massimo configurabile di "Numero massimo di annotazioni"',
     text2:
@@ -477,8 +477,8 @@ export const lang = {
 
   // Drag select / Selezione tramite trascinamento
   dragSelection: {
-    text: 'Selezione tramite trascinamento',
-    description: 'Seleziona gli elementi nello spartito con il trascinamento del mouse',
+    text: 'Seleziona tramite trascinamento',
+    description: 'Seleziona gli elementi nello spartito trascinandole col mouse',
   },
   dragSelectNotes: {
     text: 'Seleziona le note',
