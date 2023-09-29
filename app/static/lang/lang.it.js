@@ -64,8 +64,8 @@ export const lang = {
   notationLeft: { text: 'Notazione a sinistra' },
   notationRight: { text: 'Notazione a destra' },
   showSettingsMenuText: { text: 'Pannello di impostazioni' },
-  showAnnotationMenuText: { text: 'Pannello di annotazioni' },
-  showFacsimileMenuText: { text: 'Pannello di facsimili' },
+  showAnnotationMenuText: { text: 'Finestra di annotazioni' },
+  showFacsimileMenuText: { text: 'Finestra di facsimili' },
   showPlaybackControlsText: { text: 'Controlli di riproduzione' },
   facsimileTop: { text: 'Facsimile in alto' },
   facsimileBottom: { text: 'Facsimile in basso' },
@@ -155,8 +155,8 @@ export const lang = {
 
   // panel icons/ icone pannello
   showMidiPlaybackControlBarButton: { description: 'Attiva/Disattiva barra di controllo della riproduzione MIDI' },
-  showFacsimileButton: { description: 'Attiva/Disattiva pannello Facsimile' },
-  showAnnotationsButton: { description: 'Attiva/Disattiva pannello Annotazioni' },
+  showFacsimileButton: { description: 'Attiva/Disattiva la finestra di Facsimile' },
+  showAnnotationsButton: { description: 'Attiva/Disattiva la finestra Annotazioni' },
   showSettingsButton: { description: 'Mostra il pannello delle impostazioni' },
 
   // Footer texts/ Testi di piè di pagina
@@ -223,7 +223,7 @@ export const lang = {
 
   // PDF/print preview panel / Pannello di anteprima PDF/stampa
   pdfSaveButton: { text: 'Salva PDF', description: 'Salva come PDF' },
-  pdfCloseButton: { description: 'Chiudi vista di stampa' },
+  pdfCloseButton: { description: 'Chiudi anteprima di stampa' },
   pagesLegendLabel: { text: 'Intervallo di pagine', singlePage: 'pagina', multiplePages: 'Pagine' },
   selectAllPagesLabel: { text: 'Tutte' },
   selectCurrentPageLabel: { text: 'Pagina corrente' },
@@ -232,23 +232,23 @@ export const lang = {
   selectPageRangeLabel: { text: 'Intervallo di pagine:' },
   pdfPreviewSpeedModeWarning: {
     text:
-      'Solamente la pagina corrente viene renderizzata in PDF, perché è attivata la modalità veloce. ' +
+      'In modalità veloce solamente la pagina corrente viene renderizzata in PDF.' +
       'Deseleziona la modalità veloce per selezionare tutte le pagine.',
   },
   pdfPreviewNormalModeTitle: { text: "Seleziona l'intervallo di pagine da salvare in PDF." },
 
-  // facsimile panel/ pannello facsimile
-  facsimileIcon: { description: 'Pannello facsimile' },
-  facsimileDecreaseZoomButton: { description: "Riduci il pannello dello spartito" },
-  facsimileZoom: { description: "Regola la dimensione del pannello dello spartito" },
-  facsimileIncreaseZoomButton: { description: "Ingrandisci il pannello dello spartito" },
+  // facsimile panel/ finestra facsimile
+  facsimileIcon: { description: 'Finestra facsimile' },
+  facsimileDecreaseZoomButton: { description: "Riduci la finestra dello spartito" },
+  facsimileZoom: { description: "Regola la dimensione la finestra dello spartito" },
+  facsimileIncreaseZoomButton: { description: "Ingrandisci la finestra dello spartito" },
   facsimileFullPageLabel: {
     text: 'Pagina intera',
-    description: "Mostra il pannello del facsimile a pagina intera",
+    description: "Mostra la finestra del facsimile a pagina intera",
   },
-  facsimileFullPageCheckbox: { description: "Mostra il pannello del facsimile a pagina intera" },
+  facsimileFullPageCheckbox: { description: "Mostra la finestra del facsimile a pagina intera" },
   facsimileShowZonesLabel: {
-    text: 'Mostra riquadri delle zone',
+    text: 'Mostra i riquadri delle zone',
     description: 'Mostra i riquadri delle zone del facsimile',
   },
   facsimileShowZonesCheckbox: { description: 'Mostra i riquadri delle zone del facsimile' },
@@ -257,7 +257,7 @@ export const lang = {
     text: 'Modifica le zone',
     description: 'Modifica le zone del facsimile',
   },
-  facsimileCloseButton: { description: 'Chiudi il pannello facsimile' },
+  facsimileCloseButton: { description: 'Chiudi la finestra di facsimile' },
   facsimileDefaultWarning: { text: 'Nessun contenuto facsimile da visualizzare.' },
   facsimileNoSurfaceWarning: {
     text: 'Nessun elemento superficiale trovato in questa pagina.\n(Potrebbe mancare un elemento pb iniziale.)',
@@ -360,9 +360,9 @@ export const lang = {
   },
 
   // annotation panel / annotation panel
-  annotationCloseButtonText: { text: 'Chiudi pannello di annotazione' },
-  hideAnnotationPanelButton: { description: 'Chiudi pannello di annotazione' },
-  closeAnnotationPanelButton: { description: 'Chiudi pannello di annotazione' },
+  annotationCloseButtonText: { text: 'Chiudi la finestra di annotazione' },
+  hideAnnotationPanelButton: { description: 'Nascondi la finestra di annotazione' },
+  closeAnnotationPanelButton: { description: 'Chiudi la finestra di annotazione' },
   annotationToolsButton: { text: 'Strumenti', description: 'Strumenti di annotazione' },
   annotationListButton: { text: 'Lista', description: 'Elenco delle annotazioni' },
   writeAnnotStandoffText: { text: 'Annotazione Web' },
@@ -549,7 +549,7 @@ export const lang = {
   },
   scrollFollowMidiPlayback: {
     text: 'Scorrimento automatico',
-    description: 'Scorri il pannello dello spartito durante la riproduzione MIDI sulla pagina corrente',
+    description: 'Scorri la finestra dello spartito durante la riproduzione MIDI sulla pagina corrente',
   },
   pageFollowMidiPlayback: {
     text: 'Cambio pagina automatico',
@@ -558,7 +558,7 @@ export const lang = {
   highlightCurrentlySoundingNotes: {
     text: 'Evidenzia note attualmente suonate',
     description:
-      'Evidenzia visivamente le note attualmente suonate nel pannello di notazione durante la riproduzione MIDI',
+      'Evidenzia visivamente le note attualmente suonate nella finestra di notazione durante la riproduzione MIDI',
   },
 
   selectMidiExpansion: {
@@ -674,8 +674,8 @@ export const lang = {
     description: 'Mostra le annotazioni nello spartito',
   },
   showAnnotationPanel: {
-    text: 'Mostra pannello annotazioni',
-    description: 'Mostra il pannello delle annotazioni',
+    text: 'Mostra la finestra annotazioni',
+    description: 'Mostra la finestra delle annotazioni',
   },
   annotationDisplayLimit: {
     text: 'Numero massimo di annotazioni',
@@ -684,16 +684,16 @@ export const lang = {
 
   // Facsimile / Facsimile
   titleFacsimilePanel: {
-    text: 'Pannello di facsimile',
+    text: 'Finestra di facsimile',
     description: "Mostra le immagini di facsimile dell'edizione originale, se disponibili",
   },
   showFacsimilePanel: {
-    text: 'Mostra il pannello di facsimile',
+    text: 'Mostra la finestra di facsimile',
     description: "Mostra le immagini dello spartito dell'edizione originale fornite nell'elemento di facsimile",
   },
   selectFacsimilePanelOrientation: {
-    text: 'Posizione del pannello di facsimile',
-    description: 'Seleziona la posizione del pannello di facsimile rispetto allo spartito',
+    text: 'Posizione della finestra di facsimile',
+    description: 'Seleziona la posizione della finestra di facsimile rispetto allo spartito',
     labels: ['sinistra', 'destra', 'alto', 'basso'],
   },
   facsimileZoomInput: {
@@ -761,7 +761,7 @@ export const lang = {
   },
   lineWrapping: {
     text: 'Rientro righe',
-    description: 'Indica se le righe vengono spezzate a fine pannello',
+    description: 'Indica se le righe vengono spezzate alla fine della finestra',
   },
   lineNumbers: {
     text: 'Numeri di riga',
