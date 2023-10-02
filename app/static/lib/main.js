@@ -1531,6 +1531,7 @@ export let cmd = {
   downloadMei: () => downloadMei(),
   downloadMeiBasic: () => downloadMeiBasic(),
   downloadSpeedMei: () => downloadSpeedMei(),
+  indentSelection: () => e.indentSelection(v, cm),
   validate: () => v.manualValidate(),
   notesZoomIn: () => v.zoom(+1, storage),
   notesZoomOut: () => v.zoom(-1, storage),
