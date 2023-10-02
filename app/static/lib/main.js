@@ -1,6 +1,6 @@
 // mei-friend version and date
 export const version = '1.0.2';
-export const versionDate = '28 September 2023'; // use full or 3-character english months, will be translated
+export const versionDate = '2 October 2023'; // use full or 3-character english months, will be translated
 
 var vrvWorker;
 var spdWorker;
@@ -142,23 +142,6 @@ const defaultCodeMirrorOptions = {
     "' '": completeIfInTag,
     "'='": completeIfInTag,
     'Ctrl-Space': 'autocomplete',
-    // 'Alt-.': consultGuidelines,
-    "'Ï'": indentSelection, // TODO: overcome strange bindings on MAC Shift-Alt-F
-    'Shift-Alt-f': indentSelection,
-    'Shift-Ctrl-G': toMatchingTag,
-    'Cmd-E': encloseSelectionWithTag, // TODO: make OS modifier keys dynamic
-    'Ctrl-E': encloseSelectionWithTag,
-    'Cmd-/': encloseSelectionWithLastTag,
-    'Ctrl-/': encloseSelectionWithLastTag,
-    // 'Cmd-,': cmd.toggleSettingsPanel,
-    // 'Cmd-L': generateUrl,
-    // 'Ctrl-L': generateUrl,
-    // 'Cmd-O': openFileDialog,
-    // 'Ctrl-O': openFileDialog,
-    // 'Cmd-P': togglePdfMode,
-    // 'Ctrl-P': togglePdfMode,
-    // 'Cmd-S': downloadMei,
-    // 'Ctrl-S': downloadMei,
   },
   lint: {
     caller: cm,
@@ -174,24 +157,6 @@ const defaultCodeMirrorOptions = {
   defaultBrightTheme: 'default', // default theme for OS bright mode, m-f option
   defaultDarkTheme: 'paraiso-dark', // 'base16-dark', // default theme for OS dark mode, m-f option
 }; // defaultCodeMirrorOptions
-
-let keyboardShortcutsForEditor = [
-  'addIds',
-  'removeIds',
-  'validate',
-  'open',
-  'downloadMei',
-  'downloadMeiBasic',
-  'downloadSpeedMei',
-  'generateUrl',
-  'correctAccid',
-  'renumberMeasures',
-  'toggleSettingsPanel',
-  'toggleAnnotationPanel',
-  'indentSelection',
-  'togglePdfMode',
-  'openHelp',
-];
 
 // add all possible facsimile elements
 att.attFacsimile.forEach((e) => defaultVerovioOptions.svgAdditionalAttribute.push(e + '@facs'));
@@ -1416,17 +1381,7 @@ function consultGuidelines() {
       }
     }
   }
-}
-
-// wrapper for indentSelection to be called inside CodeMirror
-function indentSelection() {
-  e.indentSelection(v, cm);
-} // indentSelection()
-
-// wrapper for toMatchingTag
-function toMatchingTag() {
-  e.toMatchingTag(v, cm);
-}
+} // consultGuidelines()
 
 let tagEncloserNode; // context menu to choose node name to enclose selected text
 
@@ -1669,6 +1624,10 @@ export let cmd = {
   removeIds: () => e.manipulateXmlIds(v, cm, true),
   ingestFacsimile: () => ingestFacsimile(),
   addFacsimile: () => e.addFacsimile(v, cm),
+  encloseSelectionWithTag: encloseSelectionWithTag,
+  encloseSelectionWithLastTag: encloseSelectionWithLastTag,
+  toMatchingTag: () => e.toMatchingTag(v, cm),
+  indentSelection: () => e.indentSelection(v, cm),
   resetDefault: () => {
     // we're in a clickhandler, so our storage object is out of scope
     // but we only need to clear it, so just grab the window's storage
@@ -2341,22 +2300,20 @@ function fillInSampleEncodings() {
 }
 
 /**
- * Sets keymap JSON information to target element and defines listeners
- * It loads all bindings in `#notation` to notation, and the platform-specific
+ * Sets keymap JSON information to target element and defines listeners.
+ * It loads all bindings in `#notation` to document.body, and the platform-specific
  * to both notation and editor panels (i.e. friendContainer).
  * @param {string} keyMapFilePath
  */
 function setKeyMap(keyMapFilePath) {
-  // let keyMapParent = document.getElementById('notation');
-  let keyMapParent = document.getElementById('friendContainer');
   if (platform.startsWith('mac')) {
-    keyMapParent.classList.add('platform-darwin');
+    document.body.classList.add('platform-darwin');
   }
   if (platform.startsWith('win')) {
-    keyMapParent.classList.add('platform-win32');
+    document.body.classList.add('platform-win32');
   }
   if (platform.startsWith('linux')) {
-    keyMapParent.classList.add('platform-linux');
+    document.body.classList.add('platform-linux');
   }
   fetch(keyMapFilePath)
     .then((resp) => {
@@ -2366,7 +2323,6 @@ function setKeyMap(keyMapFilePath) {
       // iterate all keys (element) in keymap.json
       for (const [key, value] of Object.entries(keyMap)) {
         document.querySelectorAll(key).forEach((el) => {
-
           el.setAttribute('tabindex', '-1');
           el.addEventListener('keydown', (ev) => {
             if (['pagination2', 'selectTo', 'selectFrom', 'selectRange'].includes(document.activeElement.id)) {
@@ -2410,7 +2366,7 @@ export function isCtrlOrCmd(ev) {
 
 /**
  * Convert binary data to blob containing MIDI data an array of int8 byte numbers
- * @param {BinaryData} data 
+ * @param {BinaryData} data
  * @returns {Blob}
  */
 function midiDataToBlob(data) {
