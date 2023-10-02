@@ -68,6 +68,8 @@
 
     "escape": "escapeKeyPressed",
 
+    "shift-alt-f": "indentSelection",
+
     "space": "playPauseMidiPlayback"
   },
 
