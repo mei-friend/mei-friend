@@ -158,24 +158,6 @@ const defaultCodeMirrorOptions = {
   defaultDarkTheme: 'paraiso-dark', // 'base16-dark', // default theme for OS dark mode, m-f option
 }; // defaultCodeMirrorOptions
 
-let keyboardShortcutsForEditor = [
-  'addIds',
-  'removeIds',
-  'validate',
-  'open',
-  'downloadMei',
-  'downloadMeiBasic',
-  'downloadSpeedMei',
-  'generateUrl',
-  'correctAccid',
-  'renumberMeasures',
-  'toggleSettingsPanel',
-  'toggleAnnotationPanel',
-  'indentSelection',
-  'togglePdfMode',
-  'openHelp',
-];
-
 // add all possible facsimile elements
 att.attFacsimile.forEach((e) => defaultVerovioOptions.svgAdditionalAttribute.push(e + '@facs'));
 const defaultKeyMap = `${root}keymaps/default-keymap.json`;
