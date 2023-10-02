@@ -43,7 +43,7 @@ export function dragOverHandler(ev) {
 export function dragEnter(ev) {
   ev.stopPropagation();
   ev.preventDefault();
-  if (ev.target.closest('.dragOverlay')) {
+  if (ev.target.closest('.dragOverlay') || document.querySelector('.dragOverlay')) {
     // console.log('dragEnter()');
     on();
   }
@@ -52,10 +52,7 @@ export function dragEnter(ev) {
 export function dragLeave(ev) {
   ev.stopPropagation();
   ev.preventDefault();
-  if (ev.target.className === 'dragOverlay') {
-    // console.log('dragLeave()', ev);
-    off();
-  }
+  off();
 }
 
 function on() {

@@ -427,6 +427,10 @@ function onLanguageLoaded() {
   cm = CodeMirror.fromTextArea(document.getElementById('editor'), defaultCodeMirrorOptions);
   CodeMirror.normalizeKeyMap();
 
+  // make sure that the drag enter event is passed through CodeMirror
+  cm.on('dragenter', (cm, ev) => dragEnter(ev));
+  cm.on('dragleave', (cm, ev) => dragLeave(ev));
+  
   // set validation status icon to unverified
   let vs = document.getElementById('validation-status');
   vs.innerHTML = unverified;
@@ -1824,11 +1828,11 @@ function addEventListeners(v, cm) {
   });
 
   // drag'n'drop handlers
-  let fc = document.querySelector('.dragContainer');
-  fc.addEventListener('drop', () => dropHandler(event));
-  fc.addEventListener('dragover', () => dragOverHandler(event));
-  fc.addEventListener('dragenter', () => dragEnter(event));
-  fc.addEventListener('dragleave', () => dragLeave(event));
+  let fc = document.body; // querySelector('.dragContainer');
+  fc.addEventListener('drop', (ev) => dropHandler(ev));
+  fc.addEventListener('dragover', (ev) => dragOverHandler(ev));
+  fc.addEventListener('dragenter', (ev) => dragEnter(ev));
+  fc.addEventListener('dragleave', (ev) => dragLeave(ev));
   fc.addEventListener('dragstart', (ev) => console.log('Drag Start', ev));
   fc.addEventListener('dragend', (ev) => console.log('Drag End', ev));
 
