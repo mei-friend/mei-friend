@@ -142,6 +142,9 @@ const defaultCodeMirrorOptions = {
     "' '": completeIfInTag,
     "'='": completeIfInTag,
     'Ctrl-Space': 'autocomplete',
+    'Shift-Alt-f': indentSelection,
+    'Shift-Ctrl-G': toMatchingTag,
+    "'Ï'": indentSelection, // TODO: overcome strange bindings on MAC
   },
   lint: {
     caller: cm,
@@ -1383,6 +1386,16 @@ function consultGuidelines() {
   }
 } // consultGuidelines()
 
+// wrapper for indentSelection to be called inside CodeMirror
+function indentSelection() {
+  e.indentSelection(v, cm);
+} // indentSelection()
+
+// wrapper for toMatchingTag
+function toMatchingTag() {
+  e.toMatchingTag(v, cm);
+} // toMatchingTag()
+
 let tagEncloserNode; // context menu to choose node name to enclose selected text
 
 // wrapper for editor.encloseSelectionWithTag()
@@ -1625,8 +1638,6 @@ export let cmd = {
   addFacsimile: () => e.addFacsimile(v, cm),
   encloseSelectionWithTag: encloseSelectionWithTag,
   encloseSelectionWithLastTag: encloseSelectionWithLastTag,
-  toMatchingTag: () => e.toMatchingTag(v, cm),
-  indentSelection: () => e.indentSelection(v, cm),
   resetDefault: () => {
     // we're in a clickhandler, so our storage object is out of scope
     // but we only need to clear it, so just grab the window's storage
@@ -1793,11 +1804,11 @@ function addEventListeners(v, cm) {
   document.getElementById('findPrevious').addEventListener('click', () => CodeMirror.commands.findPrev(cm));
   document.getElementById('replaceMenu').addEventListener('click', () => CodeMirror.commands.replace(cm));
   document.getElementById('replaceAllMenu').addEventListener('click', () => CodeMirror.commands.replaceAll(cm));
-  document.getElementById('indentSelection').addEventListener('click', cmd.indentSelection);
+  document.getElementById('indentSelection').addEventListener('click', indentSelection);
   document.getElementById('surroundWithTags').addEventListener('click', cmd.encloseSelectionWithTag);
   document.getElementById('surroundWithLastTag').addEventListener('click', cmd.encloseSelectionWithLastTag);
   document.getElementById('jumpToLine').addEventListener('click', () => CodeMirror.commands.jumpToLine(cm));
-  document.getElementById('toMatchingTag').addEventListener('click', cmd.toMatchingTag);
+  document.getElementById('toMatchingTag').addEventListener('click', toMatchingTag);
   document.getElementById('manualValidate').addEventListener('click', cmd.validate);
   document
     .querySelectorAll('.keyShortCut')

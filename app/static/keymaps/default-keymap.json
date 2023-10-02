@@ -68,8 +68,6 @@
 
     "escape": "escapeKeyPressed",
 
-    "shift-alt-f": "indentSelection",
-
     "space": "playPauseMidiPlayback"
   },
 
@@ -111,13 +109,10 @@
     "alt-…": "consultGuidelines",
     "cmd-,": "toggleSettingsPanel",
     "cmd-a": "toggleAnnotationPanel",
-    "shift-alt-ï": "indentSelection",
     "cmd-delete": "cmdDelete",
     "cmd-p": "togglePdfMode",
     "cmd-e": "encloseSelectionWithTag",
     "cmd-/": "encloseSelectionWithLastTag",
-    "ctrl-shift-g": "toMatchingTag",
-    "alt-shift-f": "indentSelection",
 
     "ctrl-s": "addSlur",
     "ctrl-t": "addTie",
@@ -178,8 +173,6 @@
     "ctrl-p": "togglePdfMode",
     "ctrl-e": "encloseSelectionWithTag",
     "ctrl-/": "encloseSelectionWithLastTag",
-    "ctrl-shift-g": "toMatchingTag",
-    "alt-shift-f": "indentSelection",
 
     "alt-s": "addSlur",
     "alt-t": "addTie",

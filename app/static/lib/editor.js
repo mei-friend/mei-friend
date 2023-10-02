@@ -48,14 +48,8 @@ export function indentSelection(v, cm) {
 export function toMatchingTag(v, cm) {
   v.allowCursorActivity = false;
   cm.blockChanges = true;
-  console.log('toMatchingTag() before: ', cm.getCursor());
   cm.execCommand('toMatchingTag');
-  let cursor = cm.getCursor();
-  console.log('toMatchingTag() after: ', cm.getCursor());
-  // cm.setCursor({ line: cursor.line, ch: cursor.ch + 1 });
   cm.listSelections().forEach((s) => {
-    console.log('head: ', s.head);
-    console.log('anchor: ', s.anchor);
     cm.setCursor({ line: s.anchor.line, ch: s.anchor.ch + 1 }); // set cursor one right after tag opening bracket
   });
   cm.focus();
