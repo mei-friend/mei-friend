@@ -1518,7 +1518,6 @@ export let cmd = {
   downloadMei: () => downloadMei(),
   downloadMeiBasic: () => downloadMeiBasic(),
   downloadSpeedMei: () => downloadSpeedMei(),
-  indentSelection: () => indentSelection(),
   validate: () => v.manualValidate(),
   notesZoomIn: () => v.zoom(+1, storage),
   notesZoomOut: () => v.zoom(-1, storage),
@@ -1704,17 +1703,6 @@ function addEventListeners(v, cm) {
     if (ev.key === 'Escape') cmd.escapeKeyPressed();
   });
 
-  // Register key handlers to #encoding rather than giving it to CodeMirror directly
-  let enc = document.getElementById('encoding');
-  if (enc)
-    enc.addEventListener('keydown', (ev) => {
-      // Ctrl-Shift-V or Cmd-Shift-V for validation
-      if (isCtrlOrCmd(ev) && ev.shiftKey && ev.key === 'v') {
-        ev.preventDefault();
-        cmd.validate();
-      }
-    });
-
   // file status file name display
   document.getElementById('fileName').addEventListener('input', cmd.fileNameChange);
   document.getElementById('fileName').addEventListener('keydown', (ev) => {
@@ -1806,10 +1794,10 @@ function addEventListeners(v, cm) {
   document.getElementById('replaceMenu').addEventListener('click', () => CodeMirror.commands.replace(cm));
   document.getElementById('replaceAllMenu').addEventListener('click', () => CodeMirror.commands.replaceAll(cm));
   document.getElementById('indentSelection').addEventListener('click', cmd.indentSelection);
-  document.getElementById('surroundWithTags').addEventListener('click', encloseSelectionWithTag);
-  document.getElementById('surroundWithLastTag').addEventListener('click', encloseSelectionWithLastTag);
+  document.getElementById('surroundWithTags').addEventListener('click', cmd.encloseSelectionWithTag);
+  document.getElementById('surroundWithLastTag').addEventListener('click', cmd.encloseSelectionWithLastTag);
   document.getElementById('jumpToLine').addEventListener('click', () => CodeMirror.commands.jumpToLine(cm));
-  document.getElementById('toMatchingTag').addEventListener('click', toMatchingTag);
+  document.getElementById('toMatchingTag').addEventListener('click', cmd.toMatchingTag);
   document.getElementById('manualValidate').addEventListener('click', cmd.validate);
   document
     .querySelectorAll('.keyShortCut')
