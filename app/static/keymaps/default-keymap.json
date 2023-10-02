@@ -142,7 +142,7 @@
     "ctrl-shift-up": "shiftOctaveUp",
     "ctrl-shift-down": "shiftOctaveDown",
     "shift-alt-g": "addGClefChangeAfter",
-    "shift-alt-f": "addFClefChangeAfter",
+    "ctrl-shift-f": "addFClefChangeAfter",
     "shift-alt-c": "addCClefChangeAfter",
     "ctrl-alt-up": "moveElementStaffUp",
     "ctrl-alt-down": "moveElementStaffDown",
