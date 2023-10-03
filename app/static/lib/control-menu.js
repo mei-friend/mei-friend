@@ -670,6 +670,11 @@ export function addModifyerKeys(root) {
       text: 'Alt',
       description: 'Alt key',
     }, // ALT
+    cmd3Key: { // ALT / CMD on Mac
+      symbol: '&#8997;',
+      text: 'Alt',
+      description: 'Alt key',
+    }, // ALT
     cmdKey: {
       symbol: '&#8963;',
       text: 'Ctrl',
@@ -693,6 +698,11 @@ export function addModifyerKeys(root) {
       text: 'Ctrl',
       description: 'Ctrl key',
     }; // Ctrl
+    modifierKeys.cmd3Key = {
+      symbol: '&#8984;',
+      text: 'Cmd',
+      description: 'Cmd key',
+    }; // CMD
   }
   // all keyShortCut innerHTML as spearate keyIcon spans
   document.querySelectorAll('.keyShortCut').forEach((e) => {

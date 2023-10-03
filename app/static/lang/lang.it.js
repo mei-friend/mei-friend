@@ -6,8 +6,80 @@ import * as att from '../lib/attribute-classes.js';
 import { heart } from '../css/icons.js';
 
 export const lang = {
+  // Schermata iniziale
+  aboutMeiFriend: { text: 'Informazioni su mei-friend' },
+  showSplashScreen: {
+    text: "Mostra schermata iniziale all'avvio",
+    description: "Mostra la schermata iniziale di mei-friend quando l'applicazione viene caricata",
+  },
+  splashBody: {
+    html: `
+      <p>
+        mei-friend è un editor per le <a href="https://music-encoding.org">codifiche musicali</a>, ospitato presso
+        l'<a href="https://mdw.ac.at" target="_blank">Università di Musica e Arti dello Spettacolo di Vienna</a>. Si prega
+        di consultare la nostra <a href="https://mei-friend.github.io" target="_blank">documentazione completa</a> per ulteriori
+        informazioni.
+      </p>
+      <p>
+        Anche se mei-friend è un'applicazione basata su browser, i tuoi dati personali (compresa la codifica che stai
+        modificando, le impostazioni dell'applicazione e i dettagli di accesso attuali, se presenti) vengono archiviati nel
+        <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank"
+          >localStorage</a
+        > del tuo browser e non vengono trasmessi o memorizzati sui nostri server.
+      </p>
+      <p>
+        I dati vengono trasmessi a GitHub solo quando lo richiedi esplicitamente (ad esempio, quando effettui l'accesso a
+        GitHub, carichi la tua codifica da un repository GitHub o richiedi l'esecuzione di un flusso di lavoro GitHub Action
+        per te). Allo stesso modo, i dati vengono trasmessi al tuo provider Solid scelto solo quando lo richiedi esplicitamente
+        (ad esempio, quando effettui l'accesso a Solid o carichi o salvi annotazioni stand-off).
+      </p>
+      <p>
+        Utilizziamo <a href="https://matomo.org/" target="_blank">Matomo</a>
+        per raccogliere statistiche di utilizzo anonime. Queste includono il tuo indirizzo IP troncato (consentendo la
+        geolocalizzazione a livello di paese ma senza ulteriori identificazioni), il tuo browser e sistema operativo, da dove
+        provieni (cioè il sito Web di riferimento), l'ora e la durata della tua visita e le pagine che hai visitato. Queste
+        informazioni sono archiviate sull'istanza Matomo in esecuzione sui server dell'Università di Musica e Arti dello
+        Spettacolo di Vienna e non sono condivise con terze parti.
+      </p>
+      <p>
+        Infine, la riproduzione MIDI è presentata utilizzando il font sonoro SGM_plus fornito da Google Magenta e servito tramite
+        googleapis.com. Pertanto, il tuo indirizzo IP è visibile a Google durante l'avvio della riproduzione MIDI. Se non desideri
+        che ciò accada, ti preghiamo di astenerti dall'utilizzare la funzione di riproduzione MIDI.
+      </p>
+      <p>
+        mei-friend è sviluppato da
+        <a href="https://iwk.mdw.ac.at/werner-goebl" target="_blank">Werner Goebl</a> e
+        <a href="https://iwk.mdw.ac.at/david-weigl" target="_blank">David M. Weigl</a> presso il Dipartimento di Acustica
+        Musicale - Wiener Klangstil dell'Università di Musica e Arti dello Spettacolo di Vienna ed è distribuito con licenza
+        <a href="https://spdx.org/licenses/AGPL-3.0-or-later.html" target="_blank"
+          >GNU Affero General Public License v3.0</a
+        >. Si prega di consultare la nostra <a href="https://mei-friend.github.io/about/" target="_blank">pagina di
+        riconoscimenti</a> per ulteriori informazioni sui contributori e sui componenti open source riutilizzati nel nostro
+        progetto. Ringraziamo i nostri colleghi per il loro contributo e la loro guida.
+      </p>
+      <p>
+        Lo sviluppo dell'applicazione Web mei-friend è finanziato dal
+        <a href="https://fwf.ac.at" target="_blank">Fondo austriaco per la scienza (FWF)</a> nei progetti
+        <a href="https://iwk.mdw.ac.at/signature-sound-vienna/" target="_blank"
+          >P 34664-G (Signature Sound Vienna)</a
+        >
+        e <a href="https://e-laute.info">I 6019 (E-LAUTE)</a>.
+      </p>
+    `,
+  },
+  splashGotItButtonText: { text: 'Ho capito!' },
+  splashVersionText: { text: 'Versione' },
+  splashAlwaysShow: {
+    text: 'Mostra sempre questa schermata iniziale',
+    description: "Mostra sempre questa schermata iniziale al caricamento dell'applicazione",
+  },
+  splashAlwaysShowLabel: {
+    text: 'Mostra sempre questa schermata iniziale',
+    description: "Mostra sempre questa schermata iniziale al caricamento dell'applicazione",
+  },
+
   // Main menu bar
-  githubLoginLink: { text: 'Accesso' },
+  githubLoginLink: { text: 'Accedi' },
 
   month: {
     jan: 'Gennaio',
@@ -30,12 +102,13 @@ export const lang = {
   openUrlText: { text: 'Apri URL' },
   openExample: {
     text: 'Repertorio pubblico',
-    description: 'Apri una lista di repertorio di pubblico dominio',
+    description: 'Apri una lista del repertorio pubblico',
   },
   importMusicXml: { text: 'Importa MusicXML' },
   importHumdrum: { text: 'Importa Humdrum' },
   importPae: { text: 'Importa PAE, ABC' },
   saveMeiText: { text: 'Salva MEI' },
+  saveMeiBasicText: { text: 'Salva come MEI Basic' },
   saveSvg: { text: 'Salva SVG' },
   saveMidi: { text: 'Salva MIDI' },
   printPreviewText: { text: 'Anteprima PDF' },
@@ -51,8 +124,8 @@ export const lang = {
   replaceMenuText: { text: 'Sostituisci' },
   replaceAllMenuText: { text: 'Sostituisci tutto' },
   indentSelectionText: { text: 'Indenta selezione' },
-  surroundWithTagsText: { text: 'Circondare con tags' },
-  surroundWithLastTagText: { text: 'Circondare con ' },
+  surroundWithTagsText: { text: 'Circonda con tags' },
+  surroundWithLastTagText: { text: 'Circonda con' },
   jumpToLineText: { text: 'Vai alla riga' },
   toMatchingTagText: { text: 'Vai al tag corrispondente' },
   manualValidateText: { text: 'Convalida' },
@@ -72,10 +145,10 @@ export const lang = {
   facsimileLeft: { text: 'Facsimile a sinistra' },
   facsimileRight: { text: 'Facsimile a destra' },
 
-  // MANIPULATE MENU ITEM/ MENU MANIPOLA
-  manipulateMenuTitle: { text: 'Manipola' },
+  // MANIPULATE MENU ITEM/ MENU MODIFICA
+  manipulateMenuTitle: { text: 'Modifica' },
   invertPlacementText: { text: 'Inverti posizione' },
-  betweenPlacementText: { text: 'Tra posizioni' },
+  betweenPlacementText: { text: 'Posiziona in mezzo' },
   addVerticalGroupText: { text: 'Aggiungi gruppo verticale' },
   deleteText: { text: 'Elimina elemento' },
   pitchChromUpText: { text: 'Alza cromatica' },
@@ -145,7 +218,7 @@ export const lang = {
 
   // HELP MENU ITEM / VOCE DI MENU AIUTO
   helpMenuTitle: { text: 'Aiuto' },
-  goToHelpPage: { text: 'Pagina di aiuto di mei-friend' },
+  goToHelpPageText: { text: 'Pagina di aiuto di mei-friend' },
   goToCheatSheet: { text: 'Scheda informativa di mei-friend' },
   showChangelog: { text: 'Registro delle modifiche di mei-friend' },
   goToGuidelines: { text: 'Linee guida MEI' },
@@ -183,11 +256,11 @@ export const lang = {
     la velocità di rotazione in senso antiorario indica l'attività del worker`,
   },
   decreaseScaleButton: { description: 'Riduci notazione' },
-  verovioZoom: { description: 'Scala dimensioni della notazione' },
+  verovioZoom: { description: 'Scala dimensioni dello spartito' },
   increaseScaleButton: { description: 'Aumenta notazione' },
   pagination1: { html: 'Pagina ' },
   pagination3: { html: ' di' },
-  sectionSelect: { description: 'Naviga la struttura di sezione/finale codificata' },
+  sectionSelect: { description: 'Naviga la struttura di sezione/finale del codice' },
   firstPageButton: { description: 'Vai alla prima pagina' },
   previousPageButton: { description: 'Vai alla pagina precedente' },
   paginationLabel: {
@@ -195,30 +268,30 @@ export const lang = {
   },
   nextPageButton: { description: 'Vai alla pagina successiva' },
   lastPageButton: { description: "Vai all'ultima pagina" },
-  flipCheckbox: { description: 'Passa automaticamente alla posizione del cursore di codifica' },
-  flipButton: { description: 'Passa manualmente alla posizione del cursore di codifica' },
-  breaksSelect: { description: 'Definisci il comportamento degli intervalli/pagine di sistema nella notazione' },
+  flipCheckbox: { description: 'Passa automaticamente alla posizione del cursore di codice' },
+  flipButton: { description: 'Passa manualmente alla posizione del cursore di codice' },
+  breaksSelect: { description: 'Definisci il comportamento degli intervalli/pagine di sistema nello spartito' },
   breaksSelectNone: { text: 'Nessuno' },
   breaksSelectAuto: { text: 'Automatico' },
   breaksSelectMeasure: { text: 'Misura' },
-  breaksSelectLine: { text: 'Sistema' },
-  breaksSelectEncoded: { text: 'Sistema e pagina' },
+  breaksSelectLine: { text: 'Rigo' },
+  breaksSelectEncoded: { text: 'Rigo e pagina' },
   breaksSelectSmart: { text: 'Intelligente' },
   updateControlsLabel: {
     text: 'Aggiorna',
-    description: 'Aggiorna il comportamento di controllo della notazione dopo le modifiche nella codifica',
+    description: 'Cambia il comportamento di controllo dello spartito dopo le modifiche nel codice',
   },
-  liveUpdateCheckbox: { description: 'Aggiorna automaticamente la notazione dopo le modifiche nella codifica' },
-  codeManualUpdateButton: { description: 'Aggiorna manualmente la notazione' },
+  liveUpdateCheckbox: { description: 'Aggiorna automaticamente lo spartito dopo le modifiche nella codice' },
+  codeManualUpdateButton: { description: 'Aggiorna manualmente lo spartito' },
   engravingFontSelect: { description: 'Seleziona il carattere di incisione' },
-  backwardsButton: { description: 'Vai a sinistra nella notazione' },
-  forwardsButton: { description: 'Vai a destra nella notazione' },
-  upwardsButton: { description: "Naviga verso l'alto nella notazione" },
-  downwardsButton: { description: 'Naviga verso il basso nella notazione' },
+  backwardsButton: { description: 'Vai a sinistra nello spartito' },
+  forwardsButton: { description: 'Vai a destra nello spartito' },
+  upwardsButton: { description: "Naviga verso l'alto nello spartito" },
+  downwardsButton: { description: 'Naviga verso il basso nello spartito' },
   speedLabel: {
-    text: 'Modalità di velocità',
+    text: 'Modalità veloce',
     description:
-      'In modalità di velocità, solo la pagina corrente viene inviata a Verovio per ridurre i tempi di rendering con file di grandi dimensioni',
+      'Nella modalità veloce, solamente la pagina corrente viene inviata a Verovio per ridurre i tempi di rendering in caso di file di grandi dimensioni',
   },
 
   // PDF/print preview panel / Pannello di anteprima PDF/stampa
@@ -239,9 +312,9 @@ export const lang = {
 
   // facsimile panel/ pannello facsimile
   facsimileIcon: { description: 'Pannello facsimile' },
-  facsimileDecreaseZoomButton: { description: "Riduci l'immagine della notazione" },
-  facsimileZoom: { description: "Regola la dimensione dell'immagine della notazione" },
-  facsimileIncreaseZoomButton: { description: "Ingrandisci l'immagine della notazione" },
+  facsimileDecreaseZoomButton: { description: "Riduci l'immagine dello spartito" },
+  facsimileZoom: { description: "Regola la dimensione dell'immagine dello spartito" },
+  facsimileIncreaseZoomButton: { description: "Ingrandisci l'immagine dello spartito" },
   facsimileFullPageLabel: {
     text: 'Pagina intera',
     description: "Mostra l'intera pagina dell'immagine del facsimile",
@@ -323,7 +396,7 @@ export const lang = {
   forkRepertoireOrganizationLabel: { text: 'Organizzazione:' },
   forkRepertoireOrganizationOption: { text: "Scegli un'organizzazione GitHub..." },
   forkRepertoireRepositoryLabel: { text: 'Repository:' },
-  forkRepertoireRepositoryOption: { text: 'Scegli una codifica...' },
+  forkRepertoireRepositoryOption: { text: 'Scegli una codice...' },
   forkRepositoryInputName: { placeholder: 'Nome utente o organizzazione Github' },
   forkRepositoryInputRepoOption: { text: 'Scegli un repository' },
   forkRepositoryToSelectorText: { text: 'Fork a: ' },
@@ -414,7 +487,7 @@ export const lang = {
   midiSpeedmodeIndicator: {
     text: 'Modalità di velocità',
     description:
-      "La modalità di velocità è attiva; viene riprodotto solo il MIDI per la pagina corrente. Per riprodurre l'intera codifica, disabilita la modalità di velocità.",
+      "La modalità di velocità è attiva; viene riprodotto solo il MIDI per la pagina corrente. Per riprodurre l'intero codice, disabilita la modalità di velocità.",
   },
   closeMidiPlaybackControlBarButton: { description: 'Nascondi la barra di controllo della riproduzione MIDI' },
 
@@ -428,8 +501,8 @@ export const lang = {
     description: 'Reimposta ai valori predefiniti di mei-friend',
   },
   filterSettings: {
-    placeholder: 'Filtra le impostazioni',
-    description: 'Digita qui per filtrare le impostazioni',
+    placeholder: 'Cerca',
+    description: 'Digita qui per cercare',
   },
   closeSettingsButton: {
     description: 'Chiudi il pannello delle impostazioni',
@@ -478,7 +551,7 @@ export const lang = {
   // Drag select / Selezione tramite trascinamento
   dragSelection: {
     text: 'Selezione tramite trascinamento',
-    description: 'Seleziona gli elementi nella notazione con il trascinamento del mouse',
+    description: 'Seleziona gli elementi nello spartito con il trascinamento del mouse',
   },
   dragSelectNotes: {
     text: 'Seleziona le note',
@@ -507,29 +580,29 @@ export const lang = {
 
   // Control menu / Menu di controllo
   controlMenuSettings: {
-    text: 'Barra di controllo della notazione',
-    description: 'Definisci gli elementi da mostrare nel menu di controllo sopra la notazione',
+    text: 'Barra di controllo dello spartito',
+    description: 'Definisci gli elementi da mostrare nel menu di controllo sopra lo spartito',
   },
   controlMenuFlipToPageControls: {
-    text: 'Mostra i controlli per girare la pagina',
-    description: 'Mostra i controlli per girare la pagina nel menu di controllo della notazione',
+    text: 'Mostra i controlli per cambiare pagina',
+    description: 'Mostra i controlli per cambiare la pagina nel menu di controllo dello spartito',
   },
   controlMenuUpdateNotation: {
-    text: "Mostra i controlli per l'aggiornamento della notazione",
+    text: "Mostra i controlli per l'aggiornamento dello spartito",
     description:
-      'Mostra i controlli per il comportamento di aggiornamento della notazione nel menu di controllo della notazione',
+      'Mostra i controlli per il comportamento di aggiornamento dello spartito nel menu di controllo dello spartito',
   },
   controlMenuFontSelector: {
     text: 'Mostra il selettore del carattere di notazione',
-    description: 'Mostra il selettore del carattere di notazione (SMuFL) nel menu di controllo della notazione',
+    description: 'Mostra il selettore del carattere di notazione (SMuFL) nel menu di controllo dello spartito',
   },
   controlMenuNavigateArrows: {
     text: 'Mostra le frecce di navigazione',
-    description: 'Mostra le frecce di navigazione nella notazione nel menu di controllo della notazione',
+    description: 'Mostra le frecce di navigazione nello spartito nel menu di controllo dello spartito',
   },
   controlMenuSpeedmodeCheckbox: {
     text: 'Mostra la casella di controllo della modalità di velocità',
-    description: 'Mostra la casella di controllo della modalità di velocità nel menu di controllo della notazione',
+    description: 'Mostra la casella di controllo della modalità di velocità nel menu di controllo dello spartito',
   },
 
   // MIDI Playback / Riproduzione MIDI
@@ -538,31 +611,32 @@ export const lang = {
     description: 'Impostazioni riproduzione MIDI',
   },
   showMidiPlaybackContextualBubble: {
-    text: 'Mostra scorciatoia riproduzione',
+    text: 'Mostra icona di riproduzione',
     description:
-      "Fa apparire una scorciatoia (una bolla nell'angolo in basso a sinistra; " +
-      'clicca per avviare immediatamente la riproduzione) quando la barra di controllo della riproduzione MIDI è chiusa',
+      "Fa apparire un'icona nell'angolo in basso a sinistra " +
+      'per avviare immediatamente la riproduzione quando la barra di controllo della riproduzione MIDI è chiusa',
   },
   showMidiPlaybackControlBar: {
     text: 'Mostra barra di controllo riproduzione MIDI',
     description: 'Mostra barra di controllo riproduzione MIDI',
   },
   scrollFollowMidiPlayback: {
-    text: 'Scorrimento segui riproduzione MIDI',
-    description: 'Scorri il pannello di notazione per seguire la riproduzione MIDI sulla pagina corrente',
+    text: 'Scorrimento automatico',
+    description: 'Scorri il pannello dello spartito durante la riproduzione MIDI sulla pagina corrente',
   },
   pageFollowMidiPlayback: {
-    text: 'Pagina segue riproduzione MIDI',
-    description: 'Passa automaticamente alle pagine per seguire la riproduzione MIDI',
+    text: 'Cambio pagina automatico',
+    description: 'Cambia automaticamente la pagina durante la riproduzione MIDI',
   },
   highlightCurrentlySoundingNotes: {
     text: 'Evidenzia note attualmente suonate',
     description:
       'Evidenzia visivamente le note attualmente suonate nel pannello di notazione durante la riproduzione MIDI',
   },
+
   selectMidiExpansion: {
-    text: 'Espansione della riproduzione',
-    description: "Seleziona l'elemento di espansione da utilizzare per la riproduzione MIDI",
+    text: 'Espansione',
+    description: "Seleziona l'espansione da utilizzare perla riproduzione MIDI",
   },
 
   // Transposition // Trasposizione
@@ -573,12 +647,12 @@ export const lang = {
   enableTransposition: {
     text: 'Abilita la trasposizione',
     description:
-      'Abilita le impostazioni di trasposizione, da applicare tramite il pulsante di trasposizione sottostante. La trasposizione verrà applicata solo alla notazione, la codifica rimane inalterata, a meno che non si clicchi su "Rerender via Verovio" nel menu a discesa "Manipulate".',
+      'Abilita le impostazioni di trasposizione, da applicare tramite il pulsante di trasposizione sottostante. La trasposizione verrà applicata solo allo spartito, il codice rimane inalterata, a meno che non si clicchi su "Rerender via Verovio" nel menu a discesa "Manipulate".',
   },
   transposeInterval: {
     text: 'Trasponi per intervallo',
     description:
-      'Trasponi la codifica per intervallo cromatico attraverso gli intervalli più comuni (Verovio supporta il sistema base-40)',
+      'Trasponi la codice per intervallo cromatico attraverso gli intervalli più comuni (Verovio supporta il sistema base-40)',
     labels: [
       'Unisono Perfetto',
       'Unisono Aumentato',
@@ -637,7 +711,7 @@ export const lang = {
   transposeButton: {
     text: 'Trasponi',
     description:
-      'Applica la trasposizione con le impostazioni sopra indicate alla notazione, mantenendo invariata la codifica MEI. Per trasporre anche la codifica MEI con le attuali impostazioni, utilizzare "Rerender via Verovio" nel menu a tendina "Manipulate".',
+      'Applica la trasposizione con le impostazioni sopra indicate allo spartito, mantenendo invariata la codice MEI. Per trasporre anche la codice MEI con le attuali impostazioni, utilizzare "Rerender via Verovio" nel menu a tendina "Manipulate".',
   },
 
   // Renumber measures / Rinumerazione misure
@@ -670,7 +744,7 @@ export const lang = {
   },
   showAnnotations: {
     text: 'Mostra annotazioni',
-    description: 'Mostra le annotazioni nella notazione',
+    description: 'Mostra le annotazioni nello spartito',
   },
   showAnnotationPanel: {
     text: 'Mostra pannello annotazioni',
@@ -692,7 +766,7 @@ export const lang = {
   },
   selectFacsimilePanelOrientation: {
     text: 'Posizione del pannello di facsimile',
-    description: 'Seleziona la posizione del pannello di facsimile rispetto alla notazione',
+    description: 'Seleziona la posizione del pannello di facsimile rispetto allo spartito',
     labels: ['sinistra', 'destra', 'alto', 'basso'],
   },
   facsimileZoomInput: {
@@ -751,8 +825,8 @@ export const lang = {
     description: "Seleziona il tema dell'editor",
   },
   matchTheme: {
-    text: 'La notazione corrisponde al tema',
-    description: "Corrispondenza della notazione al tema di colore dell'editor",
+    text: 'lo spartito corrisponde al tema',
+    description: "Corrispondenza dello spartito al tema di colore dell'editor",
   },
   tabSize: {
     text: 'Dimensione indentazione',
@@ -780,7 +854,7 @@ export const lang = {
   },
   autoValidate: {
     text: 'Validazione automatica',
-    description: 'Valida automaticamente la codifica rispetto allo schema dopo ogni modifica',
+    description: 'Valida automaticamente la codice rispetto allo schema dopo ogni modifica',
   },
   autoShowValidationReport: {
     text: 'Mostra il rapporto di validazione automaticamente',
@@ -876,7 +950,7 @@ export const lang = {
   selectRepository: { text: 'Seleziona repository' },
   selectBranch: { text: 'Seleziona ramo' },
   commitMessageInput: { placeholder: 'Aggiornato usando mei-friend online' },
-  reportIssueWithEncoding: { value: 'Segnala problema di codifica' },
+  reportIssueWithEncoding: { value: 'Segnala problema di codice' },
   clickToOpenInMeiFriend: { text: 'Clicca per aprire in mei-friend' },
   repoAccessError: {
     text: "Spiacenti, non è possibile accedere ai repository per l'utente o l'organizzazione forniti",
@@ -917,4 +991,9 @@ export const lang = {
   codeCheckerHasExtra: { text: 'ha extra' },
   codeCheckerLacksAn: { text: 'manca un' },
   codeCheckerBecauseAlreadyDefined: { text: 'poiché è già stato definito in precedenza nella misura' },
+
+  // Warning for missing ids
+  missingIdsWarningAlert: {
+    text: 'mei-friend non è in grado di scorrere gli elementi selezionati nella codifica. Aggiungere gli id alla codifica.',
+  },
 };

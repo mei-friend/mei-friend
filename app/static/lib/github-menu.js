@@ -116,10 +116,10 @@ function repoHeaderClicked() {
   githubMenu.classList.add('show');
 } // repoHeaderClicked()
 
-function branchesHeaderClicked(ev) {
+function selectBranchClicked(ev) {
   github.filepath = '';
   fillInRepoBranches(ev.target);
-} // branchesHeaderClicked()
+} // selectBranchClicked()
 
 function contentsHeaderClicked(ev) {
   // strip trailing slash (in case our filepath is a subdir)
@@ -289,17 +289,17 @@ function assignGithubMenuClickHandlers() {
     forkRepositoryCancelButton.addEventListener('click', forkRepoCancelClicked);
   }
 
-  const repoHeader = document.getElementById('repositoriesHeader');
+  const repoHeader = document.getElementById('selectRepository');
   if (repoHeader) {
     // on click, reload list of all repositories
     repoHeader.removeEventListener('click', repoHeaderClicked);
     repoHeader.addEventListener('click', repoHeaderClicked);
   }
-  const branchesHeader = document.getElementById('branchesHeader');
-  if (branchesHeader) {
+  const selectBranch = document.getElementById('selectBranch');
+  if (selectBranch) {
     // on click, reload list of branches for current repo
-    branchesHeader.removeEventListener('click', branchesHeaderClicked);
-    branchesHeader.addEventListener('click', branchesHeaderClicked);
+    selectBranch.removeEventListener('click', selectBranchClicked);
+    selectBranch.addEventListener('click', selectBranchClicked);
   }
   const contentsHeader = document.getElementById('contentsHeader');
   if (contentsHeader) {
@@ -330,7 +330,7 @@ function assignGithubMenuClickHandlers() {
 
 export async function fillInUserRepos(per_page = 30, page = 1) {
   const repos = await github.getUserRepos(per_page, page);
-  if (document.getElementById('branchesHeader')) {
+  if (document.getElementById('selectBranch')) {
     // if user has navigated away wiew while we
     // were waiting for the user repos list, abandon it
     return;
@@ -354,9 +354,9 @@ export async function fillInRepoBranches(e, repoBranches = null, per_page = 100,
   githubMenu.innerHTML = `
     <a id="githubLogout" href="#">${translator.lang.logOut.text}</a>
     <hr class="dropdownLine">
-    <a id="repositoriesHeader" href="#"><span class="btn icon inline-block-tight">${icon.arrowLeft}</span><span id="githubRepository">${translator.lang.githubRepository.text}</span>: ${github.githubRepo}</a>
+    <a id="selectRepository" href="#"><span class="btn icon inline-block-tight">${icon.arrowLeft}</span><span id="githubRepository">${translator.lang.githubRepository.text}</span>: ${github.githubRepo}</a>
     <hr class="dropdownLine">
-    <a id="branchesHeader" class="dropdownHead" href="#"><b>${translator.lang.selectBranch.text}:</b></a>
+    <a id="selectBranch" class="dropdownHead" href="#"><b>${translator.lang.selectBranch.text}:</b></a>
     `;
   Array.from(repoBranches).forEach((branch) => {
     githubMenu.innerHTML += `<a class="repoBranch" href="#">${branch.name}</a>`;
@@ -443,9 +443,9 @@ export async function fillInBranchContents(e) {
   githubMenu.innerHTML = `
     <a id="githubLogout" href="#">${translator.lang.logOut.text}</a>
     <hr class="dropdownLine">
-    <a id="repositoriesHeader" href="#"><span class="btn icon inline-block-tight">${icon.arrowLeft}</span><span id="githubRepository">${translator.lang.githubRepository.text}</span>: ${github.githubRepo}</a>
+    <a id="selectRepository" href="#"><span class="btn icon inline-block-tight">${icon.arrowLeft}</span><span id="githubRepository">${translator.lang.githubRepository.text}</span>: ${github.githubRepo}</a>
     <hr class="dropdownLine">
-    <a id="branchesHeader" href="#"><span class="btn icon inline-block-tight">${icon.arrowLeft}</span><span id="githubBranch">${translator.lang.githubBranch.text}</span>: ${github.branch}</a>
+    <a id="selectBranch" href="#"><span class="btn icon inline-block-tight">${icon.arrowLeft}</span><span id="githubBranch">${translator.lang.githubBranch.text}</span>: ${github.branch}</a>
     <hr class="dropdownLine">
     <a id="contentsHeader" href="#"><span class="btn icon inline-block-tight filepath">${icon.arrowLeft}</span><span id="githubFilepath">${translator.lang.githubFilepath.text}</span>: <span class="filepath">${github.filepath}</span></a>
     <hr class="dropdownLine" class="actionsDivider" id="actionsDividerStart">
@@ -591,8 +591,8 @@ async function fillInCommitLog(refresh = false) {
 } // fillInCommitLog()
 
 export function renderCommitLog() {
-  let branchesHeader = document.getElementById('branchesHeader');
-  if (!branchesHeader) {
+  let selectBranch = document.getElementById('selectBranch');
+  if (!selectBranch) {
     // if user has navigated away from branch contents view while we
     // were waiting for the commit log, abandon it.
     return;
@@ -783,7 +783,7 @@ export function refreshGithubMenu() {
       <hr class="dropdownLine">
       <a id="forkRepository" href="#">${translator.lang.forkRepository.text}...</b></a>
       <hr class="dropdownLine">
-      <a id="repositoriesHeader" class="dropdownHead" href="#"><b>${translator.lang.selectRepository.text}:</b></a>
+      <a id="selectRepository" class="dropdownHead" href="#"><b>${translator.lang.selectRepository.text}:</b></a>
     `;
     fillInUserRepos();
   }
