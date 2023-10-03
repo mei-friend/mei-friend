@@ -11,6 +11,7 @@ var pageParam; // (int) page parameter given through URL
 var selectParam; // (array) select ids given through multiple instances in URL
 let safariWarningShown = false; // show Safari warning only once
 let restoreSolidTimeout; // JS timeout that allows users to 'esc' before restoring solid session
+let splashInitialLoad = true; // flag to know whether splash screen button needs to call completeInitialLoad()
 const restoreSolidTimeoutDelay = 1500; // how long to wait for above timeout, in ms
 
 // exports
@@ -349,7 +350,7 @@ export async function validate(mei, updateLinting, options) {
     if (v.validatorWithSchema && (document.getElementById('autoValidate').checked || options.forceValidate)) {
       let vs = document.getElementById('validation-status');
       vs.innerHTML = clock;
-      v.changeStatus(vs, 'wait', ['error', 'ok', 'manual']); // darkorange
+      Viewer.changeStatus(vs, 'wait', ['error', 'ok', 'manual']); // darkorange
       vs.querySelector('svg').classList.add('clockwise');
       vs.setAttribute('title', translator.lang.validatingAgainst.text + ' ' + v.currentSchema);
       const validationString = await validator.validateNG(mei);
@@ -409,6 +410,23 @@ function onLanguageLoaded() {
   }
   // build language selection menu
   buildLanguageSelection();
+
+  // show splash screen if required
+  if (storage.supported) {
+    storage.read();
+    if (!storage.splashAcknowledged || storage.showSplashScreen) {
+      showSplashScreen(true);
+    } else {
+      completeInitialLoad();
+    }
+  } else {
+    completeInitialLoad();
+  }
+} // onLanguageLoaded()
+
+function completeInitialLoad() {
+  splashInitialLoad = false; // avoid re-initialising app from splash screen button
+
   // link to changelog page according to env settings (develop/staging/production)
   let changeLogUrl;
   switch (env) {
@@ -523,7 +541,6 @@ function onLanguageLoaded() {
     : 'none';
 
   if (storage.supported) {
-    storage.read();
     if (storage.github) {
       // use github object from local storage if available
       isLoggedIn = true;
@@ -562,7 +579,6 @@ function onLanguageLoaded() {
     storage.safelySetStorageItem('fileLocation', url.href);
     storage.safelySetStorageItem('fileName', url.pathname.substring(url.pathname.lastIndexOf('/') + 1));
     storage.safelySetStorageItem('fileLocationType', 'url');
-    storage.read();
     console.log('Have set local storage: ', storage);
   }
 
@@ -602,11 +618,6 @@ function onLanguageLoaded() {
     urlFetchInProgress = true;
   }
 
-  // show splash screen if required
-  if ((storage.supported && !storage.splashAcknowledged) || document.getElementById('showSplashScreen').checked) {
-    showSplashScreen();
-  }
-
   // fill sample encodings
   fillInSampleEncodings();
 
@@ -615,7 +626,6 @@ function onLanguageLoaded() {
 
   // restore localStorage if we have it
   if (storage.supported) {
-    storage.read();
     // save (most) URL parameters in storage
     if (orientationParam !== null) storage.notationOrientation = orientationParam;
     if (notationProportionParam !== null) storage.notationProportion = notationProportionParam;
@@ -769,7 +779,7 @@ function onLanguageLoaded() {
       loginAndFetch(getSolidIdP(), populateSolidTab);
     }, restoreSolidTimeoutDelay);
   }
-} // onLanguageLoaded
+} // completeInitialLoad()
 
 export async function openUrlFetch(url = '', updateAfterLoading = true) {
   let urlInput = document.querySelector('#openUrlInput');
@@ -1316,7 +1326,15 @@ function downloadSpeedMei() {
 
 function showSplashScreen() {
   document.getElementById('splashOverlay').style.display = 'flex';
-  document.getElementById('splashAlwaysShow').checked = document.getElementById('showSplashScreen').checked;
+  document.getElementById('splashAlwaysShow').checked = storage.showSplashScreen;
+  document.getElementById('splashConfirmButton').addEventListener('click', onSplashConfirmButton);
+}
+
+function onSplashConfirmButton() { 
+    document.getElementById('splashConfirmButton').removeEventListener('click', onSplashConfirmButton);
+    document.getElementById('splashOverlay').style.display = 'none';
+    window.localStorage.setItem('splashAcknowledged', 'true');
+    if (splashInitialLoad) completeInitialLoad();
 }
 
 function togglePdfMode() {

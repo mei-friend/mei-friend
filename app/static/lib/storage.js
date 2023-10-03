@@ -329,4 +329,12 @@ export default class Storage {
   set splashAcknowledged(x) { 
     console.warn("splashAcknowledged is set automatically. Do not set it directly.");
   }
+
+  get showSplashScreen() { 
+    return this.storage['mf-showSplashScreen'];
+  }
+  
+  set showSplashScreen(x) { 
+    console.warn("showSplashScreen is set automatically. Do not set it directly.");
+  }
 }
