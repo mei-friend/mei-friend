@@ -11,6 +11,7 @@ var pageParam; // (int) page parameter given through URL
 var selectParam; // (array) select ids given through multiple instances in URL
 let safariWarningShown = false; // show Safari warning only once
 let restoreSolidTimeout; // JS timeout that allows users to 'esc' before restoring solid session
+let splashInitialLoad = true; // flag to know whether splash screen button needs to call completeInitialLoad()
 const restoreSolidTimeoutDelay = 1500; // how long to wait for above timeout, in ms
 
 // exports
@@ -424,6 +425,8 @@ function onLanguageLoaded() {
 } // onLanguageLoaded()
 
 function completeInitialLoad() {
+  splashInitialLoad = false; // avoid re-initialising app from splash screen button
+
   // link to changelog page according to env settings (develop/staging/production)
   let changeLogUrl;
   switch (env) {
@@ -1321,14 +1324,17 @@ function downloadSpeedMei() {
   }, 0);
 } // downloadSpeedMei()
 
-function showSplashScreen(initialLoad = false) {
+function showSplashScreen() {
   document.getElementById('splashOverlay').style.display = 'flex';
   document.getElementById('splashAlwaysShow').checked = storage.showSplashScreen;
-  document.getElementById('splashConfirmButton').addEventListener('click', () => {
+  document.getElementById('splashConfirmButton').addEventListener('click', onSplashConfirmButton);
+}
+
+function onSplashConfirmButton() { 
+    document.getElementById('splashConfirmButton').removeEventListener('click', onSplashConfirmButton);
     document.getElementById('splashOverlay').style.display = 'none';
     window.localStorage.setItem('splashAcknowledged', 'true');
-    if (initialLoad) completeInitialLoad();
-  });
+    if (splashInitialLoad) completeInitialLoad();
 }
 
 function togglePdfMode() {
