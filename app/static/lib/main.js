@@ -411,6 +411,8 @@ function onLanguageLoaded() {
   // build language selection menu
   buildLanguageSelection();
 
+  createSplashScreen();
+
   // show splash screen if required
   if (storage.supported) {
     storage.read();
@@ -1324,18 +1326,32 @@ function downloadSpeedMei() {
   }, 0);
 } // downloadSpeedMei()
 
-function showSplashScreen() {
-  document.getElementById('splashOverlay').style.display = 'flex';
-  document.getElementById('splashAlwaysShow').checked = storage.showSplashScreen;
-  document.getElementById('splashConfirmButton').addEventListener('click', onSplashConfirmButton);
-}
-
-function onSplashConfirmButton() { 
-    document.getElementById('splashConfirmButton').removeEventListener('click', onSplashConfirmButton);
+function createSplashScreen() {
+  const alwaysShow = document.getElementById('splashAlwaysShow'); // checkbox in splash screen
+  alwaysShow.addEventListener('change', (e) => {
+    const showSplash = document.getElementById('showSplashScreen'); // checkbox in settings
+    if (showSplash) {
+      showSplash.click();
+    } else {
+      if (e.target.checked) {
+        storage.showSplashScreen = 'true';
+      } else {
+        storage.removeItem('mf-showSplashScreen');
+      }
+    }
+  });
+  document.getElementById('splashConfirmButton').addEventListener('click', () => {
     document.getElementById('splashOverlay').style.display = 'none';
     window.localStorage.setItem('splashAcknowledged', 'true');
     if (splashInitialLoad) completeInitialLoad();
-}
+  });
+} // createSplashScreen()
+
+function showSplashScreen() {
+  const alwaysShow = document.getElementById('splashAlwaysShow'); // checkbox in splash screen
+  document.getElementById('splashOverlay').style.display = 'flex';
+  alwaysShow.checked = storage.showSplashScreen;
+} // showSplashScreen()
 
 function togglePdfMode() {
   console.log('Toggle PDF mode');

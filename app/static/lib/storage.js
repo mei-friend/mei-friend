@@ -334,7 +334,7 @@ export default class Storage {
     return this.storage['mf-showSplashScreen'];
   }
   
-  set showSplashScreen(x) { 
-    console.warn("showSplashScreen is set automatically. Do not set it directly.");
+  set showSplashScreen(showSplashScreen) { 
+    this.safelySetStorageItem('mf-showSplashScreen', showSplashScreen)
   }
 }
