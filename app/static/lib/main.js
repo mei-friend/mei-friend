@@ -114,6 +114,7 @@ import {
   guidelinesBase,
   platform,
   isSafari,
+  supportedLanguages,
 } from './defaults.js';
 import Translator from './translator.js';
 import { buildLanguageSelection, translateLanguageSelection } from './language-selector.js';
@@ -383,7 +384,9 @@ document.addEventListener('DOMContentLoaded', function () {
   translator = new Translator();
   // we need to look directly to local storage, because it will
   let language = window.localStorage['mf-selectLanguage'];
-  let langCode = language || translator.defaultLangCode;
+  let browseLang = navigator.language.substring(0, 2) || '';
+  if (!browseLang in supportedLanguages) browseLang = '';
+  let langCode = language || browseLang || translator.defaultLangCode;
   if (langCode !== translator.langCode) {
     // load other language...
     translator.requestLanguagePack(langCode).then((p) => {
