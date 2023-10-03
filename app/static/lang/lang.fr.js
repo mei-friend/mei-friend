@@ -43,6 +43,13 @@ export const lang = {
         de l'Université de musique et des arts du spectacle de Vienne et ne sont pas partagées avec des tiers.
       </p>
       <p>
+        La boîte à outils Verovio est chargée depuis <a href="https://verovio.org" target="_blank">https://verovio.org</a>, 
+        hébergée par <a href="https://rism.digital/" target="_blank">RISM Digital Switzerland</a>. 
+        Cela permet à mei-friend de rester à jour avec la dernière version de la boîte à outils
+        et de proposer le choix de toutes les versions prises en charge via le panneau de configuration. 
+        Lorsque vous utilisez mei-friend, votre adresse IP est donc visible par RISM Digital.
+      </p>
+      <p>
         Enfin, la lecture MIDI est présentée à l'aide de la police sonore SGM_plus fournie par Google Magenta et servie via
         googleapis.com. Votre adresse IP est donc visible par Google lors du démarrage de la lecture MIDI. Si vous ne souhaitez
         pas que cela se produise, veuillez vous abstenir d'utiliser la fonction de lecture MIDI.

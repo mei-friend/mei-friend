@@ -43,6 +43,13 @@ export const lang = {
         y no se comparte con ningún tercero.
       </p>
       <p>
+        La herramienta Verovio se carga desde <a href="https://verovio.org" target="_blank">https://verovio.org</a>, 
+        alojada por <a href="https://rism.digital/" target="_blank">RISM Digital Switzerland</a>. 
+        Esto permite que mei-friend esté siempre actualizado con la última versión de la herramienta
+        y ofrezca la opción de todas las versiones admitidas a través del panel de configuración. 
+        Cuando usas mei-friend, tu dirección IP es visible para RISM Digital.
+      </p>
+      <p>
         Por último, la reproducción MIDI se presenta utilizando la fuente de sonido SGM_plus proporcionada por Google Magenta y
         servida a través de googleapis.com. Por lo tanto, tu dirección IP es visible para Google al iniciar la reproducción MIDI.
         Si no deseas que esto ocurra, abstente de utilizar la función de reproducción MIDI.

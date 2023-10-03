@@ -35,6 +35,13 @@ export const lang = {
         を使用しています。これには切り捨てられたIPアドレス（国のレベルでの地理的位置情報を許可しますが、それ以上の識別情報は含まれません）、ブラウザとオペレーティングシステム、リファリングウェブサイトからのアクセス先、訪問の時間と期間、および訪問したページが含まれます。この情報はmdw - ウィーン音楽・演劇アート大学のサーバーで実行されているMatomoインスタンスに保存され、第三者とは共有されません。
       </p>
       <p>
+        Verovioツールキットは<a href="https://verovio.org" target="_blank">https://verovio.org</a>からロードされ、
+        <a href="https://rism.digital/" target="_blank">RISM Digital Switzerland</a>がホストしています。 
+        これにより、mei-friendは常に最新のツールキットバージョンを使用できるだけでなく、
+        設定パネルを介してすべてのサポートされているバージョンの選択を提供できます。 
+        mei-friendを使用する際、IPアドレスはRISM Digitalによって表示されるため、注意してください。
+      </p>
+      <p>
         最後に、MIDI再生はGoogle Magentaが提供するSGM_plusサウンドフォントを使用し、googleapis.comを介して提供されます。そのため、MIDI再生を開始する際にGoogleに対してIPアドレスが表示されます。これを望まない場合は、MIDI再生機能の使用を避けてください。
       </p>
       <p>
