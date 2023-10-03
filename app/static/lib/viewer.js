@@ -2350,7 +2350,11 @@ export default class Viewer {
     let vs = document.getElementById('validation-status');
     vs.innerHTML = unverified;
     vs.style.cursor = 'pointer';
-    vs.setAttribute('title', translator.lang.notValidated.text);
+    if (isSafari) {
+      document.getElementById('validation-status').title = translator.lang.isSafariWarning.text;
+    } else {
+      vs.setAttribute('title', translator.lang.notValidated.text);
+    }
     vs.removeEventListener('click', this.manualValidate);
     vs.removeEventListener('click', this.toggleValidationReportVisibility);
     vs.addEventListener('click', this.manualValidate);
