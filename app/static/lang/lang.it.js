@@ -42,6 +42,13 @@ export const lang = {
         Spettacolo di Vienna e non sono condivise con terze parti.
       </p>
       <p>
+        Il toolkit Verovio è caricato da <a href="https://verovio.org" target="_blank">https://verovio.org</a>, ospitato da
+        <a href="https://rism.digital/" target="_blank">RISM Digital Switzerland</a>. 
+        Ciò consente a mei-friend di rimanere aggiornato con l'ultima versione del toolkit
+        e di fornire la scelta di tutte le versioni supportate attraverso il pannello delle impostazioni. 
+        Quando si utilizza mei-friend, il tuo indirizzo IP è quindi visibile a RISM Digital.
+      </p>
+      <p>
         Infine, la riproduzione MIDI è presentata utilizzando il font sonoro SGM_plus fornito da Google Magenta e servito tramite
         googleapis.com. Pertanto, il tuo indirizzo IP è visibile a Google durante l'avvio della riproduzione MIDI. Se non desideri
         che ciò accada, ti preghiamo di astenerti dall'utilizzare la funzione di riproduzione MIDI.

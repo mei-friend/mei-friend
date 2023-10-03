@@ -42,6 +42,13 @@ export const lang = {
         Performing Arts Vienna, and is not shared with any third party.
       </p>
       <p>
+        The Verovio toolkit is loaded from <a href="https://verovio.org" target="_blank">https://verovio.org</a>, hosted by
+        <a href="https://rism.digital/" target="_blank">RISM Digital Switzerland</a>. 
+        This allows mei-friend to stay up-to-date with the latest toolkit version and
+        to provide the choice of all supported versions through the settings panel. 
+        When using mei-friend, your IP address is therefore visible by RISM Digital.
+      </p>
+      <p>
         Finally, MIDI playback is presented using the SGM_plus sound font provided by Google Magenta, and served
         via googleapis.com. Your IP address is therefore visible to Google when initiating MIDI playback. If you 
         do not wish for this to happen, please refrain from using the MIDI playback feature.

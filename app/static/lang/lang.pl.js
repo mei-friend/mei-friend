@@ -42,6 +42,13 @@ export const lang = {
         stronie.
       </p>
       <p>
+        Zestaw narzędzi Verovio jest ładowany z <a href="https://verovio.org" target="_blank">https://verovio.org</a>, 
+        hostowany przez <a href="https://rism.digital/" target="_blank">RISM Digital Switzerland</a>. 
+        Dzięki temu mei-friend może być zawsze aktualny z najnowszą wersją narzędzi
+        i umożliwia wybór wszystkich obsługiwanych wersji za pomocą panelu ustawień. 
+        Korzystając z mei-friend, twój adres IP jest widoczny przez RISM Digital.
+      </p>
+      <p>
         Wreszcie, odtwarzanie MIDI jest prezentowane za pomocą fontu dźwiękowego SGM_plus dostarczanego przez Google Magenta
         i obsługiwanego za pomocą googleapis.com. Twój adres IP jest widoczny dla Google podczas uruchamiania odtwarzania MIDI.
         Jeśli nie chcesz, aby to się zdarzyło, prosimy o powstrzymanie się od korzystania z funkcji odtwarzania MIDI.
