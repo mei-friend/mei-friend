@@ -2344,14 +2344,20 @@ export default class Viewer {
   } // updateSchemaStatusDisplay()
 
   /**
-   * Switch validation-status icon to manual mode and add click event handlers
+   * Switch validation-status icon to manual mode and add click event handlers.
+   * Handle Safari exception: disable menu item, set warning messages to validation status
+   * and schema status
    */
   setValidationStatusToManual() {
     let vs = document.getElementById('validation-status');
     vs.innerHTML = unverified;
     vs.style.cursor = 'pointer';
     if (isSafari) {
-      document.getElementById('validation-status').title = translator.lang.isSafariWarning.text;
+      vs.title = translator.lang.isSafariWarning.text;
+      this.updateSchemaStatusDisplay('error', '', translator.lang.isSafariWarning.text);
+      let mv = document.getElementById('manualValidate');
+      mv.disabled = true;
+      mv.classList.add('disabled');
     } else {
       vs.setAttribute('title', translator.lang.notValidated.text);
     }
@@ -2361,7 +2367,9 @@ export default class Viewer {
     this.changeStatus(vs, 'manual', ['wait', 'ok', 'error']);
     let reportDiv = document.getElementById('validation-report');
     if (reportDiv) reportDiv.style.visibility = 'hidden';
-    if (this.updateLinting && typeof this.updateLinting === 'function') this.updateLinting(cm, []); // clear errors in CodeMirror
+    if (this.updateLinting && typeof this.updateLinting === 'function') {
+      this.updateLinting(cm, []); // clear errors in CodeMirror
+    }
   } // setValidationStatusToManual()
 
   /**
