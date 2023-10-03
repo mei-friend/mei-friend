@@ -7,6 +7,7 @@
 * Support keyboard shortcuts (with os-dependent modifier keys) in encoding editor (#50)
 * Show warning message when clicking on or drag-selecting elements without xml:ids (#10)
 * Drag'n'drop on CodeMirror editor now shows drag overlay screen
+* Take language from browser locale
 ### 1.0.1 patch
 * Reduce mei-friend-specific Verovio defaults
 * Add auto-translated draft of Japanese language pack
