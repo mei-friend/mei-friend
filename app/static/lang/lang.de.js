@@ -43,6 +43,13 @@ export const lang = {
       Wien läuft, und werden nicht an Dritte weitergegeben.
     </p>
     <p>
+      Das Verovio-Toolkit wird von <a href="https://verovio.org" target="_blank">https://verovio.org</a> geladen 
+      und von  <a href="https://rism.digital/" target="_blank">RISM Digital Switzerland</a> gehostet. 
+      Dadurch bleibt mei-friend immer auf dem neuesten Stand mit der aktuellen Toolkit-Version 
+      und bietet die Auswahl aller unterstützten Versionen über das Settingsfenster. 
+      Bei der Verwendung von mei-friend ist daher Ihre IP-Adresse für RISM Digital sichtbar.
+    </p>
+    <p>
       Schließlich wird die MIDI-Wiedergabe mit dem SGM_plus-Soundfont von Google Magenta abgespielt 
       der über googleapis.com bereitgestellt wird. Ihre IP-Adresse wird beim Aktivieren der MIDI-Wiedergabefunktion 
       daher für Google sichtbar. Wenn Sie dies nicht wünschen, verzichten Sie bitte auf die Verwendung der 

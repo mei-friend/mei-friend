@@ -43,6 +43,13 @@ export const lang = {
         Viena i no es comparteix amb cap tercer.
       </p>
       <p>
+        La caixa d'eines Verovio es carrega des de <a href="https://verovio.org" target="_blank">https://verovio.org</a>, 
+        allotjada per <a href="https://rism.digital/" target="_blank">RISM Digital Switzerland</a>. 
+        Això permet a mei-friend de mantenir-se actualitzat amb l'última versió de la caixa d'eines
+        i oferir la opció de totes les versions compatibles a través del panell de configuració. 
+        Quan utilitzeu mei-friend, la vostra adreça IP és visible per RISM Digital.
+      </p>
+      <p>
         Finalment, la reproducció MIDI es presenta utilitzant la font de so SGM_plus proporcionada per Google Magenta i
         servida a través de googleapis.com. Per tant, la teva adreça IP és visible per a Google quan s'inicia la reproducció
         MIDI. Si no vols que això passi, abstén-te d'utilitzar la funció de reproducció MIDI.
