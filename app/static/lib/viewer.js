@@ -2224,8 +2224,8 @@ export default class Viewer {
     vs.innerHTML = download;
     let msg = translator.lang.loadingSchema.text + ' ' + schemaFileName;
     vs.setAttribute('title', msg);
-    this.changeStatus(vs, 'wait', ['error', 'ok', 'manual']);
-    this.updateSchemaStatusDisplay('wait', schemaFileName, msg);
+    Viewer.changeStatus(vs, 'wait', ['error', 'ok', 'manual']);
+    Viewer.updateSchemaStatusDisplay('wait', schemaFileName, msg);
 
     console.log('Viewer.replaceSchema(): ' + schemaFileName);
     let data; // content of schema file
@@ -2262,7 +2262,7 @@ export default class Viewer {
     rngLoader.setRelaxNGSchema(data);
     cm.options.hintOptions.schemaInfo = rngLoader.tags;
     console.log('New schema loaded for auto completion', schemaFileName);
-    this.updateSchemaStatusDisplay('ok', schemaFileName, msg);
+    Viewer.updateSchemaStatusDisplay('ok', schemaFileName, msg);
   } // replaceSchema()
 
   /**
@@ -2289,8 +2289,8 @@ export default class Viewer {
     vs.innerHTML = unverified;
     vs.setAttribute('title', msg);
     console.warn(msg);
-    this.changeStatus(vs, 'error', ['wait', 'ok', 'manual']);
-    this.updateSchemaStatusDisplay('error', '', msg);
+    Viewer.changeStatus(vs, 'error', ['wait', 'ok', 'manual']);
+    Viewer.updateSchemaStatusDisplay('error', '', msg);
   } // throwSchemaError()
 
   /**
@@ -2300,7 +2300,7 @@ export default class Viewer {
    * @param {string} addedClassName
    * @param {Array<string>} removedClasses
    */
-  changeStatus(el, addedClassName = '', removedClasses = []) {
+  static changeStatus(el, addedClassName = '', removedClasses = []) {
     removedClasses.forEach((c) => el.classList.remove(c));
     el.classList.add(addedClassName);
   } // changeStatus()
@@ -2311,13 +2311,13 @@ export default class Viewer {
    * @param {string} schemaName
    * @param {string} msg
    */
-  updateSchemaStatusDisplay(status = 'ok', schemaName, msg = '') {
+  static updateSchemaStatusDisplay(status = 'ok', schemaName, msg = '') {
     let el = document.getElementById('schemaStatus');
     if (el) {
       el.title = msg;
       switch (status) {
         case 'ok':
-          this.changeStatus(el, 'ok', ['error', 'manual', 'wait']);
+          Viewer.changeStatus(el, 'ok', ['error', 'manual', 'wait']);
           // pretty-printing for known schemas from music-encoding.org
           if (schemaName.includes('music-encoding.org')) {
             let pathElements = schemaName.split('/');
@@ -2332,11 +2332,11 @@ export default class Viewer {
           }
           break;
         case 'wait': // downloading schema
-          this.changeStatus(el, 'wait', ['ok', 'manual', 'error']);
+          Viewer.changeStatus(el, 'wait', ['ok', 'manual', 'error']);
           el.innerHTML = '&nbsp;&#11015;&nbsp;'; // #8681 #8615
           break;
         case 'error': // no schema in MEI or @meiversion
-          this.changeStatus(el, 'error', ['ok', 'manual', 'wait']);
+          Viewer.changeStatus(el, 'error', ['ok', 'manual', 'wait']);
           el.innerHTML = '&nbsp;?&nbsp;';
           break;
       }
@@ -2353,18 +2353,14 @@ export default class Viewer {
     vs.innerHTML = unverified;
     vs.style.cursor = 'pointer';
     if (isSafari) {
-      vs.title = translator.lang.isSafariWarning.text;
-      this.updateSchemaStatusDisplay('error', '', translator.lang.isSafariWarning.text);
-      let mv = document.getElementById('manualValidate');
-      mv.disabled = true;
-      mv.classList.add('disabled');
+      translator.handleBrowserExceptions('Safari');
     } else {
       vs.setAttribute('title', translator.lang.notValidated.text);
     }
     vs.removeEventListener('click', this.manualValidate);
     vs.removeEventListener('click', this.toggleValidationReportVisibility);
     vs.addEventListener('click', this.manualValidate);
-    this.changeStatus(vs, 'manual', ['wait', 'ok', 'error']);
+    Viewer.changeStatus(vs, 'manual', ['wait', 'ok', 'error']);
     let reportDiv = document.getElementById('validation-report');
     if (reportDiv) reportDiv.style.visibility = 'hidden';
     if (this.updateLinting && typeof this.updateLinting === 'function') {
@@ -2430,11 +2426,11 @@ export default class Viewer {
 
     let msg = '';
     if (found.length === 0 && this.validatorWithSchema) {
-      this.changeStatus(vs, 'ok', ['error', 'wait', 'manual']);
+      Viewer.changeStatus(vs, 'ok', ['error', 'wait', 'manual']);
       vs.innerHTML = verified;
       msg = 'Everything ok, no errors.';
     } else {
-      this.changeStatus(vs, 'error', ['wait', 'ok', 'manual']);
+      Viewer.changeStatus(vs, 'error', ['wait', 'ok', 'manual']);
       vs.innerHTML = alert;
       vs.innerHTML += '<span>' + Object.keys(messages).length + '</span>';
       msg = 'Validation failed. ' + Object.keys(messages).length + ' validation messages:';

@@ -349,7 +349,7 @@ export async function validate(mei, updateLinting, options) {
     if (v.validatorWithSchema && (document.getElementById('autoValidate').checked || options.forceValidate)) {
       let vs = document.getElementById('validation-status');
       vs.innerHTML = clock;
-      v.changeStatus(vs, 'wait', ['error', 'ok', 'manual']); // darkorange
+      Viewer.changeStatus(vs, 'wait', ['error', 'ok', 'manual']); // darkorange
       vs.querySelector('svg').classList.add('clockwise');
       vs.setAttribute('title', translator.lang.validatingAgainst.text + ' ' + v.currentSchema);
       const validationString = await validator.validateNG(mei);
