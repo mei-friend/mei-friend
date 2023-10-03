@@ -257,7 +257,7 @@ export function loadDataInEditor(mei, setFreshlyLoaded = true) {
   clearAnnotations();
   readAnnots(true); // from annotation.js
   setCursorToId(cm, handleURLParamSelect());
-}
+} // loadDataInEditor()
 
 export function updateLocalStorage(meiXml) {
   // if storage is available, save file name, location, content
@@ -430,7 +430,7 @@ function onLanguageLoaded() {
   // make sure that the drag enter event is passed through CodeMirror
   cm.on('dragenter', (cm, ev) => dragEnter(ev));
   cm.on('dragleave', (cm, ev) => dragLeave(ev));
-  
+
   // set validation status icon to unverified
   let vs = document.getElementById('validation-status');
   vs.innerHTML = unverified;
@@ -1711,7 +1711,11 @@ function addEventListeners(v, cm) {
       // user clicked on link in message. Open link (before the DOM element disappears in the next conditional...)
       window.open(ev.target.href, '_blank');
     }
-    if (ev.target.id !== 'alertOverlay' && ev.target.id !== 'alertMessage') {
+    if (
+      ev.target.id !== 'alertOverlay' &&
+      ev.target.id !== 'alertMessage' &&
+      document.getElementById('splashOverlay').style.display === 'none'
+    ) {
       v.hideAlerts();
     }
   });
@@ -2014,7 +2018,9 @@ function addEventListeners(v, cm) {
   // show splash screen
   document.getElementById('aboutMeiFriend').addEventListener('click', showSplashScreen);
   document.getElementById('splashOverlay').addEventListener('click', (e) => {
-    if (e.target.id === 'splashOverlay') document.getElementById('splashOverlay').style.display = 'none'; // dismiss splash when user clicks on black background
+    if (e.target.id === 'splashOverlay') {
+      document.getElementById('splashOverlay').style.display = 'none'; // dismiss splash when user clicks on black background
+    }
   });
 
   // consult guidelines

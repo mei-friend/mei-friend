@@ -880,7 +880,7 @@ export const lang = {
   isSafariWarning: {
     text:
       'It seems that you are using Safari as your browser, on which ' +
-      'mei-friend unfortunately does not currently support schema validation. ' +
+      'mei-friend unfortunately does not support schema validation. ' +
       'Please use another browser for full validation support.',
   },
   githubLoggedOutWarning: {
