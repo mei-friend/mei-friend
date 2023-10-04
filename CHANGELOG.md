@@ -1,5 +1,8 @@
 # mei-friend-online CHANGELOG.md
 
+### 1.0.3 patch
+* Enable navigation link to generated MAO objects (identify object annotations)
+
 ### 1.0.2 Splash screen 
 * Add splash screen on application load explaining data storage (#41)
 * Fix bug when drag-selected elements contain non-note elements and blocked inserting control elements on them (such as slurs) (#48)

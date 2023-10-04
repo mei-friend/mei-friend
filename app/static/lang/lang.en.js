@@ -63,7 +63,7 @@ export const lang = {
           >GNU Affero General Public License v3.0</a
         >. Please consult our
         <a href="https://mei-friend.github.io/about/" target="_blank">acknowledgements page</a> for further
-        infomation about contributors and the open-source components reused within our project. We thank our
+        information about contributors and the open-source components reused within our project. We thank our
         colleagues for their contributions and guidance.
       </p>
       <p>
