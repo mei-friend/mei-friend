@@ -1,4 +1,6 @@
 # mei-friend-online CHANGELOG.md
+### 1.0.4 patch
+* Tweak CSS and translations
 
 ### 1.0.3 patch
 * Enable navigation link to generated MAO objects (identify object annotations)
