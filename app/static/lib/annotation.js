@@ -33,11 +33,13 @@ import { nsp, traverseAndFetch } from './linked-data.js';
 
 export let annotations = [];
 
+// to enrichment_panel.js
 export function situateAndRefreshAnnotationsList(forceRefresh = false) {
   situateAnnotations();
   if (forceRefresh || !document.getElementsByClassName('annotationListItem').length) refreshAnnotationsList();
 }
 
+// to enrichment_panel.js
 export function refreshAnnotationsList() {
   const list = document.getElementById('listAnnotations');
   // clear list
@@ -169,6 +171,7 @@ export function refreshAnnotationsList() {
   });
 }
 
+// to enrichment_panel.js
 export function generateAnnotationLocationLabel(a) {
   console.log('generating anno label for ', a);
   const annotationLocationLabel = document.createElement('span');
@@ -195,7 +198,10 @@ export function generateAnnotationLocationLabel(a) {
   return annotationLocationLabel;
 }
 
-// call whenever layout reflows to re-situate annotations appropriately
+/**
+ * Adds page locations in rendering to annotation object in annotation list.
+ * Call whenever layout reflows to re-situate annotations appropriately.
+ */
 export function situateAnnotations() {
   annotations.forEach(async (a) => {
     // for each element in a.selection, ask Verovio for the page number
