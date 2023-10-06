@@ -1452,6 +1452,7 @@ input,
 select {
   background-color: var(--backgroundColor);
   color: var(--textColor);
+  text-align: left;
 }
 
 select > option {
