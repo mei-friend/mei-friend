@@ -595,8 +595,8 @@ export const lang = {
     description: 'Steuerung anzeigen zur automatischen Notationsaktualisierung',
   },
   controlMenuFontSelector: {
-    text: 'Auswahl der Notationsschrift',
-    description: 'Auswahl der Notationsschrift (SMuFL font) in der Notationskontrollleiste anzeigen',
+    text: 'Auswahl der Notationsschriftart',
+    description: 'Auswahl der Notationsschriftart (SMuFL font) in der Notationskontrollleiste anzeigen',
   },
   controlMenuNavigateArrows: {
     text: 'Navigationspfeile anzeigen',
