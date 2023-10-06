@@ -1,11 +1,11 @@
 # mei-friend-online CHANGELOG.md
 ### 1.0.4 patch
-* Tweak CSS and translations
+* Tweak CSS select and translations (German)
 
 ### 1.0.3 patch
 * Enable navigation link to generated MAO objects (identify object annotations)
 
-### 1.0.2 Splash screen 
+### 1.0.2 Splash screen (released 3 Oct 2023)
 * Add splash screen on application load explaining data storage (#41)
 * Fix bug when drag-selected elements contain non-note elements and blocked inserting control elements on them (such as slurs) (#48)
 * Support for @meter.sym/@sym information (#49). No slur (spanning element) inserted when on same time stamps.
