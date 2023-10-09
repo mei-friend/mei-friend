@@ -700,12 +700,19 @@ export function loadWebAnnotation(prev = '') {
   }
 }
 
-// Wrapper around traverseAndFetch that reports back errors / progress to 'Load linked data' UI
-export function attemptFetchExternalResource(url, targetTypes, configObj) {
-  // spin the icon to indicate loading activity
+/**
+ * Spins the icon to indicate loading activity
+ */
+function spinIcon() {
   const icon = document.getElementById('addWebAnnotationIcon');
   const svgs = Array.from(icon.getElementsByTagName('svg'));
   svgs.forEach((t) => t.classList.add('clockwise'));
+}
+
+// Wrapper around traverseAndFetch that reports back errors / progress to 'Load linked data' UI
+export function attemptFetchExternalResource(url, targetTypes, configObj) {
+  // spin the icon to indicate loading activity
+  spinIcon();
   traverseAndFetch(url, targetTypes, configObj)
     .catch((resp) => {
       if (userProvided) {
@@ -723,9 +730,7 @@ export function attemptFetchExternalResource(url, targetTypes, configObj) {
 
 export function fetchWebAnnotations(url, userProvided = true, jumps = 10) {
   // spin the icon to indicate loading activity
-  const icon = document.getElementById('addWebAnnotationIcon');
-  const svgs = Array.from(icon.getElementsByTagName('svg'));
-  svgs.forEach((t) => t.classList.add('clockwise'));
+  spinIcon();
   let fetchAppropriately = solid.getDefaultSession().info.isLoggedIn ? solid.fetch : fetch;
   fetchAppropriately(url, {
     headers: {
