@@ -245,7 +245,7 @@ export const lang = {
       'Hostowany przez <a href="https://iwk.mdw.ac.at">IWK</a> ' +
       'na <a href="https://mdw.ac.at">mdw</a>, z ' +
       heart +
-      'z Wiednia. ' +
+      ' z Wiednia. ' +
       '<a href="https://iwk.mdw.ac.at/impressum">Oświadczenie</a>.',
   },
   loadingVerovio: { text: 'Wczytywanie Verovio' },
