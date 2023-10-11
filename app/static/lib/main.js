@@ -53,12 +53,12 @@ import {
 } from './resizer.js';
 import {
   addAnnotationHandlers,
-  clearAnnotations,
+  clearListItems,
   getSolidIdP,
-  readAnnots,
+  readListItems,
   refreshAnnotations,
   populateSolidTab,
-} from './annotation.js';
+} from './enrichment_panel.js';
 import { dropHandler, dragEnter, dragOverHandler, dragLeave } from './dragger.js';
 import { openUrl, openUrlCancel } from './open-url.js';
 import {
@@ -259,8 +259,8 @@ export function loadDataInEditor(mei, setFreshlyLoaded = true) {
     // disable validation on Safari because of this strange error: "RangeError: Maximum call stack size exceeded" (WG, 1 Oct 2022)
     v.checkSchema(mei);
   }
-  clearAnnotations();
-  readAnnots(true); // from annotation.js
+  clearListItems();
+  readListItems(true); // readAnnots(true); from annotation.js
   setCursorToId(cm, handleURLParamSelect());
 }
 
@@ -1219,7 +1219,7 @@ export function handleEncoding(mei, setFreshlyLoaded = true, updateAfterLoading 
     }
     setIsMEI(false);
     clearFacsimile();
-    clearAnnotations();
+    clearListItems();
     v.busy(false);
   }
   setStandoffAnnotationEnabledStatus();
@@ -2253,7 +2253,7 @@ export function handleEditorChanges() {
     updateLocalStorage(meiXml);
   }
   if (document.getElementById('showAnnotations').checked || document.getElementById('showAnnotationPanel').checked) {
-    readAnnots(); // from annotation.js
+    readListItems(); // readAnnots(); from annotation.js
   }
   if (document.getElementById('showMidiPlaybackControlBar').checked) {
     // start a new time-out to midi-rerender
