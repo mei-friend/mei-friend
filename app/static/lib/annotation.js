@@ -199,8 +199,6 @@ export function refreshAnnotationsList() {
   return annotationLocationLabel;
 }*/
 
-
-
 /*export function deleteAnnotation(uuid) {
   const ix = annotations.findIndex((a) => a.id === uuid);
   if (ix >= 0) {
@@ -376,87 +374,87 @@ export function drawLink(a) {
     refreshAnnotations(true);
   };*/
 
-  // functions to create annotations
-  export const createIdentify = (e) => {
-    if (solid.getDefaultSession().info.isLoggedIn) {
-      const label = window.prompt('Add label for identified object (optional)');
-      const selection = v.selectedElements;
-      document.getElementById('solid_logo').classList.add('clockwise');
-      createMAOMusicalObject(selection, label)
-        .then((maoMusicalMaterial) => {
-          getSolidStorage().then((solidStorage) => {
-            console.log(
-              'CREATED MUSICAL MATERIAL: ',
-              solidStorage + maoMusicalMaterial.headers.get('location').substr(1),
-              maoMusicalMaterial
-            );
-            const a = {
-              id: solidStorage + maoMusicalMaterial.headers.get('location').substr(1),
-              type: 'annotateIdentify',
-              selection: selection,
-              isStandoff: true,
-            };
-            annotations.push(a);
-            refreshAnnotations(true);
-          });
-        })
-        .finally(() => {
-          document.getElementById('solid_logo').classList.remove('clockwise');
+// functions to create annotations
+export const createIdentify = (e) => {
+  if (solid.getDefaultSession().info.isLoggedIn) {
+    const label = window.prompt('Add label for identified object (optional)');
+    const selection = v.selectedElements;
+    document.getElementById('solid_logo').classList.add('clockwise');
+    createMAOMusicalObject(selection, label)
+      .then((maoMusicalMaterial) => {
+        getSolidStorage().then((solidStorage) => {
+          console.log(
+            'CREATED MUSICAL MATERIAL: ',
+            solidStorage + maoMusicalMaterial.headers.get('location').substr(1),
+            maoMusicalMaterial
+          );
+          const a = {
+            id: solidStorage + maoMusicalMaterial.headers.get('location').substr(1),
+            type: 'annotateIdentify',
+            selection: selection,
+            isStandoff: true,
+          };
+          annotations.push(a);
+          refreshAnnotations(true);
         });
-      // writing inline not supported
-    } else {
-      document.getElementById('solidButton').click();
-    }
+      })
+      .finally(() => {
+        document.getElementById('solid_logo').classList.remove('clockwise');
+      });
+    // writing inline not supported
+  } else {
+    document.getElementById('solidButton').click();
+  }
+};
+export const createHighlight = (e) => {
+  const a = {
+    id: generateXmlId('annot', v.xmlIdStyle),
+    type: 'annotateHighlight',
+    selection: v.selectedElements,
   };
-  export const createHighlight = (e) => {
-    const a = {
-      id: generateXmlId('annot', v.xmlIdStyle),
-      type: 'annotateHighlight',
-      selection: v.selectedElements,
-    };
-    annotations.push(a);
-    writeInlineIfRequested(a);
-    writeStandoffIfRequested(a);
+  annotations.push(a);
+  writeInlineIfRequested(a);
+  writeStandoffIfRequested(a);
+};
+export const createCircle = (e) => {
+  const a = {
+    id: generateXmlId('annot', v.xmlIdStyle),
+    type: 'annotateCircle',
+    selection: v.selectedElements,
   };
-  export const createCircle = (e) => {
-    const a = {
-      id: generateXmlId('annot', v.xmlIdStyle),
-      type: 'annotateCircle',
-      selection: v.selectedElements,
-    };
-    annotations.push(a);
-    writeInlineIfRequested(a);
-    writeStandoffIfRequested(a);
+  annotations.push(a);
+  writeInlineIfRequested(a);
+  writeStandoffIfRequested(a);
+};
+export const createDescribe = (e) => {
+  // TODO improve UX!
+  const desc = window.prompt(translator.lang.askForDescription.text);
+  const a = {
+    id: generateXmlId('annot', v.xmlIdStyle),
+    type: 'annotateDescribe',
+    selection: v.selectedElements,
+    description: desc,
   };
-  export const createDescribe = (e) => {
-    // TODO improve UX!
-    const desc = window.prompt(translator.lang.askForDescription.text);
-    const a = {
-      id: generateXmlId('annot', v.xmlIdStyle),
-      type: 'annotateDescribe',
-      selection: v.selectedElements,
-      description: desc,
-    };
-    annotations.push(a);
-    writeInlineIfRequested(a);
-    writeStandoffIfRequested(a);
+  annotations.push(a);
+  writeInlineIfRequested(a);
+  writeStandoffIfRequested(a);
+};
+export const createLink = (e) => {
+  // TODO improve UX!
+  let url = window.prompt(translator.lang.askForLinkUrl.text);
+  if (!url.startsWith('http')) url = 'https://' + url;
+  const a = {
+    id: generateXmlId('annot', v.xmlIdStyle),
+    type: 'annotateLink',
+    selection: v.selectedElements,
+    url: url,
   };
-  export const createLink = (e) => {
-    // TODO improve UX!
-    let url = window.prompt(translator.lang.askForLinkUrl.text);
-    if (!url.startsWith('http')) url = 'https://' + url;
-    const a = {
-      id: generateXmlId('annot', v.xmlIdStyle),
-      type: 'annotateLink',
-      selection: v.selectedElements,
-      url: url,
-    };
-    annotations.push(a);
-    writeInlineIfRequested(a);
-    writeStandoffIfRequested(a);
-  };
+  annotations.push(a);
+  writeInlineIfRequested(a);
+  writeStandoffIfRequested(a);
+};
 
-  /*document.querySelectorAll('.annotationToolsIcon').forEach((a) => a.removeEventListener('click', annotationHandler));
+/*document.querySelectorAll('.annotationToolsIcon').forEach((a) => a.removeEventListener('click', annotationHandler));
   document.querySelectorAll('.annotationToolsIcon').forEach((a) => a.addEventListener('click', annotationHandler));
 
   // disable 'identify music object' unless 'linked data' domain selected
@@ -1073,4 +1071,3 @@ export function copyIdToClipboard(e) {
 /*export function clearAnnotations() {
   annotations = [];
 }*/
-
