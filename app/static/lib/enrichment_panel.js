@@ -37,8 +37,7 @@ export function clearListItems() {
  * read List Items from XML
  */
 export function readListItemsFromXML(flagLimit = false) {
-  annotations = annot.readAnnots(flagLimit);
-  listItems.push(...annotations);
+  annot.readAnnots(flagLimit);
   refreshAnnotationsInRendering();
 }
 // TODO:
@@ -56,12 +55,16 @@ export function isItemInList(itemId) {
 
 /**
  * Adds a new item to ListItems if there is no item with this id
+ * @param {Object} listItemObject Annotation / Markup object to add
+ * @param {boolean} [forceRefreshAnnotations=false] should annotations be refreshed after adding?
+ * @returns {boolean} added successfully
  */
-export function addListItem(listItemObject) {
+export function addListItem(listItemObject, forceRefreshAnnotations = false) {
   let addedSuccessfully = false;
   if(!isItemInList(listItemObject.id)) {
     listItems.push(listItemObject);
     addedSuccessfully = true;
+    if (forceRefreshAnnotations === true) refreshAnnotationsInRendering(true);
   }
   return addedSuccessfully;
 }

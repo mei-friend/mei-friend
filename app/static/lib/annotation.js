@@ -1,4 +1,4 @@
-import { v, cm, log, translator, setStandoffAnnotationEnabledStatus } from './main.js';
+import { v, cm, log, translator, /*setStandoffAnnotationEnabledStatus*/ } from './main.js';
 import { convertCoords, generateXmlId, rmHash, setCursorToId } from './utils.js';
 import { meiNameSpace, xmlNameSpace, xmlToString } from './dom-utils.js';
 /*import {
@@ -15,10 +15,10 @@ import { meiNameSpace, xmlNameSpace, xmlToString } from './dom-utils.js';
 } from '../css/icons.js';*/
 import { removeInEditor } from './editor.js';
 import {
-  loginAndFetch,
+  //loginAndFetch,
   solid,
-  solidLogout,
-  provider,
+  //solidLogout,
+  //provider,
   getSolidStorage,
   friendContainer,
   annotationContainer,
@@ -394,8 +394,8 @@ export const createIdentify = (e) => {
             selection: selection,
             isStandoff: true,
           };
-          annotations.push(a);
-          refreshAnnotations(true);
+          // add item and force refresh of annotations
+          addListItem(a, true);
         });
       })
       .finally(() => {
@@ -412,7 +412,7 @@ export const createHighlight = (e) => {
     type: 'annotateHighlight',
     selection: v.selectedElements,
   };
-  annotations.push(a);
+  addListItem(a);
   writeInlineIfRequested(a);
   writeStandoffIfRequested(a);
 };
@@ -422,7 +422,7 @@ export const createCircle = (e) => {
     type: 'annotateCircle',
     selection: v.selectedElements,
   };
-  annotations.push(a);
+  addListItem(a);
   writeInlineIfRequested(a);
   writeStandoffIfRequested(a);
 };
@@ -435,7 +435,7 @@ export const createDescribe = (e) => {
     selection: v.selectedElements,
     description: desc,
   };
-  annotations.push(a);
+  addListItem(a);
   writeInlineIfRequested(a);
   writeStandoffIfRequested(a);
 };
@@ -449,7 +449,7 @@ export const createLink = (e) => {
     selection: v.selectedElements,
     url: url,
   };
-  annotations.push(a);
+  addListItem(a);
   writeInlineIfRequested(a);
   writeStandoffIfRequested(a);
 };
@@ -793,11 +793,8 @@ export function ingestWebAnnotation(webAnno) {
     }
 
     anno.selection = targets.map((t) => t['@id'].split('#')[1]);
-    if (annotations.findIndex((a) => a.id === anno.id) < 0) {
-      // add to list if we don't already have it
-      anno.isStandoff = true;
-      annotations.push(anno);
-    }
+    anno.isStandoff = true;
+    addListItem(anno, true);
     refreshAnnotations(true);
   }
 }
