@@ -20,28 +20,11 @@ import {
   speechBubble,
   symLinkFile,
 } from '../css/icons.js';
-import {
-  loginAndFetch,
-  solid,
-  solidLogout,
-  provider,
-  getSolidStorage,
-  friendContainer,
-  annotationContainer,
-  establishContainerResource,
-  establishResource,
-  createMAOMusicalObject,
-  establishDiscoveryResource,
-  getCurrentFileUri,
-  safelyPatchResource,
-} from './solid.js';
+import { loginAndFetch, solid, solidLogout, provider } from './solid.js';
+
+//#region List Items Array and access functions
 
 export let listItems = [];
-//export let annotations = [];
-
-/**
- * List of all things tab
- */
 
 /**
  * Clear list of annotations
@@ -58,8 +41,92 @@ export function readListItems(flagLimit = false) {
   listItems.push(...annotations);
   refreshAnnotations();
 }
-// TODO: 
-// * Add method to read markup elements 
+// TODO:
+// * Add method to read markup elements
+
+export function addListItem() {}
+
+// deleteItem()
+// -> calls deleteAnnotation() & deleteMarkup
+// -> deleteAnnotation() should only check if Annot or WebAnnotation should be deleted
+
+export function deleteAnnotation(uuid) {
+  const ix = listItems.findIndex((a) => a.id === uuid);
+  if (ix >= 0) {
+    listItems.splice(ix, 1);
+    annot.deleteAnnot(uuid);
+    situateAndRefreshAnnotationsList(true);
+    refreshAnnotations();
+  }
+}
+
+export function retrieveListItem() {}
+
+/**
+ *
+ */
+function situateListItems() {
+  situateAnnotations(listItems);
+}
+// should call situateAnnotations & situateMarkup when finished
+// TODO: situateAnnotations should receive an array of annotations as parameter and not access the list itself
+
+/**
+ * Adds page locations in rendering to annotation object in annotation list.
+ * Call whenever layout reflows to re-situate annotations appropriately.
+ */
+function situateAnnotations(annotations) {
+  annotations.forEach(async (a) => {
+    // for each element in a.selection, ask Verovio for the page number
+    // set a.firstPage and a.lastPage to min/max page numbers returned
+    a.firstPage = 'unsituated';
+    a.lastPage = -1;
+    if ('selection' in a) {
+      let selectionStart =
+        a.selection[0].indexOf('#') < 0 ? a.selection[0] : a.selection[0].substr(a.selection[0].indexOf('#') + 1);
+      let selLen = a.selection.length - 1;
+      let selectionEnd =
+        a.selection[selLen].indexOf('#') < 0
+          ? a.selection[selLen]
+          : a.selection[selLen].substr(a.selection[selLen].indexOf('#') + 1);
+      a.firstPage = await v.getPageWithElement(selectionStart);
+      a.lastPage = await v.getPageWithElement(selectionEnd);
+      if (a.firstPage < 0 && v.speedMode) {
+        if (v.xmlDoc.querySelector('[*|id=' + a.selection[0] + ']')?.closest('meiHead')) a.firstPage = 'meiHead';
+        else console.warn('Cannot locate annotation ', a);
+      } else {
+        // if not speed mode, asynchronous return of page numbers after we are finished here
+        const annotationLocationLabelElement = document.querySelector(
+          `.annotationLocationLabel[data-id=loc-${CSS.escape(a.id)}`
+        );
+        if (annotationLocationLabelElement) {
+          annotationLocationLabelElement.innerHTML = generateAnnotationLocationLabel(a).innerHTML;
+        }
+      }
+    }
+    // for any identifying annotations, see if there are new extracts associated with the musical material
+    if (a.type == 'annotateIdentify') {
+      // find it in the list
+      const musMatDiv = document.querySelector('#musMat_' + CSS.escape(a.id));
+      console.log('extracts DIV: ', musMatDiv);
+      if (musMatDiv && !musMatDiv.innerHTML.length) {
+        musMatDiv
+          .closest('.annotationListItem')
+          .querySelector('.makeStandoffAnnotation svg')
+          .classList.add('clockwise');
+        fetchMAOComponentsForIdentifiedObject(a.id);
+      }
+    }
+  });
+} // situateAnnotations()
+
+//#endregion
+
+/**
+ * User Interface functions
+ */
+
+//#region Verovio Notation Panel
 
 /**
  * Draws annotations in Verovio notation panel.
@@ -112,6 +179,9 @@ export function refreshAnnotations(forceListRefresh = false) {
   if (document.getElementById('showAnnotationPanel')?.checked) situateAndRefreshAnnotationsList(forceListRefresh);
 }
 
+//#endregion
+
+//#region List of all things
 /**
  * builds list of bubbles
  */
@@ -245,83 +315,6 @@ export function refreshAnnotationsList() {
     annoDiv.appendChild(annoListItemButtons);
     list.appendChild(annoDiv);
   });
-}
-
-//#region Item Controller
-/**
- * Things that do happen to items
- */
-
-/**
- * 
- */
-function situateListItems() {
-  situateAnnotations(listItems);
-}
-// should call situateAnnotations & situateMarkup when finished
-// TODO: situateAnnotations should receive an array of annotations as parameter and not access the list itself
-
-/**
- * Adds page locations in rendering to annotation object in annotation list.
- * Call whenever layout reflows to re-situate annotations appropriately.
- */
-function situateAnnotations(annotations) {
-  annotations.forEach(async (a) => {
-    // for each element in a.selection, ask Verovio for the page number
-    // set a.firstPage and a.lastPage to min/max page numbers returned
-    a.firstPage = 'unsituated';
-    a.lastPage = -1;
-    if ('selection' in a) {
-      let selectionStart =
-        a.selection[0].indexOf('#') < 0 ? a.selection[0] : a.selection[0].substr(a.selection[0].indexOf('#') + 1);
-      let selLen = a.selection.length - 1;
-      let selectionEnd =
-        a.selection[selLen].indexOf('#') < 0
-          ? a.selection[selLen]
-          : a.selection[selLen].substr(a.selection[selLen].indexOf('#') + 1);
-      a.firstPage = await v.getPageWithElement(selectionStart);
-      a.lastPage = await v.getPageWithElement(selectionEnd);
-      if (a.firstPage < 0 && v.speedMode) {
-        if (v.xmlDoc.querySelector('[*|id=' + a.selection[0] + ']')?.closest('meiHead')) a.firstPage = 'meiHead';
-        else console.warn('Cannot locate annotation ', a);
-      } else {
-        // if not speed mode, asynchronous return of page numbers after we are finished here
-        const annotationLocationLabelElement = document.querySelector(
-          `.annotationLocationLabel[data-id=loc-${CSS.escape(a.id)}`
-        );
-        if (annotationLocationLabelElement) {
-          annotationLocationLabelElement.innerHTML = generateAnnotationLocationLabel(a).innerHTML;
-        }
-      }
-    }
-    // for any identifying annotations, see if there are new extracts associated with the musical material
-    if (a.type == 'annotateIdentify') {
-      // find it in the list
-      const musMatDiv = document.querySelector('#musMat_' + CSS.escape(a.id));
-      console.log('extracts DIV: ', musMatDiv);
-      if (musMatDiv && !musMatDiv.innerHTML.length) {
-        musMatDiv
-          .closest('.annotationListItem')
-          .querySelector('.makeStandoffAnnotation svg')
-          .classList.add('clockwise');
-        fetchMAOComponentsForIdentifiedObject(a.id);
-      }
-    }
-  });
-} // situateAnnotations()
-
-// deleteItem()
-// -> calls deleteAnnotation() & deleteMarkup
-// -> deleteAnnotation() should only check if Annot or WebAnnotation should be deleted
-
-export function deleteAnnotation(uuid) {
-  const ix = listItems.findIndex((a) => a.id === uuid);
-  if (ix >= 0) {
-    listItems.splice(ix, 1);
-    annot.deleteAnnot(uuid);
-    situateAndRefreshAnnotationsList(true);
-    refreshAnnotations();
-  }
 }
 
 //#endregion
@@ -588,4 +581,4 @@ function addLoadWebAnnotatationButton() {
 
 // generateListItemButton()
 
-//# endregion
+//#endregion
