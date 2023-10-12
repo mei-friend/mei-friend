@@ -93,17 +93,18 @@ export function retrieveListItem(itemId) {}
  *  Finds page numbers in rendering for every list item
  */
 function situateListItems() {
-  situateAnnotations(listItems);
+  situateAnnotations();
 }
-// should call situateAnnotations & situateMarkup when finished
-// TODO: situateAnnotations should receive an array of annotations as parameter and not access the list itself
+// TODO: should call situateAnnotations & situateMarkup when finished
+// TODO: after all, situateAnnotations() could be moved to annotation.js if it turns out to be different to situateMarkup()
+// TODO: then situateAnnotations should receive an array of annotations as parameter and not access the list itself
 
 /**
  * Adds page locations in rendering to annotation object in annotation list.
  * Call whenever layout reflows to re-situate annotations appropriately.
  */
-function situateAnnotations(annotations) {
-  annotations.forEach(async (a) => {
+function situateAnnotations() {
+  listItems.forEach(async (a) => {
     // for each element in a.selection, ask Verovio for the page number
     // set a.firstPage and a.lastPage to min/max page numbers returned
     a.firstPage = 'unsituated';
@@ -177,7 +178,7 @@ export function refreshAnnotationsInRendering(forceListRefresh = false) {
   rac.appendChild(annoSvg);
   if (document.getElementById('showAnnotations')?.checked) {
     // drawing handlers can draw into renderedAnnotationsSvg if they need to
-    annotations.forEach((a) => {
+    listItems.forEach((a) => {
       if ('type' in a) {
         switch (a.type) {
           case 'annotateIdentify':
