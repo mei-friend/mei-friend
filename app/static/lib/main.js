@@ -56,7 +56,7 @@ import {
   clearListItems,
   getSolidIdP,
   readListItems,
-  refreshAnnotations,
+  refreshAnnotationsInRendering,
   populateSolidTab,
 } from './enrichment_panel.js';
 import { dropHandler, dragEnter, dragOverHandler, dragLeave } from './dragger.js';
@@ -952,7 +952,7 @@ async function vrvWorkerEventsHandler(ev) {
         v.updatePageNumDisplay();
         v.addNotationEventListeners(cm);
         v.updateHighlight(cm);
-        refreshAnnotations(false);
+        refreshAnnotationsInRendering(false);
         v.scrollSvg(cm);
         if (v.pdfMode) {
           // switch on frame, when in pdf mode
@@ -987,7 +987,7 @@ async function vrvWorkerEventsHandler(ev) {
         v.lastNoteId = id;
       }
       v.addNotationEventListeners(cm);
-      refreshAnnotations(false);
+      refreshAnnotationsInRendering(false);
       v.scrollSvg(cm);
       v.updateHighlight(cm);
       v.setFocusToVerovioPane();

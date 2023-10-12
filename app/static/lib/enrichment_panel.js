@@ -39,7 +39,7 @@ export function clearListItems() {
 export function readListItems(flagLimit = false) {
   annotations = annot.readAnnots(flagLimit);
   listItems.push(...annotations);
-  refreshAnnotations();
+  refreshAnnotationsInRendering();
 }
 // TODO:
 // * Add method to read markup elements
@@ -56,7 +56,7 @@ export function deleteAnnotation(uuid) {
     listItems.splice(ix, 1);
     annot.deleteAnnot(uuid);
     situateAndRefreshAnnotationsList(true);
-    refreshAnnotations();
+    refreshAnnotationsInRendering();
   }
 }
 
@@ -134,7 +134,7 @@ function situateAnnotations(annotations) {
  * In the case of markup, this is not necessary because Verovio already adds classes for markup elements to the wrapped elements.
  * @param {boolean} [forceListRefresh=false]
  */
-export function refreshAnnotations(forceListRefresh = false) {
+export function refreshAnnotationsInRendering(forceListRefresh = false) {
   // clear rendered annotations container
   const rac = document.getElementById('renderedAnnotationsContainer');
   rac.innerHTML = '';
@@ -390,7 +390,7 @@ export function addAnnotationHandlers() {
       default:
         console.warn("Don't have a handler for this type of annotation", e);
     }
-    refreshAnnotations(true);
+    refreshAnnotationsInRendering(true);
   };
 
   document.querySelectorAll('.annotationToolsIcon').forEach((a) => a.removeEventListener('click', annotationHandler));
