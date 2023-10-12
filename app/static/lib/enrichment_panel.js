@@ -24,7 +24,7 @@ import { loginAndFetch, solid, solidLogout, provider } from './solid.js';
 
 //#region List Items Array and access functions
 
-export let listItems = [];
+var listItems = [];
 
 /**
  * Clear list of annotations
@@ -44,7 +44,27 @@ export function readListItemsFromXML(flagLimit = false) {
 // TODO:
 // * Add method to read markup elements
 
-export function addListItem() {}
+/**
+ * Looks if an item with itemId exists in listItems
+ * @param {string} itemId 
+ * @returns {boolean} item is in listItems
+ */
+export function isItemInList(itemId) {
+  let index = listItems.findIndex((item) => item.id === itemId);
+  return index >= 0;
+}
+
+/**
+ * Adds a new item to ListItems if there is no item with this id
+ */
+export function addListItem(listItemObject) {
+  let addedSuccessfully = false;
+  if(!isItemInList(listItemObject.id)) {
+    listItems.push(listItemObject);
+    addedSuccessfully = true;
+  }
+  return addedSuccessfully;
+}
 
 // deleteItem()
 // -> calls deleteAnnotation() & deleteMarkup
@@ -60,10 +80,14 @@ export function deleteAnnotation(uuid) {
   }
 }
 
-export function retrieveListItem() {}
+/**
+ * Retrieve a list item by id
+ * @param {string} itemId 
+ */
+export function retrieveListItem(itemId) {}
 
 /**
- *
+ *  Finds page numbers in rendering for every list item
  */
 function situateListItems() {
   situateAnnotations(listItems);
