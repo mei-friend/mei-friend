@@ -30,7 +30,7 @@ import {
   safelyPatchResource,
 } from './solid.js';
 import { nsp, traverseAndFetch } from './linked-data.js';
-import { deleteAnnotation } from './enrichment_panel.js';
+import { deleteAnnotation, isItemInList, addListItem } from './enrichment_panel.js';
 
 //export let annotations = [];
 
@@ -484,7 +484,9 @@ export function drawLink(a) {
 export function readAnnots(flagLimit = false) {
   if (!v.xmlDoc) return;
   let annots = Array.from(v.xmlDoc.querySelectorAll('annot'));
-  annots = annots.filter((annot) => annotations.findIndex((a) => a.id !== annot.getAttribute('xml:id')));
+  //annots = annots.filter((annot) => annotations.findIndex((a) => a.id !== annot.getAttribute('xml:id'))); // original
+  //annots = annots.filter((annot) => annotations.findIndex((a) => a.id !== annot.getAttribute('xml:id')) !== -1); // corrected
+  annots = annots.filter((annot) => isItemInList(annot.getAttribute('xml:id')));
   let limit = document.getElementById('annotationDisplayLimit');
   if (limit && annots.length > limit.value) {
     if (flagLimit) {
@@ -500,9 +502,6 @@ export function readAnnots(flagLimit = false) {
     }
     return;
   }
-  
-  let annotations = [];
-
   annots.forEach((annot) => {
     let annotation = {};
     if (annot.textContent) {
@@ -531,15 +530,9 @@ export function readAnnots(flagLimit = false) {
       annotation.id = 'None';
     }
     annotation.isInline = true;
-    if (annotations.findIndex((a) => a.id === annotation.id) === -1) {
-      // only if not already included
-      // FIXME: will ignore all but the first annotation without xml:id
-      annotations.push(annotation);
-    } else {
-    }
+
+    addListItem(annotation);
   });
-  return annotations;
-  //refreshAnnotations();
 }
 
 // inserts new annot element based on anchor element into CodeMirror editor,
