@@ -45,7 +45,7 @@ export function readListItemsFromXML(flagLimit = false) {
 
 /**
  * Looks if an item with itemId exists in listItems
- * @param {string} itemId 
+ * @param {string} itemId
  * @returns {boolean} item is in listItems
  */
 export function isItemInList(itemId) {
@@ -61,7 +61,7 @@ export function isItemInList(itemId) {
  */
 export function addListItem(listItemObject, forceRefreshAnnotations = false) {
   let addedSuccessfully = false;
-  if(!isItemInList(listItemObject.id)) {
+  if (!isItemInList(listItemObject.id)) {
     listItems.push(listItemObject);
     addedSuccessfully = true;
     if (forceRefreshAnnotations === true) refreshAnnotationsInRendering(true);
@@ -85,7 +85,7 @@ export function deleteAnnotation(uuid) {
 
 /**
  * Retrieve a list item by id
- * @param {string} itemId 
+ * @param {string} itemId
  */
 export function retrieveListItem(itemId) {}
 
@@ -224,8 +224,9 @@ export function situateAndRefreshAnnotationsList(forceRefresh = false) {
   if (forceRefresh || !document.getElementsByClassName('annotationListItem').length) refreshAnnotationsList();
 }
 
-// export function refreshAnnotationsList()
-// to enrichment_panel.js
+/**
+ * Creates the list of all things in the enrichment panel
+ */
 export function refreshAnnotationsList() {
   const list = document.getElementById('listAnnotations');
   // clear list
@@ -237,110 +238,7 @@ export function refreshAnnotationsList() {
   // add web annotation button
   addLoadWebAnnotatationButton(list);
   listItems.forEach((a) => {
-    const annoDiv = document.createElement('div');
-    annoDiv.classList.add('annotationListItem');
-    annoDiv.id = a.id;
-    const details = document.createElement('details');
-    details.setAttribute('open', '');
-    const summary = document.createElement('summary');
-    const annoListItemButtons = document.createElement('div');
-    annoListItemButtons.classList.add('annotationListItemButtons');
-    const flipToAnno = document.createElement('a');
-    flipToAnno.insertAdjacentHTML('afterbegin', symLinkFile); //flipToEncoding;
-    flipToAnno.classList.add('flipPageToAnnotationText');
-    flipToAnno.title = translator.lang.flipPageToAnnotationText.description;
-    flipToAnno.classList.add('icon');
-    if (!'selection' in a) flipToAnno.classList.add('disabled');
-    const addObservation = document.createElement('a');
-    addObservation.insertAdjacentHTML('afterbegin', speechBubble);
-    addObservation.classList.add('addObservation');
-    addObservation.title = 'Add observation to extract';
-    addObservation.classList.add('icon');
-    if (a.type !== !'annotateIdentify') {
-      addObservation.classList.add('disabled');
-    }
-    const deleteAnno = document.createElement('a');
-    deleteAnno.classList.add('deleteAnnotation');
-    deleteAnno.insertAdjacentHTML('afterbegin', diffRemoved);
-    deleteAnno.title = translator.lang.deleteAnnotation.description;
-    const isStandoff = document.createElement('a');
-    isStandoff.classList.add('makeStandOffAnnotation');
-    isStandoff.insertAdjacentHTML('afterbegin', rdf);
-    isStandoff.title = translator.lang.makeStandOffAnnotation.description;
-    isStandoff.classList.add('icon');
-    isStandoff.style.filter = 'grayscale(100%)';
-    if (!a.isStandoff) {
-      isStandoff.title = translator.lang.makeStandOffAnnotation.descriptionSolid;
-      isStandoff.style.opacity = 0.3;
-    } else {
-      (isStandoff.title = translator.lang.makeStandOffAnnotation.descriptionToLocal + ': '), a.id;
-      isStandoff.dataset.id = a.id;
-      if ('standoffUri' in a) {
-        isStandoff.href = a.standoffUri;
-        isStandoff.target = '_blank';
-      } else {
-        console.warn('Standoff annotation without standoffUri: ', a);
-      }
-    }
-    const isInline = document.createElement('a');
-    isInline.id = 'makeInlineAnnotation';
-    isInline.insertAdjacentHTML('afterbegin', fileCode);
-    isInline.classList.add('icon');
-    isInline.style.fontFamily = 'monospace';
-    if (!a.isInline) {
-      isInline.title = translator.lang.makeInlineAnnotation.description;
-      isInline.style.opacity = 0.3;
-    } else {
-      isInline.title = translator.lang.makeInlineAnnotation.descriptionCopy + ': [' + a.id + ']';
-      isInline.dataset.id = a.id;
-      isInline.addEventListener('click', annot.copyIdToClipboard);
-    }
-    switch (a.type) {
-      case 'annotateHighlight':
-        summary.insertAdjacentHTML('afterbegin', highlight);
-        break;
-      case 'annotateCircle':
-        summary.insertAdjacentHTML('afterbegin', circle);
-        break;
-      case 'annotateLink':
-        summary.insertAdjacentHTML('afterbegin', link);
-        details.insertAdjacentHTML('afterbegin', a.url);
-        break;
-      case 'annotateDescribe':
-        summary.insertAdjacentHTML('afterbegin', pencil);
-        details.insertAdjacentHTML('afterbegin', a.description);
-        break;
-      case 'annotateIdentify':
-        summary.insertAdjacentHTML('afterbegin', identify);
-        details.insertAdjacentHTML('afterbegin', `<div class="mao-musMat" id="musMat_${a.id}"></div>`);
-        break;
-      default:
-        console.warn('Unknown type when drawing annotation in list: ', a);
-    }
-    const annotationLocationLabel = generateAnnotationLocationLabel(a);
-    summary.appendChild(annotationLocationLabel);
-    flipToAnno.addEventListener('click', (e) => {
-      console.debug('Flipping to annotation: ', a);
-      v.updatePage(cm, a.firstPage, a.id);
-      setCursorToId(cm, a.id);
-    });
-    deleteAnno.addEventListener('click', (e) => {
-      const reallyDelete = confirm(translator.lang.deleteAnnotationConfirmation.text);
-      if (reallyDelete) {
-        deleteAnnotation(a.id);
-      }
-    });
-    if (!details.innerHTML.length) {
-      // some annotation types don't have any annotation body to display
-      summary.classList.add('noDetails');
-    }
-    details.prepend(summary);
-    annoDiv.appendChild(details);
-    annoListItemButtons.appendChild(flipToAnno);
-    annoListItemButtons.appendChild(isInline);
-    annoListItemButtons.appendChild(isStandoff);
-    annoListItemButtons.appendChild(deleteAnno);
-    annoDiv.appendChild(annoListItemButtons);
+    let annoDiv = generateListItem(a);
     list.appendChild(annoDiv);
   });
 }
@@ -349,11 +247,134 @@ export function refreshAnnotationsList() {
 
 //#region List Items
 /**
- * build list items
+ * builds the list item bubble
+ * @param {Object} a annotation / list item object
+ * @returns bubble div
  */
-// generateListItem()
+function generateListItem(a) {
+  const annoDiv = document.createElement('div');
+  annoDiv.classList.add('annotationListItem');
+  annoDiv.id = a.id;
+  const details = document.createElement('details');
+  details.setAttribute('open', '');
+  const summary = document.createElement('summary');
+
+  switch (a.type) {
+    case 'annotateHighlight':
+      summary.insertAdjacentHTML('afterbegin', highlight);
+      break;
+    case 'annotateCircle':
+      summary.insertAdjacentHTML('afterbegin', circle);
+      break;
+    case 'annotateLink':
+      summary.insertAdjacentHTML('afterbegin', link);
+      details.insertAdjacentHTML('afterbegin', a.url);
+      break;
+    case 'annotateDescribe':
+      summary.insertAdjacentHTML('afterbegin', pencil);
+      details.insertAdjacentHTML('afterbegin', a.description);
+      break;
+    case 'annotateIdentify':
+      summary.insertAdjacentHTML('afterbegin', identify);
+      details.insertAdjacentHTML('afterbegin', `<div class="mao-musMat" id="musMat_${a.id}"></div>`);
+      break;
+    default:
+      console.warn('Unknown type when drawing annotation in list: ', a);
+  }
+  const annotationLocationLabel = generateAnnotationLocationLabel(a);
+  summary.appendChild(annotationLocationLabel);
+
+  if (!details.innerHTML.length) {
+    // some annotation types don't have any annotation body to display
+    summary.classList.add('noDetails');
+  }
+  details.prepend(summary);
+  annoDiv.appendChild(details);
+  let annoListItemButtons = generateListItemButtons(a);
+  annoDiv.appendChild(annoListItemButtons);
+  return annoDiv;
+}
+
 // generateListItemDetails()
-// export function generateAnnotationLocationLabel(a)
+function generateListItemButtons(a) {
+  const annoListItemButtons = document.createElement('div');
+  annoListItemButtons.classList.add('annotationListItemButtons');
+  const flipToAnno = document.createElement('a');
+  flipToAnno.insertAdjacentHTML('afterbegin', symLinkFile); //flipToEncoding;
+  flipToAnno.classList.add('flipPageToAnnotationText');
+  flipToAnno.title = translator.lang.flipPageToAnnotationText.description;
+  flipToAnno.classList.add('icon');
+  if (!'selection' in a) flipToAnno.classList.add('disabled');
+  const addObservation = document.createElement('a');
+  addObservation.insertAdjacentHTML('afterbegin', speechBubble);
+  addObservation.classList.add('addObservation');
+  addObservation.title = 'Add observation to extract';
+  addObservation.classList.add('icon');
+  if (a.type !== !'annotateIdentify') {
+    addObservation.classList.add('disabled');
+  }
+  const deleteAnno = document.createElement('a');
+  deleteAnno.classList.add('deleteAnnotation');
+  deleteAnno.insertAdjacentHTML('afterbegin', diffRemoved);
+  deleteAnno.title = translator.lang.deleteAnnotation.description;
+  const isStandoff = document.createElement('a');
+  isStandoff.classList.add('makeStandOffAnnotation');
+  isStandoff.insertAdjacentHTML('afterbegin', rdf);
+  isStandoff.title = translator.lang.makeStandOffAnnotation.description;
+  isStandoff.classList.add('icon');
+  isStandoff.style.filter = 'grayscale(100%)';
+  if (!a.isStandoff) {
+    isStandoff.title = translator.lang.makeStandOffAnnotation.descriptionSolid;
+    isStandoff.style.opacity = 0.3;
+  } else {
+    (isStandoff.title = translator.lang.makeStandOffAnnotation.descriptionToLocal + ': '), a.id;
+    isStandoff.dataset.id = a.id;
+    if ('standoffUri' in a) {
+      isStandoff.href = a.standoffUri;
+      isStandoff.target = '_blank';
+    } else {
+      console.warn('Standoff annotation without standoffUri: ', a);
+    }
+  }
+  const isInline = document.createElement('a');
+  isInline.id = 'makeInlineAnnotation';
+  isInline.insertAdjacentHTML('afterbegin', fileCode);
+  isInline.classList.add('icon');
+  isInline.style.fontFamily = 'monospace';
+  if (!a.isInline) {
+    isInline.title = translator.lang.makeInlineAnnotation.description;
+    isInline.style.opacity = 0.3;
+  } else {
+    isInline.title = translator.lang.makeInlineAnnotation.descriptionCopy + ': [' + a.id + ']';
+    isInline.dataset.id = a.id;
+    isInline.addEventListener('click', annot.copyIdToClipboard);
+  }
+
+  flipToAnno.addEventListener('click', (e) => {
+    console.debug('Flipping to annotation: ', a);
+    v.updatePage(cm, a.firstPage, a.id);
+    setCursorToId(cm, a.id);
+  });
+  deleteAnno.addEventListener('click', (e) => {
+    const reallyDelete = confirm(translator.lang.deleteAnnotationConfirmation.text);
+    if (reallyDelete) {
+      deleteAnnotation(a.id);
+    }
+  });
+
+  annoListItemButtons.appendChild(flipToAnno);
+  annoListItemButtons.appendChild(isInline);
+  annoListItemButtons.appendChild(isStandoff);
+  annoListItemButtons.appendChild(deleteAnno);
+
+  return annoListItemButtons;
+}
+
+/**
+ *
+ * @param {Object} a annotation / list item object
+ * @returns {HTMLElement} span element
+ */
 export function generateAnnotationLocationLabel(a) {
   console.log('generating anno label for ', a);
   const annotationLocationLabel = document.createElement('span');
@@ -379,8 +400,6 @@ export function generateAnnotationLocationLabel(a) {
   annotationLocationLabel.dataset.id = 'loc-' + a.id;
   return annotationLocationLabel;
 }
-
-// generateListItemButtons()
 
 //#endregion
 
