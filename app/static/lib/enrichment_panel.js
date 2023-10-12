@@ -235,7 +235,7 @@ export function refreshAnnotationsList() {
   // console.log("Annotations: ",annotations);
 
   // add web annotation button
-  addLoadWebAnnotatationButton();
+  addLoadWebAnnotatationButton(list);
   listItems.forEach((a) => {
     const annoDiv = document.createElement('div');
     annoDiv.classList.add('annotationListItem');
@@ -589,8 +589,9 @@ function populateLoggedOutSolidTab() {
 
 /**
  * Adds button to load web annotations into the list
+ * @param {HTMLElement} list list div element
  */
-function addLoadWebAnnotatationButton() {
+function addLoadWebAnnotatationButton(list) {
   // add web annotation button
   const addWebAnnotation = document.createElement('span');
   const rdfIcon = document.createElement('span');
