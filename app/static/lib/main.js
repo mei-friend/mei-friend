@@ -55,7 +55,7 @@ import {
   addAnnotationHandlers,
   clearListItems,
   getSolidIdP,
-  readListItems,
+  readListItemsFromXML,
   refreshAnnotationsInRendering,
   populateSolidTab,
 } from './enrichment_panel.js';
@@ -260,7 +260,7 @@ export function loadDataInEditor(mei, setFreshlyLoaded = true) {
     v.checkSchema(mei);
   }
   clearListItems();
-  readListItems(true); // readAnnots(true); from annotation.js
+  readListItemsFromXML(true); // readAnnots(true); from annotation.js
   setCursorToId(cm, handleURLParamSelect());
 }
 
@@ -2253,7 +2253,7 @@ export function handleEditorChanges() {
     updateLocalStorage(meiXml);
   }
   if (document.getElementById('showAnnotations').checked || document.getElementById('showAnnotationPanel').checked) {
-    readListItems(); // readAnnots(); from annotation.js
+    readListItemsFromXML(); // readAnnots(); from annotation.js
   }
   if (document.getElementById('showMidiPlaybackControlBar').checked) {
     // start a new time-out to midi-rerender

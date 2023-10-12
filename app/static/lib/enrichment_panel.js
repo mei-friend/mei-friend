@@ -36,7 +36,7 @@ export function clearListItems() {
 /**
  * read List Items from XML
  */
-export function readListItems(flagLimit = false) {
+export function readListItemsFromXML(flagLimit = false) {
   annotations = annot.readAnnots(flagLimit);
   listItems.push(...annotations);
   refreshAnnotationsInRendering();
