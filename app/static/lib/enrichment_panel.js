@@ -293,7 +293,7 @@ export function refreshAnnotationsList() {
     } else {
       isInline.title = translator.lang.makeInlineAnnotation.descriptionCopy + ': [' + a.id + ']';
       isInline.dataset.id = a.id;
-      isInline.addEventListener('click', copyIdToClipboard);
+      isInline.addEventListener('click', annot.copyIdToClipboard);
     }
     switch (a.type) {
       case 'annotateHighlight':
