@@ -290,38 +290,58 @@ function generateListItem(a) {
   }
   details.prepend(summary);
   annoDiv.appendChild(details);
-  let annoListItemButtons = generateListItemButtons(a);
+  let annoListItemButtons = generateAnnotationButtons(a);
   annoDiv.appendChild(annoListItemButtons);
   return annoDiv;
 }
 
-// generateListItemDetails()
-function generateListItemButtons(a) {
+/**
+ * Creates the buttons for a list item bubble
+ * @param {Object} a list item object
+ * @returns {HTMLElement} div with buttons
+ */
+function generateAnnotationButtons(a) {
   const annoListItemButtons = document.createElement('div');
   annoListItemButtons.classList.add('annotationListItemButtons');
-  const flipToAnno = document.createElement('a');
-  flipToAnno.insertAdjacentHTML('afterbegin', symLinkFile); //flipToEncoding;
-  flipToAnno.classList.add('flipPageToAnnotationText');
-  flipToAnno.title = translator.lang.flipPageToAnnotationText.description;
-  flipToAnno.classList.add('icon');
+
+  // flip to annotation button
+  const flipToAnno = generateListItemButton(
+    'flipPageToAnnotationText',
+    symLinkFile,
+    translator.lang.flipPageToAnnotationText.description
+  );
   if (!'selection' in a) flipToAnno.classList.add('disabled');
-  const addObservation = document.createElement('a');
-  addObservation.insertAdjacentHTML('afterbegin', speechBubble);
-  addObservation.classList.add('addObservation');
-  addObservation.title = 'Add observation to extract';
-  addObservation.classList.add('icon');
+  flipToAnno.addEventListener('click', (e) => {
+    console.debug('Flipping to annotation: ', a);
+    v.updatePage(cm, a.firstPage, a.id);
+    setCursorToId(cm, a.id);
+  });
+
+  // add Observation button
+  const addObservation = generateListItemButton('addObservaion', speechBubble, 'Add observation to extract');
   if (a.type !== !'annotateIdentify') {
     addObservation.classList.add('disabled');
   }
-  const deleteAnno = document.createElement('a');
-  deleteAnno.classList.add('deleteAnnotation');
-  deleteAnno.insertAdjacentHTML('afterbegin', diffRemoved);
-  deleteAnno.title = translator.lang.deleteAnnotation.description;
-  const isStandoff = document.createElement('a');
-  isStandoff.classList.add('makeStandOffAnnotation');
-  isStandoff.insertAdjacentHTML('afterbegin', rdf);
-  isStandoff.title = translator.lang.makeStandOffAnnotation.description;
-  isStandoff.classList.add('icon');
+
+  // delete annotation button
+  const deleteAnno = generateListItemButton(
+    'deleteAnnotation',
+    diffRemoved,
+    translator.lang.deleteAnnotation.description
+  );
+  deleteAnno.addEventListener('click', (e) => {
+    const reallyDelete = confirm(translator.lang.deleteAnnotationConfirmation.text);
+    if (reallyDelete) {
+      deleteAnnotation(a.id);
+    }
+  });
+
+  // make inline annotation to standoff annotation
+  const isStandoff = generateListItemButton(
+    'makeStandOffAnnotation',
+    rdf,
+    translator.lang.makeStandOffAnnotation.description
+  );
   isStandoff.style.filter = 'grayscale(100%)';
   if (!a.isStandoff) {
     isStandoff.title = translator.lang.makeStandOffAnnotation.descriptionSolid;
@@ -336,11 +356,10 @@ function generateListItemButtons(a) {
       console.warn('Standoff annotation without standoffUri: ', a);
     }
   }
-  const isInline = document.createElement('a');
-  isInline.id = 'makeInlineAnnotation';
-  isInline.insertAdjacentHTML('afterbegin', fileCode);
-  isInline.classList.add('icon');
-  isInline.style.fontFamily = 'monospace';
+
+  // make standoff annotation to inline annotation
+  const isInline = generateListItemButton('makeInlineAnnotation', fileCode);
+  //isInline.style.fontFamily = 'monospace';
   if (!a.isInline) {
     isInline.title = translator.lang.makeInlineAnnotation.description;
     isInline.style.opacity = 0.3;
@@ -350,18 +369,7 @@ function generateListItemButtons(a) {
     isInline.addEventListener('click', annot.copyIdToClipboard);
   }
 
-  flipToAnno.addEventListener('click', (e) => {
-    console.debug('Flipping to annotation: ', a);
-    v.updatePage(cm, a.firstPage, a.id);
-    setCursorToId(cm, a.id);
-  });
-  deleteAnno.addEventListener('click', (e) => {
-    const reallyDelete = confirm(translator.lang.deleteAnnotationConfirmation.text);
-    if (reallyDelete) {
-      deleteAnnotation(a.id);
-    }
-  });
-
+  // add buttons to bubble
   annoListItemButtons.appendChild(flipToAnno);
   annoListItemButtons.appendChild(isInline);
   annoListItemButtons.appendChild(isStandoff);
@@ -371,7 +379,24 @@ function generateListItemButtons(a) {
 }
 
 /**
- *
+ * Generates a basic button for the list item bubbles button list
+ * @param {string} buttonClass CSS class name
+ * @param {string} buttonIcon svg icon
+ * @param {string} buttonTitle translator title text
+ * @returns
+ */
+function generateListItemButton(buttonClass, buttonIcon, buttonTitle = '') {
+  const button = document.createElement('a');
+  button.classList.add(buttonClass);
+  button.insertAdjacentHTML('afterbegin', buttonIcon);
+  button.title = buttonTitle;
+  button.classList.add('icon');
+
+  return button;
+}
+
+/**
+ * Generates the label containing the page locations
  * @param {Object} a annotation / list item object
  * @returns {HTMLElement} span element
  */
