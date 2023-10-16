@@ -17,8 +17,13 @@ import {
 import { nsp, traverseAndFetch } from './linked-data.js';
 import { deleteAnnotation, isItemInList, addListItem } from './enrichment_panel.js';
 
-// functions to draw annotations
+//#region functions to draw annotations
 
+/**
+ * Takes an annotation object and highlights
+ * the selected elements in the notation panel
+ * @param {Object} a annotation object
+ */
 export async function drawIdentify(a) {
   if ('selection' in a) {
     const els = a.selection.map((s) => document.getElementById(s));
@@ -30,6 +35,11 @@ export async function drawIdentify(a) {
   }
 }
 
+/**
+ * Takes an annotation object and highlights
+ * the selected elements in the notation panel
+ * @param {Object} a annotation object
+ */
 export function drawHighlight(a) {
   if ('selection' in a) {
     const els = a.selection.map((s) => document.getElementById(s));
@@ -68,6 +78,12 @@ export function drawCircle(a) {
   }
 }
 
+/**
+ * Takes an annotation object and highlights
+ * the selected elements in the notation panel.
+ * Adds the description text as tool tip.
+ * @param {Object} a annotation object
+ */
 export function drawDescribe(a) {
   if ('selection' in a && 'description' in a) {
     const els = a.selection.map((s) => document.getElementById(s));
@@ -86,6 +102,12 @@ export function drawDescribe(a) {
   }
 }
 
+/**
+ * Takes an annotation object and highlights
+ * the selected elements in the notation panel.
+ * Adds a hyperlink (opening in a new tab).
+ * @param {Object} a annotation object
+ */
 export function drawLink(a) {
   if ('selection' in a && 'url' in a) {
     const els = a.selection.map((s) => document.getElementById(s));
@@ -106,7 +128,15 @@ export function drawLink(a) {
   }
 }
 
-// functions to create annotations
+//#endregion
+
+//#region functions to create annotations
+// called by addAnnotationHandlers() in the Tools tab of the Enrichment panel
+
+/**
+ * Creates a standoff Identify annotation, based on Music Annotation Ontology.
+ * @param {Event} e event
+ */
 export const createIdentify = (e) => {
   if (solid.getDefaultSession().info.isLoggedIn) {
     const label = window.prompt('Add label for identified object (optional)');
@@ -138,6 +168,11 @@ export const createIdentify = (e) => {
     document.getElementById('solidButton').click();
   }
 };
+
+/**
+ * Creates a new highlight annotation either inline or standoff.
+ * @param {Event} e event
+ */
 export const createHighlight = (e) => {
   const a = {
     id: generateXmlId('annot', v.xmlIdStyle),
@@ -148,6 +183,11 @@ export const createHighlight = (e) => {
   writeInlineIfRequested(a);
   writeStandoffIfRequested(a);
 };
+
+/**
+ * Creates a new circle annotation either inline or standoff.
+ * @param {Event} e event
+ */
 export const createCircle = (e) => {
   const a = {
     id: generateXmlId('annot', v.xmlIdStyle),
@@ -158,6 +198,11 @@ export const createCircle = (e) => {
   writeInlineIfRequested(a);
   writeStandoffIfRequested(a);
 };
+
+/**
+ * Creates a new describe annotation either inline or standoff.
+ * @param {Event} e event
+ */
 export const createDescribe = (e) => {
   // TODO improve UX!
   const desc = window.prompt(translator.lang.askForDescription.text);
@@ -171,6 +216,11 @@ export const createDescribe = (e) => {
   writeInlineIfRequested(a);
   writeStandoffIfRequested(a);
 };
+
+/**
+ * Creates a new link annotation either inline or standoff.
+ * @param {Event} e event
+ */
 export const createLink = (e) => {
   // TODO improve UX!
   let url = window.prompt(translator.lang.askForLinkUrl.text);
@@ -186,7 +236,14 @@ export const createLink = (e) => {
   writeStandoffIfRequested(a);
 };
 
-// reads <annot> elements from XML DOM and adds them into annotations array
+//#endregion
+
+//#region inline annotation functions
+
+/**
+ * reads <annot> elements from XML DOM and adds them into annotations array
+ * @param {boolean} flagLimit alert if max. number of annotations are reached
+ */
 export function readAnnots(flagLimit = false) {
   if (!v.xmlDoc) return;
   let annots = Array.from(v.xmlDoc.querySelectorAll('annot'));
@@ -241,8 +298,15 @@ export function readAnnots(flagLimit = false) {
   });
 }
 
-// inserts new annot element based on anchor element into CodeMirror editor,
-// with @xml:id, @plist and optional payload (string or ptr)
+/**
+ * inserts new annot element based on anchor element into CodeMirror editor,
+ * with @xml:id, @plist and optional payload (string or ptr)
+ * @param {Element} anchor anchor element
+ * @param {string} xmlId xml:id for new annot element
+ * @param {Array} plist selected elements
+ * @param {object|string} payload possible content of annot element
+ * @returns
+ */
 export function writeAnnot(anchor, xmlId, plist, payload) {
   // TODO: Place the annotation in the most sensible place according to the MEI schema
   // i.e., probably the closest permissible level to the anchor element.
@@ -303,6 +367,10 @@ export function writeAnnot(anchor, xmlId, plist, payload) {
   }
 }
 
+/**
+ * Delete an inline annotation
+ * @param {string} xmlId
+ */
 export function deleteAnnot(xmlId) {
   const annot = v.xmlDoc.querySelector('[*|id=' + xmlId + ']');
   if (annot) {
@@ -312,6 +380,146 @@ export function deleteAnnot(xmlId) {
     console.warn('Failed to delete non-existing annot with xml:id ', xmlId);
   }
 }
+
+/**
+ * Copies id of current inline annotation to clipboard
+ * @param {Event} e event
+ */
+export function copyIdToClipboard(e) {
+  console.log('Attempting to copy ID to clipboard: ', e);
+  navigator.clipboard.writeText(e.target.closest('.icon').dataset.id).catch((err) => {
+    console.warn("Couldn't copy id to clipboard: ", err);
+  });
+}
+
+//#endregion
+
+//#region Functions to write annotations to standoff or inline
+
+/**
+ * Writes an annotation as inline <annot> element into the MEI file if requested.
+ * @param {Object} a annotation object
+ */
+function writeInlineIfRequested(a) {
+  // write annotation to inline <annot> if the user has requested this
+  if (document.getElementById('writeAnnotationInline').checked) {
+    let el = v.xmlDoc.querySelector('[*|id="' + v.selectedElements[0] + '"]');
+    if (el) {
+      let payload;
+      if (a.type === 'annotateDescribe') payload = a.description;
+      else if (a.type === 'annotateLink') {
+        payload = document.createElementNS(meiNameSpace, 'ptr');
+        payload.setAttributeNS(xmlNameSpace, 'xml:id', 'ptr-' + generateXmlId());
+        payload.setAttribute('target', a.url);
+      }
+      writeAnnot(el, a.id, a.selection, payload);
+      a.isInline = true;
+    } else console.warn('writeInlineIfRequested: Cannot find beforeThis element for ' + a.id);
+  }
+}
+
+/**
+ * Writes an annotation as standoff web annotation in the user's Solid Pod if requested.
+ * @param {Object} a annotation object
+ */
+async function writeStandoffIfRequested(a) {
+  // write to a stand-off Web Annotation in the user's Solid Pod if requested
+  if (document.getElementById('writeAnnotationStandoff').checked) {
+    a.isStandoff = true;
+    if (solid.getDefaultSession().info.isLoggedIn) {
+      document.getElementById('solid_logo').classList.add('clockwise');
+      let currentFileUri = getCurrentFileUri();
+      let currentFileUriHash = encodeURIComponent(currentFileUri);
+      // ensure mei-friend container exists
+      establishContainerResource(friendContainer)
+        .then((friendContainerResource) => {
+          establishContainerResource(annotationContainer).then((annotationContainerResource) => {
+            establishDiscoveryResource(currentFileUri)
+              .then((dataCatalogResource) => {
+                let discoveryUri = dataCatalogResource.url;
+                // generate a web annotation JSON-LD object
+                let webAnno = new Object();
+                let body = new Object();
+                webAnno['@type'] = [nsp.OA + 'Annotation', nsp.SCHEMA + 'Dataset'];
+                webAnno[nsp.SCHEMA + 'includedInDataCatalog'] = { '@id': discoveryUri };
+                webAnno[nsp.OA + 'hasTarget'] = a.selection.map((s) => {
+                  // TODO: do something clever if fileLocationType = "file" (local)
+                  return { '@id': currentFileUri + '#' + s };
+                });
+                switch (a.type) {
+                  case 'annotateHighlight':
+                    webAnno[nsp.OA + 'motivatedBy'] = [{ '@id': nsp.OA + 'highlighting' }];
+                    break;
+                  case 'annotateDescribe':
+                    body['@type'] = [nsp.OA + 'TextualBody'];
+                    if ('description' in a) {
+                      body[nsp.RDF + 'value'] = a.description;
+                    } else {
+                      console.warn('Describing annotation without a description: ', a);
+                    }
+                    webAnno[nsp.OA + 'motivatedBy'] = [{ '@id': nsp.OA + 'describing' }];
+                    webAnno[nsp.OA + 'hasBody'] = [body];
+                    break;
+                  case 'annotateLink':
+                    webAnno[nsp.OA + 'motivatedBy'] = [{ '@id': nsp.OA + 'linking' }];
+                    webAnno[nsp.OA + 'hasBody'] = [{ '@id': a.url }];
+                    break;
+                  default:
+                    console.warn('Trying to write standoff annotation with unknown annotation type:', a);
+                    break;
+                }
+                webAnno['@id'] = annotationContainerResource + a.id;
+                establishResource(webAnno['@id'], webAnno).then((webAnnoResp) => {
+                  if (webAnnoResp.ok) {
+                    console.log('Success! Posted Web Annotation:', webAnno);
+                    // remember new resource URI within internal annotation, for use when refreshing annotation list
+                    a.standoffUri = webAnno['@id'];
+                    // update current annotation list item in DOM as well (so we can already click before anno list refresh required)
+                    let standoffIcon = document.querySelector(`#${a.id} .makeStandOffAnnotation`);
+                    standoffIcon.href = a.standoffUri;
+                    standoffIcon.target = '_blank';
+                    // patch the discovery resource to include the newly created annotation
+                    safelyPatchResource(discoveryUri, [
+                      {
+                        op: 'add',
+                        // escape ~ and / characters according to JSON POINTER spec
+                        // use '-' at end of path specification to indicate new array item to be created
+                        path: `/${nsp.SCHEMA.replaceAll('~', '~0').replaceAll('/', '~1')}dataset/-`,
+                        value: {
+                          '@type': `${nsp.SCHEMA}Dataset`,
+                          [`${nsp.SCHEMA}additionalType`]: { '@id': `${nsp.OA}Annotation` },
+                          [`${nsp.SCHEMA}url`]: {
+                            '@id': webAnno['@id'],
+                          },
+                        },
+                      },
+                    ]);
+                  } else {
+                    console.warn("Couldn't post WebAnno: ", webAnno, webAnnoResp);
+                    throw webAnnoResp;
+                  }
+                });
+              })
+              .catch((e) => {
+                console.error("Couldn't post WebAnno:", e);
+              });
+          });
+        })
+        .catch((e) => {
+          console.error("Couldn't establish container:", friendContainer, e);
+        })
+        .finally(() => {
+          document.getElementById('solid_logo').classList.remove('clockwise');
+        });
+    } else {
+      log('Cannot write standoff annotation: Please ensure you are logged in to a Solid Pod');
+    }
+  }
+}
+
+//#endregion
+
+//#region Web Annotation stuff
 
 // GUI function to set up 'Load linked data' UI
 export function loadWebAnnotation(prev = '') {
@@ -502,24 +710,6 @@ export function ingestWebAnnotation(webAnno) {
   }
 }
 
-function writeInlineIfRequested(a) {
-  // write annotation to inline <annot> if the user has requested this
-  if (document.getElementById('writeAnnotationInline').checked) {
-    let el = v.xmlDoc.querySelector('[*|id="' + v.selectedElements[0] + '"]');
-    if (el) {
-      let payload;
-      if (a.type === 'annotateDescribe') payload = a.description;
-      else if (a.type === 'annotateLink') {
-        payload = document.createElementNS(meiNameSpace, 'ptr');
-        payload.setAttributeNS(xmlNameSpace, 'xml:id', 'ptr-' + generateXmlId());
-        payload.setAttribute('target', a.url);
-      }
-      writeAnnot(el, a.id, a.selection, payload);
-      a.isInline = true;
-    } else console.warn('writeInlineIfRequested: Cannot find beforeThis element for ' + a.id);
-  }
-}
-
 // fetch all components hanging off a musical material
 async function fetchMAOComponentsForIdentifiedObject(musMatUrl) {
   traverseAndFetch(
@@ -666,105 +856,4 @@ async function drawSelectionsForIdentifiedObject(obj, url) {
   }
 }
 
-async function writeStandoffIfRequested(a) {
-  // write to a stand-off Web Annotation in the user's Solid Pod if requested
-  if (document.getElementById('writeAnnotationStandoff').checked) {
-    a.isStandoff = true;
-    if (solid.getDefaultSession().info.isLoggedIn) {
-      document.getElementById('solid_logo').classList.add('clockwise');
-      let currentFileUri = getCurrentFileUri();
-      let currentFileUriHash = encodeURIComponent(currentFileUri);
-      // ensure mei-friend container exists
-      establishContainerResource(friendContainer)
-        .then((friendContainerResource) => {
-          establishContainerResource(annotationContainer).then((annotationContainerResource) => {
-            establishDiscoveryResource(currentFileUri)
-              .then((dataCatalogResource) => {
-                let discoveryUri = dataCatalogResource.url;
-                // generate a web annotation JSON-LD object
-                let webAnno = new Object();
-                let body = new Object();
-                webAnno['@type'] = [nsp.OA + 'Annotation', nsp.SCHEMA + 'Dataset'];
-                webAnno[nsp.SCHEMA + 'includedInDataCatalog'] = { '@id': discoveryUri };
-                webAnno[nsp.OA + 'hasTarget'] = a.selection.map((s) => {
-                  // TODO: do something clever if fileLocationType = "file" (local)
-                  return { '@id': currentFileUri + '#' + s };
-                });
-                switch (a.type) {
-                  case 'annotateHighlight':
-                    webAnno[nsp.OA + 'motivatedBy'] = [{ '@id': nsp.OA + 'highlighting' }];
-                    break;
-                  case 'annotateDescribe':
-                    body['@type'] = [nsp.OA + 'TextualBody'];
-                    if ('description' in a) {
-                      body[nsp.RDF + 'value'] = a.description;
-                    } else {
-                      console.warn('Describing annotation without a description: ', a);
-                    }
-                    webAnno[nsp.OA + 'motivatedBy'] = [{ '@id': nsp.OA + 'describing' }];
-                    webAnno[nsp.OA + 'hasBody'] = [body];
-                    break;
-                  case 'annotateLink':
-                    webAnno[nsp.OA + 'motivatedBy'] = [{ '@id': nsp.OA + 'linking' }];
-                    webAnno[nsp.OA + 'hasBody'] = [{ '@id': a.url }];
-                    break;
-                  default:
-                    console.warn('Trying to write standoff annotation with unknown annotation type:', a);
-                    break;
-                }
-                webAnno['@id'] = annotationContainerResource + a.id;
-                establishResource(webAnno['@id'], webAnno).then((webAnnoResp) => {
-                  if (webAnnoResp.ok) {
-                    console.log('Success! Posted Web Annotation:', webAnno);
-                    // remember new resource URI within internal annotation, for use when refreshing annotation list
-                    a.standoffUri = webAnno['@id'];
-                    // update current annotation list item in DOM as well (so we can already click before anno list refresh required)
-                    let standoffIcon = document.querySelector(`#${a.id} .makeStandOffAnnotation`);
-                    standoffIcon.href = a.standoffUri;
-                    standoffIcon.target = '_blank';
-                    // patch the discovery resource to include the newly created annotation
-                    safelyPatchResource(discoveryUri, [
-                      {
-                        op: 'add',
-                        // escape ~ and / characters according to JSON POINTER spec
-                        // use '-' at end of path specification to indicate new array item to be created
-                        path: `/${nsp.SCHEMA.replaceAll('~', '~0').replaceAll('/', '~1')}dataset/-`,
-                        value: {
-                          '@type': `${nsp.SCHEMA}Dataset`,
-                          [`${nsp.SCHEMA}additionalType`]: { '@id': `${nsp.OA}Annotation` },
-                          [`${nsp.SCHEMA}url`]: {
-                            '@id': webAnno['@id'],
-                          },
-                        },
-                      },
-                    ]);
-                  } else {
-                    console.warn("Couldn't post WebAnno: ", webAnno, webAnnoResp);
-                    throw webAnnoResp;
-                  }
-                });
-              })
-              .catch((e) => {
-                console.error("Couldn't post WebAnno:", e);
-              });
-          });
-        })
-        .catch((e) => {
-          console.error("Couldn't establish container:", friendContainer, e);
-        })
-        .finally(() => {
-          document.getElementById('solid_logo').classList.remove('clockwise');
-        });
-    } else {
-      log('Cannot write standoff annotation: Please ensure you are logged in to a Solid Pod');
-    }
-  }
-}
-
-export function copyIdToClipboard(e) {
-  console.log('Attempting to copy ID to clipboard: ', e);
-  navigator.clipboard.writeText(e.target.closest('.icon').dataset.id).catch((err) => {
-    console.warn("Couldn't copy id to clipboard: ", err);
-  });
-}
-
+//#endregion
