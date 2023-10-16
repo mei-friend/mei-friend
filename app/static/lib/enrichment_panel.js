@@ -21,6 +21,7 @@ import {
   symLinkFile,
 } from '../css/icons.js';
 import { loginAndFetch, solid, solidLogout, provider } from './solid.js';
+import { nsp } from './linked-data.js';
 
 //#region List Items Array and access functions
 
