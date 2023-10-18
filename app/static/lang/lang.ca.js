@@ -312,10 +312,10 @@ export const lang = {
   selectPageRangeLabel: { text: 'Rang de pàgines:' },
   pdfPreviewSpeedModeWarning: {
     text:
-      'Només es renderitza la pàgina actual a PDF, perquè està activat el mode de velocitat. ' +
-      'Desmarqueu el mode de velocitat per seleccionar de totes les pàgines.',
+      'Només es renderitza la pàgina actual a PDF, perquè el mode de velocitat està activat. ' +
+      'Desmarqueu el mode de velocitat per seleccionar totes les pàgines.',
   },
-  pdfPreviewNormalModeTitle: { text: 'Seleccioneu el rang de pàgines que es vol desar en PDF.' },
+  pdfPreviewNormalModeTitle: { text: 'Seleccioneu el rang de pàgines que voleu desar com a PDF.' },
 
   // facsimile panel / panell de facsímil
   facsimileIcon: { description: 'Panell de facsímil' },
@@ -345,7 +345,7 @@ export const lang = {
   // public repertoire / repertori públic
   openUrlHeading: { text: 'Obre la codificació allotjada a la web per URL' },
   openUrlInstructions: {
-    text: "Si us plau, tria del repertori públic o introdueix l'URL d'una codificació de música allotjada a la web, a continuació. Nota: El servidor hosteig ha de suportar el compartiment de recursos en origen creuat (CORS).",
+    text: "Si us plau, tria del repertori públic o introdueix l'URL d'una codificació de música allotjada a la web, a continuació. Nota: El servidor ha de suportar el compartiment de recursos en origen creuat (CORS).",
   },
   publicRepertoireSummary: { text: 'Repertori públic' },
   sampleEncodingsComposerLabel: { text: 'Compositor:' },
