@@ -549,93 +549,6 @@
         </div>
       </div>
       <div class="dropdown">
-        <button class="dropbtn" id="markupMenuTitle">Markup</button>
-        <div class="dropdownContent" id="MarkupMenu">
-          <a id="addSupplied" href="#">
-            <span id="addSuppliedText">Supplied</span>
-            <span class="keyShortCut">U</span>
-          </a>
-          <a id="addSuppliedArtic" href="#">
-            <span id="addSuppliedArticText">Supplied (Artic)</span>
-            <span class="keyShortCut ctrlKey">U</span>
-          </a>
-          <a id="addSuppliedAccid" href="#">
-            <span id="addSuppliedAccidText">Supplied (Accid)</span>
-            <span class="keyShortCut ctrlKey shiftKey">U</span>
-          </a>
-          <hr class="dropdownLine" />
-          <a id="addUnclear" href="#">
-            <span id="addUnclearText">Unclear</span>
-          </a>
-          <a id="addUnclearArtic" href="#">
-            <span id="addUnclearArticText">Unclear (Artic)</span>
-          </a>
-          <a id="addUnclearAccid" href="#">
-            <span id="addUnclearAccidText">Unclear (Accid)</span>
-          </a>
-          <hr class="dropdownLine" />
-          <a id="addSic" href="#">
-            <span id="addSicText">Sic</span>
-          </a>
-          <a id="addSicArtic" href="#">
-            <span id="addSicArticText">Sic (Artic)</span>
-          </a>
-          <a id="addSicAccid" href="#">
-            <span id="addSicAccidText">Sic (Accid)</span>
-          </a>
-          <hr class="dropdownLine" />
-          <a id="addCorr" href="#">
-            <span id="addCorrText">Corr</span>
-          </a>
-          <a id="addCorrArtic" href="#">
-            <span id="addCorrArticText">Corr (Artic)</span>
-          </a>
-          <a id="addCorrAccid" href="#">
-            <span id="addCorrAccidText">Corr (Accid)</span>
-          </a>
-          <hr class="dropdownLine" />
-          <a id="addOrig" href="#">
-            <span id="addOrigText">Orig</span>
-          </a>
-          <a id="addOrigArtic" href="#">
-            <span id="addOrigArticText">Orig (Artic)</span>
-          </a>
-          <a id="addOrigAccid" href="#">
-            <span id="addOrigAccidText">Orig (Accid)</span>
-          </a>
-          <hr class="dropdownLine" />
-          <a id="addReg" href="#">
-            <span id="addRegText">Reg</span>
-          </a>
-          <a id="addRegArtic" href="#">
-            <span id="addRegArticText">Reg (Artic)</span>
-          </a>
-          <a id="addRegAccid" href="#">
-            <span id="addRegAccidText">Reg (Accid)</span>
-          </a>
-          <hr class="dropdownLine" />
-          <a id="addAdd" href="#">
-            <span id="addAddText">Add</span>
-          </a>
-          <a id="addAddArtic" href="#">
-            <span id="addAddArticText">Add (Artic)</span>
-          </a>
-          <a id="addAddAccid" href="#">
-            <span id="addAddAccidText">Add (Accid)</span>
-          </a>
-          <hr class="dropdownLine" />
-          <a id="addDel" href="#">
-            <span id="addDelText">Del</span>
-          </a>
-          <a id="addDelArtic" href="#">
-            <span id="addDelArticText">Del (Artic)</span>
-          </a>
-          <a id="addDelAccid" href="#">
-            <span id="addDelAccidText">Del (Accid)</span>
-          </a>
-        </div>
-      </div>
-      <div class="dropdown">
         <button class="dropbtn" id="helpMenuTitle">Help</button>
         <div class="dropdownContent" id="HelpMenu">
           <a id="goToHelpPage" href="https://mei-friend.github.io/" target="_blank">Show mei-friend help pages</a>
@@ -919,19 +832,163 @@
             <script xmlns=""/>
           </svg>
         </button>
-        <button id="annotationToolsButton" class="tablink defaultOpen" onclick="switchTab(event, 'annotationPanel')" title="Annotation tools" data-tab="annotationTools">
-          Tools
-        </button>
-        <button id="annotationListButton" class="tablink" onclick="switchTab(event, 'annotationPanel')" title="List annotations" data-tab="listAnnotations">
+        <button id="annotationListButton" class="tablink defaultOpen" onclick="switchTab(event, 'annotationPanel')" title="List annotations" data-tab="listAnnotations">
           List
+        </button>
+        <button id="markupToolsButton" class="tablink" onclick="switchTab(event, 'annotationPanel')" title="Markup tools" data-tab="markupTools">
+          Markup
+        </button>
+        <button id="annotationToolsButton" class="tablink" onclick="switchTab(event, 'annotationPanel')" title="Annotation tools" data-tab="annotationTools">
+          Annotate
         </button>
         <!--        <button class="tablink" onclick="switchTab(event, 'annotationPanel')"
           title="Links" data-tab="externalLinks">Links</button>-->
         <span id="closeAnnotationPanelButton" class="topright" title="Close Annotations Panel">&times;</span>
       </div>
       <div id="solidTab" class="tabcontent"></div>
+      <div id="listAnnotations" class="tabcontent">No annotations present.</div>
+      <div id="markupTools" class="tabcontent">
+        <menu id="markupToolsMenu" class="enrichmentToolsMenu">
+          <div class="annotationToolsIconGroup dropdown">
+            <li>
+              <div id="addSupplied" class="annotationToolsIcon">
+                <span id="addSuppliedText">supplied</span>
+              </div>
+            </li>
+            <li>
+              <div id="addSuppliedArtic" class="annotationToolsIcon">
+                <span id="addSuppliedArticText">supplied (Artic)</span>
+              </div>
+            </li>
+            <li>
+              <div id="addSuppliedAccid" class="annotationToolsIcon">
+                <span id="addSuppliedAccidText">supplied (Accid)</span>
+              </div>
+            </li>
+          </div>
+          <div class="annotationToolsIconGroup dropdown">
+            <li>
+              <div id="addUnclear" class="annotationToolsIcon">
+                <span id="addUnclearText">unclear</span>
+              </div>
+            </li>
+            <li>
+              <div id="addUnclearArtic" class="annotationToolsIcon">
+                <span id="addUnclearArticText">unclear (Artic)</span>
+              </div>
+            </li>
+            <li>
+              <div id="addUnclearAccid" class="annotationToolsIcon">
+                <span id="addUnclearAccidText">unclear (Accid)</span>
+              </div>
+            </li>
+          </div>
+          <div class="annotationToolsIconGroup dropdown">
+            <li>
+              <div id="addSic" class="annotationToolsIcon">
+              <span id="addSicText">Sic</span>
+              </div>
+            </li>
+            <li>
+              <div id="addSicArtic" class="annotationToolsIcon">
+              <span id="addSicArticText">Sic (Artic)</span>
+              </div>
+            </li>
+            <li>
+              <div id="addSicAccid" class="annotationToolsIcon">
+              <span id="addSicAccidText">Sic (Accid)</span>
+              </div>
+            </li>
+          </div>
+          <div class="annotationToolsIconGroup dropdown">
+            <li>
+              <div id="addCorr" class="annotationToolsIcon">
+              <span id="addCorrText">Corr</span>
+              </div>
+            </li>
+            <li>
+              <div id="addCorrArtic" class="annotationToolsIcon">
+              <span id="addCorrArticText">Corr (Artic)</span>
+              </div>
+            </li>
+            <li>
+              <div id="addCorrAccid" class="annotationToolsIcon">
+              <span id="addCorrAccidText">Corr (Accid)</span>
+              </div>
+            </li>
+          </div>
+          <div class="annotationToolsIconGroup dropdown">
+            <li>
+              <div id="addOrig" class="annotationToolsIcon">
+              <span id="addOrigText">Orig</span>
+              </div>
+            </li>
+            <li>
+              <div id="addOrigArtic" class="annotationToolsIcon">
+              <span id="addOrigArticText">Orig (Artic)</span>
+              </div>
+            </li>
+            <li>
+              <div id="addOrigAccid" class="annotationToolsIcon">
+              <span id="addOrigAccidText">Orig (Accid)</span>
+              </div>
+            </li>
+          </div>
+          <div class="annotationToolsIconGroup dropdown">
+            <li>
+              <div id="addReg" class="annotationToolsIcon">
+              <span id="addRegText">Reg</span>
+              </div>
+            </li>
+            <li>
+              <div id="addRegArtic" class="annotationToolsIcon">
+              <span id="addRegArticText">Reg (Artic)</span>
+              </div>
+            </li>
+            <li>
+              <div id="addRegAccid" class="annotationToolsIcon">
+              <span id="addRegAccidText">Reg (Accid)</span>
+              </div>
+            </li>
+          </div>
+          <div class="annotationToolsIconGroup dropdown">
+            <li>
+              <div id="addAdd" class="annotationToolsIcon">
+              <span id="addAddText">Add</span>
+              </div>
+            </li>
+            <li>
+              <div id="addAddArtic" class="annotationToolsIcon">
+              <span id="addAddArticText">Add (Artic)</span>
+              </div>
+            </li>
+            <li>
+              <div id="addAddAccid" class="annotationToolsIcon">
+              <span id="addAddAccidText">Add (Accid)</span>
+              </div>
+            </li>
+          </div>
+          <div class="annotationToolsIconGroup dropdown">
+            <li>
+              <div id="addDel" class="annotationToolsIcon">
+              <span id="addDelText">Del</span>
+              </div>
+            </li>
+            <li>
+              <div id="addDelArtic" class="annotationToolsIcon">
+              <span id="addDelArticText">Del (Artic)</span>
+              </div>
+            </li>
+            <li>
+              <div id="addDelAccid" class="annotationToolsIcon">
+              <span id="addDelAccidText">Del (Accid)</span>
+              </div>
+            </li>
+          </div>
+        </menu>
+      </div>
       <div id="annotationTools" class="tabcontent">
-        <menu id="annotationToolsMenu">
+        <menu id="annotationToolsMenu" class="enrichmentToolsMenu">
           <div id="annotationToolsDomainSelection">
             <div class="annotationToolsDomainSelectionItem">
               <fieldset>
@@ -1001,7 +1058,6 @@
           </div>
         </menu>
       </div>
-      <div id="listAnnotations" class="tabcontent">No annotations present.</div>
       <!-- DW HACK ESWC <div id="externalLinks" class="tabcontent">Links</div>-->
     </div>
   </div>

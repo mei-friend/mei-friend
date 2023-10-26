@@ -1,13 +1,13 @@
-#annotationToolsMenu {
+.enrichmentToolsMenu {
   display: flex;
   padding-left: 0px;
 }
 
-#annotationToolsMenu div {
+.enrichmentToolsMenu div {
   padding: 8px;
 }
 
-#annotationToolsMenu li {
+.enrichmentToolsMenu li {
   display: flex;
   list-style: none;
   padding: 10px;
@@ -84,7 +84,7 @@ fieldset {
 }
 
 #listAnnotations { 
-  display:flex !important;
+  display:flex /*!important*/;
 }
 
 #listAnnotations details {
