@@ -6,7 +6,7 @@
  */
 
 import * as att from './attribute-classes.js';
-import { replaceInEditor } from './editor.js';
+import { addApplicationInfo, replaceInEditor } from './editor.js';
 import { cmd } from './main.js';
 import * as dutils from './dom-utils.js';
 import * as speed from './speed.js';
