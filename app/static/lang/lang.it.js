@@ -113,9 +113,6 @@ export const lang = {
   addDiminuendoHairpinText: { text: 'Diminuendo' },
   addBeamText: { text: 'Raggruppa note' },
   addBeamSpanText: { text: 'Raggruppa note su più battute' },
-  addSuppliedText: { text: 'Aggiungi simbolo mancante' },
-  addSuppliedArticText: { text: 'Aggiungi simbolo mancante (Artic)' },
-  addSuppliedAccidText: { text: 'Aggiungi simbolo mancante (Accid)' },
   addArpeggioText: { text: 'Arpeggio' },
   addFermataText: { text: 'Fermata' },
   addGlissandoText: { text: 'Glissato' },
@@ -363,8 +360,9 @@ export const lang = {
   annotationCloseButtonText: { text: 'Chiudi pannello di annotazione' },
   hideAnnotationPanelButton: { description: 'Chiudi pannello di annotazione' },
   closeAnnotationPanelButton: { description: 'Chiudi pannello di annotazione' },
-  annotationToolsButton: { text: 'Strumenti', description: 'Strumenti di annotazione' },
-  annotationListButton: { text: 'Lista', description: 'Elenco delle annotazioni' },
+  markupToolsButton: { description: 'Strumenti di marcatura' },
+  annotationToolsButton: { description: 'Strumenti di annotazione' },
+  annotationListButton: { description: 'Elenco delle annotazioni' },
   writeAnnotStandoffText: { text: 'Annotazione Web' },
   annotationToolsIdentifyTitle: { text: 'Identifica' },
   annotationToolsIdentifySpan: { text: 'Identifica oggetto musicale' },
@@ -409,6 +407,39 @@ export const lang = {
     text1: "Impossibile scrivere l'annotazione perché il punto di ancoraggio MEI non ha un xml:id.",
     text2: 'Assegna un identificativo selezionando "Manipola" -> "Rendi il MEI di nuovo con id" e riprova.',
   },
+  // MENU DI MARCATURA
+  addSuppliedText: { text: '<supplied>' },
+  addSupplied: { text: 'Elementi selezionati' },
+  addSuppliedArticText: { text: 'Articolazione' },
+  addSuppliedAccidText: { text: 'Accidentale' },
+  addUnclearText: { text: '<unclear>' },
+  addUnclear: { text: 'Elementi selezionati' },
+  addUnclearArticText: { text: 'Articolazione' },
+  addUnclearAccidText: { text: 'Accidentale' },
+  addSicText: { text: '<sic>' },
+  addSic: { text: 'Elementi selezionati' },
+  addSicArticText: { text: 'Articolazione' },
+  addSicAccidText: { text: 'Accidentale' },
+  addCorrText: { text: '<corr>' },
+  addCorr: { text: 'Elementi selezionati' },
+  addCorrArticText: { text: 'Articolazione' },
+  addCorrAccidText: { text: 'Accidentale' },
+  addOrigText: { text: '<orig>' },
+  addOrig: { text: 'Elementi selezionati' },
+  addOrigArticText: { text: 'Articolazione' },
+  addOrigAccidText: { text: 'Accidentale' },
+  addRegText: { text: '<reg>' },
+  addReg: { text: 'Elementi selezionati' },
+  addRegArticText: { text: 'Articolazione' },
+  addRegAccidText: { text: 'Accidentale' },
+  addAddText: { text: '<add>' },
+  addAdd: { text: 'Elementi selezionati' },
+  addAddArticText: { text: 'Articolazione' },
+  addAddAccidText: { text: 'Accidentale' },
+  addDelText: { text: '<del>' },
+  addDel: { text: 'Elementi selezionati' },
+  addDelArticText: { text: 'Articolazione' },
+  addDelAccidText: { text: 'Accidentale' },
 
   // MIDI
   midiSpeedmodeIndicator: {
@@ -713,50 +744,50 @@ export const lang = {
   },
 
   // Supplied element // Elemento fornito
-titleSupplied: {
-  text: 'Gestisci contenuto editoriale',
-  description: 'Controllo della gestione del markup editoriale',
-},
-respSelect: {
-  text: 'Seleziona responsabilità di markup',
-  description: 'Seleziona ID di responsabilità',
-},
-showMarkup: {
-  text: 'Mostra elementi di markup editoriale',
-  description: 'Evidenzia tutti gli elementi contenuti dagli elementi di markup editoriale',
-},
-suppliedColor: {
-  text: 'Seleziona colore di evidenziazione per <supplied>',
-  description: 'Seleziona colore di evidenziazione per <supplied>',
-},
-unclearColor: {
-  title: 'Seleziona colore di evidenziazione per <unclear>',
-  description: 'Seleziona colore di evidenziazione per <unclear>',
-},
-sicColor: {
-  title: 'Seleziona colore di evidenziazione per <sic>',
-  description: 'Seleziona colore di evidenziazione per <sic>',
-},
-corrColor: {
-  title: 'Seleziona colore di evidenziazione per <corr>',
-  description: 'Seleziona colore di evidenziazione per <corr>',
-},
-origColor: {
-  title: 'Seleziona colore di evidenziazione per <orig>',
-  description: 'Seleziona colore di evidenziazione per <orig>',
-},
-regColor: {
-  title: 'Seleziona colore di evidenziazione per <reg>',
-  description: 'Seleziona colore di evidenziazione per <reg>',
-},
-addColor: {
-  title: 'Seleziona colore di evidenziazione per <add>',
-  description: 'Seleziona colore di evidenziazione per <add>',
-},
-delColor: {
-  title: 'Seleziona colore di evidenziazione per <del>',
-  description: 'Seleziona colore di evidenziazione per <del>',
-},
+  titleSupplied: {
+    text: 'Gestisci contenuto editoriale',
+    description: 'Controllo della gestione del markup editoriale',
+  },
+  respSelect: {
+    text: 'Seleziona responsabilità di markup',
+    description: 'Seleziona ID di responsabilità',
+  },
+  showMarkup: {
+    text: 'Mostra elementi di markup editoriale',
+    description: 'Evidenzia tutti gli elementi contenuti dagli elementi di markup editoriale',
+  },
+  suppliedColor: {
+    text: 'Seleziona colore di evidenziazione per <supplied>',
+    description: 'Seleziona colore di evidenziazione per <supplied>',
+  },
+  unclearColor: {
+    title: 'Seleziona colore di evidenziazione per <unclear>',
+    description: 'Seleziona colore di evidenziazione per <unclear>',
+  },
+  sicColor: {
+    title: 'Seleziona colore di evidenziazione per <sic>',
+    description: 'Seleziona colore di evidenziazione per <sic>',
+  },
+  corrColor: {
+    title: 'Seleziona colore di evidenziazione per <corr>',
+    description: 'Seleziona colore di evidenziazione per <corr>',
+  },
+  origColor: {
+    title: 'Seleziona colore di evidenziazione per <orig>',
+    description: 'Seleziona colore di evidenziazione per <orig>',
+  },
+  regColor: {
+    title: 'Seleziona colore di evidenziazione per <reg>',
+    description: 'Seleziona colore di evidenziazione per <reg>',
+  },
+  addColor: {
+    title: 'Seleziona colore di evidenziazione per <add>',
+    description: 'Seleziona colore di evidenziazione per <add>',
+  },
+  delColor: {
+    title: 'Seleziona colore di evidenziazione per <del>',
+    description: 'Seleziona colore di evidenziazione per <del>',
+  },
 
   // EDITOR SETTINGS / CODEMIRROR SETTINGS
   editorSettingsHeader: {

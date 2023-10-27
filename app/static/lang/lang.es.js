@@ -110,9 +110,6 @@ export const lang = {
   addDiminuendoHairpinText: { text: 'Disminuendo' },
   addBeamText: { text: 'Haz' },
   addBeamSpanText: { text: 'Extensión de haz' },
-  addSuppliedText: { text: 'Suministrado' },
-  addSuppliedArticText: { text: 'Suministrado (articulación)' },
-  addSuppliedAccidText: { text: 'Suministrado (acento)' },
   addArpeggioText: { text: 'Arpegio' },
   addFermataText: { text: 'Fermata' },
   addGlissandoText: { text: 'Glissando' },
@@ -357,8 +354,9 @@ export const lang = {
   annotationCloseButtonText: { text: 'Cerrar panel de anotaciones' },
   hideAnnotationPanelButton: { description: 'Cerrar panel de anotaciones' },
   closeAnnotationPanelButton: { description: 'Cerrar panel de anotaciones' },
-  annotationToolsButton: { text: 'Utilidades', description: 'Herramientas de anotación' },
-  annotationListButton: { text: 'Lista', description: 'Listar anotaciones' },
+  markupToolsButton: { description: 'Herramientas de marcado' },
+  annotationToolsButton: { description: 'Herramientas de anotación' },
+  annotationListButton: { description: 'Lista de anotaciones' },
   writeAnnotStandoffText: { text: 'Anotación Web' },
   annotationToolsIdentifyTitle: { text: 'Identificar' },
   annotationToolsIdentifySpan: { text: 'Identificar objeto musical' },
@@ -403,6 +401,39 @@ export const lang = {
     text2:
       'Asigna identificadores seleccionando "Manipular" -> "Volver a renderizar MEI (con identificadores)" e inténtalo de nuevo.',
   },
+  // MENÚ DE MARCADO
+  addSuppliedText: { text: '<suministrado>' },
+  addSupplied: { text: 'Elementos seleccionados' },
+  addSuppliedArticText: { text: 'Articulación' },
+  addSuppliedAccidText: { text: 'Accidental' },
+  addUnclearText: { text: '<no claro>' },
+  addUnclear: { text: 'Elementos seleccionados' },
+  addUnclearArticText: { text: 'Articulación' },
+  addUnclearAccidText: { text: 'Accidental' },
+  addSicText: { text: '<sic>' },
+  addSic: { text: 'Elementos seleccionados' },
+  addSicArticText: { text: 'Articulación' },
+  addSicAccidText: { text: 'Accidental' },
+  addCorrText: { text: '<corr>' },
+  addCorr: { text: 'Elementos seleccionados' },
+  addCorrArticText: { text: 'Articulación' },
+  addCorrAccidText: { text: 'Accidental' },
+  addOrigText: { text: '<orig>' },
+  addOrig: { text: 'Elementos seleccionados' },
+  addOrigArticText: { text: 'Articulación' },
+  addOrigAccidText: { text: 'Accidental' },
+  addRegText: { text: '<reg>' },
+  addReg: { text: 'Elementos seleccionados' },
+  addRegArticText: { text: 'Articulación' },
+  addRegAccidText: { text: 'Accidental' },
+  addAddText: { text: '<add>' },
+  addAdd: { text: 'Elementos seleccionados' },
+  addAddArticText: { text: 'Articulación' },
+  addAddAccidText: { text: 'Accidental' },
+  addDelText: { text: '<del>' },
+  addDel: { text: 'Elementos seleccionados' },
+  addDelArticText: { text: 'Articulación' },
+  addDelAccidText: { text: 'Accidental' },
 
   // MIDI // MIDI
   midiSpeedmodeIndicator: {
@@ -708,50 +739,50 @@ export const lang = {
   },
 
   // Supplied element / Elemento suministrado
-titleSupplied: {
-  text: 'Gestionar contenido editorial',
-  description: 'Controlar el manejo del marcado editorial',
-},
-respSelect: {
-  text: 'Seleccionar responsabilidad de marcado',
-  description: 'Seleccionar ID de responsabilidad',
-},
-showMarkup: {
-  text: 'Mostrar elementos de marcado editorial',
-  description: 'Resaltar todos los elementos contenidos por elementos de marcado editorial',
-},
-suppliedColor: {
-  text: 'Seleccionar color de resaltado para <supplied>',
-  description: 'Seleccionar color de resaltado para <supplied>',
-},
-unclearColor: {
-  title: 'Seleccionar color de resaltado para <unclear>',
-  description: 'Seleccionar color de resaltado para <unclear>',
-},
-sicColor: {
-  title: 'Seleccionar color de resaltado para <sic>',
-  description: 'Seleccionar color de resaltado para <sic>',
-},
-corrColor: {
-  title: 'Seleccionar color de resaltado para <corr>',
-  description: 'Seleccionar color de resaltado para <corr>',
-},
-origColor: {
-  title: 'Seleccionar color de resaltado para <orig>',
-  description: 'Seleccionar color de resaltado para <orig>',
-},
-regColor: {
-  title: 'Seleccionar color de resaltado para <reg>',
-  description: 'Seleccionar color de resaltado para <reg>',
-},
-addColor: {
-  title: 'Seleccionar color de resaltado para <add>',
-  description: 'Seleccionar color de resaltado para <add>',
-},
-delColor: {
-  title: 'Seleccionar color de resaltado para <del>',
-  description: 'Seleccionar color de resaltado para <del>',
-},
+  titleSupplied: {
+    text: 'Gestionar contenido editorial',
+    description: 'Controlar el manejo del marcado editorial',
+  },
+  respSelect: {
+    text: 'Seleccionar responsabilidad de marcado',
+    description: 'Seleccionar ID de responsabilidad',
+  },
+  showMarkup: {
+    text: 'Mostrar elementos de marcado editorial',
+    description: 'Resaltar todos los elementos contenidos por elementos de marcado editorial',
+  },
+  suppliedColor: {
+    text: 'Seleccionar color de resaltado para <supplied>',
+    description: 'Seleccionar color de resaltado para <supplied>',
+  },
+  unclearColor: {
+    title: 'Seleccionar color de resaltado para <unclear>',
+    description: 'Seleccionar color de resaltado para <unclear>',
+  },
+  sicColor: {
+    title: 'Seleccionar color de resaltado para <sic>',
+    description: 'Seleccionar color de resaltado para <sic>',
+  },
+  corrColor: {
+    title: 'Seleccionar color de resaltado para <corr>',
+    description: 'Seleccionar color de resaltado para <corr>',
+  },
+  origColor: {
+    title: 'Seleccionar color de resaltado para <orig>',
+    description: 'Seleccionar color de resaltado para <orig>',
+  },
+  regColor: {
+    title: 'Seleccionar color de resaltado para <reg>',
+    description: 'Seleccionar color de resaltado para <reg>',
+  },
+  addColor: {
+    title: 'Seleccionar color de resaltado para <add>',
+    description: 'Seleccionar color de resaltado para <add>',
+  },
+  delColor: {
+    title: 'Seleccionar color de resaltado para <del>',
+    description: 'Seleccionar color de resaltado para <del>',
+  },
 
   //  EDITOR SETTINGS / CODEMIRROR SETTINGS // CONFIGURACIÓN DEL EDITOR / CONFIGURACIÓN DE CODEMIRROR
   editorSettingsHeader: {

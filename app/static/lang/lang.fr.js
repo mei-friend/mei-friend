@@ -113,9 +113,6 @@ export const lang = {
   addDiminuendoHairpinText: { text: 'Diminuendo' },
   addBeamText: { text: 'Faisceau' },
   addBeamSpanText: { text: 'Envergure de faisceau' },
-  addSuppliedText: { text: 'Fourni' },
-  addSuppliedArticText: { text: 'Fourni (artic)' },
-  addSuppliedAccidText: { text: 'Fourni (accid)' },
   addArpeggioText: { text: 'Arpège' },
   addFermataText: { text: 'Fermata' },
   addGlissandoText: { text: 'Glissando' },
@@ -355,8 +352,9 @@ export const lang = {
   annotationCloseButtonText: { text: "Fermer le panneau d'annotations" },
   hideAnnotationPanelButton: { description: "Fermer le panneau d'annotations" },
   closeAnnotationPanelButton: { description: "Fermer le panneau d'annotations" },
-  annotationToolsButton: { text: 'Outils', description: "Outils d'annotation" },
-  annotationListButton: { text: 'Liste', description: 'Liste des annotations' },
+  markupToolsButton: { description: 'Outils de mise en forme' },
+  annotationToolsButton: { description: "Outils d'annotation" },
+  annotationListButton: { description: 'Liste des annotations' },
   writeAnnotStandoffText: { text: 'Annotation Web' },
   annotationToolsIdentifyTitle: { text: 'Identifier' },
   annotationToolsIdentifySpan: { text: 'Identifier un objet musical' },
@@ -401,6 +399,39 @@ export const lang = {
     text2:
       'Veuillez assigner des identifiants en sélectionnant "Manipuler" -> "Re-render MEI (avec ids)" et réessayer.',
   },
+  // MENU DE BALISAGE
+  addSuppliedText: { text: '<supplied>' },
+  addSupplied: { text: 'Éléments sélectionnés' },
+  addSuppliedArticText: { text: 'Articulation' },
+  addSuppliedAccidText: { text: 'Accidentel' },
+  addUnclearText: { text: '<unclear>' },
+  addUnclear: { text: 'Éléments sélectionnés' },
+  addUnclearArticText: { text: 'Articulation' },
+  addUnclearAccidText: { text: 'Accidentel' },
+  addSicText: { text: '<sic>' },
+  addSic: { text: 'Éléments sélectionnés' },
+  addSicArticText: { text: 'Articulation' },
+  addSicAccidText: { text: 'Accidentel' },
+  addCorrText: { text: '<corr>' },
+  addCorr: { text: 'Éléments sélectionnés' },
+  addCorrArticText: { text: 'Articulation' },
+  addCorrAccidText: { text: 'Accidentel' },
+  addOrigText: { text: '<orig>' },
+  addOrig: { text: 'Éléments sélectionnés' },
+  addOrigArticText: { text: 'Articulation' },
+  addOrigAccidText: { text: 'Accidentel' },
+  addRegText: { text: '<reg>' },
+  addReg: { text: 'Éléments sélectionnés' },
+  addRegArticText: { text: 'Articulation' },
+  addRegAccidText: { text: 'Accidentel' },
+  addAddText: { text: '<add>' },
+  addAdd: { text: 'Éléments sélectionnés' },
+  addAddArticText: { text: 'Articulation' },
+  addAddAccidText: { text: 'Accidentel' },
+  addDelText: { text: '<del>' },
+  addDel: { text: 'Éléments sélectionnés' },
+  addDelArticText: { text: 'Articulation' },
+  addDelAccidText: { text: 'Accidentel' },
 
   // MIDI
   midiSpeedmodeIndicator: {
@@ -707,50 +738,50 @@ export const lang = {
   },
 
   // Supplied element / Élément fourni
-titleSupplied: {
-  text: 'Gérer le contenu éditorial',
-  description: 'Contrôler la gestion de la mise en forme éditoriale',
-},
-respSelect: {
-  text: 'Sélectionner la responsabilité de la mise en forme',
-  description: 'Sélectionner l\'ID de la responsabilité',
-},
-showMarkup: {
-  text: 'Afficher les éléments de mise en forme éditoriale',
-  description: 'Surligner tous les éléments contenus dans les éléments de mise en forme éditoriale',
-},
-suppliedColor: {
-  text: 'Sélectionner la couleur de mise en évidence <supplied>',
-  description: 'Sélectionner la couleur de mise en évidence <supplied>',
-},
-unclearColor: {
-  title: 'Sélectionner la couleur de mise en évidence <unclear>',
-  description: 'Sélectionner la couleur de mise en évidence <unclear>',
-},
-sicColor: {
-  title: 'Sélectionner la couleur de mise en évidence <sic>',
-  description: 'Sélectionner la couleur de mise en évidence <sic>',
-},
-corrColor: {
-  title: 'Sélectionner la couleur de mise en évidence <corr>',
-  description: 'Sélectionner la couleur de mise en évidence <corr>',
-},
-origColor: {
-  title: 'Sélectionner la couleur de mise en évidence <orig>',
-  description: 'Sélectionner la couleur de mise en évidence <orig>',
-},
-regColor: {
-  title: 'Sélectionner la couleur de mise en évidence <reg>',
-  description: 'Sélectionner la couleur de mise en évidence <reg>',
-},
-addColor: {
-  title: 'Sélectionner la couleur de mise en évidence <add>',
-  description: 'Sélectionner la couleur de mise en évidence <add>',
-},
-delColor: {
-  title: 'Sélectionner la couleur de mise en évidence <del>',
-  description: 'Sélectionner la couleur de mise en évidence <del>',
-},
+  titleSupplied: {
+    text: 'Gérer le contenu éditorial',
+    description: 'Contrôler la gestion de la mise en forme éditoriale',
+  },
+  respSelect: {
+    text: 'Sélectionner la responsabilité de la mise en forme',
+    description: "Sélectionner l'ID de la responsabilité",
+  },
+  showMarkup: {
+    text: 'Afficher les éléments de mise en forme éditoriale',
+    description: 'Surligner tous les éléments contenus dans les éléments de mise en forme éditoriale',
+  },
+  suppliedColor: {
+    text: 'Sélectionner la couleur de mise en évidence <supplied>',
+    description: 'Sélectionner la couleur de mise en évidence <supplied>',
+  },
+  unclearColor: {
+    title: 'Sélectionner la couleur de mise en évidence <unclear>',
+    description: 'Sélectionner la couleur de mise en évidence <unclear>',
+  },
+  sicColor: {
+    title: 'Sélectionner la couleur de mise en évidence <sic>',
+    description: 'Sélectionner la couleur de mise en évidence <sic>',
+  },
+  corrColor: {
+    title: 'Sélectionner la couleur de mise en évidence <corr>',
+    description: 'Sélectionner la couleur de mise en évidence <corr>',
+  },
+  origColor: {
+    title: 'Sélectionner la couleur de mise en évidence <orig>',
+    description: 'Sélectionner la couleur de mise en évidence <orig>',
+  },
+  regColor: {
+    title: 'Sélectionner la couleur de mise en évidence <reg>',
+    description: 'Sélectionner la couleur de mise en évidence <reg>',
+  },
+  addColor: {
+    title: 'Sélectionner la couleur de mise en évidence <add>',
+    description: 'Sélectionner la couleur de mise en évidence <add>',
+  },
+  delColor: {
+    title: 'Sélectionner la couleur de mise en évidence <del>',
+    description: 'Sélectionner la couleur de mise en évidence <del>',
+  },
 
   //  EDITOR SETTINGS / CODEMIRROR SETTINGS / PARAMÈTRES DE L'ÉDITEUR / PARAMÈTRES DE CODEMIRROR
   editorSettingsHeader: {
