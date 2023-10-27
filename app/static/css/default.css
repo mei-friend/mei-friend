@@ -1446,6 +1446,11 @@ span.keyIcon {
   min-width: 46px;
 }
 
+#annotationPanel .tablink svg {
+  color: var(--annotationPanelTextColor);
+  fill: var(--annotationPanelTextColor);
+}
+
 .tabstart {
   fill: var(--textColor);
   border: rgba(0, 0, 0, 0) solid 2px;
