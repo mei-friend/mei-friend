@@ -1,6 +1,7 @@
 # mei-friend-online CHANGELOG.md
 ### 1.0.4 patch
 * Tweak CSS select and translations (German)
+* Fix typo at forking via URL parameters
 
 ### 1.0.3 patch
 * Enable navigation link to generated MAO objects (identify object annotations)
