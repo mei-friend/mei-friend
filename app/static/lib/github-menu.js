@@ -45,7 +45,7 @@ function forkRepo() {
 
 export function forkRepoClicked() {
   // inputRepoOverride is used to supply a repository via the forkAndOpen (?fork parameter) path
-  let lnputName = document.getElementById('forkRepositoryInputName').value;
+  let inputName = document.getElementById('forkRepositoryInputName').value;
   let inputRepo = document.getElementById('forkRepositoryInputRepo').value;
   let inputRepoOverride = document.getElementById('forkRepositoryInputRepoOverride').value;
   let inputBranchOverride = document.getElementById('forkRepositoryInputBranchOverride').value;
