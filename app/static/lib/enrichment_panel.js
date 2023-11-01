@@ -8,7 +8,7 @@ import { v, cm, translator, setStandoffAnnotationEnabledStatus } from './main.js
 import { setCursorToId } from './utils.js';
 //import { meiNameSpace, xmlNameSpace, xmlToString } from './dom-utils.js';
 import * as annot from './annotation.js';
-import { addTranscriptionLikeElement } from './markup.js';
+import { addMarkup } from './markup.js';
 import {
   circle,
   diffRemoved,
@@ -484,30 +484,30 @@ export function addAnnotationHandlers() {
 
 export function addMarkupHandlers() {
   const markupHandler = {
-  addSupplied: () => addTranscriptionLikeElement(v, cm, null, 'supplied'),
-  addSuppliedAccid: () => addTranscriptionLikeElement(v, cm, 'accid', 'supplied'),
-  addSuppliedArtic: () => addTranscriptionLikeElement(v, cm, 'artic', 'supplied'),
-  addUnclear: () => addTranscriptionLikeElement(v, cm, null, 'unclear'),
-  addUnclearAccid: () => addTranscriptionLikeElement(v, cm, 'accid', 'unclear'),
-  addUnclearArtic: () => addTranscriptionLikeElement(v, cm, 'artic', 'unclear'),
-  addSic: () => addTranscriptionLikeElement(v, cm, null, 'sic'),
-  addSicAccid: () => addTranscriptionLikeElement(v, cm, 'accid', 'sic'),
-  addSicArtic: () => addTranscriptionLikeElement(v, cm, 'artic', 'sic'),
-  addCorr: () => addTranscriptionLikeElement(v, cm, null, 'corr'),
-  addCorrAccid: () => addTranscriptionLikeElement(v, cm, 'accid', 'corr'),
-  addCorrArtic: () => addTranscriptionLikeElement(v, cm, 'artic', 'corr'),
-  addOrig: () => addTranscriptionLikeElement(v, cm, null, 'orig'),
-  addOrigAccid: () => addTranscriptionLikeElement(v, cm, 'accid', 'orig'),
-  addOrigArtic: () => addTranscriptionLikeElement(v, cm, 'artic', 'orig'),
-  addReg: () => addTranscriptionLikeElement(v, cm, null, 'reg'),
-  addRegAccid: () => addTranscriptionLikeElement(v, cm, 'accid', 'reg'),
-  addRegArtic: () => addTranscriptionLikeElement(v, cm, 'artic', 'reg'),
-  addAdd: () => addTranscriptionLikeElement(v, cm, null, 'add'),
-  addAddAccid: () => addTranscriptionLikeElement(v, cm, 'accid', 'add'),
-  addAddArtic: () => addTranscriptionLikeElement(v, cm, 'artic', 'add'),
-  addDel: () => addTranscriptionLikeElement(v, cm, null, 'del'),
-  addDelAccid: () => addTranscriptionLikeElement(v, cm, 'accid', 'del'),
-  addDelArtic: () => addTranscriptionLikeElement(v, cm, 'artic', 'del'),
+  addSupplied: () => addMarkup(null, 'supplied'),
+  addSuppliedAccid: () => addMarkup('accid', 'supplied'),
+  addSuppliedArtic: () => addMarkup('artic', 'supplied'),
+  addUnclear: () => addMarkup(null, 'unclear'),
+  addUnclearAccid: () => addMarkup('accid', 'unclear'),
+  addUnclearArtic: () => addMarkup('artic', 'unclear'),
+  addSic: () => addMarkup(null, 'sic'),
+  addSicAccid: () => addMarkup('accid', 'sic'),
+  addSicArtic: () => addMarkup('artic', 'sic'),
+  addCorr: () => addMarkup(null, 'corr'),
+  addCorrAccid: () => addMarkup('accid', 'corr'),
+  addCorrArtic: () => addMarkup('artic', 'corr'),
+  addOrig: () => addMarkup(null, 'orig'),
+  addOrigAccid: () => addMarkup('accid', 'orig'),
+  addOrigArtic: () => addMarkup('artic', 'orig'),
+  addReg: () => addMarkup(null, 'reg'),
+  addRegAccid: () => addMarkup('accid', 'reg'),
+  addRegArtic: () => addMarkup('artic', 'reg'),
+  addAdd: () => addMarkup(null, 'add'),
+  addAddAccid: () => addMarkup('accid', 'add'),
+  addAddArtic: () => addMarkup('artic', 'add'),
+  addDel: () => addMarkup(null, 'del'),
+  addDelAccid: () => addMarkup('accid', 'del'),
+  addDelArtic: () => addMarkup('artic', 'del'),
   };
 
   

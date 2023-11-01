@@ -1593,7 +1593,6 @@ export let cmd = {
   addFClefChangeAfter: () => e.addClefChange(v, cm, 'F', '4', false),
   addBeam: () => e.addBeamElement(v, cm),
   addBeamSpan: () => e.addBeamSpan(v, cm),
-  addDelArtic: () => e.addTranscriptionLikeElement(v, cm, 'artic', 'del'),
   correctAccid: () => e.checkAccidGes(v, cm),
   renumberMeasuresTest: () => e.renumberMeasures(v, cm, false),
   renumberMeasures: () => e.renumberMeasures(v, cm, true),

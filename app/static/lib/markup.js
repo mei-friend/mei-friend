@@ -7,7 +7,7 @@
 
 import * as att from './attribute-classes.js';
 import { addApplicationInfo, replaceInEditor } from './editor.js';
-import { cmd } from './main.js';
+import { cm, cmd, v } from './main.js';
 import * as dutils from './dom-utils.js';
 import * as speed from './speed.js';
 import * as utils from './utils.js';
@@ -106,6 +106,11 @@ function firstChildElement(parent) {
   }
   return null;
 } // firstChildElement()
+
+export function addMarkup(attrName = 'none', mElName = 'supplied')
+{
+  addTranscriptionLikeElement(v, cm, attrName, mElName);
+}
 
 
 /**
