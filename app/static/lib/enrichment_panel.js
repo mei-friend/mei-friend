@@ -20,6 +20,7 @@ import {
   rdf,
   speechBubble,
   symLinkFile,
+  codeScan,
 } from '../css/icons.js';
 import { loginAndFetch, solid, solidLogout, provider } from './solid.js';
 import { nsp } from './linked-data.js';
@@ -180,8 +181,9 @@ export function refreshAnnotationsInRendering(forceListRefresh = false) {
   rac.appendChild(annoSvg);
   if (document.getElementById('showAnnotations')?.checked) {
     // drawing handlers can draw into renderedAnnotationsSvg if they need to
+    // markup does not need to be drawn explicitly because this is already handled by Verovio
     listItems.forEach((a) => {
-      if ('type' in a) {
+      if ('type' in a && !('isMarkup' in a)) {
         switch (a.type) {
           case 'annotateIdentify':
             annot.drawIdentify(a);
@@ -202,7 +204,7 @@ export function refreshAnnotationsInRendering(forceListRefresh = false) {
             console.warn("Don't have a drawing function for this type of annotation", a);
         }
       } else {
-        console.warn('Skipping annotation without type: ', a);
+        console.warn('Skipping markup or annotation without type: ', a);
       }
     });
   }
@@ -260,28 +262,32 @@ function generateListItem(a) {
   const details = document.createElement('details');
   details.setAttribute('open', '');
   const summary = document.createElement('summary');
-
-  switch (a.type) {
-    case 'annotateHighlight':
-      summary.insertAdjacentHTML('afterbegin', highlight);
-      break;
-    case 'annotateCircle':
-      summary.insertAdjacentHTML('afterbegin', circle);
-      break;
-    case 'annotateLink':
-      summary.insertAdjacentHTML('afterbegin', link);
-      details.insertAdjacentHTML('afterbegin', a.url);
-      break;
-    case 'annotateDescribe':
-      summary.insertAdjacentHTML('afterbegin', pencil);
-      details.insertAdjacentHTML('afterbegin', a.description);
-      break;
-    case 'annotateIdentify':
-      summary.insertAdjacentHTML('afterbegin', identify);
-      details.insertAdjacentHTML('afterbegin', `<div class="mao-musMat" id="musMat_${a.id}"></div>`);
-      break;
-    default:
-      console.warn('Unknown type when drawing annotation in list: ', a);
+  if (a.isMarkup === true) {
+    summary.insertAdjacentHTML('afterbegin', codeScan);
+    details.insertAdjacentHTML('afterbegin', a.type);
+  } else {
+    switch (a.type) {
+      case 'annotateHighlight':
+        summary.insertAdjacentHTML('afterbegin', highlight);
+        break;
+      case 'annotateCircle':
+        summary.insertAdjacentHTML('afterbegin', circle);
+        break;
+      case 'annotateLink':
+        summary.insertAdjacentHTML('afterbegin', link);
+        details.insertAdjacentHTML('afterbegin', a.url);
+        break;
+      case 'annotateDescribe':
+        summary.insertAdjacentHTML('afterbegin', pencil);
+        details.insertAdjacentHTML('afterbegin', a.description);
+        break;
+      case 'annotateIdentify':
+        summary.insertAdjacentHTML('afterbegin', identify);
+        details.insertAdjacentHTML('afterbegin', `<div class="mao-musMat" id="musMat_${a.id}"></div>`);
+        break;
+      default:
+        console.warn('Unknown type when drawing annotation in list: ', a);
+    }
   }
   const annotationLocationLabel = generateAnnotationLocationLabel(a);
   summary.appendChild(annotationLocationLabel);
@@ -484,33 +490,32 @@ export function addAnnotationHandlers() {
 
 export function addMarkupHandlers() {
   const markupHandler = {
-  addSupplied: () => addMarkup(null, 'supplied'),
-  addSuppliedAccid: () => addMarkup('accid', 'supplied'),
-  addSuppliedArtic: () => addMarkup('artic', 'supplied'),
-  addUnclear: () => addMarkup(null, 'unclear'),
-  addUnclearAccid: () => addMarkup('accid', 'unclear'),
-  addUnclearArtic: () => addMarkup('artic', 'unclear'),
-  addSic: () => addMarkup(null, 'sic'),
-  addSicAccid: () => addMarkup('accid', 'sic'),
-  addSicArtic: () => addMarkup('artic', 'sic'),
-  addCorr: () => addMarkup(null, 'corr'),
-  addCorrAccid: () => addMarkup('accid', 'corr'),
-  addCorrArtic: () => addMarkup('artic', 'corr'),
-  addOrig: () => addMarkup(null, 'orig'),
-  addOrigAccid: () => addMarkup('accid', 'orig'),
-  addOrigArtic: () => addMarkup('artic', 'orig'),
-  addReg: () => addMarkup(null, 'reg'),
-  addRegAccid: () => addMarkup('accid', 'reg'),
-  addRegArtic: () => addMarkup('artic', 'reg'),
-  addAdd: () => addMarkup(null, 'add'),
-  addAddAccid: () => addMarkup('accid', 'add'),
-  addAddArtic: () => addMarkup('artic', 'add'),
-  addDel: () => addMarkup(null, 'del'),
-  addDelAccid: () => addMarkup('accid', 'del'),
-  addDelArtic: () => addMarkup('artic', 'del'),
+    addSupplied: () => addMarkup(null, 'supplied'),
+    addSuppliedAccid: () => addMarkup('accid', 'supplied'),
+    addSuppliedArtic: () => addMarkup('artic', 'supplied'),
+    addUnclear: () => addMarkup(null, 'unclear'),
+    addUnclearAccid: () => addMarkup('accid', 'unclear'),
+    addUnclearArtic: () => addMarkup('artic', 'unclear'),
+    addSic: () => addMarkup(null, 'sic'),
+    addSicAccid: () => addMarkup('accid', 'sic'),
+    addSicArtic: () => addMarkup('artic', 'sic'),
+    addCorr: () => addMarkup(null, 'corr'),
+    addCorrAccid: () => addMarkup('accid', 'corr'),
+    addCorrArtic: () => addMarkup('artic', 'corr'),
+    addOrig: () => addMarkup(null, 'orig'),
+    addOrigAccid: () => addMarkup('accid', 'orig'),
+    addOrigArtic: () => addMarkup('artic', 'orig'),
+    addReg: () => addMarkup(null, 'reg'),
+    addRegAccid: () => addMarkup('accid', 'reg'),
+    addRegArtic: () => addMarkup('artic', 'reg'),
+    addAdd: () => addMarkup(null, 'add'),
+    addAddAccid: () => addMarkup('accid', 'add'),
+    addAddArtic: () => addMarkup('artic', 'add'),
+    addDel: () => addMarkup(null, 'del'),
+    addDelAccid: () => addMarkup('accid', 'del'),
+    addDelArtic: () => addMarkup('artic', 'del'),
   };
 
-  
   document.getElementById('addSupplied').addEventListener('click', markupHandler.addSupplied);
   document.getElementById('addSuppliedArtic').addEventListener('click', markupHandler.addSuppliedArtic);
   document.getElementById('addSuppliedAccid').addEventListener('click', markupHandler.addSuppliedAccid);
@@ -535,7 +540,6 @@ export function addMarkupHandlers() {
   document.getElementById('addDel').addEventListener('click', markupHandler.addDel);
   document.getElementById('addDelArtic').addEventListener('click', markupHandler.addDelArtic);
   document.getElementById('addDelAccid').addEventListener('click', markupHandler.addDelAccid);
-  
 }
 
 /**

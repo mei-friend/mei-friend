@@ -12,6 +12,7 @@ import * as dutils from './dom-utils.js';
 import * as speed from './speed.js';
 import * as utils from './utils.js';
 import Viewer from './viewer.js';
+import { addListItem, refreshAnnotationsList } from './enrichment_panel.js';
 
 /**
  * [Wrapper for selectApparatus() and selectChoice().]
@@ -110,6 +111,23 @@ function firstChildElement(parent) {
 export function addMarkup(attrName = 'none', mElName = 'supplied')
 {
   addTranscriptionLikeElement(v, cm, attrName, mElName);
+  
+  // one addMarkupAction might result in multiple markup elements
+  // e.g. when selecting notes and control events
+  // mostly because symbols in a score aren't necessarily close in the xml tree
+  // properties are similar to annotations
+  // id is the xml:id of the first markup element
+  // selection contains all markup elements created at the same time
+  // type uses capitalised element name, e.g. markupSupplied
+
+  const markupItem = {
+    id: v.selectedElements[0],
+    type: mElName,
+    isMarkup: true,
+    selection: v.selectedElements,
+  };
+  let success = addListItem(markupItem);
+  if(success === true) refreshAnnotationsList();
 }
 
 
