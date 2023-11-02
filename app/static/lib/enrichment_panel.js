@@ -76,11 +76,16 @@ export function addListItem(listItemObject, forceRefreshAnnotations = false) {
 // -> calls deleteAnnotation() & deleteMarkup
 // -> deleteAnnotation() should only check if Annot or WebAnnotation should be deleted
 
-export function deleteAnnotation(uuid) {
+export function deleteListItem(uuid) {
   const ix = listItems.findIndex((a) => a.id === uuid);
   if (ix >= 0) {
     listItems.splice(ix, 1);
-    annot.deleteAnnot(uuid);
+    if (a.isMarkup === true) {
+      //markup.deleteMarkup();
+    }
+    else {
+      annot.deleteAnnot(uuid);
+    }
     situateAndRefreshAnnotationsList(true);
     refreshAnnotationsInRendering();
   }
@@ -340,7 +345,7 @@ function generateAnnotationButtons(a) {
   deleteAnno.addEventListener('click', (e) => {
     const reallyDelete = confirm(translator.lang.deleteAnnotationConfirmation.text);
     if (reallyDelete) {
-      deleteAnnotation(a.id);
+      deleteListItem(a.id);
     }
   });
 

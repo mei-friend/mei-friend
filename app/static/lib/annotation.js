@@ -15,7 +15,7 @@ import {
   safelyPatchResource,
 } from './solid.js';
 import { nsp, traverseAndFetch } from './linked-data.js';
-import { deleteAnnotation, isItemInList, addListItem } from './enrichment_panel.js';
+import { deleteListItem, isItemInList, addListItem } from './enrichment_panel.js';
 
 //#region functions to draw annotations
 
@@ -321,7 +321,7 @@ export function writeAnnot(anchor, xmlId, plist, payload) {
     console.error('Sorry, cannot currently write annotations placed outside <score>');
     v.showAlert(translator.lang.annotationsOutsideScoreWarning.text, 'warning', 5000);
     // remove from list
-    deleteAnnotation(xmlId);
+    deleteListItem(xmlId);
     return;
   }
   if (insertHere) {
