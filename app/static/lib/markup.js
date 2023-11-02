@@ -310,7 +310,7 @@ function wrapGroupWithMarkup(v, cm, groupIds, mElName, parentEl) {
       if (currentParent === parentEl) {
         markupEl.appendChild(el);
         // remove following text node to prevent trailing newlines
-        markupEl.nextSibling.remove();
+        if (markupEl.nextSibling) markupEl.nextSibling.remove();
       } else {
         //error
       }
