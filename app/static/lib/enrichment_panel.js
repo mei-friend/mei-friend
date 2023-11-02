@@ -79,11 +79,11 @@ export function addListItem(listItemObject, forceRefreshAnnotations = false) {
 export function deleteListItem(uuid) {
   const ix = listItems.findIndex((a) => a.id === uuid);
   if (ix >= 0) {
+    let a = retrieveListItem(uuid);
     listItems.splice(ix, 1);
     if (a.isMarkup === true) {
-      //markup.deleteMarkup();
-    }
-    else {
+      markup.deleteMarkup(a);
+    } else {
       annot.deleteAnnot(uuid);
     }
     situateAndRefreshAnnotationsList(true);
@@ -95,7 +95,10 @@ export function deleteListItem(uuid) {
  * Retrieve a list item by id
  * @param {string} itemId
  */
-export function retrieveListItem(itemId) {}
+export function retrieveListItem(itemId) {
+  const ix = listItems.find((a) => a.id === itemId);
+  return ix;
+}
 
 /**
  *  Finds page numbers in rendering for every list item
@@ -269,7 +272,7 @@ function generateListItem(a) {
   const summary = document.createElement('summary');
   if (a.isMarkup === true) {
     summary.insertAdjacentHTML('afterbegin', codeScan);
-    details.insertAdjacentHTML('afterbegin', '&lt;'+a.type+'&gt;');
+    details.insertAdjacentHTML('afterbegin', '&lt;' + a.type + '&gt;');
   } else {
     switch (a.type) {
       case 'annotateHighlight':

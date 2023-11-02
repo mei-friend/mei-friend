@@ -6,7 +6,7 @@
  */
 
 import * as att from './attribute-classes.js';
-import { addApplicationInfo, replaceInEditor } from './editor.js';
+import { addApplicationInfo, indentSelection, replaceInEditor } from './editor.js';
 import { cm, cmd, v } from './main.js';
 import * as dutils from './dom-utils.js';
 import * as speed from './speed.js';
@@ -327,4 +327,21 @@ function mintSuppliedId(id, nodeName, v) {
     return nodeName + underscoreId[0];
   }
   return utils.generateXmlId(nodeName, v.xmlIdStyle);
+}
+
+export function deleteMarkup(markupItem) {
+  markupItem.selection.forEach((id) => {
+    var toDelete = v.xmlDoc.querySelector("[*|id='" + id + "']");
+    var parent = toDelete.parentElement;
+    var descendants = new DocumentFragment();
+
+    for (let i = 0; i < toDelete.children.length; i++) {
+      let child = toDelete.children[i];
+      descendants.appendChild(child.cloneNode(true));
+    }
+
+    parent.replaceChild(descendants, toDelete);
+    replaceInEditor(cm, parent, true);
+    indentSelection(v, cm);
+  });
 }
