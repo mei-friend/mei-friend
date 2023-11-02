@@ -209,6 +209,40 @@ function removeWithTextnodes(element) {
 } // removeWithTextnodes()
 
 /**
+ * Inserts new note immediately after the currently (last-)selected one,
+ * or as the new last note on the currently visible notation fragment (e.g., page).
+ * It copies @pname @oct @dur from the nearest predecessor note (or otherwise default to 'c', '4', '4').
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
+ */
+export function addNote(v, cm) {
+  let pname = 'c';
+  let oct = '4';
+  let dur = '4';
+
+  let selectedElement;
+  let id = v.selectedElements.at(-1) || '';
+  if (id) {
+    selectedElement = v.xmlDoc.querySelector("[*|id='" + id + "']");
+  } else {
+    // get last note of visible fragment (i.e. page/system)
+    let noteList = document.querySelectorAll('g.note');
+    let lastNote = noteList[noteList.length - 1];
+  }
+  if (selectedElement) {
+    if (selectedElement.hasAttribute('pname')) pname = selectedElement.getAttribute('pname');
+    if (selectedElement.hasAttribute('oct')) oct = selectedElement.getAttribute('oct');
+    if (selectedElement.hasAttribute('dur')) dur = selectedElement.getAttribute('dur');
+  }
+
+  // create new note
+  let note = document.createElement('note');
+  note.setAttribute('pname', pname);
+  note.setAttribute('oct', oct);
+  note.setAttribute('dur', dur);
+} // addNote()
+
+/**
  * Adds accid element to note element.
  * (Other allowed elements are ignored for the moment.)
  * @param {Viewer} v
