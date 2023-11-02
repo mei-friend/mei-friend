@@ -108,10 +108,9 @@ function firstChildElement(parent) {
   return null;
 } // firstChildElement()
 
-export function addMarkup(attrName = 'none', mElName = 'supplied')
-{
+export function addMarkup(attrName = 'none', mElName = 'supplied') {
   addTranscriptionLikeElement(v, cm, attrName, mElName);
-  
+
   // one addMarkupAction might result in multiple markup elements
   // e.g. when selecting notes and control events
   // mostly because symbols in a score aren't necessarily close in the xml tree
@@ -127,9 +126,8 @@ export function addMarkup(attrName = 'none', mElName = 'supplied')
     selection: v.selectedElements,
   };
   let success = addListItem(markupItem);
-  if(success === true) refreshAnnotationsList();
+  if (success === true) refreshAnnotationsList();
 }
-
 
 /**
  * Surrounds selected elements with a markup element
@@ -285,7 +283,6 @@ export function addTranscriptionLikeElement(v, cm, attrName = 'none', mElName = 
   v.updateData(cm, false, true);
   v.allowCursorActivity = true; // update notation again
 } // addSuppliedElement()
-
 
 function wrapGroupWithMarkup(v, cm, groupIds, mElName, parentEl) {
   let markupEl = document.createElementNS(dutils.meiNameSpace, mElName);
