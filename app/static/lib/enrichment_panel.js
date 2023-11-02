@@ -264,7 +264,7 @@ function generateListItem(a) {
   const summary = document.createElement('summary');
   if (a.isMarkup === true) {
     summary.insertAdjacentHTML('afterbegin', codeScan);
-    details.insertAdjacentHTML('afterbegin', a.type);
+    details.insertAdjacentHTML('afterbegin', '&lt;'+a.type+'&gt;');
   } else {
     switch (a.type) {
       case 'annotateHighlight':
