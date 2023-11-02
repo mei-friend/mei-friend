@@ -12,7 +12,27 @@ import * as dutils from './dom-utils.js';
 import * as speed from './speed.js';
 import * as utils from './utils.js';
 import Viewer from './viewer.js';
-import { addListItem, refreshAnnotationsList } from './enrichment_panel.js';
+import { addListItem, isItemInList, refreshAnnotationsList } from './enrichment_panel.js';
+
+export function readMarkup() {
+  // read all markup elements supported from the current document
+  // create objects out of them
+  // add objects to list
+  // use xmlMarkupToListItem(selectedElements, mElName)
+  let elementList = att.modelTranscriptionLike.join(',');
+  let markup = Array.from(v.xmlDoc.querySelectorAll(elementList));
+  markup = markup.filter((markup) => isItemInList(markup.getAttribute('xml:id')));//doesn't work yet
+
+  markup.forEach((markupEl) => {
+    let elId = markupEl.getAttribute('xml:id');
+    let elName = markupEl.localName;
+    if (elId == null) {
+      elId = utils.generateXmlId(elName, v.xmlIdStyle);
+      markupEl.setAttributeNS(dutils.xmlNameSpace, 'xml:id', elId);
+    }
+    xmlMarkupToListItem(elId, elName);
+  });
+}
 
 /**
  * [Wrapper for selectApparatus() and selectChoice().]
@@ -110,7 +130,10 @@ function firstChildElement(parent) {
 
 export function addMarkup(attrName = 'none', mElName = 'supplied') {
   addTranscriptionLikeElement(v, cm, attrName, mElName);
+  xmlMarkupToListItem(v.selectedElements, mElName);
+}
 
+function xmlMarkupToListItem(selectedElements, mElName) {
   // one addMarkupAction might result in multiple markup elements
   // e.g. when selecting notes and control events
   // mostly because symbols in a score aren't necessarily close in the xml tree
@@ -120,10 +143,10 @@ export function addMarkup(attrName = 'none', mElName = 'supplied') {
   // type uses capitalised element name, e.g. markupSupplied
 
   const markupItem = {
-    id: v.selectedElements[0],
+    id: selectedElements[0],
     type: mElName,
     isMarkup: true,
-    selection: v.selectedElements,
+    selection: selectedElements,
   };
   let success = addListItem(markupItem);
   if (success === true) refreshAnnotationsList();

@@ -41,10 +41,9 @@ export function clearListItems() {
  */
 export function readListItemsFromXML(flagLimit = false) {
   annot.readAnnots(flagLimit);
+  markup.readMarkup();
   refreshAnnotationsInRendering();
 }
-// TODO:
-// * Add method to read markup elements
 
 /**
  * Looks if an item with itemId exists in listItems
