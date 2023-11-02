@@ -8,7 +8,7 @@ import { v, cm, translator, setStandoffAnnotationEnabledStatus } from './main.js
 import { setCursorToId } from './utils.js';
 //import { meiNameSpace, xmlNameSpace, xmlToString } from './dom-utils.js';
 import * as annot from './annotation.js';
-import { addMarkup } from './markup.js';
+import * as markup from './markup.js';
 import {
   circle,
   diffRemoved,
@@ -490,30 +490,30 @@ export function addAnnotationHandlers() {
 
 export function addMarkupHandlers() {
   const markupHandler = {
-    addSupplied: () => addMarkup(null, 'supplied'),
-    addSuppliedAccid: () => addMarkup('accid', 'supplied'),
-    addSuppliedArtic: () => addMarkup('artic', 'supplied'),
-    addUnclear: () => addMarkup(null, 'unclear'),
-    addUnclearAccid: () => addMarkup('accid', 'unclear'),
-    addUnclearArtic: () => addMarkup('artic', 'unclear'),
-    addSic: () => addMarkup(null, 'sic'),
-    addSicAccid: () => addMarkup('accid', 'sic'),
-    addSicArtic: () => addMarkup('artic', 'sic'),
-    addCorr: () => addMarkup(null, 'corr'),
-    addCorrAccid: () => addMarkup('accid', 'corr'),
-    addCorrArtic: () => addMarkup('artic', 'corr'),
-    addOrig: () => addMarkup(null, 'orig'),
-    addOrigAccid: () => addMarkup('accid', 'orig'),
-    addOrigArtic: () => addMarkup('artic', 'orig'),
-    addReg: () => addMarkup(null, 'reg'),
-    addRegAccid: () => addMarkup('accid', 'reg'),
-    addRegArtic: () => addMarkup('artic', 'reg'),
-    addAdd: () => addMarkup(null, 'add'),
-    addAddAccid: () => addMarkup('accid', 'add'),
-    addAddArtic: () => addMarkup('artic', 'add'),
-    addDel: () => addMarkup(null, 'del'),
-    addDelAccid: () => addMarkup('accid', 'del'),
-    addDelArtic: () => addMarkup('artic', 'del'),
+    addSupplied: () => markup.addMarkup(null, 'supplied'),
+    addSuppliedAccid: () => markup.addMarkup('accid', 'supplied'),
+    addSuppliedArtic: () => markup.addMarkup('artic', 'supplied'),
+    addUnclear: () => markup.addMarkup(null, 'unclear'),
+    addUnclearAccid: () => markup.addMarkup('accid', 'unclear'),
+    addUnclearArtic: () => markup.addMarkup('artic', 'unclear'),
+    addSic: () => markup.addMarkup(null, 'sic'),
+    addSicAccid: () => markup.addMarkup('accid', 'sic'),
+    addSicArtic: () => markup.addMarkup('artic', 'sic'),
+    addCorr: () => markup.addMarkup(null, 'corr'),
+    addCorrAccid: () => markup.addMarkup('accid', 'corr'),
+    addCorrArtic: () => markup.addMarkup('artic', 'corr'),
+    addOrig: () => markup.addMarkup(null, 'orig'),
+    addOrigAccid: () => markup.addMarkup('accid', 'orig'),
+    addOrigArtic: () => markup.addMarkup('artic', 'orig'),
+    addReg: () => markup.addMarkup(null, 'reg'),
+    addRegAccid: () => markup.addMarkup('accid', 'reg'),
+    addRegArtic: () => markup.addMarkup('artic', 'reg'),
+    addAdd: () => markup.addMarkup(null, 'add'),
+    addAddAccid: () => markup.addMarkup('accid', 'add'),
+    addAddArtic: () => markup.addMarkup('artic', 'add'),
+    addDel: () => markup.addMarkup(null, 'del'),
+    addDelAccid: () => markup.addMarkup('accid', 'del'),
+    addDelArtic: () => markup.addMarkup('artic', 'del'),
   };
 
   document.getElementById('addSupplied').addEventListener('click', markupHandler.addSupplied);
