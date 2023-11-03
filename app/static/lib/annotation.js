@@ -299,6 +299,49 @@ export function readAnnots(flagLimit = false) {
 }
 
 /**
+ * Adds page locations in rendering to annotation object in annotation list.
+ * Call whenever layout reflows to re-situate annotations appropriately.
+ */
+export async function situateAnnotations(a) {
+  // for each element in a.selection, ask Verovio for the page number
+  // set a.firstPage and a.lastPage to min/max page numbers returned
+  a.firstPage = 'unsituated';
+  a.lastPage = -1;
+  if ('selection' in a) {
+    let selectionStart =
+      a.selection[0].indexOf('#') < 0 ? a.selection[0] : a.selection[0].substr(a.selection[0].indexOf('#') + 1);
+    let selLen = a.selection.length - 1;
+    let selectionEnd =
+      a.selection[selLen].indexOf('#') < 0
+        ? a.selection[selLen]
+        : a.selection[selLen].substr(a.selection[selLen].indexOf('#') + 1);
+    a.firstPage = await v.getPageWithElement(selectionStart);
+    a.lastPage = await v.getPageWithElement(selectionEnd);
+  }
+
+  if (a.firstPage < 0 && v.speedMode) {
+    if (v.xmlDoc.querySelector('[*|id=' + item.selection[0] + ']')?.closest('meiHead')) a.firstPage = 'meiHead';
+    else console.warn('Cannot locate annotation ', a);
+  }
+
+  // for any identifying annotations, see if there are new extracts associated with the musical material
+  if (a.type == 'annotateIdentify') {
+    // find it in the list
+    const musMatDiv = document.querySelector('#musMat_' + CSS.escape(a.id));
+    console.log('extracts DIV: ', musMatDiv);
+    if (musMatDiv && !musMatDiv.innerHTML.length) {
+      musMatDiv
+        .closest('.annotationListItem')
+        .querySelector('.makeStandoffAnnotation svg')
+        .classList.add('clockwise');
+      fetchMAOComponentsForIdentifiedObject(a.id);
+    }
+  }
+
+  return a;
+} // situateAnnotations()
+
+/**
  * inserts new annot element based on anchor element into CodeMirror editor,
  * with @xml:id, @plist and optional payload (string or ptr)
  * @param {Element} anchor anchor element

@@ -103,60 +103,27 @@ export function retrieveListItem(itemId) {
  *  Finds page numbers in rendering for every list item
  */
 function situateListItems() {
-  situateAnnotations();
-}
-// TODO: should call situateAnnotations & situateMarkup when finished
-// TODO: after all, situateAnnotations() could be moved to annotation.js if it turns out to be different to situateMarkup()
-// TODO: then situateAnnotations should receive an array of annotations as parameter and not access the list itself
+  listItems.forEach(async (item) => {
+    let itemPromise;
+    if (item.isMarkup === true) {
+      itemPromise = markup.situateMarkup(item);
+    } else {
+      itemPromise = annot.situateAnnotations(item);
+    }
 
-/**
- * Adds page locations in rendering to annotation object in annotation list.
- * Call whenever layout reflows to re-situate annotations appropriately.
- */
-function situateAnnotations() {
-  listItems.forEach(async (a) => {
-    // for each element in a.selection, ask Verovio for the page number
-    // set a.firstPage and a.lastPage to min/max page numbers returned
-    a.firstPage = 'unsituated';
-    a.lastPage = -1;
-    if ('selection' in a) {
-      let selectionStart =
-        a.selection[0].indexOf('#') < 0 ? a.selection[0] : a.selection[0].substr(a.selection[0].indexOf('#') + 1);
-      let selLen = a.selection.length - 1;
-      let selectionEnd =
-        a.selection[selLen].indexOf('#') < 0
-          ? a.selection[selLen]
-          : a.selection[selLen].substr(a.selection[selLen].indexOf('#') + 1);
-      a.firstPage = await v.getPageWithElement(selectionStart);
-      a.lastPage = await v.getPageWithElement(selectionEnd);
-      if (a.firstPage < 0 && v.speedMode) {
-        if (v.xmlDoc.querySelector('[*|id=' + a.selection[0] + ']')?.closest('meiHead')) a.firstPage = 'meiHead';
-        else console.warn('Cannot locate annotation ', a);
-      } else {
-        // if not speed mode, asynchronous return of page numbers after we are finished here
-        const annotationLocationLabelElement = document.querySelector(
-          `.annotationLocationLabel[data-id=loc-${CSS.escape(a.id)}`
-        );
-        if (annotationLocationLabelElement) {
-          annotationLocationLabelElement.innerHTML = generateAnnotationLocationLabel(a).innerHTML;
-        }
+    itemPromise.then((item) => {
+      console.log('Situated ', item);
+      const itemLocationLabel = document.querySelector(
+        `.annotationLocationLabel[data-id=loc-${CSS.escape(item.id)}`
+      );
+      if(itemLocationLabel) {
+        itemLocationLabel.innerHTML = generateAnnotationLocationLabel(item).innerHTML;
       }
-    }
-    // for any identifying annotations, see if there are new extracts associated with the musical material
-    if (a.type == 'annotateIdentify') {
-      // find it in the list
-      const musMatDiv = document.querySelector('#musMat_' + CSS.escape(a.id));
-      console.log('extracts DIV: ', musMatDiv);
-      if (musMatDiv && !musMatDiv.innerHTML.length) {
-        musMatDiv
-          .closest('.annotationListItem')
-          .querySelector('.makeStandoffAnnotation svg')
-          .classList.add('clockwise');
-        fetchMAOComponentsForIdentifiedObject(a.id);
-      }
-    }
+    });
   });
-} // situateAnnotations()
+}
+// TODO: Fix MAO-related stuff!!!
+
 
 //#endregion
 
@@ -211,7 +178,7 @@ export function refreshAnnotationsInRendering(forceListRefresh = false) {
             console.warn("Don't have a drawing function for this type of annotation", a);
         }
       } else {
-        console.warn('Skipping markup or annotation without type: ', a);
+        if (!('isMarkup' in a)) console.warn('Skipping annotation without type: ', a);
       }
     });
   }

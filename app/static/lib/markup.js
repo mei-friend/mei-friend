@@ -30,8 +30,25 @@ export function readMarkup() {
       elId = utils.generateXmlId(elName, v.xmlIdStyle);
       markupEl.setAttributeNS(dutils.xmlNameSpace, 'xml:id', elId);
     }
-    xmlMarkupToListItem(elId, elName);
+    xmlMarkupToListItem([elId], elName);
   });
+}
+
+/**
+ * Returns for a markup item the page locations in the Verovio rendering
+ * @param {Object} markupItem markupItem to situate
+ * @returns {Promise} a promise containing the modified markupItem
+ */
+export async function situateMarkup(markupItem) {
+  if ('selection' in markupItem) {
+    let selStart = markupItem.selection[0];
+    let selLen = markupItem.selection.length - 1;
+    let selEnd = markupItem.selection[selLen];
+    markupItem.firstPage = await v.getPageWithElement(selStart);
+    markupItem.lastPage = await v.getPageWithElement(selEnd);
+  }
+
+  return markupItem;
 }
 
 /**
@@ -130,8 +147,11 @@ function firstChildElement(parent) {
 
 export function addMarkup(attrName = 'none', mElName = 'supplied') {
   addTranscriptionLikeElement(v, cm, attrName, mElName);
-  xmlMarkupToListItem(v.selectedElements, mElName);
+  let successfullyAdded = xmlMarkupToListItem(v.selectedElements, mElName);
+  refreshAnnotationsList();
 }
+// TODO FIX!!!! Somehow, the markup is already added to the list by handling the editor changes. This is stupid, prevent this!!!!
+// This messes with markup that creates more than one xml element, e.g. for notes and control events!!!
 
 function xmlMarkupToListItem(selectedElements, mElName) {
   // one addMarkupAction might result in multiple markup elements
@@ -149,7 +169,7 @@ function xmlMarkupToListItem(selectedElements, mElName) {
     selection: selectedElements,
   };
   let success = addListItem(markupItem);
-  if (success === true) refreshAnnotationsList();
+  return success;
 }
 
 /**
