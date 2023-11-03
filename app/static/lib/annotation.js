@@ -249,7 +249,7 @@ export function readAnnots(flagLimit = false) {
   let annots = Array.from(v.xmlDoc.querySelectorAll('annot'));
   //annots = annots.filter((annot) => annotations.findIndex((a) => a.id !== annot.getAttribute('xml:id'))); // original
   //annots = annots.filter((annot) => annotations.findIndex((a) => a.id !== annot.getAttribute('xml:id')) !== -1); // corrected
-  annots = annots.filter((annot) => isItemInList(annot.getAttribute('xml:id')));
+  annots = annots.filter((annot) => !isItemInList(annot.getAttribute('xml:id')));
   let limit = document.getElementById('annotationDisplayLimit');
   if (limit && annots.length > limit.value) {
     if (flagLimit) {

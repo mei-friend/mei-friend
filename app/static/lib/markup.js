@@ -21,7 +21,7 @@ export function readMarkup() {
   // use xmlMarkupToListItem(selectedElements, mElName)
   let elementList = att.modelTranscriptionLike.join(',');
   let markup = Array.from(v.xmlDoc.querySelectorAll(elementList));
-  markup = markup.filter((markup) => isItemInList(markup.getAttribute('xml:id')));//doesn't work yet
+  markup = markup.filter((markup) => !isItemInList(markup.getAttribute('xml:id')));
 
   markup.forEach((markupEl) => {
     let elId = markupEl.getAttribute('xml:id');
