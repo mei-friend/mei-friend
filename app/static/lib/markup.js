@@ -320,7 +320,7 @@ export function addTranscriptionLikeElement(v, cm, attrName = 'none', mElName = 
   if (uuids.length > 0) {
     v.selectedElements = [];
     uuids.forEach((u) => v.selectedElements.push(u));
-    if(v.selectedElements.length > 1) {
+    if (v.selectedElements.length > 1) {
       // add corresp attribute to markup elements
       addCorrespAttr(v.selectedElements);
     }
@@ -368,12 +368,12 @@ function wrapGroupWithMarkup(v, cm, groupIds, mElName, parentEl) {
 }
 
 function addCorrespAttr(grpIds) {
-  let grpLinks = grpIds.join(' #');
-  grpLinks = '#' + grpLinks;
-
-  grpIds.forEach((id) => {
-    let el = v.xmlDoc.querySelector("[*|id='" + id + "']");
-    if(!el.getAttribute('corresp')) {
+  grpIds.forEach((currentId) => {
+    let otherGrpIds = grpIds.filter((id) => id !== currentId);
+    let grpLinks = otherGrpIds.join(' #');
+    grpLinks = '#' + grpLinks;
+    let el = v.xmlDoc.querySelector("[*|id='" + currentId + "']");
+    if (!el.getAttribute('corresp')) {
       el.setAttribute('corresp', grpLinks);
       replaceInEditor(cm, el, true);
     }
