@@ -1595,6 +1595,8 @@ export let cmd = {
   },
   undo: () => cm.undo(),
   redo: () => cm.redo(),
+  // add note
+  addNote: () => e.addNote(v, cm),
   // add accidentals
   addDoubleSharp: () => e.addAccidental(v, cm, 'x'),
   addSharp: () => e.addAccidental(v, cm, 's'),
@@ -2003,6 +2005,8 @@ function addEventListeners(v, cm) {
   // ingest facsimile sekelton into currently loaded MEI file
   document.getElementById('ingestFacsimile').addEventListener('click', cmd.ingestFacsimile);
   document.getElementById('addFacsimile').addEventListener('click', cmd.addFacsimile);
+  // add note
+  // TODO eventlistener
   // insert accidentals
   document.getElementById('addDoubleSharp').addEventListener('click', cmd.addDoubleSharp);
   document.getElementById('addSharp').addEventListener('click', cmd.addSharp);

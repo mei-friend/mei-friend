@@ -20,6 +20,8 @@
     "home": "firstPage",
     "end": "lastPage",
 
+    "n": "addNote",
+
     "shift-+": "addDoubleSharp",
     "+": "addSharp",
     "=": "addNatural",

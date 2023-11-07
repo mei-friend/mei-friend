@@ -221,25 +221,58 @@ export function addNote(v, cm) {
   let dur = '4';
 
   let selectedElement;
-  let id = v.selectedElements.at(-1) || '';
-  if (id) {
-    selectedElement = v.xmlDoc.querySelector("[*|id='" + id + "']");
-  } else {
+  let i = v.selectedElements.length - 1;
+  while (i >= 0) {
+    selectedElement = v.xmlDoc.querySelector("[*|id='" + v.selectedElements.at(i) + "']");
+    if (['note', 'rest'].includes(selectedElement.nodeName)) break;
+    selectedElement = null;
+    i--;
+  }
+  if (!selectedElement) {
+    return false;
     // get last note of visible fragment (i.e. page/system)
     let noteList = document.querySelectorAll('g.note');
     let lastNote = noteList[noteList.length - 1];
   }
-  if (selectedElement) {
-    if (selectedElement.hasAttribute('pname')) pname = selectedElement.getAttribute('pname');
-    if (selectedElement.hasAttribute('oct')) oct = selectedElement.getAttribute('oct');
-    if (selectedElement.hasAttribute('dur')) dur = selectedElement.getAttribute('dur');
+  v.allowCursorActivity = false;
+
+  // create new element
+  let newEl = v.xmlDoc.createElementNS(dutils.meiNameSpace, selectedElement.nodeName);
+  let uuid = utils.generateXmlId('accid', v.xmlIdStyle);
+  newEl.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
+  newEl.setAttribute('dur', selectedElement.hasAttribute('dur') ? selectedElement.getAttribute('dur') : dur);
+  if (selectedElement.nodeName === 'note') {
+    newEl.setAttribute('oct', selectedElement.hasAttribute('oct') ? selectedElement.getAttribute('oct') : oct);
+    newEl.setAttribute('pname', selectedElement.hasAttribute('pname') ? selectedElement.getAttribute('pname') : pname);
+  } else if (selectedElement.nodeName === 'rest') {
+    if (selectedElement.hasAttribute('oloc')) newEl.setAttribute('oloc', selectedElement.getAttribute('oloc'));
+    if (selectedElement.hasAttribute('ploc')) newEl.setAttribute('ploc', selectedElement.getAttribute('ploc'));
   }
 
-  // create new note
-  let note = document.createElement('note');
-  note.setAttribute('pname', pname);
-  note.setAttribute('oct', oct);
-  note.setAttribute('dur', dur);
+  // add it to DOM
+  let nextElement = selectedElement.nextSibling;
+  if (nextElement) {
+    selectedElement.parentNode.insertBefore(newEl, nextElement);
+  } else {
+    selectedElement.parentNode.appendChild(newEl);
+  }
+
+  utils.setCursorToId(cm, id);
+  cm.execCommand('toMatchingTag');
+  cm.execCommand('goLineEnd');
+
+  let p1 = cm.getCursor();
+  cm.replaceRange('\n' + dutils.xmlToString(newEl), p1);
+  cm.indentLine(p1.line, 'smart');
+  cm.indentLine(p1.line + 1, 'smart');
+
+  v.selectedElements = [];
+  v.selectedElements.push(uuid);
+  v.lastNoteId = uuid;
+  v.updateHighlight(cm);
+  addApplicationInfo(v, cm);
+  v.updateData(cm, false, true);
+  v.allowCursorActivity = true;
 } // addNote()
 
 /**
