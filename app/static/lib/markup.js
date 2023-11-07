@@ -23,14 +23,36 @@ export function readMarkup() {
   let markup = Array.from(v.xmlDoc.querySelectorAll(elementList));
   markup = markup.filter((markup) => !isItemInList(markup.getAttribute('xml:id')));
 
+  let correspIdsToIgnore = [];
+
+  // get all selections for currently available markup elements
+
   markup.forEach((markupEl) => {
     let elId = markupEl.getAttribute('xml:id');
-    let elName = markupEl.localName;
-    if (elId == null) {
-      elId = utils.generateXmlId(elName, v.xmlIdStyle);
-      markupEl.setAttributeNS(dutils.xmlNameSpace, 'xml:id', elId);
+    if (!correspIdsToIgnore.includes(elId)) {
+      
+      let elName = markupEl.localName;
+      if (elId == null) {
+        elId = utils.generateXmlId(elName, v.xmlIdStyle);
+        markupEl.setAttributeNS(dutils.xmlNameSpace, 'xml:id', elId);
+      }
+
+      let correspStr = markupEl.getAttribute('corresp');
+      let correspIds = [];
+      if (correspStr) {
+        correspIds = correspStr.split(' ');
+        correspIds = correspIds.map((id) => {
+          if (id.startsWith('#')) {
+            return id.slice(1);
+          } else {
+            return id;
+          }
+        });
+        correspIds.forEach((id) => correspIdsToIgnore.push(id));
+      }
+      correspIds.unshift(elId);
+      xmlMarkupToListItem(elId, elName, correspIds);
     }
-    xmlMarkupToListItem([elId], elName);
   });
 }
 
@@ -147,13 +169,13 @@ function firstChildElement(parent) {
 
 export function addMarkup(attrName = 'none', mElName = 'supplied') {
   addTranscriptionLikeElement(v, cm, attrName, mElName);
-  let successfullyAdded = xmlMarkupToListItem(v.selectedElements, mElName);
+  //let successfullyAdded = xmlMarkupToListItem(v.selectedElements, mElName);
   refreshAnnotationsList();
 }
 // TODO FIX!!!! Somehow, the markup is already added to the list by handling the editor changes. This is stupid, prevent this!!!!
 // This messes with markup that creates more than one xml element, e.g. for notes and control events!!!
 
-function xmlMarkupToListItem(selectedElements, mElName) {
+function xmlMarkupToListItem(currentElementId, mElName, correspElements) {
   // one addMarkupAction might result in multiple markup elements
   // e.g. when selecting notes and control events
   // mostly because symbols in a score aren't necessarily close in the xml tree
@@ -163,10 +185,10 @@ function xmlMarkupToListItem(selectedElements, mElName) {
   // type uses capitalised element name, e.g. markupSupplied
 
   const markupItem = {
-    id: selectedElements[0],
+    id: currentElementId,
     type: mElName,
     isMarkup: true,
-    selection: selectedElements,
+    selection: correspElements,
   };
   let success = addListItem(markupItem);
   return success;
@@ -324,6 +346,14 @@ export function addTranscriptionLikeElement(v, cm, attrName = 'none', mElName = 
       // add corresp attribute to markup elements
       addCorrespAttr(v.selectedElements);
     }
+    v.selectedElements.forEach(id => {
+      let el = v.xmlDoc.querySelector("[*|id='" + id + "']");
+      let parentEl = el.parentNode;
+      replaceInEditor(cm, parentEl, true);
+      cm.execCommand('indentAuto');
+      // refresh editor here after the markup insertion is finished
+    });
+
   }
 
   addApplicationInfo(v, cm);
@@ -361,8 +391,9 @@ function wrapGroupWithMarkup(v, cm, groupIds, mElName, parentEl) {
     }
     parentEl = currentParent;
   }
-  replaceInEditor(cm, parentEl, true);
-  cm.execCommand('indentAuto');
+  // do not refresh editor here to not mess with the markup items
+  // markup items will be imported to enrichment_panel.itemList because an event triggers
+  // to read list items from the xml file as soon as the editor is refreshed
 
   return uuid;
 }
@@ -371,11 +402,11 @@ function addCorrespAttr(grpIds) {
   grpIds.forEach((currentId) => {
     let otherGrpIds = grpIds.filter((id) => id !== currentId);
     let grpLinks = otherGrpIds.join(' #');
-    grpLinks = '#' + grpLinks;
+    grpLinks = grpLinks.length <= 0 ? grpLinks : '#' + grpLinks;
     let el = v.xmlDoc.querySelector("[*|id='" + currentId + "']");
     if (!el.getAttribute('corresp')) {
       el.setAttribute('corresp', grpLinks);
-      replaceInEditor(cm, el, true);
+      // do not refresh editor here to not mess with the markup items
     }
   });
 }
