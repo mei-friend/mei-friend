@@ -42,8 +42,8 @@
     "m": "addMordent",
     "shift-m": "addMordentUpper",
     "l": "addTrill",
-    "n": "addTurn",
-    "shift-n": "addTurnLower",
+    "r": "addTurn",
+    "shift-r": "addTurnLower",
 
     "shift-s": "toggleStacc",
     "shift-v": "toggleAccent",
@@ -131,8 +131,8 @@
     "ctrl-m": "addMordent",
     "ctrl-shift-m": "addMordentUpper",
     "ctrl-l": "addTrill",
-    "ctrl-n": "addTurn",
-    "ctrl-shift-n": "addTurnLower"
+    "ctrl-r": "addTurn",
+    "ctrl-shift-r": "addTurnLower"
   },
 
   ".platform-win32, .platform-linux": {
@@ -192,7 +192,7 @@
     "alt-m": "addMordent",
     "alt-shift-m": "addMordentUpper",
     "alt-l": "addTrill",
-    "alt-n": "addTurn",
-    "alt-shift-n": "addTurnLower"
+    "alt-r": "addTurn",
+    "alt-shift-r": "addTurnLower"
   }
 }
