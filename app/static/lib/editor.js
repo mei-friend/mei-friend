@@ -257,7 +257,8 @@ export function addNote(v, cm) {
     selectedElement.parentNode.appendChild(newEl);
   }
 
-  utils.setCursorToId(cm, id);
+  // add to editor
+  utils.setCursorToId(cm, selectedElement.id);
   cm.execCommand('toMatchingTag');
   cm.execCommand('goLineEnd');
 
@@ -266,6 +267,7 @@ export function addNote(v, cm) {
   cm.indentLine(p1.line, 'smart');
   cm.indentLine(p1.line + 1, 'smart');
 
+  // do final homework
   v.selectedElements = [];
   v.selectedElements.push(uuid);
   v.lastNoteId = uuid;
