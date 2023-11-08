@@ -149,17 +149,14 @@ function situateListItems() {
 
     itemPromise.then((item) => {
       console.log('Situated ', item);
-      const itemLocationLabel = document.querySelector(
-        `.annotationLocationLabel[data-id=loc-${CSS.escape(item.id)}`
-      );
-      if(itemLocationLabel) {
+      const itemLocationLabel = document.querySelector(`.annotationLocationLabel[data-id=loc-${CSS.escape(item.id)}`);
+      if (itemLocationLabel) {
         itemLocationLabel.innerHTML = generateAnnotationLocationLabel(item).innerHTML;
       }
     });
   });
 }
 // TODO: Fix MAO-related stuff!!!
-
 
 //#endregion
 

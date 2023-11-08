@@ -14,6 +14,10 @@ import * as utils from './utils.js';
 import Viewer from './viewer.js';
 import { addListItem, isItemInList, refreshAnnotationsList, retrieveItemValuesByProperty } from './enrichment_panel.js';
 
+/**
+ * Reads markup elements from the XML document and creates
+ * list item objects for each group of corresponding markup elements.
+ */
 export function readMarkup() {
   // read all markup elements supported from the current document
   // create objects out of them
@@ -171,14 +175,25 @@ function firstChildElement(parent) {
   return null;
 } // firstChildElement()
 
+/**
+ * Calls the function to add markup and refreshes the list of items
+ * @param {string} attrName
+ * @param {string} mElName
+ */
 export function addMarkup(attrName = 'none', mElName = 'supplied') {
   addTranscriptionLikeElement(v, cm, attrName, mElName);
   //let successfullyAdded = xmlMarkupToListItem(v.selectedElements, mElName);
+  // Manually updating the item list is not necessary because refreshing the code in the editor triggers readMarkup()
   refreshAnnotationsList();
 }
-// TODO FIX!!!! Somehow, the markup is already added to the list by handling the editor changes. This is stupid, prevent this!!!!
-// This messes with markup that creates more than one xml element, e.g. for notes and control events!!!
 
+/**
+ * Creates a list item object for markup elements based on some basic data
+ * @param {string} currentElementId xml:id of current element -> item.id
+ * @param {string} mElName element name -> item.type
+ * @param {Array[string]} correspElements ids of corresponding elements (including self) -> item.selection
+ * @returns {boolean} adding item was successful
+ */
 function xmlMarkupToListItem(currentElementId, mElName, correspElements) {
   // one addMarkupAction might result in multiple markup elements
   // e.g. when selecting notes and control events
@@ -186,7 +201,6 @@ function xmlMarkupToListItem(currentElementId, mElName, correspElements) {
   // properties are similar to annotations
   // id is the xml:id of the first markup element
   // selection contains all markup elements created at the same time
-  // type uses capitalised element name, e.g. markupSupplied
 
   const markupItem = {
     id: currentElementId,
@@ -295,7 +309,6 @@ export function addTranscriptionLikeElement(v, cm, attrName = 'none', mElName = 
 
   // this loop iterates over the array of arrays of grouped ids
   // and wraps the markup around a whole group
-  // TODO (nice to have): Add @corresp to elements if more than one is created at once
   elementGroups.forEach((group) => {
     let parent = v.xmlDoc.querySelector("[*|id='" + group[0] + "']").parentNode;
 
@@ -350,14 +363,13 @@ export function addTranscriptionLikeElement(v, cm, attrName = 'none', mElName = 
       // add corresp attribute to markup elements
       addCorrespAttr(v.selectedElements);
     }
-    v.selectedElements.forEach(id => {
+    v.selectedElements.forEach((id) => {
       let el = v.xmlDoc.querySelector("[*|id='" + id + "']");
       let parentEl = el.parentNode;
       replaceInEditor(cm, parentEl, true);
       cm.execCommand('indentAuto');
       // refresh editor here after the markup insertion is finished
     });
-
   }
 
   addApplicationInfo(v, cm);
@@ -365,6 +377,15 @@ export function addTranscriptionLikeElement(v, cm, attrName = 'none', mElName = 
   v.allowCursorActivity = true; // update notation again
 } // addSuppliedElement()
 
+/**
+ * Wraps a single group of elements with a markup element
+ * @param {*} v viewer
+ * @param {*} cm code mirror
+ * @param {Array} groupIds xml:ids of elements to wrap
+ * @param {string} mElName element name for markup
+ * @param {HTMLElement} parentEl parent element of group to wrap
+ * @returns {string} id of created markup element
+ */
 function wrapGroupWithMarkup(v, cm, groupIds, mElName, parentEl) {
   let markupEl = document.createElementNS(dutils.meiNameSpace, mElName);
   let uuid;
@@ -402,6 +423,10 @@ function wrapGroupWithMarkup(v, cm, groupIds, mElName, parentEl) {
   return uuid;
 }
 
+/**
+ * Adds xml:ids related elements to a markup element
+ * @param {Array} grpIds xml:ids of related markup elements
+ */
 function addCorrespAttr(grpIds) {
   grpIds.forEach((currentId) => {
     let otherGrpIds = grpIds.filter((id) => id !== currentId);
@@ -415,6 +440,13 @@ function addCorrespAttr(grpIds) {
   });
 }
 
+/**
+ *
+ * @param {*} id xml:id of the first element that will be wrapped with markup
+ * @param {*} nodeName node name of the element the id should be created for
+ * @param {*} v viewer
+ * @returns {string} id to use as xml:id
+ */
 function mintSuppliedId(id, nodeName, v) {
   // follow the Mozarteum schema, keep numbers (for @o-sapov)
   let underscoreId = id.match(/_\d+$/);
@@ -424,6 +456,10 @@ function mintSuppliedId(id, nodeName, v) {
   return utils.generateXmlId(nodeName, v.xmlIdStyle);
 }
 
+/**
+ * Deletes a markup item from listItems and all related elements from the xml document.
+ * @param {Object} markupItem
+ */
 export function deleteMarkup(markupItem) {
   markupItem.selection.forEach((id) => {
     var toDelete = v.xmlDoc.querySelector("[*|id='" + id + "']");
