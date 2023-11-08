@@ -211,7 +211,8 @@ function removeWithTextnodes(element) {
 /**
  * Inserts new note immediately after the currently (last-)selected one,
  * or as the new last note on the currently visible notation fragment (e.g., page).
- * It copies @pname @oct @dur from the nearest predecessor note (or otherwise default to 'c', '4', '4').
+ * It copies @pname @oct @dur from the nearest predecessor note 
+ * (or otherwise default to 'c', '4', '4').
  * @param {Viewer} v
  * @param {CodeMirror} cm
  */
@@ -220,49 +221,52 @@ export function addNote(v, cm) {
   let oct = '4';
   let dur = '4';
 
-  let selectedElement;
+  // get last selected element that is a note or a rest
+  let selEl;
   let i = v.selectedElements.length - 1;
   while (i >= 0) {
-    selectedElement = v.xmlDoc.querySelector("[*|id='" + v.selectedElements.at(i) + "']");
-    if (['note', 'rest'].includes(selectedElement.nodeName)) break;
-    selectedElement = null;
+    selEl = v.xmlDoc.querySelector("[*|id='" + v.selectedElements.at(i) + "']");
+    if (['note', 'rest'].includes(selEl.nodeName)) break;
+    selEl = null;
     i--;
   }
-  if (!selectedElement) {
+
+  // stop if nothing found
+  if (!selEl) {
     return false;
-    // get last note of visible fragment (i.e. page/system)
+    // TODO: get last note of visible fragment (i.e. page/system)
     let noteList = document.querySelectorAll('g.note');
     let lastNote = noteList[noteList.length - 1];
   }
   v.allowCursorActivity = false;
 
   // create new element
-  let newEl = v.xmlDoc.createElementNS(dutils.meiNameSpace, selectedElement.nodeName);
-  let uuid = utils.generateXmlId('accid', v.xmlIdStyle);
+  let newEl = v.xmlDoc.createElementNS(dutils.meiNameSpace, selEl.nodeName);
+  const uuid = utils.generateXmlId(selEl.nodeName, v.xmlIdStyle);
   newEl.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
-  newEl.setAttribute('dur', selectedElement.hasAttribute('dur') ? selectedElement.getAttribute('dur') : dur);
-  if (selectedElement.nodeName === 'note') {
-    newEl.setAttribute('oct', selectedElement.hasAttribute('oct') ? selectedElement.getAttribute('oct') : oct);
-    newEl.setAttribute('pname', selectedElement.hasAttribute('pname') ? selectedElement.getAttribute('pname') : pname);
-  } else if (selectedElement.nodeName === 'rest') {
-    if (selectedElement.hasAttribute('oloc')) newEl.setAttribute('oloc', selectedElement.getAttribute('oloc'));
-    if (selectedElement.hasAttribute('ploc')) newEl.setAttribute('ploc', selectedElement.getAttribute('ploc'));
+  newEl.setAttribute('dur', selEl.hasAttribute('dur') ? selEl.getAttribute('dur') : dur);
+  if (selEl.nodeName === 'note') {
+    newEl.setAttribute('oct', selEl.hasAttribute('oct') ? selEl.getAttribute('oct') : oct);
+    newEl.setAttribute('pname', selEl.hasAttribute('pname') ? selEl.getAttribute('pname') : pname);
+  } else if (selEl.nodeName === 'rest') {
+    if (selEl.hasAttribute('oloc')) newEl.setAttribute('oloc', selEl.getAttribute('oloc'));
+    if (selEl.hasAttribute('ploc')) newEl.setAttribute('ploc', selEl.getAttribute('ploc'));
   }
 
   // add it to DOM
-  let nextElement = selectedElement.nextSibling;
+  const nextElement = selEl.nextSibling;
   if (nextElement) {
-    selectedElement.parentNode.insertBefore(newEl, nextElement);
+    selEl.parentNode.insertBefore(newEl, nextElement);
   } else {
-    selectedElement.parentNode.appendChild(newEl);
+    selEl.parentNode.appendChild(newEl);
   }
 
   // add to editor
-  utils.setCursorToId(cm, selectedElement.id);
+  utils.setCursorToId(cm, selEl.id);
   cm.execCommand('toMatchingTag');
   cm.execCommand('goLineEnd');
 
-  let p1 = cm.getCursor();
+  const p1 = cm.getCursor();
   cm.replaceRange('\n' + dutils.xmlToString(newEl), p1);
   cm.indentLine(p1.line, 'smart');
   cm.indentLine(p1.line + 1, 'smart');
