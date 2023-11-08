@@ -2,9 +2,11 @@
  * Applies language packs to GUI elements
  * Language packs need to be listed in supportedLanguages in defaults.js
  */
+import { isSafari } from './defaults.js';
 import * as l from '../lang/lang.en.js'; // default language
 import { translateLanguageSelection } from './language-selector.js';
 import { drawRightFooter, updateStatusBar } from './main.js';
+import Viewer from './viewer.js';
 
 /**
  * Translator class
@@ -90,12 +92,17 @@ export default class Translator {
     }
     updateStatusBar();
     drawRightFooter();
+
+    this.handleLanguageExceptions();
+
+    if (isSafari) this.handleBrowserExceptions('Safari');
   } // translateGui()
 
   /**
-   *
+   * Translate the given element `el` with a key and optionally a className
    * @param {Element} el
    * @param {string} key
+   * @param {string} className
    */
   doTranslation(el, key, className = '') {
     const v = false; // debug verbosity
@@ -146,5 +153,54 @@ export default class Translator {
       if ('html' in translationItem) el.innerHTML = translationItem.html;
       if ('placeholder' in translationItem) el.setAttribute('placeholder', translationItem.placeholder);
     }
-  }
+  } // doTranslation()
+
+  /**
+   *
+   */
+  handleLanguageExceptions() {
+    if (this.langCode === 'ja') {
+      // apply custom font-family settings for japanese language
+      document.querySelector('body').classList.add('lang_ja');
+    } else {
+      document.querySelector('body').classList.remove('lang_ja');
+    }
+  } // handleLanguageExceptions()
+
+  /**
+   * @param {Viewer} v
+   * @param {string} browserName
+   */
+  handleBrowserExceptions(browserName = '') {
+    if (browserName === 'Safari') {
+      // tell at multiple place that Safari is not a browser for mei-friend!
+      let alert = document.getElementById('alertOverlay');
+      if (alert && alert.style.display !== 'none') {
+        document.getElementById('alertMessage').innerHTML = this.lang.isSafariWarning.text;
+      }
+      let vs = document.getElementById('validation-status');
+      if (vs) {
+        vs.title = this.lang.isSafariWarning.text;
+      }
+      Viewer.updateSchemaStatusDisplay('error', '', this.lang.isSafariWarning.text);
+      let mv = document.getElementById('manualValidate');
+      if (mv) {
+        mv.disabled = true;
+        mv.classList.add('disabled');
+        mv.title = this.lang.isSafariWarning.text;
+      }
+      let av = document.getElementById('autoValidate')?.parentElement;
+      if (av) {
+        av.classList.add('disabled');
+        av.disabled = true;
+        av.title = this.lang.isSafariWarning.text;
+      }
+      let asvr = document.getElementById('autoShowValidationReport')?.parentElement;
+      if (asvr) {
+        asvr.classList.add('disabled');
+        asvr.disabled = true;
+        asvr.title = this.lang.isSafariWarning.text;
+      }
+    }
+  } // handleBrowserExceptions()
 } // class Translator()

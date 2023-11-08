@@ -6,6 +6,86 @@ import * as att from '../lib/attribute-classes.js';
 import { heart } from '../css/icons.js';
 
 export const lang = {
+  // Pantalla de bienvenida
+  aboutMeiFriend: { text: 'Acerca de mei-friend' },
+  showSplashScreen: {
+    text: 'Mostrar pantalla de bienvenida al cargar',
+    description: 'Mostrar la pantalla de bienvenida de mei-friend cuando se carga la aplicación',
+  },
+
+  splashBody: {
+    html: `
+      <p>
+        mei-friend es un editor de <a href="https://music-encoding.org">codificaciones musicales</a>, alojado en la
+        <a href="https://mdw.ac.at" target="_blank">mdw &ndash; Universidad de Música y Artes Escénicas de Viena</a>. 
+        Consulta nuestra <a href="https://mei-friend.github.io" target="_blank">documentación extensa</a> para obtener
+        más información.
+      </p>
+      <p>
+        Aunque mei-friend es una aplicación basada en el navegador, tus datos personales (incluyendo la codificación que
+        estás editando, la configuración de tu aplicación y los detalles actuales de inicio de sesión, si los tienes) se
+        almacenan en el <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank"
+          >almacenamiento local</a
+        > de tu navegador y no se transmiten ni se almacenan en nuestros servidores.
+      </p>
+      <p>
+        Los datos se transmiten a GitHub solo cuando lo solicitas explícitamente (por ejemplo, cuando inicias sesión en
+        GitHub, cargas tu codificación desde un repositorio de GitHub o cuando solicitas que se ejecute un flujo de trabajo
+        GitHub Action). De manera similar, los datos se transmiten a tu proveedor Solid elegido solo cuando lo solicitas
+        explícitamente (por ejemplo, cuando inicias sesión en Solid o cargas o guardas anotaciones stand-off).
+      </p>
+      <p>
+        Utilizamos <a href="https://matomo.org/" target="_blank">Matomo</a>
+        para recopilar estadísticas de uso anónimas. Estas incluyen tu dirección IP truncada (permitiendo la geolocalización
+        a nivel de país pero sin identificación adicional), tu navegador y sistema operativo, desde dónde llegaste (es decir,
+        el sitio web de referencia), la hora y duración de tu visita y las páginas que visitaste. Esta información se almacena
+        en la instancia de Matomo que se ejecuta en los servidores de la Universidad de Música y Artes Escénicas de Viena (mdw)
+        y no se comparte con ningún tercero.
+      </p>
+      <p>
+        La herramienta Verovio se carga desde <a href="https://verovio.org" target="_blank">https://verovio.org</a>, 
+        alojada por <a href="https://rism.digital/" target="_blank">RISM Digital Switzerland</a>. 
+        Esto permite que mei-friend esté siempre actualizado con la última versión de la herramienta
+        y ofrezca la opción de todas las versiones admitidas a través del panel de configuración. 
+        Cuando usas mei-friend, tu dirección IP es visible para RISM Digital.
+      </p>
+      <p>
+        Por último, la reproducción MIDI se presenta utilizando la fuente de sonido SGM_plus proporcionada por Google Magenta y
+        servida a través de googleapis.com. Por lo tanto, tu dirección IP es visible para Google al iniciar la reproducción MIDI.
+        Si no deseas que esto ocurra, abstente de utilizar la función de reproducción MIDI.
+      </p>
+      <p>
+        mei-friend está desarrollado por
+        <a href="https://iwk.mdw.ac.at/werner-goebl" target="_blank">Werner Goebl</a> y
+        <a href="https://iwk.mdw.ac.at/david-weigl" target="_blank">David M. Weigl</a> en el Departamento de Acústica Musical 
+        &ndash; Wiener Klangstil de la mdw &ndash; Universidad de Música y Artes Escénicas de Viena y está bajo licencia de la
+        <a href="https://spdx.org/licenses/AGPL-3.0-or-later.html" target="_blank"
+          >Licencia Pública General Affero de GNU versión 3.0 (GNU AGPLv3)</a
+        >. Consulta nuestra <a href="https://mei-friend.github.io/about/" target="_blank">página de agradecimientos</a> para
+        obtener más información sobre los colaboradores y los componentes de código abierto reutilizados en nuestro proyecto.
+        Agradecemos a nuestros colegas por sus contribuciones y orientación.
+      </p>
+      <p>
+        El desarrollo de la aplicación web de mei-friend está financiado por el
+        <a href="https://fwf.ac.at" target="_blank">Fondo de Ciencia de Austria (FWF)</a> en los proyectos
+        <a href="https://iwk.mdw.ac.at/signature-sound-vienna/" target="_blank"
+          >P 34664-G (Signature Sound Vienna)</a
+        >
+        e <a href="https://e-laute.info">I 6019 (E-LAUTE)</a>.
+      </p>
+    `,
+  },
+  splashGotItButtonText: { text: '¡Entendido!' },
+  splashVersionText: { text: 'Versión' },
+  splashAlwaysShow: {
+    text: 'Mostrar siempre esta pantalla de bienvenida',
+    description: 'Mostrar siempre esta pantalla de bienvenida al cargar la aplicación',
+  },
+  splashAlwaysShowLabel: {
+    text: 'Mostrar siempre esta pantalla de bienvenida',
+    description: 'Mostrar siempre esta pantalla de bienvenida al cargar la aplicación',
+  },
+
   // Main menu bar / Menú principal
   githubLoginLink: { text: 'Iniciar sesión en GitHub' },
 
@@ -33,6 +113,7 @@ export const lang = {
   importHumdrum: { text: 'Importar Humdrum' },
   importPae: { text: 'Importar PAE, ABC' },
   saveMeiText: { text: 'Guardar MEI' },
+  saveMeiBasicText: { text: 'Guardar como MEI Basic' },
   saveSvg: { text: 'Guardar SVG' },
   saveMidi: { text: 'Guardar MIDI' },
   printPreviewText: { text: 'Vista previa en PDF' },
@@ -142,7 +223,7 @@ export const lang = {
 
   // HELP MENU ITEM
   helpMenuTitle: { text: 'Ayuda' },
-  goToHelpPage: { text: 'Páginas de ayuda de mei-friend' },
+  goToHelpPageText: { text: 'Páginas de ayuda de mei-friend' },
   goToCheatSheet: { text: 'Hoja de trucos de mei-friend' },
   showChangelog: { text: 'Lista de cambios de mei-friend' },
   goToGuidelines: { text: 'Directrices de MEI' },
@@ -198,7 +279,7 @@ export const lang = {
   breaksSelectNone: { text: 'Ninguno' },
   breaksSelectAuto: { text: 'Automático' },
   breaksSelectLine: { text: 'Sistema' },
-  breaksSelectMeasure: { text: 'Medida' },
+  breaksSelectMeasure: { text: 'Compás' },
   breaksSelectEncoded: { text: 'Sistema y página' },
   breaksSelectSmart: { text: 'Smart' },
   updateControlsLabel: {
@@ -494,8 +575,8 @@ export const lang = {
       'Seleccionar ligaduras (es decir, elementos con el atributo @curvature: ' + att.attCurvature.join(', ') + ')',
   },
   dragSelectMeasures: {
-    text: 'Seleccionar medidas',
-    description: 'Seleccionar medidas',
+    text: 'Seleccionar compases',
+    description: 'Seleccionar compases',
   },
   // Control menu / Menú de control
   controlMenuSettings: {
@@ -635,23 +716,23 @@ export const lang = {
       'con las configuraciones actuales, utilice "Renderizar nuevamente con Verovio" en el menú desplegable "Manipular".',
   },
 
-  // Renumber measures / Renumerar medidas
+  // Renumber measures / Renumerar compases
   renumberMeasuresHeading: {
-    text: 'Renumerar medidas',
-    description: 'Configuraciones para renumerar medidas',
+    text: 'Renumerar compases',
+    description: 'Configuraciones para renumerar compases',
   },
   renumberMeasureContinueAcrossIncompleteMeasures: {
-    text: 'Continuar en medidas incompletas',
-    description: 'Continuar los números de las medidas en medidas incompletas (@metcon="false")',
+    text: 'Continuar en compases incompletas',
+    description: 'Continuar los números de las compases en compases incompletas (@metcon="false")',
   },
   renumberMeasuresUseSuffixAtMeasures: {
-    text: 'Sufijo en medidas incompletas',
-    description: 'Usar un sufijo numérico en medidas incompletas (por ejemplo, 23-cont)',
+    text: 'Sufijo en compases incompletas',
+    description: 'Usar un sufijo numérico en compases incompletas (por ejemplo, 23-cont)',
     labels: ['ninguno', '-cont'],
   },
   renumberMeasuresContinueAcrossEndings: {
     text: 'Continuar en los finales',
-    description: 'Continuar los números de las medidas en los finales',
+    description: 'Continuar los números de las compases en los finales',
   },
   renumberMeasuresUseSuffixAtEndings: {
     text: 'Sufijo en los finales',
@@ -934,4 +1015,9 @@ delColor: {
   codeCheckerHasExtra: { text: 'tiene extra' },
   codeCheckerLacksAn: { text: 'carece de un' },
   codeCheckerBecauseAlreadyDefined: { text: 'porque ya se ha definido anteriormente en el compás' },
+
+  // Warning for missing ids
+  missingIdsWarningAlert: {
+    text: 'mei-friend no puede desplazarse a los elementos seleccionados en la codificación. Por favor, añade ids a la codificación.',
+  },
 };

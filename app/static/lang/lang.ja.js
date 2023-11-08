@@ -6,6 +6,76 @@ import * as att from '../lib/attribute-classes.js';
 import { heart } from '../css/icons.js';
 
 export const lang = {
+  // スプラッシュ画面
+  aboutMeiFriend: { text: 'mei-friendについて' },
+  showSplashScreen: {
+    text: 'アプリケーションの読み込み時にスプラッシュ画面を表示',
+    description: 'mei-friendの読み込み時にスプラッシュ画面を表示します',
+  },
+  splashBody: {
+    html: `
+      <p>
+        mei-friendは<a href="https://music-encoding.org">音楽エンコーディング</a>のエディタで、
+        <a href="https://mdw.ac.at" target="_blank">mdw - ウィーン音楽・演劇アート大学</a>でホストされています。
+        詳細な情報については<a href="https://mei-friend.github.io" target="_blank">詳細なドキュメンテーション</a>
+        をご覧ください。
+      </p>
+      <p>
+        mei-friendはブラウザベースのアプリケーションですが、個人データ（編集中のエンコード、アプリケーションの設定、および
+        ログイン詳細など）はブラウザの
+        <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank"
+          >ローカルストレージ</a
+        >に保存され、サーバーに送信または保存されません。
+      </p>
+      <p>
+        データはGitHubに明示的にリクエストした場合にのみ送信されます（たとえば、GitHubにログインし、GitHubのリポジトリからエンコードを読み込む、またはGitHub Actionのワークフローをリクエストする場合など）。同様に、選択したSolidプロバイダーに対しても、明示的にリクエストした場合にのみデータが送信されます（たとえば、Solidにログインし、スタンドオフの注釈を読み込むまたは保存する場合など）。
+      </p>
+      <p>
+        無記名の使用統計情報を収集するために<a href="https://matomo.org/" target="_blank">Matomo</a>
+        を使用しています。これには切り捨てられたIPアドレス（国のレベルでの地理的位置情報を許可しますが、それ以上の識別情報は含まれません）、ブラウザとオペレーティングシステム、リファリングウェブサイトからのアクセス先、訪問の時間と期間、および訪問したページが含まれます。この情報はmdw - ウィーン音楽・演劇アート大学のサーバーで実行されているMatomoインスタンスに保存され、第三者とは共有されません。
+      </p>
+      <p>
+        Verovioツールキットは<a href="https://verovio.org" target="_blank">https://verovio.org</a>からロードされ、
+        <a href="https://rism.digital/" target="_blank">RISM Digital Switzerland</a>がホストしています。 
+        これにより、mei-friendは常に最新のツールキットバージョンを使用できるだけでなく、
+        設定パネルを介してすべてのサポートされているバージョンの選択を提供できます。 
+        mei-friendを使用する際、IPアドレスはRISM Digitalによって表示されるため、注意してください。
+      </p>
+      <p>
+        最後に、MIDI再生はGoogle Magentaが提供するSGM_plusサウンドフォントを使用し、googleapis.comを介して提供されます。そのため、MIDI再生を開始する際にGoogleに対してIPアドレスが表示されます。これを望まない場合は、MIDI再生機能の使用を避けてください。
+      </p>
+      <p>
+        mei-friendは、mdw - ウィーン音楽・演劇アート大学の音楽音響学部 - ヴィーナークランクシュティールで
+        <a href="https://iwk.mdw.ac.at/werner-goebl" target="_blank">Werner Goebl</a>および
+        <a href="https://iwk.mdw.ac.at/david-weigl" target="_blank">David M. Weigl</a>によって開発され、
+        <a href="https://spdx.org/licenses/AGPL-3.0-or-later.html" target="_blank"
+          >GNU Affero General Public License v3.0</a
+        >の下でライセンスされています。詳細な情報については、
+        <a href="https://mei-friend.github.io/about/" target="_blank">謝辞ページ</a>をご覧ください。
+        このプロジェクトで再利用されるオープンソースコンポーネントについての情報も提供しており、貢献者とガイダンスに感謝しています。
+      </p>
+      <p>
+        mei-friend Webアプリケーションの開発は、
+        <a href="https://fwf.ac.at" target="_blank">オーストリア科学振興基金（FWF）</a>のプロジェクト
+        <a href="https://iwk.mdw.ac.at/signature-sound-vienna/" target="_blank"
+          >P 34664-G（Signature Sound Vienna）</a
+        >
+        および<a href="https://e-laute.info">I 6019（E-LAUTE）</a>
+        によって資金提供されています。
+      </p>
+    `,
+  },
+  splashGotItButtonText: { text: '了解しました！' },
+  splashVersionText: { text: 'バージョン' },
+  splashAlwaysShow: {
+    text: '常にこのスプラッシュ画面を表示',
+    description: 'アプリケーションの読み込み時に常にこのスプラッシュ画面を表示',
+  },
+  splashAlwaysShowLabel: {
+    text: '常にこのスプラッシュ画面を表示',
+    description: 'アプリケーションの読み込み時に常にこのスプラッシュ画面を表示',
+  },
+
   // Main menu bar
   githubLoginLink: { text: 'ログイン' },
 
@@ -36,6 +106,7 @@ export const lang = {
   importHumdrum: { text: 'Humdrumをインポート' },
   importPae: { text: 'PAE、ABCをインポート' },
   saveMeiText: { text: 'MEIを保存' },
+  saveMeiBasicText: { text: 'MEI Basicで保存' },
   saveSvg: { text: 'SVGを保存' },
   saveMidi: { text: 'MIDIを保存' },
   printPreviewText: { text: 'PDFプレビュー' },
@@ -46,10 +117,10 @@ export const lang = {
   undoMenuText: { text: '元に戻す' },
   redoMenuText: { text: 'やり直し' },
   startSearchText: { text: '検索' },
-  findNextText: { text: '次を見つける' },
-  findPreviousText: { text: '前を見つける' },
-  replaceMenuText: { text: '置き換え' },
-  replaceAllMenuText: { text: 'すべて置き換え' },
+  findNextText: { text: '次を検索' },
+  findPreviousText: { text: '前を検索' },
+  replaceMenuText: { text: '置換' },
+  replaceAllMenuText: { text: 'すべて置換' },
   indentSelectionText: { text: '選択範囲をインデント' },
   surroundWithTagsText: { text: 'タグで囲む' },
   surroundWithLastTagText: { text: '前のタグで囲む' },
@@ -59,18 +130,18 @@ export const lang = {
 
   // VIEW MENU ITEM
   viewMenuTitle: { text: '表示' },
-  notationTop: { text: '音符上' },
-  notationBottom: { text: '音符下' },
-  notationLeft: { text: '音符左' },
-  notationRight: { text: '音符右' },
+  notationTop: { text: 'プレビューを上に表示' },
+  notationBottom: { text: 'プレビューを下に表示' },
+  notationLeft: { text: 'プレビューを左に表示' },
+  notationRight: { text: 'プレビューを右に表示' },
   showSettingsMenuText: { text: '設定パネル' },
-  showAnnotationMenuText: { text: '注釈パネル' },
-  showFacsimileMenuText: { text: '写本パネル' },
+  showAnnotationMenuText: { text: 'アノテーションパネル' },
+  showFacsimileMenuText: { text: 'ファクシミリパネル' },
   showPlaybackControlsText: { text: '再生コントロール' },
-  facsimileTop: { text: '写本上' },
-  facsimileBottom: { text: '写本下' },
-  facsimileLeft: { text: '写本左' },
-  facsimileRight: { text: '写本右' },
+  facsimileTop: { text: 'ファクシミリを上に表示' },
+  facsimileBottom: { text: 'ファクシミリを下に表示' },
+  facsimileLeft: { text: 'ファクシミリを左に表示' },
+  facsimileRight: { text: 'ファクシミリを右に表示' },
 
   // MANIPULATE MENU ITEM
   manipulateMenuTitle: { text: '操作' },
@@ -86,16 +157,16 @@ export const lang = {
   pitchOctaveDownText: { text: '1オクターブ下げる' },
   staffUpText: { text: '要素を1段階上げる' },
   staffDownText: { text: '要素を1段階下げる' },
-  increaseDurText: { text: '持続時間を増やす' },
-  decreaseDurText: { text: '持続時間を減らす' },
+  increaseDurText: { text: '音価を増やす' },
+  decreaseDurText: { text: '音価を減らす' },
   cleanAccidText: { text: '@accid.gesを確認' },
   renumberMeasuresTestText: { text: '小節を再番号付け（テスト）' },
   renumberMeasuresExecText: { text: '小節を再番号付け（実行）' },
   addIdsText: { text: 'MEIにIDを追加' },
   removeIdsText: { text: 'MEIからIDを削除' },
   reRenderMeiVerovio: { text: 'Verovioで再レンダリング' },
-  addFacsimile: { text: 'Facsimile要素を追加' },
-  ingestFacsimileText: { text: 'Facsimileを取り込む' },
+  addFacsimile: { text: 'ファクシミリを追加' },
+  ingestFacsimileText: { text: 'ファクシミリ取り込み' },
   insertMenuTitle: { text: '挿入' },
   addDoubleSharpText: { html: 'ダブルシャープ &#119082;' },
   addSharpText: { html: 'シャープ &#9839;' },
@@ -109,8 +180,8 @@ export const lang = {
   addTieText: { text: 'タイ' },
   addCrescendoHairpinText: { text: 'クレッシェンド' },
   addDiminuendoHairpinText: { text: 'ディミヌエンド' },
-  addBeamText: { text: 'ビーム' },
-  addBeamSpanText: { text: 'ビームスパン' },
+  addBeamText: { text: '連桁' },
+  addBeamSpanText: { text: '小節をまたぐ連桁' },
   addSuppliedText: { text: '供給' },
   addSuppliedArticText: { text: '供給（アーティキュレーション）' },
   addSuppliedAccidText: { text: '供給（アクシデント）' },
@@ -121,40 +192,40 @@ export const lang = {
   addPedalUpText: { text: 'ペダルアップ' },
   addTrillText: { text: 'トリル' },
   addTurnText: { text: 'ターン' },
-  addTurnLowerText: { text: '下げたターン' },
-  addMordentText: { text: 'モーダント' },
-  addMordentUpperText: { text: 'アッパーモーダント' },
+  addTurnLowerText: { text: '転回ターン' },
+  addMordentText: { text: 'モルデント' },
+  addMordentUpperText: { text: 'プラルトリラー' },
   addOctave8AboveText: { text: 'オクターブ（上8度）' },
   addOctave15AboveText: { text: 'オクターブ（上15度）' },
   addOctave8BelowText: { text: 'オクターブ（下8度）' },
   addOctave15BelowText: { text: 'オクターブ（下15度）' },
-  addGClefChangeBeforeText: { text: '前にGクレフの変更' },
-  addGClefChangeAfterText: { text: '後にGクレフの変更' },
-  addFClefChangeBeforeText: { text: '前にFクレフの変更' },
-  addFClefChangeAfterText: { text: '後にFクレフの変更' },
-  addCClefChangeBeforeText: { text: '前にCクレフの変更' },
-  addCClefChangeAfterText: { text: '後にCクレフの変更' },
+  addGClefChangeBeforeText: { text: '要素の前にト音記号' },
+  addGClefChangeAfterText: { text: '要素の後にト音記号' },
+  addFClefChangeBeforeText: { text: '要素の前にヘ音記号' },
+  addFClefChangeAfterText: { text: '要素の後にヘ音記号' },
+  addCClefChangeBeforeText: { text: '要素の前にハ音記号' },
+  addCClefChangeAfterText: { text: '要素の後にハ音記号' },
   toggleStaccText: { text: 'スタッカート' },
   toggleAccentText: { text: 'アクセント' },
   toggleTenutoText: { text: 'テヌート' },
   toggleMarcatoText: { text: 'マルカート' },
-  toggleStaccissText: { text: 'スタッキッシモ' },
+  toggleStaccissText: { text: 'スタッカーティシモ' },
   toggleSpiccText: { text: 'スピカート' },
   // HELP MENU ITEM
   helpMenuTitle: { text: 'ヘルプ' },
-  goToHelpPage: { text: 'mei-friendヘルプページ' },
+  goToHelpPageText: { text: 'mei-friendヘルプページ' },
   goToCheatSheet: { text: 'mei-friendチートシート' },
   showChangelog: { text: 'mei-friend変更履歴' },
   goToGuidelines: { text: 'MEIガイドライン' },
-  consultGuidelinesForElementText: { text: '現在の要素に対するガイドラインのエントリー' },
+  consultGuidelinesForElementText: { text: '現在の要素に対するガイドラインの項目' },
   provideFeedback: { text: 'フィードバックを提供' },
   resetDefault: { text: 'デフォルトにリセット' },
 
   // panel icons
-  showMidiPlaybackControlBarButton: { description: 'MIDI再生コントロールバーを切り替える' },
-  showFacsimileButton: { description: '写本パネルを切り替える' },
-  showAnnotationsButton: { description: '注釈パネルを切り替える' },
-  showSettingsButton: { description: '設定パネルを表示' },
+  showMidiPlaybackControlBarButton: { description: 'MIDI再生コントロールバーの表示/非表示' },
+  showFacsimileButton: { description: 'ファクシミリパネルの表示/非表示' },
+  showAnnotationsButton: { description: 'アノテーションパネルの表示/非表示' },
+  showSettingsButton: { description: '設定パネルの表示/非表示' },
 
   // Footer texts
   leftFooter: {
@@ -191,8 +262,8 @@ export const lang = {
   paginationLabel: { description: 'ページナビゲーション：表示するページ番号を手動で入力するにはクリックしてください' },
   nextPageButton: { description: '次のページに移動' },
   lastPageButton: { description: '最後のページに移動' },
-  flipCheckbox: { description: 'エンコードカーソル位置に自動的にページをフリップ' },
-  flipButton: { description: 'エンコードカーソル位置にページを手動でフリップ' },
+  flipCheckbox: { description: 'エンコードカーソル位置に自動的にページ移動' },
+  flipButton: { description: 'エンコードカーソル位置にページを手動で移動' },
   breaksSelect: { description: '楽譜のシステム/ページ区切りの動作を定義' },
   breaksSelectNone: { text: 'なし' },
   breaksSelectAuto: { text: '自動' },
@@ -203,15 +274,14 @@ export const lang = {
   updateControlsLabel: { text: '更新', description: 'エンコード変更後の楽譜の制御更新動作' },
   liveUpdateCheckbox: { description: 'エンコード変更後に楽譜を自動的に更新' },
   codeManualUpdateButton: { description: '楽譜を手動で更新' },
-  engravingFontSelect: { description: 'エングレービングフォントの選択' },
+  engravingFontSelect: { description: '楽譜フォントの選択' },
   backwardsButton: { description: '楽譜内を左に移動' },
   forwardsButton: { description: '楽譜内を右に移動' },
   upwardsButton: { description: '楽譜内を上に移動' },
   downwardsButton: { description: '楽譜内を下に移動' },
   speedLabel: {
     text: 'スピードモード',
-    description:
-      'スピードモードでは、大きなファイルでのレンダリング時間を短縮するため、現在のページのみがVerovioに送信されます',
+    description: '大きなファイルのレンダリング時間を短縮するため、現在のページのみがVerovioに送信されます',
   },
 
   // PDF/印刷プレビューパネル
@@ -220,23 +290,23 @@ export const lang = {
   pagesLegendLabel: { text: 'ページ範囲', singlePage: 'ページ', multiplePages: 'ページ' },
   selectAllPagesLabel: { text: 'すべて' },
   selectCurrentPageLabel: { text: '現在のページ' },
-  selectFromLabel: { text: 'から:' },
-  selectToLabel: { text: 'まで:' },
-  selectPageRangeLabel: { text: 'ページ範囲:' },
+  selectFromLabel: { text: '開始:' },
+  selectToLabel: { text: '終了:' },
+  selectPageRangeLabel: { text: 'ページ範囲指定:' },
   pdfPreviewSpeedModeWarning: {
     text:
       'スピードモードがアクティブ化されているため、現在のページのみがPDFにレンダリングされます。' +
-      'すべてのページから選択するにはスピードモードのチェックを外してください。',
+      'すべてのページから印刷範囲を選択するにはスピードモードのチェックを外してください。',
   },
   pdfPreviewNormalModeTitle: { text: 'PDFに保存するページ範囲を選択してください。' },
 
   // ファクシミリパネル
   facsimileIcon: { description: 'ファクシミリパネル' },
-  facsimileDecreaseZoomButton: { description: '楽譜画像を縮小' },
-  facsimileZoom: { description: '楽譜画像のサイズを調整' },
-  facsimileIncreaseZoomButton: { description: '楽譜画像を拡大' },
-  facsimileFullPageLabel: { text: '全画面表示', description: 'ファクシミリ画像の全画面表示' },
-  facsimileFullPageCheckbox: { description: 'ファクシミリ画像の全画面表示' },
+  facsimileDecreaseZoomButton: { description: '画像を縮小' },
+  facsimileZoom: { description: '画像のサイズを調整' },
+  facsimileIncreaseZoomButton: { description: '画像を拡大' },
+  facsimileFullPageLabel: { text: '全体表示', description: 'ファクシミリ画像の全体表示' },
+  facsimileFullPageCheckbox: { description: 'ファクシミリ画像の全体表示' },
   facsimileShowZonesLabel: { text: 'ゾーンボックスを表示', description: 'ファクシミリのゾーンボックスを表示' },
   facsimileShowZonesCheckbox: { description: 'ファクシミリのゾーンボックスを表示' },
   facsimileEditZonesCheckbox: { description: 'ファクシミリのゾーンを編集' },
@@ -244,9 +314,9 @@ export const lang = {
   facsimileCloseButton: { description: 'ファクシミリパネルを閉じる' },
   facsimileDefaultWarning: { text: '表示するファクシミリコンテンツはありません。' },
   facsimileNoSurfaceWarning: {
-    text: 'このページにはサーフェス要素が見つかりません。\n(初期のpb要素が不足しているかもしれません。)',
+    text: 'このページにはsurface要素が見つかりません。\n(最初ののpb要素がない可能性があります。)',
   },
-  facsimileNoZonesFullPageWarning: { text: 'ゾーンのないファクシミリは全画面モードでのみ表示されます。' },
+  facsimileNoZonesFullPageWarning: { text: 'ゾーンのないファクシミリは全体表示モードでのみ表示されます。' },
   facsimileImgeNotLoadedWarning: { text: '画像を読み込めませんでした' },
 
   // Drag'n'drop
@@ -255,7 +325,7 @@ export const lang = {
   // Public repertoire
   openUrlHeading: { text: 'URLで公開されたエンコーディングを開く' },
   openUrlInstructions: {
-    text: '公開されたレパートリーから選択するか、下記にWebホストされた楽譜エンコーディングのURLを入力してください。注意: ホストサーバーはクロスオリジンリソース共有（CORS）をサポートしている必要があります。',
+    text: '公開されたレパートリーから選択するか、下記にWebホストされた楽譜エンコーディングのURLを入力してください。注意: ホストサーバーはオリジン間リソース共有（CORS）をサポートしている必要があります。',
   },
   publicRepertoireSummary: { text: '公開レパートリー' },
   sampleEncodingsComposerLabel: { text: '作曲者:' },
@@ -875,4 +945,9 @@ export const lang = {
   codeCheckerHasExtra: { text: '余分な' }, // 余分な
   codeCheckerLacksAn: { text: '持っていません' },
   codeCheckerBecauseAlreadyDefined: { text: '以前に同じ要素が定義されているため' },
+
+  // Warning for missing ids
+  missingIdsWarningAlert: {
+    text: '「メイフレンドはエンコーディング内の選択された要素にスクロールできません。エンコーディングにIDを追加してください。 (メイフレンドはエンコーディングないのせんたくされたようそにすくろーるできません。エンコーディングにIDをついかしてください。)',
+  },
 };

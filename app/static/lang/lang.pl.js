@@ -6,6 +6,85 @@ import * as att from '../lib/attribute-classes.js';
 import { heart } from '../css/icons.js';
 
 export const lang = {
+  // Ekran powitalny
+  aboutMeiFriend: { text: 'O mei-friend' },
+  showSplashScreen: {
+    text: 'Pokaż ekran powitalny przy ładowaniu',
+    description: 'Pokaż ekran powitalny mei-friend podczas ładowania aplikacji',
+  },
+  splashBody: {
+    html: `
+      <p>
+        mei-friend to edytor dla <a href="https://music-encoding.org">kodowań muzycznych</a>, hostowany na
+        <a href="https://mdw.ac.at" target="_blank">Uniwersytecie Muzycznym i Sztuk Widowiskowych w Wiedniu</a>. 
+        Prosimy o zapoznanie się z naszą <a href="https://mei-friend.github.io" target="_blank">rozszerzoną dokumentacją</a> 
+        dla dalszych informacji.
+      </p>
+      <p>
+        Chociaż mei-friend to aplikacja oparta na przeglądarkę, Twoje dane osobowe (w tym kodowanie, które edytujesz, ustawienia
+        aplikacji i aktualne dane logowania, jeśli takie istnieją) są przechowywane w przeglądarce w
+        <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank"
+          >lokalnym magazynie</a
+        > przeglądarki i nie są przesyłane ani przechowywane na naszych serwerach.
+      </p>
+      <p>
+        Dane są przesyłane do GitHuba tylko wtedy, gdy wyraźnie o to poprosisz (np. gdy się zalogujesz do GitHuba, załadujesz
+        kodowanie z repozytorium GitHuba lub poprosisz o uruchomienie workflow GitHub Action). Podobnie dane są przesyłane do
+        wybranego dostawcy Solid tylko wtedy, gdy wyraźnie o to poprosisz (np. gdy się zalogujesz do Solid, załadujesz lub
+        zapiszesz adnotacje stand-off).
+      </p>
+      <p>
+        Używamy <a href="https://matomo.org/" target="_blank">Matomo</a>
+        do zbierania anonimowych statystyk użytkowania. Obejmuje to skrócony adres IP (umożliwiający geolokalizację na poziomie
+        kraju, ale bez dalszej identyfikacji), przeglądarkę i system operacyjny, skąd przyszliście (czyli witrynę, z której
+        przyszliście), czas i czas trwania wizyty oraz odwiedzone strony. Te informacje są przechowywane na instancji Matomo
+        działającej na serwerach Uniwersytetu Muzycznego i Sztuk Widowiskowych w Wiedniu i nie są udostępniane żadnej trzeciej
+        stronie.
+      </p>
+      <p>
+        Zestaw narzędzi Verovio jest ładowany z <a href="https://verovio.org" target="_blank">https://verovio.org</a>, 
+        hostowany przez <a href="https://rism.digital/" target="_blank">RISM Digital Switzerland</a>. 
+        Dzięki temu mei-friend może być zawsze aktualny z najnowszą wersją narzędzi
+        i umożliwia wybór wszystkich obsługiwanych wersji za pomocą panelu ustawień. 
+        Korzystając z mei-friend, twój adres IP jest widoczny przez RISM Digital.
+      </p>
+      <p>
+        Wreszcie, odtwarzanie MIDI jest prezentowane za pomocą fontu dźwiękowego SGM_plus dostarczanego przez Google Magenta
+        i obsługiwanego za pomocą googleapis.com. Twój adres IP jest widoczny dla Google podczas uruchamiania odtwarzania MIDI.
+        Jeśli nie chcesz, aby to się zdarzyło, prosimy o powstrzymanie się od korzystania z funkcji odtwarzania MIDI.
+      </p>
+      <p>
+        mei-friend został opracowany przez
+        <a href="https://iwk.mdw.ac.at/werner-goebl" target="_blank">Wernera Goebla</a> i
+        <a href="https://iwk.mdw.ac.at/david-weigl" target="_blank">Davida M. Weigla</a> w Katedrze Akustyki Muzycznej -
+        Wiener Klangstil na Uniwersytecie Muzycznym i Sztuk Widowiskowych w Wiedniu i jest licencjonowany na
+        <a href="https://spdx.org/licenses/AGPL-3.0-or-later.html" target="_blank"
+          >licencji GNU Affero General Public License v3.0</a
+        >. Proszę o konsultację naszej <a href="https://mei-friend.github.io/about/" target="_blank">strony podziękowań</a>
+        dla dalszych informacji o współtwórcach i komponentach open source używanych w naszym projekcie. Dziękujemy naszym
+        kolegom za ich wkład i wsparcie.
+      </p>
+      <p>
+        Rozwój aplikacji internetowej mei-friend jest finansowany przez
+        <a href="https://fwf.ac.at" target="_blank">Austriacki Fundusz Nauki (FWF)</a> w ramach projektów
+        <a href="https://iwk.mdw.ac.at/signature-sound-vienna/" target="_blank"
+          >P 34664-G (Signature Sound Vienna)</a
+        >
+        i <a href="https://e-laute.info">I 6019 (E-LAUTE)</a>.
+      </p>
+    `,
+  },
+  splashGotItButtonText: { text: 'Rozumiem!' },
+  splashVersionText: { text: 'Wersja' },
+  splashAlwaysShow: {
+    text: 'Zawsze wyświetl ten ekran powitalny',
+    description: 'Zawsze wyświetl ten ekran powitalny podczas ładowania aplikacji',
+  },
+  splashAlwaysShowLabel: {
+    text: 'Zawsze wyświetl ten ekran powitalny',
+    description: 'Zawsze wyświetl ten ekran powitalny podczas ładowania aplikacji',
+  },
+
   // Main menu bar
   githubLoginLink: { text: 'Zaloguj się' },
 
@@ -36,6 +115,7 @@ export const lang = {
   importHumdrum: { text: 'Importuj Humdrum' },
   importPae: { text: 'Importuj PAE, ABC' },
   saveMeiText: { text: 'Zapisz MEI' },
+  saveMeiBasicText: { text: 'Zapisz jako MEI Basic' },
   saveSvg: { text: 'Zapisz SVG' },
   saveMidi: { text: 'Zapisz MIDI' },
   printPreviewText: { text: 'Podgląd PDF' },
@@ -145,7 +225,7 @@ export const lang = {
 
   // HELP MENU ITEM // POMOC ELEMENT MENU
   helpMenuTitle: { text: 'Pomoc' },
-  goToHelpPage: { text: 'Strony pomocy mei-friend' },
+  goToHelpPageText: { text: 'Strony pomocy mei-friend' },
   goToCheatSheet: { text: 'Ściągawka mei-friend' },
   showChangelog: { text: 'Pokaż dziennik zmian mei-friend' },
   goToGuidelines: { text: 'Pokaż Wytyczne MEI' },
@@ -165,7 +245,7 @@ export const lang = {
       'Hostowany przez <a href="https://iwk.mdw.ac.at">IWK</a> ' +
       'na <a href="https://mdw.ac.at">mdw</a>, z ' +
       heart +
-      'z Wiednia. ' +
+      ' z Wiednia. ' +
       '<a href="https://iwk.mdw.ac.at/impressum">Oświadczenie</a>.',
   },
   loadingVerovio: { text: 'Wczytywanie Verovio' },
@@ -934,4 +1014,9 @@ delColor: {
   codeCheckerHasExtra: { text: 'ma dodatkowe' },
   codeCheckerLacksAn: { text: 'brakuje' },
   codeCheckerBecauseAlreadyDefined: { text: 'ponieważ zostało to już zdefiniowane wcześniej w takcie' },
+
+  // Warning for missing ids
+  missingIdsWarningAlert: {
+    text: 'mei-friend nie może przewinąć do wybranych elementów w kodowaniu. Dodaj identyfikatory do kodowania.',
+  },
 };

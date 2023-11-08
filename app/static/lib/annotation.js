@@ -433,6 +433,7 @@ export function addAnnotationHandlers() {
               type: 'annotateIdentify',
               selection: selection,
               isStandoff: true,
+              standoffUri: solidStorage + maoMusicalMaterial.headers.get('location').substr(1)
             };
             annotations.push(a);
             refreshAnnotations(true);

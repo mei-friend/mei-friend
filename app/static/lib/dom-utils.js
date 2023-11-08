@@ -5,10 +5,18 @@ export const svgNameSpace = 'http://www.w3.org/2000/svg';
 export const navElsArray = ['note', 'rest', 'mRest', 'beatRpt', 'halfmRpt', 'mRpt', 'clef'];
 export const navElsSelector = '.' + navElsArray.join(',.');
 
+import * as att from './attribute-classes.js';
 import { escapeXmlId } from './utils.js';
 
-// scans through SVG starting from element to find next element elementName
-// (e.g. 'note'), within same staff and layer
+/**
+ * Scans through SVG starting from element to find next element elementName
+ * (e.g. 'note'), within same staff and layer
+ * @param {Element} currEl
+ * @param {string} [dir='forwards|backwards']
+ * @param {string} sel
+ * @param {string} incr
+ * @returns
+ */
 export function getIdOfNextSvgElement(currEl, dir = 'forwards', sel = navElsSelector, incr = 'all') {
   let measure = currEl.closest('.measure');
   let st = currEl.closest('.staff');
@@ -66,10 +74,17 @@ export function getIdOfNextSvgElement(currEl, dir = 'forwards', sel = navElsSele
     console.info('getIdOfNextSvgElement: empty string for ' + currEl.getAttribute('id') + ', ' + dir + '; new: ' + id);
     return id;
   }
-}
+} // getIdOfNextSvgElement()
 
-// returns id in next (dir = backwards/forwards) measure, at same staff and/or
-// layer if existent (otherwise in same staff)
+/**
+ * Returns id in next (dir = backwards/forwards) measure, at same staff and/or
+ * layer if existent (otherwise in same staff)
+ * @param {Element} currEl
+ * @param {string} [dir="backwards|forwards"]
+ * @param {number} [stN=0]
+ * @param {number} [lyN=0]
+ * @returns {string} id
+ */
 export function getIdInNextMeasure(currEl, dir = 'forwards', stN = 0, lyN = 0) {
   let measureList = Array.from(document.querySelectorAll('.measure'));
   if (dir.startsWith('back')) measureList.reverse();
@@ -86,14 +101,33 @@ export function getIdInNextMeasure(currEl, dir = 'forwards', stN = 0, lyN = 0) {
     }
     if (m.getAttribute('id') === measure.getAttribute('id')) found = true;
   }
-}
+} // getIdInNextMeasure()
 
-export function getInMeasure(measure, list, stN, lyN, what = '') {
-  if (what === 'first') return getFirstInMeasure(measure, list, stN, lyN);
-  if (what === 'last') return getLastInMeasure(measure, list, stN, lyN);
-}
+/**
+ * Returns id string of requested element having the properties
+ * specified in the parameters.
+ * Wrapper for getFirstInMeasure and getLastInMeasure.
+ * @param {Element} measure
+ * @param {string} selector
+ * @param {number} stN
+ * @param {number} lyN
+ * @param {string} [what="first|last"]
+ * @returns {string} id
+ */
+export function getInMeasure(measure, selector, stN, lyN, what = '') {
+  if (what === 'first') return getFirstInMeasure(measure, selector, stN, lyN);
+  if (what === 'last') return getLastInMeasure(measure, selector, stN, lyN);
+} // getInMeasure()
 
-export function getFirstInMeasure(measure, list, stN, lyN) {
+/**
+ * Returns id of first element in measure element.
+ * @param {Element} measure
+ * @param {string} selector
+ * @param {number} stN
+ * @param {number} lyN
+ * @returns {string} id
+ */
+export function getFirstInMeasure(measure, selector, stN, lyN) {
   let foundElementId = '';
   let staff = measure.querySelector('.staff[data-n="' + stN + '"]');
   // console.info('getFirstInMeasure: staff ', staff);
@@ -102,9 +136,9 @@ export function getFirstInMeasure(measure, list, stN, lyN) {
     let layer = staff.querySelector('.layer[data-n="' + lyN + '"]');
     // console.info('getFirstInMeasure: layer ', layer);
     if (layer) {
-      el = layer.querySelector(list);
+      el = layer.querySelector(selector);
     } else {
-      el = staff.querySelector(list);
+      el = staff.querySelector(selector);
     }
     // console.info('getFirstInMeasure: el ', el);
     if (el) foundElementId = el.getAttribute('id');
@@ -112,7 +146,15 @@ export function getFirstInMeasure(measure, list, stN, lyN) {
   return foundElementId;
 } // getFirstInMeasure()
 
-export function getLastInMeasure(measure, list, stN, lyN) {
+/**
+ * Returns id of last element in measure element.
+ * @param {Element} measure
+ * @param {string}} selector
+ * @param {number} stN
+ * @param {number} lyN
+ * @returns
+ */
+export function getLastInMeasure(measure, selector, stN, lyN) {
   let foundElementId = '';
   let staff = measure.querySelector('.staff[data-n="' + stN + '"]');
   // console.info('getLastInMeasure staff: ', staff);
@@ -121,9 +163,9 @@ export function getLastInMeasure(measure, list, stN, lyN) {
     let layer = staff.querySelector('.layer[data-n="' + lyN + '"]');
     // console.info('layer: ', layer);
     if (layer) {
-      els = layer.querySelectorAll(list);
+      els = layer.querySelectorAll(selector);
     } else {
-      els = staff.querySelectorAll(list);
+      els = staff.querySelectorAll(selector);
     }
     if (els && els.length > 0) foundElementId = els[els.length - 1].getAttribute('id');
     // console.info('els: ', els);
@@ -131,6 +173,12 @@ export function getLastInMeasure(measure, list, stN, lyN) {
   return foundElementId;
 } // getLastInMeasure()
 
+/**
+ * Returns x coordinates of note and noteheads, as specified by what.
+ * @param {Element} element
+ * @param {string} [what="median|range|array"]
+ * @returns {number|array}
+ */
 export function getX(element, what = 'median') {
   if (!element) return false;
   let x = [];
@@ -148,8 +196,13 @@ export function getX(element, what = 'median') {
   if (what === 'median') return median(x);
   if (what === 'range') return Math.max(x) - Math.min(x);
   if (what === 'array') return x;
-}
+} // getX()
 
+/**
+ * Returns median of y coordinate of element
+ * @param {Element} element
+ * @returns {number}
+ */
 export function getY(element) {
   if (!element) return false;
   let y = [];
@@ -166,16 +219,25 @@ export function getY(element) {
     });
   }
   return median(y);
-}
+} // getY()
 
+/**
+ * Returns median of array of numbers
+ * @param {number[]} numbers
+ * @returns {number}
+ */
 export function median(numbers) {
   const sorted = numbers.slice().sort((a, b) => a - b);
   const middle = Math.floor(sorted.length / 2);
   if (sorted.length % 2 === 0) return (sorted[middle - 1] + sorted[middle]) / 2;
   return sorted[middle];
-}
+} // median()
 
-// returns true when element is the first in SVG page in same staff & layer
+/**
+ * Returns true when element is the first in SVG page in same staff & layer
+ * @param {string} id
+ * @returns
+ */
 export function isFirstElementOnPage(id) {
   if (!id) return true;
   let element = document.querySelector('g#' + escapeXmlId(id));
@@ -190,9 +252,13 @@ export function isFirstElementOnPage(id) {
   let firstId = getFirstInMeasure(m, navElsSelector, stN, lyN);
   console.info('isFirstElement: firstId: ' + firstId + ', thisId: ' + thisId + ', BOOL: ' + (thisId === firstId));
   return thisId === firstId;
-}
+} // isFirstElementOnPage()
 
-// returns the DOM element at encoding cursor position
+/**
+ * Returns the DOM element at encoding cursor position
+ * @param {CodeMirror} cm
+ * @returns {Element}
+ */
 export function getElementAtCursor(cm) {
   let cursor = cm.getCursor();
   let coords = cm.cursorCoords(
@@ -204,11 +270,16 @@ export function getElementAtCursor(cm) {
   );
   let elem = document.elementFromPoint(coords.left, coords.top);
   return elem;
-}
+} // getElementAtCursor()
 
-// checks whether a page beginning or system beginning has to be counted as a
-// new page (normally true, and if within an <app>, count only
-// if inside a <lem> or inside first <rdg> or <rdg|source=id)
+/**
+ * Checks whether a page beginning or system beginning has to be counted as a
+ * new page (normally true, and if within an <app>, count only
+ * if inside a <lem> or inside first <rdg> or <rdg|source=id)
+ * @param {Element} el
+ * @param {string} sourceId
+ * @returns {boolean}
+ */
 export function countAsBreak(el, sourceId = '') {
   let app;
   if ((app = el.closest('app'))) {
@@ -224,7 +295,7 @@ export function countAsBreak(el, sourceId = '') {
     return true;
   }
   return false;
-}
+} // countAsBreak()
 
 /**
  * This function takes an element and a list of ids.
@@ -264,7 +335,11 @@ export function getAdjacentSiblingElements(xmlNode, idArray) {
   return adjacentElIds;
 }
 
-// convert xmlNode to string and remove meiNameSpace declaration from return string
+/**
+ * Convert xmlNode to string and remove meiNameSpace declaration from return string
+ * @param {Node} xmlNode
+ * @returns {string}
+ */
 export function xmlToString(xmlNode) {
   let str = new XMLSerializer().serializeToString(xmlNode);
   // console.info('xmlToString: ' + str);
@@ -273,7 +348,12 @@ export function xmlToString(xmlNode) {
   return str.replace(' xmlns="' + meiNameSpace + '"', '');
 } // xmlToString()
 
-// checks xmlDoc for expand elements and returns an array of arrays
+/**
+ * Checks xmlDoc for expand elements and returns an array of arrays
+ * @param {Node} xmlDoc
+ * @param {string} baseSelector
+ * @returns {string[][]}
+ */
 export function generateExpansionList(xmlDoc, baseSelector = 'music score') {
   let selector = 'section,ending,lem,rdg';
   let expansions = [['No expansion', '']];
@@ -291,3 +371,46 @@ export function generateExpansionList(xmlDoc, baseSelector = 'music score') {
   }
   return expansions;
 } // generateExpansionList()
+
+/**
+ * Returns key signature string for a given note, after DOM traversal in xmlDoc.
+ * @param {Node} xmlDoc
+ * @param {Element} noteElement
+ * @returns {string} data.KEYFIFTHS, such as '3f', '0', or '7s'
+ */
+export function getKeySigForNote(xmlDoc, noteElement) {
+  if (!xmlDoc || !noteElement || !noteElement.hasAttribute('xml:id')) return '';
+  let keySigString = '0';
+  const sigList = xmlDoc.querySelectorAll('[key\\.sig],[sig],[*|id="' + noteElement.getAttribute('xml:id') + '"]');
+  for (const s of sigList) {
+    if (s === noteElement) break;
+    keySigString = s.getAttribute('key.sig') || s.getAttribute('sig') || '0';
+  }
+  return keySigString;
+} // getKeySigForNote()
+
+/**
+ * Returns notes names affected by key signature and
+ * the accidental string ('s', 'f', 'n')
+ * @param {string} keySigString
+ * @returns {Object} affectedNotes, keySigAccid
+ * Usage:
+ * const { affectedNotes, keySigAccid } = getAffectedNotesFromKeySig('5f')
+ */
+export function getAffectedNotesFromKeySig(keySigString = '') {
+  let affectedNotes = [];
+  let keySigAccid = 'n';
+  let splitF = keySigString.split('f');
+  let splitS = keySigString.split('s');
+  if (splitF.length > 1) {
+    keySigAccid = 'f';
+    affectedNotes = att.flats.slice(0, splitF[0]);
+  } else if (splitS.length > 1) {
+    keySigAccid = 's';
+    affectedNotes = att.sharps.slice(0, splitS[0]);
+  }
+  return {
+    affectedNotes: affectedNotes,
+    keySigAccid: keySigAccid,
+  };
+} // getAffectedNotesFromKeySig()

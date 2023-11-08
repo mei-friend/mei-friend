@@ -250,7 +250,7 @@ export function addAccidental(v, cm, accidAttribute = 's') {
 } // addAccidental()
 
 /**
- * Inserts a new control element to DOM and editor
+ * Inserts a new control element (control event) to DOM and editor
  * @param {Viewer} v
  * @param {CodeMirror} cm
  * @param {string} elName ('slur', 'dynam', ...)
@@ -259,9 +259,12 @@ export function addAccidental(v, cm, accidAttribute = 's') {
  * @returns
  */
 export function addControlElement(v, cm, elName, placement = '', form = '') {
+  // elements to which control elements (control events) can be added
+  let allowedElements = ['note', 'chord', 'rest', 'mRest', 'multiRest'];
+
   if (v.selectedElements.length === undefined || v.selectedElements.length < 1) return;
   v.selectedElements = utils.sortElementsByScorePosition(v.selectedElements);
-  v.selectedElements = speed.filterElements(v.selectedElements, v.xmlDoc);
+  v.selectedElements = speed.filterElements(v.selectedElements, v.xmlDoc, allowedElements);
   console.debug('addControlElement() ', elName, placement, form);
 
   // modifier key for inserting tstamps rather than start/endids
@@ -271,7 +274,7 @@ export function addControlElement(v, cm, elName, placement = '', form = '') {
   let startId = v.selectedElements[0];
   var startEl = v.xmlDoc.querySelector("[*|id='" + startId + "']");
   if (!startEl) return;
-  if (!['note', 'chord', 'rest', 'mRest', 'multiRest'].includes(startEl.nodeName)) {
+  if (!allowedElements.includes(startEl.nodeName)) {
     console.info('addControlElement: Cannot add new element to ' + startEl.nodeName + '.');
     return;
   }
@@ -331,12 +334,19 @@ export function addControlElement(v, cm, elName, placement = '', form = '') {
   // elements with both startid and endid
   if (['slur', 'tie', 'phrase', 'hairpin', 'gliss'].includes(elName)) {
     // stop, if selected elements are on the same beat position and through warning.
-    if (m === 0 && tstamp2 === tstamp && !startEl.hasAttribute('grace') && !endEl.hasAttribute('grace')) {
-      let msg = useTstamps ? 'Cannot insert ' : 'Attention with ' + elName + ' (' + uuid + '): ';
+    if (
+      m === 0 &&
+      tstamp >= 0 &&
+      tstamp === tstamp2 &&
+      !startEl.hasAttribute('grace') &&
+      !endEl.hasAttribute('grace')
+    ) {
+      // let msg = useTstamps ? 'Cannot insert ' : 'Attention with ' + elName + ' (' + uuid + '): ';
+      let msg = 'Cannot insert ' + elName + ' (' + uuid + '): ';
       msg += startId + ' and ' + endId + ' are on the same beat position ' + tstamp + '.';
       console.log(msg);
       v.showAlert(msg, 'warning');
-      if (useTstamps) return;
+      return; // if (useTstamps) 26 Sept 2023: stop in all cases
     }
     if (useTstamps) {
       newElement.setAttribute('tstamp', tstamp);
@@ -648,7 +658,7 @@ export function invertPlacement(v, cm, modifier = false) {
  */
 export function toggleArtic(v, cm, artic = 'stacc') {
   v.loadXml(cm.getValue());
-  let ids = speed.filterElements(v.selectedElements, v.xmlDoc);
+  let ids = speed.filterElements(v.selectedElements, v.xmlDoc, ['note', 'chord', 'beam', 'beamSpan', 'tuplet']);
   v.allowCursorActivity = false;
   let i, range;
   for (i = 0; i < ids.length; i++) {
@@ -895,10 +905,13 @@ export function addBeamSpan(v, cm) {
 export function addOctaveElement(v, cm, disPlace = 'above', dis = '8') {
   v.loadXml(cm.getValue());
   if (v.selectedElements.length < 1) return;
+  // allow only note and chord elements
+  v.selectedElements = speed.filterElements(v.selectedElements, v.xmlDoc, ['note', 'chord']);
   console.info('addOctaveElement selectedElements:', v.selectedElements);
+
   let id1 = v.selectedElements[0]; // xml:id string
   let id2 = v.selectedElements[v.selectedElements.length - 1];
-  let n1 = v.xmlDoc.querySelector("[*|id='" + id1 + "']");
+
   // add control like element <octave @startid @endid @dis @dis.place>
   let octave = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'octave');
   let uuid = utils.generateXmlId('octave', v.xmlIdStyle);
@@ -907,8 +920,10 @@ export function addOctaveElement(v, cm, disPlace = 'above', dis = '8') {
   octave.setAttribute('endid', '#' + id2);
   octave.setAttribute('dis', dis);
   octave.setAttribute('dis.place', disPlace);
-  n1.closest('measure').appendChild(octave);
-  // add it to the txtEdr
+  let n1 = v.xmlDoc.querySelector("[*|id='" + id1 + "']");
+  n1?.closest('measure').appendChild(octave);
+
+  // add it to CodeMirror
   v.allowCursorActivity = false;
   // let checkPoint = buffer.createCheckpoint(); TODO
   let sc = cm.getSearchCursor('xml:id="' + id1 + '"');
@@ -1241,19 +1256,19 @@ export function checkAccidGes(v, cm, change = false) {
     list.forEach((e) => {
       if (e.nodeName === 'scoreDef' && e.hasAttribute('key.sig')) {
         // key.sig inside scoreDef: write @sig to all staves
-        let value = e.getAttribute('key.sig');
+        const value = e.getAttribute('key.sig');
         for (let k in keySignatures) keySignatures[k] = value;
         if (d) console.debug('New key.sig in scoreDef: ' + value);
       } else if (e.nodeName === 'staffDef' && e.hasAttribute('key.sig')) {
         // key.sig inside staffDef: write @sig to that staff
-        let n = parseInt(e.getAttribute('n'));
-        let value = e.getAttribute('key.sig');
+        const n = parseInt(e.getAttribute('n'));
+        const value = e.getAttribute('key.sig');
         if (n && n > 0 && n <= keySignatures.length) keySignatures[n - 1] = value;
         if (d) console.debug('New key.sig in staffDef(' + e.getAttribute('xml:id') + ', n=' + n + '): ' + value);
       } else if (e.nodeName === 'keySig' && e.hasAttribute('sig')) {
         // keySig element in a staffDef
-        let n = parseInt(e.closest('staffDef')?.getAttribute('n'));
-        let value = e.getAttribute('sig');
+        const n = parseInt(e.closest('staffDef')?.getAttribute('n'));
+        const value = e.getAttribute('sig');
         if (n && n > 0 && n <= keySignatures.length) keySignatures[n - 1] = value;
         if (d) console.debug('New keySig("' + e.getAttribute('xml:id') + '")@sig in staffDef(' + n + '): ' + value);
       } else if (e.nodeName === 'measure') {
@@ -1265,22 +1280,13 @@ export function checkAccidGes(v, cm, change = false) {
         data.xmlId = e.getAttribute('xml:id') || '';
         data.measure = e.closest('measure')?.getAttribute('n') || '';
         // find staff number for note
-        let staffNumber = parseInt(e.closest('staff')?.getAttribute('n'));
-        let tstamp = speed.getTstampForElement(v.xmlDoc, e);
-        let pName = e.getAttribute('pname') || '';
-        let oct = e.getAttribute('oct') || '';
-        let value = keySignatures[staffNumber - 1];
-        let affectedNotes = []; // array of note names affected by keySig@sig or @key.sig
-        data.keySigAccid = 'n'; // n, f, s
-        let splitS = value.split('s');
-        let splitF = value.split('f');
-        if (splitF.length > 1) {
-          data.keySigAccid = 'f';
-          affectedNotes = att.flats.slice(0, splitF[0]);
-        } else if (splitS.length > 1) {
-          data.keySigAccid = 's';
-          affectedNotes = att.sharps.slice(0, splitS[0]);
-        }
+        const staffNumber = parseInt(e.closest('staff')?.getAttribute('n'));
+        const tstamp = speed.getTstampForElement(v.xmlDoc, e);
+        const pName = e.getAttribute('pname') || '';
+        const oct = e.getAttribute('oct') || '';
+
+        // array of note names affected by keySig@sig or @key.sig and keySigAccid 's', 'n', 'f'
+        const { affectedNotes, keySigAccid } = dutils.getAffectedNotesFromKeySig(keySignatures[staffNumber - 1]);
 
         let accid = e.getAttribute('accid') || e.querySelector('[accid]')?.getAttribute('accid');
         let accidGesEncoded =
@@ -1466,7 +1472,7 @@ export function checkAccidGes(v, cm, change = false) {
           !accid &&
           affectedNotes.includes(pName) &&
           mAccid !== accidGesMeaning &&
-          data.keySigAccid !== accidGesMeaning
+          keySigAccid !== accidGesMeaning
         ) {
           // a note, affected by key signature, either has @accid inside or as a child or has @accid.ges inside or as a child
           data.html =
@@ -1482,15 +1488,15 @@ export function checkAccidGes(v, cm, change = false) {
             '" ' +
             translator.lang.codeCheckerLacksAn.text +
             ' accid.ges="' +
-            data.keySigAccid +
+            keySigAccid +
             '". ' +
             translator.lang.codeCheckerAdd.text +
             ' accid.ges="' +
-            data.keySigAccid +
+            keySigAccid +
             '"';
           data.correct = () => {
             v.allowCursorActivity = false;
-            e.setAttribute('accid.ges', data.keySigAccid);
+            e.setAttribute('accid.ges', keySigAccid);
             replaceInEditor(cm, e, false);
             v.allowCursorActivity = true;
           };
@@ -1550,11 +1556,11 @@ export function checkAccidGes(v, cm, change = false) {
     measure.querySelectorAll('[accid]').forEach((el) => {
       let note = el.closest('note');
       if (note) {
-        let staffNumber = parseInt(el.closest('staff')?.getAttribute('n'));
-        let oct = note.getAttribute('oct') || '';
-        let pName = note.getAttribute('pname') || '';
-        let accid = el.getAttribute('accid');
-        let tstamp = speed.getTstampForElement(v.xmlDoc, note);
+        const staffNumber = parseInt(el.closest('staff')?.getAttribute('n'));
+        const oct = note.getAttribute('oct') || '';
+        const pName = note.getAttribute('pname') || '';
+        const accid = el.getAttribute('accid');
+        const tstamp = speed.getTstampForElement(v.xmlDoc, note);
 
         if (staffNumber && oct && pName && accid && tstamp >= 0) {
           if (!Object.hasOwn(measureAccids, staffNumber)) {
