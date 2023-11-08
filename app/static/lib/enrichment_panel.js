@@ -71,20 +71,20 @@ export function addListItem(listItemObject, forceRefreshAnnotations = false) {
   return addedSuccessfully;
 }
 
-// deleteItem()
-// -> calls deleteAnnotation() & deleteMarkup
-// -> deleteAnnotation() should only check if Annot or WebAnnotation should be deleted
-
+/**
+ * Deletes an annotation or markup from listItems and the xml document
+ * @param {string} uuid id of list item to delete
+ */
 export function deleteListItem(uuid) {
   const ix = listItems.findIndex((a) => a.id === uuid);
   if (ix >= 0) {
     let a = retrieveListItem(uuid);
-    listItems.splice(ix, 1);
     if (a.isMarkup === true) {
       markup.deleteMarkup(a);
     } else {
       annot.deleteAnnot(uuid);
     }
+    listItems.splice(ix, 1);
     situateAndRefreshAnnotationsList(true);
     refreshAnnotationsInRendering();
   }
