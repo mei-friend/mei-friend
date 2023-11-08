@@ -1597,6 +1597,7 @@ export let cmd = {
   redo: () => cm.redo(),
   // add note
   addNote: () => e.addNote(v, cm),
+  toggleDots: () => e.toggleDots(v, cm),
   // add accidentals
   addDoubleSharp: () => e.addAccidental(v, cm, 'x'),
   addSharp: () => e.addAccidental(v, cm, 's'),

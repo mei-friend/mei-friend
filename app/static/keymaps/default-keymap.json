@@ -21,6 +21,7 @@
     "end": "lastPage",
 
     "n": "addNote",
+    ".": "toggleDots",
 
     "shift-+": "addDoubleSharp",
     "+": "addSharp",

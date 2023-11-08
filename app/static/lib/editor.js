@@ -211,7 +211,7 @@ function removeWithTextnodes(element) {
 /**
  * Inserts new note immediately after the currently (last-)selected one,
  * or as the new last note on the currently visible notation fragment (e.g., page).
- * It copies @pname @oct @dur from the nearest predecessor note 
+ * It copies @pname @oct @dur from the nearest predecessor note
  * (or otherwise default to 'c', '4', '4').
  * @param {Viewer} v
  * @param {CodeMirror} cm
@@ -805,9 +805,8 @@ export function shiftPitch(v, cm, deltaPitch = 0, shiftChromatically = false) {
  */
 export function modifyDuration(v, cm, what = 'increase') {
   v.loadXml(cm.getValue());
-  let ids = speed.filterElements(v.selectedElements, v.xmlDoc);
   v.allowCursorActivity = false;
-  ids.forEach((id) => {
+  speed.filterElements(v.selectedElements, v.xmlDoc).forEach((id) => {
     let el = v.xmlDoc.querySelector("[*|id='" + id + "']");
     if (el) {
       let dur = el.getAttribute('dur');
@@ -820,11 +819,34 @@ export function modifyDuration(v, cm, what = 'increase') {
       }
     }
   });
-  v.selectedElements = ids;
   addApplicationInfo(v, cm);
   v.updateData(cm, false, true);
   v.allowCursorActivity = true;
 } // modifyDuration()
+
+/**
+ * Toggles a @dots="1" into a note (or all allowed elements in attAugmentDots)
+ * or removes it if already present.
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
+ */
+export function toggleDots(v, cm) {
+  v.allowCursorActivity = false;
+  speed.filterElements(v.selectedElements, v.xmlDoc).forEach((id) => {
+    let el = v.xmlDoc.querySelector("[*|id='" + id + "']");
+    if (el && att.attAugmentDots.includes(el.nodeName)) {
+      if (el.hasAttribute('dots') && el.getAttribute('dots') === '1') {
+        el.removeAttribute('dots');
+      } else {
+        el.setAttribute('dots', '1');
+      }
+      replaceInEditor(cm, el);
+    }
+  });
+  addApplicationInfo(v, cm);
+  v.updateData(cm, false, true);
+  v.allowCursorActivity = true;
+} // toggleDots()
 
 /**
  * Moves selected elements to next staff (without checking boundaries)
