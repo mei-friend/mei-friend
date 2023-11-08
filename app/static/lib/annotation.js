@@ -133,33 +133,29 @@ export function drawLink(a) {
 //#region functions to create annotations
 // called by addAnnotationHandlers() in the Tools tab of the Enrichment panel
 
-  // functions to create annotations
-  const createIdentify = (e) => {
-    if (solid.getDefaultSession().info.isLoggedIn) {
-      const label = window.prompt('Add label for identified object (optional)');
-      const selection = v.selectedElements;
-      document.getElementById('solid_logo').classList.add('clockwise');
-      createMAOMusicalObject(selection, label)
-        .then((maoMusicalMaterial) => {
-          getSolidStorage().then((solidStorage) => {
-            console.log(
-              'CREATED MUSICAL MATERIAL: ',
-              solidStorage + maoMusicalMaterial.headers.get('location').substr(1),
-              maoMusicalMaterial
-            );
-            const a = {
-              id: solidStorage + maoMusicalMaterial.headers.get('location').substr(1),
-              type: 'annotateIdentify',
-              selection: selection,
-              isStandoff: true,
-              standoffUri: solidStorage + maoMusicalMaterial.headers.get('location').substr(1)
-            };
-            annotations.push(a);
-            refreshAnnotations(true);
-          });
-        })
-        .finally(() => {
-          document.getElementById('solid_logo').classList.remove('clockwise');
+// functions to create annotations
+export const createIdentify = (e) => {
+  if (solid.getDefaultSession().info.isLoggedIn) {
+    const label = window.prompt('Add label for identified object (optional)');
+    const selection = v.selectedElements;
+    document.getElementById('solid_logo').classList.add('clockwise');
+    createMAOMusicalObject(selection, label)
+      .then((maoMusicalMaterial) => {
+        getSolidStorage().then((solidStorage) => {
+          console.log(
+            'CREATED MUSICAL MATERIAL: ',
+            solidStorage + maoMusicalMaterial.headers.get('location').substr(1),
+            maoMusicalMaterial
+          );
+          const a = {
+            id: solidStorage + maoMusicalMaterial.headers.get('location').substr(1),
+            type: 'annotateIdentify',
+            selection: selection,
+            isStandoff: true,
+            standoffUri: solidStorage + maoMusicalMaterial.headers.get('location').substr(1),
+          };
+          annotations.push(a);
+          refreshAnnotations(true);
         });
       })
       .finally(() => {
@@ -332,10 +328,7 @@ export async function situateAnnotations(a) {
     const musMatDiv = document.querySelector('#musMat_' + CSS.escape(a.id));
     console.log('extracts DIV: ', musMatDiv);
     if (musMatDiv && !musMatDiv.innerHTML.length) {
-      musMatDiv
-        .closest('.annotationListItem')
-        .querySelector('.makeStandoffAnnotation svg')
-        .classList.add('clockwise');
+      musMatDiv.closest('.annotationListItem').querySelector('.makeStandoffAnnotation svg').classList.add('clockwise');
       fetchMAOComponentsForIdentifiedObject(a.id);
     }
   }
