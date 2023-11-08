@@ -143,7 +143,6 @@ const defaultCodeMirrorOptions = {
     "'/'": completeIfAfterLt,
     "' '": completeIfInTag,
     "'='": completeIfInTag,
-    'Ctrl-Space': 'autocomplete',
     'Shift-Alt-f': indentSelection,
     'Shift-Ctrl-G': toMatchingTag,
     "'Ï'": indentSelection, // TODO: overcome strange bindings on MAC
@@ -1510,6 +1509,7 @@ export let cmd = {
   pageModeOff: () => v.pageModeOff(),
   saveAsPdf: () => v.saveAsPdf(),
   generateUrl: () => generateUrlUI(),
+  toggleFocus: () => v.toggleFocusBetweenNotationAndEncoding(cm),
   filterSettings: () => v.applySettingsFilter(),
   filterReset: () => {
     document.getElementById('filterSettings').value = '';

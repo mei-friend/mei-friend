@@ -77,6 +77,7 @@
   },
 
   ".platform-darwin": {
+    "ctrl-space": "toggleFocus",
     "cmd-right": "nextMeasure",
     "cmd-left": "previousMeasure",
     "ctrl-cmd-right": "nextPage",
@@ -139,6 +140,7 @@
   },
 
   ".platform-win32, .platform-linux": {
+    "ctrl-space": "toggleFocus",
     "ctrl-right": "nextMeasure",
     "ctrl-left": "previousMeasure",
     "ctrl-alt-right": "nextPage",
