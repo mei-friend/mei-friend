@@ -12,7 +12,7 @@ import * as dutils from './dom-utils.js';
 import * as speed from './speed.js';
 import * as utils from './utils.js';
 import Viewer from './viewer.js';
-import { addListItem, isItemInList, refreshAnnotationsList } from './enrichment_panel.js';
+import { addListItem, isItemInList, refreshAnnotationsList, retrieveItemValuesByProperty } from './enrichment_panel.js';
 
 export function readMarkup() {
   // read all markup elements supported from the current document
@@ -25,12 +25,16 @@ export function readMarkup() {
 
   let correspIdsToIgnore = [];
 
-  // get all selections for currently available markup elements
+  // get unique selections for all currently available markup items in listItems
+  // this is to ensure that for multiple corresponding markup elements only one list item is created
+  // containing all corresponding items as selection
+  let currentSelections = retrieveItemValuesByProperty('isMarkup', 'selection');
+  currentSelections = utils.flattenArrayToUniques(currentSelections);
+  correspIdsToIgnore = correspIdsToIgnore.concat(...currentSelections);
 
   markup.forEach((markupEl) => {
     let elId = markupEl.getAttribute('xml:id');
     if (!correspIdsToIgnore.includes(elId)) {
-      
       let elName = markupEl.localName;
       if (elId == null) {
         elId = utils.generateXmlId(elName, v.xmlIdStyle);

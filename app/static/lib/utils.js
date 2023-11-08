@@ -755,3 +755,17 @@ export function writeMeasureBeat(measure, beat) {
   if (parseInt(measure) === 0) return '' + beat;
   return measure + 'm+' + beat;
 } // writeMeasureBeat()
+
+/**
+ * Flattens a more dimensional array and keeps only unique values.
+ * Does not use concat to be useful for large arrays.
+ * @param {Array} inputArray 
+ * @returns {Array}
+ */
+export function flattenArrayToUniques(inputArray) {
+  let flatArray = [];
+  for ( let row of inputArray) for (let element of row) flatArray.push(element);
+  flatArray = flatArray.filter((value, index, self) => {return index == self.indexOf(value)});
+
+  return flatArray;
+}

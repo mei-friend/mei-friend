@@ -100,6 +100,42 @@ export function retrieveListItem(itemId) {
 }
 
 /**
+ * Retrieves items containing a given property from itemList
+ * @param {string} property
+ * @returns {Array} filtered list items
+ */
+export function retrieveItemsByProperty(property) {
+  let filteredList = listItems.filter((item) => property in item === true);
+
+  return filteredList;
+}
+
+/**
+ * Retrieves the values of a given property from a filtered set on
+ * @param {string} filterProperty property to filter
+ * @param {string} selectedProperty property to retrieve values
+ * @returns {Array} array of values
+ */
+export function retrieveItemValuesByProperty(filterProperty = null, selectedProperty) {
+  let filteredList = [];
+  if (filterProperty !== null) {
+    filteredList = retrieveItemsByProperty(filterProperty);
+  } else {
+    filteredList = listItems;
+  }
+
+  let arrayOfValues = [];
+
+  filteredList.forEach((item) => {
+    if (selectedProperty in item === true) {
+      arrayOfValues.push(item[selectedProperty]);
+    }
+  });
+
+  return arrayOfValues;
+}
+
+/**
  *  Finds page numbers in rendering for every list item
  */
 function situateListItems() {
