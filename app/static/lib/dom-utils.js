@@ -302,14 +302,14 @@ export function countAsBreak(el, sourceId = '') {
  * It tries to detect adjacent siblings of the initial element
  * which ids are listed in the idArray.
  * It returns an array of adjacent ids.
- * 
- * @param {Element} xmlNode initial xml element to check 
+ *
+ * @param {Element} xmlNode initial xml element to check
  * @param {Array} idArray array of possible target elements
  */
 export function getAdjacentSiblingElements(xmlNode, idArray) {
   let adjacentElIds = [];
   let directions = ['previous', 'next'];
-  
+
   let id = xmlNode.getAttribute('xml:id');
   adjacentElIds.push(id);
   idArray.splice(id, 1);
@@ -324,11 +324,9 @@ export function getAdjacentSiblingElements(xmlNode, idArray) {
         adjacentElIds.push(currentNodeId);
         idArray.splice(idArray.indexOf(currentNodeId), 1);
         node = eval('node.' + dir + 'ElementSibling');
-      }
-      else {
+      } else {
         break;
       }
-
     }
   });
 

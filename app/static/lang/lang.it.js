@@ -193,9 +193,6 @@ export const lang = {
   addDiminuendoHairpinText: { text: 'Diminuendo' },
   addBeamText: { text: 'Raggruppa note' },
   addBeamSpanText: { text: 'Raggruppa note su più battute' },
-  addSuppliedText: { text: 'Aggiungi simbolo mancante' },
-  addSuppliedArticText: { text: 'Aggiungi simbolo mancante (Artic)' },
-  addSuppliedAccidText: { text: 'Aggiungi simbolo mancante (Accid)' },
   addArpeggioText: { text: 'Arpeggio' },
   addFermataText: { text: 'Fermata' },
   addGlissandoText: { text: 'Glissato' },
@@ -442,6 +439,7 @@ export const lang = {
   // annotation panel / annotation panel
   annotationCloseButtonText: { text: 'Chiudi la finestra di annotazione' },
   hideAnnotationPanelButton: { description: 'Nascondi la finestra di annotazione' },
+  markupToolsButton: { description: 'Strumenti di marcatura' },
   closeAnnotationPanelButton: { description: 'Chiudi la finestra di annotazione' },
   annotationToolsButton: { text: 'Strumenti', description: 'Strumenti di annotazione' },
   annotationListButton: { text: 'Lista', description: 'Elenco delle annotazioni' },
@@ -489,6 +487,39 @@ export const lang = {
     text1: "Impossibile scrivere l'annotazione perché il punto di ancoraggio MEI non ha un xml:id.",
     text2: 'Assegna un identificativo selezionando "Manipola" -> "Rendi il MEI di nuovo con id" e riprova.',
   },
+  // MENU DI MARCATURA
+  addSuppliedText: { text: '<supplied>' },
+  addSupplied: { text: 'Elementi selezionati' },
+  addSuppliedArtic: { text: 'Articolazione' },
+  addSuppliedAccid: { text: 'Accidentale' },
+  addUnclearText: { text: '<unclear>' },
+  addUnclear: { text: 'Elementi selezionati' },
+  addUnclearArtic: { text: 'Articolazione' },
+  addUnclearAccid: { text: 'Accidentale' },
+  addSicText: { text: '<sic>' },
+  addSic: { text: 'Elementi selezionati' },
+  addSicArtic: { text: 'Articolazione' },
+  addSicAccid: { text: 'Accidentale' },
+  addCorrText: { text: '<corr>' },
+  addCorr: { text: 'Elementi selezionati' },
+  addCorrArtic: { text: 'Articolazione' },
+  addCorrAccid: { text: 'Accidentale' },
+  addOrigText: { text: '<orig>' },
+  addOrig: { text: 'Elementi selezionati' },
+  addOrigArtic: { text: 'Articolazione' },
+  addOrigAccid: { text: 'Accidentale' },
+  addRegText: { text: '<reg>' },
+  addReg: { text: 'Elementi selezionati' },
+  addRegArtic: { text: 'Articolazione' },
+  addRegAccid: { text: 'Accidentale' },
+  addAddText: { text: '<add>' },
+  addAdd: { text: 'Elementi selezionati' },
+  addAddArtic: { text: 'Articolazione' },
+  addAddAccid: { text: 'Accidentale' },
+  addDelText: { text: '<del>' },
+  addDel: { text: 'Elementi selezionati' },
+  addDelArtic: { text: 'Articolazione' },
+  addDelAccid: { text: 'Accidentale' },
 
   // MIDI
   midiSpeedmodeIndicator: {
@@ -794,50 +825,50 @@ export const lang = {
   },
 
   // Supplied element // Elemento fornito
-titleSupplied: {
-  text: 'Gestisci contenuto editoriale',
-  description: 'Controllo della gestione del markup editoriale',
-},
-respSelect: {
-  text: 'Seleziona responsabilità di markup',
-  description: 'Seleziona ID di responsabilità',
-},
-showMarkup: {
-  text: 'Mostra elementi di markup editoriale',
-  description: 'Evidenzia tutti gli elementi contenuti dagli elementi di markup editoriale',
-},
-suppliedColor: {
-  text: 'Seleziona colore di evidenziazione per <supplied>',
-  description: 'Seleziona colore di evidenziazione per <supplied>',
-},
-unclearColor: {
-  title: 'Seleziona colore di evidenziazione per <unclear>',
-  description: 'Seleziona colore di evidenziazione per <unclear>',
-},
-sicColor: {
-  title: 'Seleziona colore di evidenziazione per <sic>',
-  description: 'Seleziona colore di evidenziazione per <sic>',
-},
-corrColor: {
-  title: 'Seleziona colore di evidenziazione per <corr>',
-  description: 'Seleziona colore di evidenziazione per <corr>',
-},
-origColor: {
-  title: 'Seleziona colore di evidenziazione per <orig>',
-  description: 'Seleziona colore di evidenziazione per <orig>',
-},
-regColor: {
-  title: 'Seleziona colore di evidenziazione per <reg>',
-  description: 'Seleziona colore di evidenziazione per <reg>',
-},
-addColor: {
-  title: 'Seleziona colore di evidenziazione per <add>',
-  description: 'Seleziona colore di evidenziazione per <add>',
-},
-delColor: {
-  title: 'Seleziona colore di evidenziazione per <del>',
-  description: 'Seleziona colore di evidenziazione per <del>',
-},
+  titleSupplied: {
+    text: 'Gestisci contenuto editoriale',
+    description: 'Controllo della gestione del markup editoriale',
+  },
+  respSelect: {
+    text: 'Seleziona responsabilità di markup',
+    description: 'Seleziona ID di responsabilità',
+  },
+  showMarkup: {
+    text: 'Mostra elementi di markup editoriale',
+    description: 'Evidenzia tutti gli elementi contenuti dagli elementi di markup editoriale',
+  },
+  suppliedColor: {
+    text: 'Seleziona colore di evidenziazione per <supplied>',
+    description: 'Seleziona colore di evidenziazione per <supplied>',
+  },
+  unclearColor: {
+    title: 'Seleziona colore di evidenziazione per <unclear>',
+    description: 'Seleziona colore di evidenziazione per <unclear>',
+  },
+  sicColor: {
+    title: 'Seleziona colore di evidenziazione per <sic>',
+    description: 'Seleziona colore di evidenziazione per <sic>',
+  },
+  corrColor: {
+    title: 'Seleziona colore di evidenziazione per <corr>',
+    description: 'Seleziona colore di evidenziazione per <corr>',
+  },
+  origColor: {
+    title: 'Seleziona colore di evidenziazione per <orig>',
+    description: 'Seleziona colore di evidenziazione per <orig>',
+  },
+  regColor: {
+    title: 'Seleziona colore di evidenziazione per <reg>',
+    description: 'Seleziona colore di evidenziazione per <reg>',
+  },
+  addColor: {
+    title: 'Seleziona colore di evidenziazione per <add>',
+    description: 'Seleziona colore di evidenziazione per <add>',
+  },
+  delColor: {
+    title: 'Seleziona colore di evidenziazione per <del>',
+    description: 'Seleziona colore di evidenziazione per <del>',
+  },
 
   // EDITOR SETTINGS / CODEMIRROR SETTINGS
   editorSettingsHeader: {

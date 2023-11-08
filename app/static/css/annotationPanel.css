@@ -1,13 +1,15 @@
-#annotationToolsMenu {
-  display: flex;
+.enrichmentToolsMenu {
+  display: inline-grid;
   padding-left: 0px;
+  align-items: start;
+  justify-items: stretch;
 }
 
-#annotationToolsMenu div {
+.enrichmentToolsMenu div {
   padding: 8px;
 }
 
-#annotationToolsMenu li {
+.enrichmentToolsMenu li {
   display: flex;
   list-style: none;
   padding: 10px;
@@ -70,6 +72,34 @@ fieldset {
   cursor: pointer;
 }
 
+.markup-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.markup-dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: var(--annotationPanelLinkBackgroundColor);
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+.markup-dropdown-content a {
+  color: var(--annotationPanelTextColor);
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.markup-dropdown-content a:hover {background-color: var(--annotationPanelHoverColor)}
+
+.markup-dropdown:hover .markup-dropdown-content {
+  display: block;
+}
+
+
 #renderedAnnotationsContainer {
   position: absolute;
   z-index: 10;
@@ -84,7 +114,7 @@ fieldset {
 }
 
 #listAnnotations { 
-  display:flex !important;
+  display:flex /*!important*/;
 }
 
 #listAnnotations details {

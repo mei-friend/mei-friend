@@ -194,9 +194,6 @@ export const lang = {
   addDiminuendoHairpinText: { text: 'Diminuendo' },
   addBeamText: { text: 'Lligat' },
   addBeamSpanText: { text: 'Amplada del lligat' },
-  addSuppliedText: { text: 'Afegit' },
-  addSuppliedArticText: { text: 'Afegit (articulació)' },
-  addSuppliedAccidText: { text: 'Afegit (accidentals)' },
   addArpeggioText: { text: 'Arpegi' },
   addFermataText: { text: 'Fermata' },
   addGlissandoText: { text: 'Glissando' },
@@ -442,8 +439,9 @@ export const lang = {
   annotationCloseButtonText: { text: "Tanca el panell d'annotacions" },
   hideAnnotationPanelButton: { description: "Tanca el panell d'annotacions" },
   closeAnnotationPanelButton: { description: "Tanca el panell d'annotacions" },
-  annotationToolsButton: { text: 'Eines', description: "Eines d'annotació" },
-  annotationListButton: { text: 'Llista', description: "Llista d'anotacions" },
+  markupToolsButton: { description: 'Eines de marcatge' },
+  annotationToolsButton: { description: "Eines d'annotació" },
+  annotationListButton: { description: "Llista d'annotacions" },
   writeAnnotStandoffText: { text: 'Anotació web' },
   annotationToolsIdentifyTitle: { text: 'Identifica' },
   annotationToolsIdentifySpan: { text: 'Identifica objecte musical' },
@@ -488,6 +486,39 @@ export const lang = {
     text2:
       'Assigneu identificadors seleccionant "Manipula" -> "Torna a renderitzar MEI (amb ids)" i torneu-ho a intentar.',
   },
+  // MENÚ DE MARCATGE
+  addSuppliedText: { text: '<supplied>' },
+  addSupplied: { text: 'Elements seleccionats' },
+  addSuppliedArtic: { text: 'Articulació' },
+  addSuppliedAccid: { text: 'Accidental' },
+  addUnclearText: { text: '<unclear>' },
+  addUnclear: { text: 'Elements seleccionats' },
+  addUnclearArtic: { text: 'Articulació' },
+  addUnclearAccid: { text: 'Accidental' },
+  addSicText: { text: '<sic>' },
+  addSic: { text: 'Elements seleccionats' },
+  addSicArtic: { text: 'Articulació' },
+  addSicAccid: { text: 'Accidental' },
+  addCorrText: { text: '<corr>' },
+  addCorr: { text: 'Elements seleccionats' },
+  addCorrArtic: { text: 'Articulació' },
+  addCorrAccid: { text: 'Accidental' },
+  addOrigText: { text: '<orig>' },
+  addOrig: { text: 'Elements seleccionats' },
+  addOrigArtic: { text: 'Articulació' },
+  addOrigAccid: { text: 'Accidental' },
+  addRegText: { text: '<reg>' },
+  addReg: { text: 'Elements seleccionats' },
+  addRegArtic: { text: 'Articulació' },
+  addRegAccid: { text: 'Accidental' },
+  addAddText: { text: '<add>' },
+  addAdd: { text: 'Elements seleccionats' },
+  addAddArtic: { text: 'Articulació' },
+  addAddAccid: { text: 'Accidental' },
+  addDelText: { text: '<del>' },
+  addDel: { text: 'Elements seleccionats' },
+  addDelArtic: { text: 'Articulació' },
+  addDelAccid: { text: 'Accidental' },
 
   // MIDI
   midiSpeedmodeIndicator: {
@@ -789,50 +820,50 @@ export const lang = {
   },
 
   // Supplied element / Element subministrat
-titleSupplied: {
-  text: 'Gestionar el contingut editorial',
-  description: 'Controlar el tractament de la marca editorial',
-},
-respSelect: {
-  text: 'Seleccionar la responsabilitat de la marca',
-  description: 'Seleccionar l\'ID de la responsabilitat',
-},
-showMarkup: {
-  text: 'Mostrar elements de marca editorial',
-  description: 'Destacar tots els elements continguts per elements de marca editorial',
-},
-suppliedColor: {
-  text: 'Seleccionar el color d\'ús de <supplied>',
-  description: 'Seleccionar el color d\'ús de <supplied>',
-},
-unclearColor: {
-  title: 'Seleccionar el color d\'ús de <unclear>',
-  description: 'Seleccionar el color d\'ús de <unclear>',
-},
-sicColor: {
-  title: 'Seleccionar el color d\'ús de <sic>',
-  description: 'Seleccionar el color d\'ús de <sic>',
-},
-corrColor: {
-  title: 'Seleccionar el color d\'ús de <corr>',
-  description: 'Seleccionar el color d\'ús de <corr>',
-},
-origColor: {
-  title: 'Seleccionar el color d\'ús de <orig>',
-  description: 'Seleccionar el color d\'ús de <orig>',
-},
-regColor: {
-  title: 'Seleccionar el color d\'ús de <reg>',
-  description: 'Seleccionar el color d\'ús de <reg>',
-},
-addColor: {
-  title: 'Seleccionar el color d\'ús de <add>',
-  description: 'Seleccionar el color d\'ús de <add>',
-},
-delColor: {
-  title: 'Seleccionar el color d\'ús de <del>',
-  description: 'Seleccionar el color d\'ús de <del>',
-},
+  titleSupplied: {
+    text: 'Gestionar el contingut editorial',
+    description: 'Controlar el tractament de la marca editorial',
+  },
+  respSelect: {
+    text: 'Seleccionar la responsabilitat de la marca',
+    description: "Seleccionar l'ID de la responsabilitat",
+  },
+  showMarkup: {
+    text: 'Mostrar elements de marca editorial',
+    description: 'Destacar tots els elements continguts per elements de marca editorial',
+  },
+  suppliedColor: {
+    text: "Seleccionar el color d'ús de <supplied>",
+    description: "Seleccionar el color d'ús de <supplied>",
+  },
+  unclearColor: {
+    title: "Seleccionar el color d'ús de <unclear>",
+    description: "Seleccionar el color d'ús de <unclear>",
+  },
+  sicColor: {
+    title: "Seleccionar el color d'ús de <sic>",
+    description: "Seleccionar el color d'ús de <sic>",
+  },
+  corrColor: {
+    title: "Seleccionar el color d'ús de <corr>",
+    description: "Seleccionar el color d'ús de <corr>",
+  },
+  origColor: {
+    title: "Seleccionar el color d'ús de <orig>",
+    description: "Seleccionar el color d'ús de <orig>",
+  },
+  regColor: {
+    title: "Seleccionar el color d'ús de <reg>",
+    description: "Seleccionar el color d'ús de <reg>",
+  },
+  addColor: {
+    title: "Seleccionar el color d'ús de <add>",
+    description: "Seleccionar el color d'ús de <add>",
+  },
+  delColor: {
+    title: "Seleccionar el color d'ús de <del>",
+    description: "Seleccionar el color d'ús de <del>",
+  },
 
   //  EDITOR SETTINGS / CODEMIRROR SETTINGS // CONFIGURACIÓ DE L'EDITOR / CONFIGURACIÓ DE CODEMIRROR
   editorSettingsHeader: {

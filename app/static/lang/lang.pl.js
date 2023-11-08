@@ -193,9 +193,6 @@ export const lang = {
   addDiminuendoHairpinText: { text: 'Diminuendo' },
   addBeamText: { text: 'Belka' },
   addBeamSpanText: { text: 'Rozciągnięcie belki' },
-  addSuppliedText: { text: 'Uzupełnione' },
-  addSuppliedArticText: { text: 'Uzupełnione (Artic)' },
-  addSuppliedAccidText: { text: 'Uzupełnione (Accid)' },
   addArpeggioText: { text: 'Arpeggio' },
   addFermataText: { text: 'Fermata' },
   addGlissandoText: { text: 'Glissando' },
@@ -438,8 +435,9 @@ export const lang = {
   annotationCloseButtonText: { text: 'Zamknij panel adnotacji' },
   hideAnnotationPanelButton: { description: 'Zamknij panel adnotacji' },
   closeAnnotationPanelButton: { description: 'Zamknij panel adnotacji' },
-  annotationToolsButton: { text: 'Narzędzia', description: 'Narzędzia adnotacji' },
-  annotationListButton: { text: 'Lista', description: 'Lista adnotacji' },
+  markupToolsButton: { description: 'Narzędzia znaczników' },
+  annotationToolsButton: { description: 'Narzędzia adnotacji' },
+  annotationListButton: { description: 'Lista adnotacji' },
   writeAnnotStandoffText: { text: 'Adnotacja sieci Web' },
   annotationToolsIdentifyTitle: { text: 'Identyfikuj' },
   annotationToolsIdentifySpan: { text: 'Identyfikuj obiekt muzyczny' },
@@ -484,6 +482,39 @@ export const lang = {
     text2:
       'Proszę przypisać identyfikatory, wybierając "Manipulate" -> "Rerenderuj MEI (z identyfikatorami)" i spróbuj ponownie.',
   },
+  // MENU ZNACZNIKÓW
+  addSuppliedText: { text: '<supplied>' },
+  addSupplied: { text: 'Wybrane elementy' },
+  addSuppliedArtic: { text: 'Artykulacja' },
+  addSuppliedAccid: { text: 'Przypadkowe' },
+  addUnclearText: { text: '<unclear>' },
+  addUnclear: { text: 'Wybrane elementy' },
+  addUnclearArtic: { text: 'Artykulacja' },
+  addUnclearAccid: { text: 'Przypadkowe' },
+  addSicText: { text: '<sic>' },
+  addSic: { text: 'Wybrane elementy' },
+  addSicArtic: { text: 'Artykulacja' },
+  addSicAccid: { text: 'Przypadkowe' },
+  addCorrText: { text: '<corr>' },
+  addCorr: { text: 'Wybrane elementy' },
+  addCorrArtic: { text: 'Artykulacja' },
+  addCorrAccid: { text: 'Przypadkowe' },
+  addOrigText: { text: '<orig>' },
+  addOrig: { text: 'Wybrane elementy' },
+  addOrigArtic: { text: 'Artykulacja' },
+  addOrigAccid: { text: 'Przypadkowe' },
+  addRegText: { text: '<reg>' },
+  addReg: { text: 'Wybrane elementy' },
+  addRegArtic: { text: 'Artykulacja' },
+  addRegAccid: { text: 'Przypadkowe' },
+  addAddText: { text: '<add>' },
+  addAdd: { text: 'Wybrane elementy' },
+  addAddArtic: { text: 'Artykulacja' },
+  addAddAccid: { text: 'Przypadkowe' },
+  addDelText: { text: '<del>' },
+  addDel: { text: 'Wybrane elementy' },
+  addDelArtic: { text: 'Artykulacja' },
+  addDelAccid: { text: 'Przypadkowe' },
 
   // MIDI // MIDI
   midiSpeedmodeIndicator: {
@@ -784,50 +815,50 @@ export const lang = {
   },
 
   // Supplied element // Element dostarczony
-titleSupplied: {
-  text: 'Zarządzaj treścią redakcyjną',
-  description: 'Kontroluj obsługę znaczników redakcyjnych',
-},
-respSelect: {
-  text: 'Wybierz odpowiedzialność znacznika',
-  description: 'Wybierz identyfikator odpowiedzialności',
-},
-showMarkup: {
-  text: 'Pokaż elementy znacznika redakcyjnego',
-  description: 'Podświetl wszystkie elementy zawarte w elementach znacznika redakcyjnego',
-},
-suppliedColor: {
-  text: 'Wybierz kolor podświetlenia <supplied>',
-  description: 'Wybierz kolor podświetlenia <supplied>',
-},
-unclearColor: {
-  title: 'Wybierz kolor podświetlenia <unclear>',
-  description: 'Wybierz kolor podświetlenia <unclear>',
-},
-sicColor: {
-  title: 'Wybierz kolor podświetlenia <sic>',
-  description: 'Wybierz kolor podświetlenia <sic>',
-},
-corrColor: {
-  title: 'Wybierz kolor podświetlenia <corr>',
-  description: 'Wybierz kolor podświetlenia <corr>',
-},
-origColor: {
-  title: 'Wybierz kolor podświetlenia <orig>',
-  description: 'Wybierz kolor podświetlenia <orig>',
-},
-regColor: {
-  title: 'Wybierz kolor podświetlenia <reg>',
-  description: 'Wybierz kolor podświetlenia <reg>',
-},
-addColor: {
-  title: 'Wybierz kolor podświetlenia <add>',
-  description: 'Wybierz kolor podświetlenia <add>',
-},
-delColor: {
-  title: 'Wybierz kolor podświetlenia <del>',
-  description: 'Wybierz kolor podświetlenia <del>',
-},
+  titleSupplied: {
+    text: 'Zarządzaj treścią redakcyjną',
+    description: 'Kontroluj obsługę znaczników redakcyjnych',
+  },
+  respSelect: {
+    text: 'Wybierz odpowiedzialność znacznika',
+    description: 'Wybierz identyfikator odpowiedzialności',
+  },
+  showMarkup: {
+    text: 'Pokaż elementy znacznika redakcyjnego',
+    description: 'Podświetl wszystkie elementy zawarte w elementach znacznika redakcyjnego',
+  },
+  suppliedColor: {
+    text: 'Wybierz kolor podświetlenia <supplied>',
+    description: 'Wybierz kolor podświetlenia <supplied>',
+  },
+  unclearColor: {
+    title: 'Wybierz kolor podświetlenia <unclear>',
+    description: 'Wybierz kolor podświetlenia <unclear>',
+  },
+  sicColor: {
+    title: 'Wybierz kolor podświetlenia <sic>',
+    description: 'Wybierz kolor podświetlenia <sic>',
+  },
+  corrColor: {
+    title: 'Wybierz kolor podświetlenia <corr>',
+    description: 'Wybierz kolor podświetlenia <corr>',
+  },
+  origColor: {
+    title: 'Wybierz kolor podświetlenia <orig>',
+    description: 'Wybierz kolor podświetlenia <orig>',
+  },
+  regColor: {
+    title: 'Wybierz kolor podświetlenia <reg>',
+    description: 'Wybierz kolor podświetlenia <reg>',
+  },
+  addColor: {
+    title: 'Wybierz kolor podświetlenia <add>',
+    description: 'Wybierz kolor podświetlenia <add>',
+  },
+  delColor: {
+    title: 'Wybierz kolor podświetlenia <del>',
+    description: 'Wybierz kolor podświetlenia <del>',
+  },
 
   // EDITOR SETTINGS / CODEMIRROR SETTINGS
   editorSettingsHeader: {
