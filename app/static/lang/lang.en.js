@@ -6,6 +6,86 @@ import * as att from '../lib/attribute-classes.js';
 import { heart } from '../css/icons.js';
 
 export const lang = {
+  // Splash screen
+  aboutMeiFriend: { text: 'About mei-friend ' },
+  showSplashScreen: {
+    text: 'Show splash screen on load',
+    description: 'Show the mei-friend splash screen when the application is loaded',
+  },
+  splashBody: {
+    html: `
+      <p>
+        mei-friend is an editor for <a href="https://music-encoding.org">music encodings</a>, hosted at the
+        <a href="https://mdw.ac.at" target="_blank">mdw &ndash; University of Music and Performing Arts Vienna</a>. 
+        Please consult our <a href="https://mei-friend.github.io" target="_blank">extensive documentation</a> for 
+        further information.
+      </p>
+      <p>
+        Though mei-friend is a browser-based application, your personal data (including the encoding you
+        are editing, your application settings, and current login details if any) are stored in your browser's
+        <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank"
+          >local storage</a
+        > and are not transmitted to or stored on our servers.
+      </p>
+      <p>
+        Data is transmitted to GitHub only when you explicitly request it (e.g., when you log in to GitHub, load
+        your encoding from or commit to a GitHub repository, or when you request a GitHub Action workflow to be
+        run for you). Similarly, data is transmitted to your chosen Solid provider only when you explicitly
+        request it (e.g., when you log in to Solid, or load or save stand-off annotations).
+      </p>
+      <p>
+        We use <a href="https://matomo.org/" target="_blank">Matomo</a>
+        to collect anonymous usage statistics. These include your truncated IP address (permitting geolocation on
+        the country level but no further identification), your browser and operating system, where you arrived
+        from (i.e., the referring website), the time and duration of your visit, and the pages you visited. This
+        information is stored on the Matomo instance running on servers of the mdw &ndash; University of Music and
+        Performing Arts Vienna, and is not shared with any third party.
+      </p>
+      <p>
+        The Verovio toolkit is loaded from <a href="https://verovio.org" target="_blank">https://verovio.org</a>, hosted by
+        <a href="https://rism.digital/" target="_blank">RISM Digital Switzerland</a>. 
+        This allows mei-friend to stay up-to-date with the latest toolkit version and
+        to provide the choice of all supported versions through the settings panel. 
+        When using mei-friend, your IP address is therefore visible by RISM Digital.
+      </p>
+      <p>
+        Finally, MIDI playback is presented using the SGM_plus sound font provided by Google Magenta, and served
+        via googleapis.com. Your IP address is therefore visible to Google when initiating MIDI playback. If you 
+        do not wish for this to happen, please refrain from using the MIDI playback feature.
+      </p>
+      <p>
+        mei-friend is developed by
+        <a href="https://iwk.mdw.ac.at/werner-goebl" target="_blank">Werner Goebl</a> and
+        <a href="https://iwk.mdw.ac.at/david-weigl" target="_blank">David M. Weigl</a> at the Department of Music
+        Acoustics &ndash; Wiener Klangstil at the mdw &ndash; University of Music and Performing Arts Vienna, and
+        is licensed under the
+        <a href="https://spdx.org/licenses/AGPL-3.0-or-later.html" target="_blank"
+          >GNU Affero General Public License v3.0</a
+        >. Please consult our
+        <a href="https://mei-friend.github.io/about/" target="_blank">acknowledgements page</a> for further
+        information about contributors and the open-source components reused within our project. We thank our
+        colleagues for their contributions and guidance.
+      </p>
+      <p>
+        Development of the mei-friend Web application is funded by the
+        <a href="https://fwf.ac.at" target="_blank">Austrian Science Fund (FWF)</a> under projects
+        <a href="https://iwk.mdw.ac.at/signature-sound-vienna/" target="_blank"
+          >P 34664-G (Signature Sound Vienna)</a
+        >
+        and <a href="https://e-laute.info">I 6019 (E-LAUTE)</a>.
+      </p>`,
+  },
+  splashGotItButtonText: { text: 'Got it!' },
+  splashVersionText: { text: 'Version' },
+  splashAlwaysShow: {
+    text: 'Always show this splash screen',
+    description: 'Always show this splash screen on application load',
+  },
+  splashAlwaysShowLabel: {
+    text: 'Always show this splash screen',
+    description: 'Always show this splash screen on application load',
+  },
+
   // Main menu bar
   githubLoginLink: { text: 'Login' },
 
@@ -36,6 +116,7 @@ export const lang = {
   importHumdrum: { text: 'Import Humdrum' },
   importPae: { text: 'Import PAE, ABC' },
   saveMeiText: { text: 'Save MEI' },
+  saveMeiBasicText: { text: 'Save as MEI Basic' },
   saveSvg: { text: 'Save SVG' },
   saveMidi: { text: 'Save MIDI' },
   printPreviewText: { text: 'Preview PDF' },
@@ -142,7 +223,7 @@ export const lang = {
 
   // HELP MENU ITEM
   helpMenuTitle: { text: 'Help' },
-  goToHelpPage: { text: 'mei-friend help pages' },
+  goToHelpPageText: { text: 'mei-friend help pages' },
   goToCheatSheet: { text: 'mei-friend cheat sheet' },
   showChangelog: { text: 'mei-friend changelog' },
   goToGuidelines: { text: 'MEI Guidelines' },
@@ -865,7 +946,7 @@ export const lang = {
   isSafariWarning: {
     text:
       'It seems that you are using Safari as your browser, on which ' +
-      'mei-friend unfortunately does not currently support schema validation. ' +
+      'mei-friend unfortunately does not support schema validation. ' +
       'Please use another browser for full validation support.',
   },
   githubLoggedOutWarning: {
@@ -955,4 +1036,9 @@ export const lang = {
   codeCheckerHasExtra: { text: 'has extra' }, // has superfluous
   codeCheckerLacksAn: { text: 'lacks an' },
   codeCheckerBecauseAlreadyDefined: { text: 'because it has been defined earlier in the measure' },
+
+  // Warning for missing ids
+  missingIdsWarningAlert: {
+    text: 'mei-friend is unable to scroll to the selected elements in the encoding. Please add ids to the encoding.',
+  },
 };

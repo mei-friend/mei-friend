@@ -6,6 +6,87 @@ import * as att from '../lib/attribute-classes.js';
 import { heart } from '../css/icons.js';
 
 export const lang = {
+  // Splash screen
+  aboutMeiFriend: { text: 'Über mei-friend' },
+  showSplashScreen: {
+    text: 'Splash-Screen beim Laden anzeigen',
+    description: 'Beim laden von mei-friend den Splash-Screen anzeigen',
+  },
+  splashBody: {
+    html: `
+    <p>
+      mei-friend ist ein Online-Editor für <a href="https://music-encoding.org">Musik-Kodierungen</a>, gehostet an der
+      <a href="https://mdw.ac.at" target="_blank">mdw &ndash; Universität für Musik und darstellende Kunst Wien</a>. 
+      Bitte besuchen Sie für weitere Informationen unsere
+      <a href="https://mei-friend.github.io" target="_blank">umfangreiche Dokumentationswebseite</a>.
+    </p>
+    <p>
+      Obwohl mei-friend eine browserbasierte Anwendung ist, werden Ihre Daten einschließlich der 
+      von Ihnen bearbeiteten Kodierungen, Ihrer Anwendungseinstellungen und Ihrer aktuellen Anmeldeinformationen bei 
+      GitHub oder Solid, falls vorhanden, im 
+      <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank">lokalen Speicher 
+        Ihres Browsers gespeichert</a>, niemals jedoch auf unseren Servern.
+    </p>
+    <p>
+      Daten werden nur dann an GitHub übertragen, wenn Sie dies ausdrücklich anfordern (z.B. wenn Sie sich bei GitHub 
+      anmelden, Ihre Kodierung aus einem GitHub-Repository laden oder an ein GitHub-Repository übertragen oder wenn 
+      Sie eine GitHub-Action-Workflow für sich ausführen lassen). Ebenso werden Daten nur dann an Ihren ausgewählten 
+      Solid-Anbieter übertragen, wenn Sie dies ausdrücklich anfordern (z.B. wenn Sie sich bei Solid anmelden oder 
+      Stand-off-Annotationen laden oder speichern).
+    </p>
+    <p>
+      Wir verwenden <a href="https://matomo.org/" target="_blank">Matomo</a> zur Erfassung anonymer Nutzungsstatistiken. 
+      Dazu gehören Ihre gekürzte IP-Adresse, die Geolokalisierung auf Länderebene, aber keine weitere Identifizierung 
+      ermöglicht, Ihr Browser und Ihr Betriebssystem, die verweisende Website, 
+      die Uhrzeit und Dauer Ihres Besuchs und die von Ihnen besuchten Seiten. Diese Informationen werden auf der 
+      Matomo-Instanz gespeichert, die auf den Servern der mdw &ndash; Universität für Musik und darstellende Kunst 
+      Wien läuft, und werden nicht an Dritte weitergegeben.
+    </p>
+    <p>
+      Das Verovio-Toolkit wird von <a href="https://verovio.org" target="_blank">https://verovio.org</a> geladen 
+      und von  <a href="https://rism.digital/" target="_blank">RISM Digital Switzerland</a> gehostet. 
+      Dadurch bleibt mei-friend immer auf dem neuesten Stand mit der aktuellen Toolkit-Version 
+      und bietet die Auswahl aller unterstützten Versionen über das Settingsfenster. 
+      Bei der Verwendung von mei-friend ist daher Ihre IP-Adresse für RISM Digital sichtbar.
+    </p>
+    <p>
+      Schließlich wird die MIDI-Wiedergabe mit dem SGM_plus-Soundfont von Google Magenta abgespielt 
+      der über googleapis.com bereitgestellt wird. Ihre IP-Adresse wird beim Aktivieren der MIDI-Wiedergabefunktion 
+      daher für Google sichtbar. Wenn Sie dies nicht wünschen, verzichten Sie bitte auf die Verwendung der 
+      MIDI-Wiedergabefunktion.
+    </p>
+    <p>
+      mei-friend wurde entwickelt von
+      <a href="https://iwk.mdw.ac.at/werner-goebl" target="_blank">Werner Goebl</a> und
+      <a href="https://iwk.mdw.ac.at/david-weigl" target="_blank">David M. Weigl</a> am Institut für musikalische Akustik &ndash; 
+      Wiener Klangstil an der mdw &ndash; Universität für Musik und darstellende Kunst Wien und steht unter der
+      <a href="https://spdx.org/licenses/AGPL-3.0-or-later.html" target="_blank"
+        >GNU Affero General Public License v3.0</a
+      >. Bitte konsultieren Sie unsere
+      <a href="https://mei-friend.github.io/about/" target="_blank">Seite mit Danksagungen</a> für weitere
+      Informationen zu Mitwirkenden und den im Rahmen unseres Projekts wiederverwendeten Open-Source-Komponenten. 
+      Wir danken all unseren Kolleg:innen für ihre Beiträge und Unterstützung.
+    </p>
+    <p>
+      Die Entwicklung der mei-friend-Webanwendung wird finanziert von der
+      <a href="https://fwf.ac.at" target="_blank">Österreichischen Wissenschaftsfonds (FWF)</a> im Rahmen der Projekte
+      <a href="https://iwk.mdw.ac.at/signature-sound-vienna/" target="_blank"
+        >P 34664-G (Signature Sound Vienna)</a
+      >
+      und <a href="https://e-laute.info">I 6019 (E-LAUTE)</a>.
+    </p>`,
+  },
+  splashGotItButtonText: { text: 'Verstanden!' },
+  splashVersionText: { text: 'Version' },
+  splashAlwaysShow: {
+    text: 'Diese Meldung immer anzeigen',
+    description: 'Beim Öffnen von mei-friend diese Meldung anzeigen',
+  },
+  splashAlwaysShowLabel: {
+    text: 'Diese Meldung immer anzeigen',
+    description: 'Beim Öffnen von mei-friend diese Meldung anzeigen',
+  },
+
   // Main menu bar
   githubLoginLink: { text: 'Anmelden' },
 
@@ -33,6 +114,7 @@ export const lang = {
   importHumdrum: { text: 'Humdrum importieren' },
   importPae: { text: 'PAE, ABC importieren' },
   saveMeiText: { text: 'MEI speichern' },
+  saveMeiBasicText: { text: 'Als MEI Basic speichern' },
   saveSvg: { text: 'SVG speichern' },
   saveMidi: { text: 'MIDI speichern' },
   printPreviewText: { text: 'PDF-Vorschau' },
@@ -139,7 +221,7 @@ export const lang = {
 
   // HELP MENU ITEM
   helpMenuTitle: { text: 'Hilfe' },
-  goToHelpPage: { text: 'mei-friend Hilfeseiten' },
+  goToHelpPageText: { text: 'mei-friend Hilfeseiten' },
   goToCheatSheet: { text: 'mei-friend Spickzettel' },
   showChangelog: { text: 'mei-friend Änderungsliste (changelog)' },
   goToGuidelines: { text: 'MEI Guidelines' },
@@ -279,7 +361,7 @@ export const lang = {
   // GitHub actions modal
   githubActionsHeadingText: { text: 'GitHub-Action-Workflow anfordern:' },
   githubActionsDescription: {
-    text: 'Klicken Sie auf "Workflow ausführen", um die GitHub-API aufzufordern, den oben genannten Workflow anhand der unten angegebenen Eingabekonfiguration für Sie auszuführen. Ihre Codierung wird nach Abschluss des Workflow-Laufs in ihrer neuesten Version neu geladen. ',
+    text: 'Klicken Sie auf "Workflow ausführen", um die GitHub-API aufzufordern, den oben genannten Workflow anhand der unten angegebenen Eingabekonfiguration für Sie auszuführen. Ihre Kodierung wird nach Abschluss des Workflow-Laufs in ihrer neuesten Version neu geladen. ',
   },
   githubActionStatusMsgPrompt: { text: 'Workflow konnte nicht ausgeführt werden - GitHub meldet' },
   githubActionStatusMsgWaiting: { text: 'Bitte haben Sie Geduld, während GitHub Ihren Workflow verarbeitet...' },
@@ -442,7 +524,7 @@ export const lang = {
     text: 'Speed mode',
     description:
       'Der Speed Mode ist aktiv, es werden nur die MIDI-Daten der aktuellen Seite abgespielt. ' +
-      'Um die gesamte Codierung abzuspielen, bitte Speed Mode deaktivieren.',
+      'Um die gesamte Kodierung abzuspielen, bitte Speed Mode deaktivieren.',
   },
   closeMidiPlaybackControlBarButton: { description: 'MIDI-Wiedergabe-Steuerleiste ausblenden' },
 
@@ -544,8 +626,8 @@ export const lang = {
     description: 'Steuerung anzeigen zur automatischen Notationsaktualisierung',
   },
   controlMenuFontSelector: {
-    text: 'Auswahl der Notationsschrift',
-    description: 'Auswahl der Notationsschrift (SMuFL font) in der Notationskontrollleiste anzeigen',
+    text: 'Auswahl der Notationsschriftart',
+    description: 'Auswahl der Notationsschriftart (SMuFL font) in der Notationskontrollleiste anzeigen',
   },
   controlMenuNavigateArrows: {
     text: 'Navigationspfeile anzeigen',
@@ -561,9 +643,9 @@ export const lang = {
     description: 'Einstellungen für MIDI-Wiedergabe',
   },
   showMidiPlaybackContextualBubble: {
-    text: 'Wiedergabeblase anzeigen',
+    text: 'MIDI-Icon anzeigen',
     description:
-      'Ein kleines Wiedergabe-Icon (kleine Blase in der Ecke links unten) ' +
+      'Ein kleines Lautsprecher-Icon in der Ecke links unten ' +
       'wird angezeigt; durck Mausklick (oder Leertaste) wird die ' +
       'MIDI-Wiedergabeleiste angezeigt und MIDI-die Wiedergabe gestartet.',
   },
@@ -877,7 +959,7 @@ export const lang = {
     text:
       'Es scheint, dass Sie Safari als Browser verwenden, auf dem derzeit leider ' +
       'keine Schema-Validierung durch mei-friend unterstützt wird. Bitte verwenden ' +
-      'Sie einen anderen Browser für volle Validierungsunterstützung.',
+      'Sie einen anderen Browser, um den vollen Leistungsumfang zu erhalten.',
   },
   githubLoggedOutWarning: {
     text: `Sie haben sich bei mei-friend von Github abgemeldet, aber Ihr Browser ist noch bei GitHub angemeldet!
@@ -950,7 +1032,7 @@ export const lang = {
   codeCheckerFixAll: { text: 'Alle korrigieren' },
   codeCheckerIgnore: { text: 'Ignorieren' },
   codeCheckerIgnoreAll: { text: 'Alle ignorieren' },
-  codeCheckerCheckingCode: { text: 'Überprüfe Codierung...' },
+  codeCheckerCheckingCode: { text: 'Überprüfe Kodierung...' },
   codeCheckerNoAccidMessagesFound: { text: 'Alle accid.ges-Attribute sind korrekt.' },
   codeCheckerMeasure: { text: 'Takt' },
   codeCheckerNote: { text: 'Note' },
@@ -968,4 +1050,9 @@ export const lang = {
   codeCheckerHasExtra: { text: 'hat extra' }, // has superfluous
   codeCheckerLacksAn: { text: 'vermisst einen' },
   codeCheckerBecauseAlreadyDefined: { text: 'weil es im gleichen Takt bereits definiert wurde' },
+
+  // Warning for missing ids
+  missingIdsWarningAlert: {
+    text: 'mei-friend kann nicht zu den selektierten Elementen in der Enkodierung scrollen. Bitte xml:ids zur Kodierung hinzufügen.',
+  },
 };

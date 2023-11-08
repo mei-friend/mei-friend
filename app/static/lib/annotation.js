@@ -133,31 +133,33 @@ export function drawLink(a) {
 //#region functions to create annotations
 // called by addAnnotationHandlers() in the Tools tab of the Enrichment panel
 
-/**
- * Creates a standoff Identify annotation, based on Music Annotation Ontology.
- * @param {Event} e event
- */
-export const createIdentify = (e) => {
-  if (solid.getDefaultSession().info.isLoggedIn) {
-    const label = window.prompt('Add label for identified object (optional)');
-    const selection = v.selectedElements;
-    document.getElementById('solid_logo').classList.add('clockwise');
-    createMAOMusicalObject(selection, label)
-      .then((maoMusicalMaterial) => {
-        getSolidStorage().then((solidStorage) => {
-          console.log(
-            'CREATED MUSICAL MATERIAL: ',
-            solidStorage + maoMusicalMaterial.headers.get('location').substr(1),
-            maoMusicalMaterial
-          );
-          const a = {
-            id: solidStorage + maoMusicalMaterial.headers.get('location').substr(1),
-            type: 'annotateIdentify',
-            selection: selection,
-            isStandoff: true,
-          };
-          // add item and force refresh of annotations
-          addListItem(a, true);
+  // functions to create annotations
+  const createIdentify = (e) => {
+    if (solid.getDefaultSession().info.isLoggedIn) {
+      const label = window.prompt('Add label for identified object (optional)');
+      const selection = v.selectedElements;
+      document.getElementById('solid_logo').classList.add('clockwise');
+      createMAOMusicalObject(selection, label)
+        .then((maoMusicalMaterial) => {
+          getSolidStorage().then((solidStorage) => {
+            console.log(
+              'CREATED MUSICAL MATERIAL: ',
+              solidStorage + maoMusicalMaterial.headers.get('location').substr(1),
+              maoMusicalMaterial
+            );
+            const a = {
+              id: solidStorage + maoMusicalMaterial.headers.get('location').substr(1),
+              type: 'annotateIdentify',
+              selection: selection,
+              isStandoff: true,
+              standoffUri: solidStorage + maoMusicalMaterial.headers.get('location').substr(1)
+            };
+            annotations.push(a);
+            refreshAnnotations(true);
+          });
+        })
+        .finally(() => {
+          document.getElementById('solid_logo').classList.remove('clockwise');
         });
       })
       .finally(() => {

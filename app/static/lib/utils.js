@@ -6,7 +6,12 @@ const xmlIdString = /(?:xml:id=)(?:['"])(\S+?)(?:['"])/;
 const numberLikeString = /(?:n=)(?:['"])(\d+?)(?:['"])/;
 const closingTag = /(?:<[/])(\S+?)(?:[>])/;
 
-// returns the object named key of the JSON object obj
+/**
+ * JSON helper function: returns the object named key of the JSON object obj
+ * @param {*} key
+ * @param {*} obj
+ * @returns
+ */
 export function findKey(key, obj) {
   // console.info('findKey: ' + key + '. ', obj);
   if (typeof obj === 'object') {
@@ -22,7 +27,13 @@ export function findKey(key, obj) {
   }
 } // findKey()
 
-// checks whether note noteId is inside a chord. Returns false or the chord id.
+/**
+ * SVG search: checks whether note noteId is inside a chord.
+ * Returns false or the chord id.
+ * @param {string} noteId
+ * @param {string} what
+ * @returns {string|boolean}
+ */
 export function insideParent(noteId, what = 'chord') {
   if (noteId) {
     let note = document.querySelector('g#' + escapeXmlId(noteId));
@@ -33,11 +44,25 @@ export function insideParent(noteId, what = 'chord') {
   return false;
 } // insideParent()
 
-// finds all chords/notes inside an element and return array of id strings
+/**
+ * SVG search: finds all chords/notes inside an element
+ * and returns array of id strings
+ * @param {string} elId
+ * @returns {string}
+ */
 export function findNotes(elId) {
   let idArray = [];
   if (elId) {
-    let notes = document.querySelector('g#' + escapeXmlId(elId)).querySelectorAll('.note');
+    let notes = Array.from(document.querySelector('g#' + escapeXmlId(elId)).querySelectorAll('.note'));
+    // if no child notes, but a plist attribute such as in beamSpan, go through those elements
+    if (notes.length <= 0) {
+      let el = document.querySelector('[*|id="' + elId + '"]');
+      if (el && el.hasAttribute('data-plist')) {
+        el.getAttribute('data-plist')
+          .split(' #')
+          .map((e) => notes.push(document.querySelector('[*|id="' + rmHash(e) + '"]')));
+      }
+    }
     for (let note of notes) {
       let noteId = note.getAttribute('id');
       let chordId = insideParent(noteId);
@@ -51,8 +76,16 @@ export function findNotes(elId) {
   return idArray;
 } // findNotes()
 
-// look for elementname (e.g., 'staff') upwards in the xml file and return
-// attribute value (searchString defaults to the "@n" attribute).
+/**
+ * CodeMirror search: look for elementname (e.g., 'staff') upwards
+ * in the xml file and return attribute value (searchString defaults
+ * to the "@n" attribute).
+ * @param {CodeMirror} cm
+ * @param {number} row
+ * @param {string} elementName
+ * @param {RegExp} searchString
+ * @returns
+ */
 export function getElementAttributeAbove(
   cm,
   row,
@@ -69,8 +102,16 @@ export function getElementAttributeAbove(
   return [null, null];
 } // getElementAttributeAbove()
 
-// look for elementname (e.g., 'staff') downwards in the xml file and return
-// attribute value (searchString defaults to the "@n" attribute).
+/**
+ * CodeMirror search:  look for elementname (e.g., 'staff') downwards
+ * in the xml file and return attribute value (searchString defaults
+ * to the "@n" attribute).
+ * @param {CodeMirror} cm
+ * @param {number} row
+ * @param {string} elementName
+ * @param {RegExp} searchString
+ * @returns
+ */
 export function getElementAttributeBelow(
   cm,
   row,
@@ -87,7 +128,12 @@ export function getElementAttributeBelow(
   return [null, null];
 } // getElementAttributeBelow()
 
-// move encoding cursor to end of current measure
+/**
+ * CodeMirror operation: Move encoding cursor to end of current measure
+ * @param {CodeMirror} cm
+ * @param {CodeMirror.point} p
+ * @returns
+ */
 export function moveCursorToEndOfMeasure(cm, p = null) {
   const measureEnd = '</measure';
   if (!p) p = cm.getCursor();
@@ -106,11 +152,12 @@ export function moveCursorToEndOfMeasure(cm, p = null) {
 } // moveCursorToEndOfMeasure()
 
 /**
- * Searches position of id in encoding, puts cursor to the beginning
- * of the corresponding tag start, and scrolls view there.
+ * CodeMirror operation: Searches position of id in encoding,
+ * puts cursor to the beginning of the corresponding tag start,
+ * and scrolls view there.
  * @param {CodeMirror} cm
  * @param {string} id
- * @returns
+ * @returns {boolean} success in finding id
  */
 export function setCursorToId(cm, id) {
   if (id === '') return;
@@ -118,13 +165,22 @@ export function setCursorToId(cm, id) {
   if (c.findNext()) {
     cm.setCursor(c.from());
     goTagStart(cm);
+
     // scroll current cursor into view, vertically centering the view
     let enc = document.querySelector('.CodeMirror'); // retrieve size of CodeMirror panel
-    if (enc) cm.scrollIntoView(null, Math.round(enc.clientHeight / 2));
+    if (enc) {
+      cm.scrollIntoView(null, Math.round(enc.clientHeight / 2));
+    }
+    return true;
+  } else {
+    return false;
   }
 } // setCursorToId()
 
-// moves cursor of CodeMirror to start of tag
+/**
+ * CodeMirror operation: Moves cursor of CodeMirror to start of tag
+ * @param {CodeMirror} cm
+ */
 export function goTagStart(cm) {
   let tagStart = /<[\w]+?/;
   let p = cm.getCursor();
@@ -142,8 +198,15 @@ export function goTagStart(cm) {
   }
 } // goTagStart()
 
-// find attribute (@startid) of element with itemId in textEditor.getBuffer()
-// returns value of attribute ('note-00123') or null, if nothing found
+/**
+ * CodeMirror search: Find attribute (@startid) of element with itemId
+ * in textEditor.getBuffer() and return value of attribute ('note-00123')
+ * or null, if nothing found
+ * @param {CodeMirror} cm
+ * @param {string} itemId
+ * @param {string} attribute
+ * @returns {string|null}
+ */
 export function getAttributeById(cm, itemId, attribute = 'startid') {
   var searchRegExp = '<[\\w.-]+?\\s+?(?:xml:id="' + itemId + '")[^>]*?>';
   let c = cm.getSearchCursor(new RegExp(searchRegExp));
@@ -216,8 +279,12 @@ export function getIdOfNextElement(cm, rw, elementNames = dutils.navElsArray, di
   }
 } // getIdOfNextElement()
 
-// returns xml:id of current element (at encoding cursor position). If empty,
-// search for next higher staff or measure xml:id
+/**
+ * CodeMirror search: Returns xml:id of current element (at encoding cursor position).
+ * If empty, search for next higher staff or measure xml:id
+ * @param {CodeMirror} cm
+ * @returns
+ */
 export function getElementIdAtCursor(cm) {
   let tag;
   let cursor = cm.getCursor();
@@ -290,41 +357,6 @@ export function getElementIdAtCursor(cm) {
   }
   return null; // if no xml:id is found, return null
 } // getElementIdAtCursor()
-
-// returns range of element, starting at cursorPosition
-// this function assumes full xml tags (<measure>....</measure>)
-export function findElementBelow(textEditor, elementName = 'measure', point = [1, 1]) {
-  var textBuffer = textEditor.getBuffer();
-  let row1 = point.row;
-  let col1 = point.col;
-  let mxRows = textEditor.getLastBufferRow();
-  let found1 = false;
-  while ((line = textBuffer.lineForRow(row1++)) != '' && row1 < mxRows) {
-    console.info('findElement: line: ', line);
-    if ((col1 += line.slice(col1).indexOf('<' + elementName)) > 0) {
-      found1 = true;
-      break;
-    }
-    col1 = 0;
-  }
-  if (found1) console.info('findElement: found1: ' + row1 + ', ' + col1);
-  let found2 = false;
-  let row2 = row1;
-  let col2 = 0;
-  while ((line = textBuffer.lineForRow(row2++)) !== '' && row2 < mxRows) {
-    console.info('findElement: line: ', line);
-    if ((col2 = line.indexOf('</' + elementName)) > 0) {
-      col2 += line.slice(col2).indexOf('>') + 1;
-      found2 = true;
-      break;
-    }
-  }
-  if (found2) console.info('findElement: found2: ' + row2 + ', ' + col2);
-  // if (found2) textEditor.setCursorBufferPosition([row2, col2]);
-
-  if (found1 && found2) return [row1, col1, row2, col2];
-  else return null;
-} // findElementBelow()
 
 const base62Chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
