@@ -22,24 +22,23 @@ export const lang = {
       </p>
       <p>
         Tot i que mei-friend és una aplicació basada en el navegador, les teves dades personals (incloent la codificació que
-        estàs editant, la configuració de l'aplicació i els detalls actuals de l'inici de sessió, si n'hi ha) es
-        emmagatzemen al
+        estàs editant, la configuració de l'aplicació i els detalls actuals de l'inici de sessió, si n'hi ha) s'emmagatzemen a la
         <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank"
-          >magatzematge local</a
-        > del teu navegador i no es transmeten ni es emmagatzemen als nostres servidors.
+          >memòria local</a
+        > del teu navegador i no es transmeten ni s'emmagatzemen als nostres servidors.
       </p>
       <p>
         Les dades es transmeten a GitHub només quan ho demanes explícitament (per exemple, quan inicies la sessió a GitHub,
         carreguis la teva codificació des d'un repositori GitHub o quan demanis que s'executi un flux de treball GitHub
         Action). De manera similar, les dades es transmeten al teu proveïdor Solid escollit només quan ho demanes explícitament
-        (per exemple, quan inicies la sessió a Solid o carreguis o desis anotacions stand-off).
+        (per exemple, quan iniciïs la sessió a Solid o carreguis o desis anotacions stand-off).
       </p>
       <p>
         Fem servir <a href="https://matomo.org/" target="_blank">Matomo</a>
         per recopilar estadístiques d'ús anònimes. Aquestes inclouen la teva adreça IP truncada (que permet la geolocalització a
-        nivell de país però sense identificació addicional), el teu navegador i sistema operatiu, d'on vas arribar (és a dir, el
-        lloc web de referència), l'hora i durada de la teva visita i les pàgines que vas visitar. Aquesta informació es
-        emmagatzema a la instància de Matomo que s'executa als servidors de la Universitat de Música i Arts Escèniques de
+        nivell de país però sense identificació addicional), el teu navegador i sistema operatiu, des d'on has obert la pàgina (és a dir, el
+        lloc web de referència), l'hora i durada de la teva visita i les pàgines que hi has visitat. Aquesta informació s'emmagatzema 
+        a la instància de Matomo que s'executa als servidors de la Universitat de Música i Arts Escèniques de
         Viena i no es comparteix amb cap tercer.
       </p>
       <p>
@@ -62,12 +61,12 @@ export const lang = {
         <a href="https://spdx.org/licenses/AGPL-3.0-or-later.html" target="_blank"
           >Llicència Pública General Affero de GNU versió 3.0 (GNU AGPLv3)</a
         >. Consulta la nostra <a href="https://mei-friend.github.io/about/" target="_blank">pàgina d'agraïments</a> per a
-        obtenir més informació sobre els col·laboradors i els components de codi obert reutilitzats en el nostre projecte.
-        Agraim als nostres companys pel seu contribut i orientació.
+        obtenir més informació sobre les persones que hi han col·labort i els components de codi obert reutilitzats en el nostre projecte.
+        Agraim als nostres companys i companyes per la seva contribució i orientació.
       </p>
       <p>
-        El desenvolupament de l'aplicació web de mei-friend està finançat per la
-        <a href="https://fwf.ac.at" target="_blank">Fons d'Investigació d'Àustria (FWF)</a> en els projectes
+        El desenvolupament de l'aplicació web de mei-friend està finançat per 
+        <a href="https://fwf.ac.at" target="_blank">Austrian Science Fund (FWF)</a> en els projectes
         <a href="https://iwk.mdw.ac.at/signature-sound-vienna/" target="_blank"
           >P 34664-G (Signature Sound Vienna)</a
         >
@@ -75,7 +74,7 @@ export const lang = {
       </p>
     `,
   },
-  splashGotItButtonText: { text: 'Ho entès!' },
+  splashGotItButtonText: { text: 'Ho he entès!' },
   splashVersionText: { text: 'Versió' },
   splashAlwaysShow: {
     text: "Mostra sempre aquesta pantalla d'inici",
@@ -116,7 +115,7 @@ export const lang = {
   importHumdrum: { text: 'Importa Humdrum' },
   importPae: { text: 'Importa PAE, ABC' },
   saveMeiText: { text: 'Desa MEI' },
-  saveMeiBasicText: { text: 'Desa come MEI Basic' },
+  saveMeiBasicText: { text: 'Desa com a MEI Basic' },
   saveSvg: { text: 'Desa SVG' },
   saveMidi: { text: 'Desa MIDI' },
   printPreviewText: { text: 'Visualitza PDF' },
@@ -134,7 +133,7 @@ export const lang = {
   indentSelectionText: { text: 'Indentar selecció' },
   surroundWithTagsText: { text: 'Envoltar amb tags' },
   surroundWithLastTagText: { text: 'Envoltar amb ' },
-  jumpToLineText: { text: 'Salta a línia' },
+  jumpToLineText: { text: 'Salta a la línia' },
   toMatchingTagText: { text: 'Anar al tag coincident' },
   manualValidateText: { text: 'Valida' },
 
@@ -167,8 +166,8 @@ export const lang = {
   pitchOctaveDownText: { text: 'Disminueix 1 octava' },
   staffUpText: { text: 'Element 1 pauta amunt' },
   staffDownText: { text: 'Element 1 pauta avall' },
-  increaseDurText: { text: 'Augmenta duració' },
-  decreaseDurText: { text: 'Disminueix duració' },
+  increaseDurText: { text: 'Augmenta durada' },
+  decreaseDurText: { text: 'Disminueix durada' },
   cleanAccidText: { text: 'Verificar @accid.ges' },
   renumberMeasuresTestText: { text: 'Reenumera compassos (prova)' },
   renumberMeasuresExecText: { text: 'Reenumera compassos (execució)' },
@@ -186,25 +185,25 @@ export const lang = {
   addFlatText: { html: 'Bemoll &#9837;' },
   addDoubleFlatText: { html: 'Doble bemoll &#119083;' },
   addTempoText: { text: 'Tempo' },
-  addDirectiveText: { text: 'Directiva' },
+  addDirectiveText: { text: 'Anotació de sistema (directive)' },
   addDynamicsText: { text: 'Dinàmica' },
-  addSlurText: { text: 'Lligadura' },
-  addTieText: { text: 'Lligall' },
+  addSlurText: { text: 'Lligadura (slur)' },
+  addTieText: { text: 'Lligadura (tie)' },
   addCrescendoHairpinText: { text: 'Crescendo' },
   addDiminuendoHairpinText: { text: 'Diminuendo' },
-  addBeamText: { text: 'Lligat' },
-  addBeamSpanText: { text: 'Amplada del lligat' },
-  addSuppliedText: { text: 'Afegit' },
+  addBeamText: { text: 'Barra (unir pliques)' },
+  addBeamSpanText: { text: 'Amplada de la barra' },
+  addSuppliedText: { text: 'Afegit (supplied)' },
   addSuppliedArticText: { text: 'Afegit (articulació)' },
   addSuppliedAccidText: { text: 'Afegit (accidentals)' },
-  addArpeggioText: { text: 'Arpegi' },
+  addArpeggioText: { text: 'Arpeggio' },
   addFermataText: { text: 'Fermata' },
   addGlissandoText: { text: 'Glissando' },
-  addPedalDownText: { text: 'Pedal (abaix)' },
-  addPedalUpText: { text: 'Pedal (amunt)' },
+  addPedalDownText: { text: 'Pedal (accionar)' },
+  addPedalUpText: { text: 'Pedal (desaccionar)' },
   addTrillText: { text: 'Trinat' },
-  addTurnText: { text: 'Tornada' },
-  addTurnLowerText: { text: 'Baixa la volta' },
+  addTurnText: { text: 'Grupetto' },
+  addTurnLowerText: { text: 'Grupetto invertit' },
   addMordentText: { text: 'Mordent' },
   addMordentUpperText: { text: 'Mordent superior' },
   addOctave8AboveText: { text: 'Octava (8va per sobre)' },
@@ -313,10 +312,10 @@ export const lang = {
   selectPageRangeLabel: { text: 'Rang de pàgines:' },
   pdfPreviewSpeedModeWarning: {
     text:
-      'Només es renderitza la pàgina actual a PDF, perquè està activat el mode de velocitat. ' +
-      'Desmarqueu el mode de velocitat per seleccionar de totes les pàgines.',
+      'Només es renderitza la pàgina actual a PDF, perquè el mode de velocitat està activat. ' +
+      'Desmarqueu el mode de velocitat per seleccionar totes les pàgines.',
   },
-  pdfPreviewNormalModeTitle: { text: 'Seleccioneu el rang de pàgines que es vol desar en PDF.' },
+  pdfPreviewNormalModeTitle: { text: 'Seleccioneu el rang de pàgines que voleu desar com a PDF.' },
 
   // facsimile panel / panell de facsímil
   facsimileIcon: { description: 'Panell de facsímil' },
@@ -346,7 +345,7 @@ export const lang = {
   // public repertoire / repertori públic
   openUrlHeading: { text: 'Obre la codificació allotjada a la web per URL' },
   openUrlInstructions: {
-    text: "Si us plau, tria del repertori públic o introdueix l'URL d'una codificació de música allotjada a la web, a continuació. Nota: El servidor hosteig ha de suportar el compartiment de recursos en origen creuat (CORS).",
+    text: "Si us plau, tria del repertori públic o introdueix l'URL d'una codificació de música allotjada a la web, a continuació. Nota: El servidor ha de suportar el compartiment de recursos en origen creuat (CORS).",
   },
   publicRepertoireSummary: { text: 'Repertori públic' },
   sampleEncodingsComposerLabel: { text: 'Compositor:' },
