@@ -1509,7 +1509,7 @@ export let cmd = {
   pageModeOff: () => v.pageModeOff(),
   saveAsPdf: () => v.saveAsPdf(),
   generateUrl: () => generateUrlUI(),
-  toggleFocus: () => v.toggleFocusBetweenNotationAndEncoding(cm),
+  switchFocus: () => v.switchFocusBetweenNotationAndEncoding(cm),
   filterSettings: () => v.applySettingsFilter(),
   filterReset: () => {
     document.getElementById('filterSettings').value = '';
@@ -1785,7 +1785,7 @@ function addEventListeners(v, cm) {
   document.getElementById('facsimileBottom').addEventListener('click', cmd.facsimileBottom);
   document.getElementById('facsimileLeft').addEventListener('click', cmd.facsimileLeft);
   document.getElementById('facsimileRight').addEventListener('click', cmd.facsimileRight);
-
+  
   document.getElementById('filterSettings').addEventListener('input', cmd.filterSettings);
   document.getElementById('filterSettings').value = '';
   document.getElementById('filterReset').addEventListener('click', cmd.filterReset);

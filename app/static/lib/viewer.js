@@ -819,7 +819,7 @@ export default class Viewer {
    * Switch focus between notation panel and encoding panel
    * @param {CodeMirror} cm
    */
-  toggleFocusBetweenNotationAndEncoding(cm) {
+  switchFocusBetweenNotationAndEncoding(cm) {
     let notation = document.getElementById('notation');
     let encoding = document.getElementById('encoding');
     // console.log('Notation', notation);
@@ -836,7 +836,7 @@ export default class Viewer {
       notation.classList.add('panelFocus');
     }
     // console.log('New active element: ', document.activeElement);
-  } // toggleFocusBetweenNotationAndEncoding()
+  } // switchFocusBetweenNotationAndEncoding()
 
   showSettingsPanel() {
     let sp = document.getElementById('settingsPanel');
