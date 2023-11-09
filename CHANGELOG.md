@@ -1,4 +1,10 @@
 # mei-friend-online CHANGELOG.md
+### 1.0.5 (?) patch
+* Keyboard shortcut to duplicate a selected note or rest
+* Keyboard shortcut (`CTRL + SPACE`) to switch focus between notation and encoding panel
+* Keyboard shortcut (`.`) to add or remove `dots="1"` to notes, chords, etc.
+* Keyboard shortcut (`C`) to embed selected notes inside a chord element, and vice versa
+
 ### 1.0.4 patch
 * Tweak CSS select and translations (German)
 * Fix typo at forking via URL parameters
