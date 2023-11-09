@@ -1785,7 +1785,7 @@ function addEventListeners(v, cm) {
   document.getElementById('facsimileBottom').addEventListener('click', cmd.facsimileBottom);
   document.getElementById('facsimileLeft').addEventListener('click', cmd.facsimileLeft);
   document.getElementById('facsimileRight').addEventListener('click', cmd.facsimileRight);
-  
+
   document.getElementById('filterSettings').addEventListener('input', cmd.filterSettings);
   document.getElementById('filterSettings').value = '';
   document.getElementById('filterReset').addEventListener('click', cmd.filterReset);
@@ -1994,6 +1994,7 @@ function addEventListeners(v, cm) {
   document.getElementById('staffDown').addEventListener('click', cmd.moveElementStaffDown);
   document.getElementById('increaseDur').addEventListener('click', cmd.increaseDuration);
   document.getElementById('decreaseDur').addEventListener('click', cmd.decreaseDuration);
+  document.getElementById('toggleDots').addEventListener('click', cmd.toggleDots);
   // Manipulate encoding methods
   document.getElementById('cleanAccid').addEventListener('click', cmd.correctAccid);
   document.getElementById('renumberMeasuresTest').addEventListener('click', () => e.renumberMeasures(v, cm, false));
@@ -2004,11 +2005,12 @@ function addEventListeners(v, cm) {
   // add/remove ids
   document.getElementById('addIds').addEventListener('click', cmd.addIds);
   document.getElementById('removeIds').addEventListener('click', cmd.removeIds);
-  // ingest facsimile sekelton into currently loaded MEI file
+  // ingest facsimile skeleton into currently loaded MEI file
   document.getElementById('ingestFacsimile').addEventListener('click', cmd.ingestFacsimile);
   document.getElementById('addFacsimile').addEventListener('click', cmd.addFacsimile);
   // add note
-  // TODO eventlistener
+  document.getElementById('addNote').addEventListener('click', cmd.addNote);
+  document.getElementById('toggleChord').addEventListener('click', cmd.convertToChord);
   // insert accidentals
   document.getElementById('addDoubleSharp').addEventListener('click', cmd.addDoubleSharp);
   document.getElementById('addSharp').addEventListener('click', cmd.addSharp);

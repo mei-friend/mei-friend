@@ -169,6 +169,7 @@ export const lang = {
   staffDownText: { text: 'Element 1 staff down' },
   increaseDurText: { text: 'Increase duration' },
   decreaseDurText: { text: 'Decrease duration' },
+  toggleDotsText: { text: 'Toggle dotted note' },
   cleanAccidText: { text: 'Check @accid.ges' },
   renumberMeasuresTestText: { text: ' Renumber measures (test)' },
   renumberMeasuresExecText: { text: ' Renumber measures (exec)' },
@@ -180,6 +181,8 @@ export const lang = {
 
   // INSERT MENU ITEM
   insertMenuTitle: { text: 'Insert' },
+  addNoteText: { text: 'Add note' },
+  toggleChordText: { text: 'Note(s) <=> chord' },
   addDoubleSharpText: { html: 'Double sharp &#119082;' },
   addSharpText: { html: 'Sharp &#9839;' },
   addNaturalText: { html: 'Natural &#9838;' },
