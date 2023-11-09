@@ -209,8 +209,9 @@ function removeWithTextnodes(element) {
 } // removeWithTextnodes()
 
 /**
+ * (Quasi duplicate selected note):
  * Inserts new note immediately after the currently (last-)selected one,
- * or as the new last note on the currently visible notation fragment (e.g., page).
+ * (or as the new last note on the currently visible notation fragment (e.g., page)).
  * It copies @pname @oct @dur from the nearest predecessor note
  * (or otherwise default to 'c', '4', '4').
  * @param {Viewer} v
@@ -221,12 +222,12 @@ export function addNote(v, cm) {
   let oct = '4';
   let dur = '4';
 
-  // get last selected element that is a note or a rest
+  // get last selected element that is a chord, note, or rest
   let selEl;
   let i = v.selectedElements.length - 1;
   while (i >= 0) {
     selEl = v.xmlDoc.querySelector("[*|id='" + v.selectedElements.at(i) + "']");
-    if (['note', 'rest'].includes(selEl.nodeName)) break;
+    if (['chord', 'note', 'rest'].includes(selEl.nodeName)) break;
     selEl = null;
     i--;
   }
@@ -234,23 +235,35 @@ export function addNote(v, cm) {
   // stop if nothing found
   if (!selEl) {
     return false;
-    // TODO: get last note of visible fragment (i.e. page/system)
+    // TODO: get last note of visible fragment (i.e. page/system) // REALLY??
     let noteList = document.querySelectorAll('g.note');
     let lastNote = noteList[noteList.length - 1];
   }
   v.allowCursorActivity = false;
 
   // create new element
-  let newEl = v.xmlDoc.createElementNS(dutils.meiNameSpace, selEl.nodeName);
+  let newEl;
+  if (selEl.nodeName === 'chord') {
+    newEl = selEl.cloneNode(true);
+  } else {
+    newEl = v.xmlDoc.createElementNS(dutils.meiNameSpace, selEl.nodeName);
+    if (selEl.nodeName === 'note') {
+      newEl.setAttribute('oct', selEl.hasAttribute('oct') ? selEl.getAttribute('oct') : oct);
+      newEl.setAttribute('pname', selEl.hasAttribute('pname') ? selEl.getAttribute('pname') : pname);
+    } else if (selEl.nodeName === 'rest') {
+      if (selEl.hasAttribute('oloc')) newEl.setAttribute('oloc', selEl.getAttribute('oloc'));
+      if (selEl.hasAttribute('ploc')) newEl.setAttribute('ploc', selEl.getAttribute('ploc'));
+    }
+    const chord = selEl.parentElement?.closest('chord');
+    let addEl = chord ? chord : newEl;
+    addEl.setAttribute('dur', selEl.hasAttribute('dur') ? selEl.getAttribute('dur') : dur);
+  }
   const uuid = utils.generateXmlId(selEl.nodeName, v.xmlIdStyle);
   newEl.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
-  newEl.setAttribute('dur', selEl.hasAttribute('dur') ? selEl.getAttribute('dur') : dur);
-  if (selEl.nodeName === 'note') {
-    newEl.setAttribute('oct', selEl.hasAttribute('oct') ? selEl.getAttribute('oct') : oct);
-    newEl.setAttribute('pname', selEl.hasAttribute('pname') ? selEl.getAttribute('pname') : pname);
-  } else if (selEl.nodeName === 'rest') {
-    if (selEl.hasAttribute('oloc')) newEl.setAttribute('oloc', selEl.getAttribute('oloc'));
-    if (selEl.hasAttribute('ploc')) newEl.setAttribute('ploc', selEl.getAttribute('ploc'));
+  if (selEl.nodeName === 'chord') {
+    for (let e of newEl.children) {
+      e.setAttributeNS(dutils.xmlNameSpace, 'xml:id', utils.generateXmlId(e.nodeName, v.xmlIdStyle));
+    }
   }
 
   // add it to DOM
@@ -265,7 +278,6 @@ export function addNote(v, cm) {
   utils.setCursorToId(cm, selEl.id);
   cm.execCommand('toMatchingTag');
   cm.execCommand('goLineEnd');
-
   const p1 = cm.getCursor();
   cm.replaceRange('\n' + dutils.xmlToString(newEl), p1);
   cm.indentLine(p1.line, 'smart');
@@ -274,8 +286,8 @@ export function addNote(v, cm) {
   // do final homework
   v.selectedElements = [];
   v.selectedElements.push(uuid);
+  utils.setCursorToId(cm, uuid); // to select new element
   v.lastNoteId = uuid;
-  v.updateHighlight(cm);
   addApplicationInfo(v, cm);
   v.updateData(cm, false, true);
   v.allowCursorActivity = true;
@@ -818,6 +830,7 @@ export function modifyDuration(v, cm, what = 'increase') {
         replaceInEditor(cm, el);
       }
     }
+    utils.setCursorToId(cm, id); // to select new element
   });
   addApplicationInfo(v, cm);
   v.updateData(cm, false, true);
@@ -842,6 +855,7 @@ export function toggleDots(v, cm) {
       }
       replaceInEditor(cm, el);
     }
+    utils.setCursorToId(cm, id); // to select new element
   });
   addApplicationInfo(v, cm);
   v.updateData(cm, false, true);
