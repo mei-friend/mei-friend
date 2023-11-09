@@ -314,7 +314,8 @@ export function addNote(v, cm) {
  */
 export function convertToChord(v, cm) {
   v.allowCursorActivity = false;
-  let chord, uuid;
+  let chord;
+  let uuids = [];
   speed.filterElements(v.selectedElements, v.xmlDoc, ['chord', 'note']).forEach((id) => {
     let el = v.xmlDoc.querySelector("[*|id='" + id + "']");
     if (el && el.nodeName === 'chord') {
@@ -324,13 +325,16 @@ export function convertToChord(v, cm) {
         if (el.hasAttribute('dur')) ch.setAttribute('dur', el.getAttribute('dur'));
         if (el.hasAttribute('dots')) ch.setAttribute('dots', el.getAttribute('dots'));
         if (el.hasAttribute('stem.dir')) ch.setAttribute('stem.dir', el.getAttribute('stem.dir'));
+        // editor
         cm.execCommand('goLineStart');
         const p1 = cm.getCursor();
         cm.replaceRange(dutils.xmlToString(ch) + '\n', p1);
         const p2 = cm.getCursor();
         for (let p = p1.line; p <= p2.line; p++) cm.indentLine(p, 'smart');
+        // DOM
         el.parentElement.insertBefore(ch, el);
-        utils.setCursorToId(cm, ch.id); // to select new element
+        utils.setCursorToId(cm, ch.getAttribute('xml:id')); // to select new element
+        uuids.push(ch.getAttribute('xml:id'));
       }
       el.remove();
       removeInEditor(cm, el);
@@ -342,8 +346,8 @@ export function convertToChord(v, cm) {
       // create new chord and add to DOM
       if (!chord) {
         chord = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'chord');
-        uuid = utils.generateXmlId('chord', v.xmlIdStyle);
-        chord.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
+        uuids.push(utils.generateXmlId('chord', v.xmlIdStyle));
+        chord.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuids.at(-1));
         el.parentElement.insertBefore(chord, el);
       }
       if (el.hasAttribute('dur')) {
@@ -368,21 +372,21 @@ export function convertToChord(v, cm) {
     cm.replaceRange(dutils.xmlToString(chord) + '\n', p1);
     const p2 = cm.getCursor();
     for (let p = p1.line; p <= p2.line; p++) cm.indentLine(p, 'smart');
-    utils.setCursorToId(cm, uuid);
-    v.selectedElements = [];
-    v.selectedElements.push(uuid);
-    v.lastNoteId = uuid;
   }
+  utils.setCursorToId(cm, uuids.at(-1));
+  v.selectedElements = [];
+  uuids.forEach((uuid) => v.selectedElements.push(uuid));
+  v.lastNoteId = uuids.at(-1);
   addApplicationInfo(v, cm);
   v.updateData(cm, false, true);
   v.allowCursorActivity = true;
 } // convertToChord()
 
 /**
- * Converts selected notes to rests and vice versa. 
+ * Converts selected notes to rests and vice versa.
  * TODO: not secured against stupid things (like rests inside chords)
- * @param {Viewer} v 
- * @param {CodeMirror} cm 
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
  */
 export function convertNoteToRest(v, cm) {
   v.allowCursorActivity = false;
