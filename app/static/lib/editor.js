@@ -376,7 +376,46 @@ export function convertToChord(v, cm) {
   addApplicationInfo(v, cm);
   v.updateData(cm, false, true);
   v.allowCursorActivity = true;
-}
+} // convertToChord()
+
+/**
+ * Converts selected notes to rests and vice versa. 
+ * TODO: not secured against stupid things (like rests inside chords)
+ * @param {Viewer} v 
+ * @param {CodeMirror} cm 
+ */
+export function convertNoteToRest(v, cm) {
+  v.allowCursorActivity = false;
+  let uuids = [];
+  speed.filterElements(v.selectedElements, v.xmlDoc, ['rest', 'note']).forEach((id) => {
+    let oldEl = v.xmlDoc.querySelector("[*|id='" + id + "']");
+    if (oldEl) {
+      let newName = oldEl.nodeName === 'note' ? 'rest' : 'note';
+      let newEl = v.xmlDoc.createElementNS(dutils.meiNameSpace, newName);
+      let uuid = utils.generateXmlId(newName, v.xmlIdStyle);
+      newEl.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
+      uuids.push(uuid);
+      if (oldEl.hasAttribute('dur')) newEl.setAttribute('dur', oldEl.getAttribute('dur'));
+      if (oldEl.hasAttribute('dots')) newEl.setAttribute('dots', oldEl.getAttribute('dots'));
+      if (oldEl.nodeName === 'rest') {
+        if (oldEl.hasAttribute('oloc')) newEl.setAttribute('oct', oldEl.getAttribute('oloc'));
+        if (oldEl.hasAttribute('ploc')) newEl.setAttribute('pname', oldEl.getAttribute('ploc'));
+      } else {
+        if (oldEl.hasAttribute('oct')) newEl.setAttribute('oloc', oldEl.getAttribute('oct'));
+        if (oldEl.hasAttribute('pname')) newEl.setAttribute('ploc', oldEl.getAttribute('pname'));
+      }
+      oldEl.parentElement.replaceChild(newEl, oldEl);
+      replaceInEditor(cm, oldEl, true, newEl);
+    }
+  });
+  v.selectedElements = [];
+  uuids.forEach((id) => v.selectedElements.push(id));
+  utils.setCursorToId(cm, v.selectedElements.at(-1)); // to select new element
+  v.lastNoteId = v.selectedElements.at(-1);
+  addApplicationInfo(v, cm);
+  v.updateData(cm, false, true);
+  v.allowCursorActivity = true;
+} // convertNoteToRest()
 
 /**
  * Adds accid element to note element.

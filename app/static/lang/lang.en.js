@@ -182,6 +182,7 @@ export const lang = {
   // INSERT MENU ITEM
   insertMenuTitle: { text: 'Insert' },
   addNoteText: { text: 'Add note' },
+  convertNoteToRestText: { text: 'Note(s) <=> rest(s)' },
   toggleChordText: { text: 'Note(s) <=> chord' },
   addDoubleSharpText: { html: 'Double sharp &#119082;' },
   addSharpText: { html: 'Sharp &#9839;' },

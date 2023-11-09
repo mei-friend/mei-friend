@@ -21,6 +21,7 @@
     "end": "lastPage",
 
     "n": "addNote",
+    "shift-n": "convertNoteToRest",
     "c": "convertToChord",
     ".": "toggleDots",
 

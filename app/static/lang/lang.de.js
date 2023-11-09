@@ -180,6 +180,7 @@ export const lang = {
   // INSERT MENU ITEM
   insertMenuTitle: { text: 'Einfügen' },
   addNoteText: { text: 'Note duplizieren' },
+  convertNoteToRestText: { text: 'Note(n) <=> Pause(n)' },
   toggleChordText: { text: 'Note(n) <=> Akkord' },
   addDoubleSharpText: { html: 'Doppelkreuz &#119082;' },
   addSharpText: { html: 'Kreuz &#9839;' },

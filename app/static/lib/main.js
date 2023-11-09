@@ -1597,8 +1597,8 @@ export let cmd = {
   redo: () => cm.redo(),
   // add note
   addNote: () => e.addNote(v, cm),
+  convertNoteToRest: () => e.convertNoteToRest(v, cm),
   convertToChord: () => e.convertToChord(v, cm),
-  toggleDots: () => e.toggleDots(v, cm),
   // add accidentals
   addDoubleSharp: () => e.addAccidental(v, cm, 'x'),
   addSharp: () => e.addAccidental(v, cm, 's'),
@@ -1656,6 +1656,7 @@ export let cmd = {
   shiftOctaveDown: () => e.shiftPitch(v, cm, -7),
   increaseDuration: () => e.modifyDuration(v, cm, 'increase'),
   decreaseDuration: () => e.modifyDuration(v, cm, 'decrease'),
+  toggleDots: () => e.toggleDots(v, cm),
   moveElementStaffUp: () => e.moveElementToNextStaff(v, cm, true),
   moveElementStaffDown: () => e.moveElementToNextStaff(v, cm, false),
   addOctave8Above: () => e.addOctaveElement(v, cm, 'above', 8),
@@ -2010,6 +2011,7 @@ function addEventListeners(v, cm) {
   document.getElementById('addFacsimile').addEventListener('click', cmd.addFacsimile);
   // add note
   document.getElementById('addNote').addEventListener('click', cmd.addNote);
+  document.getElementById('convertNoteToRest').addEventListener('click', cmd.convertNoteToRest);
   document.getElementById('toggleChord').addEventListener('click', cmd.convertToChord);
   // insert accidentals
   document.getElementById('addDoubleSharp').addEventListener('click', cmd.addDoubleSharp);
