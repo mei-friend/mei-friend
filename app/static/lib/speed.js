@@ -1258,7 +1258,7 @@ export function filterElements(ids, xmlDoc, keepOnly = []) {
       ids.splice(i--, 1);
       continue;
     }
-    for (let j = i + 1; j < ids.length; j++) {
+    for (let j = 0; j < ids.length; j++) {
       const elj = xmlDoc.querySelector('[*|id="' + ids[j] + '"]');
       if (!elj) continue;
       if (elj.parentElement && elj.parentElement.closest('[*|id="' + ids[i] + '"]')) {
