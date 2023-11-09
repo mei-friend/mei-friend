@@ -222,12 +222,12 @@ export function addNote(v, cm) {
   let oct = '4';
   let dur = '4';
 
-  // get last selected element that is a chord, note, or rest
+  // get last selected element that is a layer, chord, note, or rest
   let selEl;
   let i = v.selectedElements.length - 1;
   while (i >= 0) {
     selEl = v.xmlDoc.querySelector("[*|id='" + v.selectedElements.at(i) + "']");
-    if (['chord', 'note', 'rest'].includes(selEl.nodeName)) break;
+    if (['layer', 'chord', 'note', 'rest'].includes(selEl.nodeName)) break;
     selEl = null;
     i--;
   }
@@ -247,9 +247,18 @@ export function addNote(v, cm) {
   if (selEl.nodeName === 'chord') {
     newEl = selEl.cloneNode(true);
     newEl.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
+  } else if (selEl.nodeName === 'layer') {
+    newEl = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'note');
+    newEl.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
+    newEl.setAttribute('dur', dur);
+    newEl.setAttribute('oct', oct);
+    newEl.setAttribute('pname', pname);
   } else {
     newEl = v.xmlDoc.createElementNS(dutils.meiNameSpace, selEl.nodeName);
     newEl.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
+    const chord = selEl.parentElement?.closest('chord');
+    let addEl = chord ? chord : newEl;
+    addEl.setAttribute('dur', selEl.hasAttribute('dur') ? selEl.getAttribute('dur') : dur);
     if (selEl.nodeName === 'note') {
       newEl.setAttribute('oct', selEl.hasAttribute('oct') ? selEl.getAttribute('oct') : oct);
       newEl.setAttribute('pname', selEl.hasAttribute('pname') ? selEl.getAttribute('pname') : pname);
@@ -257,9 +266,6 @@ export function addNote(v, cm) {
       if (selEl.hasAttribute('oloc')) newEl.setAttribute('oloc', selEl.getAttribute('oloc'));
       if (selEl.hasAttribute('ploc')) newEl.setAttribute('ploc', selEl.getAttribute('ploc'));
     }
-    const chord = selEl.parentElement?.closest('chord');
-    let addEl = chord ? chord : newEl;
-    addEl.setAttribute('dur', selEl.hasAttribute('dur') ? selEl.getAttribute('dur') : dur);
   }
   if (selEl.nodeName === 'chord') {
     for (let e of newEl.children) {
@@ -267,22 +273,28 @@ export function addNote(v, cm) {
     }
   }
 
-  // add it to DOM
-  const nextElement = selEl.nextSibling;
-  if (nextElement) {
-    selEl.parentNode.insertBefore(newEl, nextElement);
-  } else {
-    selEl.parentNode.appendChild(newEl);
-  }
+  if (selEl.nodeName !== 'layer') {
+    // add it to DOM
+    const nextElement = selEl.nextSibling;
+    if (nextElement) {
+      selEl.parentNode.insertBefore(newEl, nextElement);
+    } else {
+      selEl.parentNode.appendChild(newEl);
+    }
 
-  // add to editor
-  utils.setCursorToId(cm, selEl.id);
-  cm.execCommand('toMatchingTag');
-  cm.execCommand('goLineEnd');
-  const p1 = cm.getCursor();
-  cm.replaceRange('\n' + dutils.xmlToString(newEl), p1);
-  cm.indentLine(p1.line, 'smart');
-  cm.indentLine(p1.line + 1, 'smart');
+    // add to editor
+    utils.setCursorToId(cm, selEl.id);
+    cm.execCommand('toMatchingTag');
+    cm.execCommand('goLineEnd');
+    const p1 = cm.getCursor();
+    cm.replaceRange('\n' + dutils.xmlToString(newEl), p1);
+    const p2 = cm.getCursor();
+    for (let p = p1.line; p <= p2.line; p++) cm.indentLine(p, 'smart');
+  } else {
+    // when adding to a layer
+    selEl.appendChild(newEl);
+    replaceInEditor(cm, selEl, true);
+  }
 
   // do final homework
   v.selectedElements = [];
