@@ -820,22 +820,22 @@ export default class Viewer {
    * @param {CodeMirror} cm
    */
   toggleFocusBetweenNotationAndEncoding(cm) {
-    let notation = document.getElementById('verovio-panel');
+    let notation = document.getElementById('notation');
     let encoding = document.getElementById('encoding');
-    console.log('Notation', notation);
-    console.log('Active element: ', document.activeElement);
+    // console.log('Notation', notation);
+    // console.log('Active element: ', document.activeElement);
     if (document.activeElement === document.activeElement.closest('#notation')) {
       cm.focus();
-      console.log('Switch to encoding');
+      // console.log('Switching to encoding');
       notation.classList.remove('panelFocus');
       encoding.classList.add('panelFocus');
     } else {
       notation.focus();
-      console.log('Switch to notation');
+      // console.log('Switching to notation');
       encoding.classList.remove('panelFocus');
       notation.classList.add('panelFocus');
     }
-    console.log('New active element: ', document.activeElement);
+    // console.log('New active element: ', document.activeElement);
   } // toggleFocusBetweenNotationAndEncoding()
 
   showSettingsPanel() {
