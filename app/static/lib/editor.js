@@ -243,10 +243,13 @@ export function addNote(v, cm) {
 
   // create new element
   let newEl;
+  const uuid = utils.generateXmlId(selEl.nodeName, v.xmlIdStyle);
   if (selEl.nodeName === 'chord') {
     newEl = selEl.cloneNode(true);
+    newEl.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
   } else {
     newEl = v.xmlDoc.createElementNS(dutils.meiNameSpace, selEl.nodeName);
+    newEl.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
     if (selEl.nodeName === 'note') {
       newEl.setAttribute('oct', selEl.hasAttribute('oct') ? selEl.getAttribute('oct') : oct);
       newEl.setAttribute('pname', selEl.hasAttribute('pname') ? selEl.getAttribute('pname') : pname);
@@ -258,8 +261,6 @@ export function addNote(v, cm) {
     let addEl = chord ? chord : newEl;
     addEl.setAttribute('dur', selEl.hasAttribute('dur') ? selEl.getAttribute('dur') : dur);
   }
-  const uuid = utils.generateXmlId(selEl.nodeName, v.xmlIdStyle);
-  newEl.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
   if (selEl.nodeName === 'chord') {
     for (let e of newEl.children) {
       e.setAttributeNS(dutils.xmlNameSpace, 'xml:id', utils.generateXmlId(e.nodeName, v.xmlIdStyle));
@@ -292,6 +293,78 @@ export function addNote(v, cm) {
   v.updateData(cm, false, true);
   v.allowCursorActivity = true;
 } // addNote()
+
+/**
+ * Place selected notes into a (new) chord, containing these notes,
+ * and vice versa (remove chord and have contained notes there)
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
+ */
+export function convertToChord(v, cm) {
+  v.allowCursorActivity = false;
+  let chord, uuid;
+  speed.filterElements(v.selectedElements, v.xmlDoc, ['chord', 'note']).forEach((id) => {
+    let el = v.xmlDoc.querySelector("[*|id='" + id + "']");
+    if (el && el.nodeName === 'chord') {
+      utils.setCursorToId(cm, id);
+      while (el.children.length > 0) {
+        let ch = el.children[0];
+        if (el.hasAttribute('dur')) ch.setAttribute('dur', el.getAttribute('dur'));
+        if (el.hasAttribute('dots')) ch.setAttribute('dots', el.getAttribute('dots'));
+        if (el.hasAttribute('stem.dir')) ch.setAttribute('stem.dir', el.getAttribute('stem.dir'));
+        cm.execCommand('goLineStart');
+        const p1 = cm.getCursor();
+        cm.replaceRange(dutils.xmlToString(ch) + '\n', p1);
+        const p2 = cm.getCursor();
+        for (let p = p1.line; p <= p2.line; p++) cm.indentLine(p, 'smart');
+        el.parentElement.insertBefore(ch, el);
+        utils.setCursorToId(cm, ch.id); // to select new element
+      }
+      el.remove();
+      removeInEditor(cm, el);
+    } else if (el && el.nodeName === 'note') {
+      if (el.closest('chord')) {
+        v.showAlert('Cannot create chord within chord.');
+        return;
+      }
+      // create new chord and add to DOM
+      if (!chord) {
+        chord = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'chord');
+        uuid = utils.generateXmlId('chord', v.xmlIdStyle);
+        chord.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
+        el.parentElement.insertBefore(chord, el);
+      }
+      if (el.hasAttribute('dur')) {
+        chord.setAttribute('dur', el.getAttribute('dur'));
+        el.removeAttribute('dur');
+      }
+      if (el.hasAttribute('dots')) {
+        chord.setAttribute('dots', el.getAttribute('dots'));
+        el.removeAttribute('dots');
+      }
+      if (el.hasAttribute('stem.dir')) {
+        chord.setAttribute('stem.dir', el.getAttribute('stem.dir'));
+        el.removeAttribute('stem.dir');
+      }
+      chord.appendChild(el);
+      removeInEditor(cm, el);
+    }
+  });
+  // add to editor
+  if (chord) {
+    const p1 = cm.getCursor();
+    cm.replaceRange(dutils.xmlToString(chord) + '\n', p1);
+    const p2 = cm.getCursor();
+    for (let p = p1.line; p <= p2.line; p++) cm.indentLine(p, 'smart');
+    utils.setCursorToId(cm, uuid);
+    v.selectedElements = [];
+    v.selectedElements.push(uuid);
+    v.lastNoteId = uuid;
+  }
+  addApplicationInfo(v, cm);
+  v.updateData(cm, false, true);
+  v.allowCursorActivity = true;
+}
 
 /**
  * Adds accid element to note element.

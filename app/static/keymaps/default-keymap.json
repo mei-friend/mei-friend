@@ -21,6 +21,7 @@
     "end": "lastPage",
 
     "n": "addNote",
+    "c": "convertToChord",
     ".": "toggleDots",
 
     "shift-+": "addDoubleSharp",
