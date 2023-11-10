@@ -169,6 +169,7 @@ export const lang = {
   staffDownText: { text: 'Element 1 pauta avall' },
   increaseDurText: { text: 'Augmenta duració' },
   decreaseDurText: { text: 'Disminueix duració' },
+  toggleDotsText: { text: 'Activar punxat' },
   cleanAccidText: { text: 'Verificar @accid.ges' },
   renumberMeasuresTestText: { text: 'Reenumera compassos (prova)' },
   renumberMeasuresExecText: { text: 'Reenumera compassos (execució)' },
@@ -180,6 +181,9 @@ export const lang = {
 
   // INSERT MENU ITEM / INSERCIÓ DELS ELEMENTS DEL MENÚ
   insertMenuTitle: { text: 'Insereix' },
+  addNoteText: { text: 'Afegeix nota' },
+  convertNoteToRestText: { text: 'Nota(es) <=> silenci(s)' },
+  toggleChordText: { text: 'Nota(es) <=> acord' },
   addDoubleSharpText: { html: 'Doble sostingut &#119082;' },
   addSharpText: { html: 'Sostingut &#9839;' },
   addNaturalText: { html: 'Becaire &#9838;' },

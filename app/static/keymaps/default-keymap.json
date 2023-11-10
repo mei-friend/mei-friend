@@ -20,6 +20,11 @@
     "home": "firstPage",
     "end": "lastPage",
 
+    "n": "addNote",
+    "shift-n": "convertNoteToRest",
+    "c": "convertToChord",
+    ".": "toggleDots",
+
     "shift-+": "addDoubleSharp",
     "+": "addSharp",
     "=": "addNatural",
@@ -42,8 +47,8 @@
     "m": "addMordent",
     "shift-m": "addMordentUpper",
     "l": "addTrill",
-    "n": "addTurn",
-    "shift-n": "addTurnLower",
+    "r": "addTurn",
+    "shift-r": "addTurnLower",
 
     "shift-s": "toggleStacc",
     "shift-v": "toggleAccent",
@@ -74,6 +79,7 @@
   },
 
   ".platform-darwin": {
+    "ctrl-space": "switchFocus",
     "cmd-right": "nextMeasure",
     "cmd-left": "previousMeasure",
     "ctrl-cmd-right": "nextPage",
@@ -131,11 +137,12 @@
     "ctrl-m": "addMordent",
     "ctrl-shift-m": "addMordentUpper",
     "ctrl-l": "addTrill",
-    "ctrl-n": "addTurn",
-    "ctrl-shift-n": "addTurnLower"
+    "ctrl-r": "addTurn",
+    "ctrl-shift-r": "addTurnLower"
   },
 
   ".platform-win32, .platform-linux": {
+    "ctrl-space": "switchFocus",
     "ctrl-right": "nextMeasure",
     "ctrl-left": "previousMeasure",
     "ctrl-alt-right": "nextPage",
@@ -192,7 +199,7 @@
     "alt-m": "addMordent",
     "alt-shift-m": "addMordentUpper",
     "alt-l": "addTrill",
-    "alt-n": "addTurn",
-    "alt-shift-n": "addTurnLower"
+    "alt-r": "addTurn",
+    "alt-shift-r": "addTurnLower"
   }
 }

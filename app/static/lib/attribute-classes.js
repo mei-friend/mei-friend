@@ -55,26 +55,39 @@ export const attStems = ['note', 'chord', 'ambNote'];
 export const modelControlEvents = [
   'anchoredText',
   'arpeg',
-  'bracket',
-  'bracketspan',
+  'attacca',
+  'bend',
+  'beamSpan',
+  'bracketSpan',
   'breath',
+  'caesura',
+  'cpMark',
   'dir',
   'dynam',
   'fermata',
   'fing',
+  'fingGrp',
   'gliss',
   'hairpin',
+  'harpPedal',
   'harm',
+  'lv',
+  'metaMark',
   'mordent',
   'mnum',
   'octave',
+  'ornam',
   'pedal',
   'phrase',
   'reh',
+  'repeatMark',
+  'sp',
   'slur',
+  'stageDir',
   'tempo',
   'tie',
   'trill',
+  'tupletSpan',
   'turn',
 ];
 
@@ -82,7 +95,7 @@ export const modelControlEvents = [
 export const pnames = ['c', 'd', 'e', 'f', 'g', 'a', 'b'];
 
 export const sharpSign = '♯';
-export const flatSign = '♭'
+export const flatSign = '♭';
 
 // pitch names for sharps and flats, defined in keySig@sig or @key.sig
 export const sharps = ['f', 'c', 'g', 'd', 'a', 'e', 'b', 'f♯', 'c♯', 'g♯', 'd♯', 'a♯'];
@@ -109,6 +122,9 @@ export const timeSpanningElements = [
 
 // @dur
 export const attDurationLogical = ['ambNote', 'bTrem', 'chord', 'fTrem', 'halfmRpt', 'note', 'rest', 'space'];
+
+// @dots
+export const attAugmentDots = ['bTrem', 'chord', 'fTrem', 'note', 'rest', 'space'];
 
 // elements allowed to contain a @facs attribute (5.0.0)
 export const attFacsimile = [

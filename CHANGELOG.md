@@ -1,11 +1,20 @@
 # mei-friend-online CHANGELOG.md
+### 1.0.5 patch
+* Add Ukrainian and Esperanto language packs (still to be proof-read)
+* Keyboard shortcut (`CTRL + SPACE`) to switch focus between notation and encoding panel (#55)
+* Keyboard shortcut (`N`) to duplicate a selected chord, note or rest, or insert a new note into an empty layer (#57)
+* Keyboard shortcut (`SHIFT + N`) to convert selected notes to rests and rests to notes (#57)
+* Keyboard shortcut (`.`) to add or remove `dots="1"` to notes, chords, etc.
+* Keyboard shortcut (`C`) to embed selected notes inside a new chord element, and vice versa (remove chord and leave notes)
+
 ### 1.0.4 patch
-* Tweak CSS and translations
+* Tweak CSS select and translations (German)
+* Fix typo at forking via URL parameters
 
 ### 1.0.3 patch
 * Enable navigation link to generated MAO objects (identify object annotations)
 
-### 1.0.2 Splash screen 
+### 1.0.2 Splash screen (released 3 Oct 2023)
 * Add splash screen on application load explaining data storage (#41)
 * Fix bug when drag-selected elements contain non-note elements and blocked inserting control elements on them (such as slurs) (#48)
 * Support for @meter.sym/@sym information (#49). No slur (spanning element) inserted when on same time stamps.

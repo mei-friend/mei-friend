@@ -1,6 +1,6 @@
 // mei-friend version and date
-export const version = '1.0.4';
-export const versionDate = '6 October 2023'; // use full or 3-character english months, will be translated
+export const version = '1.0.5';
+export const versionDate = '10 November 2023'; // use full or 3-character english months, will be translated
 
 var vrvWorker;
 var spdWorker;
@@ -143,7 +143,6 @@ const defaultCodeMirrorOptions = {
     "'/'": completeIfAfterLt,
     "' '": completeIfInTag,
     "'='": completeIfInTag,
-    'Ctrl-Space': 'autocomplete',
     'Shift-Alt-f': indentSelection,
     'Shift-Ctrl-G': toMatchingTag,
     "'Ï'": indentSelection, // TODO: overcome strange bindings on MAC
@@ -1510,6 +1509,7 @@ export let cmd = {
   pageModeOff: () => v.pageModeOff(),
   saveAsPdf: () => v.saveAsPdf(),
   generateUrl: () => generateUrlUI(),
+  switchFocus: () => v.switchFocusBetweenNotationAndEncoding(cm),
   filterSettings: () => v.applySettingsFilter(),
   filterReset: () => {
     document.getElementById('filterSettings').value = '';
@@ -1595,6 +1595,10 @@ export let cmd = {
   },
   undo: () => cm.undo(),
   redo: () => cm.redo(),
+  // add note
+  addNote: () => e.addNote(v, cm),
+  convertNoteToRest: () => e.convertNoteToRest(v, cm),
+  convertToChord: () => e.convertToChord(v, cm),
   // add accidentals
   addDoubleSharp: () => e.addAccidental(v, cm, 'x'),
   addSharp: () => e.addAccidental(v, cm, 's'),
@@ -1652,6 +1656,7 @@ export let cmd = {
   shiftOctaveDown: () => e.shiftPitch(v, cm, -7),
   increaseDuration: () => e.modifyDuration(v, cm, 'increase'),
   decreaseDuration: () => e.modifyDuration(v, cm, 'decrease'),
+  toggleDots: () => e.toggleDots(v, cm),
   moveElementStaffUp: () => e.moveElementToNextStaff(v, cm, true),
   moveElementStaffDown: () => e.moveElementToNextStaff(v, cm, false),
   addOctave8Above: () => e.addOctaveElement(v, cm, 'above', 8),
@@ -1990,6 +1995,7 @@ function addEventListeners(v, cm) {
   document.getElementById('staffDown').addEventListener('click', cmd.moveElementStaffDown);
   document.getElementById('increaseDur').addEventListener('click', cmd.increaseDuration);
   document.getElementById('decreaseDur').addEventListener('click', cmd.decreaseDuration);
+  document.getElementById('toggleDots').addEventListener('click', cmd.toggleDots);
   // Manipulate encoding methods
   document.getElementById('cleanAccid').addEventListener('click', cmd.correctAccid);
   document.getElementById('renumberMeasuresTest').addEventListener('click', () => e.renumberMeasures(v, cm, false));
@@ -2000,9 +2006,13 @@ function addEventListeners(v, cm) {
   // add/remove ids
   document.getElementById('addIds').addEventListener('click', cmd.addIds);
   document.getElementById('removeIds').addEventListener('click', cmd.removeIds);
-  // ingest facsimile sekelton into currently loaded MEI file
+  // ingest facsimile skeleton into currently loaded MEI file
   document.getElementById('ingestFacsimile').addEventListener('click', cmd.ingestFacsimile);
   document.getElementById('addFacsimile').addEventListener('click', cmd.addFacsimile);
+  // add note
+  document.getElementById('addNote').addEventListener('click', cmd.addNote);
+  document.getElementById('convertNoteToRest').addEventListener('click', cmd.convertNoteToRest);
+  document.getElementById('toggleChord').addEventListener('click', cmd.convertToChord);
   // insert accidentals
   document.getElementById('addDoubleSharp').addEventListener('click', cmd.addDoubleSharp);
   document.getElementById('addSharp').addEventListener('click', cmd.addSharp);

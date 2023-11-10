@@ -1621,3 +1621,20 @@ midi-player::part(play-button) {
 #closeMidiPlaybackControlBarButton:hover {
   background-color: var(--settingsLinkHoverColor);
 }
+
+.panelFocus {
+  border-color: red;
+  border-radius: 4px;
+  border-width: 3px;
+  animation: showFocus 2s;
+}
+
+@keyframes showFocus {
+  from {
+    border-style: dotted;
+  }
+
+  to  {
+    border-style: none;
+  }
+}
