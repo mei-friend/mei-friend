@@ -168,6 +168,7 @@ export const lang = {
   staffDownText: { text: 'Abbassa di un rigo' },
   increaseDurText: { text: 'Aumenta durata' },
   decreaseDurText: { text: 'Riduci durata' },
+  toggleDotsText: { text: 'Alterna la punteggiatura' },
   cleanAccidText: { text: 'Verificare @accid.ges' },
   renumberMeasuresTestText: { text: 'Rinumera misure (test)' },
   renumberMeasuresExecText: { text: 'Rinumera misure (esegui)' },

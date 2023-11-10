@@ -169,7 +169,7 @@ export const lang = {
   staffDownText: { text: 'Element 1 staff down' },
   increaseDurText: { text: 'Increase duration' },
   decreaseDurText: { text: 'Decrease duration' },
-  toggleDotsText: { text: 'Toggle dotted note' },
+  toggleDotsText: { text: 'Toggle dotting' },
   cleanAccidText: { text: 'Check @accid.ges' },
   renumberMeasuresTestText: { text: ' Renumber measures (test)' },
   renumberMeasuresExecText: { text: ' Renumber measures (exec)' },

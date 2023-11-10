@@ -159,6 +159,7 @@ export const lang = {
   staffDownText: { text: '要素を1段階下げる' },
   increaseDurText: { text: '音価を増やす' },
   decreaseDurText: { text: '音価を減らす' },
+  toggleDotsText: { text: 'トグル・ドッティング' },
   cleanAccidText: { text: '@accid.gesを確認' },
   renumberMeasuresTestText: { text: '小節を再番号付け（テスト）' },
   renumberMeasuresExecText: { text: '小節を再番号付け（実行）' },

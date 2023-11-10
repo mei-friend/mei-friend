@@ -166,6 +166,7 @@ export const lang = {
   staffDownText: { text: 'Mover elemento una línea de pentagrama hacia abajo' },
   increaseDurText: { text: 'Aumentar duración de nota' },
   decreaseDurText: { text: 'Disminuir duración de nota' },
+  toggleDotsText: { text: 'Alternar el punteado' },
   cleanAccidText: { text: 'Verificar @accid.ges' },
   renumberMeasuresTestText: { text: 'Renumerar compases (prueba)' },
   renumberMeasuresExecText: { text: 'Renumerar compases (ejecutar)' },

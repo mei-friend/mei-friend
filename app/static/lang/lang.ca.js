@@ -169,6 +169,7 @@ export const lang = {
   staffDownText: { text: 'Element 1 pauta avall' },
   increaseDurText: { text: 'Augmenta duració' },
   decreaseDurText: { text: 'Disminueix duració' },
+  toggleDotsText: { text: 'Activar punxat' },
   cleanAccidText: { text: 'Verificar @accid.ges' },
   renumberMeasuresTestText: { text: 'Reenumera compassos (prova)' },
   renumberMeasuresExecText: { text: 'Reenumera compassos (execució)' },

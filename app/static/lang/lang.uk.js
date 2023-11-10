@@ -156,6 +156,7 @@ export const lang = {
   staffDownText: { text: 'Перемістити на 1 лінію вниз' },
   increaseDurText: { text: 'Збільшити тривалість' },
   decreaseDurText: { text: 'Зменшити тривалість' },
+  toggleDotsText: { text: 'перемикання пунктиру' },
   cleanAccidText: { text: 'Перевірити @accid.ges' },
   renumberMeasuresTestText: { text: 'Перенумерувати такти (тест)' },
   renumberMeasuresExecText: { text: 'Перенумерувати такти (виконати)' },

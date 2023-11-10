@@ -168,6 +168,7 @@ export const lang = {
   staffDownText: { text: 'Element 1 pięciolinii w dół' },
   increaseDurText: { text: 'Zwiększ długość' },
   decreaseDurText: { text: 'Zmniejsz długość' },
+  toggleDotsText: { text: 'Przełączanie kropkowania' },
   cleanAccidText: { text: 'Sprawdzić @accid.ges' },
   renumberMeasuresTestText: { text: 'Numeruj taktowania (test)' },
   renumberMeasuresExecText: { text: 'Numeruj taktowania (wykonaj)' },
