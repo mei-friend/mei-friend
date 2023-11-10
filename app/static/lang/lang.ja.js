@@ -168,7 +168,12 @@ export const lang = {
   reRenderMeiVerovio: { text: 'Verovioで再レンダリング' },
   addFacsimile: { text: 'ファクシミリを追加' },
   ingestFacsimileText: { text: 'ファクシミリ取り込み' },
+
+  // INSERT MENU
   insertMenuTitle: { text: '挿入' },
+  addNoteText: { text: '音符を追加' },
+  convertNoteToRestText: { text: '音符 <=> 休符' },
+  toggleChordText: { text: '音符 <=> 和音' },
   addDoubleSharpText: { html: 'ダブルシャープ &#119082;' },
   addSharpText: { html: 'シャープ &#9839;' },
   addNaturalText: { html: 'ナチュラル &#9838;' },

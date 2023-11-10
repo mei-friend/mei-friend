@@ -181,6 +181,9 @@ export const lang = {
 
   // INSERT MENU ITEM  ELEMENT DE MENU INSERTION
   insertMenuTitle: { text: 'Insérer' },
+  addNoteText: { text: 'Ajouter une note' },
+  convertNoteToRestText: { text: 'Note(s) <=> silence(s)' },
+  toggleChordText: { text: 'Note(s) <=> accord' },
   addDoubleSharpText: { html: 'Double dièse &#119082;' },
   addSharpText: { html: 'Dièse &#9839;' },
   addNaturalText: { html: 'Bécarre &#9838;' },

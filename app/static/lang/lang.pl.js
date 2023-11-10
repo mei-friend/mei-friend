@@ -180,6 +180,9 @@ export const lang = {
 
   // INSERT MENU ITEM // WSTAW ELEMENT MENU
   insertMenuTitle: { text: 'Wstaw' },
+  addNoteText: { text: 'Dodaj nutę' },
+  convertNoteToRestText: { text: 'Nuta(y) <=> pauza(y)' },
+  toggleChordText: { text: 'Nuta(y) <=> akord' },
   addDoubleSharpText: { html: 'Podwójny krzyżyk &#119082;' },
   addSharpText: { html: 'Krzyżyk &#9839;' },
   addNaturalText: { html: 'Kasownik &#9838;' },

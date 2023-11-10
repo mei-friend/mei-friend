@@ -180,6 +180,9 @@ export const lang = {
 
   // INSERT MENU ITEM / INSERISCI VOCE DI MENU
   insertMenuTitle: { text: 'Inserisci' },
+  addNoteText: { text: 'Aggiungi nota' },
+  convertNoteToRestText: { text: 'Nota(e) <=> pausa(e)' },
+  toggleChordText: { text: 'Nota(e) <=> accordo' },
   addDoubleSharpText: { html: 'Doppio diesis &#119082;' },
   addSharpText: { html: 'Diesis &#9839;' },
   addNaturalText: { html: 'Bequadro &#9838;' },
@@ -320,14 +323,14 @@ export const lang = {
 
   // facsimile panel/ finestra facsimile
   facsimileIcon: { description: 'Finestra facsimile' },
-  facsimileDecreaseZoomButton: { description: "Riduci la finestra dello spartito" },
-  facsimileZoom: { description: "Regola la dimensione la finestra dello spartito" },
-  facsimileIncreaseZoomButton: { description: "Ingrandisci la finestra dello spartito" },
+  facsimileDecreaseZoomButton: { description: 'Riduci la finestra dello spartito' },
+  facsimileZoom: { description: 'Regola la dimensione la finestra dello spartito' },
+  facsimileIncreaseZoomButton: { description: 'Ingrandisci la finestra dello spartito' },
   facsimileFullPageLabel: {
     text: 'Pagina intera',
-    description: "Mostra la finestra del facsimile a pagina intera",
+    description: 'Mostra la finestra del facsimile a pagina intera',
   },
-  facsimileFullPageCheckbox: { description: "Mostra la finestra del facsimile a pagina intera" },
+  facsimileFullPageCheckbox: { description: 'Mostra la finestra del facsimile a pagina intera' },
   facsimileShowZonesLabel: {
     text: 'Mostra i riquadri delle zone',
     description: 'Mostra i riquadri delle zone del facsimile',

@@ -178,6 +178,9 @@ export const lang = {
 
   // INSERT MENU ITEM
   insertMenuTitle: { text: 'Insertar' },
+  addNoteText: { text: 'Añadir nota' },
+  convertNoteToRestText: { text: 'Nota(s) <=> silencio(s)' },
+  toggleChordText: { text: 'Nota(s) <=> acorde' },
   addDoubleSharpText: { html: 'Doble stostenido &#119082;' },
   addSharpText: { html: 'Sostenido &#9839;' },
   addNaturalText: { html: 'Becuadro &#9838;' },

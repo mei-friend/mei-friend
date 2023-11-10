@@ -174,6 +174,9 @@ export const lang = {
 
   // INSERT MENU ITEM
   insertMenuTitle: { text: 'Enmeti' },
+  addNoteText: { text: 'Aldoni noton' },
+  convertNoteToRestText: { text: 'Noto(j) <=> paŭzo(j)' },
+  toggleChordText: { text: 'Noto(j) <=> akordo' },
   addDoubleSharpText: { html: 'Duobla diezo &#119082;' },
   addSharpText: { html: 'Diezo &#9839;' },
   addNaturalText: { html: 'Natura &#9838;' },

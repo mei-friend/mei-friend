@@ -168,6 +168,9 @@ export const lang = {
 
   // INSERT MENU ITEM
   insertMenuTitle: { text: 'Вставити' },
+  addNoteText: { text: 'Додати ноту' },
+  convertNoteToRestText: { text: 'Нота(и) <=> пауза(и)' },
+  toggleChordText: { text: 'Нота(и) <=> акорд' },
   addDoubleSharpText: { html: 'Подвійний діез &#119082;' },
   addSharpText: { html: 'Дієз &#9839;' },
   addNaturalText: { html: 'Натураль &#9838;' },
