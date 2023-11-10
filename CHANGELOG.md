@@ -1,5 +1,5 @@
 # mei-friend-online CHANGELOG.md
-### 1.0.5 (?) patch
+### 1.0.5 patch
 * Keyboard shortcut (`CTRL + SPACE`) to switch focus between notation and encoding panel (#55)
 * Keyboard shortcut (`N`) to duplicate a selected chord, note or rest, or insert a new note into an empty layer (#57)
 * Keyboard shortcut (`SHIFT + N`) to convert selected notes to rests and rests to notes (#57)
