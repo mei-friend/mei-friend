@@ -1,7 +1,8 @@
 # mei-friend-online CHANGELOG.md
+
 ### 1.0.5 patch
 * Add Ukrainian and Esperanto language packs (still to be proof-read)
-* Keyboard shortcut (`CTRL + SPACE`) to switch focus between notation and encoding panel (#55)
+* Keyboard shortcut (`CTRL + ALT + SPACE`) to switch focus between notation and encoding panel (#55)
 * Keyboard shortcut (`N`) to duplicate a selected chord, note or rest, or insert a new note into an empty layer (#57)
 * Keyboard shortcut (`SHIFT + N`) to convert selected notes to rests and rests to notes (#57)
 * Keyboard shortcut (`.`) to add or remove `dots="1"` to notes, chords, etc.
@@ -22,6 +23,7 @@
 * Show warning message when clicking on or drag-selecting elements without xml:ids (#10)
 * Drag'n'drop on CodeMirror editor now shows drag overlay screen
 * Take language from browser locale
+
 ### 1.0.1 patch
 * Reduce mei-friend-specific Verovio defaults
 * Add auto-translated draft of Japanese language pack

@@ -241,10 +241,10 @@ export function addNote(v, cm) {
   }
   v.allowCursorActivity = false;
 
-  // create new element
+  // clone element (chord, rest) or create new element
   let newEl;
   const uuid = utils.generateXmlId(selEl.nodeName, v.xmlIdStyle);
-  if (selEl.nodeName === 'chord') {
+  if (['chord', 'rest'].includes(selEl.nodeName)) {
     newEl = selEl.cloneNode(true);
     newEl.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
   } else if (selEl.nodeName === 'layer') {
@@ -257,16 +257,28 @@ export function addNote(v, cm) {
     newEl = v.xmlDoc.createElementNS(dutils.meiNameSpace, selEl.nodeName);
     newEl.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
     const chord = selEl.parentElement?.closest('chord');
-    let addEl = chord ? chord : newEl;
-    addEl.setAttribute('dur', selEl.hasAttribute('dur') ? selEl.getAttribute('dur') : dur);
-    if (selEl.nodeName === 'note') {
-      newEl.setAttribute('oct', selEl.hasAttribute('oct') ? selEl.getAttribute('oct') : oct);
-      newEl.setAttribute('pname', selEl.hasAttribute('pname') ? selEl.getAttribute('pname') : pname);
-    } else if (selEl.nodeName === 'rest') {
-      if (selEl.hasAttribute('oloc')) newEl.setAttribute('oloc', selEl.getAttribute('oloc'));
-      if (selEl.hasAttribute('ploc')) newEl.setAttribute('ploc', selEl.getAttribute('ploc'));
-    }
+    let addEl = chord ? chord : newEl; // place in chord, if a parent
+    copyAttribute(addEl, selEl, 'cue');
+    copyAttribute(addEl, selEl, 'dots');
+    copyAttribute(addEl, selEl, 'dur', dur);
+    copyAttribute(addEl, selEl, 'grace');
+    copyAttribute(newEl, selEl, 'oct', oct); // place in new element
+    copyAttribute(newEl, selEl, 'pname', pname); // place in new element
+    copyAttribute(addEl, selEl, 'stem.dir');
   }
+  /**
+   * Copies attribute attName to new element, if present,
+   * or assigns defaultValue, if given
+   * @param {Element} newEl
+   * @param {Element} oldEl
+   * @param {string} attName
+   * @param {string} defaultValue
+   */
+  function copyAttribute(newEl, oldEl, attName, defaultValue = '') {
+    if (oldEl.hasAttribute(attName)) newEl.setAttribute(attName, oldEl.getAttribute(attName));
+    else if (defaultValue) newEl.setAttribute(attName, defaultValue);
+  }
+
   if (selEl.nodeName === 'chord') {
     for (let e of newEl.children) {
       e.setAttributeNS(dutils.xmlNameSpace, 'xml:id', utils.generateXmlId(e.nodeName, v.xmlIdStyle));
