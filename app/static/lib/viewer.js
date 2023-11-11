@@ -822,20 +822,17 @@ export default class Viewer {
   switchFocusBetweenNotationAndEncoding(cm) {
     let notation = document.getElementById('notation');
     let encoding = document.getElementById('encoding');
-    // console.log('Notation', notation);
-    // console.log('Active element: ', document.activeElement);
-    if (document.activeElement === document.activeElement.closest('#notation')) {
-      cm.focus();
+    if (document.activeElement.closest('#notation')) {
       // console.log('Switching to encoding');
+      cm.focus();
       notation.classList.remove('panelFocus');
       encoding.classList.add('panelFocus');
     } else {
-      notation.focus();
       // console.log('Switching to notation');
+      notation.focus();
       encoding.classList.remove('panelFocus');
       notation.classList.add('panelFocus');
     }
-    // console.log('New active element: ', document.activeElement);
   } // switchFocusBetweenNotationAndEncoding()
 
   showSettingsPanel() {
