@@ -303,12 +303,24 @@ export function countAsBreak(el, sourceId = '') {
  * @returns {string}
  */
 export function xmlToString(xmlNode) {
+  sortNodeAttributes(xmlNode);
   let str = new XMLSerializer().serializeToString(xmlNode);
-  // console.info('xmlToString: ' + str);
   str = str.replace(/(?:><)/g, '>\n<');
-  // console.info('xmlToString: ' + str);
-  return str.replace(' xmlns="' + meiNameSpace + '"', '');
+  str = str.replace(' xmlns="' + meiNameSpace + '"', '');
+  return str; 
 } // xmlToString()
+
+/**
+ * Sort element attributes alphabetically, keeping xml:id first attribute
+ * @param {Element} xmlNode 
+ */
+export function sortNodeAttributes(xmlNode) {
+  let attributeNames = xmlNode.getAttributeNames();
+  attributeNames.splice(attributeNames.indexOf('xml:id'), 1); // remove xmlId from attribute names list
+  let attributePairs = attributeNames.map((attName) => [attName, xmlNode.getAttribute(attName)]);
+  attributeNames.forEach((attName) => xmlNode.removeAttribute(attName)); // remove all, but xml:id
+  attributePairs.sort().forEach((attPair) => xmlNode.setAttribute(attPair.at(0), attPair.at(1)));
+} // sortNodeAttributes()
 
 /**
  * Checks xmlDoc for expand elements and returns an array of arrays
