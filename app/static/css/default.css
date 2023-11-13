@@ -484,8 +484,8 @@ a:active {
 }
 
 #notation:focus-within, #encoding:focus-within {
-  border-color: var(--fileStatusColor);
-  animation: showFocus .5s;
+  border-color: #090;
+  animation: showFocus 1s;
 }
 
 .resizer {
@@ -1639,11 +1639,15 @@ midi-player::part(play-button) {
 }
 
 @keyframes showFocus {
-  from {
-    border-style: dotted;
+  0% {
+    border-color: #0d0;
   }
 
-  to  {
-    border-style: solid;
+  50% {
+    border-color: #0b0;
+  }
+
+  100% {
+    border-color: #090;
   }
 }
