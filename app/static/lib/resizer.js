@@ -11,7 +11,7 @@ import {
 // notation variables (verovioContainer)
 let notationOrientation = defaultNotationOrientation; // position of notation
 let notationProportion = defaultNotationProportion; // proportion notation div takes from container
-let notationResizerWidth = defaultNotationResizerWidth; // 3 px (1 + 2 padding), Attention: hard-coded also in left.css, right.css, top.css, bottom.css
+let notationResizerWidth = defaultNotationResizerWidth; // 3 px, Attention: hard-coded also in left.css, right.css, top.css, bottom.css
 // facsimile variables (facsimileContainer)
 let facsimileOrientation = defaultFacsimileOrientation; // notationOrientation of facsimile relative to notation
 let facsimileProportion = defaultFacsimileProportion;

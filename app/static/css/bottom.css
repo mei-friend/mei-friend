@@ -16,8 +16,7 @@
 
 #dragMe.resizer {
   cursor: row-resize;
-  height: 1px;
-  padding:0px 1px;
+  height: 3px;
 }
 
 #dragMe.resizer svg {
