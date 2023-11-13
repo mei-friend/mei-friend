@@ -79,7 +79,7 @@
   },
 
   ".platform-darwin": {
-    "shift-alt-space": "switchFocus",
+    "ctrl-alt-f": "switchFocus",
     "cmd-right": "nextMeasure",
     "cmd-left": "previousMeasure",
     "ctrl-cmd-right": "nextPage",
@@ -142,7 +142,7 @@
   },
 
   ".platform-win32, .platform-linux": {
-    "shift-alt-space": "switchFocus",
+    "ctrl-alt-f": "switchFocus",
     "ctrl-right": "nextMeasure",
     "ctrl-left": "previousMeasure",
     "ctrl-alt-right": "nextPage",

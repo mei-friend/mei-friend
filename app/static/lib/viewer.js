@@ -825,13 +825,9 @@ export default class Viewer {
     if (document.activeElement.closest('#notation')) {
       // console.log('Switching to encoding');
       cm.focus();
-      notation.classList.remove('panelFocus');
-      encoding.classList.add('panelFocus');
     } else {
       // console.log('Switching to notation');
       notation.focus();
-      encoding.classList.remove('panelFocus');
-      notation.classList.add('panelFocus');
     }
   } // switchFocusBetweenNotationAndEncoding()
 
