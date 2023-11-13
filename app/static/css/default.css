@@ -1642,9 +1642,17 @@ midi-player::part(play-button) {
   0% {
     border-color: #0d0;
   }
+  
+  25% {
+    border-color: #0c0;
+  }
 
   50% {
     border-color: #0b0;
+  }
+
+  75% { 
+    border-color: #0a0;
   }
 
   100% {
