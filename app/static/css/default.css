@@ -11,6 +11,7 @@
   --defaultSuppliedHighlightedColor: #b37400;
   /* TODO use mdw blue */
   --defaultHighlightColor: #4e8bed;
+  --defaultHighlightPulseColor: #0e4bad;
   --defaultControlMenuBackgroundColor: lightgray;
   --defaultNavbarBackgroundColor: lightgray;
   --defaultKeyboardShortCutColor: navy;
@@ -49,6 +50,7 @@
   --suppliedColor: var(--defaultSuppliedColor);
   --suppliedHighlightedColor: var(--defaultSuppliedHighlightedColor);
   --highlightColor: var(--defaultHighlightColor);
+  --highlightPulseColor: var(--defaultHighlightPulseColor);
   --controlMenuBackgroundColor: var(--defaultControlMenuBackgroundColor);
   --navbarBackgroundColor: var(--defaultNavbarBackgroundColor);
   --keyboardShortCutColor: var(--defaultKeyboardShortCutColor);
@@ -1023,16 +1025,41 @@ svg text {
   color: orange !important;
 }
 
+
+@keyframes pulseHighlighted {
+  0% { 
+    color: var(--textColor);
+    fill: var(--textColor);
+    stroke: var(--textColor);
+  }
+
+  20% { 
+    color: var(--highlightPulseColor);
+    fill: var(--highlightPulseColor);
+    stroke: var(--highlightPulseColor);
+  }
+
+  100% { 
+    color: var(--highlightColor);
+    fill: var(--highlightColor);
+    stroke: var(--highlightColor);
+  }
+}
+
 #verovio-panel .highlighted,
 #verovio-panel .highlighted g {
   color: var(--highlightColor);
   fill: var(--highlightColor);
+  animation: pulseHighlighted .6s;
+  animation-timing-function:ease;
 }
 
 #verovio-panel g.highlighted,
 #verovio-panel text.highlighted {
   fill: var(--highlightColor);
   fill-opacity: 100%;
+  animation: pulseHighlighted .6s;
+  animation-timing-function:ease;
 }
 
 #facsimile-panel rect.highlighted {
@@ -1040,6 +1067,8 @@ svg text {
   stroke-opacity: 70%;
   fill: var(--highlightColor);
   fill-opacity: 15%;
+  animation: pulseHighlighted .6s;
+  animation-timing-function:ease;
 }
 
 #facsimile-panel text.highlighted {
@@ -1047,6 +1076,8 @@ svg text {
   stroke-opacity: 70%;
   fill: var(--highlightColor);
   fill-opacity: 70%;
+  animation: pulseHighlighted .6s;
+  animation-timing-function:ease;
 }
 
 #verovio-panel g.supplied g {
@@ -1057,10 +1088,14 @@ svg text {
 #verovio-panel .supplied .highlighted {
   color: var(--suppliedHighlightedColor);
   fill: var(--suppliedHighlightedColor);
+  animation: pulseHighlighted .6s;
+  animation-timing-function:ease;
 }
 
 #verovio-panel g.supplied g.highlighted {
   fill: var(--suppliedHighlightedColor);
+  animation: pulseHighlighted .6s;
+  animation-timing-function:ease;
 }
 
 #verovio-panel {
