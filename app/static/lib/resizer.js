@@ -11,7 +11,7 @@ import {
 // notation variables (verovioContainer)
 let notationOrientation = defaultNotationOrientation; // position of notation
 let notationProportion = defaultNotationProportion; // proportion notation div takes from container
-let notationResizerWidth = defaultNotationResizerWidth; // 8 px, Attention: hard-coded also in left.css, right.css, top.css, bottom.css
+let notationResizerWidth = defaultNotationResizerWidth; // 3 px (1 + 2 padding), Attention: hard-coded also in left.css, right.css, top.css, bottom.css
 // facsimile variables (facsimileContainer)
 let facsimileOrientation = defaultFacsimileOrientation; // notationOrientation of facsimile relative to notation
 let facsimileProportion = defaultFacsimileProportion;
@@ -91,7 +91,7 @@ export function setOrientation(cm, _notationOrientation = '', _facsimileOrientat
       annotationPanel.style.display = 'none';
     }
     notationDiv.style.width = Math.ceil(sz.width * notationProportion);
-    notationDiv.style.height = sz.height; //- 6; TODO: remove when border removed
+    notationDiv.style.height = sz.height - 6; //TODO: remove when border removed
     cm.setSize(sz.width * (1 - notationProportion) - notationResizerWidth, sz.height - codeCheckerHeight);
   }
   friendSz.style.width = sz.width;
