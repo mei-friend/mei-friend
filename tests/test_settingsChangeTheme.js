@@ -1,6 +1,7 @@
 const utils = require('./testUtils.js');
 const { Builder, By, Key, until } = require('selenium-webdriver');
 const chrome = require('selenium-webdriver/chrome');
+const assert = require('assert');
 
 (async function test_settingsChangeTheme() {
   let driver = await new Builder()
