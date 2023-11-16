@@ -18,13 +18,9 @@ const chrome = require('selenium-webdriver/chrome');
       const srcAttribute = await meiFriendLogo.getAttribute('src');
       console.log("ping")
       console.log("src attribute: ", srcAttribute)
-      if (!srcAttribute.endsWith('-asleep.svg')) {
-        console.warn('Settings theme test - unexpected outcome: owl awake during the day!');
-      } // interact with the measure element here
+      assert(!srcAttribute.endsWith('logo-asleep.svg'), 'Settings theme test - unexpected outcome: owl awake during the day!');
       await utils.selectFromDropdown(driver, 'theme', 'cobalt');
-      if (srcAttribute.endsWith('-asleep.svg')) {
-        console.warn('Settings theme test - unexpected outcome: owl asleep at night!');
-      } // interact with the measure element here
+      assert(srcAttribute.endsWith('logo.svg'), 'Settings theme test - unexpected outcome: owl asleep at night!');
       utils.closeSettings(driver);
     } catch (error) {
       console.error('Settings theme test - error: ', error);
