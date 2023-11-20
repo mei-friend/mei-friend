@@ -540,8 +540,15 @@ export default class Viewer {
         'tuplet',
         'accid',
         'artic',
-        att.modelControlEvents,
-      ].includes(nodeName)
+        'bTrem',
+        'fTrem',
+        'ambNote',
+        'mRpt',
+        'mRpt2',
+        'halfmRpt',
+      ]
+        .concat(att.modelControlEvents)
+        .includes(nodeName)
     ) {
       this.showAlert(
         translator.lang.missingIdsWarningAlert.text +
