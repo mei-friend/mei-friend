@@ -96,6 +96,10 @@ body {
   background-color: var(--backgroundColor);
 }
 
+#GithubButton:disabled { 
+  display:none;
+}
+
 a:link {
   text-decoration: none;
   color: var(--highlightColor);
