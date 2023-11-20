@@ -73,9 +73,12 @@
   --annotationPanelTextColor: var(--defaultAnnotationPanelTextColor);
 }
 
-body.lang_ja, #lang_ja_native { 
+body.lang_ja,
+#lang_ja_native {
   /* recommended font stack for Japanese, as per https://mhdigital.llc/web-typography-in-japanese/ */
-  font-family: 'ヒラギノ角ゴ ProN', 'Hiragino Kaku Gothic ProN', '游ゴシック', '游ゴシック体', YuGothic, 'Yu Gothic', 'メイリオ', Meiryo, 'ＭＳ ゴシック', 'MS Gothic', HiraKakuProN-W3, 'TakaoExゴシック', TakaoExGothic, 'MotoyaLCedar', 'Droid Sans Japanese', sans-serif;
+  font-family: 'ヒラギノ角ゴ ProN', 'Hiragino Kaku Gothic ProN', '游ゴシック', '游ゴシック体', YuGothic, 'Yu Gothic',
+    'メイリオ', Meiryo, 'ＭＳ ゴシック', 'MS Gothic', HiraKakuProN-W3, 'TakaoExゴシック', TakaoExGothic, 'MotoyaLCedar',
+    'Droid Sans Japanese', sans-serif;
 }
 body {
   font-family: Arial, Helvetica, sans-serif;
@@ -179,14 +182,17 @@ a:active {
 
 .openUrlOverlay,
 #githubActionsOverlay,
-#solidOverlay {
+#solidOverlay,
+#splashOverlay {
+  flex-direction: row;
+  justify-content: center;
   position: fixed;
   display: none;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.8);
+  background-color: #d7e3f4cc;
   z-index: 190;
 }
 
@@ -268,6 +274,7 @@ a:active {
 
 .openUrlOverlay .openUrlUI,
 .forkRepositoryOverlay .forkRepositoryUI,
+#splash,
 #githubActionsUI {
   position: absolute;
   top: 20%;
@@ -279,6 +286,79 @@ a:active {
   background-color: var(--overlayBackgroundColor);
   color: var(--overlayTextColor);
   z-index: 190;
+}
+
+#splash {
+  padding: 1em 1em;
+  max-width: 600px;
+  min-width: 250px;
+  max-height: 400px;
+  left: unset;
+}
+
+#splashHeader {
+  text-align: center;
+  margin-bottom: 1em;
+}
+
+#splashHeader img {
+  width: 95%;
+  max-height: 500px;
+}
+
+#splashBody {
+  padding: 0em 1em;
+  height: 45%;
+  overflow-y: auto;
+  color: black;
+  background-color: var(--overlayTextColor);
+  border-radius: 10px;
+}
+
+/** start loading animation for splash screen text (not used for now) */
+/* 
+#splashBodyLoading { 
+  position:relative;
+  left: calc(50% - 1em);
+  top: 50%;
+}
+
+#splashBodyLoading:after {
+    content: '\00a0\00a0\00a0';
+    animation: progress-ellipsis 0.8s infinite;
+}
+
+@keyframes progress-ellipsis {
+    0% {
+        content: '\00a0\00a0\00a0';
+    }
+    25% {
+        content: '.\00a0\00a0';
+    }
+    50% {
+        content: '..\00a0';
+    }
+    75% {
+        content: '...';
+    }
+} 
+*/
+/** end loading animation for splash screen text **/
+
+#splashFooter {
+  font-size: small;
+}
+
+#splashVersion {
+  margin: 1em 1em;
+}
+
+#splashVersionNumber a {
+  color: var(--overlayLinkColor);
+}
+
+#splashAlwaysShowCtrl {
+  float: right;
 }
 
 .openUrlOverlay .openUrlUI > div,
@@ -1372,6 +1452,7 @@ input,
 select {
   background-color: var(--backgroundColor);
   color: var(--textColor);
+  text-align: left;
 }
 
 select > option {
@@ -1539,4 +1620,21 @@ midi-player::part(play-button) {
 
 #closeMidiPlaybackControlBarButton:hover {
   background-color: var(--settingsLinkHoverColor);
+}
+
+.panelFocus {
+  border-color: red;
+  border-radius: 4px;
+  border-width: 3px;
+  animation: showFocus 2s;
+}
+
+@keyframes showFocus {
+  from {
+    border-style: dotted;
+  }
+
+  to  {
+    border-style: none;
+  }
 }

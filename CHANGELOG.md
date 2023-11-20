@@ -1,11 +1,37 @@
 # mei-friend-online CHANGELOG.md
 
-### 1.0.1 Version 1.0.1 patch
+### 1.0.5 patch
+* Add Ukrainian and Esperanto language packs (still to be proof-read)
+* Keyboard shortcut (`CTRL + ALT + SPACE`) to switch focus between notation and encoding panel (#55)
+* Keyboard shortcut (`N`) to duplicate a selected chord, note or rest, or insert a new note into an empty layer (#57)
+* Keyboard shortcut (`SHIFT + N`) to convert selected notes to rests and rests to notes (#57)
+* Keyboard shortcut (`.`) to add or remove `dots="1"` to notes, chords, etc.
+* Keyboard shortcut (`C`) to embed selected notes inside a new chord element, and vice versa (remove chord and leave notes)
+* Misleading warning when clicking on elements without ID fixed (#52)
+
+### 1.0.4 patch
+* Tweak CSS select and translations (German)
+* Fix typo at forking via URL parameters
+
+### 1.0.3 patch
+* Enable navigation link to generated MAO objects (identify object annotations)
+
+### 1.0.2 Splash screen (released 3 Oct 2023)
+* Add splash screen on application load explaining data storage (#41)
+* Fix bug when drag-selected elements contain non-note elements and blocked inserting control elements on them (such as slurs) (#48)
+* Support for @meter.sym/@sym information (#49). No slur (spanning element) inserted when on same time stamps.
+* Support keyboard shortcuts (with os-dependent modifier keys) in encoding editor (#50)
+* Show warning message when clicking on or drag-selecting elements without xml:ids (#10)
+* Drag'n'drop on CodeMirror editor now shows drag overlay screen
+* Take language from browser locale
+
+### 1.0.1 patch
 * Reduce mei-friend-specific Verovio defaults
 * Add auto-translated draft of Japanese language pack
 * Add keyboard shortcuts to editor for saving, loading and printing files
 * Generate URL with all available parameters and lower precision
 * Fix for facsimile images not loading without zone elements (#45)
+* Fix bug when modified MEI encoding was not restored from local storage when working from GitHub
 * Always show validation report upon manual validation, but not during auto validation
 
 ## 1.0.0 Version 1.0 (released 4 September 2023)

@@ -6,6 +6,86 @@ import * as att from '../lib/attribute-classes.js';
 import { heart } from '../css/icons.js';
 
 export const lang = {
+  // Écran de démarrage
+  aboutMeiFriend: { text: 'À propos de mei-friend' },
+  showSplashScreen: {
+    text: "Afficher l'écran de démarrage",
+    description: "Afficher l'écran de démarrage de mei-friend lorsque l'application est chargée",
+  },
+  splashBody: {
+    html: `
+      <p>
+        mei-friend est un éditeur pour les <a href="https://music-encoding.org">encodages musicaux</a>, hébergé à l'
+        <a href="https://mdw.ac.at" target="_blank">Université de Musique et des Arts du Spectacle de Vienne</a>. 
+        Veuillez consulter notre <a href="https://mei-friend.github.io" target="_blank">documentation complète</a> pour 
+        plus d'informations.
+      </p>
+      <p>
+        Bien que mei-friend soit une application basée sur le navigateur, vos données personnelles (y compris l'encodage que vous
+        modifiez, les paramètres de votre application et les détails de connexion actuels, le cas échéant) sont stockés dans le
+        <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank"
+          >stockage local</a
+        > de votre navigateur et ne sont pas transmis ou stockés sur nos serveurs.
+      </p>
+      <p>
+        Les données sont transmises à GitHub uniquement lorsque vous le demandez explicitement (par exemple, lorsque vous vous
+        connectez à GitHub, chargez votre encodage depuis un référentiel GitHub ou demandez l'exécution d'un flux de travail
+        GitHub Action pour vous). De même, les données sont transmises à votre fournisseur Solid choisi uniquement lorsque vous
+        le demandez explicitement (par exemple, lorsque vous vous connectez à Solid, ou chargez ou enregistrez des annotations
+        stand-off).
+      </p>
+      <p>
+        Nous utilisons <a href="https://matomo.org/" target="_blank">Matomo</a>
+        pour collecter des statistiques d'utilisation anonymes. Celles-ci comprennent votre adresse IP tronquée (permettant
+        la géolocalisation au niveau du pays mais sans identification supplémentaire), votre navigateur et système
+        d'exploitation, d'où vous venez (c'est-à-dire le site Web de référence), l'heure et la durée de votre visite, et
+        les pages que vous avez visitées. Ces informations sont stockées sur l'instance Matomo fonctionnant sur les serveurs
+        de l'Université de musique et des arts du spectacle de Vienne et ne sont pas partagées avec des tiers.
+      </p>
+      <p>
+        La boîte à outils Verovio est chargée depuis <a href="https://verovio.org" target="_blank">https://verovio.org</a>, 
+        hébergée par <a href="https://rism.digital/" target="_blank">RISM Digital Switzerland</a>. 
+        Cela permet à mei-friend de rester à jour avec la dernière version de la boîte à outils
+        et de proposer le choix de toutes les versions prises en charge via le panneau de configuration. 
+        Lorsque vous utilisez mei-friend, votre adresse IP est donc visible par RISM Digital.
+      </p>
+      <p>
+        Enfin, la lecture MIDI est présentée à l'aide de la police sonore SGM_plus fournie par Google Magenta et servie via
+        googleapis.com. Votre adresse IP est donc visible par Google lors du démarrage de la lecture MIDI. Si vous ne souhaitez
+        pas que cela se produise, veuillez vous abstenir d'utiliser la fonction de lecture MIDI.
+      </p>
+      <p>
+        mei-friend est développé par
+        <a href="https://iwk.mdw.ac.at/werner-goebl" target="_blank">Werner Goebl</a> et
+        <a href="https://iwk.mdw.ac.at/david-weigl" target="_blank">David M. Weigl</a> au Département d'acoustique musicale -
+        Wiener Klangstil de l'Université de musique et des arts du spectacle de Vienne, et est sous licence
+        <a href="https://spdx.org/licenses/AGPL-3.0-or-later.html" target="_blank"
+          >GNU Affero General Public License v3.0</a
+        >. Veuillez consulter notre <a href="https://mei-friend.github.io/about/" target="_blank">page de remerciements</a>
+        pour plus d'informations sur les contributeurs et les composants open source réutilisés dans notre projet. Nous
+        remercions nos collègues pour leurs contributions et leur orientation.
+      </p>
+      <p>
+        Le développement de l'application Web mei-friend est financé par le
+        <a href="https://fwf.ac.at" target="_blank">Fonds autrichien pour la science (FWF)</a> dans le cadre des projets
+        <a href="https://iwk.mdw.ac.at/signature-sound-vienna/" target="_blank"
+          >P 34664-G (Signature Sound Vienna)</a
+        >
+        et <a href="https://e-laute.info">I 6019 (E-LAUTE)</a>.
+      </p>
+    `,
+  },
+  splashGotItButtonText: { text: 'Compris !' },
+  splashVersionText: { text: 'Version' },
+  splashAlwaysShow: {
+    text: 'Toujours afficher cet écran de démarrage',
+    description: "Toujours afficher cet écran de démarrage lors du chargement de l'application",
+  },
+  splashAlwaysShowLabel: {
+    text: 'Toujours afficher cet écran de démarrage',
+    description: "Toujours afficher cet écran de démarrage lors du chargement de l'application",
+  },
+
   // Main menu bar
   githubLoginLink: { text: 'Connexion' },
 
@@ -89,6 +169,7 @@ export const lang = {
   staffDownText: { text: "Élément d'un personnel vers le bas" },
   increaseDurText: { text: 'Augmenter la durée' },
   decreaseDurText: { text: 'Réduire la durée' },
+  toggleDotsText: { text: 'Activar punxat' },
   cleanAccidText: { text: 'Vérifier les @accid.ges' },
   renumberMeasuresTestText: { text: 'Renommer les mesures (test)' },
   renumberMeasuresExecText: { text: 'Renommer les mesures (exécution)' },
@@ -100,6 +181,9 @@ export const lang = {
 
   // INSERT MENU ITEM  ELEMENT DE MENU INSERTION
   insertMenuTitle: { text: 'Insérer' },
+  addNoteText: { text: 'Ajouter une note' },
+  convertNoteToRestText: { text: 'Note(s) <=> silence(s)' },
+  toggleChordText: { text: 'Note(s) <=> accord' },
   addDoubleSharpText: { html: 'Double dièse &#119082;' },
   addSharpText: { html: 'Dièse &#9839;' },
   addNaturalText: { html: 'Bécarre &#9838;' },
@@ -146,7 +230,7 @@ export const lang = {
 
   // HELP MENU ITEM / ÉLÉMENT DE MENU D'AIDE
   helpMenuTitle: { text: 'Aide' },
-  goToHelpPage: { text: "Pages d'aide de mei-friend" },
+  goToHelpPageText: { text: "Pages d'aide de mei-friend" },
   goToCheatSheet: { text: 'Antisèche de mei-friend' },
   showChangelog: { text: 'Journal des modifications de mei-friend' },
   goToGuidelines: { text: 'Lignes directrices MEI' },
@@ -914,4 +998,9 @@ export const lang = {
   codeCheckerHasExtra: { text: 'possède un élément supplémentaire' },
   codeCheckerLacksAn: { text: "manque d'un" },
   codeCheckerBecauseAlreadyDefined: { text: 'car il a été défini plus tôt dans la mesure' },
+
+  // Warning for missing ids
+  missingIdsWarningAlert: {
+    text: "mei-friend n'arrive pas à faire défiler les éléments sélectionnés dans l'encodage. Veuillez ajouter des identifiants à l'encodage.",
+  },
 };

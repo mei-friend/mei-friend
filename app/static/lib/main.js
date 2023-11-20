@@ -1,6 +1,6 @@
 // mei-friend version and date
-export const version = '1.0.1';
-export const versionDate = '21 September 2023'; // use full or 3-character english months, will be translated
+export const version = '1.0.5';
+export const versionDate = '20 November 2023'; // use full or 3-character english months, will be translated
 
 var vrvWorker;
 var spdWorker;
@@ -11,6 +11,7 @@ var pageParam; // (int) page parameter given through URL
 var selectParam; // (array) select ids given through multiple instances in URL
 let safariWarningShown = false; // show Safari warning only once
 let restoreSolidTimeout; // JS timeout that allows users to 'esc' before restoring solid session
+let splashInitialLoad = true; // flag to know whether splash screen button needs to call completeInitialLoad()
 const restoreSolidTimeoutDelay = 1500; // how long to wait for above timeout, in ms
 
 // exports
@@ -113,6 +114,7 @@ import {
   guidelinesBase,
   platform,
   isSafari,
+  supportedLanguages,
 } from './defaults.js';
 import Translator from './translator.js';
 import { buildLanguageSelection, translateLanguageSelection } from './language-selector.js';
@@ -141,23 +143,9 @@ const defaultCodeMirrorOptions = {
     "'/'": completeIfAfterLt,
     "' '": completeIfInTag,
     "'='": completeIfInTag,
-    'Ctrl-Space': 'autocomplete',
-    'Alt-.': consultGuidelines,
     'Shift-Alt-f': indentSelection,
     'Shift-Ctrl-G': toMatchingTag,
     "'Ï'": indentSelection, // TODO: overcome strange bindings on MAC
-    'Cmd-E': encloseSelectionWithTag, // TODO: make OS modifier keys dynamic
-    'Ctrl-E': encloseSelectionWithTag,
-    'Cmd-/': encloseSelectionWithLastTag,
-    'Ctrl-/': encloseSelectionWithLastTag,
-    'Cmd-L': generateUrl,
-    'Ctrl-L': generateUrl,
-    'Cmd-O': openFileDialog,
-    'Ctrl-O': openFileDialog,
-    'Cmd-P': togglePdfMode,
-    'Ctrl-P': togglePdfMode,
-    'Cmd-S': downloadMei,
-    'Ctrl-S': downloadMei,
   },
   lint: {
     caller: cm,
@@ -270,7 +258,7 @@ export function loadDataInEditor(mei, setFreshlyLoaded = true) {
   clearAnnotations();
   readAnnots(true); // from annotation.js
   setCursorToId(cm, handleURLParamSelect());
-}
+} // loadDataInEditor()
 
 export function updateLocalStorage(meiXml) {
   // if storage is available, save file name, location, content
@@ -362,7 +350,7 @@ export async function validate(mei, updateLinting, options) {
     if (v.validatorWithSchema && (document.getElementById('autoValidate').checked || options.forceValidate)) {
       let vs = document.getElementById('validation-status');
       vs.innerHTML = clock;
-      v.changeStatus(vs, 'wait', ['error', 'ok', 'manual']); // darkorange
+      Viewer.changeStatus(vs, 'wait', ['error', 'ok', 'manual']); // darkorange
       vs.querySelector('svg').classList.add('clockwise');
       vs.setAttribute('title', translator.lang.validatingAgainst.text + ' ' + v.currentSchema);
       const validationString = await validator.validateNG(mei);
@@ -395,7 +383,9 @@ document.addEventListener('DOMContentLoaded', function () {
   translator = new Translator();
   // we need to look directly to local storage, because it will
   let language = window.localStorage['mf-selectLanguage'];
-  let langCode = language || translator.defaultLangCode;
+  let browseLang = navigator.language.substring(0, 2) || '';
+  if (!browseLang in supportedLanguages) browseLang = '';
+  let langCode = language || browseLang || translator.defaultLangCode;
   if (langCode !== translator.langCode) {
     // load other language...
     translator.requestLanguagePack(langCode).then((p) => {
@@ -405,7 +395,7 @@ document.addEventListener('DOMContentLoaded', function () {
       onLanguageLoaded();
     });
   } else {
-    // ...or go on with default language
+    translator.translateGui();
     onLanguageLoaded();
   }
 });
@@ -422,6 +412,25 @@ function onLanguageLoaded() {
   }
   // build language selection menu
   buildLanguageSelection();
+
+  createSplashScreen();
+
+  // show splash screen if required
+  if (storage.supported) {
+    storage.read();
+    if (!storage.splashAcknowledged || storage.showSplashScreen) {
+      showSplashScreen(true);
+    } else {
+      completeInitialLoad();
+    }
+  } else {
+    completeInitialLoad();
+  }
+} // onLanguageLoaded()
+
+function completeInitialLoad() {
+  splashInitialLoad = false; // avoid re-initialising app from splash screen button
+
   // link to changelog page according to env settings (develop/staging/production)
   let changeLogUrl;
   switch (env) {
@@ -439,6 +448,10 @@ function onLanguageLoaded() {
 
   cm = CodeMirror.fromTextArea(document.getElementById('editor'), defaultCodeMirrorOptions);
   CodeMirror.normalizeKeyMap();
+
+  // make sure that the drag enter event is passed through CodeMirror
+  cm.on('dragenter', (cm, ev) => dragEnter(ev));
+  cm.on('dragleave', (cm, ev) => dragLeave(ev));
 
   // set validation status icon to unverified
   let vs = document.getElementById('validation-status');
@@ -532,7 +545,6 @@ function onLanguageLoaded() {
     : 'none';
 
   if (storage.supported) {
-    storage.read();
     if (storage.github) {
       // use github object from local storage if available
       isLoggedIn = true;
@@ -571,7 +583,6 @@ function onLanguageLoaded() {
     storage.safelySetStorageItem('fileLocation', url.href);
     storage.safelySetStorageItem('fileName', url.pathname.substring(url.pathname.lastIndexOf('/') + 1));
     storage.safelySetStorageItem('fileLocationType', 'url');
-    storage.read();
     console.log('Have set local storage: ', storage);
   }
 
@@ -619,7 +630,6 @@ function onLanguageLoaded() {
 
   // restore localStorage if we have it
   if (storage.supported) {
-    storage.read();
     // save (most) URL parameters in storage
     if (orientationParam !== null) storage.notationOrientation = orientationParam;
     if (notationProportionParam !== null) storage.notationProportion = notationProportionParam;
@@ -773,7 +783,7 @@ function onLanguageLoaded() {
       loginAndFetch(getSolidIdP(), populateSolidTab);
     }, restoreSolidTimeoutDelay);
   }
-} // onLanguageLoaded
+} // completeInitialLoad()
 
 export async function openUrlFetch(url = '', updateAfterLoading = true) {
   let urlInput = document.querySelector('#openUrlInput');
@@ -1318,6 +1328,33 @@ function downloadSpeedMei() {
   }, 0);
 } // downloadSpeedMei()
 
+function createSplashScreen() {
+  const alwaysShow = document.getElementById('splashAlwaysShow'); // checkbox in splash screen
+  alwaysShow.addEventListener('change', (e) => {
+    const showSplash = document.getElementById('showSplashScreen'); // checkbox in settings
+    if (showSplash) {
+      showSplash.click();
+    } else {
+      if (e.target.checked) {
+        storage.showSplashScreen = 'true';
+      } else {
+        storage.removeItem('mf-showSplashScreen');
+      }
+    }
+  });
+  document.getElementById('splashConfirmButton').addEventListener('click', () => {
+    document.getElementById('splashOverlay').style.display = 'none';
+    window.localStorage.setItem('splashAcknowledged', 'true');
+    if (splashInitialLoad) completeInitialLoad();
+  });
+} // createSplashScreen()
+
+function showSplashScreen() {
+  const alwaysShow = document.getElementById('splashAlwaysShow'); // checkbox in splash screen
+  document.getElementById('splashOverlay').style.display = 'flex';
+  alwaysShow.checked = storage.showSplashScreen;
+} // showSplashScreen()
+
 function togglePdfMode() {
   console.log('Toggle PDF mode');
   v.pdfMode ? v.saveAsPdf() : v.pageModeOn();
@@ -1387,7 +1424,7 @@ function consultGuidelines() {
       }
     }
   }
-}
+} // consultGuidelines()
 
 // wrapper for indentSelection to be called inside CodeMirror
 function indentSelection() {
@@ -1397,7 +1434,7 @@ function indentSelection() {
 // wrapper for toMatchingTag
 function toMatchingTag() {
   e.toMatchingTag(v, cm);
-}
+} // toMatchingTag()
 
 let tagEncloserNode; // context menu to choose node name to enclose selected text
 
@@ -1472,6 +1509,7 @@ export let cmd = {
   pageModeOff: () => v.pageModeOff(),
   saveAsPdf: () => v.saveAsPdf(),
   generateUrl: () => generateUrlUI(),
+  switchFocus: () => v.switchFocusBetweenNotationAndEncoding(cm),
   filterSettings: () => v.applySettingsFilter(),
   filterReset: () => {
     document.getElementById('filterSettings').value = '';
@@ -1534,13 +1572,13 @@ export let cmd = {
   downloadMei: () => downloadMei(),
   downloadMeiBasic: () => downloadMeiBasic(),
   downloadSpeedMei: () => downloadSpeedMei(),
-  indentSelection: () => indentSelection(),
+  indentSelection: () => e.indentSelection(v, cm),
   validate: () => v.manualValidate(),
-  zoomIn: () => v.zoom(+1, storage),
-  zoomOut: () => v.zoom(-1, storage),
-  zoom50: () => v.zoom(50, storage),
-  zoom100: () => v.zoom(100, storage),
-  zoomSlider: () => {
+  notesZoomIn: () => v.zoom(+1, storage),
+  notesZoomOut: () => v.zoom(-1, storage),
+  notesZoom50: () => v.zoom(50, storage),
+  notesZoom100: () => v.zoom(100, storage),
+  notesZoomSlider: () => {
     let zoomCtrl = document.getElementById('verovioZoom');
     if (zoomCtrl && storage && storage.supported) storage.scale = zoomCtrl.value;
     v.updateLayout();
@@ -1557,6 +1595,10 @@ export let cmd = {
   },
   undo: () => cm.undo(),
   redo: () => cm.redo(),
+  // add note
+  addNote: () => e.addNote(v, cm),
+  convertNoteToRest: () => e.convertNoteToRest(v, cm),
+  convertToChord: () => e.convertToChord(v, cm),
   // add accidentals
   addDoubleSharp: () => e.addAccidental(v, cm, 'x'),
   addSharp: () => e.addAccidental(v, cm, 's'),
@@ -1614,6 +1656,7 @@ export let cmd = {
   shiftOctaveDown: () => e.shiftPitch(v, cm, -7),
   increaseDuration: () => e.modifyDuration(v, cm, 'increase'),
   decreaseDuration: () => e.modifyDuration(v, cm, 'decrease'),
+  toggleDots: () => e.toggleDots(v, cm),
   moveElementStaffUp: () => e.moveElementToNextStaff(v, cm, true),
   moveElementStaffDown: () => e.moveElementToNextStaff(v, cm, false),
   addOctave8Above: () => e.addOctaveElement(v, cm, 'above', 8),
@@ -1640,6 +1683,8 @@ export let cmd = {
   removeIds: () => e.manipulateXmlIds(v, cm, true),
   ingestFacsimile: () => ingestFacsimile(),
   addFacsimile: () => e.addFacsimile(v, cm),
+  encloseSelectionWithTag: encloseSelectionWithTag,
+  encloseSelectionWithLastTag: encloseSelectionWithLastTag,
   resetDefault: () => {
     // we're in a clickhandler, so our storage object is out of scope
     // but we only need to clear it, so just grab the window's storage
@@ -1649,9 +1694,13 @@ export let cmd = {
     }
     logoutFromGithub();
   },
-  openHelp: () => window.open(`./help`, '_blank'),
+  openHelp: () => window.open(`https://mei-friend.github.io/`, '_blank'),
   consultGuidelines: () => consultGuidelines(),
   escapeKeyPressed: () => {
+    // hide overlays
+    // TODO refactor logic for all overlays below. For now only splash overlay...
+    document.getElementById('splashOverlay').style.display = 'none';
+
     // reset settings filter, if settings have focus
     if (
       document.getElementById('settingsPanel') &&
@@ -1691,7 +1740,7 @@ export let cmd = {
       cmd.toggleMidiPlaybackControlBar();
     }
   },
-};
+}; // cmd{}
 
 // add event listeners when controls menu has been instantiated
 function addEventListeners(v, cm) {
@@ -1704,24 +1753,17 @@ function addEventListeners(v, cm) {
       // user clicked on link in message. Open link (before the DOM element disappears in the next conditional...)
       window.open(ev.target.href, '_blank');
     }
-    if (ev.target.id !== 'alertOverlay' && ev.target.id !== 'alertMessage') {
+    if (
+      ev.target.id !== 'alertOverlay' &&
+      ev.target.id !== 'alertMessage' &&
+      document.getElementById('splashOverlay').style.display === 'none'
+    ) {
       v.hideAlerts();
     }
   });
   body.addEventListener('keydown', (ev) => {
     if (ev.key === 'Escape') cmd.escapeKeyPressed();
   });
-
-  // Register key handlers to #encoding rather than giving it to CodeMirror directly
-  let enc = document.getElementById('encoding');
-  if (enc)
-    enc.addEventListener('keydown', (ev) => {
-      // Ctrl-Shift-V or Cmd-Shift-V for validation
-      if (isCtrlOrCmd(ev) && ev.shiftKey && ev.key === 'v') {
-        ev.preventDefault();
-        cmd.validate();
-      }
-    });
 
   // file status file name display
   document.getElementById('fileName').addEventListener('input', cmd.fileNameChange);
@@ -1813,9 +1855,9 @@ function addEventListeners(v, cm) {
   document.getElementById('findPrevious').addEventListener('click', () => CodeMirror.commands.findPrev(cm));
   document.getElementById('replaceMenu').addEventListener('click', () => CodeMirror.commands.replace(cm));
   document.getElementById('replaceAllMenu').addEventListener('click', () => CodeMirror.commands.replaceAll(cm));
-  document.getElementById('indentSelection').addEventListener('click', cmd.indentSelection);
-  document.getElementById('surroundWithTags').addEventListener('click', encloseSelectionWithTag);
-  document.getElementById('surroundWithLastTag').addEventListener('click', encloseSelectionWithLastTag);
+  document.getElementById('indentSelection').addEventListener('click', indentSelection);
+  document.getElementById('surroundWithTags').addEventListener('click', cmd.encloseSelectionWithTag);
+  document.getElementById('surroundWithLastTag').addEventListener('click', cmd.encloseSelectionWithLastTag);
   document.getElementById('jumpToLine').addEventListener('click', () => CodeMirror.commands.jumpToLine(cm));
   document.getElementById('toMatchingTag').addEventListener('click', toMatchingTag);
   document.getElementById('manualValidate').addEventListener('click', cmd.validate);
@@ -1832,18 +1874,18 @@ function addEventListeners(v, cm) {
   });
 
   // drag'n'drop handlers
-  let fc = document.querySelector('.dragContainer');
-  fc.addEventListener('drop', () => dropHandler(event));
-  fc.addEventListener('dragover', () => dragOverHandler(event));
-  fc.addEventListener('dragenter', () => dragEnter(event));
-  fc.addEventListener('dragleave', () => dragLeave(event));
+  let fc = document.body; // querySelector('.dragContainer');
+  fc.addEventListener('drop', (ev) => dropHandler(ev));
+  fc.addEventListener('dragover', (ev) => dragOverHandler(ev));
+  fc.addEventListener('dragenter', (ev) => dragEnter(ev));
+  fc.addEventListener('dragleave', (ev) => dragLeave(ev));
   fc.addEventListener('dragstart', (ev) => console.log('Drag Start', ev));
   fc.addEventListener('dragend', (ev) => console.log('Drag End', ev));
 
   // Zooming notation with buttons
-  document.getElementById('decreaseScaleButton').addEventListener('click', cmd.zoomOut);
-  document.getElementById('increaseScaleButton').addEventListener('click', cmd.zoomIn);
-  document.getElementById('verovioZoom').addEventListener('change', cmd.zoomSlider);
+  document.getElementById('decreaseScaleButton').addEventListener('click', cmd.notesZoomOut);
+  document.getElementById('increaseScaleButton').addEventListener('click', cmd.notesZoomIn);
+  document.getElementById('verovioZoom').addEventListener('change', cmd.notesZoomSlider);
 
   // Zooming notation with mouse wheel
   vp.addEventListener('wheel', (ev) => {
@@ -1953,6 +1995,7 @@ function addEventListeners(v, cm) {
   document.getElementById('staffDown').addEventListener('click', cmd.moveElementStaffDown);
   document.getElementById('increaseDur').addEventListener('click', cmd.increaseDuration);
   document.getElementById('decreaseDur').addEventListener('click', cmd.decreaseDuration);
+  document.getElementById('toggleDots').addEventListener('click', cmd.toggleDots);
   // Manipulate encoding methods
   document.getElementById('cleanAccid').addEventListener('click', cmd.correctAccid);
   document.getElementById('renumberMeasuresTest').addEventListener('click', () => e.renumberMeasures(v, cm, false));
@@ -1963,9 +2006,13 @@ function addEventListeners(v, cm) {
   // add/remove ids
   document.getElementById('addIds').addEventListener('click', cmd.addIds);
   document.getElementById('removeIds').addEventListener('click', cmd.removeIds);
-  // ingest facsimile sekelton into currently loaded MEI file
+  // ingest facsimile skeleton into currently loaded MEI file
   document.getElementById('ingestFacsimile').addEventListener('click', cmd.ingestFacsimile);
   document.getElementById('addFacsimile').addEventListener('click', cmd.addFacsimile);
+  // add note
+  document.getElementById('addNote').addEventListener('click', cmd.addNote);
+  document.getElementById('convertNoteToRest').addEventListener('click', cmd.convertNoteToRest);
+  document.getElementById('toggleChord').addEventListener('click', cmd.convertToChord);
   // insert accidentals
   document.getElementById('addDoubleSharp').addEventListener('click', cmd.addDoubleSharp);
   document.getElementById('addSharp').addEventListener('click', cmd.addSharp);
@@ -2014,6 +2061,14 @@ function addEventListeners(v, cm) {
   document.getElementById('toggleMarcato').addEventListener('click', cmd.toggleMarcato);
   document.getElementById('toggleStacciss').addEventListener('click', cmd.toggleStacciss);
   document.getElementById('toggleSpicc').addEventListener('click', cmd.toggleSpicc);
+
+  // show splash screen
+  document.getElementById('aboutMeiFriend').addEventListener('click', showSplashScreen);
+  document.getElementById('splashOverlay').addEventListener('click', (e) => {
+    if (e.target.id === 'splashOverlay') {
+      document.getElementById('splashOverlay').style.display = 'none'; // dismiss splash when user clicks on black background
+    }
+  });
 
   // consult guidelines
   document.getElementById('consultGuidelinesForElement').addEventListener('click', cmd.consultGuidelines);
@@ -2196,12 +2251,15 @@ export function drawRightFooter() {
     }
   }
   let rf = document.querySelector('.rightfoot');
-  rf.innerHTML =
+  const versionHtml =
     "<a href='https://github.com/mei-friend/mei-friend' target='_blank'>mei-friend " +
     (env === environments.production ? version : `${env}-${version}`) +
     '</a> (' +
     translatedVersioDate +
     ').&nbsp;';
+  rf.innerHTML = versionHtml;
+  // also update version string in splash screen
+  document.getElementById('splashVersionNumber').innerHTML = versionHtml;
   if (tkVersion) {
     let githubUrl = 'https://github.com/rism-digital/verovio/releases/tag/version-' + tkVersion.split('-')[0];
     if (tkVersion.includes('dev')) {
@@ -2298,12 +2356,22 @@ function fillInSampleEncodings() {
     });
 }
 
-// sets keyMap.json to target element and defines listeners
+/**
+ * Sets keymap JSON information to target element and defines listeners.
+ * It loads all bindings in `#notation` to document.body, and the platform-specific
+ * to both notation and editor panels (i.e. friendContainer).
+ * @param {string} keyMapFilePath
+ */
 function setKeyMap(keyMapFilePath) {
-  let vp = document.getElementById('notation');
-  if (platform.startsWith('mac')) vp.classList.add('platform-darwin');
-  if (platform.startsWith('win')) vp.classList.add('platform-win32');
-  if (platform.startsWith('linux')) vp.classList.add('platform-linux');
+  if (platform.startsWith('mac')) {
+    document.body.classList.add('platform-darwin');
+  }
+  if (platform.startsWith('win')) {
+    document.body.classList.add('platform-win32');
+  }
+  if (platform.startsWith('linux')) {
+    document.body.classList.add('platform-linux');
+  }
   fetch(keyMapFilePath)
     .then((resp) => {
       return resp.json();
@@ -2311,18 +2379,17 @@ function setKeyMap(keyMapFilePath) {
     .then((keyMap) => {
       // iterate all keys (element) in keymap.json
       for (const [key, value] of Object.entries(keyMap)) {
-        let el = document.querySelector(key);
-        if (el) {
+        document.querySelectorAll(key).forEach((el) => {
           el.setAttribute('tabindex', '-1');
           el.addEventListener('keydown', (ev) => {
             if (['pagination2', 'selectTo', 'selectFrom', 'selectRange'].includes(document.activeElement.id)) {
               return;
             }
-            ev.stopPropagation();
-            ev.preventDefault();
 
+            // at each keystroke: update cmd2key (CTRL on Mac, ALT on WIN/Linux)
             v.cmd2KeyPressed = platform.startsWith('mac') ? ev.ctrlKey : ev.altKey;
 
+            // construct keyPress and keyName from event
             let keyName = ev.key;
             if (ev.code.toLowerCase() === 'space') keyName = 'space';
             // arrowdown -> down
@@ -2334,13 +2401,17 @@ function setKeyMap(keyMapFilePath) {
             if (ev.altKey) keyPress += 'alt-';
             keyPress += keyName;
             console.info('keyPressString: "' + keyPress + '"');
+
+            // find method for keyPress and execute it, if existing
             let methodName = value[keyPress];
             if (methodName !== undefined) {
+              ev.stopPropagation();
+              ev.preventDefault();
               console.log('keyMap method ' + methodName + '.', cmd[methodName]);
-              cmd[methodName]();
+              cmd[methodName](); // execute the function
             }
           });
-        }
+        });
       }
     });
 } // setKeyMap()
@@ -2350,6 +2421,11 @@ export function isCtrlOrCmd(ev) {
   return ev ? (platform.startsWith('mac') && ev.metaKey) || (!platform.startsWith('mac') && ev.ctrlKey) : false;
 } // isCtrlOrCmd()
 
+/**
+ * Convert binary data to blob containing MIDI data an array of int8 byte numbers
+ * @param {BinaryData} data
+ * @returns {Blob}
+ */
 function midiDataToBlob(data) {
   const byteCharacters = atob(data);
   const byteNumbers = new Array(byteCharacters.length);

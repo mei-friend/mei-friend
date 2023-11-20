@@ -175,10 +175,11 @@ export function addDragSelector(v, vp) {
         });
       }
 
+      let found = true;
       // select latest element in editor
       v.allowCursorActivity = false;
       if (latest && Object.keys(latest).length > 0) {
-        setCursorToId(cm, latest.el.id);
+        found = setCursorToId(cm, latest.el.id);
         v.lastNoteId = latest.el.id;
       }
 
@@ -191,7 +192,12 @@ export function addDragSelector(v, vp) {
           v.selectedElements.push(newEl);
         }
       });
+      // console.debug('Drag-Selector selected elements: ', v.selectedElements)
 
+      if (!found) {
+        // console.debug('Drag-Selector latest element: ', latest.el.classList.item(0));
+        v.showMissingIdsWarning(latest.el.classList.item(0));
+      }
       v.updateHighlight();
       v.allowCursorActivity = true;
     }

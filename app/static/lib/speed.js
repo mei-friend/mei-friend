@@ -593,18 +593,30 @@ function getStaffNumber(element) {
 } // getStaffNumber()
 
 /**
- * @param {Element} scoreDef
+ * Searches for meter information in scoreDef/staffDef@meter.count, unit, sym
+ * or in separate meterSig child elements,
+ * @param {Element} def
  * @param {string} staffNumber
  * @returns {{count: string | null, unit: string | null}}
  */
-export function getMeter(scoreDef, staffNumber = '') {
+export function getMeter(def, staffNumber = '') {
   let meter = {
-    count: scoreDef.getAttribute('meter.count'),
-    unit: scoreDef.getAttribute('meter.unit'),
+    count: def.getAttribute('meter.count'),
+    unit: def.getAttribute('meter.unit'),
   };
+  let sym = def.getAttribute('meter.sym');
+  if (sym) {
+    if (sym === 'common') {
+      meter.count = '4';
+      meter.unit = '4';
+    } else if (sym === 'cut') {
+      meter.count = '2';
+      meter.unit = '2';
+    }
+  }
   // try to find staffDef by staffNumber
   if (staffNumber) {
-    const staffDef = scoreDef.querySelector('staffDef[n="' + staffNumber + '"]');
+    const staffDef = def.querySelector('staffDef[n="' + staffNumber + '"]');
     if (staffDef) {
       let m = getMeter(staffDef);
       if (m.count && m.unit) return m;
@@ -612,12 +624,22 @@ export function getMeter(scoreDef, staffNumber = '') {
   }
   // try to find a meterSig somewhere inside scoreDef
   if (!meter.count || !meter.unit) {
-    const meterSig = scoreDef.querySelector('meterSig');
+    const meterSig = def.querySelector('meterSig');
     if (!meterSig) return meter;
-    return {
+    meter = {
       count: meterSig.getAttribute('count'),
       unit: meterSig.getAttribute('unit'),
     };
+    let sym = meterSig.getAttribute('sym');
+    if (sym) {
+      if (sym === 'common') {
+        meter.count = '4';
+        meter.unit = '4';
+      } else if (sym === 'cut') {
+        meter.count = '2';
+        meter.unit = '2';
+      }
+    }
   }
   return meter;
 } // getMeter()
@@ -643,7 +665,8 @@ export function getScoreDefForElement(xmlDoc, element, property = '') {
         let found =
           scoreDefList.item(i).querySelector('[meter],meterSig') ||
           scoreDefList.item(i).hasAttribute('meter.unit') ||
-          scoreDefList.item(i).hasAttribute('meter.count');
+          scoreDefList.item(i).hasAttribute('meter.count') ||
+          scoreDefList.item(i).hasAttribute('meter.sym');
         if (found) {
           scoreDef = scoreDefList.item(i);
           break;
@@ -1008,7 +1031,7 @@ function addKeySigElement(staffDefs, keysigValue) {
     let k = staffDef.querySelector('keySig');
     if (k) {
       k.remove();
-    } 
+    }
     staffDef.setAttribute('key.sig', keysigValue);
   }
 } // addKeySigElement()
@@ -1216,14 +1239,25 @@ export function countStaves(scoreDef) {
 } // countStaves()
 
 /**
- * Filter selected elements and keep only highest in DOM
+ * Filter selected elements and keep only highest in DOM.
+ * If keepOnly array of strings is provided (such as ['note','chord','rest']),
+ * keep only those elements and ignore others.
+ *
  * @param {string[]} ids is modified by this function
  * @param {Document} xmlDoc
+ * @param {string[]} keepOnly
  * @returns {string[]} The modified `ids` array, with all elements removed that
  * have an ancestor that is also in the `ids` array.
  */
-export function filterElements(ids, xmlDoc) {
+export function filterElements(ids, xmlDoc, keepOnly = []) {
   for (let i = 0; i < ids.length; i++) {
+    let eli = xmlDoc.querySelector('[*|id="' + ids[i] + '"]');
+    if ((eli && keepOnly.length > 0 && !keepOnly.includes(eli.nodeName)) || !eli) {
+      // Remove elements in the list, or when not in encoding (such as @accid)
+      console.debug('Speed.filterElements: removed: ', eli ? eli : ids[i]);
+      ids.splice(i--, 1);
+      continue;
+    }
     for (let j = i + 1; j < ids.length; j++) {
       const elj = xmlDoc.querySelector('[*|id="' + ids[j] + '"]');
       if (!elj) continue;

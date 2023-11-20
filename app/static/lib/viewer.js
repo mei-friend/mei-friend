@@ -506,7 +506,10 @@ export default class Viewer {
       }
     } else {
       // set cursor position in buffer
-      utils.setCursorToId(cm, itemId);
+      let found = utils.setCursorToId(cm, itemId);
+      if (!found) {
+        this.showMissingIdsWarning(e.currentTarget.classList.item(0));
+      }
       this.selectedElements = [];
       this.selectedElements.push(itemId);
       msg += 'newly created: ' + itemId + ', size: ' + this.selectedElements.length;
@@ -524,6 +527,40 @@ export default class Viewer {
     this.lastNoteId = startid ? utils.rmHash(startid) : itemId;
     this.allowCursorActivity = true;
   } // handleClickOnNotation()
+
+  showMissingIdsWarning(nodeName = '') {
+    if (
+      [
+        'note',
+        'rest',
+        'chord',
+        'mRest',
+        'multiRest',
+        'beam',
+        'tuplet',
+        'accid',
+        'artic',
+        'bTrem',
+        'fTrem',
+        'ambNote',
+        'mRpt',
+        'mRpt2',
+        'halfmRpt',
+      ]
+        .concat(att.modelControlEvents)
+        .includes(nodeName)
+    ) {
+      this.showAlert(
+        translator.lang.missingIdsWarningAlert.text +
+          ' (' +
+          translator.lang.manipulateMenuTitle.text +
+          '&mdash;' +
+          translator.lang.addIdsText.text +
+          ')',
+        'warning'
+      );
+    }
+  } // showMissingIdsWarning()
 
   // when cursor pos in editor changed, update notation location / highlight
   cursorActivity(cm, forceFlip = false) {
@@ -673,10 +710,14 @@ export default class Viewer {
     } else if (env === environments.testing) {
       owlSrc += 'testing-';
     }
+    let splashOwl = document.getElementById('splashLogo');
+    let splashOwlSrc = splashOwl.getAttribute('src'); // splash logo does not adjust with environment
+    splashOwlSrc = splashOwlSrc.substring(0, splashOwlSrc.lastIndexOf('/') + 1);
     if (j < 128) {
       // dark
       // wake up owl
       owlSrc += 'menu-logo' + (isSafari ? '.png' : '.svg');
+      splashOwlSrc += 'menu-logo' + (isSafari ? '.png' : '.svg');
       els.forEach((el) => el.style.setProperty('filter', 'invert(.8)'));
       rt.style.setProperty('--settingsLinkBackgroundColor', utils.brighter(cm.backgroundColor, 21));
       rt.style.setProperty('--settingsLinkHoverColor', utils.brighter(cm.backgroundColor, 36));
@@ -719,6 +760,7 @@ export default class Viewer {
       // bright mode
       // sleepy owl
       owlSrc += 'menu-logo-asleep' + (isSafari ? '.png' : '.svg');
+      splashOwlSrc += 'menu-logo-asleep' + (isSafari ? '.png' : '.svg');
       els.forEach((el) => el.style.removeProperty('filter'));
       rt.style.setProperty('--settingsLinkBackgroundColor', utils.brighter(cm.backgroundColor, -16));
       rt.style.setProperty('--settingsLinkHoverColor', utils.brighter(cm.backgroundColor, -24));
@@ -761,6 +803,7 @@ export default class Viewer {
       );
     }
     owl.setAttribute('src', owlSrc);
+    splashOwl.setAttribute('src', splashOwlSrc);
   } // setMenuColors()
 
   // Control zoom of notation display and update Verovio layout
@@ -792,9 +835,29 @@ export default class Viewer {
   // set focus to verovioPane in order to ensure working key bindings
   setFocusToVerovioPane() {
     let el = document.getElementById('verovio-panel');
-    el.setAttribute('tabindex', '-1');
+    // el.setAttribute('tabindex', '-1');
     el.focus();
   } // setFocusToVerovioPane()
+
+  /**
+   * Switch focus between notation panel and encoding panel
+   * @param {CodeMirror} cm
+   */
+  switchFocusBetweenNotationAndEncoding(cm) {
+    let notation = document.getElementById('notation');
+    let encoding = document.getElementById('encoding');
+    if (document.activeElement.closest('#notation')) {
+      // console.log('Switching to encoding');
+      cm.focus();
+      notation.classList.remove('panelFocus');
+      encoding.classList.add('panelFocus');
+    } else {
+      // console.log('Switching to notation');
+      notation.focus();
+      encoding.classList.remove('panelFocus');
+      notation.classList.add('panelFocus');
+    }
+  } // switchFocusBetweenNotationAndEncoding()
 
   showSettingsPanel() {
     let sp = document.getElementById('settingsPanel');
@@ -2205,8 +2268,8 @@ export default class Viewer {
     vs.innerHTML = download;
     let msg = translator.lang.loadingSchema.text + ' ' + schemaFileName;
     vs.setAttribute('title', msg);
-    this.changeStatus(vs, 'wait', ['error', 'ok', 'manual']);
-    this.updateSchemaStatusDisplay('wait', schemaFileName, msg);
+    Viewer.changeStatus(vs, 'wait', ['error', 'ok', 'manual']);
+    Viewer.updateSchemaStatusDisplay('wait', schemaFileName, msg);
 
     console.log('Viewer.replaceSchema(): ' + schemaFileName);
     let data; // content of schema file
@@ -2243,7 +2306,7 @@ export default class Viewer {
     rngLoader.setRelaxNGSchema(data);
     cm.options.hintOptions.schemaInfo = rngLoader.tags;
     console.log('New schema loaded for auto completion', schemaFileName);
-    this.updateSchemaStatusDisplay('ok', schemaFileName, msg);
+    Viewer.updateSchemaStatusDisplay('ok', schemaFileName, msg);
   } // replaceSchema()
 
   /**
@@ -2270,8 +2333,8 @@ export default class Viewer {
     vs.innerHTML = unverified;
     vs.setAttribute('title', msg);
     console.warn(msg);
-    this.changeStatus(vs, 'error', ['wait', 'ok', 'manual']);
-    this.updateSchemaStatusDisplay('error', '', msg);
+    Viewer.changeStatus(vs, 'error', ['wait', 'ok', 'manual']);
+    Viewer.updateSchemaStatusDisplay('error', '', msg);
   } // throwSchemaError()
 
   /**
@@ -2281,7 +2344,7 @@ export default class Viewer {
    * @param {string} addedClassName
    * @param {Array<string>} removedClasses
    */
-  changeStatus(el, addedClassName = '', removedClasses = []) {
+  static changeStatus(el, addedClassName = '', removedClasses = []) {
     removedClasses.forEach((c) => el.classList.remove(c));
     el.classList.add(addedClassName);
   } // changeStatus()
@@ -2292,13 +2355,13 @@ export default class Viewer {
    * @param {string} schemaName
    * @param {string} msg
    */
-  updateSchemaStatusDisplay(status = 'ok', schemaName, msg = '') {
+  static updateSchemaStatusDisplay(status = 'ok', schemaName, msg = '') {
     let el = document.getElementById('schemaStatus');
     if (el) {
       el.title = msg;
       switch (status) {
         case 'ok':
-          this.changeStatus(el, 'ok', ['error', 'manual', 'wait']);
+          Viewer.changeStatus(el, 'ok', ['error', 'manual', 'wait']);
           // pretty-printing for known schemas from music-encoding.org
           if (schemaName.includes('music-encoding.org')) {
             let pathElements = schemaName.split('/');
@@ -2313,11 +2376,11 @@ export default class Viewer {
           }
           break;
         case 'wait': // downloading schema
-          this.changeStatus(el, 'wait', ['ok', 'manual', 'error']);
+          Viewer.changeStatus(el, 'wait', ['ok', 'manual', 'error']);
           el.innerHTML = '&nbsp;&#11015;&nbsp;'; // #8681 #8615
           break;
         case 'error': // no schema in MEI or @meiversion
-          this.changeStatus(el, 'error', ['ok', 'manual', 'wait']);
+          Viewer.changeStatus(el, 'error', ['ok', 'manual', 'wait']);
           el.innerHTML = '&nbsp;?&nbsp;';
           break;
       }
@@ -2325,20 +2388,28 @@ export default class Viewer {
   } // updateSchemaStatusDisplay()
 
   /**
-   * Switch validation-status icon to manual mode and add click event handlers
+   * Switch validation-status icon to manual mode and add click event handlers.
+   * Handle Safari exception: disable menu item, set warning messages to validation status
+   * and schema status
    */
   setValidationStatusToManual() {
     let vs = document.getElementById('validation-status');
     vs.innerHTML = unverified;
     vs.style.cursor = 'pointer';
-    vs.setAttribute('title', translator.lang.notValidated.text);
+    if (isSafari) {
+      translator.handleBrowserExceptions('Safari');
+    } else {
+      vs.setAttribute('title', translator.lang.notValidated.text);
+    }
     vs.removeEventListener('click', this.manualValidate);
     vs.removeEventListener('click', this.toggleValidationReportVisibility);
     vs.addEventListener('click', this.manualValidate);
-    this.changeStatus(vs, 'manual', ['wait', 'ok', 'error']);
+    Viewer.changeStatus(vs, 'manual', ['wait', 'ok', 'error']);
     let reportDiv = document.getElementById('validation-report');
     if (reportDiv) reportDiv.style.visibility = 'hidden';
-    if (this.updateLinting && typeof this.updateLinting === 'function') this.updateLinting(cm, []); // clear errors in CodeMirror
+    if (this.updateLinting && typeof this.updateLinting === 'function') {
+      this.updateLinting(cm, []); // clear errors in CodeMirror
+    }
   } // setValidationStatusToManual()
 
   /**
@@ -2399,11 +2470,11 @@ export default class Viewer {
 
     let msg = '';
     if (found.length === 0 && this.validatorWithSchema) {
-      this.changeStatus(vs, 'ok', ['error', 'wait', 'manual']);
+      Viewer.changeStatus(vs, 'ok', ['error', 'wait', 'manual']);
       vs.innerHTML = verified;
       msg = 'Everything ok, no errors.';
     } else {
-      this.changeStatus(vs, 'error', ['wait', 'ok', 'manual']);
+      Viewer.changeStatus(vs, 'error', ['wait', 'ok', 'manual']);
       vs.innerHTML = alert;
       vs.innerHTML += '<span>' + Object.keys(messages).length + '</span>';
       msg = 'Validation failed. ' + Object.keys(messages).length + ' validation messages:';
