@@ -97,7 +97,7 @@ body {
 }
 
 #GithubButton:disabled { 
-  pointer-events:none;
+  display:none;
 }
 
 a:link {
