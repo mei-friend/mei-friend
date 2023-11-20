@@ -209,6 +209,231 @@ function removeWithTextnodes(element) {
 } // removeWithTextnodes()
 
 /**
+ * (Quasi duplicate selected note):
+ * Inserts new note immediately after the currently (last-)selected one,
+ * (or as the new last note on the currently visible notation fragment (e.g., page)).
+ * It copies @pname @oct @dur from the nearest predecessor note
+ * (or otherwise default to 'c', '4', '4').
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
+ */
+export function addNote(v, cm) {
+  let pname = 'c';
+  let oct = '4';
+  let dur = '4';
+
+  // get last selected element that is a layer, chord, note, or rest
+  let selEl;
+  let i = v.selectedElements.length - 1;
+  while (i >= 0) {
+    selEl = v.xmlDoc.querySelector("[*|id='" + v.selectedElements.at(i) + "']");
+    if (['layer', 'chord', 'note', 'rest'].includes(selEl.nodeName)) break;
+    selEl = null;
+    i--;
+  }
+
+  // stop if nothing found
+  if (!selEl) {
+    return false;
+    // TODO: get last note of visible fragment (i.e. page/system) // REALLY??
+    let noteList = document.querySelectorAll('g.note');
+    let lastNote = noteList[noteList.length - 1];
+  }
+  v.allowCursorActivity = false;
+
+  // clone element (chord, rest) or create new element
+  let newEl;
+  const uuid = utils.generateXmlId(selEl.nodeName, v.xmlIdStyle);
+  if (['chord', 'rest'].includes(selEl.nodeName)) {
+    newEl = selEl.cloneNode(true);
+    newEl.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
+  } else if (selEl.nodeName === 'layer') {
+    newEl = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'note');
+    newEl.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
+    newEl.setAttribute('dur', dur);
+    newEl.setAttribute('oct', oct);
+    newEl.setAttribute('pname', pname);
+  } else {
+    newEl = v.xmlDoc.createElementNS(dutils.meiNameSpace, selEl.nodeName);
+    newEl.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
+    const chord = selEl.parentElement?.closest('chord');
+    let addEl = chord ? chord : newEl; // place in chord, if a parent
+    copyAttribute(addEl, selEl, 'cue');
+    copyAttribute(addEl, selEl, 'dots');
+    copyAttribute(addEl, selEl, 'dur', dur);
+    copyAttribute(addEl, selEl, 'grace');
+    copyAttribute(newEl, selEl, 'oct', oct); // place in new element
+    copyAttribute(newEl, selEl, 'pname', pname); // place in new element
+    copyAttribute(addEl, selEl, 'stem.dir');
+  }
+  /**
+   * Copies attribute attName to new element, if present,
+   * or assigns defaultValue, if given
+   * @param {Element} newEl
+   * @param {Element} oldEl
+   * @param {string} attName
+   * @param {string} defaultValue
+   */
+  function copyAttribute(newEl, oldEl, attName, defaultValue = '') {
+    if (oldEl.hasAttribute(attName)) newEl.setAttribute(attName, oldEl.getAttribute(attName));
+    else if (defaultValue) newEl.setAttribute(attName, defaultValue);
+  }
+
+  if (selEl.nodeName === 'chord') {
+    for (let e of newEl.children) {
+      e.setAttributeNS(dutils.xmlNameSpace, 'xml:id', utils.generateXmlId(e.nodeName, v.xmlIdStyle));
+    }
+  }
+
+  if (selEl.nodeName !== 'layer') {
+    // add it to DOM
+    const nextElement = selEl.nextSibling;
+    if (nextElement) {
+      selEl.parentNode.insertBefore(newEl, nextElement);
+    } else {
+      selEl.parentNode.appendChild(newEl);
+    }
+
+    // add to editor
+    utils.setCursorToId(cm, selEl.id);
+    cm.execCommand('toMatchingTag');
+    cm.execCommand('goLineEnd');
+    const p1 = cm.getCursor();
+    cm.replaceRange('\n' + dutils.xmlToString(newEl), p1);
+    const p2 = cm.getCursor();
+    for (let p = p1.line; p <= p2.line; p++) cm.indentLine(p, 'smart');
+  } else {
+    // when adding to a layer
+    selEl.appendChild(newEl);
+    replaceInEditor(cm, selEl, true);
+  }
+
+  // do final homework
+  v.selectedElements = [];
+  v.selectedElements.push(uuid);
+  utils.setCursorToId(cm, uuid); // to select new element
+  v.lastNoteId = uuid;
+  addApplicationInfo(v, cm);
+  v.updateData(cm, false, true);
+  v.allowCursorActivity = true;
+} // addNote()
+
+/**
+ * Place selected notes into a (new) chord, containing these notes,
+ * and vice versa (remove chord and have contained notes there)
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
+ */
+export function convertToChord(v, cm) {
+  v.allowCursorActivity = false;
+  let chord;
+  let uuids = [];
+  speed.filterElements(v.selectedElements, v.xmlDoc, ['chord', 'note']).forEach((id) => {
+    let el = v.xmlDoc.querySelector("[*|id='" + id + "']");
+    if (el && el.nodeName === 'chord') {
+      utils.setCursorToId(cm, id);
+      while (el.children.length > 0) {
+        let ch = el.children[0];
+        if (el.hasAttribute('dur')) ch.setAttribute('dur', el.getAttribute('dur'));
+        if (el.hasAttribute('dots')) ch.setAttribute('dots', el.getAttribute('dots'));
+        if (el.hasAttribute('stem.dir')) ch.setAttribute('stem.dir', el.getAttribute('stem.dir'));
+        // editor
+        cm.execCommand('goLineStart');
+        const p1 = cm.getCursor();
+        cm.replaceRange(dutils.xmlToString(ch) + '\n', p1);
+        const p2 = cm.getCursor();
+        for (let p = p1.line; p <= p2.line; p++) cm.indentLine(p, 'smart');
+        // DOM
+        el.parentElement.insertBefore(ch, el);
+        utils.setCursorToId(cm, ch.getAttribute('xml:id')); // to select new element
+        uuids.push(ch.getAttribute('xml:id'));
+      }
+      el.remove();
+      removeInEditor(cm, el);
+    } else if (el && el.nodeName === 'note') {
+      if (el.closest('chord')) {
+        v.showAlert('Cannot create chord within chord.');
+        return;
+      }
+      // create new chord and add to DOM
+      if (!chord) {
+        chord = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'chord');
+        uuids.push(utils.generateXmlId('chord', v.xmlIdStyle));
+        chord.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuids.at(-1));
+        el.parentElement.insertBefore(chord, el);
+      }
+      if (el.hasAttribute('dur')) {
+        chord.setAttribute('dur', el.getAttribute('dur'));
+        el.removeAttribute('dur');
+      }
+      if (el.hasAttribute('dots')) {
+        chord.setAttribute('dots', el.getAttribute('dots'));
+        el.removeAttribute('dots');
+      }
+      if (el.hasAttribute('stem.dir')) {
+        chord.setAttribute('stem.dir', el.getAttribute('stem.dir'));
+        el.removeAttribute('stem.dir');
+      }
+      chord.appendChild(el);
+      removeInEditor(cm, el);
+    }
+  });
+  // add to editor
+  if (chord) {
+    const p1 = cm.getCursor();
+    cm.replaceRange(dutils.xmlToString(chord) + '\n', p1);
+    const p2 = cm.getCursor();
+    for (let p = p1.line; p <= p2.line; p++) cm.indentLine(p, 'smart');
+  }
+  utils.setCursorToId(cm, uuids.at(-1));
+  v.selectedElements = [];
+  uuids.forEach((uuid) => v.selectedElements.push(uuid));
+  v.lastNoteId = uuids.at(-1);
+  addApplicationInfo(v, cm);
+  v.updateData(cm, false, true);
+  v.allowCursorActivity = true;
+} // convertToChord()
+
+/**
+ * Converts selected notes to rests and vice versa.
+ * TODO: not secured against stupid things (like rests inside chords)
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
+ */
+export function convertNoteToRest(v, cm) {
+  v.allowCursorActivity = false;
+  let uuids = [];
+  speed.filterElements(v.selectedElements, v.xmlDoc, ['rest', 'note']).forEach((id) => {
+    let oldEl = v.xmlDoc.querySelector("[*|id='" + id + "']");
+    if (oldEl) {
+      let newName = oldEl.nodeName === 'note' ? 'rest' : 'note';
+      let newEl = v.xmlDoc.createElementNS(dutils.meiNameSpace, newName);
+      let uuid = utils.generateXmlId(newName, v.xmlIdStyle);
+      newEl.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
+      uuids.push(uuid);
+      if (oldEl.hasAttribute('dur')) newEl.setAttribute('dur', oldEl.getAttribute('dur'));
+      if (oldEl.hasAttribute('dots')) newEl.setAttribute('dots', oldEl.getAttribute('dots'));
+      if (oldEl.nodeName === 'rest') {
+        if (oldEl.hasAttribute('oloc')) newEl.setAttribute('oct', oldEl.getAttribute('oloc'));
+        if (oldEl.hasAttribute('ploc')) newEl.setAttribute('pname', oldEl.getAttribute('ploc'));
+      } else {
+        if (oldEl.hasAttribute('oct')) newEl.setAttribute('oloc', oldEl.getAttribute('oct'));
+        if (oldEl.hasAttribute('pname')) newEl.setAttribute('ploc', oldEl.getAttribute('pname'));
+      }
+      oldEl.parentElement.replaceChild(newEl, oldEl);
+      replaceInEditor(cm, oldEl, true, newEl);
+    }
+  });
+  v.selectedElements = [];
+  uuids.forEach((id) => v.selectedElements.push(id));
+  utils.setCursorToId(cm, v.selectedElements.at(-1)); // to select new element
+  v.lastNoteId = v.selectedElements.at(-1);
+  addApplicationInfo(v, cm);
+  v.updateData(cm, false, true);
+  v.allowCursorActivity = true;
+} // convertNoteToRest()
+
+/**
  * Adds accid element to note element.
  * (Other allowed elements are ignored for the moment.)
  * @param {Viewer} v
@@ -732,9 +957,8 @@ export function shiftPitch(v, cm, deltaPitch = 0, shiftChromatically = false) {
  */
 export function modifyDuration(v, cm, what = 'increase') {
   v.loadXml(cm.getValue());
-  let ids = speed.filterElements(v.selectedElements, v.xmlDoc);
   v.allowCursorActivity = false;
-  ids.forEach((id) => {
+  speed.filterElements(v.selectedElements, v.xmlDoc).forEach((id) => {
     let el = v.xmlDoc.querySelector("[*|id='" + id + "']");
     if (el) {
       let dur = el.getAttribute('dur');
@@ -746,12 +970,37 @@ export function modifyDuration(v, cm, what = 'increase') {
         replaceInEditor(cm, el);
       }
     }
+    utils.setCursorToId(cm, id); // to select new element
   });
-  v.selectedElements = ids;
   addApplicationInfo(v, cm);
   v.updateData(cm, false, true);
   v.allowCursorActivity = true;
 } // modifyDuration()
+
+/**
+ * Toggles a @dots="1" into a note (or all allowed elements in attAugmentDots)
+ * or removes it if already present.
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
+ */
+export function toggleDots(v, cm) {
+  v.allowCursorActivity = false;
+  speed.filterElements(v.selectedElements, v.xmlDoc).forEach((id) => {
+    let el = v.xmlDoc.querySelector("[*|id='" + id + "']");
+    if (el && att.attAugmentDots.includes(el.nodeName)) {
+      if (el.hasAttribute('dots') && el.getAttribute('dots') === '1') {
+        el.removeAttribute('dots');
+      } else {
+        el.setAttribute('dots', '1');
+      }
+      replaceInEditor(cm, el);
+    }
+    utils.setCursorToId(cm, id); // to select new element
+  });
+  addApplicationInfo(v, cm);
+  v.updateData(cm, false, true);
+  v.allowCursorActivity = true;
+} // toggleDots()
 
 /**
  * Moves selected elements to next staff (without checking boundaries)

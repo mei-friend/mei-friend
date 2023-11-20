@@ -167,6 +167,7 @@ export const lang = {
   staffDownText: { text: 'Element eine Notenzeile niedriger' },
   increaseDurText: { text: 'Notendauer erhöhen' },
   decreaseDurText: { text: 'Notendauer verringern' },
+  toggleDotsText: { text: 'Punktierung an/abschalten' },
   cleanAccidText: { text: '@accid.ges überprüfen' },
   renumberMeasuresTestText: { text: ' Takte neu nummerieren (test)' },
   renumberMeasuresExecText: { text: ' Takte neu nummerieren (exec)' },
@@ -178,6 +179,9 @@ export const lang = {
 
   // INSERT MENU ITEM
   insertMenuTitle: { text: 'Einfügen' },
+  addNoteText: { text: 'Note duplizieren' },
+  convertNoteToRestText: { text: 'Note(n) <=> Pause(n)' },
+  toggleChordText: { text: 'Note(n) <=> Akkord' },
   addDoubleSharpText: { html: 'Doppelkreuz &#119082;' },
   addSharpText: { html: 'Kreuz &#9839;' },
   addNaturalText: { html: 'Auflösungszeichen &#9838;' },

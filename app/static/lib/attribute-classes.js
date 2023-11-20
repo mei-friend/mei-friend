@@ -123,6 +123,9 @@ export const timeSpanningElements = [
 // @dur
 export const attDurationLogical = ['ambNote', 'bTrem', 'chord', 'fTrem', 'halfmRpt', 'note', 'rest', 'space'];
 
+// @dots
+export const attAugmentDots = ['bTrem', 'chord', 'fTrem', 'note', 'rest', 'space'];
+
 // elements allowed to contain a @facs attribute (5.0.0)
 export const attFacsimile = [
   'abbr',

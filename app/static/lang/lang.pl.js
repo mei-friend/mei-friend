@@ -168,6 +168,7 @@ export const lang = {
   staffDownText: { text: 'Element 1 pięciolinii w dół' },
   increaseDurText: { text: 'Zwiększ długość' },
   decreaseDurText: { text: 'Zmniejsz długość' },
+  toggleDotsText: { text: 'Przełączanie kropkowania' },
   cleanAccidText: { text: 'Sprawdzić @accid.ges' },
   renumberMeasuresTestText: { text: 'Numeruj taktowania (test)' },
   renumberMeasuresExecText: { text: 'Numeruj taktowania (wykonaj)' },
@@ -179,6 +180,9 @@ export const lang = {
 
   // INSERT MENU ITEM // WSTAW ELEMENT MENU
   insertMenuTitle: { text: 'Wstaw' },
+  addNoteText: { text: 'Dodaj nutę' },
+  convertNoteToRestText: { text: 'Nuta(y) <=> pauza(y)' },
+  toggleChordText: { text: 'Nuta(y) <=> akord' },
   addDoubleSharpText: { html: 'Podwójny krzyżyk &#119082;' },
   addSharpText: { html: 'Krzyżyk &#9839;' },
   addNaturalText: { html: 'Kasownik &#9838;' },

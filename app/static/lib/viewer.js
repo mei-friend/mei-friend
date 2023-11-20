@@ -828,9 +828,29 @@ export default class Viewer {
   // set focus to verovioPane in order to ensure working key bindings
   setFocusToVerovioPane() {
     let el = document.getElementById('verovio-panel');
-    el.setAttribute('tabindex', '-1');
+    // el.setAttribute('tabindex', '-1');
     el.focus();
   } // setFocusToVerovioPane()
+
+  /**
+   * Switch focus between notation panel and encoding panel
+   * @param {CodeMirror} cm
+   */
+  switchFocusBetweenNotationAndEncoding(cm) {
+    let notation = document.getElementById('notation');
+    let encoding = document.getElementById('encoding');
+    if (document.activeElement.closest('#notation')) {
+      // console.log('Switching to encoding');
+      cm.focus();
+      notation.classList.remove('panelFocus');
+      encoding.classList.add('panelFocus');
+    } else {
+      // console.log('Switching to notation');
+      notation.focus();
+      encoding.classList.remove('panelFocus');
+      notation.classList.add('panelFocus');
+    }
+  } // switchFocusBetweenNotationAndEncoding()
 
   showSettingsPanel() {
     let sp = document.getElementById('settingsPanel');

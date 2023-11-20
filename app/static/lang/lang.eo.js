@@ -162,6 +162,7 @@ export const lang = {
   staffDownText: { text: 'Elemento 1 personalo malsupren' },
   increaseDurText: { text: 'Pligrandigi daŭron' },
   decreaseDurText: { text: 'Malpligrandigi daŭron' },
+  toggleDotsText: { text: 'Ŝalti punktadon' },
   cleanAccidText: { text: 'Kontroli @accid.ges' },
   renumberMeasuresTestText: { text: ' Reenumeri mezurojn (testo)' },
   renumberMeasuresExecText: { text: ' Reenumeri mezurojn (ekzekuti)' },
@@ -173,6 +174,9 @@ export const lang = {
 
   // INSERT MENU ITEM
   insertMenuTitle: { text: 'Enmeti' },
+  addNoteText: { text: 'Aldoni noton' },
+  convertNoteToRestText: { text: 'Noto(j) <=> paŭzo(j)' },
+  toggleChordText: { text: 'Noto(j) <=> akordo' },
   addDoubleSharpText: { html: 'Duobla diezo &#119082;' },
   addSharpText: { html: 'Diezo &#9839;' },
   addNaturalText: { html: 'Natura &#9838;' },
