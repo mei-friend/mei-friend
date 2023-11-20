@@ -381,6 +381,11 @@ async function suspendedValidate(text, updateLinting, options) {
 
 // when initial page content has been loaded
 document.addEventListener('DOMContentLoaded', function () {
+  // disable GitHub menu if server-side configuration not available
+  if(!gitEnabled) { 
+    document.getElementById("GithubButton").disabled = true;
+  }
+
   translator = new Translator();
   // we need to look directly to local storage, because it will
   let language = window.localStorage['mf-selectLanguage'];
