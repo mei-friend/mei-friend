@@ -844,18 +844,14 @@ export default class Viewer {
    * @param {CodeMirror} cm
    */
   switchFocusBetweenNotationAndEncoding(cm) {
-    let notation = document.getElementById('notation');
+    let vrvP = document.getElementById('verovio-panel');
     let encoding = document.getElementById('encoding');
     if (document.activeElement.closest('#notation')) {
       // console.log('Switching to encoding');
       cm.focus();
-      notation.classList.remove('panelFocus');
-      encoding.classList.add('panelFocus');
     } else {
       // console.log('Switching to notation');
-      notation.focus();
-      encoding.classList.remove('panelFocus');
-      notation.classList.add('panelFocus');
+      vrvP.focus();
     }
   } // switchFocusBetweenNotationAndEncoding()
 
