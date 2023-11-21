@@ -77,9 +77,12 @@ export function setOrientation(cm, _notationOrientation = '', _facsimileOrientat
     } else {
       annotationPanel.style.display = 'none';
     }
-    notationDiv.style.width = sz.width; //- 6; // TODO: remove when border removed
+    notationDiv.style.width = sz.width - 2 * notationResizerWidth; // TODO: remove when border removed
     notationDiv.style.height = sz.height * notationProportion;
-    cm.setSize(sz.width, sz.height * (1 - notationProportion) - notationResizerWidth - codeCheckerHeight);
+    cm.setSize(
+      sz.width - 2 * notationResizerWidth,
+      sz.height * (1 - notationProportion) - notationResizerWidth - codeCheckerHeight
+    );
   }
   if (notationOrientation === 'left' || notationOrientation === 'right') {
     if (showAnnotationPanelCheckbox && showAnnotationPanelCheckbox.checked) {
@@ -241,7 +244,7 @@ export function addNotationResizerHandlers(v, cm) {
     let sz = resizer.parentNode.getBoundingClientRect();
     const codeChecker = document.getElementById('codeChecker');
     const codeCheckerHeight = codeChecker.getBoundingClientRect().height;
-      // console.log("Mouse move dx/dy: " + dx + "/" + dy + ', Container: ' + sz.width + '/' + sz.height);
+    // console.log("Mouse move dx/dy: " + dx + "/" + dy + ', Container: ' + sz.width + '/' + sz.height);
     switch (notationOrientation) {
       case 'top':
         notationProportion = (notationSize + dy) / sz.height;
