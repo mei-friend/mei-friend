@@ -24,15 +24,18 @@ github = oauth.register(
 
 @app.route('/')
 def index():
+    haveGHConfig = getenv("CLIENT_ID");
     if 'githubToken' in session:
         return render_template('index.html', 
                 isLoggedIn = "true", # for Javascript, not Python...
                 githubToken = session['githubToken'],
                 userLogin = session['userLogin'],
                 userName = session['userName'] if session['userName'] else session['userLogin'],
-                userEmail = session['userEmail'])
+                userEmail = session['userEmail'], 
+                gitEnabled = haveGHConfig)
     return render_template('index.html',
-        isLoggedIn = False
+        isLoggedIn = False,
+        gitEnabled = haveGHConfig
     )
 
 @app.route("/login")

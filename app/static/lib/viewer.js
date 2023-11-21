@@ -507,7 +507,9 @@ export default class Viewer {
     } else {
       // set cursor position in buffer
       let found = utils.setCursorToId(cm, itemId);
-      if (!found) this.showMissingIdsWarning();
+      if (!found) {
+        this.showMissingIdsWarning(e.currentTarget.classList.item(0));
+      }
       this.selectedElements = [];
       this.selectedElements.push(itemId);
       msg += 'newly created: ' + itemId + ', size: ' + this.selectedElements.length;
@@ -526,16 +528,38 @@ export default class Viewer {
     this.allowCursorActivity = true;
   } // handleClickOnNotation()
 
-  showMissingIdsWarning() {
-    this.showAlert(
-      translator.lang.missingIdsWarningAlert.text +
-        ' (' +
-        translator.lang.manipulateMenuTitle.text +
-        '&mdash;' +
-        translator.lang.addIdsText.text +
-        ')',
-      'warning'
-    );
+  showMissingIdsWarning(nodeName = '') {
+    if (
+      [
+        'note',
+        'rest',
+        'chord',
+        'mRest',
+        'multiRest',
+        'beam',
+        'tuplet',
+        'accid',
+        'artic',
+        'bTrem',
+        'fTrem',
+        'ambNote',
+        'mRpt',
+        'mRpt2',
+        'halfmRpt',
+      ]
+        .concat(att.modelControlEvents)
+        .includes(nodeName)
+    ) {
+      this.showAlert(
+        translator.lang.missingIdsWarningAlert.text +
+          ' (' +
+          translator.lang.manipulateMenuTitle.text +
+          '&mdash;' +
+          translator.lang.addIdsText.text +
+          ')',
+        'warning'
+      );
+    }
   } // showMissingIdsWarning()
 
   // when cursor pos in editor changed, update notation location / highlight
@@ -820,18 +844,14 @@ export default class Viewer {
    * @param {CodeMirror} cm
    */
   switchFocusBetweenNotationAndEncoding(cm) {
-    let notation = document.getElementById('notation');
+    let vrvP = document.getElementById('verovio-panel');
     let encoding = document.getElementById('encoding');
     if (document.activeElement.closest('#notation')) {
       // console.log('Switching to encoding');
       cm.focus();
-      notation.classList.remove('panelFocus');
-      encoding.classList.add('panelFocus');
     } else {
       // console.log('Switching to notation');
-      notation.focus();
-      encoding.classList.remove('panelFocus');
-      notation.classList.add('panelFocus');
+      vrvP.focus();
     }
   } // switchFocusBetweenNotationAndEncoding()
 

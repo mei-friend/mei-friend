@@ -46,8 +46,15 @@
     <script src="{{ url_for('static', filename='lib/solid.js') }}" type="module"></script>
     <script>
       let isLoggedIn;
+      let gitEnabled = true;
       let root = "{{ url_for('static', filename='') }}";
     </script>
+    <!-- disable GitHub integration if server configuration not available -->
+    {% if not gitEnabled %}
+    <script>
+      gitEnabled = false;
+    </script>
+    {% endif %}
     <!-- inject GitHub OAuth response details if available -->
     {% if isLoggedIn %}
     <script>

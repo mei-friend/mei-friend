@@ -192,8 +192,12 @@ export function addDragSelector(v, vp) {
           v.selectedElements.push(newEl);
         }
       });
+      // console.debug('Drag-Selector selected elements: ', v.selectedElements)
 
-      if (!found) v.showMissingIdsWarning();
+      if (!found) {
+        // console.debug('Drag-Selector latest element: ', latest.el.classList.item(0));
+        v.showMissingIdsWarning(latest.el.classList.item(0));
+      }
       v.updateHighlight();
       v.allowCursorActivity = true;
     }

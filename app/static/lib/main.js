@@ -1,6 +1,6 @@
 // mei-friend version and date
 export const version = '1.0.5';
-export const versionDate = '11 November 2023'; // use full or 3-character english months, will be translated
+export const versionDate = '21 November 2023'; // use full or 3-character english months, will be translated
 
 var vrvWorker;
 var spdWorker;
@@ -380,6 +380,11 @@ async function suspendedValidate(text, updateLinting, options) {
 
 // when initial page content has been loaded
 document.addEventListener('DOMContentLoaded', function () {
+  // disable GitHub menu if server-side configuration not available
+  if(!gitEnabled) { 
+    document.getElementById("GithubButton").disabled = true;
+  }
+
   translator = new Translator();
   // we need to look directly to local storage, because it will
   let language = window.localStorage['mf-selectLanguage'];
