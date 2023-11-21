@@ -974,69 +974,79 @@
       <div id="listAnnotations" class="tabcontent">No annotations present.</div>
       <div id="markupTools" class="tabcontent">
         <menu id="markupToolsMenu" class="enrichmentToolsMenu">
-          <div class="annotationToolsIconGroup markup-dropdown">
-            <span id="addSuppliedText" class="annotationToolsIcon">Supplied</span>
-            <div class="markup-dropdown-content">
-              <a id="addSupplied" href="#">Selection</a>
-              <a id="addSuppliedArtic" href="#">Articulation</a>
-              <a id="addSuppliedAccid" href="#">Accidental</a>
+          <button id="editorialMarkupBtn" class="markup-accordion-btn" onclick="toggleAccordion(event, 'editorialMarkupBtn', 'editorialMarkupPanel')">Editorial Interventions</button>
+          <div id="editorialMarkupPanel" class="markup-accordion-panel">
+            <div class="annotationToolsIconGroup markup-dropdown">
+              <span id="addSuppliedText" class="annotationToolsIcon">Supplied</span>
+              <div class="markup-dropdown-content">
+                <a id="addSupplied" href="#">Selection</a>
+                <a id="addSuppliedArtic" href="#">Articulation</a>
+                <a id="addSuppliedAccid" href="#">Accidental</a>
+              </div>
+            </div>
+            <div class="annotationToolsIconGroup markup-dropdown">
+              <span id="addUnclearText" class="annotationToolsIcon">Unclear</span>
+              <div class="markup-dropdown-content">
+                <a id="addUnclear" href="#">Selection</a>
+                <a id="addUnclearArtic" href="#">Articulation</a>
+                <a id="addUnclearAccid" href="#">Accidental</a>
+              </div>
+            </div>
+            <div class="annotationToolsIconGroup markup-dropdown">
+              <span id="addSicText" class="annotationToolsIcon">Sic</span>
+              <div class="markup-dropdown-content">
+                <a id="addSic" href="#">Selection</a>
+                <a id="addSicArtic" href="#">Articulation</a>
+                <a id="addSicAccid" href="#">Accidental</a>
+              </div>
+            </div>
+            <div class="annotationToolsIconGroup markup-dropdown">
+              <span id="addCorrText" class="annotationToolsIcon">Corr</span>
+              <div class="markup-dropdown-content">
+                <a id="addCorr" href="#">Selection</a>
+                <a id="addCorrArtic" href="#">Articulation</a>
+                <a id="addCorrAccid" href="#">Accidental</a>
+              </div>
+            </div>
+            <div class="annotationToolsIconGroup markup-dropdown">
+              <span id="addOrigText" class="annotationToolsIcon">Orig</span>
+              <div class="markup-dropdown-content">
+                <a id="addOrig" href="#">Selection</a>
+                <a id="addOrigArtic" href="#">Articulation</a>
+                <a id="addOrigAccid" href="#">Accidental</a>
+              </div>
+            </div>
+            <div class="annotationToolsIconGroup markup-dropdown">
+              <span id="addRegText" class="annotationToolsIcon">Reg</span>
+              <div class="markup-dropdown-content">
+                <a id="addReg" href="#">Selection</a>
+                <a id="addRegArtic" href="#">Articulation</a>
+                <a id="addRegAccid" href="#">Accidental</a>
+              </div>
             </div>
           </div>
-          <div class="annotationToolsIconGroup markup-dropdown">
-            <span id="addUnclearText" class="annotationToolsIcon">Unclear</span>
-            <div class="markup-dropdown-content">
-              <a id="addUnclear" href="#">Selection</a>
-              <a id="addUnclearArtic" href="#">Articulation</a>
-              <a id="addUnclearAccid" href="#">Accidental</a>
+          <button id="scribalMarkupBtn" class="markup-accordion-btn" onclick="toggleAccordion(event, 'scribalMarkupBtn', 'scribalMarkupPanel')">Scribal Interventions</button>
+          <div id="scribalMarkupPanel" class="markup-accordion-panel">
+            <div class="annotationToolsIconGroup markup-dropdown">
+              <span id="addAddText" class="annotationToolsIcon">Add</span>
+              <div class="markup-dropdown-content">
+                <a id="addAdd" href="#">Selection</a>
+                <a id="addAddArtic" href="#">Articulation</a>
+                <a id="addAddAccid" href="#">Accidental</a>
+              </div>
+            </div>
+            <div class="annotationToolsIconGroup markup-dropdown">
+              <span id="addDelText" class="annotationToolsIcon">Del</span>
+              <div class="markup-dropdown-content">
+                <a id="addDel" href="#">Selection</a>
+                <a id="addDelArtic" href="#">Articulation</a>
+                <a id="addDelAccid" href="#">Accidental</a>
+              </div>
             </div>
           </div>
-          <div class="annotationToolsIconGroup markup-dropdown">
-            <span id="addSicText" class="annotationToolsIcon">Sic</span>
-            <div class="markup-dropdown-content">
-              <a id="addSic" href="#">Selection</a>
-              <a id="addSicArtic" href="#">Articulation</a>
-              <a id="addSicAccid" href="#">Accidental</a>
-            </div>
-          </div>
-          <div class="annotationToolsIconGroup markup-dropdown">
-            <span id="addCorrText" class="annotationToolsIcon">Corr</span>
-            <div class="markup-dropdown-content">
-              <a id="addCorr" href="#">Selection</a>
-              <a id="addCorrArtic" href="#">Articulation</a>
-              <a id="addCorrAccid" href="#">Accidental</a>
-            </div>
-          </div>
-          <div class="annotationToolsIconGroup markup-dropdown">
-            <span id="addOrigText" class="annotationToolsIcon">Orig</span>
-            <div class="markup-dropdown-content">
-              <a id="addOrig" href="#">Selection</a>
-              <a id="addOrigArtic" href="#">Articulation</a>
-              <a id="addOrigAccid" href="#">Accidental</a>
-            </div>
-          </div>
-          <div class="annotationToolsIconGroup markup-dropdown">
-            <span id="addRegText" class="annotationToolsIcon">Reg</span>
-            <div class="markup-dropdown-content">
-              <a id="addReg" href="#">Selection</a>
-              <a id="addRegArtic" href="#">Articulation</a>
-              <a id="addRegAccid" href="#">Accidental</a>
-            </div>
-          </div>
-          <div class="annotationToolsIconGroup markup-dropdown">
-            <span id="addAddText" class="annotationToolsIcon">Add</span>
-            <div class="markup-dropdown-content">
-              <a id="addAdd" href="#">Selection</a>
-              <a id="addAddArtic" href="#">Articulation</a>
-              <a id="addAddAccid" href="#">Accidental</a>
-            </div>
-          </div>
-          <div class="annotationToolsIconGroup markup-dropdown">
-            <span id="addDelText" class="annotationToolsIcon">Del</span>
-            <div class="markup-dropdown-content">
-              <a id="addDel" href="#">Selection</a>
-              <a id="addDelArtic" href="#">Articulation</a>
-              <a id="addDelAccid" href="#">Accidental</a>
-            </div>
+          <button id="appMarkupBtn" class="markup-accordion-btn" onclick="toggleAccordion(event, 'appMarkupBtn', 'appMarkupPanel')">Critical Apparatus</button>
+          <div id="appMarkupPanel" class="markup-accordion-panel">
+            <span>tbc</span>
           </div>
         </menu>
       </div>
@@ -1289,6 +1299,15 @@
             tab === ev.currentTarget ? tab.classList.add('active') : tab.classList.remove('active');
           }
         }
+      }
+
+      function toggleAccordion(ev, accordionBtnId, accordionPanelId) {
+        console.log("Toggle accodion:", accordionBtnId, accordionPanelId);
+        let accordionBtn = document.getElementById(accordionBtnId);
+        let accordionPanel = document.getElementById(accordionPanelId);
+
+        accordionBtn.classList.toggle('markup-accordion-btn-active');
+        accordionPanel.classList.toggle('markup-accordion-panel-active');
       }
 
       document.querySelectorAll('.defaultOpen').forEach((item) => item.click());
