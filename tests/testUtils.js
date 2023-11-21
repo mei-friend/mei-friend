@@ -9,6 +9,14 @@ module.exports = {
       console.error('Error clicking splash confirm button via UI: ', error);
     }
   },
+  closeSettings: function (driver) {
+    try {
+      driver.findElement(By.id('hideSettingsButton')).click();
+      console.log('Hide settings button clicked!');
+    } catch (error) {
+      console.error('Error clicking hide settings button via UI: ', error);
+    }
+  },
   openUrl: function (driver, url) {
     try {
       driver.findElement(By.id('fileMenuTitle')).click();
@@ -43,17 +51,16 @@ module.exports = {
     driver.findElement(By.id('fileMenuTitle')).click();
   },
   selectFromDropdown: async function (driver, dropdownId, option) {
-    console.log("Called with : ", dropdownId, option)
+    console.log("Attempting to select from dropdown: ", dropdownId, option)
     try {
-      const selectElement = driver.findElement(By.id(dropdownId));
-      const optionElement = selectElement.findElement(By.css("option[value='" + option + "']"));
-      optionElement.click();
-      console.log("CLICKED!")
-      await driver.wait(until.elementLocated(By.id('mei-friend-logo')), 10000).then(async (meiFriendLogo) => {
-        console.log("FOUND!");
-      }).catch((e) => {
-        console.log("ERROR: ", e)
-      })
+      await driver.executeScript(`
+        const selectElement = document.getElementById("${dropdownId}");
+        // simulate click on the specified option
+        selectElement.value = "${option}";
+        // dispatch an input event on the selectElement
+        selectElement.dispatchEvent(new Event('input', { bubbles: true }));
+        console.log("Set ${dropdownId} to ${option} via UI");
+      `);
     } catch (error) {
       console.error('Error selecting option from dropdown via UI: ', error);
     }
