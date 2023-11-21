@@ -78,14 +78,15 @@ fieldset {
   border: 1px solid black;
   border-radius: 5px;
   padding: 10px;
-  background-color:var(--annotationPanelBackgroundColor)
+  background-color:var(--annotationPanelBackgroundColor);
+  cursor: pointer;
 }
 
 .markup-accordion-btn:after {
   content: '\02795'; /* Unicode character for "plus" sign (+) */
   float: right;
   margin-left: auto;
-  color: aqua/*var(--annotationPanelTextColor)*/;
+  color: aqua;/*var(--annotationPanelTextColor);*/
 }
 
 .markup-accordion-btn-active {
@@ -105,6 +106,29 @@ fieldset {
 
 .markup-accordion-panel-active {
   display: grid;
+}
+
+.markup-btn-group {
+  border: 1px solid black;
+  border-radius: 5px;
+  /*padding: 10px;*/
+  cursor: pointer; /* Pointer/hand icon */
+  float: auto; /* Float the buttons side by side */
+}
+
+/*.btn-group:after {
+  content: "";
+  clear: both;
+  display: table;
+}*/
+
+/*.markup-btn-group div:not(:last-child) {
+  border-right: none; /* Prevent double borders 
+}*/
+
+/* Add a background color on hover */
+.markup-btn-group .markup-dropdown:hover {
+  background-color: var(--annotationPanelHoverColor);
 }
 
 .markup-dropdown {
