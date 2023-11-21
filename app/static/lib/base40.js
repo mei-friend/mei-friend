@@ -10,8 +10,62 @@
 
 import * as att from './attribute-classes.js';
 
+// base 40
+export const base = 40;
+
 // number of the diatonic steps in base-40 system
-const diatonicSteps = [2, 8, 14, 19, 25, 31, 37]; 
+export const diatonicSteps = [2, 8, 14, 19, 25, 31, 37];
+
+/**
+ * Base-40 interval classes with interval names as keys, such as
+ * m2, P5, d7 and their respective interval number.
+ */
+export const intervals = {};
+intervals.dd2 = -2;
+intervals.dd1 = -1;
+intervals.P0 = 0;
+intervals.A1 = 1;
+intervals.AA2 = 2;
+intervals.d2 = 4;
+intervals.m2 = 5;
+intervals.M2 = 6;
+intervals.A2 = 7;
+intervals.AA2 = 8;
+intervals.d3 = 10;
+intervals.m3 = 11;
+intervals.M3 = 12;
+intervals.A3 = 13;
+intervals.AA3 = 14;
+intervals.dd4 = 15;
+intervals.d4 = 16;
+intervals.P4 = 17;
+intervals.A4 = 18;
+intervals.AA4 = 19;
+intervals.dd5 = 21;
+intervals.d5 = 22;
+intervals.P5 = 23;
+intervals.A5 = 24;
+intervals.AA5 = 25;
+intervals.d6 = 27;
+intervals.m6 = 28;
+intervals.M6 = 29;
+intervals.A6 = 30;
+intervals.AA6 = 31;
+intervals.d7 = 33;
+intervals.m7 = 34;
+intervals.M7 = 35;
+intervals.A7 = 36;
+intervals.AA7 = 37;
+
+/**
+ * Returns interval name ("M3, d7, AA2")
+ * for an interval number (-2 to 37)
+ * @param {number} interval
+ * @returns {string} interval name
+ */
+export function intervalName(interval = 0) {
+  return Object.keys(intervals)[Object.values(intervals).indexOf(interval)];
+} // intervalName()
 
 // accid.ges and theirs consequences in semi-tones
 const accidGesturalAndAlternation = {
@@ -43,7 +97,7 @@ const accidWrittenAndAlternation = {
 /**
  * Returns accid.ges conform string for alteration integer (in semi-tones)
  * @param {string|number} alteration (e.g., -3, -2, -1, 0, 1, 2, 3)
- * @returns {string|null}
+ * @returns {string|null} accidGes ('n', 's', ...)
  */
 export function alterationToAccidGes(alteration = 0) {
   if (alteration <= 3 && alteration >= -3) {
