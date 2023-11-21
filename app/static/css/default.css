@@ -486,8 +486,7 @@ a:active {
 }
 
 #notation:focus-within, #encoding:focus-within {
-  border-color: #090;
-  animation: showFocus 1s;
+  animation: showFocus 3s;
 }
 
 .resizer {
@@ -1678,19 +1677,23 @@ midi-player::part(play-button) {
     border-color: #0d0;
   }
   
-  25% {
+  10% {
     border-color: #0c0;
   }
 
-  50% {
+  20% {
     border-color: #0b0;
   }
 
-  75% { 
+  30% { 
     border-color: #0a0;
   }
 
-  100% {
+  40% {
     border-color: #090;
+  }
+
+  100% {
+    border-color: var(--dropdownHeadingColor);
   }
 }
