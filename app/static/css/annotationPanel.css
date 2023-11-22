@@ -5,8 +5,8 @@
   justify-items: stretch;
 }
 
-.enrichmentToolsMenu div {
-  padding: 8px;
+.enrichmentToolsMenu>div {
+  padding: 5px 8px 0px 8px;
 }
 
 .enrichmentToolsMenu li {
@@ -19,7 +19,7 @@
 .annotationToolsIcon {
   border: 1px solid black;
   border-radius: 5px;
-  padding: 10px;
+  padding: 8px;
   display: flex;
   align-content: center;
   gap: 6px;
@@ -106,6 +106,7 @@ fieldset {
 
 .markup-accordion-panel-active {
   display: grid;
+  position: relative;
 }
 
 .markup-btn-group {
@@ -122,28 +123,32 @@ fieldset {
   display: table;
 }*/
 
-/*.markup-btn-group div:not(:last-child) {
-  border-right: none; /* Prevent double borders 
-}*/
-
-/* Add a background color on hover */
-.markup-btn-group .markup-dropdown:hover {
-  background-color: var(--annotationPanelHoverColor);
+.markup-btn-group span:not(:last-child) {
+ padding-right: 10px;
 }
 
+/* Add a background color on hover */
+/*.markup-btn-group .markup-dropdown:hover {
+  background-color: var(--annotationPanelHoverColor);
+}*/
+
 .markup-dropdown {
-  position: relative;
+  /*position: relative;*/
   display: inline-block;
 }
 
 .markup-dropdown-content {
   display: none;
-  position: absolute;
+  position: fixed;
   background-color: var(--annotationPanelLinkBackgroundColor);
-  min-width: 160px;
+  min-width: 100px;
   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
   z-index: 1;
 }
+
+/*.markup-dropdown-up {
+  bottom: 50px;
+}*/
 
 .markup-dropdown-content a {
   color: var(--annotationPanelTextColor);
