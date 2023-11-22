@@ -11,6 +11,7 @@
   --defaultSuppliedHighlightedColor: #b37400;
   /* TODO use mdw blue */
   --defaultHighlightColor: #4e8bed;
+  --defaultHighlightPulseColor: #0e4bad;
   --defaultControlMenuBackgroundColor: lightgray;
   --defaultNavbarBackgroundColor: lightgray;
   --defaultKeyboardShortCutColor: navy;
@@ -49,6 +50,7 @@
   --suppliedColor: var(--defaultSuppliedColor);
   --suppliedHighlightedColor: var(--defaultSuppliedHighlightedColor);
   --highlightColor: var(--defaultHighlightColor);
+  --highlightPulseColor: var(--defaultHighlightPulseColor);
   --controlMenuBackgroundColor: var(--defaultControlMenuBackgroundColor);
   --navbarBackgroundColor: var(--defaultNavbarBackgroundColor);
   --keyboardShortCutColor: var(--defaultKeyboardShortCutColor);
@@ -94,6 +96,10 @@ body {
   top: 0;
   left: 0;
   background-color: var(--backgroundColor);
+}
+
+#GithubButton:disabled { 
+  display:none;
 }
 
 a:link {
@@ -152,6 +158,16 @@ a:active {
 
 .rightMargin {
   margin-right: 6px;
+}
+
+#focusIndicator { 
+  display: inline-block;
+  position: fixed;
+  padding-left:10px;
+  padding-top:10px;
+  transform:scale(50%,50%);
+  stroke:var(--fileStatusColor);
+  z-index: 100;
 }
 
 .dragOverlay {
@@ -458,7 +474,6 @@ a:active {
 }
 
 #friendContainer {
-  border: 3px solid var(--dropdownHeadingColor);
   border-radius: 4px;
   width: 100%;
 }
@@ -469,8 +484,13 @@ a:active {
 }
 
 #notation {
+  border: 3px solid var(--dropdownHeadingColor);
   overflow: hidden;
   display: flex;
+}
+
+#notation:focus-within, #encoding:focus-within {
+  animation: showFocus 3s;
 }
 
 .resizer {
@@ -510,6 +530,7 @@ a:active {
 }
 
 #encoding {
+  border: 3px solid var(--dropdownHeadingColor);
   display: flex;
   justify-content: left;
   flex-direction: column;
@@ -1007,16 +1028,41 @@ svg text {
   color: orange !important;
 }
 
+
+@keyframes pulseHighlighted {
+  0% { 
+    color: var(--textColor);
+    fill: var(--textColor);
+    stroke: var(--textColor);
+  }
+
+  20% { 
+    color: var(--highlightPulseColor);
+    fill: var(--highlightPulseColor);
+    stroke: var(--highlightPulseColor);
+  }
+
+  100% { 
+    color: var(--highlightColor);
+    fill: var(--highlightColor);
+    stroke: var(--highlightColor);
+  }
+}
+
 #verovio-panel .highlighted,
 #verovio-panel .highlighted g {
   color: var(--highlightColor);
   fill: var(--highlightColor);
+  animation: pulseHighlighted .6s;
+  animation-timing-function:ease;
 }
 
 #verovio-panel g.highlighted,
 #verovio-panel text.highlighted {
   fill: var(--highlightColor);
   fill-opacity: 100%;
+  animation: pulseHighlighted .6s;
+  animation-timing-function:ease;
 }
 
 #facsimile-panel rect.highlighted {
@@ -1024,6 +1070,8 @@ svg text {
   stroke-opacity: 70%;
   fill: var(--highlightColor);
   fill-opacity: 15%;
+  animation: pulseHighlighted .6s;
+  animation-timing-function:ease;
 }
 
 #facsimile-panel text.highlighted {
@@ -1031,6 +1079,8 @@ svg text {
   stroke-opacity: 70%;
   fill: var(--highlightColor);
   fill-opacity: 70%;
+  animation: pulseHighlighted .6s;
+  animation-timing-function:ease;
 }
 
 #verovio-panel g.supplied g {
@@ -1041,10 +1091,14 @@ svg text {
 #verovio-panel .supplied .highlighted {
   color: var(--suppliedHighlightedColor);
   fill: var(--suppliedHighlightedColor);
+  animation: pulseHighlighted .6s;
+  animation-timing-function:ease;
 }
 
 #verovio-panel g.supplied g.highlighted {
   fill: var(--suppliedHighlightedColor);
+  animation: pulseHighlighted .6s;
+  animation-timing-function:ease;
 }
 
 #verovio-panel {
@@ -1622,19 +1676,28 @@ midi-player::part(play-button) {
   background-color: var(--settingsLinkHoverColor);
 }
 
-.panelFocus {
-  border-color: red;
-  border-radius: 4px;
-  border-width: 3px;
-  animation: showFocus 2s;
-}
-
 @keyframes showFocus {
-  from {
-    border-style: dotted;
+  0% {
+    border-color: #0d0;
+  }
+  
+  10% {
+    border-color: #0c0;
   }
 
-  to  {
-    border-style: none;
+  20% {
+    border-color: #0b0;
+  }
+
+  30% { 
+    border-color: #0a0;
+  }
+
+  40% {
+    border-color: #090;
+  }
+
+  100% {
+    border-color: var(--dropdownHeadingColor);
   }
 }
