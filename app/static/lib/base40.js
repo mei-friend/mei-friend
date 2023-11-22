@@ -104,7 +104,7 @@ export function alterationToAccidGes(alteration = 0) {
     let i = Object.values(accidGesturalAndAlternation).indexOf(alteration);
     return Object.keys(accidGesturalAndAlternation)[i];
   } else {
-    console.log('Provide numbers between -2 and +2.');
+    console.log('Provide numbers between -3 and +3.');
     return null;
   }
 } // alterationToAccidGes()
@@ -154,6 +154,24 @@ export function accidWrittenToAlteration(accid = 'n') {
 } // accidWrittenToAlteration()
 
 /**
+ * Returns octave number of base-40 integer
+ * @param {number} base40int
+ * @returns {number}
+ */
+export function getOctave(base40int = 0) {
+  return Math.floor(base40int / 40);
+} // getOctave()
+
+/**
+ * Returns chroma integer value 
+ * @param {number} base40int 
+ * @returns {number}
+ */
+export function getChroma(base40int = 0) {
+  return base40int - getOctave(base40int) * base;
+} // getChroma()
+
+/**
  * Converts base-40 integer to object with keys: pname, accidGes, oct
  * @param {number} base40int
  * @returns {Object|null} with keys pname, accid.gestural.basic, and oct
@@ -167,8 +185,8 @@ export function base40ToPitch(base40int = 0) {
     console.log('Cannot convert negative base-40 integer values to pitch.');
     return null;
   }
-  const octValue = Math.floor(base40int / 40);
-  base40int = base40int % 40;
+  const octValue = getOctave(base40int);
+  base40int = getChroma(base40int);
   // go through diatonic steps and find correct pitch name
   for (const [i, step] of diatonicSteps.entries()) {
     if (base40int < step + 3) {
