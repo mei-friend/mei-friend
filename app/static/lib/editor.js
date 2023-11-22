@@ -2488,6 +2488,11 @@ function pitchMover(v, el, deltaPitch, shiftChromatically = false) {
   let keySig = dutils.getKeySigForNote(v.xmlDoc, el);
   console.debug('Current keySig: ', keySig);
   let affectedNotes = dutils.getAffectedNotesFromKeySig(keySig);
+  affectedNotes.b40numbers = affectedNotes.affectedNotes.map((n) => {
+    let accid = affectedNotes.keySigAccid;
+    if (n.length > 1) accid += n[1] === att.sharpSign ? 's' : 'f';
+    return b40.pitchToBase40(n[0], accid);
+  });
   let scaleShift = affectedNotes.affectedNotes.length * b40.intervals.P5;
   let scaleSteps =
     affectedNotes.keySigAccid === 'f'
@@ -2566,12 +2571,12 @@ function pitchMover(v, el, deltaPitch, shiftChromatically = false) {
 
   const newPitch = b40.base40ToPitch(b40step);
 
-  if (affectedNotes.affectedNotes.includes(newPitch.pname) && newPitch.accidGes === affectedNotes.keySigAccid) {
-    // add as accid.ges, when keySig accid identical to accidGes
+  if (affectedNotes.b40numbers.includes(b40step)) {
+    // add as accid.ges, when b40 pitch identical with a scaleStep
     el.setAttribute('accid.ges', newPitch.accidGes);
   } else if (
     (newPitch.accidGes && newPitch.accidGes !== 'n') ||
-    affectedNotes.affectedNotes.includes(newPitch.pname)
+    affectedNotes.affectedNotes.map((n) => n[0]).includes(newPitch.pname)
     // Create new element for accid, when different accid than accected note or some other accid
   ) {
     let a = document.createElementNS(dutils.meiNameSpace, 'accid');

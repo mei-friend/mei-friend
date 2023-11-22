@@ -97,7 +97,7 @@ export const pnames = ['c', 'd', 'e', 'f', 'g', 'a', 'b'];
 export const sharpSign = '♯';
 export const flatSign = '♭';
 
-// pitch names for sharps and flats, defined in keySig@sig or @key.sig
+// pitch names for sharps and flats, defined in keySig@sig or @key.sig (just 7 steps make sense)
 export const sharps = ['f', 'c', 'g', 'd', 'a', 'e', 'b', 'f♯', 'c♯', 'g♯', 'd♯', 'a♯'];
 export const flats = ['b', 'e', 'a', 'd', 'g', 'c', 'f', 'b♭', 'e♭', 'a♭', 'd♭', 'g♭'];
 
