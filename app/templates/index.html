@@ -980,15 +980,15 @@
               <div class="markup-btn-group annotationToolsIcon">
                 <div class="markup-dropdown">
                   <span>&lt;choice&gt;</span>
-                  <div class="markup-dropdown-content">
-                    <a href="#">sic | corr</a>
-                    <a href="#">corr | sic</a>
-                    <a href="#">orig | reg</a>
-                    <a href="#">reg | orig</a>  
+                  <div id="choice-content-options" class="markup-dropdown-content">
+                    <a id="choice_sic-corr" data-target="choice-content-target" data-content-choice="sic,corr" class="content-option" href="#">sic | corr</a>
+                    <a id="choice_corr-sic" data-target="choice-content-target" data-content-choice="corr,sic" class="content-option" href="#">corr | sic</a>
+                    <a id="choice_orig-reg" data-target="choice-content-target" data-content-choice="orig,reg" class="content-option" href="#">orig | reg</a>
+                    <a id="choice_reg-orig" data-target="choice-content-target" data-content-choice="reg,orig" class="content-option" href="#">reg | orig</a>  
                   </div>
                 </div>
                 <div class="markup-dropdown">
-                  <span>(select content)</span>
+                  <span id="choice-content-target">(select content)</span>
                   <div class="markup-dropdown-content">
                     <a href="#">Selection</a>
                     <a href="#">Articulation</a>

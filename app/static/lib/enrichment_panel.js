@@ -523,6 +523,15 @@ export function addMarkupHandlers() {
     addDelArtic: () => markup.addMarkup('artic', 'del'),
   };
 
+  const toggleContentSelector = (event) => {
+    let currentElement = event.currentTarget;
+    let targetID = currentElement.dataset.target;
+    let targetDisplay = document.getElementById(targetID);
+    
+    targetDisplay.innerHTML = currentElement.innerHTML;
+    targetDisplay.setAttribute('data-content',currentElement.dataset.contentChoice);
+  };
+
   document.getElementById('addSupplied').addEventListener('click', markupHandler.addSupplied);
   document.getElementById('addSuppliedArtic').addEventListener('click', markupHandler.addSuppliedArtic);
   document.getElementById('addSuppliedAccid').addEventListener('click', markupHandler.addSuppliedAccid);
@@ -547,6 +556,11 @@ export function addMarkupHandlers() {
   document.getElementById('addDel').addEventListener('click', markupHandler.addDel);
   document.getElementById('addDelArtic').addEventListener('click', markupHandler.addDelArtic);
   document.getElementById('addDelAccid').addEventListener('click', markupHandler.addDelAccid);
+
+  let contentOptions = document.getElementsByClassName('content-option');
+  for (let i = 0; i < contentOptions.length; i++) {
+    contentOptions[i].addEventListener('click', (event) => {toggleContentSelector(event)});
+  }
 }
 
 /**
