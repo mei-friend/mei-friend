@@ -8,6 +8,7 @@
 * Keyboard shortcut (`.`) to add or remove `dots="1"` to notes, chords, etc.
 * Keyboard shortcut (`C`) to embed selected notes inside a new chord element, and vice versa (remove chord and leave notes)
 * Misleading warning when clicking on elements without ID fixed (#52)
+* Key signature information is taken into account, when shifting pitch of a note (#38)
 
 ### 1.0.4 patch
 * Tweak CSS select and translations (German)
