@@ -2486,7 +2486,7 @@ function pitchMover(v, el, deltaPitch, shiftChromatically = false) {
 
   // get key signature and create scale steps in base-40 system
   let keySig = dutils.getKeySigForNote(v.xmlDoc, el);
-  console.debug('Current keySig: ', keySig);
+  // console.debug('Current keySig: ', keySig);
   let affectedNotes = dutils.getAffectedNotesFromKeySig(keySig);
   affectedNotes.b40numbers = affectedNotes.affectedNotes.map((n) => {
     let accid = affectedNotes.keySigAccid;
@@ -2499,7 +2499,7 @@ function pitchMover(v, el, deltaPitch, shiftChromatically = false) {
       ? b40.diatonicSteps.map((v) => v - scaleShift)
       : b40.diatonicSteps.map((v) => v + scaleShift);
   scaleSteps = scaleSteps.map((v) => ((v % b40.base) + b40.base) % b40.base).sort((a, b) => a - b);
-  console.debug('Current scaleSteps: ', scaleSteps);
+  // console.debug('Current scaleSteps: ', scaleSteps);
 
   accidValue =
     el.getAttribute('accid') ||
@@ -2515,10 +2515,10 @@ function pitchMover(v, el, deltaPitch, shiftChromatically = false) {
 
   // compute b40 number of current pitch
   let b40step = b40.pitchToBase40(pnameValue, accidValue, octValue) % b40.base;
-  console.debug('b40step: ' + b40step);
+  // console.debug('b40step: ' + b40step);
 
   let i = scaleSteps.indexOf(b40step);
-  console.debug('i: ' + i);
+  // console.debug('i: ' + i);
 
   if (Math.abs(deltaPitch) === 7) {
     // add/subtract 1 to octValue
