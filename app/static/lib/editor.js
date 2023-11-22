@@ -1412,13 +1412,10 @@ export function cleanAccid(v, cm) {
  * keySig/key.sig information and measure-wise accidentals,
  * finds instances of double accid & accid.ges.
  *
- * !!! TODO: make strings translatable and add to language packs !!!
- *
  * @param {Viewer} v
  * @param {CodeMirror} cm
- * @param {boolean} change
  */
-export function checkAccidGes(v, cm, change = false) {
+export function checkAccidGes(v, cm) {
   v.allowCursorActivity = false;
   v.initCodeCheckerPanel(translator.lang.codeCheckerTitle.text);
 
@@ -2463,14 +2460,15 @@ function pitchMover(v, el, deltaPitch, shiftChromatically = false) {
   } else if (['rest', 'mRest', 'multiRest'].includes(el.nodeName)) {
     octAttr = 'oloc';
     pnameAttr = 'ploc';
-    shiftChromatically = false; // shifting chromatically with rests is non-sense
   } else {
     return el;
   }
+
+  // read attributes from element
   if (el.hasAttribute(octAttr)) octValue = parseInt(el.getAttribute(octAttr));
   if (el.hasAttribute(pnameAttr)) pnameValue = el.getAttribute(pnameAttr);
 
-  // handle rests quickly
+  // handle rests quickly and return
   if (octAttr === 'oloc') {
     let pi = att.pnames.indexOf(pnameValue) + deltaPitch;
     // secure octave transistion
@@ -2488,7 +2486,7 @@ function pitchMover(v, el, deltaPitch, shiftChromatically = false) {
 
   // get key signature and create scale steps in base-40 system
   let keySig = dutils.getKeySigForNote(v.xmlDoc, el);
-  console.debug('keySig: ', keySig);
+  console.debug('Current keySig: ', keySig);
   let affectedNotes = dutils.getAffectedNotesFromKeySig(keySig);
   let scaleShift = affectedNotes.affectedNotes.length * b40.intervals.P5;
   let scaleSteps =
@@ -2496,7 +2494,7 @@ function pitchMover(v, el, deltaPitch, shiftChromatically = false) {
       ? b40.diatonicSteps.map((v) => v - scaleShift)
       : b40.diatonicSteps.map((v) => v + scaleShift);
   scaleSteps = scaleSteps.map((v) => ((v % b40.base) + b40.base) % b40.base).sort((a, b) => a - b);
-  console.debug('scaleSteps: ', scaleSteps);
+  console.debug('Current scaleSteps: ', scaleSteps);
 
   accidValue =
     el.getAttribute('accid') ||
@@ -2568,13 +2566,16 @@ function pitchMover(v, el, deltaPitch, shiftChromatically = false) {
 
   const newPitch = b40.base40ToPitch(b40step);
 
-  // if an accid value is there, create a new element for it
-  // TODO: add keySig accids as accid.ges
-  // TODO: show naturals if affected notes
-  if (newPitch.accidGes && newPitch.accidGes !== 'n') {
+  if (affectedNotes.affectedNotes.includes(newPitch.pname) && newPitch.accidGes === affectedNotes.keySigAccid) {
+    // add as accid.ges, when keySig accid identical to accidGes
+    el.setAttribute('accid.ges', newPitch.accidGes);
+  } else if (
+    (newPitch.accidGes && newPitch.accidGes !== 'n') ||
+    affectedNotes.affectedNotes.includes(newPitch.pname)
+    // Create new element for accid, when different accid than accected note or some other accid
+  ) {
     let a = document.createElementNS(dutils.meiNameSpace, 'accid');
-    let uuid = utils.generateXmlId('accid', v.xmlIdStyle);
-    a.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
+    a.setAttributeNS(dutils.xmlNameSpace, 'xml:id', utils.generateXmlId('accid', v.xmlIdStyle));
     a.setAttribute('accid', newPitch.accidGes);
     el.appendChild(a);
   }
