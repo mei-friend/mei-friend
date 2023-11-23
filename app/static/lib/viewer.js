@@ -845,7 +845,6 @@ export default class Viewer {
    */
   switchFocusBetweenNotationAndEncoding(cm) {
     let vrvP = document.getElementById('notation');
-    let encoding = document.getElementById('encoding');
     if (document.activeElement.closest('#notation')) {
       console.debug('Viewer.switchFocusBetweenNotationAndEncoding(): Switching now to encoding.', cm);
       cm.focus();

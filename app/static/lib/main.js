@@ -110,7 +110,6 @@ import {
   defaultMeiFileName,
   defaultNotationOrientation,
   defaultNotationProportion,
-  defaultSpeedMode,
   defaultVerovioOptions,
   guidelinesBase,
   platform,
@@ -120,7 +119,6 @@ import {
 import Translator from './translator.js';
 import { buildLanguageSelection, translateLanguageSelection } from './language-selector.js';
 import { runLanguageChecks } from '../tests/checkLangs.js';
-import * as expansionMap from './expansion-map.js';
 
 const defaultCodeMirrorOptions = {
   lineNumbers: true,

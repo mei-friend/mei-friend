@@ -98,8 +98,8 @@ body {
   background-color: var(--backgroundColor);
 }
 
-#GithubButton:disabled { 
-  display:none;
+#GithubButton:disabled {
+  display: none;
 }
 
 a:link {
@@ -160,13 +160,13 @@ a:active {
   margin-right: 6px;
 }
 
-#focusIndicator { 
+#focusIndicator {
   display: inline-block;
   position: fixed;
-  padding-left:10px;
-  padding-top:10px;
-  transform:scale(50%,50%);
-  stroke:var(--fileStatusColor);
+  padding-left: 10px;
+  padding-top: 10px;
+  transform: scale(50%, 50%);
+  stroke: var(--fileStatusColor);
   z-index: 100;
 }
 
@@ -490,7 +490,8 @@ a:active {
   outline: none;
 }
 
-#notation:focus-within, #encoding:focus-within {
+#notation:focus-within,
+#encoding:focus-within {
   animation: showFocus 3s;
 }
 
@@ -1029,21 +1030,20 @@ svg text {
   color: orange !important;
 }
 
-
 @keyframes pulseHighlighted {
-  0% { 
+  0% {
     color: var(--textColor);
     fill: var(--textColor);
     stroke: var(--textColor);
   }
 
-  20% { 
+  20% {
     color: var(--highlightPulseColor);
     fill: var(--highlightPulseColor);
     stroke: var(--highlightPulseColor);
   }
 
-  100% { 
+  100% {
     color: var(--highlightColor);
     fill: var(--highlightColor);
     stroke: var(--highlightColor);
@@ -1054,16 +1054,16 @@ svg text {
 #verovio-panel .highlighted g {
   color: var(--highlightColor);
   fill: var(--highlightColor);
-  animation: pulseHighlighted .6s;
-  animation-timing-function:ease;
+  animation: pulseHighlighted 0.6s;
+  animation-timing-function: ease;
 }
 
 #verovio-panel g.highlighted,
 #verovio-panel text.highlighted {
   fill: var(--highlightColor);
   fill-opacity: 100%;
-  animation: pulseHighlighted .6s;
-  animation-timing-function:ease;
+  animation: pulseHighlighted 0.6s;
+  animation-timing-function: ease;
 }
 
 #facsimile-panel rect.highlighted {
@@ -1071,8 +1071,8 @@ svg text {
   stroke-opacity: 70%;
   fill: var(--highlightColor);
   fill-opacity: 15%;
-  animation: pulseHighlighted .6s;
-  animation-timing-function:ease;
+  animation: pulseHighlighted 0.6s;
+  animation-timing-function: ease;
 }
 
 #facsimile-panel text.highlighted {
@@ -1080,8 +1080,8 @@ svg text {
   stroke-opacity: 70%;
   fill: var(--highlightColor);
   fill-opacity: 70%;
-  animation: pulseHighlighted .6s;
-  animation-timing-function:ease;
+  animation: pulseHighlighted 0.6s;
+  animation-timing-function: ease;
 }
 
 #verovio-panel g.supplied g {
@@ -1092,14 +1092,14 @@ svg text {
 #verovio-panel .supplied .highlighted {
   color: var(--suppliedHighlightedColor);
   fill: var(--suppliedHighlightedColor);
-  animation: pulseHighlighted .6s;
-  animation-timing-function:ease;
+  animation: pulseHighlighted 0.6s;
+  animation-timing-function: ease;
 }
 
 #verovio-panel g.supplied g.highlighted {
   fill: var(--suppliedHighlightedColor);
-  animation: pulseHighlighted .6s;
-  animation-timing-function:ease;
+  animation: pulseHighlighted 0.6s;
+  animation-timing-function: ease;
 }
 
 #verovio-panel {
@@ -1681,7 +1681,7 @@ midi-player::part(play-button) {
   0% {
     border-color: #0d0;
   }
-  
+
   10% {
     border-color: #0c0;
   }
@@ -1690,7 +1690,7 @@ midi-player::part(play-button) {
     border-color: #0b0;
   }
 
-  30% { 
+  30% {
     border-color: #0a0;
   }
 
