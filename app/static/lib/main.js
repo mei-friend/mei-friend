@@ -770,7 +770,7 @@ function completeInitialLoad() {
     doit = setTimeout(() => setOrientation(cm, '', '', v, storage), 500);
   };
 
-  setKeyMap(keymap);
+  setKeyMap();
 
   // remove URL parameters from URL
   // TODO: check handleURLParamSelect() occurrences, whether removing search parameters has an effect there.
