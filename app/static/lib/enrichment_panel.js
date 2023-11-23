@@ -496,33 +496,6 @@ export function addAnnotationHandlers() {
 }
 
 export function addMarkupHandlers() {
-  const markupHandler = {
-    addSupplied: () => markup.addMarkup(null, 'supplied'),
-    addSuppliedAccid: () => markup.addMarkup('accid', 'supplied'),
-    addSuppliedArtic: () => markup.addMarkup('artic', 'supplied'),
-    addUnclear: () => markup.addMarkup(null, 'unclear'),
-    addUnclearAccid: () => markup.addMarkup('accid', 'unclear'),
-    addUnclearArtic: () => markup.addMarkup('artic', 'unclear'),
-    addSic: () => markup.addMarkup(null, 'sic'),
-    addSicAccid: () => markup.addMarkup('accid', 'sic'),
-    addSicArtic: () => markup.addMarkup('artic', 'sic'),
-    addCorr: () => markup.addMarkup(null, 'corr'),
-    addCorrAccid: () => markup.addMarkup('accid', 'corr'),
-    addCorrArtic: () => markup.addMarkup('artic', 'corr'),
-    addOrig: () => markup.addMarkup(null, 'orig'),
-    addOrigAccid: () => markup.addMarkup('accid', 'orig'),
-    addOrigArtic: () => markup.addMarkup('artic', 'orig'),
-    addReg: () => markup.addMarkup(null, 'reg'),
-    addRegAccid: () => markup.addMarkup('accid', 'reg'),
-    addRegArtic: () => markup.addMarkup('artic', 'reg'),
-    addAdd: () => markup.addMarkup(null, 'add'),
-    addAddAccid: () => markup.addMarkup('accid', 'add'),
-    addAddArtic: () => markup.addMarkup('artic', 'add'),
-    addDel: () => markup.addMarkup(null, 'del'),
-    addDelAccid: () => markup.addMarkup('accid', 'del'),
-    addDelArtic: () => markup.addMarkup('artic', 'del'),
-  };
-
   const toggleContentSelector = (event) => {
     let currentElement = event.currentTarget;
     let targetID = currentElement.dataset.target;
@@ -532,34 +505,14 @@ export function addMarkupHandlers() {
     targetDisplay.setAttribute('data-content',currentElement.dataset.contentChoice);
   };
 
-  document.getElementById('addSupplied').addEventListener('click', markupHandler.addSupplied);
-  document.getElementById('addSuppliedArtic').addEventListener('click', markupHandler.addSuppliedArtic);
-  document.getElementById('addSuppliedAccid').addEventListener('click', markupHandler.addSuppliedAccid);
-  document.getElementById('addUnclear').addEventListener('click', markupHandler.addUnclear);
-  document.getElementById('addUnclearArtic').addEventListener('click', markupHandler.addUnclearArtic);
-  document.getElementById('addUnclearAccid').addEventListener('click', markupHandler.addUnclearAccid);
-  document.getElementById('addSic').addEventListener('click', markupHandler.addSic);
-  document.getElementById('addSicArtic').addEventListener('click', markupHandler.addSicArtic);
-  document.getElementById('addSicAccid').addEventListener('click', markupHandler.addSicAccid);
-  document.getElementById('addCorr').addEventListener('click', markupHandler.addCorr);
-  document.getElementById('addCorrArtic').addEventListener('click', markupHandler.addCorrArtic);
-  document.getElementById('addCorrAccid').addEventListener('click', markupHandler.addCorrAccid);
-  document.getElementById('addOrig').addEventListener('click', markupHandler.addOrig);
-  document.getElementById('addOrigArtic').addEventListener('click', markupHandler.addOrigArtic);
-  document.getElementById('addOrigAccid').addEventListener('click', markupHandler.addOrigAccid);
-  document.getElementById('addReg').addEventListener('click', markupHandler.addReg);
-  document.getElementById('addRegArtic').addEventListener('click', markupHandler.addRegArtic);
-  document.getElementById('addRegAccid').addEventListener('click', markupHandler.addRegAccid);
-  document.getElementById('addAdd').addEventListener('click', markupHandler.addAdd);
-  document.getElementById('addAddArtic').addEventListener('click', markupHandler.addAddArtic);
-  document.getElementById('addAddAccid').addEventListener('click', markupHandler.addAddAccid);
-  document.getElementById('addDel').addEventListener('click', markupHandler.addDel);
-  document.getElementById('addDelArtic').addEventListener('click', markupHandler.addDelArtic);
-  document.getElementById('addDelAccid').addEventListener('click', markupHandler.addDelAccid);
-
   let contentOptions = document.getElementsByClassName('content-option');
   for (let i = 0; i < contentOptions.length; i++) {
     contentOptions[i].addEventListener('click', (event) => {toggleContentSelector(event)});
+  }
+
+  let addMarkupButtons = document.getElementsByClassName('addMarkup');
+  for (let i = 0; i < addMarkupButtons.length; i++) {
+    addMarkupButtons[i].addEventListener('click', (event) => {markup.addMarkup(event)});
   }
 }
 

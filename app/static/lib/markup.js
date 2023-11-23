@@ -177,10 +177,13 @@ function firstChildElement(parent) {
 
 /**
  * Calls the function to add markup and refreshes the list of items
- * @param {string} attrName
- * @param {string} mElName
+ * @param {Event} event click event
  */
-export function addMarkup(attrName = 'none', mElName = 'supplied') {
+export function addMarkup(event) {
+  let eventTarget = event.currentTarget;
+  let mElName = eventTarget.dataset.elName;
+  let attrName = eventTarget.dataset.selection;
+  if (!att.modelTranscriptionLike.includes(mElName)) return;
   addTranscriptionLikeElement(v, cm, attrName, mElName);
   //let successfullyAdded = xmlMarkupToListItem(v.selectedElements, mElName);
   // Manually updating the item list is not necessary because refreshing the code in the editor triggers readMarkup()
