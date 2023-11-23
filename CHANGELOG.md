@@ -2,6 +2,7 @@
 
 ### 1.0.6 patch
 * Key signature information is taken into account, when shifting pitch of a note (#38)
+* Several navigation keyboard shortcuts removed from encoding panel (#66)
 
 ### 1.0.5 patch
 * Add Ukrainian and Esperanto language packs (still to be proof-read)
