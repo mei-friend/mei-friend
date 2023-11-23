@@ -487,6 +487,7 @@ a:active {
   border: 3px solid var(--dropdownHeadingColor);
   overflow: hidden;
   display: flex;
+  outline: none;
 }
 
 #notation:focus-within, #encoding:focus-within {
