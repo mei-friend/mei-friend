@@ -847,10 +847,10 @@ export default class Viewer {
     let vrvP = document.getElementById('verovio-panel');
     let encoding = document.getElementById('encoding');
     if (document.activeElement.closest('#notation')) {
-      // console.log('Switching to encoding');
+      console.debug('Viewer.switchFocusBetweenNotationAndEncoding(): Switching now to encoding.', cm);
       cm.focus();
     } else {
-      // console.log('Switching to notation');
+      console.debug('Viewer.switchFocusBetweenNotationAndEncoding(): Switching to now notation.', vrvP);
       vrvP.focus();
     }
   } // switchFocusBetweenNotationAndEncoding()
