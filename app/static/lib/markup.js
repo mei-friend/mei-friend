@@ -65,6 +65,31 @@ export function readMarkup() {
 }
 
 /**
+ * Creates a list item object for markup elements based on some basic data
+ * @param {string} currentElementId xml:id of current element -> item.id
+ * @param {string} mElName element name -> item.type
+ * @param {Array[string]} correspElements ids of corresponding elements (including self) -> item.selection
+ * @returns {boolean} adding item was successful
+ */
+function xmlMarkupToListItem(currentElementId, mElName, correspElements) {
+  // one addMarkupAction might result in multiple markup elements
+  // e.g. when selecting notes and control events
+  // mostly because symbols in a score aren't necessarily close in the xml tree
+  // properties are similar to annotations
+  // id is the xml:id of the first markup element
+  // selection contains all markup elements created at the same time
+
+  const markupItem = {
+    id: currentElementId,
+    type: mElName,
+    isMarkup: true,
+    selection: correspElements,
+  };
+  let success = addListItem(markupItem);
+  return success;
+}
+
+/**
  * Returns for a markup item the page locations in the Verovio rendering
  * @param {Object} markupItem markupItem to situate
  * @returns {Promise} a promise containing the modified markupItem
@@ -184,35 +209,10 @@ export function addMarkup(event) {
   let mElName = eventTarget.dataset.elName;
   let attrName = eventTarget.dataset.selection;
   if (!att.modelTranscriptionLike.includes(mElName)) return;
-  addTranscriptionLikeElement(v, cm, attrName, mElName);
+  addMarkupToXML(v, cm, attrName, mElName);
   //let successfullyAdded = xmlMarkupToListItem(v.selectedElements, mElName);
   // Manually updating the item list is not necessary because refreshing the code in the editor triggers readMarkup()
   refreshAnnotationsList();
-}
-
-/**
- * Creates a list item object for markup elements based on some basic data
- * @param {string} currentElementId xml:id of current element -> item.id
- * @param {string} mElName element name -> item.type
- * @param {Array[string]} correspElements ids of corresponding elements (including self) -> item.selection
- * @returns {boolean} adding item was successful
- */
-function xmlMarkupToListItem(currentElementId, mElName, correspElements) {
-  // one addMarkupAction might result in multiple markup elements
-  // e.g. when selecting notes and control events
-  // mostly because symbols in a score aren't necessarily close in the xml tree
-  // properties are similar to annotations
-  // id is the xml:id of the first markup element
-  // selection contains all markup elements created at the same time
-
-  const markupItem = {
-    id: currentElementId,
-    type: mElName,
-    isMarkup: true,
-    selection: correspElements,
-  };
-  let success = addListItem(markupItem);
-  return success;
 }
 
 /**
@@ -234,12 +234,11 @@ function xmlMarkupToListItem(currentElementId, mElName, correspElements) {
  * @param {string} mElName name of markup element to apply
  * @returns
  */
-export function addTranscriptionLikeElement(v, cm, attrName = 'none', mElName = 'supplied') {
+function addMarkupToXML(v, cm, attrName = 'none', mElName, multiLayerContent = []) {
   v.loadXml(cm.getValue());
   v.selectedElements = speed.filterElements(v.selectedElements, v.xmlDoc);
   v.selectedElements = utils.sortElementsByScorePosition(v.selectedElements);
   if (v.selectedElements.length < 1) return;
-  if (!att.modelTranscriptionLike.includes(mElName)) return;
   v.allowCursorActivity = false;
 
   let uuids = [];
@@ -344,7 +343,7 @@ export function addTranscriptionLikeElement(v, cm, attrName = 'none', mElName = 
           cmd.addIds();
           v.hideUserPrompt(resolveModal);
           console.log('Added ids and proceed.');
-          let markupUuid = wrapGroupWithMarkup(v, cm, group, mElName, parent);
+          let markupUuid = createMarkup(v, group, mElName, parent, multiLayerContent);
           uuids.push(markupUuid);
         })
         .catch((resolveModal) => {
@@ -352,7 +351,7 @@ export function addTranscriptionLikeElement(v, cm, attrName = 'none', mElName = 
           console.log('Aborting action because of missing parent id.');
         });
     } else {
-      let markupUuid = wrapGroupWithMarkup(v, cm, group, mElName, parent);
+      let markupUuid = createMarkup(v, group, mElName, parent, multiLayerContent);
       uuids.push(markupUuid);
 
       // buffer.groupChangesSinceCheckpoint(checkPoint); // TODO
@@ -378,18 +377,32 @@ export function addTranscriptionLikeElement(v, cm, attrName = 'none', mElName = 
   addApplicationInfo(v, cm);
   v.updateData(cm, false, true);
   v.allowCursorActivity = true; // update notation again
-} // addSuppliedElement()
+} // addMarkupToXML()
+
+function createMarkup(v, groupIds, mElName, parentEl, content) {
+  let upmostMarkupUuid;
+  let upmostMarkup;
+  if (att.modelTranscriptionLike.includes(mElName)) {
+    upmostMarkup = wrapGroupWithMarkup(v, groupIds, mElName, parentEl);
+  } else {
+    let firstChild = wrapGroupWithMarkup(v, groupIds, content[0], parentEl);
+    upmostMarkup = addMultiLayeredMarkup(v, mElName, parentEl, firstChild, content);
+  }
+  upmostMarkupUuid = upmostMarkup.getAttribute('xml:id');
+  return upmostMarkupUuid;
+}
+
+function addMultiLayeredMarkup(v, mElName, parentEl, firstChild, content) {}
 
 /**
  * Wraps a single group of elements with a markup element
  * @param {*} v viewer
- * @param {*} cm code mirror
  * @param {Array} groupIds xml:ids of elements to wrap
  * @param {string} mElName element name for markup
  * @param {HTMLElement} parentEl parent element of group to wrap
- * @returns {string} id of created markup element
+ * @returns {HTMLElement} created markup element
  */
-function wrapGroupWithMarkup(v, cm, groupIds, mElName, parentEl) {
+function wrapGroupWithMarkup(v, groupIds, mElName, parentEl) {
   let markupEl = document.createElementNS(dutils.meiNameSpace, mElName);
   let uuid;
 
@@ -423,7 +436,7 @@ function wrapGroupWithMarkup(v, cm, groupIds, mElName, parentEl) {
   // markup items will be imported to enrichment_panel.itemList because an event triggers
   // to read list items from the xml file as soon as the editor is refreshed
 
-  return uuid;
+  return markupEl;
 }
 
 /**

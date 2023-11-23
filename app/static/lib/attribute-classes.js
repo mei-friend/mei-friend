@@ -279,6 +279,9 @@ export const modelTranscriptionLike = [
   'unclear',
 ];
 
+// <app> is model.appLike, <choice> and <subst> are model.editLike
+export const alternativeEncodingElements = ['app', 'choice', 'subst'];
+
 // data.DURATION.cmn
 export const dataDurationCMN = [
   'long',
