@@ -155,6 +155,7 @@ export function selectApparatus(xmlDoc, sourceId = '') {
 /**
  * Selects the requested choice child element (TODO) and
  * keeps it in xmlDoc; other choices are removed.
+ * Keeps not only the content of the first child but the child too to allow highlighting.
  * @param {Document} xmlDoc
  * @param {string} sourceId
  * @returns {Document} xmlDoc
@@ -174,10 +175,8 @@ export function selectChoice(xmlDoc, sourceId) {
       }
     }
     if (parent && firstChild) {
-      // add clones of child nodes before choice...
-      firstChild.childNodes.forEach((child) => {
-        parent.insertBefore(child.cloneNode(true), choice);
-      });
+      // add clones of first child before choice...
+      parent.insertBefore(firstChild.cloneNode(true), choice);
       choice.remove(); // ... and remove choice afterwards
     } else {
       console.log('This choice has no child elements. ', choice);
