@@ -423,11 +423,13 @@ function addMultiLayeredMarkup(v, mElName, parentEl, firstChild, content) {
 
   parentEl.replaceChild(upmostElement, firstChild);
   upmostElement.appendChild(firstChild);
+  let dummy = document.createComment('replace this with alternative reading');
 
   for (let i = 1; i < content.length; i++) {
     let nextChild = document.createElementNS(dutils.meiNameSpace, content[i]);
     let nextChildID = mintSuppliedId(upmostElementID, content[i], v);
     nextChild.setAttributeNS(dutils.xmlNameSpace, 'xml:id', nextChildID);
+    nextChild.appendChild(dummy);
     upmostElement.appendChild(nextChild);
   }
 
