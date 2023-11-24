@@ -495,24 +495,36 @@ export function addAnnotationHandlers() {
   document.getElementById('annotationToolsButton').addEventListener('click', enableDisableIdentifyObject);
 }
 
+/**
+ * Adds click events and UI functionality for markup tool panel.
+ * Logic regarding markup is in markup.js
+ */
 export function addMarkupHandlers() {
   const toggleContentSelector = (event) => {
     let currentElement = event.currentTarget;
     let targetID = currentElement.dataset.target;
     let targetDisplay = document.getElementById(targetID);
-    
+
     targetDisplay.innerHTML = currentElement.innerHTML;
-    targetDisplay.setAttribute('data-content',currentElement.dataset.contentChoice);
+    let targetLinks = targetDisplay.parentElement.children[1].children;
+    for (let i = 0; i < targetLinks.length; i++) {
+      targetLinks[i].setAttribute('data-content', currentElement.dataset.contentChoice);
+    }
+    //TODO: make addition of data-content less error prone!
   };
 
   let contentOptions = document.getElementsByClassName('content-option');
   for (let i = 0; i < contentOptions.length; i++) {
-    contentOptions[i].addEventListener('click', (event) => {toggleContentSelector(event)});
+    contentOptions[i].addEventListener('click', (event) => {
+      toggleContentSelector(event);
+    });
   }
 
   let addMarkupButtons = document.getElementsByClassName('addMarkup');
   for (let i = 0; i < addMarkupButtons.length; i++) {
-    addMarkupButtons[i].addEventListener('click', (event) => {markup.addMarkup(event)});
+    addMarkupButtons[i].addEventListener('click', (event) => {
+      markup.addMarkup(event);
+    });
   }
 }
 

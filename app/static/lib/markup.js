@@ -208,8 +208,9 @@ export function addMarkup(event) {
   let eventTarget = event.currentTarget;
   let mElName = eventTarget.dataset.elName;
   let attrName = eventTarget.dataset.selection;
-  if (!att.modelTranscriptionLike.includes(mElName)) return;
-  addMarkupToXML(v, cm, attrName, mElName);
+  let multiLayerContent = eventTarget.dataset.content.split(',');
+  if (!att.modelTranscriptionLike.includes(mElName) && !att.alternativeEncodingElements.includes(mElName)) return;
+  addMarkupToXML(v, cm, attrName, mElName, multiLayerContent);
   //let successfullyAdded = xmlMarkupToListItem(v.selectedElements, mElName);
   // Manually updating the item list is not necessary because refreshing the code in the editor triggers readMarkup()
   refreshAnnotationsList();
@@ -232,7 +233,6 @@ export function addMarkup(event) {
  * @param {CodeMirror} cm
  * @param {string} attrName ('artic', 'accid')
  * @param {string} mElName name of markup element to apply
- * @returns
  */
 function addMarkupToXML(v, cm, attrName = 'none', mElName, multiLayerContent = []) {
   v.loadXml(cm.getValue());
@@ -379,6 +379,17 @@ function addMarkupToXML(v, cm, attrName = 'none', mElName, multiLayerContent = [
   v.allowCursorActivity = true; // update notation again
 } // addMarkupToXML()
 
+/**
+ * Creates either simple or multilayered markup for a selection of elements.
+ * Wraps the selection with a markup element and builds multilayered markup
+ * (choice, subst, app) around.
+ * @param {Viewer} v
+ * @param {Array} groupIds
+ * @param {string} mElName
+ * @param {HTMLElement} parentEl parent element
+ * @param {Array[string]} content element names
+ * @returns the uuid of the outer element
+ */
 function createMarkup(v, groupIds, mElName, parentEl, content) {
   let upmostMarkupUuid;
   let upmostMarkup;
@@ -392,7 +403,36 @@ function createMarkup(v, groupIds, mElName, parentEl, content) {
   return upmostMarkupUuid;
 }
 
-function addMultiLayeredMarkup(v, mElName, parentEl, firstChild, content) {}
+/**
+ * Wraps multi layered markup for alternative encodings around a markup element
+ * that then becomes the first child.
+ * @param {Viewer} v
+ * @param {string} mElName name of to level element to create, choice/subst/app
+ * @param {HTMLElement} parentEl parent for choice/subst/app
+ * @param {HTMLElement} firstChild first child of choice/subst/app with content
+ * @param {Array[string]} content element names for content of choice/subst/app
+ * @returns {HTMLElement} newly created multi layered markup element
+ */
+function addMultiLayeredMarkup(v, mElName, parentEl, firstChild, content) {
+  let upmostElement = document.createElementNS(dutils.meiNameSpace, mElName);
+  let upmostElementID = mintSuppliedId(firstChild.getAttribute('xml:id'), mElName, v);
+  upmostElement.setAttributeNS(dutils.xmlNameSpace, 'xml:id', upmostElementID);
+
+  let respID = getCurrentRespID();
+  if (respID) upmostElement.setAttribute('resp', '#' + respID);
+
+  parentEl.replaceChild(upmostElement, firstChild);
+  upmostElement.appendChild(firstChild);
+
+  for (let i = 1; i < content.length; i++) {
+    let nextChild = document.createElementNS(dutils.meiNameSpace, content[i]);
+    let nextChildID = mintSuppliedId(upmostElementID, content[i], v);
+    nextChild.setAttributeNS(dutils.xmlNameSpace, 'xml:id', nextChildID);
+    upmostElement.appendChild(nextChild);
+  }
+
+  return upmostElement;
+}
 
 /**
  * Wraps a single group of elements with a markup element
@@ -406,7 +446,7 @@ function wrapGroupWithMarkup(v, groupIds, mElName, parentEl) {
   let markupEl = document.createElementNS(dutils.meiNameSpace, mElName);
   let uuid;
 
-  let respId = document.getElementById('respSelect').value;
+  let respId = getCurrentRespID();
   if (respId) markupEl.setAttribute('resp', '#' + respId);
 
   for (let i = 0; i < groupIds.length; i++) {
@@ -437,6 +477,14 @@ function wrapGroupWithMarkup(v, groupIds, mElName, parentEl) {
   // to read list items from the xml file as soon as the editor is refreshed
 
   return markupEl;
+}
+
+/**
+ * Get currently selected resp id from settings.
+ * @returns {string}
+ */
+function getCurrentRespID() {
+  return document.getElementById('respSelect').value;
 }
 
 /**
