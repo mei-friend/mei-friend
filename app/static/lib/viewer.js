@@ -1915,9 +1915,17 @@ export default class Viewer {
     });
   } // setMidiExpansionOptions()
 
-  // navigate forwards/backwards/upwards/downwards in the DOM, as defined
-  // by 'dir' an by 'incrementElementName'
-  navigate(cm, incElName = 'note', dir = 'forwards') {
+  /**
+   * Navigate forwards/backwards/upwards/downwards in the DOM,
+   * as defined by 'dir' an by incrementElementName
+   * `selectedElements` are retained, if mark flag is set
+   * @param {CodeMirror} cm
+   * @param {string} incElName
+   * @param {string} direction
+   * @param {boolean} mark
+   * @returns nothing
+   */
+  navigate(cm, incElName = 'note', direction = 'forwards', mark = false) {
     console.info('navigate(): lastNoteId: ', this.lastNoteId);
     this.allowCursorActivity = false;
     let id = this.lastNoteId;
@@ -1936,7 +1944,7 @@ export default class Viewer {
       if (id) element = document.querySelector('g#' + id);
     }
     if (!element) return;
-    console.info('Navigate ' + dir + ' ' + incElName + '-wise for: ', element);
+    console.info('Navigate ' + direction + ' ' + incElName + '-wise for: ', element);
     let x = dutils.getX(element);
     let y = dutils.getY(element);
     let measure = element.closest('.measure');
@@ -1947,17 +1955,17 @@ export default class Viewer {
     } else {
       // find elements starting from current note id, element- or measure-wise
       if (incElName === 'note' || incElName === 'measure') {
-        id = dutils.getIdOfNextSvgElement(element, dir, undefined, incElName);
+        id = dutils.getIdOfNextSvgElement(element, direction, undefined, incElName);
         if (!id) {
           // when no id on screen, turn page
           let what = 'first'; // first/last note within measure
-          if (dir === 'backwards' && incElName !== 'measure') what = 'last';
+          if (direction === 'backwards' && incElName !== 'measure') what = 'last';
           let lyNo = 1;
           let layer = element.closest('.layer');
           if (layer) lyNo = layer.getAttribute('data-n');
           let staff = element.closest('.staff');
           let stNo = staff.getAttribute('data-n');
-          this.navigateBeyondPage(cm, dir, what, stNo, lyNo, y);
+          this.navigateBeyondPage(cm, direction, what, stNo, lyNo, y);
           return;
         }
       }
@@ -1969,8 +1977,8 @@ export default class Viewer {
         els.sort(function (a, b) {
           if (Math.abs(dutils.getX(a) - x) > Math.abs(dutils.getX(b) - x)) return 1;
           if (Math.abs(dutils.getX(a) - x) < Math.abs(dutils.getX(b) - x)) return -1;
-          if (dutils.getY(a) < dutils.getY(b)) return dir === 'upwards' ? 1 : -1;
-          if (dutils.getY(a) > dutils.getY(b)) return dir === 'upwards' ? -1 : 1;
+          if (dutils.getY(a) < dutils.getY(b)) return direction === 'upwards' ? 1 : -1;
+          if (dutils.getY(a) > dutils.getY(b)) return direction === 'upwards' ? -1 : 1;
           return 0;
         });
         // console.info('els: ', els);
@@ -1980,8 +1988,8 @@ export default class Viewer {
           // go thru all elements to find closest in x/y space
           if (found) {
             yy = dutils.getY(e);
-            if (dir === 'upwards' && yy >= y) continue;
-            if (dir === 'downwards' && yy <= y) continue;
+            if (direction === 'upwards' && yy >= y) continue;
+            if (direction === 'downwards' && yy <= y) continue;
             id = e.getAttribute('id');
             break;
           }
@@ -1991,16 +1999,16 @@ export default class Viewer {
 
       console.info('navigate() found this ID: ' + id);
     }
+    if (!id) return;
+
     // update cursor position in MEI file (buffer)
     utils.setCursorToId(cm, id);
-    // this.allowCursorActivityToTextposition(txtEdr); TODO
-    if (id) {
-      this.selectedElements = [];
-      if (!this.selectedElements.includes(id)) this.selectedElements.push(id);
-      this.lastNoteId = id;
-      if (document.getElementById('showMidiPlaybackControlBar').checked) {
-        startMidiTimeout();
-      }
+    // this.allowCursorActivityToTextposition(txtEdr); // TODO
+    if (!mark) this.selectedElements = [];
+    if (!this.selectedElements.includes(id)) this.selectedElements.push(id);
+    this.lastNoteId = id;
+    if (document.getElementById('showMidiPlaybackControlBar').checked) {
+      startMidiTimeout();
     }
     this.allowCursorActivity = true;
     this.scrollSvg(cm);

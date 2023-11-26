@@ -1,4 +1,4 @@
-// default keymap 
+// default keymap
 
 export const keymap = {
   // gets mapped to notation only (for all operating systems)
@@ -10,12 +10,16 @@ export const keymap = {
     left: 'previousNote',
     up: 'layerUp',
     down: 'layerDown',
-    'shift-up': 'shiftPitchChromaticallyUp',
-    'shift-down': 'shiftPitchChromaticallyDown',
+    'shift-right': 'markNextNote',
+    'shift-left': 'markPreviousNote',
+    'shift-up': 'markLayerUp',
+    'shift-down': 'markLayerDown',
+    // 'shift-up': 'shiftPitchChromaticallyUp',
+    // 'shift-down': 'shiftPitchChromaticallyDown',
     'shift-alt-up': 'shiftPitchNameUp',
     'shift-alt-down': 'shiftPitchNameDown',
-    'shift-left': 'decreaseDuration',
-    'shift-right': 'increaseDuration',
+    // 'shift-left': 'decreaseDuration',
+    // 'shift-right': 'increaseDuration',
     delete: 'delete',
     backspace: 'delete',
     pagedown: 'nextPage',
