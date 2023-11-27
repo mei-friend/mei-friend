@@ -536,6 +536,7 @@ function mintSuppliedId(id, nodeName, v) {
 
 /**
  * Deletes a markup item from listItems and all related elements from the xml document.
+ * Keeps content or content of the first child.
  * @param {Object} markupItem
  */
 export function deleteMarkup(markupItem) {
@@ -544,9 +545,17 @@ export function deleteMarkup(markupItem) {
     var parent = toDelete.parentElement;
     var descendants = new DocumentFragment();
 
-    for (let i = 0; i < toDelete.children.length; i++) {
-      let child = toDelete.children[i];
-      descendants.appendChild(child.cloneNode(true));
+    if (att.alternativeEncodingElements.includes(toDelete.localName)) {
+      let firstChild = toDelete.children[0];
+      for (let i = 0; i < firstChild.children.length; i++) {
+        let child = firstChild.children[i];
+        descendants.appendChild(child.cloneNode(true));
+      }
+    } else {
+      for (let i = 0; i < toDelete.children.length; i++) {
+        let child = toDelete.children[i];
+        descendants.appendChild(child.cloneNode(true));
+      }
     }
 
     parent.replaceChild(descendants, toDelete);
