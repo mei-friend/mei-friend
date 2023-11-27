@@ -174,33 +174,27 @@ export function selectApparatus(xmlDoc, sourceId = '') {
 /**
  * Selects the requested choice child element (TODO) and
  * keeps it in xmlDoc; other choices are removed.
- * Keeps not only the content of the first child but the child too to allow highlighting.
+ * Keeps choice and content of the first child to allow navigation and highlighting.
  * @param {Document} xmlDoc
- * @param {string} sourceId
+ * @param {string} childElName
  * @returns {Document} xmlDoc
  */
-export function selectChoice(xmlDoc, sourceId) {
+export function selectChoice(xmlDoc, childElName) {
   if (!xmlDoc) return null;
-  let choice;
-  // Go through all choice elements replace it by first child
-  while ((choice = xmlDoc.querySelector('choice'))) {
-    let parent = choice.parentElement;
+  let choices = Array.from(xmlDoc.querySelectorAll('choice'));
+  choices.forEach((choice) => {
     // this selects the first child inside <choice> by default, to be changed later (TODO)
-    let firstChild; // get first child element that is an ELEMENT_NODE
-    for (let node of choice.childNodes) {
-      if (node.nodeType === Node.ELEMENT_NODE) {
-        firstChild = node;
-        break;
+    let children = choice.children;
+    if (children) {
+      // delete currently everything but the first child
+      for (let i = 1; i < children.length; i++) {
+        children[i].remove();
       }
-    }
-    if (parent && firstChild) {
-      // add clones of first child before choice...
-      parent.insertBefore(firstChild.cloneNode(true), choice);
-      choice.remove(); // ... and remove choice afterwards
     } else {
       console.log('This choice has no child elements. ', choice);
     }
-  }
+  });
+
   return xmlDoc;
 } // selectChoice()
 
