@@ -23,22 +23,35 @@ export function readMarkup() {
   // create objects out of them
   // add objects to list
   // use xmlMarkupToListItem(selectedElements, mElName)
-  let elementList = att.modelTranscriptionLike.join(',');
+  let elementList = att.modelTranscriptionLike.concat(...att.alternativeEncodingElements).join(',');
   let markup = Array.from(v.xmlDoc.querySelectorAll(elementList));
   markup = markup.filter((markup) => !isItemInList(markup.getAttribute('xml:id')));
 
-  let correspIdsToIgnore = [];
+  let idsToIgnore = [];
 
   // get unique selections for all currently available markup items in listItems
   // this is to ensure that for multiple corresponding markup elements only one list item is created
   // containing all corresponding items as selection
   let currentSelections = retrieveItemValuesByProperty('isMarkup', 'selection');
   currentSelections = utils.flattenArrayToUniques(currentSelections);
-  correspIdsToIgnore = correspIdsToIgnore.concat(...currentSelections);
+  idsToIgnore = idsToIgnore.concat(...currentSelections);
+
+  // get ids of all children of choice/subst/app and add them to idsToIgnore
+  // adding them for each element when it's processed didn't work
+  let alternativeVersions = Array.from(
+    v.xmlDoc.querySelectorAll(att.alternativeEncodingElements.join(',') + ' > ' + '*')
+  );
+  alternativeVersions?.forEach((element) => {
+    let children = element.children;
+    for (let i = 0; i < children.length; i++) {
+      idsToIgnore.push(children[i].getAttribute('xml:id'));
+    }
+  });
 
   markup.forEach((markupEl) => {
+    let content = [];
     let elId = markupEl.getAttribute('xml:id');
-    if (!correspIdsToIgnore.includes(elId)) {
+    if (!idsToIgnore.includes(elId)) {
       let elName = markupEl.localName;
       if (elId == null) {
         elId = utils.generateXmlId(elName, v.xmlIdStyle);
@@ -56,10 +69,10 @@ export function readMarkup() {
             return id;
           }
         });
-        correspIds.forEach((id) => correspIdsToIgnore.push(id));
+        correspIds.forEach((id) => idsToIgnore.push(id));
       }
       correspIds.unshift(elId);
-      xmlMarkupToListItem(elId, elName, correspIds);
+      xmlMarkupToListItem(elId, elName, correspIds, content);
     }
   });
 }
@@ -69,9 +82,10 @@ export function readMarkup() {
  * @param {string} currentElementId xml:id of current element -> item.id
  * @param {string} mElName element name -> item.type
  * @param {Array[string]} correspElements ids of corresponding elements (including self) -> item.selection
+ * @param {Array[string]} [content=[]] children of multi-layer elements like choice/subst/app
  * @returns {boolean} adding item was successful
  */
-function xmlMarkupToListItem(currentElementId, mElName, correspElements) {
+function xmlMarkupToListItem(currentElementId, mElName, correspElements, content = []) {
   // one addMarkupAction might result in multiple markup elements
   // e.g. when selecting notes and control events
   // mostly because symbols in a score aren't necessarily close in the xml tree
@@ -85,6 +99,11 @@ function xmlMarkupToListItem(currentElementId, mElName, correspElements) {
     isMarkup: true,
     selection: correspElements,
   };
+
+  if (content.length > 0) {
+    markupItem.content = content;
+  }
+
   let success = addListItem(markupItem);
   return success;
 }
