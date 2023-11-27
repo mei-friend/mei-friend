@@ -220,7 +220,7 @@ export function addMarkup(event) {
   let eventTarget = event.currentTarget;
   let mElName = eventTarget.dataset.elName;
   let attrName = eventTarget.dataset.selection;
-  let multiLayerContent = eventTarget.dataset.content.split(',');
+  let multiLayerContent = eventTarget.dataset.content?.split(',');
   if (!att.modelTranscriptionLike.includes(mElName) && !att.alternativeEncodingElements.includes(mElName)) return;
   addMarkupToXML(v, cm, attrName, mElName, multiLayerContent);
   //let successfullyAdded = xmlMarkupToListItem(v.selectedElements, mElName);
