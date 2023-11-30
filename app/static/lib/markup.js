@@ -222,10 +222,15 @@ export function addMarkup(event) {
   let attrName = eventTarget.dataset.selection;
   let multiLayerContent = eventTarget.dataset.content?.split(',');
   if (!att.modelTranscriptionLike.includes(mElName) && !att.alternativeEncodingElements.includes(mElName)) return;
-  addMarkupToXML(v, cm, attrName, mElName, multiLayerContent);
-  //let successfullyAdded = xmlMarkupToListItem(v.selectedElements, mElName);
-  // Manually updating the item list is not necessary because refreshing the code in the editor triggers readMarkup()
-  refreshAnnotationsList();
+
+  if (att.alternativeEncodingElements.includes(mElName) && multiLayerContent == undefined) {
+    v.showAlert('Please first select a content option for this markup element!');
+  } else {
+    addMarkupToXML(v, cm, attrName, mElName, multiLayerContent);
+    //let successfullyAdded = xmlMarkupToListItem(v.selectedElements, mElName);
+    // Manually updating the item list is not necessary because refreshing the code in the editor triggers readMarkup()
+    refreshAnnotationsList();
+  }
 }
 
 /**
