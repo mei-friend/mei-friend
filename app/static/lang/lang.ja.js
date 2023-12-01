@@ -231,22 +231,22 @@ export const lang = {
   pdfPreviewNormalModeTitle: { text: 'PDFに保存するページ範囲を選択してください。' },
 
   // ファクシミリパネル
-  facsimileIcon: { description: 'ファクシミリパネル' },
+  facsimileIcon: { description: 'ファクシミリ画像パネル' },
   facsimileDecreaseZoomButton: { description: '画像を縮小' },
   facsimileZoom: { description: '画像のサイズを調整' },
   facsimileIncreaseZoomButton: { description: '画像を拡大' },
   facsimileFullPageLabel: { text: '全体表示', description: 'ファクシミリ画像の全体表示' },
   facsimileFullPageCheckbox: { description: 'ファクシミリ画像の全体表示' },
-  facsimileShowZonesLabel: { text: 'ゾーンボックスを表示', description: 'ファクシミリのゾーンボックスを表示' },
-  facsimileShowZonesCheckbox: { description: 'ファクシミリのゾーンボックスを表示' },
-  facsimileEditZonesCheckbox: { description: 'ファクシミリのゾーンを編集' },
-  facsimileEditZonesLabel: { text: 'ゾーンを編集', description: 'ファクシミリのゾーンを編集' },
-  facsimileCloseButton: { description: 'ファクシミリパネルを閉じる' },
-  facsimileDefaultWarning: { text: '表示するファクシミリコンテンツはありません。' },
+  facsimileShowZonesLabel: { text: '領域ボックスを表示', description: 'ファクシミリ画像の領域ボックスを表示' },
+  facsimileShowZonesCheckbox: { description: 'ファクシミリ画像の領域ボックスを表示' },
+  facsimileEditZonesCheckbox: { description: 'ファクシミリ画像の領域を編集' },
+  facsimileEditZonesLabel: { text: '領域を編集', description: 'ファクシミリ画像の領域を編集' },
+  facsimileCloseButton: { description: 'ファクシミリ画像パネルを閉じる' },
+  facsimileDefaultWarning: { text: '表示するファクシミリ画像はありません。' },
   facsimileNoSurfaceWarning: {
     text: 'このページにはsurface要素が見つかりません。\n(最初のpb要素がない可能性があります。)',
   },
-  facsimileNoZonesFullPageWarning: { text: 'ゾーンのないファクシミリは全体表示モードでのみ表示されます。' },
+  facsimileNoZonesFullPageWarning: { text: '領域指定のないファクシミリは全体表示モードでのみ表示されます。' },
   facsimileImgeNotLoadedWarning: { text: '画像を読み込めませんでした' },
 
   // Drag'n'drop
@@ -327,11 +327,11 @@ export const lang = {
   // Restore Solid session overlay
   solidExplanation: {
     description:
-      'Solidはリンクトデータ（RDF）を使用してスタンドオフ注釈を作成するための分散型プラットフォームです。Solidにログインしてリンクトデータアノテーションを作成できるようになります。',
+      'SolidはLinked Data（RDF）を使用してスタンドオフ注釈を作成するための分散型プラットフォームです。Solidにログインしてアノテーションを作成できるようになります。',
   },
-  solidProvider: { description: 'Solid Identity Provider (IdP)を選択または独自のIdPを指定してください。' },
+  solidProvider: { description: 'Solid Identity Provider (IdP)を選択、または独自のIdPを指定してください。' },
   solidLoginBtn: { text: 'ログイン' },
-  solidOverlayCancel: { html: 'Solidセッションを復元中 - <span>esc</span>を押すか、こちらをクリックしてキャンセル' },
+  solidOverlayCancel: { html: 'Solidセッションを復元中 - <span>esc</span>または、こちらをクリックしてキャンセル' },
   solidWelcomeMsg: { text: 'ようこそ、' },
   solidLogout: { text: 'ログアウト' },
   solidLoggedOutWarning: {
@@ -340,12 +340,12 @@ export const lang = {
   },
 
   // Annotation panel
-  annotationCloseButtonText: { text: '注釈パネルを閉じる' },
-  hideAnnotationPanelButton: { description: '注釈パネルを閉じる' },
-  closeAnnotationPanelButton: { description: '注釈パネルを閉じる' },
-  annotationToolsButton: { text: 'ツール', description: '注釈ツール' },
-  annotationListButton: { text: 'リスト', description: '注釈のリスト' },
-  writeAnnotStandoffText: { text: 'Web注釈' },
+  annotationCloseButtonText: { text: 'アノテーションパネルを閉じる' },
+  hideAnnotationPanelButton: { description: 'アノテーションパネルを閉じる' },
+  closeAnnotationPanelButton: { description: 'アノテーションパネルを閉じる' },
+  annotationToolsButton: { text: 'ツール', description: 'アノテーションツール' },
+  annotationListButton: { text: 'リスト', description: 'アノテーションのリスト' },
+  writeAnnotStandoffText: { text: 'Webアノテーション' },
   annotationToolsIdentifyTitle: { text: '識別' },
   annotationToolsIdentifySpan: { text: '音楽オブジェクトを識別' },
   annotationToolsHighlightTitle: { text: 'ハイライト' },
@@ -354,22 +354,22 @@ export const lang = {
   annotationToolsDescribeSpan: { text: '説明' },
   annotationToolsLinkTitle: { text: 'リンク' },
   annotationToolsLinkSpan: { text: 'リンク' },
-  listAnnotations: { text: '注釈はありません。' },
-  addWebAnnotation: { text: 'Web注釈を読み込む' },
-  loadWebAnnotationMessage: { text: 'Web注釈またはWeb注釈コンテナのURLを入力してください' },
+  listAnnotations: { text: 'アノテーションはありません。' },
+  addWebAnnotation: { text: 'Webアノテーションを読み込む' },
+  loadWebAnnotationMessage: { text: 'WebアノテーションまたはWebアノテーションコンテナのURLを入力してください' },
   loadWebAnnotationMessage1: { text: '提供されたURLを読み込むことができませんでした' },
   loadWebAnnotationMessage2: { text: 'もう一度お試しください' },
-  noAnnotationsToDisplay: { text: '表示する注釈がありません' },
-  flipPageToAnnotationText: { description: 'この注釈にページをめくる' },
-  deleteAnnotation: { description: 'この注釈を削除' },
-  deleteAnnotationConfirmation: { text: 'この注釈を削除してもよろしいですか？' },
+  noAnnotationsToDisplay: { text: '表示するアノテーションがありません' },
+  flipPageToAnnotationText: { description: 'このアノテーションのページを見る' },
+  deleteAnnotation: { description: 'このアノテーションを削除' },
+  deleteAnnotationConfirmation: { text: 'このアノテーションを削除してもよろしいですか？' },
   makeStandOffAnnotation: {
     description: 'スタンドオフステータス（RDF）',
     descriptionSolid: 'RDFとしてSolidに書き込む',
-    descriptionToLocal: '新しいタブでスタンドオフ（RDF）注釈を開く',
+    descriptionToLocal: '新しいタブでスタンドオフ（RDF）アノテーションを開く',
   },
   makeInlineAnnotation: {
-    description: 'インライン注釈をクリック',
+    description: 'インラインアノテーションをクリック',
     descriptionCopy: 'クリップボードに<annot> xml:idをコピー',
   },
   pageAbbreviation: { text: 'ページ' },
@@ -378,14 +378,14 @@ export const lang = {
   drawLinkUrl: { text: '新しいタブで開く' },
   askForDescription: { text: '適用するテキストの説明を入力してください' },
   maxNumberOfAnnotationAlert: {
-    text1: 'annot要素の数が設定可能な「注釈の最大数」を超えています',
-    text2: '「注釈を表示」が設定されている場合、新しい注釈が生成され、表示されます。',
+    text1: 'annot要素の数が設定可能な「アノテーションの最大数」を超えています',
+    text2: '「アノテーションを表示」が設定されている場合、新しいアノテーションが生成され、表示されます。',
   },
   annotationsOutsideScoreWarning: {
     text: '&lt;score&gt;の外に配置された注釈を書き込むことはできません。',
   },
   annotationWithoutIdWarning: {
-    text1: 'MEIアンカーポイントにxml:idがないため、注釈を書き込むことができません。',
+    text1: 'MEIアンカーポイントにxml:idがないため、アノテーションを書き込むことができません。',
     text2: '「操作」->「MEIの再レンダリング（ID付き）」を選択して識別子を割り当て、もう一度お試しください。',
   },
 
@@ -406,8 +406,8 @@ export const lang = {
     description: 'mei-friendのデフォルトにリセット',
   },
   filterSettings: {
-    placeholder: '設定をフィルター',
-    description: 'ここに入力して設定をフィルタリング',
+    placeholder: '設定を絞り込み',
+    description: 'ここに入力して設定を絞り込み',
   },
   closeSettingsButton: {
     description: '設定パネルを閉じる',
@@ -541,11 +541,11 @@ export const lang = {
   enableTransposition: {
     text: '移調を有効にする',
     description:
-      '移調設定を有効にし、下の移調ボタンをクリックして適用します。移調は楽譜にのみ適用され、エンコードは変更されません。"Manipulate"ドロップダウンメニューで"Verovioを介して再レンダリング"をクリックしない限り。',
+      '移調設定を有効にし、下の移調ボタンをクリックして適用します。移調は楽譜にのみ適用され、"Manipulate"ドロップダウンメニューで"Verovioを介して再レンダリング"をクリックしない限りエンコードは変更されません。',
   },
   transposeInterval: {
     text: '音程で移調',
-    description: '最も一般的な音程（Verovioはベース40システムをサポート）による音程でエンコードを移調',
+    description: '最も一般的な音程（Verovioはbase-40システムをサポート）による音程でエンコードを移調',
     labels: [
       '完全一度',
       '増四度',
@@ -605,7 +605,7 @@ export const lang = {
   transposeButton: {
     text: '移調',
     description:
-      '上記の設定で楽譜に移調を適用します。ただし、MEIエンコーディングは変更されず、現在の設定でMEIエンコーディングも移調するには、"Manipulate"ドロップダウンメニューで"Verovioを介して再レンダリング"を使用してください。',
+      '上記の設定で楽譜に移調を適用します。ただし、MEIエンコーディングは変更されません。現在の設定でMEIエンコーディングも移調する場合、"Manipulate"ドロップダウンメニューで"Verovioを介して再レンダリング"を使用してください。',
   },
 
   // Renumber measures
@@ -633,51 +633,51 @@ export const lang = {
 
   // Annotations
   titleAnnotations: {
-    text: '注釈',
-    description: '注釈設定',
+    text: 'アノテーション',
+    description: 'アノテーション設定',
   },
   showAnnotations: {
-    text: '注釈を表示',
-    description: '楽譜に注釈を表示',
+    text: 'アノテーションを表示',
+    description: '楽譜にアノテーションを表示',
   },
   showAnnotationPanel: {
-    text: '注釈パネルを表示',
-    description: '注釈パネルを表示',
+    text: 'アノテーションパネルを表示',
+    description: 'アノテーションパネルを表示',
   },
   annotationDisplayLimit: {
-    text: '注釈の最大数',
-    description: '表示する注釈の最大数（大きな数値はmei-friendを遅くする可能性があります）',
+    text: 'アノテーションの数',
+    description: '表示するアノテーションの数（大きい場合、mei-friendを遅くする可能性があります）',
   },
 
   // Facsimile
   titleFacsimilePanel: {
-    text: '写真パネル',
-    description: 'ソース版の写真イメージを表示します（利用可能な場合）',
+    text: 'ファクシミリ画像パネル',
+    description: 'ソース版のファクシミリ画像イメージを表示します（利用可能な場合）',
   },
   showFacsimilePanel: {
-    text: '写真パネルを表示',
-    description: '写真パネルで提供されたソース版のスコアイメージを表示',
+    text: 'ファクシミリ画像パネルを表示',
+    description: 'ファクシミリ画像パネルで提供されたソース版のスコアイメージを表示',
   },
   selectFacsimilePanelOrientation: {
-    text: '写真パネルの位置',
-    description: '楽譜に対する写真パネルの位置を選択',
+    text: 'ファクシミリ画像パネルの位置',
+    description: '楽譜に対するファクシミリ画像パネルの位置を選択',
     labels: ['左', '右', '上', '下'],
   },
   facsimileZoomInput: {
-    text: '写真イメージのズーム（％）',
-    description: '写真イメージのズームレベル（パーセント単位）',
+    text: 'ファクシミリ画像イメージのズーム（％）',
+    description: 'ファクシミリ画像イメージのズームレベル（パーセント単位）',
   },
   showFacsimileFullPage: {
     text: 'フルページを表示',
-    description: 'フルページで写真イメージを表示',
+    description: 'フルページでファクシミリ画像を表示',
   },
   showFacsimileZones: {
-    text: '写真ゾーンボックスを表示',
-    description: '写真ゾーンの境界ボックスを表示',
+    text: 'ファクシミリ画像に領域ボックスを表示',
+    description: 'ファクシミリ画像に領域の境界ボックスを表示',
   },
   editFacsimileZones: {
-    text: '写真ゾーンを編集',
-    description: '写真ゾーンを編集（境界ボックスを写真ゾーンにリンクします）',
+    text: 'ファクシミリ画像の領域を編集',
+    description: 'ファクシミリ画像の領域を編集（境界ボックスをファクシミリ画像の領域にリンクします）',
   },
   // Supplied element
   titleSupplied: {
@@ -727,7 +727,7 @@ export const lang = {
   },
   lineWrapping: {
     text: '行の折り返し',
-    description: 'パネルの末尾で行が折り返されるかどうか',
+    description: 'パネルの末尾で行を折り返し',
   },
   lineNumbers: {
     text: '行番号',
@@ -738,8 +738,8 @@ export const lang = {
     description: '最初の行番号を設定',
   },
   foldGutter: {
-    text: 'コードの折りたたみ',
-    description: '折りたたみガターを介したコードの折りたたみを有効にする',
+    text: 'コードの折り畳み',
+    description: 'コードの折り畳みを有効にする',
   },
   titleEditorOptions: {
     text: 'エディタの動作',
@@ -764,11 +764,11 @@ export const lang = {
   },
   matchTags: {
     text: 'タグの一致',
-    description: 'エディタカーソル周りの一致したタグを強調表示',
+    description: 'カーソル位置の対応するタグを強調表示',
   },
   showTrailingSpace: {
-    text: 'トレーリングスペースを強調表示',
-    description: '行末の不要なトレーリングスペースを強調表示',
+    text: '余計なスペースを強調表示',
+    description: '行末の不要なスペースを強調表示',
   },
   keyMap: {
     text: 'キーマップ',
@@ -802,7 +802,7 @@ export const lang = {
     text: 'URLがクリップボードにコピーされませんでした。もう一度お試しください。',
   },
   errorCode: { text: 'エラーコード' },
-  submitBugReport: { text: 'バグ報告を提出' },
+  submitBugReport: { text: 'バグレポートを送信' },
   loadingSchema: { text: 'スキーマを読み込み中' },
   schemaLoaded: { text: 'スキーマが読み込まれました' },
   noSchemaFound: { text: 'MEI内でスキーマ情報が見つかりません' },
@@ -815,7 +815,7 @@ export const lang = {
   validationComplete: { text: '検証完了' },
   validationFailed: { text: '検証に失敗しました' },
   noErrors: { text: 'エラーなし' },
-  errorsFound: { text: 'エラーが見つかりました（エラー数：5）' },
+  errorsFound: { text: 'エラーが見つかりました' },
 
   // GitHub-menu.js
   githubRepository: { text: 'リポジトリ' },
@@ -830,7 +830,7 @@ export const lang = {
   none: { text: 'なし' },
   commitFileNameText: { text: 'ファイル名' },
   forkRepository: { text: 'リポジトリをフォーク' },
-  forkError: { text: '申し訳ありません、リポジトリをフォークできませんでした' },
+  forkError: { text: 'リポジトリをフォークできませんでした' },
   loadingFile: { text: 'ファイルを読み込み中' },
   loadingFromGithub: { text: 'GitHubから読み込み中' },
   logOut: { text: 'ログアウト' },
@@ -844,15 +844,15 @@ export const lang = {
   allComposers: { text: 'すべての作曲家' },
 
   // Utils renumber measures
-  renumberMeasuresModalText: { text: '小節番号を再番号付け' },
+  renumberMeasuresModalText: { text: '小節番号を振り直し' },
   renumberMeasuresModalTest: { text: 'テスト' },
-  renumberMeasuresWillBe: { text: 'になります' },
+  renumberMeasuresWillBe: { text: '' },
   renumberMeasuresWouldBe: { text: 'になります' },
   renumberMeasuresChangedTo: { text: 'に変更されました' },
   renumberMeasureMeasuresRenumbered: { text: '小節が再番号付けされました' },
 
   // Code checker @accid.ges
-  codeCheckerTitle: { text: '@accid.ges属性をチェック（調号、小節ごとのaccids、タイ）' },
+  codeCheckerTitle: { text: '@accid.ges属性をチェック（対象：調号、小節ごとのaccids、タイ）' },
   codeCheckerFix: { text: '修正' },
   codeCheckerFixAll: { text: 'すべて修正' },
   codeCheckerIgnore: { text: '無視' },
@@ -875,4 +875,9 @@ export const lang = {
   codeCheckerHasExtra: { text: '余分な' }, // 余分な
   codeCheckerLacksAn: { text: '持っていません' },
   codeCheckerBecauseAlreadyDefined: { text: '以前に同じ要素が定義されているため' },
+
+    // Warning for missing ids
+  missingIdsWarningAlert: {
+    text: 'mei--friendは選択された要素に移動できませんでした。エンコーディングにidを追加してください。',
+  },
 };
