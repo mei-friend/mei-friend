@@ -50,7 +50,25 @@ module.exports = {
     }
     driver.findElement(By.id('fileMenuTitle')).click();
   },
-  selectFromDropdown: async function (driver, dropdownId, option) {
+  publicRepertoire: async function (driver, composer, encoding) {
+    try {
+      driver.findElement(By.id('fileMenuTitle')).click();
+      console.log('File menu clicked!');
+      driver.findElement(By.id('openExample')).click();
+      console.log('Public repertoire clicked!');
+      await this.selectFromDropdown(driver, 'sampleEncodingsComposer', composer);
+      await driver.wait(until.elementLocated(By.CSS_SELECTOR, `select[value='${composer}'`, 5000));
+      await this.selectFromDropdown(driver, 'sampleEncodingsEncoding', encoding);
+      let sampcomp = await driver.findElement(By.id('sampleEncodingsComposer'))
+      let sampcompval = await sampcomp.getAttribute('value');
+      console.log("sampcompval", sampcompval)
+      driver.findElement(By.id('openUrlButton')).click();
+      console.log('OpenURL button clicked!');
+    } catch (error) {
+      console.error('Error opening URL via UI: ', error);
+    }
+  },
+  selectFromDropdown: async function (driver, dropdownId, option, eventType = "change") {
     console.log("Attempting to select from dropdown: ", dropdownId, option)
     try {
       await driver.executeScript(`
@@ -58,7 +76,7 @@ module.exports = {
         // simulate click on the specified option
         selectElement.value = "${option}";
         // dispatch an input event on the selectElement
-        selectElement.dispatchEvent(new Event('input', { bubbles: true }));
+        selectElement.dispatchEvent(new Event('${eventType}', { bubbles: true }));
         console.log("Set ${dropdownId} to ${option} via UI");
       `);
     } catch (error) {
