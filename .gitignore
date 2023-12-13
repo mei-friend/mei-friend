@@ -16,3 +16,5 @@ venv
 app/__pycache__
 __pycache__
 tmp
+tests/node_modules
+tests/package-lock.json
