@@ -1,11 +1,13 @@
 const utils = require('./testUtils.js');
 const { Builder, By, Key, until } = require('selenium-webdriver');
 const chrome = require('selenium-webdriver/chrome');
+const firefox = require('selenium-webdriver/firefox');
 const assert = require('assert');
 
 (async function test_openUrlWorkflow() {
   let driver = await new Builder()
-    .forBrowser('chrome')
+    // .forBrowser('chrome')
+    .forBrowser('firefox')
     //       .setChromeOptions(new chrome.Options().headless())
     .build();
   await driver.manage().setTimeouts({ implicit: 2000 });

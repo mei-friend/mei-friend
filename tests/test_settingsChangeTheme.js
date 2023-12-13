@@ -5,7 +5,7 @@ const assert = require('assert');
 
 (async function test_settingsChangeTheme() {
   let driver = await new Builder()
-    .forBrowser('chrome')
+    .forBrowser('firefox')
     //       .setChromeOptions(new chrome.Options().headless())
     .build();
   await driver.manage().setTimeouts({ implicit: 2000 });
