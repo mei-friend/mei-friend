@@ -17,7 +17,7 @@
 * Tweak CSS select and translations (German)
 * Fix typo at forking via URL parameters
 
-### 1.0.3 patch
+### 1.0.3 patch (released 1 Nov 2023)
 * Enable navigation link to generated MAO objects (identify object annotations)
 
 ### 1.0.2 Splash screen (released 3 Oct 2023)
