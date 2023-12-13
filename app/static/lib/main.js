@@ -387,7 +387,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // we need to look directly to local storage, because it will
   let language = window.localStorage['mf-selectLanguage'];
   let browseLang = navigator.language.substring(0, 2) || '';
-  if (!browseLang in supportedLanguages) browseLang = '';
+  if (!(browseLang in supportedLanguages)) browseLang = '';
   let langCode = language || browseLang || translator.defaultLangCode;
   if (langCode !== translator.langCode) {
     // load other language...
