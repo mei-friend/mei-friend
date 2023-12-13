@@ -3,6 +3,7 @@
  */
 
 import * as att from './attribute-classes.js';
+import * as b40 from './base40.js';
 import * as dutils from './dom-utils.js';
 import * as speed from './speed.js';
 import * as utils from './utils.js';
@@ -922,7 +923,7 @@ export function toggleArtic(v, cm, artic = 'stacc') {
  * Shifts element (rests, note) up/down diatonically by pitch name (1 or 7 diatonic steps)
  * @param {Viewer} v
  * @param {CodeMirror} cm
- * @param {int} deltaPitch (-1, -12, +2)
+ * @param {int} deltaPitch (-1, -7, +2)
  * @param {boolean} shiftChromatically
  */
 export function shiftPitch(v, cm, deltaPitch = 0, shiftChromatically = false) {
@@ -1411,13 +1412,10 @@ export function cleanAccid(v, cm) {
  * keySig/key.sig information and measure-wise accidentals,
  * finds instances of double accid & accid.ges.
  *
- * !!! TODO: make strings translatable and add to language packs !!!
- *
  * @param {Viewer} v
  * @param {CodeMirror} cm
- * @param {boolean} change
  */
-export function checkAccidGes(v, cm, change = false) {
+export function checkAccidGes(v, cm) {
   v.allowCursorActivity = false;
   v.initCodeCheckerPanel(translator.lang.codeCheckerTitle.text);
 
@@ -2445,7 +2443,7 @@ function toggleArticForNote(note, artic, xmlIdStyle) {
 /**
  * Modifies an element's pitch up and down (i.e. manipulating @oct, @pname)
  * @param {Element} el
- * @param {number} deltaPitch (diatonic steps or chromatic steps)
+ * @param {number} deltaPitch (diatonic steps or chromatic steps, if flag below is set)
  * @param {boolean} shiftChromatically
  * @returns {Element} element with modified attributes
  * NOTE: when shifting chromatically, only semitones (+/-1) make sense!
@@ -2453,7 +2451,7 @@ function toggleArticForNote(note, artic, xmlIdStyle) {
 function pitchMover(v, el, deltaPitch, shiftChromatically = false) {
   let octValue = 4;
   let pnameValue = 'c';
-  let accidValue = '';
+  let accidValue = 'n';
   let octAttr;
   let pnameAttr;
   if (['note'].includes(el.nodeName)) {
@@ -2462,69 +2460,133 @@ function pitchMover(v, el, deltaPitch, shiftChromatically = false) {
   } else if (['rest', 'mRest', 'multiRest'].includes(el.nodeName)) {
     octAttr = 'oloc';
     pnameAttr = 'ploc';
-    shiftChromatically = false; // shifting chromatically with rests is non-sense
   } else {
     return el;
   }
+
+  // read attributes from element
   if (el.hasAttribute(octAttr)) octValue = parseInt(el.getAttribute(octAttr));
   if (el.hasAttribute(pnameAttr)) pnameValue = el.getAttribute(pnameAttr);
 
-  let pi;
-  if (shiftChromatically) {
-    accidValue =
-      el.getAttribute('accid') || el.querySelector('[accid]')?.getAttribute('accid') || el.getAttribute('accid.ges');
-    if (accidValue) accidValue = accidValue.slice(0, 1); // take only first character
-
-    // remove all possible accid information
-    el.removeAttribute('accid');
-    el.removeAttribute('accid.ges');
-    let accidChild = el.querySelector('accid');
-    if (accidChild) removeWithTextnodes(accidChild);
-
-    pi = att.pnames.indexOf(pnameValue); // index in scale
-    let pitchesToBeAltered = att.sharps.slice(0, 5);
-    let accidSign = 's';
-    if (deltaPitch < 0) {
-      pitchesToBeAltered = att.flats.slice(0, 5);
-      accidSign = 'f';
+  // handle rests quickly and return
+  if (octAttr === 'oloc') {
+    let pi = att.pnames.indexOf(pnameValue) + deltaPitch;
+    // secure octave transistion
+    if (pi > att.pnames.length - 1) {
+      pi -= att.pnames.length;
+      octValue++;
+    } else if (pi < 0) {
+      pi += att.pnames.length;
+      octValue--;
     }
-    if (pitchesToBeAltered.includes(pnameValue)) {
-      if (accidValue === accidSign) {
-        pi += deltaPitch;
-        accidValue = '';
-      } else if (accidValue) {
-        accidValue = '';
+    el.setAttribute(octAttr, octValue);
+    el.setAttribute(pnameAttr, att.pnames[pi]);
+    return el;
+  } // treat rests
+
+  // get key signature and create scale steps in base-40 system
+  let keySig = dutils.getKeySigForNote(v.xmlDoc, el);
+  // console.debug('Current keySig: ', keySig);
+  let affectedNotes = dutils.getAffectedNotesFromKeySig(keySig);
+  affectedNotes.b40numbers = affectedNotes.affectedNotes.map((n) => {
+    let accid = affectedNotes.keySigAccid;
+    if (n.length > 1) accid += n[1] === att.sharpSign ? 's' : 'f';
+    return b40.pitchToBase40(n[0], accid);
+  });
+  let scaleShift = affectedNotes.affectedNotes.length * b40.intervals.P5;
+  let scaleSteps =
+    affectedNotes.keySigAccid === 'f'
+      ? b40.diatonicSteps.map((v) => v - scaleShift)
+      : b40.diatonicSteps.map((v) => v + scaleShift);
+  scaleSteps = scaleSteps.map((v) => ((v % b40.base) + b40.base) % b40.base).sort((a, b) => a - b);
+  // console.debug('Current scaleSteps: ', scaleSteps);
+
+  accidValue =
+    el.getAttribute('accid') ||
+    el.querySelector('[accid]')?.getAttribute('accid') ||
+    el.getAttribute('accid.ges') ||
+    'n';
+
+  // remove all possible accid information from element
+  el.removeAttribute('accid');
+  el.removeAttribute('accid.ges');
+  let accidChild = el.querySelector('accid');
+  if (accidChild) removeWithTextnodes(accidChild);
+
+  // compute b40 number of current pitch
+  let b40step = b40.pitchToBase40(pnameValue, accidValue, octValue) % b40.base;
+  // console.debug('b40step: ' + b40step);
+
+  let i = scaleSteps.indexOf(b40step);
+  // console.debug('i: ' + i);
+
+  if (Math.abs(deltaPitch) === 7) {
+    // add/subtract 1 to octValue
+    octValue = octValue + Math.sign(deltaPitch);
+  } else {
+    // moving downwards / upwards
+    if (i >= 0) {
+      let changeOctave = false;
+      // find interval to next lower scale tone.
+      let nextI = i + Math.sign(deltaPitch);
+      let interval = 0;
+      if (i === 0 && deltaPitch < 0) {
+        nextI = scaleSteps.length - 1;
+        interval = b40.base + scaleSteps[i] - scaleSteps[nextI];
+        changeOctave = true;
+      } else if (i === scaleSteps.length - 1 && deltaPitch > 0) {
+        nextI = 0;
+        interval = b40.base + scaleSteps[nextI] - scaleSteps[i];
+        changeOctave = true;
       } else {
-        accidValue = accidSign;
+        interval = Math.abs(scaleSteps[i] - scaleSteps[nextI]);
+      }
+      if (shiftChromatically && interval === b40.intervals.M2) {
+        // if chromatically and Major Second, take small step
+        b40step = b40step + Math.sign(deltaPitch);
+      } else {
+        // or next step otherwise
+        b40step = scaleSteps[nextI];
+        if (changeOctave) octValue = octValue + Math.sign(deltaPitch);
       }
     } else {
-      if (accidValue) {
-        accidValue = '';
+      // find next higher/lower element and go to it
+      let nextI;
+      if (deltaPitch > 0) {
+        nextI = scaleSteps.findIndex((s) => s > b40step);
+        if (nextI < 0) {
+          nextI = 0;
+          octValue = octValue + 1;
+        }
       } else {
-        pi += deltaPitch;
+        nextI = scaleSteps.findLastIndex((s) => s < b40step);
+        if (nextI < 0) {
+          nextI = scaleSteps.length - 1;
+          octValue = octValue - 1;
+        }
       }
+      b40step = scaleSteps[nextI];
     }
-  } else {
-    pi = att.pnames.indexOf(pnameValue) + deltaPitch;
   }
 
-  // secure octave transistion
-  if (pi > att.pnames.length - 1) {
-    pi -= att.pnames.length;
-    octValue++;
-  } else if (pi < 0) {
-    pi += att.pnames.length;
-    octValue--;
-  }
-  if (accidValue) {
+  const newPitch = b40.base40ToPitch(b40step);
+
+  if (affectedNotes.b40numbers.includes(b40step)) {
+    // add as accid.ges, when b40 pitch identical with a scaleStep
+    el.setAttribute('accid.ges', newPitch.accidGes);
+  } else if (
+    (newPitch.accidGes && newPitch.accidGes !== 'n') ||
+    affectedNotes.affectedNotes.map((n) => n[0]).includes(newPitch.pname)
+    // Create new element for accid, when different accid than accected note or some other accid
+  ) {
     let a = document.createElementNS(dutils.meiNameSpace, 'accid');
-    let uuid = utils.generateXmlId('accid', v.xmlIdStyle);
-    a.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
-    a.setAttribute('accid', accidValue);
+    a.setAttributeNS(dutils.xmlNameSpace, 'xml:id', utils.generateXmlId('accid', v.xmlIdStyle));
+    a.setAttribute('accid', newPitch.accidGes);
     el.appendChild(a);
   }
+
   el.setAttribute(octAttr, octValue);
-  el.setAttribute(pnameAttr, att.pnames[pi]);
+  el.setAttribute(pnameAttr, newPitch.pname);
   return el;
 } // pitchMover()
 

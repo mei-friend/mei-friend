@@ -1,6 +1,6 @@
 // mei-friend version and date
-export const version = '1.0.5';
-export const versionDate = '21 November 2023'; // use full or 3-character english months, will be translated
+export const version = '1.0.6';
+export const versionDate = '23 November 2023'; // use full or 3-character english months, will be translated
 
 var vrvWorker;
 var spdWorker;
@@ -71,6 +71,7 @@ import {
   generateSectionSelect,
 } from './control-menu.js';
 import { clock, unverified, xCircleFill } from '../css/icons.js';
+import { keymap } from '../keymaps/default-keymap.js';
 import { setCursorToId } from './utils.js';
 import { getInMeasure, navElsSelector, getElementAtCursor } from './dom-utils.js';
 import { addDragSelector } from './drag-selector.js';
@@ -109,7 +110,6 @@ import {
   defaultMeiFileName,
   defaultNotationOrientation,
   defaultNotationProportion,
-  defaultSpeedMode,
   defaultVerovioOptions,
   guidelinesBase,
   platform,
@@ -119,7 +119,6 @@ import {
 import Translator from './translator.js';
 import { buildLanguageSelection, translateLanguageSelection } from './language-selector.js';
 import { runLanguageChecks } from '../tests/checkLangs.js';
-import * as expansionMap from './expansion-map.js';
 
 const defaultCodeMirrorOptions = {
   lineNumbers: true,
@@ -164,7 +163,6 @@ const defaultCodeMirrorOptions = {
 
 // add all possible facsimile elements
 att.attFacsimile.forEach((e) => defaultVerovioOptions.svgAdditionalAttribute.push(e + '@facs'));
-const defaultKeyMap = `${root}keymaps/default-keymap.json`;
 const sampleEncodingsCSV = `${root}sampleEncodings/sampleEncodings.csv`;
 let freshlyLoaded = false; // flag to ignore a cm.on("changes") event on file load
 
@@ -381,8 +379,8 @@ async function suspendedValidate(text, updateLinting, options) {
 // when initial page content has been loaded
 document.addEventListener('DOMContentLoaded', function () {
   // disable GitHub menu if server-side configuration not available
-  if(!gitEnabled) { 
-    document.getElementById("GithubButton").disabled = true;
+  if (!gitEnabled) {
+    document.getElementById('GithubButton').disabled = true;
   }
 
   translator = new Translator();
@@ -770,7 +768,7 @@ function completeInitialLoad() {
     doit = setTimeout(() => setOrientation(cm, '', '', v, storage), 500);
   };
 
-  setKeyMap(defaultKeyMap);
+  setKeyMap();
 
   // remove URL parameters from URL
   // TODO: check handleURLParamSelect() occurrences, whether removing search parameters has an effect there.
@@ -2365,60 +2363,57 @@ function fillInSampleEncodings() {
  * Sets keymap JSON information to target element and defines listeners.
  * It loads all bindings in `#notation` to document.body, and the platform-specific
  * to both notation and editor panels (i.e. friendContainer).
- * @param {string} keyMapFilePath
  */
-function setKeyMap(keyMapFilePath) {
+function setKeyMap() {
   if (platform.startsWith('mac')) {
-    document.body.classList.add('platform-darwin');
+    document.body.classList.add('platform-darwin-all');
+    document.getElementById('notation').classList.add('platform-darwin-notation');
   }
   if (platform.startsWith('win')) {
-    document.body.classList.add('platform-win32');
+    document.body.classList.add('platform-win32-all');
+    document.getElementById('notation').classList.add('platform-win32-notation');
   }
   if (platform.startsWith('linux')) {
-    document.body.classList.add('platform-linux');
+    document.body.classList.add('platform-linux-all');
+    document.getElementById('notation').classList.add('platform-linux-notation');
   }
-  fetch(keyMapFilePath)
-    .then((resp) => {
-      return resp.json();
-    })
-    .then((keyMap) => {
-      // iterate all keys (element) in keymap.json
-      for (const [key, value] of Object.entries(keyMap)) {
-        document.querySelectorAll(key).forEach((el) => {
-          el.setAttribute('tabindex', '-1');
-          el.addEventListener('keydown', (ev) => {
-            if (['pagination2', 'selectTo', 'selectFrom', 'selectRange'].includes(document.activeElement.id)) {
-              return;
-            }
 
-            // at each keystroke: update cmd2key (CTRL on Mac, ALT on WIN/Linux)
-            v.cmd2KeyPressed = platform.startsWith('mac') ? ev.ctrlKey : ev.altKey;
+  // iterate all keys (element) in keymap.json
+  for (const [key, value] of Object.entries(keymap)) {
+    document.querySelectorAll(key).forEach((el) => {
+      el.setAttribute('tabindex', '-1');
+      el.addEventListener('keydown', (ev) => {
+        if (['pagination2', 'selectTo', 'selectFrom', 'selectRange'].includes(document.activeElement.id)) {
+          return;
+        }
 
-            // construct keyPress and keyName from event
-            let keyName = ev.key;
-            if (ev.code.toLowerCase() === 'space') keyName = 'space';
-            // arrowdown -> down
-            keyName = keyName.toLowerCase().replace('arrow', '');
-            let keyPress = '';
-            if (ev.ctrlKey) keyPress += 'ctrl-';
-            if (ev.metaKey) keyPress += 'cmd-';
-            if (ev.shiftKey) keyPress += 'shift-';
-            if (ev.altKey) keyPress += 'alt-';
-            keyPress += keyName;
-            console.info('keyPressString: "' + keyPress + '"');
+        // at each keystroke: update cmd2key (CTRL on Mac, ALT on WIN/Linux)
+        v.cmd2KeyPressed = platform.startsWith('mac') ? ev.ctrlKey : ev.altKey;
 
-            // find method for keyPress and execute it, if existing
-            let methodName = value[keyPress];
-            if (methodName !== undefined) {
-              ev.stopPropagation();
-              ev.preventDefault();
-              console.log('keyMap method ' + methodName + '.', cmd[methodName]);
-              cmd[methodName](); // execute the function
-            }
-          });
-        });
-      }
+        // construct keyPress and keyName from event
+        let keyName = ev.key;
+        if (ev.code.toLowerCase() === 'space') keyName = 'space';
+        // arrowdown -> down
+        keyName = keyName.toLowerCase().replace('arrow', '');
+        let keyPress = '';
+        if (ev.ctrlKey) keyPress += 'ctrl-';
+        if (ev.metaKey) keyPress += 'cmd-';
+        if (ev.shiftKey) keyPress += 'shift-';
+        if (ev.altKey) keyPress += 'alt-';
+        keyPress += keyName;
+        console.info('keyPressString: "' + keyPress + '"');
+
+        // find method for keyPress and execute it, if existing
+        let methodName = value[keyPress];
+        if (methodName !== undefined) {
+          ev.stopPropagation();
+          ev.preventDefault();
+          console.log('keyMap method ' + methodName + '.', cmd[methodName]);
+          cmd[methodName](); // execute the function
+        }
+      });
     });
+  }
 } // setKeyMap()
 
 // returns true, if event is a CMD (Mac) or a CTRL (Windows, Linux) event
