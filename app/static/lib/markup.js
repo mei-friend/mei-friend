@@ -14,6 +14,8 @@ import * as utils from './utils.js';
 import Viewer from './viewer.js';
 import { addListItem, isItemInList, refreshAnnotationsList, retrieveItemValuesByProperty } from './enrichment_panel.js';
 
+export var choiceOptions = [{ label: '(default choice)', value: '' }];
+
 /**
  * Reads markup elements from the XML document and creates
  * list item objects for each group of corresponding markup elements.
@@ -56,6 +58,12 @@ export function readMarkup() {
       if (elId == null) {
         elId = utils.generateXmlId(elName, v.xmlIdStyle);
         markupEl.setAttributeNS(dutils.xmlNameSpace, 'xml:id', elId);
+      }
+
+      if (att.alternativeEncodingElements.includes(elName)) {
+        for (let i = 0; i < markupEl.children.length; i++) {
+          content.push(markupEl.children[i].localName);
+        }
       }
 
       let correspStr = markupEl.getAttribute('corresp');
@@ -102,6 +110,12 @@ function xmlMarkupToListItem(currentElementId, mElName, correspElements, content
 
   if (content.length > 0) {
     markupItem.content = content;
+    let elNames = choiceOptions.map((obj) => obj.value);
+    content.forEach((elName) => {
+      if (!elNames.includes(elName)) {
+        choiceOptions.push({ label: elName[0].toUpperCase() + elName.slice(1), value: elName });
+      }
+    });
   }
 
   let success = addListItem(markupItem);
@@ -186,9 +200,22 @@ export function selectChoice(xmlDoc, childElName) {
     // this selects the first child inside <choice> by default, to be changed later (TODO)
     let children = choice.children;
     if (children) {
-      // delete currently everything but the first child
-      for (let i = 1; i < children.length; i++) {
-        children[i].remove();
+      let childNames = [];
+      for (let i = 0; i > children.length; i++) {
+        childNames.push(children[i].localName);
+      }
+      if (childElName === '' || !childNames.includes(childElName)) {
+        // delete currently everything but the first child
+        for (let i = 1; i < children.length; i++) {
+          children[i].remove();
+        }
+      } else {
+        for (let i = 0; i < children.length; i++) {
+          let currentChild = children[i];
+          if (currentChild.localName !== childElName) {
+            choice.remove(currentChild);
+          }
+        }
       }
     } else {
       console.log('This choice has no child elements. ', choice);

@@ -70,6 +70,7 @@ import {
   addModifyerKeys,
   manualCurrentPage,
   generateSectionSelect,
+  setChoiceOptions,
 } from './control-menu.js';
 import { clock, unverified, xCircleFill } from '../css/icons.js';
 import { setCursorToId } from './utils.js';
@@ -899,6 +900,7 @@ async function vrvWorkerEventsHandler(ev) {
       drawRightFooter();
       document.getElementById('statusBar').innerHTML = `Verovio ${tkVersion} ${translator.lang.verovioLoaded.text}.`;
       setBreaksOptions(tkAvailableOptions, defaultVerovioOptions.breaks);
+      setChoiceOptions();
       if (!storage.supported || !meiFileName) {
         // open default mei file
         openFile();
@@ -1964,6 +1966,12 @@ function addEventListeners(v, cm) {
       start: {},
       end: {},
     };
+    v.updateAll(cm, {}, v.selectedElements[0]);
+  });
+  // choice selector
+  document.getElementById('choiceSelect').addEventListener('change', (ev) => {
+    // selection has changed
+    // then updateAll()
     v.updateAll(cm, {}, v.selectedElements[0]);
   });
   // navigation
