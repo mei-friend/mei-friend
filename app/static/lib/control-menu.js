@@ -642,12 +642,16 @@ export function handleSmartBreaksOption(speedMode) {
   });
 } // handleSmartBreaksOption()
 
-export function setChoiceOptions() {
+export function setChoiceOptions(active) {
   let choiceSelect = document.getElementById('choiceSelect');
   while (choiceSelect.hasChildNodes()) choiceSelect.remove(0);
 
-  choiceOptions.forEach((elName, key) => {
-    choiceSelect[key] = new Option(elName.label, elName.value);
+  choiceOptions.forEach((el, key) => {
+    if (el.value === active) {
+      choiceSelect[key] = new Option(el.label, el.value, false, true);
+    } else {
+      choiceSelect[key] = new Option(el.label, el.value, false, false);
+    }
   });
 }
 

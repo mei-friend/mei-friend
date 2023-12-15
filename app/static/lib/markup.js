@@ -14,7 +14,7 @@ import * as utils from './utils.js';
 import Viewer from './viewer.js';
 import { addListItem, isItemInList, refreshAnnotationsList, retrieveItemValuesByProperty } from './enrichment_panel.js';
 
-export var choiceOptions = [{ label: '(default choice)', value: '' }];
+export var choiceOptions = [];
 
 /**
  * Reads markup elements from the XML document and creates
@@ -83,6 +83,7 @@ export function readMarkup() {
       xmlMarkupToListItem(elId, elName, correspIds, content);
     }
   });
+  updateChoiceOptions();
 }
 
 /**
@@ -110,16 +111,38 @@ function xmlMarkupToListItem(currentElementId, mElName, correspElements, content
 
   if (content.length > 0) {
     markupItem.content = content;
-    let elNames = choiceOptions.map((obj) => obj.value);
-    content.forEach((elName) => {
-      if (!elNames.includes(elName)) {
-        choiceOptions.push({ label: elName[0].toUpperCase() + elName.slice(1), value: elName });
-      }
-    });
   }
 
   let success = addListItem(markupItem);
   return success;
+}
+
+function updateChoiceOptions() {
+  // the loading logic causes this function to run twice.
+  // so make sure this always represents the state of the mei document
+  // therefore this will be reset
+  choiceOptions = [];
+  choiceOptions.push({ label: '(default choice)', value: '', count: 100 });
+  let elNames = choiceOptions.map((obj) => obj.value);
+  let choices = Array.from(v.xmlDoc.querySelectorAll('choice'));
+  //TODO: change to att.alternativeEncodingElements.join(',') when ready
+
+  choices.forEach((choice) => {
+    for (let i = 0; i < choice.children.length; i++) {
+      let child = choice.children[i];
+      if (!elNames.includes(child.localName)) {
+        choiceOptions.push({
+          label: child.localName[0].toUpperCase() + child.localName.slice(1),
+          value: child.localName,
+          count: 1,
+        });
+        elNames.push(child.localName);
+      } else {
+        let obj = choiceOptions.find((obj) => obj.value === child.localName);
+        obj.count = obj.count + 1;
+      }
+    }
+  });
 }
 
 /**
@@ -572,6 +595,7 @@ function mintSuppliedId(id, nodeName, v) {
  * @param {Object} markupItem
  */
 export function deleteMarkup(markupItem) {
+  //updateChoiceOptions(markupItem.content, true);
   markupItem.selection.forEach((id) => {
     var toDelete = v.xmlDoc.querySelector("[*|id='" + id + "']");
     var parent = toDelete.parentElement;
@@ -594,4 +618,5 @@ export function deleteMarkup(markupItem) {
     replaceInEditor(cm, parent, true);
     indentSelection(v, cm);
   });
+  updateChoiceOptions();
 }
