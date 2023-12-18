@@ -7,13 +7,16 @@
 
 import * as att from './attribute-classes.js';
 import { addApplicationInfo, indentSelection, replaceInEditor } from './editor.js';
-import { cm, cmd, v } from './main.js';
+import { cm, cmd, translator, v } from './main.js';
 import * as dutils from './dom-utils.js';
 import * as speed from './speed.js';
 import * as utils from './utils.js';
 import Viewer from './viewer.js';
 import { addListItem, isItemInList, refreshAnnotationsList, retrieveItemValuesByProperty } from './enrichment_panel.js';
 
+/**
+ * Contains choice options currently available for the document
+ */
 export var choiceOptions = [];
 
 /**
@@ -117,12 +120,16 @@ function xmlMarkupToListItem(currentElementId, mElName, correspElements, content
   return success;
 }
 
+/**
+ * Retrieves the content of all choice elements from the document to store them in choiceOptions.
+ * Will be read by control-menu.js/setChoiceOptions() to build the menu.
+ */
 function updateChoiceOptions() {
   // the loading logic causes this function to run twice.
   // so make sure this always represents the state of the mei document
   // therefore this will be reset
   choiceOptions = [];
-  choiceOptions.push({ label: '(default choice)', value: '', count: 100 });
+  choiceOptions.push({ label: translator.lang.choiceDefault.text, value: '', count: 100, id: 'choiceDefault' });
   let elNames = choiceOptions.map((obj) => obj.value);
   let choices = Array.from(v.xmlDoc.querySelectorAll('choice'));
   //TODO: change to att.alternativeEncodingElements.join(',') when ready
@@ -131,10 +138,12 @@ function updateChoiceOptions() {
     for (let i = 0; i < choice.children.length; i++) {
       let child = choice.children[i];
       if (!elNames.includes(child.localName)) {
+        let capitalisedOption = child.localName[0].toUpperCase() + child.localName.slice(1);
         choiceOptions.push({
-          label: child.localName[0].toUpperCase() + child.localName.slice(1),
+          label: capitalisedOption,
           value: child.localName,
           count: 1,
+          id: 'choice' + capitalisedOption,
         });
         elNames.push(child.localName);
       } else {

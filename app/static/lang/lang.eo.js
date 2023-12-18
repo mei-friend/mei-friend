@@ -276,6 +276,8 @@ export const lang = {
   breaksSelectLine: { text: 'Sistemo' },
   breaksSelectEncoded: { text: 'Sistemo kaj paĝo' },
   breaksSelectSmart: { text: 'Saĝa' },
+  choiceSelect: { description: 'Choose displayed content for choice elements' },
+  choiceDefault: { text: '(default choice)' },
   updateControlsLabel: { text: 'Ĝisdatigo', description: 'KontrolĜisdatigo konduto de notado post ŝanĝoj en kodado' },
   liveUpdateCheckbox: { description: 'Aŭtomate ĝisdatigi notadon post ŝanĝoj en kodado' },
   codeManualUpdateButton: { description: 'Mane ĝisdatigi notadon' },

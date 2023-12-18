@@ -272,6 +272,8 @@ export const lang = {
   breaksSelectLine: { text: 'За системами' },
   breaksSelectEncoded: { text: 'За системами та сторінками' },
   breaksSelectSmart: { text: 'Розумні' },
+  choiceSelect: { description: 'Виберіть відображений вміст для елементів вибору' },
+  choiceDefault: { text: '(стандартний вибір)' },
   updateControlsLabel: { text: 'Оновлення', description: 'Поведінка оновлення нотації після змін в кодуванні' },
   liveUpdateCheckbox: { description: 'Автоматичне оновлення нотації після змін в кодуванні' },
   codeManualUpdateButton: { description: 'Ручне оновлення нотації' },

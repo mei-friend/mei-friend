@@ -281,6 +281,8 @@ export const lang = {
   breaksSelectLine: { text: 'Rigo' },
   breaksSelectEncoded: { text: 'Rigo e pagina' },
   breaksSelectSmart: { text: 'Intelligente' },
+  choiceSelect: { description: 'Scegli il contenuto visualizzato per gli elementi di scelta' },
+  choiceDefault: { text: '(scelta predefinita)' },
   updateControlsLabel: {
     text: 'Aggiorna',
     description: 'Cambia il comportamento di controllo dello spartito dopo le modifiche nel codice',
@@ -316,14 +318,14 @@ export const lang = {
 
   // facsimile panel/ finestra facsimile
   facsimileIcon: { description: 'Finestra facsimile' },
-  facsimileDecreaseZoomButton: { description: "Riduci la finestra dello spartito" },
-  facsimileZoom: { description: "Regola la dimensione la finestra dello spartito" },
-  facsimileIncreaseZoomButton: { description: "Ingrandisci la finestra dello spartito" },
+  facsimileDecreaseZoomButton: { description: 'Riduci la finestra dello spartito' },
+  facsimileZoom: { description: 'Regola la dimensione la finestra dello spartito' },
+  facsimileIncreaseZoomButton: { description: 'Ingrandisci la finestra dello spartito' },
   facsimileFullPageLabel: {
     text: 'Pagina intera',
-    description: "Mostra la finestra del facsimile a pagina intera",
+    description: 'Mostra la finestra del facsimile a pagina intera',
   },
-  facsimileFullPageCheckbox: { description: "Mostra la finestra del facsimile a pagina intera" },
+  facsimileFullPageCheckbox: { description: 'Mostra la finestra del facsimile a pagina intera' },
   facsimileShowZonesLabel: {
     text: 'Mostra i riquadri delle zone',
     description: 'Mostra i riquadri delle zone del facsimile',

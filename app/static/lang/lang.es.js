@@ -279,6 +279,8 @@ export const lang = {
   breaksSelectMeasure: { text: 'Compás' },
   breaksSelectEncoded: { text: 'Sistema y página' },
   breaksSelectSmart: { text: 'Smart' },
+  choiceSelect: { description: 'Elegir contenido mostrado para elementos de elección' },
+  choiceDefault: { text: '(elección por defecto)' },
   updateControlsLabel: {
     text: 'Actualizar',
     description: 'Controlar el comportamiento de actualización de la notación después de cambios en la codificación',

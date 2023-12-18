@@ -280,6 +280,8 @@ export const lang = {
   breaksSelectLine: { text: 'System' },
   breaksSelectEncoded: { text: 'System and page' },
   breaksSelectSmart: { text: 'Smart' },
+  choiceSelect: { description: 'Choose displayed content for choice elements' },
+  choiceDefault: { text: '(default choice)' },
   updateControlsLabel: { text: 'Update', description: 'Control update behavior of notation after changes in encoding' },
   liveUpdateCheckbox: { description: 'Automatically update notation after changes in encoding' },
   codeManualUpdateButton: { description: 'Update notation manually' },

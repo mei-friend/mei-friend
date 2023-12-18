@@ -279,6 +279,8 @@ export const lang = {
   breaksSelectLine: { text: 'System' },
   breaksSelectEncoded: { text: 'System i strona' },
   breaksSelectSmart: { text: 'Inteligentnie' },
+  choiceSelect: { description: 'Wybierz wyświetlaną zawartość dla elementów wyboru' },
+  choiceDefault: { text: '(domyślny wybór)' },
   updateControlsLabel: {
     text: 'Aktualizuj',
     description: 'Zachowanie aktualizacji sterowania notacją po zmianach w kodowaniu',

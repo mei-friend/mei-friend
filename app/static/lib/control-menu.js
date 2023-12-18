@@ -642,6 +642,11 @@ export function handleSmartBreaksOption(speedMode) {
   });
 } // handleSmartBreaksOption()
 
+/**
+ * Adds the options for choice to the choiceSelect in the 
+ * notation control bar.
+ * @param {string} active value of currently active selection 
+ */
 export function setChoiceOptions(active) {
   let choiceSelect = document.getElementById('choiceSelect');
   while (choiceSelect.hasChildNodes()) choiceSelect.remove(0);
@@ -652,6 +657,7 @@ export function setChoiceOptions(active) {
     } else {
       choiceSelect[key] = new Option(el.label, el.value, false, false);
     }
+    choiceSelect[key].id = el.id;
   });
 }
 
