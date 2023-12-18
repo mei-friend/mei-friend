@@ -13,6 +13,7 @@ import * as speed from './speed.js';
 import * as utils from './utils.js';
 import Viewer from './viewer.js';
 import { addListItem, isItemInList, refreshAnnotationsList, retrieveItemValuesByProperty } from './enrichment_panel.js';
+import { setChoiceOptions } from './control-menu.js';
 
 /**
  * Contains choice options currently available for the document
@@ -289,6 +290,20 @@ export function addMarkup(event) {
     //let successfullyAdded = xmlMarkupToListItem(v.selectedElements, mElName);
     // Manually updating the item list is not necessary because refreshing the code in the editor triggers readMarkup()
     refreshAnnotationsList();
+    //select elements of last reading for alternative encodings if copied
+    if (multiLayerContent != undefined && document.getElementById('alternativeVersionContent').value == 'copy') {
+      let newSelection = [];
+      v.selectedElements.forEach((id) => {
+        let selEl = v.xmlDoc.querySelector("[*|id='" + id + "']");
+        let lastChild = selEl.lastElementChild;
+        for (let child of lastChild.children) {
+          newSelection.push(child.getAttribute('xml:id'));
+        }
+      });
+      v.selectedElements = newSelection;
+      setChoiceOptions(multiLayerContent[multiLayerContent.length - 1]);
+      v.updateAll(cm, {}, v.selectedElements[0]);
+    }
   }
 }
 
@@ -497,16 +512,38 @@ function addMultiLayeredMarkup(v, mElName, parentEl, firstChild, content) {
   let respID = getCurrentRespID();
   if (respID) upmostElement.setAttribute('resp', '#' + respID);
 
+  let alternativeEncodingSettingsValue = document.getElementById('alternativeVersionContent').value;
+
   parentEl.replaceChild(upmostElement, firstChild);
   upmostElement.appendChild(firstChild);
-  let dummy = document.createComment('replace this with alternative reading');
+  let dummyEmpty = document.createComment('replace this with alternative reading');
+  let dummyCopy = document.createComment('change content of alternative reading');
 
   for (let i = 1; i < content.length; i++) {
     let nextChild = document.createElementNS(dutils.meiNameSpace, content[i]);
     let nextChildID = mintSuppliedId(upmostElementID, content[i], v);
     nextChild.setAttributeNS(dutils.xmlNameSpace, 'xml:id', nextChildID);
-    nextChild.appendChild(dummy);
     upmostElement.appendChild(nextChild);
+
+    switch (alternativeEncodingSettingsValue) {
+      case 'empty':
+        nextChild.appendChild(dummyEmpty);
+        break;
+      case 'copy':
+        nextChild.appendChild(dummyCopy);
+        let firstChildCopies = new DocumentFragment();
+        for (let child of firstChild.children) {
+          let newChildCopy = child.cloneNode(true);
+          let newId = utils.generateXmlId(child.localName, v.xmlIdStyle);
+          newChildCopy.setAttributeNS(dutils.xmlNameSpace, 'xml:id', newId);
+          firstChildCopies.appendChild(newChildCopy);
+        }
+        nextChild.appendChild(firstChildCopies);
+        break;
+      default:
+        nextChild.appendChild(dummyEmpty);
+        console.log('No default option for alternative encodings set!');
+    }
   }
 
   return upmostElement;
