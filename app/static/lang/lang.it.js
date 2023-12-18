@@ -849,31 +849,31 @@ export const lang = {
     description: 'Seleziona colore di evidenziazione per <supplied>',
   },
   unclearColor: {
-    title: 'Seleziona colore di evidenziazione per <unclear>',
+    text: 'Seleziona colore di evidenziazione per <unclear>',
     description: 'Seleziona colore di evidenziazione per <unclear>',
   },
   sicColor: {
-    title: 'Seleziona colore di evidenziazione per <sic>',
+    text: 'Seleziona colore di evidenziazione per <sic>',
     description: 'Seleziona colore di evidenziazione per <sic>',
   },
   corrColor: {
-    title: 'Seleziona colore di evidenziazione per <corr>',
+    text: 'Seleziona colore di evidenziazione per <corr>',
     description: 'Seleziona colore di evidenziazione per <corr>',
   },
   origColor: {
-    title: 'Seleziona colore di evidenziazione per <orig>',
+    text: 'Seleziona colore di evidenziazione per <orig>',
     description: 'Seleziona colore di evidenziazione per <orig>',
   },
   regColor: {
-    title: 'Seleziona colore di evidenziazione per <reg>',
+    text: 'Seleziona colore di evidenziazione per <reg>',
     description: 'Seleziona colore di evidenziazione per <reg>',
   },
   addColor: {
-    title: 'Seleziona colore di evidenziazione per <add>',
+    text: 'Seleziona colore di evidenziazione per <add>',
     description: 'Seleziona colore di evidenziazione per <add>',
   },
   delColor: {
-    title: 'Seleziona colore di evidenziazione per <del>',
+    text: 'Seleziona colore di evidenziazione per <del>',
     description: 'Seleziona colore di evidenziazione per <del>',
   },
 

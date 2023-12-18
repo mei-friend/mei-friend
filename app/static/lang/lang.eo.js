@@ -791,31 +791,31 @@ export const lang = {
     description: 'Elekti koloron por <supplied>',
   },
   unclearColor: {
-    title: 'Elekti koloron por <unclear>',
+    text: 'Elekti koloron por <unclear>',
     description: 'Elekti koloron por <unclear>',
   },
   sicColor: {
-    title: 'Elekti koloron por <sic>',
+    text: 'Elekti koloron por <sic>',
     description: 'Elekti koloron por <sic>',
   },
   corrColor: {
-    title: 'Elekti koloron por <corr>',
+    text: 'Elekti koloron por <corr>',
     description: 'Elekti koloron por <corr>',
   },
   origColor: {
-    title: 'Elekti koloron por <orig>',
+    text: 'Elekti koloron por <orig>',
     description: 'Elekti koloron por <orig>',
   },
   regColor: {
-    title: 'Elekti koloron por <reg>',
+    text: 'Elekti koloron por <reg>',
     description: 'Elekti koloron por <reg>',
   },
   addColor: {
-    title: 'Elekti koloron por <add>',
+    text: 'Elekti koloron por <add>',
     description: 'Elekti koloron por <add>',
   },
   delColor: {
-    title: 'Elekti koloron por <del>',
+    text: 'Elekti koloron por <del>',
     description: 'Elekti koloron por <del>',
   },
 

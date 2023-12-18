@@ -846,31 +846,31 @@ export const lang = {
     description: 'Farbe für <supplied> auswählen',
   },
   unclearColor: {
-    title: 'Farbe für <unclear>',
+    text: 'Farbe für <unclear>',
     description: 'Farbe für <unclear> auswählen',
   },
   sicColor: {
-    title: 'Farbe für <sic>',
+    text: 'Farbe für <sic>',
     description: 'Farbe für <sic> auswählen',
   },
   corrColor: {
-    title: 'Farbe für <corr>',
+    text: 'Farbe für <corr>',
     description: 'Farbe für <corr> auswählen',
   },
   origColor: {
-    title: 'Farbe für <orig>',
+    text: 'Farbe für <orig>',
     description: 'Farbe für <orig> auswählen',
   },
   regColor: {
-    title: 'Farbe für <reg>',
+    text: 'Farbe für <reg>',
     description: 'Farbe für <reg> auswählen',
   },
   addColor: {
-    title: 'Farbe für <add>',
+    text: 'Farbe für <add>',
     description: 'Farbe für <add> auswählen',
   },
   delColor: {
-    title: 'Farbe für <del>',
+    text: 'Farbe für <del>',
     description: 'Farbe für <del> auswählen',
   },
 

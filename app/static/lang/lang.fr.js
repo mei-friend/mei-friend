@@ -844,31 +844,31 @@ export const lang = {
     description: 'Sélectionner la couleur de mise en évidence <supplied>',
   },
   unclearColor: {
-    title: 'Sélectionner la couleur de mise en évidence <unclear>',
+    text: 'Sélectionner la couleur de mise en évidence <unclear>',
     description: 'Sélectionner la couleur de mise en évidence <unclear>',
   },
   sicColor: {
-    title: 'Sélectionner la couleur de mise en évidence <sic>',
+    text: 'Sélectionner la couleur de mise en évidence <sic>',
     description: 'Sélectionner la couleur de mise en évidence <sic>',
   },
   corrColor: {
-    title: 'Sélectionner la couleur de mise en évidence <corr>',
+    text: 'Sélectionner la couleur de mise en évidence <corr>',
     description: 'Sélectionner la couleur de mise en évidence <corr>',
   },
   origColor: {
-    title: 'Sélectionner la couleur de mise en évidence <orig>',
+    text: 'Sélectionner la couleur de mise en évidence <orig>',
     description: 'Sélectionner la couleur de mise en évidence <orig>',
   },
   regColor: {
-    title: 'Sélectionner la couleur de mise en évidence <reg>',
+    text: 'Sélectionner la couleur de mise en évidence <reg>',
     description: 'Sélectionner la couleur de mise en évidence <reg>',
   },
   addColor: {
-    title: 'Sélectionner la couleur de mise en évidence <add>',
+    text: 'Sélectionner la couleur de mise en évidence <add>',
     description: 'Sélectionner la couleur de mise en évidence <add>',
   },
   delColor: {
-    title: 'Sélectionner la couleur de mise en évidence <del>',
+    text: 'Sélectionner la couleur de mise en évidence <del>',
     description: 'Sélectionner la couleur de mise en évidence <del>',
   },
 

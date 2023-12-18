@@ -844,31 +844,31 @@ export const lang = {
     description: "Seleccionar el color d'ús de <supplied>",
   },
   unclearColor: {
-    title: "Seleccionar el color d'ús de <unclear>",
+    text: "Seleccionar el color d'ús de <unclear>",
     description: "Seleccionar el color d'ús de <unclear>",
   },
   sicColor: {
-    title: "Seleccionar el color d'ús de <sic>",
+    text: "Seleccionar el color d'ús de <sic>",
     description: "Seleccionar el color d'ús de <sic>",
   },
   corrColor: {
-    title: "Seleccionar el color d'ús de <corr>",
+    text: "Seleccionar el color d'ús de <corr>",
     description: "Seleccionar el color d'ús de <corr>",
   },
   origColor: {
-    title: "Seleccionar el color d'ús de <orig>",
+    text: "Seleccionar el color d'ús de <orig>",
     description: "Seleccionar el color d'ús de <orig>",
   },
   regColor: {
-    title: "Seleccionar el color d'ús de <reg>",
+    text: "Seleccionar el color d'ús de <reg>",
     description: "Seleccionar el color d'ús de <reg>",
   },
   addColor: {
-    title: "Seleccionar el color d'ús de <add>",
+    text: "Seleccionar el color d'ús de <add>",
     description: "Seleccionar el color d'ús de <add>",
   },
   delColor: {
-    title: "Seleccionar el color d'ús de <del>",
+    text: "Seleccionar el color d'ús de <del>",
     description: "Seleccionar el color d'ús de <del>",
   },
 

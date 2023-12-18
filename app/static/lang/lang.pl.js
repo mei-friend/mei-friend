@@ -839,31 +839,31 @@ export const lang = {
     description: 'Wybierz kolor podświetlenia <supplied>',
   },
   unclearColor: {
-    title: 'Wybierz kolor podświetlenia <unclear>',
+    text: 'Wybierz kolor podświetlenia <unclear>',
     description: 'Wybierz kolor podświetlenia <unclear>',
   },
   sicColor: {
-    title: 'Wybierz kolor podświetlenia <sic>',
+    text: 'Wybierz kolor podświetlenia <sic>',
     description: 'Wybierz kolor podświetlenia <sic>',
   },
   corrColor: {
-    title: 'Wybierz kolor podświetlenia <corr>',
+    text: 'Wybierz kolor podświetlenia <corr>',
     description: 'Wybierz kolor podświetlenia <corr>',
   },
   origColor: {
-    title: 'Wybierz kolor podświetlenia <orig>',
+    text: 'Wybierz kolor podświetlenia <orig>',
     description: 'Wybierz kolor podświetlenia <orig>',
   },
   regColor: {
-    title: 'Wybierz kolor podświetlenia <reg>',
+    text: 'Wybierz kolor podświetlenia <reg>',
     description: 'Wybierz kolor podświetlenia <reg>',
   },
   addColor: {
-    title: 'Wybierz kolor podświetlenia <add>',
+    text: 'Wybierz kolor podświetlenia <add>',
     description: 'Wybierz kolor podświetlenia <add>',
   },
   delColor: {
-    title: 'Wybierz kolor podświetlenia <del>',
+    text: 'Wybierz kolor podświetlenia <del>',
     description: 'Wybierz kolor podświetlenia <del>',
   },
 

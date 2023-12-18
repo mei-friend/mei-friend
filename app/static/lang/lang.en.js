@@ -834,31 +834,31 @@ export const lang = {
     description: 'Select <supplied> highlight color',
   },
   unclearColor: {
-    title: 'Select <unclear> highlight color',
+    text: 'Select <unclear> highlight color',
     description: 'Select <unclear> highlight color',
   },
   sicColor: {
-    title: 'Select <sic> highlight color',
+    text: 'Select <sic> highlight color',
     description: 'Select <sic> highlight color',
   },
   corrColor: {
-    title: 'Select <corr> highlight color',
+    text: 'Select <corr> highlight color',
     description: 'Select <corr> highlight color',
   },
   origColor: {
-    title: 'Select <orig> highlight color',
+    text: 'Select <orig> highlight color',
     description: 'Select <orig> highlight color',
   },
   regColor: {
-    title: 'Select <reg> highlight color',
+    text: 'Select <reg> highlight color',
     description: 'Select <reg> highlight color',
   },
   addColor: {
-    title: 'Select <add> highlight color',
+    text: 'Select <add> highlight color',
     description: 'Select <add> highlight color',
   },
   delColor: {
-    title: 'Select <del> highlight color',
+    text: 'Select <del> highlight color',
     description: 'Select <del> highlight color',
   },
 

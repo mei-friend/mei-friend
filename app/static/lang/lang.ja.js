@@ -808,31 +808,31 @@ export const lang = {
     description: '<supplied>のハイライトカラーを選択',
   },
   unclearColor: {
-    title: '<unclear>のハイライトカラーを選択',
+    text: '<unclear>のハイライトカラーを選択',
     description: '<unclear>のハイライトカラーを選択',
   },
   sicColor: {
-    title: '<sic>のハイライトカラーを選択',
+    text: '<sic>のハイライトカラーを選択',
     description: '<sic>のハイライトカラーを選択',
   },
   corrColor: {
-    title: '<corr>のハイライトカラーを選択',
+    text: '<corr>のハイライトカラーを選択',
     description: '<corr>のハイライトカラーを選択',
   },
   origColor: {
-    title: '<orig>のハイライトカラーを選択',
+    text: '<orig>のハイライトカラーを選択',
     description: '<orig>のハイライトカラーを選択',
   },
   regColor: {
-    title: '<reg>のハイライトカラーを選択',
+    text: '<reg>のハイライトカラーを選択',
     description: '<reg>のハイライトカラーを選択',
   },
   addColor: {
-    title: '<add>のハイライトカラーを選択',
+    text: '<add>のハイライトカラーを選択',
     description: '<add>のハイライトカラーを選択',
   },
   delColor: {
-    title: '<del>のハイライトカラーを選択',
+    text: '<del>のハイライトカラーを選択',
     description: '<del>のハイライトカラーを選択',
   },
 

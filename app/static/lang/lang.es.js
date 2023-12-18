@@ -845,31 +845,31 @@ export const lang = {
     description: 'Seleccionar color de resaltado para <supplied>',
   },
   unclearColor: {
-    title: 'Seleccionar color de resaltado para <unclear>',
+    text: 'Seleccionar color de resaltado para <unclear>',
     description: 'Seleccionar color de resaltado para <unclear>',
   },
   sicColor: {
-    title: 'Seleccionar color de resaltado para <sic>',
+    text: 'Seleccionar color de resaltado para <sic>',
     description: 'Seleccionar color de resaltado para <sic>',
   },
   corrColor: {
-    title: 'Seleccionar color de resaltado para <corr>',
+    text: 'Seleccionar color de resaltado para <corr>',
     description: 'Seleccionar color de resaltado para <corr>',
   },
   origColor: {
-    title: 'Seleccionar color de resaltado para <orig>',
+    text: 'Seleccionar color de resaltado para <orig>',
     description: 'Seleccionar color de resaltado para <orig>',
   },
   regColor: {
-    title: 'Seleccionar color de resaltado para <reg>',
+    text: 'Seleccionar color de resaltado para <reg>',
     description: 'Seleccionar color de resaltado para <reg>',
   },
   addColor: {
-    title: 'Seleccionar color de resaltado para <add>',
+    text: 'Seleccionar color de resaltado para <add>',
     description: 'Seleccionar color de resaltado para <add>',
   },
   delColor: {
-    title: 'Seleccionar color de resaltado para <del>',
+    text: 'Seleccionar color de resaltado para <del>',
     description: 'Seleccionar color de resaltado para <del>',
   },
 
