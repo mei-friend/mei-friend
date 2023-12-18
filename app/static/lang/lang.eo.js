@@ -768,22 +768,55 @@ export const lang = {
     description: 'Redakti limzonojn de facsimila bildo (ligos limzonojn al facsimilaj zonoj)',
   },
 
-  // Redakciado
+  // Supplied element
   titleSupplied: {
-    text: 'Trakti eldonan enhavon',
-    description: 'Kontroli la traktadon de <truditaj> elementoj',
-  },
-  showSupplied: {
-    text: 'Montri <truditajn> elementojn',
-    description: 'Emfazi ĉiujn elementojn enhavitajn de <trudita> elemento',
-  },
-  suppliedColor: {
-    text: 'Elekti koloron por <truditaj> elementoj',
-    description: 'Elekti koloron por emfazi <truditaj> elementoj',
+    text: 'Trakti redaktecan enhavon',
+    description: 'Kontroli traktadon de redakteca markado',
   },
   respSelect: {
-    text: 'Elekti respondecon de <truditaj> elementoj',
+    text: 'Elekti markad-respondecon',
     description: 'Elekti identigilon de respondeco',
+  },
+  showMarkup: {
+    text: 'Montri redaktecajn markilojn',
+    description: 'Emfazi ĉiujn elementojn enhavitajn de redaktecaj markiloj',
+  },
+  alternativeVersionContent: {
+    text: 'Elekti defaŭltan enhavon por alternativaj kodumoj',
+    description: 'Elekti ĉu novkreitaj alternativaj kodumoj estas malplenaj aŭ kopioj de la originala legado',
+    labels: ['malplena', 'kopia'],
+  },
+  suppliedColor: {
+    text: 'Elekti koloron por <supplied>',
+    description: 'Elekti koloron por <supplied>',
+  },
+  unclearColor: {
+    title: 'Elekti koloron por <unclear>',
+    description: 'Elekti koloron por <unclear>',
+  },
+  sicColor: {
+    title: 'Elekti koloron por <sic>',
+    description: 'Elekti koloron por <sic>',
+  },
+  corrColor: {
+    title: 'Elekti koloron por <corr>',
+    description: 'Elekti koloron por <corr>',
+  },
+  origColor: {
+    title: 'Elekti koloron por <orig>',
+    description: 'Elekti koloron por <orig>',
+  },
+  regColor: {
+    title: 'Elekti koloron por <reg>',
+    description: 'Elekti koloron por <reg>',
+  },
+  addColor: {
+    title: 'Elekti koloron por <add>',
+    description: 'Elekti koloron por <add>',
+  },
+  delColor: {
+    title: 'Elekti koloron por <del>',
+    description: 'Elekti koloron por <del>',
   },
 
   // AGORDOJ DE REDAKCIA ARAJ / AGORDOJ DE KODMIRRO

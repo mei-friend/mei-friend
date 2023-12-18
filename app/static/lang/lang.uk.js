@@ -768,20 +768,53 @@ export const lang = {
 
   // Supplied element
   titleSupplied: {
-    text: 'Редагувати редакційний контент',
-    description: 'Управління обробкою елементів <supplied>',
-  },
-  showSupplied: {
-    text: 'Показати елементи <supplied>',
-    description: 'Виділити всі елементи, які містяться в елементі <supplied>',
-  },
-  suppliedColor: {
-    text: 'Вибрати колір виділення <supplied>',
-    description: 'Вибрати колір виділення <supplied>',
+    text: 'Обробка редакційного вмісту',
+    description: 'Керування обробкою редакційної розмітки',
   },
   respSelect: {
-    text: 'Вибрати відповідальність <supplied>',
-    description: 'Вибрати ідентифікатор відповідальності',
+    text: 'Вибір відповідальності за розмітку',
+    description: 'Вибір ідентифікатора відповідальності',
+  },
+  showMarkup: {
+    text: 'Показати елементи редакційної розмітки',
+    description: 'Виділити всі елементи, що містяться в елементах редакційної розмітки',
+  },
+  alternativeVersionContent: {
+    text: 'Вибір вмісту за замовчуванням для альтернативних кодувань',
+    description: 'Вибір, чи новостворені альтернативні кодування є порожніми або копіями оригінального читання',
+    labels: ['порожнє', 'копія'],
+  },
+  suppliedColor: {
+    text: 'Вибір кольору підсвічування для <supplied>',
+    description: 'Вибір кольору підсвічування для <supplied>',
+  },
+  unclearColor: {
+    title: 'Вибір кольору підсвічування для <unclear>',
+    description: 'Вибір кольору підсвічування для <unclear>',
+  },
+  sicColor: {
+    title: 'Вибір кольору підсвічування для <sic>',
+    description: 'Вибір кольору підсвічування для <sic>',
+  },
+  corrColor: {
+    title: 'Вибір кольору підсвічування для <corr>',
+    description: 'Вибір кольору підсвічування для <corr>',
+  },
+  origColor: {
+    title: 'Вибір кольору підсвічування для <orig>',
+    description: 'Вибір кольору підсвічування для <orig>',
+  },
+  regColor: {
+    title: 'Вибір кольору підсвічування для <reg>',
+    description: 'Вибір кольору підсвічування для <reg>',
+  },
+  addColor: {
+    title: 'Вибір кольору підсвічування для <add>',
+    description: 'Вибір кольору підсвічування для <add>',
+  },
+  delColor: {
+    title: 'Вибір кольору підсвічування для <del>',
+    description: 'Вибір кольору підсвічування для <del>',
   },
   // EDITOR SETTINGS / CODEMIRROR SETTINGS
   editorSettingsHeader: {
