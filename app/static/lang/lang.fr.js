@@ -833,6 +833,12 @@ export const lang = {
     text: 'Afficher les éléments de mise en forme éditoriale',
     description: 'Surligner tous les éléments contenus dans les éléments de mise en forme éditoriale',
   },
+  alternativeVersionContent: {
+    text: 'Sélectionner le contenu par défaut pour les encodages alternatifs',
+    description:
+      'Choisir si les encodages alternatifs nouvellement créés sont vides ou des copies de la lecture originale',
+    labels: ['vide', 'copie'],
+  },
   suppliedColor: {
     text: 'Sélectionner la couleur de mise en évidence <supplied>',
     description: 'Sélectionner la couleur de mise en évidence <supplied>',

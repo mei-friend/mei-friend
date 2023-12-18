@@ -836,6 +836,11 @@ export const lang = {
     text: 'Zeige Editorisches Markup',
     description: 'Alle Elemente hervorheben, die mit editorischem Markup umschlossen sind',
   },
+  alternativeVersionContent: {
+    text: 'Wählen Sie den Standardinhalt für alternative Codierungen aus',
+    description: 'Wählen Sie aus, ob neu erstellte alternative Codierungen leer sind oder Kopien der originalen Lesung',
+    labels: ['leer', 'Kopie'],
+  },
   suppliedColor: {
     text: 'Farbe für <supplied>',
     description: 'Farbe für <supplied> auswählen',

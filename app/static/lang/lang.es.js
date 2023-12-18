@@ -834,6 +834,12 @@ export const lang = {
     text: 'Mostrar elementos de marcado editorial',
     description: 'Resaltar todos los elementos contenidos por elementos de marcado editorial',
   },
+  alternativeVersionContent: {
+    text: 'Seleccionar contenido predeterminado para codificaciones alternativas',
+    description:
+      'Elegir si las codificaciones alternativas recién creadas están vacías o son copias de la lectura original',
+    labels: ['vacío', 'copia'],
+  },
   suppliedColor: {
     text: 'Seleccionar color de resaltado para <supplied>',
     description: 'Seleccionar color de resaltado para <supplied>',

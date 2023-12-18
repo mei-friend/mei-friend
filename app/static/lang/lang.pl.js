@@ -829,6 +829,11 @@ export const lang = {
     text: 'Pokaż elementy znacznika redakcyjnego',
     description: 'Podświetl wszystkie elementy zawarte w elementach znacznika redakcyjnego',
   },
+  alternativeVersionContent: {
+    text: 'Wybierz domyślną zawartość dla alternatywnych kodowań',
+    description: 'Wybierz, czy nowo utworzone alternatywne kodowania są puste czy kopie oryginalnego odczytu',
+    labels: ['puste', 'kopia'],
+  },
   suppliedColor: {
     text: 'Wybierz kolor podświetlenia <supplied>',
     description: 'Wybierz kolor podświetlenia <supplied>',

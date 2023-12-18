@@ -824,6 +824,11 @@ export const lang = {
     text: 'Show editorial markup elements',
     description: 'Highlight all elements contained by editorial markup elements',
   },
+  alternativeVersionContent: {
+    text: 'Select default content for alternative encodings',
+    description: 'Choose if newly created alternative encodings are empty or copies of the original reading',
+    labels: ['empty', 'copy'],
+  },
   suppliedColor: {
     text: 'Select <supplied> highlight color',
     description: 'Select <supplied> highlight color',

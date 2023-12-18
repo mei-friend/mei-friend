@@ -834,6 +834,11 @@ export const lang = {
     text: 'Mostrar elements de marca editorial',
     description: 'Destacar tots els elements continguts per elements de marca editorial',
   },
+  alternativeVersionContent: {
+    text: 'Seleccioneu el contingut per defecte per a les codificacions alternatives',
+    description: 'Trieu si les codificacions alternatives de nova creació estan buides o còpies de la lectura original',
+    labels: ['buit', 'còpia'],
+  },
   suppliedColor: {
     text: "Seleccionar el color d'ús de <supplied>",
     description: "Seleccionar el color d'ús de <supplied>",
