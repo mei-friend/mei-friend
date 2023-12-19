@@ -658,7 +658,7 @@ export function setChoiceOptions(active) {
       choiceSelect[key] = new Option(el.label, el.value, false, false);
     }
     choiceSelect[key].id = el.id;
-    choiceSelect[key].data.setting = el.setting;
+    choiceSelect[key].dataset.prop = el.prop;
   });
 }
 

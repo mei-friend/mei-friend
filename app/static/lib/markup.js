@@ -135,7 +135,7 @@ function updateChoiceOptions() {
     value: '',
     count: 100,
     id: 'choiceDefault',
-    setting: 'choiceXPathQuery',
+    prop: 'choiceXPathQuery',
   };
   let elNames = choiceOptions.map((obj) => obj.value);
   let choices = Array.from(v.xmlDoc.querySelectorAll('choice'));
@@ -153,7 +153,7 @@ function updateChoiceOptions() {
           value: child.localName,
           count: 1,
           id: 'choice' + capitalisedOption,
-          seetting: 'choiceXPathQuery',
+          prop: 'choiceXPathQuery',
         });
         elNames.push(child.localName);
       } else {
