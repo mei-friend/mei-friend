@@ -130,10 +130,18 @@ function updateChoiceOptions() {
   // so make sure this always represents the state of the mei document
   // therefore this will be reset
   choiceOptions = [];
-  choiceOptions.push({ label: translator.lang.choiceDefault.text, value: '', count: 100, id: 'choiceDefault' });
+  let defaultOption = {
+    label: translator.lang.choiceDefault.text,
+    value: '',
+    count: 100,
+    id: 'choiceDefault',
+    setting: 'choiceXPathQuery',
+  };
   let elNames = choiceOptions.map((obj) => obj.value);
   let choices = Array.from(v.xmlDoc.querySelectorAll('choice'));
   //TODO: change to att.alternativeEncodingElements.join(',') when ready
+
+  choiceOptions.push(defaultOption);
 
   choices.forEach((choice) => {
     for (let i = 0; i < choice.children.length; i++) {
@@ -145,6 +153,7 @@ function updateChoiceOptions() {
           value: child.localName,
           count: 1,
           id: 'choice' + capitalisedOption,
+          seetting: 'choiceXPathQuery',
         });
         elNames.push(child.localName);
       } else {
