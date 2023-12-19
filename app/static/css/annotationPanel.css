@@ -72,39 +72,7 @@ fieldset {
   cursor: pointer;
 }
 
-.markup-accordion-btn {
-  width: 100%;
-  text-align: left;
-  border: 1px solid black;
-  border-radius: 5px;
-  padding: 10px;
-  background-color:var(--annotationPanelBackgroundColor);
-  cursor: pointer;
-}
-
-.markup-accordion-btn:after {
-  content: '\02795'; /* Unicode character for "plus" sign (+) */
-  float: right;
-  margin-left: auto;
-  color: aqua;/*var(--annotationPanelTextColor);*/
-}
-
-.markup-accordion-btn-active {
-  background-color: var(--annotationPanelLinkBackgroundColor)
-}
-
-.markup-accordion-btn-active:after {
-  content: '\02796'; /* Unicode character for "minus" sign (-) */
-}
-
-.markup-accordion-panel {
-  display: none;
-  overflow: hidden;
-  border: 1px solid black;
-  border-radius: 5px;
-}
-
-.markup-accordion-panel-active {
+.markup-panel {
   display: grid;
   position: relative;
 }
