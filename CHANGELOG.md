@@ -3,6 +3,8 @@
 ### 1.0.6 patch
 * Key signature information is taken into account, when shifting pitch of a note (#38)
 * Several navigation keyboard shortcuts removed from encoding panel (#66)
+* Bug fix for #73 to correctly handle unknown language code
+* Transparently open and convert Fronimo lute tablature format using luteconv-webui
 
 ### 1.0.5 patch
 * Add Ukrainian and Esperanto language packs (still to be proof-read)
@@ -17,7 +19,7 @@
 * Tweak CSS select and translations (German)
 * Fix typo at forking via URL parameters
 
-### 1.0.3 patch
+### 1.0.3 patch (released 1 Nov 2023)
 * Enable navigation link to generated MAO objects (identify object annotations)
 
 ### 1.0.2 Splash screen (released 3 Oct 2023)

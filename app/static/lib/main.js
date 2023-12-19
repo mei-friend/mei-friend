@@ -1,6 +1,6 @@
 // mei-friend version and date
 export const version = '1.0.6';
-export const versionDate = '23 November 2023'; // use full or 3-character english months, will be translated
+export const versionDate = '19 December 2023'; // use full or 3-character english months, will be translated
 
 var vrvWorker;
 var spdWorker;
@@ -387,7 +387,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // we need to look directly to local storage, because it will
   let language = window.localStorage['mf-selectLanguage'];
   let browseLang = navigator.language.substring(0, 2) || '';
-  if (!browseLang in supportedLanguages) browseLang = '';
+  if (!(browseLang in supportedLanguages)) browseLang = '';
   let langCode = language || browseLang || translator.defaultLangCode;
   if (langCode !== translator.langCode) {
     // load other language...
