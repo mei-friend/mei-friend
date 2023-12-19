@@ -1,5 +1,6 @@
-//const lc_endpoint = "https://luteconv.mdw.ac.at";
-const lc_endpoint = "http://localhost:3100";
+const lc_endpoint = "https://luteconv.mdw.ac.at";
+//const lc_endpoint = "https://staging.luteconv.mdw.ac.at";
+//const lc_endpoint = "http://localhost:3100";
 
 export async function luteconv(sourceData, fName, endpoint = lc_endpoint) {
     console.log("Converting to MEI with luteconv...", typeof sourceData, sourceData, fName);
