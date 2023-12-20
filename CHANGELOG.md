@@ -1,6 +1,6 @@
 # mei-friend-online CHANGELOG.md
 
-### 1.0.6 patch
+### 1.0.6 patch (released on 20 Dec 2023)
 * Key signature information is taken into account, when shifting pitch of a note (#38)
 * Several navigation keyboard shortcuts removed from encoding panel (#66)
 * Bug fix for #73 to correctly handle unknown language code
