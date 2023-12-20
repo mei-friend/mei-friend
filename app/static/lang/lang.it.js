@@ -42,6 +42,15 @@ export const lang = {
         Spettacolo di Vienna e non sono condivise con terze parti.
       </p>
       <p>
+        Le tablature per liuto vengono convertite in MEI utilizzando 
+        <a href="https://bitbucket.org/bayleaf/luteconv/" target="_blank">luteconv</a> 
+        sviluppato da Paul Overell, 
+        tramite il servizio <a href="https://codeberg.org/mdwRepository/luteconv-webui" target="_blank">luteconv-webui</a> 
+        sviluppato da Stefan Szepe e <a href="https://luteconv.mdw.ac.at" target="_blank">ospitato dalla mdw</a>. 
+        Questo servizio crea copie accessibili sul Web delle tue codifiche come parte del processo di conversione, 
+        ma queste sono accessibili solo tramite un valore hash di link unico e vengono cancellate periodicamente.
+      </p>
+      <p>
         Il toolkit Verovio è caricato da <a href="https://verovio.org" target="_blank">https://verovio.org</a>, ospitato da
         <a href="https://rism.digital/" target="_blank">RISM Digital Switzerland</a>. 
         Ciò consente a mei-friend di rimanere aggiornato con l'ultima versione del toolkit

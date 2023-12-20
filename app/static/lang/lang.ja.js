@@ -38,6 +38,14 @@ export const lang = {
       </p>
       <p>
 
+      リュートのタブラチュアは、ポール・オベレルによって開発された<a href="https://bitbucket.org/bayleaf/luteconv/" target="_blank">luteconv</a>を使用してMEIに変換され、
+      ステファン・スゼープによって開発された<a href="https://codeberg.org/mdwRepository/luteconv-webui" target="_blank">luteconv-webuiサービス</a>を介して、
+      <a href="https://luteconv.mdw.ac.at" target="_blank">mdwによってホストされています</a>。このサービスは、変換プロセスの一部としてエンコーディングのWebアクセス可能なコピーを作成しますが、
+      これらは一意のリンクハッシュ値を介してのみアクセス可能で、定期的に削除されます。
+      
+      </p>
+      <p>
+
       Verovioツールキットは<a href="https://verovio.org" target="_blank">https://verovio.org</a>からロードされ、<a href="https://rism.digital/" target="_blank">RISM Digital Switzerland</a>
       がホストしています。これにより、最新のツールキットバージョンを使用できるだけでなく、設定パネルを介してすべてのサポートされている任意のバージョンを選択できます。mei-friendを使用する際には、
       IPアドレスがRISM Digitalに表示されることに留意してください。

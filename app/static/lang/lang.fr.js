@@ -43,6 +43,14 @@ export const lang = {
         de l'Université de musique et des arts du spectacle de Vienne et ne sont pas partagées avec des tiers.
       </p>
       <p>
+        Les tablatures de luth sont converties en MEI en utilisant 
+        <a href="https://bitbucket.org/bayleaf/luteconv/" target="_blank">luteconv</a> développé par Paul Overell, 
+        via le service <a href="https://codeberg.org/mdwRepository/luteconv-webui" target="_blank">luteconv-webui</a> 
+        développé par Stefan Szepe et <a href="https://luteconv.mdw.ac.at" target="_blank">hébergé par le mdw</a>. 
+        Ce service crée des copies accessibles sur le Web de vos encodages dans le cadre du processus de conversion, 
+        mais celles-ci ne sont accessibles que via une valeur de hachage de lien unique et sont périodiquement supprimées.
+      </p>
+      <p>
         La boîte à outils Verovio est chargée depuis <a href="https://verovio.org" target="_blank">https://verovio.org</a>, 
         hébergée par <a href="https://rism.digital/" target="_blank">RISM Digital Switzerland</a>. 
         Cela permet à mei-friend de rester à jour avec la dernière version de la boîte à outils
