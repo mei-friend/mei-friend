@@ -47,7 +47,7 @@ export const lang = {
         via the <a href="https://codeberg.org/mdwRepository/luteconv-webui" target="_blank">luteconv-webui service</a> 
         developed by Stefan Szepe and <a href="https://luteconv.mdw.ac.at" target="_blank">hosted by the mdw</a>. 
         This service creates Web-accessible copies of your encodings as part of the conversion process, but these are 
-        accessible only via a unique link hash value, and are intermittently deleted. 
+        accessible only via a unique link hash value, and are periodically deleted. 
       </p>
       <p>
         The Verovio toolkit is loaded from <a href="https://verovio.org" target="_blank">https://verovio.org</a>, hosted by
