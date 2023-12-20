@@ -43,6 +43,14 @@ export const lang = {
         de l'Université de musique et des arts du spectacle de Vienne et ne sont pas partagées avec des tiers.
       </p>
       <p>
+        Les tablatures de luth sont converties en MEI en utilisant 
+        <a href="https://bitbucket.org/bayleaf/luteconv/" target="_blank">luteconv</a> développé par Paul Overell, 
+        via le service <a href="https://codeberg.org/mdwRepository/luteconv-webui" target="_blank">luteconv-webui</a> 
+        développé par Stefan Szepe et <a href="https://luteconv.mdw.ac.at" target="_blank">hébergé par le mdw</a>. 
+        Ce service crée des copies accessibles sur le Web de vos encodages dans le cadre du processus de conversion, 
+        mais celles-ci ne sont accessibles que via une valeur de hachage de lien unique et sont périodiquement supprimées.
+      </p>
+      <p>
         La boîte à outils Verovio est chargée depuis <a href="https://verovio.org" target="_blank">https://verovio.org</a>, 
         hébergée par <a href="https://rism.digital/" target="_blank">RISM Digital Switzerland</a>. 
         Cela permet à mei-friend de rester à jour avec la dernière version de la boîte à outils
@@ -169,6 +177,7 @@ export const lang = {
   staffDownText: { text: "Élément d'un personnel vers le bas" },
   increaseDurText: { text: 'Augmenter la durée' },
   decreaseDurText: { text: 'Réduire la durée' },
+  toggleDotsText: { text: 'Activar punxat' },
   cleanAccidText: { text: 'Vérifier les @accid.ges' },
   renumberMeasuresTestText: { text: 'Renommer les mesures (test)' },
   renumberMeasuresExecText: { text: 'Renommer les mesures (exécution)' },
@@ -180,6 +189,9 @@ export const lang = {
 
   // INSERT MENU ITEM  ELEMENT DE MENU INSERTION
   insertMenuTitle: { text: 'Insérer' },
+  addNoteText: { text: 'Ajouter une note' },
+  convertNoteToRestText: { text: 'Note(s) <=> silence(s)' },
+  toggleChordText: { text: 'Note(s) <=> accord' },
   addDoubleSharpText: { html: 'Double dièse &#119082;' },
   addSharpText: { html: 'Dièse &#9839;' },
   addNaturalText: { html: 'Bécarre &#9838;' },

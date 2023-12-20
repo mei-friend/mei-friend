@@ -507,7 +507,9 @@ export default class Viewer {
     } else {
       // set cursor position in buffer
       let found = utils.setCursorToId(cm, itemId);
-      if (!found) this.showMissingIdsWarning();
+      if (!found) {
+        this.showMissingIdsWarning(e.currentTarget.classList.item(0));
+      }
       this.selectedElements = [];
       this.selectedElements.push(itemId);
       msg += 'newly created: ' + itemId + ', size: ' + this.selectedElements.length;
@@ -526,16 +528,38 @@ export default class Viewer {
     this.allowCursorActivity = true;
   } // handleClickOnNotation()
 
-  showMissingIdsWarning() {
-    this.showAlert(
-      translator.lang.missingIdsWarningAlert.text +
-        ' (' +
-        translator.lang.manipulateMenuTitle.text +
-        '&mdash;' +
-        translator.lang.addIdsText.text +
-        ')',
-      'warning'
-    );
+  showMissingIdsWarning(nodeName = '') {
+    if (
+      [
+        'note',
+        'rest',
+        'chord',
+        'mRest',
+        'multiRest',
+        'beam',
+        'tuplet',
+        'accid',
+        'artic',
+        'bTrem',
+        'fTrem',
+        'ambNote',
+        'mRpt',
+        'mRpt2',
+        'halfmRpt',
+      ]
+        .concat(att.modelControlEvents)
+        .includes(nodeName)
+    ) {
+      this.showAlert(
+        translator.lang.missingIdsWarningAlert.text +
+          ' (' +
+          translator.lang.manipulateMenuTitle.text +
+          '&mdash;' +
+          translator.lang.addIdsText.text +
+          ')',
+        'warning'
+      );
+    }
   } // showMissingIdsWarning()
 
   // when cursor pos in editor changed, update notation location / highlight
@@ -811,9 +835,24 @@ export default class Viewer {
   // set focus to verovioPane in order to ensure working key bindings
   setFocusToVerovioPane() {
     let el = document.getElementById('verovio-panel');
-    el.setAttribute('tabindex', '-1');
+    // el.setAttribute('tabindex', '-1');
     el.focus();
   } // setFocusToVerovioPane()
+
+  /**
+   * Switch focus between notation panel and encoding panel
+   * @param {CodeMirror} cm
+   */
+  switchFocusBetweenNotationAndEncoding(cm) {
+    let vrvP = document.getElementById('notation');
+    if (document.activeElement.closest('#notation')) {
+      console.debug('Viewer.switchFocusBetweenNotationAndEncoding(): Switching now to encoding.', cm);
+      cm.focus();
+    } else {
+      console.debug('Viewer.switchFocusBetweenNotationAndEncoding(): Switching to now notation.', vrvP);
+      vrvP.focus();
+    }
+  } // switchFocusBetweenNotationAndEncoding()
 
   showSettingsPanel() {
     let sp = document.getElementById('settingsPanel');

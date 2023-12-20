@@ -42,6 +42,14 @@ export const lang = {
         Performing Arts Vienna, and is not shared with any third party.
       </p>
       <p>
+        Lute tablatures are converted to MEI using 
+        <a href="https://bitbucket.org/bayleaf/luteconv/" target="_blank">luteconv</a> developed by Paul Overell, 
+        via the <a href="https://codeberg.org/mdwRepository/luteconv-webui" target="_blank">luteconv-webui service</a> 
+        developed by Stefan Szepe and <a href="https://luteconv.mdw.ac.at" target="_blank">hosted by the mdw</a>. 
+        This service creates Web-accessible copies of your encodings as part of the conversion process, but these are 
+        accessible only via a unique link hash value, and are periodically deleted. 
+      </p>
+      <p>
         The Verovio toolkit is loaded from <a href="https://verovio.org" target="_blank">https://verovio.org</a>, hosted by
         <a href="https://rism.digital/" target="_blank">RISM Digital Switzerland</a>. 
         This allows mei-friend to stay up-to-date with the latest toolkit version and
@@ -169,6 +177,7 @@ export const lang = {
   staffDownText: { text: 'Element 1 staff down' },
   increaseDurText: { text: 'Increase duration' },
   decreaseDurText: { text: 'Decrease duration' },
+  toggleDotsText: { text: 'Toggle dotting' },
   cleanAccidText: { text: 'Check @accid.ges' },
   renumberMeasuresTestText: { text: ' Renumber measures (test)' },
   renumberMeasuresExecText: { text: ' Renumber measures (exec)' },
@@ -180,6 +189,9 @@ export const lang = {
 
   // INSERT MENU ITEM
   insertMenuTitle: { text: 'Insert' },
+  addNoteText: { text: 'Add note' },
+  convertNoteToRestText: { text: 'Note(s) <=> rest(s)' },
+  toggleChordText: { text: 'Note(s) <=> chord' },
   addDoubleSharpText: { html: 'Double sharp &#119082;' },
   addSharpText: { html: 'Sharp &#9839;' },
   addNaturalText: { html: 'Natural &#9838;' },

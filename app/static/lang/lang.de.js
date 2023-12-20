@@ -43,6 +43,15 @@ export const lang = {
       Wien läuft, und werden nicht an Dritte weitergegeben.
     </p>
     <p>
+      Lautentabulaturen werden mit <a href="https://bitbucket.org/bayleaf/luteconv/" target="_blank">luteconv</a> 
+      von Paul Overell nach MEI konvertiert, 
+      über den <a href="https://codeberg.org/mdwRepository/luteconv-webui" target="_blank">luteconv-webui-Dienst</a>, 
+      der von Stefan Szepe entwickelt und von der
+      <a href="https://luteconv.mdw.ac.at" target="_blank">mdw</a> zur Verfügung gestellt wird. 
+      Dieser Dienst erstellt webzugängliche Kopien Ihrer Kodierungen als Teil des Konvertierungsprozesses, 
+      diese sind jedoch nur über einen einzigartigen (gehashten) Link zugänglich und werden nach kurzer Zeit wieder gelöscht.
+    </p>
+    <p>
       Das Verovio-Toolkit wird von <a href="https://verovio.org" target="_blank">https://verovio.org</a> geladen 
       und von  <a href="https://rism.digital/" target="_blank">RISM Digital Switzerland</a> gehostet. 
       Dadurch bleibt mei-friend immer auf dem neuesten Stand mit der aktuellen Toolkit-Version 
@@ -167,6 +176,7 @@ export const lang = {
   staffDownText: { text: 'Element eine Notenzeile niedriger' },
   increaseDurText: { text: 'Notendauer erhöhen' },
   decreaseDurText: { text: 'Notendauer verringern' },
+  toggleDotsText: { text: 'Punktierung an/abschalten' },
   cleanAccidText: { text: '@accid.ges überprüfen' },
   renumberMeasuresTestText: { text: ' Takte neu nummerieren (test)' },
   renumberMeasuresExecText: { text: ' Takte neu nummerieren (exec)' },
@@ -178,6 +188,9 @@ export const lang = {
 
   // INSERT MENU ITEM
   insertMenuTitle: { text: 'Einfügen' },
+  addNoteText: { text: 'Note duplizieren' },
+  convertNoteToRestText: { text: 'Note(n) <=> Pause(n)' },
+  toggleChordText: { text: 'Note(n) <=> Akkord' },
   addDoubleSharpText: { html: 'Doppelkreuz &#119082;' },
   addSharpText: { html: 'Kreuz &#9839;' },
   addNaturalText: { html: 'Auflösungszeichen &#9838;' },
@@ -595,8 +608,8 @@ export const lang = {
     description: 'Steuerung anzeigen zur automatischen Notationsaktualisierung',
   },
   controlMenuFontSelector: {
-    text: 'Auswahl der Notationsschrift',
-    description: 'Auswahl der Notationsschrift (SMuFL font) in der Notationskontrollleiste anzeigen',
+    text: 'Auswahl der Notationsschriftart',
+    description: 'Auswahl der Notationsschriftart (SMuFL font) in der Notationskontrollleiste anzeigen',
   },
   controlMenuNavigateArrows: {
     text: 'Navigationspfeile anzeigen',

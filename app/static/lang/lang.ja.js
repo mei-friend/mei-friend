@@ -14,65 +14,70 @@ export const lang = {
   },
   splashBody: {
     html: `
-      <p>
-        mei-friendは<a href="https://music-encoding.org">音楽エンコーディング</a>のエディタで、
-        <a href="https://mdw.ac.at" target="_blank">mdw - ウィーン音楽・演劇アート大学</a>でホストされています。
-        詳細な情報については<a href="https://mei-friend.github.io" target="_blank">詳細なドキュメンテーション</a>
-        をご覧ください。
+   <p>
+      mei-friendは、<a href="https://music-encoding.org">Music Encoding Initiative</a>のエディタで、
+      <a href="https://mdw.ac.at" target="_blank">ウィーン国立音楽大学</a>がホストするプラットフォームです。
+      詳細な情報は<a href="https://mei-friend.github.io" target="_blank">こちら</a>をご覧ください。
       </p>
       <p>
-        mei-friendはブラウザベースのアプリケーションですが、個人データ（編集中のエンコード、アプリケーションの設定、および
-        ログイン詳細など）はブラウザの
-        <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank"
-          >ローカルストレージ</a
-        >に保存され、サーバーに送信または保存されません。
+      mei-friendはブラウザベースのアプリケーションでありながら、個人データ（編集中の楽譜データ、アプリケーションの設定、
+      およびログイン詳細など）はブラウザの<a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank" >ローカルストレージ</a>
+      に保存され、サーバーには送信または保存されません。
+
       </p>
       <p>
-        データはGitHubに明示的にリクエストした場合にのみ送信されます（たとえば、GitHubにログインし、GitHubのリポジトリからエンコードを読み込む、またはGitHub Actionのワークフローをリクエストする場合など）。同様に、選択したSolidプロバイダーに対しても、明示的にリクエストした場合にのみデータが送信されます（たとえば、Solidにログインし、スタンドオフの注釈を読み込むまたは保存する場合など）。
+
+      データは明示的なリクエスト時のみGitHubに送信されます。同様に、選択したSolidプロバイダーに対しても明示的なリクエスト時にのみデータが送信されます。
+
       </p>
       <p>
-        無記名の使用統計情報を収集するために<a href="https://matomo.org/" target="_blank">Matomo</a>
-        を使用しています。これには切り捨てられたIPアドレス（国のレベルでの地理的位置情報を許可しますが、それ以上の識別情報は含まれません）、ブラウザとオペレーティングシステム、リファリングウェブサイトからのアクセス先、訪問の時間と期間、および訪問したページが含まれます。この情報はmdw - ウィーン音楽・演劇アート大学のサーバーで実行されているMatomoインスタンスに保存され、第三者とは共有されません。
+
+      mei-friendは<a href="https://matomo.org/" target="_blank">Matomo</a>を使用して匿名の使用統計情報を収集しています。これには省略されたIPアドレス
+      （国のレベルでの地理的位置情報を許可しますが、それ以上の識別情報は含まれません）、ブラウザ、オペレーティングシステム、参照元ウェブサイト、訪問の時間と期間、
+      および訪問したページが含まれます。この情報はウィーン国立音楽大学のサーバーで実行されているMatomoインスタンスに保存され、第三者とは共有されることはありません。
       </p>
       <p>
-        Verovioツールキットは<a href="https://verovio.org" target="_blank">https://verovio.org</a>からロードされ、
-        <a href="https://rism.digital/" target="_blank">RISM Digital Switzerland</a>がホストしています。 
-        これにより、mei-friendは常に最新のツールキットバージョンを使用できるだけでなく、
-        設定パネルを介してすべてのサポートされているバージョンの選択を提供できます。 
-        mei-friendを使用する際、IPアドレスはRISM Digitalによって表示されるため、注意してください。
+
+      リュートのタブラチュアは、ポール・オベレルによって開発された<a href="https://bitbucket.org/bayleaf/luteconv/" target="_blank">luteconv</a>を使用してMEIに変換され、
+      ステファン・スゼープによって開発された<a href="https://codeberg.org/mdwRepository/luteconv-webui" target="_blank">luteconv-webuiサービス</a>を介して、
+      <a href="https://luteconv.mdw.ac.at" target="_blank">mdwによってホストされています</a>。このサービスは、変換プロセスの一部としてエンコーディングのWebアクセス可能なコピーを作成しますが、
+      これらは一意のリンクハッシュ値を介してのみアクセス可能で、定期的に削除されます。
+      
       </p>
       <p>
-        最後に、MIDI再生はGoogle Magentaが提供するSGM_plusサウンドフォントを使用し、googleapis.comを介して提供されます。そのため、MIDI再生を開始する際にGoogleに対してIPアドレスが表示されます。これを望まない場合は、MIDI再生機能の使用を避けてください。
+
+      Verovioツールキットは<a href="https://verovio.org" target="_blank">https://verovio.org</a>からロードされ、<a href="https://rism.digital/" target="_blank">RISM Digital Switzerland</a>
+      がホストしています。これにより、最新のツールキットバージョンを使用できるだけでなく、設定パネルを介してすべてのサポートされている任意のバージョンを選択できます。mei-friendを使用する際には、
+      IPアドレスがRISM Digitalに表示されることに留意してください。
       </p>
       <p>
-        mei-friendは、mdw - ウィーン音楽・演劇アート大学の音楽音響学部 - ヴィーナークランクシュティールで
-        <a href="https://iwk.mdw.ac.at/werner-goebl" target="_blank">Werner Goebl</a>および
-        <a href="https://iwk.mdw.ac.at/david-weigl" target="_blank">David M. Weigl</a>によって開発され、
-        <a href="https://spdx.org/licenses/AGPL-3.0-or-later.html" target="_blank"
-          >GNU Affero General Public License v3.0</a
-        >の下でライセンスされています。詳細な情報については、
-        <a href="https://mei-friend.github.io/about/" target="_blank">謝辞ページ</a>をご覧ください。
-        このプロジェクトで再利用されるオープンソースコンポーネントについての情報も提供しており、貢献者とガイダンスに感謝しています。
+
+      MIDI再生にはGoogle Magentaが提供するSGM_plusサウンドフォントが使用され、googleapis.comを介して提供されます。そのため、MIDI再生を開始する際にはGoogleに対してIPアドレスが表示されます。
+      これを避ける場合は、MIDI再生機能の使用を控えてください。
+
       </p>
       <p>
-        mei-friend Webアプリケーションの開発は、
-        <a href="https://fwf.ac.at" target="_blank">オーストリア科学振興基金（FWF）</a>のプロジェクト
-        <a href="https://iwk.mdw.ac.at/signature-sound-vienna/" target="_blank"
-          >P 34664-G（Signature Sound Vienna）</a
-        >
-        および<a href="https://e-laute.info">I 6019（E-LAUTE）</a>
-        によって資金提供されています。
+
+        mei-friendは、ウィーン国立音楽大学音楽音響学部 Wiener Klangstil (IWK)で<a href="https://iwk.mdw.ac.at/werner-goebl" target="_blank">Werner Goebl</a>および
+        <a href="https://iwk.mdw.ac.at/david-weigl" target="_blank">David M. Weigl</a>によって開発され、<a href="https://spdx.org/licenses/AGPL-3.0-or-later.html" target="_blank">GNU Affero General Public License v3.0</a>
+        の下でライセンスされています。貢献者やプロジェクト内で再利用されているオープンソースコンポーネントの詳細については、<a href="https://mei-friend.github.io/about/" target="_blank">謝辞</a>をご覧ください。
+        コミュニティから寄せられる大いなる貢献と助言に感謝します。
       </p>
+      <p>
+        mei-friend Webアプリケーションの開発は、<a href="https://fwf.ac.at" target="_blank">オーストリア科学振興基金（FWF）</a>
+        のプロジェクト<a href="https://iwk.mdw.ac.at/signature-sound-vienna/" target="_blank">P 34664-G（Signature Sound Vienna）</a>
+        および<a href="https://e-laute.info">I 6019（E-LAUTE）</a>によって資金提供されています。
+        </p>
     `,
   },
-  splashGotItButtonText: { text: '了解しました！' },
+  splashGotItButtonText: { text: 'わかりました' },
   splashVersionText: { text: 'バージョン' },
   splashAlwaysShow: {
-    text: '常にこのスプラッシュ画面を表示',
+    text: '常にこの画面を表示',
     description: 'アプリケーションの読み込み時に常にこのスプラッシュ画面を表示',
   },
   splashAlwaysShowLabel: {
-    text: '常にこのスプラッシュ画面を表示',
+    text: '常にこの画面を表示',
     description: 'アプリケーションの読み込み時に常にこのスプラッシュ画面を表示',
   },
 
@@ -159,6 +164,7 @@ export const lang = {
   staffDownText: { text: '要素を1段階下げる' },
   increaseDurText: { text: '音価を増やす' },
   decreaseDurText: { text: '音価を減らす' },
+  toggleDotsText: { text: 'トグル・ドッティング' },
   cleanAccidText: { text: '@accid.gesを確認' },
   renumberMeasuresTestText: { text: '小節を再番号付け（テスト）' },
   renumberMeasuresExecText: { text: '小節を再番号付け（実行）' },
@@ -167,7 +173,12 @@ export const lang = {
   reRenderMeiVerovio: { text: 'Verovioで再レンダリング' },
   addFacsimile: { text: 'ファクシミリを追加' },
   ingestFacsimileText: { text: 'ファクシミリ取り込み' },
+
+  // INSERT MENU
   insertMenuTitle: { text: '挿入' },
+  addNoteText: { text: '音符を追加' },
+  convertNoteToRestText: { text: '音符 <=> 休符' },
+  toggleChordText: { text: '音符 <=> 和音' },
   addDoubleSharpText: { html: 'ダブルシャープ &#119082;' },
   addSharpText: { html: 'シャープ &#9839;' },
   addNaturalText: { html: 'ナチュラル &#9838;' },
