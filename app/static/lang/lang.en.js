@@ -280,6 +280,8 @@ export const lang = {
   breaksSelectLine: { text: 'System' },
   breaksSelectEncoded: { text: 'System and page' },
   breaksSelectSmart: { text: 'Smart' },
+  choiceSelect: { description: 'Choose displayed content for choice elements' },
+  choiceDefault: { text: '(default choice)' },
   updateControlsLabel: { text: 'Update', description: 'Control update behavior of notation after changes in encoding' },
   liveUpdateCheckbox: { description: 'Automatically update notation after changes in encoding' },
   codeManualUpdateButton: { description: 'Update notation manually' },
@@ -822,36 +824,41 @@ export const lang = {
     text: 'Show editorial markup elements',
     description: 'Highlight all elements contained by editorial markup elements',
   },
+  alternativeVersionContent: {
+    text: 'Select default content for alternative encodings',
+    description: 'Choose if newly created alternative encodings are empty or copies of the original reading',
+    labels: ['empty', 'copy'],
+  },
   suppliedColor: {
     text: 'Select <supplied> highlight color',
     description: 'Select <supplied> highlight color',
   },
   unclearColor: {
-    title: 'Select <unclear> highlight color',
+    text: 'Select <unclear> highlight color',
     description: 'Select <unclear> highlight color',
   },
   sicColor: {
-    title: 'Select <sic> highlight color',
+    text: 'Select <sic> highlight color',
     description: 'Select <sic> highlight color',
   },
   corrColor: {
-    title: 'Select <corr> highlight color',
+    text: 'Select <corr> highlight color',
     description: 'Select <corr> highlight color',
   },
   origColor: {
-    title: 'Select <orig> highlight color',
+    text: 'Select <orig> highlight color',
     description: 'Select <orig> highlight color',
   },
   regColor: {
-    title: 'Select <reg> highlight color',
+    text: 'Select <reg> highlight color',
     description: 'Select <reg> highlight color',
   },
   addColor: {
-    title: 'Select <add> highlight color',
+    text: 'Select <add> highlight color',
     description: 'Select <add> highlight color',
   },
   delColor: {
-    title: 'Select <del> highlight color',
+    text: 'Select <del> highlight color',
     description: 'Select <del> highlight color',
   },
 

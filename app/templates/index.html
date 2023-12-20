@@ -1,246 +1,225 @@
 <!-- <!DOCTYPE html> -->
 <html>
-  <head>
-    <meta charset="utf-8" />
-    <title>mei-friend</title>
-    <meta name="author" content="Werner Goebl" />
-    <meta name="author" content="David M. Weigl" />
 
-    <meta
-      name="description"
-      content="mei-friend is a ‘last mile’ editor for MEI music encodings
+<head>
+  <meta charset="utf-8" />
+  <title>mei-friend</title>
+  <meta name="author" content="Werner Goebl" />
+  <meta name="author" content="David M. Weigl" />
+
+  <meta name="description" content="mei-friend is a ‘last mile’ editor for MEI music encodings
   intended to alleviate the common task of cleaning up encodings generated via optical music recognition,
   or via conversion from other formats, originally implemented as a plugin package for the Atom text editor.
   The mei-friend Web Application is a reworking of the tool as a full-featured,
   cross-browser compatible Web application, with optimised performance and an extended set of features.
-  The application is available online at https://mei-friend.mdw.ac.at."
-    />
+  The application is available online at https://mei-friend.mdw.ac.at." />
 
-    <meta property="og:image" content="{{ url_for('static', filename='svg/menu-logo.svg') }}" />
-    <meta property="og:description" content="mei-friend is a ‘last mile’ editor for MEI music encodings." />
-    <meta property="og:title" content="mei-friend online editor" />
+  <meta property="og:image" content="{{ url_for('static', filename='svg/menu-logo.svg') }}" />
+  <meta property="og:description" content="mei-friend is a ‘last mile’ editor for MEI music encodings." />
+  <meta property="og:title" content="mei-friend online editor" />
 
-    <meta
-      name="keywords"
-      content="music encoding initiative, MEI, musicXML, humdrum, ABC, PAE,
-  music notation, music editing software, Verovio"
-    />
+  <meta name="keywords" content="music encoding initiative, MEI, musicXML, humdrum, ABC, PAE,
+  music notation, music editing software, Verovio" />
 
-    <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.png') }}" />
-    <!-- TODO: FIX IMPORT OF ICONS -->
-    <!-- <script src="{{ url_for('static', filename='css/icons.js') }}"></script> -->
-    <link rel="stylesheet" id="orientationCSS" href="{{ url_for('static', filename='css/bottom.css') }}" />
-    <link
-      rel="stylesheet"
-      id="facsimileOrientationCSS"
-      href="{{ url_for('static', filename='css/facsimile-bottom.css') }}"
-    />
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.64.0/codemirror.min.js" integrity="sha512-4DlmQ+aBOfYTZ3uzRKCDXdyL7y8IlopnVChhXG0pRFgyvhwONVQW3JX8e5DYoXUNr3evQpLZz7S3O1XxMH4WKA==" crossorigin="anonymous"
+  <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.png') }}" />
+  <!-- TODO: FIX IMPORT OF ICONS -->
+  <!-- <script src="{{ url_for('static', filename='css/icons.js') }}"></script> -->
+  <link rel="stylesheet" id="orientationCSS" href="{{ url_for('static', filename='css/bottom.css') }}" />
+  <link rel="stylesheet" id="facsimileOrientationCSS"
+    href="{{ url_for('static', filename='css/facsimile-bottom.css') }}" />
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.64.0/codemirror.min.js" integrity="sha512-4DlmQ+aBOfYTZ3uzRKCDXdyL7y8IlopnVChhXG0pRFgyvhwONVQW3JX8e5DYoXUNr3evQpLZz7S3O1XxMH4WKA==" crossorigin="anonymous"
     referrerpolicy="no-referrer">
   </script> -->
 
-    <script src="{{ url_for('static', filename='deps/solid-client-authn.bundle.js') }}"></script>
-    <script src="{{ url_for('static', filename='lib/env.js') }}"></script>
-    <script src="{{ url_for('static', filename='lib/jsgit.js') }}"></script>
-    <script src="{{ url_for('static', filename='lib/github.js') }}" type="module"></script>
-    <script src="{{ url_for('static', filename='lib/solid.js') }}" type="module"></script>
-    <script>
-      let isLoggedIn;
-      let root = "{{ url_for('static', filename='') }}";
-    </script>
-    <!-- inject GitHub OAuth response details if available -->
-    {% if isLoggedIn %}
-    <script>
-      isLoggedIn = true;
-      const githubToken = '{{ githubToken }}';
-      const userLogin = '{{ userLogin }}';
-      const userName = '{{ userName }}';
-      const userEmail = '{{ userEmail }}';
-    </script>
-    {% endif %}
-    <script src="{{ url_for('static', filename='CodeMirror/lib/codemirror.js') }}"></script>
-    <link href="{{ url_for('static', filename='CodeMirror/lib/codemirror.css') }}" rel="stylesheet" />
-    <script src="{{ url_for('static', filename='CodeMirror/mode/xml/xml.js') }}"></script>
-    <link href="{{ url_for('static', filename='CodeMirror/theme/abbott.css') }}" rel="stylesheet" />
-    <link href="{{ url_for('static', filename='CodeMirror/theme/base16-dark.css') }}" rel="stylesheet" />
-    <link href="{{ url_for('static', filename='CodeMirror/theme/base16-light.css') }}" rel="stylesheet" />
-    <link href="{{ url_for('static', filename='CodeMirror/theme/cobalt.css') }}" rel="stylesheet" />
-    <link href="{{ url_for('static', filename='CodeMirror/theme/darcula.css') }}" rel="stylesheet" />
-    <link href="{{ url_for('static', filename='CodeMirror/theme/dracula.css') }}" rel="stylesheet" />
-    <link href="{{ url_for('static', filename='CodeMirror/theme/eclipse.css') }}" rel="stylesheet" />
-    <link href="{{ url_for('static', filename='CodeMirror/theme/elegant.css') }}" rel="stylesheet" />
-    <link href="{{ url_for('static', filename='CodeMirror/theme/monokai.css') }}" rel="stylesheet" />
-    <link href="{{ url_for('static', filename='CodeMirror/theme/idea.css') }}" rel="stylesheet" />
-    <link href="{{ url_for('static', filename='CodeMirror/theme/juejin.css') }}" rel="stylesheet" />
-    <link href="{{ url_for('static', filename='CodeMirror/theme/mdn-like.css') }}" rel="stylesheet" />
-    <link href="{{ url_for('static', filename='CodeMirror/theme/neo.css') }}" rel="stylesheet" />
-    <link href="{{ url_for('static', filename='CodeMirror/theme/paraiso-dark.css') }}" rel="stylesheet" />
-    <link href="{{ url_for('static', filename='CodeMirror/theme/paraiso-light.css') }}" rel="stylesheet" />
-    <link href="{{ url_for('static', filename='CodeMirror/theme/pastel-on-dark.css') }}" rel="stylesheet" />
-    <link href="{{ url_for('static', filename='CodeMirror/theme/solarized.css') }}" rel="stylesheet" />
-    <link href="{{ url_for('static', filename='CodeMirror/theme/xq-dark.css') }}" rel="stylesheet" />
-    <link href="{{ url_for('static', filename='CodeMirror/theme/xq-light.css') }}" rel="stylesheet" />
-    <link href="{{ url_for('static', filename='CodeMirror/theme/yeti.css') }}" rel="stylesheet" />
-    <link href="{{ url_for('static', filename='CodeMirror/theme/yonce.css') }}" rel="stylesheet" />
-    <link href="{{ url_for('static', filename='CodeMirror/theme/zenburn.css') }}" rel="stylesheet" />
-    <script src="{{ url_for('static', filename='CodeMirror/addon/edit/closetag.js') }}"></script>
-    <script src="{{ url_for('static', filename='CodeMirror/addon/edit/closebrackets.js') }}"></script>
-    <script src="{{ url_for('static', filename='CodeMirror/addon/edit/matchtags.js') }}"></script>
-    <script src="{{ url_for('static', filename='CodeMirror/addon/edit/trailingspace.js') }}"></script>
-    <script src="{{ url_for('static', filename='CodeMirror/addon/fold/xml-fold.js') }}"></script>
-    <script src="{{ url_for('static', filename='CodeMirror/addon/fold/foldcode.js') }}"></script>
-    <script src="{{ url_for('static', filename='CodeMirror/addon/fold/foldgutter.js') }}"></script>
-    <script src="{{ url_for('static', filename='CodeMirror/addon/search/search.js') }}"></script>
-    <script src="{{ url_for('static', filename='CodeMirror/addon/search/searchcursor.js') }}"></script>
-    <script src="{{ url_for('static', filename='CodeMirror/addon/search/jump-to-line.js') }}"></script>
-    <script src="{{ url_for('static', filename='CodeMirror/addon/dialog/dialog.js') }}"></script>
-    <link href="{{ url_for('static', filename='CodeMirror/addon/dialog/dialog.css') }}" rel="stylesheet" />
-    <script src="{{ url_for('static', filename='CodeMirror/addon/hint/show-hint.js') }}"></script>
-    <script src="{{ url_for('static', filename='CodeMirror/addon/hint/xml-hint.js') }}"></script>
-    <link href="{{ url_for('static', filename='CodeMirror/addon/hint/show-hint.css') }}" rel="stylesheet" />
-    <link href="{{ url_for('static', filename='CodeMirror/addon/lint/lint.css') }}" rel="stylesheet" />
-    <script src="{{ url_for('static', filename='CodeMirror/addon/lint/lint.js') }}"></script>
-    <!-- <script src="{{ url_for('static', filename='CodeMirror/keymap/emacs.js') }}"></script>
+  <script src="{{ url_for('static', filename='deps/solid-client-authn.bundle.js') }}"></script>
+  <script src="{{ url_for('static', filename='lib/env.js') }}"></script>
+  <script src="{{ url_for('static', filename='lib/jsgit.js') }}"></script>
+  <script src="{{ url_for('static', filename='lib/github.js') }}" type="module"></script>
+  <script src="{{ url_for('static', filename='lib/solid.js') }}" type="module"></script>
+  <script>
+    let isLoggedIn;
+    let root = "{{ url_for('static', filename='') }}";
+  </script>
+  <!-- inject GitHub OAuth response details if available -->
+  {% if isLoggedIn %}
+  <script>
+    isLoggedIn = true;
+    const githubToken = '{{ githubToken }}';
+    const userLogin = '{{ userLogin }}';
+    const userName = '{{ userName }}';
+    const userEmail = '{{ userEmail }}';
+  </script>
+  {% endif %}
+  <script src="{{ url_for('static', filename='CodeMirror/lib/codemirror.js') }}"></script>
+  <link href="{{ url_for('static', filename='CodeMirror/lib/codemirror.css') }}" rel="stylesheet" />
+  <script src="{{ url_for('static', filename='CodeMirror/mode/xml/xml.js') }}"></script>
+  <link href="{{ url_for('static', filename='CodeMirror/theme/abbott.css') }}" rel="stylesheet" />
+  <link href="{{ url_for('static', filename='CodeMirror/theme/base16-dark.css') }}" rel="stylesheet" />
+  <link href="{{ url_for('static', filename='CodeMirror/theme/base16-light.css') }}" rel="stylesheet" />
+  <link href="{{ url_for('static', filename='CodeMirror/theme/cobalt.css') }}" rel="stylesheet" />
+  <link href="{{ url_for('static', filename='CodeMirror/theme/darcula.css') }}" rel="stylesheet" />
+  <link href="{{ url_for('static', filename='CodeMirror/theme/dracula.css') }}" rel="stylesheet" />
+  <link href="{{ url_for('static', filename='CodeMirror/theme/eclipse.css') }}" rel="stylesheet" />
+  <link href="{{ url_for('static', filename='CodeMirror/theme/elegant.css') }}" rel="stylesheet" />
+  <link href="{{ url_for('static', filename='CodeMirror/theme/monokai.css') }}" rel="stylesheet" />
+  <link href="{{ url_for('static', filename='CodeMirror/theme/idea.css') }}" rel="stylesheet" />
+  <link href="{{ url_for('static', filename='CodeMirror/theme/juejin.css') }}" rel="stylesheet" />
+  <link href="{{ url_for('static', filename='CodeMirror/theme/mdn-like.css') }}" rel="stylesheet" />
+  <link href="{{ url_for('static', filename='CodeMirror/theme/neo.css') }}" rel="stylesheet" />
+  <link href="{{ url_for('static', filename='CodeMirror/theme/paraiso-dark.css') }}" rel="stylesheet" />
+  <link href="{{ url_for('static', filename='CodeMirror/theme/paraiso-light.css') }}" rel="stylesheet" />
+  <link href="{{ url_for('static', filename='CodeMirror/theme/pastel-on-dark.css') }}" rel="stylesheet" />
+  <link href="{{ url_for('static', filename='CodeMirror/theme/solarized.css') }}" rel="stylesheet" />
+  <link href="{{ url_for('static', filename='CodeMirror/theme/xq-dark.css') }}" rel="stylesheet" />
+  <link href="{{ url_for('static', filename='CodeMirror/theme/xq-light.css') }}" rel="stylesheet" />
+  <link href="{{ url_for('static', filename='CodeMirror/theme/yeti.css') }}" rel="stylesheet" />
+  <link href="{{ url_for('static', filename='CodeMirror/theme/yonce.css') }}" rel="stylesheet" />
+  <link href="{{ url_for('static', filename='CodeMirror/theme/zenburn.css') }}" rel="stylesheet" />
+  <script src="{{ url_for('static', filename='CodeMirror/addon/edit/closetag.js') }}"></script>
+  <script src="{{ url_for('static', filename='CodeMirror/addon/edit/closebrackets.js') }}"></script>
+  <script src="{{ url_for('static', filename='CodeMirror/addon/edit/matchtags.js') }}"></script>
+  <script src="{{ url_for('static', filename='CodeMirror/addon/edit/trailingspace.js') }}"></script>
+  <script src="{{ url_for('static', filename='CodeMirror/addon/fold/xml-fold.js') }}"></script>
+  <script src="{{ url_for('static', filename='CodeMirror/addon/fold/foldcode.js') }}"></script>
+  <script src="{{ url_for('static', filename='CodeMirror/addon/fold/foldgutter.js') }}"></script>
+  <script src="{{ url_for('static', filename='CodeMirror/addon/search/search.js') }}"></script>
+  <script src="{{ url_for('static', filename='CodeMirror/addon/search/searchcursor.js') }}"></script>
+  <script src="{{ url_for('static', filename='CodeMirror/addon/search/jump-to-line.js') }}"></script>
+  <script src="{{ url_for('static', filename='CodeMirror/addon/dialog/dialog.js') }}"></script>
+  <link href="{{ url_for('static', filename='CodeMirror/addon/dialog/dialog.css') }}" rel="stylesheet" />
+  <script src="{{ url_for('static', filename='CodeMirror/addon/hint/show-hint.js') }}"></script>
+  <script src="{{ url_for('static', filename='CodeMirror/addon/hint/xml-hint.js') }}"></script>
+  <link href="{{ url_for('static', filename='CodeMirror/addon/hint/show-hint.css') }}" rel="stylesheet" />
+  <link href="{{ url_for('static', filename='CodeMirror/addon/lint/lint.css') }}" rel="stylesheet" />
+  <script src="{{ url_for('static', filename='CodeMirror/addon/lint/lint.js') }}"></script>
+  <!-- <script src="{{ url_for('static', filename='CodeMirror/keymap/emacs.js') }}"></script>
   <script src="{{ url_for('static', filename='CodeMirror/keymap/vim.js') }}"></script> -->
 
-    <script
-      src="{{ url_for('static', filename='deps/CodeMirror_emacs.min.js') }}"
-      integrity="sha512-JRRAFgTvx2rg2AO6juzwLSqaBfA5MVnZAdnWNwgsLIAnjYsMI6liEnBjFgIbskM3oi5hHBLGCzwZUMd6Nsee8Q=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    ></script>
-    <script
-      src="{{ url_for('static', filename='deps/CodeMirror_vim.min.js') }}"
-      integrity="sha512-px+d4ezEJ2hi3SHqwRziL871LTHSqfj1GxV1Cp78Sp/SAMEIJwxKNDGcQz96FEv/IqRPLcJ848BWhSUM7msEGQ=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    ></script>
+  <script src="{{ url_for('static', filename='deps/CodeMirror_emacs.min.js') }}"
+    integrity="sha512-JRRAFgTvx2rg2AO6juzwLSqaBfA5MVnZAdnWNwgsLIAnjYsMI6liEnBjFgIbskM3oi5hHBLGCzwZUMd6Nsee8Q=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="{{ url_for('static', filename='deps/CodeMirror_vim.min.js') }}"
+    integrity="sha512-px+d4ezEJ2hi3SHqwRziL871LTHSqfj1GxV1Cp78Sp/SAMEIJwxKNDGcQz96FEv/IqRPLcJ848BWhSUM7msEGQ=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
-    <!-- Load Google Magenta html MIDI player  -->
-    <script src="{{ url_for('static', filename='deps/html-midi-player.bundle.js') }}"></script>
-    <script type="text/javascript">
-      // get another handle on html-midi-player's 'core' variable to prevent namespace clash with 'core' defined by jsonld
-      var midiCore = core;
-    </script>
+  <!-- Load Google Magenta html MIDI player  -->
+  <script src="{{ url_for('static', filename='deps/html-midi-player.bundle.js') }}"></script>
+  <script type="text/javascript">
+    // get another handle on html-midi-player's 'core' variable to prevent namespace clash with 'core' defined by jsonld
+    var midiCore = core;
+  </script>
 
-    <script src="{{ url_for('static', filename='deps/js-yaml.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='deps/jsonld.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='deps/fast-json-patch.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='deps/js-yaml.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='deps/jsonld.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='deps/fast-json-patch.min.js') }}"></script>
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/default.css') }}" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/annotationPanel.css') }}" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/icons.css') }}" />
-    <script type="module" src="{{ url_for('static', filename='lib/main.js') }}"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/default.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/annotationPanel.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/icons.css') }}" />
+  <script type="module" src="{{ url_for('static', filename='lib/main.js') }}"></script>
 
-    <!-- Load Matomo@mdw.ac.at -->
-    <script type="text/javascript">
-      var _paq = (window._paq = window._paq || []);
-      /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
-      _paq.push(['setDoNotTrack', true]);
-      _paq.push(['requireCookieConsent']);
-      if (
-        (function () {
-          try {
-            return JSON.parse(unescape(('; ' + document.cookie).split('; consent=').pop().split(';').shift())).tracking;
-          } catch (e) {
-            return false;
-          }
-        })()
-      ) {
-        _paq.push(['setCookieConsentGiven']);
-      } else {
-        _paq.push(['forgetCookieConsentGiven']);
-      }
-      _paq.push(['trackPageView']);
-      _paq.push(['enableLinkTracking']);
+  <!-- Load Matomo@mdw.ac.at -->
+  <script type="text/javascript">
+    var _paq = (window._paq = window._paq || []);
+    /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+    _paq.push(['setDoNotTrack', true]);
+    _paq.push(['requireCookieConsent']);
+    if (
       (function () {
-        var u = '//mdw.ac.at/piwik/';
-        _paq.push(['setTrackerUrl', u + 'matomo.php']);
-        _paq.push(['setSiteId', '1000092']);
-        var d = document,
-          g = d.createElement('script'),
-          s = d.getElementsByTagName('script')[0];
-        g.type = 'text/javascript';
-        g.async = true;
-        g.src = u + 'matomo.js';
-        s.parentNode.insertBefore(g, s);
-      })();
-    </script>
-    <noscript>
-      <p><img src="//mdw.ac.at/piwik/matomo.php?idsite=1000092&amp;rec=1" style="border: 0" alt="" /></p>
-    </noscript>
-    <!-- End Matomo Code -->
-  </head>
+        try {
+          return JSON.parse(unescape(('; ' + document.cookie).split('; consent=').pop().split(';').shift())).tracking;
+        } catch (e) {
+          return false;
+        }
+      })()
+    ) {
+      _paq.push(['setCookieConsentGiven']);
+    } else {
+      _paq.push(['forgetCookieConsentGiven']);
+    }
+    _paq.push(['trackPageView']);
+    _paq.push(['enableLinkTracking']);
+    (function () {
+      var u = '//mdw.ac.at/piwik/';
+      _paq.push(['setTrackerUrl', u + 'matomo.php']);
+      _paq.push(['setSiteId', '1000092']);
+      var d = document,
+        g = d.createElement('script'),
+        s = d.getElementsByTagName('script')[0];
+      g.type = 'text/javascript';
+      g.async = true;
+      g.src = u + 'matomo.js';
+      s.parentNode.insertBefore(g, s);
+    })();
+  </script>
+  <noscript>
+    <p><img src="//mdw.ac.at/piwik/matomo.php?idsite=1000092&amp;rec=1" style="border: 0" alt="" /></p>
+  </noscript>
+  <!-- End Matomo Code -->
+</head>
 
-  <body>
-    <div class="header">
-      <div class="title">
-        <a href="https://mei-friend.mdw.ac.at/"
-          ><img src="{{ url_for('static', filename='owl/menu-logo.svg') }}" alt="mei-friend" id="mei-friend-logo"
-        /></a>
+<body>
+  <div class="header">
+    <div class="title">
+      <a href="https://mei-friend.mdw.ac.at/"><img src="{{ url_for('static', filename='owl/menu-logo.svg') }}"
+          alt="mei-friend" id="mei-friend-logo" /></a>
+    </div>
+    <div class="navbar" id="menuBar">
+      <div class="dropdown">
+        <button class="dropbtn GithubButton" id="GithubButton">
+          <svg id="GithubLogo" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+            <path fill-rule="evenodd"
+              d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z" />
+          </svg>
+          <span id="GithubName"><a href="login" id="githubLoginLink">Login</a></span>
+        </button>
+        <div class="dropdownContent loggedOut" id="GithubMenu"></div>
       </div>
-      <div class="navbar" id="menuBar">
-        <div class="dropdown">
-          <button class="dropbtn GithubButton" id="GithubButton">
-            <svg id="GithubLogo" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-              <path
-                fill-rule="evenodd"
-                d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"
-              />
-            </svg>
-            <span id="GithubName"><a href="login" id="githubLoginLink">Login</a></span>
-          </button>
-          <div class="dropdownContent loggedOut" id="GithubMenu"></div>
+      <div class="dropdown">
+        <button id="fileMenuTitle" class="dropbtn">File</button>
+        <div class="dropdownContent" id="FileMenu">
+          <a id="openMei" href="#"><span id="openMeiText">Open file</span><span class="keyShortCut cmdKey">O</span></a>
+          <a id="openUrl" href="#"><span id="openUrlText">Open URL</span></a>
+          <a id="openExample" href="#">Public repertoire</a>
+          <a id="importMusicXml" href="#">Import MusicXML</a>
+          <a id="importHumdrum" href="#">Import Humdrum</a>
+          <a id="importPae" href="#">Import PAE, ABC</a>
+          <hr class="dropdownLine" />
+          <a id="saveMei" href="#"><span id="saveMeiText">Save MEI</span><span class="keyShortCut cmdKey">S</span></a>
+          <a id="saveMeiBasic" href="#"><span id="saveMeiBasicText">Save as MEI Basic</span><span
+              class="keyShortCut shiftKey cmdKey">B</span></a>
+          <a id="saveSvg" href="#">Save SVG</a>
+          <a id="saveMidi" href="#">Save MIDI</a>
+          <a id="printPreview" href="#"><span id="printPreviewText">Preview PDF</span><span
+              class="keyShortCut cmdKey">P</span></a>
+          <hr class="dropdownLine" />
+          <a id="generateUrlMenu" href="#">
+            <span id="generateUrlText">Generate mei-friend URL</span>
+            <span class="keyShortCut cmdKey">L</span>
+          </a>
         </div>
-        <div class="dropdown">
-          <button id="fileMenuTitle" class="dropbtn">File</button>
-          <div class="dropdownContent" id="FileMenu">
-            <a id="openMei" href="#"
-              ><span id="openMeiText">Open file</span><span class="keyShortCut cmdKey">O</span></a
-            >
-            <a id="openUrl" href="#"><span id="openUrlText">Open URL</span></a>
-            <a id="openExample" href="#">Public repertoire</a>
-            <a id="importMusicXml" href="#">Import MusicXML</a>
-            <a id="importHumdrum" href="#">Import Humdrum</a>
-            <a id="importPae" href="#">Import PAE, ABC</a>
-            <hr class="dropdownLine" />
-            <a id="saveMei" href="#"><span id="saveMeiText">Save MEI</span><span class="keyShortCut cmdKey">S</span></a>
-            <a id="saveMeiBasic" href="#"
-              ><span id="saveMeiBasicText">Save as MEI Basic</span><span class="keyShortCut shiftKey cmdKey">B</span></a
-            >
-            <a id="saveSvg" href="#">Save SVG</a>
-            <a id="saveMidi" href="#">Save MIDI</a>
-            <a id="printPreview" href="#"
-              ><span id="printPreviewText">Preview PDF</span><span class="keyShortCut cmdKey">P</span></a
-            >
-            <hr class="dropdownLine" />
-            <a id="generateUrlMenu" href="#">
-              <span id="generateUrlText">Generate mei-friend URL</span>
-              <span class="keyShortCut cmdKey">L</span>
-            </a>
-          </div>
-        </div>
-        <div class="dropdown">
-          <button id="editMenuTitle" class="dropbtn">Code</button>
-          <div class="dropdownContent" id="EditMenu">
-            <a id="undoMenu" href="#">
-              <span id="undoMenuText">Undo</span>
-              <span class="keyShortCut cmdKey">Z</span>
-            </a>
-            <a id="redoMenu" href="#">
-              <span id="redoMenuText">Redo</span>
-              <span class="keyShortCut shiftKey cmdKey">Z</span>
-            </a>
-            <hr class="dropdownLine" />
-            <a id="startSearch" href="#">
-              <span id="startSearchText">Search</span>
-              <span class="keyShortCut cmdKey">F</span>
-            </a>
-            <a id="findNext" href="#">
-              <span id="findNextText">Find next</span>
-              <span class="keyShortCut cmdKey">G</span>
-            </a>
+      </div>
+      <div class="dropdown">
+        <button id="editMenuTitle" class="dropbtn">Code</button>
+        <div class="dropdownContent" id="EditMenu">
+          <a id="undoMenu" href="#">
+            <span id="undoMenuText">Undo</span>
+            <span class="keyShortCut cmdKey">Z</span>
+          </a>
+          <a id="redoMenu" href="#">
+            <span id="redoMenuText">Redo</span>
+            <span class="keyShortCut shiftKey cmdKey">Z</span>
+          </a>
+          <hr class="dropdownLine" />
+          <a id="startSearch" href="#">
+            <span id="startSearchText">Search</span>
+            <span class="keyShortCut cmdKey">F</span>
+          </a>
+          <a id="findNext" href="#">
+            <span id="findNextText">Find next</span>
+            <span class="keyShortCut cmdKey">G</span>
+          </a>
           <a id="findPrevious" href="#">
             <span id="findPreviousText">Find previous</span>
             <span class="keyShortCut shiftKey cmdKey">G</span>
@@ -335,7 +314,7 @@
           <a id="delete" href="#">
             <span id="deleteText">Delete element</span>
             <span class="keyShortCut">
-              <span class="keyIcon">⌫</span>, 
+              <span class="keyIcon">⌫</span>,
               <span class="keyIcon">DEL</span>
             </span>
           </a>
@@ -591,9 +570,8 @@
             <span id="goToHelpPageText">Show mei-friend help pages</span>
             <span class="keyShortCut cmdKey">?</span>
           </a>
-          <a id="goToCheatSheet" href="https://mei-friend.github.io/cheatsheet/" target="_blank"
-            >Show mei-friend cheat sheet</a
-          >
+          <a id="goToCheatSheet" href="https://mei-friend.github.io/cheatsheet/" target="_blank">Show mei-friend cheat
+            sheet</a>
           <a id="showChangelog" href="#" target="_blank">Show mei-friend changelog</a>
           <hr class="dropdownLine" />
           <a id="goToGuidelines" href="https://music-encoding.org/guidelines" target="_blank">Show MEI Guidelines</a>
@@ -602,9 +580,8 @@
             <span class="keyShortCut altKey">.</span>
           </a>
           <hr class="dropdownLine" />
-          <a id="provideFeedback" href="https://github.com/mei-friend/mei-friend/issues/new/choose" target="_blank"
-            >Provide feedback</a
-          >
+          <a id="provideFeedback" href="https://github.com/mei-friend/mei-friend/issues/new/choose"
+            target="_blank">Provide feedback</a>
           <hr class="dropdownLine" />
           <a id="resetDefault" href="#">Reset to default</a>
         </div>
@@ -620,7 +597,7 @@
     <div class="fillSpace"></div>
     <div id="showLanguageSelectionButton" class="settingsButton">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16">
-        <path 
+        <path
           d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0ZM5.78 8.75a9.64 9.64 0 0 0 1.363 4.177c.255.426.542.832.857 1.215.245-.296.551-.705.857-1.215A9.64 9.64 0 0 0 10.22 8.75Zm4.44-1.5a9.64 9.64 0 0 0-1.363-4.177c-.307-.51-.612-.919-.857-1.215a9.927 9.927 0 0 0-.857 1.215A9.64 9.64 0 0 0 5.78 7.25Zm-5.944 1.5H1.543a6.507 6.507 0 0 0 4.666 5.5c-.123-.181-.24-.365-.352-.552-.715-1.192-1.437-2.874-1.581-4.948Zm-2.733-1.5h2.733c.144-2.074.866-3.756 1.58-4.948.12-.197.237-.381.353-.552a6.507 6.507 0 0 0-4.666 5.5Zm10.181 1.5c-.144 2.074-.866 3.756-1.58 4.948-.12.197-.237.381-.353.552a6.507 6.507 0 0 0 4.666-5.5Zm2.733-1.5a6.507 6.507 0 0 0-4.666-5.5c.123.181.24.365.353.552.714 1.192 1.436 2.874 1.58 4.948Z">
         </path>
       </svg>
@@ -661,261 +638,229 @@
     </div>
   </div>
 
-    <div class="dragContainer">
-      <div id="splashOverlay">
-        <div id="splash">
-          <div id="splashHeader">
-            <img src="{{ url_for('static', filename='owl/menu-logo.svg') }}" alt="mei-friend" id="splashLogo" />
+  <div class="dragContainer">
+    <div id="splashOverlay">
+      <div id="splash">
+        <div id="splashHeader">
+          <img src="{{ url_for('static', filename='owl/menu-logo.svg') }}" alt="mei-friend" id="splashLogo" />
+        </div>
+        <div id="splashBody"></div>
+        <div id="splashFooter">
+          <div id="splashVersion">
+            <span id="splashVersionText">Version</span>: <span id="splashVersionNumber"></span>
           </div>
-          <div id="splashBody"></div>
-          <div id="splashFooter">
-            <div id="splashVersion">
-              <span id="splashVersionText">Version</span>: <span id="splashVersionNumber"></span>
-            </div>
-            <button id="splashConfirmButton">
-              <span id="splashGotItButtonText">Got it!</span>
-            </button>
-            <span id="splashAlwaysShowCtrl">
-              <input
-                id="splashAlwaysShow"
-                type="checkbox"
-                title="Always show this splash screen on application load"
-              />
-              <label
-                id="splashAlwaysShowLabel"
-                for="splashAlwaysShow"
-                title="Always show this splash screen on application load"
-                >Always show this splash screen</label
-              >
-            </span>
-          </div>
+          <button id="splashConfirmButton">
+            <span id="splashGotItButtonText">Got it!</span>
+          </button>
+          <span id="splashAlwaysShowCtrl">
+            <input id="splashAlwaysShow" type="checkbox" title="Always show this splash screen on application load" />
+            <label id="splashAlwaysShowLabel" for="splashAlwaysShow"
+              title="Always show this splash screen on application load">Always show this splash screen</label>
+          </span>
         </div>
       </div>
-      <div class="dragOverlay">
-        <div class="dragOverlayText" id="dragOverlayText">Drag your input file here.</div>
-      </div>
-      <div id="solidOverlay">
-        <div id="solidLoadingIndicator">
-          <svg
-            class="clockwise"
-            version="1.1"
-            id="solid_loading"
-            xmlns="http://www.w3.org/2000/svg"
-            xmlns:xlink="http://www.w3.org/1999/xlink"
-            x="0px"
-            y="0px"
-            viewBox="0 0 1200 1200"
-            style="enable-background: new 0 0 1200 1200"
-            xml:space="preserve"
-          >
-            <title>Restoring Solid session - press 'esc' to cancel</title>
-            <style type="text/css">
-              .st0 {
-                fill: #7c4dff;
-              }
-              .st1 {
-                fill: #f7f7f7;
-              }
-              .st2 {
-                opacity: 0.3;
-                fill: #444444;
-              }
-            </style>
-            <path
-              class="st0"
-              d="M321.1,983.5L128.8,650c-17.8-30.9-17.8-69,0-99.9l192.3-333.5c17.9-31,50.9-50,86.6-50h384.5  c35.7,0,68.8,19.1,86.6,50L1071.2,550c17.8,30.9,17.8,69,0,99.9L878.9,983.5c-17.9,31-50.9,50-86.6,50H407.8  C372,1033.5,339,1014.4,321.1,983.5z"
-            />
-            <path
-              class="st1"
-              d="M421.4,522.4H817c4.9,0,8.9-4,8.9-8.9v-74.1c0-49.3-40-89.3-89.3-89.3H499.1  C430,350,374,406,374,475.1v0C374,501.2,395.2,522.4,421.4,522.4z"
-            />
-            <path
-              class="st1"
-              d="M460.2,850h236.4c71.4,0,129.3-57.9,129.3-129.3v0c0-23.8-19.3-43.1-43.1-43.1H382.6  c-4.8,0-8.6,3.9-8.6,8.6v77.6C374,811.4,412.6,850,460.2,850z"
-            />
-            <path
-              class="st1"
-              d="M391.5,512.6l295,295c19.5,19.5,51.2,19.5,70.7,0l51.2-51.2c19.5-19.5,19.5-51.2,0-70.7l-295-295  c-19.5-19.5-51.2-19.5-70.7,0l-51.2,51.2C372,461.4,372,493.1,391.5,512.6z"
-            />
-            polygon class="st2" points="691.4,812.5 518.1,677.6 556.5,677.6 "/>
-            <polygon class="st2" points="508.6,385.8 645.2,522.4 691.4,522.4 " />
-            <script xmlns="" />
-          </svg>
-          <p id="solidOverlayCancel">Restoring Solid session - press <span>esc</span> or click here to cancel</p>
-        </div>
-      </div>
-      <div id="githubActionsOverlay">
-        <div id="githubActionsUI">
-          <h3 id="githubActionsHeading">
-            <span id="githubActionsHeadingText">Request GitHub Action workflow:</span>
-            <span id="requestedWorkflowName"></span>
-          </h3>
-          <p id="githubActionsDescription">
-            Click on "Run workflow" to ask the GitHub API to run the above workflow for you, using the input
-            configuration specified below. Your encoding will be reloaded in its latest version once the workflow run
-            completes.
-          </p>
-          <div id="githubActionsInputConfigContainer"></div>
-          <p id="githubActionsStatus"></p>
-          <div id="githubActionsButtons">
-            <button id="githubActionsRunButton">Run workflow</button>
-            <button id="githubActionsCancelButton">Cancel</button>
-          </div>
-        </div>
-      </div>
-      <div class="openUrlOverlay">
-        <div class="openUrlUI">
-          <div id="openUrlUIGrouping">
-            <h3 id="openUrlHeading">Open Web-hosted encoding by URL</h3>
-            <p id="openUrlInstructions">
-              Please choose from the public repertoire or enter the URL of a Web-hosted music encoding, below. Note:
-              Host server must support cross-origin resource sharing (CORS).
-            </p>
-            <details>
-              <summary id="publicRepertoireSummary">Public repertoire</summary>
-              <div>
-                <div>
-                  <label for="sampleEncodingsComposer" id="sampleEncodingsComposerLabel">Composer:</label>
-                  <select id="sampleEncodingsComposer" name="sampleEncodingsComposer"></select>
-                </div>
-                <div>
-                  <label for="sampleEncodingsEncoding" id="sampleEncodingsEncodingLabel">Encoding:</label>
-                  <select id="sampleEncodingsEncoding" name="sampleEncodingsEncoding">
-                    <option value="" id="sampleEncodingsOptionLabel">Choose an encoding...</option>
-                  </select>
-                </div>
-              </div>
-            </details>
-            <div id="openUrlInputWrapper">
-              <input id="openUrlInput" type="text" placeholder="http://..." />
-              <button id="openUrlButton">Open URL</button>
-              <button id="openUrlCancel">Cancel</button>
-            </div>
-            <span id="openUrlStatus"></span>
-            <p id="proposePublicRepertoire">
-              We welcome proposals for
-              <a
-                target="_blank"
-                href="https://github.com/mei-friend/mei-friend/issues/new?template=public_repertoire.md"
-                >additions to the public repertoire</a
-              >.
-            </p>
-          </div>
-        </div>
-      </div>
-      <div class="forkRepositoryOverlay" id="forkAndOpenOverlay">
-        <div class="forkRepositoryUI">
-          <div class="forkRepositoryUIGrouping">
-            <h3>
-              <img
-                id="forkRepoGithubLogo"
-                class="forkRepoGithubLogo"
-                src="{{ url_for('static', filename='img/GitHub-Mark-32px.png') }}"
-              />
-              <span id="forkRepoGithubText">Fork Github Repository</span>
-            </h3>
-            <p id="forkRepoGithubExplanation">
-              The link you have followed will create a GitHub fork of the following repository for editing in
-              mei-friend:
-            </p>
-            <p id="forkRepoRequested" />
-            <p id="forkRepoGithubConfirm">Is this OK?</p>
-            <div id="forkAndOpenInputWrapper">
-              <label for="forkAndOpenSelector" id="forkRepositoryToSelectorText">Fork to: </label>
-              <select id="forkAndOpenSelector" name="forkAndOpenSelector"></select>
-              <button id="forkAndOpenButton" class="forkRepositoryButton">Fork repository</button>
-              <button id="forkAndOpenCancel">Cancel</button>
-            </div>
-            <span id="forkAndOpenStatus" class="forkRepositoryStatus" />
-          </div>
-        </div>
-      </div>
-      <div class="forkRepositoryOverlay" id="forkRepositoryOverlay">
-        <div class="forkRepositoryUI">
-          <div class="forkRepositoryUIGrouping">
-            <h3>
-              <img class="forkRepoGithubLogo" src="{{ url_for('static', filename='img/GitHub-Mark-32px.png') }}" />
-              <span id="forkRepositoryGithubText">Fork Github Repository</span>
-            </h3>
-            <p id="forkRepositoryInstructions">
-              Please choose from the public repertoire or enter the Github (user or organization) name and the
-              repository name of a Github-hosted repository, below. Your forked repository will become available from
-              the Github menu.
-            </p>
-            <details>
-              <summary id="forkRepertoireSummary">Public repertoire</summary>
-              <div>
-                <div>
-                  <label for="forkRepertoireComposer" id="forkRepertoireComposerLabel">Composer:</label>
-                  <select id="forkRepertoireComposer" name="forkRepertoireComposer"></select>
-                </div>
-                <div>
-                  <label for="forkRepertoireOrganization" id="forkRepertoireOrganizationLabel">Organization:</label>
-                  <select id="forkRepertoireOrganization" name="forkRepertoireOrganization">
-                    <option value="" id="forkRepertoireOrganizationOption">Choose a GitHub Organization...</option>
-                  </select>
-                </div>
-                <div>
-                  <label for="forkRepertoireRepository" id="forkRepertoireRepositoryLabel">Repository:</label>
-                  <select id="forkRepertoireRepository" name="forkRepertoireRepository">
-                    <option value="" id="forkRepertoireRepositoryOption">Choose an encoding...</option>
-                  </select>
-                </div>
-              </div>
-            </details>
-            <div id="forkRepositoryInputWrapper">
-              <input id="forkRepositoryInputName" type="text" placeholder="Github user or organization" />
-              <input id="forkRepositoryInputRepoOverride" type="hidden" />
-              <input id="forkRepositoryInputBranchOverride" type="hidden" />
-              <input id="forkRepositoryInputFilepathOverride" type="hidden" />
-              <select id="forkRepositoryInputRepo" name="forkRepositoryInputRepo">
-                <option value="" disabled selected hidden>Choose a repository</option>
-              </select>
-              <label for="forkRepositoryToSelector" id="forkRepositoryToSelectorText">Fork to: </label>
-              <select id="forkRepositoryToSelector" name="forkRepositoryToSelector"></select>
-              <button id="forkRepositoryButton" class="forkRepositoryButton">Fork repository</button>
-              <button id="forkRepositoryCancel">Cancel</button>
-            </div>
-            <span id="forkRepositoryStatus" class="forkRepositoryStatus"></span>
-            <p id="forkProposePublicRepertoire">
-              We welcome proposals for
-              <a
-                target="_blank"
-                href="https://github.com/mei-friend/mei-friend/issues/new?template=public_repertoire.md"
-              >
-                additions to the public repertoire </a
-              >.
-            </p>
-          </div>
-        </div>
-      </div>
-      <div id="friendContainer">
-        <div id="alertOverlay" class="alert" style="display: none">
-          <span id="alertIcon" class="alertIcon"></span>
-          <span id="alertMessage">This is the alert overlay to display messages to the user.</span>
-          <span class="alertCloseButton" onclick="this.parentElement.style.display='none';">&times;</span>
-        </div>
-        <div id="promptOverlay" class="alert" style="display: none">
-          <span id="promptIcon" class="alertIcon"></span>
-          <div id="promptContent">
-            <span id="promptMessage">This is the alert overlay to display messages to the user.</span>
-            <div id="promptButtons">
-            </div>
-          </div>
-        </div>
-        <div id="renderedAnnotationsContainer"></div>
-        <div id="notation"></div>
-        <div class="resizer" id="dragMe"></div>
-        <div id="encoding">
-          <textarea id="editor"></textarea>
-          <span id="validation-status"></span>
-          <span id="codeChecker">Code Checker</span>
-        </div>
-      </div>
+    </div>
+    <div class="dragOverlay">
+      <div class="dragOverlayText" id="dragOverlayText">Drag your input file here.</div>
+    </div>
+    <div id="solidOverlay">
+      <div id="solidLoadingIndicator">
+        <svg class="clockwise" version="1.1" id="solid_loading" xmlns="http://www.w3.org/2000/svg"
+          xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 1200 1200"
+          style="enable-background: new 0 0 1200 1200" xml:space="preserve">
+          <title>Restoring Solid session - press 'esc' to cancel</title>
+          <style type="text/css">
+            .st0 {
+              fill: #7c4dff;
+            }
 
-      <div id="annotationPanel" style="display: none">
-        <div class="tab">
-          <!--
+            .st1 {
+              fill: #f7f7f7;
+            }
+
+            .st2 {
+              opacity: 0.3;
+              fill: #444444;
+            }
+          </style>
+          <path class="st0"
+            d="M321.1,983.5L128.8,650c-17.8-30.9-17.8-69,0-99.9l192.3-333.5c17.9-31,50.9-50,86.6-50h384.5  c35.7,0,68.8,19.1,86.6,50L1071.2,550c17.8,30.9,17.8,69,0,99.9L878.9,983.5c-17.9,31-50.9,50-86.6,50H407.8  C372,1033.5,339,1014.4,321.1,983.5z" />
+          <path class="st1"
+            d="M421.4,522.4H817c4.9,0,8.9-4,8.9-8.9v-74.1c0-49.3-40-89.3-89.3-89.3H499.1  C430,350,374,406,374,475.1v0C374,501.2,395.2,522.4,421.4,522.4z" />
+          <path class="st1"
+            d="M460.2,850h236.4c71.4,0,129.3-57.9,129.3-129.3v0c0-23.8-19.3-43.1-43.1-43.1H382.6  c-4.8,0-8.6,3.9-8.6,8.6v77.6C374,811.4,412.6,850,460.2,850z" />
+          <path class="st1"
+            d="M391.5,512.6l295,295c19.5,19.5,51.2,19.5,70.7,0l51.2-51.2c19.5-19.5,19.5-51.2,0-70.7l-295-295  c-19.5-19.5-51.2-19.5-70.7,0l-51.2,51.2C372,461.4,372,493.1,391.5,512.6z" />
+          polygon class="st2" points="691.4,812.5 518.1,677.6 556.5,677.6 "/>
+          <polygon class="st2" points="508.6,385.8 645.2,522.4 691.4,522.4 " />
+          <script xmlns="" />
+        </svg>
+        <p id="solidOverlayCancel">Restoring Solid session - press <span>esc</span> or click here to cancel</p>
+      </div>
+    </div>
+    <div id="githubActionsOverlay">
+      <div id="githubActionsUI">
+        <h3 id="githubActionsHeading">
+          <span id="githubActionsHeadingText">Request GitHub Action workflow:</span>
+          <span id="requestedWorkflowName"></span>
+        </h3>
+        <p id="githubActionsDescription">
+          Click on "Run workflow" to ask the GitHub API to run the above workflow for you, using the input
+          configuration specified below. Your encoding will be reloaded in its latest version once the workflow run
+          completes.
+        </p>
+        <div id="githubActionsInputConfigContainer"></div>
+        <p id="githubActionsStatus"></p>
+        <div id="githubActionsButtons">
+          <button id="githubActionsRunButton">Run workflow</button>
+          <button id="githubActionsCancelButton">Cancel</button>
+        </div>
+      </div>
+    </div>
+    <div class="openUrlOverlay">
+      <div class="openUrlUI">
+        <div id="openUrlUIGrouping">
+          <h3 id="openUrlHeading">Open Web-hosted encoding by URL</h3>
+          <p id="openUrlInstructions">
+            Please choose from the public repertoire or enter the URL of a Web-hosted music encoding, below. Note:
+            Host server must support cross-origin resource sharing (CORS).
+          </p>
+          <details>
+            <summary id="publicRepertoireSummary">Public repertoire</summary>
+            <div>
+              <div>
+                <label for="sampleEncodingsComposer" id="sampleEncodingsComposerLabel">Composer:</label>
+                <select id="sampleEncodingsComposer" name="sampleEncodingsComposer"></select>
+              </div>
+              <div>
+                <label for="sampleEncodingsEncoding" id="sampleEncodingsEncodingLabel">Encoding:</label>
+                <select id="sampleEncodingsEncoding" name="sampleEncodingsEncoding">
+                  <option value="" id="sampleEncodingsOptionLabel">Choose an encoding...</option>
+                </select>
+              </div>
+            </div>
+          </details>
+          <div id="openUrlInputWrapper">
+            <input id="openUrlInput" type="text" placeholder="http://..." />
+            <button id="openUrlButton">Open URL</button>
+            <button id="openUrlCancel">Cancel</button>
+          </div>
+          <span id="openUrlStatus"></span>
+          <p id="proposePublicRepertoire">
+            We welcome proposals for
+            <a target="_blank"
+              href="https://github.com/mei-friend/mei-friend/issues/new?template=public_repertoire.md">additions to the
+              public repertoire</a>.
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="forkRepositoryOverlay" id="forkAndOpenOverlay">
+      <div class="forkRepositoryUI">
+        <div class="forkRepositoryUIGrouping">
+          <h3>
+            <img id="forkRepoGithubLogo" class="forkRepoGithubLogo"
+              src="{{ url_for('static', filename='img/GitHub-Mark-32px.png') }}" />
+            <span id="forkRepoGithubText">Fork Github Repository</span>
+          </h3>
+          <p id="forkRepoGithubExplanation">
+            The link you have followed will create a GitHub fork of the following repository for editing in
+            mei-friend:
+          </p>
+          <p id="forkRepoRequested" />
+          <p id="forkRepoGithubConfirm">Is this OK?</p>
+          <div id="forkAndOpenInputWrapper">
+            <label for="forkAndOpenSelector" id="forkRepositoryToSelectorText">Fork to: </label>
+            <select id="forkAndOpenSelector" name="forkAndOpenSelector"></select>
+            <button id="forkAndOpenButton" class="forkRepositoryButton">Fork repository</button>
+            <button id="forkAndOpenCancel">Cancel</button>
+          </div>
+          <span id="forkAndOpenStatus" class="forkRepositoryStatus" />
+        </div>
+      </div>
+    </div>
+    <div class="forkRepositoryOverlay" id="forkRepositoryOverlay">
+      <div class="forkRepositoryUI">
+        <div class="forkRepositoryUIGrouping">
+          <h3>
+            <img class="forkRepoGithubLogo" src="{{ url_for('static', filename='img/GitHub-Mark-32px.png') }}" />
+            <span id="forkRepositoryGithubText">Fork Github Repository</span>
+          </h3>
+          <p id="forkRepositoryInstructions">
+            Please choose from the public repertoire or enter the Github (user or organization) name and the
+            repository name of a Github-hosted repository, below. Your forked repository will become available from
+            the Github menu.
+          </p>
+          <details>
+            <summary id="forkRepertoireSummary">Public repertoire</summary>
+            <div>
+              <div>
+                <label for="forkRepertoireComposer" id="forkRepertoireComposerLabel">Composer:</label>
+                <select id="forkRepertoireComposer" name="forkRepertoireComposer"></select>
+              </div>
+              <div>
+                <label for="forkRepertoireOrganization" id="forkRepertoireOrganizationLabel">Organization:</label>
+                <select id="forkRepertoireOrganization" name="forkRepertoireOrganization">
+                  <option value="" id="forkRepertoireOrganizationOption">Choose a GitHub Organization...</option>
+                </select>
+              </div>
+              <div>
+                <label for="forkRepertoireRepository" id="forkRepertoireRepositoryLabel">Repository:</label>
+                <select id="forkRepertoireRepository" name="forkRepertoireRepository">
+                  <option value="" id="forkRepertoireRepositoryOption">Choose an encoding...</option>
+                </select>
+              </div>
+            </div>
+          </details>
+          <div id="forkRepositoryInputWrapper">
+            <input id="forkRepositoryInputName" type="text" placeholder="Github user or organization" />
+            <input id="forkRepositoryInputRepoOverride" type="hidden" />
+            <input id="forkRepositoryInputBranchOverride" type="hidden" />
+            <input id="forkRepositoryInputFilepathOverride" type="hidden" />
+            <select id="forkRepositoryInputRepo" name="forkRepositoryInputRepo">
+              <option value="" disabled selected hidden>Choose a repository</option>
+            </select>
+            <label for="forkRepositoryToSelector" id="forkRepositoryToSelectorText">Fork to: </label>
+            <select id="forkRepositoryToSelector" name="forkRepositoryToSelector"></select>
+            <button id="forkRepositoryButton" class="forkRepositoryButton">Fork repository</button>
+            <button id="forkRepositoryCancel">Cancel</button>
+          </div>
+          <span id="forkRepositoryStatus" class="forkRepositoryStatus"></span>
+          <p id="forkProposePublicRepertoire">
+            We welcome proposals for
+            <a target="_blank" href="https://github.com/mei-friend/mei-friend/issues/new?template=public_repertoire.md">
+              additions to the public repertoire </a>.
+          </p>
+        </div>
+      </div>
+    </div>
+    <div id="friendContainer">
+      <div id="alertOverlay" class="alert" style="display: none">
+        <span id="alertIcon" class="alertIcon"></span>
+        <span id="alertMessage">This is the alert overlay to display messages to the user.</span>
+        <span class="alertCloseButton" onclick="this.parentElement.style.display='none';">&times;</span>
+      </div>
+      <div id="promptOverlay" class="alert" style="display: none">
+        <span id="promptIcon" class="alertIcon"></span>
+        <div id="promptContent">
+          <span id="promptMessage">This is the alert overlay to display messages to the user.</span>
+          <div id="promptButtons">
+          </div>
+        </div>
+      </div>
+      <div id="renderedAnnotationsContainer"></div>
+      <div id="notation"></div>
+      <div class="resizer" id="dragMe"></div>
+      <div id="encoding">
+        <textarea id="editor"></textarea>
+        <span id="validation-status"></span>
+        <span id="codeChecker">Code Checker</span>
+      </div>
+    </div>
+
+    <div id="annotationPanel" style="display: none">
+      <div class="tab">
+        <!--
         <button id="hideAnnotationPanelButton" class="tabstart" title="Close Annotations Panel">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" viewBox="0 0 19 21">
             <title id="annotationCloseButtonText">Close Annotations Panel</title>
@@ -924,46 +869,69 @@
           </svg>
         </button>
         -->
-          <button
-            id="solidButton"
-            class="tablink"
-            title="Login to Solid"
-            onclick="switchTab(event, 'annotationPanel')"
-            data-tab="solidTab"
-          >
-            <!-- Solid logo SVG: Andrei Sambra, CC BY-SA 4.0 
+        <button id="solidButton" class="tablink" title="Login to Solid" onclick="switchTab(event, 'annotationPanel')"
+          data-tab="solidTab">
+          <!-- Solid logo SVG: Andrei Sambra, CC BY-SA 4.0 
             https://en.wikipedia.org/wiki/Solid_(web_decentralization_project)#/media/File:MIT's_Solid_project_logo.svg-->
-          <svg version="1.1" id="solid_logo" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 1200 1200" style="enable-background:new 0 0 1200 1200;" xml:space="preserve">
+          <svg version="1.1" id="solid_logo" xmlns="http://www.w3.org/2000/svg"
+            xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 1200 1200"
+            style="enable-background:new 0 0 1200 1200;" xml:space="preserve">
             <title>Login to Solid</title>
             <style type="text/css">
-              .st0{fill:#7C4DFF;}
-              .st1{fill:#F7F7F7;}
-              .st2{opacity:0.3;fill:#444444;}
+              .st0 {
+                fill: #7C4DFF;
+              }
+
+              .st1 {
+                fill: #F7F7F7;
+              }
+
+              .st2 {
+                opacity: 0.3;
+                fill: #444444;
+              }
             </style>
-            <path class="st0" d="M321.1,983.5L128.8,650c-17.8-30.9-17.8-69,0-99.9l192.3-333.5c17.9-31,50.9-50,86.6-50h384.5  c35.7,0,68.8,19.1,86.6,50L1071.2,550c17.8,30.9,17.8,69,0,99.9L878.9,983.5c-17.9,31-50.9,50-86.6,50H407.8  C372,1033.5,339,1014.4,321.1,983.5z"/>
-            <path class="st1" d="M421.4,522.4H817c4.9,0,8.9-4,8.9-8.9v-74.1c0-49.3-40-89.3-89.3-89.3H499.1  C430,350,374,406,374,475.1v0C374,501.2,395.2,522.4,421.4,522.4z"/>
-            <path class="st1" d="M460.2,850h236.4c71.4,0,129.3-57.9,129.3-129.3v0c0-23.8-19.3-43.1-43.1-43.1H382.6  c-4.8,0-8.6,3.9-8.6,8.6v77.6C374,811.4,412.6,850,460.2,850z"/>
-            <path class="st1" d="M391.5,512.6l295,295c19.5,19.5,51.2,19.5,70.7,0l51.2-51.2c19.5-19.5,19.5-51.2,0-70.7l-295-295  c-19.5-19.5-51.2-19.5-70.7,0l-51.2,51.2C372,461.4,372,493.1,391.5,512.6z"/>
+            <path class="st0"
+              d="M321.1,983.5L128.8,650c-17.8-30.9-17.8-69,0-99.9l192.3-333.5c17.9-31,50.9-50,86.6-50h384.5  c35.7,0,68.8,19.1,86.6,50L1071.2,550c17.8,30.9,17.8,69,0,99.9L878.9,983.5c-17.9,31-50.9,50-86.6,50H407.8  C372,1033.5,339,1014.4,321.1,983.5z" />
+            <path class="st1"
+              d="M421.4,522.4H817c4.9,0,8.9-4,8.9-8.9v-74.1c0-49.3-40-89.3-89.3-89.3H499.1  C430,350,374,406,374,475.1v0C374,501.2,395.2,522.4,421.4,522.4z" />
+            <path class="st1"
+              d="M460.2,850h236.4c71.4,0,129.3-57.9,129.3-129.3v0c0-23.8-19.3-43.1-43.1-43.1H382.6  c-4.8,0-8.6,3.9-8.6,8.6v77.6C374,811.4,412.6,850,460.2,850z" />
+            <path class="st1"
+              d="M391.5,512.6l295,295c19.5,19.5,51.2,19.5,70.7,0l51.2-51.2c19.5-19.5,19.5-51.2,0-70.7l-295-295  c-19.5-19.5-51.2-19.5-70.7,0l-51.2,51.2C372,461.4,372,493.1,391.5,512.6z" />
             polygon class="st2" points="691.4,812.5 518.1,677.6 556.5,677.6 "/>
-            <polygon class="st2" points="508.6,385.8 645.2,522.4 691.4,522.4 "/>
-            <script xmlns=""/>
+            <polygon class="st2" points="508.6,385.8 645.2,522.4 691.4,522.4 " />
+            <script xmlns="" />
           </svg>
         </button>
-        <button id="annotationListButton" class="tablink defaultOpen" onclick="switchTab(event, 'annotationPanel')" title="List annotations" data-tab="listAnnotations">
+        <button id="annotationListButton" class="tablink defaultOpen" onclick="switchTab(event, 'annotationPanel')"
+          title="List annotations" data-tab="listAnnotations">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
-            <path d="M8.75 5.5h11.5a.75.75 0 0 1 0 1.5H8.75a.75.75 0 0 1 0-1.5Zm0 6h11.5a.75.75 0 0 1 0 1.5H8.75a.75.75 0 0 1 0-1.5Zm0 6h11.5a.75.75 0 0 1 0 1.5H8.75a.75.75 0 0 1 0-1.5ZM5 12a1 1 0 1 1-2 0 1 1 0 0 1 2 0ZM4 7a1 1 0 1 1 0-2 1 1 0 0 1 0 2Zm0 12a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path>
+            <path
+              d="M8.75 5.5h11.5a.75.75 0 0 1 0 1.5H8.75a.75.75 0 0 1 0-1.5Zm0 6h11.5a.75.75 0 0 1 0 1.5H8.75a.75.75 0 0 1 0-1.5Zm0 6h11.5a.75.75 0 0 1 0 1.5H8.75a.75.75 0 0 1 0-1.5ZM5 12a1 1 0 1 1-2 0 1 1 0 0 1 2 0ZM4 7a1 1 0 1 1 0-2 1 1 0 0 1 0 2Zm0 12a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z">
+            </path>
           </svg>
         </button>
-        <button id="markupToolsButton" class="tablink" onclick="switchTab(event, 'annotationPanel')" title="Markup tools" data-tab="markupTools">
+        <button id="markupToolsButton" class="tablink" onclick="switchTab(event, 'annotationPanel')"
+          title="Markup tools" data-tab="markupTools">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
-            <path d="M10.3 6.74a.75.75 0 0 1-.04 1.06l-2.908 2.7 2.908 2.7a.75.75 0 1 1-1.02 1.1l-3.5-3.25a.75.75 0 0 1 0-1.1l3.5-3.25a.75.75 0 0 1 1.06.04Zm3.44 1.06a.75.75 0 1 1 1.02-1.1l3.5 3.25a.75.75 0 0 1 0 1.1l-3.5 3.25a.75.75 0 1 1-1.02-1.1l2.908-2.7-2.908-2.7Z"></path>
-            <path d="M1.5 4.25c0-.966.784-1.75 1.75-1.75h17.5c.966 0 1.75.784 1.75 1.75v12.5a1.75 1.75 0 0 1-1.75 1.75h-9.69l-3.573 3.573A1.458 1.458 0 0 1 5 21.043V18.5H3.25a1.75 1.75 0 0 1-1.75-1.75ZM3.25 4a.25.25 0 0 0-.25.25v12.5c0 .138.112.25.25.25h2.5a.75.75 0 0 1 .75.75v3.19l3.72-3.72a.749.749 0 0 1 .53-.22h10a.25.25 0 0 0 .25-.25V4.25a.25.25 0 0 0-.25-.25Z"></path>
+            <path
+              d="M10.3 6.74a.75.75 0 0 1-.04 1.06l-2.908 2.7 2.908 2.7a.75.75 0 1 1-1.02 1.1l-3.5-3.25a.75.75 0 0 1 0-1.1l3.5-3.25a.75.75 0 0 1 1.06.04Zm3.44 1.06a.75.75 0 1 1 1.02-1.1l3.5 3.25a.75.75 0 0 1 0 1.1l-3.5 3.25a.75.75 0 1 1-1.02-1.1l2.908-2.7-2.908-2.7Z">
+            </path>
+            <path
+              d="M1.5 4.25c0-.966.784-1.75 1.75-1.75h17.5c.966 0 1.75.784 1.75 1.75v12.5a1.75 1.75 0 0 1-1.75 1.75h-9.69l-3.573 3.573A1.458 1.458 0 0 1 5 21.043V18.5H3.25a1.75 1.75 0 0 1-1.75-1.75ZM3.25 4a.25.25 0 0 0-.25.25v12.5c0 .138.112.25.25.25h2.5a.75.75 0 0 1 .75.75v3.19l3.72-3.72a.749.749 0 0 1 .53-.22h10a.25.25 0 0 0 .25-.25V4.25a.25.25 0 0 0-.25-.25Z">
+            </path>
           </svg>
         </button>
-        <button id="annotationToolsButton" class="tablink" onclick="switchTab(event, 'annotationPanel')" title="Annotation tools" data-tab="annotationTools">
+        <button id="annotationToolsButton" class="tablink" onclick="switchTab(event, 'annotationPanel')"
+          title="Annotation tools" data-tab="annotationTools">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
-            <path d="M1.75 1h12.5c.966 0 1.75.784 1.75 1.75v9.5A1.75 1.75 0 0 1 14.25 14H8.061l-2.574 2.573A1.458 1.458 0 0 1 3 15.543V14H1.75A1.75 1.75 0 0 1 0 12.25v-9.5C0 1.784.784 1 1.75 1ZM1.5 2.75v9.5c0 .138.112.25.25.25h2a.75.75 0 0 1 .75.75v2.19l2.72-2.72a.749.749 0 0 1 .53-.22h6.5a.25.25 0 0 0 .25-.25v-9.5a.25.25 0 0 0-.25-.25H1.75a.25.25 0 0 0-.25.25Z"></path>
-            <path d="M22.5 8.75a.25.25 0 0 0-.25-.25h-3.5a.75.75 0 0 1 0-1.5h3.5c.966 0 1.75.784 1.75 1.75v9.5A1.75 1.75 0 0 1 22.25 20H21v1.543a1.457 1.457 0 0 1-2.487 1.03L15.939 20H10.75A1.75 1.75 0 0 1 9 18.25v-1.465a.75.75 0 0 1 1.5 0v1.465c0 .138.112.25.25.25h5.5a.75.75 0 0 1 .53.22l2.72 2.72v-2.19a.75.75 0 0 1 .75-.75h2a.25.25 0 0 0 .25-.25v-9.5Z"></path>
+            <path
+              d="M1.75 1h12.5c.966 0 1.75.784 1.75 1.75v9.5A1.75 1.75 0 0 1 14.25 14H8.061l-2.574 2.573A1.458 1.458 0 0 1 3 15.543V14H1.75A1.75 1.75 0 0 1 0 12.25v-9.5C0 1.784.784 1 1.75 1ZM1.5 2.75v9.5c0 .138.112.25.25.25h2a.75.75 0 0 1 .75.75v2.19l2.72-2.72a.749.749 0 0 1 .53-.22h6.5a.25.25 0 0 0 .25-.25v-9.5a.25.25 0 0 0-.25-.25H1.75a.25.25 0 0 0-.25.25Z">
+            </path>
+            <path
+              d="M22.5 8.75a.25.25 0 0 0-.25-.25h-3.5a.75.75 0 0 1 0-1.5h3.5c.966 0 1.75.784 1.75 1.75v9.5A1.75 1.75 0 0 1 22.25 20H21v1.543a1.457 1.457 0 0 1-2.487 1.03L15.939 20H10.75A1.75 1.75 0 0 1 9 18.25v-1.465a.75.75 0 0 1 1.5 0v1.465c0 .138.112.25.25.25h5.5a.75.75 0 0 1 .53.22l2.72 2.72v-2.19a.75.75 0 0 1 .75-.75h2a.25.25 0 0 0 .25-.25v-9.5Z">
+            </path>
           </svg>
         </button>
         <!--        <button class="tablink" onclick="switchTab(event, 'annotationPanel')"
@@ -973,69 +941,103 @@
       <div id="solidTab" class="tabcontent"></div>
       <div id="listAnnotations" class="tabcontent">No annotations present.</div>
       <div id="markupTools" class="tabcontent">
-        <menu id="markupToolsMenu" class="enrichmentToolsMenu">
+        <menu id="markupToolsMenu" class="enrichmentToolsMenu markup-panel">
+          <span>Alternative encodings</span>
+          <div class="annotationToolsIconGroup">
+            <div class="markup-btn-group annotationToolsIcon">
+              <div class="markup-dropdown">
+                <span>&lt;choice&gt;</span>
+                <div id="choice-content-options" class="markup-dropdown-content">
+                  <a id="choice_sic-corr" data-target="choice-content-target" data-content-choice="sic,corr"
+                    class="content-option" href="#">sic | corr</a>
+                  <a id="choice_corr-sic" data-target="choice-content-target" data-content-choice="corr,sic"
+                    class="content-option" href="#">corr | sic</a>
+                  <a id="choice_orig-reg" data-target="choice-content-target" data-content-choice="orig,reg"
+                    class="content-option" href="#">orig | reg</a>
+                  <a id="choice_reg-orig" data-target="choice-content-target" data-content-choice="reg,orig"
+                    class="content-option" href="#">reg | orig</a>
+                </div>
+              </div>
+              <div class="markup-dropdown">
+                <span id="choice-content-target">(select content)</span>
+                <div class="markup-dropdown-content">
+                  <a class="addMarkup" data-el-name="choice" data-selection="" href="#">Selection</a>
+                  <a class="addMarkup" data-el-name="choice" data-selection="artic" href="#">Articulation</a>
+                  <a class="addMarkup" data-el-name="choice" data-selection="accid" href="#">Accidental</a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <span>Editorial interventions</span>
           <div class="annotationToolsIconGroup markup-dropdown">
             <span id="addSuppliedText" class="annotationToolsIcon">Supplied</span>
             <div class="markup-dropdown-content">
-              <a id="addSupplied" href="#">Selection</a>
-              <a id="addSuppliedArtic" href="#">Articulation</a>
-              <a id="addSuppliedAccid" href="#">Accidental</a>
+              <a class="addMarkup" data-el-name="supplied" data-selection="" id="addSupplied" href="#">Selection</a>
+              <a class="addMarkup" data-el-name="supplied" data-selection="artic" id="addSuppliedArtic"
+                href="#">Articulation</a>
+              <a class="addMarkup" data-el-name="supplied" data-selection="accid" id="addSuppliedAccid"
+                href="#">Accidental</a>
             </div>
           </div>
           <div class="annotationToolsIconGroup markup-dropdown">
             <span id="addUnclearText" class="annotationToolsIcon">Unclear</span>
             <div class="markup-dropdown-content">
-              <a id="addUnclear" href="#">Selection</a>
-              <a id="addUnclearArtic" href="#">Articulation</a>
-              <a id="addUnclearAccid" href="#">Accidental</a>
+              <a class="addMarkup" data-el-name="unclear" data-selection="" id="addUnclear" href="#">Selection</a>
+              <a class="addMarkup" data-el-name="unclear" data-selection="artic" id="addUnclearArtic"
+                href="#">Articulation</a>
+              <a class="addMarkup" data-el-name="unclear" data-selection="accid" id="addUnclearAccid"
+                href="#">Accidental</a>
             </div>
           </div>
           <div class="annotationToolsIconGroup markup-dropdown">
             <span id="addSicText" class="annotationToolsIcon">Sic</span>
             <div class="markup-dropdown-content">
-              <a id="addSic" href="#">Selection</a>
-              <a id="addSicArtic" href="#">Articulation</a>
-              <a id="addSicAccid" href="#">Accidental</a>
+              <a class="addMarkup" data-el-name="sic" data-selection="" id="addSic" href="#">Selection</a>
+              <a class="addMarkup" data-el-name="sic" data-selection="artic" id="addSicArtic" href="#">Articulation</a>
+              <a class="addMarkup" data-el-name="sic" data-selection="accid" id="addSicAccid" href="#">Accidental</a>
             </div>
           </div>
           <div class="annotationToolsIconGroup markup-dropdown">
             <span id="addCorrText" class="annotationToolsIcon">Corr</span>
             <div class="markup-dropdown-content">
-              <a id="addCorr" href="#">Selection</a>
-              <a id="addCorrArtic" href="#">Articulation</a>
-              <a id="addCorrAccid" href="#">Accidental</a>
+              <a class="addMarkup" data-el-name="corr" data-selection="" id="addCorr" href="#">Selection</a>
+              <a class="addMarkup" data-el-name="corr" data-selection="artic" id="addCorrArtic"
+                href="#">Articulation</a>
+              <a class="addMarkup" data-el-name="corr" data-selection="accid" id="addCorrAccid" href="#">Accidental</a>
             </div>
           </div>
           <div class="annotationToolsIconGroup markup-dropdown">
             <span id="addOrigText" class="annotationToolsIcon">Orig</span>
             <div class="markup-dropdown-content">
-              <a id="addOrig" href="#">Selection</a>
-              <a id="addOrigArtic" href="#">Articulation</a>
-              <a id="addOrigAccid" href="#">Accidental</a>
+              <a class="addMarkup" data-el-name="orig" data-selection="" id="addOrig" href="#">Selection</a>
+              <a class="addMarkup" data-el-name="orig" data-selection="artic" id="addOrigArtic"
+                href="#">Articulation</a>
+              <a class="addMarkup" data-el-name="orig" data-selection="accid" id="addOrigAccid" href="#">Accidental</a>
             </div>
           </div>
           <div class="annotationToolsIconGroup markup-dropdown">
             <span id="addRegText" class="annotationToolsIcon">Reg</span>
             <div class="markup-dropdown-content">
-              <a id="addReg" href="#">Selection</a>
-              <a id="addRegArtic" href="#">Articulation</a>
-              <a id="addRegAccid" href="#">Accidental</a>
+              <a class="addMarkup" data-el-name="reg" data-selection="" id="addReg" href="#">Selection</a>
+              <a class="addMarkup" data-el-name="reg" data-selection="artic" id="addRegArtic" href="#">Articulation</a>
+              <a class="addMarkup" data-el-name="reg" data-selection="accid" id="addRegAccid" href="#">Accidental</a>
             </div>
           </div>
+          <span>Descriptive Markup</span>
           <div class="annotationToolsIconGroup markup-dropdown">
             <span id="addAddText" class="annotationToolsIcon">Add</span>
             <div class="markup-dropdown-content">
-              <a id="addAdd" href="#">Selection</a>
-              <a id="addAddArtic" href="#">Articulation</a>
-              <a id="addAddAccid" href="#">Accidental</a>
+              <a class="addMarkup" data-el-name="add" data-selection="" id="addAdd" href="#">Selection</a>
+              <a class="addMarkup" data-el-name="add" data-selection="artic" id="addAddArtic" href="#">Articulation</a>
+              <a class="addMarkup" data-el-name="add" data-selection="accid" id="addAddAccid" href="#">Accidental</a>
             </div>
           </div>
           <div class="annotationToolsIconGroup markup-dropdown">
             <span id="addDelText" class="annotationToolsIcon">Del</span>
             <div class="markup-dropdown-content">
-              <a id="addDel" href="#">Selection</a>
-              <a id="addDelArtic" href="#">Articulation</a>
-              <a id="addDelAccid" href="#">Accidental</a>
+              <a class="addMarkup" data-el-name="del" data-selection="" id="addDel" href="#">Selection</a>
+              <a class="addMarkup" data-el-name="del" data-selection="artic" id="addDelArtic" href="#">Articulation</a>
+              <a class="addMarkup" data-el-name="del" data-selection="accid" id="addDelAccid" href="#">Accidental</a>
             </div>
           </div>
         </menu>
@@ -1045,10 +1047,15 @@
           <div id="annotationToolsDomainSelection">
             <div class="annotationToolsDomainSelectionItem">
               <fieldset>
-                <input type="radio" checked id="writeAnnotationInline" title="Generate in-line annotations." value="writeAnnotationInline" name="annotationToolDomainSelector">
-                <label for="writeAnnotionInline" title="Generate in-line annotations using MEI &lt;annot&gt; elements.">MEI</label>
-                <input type="radio" id="writeAnnotationStandoff" title="Generate stand-off annotations. Only possible if working on a native MEI file from URL or GitHub, and when logged into a Solid Pod." value="writeAnnotationStandoff" name="annotationToolDomainSelector">
-                <label id="writeAnnotationStandoffLabel" for="writeAnnotionStandoff" title="Generate stand-off annotations. Only possible if working on a native MEI file from URL or GitHub, and when logged into a Solid Pod.">RDF</label>
+                <input type="radio" checked id="writeAnnotationInline" title="Generate in-line annotations."
+                  value="writeAnnotationInline" name="annotationToolDomainSelector">
+                <label for="writeAnnotionInline"
+                  title="Generate in-line annotations using MEI &lt;annot&gt; elements.">MEI</label>
+                <input type="radio" id="writeAnnotationStandoff"
+                  title="Generate stand-off annotations. Only possible if working on a native MEI file from URL or GitHub, and when logged into a Solid Pod."
+                  value="writeAnnotationStandoff" name="annotationToolDomainSelector">
+                <label id="writeAnnotationStandoffLabel" for="writeAnnotionStandoff"
+                  title="Generate stand-off annotations. Only possible if working on a native MEI file from URL or GitHub, and when logged into a Solid Pod.">RDF</label>
               </fieldset>
             </div>
           </div>
@@ -1056,44 +1063,44 @@
             <li>
               <div class="annotationToolsIcon" id="annotateIdentify">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
-                  <title id=""annotationToolsIdentifyTitle">identify</title>
-                  <path 
-                    d="m12.596 11.596-3.535 3.536a1.5 1.5 0 0 1-2.122 0l-3.535-3.536a6.5 6.5 0 1 1 9.192-9.193 6.5 6.5 0 0 1 0 9.193Zm-1.06-8.132v-.001a5 5 0 1 0-7.072 7.072L8 14.07l3.536-3.534a5 5 0 0 0 0-7.072ZM8 9a2 2 0 1 1-.001-3.999A2 2 0 0 1 8 9Z"></path>
+                  <title id="" annotationToolsIdentifyTitle">identify</title>
+                  <path
+                    d="m12.596 11.596-3.535 3.536a1.5 1.5 0 0 1-2.122 0l-3.535-3.536a6.5 6.5 0 1 1 9.192-9.193 6.5 6.5 0 0 1 0 9.193Zm-1.06-8.132v-.001a5 5 0 1 0-7.072 7.072L8 14.07l3.536-3.534a5 5 0 0 0 0-7.072ZM8 9a2 2 0 1 1-.001-3.999A2 2 0 0 1 8 9Z">
+                  </path>
                 </svg>
-                <span id=""annotationToolsIdentifySpan">Identify musical object</span>
+                <span id="" annotationToolsIdentifySpan">Identify musical object</span>
               </div>
-            </div>
-            <div class="annotationToolsIconGroup">
-              <li>
-                <div class="annotationToolsIcon" id="annotateIdentify">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
-                    <title id="annotationToolsIdentifyTitle">identify</title>
-                    <path
-                      d="m12.596 11.596-3.535 3.536a1.5 1.5 0 0 1-2.122 0l-3.535-3.536a6.5 6.5 0 1 1 9.192-9.193 6.5 6.5 0 0 1 0 9.193Zm-1.06-8.132v-.001a5 5 0 1 0-7.072 7.072L8 14.07l3.536-3.534a5 5 0 0 0 0-7.072ZM8 9a2 2 0 1 1-.001-3.999A2 2 0 0 1 8 9Z"
-                    ></path>
-                  </svg>
-                  <span id="annotationToolsIdentifySpan">Identify musical object</span>
-                </div>
-              </li>
-            </div>
-            <div class="annotationToolsIconGroup">
-              <li>
-                <div class="annotationToolsIcon" id="annotateHighlight">
-                  <!--<svg xmlns="http://www.w3.org/2000/svg"  aria-hidden="true" role="img" id="footer-sample-full" width="16px" height="16px"  viewBox="0 0 1024 1024">
+          </div>
+          <div class="annotationToolsIconGroup">
+            <li>
+              <div class="annotationToolsIcon" id="annotateIdentify">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
+                  <title id="annotationToolsIdentifyTitle">identify</title>
+                  <path
+                    d="m12.596 11.596-3.535 3.536a1.5 1.5 0 0 1-2.122 0l-3.535-3.536a6.5 6.5 0 1 1 9.192-9.193 6.5 6.5 0 0 1 0 9.193Zm-1.06-8.132v-.001a5 5 0 1 0-7.072 7.072L8 14.07l3.536-3.534a5 5 0 0 0 0-7.072ZM8 9a2 2 0 1 1-.001-3.999A2 2 0 0 1 8 9Z">
+                  </path>
+                </svg>
+                <span id="annotationToolsIdentifySpan">Identify musical object</span>
+              </div>
+            </li>
+          </div>
+          <div class="annotationToolsIconGroup">
+            <li>
+              <div class="annotationToolsIcon" id="annotateHighlight">
+                <!--<svg xmlns="http://www.w3.org/2000/svg"  aria-hidden="true" role="img" id="footer-sample-full" width="16px" height="16px"  viewBox="0 0 1024 1024">
                   <path fill="currentColor"
                     d="M957.6 507.4L603.2 158.2a7.9 7.9 0 0 0-11.2 0L353.3 393.4a8.03 8.03 0 0 0-.1 11.3l.1.1l40 39.4l-117.2 115.3a8.03 8.03 0 0 0-.1 11.3l.1.1l39.5 38.9l-189.1 187H72.1c-4.4 0-8.1 3.6-8.1 8V860c0 4.4 3.6 8 8 8h344.9c2.1 0 4.1-.8 5.6-2.3l76.1-75.6l40.4 39.8a7.9 7.9 0 0 0 11.2 0l117.1-115.6l40.1 39.5a7.9 7.9 0 0 0 11.2 0l238.7-235.2c3.4-3 3.4-8 .3-11.2zM389.8 796.2H229.6l134.4-133l80.1 78.9l-54.3 54.1zm154.8-62.1L373.2 565.2l68.6-67.6l171.4 168.9l-68.6 67.6zM713.1 658L450.3 399.1L597.6 254l262.8 259l-147.3 145z">
                   </path>
                 </svg>-->
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16px" height="16px" viewBox="0 0 20 20">
-                    <title id="annotationToolsHighlightTitle">highlight</title>
-                    <path
-                      d="M15.14 2.27a1 1 0 0 0-1.41 0l-10 10a1 1 0 0 0 0 1.41L4 14l-3 4h5l1-1 .29.29a1 1 0 0 0 1.41 0l10-10a1 1 0 0 0 .03-1.43zM7 15l-2-2 9-9 2 2z"
-                    />
-                  </svg>
-                  <span id="annotationToolsHighlightSpan">Highlight</span>
-                </div>
-              </li>
-              <!--DW HACK ESWC <li>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16px" height="16px" viewBox="0 0 20 20">
+                  <title id="annotationToolsHighlightTitle">highlight</title>
+                  <path
+                    d="M15.14 2.27a1 1 0 0 0-1.41 0l-10 10a1 1 0 0 0 0 1.41L4 14l-3 4h5l1-1 .29.29a1 1 0 0 0 1.41 0l10-10a1 1 0 0 0 .03-1.43zM7 15l-2-2 9-9 2 2z" />
+                </svg>
+                <span id="annotationToolsHighlightSpan">Highlight</span>
+              </div>
+            </li>
+            <!--DW HACK ESWC <li>
               <div class="annotationToolsIcon" id="annotateCircle">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
                   <path fill-rule="evenodd" d="M8 1.5a6.5 6.5 0 100 13 6.5 6.5 0 000-13zM0 8a8 8 0 1116 0A8 8 0 010 8z" />
@@ -1101,197 +1108,175 @@
                 Circle
               </div>
             </li>-->
-              <li>
-                <div class="annotationToolsIcon" id="annotateDescribe">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-                    <title id="annotationToolsDescribeTitle">Describe</title>
-                    <path
-                      fill-rule="evenodd"
-                      d="M11.013 1.427a1.75 1.75 0 012.474 0l1.086 1.086a1.75 1.75 0 010 2.474l-8.61 8.61c-.21.21-.47.364-.756.445l-3.251.93a.75.75 0 01-.927-.928l.929-3.25a1.75 1.75 0 01.445-.758l8.61-8.61zm1.414 1.06a.25.25 0 00-.354 0L10.811 3.75l1.439 1.44 1.263-1.263a.25.25 0 000-.354l-1.086-1.086zM11.189 6.25L9.75 4.81l-6.286 6.287a.25.25 0 00-.064.108l-.558 1.953 1.953-.558a.249.249 0 00.108-.064l6.286-6.286z"
-                    />
-                  </svg>
-                  <span id="annotationToolsDescribeSpan">Describe</span>
-                </div>
-              </li>
-              <li>
-                <div class="annotationToolsIcon" id="annotateLink">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-                    <title id="annotationToolsLinkTitle">Link</title>
-                    <path
-                      fill-rule="evenodd"
-                      d="M7.775 3.275a.75.75 0 001.06 1.06l1.25-1.25a2 2 0 112.83 2.83l-2.5 2.5a2 2 0 01-2.83 0 .75.75 0 00-1.06 1.06 3.5 3.5 0 004.95 0l2.5-2.5a3.5 3.5 0 00-4.95-4.95l-1.25 1.25zm-4.69 9.64a2 2 0 010-2.83l2.5-2.5a2 2 0 012.83 0 .75.75 0 001.06-1.06 3.5 3.5 0 00-4.95 0l-2.5 2.5a3.5 3.5 0 004.95 4.95l1.25-1.25a.75.75 0 00-1.06-1.06l-1.25 1.25a2 2 0 01-2.83 0z"
-                    />
-                  </svg>
-                  <span id="annotationToolsLinkSpan">Link</span>
-                </div>
-              </li>
-            </div>
-          </menu>
-        </div>
-        <div id="listAnnotations" class="tabcontent">No annotations present.</div>
-        <!-- DW HACK ESWC <div id="externalLinks" class="tabcontent">Links</div>-->
+            <li>
+              <div class="annotationToolsIcon" id="annotateDescribe">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                  <title id="annotationToolsDescribeTitle">Describe</title>
+                  <path fill-rule="evenodd"
+                    d="M11.013 1.427a1.75 1.75 0 012.474 0l1.086 1.086a1.75 1.75 0 010 2.474l-8.61 8.61c-.21.21-.47.364-.756.445l-3.251.93a.75.75 0 01-.927-.928l.929-3.25a1.75 1.75 0 01.445-.758l8.61-8.61zm1.414 1.06a.25.25 0 00-.354 0L10.811 3.75l1.439 1.44 1.263-1.263a.25.25 0 000-.354l-1.086-1.086zM11.189 6.25L9.75 4.81l-6.286 6.287a.25.25 0 00-.064.108l-.558 1.953 1.953-.558a.249.249 0 00.108-.064l6.286-6.286z" />
+                </svg>
+                <span id="annotationToolsDescribeSpan">Describe</span>
+              </div>
+            </li>
+            <li>
+              <div class="annotationToolsIcon" id="annotateLink">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                  <title id="annotationToolsLinkTitle">Link</title>
+                  <path fill-rule="evenodd"
+                    d="M7.775 3.275a.75.75 0 001.06 1.06l1.25-1.25a2 2 0 112.83 2.83l-2.5 2.5a2 2 0 01-2.83 0 .75.75 0 00-1.06 1.06 3.5 3.5 0 004.95 0l2.5-2.5a3.5 3.5 0 00-4.95-4.95l-1.25 1.25zm-4.69 9.64a2 2 0 010-2.83l2.5-2.5a2 2 0 012.83 0 .75.75 0 001.06-1.06 3.5 3.5 0 00-4.95 0l-2.5 2.5a3.5 3.5 0 004.95 4.95l1.25-1.25a.75.75 0 00-1.06-1.06l-1.25 1.25a2 2 0 01-2.83 0z" />
+                </svg>
+                <span id="annotationToolsLinkSpan">Link</span>
+              </div>
+            </li>
+          </div>
+        </menu>
       </div>
+      <div id="listAnnotations" class="tabcontent">No annotations present.</div>
+      <!-- DW HACK ESWC <div id="externalLinks" class="tabcontent">Links</div>-->
     </div>
-    <div id="midiPlaybackControlBar">
-      <midi-player id="midi-player" sound-font> </midi-player>
-      <span
-        id="midiSpeedmodeIndicator"
-        title="Speed mode is active; only playing MIDI for current page. To play the entire encoding, disable speed mode."
-        >Speed mode</span
-      >
-      <select
-        id="controlbar-midi-expansion-selector"
-        name="expansion-select"
-        title="Select expansion element for MIDI playback"
-      >
-        <option value="">No expansion</option>
-      </select>
-      <span id="closeMidiPlaybackControlBarButton" title="Hide MIDI Playback Control Bar">×</span>
-    </div>
+  </div>
+  <div id="midiPlaybackControlBar">
+    <midi-player id="midi-player" sound-font> </midi-player>
+    <span id="midiSpeedmodeIndicator"
+      title="Speed mode is active; only playing MIDI for current page. To play the entire encoding, disable speed mode.">Speed
+      mode</span>
+    <select id="controlbar-midi-expansion-selector" name="expansion-select"
+      title="Select expansion element for MIDI playback">
+      <option value="">No expansion</option>
+    </select>
+    <span id="closeMidiPlaybackControlBarButton" title="Hide MIDI Playback Control Bar">×</span>
+  </div>
 
-    <div class="footer">
-      <div id="midiPlayerContextual">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
-          <path
-            d="M7.563 2.069A.75.75 0 018 2.75v10.5a.751.751 0 01-1.238.57L3.472 11H1.75A1.75 1.75 0 010 9.25v-2.5C0 5.784.784 5 1.75 5h1.723l3.289-2.82a.75.75 0 01.801-.111zM6.5 4.38L4.238 6.319a.748.748 0 01-.488.181h-2a.25.25 0 00-.25.25v2.5c0 .138.112.25.25.25h2c.179 0 .352.064.488.18L6.5 11.62zm6.096-2.038a.75.75 0 011.06 0 8 8 0 010 11.314.751.751 0 01-1.042-.018.751.751 0 01-.018-1.042 6.5 6.5 0 000-9.193.75.75 0 010-1.06zm-1.06 2.121l-.001.001a5 5 0 010 7.07.749.749 0 01-1.275-.326.749.749 0 01.215-.734 3.5 3.5 0 000-4.95.75.75 0 111.061-1.061z"
-          ></path>
+  <div class="footer">
+    <div id="midiPlayerContextual">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
+        <path
+          d="M7.563 2.069A.75.75 0 018 2.75v10.5a.751.751 0 01-1.238.57L3.472 11H1.75A1.75 1.75 0 010 9.25v-2.5C0 5.784.784 5 1.75 5h1.723l3.289-2.82a.75.75 0 01.801-.111zM6.5 4.38L4.238 6.319a.748.748 0 01-.488.181h-2a.25.25 0 00-.25.25v2.5c0 .138.112.25.25.25h2c.179 0 .352.064.488.18L6.5 11.62zm6.096-2.038a.75.75 0 011.06 0 8 8 0 010 11.314.751.751 0 01-1.042-.018.751.751 0 01-.018-1.042 6.5 6.5 0 000-9.193.75.75 0 010-1.06zm-1.06 2.121l-.001.001a5 5 0 010 7.07.749.749 0 01-1.275-.326.749.749 0 01.215-.734 3.5 3.5 0 000-4.95.75.75 0 111.061-1.061z">
+        </path>
+      </svg>
+    </div>
+    <div class="leftfoot" id="leftFooter"></div>
+    <div class="middlefoot" id="middleFooter">
+      <div id="statusBar"></div>
+      <div id="progressBar"></div>
+    </div>
+    <div class="rightfoot"></div>
+  </div>
+
+  <div id="settingsPanel" class="out">
+    <div class="tab">
+      <button id="hideSettingsButton" class="tabstart" title="Hide Settings Panel">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" viewBox="0 0 16 16" id="hideSettingsButtonImg">
+          <path fill-rule="evenodd"
+            d="M7.429 1.525a6.593 6.593 0 011.142 0c.036.003.108.036.137.146l.289 1.105c.147.56.55.967.997 1.189.174.086.341.183.501.29.417.278.97.423 1.53.27l1.102-.303c.11-.03.175.016.195.046.219.31.41.641.573.989.014.031.022.11-.059.19l-.815.806c-.411.406-.562.957-.53 1.456a4.588 4.588 0 010 .582c-.032.499.119 1.05.53 1.456l.815.806c.08.08.073.159.059.19a6.494 6.494 0 01-.573.99c-.02.029-.086.074-.195.045l-1.103-.303c-.559-.153-1.112-.008-1.529.27-.16.107-.327.204-.5.29-.449.222-.851.628-.998 1.189l-.289 1.105c-.029.11-.101.143-.137.146a6.613 6.613 0 01-1.142 0c-.036-.003-.108-.037-.137-.146l-.289-1.105c-.147-.56-.55-.967-.997-1.189a4.502 4.502 0 01-.501-.29c-.417-.278-.97-.423-1.53-.27l-1.102.303c-.11.03-.175-.016-.195-.046a6.492 6.492 0 01-.573-.989c-.014-.031-.022-.11.059-.19l.815-.806c.411-.406.562-.957.53-1.456a4.587 4.587 0 010-.582c.032-.499-.119-1.05-.53-1.456l-.815-.806c-.08-.08-.073-.159-.059-.19a6.44 6.44 0 01.573-.99c.02-.029.086-.075.195-.045l1.103.303c.559.153 1.112.008 1.529-.27.16-.107.327-.204.5-.29.449-.222.851-.628.998-1.189l.289-1.105c.029-.11.101-.143.137-.146zM8 0c-.236 0-.47.01-.701.03-.743.065-1.29.615-1.458 1.261l-.29 1.106c-.017.066-.078.158-.211.224a5.994 5.994 0 00-.668.386c-.123.082-.233.09-.3.071L3.27 2.776c-.644-.177-1.392.02-1.82.63a7.977 7.977 0 00-.704 1.217c-.315.675-.111 1.422.363 1.891l.815.806c.05.048.098.147.088.294a6.084 6.084 0 000 .772c.01.147-.038.246-.088.294l-.815.806c-.474.469-.678 1.216-.363 1.891.2.428.436.835.704 1.218.428.609 1.176.806 1.82.63l1.103-.303c.066-.019.176-.011.299.071.213.143.436.272.668.386.133.066.194.158.212.224l.289 1.106c.169.646.715 1.196 1.458 1.26a8.094 8.094 0 001.402 0c.743-.064 1.29-.614 1.458-1.26l.29-1.106c.017-.066.078-.158.211-.224a5.98 5.98 0 00.668-.386c.123-.082.233-.09.3-.071l1.102.302c.644.177 1.392-.02 1.82-.63.268-.382.505-.789.704-1.217.315-.675.111-1.422-.364-1.891l-.814-.806c-.05-.048-.098-.147-.088-.294a6.1 6.1 0 000-.772c-.01-.147.039-.246.088-.294l.814-.806c.475-.469.679-1.216.364-1.891a7.992 7.992 0 00-.704-1.218c-.428-.609-1.176-.806-1.82-.63l-1.103.303c-.066.019-.176.011-.299-.071a5.991 5.991 0 00-.668-.386c-.133-.066-.194-.158-.212-.224L10.16 1.29C9.99.645 9.444.095 8.701.031A8.094 8.094 0 008 0zm1.5 8a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM11 8a3 3 0 11-6 0 3 3 0 016 0z" />
         </svg>
-      </div>
-      <div class="leftfoot" id="leftFooter"></div>
-      <div class="middlefoot" id="middleFooter">
-        <div id="statusBar"></div>
-        <div id="progressBar"></div>
-      </div>
-      <div class="rightfoot"></div>
+      </button>
+      <button id="meifriendOptionsTab" class="tablink" onclick="switchTab(event, 'settingsPanel')"
+        title="mei-friend Settings" data-tab="meiFriendSettings">
+        mei-friend
+      </button>
+      <button id="editorOptionsTab" class="tablink defaultOpen" onclick="switchTab(event, 'settingsPanel')"
+        title="Editor Settings" data-tab="editorSettings">
+        Editor
+      </button>
+      <button id="verovioOptionsTab" class="tablink" onclick="switchTab(event, 'settingsPanel')" title="Verovio Options"
+        data-tab="verovioSettings">
+        Verovio
+      </button>
+      <span id="closeSettingsButton" class="topright" title="Hide Settings Panel">&times;</span>
     </div>
-
-    <div id="settingsPanel" class="out">
-      <div class="tab">
-        <button id="hideSettingsButton" class="tabstart" title="Hide Settings Panel">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" viewBox="0 0 16 16" id="hideSettingsButtonImg">
-            <path
-              fill-rule="evenodd"
-              d="M7.429 1.525a6.593 6.593 0 011.142 0c.036.003.108.036.137.146l.289 1.105c.147.56.55.967.997 1.189.174.086.341.183.501.29.417.278.97.423 1.53.27l1.102-.303c.11-.03.175.016.195.046.219.31.41.641.573.989.014.031.022.11-.059.19l-.815.806c-.411.406-.562.957-.53 1.456a4.588 4.588 0 010 .582c-.032.499.119 1.05.53 1.456l.815.806c.08.08.073.159.059.19a6.494 6.494 0 01-.573.99c-.02.029-.086.074-.195.045l-1.103-.303c-.559-.153-1.112-.008-1.529.27-.16.107-.327.204-.5.29-.449.222-.851.628-.998 1.189l-.289 1.105c-.029.11-.101.143-.137.146a6.613 6.613 0 01-1.142 0c-.036-.003-.108-.037-.137-.146l-.289-1.105c-.147-.56-.55-.967-.997-1.189a4.502 4.502 0 01-.501-.29c-.417-.278-.97-.423-1.53-.27l-1.102.303c-.11.03-.175-.016-.195-.046a6.492 6.492 0 01-.573-.989c-.014-.031-.022-.11.059-.19l.815-.806c.411-.406.562-.957.53-1.456a4.587 4.587 0 010-.582c.032-.499-.119-1.05-.53-1.456l-.815-.806c-.08-.08-.073-.159-.059-.19a6.44 6.44 0 01.573-.99c.02-.029.086-.075.195-.045l1.103.303c.559.153 1.112.008 1.529-.27.16-.107.327-.204.5-.29.449-.222.851-.628.998-1.189l.289-1.105c.029-.11.101-.143.137-.146zM8 0c-.236 0-.47.01-.701.03-.743.065-1.29.615-1.458 1.261l-.29 1.106c-.017.066-.078.158-.211.224a5.994 5.994 0 00-.668.386c-.123.082-.233.09-.3.071L3.27 2.776c-.644-.177-1.392.02-1.82.63a7.977 7.977 0 00-.704 1.217c-.315.675-.111 1.422.363 1.891l.815.806c.05.048.098.147.088.294a6.084 6.084 0 000 .772c.01.147-.038.246-.088.294l-.815.806c-.474.469-.678 1.216-.363 1.891.2.428.436.835.704 1.218.428.609 1.176.806 1.82.63l1.103-.303c.066-.019.176-.011.299.071.213.143.436.272.668.386.133.066.194.158.212.224l.289 1.106c.169.646.715 1.196 1.458 1.26a8.094 8.094 0 001.402 0c.743-.064 1.29-.614 1.458-1.26l.29-1.106c.017-.066.078-.158.211-.224a5.98 5.98 0 00.668-.386c.123-.082.233-.09.3-.071l1.102.302c.644.177 1.392-.02 1.82-.63.268-.382.505-.789.704-1.217.315-.675.111-1.422-.364-1.891l-.814-.806c-.05-.048-.098-.147-.088-.294a6.1 6.1 0 000-.772c-.01-.147.039-.246.088-.294l.814-.806c.475-.469.679-1.216.364-1.891a7.992 7.992 0 00-.704-1.218c-.428-.609-1.176-.806-1.82-.63l-1.103.303c-.066.019-.176.011-.299-.071a5.991 5.991 0 00-.668-.386c-.133-.066-.194-.158-.212-.224L10.16 1.29C9.99.645 9.444.095 8.701.031A8.094 8.094 0 008 0zm1.5 8a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM11 8a3 3 0 11-6 0 3 3 0 016 0z"
-            />
-          </svg>
-        </button>
-        <button
-          id="meifriendOptionsTab"
-          class="tablink"
-          onclick="switchTab(event, 'settingsPanel')"
-          title="mei-friend Settings"
-          data-tab="meiFriendSettings"
-        >
-          mei-friend
-        </button>
-        <button
-          id="editorOptionsTab"
-          class="tablink defaultOpen"
-          onclick="switchTab(event, 'settingsPanel')"
-          title="Editor Settings"
-          data-tab="editorSettings"
-        >
-          Editor
-        </button>
-        <button
-          id="verovioOptionsTab"
-          class="tablink"
-          onclick="switchTab(event, 'settingsPanel')"
-          title="Verovio Options"
-          data-tab="verovioSettings"
-        >
-          Verovio
-        </button>
-        <span id="closeSettingsButton" class="topright" title="Hide Settings Panel">&times;</span>
+    <!-- Tab content -->
+    <div id="settingsTabContentWrapper">
+      <div id="filterSettingsWrapper">
+        <input type="text" required id="filterSettings" placeholder="Filter settings" value=""
+          title="Type here to filter settings" />
+        <div id="filterReset"></div>
       </div>
-      <!-- Tab content -->
-      <div id="settingsTabContentWrapper">
-        <div id="filterSettingsWrapper">
-          <input
-            type="text"
-            required
-            id="filterSettings"
-            placeholder="Filter settings"
-            value=""
-            title="Type here to filter settings"
-          />
-          <div id="filterReset"></div>
-        </div>
-        <div id="meiFriendSettings" class="tabcontent"></div>
-        <div id="editorSettings" class="tabcontent"></div>
-        <div id="verovioSettings" class="tabcontent"></div>
-      </div>
+      <div id="meiFriendSettings" class="tabcontent"></div>
+      <div id="editorSettings" class="tabcontent"></div>
+      <div id="verovioSettings" class="tabcontent"></div>
     </div>
+  </div>
 
-    <script>
-      // menu bar behavior like MacOS menu bars
-      let show = false;
-      document.getElementById('menuBar').addEventListener('click', (ev) => {
-        // Notes on menu switching behaviour:
-        // We want menu bars to work like Mac OS bars, EXCEPT that
-        // ... the GitHub menu should stay open on clicks (=> navigation)
-        // ... UNLESS a file is opened or commit button is clicked.
-        let targetAfterClick = '';
-        if (ev.target.hasAttribute('id')) {
-          // During navigation, GitHub menu rebuilds itself, so the ev.target
-          // might be lost by the time we get to this handler.
-          // For these cases (e.g., click on repositoriesHeader), we fetch the newly-built
-          // version of the target, below, if it has an ID.
-          targetAfterClick = document.getElementById(ev.target.id);
-        } else {
-          // otherwise, we just use the target as is.
-          targetAfterClick = ev.target;
-        }
-        var menuList = document.getElementById('menuBar').querySelectorAll('.dropdownContent');
-        menuList.forEach((e) => {
-          if (
-            show &&
-            (!targetAfterClick ||
-              targetAfterClick.closest('#GithubMenu') === null ||
-              targetAfterClick.classList.contains('closeOnClick'))
-          ) {
-            e.classList.remove('show');
-          } else {
-            e.classList.add('show');
-          }
-        });
+  <script>
+    // menu bar behavior like MacOS menu bars
+    let show = false;
+    document.getElementById('menuBar').addEventListener('click', (ev) => {
+      // Notes on menu switching behaviour:
+      // We want menu bars to work like Mac OS bars, EXCEPT that
+      // ... the GitHub menu should stay open on clicks (=> navigation)
+      // ... UNLESS a file is opened or commit button is clicked.
+      let targetAfterClick = '';
+      if (ev.target.hasAttribute('id')) {
+        // During navigation, GitHub menu rebuilds itself, so the ev.target
+        // might be lost by the time we get to this handler.
+        // For these cases (e.g., click on repositoriesHeader), we fetch the newly-built
+        // version of the target, below, if it has an ID.
+        targetAfterClick = document.getElementById(ev.target.id);
+      } else {
+        // otherwise, we just use the target as is.
+        targetAfterClick = ev.target;
+      }
+      var menuList = document.getElementById('menuBar').querySelectorAll('.dropdownContent');
+      menuList.forEach((e) => {
         if (
-          !targetAfterClick ||
-          targetAfterClick.closest('#GithubMenu') === null ||
-          targetAfterClick.classList.contains('closeOnClick')
+          show &&
+          (!targetAfterClick ||
+            targetAfterClick.closest('#GithubMenu') === null ||
+            targetAfterClick.classList.contains('closeOnClick'))
         ) {
-          // toggle "show" only if not in continuous-Github-menu behaviour
-          show = !show;
-        }
-        // if user is logged out, force github menu to be hidden
-        if (document.getElementById('GithubMenu').classList.contains('loggedOut')) {
-          document.getElementById('GithubMenu').classList.remove('show');
+          e.classList.remove('show');
+        } else {
+          e.classList.add('show');
         }
       });
+      if (
+        !targetAfterClick ||
+        targetAfterClick.closest('#GithubMenu') === null ||
+        targetAfterClick.classList.contains('closeOnClick')
+      ) {
+        // toggle "show" only if not in continuous-Github-menu behaviour
+        show = !show;
+      }
+      // if user is logged out, force github menu to be hidden
+      if (document.getElementById('GithubMenu').classList.contains('loggedOut')) {
+        document.getElementById('GithubMenu').classList.remove('show');
+      }
+    });
 
-      // switch tabs in settings menu
-      function switchTab(ev, containingElementId) {
-        console.log("switchtab :", ev, containingElementId)
-        //const tabId = ev.target.dataset.tab;
-        const tabId = ev.target.closest("[data-tab]").dataset.tab;
-        // console.log('switchTab: ', containingElementId, tabId);
-        // console.log('switchTab: ', ev);
-        let containingElement = document.getElementById(containingElementId);
-        if (containingElement) {
-          // hide all tab contents except tabId
-          for (let cont of containingElement.getElementsByClassName('tabcontent')) {
-            cont.style.display = cont.id === tabId ? 'block' : 'none';
-          }
-          // remove class "active" from tablinks except for current target
-          for (let tab of containingElement.getElementsByClassName('tablink')) {
-            // console.log('tab: ', tab);
-            // console.log('ev.currentTarget: ', ev.currentTarget);
-            tab === ev.currentTarget ? tab.classList.add('active') : tab.classList.remove('active');
-          }
+    // switch tabs in settings menu
+    function switchTab(ev, containingElementId) {
+      console.log("switchtab :", ev, containingElementId)
+      //const tabId = ev.target.dataset.tab;
+      const tabId = ev.target.closest("[data-tab]").dataset.tab;
+      // console.log('switchTab: ', containingElementId, tabId);
+      // console.log('switchTab: ', ev);
+      let containingElement = document.getElementById(containingElementId);
+      if (containingElement) {
+        // hide all tab contents except tabId
+        for (let cont of containingElement.getElementsByClassName('tabcontent')) {
+          cont.style.display = cont.id === tabId ? 'block' : 'none';
+        }
+        // remove class "active" from tablinks except for current target
+        for (let tab of containingElement.getElementsByClassName('tablink')) {
+          // console.log('tab: ', tab);
+          // console.log('ev.currentTarget: ', ev.currentTarget);
+          tab === ev.currentTarget ? tab.classList.add('active') : tab.classList.remove('active');
         }
       }
+    }
 
-      document.querySelectorAll('.defaultOpen').forEach((item) => item.click());
-    </script>
-  </body>
+    /*function toggleAccordion(ev, accordionBtnId, accordionPanelId) {
+      console.log("Toggle accodion:", accordionBtnId, accordionPanelId);
+      let accordionBtn = document.getElementById(accordionBtnId);
+      let accordionPanel = document.getElementById(accordionPanelId);
+
+      accordionBtn.classList.toggle('markup-accordion-btn-active');
+      accordionPanel.classList.toggle('markup-accordion-panel-active');
+    }*/
+
+    document.querySelectorAll('.defaultOpen').forEach((item) => item.click());
+  </script>
+</body>
+
 </html>

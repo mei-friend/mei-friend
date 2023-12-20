@@ -1,12 +1,12 @@
 .enrichmentToolsMenu {
-  display: inline-grid;
+  display: block;
   padding-left: 0px;
   align-items: start;
   justify-items: stretch;
 }
 
-.enrichmentToolsMenu div {
-  padding: 8px;
+.enrichmentToolsMenu>div {
+  padding: 5px 8px 0px 8px;
 }
 
 .enrichmentToolsMenu li {
@@ -19,7 +19,7 @@
 .annotationToolsIcon {
   border: 1px solid black;
   border-radius: 5px;
-  padding: 10px;
+  padding: 8px;
   display: flex;
   align-content: center;
   gap: 6px;
@@ -72,19 +72,51 @@ fieldset {
   cursor: pointer;
 }
 
-.markup-dropdown {
+.markup-panel {
+  display: grid;
   position: relative;
+}
+
+.markup-btn-group {
+  border: 1px solid black;
+  border-radius: 5px;
+  /*padding: 10px;*/
+  cursor: pointer; /* Pointer/hand icon */
+  float: auto; /* Float the buttons side by side */
+}
+
+/*.btn-group:after {
+  content: "";
+  clear: both;
+  display: table;
+}*/
+
+.markup-btn-group span:not(:last-child) {
+ padding-right: 10px;
+}
+
+/* Add a background color on hover */
+/*.markup-btn-group .markup-dropdown:hover {
+  background-color: var(--annotationPanelHoverColor);
+}*/
+
+.markup-dropdown {
+  /*position: relative;*/
   display: inline-block;
 }
 
 .markup-dropdown-content {
   display: none;
-  position: absolute;
+  position: fixed;
   background-color: var(--annotationPanelLinkBackgroundColor);
-  min-width: 160px;
+  min-width: 100px;
   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
   z-index: 1;
 }
+
+/*.markup-dropdown-up {
+  bottom: 50px;
+}*/
 
 .markup-dropdown-content a {
   color: var(--annotationPanelTextColor);

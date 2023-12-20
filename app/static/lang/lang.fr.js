@@ -282,6 +282,8 @@ export const lang = {
   breaksSelectLine: { text: 'Système' },
   breaksSelectEncoded: { text: 'Système et page' },
   breaksSelectSmart: { text: 'Intelligent' },
+  choiceSelect: { description: 'Choisissez le contenu affiché pour les éléments de choix' },
+  choiceDefault: { text: '(choix par défaut)' },
   updateControlsLabel: {
     text: 'Mise à jour',
     description: "Comportement de mise à jour des contrôles de la notation après les modifications de l'encodage",
@@ -831,36 +833,42 @@ export const lang = {
     text: 'Afficher les éléments de mise en forme éditoriale',
     description: 'Surligner tous les éléments contenus dans les éléments de mise en forme éditoriale',
   },
+  alternativeVersionContent: {
+    text: 'Sélectionner le contenu par défaut pour les encodages alternatifs',
+    description:
+      'Choisir si les encodages alternatifs nouvellement créés sont vides ou des copies de la lecture originale',
+    labels: ['vide', 'copie'],
+  },
   suppliedColor: {
     text: 'Sélectionner la couleur de mise en évidence <supplied>',
     description: 'Sélectionner la couleur de mise en évidence <supplied>',
   },
   unclearColor: {
-    title: 'Sélectionner la couleur de mise en évidence <unclear>',
+    text: 'Sélectionner la couleur de mise en évidence <unclear>',
     description: 'Sélectionner la couleur de mise en évidence <unclear>',
   },
   sicColor: {
-    title: 'Sélectionner la couleur de mise en évidence <sic>',
+    text: 'Sélectionner la couleur de mise en évidence <sic>',
     description: 'Sélectionner la couleur de mise en évidence <sic>',
   },
   corrColor: {
-    title: 'Sélectionner la couleur de mise en évidence <corr>',
+    text: 'Sélectionner la couleur de mise en évidence <corr>',
     description: 'Sélectionner la couleur de mise en évidence <corr>',
   },
   origColor: {
-    title: 'Sélectionner la couleur de mise en évidence <orig>',
+    text: 'Sélectionner la couleur de mise en évidence <orig>',
     description: 'Sélectionner la couleur de mise en évidence <orig>',
   },
   regColor: {
-    title: 'Sélectionner la couleur de mise en évidence <reg>',
+    text: 'Sélectionner la couleur de mise en évidence <reg>',
     description: 'Sélectionner la couleur de mise en évidence <reg>',
   },
   addColor: {
-    title: 'Sélectionner la couleur de mise en évidence <add>',
+    text: 'Sélectionner la couleur de mise en évidence <add>',
     description: 'Sélectionner la couleur de mise en évidence <add>',
   },
   delColor: {
-    title: 'Sélectionner la couleur de mise en évidence <del>',
+    text: 'Sélectionner la couleur de mise en évidence <del>',
     description: 'Sélectionner la couleur de mise en évidence <del>',
   },
 

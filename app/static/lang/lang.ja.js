@@ -271,6 +271,8 @@ export const lang = {
   breaksSelectLine: { text: 'システム' },
   breaksSelectEncoded: { text: 'システムとページ' },
   breaksSelectSmart: { text: 'スマート' },
+  choiceSelect: { description: '選択要素の表示コンテンツを選択します' },
+  choiceDefault: { text: '(デフォルトの選択)' },
   updateControlsLabel: { text: '更新', description: 'エンコード変更後の楽譜の制御更新動作' },
   liveUpdateCheckbox: { description: 'エンコード変更後に楽譜を自動的に更新' },
   codeManualUpdateButton: { description: '楽譜を手動で更新' },
@@ -785,20 +787,53 @@ export const lang = {
   },
   // Supplied element
   titleSupplied: {
-    text: '編集コンテンツを操作',
-    description: '<supplied>要素の操作を制御します',
-  },
-  showSupplied: {
-    text: '<supplied>要素を表示',
-    description: '<supplied>要素に含まれるすべての要素を強調表示します',
-  },
-  suppliedColor: {
-    text: '<supplied>の強調表示色を選択',
-    description: '<supplied>の強調表示色を選択',
+    text: '編集コンテンツの処理',
+    description: '編集マークアップの処理を制御',
   },
   respSelect: {
-    text: '<supplied>の責任者を選択',
-    description: '責任者IDを選択',
+    text: 'マークアップの責任を選択',
+    description: '責任のIDを選択',
+  },
+  showMarkup: {
+    text: '編集マークアップ要素を表示',
+    description: '編集マークアップ要素に含まれるすべての要素を強調表示',
+  },
+  alternativeVersionContent: {
+    text: '代替エンコーディングのデフォルトコンテンツを選択',
+    description: '新しく作成された代替エンコーディングが空であるか、元の読み物のコピーであるかを選択',
+    labels: ['空', 'コピー'],
+  },
+  suppliedColor: {
+    text: '<supplied>のハイライトカラーを選択',
+    description: '<supplied>のハイライトカラーを選択',
+  },
+  unclearColor: {
+    text: '<unclear>のハイライトカラーを選択',
+    description: '<unclear>のハイライトカラーを選択',
+  },
+  sicColor: {
+    text: '<sic>のハイライトカラーを選択',
+    description: '<sic>のハイライトカラーを選択',
+  },
+  corrColor: {
+    text: '<corr>のハイライトカラーを選択',
+    description: '<corr>のハイライトカラーを選択',
+  },
+  origColor: {
+    text: '<orig>のハイライトカラーを選択',
+    description: '<orig>のハイライトカラーを選択',
+  },
+  regColor: {
+    text: '<reg>のハイライトカラーを選択',
+    description: '<reg>のハイライトカラーを選択',
+  },
+  addColor: {
+    text: '<add>のハイライトカラーを選択',
+    description: '<add>のハイライトカラーを選択',
+  },
+  delColor: {
+    text: '<del>のハイライトカラーを選択',
+    description: '<del>のハイライトカラーを選択',
   },
 
   // EDITOR SETTINGS / CODEMIRROR SETTINGS

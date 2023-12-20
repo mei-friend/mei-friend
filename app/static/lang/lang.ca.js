@@ -282,6 +282,8 @@ export const lang = {
   breaksSelectLine: { text: 'Sistema' },
   breaksSelectEncoded: { text: 'Sistema i pàgina' },
   breaksSelectSmart: { text: 'Intel·ligent' },
+  choiceSelect: { description: 'Trieu el contingut mostrat pels elements de selecció' },
+  choiceDefault: { text: '(opció per defecte)' },
   updateControlsLabel: {
     text: 'Actualitzar',
     description: "Comportament d'actualització dels controls de la notació després de canvis en l'encoding",
@@ -832,36 +834,41 @@ export const lang = {
     text: 'Mostrar elements de marca editorial',
     description: 'Destacar tots els elements continguts per elements de marca editorial',
   },
+  alternativeVersionContent: {
+    text: 'Seleccioneu el contingut per defecte per a les codificacions alternatives',
+    description: 'Trieu si les codificacions alternatives de nova creació estan buides o còpies de la lectura original',
+    labels: ['buit', 'còpia'],
+  },
   suppliedColor: {
     text: "Seleccionar el color d'ús de <supplied>",
     description: "Seleccionar el color d'ús de <supplied>",
   },
   unclearColor: {
-    title: "Seleccionar el color d'ús de <unclear>",
+    text: "Seleccionar el color d'ús de <unclear>",
     description: "Seleccionar el color d'ús de <unclear>",
   },
   sicColor: {
-    title: "Seleccionar el color d'ús de <sic>",
+    text: "Seleccionar el color d'ús de <sic>",
     description: "Seleccionar el color d'ús de <sic>",
   },
   corrColor: {
-    title: "Seleccionar el color d'ús de <corr>",
+    text: "Seleccionar el color d'ús de <corr>",
     description: "Seleccionar el color d'ús de <corr>",
   },
   origColor: {
-    title: "Seleccionar el color d'ús de <orig>",
+    text: "Seleccionar el color d'ús de <orig>",
     description: "Seleccionar el color d'ús de <orig>",
   },
   regColor: {
-    title: "Seleccionar el color d'ús de <reg>",
+    text: "Seleccionar el color d'ús de <reg>",
     description: "Seleccionar el color d'ús de <reg>",
   },
   addColor: {
-    title: "Seleccionar el color d'ús de <add>",
+    text: "Seleccionar el color d'ús de <add>",
     description: "Seleccionar el color d'ús de <add>",
   },
   delColor: {
-    title: "Seleccionar el color d'ús de <del>",
+    text: "Seleccionar el color d'ús de <del>",
     description: "Seleccionar el color d'ús de <del>",
   },
 

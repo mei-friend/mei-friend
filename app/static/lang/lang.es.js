@@ -279,6 +279,8 @@ export const lang = {
   breaksSelectMeasure: { text: 'Compás' },
   breaksSelectEncoded: { text: 'Sistema y página' },
   breaksSelectSmart: { text: 'Smart' },
+  choiceSelect: { description: 'Elegir contenido mostrado para elementos de elección' },
+  choiceDefault: { text: '(elección por defecto)' },
   updateControlsLabel: {
     text: 'Actualizar',
     description: 'Controlar el comportamiento de actualización de la notación después de cambios en la codificación',
@@ -832,36 +834,42 @@ export const lang = {
     text: 'Mostrar elementos de marcado editorial',
     description: 'Resaltar todos los elementos contenidos por elementos de marcado editorial',
   },
+  alternativeVersionContent: {
+    text: 'Seleccionar contenido predeterminado para codificaciones alternativas',
+    description:
+      'Elegir si las codificaciones alternativas recién creadas están vacías o son copias de la lectura original',
+    labels: ['vacío', 'copia'],
+  },
   suppliedColor: {
     text: 'Seleccionar color de resaltado para <supplied>',
     description: 'Seleccionar color de resaltado para <supplied>',
   },
   unclearColor: {
-    title: 'Seleccionar color de resaltado para <unclear>',
+    text: 'Seleccionar color de resaltado para <unclear>',
     description: 'Seleccionar color de resaltado para <unclear>',
   },
   sicColor: {
-    title: 'Seleccionar color de resaltado para <sic>',
+    text: 'Seleccionar color de resaltado para <sic>',
     description: 'Seleccionar color de resaltado para <sic>',
   },
   corrColor: {
-    title: 'Seleccionar color de resaltado para <corr>',
+    text: 'Seleccionar color de resaltado para <corr>',
     description: 'Seleccionar color de resaltado para <corr>',
   },
   origColor: {
-    title: 'Seleccionar color de resaltado para <orig>',
+    text: 'Seleccionar color de resaltado para <orig>',
     description: 'Seleccionar color de resaltado para <orig>',
   },
   regColor: {
-    title: 'Seleccionar color de resaltado para <reg>',
+    text: 'Seleccionar color de resaltado para <reg>',
     description: 'Seleccionar color de resaltado para <reg>',
   },
   addColor: {
-    title: 'Seleccionar color de resaltado para <add>',
+    text: 'Seleccionar color de resaltado para <add>',
     description: 'Seleccionar color de resaltado para <add>',
   },
   delColor: {
-    title: 'Seleccionar color de resaltado para <del>',
+    text: 'Seleccionar color de resaltado para <del>',
     description: 'Seleccionar color de resaltado para <del>',
   },
 

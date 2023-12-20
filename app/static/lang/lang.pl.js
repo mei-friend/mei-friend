@@ -279,6 +279,8 @@ export const lang = {
   breaksSelectLine: { text: 'System' },
   breaksSelectEncoded: { text: 'System i strona' },
   breaksSelectSmart: { text: 'Inteligentnie' },
+  choiceSelect: { description: 'Wybierz wyświetlaną zawartość dla elementów wyboru' },
+  choiceDefault: { text: '(domyślny wybór)' },
   updateControlsLabel: {
     text: 'Aktualizuj',
     description: 'Zachowanie aktualizacji sterowania notacją po zmianach w kodowaniu',
@@ -827,36 +829,41 @@ export const lang = {
     text: 'Pokaż elementy znacznika redakcyjnego',
     description: 'Podświetl wszystkie elementy zawarte w elementach znacznika redakcyjnego',
   },
+  alternativeVersionContent: {
+    text: 'Wybierz domyślną zawartość dla alternatywnych kodowań',
+    description: 'Wybierz, czy nowo utworzone alternatywne kodowania są puste czy kopie oryginalnego odczytu',
+    labels: ['puste', 'kopia'],
+  },
   suppliedColor: {
     text: 'Wybierz kolor podświetlenia <supplied>',
     description: 'Wybierz kolor podświetlenia <supplied>',
   },
   unclearColor: {
-    title: 'Wybierz kolor podświetlenia <unclear>',
+    text: 'Wybierz kolor podświetlenia <unclear>',
     description: 'Wybierz kolor podświetlenia <unclear>',
   },
   sicColor: {
-    title: 'Wybierz kolor podświetlenia <sic>',
+    text: 'Wybierz kolor podświetlenia <sic>',
     description: 'Wybierz kolor podświetlenia <sic>',
   },
   corrColor: {
-    title: 'Wybierz kolor podświetlenia <corr>',
+    text: 'Wybierz kolor podświetlenia <corr>',
     description: 'Wybierz kolor podświetlenia <corr>',
   },
   origColor: {
-    title: 'Wybierz kolor podświetlenia <orig>',
+    text: 'Wybierz kolor podświetlenia <orig>',
     description: 'Wybierz kolor podświetlenia <orig>',
   },
   regColor: {
-    title: 'Wybierz kolor podświetlenia <reg>',
+    text: 'Wybierz kolor podświetlenia <reg>',
     description: 'Wybierz kolor podświetlenia <reg>',
   },
   addColor: {
-    title: 'Wybierz kolor podświetlenia <add>',
+    text: 'Wybierz kolor podświetlenia <add>',
     description: 'Wybierz kolor podświetlenia <add>',
   },
   delColor: {
-    title: 'Wybierz kolor podświetlenia <del>',
+    text: 'Wybierz kolor podświetlenia <del>',
     description: 'Wybierz kolor podświetlenia <del>',
   },
 

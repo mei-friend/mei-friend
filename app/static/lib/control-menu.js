@@ -3,6 +3,7 @@ import { fontList, platform } from './defaults.js';
 import { svgNameSpace } from './dom-utils.js';
 import { translator } from './main.js';
 import { createPageRangeSelector } from './page-range-selector.js';
+import { choiceOptions } from './markup.js';
 
 // constructs the div structure of #notation parent
 export function createNotationDiv(parentElement, scale) {
@@ -231,6 +232,18 @@ export function createNotationControlBar(parentElement, scale) {
   breaksSelector.classList.add('input-select');
   breaksCtrls.title = 'Define system/page breaks behavior of notation';
   breaksCtrls.appendChild(breaksSelector);
+
+  // choice selector
+  let choiceCtrls = document.createElement('div');
+  choiceCtrls.id = 'choiceControls';
+  choiceCtrls.classList.add('controls');
+  vrvCtrlMenu.appendChild(choiceCtrls);
+
+  let choiceSelector = document.createElement('select');
+  choiceSelector.id = 'choiceSelect';
+  choiceSelector.classList.add('btn', 'input-select');
+  choiceSelector.title = 'Choose displayed content for choice elements';
+  choiceCtrls.appendChild(choiceSelector);
 
   // MEI encoding update behavior
   let updateCtrls = document.createElement('div');
@@ -628,6 +641,26 @@ export function handleSmartBreaksOption(speedMode) {
     }
   });
 } // handleSmartBreaksOption()
+
+/**
+ * Adds the options for choice to the choiceSelect in the 
+ * notation control bar.
+ * @param {string} active value of currently active selection 
+ */
+export function setChoiceOptions(active) {
+  let choiceSelect = document.getElementById('choiceSelect');
+  while (choiceSelect.hasChildNodes()) choiceSelect.remove(0);
+
+  choiceOptions.forEach((el, key) => {
+    if (el.value === active) {
+      choiceSelect[key] = new Option(el.label, el.value, false, true);
+    } else {
+      choiceSelect[key] = new Option(el.label, el.value, false, false);
+    }
+    choiceSelect[key].id = el.id;
+    choiceSelect[key].dataset.prop = el.prop;
+  });
+}
 
 // checks xmlDoc for section, ending, lem, rdg elements for quick navigation
 export function generateSectionSelect(xmlDoc) {

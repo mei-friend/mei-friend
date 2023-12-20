@@ -70,6 +70,7 @@ import {
   addModifyerKeys,
   manualCurrentPage,
   generateSectionSelect,
+  setChoiceOptions,
 } from './control-menu.js';
 import { clock, unverified, xCircleFill } from '../css/icons.js';
 import { setCursorToId } from './utils.js';
@@ -899,6 +900,7 @@ async function vrvWorkerEventsHandler(ev) {
       drawRightFooter();
       document.getElementById('statusBar').innerHTML = `Verovio ${tkVersion} ${translator.lang.verovioLoaded.text}.`;
       setBreaksOptions(tkAvailableOptions, defaultVerovioOptions.breaks);
+      setChoiceOptions('');
       if (!storage.supported || !meiFileName) {
         // open default mei file
         openFile();
@@ -958,6 +960,9 @@ async function vrvWorkerEventsHandler(ev) {
       } else if (v.speedMode && bs === 'auto' && Object.keys(v.pageBreaks).length > 0) {
         v.pageCount = Object.keys(v.pageBreaks).length;
       }
+      //update choiceSelect
+      let cs = document.getElementById('choiceSelect').value;
+      setChoiceOptions(cs);
       // update only if still same page
       if (v.currentPage === ev.data.pageNo || ev.data.forceUpdate || ev.data.computePageBreaks || v.pdfMode) {
         if (ev.data.forceUpdate) {
@@ -1964,6 +1969,12 @@ function addEventListeners(v, cm) {
       start: {},
       end: {},
     };
+    v.updateAll(cm, {}, v.selectedElements[0]);
+  });
+  // choice selector
+  document.getElementById('choiceSelect').addEventListener('change', (ev) => {
+    // selection has changed
+    // then updateAll()
     v.updateAll(cm, {}, v.selectedElements[0]);
   });
   // navigation

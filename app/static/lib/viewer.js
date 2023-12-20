@@ -70,6 +70,7 @@ export default class Viewer {
     this.timeoutDelay = defaultViewerTimeoutDelay; // ms, window in which concurrent clicks are treated as one update
     this.verovioIcon = document.getElementById('verovioIcon');
     this.breaksSelect = /** @type HTMLSelectElement */ (document.getElementById('breaksSelect'));
+    this.choiceSelect = document.getElementById('choiceSelect'); //choice select control
     this.alertCloser;
     this.pdfMode = false;
     this.cmd2KeyPressed = false;
@@ -242,7 +243,8 @@ export default class Viewer {
     }
     // update DOM only if encoding has been edited or
     this.loadXml(mei, forceReload);
-    this.xmlDoc = selectMarkup(this.xmlDoc); // select markup
+    const choiceOption = this.choiceSelect.value;
+    //this.xmlDoc = selectMarkup(this.xmlDoc, choiceOption); // select markup
     // count pages from system/pagebreaks
     if (Array.isArray(breaks)) {
       let music = this.xmlDoc.querySelector('music score');
@@ -365,6 +367,12 @@ export default class Viewer {
     if (fontSel) this.vrvOptions.font = fontSel.value;
     let bs = this.breaksSelect;
     if (bs) this.vrvOptions.breaks = bs.value;
+    let choiceSelect = this.choiceSelect.value;
+    if (choiceSelect != '') {
+      this.vrvOptions.choiceXPathQuery = ['./' + choiceSelect];
+    } else {
+      this.vrvOptions.choiceXPathQuery = [];
+    }
 
     // update page dimensions, only if not in pdf mode
     if (this.pdfMode) {

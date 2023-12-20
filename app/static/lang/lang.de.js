@@ -278,6 +278,8 @@ export const lang = {
   breaksSelectLine: { text: 'System' },
   breaksSelectEncoded: { text: 'System und Seite' },
   breaksSelectSmart: { text: 'Smart' },
+  choiceSelect: { description: 'Wählen Sie den angezeigten Inhalt für Choice-Elemente' },
+  choiceDefault: { text: '(Standardauswahl)' },
   updateControlsLabel: {
     text: 'Aktualisieren',
     description: 'Aktualisierungsverhalten der Notation nach Änderungen in der Kodierung',
@@ -834,36 +836,41 @@ export const lang = {
     text: 'Zeige Editorisches Markup',
     description: 'Alle Elemente hervorheben, die mit editorischem Markup umschlossen sind',
   },
+  alternativeVersionContent: {
+    text: 'Wählen Sie den Standardinhalt für alternative Codierungen aus',
+    description: 'Wählen Sie aus, ob neu erstellte alternative Codierungen leer sind oder Kopien der originalen Lesung',
+    labels: ['leer', 'Kopie'],
+  },
   suppliedColor: {
     text: 'Farbe für <supplied>',
     description: 'Farbe für <supplied> auswählen',
   },
   unclearColor: {
-    title: 'Farbe für <unclear>',
+    text: 'Farbe für <unclear>',
     description: 'Farbe für <unclear> auswählen',
   },
   sicColor: {
-    title: 'Farbe für <sic>',
+    text: 'Farbe für <sic>',
     description: 'Farbe für <sic> auswählen',
   },
   corrColor: {
-    title: 'Farbe für <corr>',
+    text: 'Farbe für <corr>',
     description: 'Farbe für <corr> auswählen',
   },
   origColor: {
-    title: 'Farbe für <orig>',
+    text: 'Farbe für <orig>',
     description: 'Farbe für <orig> auswählen',
   },
   regColor: {
-    title: 'Farbe für <reg>',
+    text: 'Farbe für <reg>',
     description: 'Farbe für <reg> auswählen',
   },
   addColor: {
-    title: 'Farbe für <add>',
+    text: 'Farbe für <add>',
     description: 'Farbe für <add> auswählen',
   },
   delColor: {
-    title: 'Farbe für <del>',
+    text: 'Farbe für <del>',
     description: 'Farbe für <del> auswählen',
   },
 

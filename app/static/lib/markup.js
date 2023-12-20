@@ -7,12 +7,18 @@
 
 import * as att from './attribute-classes.js';
 import { addApplicationInfo, indentSelection, replaceInEditor } from './editor.js';
-import { cm, cmd, v } from './main.js';
+import { cm, cmd, translator, v } from './main.js';
 import * as dutils from './dom-utils.js';
 import * as speed from './speed.js';
 import * as utils from './utils.js';
 import Viewer from './viewer.js';
 import { addListItem, isItemInList, refreshAnnotationsList, retrieveItemValuesByProperty } from './enrichment_panel.js';
+import { setChoiceOptions } from './control-menu.js';
+
+/**
+ * Contains choice options currently available for the document
+ */
+export var choiceOptions = [];
 
 /**
  * Reads markup elements from the XML document and creates
@@ -23,26 +29,45 @@ export function readMarkup() {
   // create objects out of them
   // add objects to list
   // use xmlMarkupToListItem(selectedElements, mElName)
-  let elementList = att.modelTranscriptionLike.join(',');
+  let elementList = att.modelTranscriptionLike.concat(...att.alternativeEncodingElements).join(',');
   let markup = Array.from(v.xmlDoc.querySelectorAll(elementList));
   markup = markup.filter((markup) => !isItemInList(markup.getAttribute('xml:id')));
 
-  let correspIdsToIgnore = [];
+  let idsToIgnore = [];
 
   // get unique selections for all currently available markup items in listItems
   // this is to ensure that for multiple corresponding markup elements only one list item is created
   // containing all corresponding items as selection
   let currentSelections = retrieveItemValuesByProperty('isMarkup', 'selection');
   currentSelections = utils.flattenArrayToUniques(currentSelections);
-  correspIdsToIgnore = correspIdsToIgnore.concat(...currentSelections);
+  idsToIgnore = idsToIgnore.concat(...currentSelections);
+
+  // get ids of all children of choice/subst/app and add them to idsToIgnore
+  // adding them for each element when it's processed didn't work
+  let alternativeVersions = Array.from(
+    v.xmlDoc.querySelectorAll(att.alternativeEncodingElements.join(',') + ' > ' + '*')
+  );
+  alternativeVersions?.forEach((element) => {
+    let children = element.children;
+    for (let i = 0; i < children.length; i++) {
+      idsToIgnore.push(children[i].getAttribute('xml:id'));
+    }
+  });
 
   markup.forEach((markupEl) => {
+    let content = [];
     let elId = markupEl.getAttribute('xml:id');
-    if (!correspIdsToIgnore.includes(elId)) {
+    if (!idsToIgnore.includes(elId)) {
       let elName = markupEl.localName;
       if (elId == null) {
         elId = utils.generateXmlId(elName, v.xmlIdStyle);
         markupEl.setAttributeNS(dutils.xmlNameSpace, 'xml:id', elId);
+      }
+
+      if (att.alternativeEncodingElements.includes(elName)) {
+        for (let i = 0; i < markupEl.children.length; i++) {
+          content.push(markupEl.children[i].localName);
+        }
       }
 
       let correspStr = markupEl.getAttribute('corresp');
@@ -56,10 +81,85 @@ export function readMarkup() {
             return id;
           }
         });
-        correspIds.forEach((id) => correspIdsToIgnore.push(id));
+        correspIds.forEach((id) => idsToIgnore.push(id));
       }
       correspIds.unshift(elId);
-      xmlMarkupToListItem(elId, elName, correspIds);
+      xmlMarkupToListItem(elId, elName, correspIds, content);
+    }
+  });
+  updateChoiceOptions();
+}
+
+/**
+ * Creates a list item object for markup elements based on some basic data
+ * @param {string} currentElementId xml:id of current element -> item.id
+ * @param {string} mElName element name -> item.type
+ * @param {Array[string]} correspElements ids of corresponding elements (including self) -> item.selection
+ * @param {Array[string]} [content=[]] children of multi-layer elements like choice/subst/app
+ * @returns {boolean} adding item was successful
+ */
+function xmlMarkupToListItem(currentElementId, mElName, correspElements, content = []) {
+  // one addMarkupAction might result in multiple markup elements
+  // e.g. when selecting notes and control events
+  // mostly because symbols in a score aren't necessarily close in the xml tree
+  // properties are similar to annotations
+  // id is the xml:id of the first markup element
+  // selection contains all markup elements created at the same time
+
+  const markupItem = {
+    id: currentElementId,
+    type: mElName,
+    isMarkup: true,
+    selection: correspElements,
+  };
+
+  if (content.length > 0) {
+    markupItem.content = content;
+  }
+
+  let success = addListItem(markupItem);
+  return success;
+}
+
+/**
+ * Retrieves the content of all choice elements from the document to store them in choiceOptions.
+ * Will be read by control-menu.js/setChoiceOptions() to build the menu.
+ */
+function updateChoiceOptions() {
+  // the loading logic causes this function to run twice.
+  // so make sure this always represents the state of the mei document
+  // therefore this will be reset
+  choiceOptions = [];
+  let defaultOption = {
+    label: translator.lang.choiceDefault.text,
+    value: '',
+    count: 100,
+    id: 'choiceDefault',
+    prop: 'choiceXPathQuery',
+  };
+  let elNames = choiceOptions.map((obj) => obj.value);
+  let choices = Array.from(v.xmlDoc.querySelectorAll('choice'));
+  //TODO: change to att.alternativeEncodingElements.join(',') when ready
+
+  choiceOptions.push(defaultOption);
+
+  choices.forEach((choice) => {
+    for (let i = 0; i < choice.children.length; i++) {
+      let child = choice.children[i];
+      if (!elNames.includes(child.localName)) {
+        let capitalisedOption = child.localName[0].toUpperCase() + child.localName.slice(1);
+        choiceOptions.push({
+          label: capitalisedOption,
+          value: child.localName,
+          count: 1,
+          id: 'choice' + capitalisedOption,
+          prop: 'choiceXPathQuery',
+        });
+        elNames.push(child.localName);
+      } else {
+        let obj = choiceOptions.find((obj) => obj.value === child.localName);
+        obj.count = obj.count + 1;
+      }
     }
   });
 }
@@ -130,34 +230,40 @@ export function selectApparatus(xmlDoc, sourceId = '') {
 /**
  * Selects the requested choice child element (TODO) and
  * keeps it in xmlDoc; other choices are removed.
+ * Keeps choice and content of the first child to allow navigation and highlighting.
  * @param {Document} xmlDoc
- * @param {string} sourceId
+ * @param {string} childElName
  * @returns {Document} xmlDoc
  */
-export function selectChoice(xmlDoc, sourceId) {
+export function selectChoice(xmlDoc, childElName) {
   if (!xmlDoc) return null;
-  let choice;
-  // Go through all choice elements replace it by first child
-  while ((choice = xmlDoc.querySelector('choice'))) {
-    let parent = choice.parentElement;
+  let choices = Array.from(xmlDoc.querySelectorAll('choice'));
+  choices.forEach((choice) => {
     // this selects the first child inside <choice> by default, to be changed later (TODO)
-    let firstChild; // get first child element that is an ELEMENT_NODE
-    for (let node of choice.childNodes) {
-      if (node.nodeType === Node.ELEMENT_NODE) {
-        firstChild = node;
-        break;
+    let children = choice.children;
+    if (children) {
+      let childNames = [];
+      for (let i = 0; i > children.length; i++) {
+        childNames.push(children[i].localName);
       }
-    }
-    if (parent && firstChild) {
-      // add clones of child nodes before choice...
-      firstChild.childNodes.forEach((child) => {
-        parent.insertBefore(child.cloneNode(true), choice);
-      });
-      choice.remove(); // ... and remove choice afterwards
+      if (childElName === '' || !childNames.includes(childElName)) {
+        // delete currently everything but the first child
+        for (let i = 1; i < children.length; i++) {
+          children[i].remove();
+        }
+      } else {
+        for (let i = 0; i < children.length; i++) {
+          let currentChild = children[i];
+          if (currentChild.localName !== childElName) {
+            choice.remove(currentChild);
+          }
+        }
+      }
     } else {
       console.log('This choice has no child elements. ', choice);
     }
-  }
+  });
+
   return xmlDoc;
 } // selectChoice()
 
@@ -177,39 +283,37 @@ function firstChildElement(parent) {
 
 /**
  * Calls the function to add markup and refreshes the list of items
- * @param {string} attrName
- * @param {string} mElName
+ * @param {Event} event click event
  */
-export function addMarkup(attrName = 'none', mElName = 'supplied') {
-  addTranscriptionLikeElement(v, cm, attrName, mElName);
-  //let successfullyAdded = xmlMarkupToListItem(v.selectedElements, mElName);
-  // Manually updating the item list is not necessary because refreshing the code in the editor triggers readMarkup()
-  refreshAnnotationsList();
-}
+export function addMarkup(event) {
+  let eventTarget = event.currentTarget;
+  let mElName = eventTarget.dataset.elName;
+  let attrName = eventTarget.dataset.selection;
+  let multiLayerContent = eventTarget.dataset.content?.split(',');
+  if (!att.modelTranscriptionLike.includes(mElName) && !att.alternativeEncodingElements.includes(mElName)) return;
 
-/**
- * Creates a list item object for markup elements based on some basic data
- * @param {string} currentElementId xml:id of current element -> item.id
- * @param {string} mElName element name -> item.type
- * @param {Array[string]} correspElements ids of corresponding elements (including self) -> item.selection
- * @returns {boolean} adding item was successful
- */
-function xmlMarkupToListItem(currentElementId, mElName, correspElements) {
-  // one addMarkupAction might result in multiple markup elements
-  // e.g. when selecting notes and control events
-  // mostly because symbols in a score aren't necessarily close in the xml tree
-  // properties are similar to annotations
-  // id is the xml:id of the first markup element
-  // selection contains all markup elements created at the same time
-
-  const markupItem = {
-    id: currentElementId,
-    type: mElName,
-    isMarkup: true,
-    selection: correspElements,
-  };
-  let success = addListItem(markupItem);
-  return success;
+  if (att.alternativeEncodingElements.includes(mElName) && multiLayerContent == undefined) {
+    v.showAlert('Please first select a content option for this markup element!');
+  } else {
+    addMarkupToXML(v, cm, attrName, mElName, multiLayerContent);
+    //let successfullyAdded = xmlMarkupToListItem(v.selectedElements, mElName);
+    // Manually updating the item list is not necessary because refreshing the code in the editor triggers readMarkup()
+    refreshAnnotationsList();
+    //select elements of last reading for alternative encodings if copied
+    if (multiLayerContent != undefined && document.getElementById('alternativeVersionContent').value == 'copy') {
+      let newSelection = [];
+      v.selectedElements.forEach((id) => {
+        let selEl = v.xmlDoc.querySelector("[*|id='" + id + "']");
+        let lastChild = selEl.lastElementChild;
+        for (let child of lastChild.children) {
+          newSelection.push(child.getAttribute('xml:id'));
+        }
+      });
+      v.selectedElements = newSelection;
+      setChoiceOptions(multiLayerContent[multiLayerContent.length - 1]);
+      v.updateAll(cm, {}, v.selectedElements[0]);
+    }
+  }
 }
 
 /**
@@ -229,14 +333,12 @@ function xmlMarkupToListItem(currentElementId, mElName, correspElements) {
  * @param {CodeMirror} cm
  * @param {string} attrName ('artic', 'accid')
  * @param {string} mElName name of markup element to apply
- * @returns
  */
-export function addTranscriptionLikeElement(v, cm, attrName = 'none', mElName = 'supplied') {
+function addMarkupToXML(v, cm, attrName = 'none', mElName, multiLayerContent = []) {
   v.loadXml(cm.getValue());
   v.selectedElements = speed.filterElements(v.selectedElements, v.xmlDoc);
   v.selectedElements = utils.sortElementsByScorePosition(v.selectedElements);
   if (v.selectedElements.length < 1) return;
-  if (!att.modelTranscriptionLike.includes(mElName)) return;
   v.allowCursorActivity = false;
 
   let uuids = [];
@@ -341,7 +443,7 @@ export function addTranscriptionLikeElement(v, cm, attrName = 'none', mElName = 
           cmd.addIds();
           v.hideUserPrompt(resolveModal);
           console.log('Added ids and proceed.');
-          let markupUuid = wrapGroupWithMarkup(v, cm, group, mElName, parent);
+          let markupUuid = createMarkup(v, group, mElName, parent, multiLayerContent);
           uuids.push(markupUuid);
         })
         .catch((resolveModal) => {
@@ -349,7 +451,7 @@ export function addTranscriptionLikeElement(v, cm, attrName = 'none', mElName = 
           console.log('Aborting action because of missing parent id.');
         });
     } else {
-      let markupUuid = wrapGroupWithMarkup(v, cm, group, mElName, parent);
+      let markupUuid = createMarkup(v, group, mElName, parent, multiLayerContent);
       uuids.push(markupUuid);
 
       // buffer.groupChangesSinceCheckpoint(checkPoint); // TODO
@@ -375,22 +477,100 @@ export function addTranscriptionLikeElement(v, cm, attrName = 'none', mElName = 
   addApplicationInfo(v, cm);
   v.updateData(cm, false, true);
   v.allowCursorActivity = true; // update notation again
-} // addSuppliedElement()
+} // addMarkupToXML()
+
+/**
+ * Creates either simple or multilayered markup for a selection of elements.
+ * Wraps the selection with a markup element and builds multilayered markup
+ * (choice, subst, app) around.
+ * @param {Viewer} v
+ * @param {Array} groupIds
+ * @param {string} mElName
+ * @param {HTMLElement} parentEl parent element
+ * @param {Array[string]} content element names
+ * @returns the uuid of the outer element
+ */
+function createMarkup(v, groupIds, mElName, parentEl, content) {
+  let upmostMarkupUuid;
+  let upmostMarkup;
+  if (att.modelTranscriptionLike.includes(mElName)) {
+    upmostMarkup = wrapGroupWithMarkup(v, groupIds, mElName, parentEl);
+  } else {
+    let firstChild = wrapGroupWithMarkup(v, groupIds, content[0], parentEl);
+    upmostMarkup = addMultiLayeredMarkup(v, mElName, parentEl, firstChild, content);
+  }
+  upmostMarkupUuid = upmostMarkup.getAttribute('xml:id');
+  return upmostMarkupUuid;
+}
+
+/**
+ * Wraps multi layered markup for alternative encodings around a markup element
+ * that then becomes the first child.
+ * @param {Viewer} v
+ * @param {string} mElName name of to level element to create, choice/subst/app
+ * @param {HTMLElement} parentEl parent for choice/subst/app
+ * @param {HTMLElement} firstChild first child of choice/subst/app with content
+ * @param {Array[string]} content element names for content of choice/subst/app
+ * @returns {HTMLElement} newly created multi layered markup element
+ */
+function addMultiLayeredMarkup(v, mElName, parentEl, firstChild, content) {
+  let upmostElement = document.createElementNS(dutils.meiNameSpace, mElName);
+  let upmostElementID = mintSuppliedId(firstChild.getAttribute('xml:id'), mElName, v);
+  upmostElement.setAttributeNS(dutils.xmlNameSpace, 'xml:id', upmostElementID);
+
+  let respID = getCurrentRespID();
+  if (respID) upmostElement.setAttribute('resp', '#' + respID);
+
+  let alternativeEncodingSettingsValue = document.getElementById('alternativeVersionContent').value;
+
+  parentEl.replaceChild(upmostElement, firstChild);
+  upmostElement.appendChild(firstChild);
+  let dummyEmpty = document.createComment('replace this with alternative reading');
+  let dummyCopy = document.createComment('change content of alternative reading');
+
+  for (let i = 1; i < content.length; i++) {
+    let nextChild = document.createElementNS(dutils.meiNameSpace, content[i]);
+    let nextChildID = mintSuppliedId(upmostElementID, content[i], v);
+    nextChild.setAttributeNS(dutils.xmlNameSpace, 'xml:id', nextChildID);
+    upmostElement.appendChild(nextChild);
+
+    switch (alternativeEncodingSettingsValue) {
+      case 'empty':
+        nextChild.appendChild(dummyEmpty);
+        break;
+      case 'copy':
+        nextChild.appendChild(dummyCopy);
+        let firstChildCopies = new DocumentFragment();
+        for (let child of firstChild.children) {
+          let newChildCopy = child.cloneNode(true);
+          let newId = utils.generateXmlId(child.localName, v.xmlIdStyle);
+          newChildCopy.setAttributeNS(dutils.xmlNameSpace, 'xml:id', newId);
+          firstChildCopies.appendChild(newChildCopy);
+        }
+        nextChild.appendChild(firstChildCopies);
+        break;
+      default:
+        nextChild.appendChild(dummyEmpty);
+        console.log('No default option for alternative encodings set!');
+    }
+  }
+
+  return upmostElement;
+}
 
 /**
  * Wraps a single group of elements with a markup element
  * @param {*} v viewer
- * @param {*} cm code mirror
  * @param {Array} groupIds xml:ids of elements to wrap
  * @param {string} mElName element name for markup
  * @param {HTMLElement} parentEl parent element of group to wrap
- * @returns {string} id of created markup element
+ * @returns {HTMLElement} created markup element
  */
-function wrapGroupWithMarkup(v, cm, groupIds, mElName, parentEl) {
+function wrapGroupWithMarkup(v, groupIds, mElName, parentEl) {
   let markupEl = document.createElementNS(dutils.meiNameSpace, mElName);
   let uuid;
 
-  let respId = document.getElementById('respSelect').value;
+  let respId = getCurrentRespID();
   if (respId) markupEl.setAttribute('resp', '#' + respId);
 
   for (let i = 0; i < groupIds.length; i++) {
@@ -420,7 +600,15 @@ function wrapGroupWithMarkup(v, cm, groupIds, mElName, parentEl) {
   // markup items will be imported to enrichment_panel.itemList because an event triggers
   // to read list items from the xml file as soon as the editor is refreshed
 
-  return uuid;
+  return markupEl;
+}
+
+/**
+ * Get currently selected resp id from settings.
+ * @returns {string}
+ */
+function getCurrentRespID() {
+  return document.getElementById('respSelect').value;
 }
 
 /**
@@ -458,21 +646,32 @@ function mintSuppliedId(id, nodeName, v) {
 
 /**
  * Deletes a markup item from listItems and all related elements from the xml document.
+ * Keeps content or content of the first child.
  * @param {Object} markupItem
  */
 export function deleteMarkup(markupItem) {
+  //updateChoiceOptions(markupItem.content, true);
   markupItem.selection.forEach((id) => {
     var toDelete = v.xmlDoc.querySelector("[*|id='" + id + "']");
     var parent = toDelete.parentElement;
     var descendants = new DocumentFragment();
 
-    for (let i = 0; i < toDelete.children.length; i++) {
-      let child = toDelete.children[i];
-      descendants.appendChild(child.cloneNode(true));
+    if (att.alternativeEncodingElements.includes(toDelete.localName)) {
+      let firstChild = toDelete.children[0];
+      for (let i = 0; i < firstChild.children.length; i++) {
+        let child = firstChild.children[i];
+        descendants.appendChild(child.cloneNode(true));
+      }
+    } else {
+      for (let i = 0; i < toDelete.children.length; i++) {
+        let child = toDelete.children[i];
+        descendants.appendChild(child.cloneNode(true));
+      }
     }
 
     parent.replaceChild(descendants, toDelete);
     replaceInEditor(cm, parent, true);
     indentSelection(v, cm);
   });
+  updateChoiceOptions();
 }

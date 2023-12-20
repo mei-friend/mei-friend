@@ -281,6 +281,8 @@ export const lang = {
   breaksSelectLine: { text: 'Rigo' },
   breaksSelectEncoded: { text: 'Rigo e pagina' },
   breaksSelectSmart: { text: 'Intelligente' },
+  choiceSelect: { description: 'Scegli il contenuto visualizzato per gli elementi di scelta' },
+  choiceDefault: { text: '(scelta predefinita)' },
   updateControlsLabel: {
     text: 'Aggiorna',
     description: 'Cambia il comportamento di controllo dello spartito dopo le modifiche nel codice',
@@ -316,14 +318,14 @@ export const lang = {
 
   // facsimile panel/ finestra facsimile
   facsimileIcon: { description: 'Finestra facsimile' },
-  facsimileDecreaseZoomButton: { description: "Riduci la finestra dello spartito" },
-  facsimileZoom: { description: "Regola la dimensione la finestra dello spartito" },
-  facsimileIncreaseZoomButton: { description: "Ingrandisci la finestra dello spartito" },
+  facsimileDecreaseZoomButton: { description: 'Riduci la finestra dello spartito' },
+  facsimileZoom: { description: 'Regola la dimensione la finestra dello spartito' },
+  facsimileIncreaseZoomButton: { description: 'Ingrandisci la finestra dello spartito' },
   facsimileFullPageLabel: {
     text: 'Pagina intera',
-    description: "Mostra la finestra del facsimile a pagina intera",
+    description: 'Mostra la finestra del facsimile a pagina intera',
   },
-  facsimileFullPageCheckbox: { description: "Mostra la finestra del facsimile a pagina intera" },
+  facsimileFullPageCheckbox: { description: 'Mostra la finestra del facsimile a pagina intera' },
   facsimileShowZonesLabel: {
     text: 'Mostra i riquadri delle zone',
     description: 'Mostra i riquadri delle zone del facsimile',
@@ -837,36 +839,41 @@ export const lang = {
     text: 'Mostra elementi di markup editoriale',
     description: 'Evidenzia tutti gli elementi contenuti dagli elementi di markup editoriale',
   },
+  alternativeVersionContent: {
+    text: 'Seleziona il contenuto predefinito per le codifiche alternative',
+    description: 'Scegli se le codifiche alternative appena create sono vuote o copie della lettura originale',
+    labels: ['vuoto', 'copia'],
+  },
   suppliedColor: {
     text: 'Seleziona colore di evidenziazione per <supplied>',
     description: 'Seleziona colore di evidenziazione per <supplied>',
   },
   unclearColor: {
-    title: 'Seleziona colore di evidenziazione per <unclear>',
+    text: 'Seleziona colore di evidenziazione per <unclear>',
     description: 'Seleziona colore di evidenziazione per <unclear>',
   },
   sicColor: {
-    title: 'Seleziona colore di evidenziazione per <sic>',
+    text: 'Seleziona colore di evidenziazione per <sic>',
     description: 'Seleziona colore di evidenziazione per <sic>',
   },
   corrColor: {
-    title: 'Seleziona colore di evidenziazione per <corr>',
+    text: 'Seleziona colore di evidenziazione per <corr>',
     description: 'Seleziona colore di evidenziazione per <corr>',
   },
   origColor: {
-    title: 'Seleziona colore di evidenziazione per <orig>',
+    text: 'Seleziona colore di evidenziazione per <orig>',
     description: 'Seleziona colore di evidenziazione per <orig>',
   },
   regColor: {
-    title: 'Seleziona colore di evidenziazione per <reg>',
+    text: 'Seleziona colore di evidenziazione per <reg>',
     description: 'Seleziona colore di evidenziazione per <reg>',
   },
   addColor: {
-    title: 'Seleziona colore di evidenziazione per <add>',
+    text: 'Seleziona colore di evidenziazione per <add>',
     description: 'Seleziona colore di evidenziazione per <add>',
   },
   delColor: {
-    title: 'Seleziona colore di evidenziazione per <del>',
+    text: 'Seleziona colore di evidenziazione per <del>',
     description: 'Seleziona colore di evidenziazione per <del>',
   },
 

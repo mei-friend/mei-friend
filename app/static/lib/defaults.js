@@ -735,6 +735,12 @@ export const meiFriendSettingsOptions = {
     open: false,
     default: false,
   },
+  showMarkup: {
+    title: 'Show editorial markup elements',
+    description: 'filled in by language packs',
+    type: 'bool',
+    default: true,
+  },
   respSelect: {
     title: 'Select markup responsibility',
     description: 'filled in by language packs',
@@ -742,11 +748,12 @@ export const meiFriendSettingsOptions = {
     default: 'none',
     values: [],
   },
-  showMarkup: {
-    title: 'Show editorial markup elements',
+  alternativeVersionContent: {
+    title: 'Select default content for alternative encodings',
     description: 'filled in by language packs',
-    type: 'bool',
-    default: true,
+    type: 'select',
+    values: ['empty', 'copy'],
+    default: 'copy',
   },
   suppliedColor: {
     title: 'Select <supplied> highlight color',
