@@ -42,6 +42,14 @@ export const lang = {
         Performing Arts Vienna, and is not shared with any third party.
       </p>
       <p>
+        Lute tablatures are converted to MEI using 
+        <a href="https://bitbucket.org/bayleaf/luteconv/" target="_blank">luteconv</a> developed by Paul Overell, 
+        via the <a href="https://codeberg.org/mdwRepository/luteconv-webui" target="_blank">luteconv-webui service</a> 
+        developed by Stefan Szepe and <a href="https://luteconv.mdw.ac.at" target="_blank">hosted by the mdw</a>. 
+        This service creates Web-accessible copies of your encodings as part of the conversion process, but these are 
+        accessible only via a unique link hash value, and are periodically deleted. 
+      </p>
+      <p>
         The Verovio toolkit is loaded from <a href="https://verovio.org" target="_blank">https://verovio.org</a>, hosted by
         <a href="https://rism.digital/" target="_blank">RISM Digital Switzerland</a>. 
         This allows mei-friend to stay up-to-date with the latest toolkit version and

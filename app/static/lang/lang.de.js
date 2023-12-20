@@ -43,6 +43,15 @@ export const lang = {
       Wien läuft, und werden nicht an Dritte weitergegeben.
     </p>
     <p>
+      Lautentabulaturen werden mit <a href="https://bitbucket.org/bayleaf/luteconv/" target="_blank">luteconv</a> 
+      von Paul Overell nach MEI konvertiert, 
+      über den <a href="https://codeberg.org/mdwRepository/luteconv-webui" target="_blank">luteconv-webui-Dienst</a>, 
+      der von Stefan Szepe entwickelt und von der
+      <a href="https://luteconv.mdw.ac.at" target="_blank">mdw</a> zur Verfügung gestellt wird. 
+      Dieser Dienst erstellt webzugängliche Kopien Ihrer Kodierungen als Teil des Konvertierungsprozesses, 
+      diese sind jedoch nur über einen einzigartigen (gehashten) Link zugänglich und werden nach kurzer Zeit wieder gelöscht.
+    </p>
+    <p>
       Das Verovio-Toolkit wird von <a href="https://verovio.org" target="_blank">https://verovio.org</a> geladen 
       und von  <a href="https://rism.digital/" target="_blank">RISM Digital Switzerland</a> gehostet. 
       Dadurch bleibt mei-friend immer auf dem neuesten Stand mit der aktuellen Toolkit-Version 

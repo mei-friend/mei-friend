@@ -1,6 +1,6 @@
 // mei-friend version and date
 export const version = '1.0.6';
-export const versionDate = '13 December 2023'; // use full or 3-character english months, will be translated
+export const versionDate = '20 December 2023'; // use full or 3-character english months, will be translated
 
 var vrvWorker;
 var spdWorker;
@@ -117,6 +117,7 @@ import {
   supportedLanguages,
 } from './defaults.js';
 import Translator from './translator.js';
+import { luteconv } from './luteconv.js';
 import { buildLanguageSelection, translateLanguageSelection } from './language-selector.js';
 import { runLanguageChecks } from '../tests/checkLangs.js';
 
@@ -1164,7 +1165,7 @@ export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true, upd
         if (mei) loaded(mei);
         else notLoaded();
       };
-      if (meiFileName.endsWith('.mxl')) {
+      if (meiFileName.endsWith('.mxl') || meiFileName.endsWith('.ft2') || meiFileName.endsWith('.ft3')) {
         reader.readAsArrayBuffer(file);
       } else {
         reader.readAsText(file);
@@ -1214,6 +1215,32 @@ export function handleEncoding(mei, setFreshlyLoaded = true, updateAfterLoading 
     });
     found = true;
     setIsMEI(false);
+  } else if (meiFileName.endsWith('.ft2') || meiFileName.endsWith('.ft3')) { 
+    // lute tablature file (Fronimo format)
+    console.log('Load Fronimo file.', mei.slice(0, 128));
+    // set found to true, since we don't know if luteconv will succeed
+    // (we don't want to show the "format not recognized" message)
+    found = true;
+    setIsMEI(false);
+    // attempt to convert to MEI using luteconv web service:
+    luteconv(mei, meiFileName).then((mei) => {
+      if (mei) {
+        // rename file to .mei
+        setMeiFileInfo(meiFileName + ".mei", meiFileLocation, meiFileLocationPrintable);
+        updateFileStatusDisplay();
+        vrvWorker.postMessage({
+          cmd: 'importData',
+          format: 'mei',
+          mei: mei,
+        });
+      } else { 
+        log('Loading ' + meiFileName + 'did not succeed. ' + 'Could not convert Fronimo file using luteconv.');
+        clearFacsimile();
+        clearAnnotations();
+        v.busy(false);
+      }
+    });
+
   } else {
     // all other formats are found by search term in text file
     for (const [key, value] of Object.entries(inputFormats)) {
