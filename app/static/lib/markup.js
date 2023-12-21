@@ -128,41 +128,56 @@ function xmlMarkupToListItem(currentElementId, mElName, correspElements, content
 function updateChoiceOptions() {
   // the loading logic causes this function to run twice.
   // so make sure this always represents the state of the mei document
-  // therefore this will be reset
+  // therefore reset choiceOptions first
   choiceOptions = [];
+
   let defaultOption = {
     label: translator.lang.choiceDefault.text,
     value: '',
     count: 100,
-    id: 'choiceDefault',
-    prop: 'choiceXPathQuery',
+    id: 'Default',
+    prop: 'XPathQuery',
   };
-  let elNames = choiceOptions.map((obj) => obj.value);
-  let choices = Array.from(v.xmlDoc.querySelectorAll('choice'));
+
+  //let elNames = choiceOptions.map((obj) => obj.value);
+  let choices = Array.from(v.xmlDoc.querySelectorAll('choice,subst'));
   //TODO: change to att.alternativeEncodingElements.join(',') when ready
 
-  choiceOptions.push(defaultOption);
+  let topLevelEls = choices.map((obj) => obj.localName).filter((value, index, array) => array.indexOf(value) === index);
+  topLevelEls.forEach((topLevelEl) => {
+    let optGroup = { elName: topLevelEl, options: [] };
+    let newDefault = Object.assign({}, defaultOption);
+    newDefault.id = topLevelEl + newDefault.id;
+    newDefault.prop = topLevelEl + newDefault.prop;
+    optGroup.options.push(newDefault);
 
-  choices.forEach((choice) => {
-    for (let i = 0; i < choice.children.length; i++) {
-      let child = choice.children[i];
-      if (!elNames.includes(child.localName)) {
-        let capitalisedOption = child.localName[0].toUpperCase() + child.localName.slice(1);
-        choiceOptions.push({
-          label: capitalisedOption,
-          value: child.localName,
-          count: 1,
-          id: 'choice' + capitalisedOption,
-          prop: 'choiceXPathQuery',
-        });
-        elNames.push(child.localName);
-      } else {
-        let obj = choiceOptions.find((obj) => obj.value === child.localName);
-        obj.count = obj.count + 1;
+    let elNames = optGroup.options.map((obj) => obj.value);
+
+    let currentChoices = choices.filter((el) => el.localName === topLevelEl);
+    currentChoices.forEach((choice) => {
+      for (let i = 0; i < choice.children.length; i++) {
+        let child = choice.children[i];
+        if (!elNames.includes(child.localName)) {
+          let capitalisedOption = child.localName[0].toUpperCase() + child.localName.slice(1);
+          optGroup.options.push({
+            label: capitalisedOption,
+            value: child.localName,
+            count: 1,
+            id: topLevelEl + capitalisedOption,
+            prop: topLevelEl + 'XPathQuery',
+          });
+          elNames.push(child.localName);
+        } else {
+          let obj = optGroup.options.find((obj) => obj.value === child.localName);
+          obj.count = obj.count + 1;
+        }
       }
-    }
+    });
+
+    choiceOptions.push(optGroup);
   });
 }
+
 
 /**
  * Returns for a markup item the page locations in the Verovio rendering

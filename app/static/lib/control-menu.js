@@ -649,16 +649,26 @@ export function handleSmartBreaksOption(speedMode) {
  */
 export function setChoiceOptions(active) {
   let choiceSelect = document.getElementById('choiceSelect');
-  while (choiceSelect.hasChildNodes()) choiceSelect.remove(0);
+  while (choiceSelect.hasChildNodes()) {
+    choiceSelect.removeChild(choiceSelect.firstChild);
+  }
 
-  choiceOptions.forEach((el, key) => {
-    if (el.value === active) {
-      choiceSelect[key] = new Option(el.label, el.value, false, true);
-    } else {
-      choiceSelect[key] = new Option(el.label, el.value, false, false);
-    }
-    choiceSelect[key].id = el.id;
-    choiceSelect[key].dataset.prop = el.prop;
+  choiceOptions.forEach((groupEl) => {
+    let group = document.createElement('optgroup');
+    group.label = groupEl.elName;
+
+    groupEl.options.forEach((el) => {
+      let option;
+      if (el.value === active) {
+        option = new Option(el.label, el.value, false, true);
+      } else {
+        option = new Option(el.label, el.value, false, false);
+      }
+      option.id = el.id;
+      option.dataset.prop = el.prop;
+      group.appendChild(option);
+    });
+    choiceSelect.appendChild(group);
   });
 }
 
