@@ -620,10 +620,17 @@ function wrapGroupWithMarkup(v, groupIds, mElName, parentEl) {
 
 /**
  * Get currently selected resp id from settings.
- * @returns {string}
+ * Returns null if string is empty
+ * @returns {string|null}
  */
 function getCurrentRespID() {
-  return document.getElementById('respSelect').value;
+  let respId = document.getElementById('respSelect').value;
+
+  if (respId === '') {
+    respId = null;
+  }
+
+  return respId;
 }
 
 /**

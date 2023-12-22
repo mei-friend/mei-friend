@@ -3,6 +3,7 @@
 ### 1.1.4 Refine Editorial Markup
 
 * Add subst element to markup tools.
+* Moved responsibility select from mei-friend settings to markup tools.
 
 ### 1.1.3 <choice>
 

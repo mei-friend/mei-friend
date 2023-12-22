@@ -514,6 +514,8 @@ export function addMarkupHandlers() {
     //TODO: make addition of data-content less error prone!
   };
 
+  addRespSelect();
+
   let contentOptions = document.getElementsByClassName('content-option');
   for (let i = 0; i < contentOptions.length; i++) {
     contentOptions[i].addEventListener('click', (event) => {
@@ -527,6 +529,34 @@ export function addMarkupHandlers() {
       markup.addMarkup(event);
     });
   }
+}
+
+/**
+ * Adds the respSelect control to te markup tools tab.
+ */
+function addRespSelect() {
+  let respSelectBase = {
+    title: 'Select markup responsibility',
+    description: 'filled in by language packs',
+    type: 'select',
+    default: 'none',
+    values: [],
+  };
+
+  let respSelDiv = document.createElement('div');
+  respSelDiv.classList.add('markupSetting');
+  respSelDiv.classList.add('optionsItem');
+  let respSelect = document.createElement(respSelectBase.type);
+  respSelect.id = 'respSelect';
+  let respSelLabel = document.createElement('label');
+  respSelLabel.title = respSelectBase.title;
+  respSelLabel.textContent = respSelectBase.title;
+  respSelLabel.htmlFor = respSelect.id;
+  respSelDiv.appendChild(respSelLabel);
+  respSelDiv.appendChild(respSelect);
+
+  let markupMenu = document.getElementById('markupToolsMenu');
+  markupMenu.prepend(respSelDiv);
 }
 
 /**
