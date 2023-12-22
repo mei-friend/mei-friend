@@ -4,6 +4,7 @@
 
 * Add subst element to markup tools.
 * Moved responsibility select from mei-friend settings to markup tools.
+* Complete translations and tooltips for markup tools.
 
 ### 1.1.3 <choice>
 

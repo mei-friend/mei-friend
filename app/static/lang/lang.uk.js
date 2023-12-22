@@ -181,9 +181,6 @@ export const lang = {
   addDiminuendoHairpinText: { text: 'Димінуендо (клинчатий)' },
   addBeamText: { text: 'Група нот' },
   addBeamSpanText: { text: 'Спан групи нот' },
-  addSuppliedText: { text: 'Додати поставлене' },
-  addSuppliedArticText: { text: 'Додати поставлене (артикуляція)' },
-  addSuppliedAccidText: { text: 'Додати поставлене (акценти)' },
   addArpeggioText: { text: 'Арпеджіо' },
   addFermataText: { text: 'Фермата' },
   addGlissandoText: { text: 'Глісандо' },
@@ -470,6 +467,105 @@ export const lang = {
     text2:
       'Будь ласка, присвойте ідентифікатори, вибравши "Маніпулювати" -> "Перерендер MEI (з id)" і повторіть спробу.',
   },
+  // Markup tools
+  respSelect: {
+    text: 'Вибір відповідальності за розмітку',
+    description: 'Вибір ідентифікатора відповідальності',
+  },
+  alternativeEncodingsGrp: {
+    text: 'Альтернативні кодування',
+    description: 'Елементи розмітки, які містять кілька версій.',
+  },
+  addChoiceText: {
+    text: '<choice>',
+    description: 'Групує кілька альтернативних кодувань для того ж самого місця в тексті.',
+  },
+  choiceSicCorr: { text: 'sic | corr', description: 'Помістіть вибір у <sic> і додайте <corr>.' },
+  choiceCorrSic: { text: 'corr | sic', description: 'Помістіть вибір у <corr> і додайте <sic>.' },
+  choiceOrigReg: { text: 'orig | reg', description: 'Помістіть вибір у <orig> і додайте <reg>.' },
+  choiceRegOrig: { text: 'reg | orig', description: 'Помістіть вибір у <reg> і додайте <orig>.' },
+  choiceContentTarget: {
+    text: '(виберіть вміст)',
+    description: 'Спочатку виберіть вміст для цього елемента, навівши на <choice>.',
+  },
+  addChoice: { text: 'Вибрані елементи', description: 'Додайте розмітку до вибраних елементів.' },
+  addChoiceArtic: { text: 'Артикуляція', description: 'Додайте розмітку до артикуляцій в виділенні.' },
+  addChoiceAccid: { text: 'Випадковий', description: 'Додайте розмітку до випадкових елементів в виділенні.' },
+  addSubstText: {
+    text: '<subst>',
+    description:
+      '(заміна) - Групує транскрипційні елементи, коли комбінація повинна розглядатися як єдиний втручання в текст.',
+  },
+  substAddDel: { text: 'add | del', description: 'Помістіть вибір у <add> і додайте <del>.' },
+  substDelAdd: { text: 'del | add', description: 'Помістіть вибір у <del> і додайте <add>.' },
+  substContentTarget: {
+    text: '(виберіть вміст)',
+    description: 'Спочатку виберіть вміст для цього елемента, навівши на <subst>.',
+  },
+  addSubst: { text: 'Вибрані елементи', description: 'Додайте розмітку до вибраних елементів.' },
+  addSubstArtic: { text: 'Артикуляція', description: 'Додайте розмітку до артикуляцій в виділенні.' },
+  addSubstAccid: { text: 'Випадковий', description: 'Додайте розмітку до випадкових елементів в виділенні.' },
+  editInterventionsGrp: {
+    text: 'Редакційні втручання',
+    description: 'Елементи розмітки, які використовуються для кодування редакційних втручань.',
+  },
+  addSuppliedText: {
+    text: '<supplied>',
+    description: 'Містить матеріал, наданий транскрибером чи редактором з будь-якої причини.',
+  },
+  addSupplied: { text: 'Вибрані елементи', description: 'Додайте розмітку до вибраних елементів.' },
+  addSuppliedArtic: { text: 'Артикуляція', description: 'Додайте розмітку до артикуляцій в виділенні.' },
+  addSuppliedAccid: { text: 'Випадковий', description: 'Додайте розмітку до випадкових елементів в виділенні.' },
+  addUnclearText: {
+    text: '<unclear>',
+    description:
+      'Містить матеріал, який не може бути транскрибований із впевненістю через його нерозбірливість або незчутливість у джерелі.',
+  },
+  addUnclear: { text: 'Вибрані елементи', description: 'Додайте розмітку до вибраних елементів.' },
+  addUnclearArtic: { text: 'Артикуляція', description: 'Додайте розмітку до артикуляцій в виділенні.' },
+  addUnclearAccid: { text: 'Випадковий', description: 'Додайте розмітку до випадкових елементів в виділенні.' },
+  addSicText: { text: '<sic>', description: 'Містить, ймовірно, невірний або неточний матеріал.' },
+  addSic: { text: 'Вибрані елементи', description: 'Додайте розмітку до вибраних елементів.' },
+  addSicArtic: { text: 'Артикуляція', description: 'Додайте розмітку до артикуляцій в виділенні.' },
+  addSicAccid: { text: 'Випадковий', description: 'Додайте розмітку до випадкових елементів в виділенні.' },
+  addCorrText: {
+    text: '<corr>',
+    description: '(виправлення) - Містить правильну форму видимо помилкового уривка.',
+  },
+  addCorr: { text: 'Вибрані елементи', description: 'Додайте розмітку до вибраних елементів.' },
+  addCorrArtic: { text: 'Артикуляція', description: 'Додайте розмітку до артикуляцій в виділенні.' },
+  addCorrAccid: { text: 'Випадковий', description: 'Додайте розмітку до випадкових елементів в виділенні.' },
+  addOrigText: {
+    text: '<orig>',
+    description:
+      '(оригінальний) - Містить матеріал, який позначено як слідуючий оригіналу, а не нормалізований чи виправлений.',
+  },
+  addOrig: { text: 'Вибрані елементи', description: 'Додайте розмітку до вибраних елементів.' },
+  addOrigArtic: { text: 'Артикуляція', description: 'Додайте розмітку до артикуляцій в виділенні.' },
+  addOrigAccid: { text: 'Випадковий', description: 'Додайте розмітку до випадкових елементів в виділенні.' },
+  addRegText: {
+    text: '<reg>',
+    description: '(регуляризація) - Містить матеріал, який було регуляризовано чи нормалізовано в певному сенсі.',
+  },
+  addReg: { text: 'Вибрані елементи', description: 'Додайте розмітку до вибраних елементів.' },
+  addRegArtic: { text: 'Артикуляція', description: 'Додайте розмітку до артикуляцій в виділенні.' },
+  addRegAccid: { text: 'Випадковий', description: 'Додайте розмітку до випадкових елементів в виділенні.' },
+  descMarkupGrp: {
+    text: 'Описова розмітка',
+    description: 'Елементи розмітки, використовувані для кодування втручань в джерело.',
+  },
+  addAddText: { text: '<add>', description: '(додаток) - Позначає додаток до тексту.' },
+  addAdd: { text: 'Вибрані елементи', description: 'Додайте розмітку до вибраних елементів.' },
+  addAddArtic: { text: 'Артикуляція', description: 'Додайте розмітку до артикуляцій в виділенні.' },
+  addAddAccid: { text: 'Випадковий', description: 'Додайте розмітку до випадкових елементів в виділенні.' },
+  addDelText: {
+    text: '<del>',
+    description:
+      '(видалення) - Містить інформацію, видалену, позначену як видалену або інакше вказану як зайву або фальшиву в копіювальному тексті автором, копістом, анотатором або виправником.',
+  },
+  addDel: { text: 'Вибрані елементи', description: 'Додайте розмітку до вибраних елементів.' },
+  addDelArtic: { text: 'Артикуляція', description: 'Додайте розмітку до артикуляцій в виділенні.' },
+  addDelAccid: { text: 'Випадковий', description: 'Додайте розмітку до випадкових елементів в виділенні.' },
 
   // MIDI
   midiSpeedmodeIndicator: {
@@ -770,10 +866,6 @@ export const lang = {
   titleSupplied: {
     text: 'Обробка редакційного вмісту',
     description: 'Керування обробкою редакційної розмітки',
-  },
-  respSelect: {
-    text: 'Вибір відповідальності за розмітку',
-    description: 'Вибір ідентифікатора відповідальності',
   },
   showMarkup: {
     text: 'Показати елементи редакційної розмітки',
