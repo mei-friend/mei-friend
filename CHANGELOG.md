@@ -1,5 +1,9 @@
 # mei-friend-online CHANGELOG.md
 
+### 1.1.4 Refine Editorial Markup
+
+* Add subst element to markup tools.
+
 ### 1.1.3 <choice>
 
 * Add choice element to markup tools.
