@@ -562,8 +562,7 @@ function addMultiLayeredMarkup(v, mElName, parentEl, firstChild, content) {
         let firstChildCopies = new DocumentFragment();
         for (let child of firstChild.children) {
           let newChildCopy = child.cloneNode(true);
-          let newId = utils.generateXmlId(child.localName, v.xmlIdStyle);
-          newChildCopy.setAttributeNS(dutils.xmlNameSpace, 'xml:id', newId);
+          dutils.addNewXmlIdsToDescendants(newChildCopy);
           firstChildCopies.appendChild(newChildCopy);
         }
         nextChild.appendChild(firstChildCopies);

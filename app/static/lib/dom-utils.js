@@ -6,7 +6,8 @@ export const navElsArray = ['note', 'rest', 'mRest', 'beatRpt', 'halfmRpt', 'mRp
 export const navElsSelector = '.' + navElsArray.join(',.');
 
 import * as att from './attribute-classes.js';
-import { escapeXmlId } from './utils.js';
+import { escapeXmlId, generateXmlId } from './utils.js';
+import Viewer from './viewer.js';
 
 /**
  * Scans through SVG starting from element to find next element elementName
@@ -412,3 +413,16 @@ export function getAffectedNotesFromKeySig(keySigString = '') {
     keySigAccid: keySigAccid,
   };
 } // getAffectedNotesFromKeySig()
+
+export function addNewXmlIdsToDescendants(xmlNode) {
+  if (xmlNode.getAttribute('xml:id')) {
+    let newID = generateXmlId(xmlNode.localName, Viewer.xmlIdStyle);
+    xmlNode.setAttributeNS(xmlNameSpace, 'xml:id', newID);
+
+    if (xmlNode.children.length > 0) {
+      for (let child of xmlNode.children) {
+        addNewXmlIdsToDescendants(child);
+      }
+    }
+  }
+}
