@@ -533,8 +533,12 @@ function addMultiLayeredMarkup(v, mElName, parentEl, firstChild, content) {
   let upmostElementID = mintSuppliedId(firstChild.getAttribute('xml:id'), mElName, v);
   upmostElement.setAttributeNS(dutils.xmlNameSpace, 'xml:id', upmostElementID);
 
+  // add respID to choice/subst instead of children
+  // and delete it from firstChild if necessary
+  // because it's too complex to decide on resps for children and (currently) to set them individually
   let respID = getCurrentRespID();
   if (respID) upmostElement.setAttribute('resp', '#' + respID);
+  if (firstChild.getAttribute('resp')) firstChild.removeAttribute('resp');
 
   let alternativeEncodingSettingsValue = document.getElementById('alternativeVersionContent').value;
 
