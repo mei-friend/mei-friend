@@ -6,6 +6,9 @@
 * Moved responsibility select from mei-friend settings to markup tools.
 * Complete translations and tooltips for markup tools.
 * Fix generation of new xml:ids to copied elements.
+* Add resp label to markup items within list tab in Enrichment Panel.
+* Add 'Describe Markup' button to markup list items.
+* Improve sorting of list items in Enrichment Panel's List tab.
 
 ### 1.1.3 <choice>
 

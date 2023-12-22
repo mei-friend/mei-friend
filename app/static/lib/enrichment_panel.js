@@ -36,12 +36,20 @@ export function clearListItems() {
   listItems = [];
 }
 
+function sortListItems() {
+  situateListItems();
+  listItems.sort((a, b) => {
+    a.firstPage - b.firstPage;
+  });
+}
+
 /**
  * read List Items from XML
  */
 export function readListItemsFromXML(flagLimit = false) {
   annot.readAnnots(flagLimit);
   markup.readMarkup();
+  sortListItems();
   refreshAnnotationsInRendering();
 }
 
@@ -66,6 +74,7 @@ export function addListItem(listItemObject, forceRefreshAnnotations = false) {
   if (!isItemInList(listItemObject.id)) {
     listItems.push(listItemObject);
     addedSuccessfully = true;
+    sortListItems();
     if (forceRefreshAnnotations === true) refreshAnnotationsInRendering(true);
   }
   return addedSuccessfully;
@@ -273,6 +282,7 @@ function generateListItem(a) {
     summary.insertAdjacentHTML('afterbegin', codeScan);
     details.insertAdjacentHTML('afterbegin', '&lt;' + a.type + '&gt;');
     if (a.content) details.insertAdjacentHTML('beforeend', ' (' + a.content + ')');
+    if (a.resp) details.insertAdjacentHTML('beforeend', '<br />[resp: ' + a.resp + ']');
   } else {
     switch (a.type) {
       case 'annotateHighlight':
@@ -339,6 +349,14 @@ function generateAnnotationButtons(a) {
     addObservation.classList.add('disabled');
   }
 
+  // add Describe button (for Markup)
+  const addDescribe = generateListItemButton('describeMarkup', pencil, translator.lang.describeMarkup.description);
+  if (a.isMarkup) {
+    addDescribe.addEventListener('click', (e) => {
+      annot.createDescribe(e, a.selection);
+    });
+  }
+
   // delete annotation button
   const deleteAnno = generateListItemButton(
     'deleteAnnotation',
@@ -387,8 +405,12 @@ function generateAnnotationButtons(a) {
 
   // add buttons to bubble
   annoListItemButtons.appendChild(flipToAnno);
-  annoListItemButtons.appendChild(isInline);
-  annoListItemButtons.appendChild(isStandoff);
+  if (!a.isMarkup) {
+    annoListItemButtons.appendChild(isInline);
+    annoListItemButtons.appendChild(isStandoff);
+  } else {
+    annoListItemButtons.appendChild(addDescribe);
+  }
   annoListItemButtons.appendChild(deleteAnno);
 
   return annoListItemButtons;
@@ -461,19 +483,19 @@ export function addAnnotationHandlers() {
     console.log('annotation Handler: Selected elements: ', v.selectedElements);
     switch (e.target.closest('.annotationToolsIcon')?.getAttribute('id')) {
       case 'annotateIdentify':
-        annot.createIdentify(e);
+        annot.createIdentify(e, v.selectedElements);
         break;
       case 'annotateHighlight':
-        annot.createHighlight(e);
+        annot.createHighlight(e, v.selectedElements);
         break;
       case 'annotateCircle':
-        annot.createCircle(e);
+        annot.createCircle(e, v.selectedElements);
         break;
       case 'annotateLink':
-        annot.createLink(e);
+        annot.createLink(e, v.selectedElements);
         break;
       case 'annotateDescribe':
-        annot.createDescribe(e);
+        annot.createDescribe(e, v.selectedElements);
         break;
       default:
         console.warn("Don't have a handler for this type of annotation", e);

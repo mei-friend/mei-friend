@@ -44,9 +44,7 @@ export function readMarkup() {
 
   // get ids of all children of choice/subst/app and add them to idsToIgnore
   // adding them for each element when it's processed didn't work
-  let alternativeVersions = Array.from(
-    v.xmlDoc.querySelectorAll(att.alternativeEncodingElements.join(',') + ' > ' + '*')
-  );
+  let alternativeVersions = Array.from(v.xmlDoc.querySelectorAll(att.alternativeEncodingElements.join(',')));
   alternativeVersions?.forEach((element) => {
     let children = element.children;
     for (let i = 0; i < children.length; i++) {
@@ -84,7 +82,10 @@ export function readMarkup() {
         correspIds.forEach((id) => idsToIgnore.push(id));
       }
       correspIds.unshift(elId);
-      xmlMarkupToListItem(elId, elName, correspIds, content);
+
+      let resp = markupEl.getAttribute('resp');
+
+      xmlMarkupToListItem(elId, elName, correspIds, content, resp);
     }
   });
   updateChoiceOptions();
@@ -96,9 +97,10 @@ export function readMarkup() {
  * @param {string} mElName element name -> item.type
  * @param {Array[string]} correspElements ids of corresponding elements (including self) -> item.selection
  * @param {Array[string]} [content=[]] children of multi-layer elements like choice/subst/app
+ * @param {string} resp value of resp attribute
  * @returns {boolean} adding item was successful
  */
-function xmlMarkupToListItem(currentElementId, mElName, correspElements, content = []) {
+function xmlMarkupToListItem(currentElementId, mElName, correspElements, content = [], resp) {
   // one addMarkupAction might result in multiple markup elements
   // e.g. when selecting notes and control events
   // mostly because symbols in a score aren't necessarily close in the xml tree
@@ -115,6 +117,15 @@ function xmlMarkupToListItem(currentElementId, mElName, correspElements, content
 
   if (content.length > 0) {
     markupItem.content = content;
+  }
+
+  if (resp) {
+    if (resp[0] === '#') resp = resp.slice(1);
+    let respEl = v.xmlDoc.querySelector("[*|id='" + resp + "']");
+    if (respEl) {
+      let respName = respEl.textContent;
+      markupItem.resp = respName;
+    }
   }
 
   let success = addListItem(markupItem);

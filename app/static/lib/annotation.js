@@ -134,9 +134,9 @@ export function drawLink(a) {
 // called by addAnnotationHandlers() in the Tools tab of the Enrichment panel
 
 // functions to create annotations
-export const createIdentify = (e) => {
+export const createIdentify = (e, selection) => {
   if (solid.getDefaultSession().info.isLoggedIn) {
-    const label = window.prompt('Add label for identified object (optional)');
+    //const label = window.prompt('Add label for identified object (optional)');
     const selection = v.selectedElements;
     document.getElementById('solid_logo').classList.add('clockwise');
     createMAOMusicalObject(selection, label)
@@ -171,11 +171,11 @@ export const createIdentify = (e) => {
  * Creates a new highlight annotation either inline or standoff.
  * @param {Event} e event
  */
-export const createHighlight = (e) => {
+export const createHighlight = (e, selection) => {
   const a = {
     id: generateXmlId('annot', v.xmlIdStyle),
     type: 'annotateHighlight',
-    selection: v.selectedElements,
+    selection: selection,
   };
   addListItem(a);
   writeInlineIfRequested(a);
@@ -186,11 +186,11 @@ export const createHighlight = (e) => {
  * Creates a new circle annotation either inline or standoff.
  * @param {Event} e event
  */
-export const createCircle = (e) => {
+export const createCircle = (e, selection) => {
   const a = {
     id: generateXmlId('annot', v.xmlIdStyle),
     type: 'annotateCircle',
-    selection: v.selectedElements,
+    selection: selection,
   };
   addListItem(a);
   writeInlineIfRequested(a);
@@ -201,16 +201,16 @@ export const createCircle = (e) => {
  * Creates a new describe annotation either inline or standoff.
  * @param {Event} e event
  */
-export const createDescribe = (e) => {
+export const createDescribe = (e, selection) => {
   // TODO improve UX!
   const desc = window.prompt(translator.lang.askForDescription.text);
   const a = {
     id: generateXmlId('annot', v.xmlIdStyle),
     type: 'annotateDescribe',
-    selection: v.selectedElements,
+    selection: selection,
     description: desc,
   };
-  addListItem(a);
+  addListItem(a, true);
   writeInlineIfRequested(a);
   writeStandoffIfRequested(a);
 };
@@ -219,14 +219,14 @@ export const createDescribe = (e) => {
  * Creates a new link annotation either inline or standoff.
  * @param {Event} e event
  */
-export const createLink = (e) => {
+export const createLink = (e, selection) => {
   // TODO improve UX!
   let url = window.prompt(translator.lang.askForLinkUrl.text);
   if (!url.startsWith('http')) url = 'https://' + url;
   const a = {
     id: generateXmlId('annot', v.xmlIdStyle),
     type: 'annotateLink',
-    selection: v.selectedElements,
+    selection: selection,
     url: url,
   };
   addListItem(a);
@@ -441,7 +441,7 @@ export function copyIdToClipboard(e) {
 function writeInlineIfRequested(a) {
   // write annotation to inline <annot> if the user has requested this
   if (document.getElementById('writeAnnotationInline').checked) {
-    let el = v.xmlDoc.querySelector('[*|id="' + v.selectedElements[0] + '"]');
+    let el = v.xmlDoc.querySelector('[*|id="' + a.selection[0] + '"]');
     if (el) {
       let payload;
       if (a.type === 'annotateDescribe') payload = a.description;
