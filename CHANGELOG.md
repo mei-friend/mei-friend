@@ -1,4 +1,26 @@
 # mei-friend-online CHANGELOG.md
+
+### 1.1.3 <choice>
+
+* Add choice element to markup tools.
+* Add setting to toggle whether a new alternative version should be created empty or if the content or the first version should be copied.
+* Add choice select to switch versions visible in the notation panel.
+* Add logic to handle markup for alternative versions.
+
+### 1.1.2 Enrichment Panel
+
+* Annotation panel has been refactored to Enrichment panel.
+* List tab in the Enrichment panel now shows annotations and markup.
+* Markup menu has been moved to new markup tools tab in the Enrichment Panel.
+
+### 1.1.1 Basic integration of Editorial Markup
+
+* Add support for markup elements: unclear, sic, corr, orig, reg, add, del.
+* Markup elements wrap multiple adjacent elements.
+* Add warning modal if missing xml:ids would affect markup creation.
+* Add settings to change highighting colors for markup elements.
+* Change option labels in responsibility select to text content.
+
 ### 1.0.4 patch
 * Tweak CSS select and translations (German)
 * Fix typo at forking via URL parameters
