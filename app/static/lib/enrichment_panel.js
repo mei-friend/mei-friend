@@ -72,7 +72,8 @@ export function addListItem(listItemObject, forceRefreshAnnotations = false) {
 }
 
 /**
- * Deletes an annotation or markup from listItems and the xml document
+ * Deletes an annotation or markup from listItems and the xml document.
+ * If markup should be deleted, items with identical selection are deleted.
  * @param {string} uuid id of list item to delete
  */
 export function deleteListItem(uuid) {
@@ -81,10 +82,20 @@ export function deleteListItem(uuid) {
     let a = retrieveListItem(uuid);
     if (a.isMarkup === true) {
       markup.deleteMarkup(a);
+      // remove markup from list and
+      // delete annotations if selection is identical with selection of current markup
+      // for now, we delete items by selection
+      // (change if this causes trouble, theoretically it shoudln't because selection
+      // is only identical if an annotation created via a markup item)
+      let sel = a.selection;
+      let filteredItems = listItems.filter((item) => item.selection !== sel);
+      listItems = filteredItems;
     } else {
       annot.deleteAnnot(uuid);
+      // remove only the annotation from the list that should be deleted
+      listItems.splice(ix, 1);
     }
-    listItems.splice(ix, 1);
+
     situateAndRefreshAnnotationsList(true);
     refreshAnnotationsInRendering();
   }
@@ -253,10 +264,10 @@ export function refreshAnnotationsInRendering(forceListRefresh = false) {
 
 /**
  * Forces the situation of annotations and refreshes
- * the list of annotations
+ * the list of all things.
  * @param {boolean} forceRefresh true when list should be refreshed
  */
-export function situateAndRefreshAnnotationsList(forceRefresh = false) {
+function situateAndRefreshAnnotationsList(forceRefresh = false) {
   situateListItems()
     .then((sortedList) => {
       listItems = sortedList;
