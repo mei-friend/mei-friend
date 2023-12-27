@@ -5,7 +5,7 @@
 //import { v, cm, log, translator, setStandoffAnnotationEnabledStatus } from './main.js';
 import { v, cm, translator, setStandoffAnnotationEnabledStatus } from './main.js';
 //import { convertCoords, generateXmlId, rmHash, setCursorToId } from './utils.js';
-import { setCursorToId } from './utils.js';
+import { setCursorToId, sortElementsByScorePosition } from './utils.js';
 //import { meiNameSpace, xmlNameSpace, xmlToString } from './dom-utils.js';
 import * as annot from './annotation.js';
 import * as markup from './markup.js';
@@ -36,20 +36,12 @@ export function clearListItems() {
   listItems = [];
 }
 
-function sortListItems() {
-  situateListItems();
-  listItems.sort((a, b) => {
-    a.firstPage - b.firstPage;
-  });
-}
-
 /**
  * read List Items from XML
  */
 export function readListItemsFromXML(flagLimit = false) {
   annot.readAnnots(flagLimit);
   markup.readMarkup();
-  sortListItems();
   refreshAnnotationsInRendering();
 }
 
@@ -74,7 +66,6 @@ export function addListItem(listItemObject, forceRefreshAnnotations = false) {
   if (!isItemInList(listItemObject.id)) {
     listItems.push(listItemObject);
     addedSuccessfully = true;
-    sortListItems();
     if (forceRefreshAnnotations === true) refreshAnnotationsInRendering(true);
   }
   return addedSuccessfully;
@@ -145,10 +136,35 @@ export function retrieveItemValuesByProperty(filterProperty = null, selectedProp
 }
 
 /**
- *  Finds page numbers in rendering for every list item
+ *  Finds page numbers in rendering for every list item and sorts the list items.
+ *  @returns {Array} Sorted list items.
  */
-function situateListItems() {
-  listItems.forEach(async (item) => {
+async function situateListItems() {
+  const asyncResults = await Promise.all(listItems.map((item) => situateOneListItem(item)));
+  const sortedResults = asyncResults.sort((a, b) => {
+    let byPage = a.firstPage - b.firstPage;
+    if (byPage === 0 && a.selection && b.selection) {
+      let byPosition = 0;
+      let aQuery = a.selection[0];
+      let bQuery = b.selection[0];
+      let sortedCompare = sortElementsByScorePosition([aQuery, bQuery]);
+      let aPos = sortedCompare.findIndex((el) => el === aQuery);
+      if (aPos === 0) {
+        byPosition = -1;
+      } else {
+        byPosition = 1;
+      }
+      return byPosition;
+    } else {
+      return byPage;
+    }
+  });
+
+  return sortedResults;
+}
+
+async function situateOneListItem(item) {
+  return new Promise((resolve) => {
     let itemPromise;
     if (item.isMarkup === true) {
       itemPromise = markup.situateMarkup(item);
@@ -162,6 +178,7 @@ function situateListItems() {
       if (itemLocationLabel) {
         itemLocationLabel.innerHTML = generateAnnotationLocationLabel(item).innerHTML;
       }
+      resolve(item);
     });
   });
 }
@@ -240,8 +257,12 @@ export function refreshAnnotationsInRendering(forceListRefresh = false) {
  * @param {boolean} forceRefresh true when list should be refreshed
  */
 export function situateAndRefreshAnnotationsList(forceRefresh = false) {
-  situateListItems();
-  if (forceRefresh || !document.getElementsByClassName('annotationListItem').length) refreshAnnotationsList();
+  situateListItems()
+    .then((sortedList) => {
+      listItems = sortedList;
+      if (forceRefresh || !document.getElementsByClassName('annotationListItem').length) refreshAnnotationsList();
+    })
+    .catch((error) => console.error('Situating of list items failed:', error));
 }
 
 /**
