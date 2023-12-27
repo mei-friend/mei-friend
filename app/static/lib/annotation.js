@@ -16,6 +16,7 @@ import {
 } from './solid.js';
 import { nsp, traverseAndFetch } from './linked-data.js';
 import { deleteListItem, isItemInList, addListItem } from './enrichment_panel.js';
+import * as att from './attribute-classes.js';
 
 //#region functions to draw annotations
 
@@ -350,8 +351,11 @@ export function writeAnnot(anchor, xmlId, plist, payload) {
   // i.e., probably the closest permissible level to the anchor element.
   // For now, we only support a limited range of music body elements
   let insertHere;
-  if (anchor.closest('supplied')) insertHere = anchor.closest('supplied');
-  else if (anchor.closest('layer')) insertHere = anchor.closest('layer');
+  if (anchor.closest(att.modelTranscriptionLike.join(','))) {
+    insertHere = anchor.closest(att.modelTranscriptionLike.join(','));
+  } else if (anchor.closest(att.alternativeEncodingElements.join(','))) {
+    insertHere = anchor.closest(att.alternativeEncodingElements.join(','));
+  } else if (anchor.closest('layer')) insertHere = anchor.closest('layer');
   else if (anchor.closest('measure')) insertHere = anchor.closest('measure');
   else if (anchor.closest('section')) insertHere = anchor.closest('section');
   else if (anchor.closest('score')) insertHere = anchor.closest('score');
@@ -363,7 +367,8 @@ export function writeAnnot(anchor, xmlId, plist, payload) {
     return;
   }
   if (insertHere) {
-    // trz to add our annotation at beginning of insertHere element's list of children:
+    // trz to add our annotation at beginning of insertHere element's list of children.
+    // in case of alternative encodings, add annotation at beginning of first child WRONG!!
     // find first non-text child with an identifier
     const firstChildNode = Array.from(insertHere.childNodes)
       .filter((c) => c.nodeType !== Node.TEXT_NODE)
@@ -382,9 +387,16 @@ export function writeAnnot(anchor, xmlId, plist, payload) {
         }
       }
       // insert <annot> into the DOM
-      insertHere.insertAdjacentElement('afterbegin', annot);
-      // now write it into CM
+      if (att.alternativeEncodingElements.includes(insertHere.localName)) {
+        // modify cursor position
+        setCursorToId(cm, insertHere.getAttribute('xml:id'));
+        insertHere.insertAdjacentElement('beforebegin', annot);
+      } else {
+        insertHere.insertAdjacentElement('afterbegin', annot);
+      }
+      // get cursor position (we just set)
       let p1 = cm.getCursor();
+      // now write it into CM
       cm.replaceRange(xmlToString(annot) + '\n', p1);
       let p2 = cm.getCursor();
       // indent nicely
