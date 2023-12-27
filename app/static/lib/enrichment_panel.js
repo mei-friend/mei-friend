@@ -148,6 +148,7 @@ export function retrieveItemValuesByProperty(filterProperty = null, selectedProp
 
 /**
  *  Finds page numbers in rendering for every list item and sorts the list items.
+ *  Sorts 1. by page, 2. by horizontal position on page, 3. markup and then annotations (if selection is identical).
  *  @returns {Array} Sorted list items.
  */
 async function situateListItems() {
@@ -158,13 +159,29 @@ async function situateListItems() {
       let byPosition = 0;
       let aQuery = a.selection[0];
       let bQuery = b.selection[0];
+
       let sortedCompare = sortElementsByScorePosition([aQuery, bQuery]);
       let aPos = sortedCompare.findIndex((el) => el === aQuery);
-      if (aPos === 0) {
+      
+      if (aQuery === bQuery) {
+        if(a.isMarkup && b.isMarkup) {
+          // shouldn't happen in theory
+          byPosition = 0;
+        }
+        else if(a.isMarkup) {
+          byPosition = -1;
+        }
+        else {
+          //b.isMarkup
+          byPosition = 1;
+        }
+      }
+      else if (aPos === 0) {
         byPosition = -1;
       } else {
         byPosition = 1;
       }
+
       return byPosition;
     } else {
       return byPage;
