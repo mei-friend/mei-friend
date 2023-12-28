@@ -9,6 +9,7 @@
 * Add resp label to markup items within list tab in Enrichment Panel.
 * Add 'Describe Markup' button to markup list items.
 * Improve sorting of list items in Enrichment Panel's List tab.
+* Refresh list items on language change.
 
 ### 1.1.3 <choice>
 
