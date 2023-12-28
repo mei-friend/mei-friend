@@ -410,10 +410,12 @@ function generateAnnotationButtons(a) {
   const deleteAnno = generateListItemButton(
     'deleteAnnotation',
     diffRemoved,
-    translator.lang.deleteAnnotation.description
+    a.isMarkup ? translator.lang.deleteMarkup.description : translator.lang.deleteAnnotation.description
   );
   deleteAnno.addEventListener('click', (e) => {
-    const reallyDelete = confirm(translator.lang.deleteAnnotationConfirmation.text);
+    const reallyDelete = confirm(
+      a.isMarkup ? translator.lang.deleteMarkupConfirmation.text : translator.lang.deleteAnnotationConfirmation.text
+    );
     if (reallyDelete) {
       deleteListItem(a.id);
     }

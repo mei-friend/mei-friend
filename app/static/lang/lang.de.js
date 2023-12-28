@@ -459,6 +459,9 @@ export const lang = {
   loadWebAnnotationMessage2: { text: 'bitte nochmal versuchen' },
   noAnnotationsToDisplay: { text: 'Keine Annotationen zum Anzeigen' },
   flipPageToAnnotationText: { description: 'Zu dieser Annotation blättern' },
+  describeMarkup: { description: 'Dieses Markup beschreiben' },
+  deleteMarkup: { description: 'Dieses Markup löschen' },
+  deleteMarkupConfirmation: { text: 'Möchten Sie dieses Markup wirklich löschen?' },
   deleteAnnotation: { description: 'Diese Annotation löschen' },
   deleteAnnotationConfirmation: { text: 'Diese Annotation wirklich löschen?' },
   makeStandOffAnnotation: {

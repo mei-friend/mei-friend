@@ -434,6 +434,9 @@ export const lang = {
   loadWebAnnotationMessage2: { text: 'もう一度お試しください' },
   noAnnotationsToDisplay: { text: '表示する注釈がありません' },
   flipPageToAnnotationText: { description: 'この注釈にページをめくる' },
+  describeMarkup: { description: 'このマークアップを説明する' },
+  deleteMarkup: { description: 'このマークアップを削除する' },
+  deleteMarkupConfirmation: { text: 'このマークアップを削除してもよろしいですか？' },
   deleteAnnotation: { description: 'この注釈を削除' },
   deleteAnnotationConfirmation: { text: 'この注釈を削除してもよろしいですか？' },
   makeStandOffAnnotation: {

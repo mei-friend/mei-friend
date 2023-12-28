@@ -460,6 +460,9 @@ export const lang = {
   loadWebAnnotationMessage2: { text: 'Si us plau, intenta-ho de nou' },
   noAnnotationsToDisplay: { text: 'No hi ha cap anotació per mostrar' },
   flipPageToAnnotationText: { description: 'Gira la pàgina fins a aquesta anotació' },
+  describeMarkup: { description: 'Descriu aquest marcatge' },
+  deleteMarkup: { description: 'Elimina aquest marcatge' },
+  deleteMarkupConfirmation: { text: 'Esteu segur que voleu eliminar aquest marcatge?' },
   deleteAnnotation: { description: 'Elimina aquesta anotació' },
   deleteAnnotationConfirmation: { text: 'Esteu segur que voleu eliminar aquesta anotació?' },
   makeStandOffAnnotation: {
