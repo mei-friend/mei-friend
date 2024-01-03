@@ -284,6 +284,7 @@ export const lang = {
   breaksSelectSmart: { text: 'Intel·ligent' },
   choiceSelect: { description: 'Trieu el contingut mostrat pels elements de selecció' },
   choiceDefault: { text: '(opció per defecte)' },
+  noChoice: { text: '(cap opció disponible)' },
   updateControlsLabel: {
     text: 'Actualitzar',
     description: "Comportament d'actualització dels controls de la notació després de canvis en l'encoding",

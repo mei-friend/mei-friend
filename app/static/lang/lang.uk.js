@@ -271,6 +271,7 @@ export const lang = {
   breaksSelectSmart: { text: 'Розумні' },
   choiceSelect: { description: 'Виберіть відображений вміст для елементів вибору' },
   choiceDefault: { text: '(стандартний вибір)' },
+  noChoice: { text: '(немає доступних варіантів)' },
   updateControlsLabel: { text: 'Оновлення', description: 'Поведінка оновлення нотації після змін в кодуванні' },
   liveUpdateCheckbox: { description: 'Автоматичне оновлення нотації після змін в кодуванні' },
   codeManualUpdateButton: { description: 'Ручне оновлення нотації' },

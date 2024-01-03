@@ -280,6 +280,7 @@ export const lang = {
   breaksSelectSmart: { text: 'Smart' },
   choiceSelect: { description: 'Wählen Sie den angezeigten Inhalt für Choice-Elemente' },
   choiceDefault: { text: '(Standardauswahl)' },
+  noChoice: { text: '(keine Auswahl verfügbar)' },
   updateControlsLabel: {
     text: 'Aktualisieren',
     description: 'Aktualisierungsverhalten der Notation nach Änderungen in der Kodierung',

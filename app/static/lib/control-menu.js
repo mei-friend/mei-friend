@@ -652,24 +652,31 @@ export function setChoiceOptions(active) {
   while (choiceSelect.hasChildNodes()) {
     choiceSelect.removeChild(choiceSelect.firstChild);
   }
+  if (choiceOptions.length > 0) {
+    choiceOptions.forEach((groupEl) => {
+      let group = document.createElement('optgroup');
+      group.label = groupEl.label ? groupEl.label : groupEl.elName;
+      if (groupEl.id) group.id = groupEl.id;
 
-  choiceOptions.forEach((groupEl) => {
-    let group = document.createElement('optgroup');
-    group.label = groupEl.elName;
-
-    groupEl.options.forEach((el) => {
-      let option;
-      if (el.value === active) {
-        option = new Option(el.label, el.value, false, true);
-      } else {
-        option = new Option(el.label, el.value, false, false);
-      }
-      option.id = el.id;
-      option.dataset.prop = el.prop;
-      group.appendChild(option);
+      groupEl.options.forEach((el) => {
+        let option;
+        if (active && el.value === active) {
+          option = new Option(el.label, el.value, false, true);
+        } else {
+          option = new Option(el.label, el.value, false, false);
+        }
+        option.id = el.id;
+        option.dataset.prop = el.prop;
+        group.appendChild(option);
+      });
+      choiceSelect.appendChild(group);
     });
-    choiceSelect.appendChild(group);
-  });
+  } else {
+    let option = new Option(translator.lang.noChoice.text, '', false, false);
+    option.id = 'noChoice';
+    choiceSelect.appendChild(option);
+  }
+  
 }
 
 // checks xmlDoc for section, ending, lem, rdg elements for quick navigation

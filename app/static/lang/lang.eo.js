@@ -275,6 +275,7 @@ export const lang = {
   breaksSelectSmart: { text: 'Saĝa' },
   choiceSelect: { description: 'Choose displayed content for choice elements' },
   choiceDefault: { text: '(default choice)' },
+  noChoice: { text: '(nenia elekto disponebla)' },
   updateControlsLabel: { text: 'Ĝisdatigo', description: 'KontrolĜisdatigo konduto de notado post ŝanĝoj en kodado' },
   liveUpdateCheckbox: { description: 'Aŭtomate ĝisdatigi notadon post ŝanĝoj en kodado' },
   codeManualUpdateButton: { description: 'Mane ĝisdatigi notadon' },

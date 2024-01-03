@@ -281,6 +281,7 @@ export const lang = {
   breaksSelectSmart: { text: 'Inteligentnie' },
   choiceSelect: { description: 'Wybierz wyświetlaną zawartość dla elementów wyboru' },
   choiceDefault: { text: '(domyślny wybór)' },
+  noChoice: { text: '(brak dostępnych opcji)' },
   updateControlsLabel: {
     text: 'Aktualizuj',
     description: 'Zachowanie aktualizacji sterowania notacją po zmianach w kodowaniu',

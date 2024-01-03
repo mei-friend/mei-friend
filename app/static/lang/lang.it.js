@@ -283,6 +283,7 @@ export const lang = {
   breaksSelectSmart: { text: 'Intelligente' },
   choiceSelect: { description: 'Scegli il contenuto visualizzato per gli elementi di scelta' },
   choiceDefault: { text: '(scelta predefinita)' },
+  noChoice: { text: '(nessuna scelta disponibile)' },
   updateControlsLabel: {
     text: 'Aggiorna',
     description: 'Cambia il comportamento di controllo dello spartito dopo le modifiche nel codice',

@@ -273,6 +273,7 @@ export const lang = {
   breaksSelectSmart: { text: 'スマート' },
   choiceSelect: { description: '選択要素の表示コンテンツを選択します' },
   choiceDefault: { text: '(デフォルトの選択)' },
+  noChoice: { text: '(利用可能な選択肢なし)' },
   updateControlsLabel: { text: '更新', description: 'エンコード変更後の楽譜の制御更新動作' },
   liveUpdateCheckbox: { description: 'エンコード変更後に楽譜を自動的に更新' },
   codeManualUpdateButton: { description: '楽譜を手動で更新' },
