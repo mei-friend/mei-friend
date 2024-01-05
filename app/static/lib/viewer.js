@@ -822,7 +822,7 @@ export default class Viewer {
   // set focus to verovioPane in order to ensure working key bindings
   setFocusToVerovioPane() {
     let el = document.getElementById('verovio-panel');
-    el.setAttribute('tabindex', '-1');
+    //el.setAttribute('tabindex', '-1');
     el.focus();
   } // setFocusToVerovioPane()
 
