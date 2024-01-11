@@ -44,9 +44,7 @@ export function readMarkup() {
 
   // get ids of all children of choice/subst/app and add them to idsToIgnore
   // adding them for each element when it's processed didn't work
-  let alternativeVersions = Array.from(
-    v.xmlDoc.querySelectorAll(att.alternativeEncodingElements.join(',') + ' > ' + '*')
-  );
+  let alternativeVersions = Array.from(v.xmlDoc.querySelectorAll(att.alternativeEncodingElements.join(',')));
   alternativeVersions?.forEach((element) => {
     let children = element.children;
     for (let i = 0; i < children.length; i++) {
@@ -84,7 +82,10 @@ export function readMarkup() {
         correspIds.forEach((id) => idsToIgnore.push(id));
       }
       correspIds.unshift(elId);
-      xmlMarkupToListItem(elId, elName, correspIds, content);
+
+      let resp = markupEl.getAttribute('resp');
+
+      xmlMarkupToListItem(elId, elName, correspIds, content, resp);
     }
   });
   updateChoiceOptions();
@@ -96,9 +97,10 @@ export function readMarkup() {
  * @param {string} mElName element name -> item.type
  * @param {Array[string]} correspElements ids of corresponding elements (including self) -> item.selection
  * @param {Array[string]} [content=[]] children of multi-layer elements like choice/subst/app
+ * @param {string} resp value of resp attribute
  * @returns {boolean} adding item was successful
  */
-function xmlMarkupToListItem(currentElementId, mElName, correspElements, content = []) {
+function xmlMarkupToListItem(currentElementId, mElName, correspElements, content = [], resp) {
   // one addMarkupAction might result in multiple markup elements
   // e.g. when selecting notes and control events
   // mostly because symbols in a score aren't necessarily close in the xml tree
@@ -117,6 +119,15 @@ function xmlMarkupToListItem(currentElementId, mElName, correspElements, content
     markupItem.content = content;
   }
 
+  if (resp) {
+    if (resp[0] === '#') resp = resp.slice(1);
+    let respEl = v.xmlDoc.querySelector("[*|id='" + resp + "']");
+    if (respEl) {
+      let respName = respEl.textContent;
+      markupItem.resp = respName;
+    }
+  }
+
   let success = addListItem(markupItem);
   return success;
 }
@@ -128,41 +139,56 @@ function xmlMarkupToListItem(currentElementId, mElName, correspElements, content
 function updateChoiceOptions() {
   // the loading logic causes this function to run twice.
   // so make sure this always represents the state of the mei document
-  // therefore this will be reset
+  // therefore reset choiceOptions first
   choiceOptions = [];
+
   let defaultOption = {
     label: translator.lang.choiceDefault.text,
     value: '',
     count: 100,
-    id: 'choiceDefault',
-    prop: 'choiceXPathQuery',
+    id: 'Default',
+    prop: 'XPathQuery',
   };
-  let elNames = choiceOptions.map((obj) => obj.value);
-  let choices = Array.from(v.xmlDoc.querySelectorAll('choice'));
+
+  //let elNames = choiceOptions.map((obj) => obj.value);
+  let choices = Array.from(v.xmlDoc.querySelectorAll('choice,subst'));
   //TODO: change to att.alternativeEncodingElements.join(',') when ready
 
-  choiceOptions.push(defaultOption);
+  let topLevelEls = choices.map((obj) => obj.localName).filter((value, index, array) => array.indexOf(value) === index);
+  topLevelEls.forEach((topLevelEl) => {
+    let optGroup = { elName: topLevelEl, options: [] };
+    let newDefault = Object.assign({}, defaultOption);
+    newDefault.id = topLevelEl + newDefault.id;
+    newDefault.prop = topLevelEl + newDefault.prop;
+    optGroup.options.push(newDefault);
 
-  choices.forEach((choice) => {
-    for (let i = 0; i < choice.children.length; i++) {
-      let child = choice.children[i];
-      if (!elNames.includes(child.localName)) {
-        let capitalisedOption = child.localName[0].toUpperCase() + child.localName.slice(1);
-        choiceOptions.push({
-          label: capitalisedOption,
-          value: child.localName,
-          count: 1,
-          id: 'choice' + capitalisedOption,
-          prop: 'choiceXPathQuery',
-        });
-        elNames.push(child.localName);
-      } else {
-        let obj = choiceOptions.find((obj) => obj.value === child.localName);
-        obj.count = obj.count + 1;
+    let elNames = optGroup.options.map((obj) => obj.value);
+
+    let currentChoices = choices.filter((el) => el.localName === topLevelEl);
+    currentChoices.forEach((choice) => {
+      for (let i = 0; i < choice.children.length; i++) {
+        let child = choice.children[i];
+        if (!elNames.includes(child.localName)) {
+          let capitalisedOption = child.localName[0].toUpperCase() + child.localName.slice(1);
+          optGroup.options.push({
+            label: capitalisedOption,
+            value: child.localName,
+            count: 1,
+            id: topLevelEl + capitalisedOption,
+            prop: topLevelEl + 'XPathQuery',
+          });
+          elNames.push(child.localName);
+        } else {
+          let obj = optGroup.options.find((obj) => obj.value === child.localName);
+          obj.count = obj.count + 1;
+        }
       }
-    }
+    });
+
+    choiceOptions.push(optGroup);
   });
 }
+
 
 /**
  * Returns for a markup item the page locations in the Verovio rendering
@@ -518,8 +544,12 @@ function addMultiLayeredMarkup(v, mElName, parentEl, firstChild, content) {
   let upmostElementID = mintSuppliedId(firstChild.getAttribute('xml:id'), mElName, v);
   upmostElement.setAttributeNS(dutils.xmlNameSpace, 'xml:id', upmostElementID);
 
+  // add respID to choice/subst instead of children
+  // and delete it from firstChild if necessary
+  // because it's too complex to decide on resps for children and (currently) to set them individually
   let respID = getCurrentRespID();
   if (respID) upmostElement.setAttribute('resp', '#' + respID);
+  if (firstChild.getAttribute('resp')) firstChild.removeAttribute('resp');
 
   let alternativeEncodingSettingsValue = document.getElementById('alternativeVersionContent').value;
 
@@ -543,8 +573,7 @@ function addMultiLayeredMarkup(v, mElName, parentEl, firstChild, content) {
         let firstChildCopies = new DocumentFragment();
         for (let child of firstChild.children) {
           let newChildCopy = child.cloneNode(true);
-          let newId = utils.generateXmlId(child.localName, v.xmlIdStyle);
-          newChildCopy.setAttributeNS(dutils.xmlNameSpace, 'xml:id', newId);
+          dutils.addNewXmlIdsToDescendants(newChildCopy);
           firstChildCopies.appendChild(newChildCopy);
         }
         nextChild.appendChild(firstChildCopies);
@@ -605,10 +634,17 @@ function wrapGroupWithMarkup(v, groupIds, mElName, parentEl) {
 
 /**
  * Get currently selected resp id from settings.
- * @returns {string}
+ * Returns null if string is empty
+ * @returns {string|null}
  */
 function getCurrentRespID() {
-  return document.getElementById('respSelect').value;
+  let respId = document.getElementById('respSelect').value;
+
+  if (respId === '') {
+    respId = null;
+  }
+
+  return respId;
 }
 
 /**

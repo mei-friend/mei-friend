@@ -979,33 +979,54 @@
       <div id="listAnnotations" class="tabcontent">No annotations present.</div>
       <div id="markupTools" class="tabcontent">
         <menu id="markupToolsMenu" class="enrichmentToolsMenu markup-panel">
-          <span>Alternative encodings</span>
+          <span id="alternativeEncodingsGrp">Alternative encodings</span>
           <div class="annotationToolsIconGroup">
             <div class="markup-btn-group annotationToolsIcon">
               <div class="markup-dropdown">
-                <span>&lt;choice&gt;</span>
+                <span id="addChoiceText">&lt;choice&gt;</span>
                 <div id="choice-content-options" class="markup-dropdown-content">
-                  <a id="choice_sic-corr" data-target="choice-content-target" data-content-choice="sic,corr"
+                  <a id="choiceSicCorr" data-target="choiceContentTarget" data-content-choice="sic,corr"
                     class="content-option" href="#">sic | corr</a>
-                  <a id="choice_corr-sic" data-target="choice-content-target" data-content-choice="corr,sic"
+                  <a id="choiceCorrSic" data-target="choiceContentTarget" data-content-choice="corr,sic"
                     class="content-option" href="#">corr | sic</a>
-                  <a id="choice_orig-reg" data-target="choice-content-target" data-content-choice="orig,reg"
+                  <a id="choiceOrigReg" data-target="choiceContentTarget" data-content-choice="orig,reg"
                     class="content-option" href="#">orig | reg</a>
-                  <a id="choice_reg-orig" data-target="choice-content-target" data-content-choice="reg,orig"
+                  <a id="choiceRegOrig" data-target="choiceContentTarget" data-content-choice="reg,orig"
                     class="content-option" href="#">reg | orig</a>
                 </div>
               </div>
               <div class="markup-dropdown">
-                <span id="choice-content-target">(select content)</span>
+                <span id="choiceContentTarget">(select content)</span>
                 <div class="markup-dropdown-content">
-                  <a class="addMarkup" data-el-name="choice" data-selection="" href="#">Selection</a>
-                  <a class="addMarkup" data-el-name="choice" data-selection="artic" href="#">Articulation</a>
-                  <a class="addMarkup" data-el-name="choice" data-selection="accid" href="#">Accidental</a>
+                  <a id="addChoice" class="addMarkup" data-el-name="choice" data-selection="" href="#">Selection</a>
+                  <a id="addChoiceArtic" class="addMarkup" data-el-name="choice" data-selection="artic" href="#">Articulation</a>
+                  <a id="addChoiceAccid" class="addMarkup" data-el-name="choice" data-selection="accid" href="#">Accidental</a>
                 </div>
               </div>
             </div>
           </div>
-          <span>Editorial interventions</span>
+          <div class="annotationToolsIconGroup">
+            <div class="markup-btn-group annotationToolsIcon">
+              <div class="markup-dropdown">
+                <span id="addSubstText">&lt;subst&gt;</span>
+                <div id="subst-content-options" class="markup-dropdown-content">
+                  <a id="substAddDel" data-target="substContentTarget" data-content-choice="add,del"
+                    class="content-option" href="#">add | del</a>
+                  <a id="substDelAdd" data-target="substContentTarget" data-content-choice="del,add"
+                    class="content-option" href="#">del | add</a>
+                </div>
+              </div>
+              <div class="markup-dropdown">
+                <span id="substContentTarget">(select content)</span>
+                <div class="markup-dropdown-content">
+                  <a id="addSubst" class="addMarkup" data-el-name="subst" data-selection="" href="#">Selection</a>
+                  <a id="addSubstArtic" class="addMarkup" data-el-name="subst" data-selection="artic" href="#">Articulation</a>
+                  <a id="addSubstAccid" class="addMarkup" data-el-name="subst" data-selection="accid" href="#">Accidental</a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <span id="editInterventionsGrp">Editorial interventions</span>
           <div class="annotationToolsIconGroup markup-dropdown">
             <span id="addSuppliedText" class="annotationToolsIcon">Supplied</span>
             <div class="markup-dropdown-content">
@@ -1060,7 +1081,7 @@
               <a class="addMarkup" data-el-name="reg" data-selection="accid" id="addRegAccid" href="#">Accidental</a>
             </div>
           </div>
-          <span>Descriptive Markup</span>
+          <span id="descMarkupGrp">Descriptive Markup</span>
           <div class="annotationToolsIconGroup markup-dropdown">
             <span id="addAddText" class="annotationToolsIcon">Add</span>
             <div class="markup-dropdown-content">

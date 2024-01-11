@@ -964,7 +964,7 @@ async function vrvWorkerEventsHandler(ev) {
         v.pageCount = Object.keys(v.pageBreaks).length;
       }
       //update choiceSelect
-      let cs = document.getElementById('choiceSelect').value;
+      let cs = document.getElementById('choiceSelect').selectedOptions[0]?.value;
       setChoiceOptions(cs);
       // update only if still same page
       if (v.currentPage === ev.data.pageNo || ev.data.forceUpdate || ev.data.computePageBreaks || v.pdfMode) {

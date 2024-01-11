@@ -1,5 +1,33 @@
 # mei-friend-online CHANGELOG.md
 
+### 1.1.4 Refine Editorial Markup
+* Add subst element to markup tools.
+* Moved responsibility select from mei-friend settings to markup tools.
+* Complete translations and tooltips for markup tools.
+* Fix generation of new xml:ids to copied elements.
+* Add resp label to markup items within list tab in Enrichment Panel.
+* Add 'Describe Markup' button to markup list items.
+* Improve sorting of list items in Enrichment Panel's List tab.
+* Refresh list items on language change.
+
+### 1.1.3 <choice>
+* Add choice element to markup tools.
+* Add setting to toggle whether a new alternative version should be created empty or if the content or the first version should be copied.
+* Add choice select to switch versions visible in the notation panel.
+* Add logic to handle markup for alternative versions.
+
+### 1.1.2 Enrichment Panel
+* Annotation panel has been refactored to Enrichment panel.
+* List tab in the Enrichment panel now shows annotations and markup.
+* Markup menu has been moved to new markup tools tab in the Enrichment Panel.
+
+### 1.1.1 Basic integration of Editorial Markup
+* Add support for markup elements: unclear, sic, corr, orig, reg, add, del.
+* Markup elements wrap multiple adjacent elements.
+* Add warning modal if missing xml:ids would affect markup creation.
+* Add settings to change highighting colors for markup elements.
+* Change option labels in responsibility select to text content.
+
 ### 1.0.6 patch (released on 20 Dec 2023)
 * Key signature information is taken into account, when shifting pitch of a note (#38)
 * Several navigation keyboard shortcuts removed from encoding panel (#66)

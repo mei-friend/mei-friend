@@ -16,6 +16,7 @@ import {
 } from './solid.js';
 import { nsp, traverseAndFetch } from './linked-data.js';
 import { deleteListItem, isItemInList, addListItem } from './enrichment_panel.js';
+import * as att from './attribute-classes.js';
 
 //#region functions to draw annotations
 
@@ -134,9 +135,9 @@ export function drawLink(a) {
 // called by addAnnotationHandlers() in the Tools tab of the Enrichment panel
 
 // functions to create annotations
-export const createIdentify = (e) => {
+export const createIdentify = (e, selection) => {
   if (solid.getDefaultSession().info.isLoggedIn) {
-    const label = window.prompt('Add label for identified object (optional)');
+    //const label = window.prompt('Add label for identified object (optional)');
     const selection = v.selectedElements;
     document.getElementById('solid_logo').classList.add('clockwise');
     createMAOMusicalObject(selection, label)
@@ -171,11 +172,11 @@ export const createIdentify = (e) => {
  * Creates a new highlight annotation either inline or standoff.
  * @param {Event} e event
  */
-export const createHighlight = (e) => {
+export const createHighlight = (e, selection) => {
   const a = {
     id: generateXmlId('annot', v.xmlIdStyle),
     type: 'annotateHighlight',
-    selection: v.selectedElements,
+    selection: selection,
   };
   addListItem(a);
   writeInlineIfRequested(a);
@@ -186,11 +187,11 @@ export const createHighlight = (e) => {
  * Creates a new circle annotation either inline or standoff.
  * @param {Event} e event
  */
-export const createCircle = (e) => {
+export const createCircle = (e, selection) => {
   const a = {
     id: generateXmlId('annot', v.xmlIdStyle),
     type: 'annotateCircle',
-    selection: v.selectedElements,
+    selection: selection,
   };
   addListItem(a);
   writeInlineIfRequested(a);
@@ -201,16 +202,16 @@ export const createCircle = (e) => {
  * Creates a new describe annotation either inline or standoff.
  * @param {Event} e event
  */
-export const createDescribe = (e) => {
+export const createDescribe = (e, selection) => {
   // TODO improve UX!
   const desc = window.prompt(translator.lang.askForDescription.text);
   const a = {
     id: generateXmlId('annot', v.xmlIdStyle),
     type: 'annotateDescribe',
-    selection: v.selectedElements,
+    selection: selection,
     description: desc,
   };
-  addListItem(a);
+  addListItem(a, true);
   writeInlineIfRequested(a);
   writeStandoffIfRequested(a);
 };
@@ -219,14 +220,14 @@ export const createDescribe = (e) => {
  * Creates a new link annotation either inline or standoff.
  * @param {Event} e event
  */
-export const createLink = (e) => {
+export const createLink = (e, selection) => {
   // TODO improve UX!
   let url = window.prompt(translator.lang.askForLinkUrl.text);
   if (!url.startsWith('http')) url = 'https://' + url;
   const a = {
     id: generateXmlId('annot', v.xmlIdStyle),
     type: 'annotateLink',
-    selection: v.selectedElements,
+    selection: selection,
     url: url,
   };
   addListItem(a);
@@ -350,8 +351,11 @@ export function writeAnnot(anchor, xmlId, plist, payload) {
   // i.e., probably the closest permissible level to the anchor element.
   // For now, we only support a limited range of music body elements
   let insertHere;
-  if (anchor.closest('supplied')) insertHere = anchor.closest('supplied');
-  else if (anchor.closest('layer')) insertHere = anchor.closest('layer');
+  if (anchor.closest(att.modelTranscriptionLike.join(','))) {
+    insertHere = anchor.closest(att.modelTranscriptionLike.join(','));
+  } else if (anchor.closest(att.alternativeEncodingElements.join(','))) {
+    insertHere = anchor.closest(att.alternativeEncodingElements.join(','));
+  } else if (anchor.closest('layer')) insertHere = anchor.closest('layer');
   else if (anchor.closest('measure')) insertHere = anchor.closest('measure');
   else if (anchor.closest('section')) insertHere = anchor.closest('section');
   else if (anchor.closest('score')) insertHere = anchor.closest('score');
@@ -363,7 +367,8 @@ export function writeAnnot(anchor, xmlId, plist, payload) {
     return;
   }
   if (insertHere) {
-    // trz to add our annotation at beginning of insertHere element's list of children:
+    // trz to add our annotation at beginning of insertHere element's list of children.
+    // in case of alternative encodings, add annotation at beginning of first child WRONG!!
     // find first non-text child with an identifier
     const firstChildNode = Array.from(insertHere.childNodes)
       .filter((c) => c.nodeType !== Node.TEXT_NODE)
@@ -382,9 +387,16 @@ export function writeAnnot(anchor, xmlId, plist, payload) {
         }
       }
       // insert <annot> into the DOM
-      insertHere.insertAdjacentElement('afterbegin', annot);
-      // now write it into CM
+      if (att.alternativeEncodingElements.includes(insertHere.localName)) {
+        // modify cursor position
+        setCursorToId(cm, insertHere.getAttribute('xml:id'));
+        insertHere.insertAdjacentElement('beforebegin', annot);
+      } else {
+        insertHere.insertAdjacentElement('afterbegin', annot);
+      }
+      // get cursor position (we just set)
       let p1 = cm.getCursor();
+      // now write it into CM
       cm.replaceRange(xmlToString(annot) + '\n', p1);
       let p2 = cm.getCursor();
       // indent nicely
@@ -441,7 +453,7 @@ export function copyIdToClipboard(e) {
 function writeInlineIfRequested(a) {
   // write annotation to inline <annot> if the user has requested this
   if (document.getElementById('writeAnnotationInline').checked) {
-    let el = v.xmlDoc.querySelector('[*|id="' + v.selectedElements[0] + '"]');
+    let el = v.xmlDoc.querySelector('[*|id="' + a.selection[0] + '"]');
     if (el) {
       let payload;
       if (a.type === 'annotateDescribe') payload = a.description;

@@ -367,11 +367,14 @@ export default class Viewer {
     if (fontSel) this.vrvOptions.font = fontSel.value;
     let bs = this.breaksSelect;
     if (bs) this.vrvOptions.breaks = bs.value;
-    let choiceSelect = this.choiceSelect.value;
-    if (choiceSelect != '') {
-      this.vrvOptions.choiceXPathQuery = ['./' + choiceSelect];
-    } else {
-      this.vrvOptions.choiceXPathQuery = [];
+    let choiceSelect = this.choiceSelect;
+    if (choiceSelect.selectedOptions.length > 0) {
+      let selectedChoice = choiceSelect.selectedOptions[0]; //always the first until type is changed to multiselect
+      if (selectedChoice.value != '') {
+        this.vrvOptions[selectedChoice.dataset.prop] = ['./' + selectedChoice.value];
+      } else {
+        this.vrvOptions[selectedChoice.dataset.prop] = [];
+      }
     }
 
     // update page dimensions, only if not in pdf mode
@@ -1191,10 +1194,6 @@ export default class Viewer {
           checkedMarkup = document.getElementById('showMarkup').checked;
           setHighlightColorProperty('del', checkedMarkup, value, true);
           break;
-        case 'respSelect':
-          if (this.xmlDoc)
-            o.values = Array.from(this.xmlDoc.querySelectorAll('corpName[*|id]')).map((e) => e.getAttribute('xml:id'));
-          break;
         case 'controlMenuFontSelector':
           document.getElementById('engravingFontControls').style.display = value ? 'inherit' : 'none';
           break;
@@ -1437,9 +1436,6 @@ export default class Viewer {
             break;
           case 'delColor':
             setHighlightColorProperty('del', checkedMarkup, document.getElementById(option).value, false);
-            break;
-          case 'respSelect':
-            this.respId = document.getElementById('respSelect').value;
             break;
           case 'controlMenuFontSelector':
             document.getElementById('engravingFontControls').style.display = document.getElementById(
@@ -1944,6 +1940,10 @@ export default class Viewer {
     if (rs) {
       let value = rs.value;
       while (rs.length > 0) rs.options.remove(0);
+
+      //add empty default
+      rs.add(new Option('(none)', ''));
+
       let optEls = this.xmlDoc.querySelectorAll('corpName[*|id],persName[*|id]');
       optEls.forEach((el) => {
         if (el.closest('respStmt')) {

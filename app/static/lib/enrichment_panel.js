@@ -5,7 +5,7 @@
 //import { v, cm, log, translator, setStandoffAnnotationEnabledStatus } from './main.js';
 import { v, cm, translator, setStandoffAnnotationEnabledStatus } from './main.js';
 //import { convertCoords, generateXmlId, rmHash, setCursorToId } from './utils.js';
-import { setCursorToId } from './utils.js';
+import { setCursorToId, sortElementsByScorePosition } from './utils.js';
 //import { meiNameSpace, xmlNameSpace, xmlToString } from './dom-utils.js';
 import * as annot from './annotation.js';
 import * as markup from './markup.js';
@@ -72,7 +72,8 @@ export function addListItem(listItemObject, forceRefreshAnnotations = false) {
 }
 
 /**
- * Deletes an annotation or markup from listItems and the xml document
+ * Deletes an annotation or markup from listItems and the xml document.
+ * If markup should be deleted, items with identical selection are deleted.
  * @param {string} uuid id of list item to delete
  */
 export function deleteListItem(uuid) {
@@ -81,10 +82,20 @@ export function deleteListItem(uuid) {
     let a = retrieveListItem(uuid);
     if (a.isMarkup === true) {
       markup.deleteMarkup(a);
+      // remove markup from list and
+      // delete annotations if selection is identical with selection of current markup
+      // for now, we delete items by selection
+      // (change if this causes trouble, theoretically it shoudln't because selection
+      // is only identical if an annotation created via a markup item)
+      let sel = a.selection;
+      let filteredItems = listItems.filter((item) => item.selection !== sel);
+      listItems = filteredItems;
     } else {
       annot.deleteAnnot(uuid);
+      // remove only the annotation from the list that should be deleted
+      listItems.splice(ix, 1);
     }
-    listItems.splice(ix, 1);
+
     situateAndRefreshAnnotationsList(true);
     refreshAnnotationsInRendering();
   }
@@ -136,10 +147,52 @@ export function retrieveItemValuesByProperty(filterProperty = null, selectedProp
 }
 
 /**
- *  Finds page numbers in rendering for every list item
+ *  Finds page numbers in rendering for every list item and sorts the list items.
+ *  Sorts 1. by page, 2. by horizontal position on page, 3. markup and then annotations (if selection is identical).
+ *  @returns {Array} Sorted list items.
  */
-function situateListItems() {
-  listItems.forEach(async (item) => {
+async function situateListItems() {
+  const asyncResults = await Promise.all(listItems.map((item) => situateOneListItem(item)));
+  const sortedResults = asyncResults.sort((a, b) => {
+    let byPage = a.firstPage - b.firstPage;
+    if (byPage === 0 && a.selection && b.selection) {
+      let byPosition = 0;
+      let aQuery = a.selection[0];
+      let bQuery = b.selection[0];
+
+      let sortedCompare = sortElementsByScorePosition([aQuery, bQuery]);
+      let aPos = sortedCompare.findIndex((el) => el === aQuery);
+      
+      if (aQuery === bQuery) {
+        if(a.isMarkup && b.isMarkup) {
+          // shouldn't happen in theory
+          byPosition = 0;
+        }
+        else if(a.isMarkup) {
+          byPosition = -1;
+        }
+        else {
+          //b.isMarkup
+          byPosition = 1;
+        }
+      }
+      else if (aPos === 0) {
+        byPosition = -1;
+      } else {
+        byPosition = 1;
+      }
+
+      return byPosition;
+    } else {
+      return byPage;
+    }
+  });
+
+  return sortedResults;
+}
+
+async function situateOneListItem(item) {
+  return new Promise((resolve) => {
     let itemPromise;
     if (item.isMarkup === true) {
       itemPromise = markup.situateMarkup(item);
@@ -153,6 +206,7 @@ function situateListItems() {
       if (itemLocationLabel) {
         itemLocationLabel.innerHTML = generateAnnotationLocationLabel(item).innerHTML;
       }
+      resolve(item);
     });
   });
 }
@@ -227,12 +281,16 @@ export function refreshAnnotationsInRendering(forceListRefresh = false) {
 
 /**
  * Forces the situation of annotations and refreshes
- * the list of annotations
+ * the list of all things.
  * @param {boolean} forceRefresh true when list should be refreshed
  */
-export function situateAndRefreshAnnotationsList(forceRefresh = false) {
-  situateListItems();
-  if (forceRefresh || !document.getElementsByClassName('annotationListItem').length) refreshAnnotationsList();
+function situateAndRefreshAnnotationsList(forceRefresh = false) {
+  situateListItems()
+    .then((sortedList) => {
+      listItems = sortedList;
+      if (forceRefresh || !document.getElementsByClassName('annotationListItem').length) refreshAnnotationsList();
+    })
+    .catch((error) => console.error('Situating of list items failed:', error));
 }
 
 /**
@@ -273,6 +331,7 @@ function generateListItem(a) {
     summary.insertAdjacentHTML('afterbegin', codeScan);
     details.insertAdjacentHTML('afterbegin', '&lt;' + a.type + '&gt;');
     if (a.content) details.insertAdjacentHTML('beforeend', ' (' + a.content + ')');
+    if (a.resp) details.insertAdjacentHTML('beforeend', '<br />[resp: ' + a.resp + ']');
   } else {
     switch (a.type) {
       case 'annotateHighlight':
@@ -339,14 +398,24 @@ function generateAnnotationButtons(a) {
     addObservation.classList.add('disabled');
   }
 
+  // add Describe button (for Markup)
+  const addDescribe = generateListItemButton('describeMarkup', pencil, translator.lang.describeMarkup.description);
+  if (a.isMarkup) {
+    addDescribe.addEventListener('click', (e) => {
+      annot.createDescribe(e, a.selection);
+    });
+  }
+
   // delete annotation button
   const deleteAnno = generateListItemButton(
     'deleteAnnotation',
     diffRemoved,
-    translator.lang.deleteAnnotation.description
+    a.isMarkup ? translator.lang.deleteMarkup.description : translator.lang.deleteAnnotation.description
   );
   deleteAnno.addEventListener('click', (e) => {
-    const reallyDelete = confirm(translator.lang.deleteAnnotationConfirmation.text);
+    const reallyDelete = confirm(
+      a.isMarkup ? translator.lang.deleteMarkupConfirmation.text : translator.lang.deleteAnnotationConfirmation.text
+    );
     if (reallyDelete) {
       deleteListItem(a.id);
     }
@@ -387,8 +456,12 @@ function generateAnnotationButtons(a) {
 
   // add buttons to bubble
   annoListItemButtons.appendChild(flipToAnno);
-  annoListItemButtons.appendChild(isInline);
-  annoListItemButtons.appendChild(isStandoff);
+  if (!a.isMarkup) {
+    annoListItemButtons.appendChild(isInline);
+    annoListItemButtons.appendChild(isStandoff);
+  } else {
+    annoListItemButtons.appendChild(addDescribe);
+  }
   annoListItemButtons.appendChild(deleteAnno);
 
   return annoListItemButtons;
@@ -461,19 +534,19 @@ export function addAnnotationHandlers() {
     console.log('annotation Handler: Selected elements: ', v.selectedElements);
     switch (e.target.closest('.annotationToolsIcon')?.getAttribute('id')) {
       case 'annotateIdentify':
-        annot.createIdentify(e);
+        annot.createIdentify(e, v.selectedElements);
         break;
       case 'annotateHighlight':
-        annot.createHighlight(e);
+        annot.createHighlight(e, v.selectedElements);
         break;
       case 'annotateCircle':
-        annot.createCircle(e);
+        annot.createCircle(e, v.selectedElements);
         break;
       case 'annotateLink':
-        annot.createLink(e);
+        annot.createLink(e, v.selectedElements);
         break;
       case 'annotateDescribe':
-        annot.createDescribe(e);
+        annot.createDescribe(e, v.selectedElements);
         break;
       default:
         console.warn("Don't have a handler for this type of annotation", e);
@@ -514,6 +587,8 @@ export function addMarkupHandlers() {
     //TODO: make addition of data-content less error prone!
   };
 
+  addRespSelect();
+
   let contentOptions = document.getElementsByClassName('content-option');
   for (let i = 0; i < contentOptions.length; i++) {
     contentOptions[i].addEventListener('click', (event) => {
@@ -527,6 +602,34 @@ export function addMarkupHandlers() {
       markup.addMarkup(event);
     });
   }
+}
+
+/**
+ * Adds the respSelect control to te markup tools tab.
+ */
+function addRespSelect() {
+  let respSelectBase = {
+    title: 'Select markup responsibility',
+    description: 'filled in by language packs',
+    type: 'select',
+    default: 'none',
+    values: [],
+  };
+
+  let respSelDiv = document.createElement('div');
+  respSelDiv.classList.add('markupSetting');
+  respSelDiv.classList.add('optionsItem');
+  let respSelect = document.createElement(respSelectBase.type);
+  respSelect.id = 'respSelect';
+  let respSelLabel = document.createElement('label');
+  respSelLabel.title = respSelectBase.title;
+  respSelLabel.textContent = respSelectBase.title;
+  respSelLabel.htmlFor = respSelect.id;
+  respSelDiv.appendChild(respSelLabel);
+  respSelDiv.appendChild(respSelect);
+
+  let markupMenu = document.getElementById('markupToolsMenu');
+  markupMenu.prepend(respSelDiv);
 }
 
 /**

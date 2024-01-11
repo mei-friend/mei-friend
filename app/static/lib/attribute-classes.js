@@ -286,7 +286,11 @@ export const modelTranscriptionLike = [
 ];
 
 // <app> is model.appLike, <choice> and <subst> are model.editLike
-export const alternativeEncodingElements = ['app', 'choice', 'subst'];
+export const alternativeEncodingElements = [
+  /*'app', (leave out for now, needs special handling) */
+  'choice',
+  'subst',
+];
 
 // data.DURATION.cmn
 export const dataDurationCMN = [

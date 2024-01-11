@@ -741,13 +741,14 @@ export const meiFriendSettingsOptions = {
     type: 'bool',
     default: true,
   },
-  respSelect: {
+  // moved to markup tools tab
+  /*respSelect: {
     title: 'Select markup responsibility',
     description: 'filled in by language packs',
     type: 'select',
     default: 'none',
     values: [],
-  },
+  },*/
   alternativeVersionContent: {
     title: 'Select default content for alternative encodings',
     description: 'filled in by language packs',

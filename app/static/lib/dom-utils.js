@@ -6,7 +6,8 @@ export const navElsArray = ['note', 'rest', 'mRest', 'beatRpt', 'halfmRpt', 'mRp
 export const navElsSelector = '.' + navElsArray.join(',.');
 
 import * as att from './attribute-classes.js';
-import { escapeXmlId } from './utils.js';
+import { escapeXmlId, generateXmlId } from './utils.js';
+import Viewer from './viewer.js';
 
 /**
  * Scans through SVG starting from element to find next element elementName
@@ -173,53 +174,73 @@ export function getLastInMeasure(measure, selector, stN, lyN) {
   return foundElementId;
 } // getLastInMeasure()
 
+/*
+AP 27.12.2023
+To change getX to retrieve X positions for markup, I refactored getX() and getY():
+1. Both functions are nearly identical. Logic is moved to getCoordinateValue().
+  getX() and getY() both call getCoordinateValue().
+  Keeps changes in logic consistent for both axes.
+3. getX() had a parameter "what" [what="median|range|array"] to specify the return value:
+    if (what === 'median') return median(x);
+    if (what === 'range') return Math.max(x) - Math.min(x);
+    if (what === 'array') return x;
+  This parameter hasn't been used anywhere in the code. I removed it for now.
+*/
+
 /**
- * Returns x coordinates of note and noteheads, as specified by what.
+ * Returns x coordinates of note and noteheads.
  * @param {Element} element
- * @param {string} [what="median|range|array"]
  * @returns {number|array}
  */
 export function getX(element, what = 'median') {
-  if (!element) return false;
-  let x = [];
-  if (element.getAttribute('class').includes('chord')) {
-    let els = element.querySelectorAll('g.note');
-    els.forEach((item, i) => {
-      x.push(getX(item));
-    });
-  } else if (navElsArray.some((el) => element.getAttribute('class').includes(el))) {
-    // (element.getAttribute('class').includes("note")) {
-    let els = element.querySelectorAll('.notehead > use[x]'); // should be one!
-    if (els.length === 0) els = element.querySelectorAll('use[x]'); // non-notes
-    els.forEach((item) => x.push(parseInt(item.getAttribute('x'))));
-  }
-  if (what === 'median') return median(x);
-  if (what === 'range') return Math.max(x) - Math.min(x);
-  if (what === 'array') return x;
+  return getCoordinateValue(element, 'x');
 } // getX()
 
 /**
- * Returns median of y coordinate of element
+ * Returns median of y coordinate of note and noteheads.
  * @param {Element} element
  * @returns {number}
  */
 export function getY(element) {
+  return getCoordinateValue(element, 'y');
+} // getY()
+
+/**
+ * Returns median of coordinate value for a specified axis.
+ * Checks for notes within coords, navigation elements (navEls), 
+ * and the position of navigation elements within markup elements. 
+ * navElsArray = ['note', 'rest', 'mRest', 'beatRpt', 'halfmRpt', 'mRpt', 'clef'];
+ * @param {SVGGElement} element svg element
+ * @param {string} axis [axis="x|y"]
+ * @returns {number}
+ */
+function getCoordinateValue(element, axis) {
   if (!element) return false;
-  let y = [];
-  if (element.getAttribute('class').includes('chord')) {
+  let values = [];
+  let elementClasses = element.getAttribute('class');
+  if (elementClasses.includes('chord')) {
     let els = element.querySelectorAll('g.note');
     els.forEach((item, i) => {
-      y.push(getY(item));
+      values.push(getCoordinateValue(item, axis));
     });
-  } else if (navElsArray.some((el) => element.getAttribute('class').includes(el))) {
-    let els = element.querySelectorAll('.notehead > use[y]'); // should be one!
-    if (els.length === 0) els = element.querySelectorAll('use[y]'); // non-notes
+  } else if (navElsArray.some((el) => elementClasses.includes(el))) {
+    let els = element.querySelectorAll('.notehead > use[' + axis + ']'); // should be one!
+    if (els.length === 0) els = element.querySelectorAll('use[' + axis + ']'); // non-notes
     els.forEach((item, i) => {
-      y.push(parseInt(item.getAttribute('y')));
+      values.push(parseInt(item.getAttribute(axis)));
     });
   }
-  return median(y);
-} // getY()
+  else if (
+    att.alternativeEncodingElements.some((el) => elementClasses.includes(el)) || 
+    att.modelTranscriptionLike.some((el) => elementClasses.includes(el))
+    ) {
+    let els = element.querySelectorAll(navElsSelector);
+    els.forEach((item) => {
+      values.push(getCoordinateValue(item, axis));
+    });
+  }
+  return median(values);
+}
 
 /**
  * Returns median of array of numbers
@@ -424,3 +445,16 @@ export function getAffectedNotesFromKeySig(keySigString = '') {
     keySigAccid: keySigAccid,
   };
 } // getAffectedNotesFromKeySig()
+
+export function addNewXmlIdsToDescendants(xmlNode) {
+  if (xmlNode.getAttribute('xml:id')) {
+    let newID = generateXmlId(xmlNode.localName, Viewer.xmlIdStyle);
+    xmlNode.setAttributeNS(xmlNameSpace, 'xml:id', newID);
+
+    if (xmlNode.children.length > 0) {
+      for (let child of xmlNode.children) {
+        addNewXmlIdsToDescendants(child);
+      }
+    }
+  }
+}

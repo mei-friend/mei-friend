@@ -77,6 +77,21 @@ fieldset {
   position: relative;
 }
 
+.markupSetting {
+  display: grid;
+  margin-bottom: 10px;
+}
+
+.markupSetting select {
+  background-color: var(--annotationPanelLinkBackgroundColor);
+  color: var(--annotationPanelTextColor);
+}
+
+.markupSetting select option {
+  background-color: var(--annotationPanelLinkBackgroundColor);
+  color: var(--annotationPanelTextColor);
+}
+
 .markup-btn-group {
   border: 1px solid black;
   border-radius: 5px;
