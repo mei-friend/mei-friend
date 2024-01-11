@@ -3,6 +3,7 @@
  */
 
 import * as att from './attribute-classes.js';
+import * as b40 from './base40.js';
 import * as dutils from './dom-utils.js';
 import * as speed from './speed.js';
 import * as utils from './utils.js';
@@ -207,6 +208,231 @@ function removeWithTextnodes(element) {
   }
   return parent;
 } // removeWithTextnodes()
+
+/**
+ * (Quasi duplicate selected note):
+ * Inserts new note immediately after the currently (last-)selected one,
+ * (or as the new last note on the currently visible notation fragment (e.g., page)).
+ * It copies @pname @oct @dur from the nearest predecessor note
+ * (or otherwise default to 'c', '4', '4').
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
+ */
+export function addNote(v, cm) {
+  let pname = 'c';
+  let oct = '4';
+  let dur = '4';
+
+  // get last selected element that is a layer, chord, note, or rest
+  let selEl;
+  let i = v.selectedElements.length - 1;
+  while (i >= 0) {
+    selEl = v.xmlDoc.querySelector("[*|id='" + v.selectedElements.at(i) + "']");
+    if (['layer', 'chord', 'note', 'rest'].includes(selEl.nodeName)) break;
+    selEl = null;
+    i--;
+  }
+
+  // stop if nothing found
+  if (!selEl) {
+    return false;
+    // TODO: get last note of visible fragment (i.e. page/system) // REALLY??
+    let noteList = document.querySelectorAll('g.note');
+    let lastNote = noteList[noteList.length - 1];
+  }
+  v.allowCursorActivity = false;
+
+  // clone element (chord, rest) or create new element
+  let newEl;
+  const uuid = utils.generateXmlId(selEl.nodeName, v.xmlIdStyle);
+  if (['chord', 'rest'].includes(selEl.nodeName)) {
+    newEl = selEl.cloneNode(true);
+    newEl.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
+  } else if (selEl.nodeName === 'layer') {
+    newEl = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'note');
+    newEl.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
+    newEl.setAttribute('dur', dur);
+    newEl.setAttribute('oct', oct);
+    newEl.setAttribute('pname', pname);
+  } else {
+    newEl = v.xmlDoc.createElementNS(dutils.meiNameSpace, selEl.nodeName);
+    newEl.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
+    const chord = selEl.parentElement?.closest('chord');
+    let addEl = chord ? chord : newEl; // place in chord, if a parent
+    copyAttribute(addEl, selEl, 'cue');
+    copyAttribute(addEl, selEl, 'dots');
+    copyAttribute(addEl, selEl, 'dur', dur);
+    copyAttribute(addEl, selEl, 'grace');
+    copyAttribute(newEl, selEl, 'oct', oct); // place in new element
+    copyAttribute(newEl, selEl, 'pname', pname); // place in new element
+    copyAttribute(addEl, selEl, 'stem.dir');
+  }
+  /**
+   * Copies attribute attName to new element, if present,
+   * or assigns defaultValue, if given
+   * @param {Element} newEl
+   * @param {Element} oldEl
+   * @param {string} attName
+   * @param {string} defaultValue
+   */
+  function copyAttribute(newEl, oldEl, attName, defaultValue = '') {
+    if (oldEl.hasAttribute(attName)) newEl.setAttribute(attName, oldEl.getAttribute(attName));
+    else if (defaultValue) newEl.setAttribute(attName, defaultValue);
+  }
+
+  if (selEl.nodeName === 'chord') {
+    for (let e of newEl.children) {
+      e.setAttributeNS(dutils.xmlNameSpace, 'xml:id', utils.generateXmlId(e.nodeName, v.xmlIdStyle));
+    }
+  }
+
+  if (selEl.nodeName !== 'layer') {
+    // add it to DOM
+    const nextElement = selEl.nextSibling;
+    if (nextElement) {
+      selEl.parentNode.insertBefore(newEl, nextElement);
+    } else {
+      selEl.parentNode.appendChild(newEl);
+    }
+
+    // add to editor
+    utils.setCursorToId(cm, selEl.id);
+    cm.execCommand('toMatchingTag');
+    cm.execCommand('goLineEnd');
+    const p1 = cm.getCursor();
+    cm.replaceRange('\n' + dutils.xmlToString(newEl), p1);
+    const p2 = cm.getCursor();
+    for (let p = p1.line; p <= p2.line; p++) cm.indentLine(p, 'smart');
+  } else {
+    // when adding to a layer
+    selEl.appendChild(newEl);
+    replaceInEditor(cm, selEl, true);
+  }
+
+  // do final homework
+  v.selectedElements = [];
+  v.selectedElements.push(uuid);
+  utils.setCursorToId(cm, uuid); // to select new element
+  v.lastNoteId = uuid;
+  addApplicationInfo(v, cm);
+  v.updateData(cm, false, true);
+  v.allowCursorActivity = true;
+} // addNote()
+
+/**
+ * Place selected notes into a (new) chord, containing these notes,
+ * and vice versa (remove chord and have contained notes there)
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
+ */
+export function convertToChord(v, cm) {
+  v.allowCursorActivity = false;
+  let chord;
+  let uuids = [];
+  speed.filterElements(v.selectedElements, v.xmlDoc, ['chord', 'note']).forEach((id) => {
+    let el = v.xmlDoc.querySelector("[*|id='" + id + "']");
+    if (el && el.nodeName === 'chord') {
+      utils.setCursorToId(cm, id);
+      while (el.children.length > 0) {
+        let ch = el.children[0];
+        if (el.hasAttribute('dur')) ch.setAttribute('dur', el.getAttribute('dur'));
+        if (el.hasAttribute('dots')) ch.setAttribute('dots', el.getAttribute('dots'));
+        if (el.hasAttribute('stem.dir')) ch.setAttribute('stem.dir', el.getAttribute('stem.dir'));
+        // editor
+        cm.execCommand('goLineStart');
+        const p1 = cm.getCursor();
+        cm.replaceRange(dutils.xmlToString(ch) + '\n', p1);
+        const p2 = cm.getCursor();
+        for (let p = p1.line; p <= p2.line; p++) cm.indentLine(p, 'smart');
+        // DOM
+        el.parentElement.insertBefore(ch, el);
+        utils.setCursorToId(cm, ch.getAttribute('xml:id')); // to select new element
+        uuids.push(ch.getAttribute('xml:id'));
+      }
+      el.remove();
+      removeInEditor(cm, el);
+    } else if (el && el.nodeName === 'note') {
+      if (el.closest('chord')) {
+        v.showAlert('Cannot create chord within chord.');
+        return;
+      }
+      // create new chord and add to DOM
+      if (!chord) {
+        chord = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'chord');
+        uuids.push(utils.generateXmlId('chord', v.xmlIdStyle));
+        chord.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuids.at(-1));
+        el.parentElement.insertBefore(chord, el);
+      }
+      if (el.hasAttribute('dur')) {
+        chord.setAttribute('dur', el.getAttribute('dur'));
+        el.removeAttribute('dur');
+      }
+      if (el.hasAttribute('dots')) {
+        chord.setAttribute('dots', el.getAttribute('dots'));
+        el.removeAttribute('dots');
+      }
+      if (el.hasAttribute('stem.dir')) {
+        chord.setAttribute('stem.dir', el.getAttribute('stem.dir'));
+        el.removeAttribute('stem.dir');
+      }
+      chord.appendChild(el);
+      removeInEditor(cm, el);
+    }
+  });
+  // add to editor
+  if (chord) {
+    const p1 = cm.getCursor();
+    cm.replaceRange(dutils.xmlToString(chord) + '\n', p1);
+    const p2 = cm.getCursor();
+    for (let p = p1.line; p <= p2.line; p++) cm.indentLine(p, 'smart');
+  }
+  utils.setCursorToId(cm, uuids.at(-1));
+  v.selectedElements = [];
+  uuids.forEach((uuid) => v.selectedElements.push(uuid));
+  v.lastNoteId = uuids.at(-1);
+  addApplicationInfo(v, cm);
+  v.updateData(cm, false, true);
+  v.allowCursorActivity = true;
+} // convertToChord()
+
+/**
+ * Converts selected notes to rests and vice versa.
+ * TODO: not secured against stupid things (like rests inside chords)
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
+ */
+export function convertNoteToRest(v, cm) {
+  v.allowCursorActivity = false;
+  let uuids = [];
+  speed.filterElements(v.selectedElements, v.xmlDoc, ['rest', 'note']).forEach((id) => {
+    let oldEl = v.xmlDoc.querySelector("[*|id='" + id + "']");
+    if (oldEl) {
+      let newName = oldEl.nodeName === 'note' ? 'rest' : 'note';
+      let newEl = v.xmlDoc.createElementNS(dutils.meiNameSpace, newName);
+      let uuid = utils.generateXmlId(newName, v.xmlIdStyle);
+      newEl.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
+      uuids.push(uuid);
+      if (oldEl.hasAttribute('dur')) newEl.setAttribute('dur', oldEl.getAttribute('dur'));
+      if (oldEl.hasAttribute('dots')) newEl.setAttribute('dots', oldEl.getAttribute('dots'));
+      if (oldEl.nodeName === 'rest') {
+        if (oldEl.hasAttribute('oloc')) newEl.setAttribute('oct', oldEl.getAttribute('oloc'));
+        if (oldEl.hasAttribute('ploc')) newEl.setAttribute('pname', oldEl.getAttribute('ploc'));
+      } else {
+        if (oldEl.hasAttribute('oct')) newEl.setAttribute('oloc', oldEl.getAttribute('oct'));
+        if (oldEl.hasAttribute('pname')) newEl.setAttribute('ploc', oldEl.getAttribute('pname'));
+      }
+      oldEl.parentElement.replaceChild(newEl, oldEl);
+      replaceInEditor(cm, oldEl, true, newEl);
+    }
+  });
+  v.selectedElements = [];
+  uuids.forEach((id) => v.selectedElements.push(id));
+  utils.setCursorToId(cm, v.selectedElements.at(-1)); // to select new element
+  v.lastNoteId = v.selectedElements.at(-1);
+  addApplicationInfo(v, cm);
+  v.updateData(cm, false, true);
+  v.allowCursorActivity = true;
+} // convertNoteToRest()
 
 /**
  * Adds accid element to note element.
@@ -697,7 +923,7 @@ export function toggleArtic(v, cm, artic = 'stacc') {
  * Shifts element (rests, note) up/down diatonically by pitch name (1 or 7 diatonic steps)
  * @param {Viewer} v
  * @param {CodeMirror} cm
- * @param {int} deltaPitch (-1, -12, +2)
+ * @param {int} deltaPitch (-1, -7, +2)
  * @param {boolean} shiftChromatically
  */
 export function shiftPitch(v, cm, deltaPitch = 0, shiftChromatically = false) {
@@ -732,9 +958,8 @@ export function shiftPitch(v, cm, deltaPitch = 0, shiftChromatically = false) {
  */
 export function modifyDuration(v, cm, what = 'increase') {
   v.loadXml(cm.getValue());
-  let ids = speed.filterElements(v.selectedElements, v.xmlDoc);
   v.allowCursorActivity = false;
-  ids.forEach((id) => {
+  speed.filterElements(v.selectedElements, v.xmlDoc).forEach((id) => {
     let el = v.xmlDoc.querySelector("[*|id='" + id + "']");
     if (el) {
       let dur = el.getAttribute('dur');
@@ -746,12 +971,37 @@ export function modifyDuration(v, cm, what = 'increase') {
         replaceInEditor(cm, el);
       }
     }
+    utils.setCursorToId(cm, id); // to select new element
   });
-  v.selectedElements = ids;
   addApplicationInfo(v, cm);
   v.updateData(cm, false, true);
   v.allowCursorActivity = true;
 } // modifyDuration()
+
+/**
+ * Toggles a @dots="1" into a note (or all allowed elements in attAugmentDots)
+ * or removes it if already present.
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
+ */
+export function toggleDots(v, cm) {
+  v.allowCursorActivity = false;
+  speed.filterElements(v.selectedElements, v.xmlDoc).forEach((id) => {
+    let el = v.xmlDoc.querySelector("[*|id='" + id + "']");
+    if (el && att.attAugmentDots.includes(el.nodeName)) {
+      if (el.hasAttribute('dots') && el.getAttribute('dots') === '1') {
+        el.removeAttribute('dots');
+      } else {
+        el.setAttribute('dots', '1');
+      }
+      replaceInEditor(cm, el);
+    }
+    utils.setCursorToId(cm, id); // to select new element
+  });
+  addApplicationInfo(v, cm);
+  v.updateData(cm, false, true);
+  v.allowCursorActivity = true;
+} // toggleDots()
 
 /**
  * Moves selected elements to next staff (without checking boundaries)
@@ -1064,13 +1314,10 @@ export function cleanAccid(v, cm) {
  * keySig/key.sig information and measure-wise accidentals,
  * finds instances of double accid & accid.ges.
  *
- * !!! TODO: make strings translatable and add to language packs !!!
- *
  * @param {Viewer} v
  * @param {CodeMirror} cm
- * @param {boolean} change
  */
-export function checkAccidGes(v, cm, change = false) {
+export function checkAccidGes(v, cm) {
   v.allowCursorActivity = false;
   v.initCodeCheckerPanel(translator.lang.codeCheckerTitle.text);
 
@@ -2098,7 +2345,7 @@ function toggleArticForNote(note, artic, xmlIdStyle) {
 /**
  * Modifies an element's pitch up and down (i.e. manipulating @oct, @pname)
  * @param {Element} el
- * @param {number} deltaPitch (diatonic steps or chromatic steps)
+ * @param {number} deltaPitch (diatonic steps or chromatic steps, if flag below is set)
  * @param {boolean} shiftChromatically
  * @returns {Element} element with modified attributes
  * NOTE: when shifting chromatically, only semitones (+/-1) make sense!
@@ -2106,7 +2353,7 @@ function toggleArticForNote(note, artic, xmlIdStyle) {
 function pitchMover(v, el, deltaPitch, shiftChromatically = false) {
   let octValue = 4;
   let pnameValue = 'c';
-  let accidValue = '';
+  let accidValue = 'n';
   let octAttr;
   let pnameAttr;
   if (['note'].includes(el.nodeName)) {
@@ -2115,69 +2362,133 @@ function pitchMover(v, el, deltaPitch, shiftChromatically = false) {
   } else if (['rest', 'mRest', 'multiRest'].includes(el.nodeName)) {
     octAttr = 'oloc';
     pnameAttr = 'ploc';
-    shiftChromatically = false; // shifting chromatically with rests is non-sense
   } else {
     return el;
   }
+
+  // read attributes from element
   if (el.hasAttribute(octAttr)) octValue = parseInt(el.getAttribute(octAttr));
   if (el.hasAttribute(pnameAttr)) pnameValue = el.getAttribute(pnameAttr);
 
-  let pi;
-  if (shiftChromatically) {
-    accidValue =
-      el.getAttribute('accid') || el.querySelector('[accid]')?.getAttribute('accid') || el.getAttribute('accid.ges');
-    if (accidValue) accidValue = accidValue.slice(0, 1); // take only first character
-
-    // remove all possible accid information
-    el.removeAttribute('accid');
-    el.removeAttribute('accid.ges');
-    let accidChild = el.querySelector('accid');
-    if (accidChild) removeWithTextnodes(accidChild);
-
-    pi = att.pnames.indexOf(pnameValue); // index in scale
-    let pitchesToBeAltered = att.sharps.slice(0, 5);
-    let accidSign = 's';
-    if (deltaPitch < 0) {
-      pitchesToBeAltered = att.flats.slice(0, 5);
-      accidSign = 'f';
+  // handle rests quickly and return
+  if (octAttr === 'oloc') {
+    let pi = att.pnames.indexOf(pnameValue) + deltaPitch;
+    // secure octave transistion
+    if (pi > att.pnames.length - 1) {
+      pi -= att.pnames.length;
+      octValue++;
+    } else if (pi < 0) {
+      pi += att.pnames.length;
+      octValue--;
     }
-    if (pitchesToBeAltered.includes(pnameValue)) {
-      if (accidValue === accidSign) {
-        pi += deltaPitch;
-        accidValue = '';
-      } else if (accidValue) {
-        accidValue = '';
+    el.setAttribute(octAttr, octValue);
+    el.setAttribute(pnameAttr, att.pnames[pi]);
+    return el;
+  } // treat rests
+
+  // get key signature and create scale steps in base-40 system
+  let keySig = dutils.getKeySigForNote(v.xmlDoc, el);
+  // console.debug('Current keySig: ', keySig);
+  let affectedNotes = dutils.getAffectedNotesFromKeySig(keySig);
+  affectedNotes.b40numbers = affectedNotes.affectedNotes.map((n) => {
+    let accid = affectedNotes.keySigAccid;
+    if (n.length > 1) accid += n[1] === att.sharpSign ? 's' : 'f';
+    return b40.pitchToBase40(n[0], accid);
+  });
+  let scaleShift = affectedNotes.affectedNotes.length * b40.intervals.P5;
+  let scaleSteps =
+    affectedNotes.keySigAccid === 'f'
+      ? b40.diatonicSteps.map((v) => v - scaleShift)
+      : b40.diatonicSteps.map((v) => v + scaleShift);
+  scaleSteps = scaleSteps.map((v) => ((v % b40.base) + b40.base) % b40.base).sort((a, b) => a - b);
+  // console.debug('Current scaleSteps: ', scaleSteps);
+
+  accidValue =
+    el.getAttribute('accid') ||
+    el.querySelector('[accid]')?.getAttribute('accid') ||
+    el.getAttribute('accid.ges') ||
+    'n';
+
+  // remove all possible accid information from element
+  el.removeAttribute('accid');
+  el.removeAttribute('accid.ges');
+  let accidChild = el.querySelector('accid');
+  if (accidChild) removeWithTextnodes(accidChild);
+
+  // compute b40 number of current pitch
+  let b40step = b40.pitchToBase40(pnameValue, accidValue, octValue) % b40.base;
+  // console.debug('b40step: ' + b40step);
+
+  let i = scaleSteps.indexOf(b40step);
+  // console.debug('i: ' + i);
+
+  if (Math.abs(deltaPitch) === 7) {
+    // add/subtract 1 to octValue
+    octValue = octValue + Math.sign(deltaPitch);
+  } else {
+    // moving downwards / upwards
+    if (i >= 0) {
+      let changeOctave = false;
+      // find interval to next lower scale tone.
+      let nextI = i + Math.sign(deltaPitch);
+      let interval = 0;
+      if (i === 0 && deltaPitch < 0) {
+        nextI = scaleSteps.length - 1;
+        interval = b40.base + scaleSteps[i] - scaleSteps[nextI];
+        changeOctave = true;
+      } else if (i === scaleSteps.length - 1 && deltaPitch > 0) {
+        nextI = 0;
+        interval = b40.base + scaleSteps[nextI] - scaleSteps[i];
+        changeOctave = true;
       } else {
-        accidValue = accidSign;
+        interval = Math.abs(scaleSteps[i] - scaleSteps[nextI]);
+      }
+      if (shiftChromatically && interval === b40.intervals.M2) {
+        // if chromatically and Major Second, take small step
+        b40step = b40step + Math.sign(deltaPitch);
+      } else {
+        // or next step otherwise
+        b40step = scaleSteps[nextI];
+        if (changeOctave) octValue = octValue + Math.sign(deltaPitch);
       }
     } else {
-      if (accidValue) {
-        accidValue = '';
+      // find next higher/lower element and go to it
+      let nextI;
+      if (deltaPitch > 0) {
+        nextI = scaleSteps.findIndex((s) => s > b40step);
+        if (nextI < 0) {
+          nextI = 0;
+          octValue = octValue + 1;
+        }
       } else {
-        pi += deltaPitch;
+        nextI = scaleSteps.findLastIndex((s) => s < b40step);
+        if (nextI < 0) {
+          nextI = scaleSteps.length - 1;
+          octValue = octValue - 1;
+        }
       }
+      b40step = scaleSteps[nextI];
     }
-  } else {
-    pi = att.pnames.indexOf(pnameValue) + deltaPitch;
   }
 
-  // secure octave transistion
-  if (pi > att.pnames.length - 1) {
-    pi -= att.pnames.length;
-    octValue++;
-  } else if (pi < 0) {
-    pi += att.pnames.length;
-    octValue--;
-  }
-  if (accidValue) {
+  const newPitch = b40.base40ToPitch(b40step);
+
+  if (affectedNotes.b40numbers.includes(b40step)) {
+    // add as accid.ges, when b40 pitch identical with a scaleStep
+    el.setAttribute('accid.ges', newPitch.accidGes);
+  } else if (
+    (newPitch.accidGes && newPitch.accidGes !== 'n') ||
+    affectedNotes.affectedNotes.map((n) => n[0]).includes(newPitch.pname)
+    // Create new element for accid, when different accid than accected note or some other accid
+  ) {
     let a = document.createElementNS(dutils.meiNameSpace, 'accid');
-    let uuid = utils.generateXmlId('accid', v.xmlIdStyle);
-    a.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
-    a.setAttribute('accid', accidValue);
+    a.setAttributeNS(dutils.xmlNameSpace, 'xml:id', utils.generateXmlId('accid', v.xmlIdStyle));
+    a.setAttribute('accid', newPitch.accidGes);
     el.appendChild(a);
   }
+
   el.setAttribute(octAttr, octValue);
-  el.setAttribute(pnameAttr, att.pnames[pi]);
+  el.setAttribute(pnameAttr, newPitch.pname);
   return el;
 } // pitchMover()
 

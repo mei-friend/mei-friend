@@ -36,6 +36,14 @@ export const lang = {
       por kolekti anonimajn uzo-statistikojn. Tio inkluzivas vian mallongan IP-adreson (permesanta geolokigon ĝis landnivelo, sed neniun plian identigon), vian foliumilon kaj operaciumon, de kie vi venis (t.e., la referanta retejo), la tempon kaj daŭron de via vizito, kaj la paĝojn kiujn vi vizitis. Tiu informo estas konservita en la Matomo-okaziga servilo situanta sur serviloj de mdw &ndash; Universitato de Muziko kaj Artaj Artoj de Vieno, kaj ne estas dividata kun triaj partioj.
     </p>
     <p>
+      Lut-tabulaturoj estas konvertitaj al MEI uzante 
+      <a href="https://bitbucket.org/bayleaf/luteconv/" target="_blank">luteconv</a> disvolvita de Paul Overell, 
+      per la <a href="https://codeberg.org/mdwRepository/luteconv-webui" target="_blank">luteconv-webui servo</a> 
+      disvolvita de Stefan Szepe kaj <a href="https://luteconv.mdw.ac.at" target="_blank">gastigita de la mdw</a>. 
+      Ĉi tiu servo kreas rete alireblajn kopiojn de viaj kodadoj kiel parto de la konverta procezo, 
+      sed ĉi tiuj estas alireblaj nur per unika ligila haŝvaloro, kaj estas perioda forigita.
+    </p>
+    <p>
       La Verovio-ilareto estas ŝargita el <a href="https://verovio.org" target="_blank">https://verovio.org</a>, gastigata de
       <a href="https://rism.digital/" target="_blank">RISM Digital Switzerland</a>. 
       Tio ebligas al mei-friend resti aktualigita kun la plej nova ilaretoversio kaj
@@ -56,7 +64,7 @@ export const lang = {
       <a href="https://spdx.org/licenses/AGPL-3.0-or-later.html" target="_blank"
         >GNU Affero General Public License v3.0</a
       >. Bonvolu konsulti nian
-      <a href="https://mei-friend.github.io/about/" target="_blank">rekonaĵopagxon</a> por pliaj
+      <a href="https://mei-friend.github.io/about/" target="_blank">rekonaĵopaĝon</a> por pliaj
       informoj pri kontribuantoj kaj la malfermfontaj komponentoj kiuj estas reuzitaj en nia projekto. Ni dankas
       niajn kunlaborantojn pro iliaj kontribuoj kaj gvidado.
     </p>
@@ -162,6 +170,7 @@ export const lang = {
   staffDownText: { text: 'Elemento 1 personalo malsupren' },
   increaseDurText: { text: 'Pligrandigi daŭron' },
   decreaseDurText: { text: 'Malpligrandigi daŭron' },
+  toggleDotsText: { text: 'Ŝalti punktadon' },
   cleanAccidText: { text: 'Kontroli @accid.ges' },
   renumberMeasuresTestText: { text: ' Reenumeri mezurojn (testo)' },
   renumberMeasuresExecText: { text: ' Reenumeri mezurojn (ekzekuti)' },
@@ -173,6 +182,9 @@ export const lang = {
 
   // INSERT MENU ITEM
   insertMenuTitle: { text: 'Enmeti' },
+  addNoteText: { text: 'Aldoni noton' },
+  convertNoteToRestText: { text: 'Noto(j) <=> paŭzo(j)' },
+  toggleChordText: { text: 'Noto(j) <=> akordo' },
   addDoubleSharpText: { html: 'Duobla diezo &#119082;' },
   addSharpText: { html: 'Diezo &#9839;' },
   addNaturalText: { html: 'Natura &#9838;' },

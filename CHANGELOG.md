@@ -1,9 +1,25 @@
 # mei-friend-online CHANGELOG.md
+
+### 1.0.6 patch (released on 20 Dec 2023)
+* Key signature information is taken into account, when shifting pitch of a note (#38)
+* Several navigation keyboard shortcuts removed from encoding panel (#66)
+* Bug fix for #73 to correctly handle unknown language code
+* Transparently open and convert Fronimo lute tablature format using luteconv-webui
+
+### 1.0.5 patch
+* Add Ukrainian and Esperanto language packs (still to be proof-read)
+* Keyboard shortcut (`SHIFT + SPACE`) to switch focus between notation and encoding panel (#55)
+* Keyboard shortcut (`N`) to duplicate a selected chord, note or rest, or insert a new note into an empty layer (#57)
+* Keyboard shortcut (`SHIFT + N`) to convert selected notes to rests and rests to notes (#57)
+* Keyboard shortcut (`.`) to add or remove `dots="1"` to notes, chords, etc.
+* Keyboard shortcut (`C`) to embed selected notes inside a new chord element, and vice versa (remove chord and leave notes)
+* Misleading warning when clicking on elements without ID fixed (#52)
+
 ### 1.0.4 patch
 * Tweak CSS select and translations (German)
 * Fix typo at forking via URL parameters
 
-### 1.0.3 patch
+### 1.0.3 patch (released 1 Nov 2023)
 * Enable navigation link to generated MAO objects (identify object annotations)
 
 ### 1.0.2 Splash screen (released 3 Oct 2023)
@@ -14,6 +30,7 @@
 * Show warning message when clicking on or drag-selecting elements without xml:ids (#10)
 * Drag'n'drop on CodeMirror editor now shows drag overlay screen
 * Take language from browser locale
+
 ### 1.0.1 patch
 * Reduce mei-friend-specific Verovio defaults
 * Add auto-translated draft of Japanese language pack

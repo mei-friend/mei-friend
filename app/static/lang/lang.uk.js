@@ -34,6 +34,14 @@ export const lang = {
       для збору анонімних статистичних даних про використання. До них належать скорочена IP-адреса (дозволяє визначити геолокацію лише на рівні країни, але не дозволяє вище), ваш веб-переглядач та операційна система, з якої ви прийшли (тобто посилаючий сайт), час і тривалість вашого візиту та сторінки, які ви відвідали. Ця інформація зберігається на інсталяції Matomo, яка працює на серверах mdw &ndash; Університет музики та виконавських мистецтв у Відні, і не передається жодній третій стороні.
     </p>
     <p>
+      Табулатури лютні конвертуються у MEI за допомогою <a href="https://bitbucket.org/bayleaf/luteconv/" target="_blank">luteconv</a>, 
+      розробленого Полом Овереллом, 
+      через сервіс <a href="https://codeberg.org/mdwRepository/luteconv-webui" target="_blank">luteconv-webui</a>, 
+      розроблений Стефаном Сзепе і <a href="https://luteconv.mdw.ac.at" target="_blank">розміщений на mdw</a>. 
+      Цей сервіс створює доступні в Інтернеті копії ваших кодувань як частину процесу конвертації, 
+      але вони доступні лише через унікальне значення хешу посилання і періодично видаляються.
+    </p>
+    <p>
       Набір інструментів Verovio завантажується зі сторінки <a href="https://verovio.org" target="_blank">https://verovio.org</a>, розміщеної на
       <a href="https://rism.digital/" target="_blank">RISM Digital Switzerland</a>. 
       Це дозволяє mei-friend бути в актуальному стані з останньою версією і
@@ -156,6 +164,7 @@ export const lang = {
   staffDownText: { text: 'Перемістити на 1 лінію вниз' },
   increaseDurText: { text: 'Збільшити тривалість' },
   decreaseDurText: { text: 'Зменшити тривалість' },
+  toggleDotsText: { text: 'перемикання пунктиру' },
   cleanAccidText: { text: 'Перевірити @accid.ges' },
   renumberMeasuresTestText: { text: 'Перенумерувати такти (тест)' },
   renumberMeasuresExecText: { text: 'Перенумерувати такти (виконати)' },
@@ -167,6 +176,9 @@ export const lang = {
 
   // INSERT MENU ITEM
   insertMenuTitle: { text: 'Вставити' },
+  addNoteText: { text: 'Додати ноту' },
+  convertNoteToRestText: { text: 'Нота(и) <=> пауза(и)' },
+  toggleChordText: { text: 'Нота(и) <=> акорд' },
   addDoubleSharpText: { html: 'Подвійний діез &#119082;' },
   addSharpText: { html: 'Дієз &#9839;' },
   addNaturalText: { html: 'Натураль &#9838;' },
