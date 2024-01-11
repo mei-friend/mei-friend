@@ -1,6 +1,6 @@
 // mei-friend version and date
 export const version = '1.1.4';
-export const versionDate = '03 January 2024'; // use full or 3-character english months, will be translated
+export const versionDate = '11 January 2023'; // use full or 3-character english months, will be translated
 
 var vrvWorker;
 var spdWorker;
@@ -73,6 +73,7 @@ import {
   setChoiceOptions,
 } from './control-menu.js';
 import { clock, unverified, xCircleFill } from '../css/icons.js';
+import { keymap } from '../keymaps/default-keymap.js';
 import { setCursorToId } from './utils.js';
 import { getInMeasure, navElsSelector, getElementAtCursor } from './dom-utils.js';
 import { addDragSelector } from './drag-selector.js';
@@ -111,7 +112,6 @@ import {
   defaultMeiFileName,
   defaultNotationOrientation,
   defaultNotationProportion,
-  defaultSpeedMode,
   defaultVerovioOptions,
   guidelinesBase,
   platform,
@@ -119,9 +119,9 @@ import {
   supportedLanguages,
 } from './defaults.js';
 import Translator from './translator.js';
+import { luteconv } from './luteconv.js';
 import { buildLanguageSelection, translateLanguageSelection } from './language-selector.js';
 import { runLanguageChecks } from '../tests/checkLangs.js';
-import * as expansionMap from './expansion-map.js';
 
 const defaultCodeMirrorOptions = {
   lineNumbers: true,
@@ -145,7 +145,6 @@ const defaultCodeMirrorOptions = {
     "'/'": completeIfAfterLt,
     "' '": completeIfInTag,
     "'='": completeIfInTag,
-    'Ctrl-Space': 'autocomplete',
     'Shift-Alt-f': indentSelection,
     'Shift-Ctrl-G': toMatchingTag,
     "'Ï'": indentSelection, // TODO: overcome strange bindings on MAC
@@ -167,7 +166,6 @@ const defaultCodeMirrorOptions = {
 
 // add all possible facsimile elements
 att.attFacsimile.forEach((e) => defaultVerovioOptions.svgAdditionalAttribute.push(e + '@facs'));
-const defaultKeyMap = `${root}keymaps/default-keymap.json`;
 const sampleEncodingsCSV = `${root}sampleEncodings/sampleEncodings.csv`;
 let freshlyLoaded = false; // flag to ignore a cm.on("changes") event on file load
 
@@ -383,11 +381,16 @@ async function suspendedValidate(text, updateLinting, options) {
 
 // when initial page content has been loaded
 document.addEventListener('DOMContentLoaded', function () {
+  // disable GitHub menu if server-side configuration not available
+  if (!gitEnabled) {
+    document.getElementById('GithubButton').disabled = true;
+  }
+
   translator = new Translator();
   // we need to look directly to local storage, because it will
   let language = window.localStorage['mf-selectLanguage'];
   let browseLang = navigator.language.substring(0, 2) || '';
-  if (!browseLang in supportedLanguages) browseLang = '';
+  if (!(browseLang in supportedLanguages)) browseLang = '';
   let langCode = language || browseLang || translator.defaultLangCode;
   if (langCode !== translator.langCode) {
     // load other language...
@@ -769,7 +772,7 @@ function completeInitialLoad() {
     doit = setTimeout(() => setOrientation(cm, '', '', v, storage), 500);
   };
 
-  setKeyMap(defaultKeyMap);
+  setKeyMap();
 
   // remove URL parameters from URL
   // TODO: check handleURLParamSelect() occurrences, whether removing search parameters has an effect there.
@@ -1169,7 +1172,7 @@ export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true, upd
         if (mei) loaded(mei);
         else notLoaded();
       };
-      if (meiFileName.endsWith('.mxl')) {
+      if (meiFileName.endsWith('.mxl') || meiFileName.endsWith('.ft2') || meiFileName.endsWith('.ft3')) {
         reader.readAsArrayBuffer(file);
       } else {
         reader.readAsText(file);
@@ -1219,6 +1222,32 @@ export function handleEncoding(mei, setFreshlyLoaded = true, updateAfterLoading 
     });
     found = true;
     setIsMEI(false);
+  } else if (meiFileName.endsWith('.ft2') || meiFileName.endsWith('.ft3')) { 
+    // lute tablature file (Fronimo format)
+    console.log('Load Fronimo file.', mei.slice(0, 128));
+    // set found to true, since we don't know if luteconv will succeed
+    // (we don't want to show the "format not recognized" message)
+    found = true;
+    setIsMEI(false);
+    // attempt to convert to MEI using luteconv web service:
+    luteconv(mei, meiFileName).then((mei) => {
+      if (mei) {
+        // rename file to .mei
+        setMeiFileInfo(meiFileName + ".mei", meiFileLocation, meiFileLocationPrintable);
+        updateFileStatusDisplay();
+        vrvWorker.postMessage({
+          cmd: 'importData',
+          format: 'mei',
+          mei: mei,
+        });
+      } else { 
+        log('Loading ' + meiFileName + 'did not succeed. ' + 'Could not convert Fronimo file using luteconv.');
+        clearFacsimile();
+        clearAnnotations();
+        v.busy(false);
+      }
+    });
+
   } else {
     // all other formats are found by search term in text file
     for (const [key, value] of Object.entries(inputFormats)) {
@@ -1517,6 +1546,7 @@ export let cmd = {
   pageModeOff: () => v.pageModeOff(),
   saveAsPdf: () => v.saveAsPdf(),
   generateUrl: () => generateUrlUI(),
+  switchFocus: () => v.switchFocusBetweenNotationAndEncoding(cm),
   filterSettings: () => v.applySettingsFilter(),
   filterReset: () => {
     document.getElementById('filterSettings').value = '';
@@ -1602,6 +1632,10 @@ export let cmd = {
   },
   undo: () => cm.undo(),
   redo: () => cm.redo(),
+  // add note
+  addNote: () => e.addNote(v, cm),
+  convertNoteToRest: () => e.convertNoteToRest(v, cm),
+  convertToChord: () => e.convertToChord(v, cm),
   // add accidentals
   addDoubleSharp: () => e.addAccidental(v, cm, 'x'),
   addSharp: () => e.addAccidental(v, cm, 's'),
@@ -1659,6 +1693,7 @@ export let cmd = {
   shiftOctaveDown: () => e.shiftPitch(v, cm, -7),
   increaseDuration: () => e.modifyDuration(v, cm, 'increase'),
   decreaseDuration: () => e.modifyDuration(v, cm, 'decrease'),
+  toggleDots: () => e.toggleDots(v, cm),
   moveElementStaffUp: () => e.moveElementToNextStaff(v, cm, true),
   moveElementStaffDown: () => e.moveElementToNextStaff(v, cm, false),
   addOctave8Above: () => e.addOctaveElement(v, cm, 'above', 8),
@@ -2000,6 +2035,7 @@ function addEventListeners(v, cm) {
   document.getElementById('staffDown').addEventListener('click', cmd.moveElementStaffDown);
   document.getElementById('increaseDur').addEventListener('click', cmd.increaseDuration);
   document.getElementById('decreaseDur').addEventListener('click', cmd.decreaseDuration);
+  document.getElementById('toggleDots').addEventListener('click', cmd.toggleDots);
   // Manipulate encoding methods
   document.getElementById('cleanAccid').addEventListener('click', cmd.correctAccid);
   document.getElementById('renumberMeasuresTest').addEventListener('click', () => e.renumberMeasures(v, cm, false));
@@ -2010,9 +2046,13 @@ function addEventListeners(v, cm) {
   // add/remove ids
   document.getElementById('addIds').addEventListener('click', cmd.addIds);
   document.getElementById('removeIds').addEventListener('click', cmd.removeIds);
-  // ingest facsimile sekelton into currently loaded MEI file
+  // ingest facsimile skeleton into currently loaded MEI file
   document.getElementById('ingestFacsimile').addEventListener('click', cmd.ingestFacsimile);
   document.getElementById('addFacsimile').addEventListener('click', cmd.addFacsimile);
+  // add note
+  document.getElementById('addNote').addEventListener('click', cmd.addNote);
+  document.getElementById('convertNoteToRest').addEventListener('click', cmd.convertNoteToRest);
+  document.getElementById('toggleChord').addEventListener('click', cmd.convertToChord);
   // insert accidentals
   document.getElementById('addDoubleSharp').addEventListener('click', cmd.addDoubleSharp);
   document.getElementById('addSharp').addEventListener('click', cmd.addSharp);
@@ -2357,60 +2397,57 @@ function fillInSampleEncodings() {
  * Sets keymap JSON information to target element and defines listeners.
  * It loads all bindings in `#notation` to document.body, and the platform-specific
  * to both notation and editor panels (i.e. friendContainer).
- * @param {string} keyMapFilePath
  */
-function setKeyMap(keyMapFilePath) {
+function setKeyMap() {
   if (platform.startsWith('mac')) {
-    document.body.classList.add('platform-darwin');
+    document.body.classList.add('platform-darwin-all');
+    document.getElementById('notation').classList.add('platform-darwin-notation');
   }
   if (platform.startsWith('win')) {
-    document.body.classList.add('platform-win32');
+    document.body.classList.add('platform-win32-all');
+    document.getElementById('notation').classList.add('platform-win32-notation');
   }
   if (platform.startsWith('linux')) {
-    document.body.classList.add('platform-linux');
+    document.body.classList.add('platform-linux-all');
+    document.getElementById('notation').classList.add('platform-linux-notation');
   }
-  fetch(keyMapFilePath)
-    .then((resp) => {
-      return resp.json();
-    })
-    .then((keyMap) => {
-      // iterate all keys (element) in keymap.json
-      for (const [key, value] of Object.entries(keyMap)) {
-        document.querySelectorAll(key).forEach((el) => {
-          el.setAttribute('tabindex', '-1');
-          el.addEventListener('keydown', (ev) => {
-            if (['pagination2', 'selectTo', 'selectFrom', 'selectRange'].includes(document.activeElement.id)) {
-              return;
-            }
 
-            // at each keystroke: update cmd2key (CTRL on Mac, ALT on WIN/Linux)
-            v.cmd2KeyPressed = platform.startsWith('mac') ? ev.ctrlKey : ev.altKey;
+  // iterate all keys (element) in keymap.json
+  for (const [key, value] of Object.entries(keymap)) {
+    document.querySelectorAll(key).forEach((el) => {
+      el.setAttribute('tabindex', '-1');
+      el.addEventListener('keydown', (ev) => {
+        if (['pagination2', 'selectTo', 'selectFrom', 'selectRange'].includes(document.activeElement.id)) {
+          return;
+        }
 
-            // construct keyPress and keyName from event
-            let keyName = ev.key;
-            if (ev.code.toLowerCase() === 'space') keyName = 'space';
-            // arrowdown -> down
-            keyName = keyName.toLowerCase().replace('arrow', '');
-            let keyPress = '';
-            if (ev.ctrlKey) keyPress += 'ctrl-';
-            if (ev.metaKey) keyPress += 'cmd-';
-            if (ev.shiftKey) keyPress += 'shift-';
-            if (ev.altKey) keyPress += 'alt-';
-            keyPress += keyName;
-            console.info('keyPressString: "' + keyPress + '"');
+        // at each keystroke: update cmd2key (CTRL on Mac, ALT on WIN/Linux)
+        v.cmd2KeyPressed = platform.startsWith('mac') ? ev.ctrlKey : ev.altKey;
 
-            // find method for keyPress and execute it, if existing
-            let methodName = value[keyPress];
-            if (methodName !== undefined) {
-              ev.stopPropagation();
-              ev.preventDefault();
-              console.log('keyMap method ' + methodName + '.', cmd[methodName]);
-              cmd[methodName](); // execute the function
-            }
-          });
-        });
-      }
+        // construct keyPress and keyName from event
+        let keyName = ev.key;
+        if (ev.code.toLowerCase() === 'space') keyName = 'space';
+        // arrowdown -> down
+        keyName = keyName.toLowerCase().replace('arrow', '');
+        let keyPress = '';
+        if (ev.ctrlKey) keyPress += 'ctrl-';
+        if (ev.metaKey) keyPress += 'cmd-';
+        if (ev.shiftKey) keyPress += 'shift-';
+        if (ev.altKey) keyPress += 'alt-';
+        keyPress += keyName;
+        console.info('keyPressString: "' + keyPress + '"');
+
+        // find method for keyPress and execute it, if existing
+        let methodName = value[keyPress];
+        if (methodName !== undefined) {
+          ev.stopPropagation();
+          ev.preventDefault();
+          console.log('keyMap method ' + methodName + '.', cmd[methodName]);
+          cmd[methodName](); // execute the function
+        }
+      });
     });
+  }
 } // setKeyMap()
 
 // returns true, if event is a CMD (Mac) or a CTRL (Windows, Linux) event

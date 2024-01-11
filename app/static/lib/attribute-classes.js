@@ -97,9 +97,12 @@ export const pnames = ['c', 'd', 'e', 'f', 'g', 'a', 'b'];
 export const sharpSign = '♯';
 export const flatSign = '♭';
 
-// pitch names for sharps and flats, defined in keySig@sig or @key.sig
+// pitch names for sharps and flats, defined in keySig@sig or @key.sig (just 7 steps make sense)
 export const sharps = ['f', 'c', 'g', 'd', 'a', 'e', 'b', 'f♯', 'c♯', 'g♯', 'd♯', 'a♯'];
 export const flats = ['b', 'e', 'a', 'd', 'g', 'c', 'f', 'b♭', 'e♭', 'a♭', 'd♭', 'g♭'];
+
+export const dataAccidentalGestural = ['s', 'f', 'ss', 'ff', 'ts', 'tf', 'n'];
+export const dataAccidentalWritten = ['s', 'f', 'ss', 'x', 'ff', 'xs', 'sx', 'ts', 'tf', 'n', 'nf', 'ns'];
 
 // according to Verovio 3.9's implementation of timeSpanningInterface()
 // better: att.startEndId and att.timestamp2.logical
@@ -122,6 +125,9 @@ export const timeSpanningElements = [
 
 // @dur
 export const attDurationLogical = ['ambNote', 'bTrem', 'chord', 'fTrem', 'halfmRpt', 'note', 'rest', 'space'];
+
+// @dots
+export const attAugmentDots = ['bTrem', 'chord', 'fTrem', 'note', 'rest', 'space'];
 
 // elements allowed to contain a @facs attribute (5.0.0)
 export const attFacsimile = [

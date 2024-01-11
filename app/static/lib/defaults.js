@@ -975,7 +975,7 @@ export const defaultFacsimileRectangleLineWidth = 6; // px facsimile zone boundi
 export const defaultFacsimileRectangleColor = 'darkred'; // facsimile zone bounding box color
 
 // for resizer
-export const defaultNotationResizerWidth = 8; // pixel
+export const defaultNotationResizerWidth = 3; // pixel
 export const defaultNotationOrientation = 'bottom';
 export const defaultNotationProportion = 0.5;
 export const defaultFacsimileResizerWidth = 8; // px, compare to css facsimile-[left/right/top/bottom].css
