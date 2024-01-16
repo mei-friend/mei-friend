@@ -22,7 +22,7 @@ export const lang = {
     </p>
     <p>
       Obwohl mei-friend eine browserbasierte Anwendung ist, werden Ihre Daten einschließlich der 
-      von Ihnen bearbeiteten Kodierungen, Ihrer Anwendungseinstellungen und Ihrer aktuellen Anmeldeinformationen bei 
+      von Ihnen bearbeiteten Musik-Kodierungen, Ihrer Anwendungseinstellungen und Ihrer aktuellen Anmeldeinformationen bei 
       GitHub oder Solid, falls vorhanden, im 
       <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank">lokalen Speicher 
         Ihres Browsers gespeichert</a>, niemals jedoch auf unseren Servern.
@@ -30,7 +30,7 @@ export const lang = {
     <p>
       Daten werden nur dann an GitHub übertragen, wenn Sie dies ausdrücklich anfordern (z.B. wenn Sie sich bei GitHub 
       anmelden, Ihre Kodierung aus einem GitHub-Repository laden oder an ein GitHub-Repository übertragen oder wenn 
-      Sie eine GitHub-Action-Workflow für sich ausführen lassen). Ebenso werden Daten nur dann an Ihren ausgewählten 
+      Sie einen GitHub-Action-Workflow für sich ausführen lassen). Ebenso werden Daten nur dann an Ihren ausgewählten 
       Solid-Anbieter übertragen, wenn Sie dies ausdrücklich anfordern (z.B. wenn Sie sich bei Solid anmelden oder 
       Stand-off-Annotationen laden oder speichern).
     </p>
@@ -59,7 +59,7 @@ export const lang = {
       Bei der Verwendung von mei-friend ist daher Ihre IP-Adresse für RISM Digital sichtbar.
     </p>
     <p>
-      Schließlich wird die MIDI-Wiedergabe mit dem SGM_plus-Soundfont von Google Magenta abgespielt 
+      Schließlich wird die MIDI-Wiedergabe mit dem SGM_plus-Soundfont von Google Magenta abgespielt, 
       der über googleapis.com bereitgestellt wird. Ihre IP-Adresse wird beim Aktivieren der MIDI-Wiedergabefunktion 
       daher für Google sichtbar. Wenn Sie dies nicht wünschen, verzichten Sie bitte auf die Verwendung der 
       MIDI-Wiedergabefunktion.
@@ -77,7 +77,7 @@ export const lang = {
       Wir danken all unseren Kolleg:innen für ihre Beiträge und Unterstützung.
     </p>
     <p>
-      Die Entwicklung der mei-friend-Webanwendung wird finanziert von der
+      Die Entwicklung der mei-friend-Webanwendung wird finanziert vom
       <a href="https://fwf.ac.at" target="_blank">Österreichischen Wissenschaftsfonds (FWF)</a> im Rahmen der Projekte
       <a href="https://iwk.mdw.ac.at/signature-sound-vienna/" target="_blank"
         >P 34664-G (Signature Sound Vienna)</a

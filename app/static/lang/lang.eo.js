@@ -64,7 +64,7 @@ export const lang = {
       <a href="https://spdx.org/licenses/AGPL-3.0-or-later.html" target="_blank"
         >GNU Affero General Public License v3.0</a
       >. Bonvolu konsulti nian
-      <a href="https://mei-friend.github.io/about/" target="_blank">rekonaĵopagxon</a> por pliaj
+      <a href="https://mei-friend.github.io/about/" target="_blank">rekonaĵopaĝon</a> por pliaj
       informoj pri kontribuantoj kaj la malfermfontaj komponentoj kiuj estas reuzitaj en nia projekto. Ni dankas
       niajn kunlaborantojn pro iliaj kontribuoj kaj gvidado.
     </p>

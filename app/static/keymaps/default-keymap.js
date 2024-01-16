@@ -118,7 +118,7 @@ export const keymap = {
     'cmd-l': 'generateUrl',
     'cmd-i': 'ingestFacsimile',
     'ctrl-shift-c': 'correctAccid',
-    'shift-r': 'renumberMeasuresTest',
+    // 'shift-r': 'renumberMeasuresTest',
     'cmd-shift-r': 'renumberMeasures',
     'cmd-?': 'openHelp',
     'cmd-ß': 'openHelp',
