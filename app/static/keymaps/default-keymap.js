@@ -187,7 +187,7 @@ export const keymap = {
     'ctrl-l': 'generateUrl',
     'ctrl-i': 'ingestFacsimile',
     'ctrl-shift-c': 'correctAccid',
-    'shift-r': 'renumberMeasuresTest',
+    // 'shift-r': 'renumberMeasuresTest',
     'ctrl-shift-r': 'renumberMeasures',
     'ctrl-?': 'openHelp',
     'ctrl-ß': 'openHelp',
