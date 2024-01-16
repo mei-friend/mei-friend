@@ -1,5 +1,9 @@
 # mei-friend-online CHANGELOG.md
 
+### 1.0.7 patch (released on 16 Jan 2024)
+* Fix for issue #76 removing `SHIFT + R` as keyboard shortcut for testing measure renumbering, but allowing to enter an upper-case `R`.
+* Small language fixes in DE, PO, and EO.
+
 ### 1.0.6 patch (released on 20 Dec 2023)
 * Key signature information is taken into account, when shifting pitch of a note (#38)
 * Several navigation keyboard shortcuts removed from encoding panel (#66)
