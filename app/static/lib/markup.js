@@ -215,12 +215,13 @@ export async function situateMarkup(markupItem) {
  * and first child in choice.
  * @param {Document} xmlDoc
  * @param {string} selectString
- * @returns {Document} xmlDoc
+ * @returns {Object} result = { changed: changeFlag, doc: xmlDoc }
  */
 export function selectMarkup(xmlDoc, selectString = '') {
-  xmlDoc = selectApparatus(xmlDoc, selectString);
-  xmlDoc = selectChoice(xmlDoc, selectString);
-  return xmlDoc;
+  let result;
+  result = selectApparatus(xmlDoc, selectString);
+  result = selectChoice(xmlDoc, selectString);
+  return result;
 } // selectMarkup()
 
 /**
@@ -230,10 +231,11 @@ export function selectMarkup(xmlDoc, selectString = '') {
  * is kept in returned xmlDoc.
  * @param {Document} xmlDoc
  * @param {string} sourceId (TODO)
- * @returns {Document} xmlDoc
+ * @returns {Object} result = { changed: changeFlag, doc: xmlDoc }
  */
 export function selectApparatus(xmlDoc, sourceId = '') {
   if (!xmlDoc) return null;
+  let changeFlag = false;
   let app;
   // Go through all app elements replace it by lemma or first reading
   while ((app = xmlDoc.querySelector('app'))) {
@@ -246,11 +248,15 @@ export function selectApparatus(xmlDoc, sourceId = '') {
         parent.insertBefore(child.cloneNode(true), app);
       });
       app.remove(); // ... and remove app afterwards
+      changeFlag = true;
     } else {
       console.log('This app has neither lemma nor reading elements. ', app);
     }
   }
-  return xmlDoc;
+
+  let result = { changed: changeFlag, doc: xmlDoc };
+
+  return result;
 } // selectApparatus()
 
 /**
@@ -259,29 +265,32 @@ export function selectApparatus(xmlDoc, sourceId = '') {
  * Keeps choice and content of the first child to allow navigation and highlighting.
  * @param {Document} xmlDoc
  * @param {string} childElName
- * @returns {Document} xmlDoc
+ * @returns {Object} result = { changed: changeFlag, doc: xmlDoc }
  */
 export function selectChoice(xmlDoc, childElName) {
   if (!xmlDoc) return null;
+  let changeFlag = false;
   let choices = Array.from(xmlDoc.querySelectorAll('choice'));
   choices.forEach((choice) => {
     // this selects the first child inside <choice> by default, to be changed later (TODO)
     let children = choice.children;
     if (children) {
       let childNames = [];
-      for (let i = 0; i > children.length; i++) {
+      for (let i = 0; i < children.length; i++) {
         childNames.push(children[i].localName);
       }
       if (childElName === '' || !childNames.includes(childElName)) {
         // delete currently everything but the first child
         for (let i = 1; i < children.length; i++) {
           children[i].remove();
+          changeFlag = true;
         }
       } else {
         for (let i = 0; i < children.length; i++) {
           let currentChild = children[i];
           if (currentChild.localName !== childElName) {
-            choice.remove(currentChild);
+            currentChild.remove();
+            changeFlag = true;
           }
         }
       }
@@ -290,7 +299,9 @@ export function selectChoice(xmlDoc, childElName) {
     }
   });
 
-  return xmlDoc;
+  let result = { changed: changeFlag, doc: xmlDoc };
+
+  return result;
 } // selectChoice()
 
 /**

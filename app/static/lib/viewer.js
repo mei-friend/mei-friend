@@ -244,7 +244,11 @@ export default class Viewer {
     // update DOM only if encoding has been edited or
     this.loadXml(mei, forceReload);
     const choiceOption = this.choiceSelect.value;
-    //this.xmlDoc = selectMarkup(this.xmlDoc, choiceOption); // select markup
+    let markupResult = selectMarkup(this.xmlDoc, choiceOption); // select markup
+    if (markupResult.changed === true) {
+      this.xmlDoc = markupResult.doc;
+      this.xmlDocOutdated = true;
+    }
     // count pages from system/pagebreaks
     if (Array.isArray(breaks)) {
       let music = this.xmlDoc.querySelector('music score');
