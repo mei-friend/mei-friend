@@ -1,5 +1,9 @@
 # mei-friend-online CHANGELOG.md
 
+### 1.1.5 patch
+
+* Include filtering for different versions inside `<choice>` or `<subst>` in speed mode.
+
 ### 1.1.4 Refine Editorial Markup
 * Add subst element to markup tools.
 * Moved responsibility select from mei-friend settings to markup tools.

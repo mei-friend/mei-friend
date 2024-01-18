@@ -220,7 +220,8 @@ export async function situateMarkup(markupItem) {
 export function selectMarkup(xmlDoc, selectString = '') {
   let result;
   result = selectApparatus(xmlDoc, selectString);
-  result = selectChoice(xmlDoc, selectString);
+  result = selectChoiceSubst(xmlDoc, 'choice', selectString);
+  result = selectChoiceSubst(xmlDoc, 'subst', selectString);
   return result;
 } // selectMarkup()
 
@@ -260,17 +261,18 @@ export function selectApparatus(xmlDoc, sourceId = '') {
 } // selectApparatus()
 
 /**
- * Selects the requested choice child element (TODO) and
+ * Selects the requested child element for either choice or subst
  * keeps it in xmlDoc; other choices are removed.
  * Keeps choice and content of the first child to allow navigation and highlighting.
  * @param {Document} xmlDoc
- * @param {string} childElName
+ * @param {string} elName name of element to filter: choice|subst
+ * @param {string} childElName name of child element to keep
  * @returns {Object} result = { changed: changeFlag, doc: xmlDoc }
  */
-export function selectChoice(xmlDoc, childElName) {
+export function selectChoiceSubst(xmlDoc, elName, childElName) {
   if (!xmlDoc) return null;
   let changeFlag = false;
-  let choices = Array.from(xmlDoc.querySelectorAll('choice'));
+  let choices = Array.from(xmlDoc.querySelectorAll(elName));
   choices.forEach((choice) => {
     // this selects the first child inside <choice> by default, to be changed later (TODO)
     let children = choice.children;
