@@ -2011,6 +2011,7 @@ function addEventListeners(v, cm) {
     // selection has changed
     // then updateAll()
     v.updateAll(cm, {}, v.selectedElements[0]);
+    requestMidiFromVrvWorker(true);
   });
   // navigation
   document.getElementById('backwardsButton').addEventListener('click', cmd.previousNote);
