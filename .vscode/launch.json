@@ -8,7 +8,7 @@
             "type": "chrome",
             "request": "launch",
             "name": "mei-friend",
-            "url": "http://localhost:5000",
+            "url": "http://localhost:5001",
             "webRoot": "${workspaceFolder}/app"
         }
     ]
