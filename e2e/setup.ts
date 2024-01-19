@@ -1,4 +1,4 @@
-const defaultUrl = 'http://localhost:5001/';
+const defaultUrl = '/';
 
 export async function setupPage(page, url = defaultUrl) {
   await page.goto(url);
