@@ -9,6 +9,8 @@ app/static/npm/node_modules/**/*
 !app/static/npm/node_modules/@inrupt/solid-client-authn-browser
 !app/static/npm/node_modules/@inrupt/solid-client-authn-browser/dist
 !app/static/npm/node_modules/@inrupt/solid-client-authn-browser/dist/solid-client-authn.bundle.js
+tests/node_modules
+tests/package-lock.json
 .DS_Store
 .env
 venv
@@ -16,3 +18,12 @@ venv
 app/__pycache__
 __pycache__
 tmp
+tests/node_modules
+tests/package-lock.json
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+node_modules/
+package-lock.json
+

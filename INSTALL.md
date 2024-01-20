@@ -25,6 +25,7 @@ mei-friend running within a browser
 * For deployment, *un*set FLASK_APP. This will cause wsgi.py to be used instead.
 * To build CodeMirror (source cloned as submodule via --recursive flag earlier):
   - cd app/static/CodeMirror/
+  - npm install rollup
   - npm run build
 * Return to root mei-friend directory: 
   - cd ../../../

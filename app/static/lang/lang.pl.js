@@ -42,6 +42,14 @@ export const lang = {
         stronie.
       </p>
       <p>
+        Tabulatury lutniowe są konwertowane do MEI przy użyciu 
+        <a href="https://bitbucket.org/bayleaf/luteconv/" target="_blank">luteconv</a> opracowanego przez Paula Overella, 
+        za pośrednictwem usługi <a href="https://codeberg.org/mdwRepository/luteconv-webui" target="_blank">luteconv-webui</a> 
+        opracowanej przez Stefana Szepe i <a href="https://luteconv.mdw.ac.at" target="_blank">hostowanej przez mdw</a>. 
+        Ta usługa tworzy dostępne w sieci kopie twoich kodowań jako część procesu konwersji, 
+        ale są one dostępne tylko za pośrednictwem unikalnej wartości hasha linku i są okresowo usuwane.
+      </p>
+      <p>
         Zestaw narzędzi Verovio jest ładowany z <a href="https://verovio.org" target="_blank">https://verovio.org</a>, 
         hostowany przez <a href="https://rism.digital/" target="_blank">RISM Digital Switzerland</a>. 
         Dzięki temu mei-friend może być zawsze aktualny z najnowszą wersją narzędzi

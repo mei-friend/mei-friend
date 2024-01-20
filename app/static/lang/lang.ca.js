@@ -42,6 +42,14 @@ export const lang = {
         Viena i no es comparteix amb cap tercer.
       </p>
       <p>
+        Les tablatures de llaüt es converteixen a MEI utilitzant 
+        <a href="https://bitbucket.org/bayleaf/luteconv/" target="_blank">luteconv</a> desenvolupat per Paul Overell, 
+        a través del servei <a href="https://codeberg.org/mdwRepository/luteconv-webui" target="_blank">luteconv-webui</a> 
+        desenvolupat per Stefan Szepe i <a href="https://luteconv.mdw.ac.at" target="_blank">allotjat per la mdw</a>. 
+        Aquest servei crea còpies accessibles a la web de les teves codificacions com a part del procés de conversió, 
+        però aquestes només són accessibles a través d'un valor únic de hash d'enllaç i són eliminades periòdicament.
+      </p>
+      <p>
         La caixa d'eines Verovio es carrega des de <a href="https://verovio.org" target="_blank">https://verovio.org</a>, 
         allotjada per <a href="https://rism.digital/" target="_blank">RISM Digital Switzerland</a>. 
         Això permet a mei-friend de mantenir-se actualitzat amb l'última versió de la caixa d'eines
@@ -168,6 +176,7 @@ export const lang = {
   staffDownText: { text: 'Element 1 pauta avall' },
   increaseDurText: { text: 'Augmenta durada' },
   decreaseDurText: { text: 'Disminueix durada' },
+  toggleDotsText: { text: 'Afegeix un punt' },
   cleanAccidText: { text: 'Verificar @accid.ges' },
   renumberMeasuresTestText: { text: 'Reenumera compassos (prova)' },
   renumberMeasuresExecText: { text: 'Reenumera compassos (execució)' },

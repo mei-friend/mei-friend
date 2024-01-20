@@ -192,7 +192,13 @@ export async function drawFacsimile() {
       // relative file paths in surface@target
       if (fileLocationType === 'github') {
         let url = new URL(
-          'https://raw.githubusercontent.com/' + github.githubRepo + '/' + github.branch + '/' + facs[zoneId].target
+          'https://raw.githubusercontent.com/' +
+            github.githubRepo +
+            '/' +
+            github.branch +
+            github.filepath.substring(0, github.filepath.lastIndexOf('/')) +
+            '/' +
+            facs[zoneId].target
         );
         imgName = url.href;
       } else if (fileLocationType === 'url') {

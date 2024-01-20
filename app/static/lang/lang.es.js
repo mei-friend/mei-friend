@@ -43,6 +43,14 @@ export const lang = {
         y no se comparte con ningún tercero.
       </p>
       <p>
+        Las tablaturas de laúd se convierten a MEI utilizando 
+        <a href="https://bitbucket.org/bayleaf/luteconv/" target="_blank">luteconv</a> desarrollado por Paul Overell, 
+        a través del servicio <a href="https://codeberg.org/mdwRepository/luteconv-webui" target="_blank">luteconv-webui</a> 
+        desarrollado por Stefan Szepe y <a href="https://luteconv.mdw.ac.at" target="_blank">alojado por el mdw</a>. 
+        Este servicio crea copias accesibles en la web de tus codificaciones como parte del proceso de conversión, 
+        pero estas solo son accesibles a través de un valor de hash de enlace único y son eliminadas periódicamente.
+      </p>
+      <p>
         La herramienta Verovio se carga desde <a href="https://verovio.org" target="_blank">https://verovio.org</a>, 
         alojada por <a href="https://rism.digital/" target="_blank">RISM Digital Switzerland</a>. 
         Esto permite que mei-friend esté siempre actualizado con la última versión de la herramienta

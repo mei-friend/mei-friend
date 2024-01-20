@@ -1,8 +1,17 @@
 # mei-friend-online CHANGELOG.md
 
-### 1.0.6 patch
+### 1.0.8 patch (released on 20 Jan 2024)
+* Handle facsimile graphics path correctly in GitHub repos with subdirectories
+
+### 1.0.7 patch (released on 16 Jan 2024)
+* Fix for issue #76 removing `SHIFT + R` as keyboard shortcut for testing measure renumbering, but allowing to enter an upper-case `R`.
+* Small language fixes in DE, PO, and EO.
+
+### 1.0.6 patch (released on 20 Dec 2023)
 * Key signature information is taken into account, when shifting pitch of a note (#38)
 * Several navigation keyboard shortcuts removed from encoding panel (#66)
+* Bug fix for #73 to correctly handle unknown language code
+* Transparently open and convert Fronimo lute tablature format using luteconv-webui
 
 ### 1.0.5 patch
 * Add Ukrainian and Esperanto language packs (still to be proof-read)
@@ -17,7 +26,7 @@
 * Tweak CSS select and translations (German)
 * Fix typo at forking via URL parameters
 
-### 1.0.3 patch
+### 1.0.3 patch (released 1 Nov 2023)
 * Enable navigation link to generated MAO objects (identify object annotations)
 
 ### 1.0.2 Splash screen (released 3 Oct 2023)

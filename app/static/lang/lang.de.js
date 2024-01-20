@@ -22,7 +22,7 @@ export const lang = {
     </p>
     <p>
       Obwohl mei-friend eine browserbasierte Anwendung ist, werden Ihre Daten einschließlich der 
-      von Ihnen bearbeiteten Kodierungen, Ihrer Anwendungseinstellungen und Ihrer aktuellen Anmeldeinformationen bei 
+      von Ihnen bearbeiteten Musik-Kodierungen, Ihrer Anwendungseinstellungen und Ihrer aktuellen Anmeldeinformationen bei 
       GitHub oder Solid, falls vorhanden, im 
       <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank">lokalen Speicher 
         Ihres Browsers gespeichert</a>, niemals jedoch auf unseren Servern.
@@ -30,7 +30,7 @@ export const lang = {
     <p>
       Daten werden nur dann an GitHub übertragen, wenn Sie dies ausdrücklich anfordern (z.B. wenn Sie sich bei GitHub 
       anmelden, Ihre Kodierung aus einem GitHub-Repository laden oder an ein GitHub-Repository übertragen oder wenn 
-      Sie eine GitHub-Action-Workflow für sich ausführen lassen). Ebenso werden Daten nur dann an Ihren ausgewählten 
+      Sie einen GitHub-Action-Workflow für sich ausführen lassen). Ebenso werden Daten nur dann an Ihren ausgewählten 
       Solid-Anbieter übertragen, wenn Sie dies ausdrücklich anfordern (z.B. wenn Sie sich bei Solid anmelden oder 
       Stand-off-Annotationen laden oder speichern).
     </p>
@@ -43,6 +43,15 @@ export const lang = {
       Wien läuft, und werden nicht an Dritte weitergegeben.
     </p>
     <p>
+      Lautentabulaturen werden mit <a href="https://bitbucket.org/bayleaf/luteconv/" target="_blank">luteconv</a> 
+      von Paul Overell nach MEI konvertiert, 
+      über den <a href="https://codeberg.org/mdwRepository/luteconv-webui" target="_blank">luteconv-webui-Dienst</a>, 
+      der von Stefan Szepe entwickelt und von der
+      <a href="https://luteconv.mdw.ac.at" target="_blank">mdw</a> zur Verfügung gestellt wird. 
+      Dieser Dienst erstellt webzugängliche Kopien Ihrer Kodierungen als Teil des Konvertierungsprozesses, 
+      diese sind jedoch nur über einen einzigartigen (gehashten) Link zugänglich und werden nach kurzer Zeit wieder gelöscht.
+    </p>
+    <p>
       Das Verovio-Toolkit wird von <a href="https://verovio.org" target="_blank">https://verovio.org</a> geladen 
       und von  <a href="https://rism.digital/" target="_blank">RISM Digital Switzerland</a> gehostet. 
       Dadurch bleibt mei-friend immer auf dem neuesten Stand mit der aktuellen Toolkit-Version 
@@ -50,7 +59,7 @@ export const lang = {
       Bei der Verwendung von mei-friend ist daher Ihre IP-Adresse für RISM Digital sichtbar.
     </p>
     <p>
-      Schließlich wird die MIDI-Wiedergabe mit dem SGM_plus-Soundfont von Google Magenta abgespielt 
+      Schließlich wird die MIDI-Wiedergabe mit dem SGM_plus-Soundfont von Google Magenta abgespielt, 
       der über googleapis.com bereitgestellt wird. Ihre IP-Adresse wird beim Aktivieren der MIDI-Wiedergabefunktion 
       daher für Google sichtbar. Wenn Sie dies nicht wünschen, verzichten Sie bitte auf die Verwendung der 
       MIDI-Wiedergabefunktion.
@@ -68,7 +77,7 @@ export const lang = {
       Wir danken all unseren Kolleg:innen für ihre Beiträge und Unterstützung.
     </p>
     <p>
-      Die Entwicklung der mei-friend-Webanwendung wird finanziert von der
+      Die Entwicklung der mei-friend-Webanwendung wird finanziert vom
       <a href="https://fwf.ac.at" target="_blank">Österreichischen Wissenschaftsfonds (FWF)</a> im Rahmen der Projekte
       <a href="https://iwk.mdw.ac.at/signature-sound-vienna/" target="_blank"
         >P 34664-G (Signature Sound Vienna)</a
