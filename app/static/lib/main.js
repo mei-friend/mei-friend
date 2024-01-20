@@ -1215,7 +1215,7 @@ export function handleEncoding(mei, setFreshlyLoaded = true, updateAfterLoading 
     });
     found = true;
     setIsMEI(false);
-  } else if (meiFileName.endsWith('.ft2') || meiFileName.endsWith('.ft3')) { 
+  } else if (meiFileName.endsWith('.ft2') || meiFileName.endsWith('.ft3')) {
     // lute tablature file (Fronimo format)
     console.log('Load Fronimo file.', mei.slice(0, 128));
     // set found to true, since we don't know if luteconv will succeed
@@ -1226,21 +1226,20 @@ export function handleEncoding(mei, setFreshlyLoaded = true, updateAfterLoading 
     luteconv(mei, meiFileName).then((mei) => {
       if (mei) {
         // rename file to .mei
-        setMeiFileInfo(meiFileName + ".mei", meiFileLocation, meiFileLocationPrintable);
+        setMeiFileInfo(meiFileName + '.mei', meiFileLocation, meiFileLocationPrintable);
         updateFileStatusDisplay();
         vrvWorker.postMessage({
           cmd: 'importData',
           format: 'mei',
           mei: mei,
         });
-      } else { 
+      } else {
         log('Loading ' + meiFileName + 'did not succeed. ' + 'Could not convert Fronimo file using luteconv.');
         clearFacsimile();
         clearAnnotations();
         v.busy(false);
       }
     });
-
   } else {
     // all other formats are found by search term in text file
     for (const [key, value] of Object.entries(inputFormats)) {
@@ -2313,7 +2312,7 @@ export function setStandoffAnnotationEnabledStatus() {
 }
 
 // handles any changes in CodeMirror
-export function handleEditorChanges() {
+export async function handleEditorChanges() {
   const commitUI = document.querySelector('#commitUI');
   let changeIndicator = false;
   let meiXml = cm.getValue();
@@ -2342,6 +2341,10 @@ export function handleEditorChanges() {
   if (document.getElementById('showMidiPlaybackControlBar').checked) {
     // start a new time-out to midi-rerender
     startMidiTimeout(true);
+  }
+  if (document.getElementById('showFacsimilePanel')?.checked) {
+    console.log('Redrawing facsimile after keystroke.');
+    await drawFacsimile();
   }
 } // handleEditorChanges()
 
