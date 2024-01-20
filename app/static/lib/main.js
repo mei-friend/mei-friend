@@ -2312,7 +2312,7 @@ export function setStandoffAnnotationEnabledStatus() {
 }
 
 // handles any changes in CodeMirror
-export async function handleEditorChanges() {
+export function handleEditorChanges() {
   const commitUI = document.querySelector('#commitUI');
   let changeIndicator = false;
   let meiXml = cm.getValue();
@@ -2344,7 +2344,7 @@ export async function handleEditorChanges() {
   }
   if (document.getElementById('showFacsimilePanel')?.checked) {
     console.log('Redrawing facsimile after keystroke.');
-    await drawFacsimile();
+    drawFacsimile();
   }
 } // handleEditorChanges()
 
