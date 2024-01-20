@@ -976,126 +976,131 @@
         <span id="closeAnnotationPanelButton" class="topright" title="Close Annotations Panel">&times;</span>
       </div>
       <div id="solidTab" class="tabcontent"></div>
-      <div id="listAnnotations" class="tabcontent">No annotations present.</div>
       <div id="markupTools" class="tabcontent">
         <menu id="markupToolsMenu" class="enrichmentToolsMenu markup-panel">
-          <span id="alternativeEncodingsGrp">Alternative encodings</span>
-          <div class="annotationToolsIconGroup">
-            <div class="markup-btn-group annotationToolsIcon">
-              <div class="markup-dropdown">
-                <span id="addChoiceText">&lt;choice&gt;</span>
-                <div id="choice-content-options" class="markup-dropdown-content">
-                  <a id="choiceSicCorr" data-target="choiceContentTarget" data-content-choice="sic,corr"
-                    class="content-option" href="#">sic | corr</a>
-                  <a id="choiceCorrSic" data-target="choiceContentTarget" data-content-choice="corr,sic"
-                    class="content-option" href="#">corr | sic</a>
-                  <a id="choiceOrigReg" data-target="choiceContentTarget" data-content-choice="orig,reg"
-                    class="content-option" href="#">orig | reg</a>
-                  <a id="choiceRegOrig" data-target="choiceContentTarget" data-content-choice="reg,orig"
-                    class="content-option" href="#">reg | orig</a>
+          <div class="markupGrp">
+            <span id="alternativeEncodingsGrp">Alternative encodings</span>
+            <div class="annotationToolsIconGroup">
+              <div class="markup-btn-group annotationToolsIcon">
+                <div class="markup-dropdown">
+                  <span id="addChoiceText">&lt;choice&gt;</span>
+                  <div id="choice-content-options" class="markup-dropdown-content">
+                    <a id="choiceSicCorr" data-target="choiceContentTarget" data-content-choice="sic,corr"
+                      class="content-option" href="#">sic | corr</a>
+                    <a id="choiceCorrSic" data-target="choiceContentTarget" data-content-choice="corr,sic"
+                      class="content-option" href="#">corr | sic</a>
+                    <a id="choiceOrigReg" data-target="choiceContentTarget" data-content-choice="orig,reg"
+                      class="content-option" href="#">orig | reg</a>
+                    <a id="choiceRegOrig" data-target="choiceContentTarget" data-content-choice="reg,orig"
+                      class="content-option" href="#">reg | orig</a>
+                  </div>
                 </div>
-              </div>
-              <div class="markup-dropdown">
-                <span id="choiceContentTarget">(select content)</span>
-                <div class="markup-dropdown-content">
-                  <a id="addChoice" class="addMarkup" data-el-name="choice" data-selection="" href="#">Selection</a>
-                  <a id="addChoiceArtic" class="addMarkup" data-el-name="choice" data-selection="artic" href="#">Articulation</a>
-                  <a id="addChoiceAccid" class="addMarkup" data-el-name="choice" data-selection="accid" href="#">Accidental</a>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="annotationToolsIconGroup">
-            <div class="markup-btn-group annotationToolsIcon">
-              <div class="markup-dropdown">
-                <span id="addSubstText">&lt;subst&gt;</span>
-                <div id="subst-content-options" class="markup-dropdown-content">
-                  <a id="substAddDel" data-target="substContentTarget" data-content-choice="add,del"
-                    class="content-option" href="#">add | del</a>
-                  <a id="substDelAdd" data-target="substContentTarget" data-content-choice="del,add"
-                    class="content-option" href="#">del | add</a>
-                </div>
-              </div>
-              <div class="markup-dropdown">
-                <span id="substContentTarget">(select content)</span>
-                <div class="markup-dropdown-content">
-                  <a id="addSubst" class="addMarkup" data-el-name="subst" data-selection="" href="#">Selection</a>
-                  <a id="addSubstArtic" class="addMarkup" data-el-name="subst" data-selection="artic" href="#">Articulation</a>
-                  <a id="addSubstAccid" class="addMarkup" data-el-name="subst" data-selection="accid" href="#">Accidental</a>
+                <div class="markup-dropdown">
+                  <span id="choiceContentTarget">(select content)</span>
+                  <div class="markup-dropdown-content">
+                    <a id="addChoice" class="addMarkup" data-el-name="choice" data-selection="" href="#">Selection</a>
+                    <a id="addChoiceArtic" class="addMarkup" data-el-name="choice" data-selection="artic" href="#">Articulation</a>
+                    <a id="addChoiceAccid" class="addMarkup" data-el-name="choice" data-selection="accid" href="#">Accidental</a>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-          <span id="editInterventionsGrp">Editorial interventions</span>
-          <div class="annotationToolsIconGroup markup-dropdown">
-            <span id="addSuppliedText" class="annotationToolsIcon">Supplied</span>
-            <div class="markup-dropdown-content">
-              <a class="addMarkup" data-el-name="supplied" data-selection="" id="addSupplied" href="#">Selection</a>
-              <a class="addMarkup" data-el-name="supplied" data-selection="artic" id="addSuppliedArtic"
-                href="#">Articulation</a>
-              <a class="addMarkup" data-el-name="supplied" data-selection="accid" id="addSuppliedAccid"
-                href="#">Accidental</a>
+            <div class="annotationToolsIconGroup">
+              <div class="markup-btn-group annotationToolsIcon">
+                <div class="markup-dropdown">
+                  <span id="addSubstText">&lt;subst&gt;</span>
+                  <div id="subst-content-options" class="markup-dropdown-content">
+                    <a id="substAddDel" data-target="substContentTarget" data-content-choice="add,del"
+                      class="content-option" href="#">add | del</a>
+                    <a id="substDelAdd" data-target="substContentTarget" data-content-choice="del,add"
+                      class="content-option" href="#">del | add</a>
+                  </div>
+                </div>
+                <div class="markup-dropdown">
+                  <span id="substContentTarget">(select content)</span>
+                  <div class="markup-dropdown-content">
+                    <a id="addSubst" class="addMarkup" data-el-name="subst" data-selection="" href="#">Selection</a>
+                    <a id="addSubstArtic" class="addMarkup" data-el-name="subst" data-selection="artic" href="#">Articulation</a>
+                    <a id="addSubstAccid" class="addMarkup" data-el-name="subst" data-selection="accid" href="#">Accidental</a>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-          <div class="annotationToolsIconGroup markup-dropdown">
-            <span id="addUnclearText" class="annotationToolsIcon">Unclear</span>
-            <div class="markup-dropdown-content">
-              <a class="addMarkup" data-el-name="unclear" data-selection="" id="addUnclear" href="#">Selection</a>
-              <a class="addMarkup" data-el-name="unclear" data-selection="artic" id="addUnclearArtic"
-                href="#">Articulation</a>
-              <a class="addMarkup" data-el-name="unclear" data-selection="accid" id="addUnclearAccid"
-                href="#">Accidental</a>
+          <div class="markupGrp">
+            <span id="editInterventionsGrp">Editorial interventions</span>
+            <div class="annotationToolsIconGroup markup-dropdown">
+              <span id="addSuppliedText" class="annotationToolsIcon">Supplied</span>
+              <div class="markup-dropdown-content">
+                <a class="addMarkup" data-el-name="supplied" data-selection="" id="addSupplied" href="#">Selection</a>
+                <a class="addMarkup" data-el-name="supplied" data-selection="artic" id="addSuppliedArtic"
+                  href="#">Articulation</a>
+                <a class="addMarkup" data-el-name="supplied" data-selection="accid" id="addSuppliedAccid"
+                  href="#">Accidental</a>
+              </div>
+            </div>
+            <div class="annotationToolsIconGroup markup-dropdown">
+              <span id="addUnclearText" class="annotationToolsIcon">Unclear</span>
+              <div class="markup-dropdown-content">
+                <a class="addMarkup" data-el-name="unclear" data-selection="" id="addUnclear" href="#">Selection</a>
+                <a class="addMarkup" data-el-name="unclear" data-selection="artic" id="addUnclearArtic"
+                  href="#">Articulation</a>
+                <a class="addMarkup" data-el-name="unclear" data-selection="accid" id="addUnclearAccid"
+                  href="#">Accidental</a>
+              </div>
+            </div>
+            <div class="annotationToolsIconGroup markup-dropdown">
+              <span id="addSicText" class="annotationToolsIcon">Sic</span>
+              <div class="markup-dropdown-content">
+                <a class="addMarkup" data-el-name="sic" data-selection="" id="addSic" href="#">Selection</a>
+                <a class="addMarkup" data-el-name="sic" data-selection="artic" id="addSicArtic" href="#">Articulation</a>
+                <a class="addMarkup" data-el-name="sic" data-selection="accid" id="addSicAccid" href="#">Accidental</a>
+              </div>
+            </div>
+            <div class="annotationToolsIconGroup markup-dropdown">
+              <span id="addCorrText" class="annotationToolsIcon">Corr</span>
+              <div class="markup-dropdown-content">
+                <a class="addMarkup" data-el-name="corr" data-selection="" id="addCorr" href="#">Selection</a>
+                <a class="addMarkup" data-el-name="corr" data-selection="artic" id="addCorrArtic"
+                  href="#">Articulation</a>
+                <a class="addMarkup" data-el-name="corr" data-selection="accid" id="addCorrAccid" href="#">Accidental</a>
+              </div>
+            </div>
+            <div class="annotationToolsIconGroup markup-dropdown">
+              <span id="addOrigText" class="annotationToolsIcon">Orig</span>
+              <div class="markup-dropdown-content">
+                <a class="addMarkup" data-el-name="orig" data-selection="" id="addOrig" href="#">Selection</a>
+                <a class="addMarkup" data-el-name="orig" data-selection="artic" id="addOrigArtic"
+                  href="#">Articulation</a>
+                <a class="addMarkup" data-el-name="orig" data-selection="accid" id="addOrigAccid" href="#">Accidental</a>
+              </div>
+            </div>
+            <div class="annotationToolsIconGroup markup-dropdown">
+              <span id="addRegText" class="annotationToolsIcon">Reg</span>
+              <div class="markup-dropdown-content">
+                <a class="addMarkup" data-el-name="reg" data-selection="" id="addReg" href="#">Selection</a>
+                <a class="addMarkup" data-el-name="reg" data-selection="artic" id="addRegArtic" href="#">Articulation</a>
+                <a class="addMarkup" data-el-name="reg" data-selection="accid" id="addRegAccid" href="#">Accidental</a>
+              </div>
             </div>
           </div>
-          <div class="annotationToolsIconGroup markup-dropdown">
-            <span id="addSicText" class="annotationToolsIcon">Sic</span>
-            <div class="markup-dropdown-content">
-              <a class="addMarkup" data-el-name="sic" data-selection="" id="addSic" href="#">Selection</a>
-              <a class="addMarkup" data-el-name="sic" data-selection="artic" id="addSicArtic" href="#">Articulation</a>
-              <a class="addMarkup" data-el-name="sic" data-selection="accid" id="addSicAccid" href="#">Accidental</a>
+          <div class="markupGrp">
+            <span id="descMarkupGrp">Descriptive Markup</span>
+            <div class="annotationToolsIconGroup markup-dropdown">
+              <span id="addAddText" class="annotationToolsIcon">Add</span>
+              <div class="markup-dropdown-content">
+                <a class="addMarkup" data-el-name="add" data-selection="" id="addAdd" href="#">Selection</a>
+                <a class="addMarkup" data-el-name="add" data-selection="artic" id="addAddArtic" href="#">Articulation</a>
+                <a class="addMarkup" data-el-name="add" data-selection="accid" id="addAddAccid" href="#">Accidental</a>
+              </div>
             </div>
-          </div>
-          <div class="annotationToolsIconGroup markup-dropdown">
-            <span id="addCorrText" class="annotationToolsIcon">Corr</span>
-            <div class="markup-dropdown-content">
-              <a class="addMarkup" data-el-name="corr" data-selection="" id="addCorr" href="#">Selection</a>
-              <a class="addMarkup" data-el-name="corr" data-selection="artic" id="addCorrArtic"
-                href="#">Articulation</a>
-              <a class="addMarkup" data-el-name="corr" data-selection="accid" id="addCorrAccid" href="#">Accidental</a>
-            </div>
-          </div>
-          <div class="annotationToolsIconGroup markup-dropdown">
-            <span id="addOrigText" class="annotationToolsIcon">Orig</span>
-            <div class="markup-dropdown-content">
-              <a class="addMarkup" data-el-name="orig" data-selection="" id="addOrig" href="#">Selection</a>
-              <a class="addMarkup" data-el-name="orig" data-selection="artic" id="addOrigArtic"
-                href="#">Articulation</a>
-              <a class="addMarkup" data-el-name="orig" data-selection="accid" id="addOrigAccid" href="#">Accidental</a>
-            </div>
-          </div>
-          <div class="annotationToolsIconGroup markup-dropdown">
-            <span id="addRegText" class="annotationToolsIcon">Reg</span>
-            <div class="markup-dropdown-content">
-              <a class="addMarkup" data-el-name="reg" data-selection="" id="addReg" href="#">Selection</a>
-              <a class="addMarkup" data-el-name="reg" data-selection="artic" id="addRegArtic" href="#">Articulation</a>
-              <a class="addMarkup" data-el-name="reg" data-selection="accid" id="addRegAccid" href="#">Accidental</a>
-            </div>
-          </div>
-          <span id="descMarkupGrp">Descriptive Markup</span>
-          <div class="annotationToolsIconGroup markup-dropdown">
-            <span id="addAddText" class="annotationToolsIcon">Add</span>
-            <div class="markup-dropdown-content">
-              <a class="addMarkup" data-el-name="add" data-selection="" id="addAdd" href="#">Selection</a>
-              <a class="addMarkup" data-el-name="add" data-selection="artic" id="addAddArtic" href="#">Articulation</a>
-              <a class="addMarkup" data-el-name="add" data-selection="accid" id="addAddAccid" href="#">Accidental</a>
-            </div>
-          </div>
-          <div class="annotationToolsIconGroup markup-dropdown">
-            <span id="addDelText" class="annotationToolsIcon">Del</span>
-            <div class="markup-dropdown-content">
-              <a class="addMarkup" data-el-name="del" data-selection="" id="addDel" href="#">Selection</a>
-              <a class="addMarkup" data-el-name="del" data-selection="artic" id="addDelArtic" href="#">Articulation</a>
-              <a class="addMarkup" data-el-name="del" data-selection="accid" id="addDelAccid" href="#">Accidental</a>
+            <div class="annotationToolsIconGroup markup-dropdown">
+              <span id="addDelText" class="annotationToolsIcon">Del</span>
+              <div class="markup-dropdown-content">
+                <a class="addMarkup" data-el-name="del" data-selection="" id="addDel" href="#">Selection</a>
+                <a class="addMarkup" data-el-name="del" data-selection="artic" id="addDelArtic" href="#">Articulation</a>
+                <a class="addMarkup" data-el-name="del" data-selection="accid" id="addDelAccid" href="#">Accidental</a>
+              </div>
             </div>
           </div>
         </menu>
@@ -1116,18 +1121,6 @@
                   title="Generate stand-off annotations. Only possible if working on a native MEI file from URL or GitHub, and when logged into a Solid Pod.">RDF</label>
               </fieldset>
             </div>
-          </div>
-          <div class="annotationToolsIconGroup">
-            <li>
-              <div class="annotationToolsIcon" id="annotateIdentify">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
-                  <title id="" annotationToolsIdentifyTitle">identify</title>
-                  <path
-                    d="m12.596 11.596-3.535 3.536a1.5 1.5 0 0 1-2.122 0l-3.535-3.536a6.5 6.5 0 1 1 9.192-9.193 6.5 6.5 0 0 1 0 9.193Zm-1.06-8.132v-.001a5 5 0 1 0-7.072 7.072L8 14.07l3.536-3.534a5 5 0 0 0 0-7.072ZM8 9a2 2 0 1 1-.001-3.999A2 2 0 0 1 8 9Z">
-                  </path>
-                </svg>
-                <span id="" annotationToolsIdentifySpan">Identify musical object</span>
-              </div>
           </div>
           <div class="annotationToolsIconGroup">
             <li>
@@ -1313,7 +1306,7 @@
       if (containingElement) {
         // hide all tab contents except tabId
         for (let cont of containingElement.getElementsByClassName('tabcontent')) {
-          cont.style.display = cont.id === tabId ? 'block' : 'none';
+          cont.style.display = cont.id === tabId ? 'block' : 'none'; 
         }
         // remove class "active" from tablinks except for current target
         for (let tab of containingElement.getElementsByClassName('tablink')) {

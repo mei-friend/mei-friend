@@ -1,5 +1,5 @@
 .enrichmentToolsMenu {
-  display: block;
+  display: flex;
   padding-left: 0px;
   align-items: start;
   justify-items: stretch;
@@ -73,12 +73,19 @@ fieldset {
 }
 
 .markup-panel {
-  display: grid;
+  display: flex;
   position: relative;
+  flex-direction: column;
+}
+
+.markupGrp {
+  display: inherit;
+  flex-direction: column;
+  gap: 3px;
 }
 
 .markupSetting {
-  display: grid;
+  display: inline-grid;
   margin-bottom: 10px;
 }
 
