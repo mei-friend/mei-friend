@@ -20,3 +20,10 @@ __pycache__
 tmp
 tests/node_modules
 tests/package-lock.json
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+node_modules/
+package-lock.json
+

@@ -1,5 +1,8 @@
 # mei-friend-online CHANGELOG.md
 
+### 1.0.8 patch (released on 20 Jan 2024)
+* Handle facsimile graphics path correctly in GitHub repos with subdirectories
+
 ### 1.0.7 patch (released on 16 Jan 2024)
 * Fix for issue #76 removing `SHIFT + R` as keyboard shortcut for testing measure renumbering, but allowing to enter an upper-case `R`.
 * Small language fixes in DE, PO, and EO.
