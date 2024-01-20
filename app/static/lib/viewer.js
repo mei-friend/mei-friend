@@ -5,7 +5,7 @@ import * as speed from './speed.js';
 import * as utils from './utils.js';
 import { getControlMenuState, showPdfButtons, setControlMenuState, setCheckbox } from './control-menu.js';
 import { alert, download, info, success, verified, unverified, xCircleFill } from '../css/icons.js';
-import { drawFacsimile, highlightZone, zoomFacsimile } from './facsimile.js';
+import { drawFacsimile, highlightZone, loadFacsimile, zoomFacsimile } from './facsimile.js';
 import {
   cm,
   cmd,
@@ -628,7 +628,9 @@ export default class Viewer {
       cmd.toggleMidiPlaybackControlBar();
     }
     // console.log('NotationUpdated forceUpdate:' + forceUpdate);
-    this.xmlDocOutdated = true;
+    // this.xmlDocOutdated = true;
+    this.loadXml(cm.getValue(), true);
+    loadFacsimile(this.xmlDoc);
     this.toolkitDataOutdated = true;
     if (!isSafari) this.checkSchema(cm.getValue());
     let ch = document.getElementById('liveUpdateCheckbox');
