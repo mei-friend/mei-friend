@@ -628,9 +628,9 @@ export default class Viewer {
       cmd.toggleMidiPlaybackControlBar();
     }
     // console.log('NotationUpdated forceUpdate:' + forceUpdate);
-    // this.xmlDocOutdated = true;
-    this.loadXml(cm.getValue(), true);
-    loadFacsimile(this.xmlDoc);
+    this.xmlDocOutdated = true;
+    // this.loadXml(cm.getValue(), true);
+    // loadFacsimile(this.xmlDoc);
     this.toolkitDataOutdated = true;
     if (!isSafari) this.checkSchema(cm.getValue());
     let ch = document.getElementById('liveUpdateCheckbox');
