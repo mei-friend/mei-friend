@@ -48,3 +48,12 @@
 #addWebAnnotation {
   width: 100px;
 }
+
+#markupToolsMenu {
+  display: flex;
+  flex-direction: row;
+}
+
+.markupGrp {
+  display: inline-block !important;
+}
