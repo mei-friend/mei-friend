@@ -523,7 +523,7 @@ export default class Viewer {
     this.setFocusToVerovioPane();
 
     // set lastNoteId to @startid of control element
-    let startid = this.xmlDoc.querySelector('[*|id=' + itemId + ']')?.getAttribute('startid');
+    let startid = this.xmlDoc.querySelector('[*|id="' + itemId + '"]')?.getAttribute('startid');
     this.lastNoteId = startid ? utils.rmHash(startid) : itemId;
     this.allowCursorActivity = true;
   } // handleClickOnNotation()
@@ -629,8 +629,6 @@ export default class Viewer {
     }
     // console.log('NotationUpdated forceUpdate:' + forceUpdate);
     this.xmlDocOutdated = true;
-    // this.loadXml(cm.getValue(), true);
-    // loadFacsimile(this.xmlDoc);
     this.toolkitDataOutdated = true;
     if (!isSafari) this.checkSchema(cm.getValue());
     let ch = document.getElementById('liveUpdateCheckbox');

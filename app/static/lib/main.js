@@ -1,6 +1,6 @@
 // mei-friend version and date
 export const version = '1.0.8';
-export const versionDate = '20 January 2024'; // use full or 3-character english months, will be translated
+export const versionDate = '21 January 2024'; // use full or 3-character english months, will be translated
 
 var vrvWorker;
 var spdWorker;
@@ -968,6 +968,7 @@ async function vrvWorkerEventsHandler(ev) {
         updateHtmlTitle();
         document.getElementById('verovio-panel').innerHTML = ev.data.svg;
         if (document.getElementById('showFacsimilePanel') && document.getElementById('showFacsimilePanel').checked) {
+          loadFacsimile(v.xmlDoc);
           await drawFacsimile();
         }
         if (ev.data.setCursorToPageBeginning) v.setCursorToPageBeginning(cm);
@@ -2341,10 +2342,6 @@ export function handleEditorChanges() {
   if (document.getElementById('showMidiPlaybackControlBar').checked) {
     // start a new time-out to midi-rerender
     startMidiTimeout(true);
-  }
-  if (document.getElementById('showFacsimilePanel')?.checked) {
-    console.log('Redrawing facsimile after keystroke.');
-    drawFacsimile();
   }
 } // handleEditorChanges()
 
