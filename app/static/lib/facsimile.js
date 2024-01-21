@@ -254,10 +254,10 @@ export async function drawFacsimile() {
     let zoomFactor = document.getElementById('facsimileZoomInput').value / 100;
     svgContainer.setAttribute('transform-origin', 'left top');
     svgContainer.setAttribute('transform', 'scale(' + zoomFactor + ')');
-    svgContainer.setAttribute('width', width);
-    svgContainer.setAttribute('height', height);
+    if (width !== 0) svgContainer.setAttribute('width', width);
+    if (height !== 0) svgContainer.setAttribute('height', height);
     // svgContainer.appendChild(document.createAttributeNS(svgNameSpace, 'circle'))
-    svg.setAttribute('viewBox', ulx + ' ' + uly + ' ' + width + ' ' + height);
+    if (width !== 0 && height !== 0) svg.setAttribute('viewBox', ulx + ' ' + uly + ' ' + width + ' ' + height);
 
     if (false) {
       // show page name on svg
@@ -474,7 +474,7 @@ export function addZoneResizer(v, rect) {
       'ZoneResizer: Mouse down ' + resize + ' ev.clientX/Y:' + ev.clientX + '/' + ev.clientX + ', rect:',
       rect
     );
-  }
+  } // mouseDown()
 
   function mouseMove(ev) {
     let bcr = rect.getBoundingClientRect();
@@ -562,13 +562,12 @@ export function addZoneResizer(v, rect) {
       v.allowCursorActivity = true;
       // console.log('Dragging: ' + resize + ' ' + dx + '/' + dy);
     }
-  }
+  } // mouseMove()
 
   function mouseUp(ev) {
     resize = '';
     loadFacsimile(v.xmlDoc);
-    // console.log('mouse up');
-  }
+  } // mouseUp()
 } // addZoneResizer()
 
 /**
@@ -622,7 +621,7 @@ export function addZoneDrawer() {
         start
       );
     }
-  }
+  } // mouseDown()
 
   function mouseMove(ev) {
     ev.preventDefault();
@@ -641,7 +640,7 @@ export function addZoneDrawer() {
         rect.setAttribute('height', c.height);
       }
     }
-  }
+  } // mouseMove()
 
   function mouseUp(ev) {
     if (document.getElementById('editFacsimileZones').checked && !resize) {
@@ -671,7 +670,7 @@ export function addZoneDrawer() {
       }
       drawing = '';
     }
-  }
+  } // mouseUp()
 } // addZoneDrawer()
 
 /**
