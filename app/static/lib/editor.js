@@ -2690,7 +2690,7 @@ function getStaffNumbersForClosestStaffGroup(v, element) {
   if (!element) return null;
   let staffNumber;
   if (element.hasAttribute('startid')) {
-    const startElement = v.xmlDoc.querySelector('[*|id=' + utils.rmHash(element.getAttribute('startid')) + ']');
+    const startElement = v.xmlDoc.querySelector('[*|id="' + utils.rmHash(element.getAttribute('startid')) + '"]');
     if (startElement) {
       staffNumber = startElement.closest('staff')?.getAttribute('n');
     }
