@@ -234,7 +234,7 @@ function loadFile(fileName = '', clearBeforeLoading = true, ev = null) {
       fillInCommitLog('withRefresh');
       const fnStatus = document.getElementById('fileName');
       if (fnStatus) fnStatus.removeAttribute('contenteditable');
-      v.allowCursorActivity = false;
+      v.allowCursorActivity = true;
     })
     .catch((err) => {
       console.error("Couldn't read Github repo to fill in branch contents:", err);
