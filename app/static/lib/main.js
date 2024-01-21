@@ -968,6 +968,7 @@ async function vrvWorkerEventsHandler(ev) {
         updateHtmlTitle();
         document.getElementById('verovio-panel').innerHTML = ev.data.svg;
         if (document.getElementById('showFacsimilePanel') && document.getElementById('showFacsimilePanel').checked) {
+          loadFacsimile(v.xmlDoc);
           await drawFacsimile();
         }
         if (ev.data.setCursorToPageBeginning) v.setCursorToPageBeginning(cm);
@@ -2341,10 +2342,6 @@ export function handleEditorChanges() {
   if (document.getElementById('showMidiPlaybackControlBar').checked) {
     // start a new time-out to midi-rerender
     startMidiTimeout(true);
-  }
-  if (document.getElementById('showFacsimilePanel')?.checked) {
-    console.log('Redrawing facsimile after keystroke.');
-    drawFacsimile();
   }
 } // handleEditorChanges()
 

@@ -14,6 +14,7 @@ import { defaultFacsimileRectangleColor, defaultFacsimileRectangleLineWidth } fr
 
 var facs = {}; // facsimile structure in MEI file
 var sourceImages = {}; // object of source images
+var oldFacsimile; // previous facsimile element
 const rectangleLineWidth = defaultFacsimileRectangleLineWidth; // width of bounding box rectangles in px
 const rectangleColor = defaultFacsimileRectangleColor; // color of zone rectangles
 var listenerHandles = {};
@@ -64,12 +65,12 @@ export function clearFacsimile() {
  * each containing own coordinates (ulx, uly, lrx, lry)
  * and containing surface info (target, width, height)
  * @param {Document} xmlDoc
- * @returns {object} facs
+ * Modifies global variable facs
  */
 export function loadFacsimile(xmlDoc) {
-  clearFacsimile();
   let facsimile = xmlDoc.querySelector('facsimile');
-  if (facsimile) {
+  if (facsimile && !facsimile.isEqualNode(oldFacsimile)) {
+    clearFacsimile();
     // look for surface elements
     let surfaces = facsimile.querySelectorAll('surface');
     surfaces.forEach((s) => {
@@ -111,8 +112,8 @@ export function loadFacsimile(xmlDoc) {
         }
       }
     });
+    oldFacsimile = facsimile;
   }
-  return facs;
 
   /**
    * Local function to handle main attributes of graphic element.
@@ -550,7 +551,7 @@ export function addZoneResizer(v, rect) {
       if (txt && (resize === 'northwest' || resize === 'west' || resize === 'pan')) txt.setAttribute('x', txtX + dx);
       if (txt && (resize === 'north' || resize === 'northwest' || resize === 'pan')) txt.setAttribute('y', txtY + dy);
 
-      let zone = v.xmlDoc.querySelector('[*|id=' + rect.id + ']');
+      let zone = v.xmlDoc.querySelector('[*|id="' + rect.id + '"]');
       zone.setAttribute('ulx', c.x);
       zone.setAttribute('uly', c.y);
       zone.setAttribute('lrx', c.x + c.width);
