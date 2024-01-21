@@ -213,7 +213,7 @@ export function situateAnnotations() {
       a.firstPage = await v.getPageWithElement(selectionStart);
       a.lastPage = await v.getPageWithElement(selectionEnd);
       if (a.firstPage < 0 && v.speedMode) {
-        if (v.xmlDoc.querySelector('[*|id=' + a.selection[0] + ']')?.closest('meiHead')) a.firstPage = 'meiHead';
+        if (v.xmlDoc.querySelector('[*|id="' + a.selection[0] + '"]')?.closest('meiHead')) a.firstPage = 'meiHead';
         else console.warn('Cannot locate annotation ', a);
       } else {
         // if not speed mode, asynchronous return of page numbers after we are finished here
@@ -640,7 +640,7 @@ export function writeAnnot(anchor, xmlId, plist, payload) {
 }
 
 export function deleteAnnot(xmlId) {
-  const annot = v.xmlDoc.querySelector('[*|id=' + xmlId + ']');
+  const annot = v.xmlDoc.querySelector('[*|id="' + xmlId + '"]');
   if (annot) {
     removeInEditor(cm, annot);
     annot.remove();

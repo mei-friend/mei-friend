@@ -14,6 +14,7 @@ import { defaultFacsimileRectangleColor, defaultFacsimileRectangleLineWidth } fr
 
 var facs = {}; // facsimile structure in MEI file
 var sourceImages = {}; // object of source images
+var oldFacsimile; // previous facsimile element
 const rectangleLineWidth = defaultFacsimileRectangleLineWidth; // width of bounding box rectangles in px
 const rectangleColor = defaultFacsimileRectangleColor; // color of zone rectangles
 var listenerHandles = {};
@@ -64,12 +65,12 @@ export function clearFacsimile() {
  * each containing own coordinates (ulx, uly, lrx, lry)
  * and containing surface info (target, width, height)
  * @param {Document} xmlDoc
- * @returns {object} facs
+ * Modifies global variable facs
  */
 export function loadFacsimile(xmlDoc) {
-  clearFacsimile();
   let facsimile = xmlDoc.querySelector('facsimile');
-  if (facsimile) {
+  if (facsimile && !facsimile.isEqualNode(oldFacsimile)) {
+    clearFacsimile();
     // look for surface elements
     let surfaces = facsimile.querySelectorAll('surface');
     surfaces.forEach((s) => {
@@ -111,8 +112,8 @@ export function loadFacsimile(xmlDoc) {
         }
       }
     });
+    oldFacsimile = facsimile;
   }
-  return facs;
 
   /**
    * Local function to handle main attributes of graphic element.
@@ -253,10 +254,10 @@ export async function drawFacsimile() {
     let zoomFactor = document.getElementById('facsimileZoomInput').value / 100;
     svgContainer.setAttribute('transform-origin', 'left top');
     svgContainer.setAttribute('transform', 'scale(' + zoomFactor + ')');
-    svgContainer.setAttribute('width', width);
-    svgContainer.setAttribute('height', height);
+    if (width !== 0) svgContainer.setAttribute('width', width);
+    if (height !== 0) svgContainer.setAttribute('height', height);
     // svgContainer.appendChild(document.createAttributeNS(svgNameSpace, 'circle'))
-    svg.setAttribute('viewBox', ulx + ' ' + uly + ' ' + width + ' ' + height);
+    if (width !== 0 && height !== 0) svg.setAttribute('viewBox', ulx + ' ' + uly + ' ' + width + ' ' + height);
 
     if (false) {
       // show page name on svg
@@ -473,7 +474,7 @@ export function addZoneResizer(v, rect) {
       'ZoneResizer: Mouse down ' + resize + ' ev.clientX/Y:' + ev.clientX + '/' + ev.clientX + ', rect:',
       rect
     );
-  }
+  } // mouseDown()
 
   function mouseMove(ev) {
     let bcr = rect.getBoundingClientRect();
@@ -550,7 +551,7 @@ export function addZoneResizer(v, rect) {
       if (txt && (resize === 'northwest' || resize === 'west' || resize === 'pan')) txt.setAttribute('x', txtX + dx);
       if (txt && (resize === 'north' || resize === 'northwest' || resize === 'pan')) txt.setAttribute('y', txtY + dy);
 
-      let zone = v.xmlDoc.querySelector('[*|id=' + rect.id + ']');
+      let zone = v.xmlDoc.querySelector('[*|id="' + rect.id + '"]');
       zone.setAttribute('ulx', c.x);
       zone.setAttribute('uly', c.y);
       zone.setAttribute('lrx', c.x + c.width);
@@ -561,13 +562,12 @@ export function addZoneResizer(v, rect) {
       v.allowCursorActivity = true;
       // console.log('Dragging: ' + resize + ' ' + dx + '/' + dy);
     }
-  }
+  } // mouseMove()
 
   function mouseUp(ev) {
     resize = '';
     loadFacsimile(v.xmlDoc);
-    // console.log('mouse up');
-  }
+  } // mouseUp()
 } // addZoneResizer()
 
 /**
@@ -621,7 +621,7 @@ export function addZoneDrawer() {
         start
       );
     }
-  }
+  } // mouseDown()
 
   function mouseMove(ev) {
     ev.preventDefault();
@@ -640,7 +640,7 @@ export function addZoneDrawer() {
         rect.setAttribute('height', c.height);
       }
     }
-  }
+  } // mouseMove()
 
   function mouseUp(ev) {
     if (document.getElementById('editFacsimileZones').checked && !resize) {
@@ -670,7 +670,7 @@ export function addZoneDrawer() {
       }
       drawing = '';
     }
-  }
+  } // mouseUp()
 } // addZoneDrawer()
 
 /**
