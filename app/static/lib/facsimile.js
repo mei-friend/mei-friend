@@ -57,6 +57,9 @@ function showWarningText(txt = translator.lang.facsimileDefaultWarning.text) {
 export function clearFacsimile() {
   facs = {};
   sourceImages = {};
+  let svgContainer = document.getElementById('sourceImageContainer');
+  svgContainer.removeAttribute('width');
+  svgContainer.removeAttribute('height');
 } // clearFacsimile()
 
 /**
@@ -238,6 +241,8 @@ export async function drawFacsimile() {
     }
 
     if (fullPage) {
+      // console.debug('img getBBox(): ', img.getBBox());
+      // console.debug('img getBoundingClientRect(): ', img.getBoundingClientRect());
       let bb = img.getBBox();
       ulx = 0;
       uly = 0;
@@ -250,7 +255,6 @@ export async function drawFacsimile() {
     }
     let width = lrx - ulx;
     let height = lry - uly;
-    // svgContainer.setAttribute("transform", "translate(" + (ulx / 2) + " " + (uly / 2 ) + ") scale(" + zoomFactor + ")");
     let zoomFactor = document.getElementById('facsimileZoomInput').value / 100;
     svgContainer.setAttribute('transform-origin', 'left top');
     svgContainer.setAttribute('transform', 'scale(' + zoomFactor + ')');

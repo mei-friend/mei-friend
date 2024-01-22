@@ -1939,29 +1939,34 @@ function addEventListeners(v, cm) {
       ev.stopPropagation();
       zoomFacsimile(Math.sign(ev.deltaY) * -5); // scrolling towards user = increase
       document.getElementById('facsimileZoom').value = document.getElementById('facsimileZoomInput').value;
+      document.getElementById('facsimileZoom').input();
     }
   });
 
   // facsimile full-page
   document.getElementById('facsimileFullPageCheckbox').addEventListener('click', (e) => {
-    document.getElementById('showFacsimileFullPage').checked = e.target.checked;
+    document.getElementById('showFacsimileFullPage').click(); // checked = e.target.checked;
     drawFacsimile();
   });
 
   // show facsimile zone bounding boxes
   document.getElementById('facsimileShowZonesCheckbox').addEventListener('click', (e) => {
-    document.getElementById('showFacsimileZones').checked = e.target.checked;
+    document.getElementById('showFacsimileZones').click(); // checked = e.target.checked;
     // uncheck edit option when hiding bounding boxes
     if (!e.target.checked) {
-      document.getElementById('editFacsimileZones').checked = false;
-      document.getElementById('facsimileEditZonesCheckbox').checked = false;
+      if (document.getElementById('editFacsimileZones').checked) {
+        document.getElementById('editFacsimileZones').click();
+      }
+      if (document.getElementById('facsimileEditZonesCheckbox').checked) {
+        document.getElementById('facsimileEditZonesCheckbox').click();
+      }
     }
     setOrientation(cm, '', '', v);
   });
 
   // facsimile edit zones
   document.getElementById('facsimileEditZonesCheckbox').addEventListener('click', (e) => {
-    document.getElementById('editFacsimileZones').checked = e.target.checked;
+    document.getElementById('editFacsimileZones').click(); // checked = e.target.checked;
     // show bounding boxes for editing
     if (e.target.checked && !document.getElementById('facsimileShowZonesCheckbox').checked) {
       document.getElementById('showFacsimileZones').checked = true;
