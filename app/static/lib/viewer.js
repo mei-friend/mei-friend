@@ -1609,12 +1609,13 @@ export default class Viewer {
         Object.keys(group.options).forEach((opt) => {
           let o = group.options[opt]; // vrv available options
           let value = o.default; // available options defaults
-          if (defaultVrvOptions.hasOwnProperty(opt))
+          if (defaultVrvOptions.hasOwnProperty(opt)) {
             // mei-friend vrv defaults
             value = defaultVrvOptions[opt];
-          if (storage.hasOwnProperty(opt)) {
-            if (restoreFromLocalStorage) value = storage[opt];
-            else delete storage[opt];
+          }
+          if (storage.hasOwnProperty('vrv-' + opt)) {
+            if (restoreFromLocalStorage) value = storage['vrv-' + opt];
+            else delete storage['vrv-' + opt];
           }
           if (!skipList.includes(opt)) {
             let div = this.createOptionsItem('vrv-' + opt, o, value);
