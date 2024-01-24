@@ -1304,6 +1304,12 @@ export default class Viewer {
           case 'showMidiPlaybackControlBar':
             cmd.toggleMidiPlaybackControlBar(false);
             break;
+          case 'selectMidiExpansion':
+            this.updateSelectMidiExpansion();
+            if (document.getElementById('showMidiPlaybackControlBar').checked) {
+              startMidiTimeout(true);
+            }
+            break;
           case 'enableGithubActions':
             this.setGithubActionsDisplay();
             break;
@@ -1340,42 +1346,32 @@ export default class Viewer {
           case 'transposeInterval':
           case 'transposeDirection':
             break;
-          case 'showFacsimileZones':
-            document.getElementById('facsimileShowZonesCheckbox').checked = value;
-            if (!value) {
-              document.getElementById('editFacsimileZones').checked = false;
-              document.getElementById('facsimileEditZonesCheckbox').checked = false;
-            }
-            drawFacsimile();
-            break;
-          case 'selectMidiExpansion':
-            this.updateSelectMidiExpansion();
-            if (document.getElementById('showMidiPlaybackControlBar').checked) {
-              startMidiTimeout(true);
-            }
-            break;
-          case 'editFacsimileZones':
-            document.getElementById('facsimileEditZonesCheckbox').checked = value;
-            if (value) {
-              document.getElementById('showFacsimileZones').checked = true;
-              document.getElementById('facsimileShowZonesCheckbox').checked = true;
-            }
-            drawFacsimile();
-            break;
           case 'showFacsimilePanel':
             value ? cmd.showFacsimilePanel() : cmd.hideFacsimilePanel();
             break;
           case 'selectFacsimilePanelOrientation':
             drawFacsimile();
             break;
+          case 'facsimileZoomInput':
+            zoomFacsimile();
+            break;
           case 'showFacsimileFullPage':
             document.getElementById('facsimileFullPageCheckbox').checked = value;
             drawFacsimile();
             break;
-          case 'facsimileZoomInput':
-            zoomFacsimile();
-            let facsZoom = document.getElementById('facsimileZoom');
-            if (facsZoom) facsZoom.value = value;
+          case 'showFacsimileZones':
+            document.getElementById('facsimileShowZonesCheckbox').checked = value;
+            if (!value && document.getElementById('editFacsimileZones').checked) {
+              document.getElementById('editFacsimileZones').click();
+            }
+            drawFacsimile();
+            break;
+          case 'editFacsimileZones':
+            document.getElementById('facsimileEditZonesCheckbox').checked = value;
+            if (value && !document.getElementById('showFacsimileZones').checked) {
+              document.getElementById('showFacsimileZones').click();
+            }
+            drawFacsimile();
             break;
           case 'showSupplied':
             rt.style.setProperty('--suppliedColor', value ? col : 'var(--notationColor)');

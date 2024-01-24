@@ -1945,27 +1945,11 @@ function addEventListeners(v, cm) {
   // show facsimile zone bounding boxes
   document.getElementById('facsimileShowZonesCheckbox').addEventListener('click', (e) => {
     document.getElementById('showFacsimileZones').click(); // checked = e.target.checked;
-    // uncheck edit option when hiding bounding boxes
-    if (!e.target.checked) {
-      if (document.getElementById('editFacsimileZones').checked) {
-        document.getElementById('editFacsimileZones').click();
-      }
-      if (document.getElementById('facsimileEditZonesCheckbox').checked) {
-        document.getElementById('facsimileEditZonesCheckbox').click();
-      }
-    }
-    setOrientation(cm, '', '', v);
   });
 
   // facsimile edit zones
   document.getElementById('facsimileEditZonesCheckbox').addEventListener('click', (e) => {
     document.getElementById('editFacsimileZones').click(); // checked = e.target.checked;
-    // show bounding boxes for editing
-    if (e.target.checked && !document.getElementById('facsimileShowZonesCheckbox').checked) {
-      document.getElementById('showFacsimileZones').checked = true;
-      document.getElementById('facsimileShowZonesCheckbox').checked = true;
-    }
-    setOrientation(cm, '', '', v);
   });
 
   // facsimile close button
