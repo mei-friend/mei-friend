@@ -1767,7 +1767,13 @@ export default class Viewer {
     // label
     let label = document.createElement('label');
     let title = o.description;
-    if (o.default) title += ' (default: ' + o.default + ')';
+    if (o.default || o.min || o.max) {
+      let values = [];
+      if (o.min) values.push('min: ' + o.min);
+      if (o.max) values.push('max: ' + o.max);
+      if (o.default) values.push('default: ' + o.default);
+      title += ' (' + values.join(', ') + ')';
+    }
     label.setAttribute('title', title);
     label.setAttribute('for', 'radioId' in o ? o.radioId : opt);
     label.innerText = o.title;
