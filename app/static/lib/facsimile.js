@@ -241,8 +241,8 @@ export async function drawFacsimile() {
     }
 
     if (fullPage) {
-      // console.debug('img getBBox(): ', img.getBBox());
-      // console.debug('img getBoundingClientRect(): ', img.getBoundingClientRect());
+      console.debug('Facsimile img getBBox(): ', img.getBBox());
+      console.debug('Facsimile img getBoundingClientRect(): ', img.getBoundingClientRect());
       let bb = img.getBBox();
       ulx = 0;
       uly = 0;
@@ -386,19 +386,21 @@ async function embedImage(url) {
  * @param {float} deltaPercent
  */
 export function zoomFacsimile(deltaPercent) {
-  let facsimileZoomInput = document.getElementById('facsimileZoomInput');
-  let facsZoom = document.getElementById('facsimileZoom');
-  if (facsimileZoomInput && deltaPercent) {
+  let facsimileZoomInput = document.getElementById('facsimileZoomInput'); // mf settings menu
+  if (!facsimileZoomInput) return;
+  if (deltaPercent) {
     facsimileZoomInput.value = Math.min(
       parseInt(facsimileZoomInput.max),
       Math.max(parseInt(facsimileZoomInput.min), parseInt(facsimileZoomInput.value) + deltaPercent)
     );
+    // click on settings UI element to update local storage
+    facsimileZoomInput.dispatchEvent(new Event('input', { bubbles: true }));
   }
-  if (facsZoom && deltaPercent) {
-    facsZoom.value = facsimileZoomInput.value;
-  }
+  let facsZoom = document.getElementById('facsimileZoom'); // facsimile panel
+  if (!facsZoom) return;
+  if (deltaPercent) facsZoom.value = facsimileZoomInput.value;
   let svgContainer = document.getElementById('sourceImageContainer');
-  svgContainer.setAttribute('transform', 'scale(' + facsimileZoomInput.value / 100 + ')');
+  if (svgContainer) svgContainer.setAttribute('transform', 'scale(' + facsimileZoomInput.value / 100 + ')');
 } // zoomFacsimile()
 
 /**

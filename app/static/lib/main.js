@@ -1615,14 +1615,6 @@ export let cmd = {
   },
   facsZoomIn: () => zoomFacsimile(+5),
   facsZoomOut: () => zoomFacsimile(-5),
-  facsZoomSlider: () => {
-    let facsZoom = document.getElementById('facsimileZoom');
-    let facsZoomInput = document.getElementById('facsimileZoomInput');
-    if (facsZoom && facsZoomInput) {
-      facsZoomInput.value = facsZoom.value;
-      zoomFacsimile();
-    }
-  },
   undo: () => cm.undo(),
   redo: () => cm.redo(),
   // add note
@@ -1929,7 +1921,10 @@ function addEventListeners(v, cm) {
   // Zooming facsimile with buttons
   document.getElementById('facsimileDecreaseZoomButton').addEventListener('click', cmd.facsZoomOut);
   document.getElementById('facsimileIncreaseZoomButton').addEventListener('click', cmd.facsZoomIn);
-  document.getElementById('facsimileZoom').addEventListener('change', cmd.facsZoomSlider);
+  document.getElementById('facsimileZoom').addEventListener('change', () => {
+    // deltaZoom = facsimile panel value minus settings panel value
+    zoomFacsimile(document.getElementById('facsimileZoom').value - document.getElementById('facsimileZoomInput').value);
+  });
 
   // Zooming facsimile with mouse wheel
   let ip = document.getElementById('facsimile-panel');
@@ -1938,8 +1933,6 @@ function addEventListeners(v, cm) {
       ev.preventDefault();
       ev.stopPropagation();
       zoomFacsimile(Math.sign(ev.deltaY) * -5); // scrolling towards user = increase
-      document.getElementById('facsimileZoom').value = document.getElementById('facsimileZoomInput').value;
-      document.getElementById('facsimileZoom').input();
     }
   });
 

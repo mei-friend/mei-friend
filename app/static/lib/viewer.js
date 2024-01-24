@@ -1177,6 +1177,9 @@ export default class Viewer {
         case 'controlMenuUpdateNotation':
           document.getElementById('updateControls').style.display = value ? 'inherit' : 'none';
           break;
+        case 'facsimileZoomInput':
+          document.getElementById('facsimileZoom').value = value;
+          break;
         case 'showFacsimileFullPage':
           document.getElementById('facsimileFullPageCheckbox').checked = value;
           break;
