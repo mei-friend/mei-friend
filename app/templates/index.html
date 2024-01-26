@@ -1306,7 +1306,8 @@
       if (containingElement) {
         // hide all tab contents except tabId
         for (let cont of containingElement.getElementsByClassName('tabcontent')) {
-          cont.style.display = cont.id === tabId ? 'block' : 'none'; 
+          cont.style.display = cont.id === tabId ? 'flex' : 'none'; 
+          // change block to flex to fix horizontal list of all things
         }
         // remove class "active" from tablinks except for current target
         for (let tab of containingElement.getElementsByClassName('tablink')) {
