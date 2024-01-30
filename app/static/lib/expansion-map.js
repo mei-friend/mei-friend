@@ -33,7 +33,7 @@ export function expand(expansionElement, existingList, xmlDoc) {
   for (let s of expansionList) {
     s = rmHash(s);
     console.log('expansionList s: ' + s);
-    let currSect = xmlDoc.querySelector('[*|id=' + s + ']');
+    let currSect = xmlDoc.querySelector('[*|id="' + s + '"]');
     if (!currSect) {
       return;
     }
@@ -87,7 +87,7 @@ export function expand(expansionElement, existingList, xmlDoc) {
 
   // remove unused sections from reductionList
   reductionList.forEach((r) => {
-    let el = xmlDoc.querySelector('[*|id=' + r + ']');
+    let el = xmlDoc.querySelector('[*|id="' + r + '"]');
     if (el) el.remove();
   });
 

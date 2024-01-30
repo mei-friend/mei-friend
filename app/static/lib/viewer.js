@@ -5,7 +5,7 @@ import * as speed from './speed.js';
 import * as utils from './utils.js';
 import { getControlMenuState, showPdfButtons, setControlMenuState, setCheckbox } from './control-menu.js';
 import { alert, download, info, success, verified, unverified, xCircleFill } from '../css/icons.js';
-import { drawFacsimile, highlightZone, zoomFacsimile } from './facsimile.js';
+import { drawFacsimile, highlightZone, loadFacsimile, zoomFacsimile } from './facsimile.js';
 import {
   cm,
   cmd,
@@ -534,7 +534,7 @@ export default class Viewer {
     this.setFocusToVerovioPane();
 
     // set lastNoteId to @startid of control element
-    let startid = this.xmlDoc.querySelector('[*|id=' + itemId + ']')?.getAttribute('startid');
+    let startid = this.xmlDoc.querySelector('[*|id="' + itemId + '"]')?.getAttribute('startid');
     this.lastNoteId = startid ? utils.rmHash(startid) : itemId;
     this.allowCursorActivity = true;
   } // handleClickOnNotation()
@@ -1210,6 +1210,9 @@ export default class Viewer {
         case 'controlMenuUpdateNotation':
           document.getElementById('updateControls').style.display = value ? 'inherit' : 'none';
           break;
+        case 'facsimileZoomInput':
+          document.getElementById('facsimileZoom').value = value;
+          break;
         case 'showFacsimileFullPage':
           document.getElementById('facsimileFullPageCheckbox').checked = value;
           break;
@@ -1334,6 +1337,12 @@ export default class Viewer {
           case 'showMidiPlaybackControlBar':
             cmd.toggleMidiPlaybackControlBar(false);
             break;
+          case 'selectMidiExpansion':
+            this.updateSelectMidiExpansion();
+            if (document.getElementById('showMidiPlaybackControlBar').checked) {
+              startMidiTimeout(true);
+            }
+            break;
           case 'enableGithubActions':
             this.setGithubActionsDisplay();
             break;
@@ -1370,42 +1379,32 @@ export default class Viewer {
           case 'transposeInterval':
           case 'transposeDirection':
             break;
-          case 'showFacsimileZones':
-            document.getElementById('facsimileShowZonesCheckbox').checked = value;
-            if (!value) {
-              document.getElementById('editFacsimileZones').checked = false;
-              document.getElementById('facsimileEditZonesCheckbox').checked = false;
-            }
-            drawFacsimile();
-            break;
-          case 'selectMidiExpansion':
-            this.updateSelectMidiExpansion();
-            if (document.getElementById('showMidiPlaybackControlBar').checked) {
-              startMidiTimeout(true);
-            }
-            break;
-          case 'editFacsimileZones':
-            document.getElementById('facsimileEditZonesCheckbox').checked = value;
-            if (value) {
-              document.getElementById('showFacsimileZones').checked = true;
-              document.getElementById('facsimileShowZonesCheckbox').checked = true;
-            }
-            drawFacsimile();
-            break;
           case 'showFacsimilePanel':
             value ? cmd.showFacsimilePanel() : cmd.hideFacsimilePanel();
             break;
           case 'selectFacsimilePanelOrientation':
             drawFacsimile();
             break;
+          case 'facsimileZoomInput':
+            zoomFacsimile();
+            break;
           case 'showFacsimileFullPage':
             document.getElementById('facsimileFullPageCheckbox').checked = value;
             drawFacsimile();
             break;
-          case 'facsimileZoomInput':
-            zoomFacsimile();
-            let facsZoom = document.getElementById('facsimileZoom');
-            if (facsZoom) facsZoom.value = value;
+          case 'showFacsimileZones':
+            document.getElementById('facsimileShowZonesCheckbox').checked = value;
+            if (!value && document.getElementById('editFacsimileZones').checked) {
+              document.getElementById('editFacsimileZones').click();
+            }
+            drawFacsimile();
+            break;
+          case 'editFacsimileZones':
+            document.getElementById('facsimileEditZonesCheckbox').checked = value;
+            if (value && !document.getElementById('showFacsimileZones').checked) {
+              document.getElementById('showFacsimileZones').click();
+            }
+            drawFacsimile();
             break;
           case 'showMarkup':
             att.modelTranscriptionLike.forEach((element) => {
@@ -1678,12 +1677,13 @@ export default class Viewer {
         Object.keys(group.options).forEach((opt) => {
           let o = group.options[opt]; // vrv available options
           let value = o.default; // available options defaults
-          if (defaultVrvOptions.hasOwnProperty(opt))
+          if (defaultVrvOptions.hasOwnProperty(opt)) {
             // mei-friend vrv defaults
             value = defaultVrvOptions[opt];
-          if (storage.hasOwnProperty(opt)) {
-            if (restoreFromLocalStorage) value = storage[opt];
-            else delete storage[opt];
+          }
+          if (storage.hasOwnProperty('vrv-' + opt)) {
+            if (restoreFromLocalStorage) value = storage['vrv-' + opt];
+            else delete storage['vrv-' + opt];
           }
           if (!skipList.includes(opt)) {
             let div = this.createOptionsItem('vrv-' + opt, o, value);
@@ -1835,7 +1835,13 @@ export default class Viewer {
     // label
     let label = document.createElement('label');
     let title = o.description;
-    if (o.default) title += ' (default: ' + o.default + ')';
+    if (o.default || o.min || o.max) {
+      let values = [];
+      if (o.min) values.push('min: ' + o.min);
+      if (o.max) values.push('max: ' + o.max);
+      if (o.default) values.push('default: ' + o.default);
+      title += ' (' + values.join(', ') + ')';
+    }
     label.setAttribute('title', title);
     label.setAttribute('for', 'radioId' in o ? o.radioId : opt);
     label.innerText = o.title;

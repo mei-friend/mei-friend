@@ -1702,7 +1702,7 @@ export function manipulateXmlIds(v, cm, removeIds = false) {
   v.loadXml(cm.getValue(), true);
 
   // start from these elements
-  let selector = 'body > mdiv';
+  let selector = 'mei > music'; // 'body > mdiv';
   let rootList = v.xmlDoc.querySelectorAll(selector);
 
   // determine skipList to securely remove ids
@@ -1713,9 +1713,13 @@ export function manipulateXmlIds(v, cm, removeIds = false) {
   // manipulate xml tree starting from selector
   rootList.forEach((e) => dig(e));
 
-  addApplicationInfo(v, cm);
+  // before serialization, sort xml attributes with xml:id first, then alphabetically
+  v.xmlDoc.querySelectorAll('[*|id]').forEach((e) => dutils.sortNodeAttributes(e));
   cm.setValue(new XMLSerializer().serializeToString(v.xmlDoc));
+  addApplicationInfo(v, cm);
   v.updateData(cm, false, true);
+  
+  // reporting
   let msg;
   if (removeIds) {
     msg = report.removed + ' xml:ids removed from encoding, ';
@@ -1761,7 +1765,7 @@ export function manipulateXmlIds(v, cm, removeIds = false) {
       // recursively through the xml tree
       el.childNodes.forEach((e) => dig(e, explore));
     }
-  }
+  } // dig()
 } // manipulateXmlIds()
 
 /**
@@ -2592,7 +2596,7 @@ function getStaffNumbersForClosestStaffGroup(v, element) {
   if (!element) return null;
   let staffNumber;
   if (element.hasAttribute('startid')) {
-    const startElement = v.xmlDoc.querySelector('[*|id=' + utils.rmHash(element.getAttribute('startid')) + ']');
+    const startElement = v.xmlDoc.querySelector('[*|id="' + utils.rmHash(element.getAttribute('startid')) + '"]');
     if (startElement) {
       staffNumber = startElement.closest('staff')?.getAttribute('n');
     }

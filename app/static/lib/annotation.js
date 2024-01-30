@@ -422,7 +422,7 @@ export function writeAnnot(anchor, xmlId, plist, payload) {
  * @param {string} xmlId
  */
 export function deleteAnnot(xmlId) {
-  const annot = v.xmlDoc.querySelector('[*|id=' + xmlId + ']');
+  const annot = v.xmlDoc.querySelector('[*|id="' + xmlId + '"]');
   if (annot) {
     removeInEditor(cm, annot);
     annot.remove();
