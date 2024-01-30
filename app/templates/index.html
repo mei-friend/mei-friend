@@ -1053,62 +1053,34 @@
           </button>
           <!--        <button class="tablink" onclick="switchTab(event, 'annotationPanel')"
           title="Links" data-tab="externalLinks">Links</button>-->
-          <span id="closeAnnotationPanelButton" class="topright" title="Close Annotations Panel">&times;</span>
-        </div>
-        <div id="solidTab" class="tabcontent"></div>
-        <div id="listAnnotations" class="tabcontent">No annotations present.</div>
-        <div id="markupTools" class="tabcontent">
-          <menu id="markupToolsMenu" class="enrichmentToolsMenu markup-panel">
+        <span id="closeAnnotationPanelButton" class="topright" title="Close Annotations Panel">&times;</span>
+      </div>
+      <div id="solidTab" class="tabcontent"></div>
+      <div id="markupTools" class="tabcontent">
+        <menu id="markupToolsMenu" class="enrichmentToolsMenu markup-panel">
+          <div class="markupGrp">
             <span id="alternativeEncodingsGrp">Alternative encodings</span>
             <div class="annotationToolsIconGroup">
               <div class="markup-btn-group annotationToolsIcon">
                 <div class="markup-dropdown">
                   <span id="addChoiceText">&lt;choice&gt;</span>
                   <div id="choice-content-options" class="markup-dropdown-content">
-                    <a
-                      id="choiceSicCorr"
-                      data-target="choiceContentTarget"
-                      data-content-choice="sic,corr"
-                      class="content-option"
-                      href="#"
-                      >sic | corr</a
-                    >
-                    <a
-                      id="choiceCorrSic"
-                      data-target="choiceContentTarget"
-                      data-content-choice="corr,sic"
-                      class="content-option"
-                      href="#"
-                      >corr | sic</a
-                    >
-                    <a
-                      id="choiceOrigReg"
-                      data-target="choiceContentTarget"
-                      data-content-choice="orig,reg"
-                      class="content-option"
-                      href="#"
-                      >orig | reg</a
-                    >
-                    <a
-                      id="choiceRegOrig"
-                      data-target="choiceContentTarget"
-                      data-content-choice="reg,orig"
-                      class="content-option"
-                      href="#"
-                      >reg | orig</a
-                    >
+                    <a id="choiceSicCorr" data-target="choiceContentTarget" data-content-choice="sic,corr"
+                      class="content-option" href="#">sic | corr</a>
+                    <a id="choiceCorrSic" data-target="choiceContentTarget" data-content-choice="corr,sic"
+                      class="content-option" href="#">corr | sic</a>
+                    <a id="choiceOrigReg" data-target="choiceContentTarget" data-content-choice="orig,reg"
+                      class="content-option" href="#">orig | reg</a>
+                    <a id="choiceRegOrig" data-target="choiceContentTarget" data-content-choice="reg,orig"
+                      class="content-option" href="#">reg | orig</a>
                   </div>
                 </div>
                 <div class="markup-dropdown">
                   <span id="choiceContentTarget">(select content)</span>
                   <div class="markup-dropdown-content">
                     <a id="addChoice" class="addMarkup" data-el-name="choice" data-selection="" href="#">Selection</a>
-                    <a id="addChoiceArtic" class="addMarkup" data-el-name="choice" data-selection="artic" href="#"
-                      >Articulation</a
-                    >
-                    <a id="addChoiceAccid" class="addMarkup" data-el-name="choice" data-selection="accid" href="#"
-                      >Accidental</a
-                    >
+                    <a id="addChoiceArtic" class="addMarkup" data-el-name="choice" data-selection="artic" href="#">Articulation</a>
+                    <a id="addChoiceAccid" class="addMarkup" data-el-name="choice" data-selection="accid" href="#">Accidental</a>
                   </div>
                 </div>
               </div>
@@ -1118,70 +1090,50 @@
                 <div class="markup-dropdown">
                   <span id="addSubstText">&lt;subst&gt;</span>
                   <div id="subst-content-options" class="markup-dropdown-content">
-                    <a
-                      id="substAddDel"
-                      data-target="substContentTarget"
-                      data-content-choice="add,del"
-                      class="content-option"
-                      href="#"
-                      >add | del</a
-                    >
-                    <a
-                      id="substDelAdd"
-                      data-target="substContentTarget"
-                      data-content-choice="del,add"
-                      class="content-option"
-                      href="#"
-                      >del | add</a
-                    >
+                    <a id="substAddDel" data-target="substContentTarget" data-content-choice="add,del"
+                      class="content-option" href="#">add | del</a>
+                    <a id="substDelAdd" data-target="substContentTarget" data-content-choice="del,add"
+                      class="content-option" href="#">del | add</a>
                   </div>
                 </div>
                 <div class="markup-dropdown">
                   <span id="substContentTarget">(select content)</span>
                   <div class="markup-dropdown-content">
                     <a id="addSubst" class="addMarkup" data-el-name="subst" data-selection="" href="#">Selection</a>
-                    <a id="addSubstArtic" class="addMarkup" data-el-name="subst" data-selection="artic" href="#"
-                      >Articulation</a
-                    >
-                    <a id="addSubstAccid" class="addMarkup" data-el-name="subst" data-selection="accid" href="#"
-                      >Accidental</a
-                    >
+                    <a id="addSubstArtic" class="addMarkup" data-el-name="subst" data-selection="artic" href="#">Articulation</a>
+                    <a id="addSubstAccid" class="addMarkup" data-el-name="subst" data-selection="accid" href="#">Accidental</a>
                   </div>
                 </div>
               </div>
             </div>
+          </div>
+          <div class="markupGrp">
             <span id="editInterventionsGrp">Editorial interventions</span>
             <div class="annotationToolsIconGroup markup-dropdown">
               <span id="addSuppliedText" class="annotationToolsIcon">Supplied</span>
               <div class="markup-dropdown-content">
                 <a class="addMarkup" data-el-name="supplied" data-selection="" id="addSupplied" href="#">Selection</a>
-                <a class="addMarkup" data-el-name="supplied" data-selection="artic" id="addSuppliedArtic" href="#"
-                  >Articulation</a
-                >
-                <a class="addMarkup" data-el-name="supplied" data-selection="accid" id="addSuppliedAccid" href="#"
-                  >Accidental</a
-                >
+                <a class="addMarkup" data-el-name="supplied" data-selection="artic" id="addSuppliedArtic"
+                  href="#">Articulation</a>
+                <a class="addMarkup" data-el-name="supplied" data-selection="accid" id="addSuppliedAccid"
+                  href="#">Accidental</a>
               </div>
             </div>
             <div class="annotationToolsIconGroup markup-dropdown">
               <span id="addUnclearText" class="annotationToolsIcon">Unclear</span>
               <div class="markup-dropdown-content">
                 <a class="addMarkup" data-el-name="unclear" data-selection="" id="addUnclear" href="#">Selection</a>
-                <a class="addMarkup" data-el-name="unclear" data-selection="artic" id="addUnclearArtic" href="#"
-                  >Articulation</a
-                >
-                <a class="addMarkup" data-el-name="unclear" data-selection="accid" id="addUnclearAccid" href="#"
-                  >Accidental</a
-                >
+                <a class="addMarkup" data-el-name="unclear" data-selection="artic" id="addUnclearArtic"
+                  href="#">Articulation</a>
+                <a class="addMarkup" data-el-name="unclear" data-selection="accid" id="addUnclearAccid"
+                  href="#">Accidental</a>
               </div>
             </div>
             <div class="annotationToolsIconGroup markup-dropdown">
               <span id="addSicText" class="annotationToolsIcon">Sic</span>
               <div class="markup-dropdown-content">
                 <a class="addMarkup" data-el-name="sic" data-selection="" id="addSic" href="#">Selection</a>
-                <a class="addMarkup" data-el-name="sic" data-selection="artic" id="addSicArtic" href="#"
-                  >Articulation</a
-                >
+                <a class="addMarkup" data-el-name="sic" data-selection="artic" id="addSicArtic" href="#">Articulation</a>
                 <a class="addMarkup" data-el-name="sic" data-selection="accid" id="addSicAccid" href="#">Accidental</a>
               </div>
             </div>
@@ -1189,44 +1141,36 @@
               <span id="addCorrText" class="annotationToolsIcon">Corr</span>
               <div class="markup-dropdown-content">
                 <a class="addMarkup" data-el-name="corr" data-selection="" id="addCorr" href="#">Selection</a>
-                <a class="addMarkup" data-el-name="corr" data-selection="artic" id="addCorrArtic" href="#"
-                  >Articulation</a
-                >
-                <a class="addMarkup" data-el-name="corr" data-selection="accid" id="addCorrAccid" href="#"
-                  >Accidental</a
-                >
+                <a class="addMarkup" data-el-name="corr" data-selection="artic" id="addCorrArtic"
+                  href="#">Articulation</a>
+                <a class="addMarkup" data-el-name="corr" data-selection="accid" id="addCorrAccid" href="#">Accidental</a>
               </div>
             </div>
             <div class="annotationToolsIconGroup markup-dropdown">
               <span id="addOrigText" class="annotationToolsIcon">Orig</span>
               <div class="markup-dropdown-content">
                 <a class="addMarkup" data-el-name="orig" data-selection="" id="addOrig" href="#">Selection</a>
-                <a class="addMarkup" data-el-name="orig" data-selection="artic" id="addOrigArtic" href="#"
-                  >Articulation</a
-                >
-                <a class="addMarkup" data-el-name="orig" data-selection="accid" id="addOrigAccid" href="#"
-                  >Accidental</a
-                >
+                <a class="addMarkup" data-el-name="orig" data-selection="artic" id="addOrigArtic"
+                  href="#">Articulation</a>
+                <a class="addMarkup" data-el-name="orig" data-selection="accid" id="addOrigAccid" href="#">Accidental</a>
               </div>
             </div>
             <div class="annotationToolsIconGroup markup-dropdown">
               <span id="addRegText" class="annotationToolsIcon">Reg</span>
               <div class="markup-dropdown-content">
                 <a class="addMarkup" data-el-name="reg" data-selection="" id="addReg" href="#">Selection</a>
-                <a class="addMarkup" data-el-name="reg" data-selection="artic" id="addRegArtic" href="#"
-                  >Articulation</a
-                >
+                <a class="addMarkup" data-el-name="reg" data-selection="artic" id="addRegArtic" href="#">Articulation</a>
                 <a class="addMarkup" data-el-name="reg" data-selection="accid" id="addRegAccid" href="#">Accidental</a>
               </div>
             </div>
+          </div>
+          <div class="markupGrp">
             <span id="descMarkupGrp">Descriptive Markup</span>
             <div class="annotationToolsIconGroup markup-dropdown">
               <span id="addAddText" class="annotationToolsIcon">Add</span>
               <div class="markup-dropdown-content">
                 <a class="addMarkup" data-el-name="add" data-selection="" id="addAdd" href="#">Selection</a>
-                <a class="addMarkup" data-el-name="add" data-selection="artic" id="addAddArtic" href="#"
-                  >Articulation</a
-                >
+                <a class="addMarkup" data-el-name="add" data-selection="artic" id="addAddArtic" href="#">Articulation</a>
                 <a class="addMarkup" data-el-name="add" data-selection="accid" id="addAddAccid" href="#">Accidental</a>
               </div>
             </div>
@@ -1234,65 +1178,47 @@
               <span id="addDelText" class="annotationToolsIcon">Del</span>
               <div class="markup-dropdown-content">
                 <a class="addMarkup" data-el-name="del" data-selection="" id="addDel" href="#">Selection</a>
-                <a class="addMarkup" data-el-name="del" data-selection="artic" id="addDelArtic" href="#"
-                  >Articulation</a
-                >
+                <a class="addMarkup" data-el-name="del" data-selection="artic" id="addDelArtic" href="#">Articulation</a>
                 <a class="addMarkup" data-el-name="del" data-selection="accid" id="addDelAccid" href="#">Accidental</a>
               </div>
             </div>
-          </menu>
-        </div>
-        <div id="annotationTools" class="tabcontent">
-          <menu id="annotationToolsMenu" class="enrichmentToolsMenu">
-            <div id="annotationToolsDomainSelection">
-              <div class="annotationToolsDomainSelectionItem">
-                <fieldset>
-                  <input
-                    type="radio"
-                    checked
-                    id="writeAnnotationInline"
-                    title="Generate in-line annotations."
-                    value="writeAnnotationInline"
-                    name="annotationToolDomainSelector"
-                  />
-                  <label
-                    for="writeAnnotionInline"
-                    title="Generate in-line annotations using MEI &lt;annot&gt; elements."
-                    >MEI</label
-                  >
-                  <input
-                    type="radio"
-                    id="writeAnnotationStandoff"
-                    title="Generate stand-off annotations. Only possible if working on a native MEI file from URL or GitHub, and when logged into a Solid Pod."
-                    value="writeAnnotationStandoff"
-                    name="annotationToolDomainSelector"
-                  />
-                  <label
-                    id="writeAnnotationStandoffLabel"
-                    for="writeAnnotionStandoff"
-                    title="Generate stand-off annotations. Only possible if working on a native MEI file from URL or GitHub, and when logged into a Solid Pod."
-                    >RDF</label
-                  >
-                </fieldset>
+          </div>
+        </menu>
+      </div>
+      <div id="annotationTools" class="tabcontent">
+        <menu id="annotationToolsMenu" class="enrichmentToolsMenu">
+          <div id="annotationToolsDomainSelection">
+            <div class="annotationToolsDomainSelectionItem">
+              <fieldset>
+                <input type="radio" checked id="writeAnnotationInline" title="Generate in-line annotations."
+                  value="writeAnnotationInline" name="annotationToolDomainSelector">
+                <label for="writeAnnotionInline"
+                  title="Generate in-line annotations using MEI &lt;annot&gt; elements.">MEI</label>
+                <input type="radio" id="writeAnnotationStandoff"
+                  title="Generate stand-off annotations. Only possible if working on a native MEI file from URL or GitHub, and when logged into a Solid Pod."
+                  value="writeAnnotationStandoff" name="annotationToolDomainSelector">
+                <label id="writeAnnotationStandoffLabel" for="writeAnnotionStandoff"
+                  title="Generate stand-off annotations. Only possible if working on a native MEI file from URL or GitHub, and when logged into a Solid Pod.">RDF</label>
+              </fieldset>
+            </div>
+          </div>
+          <div class="annotationToolsIconGroup">
+            <li>
+              <div class="annotationToolsIcon" id="annotateIdentify">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
+                  <title id="annotationToolsIdentifyTitle">identify</title>
+                  <path
+                    d="m12.596 11.596-3.535 3.536a1.5 1.5 0 0 1-2.122 0l-3.535-3.536a6.5 6.5 0 1 1 9.192-9.193 6.5 6.5 0 0 1 0 9.193Zm-1.06-8.132v-.001a5 5 0 1 0-7.072 7.072L8 14.07l3.536-3.534a5 5 0 0 0 0-7.072ZM8 9a2 2 0 1 1-.001-3.999A2 2 0 0 1 8 9Z">
+                  </path>
+                </svg>
+                <span id="annotationToolsIdentifySpan">Identify musical object</span>
               </div>
-            </div>
-            <div class="annotationToolsIconGroup">
-              <li>
-                <div class="annotationToolsIcon" id="annotateIdentify">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
-                    <title id="annotationToolsIdentifyTitle">identify</title>
-                    <path
-                      d="m12.596 11.596-3.535 3.536a1.5 1.5 0 0 1-2.122 0l-3.535-3.536a6.5 6.5 0 1 1 9.192-9.193 6.5 6.5 0 0 1 0 9.193Zm-1.06-8.132v-.001a5 5 0 1 0-7.072 7.072L8 14.07l3.536-3.534a5 5 0 0 0 0-7.072ZM8 9a2 2 0 1 1-.001-3.999A2 2 0 0 1 8 9Z"
-                    ></path>
-                  </svg>
-                  <span id="annotationToolsIdentifySpan">Identify musical object</span>
-                </div>
-              </li>
-            </div>
-            <div class="annotationToolsIconGroup">
-              <li>
-                <div class="annotationToolsIcon" id="annotateHighlight">
-                  <!--<svg xmlns="http://www.w3.org/2000/svg"  aria-hidden="true" role="img" id="footer-sample-full" width="16px" height="16px"  viewBox="0 0 1024 1024">
+            </li>
+          </div>
+          <div class="annotationToolsIconGroup">
+            <li>
+              <div class="annotationToolsIcon" id="annotateHighlight">
+                <!--<svg xmlns="http://www.w3.org/2000/svg"  aria-hidden="true" role="img" id="footer-sample-full" width="16px" height="16px"  viewBox="0 0 1024 1024">
                   <path fill="currentColor"
                     d="M957.6 507.4L603.2 158.2a7.9 7.9 0 0 0-11.2 0L353.3 393.4a8.03 8.03 0 0 0-.1 11.3l.1.1l40 39.4l-117.2 115.3a8.03 8.03 0 0 0-.1 11.3l.1.1l39.5 38.9l-189.1 187H72.1c-4.4 0-8.1 3.6-8.1 8V860c0 4.4 3.6 8 8 8h344.9c2.1 0 4.1-.8 5.6-2.3l76.1-75.6l40.4 39.8a7.9 7.9 0 0 0 11.2 0l117.1-115.6l40.1 39.5a7.9 7.9 0 0 0 11.2 0l238.7-235.2c3.4-3 3.4-8 .3-11.2zM389.8 796.2H229.6l134.4-133l80.1 78.9l-54.3 54.1zm154.8-62.1L373.2 565.2l68.6-67.6l171.4 168.9l-68.6 67.6zM713.1 658L450.3 399.1L597.6 254l262.8 259l-147.3 145z">
                   </path>
@@ -1482,27 +1408,28 @@
         }
       });
 
-      // switch tabs in settings menu
-      function switchTab(ev, containingElementId) {
-        console.log('switchtab :', ev, containingElementId);
-        //const tabId = ev.target.dataset.tab;
-        const tabId = ev.target.closest('[data-tab]').dataset.tab;
-        // console.log('switchTab: ', containingElementId, tabId);
-        // console.log('switchTab: ', ev);
-        let containingElement = document.getElementById(containingElementId);
-        if (containingElement) {
-          // hide all tab contents except tabId
-          for (let cont of containingElement.getElementsByClassName('tabcontent')) {
-            cont.style.display = cont.id === tabId ? 'block' : 'none';
-          }
-          // remove class "active" from tablinks except for current target
-          for (let tab of containingElement.getElementsByClassName('tablink')) {
-            // console.log('tab: ', tab);
-            // console.log('ev.currentTarget: ', ev.currentTarget);
-            tab === ev.currentTarget ? tab.classList.add('active') : tab.classList.remove('active');
-          }
+    // switch tabs in settings menu
+    function switchTab(ev, containingElementId) {
+      console.log("switchtab :", ev, containingElementId)
+      //const tabId = ev.target.dataset.tab;
+      const tabId = ev.target.closest("[data-tab]").dataset.tab;
+      // console.log('switchTab: ', containingElementId, tabId);
+      // console.log('switchTab: ', ev);
+      let containingElement = document.getElementById(containingElementId);
+      if (containingElement) {
+        // hide all tab contents except tabId
+        for (let cont of containingElement.getElementsByClassName('tabcontent')) {
+          cont.style.display = cont.id === tabId ? 'flex' : 'none'; 
+          // change block to flex to fix horizontal list of all things
+        }
+        // remove class "active" from tablinks except for current target
+        for (let tab of containingElement.getElementsByClassName('tablink')) {
+          // console.log('tab: ', tab);
+          // console.log('ev.currentTarget: ', ev.currentTarget);
+          tab === ev.currentTarget ? tab.classList.add('active') : tab.classList.remove('active');
         }
       }
+    }
 
       /*function toggleAccordion(ev, accordionBtnId, accordionPanelId) {
       console.log("Toggle accodion:", accordionBtnId, accordionPanelId);

@@ -1,5 +1,11 @@
 # mei-friend-online CHANGELOG.md
 
+### 1.1.5 patch
+
+* Include filtering for different versions inside `<choice>` or `<subst>` in speed mode.
+* Update midi on switching versions in the notation panel.
+* Honrizontal layout for markup panel added.
+
 ### 1.1.4 Refine Editorial Markup
 
 - Add subst element to markup tools.

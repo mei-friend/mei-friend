@@ -38,3 +38,11 @@
 .annotationToolsDomainSelectionItem {
   flex-direction: row;
 }
+
+#markupToolsMenu {
+  flex-direction: row;
+}
+
+.markupGrp {
+  display: inline-block !important;
+}
