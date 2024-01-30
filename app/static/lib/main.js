@@ -1,6 +1,6 @@
 // mei-friend version and date
-export const version = '1.0.8';
-export const versionDate = '21 January 2024'; // use full or 3-character english months, will be translated
+export const version = '1.0.9';
+export const versionDate = '30 January 2024'; // use full or 3-character english months, will be translated
 
 var vrvWorker;
 var spdWorker;
@@ -1393,7 +1393,7 @@ function togglePdfMode() {
 export function requestMidiFromVrvWorker(requestTimemap = false) {
   let mei;
   // if (v.expansionId) {
-  //   let expansionEl = v.xmlDoc.querySelector('[*|id=' + v.expansionId + ']');
+  //   let expansionEl = v.xmlDoc.querySelector('[*|id="' + v.expansionId + '"]');
   //   let existingList = [];
   //   let expandedDoc = expansionMap.expand(expansionEl, existingList, v.xmlDoc.cloneNode(true));
   //   mei = v.speedFilter(new XMLSerializer().serializeToString(expandedDoc), false, true);
@@ -1615,14 +1615,6 @@ export let cmd = {
   },
   facsZoomIn: () => zoomFacsimile(+5),
   facsZoomOut: () => zoomFacsimile(-5),
-  facsZoomSlider: () => {
-    let facsZoom = document.getElementById('facsimileZoom');
-    let facsZoomInput = document.getElementById('facsimileZoomInput');
-    if (facsZoom && facsZoomInput) {
-      facsZoomInput.value = facsZoom.value;
-      zoomFacsimile();
-    }
-  },
   undo: () => cm.undo(),
   redo: () => cm.redo(),
   // add note
@@ -1929,7 +1921,10 @@ function addEventListeners(v, cm) {
   // Zooming facsimile with buttons
   document.getElementById('facsimileDecreaseZoomButton').addEventListener('click', cmd.facsZoomOut);
   document.getElementById('facsimileIncreaseZoomButton').addEventListener('click', cmd.facsZoomIn);
-  document.getElementById('facsimileZoom').addEventListener('change', cmd.facsZoomSlider);
+  document.getElementById('facsimileZoom').addEventListener('change', () => {
+    // deltaZoom = facsimile panel value minus settings panel value
+    zoomFacsimile(document.getElementById('facsimileZoom').value - document.getElementById('facsimileZoomInput').value);
+  });
 
   // Zooming facsimile with mouse wheel
   let ip = document.getElementById('facsimile-panel');
@@ -1938,36 +1933,23 @@ function addEventListeners(v, cm) {
       ev.preventDefault();
       ev.stopPropagation();
       zoomFacsimile(Math.sign(ev.deltaY) * -5); // scrolling towards user = increase
-      document.getElementById('facsimileZoom').value = document.getElementById('facsimileZoomInput').value;
     }
   });
 
   // facsimile full-page
   document.getElementById('facsimileFullPageCheckbox').addEventListener('click', (e) => {
-    document.getElementById('showFacsimileFullPage').checked = e.target.checked;
+    document.getElementById('showFacsimileFullPage').click(); // checked = e.target.checked;
     drawFacsimile();
   });
 
   // show facsimile zone bounding boxes
   document.getElementById('facsimileShowZonesCheckbox').addEventListener('click', (e) => {
-    document.getElementById('showFacsimileZones').checked = e.target.checked;
-    // uncheck edit option when hiding bounding boxes
-    if (!e.target.checked) {
-      document.getElementById('editFacsimileZones').checked = false;
-      document.getElementById('facsimileEditZonesCheckbox').checked = false;
-    }
-    setOrientation(cm, '', '', v);
+    document.getElementById('showFacsimileZones').click(); // checked = e.target.checked;
   });
 
   // facsimile edit zones
   document.getElementById('facsimileEditZonesCheckbox').addEventListener('click', (e) => {
-    document.getElementById('editFacsimileZones').checked = e.target.checked;
-    // show bounding boxes for editing
-    if (e.target.checked && !document.getElementById('facsimileShowZonesCheckbox').checked) {
-      document.getElementById('showFacsimileZones').checked = true;
-      document.getElementById('facsimileShowZonesCheckbox').checked = true;
-    }
-    setOrientation(cm, '', '', v);
+    document.getElementById('editFacsimileZones').click(); // checked = e.target.checked;
   });
 
   // facsimile close button

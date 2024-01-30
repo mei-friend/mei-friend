@@ -1,8 +1,12 @@
 # mei-friend-online CHANGELOG.md
 
-### 1.0.8 patch (released on 20 Jan 2024)
+### 1.0.9 patch
+* Facsimile panel GUI elements update local storage 
+* Verovio settings retrieved from local storage
+
+### 1.0.8 patch (released on 21 Jan 2024)
 * Handle facsimile graphics path correctly in GitHub repos with subdirectories
-* Optimize facsimile redrawing after encoding editing
+* Optimize facsimile redrawing after editing the encoding 
 * Polish facsimile updating and size handling
 
 ### 1.0.7 patch (released on 16 Jan 2024)
