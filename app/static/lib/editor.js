@@ -74,7 +74,7 @@ export function deleteElement(v, cm, modifyerKey = false) {
   v.selectedElements.forEach((id) => {
     let cursor = cm.getCursor();
     let nextId = utils.getIdOfNextElement(cm, cursor.line)[0]; // TODO necessary?
-    let element = v.xmlDoc.querySelector("[*|id='" + id + "']");
+    let element = v.xmlDoc.querySelector('[*|id="' + id + '"]');
     console.debug('Deleting: ', element);
     if (!element) {
       console.log(id + ' not found for deletion.');
@@ -156,8 +156,8 @@ export function deleteElement(v, cm, modifyerKey = false) {
       }
 
       // Check if element has been pointed to in a slur, tie (@startid, @endid); TODO: @plist?
-      let pointingElements = v.xmlDoc.querySelectorAll("[startid='#" + id + "'],[endid='#" + id + "']");
-      // v.xmlDoc.querySelector("[startid='#" + id + "']") || v.xmlDoc.querySelector("[endid='#" + id + "']") || '';
+      let pointingElements = v.xmlDoc.querySelectorAll('[startid="#' + id + '"],[endid="#' + id + '"]');
+      // v.xmlDoc.querySelector("[startid='#" + id + '"]') || v.xmlDoc.querySelector("[endid='#" + id + '"]') || '';
       pointingElements.forEach((pointingElement) => {
         console.log(
           'Removing pointing element <' +
@@ -227,7 +227,7 @@ export function addNote(v, cm) {
   let selEl;
   let i = v.selectedElements.length - 1;
   while (i >= 0) {
-    selEl = v.xmlDoc.querySelector("[*|id='" + v.selectedElements.at(i) + "']");
+    selEl = v.xmlDoc.querySelector('[*|id="' + v.selectedElements.at(i) + '"]');
     if (['layer', 'chord', 'note', 'rest'].includes(selEl.nodeName)) break;
     selEl = null;
     i--;
@@ -330,7 +330,7 @@ export function convertToChord(v, cm) {
   let chord;
   let uuids = [];
   speed.filterElements(v.selectedElements, v.xmlDoc, ['chord', 'note']).forEach((id) => {
-    let el = v.xmlDoc.querySelector("[*|id='" + id + "']");
+    let el = v.xmlDoc.querySelector('[*|id="' + id + '"]');
     if (el && el.nodeName === 'chord') {
       utils.setCursorToId(cm, id);
       while (el.children.length > 0) {
@@ -405,7 +405,7 @@ export function convertNoteToRest(v, cm) {
   v.allowCursorActivity = false;
   let uuids = [];
   speed.filterElements(v.selectedElements, v.xmlDoc, ['rest', 'note']).forEach((id) => {
-    let oldEl = v.xmlDoc.querySelector("[*|id='" + id + "']");
+    let oldEl = v.xmlDoc.querySelector('[*|id="' + id + '"]');
     if (oldEl) {
       let newName = oldEl.nodeName === 'note' ? 'rest' : 'note';
       let newEl = v.xmlDoc.createElementNS(dutils.meiNameSpace, newName);
@@ -448,7 +448,7 @@ export function addAccidental(v, cm, accidAttribute = 's') {
   let uuid;
 
   v.selectedElements.forEach((xmlId, i) => {
-    let el = v.xmlDoc.querySelector("[*|id='" + xmlId + "']");
+    let el = v.xmlDoc.querySelector('[*|id="' + xmlId + '"]');
     if (el && el.nodeName === 'note') {
       let accid = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'accid');
       uuid = utils.generateXmlId('accid', v.xmlIdStyle);
@@ -497,7 +497,7 @@ export function addControlElement(v, cm, elName, placement = '', form = '') {
 
   // find and validate startEl with @startId
   let startId = v.selectedElements[0];
-  var startEl = v.xmlDoc.querySelector("[*|id='" + startId + "']");
+  var startEl = v.xmlDoc.querySelector('[*|id="' + startId + '"]');
   if (!startEl) return;
   if (!allowedElements.includes(startEl.nodeName)) {
     console.info('addControlElement: Cannot add new element to ' + startEl.nodeName + '.');
@@ -520,7 +520,7 @@ export function addControlElement(v, cm, elName, placement = '', form = '') {
     endId = v.selectedElements[v.selectedElements.length - 1];
   }
   if (endId) {
-    endEl = v.xmlDoc.querySelector("[*|id='" + endId + "']");
+    endEl = v.xmlDoc.querySelector('[*|id="' + endId + '"]');
     if (!['note', 'chord', 'mRest', 'multiRest'].includes(endEl.nodeName)) {
       console.info('addControlElement: Cannot add new element to end element ' + endEl.nodeName);
       return;
@@ -532,7 +532,7 @@ export function addControlElement(v, cm, elName, placement = '', form = '') {
   }
   // check inner elements (without start/end) for staff numbers and add them, if missing in staveArray
   for (let i = 1; i < v.selectedElements.length - 1; i++) {
-    let el = v.xmlDoc.querySelector("[*|id='" + v.selectedElements[i] + "']");
+    let el = v.xmlDoc.querySelector('[*|id="' + v.selectedElements[i] + '"]');
     let n = el?.closest('staff')?.getAttribute('n');
     if (!staveArray.includes(n)) staveArray.push(n);
   }
@@ -689,7 +689,7 @@ export function addClefChange(v, cm, shape = 'G', line = '2', before = true) {
   if (v.selectedElements.length === 0) return;
   v.allowCursorActivity = false; // stop update notation
   let id = v.selectedElements[0];
-  var el = v.xmlDoc.querySelector("[*|id='" + id + "']");
+  var el = v.xmlDoc.querySelector('[*|id="' + id + '"]');
   let chord = el.closest('chord');
   if (chord) id = chord.getAttribute('xml:id');
   let staffNumber = el.closest('staff')?.getAttribute('n');
@@ -736,11 +736,11 @@ export function invertPlacement(v, cm, modifier = false) {
   v.allowCursorActivity = false; // no need to redraw notation
   let noteList, range;
   for (let id of ids) {
-    var el = v.xmlDoc.querySelector("[*|id='" + id + "']");
+    var el = v.xmlDoc.querySelector('[*|id="' + id + '"]');
     let chordId = utils.insideParent(id);
     if (el && el.nodeName === 'note') {
       if (chordId) id = chordId;
-      el = v.xmlDoc.querySelector("[*|id='" + id + "']");
+      el = v.xmlDoc.querySelector('[*|id="' + id + '"]');
     }
     if (!el) {
       console.log('invertPlacement(): element not found', id);
@@ -837,7 +837,7 @@ export function invertPlacement(v, cm, modifier = false) {
       let plist = el.getAttribute('plist');
       if (plist) {
         plist.split(' ').forEach((p) => {
-          let note = v.xmlDoc.querySelector("[*|id='" + utils.rmHash(p) + "']");
+          let note = v.xmlDoc.querySelector('[*|id="' + utils.rmHash(p) + '"]');
           if (note) {
             if (note.parentNode.nodeName === 'chord') note = note.parentNode;
             if (note.hasAttribute(attr) && note.getAttribute(attr) === val) {
@@ -894,7 +894,7 @@ export function toggleArtic(v, cm, artic = 'stacc') {
     // if note inside a chord, look at chord
     parentId = utils.insideParent(id, 'chord');
     if (parentId) id = parentId;
-    let note = v.xmlDoc.querySelector("[*|id='" + id + "']");
+    let note = v.xmlDoc.querySelector('[*|id="' + id + '"]');
     if (!note) continue;
     let uuid;
     let noteList;
@@ -906,7 +906,7 @@ export function toggleArtic(v, cm, artic = 'stacc') {
     } else if ((noteList = utils.findNotes(id))) {
       let noteId;
       for (noteId of noteList) {
-        note = v.xmlDoc.querySelector("[*|id='" + noteId + "']");
+        note = v.xmlDoc.querySelector('[*|id="' + noteId + '"]');
         uuid = toggleArticForNote(note, artic, v.xmlIdStyle);
         range = replaceInEditor(cm, note, true);
         cm.execCommand('indentAuto');
@@ -933,7 +933,7 @@ export function shiftPitch(v, cm, deltaPitch = 0, shiftChromatically = false) {
   let i;
   for (i = 0; i < ids.length; i++) {
     let id = ids[i];
-    let el = v.xmlDoc.querySelector("[*|id='" + id + "']");
+    let el = v.xmlDoc.querySelector('[*|id="' + id + '"]');
     if (!el) continue;
     let chs = Array.from(el.querySelectorAll('note,rest,mRest,multiRest'));
     if (chs.length > 0) {
@@ -960,7 +960,7 @@ export function modifyDuration(v, cm, what = 'increase') {
   v.loadXml(cm.getValue());
   v.allowCursorActivity = false;
   speed.filterElements(v.selectedElements, v.xmlDoc).forEach((id) => {
-    let el = v.xmlDoc.querySelector("[*|id='" + id + "']");
+    let el = v.xmlDoc.querySelector('[*|id="' + id + '"]');
     if (el) {
       let dur = el.getAttribute('dur');
       if (dur) {
@@ -987,7 +987,7 @@ export function modifyDuration(v, cm, what = 'increase') {
 export function toggleDots(v, cm) {
   v.allowCursorActivity = false;
   speed.filterElements(v.selectedElements, v.xmlDoc).forEach((id) => {
-    let el = v.xmlDoc.querySelector("[*|id='" + id + "']");
+    let el = v.xmlDoc.querySelector('[*|id="' + id + '"]');
     if (el && att.attAugmentDots.includes(el.nodeName)) {
       if (el.hasAttribute('dots') && el.getAttribute('dots') === '1') {
         el.removeAttribute('dots');
@@ -1018,7 +1018,7 @@ export function moveElementToNextStaff(v, cm, upwards = true) {
   let noteList;
   for (i = 0; i < ids.length; i++) {
     let id = ids[i];
-    let el = v.xmlDoc.querySelector("[*|id='" + id + "']");
+    let el = v.xmlDoc.querySelector('[*|id="' + id + '"]');
     if (!el) continue;
     if (['note', 'chord', 'rest', 'mRest', 'multiRest'].includes(el.nodeName)) {
       staffMover(cm, el, upwards);
@@ -1026,7 +1026,7 @@ export function moveElementToNextStaff(v, cm, upwards = true) {
       let noteId;
       for (noteId of noteList) {
         console.debug('moving: ' + noteId);
-        let sel = v.xmlDoc.querySelector("[*|id='" + noteId + "']");
+        let sel = v.xmlDoc.querySelector('[*|id="' + noteId + '"]');
         staffMover(cm, sel, upwards);
       }
     }
@@ -1056,8 +1056,8 @@ export function addBeamElement(v, cm, elementName = 'beam') {
   if ((parentId = utils.insideParent(id1, 'chord'))) id1 = parentId;
   let id2 = v.selectedElements[v.selectedElements.length - 1];
   if ((parentId = utils.insideParent(id2, 'chord'))) id2 = parentId;
-  let n1 = v.xmlDoc.querySelector("[*|id='" + id1 + "']");
-  let n2 = v.xmlDoc.querySelector("[*|id='" + id2 + "']");
+  let n1 = v.xmlDoc.querySelector('[*|id="' + id1 + '"]');
+  let n2 = v.xmlDoc.querySelector('[*|id="' + id2 + '"]');
   let par1 = n1.parentNode;
   v.allowCursorActivity = false;
   // let checkPoint = buffer.createCheckpoint(); TODO
@@ -1124,7 +1124,7 @@ export function addBeamSpan(v, cm) {
   beamSpan.setAttribute('startid', '#' + id1);
   beamSpan.setAttribute('endid', '#' + id2);
   beamSpan.setAttribute('plist', v.selectedElements.map((e) => '#' + e).join(' '));
-  let n1 = v.xmlDoc.querySelector("[*|id='" + id1 + "']");
+  let n1 = v.xmlDoc.querySelector('[*|id="' + id1 + '"]');
   n1.closest('measure').appendChild(beamSpan);
   v.allowCursorActivity = false;
   let sc = cm.getSearchCursor('xml:id="' + id1 + '"');
@@ -1169,7 +1169,7 @@ export function addOctaveElement(v, cm, disPlace = 'above', dis = '8') {
   octave.setAttribute('endid', '#' + id2);
   octave.setAttribute('dis', dis);
   octave.setAttribute('dis.place', disPlace);
-  let n1 = v.xmlDoc.querySelector("[*|id='" + id1 + "']");
+  let n1 = v.xmlDoc.querySelector('[*|id="' + id1 + '"]');
   n1?.closest('measure').appendChild(octave);
 
   // add it to CodeMirror
@@ -1215,7 +1215,7 @@ export function addVerticalGroup(v, cm) {
   });
   while (existingValues.indexOf(value) >= 0) value++; // increment until unique
   v.selectedElements.forEach((id) => {
-    let el = v.xmlDoc.querySelector("[*|id='" + id + "']");
+    let el = v.xmlDoc.querySelector('[*|id="' + id + '"]');
     if (!el) {
       console.warn('No such element in xml document: ' + id);
     } else if (att.attVerticalGroup.includes(el.nodeName)) {
@@ -1437,7 +1437,7 @@ export function checkAccidGes(v, cm) {
 
         if (data.xmlId && data.xmlId in ties) {
           // Check whether note tied by starting note
-          let startingNote = v.xmlDoc.querySelector('[*|id=' + ties[data.xmlId] + ']');
+          let startingNote = v.xmlDoc.querySelector('[*|id="' + ties[data.xmlId] + '"]');
           if (startingNote) {
             if (pName !== startingNote.getAttribute('pname')) {
               data.html =
@@ -1718,7 +1718,7 @@ export function manipulateXmlIds(v, cm, removeIds = false) {
   cm.setValue(new XMLSerializer().serializeToString(v.xmlDoc));
   addApplicationInfo(v, cm);
   v.updateData(cm, false, true);
-  
+
   // reporting
   let msg;
   if (removeIds) {
@@ -1781,7 +1781,7 @@ export function addZone(v, cm, rect, addMeasure = true) {
   v.allowCursorActivity = false;
   // get current element id and nodeName from editor
   let selectedId = utils.getElementIdAtCursor(cm);
-  let selectedElement = v.xmlDoc.querySelector('[*|id=' + selectedId + ']');
+  let selectedElement = v.xmlDoc.querySelector('[*|id="' + selectedId + '"]');
   if (!selectedElement) {
     v.allowCursorActivity = true;
     return false;
@@ -2542,17 +2542,17 @@ function findAndModifyOctaveElements(cm, xmlDoc, id1, id2, disPlace, dis, add = 
   let deltaOct = (parseInt(dis) - 1) / 7;
   if (disPlace === 'below') deltaOct *= -1; // normal logic: minus 1 when below
   if (add) deltaOct *= -1; // inverse logic: minus when adding above 8
-  let n1 = xmlDoc.querySelector("[*|id='" + id1 + "']");
+  let n1 = xmlDoc.querySelector('[*|id="' + id1 + '"]');
   let st1 = n1.closest('staff');
   if (st1) {
     let staffNumber = st1.getAttribute('n');
     // find all staves with the same @n attribute
-    let allStaves = xmlDoc.querySelectorAll("staff[n='" + staffNumber + "']");
+    let allStaves = xmlDoc.querySelectorAll('staff[n="' + staffNumber + '"]');
     let staffFound = false;
     let noteFound = false;
     // find staff with id1 in it
     for (let st of allStaves) {
-      let child1 = st.querySelector("[*|id='" + id1 + "']");
+      let child1 = st.querySelector('[*|id="' + id1 + '"]');
       if (child1) staffFound = true;
       if (!child1 && !staffFound) {
         continue;

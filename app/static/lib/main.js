@@ -1400,7 +1400,7 @@ function togglePdfMode() {
 export function requestMidiFromVrvWorker(requestTimemap = false) {
   let mei;
   // if (v.expansionId) {
-  //   let expansionEl = v.xmlDoc.querySelector('[*|id=' + v.expansionId + ']');
+  //   let expansionEl = v.xmlDoc.querySelector('[*|id="' + v.expansionId + '"]');
   //   let existingList = [];
   //   let expandedDoc = expansionMap.expand(expansionEl, existingList, v.xmlDoc.cloneNode(true));
   //   mei = v.speedFilter(new XMLSerializer().serializeToString(expandedDoc), false, true);
