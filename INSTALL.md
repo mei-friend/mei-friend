@@ -24,14 +24,20 @@ mei-friend running within a browser
 * For development mode, set FLASK_ENV to "development" => do not deploy in development mode!
 * For deployment, *un*set FLASK_APP. This will cause wsgi.py to be used instead.
 * To build CodeMirror (source cloned as submodule via --recursive flag earlier):
-  - cd app/static/CodeMirror/
-  - npm install rollup
-  - npm run build
+  - `cd app/static/CodeMirror/`
+  - `npm install rollup`
+  - `npm run build`
 * Return to root mei-friend directory: 
-  - cd ../../../
+  - `cd ../../../`
 * Run `python -m venv venv` (if your system python is not python 3, run `python3 -m venv venv`)
 * Run `. venv/bin/activate` (for Windows, use ` . venv\Scripts\activate`). Your prompt should update to show (venv) at the start.
 * Run `pip install -r requirements.txt`
+
+## Install and set up end-to-end testing with playwright
+* Run `npm install` in the mei-friend root directory to install the required packages
+* Go to tests directory:
+  - `cd e2e`
+  - `npx playwright install` to instruct playwright to download the required browser files 
 
 ## To run (from root mei-friend directory):
 ### Development mode:
