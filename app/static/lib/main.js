@@ -1,6 +1,6 @@
 // mei-friend version and date
-export const version = '1.0.9';
-export const versionDate = '30 January 2024'; // use full or 3-character english months, will be translated
+export const version = '1.0.10';
+export const versionDate = '31 January 2024'; // use full or 3-character english months, will be translated
 
 var vrvWorker;
 var spdWorker;
@@ -1148,8 +1148,8 @@ export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true, upd
         loadDataInEditor(mei, setFreshlyLoaded);
         setFileChangedState(false);
         updateLocalStorage(mei);
+        v.allowCursorActivity = true;
         if (updateAfterLoading) {
-          v.allowCursorActivity = true;
           v.updateAll(cm, {}, handleURLParamSelect());
         }
       });
@@ -1255,8 +1255,8 @@ export function handleEncoding(mei, setFreshlyLoaded = true, updateAfterLoading 
           loadDataInEditor(mei, setFreshlyLoaded);
           setFileChangedState(false);
           updateLocalStorage(mei);
+          v.allowCursorActivity = true;
           if (updateAfterLoading) {
-            v.allowCursorActivity = true;
             v.updateAll(cm, defaultVerovioOptions, handleURLParamSelect());
           }
           break;
