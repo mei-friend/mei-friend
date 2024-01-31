@@ -14,6 +14,7 @@ import { defaultFacsimileRectangleColor, defaultFacsimileRectangleLineWidth } fr
 
 var facs = {}; // facsimile structure in MEI file
 var sourceImages = {}; // object of source images
+var oldFacsimile; // previous facsimile element
 const rectangleLineWidth = defaultFacsimileRectangleLineWidth; // width of bounding box rectangles in px
 const rectangleColor = defaultFacsimileRectangleColor; // color of zone rectangles
 var listenerHandles = {};
@@ -56,6 +57,9 @@ function showWarningText(txt = translator.lang.facsimileDefaultWarning.text) {
 export function clearFacsimile() {
   facs = {};
   sourceImages = {};
+  let svgContainer = document.getElementById('sourceImageContainer');
+  svgContainer.removeAttribute('width');
+  svgContainer.removeAttribute('height');
 } // clearFacsimile()
 
 /**
@@ -64,12 +68,12 @@ export function clearFacsimile() {
  * each containing own coordinates (ulx, uly, lrx, lry)
  * and containing surface info (target, width, height)
  * @param {Document} xmlDoc
- * @returns {object} facs
+ * Modifies global variable facs
  */
 export function loadFacsimile(xmlDoc) {
-  clearFacsimile();
   let facsimile = xmlDoc.querySelector('facsimile');
-  if (facsimile) {
+  if (facsimile && !facsimile.isEqualNode(oldFacsimile)) {
+    clearFacsimile();
     // look for surface elements
     let surfaces = facsimile.querySelectorAll('surface');
     surfaces.forEach((s) => {
@@ -111,8 +115,8 @@ export function loadFacsimile(xmlDoc) {
         }
       }
     });
+    oldFacsimile = facsimile;
   }
-  return facs;
 
   /**
    * Local function to handle main attributes of graphic element.
@@ -192,7 +196,13 @@ export async function drawFacsimile() {
       // relative file paths in surface@target
       if (fileLocationType === 'github') {
         let url = new URL(
-          'https://raw.githubusercontent.com/' + github.githubRepo + '/' + github.branch + '/' + facs[zoneId].target
+          'https://raw.githubusercontent.com/' +
+            github.githubRepo +
+            '/' +
+            github.branch +
+            github.filepath.substring(0, github.filepath.lastIndexOf('/')) +
+            '/' +
+            facs[zoneId].target
         );
         imgName = url.href;
       } else if (fileLocationType === 'url') {
@@ -231,6 +241,8 @@ export async function drawFacsimile() {
     }
 
     if (fullPage) {
+      console.debug('Facsimile img getBBox(): ', img.getBBox());
+      console.debug('Facsimile img getBoundingClientRect(): ', img.getBoundingClientRect());
       let bb = img.getBBox();
       ulx = 0;
       uly = 0;
@@ -243,14 +255,13 @@ export async function drawFacsimile() {
     }
     let width = lrx - ulx;
     let height = lry - uly;
-    // svgContainer.setAttribute("transform", "translate(" + (ulx / 2) + " " + (uly / 2 ) + ") scale(" + zoomFactor + ")");
     let zoomFactor = document.getElementById('facsimileZoomInput').value / 100;
     svgContainer.setAttribute('transform-origin', 'left top');
     svgContainer.setAttribute('transform', 'scale(' + zoomFactor + ')');
-    svgContainer.setAttribute('width', width);
-    svgContainer.setAttribute('height', height);
+    if (width !== 0) svgContainer.setAttribute('width', width);
+    if (height !== 0) svgContainer.setAttribute('height', height);
     // svgContainer.appendChild(document.createAttributeNS(svgNameSpace, 'circle'))
-    svg.setAttribute('viewBox', ulx + ' ' + uly + ' ' + width + ' ' + height);
+    if (width !== 0 && height !== 0) svg.setAttribute('viewBox', ulx + ' ' + uly + ' ' + width + ' ' + height);
 
     if (false) {
       // show page name on svg
@@ -375,19 +386,21 @@ async function embedImage(url) {
  * @param {float} deltaPercent
  */
 export function zoomFacsimile(deltaPercent) {
-  let facsimileZoomInput = document.getElementById('facsimileZoomInput');
-  let facsZoom = document.getElementById('facsimileZoom');
-  if (facsimileZoomInput && deltaPercent) {
+  let facsimileZoomInput = document.getElementById('facsimileZoomInput'); // mf settings menu
+  if (!facsimileZoomInput) return;
+  if (deltaPercent) {
     facsimileZoomInput.value = Math.min(
       parseInt(facsimileZoomInput.max),
       Math.max(parseInt(facsimileZoomInput.min), parseInt(facsimileZoomInput.value) + deltaPercent)
     );
+    // click on settings UI element to update local storage
+    facsimileZoomInput.dispatchEvent(new Event('input', { bubbles: true }));
   }
-  if (facsZoom && deltaPercent) {
-    facsZoom.value = facsimileZoomInput.value;
-  }
+  let facsZoom = document.getElementById('facsimileZoom'); // facsimile panel
+  if (!facsZoom) return;
+  if (deltaPercent) facsZoom.value = facsimileZoomInput.value;
   let svgContainer = document.getElementById('sourceImageContainer');
-  svgContainer.setAttribute('transform', 'scale(' + facsimileZoomInput.value / 100 + ')');
+  if (svgContainer) svgContainer.setAttribute('transform', 'scale(' + facsimileZoomInput.value / 100 + ')');
 } // zoomFacsimile()
 
 /**
@@ -467,7 +480,7 @@ export function addZoneResizer(v, rect) {
       'ZoneResizer: Mouse down ' + resize + ' ev.clientX/Y:' + ev.clientX + '/' + ev.clientX + ', rect:',
       rect
     );
-  }
+  } // mouseDown()
 
   function mouseMove(ev) {
     let bcr = rect.getBoundingClientRect();
@@ -544,7 +557,7 @@ export function addZoneResizer(v, rect) {
       if (txt && (resize === 'northwest' || resize === 'west' || resize === 'pan')) txt.setAttribute('x', txtX + dx);
       if (txt && (resize === 'north' || resize === 'northwest' || resize === 'pan')) txt.setAttribute('y', txtY + dy);
 
-      let zone = v.xmlDoc.querySelector('[*|id=' + rect.id + ']');
+      let zone = v.xmlDoc.querySelector('[*|id="' + rect.id + '"]');
       zone.setAttribute('ulx', c.x);
       zone.setAttribute('uly', c.y);
       zone.setAttribute('lrx', c.x + c.width);
@@ -555,13 +568,12 @@ export function addZoneResizer(v, rect) {
       v.allowCursorActivity = true;
       // console.log('Dragging: ' + resize + ' ' + dx + '/' + dy);
     }
-  }
+  } // mouseMove()
 
   function mouseUp(ev) {
     resize = '';
     loadFacsimile(v.xmlDoc);
-    // console.log('mouse up');
-  }
+  } // mouseUp()
 } // addZoneResizer()
 
 /**
@@ -615,7 +627,7 @@ export function addZoneDrawer() {
         start
       );
     }
-  }
+  } // mouseDown()
 
   function mouseMove(ev) {
     ev.preventDefault();
@@ -634,7 +646,7 @@ export function addZoneDrawer() {
         rect.setAttribute('height', c.height);
       }
     }
-  }
+  } // mouseMove()
 
   function mouseUp(ev) {
     if (document.getElementById('editFacsimileZones').checked && !resize) {
@@ -664,7 +676,7 @@ export function addZoneDrawer() {
       }
       drawing = '';
     }
-  }
+  } // mouseUp()
 } // addZoneDrawer()
 
 /**
