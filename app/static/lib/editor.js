@@ -78,6 +78,7 @@ export function deleteElement(v, cm, modifyerKey = false) {
     console.debug('Deleting: ', element);
     if (!element) {
       console.log(id + ' not found for deletion.');
+      v.allowCursorActivity = true;
       return;
     }
     // let checkPoint = buffer.createCheckpoint(); TODO
@@ -354,6 +355,7 @@ export function convertToChord(v, cm) {
     } else if (el && el.nodeName === 'note') {
       if (el.closest('chord')) {
         v.showAlert('Cannot create chord within chord.');
+        v.allowCursorActivity = true;
         return;
       }
       // create new chord and add to DOM
@@ -1241,6 +1243,7 @@ export function addSuppliedElement(v, cm, attrName = 'none') {
               'No ' + attrName + ' attribute or child node found in element ' + el.nodeName + ' (' + id + ').';
             console.log(msg);
             v.showAlert(msg, 'warning');
+            v.allowCursorActivity = true;
             return;
           }
         } else {
@@ -1832,8 +1835,8 @@ export function manipulateXmlIds(v, cm, removeIds = false) {
   }
   msg += ' (Processing time: ' + (Date.now() - startTime) / 1000 + ' s)';
   console.log(msg);
-  v.showAlert(msg, 'success');
   v.allowCursorActivity = true;
+  v.showAlert(msg, 'success');
 
   // digs through xml tree recursively, when explore=true, just adding ids that are pointed to
   function dig(el, explore = false) {
@@ -1910,7 +1913,10 @@ export function addZone(v, cm, rect, addMeasure = true) {
     if (prevMeas.nodeName !== 'measure') {
       // try to find closest measure element
       let m = prevMeas.closest('measure');
-      if (!m) return false; // and stop, if unsuccessful
+      if (!m) {
+        v.allowCursorActivity = true;
+        return false; // and stop, if unsuccessful
+      }
       prevMeas = m;
     }
 

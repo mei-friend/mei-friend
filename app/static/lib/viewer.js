@@ -1930,7 +1930,10 @@ export default class Viewer {
     if (id === '') {
       // empty note id
       id = this.setCursorToPageBeginning(cm); // re-defines lastNotId
-      if (!id) return;
+      if (!id) {
+        this.allowCursorActivity = true;
+        return;
+      }
     }
     let element;
     id = utils.escapeXmlId(id);
@@ -1941,7 +1944,10 @@ export default class Viewer {
       id = utils.escapeXmlId(this.lastNoteId);
       if (id) element = document.querySelector('g#' + id);
     }
-    if (!element) return;
+    if (!element) {
+      this.allowCursorActivity = true;
+      return;
+    }
     console.info('Navigate ' + dir + ' ' + incElName + '-wise for: ', element);
     let x = dutils.getX(element);
     let y = dutils.getY(element);
@@ -1964,6 +1970,7 @@ export default class Viewer {
           let staff = element.closest('.staff');
           let stNo = staff.getAttribute('data-n');
           this.navigateBeyondPage(cm, dir, what, stNo, lyNo, y);
+          this.allowCursorActivity = true;
           return;
         }
       }
