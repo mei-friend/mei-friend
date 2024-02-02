@@ -219,9 +219,18 @@ export async function situateMarkup(markupItem) {
  */
 export function selectMarkup(xmlDoc, selectString = '') {
   let result;
-  result = selectApparatus(xmlDoc, selectString);
-  result = selectChoiceSubst(xmlDoc, 'choice', selectString);
-  result = selectChoiceSubst(xmlDoc, 'subst', selectString);
+  let appResult = selectApparatus(xmlDoc, selectString);
+  if (appResult.changed === true) {
+    result = appResult;
+  }
+  let choiceResult = selectChoiceSubst(xmlDoc, 'choice', selectString);
+  if (result == undefined && choiceResult.changed === true) {
+    result = choiceResult;
+  }
+  let substResult = selectChoiceSubst(xmlDoc, 'subst', selectString);
+  if (result == undefined && substResult.changed === true) {
+    result = substResult;
+  }
   return result;
 } // selectMarkup()
 
