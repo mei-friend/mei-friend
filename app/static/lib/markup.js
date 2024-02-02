@@ -710,6 +710,11 @@ function mintSuppliedId(id, nodeName, v) {
 export function deleteMarkup(markupItem) {
   //updateChoiceOptions(markupItem.content, true);
   markupItem.selection.forEach((id) => {
+    // make sure to load the whole unfiltered file if in speed mode has been filtered for variant readings
+    // otherwise there are not all children of alternative encoding elements available
+    if(v.xmlDocOutdated === true) {
+      v.loadXml(cm.getValue(), true);
+    }
     var toDelete = v.xmlDoc.querySelector("[*|id='" + id + "']");
     var parent = toDelete.parentElement;
     var descendants = new DocumentFragment();
