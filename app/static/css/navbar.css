@@ -388,8 +388,8 @@
   max-width: 120px;
 }
 
-/* language selection list */
-#languageSelectionList {
+/* language selection  / profile panel lists */
+#languageSelectionList, #profilePanelList {
   position:absolute;
   right: 0px;
   border-radius: 4px;
@@ -397,10 +397,39 @@
   padding-top:.2em;
 }
 
-#languageSelectionList td {
+#profilePanelList table { 
+  border-collapse: collapse;
+}
+
+#profilePanelList td.profilePanelListFnc { 
+  /* condense the function buttons */
+  padding: 0px;
+  margin: 0px;
+  width: 1.5em;
+  height: 1.5em;
+  text-align: center;
+  vertical-align: middle;
+  cursor: pointer;
+}
+
+#profilePanelList tr {
+  border: dotted;
+  border-width: 1px 0;
+} 
+
+#profilePanelList tr:first-child {
+  border-top: none;
+}
+
+#profilePanelList tr:last-child {
+  border-bottom: none;
+}
+
+#languageSelectionList td, #profilePanelList td {
   padding-left: 0.5em;
   padding-right: 0.5em;
   color: var(--textColor);
+  white-space: nowrap;
 }
 
 #languageSelectionList .selectedLang {

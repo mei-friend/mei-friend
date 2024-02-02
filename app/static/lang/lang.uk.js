@@ -83,7 +83,7 @@ export const lang = {
   },
 
   // Main menu bar
-  githubLoginLink: { text: 'Увійти' },
+  githubLoginLinkText: { text: 'git' },
 
   month: {
     jan: 'Січень',

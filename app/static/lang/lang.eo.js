@@ -89,7 +89,7 @@ export const lang = {
   },
 
   // Ĉefmenuo
-  githubLoginLink: { text: 'Ensaluti' },
+  githubLoginLinkText: { text: 'git' },
 
   month: {
     jan: 'Januaro',

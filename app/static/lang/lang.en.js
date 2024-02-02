@@ -8,6 +8,7 @@ import { heart } from '../css/icons.js';
 export const lang = {
   // Splash screen
   aboutMeiFriend: { text: 'About mei-friend ' },
+
   showSplashScreen: {
     text: 'Show splash screen on load',
     description: 'Show the mei-friend splash screen when the application is loaded',
@@ -95,7 +96,7 @@ export const lang = {
   },
 
   // Main menu bar
-  githubLoginLink: { text: 'Login' },
+  githubLoginLinkText: { text: 'git' },
 
   month: {
     jan: 'January',
@@ -994,4 +995,11 @@ export const lang = {
   missingIdsWarningAlert: {
     text: 'mei-friend is unable to scroll to the selected elements in the encoding. Please add ids to the encoding.',
   },
+
+  // profile panel
+  profile_githubNameOrLoginMsg: { text: 'Login to GitHub' },
+  profile_gitlabNameOrLoginMsg: { text: 'Login to GitLab' },
+  profile_solidNameOrLoginMsg: { text: 'Login to Solid' }, 
+  profile_codebergNameOrLoginMsg: { text: 'Login to Codeberg' },
+
 };

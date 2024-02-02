@@ -772,7 +772,7 @@ export function logoutFromGithub() {
 
 export function refreshGithubMenu() {
   // display Github name
-  document.getElementById('GithubName').innerText =
+  document.getElementById('profile_githubNameOrLoginMsg').innerText =
     github.author.name === 'None' ? github.userLogin : github.author.name;
   // populate Github menu
   let githubMenu = document.getElementById('GithubMenu');

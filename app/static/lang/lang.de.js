@@ -97,7 +97,7 @@ export const lang = {
   },
 
   // Main menu bar
-  githubLoginLink: { text: 'Anmelden' },
+  githubLoginLinkText: { text: 'git' },
 
   month: {
     jan: 'Januar',

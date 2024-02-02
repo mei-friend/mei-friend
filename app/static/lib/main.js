@@ -30,6 +30,7 @@ export let fileLocationType = ''; // file, github, url
 export let isMEI; // is the currently edited file native MEI?
 export let fileChanged = false; // flag to track whether unsaved changes to file exist
 export let translator; // translator object for language support
+export let profile; // profile object for tracking user login status and other info on integrated platforms
 
 export const sampleEncodings = [];
 export const samp = {
@@ -117,6 +118,7 @@ import {
   supportedLanguages,
 } from './defaults.js';
 import Translator from './translator.js';
+import Profile from './profile.js';
 import { luteconv } from './luteconv.js';
 import { buildLanguageSelection, translateLanguageSelection } from './language-selector.js';
 import { runLanguageChecks } from '../tests/checkLangs.js';
@@ -379,7 +381,15 @@ async function suspendedValidate(text, updateLinting, options) {
 
 // when initial page content has been loaded
 document.addEventListener('DOMContentLoaded', function () {
-  // disable GitHub menu if server-side configuration not available
+  // create new profile object
+  profile = new Profile();
+  // for each git provider, note whether server-side configuration is available
+  profile.initialise({
+    github: gitEnabled,
+    gitlab: false, // TODO gitlab integration
+    codeberg: false, // TODO codeberg integration
+  })
+
   if (!gitEnabled) {
     document.getElementById('GithubButton').disabled = true;
   }
@@ -1569,6 +1579,14 @@ export let cmd = {
       }
     }
   },
+  showProfilePanel: () => {
+    const profileSel = document.getElementById('profilePanelList');
+    profileSel.style.display = 'block';
+  },
+  hideProfilePanel: () => {
+    const profileSel = document.getElementById('profilePanelList');
+    profileSel.style.display = 'none';
+  },
   showLanguageSelection: () => {
     const langSel = document.getElementById('languageSelectionList');
     langSel.style.display = 'block';
@@ -1840,6 +1858,12 @@ function addEventListeners(v, cm) {
     }
   });
   document.getElementById('showAnnotationMenu').addEventListener('click', cmd.showAnnotationPanel);
+  document.getElementById('showProfilePanelButton').addEventListener('mouseenter', () => {
+    cmd.showProfilePanel();
+  });
+  document.getElementById('showProfilePanelButton').addEventListener('mouseleave', () => {
+    cmd.hideProfilePanel();
+  });
   document.getElementById('showLanguageSelectionButton').addEventListener('mouseenter', () => {
     cmd.showLanguageSelection();
   });
