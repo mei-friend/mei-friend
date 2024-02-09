@@ -954,7 +954,7 @@
             id="solidButton"
             class="tablink"
             title="Login to Solid"
-            onclick="switchTab(event, 'annotationPanel')"
+            onclick="switchTab(event, 'annotationPanel', 'flex')"
             data-tab="solidTab"
           >
             <!-- Solid logo SVG: Andrei Sambra, CC BY-SA 4.0 
@@ -1009,7 +1009,7 @@
           <button
             id="annotationListButton"
             class="tablink defaultOpen"
-            onclick="switchTab(event, 'annotationPanel')"
+            onclick="switchTab(event, 'annotationPanel', 'flex')"
             title="List annotations"
             data-tab="listAnnotations"
           >
@@ -1022,7 +1022,7 @@
           <button
             id="markupToolsButton"
             class="tablink"
-            onclick="switchTab(event, 'annotationPanel')"
+            onclick="switchTab(event, 'annotationPanel', 'flex')"
             title="Markup tools"
             data-tab="markupTools"
           >
@@ -1038,7 +1038,7 @@
           <button
             id="annotationToolsButton"
             class="tablink"
-            onclick="switchTab(event, 'annotationPanel')"
+            onclick="switchTab(event, 'annotationPanel', 'flex')"
             title="Annotation tools"
             data-tab="annotationTools"
           >
@@ -1317,7 +1317,7 @@
         <button
           id="meifriendOptionsTab"
           class="tablink"
-          onclick="switchTab(event, 'settingsPanel')"
+          onclick="switchTab(event, 'settingsPanel', 'block')"
           title="mei-friend Settings"
           data-tab="meiFriendSettings"
         >
@@ -1326,7 +1326,7 @@
         <button
           id="editorOptionsTab"
           class="tablink defaultOpen"
-          onclick="switchTab(event, 'settingsPanel')"
+          onclick="switchTab(event, 'settingsPanel', 'block')"
           title="Editor Settings"
           data-tab="editorSettings"
         >
@@ -1335,7 +1335,7 @@
         <button
           id="verovioOptionsTab"
           class="tablink"
-          onclick="switchTab(event, 'settingsPanel')"
+          onclick="switchTab(event, 'settingsPanel', 'block')"
           title="Verovio Options"
           data-tab="verovioSettings"
         >
@@ -1409,7 +1409,7 @@
       });
 
     // switch tabs in settings menu
-    function switchTab(ev, containingElementId) {
+    function switchTab(ev, containingElementId, displayOption) {
       console.log("switchtab :", ev, containingElementId)
       //const tabId = ev.target.dataset.tab;
       const tabId = ev.target.closest("[data-tab]").dataset.tab;
@@ -1419,8 +1419,8 @@
       if (containingElement) {
         // hide all tab contents except tabId
         for (let cont of containingElement.getElementsByClassName('tabcontent')) {
-          cont.style.display = cont.id === tabId ? 'flex' : 'none'; 
-          // change block to flex to fix horizontal list of all things
+          cont.style.display = cont.id === tabId ? displayOption : 'none'; 
+          // change block to flex to fix horizontal list of all things, block for settings
         }
         // remove class "active" from tablinks except for current target
         for (let tab of containingElement.getElementsByClassName('tablink')) {
