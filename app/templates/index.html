@@ -1066,13 +1066,29 @@
                   <span id="addChoiceText">&lt;choice&gt;</span>
                   <div id="choice-content-options" class="markup-dropdown-content">
                     <a id="choiceSicCorr" data-target="choiceContentTarget" data-content-choice="sic,corr"
-                      class="content-option" href="#">sic | corr</a>
+                      class="content-option" href="#">
+                      <span class="sicLabel">sic</span> 
+                      | 
+                      <span class="corrLabel">corr</span>
+                    </a>
                     <a id="choiceCorrSic" data-target="choiceContentTarget" data-content-choice="corr,sic"
-                      class="content-option" href="#">corr | sic</a>
+                      class="content-option" href="#">
+                      <span class="corrLabel">corr</span> 
+                      | 
+                      <span class="sicLabel">sic</span>
+                    </a>
                     <a id="choiceOrigReg" data-target="choiceContentTarget" data-content-choice="orig,reg"
-                      class="content-option" href="#">orig | reg</a>
+                      class="content-option" href="#">
+                      <span class="origLabel">orig</span> 
+                      | 
+                      <span class="regLabel">reg</span>
+                    </a>
                     <a id="choiceRegOrig" data-target="choiceContentTarget" data-content-choice="reg,orig"
-                      class="content-option" href="#">reg | orig</a>
+                      class="content-option" href="#">
+                      <span class="regLabel">reg</span> 
+                      | 
+                      <span class="origLabel">orig</span>
+                    </a>
                   </div>
                 </div>
                 <div class="markup-dropdown">
@@ -1091,9 +1107,17 @@
                   <span id="addSubstText">&lt;subst&gt;</span>
                   <div id="subst-content-options" class="markup-dropdown-content">
                     <a id="substAddDel" data-target="substContentTarget" data-content-choice="add,del"
-                      class="content-option" href="#">add | del</a>
+                      class="content-option" href="#">
+                      <span class="addLabel">add</span> 
+                      | 
+                      <span class="delLabel">del</span>
+                    </a>
                     <a id="substDelAdd" data-target="substContentTarget" data-content-choice="del,add"
-                      class="content-option" href="#">del | add</a>
+                      class="content-option" href="#">
+                      <span class="delLabel">del</span> 
+                      | 
+                      <span class="addLabel">add</span>
+                    </a>
                   </div>
                 </div>
                 <div class="markup-dropdown">
@@ -1130,7 +1154,7 @@
               </div>
             </div>
             <div class="annotationToolsIconGroup markup-dropdown">
-              <span id="addSicText" class="annotationToolsIcon">Sic</span>
+              <span id="addSicText" class="annotationToolsIcon sicLabel">Sic</span>
               <div class="markup-dropdown-content">
                 <a class="addMarkup" data-el-name="sic" data-selection="" id="addSic" href="#">Selection</a>
                 <a class="addMarkup" data-el-name="sic" data-selection="artic" id="addSicArtic" href="#">Articulation</a>
@@ -1138,7 +1162,7 @@
               </div>
             </div>
             <div class="annotationToolsIconGroup markup-dropdown">
-              <span id="addCorrText" class="annotationToolsIcon">Corr</span>
+              <span id="addCorrText" class="annotationToolsIcon corrLabel">Corr</span>
               <div class="markup-dropdown-content">
                 <a class="addMarkup" data-el-name="corr" data-selection="" id="addCorr" href="#">Selection</a>
                 <a class="addMarkup" data-el-name="corr" data-selection="artic" id="addCorrArtic"
@@ -1147,7 +1171,7 @@
               </div>
             </div>
             <div class="annotationToolsIconGroup markup-dropdown">
-              <span id="addOrigText" class="annotationToolsIcon">Orig</span>
+              <span id="addOrigText" class="annotationToolsIcon origLabel">Orig</span>
               <div class="markup-dropdown-content">
                 <a class="addMarkup" data-el-name="orig" data-selection="" id="addOrig" href="#">Selection</a>
                 <a class="addMarkup" data-el-name="orig" data-selection="artic" id="addOrigArtic"
@@ -1156,7 +1180,7 @@
               </div>
             </div>
             <div class="annotationToolsIconGroup markup-dropdown">
-              <span id="addRegText" class="annotationToolsIcon">Reg</span>
+              <span id="addRegText" class="annotationToolsIcon regLabel">Reg</span>
               <div class="markup-dropdown-content">
                 <a class="addMarkup" data-el-name="reg" data-selection="" id="addReg" href="#">Selection</a>
                 <a class="addMarkup" data-el-name="reg" data-selection="artic" id="addRegArtic" href="#">Articulation</a>
@@ -1167,7 +1191,7 @@
           <div class="markupGrp">
             <span id="descMarkupGrp">Descriptive Markup</span>
             <div class="annotationToolsIconGroup markup-dropdown">
-              <span id="addAddText" class="annotationToolsIcon">Add</span>
+              <span id="addAddText" class="annotationToolsIcon addLabel">Add</span>
               <div class="markup-dropdown-content">
                 <a class="addMarkup" data-el-name="add" data-selection="" id="addAdd" href="#">Selection</a>
                 <a class="addMarkup" data-el-name="add" data-selection="artic" id="addAddArtic" href="#">Articulation</a>
@@ -1175,7 +1199,7 @@
               </div>
             </div>
             <div class="annotationToolsIconGroup markup-dropdown">
-              <span id="addDelText" class="annotationToolsIcon">Del</span>
+              <span id="addDelText" class="annotationToolsIcon delLabel">Del</span>
               <div class="markup-dropdown-content">
                 <a class="addMarkup" data-el-name="del" data-selection="" id="addDel" href="#">Selection</a>
                 <a class="addMarkup" data-el-name="del" data-selection="artic" id="addDelArtic" href="#">Articulation</a>
