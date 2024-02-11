@@ -122,9 +122,14 @@ fieldset {
   background-color: var(--annotationPanelHoverColor);
 }*/
 
+.alternativeEncodingsTag{
+  border-right: 1px solid black;
+}
+
 .markup-dropdown {
   /*position: relative;*/
   display: inline-block;
+  padding: 8px 6px;
 }
 
 .markup-dropdown-content {
