@@ -1,10 +1,16 @@
 # mei-friend-online CHANGELOG.md
 
+### 1.1.6 patch
+
+* Fix version selection and parsing in speed mode
+* Fix and markup deletion in speed mode
+* Improve markup UI
+
 ### 1.1.5 patch
 
 * Include filtering for different versions inside `<choice>` or `<subst>` in speed mode.
 * Update midi on switching versions in the notation panel.
-* Honrizontal layout for markup panel added.
+* Horizontal layout for markup panel added.
 
 ### 1.1.4 Refine Editorial Markup
 
