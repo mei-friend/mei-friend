@@ -1411,11 +1411,15 @@ span.keyIcon {
   cursor: pointer;
 }
 
+#profileOptionsTab svg {
+  fill: var(--textColor);
+}
+
 /* Style the close button */
 .topright {
-  color: var(--textcolor);
+  color: var(--textColor);
   float: right;
-  padding: 6px 12px;
+  padding: 6px 10px;
   cursor: pointer;
   font-size: 22px;
 }

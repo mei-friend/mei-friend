@@ -73,7 +73,7 @@ import {
   manualCurrentPage,
   generateSectionSelect,
 } from './control-menu.js';
-import { clock, unverified, xCircleFill } from '../css/icons.js';
+import { clock, profile as profileIcon, unverified, xCircleFill } from '../css/icons.js';
 import { keymap } from '../keymaps/default-keymap.js';
 import { setCursorToId } from './utils.js';
 import { getInMeasure, navElsSelector, getElementAtCursor } from './dom-utils.js';
@@ -391,6 +391,8 @@ document.addEventListener('DOMContentLoaded', function () {
     gitlab: false, // TODO gitlab integration
     codeberg: false, // TODO codeberg integration
   });
+
+  document.getElementById('profileOptionsTab').innerHTML = profileIcon;
 
   if (!gitEnabled) {
     document.getElementById('GithubButton').disabled = true;
