@@ -643,7 +643,8 @@ function completeInitialLoad() {
 
   // populate the Solid tab in the annotations panel
   populateSolidTab();
-
+  // HACK 20240212: temporarily make profile.github.obj a shared / exported variable, until githubmenu can be refactored
+  github = profile.github.obj;
   profile.drawProfileTable(); // draw profile table according to logged-in status
 
   // restore localStorage if we have it
@@ -704,9 +705,6 @@ function completeInitialLoad() {
     meiFileLocationPrintable = '';
     openFile(undefined, false, false); // default MEI
   }
-  // HACK 20240212: temporarily make profile.github.obj a shared / exported variable, until githubmenu can be refactored
-  github = profile.github.obj;
-
   if (isLoggedIn) {
     // regardless of storage availability:
     // if we are logged in, refresh github menu

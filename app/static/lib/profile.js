@@ -73,6 +73,13 @@ export default class Profile {
       profileName.id = `profile_${profile}UserName`;
       profileName.innerText = this[profile].obj.author.name || this[profile].obj.userLogin;
       profileName.removeEventListener('click', this[profile].login);
+      profileName.addEventListener('click', () => {
+        // visually indicate git menu dropdown button
+        const gitBtn = document.getElementById('gitMenu');
+        gitBtn.classList.add('indicate');
+        // remove after 2s
+        setTimeout(() => gitBtn.classList.remove('indicate'), 2000);
+      });
     } else {
       profileName.id = `profile_${profile}LoginMsg`;
       profileName.addEventListener('click', this[profile].login);
@@ -95,18 +102,15 @@ export default class Profile {
 
   toggleGitMenu() {
     // if at least one git provider is available and user is logged in, show git menu
-    let gitBtn = document.getElementById('GithubButton');
-    if (gitBtn) {
-      let gitContainer = gitBtn.closest('.dropdown');
-      if (
-        (this.github.available && this.github.obj.userLogin) ||
-        (this.gitlab.available && this.gitlab.obj.userLogin) ||
-        (this.codeberg.available && this.codeberg.obj.userLogin)
-      ) {
-        gitContainer.style.display = 'block';
-      } else {
-        gitContainer.style.display = 'none';
-      }
+    let gitMenu = document.getElementById('gitMenu');
+    if (
+      (this.github.available && this.github.obj.userLogin) ||
+      (this.gitlab.available && this.gitlab.obj.userLogin) ||
+      (this.codeberg.available && this.codeberg.obj.userLogin)
+    ) {
+      gitMenu.style.display = 'block';
+    } else {
+      gitMenu.style.display = 'none';
     }
   } // toggleGitMenu()
 }

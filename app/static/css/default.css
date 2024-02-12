@@ -495,6 +495,10 @@ a:active {
   animation: showFocus 3s;
 }
 
+#gitMenu.indicate { 
+  animation:indicate 2s;
+}
+
 .resizer {
   background-color: var(--dropdownHeadingColor);
   z-index: 6;
@@ -1675,6 +1679,27 @@ midi-player::part(play-button) {
 
 #closeMidiPlaybackControlBarButton:hover {
   background-color: var(--settingsLinkHoverColor);
+}
+
+@keyframes indicate { 
+  0% { 
+    box-shadow: inset 1px 2px 4px 16px var(--dropdownBackgroundColor);
+  }
+  20% { 
+    box-shadow: inset 1px 2px 4px 16px var(--dropdownHeadingColor);
+  }
+  40% { 
+    box-shadow: inset 1px 2px 4px 16px var(--dropdownBackgroundColor);
+  }
+  60% { 
+    box-shadow: inset 1px 2px 4px 16px var(--dropdownHeadingColor);
+  }
+  80% { 
+    box-shadow: inset 1px 2px 4px 16px var(--dropdownBackgroundColor);
+  }
+  100% { 
+    box-shadow: inset 1px 2px 4px 16px var(--dropdownHeadingColor);
+  }
 }
 
 @keyframes showFocus {
