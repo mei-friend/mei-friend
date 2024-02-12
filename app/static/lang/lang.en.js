@@ -997,9 +997,8 @@ export const lang = {
   },
 
   // profile panel
-  profile_githubNameOrLoginMsg: { text: 'Login to GitHub' },
-  profile_gitlabNameOrLoginMsg: { text: 'Login to GitLab' },
-  profile_solidNameOrLoginMsg: { text: 'Login to Solid' }, 
-  profile_codebergNameOrLoginMsg: { text: 'Login to Codeberg' },
-
+  profile_githubLoginMsg: { text: 'Login to GitHub' },
+  profile_gitlabLoginMsg: { text: 'Login to GitLab' },
+  profile_solidLoginMsg: { text: 'Login to Solid' },
+  profile_codebergLoginMsg: { text: 'Login to Codeberg' },
 };

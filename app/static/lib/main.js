@@ -2,6 +2,9 @@
 export const version = '1.0.10';
 export const versionDate = '31 January 2024'; // use full or 3-character english months, will be translated
 
+// HACK 20240212: temporarily make profile.github.obj a shared / exported variable until githubmenu can be refactored
+export let github;
+
 var vrvWorker;
 var spdWorker;
 var tkAvailableOptions;
@@ -19,7 +22,6 @@ export var cm;
 export var v; // viewer instance
 export var validator; // validator object
 export var rngLoader; // object for loading a relaxNG schema for hinting
-export let github; // github API wrapper object
 export let storage = new Storage();
 export var tkVersion = ''; // string of the currently loaded toolkit version
 export var tkUrl = ''; // string of the currently loaded toolkit origin
@@ -186,7 +188,7 @@ export function setFileChangedState(fileChangedState) {
     fileStatusElement.classList.remove('changed');
     fileChangedIndicatorElement.innerText = '';
   }
-  if (isLoggedIn && github && github.filepath && commitUI) {
+  if (isLoggedIn && profile.github.available && profile.github.obj.filepath && commitUI) {
     setCommitUIEnabledStatus();
   }
   if (storage.supported) {
@@ -289,16 +291,16 @@ export function updateLocalStorage(meiXml) {
 
 export function updateGithubInLocalStorage() {
   if (storage.supported && !storage.override && isLoggedIn) {
-    const author = github.author;
+    const author = profile.github.obj.author;
     const name = author.name;
     const email = author.email;
     storage.github = {
-      githubRepo: github.githubRepo,
-      githubToken: github.githubToken,
-      branch: github.branch,
-      commit: github.commit,
-      filepath: github.filepath,
-      userLogin: github.userLogin,
+      githubRepo: profile.github.obj.githubRepo,
+      githubToken: profile.github.obj.githubToken,
+      branch: profile.github.obj.branch,
+      commit: profile.github.obj.commit,
+      filepath: profile.github.obj.filepath,
+      userLogin: profile.github.obj.userLogin,
       userName: name,
       userEmail: email,
     };
@@ -388,7 +390,7 @@ document.addEventListener('DOMContentLoaded', function () {
     github: gitEnabled,
     gitlab: false, // TODO gitlab integration
     codeberg: false, // TODO codeberg integration
-  })
+  });
 
   if (!gitEnabled) {
     document.getElementById('GithubButton').disabled = true;
@@ -562,7 +564,7 @@ function completeInitialLoad() {
     if (storage.github) {
       // use github object from local storage if available
       isLoggedIn = true;
-      github = new Github(
+      profile.github.obj = new Github(
         storage.github.githubRepo,
         storage.github.githubToken,
         storage.github.branch,
@@ -575,14 +577,14 @@ function completeInitialLoad() {
       //document.querySelector("#fileLocation").innerText = meiFileLocationPrintable;
     } else if (isLoggedIn) {
       // initialise and store new github object
-      github = new Github('', githubToken, '', '', '', userLogin, userName, userEmail);
+      profile.github.obj = new Github('', githubToken, '', '', '', userLogin, userName, userEmail);
       storage.github = {
-        githubRepo: github.githubRepo,
-        githubToken: github.githubToken,
-        branch: github.branch,
-        commit: github.commit,
-        filepath: github.filepath,
-        userLogin: github.userLogin,
+        githubRepo: profile.github.obj.githubRepo,
+        githubToken: profile.github.obj.githubToken,
+        branch: profile.github.obj.branch,
+        commit: profile.github.obj.commit,
+        filepath: profile.github.obj.filepath,
+        userLogin: profile.github.obj.userLogin,
         userName: userName,
         userEmail: userEmail,
       };
@@ -642,6 +644,8 @@ function completeInitialLoad() {
   // populate the Solid tab in the annotations panel
   populateSolidTab();
 
+  profile.drawProfileTable(); // draw profile table according to logged-in status
+
   // restore localStorage if we have it
   if (storage.supported) {
     // save (most) URL parameters in storage
@@ -683,34 +687,38 @@ function completeInitialLoad() {
         setFileChangedState(false);
       }
     }
-    if (storage.forkAndOpen && github) {
+
+    if (storage.forkAndOpen && profile.github.available) {
       // we've arrived back after an automated log-in request
       // now fork and open the supplied URL, and remove it from storage
-      forkAndOpen(github, storage.forkAndOpen);
+      forkAndOpen(profile.github.obj, storage.forkAndOpen);
       storage.removeItem('forkAndOpen');
     }
   } else {
     // no local storage
     if (isLoggedIn) {
       // initialise new github object
-      github = new Github('', githubToken, '', '', '', userLogin, userName, userEmail);
+      profile.github.obj = new Github('', githubToken, '', '', '', userLogin, userName, userEmail);
     }
     meiFileLocation = '';
     meiFileLocationPrintable = '';
     openFile(undefined, false, false); // default MEI
   }
+  // HACK 20240212: temporarily make profile.github.obj a shared / exported variable, until githubmenu can be refactored
+  github = profile.github.obj;
+
   if (isLoggedIn) {
     // regardless of storage availability:
     // if we are logged in, refresh github menu
     refreshGithubMenu();
-    if (github.githubRepo && github.branch && github.filepath) {
+    if (profile.github.obj.githubRepo && profile.github.obj.branch && profile.github.obj.filepath) {
       // preset github menu to where the user left off, if we can
       fillInBranchContents();
     }
   }
   if (forkParam === 'true' && urlFileName) {
-    if (isLoggedIn && github) {
-      forkAndOpen(github, urlFileName);
+    if (isLoggedIn && profile.github.available) {
+      forkAndOpen(profile.github.obj, urlFileName);
     } else {
       if (storage.supported) {
         storage.safelySetStorageItem('forkAndOpen', urlFileName);
@@ -807,7 +815,7 @@ export async function openUrlFetch(url = '', updateAfterLoading = true) {
     const headers = { Accept: 'application/xml, text/xml, application/mei+xml' };
     if (isLoggedIn && url.href.trim().startsWith('https://raw.githubusercontent.com')) {
       // GitHub URL - use GitHub credentials to enable URL fetch from private repos
-      github.directlyReadFileContents(url.href).then((data) => {
+      profile.github.obj.directlyReadFileContents(url.href).then((data) => {
         openUrlProcess(data, url, updateAfterLoading);
       });
     } else {
@@ -851,8 +859,8 @@ function openUrlProcess(content, url, updateAfterLoading) {
   meiFileName = url.pathname.substring(url.pathname.lastIndexOf('/') + 1);
   if (storage.github && isLoggedIn) {
     // re-initialise github menu since we're now working from a URL
-    github.filepath = '';
-    github.branch = '';
+    profile.github.obj.filepath = '';
+    profile.github.obj.branch = '';
     if (storage.supported) {
       updateGithubInLocalStorage();
     }
@@ -1129,8 +1137,8 @@ let inputFormats = {
 export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true, updateAfterLoading = true) {
   if (storage.github && isLoggedIn) {
     // re-initialise github menu since we're now working from a file
-    github.filepath = '';
-    github.branch = '';
+    profile.github.obj.filepath = '';
+    profile.github.obj.branch = '';
     if (storage.supported) {
       updateGithubInLocalStorage();
     }
@@ -1143,7 +1151,7 @@ export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true, upd
     storage.fileLocationType = 'file';
   }
   fileLocationType = 'file';
-  if (github) github.filepath = '';
+  if (profile.github.available) profile.github.obj.filepath = '';
   if (typeof file === 'string') {
     // with fileName string
     meiFileName = file;
@@ -1311,8 +1319,8 @@ function openFileDialog(accept = '*') {
       openFile(files[0]);
       if (isLoggedIn) {
         // re-initialise github menu since we're now working locally
-        github.filepath = '';
-        github.branch = '';
+        profile.github.obj.filepath = '';
+        profile.github.obj.branch = '';
         if (storage.supported) {
           updateGithubInLocalStorage();
         }
@@ -2323,10 +2331,10 @@ export function handleEditorChanges() {
   const commitUI = document.querySelector('#commitUI');
   let changeIndicator = false;
   let meiXml = cm.getValue();
-  if (isLoggedIn && github.filepath && commitUI) {
+  if (isLoggedIn && profile.github.obj.filepath && commitUI) {
     // fileChanged flag may have been set from storage - if so, run with it
     // otherwise set it to true if we've changed the file content this session
-    changeIndicator = fileChanged || meiXml !== github.content;
+    changeIndicator = fileChanged || meiXml !== profile.github.obj.content;
   } else {
     // interpret any CodeMirror change as a file changed state
     changeIndicator = true;
@@ -2486,7 +2494,13 @@ export function generateUrl() {
   if (fileLocationType === 'url') {
     url += 'file=' + meiFileLocation;
   } else if (fileLocationType === 'github') {
-    url += 'file=' + 'https://raw.githubusercontent.com/' + github.githubRepo + '/' + github.branch + github.filepath;
+    url +=
+      'file=' +
+      'https://raw.githubusercontent.com/' +
+      profile.github.obj.githubRepo +
+      '/' +
+      profile.github.obj.branch +
+      profile.github.obj.filepath;
   }
   // generate other parameters
   url += amp + 'scale=' + v.vrvOptions.scale;
