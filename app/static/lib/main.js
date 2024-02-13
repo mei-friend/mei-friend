@@ -536,6 +536,7 @@ function completeInitialLoad() {
   }
   v.addCmOptionsToSettingsPanel(defaultCodeMirrorOptions);
   v.addMeiFriendOptionsToSettingsPanel();
+  v.addProfileOptionsToSettingsPanel(profile);
   v.applySettingsFilter();
 
   // check autoValidate as URL param

@@ -1676,6 +1676,38 @@ export default class Viewer {
     }
   } // addVrvOptionsToSettingsPanel()
 
+  addProfileOptionsToSettingsPanel(profiles, restoreFromLocalStorage = true) {
+    // TODO add profile options to settings panel
+    let psp = document.getElementById('profileSettings');
+    let addListeners = false; // add event listeners only the first time
+    if (!/\w/g.test(psp.innerHTML)) addListeners = true;
+    psp.innerHTML = '<div class="settingsHeader" id="profileSettingsHeader">External Services</div>';
+    let storage = window.localStorage;
+    let currentHeader;
+    Object.keys(profiles).forEach((profile) => {
+      console.log('PROFILE: ', profile, profiles[profile]);
+      Object.keys(profiles[profile].options).forEach((opt) => {
+        let o = profiles[profile].options[opt];
+        let value = o.default;
+        if (storage.hasOwnProperty('profile-' + opt)) {
+          if (restoreFromLocalStorage) value = storage['profile-' + opt];
+          else delete storage['profile-' + opt];
+        }
+        let div = this.createOptionsItem(opt, o, value);
+        if (div) {
+          if (div.classList.contains('optionsSubHeading')) {
+            currentHeader = div;
+            psp.appendChild(currentHeader);
+          } else if (currentHeader) {
+            currentHeader.appendChild(div);
+          } else {
+            psp.appendChild(div);
+          }
+        }
+      });
+    });
+  }
+
   // TODO: does not get called (WG., 12 Okt 2022)
   // adds an event listener to the targetNode, to listen to 'header' elements (details/summary)
   // and storing this information in local storage, using the storageSuffix in the variable name
@@ -1854,9 +1886,18 @@ export default class Viewer {
         input.setAttribute('value', o.title);
         input.setAttribute('title', o.description);
         break;
+      case 'text':
+        input = document.createElement('input');
+        input.setAttribute('type', 'text');
+        input.setAttribute('name', opt);
+        input.setAttribute('id', opt);
+        input.setAttribute('placeholder', o.placeholder || '');
+        input.setAttribute('value', optDefault || '');
+        input.setAttribute('title', o.description);
+        break;
       default:
         console.log(
-          'Creating Verovio Options: Unhandled data type: ' +
+          'Creating Settings Options: Unhandled data type: ' +
             o.type +
             ', title: ' +
             o.title +

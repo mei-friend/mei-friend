@@ -1303,7 +1303,7 @@
       // switch tabs in settings menu
       function switchTab(ev, containingElementId) {
         console.log('switchtab :', ev, containingElementId);
-        const tabId = ev.target.dataset.tab;
+        const tabId = ev.target.closest('button').dataset.tab;
         // console.log('switchTab: ', containingElementId, tabId);
         // console.log('switchTab: ', ev);
         let containingElement = document.getElementById(containingElementId);

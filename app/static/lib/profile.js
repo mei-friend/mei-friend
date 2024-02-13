@@ -6,24 +6,71 @@ export default class Profile {
       login: () => (window.location.href = '/login'),
       available: false,
       icon: githubLogo,
+      options: {
+        titleGitHubSettings: {
+          type: 'header',
+          title: 'GitHub',
+          description: 'GitHub (git cloud service), used for version control and collaboration',
+        },
+      },
       obj: {}, // handle object for GitHub
     };
     this.solid = {
       login: () => console.log('login to solid'), // stub
       available: false,
       icon: solidLogo,
+      options: {
+        titleSolidSettings: {
+          type: 'header',
+          title: 'Solid',
+          description:
+            'Solid (decentralised Web platform), used for stand-off (RDF/Linked Data) annotation storage and sharing',
+        },
+        /*idpSolidSettings: {
+          type: 'select',
+          values: ['https://solidcommunity.net', 'https://solid.inrupt.net'],
+          label: 'Identity Provider (IDP)',
+          default: 'https://solidcommunity.net',
+        },*/
+        idpSolidSelect: {
+          type: 'select',
+          title: 'Select IdP',
+          description:
+            'Select a Solid Identity Provider (IdP) from the list (or choose other radio button to enter a custom one)',
+          labels: ['Solid Community', 'Inrupt'],
+          values: ['https://solidcommunity.net', 'https://solid.inrupt.net'],
+          default: true,
+          radioId: 'idpSolidPrescribed',
+          radioName: 'idpSolidType',
+        },
+        idpSolidCustom: {
+          type: 'text',
+          title: 'Custom IdP',
+          description:
+            'Enter the URL of a custom Solid Identity Provider (IdP) (or choose a radio button to select from a list)',
+          placeholder: 'https://your.solid.provider',
+          radioId: 'idpSolidCustom',
+          radioName: 'idpSolidType',
+        },
+      },
       obj: {}, // handle object for Solid
     };
     this.gitlab = {
       login: () => console.log('login to gitlab'), // stub
       available: false,
       icon: gitlabLogo,
+      options: {
+        // empty for now
+      },
       obj: {}, // handle object for GitLab
     };
     this.codeberg = {
       login: () => console.log('login to codeberg'), // stub
       available: false,
       icon: codebergLogo,
+      options: {
+        // empty for now
+      },
       obj: {}, // handle object for Codeberg
     };
   } // constructor()
