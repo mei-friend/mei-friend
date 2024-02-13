@@ -12,6 +12,21 @@ export default class Profile {
           title: 'GitHub',
           description: 'GitHub (git cloud service), used for version control and collaboration',
         },
+        loginStatusGitHub: {
+          type: 'span',
+          title: 'Logged in as: ',
+          value: 'foo',
+        },
+        loginButtonGitHub: {
+          type: 'button',
+          title: 'Login to GitHub',
+          value: 'Login',
+        },
+        logoutButtonGitHub: {
+          type: 'button',
+          title: 'Logout from GitHub',
+          value: 'Logout',
+        },
       },
       obj: {}, // handle object for GitHub
     };
@@ -26,12 +41,11 @@ export default class Profile {
           description:
             'Solid (decentralised Web platform), used for stand-off (RDF/Linked Data) annotation storage and sharing',
         },
-        /*idpSolidSettings: {
-          type: 'select',
-          values: ['https://solidcommunity.net', 'https://solid.inrupt.net'],
-          label: 'Identity Provider (IDP)',
-          default: 'https://solidcommunity.net',
-        },*/
+        loginStatusSolid: {
+          type: 'span',
+          title: 'Logged in as: ',
+          value: 'foo',
+        },
         idpSolidSelect: {
           type: 'select',
           title: 'Select IdP',
@@ -51,6 +65,16 @@ export default class Profile {
           placeholder: 'https://your.solid.provider',
           radioId: 'idpSolidCustom',
           radioName: 'idpSolidType',
+        },
+        loginButtonSolid: {
+          type: 'button',
+          title: 'Login to Solid',
+          value: 'Login',
+        },
+        logoutButtonSolid: {
+          type: 'button',
+          title: 'Logout from Solid',
+          value: 'Logout',
         },
       },
       obj: {}, // handle object for Solid

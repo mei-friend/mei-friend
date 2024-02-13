@@ -1877,7 +1877,6 @@ export default class Viewer {
         break;
       case 'button':
         label.textContent = ''; // '--transpose ' + this.getTranspositionOption();
-
         label.setAttribute('title', '');
         input = document.createElement('input');
         input.setAttribute('type', 'button');
@@ -1894,6 +1893,13 @@ export default class Viewer {
         input.setAttribute('placeholder', o.placeholder || '');
         input.setAttribute('value', optDefault || '');
         input.setAttribute('title', o.description);
+        break;
+      case 'span':
+        label.textContent = o.title;
+        input = document.createElement('span');
+        input.setAttribute('name', opt);
+        input.setAttribute('id', opt);
+        input.textContent = o.value;
         break;
       default:
         console.log(
