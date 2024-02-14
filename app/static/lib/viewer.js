@@ -5,7 +5,8 @@ import * as speed from './speed.js';
 import * as utils from './utils.js';
 import { getControlMenuState, showPdfButtons, setControlMenuState, setCheckbox } from './control-menu.js';
 import { alert, download, info, success, verified, unverified, xCircleFill } from '../css/icons.js';
-import { drawFacsimile, highlightZone, loadFacsimile, zoomFacsimile } from './facsimile.js';
+import * as facs from './facsimile.js';
+//  drawFacsimile, highlightZone, zoomFacsimile
 import {
   cm,
   cmd,
@@ -624,6 +625,10 @@ export default class Viewer {
         vp.scrollTo({ top: scrollTop, left: scrollLeft, behavior: 'smooth' });
       }
     }
+
+    if (document.getElementById('showFacsimilePanel') && document.getElementById('showFacsimilePanel').checked) {
+      // scrollFacsimileTo(id);
+    }
   } // scrollSvgTo()
 
   // when editor emits changes, update notation rendering
@@ -659,7 +664,7 @@ export default class Viewer {
         if (el) {
           el.forEach((e) => {
             e.classList.add('highlighted');
-            if (e.nodeName === 'rect' && e.closest('#sourceImageSvg')) highlightZone(e);
+            if (e.nodeName === 'rect' && e.closest('#sourceImageSvg')) facs.highlightZone(e);
             e.querySelectorAll('g').forEach((g) => g.classList.add('highlighted'));
           });
         }
@@ -1354,28 +1359,28 @@ export default class Viewer {
             value ? cmd.showFacsimilePanel() : cmd.hideFacsimilePanel();
             break;
           case 'selectFacsimilePanelOrientation':
-            drawFacsimile();
+            facs.drawFacsimile();
             break;
           case 'facsimileZoomInput':
-            zoomFacsimile();
+            facs.zoomFacsimile();
             break;
           case 'showFacsimileFullPage':
             document.getElementById('facsimileFullPageCheckbox').checked = value;
-            drawFacsimile();
+            facs.drawFacsimile();
             break;
           case 'showFacsimileZones':
             document.getElementById('facsimileShowZonesCheckbox').checked = value;
             if (!value && document.getElementById('editFacsimileZones').checked) {
               document.getElementById('editFacsimileZones').click();
             }
-            drawFacsimile();
+            facs.drawFacsimile();
             break;
           case 'editFacsimileZones':
             document.getElementById('facsimileEditZonesCheckbox').checked = value;
             if (value && !document.getElementById('showFacsimileZones').checked) {
               document.getElementById('showFacsimileZones').click();
             }
-            drawFacsimile();
+            facs.drawFacsimile();
             break;
           case 'showSupplied':
             rt.style.setProperty('--suppliedColor', value ? col : 'var(--notationColor)');
