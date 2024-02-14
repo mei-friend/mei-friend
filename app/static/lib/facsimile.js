@@ -260,8 +260,9 @@ export async function drawFacsimile() {
     svgContainer.setAttribute('transform', 'scale(' + zoomFactor + ')');
     if (width !== 0) svgContainer.setAttribute('width', width);
     if (height !== 0) svgContainer.setAttribute('height', height);
-    // svgContainer.appendChild(document.createAttributeNS(svgNameSpace, 'circle'))
-    if (width !== 0 && height !== 0) svg.setAttribute('viewBox', ulx + ' ' + uly + ' ' + width + ' ' + height);
+    if (width !== 0 && height !== 0) {
+      svg.setAttribute('viewBox', ulx + ' ' + uly + ' ' + width + ' ' + height);
+    }
 
     if (false) {
       // show page name on svg

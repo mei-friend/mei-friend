@@ -596,38 +596,13 @@ export default class Viewer {
     let id = typeof cmOrId === 'string' ? cmOrId : utils.getElementIdAtCursor(cmOrId);
     if (!id) return;
     let el = document.querySelector('g#' + utils.escapeXmlId(id));
-    if (el) {
-      let changed = false;
-      let scrollLeft, scrollTop;
-      let vpRect = vp.getBoundingClientRect();
-      let elRect = el.getBBox();
-      const mx = el.getScreenCTM();
-      const closeToPerc = 0.1; // adjust scrolling only when element (close to or completely) outside
+    if (vp && el) dutils.scrollTo(vp, el);
 
-      // kind-of page-wise flipping for x
-      let sx = mx.a * (elRect.x + elRect.width / 2) + mx.c * (elRect.y + elRect.height / 2) + mx.e;
-      if (sx < vpRect.x + vpRect.width * closeToPerc) {
-        scrollLeft = vp.scrollLeft - (vpRect.x + vpRect.width * (1 - closeToPerc) - sx);
-        changed = true;
-      } else if (sx > vpRect.x + vpRect.width * (1 - closeToPerc)) {
-        scrollLeft = vp.scrollLeft - (vpRect.x + vpRect.width * closeToPerc - sx);
-        changed = true;
-      }
-
-      // y flipping
-      let sy = mx.b * (elRect.x + elRect.width / 2) + mx.d * (elRect.y + elRect.height / 2) + mx.f;
-      if (sy < vpRect.y + vpRect.height * closeToPerc || sy > vpRect.y + vpRect.height * (1 - closeToPerc)) {
-        scrollTop = vp.scrollTop - (vpRect.y + vpRect.height / 2 - sy);
-        changed = true;
-      }
-
-      if (changed) {
-        vp.scrollTo({ top: scrollTop, left: scrollLeft, behavior: 'smooth' });
-      }
-    }
-
+    // scroll to current element inside facsimile panel, if existing
     if (document.getElementById('showFacsimilePanel') && document.getElementById('showFacsimilePanel').checked) {
-      // scrollFacsimileTo(id);
+      let rect = document.querySelector('rect#' + id);
+      let fp = document.getElementById('facsimile-panel');
+      if (rect && fp) dutils.scrollTo(fp, rect);
     }
   } // scrollSvgTo()
 

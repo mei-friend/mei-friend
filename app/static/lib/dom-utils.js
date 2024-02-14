@@ -307,12 +307,12 @@ export function xmlToString(xmlNode) {
   let str = new XMLSerializer().serializeToString(xmlNode);
   str = str.replace(/(?:><)/g, '>\n<');
   str = str.replace(' xmlns="' + meiNameSpace + '"', '');
-  return str; 
+  return str;
 } // xmlToString()
 
 /**
  * Sort element attributes alphabetically, keeping xml:id first attribute
- * @param {Element} xmlNode 
+ * @param {Element} xmlNode
  */
 export function sortNodeAttributes(xmlNode) {
   let attributeNames = xmlNode.getAttributeNames();
@@ -388,3 +388,42 @@ export function getAffectedNotesFromKeySig(keySigString = '') {
     keySigAccid: keySigAccid,
   };
 } // getAffectedNotesFromKeySig()
+
+/**
+ * Scroll DOM element into view inside container element.
+ * (Called to scroll SVG and facsimile image into view.)
+ * @param {Element} container
+ * @param {Element} element
+ * @returns {boolean} if scrolled or not
+ */
+export function scrollTo(container, element) {
+  let changed = false;
+  let scrollLeft, scrollTop;
+  let ctRect = container.getBoundingClientRect();
+  let elRect = element.getBBox();
+  const mx = element.getScreenCTM(); // element matrix
+  const closeToPerc = 0.1; // adjust scrolling only when element (close to or completely) outside
+
+  // kind-of page-wise flipping for x
+  let sx = mx.a * (elRect.x + elRect.width / 2) + mx.c * (elRect.y + elRect.height / 2) + mx.e;
+  if (sx < ctRect.x + ctRect.width * closeToPerc) {
+    scrollLeft = container.scrollLeft - (ctRect.x + ctRect.width * (1 - closeToPerc) - sx);
+    changed = true;
+  } else if (sx > ctRect.x + ctRect.width * (1 - closeToPerc)) {
+    scrollLeft = container.scrollLeft - (ctRect.x + ctRect.width * closeToPerc - sx);
+    changed = true;
+  }
+
+  // y flipping
+  let sy = mx.b * (elRect.x + elRect.width / 2) + mx.d * (elRect.y + elRect.height / 2) + mx.f;
+  if (sy < ctRect.y + ctRect.height * closeToPerc || sy > ctRect.y + ctRect.height * (1 - closeToPerc)) {
+    scrollTop = container.scrollTop - (ctRect.y + ctRect.height / 2 - sy);
+    changed = true;
+  }
+
+  if (changed) {
+    container.scrollTo({ top: scrollTop, left: scrollLeft, behavior: 'smooth' });
+    return true;
+  }
+  return false;
+} // scrollTo()
