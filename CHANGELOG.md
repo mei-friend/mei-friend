@@ -3,6 +3,7 @@
 ### 1.0.9 patch
 * Facsimile panel GUI elements update local storage 
 * Verovio settings retrieved from local storage
+* Scroll to facsimile image zones corresponding to selected element in editor or notation
 
 ### 1.0.8 patch (released on 21 Jan 2024)
 * Handle facsimile graphics path correctly in GitHub repos with subdirectories
