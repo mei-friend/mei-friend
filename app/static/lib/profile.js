@@ -12,17 +12,17 @@ export default class Profile {
           title: 'GitHub',
           description: 'GitHub (git cloud service), used for version control and collaboration',
         },
-        loginStatusGitHub: {
+        github_loginStatus: {
           type: 'span',
           title: 'Logged in as: ',
-          value: 'foo',
+          value: '',
         },
-        loginButtonGitHub: {
+        github_loginButton: {
           type: 'button',
           title: 'Login to GitHub',
           value: 'Login',
         },
-        logoutButtonGitHub: {
+        github_logoutButton: {
           type: 'button',
           title: 'Logout from GitHub',
           value: 'Logout',
@@ -41,12 +41,12 @@ export default class Profile {
           description:
             'Solid (decentralised Web platform), used for stand-off (RDF/Linked Data) annotation storage and sharing',
         },
-        loginStatusSolid: {
+        solid_loginStatus: {
           type: 'span',
           title: 'Logged in as: ',
-          value: 'foo',
+          value: '',
         },
-        idpSolidSelect: {
+        solid_idpSelect: {
           type: 'select',
           title: 'Select IdP',
           description:
@@ -57,7 +57,7 @@ export default class Profile {
           radioId: 'idpSolidPrescribed',
           radioName: 'idpSolidType',
         },
-        idpSolidCustom: {
+        solid_idpCustom: {
           type: 'text',
           title: 'Custom IdP',
           description:
@@ -66,12 +66,12 @@ export default class Profile {
           radioId: 'idpSolidCustom',
           radioName: 'idpSolidType',
         },
-        loginButtonSolid: {
+        solid_loginButton: {
           type: 'button',
           title: 'Login to Solid',
           value: 'Login',
         },
-        logoutButtonSolid: {
+        solid_logoutButton: {
           type: 'button',
           title: 'Logout from Solid',
           value: 'Logout',
@@ -127,8 +127,50 @@ export default class Profile {
     });
     // insert table into profile panel
     profilePanel.appendChild(profileTable);
-    this.toggleGitMenu(); // show/hide git menu
   } // drawProfileTable()
+
+  updateSettingsStatus() {
+    /* for each profile provider, update the settings status:
+       if user is logged in:
+         add user name into `loginStatus{$profile}` span 
+         hide idp select and custom input (if they exist)
+         hide login button 
+       if user is not logged in:
+         hide user name span and logout button
+      Finally, show/hide git menu (depending on whether at least one git provider 
+        is available and user is logged in)
+         */
+    Object.keys(this).forEach((profile) => {
+      if (this[profile].available) {
+        const loginStatus = document.getElementById(`${profile}_loginStatus`);
+        const loginStatusLabel = document.querySelector(`label[for="${profile}_loginStatus"]`);
+        const loginButton = document.getElementById(`${profile}_loginButton`);
+        const logoutButton = document.getElementById(`${profile}_logoutButton`);
+        const idpSelect = document.getElementById(`${profile}_idpSelect`);
+        const idpSelectLabel = document.querySelector(`label[for="${profile}_idpSelect"]`);
+        const idpCustom = document.getElementById(`${profile}_idpCustom`);
+        const idpCustomLabel = document.querySelector(`label[for="${profile}_idpCustom"]`);
+        if (this[profile].obj.userLogin) {
+          // user is logged in
+          loginStatus.innerText = this[profile].obj.userLogin;
+          loginButton.style.display = 'none';
+          if (idpSelect) {
+            idpSelect.style.display = 'none';
+            idpSelectLabel.style.display = 'none';
+          }
+          if (idpCustom) {
+            idpCustom.style.display = 'none';
+            idpCustomLabel.style.display = 'none';
+          }
+        } else {
+          // user is not logged in
+          loginStatus.style.display = 'none';
+          logoutButton.style.display = 'none';
+        }
+      }
+    });
+    this.toggleGitMenu(); // show/hide git menu
+  } // updateSettingsStatus()
 
   buildProfileRow(profile) {
     // create table row element for profile provider

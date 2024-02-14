@@ -649,6 +649,7 @@ function completeInitialLoad() {
   // HACK 20240212: temporarily make profile.github.obj a shared / exported variable, until githubmenu can be refactored
   github = profile.github.obj;
   profile.drawProfileTable(); // draw profile table according to logged-in status
+  profile.updateSettingsStatus(); // update status displays in settings according to logged-in status
 
   // restore localStorage if we have it
   if (storage.supported) {
