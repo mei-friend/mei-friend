@@ -976,7 +976,7 @@ async function vrvWorkerEventsHandler(ev) {
         v.addNotationEventListeners(cm);
         v.updateHighlight(cm);
         refreshAnnotations(false);
-        v.scrollSvg(cm);
+        v.scrollSvgTo(cm);
         if (v.pdfMode) {
           // switch on frame, when in pdf mode
           const svg = document.querySelector('#verovio-panel svg');
@@ -1011,7 +1011,7 @@ async function vrvWorkerEventsHandler(ev) {
       }
       v.addNotationEventListeners(cm);
       refreshAnnotations(false);
-      v.scrollSvg(cm);
+      v.scrollSvgTo(cm);
       v.updateHighlight(cm);
       v.setFocusToVerovioPane();
       v.busy(false);

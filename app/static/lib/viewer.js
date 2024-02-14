@@ -578,15 +578,19 @@ export default class Viewer {
           this.updatePage(cm, '', id, false);
         } else {
           // on current page
-          this.scrollSvg(cm);
+          this.scrollSvgTo(cm);
           this.updateHighlight(cm);
         }
       }
     }
   } // cursorActivity()
 
-  // Scroll notation SVG into view, both vertically and horizontally
-  scrollSvg(cmOrId) {
+  /**
+   * Scroll notation SVG into view, both vertically and horizontally
+   * @param {string|CodeMirror} cmOrId
+   * @returns
+   */
+  scrollSvgTo(cmOrId) {
     let vp = document.getElementById('verovio-panel');
     let id = typeof cmOrId === 'string' ? cmOrId : utils.getElementIdAtCursor(cmOrId);
     if (!id) return;
@@ -596,11 +600,11 @@ export default class Viewer {
       let scrollLeft, scrollTop;
       let vpRect = vp.getBoundingClientRect();
       let elRect = el.getBBox();
-      var mx = el.getScreenCTM();
-      // adjust scrolling only when element (close to or completely) outside
-      const closeToPerc = 0.1;
-      let sx = mx.a * (elRect.x + elRect.width / 2) + mx.c * (elRect.y + elRect.height / 2) + mx.e;
+      const mx = el.getScreenCTM();
+      const closeToPerc = 0.1; // adjust scrolling only when element (close to or completely) outside
+
       // kind-of page-wise flipping for x
+      let sx = mx.a * (elRect.x + elRect.width / 2) + mx.c * (elRect.y + elRect.height / 2) + mx.e;
       if (sx < vpRect.x + vpRect.width * closeToPerc) {
         scrollLeft = vp.scrollLeft - (vpRect.x + vpRect.width * (1 - closeToPerc) - sx);
         changed = true;
@@ -620,7 +624,7 @@ export default class Viewer {
         vp.scrollTo({ top: scrollTop, left: scrollLeft, behavior: 'smooth' });
       }
     }
-  } // scrollSvg()
+  } // scrollSvgTo()
 
   // when editor emits changes, update notation rendering
   notationUpdated(cm, forceUpdate = false) {
@@ -2016,7 +2020,7 @@ export default class Viewer {
       }
     }
     this.allowCursorActivity = true;
-    this.scrollSvg(cm);
+    this.scrollSvgTo(cm);
     this.updateHighlight(cm);
   } // navigate()
 
