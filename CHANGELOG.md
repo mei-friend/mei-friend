@@ -3,7 +3,7 @@
 ### 1.0.10 patch
 * Scroll to facsimile image zones corresponding to selected element in editor or notation
 * TODO: Make sure zone element edits are reloaded and redrawn in facsimile panel
-* TODO: Fix bug with drawing new zone without fullpage mode
+* Bug with drawing new zone without fullpage mode fixed
 
 ### 1.0.9 patch
 * Facsimile panel GUI elements update local storage 
