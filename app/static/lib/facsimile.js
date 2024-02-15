@@ -644,8 +644,8 @@ export function addZoneDrawer() {
         let s = transformCTM(start, mx);
         let e = transformCTM(end, mx);
         let c = adjustCoordinates(s.x, s.y, e.x - s.x, e.y - s.y);
-        rect.setAttribute('x', c.x + ulx); // global variable ulx (upper-left corner)
-        rect.setAttribute('y', c.y + uly); // global variable uly (upper-left corner)
+        rect.setAttribute('x', c.x); // + ulx); // global variable ulx (upper-left corner)
+        rect.setAttribute('y', c.y); // + uly); // global variable uly (upper-left corner)
         rect.setAttribute('width', c.width);
         rect.setAttribute('height', c.height);
       }
