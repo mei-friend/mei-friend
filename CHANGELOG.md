@@ -1,9 +1,13 @@
 # mei-friend-online CHANGELOG.md
 
+### 1.0.10 patch
+* Scroll to facsimile image zones corresponding to selected element in editor or notation
+* TODO: Make sure zone element edits are reloaded and redrawn in facsimile panel
+* TODO: Fix bug with drawing new zone without fullpage mode
+
 ### 1.0.9 patch
 * Facsimile panel GUI elements update local storage 
 * Verovio settings retrieved from local storage
-* Scroll to facsimile image zones corresponding to selected element in editor or notation
 
 ### 1.0.8 patch (released on 21 Jan 2024)
 * Handle facsimile graphics path correctly in GitHub repos with subdirectories
