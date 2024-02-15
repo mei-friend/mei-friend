@@ -968,7 +968,7 @@ async function vrvWorkerEventsHandler(ev) {
         updateHtmlTitle();
         document.getElementById('verovio-panel').innerHTML = ev.data.svg;
         if (document.getElementById('showFacsimilePanel') && document.getElementById('showFacsimilePanel').checked) {
-          loadFacsimile(v.xmlDoc);
+          // loadFacsimile(v.xmlDoc);
           await drawFacsimile();
         }
         if (ev.data.setCursorToPageBeginning) v.setCursorToPageBeginning(cm);

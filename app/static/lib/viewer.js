@@ -78,6 +78,7 @@ export default class Viewer {
     this.settingsReplaceFriendContainer = false; // whether or not the settings panel is over the mei-friend window (false) or replaces it (true)
     this.notationProportion = defaultNotationProportion; // remember proportion during pdf mode
     this.expansionId = ''; // id string of currently selected expansion element
+    this.facsimileObserver = new MutationObserver(() => facs.loadFacsimile(this.xmlDoc));
   } // constructor() // constructor()
 
   // change options, load new data, render current page, add listeners, highlight
@@ -297,8 +298,11 @@ export default class Viewer {
 
   loadXml(mei, forceReload = false) {
     if (this.xmlDocOutdated || forceReload) {
+      this.facsimileObserver.disconnect();
       this.xmlDoc = this.parser.parseFromString(mei, 'text/xml');
       this.xmlDocOutdated = false;
+      let facsimile = this.xmlDoc.querySelector('facsimile');
+      if (facsimile) this.facsimileObserver.observe(facsimile, { attributes: true, childList: true, subtree: true });
     }
   } // loadXml()
 

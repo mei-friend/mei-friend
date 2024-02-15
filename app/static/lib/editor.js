@@ -181,7 +181,7 @@ export function deleteElement(v, cm, modifyerKey = false) {
       return;
     }
   });
-  loadFacsimile(v.xmlDoc);
+  // loadFacsimile(v.xmlDoc);
   // buffer.groupChangesSinceCheckpoint(checkPoint); TODO
   v.selectedElements = selectedElements;
   v.lastNoteId = v.selectedElements.at(-1);
@@ -1938,7 +1938,7 @@ export function addZone(v, cm, rect, addMeasure = true) {
     utils.setCursorToId(cm, uuid);
 
     // updating
-    loadFacsimile(v.xmlDoc);
+    // loadFacsimile(v.xmlDoc);
     addApplicationInfo(v, cm);
     v.updateData(cm, false, false);
     console.log('Editor: new zone ' + uuid + 'added.', rect);
@@ -1984,7 +1984,7 @@ export function addZone(v, cm, rect, addMeasure = true) {
     utils.setCursorToId(cm, uuid);
 
     // updating
-    loadFacsimile(v.xmlDoc);
+    // loadFacsimile(v.xmlDoc);
     addApplicationInfo(v, cm);
     v.updateData(cm, false, false);
     console.log('Editor: new zone ' + uuid + 'added.', rect);
@@ -2022,7 +2022,7 @@ export function removeZone(v, cm, zone, removeMeasure = false) {
       replaceInEditor(cm, e);
     }
   });
-  loadFacsimile(v.xmlDoc);
+  // loadFacsimile(v.xmlDoc);
   addApplicationInfo(v, cm);
   v.updateData(cm, false, false);
 } // removeZone()
@@ -2091,7 +2091,7 @@ export function addFacsimile(v, cm) {
   for (let l = p1.line; l <= cm.getCursor().line; l++) cm.indentLine(l, 'smart');
   utils.setCursorToId(cm, facsimileId);
 
-  loadFacsimile(v.xmlDoc);
+  // loadFacsimile(v.xmlDoc);
   addApplicationInfo(v, cm);
   v.updateData(cm, false, false);
   console.log('Editor: new facsimile added', facsimile);

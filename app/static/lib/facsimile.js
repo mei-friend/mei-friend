@@ -57,9 +57,9 @@ function showWarningText(txt = translator.lang.facsimileDefaultWarning.text) {
 export function clearFacsimile() {
   facs = {};
   sourceImages = {};
-  let svgContainer = document.getElementById('sourceImageContainer');
-  svgContainer.removeAttribute('width');
-  svgContainer.removeAttribute('height');
+  // let svgContainer = document.getElementById('sourceImageContainer');
+  // svgContainer.removeAttribute('width');
+  // svgContainer.removeAttribute('height');
 } // clearFacsimile()
 
 /**
@@ -72,7 +72,7 @@ export function clearFacsimile() {
  */
 export function loadFacsimile(xmlDoc) {
   let facsimile = xmlDoc.querySelector('facsimile');
-  if (facsimile && !facsimile.isEqualNode(oldFacsimile)) {
+  if (facsimile) {
     clearFacsimile();
     // look for surface elements
     let surfaces = facsimile.querySelectorAll('surface');
@@ -90,6 +90,7 @@ export function loadFacsimile(xmlDoc) {
     });
     // look for zone elements
     let zones = facsimile.querySelectorAll('zone');
+    console.debug('facsimile.loadFacsimile(): loading ' + zones.length + ' zones.');
     zones.forEach((z) => {
       let id, ulx, uly, lrx, lry;
       if (z.hasAttribute('xml:id')) id = z.getAttribute('xml:id');
@@ -115,7 +116,9 @@ export function loadFacsimile(xmlDoc) {
         }
       }
     });
-    oldFacsimile = facsimile;
+    // oldFacsimile = facsimile;
+  } else {
+    console.debug('facsimile.loadFacsimile(): skip loading because facsimile the same.');
   }
 
   /**
@@ -573,7 +576,7 @@ export function addZoneResizer(v, rect) {
 
   function mouseUp(ev) {
     resize = '';
-    loadFacsimile(v.xmlDoc);
+    // loadFacsimile(v.xmlDoc);
   } // mouseUp()
 } // addZoneResizer()
 
@@ -780,7 +783,7 @@ function handleFacsimileIngestion(reply) {
     cm.replaceRange(xmlToString(facsimile) + '\n', cr);
     let cr2 = cm.getCursor();
     for (let l = cr.line; l <= cr2.line; l++) cm.indentLine(l);
-    loadFacsimile(v.xmlDoc);
+    // loadFacsimile(v.xmlDoc);
     console.log('Adding facsimile before body', facsimile);
   }
 
