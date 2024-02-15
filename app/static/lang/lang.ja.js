@@ -489,10 +489,17 @@ export const lang = {
     text: '<choice>',
     description: 'テキスト内の同じポイントの複数の代替エンコーディングをグループ化します。',
   },
-  choiceSicCorr: { text: 'sic | corr', description: '<sic> に選択を入れて <corr> を追加します。' },
-  choiceCorrSic: { text: 'corr | sic', description: '<corr> に選択を入れて <sic> を追加します。' },
-  choiceOrigReg: { text: 'orig | reg', description: '<orig> に選択を入れて <reg> を追加します。' },
-  choiceRegOrig: { text: 'reg | orig', description: '<reg> に選択を入れて <orig> を追加します。' },
+  choiceSicCorr: { 
+    description: '<sic> に選択を入れて <corr> を追加します。' 
+},
+  choiceCorrSic: { 
+    description: '<corr> に選択を入れて <sic> を追加します。' 
+  },
+  choiceOrigReg: { 
+    description: '<orig> に選択を入れて <reg> を追加します。' 
+  },
+  choiceRegOrig: { 
+    description: '<reg> に選択を入れて <orig> を追加します。' },
   choiceContentTarget: {
     text: '(コンテンツを選択)',
     description: '<choice> の上にホバーしてこの要素のためにコンテンツを選択します。',
@@ -507,8 +514,12 @@ export const lang = {
     text: '<subst>',
     description: '(置換) - テキスト内での組み合わせが単一の介入と見なされる場合に、転写要素をグループ化します。',
   },
-  substAddDel: { text: 'add | del', description: '<add> に選択を入れて <del> を追加します。' },
-  substDelAdd: { text: 'del | add', description: '<del> に選択を入れて <add> を追加します。' },
+  substAddDel: { 
+    description: '<add> に選択を入れて <del> を追加します。' 
+  },
+  substDelAdd: { 
+    description: '<del> に選択を入れて <add> を追加します。' 
+  },
   substContentTarget: {
     text: '(コンテンツを選択)',
     description: '<subst> の上にホバーしてこの要素のためにコンテンツを選択します。',

@@ -496,10 +496,18 @@ export const lang = {
     text: '<choice>',
     description: 'Групує кілька альтернативних кодувань для того ж самого місця в тексті.',
   },
-  choiceSicCorr: { text: 'sic | corr', description: 'Помістіть вибір у <sic> і додайте <corr>.' },
-  choiceCorrSic: { text: 'corr | sic', description: 'Помістіть вибір у <corr> і додайте <sic>.' },
-  choiceOrigReg: { text: 'orig | reg', description: 'Помістіть вибір у <orig> і додайте <reg>.' },
-  choiceRegOrig: { text: 'reg | orig', description: 'Помістіть вибір у <reg> і додайте <orig>.' },
+  choiceSicCorr: { 
+    description: 'Помістіть вибір у <sic> і додайте <corr>.' 
+  },
+  choiceCorrSic: { 
+    description: 'Помістіть вибір у <corr> і додайте <sic>.' 
+  },
+  choiceOrigReg: { 
+    description: 'Помістіть вибір у <orig> і додайте <reg>.' 
+  },
+  choiceRegOrig: { 
+    description: 'Помістіть вибір у <reg> і додайте <orig>.' 
+  },
   choiceContentTarget: {
     text: '(виберіть вміст)',
     description: 'Спочатку виберіть вміст для цього елемента, навівши на <choice>.',
@@ -512,8 +520,12 @@ export const lang = {
     description:
       '(заміна) - Групує транскрипційні елементи, коли комбінація повинна розглядатися як єдиний втручання в текст.',
   },
-  substAddDel: { text: 'add | del', description: 'Помістіть вибір у <add> і додайте <del>.' },
-  substDelAdd: { text: 'del | add', description: 'Помістіть вибір у <del> і додайте <add>.' },
+  substAddDel: { 
+    description: 'Помістіть вибір у <add> і додайте <del>.' 
+  },
+  substDelAdd: { 
+    description: 'Помістіть вибір у <del> і додайте <add>.' 
+  },
   substContentTarget: {
     text: '(виберіть вміст)',
     description: 'Спочатку виберіть вміст для цього елемента, навівши на <subst>.',

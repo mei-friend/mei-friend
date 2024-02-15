@@ -519,10 +519,18 @@ export const lang = {
     text: '<choice>',
     description: 'Raggruppa diverse codifiche alternative per lo stesso punto in un testo.',
   },
-  choiceSicCorr: { text: 'sic | corr', description: 'Inserisci la selezione in <sic> e aggiungi <corr>.' },
-  choiceCorrSic: { text: 'corr | sic', description: 'Inserisci la selezione in <corr> e aggiungi <sic>.' },
-  choiceOrigReg: { text: 'orig | reg', description: 'Inserisci la selezione in <orig> e aggiungi <reg>.' },
-  choiceRegOrig: { text: 'reg | orig', description: 'Inserisci la selezione in <reg> e aggiungi <orig>.' },
+  choiceSicCorr: { 
+    description: 'Inserisci la selezione in <sic> e aggiungi <corr>.' 
+  },
+  choiceCorrSic: { 
+    description: 'Inserisci la selezione in <corr> e aggiungi <sic>.' 
+  },
+  choiceOrigReg: { 
+    description: 'Inserisci la selezione in <orig> e aggiungi <reg>.' 
+  },
+  choiceRegOrig: { 
+    description: 'Inserisci la selezione in <reg> e aggiungi <orig>.' 
+  },
   choiceContentTarget: {
     text: '(seleziona il contenuto)',
     description: 'Prima, seleziona il contenuto per questo elemento passando sopra a <scelta>.',
@@ -535,8 +543,12 @@ export const lang = {
     description:
       "(sostituzione) - Raggruppa gli elementi di trascrizione quando la combinazione deve essere considerata come un'intervento singolo nel testo.",
   },
-  substAddDel: { text: 'add | del', description: 'Inserisci la selezione in <add> e aggiungi <del>.' },
-  substDelAdd: { text: 'del | add', description: 'Inserisci la selezione in <del> e aggiungi <add>.' },
+  substAddDel: { 
+    description: 'Inserisci la selezione in <add> e aggiungi <del>.' 
+  },
+  substDelAdd: { 
+    description: 'Inserisci la selezione in <del> e aggiungi <add>.' 
+  },
   substContentTarget: {
     text: '(seleziona il contenuto)',
     description: 'Prima, seleziona il contenuto per questo elemento passando sopra a <sostituzione>.',

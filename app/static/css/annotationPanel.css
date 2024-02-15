@@ -264,3 +264,46 @@ summary.noDetails {
 #providerSelect { 
   display:block;
 }
+
+/* highlight markup menu buttons with corresponding colors */
+
+.suppliedLabel {
+  background-color: var(--suppliedColor);
+}
+
+.unclearLabel {
+  background-color: var(--unclearColor);
+}
+
+.sicLabel {
+  background-color: var(--sicColor);
+}
+
+.corrLabel {
+  background-color: var(--corrColor);
+}
+
+.origLabel {
+  background-color: var(--origColor);
+}
+
+.regLabel {
+  background-color: var(--regColor);
+}
+
+.addLabel {
+  background-color: var(--addColor);
+}
+
+.delLabel {
+  background-color: var(--delColor);
+}
+
+.splitButtonContainer {
+  /*display: inline-block;*/
+}
+
+.splitButtonLabel {
+  padding: 8px;
+  /*width: 50%;*/
+}

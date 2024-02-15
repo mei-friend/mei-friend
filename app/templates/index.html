@@ -1066,33 +1066,25 @@
                   <span id="addChoiceText">&lt;choice&gt;</span>
                   <div id="choice-content-options" class="markup-dropdown-content">
                     <a id="choiceSicCorr" data-target="choiceContentTarget" data-content-choice="sic,corr"
-                      class="content-option" href="#">
-                      <span class="sicLabel">sic</span> 
-                      | 
-                      <span class="corrLabel">corr</span>
+                      class="content-option splitButtonContainer" href="#">
+                      <span class="sicLabel splitButtonLabel">sic</span><span class="corrLabel splitButtonLabel">corr</span>
                     </a>
                     <a id="choiceCorrSic" data-target="choiceContentTarget" data-content-choice="corr,sic"
-                      class="content-option" href="#">
-                      <span class="corrLabel">corr</span> 
-                      | 
-                      <span class="sicLabel">sic</span>
+                      class="content-option splitButtonContainer" href="#">
+                      <span class="corrLabel splitButtonLabel">corr</span><span class="sicLabel splitButtonLabel">sic</span>
                     </a>
                     <a id="choiceOrigReg" data-target="choiceContentTarget" data-content-choice="orig,reg"
-                      class="content-option" href="#">
-                      <span class="origLabel">orig</span> 
-                      | 
-                      <span class="regLabel">reg</span>
+                      class="content-option splitButtonContainer" href="#">
+                      <span class="origLabel splitButtonLabel">orig</span><span class="regLabel splitButtonLabel">reg</span>
                     </a>
                     <a id="choiceRegOrig" data-target="choiceContentTarget" data-content-choice="reg,orig"
-                      class="content-option" href="#">
-                      <span class="regLabel">reg</span> 
-                      | 
-                      <span class="origLabel">orig</span>
+                      class="content-option splitButtonContainer" href="#">
+                      <span class="regLabel splitButtonLabel">reg</span><span class="origLabel splitButtonLabel">orig</span>
                     </a>
                   </div>
                 </div>
                 <div class="markup-dropdown">
-                  <span id="choiceContentTarget">(select content)</span>
+                  <span id="choiceContentTarget" class="splitButtonContainer">(select content)</span>
                   <div class="markup-dropdown-content">
                     <a id="addChoice" class="addMarkup" data-el-name="choice" data-selection="" href="#">Selection</a>
                     <a id="addChoiceArtic" class="addMarkup" data-el-name="choice" data-selection="artic" href="#">Articulation</a>
@@ -1107,21 +1099,17 @@
                   <span id="addSubstText">&lt;subst&gt;</span>
                   <div id="subst-content-options" class="markup-dropdown-content">
                     <a id="substAddDel" data-target="substContentTarget" data-content-choice="add,del"
-                      class="content-option" href="#">
-                      <span class="addLabel">add</span> 
-                      | 
-                      <span class="delLabel">del</span>
+                      class="content-option splitButtonContainer" href="#">
+                      <span class="addLabel splitButtonLabel">add</span><span class="delLabel splitButtonLabel">del</span>
                     </a>
                     <a id="substDelAdd" data-target="substContentTarget" data-content-choice="del,add"
-                      class="content-option" href="#">
-                      <span class="delLabel">del</span> 
-                      | 
-                      <span class="addLabel">add</span>
+                      class="content-option splitButtonContainer" href="#">
+                      <span class="delLabel splitButtonLabel">del</span><span class="addLabel splitButtonLabel">add</span>
                     </a>
                   </div>
                 </div>
                 <div class="markup-dropdown">
-                  <span id="substContentTarget">(select content)</span>
+                  <span id="substContentTarget" class="splitButtonContainer">(select content)</span>
                   <div class="markup-dropdown-content">
                     <a id="addSubst" class="addMarkup" data-el-name="subst" data-selection="" href="#">Selection</a>
                     <a id="addSubstArtic" class="addMarkup" data-el-name="subst" data-selection="artic" href="#">Articulation</a>
@@ -1134,7 +1122,7 @@
           <div class="markupGrp">
             <span id="editInterventionsGrp">Editorial interventions</span>
             <div class="annotationToolsIconGroup markup-dropdown">
-              <span id="addSuppliedText" class="annotationToolsIcon">Supplied</span>
+              <span id="addSuppliedText" class="annotationToolsIcon suppliedLabel">Supplied</span>
               <div class="markup-dropdown-content">
                 <a class="addMarkup" data-el-name="supplied" data-selection="" id="addSupplied" href="#">Selection</a>
                 <a class="addMarkup" data-el-name="supplied" data-selection="artic" id="addSuppliedArtic"
@@ -1144,7 +1132,7 @@
               </div>
             </div>
             <div class="annotationToolsIconGroup markup-dropdown">
-              <span id="addUnclearText" class="annotationToolsIcon">Unclear</span>
+              <span id="addUnclearText" class="annotationToolsIcon unclearLabel">Unclear</span>
               <div class="markup-dropdown-content">
                 <a class="addMarkup" data-el-name="unclear" data-selection="" id="addUnclear" href="#">Selection</a>
                 <a class="addMarkup" data-el-name="unclear" data-selection="artic" id="addUnclearArtic"

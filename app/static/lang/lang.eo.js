@@ -500,10 +500,18 @@ export const lang = {
     text: '<choice>',
     description: 'Grupigas nombron da alternativaj kodoj por la sama punkto en teksto.',
   },
-  choiceSicCorr: { text: 'sic | corr', description: 'Metu elekton en <sic> kaj aldonu <corr>.' },
-  choiceCorrSic: { text: 'corr | sic', description: 'Metu elekton en <corr> kaj aldonu <sic>.' },
-  choiceOrigReg: { text: 'orig | reg', description: 'Metu elekton en <orig> kaj aldonu <reg>.' },
-  choiceRegOrig: { text: 'reg | orig', description: 'Metu elekton en <reg> kaj aldonu <orig>.' },
+  choiceSicCorr: { 
+    description: 'Metu elekton en <sic> kaj aldonu <corr>.' 
+  },
+  choiceCorrSic: { 
+    description: 'Metu elekton en <corr> kaj aldonu <sic>.' 
+  },
+  choiceOrigReg: { 
+    description: 'Metu elekton en <orig> kaj aldonu <reg>.' 
+  },
+  choiceRegOrig: { 
+    description: 'Metu elekton en <reg> kaj aldonu <orig>.' 
+  },
   choiceContentTarget: {
     text: '(elektu enhavon)',
     description: 'Unue elektu enhavon por tiu elemento pasante la muson super <elekto>.',
@@ -516,8 +524,12 @@ export const lang = {
     description:
       '(anstataŭigo) – Grupigas transskriptajn elementojn kiam la kombino devas esti rigardata kiel unuopa interveno en la teksto.',
   },
-  substAddDel: { text: 'add | del', description: 'Metu elekton en <add> kaj aldonu <del>.' },
-  substDelAdd: { text: 'del | add', description: 'Metu elekton en <del> kaj aldonu <add>.' },
+  substAddDel: { 
+    description: 'Metu elekton en <add> kaj aldonu <del>.' 
+  },
+  substDelAdd: { 
+    description: 'Metu elekton en <del> kaj aldonu <add>.' 
+  },
   substContentTarget: {
     text: '(elektu enhavon)',
     description: 'Unue elektu enhavon por tiu elemento pasante la muson super <anstataŭigo>.',

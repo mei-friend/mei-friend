@@ -513,10 +513,18 @@ export const lang = {
     text: '<choice>',
     description: 'Grupuje wiele alternatywnych kodowań dla tego samego punktu w tekście.',
   },
-  choiceSicCorr: { text: 'sic | corr', description: 'Umieść wybór w znaczniku <sic> i dodaj <corr>.' },
-  choiceCorrSic: { text: 'corr | sic', description: 'Umieść wybór w znaczniku <corr> i dodaj <sic>.' },
-  choiceOrigReg: { text: 'orig | reg', description: 'Umieść wybór w znaczniku <orig> i dodaj <reg>.' },
-  choiceRegOrig: { text: 'reg | orig', description: 'Umieść wybór w znaczniku <reg> i dodaj <orig>.' },
+  choiceSicCorr: { 
+    description: 'Umieść wybór w znaczniku <sic> i dodaj <corr>.' 
+},
+  choiceCorrSic: { 
+    description: 'Umieść wybór w znaczniku <corr> i dodaj <sic>.' 
+},
+  choiceOrigReg: { 
+    description: 'Umieść wybór w znaczniku <orig> i dodaj <reg>.' 
+  },
+  choiceRegOrig: { 
+    description: 'Umieść wybór w znaczniku <reg> i dodaj <orig>.' 
+  },
   choiceContentTarget: {
     text: '(wybierz zawartość)',
     description: 'Najpierw wybierz zawartość dla tego elementu, najeżdżając na <choice>.',
@@ -529,8 +537,12 @@ export const lang = {
     description:
       '(zastąpienie) - Grupuje elementy transkrypcyjne, gdy kombinacja ma być traktowana jako pojedyncza interwencja w tekście.',
   },
-  substAddDel: { text: 'add | del', description: 'Umieść wybór w znaczniku <add> i dodaj <del>.' },
-  substDelAdd: { text: 'del | add', description: 'Umieść wybór w znaczniku <del> i dodaj <add>.' },
+  substAddDel: { 
+    description: 'Umieść wybór w znaczniku <add> i dodaj <del>.' 
+  },
+  substDelAdd: { 
+    description: 'Umieść wybór w znaczniku <del> i dodaj <add>.' 
+  },
   substContentTarget: {
     text: '(wybierz zawartość)',
     description: 'Najpierw wybierz zawartość dla tego elementu, najeżdżając na <subst>.',
