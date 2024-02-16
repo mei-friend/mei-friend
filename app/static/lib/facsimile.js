@@ -157,7 +157,11 @@ export async function drawFacsimile() {
   let lrx = 0;
   let lry = 0;
   let zoneId = '';
-  let svgFacs = document.querySelectorAll('[data-facs]'); // list displayed zones
+  // list displayed zones (filter doubled note elements in tab notation, see Verovio issue #3600)
+  let svgFacs = Array.from(document.querySelectorAll('[data-facs]')).filter(
+    (x) => !x.parentElement.classList.contains('note')
+  );
+
   if (svgFacs && fullPage) {
     let firstZone = svgFacs.item(0);
     if (firstZone && firstZone.hasAttribute('data-facs')) zoneId = rmHash(firstZone.getAttribute('data-facs'));
@@ -428,6 +432,10 @@ export function highlightZone(rect) {
   // add zone resizer for selected zone box (only when linked to zone
   // rather than to pointing element, ie. measure)
   if (document.getElementById('editFacsimileZones').checked) listenerHandles = addZoneResizer(v, rect);
+
+  // highlight rectangle
+  // rect.classList.add('highlighted');
+  // rect.querySelectorAll('g').forEach((g) => g.classList.add('highlighted'));
 } // highlightZone()
 
 /**
@@ -561,12 +569,14 @@ export function addZoneResizer(v, rect) {
       if (txt && (resize === 'northwest' || resize === 'west' || resize === 'pan')) txt.setAttribute('x', txtX + dx);
       if (txt && (resize === 'north' || resize === 'northwest' || resize === 'pan')) txt.setAttribute('y', txtY + dy);
 
+      // update in xmlDoc
       let zone = v.xmlDoc.querySelector('[*|id="' + rect.id + '"]');
       zone.setAttribute('ulx', c.x);
       zone.setAttribute('uly', c.y);
       zone.setAttribute('lrx', c.x + c.width);
       zone.setAttribute('lry', c.y + c.height);
-      // edit in CodeMirror
+
+      // Update in CodeMirror
       v.allowCursorActivity = false;
       replaceInEditor(cm, zone, true);
       v.allowCursorActivity = true;
@@ -576,7 +586,6 @@ export function addZoneResizer(v, rect) {
 
   function mouseUp(ev) {
     resize = '';
-    // loadFacsimile(v.xmlDoc);
   } // mouseUp()
 } // addZoneResizer()
 
@@ -675,6 +684,9 @@ export function addZoneDrawer() {
           v.showAlert(warning, 'warning', 15000);
           console.warn(warning);
         }
+        // else {
+        //   highlightZone(rect);
+        // }
       } else if (rect) {
         rect.remove();
       }

@@ -7,7 +7,7 @@ import * as b40 from './base40.js';
 import * as dutils from './dom-utils.js';
 import * as speed from './speed.js';
 import * as utils from './utils.js';
-import { loadFacsimile } from './facsimile.js';
+import * as facs from './facsimile.js';
 import { handleEditorChanges, translator, version, versionDate } from './main.js';
 import Viewer from './viewer.js';
 
@@ -1782,7 +1782,7 @@ export function renumberMeasures(v, cm, change = false) {
   v.allowCursorActivity = false;
   v.loadXml(cm.getValue(), true);
   utils.renumberMeasures(v, cm, 1, change);
-  if (document.getElementById('showFacsimilePanel').checked) loadFacsimile(v.xmlDoc);
+  if (document.getElementById('showFacsimilePanel').checked) facs.loadFacsimile(v.xmlDoc);
   addApplicationInfo(v, cm);
   v.updateData(cm, false, true);
   v.allowCursorActivity = true;
@@ -1940,7 +1940,7 @@ export function addZone(v, cm, rect, addMeasure = true) {
     // updating
     // loadFacsimile(v.xmlDoc);
     addApplicationInfo(v, cm);
-    v.updateData(cm, false, false);
+    // v.updateData(cm, false, false);
     console.log('Editor: new zone ' + uuid + 'added.', rect);
     v.allowCursorActivity = true;
     return true;
@@ -1984,9 +1984,8 @@ export function addZone(v, cm, rect, addMeasure = true) {
     utils.setCursorToId(cm, uuid);
 
     // updating
-    // loadFacsimile(v.xmlDoc);
     addApplicationInfo(v, cm);
-    v.updateData(cm, false, false);
+    // v.updateData(cm, false, false);
     console.log('Editor: new zone ' + uuid + 'added.', rect);
     v.allowCursorActivity = true;
     return true;
@@ -2022,7 +2021,6 @@ export function removeZone(v, cm, zone, removeMeasure = false) {
       replaceInEditor(cm, e);
     }
   });
-  // loadFacsimile(v.xmlDoc);
   addApplicationInfo(v, cm);
   v.updateData(cm, false, false);
 } // removeZone()
