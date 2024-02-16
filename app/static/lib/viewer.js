@@ -302,7 +302,10 @@ export default class Viewer {
       this.xmlDoc = this.parser.parseFromString(mei, 'text/xml');
       this.xmlDocOutdated = false;
       let facsimile = this.xmlDoc.querySelector('facsimile');
-      if (facsimile) this.facsimileObserver.observe(facsimile, { attributes: true, childList: true, subtree: true });
+      if (facsimile) {
+        facs.loadFacsimile(this.xmlDoc);
+        this.facsimileObserver.observe(facsimile, { attributes: true, childList: true, subtree: true });
+      }
     }
   } // loadXml()
 
