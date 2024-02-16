@@ -629,24 +629,33 @@ export default class Viewer {
     }
   } // notationUpdated()
 
-  // highlight currently selected elements, if cm left out, all are cleared
+  /**
+   * Highlights currently selected elements or the element at cursor in CodeMirror.
+   * If cm is left out, all are cleared
+   * @param {CodeMirror} cm
+   */
   updateHighlight(cm) {
     // clear existing highlighted classes
     let highlighted = document.querySelectorAll('.highlighted');
-    // console.info('updateHlt: highlighted: ', highlighted);
     highlighted.forEach((e) => e.classList.remove('highlighted'));
+
+    // create array of id strings from selectedElements or from cursor position
     let ids = [];
     if (this.selectedElements.length > 0) this.selectedElements.forEach((item) => ids.push(item));
     else if (cm) ids.push(utils.getElementIdAtCursor(cm));
     // console.info('updateHlt ids: ', ids);
+
+    // highlight those elements
     for (let id of ids) {
       if (id) {
         let el = document.querySelectorAll('#' + utils.escapeXmlId(id)); // was: 'g#'+id
         // console.info('updateHlt el: ', el);
         if (el) {
           el.forEach((e) => {
+            if (e.nodeName === 'rect' && e.closest('#sourceImageSvg')) {
+              facs.highlightZone(e);
+            }
             e.classList.add('highlighted');
-            if (e.nodeName === 'rect' && e.closest('#sourceImageSvg')) facs.highlightZone(e);
             e.querySelectorAll('g').forEach((g) => g.classList.add('highlighted'));
           });
         }
