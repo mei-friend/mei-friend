@@ -14,7 +14,6 @@ import { defaultFacsimileRectangleColor, defaultFacsimileRectangleLineWidth } fr
 
 var facs = {}; // facsimile structure in MEI file
 var sourceImages = {}; // object of source images
-var oldFacsimile; // previous facsimile element
 const rectangleLineWidth = defaultFacsimileRectangleLineWidth; // width of bounding box rectangles in px
 const rectangleColor = defaultFacsimileRectangleColor; // color of zone rectangles
 var listenerHandles = {};
@@ -163,7 +162,7 @@ export async function drawFacsimile() {
   );
 
   if (svgFacs && fullPage) {
-    let firstZone = svgFacs.item(0);
+    let firstZone = svgFacs.at(0);
     if (firstZone && firstZone.hasAttribute('data-facs')) zoneId = rmHash(firstZone.getAttribute('data-facs'));
   } else {
     svgFacs.forEach((f) => {
@@ -195,7 +194,6 @@ export async function drawFacsimile() {
     }
   }
   if (zoneId && facs[zoneId]) {
-    svg.innerHTML = '';
     // find the correct path of the image file
     let img;
     let imgName = facs[zoneId].target;
@@ -237,7 +235,9 @@ export async function drawFacsimile() {
       img = await loadImage(imgName);
       sourceImages[imgName] = img;
     }
+
     //
+    Array.from(svg.children).forEach((c) => svg.removeChild(c));
     if (img) {
       console.log('Appending child image:', img);
       svg.appendChild(img);
@@ -314,21 +314,21 @@ export async function drawFacsimile() {
  */
 function drawBoundingBox(zoneId) {
   if (facs[zoneId]) {
-    let pointerId = facs[zoneId]['pointerId'];
-    let pointerN = facs[zoneId]['pointerN'];
+    let svg = document.getElementById('sourceImageSvg');
     let rect = document.createElementNS(svgNameSpace, 'rect');
+    svg.appendChild(rect);
     rect.setAttribute('rx', rectangleLineWidth / 2);
     rect.setAttribute('ry', rectangleLineWidth / 2);
     rect.addEventListener('click', (e) => v.handleClickOnNotation(e, cm));
     let editFacsimileZones = document.getElementById('editFacsimileZones').checked;
-    let svg = document.getElementById('sourceImageSvg');
-    svg.appendChild(rect);
     let x = parseFloat(facs[zoneId].ulx);
     let y = parseFloat(facs[zoneId].uly);
     let width = parseFloat(facs[zoneId].lrx) - x;
     let height = parseFloat(facs[zoneId].lry) - y;
     updateRect(rect, x, y, width, height, rectangleColor, rectangleLineWidth, 'none');
+    let pointerId = facs[zoneId]['pointerId']; // id of pointing element (e.g., measure)
     if (pointerId) rect.id = editFacsimileZones ? zoneId : pointerId;
+    let pointerN = facs[zoneId]['pointerN']; // number-like
     if (pointerN) {
       // draw number-like info from element (e.g., measure)
       let txt = document.createElementNS(svgNameSpace, 'text');
@@ -434,8 +434,8 @@ export function highlightZone(rect) {
   if (document.getElementById('editFacsimileZones').checked) listenerHandles = addZoneResizer(v, rect);
 
   // highlight rectangle
-  // rect.classList.add('highlighted');
-  // rect.querySelectorAll('g').forEach((g) => g.classList.add('highlighted'));
+  rect.classList.add('highlighted');
+  rect.querySelectorAll('g').forEach((g) => g.classList.add('highlighted'));
 } // highlightZone()
 
 /**
@@ -446,12 +446,7 @@ export function highlightZone(rect) {
  * @returns {object} of event listener handles
  */
 export function addZoneResizer(v, rect) {
-  let txt = document.querySelector('text[id="' + rect.id + '"]');
-  let txtX, txtY;
-  if (txt) {
-    txtX = parseFloat(txt.getAttribute('x'));
-    txtY = parseFloat(txt.getAttribute('y'));
-  }
+  let txt, txtX, txtY; // text element for zone number and its x/y coordinates
   var ip = document.getElementById('facsimile-panel');
   var svg = document.getElementById('sourceImageSvg');
   var start = {}; // starting point start.x, start.y
@@ -469,6 +464,12 @@ export function addZoneResizer(v, rect) {
   };
 
   function mouseDown(ev) {
+    txt = document.querySelector('text[id="' + rect.id + '"]');
+    if (txt) {
+      txtX = parseFloat(txt.getAttribute('x'));
+      txtY = parseFloat(txt.getAttribute('y'));
+    }
+
     let bcr = rect.getBoundingClientRect();
     bb = rect.getBBox();
     start.x = ev.clientX + ip.scrollLeft;
@@ -566,8 +567,12 @@ export function addZoneResizer(v, rect) {
       (x = Math.round(x)), (y = Math.round(y)), (width = Math.round(width)), (height = Math.round(height));
       let c = adjustCoordinates(x, y, width, height);
       updateRect(rect, c.x, c.y, c.width, c.height, rectangleColor, rectangleLineWidth, 'none');
-      if (txt && (resize === 'northwest' || resize === 'west' || resize === 'pan')) txt.setAttribute('x', txtX + dx);
-      if (txt && (resize === 'north' || resize === 'northwest' || resize === 'pan')) txt.setAttribute('y', txtY + dy);
+      if (txt && (resize === 'northwest' || resize === 'west' || resize === 'pan')) {
+        txt.setAttribute('x', txtX + dx);
+      }
+      if (txt && (resize === 'north' || resize === 'northwest' || resize === 'pan')) {
+        txt.setAttribute('y', txtY + dy);
+      }
 
       // update in xmlDoc
       let zone = v.xmlDoc.querySelector('[*|id="' + rect.id + '"]');
@@ -580,7 +585,7 @@ export function addZoneResizer(v, rect) {
       v.allowCursorActivity = false;
       replaceInEditor(cm, zone, true);
       v.allowCursorActivity = true;
-      // console.log('Dragging: ' + resize + ' ' + dx + '/' + dy);
+      console.log('Dragging: ' + resize + ' ' + dx + '/' + dy + ', txt: ', txt);
     }
   } // mouseMove()
 
@@ -673,7 +678,12 @@ export function addZoneDrawer() {
         // * Without modifier key: select an existing element (e.g. measure, dynam)
         //   a zone will be added to pertinent surface and @facs add to the selected element
         // * With CMD/CTRL: select a zone, add a zone afterwards and a measure;
-        if (!addZone(v, cm, rect, metaPressed)) {
+        let uuid = addZone(v, cm, rect, metaPressed);
+        if (uuid) {
+          rect.addEventListener('click', (e) => v.handleClickOnNotation(e, cm));
+          // drawBoundingBox(uuid); // TODO: add number-like label here
+          highlightZone(rect);
+        } else {
           if (rect) rect.remove();
           let warning = 'Cannot add zone element. ';
           if (!metaPressed) {
@@ -684,9 +694,6 @@ export function addZoneDrawer() {
           v.showAlert(warning, 'warning', 15000);
           console.warn(warning);
         }
-        // else {
-        //   highlightZone(rect);
-        // }
       } else if (rect) {
         rect.remove();
       }

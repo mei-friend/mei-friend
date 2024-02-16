@@ -138,6 +138,7 @@ export function deleteElement(v, cm, modifyerKey = false) {
       // remove zone; with CMD remove pointing element; without just remove @facs from pointing element
       removeZone(v, cm, element, modifyerKey);
       element.remove();
+      facs.drawFacsimile();
     } else if (['note', 'chord', 'rest', 'mRest', 'multiRest'].includes(element.nodeName)) {
       console.log('Removing <' + element.nodeName + '>: "' + id + '"');
       // Check if element is last inside a chord, a tuplet, or a beam, and
@@ -1876,7 +1877,7 @@ export function manipulateXmlIds(v, cm, removeIds = false) {
  * @param {CodeMirror} cm
  * @param {object} rect
  * @param {boolean} addMeasure
- * @returns
+ * @returns {string} uuid
  */
 export function addZone(v, cm, rect, addMeasure = true) {
   v.allowCursorActivity = false;
@@ -1885,7 +1886,7 @@ export function addZone(v, cm, rect, addMeasure = true) {
   let selectedElement = v.xmlDoc.querySelector('[*|id="' + selectedId + '"]');
   if (!selectedElement) {
     v.allowCursorActivity = true;
-    return false;
+    return '';
   }
 
   // create zone with all attributes
@@ -1915,7 +1916,7 @@ export function addZone(v, cm, rect, addMeasure = true) {
       let m = prevMeas.closest('measure');
       if (!m) {
         v.allowCursorActivity = true;
-        return false; // and stop, if unsuccessful
+        return ''; // and stop, if unsuccessful
       }
       prevMeas = m;
     }
@@ -1938,12 +1939,11 @@ export function addZone(v, cm, rect, addMeasure = true) {
     utils.setCursorToId(cm, uuid);
 
     // updating
-    // loadFacsimile(v.xmlDoc);
     addApplicationInfo(v, cm);
     // v.updateData(cm, false, false);
     console.log('Editor: new zone ' + uuid + 'added.', rect);
     v.allowCursorActivity = true;
-    return true;
+    return uuid;
 
     // only add zone and a @facs for the selected element
   } else if (!addMeasure && att.attFacsimile.includes(selectedElement.nodeName)) {
@@ -1956,7 +1956,7 @@ export function addZone(v, cm, rect, addMeasure = true) {
     if (!referenceNode) {
       console.log('addZone(): no reference element found with xml:id="' + referenceNodeId + '"');
       v.allowCursorActivity = true;
-      return false;
+      return '';
     }
     if (referenceNode.nodeName === 'surface') {
       referenceNode.appendChild(zone);
@@ -1988,10 +1988,10 @@ export function addZone(v, cm, rect, addMeasure = true) {
     // v.updateData(cm, false, false);
     console.log('Editor: new zone ' + uuid + 'added.', rect);
     v.allowCursorActivity = true;
-    return true;
+    return uuid;
   } else {
     v.allowCursorActivity = true;
-    return false;
+    return '';
   }
 } // addZone()
 
@@ -2022,7 +2022,7 @@ export function removeZone(v, cm, zone, removeMeasure = false) {
     }
   });
   addApplicationInfo(v, cm);
-  v.updateData(cm, false, false);
+  // v.updateData(cm, false, false);
 } // removeZone()
 
 /**
