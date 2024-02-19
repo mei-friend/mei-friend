@@ -10,7 +10,7 @@ import { transformCTM, updateRect } from './drag-selector.js';
 import { cm, fileLocationType, github, isCtrlOrCmd, meiFileLocation, translator, v } from './main.js';
 import { addZone, replaceInEditor } from './editor.js';
 import { attFacsimile } from './attribute-classes.js';
-import { defaultFacsimileRectangleColor, defaultFacsimileRectangleLineWidth } from './defaults.js';
+import { defaultFacsimileRectangleColor, defaultFacsimileRectangleLineWidth, isFirefox } from './defaults.js';
 
 var facs = {}; // facsimile structure in MEI file
 var sourceImages = {}; // object of source images
@@ -587,7 +587,7 @@ export function addZoneResizer(v, rect) {
       v.allowCursorActivity = false;
       replaceInEditor(cm, zone, true);
       v.allowCursorActivity = true;
-      console.log('Dragging: ' + resize + ' ' + dx + '/' + dy + ', txt: ', txt);
+      // console.log('Dragging: ' + resize + ' ' + dx + '/' + dy + ', txt: ', txt);
     }
   } // mouseMove()
 
@@ -605,7 +605,7 @@ export function addZoneDrawer() {
   let svg = document.getElementById('sourceImageSvg');
   let start = {}; // starting point start.x, start.y
   let end = {}; // ending point
-  let drawing = '';
+  let drawing = ''; // 'new' or ''
   let minSize = 20; // px, minimum width and height for a zone
 
   svg.addEventListener('mousedown', mouseDown);
@@ -620,13 +620,15 @@ export function addZoneDrawer() {
 
       var mx = svg.getScreenCTM().inverse();
       let s = transformCTM(start, mx);
+      console.log('ScreenCTM: ', mx);
+      console.log('transformed: ', s);
 
       let rect = document.createElementNS(svgNameSpace, 'rect');
       rect.id = 'new-rect';
       rect.setAttribute('rx', rectangleLineWidth / 2);
       rect.setAttribute('ry', rectangleLineWidth / 2);
-      rect.setAttribute('x', s.x + ulx); // global variable ulx (upper-left corner)
-      rect.setAttribute('y', s.y + uly); // global variable uly (upper-left corner)
+      rect.setAttribute('x', s.x); //+ ulx); // global variable ulx (upper-left corner)
+      rect.setAttribute('y', s.y); // + uly); // global variable uly (upper-left corner)
       rect.setAttribute('stroke', rectangleColor);
       rect.setAttribute('stroke-width', rectangleLineWidth);
       rect.setAttribute('fill', 'none');
@@ -664,8 +666,10 @@ export function addZoneDrawer() {
         let s = transformCTM(start, mx);
         let e = transformCTM(end, mx);
         let c = adjustCoordinates(s.x, s.y, e.x - s.x, e.y - s.y);
-        rect.setAttribute('x', c.x + ulx); // global variable ulx (upper-left corner)
-        rect.setAttribute('y', c.y + uly); // global variable uly (upper-left corner)
+        // see https://bugzilla.mozilla.org/show_bug.cgi?id=1610093 (checked 19 Feb 2024)
+        // or: https://jsfiddle.net/edemaine/vLjd1pa7/6/ for a test
+        rect.setAttribute('x', isFirefox ? c.x + ulx : c.x); // global variable ulx (upper-left corner) only with Firefox
+        rect.setAttribute('y', isFirefox ? c.y + uly : c.y); // global variable uly (upper-left corner) only with Firefox
         rect.setAttribute('width', c.width);
         rect.setAttribute('height', c.height);
       }
