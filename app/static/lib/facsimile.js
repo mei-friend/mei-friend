@@ -175,6 +175,7 @@ export async function drawFacsimile() {
         if (parseFloat(facs[zoneId].lry) > lry) lry = parseFloat(facs[zoneId].lry) + rectangleLineWidth / 2;
       }
     });
+    console.log('Facsimile envelope: ulx/uly; lrx/lry: ' + ulx + '/' + uly + '; ' + lrx + '/' + lry);
   }
   // display surface graphic if no data-facs are found in SVG
   if (!zoneId || !facs[zoneId]) {
@@ -260,7 +261,7 @@ export async function drawFacsimile() {
       busy(false);
       return;
     }
-    
+
     let width = lrx - ulx;
     let height = lry - uly;
     let zoomFactor = document.getElementById('facsimileZoomInput').value / 100;
@@ -642,6 +643,10 @@ export function addZoneDrawer() {
           ip.scrollLeft +
           '/' +
           ip.scrollTop +
+          ', ulx/uly: ' +
+          ulx +
+          '/' +
+          uly +
           ', start: ',
         start
       );
