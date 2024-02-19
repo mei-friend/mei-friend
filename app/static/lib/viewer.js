@@ -78,6 +78,7 @@ export default class Viewer {
     this.settingsReplaceFriendContainer = false; // whether or not the settings panel is over the mei-friend window (false) or replaces it (true)
     this.notationProportion = defaultNotationProportion; // remember proportion during pdf mode
     this.expansionId = ''; // id string of currently selected expansion element
+    this.facsimileObserver = new MutationObserver(() => facs.loadFacsimile(this.xmlDoc));
   } // constructor() // constructor()
 
   // change options, load new data, render current page, add listeners, highlight
@@ -297,8 +298,14 @@ export default class Viewer {
 
   loadXml(mei, forceReload = false) {
     if (this.xmlDocOutdated || forceReload) {
+      this.facsimileObserver.disconnect();
       this.xmlDoc = this.parser.parseFromString(mei, 'text/xml');
       this.xmlDocOutdated = false;
+      let facsimile = this.xmlDoc.querySelector('facsimile');
+      if (facsimile) {
+        facs.loadFacsimile(this.xmlDoc);
+        this.facsimileObserver.observe(facsimile, { attributes: true, childList: true, subtree: true });
+      }
     }
   } // loadXml()
 
@@ -622,24 +629,33 @@ export default class Viewer {
     }
   } // notationUpdated()
 
-  // highlight currently selected elements, if cm left out, all are cleared
+  /**
+   * Highlights currently selected elements or the element at cursor in CodeMirror.
+   * If cm is left out, all are cleared
+   * @param {CodeMirror} cm
+   */
   updateHighlight(cm) {
     // clear existing highlighted classes
     let highlighted = document.querySelectorAll('.highlighted');
-    // console.info('updateHlt: highlighted: ', highlighted);
     highlighted.forEach((e) => e.classList.remove('highlighted'));
+
+    // create array of id strings from selectedElements or from cursor position
     let ids = [];
     if (this.selectedElements.length > 0) this.selectedElements.forEach((item) => ids.push(item));
     else if (cm) ids.push(utils.getElementIdAtCursor(cm));
     // console.info('updateHlt ids: ', ids);
+
+    // highlight those elements
     for (let id of ids) {
       if (id) {
         let el = document.querySelectorAll('#' + utils.escapeXmlId(id)); // was: 'g#'+id
         // console.info('updateHlt el: ', el);
         if (el) {
           el.forEach((e) => {
+            if (e.nodeName === 'rect' && e.closest('#sourceImageSvg')) {
+              facs.highlightZone(e);
+            }
             e.classList.add('highlighted');
-            if (e.nodeName === 'rect' && e.closest('#sourceImageSvg')) facs.highlightZone(e);
             e.querySelectorAll('g').forEach((g) => g.classList.add('highlighted'));
           });
         }
