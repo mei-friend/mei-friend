@@ -2021,8 +2021,6 @@ export function removeZone(v, cm, zone, removeMeasure = false) {
       replaceInEditor(cm, e);
     }
   });
-  addApplicationInfo(v, cm);
-  // v.updateData(cm, false, false);
 } // removeZone()
 
 /**

@@ -72,7 +72,7 @@ export function clearFacsimile() {
 export function loadFacsimile(xmlDoc) {
   let facsimile = xmlDoc.querySelector('facsimile');
   if (facsimile) {
-    clearFacsimile();
+    facs = {};
     // look for surface elements
     let surfaces = facsimile.querySelectorAll('surface');
     surfaces.forEach((s) => {
@@ -255,19 +255,20 @@ export async function drawFacsimile() {
       uly = 0;
       lrx = bb.width;
       lry = bb.height;
-    } else if (facs[zoneId]['type'] === 'surface') {
+    } else if (facs && facs[zoneId] && facs[zoneId]['type'] === 'surface') {
       showWarningText(translator.lang.facsimileNoZonesFullPageWarning.text);
       busy(false);
       return;
     }
+    
     let width = lrx - ulx;
     let height = lry - uly;
     let zoomFactor = document.getElementById('facsimileZoomInput').value / 100;
     svgContainer.setAttribute('transform-origin', 'left top');
     svgContainer.setAttribute('transform', 'scale(' + zoomFactor + ')');
-    if (width !== 0) svgContainer.setAttribute('width', width);
-    if (height !== 0) svgContainer.setAttribute('height', height);
-    if (width !== 0 && height !== 0) {
+    if (width > 0) svgContainer.setAttribute('width', width);
+    if (height > 0) svgContainer.setAttribute('height', height);
+    if (width > 0 && height > 0) {
       svg.setAttribute('viewBox', ulx + ' ' + uly + ' ' + width + ' ' + height);
     }
 
