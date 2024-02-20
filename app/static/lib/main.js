@@ -1,6 +1,6 @@
 // mei-friend version and date
 export const version = '1.0.10';
-export const versionDate = '31 January 2024'; // use full or 3-character english months, will be translated
+export const versionDate = '20 February 2024'; // use full or 3-character english months, will be translated
 
 var vrvWorker;
 var spdWorker;
@@ -968,7 +968,7 @@ async function vrvWorkerEventsHandler(ev) {
         updateHtmlTitle();
         document.getElementById('verovio-panel').innerHTML = ev.data.svg;
         if (document.getElementById('showFacsimilePanel') && document.getElementById('showFacsimilePanel').checked) {
-          loadFacsimile(v.xmlDoc);
+          // loadFacsimile(v.xmlDoc);
           await drawFacsimile();
         }
         if (ev.data.setCursorToPageBeginning) v.setCursorToPageBeginning(cm);
@@ -976,7 +976,7 @@ async function vrvWorkerEventsHandler(ev) {
         v.addNotationEventListeners(cm);
         v.updateHighlight(cm);
         refreshAnnotations(false);
-        v.scrollSvg(cm);
+        v.scrollSvgTo(cm);
         if (v.pdfMode) {
           // switch on frame, when in pdf mode
           const svg = document.querySelector('#verovio-panel svg');
@@ -1011,7 +1011,7 @@ async function vrvWorkerEventsHandler(ev) {
       }
       v.addNotationEventListeners(cm);
       refreshAnnotations(false);
-      v.scrollSvg(cm);
+      v.scrollSvgTo(cm);
       v.updateHighlight(cm);
       v.setFocusToVerovioPane();
       v.busy(false);

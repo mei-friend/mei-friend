@@ -179,6 +179,7 @@ export const supportedLanguages = {
 // export let platform = navigator.platform.toLowerCase(); // TODO
 export const platform = (navigator?.userAgentData?.platform || navigator?.platform || 'unknown').toLowerCase();
 export const isSafari = !!navigator.userAgent.match(/Version\/[\d\.]+.*Safari/);
+export const isFirefox = navigator.userAgent.toLowerCase().includes('firefox');
 
 // guidelines base URL, needed to construct element / attribute URLs
 // TODO ideally determine version part automatically
