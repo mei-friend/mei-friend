@@ -2,8 +2,10 @@
 
 ### 1.0.10 patch
 * Scroll to facsimile image zones corresponding to selected element in editor or notation
-* TODO: Make sure zone element edits are reloaded and redrawn in facsimile panel
-* Bug with drawing new zone without fullpage mode fixed
+* Make sure zone element edits are reloaded and redrawn in facsimile panel
+* Drawing new zones in non-fullpage mode corrected for Firefox and other browsers
+* New zones remain selected after insertion
+* Clicking on elements with `@facs` attribute will highlight linked zone also in zone edit mode
 
 ### 1.0.9 patch
 * Facsimile panel GUI elements update local storage 
