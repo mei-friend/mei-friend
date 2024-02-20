@@ -1985,7 +1985,8 @@ export function addZone(v, cm, rect, addMeasure = true) {
 
     // updating
     addApplicationInfo(v, cm);
-    // v.updateData(cm, false, false);
+    v.updateData(cm, false, false);
+    // TODO: select zone in SVG
     console.log('Editor: new zone ' + uuid + 'added.', rect);
     v.allowCursorActivity = true;
     return uuid;

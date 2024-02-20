@@ -615,20 +615,14 @@ export function addZoneDrawer() {
   function mouseDown(ev) {
     ev.preventDefault();
     if (document.getElementById('editFacsimileZones').checked && !resize) {
+      // remember point clicked on
       start.x = ev.clientX; // + ip.scrollLeft;
       start.y = ev.clientY; // + ip.scrollTop;
-
-      var mx = svg.getScreenCTM().inverse();
-      let s = transformCTM(start, mx);
-      console.log('ScreenCTM: ', mx);
-      console.log('transformed: ', s);
 
       let rect = document.createElementNS(svgNameSpace, 'rect');
       rect.id = 'new-rect';
       rect.setAttribute('rx', rectangleLineWidth / 2);
       rect.setAttribute('ry', rectangleLineWidth / 2);
-      rect.setAttribute('x', s.x); //+ ulx); // global variable ulx (upper-left corner)
-      rect.setAttribute('y', s.y); // + uly); // global variable uly (upper-left corner)
       rect.setAttribute('stroke', rectangleColor);
       rect.setAttribute('stroke-width', rectangleLineWidth);
       rect.setAttribute('fill', 'none');
