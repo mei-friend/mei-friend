@@ -169,6 +169,7 @@ export default class Profile {
         } else {
           // user is not logged in
           loginStatus.style.display = 'none';
+          loginStatusLabel.style.display = 'none';
           logoutButton.style.display = 'none';
         }
       }
