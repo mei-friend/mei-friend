@@ -311,8 +311,6 @@ export async function drawFacsimile() {
 /**
  * Draws the bounding box for the zone with zoneId, using global object facs
  * @param {string} zoneId
- * @param {string} pointerId
- * @param {string} pointerN
  */
 function drawBoundingBox(zoneId) {
   if (facs[zoneId]) {

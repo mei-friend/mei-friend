@@ -643,17 +643,24 @@ export default class Viewer {
     let ids = [];
     if (this.selectedElements.length > 0) this.selectedElements.forEach((item) => ids.push(item));
     else if (cm) ids.push(utils.getElementIdAtCursor(cm));
-    // console.info('updateHlt ids: ', ids);
+    // console.info('updatehighlight() ids: ', ids);
 
     // highlight those elements
     for (let id of ids) {
       if (id) {
         let el = document.querySelectorAll('#' + utils.escapeXmlId(id)); // was: 'g#'+id
-        // console.info('updateHlt el: ', el);
+        // console.log('updatehighlight() el list: ', el);
         if (el) {
           el.forEach((e) => {
+            // console.log('updatehighlight() e: ', e);
             if (e.nodeName === 'rect' && e.closest('#sourceImageSvg')) {
               facs.highlightZone(e);
+            } else if (e.hasAttribute('data-facs')) {
+              let ref = utils.rmHash(e.getAttribute('data-facs'));
+              if (ref) {
+                let zone = document.getElementById(ref);
+                if (zone) facs.highlightZone(zone);
+              }
             }
             e.classList.add('highlighted');
             e.querySelectorAll('g').forEach((g) => g.classList.add('highlighted'));
