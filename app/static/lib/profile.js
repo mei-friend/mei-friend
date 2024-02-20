@@ -20,11 +20,13 @@ export default class Profile {
         github_loginButton: {
           type: 'button',
           title: 'Login to GitHub',
+          description: 'Login to GitHub',
           value: 'Login',
         },
         github_logoutButton: {
           type: 'button',
           title: 'Logout from GitHub',
+          description: 'Logout from GitHub',
           value: 'Logout',
         },
       },
@@ -69,11 +71,13 @@ export default class Profile {
         solid_loginButton: {
           type: 'button',
           title: 'Login to Solid',
+          description: 'Login to Solid',
           value: 'Login',
         },
         solid_logoutButton: {
           type: 'button',
           title: 'Logout from Solid',
+          description: 'Logout from Solid',
           value: 'Logout',
         },
       },

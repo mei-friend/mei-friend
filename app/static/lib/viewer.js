@@ -35,6 +35,7 @@ import {
   supportedVerovioVersions,
 } from './defaults.js';
 import * as icon from './../css/icons.js';
+import { logoutFromGithub } from './github-menu.js';
 
 export default class Viewer {
   constructor(vrvWorker, spdWorker) {
@@ -1706,6 +1707,22 @@ export default class Viewer {
         }
       });
     });
+    if(addListeners) {
+      // add change listeners to profile settings
+      psp.addEventListener('click', (ev) => {
+        console.log('Profile settings click event listener: ', ev);
+        switch (ev.target.id) {
+          case 'github_loginButton':
+            console.log('GitHub login button clicked');
+            window.location.href = '/login';
+            break;
+          case 'github_logoutButton':
+            console.log('GitHub logout button clicked');
+            logoutFromGithub();
+            break;
+        }
+      });
+    }
   }
 
   // TODO: does not get called (WG., 12 Okt 2022)
