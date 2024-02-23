@@ -17,7 +17,7 @@ test.describe('Test local file input functionality', () => {
     const fileChooserPromise = page.waitForEvent('filechooser');
     await page.click('#fileMenuTitle');
     await page.click('#openMei');
-    // WG: input element seems to be blocked by playwright, so we can't test this
+    // WG TODO: input element seems to be blocked by playwright, so we can't test this
 
     // const fileChooser = await fileChooserPromise;
     // await fileChooser.setFiles('e2e/test-encodings/BeetAnGeSample.musicxml');
@@ -39,7 +39,18 @@ test.describe('Test input via URL', () => {
     await expect(page.locator('#note-0000000026346875 use')).toBeVisible();
   });
 
-  test.skip('Test OpenURL function to load text-based non-MEI file', async ({ page }) => {
+  test('Test OpenURL function to load text-based non-MEI file', async ({ page }) => {
+    await openUrl(page, 'https://raw.githubusercontent.com/wergo/test-encodings/main/BeetAnGeSample.musicxml');
+
+    // check first syl element to have text "Auf"
+    await expect(page.locator('g.syl tspan tspan').first()).toHaveText('Auf');
+    // click on last page button
+    await page.click('#lastPageButton');
+    // check last syl element to have text "schen"
+    await expect(page.locator('g.syl tspan tspan').last()).toHaveText('schen');
+  });
+
+  test.skip('Test OpenURL function to load binary non-MEI file', async ({ page }) => {
     // load mxl file https://github.com/wergo/test-encodings/blob/main/BrahWiMeSample.mxl
     await openUrl(
       page,
@@ -49,5 +60,25 @@ test.describe('Test input via URL', () => {
 
     // check first syl element to have text "Auf"
     // await expect(page.locator('#syl-0000002024515355')).toHaveText('Auf');
+  });
+
+  test('Test OpenURL function to load invalid text file', async ({ page }) => {
+    await openUrl(page, 'https://raw.githubusercontent.com/wergo/test-encodings/main/test-tk-expansion.html');
+    // inner text of verovio-panel should start with "Format not recognized"
+    await expect(page.locator('#verovio-panel')).toContainText('Format not recognized');
+    await expect(page.locator('#verovio-panel')).toContainText('Error Code: 1649499359728');
+  });
+
+  test('Test OpenURL function to load MEI file from server without CORS support', async ({ page }) => {
+    await openUrl(page, 'https://iwk.mdw.ac.at/goebl/Beethoven_Op126Nr1.mei');
+    // check for CORS error message in openUrlStatus
+    await expect(page.locator('#openUrlStatus')).toHaveText('CORS error');
+  });
+
+  test('Test OpenURL function to load from invalid URL', async ({ page }) => {
+    await openUrl(page, 'https://raw.githubusercontent.com/wergo/test-encodings/main/invalid.mei');
+    // check for CORS error message in openUrlStatus
+    await expect(page.locator('#openUrlStatus')).toContainText('404');
+    // TODO: do not give CORS error, but "Network error" instead
   });
 });
