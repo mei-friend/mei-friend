@@ -40,8 +40,57 @@ test.describe('Test settings panel', () => {
   });
 });
 
-test.describe.skip('Test mei-friend settings panel tab', () => {
-  // no-op for now, TODO write tests!
+test.describe('Test mei-friend settings panel tab', () => {
+  test('Test Verovio version change', async ({ page }) => {
+    // open settings panel
+    await page.click('#showSettingsButton');
+    // select mei-friend options tab
+    await page.click('#meifriendOptionsTab');
+    // choose a different Verovio version from selector
+    await page.locator('#selectToolkitVersion').selectOption('3.11.0');
+    // check Vrv version string in right footer is 3.11.0
+    await expect(page.locator('.rightfoot a:nth-child(2)')).toHaveText(/3\.11\.0.*/);
+    // check that a note is visible in the notation
+    await expect(page.locator('g.note').first()).toBeVisible();
+  });
+  test('Test Speed mode checkbox updates control-bar and vice-versa', async ({ page }) => {
+    // open settings panel
+    await page.click('#showSettingsButton');
+    // select mei-friend options tab
+    await page.click('#meifriendOptionsTab');
+    // ensure that speed mode checkbox in settings is checked (default behaviour)
+    await expect(page.locator('#toggleSpeedMode')).toBeChecked();
+    // ensure that speed mode checkbox in control-bar is checked
+    await expect(page.locator('#speedCheckbox')).toBeChecked();
+    // click settings checkbox
+    await page.click('#toggleSpeedMode');
+    // ensure both boxes are now no longer checked
+    await expect(page.locator('#toggleSpeedMode')).not.toBeChecked();
+    await expect(page.locator('#speedCheckbox')).not.toBeChecked();
+    // click control-bar checkbox
+    await page.click('#speedCheckbox');
+    // ensure both boxes are now checked again
+    await expect(page.locator('#toggleSpeedMode')).toBeChecked();
+    await expect(page.locator('#speedCheckbox')).toBeChecked();
+  });
+  test('Test "Style of generated xml:ids" selector and functionality', async ({ page }) => {
+    // open settings panel
+    await page.click('#showSettingsButton');
+    // select mei-friend options tab
+    await page.click('#meifriendOptionsTab');
+    // ensure that the default xml:id style is 'Base36'
+    await expect(page.locator('#selectIdStyle')).toHaveValue('Base36');
+    // choose a different xml:id style from selector
+    await page.locator('#selectIdStyle').selectOption('Original');
+    // remove xml:id's from the MEI by clicking #manipulateMenuTitle => #removeIdsText
+    await page.click('#manipulateMenuTitle');
+    await page.click('#removeIdsText');
+    /// add xml:id's back to the MEI by clicking #manipulateMenuTitle => #addIdsText
+    await page.click('#manipulateMenuTitle');
+    await page.click('#addIdsText');
+    // ensure that the xml:id style of the first g.staff element fits the selected style
+    await expect(page.locator('g.staff').first()).toHaveAttribute('id', /^staff-\d\d\d\d\d\d\d\d\d\d\d\d\d\d\d\d$/);
+  });
 });
 
 test.describe('Test editor settings panel tab', () => {
