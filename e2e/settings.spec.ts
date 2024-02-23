@@ -91,6 +91,56 @@ test.describe('Test mei-friend settings panel tab', () => {
     // ensure that the xml:id style of the first g.staff element fits the selected style
     await expect(page.locator('g.staff').first()).toHaveAttribute('id', /^staff-\d\d\d\d\d\d\d\d\d\d\d\d\d\d\d\d$/);
   });
+  test('Test "Insert application statement" checkbox and functionality', async ({ page }) => {
+    // open settings panel
+    await page.click('#showSettingsButton');
+    // select mei-friend options tab
+    await page.click('#meifriendOptionsTab');
+    // ensure that the default application statement checkbox is checked (default)
+    await expect(page.locator('#addApplicationNote')).toBeChecked();
+    // uncheck the application statement checkbox
+    await page.click('#addApplicationNote');
+    // open a known CMN MEI without application statement
+    await openUrl(
+      page,
+      'https://raw.githubusercontent.com/trompamusic-encodings/Schumann-Clara_Romanze-in-a-Moll/b408031f725b0a1f4eea57a89a04c75c3431da62/Schumann-Clara_Romanze-ohne-Opuszahl_a-Moll.mei'
+    );
+    // scroll the editor to the end of the <appInfo> element to ensure that the application statements are in viewport
+    await page.click('#editMenuTitle');
+    await page.click('#startSearch');
+    await page.keyboard.type('</appInfo');
+    // send a return key to ensure that the search is performed
+    await page.keyboard.press('Enter');
+    // ensure that the application statement is not present in the MEI:
+    await expect(await page.locator('#encoding').innerText()).not.toMatch(/.*<name .*mei-friend<\/.*/);
+    // make a change to the MEI (shift pitch of first note) and check app statement still not present
+    // click on the first g.note element
+    await page.click('g.note');
+    await page.click('#manipulateMenuTitle');
+    await page.click('#pitchChromUp');
+    // reset viewport to end of <appInfo> element]
+    await page.click('#editMenuTitle');
+    await page.click('#startSearch');
+    await page.keyboard.type('</appInfo');
+    // send a return key to ensure that the search is performed
+    await page.keyboard.press('Enter');
+    await expect(await page.locator('#encoding').innerText()).not.toMatch(/.*<name .*mei-friend<\/.*/);
+    // re-check the application statement checkbox
+    // click on the first g.note element
+    await page.click('#addApplicationNote');
+    // make another change to the MEI (shift pitch of first note) and check app statement is present
+    await page.click('g.note');
+    await page.click('#manipulateMenuTitle');
+    await page.click('#pitchChromUp');
+    // scroll the editor to the end of the <appInfo> element to ensure that the application statements are in viewport
+    await page.click('#editMenuTitle');
+    await page.click('#startSearch');
+    await page.keyboard.type('</appInfo');
+    // send a return key to ensure that the search is performed
+    await page.keyboard.press('Enter');
+    await expect(await page.locator('#encoding').innerText()).toMatch(/.*<name .*mei-friend<\/.*/);
+    // check the inner text of the #encoding element matches the regex /<name .*mei-friend<\//
+  });
 });
 
 test.describe('Test editor settings panel tab', () => {
@@ -111,10 +161,6 @@ test.describe('Test editor settings panel tab', () => {
 });
 
 test.describe('Test Verovio settings panel tab', () => {
-  // no-op for now, TODO write tests!
-  test.skip('Test that expected categories exist', async ({ page }) => {
-    // no-op for now, TODO write tests!
-  });
   test('Test that checkboxes work', async ({ page }) => {
     await page.click('#showSettingsButton');
     await page.click('#verovioOptionsTab');
