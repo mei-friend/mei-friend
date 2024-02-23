@@ -161,7 +161,7 @@ export function highlightNotesAtMidiPlaybackTime(ev = false) {
         let measure = el ? el.closest('.measure') : null;
         if (measure) {
           // scroll to its ID
-          v.scrollSvg(measure.id);
+          v.scrollSvgTo(measure.id);
         }
       }
     }

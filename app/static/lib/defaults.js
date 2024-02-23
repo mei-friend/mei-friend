@@ -179,6 +179,7 @@ export const supportedLanguages = {
 // export let platform = navigator.platform.toLowerCase(); // TODO
 export const platform = (navigator?.userAgentData?.platform || navigator?.platform || 'unknown').toLowerCase();
 export const isSafari = !!navigator.userAgent.match(/Version\/[\d\.]+.*Safari/);
+export const isFirefox = navigator.userAgent.toLowerCase().includes('firefox');
 
 // guidelines base URL, needed to construct element / attribute URLs
 // TODO ideally determine version part automatically
@@ -254,6 +255,11 @@ supportedVerovioVersions.develop = {
 supportedVerovioVersions.latest = {
   url: 'https://www.verovio.org/javascript/latest/verovio-toolkit-hum.js',
   description: 'Current Verovio release',
+};
+supportedVerovioVersions['4.1.0'] = {
+  url: 'https://www.verovio.org/javascript/4.1.0/verovio-toolkit-hum.js',
+  description: 'Verovio release 4.1.0',
+  releaseDate: '15 Dec 2023',
 };
 supportedVerovioVersions['4.0.1'] = {
   url: 'https://www.verovio.org/javascript/4.0.1/verovio-toolkit-hum.js',

@@ -5,7 +5,8 @@ import * as speed from './speed.js';
 import * as utils from './utils.js';
 import { getControlMenuState, showPdfButtons, setControlMenuState, setCheckbox } from './control-menu.js';
 import { alert, download, info, success, verified, unverified, xCircleFill } from '../css/icons.js';
-import { drawFacsimile, highlightZone, loadFacsimile, zoomFacsimile } from './facsimile.js';
+import * as facs from './facsimile.js';
+//  drawFacsimile, highlightZone, zoomFacsimile
 import {
   cm,
   cmd,
@@ -77,6 +78,7 @@ export default class Viewer {
     this.settingsReplaceFriendContainer = false; // whether or not the settings panel is over the mei-friend window (false) or replaces it (true)
     this.notationProportion = defaultNotationProportion; // remember proportion during pdf mode
     this.expansionId = ''; // id string of currently selected expansion element
+    this.facsimileObserver = new MutationObserver(() => facs.loadFacsimile(this.xmlDoc));
   } // constructor() // constructor()
 
   // change options, load new data, render current page, add listeners, highlight
@@ -296,8 +298,14 @@ export default class Viewer {
 
   loadXml(mei, forceReload = false) {
     if (this.xmlDocOutdated || forceReload) {
+      this.facsimileObserver.disconnect();
       this.xmlDoc = this.parser.parseFromString(mei, 'text/xml');
       this.xmlDocOutdated = false;
+      let facsimile = this.xmlDoc.querySelector('facsimile');
+      if (facsimile) {
+        facs.loadFacsimile(this.xmlDoc);
+        this.facsimileObserver.observe(facsimile, { attributes: true, childList: true, subtree: true });
+      }
     }
   } // loadXml()
 
@@ -578,49 +586,32 @@ export default class Viewer {
           this.updatePage(cm, '', id, false);
         } else {
           // on current page
-          this.scrollSvg(cm);
+          this.scrollSvgTo(cm);
           this.updateHighlight(cm);
         }
       }
     }
   } // cursorActivity()
 
-  // Scroll notation SVG into view, both vertically and horizontally
-  scrollSvg(cmOrId) {
+  /**
+   * Scroll notation SVG into view, both vertically and horizontally
+   * @param {string|CodeMirror} cmOrId
+   * @returns
+   */
+  scrollSvgTo(cmOrId) {
     let vp = document.getElementById('verovio-panel');
     let id = typeof cmOrId === 'string' ? cmOrId : utils.getElementIdAtCursor(cmOrId);
     if (!id) return;
     let el = document.querySelector('g#' + utils.escapeXmlId(id));
-    if (el) {
-      let changed = false;
-      let scrollLeft, scrollTop;
-      let vpRect = vp.getBoundingClientRect();
-      let elRect = el.getBBox();
-      var mx = el.getScreenCTM();
-      // adjust scrolling only when element (close to or completely) outside
-      const closeToPerc = 0.1;
-      let sx = mx.a * (elRect.x + elRect.width / 2) + mx.c * (elRect.y + elRect.height / 2) + mx.e;
-      // kind-of page-wise flipping for x
-      if (sx < vpRect.x + vpRect.width * closeToPerc) {
-        scrollLeft = vp.scrollLeft - (vpRect.x + vpRect.width * (1 - closeToPerc) - sx);
-        changed = true;
-      } else if (sx > vpRect.x + vpRect.width * (1 - closeToPerc)) {
-        scrollLeft = vp.scrollLeft - (vpRect.x + vpRect.width * closeToPerc - sx);
-        changed = true;
-      }
+    if (vp && el) dutils.scrollTo(vp, el);
 
-      // y flipping
-      let sy = mx.b * (elRect.x + elRect.width / 2) + mx.d * (elRect.y + elRect.height / 2) + mx.f;
-      if (sy < vpRect.y + vpRect.height * closeToPerc || sy > vpRect.y + vpRect.height * (1 - closeToPerc)) {
-        scrollTop = vp.scrollTop - (vpRect.y + vpRect.height / 2 - sy);
-        changed = true;
-      }
-
-      if (changed) {
-        vp.scrollTo({ top: scrollTop, left: scrollLeft, behavior: 'smooth' });
-      }
+    // scroll to current element inside facsimile panel, if existing
+    if (document.getElementById('showFacsimilePanel') && document.getElementById('showFacsimilePanel').checked) {
+      let rect = document.querySelector('rect#' + id);
+      let fp = document.getElementById('facsimile-panel');
+      if (rect && fp) dutils.scrollTo(fp, rect);
     }
-  } // scrollSvg()
+  } // scrollSvgTo()
 
   // when editor emits changes, update notation rendering
   notationUpdated(cm, forceUpdate = false) {
@@ -638,24 +629,40 @@ export default class Viewer {
     }
   } // notationUpdated()
 
-  // highlight currently selected elements, if cm left out, all are cleared
+  /**
+   * Highlights currently selected elements or the element at cursor in CodeMirror.
+   * If cm is left out, all are cleared
+   * @param {CodeMirror} cm
+   */
   updateHighlight(cm) {
     // clear existing highlighted classes
     let highlighted = document.querySelectorAll('.highlighted');
-    // console.info('updateHlt: highlighted: ', highlighted);
     highlighted.forEach((e) => e.classList.remove('highlighted'));
+
+    // create array of id strings from selectedElements or from cursor position
     let ids = [];
     if (this.selectedElements.length > 0) this.selectedElements.forEach((item) => ids.push(item));
     else if (cm) ids.push(utils.getElementIdAtCursor(cm));
-    // console.info('updateHlt ids: ', ids);
+    // console.info('updatehighlight() ids: ', ids);
+
+    // highlight those elements
     for (let id of ids) {
       if (id) {
         let el = document.querySelectorAll('#' + utils.escapeXmlId(id)); // was: 'g#'+id
-        // console.info('updateHlt el: ', el);
+        // console.log('updatehighlight() el list: ', el);
         if (el) {
           el.forEach((e) => {
+            // console.log('updatehighlight() e: ', e);
+            if (e.nodeName === 'rect' && e.closest('#sourceImageSvg')) {
+              facs.highlightZone(e);
+            } else if (e.hasAttribute('data-facs')) {
+              let ref = utils.rmHash(e.getAttribute('data-facs'));
+              if (ref) {
+                let zone = document.getElementById(ref);
+                if (zone) facs.highlightZone(zone);
+              }
+            }
             e.classList.add('highlighted');
-            if (e.nodeName === 'rect' && e.closest('#sourceImageSvg')) highlightZone(e);
             e.querySelectorAll('g').forEach((g) => g.classList.add('highlighted'));
           });
         }
@@ -1350,28 +1357,28 @@ export default class Viewer {
             value ? cmd.showFacsimilePanel() : cmd.hideFacsimilePanel();
             break;
           case 'selectFacsimilePanelOrientation':
-            drawFacsimile();
+            facs.drawFacsimile();
             break;
           case 'facsimileZoomInput':
-            zoomFacsimile();
+            facs.zoomFacsimile();
             break;
           case 'showFacsimileFullPage':
             document.getElementById('facsimileFullPageCheckbox').checked = value;
-            drawFacsimile();
+            facs.drawFacsimile();
             break;
           case 'showFacsimileZones':
             document.getElementById('facsimileShowZonesCheckbox').checked = value;
             if (!value && document.getElementById('editFacsimileZones').checked) {
               document.getElementById('editFacsimileZones').click();
             }
-            drawFacsimile();
+            facs.drawFacsimile();
             break;
           case 'editFacsimileZones':
             document.getElementById('facsimileEditZonesCheckbox').checked = value;
             if (value && !document.getElementById('showFacsimileZones').checked) {
               document.getElementById('showFacsimileZones').click();
             }
-            drawFacsimile();
+            facs.drawFacsimile();
             break;
           case 'showSupplied':
             rt.style.setProperty('--suppliedColor', value ? col : 'var(--notationColor)');
@@ -1930,7 +1937,10 @@ export default class Viewer {
     if (id === '') {
       // empty note id
       id = this.setCursorToPageBeginning(cm); // re-defines lastNotId
-      if (!id) return;
+      if (!id) {
+        this.allowCursorActivity = true;
+        return;
+      }
     }
     let element;
     id = utils.escapeXmlId(id);
@@ -1941,7 +1951,10 @@ export default class Viewer {
       id = utils.escapeXmlId(this.lastNoteId);
       if (id) element = document.querySelector('g#' + id);
     }
-    if (!element) return;
+    if (!element) {
+      this.allowCursorActivity = true;
+      return;
+    }
     console.info('Navigate ' + dir + ' ' + incElName + '-wise for: ', element);
     let x = dutils.getX(element);
     let y = dutils.getY(element);
@@ -1964,6 +1977,7 @@ export default class Viewer {
           let staff = element.closest('.staff');
           let stNo = staff.getAttribute('data-n');
           this.navigateBeyondPage(cm, dir, what, stNo, lyNo, y);
+          this.allowCursorActivity = true;
           return;
         }
       }
@@ -2009,7 +2023,7 @@ export default class Viewer {
       }
     }
     this.allowCursorActivity = true;
-    this.scrollSvg(cm);
+    this.scrollSvgTo(cm);
     this.updateHighlight(cm);
   } // navigate()
 
