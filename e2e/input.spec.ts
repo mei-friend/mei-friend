@@ -82,3 +82,10 @@ test.describe('Test input via URL', () => {
     // TODO: do not give CORS error, but "Network error" instead
   });
 });
+
+test.describe('Drag and drop functionality', () => {
+  test.fixme('Test drag and drop of a local MEI file onto the mei-friend window', async ({ page }) => {
+    // TODO: drag and drop MEI file from e2e/test-encodings/BeetAnGeSample.mei onto the browser window
+    //  await page.locator('#item-to-be-dragged').dragTo(page.locator('#item-to-drop-at'));
+  });
+});
