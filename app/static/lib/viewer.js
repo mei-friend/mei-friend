@@ -254,7 +254,7 @@ export default class Viewer {
     let speedMeiDoc = this.xmlDoc.cloneNode(true);
     const choiceOption = this.choiceSelect.value;
     let markupResult = selectMarkup(speedMeiDoc, choiceOption); // select markup
-    if (markupResult.changed === true) {
+    if (markupResult?.changed === true) {
       speedMeiDoc = markupResult.doc;
       //this.xmlDocOutdated = true;
       // unnecessary if this.xmlDoc is not touched
