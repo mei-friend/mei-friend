@@ -499,6 +499,16 @@ export const lang = {
     text: 'Select markup responsibility',
     description: 'Select responsibility id',
   },
+  selectionSelect: {
+    text: 'Default selection for markup',
+    description: 'Choose if newly created markup should enclose the selected elements, articulation or accidentals',
+    labels: ['Selected elements','Articulation', 'Accidentals'],
+    valuesDescriptions: [
+      'Add markup to selected elements.', 
+      'Add markup to articulations within selection.', 
+      'Add markup to accidentals within selection.'
+    ],
+  },
   alternativeEncodingsGrp: {
     text: 'Alternative encodings',
     description: 'Markup elements that contain multiple versions.',
@@ -523,9 +533,6 @@ export const lang = {
     text: '(select content)',
     description: 'First, select content for this element by hovering over <choice>.',
   },
-  addChoice: { text: 'Selected elements', description: 'Add markup to selected elements.' },
-  addChoiceArtic: { text: 'Articulation', description: 'Add markup to articulations within selection.' },
-  addChoiceAccid: { text: 'Accidental', description: 'Add markup to accidentals within selection.' },
   addSubstText: {
     text: '<subst>',
     description:
@@ -541,9 +548,6 @@ export const lang = {
     text: '(select content)',
     description: 'First, select content for this element by hovering over <subst>.',
   },
-  addSubst: { text: 'Selected elements', description: 'Add markup to selected elements.' },
-  addSubstArtic: { text: 'Articulation', description: 'Add markup to articulations within selection.' },
-  addSubstAccid: { text: 'Accidental', description: 'Add markup to accidentals within selection.' },
   editInterventionsGrp: {
     text: 'Editorial interventions',
     description: 'Markup elements used to encode editorial interventions.',
@@ -552,59 +556,35 @@ export const lang = {
     text: '<supplied>',
     description: 'Contains material supplied by the transcriber or editor for any reason.',
   },
-  addSupplied: { text: 'Selected elements', description: 'Add markup to selected elements.' },
-  addSuppliedArtic: { text: 'Articulation', description: 'Add markup to articulations within selection.' },
-  addSuppliedAccid: { text: 'Accidental', description: 'Add markup to accidentals within selection.' },
   addUnclearText: {
     text: '<unclear>',
     description:
       'Contains material that cannot be transcribed with certainty because it is illegible or inaudible in the source.',
   },
-  addUnclear: { text: 'Selected elements', description: 'Add markup to selected elements.' },
-  addUnclearArtic: { text: 'Articulation', description: 'Add markup to articulations within selection.' },
-  addUnclearAccid: { text: 'Accidental', description: 'Add markup to accidentals within selection.' },
   addSicText: { text: '<sic>', description: 'Contains apparently incorrect or inaccurate material.' },
-  addSic: { text: 'Selected elements', description: 'Add markup to selected elements.' },
-  addSicArtic: { text: 'Articulation', description: 'Add markup to articulations within selection.' },
-  addSicAccid: { text: 'Accidental', description: 'Add markup to accidentals within selection.' },
   addCorrText: {
     text: '<corr>',
     description: '(correction) – Contains the correct form of an apparent erroneous passage.',
   },
-  addCorr: { text: 'Selected elements', description: 'Add markup to selected elements.' },
-  addCorrArtic: { text: 'Articulation', description: 'Add markup to articulations within selection.' },
-  addCorrAccid: { text: 'Accidental', description: 'Add markup to accidentals within selection.' },
   addOrigText: {
     text: '<orig>',
     description:
       '(original) – Contains material which is marked as following the original, rather than being normalized or corrected.',
   },
-  addOrig: { text: 'Selected elements', description: 'Add markup to selected elements.' },
-  addOrigArtic: { text: 'Articulation', description: 'Add markup to articulations within selection.' },
-  addOrigAccid: { text: 'Accidental', description: 'Add markup to accidentals within selection.' },
   addRegText: {
     text: '<reg>',
     description: '(regularization) – Contains material which has been regularized or normalized in some sense.',
   },
-  addReg: { text: 'Selected elements', description: 'Add markup to selected elements.' },
-  addRegArtic: { text: 'Articulation', description: 'Add markup to articulations within selection.' },
-  addRegAccid: { text: 'Accidental', description: 'Add markup to accidentals within selection.' },
   descMarkupGrp: {
     text: 'Descriptive Markup',
     description: 'Markup elements used to encode interventions in the source material.',
   },
   addAddText: { text: '<add>', description: '(addition) – Marks an addition to the text.' },
-  addAdd: { text: 'Selected elements', description: 'Add markup to selected elements.' },
-  addAddArtic: { text: 'Articulation', description: 'Add markup to articulations within selection.' },
-  addAddAccid: { text: 'Accidental', description: 'Add markup to accidentals within selection.' },
   addDelText: {
     text: '<del>',
     description:
       '(deletion) – Contains information deleted, marked as deleted, or otherwise indicated as superfluous or spurious in the copy text by an author, scribe, annotator, or corrector.',
   },
-  addDel: { text: 'Selected elements', description: 'Add markup to selected elements.' },
-  addDelArtic: { text: 'Articulation', description: 'Add markup to articulations within selection.' },
-  addDelAccid: { text: 'Accidental', description: 'Add markup to accidentals within selection.' },
 
   // MIDI
   midiSpeedmodeIndicator: {

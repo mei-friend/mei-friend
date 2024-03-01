@@ -580,15 +580,12 @@ export function addMarkupHandlers() {
     let targetDisplay = document.getElementById(targetID);
 
     targetDisplay.innerHTML = currentElement.innerHTML;
-    let targetLinks = targetDisplay.parentElement.children[1].children;
-    for (let i = 0; i < targetLinks.length; i++) {
-      targetLinks[i].setAttribute('data-content', currentElement.dataset.contentChoice);
-    }
-    //TODO: make addition of data-content less error prone!
+    targetDisplay.setAttribute('data-content', currentElement.dataset.contentChoice);
   };
 
+  addSelectionSelect();
   addRespSelect();
-
+  
   let contentOptions = document.getElementsByClassName('content-option');
   for (let i = 0; i < contentOptions.length; i++) {
     contentOptions[i].addEventListener('click', (event) => {
@@ -630,6 +627,44 @@ function addRespSelect() {
 
   let markupMenu = document.getElementById('markupToolsMenu');
   markupMenu.prepend(respSelDiv);
+}
+
+/**
+ * add selection select control to markup tools tab
+ */
+function addSelectionSelect() {
+  let selectSelectBase = {
+    title: 'Select markup selection',
+    description: 'filled in by language packs',
+    type: 'select',
+    default: '',
+    values: ['','artic', 'accid'],
+  }
+
+  let selSelDiv = document.createElement('div');
+  selSelDiv.classList.add('markupSetting');
+  selSelDiv.classList.add('optionsItem');
+  let selSelect = document.createElement(selectSelectBase.type);
+  selSelect.id = 'selectionSelect';
+
+  selectSelectBase.values.forEach((value, i) => {
+    let label = 'labels' in translator.lang.selectionSelect ? translator.lang.selectionSelect.labels.at(i) : value;
+    let option = new Option(label, value, selectSelectBase.values.indexOf(selectSelectBase.default) === i ? true : false);
+    // Does not update on language change, find better solution
+    //if ('valuesDescriptions' in translator.lang.selectionSelect) option.title = translator.lang.selectionSelect.valuesDescriptions[i];
+    selSelect.add(option);
+  });
+
+  let selSelLabel = document.createElement('label');
+  selSelLabel.title = selectSelectBase.title;
+  selSelLabel.textContent = selectSelectBase.title;
+  selSelLabel.htmlFor = selSelect.id;
+
+  selSelDiv.appendChild(selSelLabel);
+  selSelDiv.appendChild(selSelect);
+
+  let markupMenu = document.getElementById('markupToolsMenu');
+  markupMenu.prepend(selSelDiv);
 }
 
 /**

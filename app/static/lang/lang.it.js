@@ -511,6 +511,16 @@ export const lang = {
     text: 'Seleziona responsabilità di markup',
     description: 'Seleziona ID di responsabilità',
   },
+  selectionSelect: {
+    text: 'Selezione predefinita per il markup',
+    description: 'Scegli se il markup appena creato deve racchiudere gli elementi selezionati, l\'articolazione o gli accidenti',
+    labels: ['Elementi selezionati','Articolazione', 'Accidentale'],
+    valuesDescriptions: [
+      'Aggiungi il markup agli elementi selezionati.', 
+      'Aggiungi il markup alle articolazioni nella selezione.', 
+      'Aggiungi il markup agli accidentali nella selezione.'
+    ],
+  },
   alternativeEncodingsGrp: {
     text: 'Codifiche alternative',
     description: 'Elementi di markup che contengono diverse versioni.',
@@ -535,9 +545,6 @@ export const lang = {
     text: '(seleziona il contenuto)',
     description: 'Prima, seleziona il contenuto per questo elemento passando sopra a <scelta>.',
   },
-  addChoice: { text: 'Elementi selezionati', description: 'Aggiungi il markup agli elementi selezionati.' },
-  addChoiceArtic: { text: 'Articolazione', description: 'Aggiungi il markup alle articolazioni nella selezione.' },
-  addChoiceAccid: { text: 'Accidentale', description: 'Aggiungi il markup agli accidentali nella selezione.' },
   addSubstText: {
     text: '<subst>',
     description:
@@ -553,9 +560,6 @@ export const lang = {
     text: '(seleziona il contenuto)',
     description: 'Prima, seleziona il contenuto per questo elemento passando sopra a <sostituzione>.',
   },
-  addSubst: { text: 'Elementi selezionati', description: 'Aggiungi il markup agli elementi selezionati.' },
-  addSubstArtic: { text: 'Articolazione', description: 'Aggiungi il markup alle articolazioni nella selezione.' },
-  addSubstAccid: { text: 'Accidentale', description: 'Aggiungi il markup agli accidentali nella selezione.' },
   editInterventionsGrp: {
     text: 'Interventi editoriali',
     description: 'Elementi di markup utilizzati per codificare gli interventi editoriali.',
@@ -564,59 +568,35 @@ export const lang = {
     text: '<supplied>',
     description: "Contiene materiale fornito dal trascrittore o dall'editore per qualsiasi motivo.",
   },
-  addSupplied: { text: 'Elementi selezionati', description: 'Aggiungi il markup agli elementi selezionati.' },
-  addSuppliedArtic: { text: 'Articolazione', description: 'Aggiungi il markup alle articolazioni nella selezione.' },
-  addSuppliedAccid: { text: 'Accidentale', description: 'Aggiungi il markup agli accidentali nella selezione.' },
   addUnclearText: {
     text: '<unclear>',
     description:
       'Contiene materiale che non può essere trascritto con certezza perché è illeggibile o incomprensibile nella fonte.',
   },
-  addUnclear: { text: 'Elementi selezionati', description: 'Aggiungi il markup agli elementi selezionati.' },
-  addUnclearArtic: { text: 'Articolazione', description: 'Aggiungi il markup alle articolazioni nella selezione.' },
-  addUnclearAccid: { text: 'Accidentale', description: 'Aggiungi il markup agli accidentali nella selezione.' },
   addSicText: { text: '<sic>', description: 'Contiene materiale apparentemente scorretto o inaccurato.' },
-  addSic: { text: 'Elementi selezionati', description: 'Aggiungi il markup agli elementi selezionati.' },
-  addSicArtic: { text: 'Articolazione', description: 'Aggiungi il markup alle articolazioni nella selezione.' },
-  addSicAccid: { text: 'Accidentale', description: 'Aggiungi il markup agli accidentali nella selezione.' },
   addCorrText: {
     text: '<corr>',
     description: '(correzione) - Contiene la forma corretta di un passaggio apparentemente errato.',
   },
-  addCorr: { text: 'Elementi selezionati', description: 'Aggiungi il markup agli elementi selezionati.' },
-  addCorrArtic: { text: 'Articolazione', description: 'Aggiungi il markup alle articolazioni nella selezione.' },
-  addCorrAccid: { text: 'Accidentale', description: 'Aggiungi il markup agli accidentali nella selezione.' },
   addOrigText: {
     text: '<orig>',
     description:
       "(originale) - Contiene materiale contrassegnato come seguente l'originale, piuttosto che essere normalizzato o corretto.",
   },
-  addOrig: { text: 'Elementi selezionati', description: 'Aggiungi il markup agli elementi selezionati.' },
-  addOrigArtic: { text: 'Articolazione', description: 'Aggiungi il markup alle articolazioni nella selezione.' },
-  addOrigAccid: { text: 'Accidentale', description: 'Aggiungi il markup agli accidentali nella selezione.' },
   addRegText: {
     text: '<reg>',
     description: '(regolarizzazione) - Contiene materiale che è stato regolarizzato o normalizzato in qualche modo.',
   },
-  addReg: { text: 'Elementi selezionati', description: 'Aggiungi il markup agli elementi selezionati.' },
-  addRegArtic: { text: 'Articolazione', description: 'Aggiungi il markup alle articolazioni nella selezione.' },
-  addRegAccid: { text: 'Accidentale', description: 'Aggiungi il markup agli accidentali nella selezione.' },
   descMarkupGrp: {
     text: 'Markup descrittivo',
     description: 'Elementi di markup utilizzati per codificare le modifiche nel materiale di origine.',
   },
   addAddText: { text: '<add>', description: "(aggiunta) - Marca un'aggiunta al testo." },
-  addAdd: { text: 'Elementi selezionati', description: 'Aggiungi il markup agli elementi selezionati.' },
-  addAddArtic: { text: 'Articolazione', description: 'Aggiungi il markup alle articolazioni nella selezione.' },
-  addAddAccid: { text: 'Accidentale', description: 'Aggiungi il markup agli accidentali nella selezione.' },
   addDelText: {
     text: '<del>',
     description:
       '(eliminazione) - Contiene informazioni eliminate, contrassegnate come eliminate o indicate come superflue o spurie nel testo di copia da parte di un autore, uno scriba, un annotatore o un correttore.',
   },
-  addDel: { text: 'Elementi selezionati', description: 'Aggiungi il markup agli elementi selezionati.' },
-  addDelArtic: { text: 'Articolazione', description: 'Aggiungi il markup alle articolazioni nella selezione.' },
-  addDelAccid: { text: 'Accidentale', description: 'Aggiungi il markup agli accidentali nella selezione.' },
 
   // MIDI
   midiSpeedmodeIndicator: {

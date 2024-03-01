@@ -92,6 +92,7 @@ fieldset {
 .markupSetting select {
   background-color: var(--annotationPanelLinkBackgroundColor);
   color: var(--annotationPanelTextColor);
+  max-width: fit-content;
 }
 
 .markupSetting select option {
