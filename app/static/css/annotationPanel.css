@@ -123,8 +123,9 @@ fieldset {
   background-color: var(--annotationPanelHoverColor);
 }*/
 
-.alternativeEncodingsTag{
-  border-right: 1px solid black;
+.alternativeEncodingsContent{
+  border-left: 1px solid black;
+  width: min-content;
 }
 
 .markup-dropdown {
@@ -302,6 +303,7 @@ summary.noDetails {
 
 .splitButtonContainer {
   /*display: inline-block;*/
+  word-wrap: break-word;
 }
 
 .splitButtonLabel {
