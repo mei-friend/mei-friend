@@ -270,35 +270,35 @@ summary.noDetails {
 /* highlight markup menu buttons with corresponding colors */
 
 .suppliedLabel {
-  background-color: var(--suppliedColor);
+  background-color: var(--suppliedBgColor);
 }
 
 .unclearLabel {
-  background-color: var(--unclearColor);
+  background-color: var(--unclearBgColor);
 }
 
 .sicLabel {
-  background-color: var(--sicColor);
+  background-color: var(--sicBgColor);
 }
 
 .corrLabel {
-  background-color: var(--corrColor);
+  background-color: var(--corrBgColor);
 }
 
 .origLabel {
-  background-color: var(--origColor);
+  background-color: var(--origBgColor);
 }
 
 .regLabel {
-  background-color: var(--regColor);
+  background-color: var(--regBgColor);
 }
 
 .addLabel {
-  background-color: var(--addColor);
+  background-color: var(--addBgColor);
 }
 
 .delLabel {
-  background-color: var(--delColor);
+  background-color: var(--delBgColor);
 }
 
 .splitButtonContainer {

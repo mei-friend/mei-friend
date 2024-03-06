@@ -1174,6 +1174,10 @@ export default class Viewer {
               '--' + element + 'HighlightedColor',
               value ? 'var(--default' + upperCaseElementName + 'HighlightedColor)' : 'var(--highlightColor)'
             );
+            rt.style.setProperty(
+              '--' + element + 'BgColor',
+              value ? 'var(--' + element + 'Color)' : 'var(--annotationPanelBackgroundColor)'
+            );
           });
           break;
         case 'suppliedColor':
@@ -1545,12 +1549,20 @@ export default class Viewer {
           '--default' + upperCaseElementName + 'HighlightedColor',
           checkedMarkup ? utils.brighter(colorValue, -50) : 'var(--highlightColor)'
         );
+        rt.style.setProperty(
+          '--' + elementName + 'BgColor',
+          checkedMarkup ? 'var(--' + elementName + 'Color)' : 'var(--annotationPanelBackgroundColor)'
+        );
       }
 
       rt.style.setProperty('--' + elementName + 'Color', checkedMarkup ? colorValue : 'var(--notationColor)');
       rt.style.setProperty(
         '--' + elementName + 'HighlightedColor',
         checkedMarkup ? utils.brighter(colorValue, -50) : 'var(--highlightColor)'
+      );
+      rt.style.setProperty(
+        '--' + elementName + 'BgColor',
+        checkedMarkup ? 'var(--' + elementName + 'Color)' : 'var(--annotationPanelBackgroundColor)'
       );
     }
   } // addMeiFriendOptionsToSettingsPanel()
