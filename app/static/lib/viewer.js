@@ -231,10 +231,16 @@ export default class Viewer {
     );
   } // getPageWithElementFromVrvWorker()
 
-  // with normal mode: load DOM and pass-through the MEI code;
-  // with speed mode: load into DOM (if xmlDocOutdated) and
-  // return MEI excerpt of currentPage page
-  // (including dummy measures before and after current page by default)
+  /**
+   * with normal mode: load DOM and pass-through the MEI code;
+   * with speed mode: load into DOM (if xmlDocOutdated) and
+   * return MEI excerpt of currentPage page
+   * (including dummy measures before and after current page by default)
+   * @param {string} mei mei file in string format
+   * @param {boolean} includeDummyMeasures 
+   * @param {boolean} forceReload 
+   * @returns 
+   */
   speedFilter(mei, includeDummyMeasures = true, forceReload = false) {
     let breaks = this.breaksValue();
     let breaksSelectVal = this.breaksSelect.value;
@@ -243,15 +249,19 @@ export default class Viewer {
     }
     // update DOM only if encoding has been edited or
     this.loadXml(mei, forceReload);
+    // create a deep clone of xml.Doc before filtering for markup
+    // hard markup filters should never modify v.xmlDoc! (because non-displayed variants will get lost)
+    let speedMeiDoc = this.xmlDoc.cloneNode(true);
     const choiceOption = this.choiceSelect.value;
-    let markupResult = selectMarkup(this.xmlDoc, choiceOption); // select markup
-    if (markupResult.changed === true) {
-      this.xmlDoc = markupResult.doc;
-      this.xmlDocOutdated = true;
+    let markupResult = selectMarkup(speedMeiDoc, choiceOption); // select markup
+    if (markupResult?.changed === true) {
+      speedMeiDoc = markupResult.doc;
+      //this.xmlDocOutdated = true;
+      // unnecessary if this.xmlDoc is not touched
     }
     // count pages from system/pagebreaks
     if (Array.isArray(breaks)) {
-      let music = this.xmlDoc.querySelector('music score');
+      let music = speedMeiDoc.querySelector('music score');
       let elements;
       if (music) elements = music.querySelectorAll('measure, sb, pb');
       else return '';
@@ -297,7 +307,7 @@ export default class Viewer {
       // else console.log('pageSpanners empty: ', this.pageSpanners);
     }
     // retrieve requested MEI page from DOM
-    return speed.getPageFromDom(this.xmlDoc, this.currentPage, breaks, this.pageSpanners, includeDummyMeasures);
+    return speed.getPageFromDom(speedMeiDoc, this.currentPage, breaks, this.pageSpanners, includeDummyMeasures);
   } // speedFilter()
 
   loadXml(mei, forceReload = false) {
@@ -1164,6 +1174,10 @@ export default class Viewer {
               '--' + element + 'HighlightedColor',
               value ? 'var(--default' + upperCaseElementName + 'HighlightedColor)' : 'var(--highlightColor)'
             );
+            rt.style.setProperty(
+              '--' + element + 'BgColor',
+              value ? 'var(--' + element + 'Color)' : 'var(--annotationPanelBackgroundColor)'
+            );
           });
           break;
         case 'suppliedColor':
@@ -1535,12 +1549,20 @@ export default class Viewer {
           '--default' + upperCaseElementName + 'HighlightedColor',
           checkedMarkup ? utils.brighter(colorValue, -50) : 'var(--highlightColor)'
         );
+        rt.style.setProperty(
+          '--' + elementName + 'BgColor',
+          checkedMarkup ? 'var(--' + elementName + 'Color)' : 'var(--annotationPanelBackgroundColor)'
+        );
       }
 
       rt.style.setProperty('--' + elementName + 'Color', checkedMarkup ? colorValue : 'var(--notationColor)');
       rt.style.setProperty(
         '--' + elementName + 'HighlightedColor',
         checkedMarkup ? utils.brighter(colorValue, -50) : 'var(--highlightColor)'
+      );
+      rt.style.setProperty(
+        '--' + elementName + 'BgColor',
+        checkedMarkup ? 'var(--' + elementName + 'Color)' : 'var(--annotationPanelBackgroundColor)'
       );
     }
   } // addMeiFriendOptionsToSettingsPanel()

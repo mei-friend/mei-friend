@@ -508,6 +508,16 @@ export const lang = {
   respSelect: {
     text: 'Responsibility auswählen',
     description: 'Responsibility-ID für editorisches Markup auswählen',
+  },  
+  selectionSelect: {
+    text: 'Standardselektion für Markup',
+    description: 'Wählen Sie aus, ob neu erstellte Markup die ausgewählten Elemente, Artikulationen oder Vorzeichen umschließen soll',
+    labels: ['Ausgewählte Elemente','Artikulation', 'Vorzeichen'],
+    valuesDescriptions: [
+      'Füge Markup zu ausgewählten Elementen hinzu.', 
+      'Füge Markup zu Artikulationen innerhalb der Auswahl hinzu.', 
+      'Füge Markup zu Vorzeichen innerhalb der Auswahl hinzu.'
+    ],
   },
   alternativeEncodingsGrp: {
     text: 'Alternative Codierungen',
@@ -517,31 +527,38 @@ export const lang = {
     text: '<choice>',
     description: 'Gruppiert mehrere alternative Codierungen für denselben Punkt in einem Text.',
   },
-  choiceSicCorr: { text: 'sic | corr', description: 'Setze die Auswahl in <sic> und füge <corr> hinzu.' },
-  choiceCorrSic: { text: 'corr | sic', description: 'Setze die Auswahl in <corr> und füge <sic> hinzu.' },
-  choiceOrigReg: { text: 'orig | reg', description: 'Setze die Auswahl in <orig> und füge <reg> hinzu.' },
-  choiceRegOrig: { text: 'reg | orig', description: 'Setze die Auswahl in <reg> und füge <orig> hinzu.' },
+  choiceSicCorr: { 
+    description: 'Setze die Auswahl in <sic> und füge <corr> hinzu.' 
+  },
+  choiceCorrSic: { 
+    description: 'Setze die Auswahl in <corr> und füge <sic> hinzu.' 
+  },
+  choiceOrigReg: { 
+    description: 'Setze die Auswahl in <orig> und füge <reg> hinzu.' 
+  },
+  choiceRegOrig: { 
+    description: 'Setze die Auswahl in <reg> und füge <orig> hinzu.' 
+  },
   choiceContentTarget: {
     text: '(Inhalt auswählen)',
     description: 'Wähle zuerst den Inhalt für dieses Element aus, indem du über <choice> schwebst.',
   },
-  addChoice: { text: 'Ausgewählte Elemente', description: 'Füge Markup zu ausgewählten Elementen hinzu.' },
-  addChoiceArtic: { text: 'Artikulation', description: 'Füge Markup zu Artikulationen innerhalb der Auswahl hinzu.' },
-  addChoiceAccid: { text: 'Vorzeichen', description: 'Füge Markup zu Vorzeichen innerhalb der Auswahl hinzu.' },
   addSubstText: {
     text: '<subst>',
     description:
       '(Substitution) – Gruppiert transkriptionelle Elemente, wenn die Kombination als einzelner Eingriff im Text betrachtet werden soll.',
   },
-  substAddDel: { text: 'add | del', description: 'Setze die Auswahl in <add> und füge <del> hinzu.' },
-  substDelAdd: { text: 'del | add', description: 'Setze die Auswahl in <del> und füge <add> hinzu.' },
+  substAddDel: { 
+    description: 'Setze die Auswahl in <add> und füge <del> hinzu.' 
+  },
+  substDelAdd: { 
+    
+    description: 'Setze die Auswahl in <del> und füge <add> hinzu.' 
+  },
   substContentTarget: {
     text: '(Inhalt auswählen)',
     description: 'Wähle zuerst den Inhalt für dieses Element aus, indem du über <subst> schwebst.',
   },
-  addSubst: { text: 'Ausgewählte Elemente', description: 'Füge Markup zu ausgewählten Elementen hinzu.' },
-  addSubstArtic: { text: 'Artikulation', description: 'Füge Markup zu Artikulationen innerhalb der Auswahl hinzu.' },
-  addSubstAccid: { text: 'Vorzeichen', description: 'Füge Markup zu Vorzeichen innerhalb der Auswahl hinzu.' },
   editInterventionsGrp: {
     text: 'Editorische Eingriffe',
     description: 'Markup-Elemente, die zur Codierung editorischer Eingriffe verwendet werden.',
@@ -550,60 +567,36 @@ export const lang = {
     text: '<supplied>',
     description: 'Enthält Material, das vom Transkribenten oder Redakteur aus irgendeinem Grund bereitgestellt wurde.',
   },
-  addSupplied: { text: 'Ausgewählte Elemente', description: 'Füge Markup zu ausgewählten Elementen hinzu.' },
-  addSuppliedArtic: { text: 'Artikulation', description: 'Füge Markup zu Artikulationen innerhalb der Auswahl hinzu.' },
-  addSuppliedAccid: { text: 'Vorzeichen', description: 'Füge Markup zu Vorzeichen innerhalb der Auswahl hinzu.' },
   addUnclearText: {
     text: '<unclear>',
     description:
       'Enthält Material, das aufgrund von Unleserlichkeit oder Unverständlichkeit in der Quelle nicht mit Sicherheit transkribiert werden kann.',
   },
-  addUnclear: { text: 'Ausgewählte Elemente', description: 'Füge Markup zu ausgewählten Elementen hinzu.' },
-  addUnclearArtic: { text: 'Artikulation', description: 'Füge Markup zu Artikulationen innerhalb der Auswahl hinzu.' },
-  addUnclearAccid: { text: 'Vorzeichen', description: 'Füge Markup zu Vorzeichen innerhalb der Auswahl hinzu.' },
   addSicText: { text: '<sic>', description: 'Enthält scheinbar falsches oder ungenaues Material.' },
-  addSic: { text: 'Ausgewählte Elemente', description: 'Füge Markup zu ausgewählten Elementen hinzu.' },
-  addSicArtic: { text: 'Artikulation', description: 'Füge Markup zu Artikulationen innerhalb der Auswahl hinzu.' },
-  addSicAccid: { text: 'Vorzeichen', description: 'Füge Markup zu Vorzeichen innerhalb der Auswahl hinzu.' },
   addCorrText: {
     text: '<corr>',
     description: '(Korrektur) – Enthält die korrekte Form einer offensichtlich fehlerhaften Passage.',
   },
-  addCorr: { text: 'Ausgewählte Elemente', description: 'Füge Markup zu ausgewählten Elementen hinzu.' },
-  addCorrArtic: { text: 'Artikulation', description: 'Füge Markup zu Artikulationen innerhalb der Auswahl hinzu.' },
-  addCorrAccid: { text: 'Vorzeichen', description: 'Füge Markup zu Vorzeichen innerhalb der Auswahl hinzu.' },
   addOrigText: {
     text: '<orig>',
     description:
       '(original) – Enthält Material, das als dem Original folgend markiert ist, anstatt genormalisiert oder korrigiert zu werden.',
   },
-  addOrig: { text: 'Ausgewählte Elemente', description: 'Füge Markup zu ausgewählten Elementen hinzu.' },
-  addOrigArtic: { text: 'Artikulation', description: 'Füge Markup zu Artikulationen innerhalb der Auswahl hinzu.' },
-  addOrigAccid: { text: 'Vorzeichen', description: 'Füge Markup zu Vorzeichen innerhalb der Auswahl hinzu.' },
   addRegText: {
     text: '<reg>',
     description:
       '(Regularisierung) – Enthält Material, das in irgendeiner Weise regularisiert oder normalisiert wurde.',
   },
-  addReg: { text: 'Ausgewählte Elemente', description: 'Füge Markup zu ausgewählten Elementen hinzu.' },
-  addRegArtic: { text: 'Artikulation', description: 'Füge Markup zu Artikulationen innerhalb der Auswahl hinzu.' },
-  addRegAccid: { text: 'Vorzeichen', description: 'Füge Markup zu Vorzeichen innerhalb der Auswahl hinzu.' },
   descMarkupGrp: {
     text: 'Deskriptive Markup',
     description: 'Markup-Elemente, die zur Codierung von Interventionen im Quellenmaterial verwendet werden.',
   },
   addAddText: { text: '<add>', description: '(Hinzufügung) – Markiert eine Hinzufügung zum Text.' },
-  addAdd: { text: 'Ausgewählte Elemente', description: 'Füge Markup zu ausgewählten Elementen hinzu.' },
-  addAddArtic: { text: 'Artikulation', description: 'Füge Markup zu Artikulationen innerhalb der Auswahl hinzu.' },
-  addAddAccid: { text: 'Vorzeichen', description: 'Füge Markup zu Vorzeichen innerhalb der Auswahl hinzu.' },
   addDelText: {
     text: '<del>',
     description:
       '(Löschung) – Enthält Informationen, die gelöscht wurden, als gelöscht markiert wurden oder anderweitig als überflüssig oder irreführend im Kopietext durch einen Autor, Schreiber, Annotator oder Korrektor angegeben wurden.',
   },
-  addDel: { text: 'Ausgewählte Elemente', description: 'Füge Markup zu ausgewählten Elementen hinzu.' },
-  addDelArtic: { text: 'Artikulation', description: 'Füge Markup zu Artikulationen innerhalb der Auswahl hinzu.' },
-  addDelAccid: { text: 'Vorzeichen', description: 'Füge Markup zu Vorzeichen innerhalb der Auswahl hinzu.' },
 
   // MIDI
   midiSpeedmodeIndicator: {

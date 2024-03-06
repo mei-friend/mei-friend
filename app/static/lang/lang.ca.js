@@ -511,6 +511,16 @@ export const lang = {
     text: 'Seleccionar la responsabilitat de la marca',
     description: "Seleccionar l'ID de la responsabilitat",
   },
+  selectionSelect: {
+    text: 'Selecció per defecte per a la marca',
+    description: 'Trieu si la marca de nova creació hauria d\'envoltar els elements seleccionats, les articulacions o els accidentals',
+    labels: ['Elements seleccionats','Articulació', 'Accidental'],
+    valuesDescriptions: [
+      'Afegeix marcatge als elements seleccionats.', 
+      'Afegeix marcatge a les articulacions dins la selecció.', 
+      'Afegeix marcatge als accidentals dins la selecció.'
+    ],
+  },
   alternativeEncodingsGrp: {
     text: 'Codificacions alternatives',
     description: 'Elements de marcatge que contenen múltiples versions.',
@@ -519,31 +529,37 @@ export const lang = {
     text: '<choice>',
     description: 'Agrupa diverses codificacions alternatives pel mateix punt en un text.',
   },
-  choiceSicCorr: { text: 'sic | corr', description: 'Posa la selecció a <sic> i afegeix <corr>.' },
-  choiceCorrSic: { text: 'corr | sic', description: 'Posa la selecció a <corr> i afegeix <sic>.' },
-  choiceOrigReg: { text: 'orig | reg', description: 'Posa la selecció a <orig> i afegeix <reg>.' },
-  choiceRegOrig: { text: 'reg | orig', description: 'Posa la selecció a <reg> i afegeix <orig>.' },
+  choiceSicCorr: { 
+    description: 'Posa la selecció a <sic> i afegeix <corr>.' 
+  },
+  choiceCorrSic: { 
+    description: 'Posa la selecció a <corr> i afegeix <sic>.' 
+  },
+  choiceOrigReg: { 
+    description: 'Posa la selecció a <orig> i afegeix <reg>.' 
+  },
+  choiceRegOrig: { 
+    description: 'Posa la selecció a <reg> i afegeix <orig>.' 
+  },
   choiceContentTarget: {
     text: '(selecciona contingut)',
     description: 'Primer, selecciona contingut per a aquest element passant el ratolí sobre <choice>.',
   },
-  addChoice: { text: 'Elements seleccionats', description: 'Afegeix marcatge als elements seleccionats.' },
-  addChoiceArtic: { text: 'Articulació', description: 'Afegeix marcatge a les articulacions dins la selecció.' },
-  addChoiceAccid: { text: 'Accidental', description: 'Afegeix marcatge als accidentals dins la selecció.' },
   addSubstText: {
     text: '<subst>',
     description:
       '(substitució) – Agrupa elements de transcripció quan la combinació ha de ser considerada com una intervenció única en el text.',
   },
-  substAddDel: { text: 'add | del', description: 'Posa la selecció a <add> i afegeix <del>.' },
-  substDelAdd: { text: 'del | add', description: 'Posa la selecció a <del> i afegeix <add>.' },
+  substAddDel: { 
+    description: 'Posa la selecció a <add> i afegeix <del>.' 
+  },
+  substDelAdd: { 
+    description: 'Posa la selecció a <del> i afegeix <add>.' 
+  },
   substContentTarget: {
     text: '(selecciona contingut)',
     description: 'Primer, selecciona contingut per a aquest element passant el ratolí sobre <subst>.',
   },
-  addSubst: { text: 'Elements seleccionats', description: 'Afegeix marcatge als elements seleccionats.' },
-  addSubstArtic: { text: 'Articulació', description: 'Afegeix marcatge a les articulacions dins la selecció.' },
-  addSubstAccid: { text: 'Accidental', description: 'Afegeix marcatge als accidentals dins la selecció.' },
   editInterventionsGrp: {
     text: 'Intervencions editorials',
     description: 'Elements de marcatge utilitzats per codificar intervencions editorials.',
@@ -552,57 +568,33 @@ export const lang = {
     text: '<supplied>',
     description: 'Conté material subministrat pel transcriptor o editor per qualsevol motiu.',
   },
-  addSupplied: { text: 'Elements seleccionats', description: 'Afegeix marcatge als elements seleccionats.' },
-  addSuppliedArtic: { text: 'Articulació', description: 'Afegeix marcatge a les articulacions dins la selecció.' },
-  addSuppliedAccid: { text: 'Accidental', description: 'Afegeix marcatge als accidentals dins la selecció.' },
   addUnclearText: {
     text: '<unclear>',
     description: 'Conté material que no es pot transcriure amb certesa perquè és il·legible o inaudible a la font.',
   },
-  addUnclear: { text: 'Elements seleccionats', description: 'Afegeix marcatge als elements seleccionats.' },
-  addUnclearArtic: { text: 'Articulació', description: 'Afegeix marcatge a les articulacions dins la selecció.' },
-  addUnclearAccid: { text: 'Accidental', description: 'Afegeix marcatge als accidentals dins la selecció.' },
   addSicText: { text: '<sic>', description: 'Conté material aparentment incorrecte o inexacte.' },
-  addSic: { text: 'Elements seleccionats', description: 'Afegeix marcatge als elements seleccionats.' },
-  addSicArtic: { text: 'Articulació', description: 'Afegeix marcatge a les articulacions dins la selecció.' },
-  addSicAccid: { text: 'Accidental', description: 'Afegeix marcatge als accidentals dins la selecció.' },
   addCorrText: {
     text: '<corr>',
     description: "(correcció) – Conté la forma correcta d'un passatge aparentment erroni.",
   },
-  addCorr: { text: 'Elements seleccionats', description: 'Afegeix marcatge als elements seleccionats.' },
-  addCorrArtic: { text: 'Articulació', description: 'Afegeix marcatge a les articulacions dins la selecció.' },
-  addCorrAccid: { text: 'Accidental', description: 'Afegeix marcatge als accidentals dins la selecció.' },
   addOrigText: {
     text: '<orig>',
     description: "(original) – Conté material marcat com a següent l'original, en lloc de ser normalitzat o corregit.",
   },
-  addOrig: { text: 'Elements seleccionats', description: 'Afegeix marcatge als elements seleccionats.' },
-  addOrigArtic: { text: 'Articulació', description: 'Afegeix marcatge a les articulacions dins la selecció.' },
-  addOrigAccid: { text: 'Accidental', description: 'Afegeix marcatge als accidentals dins la selecció.' },
   addRegText: {
     text: '<reg>',
     description: "(regularització) – Conté material que ha estat regularitzat o normalitzat d'alguna manera.",
   },
-  addReg: { text: 'Elements seleccionats', description: 'Afegeix marcatge als elements seleccionats.' },
-  addRegArtic: { text: 'Articulació', description: 'Afegeix marcatge a les articulacions dins la selecció.' },
-  addRegAccid: { text: 'Accidental', description: 'Afegeix marcatge als accidentals dins la selecció.' },
   descMarkupGrp: {
     text: 'Marcatge Descriptiu',
     description: 'Elements de marcatge utilitzats per codificar intervencions en el material font.',
   },
   addAddText: { text: '<add>', description: '(addició) – Marca una addició al text.' },
-  addAdd: { text: 'Elements seleccionats', description: 'Afegeix marcatge als elements seleccionats.' },
-  addAddArtic: { text: 'Articulació', description: 'Afegeix marcatge a les articulacions dins la selecció.' },
-  addAddAccid: { text: 'Accidental', description: 'Afegeix marcatge als accidentals dins la selecció.' },
   addDelText: {
     text: '<del>',
     description:
       '(supressió) – Conté informació eliminada, marcada com a eliminada o indicada com a superflua o espúria al text original per un autor, escriptor, annotador o corrector.',
   },
-  addDel: { text: 'Elements seleccionats', description: 'Afegeix marcatge als elements seleccionats.' },
-  addDelArtic: { text: 'Articulació', description: 'Afegeix marcatge a les articulacions dins la selecció.' },
-  addDelAccid: { text: 'Accidental', description: 'Afegeix marcatge als accidentals dins la selecció.' },
 
   // MIDI
   midiSpeedmodeIndicator: {

@@ -481,6 +481,16 @@ export const lang = {
     text: 'マークアップの責任を選択',
     description: '責任のIDを選択',
   },
+  selectionSelect: {
+    text: 'マークアップのデフォルト選択',
+    description: '新しく作成されたマークアップが選択された要素、アーティキュレーション、またはアクシデンタルを囲むかどうかを選択してください',
+    labels: ['選択された要素','アーティキュレーション', 'アクシデンタル'],
+    valuesDescriptions: [
+      '選択された要素にマークアップを追加します。', 
+      '選択範囲内のアーティキュレーションにマークアップを追加します。',
+      '選択範囲内のアクシデンタルにマークアップを追加します。'
+    ],
+  },
   alternativeEncodingsGrp: {
     text: '代替エンコーディング',
     description: '複数のバージョンを含むマークアップ要素。',
@@ -489,36 +499,35 @@ export const lang = {
     text: '<choice>',
     description: 'テキスト内の同じポイントの複数の代替エンコーディングをグループ化します。',
   },
-  choiceSicCorr: { text: 'sic | corr', description: '<sic> に選択を入れて <corr> を追加します。' },
-  choiceCorrSic: { text: 'corr | sic', description: '<corr> に選択を入れて <sic> を追加します。' },
-  choiceOrigReg: { text: 'orig | reg', description: '<orig> に選択を入れて <reg> を追加します。' },
-  choiceRegOrig: { text: 'reg | orig', description: '<reg> に選択を入れて <orig> を追加します。' },
+  choiceSicCorr: { 
+    description: '<sic> に選択を入れて <corr> を追加します。' 
+},
+  choiceCorrSic: { 
+    description: '<corr> に選択を入れて <sic> を追加します。' 
+  },
+  choiceOrigReg: { 
+    description: '<orig> に選択を入れて <reg> を追加します。' 
+  },
+  choiceRegOrig: { 
+    description: '<reg> に選択を入れて <orig> を追加します。' },
   choiceContentTarget: {
     text: '(コンテンツを選択)',
     description: '<choice> の上にホバーしてこの要素のためにコンテンツを選択します。',
   },
-  addChoice: { text: '選択された要素', description: '選択された要素にマークアップを追加します。' },
-  addChoiceArtic: {
-    text: 'アーティキュレーション',
-    description: '選択範囲内のアーティキュレーションにマークアップを追加します。',
-  },
-  addChoiceAccid: { text: 'アクシデンタル', description: '選択範囲内のアクシデンタルにマークアップを追加します。' },
   addSubstText: {
     text: '<subst>',
     description: '(置換) - テキスト内での組み合わせが単一の介入と見なされる場合に、転写要素をグループ化します。',
   },
-  substAddDel: { text: 'add | del', description: '<add> に選択を入れて <del> を追加します。' },
-  substDelAdd: { text: 'del | add', description: '<del> に選択を入れて <add> を追加します。' },
+  substAddDel: { 
+    description: '<add> に選択を入れて <del> を追加します。' 
+  },
+  substDelAdd: { 
+    description: '<del> に選択を入れて <add> を追加します。' 
+  },
   substContentTarget: {
     text: '(コンテンツを選択)',
     description: '<subst> の上にホバーしてこの要素のためにコンテンツを選択します。',
   },
-  addSubst: { text: '選択された要素', description: '選択された要素にマークアップを追加します。' },
-  addSubstArtic: {
-    text: 'アーティキュレーション',
-    description: '選択範囲内のアーティキュレーションにマークアップを追加します。',
-  },
-  addSubstAccid: { text: 'アクシデンタル', description: '選択範囲内のアクシデンタルにマークアップを追加します。' },
   editInterventionsGrp: {
     text: '編集介入',
     description: '編集介入をエンコードするために使用されるマークアップ要素。',
@@ -527,81 +536,33 @@ export const lang = {
     text: '<supplied>',
     description: '転写者または編集者によって供給された素材を含みます。',
   },
-  addSupplied: { text: '選択された要素', description: '選択された要素にマークアップを追加します。' },
-  addSuppliedArtic: {
-    text: 'アーティキュレーション',
-    description: '選択範囲内のアーティキュレーションにマークアップを追加します。',
-  },
-  addSuppliedAccid: { text: 'アクシデンタル', description: '選択範囲内のアクシデンタルにマークアップを追加します。' },
   addUnclearText: {
     text: '<unclear>',
     description: '原文で確実に転写できない素材を含みます（読めないか聞き取れない）。',
   },
-  addUnclear: { text: '選択された要素', description: '選択された要素にマークアップを追加します。' },
-  addUnclearArtic: {
-    text: 'アーティキュレーション',
-    description: '選択範囲内のアーティキュレーションにマークアップを追加します。',
-  },
-  addUnclearAccid: { text: 'アクシデンタル', description: '選択範囲内のアクシデンタルにマークアップを追加します。' },
   addSicText: { text: '<sic>', description: '明らかに不正確または誤った素材を含みます。' },
-  addSic: { text: '選択された要素', description: '選択された要素にマークアップを追加します。' },
-  addSicArtic: {
-    text: 'アーティキュレーション',
-    description: '選択範囲内のアーティキュレーションにマークアップを追加します。',
-  },
-  addSicAccid: { text: 'アクシデンタル', description: '選択範囲内のアクシデンタルにマークアップを追加します。' },
   addCorrText: {
     text: '<corr>',
     description: '(訂正) - 明らかに誤った部分の正しい形を含みます。',
   },
-  addCorr: { text: '選択された要素', description: '選択された要素にマークアップを追加します。' },
-  addCorrArtic: {
-    text: 'アーティキュレーション',
-    description: '選択範囲内のアーティキュレーションにマークアップを追加します。',
-  },
-  addCorrAccid: { text: 'アクシデンタル', description: '選択範囲内のアクシデンタルにマークアップを追加します。' },
   addOrigText: {
     text: '<orig>',
     description: '(原文) - 正規化または訂正されるのではなく、元の形に従っている素材を含みます。',
   },
-  addOrig: { text: '選択された要素', description: '選択された要素にマークアップを追加します。' },
-  addOrigArtic: {
-    text: 'アーティキュレーション',
-    description: '選択範囲内のアーティキュレーションにマークアップを追加します。',
-  },
-  addOrigAccid: { text: 'アクシデンタル', description: '選択範囲内のアクシデンタルにマークアップを追加します。' },
   addRegText: {
     text: '<reg>',
     description: '(正規化) - ある意味で正規化または規格化された素材を含みます。',
   },
-  addReg: { text: '選択された要素', description: '選択された要素にマークアップを追加します。' },
-  addRegArtic: {
-    text: 'アーティキュレーション',
-    description: '選択範囲内のアーティキュレーションにマークアップを追加します。',
-  },
-  addRegAccid: { text: 'アクシデンタル', description: '選択範囲内のアクシデンタルにマークアップを追加します。' },
   descMarkupGrp: {
     text: '記述的なマークアップ',
     description: 'ソース素材への介入をエンコードするために使用されるマークアップ要素。',
   },
   addAddText: { text: '<add>', description: '(追加) - テキストへの追加をマークします。' },
-  addAdd: { text: '選択された要素', description: '選択された要素にマークアップを追加します。' },
-  addAddArtic: {
-    text: 'アーティキュレーション',
-    description: '選択範囲内のアーティキュレーションにマークアップを追加します。',
-  },
-  addAddAccid: { text: 'アクシデンタル', description: '選択範囲内のアクシデンタルにマークアップを追加します。' },
   addDelText: {
     text: '<del>',
     description:
       '(削除) - 著者、書記、注釈者、または校正者によって削除された情報、削除されたもの、またはコピーテキストで不要または誤って指定されたものを含みます。',
   },
-  addDel: { text: '選択された要素', description: '選択された要素にマークアップを追加します。' },
-  addDelArtic: {
-    text: 'アーティキュレーション',
-    description: '選択範囲内のアーティキュレーションにマークアップを追加します。',
-  },
-  addDelAccid: { text: 'アクシデンタル', description: '選択範囲内のアクシデンタルにマークアップを追加します。' },
 
   // MIDI
   midiSpeedmodeIndicator: {

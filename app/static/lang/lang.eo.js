@@ -492,6 +492,16 @@ export const lang = {
     text: 'Elekti markad-respondecon',
     description: 'Elekti identigilon de respondeco',
   },
+  selectionSelect: {
+    text: 'Defaŭlta elekto por markado',
+    description: 'Elektu ĉu nova kreita markado devus ĉirkaŭi la elektitajn elementojn, artikulaciojn aŭ akcidentojn',
+    labels: ['Elektitaj elementoj','Artikulado', 'Okaza'],
+    valuesDescriptions: [
+      'Aldonu markigon al elektitaj elementoj.', 
+      'Aldonu markigon al artikuladoj en la elektado.', 
+      'Aldonu markigon al okazaĵoj en la elektado.'
+    ],
+  },
   alternativeEncodingsGrp: {
     text: 'Alternativaj kodoj',
     description: 'Markigoj kiuj enhavas multoblajn versiojn.',
@@ -500,31 +510,37 @@ export const lang = {
     text: '<choice>',
     description: 'Grupigas nombron da alternativaj kodoj por la sama punkto en teksto.',
   },
-  choiceSicCorr: { text: 'sic | corr', description: 'Metu elekton en <sic> kaj aldonu <corr>.' },
-  choiceCorrSic: { text: 'corr | sic', description: 'Metu elekton en <corr> kaj aldonu <sic>.' },
-  choiceOrigReg: { text: 'orig | reg', description: 'Metu elekton en <orig> kaj aldonu <reg>.' },
-  choiceRegOrig: { text: 'reg | orig', description: 'Metu elekton en <reg> kaj aldonu <orig>.' },
+  choiceSicCorr: { 
+    description: 'Metu elekton en <sic> kaj aldonu <corr>.' 
+  },
+  choiceCorrSic: { 
+    description: 'Metu elekton en <corr> kaj aldonu <sic>.' 
+  },
+  choiceOrigReg: { 
+    description: 'Metu elekton en <orig> kaj aldonu <reg>.' 
+  },
+  choiceRegOrig: { 
+    description: 'Metu elekton en <reg> kaj aldonu <orig>.' 
+  },
   choiceContentTarget: {
     text: '(elektu enhavon)',
     description: 'Unue elektu enhavon por tiu elemento pasante la muson super <elekto>.',
   },
-  addChoice: { text: 'Elektitaj elementoj', description: 'Aldonu markigon al elektitaj elementoj.' },
-  addChoiceArtic: { text: 'Artikulado', description: 'Aldonu markigon al artikuladoj en la elektado.' },
-  addChoiceAccid: { text: 'Okaza', description: 'Aldonu markigon al okazaĵoj en la elektado.' },
   addSubstText: {
     text: '<subst>',
     description:
       '(anstataŭigo) – Grupigas transskriptajn elementojn kiam la kombino devas esti rigardata kiel unuopa interveno en la teksto.',
   },
-  substAddDel: { text: 'add | del', description: 'Metu elekton en <add> kaj aldonu <del>.' },
-  substDelAdd: { text: 'del | add', description: 'Metu elekton en <del> kaj aldonu <add>.' },
+  substAddDel: { 
+    description: 'Metu elekton en <add> kaj aldonu <del>.' 
+  },
+  substDelAdd: { 
+    description: 'Metu elekton en <del> kaj aldonu <add>.' 
+  },
   substContentTarget: {
     text: '(elektu enhavon)',
     description: 'Unue elektu enhavon por tiu elemento pasante la muson super <anstataŭigo>.',
   },
-  addSubst: { text: 'Elektitaj elementoj', description: 'Aldonu markigon al elektitaj elementoj.' },
-  addSubstArtic: { text: 'Artikulado', description: 'Aldonu markigon al artikuladoj en la elektado.' },
-  addSubstAccid: { text: 'Okaza', description: 'Aldonu markigon al okazaĵoj en la elektado.' },
   editInterventionsGrp: {
     text: 'Redakciaj intervenoj',
     description: 'Markigoj uzataj por enkodi redakciajn intervenojn.',
@@ -533,59 +549,35 @@ export const lang = {
     text: '<supplied>',
     description: 'Enhavas materialon provizitan de la transskribanto aŭ redaktoro pro iu kialo.',
   },
-  addSupplied: { text: 'Elektitaj elementoj', description: 'Aldonu markigon al elektitaj elementoj.' },
-  addSuppliedArtic: { text: 'Artikulado', description: 'Aldonu markigon al artikuladoj en la elektado.' },
-  addSuppliedAccid: { text: 'Okaza', description: 'Aldonu markigon al okazaĵoj en la elektado.' },
   addUnclearText: {
     text: '<unclear>',
     description:
       'Enhavas materialon kiun oni ne povas transskribi kun certeco ĉar ĝi estas nelegebla aŭ neaŭdebla en la fonto.',
   },
-  addUnclear: { text: 'Elektitaj elementoj', description: 'Aldonu markigon al elektitaj elementoj.' },
-  addUnclearArtic: { text: 'Artikulado', description: 'Aldonu markigon al artikuladoj en la elektado.' },
-  addUnclearAccid: { text: 'Okaza', description: 'Aldonu markigon al okazaĵoj en la elektado.' },
   addSicText: { text: '<sic>', description: 'Enhavas ŝajne malĝustan aŭ eraran materialon.' },
-  addSic: { text: 'Elektitaj elementoj', description: 'Aldonu markigon al elektitaj elementoj.' },
-  addSicArtic: { text: 'Artikulado', description: 'Aldonu markigon al artikuladoj en la elektado.' },
-  addSicAccid: { text: 'Okaza', description: 'Aldonu markigon al okazaĵoj en la elektado.' },
   addCorrText: {
     text: '<corr>',
     description: '(korekto) – Enhavas la ĝustan formon de ŝajne erara pasiĝo.',
   },
-  addCorr: { text: 'Elektitaj elementoj', description: 'Aldonu markigon al elektitaj elementoj.' },
-  addCorrArtic: { text: 'Artikulado', description: 'Aldonu markigon al artikuladoj en la elektado.' },
-  addCorrAccid: { text: 'Okaza', description: 'Aldonu markigon al okazaĵoj en la elektado.' },
   addOrigText: {
     text: '<orig>',
     description:
       '(originalo) – Enhavas materialon kiu estas markita kiel sekva la originalon, anstataŭ esti normaligita aŭ korektita.',
   },
-  addOrig: { text: 'Elektitaj elementoj', description: 'Aldonu markigon al elektitaj elementoj.' },
-  addOrigArtic: { text: 'Artikulado', description: 'Aldonu markigon al artikuladoj en la elektado.' },
-  addOrigAccid: { text: 'Okaza', description: 'Aldonu markigon al okazaĵoj en la elektado.' },
   addRegText: {
     text: '<reg>',
     description: '(reguligo) – Enhavas materialon kiu estas reguligita aŭ normaligita iam ajn.',
   },
-  addReg: { text: 'Elektitaj elementoj', description: 'Aldonu markigon al elektitaj elementoj.' },
-  addRegArtic: { text: 'Artikulado', description: 'Aldonu markigon al artikuladoj en la elektado.' },
-  addRegAccid: { text: 'Okaza', description: 'Aldonu markigon al okazaĵoj en la elektado.' },
   descMarkupGrp: {
     text: 'Priskriba Markigo',
     description: 'Markigoj uzataj por enkodi intervenojn en la fontmateriaĵo.',
   },
   addAddText: { text: '<add>', description: '(aldono) – Markas aldono al la teksto.' },
-  addAdd: { text: 'Elektitaj elementoj', description: 'Aldonu markigon al elektitaj elementoj.' },
-  addAddArtic: { text: 'Artikulado', description: 'Aldonu markigon al artikuladoj en la elektado.' },
-  addAddAccid: { text: 'Okaza', description: 'Aldonu markigon al okazaĵoj en la elektado.' },
   addDelText: {
     text: '<del>',
     description:
       '(forigo) – Enhavas informon forigitan, markitan kiel forigita, aŭ alie indikitan kiel superflua aŭ fuŝa en la kopia teksto de aŭtoro, skribanto, notanto, aŭ korektisto.',
   },
-  addDel: { text: 'Elektitaj elementoj', description: 'Aldonu markigon al elektitaj elementoj.' },
-  addDelArtic: { text: 'Artikulado', description: 'Aldonu markigon al artikuladoj en la elektado.' },
-  addDelAccid: { text: 'Okaza', description: 'Aldonu markigon al okazaĵoj en la elektado.' },
 
   // MIDI
   midiSpeedmodeIndicator: {

@@ -954,7 +954,7 @@
             id="solidButton"
             class="tablink"
             title="Login to Solid"
-            onclick="switchTab(event, 'annotationPanel')"
+            onclick="switchTab(event, 'annotationPanel', 'flex')"
             data-tab="solidTab"
           >
             <!-- Solid logo SVG: Andrei Sambra, CC BY-SA 4.0 
@@ -1009,7 +1009,7 @@
           <button
             id="annotationListButton"
             class="tablink defaultOpen"
-            onclick="switchTab(event, 'annotationPanel')"
+            onclick="switchTab(event, 'annotationPanel', 'flex')"
             title="List annotations"
             data-tab="listAnnotations"
           >
@@ -1022,7 +1022,7 @@
           <button
             id="markupToolsButton"
             class="tablink"
-            onclick="switchTab(event, 'annotationPanel')"
+            onclick="switchTab(event, 'annotationPanel', 'flex')"
             title="Markup tools"
             data-tab="markupTools"
           >
@@ -1038,7 +1038,7 @@
           <button
             id="annotationToolsButton"
             class="tablink"
-            onclick="switchTab(event, 'annotationPanel')"
+            onclick="switchTab(event, 'annotationPanel', 'flex')"
             title="Annotation tools"
             data-tab="annotationTools"
           >
@@ -1061,48 +1061,50 @@
           <div class="markupGrp">
             <span id="alternativeEncodingsGrp">Alternative encodings</span>
             <div class="annotationToolsIconGroup">
-              <div class="markup-btn-group annotationToolsIcon">
+              <div class="markup-btn-group">
                 <div class="markup-dropdown">
                   <span id="addChoiceText">&lt;choice&gt;</span>
                   <div id="choice-content-options" class="markup-dropdown-content">
                     <a id="choiceSicCorr" data-target="choiceContentTarget" data-content-choice="sic,corr"
-                      class="content-option" href="#">sic | corr</a>
+                      class="content-option splitButtonContainer" href="#">
+                      <span class="sicLabel splitButtonLabel">sic</span><span class="corrLabel splitButtonLabel">corr</span>
+                    </a>
                     <a id="choiceCorrSic" data-target="choiceContentTarget" data-content-choice="corr,sic"
-                      class="content-option" href="#">corr | sic</a>
+                      class="content-option splitButtonContainer" href="#">
+                      <span class="corrLabel splitButtonLabel">corr</span><span class="sicLabel splitButtonLabel">sic</span>
+                    </a>
                     <a id="choiceOrigReg" data-target="choiceContentTarget" data-content-choice="orig,reg"
-                      class="content-option" href="#">orig | reg</a>
+                      class="content-option splitButtonContainer" href="#">
+                      <span class="origLabel splitButtonLabel">orig</span><span class="regLabel splitButtonLabel">reg</span>
+                    </a>
                     <a id="choiceRegOrig" data-target="choiceContentTarget" data-content-choice="reg,orig"
-                      class="content-option" href="#">reg | orig</a>
+                      class="content-option splitButtonContainer" href="#">
+                      <span class="regLabel splitButtonLabel">reg</span><span class="origLabel splitButtonLabel">orig</span>
+                    </a>
                   </div>
                 </div>
-                <div class="markup-dropdown">
-                  <span id="choiceContentTarget">(select content)</span>
-                  <div class="markup-dropdown-content">
-                    <a id="addChoice" class="addMarkup" data-el-name="choice" data-selection="" href="#">Selection</a>
-                    <a id="addChoiceArtic" class="addMarkup" data-el-name="choice" data-selection="artic" href="#">Articulation</a>
-                    <a id="addChoiceAccid" class="addMarkup" data-el-name="choice" data-selection="accid" href="#">Accidental</a>
-                  </div>
+                <div class="markup-dropdown alternativeEncodingsContent">
+                  <span id="choiceContentTarget" class="splitButtonContainer addMarkup" data-el-name="choice">(select content)</span>
                 </div>
               </div>
             </div>
             <div class="annotationToolsIconGroup">
-              <div class="markup-btn-group annotationToolsIcon">
+              <div class="markup-btn-group">
                 <div class="markup-dropdown">
                   <span id="addSubstText">&lt;subst&gt;</span>
                   <div id="subst-content-options" class="markup-dropdown-content">
                     <a id="substAddDel" data-target="substContentTarget" data-content-choice="add,del"
-                      class="content-option" href="#">add | del</a>
+                      class="content-option splitButtonContainer" href="#">
+                      <span class="addLabel splitButtonLabel">add</span><span class="delLabel splitButtonLabel">del</span>
+                    </a>
                     <a id="substDelAdd" data-target="substContentTarget" data-content-choice="del,add"
-                      class="content-option" href="#">del | add</a>
+                      class="content-option splitButtonContainer" href="#">
+                      <span class="delLabel splitButtonLabel">del</span><span class="addLabel splitButtonLabel">add</span>
+                    </a>
                   </div>
                 </div>
-                <div class="markup-dropdown">
-                  <span id="substContentTarget">(select content)</span>
-                  <div class="markup-dropdown-content">
-                    <a id="addSubst" class="addMarkup" data-el-name="subst" data-selection="" href="#">Selection</a>
-                    <a id="addSubstArtic" class="addMarkup" data-el-name="subst" data-selection="artic" href="#">Articulation</a>
-                    <a id="addSubstAccid" class="addMarkup" data-el-name="subst" data-selection="accid" href="#">Accidental</a>
-                  </div>
+                <div class="markup-dropdown alternativeEncodingsContent">
+                  <span id="substContentTarget" class="splitButtonContainer addMarkup" data-el-name="subst">(select content)</span>
                 </div>
               </div>
             </div>
@@ -1110,77 +1112,31 @@
           <div class="markupGrp">
             <span id="editInterventionsGrp">Editorial interventions</span>
             <div class="annotationToolsIconGroup markup-dropdown">
-              <span id="addSuppliedText" class="annotationToolsIcon">Supplied</span>
-              <div class="markup-dropdown-content">
-                <a class="addMarkup" data-el-name="supplied" data-selection="" id="addSupplied" href="#">Selection</a>
-                <a class="addMarkup" data-el-name="supplied" data-selection="artic" id="addSuppliedArtic"
-                  href="#">Articulation</a>
-                <a class="addMarkup" data-el-name="supplied" data-selection="accid" id="addSuppliedAccid"
-                  href="#">Accidental</a>
-              </div>
+              <span id="addSuppliedText" class="annotationToolsIcon suppliedLabel addMarkup" data-el-name="supplied">Supplied</span>
             </div>
             <div class="annotationToolsIconGroup markup-dropdown">
-              <span id="addUnclearText" class="annotationToolsIcon">Unclear</span>
-              <div class="markup-dropdown-content">
-                <a class="addMarkup" data-el-name="unclear" data-selection="" id="addUnclear" href="#">Selection</a>
-                <a class="addMarkup" data-el-name="unclear" data-selection="artic" id="addUnclearArtic"
-                  href="#">Articulation</a>
-                <a class="addMarkup" data-el-name="unclear" data-selection="accid" id="addUnclearAccid"
-                  href="#">Accidental</a>
-              </div>
+              <span id="addUnclearText" class="annotationToolsIcon unclearLabel addMarkup" data-el-name="unclear">Unclear</span>
             </div>
             <div class="annotationToolsIconGroup markup-dropdown">
-              <span id="addSicText" class="annotationToolsIcon">Sic</span>
-              <div class="markup-dropdown-content">
-                <a class="addMarkup" data-el-name="sic" data-selection="" id="addSic" href="#">Selection</a>
-                <a class="addMarkup" data-el-name="sic" data-selection="artic" id="addSicArtic" href="#">Articulation</a>
-                <a class="addMarkup" data-el-name="sic" data-selection="accid" id="addSicAccid" href="#">Accidental</a>
-              </div>
+              <span id="addSicText" class="annotationToolsIcon sicLabel addMarkup" data-el-name="sic">Sic</span>
             </div>
             <div class="annotationToolsIconGroup markup-dropdown">
-              <span id="addCorrText" class="annotationToolsIcon">Corr</span>
-              <div class="markup-dropdown-content">
-                <a class="addMarkup" data-el-name="corr" data-selection="" id="addCorr" href="#">Selection</a>
-                <a class="addMarkup" data-el-name="corr" data-selection="artic" id="addCorrArtic"
-                  href="#">Articulation</a>
-                <a class="addMarkup" data-el-name="corr" data-selection="accid" id="addCorrAccid" href="#">Accidental</a>
-              </div>
+              <span id="addCorrText" class="annotationToolsIcon corrLabel addMarkup" data-el-name="corr">Corr</span>
             </div>
             <div class="annotationToolsIconGroup markup-dropdown">
-              <span id="addOrigText" class="annotationToolsIcon">Orig</span>
-              <div class="markup-dropdown-content">
-                <a class="addMarkup" data-el-name="orig" data-selection="" id="addOrig" href="#">Selection</a>
-                <a class="addMarkup" data-el-name="orig" data-selection="artic" id="addOrigArtic"
-                  href="#">Articulation</a>
-                <a class="addMarkup" data-el-name="orig" data-selection="accid" id="addOrigAccid" href="#">Accidental</a>
-              </div>
+              <span id="addOrigText" class="annotationToolsIcon origLabel addMarkup" data-el-name="orig">Orig</span>
             </div>
             <div class="annotationToolsIconGroup markup-dropdown">
-              <span id="addRegText" class="annotationToolsIcon">Reg</span>
-              <div class="markup-dropdown-content">
-                <a class="addMarkup" data-el-name="reg" data-selection="" id="addReg" href="#">Selection</a>
-                <a class="addMarkup" data-el-name="reg" data-selection="artic" id="addRegArtic" href="#">Articulation</a>
-                <a class="addMarkup" data-el-name="reg" data-selection="accid" id="addRegAccid" href="#">Accidental</a>
-              </div>
+              <span id="addRegText" class="annotationToolsIcon regLabel addMarkup" data-el-name="reg">Reg</span>
             </div>
           </div>
           <div class="markupGrp">
             <span id="descMarkupGrp">Descriptive Markup</span>
             <div class="annotationToolsIconGroup markup-dropdown">
-              <span id="addAddText" class="annotationToolsIcon">Add</span>
-              <div class="markup-dropdown-content">
-                <a class="addMarkup" data-el-name="add" data-selection="" id="addAdd" href="#">Selection</a>
-                <a class="addMarkup" data-el-name="add" data-selection="artic" id="addAddArtic" href="#">Articulation</a>
-                <a class="addMarkup" data-el-name="add" data-selection="accid" id="addAddAccid" href="#">Accidental</a>
-              </div>
+              <span id="addAddText" class="annotationToolsIcon addLabel addMarkup" data-el-name="add">Add</span>
             </div>
             <div class="annotationToolsIconGroup markup-dropdown">
-              <span id="addDelText" class="annotationToolsIcon">Del</span>
-              <div class="markup-dropdown-content">
-                <a class="addMarkup" data-el-name="del" data-selection="" id="addDel" href="#">Selection</a>
-                <a class="addMarkup" data-el-name="del" data-selection="artic" id="addDelArtic" href="#">Articulation</a>
-                <a class="addMarkup" data-el-name="del" data-selection="accid" id="addDelAccid" href="#">Accidental</a>
-              </div>
+              <span id="addDelText" class="annotationToolsIcon delLabel addMarkup" data-el-name="del">Del</span>
             </div>
           </div>
         </menu>
@@ -1317,7 +1273,7 @@
         <button
           id="meifriendOptionsTab"
           class="tablink"
-          onclick="switchTab(event, 'settingsPanel')"
+          onclick="switchTab(event, 'settingsPanel', 'block')"
           title="mei-friend Settings"
           data-tab="meiFriendSettings"
         >
@@ -1326,7 +1282,7 @@
         <button
           id="editorOptionsTab"
           class="tablink defaultOpen"
-          onclick="switchTab(event, 'settingsPanel')"
+          onclick="switchTab(event, 'settingsPanel', 'block')"
           title="Editor Settings"
           data-tab="editorSettings"
         >
@@ -1335,7 +1291,7 @@
         <button
           id="verovioOptionsTab"
           class="tablink"
-          onclick="switchTab(event, 'settingsPanel')"
+          onclick="switchTab(event, 'settingsPanel', 'block')"
           title="Verovio Options"
           data-tab="verovioSettings"
         >
@@ -1409,7 +1365,7 @@
       });
 
     // switch tabs in settings menu
-    function switchTab(ev, containingElementId) {
+    function switchTab(ev, containingElementId, displayOption) {
       console.log("switchtab :", ev, containingElementId)
       //const tabId = ev.target.dataset.tab;
       const tabId = ev.target.closest("[data-tab]").dataset.tab;
@@ -1419,8 +1375,8 @@
       if (containingElement) {
         // hide all tab contents except tabId
         for (let cont of containingElement.getElementsByClassName('tabcontent')) {
-          cont.style.display = cont.id === tabId ? 'flex' : 'none'; 
-          // change block to flex to fix horizontal list of all things
+          cont.style.display = cont.id === tabId ? displayOption : 'none'; 
+          // change block to flex to fix horizontal list of all things, block for settings
         }
         // remove class "active" from tablinks except for current target
         for (let tab of containingElement.getElementsByClassName('tablink')) {
