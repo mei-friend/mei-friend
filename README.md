@@ -37,7 +37,8 @@ We use [CodeMirror](https://codemirror.net) as our text editor, and [Verovio](ht
 **Annotation support**. The annotation panel provides tooling for generating in-line <annot> elements, as well as for listing, navigating between, and visualising annotations. Support for stand-off Web Annotations is planned for future development.
 
 ## Installation
-To try out mei-friend, simply navigate to the production instance on [https://mei-friend.mdw.ac.at](https://mei-friend.mdw.ac.at target="_blank"). To run your own instance locally on your system, please follow the [installation instructions](INSTALL.md). 
+To try out mei-friend, simply navigate to the production instance on [https://mei-friend.mdw.ac.at](https://mei-friend.mdw.ac.at){:target=”_blank”}. 
+To run your own instance locally on your system, please follow the [installation instructions](INSTALL.md). 
 
 ## Publications
 Goebl, W., & Weigl, D. M. (2023). mei-friend v1.0: Music Encoding in the Browser. Encoding Cultures. Joine MEC and TEI Conference 2023, Paderborn, Germany. https://teimec2023.uni-paderborn.de/contributions/159.html
