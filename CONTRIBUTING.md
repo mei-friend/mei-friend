@@ -6,7 +6,7 @@ mei-friend is developed in an open-source environment and we welcome contributio
 
 We are grateful for contributions to the mei-friend project in the following areas: [bug reports](#reporting-bugs), [feature requests](#requesting-new-features), [contributing encodings to the public repertoire](#contributing-encodings-to-the-public-repertoire), [contributing translation fixes and new translations](#contributing-translation-fixes-and-new-translations), and [contributing to the mei-friend codebase](#contributing-to-the-mei-friend-codebase). Note that the first three of these areas do not require any programming knowledge, and are accessible to all users of mei-friend: you can contribute to the project by simply using it and providing feedback through the [code repository's issue tracker](https://github.com/mei-friend/mei-friend/issues/new/choose), also available through mei-friend's `Help` -> `Provide feedback` menu item.
 
-<img src="https://mei-friend.github.io/assets/img/github/GitHub-raising-an-issue.png" title="Templates provided by the mei-friend code repository's issue tracker" style="border:1px solid grey; border-radius:5px;">
+<img src="https://mei-friend.github.io/assets/img/github/GitHub-raising-an-issue.png" width="400" title="Templates provided by the mei-friend code repository's issue tracker">
 
 ## Reporting bugs
 
