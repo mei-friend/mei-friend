@@ -4,9 +4,9 @@ mei-friend is developed in an open-source environment and we welcome contributio
 
 ## How can I contribute?
 
-We are grateful for contributions to the mei-friend project in the following areas: bug reports, feature requests, contributing encodings to the public repertoire, contributing translation fixes and new translations, and contributing to the mei-friend codebase.
+We are grateful for contributions to the mei-friend project in the following areas: [bug reports](#reporting-bugs), [feature requests](#requesting-new-features), [contributing encodings to the public repertoire](#contributing-encodings-to-the-public-repertoire), [contributing translation fixes and new translations](#contributing-translation-fixes-and-new-translations), and [contributing to the mei-friend codebase](#contributing-to-the-mei-friend-codebase).
 
-## Reporting Bugs
+## Reporting bugs
 
 If you find a bug in mei-friend, please raise an issue on the [mei-friend GitHub repository's issue tracker](https://github.com/mei-friend/mei-friend/issues/new/choose). Please follow the template provided, entering as much information as possible, including the version of mei-friend you are using, the operating system you are using, and the steps to reproduce the bug.
 
@@ -42,7 +42,7 @@ Concretely, the object `supportedLanguages` within [the file `defaults.js` insid
 
 ## Contributing to the mei-friend codebase
 
-We welcome code contributions for new features to mei-friend. Before getting to work coding, please get in contact with the mei-friend developer team to discuss your proposed changes by creating a [feature request](#Requesting new features) on the issue tracker. Once you have received feedback and approval, please [fork the mei-friend repository](https://github.com/mei-friend/mei-friend/fork), implement your changes, noting that the mei-friend code repository contains a `.prettierrc` file to enforce code formatting. After testing that your changes work as agreed, please raise a Pull Request to the `develop` branch of the mei-friend repository. The mei-friend development team will then review your changes with a view toward merging them.
+We welcome code contributions for new features to mei-friend. Before getting to work coding, please get in contact with the mei-friend developer team to discuss your proposed changes by creating a [feature request](#requesting-new-features) on the issue tracker. Once you have received feedback and approval, please [fork the mei-friend repository](https://github.com/mei-friend/mei-friend/fork), implement your changes, noting that the mei-friend code repository contains a `.prettierrc` file to enforce code formatting. After testing that your changes work as agreed, please raise a Pull Request to the `develop` branch of the mei-friend repository. The mei-friend development team will then review your changes with a view toward merging them.
 
 ## Code of conduct
 
