@@ -1,7 +1,7 @@
 # Installation instructions
 
 Here we describe how to set up your instance of mei-friend to run locally on your system, such as to test your own modifications of the code base. 
-If you simply want to try out mei-friend, please go to [https://mei-friend.mdw.ac.at](https://mei-friend.mdw.ac.at target="_blank"). 
+If you simply want to try out mei-friend, please go to [https://mei-friend.mdw.ac.at](https://mei-friend.mdw.ac.at). 
 
 ## To configure:
 
