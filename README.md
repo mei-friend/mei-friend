@@ -37,7 +37,7 @@ We use [CodeMirror](https://codemirror.net) as our text editor, and [Verovio](ht
 **Annotation support**. The annotation panel provides tooling for generating in-line <annot> elements, as well as for listing, navigating between, and visualising annotations. Support for stand-off Web Annotations is planned for future development.
 
 ## Installation
-To try out mei-friend, simply navigate to the production instance on [https://mei-friend.mdw.ac.at](https://mei-friend.mdw.ac.at/){:target="_blank"}. 
+To try out mei-friend, simply navigate to the production instance on [https://mei-friend.mdw.ac.at](https://mei-friend.mdw.ac.at/). 
 To run your own instance locally on your system, please follow the [installation instructions](INSTALL.md). 
 
 ## Publications
