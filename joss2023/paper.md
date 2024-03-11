@@ -17,7 +17,7 @@ authors:
 affiliations:
  - name: Department of Music Acoustics – Wiener Klangstil (IWK), mdw – University of Music and Performing Arts Vienna, Austria
    index: 1
-date: 11 August 2023
+date: 11 March 2024
 bibliography: paper.bib
 ---
 
@@ -53,7 +53,7 @@ The mei-friend development process operates over three distinct environments: *p
 
 The editor has seen significant and growing adoption by the MEI community, currently receiving more than five-hundred distinct visitor sessions each month on its hosted instance.
 The predecessor Atom plugin was reviewed as part of editorial work for the *Digital Interactive Mozart Edition* [@Sapov_2022] and used to edit a large collection of Beethoven solo-piano pieces [@weigl2019interweaving].
-The Web application is central to ongoing Digital Musicology research projects analysing and comparing orchestral performances aligned with digital score encodings [@Weigl_etal_DLfM2022] and establishing a digital edition of German lute tablatures of the 15th and 16th centuries [@elaute2023mec]. 
+The Web application is central to ongoing Digital Musicology research projects analysing and comparing orchestral performances aligned with digital score encodings [@Weigl_etal_DLfM2023] and establishing a digital edition of German lute tablatures of the 15th and 16th centuries [@elaute2023mec]. 
 A further community-based project is underway to extend mei-friend's support for scholarly edition and markup [@nfdi4culture_Plaksin2022]. 
 mei-friend has been used to teach music encoding at universities in Boston, Vienna, and Würzburg; academic events, including the Digital Humanities @ Oxford Summer School and the *Semana HD* organized by South American Digital Humanities associations; and conferences, including the *Music Encoding Conference* (MEC), the *Medieval and Renaissance Music Conference* (MedRen), and the *Extended Semantic Web Conference* (ESWC). 
 
