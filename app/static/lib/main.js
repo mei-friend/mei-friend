@@ -1434,23 +1434,33 @@ function downloadSvg() {
 } // downloadSvg()
 
 function consultGuidelines() {
-  const elementAtCursor = getElementAtCursor(cm);
+  let elementAtCursor = getElementAtCursor(cm);
+  console.log('Looking at first element', elementAtCursor);
   if (elementAtCursor) {
     // cursor is currently positioned on an element
-    // move up to the closest "presentation" (codemirror line)
-    const presentation = elementAtCursor.closest('span[role="presentation"]');
-    if (presentation) {
+    // find closest preceding element that opens a tag
+    let found = false;
+    do {
+      console.log('Looking at element', elementAtCursor);
+      if (
+        elementAtCursor.nodeType !== Node.TEXT_NODE &&
+        elementAtCursor.classList.contains('cm-tag') &&
+        !elementAtCursor.classList.contains('cm-bracket')
+      ) {
+        found = true;
+        break;
+      }
+      elementAtCursor = elementAtCursor.previousSibling;
+    } while (elementAtCursor.previousSibling);
+
+    if (found) {
       // choose the first XML element (a "tag" that isn't a "bracket")
-      const xmlEls = presentation.querySelectorAll('.cm-tag:not(.cm-bracket)');
-      let xmlElName = Array.from(xmlEls)
-        .map((e) => e.innerText)
-        .join('');
-      if (xmlElName && !xmlElName.includes(':')) {
+      if (elementAtCursor.innerText && !elementAtCursor.innerText.includes(':')) {
         // it's an element in the default (hopefully MEI...) namespace
         // FIXME: For MEI 3.x and 4.x, guidelines have element name in all lower case
         // for MEI 5.0, camelCase is required.
         //window.open(guidelinesBase + 'elements/' + xmlElName.toLowerCase(), '_blank');
-        window.open(guidelinesBase + 'elements/' + xmlElName, '_blank');
+        window.open(guidelinesBase + 'elements/' + elementAtCursor.innerText, '_blank');
       }
     }
   }
