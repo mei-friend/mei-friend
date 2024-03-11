@@ -22,8 +22,7 @@ bibliography: paper.bib
 ---
 
 # Summary
-Digital music encodings are machine-readable representations of music score documents. Going beyond the purely visual information captured by score images or PDFs, music encodings explicitly capture the musical semantics of the score. This makes it possible to use music encodings as research data objects for musicological analyses [@rizo2019mei], and to build digital score interfaces for applications in music scholarship, rehearsal, and performance
-[@Pugin2018interaction]. 
+Digital music encodings are machine-readable representations of music score documents. Beyond the visual information captured by score images or PDFs, music encodings explicitly capture the musical semantics of the score. This makes it possible to use music encodings as research data objects for musicological analyses [@rizo2019mei], and to build digital score interfaces for applications in music scholarship, rehearsal, and performance [@Pugin2018interaction]. 
 
 mei-friend is a friendly, interactive, browser-based editor for music encodings. It opens music encodings in a variety of formats and converts these to MEI, the XML-based format developed by the Music Encoding Initiative, a community of music scholars, librarians, and technologists. Alongside a rich set of interactive editing operations, mei-friend offers specialized functionalities targeted at music scholars, including panels to display facsimile score images and to author score annotations. Collaborative encoding practices are supported through integration with GitHub and Solid, and by remote configuration capabilities via hyperlink (URL parameters). Important MEI community resources are also integrated, supporting direct reference to documentation [@MEI_Guidelines] for currently-selected elements, and auto-completion and validation using the MEI-XML schema definitions. Also provided are curated links to openly-licensed reference music encodings.
 
