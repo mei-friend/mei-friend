@@ -1435,13 +1435,13 @@ function downloadSvg() {
 
 function consultGuidelines() {
   let elementAtCursor = getElementAtCursor(cm);
-  console.log('Looking at first element', elementAtCursor);
+  //console.log('Consult guidelines: Looking at first element', elementAtCursor);
   if (elementAtCursor) {
     // cursor is currently positioned on an element
     // find closest preceding element that opens a tag
     let found = false;
     do {
-      console.log('Looking at element', elementAtCursor);
+      //   console.log('Consult guidelines: Looking at element', elementAtCursor);
       if (
         elementAtCursor.nodeType !== Node.TEXT_NODE &&
         elementAtCursor.classList.contains('cm-tag') &&
