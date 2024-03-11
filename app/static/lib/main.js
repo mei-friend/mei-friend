@@ -1450,7 +1450,9 @@ function consultGuidelines() {
         found = true;
         break;
       }
-      elementAtCursor = elementAtCursor.previousSibling;
+      if (elementAtCursor.previousSibling) {
+        elementAtCursor = elementAtCursor.previousSibling;
+      }
     } while (elementAtCursor.previousSibling);
 
     if (found) {
