@@ -31,7 +31,6 @@ The editor targets an audience of music scholars, students, librarians, performe
 # Statement of Need
 
 Music encodings are machine-readable representations of music scores with important affordances for digital music research, preservation of cultural heritage, and music rehearsal and performance [@Geertinger_2021].
-
 MEI, the family of XML schemas promoted and continually developed by the community of the Music Encoding Initiative, is noted for its richly comprehensive representation of music semantics, including facilities for digital scholarly edition, analytical markup, and capturing catalogue-level metadata and source descriptions alongside the music content; and, for its support for a variety of notations including tablatures, neumes, and mensural notation alongside common western music notation [@Crawford2016music]. These capabilities set MEI apart for scholarly use from less richly elaborated but more widespread competitors such as MusicXML, which, unlike MEI, can be exported by most commercial notation software [@Pugin2018interaction]. Conversely, the retention of XML as a technological basis, with advantages particularly in terms of interoperability and addressability, speak for MEI in favour of other research-focused formats such as Humdrum Kern in the context of FAIR data management [@Weigl_etal_EMR2021]. 
 
 ![mei-friend interface: MEI encoding of Beethoven's WoO 57 (right panel), digital score rendering (top-left panel), and associated facsimile image of the source edition (bottom-left panel), with the currently-selected measure highlighted in each modality.\label{fig:example}](mei-friend-WoO57-facsimile-3.png){ width="100%" }
@@ -52,7 +51,7 @@ The official application instance, available at <https://mei-friend.mdw.ac.at/>,
 
 The mei-friend development process operates over three distinct environments: *production*, served from the `main` branch of the mei-friend code repository; *staging*, served from the `staging` branch and accessible for public testing purposes at <https://staging.mei-friend.mdw.ac.at>; and *develop*, served from the `develop` branch. The application adjusts to its environment context, running tests when in develop and altering the logo to alert users when in staging.
 
-The editor has seen significant and growing adoption by the MEI community, typically receiving more than one-hundred distinct visitor sessions each week on its official instance at time of writing.
+The editor has seen significant and growing adoption by the MEI community, currently receiving more than five-hundred distinct visitor sessions each month on its hosted instance.
 The predecessor Atom plugin was reviewed in the context of editorial work for the *Digital Interactive Mozart Edition* [@Sapov_2022] and used in the edition of a large collection of Beethoven solo-piano pieces [@weigl2019interweaving].
 The Web application is central to ongoing Digital Musicology research projects analysing and comparing orchestral performances aligned with digital score encodings [@Weigl_etal_DLfM2022] and establishing a digital edition of German lute tablatures of the 15th and 16th centuries [@elaute2023mec]. 
 A further community-based project is underway to extend mei-friend's support for scholarly edition and markup [@nfdi4culture_Plaksin2022]. 
