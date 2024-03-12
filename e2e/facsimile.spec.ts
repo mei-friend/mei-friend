@@ -39,14 +39,16 @@ test.describe('Test facsimile functionality.', () => {
     await expect(page.locator('#sourceImageSvg text').first()).toBeVisible();
   });
 
-  test.fixme('Open MEI with minimal facsimile and check display', async ({ page }) => {
+  test('Open MEI with minimal facsimile and check display', async ({ page }) => {
     // Check the expected MEI elements are visible (Beethoven's WoO 57)
     await openUrl(
       page,
       'https://raw.githubusercontent.com/trompamusic-encodings/Beethoven_Op76_BreitkopfHaertel/f769e83/Beethoven_Op76-Breitkopf-Haertel_pb-facs.mei'
     );
     await expect(page.locator('#n7pyz78 use').first()).toBeVisible();
-    // await expect(page.locator('#sourceImageSvg image')).toBeFalsy();
-    // await expect(page.locator('#facsimileMessagePanel h2')).toContainText('No facsimile available');
+    // find sourceImageSvg and check that it has no children
+    await expect(page.locator('#sourceImageSvg').locator('*')).toHaveCount(0);
+    // check that facsimileMessagePanel h2 contains text
+    await expect(page.locator('#facsimileMessagePanel h2')).toBeVisible();
   });
 });
