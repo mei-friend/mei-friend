@@ -29,6 +29,13 @@ test.describe('Test facsimile functionality.', () => {
     );
     await expect(page.locator('#beam-0000001508587757 polygon').first()).toBeVisible();
 
+    await page.locator('#breaksSelect').selectOption('encoded');
+
+    await page.locator('g#chord-0000000104286025').click();
+
+    await page.locator('rect#measure-0000000595472239').scrollIntoViewIfNeeded();
+    await page.locator('text#measure-0000000595472239').click();
+
     // click on lastPageButton to go to the last page
     await page.click('#lastPageButton');
 
@@ -37,9 +44,14 @@ test.describe('Test facsimile functionality.', () => {
     await expect(page.locator('#sourceImageSvg image')).toBeVisible();
     await expect(page.locator('#sourceImageSvg rect').first()).toBeVisible();
     await expect(page.locator('#sourceImageSvg text').first()).toBeVisible();
+
+    // click on specific zone, check visibility of note
+    await page.locator('text#measure-0000001750764473').click();
+    await page.getByText('"measure-0000001750764473"').click();
+    await expect(page.locator('g#note-0000001956624735')).toHaveClass('note highlighted');
   });
 
-  test('Open MEI with minimal facsimile and check display', async ({ page }) => {
+  test('Open MEI with minimal facsimile, click-draw zone', async ({ page }) => {
     // Check the expected MEI elements are visible (Beethoven's WoO 57)
     await openUrl(
       page,
@@ -50,5 +62,38 @@ test.describe('Test facsimile functionality.', () => {
     await expect(page.locator('#sourceImageSvg').locator('*')).toHaveCount(0);
     // check that facsimileMessagePanel h2 contains text
     await expect(page.locator('#facsimileMessagePanel h2')).toBeVisible();
+
+    // click facsimileFullPageCheckbox and check whether image is visible inside sourceImageSvg
+    await page.click('#facsimileFullPageCheckbox');
+    await expect(page.locator('#sourceImageSvg image')).toBeVisible();
+
+    await page.getByRole('button', { name: 'Decrease notation image' }).click({
+      clickCount: 7,
+    });
+    await expect(page.locator('#sourceImageSvg image')).toBeVisible();
+
+    // set notation and facsimile top
+    await page.locator('#viewMenuTitle').click();
+    await page.locator('#notationTop').click();
+    await page.locator('#viewMenuTitle').click();
+    await page.locator('#facsimileTop').click();
+
+    // enable zone editing
+    await page.locator('#facsimileEditZonesCheckbox').click();
+
+    // click on a measure and check that the note is visible
+    await page.getByText('"m18xsdz"').click();
+    await expect(page.locator('#n7pyz78 use')).toBeVisible();
+
+    // draw new zone for that measure
+    await page.mouse.move(120, 120);
+    await page.mouse.down({ button: 'left' });
+    await page.mouse.move(240, 240);
+    await page.mouse.up();
+
+    // get id from zone and check that it starts with 'z'
+    const id = await page.locator('#sourceImageSvg').locator('rect').last().getAttribute('id');
+    console.log('Id of newly created zone:', id);
+    if (id) await expect(id[0]).toBe('z');
   });
 });
