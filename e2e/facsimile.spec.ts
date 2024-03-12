@@ -51,7 +51,7 @@ test.describe('Test facsimile functionality.', () => {
     await expect(page.locator('g#note-0000001956624735')).toHaveClass('note highlighted');
   });
 
-  test('Open MEI with minimal facsimile, click-draw zone, and resize it', async ({ page }) => {
+  test('Open MEI with minimal facsimile, click-draw zone, and resize and move it', async ({ page }) => {
     // Check the expected MEI elements are visible (Beethoven's WoO 57)
     await openUrl(
       page,
