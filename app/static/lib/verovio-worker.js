@@ -399,17 +399,18 @@ addEventListener(
             return family;
           }
           if (family.match(/(?:^|,)\s*sans-serif\s*$/) || true) {
+            let font = 'Times'; // 'Edwin'; does not work, because pdfkit is using the fs package available in node.js only
             if (bold && italic) {
-              return 'Times-BoldItalic';
+              return font + '-BoldItalic';
             }
             if (bold && !italic) {
-              return 'Times-Bold';
+              return font + '-Bold';
             }
             if (!bold && italic) {
-              return 'Times-Italic';
+              return font + '-Italic';
             }
             if (!bold && !italic) {
-              return 'Times-Roman';
+              return font + '-Roman';
             }
           }
         };
