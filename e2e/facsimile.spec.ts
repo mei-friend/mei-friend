@@ -51,7 +51,7 @@ test.describe('Test facsimile functionality.', () => {
     await expect(page.locator('g#note-0000001956624735')).toHaveClass('note highlighted');
   });
 
-  test('Open MEI with minimal facsimile, click-draw zone, and resize and move it', async ({ page }) => {
+  test('Open MEI with minimal facsimile, click-draw zone, and resize and move, and delete it', async ({ page }) => {
     // Check the expected MEI elements are visible (Beethoven's WoO 57)
     await openUrl(
       page,
@@ -92,12 +92,12 @@ test.describe('Test facsimile functionality.', () => {
     await page.mouse.up();
 
     // get id from zone and check that it starts with 'z'
-    const id = await page.locator('#sourceImageSvg').locator('rect').last().getAttribute('id');
-    console.log('Id of newly created zone:', id);
-    if (id) await expect(id[0]).toBe('z');
+    const zoneId = await page.locator('#sourceImageSvg').locator('rect').last().getAttribute('id');
+    console.log('Id of newly created zone:', zoneId);
+    if (zoneId) expect(zoneId[0]).toBe('z');
 
     // resize the zone horizontally
-    const zone = await page.locator('#sourceImageSvg').locator('rect').last();
+    const zone = page.locator('#sourceImageSvg').locator('rect').last();
     let width = await zone.getAttribute('width');
     let x = await zone.getAttribute('x');
     let y = await zone.getAttribute('y');
@@ -129,5 +129,14 @@ test.describe('Test facsimile functionality.', () => {
       console.log('Zone: Y before:', y, 'Y after:', newY);
       expect(parseFloat(y)).toBeLessThan(parseFloat(newY));
     }
+
+    // delete the zone
+    await page.locator('#manipulateMenuTitle').click();
+    await page.locator('#delete').click();
+
+    // check that the zone has been deleted
+    let lastZoneId = await page.locator('#sourceImageSvg').locator('rect').last().getAttribute('id');
+    console.log('Last zone id:', lastZoneId);
+    expect(lastZoneId).toBeNull();
   });
 });
