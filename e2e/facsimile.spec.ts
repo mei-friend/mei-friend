@@ -51,7 +51,7 @@ test.describe('Test facsimile functionality.', () => {
     await expect(page.locator('g#note-0000001956624735')).toHaveClass('note highlighted');
   });
 
-  test('Open MEI with minimal facsimile, click-draw zone', async ({ page }) => {
+  test('Open MEI with minimal facsimile, click-draw zone, and resize it', async ({ page }) => {
     // Check the expected MEI elements are visible (Beethoven's WoO 57)
     await openUrl(
       page,
@@ -95,5 +95,39 @@ test.describe('Test facsimile functionality.', () => {
     const id = await page.locator('#sourceImageSvg').locator('rect').last().getAttribute('id');
     console.log('Id of newly created zone:', id);
     if (id) await expect(id[0]).toBe('z');
+
+    // resize the zone horizontally
+    const zone = await page.locator('#sourceImageSvg').locator('rect').last();
+    let width = await zone.getAttribute('width');
+    let x = await zone.getAttribute('x');
+    let y = await zone.getAttribute('y');
+
+    // move mouse to the zone and resize it horizontally
+    await page.mouse.move(240, 180);
+    await page.mouse.down({ button: 'left' });
+    await page.mouse.move(180, 180);
+    await page.mouse.up();
+
+    let newWidth = await zone.getAttribute('width');
+    if (width && newWidth) {
+      console.log('Zone: Width before:', width, 'Width after:', newWidth);
+      expect(parseFloat(width)).toBeGreaterThan(parseFloat(newWidth));
+    }
+
+    // move zone with mouse and check that it has moved
+    await page.mouse.move(140, 140);
+    await page.mouse.down({ button: 'left' });
+    await page.mouse.move(180, 180);
+    await page.mouse.up();
+
+    let newX = await zone.getAttribute('x');
+    let newY = await zone.getAttribute('y');
+
+    if (x && newX && y && newY) {
+      console.log('Zone: X before:', x, 'X after:', newX);
+      expect(parseFloat(x)).toBeLessThan(parseFloat(newX));
+      console.log('Zone: Y before:', y, 'Y after:', newY);
+      expect(parseFloat(y)).toBeLessThan(parseFloat(newY));
+    }
   });
 });
