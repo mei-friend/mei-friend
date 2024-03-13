@@ -51,4 +51,19 @@ test.describe('Test that the MIDI playback panel works correctly', () => {
   });
 });
 
-test.skip('Test that MIDI playback works correctly', () => {});
+test.describe('Test that MIDI playback works correctly', () => {
+  test('Test that playback causes notes to highlight', async ({ page }) => {
+    // open the panel using the menu: View -> Playback controls
+    await page.locator('#viewMenuTitle').click();
+    await page.locator('#showPlaybackControls').click();
+    // switch focus to encoding
+    await page.keyboard.press('Shift+Space');
+    // hackily wait for half a second to enable playback on 'space' key
+    // TODO: figure out why this is necessary
+    await page.waitForTimeout(500);
+    // commence playback
+    await page.keyboard.press('Space');
+    // check that the first note is highlighted
+    await expect(page.locator('.currently-playing').first()).toBeVisible();
+  });
+});
