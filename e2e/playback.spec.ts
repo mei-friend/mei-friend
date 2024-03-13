@@ -6,7 +6,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 test.describe('Test that the MIDI playback panel works correctly', () => {
-  test('Test that the MIDI playback panel opens and closes correctly', async ({ page }) => {
+  test('Test that the MIDI playback panel opens and closes using panel icon', async ({ page }) => {
     // expect that the MIDI playback panel is not visible, and the contextual playback button (bubble) to be visible
     await expect(page.locator('#midiPlaybackControlBar')).not.toBeVisible();
     await expect(page.locator('#midiPlayerContextual')).toBeVisible();
@@ -18,7 +18,9 @@ test.describe('Test that the MIDI playback panel works correctly', () => {
     await page.locator('#showMidiPlaybackControlBarButton').click();
     await expect(page.locator('#midiPlaybackControlBar')).not.toBeVisible();
     await expect(page.locator('#midiPlayerContextual')).toBeVisible();
-    // now open the panel again using the bubble this time
+  });
+  test('Test that the MIDI playback panel opens and closes using contextual indicators', async ({ page }) => {
+    // open the panel using the contexutal bubble
     await page.locator('#midiPlayerContextual').click();
     await expect(page.locator('#midiPlaybackControlBar')).toBeVisible();
     await expect(page.locator('#midiPlayerContextual')).not.toBeVisible();
@@ -26,6 +28,8 @@ test.describe('Test that the MIDI playback panel works correctly', () => {
     await page.locator('#closeMidiPlaybackControlBarButton').click();
     await expect(page.locator('#midiPlaybackControlBar')).not.toBeVisible();
     await expect(page.locator('#midiPlayerContextual')).toBeVisible();
+  });
+  test('Test that the MIDI playback panel opens and closes using the menu item', async ({ page }) => {
     // open it using the menu: View -> Playback controls
     await page.locator('#viewMenuTitle').click();
     await page.locator('#showPlaybackControls').click();
@@ -36,7 +40,8 @@ test.describe('Test that the MIDI playback panel works correctly', () => {
     await page.locator('#showPlaybackControls').click();
     await expect(page.locator('#midiPlaybackControlBar')).not.toBeVisible();
     await expect(page.locator('#midiPlayerContextual')).toBeVisible();
-    // finally, open it using the keyboard:
+  });
+  test('Test that the MIDI playback panel opens using the keyboard', async ({ page }) => {
     // first, move focus to the notation
     await page.keyboard.press('Shift+Space');
     // then, open the panel
