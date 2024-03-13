@@ -1,6 +1,5 @@
 import { test, expect } from '@playwright/test';
 import { setupPage, openUrl } from './setup';
-import exp from 'constants';
 
 test.beforeEach(async ({ page }) => {
   console.log('Calling setupPage!');
@@ -27,7 +26,7 @@ test.describe('Test facsimile functionality.', () => {
       page,
       'https://raw.githubusercontent.com/trompamusic-encodings/Beethoven_WoO57_BreitkopfHaertel/9d60074/Beethoven_WoO57-Breitkopf.mei'
     );
-    await expect(page.locator('#beam-0000001508587757 polygon').first()).toBeVisible();
+    await expect(page.locator('#beam-0000001508587757').first()).toBeVisible();
 
     await page.locator('#breaksSelect').selectOption('encoded');
 
