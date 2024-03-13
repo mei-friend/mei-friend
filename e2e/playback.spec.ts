@@ -86,4 +86,24 @@ test.describe('Test that MIDI playback works correctly', () => {
       return document.querySelector('#verovio-panel')!.scrollTop !== initialScroll;
     }, initialScroll);
   });
+
+  test('Test automatic page turning during playback', async ({ page }) => {
+    // open known MEI file
+    await openUrl(
+      page,
+      'https://raw.githubusercontent.com/trompamusic-encodings/Schumann-Clara_Romanze-in-a-Moll/b408031f725b0a1f4eea57a89a04c75c3431da62/Schumann-Clara_Romanze-ohne-Opuszahl_a-Moll.mei'
+    );
+    // render page breaks
+    await page.locator('#breaksSelect').selectOption('encoded');
+    // disable speedmode to allow playback beyond first page
+    await page.locator('#speedCheckbox').uncheck();
+    // click on a note near end of first page
+    await page.locator('#note-0000000547593172 use').first().click();
+    // expect that the page number is 1
+    await expect(page.locator('#pagination2')).toHaveText(' 1 ');
+    // commence playback
+    await page.keyboard.press('Space');
+    // eventually, the page number should change as viewport follows playback
+    await expect(page.locator('#pagination2')).toHaveText(' 2 ');
+  });
 });
