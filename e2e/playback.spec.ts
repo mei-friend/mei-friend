@@ -66,4 +66,24 @@ test.describe('Test that MIDI playback works correctly', () => {
     // check that the first note is highlighted
     await expect(page.locator('.currently-playing').first()).toBeVisible();
   });
+
+  test('Test automatic scrolling during playback', async ({ page }) => {
+    // open known MEI file
+    await openUrl(
+      page,
+      'https://raw.githubusercontent.com/trompamusic-encodings/Schumann-Clara_Romanze-in-a-Moll/b408031f725b0a1f4eea57a89a04c75c3431da62/Schumann-Clara_Romanze-ohne-Opuszahl_a-Moll.mei'
+    );
+    // render page breaks
+    await page.locator('#breaksSelect').selectOption('encoded');
+    // click on a note near end of first system
+    await page.locator('#note-0000001030232648 use').first().click();
+    // test whether #verovio-panel eventually changes its scroll position
+    const initialScroll = await page.locator('#verovio-panel').evaluate((el) => el.scrollTop);
+    // commence playback
+    await page.keyboard.press('Space');
+    // eventually, the scroll position should change as viewport follows playback
+    await page.waitForFunction((initialScroll) => {
+      return document.querySelector('#verovio-panel')!.scrollTop !== initialScroll;
+    }, initialScroll);
+  });
 });
