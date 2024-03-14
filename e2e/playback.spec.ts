@@ -58,11 +58,10 @@ test.describe('Test that MIDI playback works correctly', () => {
     await page.locator('#showPlaybackControls').click();
     // switch focus to encoding
     await page.keyboard.press('Shift+Space');
-    // hackily wait for half a second to enable playback on 'space' key
-    // TODO: figure out why this is necessary
-    await page.waitForTimeout(500);
+    await expect(page.locator('#midiPlaybackControlBar')).not.toBeVisible();
     // commence playback
     await page.keyboard.press('Space');
+    await expect(page.locator('#midiPlaybackControlBar')).toBeVisible();
     // check that the first note is highlighted
     await expect(page.locator('.currently-playing').first()).toBeVisible();
   });
@@ -76,11 +75,14 @@ test.describe('Test that MIDI playback works correctly', () => {
     // render page breaks
     await page.locator('#breaksSelect').selectOption('encoded');
     // click on a note near end of first system
-    await page.locator('#note-0000001030232648 use').first().click();
+    // HACK - use force: true to prevent right footer from intercepting pointer event
+    // TODO - figure out why this happens
+    await page.locator('#note-0000001030232648 use').first().click({ force: true });
     // test whether #verovio-panel eventually changes its scroll position
     const initialScroll = await page.locator('#verovio-panel').evaluate((el) => el.scrollTop);
     // commence playback
     await page.keyboard.press('Space');
+    await expect(page.locator('#midiPlaybackControlBar')).toBeVisible();
     // eventually, the scroll position should change as viewport follows playback
     await page.waitForFunction((initialScroll) => {
       return document.querySelector('#verovio-panel')!.scrollTop !== initialScroll;
@@ -98,11 +100,14 @@ test.describe('Test that MIDI playback works correctly', () => {
     // disable speedmode to allow playback beyond first page
     await page.locator('#speedCheckbox').uncheck();
     // click on a note near end of first page
+    // HACK - use force: true to prevent Verovio SVG from intercepting pointer event
+    // TODO - figure out why this happens
     await page.locator('#note-0000000547593172 use').first().click();
     // expect that the page number is 1
     await expect(page.locator('#pagination2')).toHaveText(' 1 ');
     // commence playback
     await page.keyboard.press('Space');
+    await expect(page.locator('#midiPlaybackControlBar')).toBeVisible();
     // eventually, the page number should change as viewport follows playback
     await expect(page.locator('#pagination2')).toHaveText(' 2 ');
   });
