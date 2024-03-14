@@ -89,7 +89,34 @@ test.describe('Test that MIDI playback works correctly', () => {
     }, initialScroll);
   });
 
-  test('Test automatic page turning during playback', async ({ page }) => {
+  test('Test that playback stops when the end of the page is reached (when in speed mode)', async ({ page }) => {
+    // open known MEI file
+    await openUrl(
+      page,
+      'https://raw.githubusercontent.com/trompamusic-encodings/Schumann-Clara_Romanze-in-a-Moll/b408031f725b0a1f4eea57a89a04c75c3431da62/Schumann-Clara_Romanze-ohne-Opuszahl_a-Moll.mei'
+    );
+    // render page breaks
+    await page.locator('#breaksSelect').selectOption('encoded');
+    // enable speedmode, preventing automatic page turning
+    await page.locator('#speedCheckbox').check();
+    // click on a note near end of first page
+    // HACK - use force: true to prevent Verovio SVG from intercepting pointer event
+    // TODO - figure out why this happens
+    await page.locator('#note-0000000547593172 use').first().click();
+    // commence playback
+    await page.keyboard.press('Space');
+    await expect(page.locator('#midiPlaybackControlBar')).toBeVisible();
+    // ... something should be highlighted ...
+    await expect(page.locator('.currently-playing').first()).toBeVisible();
+    // ... then, after 2 seconds of playback (i.e., past end of page) ...
+    await page.waitForTimeout(2000);
+    // ... nothing should be highlighted ...
+    await expect(page.locator('.currently-playing')).not.toBeVisible();
+    // ... and the page indicator should not have changed
+    await expect(page.locator('#pagination2')).toHaveText(' 1 ');
+  });
+
+  test('Test automatic page turning during playback (when not in speed mode)', async ({ page }) => {
     // open known MEI file
     await openUrl(
       page,
