@@ -115,7 +115,9 @@ test.describe('Test mei-friend settings panel tab', () => {
     await expect(await page.locator('#encoding').innerText()).not.toMatch(/.*<name .*mei-friend<\/.*/);
     // make a change to the MEI (shift pitch of first note) and check app statement still not present
     // click on the first g.note element
-    await page.click('g.note');
+    // HACK - use force: true to prevent Verovio SVG from intercepting pointer event
+    // TODO - figure out why this happens
+    await page.locator('g.note').first().click({ force: true });
     await page.click('#manipulateMenuTitle');
     await page.click('#pitchChromUp');
     // reset viewport to end of <appInfo> element]
@@ -129,7 +131,9 @@ test.describe('Test mei-friend settings panel tab', () => {
     // click on the first g.note element
     await page.click('#addApplicationNote');
     // make another change to the MEI (shift pitch of first note) and check app statement is present
-    await page.click('g.note');
+    // HACK - use force: true to prevent Verovio SVG from intercepting pointer event
+    // TODO - figure out why this happens
+    await page.locator('g.note').first().click({ force: true });
     await page.click('#manipulateMenuTitle');
     await page.click('#pitchChromUp');
     // scroll the editor to the end of the <appInfo> element to ensure that the application statements are in viewport
