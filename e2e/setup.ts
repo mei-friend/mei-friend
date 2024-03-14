@@ -1,4 +1,4 @@
-const defaultUrl = '/';
+export const defaultUrl = '/';
 
 export async function setupPage(page, url = defaultUrl) {
   await page.goto(url);
