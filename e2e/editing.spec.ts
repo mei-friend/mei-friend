@@ -7,6 +7,8 @@ test.beforeEach(async ({ page }) => {
 });
 
 test.describe('Test editing functionality.', () => {
+
+  // TODO: Split into test.step 
   test('Add, modify, and delete slur to selected elements', async ({ page }) => {
     // open file from URL
     await openUrl(
@@ -43,16 +45,18 @@ test.describe('Test editing functionality.', () => {
  * @param {string[]} ids
  */
 async function selectElements(page: Page, ids: string[]) {
-  ids.forEach(async (id, i) => {
+  let i = 0;
+  for (let id of ids) {
+    // ids.forEach(async (id, i) => {
     console.log(i + ': Selecting element with id: ', id);
-    let mod = {};
+    let mod = { force: true };
     if (i > 0) {
       mod['modifiers'] = ['Meta'];
     }
     let note = page.locator('g#' + id);
     await expect(note).toBeVisible();
     await note.locator('*').first().click(mod); // need to click on any child element to select the parent
-  });
+  }
   return true;
 } // selectElements()
 
