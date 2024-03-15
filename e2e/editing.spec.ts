@@ -6,7 +6,7 @@ test.beforeEach(async ({ page }) => {
   await setupPage(page);
 });
 
-test.describe('Test editing functionality.', () => {
+test.describe('Test insertion functionality.', () => {
   test('Add, modify, and delete slur to one selected element', async ({ page }) => {
     let uuid: string | null; // id of the new slur
 
@@ -75,7 +75,7 @@ test.describe('Test editing functionality.', () => {
     });
   });
 
-  test('Add and delete slur to two selected elements', async ({ page }) => {
+  test('Add, modify, and delete slur to two selected elements', async ({ page }) => {
     let uuid: string | null; // id of the new slur
 
     await test.step('Open MEI file, turn page, and descrease scaling', async () => {
@@ -151,7 +151,81 @@ test.describe('Test editing functionality.', () => {
     await test.step('Delete slur', async () => {
       // delete this slur now
       console.log('Deleting slur: ', uuid);
-      await deleteElement(page, [uuid]);
+      await deleteElement(page, [uuid!]);
+    });
+  });
+
+  test('Add a tie to one selected element', async ({ page }) => {
+    let uuid: string | null; // id of the new tie
+
+    await test.step('Open MEI file, turn page, and descrease scaling', async () => {
+      // open file from URL
+      await openUrl(
+        page,
+        'https://raw.githubusercontent.com/trompamusic-encodings/Beethoven_WoO70_BreitkopfHaertel/master/Beethoven_WoO70-Breitkopf.mei'
+      );
+
+      // check whether first note on second page 'note-0000001568544877' is visible
+      await expect(page.locator('#note-0000001631474113')).toBeVisible();
+
+      // click on #nextPageButton
+      await page.locator('#nextPageButton').click();
+
+      // check whether first note on second page 'note-0000001568544877' is visible
+      await expect(page.locator('#note-0000001568544877')).toBeVisible();
+
+      // click on #nextPageButton
+      await page.locator('#nextPageButton').click();
+
+      // check whether first note on second page 'note-0000001568544877' is visible
+      await expect(page.locator('#note-0000000973543454')).toBeVisible();
+    });
+
+    await test.step('Select one element and add a tie', async () => {
+      // select two elements and add slur to selected elements
+      let elements = ['note-0000001209141443'];
+      await selectElements(page, elements);
+      uuid = await insertElement(page, elements, 'tie', 'addTie');
+      console.log('New tie inserted: ', uuid);
+
+      // test whether the new slur has attributes startid and endid to the first and last elements respectively
+      const tie = page.locator('g#' + uuid);
+      await expect(tie).toBeVisible();
+      const currentLine = page.locator('span[role="presentation"]', { has: page.getByText(uuid!) });
+      await expect(currentLine).toBeVisible();
+      await expect(currentLine).toHaveText(new RegExp('startid="#' + elements[0]));
+      await expect(currentLine).toHaveText(new RegExp('endid="#note-0000002071154177')); // expected note in the next measure
+    });
+
+    await test.step('Modify tie', async () => {
+      // modify this slur now
+      console.log('Modifying tie: ', uuid);
+
+      // get notation panel into focus
+      await page.keyboard.press('Shift+Space');
+      // check whether notation has class focus-visible
+      const notation = page.locator('#notation');
+      await expect(notation).toHaveClass(/focus-visible/);
+
+      // press X to flip slur direction
+      await page.keyboard.press('x');
+      // check encoding whether slur has curvedir="above"
+      let currentLine = page.locator('span[role="presentation"]', { has: page.getByText(uuid!) });
+      await expect(currentLine).toBeVisible();
+      await expect(currentLine).toHaveText(new RegExp('curvedir="above"'));
+
+      // press X to flip slur direction
+      await page.keyboard.press('x');
+      // check encoding whether slur has curvedir="above"
+      currentLine = page.locator('span[role="presentation"]', { has: page.getByText(uuid!) });
+      await expect(currentLine).toBeVisible();
+      await expect(currentLine).toHaveText(new RegExp('curvedir="below"'));
+    });
+
+    await test.step('Delete tie', async () => {
+      // delete this slur now
+      console.log('Deleting tie: ', uuid);
+      await deleteElement(page, [uuid!]);
     });
   });
 });
@@ -188,7 +262,7 @@ async function selectElements(page: Page, ids: string[]) {
 async function insertElement(page: Page, ids: string[], elementName: string = 'slur', menuItem: string = 'addSlur') {
   await page.locator('#insertMenuTitle').click();
   await page.locator('#insertMenuTitle').hover();
-  // await expect(page.locator('#' + menuItem)).toBeVisible();
+  await expect(page.locator('#' + menuItem)).toBeVisible();
   await page.locator('#' + menuItem).click();
 
   // check that element is visible
