@@ -1,11 +1,13 @@
+import { Page } from "@playwright/test";
+
 export const defaultUrl = '/';
 
-export async function setupPage(page, url = defaultUrl) {
+export async function setupPage(page: Page, url = defaultUrl) {
   await page.goto(url);
   await page.click('#splashConfirmButton');
 }
 
-export async function openUrl(page, url) {
+export async function openUrl(page: Page, url: string) {
   await page.click('#fileMenuTitle');
   // click on the element with ID "openUrl"
   await page.click('#openUrl');
