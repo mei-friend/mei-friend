@@ -60,7 +60,7 @@ test.describe('Test editing functionality.', () => {
     await test.step('Delete slur', async () => {
       // delete this slur now
       console.log('Deleting slur: ', uuid);
-      await deleteElement(page, [uuid]);
+      await deleteElement(page, [uuid!]);
     });
   });
 });
