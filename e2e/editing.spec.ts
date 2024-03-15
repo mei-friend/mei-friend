@@ -50,8 +50,7 @@ test.describe('Test insertion functionality.', () => {
       // get notation panel into focus
       await page.keyboard.press('Shift+Space');
       // check whether notation has class focus-visible
-      const notation = page.locator('#notation');
-      await expect(notation).toHaveClass(/focus-visible/);
+      await expect(page.locator('#notation')).toHaveClass(/focus-visible/);
 
       // press X to flip slur direction
       await page.keyboard.press('x');
@@ -130,8 +129,7 @@ test.describe('Test insertion functionality.', () => {
       // get notation panel into focus
       await page.keyboard.press('Shift+Space');
       // check whether notation has class focus-visible
-      const notation = page.locator('#notation');
-      await expect(notation).toHaveClass(/focus-visible/);
+      await expect(page.locator('#notation')).toHaveClass(/focus-visible/);
 
       // press X to flip slur direction
       await page.keyboard.press('x');
@@ -204,8 +202,7 @@ test.describe('Test insertion functionality.', () => {
       // get notation panel into focus
       await page.keyboard.press('Shift+Space');
       // check whether notation has class focus-visible
-      const notation = page.locator('#notation');
-      await expect(notation).toHaveClass(/focus-visible/);
+      await expect(page.locator('#notation')).toHaveClass(/focus-visible/);
 
       // press X to flip slur direction
       await page.keyboard.press('x');
