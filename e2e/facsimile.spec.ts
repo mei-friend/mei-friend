@@ -134,8 +134,6 @@ test.describe('Test facsimile functionality.', () => {
     await page.locator('#delete').click();
 
     // check that the zone has been deleted
-    let lastZoneId = await page.locator('#sourceImageSvg').locator('rect').last().getAttribute('id');
-    console.log('Last zone id:', lastZoneId);
-    expect(lastZoneId).toBeNull();
+    await expect(page.locator('#sourceImageSvg').locator('rect').last()).not.toBeVisible;
   });
 });
