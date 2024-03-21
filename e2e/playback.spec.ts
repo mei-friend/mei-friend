@@ -110,10 +110,8 @@ test.describe('Test that MIDI playback works correctly', () => {
     await expect(page.locator('#midiPlaybackControlBar')).toBeVisible();
     // ... something should be highlighted ...
     await expect(page.locator('.currently-playing').first()).toBeVisible();
-    // ... then, after 2 seconds of playback (i.e., past end of page) ...
-    await page.waitForTimeout(4000);
-    // ... nothing should be highlighted ...
-    await expect(page.locator('.currently-playing')).not.toBeVisible();
+    // ... eventually (past end of page) nothing should be highlighted ...
+    await expect(page.locator('.currently-playing')).toHaveCount(0);
     // ... and the page indicator should not have changed
     await expect(page.locator('#pagination2')).toHaveText(' 1 ');
   });
@@ -137,10 +135,12 @@ test.describe('Test that MIDI playback works correctly', () => {
     // commence playback
     await page.keyboard.press('Space');
     await expect(page.locator('#midiPlaybackControlBar')).toBeVisible();
-    // eventually, the page number should change as viewport follows playback
+    // ... something should be highlighted ...
+    await expect(page.locator('.currently-playing').first()).toBeVisible();
+    // eventually, the first note on the second page should be visible and highlighted
+    await expect(page.locator('#note-0000000226572947')).toBeVisible();
+    await expect(page.locator('#note-0000000226572947')).toHaveClass(/currently-playing/);
+    // ... and the page indicator should have changed
     await expect(page.locator('#pagination2')).toHaveText(' 2 ');
-
-    await page.keyboard.press('Space');
-    await expect(page.locator('#midiPlaybackControlBar')).toBeVisible();
   });
 });
