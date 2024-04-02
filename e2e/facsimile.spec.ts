@@ -30,8 +30,9 @@ test.describe('Test facsimile functionality.', () => {
 
     await page.locator('#breaksSelect').selectOption('encoded');
 
-    await page.locator('g#chord-0000000104286025').click();
-
+    await expect(page.locator('g#chord-0000000104286025')).toBeVisible();
+    await page.locator('g#chord-0000000104286025').scrollIntoViewIfNeeded();
+    
     await page.locator('rect#measure-0000000595472239').scrollIntoViewIfNeeded();
     await page.locator('text#measure-0000000595472239').click();
 
