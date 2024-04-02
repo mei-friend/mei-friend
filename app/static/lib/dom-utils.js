@@ -268,7 +268,9 @@ export function getElementAtCursor(cm) {
     },
     'window'
   );
-  let elem = document.elementFromPoint(coords.left, coords.top);
+  const elems = document.elementsFromPoint(coords.left, coords.top);
+  const inEncoding = elems.filter((el) => el.closest('#encoding'));
+  const elem = inEncoding[0];
   return elem;
 } // getElementAtCursor()
 

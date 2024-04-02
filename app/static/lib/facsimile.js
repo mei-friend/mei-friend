@@ -218,8 +218,8 @@ export async function drawFacsimile() {
         imgName = `${root}local/` + facs[zoneId].target;
         imgName = imgName.replace('.tif', '.jpg'); // hack for some DIME files...
       }
-    } else if (imgName.startsWith('https://raw.githubusercontent.com/') && github.githubToken) {
-      // absolute file paths
+    } else if (imgName.startsWith('https://raw.githubusercontent.com/') && github && github.githubToken && github.branch && github.filepath) {
+      // absolute file paths for GitHub
       let url = new URL(
         'https://raw.githubusercontent.com/' + github.githubRepo + '/' + github.branch + github.filepath
       );
