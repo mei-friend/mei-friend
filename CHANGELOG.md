@@ -1,5 +1,8 @@
 # mei-friend-online CHANGELOG.md
 
+### 1.0.12 patch
+* 
+
 ### 1.0.11 patch
 * Extend documentation with a new file `CONTRIBUTING.md` to provide guidelines for contributing to mei-friend
 * Update external documentation pages at https://mei-friend.github.io including updated installation instructions, 
