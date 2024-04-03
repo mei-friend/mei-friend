@@ -257,19 +257,23 @@ async function selectElements(page: Page, ids: string[]) {
  * @param {string} menuItem
  */
 async function insertElement(page: Page, ids: string[], elementName: string = 'slur', menuItem: string = 'addSlur') {
+  console.log('Inserting element: ', elementName, ' with menu item: ', menuItem + ' to elements: ', ids);
+
+  // click on the INSERT menu item and select the element to insert
   await page.locator('#insertMenuTitle').click();
   await page.locator('#insertMenuTitle').hover();
   await expect(page.locator('#' + menuItem)).toBeVisible();
   await page.locator('#' + menuItem).click();
 
-  // check that element is visible
+  // find enclosing measure
   const measure = page.locator('g.measure', { has: page.locator('g#' + ids[0]) });
-  const element = measure.locator('g.' + elementName + '.highlighted');
-
+  
+  // check that element is visible (not working in Firefox)
   await expect(async () => {
-    await expect(element).toHaveAttribute('id');
+    expect(measure.locator('g.' + elementName + '.highlighted')).toHaveAttribute('id');
   }).toPass({ timeout: 5000 });
-  const newId = await element.getAttribute('id');
+  
+  let newId = await measure.locator('g.' + elementName + '.highlighted').getAttribute('id');
   console.log('new element ' + elementName + ': ' + newId + ' inserted.');
 
   await expect(page.locator(`#${newId}`)).toBeVisible();
