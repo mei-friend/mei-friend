@@ -44,6 +44,8 @@ test.describe('Test that the MIDI playback panel works correctly', () => {
   test('Test that the MIDI playback panel opens using the keyboard', async ({ page }) => {
     // first, move focus to the notation
     await page.keyboard.press('Shift+Space');
+    await expect(page.locator('#notation')).toHaveClass(/focus-visible/);
+
     // then, open the panel
     await page.keyboard.press('Space');
     await expect(page.locator('#midiPlaybackControlBar')).toBeVisible();
@@ -137,5 +139,8 @@ test.describe('Test that MIDI playback works correctly', () => {
     await expect(page.locator('#midiPlaybackControlBar')).toBeVisible();
     // eventually, the page number should change as viewport follows playback
     await expect(page.locator('#pagination2')).toHaveText(' 2 ');
+
+    await page.keyboard.press('Space');
+    await expect(page.locator('#midiPlaybackControlBar')).toBeVisible();
   });
 });

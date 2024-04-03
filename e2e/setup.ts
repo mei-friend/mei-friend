@@ -17,3 +17,4 @@ export async function openUrl(page: Page, url: string) {
   await page.keyboard.type(url);
   await page.click('#openUrlButton');
 }
+  

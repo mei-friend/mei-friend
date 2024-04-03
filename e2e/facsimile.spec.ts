@@ -30,8 +30,9 @@ test.describe('Test facsimile functionality.', () => {
 
     await page.locator('#breaksSelect').selectOption('encoded');
 
-    await page.locator('g#chord-0000000104286025').click();
-
+    await expect(page.locator('g#chord-0000000104286025')).toBeVisible();
+    await page.locator('g#chord-0000000104286025').scrollIntoViewIfNeeded();
+    
     await page.locator('rect#measure-0000000595472239').scrollIntoViewIfNeeded();
     await page.locator('text#measure-0000000595472239').click();
 
@@ -134,8 +135,6 @@ test.describe('Test facsimile functionality.', () => {
     await page.locator('#delete').click();
 
     // check that the zone has been deleted
-    let lastZoneId = await page.locator('#sourceImageSvg').locator('rect').last().getAttribute('id');
-    console.log('Last zone id:', lastZoneId);
-    expect(lastZoneId).toBeNull();
+    await expect(page.locator('#sourceImageSvg').locator('rect').last()).not.toBeVisible;
   });
 });
