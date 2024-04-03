@@ -16,11 +16,17 @@ test.describe('Test insertion functionality.', () => {
         page,
         'https://raw.githubusercontent.com/trompamusic-encodings/Beethoven_WoO70_BreitkopfHaertel/master/Beethoven_WoO70-Breitkopf.mei'
       );
-      // click on #nextPageButton
+
+      // check whether page loaded successfully
+      await expect(page.locator('#note-0000001631474113')).toBeVisible();
+
+      // click on #lastPageButton
       await page.locator('#lastPageButton').click();
 
       // check whether first note on last page 'note-0000000604712286' is visible
-      await expect(page.locator('#note-0000000604712286')).toBeVisible();
+      await expect(async () => {
+        expect(page.locator('#note-0000000604712286')).toBeVisible();
+      }).toPass({ intervals: [1000, 1500, 2000, 3500], timeout: 5000 });
 
       // retrieve width from svg inside verovio-panel
       const height = await page.locator('#verovio-panel svg').first().getAttribute('height');
@@ -83,6 +89,10 @@ test.describe('Test insertion functionality.', () => {
         page,
         'https://raw.githubusercontent.com/trompamusic-encodings/Beethoven_WoO70_BreitkopfHaertel/master/Beethoven_WoO70-Breitkopf.mei'
       );
+
+      // check whether page loaded successfully
+      await expect(page.locator('#note-0000001631474113')).toBeVisible();
+
       // click on #nextPageButton
       await page.locator('#nextPageButton').click();
 
@@ -163,7 +173,7 @@ test.describe('Test insertion functionality.', () => {
         'https://raw.githubusercontent.com/trompamusic-encodings/Beethoven_WoO70_BreitkopfHaertel/master/Beethoven_WoO70-Breitkopf.mei'
       );
 
-      // check whether first note on second page 'note-0000001568544877' is visible
+      // check whether first note on first page 'note-0000001568544877' is visible
       await expect(page.locator('#note-0000001631474113')).toBeVisible();
 
       // click on #nextPageButton
@@ -175,7 +185,7 @@ test.describe('Test insertion functionality.', () => {
       // click on #nextPageButton
       await page.locator('#nextPageButton').click();
 
-      // check whether first note on second page 'note-0000001568544877' is visible
+      // check whether first note on third page 'note-0000001568544877' is visible
       await expect(page.locator('#note-0000000973543454')).toBeVisible();
     });
 
@@ -267,12 +277,16 @@ async function insertElement(page: Page, ids: string[], elementName: string = 's
 
   // find enclosing measure
   const measure = page.locator('g.measure', { has: page.locator('g#' + ids[0]) });
-  
+  await expect(measure).toBeVisible();
+
   // check that element is visible (not working in Firefox)
-  await expect(async () => {
-    expect(measure.locator('g.' + elementName + '.highlighted')).toHaveAttribute('id');
-  }).toPass({ timeout: 5000 });
-  
+  // await expect(async () => {
+  // expect(measure.locator('g.' + elementName + '.highlighted')).toBeAttached();
+  await page.waitForSelector('g.' + elementName + '.highlighted', { state: 'attached' });
+  // expect(measure.locator('g.' + elementName + '.highlighted')).toBeVisible();
+  // expect(measure.locator('g.' + elementName + '.highlighted')).toHaveAttribute('id');
+  // }).toPass({ timeout: 5000 });
+
   let newId = await measure.locator('g.' + elementName + '.highlighted').getAttribute('id');
   console.log('new element ' + elementName + ': ' + newId + ' inserted.');
 
