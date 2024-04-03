@@ -28,13 +28,21 @@ test.describe('Test facsimile functionality.', () => {
     );
     await expect(page.locator('#beam-0000001508587757').first()).toBeVisible();
 
+    // change breaksSelect to 'encoded' and check that it has changed
     await page.locator('#breaksSelect').selectOption('encoded');
+    await expect(page.locator('#breaksSelect')).toHaveValue('encoded');
 
+    // check whether an element from the end of the page is visible
     await expect(page.locator('g#chord-0000000104286025')).toBeVisible();
-    await page.locator('g#chord-0000000104286025').scrollIntoViewIfNeeded();
-    
-    await page.locator('rect#measure-0000000595472239').scrollIntoViewIfNeeded();
+    // await page.locator('g#chord-0000000104286025').scrollIntoViewIfNeeded({ timeout: 5000 });
+
+    // click on a specific zone, check visibility of note
+    await expect(page.locator('rect#measure-0000000595472239')).toBeVisible();
+    // await page.locator('rect#measure-0000000595472239').scrollIntoViewIfNeeded({ timeout: 5000 });
     await page.locator('text#measure-0000000595472239').click();
+    // check whether measure is highlighted in notation panel
+    await expect(page.locator('g#measure-0000000595472239')).toBeVisible();
+    await expect(page.locator('g#measure-0000000595472239')).toHaveClass('measure highlighted');
 
     // click on lastPageButton to go to the last page
     await page.click('#lastPageButton');
@@ -48,6 +56,7 @@ test.describe('Test facsimile functionality.', () => {
     // click on specific zone, check visibility of note
     await page.locator('text#measure-0000001750764473').click();
     await page.getByText('"measure-0000001750764473"').click();
+    // check whether first note in measure is highlighted in notation panel
     await expect(page.locator('g#note-0000001956624735')).toHaveClass('note highlighted');
   });
 
