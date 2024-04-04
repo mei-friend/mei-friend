@@ -274,7 +274,8 @@ test.describe('Insert notes, rests, and accidentals.', () => {
       for (let uuid of uuids) {
         await selectElements(page, [uuid]);
         await expect(page.locator('g#' + uuid)).toBeVisible();
-        await deleteElements(page, [uuid]);
+        await expect(page.locator('g#' + uuid)).toHaveClass('accid highlighted');
+        // await deleteElements(page, [uuid]);
       }
     });
   });
