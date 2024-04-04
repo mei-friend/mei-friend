@@ -6,8 +6,261 @@ test.beforeEach(async ({ page }) => {
   await setupPage(page);
 });
 
-test.describe('Test insertion functionality.', () => {
-  test('Add, modify, and delete slur to one selected element', async ({ page }) => {
+test.describe('Insert notes, rests, and accidentals.', () => {
+  test('Insert new note', async ({ page }) => {
+    let uuid: string | null; // id of the new slur
+    const noteId = 'note-0000001117852400'; // selected note
+
+    await test.step('Open MEI file and select a note in first measure', async () => {
+      // open file from URL
+      await openUrl(
+        page,
+        'https://raw.githubusercontent.com/trompamusic-encodings/Beethoven_WoO70_BreitkopfHaertel/master/Beethoven_WoO70-Breitkopf.mei'
+      );
+
+      // check whether page loaded successfully
+      await expect(page.locator('#note-0000001631474113')).toBeVisible();
+
+      // select #note-0000001117852400
+      await selectElements(page, [noteId]);
+
+      // check whether note is highlighted
+      await expect(page.locator('#' + noteId)).toHaveClass('note highlighted');
+    });
+
+    await test.step('Insert a note and check its content', async () => {
+      let uuid = await insertElement(page, [noteId], 'note', 'addNote');
+      console.log('New note inserted: ', uuid);
+
+      // check that the new note is visible
+      await expect(page.locator(`#${uuid}`)).toBeVisible();
+
+      const currentLine = page.locator('span[role="presentation"]', { has: page.getByText(uuid!) });
+      await expect(currentLine).toBeVisible();
+      // test attributes of the new note
+      await expect(currentLine).toHaveText(new RegExp('pname="a"'));
+      await expect(currentLine).toHaveText(new RegExp('oct="4"'));
+      await expect(currentLine).toHaveText(new RegExp('dur="8"'));
+    });
+  });
+
+  test('Convert new notes to chord', async ({ page }) => {
+    const ids = ['note-0000001117852400']; // first selected note
+    let chordId: string | null; // id of the new chord
+
+    await test.step('Open MEI file and select a note in first measure', async () => {
+      // open file from URL
+      await openUrl(
+        page,
+        'https://raw.githubusercontent.com/trompamusic-encodings/Beethoven_WoO70_BreitkopfHaertel/master/Beethoven_WoO70-Breitkopf.mei'
+      );
+
+      // check whether page loaded successfully
+      await expect(page.locator('#note-0000001631474113')).toBeVisible();
+
+      // select #note-0000001117852400
+      await selectElements(page, ids);
+
+      // check whether note is highlighted
+      await expect(page.locator('#' + ids)).toHaveClass('note highlighted');
+    });
+
+    await test.step('Add a note and change its pitch', async () => {
+      let uuid = await insertElement(page, ids, 'note', 'addNote');
+      console.log('First new note inserted: ', uuid);
+
+      // check that the new note is visible
+      await expect(page.locator(`#${uuid}`)).toBeVisible();
+
+      // click on note to select it
+      await selectElements(page, [uuid!]);
+
+      // change pitch up of the new note
+      await clickManipulate(page, 'pitchUpDiat');
+
+      ids.push(uuid!);
+
+      uuid = await insertElement(page, ids, 'note', 'addNote');
+      console.log('Second new note inserted: ', uuid);
+
+      // check that the new note is visible
+      await expect(page.locator(`#${uuid}`)).toBeVisible();
+
+      // click on note to select it
+      await selectElements(page, [uuid!]);
+
+      // change pitch up of the new note
+      await clickManipulate(page, 'pitchOctaveDown');
+
+      ids.push(uuid!);
+    });
+
+    await test.step('Select all three notes and convert to chord', async () => {
+      // select elements
+      await selectElements(page, ids);
+
+      // check whether notes are highlighted
+      await expect(page.locator('#' + ids[0])).toHaveClass('note highlighted');
+      await expect(page.locator('#' + ids[1])).toHaveClass('note highlighted');
+      await expect(page.locator('#' + ids[2])).toHaveClass('note highlighted');
+
+      // convert the selected notes to a chord
+      await clickManipulate(page, 'toggleChord');
+
+      // find parent chord of g#note-0000001117852400
+      const chord = page.locator('g.chord', { has: page.locator('g#' + ids[0]) });
+      await expect(chord).toBeVisible();
+
+      // retrieve the id of the new chord
+      chordId = await chord.getAttribute('id');
+      console.log('New chord inserted: ', chordId);
+
+      // check chord in encoding
+      const currentLine = page.locator('span[role="presentation"]', { has: page.getByText(chordId!) });
+      await expect(currentLine).toBeVisible();
+      await expect(currentLine).toHaveText(new RegExp('dur="8"'));
+    });
+
+    await test.step('Flip stem direction', async () => {
+      // flip stem direction of the chord
+      await clickManipulate(page, 'invertPlacement');
+
+      // check encoding whether chord has stem direction down
+      const currentLine = page.locator('span[role="presentation"]', { has: page.getByText(chordId!) });
+      await expect(currentLine).toBeVisible();
+      await expect(currentLine).toHaveText(new RegExp('stem.dir="down"'));
+    });
+  });
+
+  test('Convert note to rest', async ({ page }) => {
+    let uuid: string | null; // id of the new slur
+    const noteId = 'note-0000001117852400'; // selected note
+
+    await test.step('Open MEI file and select a note in second measure', async () => {
+      // open file from URL
+      await openUrl(
+        page,
+        'https://raw.githubusercontent.com/trompamusic-encodings/Beethoven_WoO70_BreitkopfHaertel/master/Beethoven_WoO70-Breitkopf.mei'
+      );
+
+      // check whether page loaded successfully
+      await expect(page.locator('#note-0000001631474113')).toBeVisible();
+
+      // select #note-0000001117852400
+      await selectElements(page, [noteId]);
+
+      // check whether note is highlighted
+      await expect(page.locator('#' + noteId)).toHaveClass('note highlighted');
+    });
+
+    await test.step('Convert new note to rest', async () => {
+      // convert the new note to a rest
+      console.log('Converting note to rest: ', uuid);
+      await page.locator('#manipulateMenuTitle').click();
+      await page.locator('#manipulateMenuTitle').hover();
+      await expect(page.locator('#convertNoteToRest')).toBeVisible();
+      await page.locator('#convertNoteToRest').click();
+
+      // find the new rest
+      const rest = page.locator('g.rest.highlighted');
+      await expect(rest).toBeVisible();
+      // retrieve the id of the new rest
+      const newId = await rest.getAttribute('id');
+
+      // check that the attributes of the new rests are correct
+      const currentLine = page.locator('span[role="presentation"]', { has: page.getByText(newId!) });
+      await expect(currentLine).toBeVisible();
+      await expect(currentLine).toHaveText(new RegExp('dur="8"'));
+      await expect(currentLine).toHaveText(new RegExp('oloc="4"'));
+      await expect(currentLine).toHaveText(new RegExp('ploc="a"'));
+    });
+  });
+
+  test('Delete notes', async ({ page }) => {
+    let layer: any; // parent layer of the selected notes
+    const ids = ['note-0000001318117900', 'note-0000000166242848', 'note-0000000167321589', 'note-0000001117852400']; // selected note
+
+    await test.step('Open MEI file and select notes in first measure', async () => {
+      // open file from URL
+      await openUrl(
+        page,
+        'https://raw.githubusercontent.com/trompamusic-encodings/Beethoven_WoO70_BreitkopfHaertel/master/Beethoven_WoO70-Breitkopf.mei'
+      );
+
+      // check whether page loaded successfully
+      await expect(page.locator('#note-0000001631474113')).toBeVisible();
+
+      // select #note-0000001117852400
+      await selectElements(page, ids);
+
+      // check whether notes are highlighted
+      await expect(page.locator('#' + ids[0])).toHaveClass('note highlighted');
+      await expect(page.locator('#' + ids[1])).toHaveClass('note highlighted');
+      await expect(page.locator('#' + ids[2])).toHaveClass('note highlighted');
+      await expect(page.locator('#' + ids[3])).toHaveClass('note highlighted');
+
+      // get parent layer of the selected notes
+      layer = page.locator('g.layer', { has: page.locator('g#' + ids[0]) });
+    });
+
+    await test.step('Delete selected elements', async () => {
+      let uuid = await deleteElement(page, ids);
+      console.log('Deleted elements: ', ids);
+
+      // check that there are no child notes in the layer anymore
+      await expect(layer.locator('g.note')).not.toBeVisible();
+    });
+  });
+
+  test('Insert/delete double sharp', async ({ page }) => {
+    const ids = ['note-0000000417567361']; // selected note
+    let uuid: string | null; // id of the new accidental
+
+    await test.step('Open MEI file and select notes in first measure', async () => {
+      // open file from URL
+      await openUrl(
+        page,
+        'https://raw.githubusercontent.com/trompamusic-encodings/Beethoven_WoO70_BreitkopfHaertel/master/Beethoven_WoO70-Breitkopf.mei'
+      );
+
+      // check whether page loaded successfully
+      await expect(page.locator('g#note-0000001631474113')).toBeVisible();
+
+      // select #note-0000000417567361
+      await selectElements(page, ids);
+
+      // check whether notes are highlighted
+      await expect(page.locator('g#' + ids[0])).toHaveClass('note highlighted');
+    });
+
+    await test.step('Insert double sharp', async () => {
+      // insert double sharp
+      await clickInsert(page, 'addDoubleSharp');
+
+      // find 'g#' + ids[0] and check whether it has a double sharp as child
+
+      const note = page.locator('g#' + ids[0]);
+      await expect(note).toBeVisible();
+
+      // check whether note has a double sharp as child
+      await expect(note.locator('g.accid.highlighted')).toBeVisible();
+
+      uuid = await note.locator('g.accid.highlighted').getAttribute('id');
+    });
+
+    await test.step('Delete double sharp', async () => { 
+      // delete new accidental
+      await deleteElement(page, [uuid!]);
+
+      // check whether note has no double sharp as child anymore
+      const note = page.locator('g#' + ids[0]);
+      await expect(note.locator('g.accid.highlighted')).not.toBeVisible();
+    });
+  });
+});
+
+test.describe('Insert, modify, and delete control elements.', () => {
+  test('Slur to one selected element', async ({ page }) => {
     let uuid: string | null; // id of the new slur
 
     await test.step('Open MEI file, flip to last page', async () => {
@@ -80,7 +333,7 @@ test.describe('Test insertion functionality.', () => {
     });
   });
 
-  test('Add, modify, and delete slur to two selected elements', async ({ page }) => {
+  test('Slur to two selected elements', async ({ page }) => {
     let uuid: string | null; // id of the new slur
 
     await test.step('Open MEI file, turn page, and descrease scaling', async () => {
@@ -163,7 +416,7 @@ test.describe('Test insertion functionality.', () => {
     });
   });
 
-  test('Add a tie to one selected element', async ({ page }) => {
+  test('Tie to one selected element', async ({ page }) => {
     let uuid: string | null; // id of the new tie
 
     await test.step('Open MEI file, turn page, and descrease scaling', async () => {
@@ -235,6 +488,73 @@ test.describe('Test insertion functionality.', () => {
       await deleteElement(page, [uuid!]);
     });
   });
+
+  test('Tie to two selected elements', async ({ page }) => {
+    let uuid: string | null; // id of the new tie
+
+    await test.step('Open MEI file and turn page', async () => {
+      // open file from URL
+      await openUrl(
+        page,
+        'https://raw.githubusercontent.com/trompamusic-encodings/Beethoven_WoO70_BreitkopfHaertel/master/Beethoven_WoO70-Breitkopf.mei'
+      );
+
+      // check whether page loaded successfully
+      await expect(page.locator('#note-0000001631474113')).toBeVisible();
+
+      // click on #nextPageButton
+      await page.locator('#nextPageButton').click();
+
+      // check whether first note on second page 'note-0000001568544877' is visible
+      await expect(page.locator('#note-0000001568544877')).toBeVisible();
+    });
+
+    await test.step('Select two elements and add slur to selected elements', async () => {
+      // select two elements and add slur to selected elements
+      let elements = ['note-0000000732269518', 'note-0000001551304518'];
+      await selectElements(page, elements);
+      uuid = await insertElement(page, elements, 'tie', 'addTie');
+      console.log('New tie inserted: ', uuid);
+
+      // test whether the new slur has attributes startid and endid to the first and last elements respectively
+      const slur = page.locator('g#' + uuid);
+      await expect(slur).toBeVisible();
+      const currentLine = page.locator('span[role="presentation"]', { has: page.getByText(uuid!) });
+      await expect(currentLine).toBeVisible();
+      await expect(currentLine).toHaveText(new RegExp('startid="#' + elements[0]));
+      await expect(currentLine).toHaveText(new RegExp('endid="#' + elements[elements.length - 1]));
+    });
+
+    await test.step('Modify tie', async () => {
+      // modify this tie now
+      console.log('Modifying tie: ', uuid);
+
+      // get notation panel into focus
+      await page.keyboard.press('Shift+Space');
+      // check whether notation has class focus-visible
+      await expect(page.locator('#notation')).toHaveClass(/focus-visible/);
+
+      // press X to flip curve direction
+      await page.keyboard.press('x');
+      // check encoding whether slur has curvedir="above"
+      let currentLine = page.locator('span[role="presentation"]', { has: page.getByText(uuid!) });
+      await expect(currentLine).toBeVisible();
+      await expect(currentLine).toHaveText(new RegExp('curvedir="above"'));
+
+      // press X to flip curve direction
+      await page.keyboard.press('x');
+      // check encoding whether slur has curvedir="above"
+      currentLine = page.locator('span[role="presentation"]', { has: page.getByText(uuid!) });
+      await expect(currentLine).toBeVisible();
+      await expect(currentLine).toHaveText(new RegExp('curvedir="below"'));
+    });
+
+    await test.step('Delete tie', async () => {
+      // delete this tie now
+      console.log('Deleting tie: ', uuid);
+      await deleteElement(page, [uuid!]);
+    });
+  });
 });
 
 /**
@@ -279,13 +599,16 @@ async function insertElement(page: Page, ids: string[], elementName: string = 's
   const measure = page.locator('g.measure', { has: page.locator('g#' + ids[0]) });
   await expect(measure).toBeVisible();
 
+  // wait for the element to be inserted (necessary for Firefox)
+  await page.waitForTimeout(2000);
+
   // check that element is visible (not working in Firefox)
-  // await expect(async () => {
-  // expect(measure.locator('g.' + elementName + '.highlighted')).toBeAttached();
-  await page.waitForSelector('g.' + elementName + '.highlighted', { state: 'attached' });
-  // expect(measure.locator('g.' + elementName + '.highlighted')).toBeVisible();
-  // expect(measure.locator('g.' + elementName + '.highlighted')).toHaveAttribute('id');
-  // }).toPass({ timeout: 5000 });
+  await expect(async () => {
+    // exipect(measure.locator('g.' + elementName + '.highlighted')).toBeAttached();
+    page.waitForSelector('g.' + elementName + '.highlighted', { state: 'attached' });
+    // expect(measure.locator('g.' + elementName + '.highlighted')).toBeVisible();
+    // expect(measure.locator('g.' + elementName + '.highlighted')).toHaveAttribute('id');
+  }).toPass({ timeout: 5000 });
 
   let newId = await measure.locator('g.' + elementName + '.highlighted').getAttribute('id');
   console.log('new element ' + elementName + ': ' + newId + ' inserted.');
@@ -317,3 +640,35 @@ async function deleteElement(page: Page, ids: string[]) {
   }
   return true;
 } // deleteElement()
+
+/**
+ * Shorthand for clicking on the INSERT menu item to insert elements
+ * @param page
+ * @param menuItem
+ * @returns
+ */
+async function clickInsert(page: Page, menuItem: string = 'addSlur') {
+  await page.locator('#insertMenuTitle').click();
+  await page.locator('#insertMenuTitle').hover();
+  await expect(page.locator('#' + menuItem)).toBeVisible();
+  await page.locator('#' + menuItem).click();
+
+  await expect(page.locator('#' + menuItem)).not.toBeVisible();
+  return true;
+} // insert()
+
+/**
+ * Shorthand for clicking on the MANIPULATE menu item to manipulate elements
+ * @param page
+ * @param menuItem
+ * @returns
+ */
+async function clickManipulate(page: Page, menuItem: string = 'pitchUpDiat') {
+  await page.locator('#manipulateMenuTitle').click();
+  await page.locator('#manipulateMenuTitle').hover();
+  await expect(page.locator('#' + menuItem)).toBeVisible();
+  await page.locator('#' + menuItem).click();
+
+  await expect(page.locator('#' + menuItem)).not.toBeVisible();
+  return true;
+} // manipulate()
