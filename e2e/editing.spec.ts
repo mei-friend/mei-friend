@@ -25,6 +25,7 @@ test.describe('Insert notes, rests, and accidentals.', () => {
       await selectElements(page, [noteId]);
 
       // check whether note is highlighted
+      await expect(page.locator('#' + noteId)).toBeVisible();
       await expect(page.locator('#' + noteId)).toHaveClass('note highlighted');
     });
 
@@ -62,6 +63,7 @@ test.describe('Insert notes, rests, and accidentals.', () => {
       await selectElements(page, ids);
 
       // check whether note is highlighted
+      await expect(page.locator('#' + ids)).toBeVisible();
       await expect(page.locator('#' + ids)).toHaveClass('note highlighted');
     });
 
@@ -150,16 +152,14 @@ test.describe('Insert notes, rests, and accidentals.', () => {
       await selectElements(page, [noteId]);
 
       // check whether note is highlighted
+      await expect(page.locator('#' + noteId)).toBeVisible();
       await expect(page.locator('#' + noteId)).toHaveClass('note highlighted');
     });
 
     await test.step('Convert new note to rest', async () => {
       // convert the new note to a rest
       console.log('Converting note to rest: ', uuid);
-      await page.locator('#manipulateMenuTitle').click();
-      await page.locator('#manipulateMenuTitle').hover();
-      await expect(page.locator('#convertNoteToRest')).toBeVisible();
-      await page.locator('#convertNoteToRest').click();
+      await clickManipulate(page, 'convertNoteToRest');
 
       // find the new rest
       const rest = page.locator('g.rest.highlighted');
@@ -194,6 +194,7 @@ test.describe('Insert notes, rests, and accidentals.', () => {
       await selectElements(page, ids);
 
       // check whether notes are highlighted
+      await expect(page.locator('#' + ids[0])).toBeVisible();
       await expect(page.locator('#' + ids[0])).toHaveClass('note highlighted');
       await expect(page.locator('#' + ids[1])).toHaveClass('note highlighted');
       await expect(page.locator('#' + ids[2])).toHaveClass('note highlighted');
@@ -204,7 +205,7 @@ test.describe('Insert notes, rests, and accidentals.', () => {
     });
 
     await test.step('Delete selected elements', async () => {
-      let uuid = await deleteElement(page, ids);
+      let uuid = await deleteElements(page, ids);
       console.log('Deleted elements: ', ids);
 
       // check that there are no child notes in the layer anymore
@@ -212,9 +213,16 @@ test.describe('Insert notes, rests, and accidentals.', () => {
     });
   });
 
-  test('Insert/delete double sharp', async ({ page }) => {
-    const ids = ['note-0000000417567361']; // selected note
-    let uuid: string | null; // id of the new accidental
+  test('Insert/delete accidentals', async ({ page }) => {
+    const ids = [
+      'note-0000001403952294',
+      'note-0000002094055458',
+      'note-0000001828075570',
+      'note-0000000417567361',
+      'note-0000000078077931',
+    ]; // selected note
+    const accids = ['addDoubleSharp', 'addSharp', 'addNatural', 'addFlat', 'addDoubleFlat'];
+    let uuids: string[] = []; // id of the new accidental
 
     await test.step('Open MEI file and select notes in first measure', async () => {
       // open file from URL
@@ -225,36 +233,49 @@ test.describe('Insert notes, rests, and accidentals.', () => {
 
       // check whether page loaded successfully
       await expect(page.locator('g#note-0000001631474113')).toBeVisible();
-
-      // select #note-0000000417567361
-      await selectElements(page, ids);
-
-      // check whether notes are highlighted
-      await expect(page.locator('g#' + ids[0])).toHaveClass('note highlighted');
     });
 
-    await test.step('Insert double sharp', async () => {
-      // insert double sharp
-      await clickInsert(page, 'addDoubleSharp');
+    await test.step('Insert accidentals', async () => {
+      for (let i = 0; i < ids.length; i++) {
+        // select #note-0000000417567361
+        await selectElements(page, ids.slice(i, i + 1));
 
-      // find 'g#' + ids[0] and check whether it has a double sharp as child
+        // find 'g#' + ids[0] and check whether it has an accid as child
+        await expect(async () => {
+          expect(page.locator('g#' + ids[i])).toBeVisible();
+        }).toPass({ timeout: 5000 });
 
-      const note = page.locator('g#' + ids[0]);
-      await expect(note).toBeVisible();
+        // check whether notes are highlighted
+        await expect(async () => {
+          expect(page.locator('g#' + ids[i])).toHaveClass('note highlighted');
+        }).toPass({ timeout: 5000 });
 
-      // check whether note has a double sharp as child
-      await expect(note.locator('g.accid.highlighted')).toBeVisible();
+        // insert double sharp
+        await clickInsert(page, accids[i]);
 
-      uuid = await note.locator('g.accid.highlighted').getAttribute('id');
+        // check whether note has an accid as child (not working in Firefox)
+        const note = page.locator('g#' + ids[i]);
+        await expect(note.locator('g.accid.highlighted')).toBeVisible();
+
+        let uuid = await note.locator('g.accid.highlighted').getAttribute('id');
+        if (uuid) uuids.push(uuid);
+      }
+      console.log('New accidentals inserted: ', uuids);
     });
 
-    await test.step('Delete double sharp', async () => { 
+    await test.step('Delete accidentals', async () => {
+      console.log('Now deleting these accidentals: ', uuids);
+      // select all uuids, not working as system in background gets selected
+      // await selectElements(page, uuids);
+
       // delete new accidental
-      await deleteElement(page, [uuid!]);
+      // await deleteElement(page, uuids);
 
-      // check whether note has no double sharp as child anymore
-      const note = page.locator('g#' + ids[0]);
-      await expect(note.locator('g.accid.highlighted')).not.toBeVisible();
+      for (let uuid of uuids) {
+        await selectElements(page, [uuid]);
+        await expect(page.locator('g#' + uuid)).toBeVisible();
+        await deleteElements(page, [uuid]);
+      }
     });
   });
 });
@@ -329,7 +350,7 @@ test.describe('Insert, modify, and delete control elements.', () => {
     await test.step('Delete slur', async () => {
       // delete this slur now
       console.log('Deleting slur: ', uuid);
-      await deleteElement(page, [uuid!]);
+      await deleteElements(page, [uuid!]);
     });
   });
 
@@ -412,7 +433,7 @@ test.describe('Insert, modify, and delete control elements.', () => {
     await test.step('Delete slur', async () => {
       // delete this slur now
       console.log('Deleting slur: ', uuid);
-      await deleteElement(page, [uuid!]);
+      await deleteElements(page, [uuid!]);
     });
   });
 
@@ -485,7 +506,7 @@ test.describe('Insert, modify, and delete control elements.', () => {
     await test.step('Delete tie', async () => {
       // delete this slur now
       console.log('Deleting tie: ', uuid);
-      await deleteElement(page, [uuid!]);
+      await deleteElements(page, [uuid!]);
     });
   });
 
@@ -552,7 +573,7 @@ test.describe('Insert, modify, and delete control elements.', () => {
     await test.step('Delete tie', async () => {
       // delete this tie now
       console.log('Deleting tie: ', uuid);
-      await deleteElement(page, [uuid!]);
+      await deleteElements(page, [uuid!]);
     });
   });
 });
@@ -563,17 +584,24 @@ test.describe('Insert, modify, and delete control elements.', () => {
  * @param {string[]} ids
  */
 async function selectElements(page: Page, ids: string[]) {
+  console.log('Selecting elements: ', ids);
   let i = 0;
   for (let id of ids) {
     // ids.forEach(async (id, i) => {
-    console.log(i + ': Selecting element with id: ', id);
-    let mod = { force: true };
+    let mod = { delay: 12, force: true };
     if (i > 0) {
       mod['modifiers'] = ['Meta'];
     }
-    let element = page.locator('g#' + id);
-    await expect(element).toBeVisible();
-    await element.locator('*').first().click(mod); // need to click on any child element to select the parent
+    console.log(i + ': Selecting element with id: ', id + ' with mod: ', mod);
+
+    // await expect(async () => {
+    await expect(page.locator('g#' + id)).toBeVisible();
+    // }).toPass({ timeout: 5000 });
+    await page
+      .locator('g#' + id)
+      .locator('*')
+      .first()
+      .click(mod); // need to click on any child element to select the parent
     i++;
   }
   return true;
@@ -590,10 +618,7 @@ async function insertElement(page: Page, ids: string[], elementName: string = 's
   console.log('Inserting element: ', elementName, ' with menu item: ', menuItem + ' to elements: ', ids);
 
   // click on the INSERT menu item and select the element to insert
-  await page.locator('#insertMenuTitle').click();
-  await page.locator('#insertMenuTitle').hover();
-  await expect(page.locator('#' + menuItem)).toBeVisible();
-  await page.locator('#' + menuItem).click();
+  await clickInsert(page, menuItem);
 
   // find enclosing measure
   const measure = page.locator('g.measure', { has: page.locator('g#' + ids[0]) });
@@ -618,23 +643,22 @@ async function insertElement(page: Page, ids: string[], elementName: string = 's
 } // insertElements()
 
 /**
- * Deletes the elements with the given string array of ids
+ * Deletes the selected elements and check their absence
  * @param {Page} page
  * @param {string[]} ids
  * @returns
  */
-async function deleteElement(page: Page, ids: string[]) {
+async function deleteElements(page: Page, ids: string[]) {
   console.log('Deleting elements: ', ids);
 
-  // select the elements through the menu bar
-  await page.locator('#manipulateMenuTitle').click();
-  await page.locator('#delete').click();
+  // delete the selected elements through the menu bar
+  await clickManipulate(page, 'delete');
 
   // check that the element(s) have been deleted
   for (let id of ids) {
     // ids.forEach(async (id) => {
     const element = page.locator('g#' + id);
-    console.log('Deleting element ' + id + ': ' + element);
+    console.log('Checking deleted element ' + id + ': ' + element);
     // check whether the element is not visible
     await expect(element).not.toBeVisible();
   }
@@ -649,7 +673,6 @@ async function deleteElement(page: Page, ids: string[]) {
  */
 async function clickInsert(page: Page, menuItem: string = 'addSlur') {
   await page.locator('#insertMenuTitle').click();
-  await page.locator('#insertMenuTitle').hover();
   await expect(page.locator('#' + menuItem)).toBeVisible();
   await page.locator('#' + menuItem).click();
 
@@ -665,7 +688,6 @@ async function clickInsert(page: Page, menuItem: string = 'addSlur') {
  */
 async function clickManipulate(page: Page, menuItem: string = 'pitchUpDiat') {
   await page.locator('#manipulateMenuTitle').click();
-  await page.locator('#manipulateMenuTitle').hover();
   await expect(page.locator('#' + menuItem)).toBeVisible();
   await page.locator('#' + menuItem).click();
 
