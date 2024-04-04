@@ -65,8 +65,9 @@ test.describe('Test input via URL', () => {
   test('Test OpenURL function to load invalid text file', async ({ page }) => {
     await openUrl(page, 'https://raw.githubusercontent.com/wergo/test-encodings/main/test-tk-expansion.html');
     // inner text of verovio-panel should start with "Format not recognized"
-    await expect(page.locator('#verovio-panel')).toContainText('Format not recognized');
-    await expect(page.locator('#verovio-panel')).toContainText('Error Code: 1649499359728');
+    await expect(await page.locator('#alertOverlay')).toBeVisible();
+    await expect(page.locator('#alertOverlay')).toContainText('Format not recognized');
+    await expect(page.locator('#alertOverlay')).toContainText('Error Code: 1649499359728');
   });
 
   test('Test OpenURL function to load MEI file from server without CORS support', async ({ page }) => {

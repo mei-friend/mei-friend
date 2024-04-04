@@ -16,11 +16,14 @@ test.describe('Test insertion functionality.', () => {
         page,
         'https://raw.githubusercontent.com/trompamusic-encodings/Beethoven_WoO70_BreitkopfHaertel/master/Beethoven_WoO70-Breitkopf.mei'
       );
-      // click on #nextPageButton
+      // click on #lastPageButton
       await page.locator('#lastPageButton').click();
-
+      // wait for page to flip
+      await expect(async () => {
+        await expect(await page.locator('#pagination2').textContent()).not.toBe(' 1 ');
+      }).toPass({ timeout: 5000 });
       // check whether first note on last page 'note-0000000604712286' is visible
-      await expect(page.locator('#note-0000000604712286')).toBeVisible();
+      await expect(await page.locator('#note-0000000604712286')).toBeVisible();
 
       // retrieve width from svg inside verovio-panel
       const height = await page.locator('#verovio-panel svg').first().getAttribute('height');
@@ -167,10 +170,10 @@ test.describe('Test insertion functionality.', () => {
       await expect(page.locator('#note-0000001631474113')).toBeVisible();
 
       // click on #nextPageButton
-      await page.locator('#nextPageButton').click();
+      await page.locator('#nextPageButton').click({ force: true });
 
       // check whether first note on second page 'note-0000001568544877' is visible
-      await expect(page.locator('#note-0000001568544877')).toBeVisible();
+      await expect(page.locator('g#note-0000001568544877')).toBeVisible();
 
       // click on #nextPageButton
       await page.locator('#nextPageButton').click();
@@ -257,19 +260,26 @@ async function selectElements(page: Page, ids: string[]) {
  * @param {string} menuItem
  */
 async function insertElement(page: Page, ids: string[], elementName: string = 'slur', menuItem: string = 'addSlur') {
+  console.log('Ids: ', ids);
+  const measure = page.locator('g.measure', { has: page.locator('g#' + ids[0]) });
+
+  await expect(async () => {
+    // wait for measure to be visible
+    await expect(measure).toBeVisible();
+  }).toPass({ timeout: 10000 });
+
   await page.locator('#insertMenuTitle').click();
-  await page.locator('#insertMenuTitle').hover();
+  //await page.locator('#insertMenuTitle').hover();
   await expect(page.locator('#' + menuItem)).toBeVisible();
   await page.locator('#' + menuItem).click();
 
-  // check that element is visible
-  const measure = page.locator('g.measure', { has: page.locator('g#' + ids[0]) });
-  const element = measure.locator('g.' + elementName + '.highlighted');
+  const el = 'g.' + elementName + '.highlighted';
 
-  await expect(async () => {
-    await expect(element).toHaveAttribute('id');
-  }).toPass({ timeout: 5000 });
-  const newId = await element.getAttribute('id');
+  // wait for inserted element to be visible
+  await expect(measure.locator(el)).toBeVisible();
+  await expect(measure.locator(el)).toHaveAttribute('id');
+
+  const newId = await measure.locator(el).getAttribute('id');
   console.log('new element ' + elementName + ': ' + newId + ' inserted.');
 
   await expect(page.locator(`#${newId}`)).toBeVisible();

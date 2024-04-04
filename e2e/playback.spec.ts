@@ -101,16 +101,18 @@ test.describe('Test that MIDI playback works correctly', () => {
     await page.locator('#breaksSelect').selectOption('encoded');
     // enable speedmode, preventing automatic page turning
     await page.locator('#speedCheckbox').check();
+    // wait for first note to appear
+    await expect(page.locator('g#note-0000001038383042')).toBeVisible();
     // click on a note near end of first page
-    // HACK - use force: true to prevent Verovio SVG from intercepting pointer event
-    // TODO - figure out why this happens
-    await page.locator('#note-0000000547593172 use').first().click();
+    await page.locator('#note-0000000547593172 use').first().click({ force: true });
+    // wait for it to become selected
+    await expect(page.locator('#note-0000000547593172')).toHaveClass(/highlighted/);
     // commence playback
     await page.keyboard.press('Space');
     await expect(page.locator('#midiPlaybackControlBar')).toBeVisible();
-    // ... something should be highlighted ...
-    await expect(page.locator('.currently-playing').first()).toBeVisible();
-    // ... eventually (past end of page) nothing should be highlighted ...
+    // ... the note should be currently playing...
+    await expect(page.locator('#note-0000000547593172')).toHaveClass(/currently-playing/);
+    // ... eventually (past end of page) nothing should be currently playing...
     await expect(page.locator('.currently-playing')).toHaveCount(0);
     // ... and the page indicator should not have changed
     await expect(page.locator('#pagination2')).toHaveText(' 1 ');
