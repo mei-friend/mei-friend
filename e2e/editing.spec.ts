@@ -22,7 +22,7 @@ test.describe('Insert notes, rests, and accidentals.', () => {
       await expect(page.locator('#note-0000001631474113')).toBeVisible();
 
       // select #note-0000001117852400
-      await selectElements(page, [noteId]);
+      await selectElementsByClicking(page, [noteId]);
 
       // check whether note is highlighted
       await expect(page.locator('#' + noteId)).toBeVisible();
@@ -60,7 +60,7 @@ test.describe('Insert notes, rests, and accidentals.', () => {
       await expect(page.locator('#note-0000001631474113')).toBeVisible();
 
       // select #note-0000001117852400
-      await selectElements(page, ids);
+      await selectElementsByClicking(page, ids);
 
       // check whether note is highlighted
       await expect(page.locator('#' + ids)).toBeVisible();
@@ -75,7 +75,7 @@ test.describe('Insert notes, rests, and accidentals.', () => {
       await expect(page.locator(`#${uuid}`)).toBeVisible();
 
       // click on note to select it
-      await selectElements(page, [uuid!]);
+      await selectElementsByClicking(page, [uuid!]);
 
       // change pitch up of the new note
       await clickManipulate(page, 'pitchUpDiat');
@@ -89,7 +89,7 @@ test.describe('Insert notes, rests, and accidentals.', () => {
       await expect(page.locator(`#${uuid}`)).toBeVisible();
 
       // click on note to select it
-      await selectElements(page, [uuid!]);
+      await selectElementsByClicking(page, [uuid!]);
 
       // change pitch up of the new note
       await clickManipulate(page, 'pitchOctaveDown');
@@ -99,7 +99,7 @@ test.describe('Insert notes, rests, and accidentals.', () => {
 
     await test.step('Select all three notes and convert to chord', async () => {
       // select elements
-      await selectElements(page, ids);
+      await selectElementsByClicking(page, ids);
 
       // check whether notes are highlighted
       await expect(page.locator('#' + ids[0])).toHaveClass('note highlighted');
@@ -149,7 +149,7 @@ test.describe('Insert notes, rests, and accidentals.', () => {
       await expect(page.locator('#note-0000001631474113')).toBeVisible();
 
       // select #note-0000001117852400
-      await selectElements(page, [noteId]);
+      await selectElementsByClicking(page, [noteId]);
 
       // check whether note is highlighted
       await expect(page.locator('#' + noteId)).toBeVisible();
@@ -191,7 +191,7 @@ test.describe('Insert notes, rests, and accidentals.', () => {
       await expect(page.locator('#note-0000001631474113')).toBeVisible();
 
       // select #note-0000001117852400
-      await selectElements(page, ids);
+      await selectElementsByClicking(page, ids);
 
       // check whether notes are highlighted
       await expect(page.locator('#' + ids[0])).toBeVisible();
@@ -235,10 +235,10 @@ test.describe('Insert notes, rests, and accidentals.', () => {
       await expect(page.locator('g#note-0000001631474113')).toBeVisible();
     });
 
-    await test.step('Insert accidentals', async () => {
+    await test.step('Insert and delete accidentals', async () => {
       for (let i = 0; i < ids.length; i++) {
         // select #note-0000000417567361
-        await selectElements(page, ids.slice(i, i + 1));
+        await selectElementsByClicking(page, ids.slice(i, i + 1));
 
         // find 'g#' + ids[0] and check whether it has an accid as child
         await expect(async () => {
@@ -252,6 +252,7 @@ test.describe('Insert notes, rests, and accidentals.', () => {
 
         // insert double sharp
         await clickInsert(page, accids[i]);
+        console.log('Accidental inserted: ', accids[i]);
 
         // check whether note has an accid as child (not working in Firefox)
         const note = page.locator('g#' + ids[i]);
@@ -259,24 +260,17 @@ test.describe('Insert notes, rests, and accidentals.', () => {
 
         let uuid = await note.locator('g.accid.highlighted').getAttribute('id');
         if (uuid) uuids.push(uuid);
+
+        // 3 seconds delay
+        await page.waitForTimeout(30);
+
+        // delete the accidental
+        await deleteElements(page, [uuid!]);
+        // check that it is not visible anymore
+        await expect(note.locator('g.accid.highlighted')).not.toBeVisible();
+        console.log('Deleted accidental: ', uuid);
       }
       console.log('New accidentals inserted: ', uuids);
-    });
-
-    await test.step('Delete accidentals', async () => {
-      console.log('Now deleting these accidentals: ', uuids);
-      // select all uuids, not working as system in background gets selected
-      // await selectElements(page, uuids);
-
-      // delete new accidental
-      // await deleteElement(page, uuids);
-
-      for (let uuid of uuids) {
-        await selectElements(page, [uuid]);
-        await expect(page.locator('g#' + uuid)).toBeVisible();
-        await expect(page.locator('g#' + uuid)).toHaveClass('accid highlighted');
-        // await deleteElements(page, [uuid]);
-      }
     });
   });
 });
@@ -311,7 +305,7 @@ test.describe('Insert, modify, and delete control elements.', () => {
     await test.step('Select one element and add slur to that element', async () => {
       // select one element and add slur to that element (expecting next note to be selected)
       let elements = ['note-0000002071553041'];
-      await selectElements(page, elements);
+      await selectElementsByClicking(page, elements);
       uuid = await insertElement(page, elements, 'slur', 'addSlur');
       console.log('New slur inserted: ', uuid);
 
@@ -394,7 +388,7 @@ test.describe('Insert, modify, and delete control elements.', () => {
     await test.step('Select two elements and add slur to selected elements', async () => {
       // select two elements and add slur to selected elements
       let elements = ['note-0000001751146466', 'note-0000001042243679'];
-      await selectElements(page, elements);
+      await selectElementsByClicking(page, elements);
       uuid = await insertElement(page, elements, 'slur', 'addSlur');
       console.log('New slur inserted: ', uuid);
 
@@ -467,7 +461,7 @@ test.describe('Insert, modify, and delete control elements.', () => {
     await test.step('Select one element and add a tie', async () => {
       // select two elements and add slur to selected elements
       let elements = ['note-0000001209141443'];
-      await selectElements(page, elements);
+      await selectElementsByClicking(page, elements);
       uuid = await insertElement(page, elements, 'tie', 'addTie');
       console.log('New tie inserted: ', uuid);
 
@@ -534,7 +528,7 @@ test.describe('Insert, modify, and delete control elements.', () => {
     await test.step('Select two elements and add slur to selected elements', async () => {
       // select two elements and add slur to selected elements
       let elements = ['note-0000000732269518', 'note-0000001551304518'];
-      await selectElements(page, elements);
+      await selectElementsByClicking(page, elements);
       uuid = await insertElement(page, elements, 'tie', 'addTie');
       console.log('New tie inserted: ', uuid);
 
@@ -584,7 +578,7 @@ test.describe('Insert, modify, and delete control elements.', () => {
  * @param {Page} page
  * @param {string[]} ids
  */
-async function selectElements(page: Page, ids: string[]) {
+async function selectElementsByClicking(page: Page, ids: string[]) {
   console.log('Selecting elements: ', ids);
   let i = 0;
   for (let id of ids) {
@@ -607,6 +601,45 @@ async function selectElements(page: Page, ids: string[]) {
   }
   return true;
 } // selectElements()
+
+/**
+ * Select elements indicated in the ids string array in the notation panel
+ * by click-dragging the elements
+ * @param page
+ * @param ids
+ * @returns
+ */
+async function selectElementsByDragging(page: Page, ids: string[]) {
+  console.log('Selecting elements through click-drag: ', ids);
+  let i = 0;
+  for (let id of ids) {
+    // get bbox of element
+    let el = page.locator('g#' + id);
+    await expect(el).toBeVisible();
+    const bbox = await el.boundingBox();
+    console.log('Bounding box of element: ', bbox);
+
+    // get the element through javascript and get screenCTM coordinates
+    const ctm = await page.evaluate((id) => {
+      let el = document.querySelector('g#' + id);
+      if (el) return el.getScreenCTM(); // TODO: this does not work.
+      else return null;
+    });
+
+    console.log('Screen CTM of element: ', ctm);
+
+    // move mouse to top-left corner of element and click
+    await page.mouse.move(bbox!.x, bbox!.y);
+    await page.mouse.down();
+    // move mouse to element's bottom right corner and release
+    await page.mouse.move(bbox!.x + bbox!.width, bbox!.y + bbox!.height);
+    await page.mouse.up();
+    // wait for 2 seconds
+    await page.waitForTimeout(2000);
+    i++;
+  }
+  return true;
+} // selectElementsByDragging()
 
 /**
  * Inserts the given element to the selected elements, using the INSERT menu item
