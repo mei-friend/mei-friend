@@ -1,0 +1,17 @@
+{
+  "name": "mei-friend",
+  "version": "1.0.0",
+  "description": "<img src=\"https://raw.githubusercontent.com/mei-friend/mei-friend/main/app/static/owl/menu-logo.svg\" title=\"mei-friend\" width=\"33%\">",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {},
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.41.0",
+    "@types/node": "^20.11.5"
+  }
+}
