@@ -1,10 +1,13 @@
 # mei-friend-online CHANGELOG.md
 
+### 1.0.12 patch
+* Add PlayWright end-to-end tests for the main functionality of mei-friend
+
 ### 1.0.11 patch
 * Extend documentation with a new file `CONTRIBUTING.md` to provide guidelines for contributing to mei-friend
 * Update external documentation pages at https://mei-friend.github.io including updated installation instructions, 
   information on the code structure, and an updated page on contributing to mei-friend
-* Fix bug when loading facsimile source images from URLs starting with raw.githubusercontent
+* Fix bug when loading facsimile source images from URLs starting with raw.githubusercontent (#93)
 
 ### 1.0.10 patch
 * Scroll to facsimile image zones corresponding to selected element in editor or notation

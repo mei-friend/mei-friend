@@ -26,4 +26,3 @@ tests/package-lock.json
 /playwright/.cache/
 node_modules/
 package-lock.json
-
