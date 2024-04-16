@@ -1,7 +1,7 @@
 # mei-friend-online CHANGELOG.md
 
 ### 1.0.12 patch
-* 
+* Add PlayWright end-to-end tests for the main functionality of mei-friend
 
 ### 1.0.11 patch
 * Extend documentation with a new file `CONTRIBUTING.md` to provide guidelines for contributing to mei-friend
