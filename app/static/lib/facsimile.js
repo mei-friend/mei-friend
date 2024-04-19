@@ -18,7 +18,7 @@ const rectangleLineWidth = defaultFacsimileRectangleLineWidth; // width of bound
 const rectangleColor = defaultFacsimileRectangleColor; // color of zone rectangles
 var listenerHandles = {};
 var resize = ''; // west, east, north, south, northwest, southeast etc
-var ulx, uly;
+var sourceImageBoxes = {}; // ulx, uly, lrx, lry of source image boxes per page
 
 /**
  * Show warning text to facsimile panel (as svg text element) and
@@ -94,6 +94,7 @@ export function loadFacsimile(xmlDoc) {
       facs[id]['type'] = 'surface';
       facs[id]['sourceImageNumber'] = i; // store number of image page
       facs['sourceImage-' + i] = id;
+      facs[id]['surfaceId'] = id;
     }
   });
 
@@ -167,15 +168,10 @@ export async function drawFacsimile() {
 
   let zoomFactor = document.getElementById('facsimileZoomInput').value / 100;
 
-  // clear svg and append image
+  // clear all svgs and sourceImageBoxes
   facsimilePanel.querySelectorAll('[*|id^="sourceImage-"]').forEach((c) => c.remove());
+  // c.querySelectorAll(':not(image)').forEach((e) => c.removeChild(e));
   // Array.from(svg.children).forEach((c) => svg.removeChild(c));
-
-  ulx = Number.MAX_VALUE; // boundary values for image envelope (left-upper corner is global)
-  uly = Number.MAX_VALUE;
-  let lrx = 0;
-  let lry = 0;
-  let zoneId = '';
 
   // list displayed zones (filter doubled note elements in tab notation, see Verovio issue #3600)
   let svgFacs = Array.from(document.querySelectorAll('[data-facs]')).filter(
@@ -184,59 +180,79 @@ export async function drawFacsimile() {
 
   // iterate over svgFacs (svg group elements with data-facs attributes) and retrieve zoneId
   for (let f of svgFacs) {
+    let zoneId = '';
     if (f.hasAttribute('data-facs')) {
       zoneId = rmHash(f.getAttribute('data-facs'));
     }
 
-    
     // retrieve source image number from surface/zone element
-    let sourceImageNumber = '';
-    let surfaceId = '';
-    surfaceId = facs[zoneId].type === 'zone' ? facs[zoneId]['surfaceId'] : zoneId;
+    let sourceImageNumber = -1;
+    let surfaceId = facs[zoneId].surfaceId;
     if (surfaceId && facs[surfaceId]) {
       sourceImageNumber = facs[surfaceId]['sourceImageNumber'];
     }
-    
+
     console.log('Facsimile zoneId: ' + zoneId + ' (' + f.id + ')' + ', type: ' + facs[zoneId]?.type);
     console.log('          surfaceId: ' + surfaceId + ', sourceImageNumber: ' + sourceImageNumber);
-    
+
     if (sourceImageNumber >= 0) {
+      // when not in full page mode, store envelope of source image per page
+      if (!fullPage) {
+        if (!sourceImageBoxes[sourceImageNumber])
+          sourceImageBoxes[sourceImageNumber] = { ulx: Number.MAX_VALUE, uly: Number.MAX_VALUE, lrx: 0, lry: 0 };
+        if (parseFloat(facs[zoneId].ulx) < sourceImageBoxes[sourceImageNumber].ulx)
+          sourceImageBoxes[sourceImageNumber].ulx = parseFloat(facs[zoneId].ulx) - rectangleLineWidth / 2;
+        if (parseFloat(facs[zoneId].uly) < sourceImageBoxes[sourceImageNumber].uly)
+          sourceImageBoxes[sourceImageNumber].uly = parseFloat(facs[zoneId].uly) - rectangleLineWidth / 2;
+        if (parseFloat(facs[zoneId].lrx) > sourceImageBoxes[sourceImageNumber].lrx)
+          sourceImageBoxes[sourceImageNumber].lrx = parseFloat(facs[zoneId].lrx) + rectangleLineWidth / 2;
+        if (parseFloat(facs[zoneId].lry) > sourceImageBoxes[sourceImageNumber].lry)
+          sourceImageBoxes[sourceImageNumber].lry = parseFloat(facs[zoneId].lry) + rectangleLineWidth / 2;
+      }
+
       if (facsimilePanel.querySelector('#sourceImage-' + sourceImageNumber)) {
         console.log('Image svg already appended: sourceImage-' + sourceImageNumber);
       } else {
+        // let div = document.createElement('div');
         let imageSvg = document.createElementNS(svgNameSpace, 'svg');
         imageSvg.id = 'sourceImage-' + sourceImageNumber;
+        // div.appendChild(imageSvg);
         facsimilePanel.appendChild(imageSvg);
+
         let img = await getImageForZone(zoneId);
         console.log('Appending new source image ' + sourceImageNumber + ': ', img);
         imageSvg.appendChild(img);
 
+        // set width, height, viewBox and transform for image
         let surfaceWidth = parseFloat(facs[surfaceId].width);
         let surfaceHeight = parseFloat(facs[surfaceId].height);
-        if (surfaceWidth) imageSvg.setAttribute('width', surfaceWidth);
-        if (surfaceHeight) imageSvg.setAttribute('height', surfaceHeight);
+        // store original width and height in data attributes
+        if (surfaceWidth) imageSvg.setAttribute('data-width', surfaceWidth);
+        if (surfaceHeight) imageSvg.setAttribute('data-height', surfaceHeight);
+        // scale image to zoom factor
+        if (surfaceWidth) imageSvg.setAttribute('width', Math.round(surfaceWidth * zoomFactor));
+        if (surfaceHeight) imageSvg.setAttribute('height', Math.round(surfaceHeight * zoomFactor));
 
-        imageSvg.setAttribute('transform-origin', 'left top');
-        imageSvg.setAttribute('transform', 'scale(' + zoomFactor + ')');
-        // set viewBox to the size of the surface
-        imageSvg.setAttribute('viewBox', '0 0 ' + surfaceWidth + ' ' + surfaceHeight);
+        if (fullPage) {
+          imageSvg.setAttribute('viewBox', '0 0 ' + surfaceWidth + ' ' + surfaceHeight);
+        }
       }
 
-      if (false && facs[zoneId].type === 'surface') {
-        let surfaceWidth = parseFloat(facs[zoneId].width);
-        let surfaceHeight = parseFloat(facs[zoneId].height);
+      let svg = document.getElementById('sourceImage-' + sourceImageNumber);
 
-        let containerWidth = parseFloat(svgContainer.getAttribute('width')) || 0;
-        let containerHeight = parseFloat(svgContainer.getAttribute('height')) || 0;
-        if (surfaceWidth > containerWidth) {
-          svgContainer.setAttribute('width', surfaceWidth);
-        }
-        svgContainer.setAttribute('height', containerHeight + surfaceHeight);
+      // draw bounding box for zone, if checkbox is checked
+      if (svg && document.getElementById('facsimileShowZonesCheckbox')?.checked && facs[zoneId].type === 'zone') {
+        drawBoundingBox(zoneId, svg);
+      }
 
-        if (!svgContainer.hasAttribute('transform-origin')) {
-          svgContainer.setAttribute('transform-origin', 'left top');
-          svgContainer.setAttribute('transform', 'scale(' + zoomFactor + ')');
-        }
+      // set viewBox when not in full page mode
+      if (svg && !fullPage) {
+        let viewBox = [];
+        viewBox.push(sourceImageBoxes[sourceImageNumber].ulx);
+        viewBox.push(sourceImageBoxes[sourceImageNumber].uly);
+        viewBox.push(sourceImageBoxes[sourceImageNumber].lrx - sourceImageBoxes[sourceImageNumber].ulx);
+        viewBox.push(sourceImageBoxes[sourceImageNumber].lry - sourceImageBoxes[sourceImageNumber].uly);
+        svg.setAttribute('viewBox', viewBox.join(' '));
       }
     }
     // else {
@@ -364,10 +380,10 @@ export async function drawFacsimile() {
 /**
  * Draws the bounding box for the zone with zoneId, using global object facs
  * @param {string} zoneId
+ * @param {SVGElement} svg
  */
-function drawBoundingBox(zoneId) {
+function drawBoundingBox(zoneId, svg) {
   if (facs[zoneId]) {
-    let svg = document.getElementById('sourceImageSvg');
     let rect = document.createElementNS(svgNameSpace, 'rect');
     svg.appendChild(rect);
     rect.setAttribute('rx', rectangleLineWidth / 2);
@@ -527,7 +543,10 @@ export function zoomFacsimile(deltaPercent) {
   // find all source images SVGs and adjust their scale
   let sourceImages = document.querySelectorAll('[id^="sourceImage-"]');
   sourceImages.forEach((si) => {
-    si.setAttribute('transform', 'scale(' + facsimileZoomInput.value / 100 + ')');
+    let width = parseFloat(si.getAttribute('data-width'));
+    let height = parseFloat(si.getAttribute('data-height'));
+    si.setAttribute('width', Math.round((width * facsimileZoomInput.value) / 100));
+    si.setAttribute('height', Math.round((height * facsimileZoomInput.value) / 100));
   });
 } // zoomFacsimile()
 

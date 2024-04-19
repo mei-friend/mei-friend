@@ -82,6 +82,7 @@ body.lang_ja,
     'メイリオ', Meiryo, 'ＭＳ ゴシック', 'MS Gothic', HiraKakuProN-W3, 'TakaoExゴシック', TakaoExGothic, 'MotoyaLCedar',
     'Droid Sans Japanese', sans-serif;
 }
+
 body {
   font-family: Arial, Helvetica, sans-serif;
   width: 100%;
@@ -530,8 +531,9 @@ a:active {
 #facsimile-panel svg {
   border: solid;
   border-color: var(--dropdownBorderColor);
-  border-width: 1px;
-  border-radius: 2px;
+  border-width: 3px;
+  border-radius: 3px;
+  margin: 2px;
 }
 
 #source-image-label {
