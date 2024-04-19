@@ -67,58 +67,66 @@ export function clearFacsimile() {
  * each containing own coordinates (ulx, uly, lrx, lry)
  * and containing surface info (target, width, height)
  * @param {Document} xmlDoc
- * Modifies global variable facs
+ *
+ * Note:
+ * 1) Clears and creates global variable facs.
+ * 2) Loads only first facsimile element in xmlDoc.
  */
 export function loadFacsimile(xmlDoc) {
   let facsimile = xmlDoc.querySelector('facsimile');
-  if (facsimile) {
-    facs = {};
-    // look for surface elements
-    let surfaces = facsimile.querySelectorAll('surface');
-    surfaces.forEach((s) => {
-      let id;
-      let { target, width, height } = fillGraphic(s.querySelector('graphic'));
-      if (s.hasAttribute('xml:id')) id = s.getAttribute('xml:id');
-      if (id) {
-        facs[id] = {};
-        if (target) facs[id]['target'] = target;
-        if (width) facs[id]['width'] = width;
-        if (height) facs[id]['height'] = height;
-        facs[id]['type'] = 'surface';
-      }
-    });
-    // look for zone elements
-    let zones = facsimile.querySelectorAll('zone');
-    console.debug('facsimile.loadFacsimile(): loading ' + zones.length + ' zones.');
-    zones.forEach((z) => {
-      let id, ulx, uly, lrx, lry;
-      if (z.hasAttribute('xml:id')) id = z.getAttribute('xml:id');
-      if (z.hasAttribute('ulx')) ulx = z.getAttribute('ulx');
-      if (z.hasAttribute('uly')) uly = z.getAttribute('uly');
-      if (z.hasAttribute('lrx')) lrx = z.getAttribute('lrx');
-      if (z.hasAttribute('lry')) lry = z.getAttribute('lry');
-      let { target, width, height } = fillGraphic(z.parentElement.querySelector('graphic'));
-      if (id) {
-        facs[id] = {};
-        facs[id]['type'] = 'zone';
-        if (target) facs[id]['target'] = target;
-        if (width) facs[id]['width'] = width;
-        if (height) facs[id]['height'] = height;
-        if (ulx) facs[id]['ulx'] = ulx;
-        if (uly) facs[id]['uly'] = uly;
-        if (lrx) facs[id]['lrx'] = lrx;
-        if (lry) facs[id]['lry'] = lry;
-        let measure = xmlDoc.querySelector('[facs="#' + id + '"]');
-        if (measure) {
-          if (measure.hasAttribute('xml:id')) facs[id]['pointerId'] = measure.getAttribute('xml:id');
-          if (measure.hasAttribute('n')) facs[id]['pointerN'] = measure.getAttribute('n');
+  if (!facsimile) {
+    console.info('facsimile.loadFacsimile(): No facsimile element found.');
+    return;
+  }
+  facs = {};
+
+  // look for surface elements
+  let surfaces = facsimile.querySelectorAll('surface');
+  surfaces.forEach((s) => {
+    let id;
+    let { target, width, height } = fillGraphic(s.querySelector('graphic'));
+    if (s.hasAttribute('xml:id')) id = s.getAttribute('xml:id');
+    if (id) {
+      facs[id] = {};
+      if (target) facs[id]['target'] = target;
+      if (width) facs[id]['width'] = width;
+      if (height) facs[id]['height'] = height;
+      facs[id]['type'] = 'surface';
+    }
+  });
+
+  // look for zone elements
+  let zones = facsimile.querySelectorAll('zone');
+  console.debug('facsimile.loadFacsimile(): loading ' + zones.length + ' zones.');
+  zones.forEach((z) => {
+    let id, ulx, uly, lrx, lry;
+    if (z.hasAttribute('xml:id')) id = z.getAttribute('xml:id');
+    if (z.hasAttribute('ulx')) ulx = z.getAttribute('ulx');
+    if (z.hasAttribute('uly')) uly = z.getAttribute('uly');
+    if (z.hasAttribute('lrx')) lrx = z.getAttribute('lrx');
+    if (z.hasAttribute('lry')) lry = z.getAttribute('lry');
+    let { target, width, height } = fillGraphic(z.parentElement.querySelector('graphic'));
+    if (id) {
+      facs[id] = {};
+      facs[id]['type'] = 'zone';
+      if (target) facs[id]['target'] = target;
+      if (width) facs[id]['width'] = width;
+      if (height) facs[id]['height'] = height;
+      if (ulx) facs[id]['ulx'] = ulx;
+      if (uly) facs[id]['uly'] = uly;
+      if (lrx) facs[id]['lrx'] = lrx;
+      if (lry) facs[id]['lry'] = lry;
+      let pointingElement = xmlDoc.querySelector('[facs="#' + id + '"]');
+      if (pointingElement) {
+        if (pointingElement.hasAttribute('xml:id')) {
+          facs[id]['pointerId'] = pointingElement.getAttribute('xml:id');
+        }
+        if (pointingElement.hasAttribute('n')) {
+          facs[id]['pointerN'] = pointingElement.getAttribute('n');
         }
       }
-    });
-    // oldFacsimile = facsimile;
-  } else {
-    console.debug('facsimile.loadFacsimile(): skip loading because facsimile the same.');
-  }
+    }
+  });
 
   /**
    * Local function to handle main attributes of graphic element.
@@ -156,6 +164,7 @@ export async function drawFacsimile() {
   let lrx = 0;
   let lry = 0;
   let zoneId = '';
+
   // list displayed zones (filter doubled note elements in tab notation, see Verovio issue #3600)
   let svgFacs = Array.from(document.querySelectorAll('[data-facs]')).filter(
     (x) => !x.parentElement.classList.contains('note')
@@ -163,7 +172,9 @@ export async function drawFacsimile() {
 
   if (svgFacs && fullPage) {
     let firstZone = svgFacs.at(0);
-    if (firstZone && firstZone.hasAttribute('data-facs')) zoneId = rmHash(firstZone.getAttribute('data-facs'));
+    if (firstZone && firstZone.hasAttribute('data-facs')) {
+      zoneId = rmHash(firstZone.getAttribute('data-facs'));
+    }
   } else {
     svgFacs.forEach((f) => {
       // go through displayed zones and find envelope
@@ -177,6 +188,7 @@ export async function drawFacsimile() {
     });
     console.log('Facsimile envelope: ulx/uly; lrx/lry: ' + ulx + '/' + uly + '; ' + lrx + '/' + lry);
   }
+
   // display surface graphic if no data-facs are found in SVG
   if (!zoneId || !facs[zoneId]) {
     let pb = getCurrentPbElement(v.xmlDoc); // id of current page beginning
@@ -194,38 +206,13 @@ export async function drawFacsimile() {
       return;
     }
   }
-  if (zoneId && facs[zoneId]) {
-    // find the correct path of the image file
-    let img;
-    let imgName = facs[zoneId].target;
-    if (!imgName.startsWith('http')) {
-      // relative file paths in surface@target
-      if (fileLocationType === 'github') {
-        let url = new URL(
-          'https://raw.githubusercontent.com/' +
-            github.githubRepo +
-            '/' +
-            github.branch +
-            github.filepath.substring(0, github.filepath.lastIndexOf('/')) +
-            '/' +
-            facs[zoneId].target
-        );
-        imgName = url.href;
-      } else if (fileLocationType === 'url') {
-        let url = new URL(meiFileLocation);
-        imgName = url.origin + url.pathname.substring(0, url.pathname.lastIndexOf('/') + 1) + imgName;
-      } else {
-        imgName = `${root}local/` + facs[zoneId].target;
-        imgName = imgName.replace('.tif', '.jpg'); // hack for some DIME files...
-      }
-    } else if (imgName.startsWith('https://raw.githubusercontent.com/') && github && github.githubToken && github.branch && github.filepath) {
-      // absolute file paths for GitHub
-      let url = new URL(
-        'https://raw.githubusercontent.com/' + github.githubRepo + '/' + github.branch + github.filepath
-      );
-      imgName = url.href;
-    }
 
+  // load image from source and draw image and zones
+  if (zoneId && facs[zoneId]) {
+
+    // get image from source based on zoneId
+    let imgName = createImageName(zoneId);    
+    let img;
     // retrieve image from object, if already there...
     if (sourceImages.hasOwnProperty(imgName)) {
       console.log('Using existing image from ' + imgName);
@@ -237,7 +224,7 @@ export async function drawFacsimile() {
       sourceImages[imgName] = img;
     }
 
-    //
+    // clear svg and append image
     Array.from(svg.children).forEach((c) => svg.removeChild(c));
     if (img) {
       console.log('Appending child image:', img);
@@ -249,9 +236,9 @@ export async function drawFacsimile() {
     }
 
     if (fullPage) {
-      console.debug('Facsimile img getBBox(): ', img.getBBox());
-      console.debug('Facsimile img getBoundingClientRect(): ', img.getBoundingClientRect());
       let bb = img.getBBox();
+      console.debug('Facsimile img getBBox(): ', bb);
+      console.debug('Facsimile img getBoundingClientRect(): ', img.getBoundingClientRect());
       ulx = 0;
       uly = 0;
       lrx = bb.width;
@@ -344,6 +331,48 @@ function drawBoundingBox(zoneId) {
     }
   }
 } // drawBoundingBox()
+
+/**
+ * Figure out the complete path of the image file from the zone id string
+ * @param {string} zoneId 
+ * @returns 
+ */
+function createImageName(zoneId) {
+  // find the correct path of the image file
+  let imgName = facs[zoneId].target;
+  if (!imgName.startsWith('http')) {
+    // relative file paths in surface@target
+    if (fileLocationType === 'github') {
+      let url = new URL(
+        'https://raw.githubusercontent.com/' +
+          github.githubRepo +
+          '/' +
+          github.branch +
+          github.filepath.substring(0, github.filepath.lastIndexOf('/')) +
+          '/' +
+          facs[zoneId].target
+      );
+      imgName = url.href;
+    } else if (fileLocationType === 'url') {
+      let url = new URL(meiFileLocation);
+      imgName = url.origin + url.pathname.substring(0, url.pathname.lastIndexOf('/') + 1) + imgName;
+    } else {
+      imgName = `${root}local/` + facs[zoneId].target;
+      imgName = imgName.replace('.tif', '.jpg'); // hack for some DIME files...
+    }
+  } else if (
+    imgName.startsWith('https://raw.githubusercontent.com/') &&
+    github &&
+    github.githubToken &&
+    github.branch &&
+    github.filepath
+  ) {
+    // absolute file paths for GitHub
+    let url = new URL('https://raw.githubusercontent.com/' + github.githubRepo + '/' + github.branch + github.filepath);
+    imgName = url.href;
+  }
+  return imgName;
+} // createImageName()
 
 /**
  * Load asynchronously the image from url and returns a promise
