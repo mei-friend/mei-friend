@@ -27,15 +27,15 @@ var ulx, uly;
  * @returns void
  */
 function showWarningText(txt = translator.lang.facsimileDefaultWarning.text) {
-  let svgContainer = document.getElementById('sourceImageContainer');
-  let svg = document.getElementById('sourceImageSvg');
-  if (!svg || !svgContainer) return;
+  // let svgContainer = document.getElementById('sourceImageContainer');
+  // let svg = document.getElementById('sourceImageSvg');
+  // if (!svg || !svgContainer) return;
 
-  // clear existing structures
-  svgContainer.removeAttribute('transform-origin');
-  svgContainer.removeAttribute('transform');
-  svg.removeAttribute('viewBox');
-  svg.innerHTML = '';
+  // // clear existing structures
+  // svgContainer.removeAttribute('transform-origin');
+  // svgContainer.removeAttribute('transform');
+  // svg.removeAttribute('viewBox');
+  // svg.innerHTML = '';
 
   let facsimileMessagePanel = document.getElementById('facsimileMessagePanel');
   facsimileMessagePanel.style.display = 'block';
@@ -82,7 +82,7 @@ export function loadFacsimile(xmlDoc) {
 
   // look for surface elements
   let surfaces = facsimile.querySelectorAll('surface');
-  surfaces.forEach((s) => {
+  surfaces.forEach((s, i) => {
     let id;
     let { target, width, height } = fillGraphic(s.querySelector('graphic'));
     if (s.hasAttribute('xml:id')) id = s.getAttribute('xml:id');
@@ -92,6 +92,8 @@ export function loadFacsimile(xmlDoc) {
       if (width) facs[id]['width'] = width;
       if (height) facs[id]['height'] = height;
       facs[id]['type'] = 'surface';
+      facs[id]['sourceImageNumber'] = i; // store number of image page
+      facs['sourceImage-' + i] = id;
     }
   });
 
@@ -105,6 +107,7 @@ export function loadFacsimile(xmlDoc) {
     if (z.hasAttribute('uly')) uly = z.getAttribute('uly');
     if (z.hasAttribute('lrx')) lrx = z.getAttribute('lrx');
     if (z.hasAttribute('lry')) lry = z.getAttribute('lry');
+    let parentId = z.parentElement.getAttribute('xml:id');
     let { target, width, height } = fillGraphic(z.parentElement.querySelector('graphic'));
     if (id) {
       facs[id] = {};
@@ -116,6 +119,7 @@ export function loadFacsimile(xmlDoc) {
       if (uly) facs[id]['uly'] = uly;
       if (lrx) facs[id]['lrx'] = lrx;
       if (lry) facs[id]['lry'] = lry;
+      if (parentId) facs[id]['surfaceId'] = parentId;
       let pointingElement = xmlDoc.querySelector('[facs="#' + id + '"]');
       if (pointingElement) {
         if (pointingElement.hasAttribute('xml:id')) {
@@ -156,9 +160,17 @@ export async function drawFacsimile() {
   let fullPage = document.getElementById('showFacsimileFullPage').checked;
   let facsimileMessagePanel = document.getElementById('facsimileMessagePanel');
   facsimileMessagePanel.style.display = 'none';
-  let svgContainer = document.getElementById('sourceImageContainer');
-  let svg = document.getElementById('sourceImageSvg');
-  if (!svg || !svgContainer) return;
+  let facsimilePanel = document.getElementById('facsimile-panel');
+  // let svgContainer = document.getElementById('sourceImageContainer');
+  // let svg = document.getElementById('sourceImageSvg');
+  // if (!svg || !svgContainer) return;
+
+  let zoomFactor = document.getElementById('facsimileZoomInput').value / 100;
+
+  // clear svg and append image
+  facsimilePanel.querySelectorAll('[*|id^="sourceImage-"]').forEach((c) => c.remove());
+  // Array.from(svg.children).forEach((c) => svg.removeChild(c));
+
   ulx = Number.MAX_VALUE; // boundary values for image envelope (left-upper corner is global)
   uly = Number.MAX_VALUE;
   let lrx = 0;
@@ -169,6 +181,73 @@ export async function drawFacsimile() {
   let svgFacs = Array.from(document.querySelectorAll('[data-facs]')).filter(
     (x) => !x.parentElement.classList.contains('note')
   );
+
+  // iterate over svgFacs (svg group elements with data-facs attributes) and retrieve zoneId
+  for (let f of svgFacs) {
+    if (f.hasAttribute('data-facs')) {
+      zoneId = rmHash(f.getAttribute('data-facs'));
+    }
+
+    
+    // retrieve source image number from surface/zone element
+    let sourceImageNumber = '';
+    let surfaceId = '';
+    surfaceId = facs[zoneId].type === 'zone' ? facs[zoneId]['surfaceId'] : zoneId;
+    if (surfaceId && facs[surfaceId]) {
+      sourceImageNumber = facs[surfaceId]['sourceImageNumber'];
+    }
+    
+    console.log('Facsimile zoneId: ' + zoneId + ' (' + f.id + ')' + ', type: ' + facs[zoneId]?.type);
+    console.log('          surfaceId: ' + surfaceId + ', sourceImageNumber: ' + sourceImageNumber);
+    
+    if (sourceImageNumber >= 0) {
+      if (facsimilePanel.querySelector('#sourceImage-' + sourceImageNumber)) {
+        console.log('Image svg already appended: sourceImage-' + sourceImageNumber);
+      } else {
+        let imageSvg = document.createElementNS(svgNameSpace, 'svg');
+        imageSvg.id = 'sourceImage-' + sourceImageNumber;
+        facsimilePanel.appendChild(imageSvg);
+        let img = await getImageForZone(zoneId);
+        console.log('Appending new source image ' + sourceImageNumber + ': ', img);
+        imageSvg.appendChild(img);
+
+        let surfaceWidth = parseFloat(facs[surfaceId].width);
+        let surfaceHeight = parseFloat(facs[surfaceId].height);
+        if (surfaceWidth) imageSvg.setAttribute('width', surfaceWidth);
+        if (surfaceHeight) imageSvg.setAttribute('height', surfaceHeight);
+
+        imageSvg.setAttribute('transform-origin', 'left top');
+        imageSvg.setAttribute('transform', 'scale(' + zoomFactor + ')');
+        // set viewBox to the size of the surface
+        imageSvg.setAttribute('viewBox', '0 0 ' + surfaceWidth + ' ' + surfaceHeight);
+      }
+
+      if (false && facs[zoneId].type === 'surface') {
+        let surfaceWidth = parseFloat(facs[zoneId].width);
+        let surfaceHeight = parseFloat(facs[zoneId].height);
+
+        let containerWidth = parseFloat(svgContainer.getAttribute('width')) || 0;
+        let containerHeight = parseFloat(svgContainer.getAttribute('height')) || 0;
+        if (surfaceWidth > containerWidth) {
+          svgContainer.setAttribute('width', surfaceWidth);
+        }
+        svgContainer.setAttribute('height', containerHeight + surfaceHeight);
+
+        if (!svgContainer.hasAttribute('transform-origin')) {
+          svgContainer.setAttribute('transform-origin', 'left top');
+          svgContainer.setAttribute('transform', 'scale(' + zoomFactor + ')');
+        }
+      }
+    }
+    // else {
+    //   showWarningText(translator.lang.facsimileImgeNotLoadedWarning.text + ' \n(' + imgName + ').');
+    //   busy(false);
+    //   return;
+    // }
+  }
+
+  busy(false);
+  return;
 
   if (svgFacs && fullPage) {
     let firstZone = svgFacs.at(0);
@@ -209,20 +288,7 @@ export async function drawFacsimile() {
 
   // load image from source and draw image and zones
   if (zoneId && facs[zoneId]) {
-
-    // get image from source based on zoneId
-    let imgName = createImageName(zoneId);    
-    let img;
-    // retrieve image from object, if already there...
-    if (sourceImages.hasOwnProperty(imgName)) {
-      console.log('Using existing image from ' + imgName);
-      img = sourceImages[imgName];
-      // or load it freshly from source, if not
-    } else {
-      console.log('Loading image from ' + imgName);
-      img = await loadImage(imgName);
-      sourceImages[imgName] = img;
-    }
+    let img = await getImageForZone(zoneId);
 
     // clear svg and append image
     Array.from(svg.children).forEach((c) => svg.removeChild(c));
@@ -333,9 +399,30 @@ function drawBoundingBox(zoneId) {
 } // drawBoundingBox()
 
 /**
+ * Get image from source based on zone id
+ * @param {string} zoneId
+ * @returns
+ */
+async function getImageForZone(zoneId) {
+  let imgName = createImageName(zoneId);
+  let img;
+  // retrieve image from object, if already there...
+  if (sourceImages.hasOwnProperty(imgName)) {
+    console.log('Using existing image from ' + imgName);
+    img = sourceImages[imgName];
+    // or load it freshly from source, if not
+  } else {
+    console.log('Loading image from ' + imgName);
+    img = await loadImage(imgName);
+    sourceImages[imgName] = img;
+  }
+  return img;
+} // getImageForZone()
+
+/**
  * Figure out the complete path of the image file from the zone id string
- * @param {string} zoneId 
- * @returns 
+ * @param {string} zoneId
+ * @returns
  */
 function createImageName(zoneId) {
   // find the correct path of the image file
@@ -436,8 +523,12 @@ export function zoomFacsimile(deltaPercent) {
   let facsZoom = document.getElementById('facsimileZoom'); // facsimile panel
   if (!facsZoom) return;
   if (deltaPercent) facsZoom.value = facsimileZoomInput.value;
-  let svgContainer = document.getElementById('sourceImageContainer');
-  if (svgContainer) svgContainer.setAttribute('transform', 'scale(' + facsimileZoomInput.value / 100 + ')');
+
+  // find all source images SVGs and adjust their scale
+  let sourceImages = document.querySelectorAll('[id^="sourceImage-"]');
+  sourceImages.forEach((si) => {
+    si.setAttribute('transform', 'scale(' + facsimileZoomInput.value / 100 + ')');
+  });
 } // zoomFacsimile()
 
 /**
@@ -629,15 +720,14 @@ export function addZoneResizer(v, rect) {
  */
 export function addZoneDrawer() {
   let ip = document.getElementById('facsimile-panel');
-  let svg = document.getElementById('sourceImageSvg');
   let start = {}; // starting point start.x, start.y
   let end = {}; // ending point
   let drawing = ''; // 'new' or ''
   let minSize = 20; // px, minimum width and height for a zone
 
-  svg.addEventListener('mousedown', mouseDown);
-  svg.addEventListener('mousemove', mouseMove);
-  svg.addEventListener('mouseup', mouseUp);
+  ip.addEventListener('mousedown', mouseDown);
+  ip.addEventListener('mousemove', mouseMove);
+  ip.addEventListener('mouseup', mouseUp);
 
   function mouseDown(ev) {
     ev.preventDefault();
@@ -653,7 +743,7 @@ export function addZoneDrawer() {
       rect.setAttribute('stroke', rectangleColor);
       rect.setAttribute('stroke-width', rectangleLineWidth);
       rect.setAttribute('fill', 'none');
-      svg.appendChild(rect);
+      ev.target.appendChild(rect);
       drawing = 'new';
       console.log(
         'ZoneDrawer mouse down: ' +
@@ -683,7 +773,7 @@ export function addZoneDrawer() {
       if (rect && !resize) {
         end.x = ev.clientX;
         end.y = ev.clientY;
-        var mx = svg.getScreenCTM().inverse();
+        var mx = ev.target.getScreenCTM().inverse();
         let s = transformCTM(start, mx);
         let e = transformCTM(end, mx);
         let c = adjustCoordinates(s.x, s.y, e.x - s.x, e.y - s.y);

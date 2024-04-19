@@ -35,21 +35,22 @@ export function createNotationDiv(parentElement, scale) {
 
   let facsimileMessagePanel = document.createElement('div');
   facsimileMessagePanel.id = 'facsimileMessagePanel';
+  facsimilePanel.append(facsimileMessagePanel);
+  facsimileContainer.appendChild(facsimilePanel);
 
   // SVG: facsimile image container
-  var svgContainer = document.createElementNS(svgNameSpace, 'svg');
-  svgContainer.id = 'sourceImageContainer';
-  svgContainer.setAttribute('width', '500px');
+  // var svgContainer = document.createElementNS(svgNameSpace, 'svg');
+  // svgContainer.id = 'sourceImageContainer';
+  // svgContainer.setAttribute('width', '500px');
 
-  // SVG: facsimile image svg
-  var svg = document.createElementNS(svgNameSpace, 'svg');
-  svg.id = 'sourceImageSvg';
+  // // SVG: facsimile image svg
+  // var svg = document.createElementNS(svgNameSpace, 'svg');
+  // svg.id = 'sourceImageSvg';
 
-  // append everything
-  svgContainer.appendChild(svg);
-  facsimilePanel.append(facsimileMessagePanel);
-  facsimilePanel.append(svgContainer);
-  facsimileContainer.appendChild(facsimilePanel);
+  // // append everything
+  // svgContainer.appendChild(svg);
+  // facsimilePanel.append(svgContainer);
+  
 
   // add both containers to parent (#notation)
   parentElement.appendChild(verovioContainer);
