@@ -1,5 +1,8 @@
 # mei-friend-online CHANGELOG.md
 
+### 1.0.13 patch
+* Add support for displaying multiple source image files referenced in facsimile element (#94).
+
 ### 1.0.12 patch
 * Add PlayWright end-to-end tests for the main functionality of mei-friend
 
