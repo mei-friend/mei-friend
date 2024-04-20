@@ -32,12 +32,6 @@ function showWarningText(txt = translator.lang.facsimileDefaultWarning.text) {
   // let svg = document.getElementById('sourceImageSvg');
   // if (!svg || !svgContainer) return;
 
-  // // clear existing structures
-  // svgContainer.removeAttribute('transform-origin');
-  // svgContainer.removeAttribute('transform');
-  // svg.removeAttribute('viewBox');
-  // svg.innerHTML = '';
-
   let facsimileMessagePanel = document.getElementById('facsimileMessagePanel');
   facsimileMessagePanel.style.display = 'block';
   if (facsimileMessagePanel) {
@@ -167,7 +161,7 @@ export async function drawFacsimile() {
   let zoomFactor = document.getElementById('facsimileZoomInput').value / 100;
 
   // clear all svgs and sourceImageBoxes
-  facsimilePanel.querySelectorAll('[*|id^="sourceImage-"]').forEach((c) => c.remove());
+  clearSourceImages();
   // c.querySelectorAll(':not(image)').forEach((e) => c.removeChild(e));
   // Array.from(svg.children).forEach((c) => svg.removeChild(c));
 
@@ -175,6 +169,37 @@ export async function drawFacsimile() {
   let svgFacs = Array.from(document.querySelectorAll('[data-facs]')).filter(
     (x) => !x.parentElement.classList.contains('note')
   );
+
+  // warn, if no @facs attributes are found in the current notation SVG,
+  if (svgFacs.length === 0) {
+    let pb = getCurrentPbElement(v.xmlDoc); // id of current page beginning
+    if (!pb) {
+      showWarningText(translator.lang.facsimileNoSurfaceWarning.text);
+      busy(false);
+      return;
+    }
+  }
+
+  // if no zones are found, warn if not in full-page mode
+  let hasZones = false;
+  svgFacs.forEach((f) => {
+    let facsAttribute = f.getAttribute('data-facs') || '';
+    if (facsAttribute && facs[rmHash(facsAttribute)].type === 'zone') {
+      hasZones = true;
+    }
+  });
+  if (!hasZones && !fullPage) {
+    let pb = getCurrentPbElement(v.xmlDoc); // id of current page beginning
+    let zoneId = '';
+    if (pb && pb.hasAttribute('facs')) {
+      zoneId = rmHash(pb.getAttribute('facs'));
+    }
+    if (zoneId) {
+      showWarningText(translator.lang.facsimileNoZonesFullPageWarning.text);
+      busy(false);
+      return;
+    }
+  }
 
   // iterate over svgFacs (svg group elements with data-facs attributes) and retrieve zoneId
   for (let f of svgFacs) {
@@ -237,15 +262,20 @@ export async function drawFacsimile() {
         text.setAttribute('font-weight', 'bold');
         text.setAttribute('text-anchor', 'middle');
         text.setAttribute('x', '50%');
-        text.setAttribute('y', '50%');
+        text.setAttribute('y', '20%');
         text.textContent = 'Loading image...';
         imageSvg.appendChild(text);
 
+        // load image from source and draw image and zones
         let img = await getImageForZone(imgName);
-        text.remove();
-        console.log('Appending new source image ' + sourceImageNumber + ': ', img);
-        imageSvg.appendChild(img);
-
+        if (img) {
+          text.remove();
+          console.log('Appending new source image ' + sourceImageNumber + ': ', img);
+          imageSvg.appendChild(img);
+        } else {
+          text.textContent = translator.lang.facsimileImgeNotLoadedWarning.text;
+          continue;
+        }
         // set width, height, viewBox and transform for image
         let surfaceWidth = parseFloat(facs[surfaceId].width);
         let surfaceHeight = parseFloat(facs[surfaceId].height);
@@ -556,6 +586,18 @@ async function embedImage(url) {
     };
   });
 } // embedImage()
+
+/**
+ * Clear all source image divs and svgs
+ */
+function clearSourceImages() {
+  let facsimilePanel = document.getElementById('facsimile-panel');
+  if (facsimilePanel) {
+    facsimilePanel.querySelectorAll('[*|id^="sourceImage-"]').forEach((c) => {
+      c.remove();
+    });
+  }
+}
 
 /**
  * Zooms the facsimile surface image in the sourceImageContainer svg.

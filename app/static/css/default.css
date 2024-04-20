@@ -532,9 +532,11 @@ a:active {
 #facsimile-panel svg {
   border: solid;
   border-color: var(--dropdownBorderColor);
-  border-width: 3px;
-  border-radius: 3px;
+  border-width: 2px;
+  border-radius: 4px;
   margin: 2px;
+  min-width: 231px;
+  min-height: 327px;
 }
 
 #facsimile-panel div {
