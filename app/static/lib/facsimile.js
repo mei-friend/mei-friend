@@ -382,22 +382,29 @@ export async function drawFacsimile() {
  */
 function drawBoundingBox(zoneId, svg) {
   if (facs[zoneId]) {
+    let editFacsimileZones = document.getElementById('editFacsimileZones').checked;
+    let pointerId = facs[zoneId]['pointerId']; // id of pointing element (e.g., measure)
+    let rectId = editFacsimileZones ? zoneId : pointerId;
+
+    // remove any already existing rectangle with the same id
+    svg.querySelectorAll('#' + rectId).forEach((r) => r.remove());
+
+    // draw new rectangle
     let rect = document.createElementNS(svgNameSpace, 'rect');
     svg.appendChild(rect);
     rect.setAttribute('rx', rectangleLineWidth / 2);
     rect.setAttribute('ry', rectangleLineWidth / 2);
     rect.addEventListener('click', (e) => v.handleClickOnNotation(e, cm));
-    let editFacsimileZones = document.getElementById('editFacsimileZones').checked;
     let x = parseFloat(facs[zoneId].ulx);
     let y = parseFloat(facs[zoneId].uly);
     let width = parseFloat(facs[zoneId].lrx) - x;
     let height = parseFloat(facs[zoneId].lry) - y;
     updateRect(rect, x, y, width, height, rectangleColor, rectangleLineWidth, 'none');
-    let pointerId = facs[zoneId]['pointerId']; // id of pointing element (e.g., measure)
-    if (pointerId) rect.id = editFacsimileZones ? zoneId : pointerId;
+    if (pointerId) rect.id = rectId;
+
+    // draw number-like info from element (e.g., measure)
     let pointerN = facs[zoneId]['pointerN']; // number-like
     if (pointerN) {
-      // draw number-like info from element (e.g., measure)
       let txt = document.createElementNS(svgNameSpace, 'text');
       svg.appendChild(txt);
       txt.setAttribute('font-size', '28px');
@@ -407,7 +414,7 @@ function drawBoundingBox(zoneId, svg) {
       txt.setAttribute('y', y + 29);
       txt.addEventListener('click', (e) => v.handleClickOnNotation(e, cm));
       txt.textContent = pointerN;
-      if (pointerId) txt.id = editFacsimileZones ? zoneId : pointerId;
+      if (pointerId) txt.id = rectId;
     }
   }
 } // drawBoundingBox()
