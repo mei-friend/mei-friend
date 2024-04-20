@@ -210,12 +210,13 @@ export async function drawFacsimile() {
       if (facsimilePanel.querySelector('#sourceImage-' + sourceImageNumber)) {
         console.log('Image svg already appended: sourceImage-' + sourceImageNumber);
       } else {
-        // let div = document.createElement('div');
+        // create new div and svg for source image
+        let div = document.createElement('div');
         let imageSvg = document.createElementNS(svgNameSpace, 'svg');
-        imageSvg.id = 'sourceImage-' + sourceImageNumber;
+        div.id = 'sourceImage-' + sourceImageNumber;
         imageSvg.setAttribute('data-sourceImageNumber', sourceImageNumber);
-        // div.appendChild(imageSvg);
-        facsimilePanel.appendChild(imageSvg);
+        div.appendChild(imageSvg);
+        facsimilePanel.appendChild(div);
 
         let img = await getImageForZone(zoneId);
         console.log('Appending new source image ' + sourceImageNumber + ': ', img);
@@ -236,7 +237,7 @@ export async function drawFacsimile() {
         }
       }
 
-      let svg = document.getElementById('sourceImage-' + sourceImageNumber);
+      let svg = document.getElementById('sourceImage-' + sourceImageNumber).querySelector('svg');
 
       // draw bounding box for zone, if checkbox is checked
       if (svg && document.getElementById('facsimileShowZonesCheckbox')?.checked && facs[zoneId].type === 'zone') {
@@ -548,10 +549,11 @@ export function zoomFacsimile(deltaPercent) {
   // find all source images SVGs and adjust their scale
   let sourceImages = document.querySelectorAll('[id^="sourceImage-"]');
   sourceImages.forEach((si) => {
-    let width = parseFloat(si.getAttribute('data-width'));
-    let height = parseFloat(si.getAttribute('data-height'));
-    si.setAttribute('width', Math.round((width * facsimileZoomInput.value) / 100));
-    si.setAttribute('height', Math.round((height * facsimileZoomInput.value) / 100));
+    let svg = si.querySelector('svg');
+    let width = parseFloat(svg.getAttribute('data-width'));
+    let height = parseFloat(svg.getAttribute('data-height'));
+    svg.setAttribute('width', Math.round((width * facsimileZoomInput.value) / 100));
+    svg.setAttribute('height', Math.round((height * facsimileZoomInput.value) / 100));
   });
 } // zoomFacsimile()
 
