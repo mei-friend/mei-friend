@@ -1383,6 +1383,7 @@ function showSplashScreen() {
   const alwaysShow = document.getElementById('splashAlwaysShow'); // checkbox in splash screen
   document.getElementById('splashOverlay').style.display = 'flex';
   alwaysShow.checked = storage.showSplashScreen;
+  document.getElementById('splashConfirmButton').focus({ focusVisible: false });
 } // showSplashScreen()
 
 function togglePdfMode() {
