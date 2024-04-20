@@ -710,7 +710,7 @@ export const meiFriendSettingsOptions = {
     title: 'Facsimile image zoom (%)',
     description: 'filled in by language packs',
     type: 'int',
-    min: 10,
+    min: 5,
     max: 300,
     step: 5,
     default: 100,

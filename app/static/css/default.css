@@ -537,6 +537,12 @@ a:active {
   margin: 2px;
 }
 
+#facsimile-panel div {
+  margin-left: 5px;
+  color: var(--dropdownBorderColor);
+  fill: var(--dropdownBorderColor);
+}
+
 #source-image-label {
   justify-content: center;
 }

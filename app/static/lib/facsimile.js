@@ -11,6 +11,7 @@ import { cm, fileLocationType, github, isCtrlOrCmd, meiFileLocation, translator,
 import { addZone, replaceInEditor } from './editor.js';
 import { attFacsimile } from './attribute-classes.js';
 import { defaultFacsimileRectangleColor, defaultFacsimileRectangleLineWidth, isFirefox } from './defaults.js';
+import { clock } from '../css/icons.js';
 
 var facs = {}; // facsimile structure in MEI file
 var sourceImages = {}; // object of source images
@@ -210,15 +211,38 @@ export async function drawFacsimile() {
       if (facsimilePanel.querySelector('#sourceImage-' + sourceImageNumber)) {
         console.log('Image svg already appended: sourceImage-' + sourceImageNumber);
       } else {
+        let imgName = createImageName(zoneId);
+
         // create new div and svg for source image
         let div = document.createElement('div');
-        let imageSvg = document.createElementNS(svgNameSpace, 'svg');
         div.id = 'sourceImage-' + sourceImageNumber;
-        imageSvg.setAttribute('data-sourceImageNumber', sourceImageNumber);
-        div.appendChild(imageSvg);
         facsimilePanel.appendChild(div);
 
-        let img = await getImageForZone(zoneId);
+        // create span for image number
+        let imageTitle = document.createElement('div');
+        // imageTitle.textContent = 'Image ' + (sourceImageNumber + 1) + ': ' + facs[surfaceId].target;
+        imageTitle.textContent = facs[surfaceId].target;
+        imageTitle.title = 'Image ' + (sourceImageNumber + 1) + ': ' + imgName;
+        imageTitle.style.fontSize = 35 * zoomFactor + 'px';
+        div.appendChild(imageTitle);
+
+        // create new svg for source image
+        let imageSvg = document.createElementNS(svgNameSpace, 'svg');
+        imageSvg.setAttribute('data-sourceImageNumber', sourceImageNumber);
+        div.appendChild(imageSvg);
+
+        // load clock icon while image is loading
+        let text = document.createElementNS(svgNameSpace, 'text');
+        text.setAttribute('font-size', '28px');
+        text.setAttribute('font-weight', 'bold');
+        text.setAttribute('text-anchor', 'middle');
+        text.setAttribute('x', '50%');
+        text.setAttribute('y', '50%');
+        text.textContent = 'Loading image...';
+        imageSvg.appendChild(text);
+
+        let img = await getImageForZone(imgName);
+        text.remove();
         console.log('Appending new source image ' + sourceImageNumber + ': ', img);
         imageSvg.appendChild(img);
 
@@ -229,6 +253,7 @@ export async function drawFacsimile() {
         if (surfaceWidth) imageSvg.setAttribute('data-width', surfaceWidth);
         if (surfaceHeight) imageSvg.setAttribute('data-height', surfaceHeight);
         // scale image to zoom factor
+        imageSvg.setAttribute('data-zoomFactor', zoomFactor);
         if (surfaceWidth) imageSvg.setAttribute('width', Math.round(surfaceWidth * zoomFactor));
         if (surfaceHeight) imageSvg.setAttribute('height', Math.round(surfaceHeight * zoomFactor));
 
@@ -422,11 +447,10 @@ function drawBoundingBox(zoneId, svg) {
 
 /**
  * Get image from source based on zone id
- * @param {string} zoneId
+ * @param {string} imgName
  * @returns
  */
-async function getImageForZone(zoneId) {
-  let imgName = createImageName(zoneId);
+async function getImageForZone(imgName) {
   let img;
   // retrieve image from object, if already there...
   if (sourceImages.hasOwnProperty(imgName)) {
@@ -554,6 +578,8 @@ export function zoomFacsimile(deltaPercent) {
     let height = parseFloat(svg.getAttribute('data-height'));
     svg.setAttribute('width', Math.round((width * facsimileZoomInput.value) / 100));
     svg.setAttribute('height', Math.round((height * facsimileZoomInput.value) / 100));
+    let imageTitle = si.querySelector('div');
+    imageTitle.style.fontSize = (35 * facsimileZoomInput.value) / 100 + 'px';
   });
 } // zoomFacsimile()
 
