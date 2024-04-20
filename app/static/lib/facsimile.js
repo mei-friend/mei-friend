@@ -11,7 +11,6 @@ import { cm, fileLocationType, github, isCtrlOrCmd, meiFileLocation, translator,
 import { addZone, replaceInEditor } from './editor.js';
 import { attFacsimile } from './attribute-classes.js';
 import { defaultFacsimileRectangleColor, defaultFacsimileRectangleLineWidth, isFirefox } from './defaults.js';
-import { clock } from '../css/icons.js';
 
 var facs = {}; // facsimile structure in MEI file
 var sourceImages = {}; // object of source images
@@ -162,6 +161,7 @@ export async function drawFacsimile() {
 
   // clear all svgs and sourceImageBoxes
   clearSourceImages();
+  sourceImageBoxes = {};
   // c.querySelectorAll(':not(image)').forEach((e) => c.removeChild(e));
   // Array.from(svg.children).forEach((c) => svg.removeChild(c));
 
@@ -231,11 +231,10 @@ export async function drawFacsimile() {
           sourceImageBoxes[sourceImageNumber].lrx = parseFloat(facs[zoneId].lrx) + rectangleLineWidth / 2;
         if (parseFloat(facs[zoneId].lry) > sourceImageBoxes[sourceImageNumber].lry)
           sourceImageBoxes[sourceImageNumber].lry = parseFloat(facs[zoneId].lry) + rectangleLineWidth / 2;
+        // console.log('Facsimile envelope: ulx/uly; lrx/lry: ' + sourceImageBoxes[sourceImageNumber]);
       }
 
-      if (facsimilePanel.querySelector('#sourceImage-' + sourceImageNumber)) {
-        console.log('Image svg already appended: sourceImage-' + sourceImageNumber);
-      } else {
+      if (!facsimilePanel.querySelector('#sourceImage-' + sourceImageNumber)) {
         let imgName = createImageName(zoneId);
 
         // create new div and svg for source image
@@ -310,129 +309,18 @@ export async function drawFacsimile() {
         let viewBox = [];
         viewBox.push(sourceImageBoxes[sourceImageNumber].ulx);
         viewBox.push(sourceImageBoxes[sourceImageNumber].uly);
-        viewBox.push(sourceImageBoxes[sourceImageNumber].lrx - sourceImageBoxes[sourceImageNumber].ulx);
-        viewBox.push(sourceImageBoxes[sourceImageNumber].lry - sourceImageBoxes[sourceImageNumber].uly);
+        let width = sourceImageBoxes[sourceImageNumber].lrx - sourceImageBoxes[sourceImageNumber].ulx;
+        let height = sourceImageBoxes[sourceImageNumber].lry - sourceImageBoxes[sourceImageNumber].uly;
+        viewBox.push(width);
+        viewBox.push(height);
         svg.setAttribute('viewBox', viewBox.join(' '));
+        console.log('sourceImageBoxes: ', sourceImageBoxes[sourceImageNumber]);
+        console.log('Facsimile viewBox: ' + viewBox.join(' '));
+
+        svg.setAttribute('width', Math.round(width * zoomFactor));
+        svg.removeAttribute('height');
       }
     }
-    // else {
-    //   showWarningText(translator.lang.facsimileImgeNotLoadedWarning.text + ' \n(' + imgName + ').');
-    //   busy(false);
-    //   return;
-    // }
-  }
-
-  busy(false);
-  return;
-
-  if (svgFacs && fullPage) {
-    let firstZone = svgFacs.at(0);
-    if (firstZone && firstZone.hasAttribute('data-facs')) {
-      zoneId = rmHash(firstZone.getAttribute('data-facs'));
-    }
-  } else {
-    svgFacs.forEach((f) => {
-      // go through displayed zones and find envelope
-      if (f.hasAttribute('data-facs')) zoneId = rmHash(f.getAttribute('data-facs'));
-      if (facs[zoneId]) {
-        if (parseFloat(facs[zoneId].ulx) < ulx) ulx = parseFloat(facs[zoneId].ulx) - rectangleLineWidth / 2;
-        if (parseFloat(facs[zoneId].uly) < uly) uly = parseFloat(facs[zoneId].uly) - rectangleLineWidth / 2;
-        if (parseFloat(facs[zoneId].lrx) > lrx) lrx = parseFloat(facs[zoneId].lrx) + rectangleLineWidth / 2;
-        if (parseFloat(facs[zoneId].lry) > lry) lry = parseFloat(facs[zoneId].lry) + rectangleLineWidth / 2;
-      }
-    });
-    console.log('Facsimile envelope: ulx/uly; lrx/lry: ' + ulx + '/' + uly + '; ' + lrx + '/' + lry);
-  }
-
-  // display surface graphic if no data-facs are found in SVG
-  if (!zoneId || !facs[zoneId]) {
-    let pb = getCurrentPbElement(v.xmlDoc); // id of current page beginning
-    if (!pb) {
-      showWarningText(translator.lang.facsimileNoSurfaceWarning.text);
-      busy(false);
-      return;
-    }
-    if (pb && pb.hasAttribute('facs')) {
-      zoneId = rmHash(pb.getAttribute('facs'));
-    }
-    if (zoneId && !fullPage) {
-      showWarningText(translator.lang.facsimileNoZonesFullPageWarning.text);
-      busy(false);
-      return;
-    }
-  }
-
-  // load image from source and draw image and zones
-  if (zoneId && facs[zoneId]) {
-    let img = await getImageForZone(zoneId);
-
-    // clear svg and append image
-    Array.from(svg.children).forEach((c) => svg.removeChild(c));
-    if (img) {
-      console.log('Appending child image:', img);
-      svg.appendChild(img);
-    } else {
-      showWarningText(translator.lang.facsimileImgeNotLoadedWarning.text + ' \n(' + imgName + ').');
-      busy(false);
-      return;
-    }
-
-    if (fullPage) {
-      let bb = img.getBBox();
-      console.debug('Facsimile img getBBox(): ', bb);
-      console.debug('Facsimile img getBoundingClientRect(): ', img.getBoundingClientRect());
-      ulx = 0;
-      uly = 0;
-      lrx = bb.width;
-      lry = bb.height;
-    } else if (facs && facs[zoneId] && facs[zoneId]['type'] === 'surface') {
-      showWarningText(translator.lang.facsimileNoZonesFullPageWarning.text);
-      busy(false);
-      return;
-    }
-
-    let width = lrx - ulx;
-    let height = lry - uly;
-    let zoomFactor = document.getElementById('facsimileZoomInput').value / 100;
-    svgContainer.setAttribute('transform-origin', 'left top');
-    svgContainer.setAttribute('transform', 'scale(' + zoomFactor + ')');
-    if (width > 0) svgContainer.setAttribute('width', width);
-    if (height > 0) svgContainer.setAttribute('height', height);
-    if (width > 0 && height > 0) {
-      svg.setAttribute('viewBox', ulx + ' ' + uly + ' ' + width + ' ' + height);
-    }
-
-    if (false) {
-      // show page name on svg
-      let lbl = document.getElementById('sourceImageSvgLabel');
-      if (!lbl) {
-        lbl = document.createElementNS(svgNameSpace, 'text');
-        lbl.setAttribute('id', 'sourceImageSvgLabel');
-      }
-      lbl.textContent = imgName.split('\\').pop().split('/').pop();
-      lbl.setAttribute('font-size', '28px');
-      lbl.setAttribute('font-weight', 'bold');
-      lbl.setAttribute('x', ulx + 7);
-      lbl.setAttribute('y', uly + 29);
-      svg.appendChild(lbl);
-    }
-
-    // go through displayed zones and draw bounding boxes with number-like label
-    if (document.getElementById('facsimileShowZonesCheckbox')?.checked) {
-      if (fullPage) {
-        for (let z in facs) {
-          if (facs[z]['target'] === facs[zoneId]['target']) drawBoundingBox(z);
-        }
-      } else {
-        svgFacs.forEach((m) => {
-          if (m.hasAttribute('data-facs')) zoneId = rmHash(m.getAttribute('data-facs'));
-          drawBoundingBox(zoneId);
-        });
-      }
-    }
-    // console.log('ulx/uly//lrx/lry;w/h: ' + ulx + '/' + uly + '; ' + lrx + '/' + lry + '; ' + width + '/' + height);
-  } else {
-    showWarningText(); // no facsimile content to show
   }
   busy(false);
 } // drawFacsimile()
@@ -622,10 +510,10 @@ export function zoomFacsimile(deltaPercent) {
   let sourceImages = document.querySelectorAll('[id^="sourceImage-"]');
   sourceImages.forEach((si) => {
     let svg = si.querySelector('svg');
-    let width = parseFloat(svg.getAttribute('data-width'));
-    let height = parseFloat(svg.getAttribute('data-height'));
-    svg.setAttribute('width', Math.round((width * facsimileZoomInput.value) / 100));
-    svg.setAttribute('height', Math.round((height * facsimileZoomInput.value) / 100));
+    let viewBox = svg.getAttribute('viewBox')?.split(' ');
+    if (!viewBox) return;
+    svg.setAttribute('width', Math.round((viewBox[2] * facsimileZoomInput.value) / 100));
+    svg.removeAttribute('height');
     let imageTitle = si.querySelector('div');
     imageTitle.style.fontSize = (35 * facsimileZoomInput.value) / 100 + 'px';
   });
