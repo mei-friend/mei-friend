@@ -162,9 +162,6 @@ export async function drawFacsimile() {
   let facsimileMessagePanel = document.getElementById('facsimileMessagePanel');
   facsimileMessagePanel.style.display = 'none';
   let facsimilePanel = document.getElementById('facsimile-panel');
-  // let svgContainer = document.getElementById('sourceImageContainer');
-  // let svg = document.getElementById('sourceImageSvg');
-  // if (!svg || !svgContainer) return;
 
   let zoomFactor = document.getElementById('facsimileZoomInput').value / 100;
 
@@ -192,8 +189,8 @@ export async function drawFacsimile() {
       sourceImageNumber = facs[surfaceId]['sourceImageNumber'];
     }
 
-    console.log('Facsimile zoneId: ' + zoneId + ' (' + f.id + ')' + ', type: ' + facs[zoneId]?.type);
-    console.log('          surfaceId: ' + surfaceId + ', sourceImageNumber: ' + sourceImageNumber);
+    // console.log('Facsimile zoneId: ' + zoneId + ' (' + f.id + ')' + ', type: ' + facs[zoneId]?.type);
+    // console.log('          surfaceId: ' + surfaceId + ', sourceImageNumber: ' + sourceImageNumber);
 
     if (sourceImageNumber >= 0) {
       // when not in full page mode, store envelope of source image per page
@@ -216,6 +213,7 @@ export async function drawFacsimile() {
         // let div = document.createElement('div');
         let imageSvg = document.createElementNS(svgNameSpace, 'svg');
         imageSvg.id = 'sourceImage-' + sourceImageNumber;
+        imageSvg.setAttribute('data-sourceImageNumber', sourceImageNumber);
         // div.appendChild(imageSvg);
         facsimilePanel.appendChild(imageSvg);
 
@@ -556,7 +554,10 @@ export function zoomFacsimile(deltaPercent) {
  * @param {rect} rect
  */
 export function highlightZone(rect) {
-  let svg = document.getElementById('sourceImageSvg');
+  let svg = rect.closest('svg');
+  // console.log('Highlighting zone: ', rect.id, svg);
+  if (!svg) return;
+
   // remove event listerners
   for (let key in listenerHandles) {
     if (key === 'mousedown') {
@@ -568,9 +569,11 @@ export function highlightZone(rect) {
       if (ip) ip.removeEventListener(key, listenerHandles[key]);
     }
   }
-  // add zone resizer for selected zone box (only when linked to zone
+  // add zone resizer for selected zone box (only when linked to zone,
   // rather than to pointing element, ie. measure)
-  if (document.getElementById('editFacsimileZones').checked) listenerHandles = addZoneResizer(v, rect);
+  if (document.getElementById('editFacsimileZones').checked) {
+    listenerHandles = addZoneResizer(v, rect);
+  }
 
   // highlight rectangle
   rect.classList.add('highlighted');
@@ -587,7 +590,9 @@ export function highlightZone(rect) {
 export function addZoneResizer(v, rect) {
   let txt, txtX, txtY; // text element for zone number and its x/y coordinates
   var ip = document.getElementById('facsimile-panel');
-  var svg = document.getElementById('sourceImageSvg');
+  var svg = rect.closest('svg');
+  // console.log('Adding zone resizer for: ', rect.id, svg);
+  if (!ip || !svg) return;
   var start = {}; // starting point start.x, start.y
   var end = {}; // ending point
   var bb;
@@ -667,6 +672,7 @@ export function addZoneResizer(v, rect) {
       end.x = ev.clientX;
       end.y = ev.clientY;
 
+      if (!svg) return;
       var mx = svg.getScreenCTM().inverse();
       let s = transformCTM(thisStart, mx);
       let e = transformCTM(end, mx);
@@ -739,6 +745,8 @@ export function addZoneResizer(v, rect) {
  */
 export function addZoneDrawer() {
   let ip = document.getElementById('facsimile-panel');
+  let svg;
+  let sourceImageNumber = -1;
   let start = {}; // starting point start.x, start.y
   let end = {}; // ending point
   let drawing = ''; // 'new' or ''
@@ -762,7 +770,10 @@ export function addZoneDrawer() {
       rect.setAttribute('stroke', rectangleColor);
       rect.setAttribute('stroke-width', rectangleLineWidth);
       rect.setAttribute('fill', 'none');
-      ev.target.appendChild(rect);
+      svg = ev.target.closest('svg');
+      if (!svg) return;
+      sourceImageNumber = parseInt(svg.getAttribute('data-sourceImageNumber'));
+      svg.appendChild(rect);
       drawing = 'new';
       console.log(
         'ZoneDrawer mouse down: ' +
@@ -775,10 +786,6 @@ export function addZoneDrawer() {
           ip.scrollLeft +
           '/' +
           ip.scrollTop +
-          ', ulx/uly: ' +
-          ulx +
-          '/' +
-          uly +
           ', start: ',
         start
       );
@@ -789,17 +796,26 @@ export function addZoneDrawer() {
     ev.preventDefault();
     if (document.getElementById('editFacsimileZones').checked && drawing === 'new') {
       let rect = document.getElementById('new-rect');
-      if (rect && !resize) {
+      if (rect && !resize && svg) {
         end.x = ev.clientX;
         end.y = ev.clientY;
-        var mx = ev.target.getScreenCTM().inverse();
+        var mx = svg.getScreenCTM().inverse();
         let s = transformCTM(start, mx);
         let e = transformCTM(end, mx);
         let c = adjustCoordinates(s.x, s.y, e.x - s.x, e.y - s.y);
         // see https://bugzilla.mozilla.org/show_bug.cgi?id=1610093 (checked 19 Feb 2024)
         // or: https://jsfiddle.net/edemaine/vLjd1pa7/6/ for a test
-        rect.setAttribute('x', isFirefox ? c.x + ulx : c.x); // global variable ulx (upper-left corner) only with Firefox
-        rect.setAttribute('y', isFirefox ? c.y + uly : c.y); // global variable uly (upper-left corner) only with Firefox
+        // global variable ulx (upper-left corner) only with Firefox
+        let ulx = 0;
+        let uly = 0;
+        // check whether sourceImageNumber is set
+        if (sourceImageBoxes.length > 0 && sourceImageBoxes[sourceImageNumber]) {
+          ulx = sourceImageBoxes[sourceImageNumber].ulx;
+          uly = sourceImageBoxes[sourceImageNumber].uly;
+        }
+        rect.setAttribute('x', isFirefox ? c.x + ulx : c.x);
+        // global variable uly (upper-left corner) only with Firefox
+        rect.setAttribute('y', isFirefox ? c.y + uly : c.y);
         rect.setAttribute('width', c.width);
         rect.setAttribute('height', c.height);
       }
