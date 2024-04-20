@@ -249,6 +249,12 @@ export async function drawFacsimile() {
         // set width, height, viewBox and transform for image
         let surfaceWidth = parseFloat(facs[surfaceId].width);
         let surfaceHeight = parseFloat(facs[surfaceId].height);
+
+        // get bounding box for image
+        let bb = img.getBBox();
+        if (!surfaceWidth) surfaceWidth = bb.width;
+        if (!surfaceHeight) surfaceHeight = bb.height;
+
         // store original width and height in data attributes
         if (surfaceWidth) imageSvg.setAttribute('data-width', surfaceWidth);
         if (surfaceHeight) imageSvg.setAttribute('data-height', surfaceHeight);
