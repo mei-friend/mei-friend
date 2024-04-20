@@ -162,8 +162,6 @@ export async function drawFacsimile() {
   // clear all svgs and sourceImageBoxes
   clearSourceImages();
   sourceImageBoxes = {};
-  // c.querySelectorAll(':not(image)').forEach((e) => c.removeChild(e));
-  // Array.from(svg.children).forEach((c) => svg.removeChild(c));
 
   // list displayed zones (filter doubled note elements in tab notation, see Verovio issue #3600)
   let svgFacs = Array.from(document.querySelectorAll('[data-facs]')).filter(
@@ -180,21 +178,16 @@ export async function drawFacsimile() {
     }
   }
 
-  // if no zones are found, warn if not in full-page mode
-  let hasZones = false;
-  svgFacs.forEach((f) => {
-    let facsAttribute = f.getAttribute('data-facs') || '';
-    if (facsAttribute && facs[rmHash(facsAttribute)].type === 'zone') {
-      hasZones = true;
-    }
-  });
-  if (!hasZones && !fullPage) {
-    let pb = getCurrentPbElement(v.xmlDoc); // id of current page beginning
-    let zoneId = '';
-    if (pb && pb.hasAttribute('facs')) {
-      zoneId = rmHash(pb.getAttribute('facs'));
-    }
-    if (zoneId) {
+  // warn, if no zones are found, when not in full-page mode
+  if (!fullPage) {
+    let hasZones = false;
+    svgFacs.forEach((f) => {
+      let facsAttribute = f.getAttribute('data-facs') || '';
+      if (facsAttribute && facs[rmHash(facsAttribute)].type === 'zone') {
+        hasZones = true;
+      }
+    });
+    if (!hasZones) {
       showWarningText(translator.lang.facsimileNoZonesFullPageWarning.text);
       busy(false);
       return;
@@ -507,15 +500,16 @@ export function zoomFacsimile(deltaPercent) {
   if (deltaPercent) facsZoom.value = facsimileZoomInput.value;
 
   // find all source images SVGs and adjust their scale
-  let sourceImages = document.querySelectorAll('[id^="sourceImage-"]');
-  sourceImages.forEach((si) => {
+  document.querySelectorAll('[id^="sourceImage-"]').forEach((si) => {
     let svg = si.querySelector('svg');
     let viewBox = svg.getAttribute('viewBox')?.split(' ');
     if (!viewBox) return;
-    svg.setAttribute('width', Math.round((viewBox[2] * facsimileZoomInput.value) / 100));
+    let zoomFactor = parseFloat(facsimileZoomInput.value / 100);
+    svg.setAttribute('width', Math.round(viewBox[2] * zoomFactor));
     svg.removeAttribute('height');
+    svg.setAttribute('data-zoomFactor', zoomFactor);
     let imageTitle = si.querySelector('div');
-    imageTitle.style.fontSize = (35 * facsimileZoomInput.value) / 100 + 'px';
+    imageTitle.style.fontSize = (30 * zoomFactor) + 'px';
   });
 } // zoomFacsimile()
 
