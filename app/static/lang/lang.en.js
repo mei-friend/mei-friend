@@ -789,6 +789,10 @@ export const lang = {
     text: 'Edit facsimile zones',
     description: 'Edit facsimile zones (will link bounding boxes to facsimile zones)',
   },
+  showFacsimileTitles: {
+    text: 'Show facsimile titles',
+    description: 'Show facsimile titles above source images',
+  },
 
   // Supplied element
   titleSupplied: {

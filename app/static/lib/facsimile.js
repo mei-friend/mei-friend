@@ -18,7 +18,7 @@ const rectangleLineWidth = defaultFacsimileRectangleLineWidth; // width of bound
 const rectangleColor = defaultFacsimileRectangleColor; // color of zone rectangles
 var listenerHandles = {};
 var resize = ''; // west, east, north, south, northwest, southeast etc
-var ulx, uly;
+var sourceImageBoxes = {}; // ulx, uly, lrx, lry of source image boxes per page
 
 /**
  * Show warning text to facsimile panel (as svg text element) and
@@ -27,15 +27,9 @@ var ulx, uly;
  * @returns void
  */
 function showWarningText(txt = translator.lang.facsimileDefaultWarning.text) {
-  let svgContainer = document.getElementById('sourceImageContainer');
-  let svg = document.getElementById('sourceImageSvg');
-  if (!svg || !svgContainer) return;
-
-  // clear existing structures
-  svgContainer.removeAttribute('transform-origin');
-  svgContainer.removeAttribute('transform');
-  svg.removeAttribute('viewBox');
-  svg.innerHTML = '';
+  // let svgContainer = document.getElementById('sourceImageContainer');
+  // let svg = document.getElementById('sourceImageSvg');
+  // if (!svg || !svgContainer) return;
 
   let facsimileMessagePanel = document.getElementById('facsimileMessagePanel');
   facsimileMessagePanel.style.display = 'block';
@@ -67,58 +61,71 @@ export function clearFacsimile() {
  * each containing own coordinates (ulx, uly, lrx, lry)
  * and containing surface info (target, width, height)
  * @param {Document} xmlDoc
- * Modifies global variable facs
+ *
+ * Note:
+ * 1) Clears and creates global variable facs.
+ * 2) Loads only first facsimile element in xmlDoc.
  */
 export function loadFacsimile(xmlDoc) {
   let facsimile = xmlDoc.querySelector('facsimile');
-  if (facsimile) {
-    facs = {};
-    // look for surface elements
-    let surfaces = facsimile.querySelectorAll('surface');
-    surfaces.forEach((s) => {
-      let id;
-      let { target, width, height } = fillGraphic(s.querySelector('graphic'));
-      if (s.hasAttribute('xml:id')) id = s.getAttribute('xml:id');
-      if (id) {
-        facs[id] = {};
-        if (target) facs[id]['target'] = target;
-        if (width) facs[id]['width'] = width;
-        if (height) facs[id]['height'] = height;
-        facs[id]['type'] = 'surface';
-      }
-    });
-    // look for zone elements
-    let zones = facsimile.querySelectorAll('zone');
-    console.debug('facsimile.loadFacsimile(): loading ' + zones.length + ' zones.');
-    zones.forEach((z) => {
-      let id, ulx, uly, lrx, lry;
-      if (z.hasAttribute('xml:id')) id = z.getAttribute('xml:id');
-      if (z.hasAttribute('ulx')) ulx = z.getAttribute('ulx');
-      if (z.hasAttribute('uly')) uly = z.getAttribute('uly');
-      if (z.hasAttribute('lrx')) lrx = z.getAttribute('lrx');
-      if (z.hasAttribute('lry')) lry = z.getAttribute('lry');
-      let { target, width, height } = fillGraphic(z.parentElement.querySelector('graphic'));
-      if (id) {
-        facs[id] = {};
-        facs[id]['type'] = 'zone';
-        if (target) facs[id]['target'] = target;
-        if (width) facs[id]['width'] = width;
-        if (height) facs[id]['height'] = height;
-        if (ulx) facs[id]['ulx'] = ulx;
-        if (uly) facs[id]['uly'] = uly;
-        if (lrx) facs[id]['lrx'] = lrx;
-        if (lry) facs[id]['lry'] = lry;
-        let measure = xmlDoc.querySelector('[facs="#' + id + '"]');
-        if (measure) {
-          if (measure.hasAttribute('xml:id')) facs[id]['pointerId'] = measure.getAttribute('xml:id');
-          if (measure.hasAttribute('n')) facs[id]['pointerN'] = measure.getAttribute('n');
+  if (!facsimile) {
+    console.info('facsimile.loadFacsimile(): No facsimile element found.');
+    return;
+  }
+  facs = {};
+
+  // look for surface elements
+  let surfaces = facsimile.querySelectorAll('surface');
+  surfaces.forEach((s, i) => {
+    let id;
+    let { target, width, height } = fillGraphic(s.querySelector('graphic'));
+    if (s.hasAttribute('xml:id')) id = s.getAttribute('xml:id');
+    if (id) {
+      facs[id] = {};
+      if (target) facs[id]['target'] = target;
+      if (width) facs[id]['width'] = width;
+      if (height) facs[id]['height'] = height;
+      facs[id]['type'] = 'surface';
+      facs[id]['sourceImageNumber'] = i; // store number of image page
+      facs['sourceImage-' + i] = id;
+      facs[id]['surfaceId'] = id;
+    }
+  });
+
+  // look for zone elements
+  let zones = facsimile.querySelectorAll('zone');
+  console.debug('facsimile.loadFacsimile(): loading ' + zones.length + ' zones.');
+  zones.forEach((z) => {
+    let id, ulx, uly, lrx, lry;
+    if (z.hasAttribute('xml:id')) id = z.getAttribute('xml:id');
+    if (z.hasAttribute('ulx')) ulx = z.getAttribute('ulx');
+    if (z.hasAttribute('uly')) uly = z.getAttribute('uly');
+    if (z.hasAttribute('lrx')) lrx = z.getAttribute('lrx');
+    if (z.hasAttribute('lry')) lry = z.getAttribute('lry');
+    let parentId = z.parentElement.getAttribute('xml:id');
+    let { target, width, height } = fillGraphic(z.parentElement.querySelector('graphic'));
+    if (id) {
+      facs[id] = {};
+      facs[id]['type'] = 'zone';
+      if (target) facs[id]['target'] = target;
+      if (width) facs[id]['width'] = width;
+      if (height) facs[id]['height'] = height;
+      if (ulx) facs[id]['ulx'] = ulx;
+      if (uly) facs[id]['uly'] = uly;
+      if (lrx) facs[id]['lrx'] = lrx;
+      if (lry) facs[id]['lry'] = lry;
+      if (parentId) facs[id]['surfaceId'] = parentId;
+      let pointingElement = xmlDoc.querySelector('[facs="#' + id + '"]');
+      if (pointingElement) {
+        if (pointingElement.hasAttribute('xml:id')) {
+          facs[id]['pointerId'] = pointingElement.getAttribute('xml:id');
+        }
+        if (pointingElement.hasAttribute('n')) {
+          facs[id]['pointerN'] = pointingElement.getAttribute('n');
         }
       }
-    });
-    // oldFacsimile = facsimile;
-  } else {
-    console.debug('facsimile.loadFacsimile(): skip loading because facsimile the same.');
-  }
+    }
+  });
 
   /**
    * Local function to handle main attributes of graphic element.
@@ -148,162 +155,167 @@ export async function drawFacsimile() {
   let fullPage = document.getElementById('showFacsimileFullPage').checked;
   let facsimileMessagePanel = document.getElementById('facsimileMessagePanel');
   facsimileMessagePanel.style.display = 'none';
-  let svgContainer = document.getElementById('sourceImageContainer');
-  let svg = document.getElementById('sourceImageSvg');
-  if (!svg || !svgContainer) return;
-  ulx = Number.MAX_VALUE; // boundary values for image envelope (left-upper corner is global)
-  uly = Number.MAX_VALUE;
-  let lrx = 0;
-  let lry = 0;
-  let zoneId = '';
+  let facsimilePanel = document.getElementById('facsimile-panel');
+
+  let zoomFactor = document.getElementById('facsimileZoomInput').value / 100;
+
+  // clear all svgs and sourceImageBoxes
+  clearSourceImages();
+  sourceImageBoxes = {};
+
   // list displayed zones (filter doubled note elements in tab notation, see Verovio issue #3600)
   let svgFacs = Array.from(document.querySelectorAll('[data-facs]')).filter(
     (x) => !x.parentElement.classList.contains('note')
   );
 
-  if (svgFacs && fullPage) {
-    let firstZone = svgFacs.at(0);
-    if (firstZone && firstZone.hasAttribute('data-facs')) zoneId = rmHash(firstZone.getAttribute('data-facs'));
-  } else {
-    svgFacs.forEach((f) => {
-      // go through displayed zones and find envelope
-      if (f.hasAttribute('data-facs')) zoneId = rmHash(f.getAttribute('data-facs'));
-      if (facs[zoneId]) {
-        if (parseFloat(facs[zoneId].ulx) < ulx) ulx = parseFloat(facs[zoneId].ulx) - rectangleLineWidth / 2;
-        if (parseFloat(facs[zoneId].uly) < uly) uly = parseFloat(facs[zoneId].uly) - rectangleLineWidth / 2;
-        if (parseFloat(facs[zoneId].lrx) > lrx) lrx = parseFloat(facs[zoneId].lrx) + rectangleLineWidth / 2;
-        if (parseFloat(facs[zoneId].lry) > lry) lry = parseFloat(facs[zoneId].lry) + rectangleLineWidth / 2;
-      }
-    });
-    console.log('Facsimile envelope: ulx/uly; lrx/lry: ' + ulx + '/' + uly + '; ' + lrx + '/' + lry);
-  }
-  // display surface graphic if no data-facs are found in SVG
-  if (!zoneId || !facs[zoneId]) {
+  // warn, if no @facs attributes are found in the current notation SVG,
+  if (svgFacs.length === 0) {
     let pb = getCurrentPbElement(v.xmlDoc); // id of current page beginning
     if (!pb) {
       showWarningText(translator.lang.facsimileNoSurfaceWarning.text);
       busy(false);
       return;
     }
-    if (pb && pb.hasAttribute('facs')) {
-      zoneId = rmHash(pb.getAttribute('facs'));
-    }
-    if (zoneId && !fullPage) {
+  }
+
+  // warn, if no zones are found, when not in full-page mode
+  if (!fullPage) {
+    let hasZones = false;
+    svgFacs.forEach((f) => {
+      let facsAttribute = f.getAttribute('data-facs') || '';
+      if (facsAttribute && facs[rmHash(facsAttribute)].type === 'zone') {
+        hasZones = true;
+      }
+    });
+    if (!hasZones) {
       showWarningText(translator.lang.facsimileNoZonesFullPageWarning.text);
       busy(false);
       return;
     }
   }
-  if (zoneId && facs[zoneId]) {
-    // find the correct path of the image file
-    let img;
-    let imgName = facs[zoneId].target;
-    if (!imgName.startsWith('http')) {
-      // relative file paths in surface@target
-      if (fileLocationType === 'github') {
-        let url = new URL(
-          'https://raw.githubusercontent.com/' +
-            github.githubRepo +
-            '/' +
-            github.branch +
-            github.filepath.substring(0, github.filepath.lastIndexOf('/')) +
-            '/' +
-            facs[zoneId].target
-        );
-        imgName = url.href;
-      } else if (fileLocationType === 'url') {
-        let url = new URL(meiFileLocation);
-        imgName = url.origin + url.pathname.substring(0, url.pathname.lastIndexOf('/') + 1) + imgName;
-      } else {
-        imgName = `${root}local/` + facs[zoneId].target;
-        imgName = imgName.replace('.tif', '.jpg'); // hack for some DIME files...
+
+  // iterate over svgFacs (svg group elements with data-facs attributes) and retrieve zoneId
+  for (let f of svgFacs) {
+    let zoneId = '';
+    if (f.hasAttribute('data-facs')) {
+      zoneId = rmHash(f.getAttribute('data-facs'));
+    }
+
+    // retrieve source image number from surface/zone element
+    let sourceImageNumber = -1;
+    let surfaceId = facs[zoneId].surfaceId;
+    if (surfaceId && facs[surfaceId]) {
+      sourceImageNumber = facs[surfaceId]['sourceImageNumber'];
+    }
+
+    // console.log('Facsimile zoneId: ' + zoneId + ' (' + f.id + ')' + ', type: ' + facs[zoneId]?.type);
+    // console.log('          surfaceId: ' + surfaceId + ', sourceImageNumber: ' + sourceImageNumber);
+
+    if (sourceImageNumber >= 0) {
+      // when not in full page mode, store envelope of source image per page
+      if (!fullPage) {
+        if (!sourceImageBoxes[sourceImageNumber])
+          sourceImageBoxes[sourceImageNumber] = { ulx: Number.MAX_VALUE, uly: Number.MAX_VALUE, lrx: 0, lry: 0 };
+        if (parseFloat(facs[zoneId].ulx) < sourceImageBoxes[sourceImageNumber].ulx)
+          sourceImageBoxes[sourceImageNumber].ulx = parseFloat(facs[zoneId].ulx) - rectangleLineWidth / 2;
+        if (parseFloat(facs[zoneId].uly) < sourceImageBoxes[sourceImageNumber].uly)
+          sourceImageBoxes[sourceImageNumber].uly = parseFloat(facs[zoneId].uly) - rectangleLineWidth / 2;
+        if (parseFloat(facs[zoneId].lrx) > sourceImageBoxes[sourceImageNumber].lrx)
+          sourceImageBoxes[sourceImageNumber].lrx = parseFloat(facs[zoneId].lrx) + rectangleLineWidth / 2;
+        if (parseFloat(facs[zoneId].lry) > sourceImageBoxes[sourceImageNumber].lry)
+          sourceImageBoxes[sourceImageNumber].lry = parseFloat(facs[zoneId].lry) + rectangleLineWidth / 2;
+        // console.log('Facsimile envelope: ulx/uly; lrx/lry: ' + sourceImageBoxes[sourceImageNumber]);
       }
-    } else if (imgName.startsWith('https://raw.githubusercontent.com/') && github && github.githubToken && github.branch && github.filepath) {
-      // absolute file paths for GitHub
-      let url = new URL(
-        'https://raw.githubusercontent.com/' + github.githubRepo + '/' + github.branch + github.filepath
-      );
-      imgName = url.href;
-    }
 
-    // retrieve image from object, if already there...
-    if (sourceImages.hasOwnProperty(imgName)) {
-      console.log('Using existing image from ' + imgName);
-      img = sourceImages[imgName];
-      // or load it freshly from source, if not
-    } else {
-      console.log('Loading image from ' + imgName);
-      img = await loadImage(imgName);
-      sourceImages[imgName] = img;
-    }
+      if (!facsimilePanel.querySelector('#sourceImage-' + sourceImageNumber)) {
+        let imgName = createImageName(zoneId);
 
-    //
-    Array.from(svg.children).forEach((c) => svg.removeChild(c));
-    if (img) {
-      console.log('Appending child image:', img);
-      svg.appendChild(img);
-    } else {
-      showWarningText(translator.lang.facsimileImgeNotLoadedWarning.text + ' \n(' + imgName + ').');
-      busy(false);
-      return;
-    }
+        // create new div and svg for source image
+        let div = document.createElement('div');
+        div.id = 'sourceImage-' + sourceImageNumber;
+        facsimilePanel.appendChild(div);
 
-    if (fullPage) {
-      console.debug('Facsimile img getBBox(): ', img.getBBox());
-      console.debug('Facsimile img getBoundingClientRect(): ', img.getBoundingClientRect());
-      let bb = img.getBBox();
-      ulx = 0;
-      uly = 0;
-      lrx = bb.width;
-      lry = bb.height;
-    } else if (facs && facs[zoneId] && facs[zoneId]['type'] === 'surface') {
-      showWarningText(translator.lang.facsimileNoZonesFullPageWarning.text);
-      busy(false);
-      return;
-    }
-
-    let width = lrx - ulx;
-    let height = lry - uly;
-    let zoomFactor = document.getElementById('facsimileZoomInput').value / 100;
-    svgContainer.setAttribute('transform-origin', 'left top');
-    svgContainer.setAttribute('transform', 'scale(' + zoomFactor + ')');
-    if (width > 0) svgContainer.setAttribute('width', width);
-    if (height > 0) svgContainer.setAttribute('height', height);
-    if (width > 0 && height > 0) {
-      svg.setAttribute('viewBox', ulx + ' ' + uly + ' ' + width + ' ' + height);
-    }
-
-    if (false) {
-      // show page name on svg
-      let lbl = document.getElementById('sourceImageSvgLabel');
-      if (!lbl) {
-        lbl = document.createElementNS(svgNameSpace, 'text');
-        lbl.setAttribute('id', 'sourceImageSvgLabel');
-      }
-      lbl.textContent = imgName.split('\\').pop().split('/').pop();
-      lbl.setAttribute('font-size', '28px');
-      lbl.setAttribute('font-weight', 'bold');
-      lbl.setAttribute('x', ulx + 7);
-      lbl.setAttribute('y', uly + 29);
-      svg.appendChild(lbl);
-    }
-
-    // go through displayed zones and draw bounding boxes with number-like label
-    if (document.getElementById('facsimileShowZonesCheckbox')?.checked) {
-      if (fullPage) {
-        for (let z in facs) {
-          if (facs[z]['target'] === facs[zoneId]['target']) drawBoundingBox(z);
+        // create span for image number
+        if (document.getElementById('showFacsimileTitles')?.checked) {
+          let imageTitle = document.createElement('div');
+          // imageTitle.textContent = 'Image ' + (sourceImageNumber + 1) + ': ' + facs[surfaceId].target;
+          imageTitle.textContent = facs[surfaceId].target;
+          imageTitle.title = 'Image ' + (sourceImageNumber + 1) + ': ' + imgName;
+          imageTitle.style.fontSize = scaleTitleFonzSize(zoomFactor);
+          div.appendChild(imageTitle);
         }
-      } else {
-        svgFacs.forEach((m) => {
-          if (m.hasAttribute('data-facs')) zoneId = rmHash(m.getAttribute('data-facs'));
-          drawBoundingBox(zoneId);
-        });
+
+        // create new svg for source image
+        let imageSvg = document.createElementNS(svgNameSpace, 'svg');
+        imageSvg.setAttribute('data-sourceImageNumber', sourceImageNumber);
+        div.appendChild(imageSvg);
+
+        // load clock icon while image is loading
+        let text = document.createElementNS(svgNameSpace, 'text');
+        text.setAttribute('font-size', '28px');
+        text.setAttribute('font-weight', 'bold');
+        text.setAttribute('text-anchor', 'middle');
+        text.setAttribute('x', '50%');
+        text.setAttribute('y', '20%');
+        text.textContent = 'Loading image...';
+        imageSvg.appendChild(text);
+
+        // load image from source and draw image and zones
+        let img = await getImageForZone(imgName);
+        if (img) {
+          text.remove();
+          console.log('Appending new source image ' + sourceImageNumber + ': ', img);
+          imageSvg.appendChild(img);
+        } else {
+          text.textContent = translator.lang.facsimileImgeNotLoadedWarning.text;
+          continue;
+        }
+        // set width, height, viewBox and transform for image
+        let surfaceWidth = parseFloat(facs[surfaceId].width);
+        let surfaceHeight = parseFloat(facs[surfaceId].height);
+
+        // get bounding box for image
+        let bb = img.getBBox();
+        if (!surfaceWidth) surfaceWidth = bb.width;
+        if (!surfaceHeight) surfaceHeight = bb.height;
+
+        // store original width and height in data attributes
+        if (surfaceWidth) imageSvg.setAttribute('data-width', surfaceWidth);
+        if (surfaceHeight) imageSvg.setAttribute('data-height', surfaceHeight);
+        // scale image to zoom factor
+        imageSvg.setAttribute('data-zoomFactor', zoomFactor);
+        if (surfaceWidth) imageSvg.setAttribute('width', Math.round(surfaceWidth * zoomFactor));
+        if (surfaceHeight) imageSvg.setAttribute('height', Math.round(surfaceHeight * zoomFactor));
+
+        if (fullPage) {
+          imageSvg.setAttribute('viewBox', '0 0 ' + surfaceWidth + ' ' + surfaceHeight);
+        }
+      }
+
+      let svg = document.getElementById('sourceImage-' + sourceImageNumber).querySelector('svg');
+
+      // draw bounding box for zone, if checkbox is checked
+      if (svg && document.getElementById('facsimileShowZonesCheckbox')?.checked && facs[zoneId].type === 'zone') {
+        drawBoundingBox(zoneId, svg);
+      }
+
+      // set viewBox when not in full page mode
+      if (svg && !fullPage) {
+        let viewBox = [];
+        viewBox.push(sourceImageBoxes[sourceImageNumber].ulx);
+        viewBox.push(sourceImageBoxes[sourceImageNumber].uly);
+        let width = sourceImageBoxes[sourceImageNumber].lrx - sourceImageBoxes[sourceImageNumber].ulx;
+        let height = sourceImageBoxes[sourceImageNumber].lry - sourceImageBoxes[sourceImageNumber].uly;
+        viewBox.push(width);
+        viewBox.push(height);
+        svg.setAttribute('viewBox', viewBox.join(' '));
+        console.log('sourceImageBoxes: ', sourceImageBoxes[sourceImageNumber]);
+        console.log('Facsimile viewBox: ' + viewBox.join(' '));
+
+        svg.setAttribute('width', Math.round(width * zoomFactor));
+        svg.removeAttribute('height');
       }
     }
-    // console.log('ulx/uly//lrx/lry;w/h: ' + ulx + '/' + uly + '; ' + lrx + '/' + lry + '; ' + width + '/' + height);
-  } else {
-    showWarningText(); // no facsimile content to show
   }
   busy(false);
 } // drawFacsimile()
@@ -311,26 +323,33 @@ export async function drawFacsimile() {
 /**
  * Draws the bounding box for the zone with zoneId, using global object facs
  * @param {string} zoneId
+ * @param {SVGElement} svg
  */
-function drawBoundingBox(zoneId) {
+function drawBoundingBox(zoneId, svg) {
   if (facs[zoneId]) {
-    let svg = document.getElementById('sourceImageSvg');
+    let editFacsimileZones = document.getElementById('editFacsimileZones').checked;
+    let pointerId = facs[zoneId]['pointerId']; // id of pointing element (e.g., measure)
+    let rectId = editFacsimileZones ? zoneId : pointerId;
+
+    // remove any already existing rectangle with the same id
+    svg.querySelectorAll('#' + rectId).forEach((r) => r.remove());
+
+    // draw new rectangle
     let rect = document.createElementNS(svgNameSpace, 'rect');
     svg.appendChild(rect);
     rect.setAttribute('rx', rectangleLineWidth / 2);
     rect.setAttribute('ry', rectangleLineWidth / 2);
     rect.addEventListener('click', (e) => v.handleClickOnNotation(e, cm));
-    let editFacsimileZones = document.getElementById('editFacsimileZones').checked;
     let x = parseFloat(facs[zoneId].ulx);
     let y = parseFloat(facs[zoneId].uly);
     let width = parseFloat(facs[zoneId].lrx) - x;
     let height = parseFloat(facs[zoneId].lry) - y;
     updateRect(rect, x, y, width, height, rectangleColor, rectangleLineWidth, 'none');
-    let pointerId = facs[zoneId]['pointerId']; // id of pointing element (e.g., measure)
-    if (pointerId) rect.id = editFacsimileZones ? zoneId : pointerId;
+    if (pointerId) rect.id = rectId;
+
+    // draw number-like info from element (e.g., measure)
     let pointerN = facs[zoneId]['pointerN']; // number-like
     if (pointerN) {
-      // draw number-like info from element (e.g., measure)
       let txt = document.createElementNS(svgNameSpace, 'text');
       svg.appendChild(txt);
       txt.setAttribute('font-size', '28px');
@@ -340,10 +359,72 @@ function drawBoundingBox(zoneId) {
       txt.setAttribute('y', y + 29);
       txt.addEventListener('click', (e) => v.handleClickOnNotation(e, cm));
       txt.textContent = pointerN;
-      if (pointerId) txt.id = editFacsimileZones ? zoneId : pointerId;
+      if (pointerId) txt.id = rectId;
     }
   }
 } // drawBoundingBox()
+
+/**
+ * Get image from source based on zone id
+ * @param {string} imgName
+ * @returns
+ */
+async function getImageForZone(imgName) {
+  let img;
+  // retrieve image from object, if already there...
+  if (sourceImages.hasOwnProperty(imgName)) {
+    console.log('Using existing image from ' + imgName);
+    img = sourceImages[imgName];
+    // or load it freshly from source, if not
+  } else {
+    console.log('Loading image from ' + imgName);
+    img = await loadImage(imgName);
+    sourceImages[imgName] = img;
+  }
+  return img;
+} // getImageForZone()
+
+/**
+ * Figure out the complete path of the image file from the zone id string
+ * @param {string} zoneId
+ * @returns
+ */
+function createImageName(zoneId) {
+  // find the correct path of the image file
+  let imgName = facs[zoneId].target;
+  if (!imgName.startsWith('http')) {
+    // relative file paths in surface@target
+    if (fileLocationType === 'github') {
+      let url = new URL(
+        'https://raw.githubusercontent.com/' +
+          github.githubRepo +
+          '/' +
+          github.branch +
+          github.filepath.substring(0, github.filepath.lastIndexOf('/')) +
+          '/' +
+          facs[zoneId].target
+      );
+      imgName = url.href;
+    } else if (fileLocationType === 'url') {
+      let url = new URL(meiFileLocation);
+      imgName = url.origin + url.pathname.substring(0, url.pathname.lastIndexOf('/') + 1) + imgName;
+    } else {
+      imgName = `${root}local/` + facs[zoneId].target;
+      imgName = imgName.replace('.tif', '.jpg'); // hack for some DIME files...
+    }
+  } else if (
+    imgName.startsWith('https://raw.githubusercontent.com/') &&
+    github &&
+    github.githubToken &&
+    github.branch &&
+    github.filepath
+  ) {
+    // absolute file paths for GitHub
+    let url = new URL('https://raw.githubusercontent.com/' + github.githubRepo + '/' + github.branch + github.filepath);
+    imgName = url.href;
+  }
+  return imgName;
+} // createImageName()
 
 /**
  * Load asynchronously the image from url and returns a promise
@@ -390,6 +471,18 @@ async function embedImage(url) {
 } // embedImage()
 
 /**
+ * Clear all source image divs and svgs
+ */
+function clearSourceImages() {
+  let facsimilePanel = document.getElementById('facsimile-panel');
+  if (facsimilePanel) {
+    facsimilePanel.querySelectorAll('[*|id^="sourceImage-"]').forEach((c) => {
+      c.remove();
+    });
+  }
+}
+
+/**
  * Zooms the facsimile surface image in the sourceImageContainer svg.
  * @param {float} deltaPercent
  */
@@ -407,9 +500,33 @@ export function zoomFacsimile(deltaPercent) {
   let facsZoom = document.getElementById('facsimileZoom'); // facsimile panel
   if (!facsZoom) return;
   if (deltaPercent) facsZoom.value = facsimileZoomInput.value;
-  let svgContainer = document.getElementById('sourceImageContainer');
-  if (svgContainer) svgContainer.setAttribute('transform', 'scale(' + facsimileZoomInput.value / 100 + ')');
+
+  // find all source images SVGs and adjust their scale
+  document.querySelectorAll('[id^="sourceImage-"]').forEach((si) => {
+    let svg = si.querySelector('svg');
+    let viewBox = svg.getAttribute('viewBox')?.split(' ');
+    if (!viewBox) return;
+    let zoomFactor = parseFloat(facsimileZoomInput.value / 100);
+    svg.setAttribute('width', Math.round(viewBox[2] * zoomFactor));
+    svg.removeAttribute('height');
+    svg.setAttribute('data-zoomFactor', zoomFactor);
+    let imageTitle = si.querySelector('div');
+    if (imageTitle) imageTitle.style.fontSize = scaleTitleFonzSize(zoomFactor);
+  });
 } // zoomFacsimile()
+
+/**
+ * Scale the title font size according to the zoom factor,
+ * with a minimum of 3pt and a maximum of 16pt
+ * @param {Number} zoomFactor
+ * @returns {String} font size in pt
+ */
+function scaleTitleFonzSize(zoomFactor) {
+  let minFontSize = 3; // pt
+  let maxFontSize = 16; // pt
+  let fontSize = Math.max(minFontSize, Math.min(maxFontSize, 22 * zoomFactor));
+  return Math.round(fontSize * 10) / 10 + 'pt';
+}
 
 /**
  * Remove all eventlisteners from zones, highlight the one rect,
@@ -417,7 +534,10 @@ export function zoomFacsimile(deltaPercent) {
  * @param {rect} rect
  */
 export function highlightZone(rect) {
-  let svg = document.getElementById('sourceImageSvg');
+  let svg = rect.closest('svg');
+  // console.log('Highlighting zone: ', rect.id, svg);
+  if (!svg) return;
+
   // remove event listerners
   for (let key in listenerHandles) {
     if (key === 'mousedown') {
@@ -429,9 +549,11 @@ export function highlightZone(rect) {
       if (ip) ip.removeEventListener(key, listenerHandles[key]);
     }
   }
-  // add zone resizer for selected zone box (only when linked to zone
+  // add zone resizer for selected zone box (only when linked to zone,
   // rather than to pointing element, ie. measure)
-  if (document.getElementById('editFacsimileZones').checked) listenerHandles = addZoneResizer(v, rect);
+  if (document.getElementById('editFacsimileZones').checked) {
+    listenerHandles = addZoneResizer(v, rect);
+  }
 
   // highlight rectangle
   rect.classList.add('highlighted');
@@ -448,7 +570,9 @@ export function highlightZone(rect) {
 export function addZoneResizer(v, rect) {
   let txt, txtX, txtY; // text element for zone number and its x/y coordinates
   var ip = document.getElementById('facsimile-panel');
-  var svg = document.getElementById('sourceImageSvg');
+  var svg = rect.closest('svg');
+  // console.log('Adding zone resizer for: ', rect.id, svg);
+  if (!ip || !svg) return;
   var start = {}; // starting point start.x, start.y
   var end = {}; // ending point
   var bb;
@@ -528,6 +652,7 @@ export function addZoneResizer(v, rect) {
       end.x = ev.clientX;
       end.y = ev.clientY;
 
+      if (!svg) return;
       var mx = svg.getScreenCTM().inverse();
       let s = transformCTM(thisStart, mx);
       let e = transformCTM(end, mx);
@@ -600,15 +725,16 @@ export function addZoneResizer(v, rect) {
  */
 export function addZoneDrawer() {
   let ip = document.getElementById('facsimile-panel');
-  let svg = document.getElementById('sourceImageSvg');
+  let svg;
+  let sourceImageNumber = -1;
   let start = {}; // starting point start.x, start.y
   let end = {}; // ending point
   let drawing = ''; // 'new' or ''
   let minSize = 20; // px, minimum width and height for a zone
 
-  svg.addEventListener('mousedown', mouseDown);
-  svg.addEventListener('mousemove', mouseMove);
-  svg.addEventListener('mouseup', mouseUp);
+  ip.addEventListener('mousedown', mouseDown);
+  ip.addEventListener('mousemove', mouseMove);
+  ip.addEventListener('mouseup', mouseUp);
 
   function mouseDown(ev) {
     ev.preventDefault();
@@ -624,6 +750,9 @@ export function addZoneDrawer() {
       rect.setAttribute('stroke', rectangleColor);
       rect.setAttribute('stroke-width', rectangleLineWidth);
       rect.setAttribute('fill', 'none');
+      svg = ev.target.closest('svg');
+      if (!svg) return;
+      sourceImageNumber = parseInt(svg.getAttribute('data-sourceImageNumber'));
       svg.appendChild(rect);
       drawing = 'new';
       console.log(
@@ -637,10 +766,6 @@ export function addZoneDrawer() {
           ip.scrollLeft +
           '/' +
           ip.scrollTop +
-          ', ulx/uly: ' +
-          ulx +
-          '/' +
-          uly +
           ', start: ',
         start
       );
@@ -651,7 +776,7 @@ export function addZoneDrawer() {
     ev.preventDefault();
     if (document.getElementById('editFacsimileZones').checked && drawing === 'new') {
       let rect = document.getElementById('new-rect');
-      if (rect && !resize) {
+      if (rect && !resize && svg) {
         end.x = ev.clientX;
         end.y = ev.clientY;
         var mx = svg.getScreenCTM().inverse();
@@ -660,8 +785,17 @@ export function addZoneDrawer() {
         let c = adjustCoordinates(s.x, s.y, e.x - s.x, e.y - s.y);
         // see https://bugzilla.mozilla.org/show_bug.cgi?id=1610093 (checked 19 Feb 2024)
         // or: https://jsfiddle.net/edemaine/vLjd1pa7/6/ for a test
-        rect.setAttribute('x', isFirefox ? c.x + ulx : c.x); // global variable ulx (upper-left corner) only with Firefox
-        rect.setAttribute('y', isFirefox ? c.y + uly : c.y); // global variable uly (upper-left corner) only with Firefox
+        // global variable ulx (upper-left corner) only with Firefox
+        let ulx = 0;
+        let uly = 0;
+        // check whether sourceImageNumber is set
+        if (sourceImageBoxes.length > 0 && sourceImageBoxes[sourceImageNumber]) {
+          ulx = sourceImageBoxes[sourceImageNumber].ulx;
+          uly = sourceImageBoxes[sourceImageNumber].uly;
+        }
+        rect.setAttribute('x', isFirefox ? c.x + ulx : c.x);
+        // global variable uly (upper-left corner) only with Firefox
+        rect.setAttribute('y', isFirefox ? c.y + uly : c.y);
         rect.setAttribute('width', c.width);
         rect.setAttribute('height', c.height);
       }

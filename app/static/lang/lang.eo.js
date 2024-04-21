@@ -777,6 +777,10 @@ export const lang = {
     text: 'Redakti zonojn de facsimilo',
     description: 'Redakti limzonojn de facsimila bildo (ligos limzonojn al facsimilaj zonoj)',
   },
+  showFacsimileTitles: {
+    text: 'Montri faksimilajn titolojn',
+    description: 'Montri faksimilajn titolojn super la faksimila bildoj',
+  },
 
   // Redakciado
   titleSupplied: {

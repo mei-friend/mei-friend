@@ -653,7 +653,7 @@ export default class Viewer {
         if (el) {
           el.forEach((e) => {
             // console.log('updatehighlight() e: ', e);
-            if (e.nodeName === 'rect' && e.closest('#sourceImageSvg')) {
+            if (e.nodeName === 'rect' && e.closest('#facsimile-panel')) {
               facs.highlightZone(e);
             } else if (e.hasAttribute('data-facs')) {
               let ref = utils.rmHash(e.getAttribute('data-facs'));
@@ -1378,6 +1378,9 @@ export default class Viewer {
             if (value && !document.getElementById('showFacsimileZones').checked) {
               document.getElementById('showFacsimileZones').click();
             }
+            facs.drawFacsimile();
+            break;
+          case 'showFacsimileTitles':
             facs.drawFacsimile();
             break;
           case 'showSupplied':
