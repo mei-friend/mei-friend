@@ -798,6 +798,11 @@ export const lang = {
     text: 'Edita les zones de facsímil',
     description: 'Edita les zones de facsímil (vincularà les caixes delimitadores a les zones de facsímil)',
   },
+  showFacsimileTitles: {
+    text: 'Mostra els títols dels facsímils',
+    description: 'Mostra els títols dels facsímils sobre les imatges de facsímil',
+  },
+
 
   // Supplied element / Element subministrat
   titleSupplied: {

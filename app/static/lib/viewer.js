@@ -1380,6 +1380,9 @@ export default class Viewer {
             }
             facs.drawFacsimile();
             break;
+          case 'showFacsimileTitles':
+            facs.drawFacsimile();
+            break;
           case 'showSupplied':
             rt.style.setProperty('--suppliedColor', value ? col : 'var(--notationColor)');
             rt.style.setProperty(

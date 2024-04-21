@@ -794,6 +794,10 @@ export const lang = {
     text: 'Edytuj obszary facsimile',
     description: 'Edytuj obszary facsimile (połączy ramki ograniczające z obszarami facsimile)',
   },
+  showFacsimileTitles: {
+    text: 'Pokaż tytuły faksymile',
+    description: 'Pokaż tytuły faksymile nad obrazami faksymile',
+  },
 
   // Supplied element
   titleSupplied: {

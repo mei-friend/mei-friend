@@ -236,12 +236,14 @@ export async function drawFacsimile() {
         facsimilePanel.appendChild(div);
 
         // create span for image number
-        let imageTitle = document.createElement('div');
-        // imageTitle.textContent = 'Image ' + (sourceImageNumber + 1) + ': ' + facs[surfaceId].target;
-        imageTitle.textContent = facs[surfaceId].target;
-        imageTitle.title = 'Image ' + (sourceImageNumber + 1) + ': ' + imgName;
-        imageTitle.style.fontSize = 35 * zoomFactor + 'px';
-        div.appendChild(imageTitle);
+        if (document.getElementById('showFacsimileTitles')?.checked) {
+          let imageTitle = document.createElement('div');
+          // imageTitle.textContent = 'Image ' + (sourceImageNumber + 1) + ': ' + facs[surfaceId].target;
+          imageTitle.textContent = facs[surfaceId].target;
+          imageTitle.title = 'Image ' + (sourceImageNumber + 1) + ': ' + imgName;
+          imageTitle.style.fontSize = scaleTitleFonzSize(zoomFactor);
+          div.appendChild(imageTitle);
+        }
 
         // create new svg for source image
         let imageSvg = document.createElementNS(svgNameSpace, 'svg');
@@ -509,9 +511,22 @@ export function zoomFacsimile(deltaPercent) {
     svg.removeAttribute('height');
     svg.setAttribute('data-zoomFactor', zoomFactor);
     let imageTitle = si.querySelector('div');
-    imageTitle.style.fontSize = (30 * zoomFactor) + 'px';
+    if (imageTitle) imageTitle.style.fontSize = scaleTitleFonzSize(zoomFactor);
   });
 } // zoomFacsimile()
+
+/**
+ * Scale the title font size according to the zoom factor,
+ * with a minimum of 3pt and a maximum of 16pt
+ * @param {Number} zoomFactor
+ * @returns {String} font size in pt
+ */
+function scaleTitleFonzSize(zoomFactor) {
+  let minFontSize = 3; // pt
+  let maxFontSize = 16; // pt
+  let fontSize = Math.max(minFontSize, Math.min(maxFontSize, 22 * zoomFactor));
+  return Math.round(fontSize * 10) / 10 + 'pt';
+}
 
 /**
  * Remove all eventlisteners from zones, highlight the one rect,
