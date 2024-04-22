@@ -523,6 +523,7 @@ export default class Viewer {
       msg += 'newly created: ' + itemId + ', size: ' + this.selectedElements.length;
     }
     console.log(msg);
+    this.scrollSvgTo(cm, e);
     this.updateHighlight(cm);
     if (document.getElementById('showMidiPlaybackControlBar').checked) {
       console.log('Viewer.handleClickOnNotation(): HANDLE CLICK MIDI TIMEOUT');
@@ -594,22 +595,41 @@ export default class Viewer {
   } // cursorActivity()
 
   /**
-   * Scroll notation SVG into view, both vertically and horizontally
+   * Scroll notation SVG (and facsimile zone if there) into view,
+   * both vertically and horizontally
    * @param {string|CodeMirror} cmOrId
+   * @param {MouseEvent} ev
    * @returns
    */
-  scrollSvgTo(cmOrId) {
+  scrollSvgTo(cmOrId, ev = null) {
     let vp = document.getElementById('verovio-panel');
+    let fp = document.getElementById('facsimile-panel');
+    // retrieve current id from CodeMirror or use string
     let id = typeof cmOrId === 'string' ? cmOrId : utils.getElementIdAtCursor(cmOrId);
-    if (!id) return;
-    let el = document.querySelector('g#' + utils.escapeXmlId(id));
-    if (vp && el) dutils.scrollTo(vp, el);
+    if (!id || !vp || !fp) return;
 
-    // scroll to current element inside facsimile panel, if existing
-    if (document.getElementById('showFacsimilePanel') && document.getElementById('showFacsimilePanel').checked) {
+    let scrollNotation = true;
+    let scrollFacsimile = true;
+    // check event target
+    if (ev) {
+      let target = ev.target;
+      if (target.closest('#verovio-panel')) {
+        scrollNotation = false;
+      } else if (target.closest('#facsimile-panel')) {
+        scrollFacsimile = false;
+      }
+    }
+    if (scrollNotation) {
+      // search element in notation SVG and scroll to it
+      let el = document.querySelector('g#' + utils.escapeXmlId(id));
+      if (el) dutils.scrollTo(vp, el);
+    }
+
+    // search element in facsimile SVG and scroll to it
+    let sfp = document.getElementById('showFacsimilePanel');
+    if (sfp && sfp.checked && scrollFacsimile) {
       let rect = document.querySelector('rect#' + id);
-      let fp = document.getElementById('facsimile-panel');
-      if (rect && fp) dutils.scrollTo(fp, rect);
+      if (rect) dutils.scrollTo(fp, rect);
     }
   } // scrollSvgTo()
 
