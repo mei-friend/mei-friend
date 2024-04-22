@@ -530,11 +530,14 @@ a:active {
 }
 
 #facsimile-panel svg {
+  margin: 2px;
+}
+
+#facsimile-panel svg.full-page {
   border: solid;
   border-color: var(--dropdownBorderColor);
   border-width: 2px;
   border-radius: 4px;
-  margin: 2px;
 }
 
 #facsimile-panel div {
