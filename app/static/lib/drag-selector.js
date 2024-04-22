@@ -198,7 +198,8 @@ export function addDragSelector(v, vp) {
         // console.debug('Drag-Selector latest element: ', latest.el.classList.item(0));
         v.showMissingIdsWarning(latest.el.classList.item(0));
       }
-      v.updateHighlight();
+      v.scrollSvgTo(cm, ev);
+      v.updateHighlight(cm);
       v.allowCursorActivity = true;
     }
   }); // mouse move event listener
