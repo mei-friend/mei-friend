@@ -798,6 +798,10 @@ export const lang = {
     text: 'Modifier les zones de fac-similé',
     description: 'Modifier les zones de fac-similé (liera les zones de délimitation aux zones de fac-similé)',
   },
+  showFacsimileTitles: {
+    text: 'Afficher les titres de fac-similé',
+    description: 'Afficher les titres de fac-similé au-dessus des images sources',
+  },
 
   // Supplied element / Élément fourni
   titleSupplied: {

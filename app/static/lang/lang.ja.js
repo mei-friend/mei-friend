@@ -760,6 +760,11 @@ export const lang = {
     text: '写真ゾーンを編集',
     description: '写真ゾーンを編集（境界ボックスを写真ゾーンにリンクします）',
   },
+  showFacsimileTitles: {
+    text: 'ファクシミリのタイトルを表示',
+    description: 'ソース画像の上にファクシミリのタイトルを表示',
+  },
+
   // Supplied element
   titleSupplied: {
     text: '編集コンテンツを操作',

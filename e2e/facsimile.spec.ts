@@ -15,9 +15,10 @@ test.describe('Test facsimile functionality.', () => {
     );
     await expect(page.locator('#beam-0000001508587757 polygon').first()).toBeVisible();
     await expect(page.locator('#note-0000001642495417 use')).toBeVisible();
-    await expect(page.locator('#sourceImageSvg image')).toBeVisible();
-    await expect(page.locator('#sourceImageSvg rect').first()).toBeVisible();
-    await expect(page.locator('#sourceImageSvg text').first()).toBeVisible();
+    let facsimilePanel = page.locator('#facsimile-panel');
+    await expect(facsimilePanel.locator('div svg')).toBeVisible();
+    await expect(facsimilePanel.locator('div rect').first()).toBeVisible();
+    await expect(facsimilePanel.locator('div text').first()).toBeVisible();
   });
 
   test('Open MEI with facsimile, turn to last page and check display', async ({ page }) => {
@@ -49,9 +50,10 @@ test.describe('Test facsimile functionality.', () => {
 
     // check that note note-0000002006782049 is visible
     await expect(page.locator('#note-0000002006782049 use')).toBeVisible();
-    await expect(page.locator('#sourceImageSvg image')).toBeVisible();
-    await expect(page.locator('#sourceImageSvg rect').first()).toBeVisible();
-    await expect(page.locator('#sourceImageSvg text').first()).toBeVisible();
+    let facsimilePanel = page.locator('#facsimile-panel');
+    await expect(facsimilePanel.locator('div image')).toBeVisible();
+    await expect(facsimilePanel.locator('div rect').first()).toBeVisible();
+    await expect(facsimilePanel.locator('div text').first()).toBeVisible();
 
     // click on specific zone, check visibility of note
     await page.locator('text#measure-0000001750764473').click();
@@ -68,18 +70,22 @@ test.describe('Test facsimile functionality.', () => {
     );
     await expect(page.locator('#n7pyz78 use').first()).toBeVisible();
     // find sourceImageSvg and check that it has no children
-    await expect(page.locator('#sourceImageSvg').locator('*')).toHaveCount(0);
+    let facsimilePanel = page.locator('#facsimile-panel');
+    await expect(facsimilePanel.locator('div')).toHaveCount(1);
+    await expect(facsimilePanel.locator('div').first()).toHaveId('facsimileMessagePanel');
+
     // check that facsimileMessagePanel h2 contains text
     await expect(page.locator('#facsimileMessagePanel h2')).toBeVisible();
 
     // click facsimileFullPageCheckbox and check whether image is visible inside sourceImageSvg
     await page.click('#facsimileFullPageCheckbox');
-    await expect(page.locator('#sourceImageSvg image')).toBeVisible();
+
+    await expect(facsimilePanel.locator('div svg')).toBeVisible();
 
     await page.getByRole('button', { name: 'Decrease notation image' }).click({
       clickCount: 7,
     });
-    await expect(page.locator('#sourceImageSvg image')).toBeVisible();
+    await expect(facsimilePanel.locator('div svg')).toBeVisible();
 
     // set notation and facsimile top
     await page.locator('#viewMenuTitle').click();
@@ -101,12 +107,12 @@ test.describe('Test facsimile functionality.', () => {
     await page.mouse.up();
 
     // get id from zone and check that it starts with 'z'
-    const zoneId = await page.locator('#sourceImageSvg').locator('rect').last().getAttribute('id');
+    const zoneId = await facsimilePanel.locator('div svg').locator('rect').last().getAttribute('id');
     console.log('Id of newly created zone:', zoneId);
     if (zoneId) expect(zoneId[0]).toBe('z');
 
     // resize the zone horizontally
-    const zone = page.locator('#sourceImageSvg').locator('rect').last();
+    const zone = facsimilePanel.locator('div svg').locator('rect').last();
     let width = await zone.getAttribute('width');
     let x = await zone.getAttribute('x');
     let y = await zone.getAttribute('y');
@@ -144,6 +150,6 @@ test.describe('Test facsimile functionality.', () => {
     await page.locator('#delete').click();
 
     // check that the zone has been deleted
-    await expect(page.locator('#sourceImageSvg').locator('rect').last()).not.toBeVisible;
+    await expect(facsimilePanel.locator('div svg').locator('rect').last()).not.toBeVisible;
   });
 });

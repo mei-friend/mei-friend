@@ -775,6 +775,10 @@ export const lang = {
     text: 'Редагувати області факсиміле',
     description: "Редагувати області факсиміле (пов'язані межі з областями факсиміле)",
   },
+  showFacsimileTitles: {
+    text: 'Показати назви факсиміле',
+    description: 'Показати назви факсиміле над зображеннями',
+  },
 
   // Supplied element
   titleSupplied: {

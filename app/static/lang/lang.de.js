@@ -803,7 +803,11 @@ export const lang = {
     text: 'Faksimile-Zonenfelder bearbeiten',
     description: 'Faksimile-Zonenfelder bearbeiten',
   },
-  // Supplied element
+  showFacsimileTitles: {
+    text: 'Faksimile-Titel anzeigen',
+    description: 'Faksimile-Titel über den Faksimile-Bildern anzeigen',
+  },
+// Supplied element
   titleSupplied: {
     text: 'Editorische Inhalte',
     description: 'Editorische Inhalte im MEI',
