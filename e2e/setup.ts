@@ -1,6 +1,7 @@
 import { Page } from "@playwright/test";
 
-export const defaultUrl = process.env.TEST_URL + '/';
+export const baseUrl = process.env.TEST_URL || "https://mei-friend.mdw.ac.at"
+export const defaultUrl = baseUrl + '/';
 
 export async function setupPage(page: Page, url = defaultUrl) {
   await page.goto(url);
