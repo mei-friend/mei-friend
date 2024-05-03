@@ -248,6 +248,7 @@ export async function drawFacsimile() {
         // create new svg for source image
         let imageSvg = document.createElementNS(svgNameSpace, 'svg');
         imageSvg.setAttribute('data-sourceImageNumber', sourceImageNumber);
+        fullPage ? imageSvg.classList.add('full-page') : imageSvg.classList.remove('full-page');
         div.appendChild(imageSvg);
 
         // load clock icon while image is loading

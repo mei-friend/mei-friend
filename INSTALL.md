@@ -40,8 +40,12 @@ If you simply want to try out mei-friend, please go to [https://mei-friend.mdw.a
 * Go to tests directory:
   - `cd e2e`
   - `npx playwright install` to instruct playwright to download the required browser files 
+* Update your .env file to include 
+  - TEST_URL="http://localhost:5001"
+  (Or, wherever you are running your local instance)
 
-## To run (from root mei-friend directory):
+## To run 
+* Ensure you are in the mei-friend repository's root directory
 ### Development mode:
 * `. venv/bin/activate` (for Windows, use ` . venv\Scripts\activate`)
 * `flask run`

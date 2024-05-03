@@ -3,6 +3,8 @@
 ### 1.0.13 Support for multiple facsimile source images
 * Add support for displaying multiple source image files referenced in the @facs attributes of the notation displayed (#94). Thus, when selecting `@breaks=none`, all source images referenced in the facsimile element will be shown in the facsimile panel.
 * Settings item added to control display of source image title
+* Confirm button of splash screen now in focus by default, so it can be clicked by keyboard swiftly
+* Clicking on notation elements or facsimile zones will scroll to the corresponding element in the other panels (encoding, facsimile, notation)
 
 ### 1.0.12 patch
 * Add PlayWright end-to-end tests for the main functionality of mei-friend
