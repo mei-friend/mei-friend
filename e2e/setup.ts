@@ -1,6 +1,6 @@
 import { Page } from "@playwright/test";
 
-export const defaultUrl = '/';
+export const defaultUrl = process.env.TEST_URL + '/';
 
 export async function setupPage(page: Page, url = defaultUrl) {
   await page.goto(url);
