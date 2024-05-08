@@ -199,6 +199,8 @@ export async function drawFacsimile() {
     }
   }
 
+  let sourceImageNumber = -1; // number of source image
+
   // iterate over svgFacs (svg group elements with data-facs attributes) and retrieve zoneId
   for (let f of svgFacs) {
     let zoneId = '';
@@ -207,7 +209,6 @@ export async function drawFacsimile() {
     }
 
     // retrieve source image number from surface/zone element
-    let sourceImageNumber = -1;
     let surfaceId = '';
     if (facs.hasOwnProperty(zoneId) && facs[zoneId].hasOwnProperty('surfaceId')) {
       surfaceId = facs[zoneId].surfaceId;
@@ -328,6 +329,9 @@ export async function drawFacsimile() {
         svg.removeAttribute('height');
       }
     }
+  }
+  if (sourceImageNumber < 0) {
+    showWarningText(translator.lang.facsimileNoSurfaceWarning.text);
   }
   busy(false);
 } // drawFacsimile()
