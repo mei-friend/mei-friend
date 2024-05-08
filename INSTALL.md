@@ -43,6 +43,8 @@ If you simply want to try out mei-friend, please go to [https://mei-friend.mdw.a
 * Update your .env file to include 
   - TEST_URL="http://localhost:5001"
   (Or, wherever you are running your local instance)
+* Update your git config to run tests automatically before pushing to a public branch
+- `git config --local core.hooksPath .githooks/`
 
 ## To run 
 * Ensure you are in the mei-friend repository's root directory

@@ -2,12 +2,12 @@ import { test, expect, Page } from '@playwright/test';
 import { setupPage, openUrl } from './setup';
 
 test.beforeEach(async ({ page }) => {
-  console.log('Calling setupPage!');
+  console.log('Testing editing functions.');
   await setupPage(page);
 });
 
-test.describe('Insert notes, rests, and accidentals.', () => {
-  test('Insert new note', async ({ page }) => {
+test.describe('1 Insert notes, rests, and accidentals.', () => {
+  test('1.1 Insert new note', async ({ page }) => {
     let uuid: string | null; // id of the new slur
     const noteId = 'note-0000001117852400'; // selected note
 
@@ -45,7 +45,7 @@ test.describe('Insert notes, rests, and accidentals.', () => {
     });
   });
 
-  test('Convert new notes to chord', async ({ page }) => {
+  test('1.2 Convert new notes to chord', async ({ page }) => {
     const ids = ['note-0000001117852400']; // first selected note
     let chordId: string | null; // id of the new chord
 
@@ -134,7 +134,7 @@ test.describe('Insert notes, rests, and accidentals.', () => {
     });
   });
 
-  test('Convert note to rest', async ({ page }) => {
+  test('1.3 Convert note to rest', async ({ page }) => {
     let uuid: string | null; // id of the new slur
     const noteId = 'note-0000001117852400'; // selected note
 
@@ -176,7 +176,7 @@ test.describe('Insert notes, rests, and accidentals.', () => {
     });
   });
 
-  test('Delete notes', async ({ page }) => {
+  test('1.4 Delete notes', async ({ page }) => {
     let layer: any; // parent layer of the selected notes
     const ids = ['note-0000001318117900', 'note-0000000166242848', 'note-0000000167321589', 'note-0000001117852400']; // selected note
 
@@ -213,7 +213,7 @@ test.describe('Insert notes, rests, and accidentals.', () => {
     });
   });
 
-  test('Insert/delete accidentals', async ({ page }) => {
+  test('1.5 Insert/delete accidentals', async ({ page }) => {
     const ids = [
       'note-0000001403952294',
       'note-0000002094055458',
@@ -275,8 +275,8 @@ test.describe('Insert notes, rests, and accidentals.', () => {
   });
 });
 
-test.describe('Insert, modify, and delete control elements.', () => {
-  test('Slur to one selected element', async ({ page }) => {
+test.describe('2 Insert, modify, and delete control elements.', () => {
+  test('2.1 Slur to one selected element', async ({ page }) => {
     let uuid: string | null; // id of the new slur
 
     await test.step('Open MEI file, flip to last page', async () => {
@@ -349,7 +349,7 @@ test.describe('Insert, modify, and delete control elements.', () => {
     });
   });
 
-  test('Slur to two selected elements', async ({ page }) => {
+  test('2.2 Slur to two selected elements', async ({ page }) => {
     let uuid: string | null; // id of the new slur
 
     await test.step('Open MEI file, turn page, and descrease scaling', async () => {
@@ -432,7 +432,7 @@ test.describe('Insert, modify, and delete control elements.', () => {
     });
   });
 
-  test('Tie to one selected element', async ({ page }) => {
+  test('2.3 Tie to one selected element', async ({ page }) => {
     let uuid: string | null; // id of the new tie
 
     await test.step('Open MEI file, turn page, and descrease scaling', async () => {
@@ -505,7 +505,7 @@ test.describe('Insert, modify, and delete control elements.', () => {
     });
   });
 
-  test('Tie to two selected elements', async ({ page }) => {
+  test('2.4 Tie to two selected elements', async ({ page }) => {
     let uuid: string | null; // id of the new tie
 
     await test.step('Open MEI file and turn page', async () => {

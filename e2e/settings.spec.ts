@@ -2,12 +2,12 @@ import { test, expect } from '@playwright/test';
 import { setupPage, openUrl } from './setup';
 
 test.beforeEach(async ({ page }) => {
-  console.log('Calling setupPage!');
+  console.log('Testing settings functions.');
   await setupPage(page);
 });
 
-test.describe('Test settings panel', () => {
-  test('Ensure settings panel opens and closes', async ({ page }) => {
+test.describe('1 Test settings panel', () => {
+  test('1.1 Ensure settings panel opens and closes', async ({ page }) => {
     // check settings panel opens via show settings button (cog icon)
     await expect(page.locator('#showSettingsButton')).toBeVisible();
     await page.click('#showSettingsButton');
@@ -29,7 +29,7 @@ test.describe('Test settings panel', () => {
     await page.keyboard.press('Control+Comma');
     await expect(page.locator('#hideSettingsButton')).toBeInViewport();
   });
-  test('Ensure settings panel has expected tabs', async ({ page }) => {
+  test('1.2 Ensure settings panel has expected tabs', async ({ page }) => {
     await page.click('#showSettingsButton');
     await expect(page.locator('#settingsPanel > .tab')).toBeVisible();
     await expect(page.locator('#settingsPanel > .tab :nth-child(1)').first()).toHaveId('hideSettingsButton');
@@ -40,8 +40,8 @@ test.describe('Test settings panel', () => {
   });
 });
 
-test.describe('Test mei-friend settings panel tab', () => {
-  test('Test Verovio version change', async ({ page }) => {
+test.describe('2 Test mei-friend settings panel tab', () => {
+  test('2.1 Test Verovio version change', async ({ page }) => {
     // open settings panel
     await page.click('#showSettingsButton');
     // select mei-friend options tab
@@ -53,7 +53,7 @@ test.describe('Test mei-friend settings panel tab', () => {
     // check that a note is visible in the notation
     await expect(page.locator('g.note').first()).toBeVisible();
   });
-  test('Test Speed mode checkbox updates control-bar and vice-versa', async ({ page }) => {
+  test('2.2 Test Speed mode checkbox updates control-bar and vice-versa', async ({ page }) => {
     // open settings panel
     await page.click('#showSettingsButton');
     // select mei-friend options tab
@@ -73,7 +73,7 @@ test.describe('Test mei-friend settings panel tab', () => {
     await expect(page.locator('#toggleSpeedMode')).toBeChecked();
     await expect(page.locator('#speedCheckbox')).toBeChecked();
   });
-  test('Test "Style of generated xml:ids" selector and functionality', async ({ page }) => {
+  test('2.3 Test "Style of generated xml:ids" selector and functionality', async ({ page }) => {
     // open settings panel
     await page.click('#showSettingsButton');
     // select mei-friend options tab
@@ -91,7 +91,7 @@ test.describe('Test mei-friend settings panel tab', () => {
     // ensure that the xml:id style of the first g.staff element fits the selected style
     await expect(page.locator('g.staff').first()).toHaveAttribute('id', /^staff-\d\d\d\d\d\d\d\d\d\d\d\d\d\d\d\d$/);
   });
-  test('Test "Insert application statement" checkbox and functionality', async ({ page }) => {
+  test('2.4 Test "Insert application statement" checkbox and functionality', async ({ page }) => {
     // open settings panel
     await page.click('#showSettingsButton');
     // select mei-friend options tab
@@ -147,8 +147,8 @@ test.describe('Test mei-friend settings panel tab', () => {
   });
 });
 
-test.describe('Test editor settings panel tab', () => {
-  test('Test theme change', async ({ page }) => {
+test.describe('3 Test editor settings panel tab', () => {
+  test('2.1 Test theme change', async ({ page }) => {
     // open settings panel
     await page.click('#showSettingsButton');
     // select editor options tab
@@ -164,8 +164,8 @@ test.describe('Test editor settings panel tab', () => {
   });
 });
 
-test.describe('Test Verovio settings panel tab', () => {
-  test('Test that checkboxes work', async ({ page }) => {
+test.describe('4 Test Verovio settings panel tab', () => {
+  test('4.1 Test that checkboxes work', async ({ page }) => {
     await page.click('#showSettingsButton');
     await page.click('#verovioOptionsTab');
     const checkbox = await page.locator('#verovioSettings input[type="checkbox"]').first();
@@ -173,7 +173,7 @@ test.describe('Test Verovio settings panel tab', () => {
     await checkbox.click();
     await expect((await checkbox.isChecked()) !== checkVal).toBeTruthy();
   });
-  test('Test that selects work', async ({ page }) => {
+  test('4.2 Test that selects work', async ({ page }) => {
     await page.click('#showSettingsButton');
     await page.click('#verovioOptionsTab');
     const select = await page.locator('#verovioSettings select#vrv-condense');
@@ -182,7 +182,7 @@ test.describe('Test Verovio settings panel tab', () => {
     const selectedOption = await select.evaluate((el: HTMLSelectElement) => el.value);
     await expect(selectedOption === 'encoded').toBeTruthy();
   });
-  test('Test that number inputs work', async ({ page }) => {
+  test('4.3 Test that number inputs work', async ({ page }) => {
     // check that number input works
     // test that number incr / decr works
     // test that invalid numbers fail appropriately
