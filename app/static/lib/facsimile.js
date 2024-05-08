@@ -183,8 +183,13 @@ export async function drawFacsimile() {
     let hasZones = false;
     svgFacs.forEach((f) => {
       let facsAttribute = f.getAttribute('data-facs') || '';
-      if (facsAttribute && facs[rmHash(facsAttribute)].type === 'zone') {
-        hasZones = true;
+      if (facsAttribute) {
+        facsAttribute = rmHash(facsAttribute);
+        if (facs.hasOwnProperty(facsAttribute) &&
+          facs[facsAttribute].hasOwnProperty('type') &&
+          facs[facsAttribute].type === 'zone') {
+          hasZones = true;
+        }
       }
     });
     if (!hasZones) {
@@ -203,9 +208,15 @@ export async function drawFacsimile() {
 
     // retrieve source image number from surface/zone element
     let sourceImageNumber = -1;
-    let surfaceId = facs[zoneId].surfaceId;
+    let surfaceId = '';
+    if (facs.hasOwnProperty(zoneId) && facs[zoneId].hasOwnProperty('surfaceId')) {
+      surfaceId = facs[zoneId].surfaceId;
+    }
     if (surfaceId && facs[surfaceId]) {
       sourceImageNumber = facs[surfaceId]['sourceImageNumber'];
+    } else {
+      console.log('Facsimile.drawFacsimile(): zoneId ' + zoneId + ' has no surfaceId.');
+      continue;
     }
 
     // console.log('Facsimile zoneId: ' + zoneId + ' (' + f.id + ')' + ', type: ' + facs[zoneId]?.type);
@@ -293,7 +304,7 @@ export async function drawFacsimile() {
         }
       }
 
-      let svg = document.getElementById('sourceImage-' + sourceImageNumber).querySelector('svg');
+      let svg = document.getElementById('sourceImage-' + sourceImageNumber)?.querySelector('svg');
 
       // draw bounding box for zone, if checkbox is checked
       if (svg && document.getElementById('facsimileShowZonesCheckbox')?.checked && facs[zoneId].type === 'zone') {
@@ -398,12 +409,12 @@ function createImageName(zoneId) {
     if (fileLocationType === 'github') {
       let url = new URL(
         'https://raw.githubusercontent.com/' +
-          github.githubRepo +
-          '/' +
-          github.branch +
-          github.filepath.substring(0, github.filepath.lastIndexOf('/')) +
-          '/' +
-          facs[zoneId].target
+        github.githubRepo +
+        '/' +
+        github.branch +
+        github.filepath.substring(0, github.filepath.lastIndexOf('/')) +
+        '/' +
+        facs[zoneId].target
       );
       imgName = url.href;
     } else if (fileLocationType === 'url') {
@@ -758,16 +769,16 @@ export function addZoneDrawer() {
       drawing = 'new';
       console.log(
         'ZoneDrawer mouse down: ' +
-          drawing +
-          '; ' +
-          ev.clientX +
-          '/' +
-          ev.clientY +
-          ', scroll: ' +
-          ip.scrollLeft +
-          '/' +
-          ip.scrollTop +
-          ', start: ',
+        drawing +
+        '; ' +
+        ev.clientX +
+        '/' +
+        ev.clientY +
+        ', scroll: ' +
+        ip.scrollLeft +
+        '/' +
+        ip.scrollTop +
+        ', start: ',
         start
       );
     }
