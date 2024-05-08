@@ -253,7 +253,7 @@ export async function drawFacsimile() {
           // imageTitle.textContent = 'Image ' + (sourceImageNumber + 1) + ': ' + facs[surfaceId].target;
           imageTitle.textContent = facs[surfaceId].target;
           imageTitle.title = 'Image ' + (sourceImageNumber + 1) + ': ' + imgName;
-          imageTitle.style.fontSize = scaleTitleFonzSize(zoomFactor);
+          imageTitle.style.fontSize = scaleTitleFontSize(zoomFactor);
           div.appendChild(imageTitle);
         }
 
@@ -527,7 +527,7 @@ export function zoomFacsimile(deltaPercent) {
     svg.removeAttribute('height');
     svg.setAttribute('data-zoomFactor', zoomFactor);
     let imageTitle = si.querySelector('div');
-    if (imageTitle) imageTitle.style.fontSize = scaleTitleFonzSize(zoomFactor);
+    if (imageTitle) imageTitle.style.fontSize = scaleTitleFontSize(zoomFactor);
   });
 } // zoomFacsimile()
 
@@ -537,8 +537,8 @@ export function zoomFacsimile(deltaPercent) {
  * @param {Number} zoomFactor
  * @returns {String} font size in pt
  */
-function scaleTitleFonzSize(zoomFactor) {
-  let minFontSize = 3; // pt
+function scaleTitleFontSize(zoomFactor) {
+  let minFontSize = 7; // pt
   let maxFontSize = 16; // pt
   let fontSize = Math.max(minFontSize, Math.min(maxFontSize, 22 * zoomFactor));
   return Math.round(fontSize * 10) / 10 + 'pt';
