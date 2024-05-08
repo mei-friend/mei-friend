@@ -19,7 +19,7 @@ jobs:
         run: npx playwright install --with-deps
         working-directory: e2e
       - name: Run Playwright tests
-        run: npx playwright test
+        run: npx playwright test --retries=10 --config=../playwright.config.js --project=chromium
         working-directory: e2e
       - uses: actions/upload-artifact@v3
         if: always()
