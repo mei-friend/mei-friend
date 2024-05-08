@@ -2,7 +2,7 @@
 
 ### 1.0.14 Patch
 * Update path for matomo usage statics
-* Add Verovio 4.2.0 to toolkit list
+* Add Verovio release 4.2.0 to toolkit list
 * Secure facsimile image drawing, addressing #100
 * Add git hook to run Playwright tests before pushes to publicly hosted branches (see INSTALL.md)
 
