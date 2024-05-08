@@ -2,6 +2,7 @@
 
 ### 1.0.14 Patch
 * Update path for matomo usage statics
+* Add Verovio 4.2.0 to toolkit list
 
 
 ### 1.0.13 Support for multiple facsimile source images
