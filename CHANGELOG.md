@@ -2,7 +2,8 @@
 
 ### 1.0.14 Patch
 * Update path for matomo usage statics
-
+* Add Verovio 4.2.0 to toolkit list
+* Secure facsimile image drawing, addressing #100
 
 ### 1.0.13 Support for multiple facsimile source images
 * Add support for displaying multiple source image files referenced in the @facs attributes of the notation displayed (#94). Thus, when selecting `@breaks=none`, all source images referenced in the facsimile element will be shown in the facsimile panel.
