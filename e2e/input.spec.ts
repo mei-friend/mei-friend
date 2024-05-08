@@ -2,17 +2,17 @@ import { test, expect } from '@playwright/test';
 import { setupPage, openUrl } from './setup';
 
 test.beforeEach(async ({ page }) => {
-  console.log('Calling setupPage!');
+  console.log('Testing input functions.');
   await setupPage(page);
 });
 
-test.describe('Test local file input functionality', () => {
-  test('Test that default MEI loads and renders as notation', async ({ page }) => {
+test.describe('1 Test local file input functionality', () => {
+  test('1.1 Test that default MEI loads and renders as notation', async ({ page }) => {
     await expect(page.locator('g.note').first()).toBeVisible(); // can we see the first note?
     await expect(page.locator('g.note').first()).toHaveClass('note highlighted'); // first note highlighted?
   });
 
-  test.fixme('Test local MusicXML file input', async ({ page }) => {
+  test.fixme('1.2 Test local MusicXML file input', async ({ page }) => {
     // click on menu item to open file input
     const fileChooserPromise = page.waitForEvent('filechooser');
     await page.click('#fileMenuTitle');
@@ -28,8 +28,8 @@ test.describe('Test local file input functionality', () => {
   });
 });
 
-test.describe('Test input via URL', () => {
-  test('Test OpenURL function to load known CMN MEI', async ({ page }) => {
+test.describe('2 Test input via URL', () => {
+  test('2.1 Test OpenURL function to load known CMN MEI', async ({ page }) => {
     // Check the expected MEI elements are visible (Clara Schumann's Romanze ohne Opuszahl)
     await openUrl(
       page,
@@ -39,7 +39,7 @@ test.describe('Test input via URL', () => {
     await expect(page.locator('#note-0000000026346875 use')).toBeVisible();
   });
 
-  test('Test OpenURL function to load text-based non-MEI file', async ({ page }) => {
+  test('2.2 Test OpenURL function to load text-based non-MEI file', async ({ page }) => {
     await openUrl(page, 'https://raw.githubusercontent.com/wergo/test-encodings/main/BeetAnGeSample.musicxml');
 
     // check first syl element to have text "Auf"
@@ -50,7 +50,7 @@ test.describe('Test input via URL', () => {
     await expect(page.locator('g.syl tspan tspan').last()).toHaveText('schen');
   });
 
-  test.skip('Test OpenURL function to load binary non-MEI file', async ({ page }) => {
+  test.skip('2.3 Test OpenURL function to load binary non-MEI file', async ({ page }) => {
     // load mxl file https://github.com/wergo/test-encodings/blob/main/BrahWiMeSample.mxl
     await openUrl(
       page,
@@ -62,20 +62,20 @@ test.describe('Test input via URL', () => {
     // await expect(page.locator('#syl-0000002024515355')).toHaveText('Auf');
   });
 
-  test('Test OpenURL function to load invalid text file', async ({ page }) => {
+  test('2.4 Test OpenURL function to load invalid text file', async ({ page }) => {
     await openUrl(page, 'https://raw.githubusercontent.com/wergo/test-encodings/main/test-tk-expansion.html');
     // inner text of verovio-panel should start with "Format not recognized"
     await expect(page.locator('#verovio-panel')).toContainText('Format not recognized');
     await expect(page.locator('#verovio-panel')).toContainText('Error Code: 1649499359728');
   });
 
-  test('Test OpenURL function to load MEI file from server without CORS support', async ({ page }) => {
+  test('2.5 Test OpenURL function to load MEI file from server without CORS support', async ({ page }) => {
     await openUrl(page, 'https://iwk.mdw.ac.at/goebl/Beethoven_Op126Nr1.mei');
     // check for CORS error message in openUrlStatus
     await expect(page.locator('#openUrlStatus')).toHaveText('CORS error');
   });
 
-  test('Test OpenURL function to load from invalid URL', async ({ page }) => {
+  test('2.6 Test OpenURL function to load from invalid URL', async ({ page }) => {
     await openUrl(page, 'https://raw.githubusercontent.com/wergo/test-encodings/main/invalid.mei');
     // check for CORS error message in openUrlStatus
     await expect(page.locator('#openUrlStatus')).toContainText('404');
@@ -83,8 +83,8 @@ test.describe('Test input via URL', () => {
   });
 });
 
-test.describe('Drag and drop functionality', () => {
-  test.fixme('Test drag and drop of a local MEI file onto the mei-friend window', async ({ page }) => {
+test.describe('3 Drag and drop functionality', () => {
+  test.fixme('3.1 Test drag and drop of a local MEI file onto the mei-friend window', async ({ page }) => {
     // TODO: drag and drop MEI file from e2e/test-encodings/BeetAnGeSample.mei onto the browser window
     //  await page.locator('#item-to-be-dragged').dragTo(page.locator('#item-to-drop-at'));
   });

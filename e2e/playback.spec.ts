@@ -5,8 +5,8 @@ test.beforeEach(async ({ page }) => {
   await setupPage(page);
 });
 
-test.describe('Test that the MIDI playback panel works correctly', () => {
-  test('Test that the MIDI playback panel opens and closes using panel icon', async ({ page }) => {
+test.describe('1 Test that the MIDI playback panel works correctly', () => {
+  test('1.1 Test that the MIDI playback panel opens and closes using panel icon', async ({ page }) => {
     // expect that the MIDI playback panel is not visible, and the contextual playback button (bubble) to be visible
     await expect(page.locator('#midiPlaybackControlBar')).not.toBeVisible();
     await expect(page.locator('#midiPlayerContextual')).toBeVisible();
@@ -19,7 +19,7 @@ test.describe('Test that the MIDI playback panel works correctly', () => {
     await expect(page.locator('#midiPlaybackControlBar')).not.toBeVisible();
     await expect(page.locator('#midiPlayerContextual')).toBeVisible();
   });
-  test('Test that the MIDI playback panel opens and closes using contextual indicators', async ({ page }) => {
+  test('1.2 Test that the MIDI playback panel opens and closes using contextual indicators', async ({ page }) => {
     // open the panel using the contexutal bubble
     await page.locator('#midiPlayerContextual').click();
     await expect(page.locator('#midiPlaybackControlBar')).toBeVisible();
@@ -29,7 +29,7 @@ test.describe('Test that the MIDI playback panel works correctly', () => {
     await expect(page.locator('#midiPlaybackControlBar')).not.toBeVisible();
     await expect(page.locator('#midiPlayerContextual')).toBeVisible();
   });
-  test('Test that the MIDI playback panel opens and closes using the menu item', async ({ page }) => {
+  test('1.3 Test that the MIDI playback panel opens and closes using the menu item', async ({ page }) => {
     // open it using the menu: View -> Playback controls
     await page.locator('#viewMenuTitle').click();
     await page.locator('#showPlaybackControls').click();
@@ -41,7 +41,7 @@ test.describe('Test that the MIDI playback panel works correctly', () => {
     await expect(page.locator('#midiPlaybackControlBar')).not.toBeVisible();
     await expect(page.locator('#midiPlayerContextual')).toBeVisible();
   });
-  test('Test that the MIDI playback panel opens using the keyboard', async ({ page }) => {
+  test('1.4 Test that the MIDI playback panel opens using the keyboard', async ({ page }) => {
     // first, move focus to the notation
     await page.keyboard.press('Shift+Space');
     await expect(page.locator('#notation')).toHaveClass(/focus-visible/);
@@ -53,8 +53,8 @@ test.describe('Test that the MIDI playback panel works correctly', () => {
   });
 });
 
-test.describe('Test that MIDI playback works correctly', () => {
-  test('Test that playback causes notes to highlight', async ({ page }) => {
+test.describe('2 Test that MIDI playback works correctly', () => {
+  test('2.1 Test that playback causes notes to highlight', async ({ page }) => {
     // open the panel using the menu: View -> Playback controls
     await page.locator('#viewMenuTitle').click();
     await page.locator('#showPlaybackControls').click();
@@ -68,7 +68,7 @@ test.describe('Test that MIDI playback works correctly', () => {
     await expect(page.locator('.currently-playing').first()).toBeVisible();
   });
 
-  test('Test automatic scrolling during playback', async ({ page }) => {
+  test('2.2 Test automatic scrolling during playback', async ({ page }) => {
     // open known MEI file
     await openUrl(
       page,
@@ -91,7 +91,7 @@ test.describe('Test that MIDI playback works correctly', () => {
     }, initialScroll);
   });
 
-  test('Test that playback stops when the end of the page is reached (when in speed mode)', async ({ page }) => {
+  test('2.3 Test that playback stops when the end of the page is reached (when in speed mode)', async ({ page }) => {
     // open known MEI file
     await openUrl(
       page,
@@ -118,7 +118,7 @@ test.describe('Test that MIDI playback works correctly', () => {
     await expect(page.locator('#pagination2')).toHaveText(' 1 ');
   });
 
-  test('Test automatic page turning during playback (when not in speed mode)', async ({ page }) => {
+  test('2.4 Test automatic page turning during playback (when not in speed mode)', async ({ page }) => {
     // open known MEI file
     await openUrl(
       page,

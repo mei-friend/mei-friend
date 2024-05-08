@@ -1,8 +1,8 @@
 import { test, expect } from '@playwright/test';
 import { setupPage } from './setup';
 
-test.describe('Test translation functions', () => {
-  test('Test translator works', async ({ page }) => {
+test.describe('1 Test translation functions', () => {
+  test('1.1 Test translator works', async ({ page }) => {
     // open the page
     await setupPage(page);
     // click on the globe icon
@@ -12,7 +12,7 @@ test.describe('Test translation functions', () => {
     // check that the language has been changed: #helpMenuTitle should have text 'Helpo'
     await expect(page.locator('#helpMenuTitle')).toHaveText('Helpo');
   });
-  test('Test translations work and persist across page reloads', async ({ page }) => {
+  test('1.2 Test translations work and persist across page reloads', async ({ page }) => {
     // open the page
     page.goto('/');
     // wait for splash screen to appear

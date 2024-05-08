@@ -2,12 +2,12 @@ import { test, expect } from '@playwright/test';
 import { setupPage, openUrl } from './setup';
 
 test.beforeEach(async ({ page }) => {
-  console.log('Calling setupPage!');
+  console.log('Testing facsimile functions.');
   await setupPage(page);
 });
 
-test.describe('Test facsimile functionality.', () => {
-  test('Open MEI with facsimile and check presence of encoding, source image, and zones', async ({ page }) => {
+test.describe('1 Test facsimile functionality.', () => {
+  test('1.1 Open MEI with facsimile and check presence of encoding, source image, and zones', async ({ page }) => {
     // Check the expected MEI elements are visible (Clara Schumann's Romanze ohne Opuszahl)
     await openUrl(
       page,
@@ -21,7 +21,7 @@ test.describe('Test facsimile functionality.', () => {
     await expect(facsimilePanel.locator('div text').first()).toBeVisible();
   });
 
-  test('Open MEI with facsimile, turn to last page and check display', async ({ page }) => {
+  test('1.2 Open MEI with facsimile, turn to last page and check display', async ({ page }) => {
     // Check the expected MEI elements are visible (Beethoven's WoO 57)
     await openUrl(
       page,
@@ -62,7 +62,7 @@ test.describe('Test facsimile functionality.', () => {
     await expect(page.locator('g#note-0000001956624735')).toHaveClass('note highlighted');
   });
 
-  test('Open MEI with minimal facsimile, click-draw zone, and resize and move, and delete it', async ({ page }) => {
+  test('1.3 Open MEI with minimal facsimile, click-draw zone, and resize and move, and delete it', async ({ page }) => {
     // Check the expected MEI elements are visible (Beethoven's WoO 57)
     await openUrl(
       page,
