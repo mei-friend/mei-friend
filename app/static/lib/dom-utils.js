@@ -207,8 +207,8 @@ export function getY(element) {
 
 /**
  * Returns median of coordinate value for a specified axis.
- * Checks for notes within coords, navigation elements (navEls), 
- * and the position of navigation elements within markup elements. 
+ * Checks for notes within coords, navigation elements (navEls),
+ * and the position of navigation elements within markup elements.
  * navElsArray = ['note', 'rest', 'mRest', 'beatRpt', 'halfmRpt', 'mRpt', 'clef'];
  * @param {SVGGElement} element svg element
  * @param {string} axis [axis="x|y"]
@@ -229,11 +229,10 @@ function getCoordinateValue(element, axis) {
     els.forEach((item, i) => {
       values.push(parseInt(item.getAttribute(axis)));
     });
-  }
-  else if (
-    att.alternativeEncodingElements.some((el) => elementClasses.includes(el)) || 
+  } else if (
+    att.alternativeEncodingElements.some((el) => elementClasses.includes(el)) ||
     att.modelTranscriptionLike.some((el) => elementClasses.includes(el))
-    ) {
+  ) {
     let els = element.querySelectorAll(navElsSelector);
     els.forEach((item) => {
       values.push(getCoordinateValue(item, axis));
@@ -448,6 +447,10 @@ export function getAffectedNotesFromKeySig(keySigString = '') {
   };
 } // getAffectedNotesFromKeySig()
 
+/**
+ * For all nodes with xml:id, replace with new xml:id and repeat for all decendents
+ * @param {Node} xmlNode
+ */
 export function addNewXmlIdsToDescendants(xmlNode) {
   if (xmlNode.getAttribute('xml:id')) {
     let newID = generateXmlId(xmlNode.localName, Viewer.xmlIdStyle);
@@ -459,7 +462,7 @@ export function addNewXmlIdsToDescendants(xmlNode) {
       }
     }
   }
-}
+} // addNewXmlIdsToDescendants()
 
 /**
  * Scroll DOM element into view inside container element.
