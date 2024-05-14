@@ -125,6 +125,7 @@ body.lang_ja,
     'メイリオ', Meiryo, 'ＭＳ ゴシック', 'MS Gothic', HiraKakuProN-W3, 'TakaoExゴシック', TakaoExGothic, 'MotoyaLCedar',
     'Droid Sans Japanese', sans-serif;
 }
+
 body {
   font-family: Arial, Helvetica, sans-serif;
   width: 100%;
@@ -562,12 +563,30 @@ a:active {
   overflow: auto;
   width: 100%;
   height: 100%;
+  display: flex;
 }
 
 #facsimileMessagePanel {
   padding: 8px;
   color: var(--textColor);
   background-color: var(--backgroundColor);
+}
+
+#facsimile-panel svg {
+  margin: 2px;
+}
+
+#facsimile-panel svg.full-page {
+  border: solid;
+  border-color: var(--dropdownBorderColor);
+  border-width: 2px;
+  border-radius: 4px;
+}
+
+#facsimile-panel div {
+  margin-left: 5px;
+  color: var(--dropdownBorderColor);
+  fill: var(--dropdownBorderColor);
 }
 
 #source-image-label {

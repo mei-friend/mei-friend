@@ -1,6 +1,6 @@
 // mei-friend version and date
 export const version = '1.1.5';
-export const versionDate = '30 January 2024'; // use full or 3-character english months, will be translated
+export const versionDate = '14 May 2024'; // use full or 3-character english months, will be translated
 
 var vrvWorker;
 var spdWorker;
@@ -975,7 +975,7 @@ async function vrvWorkerEventsHandler(ev) {
         updateHtmlTitle();
         document.getElementById('verovio-panel').innerHTML = ev.data.svg;
         if (document.getElementById('showFacsimilePanel') && document.getElementById('showFacsimilePanel').checked) {
-          loadFacsimile(v.xmlDoc);
+          // loadFacsimile(v.xmlDoc);
           await drawFacsimile();
         }
         if (ev.data.setCursorToPageBeginning) v.setCursorToPageBeginning(cm);
@@ -983,7 +983,7 @@ async function vrvWorkerEventsHandler(ev) {
         v.addNotationEventListeners(cm);
         v.updateHighlight(cm);
         refreshAnnotationsInRendering(false);
-        v.scrollSvg(cm);
+        v.scrollSvgTo(cm);
         if (v.pdfMode) {
           // switch on frame, when in pdf mode
           const svg = document.querySelector('#verovio-panel svg');
@@ -1018,7 +1018,7 @@ async function vrvWorkerEventsHandler(ev) {
       }
       v.addNotationEventListeners(cm);
       refreshAnnotationsInRendering(false);
-      v.scrollSvg(cm);
+      v.scrollSvgTo(cm);
       v.updateHighlight(cm);
       v.setFocusToVerovioPane();
       v.busy(false);
@@ -1155,8 +1155,8 @@ export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true, upd
         loadDataInEditor(mei, setFreshlyLoaded);
         setFileChangedState(false);
         updateLocalStorage(mei);
+        v.allowCursorActivity = true;
         if (updateAfterLoading) {
-          v.allowCursorActivity = true;
           v.updateAll(cm, {}, handleURLParamSelect());
         }
       });
@@ -1262,8 +1262,8 @@ export function handleEncoding(mei, setFreshlyLoaded = true, updateAfterLoading 
           loadDataInEditor(mei, setFreshlyLoaded);
           setFileChangedState(false);
           updateLocalStorage(mei);
+          v.allowCursorActivity = true;
           if (updateAfterLoading) {
-            v.allowCursorActivity = true;
             v.updateAll(cm, defaultVerovioOptions, handleURLParamSelect());
           }
           break;
@@ -1390,6 +1390,7 @@ function showSplashScreen() {
   const alwaysShow = document.getElementById('splashAlwaysShow'); // checkbox in splash screen
   document.getElementById('splashOverlay').style.display = 'flex';
   alwaysShow.checked = storage.showSplashScreen;
+  document.getElementById('splashConfirmButton').focus({ focusVisible: false });
 } // showSplashScreen()
 
 function togglePdfMode() {
@@ -1441,23 +1442,35 @@ function downloadSvg() {
 } // downloadSvg()
 
 function consultGuidelines() {
-  const elementAtCursor = getElementAtCursor(cm);
+  let elementAtCursor = getElementAtCursor(cm);
+  //console.log('Consult guidelines: Looking at first element', elementAtCursor);
   if (elementAtCursor) {
     // cursor is currently positioned on an element
-    // move up to the closest "presentation" (codemirror line)
-    const presentation = elementAtCursor.closest('span[role="presentation"]');
-    if (presentation) {
+    // find closest preceding element that opens a tag
+    let found = false;
+    do {
+      //   console.log('Consult guidelines: Looking at element', elementAtCursor);
+      if (
+        elementAtCursor.nodeType !== Node.TEXT_NODE &&
+        elementAtCursor.classList.contains('cm-tag') &&
+        !elementAtCursor.classList.contains('cm-bracket')
+      ) {
+        found = true;
+        break;
+      }
+      if (elementAtCursor.previousSibling) {
+        elementAtCursor = elementAtCursor.previousSibling;
+      }
+    } while (elementAtCursor.previousSibling);
+
+    if (found) {
       // choose the first XML element (a "tag" that isn't a "bracket")
-      const xmlEls = presentation.querySelectorAll('.cm-tag:not(.cm-bracket)');
-      let xmlElName = Array.from(xmlEls)
-        .map((e) => e.innerText)
-        .join('');
-      if (xmlElName && !xmlElName.includes(':')) {
+      if (elementAtCursor.innerText && !elementAtCursor.innerText.includes(':')) {
         // it's an element in the default (hopefully MEI...) namespace
         // FIXME: For MEI 3.x and 4.x, guidelines have element name in all lower case
         // for MEI 5.0, camelCase is required.
         //window.open(guidelinesBase + 'elements/' + xmlElName.toLowerCase(), '_blank');
-        window.open(guidelinesBase + 'elements/' + xmlElName, '_blank');
+        window.open(guidelinesBase + 'elements/' + elementAtCursor.innerText, '_blank');
       }
     }
   }

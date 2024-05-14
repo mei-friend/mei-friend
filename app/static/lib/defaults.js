@@ -179,6 +179,7 @@ export const supportedLanguages = {
 // export let platform = navigator.platform.toLowerCase(); // TODO
 export const platform = (navigator?.userAgentData?.platform || navigator?.platform || 'unknown').toLowerCase();
 export const isSafari = !!navigator.userAgent.match(/Version\/[\d\.]+.*Safari/);
+export const isFirefox = navigator.userAgent.toLowerCase().includes('firefox');
 
 // guidelines base URL, needed to construct element / attribute URLs
 // TODO ideally determine version part automatically
@@ -254,6 +255,16 @@ supportedVerovioVersions.develop = {
 supportedVerovioVersions.latest = {
   url: 'https://www.verovio.org/javascript/latest/verovio-toolkit-hum.js',
   description: 'Current Verovio release',
+};
+supportedVerovioVersions['4.2.0'] = {
+  url: 'https://www.verovio.org/javascript/4.2.0/verovio-toolkit-hum.js',
+  description: 'Verovio release 4.2.0',
+  releaseDate: '5 May 2024',
+};
+supportedVerovioVersions['4.1.0'] = {
+  url: 'https://www.verovio.org/javascript/4.1.0/verovio-toolkit-hum.js',
+  description: 'Verovio release 4.1.0',
+  releaseDate: '15 Dec 2023',
 };
 supportedVerovioVersions['4.0.1'] = {
   url: 'https://www.verovio.org/javascript/4.0.1/verovio-toolkit-hum.js',
@@ -704,7 +715,7 @@ export const meiFriendSettingsOptions = {
     title: 'Facsimile image zoom (%)',
     description: 'filled in by language packs',
     type: 'int',
-    min: 10,
+    min: 5,
     max: 300,
     step: 5,
     default: 100,
@@ -727,6 +738,13 @@ export const meiFriendSettingsOptions = {
     type: 'bool',
     default: false,
   },
+  showFacsimileTitles: {
+    title: 'Show facsimile titles',
+    description: 'filled in by language packs',
+    type: 'bool',
+    default: true,
+  },
+
   // Supplied element
   titleSupplied: {
     title: 'Handle editorial content',

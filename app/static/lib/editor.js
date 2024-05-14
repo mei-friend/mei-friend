@@ -7,8 +7,8 @@ import * as b40 from './base40.js';
 import * as dutils from './dom-utils.js';
 import * as speed from './speed.js';
 import * as utils from './utils.js';
-import { loadFacsimile } from './facsimile.js';
-import { cmd, handleEditorChanges, translator, version, versionDate } from './main.js';
+import * as facs from './facsimile.js';
+import { handleEditorChanges, translator, version, versionDate } from './main.js';
 import Viewer from './viewer.js';
 
 /**
@@ -78,6 +78,7 @@ export function deleteElement(v, cm, modifyerKey = false) {
     console.debug('Deleting: ', element);
     if (!element) {
       console.log(id + ' not found for deletion.');
+      v.allowCursorActivity = true;
       return;
     }
     // let checkPoint = buffer.createCheckpoint(); TODO
@@ -137,6 +138,7 @@ export function deleteElement(v, cm, modifyerKey = false) {
       // remove zone; with CMD remove pointing element; without just remove @facs from pointing element
       removeZone(v, cm, element, modifyerKey);
       element.remove();
+      facs.drawFacsimile();
     } else if (['note', 'chord', 'rest', 'mRest', 'multiRest'].includes(element.nodeName)) {
       console.log('Removing <' + element.nodeName + '>: "' + id + '"');
       // Check if element is last inside a chord, a tuplet, or a beam, and
@@ -180,7 +182,7 @@ export function deleteElement(v, cm, modifyerKey = false) {
       return;
     }
   });
-  loadFacsimile(v.xmlDoc);
+  // loadFacsimile(v.xmlDoc);
   // buffer.groupChangesSinceCheckpoint(checkPoint); TODO
   v.selectedElements = selectedElements;
   v.lastNoteId = v.selectedElements.at(-1);
@@ -354,6 +356,7 @@ export function convertToChord(v, cm) {
     } else if (el && el.nodeName === 'note') {
       if (el.closest('chord')) {
         v.showAlert('Cannot create chord within chord.');
+        v.allowCursorActivity = true;
         return;
       }
       // create new chord and add to DOM
@@ -1681,7 +1684,7 @@ export function renumberMeasures(v, cm, change = false) {
   v.allowCursorActivity = false;
   v.loadXml(cm.getValue(), true);
   utils.renumberMeasures(v, cm, 1, change);
-  if (document.getElementById('showFacsimilePanel').checked) loadFacsimile(v.xmlDoc);
+  if (document.getElementById('showFacsimilePanel').checked) facs.loadFacsimile(v.xmlDoc);
   addApplicationInfo(v, cm);
   v.updateData(cm, false, true);
   v.allowCursorActivity = true;
@@ -1734,8 +1737,8 @@ export function manipulateXmlIds(v, cm, removeIds = false) {
   }
   msg += ' (Processing time: ' + (Date.now() - startTime) / 1000 + ' s)';
   console.log(msg);
-  v.showAlert(msg, 'success');
   v.allowCursorActivity = true;
+  v.showAlert(msg, 'success');
 
   // digs through xml tree recursively, when explore=true, just adding ids that are pointed to
   function dig(el, explore = false) {
@@ -1775,7 +1778,7 @@ export function manipulateXmlIds(v, cm, removeIds = false) {
  * @param {CodeMirror} cm
  * @param {object} rect
  * @param {boolean} addMeasure
- * @returns
+ * @returns {string} uuid
  */
 export function addZone(v, cm, rect, addMeasure = true) {
   v.allowCursorActivity = false;
@@ -1784,7 +1787,7 @@ export function addZone(v, cm, rect, addMeasure = true) {
   let selectedElement = v.xmlDoc.querySelector('[*|id="' + selectedId + '"]');
   if (!selectedElement) {
     v.allowCursorActivity = true;
-    return false;
+    return '';
   }
 
   // create zone with all attributes
@@ -1812,7 +1815,10 @@ export function addZone(v, cm, rect, addMeasure = true) {
     if (prevMeas.nodeName !== 'measure') {
       // try to find closest measure element
       let m = prevMeas.closest('measure');
-      if (!m) return false; // and stop, if unsuccessful
+      if (!m) {
+        v.allowCursorActivity = true;
+        return ''; // and stop, if unsuccessful
+      }
       prevMeas = m;
     }
 
@@ -1834,12 +1840,11 @@ export function addZone(v, cm, rect, addMeasure = true) {
     utils.setCursorToId(cm, uuid);
 
     // updating
-    loadFacsimile(v.xmlDoc);
     addApplicationInfo(v, cm);
-    v.updateData(cm, false, false);
+    // v.updateData(cm, false, false);
     console.log('Editor: new zone ' + uuid + 'added.', rect);
     v.allowCursorActivity = true;
-    return true;
+    return uuid;
 
     // only add zone and a @facs for the selected element
   } else if (!addMeasure && att.attFacsimile.includes(selectedElement.nodeName)) {
@@ -1852,7 +1857,7 @@ export function addZone(v, cm, rect, addMeasure = true) {
     if (!referenceNode) {
       console.log('addZone(): no reference element found with xml:id="' + referenceNodeId + '"');
       v.allowCursorActivity = true;
-      return false;
+      return '';
     }
     if (referenceNode.nodeName === 'surface') {
       referenceNode.appendChild(zone);
@@ -1880,15 +1885,15 @@ export function addZone(v, cm, rect, addMeasure = true) {
     utils.setCursorToId(cm, uuid);
 
     // updating
-    loadFacsimile(v.xmlDoc);
     addApplicationInfo(v, cm);
     v.updateData(cm, false, false);
+    // TODO: select zone in SVG
     console.log('Editor: new zone ' + uuid + 'added.', rect);
     v.allowCursorActivity = true;
-    return true;
+    return uuid;
   } else {
     v.allowCursorActivity = true;
-    return false;
+    return '';
   }
 } // addZone()
 
@@ -1918,9 +1923,6 @@ export function removeZone(v, cm, zone, removeMeasure = false) {
       replaceInEditor(cm, e);
     }
   });
-  loadFacsimile(v.xmlDoc);
-  addApplicationInfo(v, cm);
-  v.updateData(cm, false, false);
 } // removeZone()
 
 /**
@@ -1987,7 +1989,7 @@ export function addFacsimile(v, cm) {
   for (let l = p1.line; l <= cm.getCursor().line; l++) cm.indentLine(l, 'smart');
   utils.setCursorToId(cm, facsimileId);
 
-  loadFacsimile(v.xmlDoc);
+  // loadFacsimile(v.xmlDoc);
   addApplicationInfo(v, cm);
   v.updateData(cm, false, false);
   console.log('Editor: new facsimile added', facsimile);

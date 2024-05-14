@@ -1,5 +1,7 @@
-# mei-friend-online
-mei-friend running within a browser
+# Installation instructions
+
+Here we describe how to set up your instance of mei-friend to run locally on your system, such as to test your own modifications of the code base. 
+If you simply want to try out mei-friend, please go to [https://mei-friend.mdw.ac.at](https://mei-friend.mdw.ac.at). 
 
 ## To configure:
 
@@ -24,16 +26,28 @@ mei-friend running within a browser
 * For development mode, set FLASK_ENV to "development" => do not deploy in development mode!
 * For deployment, *un*set FLASK_APP. This will cause wsgi.py to be used instead.
 * To build CodeMirror (source cloned as submodule via --recursive flag earlier):
-  - cd app/static/CodeMirror/
-  - npm install rollup
-  - npm run build
+  - `cd app/static/CodeMirror/`
+  - `npm install rollup`
+  - `npm run build`
 * Return to root mei-friend directory: 
-  - cd ../../../
+  - `cd ../../../`
 * Run `python -m venv venv` (if your system python is not python 3, run `python3 -m venv venv`)
 * Run `. venv/bin/activate` (for Windows, use ` . venv\Scripts\activate`). Your prompt should update to show (venv) at the start.
 * Run `pip install -r requirements.txt`
 
-## To run (from root mei-friend directory):
+## Install and set up end-to-end testing with playwright
+* Run `npm install` in the mei-friend root directory to install the required packages
+* Go to tests directory:
+  - `cd e2e`
+  - `npx playwright install` to instruct playwright to download the required browser files 
+* Update your .env file to include 
+  - TEST_URL="http://localhost:5001"
+  (Or, wherever you are running your local instance)
+* Update your git config to run tests automatically before pushing to a public branch
+- `git config --local core.hooksPath .githooks/`
+
+## To run 
+* Ensure you are in the mei-friend repository's root directory
 ### Development mode:
 * `. venv/bin/activate` (for Windows, use ` . venv\Scripts\activate`)
 * `flask run`

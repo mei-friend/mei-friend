@@ -44,6 +44,34 @@
 - Add settings to change highighting colors for markup elements.
 - Change option labels in responsibility select to text content.
 
+### 1.0.14 Patch
+* Update path for matomo usage statics
+* Add Verovio release 4.2.0 to toolkit list
+* Secure facsimile image drawing, addressing #100
+* Add git hook to run Playwright tests before pushes to publicly hosted branches (see INSTALL.md)
+
+### 1.0.13 Support for multiple facsimile source images
+* Add support for displaying multiple source image files referenced in the @facs attributes of the notation displayed (#94). Thus, when selecting `@breaks=none`, all source images referenced in the facsimile element will be shown in the facsimile panel.
+* Settings item added to control display of source image title
+* Confirm button of splash screen now in focus by default, so it can be clicked by keyboard swiftly
+* Clicking on notation elements or facsimile zones will scroll to the corresponding element in the other panels (encoding, facsimile, notation)
+
+### 1.0.12 patch
+* Add PlayWright end-to-end tests for the main functionality of mei-friend
+
+### 1.0.11 patch
+* Extend documentation with a new file `CONTRIBUTING.md` to provide guidelines for contributing to mei-friend
+* Update external documentation pages at https://mei-friend.github.io including updated installation instructions, 
+  information on the code structure, and an updated page on contributing to mei-friend
+* Fix bug when loading facsimile source images from URLs starting with raw.githubusercontent (#93)
+
+### 1.0.10 patch
+* Scroll to facsimile image zones corresponding to selected element in editor or notation
+* Make sure zone element edits are reloaded and redrawn in facsimile panel
+* Drawing new zones in non-fullpage mode corrected for Firefox and other browsers
+* New zones remain selected after insertion
+* Clicking on elements with `@facs` attribute will highlight linked zone also in zone edit mode
+
 ### 1.0.9 patch
 
 - Facsimile panel GUI elements update local storage

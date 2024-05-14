@@ -316,7 +316,7 @@ export const lang = {
   pdfCloseButton: { description: 'PDF-Vorschau schließen' },
   pagesLegendLabel: { text: 'Seitenbereich', singlePage: 'Seite', multiplePages: 'Seiten' },
   selectAllPagesLabel: { text: 'Alle' },
-  selectCurrentPageLabel: { text: 'Akutelle Seite' },
+  selectCurrentPageLabel: { text: 'Aktuelle Seite' },
   selectFromLabel: { text: 'von:' },
   selectToLabel: { text: 'bis:' },
   selectPageRangeLabel: { text: 'Seitenbereich:' },
@@ -361,7 +361,7 @@ export const lang = {
   sampleEncodingsComposerLabel: { text: 'Komponist:' },
   sampleEncodingsEncodingLabel: { text: 'Kodierung:' },
   sampleEncodingsOptionLabel: { text: 'Kodierung wählen...' },
-  openUrlButton: { text: 'URL Öffenen' },
+  openUrlButton: { text: 'URL Öffnen' },
   openUrlCancel: { text: 'Abbrechen' },
   proposePublicRepertoire: {
     html:
@@ -900,7 +900,11 @@ export const lang = {
     text: 'Faksimile-Zonenfelder bearbeiten',
     description: 'Faksimile-Zonenfelder bearbeiten',
   },
-  // Supplied element
+  showFacsimileTitles: {
+    text: 'Faksimile-Titel anzeigen',
+    description: 'Faksimile-Titel über den Faksimile-Bildern anzeigen',
+  },
+// Supplied element
   titleSupplied: {
     text: 'Editorisches Markup',
     description: 'Einstellungen für die Arbeit mit editorischem Markup',

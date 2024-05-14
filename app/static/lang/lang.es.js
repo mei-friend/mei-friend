@@ -894,6 +894,10 @@ export const lang = {
     text: 'Editar zonas de facsímil',
     description: 'Editar zonas de facsímil (vinculará los recuadros delimitadores a las zonas de facsímil)',
   },
+  showFacsimileTitles: {
+    text: 'Mostrar títulos de facsímiles',
+    description: 'Mostrar títulos de facsímiles sobre las imágenes de facsímil',
+  },
 
   // Supplied element / Elemento suministrado
   titleSupplied: {
