@@ -92,6 +92,7 @@ fieldset {
 .markupSetting select {
   background-color: var(--annotationPanelLinkBackgroundColor);
   color: var(--annotationPanelTextColor);
+  max-width: fit-content;
 }
 
 .markupSetting select option {
@@ -122,9 +123,15 @@ fieldset {
   background-color: var(--annotationPanelHoverColor);
 }*/
 
+.alternativeEncodingsContent{
+  border-left: 1px solid black;
+  width: min-content;
+}
+
 .markup-dropdown {
   /*position: relative;*/
   display: inline-block;
+  padding: 8px 6px;
 }
 
 .markup-dropdown-content {
@@ -258,4 +265,48 @@ summary.noDetails {
 
 #providerSelect { 
   display:block;
+}
+
+/* highlight markup menu buttons with corresponding colors */
+
+.suppliedLabel {
+  background-color: var(--suppliedBgColor);
+}
+
+.unclearLabel {
+  background-color: var(--unclearBgColor);
+}
+
+.sicLabel {
+  background-color: var(--sicBgColor);
+}
+
+.corrLabel {
+  background-color: var(--corrBgColor);
+}
+
+.origLabel {
+  background-color: var(--origBgColor);
+}
+
+.regLabel {
+  background-color: var(--regBgColor);
+}
+
+.addLabel {
+  background-color: var(--addBgColor);
+}
+
+.delLabel {
+  background-color: var(--delBgColor);
+}
+
+.splitButtonContainer {
+  /*display: inline-block;*/
+  word-wrap: break-word;
+}
+
+.splitButtonLabel {
+  padding: 8px;
+  /*width: 50%;*/
 }

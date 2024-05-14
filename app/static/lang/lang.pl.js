@@ -505,6 +505,16 @@ export const lang = {
     text: 'Wybierz odpowiedzialność znacznika',
     description: 'Wybierz identyfikator odpowiedzialności',
   },
+  selectionSelect: {
+    text: 'Domyślne zaznaczenie dla znaczników',
+    description: 'Wybierz, czy nowo utworzony znacznik powinien otaczać wybrane elementy, artykulacje lub znaki przygodne',
+    labels: ['Wybrane elementy','Artykulacja', 'Przypadkowy'],
+    valuesDescriptions: [
+      'Dodaj znacznik do wybranych elementów.', 
+      'Dodaj znacznik do artykulacji w zaznaczeniu.', 
+      'Dodaj znacznik do przypadkowych elementów w zaznaczeniu.'
+    ],
+  },
   alternativeEncodingsGrp: {
     text: 'Alternatywne kodowania',
     description: 'Elementy znaczników zawierające wiele wersji.',
@@ -513,31 +523,37 @@ export const lang = {
     text: '<choice>',
     description: 'Grupuje wiele alternatywnych kodowań dla tego samego punktu w tekście.',
   },
-  choiceSicCorr: { text: 'sic | corr', description: 'Umieść wybór w znaczniku <sic> i dodaj <corr>.' },
-  choiceCorrSic: { text: 'corr | sic', description: 'Umieść wybór w znaczniku <corr> i dodaj <sic>.' },
-  choiceOrigReg: { text: 'orig | reg', description: 'Umieść wybór w znaczniku <orig> i dodaj <reg>.' },
-  choiceRegOrig: { text: 'reg | orig', description: 'Umieść wybór w znaczniku <reg> i dodaj <orig>.' },
+  choiceSicCorr: { 
+    description: 'Umieść wybór w znaczniku <sic> i dodaj <corr>.' 
+},
+  choiceCorrSic: { 
+    description: 'Umieść wybór w znaczniku <corr> i dodaj <sic>.' 
+},
+  choiceOrigReg: { 
+    description: 'Umieść wybór w znaczniku <orig> i dodaj <reg>.' 
+  },
+  choiceRegOrig: { 
+    description: 'Umieść wybór w znaczniku <reg> i dodaj <orig>.' 
+  },
   choiceContentTarget: {
     text: '(wybierz zawartość)',
     description: 'Najpierw wybierz zawartość dla tego elementu, najeżdżając na <choice>.',
   },
-  addChoice: { text: 'Wybrane elementy', description: 'Dodaj znacznik do wybranych elementów.' },
-  addChoiceArtic: { text: 'Artykulacja', description: 'Dodaj znacznik do artykulacji w zaznaczeniu.' },
-  addChoiceAccid: { text: 'Przypadkowy', description: 'Dodaj znacznik do przypadkowych elementów w zaznaczeniu.' },
   addSubstText: {
     text: '<subst>',
     description:
       '(zastąpienie) - Grupuje elementy transkrypcyjne, gdy kombinacja ma być traktowana jako pojedyncza interwencja w tekście.',
   },
-  substAddDel: { text: 'add | del', description: 'Umieść wybór w znaczniku <add> i dodaj <del>.' },
-  substDelAdd: { text: 'del | add', description: 'Umieść wybór w znaczniku <del> i dodaj <add>.' },
+  substAddDel: { 
+    description: 'Umieść wybór w znaczniku <add> i dodaj <del>.' 
+  },
+  substDelAdd: { 
+    description: 'Umieść wybór w znaczniku <del> i dodaj <add>.' 
+  },
   substContentTarget: {
     text: '(wybierz zawartość)',
     description: 'Najpierw wybierz zawartość dla tego elementu, najeżdżając na <subst>.',
   },
-  addSubst: { text: 'Wybrane elementy', description: 'Dodaj znacznik do wybranych elementów.' },
-  addSubstArtic: { text: 'Artykulacja', description: 'Dodaj znacznik do artykulacji w zaznaczeniu.' },
-  addSubstAccid: { text: 'Przypadkowy', description: 'Dodaj znacznik do przypadkowych elementów w zaznaczeniu.' },
   editInterventionsGrp: {
     text: 'Interwencje redakcyjne',
     description: 'Elementy znaczników używane do kodowania interwencji redakcyjnych.',
@@ -546,62 +562,38 @@ export const lang = {
     text: '<supplied>',
     description: 'Zawiera materiał dostarczony przez transkryptora lub redaktora z dowolnego powodu.',
   },
-  addSupplied: { text: 'Wybrane elementy', description: 'Dodaj znacznik do wybranych elementów.' },
-  addSuppliedArtic: { text: 'Artykulacja', description: 'Dodaj znacznik do artykulacji w zaznaczeniu.' },
-  addSuppliedAccid: { text: 'Przypadkowy', description: 'Dodaj znacznik do przypadkowych elementów w zaznaczeniu.' },
   addUnclearText: {
     text: '<unclear>',
     description:
       'Zawiera materiał, który nie może być transkrybowany z pewnością, ponieważ jest nieczytelny lub niesłyszalny w źródle.',
   },
-  addUnclear: { text: 'Wybrane elementy', description: 'Dodaj znacznik do wybranych elementów.' },
-  addUnclearArtic: { text: 'Artykulacja', description: 'Dodaj znacznik do artykulacji w zaznaczeniu.' },
-  addUnclearAccid: { text: 'Przypadkowy', description: 'Dodaj znacznik do przypadkowych elementów w zaznaczeniu.' },
   addSicText: {
     text: '<sic>',
     description: 'Zawiera materiał, który jest prawdopodobnie niepoprawny lub niedokładny.',
   },
-  addSic: { text: 'Wybrane elementy', description: 'Dodaj znacznik do wybranych elementów.' },
-  addSicArtic: { text: 'Artykulacja', description: 'Dodaj znacznik do artykulacji w zaznaczeniu.' },
-  addSicAccid: { text: 'Przypadkowy', description: 'Dodaj znacznik do przypadkowych elementów w zaznaczeniu.' },
   addCorrText: {
     text: '<corr>',
     description: '(poprawka) - Zawiera poprawną formę pozornie błędnego fragmentu.',
   },
-  addCorr: { text: 'Wybrane elementy', description: 'Dodaj znacznik do wybranych elementów.' },
-  addCorrArtic: { text: 'Artykulacja', description: 'Dodaj znacznik do artykulacji w zaznaczeniu.' },
-  addCorrAccid: { text: 'Przypadkowy', description: 'Dodaj znacznik do przypadkowych elementów w zaznaczeniu.' },
   addOrigText: {
     text: '<orig>',
     description:
       '(oryginalny) - Zawiera materiał oznaczony jako zgodny z oryginałem, a nie jako znormalizowany lub poprawiony.',
   },
-  addOrig: { text: 'Wybrane elementy', description: 'Dodaj znacznik do wybranych elementów.' },
-  addOrigArtic: { text: 'Artykulacja', description: 'Dodaj znacznik do artykulacji w zaznaczeniu.' },
-  addOrigAccid: { text: 'Przypadkowy', description: 'Dodaj znacznik do przypadkowych elementów w zaznaczeniu.' },
   addRegText: {
     text: '<reg>',
     description: '(normalizacja) - Zawiera materiał, który został znormalizowany lub zharmonizowany w pewnym sensie.',
   },
-  addReg: { text: 'Wybrane elementy', description: 'Dodaj znacznik do wybranych elementów.' },
-  addRegArtic: { text: 'Artykulacja', description: 'Dodaj znacznik do artykulacji w zaznaczeniu.' },
-  addRegAccid: { text: 'Przypadkowy', description: 'Dodaj znacznik do przypadkowych elementów w zaznaczeniu.' },
   descMarkupGrp: {
     text: 'Opisowy znacznik',
     description: 'Elementy znaczników używane do kodowania interwencji w materiał źródłowy.',
   },
   addAddText: { text: '<add>', description: '(dodanie) - Oznacza dodatek do tekstu.' },
-  addAdd: { text: 'Wybrane elementy', description: 'Dodaj znacznik do wybranych elementów.' },
-  addAddArtic: { text: 'Artykulacja', description: 'Dodaj znacznik do artykulacji w zaznaczeniu.' },
-  addAddAccid: { text: 'Przypadkowy', description: 'Dodaj znacznik do przypadkowych elementów w zaznaczeniu.' },
   addDelText: {
     text: '<del>',
     description:
       '(usunięcie) - Zawiera informacje usunięte, oznaczone jako usunięte lub w inny sposób wskazane jako zbędne lub fałszywe w tekście źródłowym przez autora, skrybę, adnotatora lub poprawiacza.',
   },
-  addDel: { text: 'Wybrane elementy', description: 'Dodaj znacznik do wybranych elementów.' },
-  addDelArtic: { text: 'Artykulacja', description: 'Dodaj znacznik do artykulacji w zaznaczeniu.' },
-  addDelAccid: { text: 'Przypadkowy', description: 'Dodaj znacznik do przypadkowych elementów w zaznaczeniu.' },
 
   // MIDI // MIDI
   midiSpeedmodeIndicator: {

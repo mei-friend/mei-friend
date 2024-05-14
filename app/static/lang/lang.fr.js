@@ -503,6 +503,16 @@ export const lang = {
     text: 'Sélectionner la responsabilité de la mise en forme',
     description: "Sélectionner l'ID de la responsabilité",
   },
+  selectionSelect: {
+    text: 'Sélection par défaut pour la balise',
+    description: 'Choisissez si la balise nouvellement créée doit englober les éléments sélectionnés, les articulations ou les accidentels',
+    labels: ['Éléments sélectionnés','Articulation', 'Accidentel'],
+    valuesDescriptions: [
+      'Ajoute une balise aux éléments sélectionnés.', 
+      'Ajoute une balise aux articulations dans la sélection.', 
+      'Ajoute une balise aux accidentels dans la sélection.'
+    ],
+  },
   alternativeEncodingsGrp: {
     text: 'Encodages alternatifs',
     description: 'Éléments de balisage contenant plusieurs versions.',
@@ -511,31 +521,37 @@ export const lang = {
     text: '<choice>',
     description: 'Regroupe plusieurs encodages alternatifs pour le même point dans un texte.',
   },
-  choiceSicCorr: { text: 'sic | corr', description: 'Place la sélection dans <sic> et ajoute <corr>.' },
-  choiceCorrSic: { text: 'corr | sic', description: 'Place la sélection dans <corr> et ajoute <sic>.' },
-  choiceOrigReg: { text: 'orig | reg', description: 'Place la sélection dans <orig> et ajoute <reg>.' },
-  choiceRegOrig: { text: 'reg | orig', description: 'Place la sélection dans <reg> et ajoute <orig>.' },
+  choiceSicCorr: { 
+    description: 'Place la sélection dans <sic> et ajoute <corr>.' 
+  },
+  choiceCorrSic: { 
+    description: 'Place la sélection dans <corr> et ajoute <sic>.' 
+  },
+  choiceOrigReg: { 
+    description: 'Place la sélection dans <orig> et ajoute <reg>.' 
+  },
+  choiceRegOrig: { 
+    description: 'Place la sélection dans <reg> et ajoute <orig>.' 
+  },
   choiceContentTarget: {
     text: '(sélectionner le contenu)',
     description: "D'abord, sélectionnez le contenu pour cet élément en survolant <choix>.",
   },
-  addChoice: { text: 'Éléments sélectionnés', description: 'Ajoute une balise aux éléments sélectionnés.' },
-  addChoiceArtic: { text: 'Articulation', description: 'Ajoute une balise aux articulations dans la sélection.' },
-  addChoiceAccid: { text: 'Accidentel', description: 'Ajoute une balise aux accidentels dans la sélection.' },
   addSubstText: {
     text: '<subst>',
     description:
       '(substitution) - Regroupe les éléments de transcription lorsque la combinaison doit être considérée comme une intervention unique dans le texte.',
   },
-  substAddDel: { text: 'add | del', description: 'Place la sélection dans <add> et ajoute <del>.' },
-  substDelAdd: { text: 'del | add', description: 'Place la sélection dans <del> et ajoute <add>.' },
+  substAddDel: { 
+    description: 'Place la sélection dans <add> et ajoute <del>.' 
+  },
+  substDelAdd: { 
+    description: 'Place la sélection dans <del> et ajoute <add>.' 
+  },
   substContentTarget: {
     text: '(sélectionner le contenu)',
     description: "D'abord, sélectionnez le contenu pour cet élément en survolant <subst>.",
   },
-  addSubst: { text: 'Éléments sélectionés', description: 'Ajoute une balise aux éléments sélectionnés.' },
-  addSubstArtic: { text: 'Articulation', description: 'Ajoute une balise aux articulations dans la sélection.' },
-  addSubstAccid: { text: 'Accidentel', description: 'Ajoute une balise aux accidentels dans la sélection.' },
   editInterventionsGrp: {
     text: 'Interventions éditoriales',
     description: 'Éléments de balisage utilisés pour encoder les interventions éditoriales.',
@@ -544,59 +560,35 @@ export const lang = {
     text: '<supplied>',
     description: "Contient du matériel fourni par le transcripteur ou l'éditeur pour n'importe quelle raison.",
   },
-  addSupplied: { text: 'Éléments sélectionnés', description: 'Ajoute une balise aux éléments sélectionnés.' },
-  addSuppliedArtic: { text: 'Articulation', description: 'Ajoute une balise aux articulations dans la sélection.' },
-  addSuppliedAccid: { text: 'Accidentel', description: 'Ajoute une balise aux accidentels dans la sélection.' },
   addUnclearText: {
     text: '<unclear>',
     description:
       'Contient du matériel qui ne peut pas être transcrit avec certitude car il est illisible ou inaudible dans la source.',
   },
-  addUnclear: { text: 'Éléments sélectionnés', description: 'Ajoute une balise aux éléments sélectionnés.' },
-  addUnclearArtic: { text: 'Articulation', description: 'Ajoute une balise aux articulations dans la sélection.' },
-  addUnclearAccid: { text: 'Accidentel', description: 'Ajoute une balise aux accidentels dans la sélection.' },
   addSicText: { text: '<sic>', description: 'Contient un matériel apparemment incorrect ou inexact.' },
-  addSic: { text: 'Éléments sélectionnés', description: 'Ajoute une balise aux éléments sélectionnés.' },
-  addSicArtic: { text: 'Articulation', description: 'Ajoute une balise aux articulations dans la sélection.' },
-  addSicAccid: { text: 'Accidentel', description: 'Ajoute une balise aux accidentels dans la sélection.' },
   addCorrText: {
     text: '<corr>',
     description: "(correction) - Contient la forme correcte d'un passage apparemment erroné.",
   },
-  addCorr: { text: 'Éléments sélectionnés', description: 'Ajoute une balise aux éléments sélectionnés.' },
-  addCorrArtic: { text: 'Articulation', description: 'Ajoute une balise aux articulations dans la sélection.' },
-  addCorrAccid: { text: 'Accidentel', description: 'Ajoute une balise aux accidentels dans la sélection.' },
   addOrigText: {
     text: '<orig>',
     description:
       "(original) - Contient du matériel qui est marqué comme suivant l'original, plutôt que d'être normalisé ou corrigé.",
   },
-  addOrig: { text: 'Éléments sélectionnés', description: 'Ajoute une balise aux éléments sélectionnés.' },
-  addOrigArtic: { text: 'Articulation', description: 'Ajoute une balise aux articulations dans la sélection.' },
-  addOrigAccid: { text: 'Accidentel', description: 'Ajoute une balise aux accidentels dans la sélection.' },
   addRegText: {
     text: '<reg>',
     description: "(normalisation) - Contient du matériel qui a été normalisé ou régularisé d'une certaine manière.",
   },
-  addReg: { text: 'Éléments sélectionnés', description: 'Ajoute une balise aux éléments sélectionnés.' },
-  addRegArtic: { text: 'Articulation', description: 'Ajoute une balise aux articulations dans la sélection.' },
-  addRegAccid: { text: 'Accidentel', description: 'Ajoute une balise aux accidentels dans la sélection.' },
   descMarkupGrp: {
     text: 'Balisage descriptif',
     description: 'Éléments de balisage utilisés pour encoder les interventions dans le matériel source.',
   },
   addAddText: { text: '<add>', description: '(ajout) - Marque une addition au texte.' },
-  addAdd: { text: 'Éléments sélectionnés', description: 'Ajoute une balise aux éléments sélectionnés.' },
-  addAddArtic: { text: 'Articulation', description: 'Ajoute une balise aux articulations dans la sélection.' },
-  addAddAccid: { text: 'Accidentel', description: 'Ajoute une balise aux accidentels dans la sélection.' },
   addDelText: {
     text: '<del>',
     description:
       '(suppression) - Contient des informations supprimées, marquées comme supprimées ou indiquées comme superflues ou erronées dans le texte de copie par un auteur, un scribe, un annotateur ou un correcteur.',
   },
-  addDel: { text: 'Éléments sélectionnés', description: 'Ajoute une balise aux éléments sélectionnés.' },
-  addDelArtic: { text: 'Articulation', description: 'Ajoute une balise aux articulations dans la sélection.' },
-  addDelAccid: { text: 'Accidentel', description: 'Ajoute une balise aux accidentels dans la sélection.' },
 
   // MIDI
   midiSpeedmodeIndicator: {

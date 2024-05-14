@@ -505,6 +505,16 @@ export const lang = {
     text: 'Seleccionar responsabilidad de marcado',
     description: 'Seleccionar ID de responsabilidad',
   },
+  selectionSelect: {
+    text: 'Selección predeterminada para marcar',
+    description: 'Elija si la marca recién creada debe incluir los elementos seleccionados, articulaciones o alteraciones',
+    labels: ['Elementos seleccionados','Articulación', 'Accidental'],
+    valuesDescriptions: [
+      'Añade marcado a los elementos seleccionados.', 
+      'Añade marcado a las articulaciones dentro de la selección.', 
+      'Añade marcado a los accidentales dentro de la selección.'
+    ],
+  },
   alternativeEncodingsGrp: {
     text: 'Codificaciones alternativas',
     description: 'Elementos de marcado que contienen múltiples versiones.',
@@ -513,31 +523,37 @@ export const lang = {
     text: '<choice>',
     description: 'Agrupa varias codificaciones alternativas para el mismo punto en un texto.',
   },
-  choiceSicCorr: { text: 'sic | corr', description: 'Coloca la selección en <sic> y añade <corr>.' },
-  choiceCorrSic: { text: 'corr | sic', description: 'Coloca la selección en <corr> y añade <sic>.' },
-  choiceOrigReg: { text: 'orig | reg', description: 'Coloca la selección en <orig> y añade <reg>.' },
-  choiceRegOrig: { text: 'reg | orig', description: 'Coloca la selección en <reg> y añade <orig>.' },
+  choiceSicCorr: { 
+    description: 'Coloca la selección en <sic> y añade <corr>.' 
+  },
+  choiceCorrSic: { 
+    description: 'Coloca la selección en <corr> y añade <sic>.' 
+  },
+  choiceOrigReg: { 
+    description: 'Coloca la selección en <orig> y añade <reg>.' 
+  },
+  choiceRegOrig: { 
+    description: 'Coloca la selección en <reg> y añade <orig>.' 
+  },
   choiceContentTarget: {
     text: '(seleccionar contenido)',
     description: 'Primero, selecciona el contenido para este elemento pasando el cursor sobre <elección>.',
   },
-  addChoice: { text: 'Elementos seleccionados', description: 'Añade marcado a los elementos seleccionados.' },
-  addChoiceArtic: { text: 'Articulación', description: 'Añade marcado a las articulaciones dentro de la selección.' },
-  addChoiceAccid: { text: 'Accidental', description: 'Añade marcado a los accidentales dentro de la selección.' },
   addSubstText: {
     text: '<subst>',
     description:
       '(sustitución) – Agrupa elementos de transcripción cuando la combinación debe considerarse como una intervención única en el texto.',
   },
-  substAddDel: { text: 'add | del', description: 'Coloca la selección en <add> y añade <del>.' },
-  substDelAdd: { text: 'del | add', description: 'Coloca la selección en <del> y añade <add>.' },
+  substAddDel: { 
+    description: 'Coloca la selección en <add> y añade <del>.' 
+  },
+  substDelAdd: { 
+    description: 'Coloca la selección en <del> y añade <add>.' 
+  },
   substContentTarget: {
     text: '(seleccionar contenido)',
     description: 'Primero, selecciona el contenido para este elemento pasando el cursor sobre <sustitución>.',
   },
-  addSubst: { text: 'Elementos seleccionados', description: 'Añade marcado a los elementos seleccionados.' },
-  addSubstArtic: { text: 'Articulación', description: 'Añade marcado a las articulaciones dentro de la selección.' },
-  addSubstAccid: { text: 'Accidental', description: 'Añade marcado a los accidentales dentro de la selección.' },
   editInterventionsGrp: {
     text: 'Intervenciones editoriales',
     description: 'Elementos de marcado utilizados para codificar intervenciones editoriales.',
@@ -546,59 +562,35 @@ export const lang = {
     text: '<supplied>',
     description: 'Contiene material suministrado por el transcriptor o editor por cualquier motivo.',
   },
-  addSupplied: { text: 'Elementos seleccionados', description: 'Añade marcado a los elementos seleccionados.' },
-  addSuppliedArtic: { text: 'Articulación', description: 'Añade marcado a las articulaciones dentro de la selección.' },
-  addSuppliedAccid: { text: 'Accidental', description: 'Añade marcado a los accidentales dentro de la selección.' },
   addUnclearText: {
     text: '<unclear>',
     description:
       'Contiene material que no se puede transcribir con certeza porque es ilegible o inaudible en la fuente.',
   },
-  addUnclear: { text: 'Elementos seleccionados', description: 'Añade marcado a los elementos seleccionados.' },
-  addUnclearArtic: { text: 'Articulación', description: 'Añade marcado a las articulaciones dentro de la selección.' },
-  addUnclearAccid: { text: 'Accidental', description: 'Añade marcado a los accidentales dentro de la selección.' },
   addSicText: { text: '<sic>', description: 'Contiene material aparentemente incorrecto o inexacto.' },
-  addSic: { text: 'Elementos seleccionados', description: 'Añade marcado a los elementos seleccionados.' },
-  addSicArtic: { text: 'Articulación', description: 'Añade marcado a las articulaciones dentro de la selección.' },
-  addSicAccid: { text: 'Accidental', description: 'Añade marcado a los accidentales dentro de la selección.' },
   addCorrText: {
     text: '<corr>',
     description: '(corrección) – Contiene la forma correcta de un pasaje aparentemente erróneo.',
   },
-  addCorr: { text: 'Elementos seleccionados', description: 'Añade marcado a los elementos seleccionados.' },
-  addCorrArtic: { text: 'Articulación', description: 'Añade marcado a las articulaciones dentro de la selección.' },
-  addCorrAccid: { text: 'Accidental', description: 'Añade marcado a los accidentales dentro de la selección.' },
   addOrigText: {
     text: '<orig>',
     description:
       '(original) – Contiene material que se marca como siguiendo el original, en lugar de ser normalizado o corregido.',
   },
-  addOrig: { text: 'Elementos seleccionados', description: 'Añade marcado a los elementos seleccionados.' },
-  addOrigArtic: { text: 'Articulación', description: 'Añade marcado a las articulaciones dentro de la selección.' },
-  addOrigAccid: { text: 'Accidental', description: 'Añade marcado a los accidentales dentro de la selección.' },
   addRegText: {
     text: '<reg>',
     description: '(regularización) – Contiene material que ha sido regularizado o normalizado en algún sentido.',
   },
-  addReg: { text: 'Elementos seleccionados', description: 'Añade marcado a los elementos seleccionados.' },
-  addRegArtic: { text: 'Articulación', description: 'Añade marcado a las articulaciones dentro de la selección.' },
-  addRegAccid: { text: 'Accidental', description: 'Añade marcado a los accidentales dentro de la selección.' },
   descMarkupGrp: {
     text: 'Marcado descriptivo',
     description: 'Elementos de marcado utilizados para codificar intervenciones en el material fuente.',
   },
   addAddText: { text: '<add>', description: '(adición) – Marca una adición al texto.' },
-  addAdd: { text: 'Elementos seleccionados', description: 'Añade marcado a los elementos seleccionados.' },
-  addAddArtic: { text: 'Articulación', description: 'Añade marcado a las articulaciones dentro de la selección.' },
-  addAddAccid: { text: 'Accidental', description: 'Añade marcado a los accidentales dentro de la selección.' },
   addDelText: {
     text: '<del>',
     description:
       '(eliminación) – Contiene información eliminada, marcada como eliminada, o indicada como superflua o espuria en el texto copiado por un autor, escribano, anotador o corrector.',
   },
-  addDel: { text: 'Elementos seleccionados', description: 'Añade marcado a los elementos seleccionados.' },
-  addDelArtic: { text: 'Articulación', description: 'Añade marcado a las articulaciones dentro de la selección.' },
-  addDelAccid: { text: 'Accidental', description: 'Añade marcado a los accidentales dentro de la selección.' },
 
   // MIDI // MIDI
   midiSpeedmodeIndicator: {

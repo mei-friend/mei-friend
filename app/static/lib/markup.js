@@ -219,9 +219,18 @@ export async function situateMarkup(markupItem) {
  */
 export function selectMarkup(xmlDoc, selectString = '') {
   let result;
-  result = selectApparatus(xmlDoc, selectString);
-  result = selectChoiceSubst(xmlDoc, 'choice', selectString);
-  result = selectChoiceSubst(xmlDoc, 'subst', selectString);
+  let appResult = selectApparatus(xmlDoc, selectString);
+  if (appResult.changed === true) {
+    result = appResult;
+  }
+  let choiceResult = selectChoiceSubst(xmlDoc, 'choice', selectString);
+  if (result == undefined && choiceResult.changed === true) {
+    result = choiceResult;
+  }
+  let substResult = selectChoiceSubst(xmlDoc, 'subst', selectString);
+  if (result == undefined && substResult.changed === true) {
+    result = substResult;
+  }
   return result;
 } // selectMarkup()
 
@@ -327,7 +336,7 @@ function firstChildElement(parent) {
 export function addMarkup(event) {
   let eventTarget = event.currentTarget;
   let mElName = eventTarget.dataset.elName;
-  let attrName = eventTarget.dataset.selection;
+  let attrName = document.getElementById('selectionSelect').value;;
   let multiLayerContent = eventTarget.dataset.content?.split(',');
   if (!att.modelTranscriptionLike.includes(mElName) && !att.alternativeEncodingElements.includes(mElName)) return;
 
@@ -701,6 +710,11 @@ function mintSuppliedId(id, nodeName, v) {
 export function deleteMarkup(markupItem) {
   //updateChoiceOptions(markupItem.content, true);
   markupItem.selection.forEach((id) => {
+    // make sure to load the whole unfiltered file if in speed mode has been filtered for variant readings
+    // otherwise there are not all children of alternative encoding elements available
+    if(v.xmlDocOutdated === true) {
+      v.loadXml(cm.getValue(), true);
+    }
     var toDelete = v.xmlDoc.querySelector("[*|id='" + id + "']");
     var parent = toDelete.parentElement;
     var descendants = new DocumentFragment();
