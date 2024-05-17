@@ -43,6 +43,8 @@ If you simply want to try out mei-friend, please go to [https://mei-friend.mdw.a
 * Update your .env file to include 
   - TEST_URL="http://localhost:5001"
   (Or, wherever you are running your local instance)
+* Run the tests with playwright:
+  - `npx playwright test --retries=3 --config=../playwright.config.js --project=chromium`
 
 ## To run 
 * Ensure you are in the mei-friend repository's root directory
