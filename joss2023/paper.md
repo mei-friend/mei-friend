@@ -17,7 +17,7 @@ authors:
 affiliations:
  - name: Department of Music Acoustics – Wiener Klangstil (IWK), mdw – University of Music and Performing Arts Vienna, Austria
    index: 1
-date: 11 March 2024
+date: 21 May 2024
 bibliography: paper.bib
 ---
 
@@ -49,9 +49,9 @@ By exposing several internal variables as URL parameters, such as the encoding f
 
 The official application instance, available at <https://mei-friend.mdw.ac.at/>, is sustainably hosted within the institutional repository of the mdw -- University of Music and Performing Arts Vienna. The code base is licensed under the AGPL 3.0 open-source license, and is published at <https://github.com/mei-friend/mei-friend/>. Development of the editor and its comprehensive documentation, available <https://mei-friend.github.io/>, is ongoing, with feature proposals, bug reports, and code contributions provided by community members. The editor's user interface is available in a growing number of languages, thus applicable for uses in international contexts. 
 
-The mei-friend development process operates over three distinct environments: *production*, served from the `main` branch of the mei-friend code repository; *staging*, served from the `staging` branch and accessible for public testing purposes at <https://staging.mei-friend.mdw.ac.at>; and *develop*, served from the `develop` branch. The application adjusts to its environment context, running tests when in develop and altering the logo to alert users when in staging.
+The mei-friend development process operates over four distinct environments: *production*, served from the `main` branch of the mei-friend code repository; *staging*, served from the `staging` branch and accessible for public verification before release at <https://staging.mei-friend.mdw.ac.at>; *testing*, served from the `testing` branch and used to coordinate development of contributions by community members at <https://testing.mei-friend.mdw.ac.at>; and *develop*, served from the `develop` branch. The application adjusts to its environment context, running tests when in develop and altering the logo to alert users when in staging or testing.
 
-The editor has seen significant and growing adoption by the MEI community, currently receiving more than five-hundred distinct visitor sessions each month on its hosted instance.
+The editor has seen significant and growing adoption by the MEI community, currently receiving more than six-hundred distinct visitor sessions each month on its hosted instance.
 The predecessor Atom plugin was reviewed as part of editorial work for the *Digital Interactive Mozart Edition* [@Sapov_2022] and used to edit a large collection of Beethoven solo-piano pieces [@weigl2019interweaving].
 The Web application is central to ongoing Digital Musicology research projects analysing and comparing orchestral performances aligned with digital score encodings [@Weigl_etal_DLfM2023] and establishing a digital edition of German lute tablatures of the 15th and 16th centuries [@elaute2023mec]. 
 A further community-based project is underway to extend mei-friend's support for scholarly edition and markup [@nfdi4culture_Plaksin2022]. 
@@ -59,7 +59,6 @@ mei-friend has been used to teach music encoding at universities in Boston, Vien
 
 # Acknowledgements
 
-We acknowledge support from the Austrian Science Fund (FWF) through the projects "Signature Sound Vienna" P34664 and "E-LAUTE" I6019, as well as from the European Commision through the research and innovation action EU H2020 TROMPA – Towards Richer Online Music Public-domain Archives, grant agreement 770376. 
-We are grateful for contributions by members of the MEI community including Laurent Pugin, Thomas Weber, and Anna Plaksin. 
+We acknowledge support from the Austrian Science Fund (FWF) through the projects "Signature Sound Vienna" P34664 and "E-LAUTE" I6019, as well as from the European Commision through the research and innovation action EU H2020 TROMPA – Towards Richer Online Music Public-domain Archives, grant agreement 770376. Extensions for scholarly markup developed by Anna Plaksin are funded by the Deutsche Forschungsgemeinschaft (DFG, German Research Foundation) under the National Research Data Infrastructure – 441958017. We are grateful for contributions by members of the MEI community including Laurent Pugin, Thomas Weber, and many others. 
 
 # References
