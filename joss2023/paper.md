@@ -57,6 +57,6 @@ mei-friend has been used to teach music encoding at universities in Boston, Vien
 
 # Acknowledgements
 
-We acknowledge support from the Austrian Science Fund (FWF) through the projects "Signature Sound Vienna" P34664 and "E-LAUTE" I6019, as well as from the European Commision through the research and innovation action EU H2020 TROMPA – Towards Richer Online Music Public-domain Archives, grant agreement 770376. Extensions for scholarly markup developed by Anna Plaksin are funded by the Deutsche Forschungsgemeinschaft (DFG, German Research Foundation) under the National Research Data Infrastructure – 441958017. We are grateful for contributions by members of the MEI community including Laurent Pugin, Thomas Weber, and many others. 
+We acknowledge support from the Austrian Science Fund (FWF) through the projects "Signature Sound Vienna" P34664 and "E-LAUTE" I6019, and from the European Commision via the research and innovation action EU H2020 TROMPA – Towards Richer Online Music Public-domain Archives, grant no. 770376. Extensions for scholarly markup by Anna Plaksin are funded by the Deutsche Forschungsgemeinschaft (DFG, German Research Foundation) under the National Research Data Infrastructure – 441958017. We are grateful for contributions by members of the MEI community including Laurent Pugin, Thomas Weber, and many others. 
 
 # References
