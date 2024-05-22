@@ -180,6 +180,10 @@ export async function drawFacsimile() {
       busy(false);
       return;
     }
+    // create new element with attribute data-facs
+    let pageBeginning = pb.cloneNode(true);
+    pageBeginning.setAttribute('data-facs', pb.getAttribute('facs'));
+    svgFacs.push(pageBeginning);
   }
 
   // warn, if no zones are found, when not in full-page mode
@@ -425,12 +429,12 @@ function createImageName(zoneId) {
     if (fileLocationType === 'github') {
       let url = new URL(
         'https://raw.githubusercontent.com/' +
-          github.githubRepo +
-          '/' +
-          github.branch +
-          github.filepath.substring(0, github.filepath.lastIndexOf('/')) +
-          '/' +
-          facs[zoneId].target
+        github.githubRepo +
+        '/' +
+        github.branch +
+        github.filepath.substring(0, github.filepath.lastIndexOf('/')) +
+        '/' +
+        facs[zoneId].target
       );
       imgName = url.href;
     } else if (fileLocationType === 'url') {
@@ -796,16 +800,16 @@ export function addZoneDrawer() {
       drawing = 'new';
       console.log(
         'ZoneDrawer mouse down: ' +
-          drawing +
-          '; ' +
-          ev.clientX +
-          '/' +
-          ev.clientY +
-          ', scroll: ' +
-          ip.scrollLeft +
-          '/' +
-          ip.scrollTop +
-          ', start: ',
+        drawing +
+        '; ' +
+        ev.clientX +
+        '/' +
+        ev.clientY +
+        ', scroll: ' +
+        ip.scrollLeft +
+        '/' +
+        ip.scrollTop +
+        ', start: ',
         start
       );
     }
