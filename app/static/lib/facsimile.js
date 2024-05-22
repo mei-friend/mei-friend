@@ -157,6 +157,10 @@ export async function drawFacsimile() {
   facsimileMessagePanel.style.display = 'none';
   let facsimilePanel = document.getElementById('facsimile-panel');
 
+  // retrieve and store scroll position
+  let scrollLeft = facsimilePanel.scrollLeft;
+  let scrollTop = facsimilePanel.scrollTop;
+
   let zoomFactor = document.getElementById('facsimileZoomInput').value / 100;
 
   // clear all svgs and sourceImageBoxes
@@ -185,9 +189,11 @@ export async function drawFacsimile() {
       let facsAttribute = f.getAttribute('data-facs') || '';
       if (facsAttribute) {
         facsAttribute = rmHash(facsAttribute);
-        if (facs.hasOwnProperty(facsAttribute) &&
+        if (
+          facs.hasOwnProperty(facsAttribute) &&
           facs[facsAttribute].hasOwnProperty('type') &&
-          facs[facsAttribute].type === 'zone') {
+          facs[facsAttribute].type === 'zone'
+        ) {
           hasZones = true;
         }
       }
@@ -329,10 +335,16 @@ export async function drawFacsimile() {
         svg.removeAttribute('height');
       }
     }
-  }
+  } // iterate over svgFacs
+
   if (sourceImageNumber < 0) {
     showWarningText(translator.lang.facsimileNoSurfaceWarning.text);
   }
+
+  // restore scroll position
+  facsimilePanel.scrollLeft = scrollLeft;
+  facsimilePanel.scrollTop = scrollTop;
+
   busy(false);
 } // drawFacsimile()
 
@@ -413,12 +425,12 @@ function createImageName(zoneId) {
     if (fileLocationType === 'github') {
       let url = new URL(
         'https://raw.githubusercontent.com/' +
-        github.githubRepo +
-        '/' +
-        github.branch +
-        github.filepath.substring(0, github.filepath.lastIndexOf('/')) +
-        '/' +
-        facs[zoneId].target
+          github.githubRepo +
+          '/' +
+          github.branch +
+          github.filepath.substring(0, github.filepath.lastIndexOf('/')) +
+          '/' +
+          facs[zoneId].target
       );
       imgName = url.href;
     } else if (fileLocationType === 'url') {
@@ -497,6 +509,17 @@ function clearSourceImages() {
     });
   }
 }
+
+/**
+ * Clear all rect and text elements in the source image svgs
+ */
+export function clearZones() {
+  let facsimilePanel = document.getElementById('facsimile-panel');
+  if (facsimilePanel) {
+    facsimilePanel.querySelectorAll('rect').forEach((r) => r.remove());
+    facsimilePanel.querySelectorAll('text').forEach((t) => t.remove());
+  }
+} // clearZones()
 
 /**
  * Zooms the facsimile surface image in the sourceImageContainer svg.
@@ -773,16 +796,16 @@ export function addZoneDrawer() {
       drawing = 'new';
       console.log(
         'ZoneDrawer mouse down: ' +
-        drawing +
-        '; ' +
-        ev.clientX +
-        '/' +
-        ev.clientY +
-        ', scroll: ' +
-        ip.scrollLeft +
-        '/' +
-        ip.scrollTop +
-        ', start: ',
+          drawing +
+          '; ' +
+          ev.clientX +
+          '/' +
+          ev.clientY +
+          ', scroll: ' +
+          ip.scrollLeft +
+          '/' +
+          ip.scrollTop +
+          ', start: ',
         start
       );
     }
