@@ -12,3 +12,21 @@ version: 1.0.15
 doi: 10.5281/zenodo.123456789_TODO
 date-released: 2024-05-22
 url: "https://github.com/mei-friend/mei-friend"
+preferred-citation:
+  type: article
+  authors:
+  - family-names: "Goebl"
+    given-names: "Werner"
+    orcid: "https://orcid.org/0000-0002-1722-0718"
+  - family-names: "Weigl"
+    given-names: "David M."
+    orcid: "https://orcid.org/0000-0003-1502-1528"
+  doi: "10.0000/00000_TODO"
+  journal: "Journal of Open Source Software"
+  month: 5
+  start: 1 # First page number
+  end: 4 # Last page number
+  title: "mei-friend: An Interactive Web-based Editor for Digital Music Encodings"
+  issue: 1
+  volume: 1
+  year: 2024
