@@ -172,7 +172,8 @@ export async function drawFacsimile() {
     (x) => !x.parentElement.classList.contains('note')
   );
 
-  // warn, if no @facs attributes are found in the current notation SVG,
+  // try to find a @facs in an earlier page beginning, 
+  // or warn, if really no @facs attributes are found in the current notation SVG
   if (svgFacs.length === 0) {
     let pb = getCurrentPbElement(v.xmlDoc); // id of current page beginning
     if (!pb) {
@@ -180,10 +181,12 @@ export async function drawFacsimile() {
       busy(false);
       return;
     }
-    // create new element with attribute data-facs
-    let pageBeginning = pb.cloneNode(true);
-    pageBeginning.setAttribute('data-facs', pb.getAttribute('facs'));
-    svgFacs.push(pageBeginning);
+    // clone page beginning element and add @data-facs
+    if (pb.hasAttribute('facs')) {
+      let pageBeginning = pb.cloneNode(true);
+      pageBeginning.setAttribute('data-facs', pb.getAttribute('facs'));
+      svgFacs.push(pageBeginning);
+    }
   }
 
   // warn, if no zones are found, when not in full-page mode
