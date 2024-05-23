@@ -1,6 +1,6 @@
 # mei-friend-online CHANGELOG.md
 
-### 1.0.14 Patch
+### 1.0.14 Patch (JOSS release)
 * Update path for matomo usage statics
 * Add Verovio release 4.2.0 to toolkit list
 * Secure facsimile image drawing, addressing #100
