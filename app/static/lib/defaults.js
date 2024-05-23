@@ -256,6 +256,11 @@ supportedVerovioVersions.latest = {
   url: 'https://www.verovio.org/javascript/latest/verovio-toolkit-hum.js',
   description: 'Current Verovio release',
 };
+supportedVerovioVersions['4.2.0'] = {
+  url: 'https://www.verovio.org/javascript/4.2.0/verovio-toolkit-hum.js',
+  description: 'Verovio release 4.2.0',
+  releaseDate: '5 May 2024',
+};
 supportedVerovioVersions['4.1.0'] = {
   url: 'https://www.verovio.org/javascript/4.1.0/verovio-toolkit-hum.js',
   description: 'Verovio release 4.1.0',

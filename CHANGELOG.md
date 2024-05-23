@@ -1,8 +1,11 @@
 # mei-friend-online CHANGELOG.md
 
-### 1.0.14 Patch
+### 1.0.14 Patch (JOSS release)
 * Update path for matomo usage statics
-
+* Add Verovio release 4.2.0 to toolkit list
+* Secure facsimile image drawing, addressing #100
+* Add git hook to run Playwright tests before pushes to publicly hosted branches (see INSTALL.md)
+* Make sure a facsimile source image is always shown when solely referenced by pb elements
 
 ### 1.0.13 Support for multiple facsimile source images
 * Add support for displaying multiple source image files referenced in the @facs attributes of the notation displayed (#94). Thus, when selecting `@breaks=none`, all source images referenced in the facsimile element will be shown in the facsimile panel.
