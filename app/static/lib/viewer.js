@@ -520,9 +520,10 @@ export default class Viewer {
       }
       this.selectedElements = [];
       this.selectedElements.push(itemId);
-      msg += 'newly created: ' + itemId + ', size: ' + this.selectedElements.length;
+      msg += 'Added as first element: ' + itemId;
     }
-    console.log(msg);
+    //console.log(msg);
+    console.log('handleClickOnNotation() selectedElements: ', this.selectedElements);
     this.scrollSvgTo(cm, e);
     this.updateHighlight(cm);
     if (document.getElementById('showMidiPlaybackControlBar').checked) {
@@ -547,8 +548,8 @@ export default class Viewer {
         'multiRest',
         'beam',
         'tuplet',
-        'accid',
-        'artic',
+        //'accid',
+        //'artic',
         'bTrem',
         'fTrem',
         'ambNote',
