@@ -4,7 +4,7 @@
 
 /**
  * language codes after ISO-639-1, please enter new codes alphabetically
- * TODO: Japanese, Chinese, ...
+ * TODO: Dutch, ...
  */
 export const supportedLanguages = {
   /*bcs: {
@@ -20,6 +20,7 @@ export const supportedLanguages = {
     ja: 'Japanski',
     pl: 'Poljski',
     uk: 'Ukrajinski',
+    zh: 'Kineski',
   },
   bcsc: {
     bcs:'Босански-Хрватски-Српски',
@@ -33,6 +34,7 @@ export const supportedLanguages = {
     it: 'Италијански',
     ja: 'Јапански',
     uk: 'Украјински',
+    zh: 'Кинески',
   },*/
   ca: {
     //    bcs:'Bosnià-Croat-Serbi',
@@ -47,6 +49,7 @@ export const supportedLanguages = {
     ja: 'Japonès',
     pl: 'Polonès',
     uk: 'Ucraïnès',
+    zh: 'Xinès',
   },
   de: {
     //    bcs:'Bosnisch-Kroatisch-Serbisch',
@@ -61,6 +64,7 @@ export const supportedLanguages = {
     ja: 'Japanisch',
     pl: 'Polnisch',
     uk: 'Ukrainisch',
+    zh: 'Chinesisch',
   },
   en: {
     //    bcs:'Bosnian-Croatian-Serbian',
@@ -75,6 +79,7 @@ export const supportedLanguages = {
     ja: 'Japanese',
     pl: 'Polish',
     uk: 'Ukrainian',
+    zh: 'Chinese',
   },
   eo: {
     //    bcs:'Bosnia-Kroatio-Serbio',
@@ -89,6 +94,7 @@ export const supportedLanguages = {
     ja: 'Japania',
     pl: 'Pola',
     uk: 'Ukraina',
+    zh: 'Ĉina',
   },
   es: {
     //    bcs:'Bosnio-Croata-Serbio',
@@ -103,6 +109,7 @@ export const supportedLanguages = {
     ja: 'Japonés',
     pl: 'Polaco',
     uk: 'Ucraniano',
+    zh: 'Chino',
   },
   fr: {
     //    bcs:'Bosnien-Croate-Serbe',
@@ -117,6 +124,7 @@ export const supportedLanguages = {
     ja: 'Japonais',
     pl: 'Polonais',
     uk: 'Ukrainien',
+    zh: 'Chinois',
   },
   it: {
     //    bcs:'Bosniaco-Croato-Serbo',
@@ -131,6 +139,7 @@ export const supportedLanguages = {
     ja: 'Giapponese',
     pl: 'Polacco',
     uk: 'Ucraino',
+    zh: 'Cinese',
   },
   ja: {
     //    bcs:'ボスニア語-クロアチア語-セルビア語',
@@ -145,10 +154,11 @@ export const supportedLanguages = {
     ja: '日本語',
     pl: 'ポーランド語',
     uk: 'ウクライナ語',
+    zh: '中国語',
   },
   pl: {
-    //    bcs:'Bośniacki-Chorwacki-Serbski',
-    //    bcsc:'Bośniacki-Chorwacki-Serbski',
+    //  bcs:'Bośniacki-Chorwacki-Serbski',
+    //  bcsc:'Bośniacki-Chorwacki-Serbski',
     ca: 'Kataloński',
     de: 'Niemiecki',
     en: 'Angielski',
@@ -159,9 +169,10 @@ export const supportedLanguages = {
     ja: 'Japoński',
     pl: 'Polski',
     uk: 'Ukraiński',
+    zh: 'Chiński',
   },
   uk: {
-    //    bcs:'Боснійська-Хорватська-Сербська',
+    //   bcs:'Боснійська-Хорватська-Сербська',
     //   bcsc:'Боснійська-Хорватська-Сербська',
     ca: 'Каталонська',
     de: 'Німецька',
@@ -173,6 +184,22 @@ export const supportedLanguages = {
     ja: 'Японська',
     pl: 'Польська',
     uk: 'Українська',
+    zh: 'Китайська',
+  },
+  zh: {
+    //    bcs:'波斯尼亚-克罗地亚-塞尔维亚',
+    //    bcsc:'波斯尼亚-克罗地亚-塞尔维亚',
+    ca: '加泰罗尼亚语',
+    de: '德语',
+    en: '英语',
+    eo: '世界语',
+    es: '西班牙语',
+    fr: '法语',
+    it: '意大利语',
+    ja: '日语',
+    pl: '波兰语',
+    uk: '乌克兰语',
+    zh: '中文',
   },
 };
 
