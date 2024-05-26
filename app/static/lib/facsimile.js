@@ -258,6 +258,7 @@ export async function drawFacsimile() {
         // create new div and svg for source image
         let div = document.createElement('div');
         div.id = 'sourceImage-' + sourceImageNumber;
+        div.setAttribute('data-surfaceId', surfaceId);
         facsimilePanel.appendChild(div);
 
         // create span for image number
