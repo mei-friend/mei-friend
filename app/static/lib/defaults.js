@@ -4,12 +4,12 @@
 
 /**
  * language codes after ISO-639-1, please enter new codes alphabetically
- * TODO: Dutch, ...
+ * TODO: Portugese, Greek, Hungarian, Slovenian, Estonian, ...
  */
 export const supportedLanguages = {
   /*hr: {
-    hr:'Bosanski-Hrvatski-Srpski',
-    sr:'Bosanski-Hrvatski-Srpski',
+    hr: 'Bosanski-Hrvatski-Srpski',
+    sr: 'Bosanski-Hrvatski-Srpski',
     ca: 'Katalonski',
     de: 'Njemački',
     en: 'Engleski',
@@ -24,8 +24,8 @@ export const supportedLanguages = {
     zh: 'Kineski',
   },
   sr: {
-    hr:'Босански-Хрватски-Српски',
-    sr:'Босански-Хрватски-Српски',
+    hr: 'Босански-Хрватски-Српски',
+    sr: 'Босански-Хрватски-Српски',
     ca: 'Каталонски',
     de: 'Немачки',
     en: 'Енглески',
