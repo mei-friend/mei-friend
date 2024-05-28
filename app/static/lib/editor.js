@@ -1949,8 +1949,11 @@ export function addZone(v, cm, rect, addMeasure = true) {
 
     // only add zone and a @facs for the selected element
   } else if (!addMeasure && att.attFacsimile.includes(selectedElement.nodeName)) {
-    // find pertinent zone in surface for inserting new zone
     // TODO: retrieve correct surface element for selected source image from rect
+    let surfaceId = rect.closest('div[data-surfaceid]')?.getAttribute('data-surfaceid');
+    console.log('addZone() retrieved surfaceId: ', surfaceId);
+
+    // find pertinent zone in surface for inserting new zone
     let facs = v.xmlDoc.querySelectorAll('[facs],[*|id="' + selectedId + '"');
     let i = Array.from(facs).findIndex((n) => n.isEqualNode(selectedElement));
     let referenceNodeId = utils.rmHash(facs[i === 0 ? i + 1 : i - 1].getAttribute('facs'));
