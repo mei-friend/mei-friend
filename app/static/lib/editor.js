@@ -1881,7 +1881,9 @@ export function manipulateXmlIds(v, cm, removeIds = false) {
  */
 export function addZone(v, cm, rect, addMeasure = true) {
   v.allowCursorActivity = false;
+
   // get current element id and nodeName from editor
+  // TODO: take v.selectedElements instead; if more than one, add @facs to each
   let selectedId = utils.getElementIdAtCursor(cm);
   let selectedElement = v.xmlDoc.querySelector('[*|id="' + selectedId + '"]');
   if (!selectedElement) {

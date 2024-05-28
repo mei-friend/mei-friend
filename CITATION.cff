@@ -9,8 +9,8 @@ authors:
   orcid: "https://orcid.org/0000-0003-1502-1528"
 title: "mei-friend"
 version: 1.0.15
-doi: 10.5281/zenodo.123456789_to_be_assigned
-date-released: 2024-05-22
+doi: 10.5281/zenodo.11262560
+date-released: 2024-05-23
 url: "https://github.com/mei-friend/mei-friend"
 preferred-citation:
   type: article
@@ -21,12 +21,10 @@ preferred-citation:
   - family-names: "Weigl"
     given-names: "David M."
     orcid: "https://orcid.org/0000-0003-1502-1528"
-  doi: "10.21105/00000_to_be_assigned"
-  journal: "Journal of Open Source Software"
-  month: 5
-  start: 1 # First page number
-  end: 4 # Last page number
-  title: "mei-friend: An Interactive Web-based Editor for Digital Music Encodings"
-  volume: to appear 
-  issue: 10
   year: 2024
+  title: "mei-friend: An Interactive Web-based Editor for Digital Music Encodings"
+  journal: "Journal of Open Source Software"
+  volume: 9 
+  issue: 97
+  start: 6002 # article number as start page
+  doi: "10.21105/joss.06002" # DOI of the paper
