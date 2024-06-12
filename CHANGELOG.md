@@ -1,6 +1,10 @@
 # mei-friend-online CHANGELOG.md
 
-### 1.0.14 Patch (JOSS release)
+
+### 1.0.15 Patch 
+* Add support for new languages (Bosnian, Chinese, Croatian, Dutch, Serbian)
+
+### 1.0.14 Patch (released on 23 May 2024 for JOSS publication https://doi.org/10.21105/joss.06002)
 * Update path for matomo usage statics
 * Add Verovio release 4.2.0 to toolkit list
 * Secure facsimile image drawing, addressing #100
