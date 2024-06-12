@@ -1,3 +1,5 @@
+[![DOI](https://joss.theoj.org/papers/10.21105/joss.06002/status.svg)](https://doi.org/10.21105/joss.06002)
+
 <img src="https://raw.githubusercontent.com/mei-friend/mei-friend/main/app/static/owl/menu-logo.svg" title="mei-friend" width="33%">
 
 #  [The *mei-friend* Web Application: Editing MEI in the Browser](https://mei-friend.mdw.ac.at)
