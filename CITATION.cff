@@ -1,5 +1,5 @@
 cff-version: 1.2.0
-message: "If you use this software, please cite it as below."
+message: "If you use this software, please cite our article in the Journal of Open Source Software."
 authors:
 - family-names: "Goebl"
   given-names: "Werner"
@@ -7,26 +7,32 @@ authors:
 - family-names: "Weigl"
   given-names: "David M."
   orcid: "https://orcid.org/0000-0003-1502-1528"
-title: "mei-friend"
-version: 1.0.15
-doi: 10.5281/zenodo.123456789_to_be_assigned
-date-released: 2024-05-22
+contact:
+- family-names: Goebl
+  given-names: Werner
+  orcid: "https://orcid.org/0000-0002-1722-0718"
+doi: 10.5281/zenodo.11262560
+date-released: 2024-05-23
 url: "https://github.com/mei-friend/mei-friend"
 preferred-citation:
-  type: article
   authors:
-  - family-names: "Goebl"
-    given-names: "Werner"
+  - family-names: Goebl
+    given-names: Werner
     orcid: "https://orcid.org/0000-0002-1722-0718"
-  - family-names: "Weigl"
-    given-names: "David M."
+  - family-names: Weigl
+    given-names: David M.
     orcid: "https://orcid.org/0000-0003-1502-1528"
-  doi: "10.21105/00000_to_be_assigned"
-  journal: "Journal of Open Source Software"
-  month: 5
-  start: 1 # First page number
-  end: 4 # Last page number
+  date-published: 2024-06-11
+  doi: 10.21105/joss.06002
+  issn: 2475-9066
+  issue: 98
+  journal: Journal of Open Source Software
+  publisher:
+    name: Open Journals
+  start: 6002
   title: "mei-friend: An Interactive Web-based Editor for Digital Music Encodings"
-  volume: to appear 
-  issue: 10
+  type: article
+  url: "https://joss.theoj.org/papers/10.21105/joss.06002"
+  volume: 9
   year: 2024
+title: "mei-friend: An Interactive Web-based Editor for Digital Music Encodings"

@@ -218,6 +218,7 @@ export function addDragSelector(v, vp) {
       svgPm.removeChild(rect);
     }
     oldEls = [];
+    console.debug('Drag-Selector selected elements: ', v.selectedElements);
   }); // mouse up event listener
 } // addDragSelector()
 

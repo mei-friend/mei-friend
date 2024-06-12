@@ -258,6 +258,7 @@ export async function drawFacsimile() {
         // create new div and svg for source image
         let div = document.createElement('div');
         div.id = 'sourceImage-' + sourceImageNumber;
+        div.setAttribute('data-surfaceId', surfaceId);
         facsimilePanel.appendChild(div);
 
         // create span for image number
@@ -859,7 +860,7 @@ export function addZoneDrawer() {
         let metaPressed = isCtrlOrCmd(ev);
         // * Without modifier key: select an existing element (e.g. measure, dynam)
         //   a zone will be added to pertinent surface and @facs add to the selected element
-        // * With CMD/CTRL: select a zone, add a zone afterwards and a measure;
+        // * With CMD/CTRL: select a zone, add a zone afterwards and a new measure;
         let uuid = addZone(v, cm, rect, metaPressed);
         if (uuid) {
           rect.addEventListener('click', (e) => v.handleClickOnNotation(e, cm));
