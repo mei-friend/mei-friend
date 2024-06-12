@@ -7,7 +7,7 @@
  * TODO: Portugese, Greek, Hungarian, Slovenian, Estonian, ...
  */
 export const supportedLanguages = {
-  /*hr: {
+  hr: {
     hr: 'Bosanski-Hrvatski-Srpski',
     sr: 'Bosanski-Hrvatski-Srpski',
     ca: 'Katalonski',
@@ -37,10 +37,10 @@ export const supportedLanguages = {
     nl: 'Холандски',
     uk: 'Украјински',
     zh: 'Кинески',
-  },*/
+  },
   ca: {
-    //    hr:'Bosnià-Croat-Serbi',
-    //    sr:'Bosnià-Croat-Serbi',
+    hr:'Bosnià-Croat-Serbi',
+    sr:'Bosnià-Croat-Serbi',
     ca: 'Català',
     de: 'Alemany',
     en: 'Anglès',
@@ -55,8 +55,8 @@ export const supportedLanguages = {
     zh: 'Xinès',
   },
   de: {
-    //    hr:'Bosnisch-Kroatisch-Serbisch',
-    //    sr:'Bosnisch-Kroatisch-Serbisch',
+    hr:'Bosnisch-Kroatisch-Serbisch',
+    sr:'Bosnisch-Kroatisch-Serbisch',
     ca: 'Katalanisch',
     de: 'Deutsch',
     en: 'Englisch',
@@ -71,8 +71,8 @@ export const supportedLanguages = {
     zh: 'Chinesisch',
   },
   en: {
-    //    hr:'Bosnian-Croatian-Serbian',
-    //    sr:'Bosnian-Croatian-Serbian',
+    hr:'Bosnian-Croatian-Serbian',
+    sr:'Bosnian-Croatian-Serbian',
     ca: 'Catalan',
     de: 'German',
     en: 'English',
@@ -87,8 +87,8 @@ export const supportedLanguages = {
     zh: 'Chinese',
   },
   eo: {
-    //    hr:'Bosnia-Kroatio-Serbio',
-    //    sr:'Bosnia-Kroatio-Serbio',
+    hr:'Bosnia-Kroatio-Serbio',
+    sr:'Bosnia-Kroatio-Serbio',
     ca: 'Kataluna',
     de: 'Germana',
     en: 'Angla',
@@ -103,8 +103,8 @@ export const supportedLanguages = {
     zh: 'Ĉina',
   },
   es: {
-    //    hr:'Bosnio-Croata-Serbio',
-    //    sr:'Bosnio-Croata-Serbio',
+    hr:'Bosnio-Croata-Serbio',
+    sr:'Bosnio-Croata-Serbio',
     ca: 'Catalán',
     de: 'Alemán',
     en: 'Inglés',
@@ -119,8 +119,8 @@ export const supportedLanguages = {
     zh: 'Chino',
   },
   fr: {
-    //    hr:'Bosnien-Croate-Serbe',
-    //    sr:'Bosnien-Croate-Serbe',
+    hr:'Bosnien-Croate-Serbe',
+    sr:'Bosnien-Croate-Serbe',
     ca: 'Catalan',
     de: 'Allemand',
     en: 'Anglais',
@@ -135,8 +135,8 @@ export const supportedLanguages = {
     zh: 'Chinois',
   },
   it: {
-    //    hr:'Bosniaco-Croato-Serbo',
-    //    sr:'Bosniaco-Croato-Serbo',
+    hr:'Bosniaco-Croato-Serbo',
+    sr:'Bosniaco-Croato-Serbo',
     ca: 'Catalano',
     de: 'Tedesco',
     en: 'Inglese',
@@ -151,8 +151,8 @@ export const supportedLanguages = {
     zh: 'Cinese',
   },
   ja: {
-    //    hr:'ボスニア語-クロアチア語-セルビア語',
-    //    sr:'ボスニア語-クロアチア語-セルビア語',
+    hr:'ボスニア語-クロアチア語-セルビア語',
+    sr:'ボスニア語-クロアチア語-セルビア語',
     ca: 'カタロニア語',
     de: 'ドイツ語',
     en: '英語',
@@ -167,8 +167,8 @@ export const supportedLanguages = {
     zh: '中国語',
   },
   nl: {
-    //    hr:'Bosnisch-Kroatisch-Servisch',
-    //    sr:'Bosnisch-Kroatisch-Servisch',
+    hr:'Bosnisch-Kroatisch-Servisch',
+    sr:'Bosnisch-Kroatisch-Servisch',
     ca: 'Catalaans',
     de: 'Duits',
     en: 'Engels',
@@ -183,8 +183,8 @@ export const supportedLanguages = {
     zh: 'Chinees',
   },
   pl: {
-    //  hr:'Bośniacki-Chorwacki-Serbski',
-    //  sr:'Bośniacki-Chorwacki-Serbski',
+    hr:'Bośniacki-Chorwacki-Serbski',
+    sr:'Bośniacki-Chorwacki-Serbski',
     ca: 'Kataloński',
     de: 'Niemiecki',
     en: 'Angielski',
@@ -199,8 +199,8 @@ export const supportedLanguages = {
     zh: 'Chiński',
   },
   uk: {
-    //   hr:'Боснійська-Хорватська-Сербська',
-    //   sr:'Боснійська-Хорватська-Сербська',
+    hr:'Боснійська-Хорватська-Сербська',
+    sr:'Боснійська-Хорватська-Сербська',
     ca: 'Каталонська',
     de: 'Німецька',
     en: 'Англійська',
@@ -215,8 +215,8 @@ export const supportedLanguages = {
     zh: 'Китайська',
   },
   zh: {
-    //    hr:'波斯尼亚-克罗地亚-塞尔维亚',
-    //    sr:'波斯尼亚-克罗地亚-塞尔维亚',
+    hr:'波斯尼亚-克罗地亚-塞尔维亚',
+    sr:'波斯尼亚-克罗地亚-塞尔维亚',
     ca: '加泰罗尼亚语',
     de: '德语',
     en: '英语',
