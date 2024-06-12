@@ -87,7 +87,7 @@ export const lang = {
   },
 
   // Главна трака са менијем
-  githubLoginLinkText: { text: 'git' },
+  githubLoginLink: { text: 'Login' },
 
   month: {
     jan: 'Јануар',
@@ -168,6 +168,7 @@ export const lang = {
   staffDownText: { text: 'Елемент 1 став доле' },
   increaseDurText: { text: 'Повећај трајање' },
   decreaseDurText: { text: 'Смањи трајање' },
+  toggleDotsText: { text: 'Toggle dotting' }, // TODO: translate
   cleanAccidText: { text: 'Провери @accid.ges' },
   renumberMeasuresTestText: { text: ' Ренумерирај мере (тест)' },
   renumberMeasuresExecText: { text: ' Ренумерирај мере (изврши)' },
@@ -179,6 +180,9 @@ export const lang = {
 
   // INSERT MENU ITEM
   insertMenuTitle: { text: 'Уметни' },
+  addNoteText: { text: 'Add note' }, // TODO: translate
+  convertNoteToRestText: { text: 'Note(s) <=> rest(s)' }, // TODO: translate
+  toggleChordText: { text: 'Note(s) <=> chord' },   // TODO: translate
   addDoubleSharpText: { html: 'Дупла оштрица &#119082;' },
   addSharpText: { html: 'Оштрица &#9839;' },
   addNaturalText: { html: 'Природна ознака &#9838;' },
@@ -772,6 +776,10 @@ export const lang = {
   editFacsimileZones: {
     text: 'Уреди области факсимила',
     description: 'Уреди области факсимила (повезаће оквире са областима факсимила)',
+  },
+  showFacsimileTitles: {
+    text: 'Show facsimile titles', // TODO: translate
+    description: 'Show facsimile titles above source images', // TODO: translate
   },
 
   // Елементи допуне
