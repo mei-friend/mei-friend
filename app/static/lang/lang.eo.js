@@ -59,7 +59,7 @@ export const lang = {
       mei-friend estas disvolvita de
       <a href="https://iwk.mdw.ac.at/werner-goebl" target="_blank">Werner Goebl</a> kaj
       <a href="https://iwk.mdw.ac.at/david-weigl" target="_blank">David M. Weigl</a> ĉe la Departemento de Muzika
-      Akustiko &ndash; Viennan Stilon ĉe mdw &ndash; Universitato de Muziko kaj Prezentartoj de Vieno, kaj
+      Akustiko &ndash; Viena Sonstilo ĉe mdw &ndash; Universitato de Muziko kaj Prezentartoj de Vieno, kaj
       estas permesita sub la
       <a href="https://spdx.org/licenses/AGPL-3.0-or-later.html" target="_blank"
         >GNU Affero General Public License v3.0</a
