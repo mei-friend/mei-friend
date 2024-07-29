@@ -177,7 +177,7 @@
      whitespace breaks the ability of the github integration to open files with
      collapsable whitespace sequences in their names */
 .branchContents {
-  white-space: break-spaces;
+  white-space: pre;
 }
 
 #logTable {
