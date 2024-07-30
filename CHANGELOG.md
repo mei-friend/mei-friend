@@ -1,8 +1,8 @@
 # mei-friend-online CHANGELOG.md
 
-
 ### 1.0.15 Patch 
-* Add support for new languages (Bosnian, Chinese, Croatian, Dutch, Serbian)
+* Add support for new languages (Bosnian, Chinese, Croatian, Danish, Dutch, Serbian)
+* Fix bug preventing file load from GitHub with whitespace sequences in filenames (thx @maxrothman)
 
 ### 1.0.14 Patch (released on 23 May 2024 for JOSS publication https://doi.org/10.21105/joss.06002)
 * Update path for matomo usage statics
