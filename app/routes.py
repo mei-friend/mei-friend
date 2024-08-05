@@ -1,4 +1,8 @@
-from flask import Flask, url_for, redirect, render_template, session
+from flask import Flask, url_for, redirect, render_template, request, session, jsonify
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+from base64 import b64encode
+import requests
 from dotenv import load_dotenv
 from os import getenv
 from authlib.integrations.flask_client import OAuth
@@ -6,7 +10,15 @@ import mimetypes
 
 from app import app
 
+limiter = Limiter(
+    get_remote_address,
+    app=app,
+    default_limits=["5 per second"]
+)
+
 mimetypes.add_type('application/javascript', '.js')
+
+ALLOWED_DOMAINS = ['github.com'] # for CORS proxy
 
 oauth = OAuth(app)
 github = oauth.register(
@@ -66,6 +78,59 @@ def authorize():
 @app.route("/help")
 def show_help():
     return render_template('help.html')
+
+def is_allowed_domain(url):
+    from urllib.parse import urlparse
+    domain = urlparse(url).netloc
+    return domain in ALLOWED_DOMAINS
+
+@app.route('/proxy/<path:url>', methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'])
+@limiter.limit("5 per second")
+def proxy(url):
+    # decode the URL to handle special characters
+    url = requests.utils.unquote(url)
+    if not url:
+        return jsonify({'error': 'Missing URL subpath'}), 400
+    # default to https if no protocol is provided
+    if not url.startswith('http'):
+        url = 'https://' + url
+    if not is_allowed_domain(url):
+        return jsonify({'error': 'Domain not allowed'}), 400
+    url+= '?' + request.query_string.decode()
+
+    # Get the request method and headers
+    method = request.method
+    headers = {key: value for key, value in request.headers if key != 'Host'}
+    headers["Origin"] = headers["Referer"].strip("/")
+    headers["Sec-Fetch-Site"] = "cross-site"
+    headers["TE"] = "trailers" 
+    auth_str = session['userLogin'] + ':' + session['githubToken']
+#    headers['Authorization'] = 'Bearer ' + b64encode(auth_str.encode()).decode()
+#    headers['Authorization'] = 'Basic ' + b64encode(auth_str.encode()).decode()
+#    headers['Authorization'] = 'Bearer ' + b64encode(session['githubToken'].encode()).decode()
+#   headers['Authorization'] = 'token ' + session['githubToken']
+#   headers["X-GitHub-Api-Version"] = "2022-11-28"
+
+#   # Forward the request to the target URL
+    print(f"Proxying {method} request to {url}")
+    print(f"Headers: {headers}")
+    print(f"Credentials: {auth_str}")
+#   print(f"auth_str: {auth_str}")
+    response = requests.request(method, url, headers=headers, data=request.get_data(), cookies=request.cookies)
+    print(f"Response from {url}: {response.text}")
+
+    # Prepare the response to return to the client
+    excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
+    headers = [(name, value) for name, value in response.raw.headers.items() if name.lower() not in excluded_headers]
+
+    return (response.content, response.status_code, headers)
+
+@app.after_request
+def add_cors_headers(response):
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+    return response
 
 if __name__ == '__main__':
     load_dotenv()
