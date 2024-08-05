@@ -33,7 +33,6 @@ github = oauth.register(
     client_kwargs={'scope': 'repo user'},
 )
 
-
 @app.route('/')
 def index():
     haveGHConfig = getenv("CLIENT_ID");
@@ -57,9 +56,34 @@ def login():
     # redirect_url = url_for("authorize", _external=True)
     return github.authorize_redirect(redirect_url)
 
+@app.route('/login/<provider>')
+def loginProvider(provider):
+    redirect_uri = url_for('authorize', provider=provider, _external=True)
+    if provider == 'github':
+        return github.authorize_redirect(redirect_uri)
+#    elif provider == 'gitlab':
+#        return gitlab.authorize_redirect(redirect_uri)
+#    elif provider == 'bitbucket':
+#        return bitbucket.authorize_redirect(redirect_uri)
+    else:
+        return 'Unsupported provider', 400
+
 @app.route("/logout")
 def logout():
+    # log out of every provider
     session.clear()
+    env_url = getenv("ROOT_URL")
+    return redirect(env_url if env_url else url_for('index'))
+
+@app.route('/logout/<provider>')
+def logoutProvider(provider):
+    # log out of a specific provider
+    if provider == 'github':
+        session.pop('github_user', None)
+    elif provider == 'gitlab':
+        session.pop('gitlab_user', None)
+    elif provider == 'bitbucket':
+        session.pop('bitbucket_user', None)
     env_url = getenv("ROOT_URL")
     return redirect(env_url if env_url else url_for('index'))
 
@@ -74,6 +98,18 @@ def authorize():
     session['userEmail'] = profile["login"] + "@users.noreply.github.com"
     env_url = getenv("ROOT_URL")
     return redirect(env_url if env_url else url_for('index'))
+
+@app.route("/authorize/<provider>")
+def authorizeProvider(provider):
+    redirect_uri = url_for('authorize', provider=provider, _external=True)
+    if provider == "github":
+        return github.authorize_access_token(redirect_uri)
+#    elif provider == "gitlab":
+#        return gitlab.authorize_access_token(redirect_uri)
+#    elif provider == "bitbucket":
+#        return bitbucket.authorize_access_token(redirect_uri)
+    else:
+        return 'Unsupported provider', 400
 
 @app.route("/help")
 def show_help():
