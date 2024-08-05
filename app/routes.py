@@ -120,7 +120,7 @@ def proxy(url):
     print(f"Response from {url}: {response.text}")
 
     # Prepare the response to return to the client
-    excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
+    excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection', 'www-authenticate']
     headers = [(name, value) for name, value in response.raw.headers.items() if name.lower() not in excluded_headers]
 
     return (response.content, response.status_code, headers)

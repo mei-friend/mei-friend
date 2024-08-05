@@ -26,6 +26,13 @@ export default class GitManager {
       //     password: githubToken,
       //     username: 'x-oauth-basic',
       onAuth: () => ({ username: githubToken, password: 'x-oauth-basic' }),
+      onAuthFailure: () => {
+        console.log('auth failure');
+        return { cancel: true };
+      },
+      onAuthSuccess: () => {
+        console.log('auth success');
+      },
     };
     console.log('cloneobj', cloneobj);
     await git.clone(cloneobj);
