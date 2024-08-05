@@ -7,6 +7,15 @@ export default class GitManager {
   constructor() {
     console.log('GitManager constructor');
     this.gitdir = '/gitdir';
+    this.providerSpecific_onAuth = {
+      //see https://isomorphic-git.org/docs/en/onAuth#docsNav
+      //n.b. currently only tested with github
+      //we need a mechanism to support multiple different instances of decentralized git providers
+      github: () => ({ username: githubToken, password: 'x-oauth-basic' }),
+      gitlab: () => ({ username: 'oauth2', password: gitlabToken }),
+      bitbucket: () => ({ username: 'x-token-auth', password: bitbucketToken }),
+    };
+    this.cloud;
   }
 
   async clone(url) {
@@ -19,13 +28,9 @@ export default class GitManager {
       dir: this.gitdir,
       ref: 'main',
       corsProxy: '/proxy',
-      //corsProxy: 'https://cors.isomorphic-git.org',
       singleBranch: true,
-      //  oauth2format: 'github',
-      //token: githubToken,
-      //     password: githubToken,
-      //     username: 'x-oauth-basic',
-      onAuth: () => ({ username: githubToken, password: 'x-oauth-basic' }),
+      // need a mechanism to decide which provider to use
+      onAuth: this.providerSpecific_onAuth['github'],
       onAuthFailure: () => {
         console.log('auth failure');
         return { cancel: true };
@@ -36,25 +41,6 @@ export default class GitManager {
     };
     console.log('cloneobj', cloneobj);
     await git.clone(cloneobj);
-    /*.then(() => {
-        console.log('Repository cloned successfully!');
-      })
-      .catch((err) => {
-        console.error('Failed to clone repository:', err);
-      });*/
-    //oauth2format: 'github',
-    //token: githubToken,
-    //username: userLogin,
-    //password: 'x-oauth-basic',
-    //]password: githubToken,
-  }
-
-  async pull() {
-    await git.pull({
-      fs,
-      http,
-      dir: this.gitdir,
-    });
   }
 
   async push() {
