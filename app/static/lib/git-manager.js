@@ -1,36 +1,48 @@
 import http from 'https://unpkg.com/isomorphic-git@beta/http/web/index.js';
+import GitCloudClient from './git-cloud-client.js';
 
 window.fs = new LightningFS('fs', { wipe: true });
 window.pfs = window.fs.promises; // promisified version of fs, for your convenience
 
 export default class GitManager {
-  constructor() {
-    console.log('GitManager constructor');
-    this.gitdir = '/gitdir';
-    this.providerSpecific_onAuth = {
-      //see https://isomorphic-git.org/docs/en/onAuth#docsNav
-      //n.b. currently only tested with github
-      //we need a mechanism to support multiple different instances of decentralized git providers
-      github: () => ({ username: githubToken, password: 'x-oauth-basic' }),
-      gitlab: () => ({ username: 'oauth2', password: gitlabToken }),
-      bitbucket: () => ({ username: 'x-token-auth', password: bitbucketToken }),
-    };
-    this.cloud;
+  constructor(provider, providerType, token) {
+    console.log('GitManager constructor', provider, providerType, token);
+    this.token = token;
+    this.directory = '/' + provider; // e.g. '/github'
+    this.provider = provider;
+    this.providerType = providerType;
+    //set up type-specific onAuth, see https://isomorphic-git.org/docs/en/onAuth#docsNav
+    switch (providerType) {
+      case 'github':
+        this.onAuth = () => ({ username: this.token, password: 'x-oauth-basic' });
+        break;
+      case 'gitlab':
+        this.onAuth = () => ({ username: 'oauth2', password: this.token });
+        break;
+      case 'bitbucket':
+        this.onAuth = () => ({ username: 'x-token-auth', password: this.token });
+        break;
+      case 'codeberg':
+        this.onAuth = () => ({ username: 'oauth2', password: this.token });
+        break;
+      default:
+        throw new Error('Unknown provider');
+    }
+    this.cloud = new GitCloudClient({ token, provider, providerType });
   }
 
   async clone(url) {
-    console.log('cloning into', this.gitdir, githubToken);
-    await pfs.mkdir(this.gitdir);
+    console.log('cloning into', this.directory, this.token);
+    await pfs.mkdir(this.directory);
     let cloneobj = {
       fs,
       http,
       url,
-      dir: this.gitdir,
+      dir: this.directory,
       ref: 'main',
       corsProxy: '/proxy',
       singleBranch: true,
-      // need a mechanism to decide which provider to use
-      onAuth: this.providerSpecific_onAuth['github'],
+      onAuth: this.onAuth,
       onAuthFailure: () => {
         console.log('auth failure');
         return { cancel: true };
@@ -47,14 +59,14 @@ export default class GitManager {
     await git.push({
       fs,
       http,
-      dir: this.gitdir,
+      dir: this.directory,
     });
   }
 
   async add(path) {
     await git.add({
       fs,
-      dir: this.gitdir,
+      dir: this.directory,
       filepath: path,
     });
   }
@@ -62,7 +74,7 @@ export default class GitManager {
   async commit(message) {
     await git.commit({
       fs,
-      dir: this.gitdir,
+      dir: this.directory,
       message: message,
     });
   }
@@ -70,26 +82,26 @@ export default class GitManager {
   async status() {
     return await git.status({
       fs,
-      dir: this.gitdir,
+      dir: this.directory,
       filepath: 'README.md',
     });
   }
 
   async readFile(path) {
-    return await pfs.readFile(this.gitdir + '/' + path, 'utf8');
+    return await pfs.readFile(this.directory + '/' + path, 'utf8');
   }
 }
 
 console.log('git.js loaded');
 
-let gm = new GitManager();
+let gm = new GitManager('github', 'github', githubToken);
 console.log('gm created');
 //console.log('readdir', await pfs.readdir(git.dir));
 await gm.clone('https://github.com/isogit-test/private');
 //await gm.clone('https://github.com/musicog/test-encodings');
 console.log('cloned');
-console.log('reading', gm.gitdir);
-let out = await pfs.readdir(gm.gitdir);
+console.log('reading', gm.directory);
+let out = await pfs.readdir(gm.directory);
 console.log('read', out);
 let contents = await gm.readFile('./README.md');
 console.log('contents', contents);
