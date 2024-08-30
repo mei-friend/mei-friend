@@ -1951,10 +1951,24 @@ export function addZone(v, cm, rect, addMeasure = true) {
   } else if (!addMeasure && att.attFacsimile.includes(selectedElement.nodeName)) {
     // TODO: retrieve correct surface element for selected source image from rect
     let surfaceId = rect.closest('div[data-surfaceid]')?.getAttribute('data-surfaceid');
-    console.log('addZone() retrieved surfaceId: ', surfaceId);
+    let surface = v.xmlDoc.querySelector('[*|id="' + surfaceId + '"]');
+    console.log('addZone() retrieved surface: ', surface);
 
     // find pertinent zone in surface for inserting new zone
     let facs = v.xmlDoc.querySelectorAll('[facs],[*|id="' + selectedId + '"');
+
+    // find zones referenced by @facs and insert new zone after the last one
+    facs.forEach((f) => {
+      let id = utils.rmHash(f.getAttribute('facs'));
+      let referencedNode = v.xmlDoc.querySelector('[*|id="' + id + '"');
+      if (referencedNode.closest('surface') === surface) {
+        console.log('zone inside clicked surface: ', referencedNode);
+        if (f.isEqualNode(selectedElement)) {
+          selectedElement = referencedNode;
+        }
+      }
+    });
+
     let i = Array.from(facs).findIndex((n) => n.isEqualNode(selectedElement));
     let referenceNodeId = utils.rmHash(facs[i === 0 ? i + 1 : i - 1].getAttribute('facs'));
     let referenceNode = v.xmlDoc.querySelector('[*|id="' + referenceNodeId + '"');
