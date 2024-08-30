@@ -39,6 +39,10 @@
     referrerpolicy="no-referrer">
   </script> -->
 
+    <script src="{{ url_for('static', filename='pdfkit/pdfkit.standalone.js') }}"></script>
+    <script src="{{ url_for('static', filename='pdfkit/svgtopdf.js') }}"></script>
+    <script src="{{ url_for('static', filename='pdfkit/blob-stream.js') }}"></script>
+    
     <script src="{{ url_for('static', filename='deps/solid-client-authn.bundle.js') }}"></script>
     <script src="{{ url_for('static', filename='lib/env.js') }}"></script>
     <script src="{{ url_for('static', filename='lib/jsgit.js') }}"></script>

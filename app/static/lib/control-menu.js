@@ -50,7 +50,7 @@ export function createNotationDiv(parentElement, scale) {
   // // append everything
   // svgContainer.appendChild(svg);
   // facsimilePanel.append(svgContainer);
-  
+
 
   // add both containers to parent (#notation)
   parentElement.appendChild(verovioContainer);
@@ -367,6 +367,86 @@ export function createNotationControlBar(parentElement, scale) {
   pdfCtrlDiv.classList.add('controls');
   pdfCtrlDiv.style.display = 'none';
   vrvCtrlMenu.appendChild(pdfCtrlDiv);
+
+  // create button that turns the svg element inside verovioPanel into a pdf
+  let button = document.createElement('button');
+  button.id = 'pdfButton';
+  button.classList.add('btn');
+  button.classList.add('icon');
+  button.innerHTML = icon.pdfIcon;
+  button.classList.add('inline-block-tight');
+  button.title = 'Create PDF';
+  pdfCtrlDiv.appendChild(button);
+  button.addEventListener('click', () => {
+    console.log('Create PDF');
+
+    let svg = document.getElementById('verovio-panel').querySelector('svg');
+    console.log('svg: ', svg);
+
+    const doc = new PDFDocument({
+      autoFirstPage: false,
+      compress: true,
+      useCSS: true,
+      size: 'A4',
+      layout: 'landscape',
+    });
+
+    // create PDF file
+    doc.info = {
+      Title: 'Hallo PDF-Test',
+      Author: 'Created by mei-friend',
+      Subject: 'Version 0.1',
+      Keywords: 'Music encoding, MEI, mei-friend, public-domain',
+      CreationDate: new Date(),
+    };
+    console.log('doc: ', doc);
+
+    // create stream
+    const stream = doc.pipe(blobStream());
+    // Font callback and buffer for pdfkit
+    let fontCallback = function (family, bold, italic) {
+      if (family === 'VerovioText') {
+        return family;
+      }
+      if (family.match(/(?:^|,)\s*sans-serif\s*$/) || true) {
+        let font = 'Times'; // 'Edwin'; does not work, because pdfkit is using the fs package available in node.js only
+        if (bold && italic) {
+          return font + '-BoldItalic';
+        }
+        if (bold && !italic) {
+          return font + '-Bold';
+        }
+        if (!bold && italic) {
+          return font + '-Italic';
+        }
+        if (!bold && !italic) {
+          return font + '-Roman';
+        }
+      }
+    }
+
+    let options = {};
+    options.fontCallback = fontCallback;
+    options.useCSS = true;
+    console.log('options: ', options);
+
+    console.log('Adding page:');
+    doc.addPage();
+    SVGtoPDF(doc, svg, 0, 0, options);
+
+    doc.end();
+    console.log('doc end');
+
+    stream.on('finish', function () {
+      const blob = stream.toBlob('application/pdf');
+      const url = stream.toBlobURL('application/pdf');
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'mei-friend.pdf';
+      a.click();
+    });
+
+  });
 
   let savePdfButton = document.createElement('button');
   savePdfButton.id = 'pdfSaveButton';
