@@ -551,7 +551,7 @@ a:active {
   fill: var(--textColor);
 }
 
-#verovio-panel {
+#verovioContainer {
   height: 100%;
   width: 100%;
   overflow: inherit;
