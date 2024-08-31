@@ -396,12 +396,14 @@ export default class Viewer {
     let bs = this.breaksSelect;
     if (bs) this.vrvOptions.breaks = bs.value;
     let choiceSelect = this.choiceSelect;
-    if (choiceSelect.selectedOptions.length > 0) {
+    if (choiceSelect && choiceSelect.selectedOptions.length > 0) {
       let selectedChoice = choiceSelect.selectedOptions[0]; //always the first until type is changed to multiselect
-      if (selectedChoice.value != '') {
-        this.vrvOptions[selectedChoice.dataset.prop] = ['./' + selectedChoice.value];
-      } else {
-        this.vrvOptions[selectedChoice.dataset.prop] = [];
+      if (selectedChoice.dataset.prop) {
+        if (selectedChoice.value != '') {
+          this.vrvOptions[selectedChoice.dataset.prop] = ['./' + selectedChoice.value];
+        } else {
+          this.vrvOptions[selectedChoice.dataset.prop] = [];
+        }
       }
     }
 
