@@ -239,14 +239,19 @@ export default class Viewer {
    * return MEI excerpt of currentPage page
    * (including dummy measures before and after current page by default)
    * @param {string} mei mei file in string format
-   * @param {boolean} includeDummyMeasures 
-   * @param {boolean} forceReload 
-   * @returns 
+   * @param {boolean} includeDummyMeasures
+   * @param {boolean} forceReload
+   * @returns
    */
-  speedFilter(mei, includeDummyMeasures = true, forceReload = false) {
+  speedFilter(mei, includeDummyMeasures = true, forceReload = false, addColor = false) {
     let breaks = this.breaksValue();
     let breaksSelectVal = this.breaksSelect.value;
     if (!this.speedMode || breaksSelectVal === 'none') {
+      if (addColor) {
+        // add color to markup elements
+        let tmpXmlDoc = dutils.addColorToMarkupElements(this.parser.parseFromString(mei, 'text/xml'));
+        return new XMLSerializer().serializeToString(tmpXmlDoc);
+      }
       return mei;
     }
     // update DOM only if encoding has been edited or
@@ -254,6 +259,7 @@ export default class Viewer {
     // create a deep clone of xml.Doc before filtering for markup
     // hard markup filters should never modify v.xmlDoc! (because non-displayed variants will get lost)
     let speedMeiDoc = this.xmlDoc.cloneNode(true);
+    if (addColor) speedMeiDoc = dutils.addColorToMarkupElements(speedMeiDoc);
     const choiceOption = this.choiceSelect.value;
     let markupResult = selectMarkup(speedMeiDoc, choiceOption); // select markup
     if (markupResult?.changed === true) {
@@ -1014,9 +1020,11 @@ export default class Viewer {
   } // pageModeOff()
 
   saveAsPdf() {
+    let colorMei = this.speedFilter(cm.getValue(), undefined, undefined, true);
+    console.log('Colored MEI: ', colorMei);
     this.vrvWorker.postMessage({
       cmd: 'renderPdf',
-      msg: this.speedFilter(cm.getValue()),
+      msg: colorMei,
       title: meiFileName,
       version: version,
       versionDate: versionDate,

@@ -376,7 +376,6 @@ addEventListener(
         const doc = new PDFDocument({
           autoFirstPage: false,
           compress: true,
-          useCSS: true,
           size: pdfFormat,
           layout: pdfOrientation,
         });
