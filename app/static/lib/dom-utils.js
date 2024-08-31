@@ -6,7 +6,7 @@ export const navElsArray = ['note', 'rest', 'mRest', 'beatRpt', 'halfmRpt', 'mRp
 export const navElsSelector = '.' + navElsArray.join(',.');
 
 import * as att from './attribute-classes.js';
-import { escapeXmlId, generateXmlId } from './utils.js';
+import { escapeXmlId, generateXmlId, hexToRgb } from './utils.js';
 import Viewer from './viewer.js';
 
 /**
@@ -502,3 +502,26 @@ export function scrollTo(container, element) {
   }
   return false;
 } // scrollTo()
+
+/**
+ * Processes entire xmlDoc element for markup elemenets
+ * and adds a color attribute to first child of them
+ * @param {Node} xmlDoc
+ */
+export function addColorToMarkupElements(xmlDoc) {
+  let markupElementTypes = ['add', 'choice', 'corr', 'del', 'orig', 'sic', 'supplied', 'unclear'];
+  let colorChoserIds = markupElementTypes.map((type) => type + 'Color');
+
+  markupElementTypes.forEach((type, index) => {
+    let elements = xmlDoc.querySelectorAll(type);
+    elements.forEach((element) => {
+      let children = element.children;
+      if (children.length > 0) {
+        let hexColor = document.getElementById(colorChoserIds[index]).value;
+        let rgbString = 'rgb(' + hexToRgb(hexColor).join(', ') + ')';
+        children[0].setAttribute('color', rgbString);
+      }
+    });
+  });
+  return xmlDoc;
+} // addColorToMarkupElements()
