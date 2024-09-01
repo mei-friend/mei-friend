@@ -1022,11 +1022,9 @@ export default class Viewer {
   } // pageModeOff()
 
   saveAsPdf() {
-    let colorMei = this.speedFilter(cm.getValue(), undefined, undefined, true);
-    console.log('Colored MEI: ', colorMei);
     this.vrvWorker.postMessage({
       cmd: 'renderPdf',
-      msg: colorMei,
+      msg: this.speedFilter(cm.getValue(), undefined, undefined, true),
       title: meiFileName,
       version: version,
       versionDate: versionDate,

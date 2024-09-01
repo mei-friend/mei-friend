@@ -422,8 +422,9 @@ addEventListener(
 
           if (result.speedMode) {
             tk.setOptions({ breaks: 'encoded' });
-            tk.loadData(result.msg);
           }
+          tk.loadData(result.msg);
+          result.toolkitDataOutdated = true;
 
           // add pages to the file
           let c = 0;

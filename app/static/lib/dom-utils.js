@@ -509,7 +509,7 @@ export function scrollTo(container, element) {
  * @param {Node} xmlDoc
  */
 export function addColorToMarkupElements(xmlDoc) {
-  let markupElementTypes = ['add', 'choice', 'corr', 'del', 'orig', 'sic', 'supplied', 'unclear'];
+  let markupElementTypes = ['add', 'corr', 'del', 'orig', 'reg', 'sic', 'supplied', 'unclear'];
   let colorChoserIds = markupElementTypes.map((type) => type + 'Color');
 
   markupElementTypes.forEach((type, index) => {
@@ -519,7 +519,7 @@ export function addColorToMarkupElements(xmlDoc) {
       if (children.length > 0) {
         let hexColor = document.getElementById(colorChoserIds[index]).value;
         let rgbString = 'rgb(' + hexToRgb(hexColor).join(', ') + ')';
-        children[0].setAttribute('color', rgbString);
+        Array.from(children).forEach((child) => child.setAttribute('color', rgbString));
       }
     });
   });
