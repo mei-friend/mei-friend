@@ -2,6 +2,7 @@
 
 ### 1.1.6 patch
 
+* Support for markup color export to PDF (#108)
 * Fix version selection and parsing in speed mode
 * Fix and markup deletion in speed mode
 * Improve markup UI
