@@ -510,14 +510,14 @@ export function scrollTo(container, element) {
  */
 export function addColorToMarkupElements(xmlDoc) {
   let markupElementTypes = ['add', 'corr', 'del', 'orig', 'reg', 'sic', 'supplied', 'unclear'];
-  let colorChoserIds = markupElementTypes.map((type) => type + 'Color');
+  let colorChooserIds = markupElementTypes.map((type) => type + 'Color');
 
   markupElementTypes.forEach((type, index) => {
     let elements = xmlDoc.querySelectorAll(type);
     elements.forEach((element) => {
       let children = element.children;
       if (children.length > 0) {
-        let hexColor = document.getElementById(colorChoserIds[index]).value;
+        let hexColor = document.getElementById(colorChooserIds[index]).value;
         let rgbString = 'rgb(' + hexToRgb(hexColor).join(', ') + ')';
         Array.from(children).forEach((child) => child.setAttribute('color', rgbString));
       }
