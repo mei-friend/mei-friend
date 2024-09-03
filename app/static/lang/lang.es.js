@@ -899,6 +899,11 @@ export const lang = {
     text: 'Mapa de teclas',
     description: 'Seleccione el mapa de teclas',
   },
+  // Persistent Search / Búsqueda persistente
+  persistentSearch: {
+    text: 'Caja de búsqueda persistente',
+    description: 'Utilizar el comportamiento de la caja de búsqueda persistente (la caja de búsqueda permanece abierta hasta que se cierre explícitamente)',
+  },
 
   // Verovio settings / Configuraciones de Verovio
   verovioSettingsHeader: {
