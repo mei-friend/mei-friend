@@ -1,4 +1,6 @@
 # mei-friend-online CHANGELOG.md
+### 1.0.14p hotfix  
+* Fix infinite loop with incomplete choice element (#109, thx @maxrothmann)
 
 ### 1.0.14 Patch (JOSS release)
 * Update path for matomo usage statics
