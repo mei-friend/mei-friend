@@ -1615,6 +1615,26 @@ export let cmd = {
   downloadMei: () => downloadMei(),
   downloadMeiBasic: () => downloadMeiBasic(),
   downloadSpeedMei: () => downloadSpeedMei(),
+  doFind: () => {
+    if (document.getElementById('persistentSearch').checked) {
+      CodeMirror.commands.findPersistent(cm);
+    } else { CodeMirror.commands.find(cm); }
+    document.getElementById('CodeMirror-search-field').focus()
+  },
+  doFindNext: () => {
+    if (document.getElementById('persistentSearch').checked) {
+      CodeMirror.commands.findPersistentNext(cm)
+    } else {
+      CodeMirror.commands.findNext(cm);
+    }
+  },
+  doFindPrev: () => {
+    if (document.getElementById('persistentSearch').checked) {
+      CodeMirror.commands.findPersistentPrev(cm)
+    } else {
+      CodeMirror.commands.findPrev(cm);
+    }
+  },
   indentSelection: () => e.indentSelection(v, cm),
   validate: () => v.manualValidate(),
   notesZoomIn: () => v.zoom(+1, storage),
@@ -1885,9 +1905,9 @@ function addEventListeners(v, cm) {
   // edit dialogs
   document.getElementById('undoMenu').addEventListener('click', cmd.undo);
   document.getElementById('redoMenu').addEventListener('click', cmd.redo);
-  document.getElementById('startSearch').addEventListener('click', () => CodeMirror.commands.find(cm));
-  document.getElementById('findNext').addEventListener('click', () => CodeMirror.commands.findNext(cm));
-  document.getElementById('findPrevious').addEventListener('click', () => CodeMirror.commands.findPrev(cm));
+  document.getElementById('startSearch').addEventListener('click', () => CodeMirror.commands.findPersistent(cm));
+  document.getElementById('findNext').addEventListener('click', () => CodeMirror.commands.findPersistentNext(cm));
+  document.getElementById('findPrevious').addEventListener('click', () => CodeMirror.commands.findPersistentPrev(cm));
   document.getElementById('replaceMenu').addEventListener('click', () => CodeMirror.commands.replace(cm));
   document.getElementById('replaceAllMenu').addEventListener('click', () => CodeMirror.commands.replaceAll(cm));
   document.getElementById('indentSelection').addEventListener('click', indentSelection);

@@ -899,6 +899,10 @@ export const lang = {
     text: 'Mapa de tecles',
     description: 'Selecciona el mapa de tecles',
   },
+  persistentSearch: {
+    text: 'Caixa de cerca persistent',
+    description: 'Utilitza el comportament de la caixa de cerca persistent (la caixa de cerca roman oberta fins que es tanca explícitament)',
+  },
 
   // Verovio settings / Configuració de Verovio
   verovioSettingsHeader: {

@@ -843,6 +843,11 @@ export const lang = {
     text: '键映射',
     description: '选择键映射',
   },
+  // translate the values of the following persistentSearch object
+  persistentSearch: {
+    text: '持久搜索框',
+    description: '使用持久搜索框行为（搜索框保持打开直到显式关闭）',
+  },
 
   // Verovio settings
   verovioSettingsHeader: {

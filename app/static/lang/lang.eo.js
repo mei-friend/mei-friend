@@ -877,7 +877,11 @@ export const lang = {
     text: 'Klavara mapo',
     description: 'Elekti klavaran mapon',
   },
-
+  persistentSearch: {
+    text: 'Persistanta serĉujo',
+    description: 'Uzu persistantan konduton de serĉujo (serĉujo restas malfermita ĝis eksplcite fermata)',
+  },
+  
   // Verovio-agordoj
   verovioSettingsHeader: {
     text: 'Verovio-agordoj',

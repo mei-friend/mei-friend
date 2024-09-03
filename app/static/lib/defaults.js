@@ -1057,6 +1057,12 @@ export const codeMirrorSettingsOptions = {
     default: 'default',
     values: ['default', 'vim', 'emacs'],
   },
+  persistentSearch: {
+    title: 'Persistent search box',
+    description: 'Use persistent search box behavior (search box remains open until explicitly closed)',
+    type: 'bool',
+    default: true,
+  },
 };
 
 // for facsimile
