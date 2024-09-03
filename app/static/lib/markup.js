@@ -80,6 +80,7 @@ export function selectChoice(xmlDoc, sourceId) {
       choice.remove(); // ... and remove choice afterwards
     } else {
       console.log('This choice has no child elements. ', choice);
+      break;
     }
   }
   return xmlDoc;
