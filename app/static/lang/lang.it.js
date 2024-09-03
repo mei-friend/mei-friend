@@ -914,6 +914,10 @@ export const lang = {
     text: 'Mostra elementi di markup editoriale',
     description: 'Evidenzia tutti gli elementi contenuti dagli elementi di markup editoriale',
   },
+  markupToPDF: {  
+    text: 'Mostra elementi di markup editoriale nel PDF',
+    description: 'Mostra gli elementi di markup editoriale nel PDF generato',
+  },
   alternativeVersionContent: {
     text: 'Seleziona il contenuto predefinito per le codifiche alternative',
     description: 'Scegli se le codifiche alternative appena create sono vuote o copie della lettura originale',

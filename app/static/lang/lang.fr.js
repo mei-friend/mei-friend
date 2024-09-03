@@ -506,10 +506,10 @@ export const lang = {
   selectionSelect: {
     text: 'Sélection par défaut pour la balise',
     description: 'Choisissez si la balise nouvellement créée doit englober les éléments sélectionnés, les articulations ou les accidentels',
-    labels: ['Éléments sélectionnés','Articulation', 'Accidentel'],
+    labels: ['Éléments sélectionnés', 'Articulation', 'Accidentel'],
     valuesDescriptions: [
-      'Ajoute une balise aux éléments sélectionnés.', 
-      'Ajoute une balise aux articulations dans la sélection.', 
+      'Ajoute une balise aux éléments sélectionnés.',
+      'Ajoute une balise aux articulations dans la sélection.',
       'Ajoute une balise aux accidentels dans la sélection.'
     ],
   },
@@ -521,17 +521,17 @@ export const lang = {
     text: '<choice>',
     description: 'Regroupe plusieurs encodages alternatifs pour le même point dans un texte.',
   },
-  choiceSicCorr: { 
-    description: 'Place la sélection dans <sic> et ajoute <corr>.' 
+  choiceSicCorr: {
+    description: 'Place la sélection dans <sic> et ajoute <corr>.'
   },
-  choiceCorrSic: { 
-    description: 'Place la sélection dans <corr> et ajoute <sic>.' 
+  choiceCorrSic: {
+    description: 'Place la sélection dans <corr> et ajoute <sic>.'
   },
-  choiceOrigReg: { 
-    description: 'Place la sélection dans <orig> et ajoute <reg>.' 
+  choiceOrigReg: {
+    description: 'Place la sélection dans <orig> et ajoute <reg>.'
   },
-  choiceRegOrig: { 
-    description: 'Place la sélection dans <reg> et ajoute <orig>.' 
+  choiceRegOrig: {
+    description: 'Place la sélection dans <reg> et ajoute <orig>.'
   },
   choiceContentTarget: {
     text: '(sélectionner le contenu)',
@@ -542,11 +542,11 @@ export const lang = {
     description:
       '(substitution) - Regroupe les éléments de transcription lorsque la combinaison doit être considérée comme une intervention unique dans le texte.',
   },
-  substAddDel: { 
-    description: 'Place la sélection dans <add> et ajoute <del>.' 
+  substAddDel: {
+    description: 'Place la sélection dans <add> et ajoute <del>.'
   },
-  substDelAdd: { 
-    description: 'Place la sélection dans <del> et ajoute <add>.' 
+  substDelAdd: {
+    description: 'Place la sélection dans <del> et ajoute <add>.'
   },
   substContentTarget: {
     text: '(sélectionner le contenu)',
@@ -906,6 +906,10 @@ export const lang = {
   showMarkup: {
     text: 'Afficher les éléments de mise en forme éditoriale',
     description: 'Surligner tous les éléments contenus dans les éléments de mise en forme éditoriale',
+  },
+  markupToPDF: {
+    text: 'Afficher les éléments de mise en forme éditoriale dans le PDF',
+    description: 'Afficher les éléments de mise en forme éditoriale dans le PDF généré',
   },
   alternativeVersionContent: {
     text: 'Sélectionner le contenu par défaut pour les encodages alternatifs',

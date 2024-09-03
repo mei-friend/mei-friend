@@ -484,9 +484,9 @@ export const lang = {
   selectionSelect: {
     text: 'マークアップのデフォルト選択',
     description: '新しく作成されたマークアップが選択された要素、アーティキュレーション、またはアクシデンタルを囲むかどうかを選択してください',
-    labels: ['選択された要素','アーティキュレーション', 'アクシデンタル'],
+    labels: ['選択された要素', 'アーティキュレーション', 'アクシデンタル'],
     valuesDescriptions: [
-      '選択された要素にマークアップを追加します。', 
+      '選択された要素にマークアップを追加します。',
       '選択範囲内のアーティキュレーションにマークアップを追加します。',
       '選択範囲内のアクシデンタルにマークアップを追加します。'
     ],
@@ -499,17 +499,18 @@ export const lang = {
     text: '<choice>',
     description: 'テキスト内の同じポイントの複数の代替エンコーディングをグループ化します。',
   },
-  choiceSicCorr: { 
-    description: '<sic> に選択を入れて <corr> を追加します。' 
-},
-  choiceCorrSic: { 
-    description: '<corr> に選択を入れて <sic> を追加します。' 
+  choiceSicCorr: {
+    description: '<sic> に選択を入れて <corr> を追加します。'
   },
-  choiceOrigReg: { 
-    description: '<orig> に選択を入れて <reg> を追加します。' 
+  choiceCorrSic: {
+    description: '<corr> に選択を入れて <sic> を追加します。'
   },
-  choiceRegOrig: { 
-    description: '<reg> に選択を入れて <orig> を追加します。' },
+  choiceOrigReg: {
+    description: '<orig> に選択を入れて <reg> を追加します。'
+  },
+  choiceRegOrig: {
+    description: '<reg> に選択を入れて <orig> を追加します。'
+  },
   choiceContentTarget: {
     text: '(コンテンツを選択)',
     description: '<choice> の上にホバーしてこの要素のためにコンテンツを選択します。',
@@ -518,11 +519,11 @@ export const lang = {
     text: '<subst>',
     description: '(置換) - テキスト内での組み合わせが単一の介入と見なされる場合に、転写要素をグループ化します。',
   },
-  substAddDel: { 
-    description: '<add> に選択を入れて <del> を追加します。' 
+  substAddDel: {
+    description: '<add> に選択を入れて <del> を追加します。'
   },
-  substDelAdd: { 
-    description: '<del> に選択を入れて <add> を追加します。' 
+  substDelAdd: {
+    description: '<del> に選択を入れて <add> を追加します。'
   },
   substContentTarget: {
     text: '(コンテンツを選択)',
@@ -867,6 +868,10 @@ export const lang = {
   showMarkup: {
     text: '編集マークアップ要素を表示',
     description: '編集マークアップ要素に含まれるすべての要素を強調表示',
+  },
+  markupToPDF: {
+    text: 'PDFにマークアップを含める',
+    description: 'PDFに編集マークアップ要素を含める',
   },
   alternativeVersionContent: {
     text: '代替エンコーディングのデフォルトコンテンツを選択',

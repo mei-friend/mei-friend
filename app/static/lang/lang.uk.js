@@ -491,10 +491,10 @@ export const lang = {
   selectionSelect: {
     text: 'Стандартний вибір для розмітки',
     description: 'Виберіть, чи новостворена розмітка повинна включати вибрані елементи, артикуляції чи випадкові знаки',
-    labels: ['Вибрані елементи','Артикуляція', 'Випадковий'],
+    labels: ['Вибрані елементи', 'Артикуляція', 'Випадковий'],
     valuesDescriptions: [
-      'Додайте розмітку до вибраних елементів.', 
-      'Додайте розмітку до артикуляцій в виділенні.', 
+      'Додайте розмітку до вибраних елементів.',
+      'Додайте розмітку до артикуляцій в виділенні.',
       'Додайте розмітку до випадкових елементів в виділенні.'
     ],
   },
@@ -506,17 +506,17 @@ export const lang = {
     text: '<choice>',
     description: 'Групує кілька альтернативних кодувань для того ж самого місця в тексті.',
   },
-  choiceSicCorr: { 
-    description: 'Помістіть вибір у <sic> і додайте <corr>.' 
+  choiceSicCorr: {
+    description: 'Помістіть вибір у <sic> і додайте <corr>.'
   },
-  choiceCorrSic: { 
-    description: 'Помістіть вибір у <corr> і додайте <sic>.' 
+  choiceCorrSic: {
+    description: 'Помістіть вибір у <corr> і додайте <sic>.'
   },
-  choiceOrigReg: { 
-    description: 'Помістіть вибір у <orig> і додайте <reg>.' 
+  choiceOrigReg: {
+    description: 'Помістіть вибір у <orig> і додайте <reg>.'
   },
-  choiceRegOrig: { 
-    description: 'Помістіть вибір у <reg> і додайте <orig>.' 
+  choiceRegOrig: {
+    description: 'Помістіть вибір у <reg> і додайте <orig>.'
   },
   choiceContentTarget: {
     text: '(виберіть вміст)',
@@ -527,11 +527,11 @@ export const lang = {
     description:
       '(заміна) - Групує транскрипційні елементи, коли комбінація повинна розглядатися як єдиний втручання в текст.',
   },
-  substAddDel: { 
-    description: 'Помістіть вибір у <add> і додайте <del>.' 
+  substAddDel: {
+    description: 'Помістіть вибір у <add> і додайте <del>.'
   },
-  substDelAdd: { 
-    description: 'Помістіть вибір у <del> і додайте <add>.' 
+  substDelAdd: {
+    description: 'Помістіть вибір у <del> і додайте <add>.'
   },
   substContentTarget: {
     text: '(виберіть вміст)',
@@ -882,6 +882,10 @@ export const lang = {
   showMarkup: {
     text: 'Показати елементи редакційної розмітки',
     description: 'Виділити всі елементи, що містяться в елементах редакційної розмітки',
+  },
+  markupToPDF: {
+    text: 'Розмітка в PDF',
+    description: 'Включити редакційну розмітку у PDF-файл',
   },
   alternativeVersionContent: {
     text: 'Вибір вмісту за замовчуванням для альтернативних кодувань',

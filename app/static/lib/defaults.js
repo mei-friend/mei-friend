@@ -759,6 +759,12 @@ export const meiFriendSettingsOptions = {
     type: 'bool',
     default: true,
   },
+  markupToPDF: {
+    title: 'Show markup in PDF',
+    description: 'filled in by language packs',
+    type: 'bool',
+    default: true,
+  },
   // moved to markup tools tab
   /*respSelect: {
     title: 'Select markup responsibility',

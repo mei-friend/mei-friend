@@ -508,10 +508,10 @@ export const lang = {
   selectionSelect: {
     text: 'Selección predeterminada para marcar',
     description: 'Elija si la marca recién creada debe incluir los elementos seleccionados, articulaciones o alteraciones',
-    labels: ['Elementos seleccionados','Articulación', 'Accidental'],
+    labels: ['Elementos seleccionados', 'Articulación', 'Accidental'],
     valuesDescriptions: [
-      'Añade marcado a los elementos seleccionados.', 
-      'Añade marcado a las articulaciones dentro de la selección.', 
+      'Añade marcado a los elementos seleccionados.',
+      'Añade marcado a las articulaciones dentro de la selección.',
       'Añade marcado a los accidentales dentro de la selección.'
     ],
   },
@@ -523,17 +523,17 @@ export const lang = {
     text: '<choice>',
     description: 'Agrupa varias codificaciones alternativas para el mismo punto en un texto.',
   },
-  choiceSicCorr: { 
-    description: 'Coloca la selección en <sic> y añade <corr>.' 
+  choiceSicCorr: {
+    description: 'Coloca la selección en <sic> y añade <corr>.'
   },
-  choiceCorrSic: { 
-    description: 'Coloca la selección en <corr> y añade <sic>.' 
+  choiceCorrSic: {
+    description: 'Coloca la selección en <corr> y añade <sic>.'
   },
-  choiceOrigReg: { 
-    description: 'Coloca la selección en <orig> y añade <reg>.' 
+  choiceOrigReg: {
+    description: 'Coloca la selección en <orig> y añade <reg>.'
   },
-  choiceRegOrig: { 
-    description: 'Coloca la selección en <reg> y añade <orig>.' 
+  choiceRegOrig: {
+    description: 'Coloca la selección en <reg> y añade <orig>.'
   },
   choiceContentTarget: {
     text: '(seleccionar contenido)',
@@ -544,11 +544,11 @@ export const lang = {
     description:
       '(sustitución) – Agrupa elementos de transcripción cuando la combinación debe considerarse como una intervención única en el texto.',
   },
-  substAddDel: { 
-    description: 'Coloca la selección en <add> y añade <del>.' 
+  substAddDel: {
+    description: 'Coloca la selección en <add> y añade <del>.'
   },
-  substDelAdd: { 
-    description: 'Coloca la selección en <del> y añade <add>.' 
+  substDelAdd: {
+    description: 'Coloca la selección en <del> y añade <add>.'
   },
   substContentTarget: {
     text: '(seleccionar contenido)',
@@ -907,6 +907,10 @@ export const lang = {
   showMarkup: {
     text: 'Mostrar elementos de marcado editorial',
     description: 'Resaltar todos los elementos contenidos por elementos de marcado editorial',
+  },
+  markupToPDF: {
+    text: 'Mostrar marcado editorial en PDF',
+    description: 'Mostrar marcado editorial en PDF',
   },
   alternativeVersionContent: {
     text: 'Seleccionar contenido predeterminado para codificaciones alternativas',

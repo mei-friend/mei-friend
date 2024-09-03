@@ -898,6 +898,10 @@ export const lang = {
     text: 'Show editorial markup elements',
     description: 'Highlight all elements contained by editorial markup elements',
   },
+  markupToPDF: {
+    text: 'Show markup in PDF',
+    description: 'Show editorial markup in PDF export',
+  },
   alternativeVersionContent: {
     text: 'Select default content for alternative encodings',
     description: 'Choose if newly created alternative encodings are empty or copies of the original reading',

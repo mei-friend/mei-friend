@@ -885,6 +885,10 @@ export const lang = {
     text: 'Montri redaktecajn markilojn',
     description: 'Emfazi ĉiujn elementojn enhavitajn de redaktecaj markiloj',
   },
+  markupToPDF: {
+    text: 'Montri redaktecajn markilojn en PDF',
+    description: 'Montri redaktecajn markilojn en PDF',
+  },
   alternativeVersionContent: {
     text: 'Elekti defaŭltan enhavon por alternativaj kodumoj',
     description: 'Elekti ĉu novkreitaj alternativaj kodumoj estas malplenaj aŭ kopioj de la originala legado',

@@ -909,6 +909,10 @@ export const lang = {
     text: 'Mostrar elements de marca editorial',
     description: 'Destacar tots els elements continguts per elements de marca editorial',
   },
+  markupToPDF: {
+    text: 'Mostrar elements de marca editorial a PDF',
+    description: 'Mostrar elements de marca editorial a la sortida PDF',
+  },
   alternativeVersionContent: {
     text: 'Seleccioneu el contingut per defecte per a les codificacions alternatives',
     description: 'Trieu si les codificacions alternatives de nova creació estan buides o còpies de la lectura original',

@@ -906,6 +906,10 @@ export const lang = {
     text: 'Pokaż elementy znacznika redakcyjnego',
     description: 'Podświetl wszystkie elementy zawarte w elementach znacznika redakcyjnego',
   },
+  markupToPDF: {
+    text: 'Pokaż znaczniki redakcyjne w PDF',
+    description: 'Pokaż elementy znacznika redakcyjnego w pliku PDF',
+  },
   alternativeVersionContent: {
     text: 'Wybierz domyślną zawartość dla alternatywnych kodowań',
     description: 'Wybierz, czy nowo utworzone alternatywne kodowania są puste czy kopie oryginalnego odczytu',
