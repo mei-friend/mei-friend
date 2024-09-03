@@ -509,10 +509,9 @@ export function scrollTo(container, element) {
  * @param {Node} xmlDoc
  */
 export function addColorToMarkupElements(xmlDoc) {
-  let markupElementTypes = ['add', 'corr', 'del', 'orig', 'reg', 'sic', 'supplied', 'unclear'];
-  let colorChooserIds = markupElementTypes.map((type) => type + 'Color');
+  let colorChooserIds = att.modelTranscriptionLike.map((type) => type + 'Color');
 
-  markupElementTypes.forEach((type, index) => {
+  att.modelTranscriptionLike.forEach((type, index) => {
     let elements = xmlDoc.querySelectorAll(type);
     elements.forEach((element) => {
       let children = element.children;
