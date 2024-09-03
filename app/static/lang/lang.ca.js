@@ -914,7 +914,7 @@ export const lang = {
     description: 'Mostrar elements de marca editorial a la sortida PDF',
   },
   alternativeVersionContent: {
-    text: 'Seleccioneu el contingut per defecte per a les codificacions alternatives',
+    text: 'Contingut per defecte per a les codificacions alternatives',
     description: 'Trieu si les codificacions alternatives de nova creació estan buides o còpies de la lectura original',
     labels: ['buit', 'còpia'],
   },

@@ -918,8 +918,8 @@ export const lang = {
     description: 'Editorisches Markup in PDF exportieren',
   },
   alternativeVersionContent: {
-    text: 'Wählen Sie den Standardinhalt für alternative Codierungen aus',
-    description: 'Wählen Sie aus, ob neu erstellte alternative Codierungen leer sind oder Kopien der originalen Lesung',
+    text: 'Befüllung alternative Codierungen',
+    description: 'Vorbefüllung für alternative Codierungen auswählen: neu erstellte alternative Codierungen sind leer oder Kopien der originalen Lesung',
     labels: ['leer', 'Kopie'],
   },
   suppliedColor: {

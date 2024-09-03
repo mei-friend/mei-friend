@@ -903,8 +903,8 @@ export const lang = {
     description: 'Show editorial markup in PDF export',
   },
   alternativeVersionContent: {
-    text: 'Select default content for alternative encodings',
-    description: 'Choose if newly created alternative encodings are empty or copies of the original reading',
+    text: 'Content alternative encodings',
+    description: 'Choose default content of alternative encodings: newly created alternative encodings are empty or copies of the original reading',
     labels: ['empty', 'copy'],
   },
   suppliedColor: {

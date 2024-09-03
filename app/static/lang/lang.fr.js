@@ -912,7 +912,7 @@ export const lang = {
     description: 'Afficher les éléments de mise en forme éditoriale dans le PDF généré',
   },
   alternativeVersionContent: {
-    text: 'Sélectionner le contenu par défaut pour les encodages alternatifs',
+    text: 'Contenu par défaut pour les encodages alternatifs',
     description:
       'Choisir si les encodages alternatifs nouvellement créés sont vides ou des copies de la lecture originale',
     labels: ['vide', 'copie'],

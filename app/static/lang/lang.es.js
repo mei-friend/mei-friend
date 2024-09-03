@@ -913,7 +913,7 @@ export const lang = {
     description: 'Mostrar marcado editorial en PDF',
   },
   alternativeVersionContent: {
-    text: 'Seleccionar contenido predeterminado para codificaciones alternativas',
+    text: 'Contenido predeterminado para codificaciones alternativas',
     description:
       'Elegir si las codificaciones alternativas recién creadas están vacías o son copias de la lectura original',
     labels: ['vacío', 'copia'],

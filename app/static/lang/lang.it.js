@@ -919,7 +919,7 @@ export const lang = {
     description: 'Mostra gli elementi di markup editoriale nel PDF generato',
   },
   alternativeVersionContent: {
-    text: 'Seleziona il contenuto predefinito per le codifiche alternative',
+    text: 'Contenuto predefinito per le codifiche alternative',
     description: 'Scegli se le codifiche alternative appena create sono vuote o copie della lettura originale',
     labels: ['vuoto', 'copia'],
   },
