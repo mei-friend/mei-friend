@@ -577,14 +577,30 @@ export function addMarkupHandlers() {
   const toggleContentSelector = (event) => {
     let currentElement = event.currentTarget;
     let targetID = currentElement.dataset.target;
+    let elName = currentElement.dataset.elName;
     let targetDisplay = document.getElementById(targetID);
 
     targetDisplay.innerHTML = currentElement.innerHTML;
     targetDisplay.setAttribute('data-content', currentElement.dataset.contentChoice);
+    let dropdown = document.getElementById(`${elName}-content-options`);
+    console.log('Toggling content selector: ', currentElement,targetID, targetDisplay, elName,dropdown);
+    if (dropdown) dropdown.style.display = 'none';
   };
 
   addSelectionSelect();
   addRespSelect();
+  /* add click handlers to annotationMultiToolsSelectors, i.e. arrows on choice / subst buttons
+     use data-el-name to determine which button we're working with  */
+  let multiToolsSelectors = document.getElementsByClassName('annotationMultiToolsSelector');
+  Array.from(multiToolsSelectors).forEach((selector) => {
+    selector.addEventListener('click', (event) => {
+      let currentElement = event.currentTarget;
+      console.log('Clicked on ', currentElement, event);
+      let targetType = currentElement.dataset.elName;
+      let targetElement = document.getElementById(`${targetType}-content-options`);
+      if(targetElement) targetElement.style.display = targetElement.style.display !== 'block' ? 'block' : 'none';
+    });
+  });
 
   let contentOptions = document.getElementsByClassName('content-option');
   for (let i = 0; i < contentOptions.length; i++) {

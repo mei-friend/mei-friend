@@ -337,6 +337,9 @@ export function addMarkup(event) {
   let mElName = eventTarget.dataset.elName;
   let attrName = document.getElementById('selectionSelect').value;
   let multiLayerContent = eventTarget.dataset.content?.split(',');
+  if(!multiLayerContent) // annotationMultiToolsIcon was clicked
+    multiLayerContent = document.getElementById(`${mElName}ContentTarget`).dataset.content.split(',');
+
   if (!att.modelTranscriptionLike.includes(mElName) && !att.alternativeEncodingElements.includes(mElName)) return;
 
   if (att.alternativeEncodingElements.includes(mElName) && multiLayerContent == undefined) {
