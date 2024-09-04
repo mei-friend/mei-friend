@@ -13,7 +13,7 @@
   display: flex;
   list-style: none;
   padding: 10px;
-  background-color:var(--annotationPanelBackgroundColor)
+  background-color: var(--annotationPanelBackgroundColor)
 }
 
 .annotationToolsIcon {
@@ -26,33 +26,37 @@
   cursor: pointer;
 }
 
-.annotationToolsIconGroup { 
+.annotationToolsIconGroup {
   border-radius: 5px;
   margin-bottom: 1em;
 }
 
 .annotationListItemButtons.icon {
-  cursor:pointer;
+  cursor: pointer;
 }
 
-#annotateIdentify.disabled, writeAnnotationStandoffLabel.disabled {
-  opacity:.6;
+#annotateIdentify.disabled,
+writeAnnotationStandoffLabel.disabled {
+  opacity: .6;
   pointer-events: none;
 }
 
-.makeStandoffAnnotation svg.clockwise { 
-  pointer-events:none;
-  cursor:default;
+.makeStandoffAnnotation svg.clockwise {
+  pointer-events: none;
+  cursor: default;
 }
 
-#markupTools fieldset { 
+#markupTools fieldset {
   border-width: 1px;
   border-radius: 3px;
   padding: 2px;
-  width: 94%;
+  width: 210px;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 5px;
 }
 
-#markupTools fieldset legend { 
+#markupTools fieldset legend {
   font-weight: bold;
 }
 
@@ -74,7 +78,7 @@
   cursor: pointer;
 }
 
-.annotationIdentify { 
+.annotationIdentify {
   filter: drop-shadow(0px 0px 3em red);
   cursor: pointer;
 }
@@ -111,8 +115,10 @@
   border: 1px solid black;
   border-radius: 5px;
   /*padding: 10px;*/
-  cursor: pointer; /* Pointer/hand icon */
-  float: auto; /* Float the buttons side by side */
+  cursor: pointer;
+  /* Pointer/hand icon */
+  float: auto;
+  /* Float the buttons side by side */
 }
 
 /*.btn-group:after {
@@ -122,7 +128,7 @@
 }*/
 
 .markup-btn-group span:not(:last-child) {
- padding-right: 10px;
+  padding-right: 10px;
 }
 
 /* Add a background color on hover */
@@ -130,7 +136,7 @@
   background-color: var(--annotationPanelHoverColor);
 }*/
 
-.alternativeEncodingsContent{
+.alternativeEncodingsContent {
   border-left: 1px solid black;
   width: min-content;
 }
@@ -138,7 +144,7 @@
 .markup-dropdown {
   /*position: relative;*/
   display: inline-block;
-  padding: 8px 6px;
+  padding: 4px 3px;
 }
 
 .markup-dropdown-content {
@@ -146,7 +152,7 @@
   position: fixed;
   background-color: var(--annotationPanelLinkBackgroundColor);
   min-width: 100px;
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
   z-index: 1;
 }
 
@@ -161,7 +167,9 @@
   display: block;
 }
 
-.markup-dropdown-content a:hover {background-color: var(--annotationPanelHoverColor)}
+.markup-dropdown-content a:hover {
+  background-color: var(--annotationPanelHoverColor)
+}
 
 .markup-dropdown:hover .markup-dropdown-content {
   display: block;
@@ -181,8 +189,10 @@
   stroke-opacity: .7;
 }
 
-#listAnnotations { 
-  display:flex /*!important*/;
+#listAnnotations {
+  display: flex
+    /*!important*/
+  ;
 }
 
 #listAnnotations details {
@@ -208,21 +218,21 @@ summary.noDetails {
   border-radius: 5px;
   width: 205px;
   margin: .25em;
-  padding:0px !important;
+  padding: 0px !important;
 }
 
 .annotationListItem {
   border: 1px solid black;
   border-radius: 5px;
   height: fit-content;
-  max-height: 205px; 
+  max-height: 205px;
   width: 205px;
   margin: .25em;
   flex-shrink: 0;
 }
 
-.annotationListItem summary { 
-  font-size:10pt;
+.annotationListItem summary {
+  font-size: 10pt;
   font-weight: normal !important;
 }
 
@@ -242,36 +252,37 @@ summary.noDetails {
   padding: .25em .5em;
 }
 
-.annotationListItemButtons svg, #listAnnotations svg {
+.annotationListItemButtons svg,
+#listAnnotations svg {
   width: 1em;
   height: 1em;
 }
 
-.mao-selection { 
-  padding:2px;
-  padding-left:5px;
+.mao-selection {
+  padding: 2px;
+  padding-left: 5px;
 }
 
 .mao-extract {
-  padding:2px;
+  padding: 2px;
 }
 
-.mao-musMat { 
-  background-color: var(--annotationPanelLinkBackgroundColor); 
+.mao-musMat {
+  background-color: var(--annotationPanelLinkBackgroundColor);
   padding: 2px;
-  border-radius:10px;
+  border-radius: 10px;
 }
 
 #solid_logo {
   pointer-events: none;
 }
 
-#solidLogin { 
+#solidLogin {
   margin-left: .5em;
 }
 
-#providerSelect { 
-  display:block;
+#providerSelect {
+  display: block;
 }
 
 /* highlight markup menu buttons with corresponding colors */

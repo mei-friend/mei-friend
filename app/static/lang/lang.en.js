@@ -510,8 +510,8 @@ export const lang = {
     ],
   },
   alternativeEncodingsGrp: {
-    text: 'Alternative encodings',
-    description: 'Markup elements that contain multiple versions.',
+    text: 'Add alternative encoding',
+    description: 'Insert markup elements that contain multiple versions.',
   },
   addChoiceText: {
     text: '<choice>',
@@ -549,8 +549,8 @@ export const lang = {
     description: 'First, select content for this element by hovering over <subst>.',
   },
   editInterventionsGrp: {
-    text: 'Editorial interventions',
-    description: 'Markup elements used to encode editorial interventions.',
+    text: 'Add editorial intervention',
+    description: 'Insert markup elements used to encode editorial interventions.',
   },
   addSuppliedText: {
     text: '<supplied>',
@@ -576,7 +576,7 @@ export const lang = {
     description: '(regularization) – Contains material which has been regularized or normalized in some sense.',
   },
   descMarkupGrp: {
-    text: 'Descriptive Markup',
+    text: 'Add descriptive markup',
     description: 'Markup elements used to encode interventions in the source material.',
   },
   addAddText: { text: '<add>', description: '(addition) – Marks an addition to the text.' },
