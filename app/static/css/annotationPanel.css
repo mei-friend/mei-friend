@@ -87,6 +87,7 @@ writeAnnotationStandoffLabel.disabled {
   display: flex;
   position: relative;
   flex-direction: column;
+  gap: 10px;
 }
 
 .markupGrp {
@@ -291,32 +292,65 @@ summary.noDetails {
   border-color: var(--suppliedBgColor);
 }
 
+.suppliedLabel:hover {
+  background-color: rgb(from var(--suppliedBgColor) r g b / 0.25);
+}
+
 .unclearLabel {
   border-color: var(--unclearBgColor);
+}
+
+.unclearLabel:hover {
+  background-color: rgb(from var(--unclearBgColor) r g b / 0.25);
 }
 
 .sicLabel {
   border-color: var(--sicBgColor);
 }
 
+.sicLabel:hover {
+  background-color: rgb(from var(--sicBgColor) r g b / 0.25);
+}
+
 .corrLabel {
   border-color: var(--corrBgColor);
+}
+
+.corrLabel:hover {
+  background-color: rgb(from var(--corrBgColor) r g b / 0.25);
 }
 
 .origLabel {
   border-color: var(--origBgColor);
 }
 
+.origLabel:hover {
+  background-color: rgb(from var(--origBgColor) r g b / 0.25);
+}
+
 .regLabel {
   border-color: var(--regBgColor);
 }
+
+.regLabel:hover {
+  background-color: rgb(from var(--regBgColor) r g b / 0.25);
+}
+
 
 .addLabel {
   border-color: var(--addBgColor);
 }
 
+.addLabel:hover {
+  background-color: rgb(from var(--addBgColor) r g b / 0.25);
+}
+
 .delLabel {
   border-color: var(--delBgColor);
+}
+
+.delLabel:hover {
+  background-color: rgb(from var(--delBgColor) r g b / 0.25);
 }
 
 .splitButtonContainer {
