@@ -17,9 +17,9 @@
 }
 
 .annotationToolsIcon {
-  border: 1px solid black;
+  border: 3px solid black;
   border-radius: 5px;
-  padding: 8px;
+  padding: 4px;
   display: flex;
   align-content: center;
   gap: 6px;
@@ -45,8 +45,15 @@
   cursor:default;
 }
 
-fieldset { 
-  border: 0px;
+#markupTools fieldset { 
+  border-width: 1px;
+  border-radius: 3px;
+  padding: 2px;
+  width: 94%;
+}
+
+#markupTools fieldset legend { 
+  font-weight: bold;
 }
 
 .annotationToolsDomainSelectionItem {
@@ -79,7 +86,7 @@ fieldset {
 }
 
 .markupGrp {
-  display: inherit;
+  display: flex;
   flex-direction: column;
   gap: 3px;
 }
@@ -270,35 +277,35 @@ summary.noDetails {
 /* highlight markup menu buttons with corresponding colors */
 
 .suppliedLabel {
-  background-color: var(--suppliedBgColor);
+  border-color: var(--suppliedBgColor);
 }
 
 .unclearLabel {
-  background-color: var(--unclearBgColor);
+  border-color: var(--unclearBgColor);
 }
 
 .sicLabel {
-  background-color: var(--sicBgColor);
+  border-color: var(--sicBgColor);
 }
 
 .corrLabel {
-  background-color: var(--corrBgColor);
+  border-color: var(--corrBgColor);
 }
 
 .origLabel {
-  background-color: var(--origBgColor);
+  border-color: var(--origBgColor);
 }
 
 .regLabel {
-  background-color: var(--regBgColor);
+  border-color: var(--regBgColor);
 }
 
 .addLabel {
-  background-color: var(--addBgColor);
+  border-color: var(--addBgColor);
 }
 
 .delLabel {
-  background-color: var(--delBgColor);
+  border-color: var(--delBgColor);
 }
 
 .splitButtonContainer {

@@ -162,13 +162,13 @@ async function situateListItems() {
 
       let sortedCompare = sortElementsByScorePosition([aQuery, bQuery]);
       let aPos = sortedCompare.findIndex((el) => el === aQuery);
-      
+
       if (aQuery === bQuery) {
-        if(a.isMarkup && b.isMarkup) {
+        if (a.isMarkup && b.isMarkup) {
           // shouldn't happen in theory
           byPosition = 0;
         }
-        else if(a.isMarkup) {
+        else if (a.isMarkup) {
           byPosition = -1;
         }
         else {
@@ -585,7 +585,7 @@ export function addMarkupHandlers() {
 
   addSelectionSelect();
   addRespSelect();
-  
+
   let contentOptions = document.getElementsByClassName('content-option');
   for (let i = 0; i < contentOptions.length; i++) {
     contentOptions[i].addEventListener('click', (event) => {
@@ -625,7 +625,7 @@ function addRespSelect() {
   respSelDiv.appendChild(respSelLabel);
   respSelDiv.appendChild(respSelect);
 
-  let markupMenu = document.getElementById('markupToolsMenu');
+  let markupMenu = document.getElementById('markupSettingsFieldset');
   markupMenu.prepend(respSelDiv);
 }
 
@@ -638,7 +638,7 @@ function addSelectionSelect() {
     description: 'filled in by language packs',
     type: 'select',
     default: '',
-    values: ['','artic', 'accid'],
+    values: ['', 'artic', 'accid'],
   }
 
   let selSelDiv = document.createElement('div');
@@ -663,7 +663,7 @@ function addSelectionSelect() {
   selSelDiv.appendChild(selSelLabel);
   selSelDiv.appendChild(selSelect);
 
-  let markupMenu = document.getElementById('markupToolsMenu');
+  let markupMenu = document.getElementById('markupSettingsFieldset');
   markupMenu.prepend(selSelDiv);
 }
 

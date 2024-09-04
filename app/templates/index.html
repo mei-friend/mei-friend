@@ -1058,87 +1058,93 @@
       <div id="solidTab" class="tabcontent"></div>
       <div id="markupTools" class="tabcontent">
         <menu id="markupToolsMenu" class="enrichmentToolsMenu markup-panel">
-          <div class="markupGrp">
-            <span id="alternativeEncodingsGrp">Alternative encodings</span>
-            <div class="annotationToolsIconGroup">
-              <div class="markup-btn-group">
-                <div class="markup-dropdown">
-                  <span id="addChoiceText">&lt;choice&gt;</span>
-                  <div id="choice-content-options" class="markup-dropdown-content">
-                    <a id="choiceSicCorr" data-target="choiceContentTarget" data-content-choice="sic,corr"
-                      class="content-option splitButtonContainer" href="#">
-                      <span class="sicLabel splitButtonLabel">sic</span><span class="corrLabel splitButtonLabel">corr</span>
-                    </a>
-                    <a id="choiceCorrSic" data-target="choiceContentTarget" data-content-choice="corr,sic"
-                      class="content-option splitButtonContainer" href="#">
-                      <span class="corrLabel splitButtonLabel">corr</span><span class="sicLabel splitButtonLabel">sic</span>
-                    </a>
-                    <a id="choiceOrigReg" data-target="choiceContentTarget" data-content-choice="orig,reg"
-                      class="content-option splitButtonContainer" href="#">
-                      <span class="origLabel splitButtonLabel">orig</span><span class="regLabel splitButtonLabel">reg</span>
-                    </a>
-                    <a id="choiceRegOrig" data-target="choiceContentTarget" data-content-choice="reg,orig"
-                      class="content-option splitButtonContainer" href="#">
-                      <span class="regLabel splitButtonLabel">reg</span><span class="origLabel splitButtonLabel">orig</span>
-                    </a>
+          <fieldset id="markupSettingsFieldset">
+            <legend id="markupSettingsLegendText">Markup settings</legend>
+          </fieldset>
+          <fieldset id="insertMarkupFieldset">
+            <legend id="insertMarkupLegendText">Insert markup</legend>
+            <div class="markupGrp">
+              <span id="alternativeEncodingsGrp">Alternative encodings</span>
+              <div class="annotationToolsIconGroup">
+                <div class="markup-btn-group">
+                  <div class="markup-dropdown">
+                    <span id="addChoiceText">&lt;choice&gt;</span>
+                    <div id="choice-content-options" class="markup-dropdown-content">
+                      <a id="choiceSicCorr" data-target="choiceContentTarget" data-content-choice="sic,corr"
+                        class="content-option splitButtonContainer" href="#">
+                        <span class="sicLabel splitButtonLabel">sic</span><span class="corrLabel splitButtonLabel">corr</span>
+                      </a>
+                      <a id="choiceCorrSic" data-target="choiceContentTarget" data-content-choice="corr,sic"
+                        class="content-option splitButtonContainer" href="#">
+                        <span class="corrLabel splitButtonLabel">corr</span><span class="sicLabel splitButtonLabel">sic</span>
+                      </a>
+                      <a id="choiceOrigReg" data-target="choiceContentTarget" data-content-choice="orig,reg"
+                        class="content-option splitButtonContainer" href="#">
+                        <span class="origLabel splitButtonLabel">orig</span><span class="regLabel splitButtonLabel">reg</span>
+                      </a>
+                      <a id="choiceRegOrig" data-target="choiceContentTarget" data-content-choice="reg,orig"
+                        class="content-option splitButtonContainer" href="#">
+                        <span class="regLabel splitButtonLabel">reg</span><span class="origLabel splitButtonLabel">orig</span>
+                      </a>
+                    </div>
+                  </div>
+                  <div class="markup-dropdown alternativeEncodingsContent">
+                    <span id="choiceContentTarget" class="splitButtonContainer addMarkup" data-el-name="choice">(select content)</span>
                   </div>
                 </div>
-                <div class="markup-dropdown alternativeEncodingsContent">
-                  <span id="choiceContentTarget" class="splitButtonContainer addMarkup" data-el-name="choice">(select content)</span>
+              </div>
+              <div class="annotationToolsIconGroup">
+                <div class="markup-btn-group">
+                  <div class="markup-dropdown">
+                    <span id="addSubstText">&lt;subst&gt;</span>
+                    <div id="subst-content-options" class="markup-dropdown-content">
+                      <a id="substAddDel" data-target="substContentTarget" data-content-choice="add,del"
+                        class="content-option splitButtonContainer" href="#">
+                        <span class="addLabel splitButtonLabel">add</span><span class="delLabel splitButtonLabel">del</span>
+                      </a>
+                      <a id="substDelAdd" data-target="substContentTarget" data-content-choice="del,add"
+                        class="content-option splitButtonContainer" href="#">
+                        <span class="delLabel splitButtonLabel">del</span><span class="addLabel splitButtonLabel">add</span>
+                      </a>
+                    </div>
+                  </div>
+                  <div class="markup-dropdown alternativeEncodingsContent">
+                    <span id="substContentTarget" class="splitButtonContainer addMarkup" data-el-name="subst">(select content)</span>
+                  </div>
                 </div>
               </div>
             </div>
-            <div class="annotationToolsIconGroup">
-              <div class="markup-btn-group">
-                <div class="markup-dropdown">
-                  <span id="addSubstText">&lt;subst&gt;</span>
-                  <div id="subst-content-options" class="markup-dropdown-content">
-                    <a id="substAddDel" data-target="substContentTarget" data-content-choice="add,del"
-                      class="content-option splitButtonContainer" href="#">
-                      <span class="addLabel splitButtonLabel">add</span><span class="delLabel splitButtonLabel">del</span>
-                    </a>
-                    <a id="substDelAdd" data-target="substContentTarget" data-content-choice="del,add"
-                      class="content-option splitButtonContainer" href="#">
-                      <span class="delLabel splitButtonLabel">del</span><span class="addLabel splitButtonLabel">add</span>
-                    </a>
-                  </div>
-                </div>
-                <div class="markup-dropdown alternativeEncodingsContent">
-                  <span id="substContentTarget" class="splitButtonContainer addMarkup" data-el-name="subst">(select content)</span>
-                </div>
+            <div class="markupGrp">
+              <span id="editInterventionsGrp">Editorial interventions</span>
+              <div class="annotationToolsIconGroup markup-dropdown">
+                <span id="addSuppliedText" class="annotationToolsIcon suppliedLabel addMarkup" data-el-name="supplied">Supplied</span>
+              </div>
+              <div class="annotationToolsIconGroup markup-dropdown">
+                <span id="addUnclearText" class="annotationToolsIcon unclearLabel addMarkup" data-el-name="unclear">Unclear</span>
+              </div>
+              <div class="annotationToolsIconGroup markup-dropdown">
+                <span id="addSicText" class="annotationToolsIcon sicLabel addMarkup" data-el-name="sic">Sic</span>
+              </div>
+              <div class="annotationToolsIconGroup markup-dropdown">
+                <span id="addCorrText" class="annotationToolsIcon corrLabel addMarkup" data-el-name="corr">Corr</span>
+              </div>
+              <div class="annotationToolsIconGroup markup-dropdown">
+                <span id="addOrigText" class="annotationToolsIcon origLabel addMarkup" data-el-name="orig">Orig</span>
+              </div>
+              <div class="annotationToolsIconGroup markup-dropdown">
+                <span id="addRegText" class="annotationToolsIcon regLabel addMarkup" data-el-name="reg">Reg</span>
               </div>
             </div>
-          </div>
-          <div class="markupGrp">
-            <span id="editInterventionsGrp">Editorial interventions</span>
-            <div class="annotationToolsIconGroup markup-dropdown">
-              <span id="addSuppliedText" class="annotationToolsIcon suppliedLabel addMarkup" data-el-name="supplied">Supplied</span>
+            <div class="markupGrp">
+              <span id="descMarkupGrp">Descriptive Markup</span>
+              <div class="annotationToolsIconGroup markup-dropdown">
+                <span id="addAddText" class="annotationToolsIcon addLabel addMarkup" data-el-name="add">Add</span>
+              </div>
+              <div class="annotationToolsIconGroup markup-dropdown">
+                <span id="addDelText" class="annotationToolsIcon delLabel addMarkup" data-el-name="del">Del</span>
+              </div>
             </div>
-            <div class="annotationToolsIconGroup markup-dropdown">
-              <span id="addUnclearText" class="annotationToolsIcon unclearLabel addMarkup" data-el-name="unclear">Unclear</span>
-            </div>
-            <div class="annotationToolsIconGroup markup-dropdown">
-              <span id="addSicText" class="annotationToolsIcon sicLabel addMarkup" data-el-name="sic">Sic</span>
-            </div>
-            <div class="annotationToolsIconGroup markup-dropdown">
-              <span id="addCorrText" class="annotationToolsIcon corrLabel addMarkup" data-el-name="corr">Corr</span>
-            </div>
-            <div class="annotationToolsIconGroup markup-dropdown">
-              <span id="addOrigText" class="annotationToolsIcon origLabel addMarkup" data-el-name="orig">Orig</span>
-            </div>
-            <div class="annotationToolsIconGroup markup-dropdown">
-              <span id="addRegText" class="annotationToolsIcon regLabel addMarkup" data-el-name="reg">Reg</span>
-            </div>
-          </div>
-          <div class="markupGrp">
-            <span id="descMarkupGrp">Descriptive Markup</span>
-            <div class="annotationToolsIconGroup markup-dropdown">
-              <span id="addAddText" class="annotationToolsIcon addLabel addMarkup" data-el-name="add">Add</span>
-            </div>
-            <div class="annotationToolsIconGroup markup-dropdown">
-              <span id="addDelText" class="annotationToolsIcon delLabel addMarkup" data-el-name="del">Del</span>
-            </div>
-          </div>
+          </fieldset>
         </menu>
       </div>
       <div id="annotationTools" class="tabcontent">
