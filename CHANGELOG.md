@@ -3,6 +3,7 @@
 ### 1.1.7 patch
 * Support for markup color export to PDF (#108)
 * Add checkbox to control markup color export to PDF
+* Improve UIX of markup panel
 
 ### 1.1.6 patch
 * Fix version selection and parsing in speed mode
