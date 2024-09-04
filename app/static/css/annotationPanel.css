@@ -31,6 +31,27 @@
   margin-bottom: .2em;
 }
 
+.annotationMultiToolsIcon {
+  border: 0px;
+  display: inline-block;
+}
+
+.annotationMultiToolsButton {
+  border: 3px solid black;
+  border-radius: 5px;
+  padding: 4px;
+}
+
+.annotationMultiToolsComponent {
+  padding: 4px;
+}
+
+.annotationMultiToolsSelector {
+  border-left: 3px solid black;
+  padding: 4px;
+}
+
+
 .annotationListItemButtons.icon {
   cursor: pointer;
 }

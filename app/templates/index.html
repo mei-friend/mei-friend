@@ -1064,12 +1064,12 @@
           <fieldset class="markupGrp">
             <legend id="alternativeEncodingsGrp">Add alternative encoding</legend>
             <div class="annotationToolsIconGroup">
-              <div class="markup-btn-group">
-                <div class="annotationToolsIconGroup markup-dropdown">
-                  <span id="addChoiceText" class="annotationToolsIcon choiceLabel addMarkup" data-el-name="choice">&lt;choice&gt;: &lt;sic&gt;|&lt;corr&gt;</span>
-                  </span>
-                  <span id="addChoiceArrow" class="annotationToolsIcon choiceLabel addMarkup" data-el-name="choiceArrow">▼</span>
+              <div class="annotationMultiToolsButton">
+                <div class="addMarkup annotationMultiToolsIcon">
+                  <span id="addChoiceText" class="annotationMultiToolsComponent choiceLabel addMarkup" data-el-name="choice">&lt;choice&gt; </span>
+                  <span id="choiceContentTarget" class="annotationMultiToolsComponent choiceLabel addMarkup" data-el-name="choice">sic,corr</span>
                 </div>
+                <span id="addChoiceArrow" class="annotationMultiToolsSelector choiceLabel addMarkup" data-el-name="choice">▼</span>
                 <!--<div class="markup-dropdown">
                   <span id="addChoiceText">&lt;choice&gt;</span>
                   <div id="choice-content-options" class="markup-dropdown-content">
@@ -1091,9 +1091,6 @@
                     </a>
                   </div>
                 </div>-->
-                <div class="markup-dropdown alternativeEncodingsContent">
-                  <span id="choiceContentTarget" class="splitButtonContainer addMarkup" data-el-name="choice">(select content)</span>
-                </div>
               </div>
             </div>
             <div class="annotationToolsIconGroup">
