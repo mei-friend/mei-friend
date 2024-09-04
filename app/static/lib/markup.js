@@ -189,7 +189,6 @@ function updateChoiceOptions() {
   });
 }
 
-
 /**
  * Returns for a markup item the page locations in the Verovio rendering
  * @param {Object} markupItem markupItem to situate
@@ -336,7 +335,7 @@ function firstChildElement(parent) {
 export function addMarkup(event) {
   let eventTarget = event.currentTarget;
   let mElName = eventTarget.dataset.elName;
-  let attrName = document.getElementById('selectionSelect').value;;
+  let attrName = document.getElementById('selectionSelect').value;
   let multiLayerContent = eventTarget.dataset.content?.split(',');
   if (!att.modelTranscriptionLike.includes(mElName) && !att.alternativeEncodingElements.includes(mElName)) return;
 
@@ -712,7 +711,7 @@ export function deleteMarkup(markupItem) {
   markupItem.selection.forEach((id) => {
     // make sure to load the whole unfiltered file if in speed mode has been filtered for variant readings
     // otherwise there are not all children of alternative encoding elements available
-    if(v.xmlDocOutdated === true) {
+    if (v.xmlDocOutdated === true) {
       v.loadXml(cm.getValue(), true);
     }
     var toDelete = v.xmlDoc.querySelector("[*|id='" + id + "']");

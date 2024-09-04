@@ -16,7 +16,7 @@ export const lang = {
     html: `
     <p>
       mei-friend estas redaktanto por <a href="https://music-encoding.org">muzikaj kodadoj</a>, gastigita ĉe
-      <a href="https://mdw.ac.at" target="_blank">mdw &ndash; Universitato de Muziko kaj Artaj Artoj de Vieno</a>. 
+      <a href="https://mdw.ac.at" target="_blank">mdw &ndash; Universitato de Muziko kaj Prezentartoj de Vieno</a>. 
       Bonvolu konsulti nian <a href="https://mei-friend.github.io" target="_blank">ampleksan dokumentadon</a> por 
       pliaj informoj.
     </p>
@@ -33,7 +33,7 @@ export const lang = {
     </p>
     <p>
       Ni uzas <a href="https://matomo.org/" target="_blank">Matomo</a>
-      por kolekti anonimajn uzo-statistikojn. Tio inkluzivas vian mallongan IP-adreson (permesanta geolokigon ĝis landnivelo, sed neniun plian identigon), vian foliumilon kaj operaciumon, de kie vi venis (t.e., la referanta retejo), la tempon kaj daŭron de via vizito, kaj la paĝojn kiujn vi vizitis. Tiu informo estas konservita en la Matomo-okaziga servilo situanta sur serviloj de mdw &ndash; Universitato de Muziko kaj Artaj Artoj de Vieno, kaj ne estas dividata kun triaj partioj.
+      por kolekti anonimajn uzo-statistikojn. Tio inkluzivas vian mallongan IP-adreson (permesanta geolokigon ĝis landnivelo, sed neniun plian identigon), vian foliumilon kaj operaciumon, de kie vi venis (t.e., la referanta retejo), la tempon kaj daŭron de via vizito, kaj la paĝojn kiujn vi vizitis. Tiu informo estas konservita en la Matomo-okaziga servilo situanta sur serviloj de mdw &ndash; Universitato de Muziko kaj Prezentartoj de Vieno, kaj ne estas dividata kun triaj partioj.
     </p>
     <p>
       Lut-tabulaturoj estas konvertitaj al MEI uzante 
@@ -59,7 +59,7 @@ export const lang = {
       mei-friend estas disvolvita de
       <a href="https://iwk.mdw.ac.at/werner-goebl" target="_blank">Werner Goebl</a> kaj
       <a href="https://iwk.mdw.ac.at/david-weigl" target="_blank">David M. Weigl</a> ĉe la Departemento de Muzika
-      Akustiko &ndash; Viennan Stilon ĉe mdw &ndash; Universitato de Muziko kaj Artaj Artoj de Vieno, kaj
+      Akustiko &ndash; Viena Sonstilo ĉe mdw &ndash; Universitato de Muziko kaj Prezentartoj de Vieno, kaj
       estas permesita sub la
       <a href="https://spdx.org/licenses/AGPL-3.0-or-later.html" target="_blank"
         >GNU Affero General Public License v3.0</a
@@ -172,8 +172,8 @@ export const lang = {
   decreaseDurText: { text: 'Malpligrandigi daŭron' },
   toggleDotsText: { text: 'Ŝalti punktadon' },
   cleanAccidText: { text: 'Kontroli @accid.ges' },
-  renumberMeasuresTestText: { text: ' Reenumeri mezurojn (testo)' },
-  renumberMeasuresExecText: { text: ' Reenumeri mezurojn (ekzekuti)' },
+  renumberMeasuresTestText: { text: ' Reenumeri taktojn (testo)' },
+  renumberMeasuresExecText: { text: ' Reenumeri taktojn (ekzekuti)' },
   addIdsText: { text: 'Aldoni id-ojn al MEI' },
   removeIdsText: { text: 'Forigi id-ojn el MEI' },
   reRenderMeiVerovio: { text: ' Reeldoni per Verovio' },
@@ -281,7 +281,7 @@ export const lang = {
   breaksSelect: { description: 'Difini sistemo/paĝa-pauza konduto de notado' },
   breaksSelectNone: { text: 'Nenio' },
   breaksSelectAuto: { text: 'Aŭtomata' },
-  breaksSelectMeasure: { text: 'Mezuro' },
+  breaksSelectMeasure: { text: 'Takto' },
   breaksSelectLine: { text: 'Sistemo' },
   breaksSelectEncoded: { text: 'Sistemo kaj paĝo' },
   breaksSelectSmart: { text: 'Saĝa' },
@@ -830,7 +830,7 @@ export const lang = {
   },
   showAnnotations: {
     text: 'Montri notojn',
-    description: 'Montri muzikajn notojn en notaro',
+    description: 'Montri muzikajn notojn en partituro',
   },
   showAnnotationPanel: {
     text: 'Montri panelon de notoj',
@@ -852,7 +852,7 @@ export const lang = {
   },
   selectFacsimilePanelOrientation: {
     text: 'Loko de facsimila panelo',
-    description: 'Elekti lokon de facsimila panelo rilate al notaro',
+    description: 'Elekti lokon de facsimila panelo rilate al partituro',
     labels: ['maldekstre', 'dekstre', 'supre', 'sube'],
   },
   facsimileZoomInput: {
@@ -948,8 +948,8 @@ export const lang = {
     description: 'Elekti la stilon de la redaktoro',
   },
   matchTheme: {
-    text: 'Notaro kongruas kun la stilo',
-    description: 'Kongruigi la notaron kun la stilo de la redaktoro',
+    text: 'Partituro kongruas kun la stilo',
+    description: 'Kongruigi la partituron kun la stilo de la redaktoro',
   },
   tabSize: {
     text: 'Grando de registruminterespacoj',
@@ -1004,7 +1004,11 @@ export const lang = {
     text: 'Klavara mapo',
     description: 'Elekti klavaran mapon',
   },
-
+  persistentSearch: {
+    text: 'Persistanta serĉujo',
+    description: 'Uzu persistantan konduton de serĉujo (serĉujo restas malfermita ĝis eksplcite fermata)',
+  },
+  
   // Verovio-agordoj
   verovioSettingsHeader: {
     text: 'Verovio-agordoj',
@@ -1077,12 +1081,12 @@ export const lang = {
   allComposers: { text: 'Ĉiuj komponistoj' }, // fork-repository.js
 
   // Utilaj mezuraj renumerigi
-  renumberMeasuresModalText: { text: 'Renombre mezurojn' },
+  renumberMeasuresModalText: { text: 'Renombre taktojn' },
   renumberMeasuresModalTest: { text: 'Testo' },
   renumberMeasuresWillBe: { text: '' },
   renumberMeasuresWouldBe: { text: 'estus' },
   renumberMeasuresChangedTo: { text: 'ŝanĝis al' },
-  renumberMeasureMeasuresRenumbered: { text: 'mezuroj renumerigis' },
+  renumberMeasureMeasuresRenumbered: { text: 'taktoj renumerigis' },
 
   // Kodo-kontrolilo @accid.ges
   codeCheckerTitle: {
@@ -1094,7 +1098,7 @@ export const lang = {
   codeCheckerIgnoreAll: { text: 'Ignori ĉion' },
   codeCheckerCheckingCode: { text: 'Kontrolante kodo...' },
   codeCheckerNoAccidMessagesFound: { text: 'Ŝajnas, ke ĉiuj @accid.ges atributoj estas ĝustaj.' },
-  codeCheckerMeasure: { text: 'Mezuro' },
+  codeCheckerMeasure: { text: 'takto' },
   codeCheckerNote: { text: 'Noto' },
   codeCheckerHasBoth: { text: 'havas kaj' },
   codeCheckerAnd: { text: 'kaj' },
@@ -1109,7 +1113,7 @@ export const lang = {
   codeCheckerExtra: { text: 'ekstra' }, // superflua
   codeCheckerHasExtra: { text: 'havas ekstran' }, // havas superfluan
   codeCheckerLacksAn: { text: 'mankas unu' },
-  codeCheckerBecauseAlreadyDefined: { text: 'ĉar ĝi jam estas difinita antaŭe en la mezuro' },
+  codeCheckerBecauseAlreadyDefined: { text: 'ĉar ĝi jam estas difinita antaŭe en la takto' },
 
   // Averto pri mankantaj ID-oj
   missingIdsWarningAlert: {

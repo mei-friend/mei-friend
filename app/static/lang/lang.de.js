@@ -1032,6 +1032,10 @@ export const lang = {
     text: 'Tastenbelegung',
     description: 'Tastaturbelegung auswählen',
   },
+  persistentSearch: {
+    text: 'Persistente Suchleiste',
+    description: 'Verwenden Sie das Verhalten der persistenten Suchleiste (die Suchleiste bleibt geöffnet, bis sie explizit geschlossen wird)',
+  },
 
   // Verovio settings
   verovioSettingsHeader: {

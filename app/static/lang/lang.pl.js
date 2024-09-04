@@ -1025,6 +1025,10 @@ export const lang = {
     text: 'Mapa klawiszy',
     description: 'Wybierz mapę klawiszy',
   },
+  persistentSearch: {
+    text: 'Trwałe pole wyszukiwania',
+    description: 'Użyj zachowania trwałego pola wyszukiwania (pole wyszukiwania pozostaje otwarte do momentu wyraźnego zamknięcia)',
+  },
 
   // Verovio settings
   verovioSettingsHeader: {

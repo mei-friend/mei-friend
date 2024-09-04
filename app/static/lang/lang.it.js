@@ -1033,6 +1033,10 @@ export const lang = {
     text: 'Mappa tasti',
     description: 'Seleziona la mappa tasti',
   },
+  persistentSearch: {
+    text: 'Ricerca persistente',
+    description: 'Utilizza il comportamento della casella di ricerca persistente (la casella di ricerca rimane aperta fino alla chiusura esplicita)',
+  },
 
   // Verovio settings / Impostazioni di Verovio
   verovioSettingsHeader: {

@@ -1017,6 +1017,10 @@ export const lang = {
     text: 'Key map',
     description: 'Select key map',
   },
+  persistentSearch: {
+    text: 'Persistent search box',
+    description: 'Use persistent search box behavior (search box remains open until explicitly closed)',
+  },
 
   // Verovio settings
   verovioSettingsHeader: {

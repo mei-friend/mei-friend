@@ -157,6 +157,10 @@ export async function drawFacsimile() {
   facsimileMessagePanel.style.display = 'none';
   let facsimilePanel = document.getElementById('facsimile-panel');
 
+  // retrieve and store scroll position
+  let scrollLeft = facsimilePanel.scrollLeft;
+  let scrollTop = facsimilePanel.scrollTop;
+
   let zoomFactor = document.getElementById('facsimileZoomInput').value / 100;
 
   // clear all svgs and sourceImageBoxes
@@ -168,13 +172,20 @@ export async function drawFacsimile() {
     (x) => !x.parentElement.classList.contains('note')
   );
 
-  // warn, if no @facs attributes are found in the current notation SVG,
+  // try to find a @facs in an earlier page beginning, 
+  // or warn, if really no @facs attributes are found in the current notation SVG
   if (svgFacs.length === 0) {
     let pb = getCurrentPbElement(v.xmlDoc); // id of current page beginning
     if (!pb) {
       showWarningText(translator.lang.facsimileNoSurfaceWarning.text);
       busy(false);
       return;
+    }
+    // clone page beginning element and add @data-facs
+    if (pb.hasAttribute('facs')) {
+      let pageBeginning = pb.cloneNode(true);
+      pageBeginning.setAttribute('data-facs', pb.getAttribute('facs'));
+      svgFacs.push(pageBeginning);
     }
   }
 
@@ -185,9 +196,11 @@ export async function drawFacsimile() {
       let facsAttribute = f.getAttribute('data-facs') || '';
       if (facsAttribute) {
         facsAttribute = rmHash(facsAttribute);
-        if (facs.hasOwnProperty(facsAttribute) &&
+        if (
+          facs.hasOwnProperty(facsAttribute) &&
           facs[facsAttribute].hasOwnProperty('type') &&
-          facs[facsAttribute].type === 'zone') {
+          facs[facsAttribute].type === 'zone'
+        ) {
           hasZones = true;
         }
       }
@@ -245,6 +258,7 @@ export async function drawFacsimile() {
         // create new div and svg for source image
         let div = document.createElement('div');
         div.id = 'sourceImage-' + sourceImageNumber;
+        div.setAttribute('data-surfaceId', surfaceId);
         facsimilePanel.appendChild(div);
 
         // create span for image number
@@ -253,7 +267,7 @@ export async function drawFacsimile() {
           // imageTitle.textContent = 'Image ' + (sourceImageNumber + 1) + ': ' + facs[surfaceId].target;
           imageTitle.textContent = facs[surfaceId].target;
           imageTitle.title = 'Image ' + (sourceImageNumber + 1) + ': ' + imgName;
-          imageTitle.style.fontSize = scaleTitleFonzSize(zoomFactor);
+          imageTitle.style.fontSize = scaleTitleFontSize(zoomFactor);
           div.appendChild(imageTitle);
         }
 
@@ -329,10 +343,16 @@ export async function drawFacsimile() {
         svg.removeAttribute('height');
       }
     }
-  }
+  } // iterate over svgFacs
+
   if (sourceImageNumber < 0) {
     showWarningText(translator.lang.facsimileNoSurfaceWarning.text);
   }
+
+  // restore scroll position
+  facsimilePanel.scrollLeft = scrollLeft;
+  facsimilePanel.scrollTop = scrollTop;
+
   busy(false);
 } // drawFacsimile()
 
@@ -499,6 +519,17 @@ function clearSourceImages() {
 }
 
 /**
+ * Clear all rect and text elements in the source image svgs
+ */
+export function clearZones() {
+  let facsimilePanel = document.getElementById('facsimile-panel');
+  if (facsimilePanel) {
+    facsimilePanel.querySelectorAll('rect').forEach((r) => r.remove());
+    facsimilePanel.querySelectorAll('text').forEach((t) => t.remove());
+  }
+} // clearZones()
+
+/**
  * Zooms the facsimile surface image in the sourceImageContainer svg.
  * @param {float} deltaPercent
  */
@@ -527,7 +558,7 @@ export function zoomFacsimile(deltaPercent) {
     svg.removeAttribute('height');
     svg.setAttribute('data-zoomFactor', zoomFactor);
     let imageTitle = si.querySelector('div');
-    if (imageTitle) imageTitle.style.fontSize = scaleTitleFonzSize(zoomFactor);
+    if (imageTitle) imageTitle.style.fontSize = scaleTitleFontSize(zoomFactor);
   });
 } // zoomFacsimile()
 
@@ -537,8 +568,8 @@ export function zoomFacsimile(deltaPercent) {
  * @param {Number} zoomFactor
  * @returns {String} font size in pt
  */
-function scaleTitleFonzSize(zoomFactor) {
-  let minFontSize = 3; // pt
+function scaleTitleFontSize(zoomFactor) {
+  let minFontSize = 7; // pt
   let maxFontSize = 16; // pt
   let fontSize = Math.max(minFontSize, Math.min(maxFontSize, 22 * zoomFactor));
   return Math.round(fontSize * 10) / 10 + 'pt';
@@ -829,7 +860,7 @@ export function addZoneDrawer() {
         let metaPressed = isCtrlOrCmd(ev);
         // * Without modifier key: select an existing element (e.g. measure, dynam)
         //   a zone will be added to pertinent surface and @facs add to the selected element
-        // * With CMD/CTRL: select a zone, add a zone afterwards and a measure;
+        // * With CMD/CTRL: select a zone, add a zone afterwards and a new measure;
         let uuid = addZone(v, cm, rect, metaPressed);
         if (uuid) {
           rect.addEventListener('click', (e) => v.handleClickOnNotation(e, cm));
