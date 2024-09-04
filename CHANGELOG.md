@@ -1,19 +1,21 @@
 # mei-friend-online CHANGELOG.md
 
 ### 1.1.7 patch
-* Support for markup color export to PDF (#108)
-* Add checkbox to control markup color export to PDF
+
+- Support for markup color export to PDF (#108)
+- Add checkbox to control markup color export to PDF
 
 ### 1.1.6 patch
-* Fix version selection and parsing in speed mode
-* Fix and markup deletion in speed mode
-* Improve markup UI
+
+- Fix version selection and parsing in speed mode
+- Fix and markup deletion in speed mode
+- Improve markup UI
 
 ### 1.1.5 patch
 
-* Include filtering for different versions inside `<choice>` or `<subst>` in speed mode.
-* Update midi on switching versions in the notation panel.
-* Horizontal layout for markup panel added.
+- Include filtering for different versions inside `<choice>` or `<subst>` in speed mode.
+- Update midi on switching versions in the notation panel.
+- Horizontal layout for markup panel added.
 
 ### 1.1.4 Refine Editorial Markup
 
@@ -47,33 +49,50 @@
 - Add settings to change highighting colors for markup elements.
 - Change option labels in responsibility select to text content.
 
-### 1.0.14 Patch
-* Update path for matomo usage statics
-* Add Verovio release 4.2.0 to toolkit list
-* Secure facsimile image drawing, addressing #100
-* Add git hook to run Playwright tests before pushes to publicly hosted branches (see INSTALL.md)
+### 1.0.16 Patch
+
+- Fix infinite loop when having an incomplete choice element (#109, thx @
+  maxrothman)
+- Implement persistent search bar behavior (#110, thx @maxrothmann) with checkbox to toggle
+
+### 1.0.15 Patch
+
+- Add support for new languages (Bosnian, Chinese, Croatian, Danish, Dutch, Serbian)
+- Fix bug preventing file load from GitHub with whitespace sequences in filenames (#95, thx @maxrothman)
+
+### 1.0.14 Patch (released on 23 May 2024 for JOSS publication https://doi.org/10.21105/joss.06002)
+
+- Update path for matomo usage statics
+- Add Verovio release 4.2.0 to toolkit list
+- Secure facsimile image drawing, addressing #100
+- Add git hook to run Playwright tests before pushes to publicly hosted branches (see INSTALL.md)
+- Make sure a facsimile source image is always shown when solely referenced by pb elements
 
 ### 1.0.13 Support for multiple facsimile source images
-* Add support for displaying multiple source image files referenced in the @facs attributes of the notation displayed (#94). Thus, when selecting `@breaks=none`, all source images referenced in the facsimile element will be shown in the facsimile panel.
-* Settings item added to control display of source image title
-* Confirm button of splash screen now in focus by default, so it can be clicked by keyboard swiftly
-* Clicking on notation elements or facsimile zones will scroll to the corresponding element in the other panels (encoding, facsimile, notation)
+
+- Add support for displaying multiple source image files referenced in the @facs attributes of the notation displayed (#94). Thus, when selecting `@breaks=none`, all source images referenced in the facsimile element will be shown in the facsimile panel.
+- Settings item added to control display of source image title
+- Confirm button of splash screen now in focus by default, so it can be clicked by keyboard swiftly
+- Clicking on notation elements or facsimile zones will scroll to the corresponding element in the other panels (encoding, facsimile, notation)
 
 ### 1.0.12 patch
-* Add PlayWright end-to-end tests for the main functionality of mei-friend
+
+- Add PlayWright end-to-end tests for the main functionality of mei-friend
 
 ### 1.0.11 patch
-* Extend documentation with a new file `CONTRIBUTING.md` to provide guidelines for contributing to mei-friend
-* Update external documentation pages at https://mei-friend.github.io including updated installation instructions, 
+
+- Extend documentation with a new file `CONTRIBUTING.md` to provide guidelines for contributing to mei-friend
+- Update external documentation pages at https://mei-friend.github.io including updated installation instructions,
   information on the code structure, and an updated page on contributing to mei-friend
-* Fix bug when loading facsimile source images from URLs starting with raw.githubusercontent (#93)
+- Fix bug when loading facsimile source images from URLs starting with raw.githubusercontent (#93)
 
 ### 1.0.10 patch
-* Scroll to facsimile image zones corresponding to selected element in editor or notation
-* Make sure zone element edits are reloaded and redrawn in facsimile panel
-* Drawing new zones in non-fullpage mode corrected for Firefox and other browsers
-* New zones remain selected after insertion
-* Clicking on elements with `@facs` attribute will highlight linked zone also in zone edit mode
+
+- Scroll to facsimile image zones corresponding to selected element in editor or notation
+- Make sure zone element edits are reloaded and redrawn in facsimile panel
+- Drawing new zones in non-fullpage mode corrected for Firefox and other browsers
+- New zones remain selected after insertion
+- Clicking on elements with `@facs` attribute will highlight linked zone also in zone edit mode
 
 ### 1.0.9 patch
 

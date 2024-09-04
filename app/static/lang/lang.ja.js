@@ -988,6 +988,10 @@ export const lang = {
     text: 'キーマップ',
     description: 'キーマップを選択',
   },
+  persistentSearch: {
+    text: '永続的な検索ボックス',
+    description: '永続的な検索ボックスの動作を使用します（検索ボックスは明示的に閉じるまで開いたままになります）',
+  },
 
   // Verovio settings
   verovioSettingsHeader: {

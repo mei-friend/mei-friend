@@ -553,9 +553,10 @@ export default class Viewer {
       }
       this.selectedElements = [];
       this.selectedElements.push(itemId);
-      msg += 'newly created: ' + itemId + ', size: ' + this.selectedElements.length;
+      msg += 'Added as first element: ' + itemId;
     }
-    console.log(msg);
+    //console.log(msg);
+    console.log('handleClickOnNotation() selectedElements: ', this.selectedElements);
     this.scrollSvgTo(cm, e);
     this.updateHighlight(cm);
     if (document.getElementById('showMidiPlaybackControlBar').checked) {
@@ -580,8 +581,8 @@ export default class Viewer {
         'multiRest',
         'beam',
         'tuplet',
-        'accid',
-        'artic',
+        //'accid',
+        //'artic',
         'bTrem',
         'fTrem',
         'ambNote',
@@ -624,6 +625,7 @@ export default class Viewer {
           this.updateHighlight(cm);
         }
       }
+      console.log('cursorActivity() selectedElements: ', this.selectedElements);
     }
   } // cursorActivity()
 
@@ -694,9 +696,13 @@ export default class Viewer {
 
     // create array of id strings from selectedElements or from cursor position
     let ids = [];
-    if (this.selectedElements.length > 0) this.selectedElements.forEach((item) => ids.push(item));
-    else if (cm) ids.push(utils.getElementIdAtCursor(cm));
-    // console.info('updatehighlight() ids: ', ids);
+    if (this.selectedElements.length > 0) {
+      this.selectedElements.forEach((item) => ids.push(item));
+    } else if (cm) {
+      ids.push(utils.getElementIdAtCursor(cm));
+      console.log('updateHighlight() take id from cursor: ' + ids[0]);
+    }
+    // console.info('updateHighlight() ids: ', ids);
 
     // highlight those elements
     for (let id of ids) {

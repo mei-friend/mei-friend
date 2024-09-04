@@ -41,12 +41,14 @@ To try out mei-friend, simply navigate to the production instance on [https://me
 To run your own instance locally on your system, please follow the [installation instructions](INSTALL.md). 
 
 ## Publications
+Goebl, W., & Weigl, D. M. (2024). mei-friend: An Interactive Web-based Editor for Digital Music Encodings. <em>Journal of Open Source Software</em>, 9(97), 6002. doi:[10.21105/joss.06002](https://doi.org/10.21105/joss.06002){:target="_blank"}
+
 Goebl, W., & Weigl, D. M. (2023). mei-friend v1.0: Music Encoding in the Browser. Encoding Cultures. Joint MEC and TEI Conference 2023, Paderborn, Germany. https://teimec2023.uni-paderborn.de/contributions/159.html
 
 Goebl, W. & Weigl, D. M. (2023). The mei-friend Web Application: Editing MEI in the Browser. Music Encoding Conference Proceedings 2022 [Late-breaking Reports]. 
-doi:[10.17613/dnj6-yy29](https://dx.doi.org/10.17613/dnj6-yy29).
+doi:[10.17613/dnj6-yy29](https://dx.doi.org/10.17613/dnj6-yy29){:target="_blank"}.
 
-Goebl, W. & Weigl, D. M. (2022). Alleviating the Last Mile of Encoding: The mei-friend Package for the Atom Text Editor.  In S. Münnich & D. Rizo (Eds.), Music Encoding Conference Proceedings 2021 (pp. 31&ndash;39). University of Alicante. doi:[10.17613/fc1c-mx52](https://doi.org/10.17613/fc1c-mx52) (**Best Paper Award MEC'21**)
+Goebl, W. & Weigl, D. M. (2022). Alleviating the Last Mile of Encoding: The mei-friend Package for the Atom Text Editor.  In S. Münnich & D. Rizo (Eds.), Music Encoding Conference Proceedings 2021 (pp. 31&ndash;39). University of Alicante. doi:[10.17613/fc1c-mx52](https://doi.org/10.17613/fc1c-mx52){:target="_blank"} (**Best Paper Award MEC'21**)
 
 ## Acknowledgements
 

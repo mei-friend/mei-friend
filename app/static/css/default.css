@@ -589,6 +589,14 @@ a:active {
   fill: var(--dropdownBorderColor);
 }
 
+#facsimile-panel div div {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  direction: rtl;
+  text-align: left;
+}
+
 #source-image-label {
   justify-content: center;
 }

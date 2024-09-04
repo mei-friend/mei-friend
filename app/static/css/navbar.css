@@ -171,6 +171,15 @@
   display: block;
 }
 
+/* Show all the whitespace in the github dropdown file names
+   - Whitespace in filenames is significant, so users should see it if it's there
+   - Since the filenames are stored on the DOM, letting the browser collapse
+     whitespace breaks the ability of the github integration to open files with
+     collapsable whitespace sequences in their names */
+.branchContents {
+  white-space: pre;
+}
+
 #logTable {
   font-size: 8pt;
   white-space: nowrap;

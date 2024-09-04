@@ -1772,7 +1772,7 @@ export function manipulateXmlIds(v, cm, removeIds = false) {
 } // manipulateXmlIds()
 
 /**
- * Adds a zone element in editor (called from source-imager.js),
+ * Adds a zone element in editor (called from facsimile.js),
  * places it
  * @param {Viewer} v
  * @param {CodeMirror} cm
@@ -1782,7 +1782,9 @@ export function manipulateXmlIds(v, cm, removeIds = false) {
  */
 export function addZone(v, cm, rect, addMeasure = true) {
   v.allowCursorActivity = false;
+
   // get current element id and nodeName from editor
+  // TODO: take v.selectedElements instead; if more than one, add @facs to each
   let selectedId = utils.getElementIdAtCursor(cm);
   let selectedElement = v.xmlDoc.querySelector('[*|id="' + selectedId + '"]');
   if (!selectedElement) {
@@ -1849,6 +1851,7 @@ export function addZone(v, cm, rect, addMeasure = true) {
     // only add zone and a @facs for the selected element
   } else if (!addMeasure && att.attFacsimile.includes(selectedElement.nodeName)) {
     // find pertinent zone in surface for inserting new zone
+    // TODO: retrieve correct surface element for selected source image from rect
     let facs = v.xmlDoc.querySelectorAll('[facs],[*|id="' + selectedId + '"');
     let i = Array.from(facs).findIndex((n) => n.isEqualNode(selectedElement));
     let referenceNodeId = utils.rmHash(facs[i === 0 ? i + 1 : i - 1].getAttribute('facs'));
