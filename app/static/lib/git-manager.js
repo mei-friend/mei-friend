@@ -42,14 +42,14 @@ export default class GitManager {
       ref: 'main',
       corsProxy: '/proxy',
       singleBranch: true,
-      onAuth: this.onAuth,
+      /*onAuth: this.onAuth,
       onAuthFailure: () => {
         console.log('auth failure');
         return { cancel: true };
       },
       onAuthSuccess: () => {
         console.log('auth success');
-      },
+      },*/
     };
     console.log('cloneobj', cloneobj);
     await git.clone(cloneobj);
@@ -97,8 +97,14 @@ console.log('git.js loaded');
 let gm = new GitManager('github', 'github', githubToken);
 console.log('gm created');
 //console.log('readdir', await pfs.readdir(git.dir));
-await gm.clone('https://github.com/isogit-test/private');
-//await gm.clone('https://github.com/musicog/test-encodings');
+let test = 'gitlab';
+if (test === 'github') {
+  console.log('github');
+  await gm.clone('https://github.com/isogit-test/private');
+} else if (test === 'gitlab') {
+  console.log('gitlab');
+  await gm.clone('https://gitlab.com/musicog/test-public.git');
+}
 console.log('cloned');
 console.log('reading', gm.directory);
 let out = await pfs.readdir(gm.directory);

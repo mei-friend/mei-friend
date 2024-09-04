@@ -18,7 +18,7 @@ limiter = Limiter(
 
 mimetypes.add_type('application/javascript', '.js')
 
-ALLOWED_DOMAINS = ['github.com'] # for CORS proxy
+ALLOWED_DOMAINS = ['github.com', 'gitlab.com'] # for CORS proxy
 
 oauth = OAuth(app)
 github = oauth.register(
@@ -31,6 +31,18 @@ github = oauth.register(
     authorize_params=None,
     api_base_url='https://api.github.com/',
     client_kwargs={'scope': 'repo user'},
+)
+
+gitlab = oauth.register(
+    name='gitlab',
+    client_id=getenv("GITLAB_CLIENT_ID"),
+    client_secret=getenv("GITLAB_SECRET_ID"),
+    access_token_url='https://gitlab.com/oauth/token',
+    access_token_params=None,
+    authorize_url='https://gitlab.com/oauth/authorize',
+    authorize_params=None,
+    api_base_url='https://gitlab.com/api/v4/',
+    client_kwargs={'scope': 'api read_user'},
 )
 
 @app.route('/')
