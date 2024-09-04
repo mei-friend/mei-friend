@@ -12,7 +12,7 @@ import * as dutils from './dom-utils.js';
 import * as speed from './speed.js';
 import * as utils from './utils.js';
 import Viewer from './viewer.js';
-import { addListItem, isItemInList, refreshAnnotationsList, retrieveItemValuesByProperty } from './enrichment_panel.js';
+import { addListItem, isItemInList, refreshAnnotationsList, retrieveItemValuesByProperty } from './enrichment-panel.js';
 import { setChoiceOptions } from './control-menu.js';
 
 /**

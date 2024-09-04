@@ -60,7 +60,7 @@ import {
   readListItemsFromXML,
   refreshAnnotationsInRendering,
   populateSolidTab,
-} from './enrichment_panel.js';
+} from './enrichment-panel.js';
 import { dropHandler, dragEnter, dragOverHandler, dragLeave } from './dragger.js';
 import { openUrl, openUrlCancel } from './open-url.js';
 import {

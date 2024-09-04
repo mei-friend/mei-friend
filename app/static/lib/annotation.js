@@ -15,7 +15,7 @@ import {
   safelyPatchResource,
 } from './solid.js';
 import { nsp, traverseAndFetch } from './linked-data.js';
-import { deleteListItem, isItemInList, addListItem } from './enrichment_panel.js';
+import { deleteListItem, isItemInList, addListItem } from './enrichment-panel.js';
 import * as att from './attribute-classes.js';
 
 //#region functions to draw annotations
