@@ -1163,19 +1163,18 @@
       <div id="annotationTools" class="tabcontent">
         <menu id="annotationToolsMenu" class="enrichmentToolsMenu">
           <div id="annotationToolsDomainSelection">
-            <div class="annotationToolsDomainSelectionItem">
-              <fieldset>
-                <input type="radio" checked id="writeAnnotationInline" title="Generate in-line annotations."
-                  value="writeAnnotationInline" name="annotationToolDomainSelector">
-                <label for="writeAnnotionInline"
-                  title="Generate in-line annotations using MEI &lt;annot&gt; elements.">MEI</label>
-                <input type="radio" id="writeAnnotationStandoff"
-                  title="Generate stand-off annotations. Only possible if working on a native MEI file from URL or GitHub, and when logged into a Solid Pod."
-                  value="writeAnnotationStandoff" name="annotationToolDomainSelector">
-                <label id="writeAnnotationStandoffLabel" for="writeAnnotionStandoff"
-                  title="Generate stand-off annotations. Only possible if working on a native MEI file from URL or GitHub, and when logged into a Solid Pod.">RDF</label>
-              </fieldset>
-            </div>
+            <fieldset class="annotationToolsDomainSelectionItem">
+              <legend id="annotationToolDomainSelectorLegend">Annotation storage</legend>
+              <input type="radio" checked id="writeAnnotationInline" title="Generate in-line annotations."
+                value="writeAnnotationInline" name="annotationToolDomainSelector">
+              <label for="writeAnnotionInline"
+                title="Generate in-line annotations using MEI &lt;annot&gt; elements.">MEI</label>
+              <input type="radio" id="writeAnnotationStandoff"
+                title="Generate stand-off annotations. Only possible if working on a native MEI file from URL or GitHub, and when logged into a Solid Pod."
+                value="writeAnnotationStandoff" name="annotationToolDomainSelector">
+              <label id="writeAnnotationStandoffLabel" for="writeAnnotionStandoff"
+                title="Generate stand-off annotations. Only possible if working on a native MEI file from URL or GitHub, and when logged into a Solid Pod.">RDF</label>
+            </fieldset>
           </div>
           <div class="annotationToolsIconGroup">
             <li>
@@ -1190,7 +1189,8 @@
               </div>
             </li>
           </div>
-          <div class="annotationToolsIconGroup">
+          <fieldset class="annotationToolsIconGroup">
+            <legend id="annotationToolsMarkupLegend">Annotation tools</legend>
             <li>
               <div class="annotationToolsIcon" id="annotateHighlight">
                 <!--<svg xmlns="http://www.w3.org/2000/svg"  aria-hidden="true" role="img" id="footer-sample-full" width="16px" height="16px"  viewBox="0 0 1024 1024">
@@ -1239,7 +1239,7 @@
                   <span id="annotationToolsLinkSpan">Link</span>
                 </div>
               </li>
-            </div>
+            </fieldset>
           </menu>
         </div>
         <div id="listAnnotations" class="tabcontent">No annotations present.</div>
