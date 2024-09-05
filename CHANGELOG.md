@@ -51,9 +51,8 @@
 
 ### 1.0.16 Patch
 
-- Fix infinite loop when having an incomplete choice element (#109, thx @
-  maxrothman)
-- Implement persistent search bar behavior (#110, thx @maxrothmann) with checkbox to toggle
+- Fix infinite loop when having an incomplete choice element (#109, thx @maxrothman)
+- Implement persistent search bar behavior (#110, thx @maxrothman) with checkbox to toggle
 
 ### 1.0.15 Patch
 
