@@ -50,5 +50,5 @@
 }
 
 .markupGrp {
-  display: inline-block !important;
+  flex-wrap: wrap;
 }

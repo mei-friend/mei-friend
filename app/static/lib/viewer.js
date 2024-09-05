@@ -811,11 +811,11 @@ export default class Viewer {
       // utils.brighter(window.getComputedStyle(rt).getPropertyValue('--defaultAnnotationPanelBackgroundColor'), -40));
       rt.style.setProperty(
         '--annotationPanelLinkBackgroundColor',
-        utils.brighter(window.getComputedStyle(rt).getPropertyValue('--defaultAnnotationPanelDarkBackgroundColor'), -30)
+        utils.brighter(window.getComputedStyle(rt).getPropertyValue('--defaultAnnotationPanelDarkBackgroundColor'), -25)
       );
       rt.style.setProperty(
         '--annotationPanelHoverColor',
-        utils.brighter(window.getComputedStyle(rt).getPropertyValue('--defaultAnnotationPanelDarkBackgroundColor'), -60)
+        utils.brighter(window.getComputedStyle(rt).getPropertyValue('--defaultAnnotationPanelDarkBackgroundColor'), -35)
       );
       rt.style.setProperty('--annotationPanelTextColor', 'white');
       rt.style.setProperty(

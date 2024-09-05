@@ -26,6 +26,10 @@
   cursor: pointer;
 }
 
+.annotationToolsIcon:hover {
+  background-color: var(--annotationPanelHoverColor);
+}
+
 .annotationToolsIconGroup {
   border-radius: 5px;
   margin-bottom: .2em;
@@ -34,17 +38,19 @@
 
 .annotationMultiToolsIcon {
   border: 0px;
-  display: inline-block;
   padding: 6px 3px;
   flex-grow: 4;
+  position: relative;
 }
 
 .annotationMultiToolsIcon:hover {
   background-color: var(--annotationPanelHoverColor);
+  border-top-left-radius: 3px;
+  border-bottom-left-radius: 3px;
 }
 
 .annotationMultiToolsButton {
-  border: 2px solid black;
+  border: 2px solid var(--dropdownHeadingColor);
   border-radius: 5px;
   display: flex;
   flex-direction: row;
@@ -54,7 +60,7 @@
 }
 
 .annotationMultiToolsSelector {
-  border-left: 1px solid black;
+  border-left: 1px solid var(--dropdownHeadingColor);
   padding: 6px 0px;
   /* position: relative;
   left: 9px; */
@@ -79,6 +85,11 @@ writeAnnotationStandoffLabel.disabled {
 .makeStandoffAnnotation svg.clockwise {
   pointer-events: none;
   cursor: default;
+}
+
+#markupToolsMenu {
+  display: flex;
+  align-items: stretch;
 }
 
 #markupTools fieldset {
@@ -186,11 +197,15 @@ writeAnnotationStandoffLabel.disabled {
   display: none;
   position: absolute;
   left: 0px;
-  top: 2.3em;
+  top: 2.2em;
   background-color: var(--annotationPanelLinkBackgroundColor);
   min-width: 100px;
-  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.3);
   z-index: 1;
+  border: 1px solid var(--dropdownHeadingColor);
+  border-radius: 5px;
+  width: 100%;
+  margin-left: -1px;
 }
 
 /*.markup-dropdown-up {
@@ -199,7 +214,7 @@ writeAnnotationStandoffLabel.disabled {
 
 .markup-dropdown-content a {
   color: var(--annotationPanelTextColor);
-  padding: 12px 16px;
+  padding: 6px 2px;
   text-decoration: none;
   display: block;
 }
@@ -328,70 +343,39 @@ summary.noDetails {
   border-color: var(--suppliedBgColor);
 }
 
-.suppliedLabel:hover {
-  background-color: rgb(from var(--suppliedBgColor) r g b / 0.25);
-}
-
 .unclearLabel {
   border-color: var(--unclearBgColor);
-}
-
-.unclearLabel:hover {
-  background-color: rgb(from var(--unclearBgColor) r g b / 0.25);
 }
 
 .sicLabel {
   border-color: var(--sicBgColor);
 }
 
-.sicLabel:hover {
-  background-color: rgb(from var(--sicBgColor) r g b / 0.25);
-}
-
 .corrLabel {
   border-color: var(--corrBgColor);
-}
-
-.corrLabel:hover {
-  background-color: rgb(from var(--corrBgColor) r g b / 0.25);
 }
 
 .origLabel {
   border-color: var(--origBgColor);
 }
 
-.origLabel:hover {
-  background-color: rgb(from var(--origBgColor) r g b / 0.25);
-}
-
 .regLabel {
   border-color: var(--regBgColor);
 }
 
-.regLabel:hover {
-  background-color: rgb(from var(--regBgColor) r g b / 0.25);
-}
-
-
 .addLabel {
   border-color: var(--addBgColor);
-}
-
-.addLabel:hover {
-  background-color: rgb(from var(--addBgColor) r g b / 0.25);
 }
 
 .delLabel {
   border-color: var(--delBgColor);
 }
 
-.delLabel:hover {
-  background-color: rgb(from var(--delBgColor) r g b / 0.25);
-}
-
 .splitButtonContainer {
   /*display: inline-block;*/
   word-wrap: break-word;
+  border-radius: 5px;
+  margin: 4px;
 }
 
 .splitButtonLabel {

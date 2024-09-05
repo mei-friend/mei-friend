@@ -1068,38 +1068,37 @@
                 <div class="addMarkup annotationMultiToolsIcon" data-el-name="choice">
                   <span id="addChoiceText" class="annotationMultiToolsComponent choiceLabel" data-el-name="choice" title="Groups a number of alternative encodings for the same point in a text. ">&lt;choice&gt;</span>
                   <span id="choiceContentTarget" class="annotationMultiToolsComponent choiceLabel" data-el-name="choice" title="First, select content for this element by hovering over <choice>." data-content="sic,corr">
-                    
                     <span class="sicLabel splitButtonLabel">&lt;sic&gt;</span>
                     <span class="corrLabel splitButtonLabel">&lt;corr&gt;</span>
                   </span>
-                </div>
+                  <div id="choice-content-options" class="markup-dropdown-content" data-el-name="choice">
+                    <a id="choiceSicCorr" data-target="choiceContentTarget" data-content-choice="sic,corr" data-el-name="choice"
+                      class="content-option splitButtonContainer" href="#">
+                      <span class="annotationMultiToolsComponent">&lt;choice&gt;</span>
+                      <span class="sicLabel splitButtonLabel">&lt;sic&gt;</span>
+                      <span class="corrLabel splitButtonLabel">&lt;corr&gt;</span>
+                    </a>
+                    <a id="choiceCorrSic" data-target="choiceContentTarget" data-content-choice="corr,sic" data-el-name="choice"
+                      class="content-option splitButtonContainer" href="#">
+                      <span class="annotationMultiToolsComponent">&lt;choice&gt;</span>
+                      <span class="corrLabel splitButtonLabel">&lt;corr&gt;</span>
+                      <span class="sicLabel splitButtonLabel">&lt;sic&gt;</span>
+                    </a>
+                    <a id="choiceOrigReg" data-target="choiceContentTarget" data-content-choice="orig,reg" data-el-name="choice"
+                      class="content-option splitButtonContainer" href="#">
+                      <span class="annotationMultiToolsComponent">&lt;choice&gt;</span>
+                      <span class="origLabel splitButtonLabel">&lt;orig&gt;</span>
+                      <span class="regLabel splitButtonLabel">&lt;reg&gt;</span>
+                    </a>
+                    <a id="choiceRegOrig" data-target="choiceContentTarget" data-content-choice="reg,orig" data-el-name="choice"
+                      class="content-option splitButtonContainer" href="#">
+                      <span class="annotationMultiToolsComponent">&lt;choice&gt;</span>
+                      <span class="regLabel splitButtonLabel">&lt;reg&gt;</span>
+                      <span class="origLabel splitButtonLabel">&lt;orig&gt;</span>
+                    </a>
+                  </div>
+                  </div>
                 <span id="choiceArrow" class="annotationMultiToolsSelector choiceLabel" data-el-name="choice">▼</span>
-                <div id="choice-content-options" class="markup-dropdown-content" data-el-name="choice">
-                  <a id="choiceSicCorr" data-target="choiceContentTarget" data-content-choice="sic,corr" data-el-name="choice"
-                    class="content-option splitButtonContainer" href="#">
-                    <span class="annotationMultiToolsComponent">&lt;choice&gt;</span>
-                    <span class="sicLabel splitButtonLabel">&lt;sic&gt;</span>
-                    <span class="corrLabel splitButtonLabel">&lt;corr&gt;</span>
-                  </a>
-                  <a id="choiceCorrSic" data-target="choiceContentTarget" data-content-choice="corr,sic" data-el-name="choice"
-                    class="content-option splitButtonContainer" href="#">
-                    <span class="annotationMultiToolsComponent">&lt;choice&gt;</span>
-                    <span class="corrLabel splitButtonLabel">&lt;corr&gt;</span>
-                    <span class="sicLabel splitButtonLabel">&lt;sic&gt;</span>
-                  </a>
-                  <a id="choiceOrigReg" data-target="choiceContentTarget" data-content-choice="orig,reg" data-el-name="choice"
-                    class="content-option splitButtonContainer" href="#">
-                    <span class="annotationMultiToolsComponent">&lt;choice&gt;</span>
-                    <span class="origLabel splitButtonLabel">&lt;orig&gt;</span>
-                    <span class="regLabel splitButtonLabel">&lt;reg&gt;</span>
-                  </a>
-                  <a id="choiceRegOrig" data-target="choiceContentTarget" data-content-choice="reg,orig" data-el-name="choice"
-                    class="content-option splitButtonContainer" href="#">
-                    <span class="annotationMultiToolsComponent">&lt;choice&gt;</span>
-                    <span class="regLabel splitButtonLabel">&lt;reg&gt;</span>
-                    <span class="origLabel splitButtonLabel">&lt;orig&gt;</span>
-                  </a>
-                </div>
               </div> 
             </div>
             <div class="annotationToolsIconGroup">
@@ -1107,26 +1106,25 @@
                 <div class="addMarkup annotationMultiToolsIcon" data-el-name="subst">
                   <span id="addSubstText" class="annotationMultiToolsComponent substLabel" data-el-name="subst" title="Groups a number of alternative encodings for the same point in a text. ">&lt;subst&gt;</span>
                   <span id="substContentTarget" class="annotationMultiToolsComponent substLabel" data-el-name="subst" title="First, select content for this element by hovering over <subst>." data-content="add,del">
-                    
                     <span class="addLabel splitButtonLabel">&lt;add&gt;</span>
                     <span class="delLabel splitButtonLabel">&lt;del&gt;</span>
                   </span>
-                </div>
+                  <div id="subst-content-options" class="markup-dropdown-content" data-el-name="subst">
+                    <a id="substAddDel" data-target="substContentTarget" data-content-choice="add,del" data-el-name="subst"
+                      class="content-option splitButtonContainer" href="#">
+                      <span class="annotationMultiToolsComponent">&lt;subst&gt;</span>
+                      <span class="addLabel splitButtonLabel">&lt;add&gt;</span>
+                      <span class="delLabel splitButtonLabel">&lt;del&gt;</span>
+                    </a>
+                    <a id="substDelAdd" data-target="substContentTarget" data-content-choice="del,add" data-el-name="subst"
+                      class="content-option splitButtonContainer" href="#">
+                      <span class="annotationMultiToolsComponent">&lt;subst&gt;</span>
+                      <span class="delLabel splitButtonLabel">&lt;del&gt;</span>
+                      <span class="addLabel splitButtonLabel">&lt;add&gt;</span>
+                    </a>
+                  </div>
+                  </div>
                 <span id="substArrow" class="annotationMultiToolsSelector substLabel" data-el-name="subst">▼</span>
-                <div id="subst-content-options" class="markup-dropdown-content" data-el-name="subst">
-                  <a id="substAddDel" data-target="substContentTarget" data-content-choice="add,del" data-el-name="subst"
-                    class="content-option splitButtonContainer" href="#">
-                    <span class="annotationMultiToolsComponent">&lt;subst&gt;</span>
-                    <span class="addLabel splitButtonLabel">&lt;add&gt;</span>
-                    <span class="delLabel splitButtonLabel">&lt;del&gt;</span>
-                  </a>
-                  <a id="substDelAdd" data-target="substContentTarget" data-content-choice="del,add" data-el-name="subst"
-                    class="content-option splitButtonContainer" href="#">
-                    <span class="annotationMultiToolsComponent">&lt;subst&gt;</span>
-                    <span class="delLabel splitButtonLabel">&lt;del&gt;</span>
-                    <span class="addLabel splitButtonLabel">&lt;add&gt;</span>
-                  </a>
-                </div>
               </div>
             </div>
           </fieldset>

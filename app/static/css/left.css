@@ -51,10 +51,9 @@
 }
 
 #markupToolsMenu {
-  display: flex;
   flex-direction: row;
 }
 
 .markupGrp {
-  display: inline-block !important;
+  flex-wrap: wrap;
 }
