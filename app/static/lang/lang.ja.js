@@ -512,7 +512,6 @@ export const lang = {
     description: '<reg> に選択を入れて <orig> を追加します。'
   },
   choiceContentTarget: {
-    text: '(コンテンツを選択)',
     description: '<choice> の上にホバーしてこの要素のためにコンテンツを選択します。',
   },
   addSubstText: {
@@ -526,7 +525,6 @@ export const lang = {
     description: '<del> に選択を入れて <add> を追加します。'
   },
   substContentTarget: {
-    text: '(コンテンツを選択)',
     description: '<subst> の上にホバーしてこの要素のためにコンテンツを選択します。',
   },
   editInterventionsGrp: {

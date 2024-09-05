@@ -536,7 +536,6 @@ export const lang = {
     description: 'Coloca la selección en <reg> y añade <orig>.'
   },
   choiceContentTarget: {
-    text: '(seleccionar contenido)',
     description: 'Primero, selecciona el contenido para este elemento pasando el cursor sobre <elección>.',
   },
   addSubstText: {
@@ -551,7 +550,6 @@ export const lang = {
     description: 'Coloca la selección en <del> y añade <add>.'
   },
   substContentTarget: {
-    text: '(seleccionar contenido)',
     description: 'Primero, selecciona el contenido para este elemento pasando el cursor sobre <sustitución>.',
   },
   editInterventionsGrp: {

@@ -530,7 +530,6 @@ export const lang = {
     description: 'Put selection in <reg> and add <orig>.' 
   },
   choiceContentTarget: {
-    text: '(select content)',
     description: 'First, select content for this element by hovering over <choice>.',
   },
   addSubstText: {
@@ -545,7 +544,6 @@ export const lang = {
     description: 'Put selection in <del> and add <add>.' 
   },
   substContentTarget: {
-    text: '(select content)',
     description: 'First, select content for this element by hovering over <subst>.',
   },
   editInterventionsGrp: {

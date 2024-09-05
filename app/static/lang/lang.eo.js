@@ -523,7 +523,6 @@ export const lang = {
     description: 'Metu elekton en <reg> kaj aldonu <orig>.' 
   },
   choiceContentTarget: {
-    text: '(elektu enhavon)',
     description: 'Unue elektu enhavon por tiu elemento pasante la muson super <elekto>.',
   },
   addSubstText: {
@@ -538,7 +537,6 @@ export const lang = {
     description: 'Metu elekton en <del> kaj aldonu <add>.' 
   },
   substContentTarget: {
-    text: '(elektu enhavon)',
     description: 'Unue elektu enhavon por tiu elemento pasante la muson super <anstataŭigo>.',
   },
   editInterventionsGrp: {

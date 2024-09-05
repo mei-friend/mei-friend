@@ -519,7 +519,6 @@ export const lang = {
     description: 'Помістіть вибір у <reg> і додайте <orig>.'
   },
   choiceContentTarget: {
-    text: '(виберіть вміст)',
     description: 'Спочатку виберіть вміст для цього елемента, навівши на <choice>.',
   },
   addSubstText: {
@@ -534,7 +533,6 @@ export const lang = {
     description: 'Помістіть вибір у <del> і додайте <add>.'
   },
   substContentTarget: {
-    text: '(виберіть вміст)',
     description: 'Спочатку виберіть вміст для цього елемента, навівши на <subst>.',
   },
   editInterventionsGrp: {
