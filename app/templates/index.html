@@ -1100,25 +1100,32 @@
                     <span class="origLabel splitButtonLabel">&lt;orig&gt;</span>
                   </a>
                 </div>
-              </div>
+              </div> 
             </div>
             <div class="annotationToolsIconGroup">
-              <div class="markup-btn-group">
-                <div class="markup-dropdown">
-                  <span id="addSubstText">&lt;subst&gt;</span>
-                  <div id="subst-content-options" class="markup-dropdown-content">
-                    <a id="substAddDel" data-target="substContentTarget" data-content-choice="add,del"
-                      class="content-option splitButtonContainer" href="#">
-                      <span class="addLabel splitButtonLabel">add</span><span class="delLabel splitButtonLabel">del</span>
-                    </a>
-                    <a id="substDelAdd" data-target="substContentTarget" data-content-choice="del,add"
-                      class="content-option splitButtonContainer" href="#">
-                      <span class="delLabel splitButtonLabel">del</span><span class="addLabel splitButtonLabel">add</span>
-                    </a>
-                  </div>
+              <div class="annotationMultiToolsButton">
+                <div class="addMarkup annotationMultiToolsIcon" data-el-name="subst">
+                  <span id="addSubstText" class="annotationMultiToolsComponent substLabel" data-el-name="subst" title="Groups a number of alternative encodings for the same point in a text. ">&lt;subst&gt;</span>
+                  <span id="substContentTarget" class="annotationMultiToolsComponent substLabel" data-el-name="subst" title="First, select content for this element by hovering over <subst>." data-content="add,del">
+                    
+                    <span class="addLabel splitButtonLabel">&lt;add&gt;</span>
+                    <span class="delLabel splitButtonLabel">&lt;del&gt;</span>
+                  </span>
                 </div>
-                <div class="markup-dropdown alternativeEncodingsContent">
-                  <span id="substContentTarget" class="splitButtonContainer addMarkup" data-el-name="subst">(select content)</span>
+                <span id="substArrow" class="annotationMultiToolsSelector substLabel" data-el-name="subst">▼</span>
+                <div id="subst-content-options" class="markup-dropdown-content" data-el-name="subst">
+                  <a id="substAddDel" data-target="substContentTarget" data-content-choice="add,del" data-el-name="subst"
+                    class="content-option splitButtonContainer" href="#">
+                    <span class="annotationMultiToolsComponent">&lt;subst&gt;</span>
+                    <span class="addLabel splitButtonLabel">&lt;add&gt;</span>
+                    <span class="delLabel splitButtonLabel">&lt;del&gt;</span>
+                  </a>
+                  <a id="substDelAdd" data-target="substContentTarget" data-content-choice="del,add" data-el-name="subst"
+                    class="content-option splitButtonContainer" href="#">
+                    <span class="annotationMultiToolsComponent">&lt;subst&gt;</span>
+                    <span class="delLabel splitButtonLabel">&lt;del&gt;</span>
+                    <span class="addLabel splitButtonLabel">&lt;add&gt;</span>
+                  </a>
                 </div>
               </div>
             </div>
