@@ -94,7 +94,7 @@ writeAnnotationStandoffLabel.disabled {
 
 #markupTools fieldset {
   border-width: 1px;
-  border-radius: 3px;
+  border-radius: 9px;
   padding: 2px;
   width: 210px;
   display: flex;
