@@ -580,7 +580,9 @@ export function addMarkupHandlers() {
     let elName = currentElement.dataset.elName;
     let targetDisplay = document.getElementById(targetID);
 
+    // remove first child (i.e. <choice> span)
     targetDisplay.innerHTML = currentElement.innerHTML;
+    targetDisplay.removeChild(targetDisplay.firstElementChild);
     targetDisplay.setAttribute('data-content', currentElement.dataset.contentChoice);
     let dropdown = document.getElementById(`${elName}-content-options`);
     console.log('Toggling content selector: ', currentElement,targetID, targetDisplay, elName,dropdown);
@@ -589,8 +591,9 @@ export function addMarkupHandlers() {
 
   addSelectionSelect();
   addRespSelect();
-  /* add click handlers to annotationMultiToolsSelectors, i.e. arrows on choice / subst buttons
-     use data-el-name to determine which button we're working with  */
+
+  // add click handlers to annotationMultiToolsSelectors, i.e. arrows on choice / subst buttons
+  // use data-el-name to determine which button we're working with
   let multiToolsSelectors = document.getElementsByClassName('annotationMultiToolsSelector');
   Array.from(multiToolsSelectors).forEach((selector) => {
     selector.addEventListener('click', (event) => {
