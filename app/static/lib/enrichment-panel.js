@@ -575,6 +575,7 @@ export function addAnnotationHandlers() {
  */
 export function addMarkupHandlers() {
   const toggleContentSelector = (event) => {
+    event.stopPropagation();
     let currentElement = event.currentTarget;
     let targetID = currentElement.dataset.target;
     let elName = currentElement.dataset.elName;
