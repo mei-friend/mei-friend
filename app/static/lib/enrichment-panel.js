@@ -585,7 +585,7 @@ export function addMarkupHandlers() {
     targetDisplay.removeChild(targetDisplay.firstElementChild);
     targetDisplay.setAttribute('data-content', currentElement.dataset.contentChoice);
     let dropdown = document.getElementById(`${elName}-content-options`);
-    console.log('Toggling content selector: ', currentElement,targetID, targetDisplay, elName,dropdown);
+    console.log('Toggling content selector: ', currentElement, targetID, targetDisplay, elName, dropdown);
     if (dropdown) dropdown.style.display = 'none';
   };
 
@@ -597,11 +597,19 @@ export function addMarkupHandlers() {
   let multiToolsSelectors = document.getElementsByClassName('annotationMultiToolsSelector');
   Array.from(multiToolsSelectors).forEach((selector) => {
     selector.addEventListener('click', (event) => {
+      event.stopPropagation();
       let currentElement = event.currentTarget;
       console.log('Clicked on ', currentElement, event);
       let targetType = currentElement.dataset.elName;
       let targetElement = document.getElementById(`${targetType}-content-options`);
-      if(targetElement) targetElement.style.display = targetElement.style.display !== 'block' ? 'block' : 'none';
+
+      // if other dropdowns are open, close them
+      if (targetElement.style.display !== 'none') {
+        targetElement.style.display = 'none';
+      } else {
+        v.hideAnnotationMarkupDropDownContent();
+        targetElement.style.display = 'block';
+      }
     });
   });
 

@@ -1788,6 +1788,9 @@ export let cmd = {
       }
       // TODO: close all other overlays too...
     }
+
+    // close all annotationMultiTools/MarkupDropDownContent
+    v.hideAnnotationMarkupDropDownContent();
   },
   playPauseMidiPlayback: () => {
     if (document.getElementById('showMidiPlaybackControlBar').checked) {
@@ -1819,9 +1822,11 @@ function addEventListeners(v, cm) {
       ev.target.id !== 'alertMessage' &&
       document.getElementById('splashOverlay').style.display === 'none'
     ) {
+      console.log('Body Mousedown: Hide alerts');
       v.hideAlerts();
     }
   });
+  body.addEventListener('click', v.hideAnnotationMarkupDropDownContent);
   body.addEventListener('keydown', (ev) => {
     if (ev.key === 'Escape') cmd.escapeKeyPressed();
   });

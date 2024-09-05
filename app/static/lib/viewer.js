@@ -2430,6 +2430,11 @@ export default class Viewer {
     }
   } // hideAlerts()
 
+  // close all annotationMultiTools/MarkupDropDownContent
+  hideAnnotationMarkupDropDownContent() {
+    Array.from(document.getElementsByClassName('markup-dropdown-content')).forEach((el) => (el.style.display = 'none'));
+  } // hideAnnotationMarkupDropDownContent()
+
   /**
    * Method to check from MEI header whether the XML schema filename
    * has changed, as stored in this.currentSchema
