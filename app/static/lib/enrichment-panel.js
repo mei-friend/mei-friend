@@ -325,7 +325,10 @@ function generateListItem(a) {
   if (a.isMarkup === true) {
     legend.insertAdjacentHTML('afterbegin', codeScan);
     legend.insertAdjacentHTML('beforeend', ' &lt;' + a.type + '&gt;');
-    if (a.content) content.insertAdjacentHTML('beforeend', ' (' + a.content + ')');
+    if (a.content) {
+      content.insertAdjacentHTML('beforeend', ' (' + a.content + ')');
+      annoFieldset.classList.add(a.content.at(0) + 'Label');
+    }
     if (a.resp) content.insertAdjacentHTML('beforeend', '<br />[resp: ' + a.resp + ']');
     // add class for markup type
     att.modelTranscriptionLike.forEach((t) => {
