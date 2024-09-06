@@ -209,11 +209,6 @@ export function setFileChangedState(fileChangedState) {
   }
 }
 
-export function setGithubInstance(new_github) {
-  // update github instance (from other modules)
-  github = new_github;
-}
-
 export function setMeiFileInfo(fName, fLocation, fLocationPrintable) {
   meiFileName = fName;
   meiFileLocation = fLocation;

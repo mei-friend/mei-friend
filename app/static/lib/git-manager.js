@@ -5,12 +5,15 @@ window.fs = new LightningFS('fs', { wipe: true });
 window.pfs = window.fs.promises; // promisified version of fs, for your convenience
 
 export default class GitManager {
-  constructor(provider, providerType, token) {
+  constructor(provider, providerType, token, opts = {}) {
     console.log('GitManager constructor', provider, providerType, token);
     this.token = token;
     this.directory = '/' + provider; // e.g. '/github'
     this.provider = provider;
     this.providerType = providerType;
+    this.filepath = opts.filepath || '/' ;
+    this.repo = opts.repo || null;
+    this.branch = opts.branch || null;
     //set up type-specific onAuth, see https://isomorphic-git.org/docs/en/onAuth#docsNav
     switch (providerType) {
       case 'github':
@@ -32,6 +35,9 @@ export default class GitManager {
   }
 
   async clone(url) {
+    // TODO safety dance: check if directory exists, if so check if changes have been made, etc.
+    // wipe the pfs directory
+    await pfs.rmdir(this.directory, { recursive: true });
     console.log('cloning into', this.directory, this.token);
     await pfs.mkdir(this.directory);
     let cloneobj = {
@@ -41,15 +47,15 @@ export default class GitManager {
       dir: this.directory,
       ref: 'main',
       corsProxy: '/proxy',
-      singleBranch: true,
-      /*onAuth: this.onAuth,
+      singleBranch: false,
+      onAuth: this.onAuth,
       onAuthFailure: () => {
         console.log('auth failure');
         return { cancel: true };
       },
       onAuthSuccess: () => {
         console.log('auth success');
-      },*/
+      },
     };
     console.log('cloneobj', cloneobj);
     await git.clone(cloneobj);
@@ -87,8 +93,28 @@ export default class GitManager {
     });
   }
 
-  async readFile(path) {
+  async readFile(path = this.filepath) {
     return await pfs.readFile(this.directory + '/' + path, 'utf8');
+  }
+
+  async readDir(path = gm.filepath.substring(0, github.filepath.lastIndexOf('/'))){
+    // defaults to reading containing dir of current filepath if no path is provided
+    return await pfs.readdir(this.directory + '/' + path);
+  }
+
+  async readLog() {
+    return await git.log({
+      fs,
+      dir: this.directory,
+      depth: 10,
+      ref: this.branch,
+    });
+  }
+  async listBranches() {
+    return await git.listBranches({
+      fs,
+      dir: this.directory,
+    });
   }
 }
 
@@ -97,7 +123,7 @@ console.log('git.js loaded');
 let gm = new GitManager('github', 'github', githubToken);
 console.log('gm created');
 //console.log('readdir', await pfs.readdir(git.dir));
-let test = 'gitlab';
+let test = 'github';
 if (test === 'github') {
   console.log('github');
   await gm.clone('https://github.com/isogit-test/private');
