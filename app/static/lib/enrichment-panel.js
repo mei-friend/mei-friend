@@ -11,16 +11,16 @@ import { loginAndFetch, solid, solidLogout, provider } from './solid.js';
 import { setCursorToId, sortElementsByScorePosition } from './utils.js';
 import {
   circle,
+  codeScan,
   diffRemoved,
-  highlight,
   fileCode,
+  highlight,
   identify,
   link,
   pencil,
   rdf,
   speechBubble,
   symLinkFile,
-  codeScan,
 } from '../css/icons.js';
 
 //#region List Items Array and access functions
@@ -354,28 +354,44 @@ function generateListItem(a) {
     switch (a.type) {
       case 'annotateHighlight':
         legend.insertAdjacentHTML('afterbegin', highlight);
-        legend.insertAdjacentHTML('beforeend', ' Highlight');
+        legend.insertAdjacentHTML('beforeend', ' &lt;annot&gt; ');
+        legend.insertAdjacentHTML(
+          'beforeend',
+          '<span id="annotationToolsHighlightSpan">' + translator.lang.annotationToolsHighlightSpan.text + '</span>'
+        );
+
         annoFieldset.classList.add('annotationHighlight');
         break;
       case 'annotateCircle':
         legend.insertAdjacentHTML('afterbegin', circle);
-        legend.insertAdjacentHTML('beforeend', ' Circle');
+        legend.insertAdjacentHTML('beforeend', ' &lt;annot&gt; Circle');
         break;
       case 'annotateLink':
         legend.insertAdjacentHTML('afterbegin', link);
-        legend.insertAdjacentHTML('beforeend', ' Link');
+        legend.insertAdjacentHTML('beforeend', ' &lt;annot&gt; ');
+        legend.insertAdjacentHTML(
+          'beforeend',
+          '<span id="annotationToolsLinkSpan">' + translator.lang.annotationToolsLinkSpan.text + '</span>'
+        );
         content.insertAdjacentHTML('afterbegin', '<span>' + a.url + '</span>');
         annoFieldset.classList.add('annotationLink');
         break;
       case 'annotateDescribe':
         legend.insertAdjacentHTML('afterbegin', pencil);
-        legend.insertAdjacentHTML('beforeend', ' Description');
+        legend.insertAdjacentHTML('beforeend', ' &lt;annot&gt; ');
+        legend.insertAdjacentHTML(
+          'beforeend',
+          '<span id="annotationToolsDescribeSpan">' + translator.lang.annotationToolsDescribeSpan.text + '</span>'
+        );
         annoFieldset.classList.add('annotationDescribe');
         content.insertAdjacentHTML('beforeend', '<span>' + a.description + '</span>');
         break;
       case 'annotateIdentify':
         legend.insertAdjacentHTML('afterbegin', identify);
-        legend.insertAdjacentHTML('beforeend', ' Identify');
+        legend.insertAdjacentHTML(
+          'beforeend',
+          ' <span id="annotationToolsIdentifySpan">' + translator.lang.annotationToolsLinkSpan.text + '</span>'
+        );
         annoFieldset.classList.add('annotationIdentify');
         content.insertAdjacentHTML('afterbegin', `<div class="mao-musMat" id="musMat_${a.id}"></div>`);
         break;
