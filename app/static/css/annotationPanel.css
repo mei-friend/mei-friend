@@ -5,7 +5,7 @@
   justify-items: stretch;
 }
 
-.enrichmentToolsMenu>div {
+.enrichmentToolsMenu > div {
   padding: 5px 8px 0px 8px;
 }
 
@@ -13,7 +13,7 @@
   display: flex;
   list-style: none;
   padding: 10px;
-  background-color: var(--annotationPanelBackgroundColor)
+  background-color: var(--annotationPanelBackgroundColor);
 }
 
 .annotationToolsIcon {
@@ -32,7 +32,7 @@
 
 .annotationToolsIconGroup {
   border-radius: 5px;
-  margin-bottom: .2em;
+  margin-bottom: 0.2em;
   position: relative;
 }
 
@@ -78,7 +78,7 @@
 
 #annotateIdentify.disabled,
 writeAnnotationStandoffLabel.disabled {
-  opacity: .6;
+  opacity: 0.6;
   pointer-events: none;
 }
 
@@ -220,13 +220,12 @@ writeAnnotationStandoffLabel.disabled {
 }
 
 .markup-dropdown-content a:hover {
-  background-color: var(--annotationPanelHoverColor)
+  background-color: var(--annotationPanelHoverColor);
 }
 
 .markup-dropdown:hover .markup-dropdown-content {
   display: block;
 }
-
 
 #renderedAnnotationsContainer {
   position: absolute;
@@ -238,13 +237,11 @@ writeAnnotationStandoffLabel.disabled {
   fill: none;
   stroke: red;
   stroke-width: 3;
-  stroke-opacity: .7;
+  stroke-opacity: 0.7;
 }
 
 #listAnnotations {
-  display: flex
-    /*!important*/
-  ;
+  display: flex /*!important*/;
 }
 
 #listAnnotations details {
@@ -269,17 +266,17 @@ summary.noDetails {
   border: 1px solid black;
   border-radius: 5px;
   width: 205px;
-  margin: .25em;
+  margin: 0.25em;
   padding: 0px !important;
 }
 
 .annotationListItem {
-  border: 1px solid black;
+  border: 3px solid black;
   border-radius: 5px;
   height: fit-content;
   max-height: 205px;
-  width: 205px;
-  margin: .25em;
+  max-width: 205px;
+  margin: 0.25em;
   flex-shrink: 0;
 }
 
@@ -290,18 +287,27 @@ summary.noDetails {
 
 .annotationListItemButtons {
   border-top: 1px solid black;
-  padding: .25em .5em;
+  padding: 0.25em 0.5em;
+}
+
+.annotationContent {
+  display: flex;
+  flex-direction: column;
+}
+
+.annotationLocationLabel {
+  font-weight: bold;
 }
 
 #addWebAnnotation {
   border: 1px solid black;
   border-radius: 5px;
-  padding: .2em;
-  margin: .25em;
+  padding: 0.2em;
+  margin: 0.25em;
   cursor: pointer;
   height: fit-content;
   max-width: 192px;
-  padding: .25em .5em;
+  padding: 0.25em 0.5em;
 }
 
 .annotationListItemButtons svg,
@@ -330,7 +336,7 @@ summary.noDetails {
 }
 
 #solidLogin {
-  margin-left: .5em;
+  margin-left: 0.5em;
 }
 
 #providerSelect {

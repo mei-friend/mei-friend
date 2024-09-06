@@ -2,13 +2,13 @@
  * Provides gui elements and functionality for enrichment bar
  */
 
-//import { v, cm, log, translator, setStandoffAnnotationEnabledStatus } from './main.js';
-import { v, cm, translator, setStandoffAnnotationEnabledStatus } from './main.js';
-//import { convertCoords, generateXmlId, rmHash, setCursorToId } from './utils.js';
-import { setCursorToId, sortElementsByScorePosition } from './utils.js';
-//import { meiNameSpace, xmlNameSpace, xmlToString } from './dom-utils.js';
+import * as att from './attribute-classes.js';
 import * as annot from './annotation.js';
+import { nsp } from './linked-data.js';
+import { v, cm, translator, setStandoffAnnotationEnabledStatus } from './main.js';
 import * as markup from './markup.js';
+import { loginAndFetch, solid, solidLogout, provider } from './solid.js';
+import { setCursorToId, sortElementsByScorePosition } from './utils.js';
 import {
   circle,
   diffRemoved,
@@ -22,8 +22,6 @@ import {
   symLinkFile,
   codeScan,
 } from '../css/icons.js';
-import { loginAndFetch, solid, solidLogout, provider } from './solid.js';
-import { nsp } from './linked-data.js';
 
 //#region List Items Array and access functions
 
@@ -167,16 +165,13 @@ async function situateListItems() {
         if (a.isMarkup && b.isMarkup) {
           // shouldn't happen in theory
           byPosition = 0;
-        }
-        else if (a.isMarkup) {
+        } else if (a.isMarkup) {
           byPosition = -1;
-        }
-        else {
+        } else {
           //b.isMarkup
           byPosition = 1;
         }
-      }
-      else if (aPos === 0) {
+      } else if (aPos === 0) {
         byPosition = -1;
       } else {
         byPosition = 1;
@@ -321,53 +316,65 @@ export function refreshAnnotationsList() {
  * @returns bubble div
  */
 function generateListItem(a) {
-  const annoDiv = document.createElement('div');
-  annoDiv.classList.add('annotationListItem');
-  annoDiv.id = a.id;
-  const details = document.createElement('details');
-  details.setAttribute('open', '');
-  const summary = document.createElement('summary');
+  const annoFieldset = document.createElement('fieldset');
+  annoFieldset.classList.add('annotationListItem');
+  annoFieldset.id = a.id;
+  const legend = document.createElement('legend');
+  const content = document.createElement('div');
+  content.classList.add('annotationContent');
   if (a.isMarkup === true) {
-    summary.insertAdjacentHTML('afterbegin', codeScan);
-    details.insertAdjacentHTML('afterbegin', '&lt;' + a.type + '&gt;');
-    if (a.content) details.insertAdjacentHTML('beforeend', ' (' + a.content + ')');
-    if (a.resp) details.insertAdjacentHTML('beforeend', '<br />[resp: ' + a.resp + ']');
+    legend.insertAdjacentHTML('afterbegin', codeScan);
+    legend.insertAdjacentHTML('beforeend', ' &lt;' + a.type + '&gt;');
+    if (a.content) content.insertAdjacentHTML('beforeend', ' (' + a.content + ')');
+    if (a.resp) content.insertAdjacentHTML('beforeend', '<br />[resp: ' + a.resp + ']');
+    // add class for markup type
+    att.modelTranscriptionLike.forEach((t) => {
+      if (a.type === t) {
+        annoFieldset.classList.add(t + 'Label');
+      }
+    });
   } else {
+    annoFieldset.classList.add('annotationLabel');
     switch (a.type) {
       case 'annotateHighlight':
-        summary.insertAdjacentHTML('afterbegin', highlight);
+        legend.insertAdjacentHTML('afterbegin', highlight);
+        legend.insertAdjacentHTML('beforeend', ' Highlight');
         break;
       case 'annotateCircle':
-        summary.insertAdjacentHTML('afterbegin', circle);
+        legend.insertAdjacentHTML('afterbegin', circle);
+        legend.insertAdjacentHTML('beforeend', ' Circle');
         break;
       case 'annotateLink':
-        summary.insertAdjacentHTML('afterbegin', link);
-        details.insertAdjacentHTML('afterbegin', a.url);
+        legend.insertAdjacentHTML('afterbegin', link);
+        legend.insertAdjacentHTML('beforeend', ' Link');
+        content.insertAdjacentHTML('afterbegin', '<span>' + a.url + '</span>');
         break;
       case 'annotateDescribe':
-        summary.insertAdjacentHTML('afterbegin', pencil);
-        details.insertAdjacentHTML('afterbegin', a.description);
+        legend.insertAdjacentHTML('afterbegin', pencil);
+        legend.insertAdjacentHTML('beforeend', ' Description');
+        content.insertAdjacentHTML('beforeend', '<span>' + a.description + '</span>');
         break;
       case 'annotateIdentify':
-        summary.insertAdjacentHTML('afterbegin', identify);
-        details.insertAdjacentHTML('afterbegin', `<div class="mao-musMat" id="musMat_${a.id}"></div>`);
+        legend.insertAdjacentHTML('afterbegin', identify);
+        legend.insertAdjacentHTML('beforeend', ' Identify');
+        content.insertAdjacentHTML('afterbegin', `<div class="mao-musMat" id="musMat_${a.id}"></div>`);
         break;
       default:
         console.warn('Unknown type when drawing annotation in list: ', a);
     }
   }
   const annotationLocationLabel = generateAnnotationLocationLabel(a);
-  summary.appendChild(annotationLocationLabel);
+  content.prepend(annotationLocationLabel);
 
-  if (!details.innerHTML.length) {
+  if (!legend.innerHTML.length) {
     // some annotation types don't have any annotation body to display
-    summary.classList.add('noDetails');
+    content.classList.add('noDetails');
   }
-  details.prepend(summary);
-  annoDiv.appendChild(details);
+  annoFieldset.prepend(content);
+  annoFieldset.appendChild(legend);
   let annoListItemButtons = generateAnnotationButtons(a);
-  annoDiv.appendChild(annoListItemButtons);
-  return annoDiv;
+  annoFieldset.appendChild(annoListItemButtons);
+  return annoFieldset;
 }
 
 /**
@@ -667,7 +674,7 @@ function addSelectionSelect() {
     type: 'select',
     default: '',
     values: ['', 'artic', 'accid'],
-  }
+  };
 
   let selSelDiv = document.createElement('div');
   selSelDiv.classList.add('markupSetting');
@@ -677,7 +684,11 @@ function addSelectionSelect() {
 
   selectSelectBase.values.forEach((value, i) => {
     let label = 'labels' in translator.lang.selectionSelect ? translator.lang.selectionSelect.labels.at(i) : value;
-    let option = new Option(label, value, selectSelectBase.values.indexOf(selectSelectBase.default) === i ? true : false);
+    let option = new Option(
+      label,
+      value,
+      selectSelectBase.values.indexOf(selectSelectBase.default) === i ? true : false
+    );
     // Does not update on language change, find better solution
     //if ('valuesDescriptions' in translator.lang.selectionSelect) option.title = translator.lang.selectionSelect.valuesDescriptions[i];
     selSelect.add(option);
