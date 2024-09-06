@@ -146,9 +146,9 @@ export function retrieveItemValuesByProperty(filterProperty = null, selectedProp
 
 /**
  *  Finds page numbers in rendering for every list item and sorts the list items.
- *  Sorts 
- *    1. by page, 
- *    2. by horizontal position on page, 
+ *  Sorts
+ *    1. by page,
+ *    2. by horizontal position on page,
  *    3. markup and then annotations (if selection is identical).
  *  @returns {Array} Sorted list items.
  */
@@ -268,7 +268,9 @@ export function refreshAnnotationsInRendering(forceListRefresh = false) {
       }
     });
   }
-  if (document.getElementById('showAnnotationPanel')?.checked) situateAndRefreshAnnotationsList(forceListRefresh);
+  if (document.getElementById('showAnnotationPanel')?.checked) {
+    situateAndRefreshAnnotationsList(forceListRefresh);
+  }
 } // refreshAnnotationsInRendering()
 
 //#endregion
@@ -287,9 +289,13 @@ function situateAndRefreshAnnotationsList(forceRefresh = false) {
   situateListItems()
     .then((sortedList) => {
       listItems = sortedList;
-      if (forceRefresh || document.getElementsByClassName('annotationListItem').length) refreshAnnotationsList();
+      if (forceRefresh || document.getElementsByClassName('annotationListItem').length) {
+        refreshAnnotationsList();
+      }
     })
-    .catch((error) => console.error('Situating of list items failed:', error));
+    .catch((error) => {
+      console.error('Situating of list items failed:', error);
+    });
 } // situateAndRefreshAnnotationsList()
 
 /**
@@ -322,6 +328,9 @@ export function refreshAnnotationsList() {
 function generateListItem(a) {
   const annoFieldset = document.createElement('fieldset');
   annoFieldset.classList.add('annotationListItem');
+  if ('selected' in a && a.selected === true) {
+    annoFieldset.classList.add('selectedAnnotationListItem');
+  }
   annoFieldset.id = a.id;
   const legend = document.createElement('legend');
   const content = document.createElement('div');
@@ -388,10 +397,8 @@ function generateListItem(a) {
 
   // click handler for list item
   annoFieldset.addEventListener('click', () => {
-    annoFieldset?.parentElement?.querySelectorAll('.annotationListItem').forEach((li) => {
-      li.classList.remove('selectedAnnotationListItem');
-    });
-    annoFieldset.classList.add('selectedAnnotationListItem');
+    listItems.forEach((item) => (item.selected = false));
+    a.selected = true;
     setCursorToId(cm, a.id);
   });
 
@@ -510,7 +517,6 @@ function generateListItemButton(buttonClass, buttonIcon, buttonTitle = '') {
   button.insertAdjacentHTML('afterbegin', buttonIcon);
   button.title = buttonTitle;
   button.classList.add('icon');
-
   return button;
 } // generateListItemButton()
 
@@ -520,7 +526,7 @@ function generateListItemButton(buttonClass, buttonIcon, buttonTitle = '') {
  * @returns {HTMLElement} span element
  */
 export function generateAnnotationLocationLabel(a) {
-  console.log('generating anno label for ', a);
+  // console.log('generating anno label for ', a);
   const annotationLocationLabel = document.createElement('span');
   if (a.type === 'annotateIdentify') {
     // special case: identified MAO objects
