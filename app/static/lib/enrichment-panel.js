@@ -289,9 +289,9 @@ function situateAndRefreshAnnotationsList(forceRefresh = false) {
   situateListItems()
     .then((sortedList) => {
       listItems = sortedList;
-      if (forceRefresh || document.getElementsByClassName('annotationListItem').length) {
-        refreshAnnotationsList();
-      }
+      // if (forceRefresh || document.getElementsByClassName('annotationListItem').length) {
+      refreshAnnotationsList();
+      // }
     })
     .catch((error) => {
       console.error('Situating of list items failed:', error);
