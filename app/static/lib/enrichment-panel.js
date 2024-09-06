@@ -32,7 +32,7 @@ var listItems = [];
  */
 export function clearListItems() {
   listItems = [];
-}
+} // clearListItems()
 
 /**
  * read List Items from XML
@@ -41,7 +41,7 @@ export function readListItemsFromXML(flagLimit = false) {
   annot.readAnnots(flagLimit);
   markup.readMarkup();
   refreshAnnotationsInRendering();
-}
+} // readListItemsFromXML()
 
 /**
  * Looks if an item with itemId exists in listItems
@@ -51,7 +51,7 @@ export function readListItemsFromXML(flagLimit = false) {
 export function isItemInList(itemId) {
   let index = listItems.findIndex((item) => item.id === itemId);
   return index >= 0;
-}
+} // isItemInList()
 
 /**
  * Adds a new item to ListItems if there is no item with this id
@@ -67,7 +67,7 @@ export function addListItem(listItemObject, forceRefreshAnnotations = false) {
     if (forceRefreshAnnotations === true) refreshAnnotationsInRendering(true);
   }
   return addedSuccessfully;
-}
+} // addListItem()
 
 /**
  * Deletes an annotation or markup from listItems and the xml document.
@@ -97,7 +97,7 @@ export function deleteListItem(uuid) {
     situateAndRefreshAnnotationsList(true);
     refreshAnnotationsInRendering();
   }
-}
+} // deleteListItem()
 
 /**
  * Retrieve a list item by id
@@ -106,7 +106,7 @@ export function deleteListItem(uuid) {
 export function retrieveListItem(itemId) {
   const ix = listItems.find((a) => a.id === itemId);
   return ix;
-}
+} // retrieveListItem()
 
 /**
  * Retrieves items containing a given property from itemList
@@ -117,7 +117,7 @@ export function retrieveItemsByProperty(property) {
   let filteredList = listItems.filter((item) => property in item === true);
 
   return filteredList;
-}
+} // retrieveItemsByProperty()
 
 /**
  * Retrieves the values of a given property from a filtered set on
@@ -142,11 +142,14 @@ export function retrieveItemValuesByProperty(filterProperty = null, selectedProp
   });
 
   return arrayOfValues;
-}
+} // retrieveItemValuesByProperty()
 
 /**
  *  Finds page numbers in rendering for every list item and sorts the list items.
- *  Sorts 1. by page, 2. by horizontal position on page, 3. markup and then annotations (if selection is identical).
+ *  Sorts 
+ *    1. by page, 
+ *    2. by horizontal position on page, 
+ *    3. markup and then annotations (if selection is identical).
  *  @returns {Array} Sorted list items.
  */
 async function situateListItems() {
@@ -184,7 +187,7 @@ async function situateListItems() {
   });
 
   return sortedResults;
-}
+} // situateListItems()
 
 async function situateOneListItem(item) {
   return new Promise((resolve) => {
@@ -204,7 +207,8 @@ async function situateOneListItem(item) {
       resolve(item);
     });
   });
-}
+} // situateOneListItem()
+
 // TODO: Fix MAO-related stuff!!!
 
 //#endregion
@@ -265,7 +269,7 @@ export function refreshAnnotationsInRendering(forceListRefresh = false) {
     });
   }
   if (document.getElementById('showAnnotationPanel')?.checked) situateAndRefreshAnnotationsList(forceListRefresh);
-}
+} // refreshAnnotationsInRendering()
 
 //#endregion
 
@@ -286,7 +290,7 @@ function situateAndRefreshAnnotationsList(forceRefresh = false) {
       if (forceRefresh || !document.getElementsByClassName('annotationListItem').length) refreshAnnotationsList();
     })
     .catch((error) => console.error('Situating of list items failed:', error));
-}
+} // situateAndRefreshAnnotationsList()
 
 /**
  * Creates the list of all things in the enrichment panel
@@ -305,7 +309,7 @@ export function refreshAnnotationsList() {
     let annoDiv = generateListItem(a);
     list.appendChild(annoDiv);
   });
-}
+} // refreshAnnotationsList()
 
 //#endregion
 
@@ -342,6 +346,7 @@ function generateListItem(a) {
       case 'annotateHighlight':
         legend.insertAdjacentHTML('afterbegin', highlight);
         legend.insertAdjacentHTML('beforeend', ' Highlight');
+        annoFieldset.classList.add('annotationHighlight');
         break;
       case 'annotateCircle':
         legend.insertAdjacentHTML('afterbegin', circle);
@@ -351,15 +356,18 @@ function generateListItem(a) {
         legend.insertAdjacentHTML('afterbegin', link);
         legend.insertAdjacentHTML('beforeend', ' Link');
         content.insertAdjacentHTML('afterbegin', '<span>' + a.url + '</span>');
+        annoFieldset.classList.add('annotationLink');
         break;
       case 'annotateDescribe':
         legend.insertAdjacentHTML('afterbegin', pencil);
         legend.insertAdjacentHTML('beforeend', ' Description');
+        annoFieldset.classList.add('annotationDescribe');
         content.insertAdjacentHTML('beforeend', '<span>' + a.description + '</span>');
         break;
       case 'annotateIdentify':
         legend.insertAdjacentHTML('afterbegin', identify);
         legend.insertAdjacentHTML('beforeend', ' Identify');
+        annoFieldset.classList.add('annotationIdentify');
         content.insertAdjacentHTML('afterbegin', `<div class="mao-musMat" id="musMat_${a.id}"></div>`);
         break;
       default:
@@ -377,8 +385,21 @@ function generateListItem(a) {
   annoFieldset.appendChild(legend);
   let annoListItemButtons = generateAnnotationButtons(a);
   annoFieldset.appendChild(annoListItemButtons);
+
+  // click handler for list item
+  annoFieldset.addEventListener('click', () => {
+    annoFieldset?.parentElement?.querySelectorAll('.annotationListItem').forEach((li) => {
+      li.classList.remove('selectedAnnotationListItem');
+    });
+    annoFieldset.classList.add('selectedAnnotationListItem');
+    setCursorToId(cm, a.id);
+  });
+
+  // hover handler for list item
+  // annoFieldset.addEventListener('mousein', () => {
+
   return annoFieldset;
-}
+} // generateListItem()
 
 /**
  * Creates the buttons for a list item bubble
@@ -396,9 +417,8 @@ function generateAnnotationButtons(a) {
     translator.lang.flipPageToAnnotationText.description
   );
   if (!'selection' in a) flipToAnno.classList.add('disabled');
-  flipToAnno.addEventListener('click', (e) => {
+  flipToAnno.addEventListener('click', () => {
     console.debug('Flipping to annotation: ', a);
-    v.updatePage(cm, a.firstPage, a.id);
     setCursorToId(cm, a.id);
   });
 
@@ -475,7 +495,7 @@ function generateAnnotationButtons(a) {
   annoListItemButtons.appendChild(deleteAnno);
 
   return annoListItemButtons;
-}
+} // generateAnnotationButtons()
 
 /**
  * Generates a basic button for the list item bubbles button list
@@ -492,7 +512,7 @@ function generateListItemButton(buttonClass, buttonIcon, buttonTitle = '') {
   button.classList.add('icon');
 
   return button;
-}
+} // generateListItemButton()
 
 /**
  * Generates the label containing the page locations
@@ -523,7 +543,7 @@ export function generateAnnotationLocationLabel(a) {
   annotationLocationLabel.classList.add('annotationLocationLabel');
   annotationLocationLabel.dataset.id = 'loc-' + a.id;
   return annotationLocationLabel;
-}
+} // generateAnnotationLocationLabel()
 
 //#endregion
 
@@ -577,7 +597,7 @@ export function addAnnotationHandlers() {
   enableDisableIdentifyObject(); // set initial status
   document.getElementById('annotationToolsButton').removeEventListener('click', enableDisableIdentifyObject);
   document.getElementById('annotationToolsButton').addEventListener('click', enableDisableIdentifyObject);
-}
+} // addAnnotationHandlers()
 
 /**
  * Adds click events and UI functionality for markup tool panel.
@@ -637,7 +657,7 @@ export function addMarkupHandlers() {
       markup.addMarkup(event);
     });
   }
-}
+} // addMarkupHandlers()
 
 /**
  * Adds the respSelect control to te markup tools tab.
@@ -665,7 +685,7 @@ function addRespSelect() {
 
   let markupMenu = document.getElementById('markupSettingsFieldset');
   markupMenu.prepend(respSelDiv);
-}
+} // addRespSelect()
 
 /**
  * add selection select control to markup tools tab
@@ -707,7 +727,7 @@ function addSelectionSelect() {
 
   let markupMenu = document.getElementById('markupSettingsFieldset');
   markupMenu.prepend(selSelDiv);
-}
+} // addSelectionSelect()
 
 /**
  * enables/disables the 'Identify' button based on selected mode of annotation.
@@ -720,7 +740,7 @@ function enableDisableIdentifyObject() {
   } else {
     identifyTool.classList.remove('disabled');
   }
-}
+} // enableDisableIdentifyObject()
 
 //#endregion
 
@@ -791,7 +811,7 @@ export async function populateSolidTab() {
     });
   }
   setStandoffAnnotationEnabledStatus();
-}
+} // populateSolidTab()
 
 async function populateLoggedInSolidTab() {
   const webId = solid.getDefaultSession().info.webId;
@@ -826,7 +846,7 @@ async function populateLoggedInSolidTab() {
   return `
   <div><span id='solidWelcomeMsg'>${translator.lang.solidWelcomeMsg.text}<span><span id='solidWelcomeName' title='${webId}'>${name}</span>!</div>
   <div><button type="button" id="solidLogout">${translator.lang.solidLogout.text}</button></div>`;
-}
+} // populateLoggedInSolidTab()
 
 function populateLoggedOutSolidTab() {
   let providerContainer = document.createElement('div');
@@ -854,7 +874,7 @@ function populateLoggedOutSolidTab() {
   providerContainer.insertAdjacentElement('afterbegin', solidLoginBtn);
   providerContainer.insertAdjacentElement('afterbegin', customSolidIdP);
   return providerContainer.outerHTML;
-}
+} // populateLoggedOutSolidTab()
 
 //#endregion
 
@@ -879,7 +899,7 @@ function addLoadWebAnnotatationButton(list) {
     'beforeend',
     listItems.length ? '' : '<p>' + translator.lang.noAnnotationsToDisplay.text + '.</p>'
   );
-}
+} // addLoadWebAnnotatationButton()
 
 // generateListItemButton()
 
