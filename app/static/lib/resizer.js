@@ -73,7 +73,7 @@ export function setOrientation(cm, _notationOrientation = '', _facsimileOrientat
       sz.width -= annotationPanelExtent; // subtract width of annotation panel
       annotationPanel.style.display = 'unset';
       annotationPanel.style.width = annotationPanelExtent;
-      annotationPanel.style.height = sz.height + 5; // HACK for 5 pix difference!
+      annotationPanel.style.height = sz.height; // + 5; WG: Hack removed here. // DW: HACK for 5 pix difference!
     } else {
       annotationPanel.style.display = 'none';
     }
@@ -88,7 +88,7 @@ export function setOrientation(cm, _notationOrientation = '', _facsimileOrientat
     if (showAnnotationPanelCheckbox && showAnnotationPanelCheckbox.checked) {
       sz.height -= annotationPanelExtent; // subtract width of annotation panel
       annotationPanel.style.display = 'unset';
-      annotationPanel.style.width = sz.width + 5; // HACK for 5 pix difference!
+      annotationPanel.style.width = sz.width; // + 5; WG: hack removed here. // HACK for 5 pix difference!
       annotationPanel.style.height = annotationPanelExtent;
     } else {
       annotationPanel.style.display = 'none';
