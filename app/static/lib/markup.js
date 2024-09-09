@@ -718,25 +718,33 @@ export function deleteMarkup(markupItem) {
       v.loadXml(cm.getValue(), true);
     }
     var toDelete = v.xmlDoc.querySelector("[*|id='" + id + "']");
-    var parent = toDelete.parentElement;
-    var descendants = new DocumentFragment();
+    // only run this when something to delete is found, otherwise we don't need to delete anything
+    // prevents crashes when we have trouble updating the itemList
+    if (toDelete != null) {
+      var parent = toDelete.parentElement;
+      var descendants = new DocumentFragment();
 
-    if (att.alternativeEncodingElements.includes(toDelete.localName)) {
-      let firstChild = toDelete.children[0];
-      for (let i = 0; i < firstChild.children.length; i++) {
-        let child = firstChild.children[i];
-        descendants.appendChild(child.cloneNode(true));
+      if (att.alternativeEncodingElements.includes(toDelete.localName)) {
+        let firstChild = toDelete.children[0];
+        for (let i = 0; i < firstChild.children.length; i++) {
+          let child = firstChild.children[i];
+          descendants.appendChild(child.cloneNode(true));
+        }
+      } else {
+        for (let i = 0; i < toDelete.children.length; i++) {
+          let child = toDelete.children[i];
+          descendants.appendChild(child.cloneNode(true));
+        }
       }
-    } else {
-      for (let i = 0; i < toDelete.children.length; i++) {
-        let child = toDelete.children[i];
-        descendants.appendChild(child.cloneNode(true));
-      }
+
+      parent.replaceChild(descendants, toDelete);
+      replaceInEditor(cm, parent, true);
+      indentSelection(v, cm);
     }
-
-    parent.replaceChild(descendants, toDelete);
-    replaceInEditor(cm, parent, true);
-    indentSelection(v, cm);
+    else {
+      console.warn('Failed to delete non-existing markup with xml:id ', id);
+    }
+    
   });
   updateChoiceOptions();
 }
