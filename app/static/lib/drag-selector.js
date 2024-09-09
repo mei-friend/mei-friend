@@ -1,6 +1,7 @@
 import * as att from './attribute-classes.js';
-import { getX, getY, svgNameSpace } from './dom-utils.js';
+import { getX, getY, getParentMarkupElementId, svgNameSpace } from './dom-utils.js';
 import { platform } from './defaults.js';
+import { selectItemInAnnotationList } from './enrichment-panel.js';
 import { cm } from './main.js';
 import { startMidiTimeout } from './midi-player.js';
 import { setCursorToId } from './utils.js';
@@ -200,6 +201,13 @@ export function addDragSelector(v, vp) {
       }
       v.scrollSvgTo(cm, ev);
       v.updateHighlight(cm);
+
+      // check if id is inside a markup element, if panel visible
+      if (document.getElementById('annotationPanel').style.display !== 'none') {
+        let markupId = getParentMarkupElementId(v.xmlDoc, v.lastNoteId);
+        selectItemInAnnotationList(markupId);
+      }
+
       v.allowCursorActivity = true;
     }
   }); // mouse move event listener
