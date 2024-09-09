@@ -511,10 +511,11 @@ export function scrollTo(container, element) {
  * @returns {string} id of parent markup element or empty string
  */
 export function getParentMarkupElementId(xmlDoc, id) {
+  const markupElementList = att.modelTranscriptionLike.join(',') + ',' + att.alternativeEncodingElements.join(',') + ',' + 'annot';
   let element = xmlDoc.querySelector('[*|id="' + id + '"]');
   if (element) {
     // find parent element that is a markup element
-    let parent = element.closest(att.modelTranscriptionLike.join(',') + ',' + att.alternativeEncodingElements.join(','))
+    let parent = element.closest(markupElementList);
     if (parent) {
       let markupItemId = parent.getAttribute('xml:id');
       // check if there is an alternative encoding element above
