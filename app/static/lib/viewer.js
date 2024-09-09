@@ -1,5 +1,6 @@
 import * as att from './attribute-classes.js';
 import * as dutils from './dom-utils.js';
+import { selectItemInAnnotationList } from './enrichment-panel.js';
 import * as prs from './page-range-selector.js';
 import * as speed from './speed.js';
 import * as utils from './utils.js';
@@ -623,6 +624,23 @@ export default class Viewer {
           // on current page
           this.scrollSvgTo(cm);
           this.updateHighlight(cm);
+        }
+
+        // check if id is inside a markup element
+        let element = this.xmlDoc.querySelector('[*|id="' + id + '"]');
+        if (element) {
+          let parent = element.closest(att.modelTranscriptionLike.join(',') + ',' + att.alternativeEncodingElements.join(','))
+          if (parent) {
+            let markupItemId = parent.getAttribute('xml:id');
+            if (parent.closest(att.alternativeEncodingElements.join(','))) {
+              markupItemId = parent.closest(att.alternativeEncodingElements.join(',')).getAttribute('xml:id');
+            }
+            selectItemInAnnotationList(markupItemId);
+          } else {
+            selectItemInAnnotationList('');
+          }
+        } else {
+          selectItemInAnnotationList('');
         }
       }
       console.log('cursorActivity() selectedElements: ', this.selectedElements);

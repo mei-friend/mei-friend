@@ -322,6 +322,16 @@ export function refreshAnnotationsList() {
   });
 } // refreshAnnotationsList()
 
+/**
+ * Scroll to selected element in markup/annotation list panel
+ */
+function scrollToSelectedElement() {
+  const selectedElement = document.querySelector('.selectedAnnotationListItem');
+  if (selectedElement) {
+    selectedElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+} // scrollToSelectedElement()
+
 //#endregion
 
 //#region List Items
@@ -418,14 +428,7 @@ function generateListItem(a) {
 
   // click handler for list item
   annoFieldset.addEventListener('click', () => {
-    listItems.forEach((item) => {
-      if (item.id === a.id) {
-        item.selected = true;
-      } else if ('selected' in item) {
-        item.selected = false;
-      }
-    });
-    refreshAnnotationsList();
+    selectItemInAnnotationList(a.id);
     setCursorToId(cm, a.id);
   });
 
@@ -434,6 +437,22 @@ function generateListItem(a) {
 
   return annoFieldset;
 } // generateListItem()
+
+/** 
+ * Selects an annotation in the list and refreshes the list
+ * @param {string} uuid id of annotation to select
+ */
+export function selectItemInAnnotationList(uuid) {
+  listItems.forEach((item) => {
+    if (item.id === uuid || ('selection' in item && item.selection.includes(uuid))) {
+      item.selected = true;
+    } else if ('selected' in item) {
+      item.selected = false;
+    }
+  });
+  refreshAnnotationsList();
+  scrollToSelectedElement();
+} // selectItemInAnnotationList()
 
 /**
  * Creates the buttons for a list item bubble
