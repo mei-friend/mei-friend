@@ -707,11 +707,11 @@ function mintSuppliedId(id, nodeName, v) {
 /**
  * Deletes a markup item from listItems and all related elements from the xml document.
  * Keeps content or content of the first child.
- * @param {Object} markupItem
+ * @param {Array} selection
  */
-export function deleteMarkup(markupItem) {
+export function deleteMarkup(selection) {
   //updateChoiceOptions(markupItem.content, true);
-  markupItem.selection.forEach((id) => {
+  selection.forEach((id) => {
     // make sure to load the whole unfiltered file if in speed mode has been filtered for variant readings
     // otherwise there are not all children of alternative encoding elements available
     if (v.xmlDocOutdated === true) {

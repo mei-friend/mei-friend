@@ -80,6 +80,7 @@ export function deleteListItem(uuid) {
     let a = retrieveListItem(uuid);
     if (a.isMarkup === true) {
       markup.deleteMarkup(a);
+      markup.deleteMarkup(sel);
       // remove markup from list and
       // delete annotations if selection is identical with selection of current markup
       // for now, we delete items by selection
