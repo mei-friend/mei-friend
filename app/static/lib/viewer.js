@@ -2197,6 +2197,12 @@ export default class Viewer {
     this.allowCursorActivity = true;
     this.scrollSvgTo(cm);
     this.updateHighlight(cm);
+
+    // check if id is inside a markup element, if panel visible
+    if (document.getElementById('annotationPanel').style.display !== 'none') {
+      let markupId = dutils.getParentMarkupElementId(this.xmlDoc, id);
+      selectItemInAnnotationList(markupId);
+    }
   } // navigate()
 
   // turn page for navigation and return svg directly
