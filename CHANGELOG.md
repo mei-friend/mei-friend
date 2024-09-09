@@ -4,6 +4,7 @@
 * Support for markup color export to PDF (#108)
 * Add checkbox to control markup color export to PDF
 * Improve UIX of markup panel
+* Interactively highlight current markup item in list when clicking or drag-selecting notation and/or navigating in encoding
 
 ### 1.1.6 patch
 
