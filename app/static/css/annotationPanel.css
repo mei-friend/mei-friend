@@ -92,7 +92,7 @@ writeAnnotationStandoffLabel.disabled {
   align-items: stretch;
 }
 
-#markupTools fieldset {
+#annotationTools fieldset, #markupTools fieldset{
   border-width: 1px;
   border-radius: 9px;
   padding: 2px;
@@ -102,7 +102,7 @@ writeAnnotationStandoffLabel.disabled {
   margin-bottom: 5px;
 }
 
-#markupTools fieldset legend {
+#annotationTools fieldset > legend, #markupTools fieldset > legend {
   font-weight: bold;
 }
 

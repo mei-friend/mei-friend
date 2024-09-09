@@ -1054,113 +1054,113 @@
           <!--        <button class="tablink" onclick="switchTab(event, 'annotationPanel')"
           title="Links" data-tab="externalLinks">Links</button>-->
         <span id="closeAnnotationPanelButton" class="topright" title="Close Annotations Panel">&times;</span>
-      </div>
-      <div id="solidTab" class="tabcontent"></div>
-      <div id="markupTools" class="tabcontent">
-        <menu id="markupToolsMenu" class="enrichmentToolsMenu markup-panel">
-          <fieldset id="markupSettingsFieldset">
-            <legend id="markupSettingsLegendText">Markup settings</legend>
-          </fieldset>
-          <fieldset class="markupGrp">
-            <legend id="alternativeEncodingsGrp">Add alternative encoding</legend>
-            <div class="annotationToolsIconGroup">
-              <div class="annotationMultiToolsButton">
-                <div class="addMarkup annotationMultiToolsIcon" data-el-name="choice">
-                  <span id="addChoiceText" class="annotationMultiToolsComponent choiceLabel" data-el-name="choice" title="Groups a number of alternative encodings for the same point in a text. ">&lt;choice&gt;</span>
-                  <span id="choiceContentTarget" class="annotationMultiToolsComponent choiceLabel" data-el-name="choice" title="First, select content for this element by hovering over <choice>." data-content="sic,corr">
-                    <span class="sicLabel splitButtonLabel">&lt;sic&gt;</span>
-                    <span class="corrLabel splitButtonLabel">&lt;corr&gt;</span>
-                  </span>
-                  <div id="choice-content-options" class="markup-dropdown-content" data-el-name="choice">
-                    <a id="choiceSicCorr" data-target="choiceContentTarget" data-content-choice="sic,corr" data-el-name="choice"
-                      class="content-option splitButtonContainer" href="#">
-                      <span class="annotationMultiToolsComponent">&lt;choice&gt;</span>
+        </div>
+        <div id="solidTab" class="tabcontent"></div>
+        <div id="markupTools" class="tabcontent">
+          <menu id="markupToolsMenu" class="enrichmentToolsMenu markup-panel">
+            <fieldset id="markupSettingsFieldset">
+              <legend id="markupSettingsLegendText">Markup settings</legend>
+            </fieldset>
+            <fieldset class="markupGrp">
+              <legend id="alternativeEncodingsGrp">Add alternative encoding</legend>
+              <div class="annotationToolsIconGroup">
+                <div class="annotationMultiToolsButton">
+                  <div class="addMarkup annotationMultiToolsIcon" data-el-name="choice">
+                    <span id="addChoiceText" class="annotationMultiToolsComponent choiceLabel" data-el-name="choice" title="Groups a number of alternative encodings for the same point in a text. ">&lt;choice&gt;</span>
+                    <span id="choiceContentTarget" class="annotationMultiToolsComponent choiceLabel" data-el-name="choice" title="First, select content for this element by hovering over <choice>." data-content="sic,corr">
                       <span class="sicLabel splitButtonLabel">&lt;sic&gt;</span>
                       <span class="corrLabel splitButtonLabel">&lt;corr&gt;</span>
-                    </a>
-                    <a id="choiceCorrSic" data-target="choiceContentTarget" data-content-choice="corr,sic" data-el-name="choice"
-                      class="content-option splitButtonContainer" href="#">
-                      <span class="annotationMultiToolsComponent">&lt;choice&gt;</span>
-                      <span class="corrLabel splitButtonLabel">&lt;corr&gt;</span>
-                      <span class="sicLabel splitButtonLabel">&lt;sic&gt;</span>
-                    </a>
-                    <a id="choiceOrigReg" data-target="choiceContentTarget" data-content-choice="orig,reg" data-el-name="choice"
-                      class="content-option splitButtonContainer" href="#">
-                      <span class="annotationMultiToolsComponent">&lt;choice&gt;</span>
-                      <span class="origLabel splitButtonLabel">&lt;orig&gt;</span>
-                      <span class="regLabel splitButtonLabel">&lt;reg&gt;</span>
-                    </a>
-                    <a id="choiceRegOrig" data-target="choiceContentTarget" data-content-choice="reg,orig" data-el-name="choice"
-                      class="content-option splitButtonContainer" href="#">
-                      <span class="annotationMultiToolsComponent">&lt;choice&gt;</span>
-                      <span class="regLabel splitButtonLabel">&lt;reg&gt;</span>
-                      <span class="origLabel splitButtonLabel">&lt;orig&gt;</span>
-                    </a>
-                  </div>
-                  </div>
-                <span id="choiceArrow" class="annotationMultiToolsSelector choiceLabel" data-el-name="choice">▼</span>
-              </div> 
-            </div>
-            <div class="annotationToolsIconGroup">
-              <div class="annotationMultiToolsButton">
-                <div class="addMarkup annotationMultiToolsIcon" data-el-name="subst">
-                  <span id="addSubstText" class="annotationMultiToolsComponent substLabel" data-el-name="subst" title="Groups a number of alternative encodings for the same point in a text. ">&lt;subst&gt;</span>
-                  <span id="substContentTarget" class="annotationMultiToolsComponent substLabel" data-el-name="subst" title="First, select content for this element by hovering over <subst>." data-content="add,del">
-                    <span class="addLabel splitButtonLabel">&lt;add&gt;</span>
-                    <span class="delLabel splitButtonLabel">&lt;del&gt;</span>
-                  </span>
-                  <div id="subst-content-options" class="markup-dropdown-content" data-el-name="subst">
-                    <a id="substAddDel" data-target="substContentTarget" data-content-choice="add,del" data-el-name="subst"
-                      class="content-option splitButtonContainer" href="#">
-                      <span class="annotationMultiToolsComponent">&lt;subst&gt;</span>
-                      <span class="addLabel splitButtonLabel">&lt;add&gt;</span>
-                      <span class="delLabel splitButtonLabel">&lt;del&gt;</span>
-                    </a>
-                    <a id="substDelAdd" data-target="substContentTarget" data-content-choice="del,add" data-el-name="subst"
-                      class="content-option splitButtonContainer" href="#">
-                      <span class="annotationMultiToolsComponent">&lt;subst&gt;</span>
-                      <span class="delLabel splitButtonLabel">&lt;del&gt;</span>
-                      <span class="addLabel splitButtonLabel">&lt;add&gt;</span>
-                    </a>
-                  </div>
-                  </div>
-                <span id="substArrow" class="annotationMultiToolsSelector substLabel" data-el-name="subst">▼</span>
+                    </span>
+                    <div id="choice-content-options" class="markup-dropdown-content" data-el-name="choice">
+                      <a id="choiceSicCorr" data-target="choiceContentTarget" data-content-choice="sic,corr" data-el-name="choice"
+                        class="content-option splitButtonContainer" href="#">
+                        <span class="annotationMultiToolsComponent">&lt;choice&gt;</span>
+                        <span class="sicLabel splitButtonLabel">&lt;sic&gt;</span>
+                        <span class="corrLabel splitButtonLabel">&lt;corr&gt;</span>
+                      </a>
+                      <a id="choiceCorrSic" data-target="choiceContentTarget" data-content-choice="corr,sic" data-el-name="choice"
+                        class="content-option splitButtonContainer" href="#">
+                        <span class="annotationMultiToolsComponent">&lt;choice&gt;</span>
+                        <span class="corrLabel splitButtonLabel">&lt;corr&gt;</span>
+                        <span class="sicLabel splitButtonLabel">&lt;sic&gt;</span>
+                      </a>
+                      <a id="choiceOrigReg" data-target="choiceContentTarget" data-content-choice="orig,reg" data-el-name="choice"
+                        class="content-option splitButtonContainer" href="#">
+                        <span class="annotationMultiToolsComponent">&lt;choice&gt;</span>
+                        <span class="origLabel splitButtonLabel">&lt;orig&gt;</span>
+                        <span class="regLabel splitButtonLabel">&lt;reg&gt;</span>
+                      </a>
+                      <a id="choiceRegOrig" data-target="choiceContentTarget" data-content-choice="reg,orig" data-el-name="choice"
+                        class="content-option splitButtonContainer" href="#">
+                        <span class="annotationMultiToolsComponent">&lt;choice&gt;</span>
+                        <span class="regLabel splitButtonLabel">&lt;reg&gt;</span>
+                        <span class="origLabel splitButtonLabel">&lt;orig&gt;</span>
+                      </a>
+                    </div>
+                    </div>
+                  <span id="choiceArrow" class="annotationMultiToolsSelector choiceLabel" data-el-name="choice">▼</span>
+                </div> 
               </div>
-            </div>
-          </fieldset>
-          <fieldset class="markupGrp">
-            <legend id="editInterventionsGrp">Add editorial intervention</legend>
-            <div class="annotationToolsIconGroup markup-dropdown">
-              <span id="addSuppliedText" class="annotationToolsIcon suppliedLabel addMarkup" data-el-name="supplied">Supplied</span>
-            </div>
-            <div class="annotationToolsIconGroup markup-dropdown">
-              <span id="addUnclearText" class="annotationToolsIcon unclearLabel addMarkup" data-el-name="unclear">Unclear</span>
-            </div>
-            <div class="annotationToolsIconGroup markup-dropdown">
-              <span id="addSicText" class="annotationToolsIcon sicLabel addMarkup" data-el-name="sic">Sic</span>
-            </div>
-            <div class="annotationToolsIconGroup markup-dropdown">
-              <span id="addCorrText" class="annotationToolsIcon corrLabel addMarkup" data-el-name="corr">Corr</span>
-            </div>
-            <div class="annotationToolsIconGroup markup-dropdown">
-              <span id="addOrigText" class="annotationToolsIcon origLabel addMarkup" data-el-name="orig">Orig</span>
-            </div>
-            <div class="annotationToolsIconGroup markup-dropdown">
-              <span id="addRegText" class="annotationToolsIcon regLabel addMarkup" data-el-name="reg">Reg</span>
-            </div>
-          </fieldset>
-          <fieldset class="markupGrp">
-            <legend id="descMarkupGrp">Add descriptive markup</legend>
-            <div class="annotationToolsIconGroup markup-dropdown">
-              <span id="addAddText" class="annotationToolsIcon addLabel addMarkup" data-el-name="add">Add</span>
-            </div>
-            <div class="annotationToolsIconGroup markup-dropdown">
-              <span id="addDelText" class="annotationToolsIcon delLabel addMarkup" data-el-name="del">Del</span>
-            </div>
-          </fieldset>
-        </menu>
-      </div>
-      <div id="annotationTools" class="tabcontent">
+              <div class="annotationToolsIconGroup">
+                <div class="annotationMultiToolsButton">
+                  <div class="addMarkup annotationMultiToolsIcon" data-el-name="subst">
+                    <span id="addSubstText" class="annotationMultiToolsComponent substLabel" data-el-name="subst" title="Groups a number of alternative encodings for the same point in a text. ">&lt;subst&gt;</span>
+                    <span id="substContentTarget" class="annotationMultiToolsComponent substLabel" data-el-name="subst" title="First, select content for this element by hovering over <subst>." data-content="add,del">
+                      <span class="addLabel splitButtonLabel">&lt;add&gt;</span>
+                      <span class="delLabel splitButtonLabel">&lt;del&gt;</span>
+                    </span>
+                    <div id="subst-content-options" class="markup-dropdown-content" data-el-name="subst">
+                      <a id="substAddDel" data-target="substContentTarget" data-content-choice="add,del" data-el-name="subst"
+                        class="content-option splitButtonContainer" href="#">
+                        <span class="annotationMultiToolsComponent">&lt;subst&gt;</span>
+                        <span class="addLabel splitButtonLabel">&lt;add&gt;</span>
+                        <span class="delLabel splitButtonLabel">&lt;del&gt;</span>
+                      </a>
+                      <a id="substDelAdd" data-target="substContentTarget" data-content-choice="del,add" data-el-name="subst"
+                        class="content-option splitButtonContainer" href="#">
+                        <span class="annotationMultiToolsComponent">&lt;subst&gt;</span>
+                        <span class="delLabel splitButtonLabel">&lt;del&gt;</span>
+                        <span class="addLabel splitButtonLabel">&lt;add&gt;</span>
+                      </a>
+                    </div>
+                    </div>
+                  <span id="substArrow" class="annotationMultiToolsSelector substLabel" data-el-name="subst">▼</span>
+                </div>
+              </div>
+            </fieldset>
+            <fieldset class="markupGrp">
+              <legend id="editInterventionsGrp">Add editorial intervention</legend>
+              <div class="annotationToolsIconGroup markup-dropdown">
+                <span id="addSuppliedText" class="annotationToolsIcon suppliedLabel addMarkup" data-el-name="supplied">Supplied</span>
+              </div>
+              <div class="annotationToolsIconGroup markup-dropdown">
+                <span id="addUnclearText" class="annotationToolsIcon unclearLabel addMarkup" data-el-name="unclear">Unclear</span>
+              </div>
+              <div class="annotationToolsIconGroup markup-dropdown">
+                <span id="addSicText" class="annotationToolsIcon sicLabel addMarkup" data-el-name="sic">Sic</span>
+              </div>
+              <div class="annotationToolsIconGroup markup-dropdown">
+                <span id="addCorrText" class="annotationToolsIcon corrLabel addMarkup" data-el-name="corr">Corr</span>
+              </div>
+              <div class="annotationToolsIconGroup markup-dropdown">
+                <span id="addOrigText" class="annotationToolsIcon origLabel addMarkup" data-el-name="orig">Orig</span>
+              </div>
+              <div class="annotationToolsIconGroup markup-dropdown">
+                <span id="addRegText" class="annotationToolsIcon regLabel addMarkup" data-el-name="reg">Reg</span>
+              </div>
+            </fieldset>
+            <fieldset class="markupGrp">
+              <legend id="descMarkupGrp">Add descriptive markup</legend>
+              <div class="annotationToolsIconGroup markup-dropdown">
+                <span id="addAddText" class="annotationToolsIcon addLabel addMarkup" data-el-name="add">Add</span>
+              </div>
+              <div class="annotationToolsIconGroup markup-dropdown">
+                <span id="addDelText" class="annotationToolsIcon delLabel addMarkup" data-el-name="del">Del</span>
+              </div>
+            </fieldset>
+          </menu>
+        </div>
+        <div id="annotationTools" class="tabcontent">
         <menu id="annotationToolsMenu" class="enrichmentToolsMenu">
           <div id="annotationToolsDomainSelection">
             <fieldset class="annotationToolsDomainSelectionItem">
@@ -1190,7 +1190,7 @@
             </li>
           </div>
           <fieldset class="annotationToolsIconGroup">
-            <legend id="annotationToolsMarkupLegend">Annotation tools</legend>
+            <legend id="insertInlineAnnotationLegend">Annotation tools</legend>
             <li>
               <div class="annotationToolsIcon" id="annotateHighlight">
                 <!--<svg xmlns="http://www.w3.org/2000/svg"  aria-hidden="true" role="img" id="footer-sample-full" width="16px" height="16px"  viewBox="0 0 1024 1024">
@@ -1206,44 +1206,51 @@
                   </svg>
                   <span id="annotationToolsHighlightSpan">Highlight</span>
                 </div>
-              </li>
-              <!--DW HACK ESWC <li>
+            </li>
+            <!-- DW HACK ESWC
+            <li>
               <div class="annotationToolsIcon" id="annotateCircle">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
                   <path fill-rule="evenodd" d="M8 1.5a6.5 6.5 0 100 13 6.5 6.5 0 000-13zM0 8a8 8 0 1116 0A8 8 0 010 8z" />
                 </svg>
                 Circle
               </div>
-            </li>-->
-              <li>
-                <div class="annotationToolsIcon" id="annotateDescribe">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-                    <title id="annotationToolsDescribeTitle">Describe</title>
-                    <path
-                      fill-rule="evenodd"
-                      d="M11.013 1.427a1.75 1.75 0 012.474 0l1.086 1.086a1.75 1.75 0 010 2.474l-8.61 8.61c-.21.21-.47.364-.756.445l-3.251.93a.75.75 0 01-.927-.928l.929-3.25a1.75 1.75 0 01.445-.758l8.61-8.61zm1.414 1.06a.25.25 0 00-.354 0L10.811 3.75l1.439 1.44 1.263-1.263a.25.25 0 000-.354l-1.086-1.086zM11.189 6.25L9.75 4.81l-6.286 6.287a.25.25 0 00-.064.108l-.558 1.953 1.953-.558a.249.249 0 00.108-.064l6.286-6.286z"
-                    />
-                  </svg>
-                  <span id="annotationToolsDescribeSpan">Describe</span>
-                </div>
-              </li>
-              <li>
-                <div class="annotationToolsIcon" id="annotateLink">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-                    <title id="annotationToolsLinkTitle">Link</title>
-                    <path
-                      fill-rule="evenodd"
-                      d="M7.775 3.275a.75.75 0 001.06 1.06l1.25-1.25a2 2 0 112.83 2.83l-2.5 2.5a2 2 0 01-2.83 0 .75.75 0 00-1.06 1.06 3.5 3.5 0 004.95 0l2.5-2.5a3.5 3.5 0 00-4.95-4.95l-1.25 1.25zm-4.69 9.64a2 2 0 010-2.83l2.5-2.5a2 2 0 012.83 0 .75.75 0 001.06-1.06 3.5 3.5 0 00-4.95 0l-2.5 2.5a3.5 3.5 0 004.95 4.95l1.25-1.25a.75.75 0 00-1.06-1.06l-1.25 1.25a2 2 0 01-2.83 0z"
-                    />
-                  </svg>
-                  <span id="annotationToolsLinkSpan">Link</span>
-                </div>
-              </li>
-            </fieldset>
-          </menu>
-        </div>
-        <div id="listAnnotations" class="tabcontent">No annotations present.</div>
-        <!-- DW HACK ESWC <div id="externalLinks" class="tabcontent">Links</div>-->
+            </li>
+            -->
+            <li>
+              <div class="annotationToolsIcon" id="annotateDescribe">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                  <title id="annotationToolsDescribeTitle">Describe</title>
+                  <path
+                    fill-rule="evenodd"
+                    d="M11.013 1.427a1.75 1.75 0 012.474 0l1.086 1.086a1.75 1.75 0 010 2.474l-8.61 8.61c-.21.21-.47.364-.756.445l-3.251.93a.75.75 0 01-.927-.928l.929-3.25a1.75 1.75 0 01.445-.758l8.61-8.61zm1.414 1.06a.25.25 0 00-.354 0L10.811 3.75l1.439 1.44 1.263-1.263a.25.25 0 000-.354l-1.086-1.086zM11.189 6.25L9.75 4.81l-6.286 6.287a.25.25 0 00-.064.108l-.558 1.953 1.953-.558a.249.249 0 00.108-.064l6.286-6.286z"
+                  />
+                </svg>
+                <span id="annotationToolsDescribeSpan">Describe</span>
+              </div>
+            </li>
+            <li>
+              <div class="annotationToolsIcon" id="annotateLink">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                  <title id="annotationToolsLinkTitle">Link</title>
+                  <path
+                    fill-rule="evenodd"
+                    d="M7.775 3.275a.75.75 0 001.06 1.06l1.25-1.25a2 2 0 112.83 2.83l-2.5 2.5a2 2 0 01-2.83 0 .75.75 0 00-1.06 1.06 3.5 3.5 0 004.95 0l2.5-2.5a3.5 3.5 0 00-4.95-4.95l-1.25 1.25zm-4.69 9.64a2 2 0 010-2.83l2.5-2.5a2 2 0 012.83 0 .75.75 0 001.06-1.06 3.5 3.5 0 00-4.95 0l-2.5 2.5a3.5 3.5 0 004.95 4.95l1.25-1.25a.75.75 0 00-1.06-1.06l-1.25 1.25a2 2 0 01-2.83 0z"
+                  />
+                </svg>
+                <span id="annotationToolsLinkSpan">Link</span>
+              </div>
+            </li>
+          </fieldset>
+          <!-- TODO: insert fieldset for stand-off annotations
+          <fieldset class="annotationToolsIconGroup">
+            <legend id="insertStandoffAnnotationLegend">Stand-off annotation tools</legend>
+          </fieldset>
+          -->
+        </menu>
+      </div>
+      <div id="listAnnotations" class="tabcontent">No annotations present.</div>
+      <!-- DW HACK ESWC <div id="externalLinks" class="tabcontent">Links</div>-->
       </div>
     </div>
     <div id="midiPlaybackControlBar">
