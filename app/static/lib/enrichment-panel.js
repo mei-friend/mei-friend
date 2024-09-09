@@ -165,10 +165,10 @@ async function situateListItems() {
         let byPosition = 0;
         let aQuery = a.selection[0];
         let bQuery = b.selection[0];
-  
+
         let sortedCompare = sortElementsByScorePosition([aQuery, bQuery]);
         let aPos = sortedCompare.findIndex((el) => el === aQuery);
-  
+
         if (aQuery === bQuery) {
           if (a.isMarkup && b.isMarkup) {
             // shouldn't happen in theory
@@ -184,7 +184,7 @@ async function situateListItems() {
         } else {
           byPosition = 1;
         }
-  
+
         return byPosition;
       } else {
         return byPage;
@@ -418,8 +418,14 @@ function generateListItem(a) {
 
   // click handler for list item
   annoFieldset.addEventListener('click', () => {
-    listItems.forEach((item) => (item.selected = false));
-    a.selected = true;
+    listItems.forEach((item) => {
+      if (item.id === a.id) {
+        item.selected = true;
+      } else if ('selected' in item) {
+        item.selected = false;
+      }
+    });
+    refreshAnnotationsList();
     setCursorToId(cm, a.id);
   });
 
