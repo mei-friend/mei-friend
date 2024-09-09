@@ -79,13 +79,13 @@ export function deleteListItem(uuid) {
   if (ix >= 0) {
     let a = retrieveListItem(uuid);
     if (a.isMarkup === true) {
-      markup.deleteMarkup(a);
+      let sel = a.selection;
+      markup.deleteMarkup(sel);
       // remove markup from list and
       // delete annotations if selection is identical with selection of current markup
       // for now, we delete items by selection
       // (change if this causes trouble, theoretically it shoudln't because selection
       // is only identical if an annotation created via a markup item)
-      let sel = a.selection;
       let filteredItems = listItems.filter((item) => item.selection !== sel);
       listItems = filteredItems;
     } else {
@@ -93,7 +93,6 @@ export function deleteListItem(uuid) {
       // remove only the annotation from the list that should be deleted
       listItems.splice(ix, 1);
     }
-
     situateAndRefreshAnnotationsList(true);
     refreshAnnotationsInRendering();
   }
@@ -153,40 +152,46 @@ export function retrieveItemValuesByProperty(filterProperty = null, selectedProp
  *  @returns {Array} Sorted list items.
  */
 async function situateListItems() {
-  const asyncResults = await Promise.all(listItems.map((item) => situateOneListItem(item)));
-  const sortedResults = asyncResults.sort((a, b) => {
-    let byPage = a.firstPage - b.firstPage;
-    if (byPage === 0 && a.selection && b.selection) {
-      let byPosition = 0;
-      let aQuery = a.selection[0];
-      let bQuery = b.selection[0];
-
-      let sortedCompare = sortElementsByScorePosition([aQuery, bQuery]);
-      let aPos = sortedCompare.findIndex((el) => el === aQuery);
-
-      if (aQuery === bQuery) {
-        if (a.isMarkup && b.isMarkup) {
-          // shouldn't happen in theory
-          byPosition = 0;
-        } else if (a.isMarkup) {
+  const asyncResults = await Promise.all(listItems.length > 0 ? listItems.map((item) => situateOneListItem(item)) : []);
+  // when deleting the last item from the list, sometimes, asyncResults finds the item again after it should have been deleted
+  // to make sure to abort, when itemList is empty, because nothings needs to be sorted
+  if (listItems.length === 0) {
+    return [];
+  }
+  else {
+    const sortedResults = asyncResults.sort((a, b) => {
+      let byPage = a.firstPage - b.firstPage;
+      if (byPage === 0 && a.selection && b.selection) {
+        let byPosition = 0;
+        let aQuery = a.selection[0];
+        let bQuery = b.selection[0];
+  
+        let sortedCompare = sortElementsByScorePosition([aQuery, bQuery]);
+        let aPos = sortedCompare.findIndex((el) => el === aQuery);
+  
+        if (aQuery === bQuery) {
+          if (a.isMarkup && b.isMarkup) {
+            // shouldn't happen in theory
+            byPosition = 0;
+          } else if (a.isMarkup) {
+            byPosition = -1;
+          } else {
+            //b.isMarkup
+            byPosition = 1;
+          }
+        } else if (aPos === 0) {
           byPosition = -1;
         } else {
-          //b.isMarkup
           byPosition = 1;
         }
-      } else if (aPos === 0) {
-        byPosition = -1;
+  
+        return byPosition;
       } else {
-        byPosition = 1;
+        return byPage;
       }
-
-      return byPosition;
-    } else {
-      return byPage;
-    }
-  });
-
-  return sortedResults;
+    });
+    return sortedResults;
+  }
 } // situateListItems()
 
 async function situateOneListItem(item) {
