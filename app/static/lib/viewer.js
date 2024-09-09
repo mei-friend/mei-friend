@@ -556,6 +556,13 @@ export default class Viewer {
       this.selectedElements.push(itemId);
       msg += 'Added as first element: ' + itemId;
     }
+
+    // select current element in markup annotation list, if panel visible
+    if (document.getElementById('annotationPanel').style.display !== 'none') {
+      let markupId = dutils.getParentMarkupElementId(this.xmlDoc, itemId);
+      selectItemInAnnotationList(markupId);
+    }
+
     //console.log(msg);
     console.log('handleClickOnNotation() selectedElements: ', this.selectedElements);
     this.scrollSvgTo(cm, e);
@@ -626,22 +633,12 @@ export default class Viewer {
           this.updateHighlight(cm);
         }
 
-        // check if id is inside a markup element
-        let element = this.xmlDoc.querySelector('[*|id="' + id + '"]');
-        if (element) {
-          let parent = element.closest(att.modelTranscriptionLike.join(',') + ',' + att.alternativeEncodingElements.join(','))
-          if (parent) {
-            let markupItemId = parent.getAttribute('xml:id');
-            if (parent.closest(att.alternativeEncodingElements.join(','))) {
-              markupItemId = parent.closest(att.alternativeEncodingElements.join(',')).getAttribute('xml:id');
-            }
-            selectItemInAnnotationList(markupItemId);
-          } else {
-            selectItemInAnnotationList('');
-          }
-        } else {
-          selectItemInAnnotationList('');
+        // check if id is inside a markup element, if panel visible
+        if (document.getElementById('annotationPanel').style.display !== 'none') {
+          let markupId = dutils.getParentMarkupElementId(this.xmlDoc, id);
+          selectItemInAnnotationList(markupId);
         }
+
       }
       console.log('cursorActivity() selectedElements: ', this.selectedElements);
     }
