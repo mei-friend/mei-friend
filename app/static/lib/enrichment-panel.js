@@ -441,12 +441,16 @@ function generateListItem(a) {
 } // generateListItem()
 
 /**
- * Selects an annotation in the list and refreshes the list
- * @param {string} uuid id of annotation to select
+ * Finds for a given element id in xmlDoc 
+ * 1) an enclosing markup element or
+ * 2) an in-line annotation
+ * and selects it in the annotation list and refreshes the list.
+ * @param {string} uuid element id
  */
 export function selectItemInAnnotationList(uuid) {
+  let markupId = markup.getParentMarkupElementId(v.xmlDoc, uuid);
   listItems.forEach((item) => {
-    if (item.id === uuid || ('selection' in item && item.selection.includes(uuid))) {
+    if (item.id === markupId || ('selection' in item && (item.selection.includes(markupId) || item.selection.includes(uuid)))) {
       item.selected = true;
     } else if ('selected' in item) {
       item.selected = false;
