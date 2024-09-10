@@ -163,10 +163,10 @@ export function deleteElement(v, cm, modifyerKey = false) {
       pointingElements.forEach((pointingElement) => {
         console.log(
           'Removing pointing element <' +
-            pointingElement.nodeName +
-            '>: "' +
-            pointingElement.getAttribute('xml:id') +
-            '"'
+          pointingElement.nodeName +
+          '>: "' +
+          pointingElement.getAttribute('xml:id') +
+          '"'
         );
         removeInEditor(cm, pointingElement);
         pointingElement.remove();
@@ -941,7 +941,7 @@ export function shiftPitch(v, cm, deltaPitch = 0, shiftChromatically = false) {
     let chs = Array.from(el.querySelectorAll('note,rest,mRest,multiRest'));
     if (chs.length > 0) {
       // shift many elements
-      chs.forEach((ele) => replaceInEditor(cm, pitchMover(v, ele, deltaPitch, shiftChromatically)), true);
+      chs.forEach((ele) => replaceInEditor(cm, pitchMover(v, ele, deltaPitch, shiftChromatically), true));
     } else if (['note', 'rest', 'mRest', 'multiRest'].includes(el.nodeName)) {
       // shift one element
       replaceInEditor(cm, pitchMover(v, el, deltaPitch, shiftChromatically), true);
@@ -2195,16 +2195,16 @@ export function removeInEditor(cm, xmlNode) {
   if (sc.findNext()) {
     console.debug(
       'removeInEditor() self closing element "' +
-        id +
-        '" from ln:' +
-        sc.from().line +
-        '/ch:' +
-        sc.from().ch +
-        ' to ln:' +
-        sc.to().line +
-        '/ch:' +
-        sc.to().ch +
-        '.'
+      id +
+      '" from ln:' +
+      sc.from().line +
+      '/ch:' +
+      sc.from().ch +
+      ' to ln:' +
+      sc.to().line +
+      '/ch:' +
+      sc.to().ch +
+      '.'
     );
   } else {
     let searchFullElement =
@@ -2219,16 +2219,16 @@ export function removeInEditor(cm, xmlNode) {
     if (sc.findNext()) {
       console.debug(
         'removeInEditor() full element "' +
-          id +
-          '" from ln:' +
-          sc.from().line +
-          '/ch:' +
-          sc.from().ch +
-          ' to ln:' +
-          sc.to().line +
-          '/ch:' +
-          sc.to().ch +
-          '.'
+        id +
+        '" from ln:' +
+        sc.from().line +
+        '/ch:' +
+        sc.from().ch +
+        ' to ln:' +
+        sc.to().line +
+        '/ch:' +
+        sc.to().ch +
+        '.'
       );
     }
   }
@@ -2273,7 +2273,9 @@ export function replaceInEditor(cm, xmlNode, select = false, newNode = null) {
     let searchFullElement =
       '(?:<' + xmlNode.nodeName + `)` + xmlIdCheck + `([\\s\\S]*?)(?:</` + xmlNode.nodeName + '[ ]*?>)';
     sc = cm.getSearchCursor(new RegExp(searchFullElement));
-    if (sc.findNext()) sc.replace(newMEI);
+    if (sc.findNext()) {
+      sc.replace(newMEI);
+    }
     // console.info('searchFullElement: ' + searchFullElement);
   }
   if (!sc.atOccurrence) {
