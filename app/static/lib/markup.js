@@ -96,7 +96,7 @@ export function readMarkup() {
     }
   });
   updateChoiceOptions();
-}
+} // readMarkup()
 
 /**
  * Creates a list item object for markup elements based on some basic data
@@ -137,7 +137,7 @@ function xmlMarkupToListItem(currentElementId, mElName, correspElements, content
 
   let success = addListItem(markupItem);
   return success;
-}
+} // xmlMarkupToListItem()
 
 /**
  * Retrieves the content of all choice elements from the document to store them in choiceOptions.
@@ -194,7 +194,7 @@ function updateChoiceOptions() {
 
     choiceOptions.push(optGroup);
   });
-}
+} // updateChoiceOptions()
 
 /**
  * Returns for a markup item the page locations in the Verovio rendering
@@ -211,7 +211,7 @@ export async function situateMarkup(markupItem) {
   }
 
   return markupItem;
-}
+} // situateMarkup()
 
 /**
  * [Wrapper for selectApparatus() and selectChoice().]
@@ -371,7 +371,7 @@ export function addMarkup(event) {
       v.updateAll(cm, {}, v.selectedElements[0]);
     }
   }
-}
+} // addMarkup()
 
 /**
  * Surrounds selected elements with a markup element
@@ -464,7 +464,7 @@ function addMarkupToXML(v, cm, attrName = 'none', mElName, multiLayerContent = [
       // the supplied element per selected element used to be created here
       // this is moved to the next foreach loop
     }
-  }
+  } // while
 
   // this loop iterates over the array of arrays of grouped ids
   // and wraps the markup around a whole group
@@ -558,7 +558,7 @@ function createMarkup(v, groupIds, mElName, parentEl, content) {
   }
   upmostMarkupUuid = upmostMarkup.getAttribute('xml:id');
   return upmostMarkupUuid;
-}
+} // createMarkup()
 
 /**
  * Wraps multi layered markup for alternative encodings around a markup element
@@ -616,7 +616,7 @@ function addMultiLayeredMarkup(v, mElName, parentEl, firstChild, content) {
   }
 
   return upmostElement;
-}
+} // addMultiLayeredMarkup()
 
 /**
  * Wraps a single group of elements with a markup element
@@ -661,7 +661,7 @@ function wrapGroupWithMarkup(v, groupIds, mElName, parentEl) {
   // to read list items from the xml file as soon as the editor is refreshed
 
   return markupEl;
-}
+} // wrapGroupWithMarkup()
 
 /**
  * Get currently selected resp id from settings.
@@ -676,7 +676,7 @@ function getCurrentRespID() {
   }
 
   return respId;
-}
+} // getCurrentRespID()
 
 /**
  * Adds xml:ids related elements to a markup element
@@ -693,7 +693,7 @@ function addCorrespAttr(grpIds) {
       // do not refresh editor here to not mess with the markup items
     }
   });
-}
+} // addCorrespAttr()
 
 /**
  *
@@ -709,7 +709,7 @@ function mintSuppliedId(id, nodeName, v) {
     return nodeName + underscoreId[0];
   }
   return utils.generateXmlId(nodeName, v.xmlIdStyle);
-}
+} // mintSuppliedId()
 
 /**
  * Deletes a markup item from listItems and all related elements from the xml document.
@@ -754,7 +754,7 @@ export function deleteMarkup(selection) {
     
   });
   updateChoiceOptions();
-}
+} // deleteMarkup()
 
 /**
  * Retrieve parent markup element id of a given id string from xmlDoc,
