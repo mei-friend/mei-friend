@@ -312,7 +312,7 @@ summary.noDetails {
 
 .annotationListItem legend {
   background-color: var(--annotationPanelBackgroundColor);
-  border-radius: 8px;
+  /* border-radius: 8px; */
 }
 
 .annotationListItemButtons {
