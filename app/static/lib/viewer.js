@@ -21,7 +21,7 @@ import {
   version,
   versionDate,
 } from './main.js';
-import { selectMarkup } from './markup.js';
+import { selectMarkup, getParentMarkupElementId } from './markup.js';
 import { startMidiTimeout } from './midi-player.js';
 import { getNotationProportion, setNotationProportion, setOrientation } from './resizer.js';
 import {
@@ -559,7 +559,7 @@ export default class Viewer {
 
     // select current element in markup annotation list, if panel visible
     if (document.getElementById('annotationPanel').style.display !== 'none') {
-      let markupId = dutils.getParentMarkupElementId(this.xmlDoc, itemId);
+      let markupId = getParentMarkupElementId(this.xmlDoc, itemId);
       selectItemInAnnotationList(markupId);
     }
 
@@ -635,7 +635,7 @@ export default class Viewer {
 
         // check if id is inside a markup element, if panel visible
         if (document.getElementById('annotationPanel').style.display !== 'none') {
-          let markupId = dutils.getParentMarkupElementId(this.xmlDoc, id);
+          let markupId = getParentMarkupElementId(this.xmlDoc, id);
           selectItemInAnnotationList(markupId);
         }
 
@@ -2200,7 +2200,7 @@ export default class Viewer {
 
     // check if id is inside a markup element, if panel visible
     if (document.getElementById('annotationPanel').style.display !== 'none') {
-      let markupId = dutils.getParentMarkupElementId(this.xmlDoc, id);
+      let markupId = getParentMarkupElementId(this.xmlDoc, id);
       selectItemInAnnotationList(markupId);
     }
   } // navigate()

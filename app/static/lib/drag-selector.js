@@ -1,9 +1,10 @@
 import * as att from './attribute-classes.js';
-import { getX, getY, getParentMarkupElementId, svgNameSpace } from './dom-utils.js';
+import { getX, getY, svgNameSpace } from './dom-utils.js';
 import { platform } from './defaults.js';
 import { selectItemInAnnotationList } from './enrichment-panel.js';
 import { cm } from './main.js';
 import { startMidiTimeout } from './midi-player.js';
+import { getParentMarkupElementId } from './markup.js';
 import { setCursorToId } from './utils.js';
 import Viewer from './viewer.js';
 

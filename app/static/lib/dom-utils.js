@@ -504,31 +504,6 @@ export function scrollTo(container, element) {
 } // scrollTo()
 
 /**
- * Retrieve parent markup element id of a given id string from xmlDoc,
- * return empty string if not found.
- * @param {Node} xmlDoc
- * @param {string} id string of element
- * @returns {string} id of parent markup element or empty string
- */
-export function getParentMarkupElementId(xmlDoc, id) {
-  const markupElementList = att.modelTranscriptionLike.join(',') + ',' + att.alternativeEncodingElements.join(',') + ',' + 'annot';
-  let element = xmlDoc.querySelector('[*|id="' + id + '"]');
-  if (element) {
-    // find parent element that is a markup element
-    let parent = element.closest(markupElementList);
-    if (parent) {
-      let markupItemId = parent.getAttribute('xml:id');
-      // check if there is an alternative encoding element above
-      if (parent.closest(att.alternativeEncodingElements.join(','))) {
-        markupItemId = parent.closest(att.alternativeEncodingElements.join(',')).getAttribute('xml:id');
-      }
-      return markupItemId;
-    }
-  }
-  return '';
-} // getParentMarkupElementId()
-
-/**
  * Processes entire xmlDoc element for markup elemenets
  * and adds a color attribute to first child of them
  * @param {Node} xmlDoc

@@ -1,8 +1,5 @@
 /**
  * Provides functionality to handle editorial markup in MEI.
- * TODO: currently (Dec 2022) only default behavior.
- * Future development would have to think about how to
- * retrieve different options.
  */
 
 import * as att from './attribute-classes.js';
@@ -758,3 +755,28 @@ export function deleteMarkup(selection) {
   });
   updateChoiceOptions();
 }
+
+/**
+ * Retrieve parent markup element id of a given id string from xmlDoc,
+ * return empty string if not found.
+ * @param {Node} xmlDoc
+ * @param {string} id string of element
+ * @returns {string} id of parent markup element or empty string
+ */
+export function getParentMarkupElementId(xmlDoc, id) {
+  const markupElementList = att.modelTranscriptionLike.join(',') + ',' + att.alternativeEncodingElements.join(',') + ',' + 'annot';
+  let element = xmlDoc.querySelector('[*|id="' + id + '"]');
+  if (element) {
+    // find parent element that is a markup element
+    let parent = element.closest(markupElementList);
+    if (parent) {
+      let markupItemId = parent.getAttribute('xml:id');
+      // check if there is an alternative encoding element above
+      if (parent.closest(att.alternativeEncodingElements.join(','))) {
+        markupItemId = parent.closest(att.alternativeEncodingElements.join(',')).getAttribute('xml:id');
+      }
+      return markupItemId;
+    }
+  }
+  return '';
+} // getParentMarkupElementId()
