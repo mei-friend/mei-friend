@@ -58,7 +58,8 @@ import {
   clearListItems,
   getSolidIdP,
   readListItemsFromXML,
-  refreshAnnotationsInRendering,
+  refreshAnnotationsInNotation,
+  situateAndRefreshAnnotationsList,
   populateSolidTab,
 } from './enrichment-panel.js';
 import { dropHandler, dragEnter, dragOverHandler, dragLeave } from './dragger.js';
@@ -982,7 +983,7 @@ async function vrvWorkerEventsHandler(ev) {
         v.updatePageNumDisplay();
         v.addNotationEventListeners(cm);
         v.updateHighlight(cm);
-        refreshAnnotationsInRendering(false);
+        refreshAnnotationsInNotation(false);
         v.scrollSvgTo(cm);
         if (v.pdfMode) {
           // switch on frame, when in pdf mode
@@ -1017,7 +1018,7 @@ async function vrvWorkerEventsHandler(ev) {
         v.lastNoteId = id;
       }
       v.addNotationEventListeners(cm);
-      refreshAnnotationsInRendering(false);
+      refreshAnnotationsInNotation(false);
       v.scrollSvgTo(cm);
       v.updateHighlight(cm);
       v.setFocusToVerovioPane();
@@ -1199,6 +1200,8 @@ export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true, upd
 export function handleEncoding(mei, setFreshlyLoaded = true, updateAfterLoading = true, clearBeforeLoading = true) {
   let found = false;
   if (clearBeforeLoading) {
+    clearFacsimile();
+    clearListItems();
     if (pageParam === null) storage.removeItem('page');
     v.clear();
   }
@@ -1243,8 +1246,6 @@ export function handleEncoding(mei, setFreshlyLoaded = true, updateAfterLoading 
         });
       } else {
         log('Loading ' + meiFileName + 'did not succeed. ' + 'Could not convert Fronimo file using luteconv.');
-        clearFacsimile();
-        clearAnnotations();
         v.busy(false);
       }
     });
@@ -1287,8 +1288,6 @@ export function handleEncoding(mei, setFreshlyLoaded = true, updateAfterLoading 
       log('Format not recognized: ' + meiFileName + '.', 1649499359728);
     }
     setIsMEI(false);
-    clearFacsimile();
-    clearListItems();
     v.busy(false);
   }
   setStandoffAnnotationEnabledStatus();

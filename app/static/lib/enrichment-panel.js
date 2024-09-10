@@ -38,9 +38,11 @@ export function clearListItems() {
  * read List Items from XML
  */
 export function readListItemsFromXML(flagLimit = false) {
+  clearListItems();
   annot.readAnnots(flagLimit);
   markup.readMarkup();
-  refreshAnnotationsInRendering();
+  situateAndRefreshAnnotationsList();
+  refreshAnnotationsInNotation();
 } // readListItemsFromXML()
 
 /**
@@ -64,7 +66,7 @@ export function addListItem(listItemObject, forceRefreshAnnotations = false) {
   if (!isItemInList(listItemObject.id)) {
     listItems.push(listItemObject);
     addedSuccessfully = true;
-    if (forceRefreshAnnotations === true) refreshAnnotationsInRendering(true);
+    if (forceRefreshAnnotations === true) refreshAnnotationsInNotation(true);
   }
   return addedSuccessfully;
 } // addListItem()
@@ -94,7 +96,7 @@ export function deleteListItem(uuid) {
       listItems.splice(ix, 1);
     }
     situateAndRefreshAnnotationsList(true);
-    refreshAnnotationsInRendering();
+    refreshAnnotationsInNotation();
   }
 } // deleteListItem()
 
@@ -157,8 +159,7 @@ async function situateListItems() {
   // to make sure to abort, when itemList is empty, because nothings needs to be sorted
   if (listItems.length === 0) {
     return [];
-  }
-  else {
+  } else {
     const sortedResults = asyncResults.sort((a, b) => {
       let byPage = a.firstPage - b.firstPage;
       if (byPage === 0 && a.selection && b.selection) {
@@ -230,48 +231,49 @@ async function situateOneListItem(item) {
  * In the case of markup, this is not necessary because Verovio already adds classes for markup elements to the wrapped elements.
  * @param {boolean} [forceListRefresh=false]
  */
-export function refreshAnnotationsInRendering(forceListRefresh = false) {
+export function refreshAnnotationsInNotation(forceListRefresh = false) {
   // clear rendered annotations container
   const rac = document.getElementById('renderedAnnotationsContainer');
   rac.innerHTML = '';
   // reset annotations-containing svg
   const scoreSvg = document.querySelector('#verovio-panel svg');
-  if (!scoreSvg) return;
-  const annoSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-  annoSvg.setAttribute('width', scoreSvg.getAttribute('width'));
-  annoSvg.setAttribute('height', scoreSvg.getAttribute('height'));
-  annoSvg.setAttribute('id', 'renderedAnnotationsSvg');
-  annoSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-  annoSvg.setAttribute('xmlnsXlink', 'http://www.w3.org/1999/xlink');
-  rac.appendChild(annoSvg);
-  if (document.getElementById('showAnnotations')?.checked) {
-    // drawing handlers can draw into renderedAnnotationsSvg if they need to
-    // markup does not need to be drawn explicitly because this is already handled by Verovio
-    listItems.forEach((a) => {
-      if ('type' in a && !('isMarkup' in a)) {
-        switch (a.type) {
-          case 'annotateIdentify':
-            annot.drawIdentify(a);
-            break;
-          case 'annotateHighlight':
-            annot.drawHighlight(a);
-            break;
-          case 'annotateCircle':
-            annot.drawCircle(a);
-            break;
-          case 'annotateLink':
-            annot.drawLink(a);
-            break;
-          case 'annotateDescribe':
-            annot.drawDescribe(a);
-            break;
-          default:
-            console.warn("Don't have a drawing function for this type of annotation", a);
+  if (scoreSvg) {
+    const annoSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    annoSvg.setAttribute('width', scoreSvg.getAttribute('width'));
+    annoSvg.setAttribute('height', scoreSvg.getAttribute('height'));
+    annoSvg.setAttribute('id', 'renderedAnnotationsSvg');
+    annoSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+    annoSvg.setAttribute('xmlnsXlink', 'http://www.w3.org/1999/xlink');
+    rac.appendChild(annoSvg);
+    if (document.getElementById('showAnnotations')?.checked) {
+      // drawing handlers can draw into renderedAnnotationsSvg if they need to
+      // markup does not need to be drawn explicitly because this is already handled by Verovio
+      listItems.forEach((a) => {
+        if ('type' in a && !('isMarkup' in a)) {
+          switch (a.type) {
+            case 'annotateIdentify':
+              annot.drawIdentify(a);
+              break;
+            case 'annotateHighlight':
+              annot.drawHighlight(a);
+              break;
+            case 'annotateCircle':
+              annot.drawCircle(a);
+              break;
+            case 'annotateLink':
+              annot.drawLink(a);
+              break;
+            case 'annotateDescribe':
+              annot.drawDescribe(a);
+              break;
+            default:
+              console.warn("Don't have a drawing function for this type of annotation", a);
+          }
+        } else {
+          if (!('isMarkup' in a)) console.warn('Skipping annotation without type: ', a);
         }
-      } else {
-        if (!('isMarkup' in a)) console.warn('Skipping annotation without type: ', a);
-      }
-    });
+      });
+    }
   }
   if (document.getElementById('showAnnotationPanel')?.checked) {
     situateAndRefreshAnnotationsList(forceListRefresh);
@@ -290,7 +292,7 @@ export function refreshAnnotationsInRendering(forceListRefresh = false) {
  * the list of all things.
  * @param {boolean} forceRefresh true when list should be refreshed
  */
-function situateAndRefreshAnnotationsList(forceRefresh = false) {
+export function situateAndRefreshAnnotationsList(forceRefresh = false) {
   situateListItems()
     .then((sortedList) => {
       listItems = sortedList;
@@ -438,7 +440,7 @@ function generateListItem(a) {
   return annoFieldset;
 } // generateListItem()
 
-/** 
+/**
  * Selects an annotation in the list and refreshes the list
  * @param {string} uuid id of annotation to select
  */
@@ -633,7 +635,7 @@ export function addAnnotationHandlers() {
       default:
         console.warn("Don't have a handler for this type of annotation", e);
     }
-    refreshAnnotationsInRendering(true);
+    refreshAnnotationsInNotation(true);
   };
 
   document.querySelectorAll('.annotationToolsIcon').forEach((a) => a.removeEventListener('click', annotationHandler));
