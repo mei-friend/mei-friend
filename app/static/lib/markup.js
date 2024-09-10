@@ -29,6 +29,7 @@ export function readMarkup() {
   // create objects out of them
   // add objects to list
   // use xmlMarkupToListItem(selectedElements, mElName)
+  if (!v.xmlDoc) return;
   let elementList = att.modelTranscriptionLike.concat(...att.alternativeEncodingElements).join(',');
   let markup = Array.from(v.xmlDoc.querySelectorAll(elementList));
   markup = markup.filter((markup) => !isItemInList(markup.getAttribute('xml:id')));
