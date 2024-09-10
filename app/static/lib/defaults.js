@@ -377,6 +377,17 @@ supportedVerovioVersions.latest = {
   url: 'https://www.verovio.org/javascript/latest/verovio-toolkit-hum.js',
   description: 'Current Verovio release',
 };
+supportedVerovioVersions['4.3.0'] = {
+  url: 'https://www.verovio.org/javascript/4.3.0/verovio-toolkit-hum.js',
+  description: 'Verovio release 4.3.0',
+  releaseDate: '10 Sep 2024',
+};
+// 4.2.1 does not provide JS toolkit files
+// supportedVerovioVersions['4.2.1'] = {
+//   url: 'https://www.verovio.org/javascript/4.2.1/verovio-toolkit-hum.js',
+//   description: 'Verovio release 4.2.1',
+//   releaseDate: '10 May 2024',
+// };
 supportedVerovioVersions['4.2.0'] = {
   url: 'https://www.verovio.org/javascript/4.2.0/verovio-toolkit-hum.js',
   description: 'Verovio release 4.2.0',
