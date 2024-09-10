@@ -106,6 +106,10 @@ writeAnnotationStandoffLabel.disabled {
   font-weight: bold;
 }
 
+#annotationToolsDomainSelection fieldset {
+  flex-direction: row;
+}
+
 .selectedAnnotationListItem {
   background-color: var(--annotationPanelHoverColor);
 }

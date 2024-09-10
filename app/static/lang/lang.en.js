@@ -450,7 +450,7 @@ export const lang = {
   annotationListButton: { description: 'List annotations' },
   writeAnnotStandoffText: { text: 'Web Annotation' },
   annotationToolDomainSelectorLegend: { text: 'Select annotation storage' },
-  insertInlineAnnotationLegend: { text: 'Insert inline annotation' },
+  insertInlineAnnotationLegend: { text: 'Insert annotation' }, // TODO: 'Insert inline annotation' 
   insertStandoffAnnotationLegend: { text: 'Insert stand-off annotation' },
   annotationToolsIdentifyTitle: { text: 'Identify' },
   annotationToolsIdentifySpan: { text: 'Identify Musical Object' },
