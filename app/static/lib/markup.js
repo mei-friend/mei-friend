@@ -58,8 +58,17 @@ export function readMarkup() {
     if (!idsToIgnore.includes(elId)) {
       let elName = markupEl.localName;
       if (elId == null) {
+        // (AP, 9.9.2024) 
+        // Automatically add missing xml:ids
+        // I replace the parent element to prevent hickups and endless recursions
+        // because replaceInEditor() needs xml:ids to work. 
+        // This can definitely be solved in a better way,
+        // but I'm not familar enough with the other editor functions
         elId = utils.generateXmlId(elName, v.xmlIdStyle);
         markupEl.setAttributeNS(dutils.xmlNameSpace, 'xml:id', elId);
+        replaceInEditor(cm, markupEl.parentElement, false);
+        cm.execCommand('indentAuto');
+        console.log(`Added xml:id ${elId} to ${elName}`);
       }
 
       if (att.alternativeEncodingElements.includes(elName)) {
