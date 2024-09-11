@@ -25,6 +25,9 @@ import {
 
 //#region List Items Array and access functions
 
+/**
+ * List of all annotations and markups
+ */
 var listItems = [];
 
 /**
@@ -35,14 +38,15 @@ export function clearListItems() {
 } // clearListItems()
 
 /**
- * read List Items from XML
+ * Reads markup and annotations from XML encoding (MEI) into listItems array.
+ * @param {boolean} [flagLimit=false] limit reading to a certain number of items
  */
 export function readListItemsFromXML(flagLimit = false) {
   clearListItems();
   annot.readAnnots(flagLimit);
   markup.readMarkup();
   situateAndRefreshAnnotationsList();
-  refreshAnnotationsInNotation();
+  refreshAnnotationsInNotation(true);
 } // readListItemsFromXML()
 
 /**
@@ -237,48 +241,47 @@ export function refreshAnnotationsInNotation(forceListRefresh = false) {
   rac.innerHTML = '';
   // reset annotations-containing svg
   const scoreSvg = document.querySelector('#verovio-panel svg');
-  if (scoreSvg) {
-    const annoSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    annoSvg.setAttribute('width', scoreSvg.getAttribute('width'));
-    annoSvg.setAttribute('height', scoreSvg.getAttribute('height'));
-    annoSvg.setAttribute('id', 'renderedAnnotationsSvg');
-    annoSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-    annoSvg.setAttribute('xmlnsXlink', 'http://www.w3.org/1999/xlink');
-    rac.appendChild(annoSvg);
-    if (document.getElementById('showAnnotations')?.checked) {
-      // drawing handlers can draw into renderedAnnotationsSvg if they need to
-      // markup does not need to be drawn explicitly because this is already handled by Verovio
-      listItems.forEach((a) => {
-        if ('type' in a && !('isMarkup' in a)) {
-          switch (a.type) {
-            case 'annotateIdentify':
-              annot.drawIdentify(a);
-              break;
-            case 'annotateHighlight':
-              annot.drawHighlight(a);
-              break;
-            case 'annotateCircle':
-              annot.drawCircle(a);
-              break;
-            case 'annotateLink':
-              annot.drawLink(a);
-              break;
-            case 'annotateDescribe':
-              annot.drawDescribe(a);
-              break;
-            default:
-              console.warn("Don't have a drawing function for this type of annotation", a);
-          }
-        } else {
-          if (!('isMarkup' in a)) console.warn('Skipping annotation without type: ', a);
+  if (!scoreSvg) return;
+  const annoSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  annoSvg.setAttribute('width', scoreSvg.getAttribute('width'));
+  annoSvg.setAttribute('height', scoreSvg.getAttribute('height'));
+  annoSvg.setAttribute('id', 'renderedAnnotationsSvg');
+  annoSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+  annoSvg.setAttribute('xmlnsXlink', 'http://www.w3.org/1999/xlink');
+  rac.appendChild(annoSvg);
+  if (document.getElementById('showAnnotations')?.checked) {
+    // drawing handlers can draw into renderedAnnotationsSvg if they need to
+    // markup does not need to be drawn explicitly because this is already handled by Verovio
+    listItems.forEach((a) => {
+      if ('type' in a && !('isMarkup' in a)) {
+        switch (a.type) {
+          case 'annotateIdentify':
+            annot.drawIdentify(a);
+            break;
+          case 'annotateHighlight':
+            annot.drawHighlight(a);
+            break;
+          case 'annotateCircle':
+            annot.drawCircle(a);
+            break;
+          case 'annotateLink':
+            annot.drawLink(a);
+            break;
+          case 'annotateDescribe':
+            annot.drawDescribe(a);
+            break;
+          default:
+            console.warn("Don't have a drawing function for this type of annotation", a);
         }
-      });
-    }
+      } else {
+        if (!('isMarkup' in a)) console.warn('Skipping annotation without type: ', a);
+      }
+    });
   }
-  if (document.getElementById('showAnnotationPanel')?.checked) {
-    situateAndRefreshAnnotationsList(forceListRefresh);
-  }
-} // refreshAnnotationsInRendering()
+  // if (document.getElementById('showAnnotationPanel')?.checked) {
+  //   situateAndRefreshAnnotationsList(forceListRefresh);
+  // }
+} // refreshAnnotationsInNotation()
 
 //#endregion
 
@@ -288,8 +291,8 @@ export function refreshAnnotationsInNotation(forceListRefresh = false) {
  */
 
 /**
- * Forces the situation of annotations and refreshes
- * the list of all things.
+ * Forces the situation of annotations (i.e. finding a page number
+ * for each annotation) and refreshes the list of all things.
  * @param {boolean} forceRefresh true when list should be refreshed
  */
 export function situateAndRefreshAnnotationsList(forceRefresh = false) {
@@ -297,7 +300,7 @@ export function situateAndRefreshAnnotationsList(forceRefresh = false) {
     .then((sortedList) => {
       listItems = sortedList;
       // if (forceRefresh || document.getElementsByClassName('annotationListItem').length) {
-      refreshAnnotationsList();
+      setTimeout(() => refreshAnnotationsList(), 33);
       // }
     })
     .catch((error) => {
@@ -306,21 +309,24 @@ export function situateAndRefreshAnnotationsList(forceRefresh = false) {
 } // situateAndRefreshAnnotationsList()
 
 /**
- * Creates the list of all things in the enrichment panel
+ * Creates the list of all markup/annotation elements in the enrichment panel
  */
 export function refreshAnnotationsList() {
-  const list = document.getElementById('listAnnotations');
-  // clear list
-  while (list.firstChild) {
-    list.removeChild(list.lastChild);
+  console.debug('RRRRRRRRRRRRefreshing annotations list: ' + listItems.length + ' items');
+  const listDiv = document.getElementById('listAnnotations');
+
+  // clear list div
+  while (listDiv.firstChild) {
+    listDiv.removeChild(listDiv.lastChild);
   }
-  // console.log("Annotations: ",annotations);
 
   // add web annotation button
-  addLoadWebAnnotatationButton(list);
+  addLoadWebAnnotatationButton(listDiv);
+
+  // add list items
   listItems.forEach((a) => {
     let annoDiv = generateListItem(a);
-    list.appendChild(annoDiv);
+    listDiv.appendChild(annoDiv);
   });
 } // refreshAnnotationsList()
 
@@ -441,7 +447,7 @@ function generateListItem(a) {
 } // generateListItem()
 
 /**
- * Finds for a given element id in xmlDoc 
+ * Finds for a given element id in xmlDoc
  * 1) an enclosing markup element or
  * 2) an in-line annotation
  * and selects it in the annotation list and refreshes the list.
@@ -450,7 +456,10 @@ function generateListItem(a) {
 export function selectItemInAnnotationList(uuid) {
   let markupId = markup.getParentMarkupElementId(v.xmlDoc, uuid);
   listItems.forEach((item) => {
-    if (item.id === markupId || ('selection' in item && (item.selection.includes(markupId) || item.selection.includes(uuid)))) {
+    if (
+      item.id === markupId ||
+      ('selection' in item && (item.selection.includes(markupId) || item.selection.includes(uuid)))
+    ) {
       item.selected = true;
     } else if ('selected' in item) {
       item.selected = false;

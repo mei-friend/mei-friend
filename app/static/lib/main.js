@@ -59,7 +59,6 @@ import {
   getSolidIdP,
   readListItemsFromXML,
   refreshAnnotationsInNotation,
-  situateAndRefreshAnnotationsList,
   populateSolidTab,
 } from './enrichment-panel.js';
 import { dropHandler, dragEnter, dragOverHandler, dragLeave } from './dragger.js';
@@ -2366,7 +2365,7 @@ export function handleEditorChanges() {
     updateLocalStorage(meiXml);
   }
   if (document.getElementById('showAnnotations').checked || document.getElementById('showAnnotationPanel').checked) {
-    readListItemsFromXML(); // readAnnots(); from annotation.js
+    readListItemsFromXML(true); // readAnnots(); from annotation.js
   }
   if (document.getElementById('showMidiPlaybackControlBar').checked) {
     // start a new time-out to midi-rerender

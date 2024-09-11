@@ -240,7 +240,8 @@ export const createLink = (e, selection) => {
 //#region inline annotation functions
 
 /**
- * reads <annot> elements from XML DOM and adds them into annotations array
+ * reads <annot> elements from XML DOM and adds them into 
+ * annotations array itemList[] of enrichment-panel.js
  * @param {boolean} flagLimit alert if max. number of annotations are reached
  */
 export function readAnnots(flagLimit = false) {
@@ -295,7 +296,7 @@ export function readAnnots(flagLimit = false) {
 
     addListItem(annotation);
   });
-}
+} // readAnnots()
 
 /**
  * Adds page locations in rendering to annotation object in annotation list.
@@ -415,7 +416,7 @@ export function writeAnnot(anchor, xmlId, plist, payload) {
       log(errMsg);
     }
   }
-}
+} // writeAnnot()
 
 /**
  * Delete an inline annotation
@@ -429,7 +430,7 @@ export function deleteAnnot(xmlId) {
   } else {
     console.warn('Failed to delete non-existing annot with xml:id ', xmlId);
   }
-}
+} // deleteAnnot()
 
 /**
  * Copies id of current inline annotation to clipboard
@@ -440,7 +441,7 @@ export function copyIdToClipboard(e) {
   navigator.clipboard.writeText(e.target.closest('.icon').dataset.id).catch((err) => {
     console.warn("Couldn't copy id to clipboard: ", err);
   });
-}
+} // copyIdToClipboard()
 
 //#endregion
 
@@ -466,7 +467,7 @@ function writeInlineIfRequested(a) {
       a.isInline = true;
     } else console.warn('writeInlineIfRequested: Cannot find beforeThis element for ' + a.id);
   }
-}
+} // writeInlineIfRequested()
 
 /**
  * Writes an annotation as standoff web annotation in the user's Solid Pod if requested.
@@ -565,7 +566,7 @@ async function writeStandoffIfRequested(a) {
       log('Cannot write standoff annotation: Please ensure you are logged in to a Solid Pod');
     }
   }
-}
+} // writeStandoffIfRequested()
 
 //#endregion
 
@@ -615,7 +616,7 @@ export function loadWebAnnotation(prev = '') {
       loadWebAnnotation();
     }
   }
-}
+} // loadWebAnnotation()
 
 // Wrapper around traverseAndFetch that reports back errors / progress to 'Load linked data' UI
 export function attemptFetchExternalResource(url, targetTypes, configObj) {
@@ -636,7 +637,7 @@ export function attemptFetchExternalResource(url, targetTypes, configObj) {
       // notify that we've stopped loading
       svgs.forEach((t) => t.classList.remove('clockwise'));
     });
-}
+} // attemptFetchExternalResource()
 
 export function fetchWebAnnotations(url, userProvided = true, jumps = 10) {
   // spin the icon to indicate loading activity
@@ -706,7 +707,7 @@ export function fetchWebAnnotations(url, userProvided = true, jumps = 10) {
       // notify that we've stopped loading
       svgs.forEach((t) => t.classList.remove('clockwise'));
     });
-}
+} // fetchWebAnnotations()
 
 export function ingestWebAnnotation(webAnno) {
   // terminological note: 'webAnno' => the web annotation, 'anno' => internal mei-friend annotation we are generating
