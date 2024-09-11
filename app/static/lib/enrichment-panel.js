@@ -300,7 +300,7 @@ export function situateAndRefreshAnnotationsList(forceRefresh = false) {
     .then((sortedList) => {
       listItems = sortedList;
       // if (forceRefresh || document.getElementsByClassName('annotationListItem').length) {
-      setTimeout(() => refreshAnnotationsList(), 33);
+      refreshAnnotationsList();
       // }
     })
     .catch((error) => {
