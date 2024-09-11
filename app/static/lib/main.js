@@ -5,7 +5,6 @@ export const versionDate = '10 September 2024'; // use full or 3-character engli
 var vrvWorker;
 var spdWorker;
 var tkAvailableOptions;
-var mei;
 var breaksParam; // (string) the breaks parameter given through URL
 var pageParam; // (int) page parameter given through URL
 var selectParam; // (array) select ids given through multiple instances in URL
@@ -234,13 +233,13 @@ export function updateFileStatusDisplay() {
   else document.querySelector('#fileName').removeAttribute('contenteditable', '');
 }
 
-export function loadDataInEditor(mei, setFreshlyLoaded = true) {
+export function loadDataInEditor(meiXML, setFreshlyLoaded = true) {
   if (storage && storage.supported) {
     storage.override = false;
   }
   freshlyLoaded = setFreshlyLoaded;
-  cm.setValue(mei);
-  v.loadXml(mei);
+  cm.setValue(meiXML);
+  v.loadXml(meiXML);
   cmd.checkFacsimile();
   loadFacsimile(v.xmlDoc); // load all facsimila data of MEI
   let bs = document.getElementById('breaksSelect');
@@ -254,7 +253,7 @@ export function loadDataInEditor(mei, setFreshlyLoaded = true) {
   v.setMenuColors();
   if (!isSafari) {
     // disable validation on Safari because of this strange error: "RangeError: Maximum call stack size exceeded" (WG, 1 Oct 2022)
-    v.checkSchema(mei);
+    v.checkSchema(meiXML);
   }
   clearListItems();
   readListItemsFromXML(true); // readAnnots(true); from annotation.js
@@ -336,13 +335,13 @@ function completeIfInTag(cm) {
 /**
  * Carries out code validation using validator.validateNG() and calls
  * v.highlightValidation()
- * @param {string} mei
+ * @param {string} meiXML
  * @param {Function} updateLinting
  * @param {Object} options
  * @returns
  */
-export async function validate(mei, updateLinting, options) {
-  if (options && mei) {
+export async function validate(meiXML, updateLinting, options) {
+  if (options && meiXML) {
     // keep the callback (important for first call)
     if (updateLinting && typeof updateLinting === 'function') {
       v.updateLinting = updateLinting;
@@ -354,7 +353,7 @@ export async function validate(mei, updateLinting, options) {
       Viewer.changeStatus(vs, 'wait', ['error', 'ok', 'manual']); // darkorange
       vs.querySelector('svg').classList.add('clockwise');
       vs.setAttribute('title', translator.lang.validatingAgainst.text + ' ' + v.currentSchema);
-      const validationString = await validator.validateNG(mei);
+      const validationString = await validator.validateNG(meiXML);
       let validation;
       try {
         validation = JSON.parse(validationString);
@@ -368,7 +367,7 @@ export async function validate(mei, updateLinting, options) {
           ? translator.lang.noErrors.text + '.'
           : validation.length + ' ' + translator.lang.errorsFound.text + '.'
       );
-      v.highlightValidation(mei, validation, options.forceValidate);
+      v.highlightValidation(meiXML, validation, options.forceValidate);
     } else if (v.validatorWithSchema && !document.getElementById('autoValidate').checked) {
       v.setValidationStatusToManual();
     }
@@ -918,12 +917,11 @@ async function vrvWorkerEventsHandler(ev) {
       v.busy(false);
       break;
     case 'mei': // returned from importData, importBinaryData
-      mei = ev.data.mei;
       v.pageCount = ev.data.pageCount;
       v.allowCursorActivity = false;
-      loadDataInEditor(mei);
+      loadDataInEditor(ev.data.mei);
       setFileChangedState(false);
-      updateLocalStorage(mei);
+      updateLocalStorage(ev.data.mei);
       v.allowCursorActivity = true;
       v.updateAll(cm, defaultVerovioOptions, handleURLParamSelect());
       //v.busy(false);
@@ -1097,6 +1095,7 @@ async function vrvWorkerEventsHandler(ev) {
       v.busy(false);
       break;
   }
+  // cm.blockChanges = false;
 } // vrvWorkerEventsHandler()
 
 // handles select (& page) input parameter from URL arguments ".../?select=..."
@@ -1124,6 +1123,7 @@ let inputFormats = {
 };
 
 export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true, updateAfterLoading = true) {
+  // cm.blockChanges = true;
   if (storage.github && isLoggedIn) {
     // re-initialise github menu since we're now working from a file
     github.filepath = '';
@@ -1149,12 +1149,11 @@ export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true, upd
       .then((response) => response.text())
       .then((meiXML) => {
         console.log('MEI file ' + meiFileName + ' loaded.');
-        mei = meiXML;
         v.clear();
         v.allowCursorActivity = false;
-        loadDataInEditor(mei, setFreshlyLoaded);
+        loadDataInEditor(meiXML, setFreshlyLoaded);
         setFileChangedState(false);
-        updateLocalStorage(mei);
+        updateLocalStorage(meiXML);
         v.allowCursorActivity = true;
         if (updateAfterLoading) {
           v.updateAll(cm, {}, handleURLParamSelect());
@@ -1166,11 +1165,10 @@ export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true, upd
       meiFileName = file.name;
       console.info('openMei ' + meiFileName + ', ', cm);
       let reader = new FileReader();
-      mei = '';
       reader.onload = (event) => {
-        mei = event.target.result;
-        console.info('Reader read ' + meiFileName); // + ', mei: ', mei);
-        if (mei) loaded(mei);
+        let meiString = event.target.result;
+        console.info('Reader read ' + meiFileName); 
+        if (meiString) loaded(meiString);
         else notLoaded();
       };
       if (meiFileName.endsWith('.mxl') || meiFileName.endsWith('.ft2') || meiFileName.endsWith('.ft3')) {
@@ -1196,7 +1194,7 @@ export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true, upd
 
 // checks format of encoding string and imports or loads data/notation
 // mei argument may be MEI or any other supported format (text/binary)
-export function handleEncoding(mei, setFreshlyLoaded = true, updateAfterLoading = true, clearBeforeLoading = true) {
+export function handleEncoding(meiXML, setFreshlyLoaded = true, updateAfterLoading = true, clearBeforeLoading = true) {
   let found = false;
   if (clearBeforeLoading) {
     clearFacsimile();
@@ -1207,41 +1205,41 @@ export function handleEncoding(mei, setFreshlyLoaded = true, updateAfterLoading 
   v.busy();
   if (meiFileName.endsWith('.mxl')) {
     // compressed MusicXML file
-    console.log('Load compressed XML file.', mei.slice(0, 128));
+    console.log('Load compressed XML file.', meiXML.slice(0, 128));
     vrvWorker.postMessage({
       cmd: 'importBinaryData',
       format: 'xml',
-      mei: mei,
+      mei: meiXML,
     });
     found = true;
     setIsMEI(false);
   } else if (meiFileName.endsWith('.abc')) {
     // abc notation file
-    console.log('Load ABC file.', mei.slice(0, 128));
+    console.log('Load ABC file.', meiXML.slice(0, 128));
     vrvWorker.postMessage({
       cmd: 'importData',
       format: 'abc',
-      mei: mei,
+      mei: meiXML,
     });
     found = true;
     setIsMEI(false);
   } else if (meiFileName.endsWith('.ft2') || meiFileName.endsWith('.ft3')) {
     // lute tablature file (Fronimo format)
-    console.log('Load Fronimo file.', mei.slice(0, 128));
+    console.log('Load Fronimo file.', meiXML.slice(0, 128));
     // set found to true, since we don't know if luteconv will succeed
     // (we don't want to show the "format not recognized" message)
     found = true;
     setIsMEI(false);
     // attempt to convert to MEI using luteconv web service:
-    luteconv(mei, meiFileName).then((mei) => {
-      if (mei) {
+    luteconv(meiXML, meiFileName).then((meiString) => {
+      if (meiString) {
         // rename file to .mei
         setMeiFileInfo(meiFileName + '.mei', meiFileLocation, meiFileLocationPrintable);
         updateFileStatusDisplay();
         vrvWorker.postMessage({
           cmd: 'importData',
           format: 'mei',
-          mei: mei,
+          mei: meiString,
         });
       } else {
         log('Loading ' + meiFileName + 'did not succeed. ' + 'Could not convert Fronimo file using luteconv.');
@@ -1251,7 +1249,7 @@ export function handleEncoding(mei, setFreshlyLoaded = true, updateAfterLoading 
   } else {
     // all other formats are found by search term in text file
     for (const [key, value] of Object.entries(inputFormats)) {
-      if (mei.includes(value)) {
+      if (meiXML.includes(value)) {
         // a hint that it is a MEI file
         found = true;
         console.log(key + ' file loading: ' + meiFileName);
@@ -1259,9 +1257,9 @@ export function handleEncoding(mei, setFreshlyLoaded = true, updateAfterLoading 
           // if already a mei file
           setIsMEI(true);
           v.allowCursorActivity = false;
-          loadDataInEditor(mei, setFreshlyLoaded);
+          loadDataInEditor(meiXML, setFreshlyLoaded);
           setFileChangedState(false);
-          updateLocalStorage(mei);
+          updateLocalStorage(meiXML);
           v.allowCursorActivity = true;
           if (updateAfterLoading) {
             v.updateAll(cm, defaultVerovioOptions, handleURLParamSelect());
@@ -1273,7 +1271,7 @@ export function handleEncoding(mei, setFreshlyLoaded = true, updateAfterLoading 
           vrvWorker.postMessage({
             cmd: 'importData',
             format: key,
-            mei: mei,
+            mei: meiXML,
           });
           break;
         }
@@ -1281,7 +1279,7 @@ export function handleEncoding(mei, setFreshlyLoaded = true, updateAfterLoading 
     }
   }
   if (!found) {
-    if (mei.includes('<score-timewise'))
+    if (meiXML.includes('<score-timewise'))
       log('Loading ' + meiFileName + 'did not succeed. ' + 'No support for timewise MusicXML files.');
     else {
       log('Format not recognized: ' + meiFileName + '.', 1649499359728);
@@ -1397,12 +1395,12 @@ function togglePdfMode() {
 } // togglePdfMode()
 
 export function requestMidiFromVrvWorker(requestTimemap = false) {
-  let mei;
+  let meiString;
   // if (v.expansionId) {
   //   let expansionEl = v.xmlDoc.querySelector('[*|id="' + v.expansionId + '"]');
   //   let existingList = [];
   //   let expandedDoc = expansionMap.expand(expansionEl, existingList, v.xmlDoc.cloneNode(true));
-  //   mei = v.speedFilter(new XMLSerializer().serializeToString(expandedDoc), false, true);
+  //   meiString = v.speedFilter(new XMLSerializer().serializeToString(expandedDoc), false, true);
   //   if (v.speedMode) {
   //     v.loadXml(cm.getValue(), true); // reload xmlDoc when in speed mode
   //   } else {
@@ -1410,12 +1408,12 @@ export function requestMidiFromVrvWorker(requestTimemap = false) {
   //   }
   // } else {
   // }
-  mei = v.speedFilter(cm.getValue(), false);
+  meiString = v.speedFilter(cm.getValue(), false);
   let message = {
     cmd: 'exportMidi',
     expand: v.expansionId,
     options: v.vrvOptions,
-    mei: mei, // exclude dummy measures in speed mode
+    mei: meiString, // exclude dummy measures in speed mode
     requestTimemap: requestTimemap,
     speedMode: v.speedMode,
     toolkitDataOutdated: v.toolkitDataOutdated,
