@@ -238,8 +238,10 @@ export function loadDataInEditor(meiXML, setFreshlyLoaded = true) {
     storage.override = false;
   }
   freshlyLoaded = setFreshlyLoaded;
+  v.loadXml(meiXML, true);
+  cm.blockChanges = true;
   cm.setValue(meiXML);
-  v.loadXml(meiXML);
+  cm.blockChanges = false;
   cmd.checkFacsimile();
   loadFacsimile(v.xmlDoc); // load all facsimila data of MEI
   let bs = document.getElementById('breaksSelect');
@@ -1167,7 +1169,7 @@ export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true, upd
       let reader = new FileReader();
       reader.onload = (event) => {
         let meiString = event.target.result;
-        console.info('Reader read ' + meiFileName); 
+        console.info('Reader read ' + meiFileName);
         if (meiString) loaded(meiString);
         else notLoaded();
       };
