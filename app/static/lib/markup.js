@@ -526,8 +526,7 @@ function addMarkupToXML(v, cm, attrName = 'none', mElName, multiLayerContent = [
       let el = v.xmlDoc.querySelector("[*|id='" + id + "']");
       let parentEl = el.parentNode;
       replaceInEditor(cm, parentEl, true);
-      cm.execCommand('indentAuto');
-      // refresh editor here after the markup insertion is finished
+      replaceInEditor(cm, el, true); // to select new markup element
     });
   }
 
