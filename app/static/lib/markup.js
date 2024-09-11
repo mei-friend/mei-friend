@@ -3,7 +3,7 @@
  */
 
 import * as att from './attribute-classes.js';
-import { addApplicationInfo, indentSelection, replaceInEditor } from './editor.js';
+import { addApplicationInfo, indentSelection, removeInEditor, replaceInEditor } from './editor.js';
 import { cm, cmd, translator, v } from './main.js';
 import * as dutils from './dom-utils.js';
 import * as speed from './speed.js';
@@ -344,7 +344,7 @@ export function addMarkup(event) {
   let mElName = eventTarget.dataset.elName;
   let attrName = document.getElementById('selectionSelect').value;
   let multiLayerContent = eventTarget.dataset.content?.split(',');
-  if(!multiLayerContent) // annotationMultiToolsIcon was clicked
+  if (!multiLayerContent) // annotationMultiToolsIcon was clicked
     multiLayerContent = document.getElementById(`${mElName}ContentTarget`)?.dataset.content?.split(',');
 
   if (!att.modelTranscriptionLike.includes(mElName) && !att.alternativeEncodingElements.includes(mElName)) return;
@@ -744,14 +744,13 @@ export function deleteMarkup(selection) {
         }
       }
 
+      // replace toDelete element with its children...
+      replaceInEditor(cm, toDelete, true, Array.from(descendants.children));
+      // ... and remove toDelete afterwards
       parent.replaceChild(descendants, toDelete);
-      replaceInEditor(cm, parent, true);
-      indentSelection(v, cm);
-    }
-    else {
+    } else {
       console.warn('Failed to delete non-existing markup with xml:id ', id);
     }
-    
   });
   updateChoiceOptions();
 } // deleteMarkup()

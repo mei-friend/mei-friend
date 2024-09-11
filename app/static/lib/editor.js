@@ -110,29 +110,14 @@ export function deleteElement(v, cm, modifyerKey = false) {
       }
     } else if (['beam'].includes(element.nodeName)) {
       // delete beam
-      let p;
-      let first = true;
-      let childList = element.childNodes;
-      for (let i = 0; i < childList.length; i++) {
-        if (childList[i].nodeType === Node.TEXT_NODE) continue;
-        if (first) {
-          p = replaceInEditor(cm, element, false, childList[i]);
-          p.end.line += 1;
-          p.end.ch = 0;
-          cm.setCursor(p.end);
-          first = false;
-        } else {
-          // txtEdr.insertNewline();
-          let newMEI = dutils.xmlToString(childList[i]);
-          cm.replaceRange(newMEI + '\n', p.end);
-          let cursor = cm.getCursor();
-          for (let l = p.end.line; l < cursor.line; l++) cm.indentLine(l);
-          p.end = cursor;
-        }
-        selectedElements.push(childList[i].getAttribute('xml:id'));
-        element.parentNode.insertBefore(childList[i--], element);
-      }
-      element.remove();
+      let children = Array.from(element.children);
+      replaceInEditor(cm, element, true, children); // replace beam with an array of its children
+      children.forEach((child, i) => { // select all children ids 
+        let id = child.getAttribute('xml:id');
+        if (id) selectedElements.push(id);
+        element.parentNode.insertBefore(child, element); // move children to parent...
+      });
+      element.remove(); // ... and remove empty beam element
     } else if (element.nodeName === 'zone' && document.getElementById('editFacsimileZones').checked) {
       // delete Zone in source image display
       // remove zone; with CMD remove pointing element; without just remove @facs from pointing element
@@ -425,7 +410,7 @@ export function convertNoteToRest(v, cm) {
         if (oldEl.hasAttribute('pname')) newEl.setAttribute('ploc', oldEl.getAttribute('pname'));
       }
       oldEl.parentElement.replaceChild(newEl, oldEl);
-      replaceInEditor(cm, oldEl, true, newEl);
+      replaceInEditor(cm, oldEl, true, new Array(newEl));
     }
   });
   v.selectedElements = [];
@@ -1079,7 +1064,7 @@ export function addBeamElement(v, cm, elementName = 'beam') {
       if (nodeList[i].getAttribute('xml:id') === id2) {
         let n = nodeList[i].cloneNode(); // make a copy for replacement later
         beam.appendChild(nodeList[i--]);
-        replaceInEditor(cm, n, true, beam);
+        replaceInEditor(cm, n, true, new Array(beam));
         cm.execCommand('indentAuto');
         break;
       }
@@ -2255,11 +2240,17 @@ function isEmpty(str) {
  * @param {CodeMirror} cm CodeMirror object
  * @param {Element} xmlNode element to replace
  * @param {boolean} select keep node in editor selected? (important for auto indentation)
- * @param {Element} newNode new node to replace the old one with
+ * @param {Array[Element]} newNode an array of new nodes to replace the old one with
  * @returns
  */
-export function replaceInEditor(cm, xmlNode, select = false, newNode = null) {
-  let newMEI = newNode ? dutils.xmlToString(newNode) : dutils.xmlToString(xmlNode);
+export function replaceInEditor(cm, xmlNode, select = false, newNode = []) {
+  // construct new MEI if newNode has elements
+  let newMei = '';
+  if (Array.isArray(newNode) && newNode.length > 0) {
+    newMei = newNode.map((n) => dutils.xmlToString(n)).join('\n');
+  } else {
+    newMei = dutils.xmlToString(xmlNode);
+  }
   // search in buffer
   let itemId = xmlNode.getAttribute('xml:id');
   let xmlIdCheck = '';
@@ -2268,13 +2259,13 @@ export function replaceInEditor(cm, xmlNode, select = false, newNode = null) {
   // console.info('searchSelfClosing: ' + searchSelfClosing);
   let sc = cm.getSearchCursor(new RegExp(searchSelfClosing));
   if (sc.findNext()) {
-    sc.replace(newMEI);
+    sc.replace(newMei);
   } else {
     let searchFullElement =
       '(?:<' + xmlNode.nodeName + `)` + xmlIdCheck + `([\\s\\S]*?)(?:</` + xmlNode.nodeName + '[ ]*?>)';
     sc = cm.getSearchCursor(new RegExp(searchFullElement));
     if (sc.findNext()) {
-      sc.replace(newMEI);
+      sc.replace(newMei);
     }
     // console.info('searchFullElement: ' + searchFullElement);
   }
@@ -2285,7 +2276,7 @@ export function replaceInEditor(cm, xmlNode, select = false, newNode = null) {
       end: -1,
     };
   } else if (select) {
-    sc = cm.getSearchCursor(newMEI);
+    sc = cm.getSearchCursor(newMei);
     if (sc.findNext()) {
       let c = cm.getCursor();
       for (let l = sc.from().line; l <= sc.to().line; l++) {
