@@ -1,5 +1,3 @@
-import { get } from "http";
-
 export default class GitCloudClient {
   constructor(conf) {
     console.log('GitCloudClient constructor', conf);
@@ -46,7 +44,6 @@ export default class GitCloudClient {
       default:
         throw new Error('Unknown provider');
     }
-    this.author = getAuthor(this.providerType);
   }
 
   async getOrgs() {
@@ -86,45 +83,57 @@ export default class GitCloudClient {
     console.log('getContents');
   }
 
-  async getAuthor(providerType) {
-    // obtain the logged in user's name and email from the cloud provider, using appropriate API
-    // if no name or email specified, use the user's login name and empty email
-    let author = { name: '', email: '' };
-    let user;
-    switch (providerType) {
+  async getAuthor() {
+    if (this.author) {
+      // return the cached author object if it exists
+      return this.author;
+    }
+    switch (this.providerType) {
       case 'github':
         // fetch the user's name and email from the GitHub API
-        user = await fetch('https://api.github.com/user', {
+        return fetch('https://api.github.com/user', {
           method: 'GET',
           headers: this.apiHeaders,
-        }).then((res) => res.json());
-        break;
+        })
+          .then((res) => res.json())
+          .then((data) => this.setAuthor(data));
       case 'gitlab':
         // fetch the user's name and email from the GitLab API
-        user = await fetch('https://gitlab.com/api/v4/user', {
+        return fetch('https://gitlab.com/api/v4/user', {
           method: 'GET',
           headers: this.apiHeaders,
-        }).then((res) => res.json());
-        break;
+        })
+          .then((res) => res.json())
+          .then((data) => this.setAuthor(data));
       case 'bitbucket':
         // fetch the user's name and email from the Bitbucket API
-        user = await fetch('https://api.bitbucket.org/2.0/user', {
+        return fetch('https://api.bitbucket.org/2.0/user', {
           method: 'GET',
           headers: this.apiHeaders,
-        }).then((res) => res.json());
-        break;
+        })
+          .then((res) => res.json())
+          .then((data) => this.setAuthor(data));
       case 'codeberg':
         // fetch the user's name and email from the Codeberg API
-        const user = await fetch('https://codeberg.org/api/v1/user', {
+        return fetch('https://codeberg.org/api/v1/user', {
           method: 'GET',
           headers: this.apiHeaders,
-        }).then((res) => res.json());
-        break;
+        })
+          .then((res) => res.json())
+          .then((data) => this.setAuthor(data));
       default:
         throw new Error('Unknown provider');
     }
-    author.name = user.full_name || user.username;
+  }
+
+  setAuthor(user) {
+    console.log('setAuthor: ', user);
+    let author = {};
+    // set the author object to the provided object
+    author.name = user.name || user.login;
+    author.username = user.login;
     author.email = user.email || '';
+    this.author = author;
     return author;
   }
 }

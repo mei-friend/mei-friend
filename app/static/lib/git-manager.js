@@ -11,7 +11,7 @@ export default class GitManager {
     this.directory = '/' + provider; // e.g. '/github'
     this.provider = provider;
     this.providerType = providerType;
-    this.filepath = opts.filepath || '/' ;
+    this.filepath = opts.filepath || '/';
     this.repo = opts.repo || null;
     this.branch = opts.branch || null;
     //set up type-specific onAuth, see https://isomorphic-git.org/docs/en/onAuth#docsNav
@@ -34,9 +34,11 @@ export default class GitManager {
     this.cloud = new GitCloudClient({ token, provider, providerType });
   }
 
-  async clone(url) {
+  async clone(url, branch = this.branch) {
     // TODO safety dance: check if directory exists, if so check if changes have been made, etc.
     // wipe the pfs directory
+    // update branch
+    this.branch = branch;
     await pfs.rmdir(this.directory, { recursive: true });
     console.log('cloning into', this.directory, this.token);
     await pfs.mkdir(this.directory);
@@ -45,7 +47,7 @@ export default class GitManager {
       http,
       url,
       dir: this.directory,
-      ref: 'main',
+      ref: branch,
       corsProxy: '/proxy',
       singleBranch: false,
       onAuth: this.onAuth,
@@ -69,7 +71,7 @@ export default class GitManager {
     });
   }
 
-  async add(path) {
+  async add(path = this.filepath) {
     await git.add({
       fs,
       dir: this.directory,
@@ -97,7 +99,7 @@ export default class GitManager {
     return await pfs.readFile(this.directory + '/' + path, 'utf8');
   }
 
-  async readDir(path = gm.filepath.substring(0, github.filepath.lastIndexOf('/'))){
+  async readDir(path = gm.filepath.substring(0, github.filepath.lastIndexOf('/'))) {
     // defaults to reading containing dir of current filepath if no path is provided
     return await pfs.readdir(this.directory + '/' + path);
   }
@@ -118,7 +120,7 @@ export default class GitManager {
   }
 }
 
-console.log('git.js loaded');
+/*console.log('git.js loaded');
 
 let gm = new GitManager('github', 'github', githubToken);
 console.log('gm created');
@@ -141,3 +143,4 @@ console.log('contents', contents);
 //await gm.clone('https://github.com/isogit-test/private');
 await gm.status();
 console.log('git.js executed');
+*/

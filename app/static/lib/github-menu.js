@@ -40,7 +40,7 @@ const ghActionsInputSetters = [
 
 function forkRepo() {
   forkRepository(github);
-  console.org("FIXME - forkRepo needs to be ported to isomorphic-git");
+  console.org('FIXME - forkRepo needs to be ported to isomorphic-git');
 }
 
 export function forkRepoClicked() {
@@ -57,7 +57,7 @@ export function forkRepoClicked() {
     let githubRepo = `${inputName}/${inputRepo}`;
     gm.repo = githubRepo;
     Array.from(document.getElementsByClassName('forkRepoGithubLogo')).forEach((l) => l.classList.add('clockwise'));
-    github  // FIXME - port to isomorphic-git
+    github // FIXME - port to isomorphic-git
       .fork(() => {
         forkRepositoryStatus.forEach((s) => {
           s.classList.remove('warn');
@@ -318,7 +318,10 @@ export async function fillInUserRepos(per_page = 30, page = 1) {
   assignGithubMenuClickHandlers();
 } // fillInUserRepos()
 
-export async function fillInRepoBranches(e, repoBranches = await gm.listBranches) {
+export async function fillInRepoBranches(e, repoBranches) {
+  if (!repoBranches) {
+    repoBranches = await gm.listBranches();
+  }
   let githubMenu = document.getElementById('GithubMenu');
   githubMenu.innerHTML = `
     <a id="githubLogout" href="#">${translator.lang.logOut.text}</a>
@@ -542,13 +545,15 @@ async function fillInCommitLog(refresh = false) {
   if (refresh) {
     const githubLoadingIndicator = document.getElementById('GithubLogo');
     githubLoadingIndicator.classList.add('clockwise');
-    gm.readLog().then((log) => {
-      githubLoadingIndicator.classList.remove('clockwise');
-      renderCommitLog(log);
-    }).catch((e) => {
-      githubLoadingIndicator.classList.remove('clockwise');
-      console.warn("Couldn't read github repo", e);
-    });
+    gm.readLog()
+      .then((log) => {
+        githubLoadingIndicator.classList.remove('clockwise');
+        renderCommitLog(log);
+      })
+      .catch((e) => {
+        githubLoadingIndicator.classList.remove('clockwise');
+        console.warn("Couldn't read github repo", e);
+      });
   } else {
     renderCommitLog();
   }
@@ -580,10 +585,7 @@ export function renderCommitLog(gitlog) {
       <td>${c.commit.author.timestamp}</td>
       <td>${c.commit.author.name}</td>
       <td>${c.commit.message}</td>
-      <td><a target="_blank" href="https://github.com/${gm.repo}/commits/${c.sha}">${c.oid.slice(
-      0,
-      8
-    )}...</a></td>`;
+      <td><a target="_blank" href="https://github.com/${gm.repo}/commits/${c.sha}">${c.oid.slice(0, 8)}...</a></td>`;
     logTable.appendChild(commitRow);
   });
   const commitLogHeader = document.createElement('a');
@@ -625,7 +627,8 @@ async function handleClickGithubAction(e) {
     // (don't just reset innerHTML, so that we also clear event handlers)
     inputContainerWrapper.removeChild(inputContainerWrapper.firstChild);
   }
-  gm.cloud.getWorkflowInputs(target.dataset.path)
+  gm.cloud
+    .getWorkflowInputs(target.dataset.path)
     .then((inputs) => {
       if (!inputs) {
         return;
@@ -732,18 +735,19 @@ export function logoutFromGithub() {
   const paramsStartIx = url.indexOf('?');
   if (paramsStartIx > -1) url = url.substring(0, paramsStartIx);
   // now modify last slash to navigate to /logout
-  window.location.replace(url.substring(0, url.lastIndexOf('/')) + '/logout');
+  window.location.replace(url.substring(0, url.lastIndexOf('/')) + '/logout/' + gm.provider);
 } // logoutFromGithub()
 
 export function refreshGithubMenu() {
   // display Github name
-  document.getElementById('GithubName').innerText =
-    github.author.name === 'None' ? github.userLogin : github.author.name;
+  gm.cloud.getAuthor().then((author) => {
+    document.getElementById('GithubName').innerText = author.name;
+  });
   // populate Github menu
   let githubMenu = document.getElementById('GithubMenu');
   githubMenu.classList.remove('loggedOut');
   githubMenu.innerHTML = `<a id="githubLogout" href="#">${translator.lang.logOut.text}</a>`;
-  if (!github.filepath) {
+  if (!gm.filepath) {
     githubMenu.innerHTML += `
       <hr class="dropdownLine">
       <a id="forkRepository" href="#">${translator.lang.forkRepository.text}...</b></a>
@@ -815,22 +819,40 @@ function handleCommitButtonClicked(e) {
     // try commiting to Github
     githubLoadingIndicator.classList.add('clockwise');
     const newfile = commitFileName.innerText !== stripMeiFileName() ? commitFileName.innerText : null;
-    github
-      .writeGithubRepo(cm.getValue(), message, newfile)
+    gm.add()
       .then(() => {
-        console.debug(`Successfully written to github: ${github.githubRepo}${github.filepath}`);
-        messageInput.value = '';
-        if (newfile) {
-          // switch to new filepath
-          github.filepath = github.filepath.substring(0, github.filepath.lastIndexOf('/') + 1) + newfile;
-        }
-        // load after write (without clearing viewer metadata since we're loading same file again)
-        loadFile('', false);
+        gm.commit(message)
+          .then(() => {
+            gm.push()
+              .then(() => {
+                console.debug(`Successfully committed and pushed to github: ${github.githubRepo}${github.filepath}`);
+                messageInput.value = '';
+                if (newfile) {
+                  // switch to new filepath
+                  github.filepath = github.filepath.substring(0, github.filepath.lastIndexOf('/') + 1) + newfile;
+                }
+                // load after write (without clearing viewer metadata since we're loading same file again)
+                loadFile('', false);
+              })
+              .catch((e) => {
+                // TODO gracefully handle push error, informing user
+                cm.readOnly = false;
+                githubLoadingIndicator.classList.remove('clockwise');
+                console.warn("Couldn't push Github repo: ", e, github);
+              });
+          })
+          .catch((e) => {
+            // TODO gracefully handle commit error, informing user
+            cm.readOnly = false;
+            githubLoadingIndicator.classList.remove('clockwise');
+            console.warn("Couldn't commit Github repo: ", e, github);
+          });
       })
       .catch((e) => {
+        // TODO gracefully handle staging / add error, informing user
         cm.readOnly = false;
         githubLoadingIndicator.classList.remove('clockwise');
-        console.warn("Couldn't commit Github repo: ", e, github);
+        console.warn("Couldn't stage Github repo: ", e, github);
       });
   } else {
     // no commit without a comit message!

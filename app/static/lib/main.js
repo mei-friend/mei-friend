@@ -19,7 +19,8 @@ export var cm;
 export var v; // viewer instance
 export var validator; // validator object
 export var rngLoader; // object for loading a relaxNG schema for hinting
-export let github; // github API wrapper object
+export let github; // github API wrapper object - deprecated, TODO remove
+export let gm; // git manager object - TODO, handle multiple git providers
 export let storage = new Storage();
 export var tkVersion = ''; // string of the currently loaded toolkit version
 export var tkUrl = ''; // string of the currently loaded toolkit origin
@@ -70,7 +71,7 @@ import {
   manualCurrentPage,
   generateSectionSelect,
 } from './control-menu.js';
-import { clock, unverified, xCircleFill } from '../css/icons.js';
+import { clock, file, unverified, xCircleFill } from '../css/icons.js';
 import { keymap } from '../keymaps/default-keymap.js';
 import { setCursorToId } from './utils.js';
 import { getInMeasure, navElsSelector, getElementAtCursor } from './dom-utils.js';
@@ -120,6 +121,7 @@ import Translator from './translator.js';
 import { luteconv } from './luteconv.js';
 import { buildLanguageSelection, translateLanguageSelection } from './language-selector.js';
 import { runLanguageChecks } from '../tests/checkLangs.js';
+import GitManager from './git-manager.js';
 
 const defaultCodeMirrorOptions = {
   lineNumbers: true,
@@ -282,16 +284,15 @@ export function updateLocalStorage(meiXml) {
 
 export function updateGithubInLocalStorage() {
   if (storage.supported && !storage.override && isLoggedIn) {
-    const author = github.author;
-    const name = author.name;
-    const email = author.email;
+    const name = gm.cloud.author.name;
+    const email = gm.cloud.author.email;
     storage.github = {
-      githubRepo: github.githubRepo,
-      githubToken: github.githubToken,
-      branch: github.branch,
-      commit: github.commit,
-      filepath: github.filepath,
-      userLogin: github.userLogin,
+      githubRepo: gm.repo,
+      githubToken: gm.token,
+      branch: gm.branch,
+      //commit: github.commit,
+      filepath: gm.filepath,
+      userLogin: gm.cloud.author.username,
       userName: name,
       userEmail: email,
     };
@@ -547,7 +548,13 @@ function completeInitialLoad() {
     if (storage.github) {
       // use github object from local storage if available
       isLoggedIn = true;
-      github = new Github(
+      gm = new GitManager('github', 'github', storage.github.githubToken, {
+        repo: storage.github.githubRepo,
+        branch: storage.github.branch,
+        filepath: storage.github.filepath,
+      });
+
+      /*github = new Github(
         storage.github.githubRepo,
         storage.github.githubToken,
         storage.github.branch,
@@ -556,21 +563,28 @@ function completeInitialLoad() {
         storage.github.userLogin,
         storage.github.userName,
         storage.github.userEmail
-      );
+      );*/
       //document.querySelector("#fileLocation").innerText = meiFileLocationPrintable;
     } else if (isLoggedIn) {
       // initialise and store new github object
-      github = new Github('', githubToken, '', '', '', userLogin, userName, userEmail);
-      storage.github = {
-        githubRepo: github.githubRepo,
-        githubToken: github.githubToken,
-        branch: github.branch,
-        commit: github.commit,
-        filepath: github.filepath,
-        userLogin: github.userLogin,
-        userName: userName,
-        userEmail: userEmail,
-      };
+      gm = new GitManager('github', 'github', githubToken);
+      gm.cloud
+        .getAuthor()
+        .then((author) => {
+          //github = new Github('', githubToken, '', '', '', userLogin, userName, userEmail);
+          storage.github = {
+            githubRepo: gm.repo,
+            githubToken: gm.token,
+            branch: gm.branch,
+            filepath: gm.filepath,
+            userLogin: author.username,
+            userName: author.name,
+            userEmail: author.email,
+          };
+        })
+        .catch((err) => {
+          console.warn('Error getting author: ', err);
+        });
     }
   }
 
@@ -668,17 +682,18 @@ function completeInitialLoad() {
         setFileChangedState(false);
       }
     }
-    if (storage.forkAndOpen && github) {
+    if (storage.forkAndOpen && gm) {
       // we've arrived back after an automated log-in request
       // now fork and open the supplied URL, and remove it from storage
-      forkAndOpen(github, storage.forkAndOpen);
+      forkAndOpen(gm, storage.forkAndOpen);
       storage.removeItem('forkAndOpen');
     }
   } else {
     // no local storage
     if (isLoggedIn) {
       // initialise new github object
-      github = new Github('', githubToken, '', '', '', userLogin, userName, userEmail);
+      gm = new GitManager('github', 'github', githubToken);
+      //github = new Github('', githubToken, '', '', '', userLogin, userName, userEmail);
     }
     meiFileLocation = '';
     meiFileLocationPrintable = '';
@@ -688,14 +703,14 @@ function completeInitialLoad() {
     // regardless of storage availability:
     // if we are logged in, refresh github menu
     refreshGithubMenu();
-    if (github.githubRepo && github.branch && github.filepath) {
+    if (gm.repo && gm.branch && gm.filepath) {
       // preset github menu to where the user left off, if we can
       fillInBranchContents();
     }
   }
   if (forkParam === 'true' && urlFileName) {
-    if (isLoggedIn && github) {
-      forkAndOpen(github, urlFileName);
+    if (isLoggedIn && gm) {
+      forkAndOpen(gm, urlFileName);
     } else {
       if (storage.supported) {
         storage.safelySetStorageItem('forkAndOpen', urlFileName);
@@ -791,10 +806,42 @@ export async function openUrlFetch(url = '', updateAfterLoading = true) {
     if (!url) url = new URL(urlInput.value);
     const headers = { Accept: 'application/xml, text/xml, application/mei+xml' };
     if (isLoggedIn && url.href.trim().startsWith('https://raw.githubusercontent.com')) {
-      // GitHub URL - use GitHub credentials to enable URL fetch from private repos
-      github.directlyReadFileContents(url.href).then((data) => {
-        openUrlProcess(data, url, updateAfterLoading);
-      });
+      // determine user/org, repo, branch, and file path from URL
+      const urlParts = url.pathname.split('/');
+      const userOrg = urlParts[1];
+      const repo = urlParts[2];
+      const branch = urlParts[3];
+      const filepath = urlParts.slice(4).join('/');
+
+      if (userOrg && repo && branch && filepath) {
+        // clone repo
+        gm = new GitManager('github', 'github', githubToken);
+        // TODO modify for multiple git providers
+        gm.clone(`https://github.com/${userOrg}/${repo}.git`, branch)
+          .then(() => {
+            gm.readFile(filepath)
+              .then((data) => {
+                openUrlProcess(data, url, updateAfterLoading);
+              })
+              .catch((err) => {
+                console.warn('Error reading file from cloned repo: ', err);
+                urlStatus.innerHTML = 'Error reading file from cloned repo';
+                urlStatus.classList.add('warn');
+                urlInput.classList.add('warn');
+              });
+          })
+          .catch((err) => {
+            console.warn('Error cloning repo: ', err);
+            urlStatus.innerHTML = 'Error cloning repo';
+            urlStatus.classList.add('warn');
+            urlInput.classList.add('warn');
+          });
+      } else {
+        console.warn('Invalid raw GitHub URL provided by user: ', url);
+        urlStatus.innerHTML = 'Invalid raw GitHub URL, please fix...';
+        urlStatus.classList.add('warn');
+        urlInput.classList.add('warn');
+      }
     } else {
       const response = await fetch(url, {
         method: 'GET',
@@ -836,8 +883,8 @@ function openUrlProcess(content, url, updateAfterLoading) {
   meiFileName = url.pathname.substring(url.pathname.lastIndexOf('/') + 1);
   if (storage.github && isLoggedIn) {
     // re-initialise github menu since we're now working from a URL
-    github.filepath = '';
-    github.branch = '';
+    gm.filepath = '';
+    gm.branch = '';
     if (storage.supported) {
       updateGithubInLocalStorage();
     }
@@ -1114,8 +1161,8 @@ let inputFormats = {
 export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true, updateAfterLoading = true) {
   if (storage.github && isLoggedIn) {
     // re-initialise github menu since we're now working from a file
-    github.filepath = '';
-    github.branch = '';
+    gm.filepath = '';
+    gm.branch = '';
     if (storage.supported) {
       updateGithubInLocalStorage();
     }
@@ -1128,7 +1175,7 @@ export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true, upd
     storage.fileLocationType = 'file';
   }
   fileLocationType = 'file';
-  if (github) github.filepath = '';
+  if (github) gm.filepath = '';
   if (typeof file === 'string') {
     // with fileName string
     meiFileName = file;
@@ -1296,8 +1343,8 @@ function openFileDialog(accept = '*') {
       openFile(files[0]);
       if (isLoggedIn) {
         // re-initialise github menu since we're now working locally
-        github.filepath = '';
-        github.branch = '';
+        gm.filepath = '';
+        gm.branch = '';
         if (storage.supported) {
           updateGithubInLocalStorage();
         }
@@ -2302,29 +2349,41 @@ export function setStandoffAnnotationEnabledStatus() {
   }
 }
 
-// handles any changes in CodeMirror
-export function handleEditorChanges() {
-  const commitUI = document.querySelector('#commitUI');
-  let changeIndicator = false;
-  let meiXml = cm.getValue();
-  if (isLoggedIn && github.filepath && commitUI) {
-    // fileChanged flag may have been set from storage - if so, run with it
-    // otherwise set it to true if we've changed the file content this session
-    changeIndicator = fileChanged || meiXml !== github.content;
-  } else {
-    // interpret any CodeMirror change as a file changed state
-    changeIndicator = true;
-  }
+function checkEditorChanges() {
+  // check if we need to action an editor change
   if (freshlyLoaded) {
     // ignore changes resulting from fresh file load
     freshlyLoaded = false;
+    // ...unless the flag in local storage is set
+    if (fileChanged) {
+      handleEditorChanges();
+    }
+  } else if (isLoggedIn && github.filepath && commitUI) {
+    // we are working from git
+    // check status of file to see whether change indicator should be set
+    gm.status().then((status) => {
+      if (status !== 'unmodified') {
+        // changes detected, so handle the changes
+        handleEditorChanges();
+      } else {
+        // no changes detected, so clear the change indicator
+        v.clearChangeIndicator();
+      }
+    });
   } else {
-    setFileChangedState(changeIndicator);
+    // any other CM changes should be treated as editor changes
+    handleEditorChanges();
   }
+}
+
+// handles any changes in CodeMirror
+export function handleEditorChanges() {
+  freshlyLoaded = false;
+  const commitUI = document.querySelector('#commitUI');
   v.notationUpdated(cm);
   if (storage.supported) {
     // on every set of changes, save editor content
-    updateLocalStorage(meiXml);
+    updateLocalStorage(cm.getValue());
   }
   if (document.getElementById('showAnnotations').checked || document.getElementById('showAnnotationPanel').checked) {
     readAnnots(); // from annotation.js
