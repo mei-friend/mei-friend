@@ -139,7 +139,7 @@ async function userRepoClicked(ev) {
   gm.repo = ev.target.innerText;
   const per_page = 100;
   const page = 1;
-  const repoBranches = await gm.cloud.getRepoBranches(per_page, page);
+  const repoBranches = await gm.cloud.getBranches(per_page, page);
   if (repoBranches.length === 1) {
     // skip branch menu if only one branch
     gm.branch = repoBranches[0].name;
@@ -301,6 +301,7 @@ function assignGithubMenuClickHandlers() {
 
 export async function fillInUserRepos(per_page = 30, page = 1) {
   const repos = await gm.cloud.getRepos(per_page, page);
+  console.log('fillInUserRepos() got repos: ', repos);
   if (document.getElementById('selectBranch')) {
     // if user has navigated away wiew while we
     // were waiting for the user repos list, abandon it
@@ -322,6 +323,7 @@ export async function fillInRepoBranches(e, repoBranches) {
   if (!repoBranches) {
     repoBranches = await gm.listBranches();
   }
+  console.log('fillInRepoBranches() got branches: ', repoBranches);
   let githubMenu = document.getElementById('GithubMenu');
   githubMenu.innerHTML = `
     <a id="githubLogout" href="#">${translator.lang.logOut.text}</a>
@@ -331,7 +333,7 @@ export async function fillInRepoBranches(e, repoBranches) {
     <a id="selectBranch" class="dropdownHead" href="#"><b>${translator.lang.selectBranch.text}:</b></a>
     `;
   Array.from(repoBranches).forEach((branch) => {
-    githubMenu.innerHTML += `<a class="repoBranch" href="#">${branch}</a>`;
+    githubMenu.innerHTML += `<a class="repoBranch" href="#">${branch.name}</a>`;
   });
   // GitHub menu interactions
   assignGithubMenuClickHandlers();
@@ -403,103 +405,118 @@ async function proposeFileName(fname) {
 } // proposeFileName()
 
 export async function fillInBranchContents(e) {
+  // clone repo and read contents of branch
   const githubLoadingIndicator = document.getElementById('GithubLogo');
   githubLoadingIndicator.classList.add('clockwise');
   // TODO handle > per_page files (similar to userRepos)
   let target = document.getElementById('contentsHeader');
-  let branchContents = await gm.readDir();
-  let githubMenu = document.getElementById('GithubMenu');
-  githubMenu.innerHTML = `
-    <a id="githubLogout" href="#">${translator.lang.logOut.text}</a>
-    <hr class="dropdownLine">
-    <a id="selectRepository" href="#"><span class="btn icon inline-block-tight">${icon.arrowLeft}</span><span id="githubRepository">${translator.lang.githubRepository.text}</span>: ${gm.repo}</a>
-    <hr class="dropdownLine">
-    <a id="selectBranch" href="#"><span class="btn icon inline-block-tight">${icon.arrowLeft}</span><span id="githubBranch">${translator.lang.githubBranch.text}</span>: ${gm.branch}</a>
-    <hr class="dropdownLine">
-    <a id="contentsHeader" href="#"><span class="btn icon inline-block-tight filepath">${icon.arrowLeft}</span><span id="githubFilepath">${translator.lang.githubFilepath.text}</span>: <span class="filepath">${g.filepath}</span></a>
-    <hr class="dropdownLine" class="actionsDivider" id="actionsDividerStart">
-    `;
-  // request Githug Action workflows (if any) and handle them
-  gm.getActionWorkflowsList().then((resp) => handleWorkflowsListReceived(resp));
-  if (e) {
-    Array.from(branchContents).forEach((content) => {
-      const isDir = content.type === 'dir';
-      githubMenu.innerHTML +=
-        `<a class="branchContents ${content.type}${isDir ? '' : ' closeOnClick'}" href="#">` +
-        //  content.type === "dir" ? '<span class="btn icon icon-file-symlink-file inline-block-tight"></span>' : "" +
-        `<span class="filepath${isDir ? '' : ' closeOnClick'}">${content.name}</span>${isDir ? '...' : ''}</a>`;
+  gm.clone()
+    .then(() => {
+      gm.readDir()
+        .then((branchContents) => {
+          let githubMenu = document.getElementById('GithubMenu');
+          githubMenu.innerHTML = `
+        <a id="githubLogout" href="#">${translator.lang.logOut.text}</a>
+        <hr class="dropdownLine">
+        <a id="selectRepository" href="#"><span class="btn icon inline-block-tight">${icon.arrowLeft}</span><span id="githubRepository">${translator.lang.githubRepository.text}</span>: ${gm.repo}</a>
+        <hr class="dropdownLine">
+        <a id="selectBranch" href="#"><span class="btn icon inline-block-tight">${icon.arrowLeft}</span><span id="githubBranch">${translator.lang.githubBranch.text}</span>: ${gm.branch}</a>
+        <hr class="dropdownLine">
+        <a id="contentsHeader" href="#"><span class="btn icon inline-block-tight filepath">${icon.arrowLeft}</span><span id="githubFilepath">${translator.lang.githubFilepath.text}</span>: <span class="filepath">${gm.filepath}</span></a>
+        <hr class="dropdownLine" class="actionsDivider" id="actionsDividerStart">
+        `;
+          // request Githug Action workflows (if any) and handle them
+          // TODO
+          // gm.getActionWorkflowsList().then((resp) => handleWorkflowsListReceived(resp));
+          if (e) {
+            branchContents.forEach((content) => {
+              const isDir = gm.isDir(content);
+              githubMenu.innerHTML +=
+                `<a class="branchContents ${content.type}${isDir ? '' : ' closeOnClick'}" href="#">` +
+                //  content.type === "dir" ? '<span class="btn icon icon-file-symlink-file inline-block-tight"></span>' : "" +
+                `<span class="filepath${isDir ? '' : ' closeOnClick'}">${content}</span>${isDir ? '...' : ''}</a>`;
+            });
+          } else {
+            // Either User clicked file, or we're on forkAndOpen path, or restoring from local storage. Display commit interface
+            if (gm.filepath) {
+              setMeiFileInfo(
+                gm.filepath, // meiFileName
+                gm.repo, // meiFileLocation
+                gm.repo + ':' // meiFileLocationPrintable
+              );
+            }
+            if (storage.supported) {
+              storage.fileLocationType = 'github';
+            }
+
+            const commitUI = document.createElement('div');
+            commitUI.setAttribute('id', 'commitUI');
+
+            const commitFileName = document.createElement('span');
+            commitFileName.setAttribute('contenteditable', '');
+            commitFileName.setAttribute('id', 'commitFileName');
+            commitFileName.setAttribute('spellcheck', 'false');
+
+            const commitFileNameEdit = document.createElement('div');
+            commitFileNameEdit.setAttribute('id', 'commitFileNameEdit');
+            commitFileNameEdit.innerHTML =
+              '<span id="commitFileNameText">' + translator.lang.commitFileNameText.text + '</span>: ';
+            commitFileNameEdit.appendChild(commitFileName);
+
+            const commitMessageInput = document.createElement('input');
+            commitMessageInput.setAttribute('type', 'text');
+            commitMessageInput.setAttribute('id', 'commitMessageInput');
+            commitMessageInput.setAttribute('placeholder', translator.lang.commitMessageInput.placeholder);
+            const commitButton = document.createElement('input');
+            commitButton.setAttribute('id', 'githubCommitButton');
+            commitButton.setAttribute('type', 'button');
+            commitButton.classList.add('closeOnClick');
+            commitButton.addEventListener('click', handleCommitButtonClicked);
+            commitUI.appendChild(commitFileNameEdit);
+            commitUI.appendChild(commitMessageInput);
+            commitUI.appendChild(commitButton);
+            githubMenu.appendChild(commitUI);
+            setFileNameAfterLoad();
+            setFileChangedState(fileChanged);
+            commitMessageInput.removeEventListener('input', onMessageInput);
+            commitMessageInput.addEventListener('input', onMessageInput);
+            commitFileName.removeEventListener('input', onFileNameEdit);
+            commitFileName.addEventListener('input', onFileNameEdit);
+
+            // add "Report issue with encoding" link
+            const reportIssue = document.createElement('input');
+            reportIssue.setAttribute('type', 'button');
+            reportIssue.id = 'reportIssueWithEncoding';
+            reportIssue.value = translator.lang.reportIssueWithEncoding.value;
+            reportIssue.addEventListener('click', () => {
+              const openInMeiFriendUrl = `[${translator.lang.clickToOpenInMeiFriend.text}](${encodeURIComponent(
+                generateUrl()
+              )})`;
+              // FIXME - make this work with isomorphic-git and all cloud providers
+              const fullOpenIssueUrl = `https://github.com/${github.githubRepo}/issues/new?title=Issue+with+${meiFileName}&body=${openInMeiFriendUrl}`;
+              window.open(fullOpenIssueUrl, '_blank');
+            });
+            const reportIssueDivider = document.createElement('hr');
+            reportIssueDivider.classList.add('dropdownLine');
+            commitUI.appendChild(reportIssueDivider);
+            reportIssue.target = '_blank';
+            commitUI.appendChild(reportIssue);
+          }
+          fillInCommitLog('withRefresh');
+          // GitHub menu interactions
+          assignGithubMenuClickHandlers();
+          v.setMenuColors();
+        })
+        .catch((err) => {
+          console.error("Couldn't read Github repo to fill in branch contents:", err);
+        });
+    })
+    .catch((err) => {
+      console.error("Couldn't clone Github repo to fill in branch contents:", err);
+    })
+    .finally(() => {
+      githubLoadingIndicator.classList.remove('clockwise');
     });
-  } else {
-    // Either User clicked file, or we're on forkAndOpen path, or restoring from local storage. Display commit interface
-    if (gm.filepath) {
-      setMeiFileInfo(
-        gm.filepath, // meiFileName
-        gm.repo, // meiFileLocation
-        gm.repo + ':' // meiFileLocationPrintable
-      );
-    }
-    if (storage.supported) {
-      storage.fileLocationType = 'github';
-    }
-
-    const commitUI = document.createElement('div');
-    commitUI.setAttribute('id', 'commitUI');
-
-    const commitFileName = document.createElement('span');
-    commitFileName.setAttribute('contenteditable', '');
-    commitFileName.setAttribute('id', 'commitFileName');
-    commitFileName.setAttribute('spellcheck', 'false');
-
-    const commitFileNameEdit = document.createElement('div');
-    commitFileNameEdit.setAttribute('id', 'commitFileNameEdit');
-    commitFileNameEdit.innerHTML =
-      '<span id="commitFileNameText">' + translator.lang.commitFileNameText.text + '</span>: ';
-    commitFileNameEdit.appendChild(commitFileName);
-
-    const commitMessageInput = document.createElement('input');
-    commitMessageInput.setAttribute('type', 'text');
-    commitMessageInput.setAttribute('id', 'commitMessageInput');
-    commitMessageInput.setAttribute('placeholder', translator.lang.commitMessageInput.placeholder);
-    const commitButton = document.createElement('input');
-    commitButton.setAttribute('id', 'githubCommitButton');
-    commitButton.setAttribute('type', 'button');
-    commitButton.classList.add('closeOnClick');
-    commitButton.addEventListener('click', handleCommitButtonClicked);
-    commitUI.appendChild(commitFileNameEdit);
-    commitUI.appendChild(commitMessageInput);
-    commitUI.appendChild(commitButton);
-    githubMenu.appendChild(commitUI);
-    setFileNameAfterLoad();
-    setFileChangedState(fileChanged);
-    commitMessageInput.removeEventListener('input', onMessageInput);
-    commitMessageInput.addEventListener('input', onMessageInput);
-    commitFileName.removeEventListener('input', onFileNameEdit);
-    commitFileName.addEventListener('input', onFileNameEdit);
-
-    // add "Report issue with encoding" link
-    const reportIssue = document.createElement('input');
-    reportIssue.setAttribute('type', 'button');
-    reportIssue.id = 'reportIssueWithEncoding';
-    reportIssue.value = translator.lang.reportIssueWithEncoding.value;
-    reportIssue.addEventListener('click', () => {
-      const openInMeiFriendUrl = `[${translator.lang.clickToOpenInMeiFriend.text}](${encodeURIComponent(
-        generateUrl()
-      )})`;
-      // FIXME - make this work with isomorphic-git and all cloud providers
-      const fullOpenIssueUrl = `https://github.com/${github.githubRepo}/issues/new?title=Issue+with+${meiFileName}&body=${openInMeiFriendUrl}`;
-      window.open(fullOpenIssueUrl, '_blank');
-    });
-    const reportIssueDivider = document.createElement('hr');
-    reportIssueDivider.classList.add('dropdownLine');
-    commitUI.appendChild(reportIssueDivider);
-    reportIssue.target = '_blank';
-    commitUI.appendChild(reportIssue);
-  }
-  fillInCommitLog('withRefresh');
-  // GitHub menu interactions
-  assignGithubMenuClickHandlers();
-  v.setMenuColors();
-  githubLoadingIndicator.classList.remove('clockwise');
 } // fillInBranchContents()
 
 function handleWorkflowsListReceived(resp) {
@@ -739,6 +756,7 @@ export function logoutFromGithub() {
 } // logoutFromGithub()
 
 export function refreshGithubMenu() {
+  console.log('refreshGithubMenu()', gm);
   // display Github name
   gm.cloud.getAuthor().then((author) => {
     document.getElementById('GithubName').innerText = author.name;

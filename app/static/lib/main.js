@@ -282,19 +282,18 @@ export function updateLocalStorage(meiXml) {
   }
 }
 
-export function updateGithubInLocalStorage() {
+export async function updateGithubInLocalStorage() {
   if (storage.supported && !storage.override && isLoggedIn) {
-    const name = gm.cloud.author.name;
-    const email = gm.cloud.author.email;
+    const author = await gm.cloud.getAuthor();
     storage.github = {
       githubRepo: gm.repo,
       githubToken: gm.token,
       branch: gm.branch,
       //commit: github.commit,
       filepath: gm.filepath,
-      userLogin: gm.cloud.author.username,
-      userName: name,
-      userEmail: email,
+      userLogin: author.username,
+      userName: author.name,
+      userEmail: author.email,
     };
   }
 }

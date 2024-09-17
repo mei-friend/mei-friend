@@ -11,7 +11,9 @@ export default class GitManager {
     this.directory = '/' + provider; // e.g. '/github'
     this.provider = provider;
     this.providerType = providerType;
-    this.filepath = opts.filepath || '/';
+    this.cloud = new GitCloudClient({ gm: this, token, provider, providerType });
+
+    this.filepath = opts.filepath || '';
     this.repo = opts.repo || null;
     this.branch = opts.branch || null;
     //set up type-specific onAuth, see https://isomorphic-git.org/docs/en/onAuth#docsNav
@@ -31,15 +33,43 @@ export default class GitManager {
       default:
         throw new Error('Unknown provider');
     }
-    this.cloud = new GitCloudClient({ token, provider, providerType });
   }
 
-  async clone(url, branch = this.branch) {
-    // TODO safety dance: check if directory exists, if so check if changes have been made, etc.
-    // wipe the pfs directory
+  set repo(repo) {
+    this.cloud.repo = repo;
+  }
+
+  get repo() {
+    return this.cloud.repo;
+  }
+
+  async clone(url = this.cloud.getCloneURL(), branch = this.branch) {
+    // check if directory exists, if so check if changes have been made, etc.
+    await pfs
+      .stat(this.directory)
+      .then((stats) => {
+        // directory exists
+        // TODO safety dance: check if changes have been made, give user option to commit, etc.
+        console.log('directory exists', stats);
+        // delete the directory
+        removeRecursively(this.directory).catch((err) => {
+          console.log('rmdir error', err);
+        });
+        /*pfs.rmdir(this.directory, { recursive: true }).catch((err) => {
+          console.log('rmdir error', err);
+        });*/
+      })
+      .catch((err) => {
+        if (err.code === 'ENOENT') {
+          return false; // directory does not exist, all is well
+        } else {
+          // another error occurred...
+          console.log('stat error', err);
+          throw err;
+        }
+      });
     // update branch
     this.branch = branch;
-    await pfs.rmdir(this.directory, { recursive: true });
     console.log('cloning into', this.directory, this.token);
     await pfs.mkdir(this.directory);
     let cloneobj = {
@@ -99,7 +129,7 @@ export default class GitManager {
     return await pfs.readFile(this.directory + '/' + path, 'utf8');
   }
 
-  async readDir(path = gm.filepath.substring(0, github.filepath.lastIndexOf('/'))) {
+  async readDir(path = this.filepath.substring(0, this.filepath.lastIndexOf('/'))) {
     // defaults to reading containing dir of current filepath if no path is provided
     return await pfs.readdir(this.directory + '/' + path);
   }
@@ -117,6 +147,37 @@ export default class GitManager {
       fs,
       dir: this.directory,
     });
+  }
+
+  async isDir(path = this.filepath) {
+    return (await pfs.stat(this.directory + '/' + path)).type === 'dir';
+  }
+}
+
+async function removeRecursively(path) {
+  try {
+    // Read the contents of the directory
+    let files = await pfs.readdir(path);
+
+    // Loop over each file or subdirectory
+    for (let file of files) {
+      let fullPath = `${path}/${file}`;
+      let stats = await pfs.stat(fullPath);
+
+      if (stats.type === 'dir') {
+        // If it's a directory, call the function recursively
+        await removeRecursively(fullPath);
+      } else {
+        // If it's a file, delete it
+        await pfs.unlink(fullPath);
+      }
+    }
+
+    // After all files/subdirectories are removed, remove the directory itself
+    await pfs.rmdir(path);
+    console.log(`Directory '${path}' removed successfully`);
+  } catch (err) {
+    console.error(`Failed to remove directory '${path}':`, err);
   }
 }
 

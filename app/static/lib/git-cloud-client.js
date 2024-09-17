@@ -1,6 +1,7 @@
 export default class GitCloudClient {
   constructor(conf) {
     console.log('GitCloudClient constructor', conf);
+    this.gm = conf.gm;
     this.token = conf.token;
     this.provider = conf.provider; // e.g. 'github'
     this.providerType = conf.providerType; // e.g. 'github'
@@ -63,9 +64,13 @@ export default class GitCloudClient {
     }).then((res) => res.json());
   }
 
-  async getBranches(repo) {
+  async getBranches(per_page = 30, page = 1) {
     // fetch all branches of the current repository from the cloud provider
-    console.log('getBranches');
+    const branchesUrl = `https://api.github.com/repos/${this.repo}/branches?per_page=${per_page}&page=${page}`;
+    return fetch(branchesUrl, {
+      method: 'GET',
+      headers: this.apiHeaders,
+    }).then((res) => res.json());
   }
 
   async getCommits(repo, branch) {
@@ -135,5 +140,24 @@ export default class GitCloudClient {
     author.email = user.email || '';
     this.author = author;
     return author;
+  }
+
+  getCloneURL() {
+    // return the clone URL of the current repository
+    // based on the current repo (contains the userOrg and repoName)
+    // ensure that the URL matches the current provider
+    // TODO check this is not totally broken
+    switch (this.providerType) {
+      case 'github':
+        return `https://github.com/${this.gm.repo}`;
+      case 'gitlab':
+        return `https://${this.provider}/gitlab/${this.gm.repo}`;
+      case 'bitbucket':
+        return `https://${this.provider}/bitbucket/${this.gm.repo}`;
+      case 'codeberg':
+        return `https://${this.provider}/codeberg/${this.gm.repo}`;
+      default:
+        throw new Error('Unknown provider');
+    }
   }
 }
