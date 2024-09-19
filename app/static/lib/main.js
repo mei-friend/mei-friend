@@ -1,6 +1,6 @@
 // mei-friend version and date
 export const version = '1.0.16';
-export const versionDate = '10 September 2024'; // use full or 3-character english months, will be translated
+export const versionDate = '19 September 2024'; // use full or 3-character english months, will be translated
 
 var vrvWorker;
 var spdWorker;
@@ -2425,6 +2425,8 @@ function setKeyMap() {
     document.querySelectorAll(key).forEach((el) => {
       el.setAttribute('tabindex', '-1');
       el.addEventListener('keydown', (ev) => {
+
+        // filter out keypresses at certain elements
         if (['pagination2', 'selectTo', 'selectFrom', 'selectRange'].includes(document.activeElement.id)) {
           return;
         }

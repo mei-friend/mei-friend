@@ -81,6 +81,18 @@ export const keymap = {
     space: 'playPauseMidiPlayback',
   },
 
+  '#midiPlaybackControlBar': {
+    space: 'playPauseMidiPlayback',
+  },
+
+  '#meiFriendHeader': {
+    space: 'playPauseMidiPlayback',
+  },
+
+  '#meiFriendFooter': {
+    space: 'playPauseMidiPlayback',
+  },
+
   // only mapped to notation under MAC OSX
   '.platform-darwin-notation': {
     'cmd-right': 'nextMeasure',

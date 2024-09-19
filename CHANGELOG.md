@@ -5,6 +5,7 @@
 maxrothman)
 * Implement persistent search bar behavior (#110, thx @maxrothmann) with checkbox to toggle
 * Update Verovio release version list
+* Make sure `SPACE` bar works also outside notation panel (#92)
 
 ### 1.0.15 Patch 
 * Add support for new languages (Bosnian, Chinese, Croatian, Danish, Dutch, Serbian)

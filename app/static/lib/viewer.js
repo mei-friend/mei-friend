@@ -1029,6 +1029,7 @@ export default class Viewer {
     midiSpeedmodeIndicator.style.display = this.speedMode ? 'inline' : 'none';
     // console.log('toggle: ', midiPlaybackControlBar);
     setOrientation(cm);
+    midiPlaybackControlBar.focus();
   } // toggleMidiPlaybackControlBar()
 
   toggleAnnotationPanel() {
