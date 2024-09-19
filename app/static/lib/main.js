@@ -2427,7 +2427,10 @@ function setKeyMap() {
       el.addEventListener('keydown', (ev) => {
 
         // filter out keypresses at certain elements
-        if (['pagination2', 'selectTo', 'selectFrom', 'selectRange'].includes(document.activeElement.id)) {
+        if (['pagination2', 'selectTo', 'selectFrom', 'selectRange']
+          .includes(document.activeElement.id) ||
+          document.activeElement.closest('#encoding')) {
+          console.log('Ignoring keypress in ' + document.activeElement.id);
           return;
         }
 
