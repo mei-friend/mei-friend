@@ -450,8 +450,12 @@ function completeInitialLoad() {
   const showChangeLogLink = document.getElementById('showChangelog');
   if (showChangeLogLink) showChangeLogLink.setAttribute('href', changeLogUrl);
 
-  cm = CodeMirror.fromTextArea(document.getElementById('editor'), defaultCodeMirrorOptions);
+  cm = new CodeMirror(document.getElementById('mainEditor'), defaultCodeMirrorOptions);
   CodeMirror.normalizeKeyMap();
+
+  // add slit view to '#slitView' element
+  var cm2 = new CodeMirror(document.getElementById('splitView'), defaultCodeMirrorOptions);
+  cm2.swapDoc(cm.getDoc()?.linkedDoc({ sharedHist: true }));
 
   // make sure that the drag enter event is passed through CodeMirror
   cm.on('dragenter', (cm, ev) => dragEnter(ev));
