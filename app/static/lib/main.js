@@ -2426,9 +2426,8 @@ function setKeyMap() {
       el.setAttribute('tabindex', '-1');
       el.addEventListener('keydown', (ev) => {
 
-        // filter out keypresses at certain elements
-        if (['pagination2', 'selectTo', 'selectFrom', 'selectRange', 'commitMessageInput']
-          .includes(document.activeElement.id) ||
+        // filter out keypresses at certain elements, i.e. that contain preventKeyBindings class
+        if (document.activeElement.classList.contains('preventKeyBindings') ||
           document.activeElement.closest('#encoding')) {
           console.log('Ignoring keypress in ' + document.activeElement.id);
           return;

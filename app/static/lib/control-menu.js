@@ -160,6 +160,7 @@ export function createNotationControlBar(parentElement, scale) {
   pagination1.id = 'pagination1';
   let pagination2 = document.createElement('div');
   pagination2.id = 'pagination2';
+  pagination2.classList.add('preventKeyBindigns');
   pagination2.contentEditable = true;
   pagination2.title = 'Click to enter page number';
   let pagination3 = document.createElement('div');
