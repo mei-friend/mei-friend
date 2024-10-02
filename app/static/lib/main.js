@@ -427,7 +427,7 @@ function onLanguageLoaded() {
   }
 } // onLanguageLoaded()
 
-function completeInitialLoad() {
+async function completeInitialLoad() {
   splashInitialLoad = false; // avoid re-initialising app from splash screen button
 
   // link to changelog page according to env settings (develop/staging/production)
@@ -566,6 +566,11 @@ function completeInitialLoad() {
       //document.querySelector("#fileLocation").innerText = meiFileLocationPrintable;
     } else if (isLoggedIn) {
       // initialise and store new github object
+      // const gitWorker = new Worker(`${root}lib/git-worker.js`);
+      // const gitProxy = new WorkerProxy(gitWorker);
+      // let msg = await gitProxy.registerGitManager('github', 'github', githubToken);
+      // console.log('Registered git manager: ', msg);
+
       gm = new GitManager('github', 'github', githubToken);
       gm.cloud
         .getAuthor()
