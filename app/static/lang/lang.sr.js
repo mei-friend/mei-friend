@@ -877,6 +877,10 @@ export const lang = {
     text: 'Мапа тастера',
     description: 'Изабери мапу тастера',
   },
+  persistentSearch: {
+    text: 'Trajni pretraživač',
+    description: 'Koristi ponašanje trajnog pretraživača (pretraživač ostaje otvoren dok se eksplicitno ne zatvori)',
+  },
 
   // Поставке Веровиа
   verovioSettingsHeader: {

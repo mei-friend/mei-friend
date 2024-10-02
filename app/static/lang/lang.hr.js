@@ -878,6 +878,10 @@ export const lang = {
     text: 'Mapa tastera',
     description: 'Izaberi mapu tastera',
   },
+  persistentSearch: {
+    text: 'Tražilica koja ostaje otvorena',
+    description: 'Koristi ponašanje tražilice koja ostaje otvorena (tražilica ostaje otvorena sve dok se eksplicitno ne zatvori)',
+  },
 
   // Postavke Verovia
   verovioSettingsHeader: {

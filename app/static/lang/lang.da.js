@@ -880,6 +880,10 @@ keyMap: {
   text: 'Tastaturgenveje',
     description: 'Vælg tastaturgenveje',
 },
+persistentSearch: {
+  text: 'Vedvarende søgefelt',
+  description: 'Brug vedvarende søgefeltadfærd (søgefeltet forbliver åbent, indtil det eksplicit lukkes)',
+},
 
 // Verovio settings
 verovioSettingsHeader: {

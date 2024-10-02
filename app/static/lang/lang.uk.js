@@ -874,6 +874,10 @@ export const lang = {
     text: 'Карта клавіш',
     description: 'Вибрати карту клавіш',
   },
+  persistentSearch: {
+    text: 'Постійний пошуковий блок',
+    description: 'Використовуйте поведінку постійного пошукового блоку (пошуковий блок залишається відкритим до явного закриття)',
+  },
 
   // Verovio settings
   verovioSettingsHeader: {

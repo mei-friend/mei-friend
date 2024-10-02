@@ -898,6 +898,10 @@ export const lang = {
     text: 'Carte des touches',
     description: 'Sélectionnez la carte des touches',
   },
+  persistentSearch: {
+    text: 'Boîte de recherche persistante',
+    description: "Utiliser le comportement de la boîte de recherche persistante (la boîte de recherche reste ouverte jusqu'à ce qu'elle soit explicitement fermée)",
+  },
 
   // Verovio settings / Paramètres Verovio
   verovioSettingsHeader: {

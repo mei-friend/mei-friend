@@ -882,6 +882,10 @@ export const lang = {
     text: 'Toetsenbordindeling',
     description: 'Selecteer toetsenbordindeling',
   },
+  persistentSearch: {
+    text: 'Persistente zoekbalk',
+    description: 'Gebruik het gedrag van de persistente zoekbalk (zoekbalk blijft open totdat deze expliciet wordt gesloten)',
+  },
 
   // Verovio settings
   verovioSettingsHeader: {
