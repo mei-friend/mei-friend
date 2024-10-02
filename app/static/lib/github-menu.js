@@ -117,7 +117,7 @@ function repoHeaderClicked() {
 } // repoHeaderClicked()
 
 function selectBranchClicked(ev) {
-  github.filepath = '';
+  gm.filepath = '';
   fillInRepoBranches(ev.target);
 } // selectBranchClicked()
 
@@ -125,7 +125,7 @@ function contentsHeaderClicked(ev) {
   // strip trailing slash (in case our filepath is a subdir)
   if (gm.filepath.endsWith('/')) gm.filepath = gm.filepath.substring(0, gm.filepath.length - 1);
   //  retreat to previous slash (back one directory level)
-  gm.filepath = gm.filepath.substring(0, github.filepath.lastIndexOf('/') + 1);
+  gm.filepath = gm.filepath.substring(0, gm.filepath.lastIndexOf('/') + 1);
   // if we've retreated past the root dir, restore it
   gm.filepath = gm.filepath.length === 0 ? '/' : gm.filepath;
   const githubLoadingIndicator = document.getElementById('GithubLogo');
@@ -160,6 +160,7 @@ function repoBranchClicked(ev) {
 } // repoBranchClicked()
 
 function branchContentsDirClicked(ev) {
+  console.log('branchContentsDirClicked()');
   let target = ev.target;
   if (!target.classList.contains('filepath')) {
     // if user hasn't clicked directly on the filepath <span>, drill down to it
@@ -230,6 +231,7 @@ function assignGithubMenuClickHandlers() {
   // This function is called repeatedly during runtime as the content of the
   // Github menu is dynamic. Therefore, we remove all event listeners below
   // before adding them, to avoid attaching multiple identical listeners.
+  console.log("Assigning click handlers to Github menu items...");  
   const githubMenu = document.getElementById('GithubMenu');
   if (githubMenu) {
     githubMenu.removeEventListener('mouseleave', (e) => e.target.classList.remove('forceShow'));
@@ -350,7 +352,7 @@ async function markFileName(fname) {
   const without = fname.substring(0, fname.lastIndexOf('.'));
   const match = without.match('(.*)~\\d+$');
   const unmarked = match ? match[1] : without;
-  const containingDir = gm.filepath.substring(0, github.filepath.lastIndexOf('/'));
+  const containingDir = gm.filepath.substring(0, gm.filepath.lastIndexOf('/'));
   return gm.readDir(containingDir).then((dirListing) => {
     const prevMarked = dirListing.filter((file) => file.match(without + '~\\d+.mei$'));
     let marked;
@@ -372,8 +374,8 @@ async function proposeFileName(fname) {
   let without = fname;
   let newname;
   let nameSpan = document.getElementById('commitFileName');
-  const containingDir = gm.filepath.substring(0, github.filepath.lastIndexOf('/'));
-  github.readDir(containingDir).then((dirListing) => {
+  const containingDir = gm.filepath.substring(0, gm.filepath.lastIndexOf('/'));
+  gm.readDir(containingDir).then((dirListing) => {
     if (suffixPos > 0) {
       // there's a dot and it's not at the start of the name
       // => treat everything after it as the suffix
@@ -429,12 +431,13 @@ export async function fillInBranchContents(e) {
           // TODO
           // gm.getActionWorkflowsList().then((resp) => handleWorkflowsListReceived(resp));
           if (e) {
-            branchContents.forEach((content) => {
-              const isDir = gm.isDir(content);
+            branchContents.forEach(async (content) => {
+              const isDir = await gm.isDir(content);
               githubMenu.innerHTML +=
-                `<a class="branchContents ${content.type}${isDir ? '' : ' closeOnClick'}" href="#">` +
+                `<a class="branchContents ${content.type}${isDir ? ' dir' : ' closeOnClick'}" href="#">` +
                 //  content.type === "dir" ? '<span class="btn icon icon-file-symlink-file inline-block-tight"></span>' : "" +
-                `<span class="filepath${isDir ? '' : ' closeOnClick'}">${content}</span>${isDir ? '...' : ''}</a>`;
+                `<span class="filepath${isDir ? ' dir' : ' closeOnClick'}">${content}</span>${isDir ? '...' : ''}</a>`;
+              assignGithubMenuClickHandlers();
             });
           } else {
             // Either User clicked file, or we're on forkAndOpen path, or restoring from local storage. Display commit interface
@@ -493,7 +496,7 @@ export async function fillInBranchContents(e) {
                 generateUrl()
               )})`;
               // FIXME - make this work with isomorphic-git and all cloud providers
-              const fullOpenIssueUrl = `https://github.com/${github.githubRepo}/issues/new?title=Issue+with+${meiFileName}&body=${openInMeiFriendUrl}`;
+              const fullOpenIssueUrl = `https://github.com/${gm.repo}/issues/new?title=Issue+with+${meiFileName}&body=${openInMeiFriendUrl}`;
               window.open(fullOpenIssueUrl, '_blank');
             });
             const reportIssueDivider = document.createElement('hr');
@@ -502,9 +505,10 @@ export async function fillInBranchContents(e) {
             reportIssue.target = '_blank';
             commitUI.appendChild(reportIssue);
           }
+          assignGithubMenuClickHandlers();
           fillInCommitLog('withRefresh');
           // GitHub menu interactions
-          assignGithubMenuClickHandlers();
+          console.log('In fillInBranchContents, Assigning click handlers to Github menu items...');
           v.setMenuColors();
         })
         .catch((err) => {
@@ -843,11 +847,11 @@ function handleCommitButtonClicked(e) {
           .then(() => {
             gm.push()
               .then(() => {
-                console.debug(`Successfully committed and pushed to github: ${github.githubRepo}${github.filepath}`);
+                console.debug(`Successfully committed and pushed to github: ${gm.repo}${gm.filepath}`);
                 messageInput.value = '';
                 if (newfile) {
                   // switch to new filepath
-                  github.filepath = github.filepath.substring(0, github.filepath.lastIndexOf('/') + 1) + newfile;
+                  gm.filepath = gm.filepath.substring(0, gm.filepath.lastIndexOf('/') + 1) + newfile;
                 }
                 // load after write (without clearing viewer metadata since we're loading same file again)
                 loadFile('', false);

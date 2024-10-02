@@ -165,7 +165,7 @@ def proxy(url):
     print(f"Credentials: {auth_str}")
 #   print(f"auth_str: {auth_str}")
     response = requests.request(method, url, headers=headers, data=request.get_data(), cookies=request.cookies)
-    print(f"Response from {url}: {response.text}")
+    #print(f"Response from {url}: {response.text}")
 
     # Prepare the response to return to the client
     excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection', 'www-authenticate']

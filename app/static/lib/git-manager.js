@@ -155,6 +155,7 @@ export default class GitManager {
 }
 
 async function removeRecursively(path) {
+  console.log('removing recursively: ', path);
   try {
     // Read the contents of the directory
     let files = await pfs.readdir(path);
