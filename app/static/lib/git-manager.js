@@ -149,6 +149,11 @@ export default class GitManager {
     });
   }
 
+  async listContents(path = this.filepath) {
+    // use the cloud client to fetch the contents of the current repository and branch
+    return await this.cloud.getFiles(this.repo, this.branch, path);
+  }
+
   async isDir(path = this.filepath) {
     return (await pfs.stat(this.directory + '/' + path)).type === 'dir';
   }

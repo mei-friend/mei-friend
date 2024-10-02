@@ -78,9 +78,33 @@ export default class GitCloudClient {
     console.log('getCommits');
   }
 
-  async getFiles(repo, branch) {
+  async getFiles(repo, branch, path) {
     // fetch all files of the current repository and branch from the cloud provider
-    console.log('getFiles');
+    // use appropriate API endpoint based on the provider
+    switch (this.providerType) {
+      case 'github':
+        return fetch(`https://api.github.com/repos/${repo}/contents/${path}?ref=${branch}`, {
+          method: 'GET',
+          headers: this.apiHeaders,
+        }).then((res) => res.json());
+      case 'gitlab':
+        return fetch(`https://gitlab.com/api/v4/projects/${repo}/repository/tree?ref=${branch}&path=${path}`, {
+          method: 'GET',
+          headers: this.apiHeaders,
+        }).then((res) => res.json());
+      case 'bitbucket':
+        return fetch(`https://api.bitbucket.org/2.0/repositories/${repo}/src/${branch}/${path}`, {
+          method: 'GET',
+          headers: this.apiHeaders,
+        }).then((res) => res.json());
+      case 'codeberg':
+        return fetch(`https://codeberg.org/api/v1/repos/${repo}/contents/${path}?ref=${branch}`, {
+          method: 'GET',
+          headers: this.apiHeaders,
+        }).then((res) => res.json());
+      default:
+        throw new Error('Unknown provider');
+    }
   }
 
   async getContents(repo, branch, path) {
