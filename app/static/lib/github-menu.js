@@ -724,8 +724,9 @@ async function fillInCommitLog(refresh = false) {
 } // fillInCommitLog()
 
 export function renderCommitLog(gitlog) {
+  console.log('git log: ', gitlog);
   let selectBranch = document.getElementById('selectBranch');
-  if (!selectBranch) {
+  if (!gitlog || !selectBranch) {
     // if user has navigated away from branch contents view while we
     // were waiting for the commit log, abandon it.
     return;
@@ -744,12 +745,11 @@ export function renderCommitLog(gitlog) {
   logTable.appendChild(headerRow);
   gitlog.forEach((c) => {
     const commitRow = document.createElement('tr');
-    // FIXME - make it work with other cloud providers
     commitRow.innerHTML = `
-      <td>${c.commit.author.timestamp}</td>
+      <td>${c.commit.author.date}</td>
       <td>${c.commit.author.name}</td>
       <td>${c.commit.message}</td>
-      <td><a target="_blank" href="https://github.com/${gm.repo}/commits/${c.sha}">${c.oid.slice(0, 8)}...</a></td>`;
+      <td><a target="_blank" href="https://github.com/${gm.repo}/commits/${c.sha}">${c.sha.slice(0, 8)}...</a></td>`;
     logTable.appendChild(commitRow);
   });
   const commitLogHeader = document.createElement('a');
@@ -954,8 +954,8 @@ export function setCommitUIEnabledStatus() {
 
 function setFileNameAfterLoad(ev) {
   const commitButton = document.getElementById('githubCommitButton');
-  commitButton.classList.remove('commitAsNewFile');
   if (commitButton) {
+    commitButton.classList.remove('commitAsNewFile');
     const commitFileName = document.getElementById('commitFileName');
     if (isMEI) {
       // trim preceding slash

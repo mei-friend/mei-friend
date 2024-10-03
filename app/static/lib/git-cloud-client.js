@@ -75,7 +75,32 @@ export default class GitCloudClient {
 
   async getCommits(repo, branch) {
     // fetch all commits of the current repository and branch from the cloud provider
-    console.log('getCommits');
+    // use appropriate API endpoint based on the provider
+    // TODO check this is not totally broken, non-github providers imagined by copilot
+    switch (this.providerType) {
+      case 'github':
+        return fetch(`https://api.github.com/repos/${repo}/commits?sha=${branch}`, {
+          method: 'GET',
+          headers: this.apiHeaders,
+        }).then((res) => res.json());
+      case 'gitlab':
+        return fetch(`https://gitlab.com/api/v4/projects/${repo}/repository/commits?ref_name=${branch}`, {
+          method: 'GET',
+          headers: this.apiHeaders,
+        }).then((res) => res.json());
+      case 'bitbucket':
+        return fetch(`https://api.bitbucket.org/2.0/repositories/${repo}/commits?branch=${branch}`, {
+          method: 'GET',
+          headers: this.apiHeaders,
+        }).then((res) => res.json());
+      case 'codeberg':
+        return fetch(`https://codeberg.org/api/v1/repos/${repo}/commits?ref=${branch}`, {
+          method: 'GET',
+          headers: this.apiHeaders,
+        }).then((res) => res.json());
+      default:
+        throw new Error('Unknown provider');
+    }
   }
 
   async getFiles(repo, branch, path) {

@@ -180,29 +180,7 @@ export default class GitManager {
   }
 
   async readLog() {
-    // ensure that the repository has been cloned
-    // if not, clone it
-    // then read the log
-    return pfs
-      .stat(this.directory)
-      .catch(async (err) => {
-        if (err.code === 'ENOENT') {
-          // directory does not exist (probably because we're bootstrapping from local storage)
-          // clone the repository
-          console.log('readLog: cloning repository');
-          await this.clone();
-        } else {
-          throw err;
-        }
-      })
-      .finally(async () => {
-        return await git.log({
-          fs,
-          dir: this.directory,
-          ref: this.branch,
-          follow: true, // follow renames of files
-        });
-      });
+    return this.cloud.getCommits(this.repo, this.branch);
   }
   async listBranches() {
     return await git.listBranches({
