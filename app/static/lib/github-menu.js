@@ -175,7 +175,48 @@ function branchContentsDirClicked(ev) {
 } // branchContentsDirClicked()
 
 function branchContentsFileClicked(ev) {
-  loadFile(ev.target.innerText);
+  const githubLoadingIndicator = document.getElementById('GithubLogo');
+  // load the file into the editor
+  // first, check whether the pfs directory corresponding to the provider has already been cloned; if not, clone it.
+  // 1. check if pfs has a directory for the provider
+  gm.pfsDirExists().then((exists) => {
+    if (!exists) {
+      // 2. if not, clone the repo
+      githubLoadingIndicator.classList.add('clockwise'); // removed by loadFile()
+      gm.clone().then(() => {
+        // 3. read the file
+        loadFile(ev.target.innerText);
+      });
+    } else {
+      // 2a. if it does, check the repo is the same as the one we want to load
+      gm.getRemote().then((remote) => {
+        if (remote !== gm.repo) {
+          // 3a. if not, clone the repo
+          githubLoadingIndicator.classList.add('clockwise'); // removed by loadFile()
+          gm.clone().then(() => {
+            // 4. read the file
+            loadFile(ev.target.innerText);
+          });
+        } else {
+          // 3b. if we already have the correct repo, check we're on the correct branch
+          gm.getBranch().then((branch) => {
+            if (branch !== gm.branch) {
+              // 4a. if not, checkout the correct branch
+              githubLoadingIndicator.classList.add('clockwise'); // removed by loadFile()
+              gm.checkout().then(() => {
+                // 5. read the file
+                loadFile(ev.target.innerText);
+              });
+            } else {
+              // 4b. if we're on the correct branch, read the file
+              // TODO consider whether to force (or offer) a git pull here first
+              loadFile(ev.target.innerText);
+            }
+          });
+        }
+      });
+    }
+  });
   document.getElementById('GithubMenu').classList.remove('forceShow');
 } // branchContentsFileClicked()
 

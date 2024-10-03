@@ -93,6 +93,35 @@ export default class GitManager {
     await git.clone(cloneobj);
   }
 
+  async getBranch() {
+    return await git.currentBranch({
+      fs,
+      dir: this.directory,
+    });
+  }
+
+  async getRemote() {
+    const remoteUrl = await git.getConfig({
+      fs,
+      dir: this.directory,
+      path: 'remote.origin.url',
+    });
+    switch (this.providerType) {
+      // TODO check these, they are imagined by copilot
+      // particularly, they should use the provider in the URI
+      case 'github':
+        return remoteUrl.match(/github.com\/([^/]+\/.+)/)[1];
+      case 'gitlab':
+        return remoteUrl.match(/gitlab.com\/([^/]+\/.+)/)[1];
+      case 'bitbucket':
+        return remoteUrl.match(/bitbucket.org\/([^/]+\/.+)/)[1];
+      case 'codeberg':
+        return remoteUrl.match(/codeberg.org\/([^/]+\/.+)/)[1];
+      default:
+        throw new Error('Unknown provider');
+    }
+  }
+
   async push() {
     await git.push({
       fs,
@@ -154,7 +183,23 @@ export default class GitManager {
     return await this.cloud.getFiles(this.repo, this.branch, path);
   }
 
+  async pfsDirExists() {
+    // check whether there is a directory in the pfs at this.directory
+    try {
+      await pfs.stat(this.directory);
+      return true;
+    } catch (err) {
+      if (err.code === 'ENOENT') {
+        return false;
+      } else {
+        throw err;
+      }
+    }
+  }
+
   async isDir(path = this.filepath) {
+    // check if a path in the repo is a directory
+    // on;y necessary if information not available from cloud provider
     return (await pfs.stat(this.directory + '/' + path)).type === 'dir';
   }
 }
