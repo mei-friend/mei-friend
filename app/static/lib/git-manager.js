@@ -43,8 +43,10 @@ export default class GitManager {
     return this.cloud.repo;
   }
 
-  async clone(url = this.cloud.getCloneURL(), branch = this.branch) {
+  async #prepareClone(url, branch) {
     // check if directory exists, if so check if changes have been made, etc.
+    // if directory exists, delete it (ideally after giving user option to commit changes)
+    // then clone
     await pfs
       .stat(this.directory)
       .then((stats) => {
@@ -55,9 +57,6 @@ export default class GitManager {
         removeRecursively(this.directory).catch((err) => {
           console.log('rmdir error', err);
         });
-        /*pfs.rmdir(this.directory, { recursive: true }).catch((err) => {
-          console.log('rmdir error', err);
-        });*/
       })
       .catch((err) => {
         if (err.code === 'ENOENT') {
@@ -67,7 +66,13 @@ export default class GitManager {
           console.log('stat error', err);
           throw err;
         }
+      })
+      .finally(() => {
+        this.#doClone(url, branch);
       });
+  }
+
+  async #doClone(url, branch) {
     // update branch
     this.branch = branch;
     console.log('cloning into', this.directory, this.token);
@@ -91,6 +96,11 @@ export default class GitManager {
     };
     console.log('cloneobj', cloneobj);
     await git.clone(cloneobj);
+  }
+
+  async clone(url = this.cloud.getCloneURL(), branch = this.branch) {
+    // external function to clone a repository
+    this.#prepareClone(url, branch);
   }
 
   async getBranch() {
@@ -155,7 +165,13 @@ export default class GitManager {
   }
 
   async readFile(path = this.filepath) {
-    return await pfs.readFile(this.directory + '/' + path, 'utf8');
+    try {
+      return await pfs.readFile(this.directory + '/' + path, 'utf8');
+    } catch (err) {
+      console.error('readFile error', err);
+      // TODO let the user know that the file does not exist
+      throw err;
+    }
   }
 
   async readDir(path = this.filepath.substring(0, this.filepath.lastIndexOf('/'))) {
@@ -164,12 +180,29 @@ export default class GitManager {
   }
 
   async readLog() {
-    return await git.log({
-      fs,
-      dir: this.directory,
-      depth: 10,
-      ref: this.branch,
-    });
+    // ensure that the repository has been cloned
+    // if not, clone it
+    // then read the log
+    return pfs
+      .stat(this.directory)
+      .catch(async (err) => {
+        if (err.code === 'ENOENT') {
+          // directory does not exist (probably because we're bootstrapping from local storage)
+          // clone the repository
+          console.log('readLog: cloning repository');
+          await this.clone();
+        } else {
+          throw err;
+        }
+      })
+      .finally(async () => {
+        return await git.log({
+          fs,
+          dir: this.directory,
+          ref: this.branch,
+          follow: true, // follow renames of files
+        });
+      });
   }
   async listBranches() {
     return await git.listBranches({

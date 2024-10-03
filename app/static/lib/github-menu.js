@@ -997,7 +997,7 @@ function handleCommitButtonClicked(e) {
                   gm.filepath = gm.filepath.substring(0, gm.filepath.lastIndexOf('/') + 1) + newfile;
                 }
                 // load after write (without clearing viewer metadata since we're loading same file again)
-                loadFile('', false);
+                //loadFile('', false);
               })
               .catch((e) => {
                 // TODO gracefully handle push error, informing user

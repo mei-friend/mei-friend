@@ -1664,19 +1664,21 @@ export let cmd = {
   doFind: () => {
     if (document.getElementById('persistentSearch').checked) {
       CodeMirror.commands.findPersistent(cm);
-    } else { CodeMirror.commands.find(cm); }
-    document.getElementById('CodeMirror-search-field')?.focus()
+    } else {
+      CodeMirror.commands.find(cm);
+    }
+    document.getElementById('CodeMirror-search-field')?.focus();
   },
   doFindNext: () => {
     if (document.getElementById('persistentSearch').checked) {
-      CodeMirror.commands.findPersistentNext(cm)
+      CodeMirror.commands.findPersistentNext(cm);
     } else {
       CodeMirror.commands.findNext(cm);
     }
   },
   doFindPrev: () => {
     if (document.getElementById('persistentSearch').checked) {
-      CodeMirror.commands.findPersistentPrev(cm)
+      CodeMirror.commands.findPersistentPrev(cm);
     } else {
       CodeMirror.commands.findPrev(cm);
     }
@@ -2483,10 +2485,11 @@ function setKeyMap() {
     document.querySelectorAll(key).forEach((el) => {
       el.setAttribute('tabindex', '-1');
       el.addEventListener('keydown', (ev) => {
-
         // filter out keypresses at certain elements, i.e. that contain preventKeyBindings class
-        if (document.activeElement.classList.contains('preventKeyBindings') ||
-          document.activeElement.closest('#encoding')) {
+        if (
+          document.activeElement.classList.contains('preventKeyBindings') ||
+          document.activeElement.closest('#encoding')
+        ) {
           console.log('Ignoring keypress in ' + document.activeElement.id);
           return;
         }
