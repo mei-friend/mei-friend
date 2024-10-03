@@ -268,6 +268,10 @@ export function updateLocalStorage(meiXml) {
         storage.content = meiXml;
       }
       if (isLoggedIn) {
+        // write new content to git
+        if (gm) {
+          gm.writeToLocalGit(gm.filepath, meiXml);
+        }
         updateGithubInLocalStorage();
       }
     } catch (err) {

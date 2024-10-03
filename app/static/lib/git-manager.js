@@ -194,6 +194,28 @@ export default class GitManager {
     return await this.cloud.getFiles(this.repo, this.branch, path);
   }
 
+  async fileModified(path = this.filepath) {
+    // check if a file in the repo has been modified
+    // only necessary if information not available from cloud provider
+
+    // strip leading slash to make git.status happy
+    if (path.startsWith('/')) {
+      path = path.substring(1);
+    }
+    try {
+      let status = await git.status({
+        fs,
+        dir: this.directory,
+        filepath: path,
+      });
+      console.log('status', status);
+      return status !== 'unmodified' && status !== 'ignored' && status !== 'absent';
+    } catch (err) {
+      console.error('fileModified error', err);
+      throw err;
+    }
+  }
+
   async pfsDirExists() {
     // check whether there is a directory in the pfs at this.directory
     try {
@@ -212,6 +234,18 @@ export default class GitManager {
     // check if a path in the repo is a directory
     // on;y necessary if information not available from cloud provider
     return (await pfs.stat(this.directory + '/' + path)).type === 'dir';
+  }
+
+  async writeToLocalGit(path, content) {
+    // ensure that we have cloned the repo
+    if (!(await this.pfsDirExists())) {
+      await this.clone().then(async () => {
+        console.log('attempting to write to', this.directory + path);
+        await pfs.writeFile(this.directory + path, content, 'utf8');
+      });
+    } else {
+      await pfs.writeFile(this.directory + '/' + path, content, 'utf8');
+    }
   }
 }
 

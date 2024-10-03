@@ -724,7 +724,6 @@ async function fillInCommitLog(refresh = false) {
 } // fillInCommitLog()
 
 export function renderCommitLog(gitlog) {
-  console.log('git log: ', gitlog);
   let selectBranch = document.getElementById('selectBranch');
   if (!gitlog || !selectBranch) {
     // if user has navigated away from branch contents view while we
@@ -924,6 +923,7 @@ export function refreshGithubMenu() {
 } // refreshGithubMenu()
 
 export function setCommitUIEnabledStatus() {
+  console.log('setting github commit UI enabled status');
   const commitButton = document.getElementById('githubCommitButton');
   if (commitButton) {
     const commitFileName = document.getElementById('commitFileName');
@@ -931,7 +931,7 @@ export function setCommitUIEnabledStatus() {
       // no name change => button reads "Commit"
       commitButton.classList.remove('commitAsNewFile');
       commitButton.setAttribute('value', translator.lang.githubCommitButton.value);
-      if (fileChanged) {
+      if (gm.fileModified()) {
         // enable commit UI if file has changed
         commitButton.removeAttribute('disabled');
         commitMessageInput.removeAttribute('disabled');
