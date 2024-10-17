@@ -227,8 +227,8 @@ export default class GitManager {
     // check whether there is a directory in the pfs at this.directory
     try {
       let stat = await pfs.stat(this.directory);
-      console.log('pfsDirExists', this.directory, stat);
-      return true;
+      console.log('pfsDirExists() directory, stat:', this.directory, stat);
+      return stat.isDirectory();
     } catch (err) {
       if (err.code === 'ENOENT') {
         return false;
