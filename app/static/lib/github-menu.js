@@ -181,6 +181,7 @@ function branchContentsFileClicked(ev) {
   // 1. check if pfs has a directory for the provider
   gm.pfsDirExists().then((exists) => {
     if (!exists) {
+      console.log('pfsDirExists() returned false');
       // 2. if not, clone the repo
       githubLoadingIndicator.classList.add('clockwise'); // removed by loadFile()
       gm.clone().then(() => {
@@ -190,7 +191,8 @@ function branchContentsFileClicked(ev) {
     } else {
       // 2a. if it does, check the repo is the same as the one we want to load
       gm.getRemote().then((remote) => {
-        if (remote !== gm.repo) {
+        console.log('getRemote worked!', remote);
+        if (!remote || remote !== gm.repo) {
           // 3a. if not, clone the repo
           githubLoadingIndicator.classList.add('clockwise'); // removed by loadFile()
           gm.clone().then(() => {

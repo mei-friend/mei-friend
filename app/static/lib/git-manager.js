@@ -111,25 +111,32 @@ export default class GitManager {
   }
 
   async getRemote() {
-    const remoteUrl = await git.getConfig({
-      fs,
-      dir: this.directory,
-      path: 'remote.origin.url',
-    });
-    switch (this.providerType) {
-      // TODO check these, they are imagined by copilot
-      // particularly, they should use the provider in the URI
-      case 'github':
-        return remoteUrl.match(/github.com\/([^/]+\/.+)/)[1];
-      case 'gitlab':
-        return remoteUrl.match(/gitlab.com\/([^/]+\/.+)/)[1];
-      case 'bitbucket':
-        return remoteUrl.match(/bitbucket.org\/([^/]+\/.+)/)[1];
-      case 'codeberg':
-        return remoteUrl.match(/codeberg.org\/([^/]+\/.+)/)[1];
-      default:
-        throw new Error('Unknown provider');
-    }
+    console.log('getRemote(), git: ', git, 'dir: ', this.directory, 'fs: ', fs);
+    return git
+      .listRemotes({
+        fs,
+        dir: this.directory,
+      })
+      .then((remote) => {
+        const remoteUrl = remote[0].url;
+        console.log('getRemote(), remoteUrl: ', remoteUrl);
+        if (remoteUrl) {
+          switch (this.providerType) {
+            // TODO check these, they are imagined by copilot
+            // particularly, they should use the provider in the URI
+            case 'github':
+              return remoteUrl.match(/github.com\/([^/]+\/.+)/)[1];
+            case 'gitlab':
+              return remoteUrl.match(/gitlab.com\/([^/]+\/.+)/)[1];
+            case 'bitbucket':
+              return remoteUrl.match(/bitbucket.org\/([^/]+\/.+)/)[1];
+            case 'codeberg':
+              return remoteUrl.match(/codeberg.org\/([^/]+\/.+)/)[1];
+            default:
+              throw new Error('Unknown provider');
+          }
+        }
+      });
   }
 
   async push() {
@@ -219,7 +226,8 @@ export default class GitManager {
   async pfsDirExists() {
     // check whether there is a directory in the pfs at this.directory
     try {
-      await pfs.stat(this.directory);
+      let stat = await pfs.stat(this.directory);
+      console.log('pfsDirExists', this.directory, stat);
       return true;
     } catch (err) {
       if (err.code === 'ENOENT') {
