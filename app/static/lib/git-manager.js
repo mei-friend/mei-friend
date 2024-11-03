@@ -47,60 +47,69 @@ export default class GitManager {
     // check if directory exists, if so check if changes have been made, etc.
     // if directory exists, delete it (ideally after giving user option to commit changes)
     // then clone
-    await pfs
-      .stat(this.directory)
-      .then((stats) => {
-        // directory exists
-        // TODO safety dance: check if changes have been made, give user option to commit, etc.
-        console.log('directory exists', stats);
-        // delete the directory
-        removeRecursively(this.directory).catch((err) => {
-          console.log('rmdir error', err);
-        });
-      })
-      .catch((err) => {
-        if (err.code === 'ENOENT') {
-          return false; // directory does not exist, all is well
-        } else {
-          // another error occurred...
-          console.log('stat error', err);
-          throw err;
-        }
-      })
-      .finally(() => {
-        this.#doClone(url, branch);
-      });
+    try {
+      let stats = await pfs.stat(this.directory);
+      // directory exists
+      // TODO safety dance: check if changes have been made, give user option to commit, etc.
+      console.log('directory exists', this.directory, stats);
+      // delete the directory
+      return removeRecursively(this.directory);
+    } catch (err) {
+      if (err.code === 'ENOENT') {
+        // directory does not exist, all is well
+        console.log('directory does not exist, all is well');
+      } else {
+        // another error occurred...
+        console.log('stat error', err);
+        throw err;
+      }
+    } /*finally {
+      await this.#doClone(url, branch);
+    }*/
   }
 
   async #doClone(url, branch) {
     // update branch
     this.branch = branch;
-    console.log('cloning into', this.directory, this.token);
-    await pfs.mkdir(this.directory);
-    let cloneobj = {
-      fs,
-      http,
-      url,
-      dir: this.directory,
-      ref: branch,
-      corsProxy: '/proxy',
-      singleBranch: false,
-      onAuth: this.onAuth,
-      onAuthFailure: () => {
-        console.log('auth failure');
-        return { cancel: true };
-      },
-      onAuthSuccess: () => {
-        console.log('auth success');
-      },
-    };
-    console.log('cloneobj', cloneobj);
-    await git.clone(cloneobj);
+    // create directory
+    console.log('creating directory', this.directory);
+    return await pfs.mkdir(this.directory).then(async () => {
+      await pfs.stat(this.directory).then(async (stat) => {
+        console.log('directory created:', stat);
+        console.log('cloning into', this.directory, this.token);
+        let cloneobj = {
+          fs,
+          http,
+          url,
+          dir: this.directory,
+          ref: branch,
+          corsProxy: '/proxy',
+          singleBranch: false,
+          onAuth: this.onAuth,
+          onAuthFailure: () => {
+            console.log('auth failure');
+            return { cancel: true };
+          },
+          onAuthSuccess: () => {
+            console.log('auth success');
+          },
+        };
+        console.log('cloneobj', cloneobj);
+        await git.clone(cloneobj);
+        console.log('cloned into ', this.directory);
+        console.log('readdir', await pfs.readdir(this.directory));
+      });
+    });
   }
 
   async clone(url = this.cloud.getCloneURL(), branch = this.branch) {
-    // external function to clone a repository
-    this.#prepareClone(url, branch);
+    // run the clone process:
+    // first run #prepareClone to check if the directory exists and delete it if it does
+    // then run #doClone to actually clone the repo
+    // note: ensure both functions are run before returning
+    await this.#prepareClone(url, branch).then(async () => {
+      await this.#doClone(url, branch);
+    });
   }
 
   async getBranch() {
@@ -257,25 +266,51 @@ export default class GitManager {
   }
 }
 
+// function removeRecursively:
+// recursively remove a directory and its contents
+
 async function removeRecursively(path) {
   console.log('removing recursively: ', path);
-  try {
-    // Read the contents of the directory
+  // Check if the path exists and is a directory
+  let stat = await pfs.stat(path);
+  if (stat.isDirectory()) {
     let files = await pfs.readdir(path);
-
     // Loop over each file or subdirectory
+    let promises = [];
     for (let file of files) {
       let fullPath = `${path}/${file}`;
-      let stats = await pfs.stat(fullPath);
-
-      if (stats.type === 'dir') {
-        // If it's a directory, call the function recursively
-        await removeRecursively(fullPath);
-      } else {
-        // If it's a file, delete it
-        await pfs.unlink(fullPath);
-      }
+      promises.push(removeRecursively(fullPath));
     }
+    // After all files/subdirectories are removed, remove the directory itself
+    console.log('Promises: ', promises);
+    await Promise.all(promises);
+    console.log(`Removing Directory '${path}'`);
+    return pfs.rmdir(path);
+  } else {
+    // If it's a file, delete it
+    console.log(`Deleting file '${path}'`);
+    return pfs.unlink(path);
+  }
+}
+
+/*async function removeRecursively(path, removeList = []) {
+  console.log('removing recursively: ', path); 
+  try {
+    // Check if the path exists and is a directory
+    let stat = await pfs.stat(path);
+    if (stat.isDirectory()) {
+      let files = await pfs.readdir(path);
+      // Loop over each file or subdirectory
+      for (let file of files) {
+        let fullPath = `${path}/${file}`;
+          await removeRecursively(fullPath);
+      }
+    } else {
+      // If it's a file, delete it
+      await pfs.unlink(fullPath);
+    }
+  try {
+    // Read the contents of the directory
 
     // After all files/subdirectories are removed, remove the directory itself
     await pfs.rmdir(path);
@@ -283,7 +318,7 @@ async function removeRecursively(path) {
   } catch (err) {
     console.error(`Failed to remove directory '${path}':`, err);
   }
-}
+}*/
 
 /*console.log('git.js loaded');
 

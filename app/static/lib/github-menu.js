@@ -179,15 +179,15 @@ function branchContentsFileClicked(ev) {
   // load the file into the editor
   // first, check whether the pfs directory corresponding to the provider has already been cloned; if not, clone it.
   // 1. check if pfs has a directory for the provider
-  gm.pfsDirExists().then((exists) => {
+  gm.pfsDirExists().then(async (exists) => {
     if (!exists) {
       console.log('pfsDirExists() returned false');
       // 2. if not, clone the repo
       githubLoadingIndicator.classList.add('clockwise'); // removed by loadFile()
-      gm.clone().then(() => {
-        // 3. read the file
-        loadFile(ev.target.innerText);
-      });
+      await gm.clone();
+      console.log('menu: clone() completed, doing load file');
+      // 3. read the file
+      loadFile(ev.target.innerText);
     } else {
       // 2a. if it does, check the repo is the same as the one we want to load
       gm.getRemote().then((remote) => {
