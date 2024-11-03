@@ -43,6 +43,14 @@ export default class GitManager {
     return this.cloud.repo;
   }
 
+  async checkout(branch) {
+    await git.checkout({
+      fs,
+      dir: this.directory,
+      ref: branch,
+    });
+  }
+
   async #prepareClone(url, branch) {
     // check if directory exists, if so check if changes have been made, etc.
     // if directory exists, delete it (ideally after giving user option to commit changes)
@@ -198,6 +206,7 @@ export default class GitManager {
   async readLog() {
     return this.cloud.getCommits(this.repo, this.branch);
   }
+
   async listBranches() {
     return await git.listBranches({
       fs,

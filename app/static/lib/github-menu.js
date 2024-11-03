@@ -150,10 +150,10 @@ async function userRepoClicked(ev) {
   }
 } // userRepoClicked()
 
-function repoBranchClicked(ev) {
+async function repoBranchClicked(ev) {
   const githubLoadingIndicator = document.getElementById('GithubLogo');
-  gm.branch = ev.target.innerText;
   gm.filepath = '/';
+  gm.branch = ev.target.innerText;
   githubLoadingIndicator.classList.add('clockwise');
   fillInBranchContents(ev);
   githubLoadingIndicator.classList.remove('clockwise');
@@ -181,6 +181,7 @@ function branchContentsFileClicked(ev) {
   // 1. check if pfs has a directory for the provider
   gm.pfsDirExists().then(async (exists) => {
     if (!exists) {
+      console.log('DECISION: 1');
       console.log('pfsDirExists() returned false');
       // 2. if not, clone the repo
       githubLoadingIndicator.classList.add('clockwise'); // removed by loadFile()
@@ -189,10 +190,13 @@ function branchContentsFileClicked(ev) {
       // 3. read the file
       loadFile(ev.target.innerText);
     } else {
+      console.log('DECISION: 2');
       // 2a. if it does, check the repo is the same as the one we want to load
       gm.getRemote().then((remote) => {
+        console.log('DECISION: 3');
         console.log('getRemote worked!', remote);
         if (!remote || remote !== gm.repo) {
+          console.log('DECISION: 4');
           // 3a. if not, clone the repo
           githubLoadingIndicator.classList.add('clockwise'); // removed by loadFile()
           gm.clone().then(() => {
@@ -200,16 +204,19 @@ function branchContentsFileClicked(ev) {
             loadFile(ev.target.innerText);
           });
         } else {
+          console.log('DECISION: 5');
           // 3b. if we already have the correct repo, check we're on the correct branch
           gm.getBranch().then((branch) => {
             if (branch !== gm.branch) {
+              console.log('DECISION: 6');
               // 4a. if not, checkout the correct branch
               githubLoadingIndicator.classList.add('clockwise'); // removed by loadFile()
-              gm.checkout().then(() => {
+              gm.checkout(branch).then(() => {
                 // 5. read the file
                 loadFile(ev.target.innerText);
               });
             } else {
+              console.log('DECISION: 7');
               // 4b. if we're on the correct branch, read the file
               // TODO consider whether to force (or offer) a git pull here first
               loadFile(ev.target.innerText);
@@ -366,7 +373,9 @@ export async function fillInUserRepos(per_page = 30, page = 1) {
 
 export async function fillInRepoBranches(e, repoBranches) {
   if (!repoBranches) {
-    repoBranches = await gm.listBranches();
+    const per_page = 100;
+    const page = 1;
+    repoBranches = await gm.cloud.getBranches(per_page, page);
   }
   console.log('fillInRepoBranches() got branches: ', repoBranches);
   let githubMenu = document.getElementById('GithubMenu');
