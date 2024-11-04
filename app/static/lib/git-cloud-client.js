@@ -108,7 +108,7 @@ export default class GitCloudClient {
     // use appropriate API endpoint based on the provider
     switch (this.providerType) {
       case 'github':
-        return fetch(`https://api.github.com/repos/${repo}/contents/${path}?ref=${branch}`, {
+        return fetch(`https://api.github.com/repos/${repo}/contents${path}?ref=${branch}`, {
           method: 'GET',
           headers: this.apiHeaders,
         }).then((res) => res.json());
@@ -118,12 +118,12 @@ export default class GitCloudClient {
           headers: this.apiHeaders,
         }).then((res) => res.json());
       case 'bitbucket':
-        return fetch(`https://api.bitbucket.org/2.0/repositories/${repo}/src/${branch}/${path}`, {
+        return fetch(`https://api.bitbucket.org/2.0/repositories/${repo}/src/${branch}${path}`, {
           method: 'GET',
           headers: this.apiHeaders,
         }).then((res) => res.json());
       case 'codeberg':
-        return fetch(`https://codeberg.org/api/v1/repos/${repo}/contents/${path}?ref=${branch}`, {
+        return fetch(`https://codeberg.org/api/v1/repos/${repo}/contents${path}?ref=${branch}`, {
           method: 'GET',
           headers: this.apiHeaders,
         }).then((res) => res.json());
