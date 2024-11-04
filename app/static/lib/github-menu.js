@@ -206,12 +206,14 @@ function branchContentsFileClicked(ev) {
         } else {
           console.log('DECISION: 5');
           // 3b. if we already have the correct repo, check we're on the correct branch
-          gm.getBranch().then((branch) => {
+          gm.getBranch().then(async (branch) => {
             if (branch !== gm.branch) {
-              console.log('DECISION: 6');
+              console.log('DECISION: 6', branch, gm.branch);
               // 4a. if not, checkout the correct branch
               githubLoadingIndicator.classList.add('clockwise'); // removed by loadFile()
-              gm.checkout(branch).then(() => {
+              await gm.checkout(branch).then(async () => {
+                console.log('menu: checkout() completed, branch now: ', await gm.getBranch());
+                console.log('menu: checkout() completed, files in repo now: ', await pfs.readdir(gm.directory));
                 // 5. read the file
                 loadFile(ev.target.innerText);
               });
