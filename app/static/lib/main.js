@@ -268,10 +268,6 @@ export function updateLocalStorage(meiXml) {
         storage.content = meiXml;
       }
       if (isLoggedIn) {
-        // write new content to git
-        if (gm) {
-          gm.writeToLocalGit(gm.filepath, meiXml);
-        }
         updateGithubInLocalStorage();
       }
     } catch (err) {
@@ -2186,6 +2182,7 @@ function addEventListeners(v, cm) {
     if (!cm.blockChanges) {
       e.updateMatchingTagName(cm, changeObj);
       handleEditorChanges();
+      //checkEditorChanges();
     }
   }); // cm.on() change listener
 
@@ -2379,41 +2376,29 @@ export function setStandoffAnnotationEnabledStatus() {
   }
 }
 
-function checkEditorChanges() {
-  // check if we need to action an editor change
+// handles any changes in CodeMirror
+export async function handleEditorChanges() {
+  // fileChanged flag may have been set from storage
+  let changeIndicator = true;
+  let meiXml = cm.getValue();
+  if (isLoggedIn && gm.filepath) {
+    // if it's a git file, write to git
+    console.log('Writing to git...');
+    let status = await gm.writeAndReturnStatus(meiXml);
+    console.log('Written to git, status ', status);
+    changeIndicator = status !== 'unmodified';
+    console.log('File changed state based on git modification status: ' + status);
+  }
   if (freshlyLoaded) {
     // ignore changes resulting from fresh file load
     freshlyLoaded = false;
-    // ...unless the flag in local storage is set
-    if (fileChanged) {
-      handleEditorChanges();
-    }
-  } else if (isLoggedIn && github.filepath && commitUI) {
-    // we are working from git
-    // check status of file to see whether change indicator should be set
-    gm.status().then((status) => {
-      if (status !== 'unmodified') {
-        // changes detected, so handle the changes
-        handleEditorChanges();
-      } else {
-        // no changes detected, so clear the change indicator
-        v.clearChangeIndicator();
-      }
-    });
   } else {
-    // any other CM changes should be treated as editor changes
-    handleEditorChanges();
+    setFileChangedState(changeIndicator);
   }
-}
-
-// handles any changes in CodeMirror
-export function handleEditorChanges() {
-  freshlyLoaded = false;
-  const commitUI = document.querySelector('#commitUI');
   v.notationUpdated(cm);
   if (storage.supported) {
     // on every set of changes, save editor content
-    updateLocalStorage(cm.getValue());
+    updateLocalStorage(meiXml);
   }
   if (document.getElementById('showAnnotations').checked || document.getElementById('showAnnotationPanel').checked) {
     readAnnots(); // from annotation.js

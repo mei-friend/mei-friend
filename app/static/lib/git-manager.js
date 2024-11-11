@@ -182,6 +182,10 @@ export default class GitManager {
   }
 
   async add(path = this.filepath) {
+    if (path.startsWith('/')) {
+      path = path.substring(1);
+    }
+    console.log('add', path, this.directory);
     await git.add({
       fs,
       dir: this.directory,
@@ -197,11 +201,14 @@ export default class GitManager {
     });
   }
 
-  async status() {
+  async status(path = this.filepath) {
+    if (path.startsWith('/')) {
+      path = path.substring(1);
+    }
     return await git.status({
       fs,
       dir: this.directory,
-      filepath: 'README.md',
+      filepath: path,
     });
   }
 
@@ -279,15 +286,22 @@ export default class GitManager {
     return (await pfs.stat(this.directory + '/' + path)).type === 'dir';
   }
 
-  async writeToLocalGit(path, content) {
+  async writeAndReturnStatus(content, path = this.filepath) {
     // ensure that we have cloned the repo
+    console.log('called writeToLocalGit with path', path);
     if (!(await this.pfsDirExists())) {
-      await this.clone().then(async () => {
+      console.log('repo not cloned, cloning');
+      return await this.clone().then(async () => {
         console.log('attempting to write to', this.directory + path);
         await pfs.writeFile(this.directory + path, content, 'utf8');
+        await this.add();
+        return await this.status();
       });
     } else {
+      console.log('attempting to write directly to', this.directory + path);
       await pfs.writeFile(this.directory + '/' + path, content, 'utf8');
+      await this.add();
+      return await this.status();
     }
   }
 }
