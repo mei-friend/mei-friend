@@ -935,8 +935,7 @@ export function refreshGithubMenu() {
   }
 } // refreshGithubMenu()
 
-export function setCommitUIEnabledStatus() {
-  console.log('setting github commit UI enabled status');
+export async function setCommitUIEnabledStatus() {
   const commitButton = document.getElementById('githubCommitButton');
   if (commitButton) {
     const commitFileName = document.getElementById('commitFileName');
@@ -944,11 +943,13 @@ export function setCommitUIEnabledStatus() {
       // no name change => button reads "Commit"
       commitButton.classList.remove('commitAsNewFile');
       commitButton.setAttribute('value', translator.lang.githubCommitButton.value);
-      if (gm.fileModified()) {
+      if (await gm.fileChanged()) {
+        console.log('setting github commit UI enabled status: change detected');
         // enable commit UI if file has changed
         commitButton.removeAttribute('disabled');
         commitMessageInput.removeAttribute('disabled');
       } else {
+        console.log('setting github commit UI enabled status: NO CHANGE');
         // disable commit UI if file hasn't changed
         commitButton.setAttribute('disabled', '');
         commitMessageInput.setAttribute('disabled', '');

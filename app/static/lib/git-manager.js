@@ -86,9 +86,7 @@ export default class GitManager {
         console.log('stat error', err);
         throw err;
       }
-    } /*finally {
-      await this.#doClone(url, branch);
-    }*/
+    }
   }
 
   async #doClone(url, branch) {
@@ -185,12 +183,16 @@ export default class GitManager {
     if (path.startsWith('/')) {
       path = path.substring(1);
     }
-    console.log('add', path, this.directory);
-    await git.add({
-      fs,
-      dir: this.directory,
-      filepath: path,
-    });
+    console.log('add', this.filepath, path, this.directory);
+    if (path) {
+      await git.add({
+        fs,
+        dir: this.directory,
+        filepath: path,
+      });
+    } else {
+      console.log('git-manager: add() called with no path');
+    }
   }
 
   async commit(message) {
@@ -210,6 +212,11 @@ export default class GitManager {
       dir: this.directory,
       filepath: path,
     });
+  }
+
+  async fileChanged(path = this.filepath) {
+    let status = await this.status(path);
+    return status !== 'unmodified' && status !== 'absent';
   }
 
   async readFile(path = this.filepath) {
@@ -241,28 +248,6 @@ export default class GitManager {
   async listContents(path = this.filepath) {
     // use the cloud client to fetch the contents of the current repository and branch
     return await this.cloud.getFiles(this.repo, this.branch, path);
-  }
-
-  async fileModified(path = this.filepath) {
-    // check if a file in the repo has been modified
-    // only necessary if information not available from cloud provider
-
-    // strip leading slash to make git.status happy
-    if (path.startsWith('/')) {
-      path = path.substring(1);
-    }
-    try {
-      let status = await git.status({
-        fs,
-        dir: this.directory,
-        filepath: path,
-      });
-      console.log('status', status);
-      return status !== 'unmodified' && status !== 'ignored' && status !== 'absent';
-    } catch (err) {
-      console.error('fileModified error', err);
-      throw err;
-    }
   }
 
   async pfsDirExists() {
@@ -332,55 +317,3 @@ async function removeRecursively(path) {
     return pfs.unlink(path);
   }
 }
-
-/*async function removeRecursively(path, removeList = []) {
-  console.log('removing recursively: ', path); 
-  try {
-    // Check if the path exists and is a directory
-    let stat = await pfs.stat(path);
-    if (stat.isDirectory()) {
-      let files = await pfs.readdir(path);
-      // Loop over each file or subdirectory
-      for (let file of files) {
-        let fullPath = `${path}/${file}`;
-          await removeRecursively(fullPath);
-      }
-    } else {
-      // If it's a file, delete it
-      await pfs.unlink(fullPath);
-    }
-  try {
-    // Read the contents of the directory
-
-    // After all files/subdirectories are removed, remove the directory itself
-    await pfs.rmdir(path);
-    console.log(`Directory '${path}' removed successfully`);
-  } catch (err) {
-    console.error(`Failed to remove directory '${path}':`, err);
-  }
-}*/
-
-/*console.log('git.js loaded');
-
-let gm = new GitManager('github', 'github', githubToken);
-console.log('gm created');
-//console.log('readdir', await pfs.readdir(git.dir));
-let test = 'github';
-if (test === 'github') {
-  console.log('github');
-  await gm.clone('https://github.com/isogit-test/private');
-} else if (test === 'gitlab') {
-  console.log('gitlab');
-  await gm.clone('https://gitlab.com/musicog/test-public.git');
-}
-console.log('cloned');
-console.log('reading', gm.directory);
-let out = await pfs.readdir(gm.directory);
-console.log('read', out);
-let contents = await gm.readFile('./README.md');
-console.log('contents', contents);
-//console.log('readdir', await pfs.readdir(git.dir));
-//await gm.clone('https://github.com/isogit-test/private');
-await gm.status();
-console.log('git.js executed');
-*/

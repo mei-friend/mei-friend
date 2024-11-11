@@ -186,7 +186,8 @@ export function setFileChangedState(fileChangedState) {
     fileStatusElement.classList.remove('changed');
     fileChangedIndicatorElement.innerText = '';
   }
-  if (isLoggedIn && github && github.filepath && commitUI) {
+  if (isLoggedIn && gm && gm.filepath && commitUI) {
+    console.log('Calling setCommitUIEnabledStatus() from setFileChangedState() in main');
     setCommitUIEnabledStatus();
   }
   if (storage.supported) {
