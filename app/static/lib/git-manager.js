@@ -45,7 +45,17 @@ export default class GitManager {
 
   async checkout() {
     // first perform a fetch to ensure we have all branches
-    await git.fetch({
+    await this.fetch();
+    // now checkout the branch
+    return await git.checkout({
+      fs,
+      dir: this.directory,
+      ref: this.branch,
+    });
+  }
+
+  async fetch() {
+    return await git.fetch({
       fs,
       http,
       onAuth: this.onAuth,
@@ -57,12 +67,6 @@ export default class GitManager {
         console.log('auth success');
       },
       dir: this.directory,
-    });
-    // now checkout the branch
-    return await git.checkout({
-      fs,
-      dir: this.directory,
-      ref: this.branch,
     });
   }
 
@@ -176,6 +180,14 @@ export default class GitManager {
       fs,
       http,
       dir: this.directory,
+      onAuth: this.onAuth,
+      onAuthFailure: () => {
+        console.log('auth failure');
+        return { cancel: true };
+      },
+      onAuthSuccess: () => {
+        console.log('auth success');
+      },
     });
   }
 
@@ -199,6 +211,7 @@ export default class GitManager {
     await git.commit({
       fs,
       dir: this.directory,
+      author: await this.cloud.getAuthor(),
       message: message,
     });
   }
@@ -216,6 +229,7 @@ export default class GitManager {
 
   async fileChanged(path = this.filepath) {
     let status = await this.status(path);
+    console.log('git-manager fileChanged status:', status);
     return status !== 'unmodified' && status !== 'absent';
   }
 

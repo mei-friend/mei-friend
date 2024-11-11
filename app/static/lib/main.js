@@ -2389,6 +2389,7 @@ export async function handleEditorChanges() {
     console.log('Written to git, status ', status);
     changeIndicator = status !== 'unmodified';
     console.log('File changed state based on git modification status: ' + status);
+    setCommitUIEnabledStatus();
   }
   if (freshlyLoaded) {
     // ignore changes resulting from fresh file load

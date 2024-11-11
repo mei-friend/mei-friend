@@ -77,9 +77,13 @@ export default class GitCloudClient {
     // fetch all commits of the current repository and branch from the cloud provider
     // use appropriate API endpoint based on the provider
     // TODO check this is not totally broken, non-github providers imagined by copilot
+
+    // to circumvent GitHub API caching, add a cache buster to the URL
+    let cache_buster = Math.random();
+    // this is a hack to get around the GitHub API caching (URL is unique every time)
     switch (this.providerType) {
       case 'github':
-        return fetch(`https://api.github.com/repos/${repo}/commits?sha=${branch}`, {
+        return fetch(`https://api.github.com/repos/${repo}/commits?sha=${branch}&cache_buster=${cache_buster}`, {
           method: 'GET',
           headers: this.apiHeaders,
         }).then((res) => res.json());

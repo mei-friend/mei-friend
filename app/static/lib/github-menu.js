@@ -738,6 +738,7 @@ async function fillInCommitLog(refresh = false) {
 
 export function renderCommitLog(gitlog) {
   let selectBranch = document.getElementById('selectBranch');
+  console.log('renderCommitLog()', gitlog, selectBranch);
   if (!gitlog || !selectBranch) {
     // if user has navigated away from branch contents view while we
     // were waiting for the commit log, abandon it.
@@ -1003,34 +1004,39 @@ function handleCommitButtonClicked(e) {
         gm.commit(message)
           .then(() => {
             gm.push()
-              .then(() => {
+              .then(async () => {
                 console.debug(`Successfully committed and pushed to github: ${gm.repo}${gm.filepath}`);
                 messageInput.value = '';
                 if (newfile) {
                   // switch to new filepath
                   gm.filepath = gm.filepath.substring(0, gm.filepath.lastIndexOf('/') + 1) + newfile;
                 }
-                // load after write (without clearing viewer metadata since we're loading same file again)
-                //loadFile('', false);
+                console.log('Filepath after commit: ', gm.filepath);
+                console.log('Status after commit: ', await gm.status());
+                setCommitUIEnabledStatus();
+                console.log('attempting to fill in commit log');
+                githubLoadingIndicator.classList.remove('clockwise');
+                cm.setOption('readOnly', false);
+                fillInCommitLog('withRefresh');
               })
               .catch((e) => {
                 // TODO gracefully handle push error, informing user
-                cm.readOnly = false;
                 githubLoadingIndicator.classList.remove('clockwise');
+                cm.setOption('readOnly', false);
                 console.warn("Couldn't push Github repo: ", e, github);
               });
           })
           .catch((e) => {
             // TODO gracefully handle commit error, informing user
-            cm.readOnly = false;
             githubLoadingIndicator.classList.remove('clockwise');
+            cm.setOption('readOnly', false);
             console.warn("Couldn't commit Github repo: ", e, github);
           });
       })
       .catch((e) => {
         // TODO gracefully handle staging / add error, informing user
-        cm.readOnly = false;
         githubLoadingIndicator.classList.remove('clockwise');
+        cm.setOption('readOnly', false);
         console.warn("Couldn't stage Github repo: ", e, github);
       });
   } else {
