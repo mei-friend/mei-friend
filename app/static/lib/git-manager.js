@@ -208,6 +208,7 @@ export default class GitManager {
   }
 
   async commit(message) {
+    await this.add(this.filepath);
     await git.commit({
       fs,
       dir: this.directory,
@@ -323,19 +324,21 @@ export default class GitManager {
   }
 
   async writeAndReturnStatus(content, path = this.filepath) {
+    // ensure that path has a leading slash
+    if (!path.startsWith('/')) {
+      path = '/' + path;
+    }
     // ensure that we have cloned the repo
     if (!(await this.pfsDirExists())) {
       console.log('repo not cloned, cloning');
       return await this.clone().then(async () => {
         console.log('attempting to write to', this.directory + path);
-        await pfs.writeFile(this.directory + '/' + path, content, 'utf8');
-        await this.add(path);
+        await pfs.writeFile(this.directory + path, content, 'utf8');
         return await this.status(path);
       });
     } else {
       console.log('attempting to write directly to', this.directory + path);
-      await pfs.writeFile(this.directory + '/' + path, content, 'utf8');
-      await this.add(path);
+      await pfs.writeFile(this.directory + path, content, 'utf8');
       return await this.status();
     }
   }

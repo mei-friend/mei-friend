@@ -528,6 +528,7 @@ export async function fillInBranchContents(e) {
         commitButton.setAttribute('id', 'githubCommitButton');
         commitButton.setAttribute('type', 'button');
         commitButton.classList.add('closeOnClick');
+        commitButton.removeEventListener('click', handleCommitButtonClicked);
         commitButton.addEventListener('click', handleCommitButtonClicked);
         commitUI.appendChild(commitFileNameEdit);
         commitUI.appendChild(commitMessageInput);
@@ -1002,10 +1003,10 @@ async function handleCommitButtonClicked(e) {
     if (commitNewFile) {
       await prepareNewFileForCommit();
     }
-    doCommit();
+    await doCommit();
     if (commitNewFile) {
       setMeiFileInfo(gm.filepath, gm.repo, gm.repo + ':');
-      loadFile(gm.filepath);
+      loadFile();
       updateFileStatusDisplay();
     }
   } else {
@@ -1020,8 +1021,10 @@ async function prepareNewFileForCommit() {
   const commitFileName = document.getElementById('commitFileName');
   const newFileName = commitFileName.innerText;
   // write to new file
-  gm.writeAndReturnStatus(cm.getValue(), newFileName)
+  return await gm
+    .writeAndReturnStatus(cm.getValue(), newFileName)
     .then(async (status) => {
+      console.log('Successfully wrote new file to Github repo: ', status);
       gm.filepath = gm.filepath.substring(0, gm.filepath.lastIndexOf('/') + 1) + newFileName;
       console.log('Filepath after write: ', gm.filepath);
       return await gm.status();
@@ -1031,55 +1034,31 @@ async function prepareNewFileForCommit() {
     });
 } // prepareNewFileForCommit()
 
-function doCommit() {
+async function doCommit() {
   console.log('doCommit with filepath ', gm.filepath);
+  const commitButton = document.getElementById('githubCommitButton');
   const messageInput = document.getElementById('commitMessageInput');
   const message = messageInput.value;
   const githubLoadingIndicator = document.getElementById('GithubLogo');
-  gm.add()
-    .then(() => {
-      gm.commit(message)
-        .then(() => {
-          gm.push()
-            .then(async () => {
-              console.debug(`Successfully committed and pushed to github: ${gm.repo}${gm.filepath}`);
-              messageInput.value = '';
-              if (newfile) {
-                // switch to new filepath
-                gm.filepath = gm.filepath.substring(0, gm.filepath.lastIndexOf('/') + 1) + newfile;
-              }
-              console.log('Filepath after commit: ', gm.filepath);
-              console.log('Status after commit: ', await gm.status());
-              setCommitUIEnabledStatus();
-              console.log('attempting to fill in commit log');
-              // the following two clean-up lines are replicated in both the then block and each catch block below.
-              // why not just put them in a finally block?
-              // because we want the loading indicator to stop spinning only after the commit log has been refreshed
-              githubLoadingIndicator.classList.remove('clockwise');
-              cm.setOption('readOnly', false);
-              fillInCommitLog('withRefresh');
-            })
-            .catch((e) => {
-              // TODO gracefully handle push error, informing user
-              githubLoadingIndicator.classList.remove('clockwise');
-              cm.setOption('readOnly', false);
-              console.warn("Couldn't push Github repo: ", e, github);
-            });
-        })
-        .catch((e) => {
-          // TODO gracefully handle commit error, informing user
-          githubLoadingIndicator.classList.remove('clockwise');
-          cm.setOption('readOnly', false);
-          console.warn("Couldn't commit Github repo: ", e, github);
-        });
-    })
-    .catch((e) => {
-      // TODO gracefully handle staging / add error, informing user
-      githubLoadingIndicator.classList.remove('clockwise');
-      cm.setOption('readOnly', false);
-      console.warn("Couldn't stage Github repo: ", e, github);
-    });
+  try {
+    await gm.add();
+    await gm.commit(message);
+    await gm.push();
+  } catch (e) {
+    // TODO gracefully handle error, informing user
+    githubLoadingIndicator.classList.remove('clockwise');
+    cm.setOption('readOnly', false);
+    console.warn("Couldn't do commit and push: ", e);
+  }
+  console.debug(`Successfully committed and pushed to github: ${gm.repo}${gm.filepath}`);
+  messageInput.value = '';
+  console.log('Status after commit: ', await gm.status());
+  setCommitUIEnabledStatus();
+  githubLoadingIndicator.classList.remove('clockwise');
+  cm.setOption('readOnly', false);
+  fillInCommitLog('withRefresh');
 } // doCommit()
+
 function stripMeiFileName() {
   const stripped = meiFileName.match(/^.*\/([^\/]+)$/);
   if (Array.isArray(stripped)) {
