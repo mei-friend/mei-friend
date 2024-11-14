@@ -173,7 +173,7 @@ export function setIsMEI(bool) {
   isMEI = !!bool;
 }
 
-export function setFileChangedState(fileChangedState) {
+export async function setFileChangedState(fileChangedState) {
   fileChanged = fileChangedState;
   const fileStatusElement = document.querySelector('.fileStatus');
   const fileChangedIndicatorElement = document.querySelector('#fileChanged');

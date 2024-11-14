@@ -238,7 +238,7 @@ function loadFile(fileName = '', clearBeforeLoading = true, ev = null) {
   fillInBranchContents(ev);
   githubLoadingIndicator.classList.add('clockwise');
   gm.readFile()
-    .then((content) => {
+    .then(async (content) => {
       githubLoadingIndicator.classList.remove('clockwise');
       cm.readOnly = false;
       document.getElementById('statusBar').innerText = translator.lang.loadingFromGithub.text + '...';
@@ -251,7 +251,7 @@ function loadFile(fileName = '', clearBeforeLoading = true, ev = null) {
       handleEncoding(content, true, true, clearBeforeLoading); // retains current page and selection after commit
       setFileNameAfterLoad();
       updateFileStatusDisplay();
-      setFileChangedState(false);
+      setFileChangedState(await gm.fileChanged());
       updateGithubInLocalStorage();
       setFileLocationType('github');
       setStandoffAnnotationEnabledStatus();
@@ -467,7 +467,7 @@ export async function fillInBranchContents(e) {
   // TODO handle > per_page files (similar to userRepos)
   let target = document.getElementById('contentsHeader');
   gm.listContents(gm.filepath)
-    .then((branchContents) => {
+    .then(async (branchContents) => {
       console.log('fillInBranchContents() got contents: ', branchContents);
       let githubMenu = document.getElementById('GithubMenu');
       githubMenu.innerHTML = `
@@ -535,7 +535,7 @@ export async function fillInBranchContents(e) {
         commitUI.appendChild(commitButton);
         githubMenu.appendChild(commitUI);
         setFileNameAfterLoad();
-        setFileChangedState(fileChanged);
+        setFileChangedState(await gm.fileChanged());
         commitMessageInput.removeEventListener('input', onMessageInput);
         commitMessageInput.addEventListener('input', onMessageInput);
         commitFileName.removeEventListener('input', onFileNameEdit);
@@ -1021,11 +1021,12 @@ async function prepareNewFileForCommit() {
   const commitFileName = document.getElementById('commitFileName');
   const newFileName = commitFileName.innerText;
   // write to new file
+  let newFilePath = gm.filepath.substring(0, gm.filepath.lastIndexOf('/') + 1) + newFileName;
   return await gm
-    .writeAndReturnStatus(cm.getValue(), newFileName)
+    .writeAndReturnStatus(cm.getValue(), newFilePath)
     .then(async (status) => {
       console.log('Successfully wrote new file to Github repo: ', status);
-      gm.filepath = gm.filepath.substring(0, gm.filepath.lastIndexOf('/') + 1) + newFileName;
+      gm.filepath = newFilePath;
       console.log('Filepath after write: ', gm.filepath);
       return await gm.status();
     })
@@ -1054,6 +1055,8 @@ async function doCommit() {
   messageInput.value = '';
   console.log('Status after commit: ', await gm.status());
   setCommitUIEnabledStatus();
+  updateFileStatusDisplay();
+  setFileChangedState(await gm.fileChanged());
   githubLoadingIndicator.classList.remove('clockwise');
   cm.setOption('readOnly', false);
   fillInCommitLog('withRefresh');
