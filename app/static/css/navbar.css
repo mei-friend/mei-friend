@@ -278,13 +278,23 @@
   max-height: calc(1em + 2px);
 }
 
+.fileStatus .fileNameContainer {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fileStatus :is(.fileNameContainer:hover, .fileNameContainer:active) {
+  overflow: visible;
+  text-overflow: initial;
+  text-wrap: wrap;
+}
+
 .fileStatus #fileName {
   white-space: pre;
 }
 
 .fileStatus #fileChanged {
-  margin-left: -0.2em;
-  margin-right: 0.5em;
+  margin-left: 0.2em;
 }
 
 .fileStatus.changed {
