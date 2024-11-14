@@ -138,8 +138,8 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='css/annotationPanel.css') }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='css/icons.css') }}" />
-    <script src="https://unpkg.com/@isomorphic-git/lightning-fs"></script>
-    <script src="https://unpkg.com/isomorphic-git@beta"></script>
+    <script src="{{ url_for('static', filename='deps/lightning-fs.js') }}"></script>
+    <script src="{{ url_for('static', filename='deps/isomorphic-git.umd.min.js') }}"></script>
     <script type="module" src="{{ url_for('static', filename='lib/main.js') }}"></script>
 
     <script type="module" src="{{ url_for('static', filename='lib/git-cloud-client.js') }}"></script>

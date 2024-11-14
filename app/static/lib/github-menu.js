@@ -987,9 +987,10 @@ function setFileNameAfterLoad(ev) {
 } // setFileNameAfterLoad()
 
 // handle Github commit UI
-function handleCommitButtonClicked(e) {
-  const commitFileName = document.getElementById('commitFileName');
+async function handleCommitButtonClicked(e) {
   const messageInput = document.getElementById('commitMessageInput');
+  const commitButton = document.getElementById('githubCommitButton');
+  let commitNewFile = commitButton.classList.contains('commitAsNewFile');
   const message = messageInput.value;
   console.log('Got message: ', message);
   if (message) {
@@ -998,47 +999,15 @@ function handleCommitButtonClicked(e) {
     cm.readOnly = 'nocursor'; // don't allow editor focus
     // try commiting to Github
     githubLoadingIndicator.classList.add('clockwise');
-    const newfile = commitFileName.innerText !== stripMeiFileName() ? commitFileName.innerText : null;
-    gm.add()
-      .then(() => {
-        gm.commit(message)
-          .then(() => {
-            gm.push()
-              .then(async () => {
-                console.debug(`Successfully committed and pushed to github: ${gm.repo}${gm.filepath}`);
-                messageInput.value = '';
-                if (newfile) {
-                  // switch to new filepath
-                  gm.filepath = gm.filepath.substring(0, gm.filepath.lastIndexOf('/') + 1) + newfile;
-                }
-                console.log('Filepath after commit: ', gm.filepath);
-                console.log('Status after commit: ', await gm.status());
-                setCommitUIEnabledStatus();
-                console.log('attempting to fill in commit log');
-                githubLoadingIndicator.classList.remove('clockwise');
-                cm.setOption('readOnly', false);
-                fillInCommitLog('withRefresh');
-              })
-              .catch((e) => {
-                // TODO gracefully handle push error, informing user
-                githubLoadingIndicator.classList.remove('clockwise');
-                cm.setOption('readOnly', false);
-                console.warn("Couldn't push Github repo: ", e, github);
-              });
-          })
-          .catch((e) => {
-            // TODO gracefully handle commit error, informing user
-            githubLoadingIndicator.classList.remove('clockwise');
-            cm.setOption('readOnly', false);
-            console.warn("Couldn't commit Github repo: ", e, github);
-          });
-      })
-      .catch((e) => {
-        // TODO gracefully handle staging / add error, informing user
-        githubLoadingIndicator.classList.remove('clockwise');
-        cm.setOption('readOnly', false);
-        console.warn("Couldn't stage Github repo: ", e, github);
-      });
+    if (commitNewFile) {
+      await prepareNewFileForCommit();
+    }
+    doCommit();
+    if (commitNewFile) {
+      setMeiFileInfo(gm.filepath, gm.repo, gm.repo + ':');
+      loadFile(gm.filepath);
+      updateFileStatusDisplay();
+    }
   } else {
     // no commit without a comit message!
     messageInput.classList.add('warn');
@@ -1047,6 +1016,70 @@ function handleCommitButtonClicked(e) {
   }
 } // handleCommitButtonClicked()
 
+async function prepareNewFileForCommit() {
+  const commitFileName = document.getElementById('commitFileName');
+  const newFileName = commitFileName.innerText;
+  // write to new file
+  gm.writeAndReturnStatus(cm.getValue(), newFileName)
+    .then(async (status) => {
+      gm.filepath = gm.filepath.substring(0, gm.filepath.lastIndexOf('/') + 1) + newFileName;
+      console.log('Filepath after write: ', gm.filepath);
+      return await gm.status();
+    })
+    .catch((e) => {
+      console.warn("Couldn't write new file to Github repo: ", e, github);
+    });
+} // prepareNewFileForCommit()
+
+function doCommit() {
+  console.log('doCommit with filepath ', gm.filepath);
+  const messageInput = document.getElementById('commitMessageInput');
+  const message = messageInput.value;
+  const githubLoadingIndicator = document.getElementById('GithubLogo');
+  gm.add()
+    .then(() => {
+      gm.commit(message)
+        .then(() => {
+          gm.push()
+            .then(async () => {
+              console.debug(`Successfully committed and pushed to github: ${gm.repo}${gm.filepath}`);
+              messageInput.value = '';
+              if (newfile) {
+                // switch to new filepath
+                gm.filepath = gm.filepath.substring(0, gm.filepath.lastIndexOf('/') + 1) + newfile;
+              }
+              console.log('Filepath after commit: ', gm.filepath);
+              console.log('Status after commit: ', await gm.status());
+              setCommitUIEnabledStatus();
+              console.log('attempting to fill in commit log');
+              // the following two clean-up lines are replicated in both the then block and each catch block below.
+              // why not just put them in a finally block?
+              // because we want the loading indicator to stop spinning only after the commit log has been refreshed
+              githubLoadingIndicator.classList.remove('clockwise');
+              cm.setOption('readOnly', false);
+              fillInCommitLog('withRefresh');
+            })
+            .catch((e) => {
+              // TODO gracefully handle push error, informing user
+              githubLoadingIndicator.classList.remove('clockwise');
+              cm.setOption('readOnly', false);
+              console.warn("Couldn't push Github repo: ", e, github);
+            });
+        })
+        .catch((e) => {
+          // TODO gracefully handle commit error, informing user
+          githubLoadingIndicator.classList.remove('clockwise');
+          cm.setOption('readOnly', false);
+          console.warn("Couldn't commit Github repo: ", e, github);
+        });
+    })
+    .catch((e) => {
+      // TODO gracefully handle staging / add error, informing user
+      githubLoadingIndicator.classList.remove('clockwise');
+      cm.setOption('readOnly', false);
+      console.warn("Couldn't stage Github repo: ", e, github);
+    });
+} // doCommit()
 function stripMeiFileName() {
   const stripped = meiFileName.match(/^.*\/([^\/]+)$/);
   if (Array.isArray(stripped)) {

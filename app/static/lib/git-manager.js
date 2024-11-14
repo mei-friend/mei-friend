@@ -1,4 +1,4 @@
-import http from 'https://unpkg.com/isomorphic-git@beta/http/web/index.js';
+import http from '../deps/isomorphic-git.http.js';
 import GitCloudClient from './git-cloud-client.js';
 
 window.fs = new LightningFS('fs', { wipe: true });
@@ -252,6 +252,43 @@ export default class GitManager {
     return this.cloud.getCommits(this.repo, this.branch);
   }
 
+  async directlyReadFileContents(rawUri) {
+    return this.cloud
+      .fetchFileContents(rawUri)
+      .then((res) => {
+        // if image or blob, read base64 encoding
+        // otherwise read text
+        if (isImageUri(rawUri) || isBlobUri(rawUri)) {
+          return res.blob();
+        } else {
+          return res.text();
+        }
+      })
+      .then((data) => {
+        if (typeof data === 'string') {
+          return new Promise((resolve) => resolve(data));
+        } else {
+          return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+              let result = reader.result;
+              if (typeof result == 'string') {
+                // result is a dataUrl; replace default raw github content-type with correct one for resource
+                result = this.cloud.replaceContentType(rawUri, result);
+              }
+              resolve(result);
+            };
+            if (isBlobUri(rawUri)) {
+              reader.readAsArrayBuffer(data);
+            } else {
+              // image - read as data URL to allow inline embedding
+              reader.readAsDataURL(data);
+            }
+          });
+        }
+      });
+  }
+
   async listBranches() {
     return await git.listBranches({
       fs,
@@ -287,19 +324,18 @@ export default class GitManager {
 
   async writeAndReturnStatus(content, path = this.filepath) {
     // ensure that we have cloned the repo
-    console.log('called writeToLocalGit with path', path);
     if (!(await this.pfsDirExists())) {
       console.log('repo not cloned, cloning');
       return await this.clone().then(async () => {
         console.log('attempting to write to', this.directory + path);
-        await pfs.writeFile(this.directory + path, content, 'utf8');
-        await this.add();
-        return await this.status();
+        await pfs.writeFile(this.directory + '/' + path, content, 'utf8');
+        await this.add(path);
+        return await this.status(path);
       });
     } else {
       console.log('attempting to write directly to', this.directory + path);
       await pfs.writeFile(this.directory + '/' + path, content, 'utf8');
-      await this.add();
+      await this.add(path);
       return await this.status();
     }
   }
@@ -330,4 +366,24 @@ async function removeRecursively(path) {
     console.log(`Deleting file '${path}'`);
     return pfs.unlink(path);
   }
-}
+} // removeRecursively()
+
+// helper functions to determine the type of a URI
+
+function isImageUri(uri) {
+  // images
+  const imgSuffices = ['gif', 'jpg', 'jpeg', 'png', 'tif', 'tif', 'webp'];
+  return isUriWithSuffix(uri, imgSuffices);
+} // isImageUri()
+
+function isBlobUri(uri) {
+  // binary objects (currently: compressed musicxml files)
+  const blobSuffices = ['mxl', 'zip'];
+  return isUriWithSuffix(uri, blobSuffices);
+} // isBlobUri()
+
+function isUriWithSuffix(uri, suffices) {
+  // return true if uri has a suffix and it matches one of the provided ones (case-insensitively)
+  const suffix = uri.substring(uri.lastIndexOf('.') + 1);
+  return suffices.filter((s) => suffix.localeCompare(s, undefined, { sensitivity: 'base' }) == 0).length;
+} // isUriWithSuffix()

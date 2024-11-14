@@ -213,4 +213,53 @@ export default class GitCloudClient {
         throw new Error('Unknown provider');
     }
   }
+
+  async fetchFileContents(rawUri) {
+    // TODO make this work for other git providers
+    const components = rawUri.match(/https:\/\/raw.githubusercontent.com\/([^/]+)\/([^/]+)\/([^/]+)(.*)$/);
+    let headers = { ...this.apiHeaders };
+    headers.Accept = 'application/vnd.github.raw'; // add raw accept header
+    try {
+      const fileContentsUrl = `https://api.github.com/repos/${components[1]}/${components[2]}/contents${components[4]}`;
+      console.log('fetchFileContents: attempting to use fileContentsUrl ', fileContentsUrl);
+      console.log('Using headers ', headers);
+      return await fetch(fileContentsUrl, {
+        method: 'GET',
+        headers: headers,
+      });
+    } catch (e) {
+      console.warn('Failed to fetch file contents', e);
+    }
+  }
+
+  async replaceContentType(fileContentsUrl, result) {
+    // TODO make this work for other git providers
+    return result.replace('application/vnd.github.raw', uriSuffixToMimetype(fileContentsUrl));
+  }
 }
+
+function uriSuffixToMimetype(uri) {
+  const types = {
+    mei: 'application/xml',
+    xml: 'application/xml',
+    mxl: 'application/vnd.recordare.musicxml',
+    abc: 'text/plain',
+    krn: 'text/plain',
+    pae: 'text/plain',
+    gif: 'image/gif',
+    jpg: 'image/jpeg',
+    jpeg: 'image/jpeg',
+    png: 'image/png',
+    tif: 'image/tiff',
+    tiff: 'image/tiff',
+    svg: 'image/svg+xml',
+    webp: 'image/webp',
+  };
+  const tkeys = Object.keys(types);
+  const suffix = uri.substring(uri.lastIndexOf('.') + 1);
+  const matches = tkeys.filter((k) => suffix.localeCompare(k, undefined, { sensitivity: 'base' }) == 0);
+  if (matches.length) {
+    return types[matches[0]];
+  }
+  return 'application/octet-stream'; //default type
+} // uriSuffixToMimetype()
