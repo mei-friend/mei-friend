@@ -191,6 +191,9 @@ export default class GitCloudClient {
     author.name = user.name || user.login;
     author.username = user.login;
     author.email = user.email || '';
+    if (!author.email && this.providerType === 'github') {
+      author.email = author.username + '@users.noreply.github.com';
+    }
     this.author = author;
     return author;
   }
