@@ -236,7 +236,7 @@ export function loadDataInEditor(mei, setFreshlyLoaded = true) {
   }
   freshlyLoaded = setFreshlyLoaded;
   cm.setValue(mei);
-  v.loadXml(mei);
+  v.loadXml(mei, true);
   cmd.checkFacsimile();
   loadFacsimile(v.xmlDoc); // load all facsimila data of MEI
   let bs = document.getElementById('breaksSelect');
@@ -1583,6 +1583,8 @@ export let cmd = {
   },
   checkFacsimile: () => {
     let tf = document.getElementById('titleFacsimilePanel');
+    let f = v.xmlDoc.querySelector('facsimile');
+    console.log('checkFacsimile() called, facsimile present: ', f);
     if (v.xmlDoc.querySelector('facsimile')) {
       if (tf) tf.setAttribute('open', 'true');
       cmd.showFacsimilePanel();
