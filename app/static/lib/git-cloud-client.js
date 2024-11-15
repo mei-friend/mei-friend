@@ -48,12 +48,35 @@ export default class GitCloudClient {
   }
 
   async getOrgs() {
+    // fetch all organizations the user belongs to from the cloud provider
     return fetch(this.orgsUrl, {
       method: 'GET',
       headers: this.apiHeaders,
     }).then((res) => res.json());
-    // fetch all organizations the user belongs to from the cloud provider
-    console.log('getOrganizations');
+  }
+
+  async getSpecifiedUserOrgRepos(userOrg, per_page = 30, page = 1) {
+    let reposUrl;
+    switch (this.providerType) {
+      case 'github':
+        reposUrl = `https://api.github.com/users/${userOrg}/repos?per_page=${per_page}&page=${page}`;
+        break;
+      case 'gitlab':
+        reposUrl = `https://gitlab.com/api/v4/groups/${userOrg}/projects?per_page=${per_page}&page=${page}`;
+        break;
+      case 'bitbucket':
+        reposUrl = `https://api.bitbucket.org/2.0/repositories/${userOrg}?pagelen=${per_page}&page=${page}`;
+        break;
+      case 'codeberg':
+        reposUrl = `https://codeberg.org/api/v1/orgs/${userOrg}/repos?per_page=${per_page}&page=${page}`;
+        break;
+      default:
+        throw new Error('Unknown provider');
+    }
+    return fetch(reposUrl, {
+      method: 'GET',
+      headers: this.apiHeaders,
+    }).then((res) => res.json());
   }
 
   async getRepos(per_page = 30, page = 1) {
