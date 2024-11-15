@@ -236,7 +236,35 @@ export default class GitManager {
 
   async readFile(path = this.filepath) {
     try {
-      return await pfs.readFile(this.directory + '/' + path, 'utf8');
+      let content;
+      // remove leading slash if present
+      if (path.startsWith('/')) {
+        path = path.substring(1);
+      }
+      if (isBlobUri(path)) {
+        //  content = await pfs.readFile(this.directory + '/' + path, { encoding: null });
+        // determine current commit oid
+        let oid = await git.resolveRef({
+          fs,
+          dir: this.directory,
+          ref: this.branch,
+        });
+        // read the file at the current commit
+        content = await git.readBlob({
+          fs,
+          dir: this.directory,
+          oid: oid,
+          filepath: path,
+        });
+        console.log('readFile content from blob : ', content);
+        content = content.blob.buffer;
+        console.log('readFile buffer content from blob : ', content);
+        return content;
+      } else {
+        console.log('readFile content from string: ', content);
+        content = await pfs.readFile(this.directory + '/' + path, encoding);
+        return content;
+      }
     } catch (err) {
       console.error('readFile error', err);
       // TODO let the user know that the file does not exist
@@ -246,7 +274,11 @@ export default class GitManager {
 
   async readDir(path = this.filepath.substring(0, this.filepath.lastIndexOf('/'))) {
     // defaults to reading containing dir of current filepath if no path is provided
-    return await pfs.readdir(this.directory + '/' + path);
+    // ensure path has a leading slash
+    if (!path.startsWith('/')) {
+      path = '/' + path;
+    }
+    return await pfs.readdir(this.directory + path);
   }
 
   async readLog() {
