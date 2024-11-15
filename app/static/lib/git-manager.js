@@ -256,12 +256,9 @@ export default class GitManager {
           oid: oid,
           filepath: path,
         });
-        console.log('readFile content from blob : ', content);
         content = content.blob.buffer;
-        console.log('readFile buffer content from blob : ', content);
         return content;
       } else {
-        console.log('readFile content from string: ', content);
         content = await pfs.readFile(this.directory + '/' + path, encoding);
         return content;
       }
