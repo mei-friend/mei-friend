@@ -152,7 +152,9 @@ def proxy(url):
     headers["Origin"] = headers["Referer"].strip("/")
     headers["Sec-Fetch-Site"] = "cross-site"
     headers["TE"] = "trailers" 
-    auth_str = session['userLogin'] + ':' + session['githubToken']
+    auth_str = ''
+    if 'userLogin' in session:
+        auth_str = session['userLogin'] + ':' + session['githubToken']
 #    headers['Authorization'] = 'Bearer ' + b64encode(auth_str.encode()).decode()
 #    headers['Authorization'] = 'Basic ' + b64encode(auth_str.encode()).decode()
 #    headers['Authorization'] = 'Bearer ' + b64encode(session['githubToken'].encode()).decode()
