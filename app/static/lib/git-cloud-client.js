@@ -208,7 +208,6 @@ export default class GitCloudClient {
   }
 
   setAuthor(user) {
-    console.log('setAuthor: ', user);
     let author = {};
     // set the author object to the provided object
     author.name = user.name || user.login;
@@ -235,6 +234,70 @@ export default class GitCloudClient {
         return `https://${this.provider}/bitbucket/${this.gm.repo}`;
       case 'codeberg':
         return `https://${this.provider}/codeberg/${this.gm.repo}`;
+      default:
+        throw new Error('Unknown provider');
+    }
+  }
+
+  async createPR(target) {
+    // create a pull request of the current gm branch to the target branch
+    // use appropriate API endpoint based on the provider
+    // use title and body text as provided below:
+    let title = 'mei-friend PR for branch ' + this.gm.branch;
+    let body = 'This PR was automatically created using mei-friend';
+    switch (this.providerType) {
+      case 'github':
+        return fetch(`https://api.github.com/repos/${this.gm.repo}/pulls`, {
+          method: 'POST',
+          headers: this.apiHeaders,
+          body: JSON.stringify({
+            title: title,
+            body: body,
+            head: this.gm.branch,
+            base: target,
+          }),
+        }).then((res) => res.json());
+      case 'gitlab':
+        return fetch(`https://gitlab.com/api/v4/projects/${this.gm.repo}/merge_requests`, {
+          method: 'POST',
+          headers: this.apiHeaders,
+          body: JSON.stringify({
+            title: title,
+            description: body,
+            source_branch: this.gm.branch,
+            target_branch: target,
+          }),
+        }).then((res) => res.json());
+      case 'bitbucket':
+        return fetch(`https://api.bitbucket.org/2.0/repositories/${this.gm.repo}/pullrequests`, {
+          method: 'POST',
+          headers: this.apiHeaders,
+          body: JSON.stringify({
+            title: title,
+            description: body,
+            source: {
+              branch: {
+                name: this.gm.branch,
+              },
+            },
+            destination: {
+              branch: {
+                name: target,
+              },
+            },
+          }),
+        }).then((res) => res.json());
+      case 'codeberg':
+        return fetch(`https://codeberg.org/api/v1/repos/${this.gm.repo}/pulls`, {
+          method: 'POST',
+          headers: this.apiHeaders,
+          body: JSON.stringify({
+            title: title,
+            body: body,
+            head: this.gm.branch,
+            base: target,
+          }),
+        }).then((res) => res.json());
       default:
         throw new Error('Unknown provider');
     }
