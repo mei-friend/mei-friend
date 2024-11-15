@@ -175,6 +175,39 @@ export default class GitManager {
       });
   }
 
+  async createBranch(commitMsg) {
+    // create a new branch, commiting and pushing changes to it:
+    // first, generate a new branch name like this.username + number
+    // where number is the next unused number for this.username
+    let branches = await this.listBranches();
+    let author = await this.cloud.getAuthor();
+    let username = author.username;
+    console.log('creating branch for user', username);
+    // search for branches that start with username
+    let userBranches = branches.filter((branch) => branch.startsWith(username));
+    // find the highest number
+    let highest = 0;
+    userBranches.forEach((branch) => {
+      let num = parseInt(branch.substring(username.length));
+      if (num && num > highest) {
+        highest = num;
+      }
+    });
+    let branch = username + '-' + (highest + 1);
+    // then create the branch locally
+    await git.branch({ fs, dir: this.directory, ref: branch });
+    // update the branch in the gm object
+    this.branch = branch;
+    // commit to the new branch
+    await this.commit(commitMsg);
+    // check out the branch
+    await this.checkout();
+    // then push the branch to the remote
+    await this.push();
+
+    return branch;
+  }
+
   async push() {
     await git.push({
       fs,
@@ -188,6 +221,8 @@ export default class GitManager {
       onAuthSuccess: () => {
         console.log('auth success');
       },
+      ref: this.branch,
+      remoteRef: 'refs/heads/' + this.branch,
     });
   }
 
@@ -213,6 +248,7 @@ export default class GitManager {
       fs,
       dir: this.directory,
       author: await this.cloud.getAuthor(),
+      ref: this.branch,
       message: message,
     });
   }
