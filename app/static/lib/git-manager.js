@@ -259,7 +259,7 @@ export default class GitManager {
         content = content.blob.buffer;
         return content;
       } else {
-        content = await pfs.readFile(this.directory + '/' + path, encoding);
+        content = await pfs.readFile(this.directory + '/' + path, 'utf8');
         return content;
       }
     } catch (err) {
