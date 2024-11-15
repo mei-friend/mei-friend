@@ -184,11 +184,13 @@ export default class GitManager {
     let username = author.username;
     console.log('creating branch for user', username);
     // search for branches that start with username
-    let userBranches = branches.filter((branch) => branch.startsWith(username));
+    let userBranches = branches.filter((branch) => branch.startsWith(username + '-'));
+    console.log('userBranches', userBranches);
     // find the highest number
     let highest = 0;
     userBranches.forEach((branch) => {
-      let num = parseInt(branch.substring(username.length));
+      console.log('considering', branch);
+      let num = parseInt(branch.substring(username.length + 1));
       if (num && num > highest) {
         highest = num;
       }
