@@ -378,8 +378,8 @@ a:active {
   float: right;
 }
 
-.openUrlOverlay .openUrlUI>div,
-.forkRepositoryOverlay .forkRepositoryUI>div {
+.openUrlOverlay .openUrlUI > div,
+.forkRepositoryOverlay .forkRepositoryUI > div {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -400,8 +400,8 @@ a:active {
   cursor: pointer;
 }
 
-.openUrlOverlay .openUrlUI details>div,
-.forkRepositoryOverlay .forkRepositoryUI details>div {
+.openUrlOverlay .openUrlUI details > div,
+.forkRepositoryOverlay .forkRepositoryUI details > div {
   margin-left: 1em;
 }
 
@@ -1537,7 +1537,7 @@ select {
   text-align: left;
 }
 
-select>option {
+select > option {
   background-color: var(--dropdownBackgroundColor);
   color: var(--textColor);
 }
@@ -1610,6 +1610,21 @@ select>option {
 /* When moving the mouse over the close button */
 .alertCloseButton:hover {
   color: black;
+}
+
+#promptContent {
+  margin: auto;
+  text-align: center;
+}
+
+#promptButtons {
+  display: none;
+  text-align: center;
+  padding-top: 2.2em;
+}
+
+.promptButton {
+  margin: 0.5em;
 }
 
 #filterSettings {
