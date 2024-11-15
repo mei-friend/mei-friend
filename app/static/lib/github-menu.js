@@ -1050,6 +1050,48 @@ async function doCommit() {
     githubLoadingIndicator.classList.remove('clockwise');
     cm.setOption('readOnly', false);
     console.warn("Couldn't do commit and push: ", e);
+    v.showUserPrompt(
+      "Couldn't commit and push to Github: " + e,
+      [
+        {
+          label: 'Cancel - do not commit',
+          event: () => {
+            v.hideUserPrompt();
+          },
+        },
+        {
+          label: 'Commit to new branch and open a Pull Request',
+          event: async () => {
+            // push changes to a new branch
+            let oldBranch = gm.branch;
+            gm.createBranch(message)
+              .then(() => {
+                // redraw the github menu to show new branch
+                fillInBranchContents();
+                // create PR
+                gm.cloud
+                  .createPR(oldBranch)
+                  .then((pr) => {
+                    console.log('Created PR: ', pr);
+                    v.hideUserPrompt();
+                    // update git menu to show new branch name and include link to PR github page
+                  })
+                  .catch((e) => {
+                    console.warn("Couldn't create PR: ", e);
+                    v.hideUserPrompt();
+                    v.showAlert("Couldn't create PR: " + e);
+                  });
+              })
+              .catch((e) => {
+                console.warn("Couldn't create branch: ", e);
+                v.hideUserPrompt();
+                v.showAlert("Couldn't create branch: " + e);
+              });
+          },
+        },
+      ],
+      'warning'
+    );
   }
   console.debug(`Successfully committed and pushed to github: ${gm.repo}${gm.filepath}`);
   messageInput.value = '';
