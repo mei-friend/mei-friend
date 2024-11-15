@@ -2284,10 +2284,10 @@ export default class Viewer {
     this.setFocusToVerovioPane();
   } // showUserPrompt()
 
-  hideUserPrompt(modalid) {
+  hideUserPrompt(modalid = 'promptOverlay') {
     document.getElementById(modalid).style.display = 'none';
   }
-  
+
   // Update alert message of #alertOverlay
   updateAlert(newMsg) {
     let alertOverlay = document.getElementById('alertOverlay');
