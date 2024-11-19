@@ -437,7 +437,7 @@ function addMarkupToXML(v, cm, attrName = 'none', mElName, multiLayerContent = [
           // make new element out of attribute and handle it as element to be surrounded
           let attrValue = el.getAttribute(attrName);
           let attrEl = document.createElementNS(dutils.meiNameSpace, attrName);
-          let uuid = mintSuppliedId(id, attrName);
+          let uuid = mintSuppliedId(id, attrName, v);
           attrEl.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
           attrEl.setAttribute(attrName, attrValue);
           el.removeAttribute(attrName);
