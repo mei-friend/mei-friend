@@ -133,8 +133,18 @@ export default class GitCloudClient {
   async getFiles(repo, branch, path) {
     // fetch all files of the current repository and branch from the cloud provider
     // use appropriate API endpoint based on the provider
+
+    // first prepare the path:
+    // remove trailing slash from path
+    if (path.endsWith('/')) {
+      path = path.slice(0, -1);
+    }
+    // encode the path
+    path = encodeURIComponent(path);
+
     switch (this.providerType) {
       case 'github':
+        // remove trailng slash from path
         return fetch(`https://api.github.com/repos/${repo}/contents${path}?ref=${branch}`, {
           method: 'GET',
           headers: this.apiHeaders,
