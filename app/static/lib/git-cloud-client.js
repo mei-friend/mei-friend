@@ -335,6 +335,69 @@ export default class GitCloudClient {
     // TODO make this work for other git providers
     return result.replace('application/vnd.github.raw', uriSuffixToMimetype(fileContentsUrl));
   }
+
+  async fork(callback, forkTo = this.userLogin) {
+    let forksUrl;
+    switch (this.providerType) {
+      case 'github':
+        forksUrl = `https://api.github.com/repos/${this.gm.repo}/forks`;
+        break;
+      case 'gitlab':
+        forksUrl = `https://gitlab.com/api/v4/projects/${encodeURIComponent(this.gm.repo)}/fork`;
+        break;
+      case 'bitbucket':
+        forksUrl = `https://api.bitbucket.org/2.0/repositories/${this.gm.repo}/forks`;
+        break;
+      case 'codeberg':
+        forksUrl = `https://codeberg.org/api/v1/repos/${this.gm.repo}/forks`;
+        break;
+      default:
+        throw new Error('Unknown provider');
+    }
+    await fetch(forksUrl, {
+      method: 'GET',
+      headers: this.apiHeaders,
+    })
+      .then((res) => {
+        if (res.status <= 400) return res.json();
+        else throw res;
+      })
+      .then(async (data) => {
+        const userFork = data.filter((f) => f.owner.login === forkTo)[0];
+        // If we don't yet have a user fork, create one
+        if (!userFork) {
+          // create new fork for user
+          let fetchRequestObject = {
+            method: 'POST',
+            headers: this.apiHeaders,
+          };
+          if (forkTo !== this.userLogin) {
+            // if we are forking to an organization rather than
+            // the user's personal repositories, we have to add
+            // a note to say so to the request body
+            fetchRequestObject.body = JSON.stringify({
+              organization: forkTo,
+            });
+          }
+          await fetch(forksUrl, fetchRequestObject).then((res) => {
+            if (res.status <= 400) {
+              res.json().then((userFork) => {
+                // switch to newly created fork
+                this.gm.repo = userFork.full_name;
+              });
+            } else throw res;
+          });
+        } else {
+          this.gm.repo = userFork.full_name;
+        }
+        // initialise page with user's fork
+        callback(this);
+      })
+      .catch((err) => {
+        console.warn("Couldn't retrieve forks from ", forksUrl, ': ', err);
+        return Promise.reject(err);
+      });
+  }
 }
 
 function uriSuffixToMimetype(uri) {

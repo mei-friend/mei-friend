@@ -1,5 +1,5 @@
 import { calcSizeOfContainer } from './resizer.js';
-import { sampleEncodings, samp, github, translator } from './main.js';
+import { sampleEncodings, samp, gm, translator } from './main.js';
 import { forkRepoClicked } from './github-menu.js';
 
 const seperator = '|MEI-FRIEND|';
@@ -77,7 +77,7 @@ async function fillInUserOrgRepos(per_page = 30, page = 1) {
   if (userOrg) {
     // user or org specified
     const prevRepos = userOrgRepos.childNodes;
-    const repos = await github.getSpecifiedUserOrgRepos(userOrg, per_page, page);
+    const repos = await gm.getSpecifiedUserOrgRepos(userOrg, per_page, page);
     if (Array.isArray(repos)) {
       repos.forEach((repo) => {
         const repoOpt = document.createElement('option');
@@ -149,7 +149,7 @@ function onSelectRepository(e) {
   }
 } // onSelectRepository()
 
-export function forkAndOpen(github, url) {
+export async function forkAndOpen(gm, url) {
   // ensure URL matches our expectations
   // (fully qualified raw github url)
   const components = url.match(/https?:\/\/raw.githubusercontent.com\/([^/]+)\/([^/]+)\/([^/]+)\/([^/]+)/);
@@ -161,15 +161,14 @@ export function forkAndOpen(github, url) {
     fc.style.display = 'block';
     let userOrg = components[1];
     let repo = components[2];
-    let branch = components[3];
-    let file = components[4];
 
-    document.querySelector('#forkRepoRequested').innerText = `${components[1]}/${components[2]}`;
+    document.querySelector('#forkRepoRequested').innerText = `${userOrg}/${repo}`;
 
     let forkToSelector = document.getElementById('forkAndOpenSelector');
+    let author = await gm.getAuthor();
     // forkToSelector: User's options as to where to fork the repository to
-    forkToSelector.innerHTML = `<option value="${github.userLogin}">${github.userLogin}</option>`;
-    github.getOrganizations().then((orgs) =>
+    forkToSelector.innerHTML = `<option value="${author.username}">${author.username}</option>`;
+    gm.getOrgs().then((orgs) =>
       orgs.forEach((org) => {
         try {
           let orgName = org.organization.login;
@@ -182,14 +181,14 @@ export function forkAndOpen(github, url) {
     // forkAndOpen fork button
     const forkAndOpenButton = document.getElementById('forkAndOpenButton');
     if (forkAndOpenButton) {
-      forkAndOpenButton.addEventListener('click', () => forkAndOpenClicked(github, components));
+      forkAndOpenButton.addEventListener('click', () => forkAndOpenClicked(components));
     }
   } else {
     console.warn("'fork' parameter specified but supplied URL violates raw GitHub URL expectations");
   }
 } // forkAndOpen()
 
-export function forkAndOpenClicked(github, components) {
+export function forkAndOpenClicked(components) {
   // set up values for forkRepoClicked():
   document.getElementById('forkRepositoryInputName').value = components[1];
   document.getElementById('forkRepositoryInputRepoOverride').value = components[2];
@@ -199,7 +198,8 @@ export function forkAndOpenClicked(github, components) {
   forkRepoClicked();
 } // forkAndOpenClicked()
 
-export function forkRepository(github, components) {
+export async function forkRepository(gm) {
+  let author = await gm.getAuthor();
   let sz = calcSizeOfContainer();
   let fc = document.querySelector('#forkRepositoryOverlay');
   fc.width = sz.width * 0.25;
@@ -237,8 +237,8 @@ export function forkRepository(github, components) {
   onSelectComposer(); // initialise
 
   // forkToSelector: User's options as to where to fork the repository to
-  forkToSelector.innerHTML = `<option value="${github.userLogin}">${github.userLogin}</option>`;
-  github.getOrganizations().then((orgs) =>
+  forkToSelector.innerHTML = `<option value="${author.username}">${author.username}</option>`;
+  gm.getOrgs().then((orgs) =>
     orgs.forEach((org) => {
       try {
         let orgName = org.organization.login;

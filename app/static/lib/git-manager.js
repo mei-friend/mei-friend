@@ -409,6 +409,42 @@ export default class GitManager {
       return await this.status();
     }
   }
+
+  async fork(callback, forkTo) {
+    return await this.cloud.fork(callback, forkTo);
+  }
+
+  async getAuthor() {
+    return await this.cloud.getAuthor();
+  }
+
+  async getBranches(per_page, page) {
+    return await this.cloud.getBranches(per_page, page);
+  }
+
+  async getRepos(per_page, page) {
+    return await this.cloud.getRepos(per_page, page);
+  }
+
+  async getOrgs() {
+    return await this.cloud.getOrgs();
+  }
+
+  async getSpecifiedUserOrgRepos(userOrg, per_page, page) {
+    return await this.cloud.getSpecifiedUserOrgRepos(userOrg, per_page, page);
+  }
+
+  async createPR(branch) {
+    return await this.cloud.createPR(branch);
+  }
+
+  async getWorkflowInputs(path) {
+    return await this.cloud.getWorkflowInputs(path);
+  }
+
+  async awaitActionWorkflowCompletion(workflowId) {
+    return await this.cloud.awaitActionWorkflowCompletion(workflowId);
+  }
 }
 
 // function removeRecursively:

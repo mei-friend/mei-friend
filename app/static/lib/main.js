@@ -285,7 +285,7 @@ export function updateLocalStorage(meiXml) {
 
 export async function updateGithubInLocalStorage() {
   if (storage.supported && !storage.override && isLoggedIn) {
-    const author = await gm.cloud.getAuthor();
+    const author = await gm.getAuthor();
     storage.github = {
       githubRepo: gm.repo,
       githubToken: gm.token,
