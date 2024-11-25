@@ -90,7 +90,6 @@ import * as att from './attribute-classes.js';
 import * as e from './editor.js';
 import Viewer from './viewer.js';
 import * as speed from './speed.js';
-import Github from './github.js';
 import { loginAndFetch, solid } from './solid.js';
 import Storage from './storage.js';
 import { fillInBranchContents, logoutFromGithub, refreshGithubMenu, setCommitUIEnabledStatus } from './github-menu.js';
@@ -290,7 +289,6 @@ export async function updateGithubInLocalStorage() {
       githubRepo: gm.repo,
       githubToken: gm.token,
       branch: gm.branch,
-      //commit: github.commit,
       filepath: gm.filepath,
       userLogin: author.username,
       userName: author.name,
@@ -554,16 +552,6 @@ async function completeInitialLoad() {
         filepath: storage.github.filepath,
       });
 
-      /*github = new Github(
-        storage.github.githubRepo,
-        storage.github.githubToken,
-        storage.github.branch,
-        storage.github.commit,
-        storage.github.filepath,
-        storage.github.userLogin,
-        storage.github.userName,
-        storage.github.userEmail
-      );*/
       //document.querySelector("#fileLocation").innerText = meiFileLocationPrintable;
     } else if (isLoggedIn) {
       // initialise and store new github object
@@ -573,8 +561,7 @@ async function completeInitialLoad() {
       // console.log('Registered git manager: ', msg);
 
       gm = new GitManager('github', 'github', githubToken);
-      gm.cloud
-        .getAuthor()
+      gm.getAuthor()
         .then((author) => {
           //github = new Github('', githubToken, '', '', '', userLogin, userName, userEmail);
           storage.github = {
@@ -715,6 +702,7 @@ async function completeInitialLoad() {
   }
   if (forkParam === 'true' && urlFileName) {
     if (isLoggedIn && gm) {
+      console.log('Forking and opening URL file...');
       forkAndOpen(gm, urlFileName);
     } else {
       if (storage.supported) {
@@ -2553,7 +2541,7 @@ export function generateUrl() {
   if (fileLocationType === 'url') {
     url += 'file=' + meiFileLocation;
   } else if (fileLocationType === 'github') {
-    url += 'file=' + 'https://raw.githubusercontent.com/' + github.githubRepo + '/' + github.branch + github.filepath;
+    url += 'file=' + 'https://raw.githubusercontent.com/' + gm.repo + '/' + gm.branch + gm.filepath;
   }
   // generate other parameters
   url += amp + 'scale=' + v.vrvOptions.scale;

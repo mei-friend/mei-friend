@@ -152,8 +152,10 @@ function onSelectRepository(e) {
 export async function forkAndOpen(gm, url) {
   // ensure URL matches our expectations
   // (fully qualified raw github url)
-  const components = url.match(/https?:\/\/raw.githubusercontent.com\/([^/]+)\/([^/]+)\/([^/]+)\/([^/]+)/);
-  if (components && components.length === 5) {
+  const components = url.match(/https?:\/\/raw.githubusercontent.com\/([^/]+)\/([^/]+)\/(.*)$/);
+  console.log('components: ', components);
+  if (components && components.length === 4) {
+    console.log('forkAndOpen', components);
     let sz = calcSizeOfContainer();
     let fc = document.querySelector('#forkAndOpenOverlay');
     fc.width = sz.width * 0.25;
@@ -161,39 +163,60 @@ export async function forkAndOpen(gm, url) {
     fc.style.display = 'block';
     let userOrg = components[1];
     let repo = components[2];
+    let residue = components[3];
+    // n.b., because both branch names and file paths can contain slashes,
+    // it is hard to distinguish between them in the URL; but we need to know both!
+    // therefore, retrieve the list of branches and match them against the residue (finding a branch that is the starting substring of the residue)
+    let branches = await gm.getBranches(100, 1, userOrg + '/' + repo);
+    console.log('branches', branches, 'residue', residue);
+    try {
+      residue = residue.replace('refs/remotes/origin/', ''); // remove remote branch prefix if present
+      residue = residue.replace('refs/heads/', ''); // remove branch prefix if present
+      residue = residue.replace('refs/tags/', ''); // remove tag prefix if present
+      let branch = branches.find((b) => residue.startsWith(b.name));
+      if (!branch) {
+        throw new Error('ForkRepository: URL does not match expectations');
+      }
+      // the remaining residue is the file path
+      components[4] = branch.name;
+      components[5] = residue.slice(branch.name.length + 1);
 
-    document.querySelector('#forkRepoRequested').innerText = `${userOrg}/${repo}`;
+      document.querySelector('#forkRepoRequested').innerText = `${userOrg}/${repo}`;
 
-    let forkToSelector = document.getElementById('forkAndOpenSelector');
-    let author = await gm.getAuthor();
-    // forkToSelector: User's options as to where to fork the repository to
-    forkToSelector.innerHTML = `<option value="${author.username}">${author.username}</option>`;
-    gm.getOrgs().then((orgs) =>
-      orgs.forEach((org) => {
-        try {
-          let orgName = org.organization.login;
-          forkToSelector.innerHTML += `<option value="${orgName}">${orgName}</option>`;
-        } catch (e) {
-          console.error("Can't add organization to selector: ", org, e);
-        }
-      })
-    );
-    // forkAndOpen fork button
-    const forkAndOpenButton = document.getElementById('forkAndOpenButton');
-    if (forkAndOpenButton) {
-      forkAndOpenButton.addEventListener('click', () => forkAndOpenClicked(components));
+      let forkToSelector = document.getElementById('forkAndOpenSelector');
+      let author = await gm.getAuthor();
+      // forkToSelector: User's options as to where to fork the repository to
+      forkToSelector.innerHTML = `<option value="${author.username}">${author.username}</option>`;
+      gm.getOrgs().then((orgs) =>
+        orgs.forEach((org) => {
+          try {
+            let orgName = org.organization.login;
+            forkToSelector.innerHTML += `<option value="${orgName}">${orgName}</option>`;
+          } catch (e) {
+            console.error("Can't add organization to selector: ", org, e);
+          }
+        })
+      );
+      // forkAndOpen fork button
+      const forkAndOpenButton = document.getElementById('forkAndOpenButton');
+      if (forkAndOpenButton) {
+        forkAndOpenButton.addEventListener('click', () => forkAndOpenClicked(components));
+      }
+    } catch (e) {
+      console.warn("'fork' parameter specified but supplied URL violates raw GitHub URL expectations");
+      throw new Error('ForkRepository: URL does not match expectations', e, url);
     }
-  } else {
-    console.warn("'fork' parameter specified but supplied URL violates raw GitHub URL expectations");
   }
 } // forkAndOpen()
 
 export function forkAndOpenClicked(components) {
   // set up values for forkRepoClicked():
+  console.log('forkAndOpenClicked', components);
   document.getElementById('forkRepositoryInputName').value = components[1];
   document.getElementById('forkRepositoryInputRepoOverride').value = components[2];
-  document.getElementById('forkRepositoryInputBranchOverride').value = components[3];
-  document.getElementById('forkRepositoryInputFilepathOverride').value = '/' + components[4];
+  // components[3] is the branch name + file path (but undifferentiated since both can contain slashes)
+  document.getElementById('forkRepositoryInputBranchOverride').value = components[4];
+  document.getElementById('forkRepositoryInputFilepathOverride').value = '/' + components[5];
   document.getElementById('GithubLogo').classList.add('clockwise');
   forkRepoClicked();
 } // forkAndOpenClicked()

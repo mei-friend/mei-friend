@@ -282,6 +282,7 @@ export default class GitManager {
       if (isBlobUri(path)) {
         //  content = await pfs.readFile(this.directory + '/' + path, { encoding: null });
         // determine current commit oid
+        console.log('reading blob file', this.directory + '/' + path);
         let oid = await git.resolveRef({
           fs,
           dir: this.directory,
@@ -297,6 +298,7 @@ export default class GitManager {
         content = content.blob.buffer;
         return content;
       } else {
+        console.log('reading file', this.directory + '/' + path);
         content = await pfs.readFile(this.directory + '/' + path, 'utf8');
         return content;
       }
@@ -386,7 +388,7 @@ export default class GitManager {
 
   async isDir(path = this.filepath) {
     // check if a path in the repo is a directory
-    // on;y necessary if information not available from cloud provider
+    // only necessary if information not available from cloud provider
     return (await pfs.stat(this.directory + '/' + path)).type === 'dir';
   }
 
@@ -418,8 +420,8 @@ export default class GitManager {
     return await this.cloud.getAuthor();
   }
 
-  async getBranches(per_page, page) {
-    return await this.cloud.getBranches(per_page, page);
+  async getBranches(per_page, page, repo) {
+    return await this.cloud.getBranches(per_page, page, repo);
   }
 
   async getRepos(per_page, page) {

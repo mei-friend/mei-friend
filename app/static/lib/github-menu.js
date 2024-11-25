@@ -5,7 +5,6 @@ import {
   fileLocationType,
   generateUrl,
   gm, // git manager instance
-  github,
   handleEncoding,
   isMEI,
   meiFileName,
@@ -78,7 +77,7 @@ export function forkRepoClicked() {
           }
         });
       })
-      .finally(() => {
+      .finally(async () => {
         if (inputRepoOverride && inputBranchOverride && inputFilepathOverride) {
           // forkAndOpen path: directly switch to specified branch and open file
           gm.branch = inputBranchOverride;
@@ -86,6 +85,8 @@ export function forkRepoClicked() {
           const _file = inputFilepathOverride.substring(inputFilepathOverride.lastIndexOf('/') + 1);
           gm.filepath = _filepath;
           setMeiFileInfo(gm.filepath, gm.repo, gm.repo + ':');
+          // clone and load the file
+          await gm.clone(`https://github.com/${gm.repo}.git`, gm.branch);
           loadFile(_file);
           updateFileStatusDisplay();
         }
@@ -235,6 +236,7 @@ function loadFile(fileName = '', clearBeforeLoading = true, ev = null) {
   console.debug(`${translator.lang.loadingFile.text}: https://github.com/${gm.repo}${gm.filepath}`);
   fillInBranchContents(ev);
   githubLoadingIndicator.classList.add('clockwise');
+  console.log('loadFile(), before readFile(), gm.filepath: ', gm.filepath, 'directory: ', gm.directory);
   gm.readFile()
     .then(async (content) => {
       githubLoadingIndicator.classList.remove('clockwise');

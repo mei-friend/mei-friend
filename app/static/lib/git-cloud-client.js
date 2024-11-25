@@ -87,9 +87,9 @@ export default class GitCloudClient {
     }).then((res) => res.json());
   }
 
-  async getBranches(per_page = 30, page = 1) {
+  async getBranches(per_page = 30, page = 1, repo = this.repo) {
     // fetch all branches of the current repository from the cloud provider
-    const branchesUrl = `https://api.github.com/repos/${this.repo}/branches?per_page=${per_page}&page=${page}`;
+    const branchesUrl = `https://api.github.com/repos/${repo}/branches?per_page=${per_page}&page=${page}`;
     return fetch(branchesUrl, {
       method: 'GET',
       headers: this.apiHeaders,
@@ -371,7 +371,8 @@ export default class GitCloudClient {
             method: 'POST',
             headers: this.apiHeaders,
           };
-          if (forkTo !== this.userLogin) {
+          let author = await this.getAuthor();
+          if (forkTo !== author.username) {
             // if we are forking to an organization rather than
             // the user's personal repositories, we have to add
             // a note to say so to the request body
@@ -396,6 +397,54 @@ export default class GitCloudClient {
       .catch((err) => {
         console.warn("Couldn't retrieve forks from ", forksUrl, ': ', err);
         return Promise.reject(err);
+      });
+  }
+
+  async getActionWorkflowsList(per_page = 30, page = 1) {
+    // fetch all action workflows of the current repository from the cloud provider
+    // use appropriate API endpoint based on the provider
+    // TODO check this is not totally broken, non-github providers imagined by copilot
+
+    let actionsUrl;
+    switch (this.providerType) {
+      case 'github':
+        actionsUrl = `https://api.github.com/repos/${this.gm.repo}/actions/workflows?per_page=${per_page}&page=${page}`;
+        break;
+      case 'gitlab':
+        actionsUrl = `https://gitlab.com/api/v4/projects/${encodeURIComponent(
+          this.gm.repo
+        )}/pipelines?per_page=${per_page}&page=${page}`;
+        break;
+      case 'bitbucket':
+        actionsUrl = `https://api.bitbucket.org/2.0/repositories/${this.gm.repo}/pipelines/?pagelen=${per_page}&page=${page}`;
+        break;
+      case 'codeberg':
+        actionsUrl = `https://codeberg.org/api/v1/repos/${this.gm.repo}/actions/workflows?per_page=${per_page}&page=${page}`;
+        break;
+      default:
+        throw new Error('Unknown provider');
+    }
+    return fetch(actionsUrl, {
+      method: 'GET',
+      headers: this.apiHeaders,
+    })
+      .then((res) => res.json())
+      .then(async (data) => {
+        let list = null;
+        if (this.providerType === 'github' && 'workflows' in data) {
+          let promises = data.workflows.map((w) => this.getWorkflow(w.path));
+          let fulfilled = await Promise.all(promises);
+          let filtered = fulfilled.filter((w) => 'on' in w && 'workflow_dispatch' in w.on);
+          let pathsToKeep = filtered.map((f) => f.path);
+          list = data.workflows.filter((d) => pathsToKeep.includes(d.path));
+        } else if (this.providerType === 'gitlab' && Array.isArray(data)) {
+          list = data.filter((pipeline) => pipeline.ref === 'workflow_dispatch');
+        } else if (this.providerType === 'bitbucket' && 'values' in data) {
+          list = data.values.filter((pipeline) => pipeline.trigger.name === 'workflow_dispatch');
+        } else if (this.providerType === 'codeberg' && 'workflows' in data) {
+          list = data.workflows.filter((workflow) => workflow.on.workflow_dispatch);
+        }
+        return list;
       });
   }
 }
