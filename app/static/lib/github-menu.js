@@ -41,7 +41,7 @@ function forkRepo() {
   forkRepository(gm);
 }
 
-export function forkRepoClicked() {
+export async function forkRepoClicked() {
   // inputRepoOverride is used to supply a repository via the forkAndOpen (?fork parameter) path
   let inputName = document.getElementById('forkRepositoryInputName').value;
   let inputRepo = document.getElementById('forkRepositoryInputRepo').value;
@@ -55,14 +55,28 @@ export function forkRepoClicked() {
     let githubRepo = `${inputName}/${inputRepo}`;
     gm.repo = githubRepo;
     Array.from(document.getElementsByClassName('forkRepoGithubLogo')).forEach((l) => l.classList.add('clockwise'));
-    gm.fork(() => {
-      forkRepositoryStatus.forEach((s) => {
-        s.classList.remove('warn');
-        s.innerHTML = '';
-      });
-      fillInRepoBranches();
-      forkRepositoryCancel();
-    }, forkRepositoryToSelector.value)
+    console.log('Forking repo: ', githubRepo, gm);
+    await gm
+      .fork(async () => {
+        forkRepositoryStatus.forEach((s) => {
+          s.classList.remove('warn');
+          s.innerHTML = '';
+        });
+        fillInRepoBranches();
+        forkRepositoryCancel();
+        if (inputRepoOverride && inputBranchOverride && inputFilepathOverride) {
+          // forkAndOpen path: directly switch to specified branch and open file
+          gm.branch = inputBranchOverride;
+          const _filepath = inputFilepathOverride.substring(0, inputFilepathOverride.lastIndexOf('/') + 1);
+          const _file = inputFilepathOverride.substring(inputFilepathOverride.lastIndexOf('/') + 1);
+          gm.filepath = _filepath;
+          setMeiFileInfo(gm.filepath, gm.repo, gm.repo + ':');
+          // clone and load the file
+          await gm.clone(`https://github.com/${gm.repo}.git`, gm.branch);
+          loadFile(_file);
+          updateFileStatusDisplay();
+        }
+      }, forkRepositoryToSelector.value)
       .catch((e) => {
         forkRepositoryStatus.forEach((s) => {
           s.classList.add('warn');
@@ -78,18 +92,6 @@ export function forkRepoClicked() {
         });
       })
       .finally(async () => {
-        if (inputRepoOverride && inputBranchOverride && inputFilepathOverride) {
-          // forkAndOpen path: directly switch to specified branch and open file
-          gm.branch = inputBranchOverride;
-          const _filepath = inputFilepathOverride.substring(0, inputFilepathOverride.lastIndexOf('/') + 1);
-          const _file = inputFilepathOverride.substring(inputFilepathOverride.lastIndexOf('/') + 1);
-          gm.filepath = _filepath;
-          setMeiFileInfo(gm.filepath, gm.repo, gm.repo + ':');
-          // clone and load the file
-          await gm.clone(`https://github.com/${gm.repo}.git`, gm.branch);
-          loadFile(_file);
-          updateFileStatusDisplay();
-        }
         document.getElementById('GithubLogo').classList.remove('clockwise');
         Array.from(document.getElementsByClassName('forkRepoGithubLogo')).forEach((l) =>
           l.classList.remove('clockwise')
@@ -926,7 +928,6 @@ async function prepareNewFileForCommit() {
 } // prepareNewFileForCommit()
 
 async function doCommit() {
-  console.log('doCommit with filepath ', gm.filepath);
   const commitButton = document.getElementById('githubCommitButton');
   const messageInput = document.getElementById('commitMessageInput');
   const message = messageInput.value;

@@ -385,14 +385,16 @@ export default class GitCloudClient {
               res.json().then((userFork) => {
                 // switch to newly created fork
                 this.gm.repo = userFork.full_name;
+                // initialise page with user's fork
+                callback();
               });
             } else throw res;
           });
         } else {
           this.gm.repo = userFork.full_name;
+          // initialise page with user's fork
+          callback();
         }
-        // initialise page with user's fork
-        callback(this);
       })
       .catch((err) => {
         console.warn("Couldn't retrieve forks from ", forksUrl, ': ', err);

@@ -98,35 +98,46 @@ export default class GitManager {
     this.branch = branch;
     // create directory
     console.log('creating directory', this.directory);
-    return await pfs.mkdir(this.directory).then(async () => {
-      await pfs.stat(this.directory).then(async (stat) => {
-        console.log('directory created:', stat);
-        console.log('cloning into', this.directory, this.token);
-        console.log('with branch ', this.branch);
-        let cloneobj = {
-          fs,
-          http,
-          url,
-          dir: this.directory,
-          ref: this.branch,
-          corsProxy: '/proxy',
-          singleBranch: false,
-          onAuth: this.onAuth,
-          onAuthFailure: () => {
-            console.log('auth failure');
-            return { cancel: true };
-          },
-          onAuthSuccess: () => {
-            console.log('auth success');
-          },
-        };
-        console.log('cloneobj', cloneobj);
-        await git.clone(cloneobj);
-        console.log('cloned into ', this.directory);
-        console.log('current branch says: ', await this.getBranch());
-        console.log('readdir', await pfs.readdir(this.directory));
+    return await pfs
+      .mkdir(this.directory)
+      .then(async () => {
+        await pfs.stat(this.directory).then(async (stat) => {
+          let cloneobj = {
+            fs,
+            http,
+            url,
+            dir: this.directory,
+            ref: this.branch,
+            corsProxy: '/proxy',
+            singleBranch: false,
+            onAuth: this.onAuth,
+            onAuthFailure: () => {
+              console.log('auth failure');
+              return { cancel: true };
+            },
+            onAuthSuccess: () => {
+              console.log('auth success');
+            },
+          };
+          await git.clone(cloneobj);
+          // update remote
+          await git.deleteRemote({
+            fs,
+            dir: this.directory,
+            remote: 'origin',
+          });
+          await git.addRemote({
+            fs,
+            dir: this.directory,
+            remote: 'origin',
+            url: url,
+          });
+        });
+      })
+      .catch((err) => {
+        console.error("Couldn't clone repo", err);
+        throw err;
       });
-    });
   }
 
   async clone(url = this.cloud.getCloneURL(), branch = this.branch) {
