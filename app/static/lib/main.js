@@ -1780,13 +1780,22 @@ export let cmd = {
   encloseSelectionWithTag: encloseSelectionWithTag,
   encloseSelectionWithLastTag: encloseSelectionWithLastTag,
   resetDefault: () => {
-    // we're in a clickhandler, so our storage object is out of scope
-    // but we only need to clear it, so just grab the window's storage
+    // clear all storage
     storage = window.localStorage;
     if (storage) {
       storage.clear();
     }
-    logoutFromGithub();
+    if (window.sessionStorage) {
+      window.sessionStorage.clear();
+    }
+    window.fs = new LightningFS('fs', { wipe: true });
+    window.pfs = window.fs.promises;
+    let url = window.location.href;
+    // remove any url parameters (since these might include URLs with slashes in)
+    const paramsStartIx = url.indexOf('?');
+    if (paramsStartIx > -1) url = url.substring(0, paramsStartIx);
+    // now modify last slash to navigate to /logout
+    window.location.replace(url.substring(0, url.lastIndexOf('/')) + '/logout');
   },
   openHelp: () => window.open(`https://mei-friend.github.io/`, '_blank'),
   consultGuidelines: () => consultGuidelines(),

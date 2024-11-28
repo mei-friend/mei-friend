@@ -1,6 +1,9 @@
 export default class GitCloudClient {
   constructor(conf) {
     console.log('GitCloudClient constructor', conf);
+    if (userLogin === undefined) {
+      console.error('userLogin is undefined');
+    }
     this.gm = conf.gm;
     this.token = conf.token;
     this.provider = conf.provider; // e.g. 'github'
@@ -15,6 +18,13 @@ export default class GitCloudClient {
           Authorization: `token ${conf.token}`,
           Accept: 'application/vnd.github.v3+json',
         };
+        this.actionsHeaders = new Headers({
+          // FIXME needs to be adjusted for other providers
+          // Particularly, note the current explicit GitHub assumption in userLogin (passed from flask)
+          Authorization: 'Basic ' + btoa(userLogin + ':' + this.token),
+          Accept: 'application/vnd.github+json',
+          'X-GitHub-Api-Version': '2022-11-28',
+        });
         this.orgsUrl = `https://api.github.com/user/memberships/orgs`;
         this.reposUrl = `https://api.github.com/user/repos`;
         break;
@@ -402,53 +412,179 @@ export default class GitCloudClient {
       });
   }
 
-  async getActionWorkflowsList(per_page = 30, page = 1) {
-    // fetch all action workflows of the current repository from the cloud provider
-    // use appropriate API endpoint based on the provider
-    // TODO check this is not totally broken, non-github providers imagined by copilot
+  // TODO refactor so that this information is stored on getActionWorkflowsList
+  // to avoid extra fetch with getWorkflowInputs when workflow is clicked
+  async getWorkflow(wfPath) {
+    // rewrite to raw github URL
+    const rawUrl = 'https://raw.githubusercontent.com/' + this.repo + '/' + this.branch + '/' + wfPath;
+    return this.gm
+      .directlyReadFileContents(rawUrl, {
+        method: 'GET',
+        headers: this.apiHeaders,
+      })
+      .then((yaml) => {
+        const asJson = jsyaml.load(yaml);
+        asJson.path = wfPath;
+        if (env === environments.develop) {
+          console.debug('Obtained workflow description: ', asJson, wfPath);
+        }
+        return asJson;
+      });
+  } // getWorkflow()
 
-    let actionsUrl;
-    switch (this.providerType) {
-      case 'github':
-        actionsUrl = `https://api.github.com/repos/${this.gm.repo}/actions/workflows?per_page=${per_page}&page=${page}`;
-        break;
-      case 'gitlab':
-        actionsUrl = `https://gitlab.com/api/v4/projects/${encodeURIComponent(
-          this.gm.repo
-        )}/pipelines?per_page=${per_page}&page=${page}`;
-        break;
-      case 'bitbucket':
-        actionsUrl = `https://api.bitbucket.org/2.0/repositories/${this.gm.repo}/pipelines/?pagelen=${per_page}&page=${page}`;
-        break;
-      case 'codeberg':
-        actionsUrl = `https://codeberg.org/api/v1/repos/${this.gm.repo}/actions/workflows?per_page=${per_page}&page=${page}`;
-        break;
-      default:
-        throw new Error('Unknown provider');
+  // obtain inputs for a specified workflow (if any)
+  async getWorkflowInputs(wfPath) {
+    // rewrite to raw github URL
+    const rawUrl = 'https://raw.githubusercontent.com/' + this.repo + '/' + this.branch + '/' + wfPath;
+    return this.gm
+      .directlyReadFileContents(rawUrl, {
+        method: 'GET',
+        headers: this.apiHeaders,
+      })
+      .then((yaml) => {
+        const asJson = jsyaml.load(yaml);
+        if (env === environments.develop) {
+          console.debug('Obtained workflow description: ', asJson, wfPath);
+        }
+        // repetition below to ensure that the value of e.g. asJson.on.workflow_dispatch is not null
+        if (
+          asJson &&
+          'on' in asJson &&
+          'workflow_dispatch' in asJson.on &&
+          asJson.on.workflow_dispatch &&
+          'inputs' in asJson.on.workflow_dispatch &&
+          asJson.on.workflow_dispatch.inputs
+        ) {
+          return asJson.on.workflow_dispatch.inputs;
+        } else return null;
+      });
+  }
+
+  // obtain details for a specified workflow run
+  async getWorkflowRun(runUrl) {
+    return fetch(runUrl, {
+      method: 'GET',
+      headers: this.actionsHeaders,
+    }).then((res) => res.json());
+  } // getWorkflowRun()
+
+  async getActionWorkflowsList(per_page = 30, page = 1) {
+    // TODO make this work for other git providers
+    if (!this.providerType === 'github') {
+      console.warn('getActionWorkflowsList() only works for GitHub');
+      return;
     }
+    const actionsUrl = `https://api.github.com/repos/${this.gm.repo}/actions/workflows?per_page=${per_page}&page=${page}`;
     return fetch(actionsUrl, {
       method: 'GET',
-      headers: this.apiHeaders,
+      headers: this.actionsHeaders,
     })
       .then((res) => res.json())
       .then(async (data) => {
         let list = null;
-        if (this.providerType === 'github' && 'workflows' in data) {
+        // (longwinded) way to only show dispatch workflows
+        if ('workflows' in data) {
           let promises = data.workflows.map((w) => this.getWorkflow(w.path));
           let fulfilled = await Promise.all(promises);
           let filtered = fulfilled.filter((w) => 'on' in w && 'workflow_dispatch' in w.on);
           let pathsToKeep = filtered.map((f) => f.path);
           list = data.workflows.filter((d) => pathsToKeep.includes(d.path));
-        } else if (this.providerType === 'gitlab' && Array.isArray(data)) {
-          list = data.filter((pipeline) => pipeline.ref === 'workflow_dispatch');
-        } else if (this.providerType === 'bitbucket' && 'values' in data) {
-          list = data.values.filter((pipeline) => pipeline.trigger.name === 'workflow_dispatch');
-        } else if (this.providerType === 'codeberg' && 'workflows' in data) {
-          list = data.workflows.filter((workflow) => workflow.on.workflow_dispatch);
         }
         return list;
+      })
+      .catch((e) => {
+        console.error('Error fetching action workflows list: ', e);
+        return [];
       });
   }
+
+  async requestActionWorkflowRun(workflowId, inputs = {}) {
+    const dispatchUrl = `https://api.github.com/repos/${this.gm.repo}/actions/workflows/${workflowId}/dispatches`;
+    return fetch(dispatchUrl, {
+      method: 'POST',
+      headers: this.actionsHeaders,
+      body: JSON.stringify({
+        ref: this.gm.branch,
+        inputs: inputs,
+      }),
+    }).then((res) => {
+      // return body as JSON object, but retain response status (for error detection)
+      console.log('::::::', res);
+      if (res.status === 204) {
+        // no body on github 204 responses
+        return res;
+      } else {
+        res.json().then((data) => {
+          return { status: res.status, body: data };
+        });
+      }
+    });
+  }
+
+  async awaitActionWorkflowCompletion(workflowId, runStartAt = null) {
+    // TODO make this work for other git providers
+    if (!this.providerType === 'github') {
+      console.warn('awaitActionWorkflowCompletion() only works for GitHub');
+      return;
+    }
+    // Wait until the created workflow has completed or failed
+    // n.b.: unfortunately, because workflow dispatch is implemented as a Web Hook on the GitHub side,
+    // the job's run instance ID is not known at creation time. See https://github.com/orgs/community/discussions/9752
+    // As a work-around, we grab the latest run instance requested by the current user, of the requested workflow,
+    // ... with the current head hash, immediately after dispatch
+    // ... then grab its start_at time, and use that to poll recursively
+    const runsUrl = `https://api.github.com/repos/${this.gm.repo}/actions/workflows/${workflowId}/runs`;
+    const author = await this.getAuthor();
+    const head_sha = await this.gm.getCurrentHeadSha();
+    console.log('head_sha: ', head_sha);
+    return fetch(
+      runsUrl +
+        '?' +
+        new URLSearchParams({
+          actor: author.username,
+          branch: this.gm.branch,
+          head_sha,
+        }),
+      {
+        method: 'GET',
+        headers: this.actionsHeaders,
+        cache: 'no-store', // do not cache response to prevent delays to polling update
+      }
+    )
+      .then((res) => res.json())
+      .then((resJson) => {
+        let run;
+        if ('workflow_runs' in resJson) {
+          if (runStartAt) {
+            // start time specified -- use it to find our run of interest
+            let runsAt = resJson.workflow_runs.filter((w) => w.run_started_at === runStartAt);
+            if (runsAt.length) {
+              run = runsAt[0];
+              console.log('Got run with starttime specified, first entry of: ', runsAt);
+            }
+          } else {
+            // no start time specified -- pick the most recent one
+            let runsSorted = resJson.workflow_runs.sort((a, b) => b.run_number - a.run_number);
+            console.log('Got run WITHOUT starttime specified, first entry of: ', runsSorted);
+            if (runsSorted.length) {
+              run = runsSorted[0];
+            }
+          }
+          if (run && 'status' in run && run.status === 'completed') {
+            return run; // done
+          } else if (run && 'status' in run) {
+            // recur
+            return this.awaitActionWorkflowCompletion(workflowId, run.run_started_at);
+          } else {
+            console.error('Received unexpected response to workflow runs request, retrying:', resJson);
+            return this.awaitActionWorkflowCompletion(workflowId);
+          }
+        } else {
+          console.error('Received unexpected response to workflow runs request:', resJson);
+          return { status: 406 };
+        }
+      });
+  } // awaitActionWorkflowCompletion()
 }
 
 function uriSuffixToMimetype(uri) {

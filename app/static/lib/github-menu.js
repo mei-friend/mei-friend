@@ -24,7 +24,7 @@ const ghActionsInputSetters = [
   {
     id: 'githubActionsInputSetterFilepath',
     icon: icon.fileCode,
-    func: () => {
+    func: (gm) => {
       return gm.filepath.substr(1);
     },
   },
@@ -483,8 +483,7 @@ export async function fillInBranchContents(e) {
     <hr class="dropdownLine" class="actionsDivider" id="actionsDividerStart">
     `;
       // request Githug Action workflows (if any) and handle them
-      // TODO
-      // gm.getActionWorkflowsList().then((resp) => handleWorkflowsListReceived(resp));
+      gm.getActionWorkflowsList().then((resp) => handleWorkflowsListReceived(resp));
       if (e) {
         branchContents.forEach(async (content) => {
           const isDir = content.type === 'dir';
@@ -590,7 +589,7 @@ function handleWorkflowsListReceived(resp) {
         workflowSpan.innerText = 'GH Action: ' + wf.name;
         workflowSpan.classList.add('inline-block-tight', 'workflow');
         let workflowSpanContainer = document.createElement('a');
-        workflowSpanContainer.onclick = handleClickGithubAction;
+        workflowSpanContainer.onclick = (e) => handleClickGithubAction(e, gm);
         workflowSpanContainer.insertAdjacentElement('beforeend', workflowSpan);
         actionsDivider.insertAdjacentElement('afterend', workflowSpanContainer);
       } else {
@@ -669,7 +668,7 @@ export function renderCommitLog(gitlog) {
   githubMenu.appendChild(logTable);
 } // renderCommitLog()
 
-async function handleClickGithubAction(e) {
+async function handleClickGithubAction(e, gm) {
   // FIXME - port to isomorphic-git and all cloud providers
   const overlay = document.getElementById('githubActionsOverlay');
   const header = document.getElementById('githubActionsHeading');
@@ -737,8 +736,7 @@ async function handleClickGithubAction(e) {
     document.querySelectorAll('.githubActionsInputField').forEach((i) => {
       specifiedInputs[i.dataset.input] = i.value;
     });
-    github
-      .requestActionWorkflowRun(workflowName.dataset.id, specifiedInputs)
+    gm.requestActionWorkflowRun(workflowName.dataset.id, specifiedInputs)
       .then((workflowRunResp) => {
         console.log('Got workflow run response: ', workflowRunResp);
         if (workflowRunResp.status >= 400) {
@@ -754,12 +752,19 @@ async function handleClickGithubAction(e) {
                 runBtn.innerText = translator.lang.githubActionsRunButtonReload.text;
                 runBtn.removeAttribute('disabled');
                 ghLogo.classList.remove('clockwise');
-                runBtn.onclick = () => {
+                runBtn.onclick = async () => {
+                  ghLogo.classList.add('clockwise');
+                  // do a pull to refresh the file
+                  await gm.pull();
+                  // redraw github menu to reflect changes in git log
+                  fillInCommitLog('withRefresh');
+                  console.log('pull completed for reload, head hash now ', await gm.getCurrentHeadSha());
                   loadFile();
                   overlay.style.display = 'none';
                   statusMsg.innerHTML = '';
                   runBtn.innerText = translator.lang.githubActionsRunButton.text;
                   cancelBtn.removeAttribute('disabled');
+                  ghLogo.classList.add('clockwise');
                 };
               } else {
                 statusMsg.innerHTML = `<span id="githubActionStatusMsgFailure">${translator.lang.githubActionStatusMsgFailure.text}</span>: <a href="${workflowCompletionResp.html_url}" target="_blank">${workflowCompletionResp.conclusion}</a>`;
@@ -805,7 +810,7 @@ export function logoutFromGithub() {
   const paramsStartIx = url.indexOf('?');
   if (paramsStartIx > -1) url = url.substring(0, paramsStartIx);
   // now modify last slash to navigate to /logout
-  window.location.replace(url.substring(0, url.lastIndexOf('/')) + '/logout/' + gm.provider);
+  window.location.replace(url.substring(0, url.lastIndexOf('/')) + '/logout');
 } // logoutFromGithub()
 
 export function refreshGithubMenu() {
@@ -937,7 +942,6 @@ async function doCommit() {
     await gm.commit(message);
     await gm.push();
   } catch (e) {
-    // TODO gracefully handle error, informing user
     githubLoadingIndicator.classList.remove('clockwise');
     cm.setOption('readOnly', false);
     console.warn("Couldn't do commit and push: ", e);
@@ -1029,7 +1033,7 @@ function generateGithubActionsInputConfig(inputs, input) {
     setter.setAttribute('title', translator.lang[inp.id].text);
     setter.setAttribute('id', input + '-' + inp.id);
     setter.addEventListener('click', () => {
-      inputField.value = inp.func();
+      inputField.value = inp.func(gm);
     });
     inputSetters.insertAdjacentElement('beforeend', setter);
   });

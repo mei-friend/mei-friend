@@ -186,6 +186,19 @@ export default class GitManager {
       });
   }
 
+  async getCurrentHeadSha() {
+    return await git
+      .resolveRef({
+        fs,
+        dir: this.directory,
+        ref: 'HEAD',
+      })
+      .catch((err) => {
+        console.error('getCurrentHeadSha error', err);
+        throw err;
+      });
+  }
+
   async createBranch(commitMsg) {
     // create a new branch, commiting and pushing changes to it:
     // first, generate a new branch name like this.username + number
@@ -217,8 +230,34 @@ export default class GitManager {
     await this.checkout();
     // then push the branch to the remote
     await this.push();
-
     return branch;
+  }
+
+  async pull() {
+    // pull is actually a fetch and merge, so need author info
+    let author = await this.cloud.getAuthor();
+    try {
+      await git.pull({
+        fs,
+        http,
+        dir: this.directory,
+        onAuth: this.onAuth,
+        onAuthFailure: () => {
+          console.log('auth failure');
+          return { cancel: true };
+        },
+        onAuthSuccess: () => {
+          console.log('auth success');
+        },
+        ref: this.branch,
+        remote: 'origin',
+        singleBranch: true,
+        author,
+      });
+    } catch (err) {
+      console.error('pull error', err);
+      throw err;
+    }
   }
 
   async push() {
@@ -237,6 +276,8 @@ export default class GitManager {
       ref: this.branch,
       remoteRef: 'refs/heads/' + this.branch,
     });
+    // pull to ensure we are up to date
+    await this.pull();
   }
 
   async add(path = this.filepath) {
@@ -451,8 +492,24 @@ export default class GitManager {
     return await this.cloud.createPR(branch);
   }
 
+  async getWorkflow(wfPath) {
+    return await this.cloud.getWorkflow(wfPath);
+  }
+
+  async getWorkflowRun(wfUri) {
+    return await this.cloud.getWorkflowRun(wfUri);
+  }
+
   async getWorkflowInputs(path) {
     return await this.cloud.getWorkflowInputs(path);
+  }
+
+  async getActionWorkflowsList(path) {
+    return await this.cloud.getActionWorkflowsList(path);
+  }
+
+  async requestActionWorkflowRun(wfId, inputs) {
+    return await this.cloud.requestActionWorkflowRun(wfId, inputs);
   }
 
   async awaitActionWorkflowCompletion(workflowId) {
