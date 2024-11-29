@@ -480,7 +480,7 @@ export async function fillInBranchContents(e) {
     <a id="selectBranch" href="#"><span class="btn icon inline-block-tight">${icon.arrowLeft}</span><span id="githubBranch">${translator.lang.githubBranch.text}</span>: ${gm.branch}</a>
     <hr class="dropdownLine">
     <a id="contentsHeader" href="#"><span class="btn icon inline-block-tight filepath">${icon.arrowLeft}</span><span id="githubFilepath">${translator.lang.githubFilepath.text}</span>: <span class="filepath">${gm.filepath}</span></a>
-    <hr class="dropdownLine" class="actionsDivider" id="actionsDividerStart">
+    <div class="actionsContainer"><hr class="dropdownLine" class="actionsDivider" id="actionsDividerStart"></div>
     `;
       // request Githug Action workflows (if any) and handle them
       gm.getActionWorkflowsList().then((resp) => handleWorkflowsListReceived(resp));

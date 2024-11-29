@@ -192,8 +192,10 @@ export async function setFileChangedState(fileChangedState) {
       if (await gm.fileChanged()) {
         console.log('DISABLING WORKFLOWS');
         actionsWorkflows.forEach((el) => el.parentElement.classList.add('disabled'));
+        actionsWorkflows.forEach((el) => el.parentElement.parentElement.classList.add('notAllowed'));
       } else {
         actionsWorkflows.forEach((el) => el.parentElement.classList.remove('disabled'));
+        actionsWorkflows.forEach((el) => el.parentElement.parentElement.classList.remove('notAllowed'));
       }
     }
   }

@@ -286,7 +286,10 @@ a:active {
 
 .dropdownContent a.disabled { 
   pointer-events:none; 
-  cursor:not-allowed;
+}
+
+.actionsContainer.notAllowed{
+  cursor: not-allowed;
 }
 
 .openUrlOverlay a,
