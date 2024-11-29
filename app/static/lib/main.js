@@ -185,9 +185,17 @@ export async function setFileChangedState(fileChangedState) {
     fileStatusElement.classList.remove('changed');
     fileChangedIndicatorElement.innerText = '';
   }
-  if (isLoggedIn && gm && gm.filepath && commitUI) {
-    console.log('Calling setCommitUIEnabledStatus() from setFileChangedState() in main');
-    setCommitUIEnabledStatus();
+  if (isLoggedIn && gm && gm.filepath) {
+    let actionsWorkflows = document.querySelectorAll('.workflow');
+    if (commitUI) setCommitUIEnabledStatus();
+    if (actionsWorkflows) {
+      if (await gm.fileChanged()) {
+        console.log('DISABLING WORKFLOWS');
+        actionsWorkflows.forEach((el) => el.parentElement.classList.add('disabled'));
+      } else {
+        actionsWorkflows.forEach((el) => el.parentElement.classList.remove('disabled'));
+      }
+    }
   }
   if (storage.supported) {
     storage.fileChanged = fileChanged ? 1 : 0;

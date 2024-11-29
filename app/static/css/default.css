@@ -284,6 +284,11 @@ a:active {
   width: 95%;
 }
 
+.dropdownContent a.disabled { 
+  pointer-events:none; 
+  cursor:not-allowed;
+}
+
 .openUrlOverlay a,
 .forkRepositoryOverlay a {
   color: var(--overlayLinkColor);
