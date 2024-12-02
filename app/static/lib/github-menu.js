@@ -490,6 +490,7 @@ export async function fillInBranchContents(e) {
     const commitMessageInput = document.createElement('input');
     commitMessageInput.setAttribute('type', 'text');
     commitMessageInput.setAttribute('id', 'commitMessageInput');
+    commitMessageInput.classList.add('preventKeyBindings')
     commitMessageInput.setAttribute('placeholder', translator.lang.commitMessageInput.placeholder);
     const commitButton = document.createElement('input');
     commitButton.setAttribute('id', 'githubCommitButton');

@@ -39,12 +39,12 @@ export function createPageRangeSelector(display = 'none') {
         <div>
             <input type="radio" id="selectFromTo" name="pagesSelect" value="fromto" />
             <label for="selectFromTo" id="selectFromLabel">from:</label>
-            <input type="number" id="selectFrom" name="firstPage" value="1" min="1"/>
+            <input type="number" id="selectFrom" class="preventKeyBindings" name="firstPage" value="1" min="1"/>
         </div>
         <div>
             <div class="fillSpace"></div>
             <label for="selectFromTo" id="selectToLabel">to:</label>
-            <input type="number" id="selectTo" name="endPage" value="1" min="1" />
+            <input type="number" id="selectTo" class="preventKeyBindings" name="endPage" value="1" min="1" />
         </div>
 
         <div>
@@ -53,7 +53,7 @@ export function createPageRangeSelector(display = 'none') {
         </div>
 
         <div>
-            <input type="text" id="selectRange" value="2, 5-8" name="selectRange" placeholder="2, 5-8" />
+            <input type="text" id="selectRange" class="preventKeyBindings" value="2, 5-8" name="selectRange" placeholder="2, 5-8" />
         </div>
     </div>`;
   if (display) pageRangeDiv.style.display = display;

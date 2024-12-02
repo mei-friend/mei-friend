@@ -28,7 +28,7 @@ export class WorkerProxy {
       false
     );
 
-    // Retrun a Proxy so it is possible to catch all property and method or function calls of a the worker
+    // Return a Proxy so it is possible to catch all property and method or function calls of a the worker
     return new Proxy(this, {
       get: (target, method) => {
         return function () {
@@ -51,5 +51,5 @@ export class WorkerProxy {
         };
       },
     });
-  }
-}
+  } // constructor()
+} // WorkerProxy class
