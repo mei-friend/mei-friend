@@ -327,6 +327,14 @@ a:active {
   width: 95%;
 }
 
+.dropdownContent a.disabled { 
+  pointer-events:none; 
+}
+
+.actionsContainer.notAllowed{
+  cursor: not-allowed;
+}
+
 .openUrlOverlay a,
 .forkRepositoryOverlay a {
   color: var(--overlayLinkColor);
@@ -421,8 +429,8 @@ a:active {
   float: right;
 }
 
-.openUrlOverlay .openUrlUI>div,
-.forkRepositoryOverlay .forkRepositoryUI>div {
+.openUrlOverlay .openUrlUI > div,
+.forkRepositoryOverlay .forkRepositoryUI > div {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -443,8 +451,8 @@ a:active {
   cursor: pointer;
 }
 
-.openUrlOverlay .openUrlUI details>div,
-.forkRepositoryOverlay .forkRepositoryUI details>div {
+.openUrlOverlay .openUrlUI details > div,
+.forkRepositoryOverlay .forkRepositoryUI details > div {
   margin-left: 1em;
 }
 
@@ -2005,7 +2013,7 @@ select {
   text-align: left;
 }
 
-select>option {
+select > option {
   background-color: var(--dropdownBackgroundColor);
   color: var(--textColor);
 }

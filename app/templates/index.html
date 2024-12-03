@@ -138,7 +138,12 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='css/annotationPanel.css') }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='css/icons.css') }}" />
+    <script src="{{ url_for('static', filename='deps/lightning-fs.js') }}"></script>
+    <script src="{{ url_for('static', filename='deps/isomorphic-git.umd.min.js') }}"></script>
     <script type="module" src="{{ url_for('static', filename='lib/main.js') }}"></script>
+
+    <script type="module" src="{{ url_for('static', filename='lib/git-cloud-client.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='lib/git-manager.js') }}"></script>
 
     <!-- Load Matomo@mdw.ac.at -->
     <script type="text/javascript">
@@ -181,7 +186,7 @@
   </head>
 
   <body>
-    <div class="header">
+    <div class="header" id="meiFriendHeader">
       <div class="title">
         <a href="https://mei-friend.mdw.ac.at/"
           ><img src="{{ url_for('static', filename='owl/menu-logo.svg') }}" alt="mei-friend" id="mei-friend-logo"
@@ -814,7 +819,7 @@
               </div>
             </details>
             <div id="openUrlInputWrapper">
-              <input id="openUrlInput" type="text" placeholder="http://..." />
+              <input id="openUrlInput" class="preventKeyBindings" type="text" placeholder="http://..." />
               <button id="openUrlButton">Open URL</button>
               <button id="openUrlCancel">Cancel</button>
             </div>
@@ -1270,7 +1275,7 @@
       <span id="closeMidiPlaybackControlBarButton" title="Hide MIDI Playback Control Bar">×</span>
     </div>
 
-    <div class="footer">
+    <div class="footer" id="meiFriendFooter">
       <div id="midiPlayerContextual">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
           <path

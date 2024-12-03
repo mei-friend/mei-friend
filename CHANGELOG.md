@@ -1,4 +1,6 @@
 # mei-friend-online CHANGELOG.md
+### 1.1.8 Merge isomorphic-git and mark-up enrichment developments
+* Merges patches 1.0.17 and 1.1.7 in preparation for 1.2.0 release
 
 ### 1.1.7 patch
 * Support for markup color export to PDF (#108)
@@ -50,10 +52,16 @@
 - Add settings to change highighting colors for markup elements.
 - Change option labels in responsibility select to text content.
 
-### 1.0.16 Patch
+### 1.0.17 Refactor and extend git functionality
 
-- Fix infinite loop when having an incomplete choice element (#109, thx @maxrothman)
-- Implement persistent search bar behavior (#110, thx @maxrothman) with checkbox to toggle
+- Migrate from jsgit to isomorphic-git
+- Implement branching-on-conflict and automatic pull requests to improve safe collaborative editing
+- Prepare for future implementation of non-GitHub cloud providers
+
+### 1.0.16 Patch 
+* Fix infinite loop when having an incomplete choice element (#109, thx @
+maxrothman)
+* Implement persistent search bar behavior (#110, thx @maxrothmann) with checkbox to toggle
 * Update Verovio release version list
 
 ### 1.0.15 Patch

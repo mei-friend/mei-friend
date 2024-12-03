@@ -1101,7 +1101,7 @@ export function addBeamSpan(v, cm) {
       i++;
     }
   }
-  v.selectedElements = speed.filterElements(v.selectedElements, v.xmlDoc);
+  v.selectedElements = speed.filterElements(v.selectedElements, v.xmlDoc, ['chord', 'note']);
   v.selectedElements = utils.sortElementsByScorePosition(v.selectedElements);
   let id1 = v.selectedElements[0]; // xml:id string
   let id2 = v.selectedElements[v.selectedElements.length - 1];
@@ -1345,11 +1345,17 @@ export function checkAccidGes(v, cm) {
         if (n && n > 0 && n <= keySignatures.length) keySignatures[n - 1] = value;
         if (d) console.debug('New key.sig in staffDef(' + e.getAttribute('xml:id') + ', n=' + n + '): ' + value);
       } else if (e.nodeName === 'keySig' && e.hasAttribute('sig')) {
+        const value = e.getAttribute('sig');
         // keySig element in a staffDef
         const n = parseInt(e.closest('staffDef')?.getAttribute('n'));
-        const value = e.getAttribute('sig');
-        if (n && n > 0 && n <= keySignatures.length) keySignatures[n - 1] = value;
-        if (d) console.debug('New keySig("' + e.getAttribute('xml:id') + '")@sig in staffDef(' + n + '): ' + value);
+        if (n && n > 0 && n <= keySignatures.length) {
+          keySignatures[n - 1] = value;
+          if (d) console.debug('New keySig("' + e.getAttribute('xml:id') + '")@sig in staffDef(' + n + '): ' + value);
+        } else {
+          // if no staff number, write to all staves
+          for (let k in keySignatures) keySignatures[k] = value;
+          if (d) console.debug('New keySig("' + e.getAttribute('xml:id') + '")@sig in all staves: ' + value);
+        }
       } else if (e.nodeName === 'measure') {
         // clear measureAccids object
         measureAccids = getAccidsInMeasure(e);
