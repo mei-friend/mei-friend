@@ -2,7 +2,8 @@ export default class GitCloudClient {
   constructor(conf) {
     console.log('GitCloudClient constructor', conf);
     if (typeof userLogin === 'undefined') {
-      console.error('userLogin is undefined');
+      console.warn('User is not logged in to a git provider');
+      return;
     }
     this.gm = conf.gm;
     this.token = conf.token;
