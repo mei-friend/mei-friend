@@ -1,7 +1,7 @@
 export default class GitCloudClient {
   constructor(conf) {
     console.log('GitCloudClient constructor', conf);
-    if (userLogin === undefined) {
+    if (typeof userLogin === 'undefined') {
       console.error('userLogin is undefined');
     }
     this.gm = conf.gm;
