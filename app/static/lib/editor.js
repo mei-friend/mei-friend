@@ -1116,7 +1116,7 @@ export function addBeamSpan(v, cm) {
       i++;
     }
   }
-  v.selectedElements = speed.filterElements(v.selectedElements, v.xmlDoc);
+  v.selectedElements = speed.filterElements(v.selectedElements, v.xmlDoc, ['chord', 'note']);
   v.selectedElements = utils.sortElementsByScorePosition(v.selectedElements);
   let id1 = v.selectedElements[0]; // xml:id string
   let id2 = v.selectedElements[v.selectedElements.length - 1];
