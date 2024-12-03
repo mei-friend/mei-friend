@@ -4,13 +4,12 @@ import {
   fileChanged,
   fileLocationType,
   generateUrl,
-  github, // github instance
+  gm, // git manager instance
   handleEncoding,
   isMEI,
   meiFileName,
   setFileChangedState,
   setFileLocationType,
-  setGithubInstance, // github instance setter
   setMeiFileInfo,
   setStandoffAnnotationEnabledStatus,
   storage,
@@ -20,14 +19,13 @@ import {
   v,
 } from './main.js';
 import * as icon from './../css/icons.js';
-import Github from './github.js'; // github class
 
 const ghActionsInputSetters = [
   {
     id: 'githubActionsInputSetterFilepath',
     icon: icon.fileCode,
-    func: () => {
-      return github.filepath.substr(1);
+    func: (gm) => {
+      return gm.filepath.substr(1);
     },
   },
   {
@@ -40,10 +38,10 @@ const ghActionsInputSetters = [
 ];
 
 function forkRepo() {
-  forkRepository(github);
+  forkRepository(gm);
 }
 
-export function forkRepoClicked() {
+export async function forkRepoClicked() {
   // inputRepoOverride is used to supply a repository via the forkAndOpen (?fork parameter) path
   let inputName = document.getElementById('forkRepositoryInputName').value;
   let inputRepo = document.getElementById('forkRepositoryInputRepo').value;
@@ -55,16 +53,29 @@ export function forkRepoClicked() {
   if (inputName && (inputRepo || inputRepoOverride)) {
     inputRepo = inputRepoOverride ? inputRepoOverride : inputRepo;
     let githubRepo = `${inputName}/${inputRepo}`;
-    github.githubRepo = githubRepo;
+    gm.repo = githubRepo;
     Array.from(document.getElementsByClassName('forkRepoGithubLogo')).forEach((l) => l.classList.add('clockwise'));
-    github
-      .fork(() => {
+    console.log('Forking repo: ', githubRepo, gm);
+    await gm
+      .fork(async () => {
         forkRepositoryStatus.forEach((s) => {
           s.classList.remove('warn');
           s.innerHTML = '';
         });
         fillInRepoBranches();
         forkRepositoryCancel();
+        if (inputRepoOverride && inputBranchOverride && inputFilepathOverride) {
+          // forkAndOpen path: directly switch to specified branch and open file
+          gm.branch = inputBranchOverride;
+          const _filepath = inputFilepathOverride.substring(0, inputFilepathOverride.lastIndexOf('/') + 1);
+          const _file = inputFilepathOverride.substring(inputFilepathOverride.lastIndexOf('/') + 1);
+          gm.filepath = _filepath;
+          setMeiFileInfo(gm.filepath, gm.repo, gm.repo + ':');
+          // clone and load the file
+          await gm.clone(`https://github.com/${gm.repo}.git`, gm.branch);
+          loadFile(_file);
+          updateFileStatusDisplay();
+        }
       }, forkRepositoryToSelector.value)
       .catch((e) => {
         forkRepositoryStatus.forEach((s) => {
@@ -80,17 +91,7 @@ export function forkRepoClicked() {
           }
         });
       })
-      .finally(() => {
-        if (inputRepoOverride && inputBranchOverride && inputFilepathOverride) {
-          // forkAndOpen path: directly switch to specified branch and open file
-          github.branch = inputBranchOverride;
-          const _filepath = inputFilepathOverride.substring(0, inputFilepathOverride.lastIndexOf('/') + 1);
-          const _file = inputFilepathOverride.substring(inputFilepathOverride.lastIndexOf('/') + 1);
-          github.filepath = _filepath;
-          setMeiFileInfo(github.filepath, github.githubRepo, github.githubRepo + ':');
-          loadFile(_file);
-          updateFileStatusDisplay();
-        }
+      .finally(async () => {
         document.getElementById('GithubLogo').classList.remove('clockwise');
         Array.from(document.getElementsByClassName('forkRepoGithubLogo')).forEach((l) =>
           l.classList.remove('clockwise')
@@ -109,7 +110,7 @@ function forkRepoCancelClicked() {
 } // forkRepoCancelClicked()
 
 function repoHeaderClicked() {
-  github.filepath = '';
+  gm.filepath = '';
   refreshGithubMenu(); // reopen
   let githubMenu = document.getElementById('GithubMenu');
   githubMenu.classList.add('forceShow');
@@ -117,117 +118,142 @@ function repoHeaderClicked() {
 } // repoHeaderClicked()
 
 function selectBranchClicked(ev) {
-  github.filepath = '';
+  gm.filepath = '';
   fillInRepoBranches(ev.target);
 } // selectBranchClicked()
 
 function contentsHeaderClicked(ev) {
   // strip trailing slash (in case our filepath is a subdir)
-  if (github.filepath.endsWith('/')) github.filepath = github.filepath.substring(0, github.filepath.length - 1);
+  if (gm.filepath.endsWith('/')) gm.filepath = gm.filepath.substring(0, gm.filepath.length - 1);
   //  retreat to previous slash (back one directory level)
-  github.filepath = github.filepath.substring(0, github.filepath.lastIndexOf('/') + 1);
+  gm.filepath = gm.filepath.substring(0, gm.filepath.lastIndexOf('/') + 1);
   // if we've retreated past the root dir, restore it
-  github.filepath = github.filepath.length === 0 ? '/' : github.filepath;
+  gm.filepath = gm.filepath.length === 0 ? '/' : gm.filepath;
   const githubLoadingIndicator = document.getElementById('GithubLogo');
   githubLoadingIndicator.classList.add('clockwise');
-  github
-    .readGithubRepo()
-    .then(() => {
-      fillInBranchContents(ev);
-      githubLoadingIndicator.classList.remove('clockwise');
-    })
-    .catch(() => {
-      console.warn("Couldn't read Github repo to fill in branch contents");
-      githubLoadingIndicator.classList.remove('clockwise');
-    });
+  fillInBranchContents(ev);
+  githubLoadingIndicator.classList.remove('clockwise');
 } // contentsHeaderClicked()
 
 async function userRepoClicked(ev) {
   // re-init github object with selected repo
-  const author = github.author;
-  setGithubInstance(
-    new Github(
-      ev.target.innerText,
-      github.githubToken,
-      github.branch,
-      github.commit,
-      github.filepath,
-      github.userLogin,
-      author.name,
-      author.email
-    )
-  );
+  gm.repo = ev.target.innerText;
   const per_page = 100;
   const page = 1;
-  const repoBranches = await github.getRepoBranches(per_page, page);
+  const repoBranches = await gm.getBranches(per_page, page);
   if (repoBranches.length === 1) {
     // skip branch menu if only one branch
-    github.branch = repoBranches[0].name;
-    github.filepath = '/';
+    gm.branch = repoBranches[0].name;
+    gm.filepath = '/';
     fillInBranchContents(ev);
   } else {
     fillInRepoBranches(ev, repoBranches);
   }
 } // userRepoClicked()
 
-function repoBranchClicked(ev) {
+async function repoBranchClicked(ev) {
   const githubLoadingIndicator = document.getElementById('GithubLogo');
-  github.branch = ev.target.innerText;
-  github.filepath = '/';
+  gm.filepath = '/';
+  gm.branch = ev.target.innerText;
   githubLoadingIndicator.classList.add('clockwise');
-  github
-    .readGithubRepo()
-    .then(() => {
-      fillInBranchContents(ev);
-      githubLoadingIndicator.classList.remove('clockwise');
-    })
-    .catch(() => {
-      console.warn("Couldn't read Github repo to fill in branch contents");
-      githubLoadingIndicator.classList.remove('clockwise');
-    });
+  fillInBranchContents(ev);
+  githubLoadingIndicator.classList.remove('clockwise');
 } // repoBranchClicked()
 
 function branchContentsDirClicked(ev) {
+  console.log('branchContentsDirClicked()');
   let target = ev.target;
   if (!target.classList.contains('filepath')) {
     // if user hasn't clicked directly on the filepath <span>, drill down to it
     target = target.querySelector('.filepath');
   }
-  if (github.filepath.endsWith('/')) {
-    github.filepath += target.innerText + '/';
+  if (gm.filepath.endsWith('/')) {
+    gm.filepath += target.innerText + '/';
   } else {
-    github.filepath += '/' + target.innerText + '/';
+    gm.filepath += '/' + target.innerText + '/';
   }
   fillInBranchContents(ev);
 } // branchContentsDirClicked()
 
 function branchContentsFileClicked(ev) {
-  loadFile(ev.target.innerText);
+  const githubLoadingIndicator = document.getElementById('GithubLogo');
+  // load the file into the editor
+  // first, check whether the pfs directory corresponding to the provider has already been cloned; if not, clone it.
+  // 1. check if pfs has a directory for the provider
+  gm.pfsDirExists().then(async (exists) => {
+    if (!exists) {
+      console.log('DECISION: 1');
+      console.log('pfsDirExists() returned false');
+      // 2. if not, clone the repo
+      githubLoadingIndicator.classList.add('clockwise'); // removed by loadFile()
+      await gm.clone();
+      console.log('menu: clone() completed, doing load file');
+      // 3. read the file
+      loadFile(ev.target.innerText);
+    } else {
+      console.log('DECISION: 2');
+      // 2a. if it does, check the repo is the same as the one we want to load
+      gm.getRemote().then((remote) => {
+        console.log('DECISION: 3');
+        console.log('getRemote worked!', remote);
+        if (!remote || remote !== gm.repo) {
+          console.log('DECISION: 4');
+          // 3a. if not, clone the repo
+          githubLoadingIndicator.classList.add('clockwise'); // removed by loadFile()
+          gm.clone().then(() => {
+            // 4. read the file
+            loadFile(ev.target.innerText);
+          });
+        } else {
+          console.log('DECISION: 5');
+          // 3b. if we already have the correct repo, check we're on the correct branch
+          gm.getBranch().then(async (branch) => {
+            if (branch !== gm.branch) {
+              console.log('DECISION: 6', branch, gm.branch);
+              // 4a. if not, checkout the correct branch
+              githubLoadingIndicator.classList.add('clockwise'); // removed by loadFile()
+              await gm.checkout(branch).then(async () => {
+                console.log('menu: checkout() completed, branch now: ', await gm.getBranch());
+                console.log('menu: checkout() completed, files in repo now: ', await pfs.readdir(gm.directory));
+                // 5. read the file
+                loadFile(ev.target.innerText);
+              });
+            } else {
+              console.log('DECISION: 7');
+              // 4b. if we're on the correct branch, read the file
+              // TODO consider whether to force (or offer) a git pull here first
+              loadFile(ev.target.innerText);
+            }
+          });
+        }
+      });
+    }
+  });
   document.getElementById('GithubMenu').classList.remove('forceShow');
 } // branchContentsFileClicked()
 
 function loadFile(fileName = '', clearBeforeLoading = true, ev = null) {
   const githubLoadingIndicator = document.getElementById('GithubLogo');
-  github.filepath += fileName;
-  console.debug(`${translator.lang.loadingFile.text}: https://github.com/${github.githubRepo}${github.filepath}`);
+  gm.filepath += fileName;
+  console.debug(`${translator.lang.loadingFile.text}: https://github.com/${gm.repo}${gm.filepath}`);
   fillInBranchContents(ev);
   githubLoadingIndicator.classList.add('clockwise');
-  github
-    .readGithubRepo()
-    .then(() => {
+  console.log('loadFile(), before readFile(), gm.filepath: ', gm.filepath, 'directory: ', gm.directory);
+  gm.readFile()
+    .then(async (content) => {
       githubLoadingIndicator.classList.remove('clockwise');
       cm.readOnly = false;
       document.getElementById('statusBar').innerText = translator.lang.loadingFromGithub.text + '...';
       v.allowCursorActivity = false;
       setMeiFileInfo(
-        github.filepath, // meiFileName
-        github.githubRepo, // meiFileLocation
-        github.githubRepo + ':' // meiFileLocationPrintable
+        gm.filepath, // meiFileName
+        gm.repo, // meiFileLocation
+        gm.repo + ':' // meiFileLocationPrintable
       );
-      handleEncoding(github.content, true, true, clearBeforeLoading); // retains current page and selection after commit
+      handleEncoding(content, true, true, clearBeforeLoading); // retains current page and selection after commit
       setFileNameAfterLoad();
       updateFileStatusDisplay();
-      setFileChangedState(false);
+      setFileChangedState(await gm.fileChanged());
       updateGithubInLocalStorage();
       setFileLocationType('github');
       setStandoffAnnotationEnabledStatus();
@@ -259,6 +285,7 @@ function assignGithubMenuClickHandlers() {
   // This function is called repeatedly during runtime as the content of the
   // Github menu is dynamic. Therefore, we remove all event listeners below
   // before adding them, to avoid attaching multiple identical listeners.
+  console.log('Assigning click handlers to Github menu items...');
   const githubMenu = document.getElementById('GithubMenu');
   if (githubMenu) {
     githubMenu.removeEventListener('mouseleave', (e) => e.target.classList.remove('forceShow'));
@@ -329,7 +356,8 @@ function assignGithubMenuClickHandlers() {
 } // assignGithubMenuClickHandlers()
 
 export async function fillInUserRepos(per_page = 30, page = 1) {
-  const repos = await github.getUserRepos(per_page, page);
+  const repos = await gm.getRepos(per_page, page);
+  console.log('fillInUserRepos() got repos: ', repos);
   if (document.getElementById('selectBranch')) {
     // if user has navigated away wiew while we
     // were waiting for the user repos list, abandon it
@@ -347,14 +375,18 @@ export async function fillInUserRepos(per_page = 30, page = 1) {
   assignGithubMenuClickHandlers();
 } // fillInUserRepos()
 
-export async function fillInRepoBranches(e, repoBranches = null, per_page = 100, page = 1) {
-  // TODO handle > per_page branches (similar to userRepos)
-  repoBranches = repoBranches || (await github.getRepoBranches(per_page, page));
+export async function fillInRepoBranches(e, repoBranches) {
+  if (!repoBranches) {
+    const per_page = 100;
+    const page = 1;
+    repoBranches = await gm.getBranches(per_page, page);
+  }
+  console.log('fillInRepoBranches() got branches: ', repoBranches);
   let githubMenu = document.getElementById('GithubMenu');
   githubMenu.innerHTML = `
     <a id="githubLogout" href="#">${translator.lang.logOut.text}</a>
     <hr class="dropdownLine">
-    <a id="selectRepository" href="#"><span class="btn icon inline-block-tight">${icon.arrowLeft}</span><span id="githubRepository">${translator.lang.githubRepository.text}</span>: ${github.githubRepo}</a>
+    <a id="selectRepository" href="#"><span class="btn icon inline-block-tight">${icon.arrowLeft}</span><span id="githubRepository">${translator.lang.githubRepository.text}</span>: ${gm.repo}</a>
     <hr class="dropdownLine">
     <a id="selectBranch" class="dropdownHead" href="#"><b>${translator.lang.selectBranch.text}:</b></a>
     `;
@@ -376,11 +408,9 @@ async function markFileName(fname) {
   const without = fname.substring(0, fname.lastIndexOf('.'));
   const match = without.match('(.*)~\\d+$');
   const unmarked = match ? match[1] : without;
-  let fnamesInTree;
-  const containingDir = github.filepath.substring(0, github.filepath.lastIndexOf('/'));
-  return github.getBranchContents(containingDir).then((tree) => {
-    fnamesInTree = tree.map((contents) => contents.name);
-    const prevMarked = fnamesInTree.filter((f) => f.match(without + '~\\d+.mei$'));
+  const containingDir = gm.filepath.substring(0, gm.filepath.lastIndexOf('/'));
+  return gm.readDir(containingDir).then((dirListing) => {
+    const prevMarked = dirListing.filter((file) => file.match(without + '~\\d+.mei$'));
     let marked;
     if (prevMarked.length) {
       // marks already exist in current tree, so use "~n" where n is
@@ -400,9 +430,8 @@ async function proposeFileName(fname) {
   let without = fname;
   let newname;
   let nameSpan = document.getElementById('commitFileName');
-  const containingDir = github.filepath.substring(0, github.filepath.lastIndexOf('/'));
-  github.getBranchContents(containingDir).then((dirContents) => {
-    const fnamesInTree = dirContents.map((c) => c.name);
+  const containingDir = gm.filepath.substring(0, gm.filepath.lastIndexOf('/'));
+  gm.readDir(containingDir).then((dirListing) => {
     if (suffixPos > 0) {
       // there's a dot and it's not at the start of the name
       // => treat everything after it as the suffix
@@ -412,7 +441,7 @@ async function proposeFileName(fname) {
     if (suffix.toLowerCase() !== 'mei') {
       // see if we can get away with simply swapping suffix
       newname = without + '.mei';
-      if (fnamesInTree.includes(newname)) {
+      if (dirListing.includes(newname)) {
         // no we can't - so mark it to differentiate
         markFileName(newname).then((marked) => {
           nameSpan.innerText = marked;
@@ -434,103 +463,113 @@ async function proposeFileName(fname) {
 } // proposeFileName()
 
 export async function fillInBranchContents(e) {
+  // clone repo and read contents of branch
   const githubLoadingIndicator = document.getElementById('GithubLogo');
   githubLoadingIndicator.classList.add('clockwise');
   // TODO handle > per_page files (similar to userRepos)
   let target = document.getElementById('contentsHeader');
-  let branchContents = await github.getBranchContents(github.filepath);
-  let githubMenu = document.getElementById('GithubMenu');
-  githubMenu.innerHTML = `
+  gm.listContents(gm.filepath)
+    .then(async (branchContents) => {
+      console.log('fillInBranchContents() got contents: ', branchContents);
+      let githubMenu = document.getElementById('GithubMenu');
+      githubMenu.innerHTML = `
     <a id="githubLogout" href="#">${translator.lang.logOut.text}</a>
     <hr class="dropdownLine">
-    <a id="selectRepository" href="#"><span class="btn icon inline-block-tight">${icon.arrowLeft}</span><span id="githubRepository">${translator.lang.githubRepository.text}</span>: ${github.githubRepo}</a>
+    <a id="selectRepository" href="#"><span class="btn icon inline-block-tight">${icon.arrowLeft}</span><span id="githubRepository">${translator.lang.githubRepository.text}</span>: ${gm.repo}</a>
     <hr class="dropdownLine">
-    <a id="selectBranch" href="#"><span class="btn icon inline-block-tight">${icon.arrowLeft}</span><span id="githubBranch">${translator.lang.githubBranch.text}</span>: ${github.branch}</a>
+    <a id="selectBranch" href="#"><span class="btn icon inline-block-tight">${icon.arrowLeft}</span><span id="githubBranch">${translator.lang.githubBranch.text}</span>: ${gm.branch}</a>
     <hr class="dropdownLine">
-    <a id="contentsHeader" href="#"><span class="btn icon inline-block-tight filepath">${icon.arrowLeft}</span><span id="githubFilepath">${translator.lang.githubFilepath.text}</span>: <span class="filepath">${github.filepath}</span></a>
-    <hr class="dropdownLine" class="actionsDivider" id="actionsDividerStart">
+    <a id="contentsHeader" href="#"><span class="btn icon inline-block-tight filepath">${icon.arrowLeft}</span><span id="githubFilepath">${translator.lang.githubFilepath.text}</span>: <span class="filepath">${gm.filepath}</span></a>
+    <div class="actionsContainer"><hr class="dropdownLine" class="actionsDivider" id="actionsDividerStart"></div>
     `;
-  // request Githug Action workflows (if any) and handle them
-  github.getActionWorkflowsList().then((resp) => handleWorkflowsListReceived(resp));
-  if (e) {
-    Array.from(branchContents).forEach((content) => {
-      const isDir = content.type === 'dir';
-      githubMenu.innerHTML +=
-        `<a class="branchContents ${content.type}${isDir ? '' : ' closeOnClick'}" href="#">` +
-        //  content.type === "dir" ? '<span class="btn icon icon-file-symlink-file inline-block-tight"></span>' : "" +
-        `<span class="filepath${isDir ? '' : ' closeOnClick'}">${content.name}</span>${isDir ? '...' : ''}</a>`;
+      // request Githug Action workflows (if any) and handle them
+      gm.getActionWorkflowsList().then((resp) => handleWorkflowsListReceived(resp));
+      if (e) {
+        branchContents.forEach(async (content) => {
+          const isDir = content.type === 'dir';
+          githubMenu.innerHTML +=
+            `<a class="branchContents ${content.type}${isDir ? '' : ' closeOnClick'}" href="#">` +
+            //  content.type === "dir" ? '<span class="btn icon icon-file-symlink-file inline-block-tight"></span>' : "" +
+            `<span class="filepath${isDir ? '' : ' closeOnClick'}">${content.name}</span>${isDir ? '...' : ''}</a>`;
+          assignGithubMenuClickHandlers();
+        });
+      } else {
+        // Either User clicked file, or we're on forkAndOpen path, or restoring from local storage. Display commit interface
+        if (gm.filepath) {
+          setMeiFileInfo(
+            gm.filepath, // meiFileName
+            gm.repo, // meiFileLocation
+            gm.repo + ':' // meiFileLocationPrintable
+          );
+        }
+        if (storage.supported) {
+          storage.fileLocationType = 'github';
+        }
+
+        const commitUI = document.createElement('div');
+        commitUI.setAttribute('id', 'commitUI');
+
+        const commitFileName = document.createElement('span');
+        commitFileName.setAttribute('contenteditable', '');
+        commitFileName.setAttribute('id', 'commitFileName');
+        commitFileName.setAttribute('spellcheck', 'false');
+
+        const commitFileNameEdit = document.createElement('div');
+        commitFileNameEdit.setAttribute('id', 'commitFileNameEdit');
+        commitFileNameEdit.innerHTML =
+          '<span id="commitFileNameText">' + translator.lang.commitFileNameText.text + '</span>: ';
+        commitFileNameEdit.appendChild(commitFileName);
+
+        const commitMessageInput = document.createElement('input');
+        commitMessageInput.setAttribute('type', 'text');
+        commitMessageInput.setAttribute('id', 'commitMessageInput');
+        commitMessageInput.setAttribute('placeholder', translator.lang.commitMessageInput.placeholder);
+        commitMessageInput.classList.add('preventKeyBindings');
+        const commitButton = document.createElement('input');
+        commitButton.setAttribute('id', 'githubCommitButton');
+        commitButton.setAttribute('type', 'button');
+        commitButton.classList.add('closeOnClick');
+        commitButton.removeEventListener('click', handleCommitButtonClicked);
+        commitButton.addEventListener('click', handleCommitButtonClicked);
+        commitUI.appendChild(commitFileNameEdit);
+        commitUI.appendChild(commitMessageInput);
+        commitUI.appendChild(commitButton);
+        githubMenu.appendChild(commitUI);
+        setFileNameAfterLoad();
+        setFileChangedState(await gm.fileChanged());
+        commitMessageInput.removeEventListener('input', onMessageInput);
+        commitMessageInput.addEventListener('input', onMessageInput);
+        commitFileName.removeEventListener('input', onFileNameEdit);
+        commitFileName.addEventListener('input', onFileNameEdit);
+
+        // add "Report issue with encoding" link
+        const reportIssue = document.createElement('input');
+        reportIssue.setAttribute('type', 'button');
+        reportIssue.id = 'reportIssueWithEncoding';
+        reportIssue.value = translator.lang.reportIssueWithEncoding.value;
+        reportIssue.addEventListener('click', () => {
+          const openInMeiFriendUrl = `[${translator.lang.clickToOpenInMeiFriend.text}](${encodeURIComponent(
+            generateUrl()
+          )})`;
+          // FIXME - make this work with isomorphic-git and all cloud providers
+          const fullOpenIssueUrl = `https://github.com/${gm.repo}/issues/new?title=Issue+with+${meiFileName}&body=${openInMeiFriendUrl}`;
+          window.open(fullOpenIssueUrl, '_blank');
+        });
+        const reportIssueDivider = document.createElement('hr');
+        reportIssueDivider.classList.add('dropdownLine');
+        commitUI.appendChild(reportIssueDivider);
+        reportIssue.target = '_blank';
+        commitUI.appendChild(reportIssue);
+      }
+      assignGithubMenuClickHandlers();
+      fillInCommitLog('withRefresh');
+      // GitHub menu interactions
+      console.log('In fillInBranchContents, Assigning click handlers to Github menu items...');
+      v.setMenuColors();
+    })
+    .catch((err) => {
+      console.error("Couldn't read Github repo to fill in branch contents:", err);
     });
-  } else {
-    // Either User clicked file, or we're on forkAndOpen path, or restoring from local storage. Display commit interface
-    if (github.filepath) {
-      setMeiFileInfo(
-        github.filepath, // meiFileName
-        github.githubRepo, // meiFileLocation
-        github.githubRepo + ':' // meiFileLocationPrintable
-      );
-    }
-    if (storage.supported) {
-      storage.fileLocationType = 'github';
-    }
-
-    const commitUI = document.createElement('div');
-    commitUI.setAttribute('id', 'commitUI');
-
-    const commitFileName = document.createElement('span');
-    commitFileName.setAttribute('contenteditable', '');
-    commitFileName.setAttribute('id', 'commitFileName');
-    commitFileName.setAttribute('spellcheck', 'false');
-
-    const commitFileNameEdit = document.createElement('div');
-    commitFileNameEdit.setAttribute('id', 'commitFileNameEdit');
-    commitFileNameEdit.innerHTML =
-      '<span id="commitFileNameText">' + translator.lang.commitFileNameText.text + '</span>: ';
-    commitFileNameEdit.appendChild(commitFileName);
-
-    const commitMessageInput = document.createElement('input');
-    commitMessageInput.setAttribute('type', 'text');
-    commitMessageInput.setAttribute('id', 'commitMessageInput');
-    commitMessageInput.classList.add('preventKeyBindings')
-    commitMessageInput.setAttribute('placeholder', translator.lang.commitMessageInput.placeholder);
-    const commitButton = document.createElement('input');
-    commitButton.setAttribute('id', 'githubCommitButton');
-    commitButton.setAttribute('type', 'button');
-    commitButton.classList.add('closeOnClick');
-    commitButton.addEventListener('click', handleCommitButtonClicked);
-    commitUI.appendChild(commitFileNameEdit);
-    commitUI.appendChild(commitMessageInput);
-    commitUI.appendChild(commitButton);
-    githubMenu.appendChild(commitUI);
-    setFileNameAfterLoad();
-    setFileChangedState(fileChanged);
-    commitMessageInput.removeEventListener('input', onMessageInput);
-    commitMessageInput.addEventListener('input', onMessageInput);
-    commitFileName.removeEventListener('input', onFileNameEdit);
-    commitFileName.addEventListener('input', onFileNameEdit);
-
-    // add "Report issue with encoding" link
-    const reportIssue = document.createElement('input');
-    reportIssue.setAttribute('type', 'button');
-    reportIssue.id = 'reportIssueWithEncoding';
-    reportIssue.value = translator.lang.reportIssueWithEncoding.value;
-    reportIssue.addEventListener('click', () => {
-      const openInMeiFriendUrl = `[${translator.lang.clickToOpenInMeiFriend.text}](${encodeURIComponent(
-        generateUrl()
-      )})`;
-      const fullOpenIssueUrl = `https://github.com/${github.githubRepo}/issues/new?title=Issue+with+${meiFileName}&body=${openInMeiFriendUrl}`;
-      window.open(fullOpenIssueUrl, '_blank');
-    });
-    const reportIssueDivider = document.createElement('hr');
-    reportIssueDivider.classList.add('dropdownLine');
-    commitUI.appendChild(reportIssueDivider);
-    reportIssue.target = '_blank';
-    commitUI.appendChild(reportIssue);
-  }
-  fillInCommitLog('withRefresh');
-  // GitHub menu interactions
-  assignGithubMenuClickHandlers();
-  v.setMenuColors();
-  githubLoadingIndicator.classList.remove('clockwise');
 } // fillInBranchContents()
 
 function handleWorkflowsListReceived(resp) {
@@ -550,7 +589,7 @@ function handleWorkflowsListReceived(resp) {
         workflowSpan.innerText = 'GH Action: ' + wf.name;
         workflowSpan.classList.add('inline-block-tight', 'workflow');
         let workflowSpanContainer = document.createElement('a');
-        workflowSpanContainer.onclick = handleClickGithubAction;
+        workflowSpanContainer.onclick = (e) => handleClickGithubAction(e, gm);
         workflowSpanContainer.insertAdjacentElement('beforeend', workflowSpan);
         actionsDivider.insertAdjacentElement('afterend', workflowSpanContainer);
       } else {
@@ -576,11 +615,10 @@ async function fillInCommitLog(refresh = false) {
   if (refresh) {
     const githubLoadingIndicator = document.getElementById('GithubLogo');
     githubLoadingIndicator.classList.add('clockwise');
-    github
-      .readGithubRepo()
-      .then(() => {
+    gm.readLog()
+      .then((log) => {
         githubLoadingIndicator.classList.remove('clockwise');
-        renderCommitLog();
+        renderCommitLog(log);
       })
       .catch((e) => {
         githubLoadingIndicator.classList.remove('clockwise');
@@ -591,9 +629,10 @@ async function fillInCommitLog(refresh = false) {
   }
 } // fillInCommitLog()
 
-export function renderCommitLog() {
+export function renderCommitLog(gitlog) {
   let selectBranch = document.getElementById('selectBranch');
-  if (!selectBranch) {
+  console.log('renderCommitLog()', gitlog, selectBranch);
+  if (!gitlog || !selectBranch) {
     // if user has navigated away from branch contents view while we
     // were waiting for the commit log, abandon it.
     return;
@@ -610,16 +649,13 @@ export function renderCommitLog() {
   const headerRow = document.createElement('tr');
   headerRow.innerHTML = `<th id="githubDate">${translator.lang.githubDate.text}</th><th id="githubAuthor">${translator.lang.githubAuthor.text}</th><th id="githubMessage">${translator.lang.githubMessage.text}</th><th id="githubCommit">${translator.lang.githubCommit.text}</th>`;
   logTable.appendChild(headerRow);
-  github.commitLog.forEach((c) => {
+  gitlog.forEach((c) => {
     const commitRow = document.createElement('tr');
     commitRow.innerHTML = `
       <td>${c.commit.author.date}</td>
-      <td><a href="${c.commit.author.html_url}">${c.commit.author.name}</a></td>
+      <td>${c.commit.author.name}</td>
       <td>${c.commit.message}</td>
-      <td><a target="_blank" href="https://github.com/${github.githubRepo}/commits/${c.sha}">${c.sha.slice(
-      0,
-      8
-    )}...</a></td>`;
+      <td><a target="_blank" href="https://github.com/${gm.repo}/commits/${c.sha}">${c.sha.slice(0, 8)}...</a></td>`;
     logTable.appendChild(commitRow);
   });
   const commitLogHeader = document.createElement('a');
@@ -632,7 +668,8 @@ export function renderCommitLog() {
   githubMenu.appendChild(logTable);
 } // renderCommitLog()
 
-async function handleClickGithubAction(e) {
+async function handleClickGithubAction(e, gm) {
+  // FIXME - port to isomorphic-git and all cloud providers
   const overlay = document.getElementById('githubActionsOverlay');
   const header = document.getElementById('githubActionsHeading');
   const workflowName = document.getElementById('requestedWorkflowName');
@@ -660,8 +697,7 @@ async function handleClickGithubAction(e) {
     // (don't just reset innerHTML, so that we also clear event handlers)
     inputContainerWrapper.removeChild(inputContainerWrapper.firstChild);
   }
-  github
-    .getWorkflowInputs(target.dataset.path)
+  gm.getWorkflowInputs(target.dataset.path)
     .then((inputs) => {
       if (!inputs) {
         return;
@@ -700,8 +736,7 @@ async function handleClickGithubAction(e) {
     document.querySelectorAll('.githubActionsInputField').forEach((i) => {
       specifiedInputs[i.dataset.input] = i.value;
     });
-    github
-      .requestActionWorkflowRun(workflowName.dataset.id, specifiedInputs)
+    gm.requestActionWorkflowRun(workflowName.dataset.id, specifiedInputs)
       .then((workflowRunResp) => {
         console.log('Got workflow run response: ', workflowRunResp);
         if (workflowRunResp.status >= 400) {
@@ -709,7 +744,7 @@ async function handleClickGithubAction(e) {
           statusMsg.innerHTML = `<span id="githubActionStatusMsgFailure">${translator.lang.githubActionStatusMsgFailure.text}</span>: <a href="${workflowRunResp.body.documentation_url}" target="_blank">${workflowRunResp.body.message}</a>`;
         } else {
           // poll on latest workflow run
-          github.awaitActionWorkflowCompletion(workflowName.dataset.id).then((workflowCompletionResp) => {
+          gm.awaitActionWorkflowCompletion(workflowName.dataset.id).then((workflowCompletionResp) => {
             console.log('Got workflow completion resp: ', workflowCompletionResp);
             if ('conclusion' in workflowCompletionResp) {
               if (workflowCompletionResp.conclusion === 'success') {
@@ -717,12 +752,19 @@ async function handleClickGithubAction(e) {
                 runBtn.innerText = translator.lang.githubActionsRunButtonReload.text;
                 runBtn.removeAttribute('disabled');
                 ghLogo.classList.remove('clockwise');
-                runBtn.onclick = () => {
+                runBtn.onclick = async () => {
+                  ghLogo.classList.add('clockwise');
+                  // do a pull to refresh the file
+                  await gm.pull();
+                  // redraw github menu to reflect changes in git log
+                  fillInCommitLog('withRefresh');
+                  console.log('pull completed for reload, head hash now ', await gm.getCurrentHeadSha());
                   loadFile();
                   overlay.style.display = 'none';
                   statusMsg.innerHTML = '';
                   runBtn.innerText = translator.lang.githubActionsRunButton.text;
                   cancelBtn.removeAttribute('disabled');
+                  ghLogo.classList.add('clockwise');
                 };
               } else {
                 statusMsg.innerHTML = `<span id="githubActionStatusMsgFailure">${translator.lang.githubActionStatusMsgFailure.text}</span>: <a href="${workflowCompletionResp.html_url}" target="_blank">${workflowCompletionResp.conclusion}</a>`;
@@ -772,14 +814,16 @@ export function logoutFromGithub() {
 } // logoutFromGithub()
 
 export function refreshGithubMenu() {
+  console.log('refreshGithubMenu()', gm);
   // display Github name
-  document.getElementById('GithubName').innerText =
-    github.author.name === 'None' ? github.userLogin : github.author.name;
+  gm.getAuthor().then((author) => {
+    document.getElementById('GithubName').innerText = author.name;
+  });
   // populate Github menu
   let githubMenu = document.getElementById('GithubMenu');
   githubMenu.classList.remove('loggedOut');
   githubMenu.innerHTML = `<a id="githubLogout" href="#">${translator.lang.logOut.text}</a>`;
-  if (!github.filepath) {
+  if (!gm.filepath) {
     githubMenu.innerHTML += `
       <hr class="dropdownLine">
       <a id="forkRepository" href="#">${translator.lang.forkRepository.text}...</b></a>
@@ -790,7 +834,7 @@ export function refreshGithubMenu() {
   }
 } // refreshGithubMenu()
 
-export function setCommitUIEnabledStatus() {
+export async function setCommitUIEnabledStatus() {
   const commitButton = document.getElementById('githubCommitButton');
   if (commitButton) {
     const commitFileName = document.getElementById('commitFileName');
@@ -798,11 +842,13 @@ export function setCommitUIEnabledStatus() {
       // no name change => button reads "Commit"
       commitButton.classList.remove('commitAsNewFile');
       commitButton.setAttribute('value', translator.lang.githubCommitButton.value);
-      if (fileChanged) {
+      if (await gm.fileChanged()) {
+        console.log('setting github commit UI enabled status: change detected');
         // enable commit UI if file has changed
         commitButton.removeAttribute('disabled');
         commitMessageInput.removeAttribute('disabled');
       } else {
+        console.log('setting github commit UI enabled status: NO CHANGE');
         // disable commit UI if file hasn't changed
         commitButton.setAttribute('disabled', '');
         commitMessageInput.setAttribute('disabled', '');
@@ -821,8 +867,8 @@ export function setCommitUIEnabledStatus() {
 
 function setFileNameAfterLoad(ev) {
   const commitButton = document.getElementById('githubCommitButton');
-  commitButton.classList.remove('commitAsNewFile');
   if (commitButton) {
+    commitButton.classList.remove('commitAsNewFile');
     const commitFileName = document.getElementById('commitFileName');
     if (isMEI) {
       // trim preceding slash
@@ -839,9 +885,10 @@ function setFileNameAfterLoad(ev) {
 } // setFileNameAfterLoad()
 
 // handle Github commit UI
-function handleCommitButtonClicked(e) {
-  const commitFileName = document.getElementById('commitFileName');
+async function handleCommitButtonClicked(e) {
   const messageInput = document.getElementById('commitMessageInput');
+  const commitButton = document.getElementById('githubCommitButton');
+  let commitNewFile = commitButton.classList.contains('commitAsNewFile');
   const message = messageInput.value;
   console.log('Got message: ', message);
   if (message) {
@@ -850,24 +897,15 @@ function handleCommitButtonClicked(e) {
     cm.readOnly = 'nocursor'; // don't allow editor focus
     // try commiting to Github
     githubLoadingIndicator.classList.add('clockwise');
-    const newfile = commitFileName.innerText !== stripMeiFileName() ? commitFileName.innerText : null;
-    github
-      .writeGithubRepo(cm.getValue(), message, newfile)
-      .then(() => {
-        console.debug(`Successfully written to github: ${github.githubRepo}${github.filepath}`);
-        messageInput.value = '';
-        if (newfile) {
-          // switch to new filepath
-          github.filepath = github.filepath.substring(0, github.filepath.lastIndexOf('/') + 1) + newfile;
-        }
-        // load after write (without clearing viewer metadata since we're loading same file again)
-        loadFile('', false);
-      })
-      .catch((e) => {
-        cm.readOnly = false;
-        githubLoadingIndicator.classList.remove('clockwise');
-        console.warn("Couldn't commit Github repo: ", e, github);
-      });
+    if (commitNewFile) {
+      await prepareNewFileForCommit();
+    }
+    await doCommit();
+    if (commitNewFile) {
+      setMeiFileInfo(gm.filepath, gm.repo, gm.repo + ':');
+      loadFile();
+      updateFileStatusDisplay();
+    }
   } else {
     // no commit without a comit message!
     messageInput.classList.add('warn');
@@ -875,6 +913,90 @@ function handleCommitButtonClicked(e) {
     e.stopPropagation(); // prevent bubbling to stop github menu closing
   }
 } // handleCommitButtonClicked()
+
+async function prepareNewFileForCommit() {
+  const commitFileName = document.getElementById('commitFileName');
+  const newFileName = commitFileName.innerText;
+  // write to new file
+  let newFilePath = gm.filepath.substring(0, gm.filepath.lastIndexOf('/') + 1) + newFileName;
+  return await gm
+    .writeAndReturnStatus(cm.getValue(), newFilePath)
+    .then(async (status) => {
+      console.log('Successfully wrote new file to Github repo: ', status);
+      gm.filepath = newFilePath;
+      console.log('Filepath after write: ', gm.filepath);
+      return await gm.status();
+    })
+    .catch((e) => {
+      console.warn("Couldn't write new file to Github repo: ", e, github);
+    });
+} // prepareNewFileForCommit()
+
+async function doCommit() {
+  const commitButton = document.getElementById('githubCommitButton');
+  const messageInput = document.getElementById('commitMessageInput');
+  const message = messageInput.value;
+  const githubLoadingIndicator = document.getElementById('GithubLogo');
+  try {
+    await gm.add();
+    await gm.commit(message);
+    await gm.push();
+  } catch (e) {
+    githubLoadingIndicator.classList.remove('clockwise');
+    cm.setOption('readOnly', false);
+    console.warn("Couldn't do commit and push: ", e);
+    v.showUserPrompt(
+      "Couldn't commit and push to Github: " + e,
+      [
+        {
+          label: 'Cancel - do not commit',
+          event: () => {
+            v.hideUserPrompt();
+          },
+        },
+        {
+          label: 'Commit to new branch and open a Pull Request',
+          event: async () => {
+            // push changes to a new branch
+            let oldBranch = gm.branch;
+            gm.createBranch(message)
+              .then(() => {
+                // redraw the github menu to show new branch
+                fillInBranchContents();
+                // create PR
+                gm.createPR(oldBranch)
+                  .then((pr) => {
+                    console.log('Created PR: ', pr);
+                    v.hideUserPrompt();
+                    // update git menu to show new branch name and include link to PR github page
+                  })
+                  .catch((e) => {
+                    console.warn("Couldn't create PR: ", e);
+                    v.hideUserPrompt();
+                    v.showAlert("Couldn't create PR: " + e);
+                  });
+              })
+              .catch((e) => {
+                console.warn("Couldn't create branch: ", e);
+                v.hideUserPrompt();
+                v.showAlert("Couldn't create branch: " + e);
+              });
+          },
+        },
+      ],
+      'warning'
+    );
+  }
+  console.debug(`Successfully committed and pushed to github: ${gm.repo}${gm.filepath}`);
+  messageInput.value = '';
+  console.log('Status after commit: ', await gm.status());
+  setCommitUIEnabledStatus();
+  updateFileStatusDisplay();
+  setFileChangedState(await gm.fileChanged());
+  githubLoadingIndicator.classList.remove('clockwise');
+  cm.setOption('readOnly', false);
+  fillInCommitLog('withRefresh');
+} // doCommit()
 
 function stripMeiFileName() {
   const stripped = meiFileName.match(/^.*\/([^\/]+)$/);
@@ -911,7 +1033,7 @@ function generateGithubActionsInputConfig(inputs, input) {
     setter.setAttribute('title', translator.lang[inp.id].text);
     setter.setAttribute('id', input + '-' + inp.id);
     setter.addEventListener('click', () => {
-      inputField.value = inp.func();
+      inputField.value = inp.func(gm);
     });
     inputSetters.insertAdjacentElement('beforeend', setter);
   });

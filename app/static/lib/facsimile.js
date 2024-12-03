@@ -7,7 +7,7 @@
 import { rmHash, setCursorToId } from './utils.js';
 import { svgNameSpace, xmlToString } from './dom-utils.js';
 import { transformCTM, updateRect } from './drag-selector.js';
-import { cm, fileLocationType, github, isCtrlOrCmd, meiFileLocation, translator, v } from './main.js';
+import { cm, fileLocationType, gm, isCtrlOrCmd, meiFileLocation, translator, v } from './main.js';
 import { addZone, replaceInEditor } from './editor.js';
 import { attFacsimile } from './attribute-classes.js';
 import { defaultFacsimileRectangleColor, defaultFacsimileRectangleLineWidth, isFirefox } from './defaults.js';
@@ -172,7 +172,7 @@ export async function drawFacsimile() {
     (x) => !x.parentElement.classList.contains('note')
   );
 
-  // try to find a @facs in an earlier page beginning, 
+  // try to find a @facs in an earlier page beginning,
   // or warn, if really no @facs attributes are found in the current notation SVG
   if (svgFacs.length === 0) {
     let pb = getCurrentPbElement(v.xmlDoc); // id of current page beginning
@@ -433,12 +433,12 @@ function createImageName(zoneId) {
     if (fileLocationType === 'github') {
       let url = new URL(
         'https://raw.githubusercontent.com/' +
-        github.githubRepo +
-        '/' +
-        github.branch +
-        github.filepath.substring(0, github.filepath.lastIndexOf('/')) +
-        '/' +
-        facs[zoneId].target
+          gm.repo +
+          '/' +
+          gm.branch +
+          gm.filepath.substring(0, gm.filepath.lastIndexOf('/')) +
+          '/' +
+          facs[zoneId].target
       );
       imgName = url.href;
     } else if (fileLocationType === 'url') {
@@ -448,15 +448,9 @@ function createImageName(zoneId) {
       imgName = `${root}local/` + facs[zoneId].target;
       imgName = imgName.replace('.tif', '.jpg'); // hack for some DIME files...
     }
-  } else if (
-    imgName.startsWith('https://raw.githubusercontent.com/') &&
-    github &&
-    github.githubToken &&
-    github.branch &&
-    github.filepath
-  ) {
+  } else if (imgName.startsWith('https://raw.githubusercontent.com/') && gm && gm.token && gm.branch && gm.filepath) {
     // absolute file paths for GitHub
-    let url = new URL('https://raw.githubusercontent.com/' + github.githubRepo + '/' + github.branch + github.filepath);
+    let url = new URL('https://raw.githubusercontent.com/' + gm.repo + '/' + gm.branch + gm.filepath);
     imgName = url.href;
   }
   return imgName;
@@ -495,7 +489,7 @@ async function embedImage(url) {
   return new Promise((resolve) => {
     const img = document.createElementNS(svgNameSpace, 'image');
     img.setAttribute('id', 'source-image');
-    github.directlyReadFileContents(url).then((dataUrl) => {
+    gm.directlyReadFileContents(url).then((dataUrl) => {
       img.setAttributeNS('http://www.w3.org/1999/xlink', 'href', dataUrl);
       resolve(img);
     });
@@ -804,16 +798,16 @@ export function addZoneDrawer() {
       drawing = 'new';
       console.log(
         'ZoneDrawer mouse down: ' +
-        drawing +
-        '; ' +
-        ev.clientX +
-        '/' +
-        ev.clientY +
-        ', scroll: ' +
-        ip.scrollLeft +
-        '/' +
-        ip.scrollTop +
-        ', start: ',
+          drawing +
+          '; ' +
+          ev.clientX +
+          '/' +
+          ev.clientY +
+          ', scroll: ' +
+          ip.scrollLeft +
+          '/' +
+          ip.scrollTop +
+          ', start: ',
         start
       );
     }
