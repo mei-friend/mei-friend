@@ -327,11 +327,11 @@ a:active {
   width: 95%;
 }
 
-.dropdownContent a.disabled { 
-  pointer-events:none; 
+.dropdownContent a.disabled {
+  pointer-events: none;
 }
 
-.actionsContainer.notAllowed{
+.actionsContainer.notAllowed {
   cursor: not-allowed;
 }
 
@@ -559,7 +559,8 @@ a:active {
   fill: var(--textColor);
 }
 
-#verovioContainer {
+#verovioContainer,
+#facsimileContainer {
   height: 100%;
   width: 100%;
   overflow: inherit;

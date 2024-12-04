@@ -415,14 +415,14 @@ export default class Viewer {
       let vph = document.getElementById('vrv-pageHeight');
       if (vph) this.vrvOptions.pageHeight = vph.value;
     } else {
-      let dimensions = {}; // = getVerovioContainerSize();
+      let dimensions = {};
       let vp = document.getElementById('verovio-panel');
       dimensions.width = vp.clientWidth;
       dimensions.height = vp.clientHeight;
       // console.info('client size: ' + dimensions.width + '/' + dimensions.height);
       if (this.vrvOptions.breaks !== 'none') {
-        this.vrvOptions.pageWidth = Math.max(Math.round(dimensions.width * (100 / this.vrvOptions.scale)), 100);
-        this.vrvOptions.pageHeight = Math.max(Math.round(dimensions.height * (100 / this.vrvOptions.scale)), 100);
+        this.vrvOptions.pageWidth = Math.max(Math.floor(dimensions.width * (100 / this.vrvOptions.scale)), 100);
+        this.vrvOptions.pageHeight = Math.max(Math.floor(dimensions.height * (100 / this.vrvOptions.scale)), 100);
       }
       // console.info('Vrv pageWidth/Height: ' + this.vrvOptions.pageWidth + '/' + this.vrvOptions.pageHeight);
     }
