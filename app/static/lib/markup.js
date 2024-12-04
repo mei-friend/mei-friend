@@ -466,6 +466,11 @@ function addMarkupToXML(v, cm, attrName = 'none', mElName, multiLayerContent = [
     }
   } // while
 
+  // Arrays for the copied Elements and a sort-of dictionary for new 2 old IDs in case we have
+  // dependent IDs we need to change after the copy
+  let dicOld2NewIDs = {};
+  let copiedChilds = [];
+
   // this loop iterates over the array of arrays of grouped ids
   // and wraps the markup around a whole group
   elementGroups.forEach((group) => {
@@ -500,7 +505,7 @@ function addMarkupToXML(v, cm, attrName = 'none', mElName, multiLayerContent = [
           cmd.addIds();
           v.hideUserPrompt(resolveModal);
           console.log('Added ids and proceed.');
-          let markupUuid = createMarkup(v, group, mElName, parent, multiLayerContent);
+          let markupUuid = createMarkup(v, group, mElName, parent, multiLayerContent, copiedChilds, dicOld2NewIDs);
           uuids.push(markupUuid);
         })
         .catch((resolveModal) => {
@@ -508,11 +513,16 @@ function addMarkupToXML(v, cm, attrName = 'none', mElName, multiLayerContent = [
           console.log('Aborting action because of missing parent id.');
         });
     } else {
-      let markupUuid = createMarkup(v, group, mElName, parent, multiLayerContent);
+      let markupUuid = createMarkup(v, group, mElName, parent, multiLayerContent, copiedChilds, dicOld2NewIDs);
       uuids.push(markupUuid);
 
       // buffer.groupChangesSinceCheckpoint(checkPoint); // TODO
     }
+  });
+
+  // Go over the existing copied childs to modify dependent IDs to other modified elements
+  copiedChilds.forEach((item) => {
+    dutils.modifyDependenIDs(item, dicOld2NewIDs);
   });
 
   if (uuids.length > 0) {
@@ -544,16 +554,18 @@ function addMarkupToXML(v, cm, attrName = 'none', mElName, multiLayerContent = [
  * @param {string} mElName
  * @param {HTMLElement} parentEl parent element
  * @param {Array[string]} content element names
+ * @param {Array} copiedChilds an array where copied elements will be inserted
+ * @param {Object} dicOld2NewIDs a dictionary where old to new IDs of copied elements will be inserted
  * @returns the uuid of the outer element
  */
-function createMarkup(v, groupIds, mElName, parentEl, content) {
+function createMarkup(v, groupIds, mElName, parentEl, content, copiedChilds, dicOld2NewIDs) {
   let upmostMarkupUuid;
   let upmostMarkup;
   if (att.modelTranscriptionLike.includes(mElName)) {
     upmostMarkup = wrapGroupWithMarkup(v, groupIds, mElName, parentEl);
   } else {
     let firstChild = wrapGroupWithMarkup(v, groupIds, content[0], parentEl);
-    upmostMarkup = addMultiLayeredMarkup(v, mElName, parentEl, firstChild, content);
+    upmostMarkup = addMultiLayeredMarkup(v, mElName, parentEl, firstChild, content, copiedChilds, dicOld2NewIDs);
   }
   upmostMarkupUuid = upmostMarkup.getAttribute('xml:id');
   return upmostMarkupUuid;
@@ -567,9 +579,11 @@ function createMarkup(v, groupIds, mElName, parentEl, content) {
  * @param {HTMLElement} parentEl parent for choice/subst/app
  * @param {HTMLElement} firstChild first child of choice/subst/app with content
  * @param {Array[string]} content element names for content of choice/subst/app
+ * @param {Array} copiedChilds an array where copied elements will be inserted
+ * @param {Object} dicOld2NewIDs a dictionary where old to new IDs of copied elements will be inserted
  * @returns {HTMLElement} newly created multi layered markup element
  */
-function addMultiLayeredMarkup(v, mElName, parentEl, firstChild, content) {
+function addMultiLayeredMarkup(v, mElName, parentEl, firstChild, content, copiedChilds, dicOld2NewIDs) {
   let upmostElement = document.createElementNS(dutils.meiNameSpace, mElName);
   let upmostElementID = mintSuppliedId(firstChild.getAttribute('xml:id'), mElName, v);
   upmostElement.setAttributeNS(dutils.xmlNameSpace, 'xml:id', upmostElementID);
@@ -601,11 +615,15 @@ function addMultiLayeredMarkup(v, mElName, parentEl, firstChild, content) {
       case 'copy':
         nextChild.appendChild(dummyCopy);
         let firstChildCopies = new DocumentFragment();
+        
         for (let child of firstChild.children) {
           let newChildCopy = child.cloneNode(true);
-          dutils.addNewXmlIdsToDescendants(newChildCopy);
+          dutils.addNewXmlIdsToDescendants(newChildCopy, dicOld2NewIDs);
           firstChildCopies.appendChild(newChildCopy);
+          // Add the copy and all descendend elements to the array of copies
+          addElementAndChildsToArray(newChildCopy, copiedChilds);
         }
+        
         nextChild.appendChild(firstChildCopies);
         break;
       default:
@@ -616,6 +634,20 @@ function addMultiLayeredMarkup(v, mElName, parentEl, firstChild, content) {
 
   return upmostElement;
 } // addMultiLayeredMarkup()
+
+/**
+ * Copies the given element and all its childs into the array
+ * @param {*} element the element to add
+ * @param {*} copiedChilds the array to which to add
+ */
+function addElementAndChildsToArray(element, copiedChilds){
+  copiedChilds.push(element);
+  if (element.children.length > 0) {
+    for (let child of element.children) {
+      addElementAndChildsToArray(child, copiedChilds);
+    }
+  }
+}
 
 /**
  * Wraps a single group of elements with a markup element

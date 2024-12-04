@@ -425,19 +425,44 @@ export function getAffectedNotesFromKeySig(keySigString = '') {
 /**
  * For all nodes with xml:id, replace with new xml:id and repeat for all decendents
  * @param {Node} xmlNode
+ * @param {Object} dicIdChanges a dictionary where old to new IDs will be inserted
  */
-export function addNewXmlIdsToDescendants(xmlNode) {
+export function addNewXmlIdsToDescendants(xmlNode, dicIdChanges) {
   if (xmlNode.getAttribute('xml:id')) {
     let newID = utils.generateXmlId(xmlNode.localName, Viewer.xmlIdStyle);
+    dicIdChanges[xmlNode.getAttribute('xml:id')] = newID;
     xmlNode.setAttributeNS(xmlNameSpace, 'xml:id', newID);
 
     if (xmlNode.children.length > 0) {
       for (let child of xmlNode.children) {
-        addNewXmlIdsToDescendants(child);
+        addNewXmlIdsToDescendants(child, dicIdChanges);
       }
     }
   }
 } // addNewXmlIdsToDescendants()
+
+/**
+ * Checks if the xmlNode has dependen IDs and replaces them with the one found in dicOld2NewIDs
+ * @param {*} xmlNode 
+ * @param {*} dicOld2NewIDs 
+ */
+export function modifyDependenIDs(xmlNode, dicOld2NewIDs){
+  let currentID = utils.rmHash(xmlNode.getAttribute('endid'));
+  if (currentID && dicOld2NewIDs[currentID]) {
+    xmlNode.setAttribute('endid', "#" + dicOld2NewIDs[currentID]);
+  }
+
+  currentID = utils.rmHash(xmlNode.getAttribute('startid'));
+  if (currentID && dicOld2NewIDs[currentID]) {
+    xmlNode.setAttribute('startid', "#" + dicOld2NewIDs[currentID]);
+  }
+
+  if (xmlNode.children.length > 0) {
+    for (let child of xmlNode.children) {
+      modifyDependenIDs(child, dicOld2NewIDs);
+    }
+  }
+}
 
 /**
  * Scroll DOM element into view inside container element.
