@@ -1,6 +1,7 @@
 # mei-friend-online CHANGELOG.md
 ### 1.1.8 Merge isomorphic-git and mark-up enrichment developments
 * Merges patches 1.0.17 and 1.1.7 in preparation for 1.2.0 release
+* Resizer reworked to ensure visibility of x and y scroll bars
 
 ### 1.1.7 patch
 * Support for markup color export to PDF (#108)
