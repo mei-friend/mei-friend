@@ -248,6 +248,7 @@ export function loadDataInEditor(meiXML, setFreshlyLoaded = true) {
   v.loadXml(meiXML, true);
   cm.blockChanges = true;
   cm.setValue(meiXML);
+  cm.clearHistory();
   cm.blockChanges = false;
   cmd.checkFacsimile();
   loadFacsimile(v.xmlDoc); // load all facsimila data of MEI
