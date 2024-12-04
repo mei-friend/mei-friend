@@ -7,7 +7,14 @@
         {
             "type": "chrome",
             "request": "launch",
-            "name": "mei-friend",
+            "name": "mei-friend Chrome",
+            "url": "http://localhost:5001",
+            "webRoot": "${workspaceFolder}/app"
+        },
+        {
+            "type": "firefox",
+            "request": "launch",
+            "name": "mei-friend Firefox",
             "url": "http://localhost:5001",
             "webRoot": "${workspaceFolder}/app"
         }
