@@ -560,7 +560,7 @@ export function zoomFacsimile(deltaPercent) {
  * Scale the title font size according to the zoom factor,
  * with a minimum of 3pt and a maximum of 16pt
  * @param {Number} zoomFactor
- * @returns {String} font size in pt
+ * @returns {string} font size in pt
  */
 function scaleTitleFontSize(zoomFactor) {
   let minFontSize = 7; // pt
