@@ -368,7 +368,6 @@ export function addMarkup(event) {
       });
       v.selectedElements = newSelection;
       setChoiceOptions(multiLayerContent[multiLayerContent.length - 1]);
-      v.updateAll(cm, {}, v.selectedElements[0]);
     }
   }
 } // addMarkup()
