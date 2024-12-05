@@ -79,7 +79,9 @@ export function loadFacsimile(xmlDoc) {
   surfaces.forEach((s, i) => {
     let id;
     let { target, width, height } = fillGraphic(s.querySelector('graphic'));
-    if (s.hasAttribute('xml:id')) id = s.getAttribute('xml:id');
+    if (s.hasAttribute('xml:id')) {
+      id = s.getAttribute('xml:id');
+    }
     if (id) {
       facs[id] = {};
       if (target) facs[id]['target'] = target;
@@ -130,7 +132,7 @@ export function loadFacsimile(xmlDoc) {
   /**
    * Local function to handle main attributes of graphic element.
    * @param {Node} graphic
-   * @returns {object}
+   * @returns {Object}
    */
   function fillGraphic(graphic) {
     let t, w, h;
@@ -510,7 +512,7 @@ function clearSourceImages() {
       c.remove();
     });
   }
-}
+} // clearSourceImages()
 
 /**
  * Clear all rect and text elements in the source image svgs
@@ -525,11 +527,13 @@ export function clearZones() {
 
 /**
  * Zooms the facsimile surface image in the sourceImageContainer svg.
- * @param {float} deltaPercent
+ * @param {number} deltaPercent
  */
 export function zoomFacsimile(deltaPercent) {
   let facsimileZoomInput = document.getElementById('facsimileZoomInput'); // mf settings menu
-  if (!facsimileZoomInput) return;
+  if (!facsimileZoomInput) {
+    return;
+  }
   if (deltaPercent) {
     facsimileZoomInput.value = Math.min(
       parseInt(facsimileZoomInput.max),
@@ -539,27 +543,35 @@ export function zoomFacsimile(deltaPercent) {
     facsimileZoomInput.dispatchEvent(new Event('input', { bubbles: true }));
   }
   let facsZoom = document.getElementById('facsimileZoom'); // facsimile panel
-  if (!facsZoom) return;
-  if (deltaPercent) facsZoom.value = facsimileZoomInput.value;
+  if (!facsZoom) {
+    return;
+  }
+  if (deltaPercent) {
+    facsZoom.value = facsimileZoomInput.value;
+  }
 
   // find all source images SVGs and adjust their scale
   document.querySelectorAll('[id^="sourceImage-"]').forEach((si) => {
     let svg = si.querySelector('svg');
     let viewBox = svg.getAttribute('viewBox')?.split(' ');
-    if (!viewBox) return;
+    if (!viewBox) {
+      return;
+    }
     let zoomFactor = parseFloat(facsimileZoomInput.value / 100);
     svg.setAttribute('width', Math.round(viewBox[2] * zoomFactor));
     svg.removeAttribute('height');
     svg.setAttribute('data-zoomFactor', zoomFactor);
     let imageTitle = si.querySelector('div');
-    if (imageTitle) imageTitle.style.fontSize = scaleTitleFontSize(zoomFactor);
+    if (imageTitle) {
+      imageTitle.style.fontSize = scaleTitleFontSize(zoomFactor);
+    }
   });
 } // zoomFacsimile()
 
 /**
  * Scale the title font size according to the zoom factor,
  * with a minimum of 3pt and a maximum of 16pt
- * @param {Number} zoomFactor
+ * @param {number} zoomFactor
  * @returns {string} font size in pt
  */
 function scaleTitleFontSize(zoomFactor) {
@@ -577,7 +589,9 @@ function scaleTitleFontSize(zoomFactor) {
 export function highlightZone(rect) {
   let svg = rect.closest('svg');
   // console.log('Highlighting zone: ', rect.id, svg);
-  if (!svg) return;
+  if (!svg) {
+    return;
+  }
 
   // remove event listerners
   for (let key in listenerHandles) {
@@ -604,16 +618,18 @@ export function highlightZone(rect) {
 /**
  * Adds event listeners for resizing a zone bounding box
  * to each
- * @param {object} v
+ * @param {Object} v
  * @param {rect} rect
- * @returns {object} of event listener handles
+ * @returns {Object} of event listener handles
  */
 export function addZoneResizer(v, rect) {
   let txt, txtX, txtY; // text element for zone number and its x/y coordinates
   var ip = document.getElementById('facsimile-panel');
   var svg = rect.closest('svg');
   // console.log('Adding zone resizer for: ', rect.id, svg);
-  if (!ip || !svg) return;
+  if (!ip || !svg) {
+    return;
+  }
   var start = {}; // starting point start.x, start.y
   var end = {}; // ending point
   var bb;
@@ -644,16 +660,33 @@ export function addZoneResizer(v, rect) {
     let xr = Math.abs(ev.clientX - bcr.x - bcr.width);
     let yu = Math.abs(ev.clientY - bcr.y);
     let yl = Math.abs(ev.clientY - bcr.y - bcr.height);
-    if (ev.clientX > bcr.x && ev.clientX < bcr.x + bcr.width && ev.clientY > bcr.y && ev.clientY < bcr.y + bcr.height)
+    if (ev.clientX > bcr.x && ev.clientX < bcr.x + bcr.width && ev.clientY > bcr.y && ev.clientY < bcr.y + bcr.height) {
       resize = 'pan';
-    if (xl < thres) resize = 'west';
-    if (yu < thres) resize = 'north';
-    if (xr < thres) resize = 'east';
-    if (yl < thres) resize = 'south';
-    if (xl < thres && yu < thres) resize = 'northwest';
-    if (xr < thres && yu < thres) resize = 'northeast';
-    if (xl < thres && yl < thres) resize = 'southwest';
-    if (xr < thres && yl < thres) resize = 'southeast';
+    }
+    if (xl < thres) {
+      resize = 'west';
+    }
+    if (yu < thres) {
+      resize = 'north';
+    }
+    if (xr < thres) {
+      resize = 'east';
+    }
+    if (yl < thres) {
+      resize = 'south';
+    }
+    if (xl < thres && yu < thres) {
+      resize = 'northwest';
+    }
+    if (xr < thres && yu < thres) {
+      resize = 'northeast';
+    }
+    if (xl < thres && yl < thres) {
+      resize = 'southwest';
+    }
+    if (xr < thres && yl < thres) {
+      resize = 'southeast';
+    }
     console.log(
       'ZoneResizer: Mouse down ' + resize + ' ev.clientX/Y:' + ev.clientX + '/' + ev.clientX + ', rect:',
       rect
@@ -674,16 +707,33 @@ export function addZoneResizer(v, rect) {
       ev.clientY > bcr.y &&
       ev.clientY < bcr.y + bcr.height &&
       ev.target === rect
-    )
+    ) {
       rect.style.cursor = 'move';
-    if (xl < thres) rect.style.cursor = 'ew-resize';
-    if (yu < thres) rect.style.cursor = 'ns-resize';
-    if (xr < thres) rect.style.cursor = 'ew-resize';
-    if (yl < thres) rect.style.cursor = 'ns-resize';
-    if (xl < thres && yu < thres) rect.style.cursor = 'nwse-resize';
-    if (xr < thres && yu < thres) rect.style.cursor = 'nesw-resize';
-    if (xl < thres && yl < thres) rect.style.cursor = 'nesw-resize';
-    if (xr < thres && yl < thres) rect.style.cursor = 'nwse-resize';
+    }
+    if (xl < thres) {
+      rect.style.cursor = 'ew-resize';
+    }
+    if (yu < thres) {
+      rect.style.cursor = 'ns-resize';
+    }
+    if (xr < thres) {
+      rect.style.cursor = 'ew-resize';
+    }
+    if (yl < thres) {
+      rect.style.cursor = 'ns-resize';
+    }
+    if (xl < thres && yu < thres) {
+      rect.style.cursor = 'nwse-resize';
+    }
+    if (xr < thres && yu < thres) {
+      rect.style.cursor = 'nesw-resize';
+    }
+    if (xl < thres && yl < thres) {
+      rect.style.cursor = 'nesw-resize';
+    }
+    if (xr < thres && yl < thres) {
+      rect.style.cursor = 'nwse-resize';
+    }
     // console.log('ZoneResizer: Mouse Move ' + resize + ' ev.clientX/Y:' + ev.clientX + '/' + ev.clientY + ', rect:', bcr);
 
     if (bb && resize) {
@@ -693,7 +743,9 @@ export function addZoneResizer(v, rect) {
       end.x = ev.clientX;
       end.y = ev.clientY;
 
-      if (!svg) return;
+      if (!svg) {
+        return;
+      }
       var mx = svg.getScreenCTM().inverse();
       let s = transformCTM(thisStart, mx);
       let e = transformCTM(end, mx);
@@ -730,7 +782,10 @@ export function addZoneResizer(v, rect) {
           (x = bb.x + dx), (y = bb.y + dy), (width = bb.width), (height = bb.height);
           break;
       }
-      (x = Math.round(x)), (y = Math.round(y)), (width = Math.round(width)), (height = Math.round(height));
+      x = Math.round(x);
+      y = Math.round(y);
+      width = Math.round(width);
+      height = Math.round(height);
       let c = adjustCoordinates(x, y, width, height);
       updateRect(rect, c.x, c.y, c.width, c.height, rectangleColor, rectangleLineWidth, 'none');
       if (txt && (resize === 'northwest' || resize === 'west' || resize === 'pan')) {
@@ -755,7 +810,7 @@ export function addZoneResizer(v, rect) {
     }
   } // mouseMove()
 
-  function mouseUp(ev) {
+  function mouseUp() {
     resize = '';
   } // mouseUp()
 } // addZoneResizer()
@@ -792,7 +847,9 @@ export function addZoneDrawer() {
       rect.setAttribute('stroke-width', rectangleLineWidth);
       rect.setAttribute('fill', 'none');
       svg = ev.target.closest('svg');
-      if (!svg) return;
+      if (!svg) {
+        return;
+      }
       sourceImageNumber = parseInt(svg.getAttribute('data-sourceImageNumber'));
       svg.appendChild(rect);
       drawing = 'new';
@@ -882,11 +939,11 @@ export function addZoneDrawer() {
 /**
  * Converts negative width/height to always positive
  * left-upper corner & width/height values in an object
- * @param {int} x
- * @param {int} y
- * @param {int} width
- * @param {int} height
- * @returns {object}
+ * @param {number} x
+ * @param {number} y
+ * @param {number} width
+ * @param {number} height
+ * @returns {Object}
  */
 function adjustCoordinates(x, y, width, height) {
   let c = {};
@@ -903,7 +960,6 @@ function adjustCoordinates(x, y, width, height) {
  * adds ingestionInputHander to input element.
  */
 export function ingestFacsimile() {
-  let reply = {};
   let input = document.createElement('input');
   input.type = 'file';
   let accept = '.mei,.xml,.musicxml,.txt';
@@ -926,8 +982,11 @@ function ingestionInputHandler(ev) {
     let reader = new FileReader();
     reader.onload = (event) => {
       reply.mei = event.target.result;
-      if (reply.mei) loaded(reply);
-      else notLoaded();
+      if (reply.mei) {
+        loaded(reply);
+      } else {
+        notLoaded();
+      }
     };
     reader.readAsText(files[0]);
   });
@@ -944,7 +1003,7 @@ function ingestionInputHandler(ev) {
 /**
  * Handles ingestion of facsimile information into current MEI file
  * and adds a @facs attribute into each measure based on the @n attribute
- * @param {object} reply
+ * @param {Object} reply
  * @returns
  */
 function handleFacsimileIngestion(reply) {
@@ -954,7 +1013,9 @@ function handleFacsimileIngestion(reply) {
   let facsimile = skelXml.querySelector('facsimile');
   let zones = facsimile.querySelectorAll('zone');
   let music = v.xmlDoc.querySelector('music');
-  if (!music) return;
+  if (!music) {
+    return;
+  }
   v.allowCursorActivity = false;
 
   // ingest facsimile into target MEI (in music before body)
@@ -978,7 +1039,9 @@ function handleFacsimileIngestion(reply) {
     cr = cm.getCursor();
     cm.replaceRange(xmlToString(facsimile) + '\n', cr);
     let cr2 = cm.getCursor();
-    for (let l = cr.line; l <= cr2.line; l++) cm.indentLine(l);
+    for (let l = cr.line; l <= cr2.line; l++) {
+      cm.indentLine(l);
+    }
     // loadFacsimile(v.xmlDoc);
     console.log('Adding facsimile before body', facsimile);
   }
@@ -1027,7 +1090,9 @@ function busy(active = true) {
   let facsimileIcon = document.getElementById('facsimileIcon');
   if (facsimileIcon && active) {
     facsimileIcon.classList.add('clockwise');
-  } else if (facsimileIcon && !active) facsimileIcon.classList.remove('clockwise');
+  } else if (facsimileIcon && !active) {
+    facsimileIcon.classList.remove('clockwise');
+  }
 } // busy()
 
 /**

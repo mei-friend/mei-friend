@@ -1900,7 +1900,7 @@ export default class Viewer {
   /**
    * Creates an option div with a label and input/select depending of o.keys
    * @param {string} opt (e.g. 'vrv-pageHeight', 'controlMenuFlipToPageControls')
-   * @param {object} o
+   * @param {Object} o
    * @param {string} optDefault
    * @returns {Element}
    */
