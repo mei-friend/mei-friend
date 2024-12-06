@@ -2412,6 +2412,7 @@ export async function handleEditorChanges() {
     changeIndicator = status !== 'unmodified';
     console.log('File changed state based on git modification status: ' + status);
     setCommitUIEnabledStatus();
+    setFileChangedState(await gm.fileChanged(gm.filepath, status));
   }
   if (freshlyLoaded) {
     // ignore changes resulting from fresh file load
