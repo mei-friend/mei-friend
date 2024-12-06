@@ -556,9 +556,8 @@ async function completeInitialLoad() {
     : 'none';
 
   if (storage.supported) {
-    if (storage.github) {
+    if (storage.github && isLoggedIn) {
       // use github object from local storage if available
-      isLoggedIn = true;
       gm = new GitManager('github', 'github', storage.github.githubToken, {
         repo: storage.github.githubRepo,
         branch: storage.github.branch,
