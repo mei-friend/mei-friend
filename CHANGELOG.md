@@ -3,6 +3,7 @@
 * Merges patches 1.0.17 and 1.1.7 in preparation for 1.2.0 release
 * Resizer reworked to ensure visibility of x and y scroll bars
 * Clear undo history upon file loading to prevent undoing freshly loaded MEI file (fixes #117)
+* Allow default key bindings in Solid URL text field
 
 ### 1.1.7 patch
 * Support for markup color export to PDF (#108)

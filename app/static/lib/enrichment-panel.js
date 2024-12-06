@@ -934,6 +934,7 @@ function populateLoggedOutSolidTab() {
   customSolidIdP.placeholder = 'https://...';
   customSolidIdP.id = 'customSolidIdP';
   customSolidIdP.setAttribute('size', '17');
+  customSolidIdP.classList.add('preventKeyBindings'); // avoid CMD + A to close annotation panel
   let solidLoginBtn = document.createElement('button');
   solidLoginBtn.innerHTML = translator.lang.solidLoginBtn.text;
   solidLoginBtn.id = 'solidLogin';
