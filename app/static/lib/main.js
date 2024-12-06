@@ -662,8 +662,8 @@ async function completeInitialLoad() {
       v.showAlert(translator.lang.githubLoggedOutWarning.text, 'warning', 30000);
       storage.removeItem('githubLogoutRequested');
     }
-
     setFileChangedState(storage.fileChanged);
+    updateFileStatusDisplay();
     if (!urlFileName && !urlFetchInProgress) {
       // no URI param specified - try to restore from storage
       if (storage.content && storage.fileName) {
