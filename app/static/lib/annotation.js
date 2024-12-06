@@ -1,4 +1,4 @@
-import { v, cm, log, translator } from './main.js';
+import { v, cm, log, translator, handleEditorChanges } from './main.js';
 import { convertCoords, generateXmlId, rmHash, setCursorToId } from './utils.js';
 import { meiNameSpace, xmlNameSpace, xmlToString } from './dom-utils.js';
 import { removeInEditor } from './editor.js';
@@ -240,7 +240,7 @@ export const createLink = (e, selection) => {
 //#region inline annotation functions
 
 /**
- * reads <annot> elements from XML DOM and adds them into 
+ * reads <annot> elements from XML DOM and adds them into
  * annotations array itemList[] of enrichment-panel.js
  * @param {boolean} flagLimit alert if max. number of annotations are reached
  */
@@ -368,6 +368,9 @@ export function writeAnnot(anchor, xmlId, plist, payload) {
     return;
   }
   if (insertHere) {
+    // disable cursor activity and block changes in CM
+    v.allowCursorActivity = false;
+    cm.blockChanges = true;
     // trz to add our annotation at beginning of insertHere element's list of children.
     // in case of alternative encodings, add annotation at beginning of first child WRONG!!
     // find first non-text child with an identifier
@@ -415,6 +418,11 @@ export function writeAnnot(anchor, xmlId, plist, payload) {
       console.warn(errMsg);
       log(errMsg);
     }
+    // unlock cursor activity and allow changes in CM
+    v.allowCursorActivity = true;
+    cm.blockChanges = false;
+    // fire change event to update application state
+    handleEditorChanges();
   }
 } // writeAnnot()
 
