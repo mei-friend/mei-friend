@@ -1189,7 +1189,7 @@ export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true, upd
     storage.fileLocationType = 'file';
   }
   fileLocationType = 'file';
-  if (github) gm.filepath = '';
+  if (gm) gm.filepath = '';
   if (typeof file === 'string') {
     // with fileName string
     meiFileName = file;
