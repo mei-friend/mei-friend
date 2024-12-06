@@ -4,7 +4,7 @@
 
 import * as att from './attribute-classes.js';
 import { addApplicationInfo, replaceInEditor } from './editor.js';
-import { cm, cmd, translator, v } from './main.js';
+import { cm, cmd, handleEditorChanges, translator, v } from './main.js';
 import * as dutils from './dom-utils.js';
 import * as speed from './speed.js';
 import * as utils from './utils.js';
@@ -359,6 +359,7 @@ export function addMarkup(event) {
     v.showAlert('Please first select a content option for this markup element!');
   } else {
     addMarkupToXML(v, cm, attrName, mElName, multiLayerContent);
+    handleEditorChanges(); // update editor content
     //let successfullyAdded = xmlMarkupToListItem(v.selectedElements, mElName);
     // Manually updating the item list is not necessary because refreshing the code in the editor triggers readMarkup()
     refreshAnnotationsList();
@@ -402,6 +403,7 @@ function addMarkupToXML(v, cm, attrName = 'none', mElName, multiLayerContent = [
   v.selectedElements = utils.sortElementsByScorePosition(v.selectedElements);
   if (v.selectedElements.length < 1) return;
   v.allowCursorActivity = false;
+  cm.blockChanges = true;
 
   let uuids = [];
   let elementGroups = [];
@@ -546,8 +548,8 @@ function addMarkupToXML(v, cm, attrName = 'none', mElName, multiLayerContent = [
   }
 
   addApplicationInfo(v, cm);
-  v.updateData(cm, false, true);
   v.allowCursorActivity = true; // update notation again
+  cm.blockChanges = false;
 } // addMarkupToXML()
 
 /**
