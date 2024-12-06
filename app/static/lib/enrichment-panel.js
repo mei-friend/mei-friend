@@ -278,9 +278,9 @@ export function refreshAnnotationsInNotation(forceListRefresh = false) {
       }
     });
   }
-  // if (document.getElementById('showAnnotationPanel')?.checked) {
-  //   situateAndRefreshAnnotationsList(forceListRefresh);
-  // }
+  if (document.getElementById('showAnnotationPanel')?.checked) {
+    situateAndRefreshAnnotationsList(forceListRefresh);
+  }
 } // refreshAnnotationsInNotation()
 
 //#endregion
