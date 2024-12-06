@@ -37,12 +37,18 @@ export function clearListItems() {
   listItems = [];
 } // clearListItems()
 
+function clearInlineListItems() {
+  listItems = listItems.filter((a) => {
+    return a.isStandoff;
+  });
+} // clearInlineListItems()
+
 /**
  * Reads markup and annotations from XML encoding (MEI) into listItems array.
  * @param {boolean} [flagLimit=false] limit reading to a certain number of items
  */
 export function readListItemsFromXML(flagLimit = false) {
-  clearListItems();
+  clearInlineListItems();
   annot.readAnnots(flagLimit);
   markup.readMarkup();
   situateAndRefreshAnnotationsList();
@@ -487,12 +493,17 @@ function generateAnnotationButtons(a) {
   if (!'selection' in a) flipToAnno.classList.add('disabled');
   flipToAnno.addEventListener('click', () => {
     console.debug('Flipping to annotation: ', a);
-    setCursorToId(cm, a.id);
+
+    if (a.isInline || a.isMarkup) {
+      setCursorToId(cm, a.id);
+    } else {
+      setCursorToId(cm, a.selection[0]);
+    }
   });
 
   // add Observation button
-  const addObservation = generateListItemButton('addObservaion', speechBubble, 'Add observation to extract');
-  if (a.type !== !'annotateIdentify') {
+  const addObservation = generateListItemButton('addObservation', speechBubble, 'Add observation to extract');
+  if (a.type !== 'annotateIdentify') {
     addObservation.classList.add('disabled');
   }
 
