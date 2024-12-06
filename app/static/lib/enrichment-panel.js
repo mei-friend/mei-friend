@@ -7,7 +7,7 @@ import * as annot from './annotation.js';
 import { nsp } from './linked-data.js';
 import { v, cm, translator, setStandoffAnnotationEnabledStatus } from './main.js';
 import * as markup from './markup.js';
-import { loginAndFetch, solid, solidLogout, provider } from './solid.js';
+import { loginAndFetch, solid, solidLogout, getSolidStorage } from './solid.js';
 import { setCursorToId, sortElementsByScorePosition } from './utils.js';
 import {
   circle,
@@ -846,10 +846,10 @@ export async function populateSolidTab() {
   const solidTab = document.getElementById('solidTab');
   if (solid.getDefaultSession().info.isLoggedIn) {
     solidTab.innerHTML = await populateLoggedInSolidTab();
-    document.getElementById('solidLogout').addEventListener('click', () => {
+    document.getElementById('solidLogout').addEventListener('click', async () => {
       solidLogout(populateSolidTab);
       v.showAlert(translator.lang.solidLoggedOutWarning.html, 'warning', 30000);
-      document.getElementById('solidIdPLogoutLink').href = provider + '/logout';
+      document.getElementById('solidIdPLogoutLink').href = await getSolidStorage();
     });
   } else {
     solidTab.innerHTML = populateLoggedOutSolidTab();
