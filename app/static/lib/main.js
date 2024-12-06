@@ -565,6 +565,10 @@ async function completeInitialLoad() {
       });
 
       //document.querySelector("#fileLocation").innerText = meiFileLocationPrintable;
+    } else if (storage.github && !isLoggedIn) {
+      // we have github data but are not logged in
+      // suggests inconsistency, so formally log user out
+      logoutFromGithub();
     } else if (isLoggedIn) {
       // initialise and store new github object
       // const gitWorker = new Worker(`${root}lib/git-worker.js`);
