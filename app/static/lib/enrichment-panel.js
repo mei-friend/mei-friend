@@ -793,7 +793,9 @@ function addSelectionSelect() {
   selSelDiv.appendChild(selSelect);
 
   let markupMenu = document.getElementById('markupSettingsFieldset');
-  markupMenu.prepend(selSelDiv);
+  if (markupMenu) {
+    markupMenu.prepend(selSelDiv);
+  }
 } // addSelectionSelect()
 
 /**
