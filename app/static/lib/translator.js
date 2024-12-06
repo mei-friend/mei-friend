@@ -6,6 +6,7 @@ import { isSafari } from './defaults.js';
 import * as l from '../lang/lang.en.js'; // default language
 import { translateLanguageSelection } from './language-selector.js';
 import { drawRightFooter, updateStatusBar } from './main.js';
+import { refreshAnnotationsList } from './enrichment-panel.js';
 import Viewer from './viewer.js';
 
 /**
@@ -56,7 +57,7 @@ export default class Translator {
 
   /**
    * Copy all keys of language object to internal translator.lang
-   * @param {object} language
+   * @param {Object} language
    */
   setLang(language) {
     for (let key in language) this.lang[key] = language[key];
@@ -92,6 +93,7 @@ export default class Translator {
     }
     updateStatusBar();
     drawRightFooter();
+    refreshAnnotationsList();
 
     this.handleLanguageExceptions();
 

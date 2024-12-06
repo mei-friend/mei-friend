@@ -199,9 +199,6 @@ export const lang = {
   addDiminuendoHairpinText: { text: 'Malgrandigo harpuno' },
   addBeamText: { text: 'Traveto' },
   addBeamSpanText: { text: 'Travetospaco' },
-  addSuppliedText: { text: 'Liverita' },
-  addSuppliedArticText: { text: 'Liverita (Artaĵo)' },
-  addSuppliedAccidText: { text: 'Liverita (Akĉento)' },
   addArpeggioText: { text: 'Arpegio' },
   addFermataText: { text: 'Fermato' },
   addGlissandoText: { text: 'Glisado' },
@@ -288,6 +285,9 @@ export const lang = {
   breaksSelectLine: { text: 'Sistemo' },
   breaksSelectEncoded: { text: 'Sistemo kaj paĝo' },
   breaksSelectSmart: { text: 'Saĝa' },
+  choiceSelect: { description: 'Choose displayed content for choice elements' },
+  choiceDefault: { text: '(default choice)' },
+  noChoice: { text: '(nenia elekto disponebla)' },
   updateControlsLabel: { text: 'Ĝisdatigo', description: 'KontrolĜisdatigo konduto de notado post ŝanĝoj en kodado' },
   liveUpdateCheckbox: { description: 'Aŭtomate ĝisdatigi notadon post ŝanĝoj en kodado' },
   codeManualUpdateButton: { description: 'Mane ĝisdatigi notadon' },
@@ -439,8 +439,8 @@ export const lang = {
   annotationCloseButtonText: { text: 'Fermi la Panelon de Notoj' },
   hideAnnotationPanelButton: { description: 'Fermi la Panelon de Notoj' },
   closeAnnotationPanelButton: { description: 'Fermi la Panelon de Notoj' },
-  annotationToolsButton: { text: 'Iloj', description: 'Iloj de Notoj' },
-  annotationListButton: { text: 'Listo', description: 'Listigi Notojn' },
+  annotationToolsButton: { description: 'Iloj de Notoj' },
+  annotationListButton: { description: 'Listigi Notojn' },
   writeAnnotStandoffText: { text: 'Reteja Noto' },
   annotationToolsIdentifyTitle: { text: 'Identigi' },
   annotationToolsIdentifySpan: { text: 'Identigi Muzikan Objekton' },
@@ -457,6 +457,9 @@ export const lang = {
   loadWebAnnotationMessage2: { text: 'bonvolu reprovi' },
   noAnnotationsToDisplay: { text: 'Neniu notoj por montri' },
   flipPageToAnnotationText: { description: 'Turni paĝon al ĉi tiu noto' },
+  describeMarkup: { description: 'Priskribu ĉi tiun markadon' },
+  deleteMarkup: { description: 'Forigu ĉi tiun markadon' },
+  deleteMarkupConfirmation: { text: 'Ĉu vi certas, ke vi volas forigi ĉi tiun markadon?' },
   deleteAnnotation: { description: 'Forigi ĉi tiun noton' },
   deleteAnnotationConfirmation: { text: 'Ĉu vi certas ke vi volas forigi ĉi tiun noton?' },
   makeStandOffAnnotation: {
@@ -483,6 +486,95 @@ export const lang = {
   annotationWithoutIdWarning: {
     text1: 'Ne eblas enmeti noton ĉar la MEI ankorpunkto ne havas xml:id.',
     text2: 'Bonvolu aljuđi identigilojn elektante "Mankanĝi" -> "Re-rendi MEI (kun id-etoj)" kaj provi denove.',
+  },
+  // Markup tools
+  respSelect: {
+    text: 'Elekti markad-respondecon',
+    description: 'Elekti identigilon de respondeco',
+  },
+  selectionSelect: {
+    text: 'Defaŭlta elekto por markado',
+    description: 'Elektu ĉu nova kreita markado devus ĉirkaŭi la elektitajn elementojn, artikulaciojn aŭ akcidentojn',
+    labels: ['Elektitaj elementoj','Artikulado', 'Okaza'],
+    valuesDescriptions: [
+      'Aldonu markigon al elektitaj elementoj.', 
+      'Aldonu markigon al artikuladoj en la elektado.', 
+      'Aldonu markigon al okazaĵoj en la elektado.'
+    ],
+  },
+  alternativeEncodingsGrp: {
+    text: 'Alternativaj kodoj',
+    description: 'Markigoj kiuj enhavas multoblajn versiojn.',
+  },
+  addChoiceText: {
+    text: '<choice>',
+    description: 'Grupigas nombron da alternativaj kodoj por la sama punkto en teksto.',
+  },
+  choiceSicCorr: { 
+    description: 'Metu elekton en <sic> kaj aldonu <corr>.' 
+  },
+  choiceCorrSic: { 
+    description: 'Metu elekton en <corr> kaj aldonu <sic>.' 
+  },
+  choiceOrigReg: { 
+    description: 'Metu elekton en <orig> kaj aldonu <reg>.' 
+  },
+  choiceRegOrig: { 
+    description: 'Metu elekton en <reg> kaj aldonu <orig>.' 
+  },
+  choiceContentTarget: {
+    description: 'Unue elektu enhavon por tiu elemento pasante la muson super <elekto>.',
+  },
+  addSubstText: {
+    text: '<subst>',
+    description:
+      '(anstataŭigo) – Grupigas transskriptajn elementojn kiam la kombino devas esti rigardata kiel unuopa interveno en la teksto.',
+  },
+  substAddDel: { 
+    description: 'Metu elekton en <add> kaj aldonu <del>.' 
+  },
+  substDelAdd: { 
+    description: 'Metu elekton en <del> kaj aldonu <add>.' 
+  },
+  substContentTarget: {
+    description: 'Unue elektu enhavon por tiu elemento pasante la muson super <anstataŭigo>.',
+  },
+  editInterventionsGrp: {
+    text: 'Redakciaj intervenoj',
+    description: 'Markigoj uzataj por enkodi redakciajn intervenojn.',
+  },
+  addSuppliedText: {
+    text: '<supplied>',
+    description: 'Enhavas materialon provizitan de la transskribanto aŭ redaktoro pro iu kialo.',
+  },
+  addUnclearText: {
+    text: '<unclear>',
+    description:
+      'Enhavas materialon kiun oni ne povas transskribi kun certeco ĉar ĝi estas nelegebla aŭ neaŭdebla en la fonto.',
+  },
+  addSicText: { text: '<sic>', description: 'Enhavas ŝajne malĝustan aŭ eraran materialon.' },
+  addCorrText: {
+    text: '<corr>',
+    description: '(korekto) – Enhavas la ĝustan formon de ŝajne erara pasiĝo.',
+  },
+  addOrigText: {
+    text: '<orig>',
+    description:
+      '(originalo) – Enhavas materialon kiu estas markita kiel sekva la originalon, anstataŭ esti normaligita aŭ korektita.',
+  },
+  addRegText: {
+    text: '<reg>',
+    description: '(reguligo) – Enhavas materialon kiu estas reguligita aŭ normaligita iam ajn.',
+  },
+  descMarkupGrp: {
+    text: 'Priskriba Markigo',
+    description: 'Markigoj uzataj por enkodi intervenojn en la fontmateriaĵo.',
+  },
+  addAddText: { text: '<add>', description: '(aldono) – Markas aldono al la teksto.' },
+  addDelText: {
+    text: '<del>',
+    description:
+      '(forigo) – Enhavas informon forigitan, markitan kiel forigita, aŭ alie indikitan kiel superflua aŭ fuŝa en la kopia teksto de aŭtoro, skribanto, notanto, aŭ korektisto.',
   },
 
   // MIDI
@@ -782,22 +874,55 @@ export const lang = {
     description: 'Montri faksimilajn titolojn super la faksimila bildoj',
   },
 
-  // Redakciado
+  // Supplied element
   titleSupplied: {
-    text: 'Trakti eldonan enhavon',
-    description: 'Kontroli la traktadon de <truditaj> elementoj',
+    text: 'Trakti redaktecan enhavon',
+    description: 'Kontroli traktadon de redakteca markado',
   },
-  showSupplied: {
-    text: 'Montri <truditajn> elementojn',
-    description: 'Emfazi ĉiujn elementojn enhavitajn de <trudita> elemento',
+  showMarkup: {
+    text: 'Montri redaktecajn markilojn',
+    description: 'Emfazi ĉiujn elementojn enhavitajn de redaktecaj markiloj',
+  },
+  markupToPDF: {
+    text: 'Montri redaktecajn markilojn en PDF',
+    description: 'Montri redaktecajn markilojn en PDF',
+  },
+  alternativeVersionContent: {
+    text: 'Elekti defaŭltan enhavon por alternativaj kodumoj',
+    description: 'Elekti ĉu novkreitaj alternativaj kodumoj estas malplenaj aŭ kopioj de la originala legado',
+    labels: ['malplena', 'kopia'],
   },
   suppliedColor: {
-    text: 'Elekti koloron por <truditaj> elementoj',
-    description: 'Elekti koloron por emfazi <truditaj> elementoj',
+    text: 'Elekti koloron por <supplied>',
+    description: 'Elekti koloron por <supplied>',
   },
-  respSelect: {
-    text: 'Elekti respondecon de <truditaj> elementoj',
-    description: 'Elekti identigilon de respondeco',
+  unclearColor: {
+    text: 'Elekti koloron por <unclear>',
+    description: 'Elekti koloron por <unclear>',
+  },
+  sicColor: {
+    text: 'Elekti koloron por <sic>',
+    description: 'Elekti koloron por <sic>',
+  },
+  corrColor: {
+    text: 'Elekti koloron por <corr>',
+    description: 'Elekti koloron por <corr>',
+  },
+  origColor: {
+    text: 'Elekti koloron por <orig>',
+    description: 'Elekti koloron por <orig>',
+  },
+  regColor: {
+    text: 'Elekti koloron por <reg>',
+    description: 'Elekti koloron por <reg>',
+  },
+  addColor: {
+    text: 'Elekti koloron por <add>',
+    description: 'Elekti koloron por <add>',
+  },
+  delColor: {
+    text: 'Elekti koloron por <del>',
+    description: 'Elekti koloron por <del>',
   },
 
   // AGORDOJ DE REDAKCIA ARAJ / AGORDOJ DE KODMIRRO

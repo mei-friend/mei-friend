@@ -24,7 +24,7 @@ export const politeness = 200; // milliseconds between network requests
  * fetchMethod may be used to override the default 'fetch' (e.g. for Solid authentication)
  * @param {URL} url
  * @param {URL[]} targetTypes
- * @param {object} typeToHandlerMap
+ * @param {Object} typeToHandlerMap
  * @param {URL[]} followList
  * @param {URL[]} blockList
  * @param {Boolean} userProvided
@@ -122,8 +122,8 @@ export async function traverseAndFetch(
 /**
  * Call (a) predefined handler(s) on the provided resource to ingest it,
  * depending on the resource's type(s). typeToHandlerMap should map type URI strings to callback functions.
- * @param {object} typeToHandlerMap
- * @param {object} resource
+ * @param {Object} typeToHandlerMap
+ * @param {Object} resource
  */
 export function ingestExternalResource(url, typeToHandlerMap, resource) {
   try {

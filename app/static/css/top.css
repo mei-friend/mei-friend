@@ -48,3 +48,7 @@
 #addWebAnnotation {
   width: fit-content;
 }
+
+#markupToolsMenu {
+  flex-direction: column;
+}

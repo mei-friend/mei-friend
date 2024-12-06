@@ -193,9 +193,6 @@ export const lang = {
   addDiminuendoHairpinText: { text: 'Димінуендо (клинчатий)' },
   addBeamText: { text: 'Група нот' },
   addBeamSpanText: { text: 'Спан групи нот' },
-  addSuppliedText: { text: 'Додати поставлене' },
-  addSuppliedArticText: { text: 'Додати поставлене (артикуляція)' },
-  addSuppliedAccidText: { text: 'Додати поставлене (акценти)' },
   addArpeggioText: { text: 'Арпеджіо' },
   addFermataText: { text: 'Фермата' },
   addGlissandoText: { text: 'Глісандо' },
@@ -284,6 +281,9 @@ export const lang = {
   breaksSelectLine: { text: 'За системами' },
   breaksSelectEncoded: { text: 'За системами та сторінками' },
   breaksSelectSmart: { text: 'Розумні' },
+  choiceSelect: { description: 'Виберіть відображений вміст для елементів вибору' },
+  choiceDefault: { text: '(стандартний вибір)' },
+  noChoice: { text: '(немає доступних варіантів)' },
   updateControlsLabel: { text: 'Оновлення', description: 'Поведінка оновлення нотації після змін в кодуванні' },
   liveUpdateCheckbox: { description: 'Автоматичне оновлення нотації після змін в кодуванні' },
   codeManualUpdateButton: { description: 'Ручне оновлення нотації' },
@@ -434,8 +434,8 @@ export const lang = {
   annotationCloseButtonText: { text: 'Закрити панель анотацій' },
   hideAnnotationPanelButton: { description: 'Закрити панель анотацій' },
   closeAnnotationPanelButton: { description: 'Закрити панель анотацій' },
-  annotationToolsButton: { text: 'Інструменти', description: 'Інструменти анотацій' },
-  annotationListButton: { text: 'Список', description: 'Список анотацій' },
+  annotationToolsButton: { description: 'Інструменти анотацій' },
+  annotationListButton: { description: 'Список анотацій' },
   writeAnnotStandoffText: { text: 'Web анотація' },
   annotationToolsIdentifyTitle: { text: 'Визначити' },
   annotationToolsIdentifySpan: { text: "Визначити музичний об'єкт" },
@@ -452,6 +452,9 @@ export const lang = {
   loadWebAnnotationMessage2: { text: 'спробуйте ще раз' },
   noAnnotationsToDisplay: { text: 'Немає анотацій для відображення' },
   flipPageToAnnotationText: { description: 'Перейти до цієї анотації' },
+  describeMarkup: { description: 'Опишіть цей розмітка' },
+  deleteMarkup: { description: 'Видалити цей розмітка' },
+  deleteMarkupConfirmation: { text: 'Ви впевнені, що хочете видалити цей розмітка?' },
   deleteAnnotation: { description: 'Видалити цю анотацію' },
   deleteAnnotationConfirmation: { text: 'Ви впевнені, що хочете видалити цю анотацію?' },
   makeStandOffAnnotation: {
@@ -479,6 +482,95 @@ export const lang = {
     text1: "Неможливо створити анотацію, оскільки як xml:id для точки прив'язки MEI відсутній.",
     text2:
       'Будь ласка, присвойте ідентифікатори, вибравши "Маніпулювати" -> "Перерендер MEI (з id)" і повторіть спробу.',
+  },
+  // Markup tools
+  respSelect: {
+    text: 'Вибір відповідальності за розмітку',
+    description: 'Вибір ідентифікатора відповідальності',
+  },
+  selectionSelect: {
+    text: 'Стандартний вибір для розмітки',
+    description: 'Виберіть, чи новостворена розмітка повинна включати вибрані елементи, артикуляції чи випадкові знаки',
+    labels: ['Вибрані елементи', 'Артикуляція', 'Випадковий'],
+    valuesDescriptions: [
+      'Додайте розмітку до вибраних елементів.',
+      'Додайте розмітку до артикуляцій в виділенні.',
+      'Додайте розмітку до випадкових елементів в виділенні.'
+    ],
+  },
+  alternativeEncodingsGrp: {
+    text: 'Альтернативні кодування',
+    description: 'Елементи розмітки, які містять кілька версій.',
+  },
+  addChoiceText: {
+    text: '<choice>',
+    description: 'Групує кілька альтернативних кодувань для того ж самого місця в тексті.',
+  },
+  choiceSicCorr: {
+    description: 'Помістіть вибір у <sic> і додайте <corr>.'
+  },
+  choiceCorrSic: {
+    description: 'Помістіть вибір у <corr> і додайте <sic>.'
+  },
+  choiceOrigReg: {
+    description: 'Помістіть вибір у <orig> і додайте <reg>.'
+  },
+  choiceRegOrig: {
+    description: 'Помістіть вибір у <reg> і додайте <orig>.'
+  },
+  choiceContentTarget: {
+    description: 'Спочатку виберіть вміст для цього елемента, навівши на <choice>.',
+  },
+  addSubstText: {
+    text: '<subst>',
+    description:
+      '(заміна) - Групує транскрипційні елементи, коли комбінація повинна розглядатися як єдиний втручання в текст.',
+  },
+  substAddDel: {
+    description: 'Помістіть вибір у <add> і додайте <del>.'
+  },
+  substDelAdd: {
+    description: 'Помістіть вибір у <del> і додайте <add>.'
+  },
+  substContentTarget: {
+    description: 'Спочатку виберіть вміст для цього елемента, навівши на <subst>.',
+  },
+  editInterventionsGrp: {
+    text: 'Редакційні втручання',
+    description: 'Елементи розмітки, які використовуються для кодування редакційних втручань.',
+  },
+  addSuppliedText: {
+    text: '<supplied>',
+    description: 'Містить матеріал, наданий транскрибером чи редактором з будь-якої причини.',
+  },
+  addUnclearText: {
+    text: '<unclear>',
+    description:
+      'Містить матеріал, який не може бути транскрибований із впевненістю через його нерозбірливість або незчутливість у джерелі.',
+  },
+  addSicText: { text: '<sic>', description: 'Містить, ймовірно, невірний або неточний матеріал.' },
+  addCorrText: {
+    text: '<corr>',
+    description: '(виправлення) - Містить правильну форму видимо помилкового уривка.',
+  },
+  addOrigText: {
+    text: '<orig>',
+    description:
+      '(оригінальний) - Містить матеріал, який позначено як слідуючий оригіналу, а не нормалізований чи виправлений.',
+  },
+  addRegText: {
+    text: '<reg>',
+    description: '(регуляризація) - Містить матеріал, який було регуляризовано чи нормалізовано в певному сенсі.',
+  },
+  descMarkupGrp: {
+    text: 'Описова розмітка',
+    description: 'Елементи розмітки, використовувані для кодування втручань в джерело.',
+  },
+  addAddText: { text: '<add>', description: '(додаток) - Позначає додаток до тексту.' },
+  addDelText: {
+    text: '<del>',
+    description:
+      '(видалення) - Містить інформацію, видалену, позначену як видалену або інакше вказану як зайву або фальшиву в копіювальному тексті автором, копістом, анотатором або виправником.',
   },
 
   // MIDI
@@ -782,20 +874,53 @@ export const lang = {
 
   // Supplied element
   titleSupplied: {
-    text: 'Редагувати редакційний контент',
-    description: 'Управління обробкою елементів <supplied>',
+    text: 'Обробка редакційного вмісту',
+    description: 'Керування обробкою редакційної розмітки',
   },
-  showSupplied: {
-    text: 'Показати елементи <supplied>',
-    description: 'Виділити всі елементи, які містяться в елементі <supplied>',
+  showMarkup: {
+    text: 'Показати елементи редакційної розмітки',
+    description: 'Виділити всі елементи, що містяться в елементах редакційної розмітки',
+  },
+  markupToPDF: {
+    text: 'Розмітка в PDF',
+    description: 'Включити редакційну розмітку у PDF-файл',
+  },
+  alternativeVersionContent: {
+    text: 'Вибір вмісту за замовчуванням для альтернативних кодувань',
+    description: 'Вибір, чи новостворені альтернативні кодування є порожніми або копіями оригінального читання',
+    labels: ['порожнє', 'копія'],
   },
   suppliedColor: {
-    text: 'Вибрати колір виділення <supplied>',
-    description: 'Вибрати колір виділення <supplied>',
+    text: 'Вибір кольору підсвічування для <supplied>',
+    description: 'Вибір кольору підсвічування для <supplied>',
   },
-  respSelect: {
-    text: 'Вибрати відповідальність <supplied>',
-    description: 'Вибрати ідентифікатор відповідальності',
+  unclearColor: {
+    text: 'Вибір кольору підсвічування для <unclear>',
+    description: 'Вибір кольору підсвічування для <unclear>',
+  },
+  sicColor: {
+    text: 'Вибір кольору підсвічування для <sic>',
+    description: 'Вибір кольору підсвічування для <sic>',
+  },
+  corrColor: {
+    text: 'Вибір кольору підсвічування для <corr>',
+    description: 'Вибір кольору підсвічування для <corr>',
+  },
+  origColor: {
+    text: 'Вибір кольору підсвічування для <orig>',
+    description: 'Вибір кольору підсвічування для <orig>',
+  },
+  regColor: {
+    text: 'Вибір кольору підсвічування для <reg>',
+    description: 'Вибір кольору підсвічування для <reg>',
+  },
+  addColor: {
+    text: 'Вибір кольору підсвічування для <add>',
+    description: 'Вибір кольору підсвічування для <add>',
+  },
+  delColor: {
+    text: 'Вибір кольору підсвічування для <del>',
+    description: 'Вибір кольору підсвічування для <del>',
   },
   // EDITOR SETTINGS / CODEMIRROR SETTINGS
   editorSettingsHeader: {

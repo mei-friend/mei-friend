@@ -1,11 +1,10 @@
 // mei-friend version and date
-export const version = '1.0.17';
-export const versionDate = '3 December 2024'; // use full or 3-character english months, will be translated
+export const version = '1.1.8';
+export const versionDate = '6 December 2024'; // use full or 3-character english months, will be translated
 
 var vrvWorker;
 var spdWorker;
 var tkAvailableOptions;
-var mei;
 var breaksParam; // (string) the breaks parameter given through URL
 var pageParam; // (int) page parameter given through URL
 var selectParam; // (array) select ids given through multiple instances in URL
@@ -19,7 +18,6 @@ export var cm;
 export var v; // viewer instance
 export var validator; // validator object
 export var rngLoader; // object for loading a relaxNG schema for hinting
-export let github; // github API wrapper object - deprecated, TODO remove
 export let gm; // git manager object - TODO, handle multiple git providers
 export let storage = new Storage();
 export var tkVersion = ''; // string of the currently loaded toolkit version
@@ -55,12 +53,13 @@ import {
 } from './resizer.js';
 import {
   addAnnotationHandlers,
-  clearAnnotations,
+  addMarkupHandlers,
+  clearListItems,
   getSolidIdP,
-  readAnnots,
-  refreshAnnotations,
+  readListItemsFromXML,
+  refreshAnnotationsInNotation,
   populateSolidTab,
-} from './annotation.js';
+} from './enrichment-panel.js';
 import { dropHandler, dragEnter, dragOverHandler, dragLeave } from './dragger.js';
 import { openUrl, openUrlCancel } from './open-url.js';
 import {
@@ -70,6 +69,7 @@ import {
   addModifyerKeys,
   manualCurrentPage,
   generateSectionSelect,
+  setChoiceOptions,
 } from './control-menu.js';
 import { clock, file, unverified, xCircleFill } from '../css/icons.js';
 import { keymap } from '../keymaps/default-keymap.js';
@@ -190,7 +190,6 @@ export async function setFileChangedState(fileChangedState) {
     if (commitUI) setCommitUIEnabledStatus();
     if (actionsWorkflows) {
       if (await gm.fileChanged()) {
-        console.log('DISABLING WORKFLOWS');
         actionsWorkflows.forEach((el) => el.parentElement.classList.add('disabled'));
         actionsWorkflows.forEach((el) => el.parentElement.parentElement.classList.add('notAllowed'));
       } else {
@@ -239,13 +238,16 @@ export function updateFileStatusDisplay() {
   else document.querySelector('#fileName').removeAttribute('contenteditable', '');
 }
 
-export function loadDataInEditor(mei, setFreshlyLoaded = true) {
+export function loadDataInEditor(meiXML, setFreshlyLoaded = true) {
   if (storage && storage.supported) {
     storage.override = false;
   }
   freshlyLoaded = setFreshlyLoaded;
-  cm.setValue(mei);
-  v.loadXml(mei, true);
+  v.loadXml(meiXML, true);
+  cm.blockChanges = true;
+  cm.setValue(meiXML);
+  cm.clearHistory();
+  cm.blockChanges = false;
   cmd.checkFacsimile();
   loadFacsimile(v.xmlDoc); // load all facsimila data of MEI
   let bs = document.getElementById('breaksSelect');
@@ -259,10 +261,10 @@ export function loadDataInEditor(mei, setFreshlyLoaded = true) {
   v.setMenuColors();
   if (!isSafari) {
     // disable validation on Safari because of this strange error: "RangeError: Maximum call stack size exceeded" (WG, 1 Oct 2022)
-    v.checkSchema(mei);
+    v.checkSchema(meiXML);
   }
-  clearAnnotations();
-  readAnnots(true); // from annotation.js
+  clearListItems();
+  readListItemsFromXML(true); // readAnnots(true); from annotation.js
   setCursorToId(cm, handleURLParamSelect());
 } // loadDataInEditor()
 
@@ -338,13 +340,13 @@ function completeIfInTag(cm) {
 /**
  * Carries out code validation using validator.validateNG() and calls
  * v.highlightValidation()
- * @param {string} mei
+ * @param {string} meiXML
  * @param {Function} updateLinting
  * @param {Object} options
  * @returns
  */
-export async function validate(mei, updateLinting, options) {
-  if (options && mei) {
+export async function validate(meiXML, updateLinting, options) {
+  if (options && meiXML) {
     // keep the callback (important for first call)
     if (updateLinting && typeof updateLinting === 'function') {
       v.updateLinting = updateLinting;
@@ -356,7 +358,7 @@ export async function validate(mei, updateLinting, options) {
       Viewer.changeStatus(vs, 'wait', ['error', 'ok', 'manual']); // darkorange
       vs.querySelector('svg').classList.add('clockwise');
       vs.setAttribute('title', translator.lang.validatingAgainst.text + ' ' + v.currentSchema);
-      const validationString = await validator.validateNG(mei);
+      const validationString = await validator.validateNG(meiXML);
       let validation;
       try {
         validation = JSON.parse(validationString);
@@ -370,7 +372,7 @@ export async function validate(mei, updateLinting, options) {
           ? translator.lang.noErrors.text + '.'
           : validation.length + ' ' + translator.lang.errorsFound.text + '.'
       );
-      v.highlightValidation(mei, validation, options.forceValidate);
+      v.highlightValidation(meiXML, validation, options.forceValidate);
     } else if (v.validatorWithSchema && !document.getElementById('autoValidate').checked) {
       v.setValidationStatusToManual();
     }
@@ -553,9 +555,8 @@ async function completeInitialLoad() {
     : 'none';
 
   if (storage.supported) {
-    if (storage.github) {
+    if (storage.github && isLoggedIn) {
       // use github object from local storage if available
-      isLoggedIn = true;
       gm = new GitManager('github', 'github', storage.github.githubToken, {
         repo: storage.github.githubRepo,
         branch: storage.github.branch,
@@ -563,6 +564,10 @@ async function completeInitialLoad() {
       });
 
       //document.querySelector("#fileLocation").innerText = meiFileLocationPrintable;
+    } else if (storage.github && !isLoggedIn) {
+      // we have github data but are not logged in
+      // suggests inconsistency, so formally log user out
+      logoutFromGithub();
     } else if (isLoggedIn) {
       // initialise and store new github object
       // const gitWorker = new Worker(`${root}lib/git-worker.js`);
@@ -659,8 +664,8 @@ async function completeInitialLoad() {
       v.showAlert(translator.lang.githubLoggedOutWarning.text, 'warning', 30000);
       storage.removeItem('githubLogoutRequested');
     }
-
     setFileChangedState(storage.fileChanged);
+    updateFileStatusDisplay();
     if (!urlFileName && !urlFetchInProgress) {
       // no URI param specified - try to restore from storage
       if (storage.content && storage.fileName) {
@@ -774,6 +779,7 @@ async function completeInitialLoad() {
 
   addEventListeners(v, cm);
   addAnnotationHandlers();
+  addMarkupHandlers();
   addNotationResizerHandlers(v, cm);
   addFacsimilerResizerHandlers(v, cm);
   let doit;
@@ -945,6 +951,7 @@ async function vrvWorkerEventsHandler(ev) {
       drawRightFooter();
       document.getElementById('statusBar').innerHTML = `Verovio ${tkVersion} ${translator.lang.verovioLoaded.text}.`;
       setBreaksOptions(tkAvailableOptions, defaultVerovioOptions.breaks);
+      setChoiceOptions('');
       if (!storage.supported || !meiFileName) {
         // open default mei file
         openFile();
@@ -959,12 +966,11 @@ async function vrvWorkerEventsHandler(ev) {
       v.busy(false);
       break;
     case 'mei': // returned from importData, importBinaryData
-      mei = ev.data.mei;
       v.pageCount = ev.data.pageCount;
       v.allowCursorActivity = false;
-      loadDataInEditor(mei);
+      loadDataInEditor(ev.data.mei);
       setFileChangedState(false);
-      updateLocalStorage(mei);
+      updateLocalStorage(ev.data.mei);
       v.allowCursorActivity = true;
       v.updateAll(cm, defaultVerovioOptions, handleURLParamSelect());
       //v.busy(false);
@@ -1004,6 +1010,9 @@ async function vrvWorkerEventsHandler(ev) {
       } else if (v.speedMode && bs === 'auto' && Object.keys(v.pageBreaks).length > 0) {
         v.pageCount = Object.keys(v.pageBreaks).length;
       }
+      //update choiceSelect
+      let cs = document.getElementById('choiceSelect').selectedOptions[0]?.value;
+      setChoiceOptions(cs);
       // update only if still same page
       if (v.currentPage === ev.data.pageNo || ev.data.forceUpdate || ev.data.computePageBreaks || v.pdfMode) {
         if (ev.data.forceUpdate) {
@@ -1020,7 +1029,7 @@ async function vrvWorkerEventsHandler(ev) {
         v.updatePageNumDisplay();
         v.addNotationEventListeners(cm);
         v.updateHighlight(cm);
-        refreshAnnotations(false);
+        refreshAnnotationsInNotation(false);
         v.scrollSvgTo(cm);
         if (v.pdfMode) {
           // switch on frame, when in pdf mode
@@ -1055,7 +1064,7 @@ async function vrvWorkerEventsHandler(ev) {
         v.lastNoteId = id;
       }
       v.addNotationEventListeners(cm);
-      refreshAnnotations(false);
+      refreshAnnotationsInNotation(false);
       v.scrollSvgTo(cm);
       v.updateHighlight(cm);
       v.setFocusToVerovioPane();
@@ -1135,6 +1144,7 @@ async function vrvWorkerEventsHandler(ev) {
       v.busy(false);
       break;
   }
+  // cm.blockChanges = false;
 } // vrvWorkerEventsHandler()
 
 // handles select (& page) input parameter from URL arguments ".../?select=..."
@@ -1162,6 +1172,7 @@ let inputFormats = {
 };
 
 export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true, updateAfterLoading = true) {
+  // cm.blockChanges = true;
   if (storage.github && isLoggedIn) {
     // re-initialise github menu since we're now working from a file
     gm.filepath = '';
@@ -1178,7 +1189,7 @@ export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true, upd
     storage.fileLocationType = 'file';
   }
   fileLocationType = 'file';
-  if (github) gm.filepath = '';
+  if (gm) gm.filepath = '';
   if (typeof file === 'string') {
     // with fileName string
     meiFileName = file;
@@ -1187,12 +1198,11 @@ export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true, upd
       .then((response) => response.text())
       .then((meiXML) => {
         console.log('MEI file ' + meiFileName + ' loaded.');
-        mei = meiXML;
         v.clear();
         v.allowCursorActivity = false;
-        loadDataInEditor(mei, setFreshlyLoaded);
+        loadDataInEditor(meiXML, setFreshlyLoaded);
         setFileChangedState(false);
-        updateLocalStorage(mei);
+        updateLocalStorage(meiXML);
         v.allowCursorActivity = true;
         if (updateAfterLoading) {
           v.updateAll(cm, {}, handleURLParamSelect());
@@ -1204,11 +1214,10 @@ export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true, upd
       meiFileName = file.name;
       console.info('openMei ' + meiFileName + ', ', cm);
       let reader = new FileReader();
-      mei = '';
       reader.onload = (event) => {
-        mei = event.target.result;
-        console.info('Reader read ' + meiFileName); // + ', mei: ', mei);
-        if (mei) loaded(mei);
+        let meiString = event.target.result;
+        console.info('Reader read ' + meiFileName);
+        if (meiString) loaded(meiString);
         else notLoaded();
       };
       if (meiFileName.endsWith('.mxl') || meiFileName.endsWith('.ft2') || meiFileName.endsWith('.ft3')) {
@@ -1234,62 +1243,62 @@ export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true, upd
 
 // checks format of encoding string and imports or loads data/notation
 // mei argument may be MEI or any other supported format (text/binary)
-export function handleEncoding(mei, setFreshlyLoaded = true, updateAfterLoading = true, clearBeforeLoading = true) {
+export function handleEncoding(meiXML, setFreshlyLoaded = true, updateAfterLoading = true, clearBeforeLoading = true) {
   let found = false;
   if (clearBeforeLoading) {
+    clearFacsimile();
+    clearListItems();
     if (pageParam === null) storage.removeItem('page');
     v.clear();
   }
   v.busy();
   if (meiFileName.endsWith('.mxl')) {
     // compressed MusicXML file
-    console.log('Load compressed XML file.', mei.slice(0, 128));
+    console.log('Load compressed XML file.', meiXML.slice(0, 128));
     vrvWorker.postMessage({
       cmd: 'importBinaryData',
       format: 'xml',
-      mei: mei,
+      mei: meiXML,
     });
     found = true;
     setIsMEI(false);
   } else if (meiFileName.endsWith('.abc')) {
     // abc notation file
-    console.log('Load ABC file.', mei.slice(0, 128));
+    console.log('Load ABC file.', meiXML.slice(0, 128));
     vrvWorker.postMessage({
       cmd: 'importData',
       format: 'abc',
-      mei: mei,
+      mei: meiXML,
     });
     found = true;
     setIsMEI(false);
   } else if (meiFileName.endsWith('.ft2') || meiFileName.endsWith('.ft3')) {
     // lute tablature file (Fronimo format)
-    console.log('Load Fronimo file.', mei.slice(0, 128));
+    console.log('Load Fronimo file.', meiXML.slice(0, 128));
     // set found to true, since we don't know if luteconv will succeed
     // (we don't want to show the "format not recognized" message)
     found = true;
     setIsMEI(false);
     // attempt to convert to MEI using luteconv web service:
-    luteconv(mei, meiFileName).then((mei) => {
-      if (mei) {
+    luteconv(meiXML, meiFileName).then((meiString) => {
+      if (meiString) {
         // rename file to .mei
         setMeiFileInfo(meiFileName + '.mei', meiFileLocation, meiFileLocationPrintable);
         updateFileStatusDisplay();
         vrvWorker.postMessage({
           cmd: 'importData',
           format: 'mei',
-          mei: mei,
+          mei: meiString,
         });
       } else {
         log('Loading ' + meiFileName + 'did not succeed. ' + 'Could not convert Fronimo file using luteconv.');
-        clearFacsimile();
-        clearAnnotations();
         v.busy(false);
       }
     });
   } else {
     // all other formats are found by search term in text file
     for (const [key, value] of Object.entries(inputFormats)) {
-      if (mei.includes(value)) {
+      if (meiXML.includes(value)) {
         // a hint that it is a MEI file
         found = true;
         console.log(key + ' file loading: ' + meiFileName);
@@ -1297,9 +1306,9 @@ export function handleEncoding(mei, setFreshlyLoaded = true, updateAfterLoading 
           // if already a mei file
           setIsMEI(true);
           v.allowCursorActivity = false;
-          loadDataInEditor(mei, setFreshlyLoaded);
+          loadDataInEditor(meiXML, setFreshlyLoaded);
           setFileChangedState(false);
-          updateLocalStorage(mei);
+          updateLocalStorage(meiXML);
           v.allowCursorActivity = true;
           if (updateAfterLoading) {
             v.updateAll(cm, defaultVerovioOptions, handleURLParamSelect());
@@ -1311,7 +1320,7 @@ export function handleEncoding(mei, setFreshlyLoaded = true, updateAfterLoading 
           vrvWorker.postMessage({
             cmd: 'importData',
             format: key,
-            mei: mei,
+            mei: meiXML,
           });
           break;
         }
@@ -1319,14 +1328,12 @@ export function handleEncoding(mei, setFreshlyLoaded = true, updateAfterLoading 
     }
   }
   if (!found) {
-    if (mei.includes('<score-timewise'))
+    if (meiXML.includes('<score-timewise'))
       log('Loading ' + meiFileName + 'did not succeed. ' + 'No support for timewise MusicXML files.');
     else {
       log('Format not recognized: ' + meiFileName + '.', 1649499359728);
     }
     setIsMEI(false);
-    clearFacsimile();
-    clearAnnotations();
     v.busy(false);
   }
   setStandoffAnnotationEnabledStatus();
@@ -1437,12 +1444,12 @@ function togglePdfMode() {
 } // togglePdfMode()
 
 export function requestMidiFromVrvWorker(requestTimemap = false) {
-  let mei;
+  let meiString;
   // if (v.expansionId) {
   //   let expansionEl = v.xmlDoc.querySelector('[*|id="' + v.expansionId + '"]');
   //   let existingList = [];
   //   let expandedDoc = expansionMap.expand(expansionEl, existingList, v.xmlDoc.cloneNode(true));
-  //   mei = v.speedFilter(new XMLSerializer().serializeToString(expandedDoc), false, true);
+  //   meiString = v.speedFilter(new XMLSerializer().serializeToString(expandedDoc), false, true);
   //   if (v.speedMode) {
   //     v.loadXml(cm.getValue(), true); // reload xmlDoc when in speed mode
   //   } else {
@@ -1450,12 +1457,12 @@ export function requestMidiFromVrvWorker(requestTimemap = false) {
   //   }
   // } else {
   // }
-  mei = v.speedFilter(cm.getValue(), false);
+  meiString = v.speedFilter(cm.getValue(), false);
   let message = {
     cmd: 'exportMidi',
     expand: v.expansionId,
     options: v.vrvOptions,
-    mei: mei, // exclude dummy measures in speed mode
+    mei: meiString, // exclude dummy measures in speed mode
     requestTimemap: requestTimemap,
     speedMode: v.speedMode,
     toolkitDataOutdated: v.toolkitDataOutdated,
@@ -1775,9 +1782,6 @@ export let cmd = {
   addFClefChangeAfter: () => e.addClefChange(v, cm, 'F', '4', false),
   addBeam: () => e.addBeamElement(v, cm),
   addBeamSpan: () => e.addBeamSpan(v, cm),
-  addSupplied: () => e.addSuppliedElement(v, cm),
-  addSuppliedAccid: () => e.addSuppliedElement(v, cm, 'accid'),
-  addSuppliedArtic: () => e.addSuppliedElement(v, cm, 'artic'),
   correctAccid: () => e.checkAccidGes(v, cm),
   renumberMeasuresTest: () => e.renumberMeasures(v, cm, false),
   renumberMeasures: () => e.renumberMeasures(v, cm, true),
@@ -1840,6 +1844,9 @@ export let cmd = {
       }
       // TODO: close all other overlays too...
     }
+
+    // close all annotationMultiTools/MarkupDropDownContent
+    v.hideAnnotationMarkupDropDownContent();
   },
   playPauseMidiPlayback: () => {
     if (document.getElementById('showMidiPlaybackControlBar').checked) {
@@ -1871,9 +1878,11 @@ function addEventListeners(v, cm) {
       ev.target.id !== 'alertMessage' &&
       document.getElementById('splashOverlay').style.display === 'none'
     ) {
+      console.log('Body Mousedown: Hide alerts');
       v.hideAlerts();
     }
   });
+  body.addEventListener('click', v.hideAnnotationMarkupDropDownContent);
   body.addEventListener('keydown', (ev) => {
     if (ev.key === 'Escape') cmd.escapeKeyPressed();
   });
@@ -2075,6 +2084,13 @@ function addEventListeners(v, cm) {
     };
     v.updateAll(cm, {}, v.selectedElements[0]);
   });
+  // choice selector
+  document.getElementById('choiceSelect').addEventListener('change', (ev) => {
+    // selection has changed
+    // then updateAll()
+    v.updateAll(cm, {}, v.selectedElements[0]);
+    requestMidiFromVrvWorker(true);
+  });
   // navigation
   document.getElementById('backwardsButton').addEventListener('click', cmd.previousNote);
   document.getElementById('forwardsButton').addEventListener('click', cmd.nextNote);
@@ -2132,9 +2148,6 @@ function addEventListeners(v, cm) {
   document.getElementById('addDimHairpin').addEventListener('click', cmd.addDimHairpin);
   document.getElementById('addBeam').addEventListener('click', cmd.addBeam);
   document.getElementById('addBeamSpan').addEventListener('click', cmd.addBeamSpan);
-  document.getElementById('addSupplied').addEventListener('click', cmd.addSupplied);
-  document.getElementById('addSuppliedArtic').addEventListener('click', cmd.addSuppliedArtic);
-  document.getElementById('addSuppliedAccid').addEventListener('click', cmd.addSuppliedAccid);
   document.getElementById('addArpeggio').addEventListener('click', cmd.addArpeggio);
   // more control elements
   document.getElementById('addFermata').addEventListener('click', cmd.addFermata);
@@ -2388,6 +2401,7 @@ export function setStandoffAnnotationEnabledStatus() {
 
 // handles any changes in CodeMirror
 export async function handleEditorChanges() {
+  v.notationUpdated(cm);
   // fileChanged flag may have been set from storage
   let changeIndicator = true;
   let meiXml = cm.getValue();
@@ -2399,6 +2413,7 @@ export async function handleEditorChanges() {
     changeIndicator = status !== 'unmodified';
     console.log('File changed state based on git modification status: ' + status);
     setCommitUIEnabledStatus();
+    setFileChangedState(await gm.fileChanged(gm.filepath, status));
   }
   if (freshlyLoaded) {
     // ignore changes resulting from fresh file load
@@ -2406,13 +2421,12 @@ export async function handleEditorChanges() {
   } else {
     setFileChangedState(changeIndicator);
   }
-  v.notationUpdated(cm);
   if (storage.supported) {
     // on every set of changes, save editor content
     updateLocalStorage(meiXml);
   }
   if (document.getElementById('showAnnotations').checked || document.getElementById('showAnnotationPanel').checked) {
-    readAnnots(); // from annotation.js
+    readListItemsFromXML(true); // readAnnots(); from annotation.js
   }
   if (document.getElementById('showMidiPlaybackControlBar').checked) {
     // start a new time-out to midi-rerender

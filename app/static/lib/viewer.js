@@ -1,5 +1,6 @@
 import * as att from './attribute-classes.js';
 import * as dutils from './dom-utils.js';
+import { selectItemInAnnotationList } from './enrichment-panel.js';
 import * as prs from './page-range-selector.js';
 import * as speed from './speed.js';
 import * as utils from './utils.js';
@@ -71,6 +72,7 @@ export default class Viewer {
     this.timeoutDelay = defaultViewerTimeoutDelay; // ms, window in which concurrent clicks are treated as one update
     this.verovioIcon = document.getElementById('verovioIcon');
     this.breaksSelect = /** @type HTMLSelectElement */ (document.getElementById('breaksSelect'));
+    this.choiceSelect = document.getElementById('choiceSelect'); //choice select control
     this.alertCloser;
     this.pdfMode = false;
     this.cmd2KeyPressed = false;
@@ -232,22 +234,43 @@ export default class Viewer {
     );
   } // getPageWithElementFromVrvWorker()
 
-  // with normal mode: load DOM and pass-through the MEI code;
-  // with speed mode: load into DOM (if xmlDocOutdated) and
-  // return MEI excerpt of currentPage page
-  // (including dummy measures before and after current page by default)
-  speedFilter(mei, includeDummyMeasures = true, forceReload = false) {
+  /**
+   * with normal mode: load DOM and pass-through the MEI code;
+   * with speed mode: load into DOM (if xmlDocOutdated) and
+   * return MEI excerpt of currentPage page
+   * (including dummy measures before and after current page by default)
+   * @param {string} mei mei file in string format
+   * @param {boolean} includeDummyMeasures
+   * @param {boolean} forceReload
+   * @returns
+   */
+  speedFilter(mei, includeDummyMeasures = true, forceReload = false, addColor = false) {
     let breaks = this.breaksValue();
     let breaksSelectVal = this.breaksSelect.value;
     if (!this.speedMode || breaksSelectVal === 'none') {
+      if (addColor) {
+        // add color to markup elements
+        let tmpXmlDoc = dutils.addColorToMarkupElements(this.parser.parseFromString(mei, 'text/xml'));
+        return new XMLSerializer().serializeToString(tmpXmlDoc);
+      }
       return mei;
     }
     // update DOM only if encoding has been edited or
     this.loadXml(mei, forceReload);
-    this.xmlDoc = selectMarkup(this.xmlDoc); // select markup
+    // create a deep clone of xml.Doc before filtering for markup
+    // hard markup filters should never modify v.xmlDoc! (because non-displayed variants will get lost)
+    let speedMeiDoc = this.xmlDoc.cloneNode(true);
+    if (addColor) speedMeiDoc = dutils.addColorToMarkupElements(speedMeiDoc);
+    const choiceOption = this.choiceSelect.value;
+    let markupResult = selectMarkup(speedMeiDoc, choiceOption); // select markup
+    if (markupResult?.changed === true) {
+      speedMeiDoc = markupResult.doc;
+      //this.xmlDocOutdated = true;
+      // unnecessary if this.xmlDoc is not touched
+    }
     // count pages from system/pagebreaks
     if (Array.isArray(breaks)) {
-      let music = this.xmlDoc.querySelector('music score');
+      let music = speedMeiDoc.querySelector('music score');
       let elements;
       if (music) elements = music.querySelectorAll('measure, sb, pb');
       else return '';
@@ -293,7 +316,7 @@ export default class Viewer {
       // else console.log('pageSpanners empty: ', this.pageSpanners);
     }
     // retrieve requested MEI page from DOM
-    return speed.getPageFromDom(this.xmlDoc, this.currentPage, breaks, this.pageSpanners, includeDummyMeasures);
+    return speed.getPageFromDom(speedMeiDoc, this.currentPage, breaks, this.pageSpanners, includeDummyMeasures);
   } // speedFilter()
 
   loadXml(mei, forceReload = false) {
@@ -373,6 +396,17 @@ export default class Viewer {
     if (fontSel) this.vrvOptions.font = fontSel.value;
     let bs = this.breaksSelect;
     if (bs) this.vrvOptions.breaks = bs.value;
+    let choiceSelect = this.choiceSelect;
+    if (choiceSelect && choiceSelect.selectedOptions.length > 0) {
+      let selectedChoice = choiceSelect.selectedOptions[0]; //always the first until type is changed to multiselect
+      if (selectedChoice.dataset.prop) {
+        if (selectedChoice.value != '') {
+          this.vrvOptions[selectedChoice.dataset.prop] = ['./' + selectedChoice.value];
+        } else {
+          this.vrvOptions[selectedChoice.dataset.prop] = [];
+        }
+      }
+    }
 
     // update page dimensions, only if not in pdf mode
     if (this.pdfMode) {
@@ -381,14 +415,14 @@ export default class Viewer {
       let vph = document.getElementById('vrv-pageHeight');
       if (vph) this.vrvOptions.pageHeight = vph.value;
     } else {
-      let dimensions = {}; // = getVerovioContainerSize();
+      let dimensions = {};
       let vp = document.getElementById('verovio-panel');
       dimensions.width = vp.clientWidth;
       dimensions.height = vp.clientHeight;
       // console.info('client size: ' + dimensions.width + '/' + dimensions.height);
       if (this.vrvOptions.breaks !== 'none') {
-        this.vrvOptions.pageWidth = Math.max(Math.round(dimensions.width * (100 / this.vrvOptions.scale)), 100);
-        this.vrvOptions.pageHeight = Math.max(Math.round(dimensions.height * (100 / this.vrvOptions.scale)), 100);
+        this.vrvOptions.pageWidth = Math.max(Math.floor(dimensions.width * (100 / this.vrvOptions.scale)), 100);
+        this.vrvOptions.pageHeight = Math.max(Math.floor(dimensions.height * (100 / this.vrvOptions.scale)), 100);
       }
       // console.info('Vrv pageWidth/Height: ' + this.vrvOptions.pageWidth + '/' + this.vrvOptions.pageHeight);
     }
@@ -522,6 +556,12 @@ export default class Viewer {
       this.selectedElements.push(itemId);
       msg += 'Added as first element: ' + itemId;
     }
+
+    // select current element in markup annotation list, if panel visible
+    if (document.getElementById('annotationPanel').style.display !== 'none') {
+      selectItemInAnnotationList(itemId);
+    }
+
     //console.log(msg);
     console.log('handleClickOnNotation() selectedElements: ', this.selectedElements);
     this.scrollSvgTo(cm, e);
@@ -590,6 +630,11 @@ export default class Viewer {
           // on current page
           this.scrollSvgTo(cm);
           this.updateHighlight(cm);
+        }
+
+        // check if id is inside a markup element, if panel visible
+        if (document.getElementById('annotationPanel').style.display !== 'none') {
+          selectItemInAnnotationList(id);
         }
       }
       console.log('cursorActivity() selectedElements: ', this.selectedElements);
@@ -778,11 +823,11 @@ export default class Viewer {
       // utils.brighter(window.getComputedStyle(rt).getPropertyValue('--defaultAnnotationPanelBackgroundColor'), -40));
       rt.style.setProperty(
         '--annotationPanelLinkBackgroundColor',
-        utils.brighter(window.getComputedStyle(rt).getPropertyValue('--defaultAnnotationPanelDarkBackgroundColor'), -30)
+        utils.brighter(window.getComputedStyle(rt).getPropertyValue('--defaultAnnotationPanelDarkBackgroundColor'), -25)
       );
       rt.style.setProperty(
         '--annotationPanelHoverColor',
-        utils.brighter(window.getComputedStyle(rt).getPropertyValue('--defaultAnnotationPanelDarkBackgroundColor'), -60)
+        utils.brighter(window.getComputedStyle(rt).getPropertyValue('--defaultAnnotationPanelDarkBackgroundColor'), -35)
       );
       rt.style.setProperty('--annotationPanelTextColor', 'white');
       rt.style.setProperty(
@@ -933,8 +978,8 @@ export default class Viewer {
   } // showVerovioTabInSettingsPanel()
 
   // Switches Viewer to pdfMode
-  pageModeOn(pdfMode = true) {
-    this.pdfMode = pdfMode;
+  pageModeOn() {
+    this.pdfMode = true;
     this.controlMenuState = getControlMenuState();
     console.log('pageModeOn: state ', this.controlMenuState);
 
@@ -944,28 +989,33 @@ export default class Viewer {
     this.vrvOptions.adjustPageHeight = false;
     document.getElementById('vrv-adjustPageHeight').checked = false;
 
-    if (this.pdfMode) {
-      setCheckbox('controlMenuFlipToPageControls', false);
-      setCheckbox('controlMenuUpdateNotation', false);
-      setCheckbox('controlMenuFontSelector', true);
-      setCheckbox('controlMenuNavigateArrows', false);
-      setCheckbox('toggleSpeedMode', false);
+    setCheckbox('controlMenuFlipToPageControls', false);
+    setCheckbox('controlMenuUpdateNotation', false);
+    setCheckbox('controlMenuFontSelector', true);
+    setCheckbox('controlMenuNavigateArrows', false);
+    setCheckbox('toggleSpeedMode', false);
 
-      // hide editor and other panels
-      this.notationProportion = getNotationProportion();
-      setNotationProportion(1);
-      this.hideEditorPanel();
+    // hide editor and other panels
+    this.notationProportion = getNotationProportion();
+    setNotationProportion(1);
+    this.hideEditorPanel();
 
-      // behavior of settings panel
-      this.settingsReplaceFriendContainer = true;
-      cmd.hideFacsimilePanel();
-      cmd.hideAnnotationPanel();
-      this.showVerovioTabInSettingsPanel(); // make vrv settings visible
+    // behavior of settings panel
+    this.settingsReplaceFriendContainer = true;
+    cmd.hideFacsimilePanel();
+    cmd.hideAnnotationPanel();
+    this.showVerovioTabInSettingsPanel(); // make vrv settings visible
 
-      showPdfButtons(true);
-      this.allowNotationInteraction = false;
-      document.getElementById('friendContainer')?.classList.add('pdfMode');
-    }
+    showPdfButtons(true);
+    this.allowNotationInteraction = false;
+    document.getElementById('friendContainer')?.classList.add('pdfMode');
+
+    // turn off markup coloring when not to be exported to PDF
+    let markupToPDF = document.getElementById('markupToPDF').checked;
+    att.modelTranscriptionLike.forEach((element) => {
+      let col = document.getElementById(element + 'Color').value;
+      this.setHighlightColorProperty(element, markupToPDF, col, true);
+    });
   } // pageModeOn()
 
   // Switches back from pdfMode
@@ -987,6 +1037,13 @@ export default class Viewer {
       this.hideSettingsPanel();
       showPdfButtons(false);
 
+      // turn on markup coloring when not to be exported to PDF
+      let showMarkup = document.getElementById('showMarkup').checked;
+      att.modelTranscriptionLike.forEach((element) => {
+        let col = document.getElementById(element + 'Color').value;
+        this.setHighlightColorProperty(element, showMarkup, col, true);
+      });
+
       document.getElementById('friendContainer')?.classList.remove('pdfMode');
       setOrientation(cm, '', '', this);
       this.allowNotationInteraction = true;
@@ -997,7 +1054,7 @@ export default class Viewer {
   saveAsPdf() {
     this.vrvWorker.postMessage({
       cmd: 'renderPdf',
-      msg: this.speedFilter(cm.getValue()),
+      msg: this.speedFilter(cm.getValue(), undefined, undefined, document.getElementById('markupToPDF').checked),
       title: meiFileName,
       version: version,
       versionDate: versionDate,
@@ -1148,6 +1205,7 @@ export default class Viewer {
           delete storage['mf-' + opt];
         }
       }
+      let checkedMarkup;
       // set default values for mei-friend settings
       switch (opt) {
         case 'selectToolkitVersion':
@@ -1171,29 +1229,42 @@ export default class Viewer {
         case 'toggleSpeedMode':
           document.getElementById('midiSpeedmodeIndicator').style.display = this.speedMode ? 'inline' : 'none';
           break;
-        case 'showSupplied':
-          rt.style.setProperty('--suppliedColor', value ? 'var(--defaultSuppliedColor)' : 'var(--notationColor)');
-          rt.style.setProperty(
-            '--suppliedHighlightedColor',
-            value ? 'var(--defaultSuppliedHighlightedColor)' : 'var(--highlightColor)'
-          );
+        case 'showMarkup':
+          att.modelTranscriptionLike.forEach((element) => {
+            this.setHighlightColorProperty(element, false, '', true);
+          });
           break;
         case 'suppliedColor':
-          let checked = document.getElementById('showSupplied').checked;
-          rt.style.setProperty('--defaultSuppliedColor', checked ? value : 'var(--notationColor)');
-          rt.style.setProperty(
-            '--defaultSuppliedHighlightedColor',
-            checked ? utils.brighter(value, -50) : 'var(--highlightColor)'
-          );
-          rt.style.setProperty('--suppliedColor', checked ? value : 'var(--notationColor)');
-          rt.style.setProperty(
-            '--suppliedHighlightedColor',
-            checked ? utils.brighter(value, -50) : 'var(--highlightColor)'
-          );
+          checkedMarkup = document.getElementById('showMarkup').checked;
+          this.setHighlightColorProperty('supplied', checkedMarkup, value, true);
           break;
-        case 'respSelect':
-          if (this.xmlDoc)
-            o.values = Array.from(this.xmlDoc.querySelectorAll('corpName[*|id]')).map((e) => e.getAttribute('xml:id'));
+        case 'unclearColor':
+          checkedMarkup = document.getElementById('showMarkup').checked;
+          this.setHighlightColorProperty('unclear', checkedMarkup, value, true);
+          break;
+        case 'sicColor':
+          checkedMarkup = document.getElementById('showMarkup').checked;
+          this.setHighlightColorProperty('sic', checkedMarkup, value, true);
+          break;
+        case 'corrColor':
+          checkedMarkup = document.getElementById('showMarkup').checked;
+          this.setHighlightColorProperty('corr', checkedMarkup, value, true);
+          break;
+        case 'origColor':
+          checkedMarkup = document.getElementById('showMarkup').checked;
+          this.setHighlightColorProperty('orig', checkedMarkup, value, true);
+          break;
+        case 'regColor':
+          checkedMarkup = document.getElementById('showMarkup').checked;
+          this.setHighlightColorProperty('reg', checkedMarkup, value, true);
+          break;
+        case 'addColor':
+          checkedMarkup = document.getElementById('showMarkup').checked;
+          this.setHighlightColorProperty('add', checkedMarkup, value, true);
+          break;
+        case 'delColor':
+          checkedMarkup = document.getElementById('showMarkup').checked;
+          this.setHighlightColorProperty('del', checkedMarkup, value, true);
           break;
         case 'controlMenuFontSelector':
           document.getElementById('engravingFontControls').style.display = value ? 'inherit' : 'none';
@@ -1306,7 +1377,7 @@ export default class Viewer {
         let value = ev.target.value;
         if (ev.target.type === 'checkbox') value = ev.target.checked;
         if (ev.target.type === 'number') value = parseFloat(value);
-        let col = document.getElementById('suppliedColor').value;
+        let checkedMarkup = document.getElementById('showMarkup').checked;
         switch (option) {
           case 'selectToolkitVersion':
             this.vrvWorker.postMessage({
@@ -1410,20 +1481,53 @@ export default class Viewer {
           case 'showFacsimileTitles':
             facs.drawFacsimile();
             break;
-          case 'showSupplied':
-            rt.style.setProperty('--suppliedColor', value ? col : 'var(--notationColor)');
-            rt.style.setProperty(
-              '--suppliedHighlightedColor',
-              value ? utils.brighter(col, -50) : 'var(--highlightColor)'
-            );
+          case 'showMarkup':
+            // switch only if not in pdfMode
+            if (!this.pdfMode) {
+              att.modelTranscriptionLike.forEach((element) => {
+                let col = document.getElementById(element + 'Color').value;
+                this.setHighlightColorProperty(element, value, col, false);
+              });
+            }
+            break;
+          case 'markupToPDF':
+            // switch only if in pdfMode
+            if (this.pdfMode) {
+              att.modelTranscriptionLike.forEach((element) => {
+                let col = document.getElementById(element + 'Color').value;
+                this.setHighlightColorProperty(element, value, col, false);
+              });
+            }
+            break;
+          case 'showMarkup':
+            att.modelTranscriptionLike.forEach((element) => {
+              let col = document.getElementById(element + 'Color').value;
+              this.setHighlightColorProperty(element, value, col, false);
+            });
             break;
           case 'suppliedColor':
-            let checked = document.getElementById('showSupplied').checked;
-            rt.style.setProperty('--suppliedColor', checked ? col : 'var(--notationColor)');
-            rt.style.setProperty(
-              '--suppliedHighlightedColor',
-              checked ? utils.brighter(col, -50) : 'var(--highlightColor)'
-            );
+            this.setHighlightColorProperty('supplied', checkedMarkup, document.getElementById(option).value, false);
+            break;
+          case 'unclearColor':
+            this.setHighlightColorProperty('unclear', checkedMarkup, document.getElementById(option).value, false);
+            break;
+          case 'sicColor':
+            this.setHighlightColorProperty('sic', checkedMarkup, document.getElementById(option).value, false);
+            break;
+          case 'corrColor':
+            this.setHighlightColorProperty('corr', checkedMarkup, document.getElementById(option).value, false);
+            break;
+          case 'origColor':
+            this.setHighlightColorProperty('orig', checkedMarkup, document.getElementById(option).value, false);
+            break;
+          case 'regColor':
+            this.setHighlightColorProperty('reg', checkedMarkup, document.getElementById(option).value, false);
+            break;
+          case 'addColor':
+            this.setHighlightColorProperty('add', checkedMarkup, document.getElementById(option).value, false);
+            break;
+          case 'delColor':
+            this.setHighlightColorProperty('del', checkedMarkup, document.getElementById(option).value, false);
             break;
           case 'controlMenuFontSelector':
             document.getElementById('engravingFontControls').style.display = document.getElementById(
@@ -1509,6 +1613,35 @@ export default class Viewer {
       });
     }
   } // addMeiFriendOptionsToSettingsPanel()
+
+  setHighlightColorProperty(elementName, checkedMarkup, colorValue, setDefault = false) {
+    let rt = document.querySelector(':root');
+    if (setDefault) {
+      let upperCaseElementName = elementName.charAt(0).toUpperCase() + elementName.slice(1);
+      rt.style.setProperty(
+        '--default' + upperCaseElementName + 'Color',
+        checkedMarkup ? colorValue : 'var(--notationColor)'
+      );
+      rt.style.setProperty(
+        '--default' + upperCaseElementName + 'HighlightedColor',
+        checkedMarkup ? utils.brighter(colorValue, -50) : 'var(--highlightColor)'
+      );
+      rt.style.setProperty(
+        '--' + elementName + 'BgColor',
+        checkedMarkup ? 'var(--' + elementName + 'Color)' : 'var(--annotationPanelBackgroundColor)'
+      );
+    }
+
+    rt.style.setProperty('--' + elementName + 'Color', checkedMarkup ? colorValue : 'var(--notationColor)');
+    rt.style.setProperty(
+      '--' + elementName + 'HighlightedColor',
+      checkedMarkup ? utils.brighter(colorValue, -50) : 'var(--highlightColor)'
+    );
+    rt.style.setProperty(
+      '--' + elementName + 'BgColor',
+      checkedMarkup ? 'var(--' + elementName + 'Color)' : 'var(--annotationPanelBackgroundColor)'
+    );
+  }
 
   addCmOptionsToSettingsPanel(mfDefaults, restoreFromLocalStorage = true) {
     // NOTE: codeMirrorSettingsOptions in defaults.js
@@ -1767,7 +1900,7 @@ export default class Viewer {
   /**
    * Creates an option div with a label and input/select depending of o.keys
    * @param {string} opt (e.g. 'vrv-pageHeight', 'controlMenuFlipToPageControls')
-   * @param {object} o
+   * @param {Object} o
    * @param {string} optDefault
    * @returns {Element}
    */
@@ -1915,12 +2048,17 @@ export default class Viewer {
     if (rs) {
       let value = rs.value;
       while (rs.length > 0) rs.options.remove(0);
+
+      //add empty default
+      rs.add(new Option('(none)', ''));
+
       let optEls = this.xmlDoc.querySelectorAll('corpName[*|id],persName[*|id]');
       optEls.forEach((el) => {
         if (el.closest('respStmt')) {
           // only if inside a respStmt
           let id = el.getAttribute('xml:id');
-          rs.add(new Option(id, id, id === value ? true : false, id === value ? true : false));
+          let name = el.innerHTML;
+          rs.add(new Option(name, id, id === value ? true : false, id === value ? true : false));
         }
       });
     }
@@ -2055,6 +2193,11 @@ export default class Viewer {
     this.allowCursorActivity = true;
     this.scrollSvgTo(cm);
     this.updateHighlight(cm);
+
+    // check if id is inside a markup element, if panel visible
+    if (document.getElementById('annotationPanel').style.display !== 'none') {
+      selectItemInAnnotationList(id);
+    }
   } // navigate()
 
   // turn page for navigation and return svg directly
@@ -2302,6 +2445,11 @@ export default class Viewer {
       b.parentElement.style.display = 'none';
     }
   } // hideAlerts()
+
+  // close all annotationMultiTools/MarkupDropDownContent
+  hideAnnotationMarkupDropDownContent() {
+    Array.from(document.getElementsByClassName('markup-dropdown-content')).forEach((el) => (el.style.display = 'none'));
+  } // hideAnnotationMarkupDropDownContent()
 
   /**
    * Method to check from MEI header whether the XML schema filename

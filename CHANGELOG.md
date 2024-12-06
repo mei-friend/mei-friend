@@ -1,4 +1,59 @@
 # mei-friend-online CHANGELOG.md
+### 1.1.8 Merge isomorphic-git and mark-up enrichment developments
+* Merges patches 1.0.17 (migration to isomorphic-git) and 1.1.7 (enrichment panel and editorial markup) in preparation for 1.2.0 release
+* Resizer reworked to ensure visibility of x and y scroll bars
+* Clear undo history upon file loading to prevent undoing freshly loaded MEI file (fixes #117)
+* Allow default key bindings in Solid URL text field
+
+### 1.1.7 patch
+* Support for markup color export to PDF (#108)
+* Add checkbox to control markup color export to PDF
+* Improve UIX of markup panel
+* Interactively highlight current markup item in list when clicking or drag-selecting notation and/or navigating in encoding
+
+### 1.1.6 patch
+
+- Fix version selection and parsing in speed mode
+- Fix and markup deletion in speed mode
+- Improve markup UI
+
+### 1.1.5 patch
+
+- Include filtering for different versions inside `<choice>` or `<subst>` in speed mode.
+- Update midi on switching versions in the notation panel.
+- Horizontal layout for markup panel added.
+
+### 1.1.4 Refine Editorial Markup
+
+- Add subst element to markup tools.
+- Moved responsibility select from mei-friend settings to markup tools.
+- Complete translations and tooltips for markup tools.
+- Fix generation of new xml:ids to copied elements.
+- Add resp label to markup items within list tab in Enrichment Panel.
+- Add 'Describe Markup' button to markup list items.
+- Improve sorting of list items in Enrichment Panel's List tab.
+- Refresh list items on language change.
+
+### 1.1.3 <choice>
+
+- Add choice element to markup tools.
+- Add setting to toggle whether a new alternative version should be created empty or if the content or the first version should be copied.
+- Add choice select to switch versions visible in the notation panel.
+- Add logic to handle markup for alternative versions.
+
+### 1.1.2 Enrichment Panel
+
+- Annotation panel has been refactored to Enrichment panel.
+- List tab in the Enrichment panel now shows annotations and markup.
+- Markup menu has been moved to new markup tools tab in the Enrichment Panel.
+
+### 1.1.1 Basic integration of Editorial Markup
+
+- Add support for markup elements: unclear, sic, corr, orig, reg, add, del.
+- Markup elements wrap multiple adjacent elements.
+- Add warning modal if missing xml:ids would affect markup creation.
+- Add settings to change highighting colors for markup elements.
+- Change option labels in responsibility select to text content.
 
 ### 1.0.17 Refactor and extend git functionality
 
@@ -6,14 +61,11 @@
 - Implement branching-on-conflict and automatic pull requests to improve safe collaborative editing
 - Prepare for future implementation of non-GitHub cloud providers
 
-### 1.0.16 Patch
-
-- Fix infinite loop when having an incomplete choice element (#109, thx @
-  maxrothman)
-- Implement persistent search bar behavior (#110, thx @maxrothmann) with checkbox to toggle
-- Update Verovio release version list
-- Make sure `SPACE` bar works also outside notation panel (#92)
-- When adding beamSpan element, filter selected elements for note and chord
+### 1.0.16 Patch 
+* Fix infinite loop when having an incomplete choice element (#109, thx @
+maxrothman)
+* Implement persistent search bar behavior (#110, thx @maxrothmann) with checkbox to toggle
+* Update Verovio release version list
 
 ### 1.0.15 Patch
 

@@ -205,9 +205,6 @@ export const lang = {
   addDiminuendoHairpinText: { text: 'Diminuendo-Gabel' },
   addBeamText: { text: 'Balken' },
   addBeamSpanText: { text: 'Balkenspanner' },
-  addSuppliedText: { text: 'Supplied' },
-  addSuppliedArticText: { text: 'Supplied (Artic)' },
-  addSuppliedAccidText: { text: 'Supplied (Accid)' },
   addArpeggioText: { text: 'Arpeggio' },
   addFermataText: { text: 'Fermate' },
   addGlissandoText: { text: 'Glissando' },
@@ -294,6 +291,9 @@ export const lang = {
   breaksSelectLine: { text: 'System' },
   breaksSelectEncoded: { text: 'System und Seite' },
   breaksSelectSmart: { text: 'Smart' },
+  choiceSelect: { description: 'Wählen Sie den angezeigten Inhalt für Choice-Elemente' },
+  choiceDefault: { text: '(Standardauswahl)' },
+  noChoice: { text: '(keine Auswahl verfügbar)' },
   updateControlsLabel: {
     text: 'Aktualisieren',
     description: 'Aktualisierungsverhalten der Notation nach Änderungen in der Kodierung',
@@ -454,9 +454,13 @@ export const lang = {
   annotationCloseButtonText: { text: 'Panel für Annotationen schließen' },
   hideAnnotationPanelButton: { description: 'Panel für Annotationen schließen' },
   closeAnnotationPanelButton: { description: 'Panel für Annotationen schließen' },
-  annotationToolsButton: { text: 'Tools', description: 'Annotationswerkzeuge' },
-  annotationListButton: { text: 'Liste', description: 'Annotationen auflisten' },
+  markupToolsButton: { description: 'Werkzeuge für editorische Auszeichnungen' },
+  annotationToolsButton: { description: 'Annotationswerkzeuge' },
+  annotationListButton: { description: 'Annotationen auflisten' },
   writeAnnotStandoffText: { text: 'Web Annotationen' },
+  annotationToolDomainSelectorLegend: { text: 'Ort für Annotationen auswählen' },
+  insertInlineAnnotationLegend: { text: 'Annotationen einfügen' },
+  insertStandoffAnnotationLegend: { text: 'Web Annotation einfügen' },
   annotationToolsIdentifyTitle: { text: 'Identifizieren' },
   annotationToolsIdentifySpan: { text: 'Musikalisches Objekt identifizieren' },
   annotationToolsHighlightTitle: { text: 'Hervorheben' },
@@ -472,6 +476,9 @@ export const lang = {
   loadWebAnnotationMessage2: { text: 'bitte nochmal versuchen' },
   noAnnotationsToDisplay: { text: 'Keine Annotationen zum Anzeigen' },
   flipPageToAnnotationText: { description: 'Zu dieser Annotation blättern' },
+  describeMarkup: { description: 'Dieses Markup beschreiben' },
+  deleteMarkup: { description: 'Dieses Markup löschen' },
+  deleteMarkupConfirmation: { text: 'Möchten Sie dieses Markup wirklich löschen?' },
   deleteAnnotation: { description: 'Diese Annotation löschen' },
   deleteAnnotationConfirmation: { text: 'Diese Annotation wirklich löschen?' },
   makeStandOffAnnotation: {
@@ -499,6 +506,97 @@ export const lang = {
   annotationWithoutIdWarning: {
     text1: 'Annotation kann nicht geschrieben werden, da MEI-Ankerpunkt kein xml:id Attribut hat.',
     text2: 'Bitte xml:ids zuweisen ("Verändern" -> "Ids zu MEI hinzufügen") und erneut versuchen.',
+  },
+  // MARKUP MENU
+  respSelect: {
+    text: 'Responsibility auswählen',
+    description: 'Responsibility-ID für editorisches Markup auswählen',
+  },
+  selectionSelect: {
+    text: 'Standardselektion für Markup',
+    description: 'Wählen Sie aus, ob neu erstellte Markup die ausgewählten Elemente, Artikulationen oder Vorzeichen umschließen soll',
+    labels: ['Ausgewählte Elemente', 'Artikulation', 'Vorzeichen'],
+    valuesDescriptions: [
+      'Füge Markup zu ausgewählten Elementen hinzu.',
+      'Füge Markup zu Artikulationen innerhalb der Auswahl hinzu.',
+      'Füge Markup zu Vorzeichen innerhalb der Auswahl hinzu.'
+    ],
+  },
+  alternativeEncodingsGrp: {
+    text: 'Alternative Codierungen',
+    description: 'Markup-Elemente, die mehrere Versionen enthalten.',
+  },
+  addChoiceText: {
+    text: '<choice>',
+    description: 'Gruppiert mehrere alternative Codierungen für denselben Punkt in einem Text.',
+  },
+  choiceSicCorr: {
+    description: 'Setze die Auswahl in <sic> und füge <corr> hinzu.'
+  },
+  choiceCorrSic: {
+    description: 'Setze die Auswahl in <corr> und füge <sic> hinzu.'
+  },
+  choiceOrigReg: {
+    description: 'Setze die Auswahl in <orig> und füge <reg> hinzu.'
+  },
+  choiceRegOrig: {
+    description: 'Setze die Auswahl in <reg> und füge <orig> hinzu.'
+  },
+  choiceContentTarget: {
+    description: 'Wähle zuerst den Inhalt für dieses Element aus, indem du über <choice> schwebst.',
+  },
+  addSubstText: {
+    text: '<subst>',
+    description:
+      '(Substitution) – Gruppiert transkriptionelle Elemente, wenn die Kombination als einzelner Eingriff im Text betrachtet werden soll.',
+  },
+  substAddDel: {
+    description: 'Setze die Auswahl in <add> und füge <del> hinzu.'
+  },
+  substDelAdd: {
+
+    description: 'Setze die Auswahl in <del> und füge <add> hinzu.'
+  },
+  substContentTarget: {
+    description: 'Wähle zuerst den Inhalt für dieses Element aus, indem du über <subst> schwebst.',
+  },
+  editInterventionsGrp: {
+    text: 'Editorische Eingriffe',
+    description: 'Markup-Elemente, die zur Codierung editorischer Eingriffe verwendet werden.',
+  },
+  addSuppliedText: {
+    text: '<supplied>',
+    description: 'Enthält Material, das vom Transkribenten oder Redakteur aus irgendeinem Grund bereitgestellt wurde.',
+  },
+  addUnclearText: {
+    text: '<unclear>',
+    description:
+      'Enthält Material, das aufgrund von Unleserlichkeit oder Unverständlichkeit in der Quelle nicht mit Sicherheit transkribiert werden kann.',
+  },
+  addSicText: { text: '<sic>', description: 'Enthält scheinbar falsches oder ungenaues Material.' },
+  addCorrText: {
+    text: '<corr>',
+    description: '(Korrektur) – Enthält die korrekte Form einer offensichtlich fehlerhaften Passage.',
+  },
+  addOrigText: {
+    text: '<orig>',
+    description:
+      '(original) – Enthält Material, das als dem Original folgend markiert ist, anstatt genormalisiert oder korrigiert zu werden.',
+  },
+  addRegText: {
+    text: '<reg>',
+    description:
+      '(Regularisierung) – Enthält Material, das in irgendeiner Weise regularisiert oder normalisiert wurde.',
+  },
+  descMarkupGrp: {
+    text: 'Deskriptive Markup',
+    description: 'Markup-Elemente, die zur Codierung von Interventionen im Quellenmaterial verwendet werden.',
+  },
+  addAddText: { text: '<add>', description: '(Hinzufügung) – Markiert eine Hinzufügung zum Text.' },
+  addDelText: {
+    text: '<del>',
+    description:
+      '(Löschung) – Enthält Informationen, die gelöscht wurden, als gelöscht markiert wurden oder anderweitig als überflüssig oder irreführend im Kopietext durch einen Autor, Schreiber, Annotator oder Korrektor angegeben wurden.',
   },
 
   // MIDI
@@ -807,22 +905,55 @@ export const lang = {
     text: 'Faksimile-Titel anzeigen',
     description: 'Faksimile-Titel über den Faksimile-Bildern anzeigen',
   },
-// Supplied element
+  // Supplied element
   titleSupplied: {
-    text: 'Editorische Inhalte',
-    description: 'Editorische Inhalte im MEI',
+    text: 'Editorisches Markup',
+    description: 'Einstellungen für die Arbeit mit editorischem Markup',
   },
-  showSupplied: {
-    text: 'Zeige Supplied-Element',
-    description: 'Hebe Inhalte, die von <supplied>-Elementen umgeben sind, hervor',
+  showMarkup: {
+    text: 'Zeige Editorisches Markup',
+    description: 'Alle Elemente hervorheben, die mit editorischem Markup umschlossen sind',
+  },
+  markupToPDF: {
+    text: 'Zeige Markup in PDF',
+    description: 'Editorisches Markup in PDF exportieren',
+  },
+  alternativeVersionContent: {
+    text: 'Befüllung alternative Codierungen',
+    description: 'Vorbefüllung für alternative Codierungen auswählen: neu erstellte alternative Codierungen sind leer oder Kopien der originalen Lesung',
+    labels: ['leer', 'Kopie'],
   },
   suppliedColor: {
-    text: 'Farbe für Supplied',
-    description: 'Farbe für Supplied auswählen',
+    text: 'Farbe für <supplied>',
+    description: 'Farbe für <supplied> auswählen',
   },
-  respSelect: {
-    text: 'Responsibility wählen',
-    description: 'Responsibility id für Supplied-Element auswählen',
+  unclearColor: {
+    text: 'Farbe für <unclear>',
+    description: 'Farbe für <unclear> auswählen',
+  },
+  sicColor: {
+    text: 'Farbe für <sic>',
+    description: 'Farbe für <sic> auswählen',
+  },
+  corrColor: {
+    text: 'Farbe für <corr>',
+    description: 'Farbe für <corr> auswählen',
+  },
+  origColor: {
+    text: 'Farbe für <orig>',
+    description: 'Farbe für <orig> auswählen',
+  },
+  regColor: {
+    text: 'Farbe für <reg>',
+    description: 'Farbe für <reg> auswählen',
+  },
+  addColor: {
+    text: 'Farbe für <add>',
+    description: 'Farbe für <add> auswählen',
+  },
+  delColor: {
+    text: 'Farbe für <del>',
+    description: 'Farbe für <del> auswählen',
   },
 
   //  EDITOR SETTINGS / CODEMIRROR SETTINGS

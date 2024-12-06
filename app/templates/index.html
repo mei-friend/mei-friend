@@ -194,7 +194,11 @@
       </div>
       <div class="navbar" id="menuBar">
         <div class="dropdown">
-          <button class="dropbtn GithubButton" id="GithubButton">
+          <button
+            class="dropbtn GithubButton"
+            id="GithubButton"
+            onclick="if (typeof isLoggedIn === 'undefined') window.location.href='/login'"
+          >
             <svg id="GithubLogo" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
               <path
                 fill-rule="evenodd"
@@ -504,19 +508,6 @@
               <span class="keyShortCut shiftKey">B</span>
             </a>
             <hr class="dropdownLine" />
-            <a id="addSupplied" href="#">
-              <span id="addSuppliedText">Supplied</span>
-              <span class="keyShortCut">U</span>
-            </a>
-            <a id="addSuppliedArtic" href="#">
-              <span id="addSuppliedArticText">Supplied (Artic)</span>
-              <span class="keyShortCut ctrlKey">U</span>
-            </a>
-            <a id="addSuppliedAccid" href="#">
-              <span id="addSuppliedAccidText">Supplied (Accid)</span>
-              <span class="keyShortCut ctrlKey shiftKey">U</span>
-            </a>
-            <hr class="dropdownLine" />
             <a id="addArpeggio" href="#">
               <span id="addArpeggioText">Arpeggio</span>
               <span class="keyShortCut">A</span>
@@ -713,6 +704,7 @@
           <div id="splashHeader">
             <img src="{{ url_for('static', filename='owl/menu-logo.svg') }}" alt="mei-friend" id="splashLogo" />
           </div>
+          <hr class="dropdownLine" />
           <div id="splashBody"></div>
           <div id="splashFooter">
             <div id="splashVersion">
@@ -755,9 +747,11 @@
               .st0 {
                 fill: #7c4dff;
               }
+
               .st1 {
                 fill: #f7f7f7;
               }
+
               .st2 {
                 opacity: 0.3;
                 fill: #444444;
@@ -933,7 +927,7 @@
       </div>
       <div id="friendContainer">
         <div id="alertOverlay" class="alert" style="display: none">
-          <span id="alertIcon"></span>
+          <span id="alertIcon" class="alertIcon"></span>
           <span id="alertMessage">This is the alert overlay to display messages to the user.</span>
           <span class="alertCloseButton" onclick="this.parentElement.style.display='none';">&times;</span>
         </div>
@@ -969,7 +963,7 @@
             id="solidButton"
             class="tablink"
             title="Login to Solid"
-            onclick="switchTab(event, 'annotationPanel')"
+            onclick="switchTab(event, 'annotationPanel', 'flex')"
             data-tab="solidTab"
           >
             <!-- Solid logo SVG: Andrei Sambra, CC BY-SA 4.0 
@@ -990,9 +984,11 @@
                 .st0 {
                   fill: #7c4dff;
                 }
+
                 .st1 {
                   fill: #f7f7f7;
                 }
+
                 .st2 {
                   opacity: 0.3;
                   fill: #444444;
@@ -1020,61 +1016,253 @@
             </svg>
           </button>
           <button
-            id="annotationToolsButton"
-            class="tablink defaultOpen"
-            onclick="switchTab(event, 'annotationPanel')"
-            title="Annotation tools"
-            data-tab="annotationTools"
-          >
-            Tools
-          </button>
-          <button
             id="annotationListButton"
-            class="tablink"
-            onclick="switchTab(event, 'annotationPanel')"
+            class="tablink defaultOpen"
+            onclick="switchTab(event, 'annotationPanel', 'flex')"
             title="List annotations"
             data-tab="listAnnotations"
           >
-            List
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+              <path
+                d="M8.75 5.5h11.5a.75.75 0 0 1 0 1.5H8.75a.75.75 0 0 1 0-1.5Zm0 6h11.5a.75.75 0 0 1 0 1.5H8.75a.75.75 0 0 1 0-1.5Zm0 6h11.5a.75.75 0 0 1 0 1.5H8.75a.75.75 0 0 1 0-1.5ZM5 12a1 1 0 1 1-2 0 1 1 0 0 1 2 0ZM4 7a1 1 0 1 1 0-2 1 1 0 0 1 0 2Zm0 12a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"
+              ></path>
+            </svg>
+          </button>
+          <button
+            id="markupToolsButton"
+            class="tablink"
+            onclick="switchTab(event, 'annotationPanel', 'flex')"
+            title="Markup tools"
+            data-tab="markupTools"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+              <path
+                d="M10.3 6.74a.75.75 0 0 1-.04 1.06l-2.908 2.7 2.908 2.7a.75.75 0 1 1-1.02 1.1l-3.5-3.25a.75.75 0 0 1 0-1.1l3.5-3.25a.75.75 0 0 1 1.06.04Zm3.44 1.06a.75.75 0 1 1 1.02-1.1l3.5 3.25a.75.75 0 0 1 0 1.1l-3.5 3.25a.75.75 0 1 1-1.02-1.1l2.908-2.7-2.908-2.7Z"
+              ></path>
+              <path
+                d="M1.5 4.25c0-.966.784-1.75 1.75-1.75h17.5c.966 0 1.75.784 1.75 1.75v12.5a1.75 1.75 0 0 1-1.75 1.75h-9.69l-3.573 3.573A1.458 1.458 0 0 1 5 21.043V18.5H3.25a1.75 1.75 0 0 1-1.75-1.75ZM3.25 4a.25.25 0 0 0-.25.25v12.5c0 .138.112.25.25.25h2.5a.75.75 0 0 1 .75.75v3.19l3.72-3.72a.749.749 0 0 1 .53-.22h10a.25.25 0 0 0 .25-.25V4.25a.25.25 0 0 0-.25-.25Z"
+              ></path>
+            </svg>
+          </button>
+          <button
+            id="annotationToolsButton"
+            class="tablink"
+            onclick="switchTab(event, 'annotationPanel', 'flex')"
+            title="Annotation tools"
+            data-tab="annotationTools"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+              <path
+                d="M1.75 1h12.5c.966 0 1.75.784 1.75 1.75v9.5A1.75 1.75 0 0 1 14.25 14H8.061l-2.574 2.573A1.458 1.458 0 0 1 3 15.543V14H1.75A1.75 1.75 0 0 1 0 12.25v-9.5C0 1.784.784 1 1.75 1ZM1.5 2.75v9.5c0 .138.112.25.25.25h2a.75.75 0 0 1 .75.75v2.19l2.72-2.72a.749.749 0 0 1 .53-.22h6.5a.25.25 0 0 0 .25-.25v-9.5a.25.25 0 0 0-.25-.25H1.75a.25.25 0 0 0-.25.25Z"
+              ></path>
+              <path
+                d="M22.5 8.75a.25.25 0 0 0-.25-.25h-3.5a.75.75 0 0 1 0-1.5h3.5c.966 0 1.75.784 1.75 1.75v9.5A1.75 1.75 0 0 1 22.25 20H21v1.543a1.457 1.457 0 0 1-2.487 1.03L15.939 20H10.75A1.75 1.75 0 0 1 9 18.25v-1.465a.75.75 0 0 1 1.5 0v1.465c0 .138.112.25.25.25h5.5a.75.75 0 0 1 .53.22l2.72 2.72v-2.19a.75.75 0 0 1 .75-.75h2a.25.25 0 0 0 .25-.25v-9.5Z"
+              ></path>
+            </svg>
           </button>
           <!--        <button class="tablink" onclick="switchTab(event, 'annotationPanel')"
           title="Links" data-tab="externalLinks">Links</button>-->
           <span id="closeAnnotationPanelButton" class="topright" title="Close Annotations Panel">&times;</span>
         </div>
         <div id="solidTab" class="tabcontent"></div>
-        <div id="annotationTools" class="tabcontent">
-          <menu id="annotationToolsMenu">
-            <div id="annotationToolsDomainSelection">
-              <div class="annotationToolsDomainSelectionItem">
-                <fieldset>
-                  <input
-                    type="radio"
-                    checked
-                    id="writeAnnotationInline"
-                    title="Generate in-line annotations."
-                    value="writeAnnotationInline"
-                    name="annotationToolDomainSelector"
-                  />
-                  <label
-                    for="writeAnnotionInline"
-                    title="Generate in-line annotations using MEI &lt;annot&gt; elements."
-                    >MEI</label
-                  >
-                  <input
-                    type="radio"
-                    id="writeAnnotationStandoff"
-                    title="Generate stand-off annotations. Only possible if working on a native MEI file from URL or GitHub, and when logged into a Solid Pod."
-                    value="writeAnnotationStandoff"
-                    name="annotationToolDomainSelector"
-                  />
-                  <label
-                    id="writeAnnotationStandoffLabel"
-                    for="writeAnnotionStandoff"
-                    title="Generate stand-off annotations. Only possible if working on a native MEI file from URL or GitHub, and when logged into a Solid Pod."
-                    >RDF</label
-                  >
-                </fieldset>
+        <div id="markupTools" class="tabcontent">
+          <menu id="markupToolsMenu" class="enrichmentToolsMenu markup-panel">
+            <fieldset id="markupSettingsFieldset">
+              <legend id="markupSettingsLegendText">Markup settings</legend>
+            </fieldset>
+            <fieldset class="markupGrp">
+              <legend id="alternativeEncodingsGrp">Add alternative encoding</legend>
+              <div class="annotationToolsIconGroup">
+                <div class="annotationMultiToolsButton">
+                  <div class="addMarkup annotationMultiToolsIcon" data-el-name="choice">
+                    <span
+                      id="addChoiceText"
+                      class="annotationMultiToolsComponent choiceLabel"
+                      data-el-name="choice"
+                      title="Groups a number of alternative encodings for the same point in a text. "
+                      >&lt;choice&gt;</span
+                    >
+                    <span
+                      id="choiceContentTarget"
+                      class="annotationMultiToolsComponent choiceLabel"
+                      data-el-name="choice"
+                      title="First, select content for this element by hovering over <choice>."
+                      data-content="sic,corr"
+                    >
+                      <span class="sicLabel splitButtonLabel">&lt;sic&gt;</span>
+                      <span class="corrLabel splitButtonLabel">&lt;corr&gt;</span>
+                    </span>
+                    <div id="choice-content-options" class="markup-dropdown-content" data-el-name="choice">
+                      <a
+                        id="choiceSicCorr"
+                        data-target="choiceContentTarget"
+                        data-content-choice="sic,corr"
+                        data-el-name="choice"
+                        class="content-option splitButtonContainer"
+                        href="#"
+                      >
+                        <span class="annotationMultiToolsComponent">&lt;choice&gt;</span>
+                        <span class="sicLabel splitButtonLabel">&lt;sic&gt;</span>
+                        <span class="corrLabel splitButtonLabel">&lt;corr&gt;</span>
+                      </a>
+                      <a
+                        id="choiceCorrSic"
+                        data-target="choiceContentTarget"
+                        data-content-choice="corr,sic"
+                        data-el-name="choice"
+                        class="content-option splitButtonContainer"
+                        href="#"
+                      >
+                        <span class="annotationMultiToolsComponent">&lt;choice&gt;</span>
+                        <span class="corrLabel splitButtonLabel">&lt;corr&gt;</span>
+                        <span class="sicLabel splitButtonLabel">&lt;sic&gt;</span>
+                      </a>
+                      <a
+                        id="choiceOrigReg"
+                        data-target="choiceContentTarget"
+                        data-content-choice="orig,reg"
+                        data-el-name="choice"
+                        class="content-option splitButtonContainer"
+                        href="#"
+                      >
+                        <span class="annotationMultiToolsComponent">&lt;choice&gt;</span>
+                        <span class="origLabel splitButtonLabel">&lt;orig&gt;</span>
+                        <span class="regLabel splitButtonLabel">&lt;reg&gt;</span>
+                      </a>
+                      <a
+                        id="choiceRegOrig"
+                        data-target="choiceContentTarget"
+                        data-content-choice="reg,orig"
+                        data-el-name="choice"
+                        class="content-option splitButtonContainer"
+                        href="#"
+                      >
+                        <span class="annotationMultiToolsComponent">&lt;choice&gt;</span>
+                        <span class="regLabel splitButtonLabel">&lt;reg&gt;</span>
+                        <span class="origLabel splitButtonLabel">&lt;orig&gt;</span>
+                      </a>
+                    </div>
+                  </div>
+                  <span id="choiceArrow" class="annotationMultiToolsSelector choiceLabel" data-el-name="choice">▼</span>
+                </div>
               </div>
+              <div class="annotationToolsIconGroup">
+                <div class="annotationMultiToolsButton">
+                  <div class="addMarkup annotationMultiToolsIcon" data-el-name="subst">
+                    <span
+                      id="addSubstText"
+                      class="annotationMultiToolsComponent substLabel"
+                      data-el-name="subst"
+                      title="Groups a number of alternative encodings for the same point in a text. "
+                      >&lt;subst&gt;</span
+                    >
+                    <span
+                      id="substContentTarget"
+                      class="annotationMultiToolsComponent substLabel"
+                      data-el-name="subst"
+                      title="First, select content for this element by hovering over <subst>."
+                      data-content="add,del"
+                    >
+                      <span class="addLabel splitButtonLabel">&lt;add&gt;</span>
+                      <span class="delLabel splitButtonLabel">&lt;del&gt;</span>
+                    </span>
+                    <div id="subst-content-options" class="markup-dropdown-content" data-el-name="subst">
+                      <a
+                        id="substAddDel"
+                        data-target="substContentTarget"
+                        data-content-choice="add,del"
+                        data-el-name="subst"
+                        class="content-option splitButtonContainer"
+                        href="#"
+                      >
+                        <span class="annotationMultiToolsComponent">&lt;subst&gt;</span>
+                        <span class="addLabel splitButtonLabel">&lt;add&gt;</span>
+                        <span class="delLabel splitButtonLabel">&lt;del&gt;</span>
+                      </a>
+                      <a
+                        id="substDelAdd"
+                        data-target="substContentTarget"
+                        data-content-choice="del,add"
+                        data-el-name="subst"
+                        class="content-option splitButtonContainer"
+                        href="#"
+                      >
+                        <span class="annotationMultiToolsComponent">&lt;subst&gt;</span>
+                        <span class="delLabel splitButtonLabel">&lt;del&gt;</span>
+                        <span class="addLabel splitButtonLabel">&lt;add&gt;</span>
+                      </a>
+                    </div>
+                  </div>
+                  <span id="substArrow" class="annotationMultiToolsSelector substLabel" data-el-name="subst">▼</span>
+                </div>
+              </div>
+            </fieldset>
+            <fieldset class="markupGrp">
+              <legend id="editInterventionsGrp">Add editorial intervention</legend>
+              <div class="annotationToolsIconGroup markup-dropdown">
+                <span id="addSuppliedText" class="annotationToolsIcon suppliedLabel addMarkup" data-el-name="supplied"
+                  >Supplied</span
+                >
+              </div>
+              <div class="annotationToolsIconGroup markup-dropdown">
+                <span id="addUnclearText" class="annotationToolsIcon unclearLabel addMarkup" data-el-name="unclear"
+                  >Unclear</span
+                >
+              </div>
+              <div class="annotationToolsIconGroup markup-dropdown">
+                <span id="addSicText" class="annotationToolsIcon sicLabel addMarkup" data-el-name="sic">Sic</span>
+              </div>
+              <div class="annotationToolsIconGroup markup-dropdown">
+                <span id="addCorrText" class="annotationToolsIcon corrLabel addMarkup" data-el-name="corr">Corr</span>
+              </div>
+              <div class="annotationToolsIconGroup markup-dropdown">
+                <span id="addOrigText" class="annotationToolsIcon origLabel addMarkup" data-el-name="orig">Orig</span>
+              </div>
+              <div class="annotationToolsIconGroup markup-dropdown">
+                <span id="addRegText" class="annotationToolsIcon regLabel addMarkup" data-el-name="reg">Reg</span>
+              </div>
+            </fieldset>
+            <fieldset class="markupGrp">
+              <legend id="descMarkupGrp">Add descriptive markup</legend>
+              <div class="annotationToolsIconGroup markup-dropdown">
+                <span id="addAddText" class="annotationToolsIcon addLabel addMarkup" data-el-name="add">Add</span>
+              </div>
+              <div class="annotationToolsIconGroup markup-dropdown">
+                <span id="addDelText" class="annotationToolsIcon delLabel addMarkup" data-el-name="del">Del</span>
+              </div>
+            </fieldset>
+          </menu>
+        </div>
+        <div id="annotationTools" class="tabcontent">
+          <menu id="annotationToolsMenu" class="enrichmentToolsMenu">
+            <div id="annotationToolsDomainSelection">
+              <fieldset class="annotationToolsDomainSelectionItem">
+                <legend id="annotationToolDomainSelectorLegend">Annotation storage</legend>
+                <input
+                  type="radio"
+                  checked
+                  id="writeAnnotationInline"
+                  title="Generate in-line annotations."
+                  value="writeAnnotationInline"
+                  name="annotationToolDomainSelector"
+                />
+                <label for="writeAnnotionInline" title="Generate in-line annotations using MEI &lt;annot&gt; elements."
+                  >MEI</label
+                >
+                <input
+                  type="radio"
+                  id="writeAnnotationStandoff"
+                  title="Generate stand-off annotations. Only possible if working on a native MEI file from URL or GitHub, and when logged into a Solid Pod."
+                  value="writeAnnotationStandoff"
+                  name="annotationToolDomainSelector"
+                />
+                <label
+                  id="writeAnnotationStandoffLabel"
+                  for="writeAnnotionStandoff"
+                  title="Generate stand-off annotations. Only possible if working on a native MEI file from URL or GitHub, and when logged into a Solid Pod."
+                  >RDF</label
+                >
+              </fieldset>
             </div>
             <div class="annotationToolsIconGroup">
               <li>
@@ -1089,7 +1277,8 @@
                 </div>
               </li>
             </div>
-            <div class="annotationToolsIconGroup">
+            <fieldset class="annotationToolsIconGroup">
+              <legend id="insertInlineAnnotationLegend">Annotation tools</legend>
               <li>
                 <div class="annotationToolsIcon" id="annotateHighlight">
                   <!--<svg xmlns="http://www.w3.org/2000/svg"  aria-hidden="true" role="img" id="footer-sample-full" width="16px" height="16px"  viewBox="0 0 1024 1024">
@@ -1106,14 +1295,16 @@
                   <span id="annotationToolsHighlightSpan">Highlight</span>
                 </div>
               </li>
-              <!--DW HACK ESWC <li>
+              <!-- DW HACK ESWC
+            <li>
               <div class="annotationToolsIcon" id="annotateCircle">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
                   <path fill-rule="evenodd" d="M8 1.5a6.5 6.5 0 100 13 6.5 6.5 0 000-13zM0 8a8 8 0 1116 0A8 8 0 010 8z" />
                 </svg>
                 Circle
               </div>
-            </li>-->
+            </li>
+            -->
               <li>
                 <div class="annotationToolsIcon" id="annotateDescribe">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
@@ -1138,7 +1329,12 @@
                   <span id="annotationToolsLinkSpan">Link</span>
                 </div>
               </li>
-            </div>
+            </fieldset>
+            <!-- TODO: insert fieldset for stand-off annotations
+          <fieldset class="annotationToolsIconGroup">
+            <legend id="insertStandoffAnnotationLegend">Stand-off annotation tools</legend>
+          </fieldset>
+          -->
           </menu>
         </div>
         <div id="listAnnotations" class="tabcontent">No annotations present.</div>
@@ -1191,7 +1387,7 @@
         <button
           id="meifriendOptionsTab"
           class="tablink"
-          onclick="switchTab(event, 'settingsPanel')"
+          onclick="switchTab(event, 'settingsPanel', 'block')"
           title="mei-friend Settings"
           data-tab="meiFriendSettings"
         >
@@ -1200,7 +1396,7 @@
         <button
           id="editorOptionsTab"
           class="tablink defaultOpen"
-          onclick="switchTab(event, 'settingsPanel')"
+          onclick="switchTab(event, 'settingsPanel', 'block')"
           title="Editor Settings"
           data-tab="editorSettings"
         >
@@ -1209,7 +1405,7 @@
         <button
           id="verovioOptionsTab"
           class="tablink"
-          onclick="switchTab(event, 'settingsPanel')"
+          onclick="switchTab(event, 'settingsPanel', 'block')"
           title="Verovio Options"
           data-tab="verovioSettings"
         >
@@ -1283,16 +1479,18 @@
       });
 
       // switch tabs in settings menu
-      function switchTab(ev, containingElementId) {
+      function switchTab(ev, containingElementId, displayOption) {
         console.log('switchtab :', ev, containingElementId);
-        const tabId = ev.target.dataset.tab;
+        //const tabId = ev.target.dataset.tab;
+        const tabId = ev.target.closest('[data-tab]').dataset.tab;
         // console.log('switchTab: ', containingElementId, tabId);
         // console.log('switchTab: ', ev);
         let containingElement = document.getElementById(containingElementId);
         if (containingElement) {
           // hide all tab contents except tabId
           for (let cont of containingElement.getElementsByClassName('tabcontent')) {
-            cont.style.display = cont.id === tabId ? 'block' : 'none';
+            cont.style.display = cont.id === tabId ? displayOption : 'none';
+            // change block to flex to fix horizontal list of all things, block for settings
           }
           // remove class "active" from tablinks except for current target
           for (let tab of containingElement.getElementsByClassName('tablink')) {
@@ -1302,6 +1500,15 @@
           }
         }
       }
+
+      /*function toggleAccordion(ev, accordionBtnId, accordionPanelId) {
+      console.log("Toggle accodion:", accordionBtnId, accordionPanelId);
+      let accordionBtn = document.getElementById(accordionBtnId);
+      let accordionPanel = document.getElementById(accordionPanelId);
+
+      accordionBtn.classList.toggle('markup-accordion-btn-active');
+      accordionPanel.classList.toggle('markup-accordion-panel-active');
+    }*/
 
       document.querySelectorAll('.defaultOpen').forEach((item) => item.click());
     </script>

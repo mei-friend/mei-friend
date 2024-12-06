@@ -1,5 +1,6 @@
 import http from '../deps/isomorphic-git.http.js';
 import GitCloudClient from './git-cloud-client.js';
+import { storage } from './main.js';
 
 window.fs = new LightningFS('fs', { wipe: true });
 window.pfs = window.fs.promises; // promisified version of fs, for your convenience
@@ -318,10 +319,24 @@ export default class GitManager {
     });
   }
 
-  async fileChanged(path = this.filepath) {
-    let status = await this.status(path);
-    console.log('git-manager fileChanged status:', status);
-    return status !== 'unmodified' && status !== 'absent';
+  async fileChanged(path = this.filepath, status) {
+    let fileChanged;
+    if (!status) {
+      status = await this.status(path);
+    }
+    if (status === 'absent') {
+      // file does not exist, probably because we haven't clone it yet
+      // therefore, we rely on what we know from storage
+      if (storage && !storage.override) {
+        fileChanged = storage.fileChanged;
+      }
+    } else {
+      fileChanged = status !== 'unmodified';
+    }
+    if (storage && !storage.override) {
+      storage.fileChanged = fileChanged;
+    }
+    return fileChanged;
   }
 
   async readFile(path = this.filepath) {
@@ -486,6 +501,10 @@ export default class GitManager {
 
   async getSpecifiedUserOrgRepos(userOrg, per_page, page) {
     return await this.cloud.getSpecifiedUserOrgRepos(userOrg, per_page, page);
+  }
+
+  getRawURL() {
+    return this.cloud.getRawURL();
   }
 
   async createPR(branch) {

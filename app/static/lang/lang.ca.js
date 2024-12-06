@@ -296,6 +296,9 @@ export const lang = {
   breaksSelectLine: { text: 'Sistema' },
   breaksSelectEncoded: { text: 'Sistema i pàgina' },
   breaksSelectSmart: { text: 'Intel·ligent' },
+  choiceSelect: { description: 'Trieu el contingut mostrat pels elements de selecció' },
+  choiceDefault: { text: '(opció per defecte)' },
+  noChoice: { text: '(cap opció disponible)' },
   updateControlsLabel: {
     text: 'Actualitzar',
     description: "Comportament d'actualització dels controls de la notació després de canvis en l'encoding",
@@ -453,8 +456,9 @@ export const lang = {
   annotationCloseButtonText: { text: "Tanca el panell d'annotacions" },
   hideAnnotationPanelButton: { description: "Tanca el panell d'annotacions" },
   closeAnnotationPanelButton: { description: "Tanca el panell d'annotacions" },
-  annotationToolsButton: { text: 'Eines', description: "Eines d'annotació" },
-  annotationListButton: { text: 'Llista', description: "Llista d'anotacions" },
+  markupToolsButton: { description: 'Eines de marcatge' },
+  annotationToolsButton: { description: "Eines d'annotació" },
+  annotationListButton: { description: "Llista d'annotacions" },
   writeAnnotStandoffText: { text: 'Anotació web' },
   annotationToolsIdentifyTitle: { text: 'Identifica' },
   annotationToolsIdentifySpan: { text: 'Identifica objecte musical' },
@@ -471,6 +475,9 @@ export const lang = {
   loadWebAnnotationMessage2: { text: 'Si us plau, intenta-ho de nou' },
   noAnnotationsToDisplay: { text: 'No hi ha cap anotació per mostrar' },
   flipPageToAnnotationText: { description: 'Gira la pàgina fins a aquesta anotació' },
+  describeMarkup: { description: 'Descriu aquest marcatge' },
+  deleteMarkup: { description: 'Elimina aquest marcatge' },
+  deleteMarkupConfirmation: { text: 'Esteu segur que voleu eliminar aquest marcatge?' },
   deleteAnnotation: { description: 'Elimina aquesta anotació' },
   deleteAnnotationConfirmation: { text: 'Esteu segur que voleu eliminar aquesta anotació?' },
   makeStandOffAnnotation: {
@@ -498,6 +505,93 @@ export const lang = {
     text1: "No es pot escriure l'annotació perquè el punt d'ancoratge MEI no té xml:id.",
     text2:
       'Assigneu identificadors seleccionant "Manipula" -> "Torna a renderitzar MEI (amb ids)" i torneu-ho a intentar.',
+  },
+  // MENÚ DE MARCATGE
+  respSelect: {
+    text: 'Seleccionar la responsabilitat de la marca',
+    description: "Seleccionar l'ID de la responsabilitat",
+  },
+  selectionSelect: {
+    text: 'Selecció per defecte per a la marca',
+    description: 'Trieu si la marca de nova creació hauria d\'envoltar els elements seleccionats, les articulacions o els accidentals',
+    labels: ['Elements seleccionats','Articulació', 'Accidental'],
+    valuesDescriptions: [
+      'Afegeix marcatge als elements seleccionats.', 
+      'Afegeix marcatge a les articulacions dins la selecció.', 
+      'Afegeix marcatge als accidentals dins la selecció.'
+    ],
+  },
+  alternativeEncodingsGrp: {
+    text: 'Codificacions alternatives',
+    description: 'Elements de marcatge que contenen múltiples versions.',
+  },
+  addChoiceText: {
+    text: '<choice>',
+    description: 'Agrupa diverses codificacions alternatives pel mateix punt en un text.',
+  },
+  choiceSicCorr: { 
+    description: 'Posa la selecció a <sic> i afegeix <corr>.' 
+  },
+  choiceCorrSic: { 
+    description: 'Posa la selecció a <corr> i afegeix <sic>.' 
+  },
+  choiceOrigReg: { 
+    description: 'Posa la selecció a <orig> i afegeix <reg>.' 
+  },
+  choiceRegOrig: { 
+    description: 'Posa la selecció a <reg> i afegeix <orig>.' 
+  },
+  choiceContentTarget: {
+    description: 'Primer, selecciona contingut per a aquest element passant el ratolí sobre <choice>.',
+  },
+  addSubstText: {
+    text: '<subst>',
+    description:
+      '(substitució) – Agrupa elements de transcripció quan la combinació ha de ser considerada com una intervenció única en el text.',
+  },
+  substAddDel: { 
+    description: 'Posa la selecció a <add> i afegeix <del>.' 
+  },
+  substDelAdd: { 
+    description: 'Posa la selecció a <del> i afegeix <add>.' 
+  },
+  substContentTarget: {
+    description: 'Primer, selecciona contingut per a aquest element passant el ratolí sobre <subst>.',
+  },
+  editInterventionsGrp: {
+    text: 'Intervencions editorials',
+    description: 'Elements de marcatge utilitzats per codificar intervencions editorials.',
+  },
+  addSuppliedText: {
+    text: '<supplied>',
+    description: 'Conté material subministrat pel transcriptor o editor per qualsevol motiu.',
+  },
+  addUnclearText: {
+    text: '<unclear>',
+    description: 'Conté material que no es pot transcriure amb certesa perquè és il·legible o inaudible a la font.',
+  },
+  addSicText: { text: '<sic>', description: 'Conté material aparentment incorrecte o inexacte.' },
+  addCorrText: {
+    text: '<corr>',
+    description: "(correcció) – Conté la forma correcta d'un passatge aparentment erroni.",
+  },
+  addOrigText: {
+    text: '<orig>',
+    description: "(original) – Conté material marcat com a següent l'original, en lloc de ser normalitzat o corregit.",
+  },
+  addRegText: {
+    text: '<reg>',
+    description: "(regularització) – Conté material que ha estat regularitzat o normalitzat d'alguna manera.",
+  },
+  descMarkupGrp: {
+    text: 'Marcatge Descriptiu',
+    description: 'Elements de marcatge utilitzats per codificar intervencions en el material font.',
+  },
+  addAddText: { text: '<add>', description: '(addició) – Marca una addició al text.' },
+  addDelText: {
+    text: '<del>',
+    description:
+      '(supressió) – Conté informació eliminada, marcada com a eliminada o indicada com a superflua o espúria al text original per un autor, escriptor, annotador o corrector.',
   },
 
   // MIDI
@@ -806,20 +900,53 @@ export const lang = {
 
   // Supplied element / Element subministrat
   titleSupplied: {
-    text: 'Gestiona contingut editorial',
-    description: 'Control·la el tractament dels elements <supplied>',
+    text: 'Gestionar el contingut editorial',
+    description: 'Controlar el tractament de la marca editorial',
   },
-  showSupplied: {
-    text: 'Mostra els elements <supplied>',
-    description: 'Destaca tots els elements continguts per un element <supplied>',
+  showMarkup: {
+    text: 'Mostrar elements de marca editorial',
+    description: 'Destacar tots els elements continguts per elements de marca editorial',
+  },
+  markupToPDF: {
+    text: 'Mostrar elements de marca editorial a PDF',
+    description: 'Mostrar elements de marca editorial a la sortida PDF',
+  },
+  alternativeVersionContent: {
+    text: 'Contingut per defecte per a les codificacions alternatives',
+    description: 'Trieu si les codificacions alternatives de nova creació estan buides o còpies de la lectura original',
+    labels: ['buit', 'còpia'],
   },
   suppliedColor: {
-    text: 'Selecciona el color de ressaltat per <supplied>',
-    description: 'Selecciona el color de ressaltat per <supplied>',
+    text: "Seleccionar el color d'ús de <supplied>",
+    description: "Seleccionar el color d'ús de <supplied>",
   },
-  respSelect: {
-    text: 'Selecciona la responsabilitat per <supplied>',
-    description: 'Selecciona la identificació de la responsabilitat',
+  unclearColor: {
+    text: "Seleccionar el color d'ús de <unclear>",
+    description: "Seleccionar el color d'ús de <unclear>",
+  },
+  sicColor: {
+    text: "Seleccionar el color d'ús de <sic>",
+    description: "Seleccionar el color d'ús de <sic>",
+  },
+  corrColor: {
+    text: "Seleccionar el color d'ús de <corr>",
+    description: "Seleccionar el color d'ús de <corr>",
+  },
+  origColor: {
+    text: "Seleccionar el color d'ús de <orig>",
+    description: "Seleccionar el color d'ús de <orig>",
+  },
+  regColor: {
+    text: "Seleccionar el color d'ús de <reg>",
+    description: "Seleccionar el color d'ús de <reg>",
+  },
+  addColor: {
+    text: "Seleccionar el color d'ús de <add>",
+    description: "Seleccionar el color d'ús de <add>",
+  },
+  delColor: {
+    text: "Seleccionar el color d'ús de <del>",
+    description: "Seleccionar el color d'ús de <del>",
   },
 
   //  EDITOR SETTINGS / CODEMIRROR SETTINGS // CONFIGURACIÓ DE L'EDITOR / CONFIGURACIÓ DE CODEMIRROR

@@ -206,9 +206,6 @@ export const lang = {
   addDiminuendoHairpinText: { text: 'Diminuendo hairpin' },
   addBeamText: { text: 'Beam' },
   addBeamSpanText: { text: 'Beamspan' },
-  addSuppliedText: { text: 'Supplied' },
-  addSuppliedArticText: { text: 'Supplied (Artic)' },
-  addSuppliedAccidText: { text: 'Supplied (Accid)' },
   addArpeggioText: { text: 'Arpeggio' },
   addFermataText: { text: 'Fermata' },
   addGlissandoText: { text: 'Glissando' },
@@ -295,6 +292,9 @@ export const lang = {
   breaksSelectLine: { text: 'System' },
   breaksSelectEncoded: { text: 'System and page' },
   breaksSelectSmart: { text: 'Smart' },
+  choiceSelect: { description: 'Choose displayed content for choice elements' },
+  choiceDefault: { text: '(default choice)' },
+  noChoice: { text: '(no choice available)' },
   updateControlsLabel: { text: 'Update', description: 'Control update behavior of notation after changes in encoding' },
   liveUpdateCheckbox: { description: 'Automatically update notation after changes in encoding' },
   codeManualUpdateButton: { description: 'Update notation manually' },
@@ -445,9 +445,13 @@ export const lang = {
   annotationCloseButtonText: { text: 'Close Annotations Panel' },
   hideAnnotationPanelButton: { description: 'Close Annotations Panel' },
   closeAnnotationPanelButton: { description: 'Close Annotations Panel' },
-  annotationToolsButton: { text: 'Tools', description: 'Annotation tools' },
-  annotationListButton: { text: 'List', description: 'List annotations' },
+  markupToolsButton: { description: 'Markup tools' },
+  annotationToolsButton: { description: 'Annotation tools' },
+  annotationListButton: { description: 'List annotations' },
   writeAnnotStandoffText: { text: 'Web Annotation' },
+  annotationToolDomainSelectorLegend: { text: 'Select annotation storage' },
+  insertInlineAnnotationLegend: { text: 'Insert annotation' }, // TODO: 'Insert inline annotation' 
+  insertStandoffAnnotationLegend: { text: 'Insert stand-off annotation' },
   annotationToolsIdentifyTitle: { text: 'Identify' },
   annotationToolsIdentifySpan: { text: 'Identify Musical Object' },
   annotationToolsHighlightTitle: { text: 'Highlight' },
@@ -463,6 +467,9 @@ export const lang = {
   loadWebAnnotationMessage2: { text: 'please try again' },
   noAnnotationsToDisplay: { text: 'No annotations to display' },
   flipPageToAnnotationText: { description: 'Flip page to this annotation' },
+  describeMarkup: { description: 'Describe this markup' },
+  deleteMarkup: { description: 'Delete this markup' },
+  deleteMarkupConfirmation: { text: 'Are you sure you wish to delete this markup?' },
   deleteAnnotation: { description: 'Delete this annotation' },
   deleteAnnotationConfirmation: { text: 'Are you sure you wish to delete this annotation?' },
   makeStandOffAnnotation: {
@@ -489,6 +496,95 @@ export const lang = {
   annotationWithoutIdWarning: {
     text1: 'Cannot write annotation as MEI anchor-point lacks xml:id.',
     text2: 'Please assign identifiers by selecting "Manipulate" -> "Re-render MEI (with ids)" and try again.',
+  },
+  // MARKUP MENU
+  respSelect: {
+    text: 'Select markup responsibility',
+    description: 'Select responsibility id',
+  },
+  selectionSelect: {
+    text: 'Default selection for markup',
+    description: 'Choose if newly created markup should enclose the selected elements, articulation or accidentals',
+    labels: ['Selected elements','Articulation', 'Accidentals'],
+    valuesDescriptions: [
+      'Add markup to selected elements.', 
+      'Add markup to articulations within selection.', 
+      'Add markup to accidentals within selection.'
+    ],
+  },
+  alternativeEncodingsGrp: {
+    text: 'Add alternative encoding',
+    description: 'Insert markup elements that contain multiple versions.',
+  },
+  addChoiceText: {
+    text: '<choice>',
+    description: 'Groups a number of alternative encodings for the same point in a text. ',
+  },
+  choiceSicCorr: { 
+    description: 'Put selection in <sic> and add <corr>.' 
+  },
+  choiceCorrSic: { 
+    description: 'Put selection in <corr> and add <sic>.' 
+  },
+  choiceOrigReg: { 
+    description: 'Put selection in <orig> and add <reg>.' 
+  },
+  choiceRegOrig: { 
+    description: 'Put selection in <reg> and add <orig>.' 
+  },
+  choiceContentTarget: {
+    description: 'First, select content for this element by hovering over <choice>.',
+  },
+  addSubstText: {
+    text: '<subst>',
+    description:
+      '(substitution) – Groups transcriptional elements when the combination is to be regarded as a single intervention in the text.',
+  },
+  substAddDel: { 
+    description: 'Put selection in <add> and add <del>.' 
+  },
+  substDelAdd: { 
+    description: 'Put selection in <del> and add <add>.' 
+  },
+  substContentTarget: {
+    description: 'First, select content for this element by hovering over <subst>.',
+  },
+  editInterventionsGrp: {
+    text: 'Add editorial intervention',
+    description: 'Insert markup elements used to encode editorial interventions.',
+  },
+  addSuppliedText: {
+    text: '<supplied>',
+    description: 'Contains material supplied by the transcriber or editor for any reason.',
+  },
+  addUnclearText: {
+    text: '<unclear>',
+    description:
+      'Contains material that cannot be transcribed with certainty because it is illegible or inaudible in the source.',
+  },
+  addSicText: { text: '<sic>', description: 'Contains apparently incorrect or inaccurate material.' },
+  addCorrText: {
+    text: '<corr>',
+    description: '(correction) – Contains the correct form of an apparent erroneous passage.',
+  },
+  addOrigText: {
+    text: '<orig>',
+    description:
+      '(original) – Contains material which is marked as following the original, rather than being normalized or corrected.',
+  },
+  addRegText: {
+    text: '<reg>',
+    description: '(regularization) – Contains material which has been regularized or normalized in some sense.',
+  },
+  descMarkupGrp: {
+    text: 'Add descriptive markup',
+    description: 'Markup elements used to encode interventions in the source material.',
+  },
+  addAddText: { text: '<add>', description: '(addition) – Marks an addition to the text.' },
+  addDelText: {
+    text: '<del>',
+    description:
+      '(deletion) – Contains information deleted, marked as deleted, or otherwise indicated as superfluous or spurious in the copy text by an author, scribe, annotator, or corrector.',
   },
 
   // MIDI
@@ -797,19 +893,52 @@ export const lang = {
   // Supplied element
   titleSupplied: {
     text: 'Handle editorial content',
-    description: 'Control handling of <supplied> elements',
+    description: 'Control handling of editorial markup',
   },
-  showSupplied: {
-    text: 'Show <supplied> elements',
-    description: 'Highlight all elements contained by a <supplied> element',
+  showMarkup: {
+    text: 'Show editorial markup elements',
+    description: 'Highlight all elements contained by editorial markup elements',
+  },
+  markupToPDF: {
+    text: 'Show markup in PDF',
+    description: 'Show editorial markup in PDF export',
+  },
+  alternativeVersionContent: {
+    text: 'Content alternative encodings',
+    description: 'Choose default content of alternative encodings: newly created alternative encodings are empty or copies of the original reading',
+    labels: ['empty', 'copy'],
   },
   suppliedColor: {
     text: 'Select <supplied> highlight color',
     description: 'Select <supplied> highlight color',
   },
-  respSelect: {
-    text: 'Select <supplied> responsibility',
-    description: 'Select responsibility id',
+  unclearColor: {
+    text: 'Select <unclear> highlight color',
+    description: 'Select <unclear> highlight color',
+  },
+  sicColor: {
+    text: 'Select <sic> highlight color',
+    description: 'Select <sic> highlight color',
+  },
+  corrColor: {
+    text: 'Select <corr> highlight color',
+    description: 'Select <corr> highlight color',
+  },
+  origColor: {
+    text: 'Select <orig> highlight color',
+    description: 'Select <orig> highlight color',
+  },
+  regColor: {
+    text: 'Select <reg> highlight color',
+    description: 'Select <reg> highlight color',
+  },
+  addColor: {
+    text: 'Select <add> highlight color',
+    description: 'Select <add> highlight color',
+  },
+  delColor: {
+    text: 'Select <del> highlight color',
+    description: 'Select <del> highlight color',
   },
 
   //  EDITOR SETTINGS / CODEMIRROR SETTINGS
