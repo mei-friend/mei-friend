@@ -137,7 +137,7 @@ export function drawLink(a) {
 // functions to create annotations
 export const createIdentify = (e, selection) => {
   if (solid.getDefaultSession().info.isLoggedIn) {
-    //const label = window.prompt('Add label for identified object (optional)');
+    const label = window.prompt('Add label for identified object (optional)');
     const selection = v.selectedElements;
     document.getElementById('solid_logo').classList.add('clockwise');
     createMAOMusicalObject(selection, label)
@@ -155,8 +155,8 @@ export const createIdentify = (e, selection) => {
             isStandoff: true,
             standoffUri: solidStorage + maoMusicalMaterial.headers.get('location').substr(1),
           };
-          annotations.push(a);
-          refreshAnnotations(true);
+          addListItem(a, true);
+          //refreshAnnotations(true);
         });
       })
       .finally(() => {
