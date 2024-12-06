@@ -18,7 +18,6 @@ export var cm;
 export var v; // viewer instance
 export var validator; // validator object
 export var rngLoader; // object for loading a relaxNG schema for hinting
-export let github; // github API wrapper object - deprecated, TODO remove
 export let gm; // git manager object - TODO, handle multiple git providers
 export let storage = new Storage();
 export var tkVersion = ''; // string of the currently loaded toolkit version

@@ -260,6 +260,25 @@ export default class GitCloudClient {
     }
   }
 
+  getRawURL() {
+    // return the raw URL of the current repository
+    // based on the current repo (contains the userOrg and repoName)
+    // ensure that the URL matches the current provider
+    // TODO check this is not totally broken
+    switch (this.providerType) {
+      case 'github':
+        return `https://raw.githubusercontent.com/${this.gm.repo}`;
+      case 'gitlab':
+        return `https://${this.provider}/gitlab/${this.gm.repo}`;
+      case 'bitbucket':
+        return `https://${this.provider}/bitbucket/${this.gm.repo}`;
+      case 'codeberg':
+        return `https://${this.provider}/codeberg/${this.gm.repo}`;
+      default:
+        throw new Error('Unknown provider');
+    }
+  }
+
   async createPR(target) {
     // create a pull request of the current gm branch to the target branch
     // use appropriate API endpoint based on the provider

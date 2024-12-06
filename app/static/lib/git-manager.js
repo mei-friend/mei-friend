@@ -503,6 +503,10 @@ export default class GitManager {
     return await this.cloud.getSpecifiedUserOrgRepos(userOrg, per_page, page);
   }
 
+  getRawURL() {
+    return this.cloud.getRawURL();
+  }
+
   async createPR(branch) {
     return await this.cloud.createPR(branch);
   }
