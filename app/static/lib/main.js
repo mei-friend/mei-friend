@@ -191,7 +191,6 @@ export async function setFileChangedState(fileChangedState) {
     if (commitUI) setCommitUIEnabledStatus();
     if (actionsWorkflows) {
       if (await gm.fileChanged()) {
-        console.log('DISABLING WORKFLOWS');
         actionsWorkflows.forEach((el) => el.parentElement.classList.add('disabled'));
         actionsWorkflows.forEach((el) => el.parentElement.parentElement.classList.add('notAllowed'));
       } else {

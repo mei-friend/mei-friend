@@ -322,7 +322,6 @@ export default class GitManager {
     if (!status) {
       status = await this.status(path);
     }
-    console.log('git-manager fileChanged status:', status);
     return status !== 'unmodified' && status !== 'absent';
   }
 

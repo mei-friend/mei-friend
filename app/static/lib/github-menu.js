@@ -843,12 +843,10 @@ export async function setCommitUIEnabledStatus() {
       commitButton.classList.remove('commitAsNewFile');
       commitButton.setAttribute('value', translator.lang.githubCommitButton.value);
       if (await gm.fileChanged()) {
-        console.log('setting github commit UI enabled status: change detected');
         // enable commit UI if file has changed
         commitButton.removeAttribute('disabled');
         commitMessageInput.removeAttribute('disabled');
       } else {
-        console.log('setting github commit UI enabled status: NO CHANGE');
         // disable commit UI if file hasn't changed
         commitButton.setAttribute('disabled', '');
         commitMessageInput.setAttribute('disabled', '');
