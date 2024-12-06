@@ -318,8 +318,10 @@ export default class GitManager {
     });
   }
 
-  async fileChanged(path = this.filepath) {
-    let status = await this.status(path);
+  async fileChanged(path = this.filepath, status) {
+    if (!status) {
+      status = await this.status(path);
+    }
     console.log('git-manager fileChanged status:', status);
     return status !== 'unmodified' && status !== 'absent';
   }
