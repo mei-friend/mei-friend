@@ -1,6 +1,6 @@
 # mei-friend-online CHANGELOG.md
 ### 1.1.8 Merge isomorphic-git and mark-up enrichment developments
-* Merges patches 1.0.17 and 1.1.7 in preparation for 1.2.0 release
+* Merges patches 1.0.17 (migration to isomorphic-git) and 1.1.7 (enrichment panel and editorial markup) in preparation for 1.2.0 release
 * Resizer reworked to ensure visibility of x and y scroll bars
 * Clear undo history upon file loading to prevent undoing freshly loaded MEI file (fixes #117)
 * Allow default key bindings in Solid URL text field
