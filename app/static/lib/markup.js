@@ -3,7 +3,7 @@
  */
 
 import * as att from './attribute-classes.js';
-import { addApplicationInfo, indentSelection, removeInEditor, replaceInEditor } from './editor.js';
+import { addApplicationInfo, replaceInEditor } from './editor.js';
 import { cm, cmd, translator, v } from './main.js';
 import * as dutils from './dom-utils.js';
 import * as speed from './speed.js';
@@ -26,7 +26,9 @@ export function readMarkup() {
   // create objects out of them
   // add objects to list
   // use xmlMarkupToListItem(selectedElements, mElName)
-  if (!v.xmlDoc) return;
+  if (!v.xmlDoc) {
+    return;
+  }
   let elementList = att.modelTranscriptionLike.concat(...att.alternativeEncodingElements).join(',');
   let markup = Array.from(v.xmlDoc.querySelectorAll(elementList));
   markup = markup.filter((markup) => !isItemInList(markup.getAttribute('xml:id')));
@@ -56,10 +58,10 @@ export function readMarkup() {
     if (!idsToIgnore.includes(elId)) {
       let elName = markupEl.localName;
       if (elId == null) {
-        // (AP, 9.9.2024) 
+        // (AP, 9.9.2024)
         // Automatically add missing xml:ids
         // I replace the parent element to prevent hickups and endless recursions
-        // because replaceInEditor() needs xml:ids to work. 
+        // because replaceInEditor() needs xml:ids to work.
         // This can definitely be solved in a better way,
         // but I'm not familar enough with the other editor functions
         elId = utils.generateXmlId(elName, v.xmlIdStyle);
@@ -325,15 +327,16 @@ export function selectChoiceSubst(xmlDoc, elName, childElName) {
  * Returns first child element, ignoring text and other nodes
  * @param {Element} parent
  * @returns
+ * TODO: never used, probably remove
  */
-function firstChildElement(parent) {
-  for (let node of parent.childNodes) {
-    if (node.nodeType === Node.ELEMENT_NODE) {
-      return node;
-    }
-  }
-  return null;
-} // firstChildElement()
+// function firstChildElement(parent) {
+//   for (let node of parent.childNodes) {
+//     if (node.nodeType === Node.ELEMENT_NODE) {
+//       return node;
+//     }
+//   }
+//   return null;
+// } // firstChildElement()
 
 /**
  * Calls the function to add markup and refreshes the list of items
@@ -344,10 +347,13 @@ export function addMarkup(event) {
   let mElName = eventTarget.dataset.elName;
   let attrName = document.getElementById('selectionSelect').value;
   let multiLayerContent = eventTarget.dataset.content?.split(',');
-  if (!multiLayerContent) // annotationMultiToolsIcon was clicked
+  if (!multiLayerContent) {
+    // annotationMultiToolsIcon was clicked
     multiLayerContent = document.getElementById(`${mElName}ContentTarget`)?.dataset.content?.split(',');
-
-  if (!att.modelTranscriptionLike.includes(mElName) && !att.alternativeEncodingElements.includes(mElName)) return;
+  }
+  if (!att.modelTranscriptionLike.includes(mElName) && !att.alternativeEncodingElements.includes(mElName)) {
+    return;
+  }
 
   if (att.alternativeEncodingElements.includes(mElName) && multiLayerContent == undefined) {
     v.showAlert('Please first select a content option for this markup element!');
@@ -368,7 +374,6 @@ export function addMarkup(event) {
       });
       v.selectedElements = newSelection;
       setChoiceOptions(multiLayerContent[multiLayerContent.length - 1]);
-      v.updateAll(cm, {}, v.selectedElements[0]);
     }
   }
 } // addMarkup()
@@ -592,8 +597,12 @@ function addMultiLayeredMarkup(v, mElName, parentEl, firstChild, content, copied
   // and delete it from firstChild if necessary
   // because it's too complex to decide on resps for children and (currently) to set them individually
   let respID = getCurrentRespID();
-  if (respID) upmostElement.setAttribute('resp', '#' + respID);
-  if (firstChild.getAttribute('resp')) firstChild.removeAttribute('resp');
+  if (respID) {
+    upmostElement.setAttribute('resp', '#' + respID);
+  }
+  if (firstChild.getAttribute('resp')) {
+    firstChild.removeAttribute('resp');
+  }
 
   let alternativeEncodingSettingsValue = document.getElementById('alternativeVersionContent').value;
 
@@ -609,13 +618,10 @@ function addMultiLayeredMarkup(v, mElName, parentEl, firstChild, content, copied
     upmostElement.appendChild(nextChild);
 
     switch (alternativeEncodingSettingsValue) {
-      case 'empty':
-        nextChild.appendChild(dummyEmpty);
-        break;
       case 'copy':
         nextChild.appendChild(dummyCopy);
         let firstChildCopies = new DocumentFragment();
-        
+
         for (let child of firstChild.children) {
           let newChildCopy = child.cloneNode(true);
           dutils.addNewXmlIdsToDescendants(newChildCopy, dicOld2NewIDs);
@@ -623,8 +629,11 @@ function addMultiLayeredMarkup(v, mElName, parentEl, firstChild, content, copied
           // Add the copy and all descendend elements to the array of copies
           addElementAndChildsToArray(newChildCopy, copiedChilds);
         }
-        
+
         nextChild.appendChild(firstChildCopies);
+        break;
+      case 'empty':
+        nextChild.appendChild(dummyEmpty);
         break;
       default:
         nextChild.appendChild(dummyEmpty);
@@ -637,10 +646,10 @@ function addMultiLayeredMarkup(v, mElName, parentEl, firstChild, content, copied
 
 /**
  * Copies the given element and all its childs into the array
- * @param {*} element the element to add
- * @param {*} copiedChilds the array to which to add
+ * @param {Node} element the element to add
+ * @param {Array} copiedChilds the array to which to add
  */
-function addElementAndChildsToArray(element, copiedChilds){
+function addElementAndChildsToArray(element, copiedChilds) {
   copiedChilds.push(element);
   if (element.children.length > 0) {
     for (let child of element.children) {
@@ -651,7 +660,7 @@ function addElementAndChildsToArray(element, copiedChilds){
 
 /**
  * Wraps a single group of elements with a markup element
- * @param {*} v viewer
+ * @param {Viewer} v viewer
  * @param {Array} groupIds xml:ids of elements to wrap
  * @param {string} mElName element name for markup
  * @param {HTMLElement} parentEl parent element of group to wrap
@@ -662,7 +671,9 @@ function wrapGroupWithMarkup(v, groupIds, mElName, parentEl) {
   let uuid;
 
   let respId = getCurrentRespID();
-  if (respId) markupEl.setAttribute('resp', '#' + respId);
+  if (respId) {
+    markupEl.setAttribute('resp', '#' + respId);
+  }
 
   for (let i = 0; i < groupIds.length; i++) {
     let id = groupIds[i];
@@ -728,9 +739,9 @@ function addCorrespAttr(grpIds) {
 
 /**
  *
- * @param {*} id xml:id of the first element that will be wrapped with markup
- * @param {*} nodeName node name of the element the id should be created for
- * @param {*} v viewer
+ * @param {string} id xml:id of the first element that will be wrapped with markup
+ * @param {string} nodeName node name of the element the id should be created for
+ * @param {Viewer} v viewer
  * @returns {string} id to use as xml:id
  */
 function mintSuppliedId(id, nodeName, v) {
@@ -794,7 +805,8 @@ export function deleteMarkup(selection) {
  * @returns {string} id of parent markup element or empty string
  */
 export function getParentMarkupElementId(xmlDoc, id) {
-  const markupElementList = att.modelTranscriptionLike.join(',') + ',' + att.alternativeEncodingElements.join(',') + ',' + 'annot';
+  const markupElementList =
+    att.modelTranscriptionLike.join(',') + ',' + att.alternativeEncodingElements.join(',') + ',' + 'annot';
   let element = xmlDoc.querySelector('[*|id="' + id + '"]');
   if (element) {
     // find parent element that is a markup element

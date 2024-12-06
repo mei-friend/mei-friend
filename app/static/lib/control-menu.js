@@ -555,7 +555,7 @@ const listOfObjects = [
 
 /**
  * Returns a state object of the notation control menu
- * @returns {object}
+ * @returns {Object}
  */
 export function getControlMenuState() {
   let state = {};
@@ -576,7 +576,7 @@ export function getControlMenuState() {
 
 /**
  * Sets the state of the notation control menu
- * @param {object} state
+ * @param {Object} state
  */
 export function setControlMenuState(state) {
   listOfObjects.forEach((obj) => {

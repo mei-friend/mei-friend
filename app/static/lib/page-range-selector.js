@@ -186,8 +186,8 @@ function redrawTitle() {
 
 /**
  * Creates array of integers from i1 to i2
- * @param {Number} i1 
- * @param {Number} i2 
+ * @param {number} i1 
+ * @param {number} i2 
  * @returns 
  */
 function seq(i1, i2) {

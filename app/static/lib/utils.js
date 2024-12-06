@@ -793,8 +793,8 @@ export function readMeasureBeat(tstamp2) {
 
 /**
  * Returns a data.MEASUREBEAT string
- * @param {Number} measure
- * @param {Number} beat
+ * @param {number} measure
+ * @param {number} beat
  * @returns {string}
  */
 export function writeMeasureBeat(measure, beat) {

@@ -57,7 +57,7 @@ export default class Translator {
 
   /**
    * Copy all keys of language object to internal translator.lang
-   * @param {object} language
+   * @param {Object} language
    */
   setLang(language) {
     for (let key in language) this.lang[key] = language[key];

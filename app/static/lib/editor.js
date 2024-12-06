@@ -1767,7 +1767,7 @@ export function manipulateXmlIds(v, cm, removeIds = false) {
  * places it
  * @param {Viewer} v
  * @param {CodeMirror} cm
- * @param {object} rect
+ * @param {Object} rect
  * @param {boolean} addMeasure
  * @returns {string} uuid
  */
@@ -1928,8 +1928,8 @@ export function removeZone(v, cm, zone, removeMeasure = false) {
  * If the facsimile element exists, it will check all
  * surface elements and the pb@facs references and add them if
  * necessary.
- * @param {object} v
- * @param {object} cm
+ * @param {Object} v
+ * @param {Object} cm
  */
 export function addFacsimile(v, cm) {
   v.allowCursorActivity = false;

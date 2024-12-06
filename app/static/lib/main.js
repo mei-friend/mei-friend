@@ -2400,6 +2400,7 @@ export function setStandoffAnnotationEnabledStatus() {
 
 // handles any changes in CodeMirror
 export async function handleEditorChanges() {
+  v.notationUpdated(cm);
   // fileChanged flag may have been set from storage
   let changeIndicator = true;
   let meiXml = cm.getValue();
@@ -2418,7 +2419,6 @@ export async function handleEditorChanges() {
   } else {
     setFileChangedState(changeIndicator);
   }
-  v.notationUpdated(cm);
   if (storage.supported) {
     // on every set of changes, save editor content
     updateLocalStorage(meiXml);

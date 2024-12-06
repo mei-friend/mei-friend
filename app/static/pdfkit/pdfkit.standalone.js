@@ -122,7 +122,7 @@ class PDFObject {
   static convert(object, encryptFn = null) {
     // String literals are converted to the PDF name type
     if (typeof object === 'string') {
-      return `/${object}`; // String objects are converted to PDF strings (UTF-16)
+      return `/${Object}`; // String objects are converted to PDF strings (UTF-16)
     } else if (object instanceof String) {
       let string = object; // Detect if this is a unicode string
 
@@ -184,7 +184,7 @@ class PDFObject {
     } else if (typeof object === 'number') {
       return PDFObject.number(object);
     } else {
-      return `${object}`;
+      return `${Object}`;
     }
   }
 
@@ -5509,7 +5509,7 @@ var AcroFormMixin = {
    * nodes in a PDF form that are used to specify form name heirarchy and form
    * value defaults.
    * @param {string} name - field name (T attribute in field dictionary)
-   * @param {object} options  - other attributes to include in field dictionary
+   * @param {Object} options  - other attributes to include in field dictionary
    */
   formField(name, options = {}) {
     let fieldDict = this._fieldDict(name, null, options);
@@ -5530,7 +5530,7 @@ var AcroFormMixin = {
    * @param {number} y
    * @param {number} w
    * @param {number} h
-   * @param {object} options
+   * @param {Object} options
    */
   formAnnotation(name, type, x, y, w, h, options = {}) {
     let fieldDict = this._fieldDict(name, type, options);
@@ -5819,7 +5819,7 @@ var AttachmentsMixin = {
   /**
    * Embed contents of `src` in PDF
    * @param {Buffer | ArrayBuffer | string} src input Buffer, ArrayBuffer, base64 encoded string or path to file
-   * @param {object} options
+   * @param {Object} options
    *  * options.name: filename to be shown in PDF, will use `src` if none set
    *  * options.type: filetype to be shown in PDF
    *  * options.description: description to be shown in PDF
