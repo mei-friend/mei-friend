@@ -274,7 +274,7 @@ export default class Viewer {
       tkVersion &&
       this.pageSpanners.start &&
       Object.keys(this.pageSpanners.start).length === 0 &&
-      (breaksSelectVal !== 'auto' || Object.keys(this.pageBreaks).length > 0)
+      (breaksSelectVal !== 'auto' || (this.pageBreaks && Object.keys(this.pageBreaks).length > 0))
     ) {
       // use worker solution with swift txml parsing
       let message = {
