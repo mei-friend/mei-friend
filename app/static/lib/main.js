@@ -1007,7 +1007,7 @@ async function vrvWorkerEventsHandler(ev) {
         v.pageCount = ev.data.pageCount;
       } else if (bs === 'none') {
         v.pageCount = 1;
-      } else if (v.speedMode && bs === 'auto' && Object.keys(v.pageBreaks).length > 0) {
+      } else if (v.speedMode && bs === 'auto' && v.pageBreaks && Object.keys(v.pageBreaks).length > 0) {
         v.pageCount = Object.keys(v.pageBreaks).length;
       }
       //update choiceSelect
