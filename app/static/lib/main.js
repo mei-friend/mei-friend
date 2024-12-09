@@ -1,6 +1,7 @@
 // mei-friend version and date
 export const version = '1.1.8';
 export const versionDate = '9 December 2024'; // use full or 3-character english months, will be translated
+export const splashDate = '9 December 2024'; // date of the splash screen content
 
 var vrvWorker;
 var spdWorker;
@@ -425,16 +426,29 @@ function onLanguageLoaded() {
 
   createSplashScreen();
 
-  // show splash screen if required
+  // show splash screen if required, i.e.: if never previously acknowledged; or,
+  // if acknowledged before latest splash screen content update (splashDate), or,
+  // if splash screen is set to show on every load
   if (storage.supported) {
     storage.read();
-    if (!storage.splashAcknowledged || storage.showSplashScreen) {
-      showSplashScreen(true);
+    let splashTextUpdatedSinceLastAck;
+    try {
+      splashTextUpdatedSinceLastAck = storage.splashAcknowledged < new Date(splashDate).getTime();
+    } catch {
+      splashTextUpdatedSinceLastAck = false;
+    }
+    console.log('Splash screen acknowledged: ', storage.splashAcknowledged);
+    console.log('Splash text updated since last acknowledgement: ', splashTextUpdatedSinceLastAck);
+    console.log('Last acknowledgement date: ', new Date(storage.splashAcknowledged));
+
+    if (!storage.splashAcknowledged || splashTextUpdatedSinceLastAck || storage.showSplashScreen) {
+      showSplashScreen(splashTextUpdatedSinceLastAck);
     } else {
       completeInitialLoad();
     }
   } else {
-    completeInitialLoad();
+    // no storage; always show splash screen
+    showSplashScreen(false);
   }
 } // onLanguageLoaded()
 
@@ -1424,14 +1438,23 @@ function createSplashScreen() {
       }
     }
   });
-  document.getElementById('splashConfirmButton').addEventListener('click', () => {
-    document.getElementById('splashOverlay').style.display = 'none';
-    window.localStorage.setItem('splashAcknowledged', 'true');
-    if (splashInitialLoad) completeInitialLoad();
-  });
+  document
+    .getElementById('splashConfirmButton')
+    .addEventListener('click', () => handleSplashConfirmed(splashInitialLoad, storage));
 } // createSplashScreen()
 
-function showSplashScreen() {
+function handleSplashConfirmed(splashInitialLoad, storage) {
+  document.getElementById('splashOverlay').style.display = 'none';
+  if (storage && storage.supported) {
+    storage.splashAcknowledged = splashDate;
+  }
+  if (splashInitialLoad) completeInitialLoad();
+}
+
+function showSplashScreen(showUpdateIndicator = false) {
+  console.log('Show splash screen. Indicator: ', showUpdateIndicator);
+  const updateIndicator = document.getElementById('splashUpdateIndicator');
+  showUpdateIndicator ? (updateIndicator.style.display = 'block') : (updateIndicator.style.display = 'none'); // shown if text has changed since last acknowledgement
   const alwaysShow = document.getElementById('splashAlwaysShow'); // checkbox in splash screen
   document.getElementById('splashOverlay').style.display = 'flex';
   alwaysShow.checked = storage.showSplashScreen;
@@ -2179,7 +2202,7 @@ function addEventListeners(v, cm) {
   document.getElementById('toggleSpicc').addEventListener('click', cmd.toggleSpicc);
 
   // show splash screen
-  document.getElementById('aboutMeiFriend').addEventListener('click', showSplashScreen);
+  document.getElementById('aboutMeiFriend').addEventListener('click', () => showSplashScreen());
   document.getElementById('splashOverlay').addEventListener('click', (e) => {
     if (e.target.id === 'splashOverlay') {
       document.getElementById('splashOverlay').style.display = 'none'; // dismiss splash when user clicks on black background

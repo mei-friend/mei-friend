@@ -374,13 +374,17 @@ a:active {
   max-height: 500px;
 }
 
-#splashBody {
+#splashBodyContainer {
   padding: 0em 1em;
   height: 45%;
   overflow-y: auto;
   color: black;
   background-color: var(--overlayTextColor);
   border-radius: 10px;
+}
+
+#splashUpdateIndicator {
+  display: none;
 }
 
 /** start loading animation for splash screen text (not used for now) */
