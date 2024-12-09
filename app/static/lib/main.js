@@ -74,7 +74,7 @@ import {
 } from './control-menu.js';
 import { clock, file, unverified, xCircleFill } from '../css/icons.js';
 import { keymap } from '../keymaps/default-keymap.js';
-import { setCursorToId } from './utils.js';
+import { setCursorToId, getChangelogUrl } from './utils.js';
 import { getInMeasure, navElsSelector, getElementAtCursor } from './dom-utils.js';
 import { addDragSelector } from './drag-selector.js';
 import {
@@ -456,17 +456,7 @@ async function completeInitialLoad() {
   splashInitialLoad = false; // avoid re-initialising app from splash screen button
 
   // link to changelog page according to env settings (develop/staging/production)
-  let changeLogUrl;
-  switch (env) {
-    case 'develop':
-      changeLogUrl = 'https://github.com/mei-friend/mei-friend/blob/develop/CHANGELOG.md';
-      break;
-    case 'staging':
-      changeLogUrl = 'https://github.com/mei-friend/mei-friend/blob/staging/CHANGELOG.md';
-      break;
-    case 'production':
-      changeLogUrl = 'https://github.com/mei-friend/mei-friend/blob/main/CHANGELOG.md';
-  }
+  const changeLogUrl = getChangelogUrl();
   const showChangeLogLink = document.getElementById('showChangelog');
   if (showChangeLogLink) showChangeLogLink.setAttribute('href', changeLogUrl);
 
@@ -1452,8 +1442,11 @@ function handleSplashConfirmed(splashInitialLoad, storage) {
 }
 
 function showSplashScreen(showUpdateIndicator = false) {
-  console.log('Show splash screen. Indicator: ', showUpdateIndicator);
   const updateIndicator = document.getElementById('splashUpdateIndicator');
+  const splashLastUpdated = document.getElementById('splashLastUpdated');
+  updateIndicator.innerHTML = translator.lang.splashUpdateIndicator.html;
+  const translatedSplashDate = translator.translateDate(splashDate);
+  splashLastUpdated.innerHTML = translator.lang.splashLastUpdated.text + translatedSplashDate;
   showUpdateIndicator ? (updateIndicator.style.display = 'block') : (updateIndicator.style.display = 'none'); // shown if text has changed since last acknowledgement
   const alwaysShow = document.getElementById('splashAlwaysShow'); // checkbox in splash screen
   document.getElementById('splashOverlay').style.display = 'flex';
@@ -2374,22 +2367,7 @@ function drawLeftFooter() {
 
 export function drawRightFooter() {
   // translate month in version date
-  let translatedVersionDate = versionDate;
-  for (let key of Object.keys(translator.lang.month)) {
-    let i = versionDate.search(translator.defaultLang.month[key]);
-    if (i > 0) {
-      translatedVersionDate = versionDate.replace(translator.defaultLang.month[key], translator.lang.month[key]);
-      break;
-    }
-    i = versionDate.search(translator.defaultLang.month[key].substring(0, 3));
-    if (i > 0) {
-      translatedVersionDate = versionDate.replace(
-        translator.defaultLang.month[key].substring(0, 3),
-        translator.lang.month[key]
-      );
-      break;
-    }
-  }
+  let translatedVersionDate = translator.translateDate(versionDate);
   let rf = document.querySelector('.rightfoot');
   const versionHtml =
     "<a href='https://github.com/mei-friend/mei-friend' target='_blank'>mei-friend " +

@@ -159,6 +159,30 @@ export default class Translator {
 
   /**
    *
+   * @param {string} dateString
+   * @returns {string} the translated date string
+   */
+  translateDate(dateString) {
+    console.log('translateDate(): ', dateString);
+    let translatedDate = dateString;
+    for (let key of Object.keys(this.lang.month)) {
+      let i = dateString.search(this.defaultLang.month[key]);
+      if (i > 0) {
+        translatedDate = dateString.replace(this.defaultLang.month[key], this.lang.month[key]);
+        break;
+      }
+      i = dateString.search(this.defaultLang.month[key].substring(0, 3));
+      if (i > 0) {
+        translatedDate = dateString.replace(this.defaultLang.month[key].substring(0, 3), this.lang.month[key]);
+        break;
+      }
+    }
+    console.log('Translated date: ', translatedDate);
+    return translatedDate;
+  } // translateDate()
+
+  /**
+   *
    */
   handleLanguageExceptions() {
     if (this.langCode === 'ja') {
