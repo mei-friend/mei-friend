@@ -385,6 +385,7 @@ a:active {
 
 #splashUpdateIndicator {
   display: none;
+  font-style: italic;
 }
 
 /** start loading animation for splash screen text (not used for now) */
