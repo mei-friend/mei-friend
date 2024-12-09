@@ -2374,16 +2374,16 @@ function drawLeftFooter() {
 
 export function drawRightFooter() {
   // translate month in version date
-  let translatedVersioDate = versionDate;
+  let translatedVersionDate = versionDate;
   for (let key of Object.keys(translator.lang.month)) {
     let i = versionDate.search(translator.defaultLang.month[key]);
     if (i > 0) {
-      translatedVersioDate = versionDate.replace(translator.defaultLang.month[key], translator.lang.month[key]);
+      translatedVersionDate = versionDate.replace(translator.defaultLang.month[key], translator.lang.month[key]);
       break;
     }
     i = versionDate.search(translator.defaultLang.month[key].substring(0, 3));
     if (i > 0) {
-      translatedVersioDate = versionDate.replace(
+      translatedVersionDate = versionDate.replace(
         translator.defaultLang.month[key].substring(0, 3),
         translator.lang.month[key]
       );
@@ -2395,7 +2395,7 @@ export function drawRightFooter() {
     "<a href='https://github.com/mei-friend/mei-friend' target='_blank'>mei-friend " +
     (env === environments.production ? version : `${env}-${version}`) +
     '</a> (' +
-    translatedVersioDate +
+    translatedVersionDate +
     ').&nbsp;';
   rf.innerHTML = versionHtml;
   // also update version string in splash screen
