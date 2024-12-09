@@ -4,6 +4,7 @@
 
 import * as att from '../lib/attribute-classes.js';
 import { heart } from '../css/icons.js';
+import { getChangelogUrl } from '../lib/utils.js';
 
 export const lang = {
   // Pantalla d'inici
@@ -12,6 +13,11 @@ export const lang = {
     text: "Mostra la pantalla d'inici al carregar",
     description: "Mostra la pantalla d'inici de mei-friend quan es carrega l'aplicació",
   },
+  splashUpdateIndicator: {
+    html: `
+      El text següent s'ha actualitzat des de l'última vegada que vas reconèixer la pantalla d'inici. Per a més detalls, si us plau <a href="${getChangelogUrl()}" target="_blank">consulta el registre de canvis</a>.`,
+  },
+  splashLastUpdated: { text: 'Text actualitzat per última vegada el: ' },
   splashBody: {
     html: `
       <p>
@@ -513,12 +519,13 @@ export const lang = {
   },
   selectionSelect: {
     text: 'Selecció per defecte per a la marca',
-    description: 'Trieu si la marca de nova creació hauria d\'envoltar els elements seleccionats, les articulacions o els accidentals',
-    labels: ['Elements seleccionats','Articulació', 'Accidental'],
+    description:
+      "Trieu si la marca de nova creació hauria d'envoltar els elements seleccionats, les articulacions o els accidentals",
+    labels: ['Elements seleccionats', 'Articulació', 'Accidental'],
     valuesDescriptions: [
-      'Afegeix marcatge als elements seleccionats.', 
-      'Afegeix marcatge a les articulacions dins la selecció.', 
-      'Afegeix marcatge als accidentals dins la selecció.'
+      'Afegeix marcatge als elements seleccionats.',
+      'Afegeix marcatge a les articulacions dins la selecció.',
+      'Afegeix marcatge als accidentals dins la selecció.',
     ],
   },
   alternativeEncodingsGrp: {
@@ -529,17 +536,17 @@ export const lang = {
     text: '<choice>',
     description: 'Agrupa diverses codificacions alternatives pel mateix punt en un text.',
   },
-  choiceSicCorr: { 
-    description: 'Posa la selecció a <sic> i afegeix <corr>.' 
+  choiceSicCorr: {
+    description: 'Posa la selecció a <sic> i afegeix <corr>.',
   },
-  choiceCorrSic: { 
-    description: 'Posa la selecció a <corr> i afegeix <sic>.' 
+  choiceCorrSic: {
+    description: 'Posa la selecció a <corr> i afegeix <sic>.',
   },
-  choiceOrigReg: { 
-    description: 'Posa la selecció a <orig> i afegeix <reg>.' 
+  choiceOrigReg: {
+    description: 'Posa la selecció a <orig> i afegeix <reg>.',
   },
-  choiceRegOrig: { 
-    description: 'Posa la selecció a <reg> i afegeix <orig>.' 
+  choiceRegOrig: {
+    description: 'Posa la selecció a <reg> i afegeix <orig>.',
   },
   choiceContentTarget: {
     description: 'Primer, selecciona contingut per a aquest element passant el ratolí sobre <choice>.',
@@ -549,11 +556,11 @@ export const lang = {
     description:
       '(substitució) – Agrupa elements de transcripció quan la combinació ha de ser considerada com una intervenció única en el text.',
   },
-  substAddDel: { 
-    description: 'Posa la selecció a <add> i afegeix <del>.' 
+  substAddDel: {
+    description: 'Posa la selecció a <add> i afegeix <del>.',
   },
-  substDelAdd: { 
-    description: 'Posa la selecció a <del> i afegeix <add>.' 
+  substDelAdd: {
+    description: 'Posa la selecció a <del> i afegeix <add>.',
   },
   substContentTarget: {
     description: 'Primer, selecciona contingut per a aquest element passant el ratolí sobre <subst>.',
@@ -897,7 +904,6 @@ export const lang = {
     description: 'Mostra els títols dels facsímils sobre les imatges de facsímil',
   },
 
-
   // Supplied element / Element subministrat
   titleSupplied: {
     text: 'Gestionar el contingut editorial',
@@ -1028,7 +1034,8 @@ export const lang = {
   },
   persistentSearch: {
     text: 'Caixa de cerca persistent',
-    description: 'Utilitza el comportament de la caixa de cerca persistent (la caixa de cerca roman oberta fins que es tanca explícitament)',
+    description:
+      'Utilitza el comportament de la caixa de cerca persistent (la caixa de cerca roman oberta fins que es tanca explícitament)',
   },
 
   // Verovio settings / Configuració de Verovio

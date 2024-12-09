@@ -5,6 +5,7 @@
 
 import * as att from '../lib/attribute-classes.js';
 import { heart } from '../css/icons.js';
+import { getChangelogUrl } from '../lib/utils.js';
 
 export const lang = {
   // Splash screen
@@ -13,6 +14,11 @@ export const lang = {
     text: '加载时显示启动画面',
     description: '当应用程序加载时显示 mei-friend 启动画面',
   },
+  splashUpdateIndicator: {
+    html: `
+      自您上次确认启动画面以来，以下文本已更新。有关详细信息，请<a href="${getChangelogUrl()}" target="_blank">查阅更新日志</a>。`,
+  },
+  splashLastUpdated: { text: '文本最后更新于：' },
   splashBody: {
     html: `
       <p>

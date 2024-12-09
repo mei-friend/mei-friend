@@ -4,6 +4,7 @@
 
 import * as att from '../lib/attribute-classes.js';
 import { heart } from '../css/icons.js';
+import { getChangelogUrl } from '../lib/utils.js';
 
 export const lang = {
   // Splash screen
@@ -12,6 +13,11 @@ export const lang = {
     text: 'Прикажи почетни екран при подизању',
     description: 'Прикажи меи-френд почетни екран при подизању апликације',
   },
+  splashUpdateIndicator: {
+    html: `
+      Следећи текст је ажуриран од последњег пута када сте признали почетни екран. За детаље, молимо вас да <a href="${getChangelogUrl()}" target="_blank">консултујете дневник промена</a>.`,
+  },
+  splashLastUpdated: { text: 'Текст последњи пут ажуриран: ' },
   splashBody: {
     html: `
     <p>
@@ -182,7 +188,7 @@ export const lang = {
   insertMenuTitle: { text: 'Уметни' },
   addNoteText: { text: 'Add note' }, // TODO: translate
   convertNoteToRestText: { text: 'Note(s) <=> rest(s)' }, // TODO: translate
-  toggleChordText: { text: 'Note(s) <=> chord' },   // TODO: translate
+  toggleChordText: { text: 'Note(s) <=> chord' }, // TODO: translate
   addDoubleSharpText: { html: 'Дупла оштрица &#119082;' },
   addSharpText: { html: 'Оштрица &#9839;' },
   addNaturalText: { html: 'Природна ознака &#9838;' },

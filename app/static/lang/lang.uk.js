@@ -4,6 +4,7 @@
 
 import * as att from '../lib/attribute-classes.js';
 import { heart } from '../css/icons.js';
+import { getChangelogUrl } from '../lib/utils.js';
 
 export const lang = {
   // Splash screen
@@ -12,6 +13,11 @@ export const lang = {
     text: 'Показувати початковий екран при завантаженні',
     description: 'Показувати початковий екран mei-friend при завантаженні додатку',
   },
+  splashUpdateIndicator: {
+    html: `
+      Наступний текст було оновлено з моменту останнього підтвердження початкового екрану. Для деталей, будь ласка, <a href="${getChangelogUrl()}" target="_blank">ознайомтеся з журналом змін</a>.`,
+  },
+  splashLastUpdated: { text: 'Текст востаннє оновлено: ' },
   splashBody: {
     html: `
     <p>
@@ -495,7 +501,7 @@ export const lang = {
     valuesDescriptions: [
       'Додайте розмітку до вибраних елементів.',
       'Додайте розмітку до артикуляцій в виділенні.',
-      'Додайте розмітку до випадкових елементів в виділенні.'
+      'Додайте розмітку до випадкових елементів в виділенні.',
     ],
   },
   alternativeEncodingsGrp: {
@@ -507,16 +513,16 @@ export const lang = {
     description: 'Групує кілька альтернативних кодувань для того ж самого місця в тексті.',
   },
   choiceSicCorr: {
-    description: 'Помістіть вибір у <sic> і додайте <corr>.'
+    description: 'Помістіть вибір у <sic> і додайте <corr>.',
   },
   choiceCorrSic: {
-    description: 'Помістіть вибір у <corr> і додайте <sic>.'
+    description: 'Помістіть вибір у <corr> і додайте <sic>.',
   },
   choiceOrigReg: {
-    description: 'Помістіть вибір у <orig> і додайте <reg>.'
+    description: 'Помістіть вибір у <orig> і додайте <reg>.',
   },
   choiceRegOrig: {
-    description: 'Помістіть вибір у <reg> і додайте <orig>.'
+    description: 'Помістіть вибір у <reg> і додайте <orig>.',
   },
   choiceContentTarget: {
     description: 'Спочатку виберіть вміст для цього елемента, навівши на <choice>.',
@@ -527,10 +533,10 @@ export const lang = {
       '(заміна) - Групує транскрипційні елементи, коли комбінація повинна розглядатися як єдиний втручання в текст.',
   },
   substAddDel: {
-    description: 'Помістіть вибір у <add> і додайте <del>.'
+    description: 'Помістіть вибір у <add> і додайте <del>.',
   },
   substDelAdd: {
-    description: 'Помістіть вибір у <del> і додайте <add>.'
+    description: 'Помістіть вибір у <del> і додайте <add>.',
   },
   substContentTarget: {
     description: 'Спочатку виберіть вміст для цього елемента, навівши на <subst>.',
@@ -1001,7 +1007,8 @@ export const lang = {
   },
   persistentSearch: {
     text: 'Постійний пошуковий блок',
-    description: 'Використовуйте поведінку постійного пошукового блоку (пошуковий блок залишається відкритим до явного закриття)',
+    description:
+      'Використовуйте поведінку постійного пошукового блоку (пошуковий блок залишається відкритим до явного закриття)',
   },
 
   // Verovio settings

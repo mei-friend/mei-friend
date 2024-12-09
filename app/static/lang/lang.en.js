@@ -4,6 +4,7 @@
 
 import * as att from '../lib/attribute-classes.js';
 import { heart } from '../css/icons.js';
+import { getChangelogUrl } from '../lib/utils.js';
 
 export const lang = {
   // Splash screen
@@ -12,6 +13,11 @@ export const lang = {
     text: 'Show splash screen on load',
     description: 'Show the mei-friend splash screen when the application is loaded',
   },
+  splashUpdateIndicator: {
+    html: `
+      The following text has been updated since the last time you acknowledged the splash screen. For details, please <a href="${getChangelogUrl()}" target="_blank">consult the changelog</a>.`,
+  },
+  splashLastUpdated: { text: 'Text last updated on: ' },
   splashBody: {
     html: `
       <p>
@@ -450,7 +456,7 @@ export const lang = {
   annotationListButton: { description: 'List annotations' },
   writeAnnotStandoffText: { text: 'Web Annotation' },
   annotationToolDomainSelectorLegend: { text: 'Select annotation storage' },
-  insertInlineAnnotationLegend: { text: 'Insert annotation' }, // TODO: 'Insert inline annotation' 
+  insertInlineAnnotationLegend: { text: 'Insert annotation' }, // TODO: 'Insert inline annotation'
   insertStandoffAnnotationLegend: { text: 'Insert stand-off annotation' },
   annotationToolsIdentifyTitle: { text: 'Identify' },
   annotationToolsIdentifySpan: { text: 'Identify Musical Object' },
@@ -505,11 +511,11 @@ export const lang = {
   selectionSelect: {
     text: 'Default selection for markup',
     description: 'Choose if newly created markup should enclose the selected elements, articulation or accidentals',
-    labels: ['Selected elements','Articulation', 'Accidentals'],
+    labels: ['Selected elements', 'Articulation', 'Accidentals'],
     valuesDescriptions: [
-      'Add markup to selected elements.', 
-      'Add markup to articulations within selection.', 
-      'Add markup to accidentals within selection.'
+      'Add markup to selected elements.',
+      'Add markup to articulations within selection.',
+      'Add markup to accidentals within selection.',
     ],
   },
   alternativeEncodingsGrp: {
@@ -520,17 +526,17 @@ export const lang = {
     text: '<choice>',
     description: 'Groups a number of alternative encodings for the same point in a text. ',
   },
-  choiceSicCorr: { 
-    description: 'Put selection in <sic> and add <corr>.' 
+  choiceSicCorr: {
+    description: 'Put selection in <sic> and add <corr>.',
   },
-  choiceCorrSic: { 
-    description: 'Put selection in <corr> and add <sic>.' 
+  choiceCorrSic: {
+    description: 'Put selection in <corr> and add <sic>.',
   },
-  choiceOrigReg: { 
-    description: 'Put selection in <orig> and add <reg>.' 
+  choiceOrigReg: {
+    description: 'Put selection in <orig> and add <reg>.',
   },
-  choiceRegOrig: { 
-    description: 'Put selection in <reg> and add <orig>.' 
+  choiceRegOrig: {
+    description: 'Put selection in <reg> and add <orig>.',
   },
   choiceContentTarget: {
     description: 'First, select content for this element by hovering over <choice>.',
@@ -540,11 +546,11 @@ export const lang = {
     description:
       '(substitution) – Groups transcriptional elements when the combination is to be regarded as a single intervention in the text.',
   },
-  substAddDel: { 
-    description: 'Put selection in <add> and add <del>.' 
+  substAddDel: {
+    description: 'Put selection in <add> and add <del>.',
   },
-  substDelAdd: { 
-    description: 'Put selection in <del> and add <add>.' 
+  substDelAdd: {
+    description: 'Put selection in <del> and add <add>.',
   },
   substContentTarget: {
     description: 'First, select content for this element by hovering over <subst>.',
@@ -905,7 +911,8 @@ export const lang = {
   },
   alternativeVersionContent: {
     text: 'Content alternative encodings',
-    description: 'Choose default content of alternative encodings: newly created alternative encodings are empty or copies of the original reading',
+    description:
+      'Choose default content of alternative encodings: newly created alternative encodings are empty or copies of the original reading',
     labels: ['empty', 'copy'],
   },
   suppliedColor: {

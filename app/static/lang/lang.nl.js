@@ -4,6 +4,7 @@
 
 import * as att from '../lib/attribute-classes.js';
 import { heart } from '../css/icons.js';
+import { getChangelogUrl } from '../lib/utils.js';
 
 export const lang = {
   // Splash screen
@@ -12,6 +13,11 @@ export const lang = {
     text: 'Toon opstartscherm bij laden',
     description: 'Toon het mei-friend opstartscherm wanneer de applicatie wordt geladen',
   },
+  splashUpdateIndicator: {
+    html: `
+      De volgende tekst is bijgewerkt sinds de laatste keer dat u het opstartscherm heeft erkend. Voor details, raadpleeg de <a href="${getChangelogUrl()}" target="_blank">changelog</a>.`,
+  },
+  splashLastUpdated: { text: 'Tekst laatst bijgewerkt op: ' },
   splashBody: {
     html: `
       <p>
@@ -884,7 +890,8 @@ export const lang = {
   },
   persistentSearch: {
     text: 'Persistente zoekbalk',
-    description: 'Gebruik het gedrag van de persistente zoekbalk (zoekbalk blijft open totdat deze expliciet wordt gesloten)',
+    description:
+      'Gebruik het gedrag van de persistente zoekbalk (zoekbalk blijft open totdat deze expliciet wordt gesloten)',
   },
 
   // Verovio settings

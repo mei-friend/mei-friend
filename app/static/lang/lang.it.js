@@ -4,6 +4,7 @@
 
 import * as att from '../lib/attribute-classes.js';
 import { heart } from '../css/icons.js';
+import { getChangelogUrl } from '../lib/utils.js';
 
 export const lang = {
   // Schermata iniziale
@@ -12,6 +13,11 @@ export const lang = {
     text: "Mostra schermata iniziale all'avvio",
     description: "Mostra la schermata iniziale di mei-friend quando l'applicazione viene caricata",
   },
+  splashUpdateIndicator: {
+    html: `
+      Il seguente testo è stato aggiornato dall'ultima volta che hai riconosciuto la schermata iniziale. Per i dettagli, si prega di <a href="${getChangelogUrl()}" target="_blank">consultare il registro delle modifiche</a>.`,
+  },
+  splashLastUpdated: { text: 'Testo aggiornato il: ' },
   splashBody: {
     html: `
       <p>
@@ -513,12 +519,13 @@ export const lang = {
   },
   selectionSelect: {
     text: 'Selezione predefinita per il markup',
-    description: 'Scegli se il markup appena creato deve racchiudere gli elementi selezionati, l\'articolazione o gli accidenti',
-    labels: ['Elementi selezionati','Articolazione', 'Accidentale'],
+    description:
+      "Scegli se il markup appena creato deve racchiudere gli elementi selezionati, l'articolazione o gli accidenti",
+    labels: ['Elementi selezionati', 'Articolazione', 'Accidentale'],
     valuesDescriptions: [
-      'Aggiungi il markup agli elementi selezionati.', 
-      'Aggiungi il markup alle articolazioni nella selezione.', 
-      'Aggiungi il markup agli accidentali nella selezione.'
+      'Aggiungi il markup agli elementi selezionati.',
+      'Aggiungi il markup alle articolazioni nella selezione.',
+      'Aggiungi il markup agli accidentali nella selezione.',
     ],
   },
   alternativeEncodingsGrp: {
@@ -529,17 +536,17 @@ export const lang = {
     text: '<choice>',
     description: 'Raggruppa diverse codifiche alternative per lo stesso punto in un testo.',
   },
-  choiceSicCorr: { 
-    description: 'Inserisci la selezione in <sic> e aggiungi <corr>.' 
+  choiceSicCorr: {
+    description: 'Inserisci la selezione in <sic> e aggiungi <corr>.',
   },
-  choiceCorrSic: { 
-    description: 'Inserisci la selezione in <corr> e aggiungi <sic>.' 
+  choiceCorrSic: {
+    description: 'Inserisci la selezione in <corr> e aggiungi <sic>.',
   },
-  choiceOrigReg: { 
-    description: 'Inserisci la selezione in <orig> e aggiungi <reg>.' 
+  choiceOrigReg: {
+    description: 'Inserisci la selezione in <orig> e aggiungi <reg>.',
   },
-  choiceRegOrig: { 
-    description: 'Inserisci la selezione in <reg> e aggiungi <orig>.' 
+  choiceRegOrig: {
+    description: 'Inserisci la selezione in <reg> e aggiungi <orig>.',
   },
   choiceContentTarget: {
     description: 'Prima, seleziona il contenuto per questo elemento passando sopra a <scelta>.',
@@ -549,11 +556,11 @@ export const lang = {
     description:
       "(sostituzione) - Raggruppa gli elementi di trascrizione quando la combinazione deve essere considerata come un'intervento singolo nel testo.",
   },
-  substAddDel: { 
-    description: 'Inserisci la selezione in <add> e aggiungi <del>.' 
+  substAddDel: {
+    description: 'Inserisci la selezione in <add> e aggiungi <del>.',
   },
-  substDelAdd: { 
-    description: 'Inserisci la selezione in <del> e aggiungi <add>.' 
+  substDelAdd: {
+    description: 'Inserisci la selezione in <del> e aggiungi <add>.',
   },
   substContentTarget: {
     description: 'Prima, seleziona il contenuto per questo elemento passando sopra a <sostituzione>.',
@@ -912,7 +919,7 @@ export const lang = {
     text: 'Mostra elementi di markup editoriale',
     description: 'Evidenzia tutti gli elementi contenuti dagli elementi di markup editoriale',
   },
-  markupToPDF: {  
+  markupToPDF: {
     text: 'Mostra elementi di markup editoriale nel PDF',
     description: 'Mostra gli elementi di markup editoriale nel PDF generato',
   },
@@ -1033,7 +1040,8 @@ export const lang = {
   },
   persistentSearch: {
     text: 'Ricerca persistente',
-    description: 'Utilizza il comportamento della casella di ricerca persistente (la casella di ricerca rimane aperta fino alla chiusura esplicita)',
+    description:
+      'Utilizza il comportamento della casella di ricerca persistente (la casella di ricerca rimane aperta fino alla chiusura esplicita)',
   },
 
   // Verovio settings / Impostazioni di Verovio

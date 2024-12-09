@@ -4,6 +4,7 @@
 
 import * as att from '../lib/attribute-classes.js';
 import { heart } from '../css/icons.js';
+import { getChangelogUrl } from '../lib/utils.js';
 
 export const lang = {
   // Splash screen
@@ -12,6 +13,11 @@ export const lang = {
     text: 'Splash-Screen beim Laden anzeigen',
     description: 'Beim laden von mei-friend den Splash-Screen anzeigen',
   },
+  splashUpdateIndicator: {
+    html: `
+      Der folgende Text wurde seit dem letzten Mal, als Sie den Splash-Screen bestätigt haben, aktualisiert. Weitere Informationen entnehmen Sie bitte <a href="${getChangelogUrl()}" target="_blank">dem Änderungsprotokoll</a>.`,
+  },
+  splashLastUpdated: { text: 'Text zuletzt aktualisiert am: ' },
   splashBody: {
     html: `
     <p>
@@ -514,12 +520,13 @@ export const lang = {
   },
   selectionSelect: {
     text: 'Standardselektion für Markup',
-    description: 'Wählen Sie aus, ob neu erstellte Markup die ausgewählten Elemente, Artikulationen oder Vorzeichen umschließen soll',
+    description:
+      'Wählen Sie aus, ob neu erstellte Markup die ausgewählten Elemente, Artikulationen oder Vorzeichen umschließen soll',
     labels: ['Ausgewählte Elemente', 'Artikulation', 'Vorzeichen'],
     valuesDescriptions: [
       'Füge Markup zu ausgewählten Elementen hinzu.',
       'Füge Markup zu Artikulationen innerhalb der Auswahl hinzu.',
-      'Füge Markup zu Vorzeichen innerhalb der Auswahl hinzu.'
+      'Füge Markup zu Vorzeichen innerhalb der Auswahl hinzu.',
     ],
   },
   alternativeEncodingsGrp: {
@@ -531,16 +538,16 @@ export const lang = {
     description: 'Gruppiert mehrere alternative Codierungen für denselben Punkt in einem Text.',
   },
   choiceSicCorr: {
-    description: 'Setze die Auswahl in <sic> und füge <corr> hinzu.'
+    description: 'Setze die Auswahl in <sic> und füge <corr> hinzu.',
   },
   choiceCorrSic: {
-    description: 'Setze die Auswahl in <corr> und füge <sic> hinzu.'
+    description: 'Setze die Auswahl in <corr> und füge <sic> hinzu.',
   },
   choiceOrigReg: {
-    description: 'Setze die Auswahl in <orig> und füge <reg> hinzu.'
+    description: 'Setze die Auswahl in <orig> und füge <reg> hinzu.',
   },
   choiceRegOrig: {
-    description: 'Setze die Auswahl in <reg> und füge <orig> hinzu.'
+    description: 'Setze die Auswahl in <reg> und füge <orig> hinzu.',
   },
   choiceContentTarget: {
     description: 'Wähle zuerst den Inhalt für dieses Element aus, indem du über <choice> schwebst.',
@@ -551,11 +558,10 @@ export const lang = {
       '(Substitution) – Gruppiert transkriptionelle Elemente, wenn die Kombination als einzelner Eingriff im Text betrachtet werden soll.',
   },
   substAddDel: {
-    description: 'Setze die Auswahl in <add> und füge <del> hinzu.'
+    description: 'Setze die Auswahl in <add> und füge <del> hinzu.',
   },
   substDelAdd: {
-
-    description: 'Setze die Auswahl in <del> und füge <add> hinzu.'
+    description: 'Setze die Auswahl in <del> und füge <add> hinzu.',
   },
   substContentTarget: {
     description: 'Wähle zuerst den Inhalt für dieses Element aus, indem du über <subst> schwebst.',
@@ -920,7 +926,8 @@ export const lang = {
   },
   alternativeVersionContent: {
     text: 'Befüllung alternative Codierungen',
-    description: 'Vorbefüllung für alternative Codierungen auswählen: neu erstellte alternative Codierungen sind leer oder Kopien der originalen Lesung',
+    description:
+      'Vorbefüllung für alternative Codierungen auswählen: neu erstellte alternative Codierungen sind leer oder Kopien der originalen Lesung',
     labels: ['leer', 'Kopie'],
   },
   suppliedColor: {
@@ -1035,7 +1042,8 @@ export const lang = {
   },
   persistentSearch: {
     text: 'Persistente Suchleiste',
-    description: 'Verwenden Sie das Verhalten der persistenten Suchleiste (die Suchleiste bleibt geöffnet, bis sie explizit geschlossen wird)',
+    description:
+      'Verwenden Sie das Verhalten der persistenten Suchleiste (die Suchleiste bleibt geöffnet, bis sie explizit geschlossen wird)',
   },
 
   // Verovio settings

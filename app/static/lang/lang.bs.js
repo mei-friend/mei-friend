@@ -4,6 +4,7 @@
 
 import * as att from '../lib/attribute-classes.js';
 import { heart } from '../css/icons.js';
+import { getChangelogUrl } from '../lib/utils.js';
 
 export const lang = {
   // Splash screen
@@ -12,6 +13,11 @@ export const lang = {
     text: 'Prikaži ekran pri pokretanju',
     description: 'Prikazuje mei-friend ekran pri pokretanju aplikacije',
   },
+  splashUpdateIndicator: {
+    html: `
+      Sledeći tekst je ažuriran od poslednjeg puta kada ste potvrdili početni ekran. Za detalje, molimo vas da <a href="${getChangelogUrl()}" target="_blank">pogledate dnevnik promena</a>.`,
+  },
+  splashLastUpdated: { text: 'Tekst poslednji put ažuriran: ' },
   splashBody: {
     html: `
     <p>
@@ -183,7 +189,7 @@ export const lang = {
   insertMenuTitle: { text: 'Umetni' },
   addNoteText: { text: 'Add note' }, // TODO: translate
   convertNoteToRestText: { text: 'Note(s) <=> rest(s)' }, // TODO: translate
-  toggleChordText: { text: 'Note(s) <=> chord' },   // TODO: translate
+  toggleChordText: { text: 'Note(s) <=> chord' }, // TODO: translate
   addDoubleSharpText: { html: 'Dupla oštrica &#119082;' },
   addSharpText: { html: 'Oštrica &#9839;' },
   addNaturalText: { html: 'Naturalna oznaka &#9838;' },
@@ -880,7 +886,8 @@ export const lang = {
   },
   persistentSearch: {
     text: 'Tražilica koja ostaje otvorena',
-    description: 'Koristi ponašanje tražilice koja ostaje otvorena (tražilica ostaje otvorena dok se eksplicitno ne zatvori)',
+    description:
+      'Koristi ponašanje tražilice koja ostaje otvorena (tražilica ostaje otvorena dok se eksplicitno ne zatvori)',
   },
 
   // Postavke Verovia

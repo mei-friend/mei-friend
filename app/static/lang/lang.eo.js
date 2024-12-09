@@ -4,6 +4,7 @@
 
 import * as att from '../lib/attribute-classes.js';
 import { heart } from '../css/icons.js';
+import { getChangelogUrl } from '../lib/utils.js';
 
 export const lang = {
   // Splash screen
@@ -12,6 +13,11 @@ export const lang = {
     text: 'Montri komenca ekrano ĉe ŝarĝo',
     description: 'Montru la mei-friend komenca ekrano kiam la aplikaĵo estas ŝargita',
   },
+  splashUpdateIndicator: {
+    html: `
+      La sekva teksto estis ĝisdatigita ekde la lasta fojo kiam vi agnoskis la komencan ekranon. Por detaloj, bonvolu <a href="${getChangelogUrl()}" target="_blank">konsulti la ŝanĝoprotokolon</a>.`,
+  },
+  splashLastUpdated: { text: 'Teksto laste ĝisdatigita je: ' },
   splashBody: {
     html: `
     <p>
@@ -495,11 +501,11 @@ export const lang = {
   selectionSelect: {
     text: 'Defaŭlta elekto por markado',
     description: 'Elektu ĉu nova kreita markado devus ĉirkaŭi la elektitajn elementojn, artikulaciojn aŭ akcidentojn',
-    labels: ['Elektitaj elementoj','Artikulado', 'Okaza'],
+    labels: ['Elektitaj elementoj', 'Artikulado', 'Okaza'],
     valuesDescriptions: [
-      'Aldonu markigon al elektitaj elementoj.', 
-      'Aldonu markigon al artikuladoj en la elektado.', 
-      'Aldonu markigon al okazaĵoj en la elektado.'
+      'Aldonu markigon al elektitaj elementoj.',
+      'Aldonu markigon al artikuladoj en la elektado.',
+      'Aldonu markigon al okazaĵoj en la elektado.',
     ],
   },
   alternativeEncodingsGrp: {
@@ -510,17 +516,17 @@ export const lang = {
     text: '<choice>',
     description: 'Grupigas nombron da alternativaj kodoj por la sama punkto en teksto.',
   },
-  choiceSicCorr: { 
-    description: 'Metu elekton en <sic> kaj aldonu <corr>.' 
+  choiceSicCorr: {
+    description: 'Metu elekton en <sic> kaj aldonu <corr>.',
   },
-  choiceCorrSic: { 
-    description: 'Metu elekton en <corr> kaj aldonu <sic>.' 
+  choiceCorrSic: {
+    description: 'Metu elekton en <corr> kaj aldonu <sic>.',
   },
-  choiceOrigReg: { 
-    description: 'Metu elekton en <orig> kaj aldonu <reg>.' 
+  choiceOrigReg: {
+    description: 'Metu elekton en <orig> kaj aldonu <reg>.',
   },
-  choiceRegOrig: { 
-    description: 'Metu elekton en <reg> kaj aldonu <orig>.' 
+  choiceRegOrig: {
+    description: 'Metu elekton en <reg> kaj aldonu <orig>.',
   },
   choiceContentTarget: {
     description: 'Unue elektu enhavon por tiu elemento pasante la muson super <elekto>.',
@@ -530,11 +536,11 @@ export const lang = {
     description:
       '(anstataŭigo) – Grupigas transskriptajn elementojn kiam la kombino devas esti rigardata kiel unuopa interveno en la teksto.',
   },
-  substAddDel: { 
-    description: 'Metu elekton en <add> kaj aldonu <del>.' 
+  substAddDel: {
+    description: 'Metu elekton en <add> kaj aldonu <del>.',
   },
-  substDelAdd: { 
-    description: 'Metu elekton en <del> kaj aldonu <add>.' 
+  substDelAdd: {
+    description: 'Metu elekton en <del> kaj aldonu <add>.',
   },
   substContentTarget: {
     description: 'Unue elektu enhavon por tiu elemento pasante la muson super <anstataŭigo>.',
@@ -1006,7 +1012,7 @@ export const lang = {
     text: 'Persistanta serĉujo',
     description: 'Uzu persistantan konduton de serĉujo (serĉujo restas malfermita ĝis eksplcite fermata)',
   },
-  
+
   // Verovio-agordoj
   verovioSettingsHeader: {
     text: 'Verovio-agordoj',
