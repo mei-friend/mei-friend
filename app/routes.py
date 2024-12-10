@@ -155,19 +155,9 @@ def proxy(url):
     auth_str = ''
     if 'userLogin' in session:
         auth_str = session['userLogin'] + ':' + session['githubToken']
-#    headers['Authorization'] = 'Bearer ' + b64encode(auth_str.encode()).decode()
-#    headers['Authorization'] = 'Basic ' + b64encode(auth_str.encode()).decode()
-#    headers['Authorization'] = 'Bearer ' + b64encode(session['githubToken'].encode()).decode()
-#   headers['Authorization'] = 'token ' + session['githubToken']
-#   headers["X-GitHub-Api-Version"] = "2022-11-28"
 
 #   # Forward the request to the target URL
-    print(f"Proxying {method} request to {url}")
-    print(f"Headers: {headers}")
-    print(f"Credentials: {auth_str}")
-#   print(f"auth_str: {auth_str}")
     response = requests.request(method, url, headers=headers, data=request.get_data(), cookies=request.cookies)
-    #print(f"Response from {url}: {response.text}")
 
     # Prepare the response to return to the client
     excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection', 'www-authenticate']
