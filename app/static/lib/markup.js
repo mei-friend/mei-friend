@@ -269,6 +269,7 @@ export function selectApparatus(xmlDoc, sourceId = '') {
       changeFlag = true;
     } else {
       console.log('This app has neither lemma nor reading elements. ', app);
+      app.remove();
     }
   }
 
