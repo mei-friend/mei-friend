@@ -12,8 +12,8 @@ const lc_endpoint = 'https://luteconv.mdw.ac.at';
 export async function luteconv(sourceData, fName, endpoint = lc_endpoint) {
   // strip any subdirectories and keep only the filename
   fName = fName.split('/').pop();
-  // URI-encode the filename to avoid problems with special characters
-  fName = encodeURIComponent(fName);
+  // remove all special characters from the filename to avoid problems with luteconv
+  fName = encodeURIComponent(fName).replaceAll('%', '_');
   console.log('Converting to MEI with luteconv...', typeof sourceData, sourceData, fName);
   const blob = new Blob([sourceData], { type: 'application/gzip' });
 
