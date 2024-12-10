@@ -573,7 +573,7 @@ function isImageUri(uri) {
 
 function isBlobUri(uri) {
   // binary objects (currently: compressed musicxml files)
-  const blobSuffices = ['mxl', 'zip'];
+  const blobSuffices = ['mxl', 'zip', 'ft2', 'ft3'];
   return isUriWithSuffix(uri, blobSuffices);
 } // isBlobUri()
 
