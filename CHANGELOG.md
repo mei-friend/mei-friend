@@ -1,9 +1,11 @@
 # mei-friend-online CHANGELOG.md
 
-### 1.1.8 Merge isomorphic-git and mark-up enrichment developments
+## 1.2.0 Enrichment panel, editorial mark-up, GitHub improvements
+- Release of major new functionalities: 
 
-- Merges patches 1.0.17 (migration to isomorphic-git) and 1.1.7 (enrichment panel and editorial markup) in preparation for 1.2.0 release
-- Changes to splash screen text – extend paragraph on data transmission to announce new proxy server requirement for GitHub interactions (commit [`e7458da`](https://github.com/mei-friend/mei-friend/commit/e7458daba4bc0a7960efc0b8bbfd85e16e08a6c4)):
+  - expansion of mei-friend's facilities for editorial mark-up through a re-worked annotation panel (now renamed to enrichment panel). Thanks to @annplaksin!
+  - redevelopment of git integration for more stable and sustainable collaborative editing.
+- Changes to splash screen text – extend paragraph on data transmission to announce new proxy server requirement for GitHub interactions: commit [`e7458da`](https://github.com/mei-friend/mei-friend/commit/e7458daba4bc0a7960efc0b8bbfd85e16e08a6c4) (english text) and commit [`ac94ef1`](https://github.com/mei-friend/mei-friend/commit/ac94ef1309bcd728f6c107027b20cb857744bcf8) (translations):
 
 > For technical reasons, certain interactions with GitHub (cloning a repository to your browser when first opening an encoding, or committing changes to a repository) require data to be transmitted to a proxy server hosted by the mdw – University of Music and Performing Arts Vienna. This server acts as an intermediary between your browser and GitHub, and does not store any data transmitted through it.
 
@@ -12,6 +14,10 @@
 - Clear undo history upon file loading to prevent undoing freshly loaded MEI file (fixes #117)
 - Allow default key bindings in Solid URL text field
 - Fix bug that prevented Fronimo files being opened via the git integration
+
+### 1.1.8 Merge isomorphic-git and mark-up enrichment developments
+
+- Merges patches 1.0.17 (migration to isomorphic-git) and 1.1.7 (enrichment panel and editorial markup) in preparation for 1.2.0 release
 
 ### 1.1.7 patch
 
