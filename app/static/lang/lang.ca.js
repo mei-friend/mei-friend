@@ -26,18 +26,11 @@ export const lang = {
         Consulta la nostra <a href="https://mei-friend.github.io" target="_blank">documentació extensa</a> per a
         més informació.
       </p>
-      <p>
-        Tot i que mei-friend és una aplicació basada en el navegador, les teves dades personals (incloent la codificació que
-        estàs editant, la configuració de l'aplicació i els detalls actuals de l'inici de sessió, si n'hi ha) s'emmagatzemen a la
-        <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank"
-          >memòria local</a
-        > del teu navegador i no es transmeten ni s'emmagatzemen als nostres servidors.
+      <p> 
+        Tot i que mei-friend és una aplicació basada en el navegador, les teves dades personals (incloent-hi la codificació que estàs editant, la configuració de l'aplicació i els detalls d'inici de sessió actuals, si n'hi ha) s'emmagatzemen en el <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank">emmagatzematge local</a> del teu navegador i no s'emmagatzemen als nostres servidors. 
       </p>
-      <p>
-        Les dades es transmeten a GitHub només quan ho demanes explícitament (per exemple, quan inicies la sessió a GitHub,
-        carreguis la teva codificació des d'un repositori GitHub o quan demanis que s'executi un flux de treball GitHub
-        Action). De manera similar, les dades es transmeten al teu proveïdor Solid escollit només quan ho demanes explícitament
-        (per exemple, quan iniciïs la sessió a Solid o carreguis o desis anotacions stand-off).
+      <p> 
+        Les dades es transmeten a GitHub només quan ho sol·licites explícitament (per exemple, quan inicies sessió a GitHub, carregues la teva codificació des d'un repositori de GitHub o hi confirmes canvis, o quan sol·licites que s'executi un flux de treball de GitHub Action per a tu). De la mateixa manera, les dades es transmeten al proveïdor de Solid que hagis triat només quan ho sol·licites explícitament (per exemple, quan inicies sessió a Solid, o carregues o deses anotacions desacoblades). Per raons tècniques, certes interaccions amb GitHub (clonar un repositori al teu navegador quan obres una codificació per primera vegada, o confirmar canvis en un repositori) requereixen que les dades es transmetin a un servidor intermediari allotjat per la mdw – Universitat de Música i Arts Escèniques de Viena. Aquest servidor actua com a intermediari entre el teu navegador i GitHub, i no emmagatzema cap dada transmesa a través seu. 
       </p>
       <p>
         Fem servir <a href="https://matomo.org/" target="_blank">Matomo</a>

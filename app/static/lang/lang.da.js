@@ -27,16 +27,10 @@ export const lang = {
         yderligere information.
       </p>
       <p>
-        Selvom mei-friend er en browserbaseret applikation, gemmes dine personlige data (inklusive den kodning du redigerer,
-        dine applikationsindstillinger og nuværende loginoplysninger, hvis nogen) i din browsers
-        <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank">lokal opbevaring</a>
-        og bliver ikke transmitteret til eller gemt på vores servere.
+        Selvom mei-friend er en browserbaseret applikation, gemmes dine personlige data (inklusive den kodning, du redigerer, dine applikationsindstillinger og aktuelle loginoplysninger, hvis nogen) i din browsers <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank">lokale lager</a> og gemmes ikke på vores servere.
       </p>
       <p>
-        Data transmitteres kun til GitHub, når du eksplicit anmoder om det (f.eks. når du logger ind på GitHub,
-        indlæser din kodning fra eller committer til et GitHub-repository, eller når du anmoder om en GitHub Action
-        workflow til at blive kørt for dig). På samme måde transmitteres data kun til din valgte Solid-udbyder,
-        når du eksplicit anmoder om det (f.eks. når du logger ind på Solid, eller indlæser eller gemmer stand-off-annotationer).
+        Data overføres kun til GitHub, når du eksplicit anmoder om det (f.eks. når du logger ind på GitHub, indlæser din kodning fra eller committer til et GitHub-repository, eller når du anmoder om, at en GitHub Action workflow køres for dig). Tilsvarende overføres data kun til din valgte Solid-udbyder, når du eksplicit anmoder om det (f.eks. når du logger ind på Solid, eller indlæser eller gemmer stand-off-annotationer). Af tekniske årsager kræver visse interaktioner med GitHub (kloning af et repository til din browser, når du først åbner en kodning, eller committer ændringer til et repository) dataoverførsel til en proxyserver hostet af mdw – Universität für Musik und darstellende Kunst Wien. Denne server fungerer som en mellemmand mellem din browser og GitHub og gemmer ikke nogen data, der overføres gennem den.
       </p>
       <p>
         Vi bruger <a href="https://matomo.org/" target="_blank">Matomo</a> til at indsamle anonyme brugsstatistikker.

@@ -27,18 +27,10 @@ export const lang = {
       <a href="https://mei-friend.github.io" target="_blank">umfangreiche Dokumentationswebseite</a>.
     </p>
     <p>
-      Obwohl mei-friend eine browserbasierte Anwendung ist, werden Ihre Daten einschließlich der 
-      von Ihnen bearbeiteten Musik-Kodierungen, Ihrer Anwendungseinstellungen und Ihrer aktuellen Anmeldeinformationen bei 
-      GitHub oder Solid, falls vorhanden, im 
-      <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank">lokalen Speicher 
-        Ihres Browsers gespeichert</a>, niemals jedoch auf unseren Servern.
+      Obwohl mei-friend eine browserbasierte Anwendung ist, werden Ihre persönlichen Daten (einschließlich der Kodierung, die Sie bearbeiten, Ihrer Anwendungseinstellungen und aktuellen Anmeldedaten, falls vorhanden) im <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank">lokalen Speicher</a> Ihres Browsers und nicht auf unseren Servern gespeichert.
     </p>
     <p>
-      Daten werden nur dann an GitHub übertragen, wenn Sie dies ausdrücklich anfordern (z.B. wenn Sie sich bei GitHub 
-      anmelden, Ihre Kodierung aus einem GitHub-Repository laden oder an ein GitHub-Repository übertragen oder wenn 
-      Sie einen GitHub-Action-Workflow für sich ausführen lassen). Ebenso werden Daten nur dann an Ihren ausgewählten 
-      Solid-Anbieter übertragen, wenn Sie dies ausdrücklich anfordern (z.B. wenn Sie sich bei Solid anmelden oder 
-      Stand-off-Annotationen laden oder speichern).
+      Daten werden nur dann an GitHub übertragen, wenn Sie dies ausdrücklich anfordern (z.B. wenn Sie sich bei GitHub anmelden, Ihre Kodierung aus einem GitHub-Repository laden oder in ein solches committen, oder wenn Sie einen GitHub Action-Workflow für sich ausführen lassen). Ebenso werden Daten nur dann an Ihren gewählten Solid-Anbieter übertragen, wenn Sie dies ausdrücklich anfordern (z.B. wenn Sie sich bei Solid anmelden oder Stand-off-Annotationen laden oder speichern). Aus technischen Gründen erfordern bestimmte Interaktionen mit GitHub (z.B. das Klonen eines Repositorys in Ihren Browser beim ersten Öffnen einer Kodierung oder das Committen von Änderungen in ein Repository), dass Daten an einen Proxy-Server der mdw – Universität für Musik und darstellende Kunst Wien übertragen werden. Dieser Server fungiert als Vermittler zwischen Ihrem Browser und GitHub und speichert keine durch ihn übertragenen Daten.
     </p>
     <p>
       Wir verwenden <a href="https://matomo.org/" target="_blank">Matomo</a> zur Erfassung anonymer Nutzungsstatistiken. 

@@ -27,15 +27,10 @@ export const lang = {
       pliaj informoj.
     </p>
     <p>
-      Kvankam mei-friend estas retumila aplikaĵo, viaj personaĵaj datumoj (inkluzive la kodo kiun
-      vi redaktas, viaj aplikaĵaj agordoj, kaj aktualegaj ensalutinformoj se ili ekzistas) estas konservitaj en via retumila navigilo en
-      <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank"
-        >lokal memoro</a
-      > kaj ne estas senditaj al aŭ konservitaj sur niaj serviloj.
+      Kvankam mei-friend estas retumila aplikaĵo, viaj personaj datumoj (inkluzive de la kodado, kiun vi redaktas, viaj aplikaĵaj agordoj, kaj aktualaj ensalutaj detaloj, se ekzistas) estas konservitaj en via retumilo <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank">lokan stokadon</a> kaj ne estas konservitaj en niaj serviloj.
     </p>
     <p>
-      Datumoj estas senditaj al GitHub nur kiam vi eksplice petas tion (ekzemple, kiam vi ensalutas al GitHub, ŝargas
-      vian kodon de aŭ al GitHub-repozitorio, aŭ kiam vi petas ke GitHub-agonaj laborfluo estu ekigita por vi). Sammaniere, datumoj estas senditaj al via elektita Solid provizanto nur kiam vi eksplice petas tion (ekzemple, kiam vi ensalutas al Solid, aŭ ŝargas aŭ konservas standoff-anotaciojn).
+      Datumoj estas transdonitaj al GitHub nur kiam vi eksplicite petas ĝin (ekz., kiam vi ensalutas al GitHub, ŝarĝas vian kodadon de aŭ kontribuas al GitHub deponejo, aŭ kiam vi petas GitHub Ago-fluon por esti ruliĝita por vi). Simile, datumoj estas transdonitaj al via elektita Solid provizanto nur kiam vi eksplicite petas ĝin (ekz., kiam vi ensalutas al Solid, aŭ ŝarĝas aŭ konservas standoff-notojn). Pro teknikaj kialoj, certaj interagoj kun GitHub (klonante deponejon al via retumilo kiam unue malfermas kodadon, aŭ kontribuante ŝanĝojn al deponejo) postulas datumojn esti transdonitaj al prokura servilo gastigita de mdw – Universitato de Muziko kaj Prezentartoj de Vieno. Ĉi tiu servilo agas kiel peranto inter via retumilo kaj GitHub, kaj ne konservas iujn ajn datumojn transdonitajn tra ĝi.
     </p>
     <p>
       Ni uzas <a href="https://matomo.org/" target="_blank">Matomo</a>

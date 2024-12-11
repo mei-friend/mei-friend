@@ -27,18 +27,10 @@ export const lang = {
         plus d'informations.
       </p>
       <p>
-        Bien que mei-friend soit une application basée sur le navigateur, vos données personnelles (y compris l'encodage que vous
-        modifiez, les paramètres de votre application et les détails de connexion actuels, le cas échéant) sont stockés dans le
-        <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank"
-          >stockage local</a
-        > de votre navigateur et ne sont pas transmis ou stockés sur nos serveurs.
+        Bien que mei-friend soit une application basée sur un navigateur, vos données personnelles (y compris l'encodage que vous éditez, vos paramètres d'application et vos détails de connexion actuels, le cas échéant) sont stockées dans le <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank">stockage local</a> de votre navigateur et ne sont pas stockées sur nos serveurs.
       </p>
       <p>
-        Les données sont transmises à GitHub uniquement lorsque vous le demandez explicitement (par exemple, lorsque vous vous
-        connectez à GitHub, chargez votre encodage depuis un référentiel GitHub ou demandez l'exécution d'un flux de travail
-        GitHub Action pour vous). De même, les données sont transmises à votre fournisseur Solid choisi uniquement lorsque vous
-        le demandez explicitement (par exemple, lorsque vous vous connectez à Solid, ou chargez ou enregistrez des annotations
-        stand-off).
+        Les données sont transmises à GitHub uniquement lorsque vous le demandez explicitement (par exemple, lorsque vous vous connectez à GitHub, chargez votre encodage depuis ou validez dans un dépôt GitHub, ou lorsque vous demandez l'exécution d'un flux de travail GitHub Action). De même, les données sont transmises à votre fournisseur Solid choisi uniquement lorsque vous le demandez explicitement (par exemple, lorsque vous vous connectez à Solid, ou chargez ou enregistrez des annotations stand-off). Pour des raisons techniques, certaines interactions avec GitHub (clonage d'un dépôt dans votre navigateur lors de la première ouverture d'un encodage, ou validation de modifications dans un dépôt) nécessitent la transmission de données à un serveur proxy hébergé par le mdw – Université de Musique et des Arts du Spectacle de Vienne. Ce serveur agit comme un intermédiaire entre votre navigateur et GitHub, et ne stocke aucune donnée transmise par son intermédiaire.
       </p>
       <p>
         Nous utilisons <a href="https://matomo.org/" target="_blank">Matomo</a>

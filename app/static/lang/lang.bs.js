@@ -27,17 +27,19 @@ export const lang = {
       dodatne informacije.
     </p>
     <p>
-      Iako je mei-friend aplikacija zasnovana na pregledaču, vaši lični podaci (uključujući kod koji
-      uređujete, postavke aplikacije i trenutne prijave ako ih ima) se čuvaju u lokalnom skladištu vašeg pregledača
-      <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank"
-        >lokalnog skladišta</a
-      > i ne šalju se ili ne čuvaju na našim serverima.
+      Iako je mei-friend aplikacija zasnovana na pretraživaču, vaši lični podaci (uključujući kodiranje koje
+      uređujete, postavke aplikacije i trenutne podatke za prijavu, ako ih ima) čuvaju se u
+      <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank">lokalnoj memoriji</a> vašeg pretraživača
+      i nisu pohranjeni na našim serverima.
     </p>
     <p>
-      Podaci se prenose na GitHub samo kada ih izričito zatražite (npr. kada se prijavite na GitHub, učitate
-      svoj kod iz repozitorijuma na GitHub-u ili kada zatražite GitHub akcioni radni tok da se
-      pokrene za vas). Slično tome, podaci se prenose vašem odabranom Solid provajderu samo kada ih izričito
-      zatražite (npr. kada se prijavite na Solid, učitate ili sačuvate notacije sa odstupanjem).
+      Podaci se prenose na GitHub samo kada to izričito zatražite (npr. kada se prijavite na GitHub, učitate
+      svoje kodiranje iz ili komitujete u GitHub repozitorijum, ili kada zatražite da se za vas pokrene GitHub Action tok).
+      Slično tome, podaci se prenose vašem izabranom Solid provajderu samo kada to izričito zatražite (npr. kada se prijavite na Solid,
+      ili učitate ili sačuvate stand-off napomene). Iz tehničkih razloga, određene interakcije sa GitHub-om (kloniranje repozitorijuma
+      u vaš pretraživač prilikom prvog otvaranja kodiranja, ili komitovanje izmena u repozitorijum) zahtevaju prenos podataka na proxy server
+      hostovan od strane mdw &ndash; Univerziteta muzike i izvođačkih umetnosti u Beču. Ovaj server deluje kao posrednik između vašeg
+      pretraživača i GitHub-a, i ne pohranjuje nikakve podatke koji se prenose kroz njega.
     </p>
     <p>
       Koristimo <a href="https://matomo.org/" target="_blank">Matomo</a>

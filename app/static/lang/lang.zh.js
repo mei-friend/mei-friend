@@ -27,13 +27,10 @@ export const lang = {
         请查阅我们的<a href="https://mei-friend.github.io" target="_blank">详细文档</a>以获取更多信息。
       </p>
       <p>
-        虽然 mei-friend 是一个基于浏览器的应用程序，但您的个人数据（包括您正在编辑的编码、您的应用程序设置以及当前的登录详细信息（如有））存储在您的浏览器的
-        <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank">本地存储</a>
-        中，不会传输到我们的服务器或存储在我们的服务器上。
+        尽管 mei-friend 是一个基于浏览器的应用程序，但您的个人数据（包括您正在编辑的编码、应用程序设置以及当前的登录详细信息（如果有））存储在您浏览器的<a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank">本地存储</a>中，并未存储在我们的服务器上。
       </p>
       <p>
-        数据仅在您明确请求时传输到 GitHub（例如，当您登录 GitHub，从 GitHub 仓库加载您的编码或提交到 GitHub 仓库，或当您请求运行 GitHub 操作工作流时）。
-        同样，数据仅在您明确请求时传输到您选择的 Solid 提供商（例如，当您登录 Solid 或加载或保存独立注释时）。
+        仅当您明确请求时（例如，当您登录 GitHub，从 GitHub 仓库加载您的编码或提交到 GitHub 仓库，或当您请求运行 GitHub Action 工作流时），数据才会传输到 GitHub。同样，仅当您明确请求时（例如，当您登录 Solid，或加载或保存独立注释时），数据才会传输到您选择的 Solid 提供商。出于技术原因，与 GitHub 的某些交互（在首次打开编码时将仓库克隆到您的浏览器，或提交更改到仓库）需要将数据传输到由维也纳音乐与表演艺术大学托管的代理服务器。该服务器充当您的浏览器和 GitHub 之间的中介，不会存储通过它传输的任何数据。
       </p>
       <p>
         我们使用 <a href="https://matomo.org/" target="_blank">Matomo</a>
