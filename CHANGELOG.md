@@ -3,9 +3,9 @@
 ### 1.1.8 Merge isomorphic-git and mark-up enrichment developments
 
 - Merges patches 1.0.17 (migration to isomorphic-git) and 1.1.7 (enrichment panel and editorial markup) in preparation for 1.2.0 release
-- Changes to splash screen text -- extend paragraph on data transmission to announce new proxy server requirement for GitHub interactions (commit [`e7458da`](https://github.com/mei-friend/mei-friend/commit/e7458daba4bc0a7960efc0b8bbfd85e16e08a6c4)):
+- Changes to splash screen text – extend paragraph on data transmission to announce new proxy server requirement for GitHub interactions (commit [`e7458da`](https://github.com/mei-friend/mei-friend/commit/e7458daba4bc0a7960efc0b8bbfd85e16e08a6c4)):
 
-> For technical reasons, certain interactions with GitHub (cloning a repository to your browser when first opening an encoding, or committing changes to a repository) require data to be transmitted to a proxy server hosted by the mdw – University of Music and Performing Arts Vienna. This server acts as an intermediary between your browser and GitHub, and does not store any data transmitted through it. 
+> For technical reasons, certain interactions with GitHub (cloning a repository to your browser when first opening an encoding, or committing changes to a repository) require data to be transmitted to a proxy server hosted by the mdw – University of Music and Performing Arts Vienna. This server acts as an intermediary between your browser and GitHub, and does not store any data transmitted through it.
 
 - Implement mechanism to track and display date of last splash screen text change, and to trigger the screen to show if user has not yet acknowledged the latest version of the text.
 - Resizer reworked to ensure visibility of x and y scroll bars
