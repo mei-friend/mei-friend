@@ -4,6 +4,7 @@
 
 import * as att from '../lib/attribute-classes.js';
 import { heart } from '../css/icons.js';
+import { getChangelogUrl } from '../lib/utils.js';
 
 export const lang = {
   // Pantalla d'inici
@@ -12,6 +13,11 @@ export const lang = {
     text: "Mostra la pantalla d'inici al carregar",
     description: "Mostra la pantalla d'inici de mei-friend quan es carrega l'aplicació",
   },
+  splashUpdateIndicator: {
+    html: `
+      El text següent s'ha actualitzat des de l'última vegada que vas reconèixer la pantalla d'inici. Per a més detalls, si us plau <a href="${getChangelogUrl()}" target="_blank">consulta el registre de canvis</a>.`,
+  },
+  splashLastUpdated: { text: 'Text actualitzat per última vegada el: ' },
   splashBody: {
     html: `
       <p>
@@ -20,18 +26,11 @@ export const lang = {
         Consulta la nostra <a href="https://mei-friend.github.io" target="_blank">documentació extensa</a> per a
         més informació.
       </p>
-      <p>
-        Tot i que mei-friend és una aplicació basada en el navegador, les teves dades personals (incloent la codificació que
-        estàs editant, la configuració de l'aplicació i els detalls actuals de l'inici de sessió, si n'hi ha) s'emmagatzemen a la
-        <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank"
-          >memòria local</a
-        > del teu navegador i no es transmeten ni s'emmagatzemen als nostres servidors.
+      <p> 
+        Tot i que mei-friend és una aplicació basada en el navegador, les teves dades personals (incloent-hi la codificació que estàs editant, la configuració de l'aplicació i els detalls d'inici de sessió actuals, si n'hi ha) s'emmagatzemen en el <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank">emmagatzematge local</a> del teu navegador i no s'emmagatzemen als nostres servidors. 
       </p>
-      <p>
-        Les dades es transmeten a GitHub només quan ho demanes explícitament (per exemple, quan inicies la sessió a GitHub,
-        carreguis la teva codificació des d'un repositori GitHub o quan demanis que s'executi un flux de treball GitHub
-        Action). De manera similar, les dades es transmeten al teu proveïdor Solid escollit només quan ho demanes explícitament
-        (per exemple, quan iniciïs la sessió a Solid o carreguis o desis anotacions stand-off).
+      <p> 
+        Les dades es transmeten a GitHub només quan ho sol·licites explícitament (per exemple, quan inicies sessió a GitHub, carregues la teva codificació des d'un repositori de GitHub o hi confirmes canvis, o quan sol·licites que s'executi un flux de treball de GitHub Action per a tu). De la mateixa manera, les dades es transmeten al proveïdor de Solid que hagis triat només quan ho sol·licites explícitament (per exemple, quan inicies sessió a Solid, o carregues o deses anotacions desacoblades). Per raons tècniques, certes interaccions amb GitHub (clonar un repositori al teu navegador quan obres una codificació per primera vegada, o confirmar canvis en un repositori) requereixen que les dades es transmetin a un servidor intermediari allotjat per la mdw – Universitat de Música i Arts Escèniques de Viena. Aquest servidor actua com a intermediari entre el teu navegador i GitHub, i no emmagatzema cap dada transmesa a través seu. 
       </p>
       <p>
         Fem servir <a href="https://matomo.org/" target="_blank">Matomo</a>
@@ -513,12 +512,13 @@ export const lang = {
   },
   selectionSelect: {
     text: 'Selecció per defecte per a la marca',
-    description: 'Trieu si la marca de nova creació hauria d\'envoltar els elements seleccionats, les articulacions o els accidentals',
-    labels: ['Elements seleccionats','Articulació', 'Accidental'],
+    description:
+      "Trieu si la marca de nova creació hauria d'envoltar els elements seleccionats, les articulacions o els accidentals",
+    labels: ['Elements seleccionats', 'Articulació', 'Accidental'],
     valuesDescriptions: [
-      'Afegeix marcatge als elements seleccionats.', 
-      'Afegeix marcatge a les articulacions dins la selecció.', 
-      'Afegeix marcatge als accidentals dins la selecció.'
+      'Afegeix marcatge als elements seleccionats.',
+      'Afegeix marcatge a les articulacions dins la selecció.',
+      'Afegeix marcatge als accidentals dins la selecció.',
     ],
   },
   alternativeEncodingsGrp: {
@@ -529,17 +529,17 @@ export const lang = {
     text: '<choice>',
     description: 'Agrupa diverses codificacions alternatives pel mateix punt en un text.',
   },
-  choiceSicCorr: { 
-    description: 'Posa la selecció a <sic> i afegeix <corr>.' 
+  choiceSicCorr: {
+    description: 'Posa la selecció a <sic> i afegeix <corr>.',
   },
-  choiceCorrSic: { 
-    description: 'Posa la selecció a <corr> i afegeix <sic>.' 
+  choiceCorrSic: {
+    description: 'Posa la selecció a <corr> i afegeix <sic>.',
   },
-  choiceOrigReg: { 
-    description: 'Posa la selecció a <orig> i afegeix <reg>.' 
+  choiceOrigReg: {
+    description: 'Posa la selecció a <orig> i afegeix <reg>.',
   },
-  choiceRegOrig: { 
-    description: 'Posa la selecció a <reg> i afegeix <orig>.' 
+  choiceRegOrig: {
+    description: 'Posa la selecció a <reg> i afegeix <orig>.',
   },
   choiceContentTarget: {
     description: 'Primer, selecciona contingut per a aquest element passant el ratolí sobre <choice>.',
@@ -549,11 +549,11 @@ export const lang = {
     description:
       '(substitució) – Agrupa elements de transcripció quan la combinació ha de ser considerada com una intervenció única en el text.',
   },
-  substAddDel: { 
-    description: 'Posa la selecció a <add> i afegeix <del>.' 
+  substAddDel: {
+    description: 'Posa la selecció a <add> i afegeix <del>.',
   },
-  substDelAdd: { 
-    description: 'Posa la selecció a <del> i afegeix <add>.' 
+  substDelAdd: {
+    description: 'Posa la selecció a <del> i afegeix <add>.',
   },
   substContentTarget: {
     description: 'Primer, selecciona contingut per a aquest element passant el ratolí sobre <subst>.',
@@ -897,7 +897,6 @@ export const lang = {
     description: 'Mostra els títols dels facsímils sobre les imatges de facsímil',
   },
 
-
   // Supplied element / Element subministrat
   titleSupplied: {
     text: 'Gestionar el contingut editorial',
@@ -1028,7 +1027,8 @@ export const lang = {
   },
   persistentSearch: {
     text: 'Caixa de cerca persistent',
-    description: 'Utilitza el comportament de la caixa de cerca persistent (la caixa de cerca roman oberta fins que es tanca explícitament)',
+    description:
+      'Utilitza el comportament de la caixa de cerca persistent (la caixa de cerca roman oberta fins que es tanca explícitament)',
   },
 
   // Verovio settings / Configuració de Verovio

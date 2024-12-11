@@ -4,6 +4,7 @@
 
 import * as att from '../lib/attribute-classes.js';
 import { heart } from '../css/icons.js';
+import { getChangelogUrl } from '../lib/utils.js';
 
 export const lang = {
   // Ekran powitalny
@@ -12,6 +13,12 @@ export const lang = {
     text: 'Pokaż ekran powitalny przy ładowaniu',
     description: 'Pokaż ekran powitalny mei-friend podczas ładowania aplikacji',
   },
+  splashUpdateIndicator: {
+    html: `
+      Następujący tekst został zaktualizowany od ostatniego razu, gdy potwierdziłeś ekran powitalny. 
+      Aby uzyskać szczegółowe informacje, prosimy <a href="${getChangelogUrl()}" target="_blank">zapoznać się z dziennikiem zmian</a>. `,
+  },
+  splashLastUpdated: { text: 'Tekst ostatnio zaktualizowany: ' },
   splashBody: {
     html: `
       <p>
@@ -21,17 +28,10 @@ export const lang = {
         dla dalszych informacji.
       </p>
       <p>
-        Chociaż mei-friend to aplikacja oparta na przeglądarkę, Twoje dane osobowe (w tym kodowanie, które edytujesz, ustawienia
-        aplikacji i aktualne dane logowania, jeśli takie istnieją) są przechowywane w przeglądarce w
-        <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank"
-          >lokalnym magazynie</a
-        > przeglądarki i nie są przesyłane ani przechowywane na naszych serwerach.
+        Chociaż mei-friend jest aplikacją przeglądarkową, twoje dane osobowe (w tym kodowanie, które edytujesz, ustawienia aplikacji i bieżące dane logowania, jeśli takie istnieją) są przechowywane w <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank">lokalnej pamięci</a> twojej przeglądarki i nie są przechowywane na naszych serwerach.
       </p>
       <p>
-        Dane są przesyłane do GitHuba tylko wtedy, gdy wyraźnie o to poprosisz (np. gdy się zalogujesz do GitHuba, załadujesz
-        kodowanie z repozytorium GitHuba lub poprosisz o uruchomienie workflow GitHub Action). Podobnie dane są przesyłane do
-        wybranego dostawcy Solid tylko wtedy, gdy wyraźnie o to poprosisz (np. gdy się zalogujesz do Solid, załadujesz lub
-        zapiszesz adnotacje stand-off).
+        Dane są przesyłane do GitHub tylko wtedy, gdy wyraźnie tego zażądasz (np. gdy logujesz się do GitHub, ładujesz swoje kodowanie z repozytorium GitHub lub zatwierdzasz zmiany do repozytorium GitHub, lub gdy prosisz o uruchomienie przepływu pracy GitHub Action). Podobnie, dane są przesyłane do wybranego przez ciebie dostawcy Solid tylko wtedy, gdy wyraźnie tego zażądasz (np. gdy logujesz się do Solid, lub ładujesz lub zapisujesz adnotacje stand-off). Ze względów technicznych, niektóre interakcje z GitHub (klonowanie repozytorium do twojej przeglądarki przy pierwszym otwarciu kodowania lub zatwierdzanie zmian do repozytorium) wymagają przesyłania danych do serwera proxy hostowanego przez mdw – Uniwersytet Muzyczny i Sztuk Widowiskowych w Wiedniu. Ten serwer działa jako pośrednik między twoją przeglądarką a GitHub i nie przechowuje żadnych danych przesyłanych przez niego.
       </p>
       <p>
         Używamy <a href="https://matomo.org/" target="_blank">Matomo</a>
@@ -507,12 +507,13 @@ export const lang = {
   },
   selectionSelect: {
     text: 'Domyślne zaznaczenie dla znaczników',
-    description: 'Wybierz, czy nowo utworzony znacznik powinien otaczać wybrane elementy, artykulacje lub znaki przygodne',
-    labels: ['Wybrane elementy','Artykulacja', 'Przypadkowy'],
+    description:
+      'Wybierz, czy nowo utworzony znacznik powinien otaczać wybrane elementy, artykulacje lub znaki przygodne',
+    labels: ['Wybrane elementy', 'Artykulacja', 'Przypadkowy'],
     valuesDescriptions: [
-      'Dodaj znacznik do wybranych elementów.', 
-      'Dodaj znacznik do artykulacji w zaznaczeniu.', 
-      'Dodaj znacznik do przypadkowych elementów w zaznaczeniu.'
+      'Dodaj znacznik do wybranych elementów.',
+      'Dodaj znacznik do artykulacji w zaznaczeniu.',
+      'Dodaj znacznik do przypadkowych elementów w zaznaczeniu.',
     ],
   },
   alternativeEncodingsGrp: {
@@ -523,17 +524,17 @@ export const lang = {
     text: '<choice>',
     description: 'Grupuje wiele alternatywnych kodowań dla tego samego punktu w tekście.',
   },
-  choiceSicCorr: { 
-    description: 'Umieść wybór w znaczniku <sic> i dodaj <corr>.' 
-},
-  choiceCorrSic: { 
-    description: 'Umieść wybór w znaczniku <corr> i dodaj <sic>.' 
-},
-  choiceOrigReg: { 
-    description: 'Umieść wybór w znaczniku <orig> i dodaj <reg>.' 
+  choiceSicCorr: {
+    description: 'Umieść wybór w znaczniku <sic> i dodaj <corr>.',
   },
-  choiceRegOrig: { 
-    description: 'Umieść wybór w znaczniku <reg> i dodaj <orig>.' 
+  choiceCorrSic: {
+    description: 'Umieść wybór w znaczniku <corr> i dodaj <sic>.',
+  },
+  choiceOrigReg: {
+    description: 'Umieść wybór w znaczniku <orig> i dodaj <reg>.',
+  },
+  choiceRegOrig: {
+    description: 'Umieść wybór w znaczniku <reg> i dodaj <orig>.',
   },
   choiceContentTarget: {
     description: 'Najpierw wybierz zawartość dla tego elementu, najeżdżając na <choice>.',
@@ -543,11 +544,11 @@ export const lang = {
     description:
       '(zastąpienie) - Grupuje elementy transkrypcyjne, gdy kombinacja ma być traktowana jako pojedyncza interwencja w tekście.',
   },
-  substAddDel: { 
-    description: 'Umieść wybór w znaczniku <add> i dodaj <del>.' 
+  substAddDel: {
+    description: 'Umieść wybór w znaczniku <add> i dodaj <del>.',
   },
-  substDelAdd: { 
-    description: 'Umieść wybór w znaczniku <del> i dodaj <add>.' 
+  substDelAdd: {
+    description: 'Umieść wybór w znaczniku <del> i dodaj <add>.',
   },
   substContentTarget: {
     description: 'Najpierw wybierz zawartość dla tego elementu, najeżdżając na <subst>.',
@@ -1025,7 +1026,8 @@ export const lang = {
   },
   persistentSearch: {
     text: 'Trwałe pole wyszukiwania',
-    description: 'Użyj zachowania trwałego pola wyszukiwania (pole wyszukiwania pozostaje otwarte do momentu wyraźnego zamknięcia)',
+    description:
+      'Użyj zachowania trwałego pola wyszukiwania (pole wyszukiwania pozostaje otwarte do momentu wyraźnego zamknięcia)',
   },
 
   // Verovio settings

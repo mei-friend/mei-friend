@@ -714,8 +714,8 @@ export function median(numbers) {
   const sorted = numbers.slice().sort((a, b) => a - b);
   const middle = Math.floor(sorted.length / 2);
   if (sorted.length % 2 === 0) {
-    return (sorted[middle - 1] + sorted[middle]) / 2
-  };
+    return (sorted[middle - 1] + sorted[middle]) / 2;
+  }
   return sorted[middle];
 } // median()
 
@@ -805,13 +805,40 @@ export function writeMeasureBeat(measure, beat) {
 /**
  * Flattens a more dimensional array and keeps only unique values.
  * Does not use concat to be useful for large arrays.
- * @param {Array} inputArray 
+ * @param {Array} inputArray
  * @returns {Array}
  */
 export function flattenArrayToUniques(inputArray) {
   let flatArray = [];
-  for ( let row of inputArray) for (let element of row) flatArray.push(element);
-  flatArray = flatArray.filter((value, index, self) => {return index == self.indexOf(value)});
+  for (let row of inputArray) for (let element of row) flatArray.push(element);
+  flatArray = flatArray.filter((value, index, self) => {
+    return index == self.indexOf(value);
+  });
 
   return flatArray;
+}
+
+/**
+ * Returns the URL of the current environment's changelog
+ * @returns {string} URL of the current environment's changelog
+ */
+export function getChangelogUrl() {
+  let changeLogUrl;
+  switch (env) {
+    case 'develop':
+      changeLogUrl = 'https://github.com/mei-friend/mei-friend/blob/develop/CHANGELOG.md';
+      break;
+    case 'staging':
+      changeLogUrl = 'https://github.com/mei-friend/mei-friend/blob/staging/CHANGELOG.md';
+      break;
+    case 'testing':
+      changeLogUrl = 'https://github.com/mei-friend/mei-friend/blob/testing/CHANGELOG.md';
+      break;
+    case 'production':
+      changeLogUrl = 'https://github.com/mei-friend/mei-friend/blob/main/CHANGELOG.md';
+      break;
+    default:
+      changeLogUrl = 'https://github.com/mei-friend/mei-friend/blob/main/CHANGELOG.md';
+  }
+  return changeLogUrl;
 }

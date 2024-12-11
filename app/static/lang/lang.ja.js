@@ -4,6 +4,7 @@
 
 import * as att from '../lib/attribute-classes.js';
 import { heart } from '../css/icons.js';
+import { getChangelogUrl } from '../lib/utils.js';
 
 export const lang = {
   // スプラッシュ画面
@@ -12,6 +13,11 @@ export const lang = {
     text: 'アプリケーションの読み込み時にスプラッシュ画面を表示',
     description: 'mei-friendの読み込み時にスプラッシュ画面を表示します',
   },
+  splashUpdateIndicator: {
+    html: `
+      前回スプラッシュ画面を確認した時から、以下のテキストが更新されました。詳細については、<a href="${getChangelogUrl()}" target="_blank">変更履歴</a>をご覧ください。`,
+  },
+  splashLastUpdated: { text: 'テキストの最終更新日: ' },
   splashBody: {
     html: `
    <p>
@@ -20,15 +26,10 @@ export const lang = {
       詳細な情報は<a href="https://mei-friend.github.io" target="_blank">こちら</a>をご覧ください。
       </p>
       <p>
-      mei-friendはブラウザベースのアプリケーションでありながら、個人データ（編集中の楽譜データ、アプリケーションの設定、
-      およびログイン詳細など）はブラウザの<a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank" >ローカルストレージ</a>
-      に保存され、サーバーには送信または保存されません。
-
+        mei-friendはブラウザベースのアプリケーションですが、個人データ（編集しているエンコーディング、アプリケーション設定、および現在のログイン情報など）はブラウザの<a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank">ローカルストレージ</a>に保存され、当社のサーバーには保存されません。
       </p>
       <p>
-
-      データは明示的なリクエスト時のみGitHubに送信されます。同様に、選択したSolidプロバイダーに対しても明示的なリクエスト時にのみデータが送信されます。
-
+        データは、ユーザーが明示的に要求した場合にのみGitHubに送信されます（例：GitHubにログインする、GitHubリポジトリからエンコーディングを読み込む、コミットする、またはGitHubアクションワークフローを実行するように要求する場合）。同様に、データはユーザーが明示的に要求した場合にのみ選択したSolidプロバイダーに送信されます（例：Solidにログインする、スタンドオフ注釈を読み込むまたは保存する場合）。技術的な理由から、GitHubとの特定のやり取り（エンコーディングを最初に開くときにリポジトリをブラウザにクローンする、またはリポジトリに変更をコミットする）には、ウィーン国立音楽大学（mdw）がホストするプロキシサーバーにデータを送信する必要があります。このサーバーはブラウザとGitHubの間の仲介役として機能し、通過するデータを保存しません。
       </p>
       <p>
 
@@ -483,12 +484,13 @@ export const lang = {
   },
   selectionSelect: {
     text: 'マークアップのデフォルト選択',
-    description: '新しく作成されたマークアップが選択された要素、アーティキュレーション、またはアクシデンタルを囲むかどうかを選択してください',
+    description:
+      '新しく作成されたマークアップが選択された要素、アーティキュレーション、またはアクシデンタルを囲むかどうかを選択してください',
     labels: ['選択された要素', 'アーティキュレーション', 'アクシデンタル'],
     valuesDescriptions: [
       '選択された要素にマークアップを追加します。',
       '選択範囲内のアーティキュレーションにマークアップを追加します。',
-      '選択範囲内のアクシデンタルにマークアップを追加します。'
+      '選択範囲内のアクシデンタルにマークアップを追加します。',
     ],
   },
   alternativeEncodingsGrp: {
@@ -500,16 +502,16 @@ export const lang = {
     description: 'テキスト内の同じポイントの複数の代替エンコーディングをグループ化します。',
   },
   choiceSicCorr: {
-    description: '<sic> に選択を入れて <corr> を追加します。'
+    description: '<sic> に選択を入れて <corr> を追加します。',
   },
   choiceCorrSic: {
-    description: '<corr> に選択を入れて <sic> を追加します。'
+    description: '<corr> に選択を入れて <sic> を追加します。',
   },
   choiceOrigReg: {
-    description: '<orig> に選択を入れて <reg> を追加します。'
+    description: '<orig> に選択を入れて <reg> を追加します。',
   },
   choiceRegOrig: {
-    description: '<reg> に選択を入れて <orig> を追加します。'
+    description: '<reg> に選択を入れて <orig> を追加します。',
   },
   choiceContentTarget: {
     description: '<choice> の上にホバーしてこの要素のためにコンテンツを選択します。',
@@ -519,10 +521,10 @@ export const lang = {
     description: '(置換) - テキスト内での組み合わせが単一の介入と見なされる場合に、転写要素をグループ化します。',
   },
   substAddDel: {
-    description: '<add> に選択を入れて <del> を追加します。'
+    description: '<add> に選択を入れて <del> を追加します。',
   },
   substDelAdd: {
-    description: '<del> に選択を入れて <add> を追加します。'
+    description: '<del> に選択を入れて <add> を追加します。',
   },
   substContentTarget: {
     description: '<subst> の上にホバーしてこの要素のためにコンテンツを選択します。',

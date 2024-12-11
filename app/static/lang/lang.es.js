@@ -4,6 +4,7 @@
 
 import * as att from '../lib/attribute-classes.js';
 import { heart } from '../css/icons.js';
+import { getChangelogUrl } from '../lib/utils.js';
 
 export const lang = {
   // Pantalla de bienvenida
@@ -12,7 +13,11 @@ export const lang = {
     text: 'Mostrar pantalla de bienvenida al cargar',
     description: 'Mostrar la pantalla de bienvenida de mei-friend cuando se carga la aplicación',
   },
-
+  splashUpdateIndicator: {
+    html: `
+      El siguiente texto ha sido actualizado desde la última vez que reconociste la pantalla de bienvenida. Para más detalles, por favor <a href="${getChangelogUrl()}" target="_blank">consulta la lista de cambios</a>.`,
+  },
+  splashLastUpdated: { text: 'Texto actualizado por última vez el: ' },
   splashBody: {
     html: `
       <p>
@@ -22,17 +27,10 @@ export const lang = {
         más información.
       </p>
       <p>
-        Aunque mei-friend es una aplicación basada en el navegador, tus datos personales (incluyendo la codificación que
-        estás editando, la configuración de tu aplicación y los detalles actuales de inicio de sesión, si los tienes) se
-        almacenan en el <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank"
-          >almacenamiento local</a
-        > de tu navegador y no se transmiten ni se almacenan en nuestros servidores.
+        Aunque mei-friend es una aplicación basada en el navegador, tus datos personales (incluyendo la codificación que estás editando, tus configuraciones de la aplicación y los detalles de inicio de sesión actuales, si los hay) se almacenan en el <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank">almacenamiento local</a> de tu navegador y no se almacenan en nuestros servidores.
       </p>
       <p>
-        Los datos se transmiten a GitHub solo cuando lo solicitas explícitamente (por ejemplo, cuando inicias sesión en
-        GitHub, cargas tu codificación desde un repositorio de GitHub o cuando solicitas que se ejecute un flujo de trabajo
-        GitHub Action). De manera similar, los datos se transmiten a tu proveedor Solid elegido solo cuando lo solicitas
-        explícitamente (por ejemplo, cuando inicias sesión en Solid o cargas o guardas anotaciones stand-off).
+        Los datos se transmiten a GitHub solo cuando lo solicitas explícitamente (por ejemplo, cuando inicias sesión en GitHub, cargas tu codificación desde o confirmas en un repositorio de GitHub, o cuando solicitas que se ejecute un flujo de trabajo de GitHub Action para ti). De manera similar, los datos se transmiten a tu proveedor de Solid elegido solo cuando lo solicitas explícitamente (por ejemplo, cuando inicias sesión en Solid, o cargas o guardas anotaciones stand-off). Por razones técnicas, ciertas interacciones con GitHub (clonar un repositorio a tu navegador al abrir una codificación por primera vez, o confirmar cambios en un repositorio) requieren que los datos se transmitan a un servidor proxy alojado por la mdw – Universidad de Música y Artes Escénicas de Viena. Este servidor actúa como intermediario entre tu navegador y GitHub, y no almacena ningún dato transmitido a través de él.
       </p>
       <p>
         Utilizamos <a href="https://matomo.org/" target="_blank">Matomo</a>
@@ -507,12 +505,13 @@ export const lang = {
   },
   selectionSelect: {
     text: 'Selección predeterminada para marcar',
-    description: 'Elija si la marca recién creada debe incluir los elementos seleccionados, articulaciones o alteraciones',
+    description:
+      'Elija si la marca recién creada debe incluir los elementos seleccionados, articulaciones o alteraciones',
     labels: ['Elementos seleccionados', 'Articulación', 'Accidental'],
     valuesDescriptions: [
       'Añade marcado a los elementos seleccionados.',
       'Añade marcado a las articulaciones dentro de la selección.',
-      'Añade marcado a los accidentales dentro de la selección.'
+      'Añade marcado a los accidentales dentro de la selección.',
     ],
   },
   alternativeEncodingsGrp: {
@@ -524,16 +523,16 @@ export const lang = {
     description: 'Agrupa varias codificaciones alternativas para el mismo punto en un texto.',
   },
   choiceSicCorr: {
-    description: 'Coloca la selección en <sic> y añade <corr>.'
+    description: 'Coloca la selección en <sic> y añade <corr>.',
   },
   choiceCorrSic: {
-    description: 'Coloca la selección en <corr> y añade <sic>.'
+    description: 'Coloca la selección en <corr> y añade <sic>.',
   },
   choiceOrigReg: {
-    description: 'Coloca la selección en <orig> y añade <reg>.'
+    description: 'Coloca la selección en <orig> y añade <reg>.',
   },
   choiceRegOrig: {
-    description: 'Coloca la selección en <reg> y añade <orig>.'
+    description: 'Coloca la selección en <reg> y añade <orig>.',
   },
   choiceContentTarget: {
     description: 'Primero, selecciona el contenido para este elemento pasando el cursor sobre <elección>.',
@@ -544,10 +543,10 @@ export const lang = {
       '(sustitución) – Agrupa elementos de transcripción cuando la combinación debe considerarse como una intervención única en el texto.',
   },
   substAddDel: {
-    description: 'Coloca la selección en <add> y añade <del>.'
+    description: 'Coloca la selección en <add> y añade <del>.',
   },
   substDelAdd: {
-    description: 'Coloca la selección en <del> y añade <add>.'
+    description: 'Coloca la selección en <del> y añade <add>.',
   },
   substContentTarget: {
     description: 'Primero, selecciona el contenido para este elemento pasando el cursor sobre <sustitución>.',
@@ -1029,7 +1028,8 @@ export const lang = {
   // Persistent Search / Búsqueda persistente
   persistentSearch: {
     text: 'Caja de búsqueda persistente',
-    description: 'Utilizar el comportamiento de la caja de búsqueda persistente (la caja de búsqueda permanece abierta hasta que se cierre explícitamente)',
+    description:
+      'Utilizar el comportamiento de la caja de búsqueda persistente (la caja de búsqueda permanece abierta hasta que se cierre explícitamente)',
   },
 
   // Verovio settings / Configuraciones de Verovio

@@ -1,6 +1,7 @@
 // mei-friend version and date
-export const version = '1.1.8';
-export const versionDate = '6 December 2024'; // use full or 3-character english months, will be translated
+export const version = '1.2.0';
+export const versionDate = '11 December 2024'; // use full or 3-character english months, will be translated
+export const splashDate = '11 December 2024'; // date of the splash screen content
 
 var vrvWorker;
 var spdWorker;
@@ -73,7 +74,7 @@ import {
 } from './control-menu.js';
 import { clock, file, unverified, xCircleFill } from '../css/icons.js';
 import { keymap } from '../keymaps/default-keymap.js';
-import { setCursorToId } from './utils.js';
+import { setCursorToId, getChangelogUrl } from './utils.js';
 import { getInMeasure, navElsSelector, getElementAtCursor } from './dom-utils.js';
 import { addDragSelector } from './drag-selector.js';
 import {
@@ -425,16 +426,29 @@ function onLanguageLoaded() {
 
   createSplashScreen();
 
-  // show splash screen if required
+  // show splash screen if required, i.e.: if never previously acknowledged; or,
+  // if acknowledged before latest splash screen content update (splashDate), or,
+  // if splash screen is set to show on every load
   if (storage.supported) {
     storage.read();
-    if (!storage.splashAcknowledged || storage.showSplashScreen) {
-      showSplashScreen(true);
+    let splashTextUpdatedSinceLastAck;
+    try {
+      splashTextUpdatedSinceLastAck = storage.splashAcknowledged < new Date(splashDate).getTime();
+    } catch {
+      splashTextUpdatedSinceLastAck = false;
+    }
+    console.log('Splash screen acknowledged: ', storage.splashAcknowledged);
+    console.log('Splash text updated since last acknowledgement: ', splashTextUpdatedSinceLastAck);
+    console.log('Last acknowledgement date: ', new Date(storage.splashAcknowledged));
+
+    if (!storage.splashAcknowledged || splashTextUpdatedSinceLastAck || storage.showSplashScreen) {
+      showSplashScreen(splashTextUpdatedSinceLastAck);
     } else {
       completeInitialLoad();
     }
   } else {
-    completeInitialLoad();
+    // no storage; always show splash screen
+    showSplashScreen(false);
   }
 } // onLanguageLoaded()
 
@@ -442,17 +456,7 @@ async function completeInitialLoad() {
   splashInitialLoad = false; // avoid re-initialising app from splash screen button
 
   // link to changelog page according to env settings (develop/staging/production)
-  let changeLogUrl;
-  switch (env) {
-    case 'develop':
-      changeLogUrl = 'https://github.com/mei-friend/mei-friend/blob/develop/CHANGELOG.md';
-      break;
-    case 'staging':
-      changeLogUrl = 'https://github.com/mei-friend/mei-friend/blob/staging/CHANGELOG.md';
-      break;
-    case 'production':
-      changeLogUrl = 'https://github.com/mei-friend/mei-friend/blob/main/CHANGELOG.md';
-  }
+  const changeLogUrl = getChangelogUrl();
   const showChangeLogLink = document.getElementById('showChangelog');
   if (showChangeLogLink) showChangeLogLink.setAttribute('href', changeLogUrl);
 
@@ -1007,7 +1011,7 @@ async function vrvWorkerEventsHandler(ev) {
         v.pageCount = ev.data.pageCount;
       } else if (bs === 'none') {
         v.pageCount = 1;
-      } else if (v.speedMode && bs === 'auto' && Object.keys(v.pageBreaks).length > 0) {
+      } else if (v.speedMode && bs === 'auto' && v.pageBreaks && Object.keys(v.pageBreaks).length > 0) {
         v.pageCount = Object.keys(v.pageBreaks).length;
       }
       //update choiceSelect
@@ -1424,14 +1428,26 @@ function createSplashScreen() {
       }
     }
   });
-  document.getElementById('splashConfirmButton').addEventListener('click', () => {
-    document.getElementById('splashOverlay').style.display = 'none';
-    window.localStorage.setItem('splashAcknowledged', 'true');
-    if (splashInitialLoad) completeInitialLoad();
-  });
+  document
+    .getElementById('splashConfirmButton')
+    .addEventListener('click', () => handleSplashConfirmed(splashInitialLoad, storage));
 } // createSplashScreen()
 
-function showSplashScreen() {
+function handleSplashConfirmed(splashInitialLoad, storage) {
+  document.getElementById('splashOverlay').style.display = 'none';
+  if (storage && storage.supported) {
+    storage.splashAcknowledged = splashDate;
+  }
+  if (splashInitialLoad) completeInitialLoad();
+}
+
+function showSplashScreen(showUpdateIndicator = false) {
+  const updateIndicator = document.getElementById('splashUpdateIndicator');
+  const splashLastUpdated = document.getElementById('splashLastUpdated');
+  updateIndicator.innerHTML = translator.lang.splashUpdateIndicator.html;
+  const translatedSplashDate = translator.translateDate(splashDate);
+  splashLastUpdated.innerHTML = translator.lang.splashLastUpdated.text + translatedSplashDate;
+  showUpdateIndicator ? (updateIndicator.style.display = 'block') : (updateIndicator.style.display = 'none'); // shown if text has changed since last acknowledgement
   const alwaysShow = document.getElementById('splashAlwaysShow'); // checkbox in splash screen
   document.getElementById('splashOverlay').style.display = 'flex';
   alwaysShow.checked = storage.showSplashScreen;
@@ -2179,7 +2195,7 @@ function addEventListeners(v, cm) {
   document.getElementById('toggleSpicc').addEventListener('click', cmd.toggleSpicc);
 
   // show splash screen
-  document.getElementById('aboutMeiFriend').addEventListener('click', showSplashScreen);
+  document.getElementById('aboutMeiFriend').addEventListener('click', () => showSplashScreen());
   document.getElementById('splashOverlay').addEventListener('click', (e) => {
     if (e.target.id === 'splashOverlay') {
       document.getElementById('splashOverlay').style.display = 'none'; // dismiss splash when user clicks on black background
@@ -2351,28 +2367,13 @@ function drawLeftFooter() {
 
 export function drawRightFooter() {
   // translate month in version date
-  let translatedVersioDate = versionDate;
-  for (let key of Object.keys(translator.lang.month)) {
-    let i = versionDate.search(translator.defaultLang.month[key]);
-    if (i > 0) {
-      translatedVersioDate = versionDate.replace(translator.defaultLang.month[key], translator.lang.month[key]);
-      break;
-    }
-    i = versionDate.search(translator.defaultLang.month[key].substring(0, 3));
-    if (i > 0) {
-      translatedVersioDate = versionDate.replace(
-        translator.defaultLang.month[key].substring(0, 3),
-        translator.lang.month[key]
-      );
-      break;
-    }
-  }
+  let translatedVersionDate = translator.translateDate(versionDate);
   let rf = document.querySelector('.rightfoot');
   const versionHtml =
     "<a href='https://github.com/mei-friend/mei-friend' target='_blank'>mei-friend " +
     (env === environments.production ? version : `${env}-${version}`) +
     '</a> (' +
-    translatedVersioDate +
+    translatedVersionDate +
     ').&nbsp;';
   rf.innerHTML = versionHtml;
   // also update version string in splash screen

@@ -41,8 +41,6 @@
 
     <script src="{{ url_for('static', filename='deps/solid-client-authn.bundle.js') }}"></script>
     <script src="{{ url_for('static', filename='lib/env.js') }}"></script>
-    <script src="{{ url_for('static', filename='lib/jsgit.js') }}"></script>
-    <script src="{{ url_for('static', filename='lib/github.js') }}" type="module"></script>
     <script src="{{ url_for('static', filename='lib/solid.js') }}" type="module"></script>
     <script>
       let isLoggedIn;
@@ -705,10 +703,14 @@
             <img src="{{ url_for('static', filename='owl/menu-logo.svg') }}" alt="mei-friend" id="splashLogo" />
           </div>
           <hr class="dropdownLine" />
-          <div id="splashBody"></div>
+          <div id="splashBodyContainer">
+            <div id="splashUpdateIndicator"></div>
+            <div id="splashBody"></div>
+          </div>
           <div id="splashFooter">
             <div id="splashVersion">
               <span id="splashVersionText">Version</span>: <span id="splashVersionNumber"></span>
+              <span id="splashLastUpdated"></span>
             </div>
             <button id="splashConfirmButton">
               <span id="splashGotItButtonText">Got it!</span>

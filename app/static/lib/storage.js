@@ -322,19 +322,34 @@ export default class Storage {
     this._restoreSolidSession = restoreSolidSession;
   }
 
-  get splashAcknowledged() { 
-    return this._splashAcknowledged
+  get splashAcknowledged() {
+    // if this._splashAcknowledged is a valid ISO date string, return it as an epoch time
+    // otherwise, return false
+    try {
+      return new Date(this._splashAcknowledged).getTime();
+    } catch (e) {
+      console.warn('Unable to parse splashAcknowledged date:', this._splashAcknowledged);
+      return false;
+    }
   }
 
-  set splashAcknowledged(x) { 
-    console.warn("splashAcknowledged is set automatically. Do not set it directly.");
+  set splashAcknowledged(versionDate) {
+    // formerly, boolean to indicate splash screen was acknowledged
+    // now, version date of the app when the splash screen was acknowledged
+    try {
+      versionDate = new Date(versionDate);
+    } catch (e) {
+      console.warn('Unable to parse version date:', versionDate);
+      versionDate = null;
+    }
+    this.safelySetStorageItem('splashAcknowledged', versionDate.toISOString());
   }
 
-  get showSplashScreen() { 
+  get showSplashScreen() {
     return this.storage['mf-showSplashScreen'];
   }
-  
-  set showSplashScreen(showSplashScreen) { 
-    this.safelySetStorageItem('mf-showSplashScreen', showSplashScreen)
+
+  set showSplashScreen(showSplashScreen) {
+    this.safelySetStorageItem('mf-showSplashScreen', showSplashScreen);
   }
 }

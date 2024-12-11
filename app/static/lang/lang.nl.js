@@ -4,6 +4,7 @@
 
 import * as att from '../lib/attribute-classes.js';
 import { heart } from '../css/icons.js';
+import { getChangelogUrl } from '../lib/utils.js';
 
 export const lang = {
   // Splash screen
@@ -12,6 +13,11 @@ export const lang = {
     text: 'Toon opstartscherm bij laden',
     description: 'Toon het mei-friend opstartscherm wanneer de applicatie wordt geladen',
   },
+  splashUpdateIndicator: {
+    html: `
+      De volgende tekst is bijgewerkt sinds de laatste keer dat u het opstartscherm heeft erkend. Voor details, raadpleeg de <a href="${getChangelogUrl()}" target="_blank">changelog</a>.`,
+  },
+  splashLastUpdated: { text: 'Tekst laatst bijgewerkt op: ' },
   splashBody: {
     html: `
       <p>
@@ -21,12 +27,10 @@ export const lang = {
         meer informatie.
       </p>
       <p>
-        Hoewel mei-friend een browsergebaseerde applicatie is, worden uw persoonlijke gegevens (inclusief de codering die u bewerkt, uw applicatie-instellingen en huidige inloggegevens indien aanwezig) opgeslagen in de
-        <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank">lokale opslag</a>
-        van uw browser en worden niet naar onze servers verzonden of daar opgeslagen.
+        Hoewel mei-friend een browsergebaseerde applicatie is, worden uw persoonlijke gegevens (inclusief de codering die u bewerkt, uw applicatie-instellingen en huidige inloggegevens indien aanwezig) opgeslagen in de <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank">lokale opslag</a> van uw browser en niet op onze servers.
       </p>
       <p>
-        Gegevens worden alleen naar GitHub verzonden wanneer u er expliciet om vraagt (bijv. wanneer u inlogt op GitHub, uw codering laadt vanuit of commit naar een GitHub-repository, of wanneer u een GitHub Action workflow voor u laat uitvoeren). Evenzo worden gegevens alleen naar uw gekozen Solid-provider verzonden wanneer u er expliciet om vraagt (bijv. wanneer u inlogt op Solid, of stand-off annotaties laadt of opslaat).
+        Gegevens worden alleen naar GitHub verzonden wanneer u hier expliciet om vraagt (bijvoorbeeld wanneer u inlogt bij GitHub, uw codering laadt vanuit of commit naar een GitHub-repository, of wanneer u een GitHub Action workflow aanvraagt). Evenzo worden gegevens alleen naar uw gekozen Solid-provider verzonden wanneer u hier expliciet om vraagt (bijvoorbeeld wanneer u inlogt bij Solid, of stand-off annotaties laadt of opslaat). Om technische redenen vereisen bepaalde interacties met GitHub (zoals het klonen van een repository naar uw browser bij het eerste openen van een codering, of het committen van wijzigingen naar een repository) dat gegevens worden verzonden naar een proxyserver gehost door de mdw – Universiteit voor Muziek en Podiumkunsten Wenen. Deze server fungeert als tussenpersoon tussen uw browser en GitHub, en slaat geen gegevens op die erdoor worden verzonden.
       </p>
       <p>
         We gebruiken <a href="https://matomo.org/" target="_blank">Matomo</a>
@@ -884,7 +888,8 @@ export const lang = {
   },
   persistentSearch: {
     text: 'Persistente zoekbalk',
-    description: 'Gebruik het gedrag van de persistente zoekbalk (zoekbalk blijft open totdat deze expliciet wordt gesloten)',
+    description:
+      'Gebruik het gedrag van de persistente zoekbalk (zoekbalk blijft open totdat deze expliciet wordt gesloten)',
   },
 
   // Verovio settings

@@ -4,6 +4,7 @@
 
 import * as att from '../lib/attribute-classes.js';
 import { heart } from '../css/icons.js';
+import { getChangelogUrl } from '../lib/utils.js';
 
 export const lang = {
   // Splash screen
@@ -12,6 +13,11 @@ export const lang = {
     text: 'Prikaži ekran pri pokretanju',
     description: 'Prikazuje mei-friend ekran pri pokretanju aplikacije',
   },
+  splashUpdateIndicator: {
+    html: `
+      Sledeći tekst je ažuriran od poslednjeg puta kada ste potvrdili početni ekran. Za detalje, molimo vas da <a href="${getChangelogUrl()}" target="_blank">pogledate dnevnik promena</a>.`,
+  },
+  splashLastUpdated: { text: 'Tekst poslednji put ažuriran:' },
   splashBody: {
     html: `
     <p>
@@ -21,17 +27,10 @@ export const lang = {
       dodatne informacije.
     </p>
     <p>
-      Iako je mei-friend aplikacija zasnovana na pregledaču, vaši lični podaci (uključujući kod koji
-      uređujete, postavke aplikacije i trenutne prijave ako ih ima) se čuvaju u lokalnom skladištu vašeg pregledača
-      <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank"
-        >lokalnog skladišta</a
-      > i ne šalju se ili ne čuvaju na našim serverima.
+      Iako je mei-friend aplikacija zasnovana na pretraživaču, vaši lični podaci (uključujući kodiranje koje uređujete, postavke aplikacije i trenutne podatke za prijavu, ako ih ima) čuvaju se u <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank">lokalnoj memoriji</a> vašeg pretraživača i nisu pohranjeni na našim serverima.
     </p>
     <p>
-      Podaci se prenose na GitHub samo kada ih izričito zatražite (npr. kada se prijavite na GitHub, učitate
-      svoj kod iz repozitorijuma na GitHub-u ili kada zatražite GitHub akcioni radni tok da se
-      pokrene za vas). Slično tome, podaci se prenose vašem odabranom Solid provajderu samo kada ih izričito
-      zatražite (npr. kada se prijavite na Solid, učitate ili sačuvate notacije sa odstupanjem).
+      Podaci se prenose na GitHub samo kada to izričito zatražite (npr. kada se prijavite na GitHub, učitate svoje kodiranje iz ili komitujete u GitHub repozitorijum, ili kada zatražite da se za vas pokrene GitHub Action tok). Slično tome, podaci se prenose na vaš odabrani Solid provajder samo kada to izričito zatražite (npr. kada se prijavite na Solid, ili učitate ili sačuvate stand-off napomene). Iz tehničkih razloga, određene interakcije sa GitHub-om (kloniranje repozitorijuma u vaš pretraživač prilikom prvog otvaranja kodiranja, ili komitovanje promena u repozitorijum) zahtevaju prenos podataka na proxy server hostovan od strane mdw – Univerziteta muzike i izvođačkih umetnosti u Beču. Ovaj server deluje kao posrednik između vašeg pretraživača i GitHub-a, i ne pohranjuje nikakve podatke koji se prenose kroz njega.
     </p>
     <p>
       Koristimo <a href="https://matomo.org/" target="_blank">Matomo</a>
@@ -183,7 +182,7 @@ export const lang = {
   insertMenuTitle: { text: 'Umetni' },
   addNoteText: { text: 'Add note' }, // TODO: translate
   convertNoteToRestText: { text: 'Note(s) <=> rest(s)' }, // TODO: translate
-  toggleChordText: { text: 'Note(s) <=> chord' },   // TODO: translate
+  toggleChordText: { text: 'Note(s) <=> chord' }, // TODO: translate
   addDoubleSharpText: { html: 'Dupla oštrica &#119082;' },
   addSharpText: { html: 'Oštrica &#9839;' },
   addNaturalText: { html: 'Naturalna oznaka &#9838;' },
@@ -880,7 +879,8 @@ export const lang = {
   },
   persistentSearch: {
     text: 'Tražilica koja ostaje otvorena',
-    description: 'Koristi ponašanje tražilice koja ostaje otvorena (tražilica ostaje otvorena sve dok se eksplicitno ne zatvori)',
+    description:
+      'Koristi ponašanje tražilice koja ostaje otvorena (tražilica ostaje otvorena sve dok se eksplicitno ne zatvori)',
   },
 
   // Postavke Verovia
