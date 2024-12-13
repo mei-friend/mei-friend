@@ -67,6 +67,15 @@ export async function postResource(containerUri, resource) {
           body: JSON.stringify(resource),
         })
         .then(async (postResp) => {
+          // patch the posted resource with its own URI
+          let postedResourceUri = new URL(postResp.headers.get('Location'), containerUriResource).href;
+          await safelyPatchResource(postedResourceUri, [
+            {
+              op: 'replace', // replace the empty @id with the actual URI
+              path: '/@id',
+              value: postedResourceUri,
+            },
+          ]);
           return postResp;
         })
         .catch((e) => {
