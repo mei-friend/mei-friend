@@ -15,7 +15,7 @@ import {
   safelyPatchResource,
 } from './solid.js';
 import { nsp, traverseAndFetch } from './linked-data.js';
-import { deleteListItem, isItemInList, addListItem } from './enrichment-panel.js';
+import { deleteListItem, isItemInList, addListItem, generateAnnotationLocationLabel } from './enrichment-panel.js';
 import * as att from './attribute-classes.js';
 
 //#region functions to draw annotations
@@ -770,7 +770,7 @@ export function ingestWebAnnotation(webAnno) {
 }
 
 // fetch all components hanging off a musical material
-async function fetchMAOComponentsForIdentifiedObject(musMatUrl) {
+export async function fetchMAOComponentsForIdentifiedObject(musMatUrl) {
   traverseAndFetch(
     new URL(musMatUrl),
     [new URL(nsp.MAO + 'MusicalMaterial'), new URL(nsp.MAO + 'Extract'), new URL(nsp.MAO + 'Selection')],
@@ -830,7 +830,7 @@ async function drawMusicalMaterialForIdentifiedObject(obj, url) {
   console.log('drawMusMatForIdentifiedObject: ', obj, url);
   const musMat = document.getElementById('musMat_' + url.href);
   if (musMat) {
-    // if we have a label and haven't drawn one already...
+    musMat.innerHTML = '';
     const myListItem = musMat.closest('.annotationListItem');
     const myLabel = myListItem.querySelector('.annotationLocationLabel');
     console.log('LABEL: ', obj, myLabel);
@@ -840,7 +840,7 @@ async function drawMusicalMaterialForIdentifiedObject(obj, url) {
     }
     if (nsp.MAO + 'setting' in obj) {
       const alreadyIncluded = musMat.querySelectorAll('.mao-extract');
-      const alreadyIncludedUrls = alreadyIncluded.forEach((n) => n.id.replace('extract', ''));
+      const alreadyIncludedUrls = Array.from(alreadyIncluded).map((n) => n.id.replace('extract', ''));
       let extractsToAdd;
       if (alreadyIncludedUrls) {
         extractsToAdd = obj[nsp.MAO + 'setting'].filter((s) => !alreadyIncludedUrls.includes(s['@id']));
@@ -870,9 +870,9 @@ async function drawExtractsForIdentifiedObject(obj, url) {
   if (extract) {
     if (nsp.FRBR + 'embodiment' in obj) {
       const alreadyIncluded = extract.querySelectorAll('.mao-selection');
-      const alreadyIncludedUrls = alreadyIncluded.forEach((n) => n.id.replace('selection_', ''));
+      const alreadyIncludedUrls = Array.from(alreadyIncluded).map((n) => n.id.replace('selection_', ''));
       let selectionsToAdd;
-      if (alreadyIncludedUrls) {
+      if (alreadyIncludedUrls.length) {
         selectionsToAdd = obj[nsp.FRBR + 'embodiment'].filter((s) => !alreadyIncludedUrls.includes(s['@id']));
       } else {
         selectionsToAdd = obj[nsp.FRBR + 'embodiment'];

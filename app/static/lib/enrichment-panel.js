@@ -419,7 +419,7 @@ function generateListItem(a) {
         legend.insertAdjacentHTML('afterbegin', identify);
         legend.insertAdjacentHTML(
           'beforeend',
-          ' <span id="annotationToolsIdentifySpan">' + translator.lang.annotationToolsLinkSpan.text + '</span>'
+          ' <span id="annotationToolsIdentifySpan">' + translator.lang.annotationToolsIdentifySpan.text + '</span>'
         );
         annoFieldset.classList.add('annotationIdentify');
         content.insertAdjacentHTML('afterbegin', `<div class="mao-musMat" id="musMat_${a.id}"></div>`);
@@ -605,18 +605,18 @@ export function generateAnnotationLocationLabel(a) {
     // just add a placeholder for a label and exit
     // (since multiple selections may be situated at different locations, we deal with them elsewhere)
     annotationLocationLabel.innerHTML = '<span class="label"></span>';
+    // trigger fetching of MAO components; subsequent refetching handled by situateAnnotations()
+    annot.fetchMAOComponentsForIdentifiedObject(a.id);
+  } else if (a.firstPage === 'meiHead') {
+    annotationLocationLabel.innerHTML = `MEI&nbsp;head&nbsp;(${a.selection.length}&nbsp;${translator.lang.elementsPlural.text})`;
+  } else if (a.firstPage === 'unsituated' || a.firstPage < 0) {
+    annotationLocationLabel.innerHTML = 'Unsituated';
   } else {
-    if (a.firstPage === 'meiHead') {
-      annotationLocationLabel.innerHTML = `MEI&nbsp;head&nbsp;(${a.selection.length}&nbsp;${translator.lang.elementsPlural.text})`;
-    } else if (a.firstPage === 'unsituated' || a.firstPage < 0) {
-      annotationLocationLabel.innerHTML = 'Unsituated';
-    } else {
-      annotationLocationLabel.innerHTML =
-        translator.lang.pageAbbreviation.text +
-        '&nbsp;' +
-        (a.firstPage === a.lastPage ? a.firstPage : a.firstPage + '&ndash;' + a.lastPage) +
-        ` (${a.selection.length}&nbsp;${translator.lang.elementsPlural.text})`;
-    }
+    annotationLocationLabel.innerHTML =
+      translator.lang.pageAbbreviation.text +
+      '&nbsp;' +
+      (a.firstPage === a.lastPage ? a.firstPage : a.firstPage + '&ndash;' + a.lastPage) +
+      ` (${a.selection.length}&nbsp;${translator.lang.elementsPlural.text})`;
   }
   annotationLocationLabel.classList.add('annotationLocationLabel');
   annotationLocationLabel.dataset.id = 'loc-' + a.id;
