@@ -15,7 +15,13 @@ import {
   safelyPatchResource,
 } from './solid.js';
 import { nsp, traverseAndFetch } from './linked-data.js';
-import { deleteListItem, isItemInList, addListItem, generateAnnotationLocationLabel } from './enrichment-panel.js';
+import {
+  deleteListItem,
+  isItemInList,
+  addListItem,
+  generateAnnotationLocationLabel,
+  refreshAnnotationsInNotation,
+} from './enrichment-panel.js';
 import * as att from './attribute-classes.js';
 
 //#region functions to draw annotations
@@ -156,7 +162,6 @@ export const createIdentify = (e, selection) => {
             standoffUri: solidStorage + maoMusicalMaterial.headers.get('location').substr(1),
           };
           addListItem(a, true);
-          //refreshAnnotations(true);
         });
       })
       .finally(() => {
@@ -729,6 +734,15 @@ export function ingestWebAnnotation(webAnno) {
     };
     let targets = webAnno['http://www.w3.org/ns/oa#hasTarget'];
     if (!Array.isArray(targets)) targets = [targets];
+    // throw out any targets that do not correspond (are not fragments of) the current MEI URI
+    targets = targets.filter((t) => {
+      console.log('Filter Checking target: ', t, getCurrentFileUri());
+      return t['@id'].startsWith(getCurrentFileUri());
+    });
+    if (!targets.length) {
+      console.warn('Skipping Web Annotation without a target in this MEI file: ', webAnno);
+      return;
+    }
     anno.type = 'annotateHighlight'; // default type
     let bodies = webAnno['http://www.w3.org/ns/oa#hasBody'];
     if (bodies && !Array.isArray(bodies)) bodies = [bodies];
@@ -765,7 +779,7 @@ export function ingestWebAnnotation(webAnno) {
     anno.selection = targets.map((t) => t['@id'].split('#')[1]);
     anno.isStandoff = true;
     addListItem(anno, true);
-    refreshAnnotations(true);
+    refreshAnnotationsInNotation(true);
   }
 }
 
