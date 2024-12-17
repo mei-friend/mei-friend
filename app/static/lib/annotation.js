@@ -15,7 +15,13 @@ import {
   safelyPatchResource,
 } from './solid.js';
 import { nsp, traverseAndFetch } from './linked-data.js';
-import { deleteListItem, isItemInList, addListItem, generateAnnotationLocationLabel } from './enrichment-panel.js';
+import {
+  deleteListItem,
+  isItemInList,
+  addListItem,
+  generateAnnotationLocationLabel,
+  refreshAnnotationsInNotation,
+} from './enrichment-panel.js';
 import * as att from './attribute-classes.js';
 
 //#region functions to draw annotations
@@ -156,7 +162,6 @@ export const createIdentify = (e, selection) => {
             standoffUri: solidStorage + maoMusicalMaterial.headers.get('location').substr(1),
           };
           addListItem(a, true);
-          //refreshAnnotations(true);
         });
       })
       .finally(() => {
@@ -774,7 +779,7 @@ export function ingestWebAnnotation(webAnno) {
     anno.selection = targets.map((t) => t['@id'].split('#')[1]);
     anno.isStandoff = true;
     addListItem(anno, true);
-    refreshAnnotations(true);
+    refreshAnnotationsInNotation(true);
   }
 }
 
