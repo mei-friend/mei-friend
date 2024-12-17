@@ -729,6 +729,15 @@ export function ingestWebAnnotation(webAnno) {
     };
     let targets = webAnno['http://www.w3.org/ns/oa#hasTarget'];
     if (!Array.isArray(targets)) targets = [targets];
+    // throw out any targets that do not correspond (are not fragments of) the current MEI URI
+    targets = targets.filter((t) => {
+      console.log('Filter Checking target: ', t, getCurrentFileUri());
+      return t['@id'].startsWith(getCurrentFileUri());
+    });
+    if (!targets.length) {
+      console.warn('Skipping Web Annotation without a target in this MEI file: ', webAnno);
+      return;
+    }
     anno.type = 'annotateHighlight'; // default type
     let bodies = webAnno['http://www.w3.org/ns/oa#hasBody'];
     if (bodies && !Array.isArray(bodies)) bodies = [bodies];
