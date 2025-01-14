@@ -1023,7 +1023,8 @@ async function vrvWorkerEventsHandler(ev) {
         if (ev.data.forceUpdate) {
           v.currentPage = ev.data.pageNo;
         }
-        updateStatusBar();
+        pageInfoToStatusBar();
+        setProgressBar(0);
         updateHtmlTitle();
         document.getElementById('verovio-panel').innerHTML = ev.data.svg;
         if (document.getElementById('showFacsimilePanel') && document.getElementById('showFacsimilePanel').checked) {
@@ -1055,7 +1056,8 @@ async function vrvWorkerEventsHandler(ev) {
       }
       break;
     case 'navigatePage': // resolve navigation with page turning
-      updateStatusBar();
+      pageInfoToStatusBar();
+      setProgressBar(0);
       document.getElementById('verovio-panel').innerHTML = ev.data.svg;
       let ms = document.querySelectorAll('.measure'); // find measures on page
       if (ms.length > 0) {
@@ -1134,7 +1136,7 @@ async function vrvWorkerEventsHandler(ev) {
       //   meiFileName.substring(meiFileName.lastIndexOf("/") + 1) +
       //   ', pageBreaks', v.pageBreaks);
       v.updateData(cm, false, true);
-      updateStatusBar();
+      pageInfoToStatusBar();
       v.updatePageNumDisplay();
       v.busy(false);
       break;
@@ -1566,7 +1568,8 @@ export let cmd = {
   fileNameChange: () => {
     if (fileLocationType === 'file') {
       meiFileName = document.getElementById('fileName').innerText;
-      updateStatusBar();
+      pageInfoToStatusBar();
+      setProgressBar(0);
       updateHtmlTitle();
       if (storage.supported) storage.safelySetStorageItem('meiFileName', meiFileName);
     } else {
@@ -2334,12 +2337,19 @@ function moveProgressBar() {
   }
 }
 
-// control progress bar progress/width (in percent)
-function setProgressBar(percentage) {
+/**
+ * control progress bar progress/width (in percent)
+ * @param {number} percentage
+ */
+export function setProgressBar(percentage) {
   document.getElementById('progressBar').style.width = percentage + '%';
 }
 
-export function updateStatusBar() {
+/**
+ * updates the status bar with filename,
+ * current page number and total page count
+ */
+export function pageInfoToStatusBar() {
   if (!v) return;
   document.getElementById('statusBar').innerHTML =
     meiFileName.substring(meiFileName.lastIndexOf('/') + 1) +

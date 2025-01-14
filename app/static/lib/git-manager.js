@@ -1,6 +1,6 @@
 import http from '../deps/isomorphic-git.http.js';
 import GitCloudClient from './git-cloud-client.js';
-import { storage } from './main.js';
+import { setProgressBar, storage } from './main.js';
 
 window.fs = new LightningFS('fs', { wipe: true });
 window.pfs = window.fs.promises; // promisified version of fs, for your convenience
@@ -76,6 +76,9 @@ export default class GitManager {
     // if directory exists, delete it (ideally after giving user option to commit changes)
     // then clone
     try {
+      let statusBar = document.getElementById('statusBar');
+      statusBar.innerHTML = 'Preparing to load from ' + this.providerType + '...';
+      setProgressBar(3); // imaginary progress to show that we are doing something
       let stats = await pfs.stat(this.directory);
       // directory exists
       // TODO safety dance: check if changes have been made, give user option to commit, etc.
@@ -118,6 +121,24 @@ export default class GitManager {
             },
             onAuthSuccess: () => {
               console.log('auth success');
+            },
+            onProgress: (progress) => {
+              let statusBar = document.getElementById('statusBar');
+              if ('total' in progress) {
+                statusBar.innerHTML =
+                  'Loading from ' +
+                  this.providerType +
+                  ': ' +
+                  progress.phase +
+                  ': ' +
+                  progress.loaded +
+                  ' / ' +
+                  progress.total;
+                setProgressBar((progress.loaded / progress.total) * 100);
+              } else {
+                statusBar.innerHTML = progress.phase + ': ' + progress.loaded;
+                setProgressBar(90);
+              }
             },
           };
           await git.clone(cloneobj) /*.catch(async (err) => {
