@@ -120,7 +120,20 @@ export default class GitManager {
               console.log('auth success');
             },
           };
-          await git.clone(cloneobj);
+          await git.clone(cloneobj) /*.catch(async (err) => {
+            console.error('clone error, checking repo size', err);
+            // check if repo is too large
+            let size = await this.getRepoSize();
+            console.log('Got size: ', size);
+            // size.size is reported in kb
+            // check if it is larger than 100mb
+            if (size > 100000) {
+              throw { name: 'RepoTooLargeError', message: size };
+            } else {
+              throw new Error('clone error');
+            }
+          })*/;
+
           // update remote
           await git.deleteRemote({
             fs,
@@ -198,6 +211,16 @@ export default class GitManager {
         console.error('getCurrentHeadSha error', err);
         throw err;
       });
+  }
+
+  async getRepoSize(repo = this.repo) {
+    // use the cloud client to query the size of the specified repo
+    return await this.cloud.getRepoSize(repo);
+  }
+
+  getRepoFromCloneURL(cloneUrl) {
+    // use the cloud client to query the repo from the clone url\
+    return this.cloud.getRepoFromCloneURL(cloneUrl);
   }
 
   async createBranch(commitMsg) {
@@ -503,7 +526,7 @@ export default class GitManager {
     return await this.cloud.getSpecifiedUserOrgRepos(userOrg, per_page, page);
   }
 
-  getRawURL() {
+  getRawURL(repo = this.repo) {
     return this.cloud.getRawURL();
   }
 

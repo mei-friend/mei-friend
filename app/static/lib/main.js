@@ -830,6 +830,7 @@ export async function openUrlFetch(url = '', updateAfterLoading = true) {
         // clone repo
         gm = new GitManager('github', 'github', githubToken);
         // TODO modify for multiple git providers
+        // TODO use checkAndClone mechanism to warn about excessive sizes
         gm.clone(`https://github.com/${userOrg}/${repo}.git`, branch)
           .then(() => {
             gm.readFile(filepath)

@@ -1090,6 +1090,17 @@ export const lang = {
   githubMessage: { text: 'Message' },
   none: { text: 'None' },
   commitFileNameText: { text: 'File name' },
+  cloneError: { text: 'Error cloning repository. ' },
+  repoTooLargeError: { text: 'The repository is too large to clone: ' },
+  repoSizeWarning: {
+    text: 'To open the requested file from GitHub, mei-friend will need to clone this rather large repository. Are you sure you wish to proceed? Size of data to be downloaded: ',
+  },
+  repoSizeWarningCancel: {
+    text: 'Cancel',
+  },
+  repoSizeWarningProceed: {
+    text: 'Proceed',
+  },
   forkRepository: { text: 'Fork repository' },
   forkError: { text: 'Sorry, could not fork repository' },
   loadingFile: { text: 'Loading file' },
