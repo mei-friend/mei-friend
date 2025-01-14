@@ -1,6 +1,6 @@
 # mei-friend-online CHANGELOG.md
 
-## 1.2.0 Enrichment panel, editorial mark-up, GitHub improvements
+## 1.2.0 Enrichment panel, editorial mark-up, GitHub improvements (released on 17 January 2025)
 - Release of major new functionalities: 
 
   - expansion of mei-friend's facilities for editorial mark-up through a re-worked annotation panel (now renamed to enrichment panel). Thanks to @annplaksin!
@@ -14,6 +14,7 @@
 - Clear undo history upon file loading to prevent undoing freshly loaded MEI file (fixes #117)
 - Allow default key bindings in Solid URL text field
 - Fix bug that prevented Fronimo files being opened via the git integration
+- Improve display of long filenames (thx @maxrothman)
 
 ### 1.1.8 Merge isomorphic-git and mark-up enrichment developments
 
