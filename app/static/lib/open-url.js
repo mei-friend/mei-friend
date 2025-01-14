@@ -96,7 +96,6 @@ export function openUrl(showSamples = false) {
 export function openUrlCancel() {
   // user has cancelled the "Open URL" action
   // => hide Open URL interface, show file status display
-  let fileStatusElement = document.querySelector('.fileStatus');
   let openUrlElement = document.querySelector('.openUrlOverlay');
   // show file status, hide openUrl
   openUrlElement.style.display = 'none';

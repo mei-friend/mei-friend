@@ -175,7 +175,7 @@ export function setIsMEI(bool) {
 
 export async function setFileChangedState(fileChangedState) {
   fileChanged = fileChangedState;
-  const fileStatusElement = document.querySelector('.fileStatus');
+  const fileStatusElement = document.querySelector('#fileStatus');
   const fileChangedIndicatorElement = document.querySelector('#fileChanged');
   const fileStorageExceededIndicatorElement = document.querySelector('#fileStorageExceeded');
   const commitUI = document.querySelector('#commitUI');
@@ -234,9 +234,18 @@ export function setFileLocationType(t) {
 export function updateFileStatusDisplay() {
   document.querySelector('#fileName').innerText = meiFileName.substring(meiFileName.lastIndexOf('/') + 1);
   document.querySelector('#fileLocation').innerText = meiFileLocationPrintable || '';
-  document.querySelector('#fileLocation').title = meiFileLocation || '';
-  if (fileLocationType === 'file') document.querySelector('#fileName').setAttribute('contenteditable', '');
-  else document.querySelector('#fileName').removeAttribute('contenteditable', '');
+  let tooltip;
+  if (meiFileLocation) {
+    tooltip = meiFileLocation + ': ' + meiFileName;
+  } else {
+    tooltip = meiFileName;
+  }
+  document.querySelector('#fileNameContainer').title = tooltip;
+  if (fileLocationType === 'file') {
+    document.querySelector('#fileName').setAttribute('contenteditable', '');
+  } else {
+    document.querySelector('#fileName').removeAttribute('contenteditable');
+  }
 }
 
 export function loadDataInEditor(meiXML, setFreshlyLoaded = true) {
