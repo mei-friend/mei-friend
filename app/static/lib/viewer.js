@@ -1614,6 +1614,13 @@ export default class Viewer {
     }
   } // addMeiFriendOptionsToSettingsPanel()
 
+  /**
+   * 
+   * @param {string} elementName (such as 'supplied', 'unclear', 'sic', 'corr', 'orig', 'reg', 'add', 'del')
+   * @param {boolean} checkedMarkup whether the markup is shown in notation
+   * @param {string} colorValue the color value to set (e.g. #e69500)
+   * @param {boolean} setDefault 
+   */
   setHighlightColorProperty(elementName, checkedMarkup, colorValue, setDefault = false) {
     let rt = document.querySelector(':root');
     if (setDefault) {

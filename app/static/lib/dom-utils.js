@@ -507,7 +507,7 @@ export function scrollTo(container, element) {
 
 /**
  * Processes entire xmlDoc element for markup elemenets
- * and adds a color attribute to first child of them
+ * and adds a color attribute to first level of children
  * @param {Node} xmlNode
  */
 export function addColorToMarkupElements(xmlNode) {
