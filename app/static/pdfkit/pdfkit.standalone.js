@@ -122,7 +122,7 @@ class PDFObject {
   static convert(object, encryptFn = null) {
     // String literals are converted to the PDF name type
     if (typeof object === 'string') {
-      return `/${Object}`; // String objects are converted to PDF strings (UTF-16)
+      return `/${object}`; // String objects are converted to PDF strings (UTF-16)
     } else if (object instanceof String) {
       let string = object; // Detect if this is a unicode string
 
@@ -184,7 +184,7 @@ class PDFObject {
     } else if (typeof object === 'number') {
       return PDFObject.number(object);
     } else {
-      return `${Object}`;
+      return `${object}`;
     }
   }
 
