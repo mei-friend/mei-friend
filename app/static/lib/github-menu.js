@@ -8,6 +8,7 @@ import {
   handleEncoding,
   isMEI,
   meiFileName,
+  openUrlFetch,
   setFileChangedState,
   setFileLocationType,
   setMeiFileInfo,
@@ -36,6 +37,8 @@ const ghActionsInputSetters = [
     },
   },
 ];
+
+const REPO_SIZE_WARNING_THRESHOLD = 100 * 1024; // 100MB; consider making this a user setting
 
 function forkRepo() {
   forkRepository(gm);
@@ -72,9 +75,15 @@ export async function forkRepoClicked() {
           gm.filepath = _filepath;
           setMeiFileInfo(gm.filepath, gm.repo, gm.repo + ':');
           // clone and load the file
-          await gm.clone(`https://github.com/${gm.repo}.git`, gm.branch);
-          loadFile(_file);
-          updateFileStatusDisplay();
+          await checkAndClone(`https://github.com/${gm.repo}.git`, gm.branch);
+          /*
+            .then(() => {
+              loadFile(_file);
+              updateFileStatusDisplay();
+            })
+            .catch((e) => {
+              showCloneErrorAlert(e);
+            });*/
         }
       }, forkRepositoryToSelector.value)
       .catch((e) => {
@@ -186,24 +195,37 @@ function branchContentsFileClicked(ev) {
       // console.log('pfsDirExists() returned false');
       // 2. if not, clone the repo
       githubLoadingIndicator.classList.add('clockwise'); // removed by loadFile()
-      await gm.clone();
-      console.log('menu: clone() completed, doing load file');
-      // 3. read the file
-      loadFile(ev.target.innerText);
+      await checkAndClone(ev.target.innerText);
+      /*
+        .clone()
+        .then(() => {
+          console.log('menu: clone() completed, doing load file');
+          // 3. read the file
+          loadFile(ev.target.innerText);
+        })
+        .catch((e) => {
+          showCloneErrorAlert(e, gm.filepath + ev.target.innerText);
+        });
+      */
     } else {
       // console.log('DECISION: 2');
       // 2a. if it does, check the repo is the same as the one we want to load
-      gm.getRemote().then((remote) => {
+      gm.getRemote().then(async (remote) => {
         // console.log('DECISION: 3');
         // console.log('getRemote worked!', remote);
         if (!remote || remote !== gm.repo) {
           // console.log('DECISION: 4');
           // 3a. if not, clone the repo
           githubLoadingIndicator.classList.add('clockwise'); // removed by loadFile()
-          gm.clone().then(() => {
-            // 4. read the file
-            loadFile(ev.target.innerText);
-          });
+          await checkAndClone(ev.target.innerText);
+          /*
+            .then(() => {
+              // 4. read the file
+              loadFile(ev.target.innerText);
+            })
+            .catch((e) => {
+              showCloneErrorAlert(e, gm.filepath + ev.target.innerText);
+            });*/
         } else {
           // console.log('DECISION: 5');
           // 3b. if we already have the correct repo, check we're on the correct branch
@@ -571,6 +593,43 @@ export async function fillInBranchContents(e) {
       console.error("Couldn't read Github repo to fill in branch contents:", err);
     });
 } // fillInBranchContents()
+
+function showCloneErrorAlert(e) {
+  // stop the loading spinner
+  document.getElementById('GithubLogo').classList.remove('clockwise');
+  let msg;
+  /*
+  if (typeof e === 'object' && 'name' in e && e.name === 'RepoTooLargeError') {
+    let size = parseInt(e.message);
+    // convert to KB to MB:
+    size = Math.round(size / 1024).toFixed(2);
+    msg = translator.lang.repoTooLargeError.text + ': ' + size + 'MB';
+  } else {
+    msg = translator.lang.cloneError.text;
+  }*/
+  msg = translator.lang.cloneError.text;
+  v.showAlert(msg);
+  /*
+  v.showUserPrompt(msg, [
+    {
+      label: translator.lang.overrideCloneWithUrlCancel.text,
+      event: () => {
+        v.hideUserPrompt();
+      },
+    },
+    {
+      label: translator.lang.overrideCloneWithUrlOpen.text,
+      event: async () => {
+        // open the requested file via its raw URL
+        let url = gm.getRawURL();
+        // append file path, ensuring there's only one slash between the repo and the file path
+        url += filepath.startsWith('/') ? filepath : '/' + filepath;
+        openUrlFetch(new URL(url));
+        v.hideUserPrompt();
+      },
+    },
+  ]);*/
+}
 
 function handleWorkflowsListReceived(resp) {
   const actionsDivider = document.getElementById('actionsDividerStart');
@@ -1040,4 +1099,55 @@ function generateGithubActionsInputConfig(inputs, input) {
   inputConfig.insertAdjacentElement('beforeend', inputName);
   inputConfig.insertAdjacentElement('beforeend', inputFieldWrapper);
   return inputConfig;
+}
+
+export async function checkAndClone(file, branchurl = gm.cloud.getCloneURL(), branch = gm.branch) {
+  // check if the repo is very large; if so, ask user to confirm
+  let repo = gm.getRepoFromCloneURL(branchurl);
+  let size = await gm.getRepoSize(repo);
+  console.log('Repo size: ', size);
+  if (size > REPO_SIZE_WARNING_THRESHOLD) {
+    // stop the loading spinner
+    document.getElementById('GithubLogo').classList.remove('clockwise');
+    v.showUserPrompt(
+      translator.lang.repoSizeWarning.text + (size / 1024).toFixed(2) + 'MB',
+      [
+        {
+          label: translator.lang.repoSizeWarningCancel.text,
+          event: () => {
+            v.hideUserPrompt();
+          },
+        },
+        {
+          label: translator.lang.repoSizeWarningProceed.text,
+          event: async () => {
+            // restart the loading spinner
+            document.getElementById('GithubLogo').classList.add('clockwise');
+            // hide the warning prompt
+            v.hideUserPrompt();
+            // proceed with clone
+            gm.clone(branchurl, branch)
+              .then(() => {
+                loadFile(file);
+                updateFileStatusDisplay();
+              })
+              .catch((e) => {
+                showCloneErrorAlert(e);
+              });
+          },
+        },
+      ],
+      'warning'
+    );
+  } else {
+    console.log('Repo size is OK, proceeding with clone...');
+    gm.clone(branchurl, branch)
+      .then(() => {
+        loadFile(file);
+        updateFileStatusDisplay();
+      })
+      .catch((e) => {
+        showCloneErrorAlert(e);
+      });
+  }
 }

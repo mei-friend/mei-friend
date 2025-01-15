@@ -98,6 +98,15 @@ export default class GitCloudClient {
     }).then((res) => res.json());
   }
 
+  async getRepoSize(repo) {
+    const sizeUrl = `https://api.github.com/repos/${repo}`;
+    let size = await fetch(sizeUrl, {
+      method: 'GET',
+      headers: this.apiHeaders,
+    }).then((res) => res.json());
+    return size.size;
+  }
+
   async getBranches(per_page = 30, page = 1, repo = this.repo) {
     // fetch all branches of the current repository from the cloud provider
     const branchesUrl = `https://api.github.com/repos/${repo}/branches?per_page=${per_page}&page=${page}`;
@@ -260,20 +269,38 @@ export default class GitCloudClient {
     }
   }
 
-  getRawURL() {
+  getRepoFromCloneURL(cloneURL = this.getCloneURL()) {
+    // return the repo name from the clone URL
+    // based on the current provider
+    // TODO check this is not totally broken
+    switch (this.providerType) {
+      case 'github':
+        return cloneURL.replace('https://github.com/', '');
+      case 'gitlab':
+        return cloneURL.replace(`https://${this.provider}/gitlab/`, '');
+      case 'bitbucket':
+        return cloneURL.replace(`https://${this.provider}/bitbucket/`, '');
+      case 'codeberg':
+        return cloneURL.replace(`https://${this.provider}/codeberg/`, '');
+      default:
+        throw new Error('Unknown provider');
+    }
+  }
+
+  getRawURL(repo = this.gm.repo) {
     // return the raw URL of the current repository
     // based on the current repo (contains the userOrg and repoName)
     // ensure that the URL matches the current provider
     // TODO check this is not totally broken
     switch (this.providerType) {
       case 'github':
-        return `https://raw.githubusercontent.com/${this.gm.repo}`;
+        return `https://raw.githubusercontent.com/${repo}`;
       case 'gitlab':
-        return `https://${this.provider}/gitlab/${this.gm.repo}`;
+        return `https://${this.provider}/gitlab/${repo}`;
       case 'bitbucket':
-        return `https://${this.provider}/bitbucket/${this.gm.repo}`;
+        return `https://${this.provider}/bitbucket/${repo}`;
       case 'codeberg':
-        return `https://${this.provider}/codeberg/${this.gm.repo}`;
+        return `https://${this.provider}/codeberg/${repo}`;
       default:
         throw new Error('Unknown provider');
     }

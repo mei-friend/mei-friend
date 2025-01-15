@@ -1,7 +1,7 @@
 // mei-friend version and date
 export const version = '1.2.0';
-export const versionDate = '17 December 2024'; // use full or 3-character english months, will be translated
-export const splashDate = '11 December 2024'; // date of the splash screen content, same translation rules apply
+export const versionDate = '15 December 2024'; // use full or 3-character english months, will be translated
+export const splashDate = '15 December 2024'; // date of the splash screen content, same translation rules apply
 
 var vrvWorker;
 var spdWorker;
@@ -175,7 +175,7 @@ export function setIsMEI(bool) {
 
 export async function setFileChangedState(fileChangedState) {
   fileChanged = fileChangedState;
-  const fileStatusElement = document.querySelector('.fileStatus');
+  const fileStatusElement = document.querySelector('#fileStatus');
   const fileChangedIndicatorElement = document.querySelector('#fileChanged');
   const fileStorageExceededIndicatorElement = document.querySelector('#fileStorageExceeded');
   const commitUI = document.querySelector('#commitUI');
@@ -234,9 +234,18 @@ export function setFileLocationType(t) {
 export function updateFileStatusDisplay() {
   document.querySelector('#fileName').innerText = meiFileName.substring(meiFileName.lastIndexOf('/') + 1);
   document.querySelector('#fileLocation').innerText = meiFileLocationPrintable || '';
-  document.querySelector('#fileLocation').title = meiFileLocation || '';
-  if (fileLocationType === 'file') document.querySelector('#fileName').setAttribute('contenteditable', '');
-  else document.querySelector('#fileName').removeAttribute('contenteditable', '');
+  let tooltip;
+  if (meiFileLocation) {
+    tooltip = meiFileLocation + ': ' + meiFileName;
+  } else {
+    tooltip = meiFileName;
+  }
+  document.querySelector('#fileNameContainer').title = tooltip;
+  if (fileLocationType === 'file') {
+    document.querySelector('#fileName').setAttribute('contenteditable', '');
+  } else {
+    document.querySelector('#fileName').removeAttribute('contenteditable');
+  }
 }
 
 export function loadDataInEditor(meiXML, setFreshlyLoaded = true) {
@@ -830,6 +839,7 @@ export async function openUrlFetch(url = '', updateAfterLoading = true) {
         // clone repo
         gm = new GitManager('github', 'github', githubToken);
         // TODO modify for multiple git providers
+        // TODO use checkAndClone mechanism to warn about excessive sizes
         gm.clone(`https://github.com/${userOrg}/${repo}.git`, branch)
           .then(() => {
             gm.readFile(filepath)
@@ -1022,7 +1032,8 @@ async function vrvWorkerEventsHandler(ev) {
         if (ev.data.forceUpdate) {
           v.currentPage = ev.data.pageNo;
         }
-        updateStatusBar();
+        pageInfoToStatusBar();
+        setProgressBar(0);
         updateHtmlTitle();
         document.getElementById('verovio-panel').innerHTML = ev.data.svg;
         if (document.getElementById('showFacsimilePanel') && document.getElementById('showFacsimilePanel').checked) {
@@ -1054,7 +1065,8 @@ async function vrvWorkerEventsHandler(ev) {
       }
       break;
     case 'navigatePage': // resolve navigation with page turning
-      updateStatusBar();
+      pageInfoToStatusBar();
+      setProgressBar(0);
       document.getElementById('verovio-panel').innerHTML = ev.data.svg;
       let ms = document.querySelectorAll('.measure'); // find measures on page
       if (ms.length > 0) {
@@ -1133,7 +1145,7 @@ async function vrvWorkerEventsHandler(ev) {
       //   meiFileName.substring(meiFileName.lastIndexOf("/") + 1) +
       //   ', pageBreaks', v.pageBreaks);
       v.updateData(cm, false, true);
-      updateStatusBar();
+      pageInfoToStatusBar();
       v.updatePageNumDisplay();
       v.busy(false);
       break;
@@ -1565,7 +1577,8 @@ export let cmd = {
   fileNameChange: () => {
     if (fileLocationType === 'file') {
       meiFileName = document.getElementById('fileName').innerText;
-      updateStatusBar();
+      pageInfoToStatusBar();
+      setProgressBar(0);
       updateHtmlTitle();
       if (storage.supported) storage.safelySetStorageItem('meiFileName', meiFileName);
     } else {
@@ -2333,12 +2346,19 @@ function moveProgressBar() {
   }
 }
 
-// control progress bar progress/width (in percent)
-function setProgressBar(percentage) {
+/**
+ * control progress bar progress/width (in percent)
+ * @param {number} percentage
+ */
+export function setProgressBar(percentage) {
   document.getElementById('progressBar').style.width = percentage + '%';
 }
 
-export function updateStatusBar() {
+/**
+ * updates the status bar with filename,
+ * current page number and total page count
+ */
+export function pageInfoToStatusBar() {
   if (!v) return;
   document.getElementById('statusBar').innerHTML =
     meiFileName.substring(meiFileName.lastIndexOf('/') + 1) +

@@ -167,7 +167,6 @@ a:active {
 
 .header {
   display: flex;
-  flex-shrink: 0;
   align-items: center;
   width: 100%;
   justify-content: flex-start;
@@ -190,8 +189,8 @@ a:active {
 .settingsButton {
   width: 16px;
   height: 16px;
-  padding-left: 6px;
-  padding-right: 6px;
+  padding-left: 4px;
+  padding-right: 4px;
   cursor: pointer;
   fill: var(--textColor);
 }
