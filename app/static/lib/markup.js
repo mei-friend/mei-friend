@@ -374,8 +374,10 @@ export function addMarkup(event) {
           newSelection.push(child.getAttribute('xml:id'));
         }
       });
-      v.selectedElements = newSelection;
       setChoiceOptions(multiLayerContent[multiLayerContent.length - 1]);
+      handleEditorChanges();
+      v.selectedElements = newSelection;
+      v.setFocusToVerovioPane();
     }
   }
 } // addMarkup()
