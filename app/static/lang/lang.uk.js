@@ -4,6 +4,7 @@
 
 import * as att from '../lib/attribute-classes.js';
 import { heart } from '../css/icons.js';
+import { getChangelogUrl } from '../lib/utils.js';
 
 export const lang = {
   // Splash screen
@@ -12,6 +13,11 @@ export const lang = {
     text: 'Показувати початковий екран при завантаженні',
     description: 'Показувати початковий екран mei-friend при завантаженні додатку',
   },
+  splashUpdateIndicator: {
+    html: `
+      Наступний текст було оновлено з моменту останнього підтвердження початкового екрану. Для деталей, будь ласка, <a href="${getChangelogUrl()}" target="_blank">ознайомтеся з журналом змін</a>.`,
+  },
+  splashLastUpdated: { text: 'Текст востаннє оновлено: ' },
   splashBody: {
     html: `
     <p>
@@ -21,13 +27,10 @@ export const lang = {
       отримання додаткової інформації.
     </p>
     <p>
-      Незважаючи на те, що mei-friend є веб-додатком, ваші особисті дані (включаючи кодування, яке ви редагуєте, налаштування додатку та поточні дані входу, якщо такі є) зберігаються в локальному сховищі вашого веб-переглядача
-      <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank"
-        >local storage</a
-      > і не передаються або не зберігаються на наших серверах.
+      Хоча mei-friend є додатком на основі браузера, ваші особисті дані (включаючи кодування, яке ви редагуєте, налаштування додатку та поточні дані для входу, якщо такі є) зберігаються у <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank">локальному сховищі</a> вашого браузера і не зберігаються на наших серверах.
     </p>
     <p>
-      Дані передаються на GitHub лише тоді, коли ви це явно запитуєте (наприклад, коли ви входите в систему на GitHub, завантажуєте ваше кодування з репозиторію GitHub або фіксуєте його, або коли ви запитуєте виконання робочого процесу GitHub Action). Точно так само дані передаються на обраний вами провайдер Solid лише тоді, коли ви це явно запитуєте (наприклад, коли ви входите в систему Solid або завантажуєте або зберігаєте анотації станд-офу).
+      Дані передаються на GitHub лише тоді, коли ви явно запитуєте це (наприклад, коли ви входите в GitHub, завантажуєте своє кодування з або фіксуєте в репозиторій GitHub, або коли ви запитуєте виконання робочого процесу GitHub Action для вас). Аналогічно, дані передаються до обраного вами постачальника Solid лише тоді, коли ви явно запитуєте це (наприклад, коли ви входите в Solid, або завантажуєте чи зберігаєте stand-off анотації). З технічних причин, певні взаємодії з GitHub (клонування репозиторію у ваш браузер при першому відкритті кодування або фіксація змін у репозиторій) вимагають передачі даних на проксі-сервер, розміщений mdw – Університетом музики та виконавських мистецтв у Відні. Цей сервер діє як посередник між вашим браузером і GitHub і не зберігає жодних даних, що передаються через нього.
     </p>
     <p>
       Ми використовуємо <a href="https://matomo.org/" target="_blank">Matomo</a>
@@ -193,9 +196,6 @@ export const lang = {
   addDiminuendoHairpinText: { text: 'Димінуендо (клинчатий)' },
   addBeamText: { text: 'Група нот' },
   addBeamSpanText: { text: 'Спан групи нот' },
-  addSuppliedText: { text: 'Додати поставлене' },
-  addSuppliedArticText: { text: 'Додати поставлене (артикуляція)' },
-  addSuppliedAccidText: { text: 'Додати поставлене (акценти)' },
   addArpeggioText: { text: 'Арпеджіо' },
   addFermataText: { text: 'Фермата' },
   addGlissandoText: { text: 'Глісандо' },
@@ -284,6 +284,9 @@ export const lang = {
   breaksSelectLine: { text: 'За системами' },
   breaksSelectEncoded: { text: 'За системами та сторінками' },
   breaksSelectSmart: { text: 'Розумні' },
+  choiceSelect: { description: 'Виберіть відображений вміст для елементів вибору' },
+  choiceDefault: { text: '(стандартний вибір)' },
+  noChoice: { text: '(немає доступних варіантів)' },
   updateControlsLabel: { text: 'Оновлення', description: 'Поведінка оновлення нотації після змін в кодуванні' },
   liveUpdateCheckbox: { description: 'Автоматичне оновлення нотації після змін в кодуванні' },
   codeManualUpdateButton: { description: 'Ручне оновлення нотації' },
@@ -434,8 +437,8 @@ export const lang = {
   annotationCloseButtonText: { text: 'Закрити панель анотацій' },
   hideAnnotationPanelButton: { description: 'Закрити панель анотацій' },
   closeAnnotationPanelButton: { description: 'Закрити панель анотацій' },
-  annotationToolsButton: { text: 'Інструменти', description: 'Інструменти анотацій' },
-  annotationListButton: { text: 'Список', description: 'Список анотацій' },
+  annotationToolsButton: { description: 'Інструменти анотацій' },
+  annotationListButton: { description: 'Список анотацій' },
   writeAnnotStandoffText: { text: 'Web анотація' },
   annotationToolsIdentifyTitle: { text: 'Визначити' },
   annotationToolsIdentifySpan: { text: "Визначити музичний об'єкт" },
@@ -452,6 +455,9 @@ export const lang = {
   loadWebAnnotationMessage2: { text: 'спробуйте ще раз' },
   noAnnotationsToDisplay: { text: 'Немає анотацій для відображення' },
   flipPageToAnnotationText: { description: 'Перейти до цієї анотації' },
+  describeMarkup: { description: 'Опишіть цей розмітка' },
+  deleteMarkup: { description: 'Видалити цей розмітка' },
+  deleteMarkupConfirmation: { text: 'Ви впевнені, що хочете видалити цей розмітка?' },
   deleteAnnotation: { description: 'Видалити цю анотацію' },
   deleteAnnotationConfirmation: { text: 'Ви впевнені, що хочете видалити цю анотацію?' },
   makeStandOffAnnotation: {
@@ -479,6 +485,95 @@ export const lang = {
     text1: "Неможливо створити анотацію, оскільки як xml:id для точки прив'язки MEI відсутній.",
     text2:
       'Будь ласка, присвойте ідентифікатори, вибравши "Маніпулювати" -> "Перерендер MEI (з id)" і повторіть спробу.',
+  },
+  // Markup tools
+  respSelect: {
+    text: 'Вибір відповідальності за розмітку',
+    description: 'Вибір ідентифікатора відповідальності',
+  },
+  selectionSelect: {
+    text: 'Стандартний вибір для розмітки',
+    description: 'Виберіть, чи новостворена розмітка повинна включати вибрані елементи, артикуляції чи випадкові знаки',
+    labels: ['Вибрані елементи', 'Артикуляція', 'Випадковий'],
+    valuesDescriptions: [
+      'Додайте розмітку до вибраних елементів.',
+      'Додайте розмітку до артикуляцій в виділенні.',
+      'Додайте розмітку до випадкових елементів в виділенні.',
+    ],
+  },
+  alternativeEncodingsGrp: {
+    text: 'Альтернативні кодування',
+    description: 'Елементи розмітки, які містять кілька версій.',
+  },
+  addChoiceText: {
+    text: '<choice>',
+    description: 'Групує кілька альтернативних кодувань для того ж самого місця в тексті.',
+  },
+  choiceSicCorr: {
+    description: 'Помістіть вибір у <sic> і додайте <corr>.',
+  },
+  choiceCorrSic: {
+    description: 'Помістіть вибір у <corr> і додайте <sic>.',
+  },
+  choiceOrigReg: {
+    description: 'Помістіть вибір у <orig> і додайте <reg>.',
+  },
+  choiceRegOrig: {
+    description: 'Помістіть вибір у <reg> і додайте <orig>.',
+  },
+  choiceContentTarget: {
+    description: 'Спочатку виберіть вміст для цього елемента, навівши на <choice>.',
+  },
+  addSubstText: {
+    text: '<subst>',
+    description:
+      '(заміна) - Групує транскрипційні елементи, коли комбінація повинна розглядатися як єдиний втручання в текст.',
+  },
+  substAddDel: {
+    description: 'Помістіть вибір у <add> і додайте <del>.',
+  },
+  substDelAdd: {
+    description: 'Помістіть вибір у <del> і додайте <add>.',
+  },
+  substContentTarget: {
+    description: 'Спочатку виберіть вміст для цього елемента, навівши на <subst>.',
+  },
+  editInterventionsGrp: {
+    text: 'Редакційні втручання',
+    description: 'Елементи розмітки, які використовуються для кодування редакційних втручань.',
+  },
+  addSuppliedText: {
+    text: '<supplied>',
+    description: 'Містить матеріал, наданий транскрибером чи редактором з будь-якої причини.',
+  },
+  addUnclearText: {
+    text: '<unclear>',
+    description:
+      'Містить матеріал, який не може бути транскрибований із впевненістю через його нерозбірливість або незчутливість у джерелі.',
+  },
+  addSicText: { text: '<sic>', description: 'Містить, ймовірно, невірний або неточний матеріал.' },
+  addCorrText: {
+    text: '<corr>',
+    description: '(виправлення) - Містить правильну форму видимо помилкового уривка.',
+  },
+  addOrigText: {
+    text: '<orig>',
+    description:
+      '(оригінальний) - Містить матеріал, який позначено як слідуючий оригіналу, а не нормалізований чи виправлений.',
+  },
+  addRegText: {
+    text: '<reg>',
+    description: '(регуляризація) - Містить матеріал, який було регуляризовано чи нормалізовано в певному сенсі.',
+  },
+  descMarkupGrp: {
+    text: 'Описова розмітка',
+    description: 'Елементи розмітки, використовувані для кодування втручань в джерело.',
+  },
+  addAddText: { text: '<add>', description: '(додаток) - Позначає додаток до тексту.' },
+  addDelText: {
+    text: '<del>',
+    description:
+      '(видалення) - Містить інформацію, видалену, позначену як видалену або інакше вказану як зайву або фальшиву в копіювальному тексті автором, копістом, анотатором або виправником.',
   },
 
   // MIDI
@@ -782,20 +877,53 @@ export const lang = {
 
   // Supplied element
   titleSupplied: {
-    text: 'Редагувати редакційний контент',
-    description: 'Управління обробкою елементів <supplied>',
+    text: 'Обробка редакційного вмісту',
+    description: 'Керування обробкою редакційної розмітки',
   },
-  showSupplied: {
-    text: 'Показати елементи <supplied>',
-    description: 'Виділити всі елементи, які містяться в елементі <supplied>',
+  showMarkup: {
+    text: 'Показати елементи редакційної розмітки',
+    description: 'Виділити всі елементи, що містяться в елементах редакційної розмітки',
+  },
+  markupToPDF: {
+    text: 'Розмітка в PDF',
+    description: 'Включити редакційну розмітку у PDF-файл',
+  },
+  alternativeVersionContent: {
+    text: 'Вибір вмісту за замовчуванням для альтернативних кодувань',
+    description: 'Вибір, чи новостворені альтернативні кодування є порожніми або копіями оригінального читання',
+    labels: ['порожнє', 'копія'],
   },
   suppliedColor: {
-    text: 'Вибрати колір виділення <supplied>',
-    description: 'Вибрати колір виділення <supplied>',
+    text: 'Вибір кольору підсвічування для <supplied>',
+    description: 'Вибір кольору підсвічування для <supplied>',
   },
-  respSelect: {
-    text: 'Вибрати відповідальність <supplied>',
-    description: 'Вибрати ідентифікатор відповідальності',
+  unclearColor: {
+    text: 'Вибір кольору підсвічування для <unclear>',
+    description: 'Вибір кольору підсвічування для <unclear>',
+  },
+  sicColor: {
+    text: 'Вибір кольору підсвічування для <sic>',
+    description: 'Вибір кольору підсвічування для <sic>',
+  },
+  corrColor: {
+    text: 'Вибір кольору підсвічування для <corr>',
+    description: 'Вибір кольору підсвічування для <corr>',
+  },
+  origColor: {
+    text: 'Вибір кольору підсвічування для <orig>',
+    description: 'Вибір кольору підсвічування для <orig>',
+  },
+  regColor: {
+    text: 'Вибір кольору підсвічування для <reg>',
+    description: 'Вибір кольору підсвічування для <reg>',
+  },
+  addColor: {
+    text: 'Вибір кольору підсвічування для <add>',
+    description: 'Вибір кольору підсвічування для <add>',
+  },
+  delColor: {
+    text: 'Вибір кольору підсвічування для <del>',
+    description: 'Вибір кольору підсвічування для <del>',
   },
   // EDITOR SETTINGS / CODEMIRROR SETTINGS
   editorSettingsHeader: {
@@ -873,6 +1001,11 @@ export const lang = {
   keyMap: {
     text: 'Карта клавіш',
     description: 'Вибрати карту клавіш',
+  },
+  persistentSearch: {
+    text: 'Постійний пошуковий блок',
+    description:
+      'Використовуйте поведінку постійного пошукового блоку (пошуковий блок залишається відкритим до явного закриття)',
   },
 
   // Verovio settings

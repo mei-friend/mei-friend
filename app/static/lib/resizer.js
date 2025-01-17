@@ -19,8 +19,17 @@ let facsimileResizerWidth = defaultFacsimileResizerWidth; // px, compare to css 
 // general settings
 let minProportion = 0.05; // mimimum proportion of both notationProportion, facsimileProportion
 let maxProportion = 0.95;
-let storage;
+let storage; // storage object for local storage
 
+/**
+ * Sets orientation of notation and facsimile panel, updates CSS,
+ * and refreshes rendering of GUI.
+ * @param {CodeMirror} cm
+ * @param {String} _notationOrientation
+ * @param {String} _facsimileOrientation
+ * @param {Viewer} v
+ * @param {Object} _storage
+ */
 export function setOrientation(cm, _notationOrientation = '', _facsimileOrientation = '', v = null, _storage = null) {
   // store arguments
   if (_notationOrientation) notationOrientation = _notationOrientation;
@@ -47,12 +56,8 @@ export function setOrientation(cm, _notationOrientation = '', _facsimileOrientat
   const friendSz = document.getElementById('friendContainer');
   const notationDiv = document.getElementById('notation');
   const verovioContainer = document.getElementById('verovioContainer');
-  const verovioPanel = document.getElementById('verovio-panel');
   const facsimileDragger = document.getElementById('facsimile-dragger');
   const facsimileContainer = document.getElementById('facsimileContainer');
-  const facsimilePanel = document.getElementById('facsimile-panel');
-  const verovioControlMenu = document.getElementById('notationControlBar');
-  const facsimileControlMenu = document.getElementById('facsimileControlBar');
   const annotationPanel = document.getElementById('annotationPanel');
   const showAnnotationPanelCheckbox = document.getElementById('showAnnotationPanel');
   const showFacsimile = document.getElementById('showFacsimilePanel').checked;
@@ -73,7 +78,7 @@ export function setOrientation(cm, _notationOrientation = '', _facsimileOrientat
       sz.width -= annotationPanelExtent; // subtract width of annotation panel
       annotationPanel.style.display = 'unset';
       annotationPanel.style.width = annotationPanelExtent;
-      annotationPanel.style.height = sz.height + 5; // HACK for 5 pix difference!
+      annotationPanel.style.height = sz.height; // + 5; WG: Hack removed here. // DW: HACK for 5 pix difference!
     } else {
       annotationPanel.style.display = 'none';
     }
@@ -88,12 +93,12 @@ export function setOrientation(cm, _notationOrientation = '', _facsimileOrientat
     if (showAnnotationPanelCheckbox && showAnnotationPanelCheckbox.checked) {
       sz.height -= annotationPanelExtent; // subtract width of annotation panel
       annotationPanel.style.display = 'unset';
-      annotationPanel.style.width = sz.width + 5; // HACK for 5 pix difference!
+      annotationPanel.style.width = sz.width; // + 5; WG: hack removed here. // HACK for 5 pix difference!
       annotationPanel.style.height = annotationPanelExtent;
     } else {
       annotationPanel.style.display = 'none';
     }
-    notationDiv.style.width = Math.ceil(sz.width * notationProportion);
+    notationDiv.style.width = Math.floor(sz.width * notationProportion);
     notationDiv.style.height = sz.height - 6; //TODO: remove when border removed
     cm.setSize(sz.width * (1 - notationProportion) - notationResizerWidth, sz.height - codeCheckerHeight);
   }
@@ -103,51 +108,38 @@ export function setOrientation(cm, _notationOrientation = '', _facsimileOrientat
   friendSz.style.maxHeight = sz.height;
 
   switch (facsimileOrientation) {
-    case 'top':
     case 'bottom':
+    case 'top':
       if (showFacsimile) {
-        facsimileContainer.style.display = 'block';
+        facsimileContainer.style.display = 'flex';
         facsimileContainer.style.height =
-          parseFloat(notationDiv.style.height) * facsimileProportion - facsimileResizerWidth;
-        facsimilePanel.style.height =
-          parseFloat(facsimileContainer.style.height) - facsimileControlMenu.getBoundingClientRect().height;
-        verovioContainer.style.height = parseFloat(notationDiv.style.height) * (1 - facsimileProportion);
-        verovioPanel.style.height =
-          parseFloat(verovioContainer.style.height) - verovioControlMenu.getBoundingClientRect().height;
+          parseFloat(notationDiv.style.height) * facsimileProportion - facsimileResizerWidth / 2;
+        verovioContainer.style.height =
+          parseFloat(notationDiv.style.height) * (1 - facsimileProportion) - facsimileResizerWidth / 2;
       } else {
         facsimileContainer.style.display = 'none';
-        facsimileContainer.style.height = 0;
-        facsimilePanel.style.height = '';
+        facsimileContainer.style.height = '';
         verovioContainer.style.height = '';
-        verovioPanel.style.height = '';
       }
-      facsimileContainer.style.width = notationDiv.style.width;
-      facsimilePanel.style.width = parseFloat(facsimileContainer.style.width);
-      verovioContainer.style.width = notationDiv.style.width;
-      verovioPanel.style.width = parseFloat(verovioContainer.style.width);
+      facsimileContainer.style.width = '';
+      verovioContainer.style.width = '';
       break;
     case 'left':
     case 'right':
       if (showFacsimile) {
-        facsimileContainer.style.display = 'block';
+        facsimileContainer.style.display = 'flex';
         facsimileContainer.style.width =
-          parseFloat(notationDiv.style.width) * facsimileProportion - facsimileResizerWidth;
-        facsimilePanel.style.width = parseFloat(facsimileContainer.style.width);
-        verovioContainer.style.width = parseFloat(notationDiv.style.width) * (1 - facsimileProportion);
-        verovioPanel.style.width = parseFloat(verovioContainer.style.width);
+          parseFloat(notationDiv.style.width) * facsimileProportion - facsimileResizerWidth / 2;
+        verovioContainer.style.width =
+          parseFloat(notationDiv.style.width) * (1 - facsimileProportion) - facsimileResizerWidth / 2;
       } else {
         facsimileContainer.style.display = 'none';
-        facsimileContainer.style.width = 0;
-        facsimilePanel.style.width = '';
+        facsimileContainer.style.width = '';
         verovioContainer.style.width = '';
-        verovioPanel.style.width = '';
       }
-      facsimileContainer.style.height = parseFloat(notationDiv.style.height);
-      verovioContainer.style.height = parseFloat(notationDiv.style.height);
-      verovioPanel.style.height =
-        parseFloat(verovioContainer.style.height) - verovioControlMenu.getBoundingClientRect().height;
-      facsimilePanel.style.height =
-        parseFloat(facsimileContainer.style.height) - facsimileControlMenu.getBoundingClientRect().height;
+      facsimileContainer.style.height = '';
+      // parseFloat(notationDiv.style.height) - facsimileControlMenu.getBoundingClientRect().height;
+      verovioContainer.style.height = '';
       break;
   }
   facsimileDragger.style.display = showFacsimile ? 'flex' : 'none';
@@ -162,7 +154,7 @@ export function setOrientation(cm, _notationOrientation = '', _facsimileOrientat
       setTimeout(() => v.updateLayout(), 33);
     }
   }
-}
+} // setOrientation()
 
 export function getOrientation() {
   return notationOrientation;
@@ -188,6 +180,10 @@ export function getFacsimileOrientation() {
   return facsimileOrientation;
 }
 
+/**
+ * Returns size of #friendContainer minus header, footer, and MIDI panel
+ * @returns {Object} friendSz - width and height of friendContainer
+ */
 export function calcSizeOfContainer() {
   let bodySz = document.querySelector('body').getBoundingClientRect();
   let friendSz = document.getElementById('friendContainer').getBoundingClientRect();
@@ -205,17 +201,11 @@ export function calcSizeOfContainer() {
   return friendSz;
 }
 
-export function getVerovioContainerSize() {
-  let v = document.getElementById('notation');
-  let c = document.getElementById('notationControlBar');
-  if (!c || !v) return false;
-  let vbox = v.getBoundingClientRect();
-  let cbox = c.getBoundingClientRect();
-  vbox.height -= cbox.height;
-  return vbox;
-}
-
-// resizer handlers for resizing the notation/editor relative size
+/**
+ * Adds resizer handlers for resizing the notation/editor relative size
+ * @param {Viewer*} v
+ * @param {CodeMirror} cm
+ */
 export function addNotationResizerHandlers(v, cm) {
   const resizer = document.getElementById('dragMe');
   const notation = resizer.previousElementSibling;
@@ -236,7 +226,7 @@ export function addNotationResizerHandlers(v, cm) {
     document.addEventListener('mousemove', mouseMoveHandler);
     document.addEventListener('mouseup', mouseUpHandler);
     // console.log("Mouse down x/y: " + x + "/" + y + ', ' + notationSize);
-  };
+  }; // mouseDownHandler
 
   const mouseMoveHandler = function (e) {
     const dx = e.clientX - x;
@@ -298,7 +288,7 @@ export function addNotationResizerHandlers(v, cm) {
     notation.style.pointerEvents = 'none';
     encoding.style.userSelect = 'none';
     encoding.style.pointerEvents = 'none';
-  };
+  }; // mouseMoveHandler
 
   const mouseUpHandler = function () {
     resizer.style.removeProperty('cursor');
@@ -316,12 +306,16 @@ export function addNotationResizerHandlers(v, cm) {
     if (storage && storage.supported) {
       storage.notationProportion = notationProportion;
     }
-  };
+  }; // mouseUpHandler
 
   resizer.addEventListener('mousedown', mouseDownHandler);
 } // addNotationResizerHandlers()
 
-// resizer handlers for resizing the facsimile panel
+/**
+ * Adds resizer handlers for resizing the facsimile panel
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
+ */
 export function addFacsimilerResizerHandlers(v, cm) {
   const resizer = document.getElementById('facsimile-dragger');
   const verovioContainer = document.getElementById('verovioContainer');
@@ -340,7 +334,7 @@ export function addFacsimilerResizerHandlers(v, cm) {
     document.addEventListener('mousemove', mouseMoveHandler);
     document.addEventListener('mouseup', mouseUpHandler);
     // console.log("Mouse down x/y: " + x + "/" + y + ', ' + facsimileContainerSize);
-  };
+  }; // mouseDownHandler
 
   const mouseMoveHandler = function (e) {
     const dx = e.clientX - x;
@@ -348,34 +342,31 @@ export function addFacsimilerResizerHandlers(v, cm) {
     let sz = resizer.parentNode.getBoundingClientRect();
     // console.log("Mouse move dx/dy: " + dx + "/" + dy + ', Container: ' + sz.width + '/' + sz.height);
     switch (facsimileOrientation) {
-      case 'top':
-        facsimileProportion = (facsimileContainerSize + dy) / sz.height;
-        break;
       case 'bottom':
         facsimileProportion = (facsimileContainerSize - dy) / sz.height;
-        break;
-      case 'right':
-        facsimileProportion = (facsimileContainerSize - dx) / sz.width;
         break;
       case 'left':
         facsimileProportion = (facsimileContainerSize + dx) / sz.width;
         break;
+      case 'right':
+        facsimileProportion = (facsimileContainerSize - dx) / sz.width;
+        break;
+      case 'top':
+        facsimileProportion = (facsimileContainerSize + dy) / sz.height;
+        break;
     }
+    // restrict to min/max
     facsimileProportion = Math.min(maxProportion, Math.max(minProportion, facsimileProportion));
     switch (facsimileOrientation) {
-      case 'top':
       case 'bottom':
-        verovioContainer.style.width = sz.width;
-        verovioContainer.style.height = sz.height * (1 - facsimileProportion);
-        facsimileContainer.style.width = sz.width;
-        facsimileContainer.style.height = sz.height * facsimileProportion - facsimileResizerWidth;
+      case 'top':
+        verovioContainer.style.height = sz.height * (1 - facsimileProportion) - facsimileResizerWidth / 2;
+        facsimileContainer.style.height = sz.height * facsimileProportion - facsimileResizerWidth / 2;
         break;
       case 'left':
       case 'right':
-        verovioContainer.style.width = sz.width * (1 - facsimileProportion);
-        verovioContainer.style.height = sz.height;
-        facsimileContainer.style.width = sz.width * facsimileProportion - facsimileResizerWidth;
-        facsimileContainer.style.height = sz.height;
+        verovioContainer.style.width = sz.width * (1 - facsimileProportion) - facsimileResizerWidth / 2;
+        facsimileContainer.style.width = sz.width * facsimileProportion - facsimileResizerWidth / 2;
         break;
     }
 
@@ -386,7 +377,7 @@ export function addFacsimilerResizerHandlers(v, cm) {
     verovioContainer.style.pointerEvents = 'none';
     facsimileContainer.style.userSelect = 'none';
     facsimileContainer.style.pointerEvents = 'none';
-  };
+  }; // mouseMoveHandler
 
   const mouseUpHandler = function () {
     resizer.style.removeProperty('cursor');
@@ -404,7 +395,7 @@ export function addFacsimilerResizerHandlers(v, cm) {
     if (storage && storage.supported) {
       storage.facsimileProportion = facsimileProportion;
     }
-  };
+  }; // mouseUpHandler
 
   resizer.addEventListener('mousedown', mouseDownHandler);
 } // addFacsimilerResizerHandlers()

@@ -107,9 +107,9 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
    * Find time-spanning elements and store their @startid/@endids in object tsTable
    * and additionally in one aggregated array idList
    * @param {array} nodeArray
-   * @param {object} tsTable
+   * @param {Object} tsTable
    * @param {array} idList
-   * @returns {object} tsTable
+   * @returns {Object} tsTable
    */
   function findTimeSpanningElements(nodeArray, tsTable, idList) {
     nodeArray.forEach((el) => {
@@ -137,7 +137,7 @@ function listPageSpanningElements(mei, breaks, breaksOption) {
    * Determine the page number for each element in nodeArray recursively,
    * store it in noteTable[id] = p; and delete it from idList
    * @param {array} nodeArray
-   * @param {object} noteTable
+   * @param {Object} noteTable
    * @param {array} idList
    * @param {boolean} childOfMeasure
    * @returns

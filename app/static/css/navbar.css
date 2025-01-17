@@ -10,6 +10,11 @@
   z-index: 15;
 }
 
+.navbar :first-child {
+  /* shrink the user's github name first */
+  flex-shrink: 5;
+}
+
 /* Links inside the navbar */
 .navbar a {
   float: left;
@@ -138,7 +143,7 @@
 
 .dropdownContent table {
   border: 0px;
-  border-spacing:0;
+  border-spacing: 0;
 }
 
 #GithubMenu.dropdownContent a {
@@ -169,6 +174,15 @@
 
 .dropdownContent.forceShow {
   display: block;
+}
+
+/* Show all the whitespace in the github dropdown file names
+   - Whitespace in filenames is significant, so users should see it if it's there
+   - Since the filenames are stored on the DOM, letting the browser collapse
+     whitespace breaks the ability of the github integration to open files with
+     collapsable whitespace sequences in their names */
+.branchContents {
+  white-space: pre;
 }
 
 #logTable {
@@ -243,22 +257,22 @@
   margin-left: 0px;
 }
 
-.fileStatus {
+#fileStatus {
   font-size: 10pt;
   font-family: monospace;
-  margin-left: 1em;
-  padding: 3px 12px;
+  padding: 3px 6px;
   background: var(--backgroundColor);
   color: var(--fileStatusColor);
   white-space: nowrap;
-  display: flex;
+  display: grid;
+  grid-template-columns: auto auto auto auto auto; /* five elements within fileStatus */
   align-content: center;
   align-items: center;
-  gap: 0.2em;
   cursor: default;
+  flex-shrink: 6;
 }
 
-.fileStatus #schemaStatus {
+#fileStatus #schemaStatus {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 6pt;
   font-weight: bold;
@@ -269,26 +283,31 @@
   max-height: calc(1em + 2px);
 }
 
-.fileStatus #fileName {
+#fileStatus #fileNameContainer {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#fileStatus #fileName {
   white-space: pre;
 }
 
-.fileStatus #fileChanged {
-  margin-left: -0.2em;
-  margin-right: 0.5em;
+#fileStatus #fileChanged {
+  margin-left: 0.2em;
 }
 
-.fileStatus.changed {
+#fileStatus.changed {
   color: var(--fileStatusChangedColor);
 }
 
-.fileStatus.warn #fileName,
-.fileStatus.warn #fileLocation,
+#fileStatus.warn #fileName,
+#fileStatus.warn #fileLocation,
 #commitFileName.warn {
   text-decoration: var(--fileStatusWarnColor) dotted underline;
 }
 
-.fileStatus #fileStorageExceeded.warn {
+#fileStatus #fileStorageExceeded.warn {
   color: var(--fileStatusWarnColor);
   font-weight: bolder;
   background: var(--settingsLinkBackgroundColor);
@@ -390,11 +409,11 @@
 
 /* language selection list */
 #languageSelectionList {
-  position:absolute;
+  position: absolute;
   right: 0px;
   border-radius: 4px;
   overflow: auto;
-  padding-top:.2em;
+  padding-top: 0.2em;
 }
 
 #languageSelectionList td {
@@ -407,7 +426,7 @@
   background-color: var(--settingsBackgroundColor);
 }
 
-#languageSelectionList .selectedLang td { 
+#languageSelectionList .selectedLang td {
   border-top: 1px solid var(--textColor);
   border-bottom: 1px solid var(--textColor);
 }

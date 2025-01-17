@@ -1,12 +1,4 @@
-import {
-  log,
-  meiFileName,
-  fileLocationType,
-  github, // instance
-  meiFileLocation,
-  storage,
-  version,
-} from './main.js';
+import { log, meiFileName, fileLocationType, gm, meiFileLocation, storage, version } from './main.js';
 
 import { nsp, politeness } from './linked-data.js';
 
@@ -48,7 +40,7 @@ export function getCurrentFileUri() {
       fileUri = meiFileLocation;
       break;
     case 'github':
-      fileUri = github.rawGithubUri;
+      fileUri = gm.getRawURL() + gm.filepath;
       break;
     default:
       fileUri = meiFileLocation;
@@ -75,6 +67,15 @@ export async function postResource(containerUri, resource) {
           body: JSON.stringify(resource),
         })
         .then(async (postResp) => {
+          // patch the posted resource with its own URI
+          let postedResourceUri = new URL(postResp.headers.get('Location'), containerUriResource).href;
+          await safelyPatchResource(postedResourceUri, [
+            {
+              op: 'replace', // replace the empty @id with the actual URI
+              path: '/@id',
+              value: postedResourceUri,
+            },
+          ]);
           return postResp;
         })
         .catch((e) => {
@@ -226,8 +227,8 @@ export async function establishContainerResource(container) {
 }
 
 export async function establishDiscoveryResource(currentFileUri) {
-  return establishContainerResource(friendContainer + discoveryFragment).then(discoveryContainer => { 
-     // establish a discovery resource (if it doesn't already exist)
+  return establishContainerResource(friendContainer + discoveryFragment).then((discoveryContainer) => {
+    // establish a discovery resource (if it doesn't already exist)
     const currentFileUriHash = encodeURIComponent(currentFileUri);
     const discoveryUri = discoveryContainer + currentFileUriHash;
     return establishResource(discoveryUri, {
@@ -236,7 +237,7 @@ export async function establishDiscoveryResource(currentFileUri) {
       [nsp.SCHEMA + 'about']: { '@id': currentFileUri },
       [nsp.SCHEMA + 'dataset']: [],
     });
-  })
+  });
 }
 
 export async function createMAOMusicalObject(selectedElements, label = '') {
@@ -258,8 +259,8 @@ export async function createMAOMusicalObject(selectedElements, label = '') {
           async (selectionResource) => {
             return createMAOExtract(selectionResource, currentFileUri, dataCatalogResource.url, label).then(
               async (extractResource) => {
-                return createMAOMusicalMaterial(extractResource, currentFileUri, dataCatalogResource.url, label)
-                .then(async (musMatResource) => {
+                return createMAOMusicalMaterial(extractResource, currentFileUri, dataCatalogResource.url, label).then(
+                  async (musMatResource) => {
                     // patch the now-established discovery resource with our new MAO objects
                     return safelyPatchResource(dataCatalogResource.url, [
                       {
@@ -304,13 +305,13 @@ export async function createMAOMusicalObject(selectedElements, label = '') {
                     ]).then(() => {
                       return musMatResource;
                     }); // finally, return the musMat resource to the UI
-                  });
-                }
-              );
-            }
-          );
-        }
-      );
+                  }
+                );
+              }
+            );
+          }
+        );
+      });
     })
     .catch((e) => {
       console.error('Failed to create nsp.MAO Musical Object:', e);

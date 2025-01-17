@@ -1,11 +1,11 @@
 // mei-friend version and date
-export const version = '1.0.14p';
-export const versionDate = '3 September 2024'; // use full or 3-character english months, will be translated
+export const version = '1.2.0';
+export const versionDate = '17 January 2025'; // use full or 3-character english months, will be translated
+export const splashDate = '17 January 2025'; // date of the splash screen content, same translation rules apply
 
 var vrvWorker;
 var spdWorker;
 var tkAvailableOptions;
-var mei;
 var breaksParam; // (string) the breaks parameter given through URL
 var pageParam; // (int) page parameter given through URL
 var selectParam; // (array) select ids given through multiple instances in URL
@@ -19,7 +19,7 @@ export var cm;
 export var v; // viewer instance
 export var validator; // validator object
 export var rngLoader; // object for loading a relaxNG schema for hinting
-export let github; // github API wrapper object
+export let gm; // git manager object - TODO, handle multiple git providers
 export let storage = new Storage();
 export var tkVersion = ''; // string of the currently loaded toolkit version
 export var tkUrl = ''; // string of the currently loaded toolkit origin
@@ -54,12 +54,13 @@ import {
 } from './resizer.js';
 import {
   addAnnotationHandlers,
-  clearAnnotations,
+  addMarkupHandlers,
+  clearListItems,
   getSolidIdP,
-  readAnnots,
-  refreshAnnotations,
+  readListItemsFromXML,
+  refreshAnnotationsInNotation,
   populateSolidTab,
-} from './annotation.js';
+} from './enrichment-panel.js';
 import { dropHandler, dragEnter, dragOverHandler, dragLeave } from './dragger.js';
 import { openUrl, openUrlCancel } from './open-url.js';
 import {
@@ -69,10 +70,11 @@ import {
   addModifyerKeys,
   manualCurrentPage,
   generateSectionSelect,
+  setChoiceOptions,
 } from './control-menu.js';
-import { clock, unverified, xCircleFill } from '../css/icons.js';
+import { clock, file, unverified, xCircleFill } from '../css/icons.js';
 import { keymap } from '../keymaps/default-keymap.js';
-import { setCursorToId } from './utils.js';
+import { setCursorToId, getChangelogUrl } from './utils.js';
 import { getInMeasure, navElsSelector, getElementAtCursor } from './dom-utils.js';
 import { addDragSelector } from './drag-selector.js';
 import {
@@ -89,7 +91,6 @@ import * as att from './attribute-classes.js';
 import * as e from './editor.js';
 import Viewer from './viewer.js';
 import * as speed from './speed.js';
-import Github from './github.js';
 import { loginAndFetch, solid } from './solid.js';
 import Storage from './storage.js';
 import { fillInBranchContents, logoutFromGithub, refreshGithubMenu, setCommitUIEnabledStatus } from './github-menu.js';
@@ -120,6 +121,7 @@ import Translator from './translator.js';
 import { luteconv } from './luteconv.js';
 import { buildLanguageSelection, translateLanguageSelection } from './language-selector.js';
 import { runLanguageChecks } from '../tests/checkLangs.js';
+import GitManager from './git-manager.js';
 
 const defaultCodeMirrorOptions = {
   lineNumbers: true,
@@ -171,9 +173,9 @@ export function setIsMEI(bool) {
   isMEI = !!bool;
 }
 
-export function setFileChangedState(fileChangedState) {
+export async function setFileChangedState(fileChangedState) {
   fileChanged = fileChangedState;
-  const fileStatusElement = document.querySelector('.fileStatus');
+  const fileStatusElement = document.querySelector('#fileStatus');
   const fileChangedIndicatorElement = document.querySelector('#fileChanged');
   const fileStorageExceededIndicatorElement = document.querySelector('#fileStorageExceeded');
   const commitUI = document.querySelector('#commitUI');
@@ -184,8 +186,18 @@ export function setFileChangedState(fileChangedState) {
     fileStatusElement.classList.remove('changed');
     fileChangedIndicatorElement.innerText = '';
   }
-  if (isLoggedIn && github && github.filepath && commitUI) {
-    setCommitUIEnabledStatus();
+  if (isLoggedIn && gm && gm.filepath) {
+    let actionsWorkflows = document.querySelectorAll('.workflow');
+    if (commitUI) setCommitUIEnabledStatus();
+    if (actionsWorkflows) {
+      if (await gm.fileChanged()) {
+        actionsWorkflows.forEach((el) => el.parentElement.classList.add('disabled'));
+        actionsWorkflows.forEach((el) => el.parentElement.parentElement.classList.add('notAllowed'));
+      } else {
+        actionsWorkflows.forEach((el) => el.parentElement.classList.remove('disabled'));
+        actionsWorkflows.forEach((el) => el.parentElement.parentElement.classList.remove('notAllowed'));
+      }
+    }
   }
   if (storage.supported) {
     storage.fileChanged = fileChanged ? 1 : 0;
@@ -209,11 +221,6 @@ export function setFileChangedState(fileChangedState) {
   }
 }
 
-export function setGithubInstance(new_github) {
-  // update github instance (from other modules)
-  github = new_github;
-}
-
 export function setMeiFileInfo(fName, fLocation, fLocationPrintable) {
   meiFileName = fName;
   meiFileLocation = fLocation;
@@ -227,18 +234,30 @@ export function setFileLocationType(t) {
 export function updateFileStatusDisplay() {
   document.querySelector('#fileName').innerText = meiFileName.substring(meiFileName.lastIndexOf('/') + 1);
   document.querySelector('#fileLocation').innerText = meiFileLocationPrintable || '';
-  document.querySelector('#fileLocation').title = meiFileLocation || '';
-  if (fileLocationType === 'file') document.querySelector('#fileName').setAttribute('contenteditable', '');
-  else document.querySelector('#fileName').removeAttribute('contenteditable', '');
+  let tooltip;
+  if (meiFileLocation) {
+    tooltip = meiFileLocation + ': ' + meiFileName;
+  } else {
+    tooltip = meiFileName;
+  }
+  document.querySelector('#fileNameContainer').title = tooltip;
+  if (fileLocationType === 'file') {
+    document.querySelector('#fileName').setAttribute('contenteditable', '');
+  } else {
+    document.querySelector('#fileName').removeAttribute('contenteditable');
+  }
 }
 
-export function loadDataInEditor(mei, setFreshlyLoaded = true) {
+export function loadDataInEditor(meiXML, setFreshlyLoaded = true) {
   if (storage && storage.supported) {
     storage.override = false;
   }
   freshlyLoaded = setFreshlyLoaded;
-  cm.setValue(mei);
-  v.loadXml(mei);
+  v.loadXml(meiXML, true);
+  cm.blockChanges = true;
+  cm.setValue(meiXML);
+  cm.clearHistory();
+  cm.blockChanges = false;
   cmd.checkFacsimile();
   loadFacsimile(v.xmlDoc); // load all facsimila data of MEI
   let bs = document.getElementById('breaksSelect');
@@ -252,10 +271,10 @@ export function loadDataInEditor(mei, setFreshlyLoaded = true) {
   v.setMenuColors();
   if (!isSafari) {
     // disable validation on Safari because of this strange error: "RangeError: Maximum call stack size exceeded" (WG, 1 Oct 2022)
-    v.checkSchema(mei);
+    v.checkSchema(meiXML);
   }
-  clearAnnotations();
-  readAnnots(true); // from annotation.js
+  clearListItems();
+  readListItemsFromXML(true); // readAnnots(true); from annotation.js
   setCursorToId(cm, handleURLParamSelect());
 } // loadDataInEditor()
 
@@ -285,20 +304,17 @@ export function updateLocalStorage(meiXml) {
   }
 }
 
-export function updateGithubInLocalStorage() {
+export async function updateGithubInLocalStorage() {
   if (storage.supported && !storage.override && isLoggedIn) {
-    const author = github.author;
-    const name = author.name;
-    const email = author.email;
+    const author = await gm.getAuthor();
     storage.github = {
-      githubRepo: github.githubRepo,
-      githubToken: github.githubToken,
-      branch: github.branch,
-      commit: github.commit,
-      filepath: github.filepath,
-      userLogin: github.userLogin,
-      userName: name,
-      userEmail: email,
+      githubRepo: gm.repo,
+      githubToken: gm.token,
+      branch: gm.branch,
+      filepath: gm.filepath,
+      userLogin: author.username,
+      userName: author.name,
+      userEmail: author.email,
     };
   }
 }
@@ -334,13 +350,13 @@ function completeIfInTag(cm) {
 /**
  * Carries out code validation using validator.validateNG() and calls
  * v.highlightValidation()
- * @param {string} mei
+ * @param {string} meiXML
  * @param {Function} updateLinting
  * @param {Object} options
  * @returns
  */
-export async function validate(mei, updateLinting, options) {
-  if (options && mei) {
+export async function validate(meiXML, updateLinting, options) {
+  if (options && meiXML) {
     // keep the callback (important for first call)
     if (updateLinting && typeof updateLinting === 'function') {
       v.updateLinting = updateLinting;
@@ -352,7 +368,7 @@ export async function validate(mei, updateLinting, options) {
       Viewer.changeStatus(vs, 'wait', ['error', 'ok', 'manual']); // darkorange
       vs.querySelector('svg').classList.add('clockwise');
       vs.setAttribute('title', translator.lang.validatingAgainst.text + ' ' + v.currentSchema);
-      const validationString = await validator.validateNG(mei);
+      const validationString = await validator.validateNG(meiXML);
       let validation;
       try {
         validation = JSON.parse(validationString);
@@ -366,7 +382,7 @@ export async function validate(mei, updateLinting, options) {
           ? translator.lang.noErrors.text + '.'
           : validation.length + ' ' + translator.lang.errorsFound.text + '.'
       );
-      v.highlightValidation(mei, validation, options.forceValidate);
+      v.highlightValidation(meiXML, validation, options.forceValidate);
     } else if (v.validatorWithSchema && !document.getElementById('autoValidate').checked) {
       v.setValidationStatusToManual();
     }
@@ -419,34 +435,37 @@ function onLanguageLoaded() {
 
   createSplashScreen();
 
-  // show splash screen if required
+  // show splash screen if required, i.e.: if never previously acknowledged; or,
+  // if acknowledged before latest splash screen content update (splashDate), or,
+  // if splash screen is set to show on every load
   if (storage.supported) {
     storage.read();
-    if (!storage.splashAcknowledged || storage.showSplashScreen) {
-      showSplashScreen(true);
+    let splashTextUpdatedSinceLastAck;
+    try {
+      splashTextUpdatedSinceLastAck = storage.splashAcknowledged < new Date(splashDate).getTime();
+    } catch {
+      splashTextUpdatedSinceLastAck = false;
+    }
+    console.log('Splash screen acknowledged: ', storage.splashAcknowledged);
+    console.log('Splash text updated since last acknowledgement: ', splashTextUpdatedSinceLastAck);
+    console.log('Last acknowledgement date: ', new Date(storage.splashAcknowledged));
+
+    if (!storage.splashAcknowledged || splashTextUpdatedSinceLastAck || storage.showSplashScreen) {
+      showSplashScreen(splashTextUpdatedSinceLastAck);
     } else {
       completeInitialLoad();
     }
   } else {
-    completeInitialLoad();
+    // no storage; always show splash screen
+    showSplashScreen(false);
   }
 } // onLanguageLoaded()
 
-function completeInitialLoad() {
+async function completeInitialLoad() {
   splashInitialLoad = false; // avoid re-initialising app from splash screen button
 
   // link to changelog page according to env settings (develop/staging/production)
-  let changeLogUrl;
-  switch (env) {
-    case 'develop':
-      changeLogUrl = 'https://github.com/mei-friend/mei-friend/blob/develop/CHANGELOG.md';
-      break;
-    case 'staging':
-      changeLogUrl = 'https://github.com/mei-friend/mei-friend/blob/staging/CHANGELOG.md';
-      break;
-    case 'production':
-      changeLogUrl = 'https://github.com/mei-friend/mei-friend/blob/main/CHANGELOG.md';
-  }
+  const changeLogUrl = getChangelogUrl();
   const showChangeLogLink = document.getElementById('showChangelog');
   if (showChangeLogLink) showChangeLogLink.setAttribute('href', changeLogUrl);
 
@@ -549,33 +568,43 @@ function completeInitialLoad() {
     : 'none';
 
   if (storage.supported) {
-    if (storage.github) {
+    if (storage.github && isLoggedIn) {
       // use github object from local storage if available
-      isLoggedIn = true;
-      github = new Github(
-        storage.github.githubRepo,
-        storage.github.githubToken,
-        storage.github.branch,
-        storage.github.commit,
-        storage.github.filepath,
-        storage.github.userLogin,
-        storage.github.userName,
-        storage.github.userEmail
-      );
+      gm = new GitManager('github', 'github', storage.github.githubToken, {
+        repo: storage.github.githubRepo,
+        branch: storage.github.branch,
+        filepath: storage.github.filepath,
+      });
+
       //document.querySelector("#fileLocation").innerText = meiFileLocationPrintable;
+    } else if (storage.github && !isLoggedIn) {
+      // we have github data but are not logged in
+      // suggests inconsistency, so formally log user out
+      logoutFromGithub();
     } else if (isLoggedIn) {
       // initialise and store new github object
-      github = new Github('', githubToken, '', '', '', userLogin, userName, userEmail);
-      storage.github = {
-        githubRepo: github.githubRepo,
-        githubToken: github.githubToken,
-        branch: github.branch,
-        commit: github.commit,
-        filepath: github.filepath,
-        userLogin: github.userLogin,
-        userName: userName,
-        userEmail: userEmail,
-      };
+      // const gitWorker = new Worker(`${root}lib/git-worker.js`);
+      // const gitProxy = new WorkerProxy(gitWorker);
+      // let msg = await gitProxy.registerGitManager('github', 'github', githubToken);
+      // console.log('Registered git manager: ', msg);
+
+      gm = new GitManager('github', 'github', githubToken);
+      gm.getAuthor()
+        .then((author) => {
+          //github = new Github('', githubToken, '', '', '', userLogin, userName, userEmail);
+          storage.github = {
+            githubRepo: gm.repo,
+            githubToken: gm.token,
+            branch: gm.branch,
+            filepath: gm.filepath,
+            userLogin: author.username,
+            userName: author.name,
+            userEmail: author.email,
+          };
+        })
+        .catch((err) => {
+          console.warn('Error getting author: ', err);
+        });
     }
   }
 
@@ -648,8 +677,8 @@ function completeInitialLoad() {
       v.showAlert(translator.lang.githubLoggedOutWarning.text, 'warning', 30000);
       storage.removeItem('githubLogoutRequested');
     }
-
     setFileChangedState(storage.fileChanged);
+    updateFileStatusDisplay();
     if (!urlFileName && !urlFetchInProgress) {
       // no URI param specified - try to restore from storage
       if (storage.content && storage.fileName) {
@@ -673,17 +702,18 @@ function completeInitialLoad() {
         setFileChangedState(false);
       }
     }
-    if (storage.forkAndOpen && github) {
+    if (storage.forkAndOpen && gm) {
       // we've arrived back after an automated log-in request
       // now fork and open the supplied URL, and remove it from storage
-      forkAndOpen(github, storage.forkAndOpen);
+      forkAndOpen(gm, storage.forkAndOpen);
       storage.removeItem('forkAndOpen');
     }
   } else {
     // no local storage
     if (isLoggedIn) {
       // initialise new github object
-      github = new Github('', githubToken, '', '', '', userLogin, userName, userEmail);
+      gm = new GitManager('github', 'github', githubToken);
+      //github = new Github('', githubToken, '', '', '', userLogin, userName, userEmail);
     }
     meiFileLocation = '';
     meiFileLocationPrintable = '';
@@ -693,14 +723,15 @@ function completeInitialLoad() {
     // regardless of storage availability:
     // if we are logged in, refresh github menu
     refreshGithubMenu();
-    if (github.githubRepo && github.branch && github.filepath) {
+    if (gm.repo && gm.branch && gm.filepath) {
       // preset github menu to where the user left off, if we can
       fillInBranchContents();
     }
   }
   if (forkParam === 'true' && urlFileName) {
-    if (isLoggedIn && github) {
-      forkAndOpen(github, urlFileName);
+    if (isLoggedIn && gm) {
+      console.log('Forking and opening URL file...');
+      forkAndOpen(gm, urlFileName);
     } else {
       if (storage.supported) {
         storage.safelySetStorageItem('forkAndOpen', urlFileName);
@@ -761,6 +792,7 @@ function completeInitialLoad() {
 
   addEventListeners(v, cm);
   addAnnotationHandlers();
+  addMarkupHandlers();
   addNotationResizerHandlers(v, cm);
   addFacsimilerResizerHandlers(v, cm);
   let doit;
@@ -796,10 +828,43 @@ export async function openUrlFetch(url = '', updateAfterLoading = true) {
     if (!url) url = new URL(urlInput.value);
     const headers = { Accept: 'application/xml, text/xml, application/mei+xml' };
     if (isLoggedIn && url.href.trim().startsWith('https://raw.githubusercontent.com')) {
-      // GitHub URL - use GitHub credentials to enable URL fetch from private repos
-      github.directlyReadFileContents(url.href).then((data) => {
-        openUrlProcess(data, url, updateAfterLoading);
-      });
+      // determine user/org, repo, branch, and file path from URL
+      const urlParts = url.pathname.split('/');
+      const userOrg = urlParts[1];
+      const repo = urlParts[2];
+      const branch = urlParts[3];
+      const filepath = urlParts.slice(4).join('/');
+
+      if (userOrg && repo && branch && filepath) {
+        // clone repo
+        gm = new GitManager('github', 'github', githubToken);
+        // TODO modify for multiple git providers
+        // TODO use checkAndClone mechanism to warn about excessive sizes
+        gm.clone(`https://github.com/${userOrg}/${repo}.git`, branch)
+          .then(() => {
+            gm.readFile(filepath)
+              .then((data) => {
+                openUrlProcess(data, url, updateAfterLoading);
+              })
+              .catch((err) => {
+                console.warn('Error reading file from cloned repo: ', err);
+                urlStatus.innerHTML = 'Error reading file from cloned repo';
+                urlStatus.classList.add('warn');
+                urlInput.classList.add('warn');
+              });
+          })
+          .catch((err) => {
+            console.warn('Error cloning repo: ', err);
+            urlStatus.innerHTML = 'Error cloning repo';
+            urlStatus.classList.add('warn');
+            urlInput.classList.add('warn');
+          });
+      } else {
+        console.warn('Invalid raw GitHub URL provided by user: ', url);
+        urlStatus.innerHTML = 'Invalid raw GitHub URL, please fix...';
+        urlStatus.classList.add('warn');
+        urlInput.classList.add('warn');
+      }
     } else {
       const response = await fetch(url, {
         method: 'GET',
@@ -841,8 +906,8 @@ function openUrlProcess(content, url, updateAfterLoading) {
   meiFileName = url.pathname.substring(url.pathname.lastIndexOf('/') + 1);
   if (storage.github && isLoggedIn) {
     // re-initialise github menu since we're now working from a URL
-    github.filepath = '';
-    github.branch = '';
+    gm.filepath = '';
+    gm.branch = '';
     if (storage.supported) {
       updateGithubInLocalStorage();
     }
@@ -900,6 +965,7 @@ async function vrvWorkerEventsHandler(ev) {
       drawRightFooter();
       document.getElementById('statusBar').innerHTML = `Verovio ${tkVersion} ${translator.lang.verovioLoaded.text}.`;
       setBreaksOptions(tkAvailableOptions, defaultVerovioOptions.breaks);
+      setChoiceOptions('');
       if (!storage.supported || !meiFileName) {
         // open default mei file
         openFile();
@@ -914,12 +980,11 @@ async function vrvWorkerEventsHandler(ev) {
       v.busy(false);
       break;
     case 'mei': // returned from importData, importBinaryData
-      mei = ev.data.mei;
       v.pageCount = ev.data.pageCount;
       v.allowCursorActivity = false;
-      loadDataInEditor(mei);
+      loadDataInEditor(ev.data.mei);
       setFileChangedState(false);
-      updateLocalStorage(mei);
+      updateLocalStorage(ev.data.mei);
       v.allowCursorActivity = true;
       v.updateAll(cm, defaultVerovioOptions, handleURLParamSelect());
       //v.busy(false);
@@ -956,15 +1021,19 @@ async function vrvWorkerEventsHandler(ev) {
         v.pageCount = ev.data.pageCount;
       } else if (bs === 'none') {
         v.pageCount = 1;
-      } else if (v.speedMode && bs === 'auto' && Object.keys(v.pageBreaks).length > 0) {
+      } else if (v.speedMode && bs === 'auto' && v.pageBreaks && Object.keys(v.pageBreaks).length > 0) {
         v.pageCount = Object.keys(v.pageBreaks).length;
       }
+      //update choiceSelect
+      let cs = document.getElementById('choiceSelect').selectedOptions[0]?.value;
+      setChoiceOptions(cs);
       // update only if still same page
       if (v.currentPage === ev.data.pageNo || ev.data.forceUpdate || ev.data.computePageBreaks || v.pdfMode) {
         if (ev.data.forceUpdate) {
           v.currentPage = ev.data.pageNo;
         }
-        updateStatusBar();
+        pageInfoToStatusBar();
+        setProgressBar(0);
         updateHtmlTitle();
         document.getElementById('verovio-panel').innerHTML = ev.data.svg;
         if (document.getElementById('showFacsimilePanel') && document.getElementById('showFacsimilePanel').checked) {
@@ -975,7 +1044,7 @@ async function vrvWorkerEventsHandler(ev) {
         v.updatePageNumDisplay();
         v.addNotationEventListeners(cm);
         v.updateHighlight(cm);
-        refreshAnnotations(false);
+        refreshAnnotationsInNotation(false);
         v.scrollSvgTo(cm);
         if (v.pdfMode) {
           // switch on frame, when in pdf mode
@@ -996,7 +1065,8 @@ async function vrvWorkerEventsHandler(ev) {
       }
       break;
     case 'navigatePage': // resolve navigation with page turning
-      updateStatusBar();
+      pageInfoToStatusBar();
+      setProgressBar(0);
       document.getElementById('verovio-panel').innerHTML = ev.data.svg;
       let ms = document.querySelectorAll('.measure'); // find measures on page
       if (ms.length > 0) {
@@ -1010,7 +1080,7 @@ async function vrvWorkerEventsHandler(ev) {
         v.lastNoteId = id;
       }
       v.addNotationEventListeners(cm);
-      refreshAnnotations(false);
+      refreshAnnotationsInNotation(false);
       v.scrollSvgTo(cm);
       v.updateHighlight(cm);
       v.setFocusToVerovioPane();
@@ -1075,7 +1145,7 @@ async function vrvWorkerEventsHandler(ev) {
       //   meiFileName.substring(meiFileName.lastIndexOf("/") + 1) +
       //   ', pageBreaks', v.pageBreaks);
       v.updateData(cm, false, true);
-      updateStatusBar();
+      pageInfoToStatusBar();
       v.updatePageNumDisplay();
       v.busy(false);
       break;
@@ -1090,6 +1160,7 @@ async function vrvWorkerEventsHandler(ev) {
       v.busy(false);
       break;
   }
+  // cm.blockChanges = false;
 } // vrvWorkerEventsHandler()
 
 // handles select (& page) input parameter from URL arguments ".../?select=..."
@@ -1117,10 +1188,11 @@ let inputFormats = {
 };
 
 export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true, updateAfterLoading = true) {
+  // cm.blockChanges = true;
   if (storage.github && isLoggedIn) {
     // re-initialise github menu since we're now working from a file
-    github.filepath = '';
-    github.branch = '';
+    gm.filepath = '';
+    gm.branch = '';
     if (storage.supported) {
       updateGithubInLocalStorage();
     }
@@ -1133,7 +1205,7 @@ export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true, upd
     storage.fileLocationType = 'file';
   }
   fileLocationType = 'file';
-  if (github) github.filepath = '';
+  if (gm) gm.filepath = '';
   if (typeof file === 'string') {
     // with fileName string
     meiFileName = file;
@@ -1142,12 +1214,11 @@ export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true, upd
       .then((response) => response.text())
       .then((meiXML) => {
         console.log('MEI file ' + meiFileName + ' loaded.');
-        mei = meiXML;
         v.clear();
         v.allowCursorActivity = false;
-        loadDataInEditor(mei, setFreshlyLoaded);
+        loadDataInEditor(meiXML, setFreshlyLoaded);
         setFileChangedState(false);
-        updateLocalStorage(mei);
+        updateLocalStorage(meiXML);
         v.allowCursorActivity = true;
         if (updateAfterLoading) {
           v.updateAll(cm, {}, handleURLParamSelect());
@@ -1159,11 +1230,10 @@ export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true, upd
       meiFileName = file.name;
       console.info('openMei ' + meiFileName + ', ', cm);
       let reader = new FileReader();
-      mei = '';
       reader.onload = (event) => {
-        mei = event.target.result;
-        console.info('Reader read ' + meiFileName); // + ', mei: ', mei);
-        if (mei) loaded(mei);
+        let meiString = event.target.result;
+        console.info('Reader read ' + meiFileName);
+        if (meiString) loaded(meiString);
         else notLoaded();
       };
       if (meiFileName.endsWith('.mxl') || meiFileName.endsWith('.ft2') || meiFileName.endsWith('.ft3')) {
@@ -1189,62 +1259,62 @@ export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true, upd
 
 // checks format of encoding string and imports or loads data/notation
 // mei argument may be MEI or any other supported format (text/binary)
-export function handleEncoding(mei, setFreshlyLoaded = true, updateAfterLoading = true, clearBeforeLoading = true) {
+export function handleEncoding(meiXML, setFreshlyLoaded = true, updateAfterLoading = true, clearBeforeLoading = true) {
   let found = false;
   if (clearBeforeLoading) {
+    clearFacsimile();
+    clearListItems();
     if (pageParam === null) storage.removeItem('page');
     v.clear();
   }
   v.busy();
   if (meiFileName.endsWith('.mxl')) {
     // compressed MusicXML file
-    console.log('Load compressed XML file.', mei.slice(0, 128));
+    console.log('Load compressed XML file.', meiXML.slice(0, 128));
     vrvWorker.postMessage({
       cmd: 'importBinaryData',
       format: 'xml',
-      mei: mei,
+      mei: meiXML,
     });
     found = true;
     setIsMEI(false);
   } else if (meiFileName.endsWith('.abc')) {
     // abc notation file
-    console.log('Load ABC file.', mei.slice(0, 128));
+    console.log('Load ABC file.', meiXML.slice(0, 128));
     vrvWorker.postMessage({
       cmd: 'importData',
       format: 'abc',
-      mei: mei,
+      mei: meiXML,
     });
     found = true;
     setIsMEI(false);
   } else if (meiFileName.endsWith('.ft2') || meiFileName.endsWith('.ft3')) {
     // lute tablature file (Fronimo format)
-    console.log('Load Fronimo file.', mei.slice(0, 128));
+    console.log('Load Fronimo file.', meiXML.slice(0, 128));
     // set found to true, since we don't know if luteconv will succeed
     // (we don't want to show the "format not recognized" message)
     found = true;
     setIsMEI(false);
     // attempt to convert to MEI using luteconv web service:
-    luteconv(mei, meiFileName).then((mei) => {
-      if (mei) {
+    luteconv(meiXML, meiFileName).then((meiString) => {
+      if (meiString) {
         // rename file to .mei
         setMeiFileInfo(meiFileName + '.mei', meiFileLocation, meiFileLocationPrintable);
         updateFileStatusDisplay();
         vrvWorker.postMessage({
           cmd: 'importData',
           format: 'mei',
-          mei: mei,
+          mei: meiString,
         });
       } else {
         log('Loading ' + meiFileName + 'did not succeed. ' + 'Could not convert Fronimo file using luteconv.');
-        clearFacsimile();
-        clearAnnotations();
         v.busy(false);
       }
     });
   } else {
     // all other formats are found by search term in text file
     for (const [key, value] of Object.entries(inputFormats)) {
-      if (mei.includes(value)) {
+      if (meiXML.includes(value)) {
         // a hint that it is a MEI file
         found = true;
         console.log(key + ' file loading: ' + meiFileName);
@@ -1252,9 +1322,9 @@ export function handleEncoding(mei, setFreshlyLoaded = true, updateAfterLoading 
           // if already a mei file
           setIsMEI(true);
           v.allowCursorActivity = false;
-          loadDataInEditor(mei, setFreshlyLoaded);
+          loadDataInEditor(meiXML, setFreshlyLoaded);
           setFileChangedState(false);
-          updateLocalStorage(mei);
+          updateLocalStorage(meiXML);
           v.allowCursorActivity = true;
           if (updateAfterLoading) {
             v.updateAll(cm, defaultVerovioOptions, handleURLParamSelect());
@@ -1266,7 +1336,7 @@ export function handleEncoding(mei, setFreshlyLoaded = true, updateAfterLoading 
           vrvWorker.postMessage({
             cmd: 'importData',
             format: key,
-            mei: mei,
+            mei: meiXML,
           });
           break;
         }
@@ -1274,14 +1344,12 @@ export function handleEncoding(mei, setFreshlyLoaded = true, updateAfterLoading 
     }
   }
   if (!found) {
-    if (mei.includes('<score-timewise'))
+    if (meiXML.includes('<score-timewise'))
       log('Loading ' + meiFileName + 'did not succeed. ' + 'No support for timewise MusicXML files.');
     else {
       log('Format not recognized: ' + meiFileName + '.', 1649499359728);
     }
     setIsMEI(false);
-    clearFacsimile();
-    clearAnnotations();
     v.busy(false);
   }
   setStandoffAnnotationEnabledStatus();
@@ -1301,8 +1369,8 @@ function openFileDialog(accept = '*') {
       openFile(files[0]);
       if (isLoggedIn) {
         // re-initialise github menu since we're now working locally
-        github.filepath = '';
-        github.branch = '';
+        gm.filepath = '';
+        gm.branch = '';
         if (storage.supported) {
           updateGithubInLocalStorage();
         }
@@ -1372,14 +1440,26 @@ function createSplashScreen() {
       }
     }
   });
-  document.getElementById('splashConfirmButton').addEventListener('click', () => {
-    document.getElementById('splashOverlay').style.display = 'none';
-    window.localStorage.setItem('splashAcknowledged', 'true');
-    if (splashInitialLoad) completeInitialLoad();
-  });
+  document
+    .getElementById('splashConfirmButton')
+    .addEventListener('click', () => handleSplashConfirmed(splashInitialLoad, storage));
 } // createSplashScreen()
 
-function showSplashScreen() {
+function handleSplashConfirmed(splashInitialLoad, storage) {
+  document.getElementById('splashOverlay').style.display = 'none';
+  if (storage && storage.supported) {
+    storage.splashAcknowledged = splashDate;
+  }
+  if (splashInitialLoad) completeInitialLoad();
+}
+
+function showSplashScreen(showUpdateIndicator = false) {
+  const updateIndicator = document.getElementById('splashUpdateIndicator');
+  const splashLastUpdated = document.getElementById('splashLastUpdated');
+  updateIndicator.innerHTML = translator.lang.splashUpdateIndicator.html;
+  const translatedSplashDate = translator.translateDate(splashDate);
+  splashLastUpdated.innerHTML = translator.lang.splashLastUpdated.text + translatedSplashDate;
+  showUpdateIndicator ? (updateIndicator.style.display = 'block') : (updateIndicator.style.display = 'none'); // shown if text has changed since last acknowledgement
   const alwaysShow = document.getElementById('splashAlwaysShow'); // checkbox in splash screen
   document.getElementById('splashOverlay').style.display = 'flex';
   alwaysShow.checked = storage.showSplashScreen;
@@ -1392,12 +1472,12 @@ function togglePdfMode() {
 } // togglePdfMode()
 
 export function requestMidiFromVrvWorker(requestTimemap = false) {
-  let mei;
+  let meiString;
   // if (v.expansionId) {
   //   let expansionEl = v.xmlDoc.querySelector('[*|id="' + v.expansionId + '"]');
   //   let existingList = [];
   //   let expandedDoc = expansionMap.expand(expansionEl, existingList, v.xmlDoc.cloneNode(true));
-  //   mei = v.speedFilter(new XMLSerializer().serializeToString(expandedDoc), false, true);
+  //   meiString = v.speedFilter(new XMLSerializer().serializeToString(expandedDoc), false, true);
   //   if (v.speedMode) {
   //     v.loadXml(cm.getValue(), true); // reload xmlDoc when in speed mode
   //   } else {
@@ -1405,12 +1485,12 @@ export function requestMidiFromVrvWorker(requestTimemap = false) {
   //   }
   // } else {
   // }
-  mei = v.speedFilter(cm.getValue(), false);
+  meiString = v.speedFilter(cm.getValue(), false);
   let message = {
     cmd: 'exportMidi',
     expand: v.expansionId,
     options: v.vrvOptions,
-    mei: mei, // exclude dummy measures in speed mode
+    mei: meiString, // exclude dummy measures in speed mode
     requestTimemap: requestTimemap,
     speedMode: v.speedMode,
     toolkitDataOutdated: v.toolkitDataOutdated,
@@ -1497,7 +1577,8 @@ export let cmd = {
   fileNameChange: () => {
     if (fileLocationType === 'file') {
       meiFileName = document.getElementById('fileName').innerText;
-      updateStatusBar();
+      pageInfoToStatusBar();
+      setProgressBar(0);
       updateHtmlTitle();
       if (storage.supported) storage.safelySetStorageItem('meiFileName', meiFileName);
     } else {
@@ -1536,6 +1617,8 @@ export let cmd = {
   },
   checkFacsimile: () => {
     let tf = document.getElementById('titleFacsimilePanel');
+    let f = v.xmlDoc.querySelector('facsimile');
+    console.log('checkFacsimile() called, facsimile present: ', f);
     if (v.xmlDoc.querySelector('facsimile')) {
       if (tf) tf.setAttribute('open', 'true');
       cmd.showFacsimilePanel();
@@ -1615,6 +1698,28 @@ export let cmd = {
   downloadMei: () => downloadMei(),
   downloadMeiBasic: () => downloadMeiBasic(),
   downloadSpeedMei: () => downloadSpeedMei(),
+  doFind: () => {
+    if (document.getElementById('persistentSearch').checked) {
+      CodeMirror.commands.findPersistent(cm);
+    } else {
+      CodeMirror.commands.find(cm);
+    }
+    document.getElementById('CodeMirror-search-field')?.focus();
+  },
+  doFindNext: () => {
+    if (document.getElementById('persistentSearch').checked) {
+      CodeMirror.commands.findPersistentNext(cm);
+    } else {
+      CodeMirror.commands.findNext(cm);
+    }
+  },
+  doFindPrev: () => {
+    if (document.getElementById('persistentSearch').checked) {
+      CodeMirror.commands.findPersistentPrev(cm);
+    } else {
+      CodeMirror.commands.findPrev(cm);
+    }
+  },
   indentSelection: () => e.indentSelection(v, cm),
   validate: () => v.manualValidate(),
   notesZoomIn: () => v.zoom(+1, storage),
@@ -1706,9 +1811,6 @@ export let cmd = {
   addFClefChangeAfter: () => e.addClefChange(v, cm, 'F', '4', false),
   addBeam: () => e.addBeamElement(v, cm),
   addBeamSpan: () => e.addBeamSpan(v, cm),
-  addSupplied: () => e.addSuppliedElement(v, cm),
-  addSuppliedAccid: () => e.addSuppliedElement(v, cm, 'accid'),
-  addSuppliedArtic: () => e.addSuppliedElement(v, cm, 'artic'),
   correctAccid: () => e.checkAccidGes(v, cm),
   renumberMeasuresTest: () => e.renumberMeasures(v, cm, false),
   renumberMeasures: () => e.renumberMeasures(v, cm, true),
@@ -1721,13 +1823,22 @@ export let cmd = {
   encloseSelectionWithTag: encloseSelectionWithTag,
   encloseSelectionWithLastTag: encloseSelectionWithLastTag,
   resetDefault: () => {
-    // we're in a clickhandler, so our storage object is out of scope
-    // but we only need to clear it, so just grab the window's storage
+    // clear all storage
     storage = window.localStorage;
     if (storage) {
       storage.clear();
     }
-    logoutFromGithub();
+    if (window.sessionStorage) {
+      window.sessionStorage.clear();
+    }
+    window.fs = new LightningFS('fs', { wipe: true });
+    window.pfs = window.fs.promises;
+    let url = window.location.href;
+    // remove any url parameters (since these might include URLs with slashes in)
+    const paramsStartIx = url.indexOf('?');
+    if (paramsStartIx > -1) url = url.substring(0, paramsStartIx);
+    // now modify last slash to navigate to /logout
+    window.location.replace(url.substring(0, url.lastIndexOf('/')) + '/logout');
   },
   openHelp: () => window.open(`https://mei-friend.github.io/`, '_blank'),
   consultGuidelines: () => consultGuidelines(),
@@ -1762,6 +1873,9 @@ export let cmd = {
       }
       // TODO: close all other overlays too...
     }
+
+    // close all annotationMultiTools/MarkupDropDownContent
+    v.hideAnnotationMarkupDropDownContent();
   },
   playPauseMidiPlayback: () => {
     if (document.getElementById('showMidiPlaybackControlBar').checked) {
@@ -1793,9 +1907,11 @@ function addEventListeners(v, cm) {
       ev.target.id !== 'alertMessage' &&
       document.getElementById('splashOverlay').style.display === 'none'
     ) {
+      console.log('Body Mousedown: Hide alerts');
       v.hideAlerts();
     }
   });
+  body.addEventListener('click', v.hideAnnotationMarkupDropDownContent);
   body.addEventListener('keydown', (ev) => {
     if (ev.key === 'Escape') cmd.escapeKeyPressed();
   });
@@ -1885,9 +2001,9 @@ function addEventListeners(v, cm) {
   // edit dialogs
   document.getElementById('undoMenu').addEventListener('click', cmd.undo);
   document.getElementById('redoMenu').addEventListener('click', cmd.redo);
-  document.getElementById('startSearch').addEventListener('click', () => CodeMirror.commands.find(cm));
-  document.getElementById('findNext').addEventListener('click', () => CodeMirror.commands.findNext(cm));
-  document.getElementById('findPrevious').addEventListener('click', () => CodeMirror.commands.findPrev(cm));
+  document.getElementById('startSearch').addEventListener('click', () => CodeMirror.commands.findPersistent(cm));
+  document.getElementById('findNext').addEventListener('click', () => CodeMirror.commands.findPersistentNext(cm));
+  document.getElementById('findPrevious').addEventListener('click', () => CodeMirror.commands.findPersistentPrev(cm));
   document.getElementById('replaceMenu').addEventListener('click', () => CodeMirror.commands.replace(cm));
   document.getElementById('replaceAllMenu').addEventListener('click', () => CodeMirror.commands.replaceAll(cm));
   document.getElementById('indentSelection').addEventListener('click', indentSelection);
@@ -1997,6 +2113,13 @@ function addEventListeners(v, cm) {
     };
     v.updateAll(cm, {}, v.selectedElements[0]);
   });
+  // choice selector
+  document.getElementById('choiceSelect').addEventListener('change', (ev) => {
+    // selection has changed
+    // then updateAll()
+    v.updateAll(cm, {}, v.selectedElements[0]);
+    requestMidiFromVrvWorker(true);
+  });
   // navigation
   document.getElementById('backwardsButton').addEventListener('click', cmd.previousNote);
   document.getElementById('forwardsButton').addEventListener('click', cmd.nextNote);
@@ -2054,9 +2177,6 @@ function addEventListeners(v, cm) {
   document.getElementById('addDimHairpin').addEventListener('click', cmd.addDimHairpin);
   document.getElementById('addBeam').addEventListener('click', cmd.addBeam);
   document.getElementById('addBeamSpan').addEventListener('click', cmd.addBeamSpan);
-  document.getElementById('addSupplied').addEventListener('click', cmd.addSupplied);
-  document.getElementById('addSuppliedArtic').addEventListener('click', cmd.addSuppliedArtic);
-  document.getElementById('addSuppliedAccid').addEventListener('click', cmd.addSuppliedAccid);
   document.getElementById('addArpeggio').addEventListener('click', cmd.addArpeggio);
   // more control elements
   document.getElementById('addFermata').addEventListener('click', cmd.addFermata);
@@ -2088,7 +2208,7 @@ function addEventListeners(v, cm) {
   document.getElementById('toggleSpicc').addEventListener('click', cmd.toggleSpicc);
 
   // show splash screen
-  document.getElementById('aboutMeiFriend').addEventListener('click', showSplashScreen);
+  document.getElementById('aboutMeiFriend').addEventListener('click', () => showSplashScreen());
   document.getElementById('splashOverlay').addEventListener('click', (e) => {
     if (e.target.id === 'splashOverlay') {
       document.getElementById('splashOverlay').style.display = 'none'; // dismiss splash when user clicks on black background
@@ -2114,6 +2234,7 @@ function addEventListeners(v, cm) {
     if (!cm.blockChanges) {
       e.updateMatchingTagName(cm, changeObj);
       handleEditorChanges();
+      //checkEditorChanges();
     }
   }); // cm.on() change listener
 
@@ -2225,12 +2346,19 @@ function moveProgressBar() {
   }
 }
 
-// control progress bar progress/width (in percent)
-function setProgressBar(percentage) {
+/**
+ * control progress bar progress/width (in percent)
+ * @param {number} percentage
+ */
+export function setProgressBar(percentage) {
   document.getElementById('progressBar').style.width = percentage + '%';
 }
 
-export function updateStatusBar() {
+/**
+ * updates the status bar with filename,
+ * current page number and total page count
+ */
+export function pageInfoToStatusBar() {
   if (!v) return;
   document.getElementById('statusBar').innerHTML =
     meiFileName.substring(meiFileName.lastIndexOf('/') + 1) +
@@ -2259,28 +2387,13 @@ function drawLeftFooter() {
 
 export function drawRightFooter() {
   // translate month in version date
-  let translatedVersioDate = versionDate;
-  for (let key of Object.keys(translator.lang.month)) {
-    let i = versionDate.search(translator.defaultLang.month[key]);
-    if (i > 0) {
-      translatedVersioDate = versionDate.replace(translator.defaultLang.month[key], translator.lang.month[key]);
-      break;
-    }
-    i = versionDate.search(translator.defaultLang.month[key].substring(0, 3));
-    if (i > 0) {
-      translatedVersioDate = versionDate.replace(
-        translator.defaultLang.month[key].substring(0, 3),
-        translator.lang.month[key]
-      );
-      break;
-    }
-  }
+  let translatedVersionDate = translator.translateDate(versionDate);
   let rf = document.querySelector('.rightfoot');
   const versionHtml =
     "<a href='https://github.com/mei-friend/mei-friend' target='_blank'>mei-friend " +
     (env === environments.production ? version : `${env}-${version}`) +
     '</a> (' +
-    translatedVersioDate +
+    translatedVersionDate +
     ').&nbsp;';
   rf.innerHTML = versionHtml;
   // also update version string in splash screen
@@ -2308,17 +2421,20 @@ export function setStandoffAnnotationEnabledStatus() {
 }
 
 // handles any changes in CodeMirror
-export function handleEditorChanges() {
-  const commitUI = document.querySelector('#commitUI');
-  let changeIndicator = false;
+export async function handleEditorChanges() {
+  v.notationUpdated(cm);
+  // fileChanged flag may have been set from storage
+  let changeIndicator = true;
   let meiXml = cm.getValue();
-  if (isLoggedIn && github.filepath && commitUI) {
-    // fileChanged flag may have been set from storage - if so, run with it
-    // otherwise set it to true if we've changed the file content this session
-    changeIndicator = fileChanged || meiXml !== github.content;
-  } else {
-    // interpret any CodeMirror change as a file changed state
-    changeIndicator = true;
+  if (isLoggedIn && gm.filepath) {
+    // if it's a git file, write to git
+    console.log('Writing to git...');
+    let status = await gm.writeAndReturnStatus(meiXml);
+    console.log('Written to git, status ', status);
+    changeIndicator = status !== 'unmodified';
+    console.log('File changed state based on git modification status: ' + status);
+    setCommitUIEnabledStatus();
+    setFileChangedState(await gm.fileChanged(gm.filepath, status));
   }
   if (freshlyLoaded) {
     // ignore changes resulting from fresh file load
@@ -2326,13 +2442,12 @@ export function handleEditorChanges() {
   } else {
     setFileChangedState(changeIndicator);
   }
-  v.notationUpdated(cm);
   if (storage.supported) {
     // on every set of changes, save editor content
     updateLocalStorage(meiXml);
   }
   if (document.getElementById('showAnnotations').checked || document.getElementById('showAnnotationPanel').checked) {
-    readAnnots(); // from annotation.js
+    readListItemsFromXML(true); // readAnnots(); from annotation.js
   }
   if (document.getElementById('showMidiPlaybackControlBar').checked) {
     // start a new time-out to midi-rerender
@@ -2405,7 +2520,12 @@ function setKeyMap() {
     document.querySelectorAll(key).forEach((el) => {
       el.setAttribute('tabindex', '-1');
       el.addEventListener('keydown', (ev) => {
-        if (['pagination2', 'selectTo', 'selectFrom', 'selectRange'].includes(document.activeElement.id)) {
+        // filter out keypresses at certain elements, i.e. that contain preventKeyBindings class
+        if (
+          document.activeElement.classList.contains('preventKeyBindings') ||
+          document.activeElement.closest('#encoding')
+        ) {
+          console.log('Ignoring keypress in ' + document.activeElement.id);
           return;
         }
 
@@ -2475,7 +2595,7 @@ export function generateUrl() {
   if (fileLocationType === 'url') {
     url += 'file=' + meiFileLocation;
   } else if (fileLocationType === 'github') {
-    url += 'file=' + 'https://raw.githubusercontent.com/' + github.githubRepo + '/' + github.branch + github.filepath;
+    url += 'file=' + 'https://raw.githubusercontent.com/' + gm.repo + '/' + gm.branch + gm.filepath;
   }
   // generate other parameters
   url += amp + 'scale=' + v.vrvOptions.scale;

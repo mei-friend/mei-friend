@@ -651,7 +651,7 @@ export function brighter(rgbString, deltaPercent, alpha = 1) {
   return 'rgb(' + rgb.join(', ') + ')';
 } // brighter()
 
-function hexToRgb(hex) {
+export function hexToRgb(hex) {
   return hex
     .replace(/^#?([a-f\d])([a-f\d])([a-f\d])$/i, (m, r, g, b) => '#' + r + r + g + g + b + b)
     .substring(1)
@@ -704,6 +704,20 @@ export function convertCoords(elem) {
     };
   }
 }
+
+/**
+ * Returns median of array of numbers
+ * @param {number[]} numbers
+ * @returns {number}
+ */
+export function median(numbers) {
+  const sorted = numbers.slice().sort((a, b) => a - b);
+  const middle = Math.floor(sorted.length / 2);
+  if (sorted.length % 2 === 0) {
+    return (sorted[middle - 1] + sorted[middle]) / 2;
+  }
+  return sorted[middle];
+} // median()
 
 export function rmHash(hashedString) {
   if (!hashedString) return '';
@@ -779,11 +793,52 @@ export function readMeasureBeat(tstamp2) {
 
 /**
  * Returns a data.MEASUREBEAT string
- * @param {Number} measure
- * @param {Number} beat
+ * @param {number} measure
+ * @param {number} beat
  * @returns {string}
  */
 export function writeMeasureBeat(measure, beat) {
   if (parseInt(measure) === 0) return '' + beat;
   return measure + 'm+' + beat;
 } // writeMeasureBeat()
+
+/**
+ * Flattens a more dimensional array and keeps only unique values.
+ * Does not use concat to be useful for large arrays.
+ * @param {Array} inputArray
+ * @returns {Array}
+ */
+export function flattenArrayToUniques(inputArray) {
+  let flatArray = [];
+  for (let row of inputArray) for (let element of row) flatArray.push(element);
+  flatArray = flatArray.filter((value, index, self) => {
+    return index == self.indexOf(value);
+  });
+
+  return flatArray;
+}
+
+/**
+ * Returns the URL of the current environment's changelog
+ * @returns {string} URL of the current environment's changelog
+ */
+export function getChangelogUrl() {
+  let changeLogUrl;
+  switch (env) {
+    case 'develop':
+      changeLogUrl = 'https://github.com/mei-friend/mei-friend/blob/develop/CHANGELOG.md';
+      break;
+    case 'staging':
+      changeLogUrl = 'https://github.com/mei-friend/mei-friend/blob/staging/CHANGELOG.md';
+      break;
+    case 'testing':
+      changeLogUrl = 'https://github.com/mei-friend/mei-friend/blob/testing/CHANGELOG.md';
+      break;
+    case 'production':
+      changeLogUrl = 'https://github.com/mei-friend/mei-friend/blob/main/CHANGELOG.md';
+      break;
+    default:
+      changeLogUrl = 'https://github.com/mei-friend/mei-friend/blob/main/CHANGELOG.md';
+  }
+  return changeLogUrl;
+}

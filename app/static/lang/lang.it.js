@@ -4,6 +4,7 @@
 
 import * as att from '../lib/attribute-classes.js';
 import { heart } from '../css/icons.js';
+import { getChangelogUrl } from '../lib/utils.js';
 
 export const lang = {
   // Schermata iniziale
@@ -12,6 +13,11 @@ export const lang = {
     text: "Mostra schermata iniziale all'avvio",
     description: "Mostra la schermata iniziale di mei-friend quando l'applicazione viene caricata",
   },
+  splashUpdateIndicator: {
+    html: `
+      Il seguente testo è stato aggiornato dall'ultima volta che hai riconosciuto la schermata iniziale. Per i dettagli, si prega di <a href="${getChangelogUrl()}" target="_blank">consultare il registro delle modifiche</a>.`,
+  },
+  splashLastUpdated: { text: 'Testo aggiornato il: ' },
   splashBody: {
     html: `
       <p>
@@ -21,17 +27,10 @@ export const lang = {
         informazioni.
       </p>
       <p>
-        Anche se mei-friend è un'applicazione basata su browser, i tuoi dati personali (compresa la codifica che stai
-        modificando, le impostazioni dell'applicazione e i dettagli di accesso attuali, se presenti) vengono archiviati nel
-        <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank"
-          >localStorage</a
-        > del tuo browser e non vengono trasmessi o memorizzati sui nostri server.
+        Sebbene mei-friend sia un'applicazione basata su browser, i tuoi dati personali (inclusi la codifica che stai modificando, le impostazioni dell'applicazione e i dettagli di accesso attuali, se presenti) sono memorizzati nel <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank">local storage</a> del tuo browser e non sono memorizzati sui nostri server.
       </p>
       <p>
-        I dati vengono trasmessi a GitHub solo quando lo richiedi esplicitamente (ad esempio, quando effettui l'accesso a
-        GitHub, carichi la tua codifica da un repository GitHub o richiedi l'esecuzione di un flusso di lavoro GitHub Action
-        per te). Allo stesso modo, i dati vengono trasmessi al tuo provider Solid scelto solo quando lo richiedi esplicitamente
-        (ad esempio, quando effettui l'accesso a Solid o carichi o salvi annotazioni stand-off).
+        I dati vengono trasmessi a GitHub solo quando lo richiedi esplicitamente (ad esempio, quando accedi a GitHub, carichi la tua codifica da o fai commit su un repository GitHub, o quando richiedi l'esecuzione di un workflow di GitHub Action per te). Allo stesso modo, i dati vengono trasmessi al provider Solid scelto solo quando lo richiedi esplicitamente (ad esempio, quando accedi a Solid, o carichi o salvi annotazioni stand-off). Per motivi tecnici, alcune interazioni con GitHub (clonazione di un repository nel tuo browser quando apri una codifica per la prima volta, o commit delle modifiche a un repository) richiedono che i dati vengano trasmessi a un server proxy ospitato dalla mdw – Università di Musica e Arti dello Spettacolo di Vienna. Questo server funge da intermediario tra il tuo browser e GitHub, e non memorizza alcun dato trasmesso attraverso di esso.
       </p>
       <p>
         Utilizziamo <a href="https://matomo.org/" target="_blank">Matomo</a>
@@ -206,9 +205,6 @@ export const lang = {
   addDiminuendoHairpinText: { text: 'Diminuendo' },
   addBeamText: { text: 'Raggruppa note' },
   addBeamSpanText: { text: 'Raggruppa note su più battute' },
-  addSuppliedText: { text: 'Aggiungi simbolo mancante' },
-  addSuppliedArticText: { text: 'Aggiungi simbolo mancante (Artic)' },
-  addSuppliedAccidText: { text: 'Aggiungi simbolo mancante (Accid)' },
   addArpeggioText: { text: 'Arpeggio' },
   addFermataText: { text: 'Fermata' },
   addGlissandoText: { text: 'Glissato' },
@@ -297,6 +293,9 @@ export const lang = {
   breaksSelectLine: { text: 'Rigo' },
   breaksSelectEncoded: { text: 'Rigo e pagina' },
   breaksSelectSmart: { text: 'Intelligente' },
+  choiceSelect: { description: 'Scegli il contenuto visualizzato per gli elementi di scelta' },
+  choiceDefault: { text: '(scelta predefinita)' },
+  noChoice: { text: '(nessuna scelta disponibile)' },
   updateControlsLabel: {
     text: 'Aggiorna',
     description: 'Cambia il comportamento di controllo dello spartito dopo le modifiche nel codice',
@@ -455,9 +454,10 @@ export const lang = {
   // annotation panel / annotation panel
   annotationCloseButtonText: { text: 'Chiudi la finestra di annotazione' },
   hideAnnotationPanelButton: { description: 'Nascondi la finestra di annotazione' },
+  markupToolsButton: { description: 'Strumenti di marcatura' },
   closeAnnotationPanelButton: { description: 'Chiudi la finestra di annotazione' },
-  annotationToolsButton: { text: 'Strumenti', description: 'Strumenti di annotazione' },
-  annotationListButton: { text: 'Lista', description: 'Elenco delle annotazioni' },
+  annotationToolsButton: { description: 'Strumenti di annotazione' },
+  annotationListButton: { description: 'Elenco delle annotazioni' },
   writeAnnotStandoffText: { text: 'Annotazione Web' },
   annotationToolsIdentifyTitle: { text: 'Identifica' },
   annotationToolsIdentifySpan: { text: 'Identifica oggetto musicale' },
@@ -474,6 +474,9 @@ export const lang = {
   loadWebAnnotationMessage2: { text: 'per favore riprova' },
   noAnnotationsToDisplay: { text: 'Nessuna annotazione da visualizzare' },
   flipPageToAnnotationText: { description: 'Passa alla pagina di questa annotazione' },
+  describeMarkup: { description: 'Descrivi questo markup' },
+  deleteMarkup: { description: 'Elimina questo markup' },
+  deleteMarkupConfirmation: { text: 'Sei sicuro di voler eliminare questo markup?' },
   deleteAnnotation: { description: 'Elimina questa annotazione' },
   deleteAnnotationConfirmation: { text: 'Sei sicuro di voler eliminare questa annotazione?' },
   makeStandOffAnnotation: {
@@ -501,6 +504,96 @@ export const lang = {
   annotationWithoutIdWarning: {
     text1: "Impossibile scrivere l'annotazione perché il punto di ancoraggio MEI non ha un xml:id.",
     text2: 'Assegna un identificativo selezionando "Manipola" -> "Rendi il MEI di nuovo con id" e riprova.',
+  },
+  // MENU DI MARCATURA
+  respSelect: {
+    text: 'Seleziona responsabilità di markup',
+    description: 'Seleziona ID di responsabilità',
+  },
+  selectionSelect: {
+    text: 'Selezione predefinita per il markup',
+    description:
+      "Scegli se il markup appena creato deve racchiudere gli elementi selezionati, l'articolazione o gli accidenti",
+    labels: ['Elementi selezionati', 'Articolazione', 'Accidentale'],
+    valuesDescriptions: [
+      'Aggiungi il markup agli elementi selezionati.',
+      'Aggiungi il markup alle articolazioni nella selezione.',
+      'Aggiungi il markup agli accidentali nella selezione.',
+    ],
+  },
+  alternativeEncodingsGrp: {
+    text: 'Codifiche alternative',
+    description: 'Elementi di markup che contengono diverse versioni.',
+  },
+  addChoiceText: {
+    text: '<choice>',
+    description: 'Raggruppa diverse codifiche alternative per lo stesso punto in un testo.',
+  },
+  choiceSicCorr: {
+    description: 'Inserisci la selezione in <sic> e aggiungi <corr>.',
+  },
+  choiceCorrSic: {
+    description: 'Inserisci la selezione in <corr> e aggiungi <sic>.',
+  },
+  choiceOrigReg: {
+    description: 'Inserisci la selezione in <orig> e aggiungi <reg>.',
+  },
+  choiceRegOrig: {
+    description: 'Inserisci la selezione in <reg> e aggiungi <orig>.',
+  },
+  choiceContentTarget: {
+    description: 'Prima, seleziona il contenuto per questo elemento passando sopra a <scelta>.',
+  },
+  addSubstText: {
+    text: '<subst>',
+    description:
+      "(sostituzione) - Raggruppa gli elementi di trascrizione quando la combinazione deve essere considerata come un'intervento singolo nel testo.",
+  },
+  substAddDel: {
+    description: 'Inserisci la selezione in <add> e aggiungi <del>.',
+  },
+  substDelAdd: {
+    description: 'Inserisci la selezione in <del> e aggiungi <add>.',
+  },
+  substContentTarget: {
+    description: 'Prima, seleziona il contenuto per questo elemento passando sopra a <sostituzione>.',
+  },
+  editInterventionsGrp: {
+    text: 'Interventi editoriali',
+    description: 'Elementi di markup utilizzati per codificare gli interventi editoriali.',
+  },
+  addSuppliedText: {
+    text: '<supplied>',
+    description: "Contiene materiale fornito dal trascrittore o dall'editore per qualsiasi motivo.",
+  },
+  addUnclearText: {
+    text: '<unclear>',
+    description:
+      'Contiene materiale che non può essere trascritto con certezza perché è illeggibile o incomprensibile nella fonte.',
+  },
+  addSicText: { text: '<sic>', description: 'Contiene materiale apparentemente scorretto o inaccurato.' },
+  addCorrText: {
+    text: '<corr>',
+    description: '(correzione) - Contiene la forma corretta di un passaggio apparentemente errato.',
+  },
+  addOrigText: {
+    text: '<orig>',
+    description:
+      "(originale) - Contiene materiale contrassegnato come seguente l'originale, piuttosto che essere normalizzato o corretto.",
+  },
+  addRegText: {
+    text: '<reg>',
+    description: '(regolarizzazione) - Contiene materiale che è stato regolarizzato o normalizzato in qualche modo.',
+  },
+  descMarkupGrp: {
+    text: 'Markup descrittivo',
+    description: 'Elementi di markup utilizzati per codificare le modifiche nel materiale di origine.',
+  },
+  addAddText: { text: '<add>', description: "(aggiunta) - Marca un'aggiunta al testo." },
+  addDelText: {
+    text: '<del>',
+    description:
+      '(eliminazione) - Contiene informazioni eliminate, contrassegnate come eliminate o indicate come superflue o spurie nel testo di copia da parte di un autore, uno scriba, un annotatore o un correttore.',
   },
 
   // MIDI
@@ -810,22 +903,55 @@ export const lang = {
     description: 'Mostra i titoli dei facsimili sopra le immagini di origine',
   },
 
-  // Supplied element // Supplied element
+  // Supplied element // Elemento fornito
   titleSupplied: {
-    text: 'Gestisci il contenuto editoriale',
-    description: 'Controlla la gestione degli elementi <supplied>',
+    text: 'Gestisci contenuto editoriale',
+    description: 'Controllo della gestione del markup editoriale',
   },
-  showSupplied: {
-    text: 'Mostra gli elementi <supplied>',
-    description: "Evidenzia tutti gli elementi contenuti nell'elemento <supplied>",
+  showMarkup: {
+    text: 'Mostra elementi di markup editoriale',
+    description: 'Evidenzia tutti gli elementi contenuti dagli elementi di markup editoriale',
+  },
+  markupToPDF: {
+    text: 'Mostra elementi di markup editoriale nel PDF',
+    description: 'Mostra gli elementi di markup editoriale nel PDF generato',
+  },
+  alternativeVersionContent: {
+    text: 'Contenuto predefinito per le codifiche alternative',
+    description: 'Scegli se le codifiche alternative appena create sono vuote o copie della lettura originale',
+    labels: ['vuoto', 'copia'],
   },
   suppliedColor: {
-    text: "Seleziona il colore per l'evidenziazione di <supplied>",
-    description: "Seleziona il colore per l'evidenziazione di <supplied>",
+    text: 'Seleziona colore di evidenziazione per <supplied>',
+    description: 'Seleziona colore di evidenziazione per <supplied>',
   },
-  respSelect: {
-    text: 'Seleziona la responsabilità di <supplied>',
-    description: "Seleziona l'id della responsabilità",
+  unclearColor: {
+    text: 'Seleziona colore di evidenziazione per <unclear>',
+    description: 'Seleziona colore di evidenziazione per <unclear>',
+  },
+  sicColor: {
+    text: 'Seleziona colore di evidenziazione per <sic>',
+    description: 'Seleziona colore di evidenziazione per <sic>',
+  },
+  corrColor: {
+    text: 'Seleziona colore di evidenziazione per <corr>',
+    description: 'Seleziona colore di evidenziazione per <corr>',
+  },
+  origColor: {
+    text: 'Seleziona colore di evidenziazione per <orig>',
+    description: 'Seleziona colore di evidenziazione per <orig>',
+  },
+  regColor: {
+    text: 'Seleziona colore di evidenziazione per <reg>',
+    description: 'Seleziona colore di evidenziazione per <reg>',
+  },
+  addColor: {
+    text: 'Seleziona colore di evidenziazione per <add>',
+    description: 'Seleziona colore di evidenziazione per <add>',
+  },
+  delColor: {
+    text: 'Seleziona colore di evidenziazione per <del>',
+    description: 'Seleziona colore di evidenziazione per <del>',
   },
 
   // EDITOR SETTINGS / CODEMIRROR SETTINGS
@@ -904,6 +1030,11 @@ export const lang = {
   keyMap: {
     text: 'Mappa tasti',
     description: 'Seleziona la mappa tasti',
+  },
+  persistentSearch: {
+    text: 'Ricerca persistente',
+    description:
+      'Utilizza il comportamento della casella di ricerca persistente (la casella di ricerca rimane aperta fino alla chiusura esplicita)',
   },
 
   // Verovio settings / Impostazioni di Verovio

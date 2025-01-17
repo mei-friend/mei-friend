@@ -3,6 +3,7 @@ import { fontList, platform } from './defaults.js';
 import { svgNameSpace } from './dom-utils.js';
 import { translator } from './main.js';
 import { createPageRangeSelector } from './page-range-selector.js';
+import { choiceOptions } from './markup.js';
 
 // constructs the div structure of #notation parent
 export function createNotationDiv(parentElement, scale) {
@@ -160,6 +161,7 @@ export function createNotationControlBar(parentElement, scale) {
   pagination1.id = 'pagination1';
   let pagination2 = document.createElement('div');
   pagination2.id = 'pagination2';
+  pagination2.classList.add('preventKeyBindigns');
   pagination2.contentEditable = true;
   pagination2.title = 'Click to enter page number';
   let pagination3 = document.createElement('div');
@@ -232,6 +234,18 @@ export function createNotationControlBar(parentElement, scale) {
   breaksSelector.classList.add('input-select');
   breaksCtrls.title = 'Define system/page breaks behavior of notation';
   breaksCtrls.appendChild(breaksSelector);
+
+  // choice selector
+  let choiceCtrls = document.createElement('div');
+  choiceCtrls.id = 'choiceControls';
+  choiceCtrls.classList.add('controls');
+  vrvCtrlMenu.appendChild(choiceCtrls);
+
+  let choiceSelector = document.createElement('select');
+  choiceSelector.id = 'choiceSelect';
+  choiceSelector.classList.add('btn', 'input-select');
+  choiceSelector.title = 'Choose displayed content for choice elements';
+  choiceCtrls.appendChild(choiceSelector);
 
   // MEI encoding update behavior
   let updateCtrls = document.createElement('div');
@@ -541,7 +555,7 @@ const listOfObjects = [
 
 /**
  * Returns a state object of the notation control menu
- * @returns {object}
+ * @returns {Object}
  */
 export function getControlMenuState() {
   let state = {};
@@ -562,7 +576,7 @@ export function getControlMenuState() {
 
 /**
  * Sets the state of the notation control menu
- * @param {object} state
+ * @param {Object} state
  */
 export function setControlMenuState(state) {
   listOfObjects.forEach((obj) => {
@@ -629,6 +643,43 @@ export function handleSmartBreaksOption(speedMode) {
     }
   });
 } // handleSmartBreaksOption()
+
+/**
+ * Adds the options for choice to the choiceSelect in the 
+ * notation control bar.
+ * @param {string} active value of currently active selection 
+ */
+export function setChoiceOptions(active) {
+  let choiceSelect = document.getElementById('choiceSelect');
+  while (choiceSelect.hasChildNodes()) {
+    choiceSelect.removeChild(choiceSelect.firstChild);
+  }
+  if (choiceOptions.length > 0) {
+    choiceOptions.forEach((groupEl) => {
+      let group = document.createElement('optgroup');
+      group.label = groupEl.label ? groupEl.label : groupEl.elName;
+      if (groupEl.id) group.id = groupEl.id;
+
+      groupEl.options.forEach((el) => {
+        let option;
+        if (active && el.value === active) {
+          option = new Option(el.label, el.value, false, true);
+        } else {
+          option = new Option(el.label, el.value, false, false);
+        }
+        option.id = el.id;
+        option.dataset.prop = el.prop;
+        group.appendChild(option);
+      });
+      choiceSelect.appendChild(group);
+    });
+  } else {
+    let option = new Option(translator.lang.noChoice.text, '', false, false);
+    option.id = 'noChoice';
+    choiceSelect.appendChild(option);
+  }
+  
+}
 
 // checks xmlDoc for section, ending, lem, rdg elements for quick navigation
 export function generateSectionSelect(xmlDoc) {

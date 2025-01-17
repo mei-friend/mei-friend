@@ -41,10 +41,19 @@
 }
 
 #listAnnotations {
+  display: flex;
   flex-direction: row;
   overflow-x: scroll;
 }
 
 #addWebAnnotation {
   width: 100px;
+}
+
+#markupToolsMenu {
+  flex-direction: row;
+}
+
+.markupGrp {
+  flex-wrap: wrap;
 }

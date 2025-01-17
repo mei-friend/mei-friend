@@ -1,50 +1,117 @@
-#annotationToolsMenu {
+.enrichmentToolsMenu {
   display: flex;
   padding-left: 0px;
+  align-items: start;
+  justify-items: stretch;
 }
 
-#annotationToolsMenu div {
-  padding: 8px;
+.enrichmentToolsMenu > div {
+  padding: 5px 8px 0px 8px;
 }
 
-#annotationToolsMenu li {
+.enrichmentToolsMenu li {
   display: flex;
   list-style: none;
   padding: 10px;
-  background-color:var(--annotationPanelBackgroundColor)
+  background-color: var(--annotationPanelBackgroundColor);
 }
 
 .annotationToolsIcon {
-  border: 1px solid black;
+  border: 3px solid black;
   border-radius: 5px;
-  padding: 10px;
+  padding: 4px;
   display: flex;
   align-content: center;
   gap: 6px;
   cursor: pointer;
 }
 
-.annotationToolsIconGroup { 
+.annotationToolsIcon:hover {
+  background-color: var(--annotationPanelHoverColor);
+}
+
+.annotationToolsIconGroup {
   border-radius: 5px;
-  margin-bottom: 1em;
+  margin-bottom: 0.2em;
+  position: relative;
+}
+
+.annotationMultiToolsIcon {
+  border: 0px;
+  padding: 6px 3px;
+  flex-grow: 4;
+  position: relative;
+}
+
+.annotationMultiToolsIcon:hover {
+  background-color: var(--annotationPanelHoverColor);
+  border-top-left-radius: 3px;
+  border-bottom-left-radius: 3px;
+}
+
+.annotationMultiToolsButton {
+  border: 2px solid var(--dropdownHeadingColor);
+  border-radius: 5px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  cursor: pointer;
+}
+
+.annotationMultiToolsSelector {
+  border-left: 1px solid var(--dropdownHeadingColor);
+  padding: 6px 0px;
+  /* position: relative;
+  left: 9px; */
+}
+
+.annotationMultiToolsSelector:hover {
+  background-color: var(--annotationPanelHoverColor);
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
 }
 
 .annotationListItemButtons.icon {
-  cursor:pointer;
+  cursor: pointer;
 }
 
-#annotateIdentify.disabled, writeAnnotationStandoffLabel.disabled {
-  opacity:.6;
+#annotateIdentify.disabled,
+writeAnnotationStandoffLabel.disabled {
+  opacity: 0.6;
   pointer-events: none;
 }
 
-.makeStandoffAnnotation svg.clockwise { 
-  pointer-events:none;
-  cursor:default;
+.makeStandoffAnnotation svg.clockwise {
+  pointer-events: none;
+  cursor: default;
 }
 
-fieldset { 
-  border: 0px;
+#markupToolsMenu {
+  display: flex;
+  align-items: stretch;
+}
+
+#annotationTools fieldset, #markupTools fieldset{
+  border-width: 1px;
+  border-radius: 9px;
+  padding: 2px;
+  width: 210px;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 5px;
+}
+
+#annotationTools fieldset > legend, #markupTools fieldset > legend {
+  font-weight: bold;
+}
+
+#annotationToolsDomainSelection fieldset {
+  flex-direction: row;
+}
+
+.selectedAnnotationListItem {
+  background-color: var(--annotationPanelHoverColor);
 }
 
 .annotationToolsDomainSelectionItem {
@@ -65,9 +132,128 @@ fieldset {
   cursor: pointer;
 }
 
-.annotationIdentify { 
+.annotationIdentify {
   filter: drop-shadow(0px 0px 3em red);
   cursor: pointer;
+}
+
+.annotationHighlight.annotationListItem {
+  filter: unset;
+  box-shadow: 0em 0em 0.5em darkgreen;
+}
+
+.annotationDescribe.annotationListItem {
+  filter: unset;
+  box-shadow: 0em 0em 0.5em blue;
+  cursor: pointer;
+}
+
+.annotationLink.annotationListItem {
+  filter: unset;
+  box-shadow: 0em 0em 0.5em purple;
+}
+
+.annotationIdentify.annotationListItem {
+  filter: unset;
+  box-shadow: 0em 0em 0.5em red;
+}
+
+.markup-panel {
+  display: flex;
+  position: relative;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.markupGrp {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.markupSetting {
+  display: inline-grid;
+  margin-bottom: 10px;
+}
+
+.markupSetting select {
+  background-color: var(--annotationPanelLinkBackgroundColor);
+  color: var(--annotationPanelTextColor);
+  max-width: fit-content;
+}
+
+.markupSetting select option {
+  background-color: var(--annotationPanelLinkBackgroundColor);
+  color: var(--annotationPanelTextColor);
+}
+
+.markup-btn-group {
+  border: 1px solid black;
+  border-radius: 5px;
+  /*padding: 10px;*/
+  cursor: pointer;
+  /* Pointer/hand icon */
+  float: auto;
+  /* Float the buttons side by side */
+}
+
+/*.btn-group:after {
+  content: "";
+  clear: both;
+  display: table;
+}*/
+
+.markup-btn-group span:not(:last-child) {
+  padding-right: 10px;
+}
+
+/* Add a background color on hover */
+/*.markup-btn-group .markup-dropdown:hover {
+  background-color: var(--annotationPanelHoverColor);
+}*/
+
+.alternativeEncodingsContent {
+  border-left: 1px solid black;
+  width: min-content;
+}
+
+.markup-dropdown {
+  display: inline-block;
+  padding: 1px 2px;
+}
+
+.markup-dropdown-content {
+  display: none;
+  position: absolute;
+  left: 0px;
+  top: 2.2em;
+  background-color: var(--annotationPanelLinkBackgroundColor);
+  min-width: 100px;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.3);
+  z-index: 1;
+  border: 1px solid var(--dropdownHeadingColor);
+  border-radius: 5px;
+  width: 100%;
+  margin-left: -1px;
+}
+
+/*.markup-dropdown-up {
+  bottom: 50px;
+}*/
+
+.markup-dropdown-content a {
+  color: var(--annotationPanelTextColor);
+  padding: 6px 2px;
+  text-decoration: none;
+  display: block;
+}
+
+.markup-dropdown-content a:hover {
+  background-color: var(--annotationPanelHoverColor);
+}
+
+.markup-dropdown:hover .markup-dropdown-content {
+  display: block;
 }
 
 #renderedAnnotationsContainer {
@@ -80,11 +266,11 @@ fieldset {
   fill: none;
   stroke: red;
   stroke-width: 3;
-  stroke-opacity: .7;
+  stroke-opacity: 0.7;
 }
 
-#listAnnotations { 
-  display:flex !important;
+#listAnnotations {
+  display: flex /*!important*/;
 }
 
 #listAnnotations details {
@@ -109,69 +295,132 @@ summary.noDetails {
   border: 1px solid black;
   border-radius: 5px;
   width: 205px;
-  margin: .25em;
-  padding:0px !important;
+  margin: 0.25em;
+  padding: 0px !important;
 }
 
 .annotationListItem {
-  border: 1px solid black;
+  border: 3px solid black;
   border-radius: 5px;
   height: fit-content;
-  max-height: 205px; 
-  width: 205px;
-  margin: .25em;
+  max-height: 205px;
+  max-width: 205px;
+  margin: 0.25em;
   flex-shrink: 0;
+  cursor: pointer;
 }
 
-.annotationListItem summary { 
-  font-size:10pt;
-  font-weight: normal !important;
+.annotationListItem legend {
+  background-color: var(--annotationPanelBackgroundColor);
+  /* border-radius: 8px; */
 }
 
 .annotationListItemButtons {
   border-top: 1px solid black;
-  padding: .25em .5em;
+  padding: 0.25em 0.5em;
+}
+
+.annotationContent {
+  display: flex;
+  flex-direction: column;
+}
+
+.annotationLocationLabel {
+  font-weight: bold;
 }
 
 #addWebAnnotation {
   border: 1px solid black;
   border-radius: 5px;
-  padding: .2em;
-  margin: .25em;
+  padding: 0.2em;
+  margin: 0.25em;
   cursor: pointer;
   height: fit-content;
   max-width: 192px;
-  padding: .25em .5em;
+  padding: 0.25em 0.5em;
 }
 
-.annotationListItemButtons svg, #listAnnotations svg {
+.annotationListItemButtons svg,
+#listAnnotations svg {
   width: 1em;
   height: 1em;
 }
 
-.mao-selection { 
-  padding:2px;
-  padding-left:5px;
+.mao-selection {
+  padding: 2px;
+  padding-left: 5px;
 }
 
 .mao-extract {
-  padding:2px;
+  padding: 2px;
 }
 
-.mao-musMat { 
-  background-color: var(--annotationPanelLinkBackgroundColor); 
+.mao-musMat {
+  background-color: var(--annotationPanelLinkBackgroundColor);
   padding: 2px;
-  border-radius:10px;
+  border-radius: 10px;
 }
 
 #solid_logo {
   pointer-events: none;
 }
 
-#solidLogin { 
-  margin-left: .5em;
+#solidLogin {
+  margin-left: 0.5em;
 }
 
-#providerSelect { 
-  display:block;
+#providerSelect {
+  display: block;
+}
+
+/* highlight markup menu buttons with corresponding colors */
+
+.suppliedLabel {
+  border-color: var(--suppliedBgColor);
+}
+
+.unclearLabel {
+  border-color: var(--unclearBgColor);
+}
+
+.sicLabel {
+  border-color: var(--sicBgColor);
+}
+
+.corrLabel {
+  border-color: var(--corrBgColor);
+}
+
+.origLabel {
+  border-color: var(--origBgColor);
+}
+
+.regLabel {
+  border-color: var(--regBgColor);
+}
+
+.addLabel {
+  border-color: var(--addBgColor);
+}
+
+.delLabel {
+  border-color: var(--delBgColor);
+}
+
+.splitButtonContainer {
+  /*display: inline-block;*/
+  word-wrap: break-word;
+  border-radius: 5px;
+  margin: 4px;
+}
+
+.splitButtonLabel {
+  padding: 1px 2px;
+  border-width: 2px;
+  border-radius: 5px;
+  border-style: solid;
+}
+
+.splitButtonLabel:hover {
+  background-color: unset;
 }

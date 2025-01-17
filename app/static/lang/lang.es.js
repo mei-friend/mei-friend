@@ -4,6 +4,7 @@
 
 import * as att from '../lib/attribute-classes.js';
 import { heart } from '../css/icons.js';
+import { getChangelogUrl } from '../lib/utils.js';
 
 export const lang = {
   // Pantalla de bienvenida
@@ -12,7 +13,11 @@ export const lang = {
     text: 'Mostrar pantalla de bienvenida al cargar',
     description: 'Mostrar la pantalla de bienvenida de mei-friend cuando se carga la aplicación',
   },
-
+  splashUpdateIndicator: {
+    html: `
+      El siguiente texto ha sido actualizado desde la última vez que reconociste la pantalla de bienvenida. Para más detalles, por favor <a href="${getChangelogUrl()}" target="_blank">consulta la lista de cambios</a>.`,
+  },
+  splashLastUpdated: { text: 'Texto actualizado por última vez el: ' },
   splashBody: {
     html: `
       <p>
@@ -22,17 +27,10 @@ export const lang = {
         más información.
       </p>
       <p>
-        Aunque mei-friend es una aplicación basada en el navegador, tus datos personales (incluyendo la codificación que
-        estás editando, la configuración de tu aplicación y los detalles actuales de inicio de sesión, si los tienes) se
-        almacenan en el <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank"
-          >almacenamiento local</a
-        > de tu navegador y no se transmiten ni se almacenan en nuestros servidores.
+        Aunque mei-friend es una aplicación basada en el navegador, tus datos personales (incluyendo la codificación que estás editando, tus configuraciones de la aplicación y los detalles de inicio de sesión actuales, si los hay) se almacenan en el <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank">almacenamiento local</a> de tu navegador y no se almacenan en nuestros servidores.
       </p>
       <p>
-        Los datos se transmiten a GitHub solo cuando lo solicitas explícitamente (por ejemplo, cuando inicias sesión en
-        GitHub, cargas tu codificación desde un repositorio de GitHub o cuando solicitas que se ejecute un flujo de trabajo
-        GitHub Action). De manera similar, los datos se transmiten a tu proveedor Solid elegido solo cuando lo solicitas
-        explícitamente (por ejemplo, cuando inicias sesión en Solid o cargas o guardas anotaciones stand-off).
+        Los datos se transmiten a GitHub solo cuando lo solicitas explícitamente (por ejemplo, cuando inicias sesión en GitHub, cargas tu codificación desde o confirmas en un repositorio de GitHub, o cuando solicitas que se ejecute un flujo de trabajo de GitHub Action para ti). De manera similar, los datos se transmiten a tu proveedor de Solid elegido solo cuando lo solicitas explícitamente (por ejemplo, cuando inicias sesión en Solid, o cargas o guardas anotaciones stand-off). Por razones técnicas, ciertas interacciones con GitHub (clonar un repositorio a tu navegador al abrir una codificación por primera vez, o confirmar cambios en un repositorio) requieren que los datos se transmitan a un servidor proxy alojado por la mdw – Universidad de Música y Artes Escénicas de Viena. Este servidor actúa como intermediario entre tu navegador y GitHub, y no almacena ningún dato transmitido a través de él.
       </p>
       <p>
         Utilizamos <a href="https://matomo.org/" target="_blank">Matomo</a>
@@ -203,9 +201,6 @@ export const lang = {
   addDiminuendoHairpinText: { text: 'Disminuendo' },
   addBeamText: { text: 'Haz' },
   addBeamSpanText: { text: 'Extensión de haz' },
-  addSuppliedText: { text: 'Suministrado' },
-  addSuppliedArticText: { text: 'Suministrado (articulación)' },
-  addSuppliedAccidText: { text: 'Suministrado (acento)' },
   addArpeggioText: { text: 'Arpegio' },
   addFermataText: { text: 'Fermata' },
   addGlissandoText: { text: 'Glissando' },
@@ -294,6 +289,9 @@ export const lang = {
   breaksSelectMeasure: { text: 'Compás' },
   breaksSelectEncoded: { text: 'Sistema y página' },
   breaksSelectSmart: { text: 'Smart' },
+  choiceSelect: { description: 'Elegir contenido mostrado para elementos de elección' },
+  choiceDefault: { text: '(elección por defecto)' },
+  noChoice: { text: '(ninguna opción disponible)' },
   updateControlsLabel: {
     text: 'Actualizar',
     description: 'Controlar el comportamiento de actualización de la notación después de cambios en la codificación',
@@ -450,8 +448,9 @@ export const lang = {
   annotationCloseButtonText: { text: 'Cerrar panel de anotaciones' },
   hideAnnotationPanelButton: { description: 'Cerrar panel de anotaciones' },
   closeAnnotationPanelButton: { description: 'Cerrar panel de anotaciones' },
-  annotationToolsButton: { text: 'Utilidades', description: 'Herramientas de anotación' },
-  annotationListButton: { text: 'Lista', description: 'Listar anotaciones' },
+  markupToolsButton: { description: 'Herramientas de marcado' },
+  annotationToolsButton: { description: 'Herramientas de anotación' },
+  annotationListButton: { description: 'Lista de anotaciones' },
   writeAnnotStandoffText: { text: 'Anotación Web' },
   annotationToolsIdentifyTitle: { text: 'Identificar' },
   annotationToolsIdentifySpan: { text: 'Identificar objeto musical' },
@@ -468,6 +467,9 @@ export const lang = {
   loadWebAnnotationMessage2: { text: 'por favor, inténtalo de nuevo' },
   noAnnotationsToDisplay: { text: 'No hay anotaciones para mostrar' },
   flipPageToAnnotationText: { description: 'Ir a esta anotación' },
+  describeMarkup: { description: 'Describir este marcado' },
+  deleteMarkup: { description: 'Eliminar este marcado' },
+  deleteMarkupConfirmation: { text: '¿Estás seguro/a de que deseas eliminar este marcado?' },
   deleteAnnotation: { description: 'Eliminar esta anotación' },
   deleteAnnotationConfirmation: { text: '¿Estás seguro de que deseas eliminar esta anotación?' },
   makeStandOffAnnotation: {
@@ -495,6 +497,96 @@ export const lang = {
     text1: 'No se puede escribir la anotación porque el punto de anclaje MEI carece de xml:id.',
     text2:
       'Asigna identificadores seleccionando "Manipular" -> "Volver a renderizar MEI (con identificadores)" e inténtalo de nuevo.',
+  },
+  // MENÚ DE MARCADO
+  respSelect: {
+    text: 'Seleccionar responsabilidad de marcado',
+    description: 'Seleccionar ID de responsabilidad',
+  },
+  selectionSelect: {
+    text: 'Selección predeterminada para marcar',
+    description:
+      'Elija si la marca recién creada debe incluir los elementos seleccionados, articulaciones o alteraciones',
+    labels: ['Elementos seleccionados', 'Articulación', 'Accidental'],
+    valuesDescriptions: [
+      'Añade marcado a los elementos seleccionados.',
+      'Añade marcado a las articulaciones dentro de la selección.',
+      'Añade marcado a los accidentales dentro de la selección.',
+    ],
+  },
+  alternativeEncodingsGrp: {
+    text: 'Codificaciones alternativas',
+    description: 'Elementos de marcado que contienen múltiples versiones.',
+  },
+  addChoiceText: {
+    text: '<choice>',
+    description: 'Agrupa varias codificaciones alternativas para el mismo punto en un texto.',
+  },
+  choiceSicCorr: {
+    description: 'Coloca la selección en <sic> y añade <corr>.',
+  },
+  choiceCorrSic: {
+    description: 'Coloca la selección en <corr> y añade <sic>.',
+  },
+  choiceOrigReg: {
+    description: 'Coloca la selección en <orig> y añade <reg>.',
+  },
+  choiceRegOrig: {
+    description: 'Coloca la selección en <reg> y añade <orig>.',
+  },
+  choiceContentTarget: {
+    description: 'Primero, selecciona el contenido para este elemento pasando el cursor sobre <elección>.',
+  },
+  addSubstText: {
+    text: '<subst>',
+    description:
+      '(sustitución) – Agrupa elementos de transcripción cuando la combinación debe considerarse como una intervención única en el texto.',
+  },
+  substAddDel: {
+    description: 'Coloca la selección en <add> y añade <del>.',
+  },
+  substDelAdd: {
+    description: 'Coloca la selección en <del> y añade <add>.',
+  },
+  substContentTarget: {
+    description: 'Primero, selecciona el contenido para este elemento pasando el cursor sobre <sustitución>.',
+  },
+  editInterventionsGrp: {
+    text: 'Intervenciones editoriales',
+    description: 'Elementos de marcado utilizados para codificar intervenciones editoriales.',
+  },
+  addSuppliedText: {
+    text: '<supplied>',
+    description: 'Contiene material suministrado por el transcriptor o editor por cualquier motivo.',
+  },
+  addUnclearText: {
+    text: '<unclear>',
+    description:
+      'Contiene material que no se puede transcribir con certeza porque es ilegible o inaudible en la fuente.',
+  },
+  addSicText: { text: '<sic>', description: 'Contiene material aparentemente incorrecto o inexacto.' },
+  addCorrText: {
+    text: '<corr>',
+    description: '(corrección) – Contiene la forma correcta de un pasaje aparentemente erróneo.',
+  },
+  addOrigText: {
+    text: '<orig>',
+    description:
+      '(original) – Contiene material que se marca como siguiendo el original, en lugar de ser normalizado o corregido.',
+  },
+  addRegText: {
+    text: '<reg>',
+    description: '(regularización) – Contiene material que ha sido regularizado o normalizado en algún sentido.',
+  },
+  descMarkupGrp: {
+    text: 'Marcado descriptivo',
+    description: 'Elementos de marcado utilizados para codificar intervenciones en el material fuente.',
+  },
+  addAddText: { text: '<add>', description: '(adición) – Marca una adición al texto.' },
+  addDelText: {
+    text: '<del>',
+    description:
+      '(eliminación) – Contiene información eliminada, marcada como eliminada, o indicada como superflua o espuria en el texto copiado por un autor, escribano, anotador o corrector.',
   },
 
   // MIDI // MIDI
@@ -806,20 +898,54 @@ export const lang = {
 
   // Supplied element / Elemento suministrado
   titleSupplied: {
-    text: 'Manejar contenido editorial',
-    description: 'Controlar el manejo de elementos <supplied>',
+    text: 'Gestionar contenido editorial',
+    description: 'Controlar el manejo del marcado editorial',
   },
-  showSupplied: {
-    text: 'Mostrar elementos <supplied>',
-    description: 'Destacar todos los elementos contenidos por un elemento <supplied>',
+  showMarkup: {
+    text: 'Mostrar elementos de marcado editorial',
+    description: 'Resaltar todos los elementos contenidos por elementos de marcado editorial',
+  },
+  markupToPDF: {
+    text: 'Mostrar marcado editorial en PDF',
+    description: 'Mostrar marcado editorial en PDF',
+  },
+  alternativeVersionContent: {
+    text: 'Contenido predeterminado para codificaciones alternativas',
+    description:
+      'Elegir si las codificaciones alternativas recién creadas están vacías o son copias de la lectura original',
+    labels: ['vacío', 'copia'],
   },
   suppliedColor: {
-    text: 'Seleccionar color de resaltado <supplied>',
-    description: 'Seleccionar color de resaltado <supplied>',
+    text: 'Seleccionar color de resaltado para <supplied>',
+    description: 'Seleccionar color de resaltado para <supplied>',
   },
-  respSelect: {
-    text: 'Seleccionar responsabilidad <supplied>',
-    description: 'Seleccionar ID de responsabilidad',
+  unclearColor: {
+    text: 'Seleccionar color de resaltado para <unclear>',
+    description: 'Seleccionar color de resaltado para <unclear>',
+  },
+  sicColor: {
+    text: 'Seleccionar color de resaltado para <sic>',
+    description: 'Seleccionar color de resaltado para <sic>',
+  },
+  corrColor: {
+    text: 'Seleccionar color de resaltado para <corr>',
+    description: 'Seleccionar color de resaltado para <corr>',
+  },
+  origColor: {
+    text: 'Seleccionar color de resaltado para <orig>',
+    description: 'Seleccionar color de resaltado para <orig>',
+  },
+  regColor: {
+    text: 'Seleccionar color de resaltado para <reg>',
+    description: 'Seleccionar color de resaltado para <reg>',
+  },
+  addColor: {
+    text: 'Seleccionar color de resaltado para <add>',
+    description: 'Seleccionar color de resaltado para <add>',
+  },
+  delColor: {
+    text: 'Seleccionar color de resaltado para <del>',
+    description: 'Seleccionar color de resaltado para <del>',
   },
 
   //  EDITOR SETTINGS / CODEMIRROR SETTINGS // CONFIGURACIÓN DEL EDITOR / CONFIGURACIÓN DE CODEMIRROR
@@ -898,6 +1024,12 @@ export const lang = {
   keyMap: {
     text: 'Mapa de teclas',
     description: 'Seleccione el mapa de teclas',
+  },
+  // Persistent Search / Búsqueda persistente
+  persistentSearch: {
+    text: 'Caja de búsqueda persistente',
+    description:
+      'Utilizar el comportamiento de la caja de búsqueda persistente (la caja de búsqueda permanece abierta hasta que se cierre explícitamente)',
   },
 
   // Verovio settings / Configuraciones de Verovio

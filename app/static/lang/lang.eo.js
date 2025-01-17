@@ -4,6 +4,7 @@
 
 import * as att from '../lib/attribute-classes.js';
 import { heart } from '../css/icons.js';
+import { getChangelogUrl } from '../lib/utils.js';
 
 export const lang = {
   // Splash screen
@@ -12,28 +13,28 @@ export const lang = {
     text: 'Montri komenca ekrano ĉe ŝarĝo',
     description: 'Montru la mei-friend komenca ekrano kiam la aplikaĵo estas ŝargita',
   },
+  splashUpdateIndicator: {
+    html: `
+      La sekva teksto estis ĝisdatigita ekde la lasta fojo kiam vi agnoskis la komencan ekranon. Por detaloj, bonvolu <a href="${getChangelogUrl()}" target="_blank">konsulti la ŝanĝoprotokolon</a>.`,
+  },
+  splashLastUpdated: { text: 'Teksto laste ĝisdatigita je: ' },
   splashBody: {
     html: `
     <p>
       mei-friend estas redaktanto por <a href="https://music-encoding.org">muzikaj kodadoj</a>, gastigita ĉe
-      <a href="https://mdw.ac.at" target="_blank">mdw &ndash; Universitato de Muziko kaj Artaj Artoj de Vieno</a>. 
+      <a href="https://mdw.ac.at" target="_blank">mdw &ndash; Universitato de Muziko kaj Prezentartoj de Vieno</a>. 
       Bonvolu konsulti nian <a href="https://mei-friend.github.io" target="_blank">ampleksan dokumentadon</a> por 
       pliaj informoj.
     </p>
     <p>
-      Kvankam mei-friend estas retumila aplikaĵo, viaj personaĵaj datumoj (inkluzive la kodo kiun
-      vi redaktas, viaj aplikaĵaj agordoj, kaj aktualegaj ensalutinformoj se ili ekzistas) estas konservitaj en via retumila navigilo en
-      <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank"
-        >lokal memoro</a
-      > kaj ne estas senditaj al aŭ konservitaj sur niaj serviloj.
+      Kvankam mei-friend estas retumila aplikaĵo, viaj personaj datumoj (inkluzive de la kodado, kiun vi redaktas, viaj aplikaĵaj agordoj, kaj aktualaj ensalutaj detaloj, se ekzistas) estas konservitaj en via retumilo <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank">lokan stokadon</a> kaj ne estas konservitaj en niaj serviloj.
     </p>
     <p>
-      Datumoj estas senditaj al GitHub nur kiam vi eksplice petas tion (ekzemple, kiam vi ensalutas al GitHub, ŝargas
-      vian kodon de aŭ al GitHub-repozitorio, aŭ kiam vi petas ke GitHub-agonaj laborfluo estu ekigita por vi). Sammaniere, datumoj estas senditaj al via elektita Solid provizanto nur kiam vi eksplice petas tion (ekzemple, kiam vi ensalutas al Solid, aŭ ŝargas aŭ konservas standoff-anotaciojn).
+      Datumoj estas transdonitaj al GitHub nur kiam vi eksplicite petas ĝin (ekz., kiam vi ensalutas al GitHub, ŝarĝas vian kodadon de aŭ kontribuas al GitHub deponejo, aŭ kiam vi petas GitHub Ago-fluon por esti ruliĝita por vi). Simile, datumoj estas transdonitaj al via elektita Solid provizanto nur kiam vi eksplicite petas ĝin (ekz., kiam vi ensalutas al Solid, aŭ ŝarĝas aŭ konservas standoff-notojn). Pro teknikaj kialoj, certaj interagoj kun GitHub (klonante deponejon al via retumilo kiam unue malfermas kodadon, aŭ kontribuante ŝanĝojn al deponejo) postulas datumojn esti transdonitaj al prokura servilo gastigita de mdw – Universitato de Muziko kaj Prezentartoj de Vieno. Ĉi tiu servilo agas kiel peranto inter via retumilo kaj GitHub, kaj ne konservas iujn ajn datumojn transdonitajn tra ĝi.
     </p>
     <p>
       Ni uzas <a href="https://matomo.org/" target="_blank">Matomo</a>
-      por kolekti anonimajn uzo-statistikojn. Tio inkluzivas vian mallongan IP-adreson (permesanta geolokigon ĝis landnivelo, sed neniun plian identigon), vian foliumilon kaj operaciumon, de kie vi venis (t.e., la referanta retejo), la tempon kaj daŭron de via vizito, kaj la paĝojn kiujn vi vizitis. Tiu informo estas konservita en la Matomo-okaziga servilo situanta sur serviloj de mdw &ndash; Universitato de Muziko kaj Artaj Artoj de Vieno, kaj ne estas dividata kun triaj partioj.
+      por kolekti anonimajn uzo-statistikojn. Tio inkluzivas vian mallongan IP-adreson (permesanta geolokigon ĝis landnivelo, sed neniun plian identigon), vian foliumilon kaj operaciumon, de kie vi venis (t.e., la referanta retejo), la tempon kaj daŭron de via vizito, kaj la paĝojn kiujn vi vizitis. Tiu informo estas konservita en la Matomo-okaziga servilo situanta sur serviloj de mdw &ndash; Universitato de Muziko kaj Prezentartoj de Vieno, kaj ne estas dividata kun triaj partioj.
     </p>
     <p>
       Lut-tabulaturoj estas konvertitaj al MEI uzante 
@@ -59,7 +60,7 @@ export const lang = {
       mei-friend estas disvolvita de
       <a href="https://iwk.mdw.ac.at/werner-goebl" target="_blank">Werner Goebl</a> kaj
       <a href="https://iwk.mdw.ac.at/david-weigl" target="_blank">David M. Weigl</a> ĉe la Departemento de Muzika
-      Akustiko &ndash; Viennan Stilon ĉe mdw &ndash; Universitato de Muziko kaj Artaj Artoj de Vieno, kaj
+      Akustiko &ndash; Viena Sonstilo ĉe mdw &ndash; Universitato de Muziko kaj Prezentartoj de Vieno, kaj
       estas permesita sub la
       <a href="https://spdx.org/licenses/AGPL-3.0-or-later.html" target="_blank"
         >GNU Affero General Public License v3.0</a
@@ -172,8 +173,8 @@ export const lang = {
   decreaseDurText: { text: 'Malpligrandigi daŭron' },
   toggleDotsText: { text: 'Ŝalti punktadon' },
   cleanAccidText: { text: 'Kontroli @accid.ges' },
-  renumberMeasuresTestText: { text: ' Reenumeri mezurojn (testo)' },
-  renumberMeasuresExecText: { text: ' Reenumeri mezurojn (ekzekuti)' },
+  renumberMeasuresTestText: { text: ' Reenumeri taktojn (testo)' },
+  renumberMeasuresExecText: { text: ' Reenumeri taktojn (ekzekuti)' },
   addIdsText: { text: 'Aldoni id-ojn al MEI' },
   removeIdsText: { text: 'Forigi id-ojn el MEI' },
   reRenderMeiVerovio: { text: ' Reeldoni per Verovio' },
@@ -199,9 +200,6 @@ export const lang = {
   addDiminuendoHairpinText: { text: 'Malgrandigo harpuno' },
   addBeamText: { text: 'Traveto' },
   addBeamSpanText: { text: 'Travetospaco' },
-  addSuppliedText: { text: 'Liverita' },
-  addSuppliedArticText: { text: 'Liverita (Artaĵo)' },
-  addSuppliedAccidText: { text: 'Liverita (Akĉento)' },
   addArpeggioText: { text: 'Arpegio' },
   addFermataText: { text: 'Fermato' },
   addGlissandoText: { text: 'Glisado' },
@@ -284,10 +282,13 @@ export const lang = {
   breaksSelect: { description: 'Difini sistemo/paĝa-pauza konduto de notado' },
   breaksSelectNone: { text: 'Nenio' },
   breaksSelectAuto: { text: 'Aŭtomata' },
-  breaksSelectMeasure: { text: 'Mezuro' },
+  breaksSelectMeasure: { text: 'Takto' },
   breaksSelectLine: { text: 'Sistemo' },
   breaksSelectEncoded: { text: 'Sistemo kaj paĝo' },
   breaksSelectSmart: { text: 'Saĝa' },
+  choiceSelect: { description: 'Choose displayed content for choice elements' },
+  choiceDefault: { text: '(default choice)' },
+  noChoice: { text: '(nenia elekto disponebla)' },
   updateControlsLabel: { text: 'Ĝisdatigo', description: 'KontrolĜisdatigo konduto de notado post ŝanĝoj en kodado' },
   liveUpdateCheckbox: { description: 'Aŭtomate ĝisdatigi notadon post ŝanĝoj en kodado' },
   codeManualUpdateButton: { description: 'Mane ĝisdatigi notadon' },
@@ -439,8 +440,8 @@ export const lang = {
   annotationCloseButtonText: { text: 'Fermi la Panelon de Notoj' },
   hideAnnotationPanelButton: { description: 'Fermi la Panelon de Notoj' },
   closeAnnotationPanelButton: { description: 'Fermi la Panelon de Notoj' },
-  annotationToolsButton: { text: 'Iloj', description: 'Iloj de Notoj' },
-  annotationListButton: { text: 'Listo', description: 'Listigi Notojn' },
+  annotationToolsButton: { description: 'Iloj de Notoj' },
+  annotationListButton: { description: 'Listigi Notojn' },
   writeAnnotStandoffText: { text: 'Reteja Noto' },
   annotationToolsIdentifyTitle: { text: 'Identigi' },
   annotationToolsIdentifySpan: { text: 'Identigi Muzikan Objekton' },
@@ -457,6 +458,9 @@ export const lang = {
   loadWebAnnotationMessage2: { text: 'bonvolu reprovi' },
   noAnnotationsToDisplay: { text: 'Neniu notoj por montri' },
   flipPageToAnnotationText: { description: 'Turni paĝon al ĉi tiu noto' },
+  describeMarkup: { description: 'Priskribu ĉi tiun markadon' },
+  deleteMarkup: { description: 'Forigu ĉi tiun markadon' },
+  deleteMarkupConfirmation: { text: 'Ĉu vi certas, ke vi volas forigi ĉi tiun markadon?' },
   deleteAnnotation: { description: 'Forigi ĉi tiun noton' },
   deleteAnnotationConfirmation: { text: 'Ĉu vi certas ke vi volas forigi ĉi tiun noton?' },
   makeStandOffAnnotation: {
@@ -483,6 +487,95 @@ export const lang = {
   annotationWithoutIdWarning: {
     text1: 'Ne eblas enmeti noton ĉar la MEI ankorpunkto ne havas xml:id.',
     text2: 'Bonvolu aljuđi identigilojn elektante "Mankanĝi" -> "Re-rendi MEI (kun id-etoj)" kaj provi denove.',
+  },
+  // Markup tools
+  respSelect: {
+    text: 'Elekti markad-respondecon',
+    description: 'Elekti identigilon de respondeco',
+  },
+  selectionSelect: {
+    text: 'Defaŭlta elekto por markado',
+    description: 'Elektu ĉu nova kreita markado devus ĉirkaŭi la elektitajn elementojn, artikulaciojn aŭ akcidentojn',
+    labels: ['Elektitaj elementoj', 'Artikulado', 'Okaza'],
+    valuesDescriptions: [
+      'Aldonu markigon al elektitaj elementoj.',
+      'Aldonu markigon al artikuladoj en la elektado.',
+      'Aldonu markigon al okazaĵoj en la elektado.',
+    ],
+  },
+  alternativeEncodingsGrp: {
+    text: 'Alternativaj kodoj',
+    description: 'Markigoj kiuj enhavas multoblajn versiojn.',
+  },
+  addChoiceText: {
+    text: '<choice>',
+    description: 'Grupigas nombron da alternativaj kodoj por la sama punkto en teksto.',
+  },
+  choiceSicCorr: {
+    description: 'Metu elekton en <sic> kaj aldonu <corr>.',
+  },
+  choiceCorrSic: {
+    description: 'Metu elekton en <corr> kaj aldonu <sic>.',
+  },
+  choiceOrigReg: {
+    description: 'Metu elekton en <orig> kaj aldonu <reg>.',
+  },
+  choiceRegOrig: {
+    description: 'Metu elekton en <reg> kaj aldonu <orig>.',
+  },
+  choiceContentTarget: {
+    description: 'Unue elektu enhavon por tiu elemento pasante la muson super <elekto>.',
+  },
+  addSubstText: {
+    text: '<subst>',
+    description:
+      '(anstataŭigo) – Grupigas transskriptajn elementojn kiam la kombino devas esti rigardata kiel unuopa interveno en la teksto.',
+  },
+  substAddDel: {
+    description: 'Metu elekton en <add> kaj aldonu <del>.',
+  },
+  substDelAdd: {
+    description: 'Metu elekton en <del> kaj aldonu <add>.',
+  },
+  substContentTarget: {
+    description: 'Unue elektu enhavon por tiu elemento pasante la muson super <anstataŭigo>.',
+  },
+  editInterventionsGrp: {
+    text: 'Redakciaj intervenoj',
+    description: 'Markigoj uzataj por enkodi redakciajn intervenojn.',
+  },
+  addSuppliedText: {
+    text: '<supplied>',
+    description: 'Enhavas materialon provizitan de la transskribanto aŭ redaktoro pro iu kialo.',
+  },
+  addUnclearText: {
+    text: '<unclear>',
+    description:
+      'Enhavas materialon kiun oni ne povas transskribi kun certeco ĉar ĝi estas nelegebla aŭ neaŭdebla en la fonto.',
+  },
+  addSicText: { text: '<sic>', description: 'Enhavas ŝajne malĝustan aŭ eraran materialon.' },
+  addCorrText: {
+    text: '<corr>',
+    description: '(korekto) – Enhavas la ĝustan formon de ŝajne erara pasiĝo.',
+  },
+  addOrigText: {
+    text: '<orig>',
+    description:
+      '(originalo) – Enhavas materialon kiu estas markita kiel sekva la originalon, anstataŭ esti normaligita aŭ korektita.',
+  },
+  addRegText: {
+    text: '<reg>',
+    description: '(reguligo) – Enhavas materialon kiu estas reguligita aŭ normaligita iam ajn.',
+  },
+  descMarkupGrp: {
+    text: 'Priskriba Markigo',
+    description: 'Markigoj uzataj por enkodi intervenojn en la fontmateriaĵo.',
+  },
+  addAddText: { text: '<add>', description: '(aldono) – Markas aldono al la teksto.' },
+  addDelText: {
+    text: '<del>',
+    description:
+      '(forigo) – Enhavas informon forigitan, markitan kiel forigita, aŭ alie indikitan kiel superflua aŭ fuŝa en la kopia teksto de aŭtoro, skribanto, notanto, aŭ korektisto.',
   },
 
   // MIDI
@@ -736,7 +829,7 @@ export const lang = {
   },
   showAnnotations: {
     text: 'Montri notojn',
-    description: 'Montri muzikajn notojn en notaro',
+    description: 'Montri muzikajn notojn en partituro',
   },
   showAnnotationPanel: {
     text: 'Montri panelon de notoj',
@@ -758,7 +851,7 @@ export const lang = {
   },
   selectFacsimilePanelOrientation: {
     text: 'Loko de facsimila panelo',
-    description: 'Elekti lokon de facsimila panelo rilate al notaro',
+    description: 'Elekti lokon de facsimila panelo rilate al partituro',
     labels: ['maldekstre', 'dekstre', 'supre', 'sube'],
   },
   facsimileZoomInput: {
@@ -782,22 +875,55 @@ export const lang = {
     description: 'Montri faksimilajn titolojn super la faksimila bildoj',
   },
 
-  // Redakciado
+  // Supplied element
   titleSupplied: {
-    text: 'Trakti eldonan enhavon',
-    description: 'Kontroli la traktadon de <truditaj> elementoj',
+    text: 'Trakti redaktecan enhavon',
+    description: 'Kontroli traktadon de redakteca markado',
   },
-  showSupplied: {
-    text: 'Montri <truditajn> elementojn',
-    description: 'Emfazi ĉiujn elementojn enhavitajn de <trudita> elemento',
+  showMarkup: {
+    text: 'Montri redaktecajn markilojn',
+    description: 'Emfazi ĉiujn elementojn enhavitajn de redaktecaj markiloj',
+  },
+  markupToPDF: {
+    text: 'Montri redaktecajn markilojn en PDF',
+    description: 'Montri redaktecajn markilojn en PDF',
+  },
+  alternativeVersionContent: {
+    text: 'Elekti defaŭltan enhavon por alternativaj kodumoj',
+    description: 'Elekti ĉu novkreitaj alternativaj kodumoj estas malplenaj aŭ kopioj de la originala legado',
+    labels: ['malplena', 'kopia'],
   },
   suppliedColor: {
-    text: 'Elekti koloron por <truditaj> elementoj',
-    description: 'Elekti koloron por emfazi <truditaj> elementoj',
+    text: 'Elekti koloron por <supplied>',
+    description: 'Elekti koloron por <supplied>',
   },
-  respSelect: {
-    text: 'Elekti respondecon de <truditaj> elementoj',
-    description: 'Elekti identigilon de respondeco',
+  unclearColor: {
+    text: 'Elekti koloron por <unclear>',
+    description: 'Elekti koloron por <unclear>',
+  },
+  sicColor: {
+    text: 'Elekti koloron por <sic>',
+    description: 'Elekti koloron por <sic>',
+  },
+  corrColor: {
+    text: 'Elekti koloron por <corr>',
+    description: 'Elekti koloron por <corr>',
+  },
+  origColor: {
+    text: 'Elekti koloron por <orig>',
+    description: 'Elekti koloron por <orig>',
+  },
+  regColor: {
+    text: 'Elekti koloron por <reg>',
+    description: 'Elekti koloron por <reg>',
+  },
+  addColor: {
+    text: 'Elekti koloron por <add>',
+    description: 'Elekti koloron por <add>',
+  },
+  delColor: {
+    text: 'Elekti koloron por <del>',
+    description: 'Elekti koloron por <del>',
   },
 
   // AGORDOJ DE REDAKCIA ARAJ / AGORDOJ DE KODMIRRO
@@ -821,8 +947,8 @@ export const lang = {
     description: 'Elekti la stilon de la redaktoro',
   },
   matchTheme: {
-    text: 'Notaro kongruas kun la stilo',
-    description: 'Kongruigi la notaron kun la stilo de la redaktoro',
+    text: 'Partituro kongruas kun la stilo',
+    description: 'Kongruigi la partituron kun la stilo de la redaktoro',
   },
   tabSize: {
     text: 'Grando de registruminterespacoj',
@@ -876,6 +1002,10 @@ export const lang = {
   keyMap: {
     text: 'Klavara mapo',
     description: 'Elekti klavaran mapon',
+  },
+  persistentSearch: {
+    text: 'Persistanta serĉujo',
+    description: 'Uzu persistantan konduton de serĉujo (serĉujo restas malfermita ĝis eksplcite fermata)',
   },
 
   // Verovio-agordoj
@@ -950,12 +1080,12 @@ export const lang = {
   allComposers: { text: 'Ĉiuj komponistoj' }, // fork-repository.js
 
   // Utilaj mezuraj renumerigi
-  renumberMeasuresModalText: { text: 'Renombre mezurojn' },
+  renumberMeasuresModalText: { text: 'Renombre taktojn' },
   renumberMeasuresModalTest: { text: 'Testo' },
   renumberMeasuresWillBe: { text: '' },
   renumberMeasuresWouldBe: { text: 'estus' },
   renumberMeasuresChangedTo: { text: 'ŝanĝis al' },
-  renumberMeasureMeasuresRenumbered: { text: 'mezuroj renumerigis' },
+  renumberMeasureMeasuresRenumbered: { text: 'taktoj renumerigis' },
 
   // Kodo-kontrolilo @accid.ges
   codeCheckerTitle: {
@@ -967,7 +1097,7 @@ export const lang = {
   codeCheckerIgnoreAll: { text: 'Ignori ĉion' },
   codeCheckerCheckingCode: { text: 'Kontrolante kodo...' },
   codeCheckerNoAccidMessagesFound: { text: 'Ŝajnas, ke ĉiuj @accid.ges atributoj estas ĝustaj.' },
-  codeCheckerMeasure: { text: 'Mezuro' },
+  codeCheckerMeasure: { text: 'takto' },
   codeCheckerNote: { text: 'Noto' },
   codeCheckerHasBoth: { text: 'havas kaj' },
   codeCheckerAnd: { text: 'kaj' },
@@ -982,7 +1112,7 @@ export const lang = {
   codeCheckerExtra: { text: 'ekstra' }, // superflua
   codeCheckerHasExtra: { text: 'havas ekstran' }, // havas superfluan
   codeCheckerLacksAn: { text: 'mankas unu' },
-  codeCheckerBecauseAlreadyDefined: { text: 'ĉar ĝi jam estas difinita antaŭe en la mezuro' },
+  codeCheckerBecauseAlreadyDefined: { text: 'ĉar ĝi jam estas difinita antaŭe en la takto' },
 
   // Averto pri mankantaj ID-oj
   missingIdsWarningAlert: {

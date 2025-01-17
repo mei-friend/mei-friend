@@ -4,6 +4,7 @@
 
 import * as att from '../lib/attribute-classes.js';
 import { heart } from '../css/icons.js';
+import { getChangelogUrl } from '../lib/utils.js';
 
 export const lang = {
   // Écran de démarrage
@@ -12,6 +13,11 @@ export const lang = {
     text: "Afficher l'écran de démarrage",
     description: "Afficher l'écran de démarrage de mei-friend lorsque l'application est chargée",
   },
+  splashUpdateIndicator: {
+    html: `
+      Le texte suivant a été mis à jour depuis la dernière fois que vous avez reconnu l'écran de démarrage. Pour plus de détails, veuillez <a href="${getChangelogUrl()}" target="_blank">consulter le journal des modifications</a>.`,
+  },
+  splashLastUpdated: { text: 'Texte mis à jour le :' },
   splashBody: {
     html: `
       <p>
@@ -21,18 +27,10 @@ export const lang = {
         plus d'informations.
       </p>
       <p>
-        Bien que mei-friend soit une application basée sur le navigateur, vos données personnelles (y compris l'encodage que vous
-        modifiez, les paramètres de votre application et les détails de connexion actuels, le cas échéant) sont stockés dans le
-        <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank"
-          >stockage local</a
-        > de votre navigateur et ne sont pas transmis ou stockés sur nos serveurs.
+        Bien que mei-friend soit une application basée sur un navigateur, vos données personnelles (y compris l'encodage que vous éditez, vos paramètres d'application et vos détails de connexion actuels, le cas échéant) sont stockées dans le <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank">stockage local</a> de votre navigateur et ne sont pas stockées sur nos serveurs.
       </p>
       <p>
-        Les données sont transmises à GitHub uniquement lorsque vous le demandez explicitement (par exemple, lorsque vous vous
-        connectez à GitHub, chargez votre encodage depuis un référentiel GitHub ou demandez l'exécution d'un flux de travail
-        GitHub Action pour vous). De même, les données sont transmises à votre fournisseur Solid choisi uniquement lorsque vous
-        le demandez explicitement (par exemple, lorsque vous vous connectez à Solid, ou chargez ou enregistrez des annotations
-        stand-off).
+        Les données sont transmises à GitHub uniquement lorsque vous le demandez explicitement (par exemple, lorsque vous vous connectez à GitHub, chargez votre encodage depuis ou validez dans un dépôt GitHub, ou lorsque vous demandez l'exécution d'un flux de travail GitHub Action). De même, les données sont transmises à votre fournisseur Solid choisi uniquement lorsque vous le demandez explicitement (par exemple, lorsque vous vous connectez à Solid, ou chargez ou enregistrez des annotations stand-off). Pour des raisons techniques, certaines interactions avec GitHub (clonage d'un dépôt dans votre navigateur lors de la première ouverture d'un encodage, ou validation de modifications dans un dépôt) nécessitent la transmission de données à un serveur proxy hébergé par le mdw – Université de Musique et des Arts du Spectacle de Vienne. Ce serveur agit comme un intermédiaire entre votre navigateur et GitHub, et ne stocke aucune donnée transmise par son intermédiaire.
       </p>
       <p>
         Nous utilisons <a href="https://matomo.org/" target="_blank">Matomo</a>
@@ -206,9 +204,6 @@ export const lang = {
   addDiminuendoHairpinText: { text: 'Diminuendo' },
   addBeamText: { text: 'Faisceau' },
   addBeamSpanText: { text: 'Envergure de faisceau' },
-  addSuppliedText: { text: 'Fourni' },
-  addSuppliedArticText: { text: 'Fourni (artic)' },
-  addSuppliedAccidText: { text: 'Fourni (accid)' },
   addArpeggioText: { text: 'Arpège' },
   addFermataText: { text: 'Fermata' },
   addGlissandoText: { text: 'Glissando' },
@@ -297,6 +292,9 @@ export const lang = {
   breaksSelectLine: { text: 'Système' },
   breaksSelectEncoded: { text: 'Système et page' },
   breaksSelectSmart: { text: 'Intelligent' },
+  choiceSelect: { description: 'Choisissez le contenu affiché pour les éléments de choix' },
+  choiceDefault: { text: '(choix par défaut)' },
+  noChoice: { text: '(aucun choix disponible)' },
   updateControlsLabel: {
     text: 'Mise à jour',
     description: "Comportement de mise à jour des contrôles de la notation après les modifications de l'encodage",
@@ -448,8 +446,9 @@ export const lang = {
   annotationCloseButtonText: { text: "Fermer le panneau d'annotations" },
   hideAnnotationPanelButton: { description: "Fermer le panneau d'annotations" },
   closeAnnotationPanelButton: { description: "Fermer le panneau d'annotations" },
-  annotationToolsButton: { text: 'Outils', description: "Outils d'annotation" },
-  annotationListButton: { text: 'Liste', description: 'Liste des annotations' },
+  markupToolsButton: { description: 'Outils de mise en forme' },
+  annotationToolsButton: { description: "Outils d'annotation" },
+  annotationListButton: { description: 'Liste des annotations' },
   writeAnnotStandoffText: { text: 'Annotation Web' },
   annotationToolsIdentifyTitle: { text: 'Identifier' },
   annotationToolsIdentifySpan: { text: 'Identifier un objet musical' },
@@ -466,6 +465,9 @@ export const lang = {
   loadWebAnnotationMessage2: { text: 'veuillez réessayer' },
   noAnnotationsToDisplay: { text: 'Aucune annotation à afficher' },
   flipPageToAnnotationText: { description: 'Aller à cette annotation' },
+  describeMarkup: { description: 'Décrire ce balisage' },
+  deleteMarkup: { description: 'Supprimer ce balisage' },
+  deleteMarkupConfirmation: { text: 'Êtes-vous sûr(e) de vouloir supprimer ce balisage ?' },
   deleteAnnotation: { description: 'Supprimer cette annotation' },
   deleteAnnotationConfirmation: { text: 'Êtes-vous sûr de vouloir supprimer cette annotation ?' },
   makeStandOffAnnotation: {
@@ -493,6 +495,96 @@ export const lang = {
     text1: "Impossible d'écrire une annotation car le point d'ancrage MEI ne possède pas d'identifiant xml:",
     text2:
       'Veuillez assigner des identifiants en sélectionnant "Manipuler" -> "Re-render MEI (avec ids)" et réessayer.',
+  },
+  // MENU DE BALISAGE
+  respSelect: {
+    text: 'Sélectionner la responsabilité de la mise en forme',
+    description: "Sélectionner l'ID de la responsabilité",
+  },
+  selectionSelect: {
+    text: 'Sélection par défaut pour la balise',
+    description:
+      'Choisissez si la balise nouvellement créée doit englober les éléments sélectionnés, les articulations ou les accidentels',
+    labels: ['Éléments sélectionnés', 'Articulation', 'Accidentel'],
+    valuesDescriptions: [
+      'Ajoute une balise aux éléments sélectionnés.',
+      'Ajoute une balise aux articulations dans la sélection.',
+      'Ajoute une balise aux accidentels dans la sélection.',
+    ],
+  },
+  alternativeEncodingsGrp: {
+    text: 'Encodages alternatifs',
+    description: 'Éléments de balisage contenant plusieurs versions.',
+  },
+  addChoiceText: {
+    text: '<choice>',
+    description: 'Regroupe plusieurs encodages alternatifs pour le même point dans un texte.',
+  },
+  choiceSicCorr: {
+    description: 'Place la sélection dans <sic> et ajoute <corr>.',
+  },
+  choiceCorrSic: {
+    description: 'Place la sélection dans <corr> et ajoute <sic>.',
+  },
+  choiceOrigReg: {
+    description: 'Place la sélection dans <orig> et ajoute <reg>.',
+  },
+  choiceRegOrig: {
+    description: 'Place la sélection dans <reg> et ajoute <orig>.',
+  },
+  choiceContentTarget: {
+    description: "D'abord, sélectionnez le contenu pour cet élément en survolant <choix>.",
+  },
+  addSubstText: {
+    text: '<subst>',
+    description:
+      '(substitution) - Regroupe les éléments de transcription lorsque la combinaison doit être considérée comme une intervention unique dans le texte.',
+  },
+  substAddDel: {
+    description: 'Place la sélection dans <add> et ajoute <del>.',
+  },
+  substDelAdd: {
+    description: 'Place la sélection dans <del> et ajoute <add>.',
+  },
+  substContentTarget: {
+    description: "D'abord, sélectionnez le contenu pour cet élément en survolant <subst>.",
+  },
+  editInterventionsGrp: {
+    text: 'Interventions éditoriales',
+    description: 'Éléments de balisage utilisés pour encoder les interventions éditoriales.',
+  },
+  addSuppliedText: {
+    text: '<supplied>',
+    description: "Contient du matériel fourni par le transcripteur ou l'éditeur pour n'importe quelle raison.",
+  },
+  addUnclearText: {
+    text: '<unclear>',
+    description:
+      'Contient du matériel qui ne peut pas être transcrit avec certitude car il est illisible ou inaudible dans la source.',
+  },
+  addSicText: { text: '<sic>', description: 'Contient un matériel apparemment incorrect ou inexact.' },
+  addCorrText: {
+    text: '<corr>',
+    description: "(correction) - Contient la forme correcte d'un passage apparemment erroné.",
+  },
+  addOrigText: {
+    text: '<orig>',
+    description:
+      "(original) - Contient du matériel qui est marqué comme suivant l'original, plutôt que d'être normalisé ou corrigé.",
+  },
+  addRegText: {
+    text: '<reg>',
+    description: "(normalisation) - Contient du matériel qui a été normalisé ou régularisé d'une certaine manière.",
+  },
+  descMarkupGrp: {
+    text: 'Balisage descriptif',
+    description: 'Éléments de balisage utilisés pour encoder les interventions dans le matériel source.',
+  },
+  addAddText: { text: '<add>', description: '(ajout) - Marque une addition au texte.' },
+  addDelText: {
+    text: '<del>',
+    description:
+      '(suppression) - Contient des informations supprimées, marquées comme supprimées ou indiquées comme superflues ou erronées dans le texte de copie par un auteur, un scribe, un annotateur ou un correcteur.',
   },
 
   // MIDI
@@ -580,12 +672,16 @@ export const lang = {
   dragSelectControlElements: {
     text: 'Sélectionner les éléments de placement',
     description:
-      "Sélectionner les éléments de placement (c'est-à-dire ceux avec un attribut @placement : ' + att.attPlacement.join(', ') + ')",
+      "Sélectionner les éléments de placement (c'est-à-dire ceux avec un attribut @placement : " +
+      att.attPlacement.join(', ') +
+      ')',
   },
   dragSelectSlurs: {
     text: 'Sélectionner les liaisons',
     description:
-      "Sélectionner les liaisons (c'est-à-dire les éléments avec un attribut @curvature : ' + att.attCurvature.join(', ') + ')",
+      "Sélectionner les liaisons (c'est-à-dire les éléments avec un attribut @curvature : " +
+      att.attCurvature.join(', ') +
+      ')',
   },
   dragSelectMeasures: {
     text: 'Sélectionner les mesures',
@@ -806,19 +902,53 @@ export const lang = {
   // Supplied element / Élément fourni
   titleSupplied: {
     text: 'Gérer le contenu éditorial',
-    description: 'Contrôle la gestion des éléments <fournis>',
+    description: 'Contrôler la gestion de la mise en forme éditoriale',
   },
-  showSupplied: {
-    text: 'Afficher les éléments <fournis>',
-    description: 'Surligne tous les éléments contenus par un élément <fourni>',
+  showMarkup: {
+    text: 'Afficher les éléments de mise en forme éditoriale',
+    description: 'Surligner tous les éléments contenus dans les éléments de mise en forme éditoriale',
+  },
+  markupToPDF: {
+    text: 'Afficher les éléments de mise en forme éditoriale dans le PDF',
+    description: 'Afficher les éléments de mise en forme éditoriale dans le PDF généré',
+  },
+  alternativeVersionContent: {
+    text: 'Contenu par défaut pour les encodages alternatifs',
+    description:
+      'Choisir si les encodages alternatifs nouvellement créés sont vides ou des copies de la lecture originale',
+    labels: ['vide', 'copie'],
   },
   suppliedColor: {
-    text: 'Sélectionner la couleur de surlignage <fourni>',
-    description: 'Sélectionnez la couleur de surlignage <fourni>',
+    text: 'Sélectionner la couleur de mise en évidence <supplied>',
+    description: 'Sélectionner la couleur de mise en évidence <supplied>',
   },
-  respSelect: {
-    text: 'Sélectionner la responsabilité <fournie>',
-    description: "Sélectionner l'identifiant de responsabilité",
+  unclearColor: {
+    text: 'Sélectionner la couleur de mise en évidence <unclear>',
+    description: 'Sélectionner la couleur de mise en évidence <unclear>',
+  },
+  sicColor: {
+    text: 'Sélectionner la couleur de mise en évidence <sic>',
+    description: 'Sélectionner la couleur de mise en évidence <sic>',
+  },
+  corrColor: {
+    text: 'Sélectionner la couleur de mise en évidence <corr>',
+    description: 'Sélectionner la couleur de mise en évidence <corr>',
+  },
+  origColor: {
+    text: 'Sélectionner la couleur de mise en évidence <orig>',
+    description: 'Sélectionner la couleur de mise en évidence <orig>',
+  },
+  regColor: {
+    text: 'Sélectionner la couleur de mise en évidence <reg>',
+    description: 'Sélectionner la couleur de mise en évidence <reg>',
+  },
+  addColor: {
+    text: 'Sélectionner la couleur de mise en évidence <add>',
+    description: 'Sélectionner la couleur de mise en évidence <add>',
+  },
+  delColor: {
+    text: 'Sélectionner la couleur de mise en évidence <del>',
+    description: 'Sélectionner la couleur de mise en évidence <del>',
   },
 
   //  EDITOR SETTINGS / CODEMIRROR SETTINGS / PARAMÈTRES DE L'ÉDITEUR / PARAMÈTRES DE CODEMIRROR
@@ -897,6 +1027,11 @@ export const lang = {
   keyMap: {
     text: 'Carte des touches',
     description: 'Sélectionnez la carte des touches',
+  },
+  persistentSearch: {
+    text: 'Boîte de recherche persistante',
+    description:
+      "Utiliser le comportement de la boîte de recherche persistante (la boîte de recherche reste ouverte jusqu'à ce qu'elle soit explicitement fermée)",
   },
 
   // Verovio settings / Paramètres Verovio

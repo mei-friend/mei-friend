@@ -269,6 +269,29 @@ export const dataURI = [
   'altsym',
 ];
 
+// model.transcriptionLike
+export const modelTranscriptionLike = [
+  'add',
+  'corr',
+  //'damage', (leave out for now, no markup)
+  'del',
+  //'gap', (leave out for now, no markup)
+  //'handShift', (leave out for now)
+  'orig',
+  'reg',
+  // 'restore' (leave out for now)
+  'sic',
+  'supplied',
+  'unclear',
+];
+
+// <app> is model.appLike, <choice> and <subst> are model.editLike
+export const alternativeEncodingElements = [
+  /*'app', (leave out for now, needs special handling) */
+  'choice',
+  'subst',
+];
+
 // data.DURATION.cmn
 export const dataDurationCMN = [
   'long',

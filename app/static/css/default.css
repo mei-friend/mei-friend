@@ -9,6 +9,27 @@
   /* orange 45% darker */
   --defaultSuppliedColor: #e69500;
   --defaultSuppliedHighlightedColor: #b37400;
+  /* some red / brown */
+  --defaultUnclearColor: #964036;
+  --defaultUnclearHighlightedColor: #bb5044;
+  /* sic in red */
+  --defaultSicColor: #b30000;
+  --defaultSicHighlightedColor: #e60000;
+  /* corr in green */
+  --defaultCorrColor: #408000;
+  --defaultCorrHighlightedColor: #59b300;
+  /* orig in purple */
+  --defaultOrigColor: #993399;
+  --defaultOrigHighlightedColor: #bf40bf;
+  /* reg as blue purple */
+  --defaultRegColor: #3300cc;
+  --defaultRegHighlightedColor: #4000ff;
+  /* add in cyan */
+  --defaultAddColor: #00cccc;
+  --defaultAddHighlightedColor: #00ffff;
+  /* del as grey */
+  --defaultDelColor: #8585ad;
+  --defaultDelHighlightedColor: #a3a3c2;
   /* TODO use mdw blue */
   --defaultHighlightColor: #4e8bed;
   --defaultHighlightPulseColor: #0e4bad;
@@ -37,7 +58,7 @@
   /* annotation panel colors */
   --defaultAnnotationPanelBackgroundColor: #ffffa5;
   --defaultAnnotationPanelLinkBackgroundColor: #ffffdc;
-  --defaultAnnotationPanelHoverColor: #fff300;
+  --defaultAnnotationPanelHoverColor: #fef768;
   --defaultAnnotationPanelTextColor: black;
   --defaultAnnotationPanelDarkBackgroundColor: #aa7c08;
   /*
@@ -49,6 +70,28 @@
   --notationBackgroundColor: var(--defaultBackgroundColor);
   --suppliedColor: var(--defaultSuppliedColor);
   --suppliedHighlightedColor: var(--defaultSuppliedHighlightedColor);
+  --suppliedBgColor: var(--suppliedColor);
+  --unclearColor: var(--defaultUnclearColor);
+  --unclearHighlightedColor: var(--defaultUnclearHighlightedColor);
+  --unclearBgColor: var(--unclearColor);
+  --sicColor: var(--defaultSicColor);
+  --sicHighlightedColor: var(--defaultSicHighlightedColor);
+  --sigBgColor: var(--sicColor);
+  --corrColor: var(--defaultCorrColor);
+  --corrHighlightedColor: var(--defaultCorrHighlightedColor);
+  --corrBgColor: var(--corrColor);
+  --origColor: var(--defaultOrigColor);
+  --origHighlightedColor: var(--defaultOrigHighlightedColor);
+  --origBgColor: var(--origColor);
+  --regColor: var(--defaultRegColor);
+  --regHighlightedColor: var(--defaultRegHighlightedColor);
+  --regBgColor: var(--regColor);
+  --addColor: var(--defaultAddColor);
+  --addHighlightedColor: var(--defaultAddHighlightedColor);
+  --addBgColor: var(--addColor);
+  --delColor: var(--defaultDelColor);
+  --delHighlightedColor: var(--defaultDelHighlightedColor);
+  --delBgColor: var(--delColor);
   --highlightColor: var(--defaultHighlightColor);
   --highlightPulseColor: var(--defaultHighlightPulseColor);
   --controlMenuBackgroundColor: var(--defaultControlMenuBackgroundColor);
@@ -124,7 +167,6 @@ a:active {
 
 .header {
   display: flex;
-  flex-shrink: 0;
   align-items: center;
   width: 100%;
   justify-content: flex-start;
@@ -147,8 +189,8 @@ a:active {
 .settingsButton {
   width: 16px;
   height: 16px;
-  padding-left: 6px;
-  padding-right: 6px;
+  padding-left: 4px;
+  padding-right: 4px;
   cursor: pointer;
   fill: var(--textColor);
 }
@@ -284,6 +326,14 @@ a:active {
   width: 95%;
 }
 
+.dropdownContent a.disabled {
+  pointer-events: none;
+}
+
+.actionsContainer.notAllowed {
+  cursor: not-allowed;
+}
+
 .openUrlOverlay a,
 .forkRepositoryOverlay a {
   color: var(--overlayLinkColor);
@@ -309,7 +359,7 @@ a:active {
   padding: 1em 1em;
   max-width: 600px;
   min-width: 250px;
-  max-height: 400px;
+  height: fit-content;
   left: unset;
 }
 
@@ -323,13 +373,18 @@ a:active {
   max-height: 500px;
 }
 
-#splashBody {
+#splashBodyContainer {
   padding: 0em 1em;
-  height: 45%;
+  height: 200px;
   overflow-y: auto;
   color: black;
   background-color: var(--overlayTextColor);
   border-radius: 10px;
+}
+
+#splashUpdateIndicator {
+  display: none;
+  font-style: italic;
 }
 
 /** start loading animation for splash screen text (not used for now) */
@@ -378,8 +433,8 @@ a:active {
   float: right;
 }
 
-.openUrlOverlay .openUrlUI>div,
-.forkRepositoryOverlay .forkRepositoryUI>div {
+.openUrlOverlay .openUrlUI > div,
+.forkRepositoryOverlay .forkRepositoryUI > div {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -400,8 +455,8 @@ a:active {
   cursor: pointer;
 }
 
-.openUrlOverlay .openUrlUI details>div,
-.forkRepositoryOverlay .forkRepositoryUI details>div {
+.openUrlOverlay .openUrlUI details > div,
+.forkRepositoryOverlay .forkRepositoryUI details > div {
   margin-left: 1em;
 }
 
@@ -508,7 +563,8 @@ a:active {
   fill: var(--textColor);
 }
 
-#verovioContainer {
+#verovioContainer,
+#facsimileContainer {
   height: 100%;
   width: 100%;
   overflow: inherit;
@@ -1129,6 +1185,426 @@ svg text {
   animation-timing-function: ease;
 }
 
+#verovio-panel g.unclear g {
+  fill: var(--unclearColor);
+  color: var(--unclearColor);
+  stroke: var(--unclearColor);
+}
+
+#verovio-panel .unclear .highlighted {
+  color: var(--unclearHighlightedColor);
+  stroke: var(--unclearHighlightedColor);
+}
+
+#verovio-panel g.unclear g.highlighted {
+  fill: var(--unclearHighlightedColor);
+}
+
+#verovio-panel g.sic g {
+  fill: var(--sicColor);
+  color: var(--sicColor);
+  stroke: var(--sicColor);
+}
+
+#verovio-panel .sic .highlighted {
+  color: var(--sicHighlightedColor);
+  stroke: var(--sicHighlightedColor);
+}
+
+#verovio-panel g.sic g.highlighted {
+  fill: var(--sicHighlightedColor);
+}
+
+#verovio-panel g.corr g {
+  fill: var(--corrColor);
+  color: var(--corrColor);
+  stroke: var(--corrColor);
+}
+
+#verovio-panel .corr .highlighted {
+  color: var(--corrHighlightedColor);
+  stroke: var(--corrHighlightedColor);
+}
+
+#verovio-panel g.corr g.highlighted {
+  fill: var(--corrHighlightedColor);
+}
+
+#verovio-panel g.orig g {
+  fill: var(--origColor);
+  color: var(--origColor);
+  stroke: var(--origColor);
+}
+
+#verovio-panel .orig .highlighted {
+  color: var(--origHighlightedColor);
+  stroke: var(--origHighlightedColor);
+}
+
+#verovio-panel g.orig g.highlighted {
+  fill: var(--origHighlightedColor);
+}
+
+#verovio-panel g.reg g {
+  fill: var(--regColor);
+  color: var(--regColor);
+  stroke: var(--regColor);
+}
+
+#verovio-panel .reg .highlighted {
+  color: var(--regHighlightedColor);
+  stroke: var(--regHighlightedColor);
+}
+
+#verovio-panel g.reg g.highlighted {
+  fill: var(--regHighlightedColor);
+}
+
+#verovio-panel g.add g {
+  fill: var(--addColor);
+  color: var(--addColor);
+  stroke: var(--addColor);
+}
+
+#verovio-panel .add .highlighted {
+  color: var(--addHighlightedColor);
+  stroke: var(--addHighlightedColor);
+}
+
+#verovio-panel g.add g.highlighted {
+  fill: var(--addHighlightedColor);
+}
+
+#verovio-panel g.del g {
+  fill: var(--delColor);
+  color: var(--delColor);
+  stroke: var(--delColor);
+}
+
+#verovio-panel .del .highlighted {
+  color: var(--delHighlightedColor);
+  stroke: var(--delHighlightedColor);
+}
+
+#verovio-panel g.del g.highlighted {
+  fill: var(--delHighlightedColor);
+}
+
+#verovio-panel g.unclear g {
+  fill: var(--unclearColor);
+  color: var(--unclearColor);
+  stroke: var(--unclearColor);
+}
+
+#verovio-panel .unclear .highlighted {
+  color: var(--unclearHighlightedColor);
+  stroke: var(--unclearHighlightedColor);
+}
+
+#verovio-panel g.unclear g.highlighted {
+  fill: var(--unclearHighlightedColor);
+}
+
+#verovio-panel g.sic g {
+  fill: var(--sicColor);
+  color: var(--sicColor);
+  stroke: var(--sicColor);
+}
+
+#verovio-panel .sic .highlighted {
+  color: var(--sicHighlightedColor);
+  stroke: var(--sicHighlightedColor);
+}
+
+#verovio-panel g.sic g.highlighted {
+  fill: var(--sicHighlightedColor);
+}
+
+#verovio-panel g.corr g {
+  fill: var(--corrColor);
+  color: var(--corrColor);
+  stroke: var(--corrColor);
+}
+
+#verovio-panel .corr .highlighted {
+  color: var(--corrHighlightedColor);
+  stroke: var(--corrHighlightedColor);
+}
+
+#verovio-panel g.corr g.highlighted {
+  fill: var(--corrHighlightedColor);
+}
+
+#verovio-panel g.orig g {
+  fill: var(--origColor);
+  color: var(--origColor);
+  stroke: var(--origColor);
+}
+
+#verovio-panel .orig .highlighted {
+  color: var(--origHighlightedColor);
+  stroke: var(--origHighlightedColor);
+}
+
+#verovio-panel g.orig g.highlighted {
+  fill: var(--origHighlightedColor);
+}
+
+#verovio-panel g.reg g {
+  fill: var(--regColor);
+  color: var(--regColor);
+  stroke: var(--regColor);
+}
+
+#verovio-panel .reg .highlighted {
+  color: var(--regHighlightedColor);
+  stroke: var(--regHighlightedColor);
+}
+
+#verovio-panel g.reg g.highlighted {
+  fill: var(--regHighlightedColor);
+}
+
+#verovio-panel g.add g {
+  fill: var(--addColor);
+  color: var(--addColor);
+  stroke: var(--addColor);
+}
+
+#verovio-panel .add .highlighted {
+  color: var(--addHighlightedColor);
+  stroke: var(--addHighlightedColor);
+}
+
+#verovio-panel g.add g.highlighted {
+  fill: var(--addHighlightedColor);
+}
+
+#verovio-panel g.del g {
+  fill: var(--delColor);
+  color: var(--delColor);
+  stroke: var(--delColor);
+}
+
+#verovio-panel .del .highlighted {
+  color: var(--delHighlightedColor);
+  stroke: var(--delHighlightedColor);
+}
+
+#verovio-panel g.del g.highlighted {
+  fill: var(--delHighlightedColor);
+}
+
+#verovio-panel g.unclear g {
+  fill: var(--unclearColor);
+  color: var(--unclearColor);
+  stroke: var(--unclearColor);
+}
+
+#verovio-panel .unclear .highlighted {
+  color: var(--unclearHighlightedColor);
+  stroke: var(--unclearHighlightedColor);
+}
+
+#verovio-panel g.unclear g.highlighted {
+  fill: var(--unclearHighlightedColor);
+}
+
+#verovio-panel g.sic g {
+  fill: var(--sicColor);
+  color: var(--sicColor);
+  stroke: var(--sicColor);
+}
+
+#verovio-panel .sic .highlighted {
+  color: var(--sicHighlightedColor);
+  stroke: var(--sicHighlightedColor);
+}
+
+#verovio-panel g.sic g.highlighted {
+  fill: var(--sicHighlightedColor);
+}
+
+#verovio-panel g.corr g {
+  fill: var(--corrColor);
+  color: var(--corrColor);
+  stroke: var(--corrColor);
+}
+
+#verovio-panel .corr .highlighted {
+  color: var(--corrHighlightedColor);
+  stroke: var(--corrHighlightedColor);
+}
+
+#verovio-panel g.corr g.highlighted {
+  fill: var(--corrHighlightedColor);
+}
+
+#verovio-panel g.orig g {
+  fill: var(--origColor);
+  color: var(--origColor);
+  stroke: var(--origColor);
+}
+
+#verovio-panel .orig .highlighted {
+  color: var(--origHighlightedColor);
+  stroke: var(--origHighlightedColor);
+}
+
+#verovio-panel g.orig g.highlighted {
+  fill: var(--origHighlightedColor);
+}
+
+#verovio-panel g.reg g {
+  fill: var(--regColor);
+  color: var(--regColor);
+  stroke: var(--regColor);
+}
+
+#verovio-panel .reg .highlighted {
+  color: var(--regHighlightedColor);
+  stroke: var(--regHighlightedColor);
+}
+
+#verovio-panel g.reg g.highlighted {
+  fill: var(--regHighlightedColor);
+}
+
+#verovio-panel g.add g {
+  fill: var(--addColor);
+  color: var(--addColor);
+  stroke: var(--addColor);
+}
+
+#verovio-panel .add .highlighted {
+  color: var(--addHighlightedColor);
+  stroke: var(--addHighlightedColor);
+}
+
+#verovio-panel g.add g.highlighted {
+  fill: var(--addHighlightedColor);
+}
+
+#verovio-panel g.del g {
+  fill: var(--delColor);
+  color: var(--delColor);
+  stroke: var(--delColor);
+}
+
+#verovio-panel .del .highlighted {
+  color: var(--delHighlightedColor);
+  stroke: var(--delHighlightedColor);
+}
+
+#verovio-panel g.del g.highlighted {
+  fill: var(--delHighlightedColor);
+}
+
+#verovio-panel g.unclear g {
+  fill: var(--unclearColor);
+  color: var(--unclearColor);
+  stroke: var(--unclearColor);
+}
+
+#verovio-panel .unclear .highlighted {
+  color: var(--unclearHighlightedColor);
+  stroke: var(--unclearHighlightedColor);
+}
+
+#verovio-panel g.unclear g.highlighted {
+  fill: var(--unclearHighlightedColor);
+}
+
+#verovio-panel g.sic g {
+  fill: var(--sicColor);
+  color: var(--sicColor);
+  stroke: var(--sicColor);
+}
+
+#verovio-panel .sic .highlighted {
+  color: var(--sicHighlightedColor);
+  stroke: var(--sicHighlightedColor);
+}
+
+#verovio-panel g.sic g.highlighted {
+  fill: var(--sicHighlightedColor);
+}
+
+#verovio-panel g.corr g {
+  fill: var(--corrColor);
+  color: var(--corrColor);
+  stroke: var(--corrColor);
+}
+
+#verovio-panel .corr .highlighted {
+  color: var(--corrHighlightedColor);
+  stroke: var(--corrHighlightedColor);
+}
+
+#verovio-panel g.corr g.highlighted {
+  fill: var(--corrHighlightedColor);
+}
+
+#verovio-panel g.orig g {
+  fill: var(--origColor);
+  color: var(--origColor);
+  stroke: var(--origColor);
+}
+
+#verovio-panel .orig .highlighted {
+  color: var(--origHighlightedColor);
+  stroke: var(--origHighlightedColor);
+}
+
+#verovio-panel g.orig g.highlighted {
+  fill: var(--origHighlightedColor);
+}
+
+#verovio-panel g.reg g {
+  fill: var(--regColor);
+  color: var(--regColor);
+  stroke: var(--regColor);
+}
+
+#verovio-panel .reg .highlighted {
+  color: var(--regHighlightedColor);
+  stroke: var(--regHighlightedColor);
+}
+
+#verovio-panel g.reg g.highlighted {
+  fill: var(--regHighlightedColor);
+}
+
+#verovio-panel g.add g {
+  fill: var(--addColor);
+  color: var(--addColor);
+  stroke: var(--addColor);
+}
+
+#verovio-panel .add .highlighted {
+  color: var(--addHighlightedColor);
+  stroke: var(--addHighlightedColor);
+}
+
+#verovio-panel g.add g.highlighted {
+  fill: var(--addHighlightedColor);
+}
+
+#verovio-panel g.del g {
+  fill: var(--delColor);
+  color: var(--delColor);
+  stroke: var(--delColor);
+}
+
+#verovio-panel .del .highlighted {
+  color: var(--delHighlightedColor);
+  stroke: var(--delHighlightedColor);
+}
+
+#verovio-panel g.del g.highlighted {
+  fill: var(--delHighlightedColor);
+}
+
 #verovio-panel {
   fill: var(--notationColor);
   color: var(--notationColor);
@@ -1367,6 +1843,11 @@ span.keyIcon {
   min-width: 46px;
 }
 
+#annotationPanel .tablink svg {
+  color: var(--annotationPanelTextColor);
+  fill: var(--annotationPanelTextColor);
+}
+
 .tabstart {
   fill: var(--textColor);
   border: rgba(0, 0, 0, 0) solid 2px;
@@ -1515,6 +1996,7 @@ select {
 
 .optionsItem input[type='color'] {
   padding: 2px;
+  height: 24px;
 }
 
 .disabled {
@@ -1527,7 +2009,6 @@ select {
   margin-bottom: 10px;
   margin-right: 2px;
   border-radius: 4px;
-  max-width: 60px;
 }
 
 input,
@@ -1537,7 +2018,7 @@ select {
   text-align: left;
 }
 
-select>option {
+select > option {
   background-color: var(--dropdownBackgroundColor);
   color: var(--textColor);
 }
@@ -1589,7 +2070,7 @@ select>option {
   background-color: #ff9800;
 }
 
-#alertIcon svg {
+.alertIcon svg {
   width: 2.2em;
   height: 2.2em;
   fill: white;
@@ -1610,6 +2091,21 @@ select>option {
 /* When moving the mouse over the close button */
 .alertCloseButton:hover {
   color: black;
+}
+
+#promptContent {
+  margin: auto;
+  text-align: center;
+}
+
+#promptButtons {
+  display: none;
+  text-align: center;
+  padding-top: 2.2em;
+}
+
+.promptButton {
+  margin: 0.5em;
 }
 
 #filterSettings {

@@ -94,7 +94,7 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks, pageSpanners, include
   sections.forEach((item) => {
     if (item.nodeName === 'section') {
       // diggs into section hierachy
-      let returnSection = digger(/** @type {Element}*/ (item));
+      let returnSection = digger(/** @type {Element}*/(item));
       baseSection.appendChild(returnSection);
     }
   });
@@ -215,7 +215,7 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
           /** @type {string[]} */ (
             // @ts-ignore
             breaks.includes(currentNodeName) ||
-              (sb = /** @type {Element} */ (currentNode).querySelector(breaksSelector))
+            (sb = /** @type {Element} */ (currentNode).querySelector(breaksSelector))
           )
         ) {
           if (dutils.countAsBreak(sb ? sb : currentNode)) p++;
@@ -372,215 +372,215 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
   }; // digDeeper()
 } // readSection()
 
-/**
- * List all notes/chords to check whether they are pointed to from outside the
- * requested pageNo to be run at each edit/page turn (becomes slow with big
- * files). NOT USED; KEPT FOR DOCUMENTATION.
- *
- * TODO: @th-we: This is currently not used and probably O(n²). If it should be used
- * again, create objects mapping all `@startid` and `@endid` values once and
- * pass it as argument to this function. This should probably give us something
- * like O(n log n) complexity.
- *
- * @param {Element} xmlScore
- * @param {Document} spdScore
- * @param {number} pageNo
- */
-function matchTimespanningElements(xmlScore, spdScore, pageNo) {
-  // let t1 = performance.now();
-  let startingSelector = '';
-  let endingSelector = '';
+// /**
+//  * List all notes/chords to check whether they are pointed to from outside the
+//  * requested pageNo to be run at each edit/page turn (becomes slow with big
+//  * files). NOT USED; KEPT FOR DOCUMENTATION.
+//  *
+//  * TODO: @th-we: This is currently not used and probably O(n²). If it should be used
+//  * again, create objects mapping all `@startid` and `@endid` values once and
+//  * pass it as argument to this function. This should probably give us something
+//  * like O(n log n) complexity.
+//  *
+//  * @param {Element} xmlScore
+//  * @param {Document} spdScore
+//  * @param {number} pageNo
+//  */
+// function matchTimespanningElements(xmlScore, spdScore, pageNo) {
+//   // let t1 = performance.now();
+//   let startingSelector = '';
+//   let endingSelector = '';
 
-  var listOfTargets = spdScore.querySelectorAll('note, chord');
-  for (let target of listOfTargets) {
-    let id = '#' + target.getAttribute('xml:id');
-    //
-    endingSelector += "[startid][endid='" + id + "'],";
-    startingSelector += "[startid='" + id + "'][endid],";
-  }
-  // let t2 = performance.now();
-  // console.log(listOfTargets.length + ' notes: selector constructed ' + (t2 - t1) + ' ms.');
+//   var listOfTargets = spdScore.querySelectorAll('note, chord');
+//   for (let target of listOfTargets) {
+//     let id = '#' + target.getAttribute('xml:id');
+//     //
+//     endingSelector += "[startid][endid='" + id + "'],";
+//     startingSelector += "[startid='" + id + "'][endid],";
+//   }
+//   // let t2 = performance.now();
+//   // console.log(listOfTargets.length + ' notes: selector constructed ' + (t2 - t1) + ' ms.');
 
-  let endingElements = Array.from(xmlScore.querySelectorAll(endingSelector.slice(0, -1)));
-  let startingElements = Array.from(xmlScore.querySelectorAll(startingSelector.slice(0, -1)));
+//   let endingElements = Array.from(xmlScore.querySelectorAll(endingSelector.slice(0, -1)));
+//   let startingElements = Array.from(xmlScore.querySelectorAll(startingSelector.slice(0, -1)));
 
-  // let t3 = performance.now();
-  // console.log('querySelectorAll ' + (t3 - t2) + ' ms.');
-  //
-  // check whether this id ends in startingElements
-  for (let target of listOfTargets) {
-    let id = '#' + target.getAttribute('xml:id');
-    for (let j = 0; j < startingElements.length; j++) {
-      let el = startingElements[j];
-      // console.info('Checking identiy: ' + el.getAttribute('xml:id') + '/' + id);
-      if (el && el.getAttribute('endid') === id) {
-        // console.info('startingElement removed', startingElements[j]);
-        endingElements.splice(endingElements.indexOf(el), 1);
-        startingElements.splice(j--, 1);
-      }
-    }
-    for (let j = 0; j < endingElements.length; j++) {
-      let el = endingElements[j];
-      // console.info('Checking identiy: ' + el.getAttribute('xml:id') + '/' + id);
-      if (el && el.getAttribute('startid') === id) {
-        // console.info('endingElement removed', endingElements[j]);
-        startingElements.splice(startingElements.indexOf(el), 1);
-        endingElements.splice(j--, 1);
-      }
-    }
-  }
+//   // let t3 = performance.now();
+//   // console.log('querySelectorAll ' + (t3 - t2) + ' ms.');
+//   //
+//   // check whether this id ends in startingElements
+//   for (let target of listOfTargets) {
+//     let id = '#' + target.getAttribute('xml:id');
+//     for (let j = 0; j < startingElements.length; j++) {
+//       let el = startingElements[j];
+//       // console.info('Checking identiy: ' + el.getAttribute('xml:id') + '/' + id);
+//       if (el && el.getAttribute('endid') === id) {
+//         // console.info('startingElement removed', startingElements[j]);
+//         endingElements.splice(endingElements.indexOf(el), 1);
+//         startingElements.splice(j--, 1);
+//       }
+//     }
+//     for (let j = 0; j < endingElements.length; j++) {
+//       let el = endingElements[j];
+//       // console.info('Checking identiy: ' + el.getAttribute('xml:id') + '/' + id);
+//       if (el && el.getAttribute('startid') === id) {
+//         // console.info('endingElement removed', endingElements[j]);
+//         startingElements.splice(startingElements.indexOf(el), 1);
+//         endingElements.splice(j--, 1);
+//       }
+//     }
+//   }
 
-  // let t4 = performance.now();
-  // console.log('timespan matching took ' + (t4 - t3) + ' ms.');
+//   // let t4 = performance.now();
+//   // console.log('timespan matching took ' + (t4 - t3) + ' ms.');
 
-  // 1) go through endingElements and add to first measure
-  if (endingElements.length > 0 && pageNo > 1) {
-    const m = /** @type {Element} */ (spdScore.querySelector('[*|id="startingMeasure"]'));
-    let uuids = getIdsForDummyMeasure(m);
-    for (let endingElement of endingElements) {
-      if (endingElement) {
-        let startid = utils.rmHash(endingElement.getAttribute('startid'));
-        let note = xmlScore.querySelector('[*|id="' + startid + '"]');
-        if (!note) continue;
-        const staffNo = parseInt(getStaffNumber(note));
-        if (isNaN(staffNo)) continue;
-        let el = /** @type {Element} */ (endingElement.cloneNode(true));
-        el.setAttribute('startid', '#' + uuids[staffNo - 1]);
-        m?.appendChild(el);
-      }
-    }
-  } // 1) if
+//   // 1) go through endingElements and add to first measure
+//   if (endingElements.length > 0 && pageNo > 1) {
+//     const m = /** @type {Element} */ (spdScore.querySelector('[*|id="startingMeasure"]'));
+//     let uuids = getIdsForDummyMeasure(m);
+//     for (let endingElement of endingElements) {
+//       if (endingElement) {
+//         let startid = utils.rmHash(endingElement.getAttribute('startid'));
+//         let note = xmlScore.querySelector('[*|id="' + startid + '"]');
+//         if (!note) continue;
+//         const staffNo = parseInt(getStaffNumber(note));
+//         if (isNaN(staffNo)) continue;
+//         let el = /** @type {Element} */ (endingElement.cloneNode(true));
+//         el.setAttribute('startid', '#' + uuids[staffNo - 1]);
+//         m?.appendChild(el);
+//       }
+//     }
+//   } // 1) if
 
-  // 2) go through startingElements and append to a third-page measure
-  if (startingElements.length > 0) {
-    // console.info('work through startingElements.');
-    const m = /** @type {Element} */ (spdScore.querySelector('[*|id="endingMeasure"]'));
-    let uuids = getIdsForDummyMeasure(m);
-    for (let startingElement of startingElements) {
-      if (startingElement) {
-        let endid = utils.rmHash(startingElement.getAttribute('endid'));
-        // console.info('searching for endid: ', endid);
-        if (endid) {
-          let note = xmlScore.querySelector('[*|id="' + endid + '"]');
-          if (!note) continue;
-          const staffNo = parseInt(getStaffNumber(note));
-          if (isNaN(staffNo)) continue;
-          let tel = spdScore.querySelector('[*|id="' + startingElement.getAttribute('xml:id') + '"]');
-          if (tel) tel.setAttribute('endid', '#' + uuids[staffNo - 1]);
-        }
-      }
-    }
-  } // 2) if
+//   // 2) go through startingElements and append to a third-page measure
+//   if (startingElements.length > 0) {
+//     // console.info('work through startingElements.');
+//     const m = /** @type {Element} */ (spdScore.querySelector('[*|id="endingMeasure"]'));
+//     let uuids = getIdsForDummyMeasure(m);
+//     for (let startingElement of startingElements) {
+//       if (startingElement) {
+//         let endid = utils.rmHash(startingElement.getAttribute('endid'));
+//         // console.info('searching for endid: ', endid);
+//         if (endid) {
+//           let note = xmlScore.querySelector('[*|id="' + endid + '"]');
+//           if (!note) continue;
+//           const staffNo = parseInt(getStaffNumber(note));
+//           if (isNaN(staffNo)) continue;
+//           let tel = spdScore.querySelector('[*|id="' + startingElement.getAttribute('xml:id') + '"]');
+//           if (tel) tel.setAttribute('endid', '#' + uuids[staffNo - 1]);
+//         }
+//       }
+//     }
+//   } // 2) if
 
-  // console.log('adding slurs took ' + (performance.now() - t4) + ' ms.');
-} // matchTimespanningElements()
+//   // console.log('adding slurs took ' + (performance.now() - t4) + ' ms.');
+// } // matchTimespanningElements()
 
-/**
- * List all timespanning elements with `@startid`/`@endid` attributes on
- * different pages (similar to speed-worker::listPageSpanningElements(),
- * but for a common DOM object). NOT USED; KEPT FOR DOCUMENTATION.
- * @param {Document} xmlScore
- * @param {Break[]} breaks
- * @param {BreaksOption} breaksOption
- * @returns {PageSpanners}
- */
-export function listPageSpanningElements(xmlScore, breaks, breaksOption) {
-  let t1 = performance.now();
-  let els = xmlScore.querySelectorAll(att.timeSpanningElements.join(','));
-  let pageSpanners = {
-    start: {},
-    end: {},
-  };
-  // for breaks encoded / array; TODO auto/Object
-  let sel = '';
-  switch (breaksOption) {
-    case 'none':
-      return {
-        start: {},
-        end: {},
-      };
-    case 'auto':
-      if (Object.keys(breaks).length > 0) {
-        for (let pg in breaks) {
-          let br = breaks[pg]; // array of breaks
-          sel += '[*|id="' + br[br.length - 1] + '"],';
-        }
-      } else
-        return {
-          start: {},
-          end: {},
-        };
-      break;
-    case 'line':
-      sel = 'pb,sb,';
-      break;
-    case 'encoded':
-      sel = 'pb,';
-  }
-  // object with time-spanning-element-ids key: [@startid,@endid] array
-  let tsTable = {};
-  for (let el of els) {
-    let id = el.getAttribute('xml:id');
-    let startid = utils.rmHash(el.getAttribute('startid'));
-    if (startid) sel += '[*|id="' + startid + '"],';
-    let endid = utils.rmHash(el.getAttribute('endid'));
-    if (endid) sel += '[*|id="' + endid + '"],';
-    if (id && startid && endid) tsTable[id] = [startid, endid];
-  }
-  let t2 = performance.now();
-  console.log('listPageSpanningElements selector preps: ' + (t2 - t1) + ' ms.');
+// /**
+//  * List all timespanning elements with `@startid`/`@endid` attributes on
+//  * different pages (similar to speed-worker::listPageSpanningElements(),
+//  * but for a common DOM object). NOT USED; KEPT FOR DOCUMENTATION.
+//  * @param {Document} xmlScore
+//  * @param {Break[]} breaks
+//  * @param {BreaksOption} breaksOption
+//  * @returns {PageSpanners}
+//  */
+// export function listPageSpanningElements(xmlScore, breaks, breaksOption) {
+//   let t1 = performance.now();
+//   let els = xmlScore.querySelectorAll(att.timeSpanningElements.join(','));
+//   let pageSpanners = {
+//     start: {},
+//     end: {},
+//   };
+//   // for breaks encoded / array; TODO auto/Object
+//   let sel = '';
+//   switch (breaksOption) {
+//     case 'none':
+//       return {
+//         start: {},
+//         end: {},
+//       };
+//     case 'auto':
+//       if (Object.keys(breaks).length > 0) {
+//         for (let pg in breaks) {
+//           let br = breaks[pg]; // array of breaks
+//           sel += '[*|id="' + br[br.length - 1] + '"],';
+//         }
+//       } else
+//         return {
+//           start: {},
+//           end: {},
+//         };
+//       break;
+//     case 'line':
+//       sel = 'pb,sb,';
+//       break;
+//     case 'encoded':
+//       sel = 'pb,';
+//   }
+//   // object with time-spanning-element-ids key: [@startid,@endid] array
+//   let tsTable = {};
+//   for (let el of els) {
+//     let id = el.getAttribute('xml:id');
+//     let startid = utils.rmHash(el.getAttribute('startid'));
+//     if (startid) sel += '[*|id="' + startid + '"],';
+//     let endid = utils.rmHash(el.getAttribute('endid'));
+//     if (endid) sel += '[*|id="' + endid + '"],';
+//     if (id && startid && endid) tsTable[id] = [startid, endid];
+//   }
+//   let t2 = performance.now();
+//   console.log('listPageSpanningElements selector preps: ' + (t2 - t1) + ' ms.');
 
-  let elList = xmlScore.querySelectorAll(sel.slice(0, -1));
+//   let elList = xmlScore.querySelectorAll(sel.slice(0, -1));
 
-  t1 = t2;
-  t2 = performance.now();
-  console.log('listPageSpanningElements querySelectorAll: ' + (t2 - t1) + ' ms.');
+//   t1 = t2;
+//   t2 = performance.now();
+//   console.log('listPageSpanningElements querySelectorAll: ' + (t2 - t1) + ' ms.');
 
-  let noteTable = {};
-  let count = false;
-  let p = 1;
-  if (breaksOption === 'line' || breaksOption === 'encoded') {
-    for (let e of elList) {
-      if (e.nodeName === 'measure') count = true;
-      if (count && breaks.includes(/** @type {Break} */ (e.nodeName)) && dutils.countAsBreak(e)) p++;
-      else noteTable[e.getAttribute('xml:id') || ''] = p;
-    }
-  } else if ((breaksOption = 'auto')) {
-    /** @type {Element | undefined} */
-    let m;
-    for (let e of elList) {
-      if (e.nodeName === 'measure') {
-        p++;
-        m = e;
-      } else {
-        noteTable[e.getAttribute('xml:id') || ''] = m && e.closest('measure') === m ? p - 1 : p;
-      }
-    }
-  }
+//   let noteTable = {};
+//   let count = false;
+//   let p = 1;
+//   if (breaksOption === 'line' || breaksOption === 'encoded') {
+//     for (let e of elList) {
+//       if (e.nodeName === 'measure') count = true;
+//       if (count && breaks.includes(/** @type {Break} */ (e.nodeName)) && dutils.countAsBreak(e)) p++;
+//       else noteTable[e.getAttribute('xml:id') || ''] = p;
+//     }
+//   } else if ((breaksOption = 'auto')) {
+//     /** @type {Element | undefined} */
+//     let m;
+//     for (let e of elList) {
+//       if (e.nodeName === 'measure') {
+//         p++;
+//         m = e;
+//       } else {
+//         noteTable[e.getAttribute('xml:id') || ''] = m && e.closest('measure') === m ? p - 1 : p;
+//       }
+//     }
+//   }
 
-  t1 = t2;
-  t2 = performance.now();
-  console.log('listPageSpanningElements noteTable: ' + (t2 - t1) + ' ms.');
+//   t1 = t2;
+//   t2 = performance.now();
+//   console.log('listPageSpanningElements noteTable: ' + (t2 - t1) + ' ms.');
 
-  let p1 = 0;
-  let p2 = 0;
-  for (let spannerIds of Object.keys(tsTable)) {
-    p1 = noteTable[tsTable[spannerIds][0]];
-    p2 = noteTable[tsTable[spannerIds][1]];
-    if (p1 > 0 && p2 > 0 && p1 != p2) {
-      if (pageSpanners.start[p1]) pageSpanners.start[p1].push(spannerIds);
-      else pageSpanners.start[p1] = [spannerIds];
-      if (pageSpanners.end[p2]) pageSpanners.end[p2].push(spannerIds);
-      else pageSpanners.end[p2] = [spannerIds];
-    }
-  }
+//   let p1 = 0;
+//   let p2 = 0;
+//   for (let spannerIds of Object.keys(tsTable)) {
+//     p1 = noteTable[tsTable[spannerIds][0]];
+//     p2 = noteTable[tsTable[spannerIds][1]];
+//     if (p1 > 0 && p2 > 0 && p1 != p2) {
+//       if (pageSpanners.start[p1]) pageSpanners.start[p1].push(spannerIds);
+//       else pageSpanners.start[p1] = [spannerIds];
+//       if (pageSpanners.end[p2]) pageSpanners.end[p2].push(spannerIds);
+//       else pageSpanners.end[p2] = [spannerIds];
+//     }
+//   }
 
-  t1 = t2;
-  t2 = performance.now();
-  console.log('listPageSpanningElements pageSpanners: ' + (t2 - t1) + ' ms.');
+//   t1 = t2;
+//   t2 = performance.now();
+//   console.log('listPageSpanningElements pageSpanners: ' + (t2 - t1) + ' ms.');
 
-  return pageSpanners;
-} // listPageSpanningElements()
+//   return pageSpanners;
+// } // listPageSpanningElements()
 
 /**
  * Finds out which staff number the element belongs to.
@@ -599,7 +599,7 @@ function getStaffNumber(element) {
  * @param {string} staffNumber
  * @returns {{count: string | null, unit: string | null}}
  */
-export function getMeter(def, staffNumber = '') {
+function getMeter(def, staffNumber = '') {
   let meter = {
     count: def.getAttribute('meter.count'),
     unit: def.getAttribute('meter.unit'),
@@ -644,16 +644,13 @@ export function getMeter(def, staffNumber = '') {
   return meter;
 } // getMeter()
 
-/** @typedef { 'meter' | 'key' | '' } property */
-
 /**
  * Finds and returns a scoreDef element before the element, null otherwise
  * @param {Document} xmlDoc
  * @param {Element} element
- * @param {string} property
  * @returns {Element | null}
  */
-export function getScoreDefForElement(xmlDoc, element, property = '') {
+function getScoreDefForElement(xmlDoc, element) {
   // find meter.count/unit
   let elId = element.getAttribute('xml:id');
   let scoreDef = null;
@@ -685,6 +682,8 @@ export function getScoreDefForElement(xmlDoc, element, property = '') {
  * @param {Document} xmlDoc
  * @param {Element} element
  * @returns {number} tstamp (-1 if nothing found)
+ * 
+ * TODO: only used from editor.js; move to new DocumentController.js
  */
 export function getTstampForElement(xmlDoc, element) {
   let tstamp = -1;
@@ -732,7 +731,7 @@ export function getTstampForElement(xmlDoc, element) {
  * @param {Element} element
  * @returns {number} duration in beats, or -1 if problems
  */
-export function getDurationOfElement(element, meterUnit = 4.0) {
+function getDurationOfElement(element, meterUnit = 4.0) {
   let beatDuration = -1;
   if (element) {
     if (element.hasAttribute('grace')) {
@@ -1258,10 +1257,10 @@ export function filterElements(ids, xmlDoc, keepOnly = []) {
       ids.splice(i--, 1);
       continue;
     }
-    for (let j = i + 1; j < ids.length; j++) {
+    for (let j = 0; j < ids.length; j++) {
       const elj = xmlDoc.querySelector('[*|id="' + ids[j] + '"]');
       if (!elj) continue;
-      if (elj.closest('[*|id="' + ids[i] + '"]')) {
+      if (elj.parentElement && elj.parentElement.closest('[*|id="' + ids[i] + '"]')) {
         ids.splice(j--, 1);
       }
     }

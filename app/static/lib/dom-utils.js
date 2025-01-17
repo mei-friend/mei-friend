@@ -6,7 +6,102 @@ export const navElsArray = ['note', 'rest', 'mRest', 'beatRpt', 'halfmRpt', 'mRp
 export const navElsSelector = '.' + navElsArray.join(',.');
 
 import * as att from './attribute-classes.js';
-import { escapeXmlId } from './utils.js';
+import * as utils from './utils.js';
+import Viewer from './viewer.js';
+
+/**
+ * Returns median of coordinate value for a specified axis.
+ * Checks for notes within coords, navigation elements (navEls),
+ * and the position of navigation elements within markup elements.
+ * navElsArray = ['note', 'rest', 'mRest', 'beatRpt', 'halfmRpt', 'mRpt', 'clef'];
+ * @param {SVGGElement} element svg element
+ * @param {string} axis [axis="x|y"]
+ * @returns {number}
+ */
+function getCoordinateValue(element, axis) {
+  if (!element) return false;
+  let values = [];
+  let elementClasses = element.getAttribute('class');
+  if (elementClasses.includes('chord')) {
+    let els = element.querySelectorAll('g.note');
+    els.forEach((item) => {
+      values.push(getCoordinateValue(item, axis));
+    });
+  }
+  else if (navElsArray.some((el) => elementClasses.includes(el))) {
+    let els = element.querySelectorAll('.notehead > use[' + axis + ']'); // should be one!
+    if (els.length === 0) {
+      els = element.querySelectorAll('use[' + axis + ']');
+    } // non-notes
+    els.forEach((item) => {
+      values.push(parseInt(item.getAttribute(axis)));
+    });
+  }
+  else if (
+    att.alternativeEncodingElements.some((el) => elementClasses.includes(el)) ||
+    att.modelTranscriptionLike.some((el) => elementClasses.includes(el))
+  ) {
+    let els = element.querySelectorAll(navElsSelector);
+    els.forEach((item) => {
+      values.push(getCoordinateValue(item, axis));
+    });
+  }
+  return utils.median(values);
+} // getCoordinateValue()
+
+/**
+ * Returns id of first element in measure element.
+ * @param {Element} measure
+ * @param {string} selector
+ * @param {number} stN
+ * @param {number} lyN
+ * @returns {string} id
+ */
+export function getFirstInMeasure(measure, selector, stN, lyN) {
+  let foundElementId = '';
+  let staff = measure.querySelector('.staff[data-n="' + stN + '"]');
+  // console.info('getFirstInMeasure: staff ', staff);
+  if (staff) {
+    let el;
+    let layer = staff.querySelector('.layer[data-n="' + lyN + '"]');
+    // console.info('getFirstInMeasure: layer ', layer);
+    if (layer) {
+      el = layer.querySelector(selector);
+    } else {
+      el = staff.querySelector(selector);
+    }
+    // console.info('getFirstInMeasure: el ', el);
+    if (el) foundElementId = el.getAttribute('id');
+  }
+  return foundElementId;
+} // getFirstInMeasure()
+
+/**
+ * Returns id in next (dir = backwards/forwards) measure, at same staff and/or
+ * layer if existent (otherwise in same staff)
+ * @param {Element} currEl
+ * @param {string} [dir="backwards|forwards"]
+ * @param {number} [stN=0]
+ * @param {number} [lyN=0]
+ * @returns {string} id
+ */
+export function getIdInNextMeasure(currEl, dir = 'forwards', stN = 0, lyN = 0) {
+  let measureList = Array.from(document.querySelectorAll('.measure'));
+  if (dir.startsWith('back')) measureList.reverse();
+  let measure = currEl.closest('.measure');
+  if (lyN === 0) lyN = currEl.closest('.layer').getAttribute('data-n');
+  if (stN === 0) stN = currEl.closest('.staff').getAttribute('data-n');
+  let found = false;
+  for (let m of measureList) {
+    // console.info('getIdInNextMeasure ' + dir + ', m: ', m);
+    if (found) {
+      if (dir === 'backwards') return getLastInMeasure(m, navElsSelector, stN, lyN);
+      // forwards, back
+      else return getFirstInMeasure(m, navElsSelector, stN, lyN);
+    }
+    if (m.getAttribute('id') === measure.getAttribute('id')) found = true;
+  }
+} // getIdInNextMeasure()
 
 /**
  * Scans through SVG starting from element to find next element elementName
@@ -38,7 +133,7 @@ export function getIdOfNextSvgElement(currEl, dir = 'forwards', sel = navElsSele
     let firstId = getFirstInMeasure(measure, navElsSelector, stN, lyN);
     let currId = currEl.getAttribute('id');
     if (currChord) currId = currChordId;
-    let firstChord = document.querySelector('g#' + escapeXmlId(firstId)).closest('.chord');
+    let firstChord = document.querySelector('g#' + utils.escapeXmlId(firstId)).closest('.chord');
     if (firstChord) firstId = firstChord.getAttribute('id');
     if (currId === firstId) {
       let id = getIdInNextMeasure(currEl, dir.substring(0, 4), stN, lyN);
@@ -77,33 +172,6 @@ export function getIdOfNextSvgElement(currEl, dir = 'forwards', sel = navElsSele
 } // getIdOfNextSvgElement()
 
 /**
- * Returns id in next (dir = backwards/forwards) measure, at same staff and/or
- * layer if existent (otherwise in same staff)
- * @param {Element} currEl
- * @param {string} [dir="backwards|forwards"]
- * @param {number} [stN=0]
- * @param {number} [lyN=0]
- * @returns {string} id
- */
-export function getIdInNextMeasure(currEl, dir = 'forwards', stN = 0, lyN = 0) {
-  let measureList = Array.from(document.querySelectorAll('.measure'));
-  if (dir.startsWith('back')) measureList.reverse();
-  let measure = currEl.closest('.measure');
-  if (lyN === 0) lyN = currEl.closest('.layer').getAttribute('data-n');
-  if (stN === 0) stN = currEl.closest('.staff').getAttribute('data-n');
-  let found = false;
-  for (let m of measureList) {
-    // console.info('getIdInNextMeasure ' + dir + ', m: ', m);
-    if (found) {
-      if (dir === 'backwards') return getLastInMeasure(m, navElsSelector, stN, lyN);
-      // forwards, back
-      else return getFirstInMeasure(m, navElsSelector, stN, lyN);
-    }
-    if (m.getAttribute('id') === measure.getAttribute('id')) found = true;
-  }
-} // getIdInNextMeasure()
-
-/**
  * Returns id string of requested element having the properties
  * specified in the parameters.
  * Wrapper for getFirstInMeasure and getLastInMeasure.
@@ -118,33 +186,6 @@ export function getInMeasure(measure, selector, stN, lyN, what = '') {
   if (what === 'first') return getFirstInMeasure(measure, selector, stN, lyN);
   if (what === 'last') return getLastInMeasure(measure, selector, stN, lyN);
 } // getInMeasure()
-
-/**
- * Returns id of first element in measure element.
- * @param {Element} measure
- * @param {string} selector
- * @param {number} stN
- * @param {number} lyN
- * @returns {string} id
- */
-export function getFirstInMeasure(measure, selector, stN, lyN) {
-  let foundElementId = '';
-  let staff = measure.querySelector('.staff[data-n="' + stN + '"]');
-  // console.info('getFirstInMeasure: staff ', staff);
-  if (staff) {
-    let el;
-    let layer = staff.querySelector('.layer[data-n="' + lyN + '"]');
-    // console.info('getFirstInMeasure: layer ', layer);
-    if (layer) {
-      el = layer.querySelector(selector);
-    } else {
-      el = staff.querySelector(selector);
-    }
-    // console.info('getFirstInMeasure: el ', el);
-    if (el) foundElementId = el.getAttribute('id');
-  }
-  return foundElementId;
-} // getFirstInMeasure()
 
 /**
  * Returns id of last element in measure element.
@@ -173,91 +214,43 @@ export function getLastInMeasure(measure, selector, stN, lyN) {
   return foundElementId;
 } // getLastInMeasure()
 
+/*
+AP 27.12.2023
+To change getX to retrieve X positions for markup, I refactored getX() and getY():
+1. Both functions are nearly identical. Logic is moved to getCoordinateValue().
+  getX() and getY() both call getCoordinateValue().
+  Keeps changes in logic consistent for both axes.
+3. getX() had a parameter "what" [what="median|range|array"] to specify the return value:
+    if (what === 'median') return median(x);
+    if (what === 'range') return Math.max(x) - Math.min(x);
+    if (what === 'array') return x;
+  This parameter hasn't been used anywhere in the code. I removed it for now.
+*/
+
 /**
- * Returns x coordinates of note and noteheads, as specified by what.
+ * Returns x coordinates of note and noteheads.
  * @param {Element} element
- * @param {string} [what="median|range|array"]
  * @returns {number|array}
  */
-export function getX(element, what = 'median') {
-  if (!element) return false;
-  let x = [];
-  if (element.getAttribute('class').includes('chord')) {
-    let els = element.querySelectorAll('g.note');
-    els.forEach((item, i) => {
-      x.push(getX(item));
-    });
-  } else if (navElsArray.some((el) => element.getAttribute('class').includes(el))) {
-    // (element.getAttribute('class').includes("note")) {
-    let els = element.querySelectorAll('.notehead > use[x]'); // should be one!
-    if (els.length === 0) els = element.querySelectorAll('use[x]'); // non-notes
-    els.forEach((item) => x.push(parseInt(item.getAttribute('x'))));
-  }
-  if (what === 'median') return median(x);
-  if (what === 'range') return Math.max(x) - Math.min(x);
-  if (what === 'array') return x;
+export function getX(element) {
+  return getCoordinateValue(element, 'x');
 } // getX()
 
 /**
- * Returns median of y coordinate of element
+ * Returns median of y coordinate of note and noteheads.
  * @param {Element} element
  * @returns {number}
  */
 export function getY(element) {
-  if (!element) return false;
-  let y = [];
-  if (element.getAttribute('class').includes('chord')) {
-    let els = element.querySelectorAll('g.note');
-    els.forEach((item, i) => {
-      y.push(getY(item));
-    });
-  } else if (navElsArray.some((el) => element.getAttribute('class').includes(el))) {
-    let els = element.querySelectorAll('.notehead > use[y]'); // should be one!
-    if (els.length === 0) els = element.querySelectorAll('use[y]'); // non-notes
-    els.forEach((item, i) => {
-      y.push(parseInt(item.getAttribute('y')));
-    });
-  }
-  return median(y);
+  return getCoordinateValue(element, 'y');
 } // getY()
-
-/**
- * Returns median of array of numbers
- * @param {number[]} numbers
- * @returns {number}
- */
-export function median(numbers) {
-  const sorted = numbers.slice().sort((a, b) => a - b);
-  const middle = Math.floor(sorted.length / 2);
-  if (sorted.length % 2 === 0) return (sorted[middle - 1] + sorted[middle]) / 2;
-  return sorted[middle];
-} // median()
-
-/**
- * Returns true when element is the first in SVG page in same staff & layer
- * @param {string} id
- * @returns
- */
-export function isFirstElementOnPage(id) {
-  if (!id) return true;
-  let element = document.querySelector('g#' + escapeXmlId(id));
-  if (!element) return true;
-  let measure = element.closest('.measure');
-  let stN = element.closest('.staff').getAttribute('data-n');
-  let lyN = element.closest('.layer').getAttribute('data-n');
-  // console.info('isFirstElement this measure: ', measure);
-  // console.info('isFirstElement st/ly: ' + stN + '/' + lyN);
-  let thisId = getFirstInMeasure(measure, navElsSelector, stN, lyN);
-  let m = document.querySelector('.measure');
-  let firstId = getFirstInMeasure(m, navElsSelector, stN, lyN);
-  console.info('isFirstElement: firstId: ' + firstId + ', thisId: ' + thisId + ', BOOL: ' + (thisId === firstId));
-  return thisId === firstId;
-} // isFirstElementOnPage()
 
 /**
  * Returns the DOM element at encoding cursor position
  * @param {CodeMirror} cm
  * @returns {Element}
+ * 
+ * TODO: to be moved to a CodeMirrorController.js
  */
 export function getElementAtCursor(cm) {
   let cursor = cm.getCursor();
@@ -300,6 +293,44 @@ export function countAsBreak(el, sourceId = '') {
 } // countAsBreak()
 
 /**
+ * This function takes an element and a list of ids.
+ * It tries to detect adjacent siblings of the initial element
+ * which ids are listed in the idArray.
+ * It returns an array of adjacent ids.
+ *
+ * @param {Element} xmlNode initial xml element to check
+ * @param {Array} idArray array of possible target elements
+ */
+export function getAdjacentSiblingElements(xmlNode, idArray) {
+  let adjacentElIds = [];
+  let directions = ['previous', 'next'];
+
+  let id = xmlNode.getAttribute('xml:id');
+  adjacentElIds.push(id);
+  idArray.splice(id, 1);
+
+  directions.forEach((dir) => {
+    let node = eval('xmlNode.' + dir + 'ElementSibling');
+    if (node == null) {
+      return;
+    }
+
+    while (node) {
+      let currentNodeId = node.getAttribute('xml:id');
+      if (idArray.includes(currentNodeId)) {
+        adjacentElIds.push(currentNodeId);
+        idArray.splice(idArray.indexOf(currentNodeId), 1);
+        node = eval('node.' + dir + 'ElementSibling');
+      } else {
+        break;
+      }
+    }
+  });
+
+  return adjacentElIds;
+} // getAdjacentSiblingElements()
+
+/**
  * Convert xmlNode to string and remove meiNameSpace declaration from return string
  * @param {Node} xmlNode
  * @returns {string}
@@ -325,7 +356,7 @@ export function sortNodeAttributes(xmlNode) {
 } // sortNodeAttributes()
 
 /**
- * Checks xmlDoc for expand elements and returns an array of arrays
+ * Checks xmlDoc for expanding elements and returns an array of arrays
  * @param {Node} xmlDoc
  * @param {string} baseSelector
  * @returns {string[][]}
@@ -392,11 +423,55 @@ export function getAffectedNotesFromKeySig(keySigString = '') {
 } // getAffectedNotesFromKeySig()
 
 /**
+ * For all nodes with xml:id, replace with new xml:id and repeat for all decendents
+ * @param {Node} xmlNode
+ * @param {Object} dicIdChanges a dictionary where old to new IDs will be inserted
+ */
+export function addNewXmlIdsToDescendants(xmlNode, dicIdChanges) {
+  if (xmlNode.getAttribute('xml:id')) {
+    let newID = utils.generateXmlId(xmlNode.localName, Viewer.xmlIdStyle);
+    dicIdChanges[xmlNode.getAttribute('xml:id')] = newID;
+    xmlNode.setAttributeNS(xmlNameSpace, 'xml:id', newID);
+
+    if (xmlNode.children.length > 0) {
+      for (let child of xmlNode.children) {
+        addNewXmlIdsToDescendants(child, dicIdChanges);
+      }
+    }
+  }
+} // addNewXmlIdsToDescendants()
+
+/**
+ * Checks if the xmlNode has dependen IDs and replaces them with the one found in dicOld2NewIDs
+ * @param {*} xmlNode 
+ * @param {*} dicOld2NewIDs 
+ */
+export function modifyDependenIDs(xmlNode, dicOld2NewIDs){
+  let currentID = utils.rmHash(xmlNode.getAttribute('endid'));
+  if (currentID && dicOld2NewIDs[currentID]) {
+    xmlNode.setAttribute('endid', "#" + dicOld2NewIDs[currentID]);
+  }
+
+  currentID = utils.rmHash(xmlNode.getAttribute('startid'));
+  if (currentID && dicOld2NewIDs[currentID]) {
+    xmlNode.setAttribute('startid', "#" + dicOld2NewIDs[currentID]);
+  }
+
+  if (xmlNode.children.length > 0) {
+    for (let child of xmlNode.children) {
+      modifyDependenIDs(child, dicOld2NewIDs);
+    }
+  }
+}
+
+/**
  * Scroll DOM element into view inside container element.
  * (Called to scroll SVG and facsimile image into view.)
  * @param {Element} container
  * @param {Element} element
  * @returns {boolean} if scrolled or not
+ * 
+ * TODO: to be moved to a ViewerController.js or Viewer.js
  */
 export function scrollTo(container, element) {
   let changed = false;
@@ -429,3 +504,25 @@ export function scrollTo(container, element) {
   }
   return false;
 } // scrollTo()
+
+/**
+ * Processes entire xmlDoc element for markup elemenets
+ * and adds a color attribute to first level of children
+ * @param {Node} xmlNode
+ */
+export function addColorToMarkupElements(xmlNode) {
+  let colorChooserIds = att.modelTranscriptionLike.map((type) => type + 'Color');
+
+  att.modelTranscriptionLike.forEach((type, index) => {
+    let elements = xmlNode.querySelectorAll(type);
+    elements.forEach((element) => {
+      let children = element.children;
+      if (children.length > 0) {
+        let hexColor = document.getElementById(colorChooserIds[index]).value;
+        let rgbString = 'rgb(' + utils.hexToRgb(hexColor).join(', ') + ')';
+        Array.from(children).forEach((child) => child.setAttribute('color', rgbString));
+      }
+    });
+  });
+  return xmlNode;
+} // addColorToMarkupElements()

@@ -4,6 +4,7 @@
 
 import * as att from '../lib/attribute-classes.js';
 import { heart } from '../css/icons.js';
+import { getChangelogUrl } from '../lib/utils.js';
 
 export const lang = {
   // スプラッシュ画面
@@ -12,6 +13,11 @@ export const lang = {
     text: 'アプリケーションの読み込み時にスプラッシュ画面を表示',
     description: 'mei-friendの読み込み時にスプラッシュ画面を表示します',
   },
+  splashUpdateIndicator: {
+    html: `
+      前回スプラッシュ画面を確認した時から、以下のテキストが更新されました。詳細については、<a href="${getChangelogUrl()}" target="_blank">変更履歴</a>をご覧ください。`,
+  },
+  splashLastUpdated: { text: 'テキストの最終更新日: ' },
   splashBody: {
     html: `
    <p>
@@ -20,15 +26,10 @@ export const lang = {
       詳細な情報は<a href="https://mei-friend.github.io" target="_blank">こちら</a>をご覧ください。
       </p>
       <p>
-      mei-friendはブラウザベースのアプリケーションでありながら、個人データ（編集中の楽譜データ、アプリケーションの設定、
-      およびログイン詳細など）はブラウザの<a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank" >ローカルストレージ</a>
-      に保存され、サーバーには送信または保存されません。
-
+        mei-friendはブラウザベースのアプリケーションですが、個人データ（編集しているエンコーディング、アプリケーション設定、および現在のログイン情報など）はブラウザの<a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank">ローカルストレージ</a>に保存され、当社のサーバーには保存されません。
       </p>
       <p>
-
-      データは明示的なリクエスト時のみGitHubに送信されます。同様に、選択したSolidプロバイダーに対しても明示的なリクエスト時にのみデータが送信されます。
-
+        データは、ユーザーが明示的に要求した場合にのみGitHubに送信されます（例：GitHubにログインする、GitHubリポジトリからエンコーディングを読み込む、コミットする、またはGitHubアクションワークフローを実行するように要求する場合）。同様に、データはユーザーが明示的に要求した場合にのみ選択したSolidプロバイダーに送信されます（例：Solidにログインする、スタンドオフ注釈を読み込むまたは保存する場合）。技術的な理由から、GitHubとの特定のやり取り（エンコーディングを最初に開くときにリポジトリをブラウザにクローンする、またはリポジトリに変更をコミットする）には、ウィーン国立音楽大学（mdw）がホストするプロキシサーバーにデータを送信する必要があります。このサーバーはブラウザとGitHubの間の仲介役として機能し、通過するデータを保存しません。
       </p>
       <p>
 
@@ -282,6 +283,9 @@ export const lang = {
   breaksSelectLine: { text: 'システム' },
   breaksSelectEncoded: { text: 'システムとページ' },
   breaksSelectSmart: { text: 'スマート' },
+  choiceSelect: { description: '選択要素の表示コンテンツを選択します' },
+  choiceDefault: { text: '(デフォルトの選択)' },
+  noChoice: { text: '(利用可能な選択肢なし)' },
   updateControlsLabel: { text: '更新', description: 'エンコード変更後の楽譜の制御更新動作' },
   liveUpdateCheckbox: { description: 'エンコード変更後に楽譜を自動的に更新' },
   codeManualUpdateButton: { description: '楽譜を手動で更新' },
@@ -424,8 +428,9 @@ export const lang = {
   annotationCloseButtonText: { text: '注釈パネルを閉じる' },
   hideAnnotationPanelButton: { description: '注釈パネルを閉じる' },
   closeAnnotationPanelButton: { description: '注釈パネルを閉じる' },
-  annotationToolsButton: { text: 'ツール', description: '注釈ツール' },
-  annotationListButton: { text: 'リスト', description: '注釈のリスト' },
+  markupToolsButton: { description: 'マークアップツール' },
+  annotationToolsButton: { description: '注釈ツール' },
+  annotationListButton: { description: '注釈リスト' },
   writeAnnotStandoffText: { text: 'Web注釈' },
   annotationToolsIdentifyTitle: { text: '識別' },
   annotationToolsIdentifySpan: { text: '音楽オブジェクトを識別' },
@@ -442,6 +447,9 @@ export const lang = {
   loadWebAnnotationMessage2: { text: 'もう一度お試しください' },
   noAnnotationsToDisplay: { text: '表示する注釈がありません' },
   flipPageToAnnotationText: { description: 'この注釈にページをめくる' },
+  describeMarkup: { description: 'このマークアップを説明する' },
+  deleteMarkup: { description: 'このマークアップを削除する' },
+  deleteMarkupConfirmation: { text: 'このマークアップを削除してもよろしいですか？' },
   deleteAnnotation: { description: 'この注釈を削除' },
   deleteAnnotationConfirmation: { text: 'この注釈を削除してもよろしいですか？' },
   makeStandOffAnnotation: {
@@ -468,6 +476,93 @@ export const lang = {
   annotationWithoutIdWarning: {
     text1: 'MEIアンカーポイントにxml:idがないため、注釈を書き込むことができません。',
     text2: '「操作」->「MEIの再レンダリング（ID付き）」を選択して識別子を割り当て、もう一度お試しください。',
+  },
+  // Markup menu マークアップメニュー
+  respSelect: {
+    text: 'マークアップの責任を選択',
+    description: '責任のIDを選択',
+  },
+  selectionSelect: {
+    text: 'マークアップのデフォルト選択',
+    description:
+      '新しく作成されたマークアップが選択された要素、アーティキュレーション、またはアクシデンタルを囲むかどうかを選択してください',
+    labels: ['選択された要素', 'アーティキュレーション', 'アクシデンタル'],
+    valuesDescriptions: [
+      '選択された要素にマークアップを追加します。',
+      '選択範囲内のアーティキュレーションにマークアップを追加します。',
+      '選択範囲内のアクシデンタルにマークアップを追加します。',
+    ],
+  },
+  alternativeEncodingsGrp: {
+    text: '代替エンコーディング',
+    description: '複数のバージョンを含むマークアップ要素。',
+  },
+  addChoiceText: {
+    text: '<choice>',
+    description: 'テキスト内の同じポイントの複数の代替エンコーディングをグループ化します。',
+  },
+  choiceSicCorr: {
+    description: '<sic> に選択を入れて <corr> を追加します。',
+  },
+  choiceCorrSic: {
+    description: '<corr> に選択を入れて <sic> を追加します。',
+  },
+  choiceOrigReg: {
+    description: '<orig> に選択を入れて <reg> を追加します。',
+  },
+  choiceRegOrig: {
+    description: '<reg> に選択を入れて <orig> を追加します。',
+  },
+  choiceContentTarget: {
+    description: '<choice> の上にホバーしてこの要素のためにコンテンツを選択します。',
+  },
+  addSubstText: {
+    text: '<subst>',
+    description: '(置換) - テキスト内での組み合わせが単一の介入と見なされる場合に、転写要素をグループ化します。',
+  },
+  substAddDel: {
+    description: '<add> に選択を入れて <del> を追加します。',
+  },
+  substDelAdd: {
+    description: '<del> に選択を入れて <add> を追加します。',
+  },
+  substContentTarget: {
+    description: '<subst> の上にホバーしてこの要素のためにコンテンツを選択します。',
+  },
+  editInterventionsGrp: {
+    text: '編集介入',
+    description: '編集介入をエンコードするために使用されるマークアップ要素。',
+  },
+  addSuppliedText: {
+    text: '<supplied>',
+    description: '転写者または編集者によって供給された素材を含みます。',
+  },
+  addUnclearText: {
+    text: '<unclear>',
+    description: '原文で確実に転写できない素材を含みます（読めないか聞き取れない）。',
+  },
+  addSicText: { text: '<sic>', description: '明らかに不正確または誤った素材を含みます。' },
+  addCorrText: {
+    text: '<corr>',
+    description: '(訂正) - 明らかに誤った部分の正しい形を含みます。',
+  },
+  addOrigText: {
+    text: '<orig>',
+    description: '(原文) - 正規化または訂正されるのではなく、元の形に従っている素材を含みます。',
+  },
+  addRegText: {
+    text: '<reg>',
+    description: '(正規化) - ある意味で正規化または規格化された素材を含みます。',
+  },
+  descMarkupGrp: {
+    text: '記述的なマークアップ',
+    description: 'ソース素材への介入をエンコードするために使用されるマークアップ要素。',
+  },
+  addAddText: { text: '<add>', description: '(追加) - テキストへの追加をマークします。' },
+  addDelText: {
+    text: '<del>',
+    description:
+      '(削除) - 著者、書記、注釈者、または校正者によって削除された情報、削除されたもの、またはコピーテキストで不要または誤って指定されたものを含みます。',
   },
 
   // MIDI
@@ -767,20 +862,53 @@ export const lang = {
 
   // Supplied element
   titleSupplied: {
-    text: '編集コンテンツを操作',
-    description: '<supplied>要素の操作を制御します',
+    text: '編集コンテンツの処理',
+    description: '編集マークアップの処理を制御',
   },
-  showSupplied: {
-    text: '<supplied>要素を表示',
-    description: '<supplied>要素に含まれるすべての要素を強調表示します',
+  showMarkup: {
+    text: '編集マークアップ要素を表示',
+    description: '編集マークアップ要素に含まれるすべての要素を強調表示',
+  },
+  markupToPDF: {
+    text: 'PDFにマークアップを含める',
+    description: 'PDFに編集マークアップ要素を含める',
+  },
+  alternativeVersionContent: {
+    text: '代替エンコーディングのデフォルトコンテンツを選択',
+    description: '新しく作成された代替エンコーディングが空であるか、元の読み物のコピーであるかを選択',
+    labels: ['空', 'コピー'],
   },
   suppliedColor: {
-    text: '<supplied>の強調表示色を選択',
-    description: '<supplied>の強調表示色を選択',
+    text: '<supplied>のハイライトカラーを選択',
+    description: '<supplied>のハイライトカラーを選択',
   },
-  respSelect: {
-    text: '<supplied>の責任者を選択',
-    description: '責任者IDを選択',
+  unclearColor: {
+    text: '<unclear>のハイライトカラーを選択',
+    description: '<unclear>のハイライトカラーを選択',
+  },
+  sicColor: {
+    text: '<sic>のハイライトカラーを選択',
+    description: '<sic>のハイライトカラーを選択',
+  },
+  corrColor: {
+    text: '<corr>のハイライトカラーを選択',
+    description: '<corr>のハイライトカラーを選択',
+  },
+  origColor: {
+    text: '<orig>のハイライトカラーを選択',
+    description: '<orig>のハイライトカラーを選択',
+  },
+  regColor: {
+    text: '<reg>のハイライトカラーを選択',
+    description: '<reg>のハイライトカラーを選択',
+  },
+  addColor: {
+    text: '<add>のハイライトカラーを選択',
+    description: '<add>のハイライトカラーを選択',
+  },
+  delColor: {
+    text: '<del>のハイライトカラーを選択',
+    description: '<del>のハイライトカラーを選択',
   },
 
   // EDITOR SETTINGS / CODEMIRROR SETTINGS
@@ -859,6 +987,10 @@ export const lang = {
   keyMap: {
     text: 'キーマップ',
     description: 'キーマップを選択',
+  },
+  persistentSearch: {
+    text: '永続的な検索ボックス',
+    description: '永続的な検索ボックスの動作を使用します（検索ボックスは明示的に閉じるまで開いたままになります）',
   },
 
   // Verovio settings

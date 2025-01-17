@@ -77,8 +77,6 @@ export const keymap = {
     escape: 'escapeKeyPressed',
 
     'shift-alt-f': 'indentSelection',
-
-    space: 'playPauseMidiPlayback',
   },
 
   // only mapped to notation under MAC OSX
@@ -105,6 +103,9 @@ export const keymap = {
     'cmd-shift-m': 'removeIds',
     'cmd-shift-v': 'validate',
     'shift-alt-f': 'indentSelection',
+    'cmd-f': 'doFind',
+    'cmd-g': 'doFindNext',
+    'cmd-shift-g': 'doFindPrev',
     'cmd-z': 'undo',
     'cmd-shift-z': 'redo',
     'cmd-0': 'notesZoom100',
@@ -148,6 +149,7 @@ export const keymap = {
     'ctrl-l': 'addTrill',
     'ctrl-r': 'addTurn',
     'ctrl-shift-r': 'addTurnLower',
+    space: 'playPauseMidiPlayback',
   },
 
   // mapped to #notation under Win/Linux
@@ -174,6 +176,9 @@ export const keymap = {
     'ctrl-shift-m': 'removeIds',
     'ctrl-shift-v': 'validate',
     'shift-alt-f': 'indentSelection',
+    'ctrl-f': 'doFind',
+    'ctrl-g': 'doFindNext',
+    'ctrl-shift-g': 'doFindPrev',
     'ctrl-z': 'undo',
     'ctrl-shift-z': 'redo',
     'ctrl-0': 'notesZoom100',
@@ -216,5 +221,6 @@ export const keymap = {
     'alt-l': 'addTrill',
     'alt-r': 'addTurn',
     'alt-shift-r': 'addTurnLower',
+    space: 'playPauseMidiPlayback',
   },
 };

@@ -5,7 +5,8 @@
 import { isSafari } from './defaults.js';
 import * as l from '../lang/lang.en.js'; // default language
 import { translateLanguageSelection } from './language-selector.js';
-import { drawRightFooter, updateStatusBar } from './main.js';
+import { drawRightFooter, pageInfoToStatusBar } from './main.js';
+import { refreshAnnotationsList } from './enrichment-panel.js';
 import Viewer from './viewer.js';
 
 /**
@@ -56,7 +57,7 @@ export default class Translator {
 
   /**
    * Copy all keys of language object to internal translator.lang
-   * @param {object} language
+   * @param {Object} language
    */
   setLang(language) {
     for (let key in language) this.lang[key] = language[key];
@@ -90,8 +91,9 @@ export default class Translator {
         }
       }
     }
-    updateStatusBar();
+    pageInfoToStatusBar();
     drawRightFooter();
+    refreshAnnotationsList();
 
     this.handleLanguageExceptions();
 
@@ -154,6 +156,30 @@ export default class Translator {
       if ('placeholder' in translationItem) el.setAttribute('placeholder', translationItem.placeholder);
     }
   } // doTranslation()
+
+  /**
+   *
+   * @param {string} dateString
+   * @returns {string} the translated date string
+   */
+  translateDate(dateString) {
+    console.log('translateDate(): ', dateString);
+    let translatedDate = dateString;
+    for (let key of Object.keys(this.lang.month)) {
+      let i = dateString.search(this.defaultLang.month[key]);
+      if (i > 0) {
+        translatedDate = dateString.replace(this.defaultLang.month[key], this.lang.month[key]);
+        break;
+      }
+      i = dateString.search(this.defaultLang.month[key].substring(0, 3));
+      if (i > 0) {
+        translatedDate = dateString.replace(this.defaultLang.month[key].substring(0, 3), this.lang.month[key]);
+        break;
+      }
+    }
+    console.log('Translated date: ', translatedDate);
+    return translatedDate;
+  } // translateDate()
 
   /**
    *

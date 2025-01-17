@@ -44,3 +44,7 @@
   flex-direction: column;
   overflow-y: auto;
 }
+
+#markupToolsMenu {
+  flex-direction: column;
+}

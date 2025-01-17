@@ -8,14 +8,7 @@ let pageCount = 1;
 let currentPage = 1;
 
 /**
- * @returns pages array
- */
-export function getPages() {
-  return pages;
-} // getPages()
-
-/**
- *
+ * Creates the page range selector
  * @returns {Element} pageRangeDiv
  */
 export function createPageRangeSelector(display = 'none') {
@@ -39,12 +32,12 @@ export function createPageRangeSelector(display = 'none') {
         <div>
             <input type="radio" id="selectFromTo" name="pagesSelect" value="fromto" />
             <label for="selectFromTo" id="selectFromLabel">from:</label>
-            <input type="number" id="selectFrom" name="firstPage" value="1" min="1"/>
+            <input type="number" id="selectFrom" class="preventKeyBindings" name="firstPage" value="1" min="1"/>
         </div>
         <div>
             <div class="fillSpace"></div>
             <label for="selectFromTo" id="selectToLabel">to:</label>
-            <input type="number" id="selectTo" name="endPage" value="1" min="1" />
+            <input type="number" id="selectTo" class="preventKeyBindings" name="endPage" value="1" min="1" />
         </div>
 
         <div>
@@ -53,7 +46,7 @@ export function createPageRangeSelector(display = 'none') {
         </div>
 
         <div>
-            <input type="text" id="selectRange" value="2, 5-8" name="selectRange" placeholder="2, 5-8" />
+            <input type="text" id="selectRange" class="preventKeyBindings" value="2, 5-8" name="selectRange" placeholder="2, 5-8" />
         </div>
     </div>`;
   if (display) pageRangeDiv.style.display = display;
@@ -62,8 +55,15 @@ export function createPageRangeSelector(display = 'none') {
 } // createPageRangeSelector()
 
 /**
+ * @returns pages array
+ */
+export function getPages() {
+  return pages;
+} // getPages()
+
+/**
  * Gets called at each page change
- * @param {Viewer*} v
+ * @param {Viewer} v
  */
 export function updatePageRangeSelector(v) {
   pageCount = v.pageCount;
@@ -79,16 +79,22 @@ export function updatePageRangeSelector(v) {
     disablePageRangeMenu(false);
     document.getElementById('selectTo').max = pageCount;
     lastPage = Math.min(lastPage, pageCount);
-    if (document.getElementById('selectTo').value > pageCount) document.getElementById('selectTo').value = pageCount;
+    if (document.getElementById('selectTo').value > pageCount) {
+      document.getElementById('selectTo').value = pageCount;
+    }
     document.getElementById('selectFrom').max = Math.min(document.getElementById('selectTo').value, pageCount);
     firstPage = Math.min(firstPage, lastPage);
-    if (document.getElementById('selectFrom').value > lastPage) document.getElementById('selectFrom').value = lastPage;
+    if (document.getElementById('selectFrom').value > lastPage) {
+      document.getElementById('selectFrom').value = lastPage;
+    }
     readValues();
     document.getElementById('pagesLegendLabel').title = translator.lang.pdfPreviewNormalModeTitle.text;
     document.getElementById('pageRangeItems').classList.add('show');
   }
   redrawTitle();
 } // updatePageRangeSelector()
+
+//#region Private helper functions
 
 /**
  * Called from the menu items
@@ -109,6 +115,49 @@ function clicked(ev) {
   redrawTitle();
 } // clicked()
 
+function disablePageRangeMenu(disable = true) {
+  document
+    .getElementById('pageRangeItems')
+    .querySelectorAll('input')
+    .forEach((e) => (e.disabled = disable));
+} // disablePageRangeMenu()
+
+function generatePageRangeString(arr) {
+  let struct = [];
+  let oldPage = -1;
+  for (let i = 0; i < arr.length; i++) {
+    let currPage = arr.at(i);
+    if (currPage - oldPage > 1) {
+      struct.push([currPage]);
+    } else {
+      struct.at(-1)[1] = currPage;
+    }
+    oldPage = currPage;
+  }
+  let str = '';
+  struct.forEach((s, i) => {
+    str += s.join('&ndash;');
+    if (i < struct.length - 1) {
+      str += ', ';
+    }
+  });
+  return str;
+} // generatePageRangeString()
+
+function parsePageRangeString(str) {
+  let pageRange = [];
+  str.split(',').forEach((s) => {
+    let a = s.trim().split('-');
+    for (let i = parseInt(a.at(0)); i <= parseInt(a.at(-1)); i++) {
+      if (i >= 1 && i <= pageCount) {
+        pageRange.push(i);
+      }
+    }
+  });
+  // sort and remove duplicates
+  return pageRange.sort((a, b) => a - b).filter((item, idx) => pageRange.indexOf(item) === idx);
+} // parsePageRangeString()
+
 function readValues() {
   if (document.getElementById('selectAllPages').checked) {
     pages = seq(1, pageCount);
@@ -127,13 +176,20 @@ function readValues() {
 
 function redrawTitle() {
   let pl = document.getElementById('pagesLegendLabel');
-  if (pl)
-    pl.innerHTML =
-      (pages.length > 1
-        ? translator.lang.pagesLegendLabel.multiplePages + ': '
-        : translator.lang.pagesLegendLabel.singlePage + ': ') + generatePageRangeString(pages);
+  if (pl && pages.length <= 1) {
+    pl.innerHTML = translator.lang.pagesLegendLabel.singlePage + ': '
+  } else {
+    pl.innerHTML = translator.lang.pagesLegendLabel.multiplePages + ': ';
+  }
+  pl.innerHTML += generatePageRangeString(pages);
 } // redrawTitle()
 
+/**
+ * Creates array of integers from i1 to i2
+ * @param {number} i1 
+ * @param {number} i2 
+ * @returns 
+ */
 function seq(i1, i2) {
   let arr = [];
   for (let i = i1; i <= i2; i++) {
@@ -141,42 +197,3 @@ function seq(i1, i2) {
   }
   return arr;
 } // seq()
-
-function parsePageRangeString(str) {
-  let pageRange = [];
-  str.split(',').forEach((s) => {
-    let a = s.trim().split('-');
-    for (let i = parseInt(a.at(0)); i <= parseInt(a.at(-1)); i++) {
-      if (i >= 1 && i <= pageCount) pageRange.push(i);
-    }
-  });
-  // sort and remove duplicates
-  return pageRange.sort((a, b) => a - b).filter((item, idx) => pageRange.indexOf(item) === idx);
-} // parsePageRangeString()
-
-function generatePageRangeString(arr) {
-  let struct = [];
-  let oldPage = -1;
-  for (let i = 0; i < arr.length; i++) {
-    let currPage = arr.at(i);
-    if (currPage - oldPage > 1) {
-      struct.push([currPage]);
-    } else {
-      struct.at(-1)[1] = currPage;
-    }
-    oldPage = currPage;
-  }
-  let str = '';
-  struct.forEach((s, i) => {
-    str += s.join('&ndash;');
-    if (i < struct.length - 1) str += ', ';
-  });
-  return str;
-} // generatePageRangeString()
-
-function disablePageRangeMenu(disable = true) {
-  document
-    .getElementById('pageRangeItems')
-    .querySelectorAll('input')
-    .forEach((e) => (e.disabled = disable));
-} // activatePageRangeMenu()

@@ -110,29 +110,14 @@ export function deleteElement(v, cm, modifyerKey = false) {
       }
     } else if (['beam'].includes(element.nodeName)) {
       // delete beam
-      let p;
-      let first = true;
-      let childList = element.childNodes;
-      for (let i = 0; i < childList.length; i++) {
-        if (childList[i].nodeType === Node.TEXT_NODE) continue;
-        if (first) {
-          p = replaceInEditor(cm, element, false, childList[i]);
-          p.end.line += 1;
-          p.end.ch = 0;
-          cm.setCursor(p.end);
-          first = false;
-        } else {
-          // txtEdr.insertNewline();
-          let newMEI = dutils.xmlToString(childList[i]);
-          cm.replaceRange(newMEI + '\n', p.end);
-          let cursor = cm.getCursor();
-          for (let l = p.end.line; l < cursor.line; l++) cm.indentLine(l);
-          p.end = cursor;
-        }
-        selectedElements.push(childList[i].getAttribute('xml:id'));
-        element.parentNode.insertBefore(childList[i--], element);
-      }
-      element.remove();
+      let children = Array.from(element.children);
+      replaceInEditor(cm, element, true, children); // replace beam with an array of its children
+      children.forEach((child, i) => { // select all children ids 
+        let id = child.getAttribute('xml:id');
+        if (id) selectedElements.push(id);
+        element.parentNode.insertBefore(child, element); // move children to parent...
+      });
+      element.remove(); // ... and remove empty beam element
     } else if (element.nodeName === 'zone' && document.getElementById('editFacsimileZones').checked) {
       // delete Zone in source image display
       // remove zone; with CMD remove pointing element; without just remove @facs from pointing element
@@ -163,10 +148,10 @@ export function deleteElement(v, cm, modifyerKey = false) {
       pointingElements.forEach((pointingElement) => {
         console.log(
           'Removing pointing element <' +
-            pointingElement.nodeName +
-            '>: "' +
-            pointingElement.getAttribute('xml:id') +
-            '"'
+          pointingElement.nodeName +
+          '>: "' +
+          pointingElement.getAttribute('xml:id') +
+          '"'
         );
         removeInEditor(cm, pointingElement);
         pointingElement.remove();
@@ -425,7 +410,7 @@ export function convertNoteToRest(v, cm) {
         if (oldEl.hasAttribute('pname')) newEl.setAttribute('ploc', oldEl.getAttribute('pname'));
       }
       oldEl.parentElement.replaceChild(newEl, oldEl);
-      replaceInEditor(cm, oldEl, true, newEl);
+      replaceInEditor(cm, oldEl, true, new Array(newEl));
     }
   });
   v.selectedElements = [];
@@ -941,7 +926,7 @@ export function shiftPitch(v, cm, deltaPitch = 0, shiftChromatically = false) {
     let chs = Array.from(el.querySelectorAll('note,rest,mRest,multiRest'));
     if (chs.length > 0) {
       // shift many elements
-      chs.forEach((ele) => replaceInEditor(cm, pitchMover(v, ele, deltaPitch, shiftChromatically)), true);
+      chs.forEach((ele) => replaceInEditor(cm, pitchMover(v, ele, deltaPitch, shiftChromatically), true));
     } else if (['note', 'rest', 'mRest', 'multiRest'].includes(el.nodeName)) {
       // shift one element
       replaceInEditor(cm, pitchMover(v, el, deltaPitch, shiftChromatically), true);
@@ -1079,7 +1064,7 @@ export function addBeamElement(v, cm, elementName = 'beam') {
       if (nodeList[i].getAttribute('xml:id') === id2) {
         let n = nodeList[i].cloneNode(); // make a copy for replacement later
         beam.appendChild(nodeList[i--]);
-        replaceInEditor(cm, n, true, beam);
+        replaceInEditor(cm, n, true, new Array(beam));
         cm.execCommand('indentAuto');
         break;
       }
@@ -1116,7 +1101,7 @@ export function addBeamSpan(v, cm) {
       i++;
     }
   }
-  v.selectedElements = speed.filterElements(v.selectedElements, v.xmlDoc);
+  v.selectedElements = speed.filterElements(v.selectedElements, v.xmlDoc, ['chord', 'note']);
   v.selectedElements = utils.sortElementsByScorePosition(v.selectedElements);
   let id1 = v.selectedElements[0]; // xml:id string
   let id2 = v.selectedElements[v.selectedElements.length - 1];
@@ -1196,105 +1181,6 @@ export function addOctaveElement(v, cm, disPlace = 'above', dis = '8') {
   v.updateData(cm, false, true);
   v.allowCursorActivity = true; // update notation again
 } // addOctaveElement()
-
-/**
- * Surrounds selected elements with a supplied element
- * (and a responsibility statement from v.respId derived
- * from mei-friend settings.
- *
- * If attrName is specified, it searches for those attributes,
- * inserts them as new elements, and surrounds them with supplied
- * elements. If there is already such a artic/accid child element,
- * take it and surround it.
- * @param {Viewer} v
- * @param {CodeMirror} cm
- * @param {string} attrName ('artic', 'accid')
- * @returns
- */
-export function addSuppliedElement(v, cm, attrName = 'none') {
-  v.loadXml(cm.getValue());
-  v.selectedElements = speed.filterElements(v.selectedElements, v.xmlDoc);
-  v.selectedElements = utils.sortElementsByScorePosition(v.selectedElements);
-  if (v.selectedElements.length < 1) return;
-  v.allowCursorActivity = false;
-
-  let uuids = [];
-  v.selectedElements.forEach((id) => {
-    let el = v.xmlDoc.querySelector('[*|id="' + id + '"]');
-    if (!el) {
-      console.warn('No such element in xml document: ' + id);
-    } else {
-      let parent = el.parentNode;
-
-      // convert attrName artic|accid to note|chord element and surround that
-      if (
-        (['note', 'chord'].includes(el.nodeName) && attrName === 'artic') ||
-        (el.nodeName === 'note' && attrName === 'accid')
-      ) {
-        if (!el.hasAttribute(attrName)) {
-          let childElement;
-          el.childNodes.forEach((ch) => {
-            if (ch.nodeName === attrName) childElement = ch;
-          });
-          if (childElement) {
-            parent = el;
-            el = childElement;
-          } else {
-            const msg =
-              'No ' + attrName + ' attribute or child node found in element ' + el.nodeName + ' (' + id + ').';
-            console.log(msg);
-            v.showAlert(msg, 'warning');
-            v.allowCursorActivity = true;
-            return;
-          }
-        } else {
-          // make new element out of attribute and handle it as element to be surrounded
-          let attrValue = el.getAttribute(attrName);
-          let attrEl = document.createElementNS(dutils.meiNameSpace, attrName);
-          let uuid = mintSuppliedId(id, attrName);
-          attrEl.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
-          attrEl.setAttribute(attrName, attrValue);
-          el.removeAttribute(attrName);
-          el.appendChild(attrEl);
-          replaceInEditor(cm, el, true);
-          cm.execCommand('indentAuto');
-          parent = el;
-          el = attrEl;
-        }
-      } else if (['accid', 'artic'].includes(attrName)) {
-        const msg = 'Only chord and note elements are allowed for this command (you selected ' + el.nodeName + ').';
-        console.log(msg);
-        v.showAlert(msg, 'warning');
-      }
-
-      let sup = document.createElementNS(dutils.meiNameSpace, 'supplied');
-      let uuid = mintSuppliedId(id, 'supplied');
-      sup.setAttributeNS(dutils.xmlNameSpace, 'xml:id', uuid);
-      let respId = document.getElementById('respSelect').value;
-      if (respId) sup.setAttribute('resp', '#' + respId);
-      parent.replaceChild(sup, el);
-      sup.appendChild(el);
-      replaceInEditor(cm, el, true, sup);
-      cm.execCommand('indentAuto');
-      uuids.push(uuid);
-    }
-  });
-  // buffer.groupChangesSinceCheckpoint(checkPoint); // TODO
-  v.selectedElements = [];
-  uuids.forEach((u) => v.selectedElements.push(u));
-  addApplicationInfo(v, cm);
-  v.updateData(cm, false, true);
-  v.allowCursorActivity = true; // update notation again
-
-  function mintSuppliedId(id, nodeName) {
-    // follow the Mozarteum schema, keep numbers (for @o-sapov)
-    let underscoreId = id.match(/_\d+$/);
-    if (underscoreId) {
-      return nodeName + underscoreId[0];
-    }
-    return utils.generateXmlId(nodeName, v.xmlIdStyle);
-  }
-} // addSuppliedElement()
 
 /**
  * Adds a vertical group attribute (vgrp) to all selected elements
@@ -1459,11 +1345,17 @@ export function checkAccidGes(v, cm) {
         if (n && n > 0 && n <= keySignatures.length) keySignatures[n - 1] = value;
         if (d) console.debug('New key.sig in staffDef(' + e.getAttribute('xml:id') + ', n=' + n + '): ' + value);
       } else if (e.nodeName === 'keySig' && e.hasAttribute('sig')) {
+        const value = e.getAttribute('sig');
         // keySig element in a staffDef
         const n = parseInt(e.closest('staffDef')?.getAttribute('n'));
-        const value = e.getAttribute('sig');
-        if (n && n > 0 && n <= keySignatures.length) keySignatures[n - 1] = value;
-        if (d) console.debug('New keySig("' + e.getAttribute('xml:id') + '")@sig in staffDef(' + n + '): ' + value);
+        if (n && n > 0 && n <= keySignatures.length) {
+          keySignatures[n - 1] = value;
+          if (d) console.debug('New keySig("' + e.getAttribute('xml:id') + '")@sig in staffDef(' + n + '): ' + value);
+        } else {
+          // if no staff number, write to all staves
+          for (let k in keySignatures) keySignatures[k] = value;
+          if (d) console.debug('New keySig("' + e.getAttribute('xml:id') + '")@sig in all staves: ' + value);
+        }
       } else if (e.nodeName === 'measure') {
         // clear measureAccids object
         measureAccids = getAccidsInMeasure(e);
@@ -1875,7 +1767,7 @@ export function manipulateXmlIds(v, cm, removeIds = false) {
  * places it
  * @param {Viewer} v
  * @param {CodeMirror} cm
- * @param {object} rect
+ * @param {Object} rect
  * @param {boolean} addMeasure
  * @returns {string} uuid
  */
@@ -2036,8 +1928,8 @@ export function removeZone(v, cm, zone, removeMeasure = false) {
  * If the facsimile element exists, it will check all
  * surface elements and the pb@facs references and add them if
  * necessary.
- * @param {object} v
- * @param {object} cm
+ * @param {Object} v
+ * @param {Object} cm
  */
 export function addFacsimile(v, cm) {
   v.allowCursorActivity = false;
@@ -2294,16 +2186,16 @@ export function removeInEditor(cm, xmlNode) {
   if (sc.findNext()) {
     console.debug(
       'removeInEditor() self closing element "' +
-        id +
-        '" from ln:' +
-        sc.from().line +
-        '/ch:' +
-        sc.from().ch +
-        ' to ln:' +
-        sc.to().line +
-        '/ch:' +
-        sc.to().ch +
-        '.'
+      id +
+      '" from ln:' +
+      sc.from().line +
+      '/ch:' +
+      sc.from().ch +
+      ' to ln:' +
+      sc.to().line +
+      '/ch:' +
+      sc.to().ch +
+      '.'
     );
   } else {
     let searchFullElement =
@@ -2318,16 +2210,16 @@ export function removeInEditor(cm, xmlNode) {
     if (sc.findNext()) {
       console.debug(
         'removeInEditor() full element "' +
-          id +
-          '" from ln:' +
-          sc.from().line +
-          '/ch:' +
-          sc.from().ch +
-          ' to ln:' +
-          sc.to().line +
-          '/ch:' +
-          sc.to().ch +
-          '.'
+        id +
+        '" from ln:' +
+        sc.from().line +
+        '/ch:' +
+        sc.from().ch +
+        ' to ln:' +
+        sc.to().line +
+        '/ch:' +
+        sc.to().ch +
+        '.'
       );
     }
   }
@@ -2351,14 +2243,20 @@ function isEmpty(str) {
 
 /**
  * Finds xmlNode in textBuffer and replaces it with new serialized content
- * @param {CodeMirror} cm
- * @param {Element} xmlNode
- * @param {boolean} select
- * @param {Element} newNode
+ * @param {CodeMirror} cm CodeMirror object
+ * @param {Element} xmlNode element to replace
+ * @param {boolean} select keep node in editor selected? (important for auto indentation)
+ * @param {Array[Element]} newNode an array of new nodes to replace the old one with
  * @returns
  */
-export function replaceInEditor(cm, xmlNode, select = false, newNode = null) {
-  let newMEI = newNode ? dutils.xmlToString(newNode) : dutils.xmlToString(xmlNode);
+export function replaceInEditor(cm, xmlNode, select = false, newNode = []) {
+  // construct new MEI if newNode has elements
+  let newMei = '';
+  if (Array.isArray(newNode) && newNode.length > 0) {
+    newMei = newNode.map((n) => dutils.xmlToString(n)).join('\n');
+  } else {
+    newMei = dutils.xmlToString(xmlNode);
+  }
   // search in buffer
   let itemId = xmlNode.getAttribute('xml:id');
   let xmlIdCheck = '';
@@ -2367,12 +2265,14 @@ export function replaceInEditor(cm, xmlNode, select = false, newNode = null) {
   // console.info('searchSelfClosing: ' + searchSelfClosing);
   let sc = cm.getSearchCursor(new RegExp(searchSelfClosing));
   if (sc.findNext()) {
-    sc.replace(newMEI);
+    sc.replace(newMei);
   } else {
     let searchFullElement =
       '(?:<' + xmlNode.nodeName + `)` + xmlIdCheck + `([\\s\\S]*?)(?:</` + xmlNode.nodeName + '[ ]*?>)';
     sc = cm.getSearchCursor(new RegExp(searchFullElement));
-    if (sc.findNext()) sc.replace(newMEI);
+    if (sc.findNext()) {
+      sc.replace(newMei);
+    }
     // console.info('searchFullElement: ' + searchFullElement);
   }
   if (!sc.atOccurrence) {
@@ -2382,7 +2282,7 @@ export function replaceInEditor(cm, xmlNode, select = false, newNode = null) {
       end: -1,
     };
   } else if (select) {
-    sc = cm.getSearchCursor(newMEI);
+    sc = cm.getSearchCursor(newMei);
     if (sc.findNext()) {
       let c = cm.getCursor();
       for (let l = sc.from().line; l <= sc.to().line; l++) {
