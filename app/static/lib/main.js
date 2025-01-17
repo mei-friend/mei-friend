@@ -108,7 +108,7 @@ import { RNGLoader } from './rng-loader.js';
 import {
   defaultFacsimileOrientation,
   defaultFacsimileProportion,
-  defaultMeiFileName,
+  defaultMeiFileURL,
   defaultNotationOrientation,
   defaultNotationProportion,
   defaultVerovioOptions,
@@ -233,6 +233,10 @@ export function setFileLocationType(t) {
 
 export function updateFileStatusDisplay() {
   document.querySelector('#fileName').innerText = meiFileName.substring(meiFileName.lastIndexOf('/') + 1);
+  // hack: if we're loading the default mei-friend encoding, override the printable location
+  if (meiFileLocation === defaultMeiFileURL) {
+    meiFileLocationPrintable = 'Demo encoding:';
+  }
   document.querySelector('#fileLocation').innerText = meiFileLocationPrintable || '';
   let tooltip;
   if (meiFileLocation) {
@@ -827,7 +831,7 @@ export async function openUrlFetch(url = '', updateAfterLoading = true) {
   try {
     if (!url) url = new URL(urlInput.value);
     const headers = { Accept: 'application/xml, text/xml, application/mei+xml' };
-    if (isLoggedIn && url.href.trim().startsWith('https://raw.githubusercontent.com')) {
+    if (meiFileLocation === 'github' && isLoggedIn && url.href.trim().startsWith('https://raw.githubusercontent.com')) {
       // determine user/org, repo, branch, and file path from URL
       const urlParts = url.pathname.split('/');
       const userOrg = urlParts[1];
@@ -835,7 +839,7 @@ export async function openUrlFetch(url = '', updateAfterLoading = true) {
       const branch = urlParts[3];
       const filepath = urlParts.slice(4).join('/');
 
-      if (userOrg && repo && branch && filepath) {
+      if (fileLocationType === 'github' && userOrg && repo && branch && filepath) {
         // clone repo
         gm = new GitManager('github', 'github', githubToken);
         // TODO modify for multiple git providers
@@ -1187,7 +1191,7 @@ let inputFormats = {
   pae: '@clef',
 };
 
-export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true, updateAfterLoading = true) {
+export function openFile(file = defaultMeiFileURL, setFreshlyLoaded = true, updateAfterLoading = true) {
   // cm.blockChanges = true;
   if (storage.github && isLoggedIn) {
     // re-initialise github menu since we're now working from a file
@@ -1202,11 +1206,14 @@ export function openFile(file = defaultMeiFileName, setFreshlyLoaded = true, upd
   // remove any URL parameters, because we open a file locally or through github
   window.history.replaceState(null, null, window.location.pathname);
   if (storage.supported) {
-    storage.fileLocationType = 'file';
+    storage.fileLocationType = 'url';
   }
-  fileLocationType = 'file';
+  fileLocationType = 'url';
   if (gm) gm.filepath = '';
-  if (typeof file === 'string') {
+  if (file === defaultMeiFileURL) {
+    // opening default MEI file
+    openUrlFetch(new URL(file));
+  } else if (typeof file === 'string') {
     // with fileName string
     meiFileName = file;
     console.info('openMei ' + meiFileName + ', ', cm);

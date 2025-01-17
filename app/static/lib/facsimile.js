@@ -428,7 +428,6 @@ async function getImageForZone(imgName) {
  * @returns
  */
 function createImageName(zoneId) {
-  // find the correct path of the image file
   let imgName = facs[zoneId].target;
   if (!imgName.startsWith('http')) {
     // relative file paths in surface@target
@@ -450,7 +449,14 @@ function createImageName(zoneId) {
       imgName = `${root}local/` + facs[zoneId].target;
       imgName = imgName.replace('.tif', '.jpg'); // hack for some DIME files...
     }
-  } else if (imgName.startsWith('https://raw.githubusercontent.com/') && gm && gm.token && gm.branch && gm.filepath) {
+  } else if (
+    fileLocationType === 'github' &&
+    imgName.startsWith('https://raw.githubusercontent.com/') &&
+    gm &&
+    gm.token &&
+    gm.branch &&
+    gm.filepath
+  ) {
     // absolute file paths for GitHub
     let url = new URL('https://raw.githubusercontent.com/' + gm.repo + '/' + gm.branch + gm.filepath);
     imgName = url.href;
@@ -465,7 +471,7 @@ function createImageName(zoneId) {
  * @returns {Promise}
  */
 async function loadImage(url) {
-  if (isLoggedIn && url.startsWith('https://raw.githubusercontent.com')) {
+  if (fileLocationType === 'github' && isLoggedIn && url.startsWith('https://raw.githubusercontent.com')) {
     return embedImage(url);
   } else {
     return new Promise((resolve) => {

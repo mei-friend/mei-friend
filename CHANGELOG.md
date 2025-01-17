@@ -15,6 +15,7 @@
 - Allow default key bindings in Solid URL text field
 - Fix bug that prevented Fronimo files being opened via the git integration
 - Improve display of long filenames (thx @maxrothman)
+- Set Ludwig Baumann's "Mondnacht am Meer" as default demo encoding at start-up and add it to the public repertoire list
 
 ### 1.1.8 Merge isomorphic-git and mark-up enrichment developments
 
