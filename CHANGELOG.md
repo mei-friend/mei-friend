@@ -1,7 +1,4 @@
 # mei-friend-online CHANGELOG.md
-### 1.0.14p hotfix  
-* Fix infinite loop with incomplete choice element (#109, thx @maxrothmann)
-
 ## 1.2.0 Enrichment panel, editorial mark-up, GitHub improvements (released on 17 January 2025)
 - Release of major new functionalities: 
 
@@ -80,8 +77,7 @@
 - Prepare for future implementation of non-GitHub cloud providers
 
 ### 1.0.16 Patch 
-* Fix infinite loop when having an incomplete choice element (#109, thx @
-maxrothman)
+* Fix infinite loop when having an incomplete choice element (#109, thx @maxrothman)
 * Implement persistent search bar behavior (#110, thx @maxrothmann) with checkbox to toggle
 * Update Verovio release version list
 

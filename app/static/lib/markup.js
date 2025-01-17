@@ -316,7 +316,6 @@ export function selectChoiceSubst(xmlDoc, elName, childElName) {
       }
     } else {
       console.log('This choice has no child elements. ', choice);
-      break;
     }
   });
 
