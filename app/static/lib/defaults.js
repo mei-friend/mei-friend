@@ -482,7 +482,9 @@ supportedVerovioVersions['3.7.0*'] = {
 export const fontList = ['Leipzig', 'Bravura', 'Gootville', 'Leland', 'Petaluma'];
 
 // const defaultMeiFileName = `${root}Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei`;
-export const defaultMeiFileName = `${root}Beethoven_WoO70-Breitkopf.mei`;
+//export const defaultMeiFileName = `${root}Beethoven_WoO70-Breitkopf.mei`;
+export const defaultMeiFileURL =
+  'https://raw.githubusercontent.com/mei-friend/Demo-Encodings/refs/heads/main/Baumann-Ludwig_Mondnacht-am-Meer.mei';
 
 export const defaultVerovioOptions = {
   scale: 55,
@@ -861,7 +863,7 @@ export const meiFriendSettingsOptions = {
     min: 5,
     max: 300,
     step: 5,
-    default: 100,
+    default: 60,
   },
   showFacsimileFullPage: {
     title: 'Show full page',
@@ -1149,9 +1151,9 @@ export const defaultFacsimileRectangleColor = 'darkred'; // facsimile zone bound
 
 // for resizer
 export const defaultNotationResizerWidth = 3; // pixel
-export const defaultNotationOrientation = 'bottom';
+export const defaultNotationOrientation = 'left';
 export const defaultNotationProportion = 0.5;
 export const defaultFacsimileResizerWidth = 8; // px, compare to css facsimile-[left/right/top/bottom].css
 export const defaultFacsimileOrientation = 'bottom'; // notationOrientation of facsimile relative to notation
-export const defaultFacsimileProportion = 0.65;
+export const defaultFacsimileProportion = 0.5;
 export const annotationPanelExtent = 250; // px, width/height of annotation panel, taken away from width of friendContainer
