@@ -484,7 +484,7 @@ export const fontList = ['Leipzig', 'Bravura', 'Gootville', 'Leland', 'Petaluma'
 // const defaultMeiFileName = `${root}Beethoven_WoOAnh5_Nr1_1-Breitkopf.mei`;
 //export const defaultMeiFileName = `${root}Beethoven_WoO70-Breitkopf.mei`;
 export const defaultMeiFileURL =
-  'https://raw.githubusercontent.com/mei-friend/mei-markup-skeleton/refs/heads/main/03_Mondnacht-am-Meer_markup.mei';
+  'https://raw.githubusercontent.com/mei-friend/Demo-Encodings/refs/heads/main/Baumann-Ludwig_Mondnacht-am-Meer.mei';
 
 export const defaultVerovioOptions = {
   scale: 55,
