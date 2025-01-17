@@ -831,7 +831,7 @@ export async function openUrlFetch(url = '', updateAfterLoading = true) {
   try {
     if (!url) url = new URL(urlInput.value);
     const headers = { Accept: 'application/xml, text/xml, application/mei+xml' };
-    if (isLoggedIn && url.href.trim().startsWith('https://raw.githubusercontent.com')) {
+    if (meiFileLocation === 'github' && isLoggedIn && url.href.trim().startsWith('https://raw.githubusercontent.com')) {
       // determine user/org, repo, branch, and file path from URL
       const urlParts = url.pathname.split('/');
       const userOrg = urlParts[1];
@@ -839,7 +839,7 @@ export async function openUrlFetch(url = '', updateAfterLoading = true) {
       const branch = urlParts[3];
       const filepath = urlParts.slice(4).join('/');
 
-      if (userOrg && repo && branch && filepath) {
+      if (fileLocationType === 'github' && userOrg && repo && branch && filepath) {
         // clone repo
         gm = new GitManager('github', 'github', githubToken);
         // TODO modify for multiple git providers
