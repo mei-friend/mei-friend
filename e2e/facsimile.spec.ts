@@ -91,7 +91,7 @@ test.describe('1 Test facsimile functionality.', () => {
     await page.locator('#viewMenuTitle').click();
     await page.locator('#notationTop').click();
     await page.locator('#viewMenuTitle').click();
-    await page.locator('#facsimileTop').click();
+    await page.locator('#facsimileLeft').click();
 
     // enable zone editing
     await page.locator('#facsimileEditZonesCheckbox').click();
@@ -150,6 +150,6 @@ test.describe('1 Test facsimile functionality.', () => {
     await page.locator('#delete').click();
 
     // check that the zone has been deleted
-    await expect(facsimilePanel.locator('div svg').locator('rect').last()).not.toBeVisible;
+    await expect(facsimilePanel.locator('div svg').locator('rect').last()).not.toBeVisible();
   });
 });
