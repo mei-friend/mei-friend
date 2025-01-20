@@ -2532,8 +2532,13 @@ function setKeyMap() {
           document.activeElement.classList.contains('preventKeyBindings') ||
           document.activeElement.closest('#encoding')
         ) {
-          console.log('Ignoring keypress in ' + document.activeElement.id);
-          return;
+          if (ev.key === ' ' && ev.shiftKey) {
+            // but do not filter out certain exceptions, e.g., shift-space (switch focus).
+            // (this conditional intentionally left blank to skip return in the else below)
+          } else {
+            console.log('Ignoring keypress in ' + document.activeElement.id);
+            return;
+          }
         }
 
         // at each keystroke: update cmd2key (CTRL on Mac, ALT on WIN/Linux)
