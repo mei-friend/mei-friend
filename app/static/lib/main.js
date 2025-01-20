@@ -1,6 +1,6 @@
 // mei-friend version and date
-export const version = '1.2.0';
-export const versionDate = '17 January 2025'; // use full or 3-character english months, will be translated
+export const version = '1.2.1';
+export const versionDate = '20 January 2025'; // use full or 3-character english months, will be translated
 export const splashDate = '17 January 2025'; // date of the splash screen content, same translation rules apply
 
 var vrvWorker;
@@ -2509,16 +2509,21 @@ function fillInSampleEncodings() {
  * to both notation and editor panels (i.e. friendContainer).
  */
 function setKeyMap() {
+  document.body.classList.add('all');
+  document.body.classList.add('not-in-text');
   if (platform.startsWith('mac')) {
     document.body.classList.add('platform-darwin-all');
+    document.body.classList.add('platform-darwin-not-in-text');
     document.getElementById('notation').classList.add('platform-darwin-notation');
   }
   if (platform.startsWith('win')) {
     document.body.classList.add('platform-win32-all');
+    document.body.classList.add('platform-win32-not-in-text');
     document.getElementById('notation').classList.add('platform-win32-notation');
   }
   if (platform.startsWith('linux')) {
     document.body.classList.add('platform-linux-all');
+    document.body.classList.add('platform-linux-not-in-text');
     document.getElementById('notation').classList.add('platform-linux-notation');
   }
 
@@ -2529,10 +2534,15 @@ function setKeyMap() {
       el.addEventListener('keydown', (ev) => {
         // filter out keypresses at certain elements, i.e. that contain preventKeyBindings class
         if (
-          document.activeElement.classList.contains('preventKeyBindings') ||
-          document.activeElement.closest('#encoding')
+          (key === '.not-in-text' ||
+            key === '.platform-darwin-not-in-text' ||
+            key === '.platform-win32-not-in-text' ||
+            key === '.platform-linux-not-in-text') &&
+          (document.activeElement.classList.contains('preventKeyBindings') ||
+            document.activeElement.closest('#encoding'))
         ) {
-          console.log('Ignoring keypress in ' + document.activeElement.id);
+          ev.stopPropagation();
+          console.log('Ignoring keypress for ', ev);
           return;
         }
 

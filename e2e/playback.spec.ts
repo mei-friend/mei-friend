@@ -56,10 +56,8 @@ test.describe('1 Test that the MIDI playback panel works correctly', () => {
 test.describe('2 Test that MIDI playback works correctly', () => {
   test('2.1 Test that playback causes notes to highlight', async ({ page }) => {
     // open the panel using the menu: View -> Playback controls
-    await page.locator('#viewMenuTitle').click();
-    await page.locator('#showPlaybackControls').click();
     // switch focus to encoding
-    await page.keyboard.press('Shift+Space');
+    //  await page.keyboard.press('Shift+Space');
     await expect(page.locator('#midiPlaybackControlBar')).not.toBeVisible();
     // commence playback
     await page.keyboard.press('Space');

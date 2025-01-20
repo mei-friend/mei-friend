@@ -1,4 +1,4 @@
-// default keymap 
+// default keymap
 
 export const keymap = {
   // gets mapped to notation only (for all operating systems)
@@ -89,9 +89,24 @@ export const keymap = {
     'cmd-down': 'lastPage',
   },
 
+  // mapped to #notation under Win/Linux
+  '.platform-win32-notation, .platform-linux-notation': {
+    'ctrl-right': 'nextMeasure',
+    'ctrl-left': 'previousMeasure',
+    'ctrl-alt-right': 'nextPage',
+    'ctrl-alt-left': 'previousPage',
+    'ctrl-up': 'firstPage',
+    'ctrl-down': 'lastPage',
+  },
+
+  // mapped to all under all operating systems
+  '.all': {
+    'alt-.': 'consultGuidelines',
+    'shift-space': 'switchFocus',
+  },
+
   // mapped to body under MAC OSX
   '.platform-darwin-all': {
-    'shift-space': 'switchFocus',
     'cmd-shift-up': 'shiftOctaveUp',
     'cmd-shift-down': 'shiftOctaveDown',
     'cmd-shift-g': 'addGClefChangeAfter',
@@ -123,10 +138,8 @@ export const keymap = {
     'cmd-shift-r': 'renumberMeasures',
     'cmd-?': 'openHelp',
     'cmd-ß': 'openHelp',
-    'alt-.': 'consultGuidelines',
-    'alt-…': 'consultGuidelines',
+    'alt-…': 'consultGuidelines', // on MAC 'alt-.' fires this ellipsis (…) character
     'cmd-,': 'toggleSettingsPanel',
-    'cmd-a': 'toggleAnnotationPanel',
     'cmd-delete': 'cmdDelete',
     'cmd-p': 'togglePdfMode',
     'cmd-e': 'encloseSelectionWithTag',
@@ -149,22 +162,10 @@ export const keymap = {
     'ctrl-l': 'addTrill',
     'ctrl-r': 'addTurn',
     'ctrl-shift-r': 'addTurnLower',
-    space: 'playPauseMidiPlayback',
-  },
-
-  // mapped to #notation under Win/Linux
-  '.platform-win32-notation, .platform-linux-notation': {
-    'ctrl-right': 'nextMeasure',
-    'ctrl-left': 'previousMeasure',
-    'ctrl-alt-right': 'nextPage',
-    'ctrl-alt-left': 'previousPage',
-    'ctrl-up': 'firstPage',
-    'ctrl-down': 'lastPage',
-  },
+  }, // platform-darwin-all
 
   // mapped to body under Win/Linux
   '.platform-win32-all, .platform-linux-all': {
-    'shift-space': 'switchFocus',
     'ctrl-shift-up': 'shiftOctaveUp',
     'ctrl-shift-down': 'shiftOctaveDown',
     'shift-alt-g': 'addGClefChangeAfter',
@@ -196,9 +197,7 @@ export const keymap = {
     'ctrl-shift-r': 'renumberMeasures',
     'ctrl-?': 'openHelp',
     'ctrl-ß': 'openHelp',
-    'alt-.': 'consultGuidelines',
     'ctrl-,': 'toggleSettingsPanel',
-    'ctrl-a': 'toggleAnnotationPanel',
     'ctrl-delete': 'cmdDelete',
     'ctrl-p': 'togglePdfMode',
     'ctrl-e': 'encloseSelectionWithTag',
@@ -221,6 +220,20 @@ export const keymap = {
     'alt-l': 'addTrill',
     'alt-r': 'addTurn',
     'alt-shift-r': 'addTurnLower',
+  }, // Win/Linux-all
+
+  // not in text (fields, editor), that is, .preventKeyBinding and #encoding all operating systems
+  '.not-in-text': {
     space: 'playPauseMidiPlayback',
+  },
+
+  // not in text (fields, editor), i.e., .preventKeyBinding and #encoding Mac OSX
+  '.platform-darwin-not-in-text': {
+    'cmd-a': 'toggleAnnotationPanel',
+  },
+
+  // not in text (fields, editor), i.e., .preventKeyBinding and #encoding Win/Linux
+  '.platform-win32-not-in-text, .platform-linux-not-in-text': {
+    'ctrl-a': 'toggleAnnotationPanel',
   },
 };

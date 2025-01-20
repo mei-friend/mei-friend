@@ -1,4 +1,10 @@
 # mei-friend-online CHANGELOG.md
+
+### 1.2.1 patch
+* Improve key bindings mechanism and scope 
+* Fix switch focus and lookup guidelines key bindings in editor (and others)
+* Fix broken tests for facsimile and MIDI playback
+
 ## 1.2.0 Enrichment panel, editorial mark-up, GitHub improvements (released on 17 January 2025)
 - Release of major new functionalities: 
 
