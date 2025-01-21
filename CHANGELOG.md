@@ -4,6 +4,7 @@
 * Improve key bindings mechanism and scope 
 * Fix switch focus and lookup guidelines key bindings in editor (and others)
 * Fix broken tests for facsimile and MIDI playback
+* Ensure focus of search field in persistent search
 
 ## 1.2.0 Enrichment panel, editorial mark-up, GitHub improvements (released on 17 January 2025)
 - Release of major new functionalities: 

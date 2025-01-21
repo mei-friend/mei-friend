@@ -1,6 +1,6 @@
 // mei-friend version and date
 export const version = '1.2.1';
-export const versionDate = '20 January 2025'; // use full or 3-character english months, will be translated
+export const versionDate = '21 January 2025'; // use full or 3-character english months, will be translated
 export const splashDate = '17 January 2025'; // date of the splash screen content, same translation rules apply
 
 var vrvWorker;
@@ -1711,7 +1711,7 @@ export let cmd = {
     } else {
       CodeMirror.commands.find(cm);
     }
-    document.getElementById('CodeMirror-search-field')?.focus();
+    document.querySelector('.CodeMirror-search-field')?.focus();
   },
   doFindNext: () => {
     if (document.getElementById('persistentSearch').checked) {
