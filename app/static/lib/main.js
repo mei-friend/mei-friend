@@ -1711,7 +1711,7 @@ export let cmd = {
     } else {
       CodeMirror.commands.find(cm);
     }
-    document.getElementById('CodeMirror-search-field')?.focus();
+    document.querySelector('.CodeMirror-search-field')?.focus();
   },
   doFindNext: () => {
     if (document.getElementById('persistentSearch').checked) {
