@@ -994,7 +994,10 @@ export const lang = {
   codeCheckerBecauseAlreadyDefined: { text: 'fordi det er defineret tidligere i målet' },
 
   // Warning for missing ids
-  missingIdsWarningAlert: {
+  missingIdsWarningAlertOnScrolling: {
     text: 'mei-friend kan ikke rulle til de valgte elementer i kodningen. Tilføj venligst ids til kodningen.',
   },
+  missingIdsWarningAlertOnLoading: {
+    text: 'Der er mindst ét markup-element, der er omgivet af et overordnet element uden xml:id. mei-friend kan ikke håndtere markup i filer uden id\'er. Tilføj venligst id\'er til kodningen.'
+  },  
 };

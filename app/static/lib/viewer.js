@@ -601,7 +601,7 @@ export default class Viewer {
         .includes(nodeName)
     ) {
       this.showAlert(
-        translator.lang.missingIdsWarningAlert.text +
+        translator.lang.missingIdsWarningAlertOnScrolling.text +
           ' (' +
           translator.lang.manipulateMenuTitle.text +
           '&mdash;' +

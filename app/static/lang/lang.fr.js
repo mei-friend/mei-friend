@@ -1147,7 +1147,10 @@ export const lang = {
   codeCheckerBecauseAlreadyDefined: { text: 'car il a été défini plus tôt dans la mesure' },
 
   // Warning for missing ids
-  missingIdsWarningAlert: {
+  missingIdsWarningAlertOnScrolling: {
     text: "mei-friend n'arrive pas à faire défiler les éléments sélectionnés dans l'encodage. Veuillez ajouter des identifiants à l'encodage.",
   },
+  missingIdsWarningAlertOnLoading: {
+    text: 'Il y a au moins un élément de balisage entouré par un élément parent sans xml:id. mei-friend ne peut pas gérer le balisage dans les fichiers sans identifiants. Veuillez ajouter des identifiants à l’encodage.'
+  },  
 };

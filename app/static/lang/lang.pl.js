@@ -1139,7 +1139,10 @@ export const lang = {
   codeCheckerBecauseAlreadyDefined: { text: 'ponieważ zostało to już zdefiniowane wcześniej w takcie' },
 
   // Warning for missing ids
-  missingIdsWarningAlert: {
+  missingIdsWarningAlertOnScrolling: {
     text: 'mei-friend nie może przewinąć do wybranych elementów w kodowaniu. Dodaj identyfikatory do kodowania.',
   },
+  missingIdsWarningAlertOnLoading: {
+    text: 'Istnieje co najmniej jeden element markupu otoczony przez element nadrzędny bez xml:id. mei-friend nie może obsługiwać markupu w plikach bez identyfikatorów. Proszę dodać identyfikatory do kodowania.'
+  },  
 };

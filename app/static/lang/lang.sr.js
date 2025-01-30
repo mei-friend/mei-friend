@@ -986,7 +986,10 @@ export const lang = {
   codeCheckerBecauseAlreadyDefined: { text: 'зато што је већ дефинисано раније у такту' },
 
   // Упозорење за недостајућим идентификаторима
-  missingIdsWarningAlert: {
+  missingIdsWarningAlertOnScrolling: {
     text: 'mei-friend не може да се помери до изабраних елемената у кодирању. Молимо додајте идентификаторе у кодирање.',
   },
+  missingIdsWarningAlertOnLoading: {
+    text: 'Постоји барем један markup елемент унутар надређеног елемента без xml:id. mei-friend не може обрадити markup у фајловима без ID-ова. Молимо додајте ID-ове у кодирање.'
+  },  
 };

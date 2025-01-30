@@ -62,13 +62,35 @@ export function readMarkup() {
         // Automatically add missing xml:ids
         // I replace the parent element to prevent hickups and endless recursions
         // because replaceInEditor() needs xml:ids to work.
-        // This can definitely be solved in a better way,
-        // but I'm not familar enough with the other editor functions
-        elId = utils.generateXmlId(elName, v.xmlIdStyle);
-        markupEl.setAttributeNS(dutils.xmlNameSpace, 'xml:id', elId);
-        replaceInEditor(cm, markupEl.parentElement, false);
-        cm.execCommand('indentAuto');
-        console.log(`Added xml:id ${elId} to ${elName}`);
+        // Update (AP, 31.01.2025)
+        // Using Search/Replace instead of replaceInEditor() does not work safely
+        // There are still hickups with lacking xml:ids
+        // String serialisation also turns empty elements into self-closing elements.
+        // This prevents Search/Replace
+        // We can only perform this if the parent element has an xml:id
+
+        if(markupEl.parentElement.getAttribute('xml:id') != null) {
+          elId = utils.generateXmlId(elName, v.xmlIdStyle);
+          markupEl.setAttributeNS(dutils.xmlNameSpace, 'xml:id', elId);
+          replaceInEditor(cm, markupEl.parentElement, false);
+          cm.execCommand('indentAuto');
+          console.log(`Added xml:id ${elId} to ${elName}`);
+        }
+        else {
+          // Abort action
+          // Disable enrichment panel and warn user to add xml:ids to allow usage of enrichment panel
+          // This alert currently shows at every keystroke... this needs improvement!
+          v.showAlert(
+            translator.lang.missingIdsWarningAlertOnLoading.text +
+              ' (' +
+              translator.lang.manipulateMenuTitle.text +
+              '&mdash;' +
+              translator.lang.addIdsText.text +
+              ')',
+            'warning', 4000
+          );
+          return;
+        }
       }
 
       if (att.alternativeEncodingElements.includes(elName)) {

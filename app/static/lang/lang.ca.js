@@ -1138,7 +1138,10 @@ export const lang = {
   codeCheckerBecauseAlreadyDefined: { text: "perquè ja s'ha definit anteriorment a la compàs" },
 
   // Warning for missing ids
-  missingIdsWarningAlert: {
+  missingIdsWarningAlertOnScrolling: {
     text: 'mei-friend no pot fer scroll als elements seleccionats en la codificació. Si us plau, afegiu identificadors a la codificació.',
   },
+  missingIdsWarningAlertOnLoading: {
+    text: 'Hi ha almenys un element de marcatge inclòs dins d’un element pare sense xml:id. mei-friend no pot gestionar el marcatge en fitxers sense identificadors. Si us plau, afegiu identificadors a la codificació.'
+  },  
 };

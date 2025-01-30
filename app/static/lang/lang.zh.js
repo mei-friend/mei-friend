@@ -959,7 +959,10 @@ export const lang = {
   codeCheckerBecauseAlreadyDefined: { text: '因为它在小节中已经定义' },
 
   // Warning for missing ids
-  missingIdsWarningAlert: {
+  missingIdsWarningAlertOnScrolling: {
     text: 'mei-friend 无法滚动到编码中的所选元素。请为编码添加 id。',
   },
+  missingIdsWarningAlertOnLoading: {
+    text: '至少有一个标记元素被没有 xml:id 的父元素包围。mei-friend 无法处理没有 ID 的文件中的标记。请将 ID 添加到编码中。'
+  },  
 };

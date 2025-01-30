@@ -990,7 +990,10 @@ export const lang = {
   codeCheckerBecauseAlreadyDefined: { text: 'jer je već definisano ranije u taktu' },
 
   // Upozorenje o nedostajućim ID-ovima
-  missingIdsWarningAlert: {
+  missingIdsWarningAlertOnScrolling: {
     text: 'mei-friend nije u mogućnosti da se pomera do odabranih elemenata u kodiranju. Molimo dodajte ID-ove u kodiranje.',
   },
+  missingIdsWarningAlertOnLoading: {
+    text: 'Postoji barem jedan markup element unutar nadređenog elementa bez xml:id. mei-friend ne može obraditi markup u datotekama bez ID-ova. Molimo dodajte ID-ove u kodiranje.'
+  },  
 };
