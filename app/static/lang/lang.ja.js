@@ -1096,7 +1096,10 @@ export const lang = {
   codeCheckerBecauseAlreadyDefined: { text: '以前に同じ要素が定義されているため' },
 
   // Warning for missing ids
-  missingIdsWarningAlert: {
+  missingIdsWarningAlertOnScrolling: {
     text: '「メイフレンドはエンコーディング内の選択された要素にスクロールできません。エンコーディングにIDを追加してください。 (メイフレンドはエンコーディングないのせんたくされたようそにすくろーるできません。エンコーディングにIDをついかしてください。)',
   },
+  missingIdsWarningAlertOnLoading: {
+    text: 'xml:idがない親要素に囲まれたマークアップ要素が少なくとも1つあります。mei-friendはIDなしのファイルのマークアップを処理できません。エンコーディングにIDを追加してください。'
+  },  
 };

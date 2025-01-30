@@ -1144,7 +1144,10 @@ export const lang = {
   codeCheckerBecauseAlreadyDefined: { text: 'porque ya se ha definido anteriormente en el compás' },
 
   // Warning for missing ids
-  missingIdsWarningAlert: {
+  missingIdsWarningAlertOnScrolling: {
     text: 'mei-friend no puede desplazarse a los elementos seleccionados en la codificación. Por favor, añade ids a la codificación.',
   },
+  missingIdsWarningAlertOnLoading: {
+    text: 'Hay al menos un elemento de marcado encerrado por un elemento padre sin xml:id. mei-friend no puede manejar el marcado en archivos sin identificadores. Por favor, añade identificadores a la codificación.'
+  },  
 };
