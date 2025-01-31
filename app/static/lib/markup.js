@@ -92,6 +92,9 @@ export function readMarkup() {
               ')',
             'warning', 4000
           );
+          // Set focus to code pane to allow further typing
+          // TODO: Check if focus was of cm before to set focus conditionally
+          cm.focus();
           return;
         }
       }
