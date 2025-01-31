@@ -381,25 +381,26 @@ export function addMarkup(event) {
   if (att.alternativeEncodingElements.includes(mElName) && multiLayerContent == undefined) {
     v.showAlert('Please first select a content option for this markup element!');
   } else {
-    addMarkupToXML(v, cm, attrName, mElName, multiLayerContent);
-    handleEditorChanges(); // update editor content
-    //let successfullyAdded = xmlMarkupToListItem(v.selectedElements, mElName);
-    // Manually updating the item list is not necessary because refreshing the code in the editor triggers readMarkup()
-    refreshAnnotationsList();
-    //select elements of last reading for alternative encodings if copied
-    if (multiLayerContent != undefined && document.getElementById('alternativeVersionContent').value == 'copy') {
-      let newSelection = [];
-      v.selectedElements.forEach((id) => {
-        let selEl = v.xmlDoc.querySelector("[*|id='" + id + "']");
-        let lastChild = selEl.lastElementChild;
-        for (let child of lastChild.children) {
-          newSelection.push(child.getAttribute('xml:id'));
-        }
-      });
-      setChoiceOptions(multiLayerContent[multiLayerContent.length - 1]);
-      handleEditorChanges();
-      v.selectedElements = newSelection;
-      v.setFocusToVerovioPane();
+    let success = addMarkupToXML(v, cm, attrName, mElName, multiLayerContent);
+    if (success != false) {
+      handleEditorChanges(); // update editor content
+      // Manually updating the item list is not necessary because refreshing the code in the editor triggers readMarkup()
+      refreshAnnotationsList();
+      //select elements of last reading for alternative encodings if copied
+      if (multiLayerContent != undefined && document.getElementById('alternativeVersionContent').value == 'copy') {
+        let newSelection = [];
+        v.selectedElements.forEach((id) => {
+          let selEl = v.xmlDoc.querySelector("[*|id='" + id + "']");
+          let lastChild = selEl.lastElementChild;
+          for (let child of lastChild.children) {
+            newSelection.push(child.getAttribute('xml:id'));
+          }
+        });
+        setChoiceOptions(multiLayerContent[multiLayerContent.length - 1]);
+        handleEditorChanges();
+        v.selectedElements = newSelection;
+        v.setFocusToVerovioPane();
+      }
     }
   }
 } // addMarkup()
@@ -421,12 +422,14 @@ export function addMarkup(event) {
  * @param {CodeMirror} cm
  * @param {string} attrName ('artic', 'accid')
  * @param {string} mElName name of markup element to apply
+ * @returns {boolean} success
  */
 function addMarkupToXML(v, cm, attrName = 'none', mElName, multiLayerContent = []) {
+  let success = false;
   v.loadXml(cm.getValue());
   v.selectedElements = speed.filterElements(v.selectedElements, v.xmlDoc);
   v.selectedElements = utils.sortElementsByScorePosition(v.selectedElements);
-  if (v.selectedElements.length < 1) return;
+  if (v.selectedElements.length < 1) return success;
   v.allowCursorActivity = false;
   cm.blockChanges = true;
 
@@ -570,11 +573,13 @@ function addMarkupToXML(v, cm, attrName = 'none', mElName, multiLayerContent = [
       replaceInEditor(cm, parentEl, true);
       replaceInEditor(cm, el, true); // to select new markup element
     });
+    success = true;
   }
 
   addApplicationInfo(v, cm);
   v.allowCursorActivity = true; // update notation again
   cm.blockChanges = false;
+  return success;
 } // addMarkupToXML()
 
 /**
