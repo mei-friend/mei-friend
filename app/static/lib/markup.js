@@ -408,6 +408,10 @@ export function addMarkup(event) {
         v.setFocusToVerovioPane();
       }
     }
+    else {
+      // TODO: Add localisation!
+      v.showAlert("Adding markup was not successful!");
+    }
   }
 } // addMarkup()
 
