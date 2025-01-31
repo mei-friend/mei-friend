@@ -505,6 +505,7 @@ function addMarkupToXML(v, cm, attrName = 'none', mElName, multiLayerContent = [
   // dependent IDs we need to change after the copy
   let dicOld2NewIDs = {};
   let copiedChilds = [];
+  // TODO: Find a solution for related control events (like slurs) (AP, 31.01.2025)
 
   // this loop iterates over the array of arrays of grouped ids
   // and wraps the markup around a whole group
@@ -540,6 +541,10 @@ function addMarkupToXML(v, cm, attrName = 'none', mElName, multiLayerContent = [
           cmd.addIds();
           v.hideUserPrompt(resolveModal);
           console.log('Added ids and proceed.');
+          // TODO! (AP, 31.1.2025)
+          // Currently, the xml:ids are successfully added, but the markup will not be created.
+          // Everything in this function after this foreach does not happen
+          // This is already in 1.2.1 the case, maybe earlier
           let markupUuid = createMarkup(v, group, mElName, parent, multiLayerContent, copiedChilds, dicOld2NewIDs);
           uuids.push(markupUuid);
         })
