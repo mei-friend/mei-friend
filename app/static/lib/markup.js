@@ -48,7 +48,10 @@ export function readMarkup() {
   alternativeVersions?.forEach((element) => {
     let children = element.children;
     for (let i = 0; i < children.length; i++) {
-      idsToIgnore.push(children[i].getAttribute('xml:id'));
+      let currentChildID = children[i].getAttribute('xml:id');
+      if(currentChildID != null) {
+        idsToIgnore.push(currentChildID);
+      }
     }
   });
 
