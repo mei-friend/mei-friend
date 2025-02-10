@@ -1,5 +1,8 @@
 # mei-friend-online CHANGELOG.md
 
+### 1.2.2 patch
+* Avoid multiple search dialogs and ensure focus on search dialog
+
 ### 1.2.1 patch
 * Improve key bindings mechanism and scope 
 * Fix switch focus and lookup guidelines key bindings in editor (and others)
