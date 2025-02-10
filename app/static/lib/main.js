@@ -1,6 +1,6 @@
 // mei-friend version and date
-export const version = '1.2.1';
-export const versionDate = '22 January 2025'; // use full or 3-character english months, will be translated
+export const version = '1.2.2';
+export const versionDate = '10 February 2025'; // use full or 3-character english months, will be translated
 export const splashDate = '17 January 2025'; // date of the splash screen content, same translation rules apply
 
 var vrvWorker;
@@ -1706,6 +1706,8 @@ export let cmd = {
   downloadMeiBasic: () => downloadMeiBasic(),
   downloadSpeedMei: () => downloadSpeedMei(),
   doFind: () => {
+    // to avoid multiple search dialogs, remove all existing ones for a new search
+    document.querySelectorAll('.CodeMirror-dialog-top').forEach((e) => e.remove());
     if (document.getElementById('persistentSearch').checked) {
       CodeMirror.commands.findPersistent(cm);
     } else {
@@ -1880,7 +1882,6 @@ export let cmd = {
       }
       // TODO: close all other overlays too...
     }
-
     // close all annotationMultiTools/MarkupDropDownContent
     v.hideAnnotationMarkupDropDownContent();
   },
