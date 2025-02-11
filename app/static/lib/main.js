@@ -1655,6 +1655,8 @@ export let cmd = {
     }
     v.toggleMidiPlaybackControlBar();
     if (document.getElementById('showMidiPlaybackControlBar').checked) {
+      // check for expansion elements in MEI encoding
+      v.setMidiExpansionOptions();
       // request MIDI rendering from Verovio worker
       requestMidiFromVrvWorker(true);
       document.getElementById('midiPlayerContextual').style.display = 'none';
