@@ -576,7 +576,9 @@ export function renumberMeasures(v, cm, startNum = 1, change = false) {
     }
     // 4) No increment after bars with invisible barline (@right="invis")
     let right = '';
-    if (measureList[i].hasAttribute('right')) right = measureList[i].getAttribute('right');
+    if (measureList[i].hasAttribute('right')) {
+      right = measureList[i].getAttribute('right');
+    }
 
     let msg =
       'measure@n="' +
@@ -592,25 +594,29 @@ export function renumberMeasures(v, cm, startNum = 1, change = false) {
       (right ? ', @right:' + right : '') +
       (metcons ? ', @metcons:' + metcons : '');
     console.info(msg);
-    //if (!change)
     v.updateAlert(msg);
+
     // change measure@n
     if (change) {
       measureList[i].setAttribute('n', n + suffix);
       e.replaceInEditor(cm, measureList[i]);
     }
     // 5) handle increment from multiRest@num
-    let multiRest;
-    if ((multiRest = measureList[i].querySelector('multiRest'))) {
+    let multiRest = measureList[i].querySelector('multiRest');
+    if (multiRest) {
       let num = multiRest.getAttribute('num');
-      if (num) n += parseInt(num);
-      else n++; // should not happen...
+      if (num) {
+        n += parseInt(num);
+      } else {
+        n++; // should not happen...
+      }
     } else if (right !== 'invis' || metcon === 'false') {
       n++;
     }
     metcon = '';
-  }
-  // let re = buffer.groupChangesSinceCheckpoint(checkPoint);
+  } // loop across measures
+
+  // final alert message
   let str =
     '<b>' +
     translator.lang.renumberMeasuresModalText.text +
