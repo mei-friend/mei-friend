@@ -4,6 +4,7 @@
 * Avoid multiple search dialogs and ensure focus on search dialog (thx @maxrothman for spotting the bug)
 * Reload expansion options on toggle of MIDI playback control bar (thx @maxrothman for the suggestion)
 * Fix undo behavior after using surrounding with tag function (thx @maxrothman, fixes #135)
+* Add latest releases of Verovio (4.5.1, 4.5.0)
 
 ### 1.2.1 patch
 * Improve key bindings mechanism and scope 
