@@ -112,7 +112,8 @@ export function deleteElement(v, cm, modifyerKey = false) {
       // delete beam
       let children = Array.from(element.children);
       replaceInEditor(cm, element, true, children); // replace beam with an array of its children
-      children.forEach((child, i) => { // select all children ids 
+      children.forEach((child, i) => {
+        // select all children ids
         let id = child.getAttribute('xml:id');
         if (id) selectedElements.push(id);
         element.parentNode.insertBefore(child, element); // move children to parent...
@@ -148,10 +149,10 @@ export function deleteElement(v, cm, modifyerKey = false) {
       pointingElements.forEach((pointingElement) => {
         console.log(
           'Removing pointing element <' +
-          pointingElement.nodeName +
-          '>: "' +
-          pointingElement.getAttribute('xml:id') +
-          '"'
+            pointingElement.nodeName +
+            '>: "' +
+            pointingElement.getAttribute('xml:id') +
+            '"'
         );
         removeInEditor(cm, pointingElement);
         pointingElement.remove();
@@ -2023,7 +2024,7 @@ export function encloseSelectionWithTag(v, cm, tagString = '') {
     newEncoding += selectionText;
     if (selectionText.includes(cm.lineSeparator())) newEncoding += cm.lineSeparator();
     newEncoding += '</' + tagString + '>';
-    cm.replaceSelection(newEncoding, 'around');
+    cm.replaceSelection(newEncoding, 'around', 'customOrigin');
     indentSelection(v, cm);
   });
 } // encloseSelectionWithTag()
@@ -2186,16 +2187,16 @@ export function removeInEditor(cm, xmlNode) {
   if (sc.findNext()) {
     console.debug(
       'removeInEditor() self closing element "' +
-      id +
-      '" from ln:' +
-      sc.from().line +
-      '/ch:' +
-      sc.from().ch +
-      ' to ln:' +
-      sc.to().line +
-      '/ch:' +
-      sc.to().ch +
-      '.'
+        id +
+        '" from ln:' +
+        sc.from().line +
+        '/ch:' +
+        sc.from().ch +
+        ' to ln:' +
+        sc.to().line +
+        '/ch:' +
+        sc.to().ch +
+        '.'
     );
   } else {
     let searchFullElement =
@@ -2210,16 +2211,16 @@ export function removeInEditor(cm, xmlNode) {
     if (sc.findNext()) {
       console.debug(
         'removeInEditor() full element "' +
-        id +
-        '" from ln:' +
-        sc.from().line +
-        '/ch:' +
-        sc.from().ch +
-        ' to ln:' +
-        sc.to().line +
-        '/ch:' +
-        sc.to().ch +
-        '.'
+          id +
+          '" from ln:' +
+          sc.from().line +
+          '/ch:' +
+          sc.from().ch +
+          ' to ln:' +
+          sc.to().line +
+          '/ch:' +
+          sc.to().ch +
+          '.'
       );
     }
   }
