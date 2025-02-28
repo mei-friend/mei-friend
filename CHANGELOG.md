@@ -1,5 +1,9 @@
 # mei-friend-online CHANGELOG.md
 
+### 1.2.3 patch
+* Add latest Vervio release 5.1.0
+* 
+
 ### 1.2.2 patch
 * Avoid multiple search dialogs and ensure focus on search dialog (thx @maxrothman for spotting the bug)
 * Reload expansion options on toggle of MIDI playback control bar (thx @maxrothman for the suggestion)
