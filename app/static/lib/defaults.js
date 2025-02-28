@@ -314,6 +314,7 @@ export const guidelinesBase = 'https://music-encoding.org/guidelines/v5/';
 export const commonSchemas = {
   Basic: {
     '5.0': 'https://music-encoding.org/schema/5.0/mei-basic.rng',
+    '5.1': 'https://music-encoding.org/schema/5.1/mei-basic.rng',
   },
   CMN: {
     '2.1.1': 'https://music-encoding.org/schema/2.1.1/mei-CMN.rng',
@@ -321,6 +322,7 @@ export const commonSchemas = {
     '4.0.0': 'https://music-encoding.org/schema/4.0.0/mei-CMN.rng',
     '4.0.1': 'https://music-encoding.org/schema/4.0.1/mei-CMN.rng',
     '5.0': 'https://music-encoding.org/schema/5.0/mei-CMN.rng',
+    '5.1': 'https://music-encoding.org/schema/5.1/mei-CMN.rng',
     // '5.0.0-dev': 'https://music-encoding.org/schema/dev/mei-CMN.rng',
   },
   Mensural: {
@@ -329,6 +331,7 @@ export const commonSchemas = {
     '4.0.0': 'https://music-encoding.org/schema/4.0.0/mei-Mensural.rng',
     '4.0.1': 'https://music-encoding.org/schema/4.0.1/mei-Mensural.rng',
     '5.0': 'https://music-encoding.org/schema/5.0/mei-Mensural.rng',
+    '5.1': 'https://music-encoding.org/schema/5.1/mei-Mensural.rng',
     // '5.0.0-dev': 'https://music-encoding.org/schema/dev/mei-Mensural.rng',
   },
   Neumes: {
@@ -337,6 +340,7 @@ export const commonSchemas = {
     '4.0.0': 'https://music-encoding.org/schema/4.0.0/mei-Neumes.rng',
     '4.0.1': 'https://music-encoding.org/schema/4.0.1/mei-Neumes.rng',
     '5.0.': 'https://music-encoding.org/schema/5.0/mei-Neumes.rng',
+    '5.1.': 'https://music-encoding.org/schema/5.1/mei-Neumes.rng',
     // '5.0.0-dev': 'https://music-encoding.org/schema/dev/mei-Neumes.rng',
   },
   All: {
@@ -345,6 +349,7 @@ export const commonSchemas = {
     '4.0.0': 'https://music-encoding.org/schema/4.0.0/mei-all.rng',
     '4.0.1': 'https://music-encoding.org/schema/4.0.1/mei-all.rng',
     '5.0': 'https://music-encoding.org/schema/5.0/mei-all.rng',
+    '5.1': 'https://music-encoding.org/schema/5.1/mei-all.rng',
     // '5.0.0-dev': 'https://music-encoding.org/schema/dev/mei-all.rng',
   },
   Any: {
@@ -353,10 +358,11 @@ export const commonSchemas = {
     '4.0.0': 'https://music-encoding.org/schema/4.0.0/mei-all_anyStart.rng',
     '4.0.1': 'https://music-encoding.org/schema/4.0.1/mei-all_anyStart.rng',
     '5.0': 'https://music-encoding.org/schema/5.0/mei-all_anyStart.rng',
+    '5.1': 'https://music-encoding.org/schema/5.1/mei-all_anyStart.rng',
     // '5.0.0-dev': 'https://music-encoding.org/schema/dev/mei-all_anyStart.rng',
   },
 };
-export const defaultMeiVersion = '5.0';
+export const defaultMeiVersion = '5.1';
 export const defaultMeiProfile = 'CMN';
 export const defaultSchema = commonSchemas[defaultMeiProfile][defaultMeiVersion];
 
