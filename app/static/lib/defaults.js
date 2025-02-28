@@ -365,7 +365,7 @@ export const defaultVerovioVersion = 'latest'; // 'develop', '3.10.0'
 export let supportedVerovioVersions = {};
 if (env === environments.develop) {
   supportedVerovioVersions.local = {
-    url: `${root}local/verovio-toolkit-hum.js`,
+    url: `${root}local/verovio-toolkit.js`,
     description: 'Locally compiled Verovio toolkit version for debugging',
   };
 }
@@ -376,6 +376,11 @@ supportedVerovioVersions.develop = {
 supportedVerovioVersions.latest = {
   url: 'https://www.verovio.org/javascript/latest/verovio-toolkit-hum.js',
   description: 'Current Verovio release',
+};
+supportedVerovioVersions['5.1.0'] = {
+  url: 'https://www.verovio.org/javascript/5.1.0/verovio-toolkit-hum.js',
+  description: 'Verovio release 5.1.0',
+  releaseDate: '27 Feb 2025',
 };
 supportedVerovioVersions['5.0.0'] = {
   url: 'https://www.verovio.org/javascript/5.0.0/verovio-toolkit-hum.js',
