@@ -303,6 +303,16 @@ function onMessageInput(e) {
   }
 } // onMessageInput()
 
+/**
+ * onRemoteUpdate
+ * @description If the remote has been updated, indicate this using a '!' in the file status display
+ * and change the commit button to a pull button
+ */
+export function onRemoteUpdate() {
+  // if the remote has been updated, we need to update the file status
+  // and change the commit button to a pull button
+}
+
 function assignGithubMenuClickHandlers() {
   // This function is called repeatedly during runtime as the content of the
   // Github menu is dynamic. Therefore, we remove all event listeners below
@@ -817,7 +827,7 @@ async function handleClickGithubAction(e, gm) {
                   await gm.pull();
                   // redraw github menu to reflect changes in git log
                   fillInCommitLog('withRefresh');
-                  console.log('pull completed for reload, head hash now ', await gm.getCurrentHeadSha());
+                  console.log('pull completed for reload, head hash now ', await gm.getLocalHeadSha());
                   loadFile();
                   overlay.style.display = 'none';
                   statusMsg.innerHTML = '';

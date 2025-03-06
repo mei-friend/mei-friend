@@ -17,6 +17,14 @@ export default class GitManager {
     this.filepath = opts.filepath || '';
     this.repo = opts.repo || null;
     this.branch = opts.branch || null;
+    this.pullFrequency = opts.remoteCheckFreq || 60000; // how often to check remote for updates - default to 60 seconds
+    this.onRemoteUpdate = opts.onRemoteUpdate || null; // callback for when remote is updated
+    if (this.onRemoteUpdate) {
+      // if we have a callback, set up a timeout to check the remote periodically
+      this.checkRemoteTimeout = setTimeout(() => {
+        this.checkRemote();
+      }, this.pullFrequency);
+    }
     //set up type-specific onAuth, see https://isomorphic-git.org/docs/en/onAuth#docsNav
     switch (providerType) {
       case 'github':
@@ -42,6 +50,37 @@ export default class GitManager {
 
   get repo() {
     return this.cloud.repo;
+  }
+
+  async checkRemote() {
+    // check whether the remote has been updated with new commits
+    // if so, call the onRemoteUpdate callback
+    // first, fetch the remote, supplying the current branch appropriately
+    await this.fetch({
+      fs,
+      http,
+      dir: this.directory,
+      remote: 'origin',
+      ref: this.branch,
+      singleBranch: true,
+    });
+    // then check the current head sha against the remote head sha
+    let localHeadSha = await this.getLocalHeadSha();
+    let remoteHeadSha = await this.getRemoteHeadSha();
+    if (localHeadSha !== remoteHeadSha) {
+      // remote has been updated
+      if (this.onRemoteUpdate) {
+        console.log('Remote updated, calling onRemoteUpdate');
+        this.onRemoteUpdate();
+        // reset the timeout
+        clearTimeout(this.checkRemoteTimeout);
+        this.checkRemoteCaller = setTimeout(() => {
+          this.checkRemote();
+        }, this.pullFrequency);
+      } else {
+        console.warn('Remote updated, but no onRemoteUpdate callback set');
+      }
+    }
   }
 
   async checkout() {
@@ -221,7 +260,7 @@ export default class GitManager {
       });
   }
 
-  async getCurrentHeadSha() {
+  async getLocalHeadSha() {
     return await git
       .resolveRef({
         fs,
@@ -229,7 +268,20 @@ export default class GitManager {
         ref: 'HEAD',
       })
       .catch((err) => {
-        console.error('getCurrentHeadSha error', err);
+        console.error('getLocalHeadSha error', err);
+        throw err;
+      });
+  }
+
+  async getRemoteHeadSha() {
+    return await git
+      .resolveRef({
+        fs,
+        dir: this.directory,
+        ref: 'refs/remotes/origin/' + this.branch,
+      })
+      .catch((err) => {
+        console.error('getRemoteHeadSha error', err);
         throw err;
       });
   }

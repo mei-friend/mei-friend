@@ -93,7 +93,13 @@ import Viewer from './viewer.js';
 import * as speed from './speed.js';
 import { loginAndFetch, solid } from './solid.js';
 import Storage from './storage.js';
-import { fillInBranchContents, logoutFromGithub, refreshGithubMenu, setCommitUIEnabledStatus } from './github-menu.js';
+import {
+  fillInBranchContents,
+  logoutFromGithub,
+  refreshGithubMenu,
+  setCommitUIEnabledStatus,
+  onRemoteUpdate,
+} from './github-menu.js';
 import { forkAndOpen, forkRepositoryCancel } from './fork-repository.js';
 import {
   addZoneDrawer,
@@ -578,6 +584,7 @@ async function completeInitialLoad() {
         repo: storage.github.githubRepo,
         branch: storage.github.branch,
         filepath: storage.github.filepath,
+        onRemoteUpdate,
       });
 
       //document.querySelector("#fileLocation").innerText = meiFileLocationPrintable;
@@ -592,7 +599,7 @@ async function completeInitialLoad() {
       // let msg = await gitProxy.registerGitManager('github', 'github', githubToken);
       // console.log('Registered git manager: ', msg);
 
-      gm = new GitManager('github', 'github', githubToken);
+      gm = new GitManager('github', 'github', githubToken, { onRemoteUpdate });
       gm.getAuthor()
         .then((author) => {
           //github = new Github('', githubToken, '', '', '', userLogin, userName, userEmail);
@@ -716,7 +723,7 @@ async function completeInitialLoad() {
     // no local storage
     if (isLoggedIn) {
       // initialise new github object
-      gm = new GitManager('github', 'github', githubToken);
+      gm = new GitManager('github', 'github', githubToken, { onRemoteUpdate });
       //github = new Github('', githubToken, '', '', '', userLogin, userName, userEmail);
     }
     meiFileLocation = '';
@@ -841,7 +848,7 @@ export async function openUrlFetch(url = '', updateAfterLoading = true) {
 
       if (fileLocationType === 'github' && userOrg && repo && branch && filepath) {
         // clone repo
-        gm = new GitManager('github', 'github', githubToken);
+        gm = new GitManager('github', 'github', githubToken, { onRemoteUpdate });
         // TODO modify for multiple git providers
         // TODO use checkAndClone mechanism to warn about excessive sizes
         gm.clone(`https://github.com/${userOrg}/${repo}.git`, branch)
