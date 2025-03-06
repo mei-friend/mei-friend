@@ -2,7 +2,7 @@
 
 ### 1.2.3 patch
 * Add latest Vervio release 5.1.0
-* 
+* Better accommodate Solid Pods hosted on providers running Community Solid Server
 
 ### 1.2.2 patch
 * Avoid multiple search dialogs and ensure focus on search dialog (thx @maxrothman for spotting the bug)
