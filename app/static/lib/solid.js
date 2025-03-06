@@ -398,7 +398,7 @@ export async function getProfile() {
     .then((resp) => resp.json())
     .then((json) => jsonld.expand(json))
     .then((profile) => {
-      let me = Array.from(profile).filter((e) => '@id' in e && e['@id'] === webId);
+      let me = Array.from(profile).filter((e) => '@id' in e && e['@id'] === webId && nsp.PIM + 'storage' in e);
       if (me.length) {
         if (me.length > 1) {
           console.warn('User profile contains multiple entries for webId: ', me);
