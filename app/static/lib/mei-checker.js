@@ -439,9 +439,8 @@ export function checkMeterConformance(v, cm) {
       let data = {};
       data.xmlId = measure.getAttribute('xml:id') || '';
       data.measure = measure.getAttribute('n') || '';
-      data.html = 'In measure ' + data.measure + ': ';
       nonConformingStaves.forEach((staff) => {
-        data.html +=
+        data.html =
           'Measure ' +
           data.measure +
           ' Staff ' +
