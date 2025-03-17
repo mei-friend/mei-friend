@@ -210,7 +210,8 @@ export async function establishContainerResource(container) {
   return getSolidStorage().then(async (storage) => {
     // establish container resource
     let resource = structuredClone(resources.ldpContainer);
-    return establishResource(storage + container, resource)
+    let containerUri = new URL(storage).origin + '/' + container;
+    return establishResource(containerUri, resource)
       .then(async (resp) => {
         if (resp) {
           if (resp.ok) {

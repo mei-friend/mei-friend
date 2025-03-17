@@ -94,7 +94,7 @@ export function getPageFromDom(xmlDoc, pageNo = 1, breaks, pageSpanners, include
   sections.forEach((item) => {
     if (item.nodeName === 'section') {
       // diggs into section hierachy
-      let returnSection = digger(/** @type {Element}*/(item));
+      let returnSection = digger(/** @type {Element}*/ (item));
       baseSection.appendChild(returnSection);
     }
   });
@@ -215,7 +215,7 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
           /** @type {string[]} */ (
             // @ts-ignore
             breaks.includes(currentNodeName) ||
-            (sb = /** @type {Element} */ (currentNode).querySelector(breaksSelector))
+              (sb = /** @type {Element} */ (currentNode).querySelector(breaksSelector))
           )
         ) {
           if (dutils.countAsBreak(sb ? sb : currentNode)) p++;
@@ -645,18 +645,19 @@ function getMeter(def, staffNumber = '') {
 } // getMeter()
 
 /**
- * Finds and returns a scoreDef element before the element, null otherwise
+ * Finds and returns the scoreDef element before the element, null otherwise
  * @param {Document} xmlDoc
  * @param {Element} element
  * @returns {Element | null}
  */
-function getScoreDefForElement(xmlDoc, element) {
+export function getScoreDefForElement(xmlDoc, element) {
   // find meter.count/unit
   let elId = element.getAttribute('xml:id');
   let scoreDef = null;
   if (elId) {
     let scoreDefList = xmlDoc.querySelectorAll('scoreDef,[*|id="' + elId + '"]');
     let search = false;
+    // go backward in scoreDefList
     for (let i = scoreDefList.length - 1; i >= 0; i--) {
       if (search) {
         let found =
@@ -682,7 +683,7 @@ function getScoreDefForElement(xmlDoc, element) {
  * @param {Document} xmlDoc
  * @param {Element} element
  * @returns {number} tstamp (-1 if nothing found)
- * 
+ *
  * TODO: only used from editor.js; move to new DocumentController.js
  */
 export function getTstampForElement(xmlDoc, element) {
