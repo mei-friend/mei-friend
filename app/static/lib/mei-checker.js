@@ -1,3 +1,4 @@
+import * as att from './attribute-classes.js';
 import * as dutils from './dom-utils.js';
 import * as editor from './editor.js';
 import { translator } from './main.js';
@@ -344,6 +345,9 @@ export function checkAccidGes(v, cm) {
    * @returns {Object} measureAccids
    */
   function getAccidsInMeasure(measure) {
+    v.allowCursorActivity = false;
+    v.initCodeCheckerPanel('Checking meter conformance...');
+
     let measureAccids = {};
     // list all @accid attributes in measure
     measure.querySelectorAll('[accid]').forEach((el) => {
@@ -372,3 +376,93 @@ export function checkAccidGes(v, cm) {
     return measureAccids;
   } // getAccidsInMeasure()
 } // checkAccidGes()
+
+/**
+ * checkMeterConformance goes through all measure elements in xmlDoc and checks
+ * whether the duration of the elements of each layer in the measure conforms to
+ * the time signature of the measure.
+ */
+export function checkMeterConformance(v, cm) {
+  let elementsWithDuration = ['chord', 'note', 'space', 'rest', 'ftrem'];
+  let ignoreElements = ['mRest', 'multiRest', 'mSpace'];
+
+  v.allowCursorActivity = false;
+  v.initCodeCheckerPanel(translator.lang.codeCheckerTitle.text);
+
+  let measures = v.xmlDoc.querySelectorAll('measure');
+  measures.forEach((measure) => {
+    let nonConformingStaves = [];
+    let scoreDef = speed.getScoreDefForElement(v.xmlDoc, measure);
+    // iterate through all staves in the measure
+    measure.querySelectorAll('staff').forEach((staff) => {
+      let duration = 0;
+      let staffNumber = parseInt(staff.getAttribute('n')) || 1;
+      let meter = speed.getMeter(scoreDef, staffNumber);
+      let conformance = false;
+      // iterate through all layers in the staff
+      staff.querySelectorAll('layer').forEach((layer) => {
+        let layerDuration = 0;
+        let durationElements = Array.from(layer.querySelectorAll(elementsWithDuration.join(',')));
+        // filter elements that have a common parent
+        for (let i = 0; i < durationElements.length; i++) {
+          let children = durationElements[i].querySelectorAll(elementsWithDuration.join(','));
+          children.forEach((element) => {
+            let i = durationElements.findIndex((e) => e === element);
+            durationElements.splice(i, 1);
+          });
+        }
+        durationElements.forEach((element) => {
+          if (element.nodeName === 'fTrem') {
+            // TODO: treat fTrem child elements as having half the duration of the note
+
+          } else {
+            layerDuration += speed.getDurationOfElement(element, parseFloat(meter.unit));
+          }
+        });
+        if (layerDuration > duration) {
+          duration = layerDuration;
+        }
+        // for each fTrem element, divide the duration by 2
+        // layer.querySelectorAll('fTrem').forEach(() => (duration = duration / 2));
+      });
+      let ignore = false;
+      staff.querySelectorAll(ignoreElements.join(',')).forEach(() => (ignore = true));
+      if (duration === parseFloat(meter.count) || ignore) {
+        conformance = true;
+      } else {
+        nonConformingStaves.push({ staff: staffNumber, duration: duration, meter: meter });
+      }
+    });
+
+    // display message in code checker panel
+    if (nonConformingStaves.length > 0) {
+      let data = {};
+      data.xmlId = measure.getAttribute('xml:id') || '';
+      data.measure = measure.getAttribute('n') || '';
+      data.html = 'In measure ' + data.measure + ': ';
+      nonConformingStaves.forEach((staff) => {
+        data.html +=
+          'Measure ' +
+          data.measure +
+          ' Staff ' +
+          staff.staff +
+          ' has a duration of ' +
+          staff.duration +
+          ' instead of ' +
+          staff.meter.count +
+          '. ';
+        data.correct = () => {
+          v.allowCursorActivity = false;
+          measure.setAttribute('metcon', 'false');
+          editor.replaceInEditor(cm, measure, false);
+          v.allowCursorActivity = true;
+        };
+        v.addCodeCheckerEntry(data);
+        console.debug(data.html);
+      });
+    }
+  });
+
+  v.finalizeCodeCheckerPanel('All measures conform to their time signatures.');
+  v.allowCursorActivity = true;
+} // checkMeterConformance()
