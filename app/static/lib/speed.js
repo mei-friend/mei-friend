@@ -599,7 +599,7 @@ function getStaffNumber(element) {
  * @param {string} staffNumber
  * @returns {{count: string | null, unit: string | null}}
  */
-function getMeter(def, staffNumber = '') {
+export function getMeter(def, staffNumber = '') {
   let meter = {
     count: def.getAttribute('meter.count'),
     unit: def.getAttribute('meter.unit'),
@@ -712,7 +712,7 @@ export function getTstampForElement(xmlDoc, element) {
           if (e === element) {
             break;
           }
-          tstamp += getDurationOfElement(e, parseInt(unit));
+          tstamp += getDurationOfElement(e, parseFloat(unit));
         }
       }
     }
@@ -732,7 +732,7 @@ export function getTstampForElement(xmlDoc, element) {
  * @param {Element} element
  * @returns {number} duration in beats, or -1 if problems
  */
-function getDurationOfElement(element, meterUnit = 4.0) {
+export function getDurationOfElement(element, meterUnit = 4.0) {
   let beatDuration = -1;
   if (element) {
     if (element.hasAttribute('grace')) {
