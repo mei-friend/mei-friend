@@ -660,15 +660,15 @@ export function getScoreDefForElement(xmlDoc, element) {
     // go backward in scoreDefList
     for (let i = scoreDefList.length - 1; i >= 0; i--) {
       if (search) {
-        // let found =
-        //   scoreDefList.item(i).querySelector('[meter],meterSig') ||
-        //   scoreDefList.item(i).hasAttribute('meter.unit') ||
-        //   scoreDefList.item(i).hasAttribute('meter.count') ||
-        //   scoreDefList.item(i).hasAttribute('meter.sym');
-        // if (found) {
-        scoreDef = scoreDefList.item(i);
-        break;
-        // }
+        let found =
+          scoreDefList.item(i).querySelector('[meter],meterSig') ||
+          scoreDefList.item(i).hasAttribute('meter.unit') ||
+          scoreDefList.item(i).hasAttribute('meter.count') ||
+          scoreDefList.item(i).hasAttribute('meter.sym');
+        if (found) {
+          scoreDef = scoreDefList.item(i);
+          break;
+        }
       }
       if (scoreDefList.item(i).nodeName === element.nodeName) {
         search = true;
