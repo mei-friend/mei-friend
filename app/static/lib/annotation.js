@@ -149,17 +149,16 @@ export const createIdentify = (e, selection) => {
     createMAOMusicalObject(selection, label)
       .then((maoMusicalMaterial) => {
         getSolidStorage().then((solidStorage) => {
-          console.log(
-            'CREATED MUSICAL MATERIAL: ',
-            solidStorage + maoMusicalMaterial.headers.get('location').substr(1),
-            maoMusicalMaterial
-          );
+          const path = new URL(maoMusicalMaterial.headers.get('location')).pathname;
+          // join the path with the storage URL to get the full URL
+          const newUrl = new URL(path, solidStorage).href;
+          console.log('CREATED MUSICAL MATERIAL: ', newUrl, maoMusicalMaterial);
           const a = {
-            id: solidStorage + maoMusicalMaterial.headers.get('location').substr(1),
+            id: newUrl,
             type: 'annotateIdentify',
             selection: selection,
             isStandoff: true,
-            standoffUri: solidStorage + maoMusicalMaterial.headers.get('location').substr(1),
+            standoffUri: newUrl,
           };
           addListItem(a, true);
         });
