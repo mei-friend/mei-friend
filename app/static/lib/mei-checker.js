@@ -380,11 +380,17 @@ export function checkAccidGes(v, cm) {
  * checkMeterConformance goes through all measure elements in xmlDoc and checks
  * whether the duration of the elements of each layer in the measure conforms to
  * the time signature of the measure.
+ * It counts these elements for duration chord, note, space, rest; and treats
+ * fTrem elements as having half the duration of the note.
+ *
+ * TODO: choice, subst not counted twice
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
  */
 export function checkMeterConformance(v, cm) {
   // checkMeterSignature(v);
 
-  let elementsWithDuration = ['chord', 'note', 'space', 'rest', 'ftrem'];
+  let elementsWithDuration = ['chord', 'note', 'space', 'rest', 'fTrem'];
   let ignoreElements = ['mRest', 'multiRest', 'mSpace'];
 
   v.allowCursorActivity = false;
@@ -392,28 +398,25 @@ export function checkMeterConformance(v, cm) {
 
   let measures = v.xmlDoc.querySelectorAll('measure');
   measures.forEach((measure) => {
-    let nonConformingStaves = [];
     // iterate through all staves in the measure
     measure.querySelectorAll('staff').forEach((staff) => {
       let duration = 0;
-      let staffNumber = parseInt(staff.getAttribute('n')) || 1;
       let meter = speed.getMeterForElement(v.xmlDoc, staff);
       let conformance = false;
       // iterate through all layers in the staff
       staff.querySelectorAll('layer').forEach((layer) => {
         let layerDuration = 0;
         let durationElements = Array.from(layer.querySelectorAll(elementsWithDuration.join(',')));
-        // filter elements that have a common parent
-        for (let i = 0; i < durationElements.length; i++) {
-          let children = durationElements[i].querySelectorAll(elementsWithDuration.join(','));
-          children.forEach((element) => {
-            let i = durationElements.findIndex((e) => e === element);
-            durationElements.splice(i, 1);
-          });
-        }
+        dutils.filterChildren(durationElements, elementsWithDuration);
         durationElements.forEach((element) => {
           if (element.nodeName === 'fTrem') {
-            // TODO: treat fTrem child elements as having half the duration of the note
+            let ftremDuration = 0;
+            let frtremChildren = Array.from(element.querySelectorAll(elementsWithDuration.join(',')));
+            dutils.filterChildren(frtremChildren, elementsWithDuration);
+            frtremChildren.forEach((e) => {
+              ftremDuration += speed.getDurationOfElement(e, utils.parseMeterNumber(meter.unit));
+            });
+            layerDuration += ftremDuration / 2;
           } else {
             layerDuration += speed.getDurationOfElement(element, utils.parseMeterNumber(meter.unit));
           }
