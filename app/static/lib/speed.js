@@ -600,6 +600,9 @@ function getStaffNumber(element) {
  * @returns {{count: string | null, unit: string | null}}
  */
 export function getMeter(def, staffNumber = '') {
+  if (!def) {
+    return { count: null, unit: null };
+  }
   let meter = {
     count: def.getAttribute('meter.count'),
     unit: def.getAttribute('meter.unit'),
@@ -645,38 +648,85 @@ export function getMeter(def, staffNumber = '') {
 } // getMeter()
 
 /**
- * Finds and returns the scoreDef element before the element, null otherwise
+ * Finds and returns the scoreDef element before the element
+ * that contains meter information, null otherwise
  * @param {Document} xmlDoc
  * @param {Element} element
  * @returns {Element | null}
+ * 
+ * Deprecated; use getMeterForElement() instead (WG., March 2025)
  */
-export function getScoreDefForElement(xmlDoc, element) {
-  // find meter.count/unit
+// export function getMeterScoreDefForElement(xmlDoc, element) {
+//   // find meter.count/unit
+//   let elId = element.getAttribute('xml:id');
+//   let scoreDef = null;
+//   if (elId) {
+//     let scoreDefList = xmlDoc.querySelectorAll('scoreDef,[*|id="' + elId + '"]');
+//     let search = false;
+//     // go backward in scoreDefList
+//     for (let i = scoreDefList.length - 1; i >= 0; i--) {
+//       if (search) {
+//         let found =
+//           scoreDefList.item(i).querySelector('[meter\\.unit],[meter\\.count],meterSig') ||
+//           scoreDefList.item(i).hasAttribute('meter.unit') ||
+//           scoreDefList.item(i).hasAttribute('meter.count') ||
+//           scoreDefList.item(i).hasAttribute('meter.sym');
+//         if (found) {
+//           scoreDef = scoreDefList.item(i);
+//           break;
+//         }
+//       }
+//       if (scoreDefList.item(i).nodeName === element.nodeName) {
+//         search = true;
+//       }
+//     }
+//   }
+//   return scoreDef;
+// } // getScoreDefForElement()
+
+/**
+ * getMeterForElement() returns the meter information for the element
+ * @param {Document} xmlDoc
+ * @param {Element} element
+ * @returns {{count: string | null, unit: string | null}}
+ */
+export function getMeterForElement(xmlDoc, element) {
   let elId = element.getAttribute('xml:id');
-  let scoreDef = null;
-  if (elId) {
-    let scoreDefList = xmlDoc.querySelectorAll('scoreDef,[*|id="' + elId + '"]');
+  let staffNumber = getStaffNumber(element);
+  if (elId && staffNumber) {
+    let meterDefList = xmlDoc.querySelectorAll('[meter\\.unit],[meter\\.count],meterSig,[*|id="' + elId + '"]');
     let search = false;
-    // go backward in scoreDefList
-    for (let i = scoreDefList.length - 1; i >= 0; i--) {
+    // search backwards in meterDefList, starting true search from element
+    for (let i = meterDefList.length - 1; i >= 0; i--) {
       if (search) {
-        let found =
-          scoreDefList.item(i).querySelector('[meter],meterSig') ||
-          scoreDefList.item(i).hasAttribute('meter.unit') ||
-          scoreDefList.item(i).hasAttribute('meter.count') ||
-          scoreDefList.item(i).hasAttribute('meter.sym');
-        if (found) {
-          scoreDef = scoreDefList.item(i);
-          break;
+        if (
+          meterDefList.item(i).nodeName === 'scoreDef' ||
+          (meterDefList.item(i).nodeName === 'staffDef' && staffNumber === meterDefList.item(i).getAttribute('n'))
+        ) {
+          return getMeter(meterDefList.item(i), getStaffNumber(element));
+        }
+        if (meterDefList.item(i).nodeName === 'meterSig') {
+          let parent = meterDefList.item(i).closest('scoreDef,staffDef,layer');
+          if (parent) {
+            return getMeter(parent, getStaffNumber(element));
+          }
+          let meterSigGroup = meterDefList.item(i).closest('meterSigGrp');
+          if (meterSigGroup) {
+            // TODO: support meterSigGrp func="interchanging,mixed,additive"
+           console.log('getMeterForElement() meterSigGrp currently not supported: ', meterSigGroup);
+          }
         }
       }
-      if (scoreDefList.item(i).nodeName === element.nodeName) {
+      if (meterDefList.item(i).nodeName === element.nodeName) {
         search = true;
       }
     }
+    console.log('getMeterForElement(): no meter information found in entire document');
+  } else {
+    console.log('getMeterForElement(): no xml:id or staff number found');
   }
-  return scoreDef;
-} // getScoreDefForElement()
+  return { count: null, unit: null };
+} // getMeterForElement()
 
 /**
  * Returns a @tstamp (beat position) of the element within the current measure
@@ -690,30 +740,26 @@ export function getTstampForElement(xmlDoc, element) {
   let tstamp = -1;
   let chord = element.closest('chord'); // take chord as element, if exists
   if (chord) element = chord;
-  let staffNumber = getStaffNumber(element);
-  let scoreDef = getScoreDefForElement(xmlDoc, element);
-  if (scoreDef && staffNumber) {
-    const { count, unit } = getMeter(scoreDef, staffNumber);
-    if (unit) {
-      // iterate over notes before element in current layer
-      let layer = element.closest('layer');
-      if (layer) {
-        tstamp = 1;
-        let chordList = []; // list of chords that have been counted
-        let durList = Array.from(layer.querySelectorAll(att.attDurationLogical.join(',')));
-        for (let e of durList) {
-          // exclude notes within a chord
-          let parentChord = e.closest('chord');
-          if (e.nodeName === 'note' && parentChord && chordList.includes(parentChord)) {
-            continue;
-          }
-          if (parentChord) chordList.push(parentChord);
-          // stop adding beats when requested element is reached
-          if (e === element) {
-            break;
-          }
-          tstamp += getDurationOfElement(e, parseFloat(unit));
+  let meter = getMeterForElement(xmlDoc, element);
+  if (meter && meter.unit) {
+    // iterate over notes before element in current layer
+    let layer = element.closest('layer');
+    if (layer) {
+      tstamp = 1;
+      let chordList = []; // list of chords that have been counted
+      let durList = Array.from(layer.querySelectorAll(att.attDurationLogical.join(',')));
+      for (let e of durList) {
+        // exclude notes within a chord
+        let parentChord = e.closest('chord');
+        if (e.nodeName === 'note' && parentChord && chordList.includes(parentChord)) {
+          continue;
         }
+        if (parentChord) chordList.push(parentChord);
+        // stop adding beats when requested element is reached
+        if (e === element) {
+          break;
+        }
+        tstamp += getDurationOfElement(e, parseFloat(meter.unit));
       }
     }
   }
