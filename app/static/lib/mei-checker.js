@@ -396,7 +396,7 @@ export function checkMeterConformance(v, cm) {
   v.allowCursorActivity = false;
   v.initCodeCheckerPanel(translator.lang.codeCheckerTitle.text);
 
-  let measures = v.xmlDoc.querySelectorAll('measure');
+  let measures = v.xmlDoc.querySelectorAll('measure:not([metcon="false"])');
   measures.forEach((measure) => {
     // iterate through all staves in the measure
     measure.querySelectorAll('staff').forEach((staff) => {
