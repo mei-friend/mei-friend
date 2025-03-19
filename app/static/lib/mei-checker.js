@@ -1,4 +1,3 @@
-import * as att from './attribute-classes.js';
 import * as dutils from './dom-utils.js';
 import * as editor from './editor.js';
 import { translator } from './main.js';
@@ -383,6 +382,8 @@ export function checkAccidGes(v, cm) {
  * the time signature of the measure.
  */
 export function checkMeterConformance(v, cm) {
+  // checkMeterSignature(v);
+
   let elementsWithDuration = ['chord', 'note', 'space', 'rest', 'ftrem'];
   let ignoreElements = ['mRest', 'multiRest', 'mSpace'];
 
@@ -392,12 +393,11 @@ export function checkMeterConformance(v, cm) {
   let measures = v.xmlDoc.querySelectorAll('measure');
   measures.forEach((measure) => {
     let nonConformingStaves = [];
-    let scoreDef = speed.getScoreDefForElement(v.xmlDoc, measure);
     // iterate through all staves in the measure
     measure.querySelectorAll('staff').forEach((staff) => {
       let duration = 0;
       let staffNumber = parseInt(staff.getAttribute('n')) || 1;
-      let meter = speed.getMeter(scoreDef, staffNumber);
+      let meter = speed.getMeterForElement(v.xmlDoc, staff);
       let conformance = false;
       // iterate through all layers in the staff
       staff.querySelectorAll('layer').forEach((layer) => {
@@ -414,9 +414,8 @@ export function checkMeterConformance(v, cm) {
         durationElements.forEach((element) => {
           if (element.nodeName === 'fTrem') {
             // TODO: treat fTrem child elements as having half the duration of the note
-
           } else {
-            layerDuration += speed.getDurationOfElement(element, parseFloat(meter.unit));
+            layerDuration += speed.getDurationOfElement(element, utils.parseMeterNumber(meter.unit));
           }
         });
         if (layerDuration > duration) {
@@ -427,28 +426,21 @@ export function checkMeterConformance(v, cm) {
       });
       let ignore = false;
       staff.querySelectorAll(ignoreElements.join(',')).forEach(() => (ignore = true));
-      if (duration === parseFloat(meter.count) || ignore) {
+      if (duration === utils.parseMeterNumber(meter.count) || ignore) {
         conformance = true;
       } else {
-        nonConformingStaves.push({ staff: staffNumber, duration: duration, meter: meter });
-      }
-    });
-
-    // display message in code checker panel
-    if (nonConformingStaves.length > 0) {
-      let data = {};
-      data.xmlId = measure.getAttribute('xml:id') || '';
-      data.measure = measure.getAttribute('n') || '';
-      nonConformingStaves.forEach((staff) => {
+        // display non conformance message as entry in code checker panel
+        let data = {};
+        data.xmlId = staff.getAttribute('xml:id') || ''; // click to jump to element
         data.html =
           'Measure ' +
-          data.measure +
+          (measure.getAttribute('n') || '') +
           ' Staff ' +
-          staff.staff +
+          (staff.getAttribute('n') || '') +
           ' has a duration of ' +
-          staff.duration +
+          duration +
           ' instead of ' +
-          staff.meter.count +
+          utils.parseMeterNumber(meter.count) +
           '. ';
         data.correct = () => {
           v.allowCursorActivity = false;
@@ -458,10 +450,26 @@ export function checkMeterConformance(v, cm) {
         };
         v.addCodeCheckerEntry(data);
         console.debug(data.html);
-      });
-    }
+      }
+    });
   });
 
   v.finalizeCodeCheckerPanel('All measures conform to their time signatures.');
   v.allowCursorActivity = true;
 } // checkMeterConformance()
+
+/**
+ * Debug function:
+ * Test all note, chord etc elements in the xmlDoc for a meter signature and report it.
+ */
+function checkMeterSignature(v) {
+  let elements = v.xmlDoc.querySelectorAll('note,rest,chord,space');
+  elements.forEach((element) => {
+    let meter = speed.getMeterForElement(v.xmlDoc, element);
+    if (meter && meter.count && meter.unit) {
+      console.log(element.nodeName + ' (' + element.getAttribute('xml:id') + '): ' + meter.count + '/' + meter.unit);
+    } else {
+      console.log('No scoreDef found for ' + element.nodeName + ' (' + element.getAttribute('xml:id') + ')');
+    }
+  });
+} // checkMeterSignature()

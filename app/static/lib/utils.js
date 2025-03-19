@@ -848,3 +848,12 @@ export function getChangelogUrl() {
   }
   return changeLogUrl;
 }
+
+/**
+ * Evaluate meter count or unit from @meter attribute to a number
+ * @param {string} number such as '3' or '3+4+5'
+ * @returns {number | NaN} the sum of the meter count or unit
+ */
+export function parseMeterNumber(number) {
+  return number.split('+').reduce((a, b) => parseInt(a) + parseInt(b), 0);
+} // parseMeterNumber()
