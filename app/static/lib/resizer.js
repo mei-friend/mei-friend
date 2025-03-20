@@ -11,14 +11,14 @@ import {
 // notation variables (verovioContainer)
 let notationOrientation = defaultNotationOrientation; // position of notation
 let notationProportion = defaultNotationProportion; // proportion notation div takes from container
-let notationResizerWidth = defaultNotationResizerWidth; // 3 px, Attention: hard-coded also in left.css, right.css, top.css, bottom.css
+const notationResizerWidth = defaultNotationResizerWidth; // 3 px, Attention: hard-coded also in left.css, right.css, top.css, bottom.css
 // facsimile variables (facsimileContainer)
 let facsimileOrientation = defaultFacsimileOrientation; // notationOrientation of facsimile relative to notation
 let facsimileProportion = defaultFacsimileProportion;
-let facsimileResizerWidth = defaultFacsimileResizerWidth; // px, compare to css facsimile-[left/right/top/bottom].css
+const facsimileResizerWidth = defaultFacsimileResizerWidth; // px, compare to css facsimile-[left/right/top/bottom].css
 // general settings
-let minProportion = 0.05; // mimimum proportion of both notationProportion, facsimileProportion
-let maxProportion = 0.95;
+const minProportion = 0.05; // mimimum proportion of both notationProportion, facsimileProportion
+const maxProportion = 0.95;
 let storage; // storage object for local storage
 
 /**
@@ -212,8 +212,8 @@ export function addNotationResizerHandlers(v, cm) {
   const encoding = resizer.nextElementSibling;
   const verovioContainer = document.getElementById('verovioContainer');
   const facsimileContainer = document.getElementById('facsimileContainer');
-  let x = 0;
-  let y = 0;
+  let x = 0; // x coordinate at mouse down
+  let y = 0; // y coordinate at mouse down
   let notationSize = 0;
 
   const mouseDownHandler = function (e) {
@@ -234,7 +234,6 @@ export function addNotationResizerHandlers(v, cm) {
     let sz = resizer.parentNode.getBoundingClientRect();
     const codeChecker = document.getElementById('codeChecker');
     const codeCheckerHeight = codeChecker.getBoundingClientRect().height;
-    // console.log("Mouse move dx/dy: " + dx + "/" + dy + ', Container: ' + sz.width + '/' + sz.height);
     switch (notationOrientation) {
       case 'top':
         notationProportion = (notationSize + dy) / sz.height;
@@ -249,6 +248,24 @@ export function addNotationResizerHandlers(v, cm) {
         notationProportion = (notationSize + dx) / sz.width;
         break;
     }
+    console.log(
+      'Mouse move x/y: ' +
+        x +
+        '/' +
+        y +
+        ', dx/dy: ' +
+        dx +
+        '/' +
+        dy +
+        ', Container: ' +
+        sz.width +
+        '/' +
+        sz.height +
+        ', Notationproporion: ' +
+        notationProportion +
+        ', codeCheckerHeight: ' +
+        codeCheckerHeight
+    );
     // restrict to min/max
     notationProportion = Math.min(maxProportion, Math.max(minProportion, notationProportion));
     // update relative size of facsimile images, if active
