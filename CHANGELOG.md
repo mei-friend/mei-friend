@@ -1,5 +1,8 @@
 # mei-friend-online CHANGELOG.md
 
+### 1.2.4 patch
+* Add meter conformance checker (#142) that inspects the duration of each measure relative to the current time signature
+
 ### 1.2.3 patch
 * Add latest Vervio release 5.1.0
 * Better accommodate Solid Pods hosted on providers running Community Solid Server
