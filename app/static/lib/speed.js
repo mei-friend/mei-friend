@@ -653,7 +653,7 @@ export function getMeter(def, staffNumber = '') {
  * @param {Document} xmlDoc
  * @param {Element} element
  * @returns {Element | null}
- * 
+ *
  * Deprecated; use getMeterForElement() instead (WG., March 2025)
  */
 // export function getMeterScoreDefForElement(xmlDoc, element) {
@@ -713,7 +713,7 @@ export function getMeterForElement(xmlDoc, element) {
           let meterSigGroup = meterDefList.item(i).closest('meterSigGrp');
           if (meterSigGroup) {
             // TODO: support meterSigGrp func="interchanging,mixed,additive"
-           console.log('getMeterForElement() meterSigGrp currently not supported: ', meterSigGroup);
+            console.log('getMeterForElement() meterSigGrp currently not supported: ', meterSigGroup);
           }
         }
       }
@@ -781,8 +781,8 @@ export function getTstampForElement(xmlDoc, element) {
 export function getDurationOfElement(element, meterUnit = 4.0) {
   let beatDuration = -1;
   if (element) {
-    if (element.hasAttribute('grace')) {
-      let graceValue = element.getAttribute('grace');
+    if (element.hasAttribute('grace') || element.closest('graceGrp')) {
+      let graceValue = element.getAttribute('grace') || element.closest('graceGrp')?.getAttribute('grace');
       if (graceValue && ['acc', 'unacc', 'unknown'].includes(graceValue)) {
         return 0;
       }
