@@ -219,13 +219,14 @@ export function addNotationResizerHandlers(v, cm) {
   const mouseDownHandler = function (e) {
     x = e.clientX;
     y = e.clientY;
-    if (notationOrientation === 'top' || notationOrientation === 'bottom')
+    if (notationOrientation === 'top' || notationOrientation === 'bottom') {
       notationSize = notation.getBoundingClientRect().height;
-    if (notationOrientation === 'left' || notationOrientation === 'right')
+    } else if (notationOrientation === 'left' || notationOrientation === 'right') {
       notationSize = notation.getBoundingClientRect().width;
+    }
     document.addEventListener('mousemove', mouseMoveHandler);
     document.addEventListener('mouseup', mouseUpHandler);
-    // console.log("Mouse down x/y: " + x + "/" + y + ', ' + notationSize);
+    console.log('Mouse down x/y: ' + x + '/' + y + ', ' + notationSize);
   }; // mouseDownHandler
 
   const mouseMoveHandler = function (e) {
@@ -269,6 +270,7 @@ export function addNotationResizerHandlers(v, cm) {
     // restrict to min/max
     notationProportion = Math.min(maxProportion, Math.max(minProportion, notationProportion));
     // update relative size of facsimile images, if active
+
     switch (notationOrientation) {
       case 'top':
       case 'bottom':
@@ -286,7 +288,11 @@ export function addNotationResizerHandlers(v, cm) {
       case 'left':
       case 'right':
         notation.style.width = notationProportion * sz.width;
-        cm.setSize(sz.width * (1 - notationProportion) - notationResizerWidth, sz.height - codeCheckerHeight);
+        let cmWidth = sz.width * (1 - notationProportion) - notationResizerWidth;
+        let cmHeight = sz.height - codeCheckerHeight;
+        console.log('L/R: cmWidth/cmHeight: ' + cmWidth + '/' + cmHeight);
+        cm.setSize(cmWidth, cmHeight);
+        // set facsimile size
         if (
           document.getElementById('showFacsimilePanel').checked &&
           (facsimileOrientation === 'left' || facsimileOrientation === 'right')
