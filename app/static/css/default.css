@@ -544,6 +544,7 @@ a:active {
   overflow: hidden;
   display: flex;
   outline: none;
+  box-sizing: border-box;
 }
 
 #notation:focus-within,
@@ -620,6 +621,7 @@ a:active {
   justify-content: left;
   flex-direction: column;
   position: relative;
+  box-sizing: border-box;
 }
 
 #codeChecker {

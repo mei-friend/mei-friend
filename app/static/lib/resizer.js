@@ -16,6 +16,8 @@ const notationResizerWidth = defaultNotationResizerWidth; // 3 px, Attention: ha
 let facsimileOrientation = defaultFacsimileOrientation; // notationOrientation of facsimile relative to notation
 let facsimileProportion = defaultFacsimileProportion;
 const facsimileResizerWidth = defaultFacsimileResizerWidth; // px, compare to css facsimile-[left/right/top/bottom].css
+const notationBorderWidth = 3; // px, border width of notation panel, cf. default.css #notation
+const encodingBorderWidth = 3; // px, border width of encoding panel, cf. default.css #encoding
 // general settings
 const minProportion = 0.05; // mimimum proportion of both notationProportion, facsimileProportion
 const maxProportion = 0.95;
@@ -82,11 +84,11 @@ export function setOrientation(cm, _notationOrientation = '', _facsimileOrientat
     } else {
       annotationPanel.style.display = 'none';
     }
-    notationDiv.style.width = sz.width - 2 * notationResizerWidth; // TODO: remove when border removed
+    notationDiv.style.width = sz.width; // - 2 * notationBorderWidth;
     notationDiv.style.height = sz.height * notationProportion;
     cm.setSize(
-      sz.width - 2 * notationResizerWidth,
-      sz.height * (1 - notationProportion) - notationResizerWidth - codeCheckerHeight
+      sz.width,
+      sz.height * (1 - notationProportion) - notationResizerWidth - 2 * notationBorderWidth - codeCheckerHeight
     );
   }
   if (notationOrientation === 'left' || notationOrientation === 'right') {
@@ -99,8 +101,11 @@ export function setOrientation(cm, _notationOrientation = '', _facsimileOrientat
       annotationPanel.style.display = 'none';
     }
     notationDiv.style.width = Math.floor(sz.width * notationProportion);
-    notationDiv.style.height = sz.height - 6; //TODO: remove when border removed
-    cm.setSize(sz.width * (1 - notationProportion) - notationResizerWidth, sz.height - codeCheckerHeight);
+    notationDiv.style.height = sz.height;
+    cm.setSize(
+      sz.width * (1 - notationProportion) - notationResizerWidth - 2 * encodingBorderWidth,
+      sz.height - codeCheckerHeight
+    );
   }
   friendSz.style.width = sz.width;
   friendSz.style.maxWidth = sz.width;
@@ -113,9 +118,8 @@ export function setOrientation(cm, _notationOrientation = '', _facsimileOrientat
       if (showFacsimile) {
         facsimileContainer.style.display = 'flex';
         facsimileContainer.style.height =
-          parseFloat(notationDiv.style.height) * facsimileProportion - facsimileResizerWidth / 2;
-        verovioContainer.style.height =
-          parseFloat(notationDiv.style.height) * (1 - facsimileProportion) - facsimileResizerWidth / 2;
+          parseFloat(notationDiv.style.height) * facsimileProportion - facsimileResizerWidth - 2 * notationBorderWidth;
+        verovioContainer.style.height = parseFloat(notationDiv.style.height) * (1 - facsimileProportion);
       } else {
         facsimileContainer.style.display = 'none';
         facsimileContainer.style.height = '';
@@ -129,9 +133,8 @@ export function setOrientation(cm, _notationOrientation = '', _facsimileOrientat
       if (showFacsimile) {
         facsimileContainer.style.display = 'flex';
         facsimileContainer.style.width =
-          parseFloat(notationDiv.style.width) * facsimileProportion - facsimileResizerWidth / 2;
-        verovioContainer.style.width =
-          parseFloat(notationDiv.style.width) * (1 - facsimileProportion) - facsimileResizerWidth / 2;
+          parseFloat(notationDiv.style.width) * facsimileProportion - facsimileResizerWidth - 2 * notationBorderWidth;
+        verovioContainer.style.width = parseFloat(notationDiv.style.width) * (1 - facsimileProportion);
       } else {
         facsimileContainer.style.display = 'none';
         facsimileContainer.style.width = '';
@@ -275,20 +278,23 @@ export function addNotationResizerHandlers(v, cm) {
       case 'top':
       case 'bottom':
         notation.style.height = notationProportion * sz.height;
-        cm.setSize(sz.width, sz.height * (1 - notationProportion) - notationResizerWidth - codeCheckerHeight);
+        cm.setSize(
+          sz.width,
+          sz.height * (1 - notationProportion) - notationResizerWidth - 2 * encodingBorderWidth - codeCheckerHeight
+        );
         if (
           document.getElementById('showFacsimilePanel').checked &&
           (facsimileOrientation === 'top' || facsimileOrientation === 'bottom')
         ) {
           verovioContainer.style.height = parseFloat(notation.style.height) * (1 - facsimileProportion);
           facsimileContainer.style.height =
-            parseFloat(notation.style.height) * facsimileProportion - facsimileResizerWidth;
+            parseFloat(notation.style.height) * facsimileProportion - facsimileResizerWidth - 2 * notationBorderWidth;
         }
         break;
       case 'left':
       case 'right':
-        notation.style.width = notationProportion * sz.width;
-        let cmWidth = sz.width * (1 - notationProportion) - notationResizerWidth;
+        notation.style.width = sz.width * notationProportion;
+        let cmWidth = sz.width * (1 - notationProportion) - notationResizerWidth - 2 * encodingBorderWidth;
         let cmHeight = sz.height - codeCheckerHeight;
         console.log('L/R: cmWidth/cmHeight: ' + cmWidth + '/' + cmHeight);
         cm.setSize(cmWidth, cmHeight);
@@ -299,7 +305,7 @@ export function addNotationResizerHandlers(v, cm) {
         ) {
           verovioContainer.style.width = parseFloat(notation.style.width) * (1 - facsimileProportion);
           facsimileContainer.style.width =
-            parseFloat(notation.style.width) * facsimileProportion - facsimileResizerWidth;
+            parseFloat(notation.style.width) * facsimileProportion - facsimileResizerWidth - 2 * notationBorderWidth;
         }
         break;
     }
@@ -366,16 +372,20 @@ export function addFacsimilerResizerHandlers(v, cm) {
     // console.log("Mouse move dx/dy: " + dx + "/" + dy + ', Container: ' + sz.width + '/' + sz.height);
     switch (facsimileOrientation) {
       case 'bottom':
-        facsimileProportion = (facsimileContainerSize - dy) / sz.height;
+        facsimileProportion =
+          (facsimileContainerSize - dy + facsimileResizerWidth + 2 * encodingBorderWidth) / sz.height;
         break;
       case 'left':
-        facsimileProportion = (facsimileContainerSize + dx) / sz.width;
+        facsimileProportion =
+          (facsimileContainerSize + dx + facsimileResizerWidth + 2 * encodingBorderWidth) / sz.width;
         break;
       case 'right':
-        facsimileProportion = (facsimileContainerSize - dx) / sz.width;
+        facsimileProportion =
+          (facsimileContainerSize - dx + facsimileResizerWidth + 2 * encodingBorderWidth) / sz.width;
         break;
       case 'top':
-        facsimileProportion = (facsimileContainerSize + dy) / sz.height;
+        facsimileProportion =
+          (facsimileContainerSize + dy + facsimileResizerWidth + 2 * encodingBorderWidth) / sz.height;
         break;
     }
     // restrict to min/max
@@ -383,13 +393,15 @@ export function addFacsimilerResizerHandlers(v, cm) {
     switch (facsimileOrientation) {
       case 'bottom':
       case 'top':
-        verovioContainer.style.height = sz.height * (1 - facsimileProportion) - facsimileResizerWidth / 2;
-        facsimileContainer.style.height = sz.height * facsimileProportion - facsimileResizerWidth / 2;
+        verovioContainer.style.height = sz.height * (1 - facsimileProportion);
+        facsimileContainer.style.height =
+          sz.height * facsimileProportion - facsimileResizerWidth - 2 * notationBorderWidth;
         break;
       case 'left':
       case 'right':
-        verovioContainer.style.width = sz.width * (1 - facsimileProportion) - facsimileResizerWidth / 2;
-        facsimileContainer.style.width = sz.width * facsimileProportion - facsimileResizerWidth / 2;
+        verovioContainer.style.width = sz.width * (1 - facsimileProportion);
+        facsimileContainer.style.width =
+          sz.width * facsimileProportion - facsimileResizerWidth - 2 * notationBorderWidth;
         break;
     }
 
