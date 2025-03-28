@@ -332,10 +332,11 @@ export function checkAccidGes(v, cm) {
         }
       }
     });
+    console.debug('Found ' + count + ' accid.ges observations.');
     v.finalizeCodeCheckerPanel('All accid.ges attributes seem correct.');
+    v.allowCursorActivity = true;
   }, 0);
 
-  v.allowCursorActivity = true;
 
   /**
    * Search for @accid attributes in measure and store them in
@@ -345,7 +346,7 @@ export function checkAccidGes(v, cm) {
    */
   function getAccidsInMeasure(measure) {
     v.allowCursorActivity = false;
-    v.initCodeCheckerPanel('Checking meter conformance...');
+    v.initCodeCheckerPanel(translator.lang.codeCheckerTitle.text);
 
     let measureAccids = {};
     // list all @accid attributes in measure
@@ -394,7 +395,7 @@ export function checkMeterConformance(v, cm) {
   let ignoreElements = ['mRest', 'multiRest', 'mSpace'];
 
   v.allowCursorActivity = false;
-  v.initCodeCheckerPanel(translator.lang.codeCheckerTitle.text);
+  v.initCodeCheckerPanel('Checking meter conformance...');
 
   let measures = v.xmlDoc.querySelectorAll('measure:not([metcon="false"])');
   measures.forEach((measure) => {
