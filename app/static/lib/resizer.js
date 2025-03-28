@@ -90,6 +90,9 @@ export function setOrientation(cm, _notationOrientation = '', _facsimileOrientat
       sz.width,
       sz.height * (1 - notationProportion) - notationResizerWidth - 2 * notationBorderWidth - codeCheckerHeight
     );
+    if (codeChecker) {
+      codeChecker.style.width = 'unset';
+    }
   }
   if (notationOrientation === 'left' || notationOrientation === 'right') {
     if (showAnnotationPanelCheckbox && showAnnotationPanelCheckbox.checked) {
@@ -102,10 +105,11 @@ export function setOrientation(cm, _notationOrientation = '', _facsimileOrientat
     }
     notationDiv.style.width = Math.floor(sz.width * notationProportion);
     notationDiv.style.height = sz.height;
-    cm.setSize(
-      sz.width * (1 - notationProportion) - notationResizerWidth - 2 * encodingBorderWidth,
-      sz.height - codeCheckerHeight
-    );
+    let cmWidth = sz.width * (1 - notationProportion) - notationResizerWidth - 2 * encodingBorderWidth;
+    cm.setSize(cmWidth, sz.height - codeCheckerHeight);
+    if (codeChecker) {
+      codeChecker.style.width = cmWidth;
+    }
   }
   friendSz.style.width = sz.width;
   friendSz.style.maxWidth = sz.width;
@@ -215,6 +219,7 @@ export function addNotationResizerHandlers(v, cm) {
   const encoding = resizer.nextElementSibling;
   const verovioContainer = document.getElementById('verovioContainer');
   const facsimileContainer = document.getElementById('facsimileContainer');
+  const codeChecker = document.getElementById('codeChecker');
   let x = 0; // x coordinate at mouse down
   let y = 0; // y coordinate at mouse down
   let notationSize = 0;
@@ -298,6 +303,9 @@ export function addNotationResizerHandlers(v, cm) {
         let cmHeight = sz.height - codeCheckerHeight;
         console.log('L/R: cmWidth/cmHeight: ' + cmWidth + '/' + cmHeight);
         cm.setSize(cmWidth, cmHeight);
+        if (codeChecker) {
+          codeChecker.style.width = cmWidth;
+        }
         // set facsimile size
         if (
           document.getElementById('showFacsimilePanel').checked &&
