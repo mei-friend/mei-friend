@@ -20,7 +20,7 @@ const facsimileResizerWidth = defaultFacsimileResizerWidth; // px, compare to cs
 const notationBorderWidth = 3; // px, border width of notation panel, cf. default.css #notation
 const encodingBorderWidth = 3; // px, border width of encoding panel, cf. default.css #encoding
 let codeCheckerHeight = defaultCodeCheckerHeight; // px, height of code checker panel, cf. default.css #codeChecker
-  
+
 // general settings
 const minProportion = 0.05; // mimimum proportion of both notationProportion, facsimileProportion
 const maxProportion = 0.95;
@@ -450,3 +450,50 @@ export function addFacsimilerResizerHandlers(v, cm) {
 
   resizer.addEventListener('mousedown', mouseDownHandler);
 } // addFacsimilerResizerHandlers()
+
+/**
+ * Adds resizer handlers for resizing the code checker panel
+ */
+export function addCodeCheckerResizerHandlers(v, cm) {
+  const resizer = document.getElementById('codeCheckerResizer');
+  const encoding = document.getElementById('encoding');
+  const codeChecker = document.getElementById('codeChecker');
+  let y = 0;
+  let dy = 0;
+
+  // TODO: BUG check when notation top|bottom
+  // TODO: center to mouse click
+
+  const mouseDownHandler = function (e) {
+    codeCheckerHeight = codeChecker.getBoundingClientRect().height;
+    y = e.clientY;
+    dy = 0;
+    document.addEventListener('mousemove', mouseMoveHandler);
+    document.addEventListener('mouseup', mouseUpHandler);
+  }; // mouseDownHandler
+
+  const mouseMoveHandler = function (e) {
+    dy = y - e.clientY;
+    let sz = encoding.getBoundingClientRect();
+    cm.setSize(null, sz.height - codeCheckerHeight - dy);
+    codeChecker.style.height = codeCheckerHeight + dy;
+  }; // mouseMoveHandler
+
+  const mouseUpHandler = function () {
+    codeCheckerHeight += dy;
+    document.removeEventListener('mousemove', mouseMoveHandler);
+    document.removeEventListener('mouseup', mouseUpHandler);
+    if (v) {
+      setOrientation(cm, '', '', v);
+    }
+
+    // TODO: save codeCheckerHeight in local storage
+    // if (storage && storage.supported && codeCheckerHeight !== defaultCodeCheckerHeight) {
+    //   storage.codeCheckerHeight = codeCheckerHeight;
+    // } else {
+    //   storage.
+    // }
+  }; // mouseUpHandler
+
+  resizer.addEventListener('mousedown', mouseDownHandler);
+} // addCodeCheckerResizerHandlers()

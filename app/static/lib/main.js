@@ -1,6 +1,6 @@
 // mei-friend version and date
 export const version = '1.2.4';
-export const versionDate = '20 March 2025'; // use full or 3-character english months, will be translated
+export const versionDate = '31 March 2025'; // use full or 3-character english months, will be translated
 export const splashDate = '17 January 2025'; // date of the splash screen content, same translation rules apply
 
 var vrvWorker;
@@ -42,6 +42,7 @@ export const samp = {
 };
 
 import {
+  addCodeCheckerResizerHandlers,
   addFacsimilerResizerHandlers,
   addNotationResizerHandlers,
   getFacsimileOrientation,
@@ -57,9 +58,9 @@ import {
   addMarkupHandlers,
   clearListItems,
   getSolidIdP,
+  populateSolidTab,
   readListItemsFromXML,
   refreshAnnotationsInNotation,
-  populateSolidTab,
 } from './enrichment-panel.js';
 import { dropHandler, dragEnter, dragOverHandler, dragLeave } from './dragger.js';
 import { openUrl, openUrlCancel } from './open-url.js';
@@ -802,6 +803,8 @@ async function completeInitialLoad() {
   addMarkupHandlers();
   addNotationResizerHandlers(v, cm);
   addFacsimilerResizerHandlers(v, cm);
+  addCodeCheckerResizerHandlers(v, cm);
+
   let doit;
   window.onresize = () => {
     clearTimeout(doit); // wait half a second before re-calculating orientation

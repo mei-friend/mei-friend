@@ -625,12 +625,11 @@ a:active {
 }
 
 #codeChecker {
-  min-height: 14em;
-  max-height: 14em;
+  /* min-height: 14em; */
+  /* max-height: 14em; */
   display: none;
   padding: 2px;
-  overflow-x: auto;
-  overflow-y: scroll;
+  overflow: auto;
   color: var(--textColor);
   background-color: var(--settingsBackgroundColor);
   /* border: 2px solid var(--settingsBackgroundAlternativeColor);
