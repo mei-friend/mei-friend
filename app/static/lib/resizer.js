@@ -6,6 +6,7 @@ import {
   defaultNotationProportion,
   defaultFacsimileProportion,
   defaultFacsimileResizerWidth,
+  defaultCodeCheckerHeight,
 } from './defaults.js';
 
 // notation variables (verovioContainer)
@@ -18,6 +19,8 @@ let facsimileProportion = defaultFacsimileProportion;
 const facsimileResizerWidth = defaultFacsimileResizerWidth; // px, compare to css facsimile-[left/right/top/bottom].css
 const notationBorderWidth = 3; // px, border width of notation panel, cf. default.css #notation
 const encodingBorderWidth = 3; // px, border width of encoding panel, cf. default.css #encoding
+let codeCheckerHeight = defaultCodeCheckerHeight; // px, height of code checker panel, cf. default.css #codeChecker
+  
 // general settings
 const minProportion = 0.05; // mimimum proportion of both notationProportion, facsimileProportion
 const maxProportion = 0.95;
@@ -64,7 +67,13 @@ export function setOrientation(cm, _notationOrientation = '', _facsimileOrientat
   const showAnnotationPanelCheckbox = document.getElementById('showAnnotationPanel');
   const showFacsimile = document.getElementById('showFacsimilePanel').checked;
   const codeChecker = document.getElementById('codeChecker');
-  const codeCheckerHeight = codeChecker.getBoundingClientRect().height;
+  let ccHeight = 0;
+  if (codeChecker && codeChecker.style.display !== 'none') {
+    ccHeight = codeCheckerHeight;
+    document.getElementById('codeCheckerResizer').style.display = 'flex';
+  } else {
+    document.getElementById('codeCheckerResizer').style.display = 'none';
+  }
   let sz = calcSizeOfContainer(); // friendContainer
   // console.log('setOrientation(' + _notationOrientation + ') container size:', sz);
 
@@ -88,7 +97,7 @@ export function setOrientation(cm, _notationOrientation = '', _facsimileOrientat
     notationDiv.style.height = sz.height * notationProportion;
     cm.setSize(
       sz.width,
-      sz.height * (1 - notationProportion) - notationResizerWidth - 2 * notationBorderWidth - codeCheckerHeight
+      sz.height * (1 - notationProportion) - notationResizerWidth - 2 * notationBorderWidth - ccHeight
     );
     if (codeChecker) {
       codeChecker.style.width = 'unset';
@@ -106,7 +115,7 @@ export function setOrientation(cm, _notationOrientation = '', _facsimileOrientat
     notationDiv.style.width = Math.floor(sz.width * notationProportion);
     notationDiv.style.height = sz.height;
     let cmWidth = sz.width * (1 - notationProportion) - notationResizerWidth - 2 * encodingBorderWidth;
-    cm.setSize(cmWidth, sz.height - codeCheckerHeight);
+    cm.setSize(cmWidth, sz.height - ccHeight);
     if (codeChecker) {
       codeChecker.style.width = cmWidth;
     }
@@ -242,7 +251,6 @@ export function addNotationResizerHandlers(v, cm) {
     const dy = e.clientY - y;
     let sz = resizer.parentNode.getBoundingClientRect();
     const codeChecker = document.getElementById('codeChecker');
-    const codeCheckerHeight = codeChecker.getBoundingClientRect().height;
     switch (notationOrientation) {
       case 'top':
         notationProportion = (notationSize + dy) / sz.height;

@@ -659,6 +659,21 @@ a:active {
   stroke: darkgreen;
 }
 
+#codeCheckerResizer {
+  cursor: row-resize;
+  height: 6px;
+}
+
+#codeCheckerResizer svg {
+  min-height: 16px;
+  max-height: 16px;
+}
+
+#codeCheckerCloseButton {
+  position: absolute;
+  right: 10px;
+}
+
 #validation-status {
   z-index: 5;
   position: absolute;

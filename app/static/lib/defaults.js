@@ -1177,4 +1177,5 @@ export const defaultNotationProportion = 0.5;
 export const defaultFacsimileResizerWidth = 8; // px, compare to css facsimile-[left/right/top/bottom].css
 export const defaultFacsimileOrientation = 'bottom'; // notationOrientation of facsimile relative to notation
 export const defaultFacsimileProportion = 0.5;
+export const defaultCodeCheckerHeight = 200; // px, height of code checker panel
 export const annotationPanelExtent = 250; // px, width/height of annotation panel, taken away from width of friendContainer

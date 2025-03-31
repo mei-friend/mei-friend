@@ -2829,6 +2829,7 @@ export default class Viewer {
 
     let closeButton = document.createElement('span');
     closeButton.classList.add('rightButton');
+    closeButton.id = 'codeCheckerCloseButton';
     closeButton.innerHTML = '&times';
     closeButton.addEventListener('click', () => {
       codeChecker.style.display = 'none';

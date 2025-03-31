@@ -64,15 +64,16 @@ import {
 import { dropHandler, dragEnter, dragOverHandler, dragLeave } from './dragger.js';
 import { openUrl, openUrlCancel } from './open-url.js';
 import {
-  createNotationDiv,
-  setBreaksOptions,
-  handleSmartBreaksOption,
   addModifyerKeys,
-  manualCurrentPage,
+  createNotationDiv,
+  createEncodingPanel,
   generateSectionSelect,
+  handleSmartBreaksOption,
+  manualCurrentPage,
+  setBreaksOptions,
   setChoiceOptions,
 } from './control-menu.js';
-import { clock, file, unverified, xCircleFill } from '../css/icons.js';
+import { clock, unverified, xCircleFill } from '../css/icons.js';
 import { keymap } from '../keymaps/default-keymap.js';
 import { setCursorToId, getChangelogUrl } from './utils.js';
 import { getInMeasure, navElsSelector, getElementAtCursor } from './dom-utils.js';
@@ -504,6 +505,7 @@ async function completeInitialLoad() {
   breaksParam = searchParams.get('breaks');
 
   createNotationDiv(document.getElementById('notation'), defaultVerovioOptions.scale);
+  createEncodingPanel();
   addModifyerKeys(document); //
 
   console.log('DOMContentLoaded. Trying now to load Verovio...');
