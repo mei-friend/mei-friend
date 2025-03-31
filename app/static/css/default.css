@@ -633,8 +633,8 @@ a:active {
   overflow-y: scroll;
   color: var(--textColor);
   background-color: var(--settingsBackgroundColor);
-  border: 2px solid var(--settingsBackgroundAlternativeColor);
-  border-radius: 4px;
+  /* border: 2px solid var(--settingsBackgroundAlternativeColor);
+  border-radius: 4px; */
   font-family: monospace;
 }
 
