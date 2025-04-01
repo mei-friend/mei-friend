@@ -253,7 +253,7 @@ export function addNotationResizerHandlers(v, cm) {
     const codeChecker = document.getElementById('codeChecker');
     let ccHeight = 0;
     if (codeChecker && codeChecker.style.display !== 'none') {
-      ccHeight = codeCheckerHeight;
+      ccHeight = codeCheckerHeight + codeCheckerResizerHeight;
       document.getElementById('codeCheckerResizer').style.display = 'flex';
     } else {
       document.getElementById('codeCheckerResizer').style.display = 'none';
@@ -272,24 +272,24 @@ export function addNotationResizerHandlers(v, cm) {
         notationProportion = (notationSize + dx) / sz.width;
         break;
     }
-    console.log(
-      'Mouse move x/y: ' +
-        x +
-        '/' +
-        y +
-        ', dx/dy: ' +
-        dx +
-        '/' +
-        dy +
-        ', Container: ' +
-        sz.width +
-        '/' +
-        sz.height +
-        ', Notationproporion: ' +
-        notationProportion +
-        ', codeCheckerHeight: ' +
-        ccHeight
-    );
+    // console.log(
+    //   'Mouse move x/y: ' +
+    //     x +
+    //     '/' +
+    //     y +
+    //     ', dx/dy: ' +
+    //     dx +
+    //     '/' +
+    //     dy +
+    //     ', Container: ' +
+    //     sz.width +
+    //     '/' +
+    //     sz.height +
+    //     ', Notationproporion: ' +
+    //     notationProportion +
+    //     ', codeCheckerHeight: ' +
+    //     ccHeight
+    // );
     // restrict to min/max
     notationProportion = Math.min(maxProportion, Math.max(minProportion, notationProportion));
     // update relative size of facsimile images, if active
@@ -318,7 +318,7 @@ export function addNotationResizerHandlers(v, cm) {
         notationPanel.style.width = sz.width * notationProportion;
         let cmWidth = sz.width * (1 - notationProportion) - notationResizerWidth - 2 * encodingBorderWidth;
         let cmHeight = sz.height - ccHeight;
-        console.log('L/R: cmWidth/cmHeight: ' + cmWidth + '/' + cmHeight);
+        // console.log('L/R: cmWidth/cmHeight: ' + cmWidth + '/' + cmHeight);
         cm.setSize(cmWidth, cmHeight);
         if (codeChecker) {
           codeChecker.style.width = cmWidth;
@@ -474,10 +474,6 @@ export function addCodeCheckerResizerHandlers(v, cm) {
   let dy = 0;
   let sz;
 
-  // TODO: center to mouse click
-  // TODO: add min/max height
-  // TODO: make initial size to fill space
-
   const mouseDownHandler = function (e) {
     codeCheckerHeight =
       encodingPanel.getBoundingClientRect().height -
@@ -489,42 +485,22 @@ export function addCodeCheckerResizerHandlers(v, cm) {
     sz = encodingPanel.getBoundingClientRect();
     document.addEventListener('mousemove', mouseMoveHandler);
     document.addEventListener('mouseup', mouseUpHandler);
-    console.log('CodeCheckerResizer Mouse down y/dy: ' + y + ', codeCheckerHeight: ' + codeCheckerHeight);
   }; // mouseDownHandler
 
   const mouseMoveHandler = function (e) {
     dy = y - e.clientY;
     let cmHeight = sz.height - codeCheckerHeight - dy - codeCheckerResizerHeight;
     cm.setSize(null, cmHeight);
-    codeChecker.style.height = codeCheckerHeight + dy;
-    console.log(
-      'CodeCheckerResizer Mouse move y/dy: ' +
-        y +
-        '/' +
-        dy +
-        ', cmHeight:' +
-        cmHeight +
-        ', Container: ' +
-        sz.width +
-        '/' +
-        sz.height
-    );
+    codeChecker.style.height = codeCheckerHeight + dy - codeCheckerResizerHeight;
   }; // mouseMoveHandler
 
   const mouseUpHandler = function () {
-    codeCheckerHeight += dy;
+    codeCheckerHeight = codeCheckerHeight + dy;
     document.removeEventListener('mousemove', mouseMoveHandler);
     document.removeEventListener('mouseup', mouseUpHandler);
     if (v) {
       setOrientation(cm, '', '', v);
     }
-
-    // TODO: save codeCheckerHeight in local storage
-    // if (storage && storage.supported && codeCheckerHeight !== defaultCodeCheckerHeight) {
-    //   storage.codeCheckerHeight = codeCheckerHeight;
-    // } else {
-    //   storage.
-    // }
   }; // mouseUpHandler
 
   codeCheckerResizer.addEventListener('mousedown', mouseDownHandler);
