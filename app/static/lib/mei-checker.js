@@ -345,9 +345,6 @@ export function checkAccidGes(v, cm) {
    * @returns {Object} measureAccids
    */
   function getAccidsInMeasure(measure) {
-    v.allowCursorActivity = false;
-    v.initCodeCheckerPanel(translator.lang.codeCheckerTitle.text);
-
     let measureAccids = {};
     // list all @accid attributes in measure
     measure.querySelectorAll('[accid]').forEach((el) => {
