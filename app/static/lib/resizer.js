@@ -475,6 +475,8 @@ export function addCodeCheckerResizerHandlers(v, cm) {
   let sz;
 
   // TODO: center to mouse click
+  // TODO: add min/max height
+  // TODO: make initial size to fill space
 
   const mouseDownHandler = function (e) {
     codeCheckerHeight =
