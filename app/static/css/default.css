@@ -624,21 +624,21 @@ a:active {
   box-sizing: border-box;
 }
 
+.strikethrough {
+  text-decoration: line-through;
+}
+
 #codeChecker {
   /* min-height: 14em; */
   /* max-height: 14em; */
   display: none;
-  padding: 2px;
+  padding-left: 2px;
   overflow: auto;
   color: var(--textColor);
   background-color: var(--settingsBackgroundColor);
   /* border: 2px solid var(--settingsBackgroundAlternativeColor);
   border-radius: 4px; */
   font-family: monospace;
-}
-
-.strikethrough {
-  text-decoration: line-through;
 }
 
 #codeChecker div:nth-child(odd) {

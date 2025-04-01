@@ -19,6 +19,7 @@ let facsimileProportion = defaultFacsimileProportion;
 const facsimileResizerWidth = defaultFacsimileResizerWidth; // px, compare to css facsimile-[left/right/top/bottom].css
 const notationBorderWidth = 3; // px, border width of notation panel, cf. default.css #notation
 const encodingBorderWidth = 3; // px, border width of encoding panel, cf. default.css #encoding
+const codeCheckerResizerHeight = 6; // px, border width of code checker panel, cf. default.css #codeChecker
 let codeCheckerHeight = defaultCodeCheckerHeight; // px, height of code checker panel, cf. default.css #codeChecker
 
 // general settings
@@ -69,7 +70,7 @@ export function setOrientation(cm, _notationOrientation = '', _facsimileOrientat
   const codeChecker = document.getElementById('codeChecker');
   let ccHeight = 0;
   if (codeChecker && codeChecker.style.display !== 'none') {
-    ccHeight = codeCheckerHeight;
+    ccHeight = codeCheckerHeight + codeCheckerResizerHeight;
     document.getElementById('codeCheckerResizer').style.display = 'flex';
   } else {
     document.getElementById('codeCheckerResizer').style.display = 'none';
@@ -223,12 +224,11 @@ export function calcSizeOfContainer() {
  * @param {CodeMirror} cm
  */
 export function addNotationResizerHandlers(v, cm) {
-  const resizer = document.getElementById('dragMe');
-  const notation = resizer.previousElementSibling;
-  const encoding = resizer.nextElementSibling;
+  const notationResizer = document.getElementById('dragMe');
+  const notationPanel = notationResizer.previousElementSibling;
+  const encodingPanel = notationResizer.nextElementSibling;
   const verovioContainer = document.getElementById('verovioContainer');
   const facsimileContainer = document.getElementById('facsimileContainer');
-  const codeChecker = document.getElementById('codeChecker');
   let x = 0; // x coordinate at mouse down
   let y = 0; // y coordinate at mouse down
   let notationSize = 0;
@@ -237,9 +237,9 @@ export function addNotationResizerHandlers(v, cm) {
     x = e.clientX;
     y = e.clientY;
     if (notationOrientation === 'top' || notationOrientation === 'bottom') {
-      notationSize = notation.getBoundingClientRect().height;
+      notationSize = notationPanel.getBoundingClientRect().height;
     } else if (notationOrientation === 'left' || notationOrientation === 'right') {
-      notationSize = notation.getBoundingClientRect().width;
+      notationSize = notationPanel.getBoundingClientRect().width;
     }
     document.addEventListener('mousemove', mouseMoveHandler);
     document.addEventListener('mouseup', mouseUpHandler);
@@ -249,8 +249,15 @@ export function addNotationResizerHandlers(v, cm) {
   const mouseMoveHandler = function (e) {
     const dx = e.clientX - x;
     const dy = e.clientY - y;
-    let sz = resizer.parentNode.getBoundingClientRect();
+    let sz = notationResizer.parentNode.getBoundingClientRect();
     const codeChecker = document.getElementById('codeChecker');
+    let ccHeight = 0;
+    if (codeChecker && codeChecker.style.display !== 'none') {
+      ccHeight = codeCheckerHeight;
+      document.getElementById('codeCheckerResizer').style.display = 'flex';
+    } else {
+      document.getElementById('codeCheckerResizer').style.display = 'none';
+    }
     switch (notationOrientation) {
       case 'top':
         notationProportion = (notationSize + dy) / sz.height;
@@ -281,7 +288,7 @@ export function addNotationResizerHandlers(v, cm) {
         ', Notationproporion: ' +
         notationProportion +
         ', codeCheckerHeight: ' +
-        codeCheckerHeight
+        ccHeight
     );
     // restrict to min/max
     notationProportion = Math.min(maxProportion, Math.max(minProportion, notationProportion));
@@ -290,25 +297,27 @@ export function addNotationResizerHandlers(v, cm) {
     switch (notationOrientation) {
       case 'top':
       case 'bottom':
-        notation.style.height = notationProportion * sz.height;
+        notationPanel.style.height = notationProportion * sz.height;
         cm.setSize(
           sz.width,
-          sz.height * (1 - notationProportion) - notationResizerWidth - 2 * encodingBorderWidth - codeCheckerHeight
+          sz.height * (1 - notationProportion) - notationResizerWidth - 2 * encodingBorderWidth - ccHeight
         );
         if (
           document.getElementById('showFacsimilePanel').checked &&
           (facsimileOrientation === 'top' || facsimileOrientation === 'bottom')
         ) {
-          verovioContainer.style.height = parseFloat(notation.style.height) * (1 - facsimileProportion);
+          verovioContainer.style.height = parseFloat(notationPanel.style.height) * (1 - facsimileProportion);
           facsimileContainer.style.height =
-            parseFloat(notation.style.height) * facsimileProportion - facsimileResizerWidth - 2 * notationBorderWidth;
+            parseFloat(notationPanel.style.height) * facsimileProportion -
+            facsimileResizerWidth -
+            2 * notationBorderWidth;
         }
         break;
       case 'left':
       case 'right':
-        notation.style.width = sz.width * notationProportion;
+        notationPanel.style.width = sz.width * notationProportion;
         let cmWidth = sz.width * (1 - notationProportion) - notationResizerWidth - 2 * encodingBorderWidth;
-        let cmHeight = sz.height - codeCheckerHeight;
+        let cmHeight = sz.height - ccHeight;
         console.log('L/R: cmWidth/cmHeight: ' + cmWidth + '/' + cmHeight);
         cm.setSize(cmWidth, cmHeight);
         if (codeChecker) {
@@ -319,29 +328,31 @@ export function addNotationResizerHandlers(v, cm) {
           document.getElementById('showFacsimilePanel').checked &&
           (facsimileOrientation === 'left' || facsimileOrientation === 'right')
         ) {
-          verovioContainer.style.width = parseFloat(notation.style.width) * (1 - facsimileProportion);
+          verovioContainer.style.width = parseFloat(notationPanel.style.width) * (1 - facsimileProportion);
           facsimileContainer.style.width =
-            parseFloat(notation.style.width) * facsimileProportion - facsimileResizerWidth - 2 * notationBorderWidth;
+            parseFloat(notationPanel.style.width) * facsimileProportion -
+            facsimileResizerWidth -
+            2 * notationBorderWidth;
         }
         break;
     }
     // console.log('notation w/h: ' + notation.style.width + '/' + notation.style.height)
     const cursor = notationOrientation === 'left' || notationOrientation === 'right' ? 'col-resize' : 'row-resize';
-    resizer.style.cursor = cursor;
+    notationResizer.style.cursor = cursor;
     document.body.style.cursor = cursor;
-    notation.style.userSelect = 'none';
-    notation.style.pointerEvents = 'none';
-    encoding.style.userSelect = 'none';
-    encoding.style.pointerEvents = 'none';
+    notationPanel.style.userSelect = 'none';
+    notationPanel.style.pointerEvents = 'none';
+    encodingPanel.style.userSelect = 'none';
+    encodingPanel.style.pointerEvents = 'none';
   }; // mouseMoveHandler
 
   const mouseUpHandler = function () {
-    resizer.style.removeProperty('cursor');
+    notationResizer.style.removeProperty('cursor');
     document.body.style.removeProperty('cursor');
-    notation.style.removeProperty('user-select');
-    notation.style.removeProperty('pointer-events');
-    encoding.style.removeProperty('user-select');
-    encoding.style.removeProperty('pointer-events');
+    notationPanel.style.removeProperty('user-select');
+    notationPanel.style.removeProperty('pointer-events');
+    encodingPanel.style.removeProperty('user-select');
+    encodingPanel.style.removeProperty('pointer-events');
     document.removeEventListener('mousemove', mouseMoveHandler);
     document.removeEventListener('mouseup', mouseUpHandler);
     if (v) {
@@ -353,7 +364,7 @@ export function addNotationResizerHandlers(v, cm) {
     }
   }; // mouseUpHandler
 
-  resizer.addEventListener('mousedown', mouseDownHandler);
+  notationResizer.addEventListener('mousedown', mouseDownHandler);
 } // addNotationResizerHandlers()
 
 /**
@@ -455,28 +466,43 @@ export function addFacsimilerResizerHandlers(v, cm) {
  * Adds resizer handlers for resizing the code checker panel
  */
 export function addCodeCheckerResizerHandlers(v, cm) {
-  const resizer = document.getElementById('codeCheckerResizer');
-  const encoding = document.getElementById('encoding');
+  const codeCheckerResizer = document.getElementById('codeCheckerResizer');
+  const encodingPanel = document.getElementById('encoding');
   const codeChecker = document.getElementById('codeChecker');
   let y = 0;
   let dy = 0;
+  let sz;
 
-  // TODO: BUG check when notation top|bottom
   // TODO: center to mouse click
 
   const mouseDownHandler = function (e) {
+    // TODO: wrong value when codeChecker panel smaller than codeCheckerHeight
     codeCheckerHeight = codeChecker.getBoundingClientRect().height;
     y = e.clientY;
     dy = 0;
+    sz = encodingPanel.getBoundingClientRect();
     document.addEventListener('mousemove', mouseMoveHandler);
     document.addEventListener('mouseup', mouseUpHandler);
+    console.log('CodeCheckerResizer Mouse down y/dy: ' + y + ', codeCheckerHeight: ' + codeCheckerHeight);
   }; // mouseDownHandler
 
   const mouseMoveHandler = function (e) {
     dy = y - e.clientY;
-    let sz = encoding.getBoundingClientRect();
-    cm.setSize(null, sz.height - codeCheckerHeight - dy);
+    let cmHeight = sz.height - codeCheckerHeight - dy - codeCheckerResizerHeight;
+    cm.setSize(null, cmHeight);
     codeChecker.style.height = codeCheckerHeight + dy;
+    console.log(
+      'CodeCheckerResizer Mouse move y/dy: ' +
+        y +
+        '/' +
+        dy +
+        ', cmHeight:' +
+        cmHeight +
+        ', Container: ' +
+        sz.width +
+        '/' +
+        sz.height
+    );
   }; // mouseMoveHandler
 
   const mouseUpHandler = function () {
@@ -495,5 +521,5 @@ export function addCodeCheckerResizerHandlers(v, cm) {
     // }
   }; // mouseUpHandler
 
-  resizer.addEventListener('mousedown', mouseDownHandler);
+  codeCheckerResizer.addEventListener('mousedown', mouseDownHandler);
 } // addCodeCheckerResizerHandlers()
