@@ -26,6 +26,7 @@ import { startMidiTimeout } from './midi-player.js';
 import { getNotationProportion, setNotationProportion, setOrientation } from './resizer.js';
 import {
   commonSchemas,
+  defaultCodeCheckerHeight,
   codeMirrorSettingsOptions,
   defaultNotationProportion,
   defaultSpeedMode,
@@ -2824,6 +2825,7 @@ export default class Viewer {
     let codeChecker = document.getElementById('codeChecker');
     if (!codeChecker) return;
     codeChecker.innerHTML = '';
+    codeChecker.style.height = defaultCodeCheckerHeight + 'px';
     codeChecker.style.display = 'block';
     setOrientation(cm, '', '', this);
 
