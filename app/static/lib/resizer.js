@@ -469,6 +469,7 @@ export function addCodeCheckerResizerHandlers(v, cm) {
   const codeCheckerResizer = document.getElementById('codeCheckerResizer');
   const encodingPanel = document.getElementById('encoding');
   const codeChecker = document.getElementById('codeChecker');
+  const codeMirror = document.querySelector('.CodeMirror');
   let y = 0;
   let dy = 0;
   let sz;
@@ -476,8 +477,11 @@ export function addCodeCheckerResizerHandlers(v, cm) {
   // TODO: center to mouse click
 
   const mouseDownHandler = function (e) {
-    // TODO: wrong value when codeChecker panel smaller than codeCheckerHeight
-    codeCheckerHeight = codeChecker.getBoundingClientRect().height;
+    codeCheckerHeight =
+      encodingPanel.getBoundingClientRect().height -
+      codeMirror.getBoundingClientRect().height -
+      codeCheckerResizerHeight;
+
     y = e.clientY;
     dy = 0;
     sz = encodingPanel.getBoundingClientRect();
