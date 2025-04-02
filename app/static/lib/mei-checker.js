@@ -42,9 +42,13 @@ export function checkAccidGes(v, cm) {
   let list = v.xmlDoc.querySelectorAll('[key\\.sig],keySig,measure,note');
   let i = 0;
   setProgressBar(0);
-  document.getElementById('statusBar').innerHTML =
-    'Checking accid.ges... 0 of ' + list.length + ' measures checked.';
-    
+  document.getElementById('statusBar').innerHTML = 'Checking accid.ges... 0 of ' + list.length + ' measures checked.';
+
+  /**
+   * Iterate through all elements in the list and check for
+   * accid.ges and accid attributes. Recursively call this function
+   * until all elements have been processed, with setTimeout() for GUI updates.
+   */
   function processAccidGes() {
     let element = list[i];
     if (i < list.length) {
@@ -417,6 +421,13 @@ export function checkMeterConformance(v, cm) {
   document.getElementById('statusBar').innerHTML =
     'Checking meter conformance... 0 of ' + measures.length + ' measures checked.';
   let n = 0;
+
+  /**
+   * Iterate through all measures and check for
+   * duration of elements in the measure.
+   * Recursively call this function until all measures have been processed,
+   * with setTimeout() for GUI updates.
+   */
   function processMeasure() {
     if (n < measures.length) {
       let measure = measures[n];
