@@ -1830,7 +1830,7 @@ export let cmd = {
   addBeam: () => e.addBeamElement(v, cm),
   addBeamSpan: () => e.addBeamSpan(v, cm),
   correctAccid: () => checker.checkAccidGes(v, cm),
-  checkMeterConformance: () => checker.checkMeterConformance(v, cm),
+  checkMeterConformance: () => setTimeout(() => checker.checkMeterConformance(v, cm), 10),
   renumberMeasuresTest: () => e.renumberMeasures(v, cm, false),
   renumberMeasures: () => e.renumberMeasures(v, cm, true),
   reRenderMei: () => v.reRenderMei(cm, false),

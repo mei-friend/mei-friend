@@ -1,7 +1,7 @@
 import * as defaults from './defaults.js';
 import * as dutils from './dom-utils.js';
 import * as editor from './editor.js';
-import { translator } from './main.js';
+import { setProgressBar, translator } from './main.js';
 import * as speed from './speed.js';
 import * as utils from './utils.js';
 
@@ -18,29 +18,40 @@ export function checkAccidGes(v, cm) {
   v.initCodeCheckerPanel(translator.lang.codeCheckerTitle.text);
 
   let d = true; // send debug info to console
-  setTimeout(() => {
-    v.loadXml(cm.getValue(), true); // force reload DOM
 
-    // define default key signatures per staff
-    let noStaves = v.xmlDoc.querySelector('scoreDef').querySelectorAll('staffDef').length;
-    let keySignatures = Array(noStaves).fill('0');
-    if (d) console.debug('correctAccidGes. ' + noStaves + ' staves defined.');
+  v.loadXml(cm.getValue(), true); // force reload DOM
 
-    // list all ties to handle those separately
-    let ties = {};
-    v.xmlDoc.querySelectorAll('tie').forEach((t) => {
-      let startId = utils.rmHash(t.getAttribute('startid')) || '';
-      let endId = utils.rmHash(t.getAttribute('endid')) || '';
-      if (endId) {
-        if (!startId) console.log('Tie ' + t.getAttribute('xml:id') + ' without startId. ');
-        else ties[endId] = startId;
-      }
-    });
+  // define default key signatures per staff
+  let noStaves = v.xmlDoc.querySelector('scoreDef').querySelectorAll('staffDef').length;
+  let keySignatures = Array(noStaves).fill('0');
+  if (d) console.debug('correctAccidGes. ' + noStaves + ' staves defined.');
 
-    let count = 0;
-    let measureAccids = {}; // accidentals within a measure[staff][oct][pname]
-    let list = v.xmlDoc.querySelectorAll('[key\\.sig],keySig,measure,note');
-    list.forEach((element) => {
+  // list all ties to handle those separately
+  let ties = {};
+  v.xmlDoc.querySelectorAll('tie').forEach((t) => {
+    let startId = utils.rmHash(t.getAttribute('startid')) || '';
+    let endId = utils.rmHash(t.getAttribute('endid')) || '';
+    if (endId) {
+      if (!startId) console.log('Tie ' + t.getAttribute('xml:id') + ' without startId. ');
+      else ties[endId] = startId;
+    }
+  });
+
+  let count = 0;
+  let measureAccids = {}; // accidentals within a measure[staff][oct][pname]
+  let list = v.xmlDoc.querySelectorAll('[key\\.sig],keySig,measure,note');
+  let i = 0;
+  setProgressBar(0);
+  document.getElementById('statusBar').innerHTML =
+    'Checking accid.ges... 0 of ' + list.length + ' measures checked.';
+    
+  function processAccidGes() {
+    let element = list[i];
+    if (i < list.length) {
+      setProgressBar((100 * i) / list.length);
+      document.getElementById('statusBar').innerHTML =
+        'Checking accid.ges... ' + i + ' of ' + list.length + ' measures checked.';
+
       if (element.nodeName === 'scoreDef' && element.hasAttribute('key.sig')) {
         // key.sig inside scoreDef: write @sig to all staves
         const value = element.getAttribute('key.sig');
@@ -332,11 +343,18 @@ export function checkAccidGes(v, cm) {
           if (d) console.debug(data.html);
         }
       }
-    });
-    console.debug('Found ' + count + ' accid.ges observations.');
-    v.finalizeCodeCheckerPanel('All accid.ges attributes seem correct.');
-    v.allowCursorActivity = true;
-  }, 0);
+      i++;
+      setTimeout(processAccidGes, 0);
+    } else {
+      console.debug('Found ' + count + ' accid.ges observations.');
+      setProgressBar(100);
+      document.getElementById('statusBar').innerHTML =
+        'Accidental conformance: ' + count + ' accid.ges observations found.';
+      v.finalizeCodeCheckerPanel('All accid.ges attributes seem correct.');
+      v.allowCursorActivity = true;
+    }
+  } // processAccidGes()
+  processAccidGes();
 
   /**
    * Search for @accid attributes in measure and store them in
@@ -395,68 +413,86 @@ export function checkMeterConformance(v, cm) {
   v.initCodeCheckerPanel('Checking meter conformance...');
 
   let measures = v.xmlDoc.querySelectorAll('measure:not([metcon="false"])');
-  measures.forEach((measure) => {
-    // iterate through all staves in the measure
-    measure.querySelectorAll('staff').forEach((staff) => {
-      let duration = 0;
-      let meter = speed.getMeterForElement(v.xmlDoc, staff);
-      let conformance = false;
-      // iterate through all layers in the staff
-      staff.querySelectorAll('layer').forEach((layer) => {
-        let layerDuration = 0;
-        let durationElements = Array.from(layer.querySelectorAll(elementsWithDuration.join(',')));
-        dutils.filterChildren(durationElements, elementsWithDuration);
-        durationElements.forEach((element) => {
-          if (element.nodeName === 'fTrem') {
-            let ftremDuration = 0;
-            let frtremChildren = Array.from(element.querySelectorAll(elementsWithDuration.join(',')));
-            dutils.filterChildren(frtremChildren, elementsWithDuration);
-            frtremChildren.forEach((e) => {
-              ftremDuration += speed.getDurationOfElement(e, utils.parseMeterNumber(meter.unit));
-            });
-            layerDuration += ftremDuration / 2;
-          } else {
-            layerDuration += speed.getDurationOfElement(element, utils.parseMeterNumber(meter.unit));
+  setProgressBar(0);
+  document.getElementById('statusBar').innerHTML =
+    'Checking meter conformance... 0 of ' + measures.length + ' measures checked.';
+  let n = 0;
+  function processMeasure() {
+    if (n < measures.length) {
+      let measure = measures[n];
+      setProgressBar((100 * n) / measures.length);
+      document.getElementById('statusBar').innerHTML =
+        'Checking meter conformance... ' + n + ' of ' + measures.length + ' measures checked.';
+      // iterate through all staves in the measure
+      measure.querySelectorAll('staff').forEach((staff) => {
+        let duration = 0;
+        let meter = speed.getMeterForElement(v.xmlDoc, staff);
+        let conformance = false;
+        // iterate through all layers in the staff
+        staff.querySelectorAll('layer').forEach((layer) => {
+          let layerDuration = 0;
+          let durationElements = Array.from(layer.querySelectorAll(elementsWithDuration.join(',')));
+          dutils.filterChildren(durationElements, elementsWithDuration);
+          durationElements.forEach((element) => {
+            if (element.nodeName === 'fTrem') {
+              let ftremDuration = 0;
+              let frtremChildren = Array.from(element.querySelectorAll(elementsWithDuration.join(',')));
+              dutils.filterChildren(frtremChildren, elementsWithDuration);
+              frtremChildren.forEach((e) => {
+                ftremDuration += speed.getDurationOfElement(e, utils.parseMeterNumber(meter.unit));
+              });
+              layerDuration += ftremDuration / 2;
+            } else {
+              layerDuration += speed.getDurationOfElement(element, utils.parseMeterNumber(meter.unit));
+            }
+          });
+          if (layerDuration > duration) {
+            duration = layerDuration;
           }
+          // for each fTrem element, divide the duration by 2
+          // layer.querySelectorAll('fTrem').forEach(() => (duration = duration / 2));
         });
-        if (layerDuration > duration) {
-          duration = layerDuration;
+        let ignore = false;
+        staff.querySelectorAll(ignoreElements.join(',')).forEach(() => (ignore = true));
+        if (
+          utils.compareNumbersWithTolerance(duration, utils.parseMeterNumber(meter.count), defaults.beatTolerance) ||
+          ignore
+        ) {
+          conformance = true;
+        } else {
+          // display non conformance message as entry in code checker panel
+          let data = {};
+          data.xmlId = staff.getAttribute('xml:id') || ''; // click to jump to element
+          data.html =
+            'Measure ' +
+            (measure.getAttribute('n') || '') +
+            ' Staff ' +
+            (staff.getAttribute('n') || '') +
+            ' has a duration of ' +
+            duration +
+            ' instead of ' +
+            utils.parseMeterNumber(meter.count) +
+            '. ';
+          data.correct = () => {
+            v.allowCursorActivity = false;
+            measure.setAttribute('metcon', 'false');
+            editor.replaceInEditor(cm, measure, false);
+            v.allowCursorActivity = true;
+          };
+          v.addCodeCheckerEntry(data);
+          console.debug(data.html);
         }
-        // for each fTrem element, divide the duration by 2
-        // layer.querySelectorAll('fTrem').forEach(() => (duration = duration / 2));
       });
-      let ignore = false;
-      staff.querySelectorAll(ignoreElements.join(',')).forEach(() => (ignore = true));
-      if (utils.compareNumbersWithTolerance(duration, utils.parseMeterNumber(meter.count), defaults.beatTolerance) || ignore) {
-        conformance = true;
-      } else {
-        // display non conformance message as entry in code checker panel
-        let data = {};
-        data.xmlId = staff.getAttribute('xml:id') || ''; // click to jump to element
-        data.html =
-          'Measure ' +
-          (measure.getAttribute('n') || '') +
-          ' Staff ' +
-          (staff.getAttribute('n') || '') +
-          ' has a duration of ' +
-          duration +
-          ' instead of ' +
-          utils.parseMeterNumber(meter.count) +
-          '. ';
-        data.correct = () => {
-          v.allowCursorActivity = false;
-          measure.setAttribute('metcon', 'false');
-          editor.replaceInEditor(cm, measure, false);
-          v.allowCursorActivity = true;
-        };
-        v.addCodeCheckerEntry(data);
-        console.debug(data.html);
-      }
-    });
-  });
-
-  v.finalizeCodeCheckerPanel('All measures conform to their time signatures.');
-  v.allowCursorActivity = true;
+      n++;
+      setTimeout(processMeasure, 0);
+    } else {
+      setProgressBar(100);
+      document.getElementById('statusBar').innerHTML = 'Meter conformance: ' + n + ' measures checked.';
+      v.finalizeCodeCheckerPanel('All measures conform to their time signatures.');
+      v.allowCursorActivity = true;
+    }
+  } // processMeasure()
+  processMeasure();
 } // checkMeterConformance()
 
 /**
