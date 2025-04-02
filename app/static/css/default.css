@@ -629,15 +629,12 @@ a:active {
 }
 
 #codeChecker {
-  /* min-height: 14em; */
-  /* max-height: 14em; */
   display: none;
+  flex-direction: column;
   padding-left: 2px;
-  overflow: auto;
+  overflow-y: auto;
   color: var(--textColor);
   background-color: var(--settingsBackgroundColor);
-  /* border: 2px solid var(--settingsBackgroundAlternativeColor);
-  border-radius: 4px; */
   font-family: monospace;
 }
 
@@ -650,6 +647,8 @@ a:active {
   border-color: var(--dropdownBorderColor) !important;
   padding-left: 2px;
   padding-right: 2px;
+  min-width: fit-content;
+  margin-left: 2px; /* Add spacing between buttons */
 }
 
 #codeChecker svg {
@@ -671,6 +670,20 @@ a:active {
 #codeCheckerCloseButton {
   position: absolute;
   right: 10px;
+}
+
+#codeCheckerInfoTotal {
+  margin-right: 35px;
+}
+
+.codeCheckerMessage {
+  flex: 1; /* Fills the remaining space */
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  padding-right: 10px; /* Add spacing between the message and the button */
+  cursor: default;
+  position: relative;
 }
 
 #validation-status {

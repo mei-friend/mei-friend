@@ -2827,7 +2827,7 @@ export default class Viewer {
     if (!codeChecker) return;
     codeChecker.innerHTML = '';
     codeChecker.style.height = codeCheckerHeight + 'px';
-    codeChecker.style.display = 'block';
+    codeChecker.style.display = 'flex';
     setOrientation(cm, '', '', this);
 
     let closeButton = document.createElement('span');
@@ -2843,8 +2843,13 @@ export default class Viewer {
     let headerDiv = document.createElement('div');
     headerDiv.classList.add('validation-title');
     headerDiv.id = 'codeCheckerTitle';
-    headerDiv.innerHTML = title;
     codeChecker.appendChild(headerDiv);
+
+    let titleSpan = document.createElement('span');
+    titleSpan.innerHTML = title;
+    titleSpan.title = title;
+    titleSpan.classList.add('codeCheckerMessage');
+    headerDiv.appendChild(titleSpan);
 
     // Correct/Fix all
     let correctAllButton = document.createElement('button');
@@ -2919,7 +2924,8 @@ export default class Viewer {
     let span = document.createElement('span');
     span.classList.add('codeCheckerMessage');
     span.innerHTML = data.html;
-    span.addEventListener('click', (ev) => {
+    span.title = data.html;
+    span.addEventListener('click', () => {
       utils.setCursorToId(cm, data.xmlId);
       cm.focus();
     });
