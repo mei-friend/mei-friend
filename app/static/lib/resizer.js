@@ -20,7 +20,7 @@ const facsimileResizerWidth = defaultFacsimileResizerWidth; // px, compare to cs
 const notationBorderWidth = 3; // px, border width of notation panel, cf. default.css #notation
 const encodingBorderWidth = 3; // px, border width of encoding panel, cf. default.css #encoding
 const codeCheckerResizerHeight = 6; // px, border width of code checker panel, cf. default.css #codeChecker
-let codeCheckerHeight = defaultCodeCheckerHeight; // px, height of code checker panel, cf. default.css #codeChecker
+export let codeCheckerHeight = defaultCodeCheckerHeight; // px, height of code checker panel, cf. default.css #codeChecker
 
 // general settings
 const minProportion = 0.05; // mimimum proportion of both notationProportion, facsimileProportion

@@ -7,6 +7,7 @@ import * as utils from './utils.js';
 import { getControlMenuState, showPdfButtons, setControlMenuState, setCheckbox } from './control-menu.js';
 import { alert, download, info, success, verified, unverified, xCircleFill } from '../css/icons.js';
 import * as facs from './facsimile.js';
+import { codeCheckerHeight } from './resizer.js';
 //  drawFacsimile, highlightZone, zoomFacsimile
 import {
   cm,
@@ -1616,11 +1617,11 @@ export default class Viewer {
   } // addMeiFriendOptionsToSettingsPanel()
 
   /**
-   * 
+   *
    * @param {string} elementName (such as 'supplied', 'unclear', 'sic', 'corr', 'orig', 'reg', 'add', 'del')
    * @param {boolean} checkedMarkup whether the markup is shown in notation
    * @param {string} colorValue the color value to set (e.g. #e69500)
-   * @param {boolean} setDefault 
+   * @param {boolean} setDefault
    */
   setHighlightColorProperty(elementName, checkedMarkup, colorValue, setDefault = false) {
     let rt = document.querySelector(':root');
@@ -2825,7 +2826,7 @@ export default class Viewer {
     let codeChecker = document.getElementById('codeChecker');
     if (!codeChecker) return;
     codeChecker.innerHTML = '';
-    codeChecker.style.height = defaultCodeCheckerHeight + 'px';
+    codeChecker.style.height = codeCheckerHeight + 'px';
     codeChecker.style.display = 'block';
     setOrientation(cm, '', '', this);
 
