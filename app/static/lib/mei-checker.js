@@ -39,8 +39,11 @@ export function checkAccidGes(v, cm) {
 
   let count = 0;
   let measureAccids = {}; // accidentals within a measure[staff][oct][pname]
-  let list = v.xmlDoc.querySelectorAll('[key\\.sig],keySig,measure,note');
+  const list = v.xmlDoc.querySelectorAll('[key\\.sig],keySig,measure,note');
   let i = 0;
+  const increment = list.length / 100;
+  let step = increment;
+
   setProgressBar(0);
   document.getElementById('statusBar').innerHTML = 'Checking accid.ges... 0 of ' + list.length + ' measures checked.';
 
@@ -52,9 +55,12 @@ export function checkAccidGes(v, cm) {
   function processAccidGes() {
     let element = list[i];
     if (i < list.length) {
-      setProgressBar((100 * i) / list.length);
-      document.getElementById('statusBar').innerHTML =
-        'Checking accid.ges... ' + i + ' of ' + list.length + ' measures checked.';
+      if (i > step) {
+        setProgressBar((100 * i) / list.length);
+        document.getElementById('statusBar').innerHTML =
+          'Checking accid.ges... ' + i + ' of ' + list.length + ' measures checked.';
+        step += increment;
+      }
 
       if (element.nodeName === 'scoreDef' && element.hasAttribute('key.sig')) {
         // key.sig inside scoreDef: write @sig to all staves
@@ -421,6 +427,8 @@ export function checkMeterConformance(v, cm) {
   document.getElementById('statusBar').innerHTML =
     'Checking meter conformance... 0 of ' + measures.length + ' measures checked.';
   let n = 0;
+  let increment = measures.length / 100;
+  let step = increment;
 
   /**
    * Iterate through all measures and check for
@@ -431,9 +439,12 @@ export function checkMeterConformance(v, cm) {
   function processMeasure() {
     if (n < measures.length) {
       let measure = measures[n];
-      setProgressBar((100 * n) / measures.length);
-      document.getElementById('statusBar').innerHTML =
-        'Checking meter conformance... ' + n + ' of ' + measures.length + ' measures checked.';
+      if (n > step) {
+        setProgressBar((100 * n) / measures.length);
+        document.getElementById('statusBar').innerHTML =
+          'Checking meter conformance... ' + n + ' of ' + measures.length + ' measures checked.';
+        step += increment;
+      }
       // iterate through all staves in the measure
       measure.querySelectorAll('staff').forEach((staff) => {
         let duration = 0;
