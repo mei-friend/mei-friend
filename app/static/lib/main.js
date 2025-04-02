@@ -260,6 +260,7 @@ export function loadDataInEditor(meiXML, setFreshlyLoaded = true) {
     storage.override = false;
   }
   freshlyLoaded = setFreshlyLoaded;
+  v.hideCodeCheckerPanel();
   v.loadXml(meiXML, true);
   cm.blockChanges = true;
   cm.setValue(meiXML);

@@ -2991,4 +2991,9 @@ export default class Viewer {
       document.getElementById('codeCheckerInfoTotal').innerHTML = document.querySelectorAll('.validation-item')?.length;
     }
   } // finalizeCodeCheckerPanel()
+
+  hideCodeCheckerPanel() {
+    document.getElementById('codeCheckerResizer').style.display = 'none';
+    document.getElementById('codeChecker').style.display = 'none';
+  }
 } // class Viewer
