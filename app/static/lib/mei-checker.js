@@ -1,3 +1,4 @@
+import * as defaults from './defaults.js';
 import * as dutils from './dom-utils.js';
 import * as editor from './editor.js';
 import { translator } from './main.js';
@@ -337,7 +338,6 @@ export function checkAccidGes(v, cm) {
     v.allowCursorActivity = true;
   }, 0);
 
-
   /**
    * Search for @accid attributes in measure and store them in
    * an object measureAccids[staffNumber][oct][pName][tstamp] = accid
@@ -427,7 +427,7 @@ export function checkMeterConformance(v, cm) {
       });
       let ignore = false;
       staff.querySelectorAll(ignoreElements.join(',')).forEach(() => (ignore = true));
-      if (duration === utils.parseMeterNumber(meter.count) || ignore) {
+      if (utils.compareNumbersWithTolerance(duration, utils.parseMeterNumber(meter.count), defaults.beatTolerance) || ignore) {
         conformance = true;
       } else {
         // display non conformance message as entry in code checker panel

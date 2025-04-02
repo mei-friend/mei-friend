@@ -857,3 +857,14 @@ export function getChangelogUrl() {
 export function parseMeterNumber(number) {
   return number.split('+').reduce((a, b) => parseInt(a) + parseInt(b), 0);
 } // parseMeterNumber()
+
+/**
+ * Function to compare two numbers with a tolerance
+ * @param {number} num1
+ * @param {number} num2
+ * @param {number} tolerance
+ * @returns {boolean} true if the numbers are equal within the tolerance  
+ */
+export function compareNumbersWithTolerance(num1, num2, tolerance = 0.001) {
+  return Math.abs(num1 - num2) <= tolerance;
+} // compareNumbersWithTolerance()

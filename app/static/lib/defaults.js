@@ -314,7 +314,7 @@ export const guidelinesBase = 'https://music-encoding.org/guidelines/v5/';
 export const commonSchemas = {
   Basic: {
     '5.0': 'https://music-encoding.org/schema/5.0/mei-basic.rng',
-    '5.1': 'https://music-encoding.org/schema/5.1/mei-basic.rng',
+    5.1: 'https://music-encoding.org/schema/5.1/mei-basic.rng',
   },
   CMN: {
     '2.1.1': 'https://music-encoding.org/schema/2.1.1/mei-CMN.rng',
@@ -322,7 +322,7 @@ export const commonSchemas = {
     '4.0.0': 'https://music-encoding.org/schema/4.0.0/mei-CMN.rng',
     '4.0.1': 'https://music-encoding.org/schema/4.0.1/mei-CMN.rng',
     '5.0': 'https://music-encoding.org/schema/5.0/mei-CMN.rng',
-    '5.1': 'https://music-encoding.org/schema/5.1/mei-CMN.rng',
+    5.1: 'https://music-encoding.org/schema/5.1/mei-CMN.rng',
     // '5.0.0-dev': 'https://music-encoding.org/schema/dev/mei-CMN.rng',
   },
   Mensural: {
@@ -331,7 +331,7 @@ export const commonSchemas = {
     '4.0.0': 'https://music-encoding.org/schema/4.0.0/mei-Mensural.rng',
     '4.0.1': 'https://music-encoding.org/schema/4.0.1/mei-Mensural.rng',
     '5.0': 'https://music-encoding.org/schema/5.0/mei-Mensural.rng',
-    '5.1': 'https://music-encoding.org/schema/5.1/mei-Mensural.rng',
+    5.1: 'https://music-encoding.org/schema/5.1/mei-Mensural.rng',
     // '5.0.0-dev': 'https://music-encoding.org/schema/dev/mei-Mensural.rng',
   },
   Neumes: {
@@ -349,7 +349,7 @@ export const commonSchemas = {
     '4.0.0': 'https://music-encoding.org/schema/4.0.0/mei-all.rng',
     '4.0.1': 'https://music-encoding.org/schema/4.0.1/mei-all.rng',
     '5.0': 'https://music-encoding.org/schema/5.0/mei-all.rng',
-    '5.1': 'https://music-encoding.org/schema/5.1/mei-all.rng',
+    5.1: 'https://music-encoding.org/schema/5.1/mei-all.rng',
     // '5.0.0-dev': 'https://music-encoding.org/schema/dev/mei-all.rng',
   },
   Any: {
@@ -358,7 +358,7 @@ export const commonSchemas = {
     '4.0.0': 'https://music-encoding.org/schema/4.0.0/mei-all_anyStart.rng',
     '4.0.1': 'https://music-encoding.org/schema/4.0.1/mei-all_anyStart.rng',
     '5.0': 'https://music-encoding.org/schema/5.0/mei-all_anyStart.rng',
-    '5.1': 'https://music-encoding.org/schema/5.1/mei-all_anyStart.rng',
+    5.1: 'https://music-encoding.org/schema/5.1/mei-all_anyStart.rng',
     // '5.0.0-dev': 'https://music-encoding.org/schema/dev/mei-all_anyStart.rng',
   },
 };
@@ -1165,6 +1165,9 @@ export const codeMirrorSettingsOptions = {
     default: true,
   },
 };
+
+// for MEI crunching
+export const beatTolerance = 0.000001; // tolerance below which beat numbers are considered equal
 
 // for facsimile
 export const defaultFacsimileRectangleLineWidth = 6; // px facsimile zone bounding box line width
