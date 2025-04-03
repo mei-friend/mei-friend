@@ -369,7 +369,7 @@ export function checkAccidGes(v, cm) {
       document.getElementById('statusBar').innerHTML =
         'Accidental conformance: ' + count + ' accid.ges observations found.';
 
-      v.finalizeCodeCheckerPanel('All accid.ges attributes seem correct.');
+      v.finalizeCodeCheckerPanel(translator.lang.codeCheckerNoAccidMessagesFound.text);
       v.allowCursorActivity = true;
     }
   } // processAccidGes()
@@ -532,7 +532,7 @@ export function checkMeterConformance(v, cm) {
     } else {
       setProgressBar(0);
       document.getElementById('statusBar').innerHTML = 'Meter conformance: ' + n + ' measures checked.';
-      v.finalizeCodeCheckerPanel(translator.lang.codeCheckerMeterConformanceMessage);
+      v.finalizeCodeCheckerPanel(translator.lang.codeCheckerMeterConformanceMessage.text);
       v.allowCursorActivity = true;
     }
   } // processMeasure()

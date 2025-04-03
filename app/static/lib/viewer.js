@@ -2993,10 +2993,10 @@ export default class Viewer {
     codeChecker.appendChild(div);
   } // addCodeCheckerEntry()
 
-  finalizeCodeCheckerPanel() {
+  finalizeCodeCheckerPanel(allGoodString = translator.lang.codeCheckerNoAccidMessagesFound.text) {
     let nothingFound = document.getElementById('codeCheckerCheckingCode');
     if (nothingFound) {
-      nothingFound.innerHTML = translator.lang.codeCheckerNoAccidMessagesFound.text;
+      nothingFound.innerHTML = allGoodString;
     } else {
       document.getElementById('codeCheckerInfoCurrent').innerHTML = 0;
       document.getElementById('codeCheckerInfoOf').innerHTML = '/';
