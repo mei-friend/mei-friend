@@ -776,11 +776,11 @@ export function getTstampForElement(xmlDoc, element) {
  * dur="4" dots="2" in a x/2 meter returns 0.825
  *
  * @param {Element} element
- * @returns {number} duration in beats, or -1 if problems
+ * @returns {number} duration in beats, or NaN if problems
  */
 export function getDurationOfElement(element, meterUnit = 4.0) {
-  let beatDuration = -1;
-  if (element) {
+  let beatDuration = NaN;
+  if (element && meterUnit) {
     if (element.hasAttribute('grace') || element.closest('graceGrp')) {
       let graceValue = element.getAttribute('grace') || element.closest('graceGrp')?.getAttribute('grace');
       if (graceValue && ['acc', 'unacc', 'unknown'].includes(graceValue)) {
