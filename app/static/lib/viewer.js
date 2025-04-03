@@ -3000,7 +3000,8 @@ export default class Viewer {
     } else {
       document.getElementById('codeCheckerInfoCurrent').innerHTML = 0;
       document.getElementById('codeCheckerInfoOf').innerHTML = '/';
-      document.getElementById('codeCheckerInfoTotal').innerHTML = document.querySelectorAll('.validation-item')?.length;
+      // decrement the first empty validation-item
+      document.getElementById('codeCheckerInfoTotal').innerHTML = document.querySelectorAll('.validation-item')?.length - 1;
     }
   } // finalizeCodeCheckerPanel()
 
