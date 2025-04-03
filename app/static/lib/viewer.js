@@ -2830,16 +2830,6 @@ export default class Viewer {
     codeChecker.style.display = 'flex';
     setOrientation(cm, '', '', this);
 
-    let closeButton = document.createElement('span');
-    closeButton.classList.add('rightButton');
-    closeButton.id = 'codeCheckerCloseButton';
-    closeButton.innerHTML = '&times';
-    closeButton.addEventListener('click', () => {
-      codeChecker.style.display = 'none';
-      setOrientation(cm, '', '', this);
-    });
-    codeChecker.appendChild(closeButton);
-
     let headerDiv = document.createElement('div');
     headerDiv.classList.add('validation-title');
     headerDiv.id = 'codeCheckerTitle';
@@ -2895,6 +2885,22 @@ export default class Viewer {
     let infoSpanTotal = document.createElement('span');
     infoSpanTotal.id = 'codeCheckerInfoTotal';
     headerDiv.appendChild(infoSpanTotal);
+
+    let closeButton = document.createElement('span');
+    closeButton.classList.add('rightButton');
+    closeButton.id = 'codeCheckerCloseButton';
+    closeButton.innerHTML = '&times';
+    closeButton.addEventListener('click', () => {
+      codeChecker.style.display = 'none';
+      setOrientation(cm, '', '', this);
+    });
+    headerDiv.appendChild(closeButton);
+
+    // add empty validation-item to show that the panel is open
+    let emptyDiv = document.createElement('div');
+    emptyDiv.classList.add('validation-item');
+    emptyDiv.classList.add('codeCheckerInfoEmpty');
+    codeChecker.appendChild(emptyDiv);
 
     let noMessages = document.createElement('div');
     noMessages.classList.add('validation-item');

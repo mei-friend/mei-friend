@@ -631,15 +631,14 @@ a:active {
 #codeChecker {
   display: none;
   flex-direction: column;
-  padding-left: 2px;
   overflow-y: auto;
   color: var(--textColor);
-  background-color: var(--settingsBackgroundColor);
+  background-color: var(--settingsBackgroundAlternativeColor);
   font-family: monospace;
 }
 
-#codeChecker div:nth-child(odd) {
-  background: var(--settingsBackgroundAlternativeColor);
+#codeChecker div:nth-child(even) {
+  background: var(--settingsBackgroundColor);
 }
 
 #codeChecker button {
@@ -668,8 +667,8 @@ a:active {
 }
 
 #codeCheckerCloseButton {
-  position: absolute;
-  right: 10px;
+  margin-right: 10px;
+  margin-top: .5px;
 }
 
 #codeCheckerInfoTotal {
@@ -684,6 +683,18 @@ a:active {
   padding-right: 10px; /* Add spacing between the message and the button */
   cursor: default;
   position: relative;
+  padding-left: 2px;
+}
+
+#codeCheckerTitle {
+  position: absolute;
+  width: 100%;
+  background-color: var(--navbarBackgroundColor);
+  z-index: 1;
+}
+
+.codeCheckerInfoEmpty {
+  min-height: 2em;
 }
 
 #validation-status {
