@@ -178,6 +178,7 @@ export const lang = {
   decreaseDurText: { text: 'Riduci durata' },
   toggleDotsText: { text: 'Alterna la punteggiatura' },
   cleanAccidText: { text: 'Verificare @accid.ges' },
+  meterConformanceText: { text: 'Verificare @metcon' },
   renumberMeasuresTestText: { text: 'Rinumera misure (test)' },
   renumberMeasuresExecText: { text: 'Rinumera misure (esegui)' },
   addIdsText: { text: 'Aggiungi ids a MEI' },
@@ -1121,8 +1122,11 @@ export const lang = {
   renumberMeasureMeasuresRenumbered: { text: 'misure rinumerate' },
 
   // Code checker panel (accid.ges)
-  codeCheckerTitle: {
+  accidGesCodeCheckerTitle: {
     text: 'Verifica gli attributi @accid.ges (rispetto alla tonalità della chiave, gli accid. per misura e legature).',
+  },
+  metConCodeCheckerTitle: {
+    text: 'Verifica della conformità metrica (almeno un livello per rigo ha un numero di battuta specificato nella misura).',
   },
   codeCheckerFix: { text: 'Correggi' },
   codeCheckerFixAll: { text: 'Correggi tutto' },
@@ -1130,10 +1134,13 @@ export const lang = {
   codeCheckerIgnoreAll: { text: 'Ignora tutto' },
   codeCheckerCheckingCode: { text: 'Verifica del codice in corso...' },
   codeCheckerNoAccidMessagesFound: { text: 'Tutti gli attributi accid.ges sembrano corretti.' },
+  codeCheckerMeterConformanceMessage: { text: 'Tutte le misure rispettano le firme metriche.' },
   codeCheckerMeasure: { text: 'Misura' },
   codeCheckerNote: { text: 'Nota' },
   codeCheckerHasBoth: { text: 'ha entrambi' },
   codeCheckerAnd: { text: 'e' },
+  codeCheckerHasADurationOf: { text: 'ha una durata di' },
+  codeCheckerInsteadOf: { text: 'invece di' },
   codeCheckerRemove: { text: 'Rimuovi' },
   codeCheckerFixTo: { text: 'Correggi a' },
   codeCheckerAdd: { text: 'Aggiungi' },

@@ -27,8 +27,7 @@ function getCoordinateValue(element, axis) {
     els.forEach((item) => {
       values.push(getCoordinateValue(item, axis));
     });
-  }
-  else if (navElsArray.some((el) => elementClasses.includes(el))) {
+  } else if (navElsArray.some((el) => elementClasses.includes(el))) {
     let els = element.querySelectorAll('.notehead > use[' + axis + ']'); // should be one!
     if (els.length === 0) {
       els = element.querySelectorAll('use[' + axis + ']');
@@ -36,8 +35,7 @@ function getCoordinateValue(element, axis) {
     els.forEach((item) => {
       values.push(parseInt(item.getAttribute(axis)));
     });
-  }
-  else if (
+  } else if (
     att.alternativeEncodingElements.some((el) => elementClasses.includes(el)) ||
     att.modelTranscriptionLike.some((el) => elementClasses.includes(el))
   ) {
@@ -249,7 +247,7 @@ export function getY(element) {
  * Returns the DOM element at encoding cursor position
  * @param {CodeMirror} cm
  * @returns {Element}
- * 
+ *
  * TODO: to be moved to a CodeMirrorController.js
  */
 export function getElementAtCursor(cm) {
@@ -443,18 +441,18 @@ export function addNewXmlIdsToDescendants(xmlNode, dicIdChanges) {
 
 /**
  * Checks if the xmlNode has dependen IDs and replaces them with the one found in dicOld2NewIDs
- * @param {*} xmlNode 
- * @param {*} dicOld2NewIDs 
+ * @param {*} xmlNode
+ * @param {*} dicOld2NewIDs
  */
-export function modifyDependenIDs(xmlNode, dicOld2NewIDs){
+export function modifyDependenIDs(xmlNode, dicOld2NewIDs) {
   let currentID = utils.rmHash(xmlNode.getAttribute('endid'));
   if (currentID && dicOld2NewIDs[currentID]) {
-    xmlNode.setAttribute('endid', "#" + dicOld2NewIDs[currentID]);
+    xmlNode.setAttribute('endid', '#' + dicOld2NewIDs[currentID]);
   }
 
   currentID = utils.rmHash(xmlNode.getAttribute('startid'));
   if (currentID && dicOld2NewIDs[currentID]) {
-    xmlNode.setAttribute('startid', "#" + dicOld2NewIDs[currentID]);
+    xmlNode.setAttribute('startid', '#' + dicOld2NewIDs[currentID]);
   }
 
   if (xmlNode.children.length > 0) {
@@ -470,7 +468,7 @@ export function modifyDependenIDs(xmlNode, dicOld2NewIDs){
  * @param {Element} container
  * @param {Element} element
  * @returns {boolean} if scrolled or not
- * 
+ *
  * TODO: to be moved to a ViewerController.js or Viewer.js
  */
 export function scrollTo(container, element) {
@@ -526,3 +524,20 @@ export function addColorToMarkupElements(xmlNode) {
   });
   return xmlNode;
 } // addColorToMarkupElements()
+
+/**
+ * Filter children of array of elements that have a common parent
+ * @param {Element[]} elements (gets modified in function)
+ * @param {string[]} elementTypes
+ * @returns {Element[]} elements
+ */
+export function filterChildren(elements, elementTypes = ['']) {
+  for (let i = 0; i < elements.length; i++) {
+    let children = elements[i].querySelectorAll(elementTypes.join(','));
+    children.forEach((element) => {
+      let i = elements.findIndex((e) => e === element);
+      elements.splice(i, 1);
+    });
+  }
+  return elements;
+} // filterChidren()

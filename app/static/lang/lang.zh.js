@@ -167,6 +167,7 @@ export const lang = {
   decreaseDurText: { text: '减少时值' },
   toggleDotsText: { text: '切换点' },
   cleanAccidText: { text: '检查 @accid.ges' },
+  meterConformanceText: { text: '检查 @metcon' },
   renumberMeasuresTestText: { text: '重编号小节（测试）' },
   renumberMeasuresExecText: { text: '重编号小节（执行）' },
   addIdsText: { text: '为 MEI 添加 id' },
@@ -934,7 +935,7 @@ export const lang = {
   renumberMeasureMeasuresRenumbered: { text: '小节重新编号' },
 
   // Code checker @accid.ges
-  codeCheckerTitle: { text: '检查 @accid.ges 属性（针对调号、小节内音调和连音）。' },
+  accidGesCodeCheckerTitle: { text: '检查 @accid.ges 属性（针对调号、小节内音调和连音）。' },
   codeCheckerFix: { text: '修复' },
   codeCheckerFixAll: { text: '修复所有' },
   codeCheckerIgnore: { text: '忽略' },

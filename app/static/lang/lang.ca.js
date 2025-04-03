@@ -177,6 +177,7 @@ export const lang = {
   decreaseDurText: { text: 'Disminueix durada' },
   toggleDotsText: { text: 'Afegeix un punt' },
   cleanAccidText: { text: 'Verificar @accid.ges' },
+  meterConformanceText: { text: 'Verificar @metcon' },
   renumberMeasuresTestText: { text: 'Reenumera compassos (prova)' },
   renumberMeasuresExecText: { text: 'Reenumera compassos (execució)' },
   addIdsText: { text: 'Afegeix IDs a MEI' },
@@ -1111,8 +1112,11 @@ export const lang = {
   renumberMeasureMeasuresRenumbered: { text: 'compassos reenumerades' },
 
   // Code checker panel (accid.ges)
-  codeCheckerTitle: {
+  accidGesCodeCheckerTitle: {
     text: 'Verifica els atributs @accid.ges (en comparació amb la clau de sol, els accid. per compàs i les lligadures).',
+  },
+  metConCodeCheckerTitle: {
+    text: 'Comprovant conformitat mètrica (almenys una capa per pentagrama té número de pulsació segons la signatura de compàs).',
   },
   codeCheckerFix: { text: 'Corregeix' },
   codeCheckerFixAll: { text: 'Corregir tot' },
@@ -1120,10 +1124,13 @@ export const lang = {
   codeCheckerIgnoreAll: { text: 'Ignora tot' },
   codeCheckerCheckingCode: { text: 'Comprovant codi...' },
   codeCheckerNoAccidMessagesFound: { text: 'Tots els atributs accid.ges semblen correctes.' },
+  codeCheckerMeterConformanceMessage: { text: 'Tots els compassos compleixen amb les seves signatures de compàs.' },
   codeCheckerMeasure: { text: 'compàs' },
   codeCheckerNote: { text: 'Nota' },
   codeCheckerHasBoth: { text: 'té ambdós' },
   codeCheckerAnd: { text: 'i' },
+  codeCheckerHasADurationOf: { text: 'té una durada de' },
+  codeCheckerInsteadOf: { text: 'en lloc de' },
   codeCheckerRemove: { text: 'Suprimeix' },
   codeCheckerFixTo: { text: 'Corregir a' },
   codeCheckerAdd: { text: 'Afegir' },

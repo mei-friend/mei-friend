@@ -544,6 +544,7 @@ a:active {
   overflow: hidden;
   display: flex;
   outline: none;
+  box-sizing: border-box;
 }
 
 #notation:focus-within,
@@ -620,28 +621,24 @@ a:active {
   justify-content: left;
   flex-direction: column;
   position: relative;
-}
-
-#codeChecker {
-  min-height: 14em;
-  max-height: 14em;
-  display: none;
-  padding: 2px;
-  overflow-x: auto;
-  overflow-y: scroll;
-  color: var(--textColor);
-  background-color: var(--settingsBackgroundColor);
-  border: 2px solid var(--settingsBackgroundAlternativeColor);
-  border-radius: 4px;
-  font-family: monospace;
+  box-sizing: border-box;
 }
 
 .strikethrough {
   text-decoration: line-through;
 }
 
-#codeChecker div:nth-child(odd) {
-  background: var(--settingsBackgroundAlternativeColor);
+#codeChecker {
+  display: none;
+  flex-direction: column;
+  overflow-y: auto;
+  color: var(--textColor);
+  background-color: var(--settingsBackgroundAlternativeColor);
+  font-family: monospace;
+}
+
+#codeChecker div:nth-child(even) {
+  background: var(--settingsBackgroundColor);
 }
 
 #codeChecker button {
@@ -649,12 +646,55 @@ a:active {
   border-color: var(--dropdownBorderColor) !important;
   padding-left: 2px;
   padding-right: 2px;
+  min-width: fit-content;
+  margin-left: 2px; /* Add spacing between buttons */
 }
 
 #codeChecker svg {
   width: 16px;
   height: 16px;
   stroke: darkgreen;
+}
+
+#codeCheckerResizer {
+  cursor: row-resize;
+  height: 6px;
+}
+
+#codeCheckerResizer svg {
+  min-height: 16px;
+  max-height: 16px;
+}
+
+#codeCheckerCloseButton {
+  margin-right: 10px;
+  margin-top: .5px;
+}
+
+#codeCheckerInfoTotal {
+  margin-right: 35px;
+}
+
+.codeCheckerMessage {
+  flex: 1; /* Fills the remaining space */
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  padding-right: 10px; /* Add spacing between the message and the button */
+  cursor: default;
+  position: relative;
+  padding-left: 2px;
+}
+
+#codeCheckerTitle {
+  position: absolute;
+  width: 100%;
+  background-color: var(--navbarBackgroundColor);
+  z-index: 1;
+}
+
+.codeCheckerInfoEmpty {
+  min-height: 2em;
 }
 
 #validation-status {
