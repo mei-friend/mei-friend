@@ -519,6 +519,8 @@ export function checkMeterConformance(v, cm) {
             v.allowCursorActivity = false;
             measure.setAttribute('metcon', 'false');
             editor.replaceInEditor(cm, measure, false);
+            utils.setCursorToId(cm, measure.getAttribute('xml:id'));
+            v.loadXml(cm.getValue(), true); // force reload DOM
             v.allowCursorActivity = true;
           };
           v.addCodeCheckerEntry(data);
