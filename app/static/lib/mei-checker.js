@@ -365,7 +365,7 @@ export function checkAccidGes(v, cm) {
     } else {
       console.debug('Found ' + count + ' accid.ges observations.');
 
-      setProgressBar(100);
+      setProgressBar(0);
       document.getElementById('statusBar').innerHTML =
         'Accidental conformance: ' + count + ' accid.ges observations found.';
 
@@ -528,7 +528,7 @@ export function checkMeterConformance(v, cm) {
       n++;
       setTimeout(processMeasure, 0);
     } else {
-      setProgressBar(100);
+      setProgressBar(0);
       document.getElementById('statusBar').innerHTML = 'Meter conformance: ' + n + ' measures checked.';
       v.finalizeCodeCheckerPanel(translator.lang.codeCheckerMeterConformanceMessage);
       v.allowCursorActivity = true;
