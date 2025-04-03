@@ -1,6 +1,6 @@
 // mei-friend version and date
-export const version = '1.2.3';
-export const versionDate = '18 March 2025'; // use full or 3-character english months, will be translated
+export const version = '1.2.4';
+export const versionDate = '3 April 2025'; // use full or 3-character english months, will be translated
 export const splashDate = '17 January 2025'; // date of the splash screen content, same translation rules apply
 
 var vrvWorker;
@@ -42,6 +42,7 @@ export const samp = {
 };
 
 import {
+  addCodeCheckerResizerHandlers,
   addFacsimilerResizerHandlers,
   addNotationResizerHandlers,
   getFacsimileOrientation,
@@ -57,22 +58,23 @@ import {
   addMarkupHandlers,
   clearListItems,
   getSolidIdP,
+  populateSolidTab,
   readListItemsFromXML,
   refreshAnnotationsInNotation,
-  populateSolidTab,
 } from './enrichment-panel.js';
 import { dropHandler, dragEnter, dragOverHandler, dragLeave } from './dragger.js';
 import { openUrl, openUrlCancel } from './open-url.js';
 import {
-  createNotationDiv,
-  setBreaksOptions,
-  handleSmartBreaksOption,
   addModifyerKeys,
-  manualCurrentPage,
+  createNotationDiv,
+  createEncodingPanel,
   generateSectionSelect,
+  handleSmartBreaksOption,
+  manualCurrentPage,
+  setBreaksOptions,
   setChoiceOptions,
 } from './control-menu.js';
-import { clock, file, unverified, xCircleFill } from '../css/icons.js';
+import { clock, unverified, xCircleFill } from '../css/icons.js';
 import { keymap } from '../keymaps/default-keymap.js';
 import { setCursorToId, getChangelogUrl } from './utils.js';
 import { getInMeasure, navElsSelector, getElementAtCursor } from './dom-utils.js';
@@ -258,6 +260,7 @@ export function loadDataInEditor(meiXML, setFreshlyLoaded = true) {
     storage.override = false;
   }
   freshlyLoaded = setFreshlyLoaded;
+  v.hideCodeCheckerPanel();
   v.loadXml(meiXML, true);
   cm.blockChanges = true;
   cm.setValue(meiXML);
@@ -504,6 +507,7 @@ async function completeInitialLoad() {
   breaksParam = searchParams.get('breaks');
 
   createNotationDiv(document.getElementById('notation'), defaultVerovioOptions.scale);
+  createEncodingPanel();
   addModifyerKeys(document); //
 
   console.log('DOMContentLoaded. Trying now to load Verovio...');
@@ -800,6 +804,8 @@ async function completeInitialLoad() {
   addMarkupHandlers();
   addNotationResizerHandlers(v, cm);
   addFacsimilerResizerHandlers(v, cm);
+  addCodeCheckerResizerHandlers(v, cm);
+
   let doit;
   window.onresize = () => {
     clearTimeout(doit); // wait half a second before re-calculating orientation
@@ -1824,6 +1830,7 @@ export let cmd = {
   addBeam: () => e.addBeamElement(v, cm),
   addBeamSpan: () => e.addBeamSpan(v, cm),
   correctAccid: () => checker.checkAccidGes(v, cm),
+  checkMeterConformance: () => setTimeout(() => checker.checkMeterConformance(v, cm), 10),
   renumberMeasuresTest: () => e.renumberMeasures(v, cm, false),
   renumberMeasures: () => e.renumberMeasures(v, cm, true),
   reRenderMei: () => v.reRenderMei(cm, false),
@@ -2157,6 +2164,7 @@ function addEventListeners(v, cm) {
   document.getElementById('toggleDots').addEventListener('click', cmd.toggleDots);
   // Manipulate encoding methods
   document.getElementById('cleanAccid').addEventListener('click', cmd.correctAccid);
+  document.getElementById('meterConformance').addEventListener('click', cmd.checkMeterConformance);
   document.getElementById('renumberMeasuresTest').addEventListener('click', () => e.renumberMeasures(v, cm, false));
   document.getElementById('renumberMeasuresExec').addEventListener('click', () => e.renumberMeasures(v, cm, true));
   // rerender through Verovio

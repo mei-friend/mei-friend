@@ -170,6 +170,7 @@ export const lang = {
   decreaseDurText: { text: 'Smanji trajanje' },
   toggleDotsText: { text: 'Toggle dotting' }, // TODO: translate
   cleanAccidText: { text: 'Proveri @accid.ges' },
+  meterConformanceText: { text: 'Proveri @metcon' },
   renumberMeasuresTestText: { text: ' Renumeriraj mere (test)' },
   renumberMeasuresExecText: { text: ' Renumeriraj mere (izvrši)' },
   addIdsText: { text: 'Dodaj ID-ove MEI' },
@@ -963,7 +964,7 @@ export const lang = {
   renumberMeasureMeasuresRenumbered: { text: 'taktova je renumerisano' },
 
   // Code checker @accid.ges
-  codeCheckerTitle: {
+  accidGesCodeCheckerTitle: {
     text: 'Provera atributa @accid.ges (protiv ključnog tona, akcidentalnog tona u svakom taktu i veza).',
   },
   codeCheckerFix: { text: 'Popravi' },

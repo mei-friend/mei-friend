@@ -160,7 +160,7 @@ export function moveCursorToEndOfMeasure(cm, p = null) {
  * @returns {boolean} success in finding id
  */
 export function setCursorToId(cm, id) {
-  if (id === '') return;
+  if (!id) return;
   let c = cm.getSearchCursor(new RegExp(`(?:['"])` + id + `(?:['"])`));
   if (c.findNext()) {
     cm.setCursor(c.from());
@@ -862,3 +862,26 @@ export function ensureRelativeURL(url) {
     return url;
   }
 } // ensureRelativeURL()
+
+/**
+ * Evaluate meter count or unit from @meter attribute to a number
+ * @param {string} number such as '3' or '3+4+5'
+ * @returns {number | NaN} the sum of the meter count or unit
+ */
+export function parseMeterNumber(number) {
+  if (number) {
+    return number.split('+').reduce((a, b) => parseInt(a) + parseInt(b), 0);
+  }
+  return NaN;
+} // parseMeterNumber()
+
+/**
+ * Function to compare two numbers with a tolerance
+ * @param {number} num1
+ * @param {number} num2
+ * @param {number} tolerance
+ * @returns {boolean} true if the numbers are equal within the tolerance
+ */
+export function compareNumbersWithTolerance(num1, num2, tolerance = 0.001) {
+  return Math.abs(num1 - num2) <= tolerance;
+} // compareNumbersWithTolerance()

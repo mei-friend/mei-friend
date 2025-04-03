@@ -177,6 +177,7 @@ export const lang = {
   decreaseDurText: { text: 'Réduire la durée' },
   toggleDotsText: { text: 'Activar punxat' },
   cleanAccidText: { text: 'Vérifier les @accid.ges' },
+  meterConformanceText: { text: 'Vérifier les @metcon' },
   renumberMeasuresTestText: { text: 'Renommer les mesures (test)' },
   renumberMeasuresExecText: { text: 'Renommer les mesures (exécution)' },
   addIdsText: { text: 'Ajouter des identifiants à MEI' },
@@ -1120,8 +1121,11 @@ export const lang = {
   renumberMeasureMeasuresRenumbered: { text: 'mesures renommées' },
 
   // Code checker panel (accid.ges)
-  codeCheckerTitle: {
+  accidGesCodeCheckerTitle: {
     text: 'Vérifiez les attributs @accid.ges (par rapport à la signature de clé, les accid. par mesure et les liaisons).',
+  },
+  metConCodeCheckerTitle: {
+    text: 'Vérification de la conformité au mètre (au moins une couche par portée doit avoir un numéro de temps correspondant à la signature temporelle).',
   },
   codeCheckerFix: { text: 'Corriger' },
   codeCheckerFixAll: { text: 'Tout corriger' },
@@ -1129,10 +1133,14 @@ export const lang = {
   codeCheckerIgnoreAll: { text: 'Tout ignorer' },
   codeCheckerCheckingCode: { text: 'Vérification du code en cours...' },
   codeCheckerNoAccidMessagesFound: { text: 'Tous les attributs accid.ges semblent corrects.' },
+  codeCheckerMeterConformanceMessage: { text: 'Toutes les mesures sont conformes à leurs signatures temporelles.' },
   codeCheckerMeasure: { text: 'Mesure' },
+  codeCheckerStaff: { text: 'Portée' },
   codeCheckerNote: { text: 'Note' },
   codeCheckerHasBoth: { text: 'possède les deux' },
   codeCheckerAnd: { text: 'et' },
+  codeCheckerHasADurationOf: { text: 'a une durée de' },
+  codeCheckerInsteadOf: { text: 'au lieu de' },
   codeCheckerRemove: { text: 'Retirer' },
   codeCheckerFixTo: { text: 'Corriger à' },
   codeCheckerAdd: { text: 'Ajouter' },
