@@ -174,6 +174,7 @@ export const lang = {
   decreaseDurText: { text: 'Disminuir duración de nota' },
   toggleDotsText: { text: 'Alternar el punteado' },
   cleanAccidText: { text: 'Verificar @accid.ges' },
+  meterConformanceText: { text: 'Verificar @metcon' },
   renumberMeasuresTestText: { text: 'Renumerar compases (prueba)' },
   renumberMeasuresExecText: { text: 'Renumerar compases (ejecutar)' },
   addIdsText: { text: 'Añadir IDs a MEI' },
@@ -1110,7 +1111,7 @@ export const lang = {
   renumberMeasureMeasuresRenumbered: { text: 'compases renumerados' },
 
   // Code checker panel (accid.ges)
-  codeCheckerTitle: {
+  accidGesCodeCheckerTitle: {
     text: 'Verificar los atributos @accid.ges (en relación con la armadura de clave, los accid. por compás y las ligaduras).',
   },
   codeCheckerFix: { text: 'Corregir' },

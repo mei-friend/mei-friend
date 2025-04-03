@@ -171,6 +171,7 @@ export const lang = {
   decreaseDurText: { text: 'Duur verkorten' },
   toggleDotsText: { text: 'Puntjes wisselen' },
   cleanAccidText: { text: 'Controleer @accid.ges' },
+  meterConformanceText: { text: 'Controleer @metcon' },
   renumberMeasuresTestText: { text: 'Herhaal maten (test)' },
   renumberMeasuresExecText: { text: 'Herhaal maten (uitvoeren)' },
   addIdsText: { text: 'Ids toevoegen aan MEI' },
@@ -972,7 +973,7 @@ export const lang = {
   renumberMeasureMeasuresRenumbered: { text: 'maten hernummerd' },
 
   // Code checker @accid.ges
-  codeCheckerTitle: { text: 'Controleer @accid.ges attributen (tegen toonsoort, maat-accidenten en bindbogen).' },
+  accidGesCodeCheckerTitle: { text: 'Controleer @accid.ges attributen (tegen toonsoort, maat-accidenten en bindbogen).' },
   codeCheckerFix: { text: 'Repareren' },
   codeCheckerFixAll: { text: 'Alles repareren' },
   codeCheckerIgnore: { text: 'Negeren' },

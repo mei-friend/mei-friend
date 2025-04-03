@@ -177,6 +177,7 @@ export const lang = {
   decreaseDurText: { text: 'Disminueix durada' },
   toggleDotsText: { text: 'Afegeix un punt' },
   cleanAccidText: { text: 'Verificar @accid.ges' },
+  meterConformanceText: { text: 'Verificar @metcon' },
   renumberMeasuresTestText: { text: 'Reenumera compassos (prova)' },
   renumberMeasuresExecText: { text: 'Reenumera compassos (execució)' },
   addIdsText: { text: 'Afegeix IDs a MEI' },
@@ -1111,7 +1112,7 @@ export const lang = {
   renumberMeasureMeasuresRenumbered: { text: 'compassos reenumerades' },
 
   // Code checker panel (accid.ges)
-  codeCheckerTitle: {
+  accidGesCodeCheckerTitle: {
     text: 'Verifica els atributs @accid.ges (en comparació amb la clau de sol, els accid. per compàs i les lligadures).',
   },
   codeCheckerFix: { text: 'Corregeix' },

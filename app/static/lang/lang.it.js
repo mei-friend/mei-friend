@@ -178,6 +178,7 @@ export const lang = {
   decreaseDurText: { text: 'Riduci durata' },
   toggleDotsText: { text: 'Alterna la punteggiatura' },
   cleanAccidText: { text: 'Verificare @accid.ges' },
+  meterConformanceText: { text: 'Verificare @metcon' },
   renumberMeasuresTestText: { text: 'Rinumera misure (test)' },
   renumberMeasuresExecText: { text: 'Rinumera misure (esegui)' },
   addIdsText: { text: 'Aggiungi ids a MEI' },
@@ -1121,7 +1122,7 @@ export const lang = {
   renumberMeasureMeasuresRenumbered: { text: 'misure rinumerate' },
 
   // Code checker panel (accid.ges)
-  codeCheckerTitle: {
+  accidGesCodeCheckerTitle: {
     text: 'Verifica gli attributi @accid.ges (rispetto alla tonalità della chiave, gli accid. per misura e legature).',
   },
   codeCheckerFix: { text: 'Correggi' },

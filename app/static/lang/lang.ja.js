@@ -167,6 +167,7 @@ export const lang = {
   decreaseDurText: { text: '音価を減らす' },
   toggleDotsText: { text: 'トグル・ドッティング' },
   cleanAccidText: { text: '@accid.gesを確認' },
+  meterConformanceText: { text: '@metconを確認' },
   renumberMeasuresTestText: { text: '小節を再番号付け（テスト）' },
   renumberMeasuresExecText: { text: '小節を再番号付け（実行）' },
   addIdsText: { text: 'MEIにIDを追加' },
@@ -1070,7 +1071,7 @@ export const lang = {
   renumberMeasureMeasuresRenumbered: { text: '小節が再番号付けされました' },
 
   // Code checker @accid.ges
-  codeCheckerTitle: { text: '@accid.ges属性をチェック（調号、小節ごとのaccids、タイ）' },
+  accidGesCodeCheckerTitle: { text: '@accid.ges属性をチェック（調号、小節ごとのaccids、タイ）' },
   codeCheckerFix: { text: '修正' },
   codeCheckerFixAll: { text: 'すべて修正' },
   codeCheckerIgnore: { text: '無視' },
