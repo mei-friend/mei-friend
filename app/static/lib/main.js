@@ -1,6 +1,6 @@
 // mei-friend version and date
-export const version = '1.2.2';
-export const versionDate = '20 February 2025'; // use full or 3-character english months, will be translated
+export const version = '1.2.3';
+export const versionDate = '18 March 2025'; // use full or 3-character english months, will be translated
 export const splashDate = '17 January 2025'; // date of the splash screen content, same translation rules apply
 
 var vrvWorker;
@@ -77,6 +77,7 @@ import { keymap } from '../keymaps/default-keymap.js';
 import { setCursorToId, getChangelogUrl } from './utils.js';
 import { getInMeasure, navElsSelector, getElementAtCursor } from './dom-utils.js';
 import { addDragSelector } from './drag-selector.js';
+import * as checker from './mei-checker.js';
 import {
   highlightNotesAtMidiPlaybackTime,
   mp,
@@ -1829,7 +1830,7 @@ export let cmd = {
   addFClefChangeAfter: () => e.addClefChange(v, cm, 'F', '4', false),
   addBeam: () => e.addBeamElement(v, cm),
   addBeamSpan: () => e.addBeamSpan(v, cm),
-  correctAccid: () => e.checkAccidGes(v, cm),
+  correctAccid: () => checker.checkAccidGes(v, cm),
   renumberMeasuresTest: () => e.renumberMeasures(v, cm, false),
   renumberMeasures: () => e.renumberMeasures(v, cm, true),
   reRenderMei: () => v.reRenderMei(cm, false),
