@@ -1,5 +1,8 @@
 # mei-friend-online CHANGELOG.md
 
+### 1.2.4 patch
+* Improve handling of remote changes to Git-managed files
+
 ### 1.2.3 patch
 * Add latest Vervio release 5.1.0
 * Better accommodate Solid Pods hosted on providers running Community Solid Server
