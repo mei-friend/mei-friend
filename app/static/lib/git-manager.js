@@ -17,7 +17,8 @@ export default class GitManager {
     this.filepath = opts.filepath || '';
     this.repo = opts.repo || null;
     this.branch = opts.branch || null;
-    this.pullFrequency = opts.remoteCheckFreq || 60000; // how often to check remote for updates - default to 60 seconds
+    this.headSha = opts.headSha || null; // sha of most recent commit
+    this.pullFrequency = opts.remoteCheckFreq || 5000; // how often to check remote for updates - default to once every 5 seconds
     this.onRemoteUpdate = opts.onRemoteUpdate || null; // callback for when remote is updated
     if (this.onRemoteUpdate) {
       // if we have a callback, set up a timeout to check the remote periodically
@@ -52,10 +53,7 @@ export default class GitManager {
     return this.cloud.repo;
   }
 
-  async checkRemote() {
-    // check whether the remote has been updated with new commits
-    // if so, call the onRemoteUpdate callback
-    // first, fetch the remote, supplying the current branch appropriately
+  async remoteChangesExist() {
     await this.fetch({
       fs,
       http,
@@ -67,20 +65,28 @@ export default class GitManager {
     // then check the current head sha against the remote head sha
     let localHeadSha = await this.getLocalHeadSha();
     let remoteHeadSha = await this.getRemoteHeadSha();
-    if (localHeadSha !== remoteHeadSha) {
+    return this.remoteChangedDuringRestore || localHeadSha !== remoteHeadSha;
+  }
+
+  async checkRemote() {
+    // check whether the remote has been updated with new commits
+    // if so, call the onRemoteUpdate callback
+    // first, fetch the remote, supplying the current branch appropriately
+    console.log('checking remote for updates');
+    if (await this.remoteChangesExist()) {
       // remote has been updated
       if (this.onRemoteUpdate) {
         console.log('Remote updated, calling onRemoteUpdate');
         this.onRemoteUpdate();
-        // reset the timeout
-        clearTimeout(this.checkRemoteTimeout);
-        this.checkRemoteCaller = setTimeout(() => {
-          this.checkRemote();
-        }, this.pullFrequency);
       } else {
         console.warn('Remote updated, but no onRemoteUpdate callback set');
       }
     }
+    // reset the timeout
+    clearTimeout(this.checkRemoteTimeout);
+    this.checkRemoteTimeout = setTimeout(() => {
+      this.checkRemote();
+    }, this.pullFrequency);
   }
 
   async checkout() {
@@ -206,6 +212,12 @@ export default class GitManager {
             remote: 'origin',
             url: url,
           });
+          // if our headSha is set but does not match the new local head sha,
+          // we are trying to restore a previous state and the remote has changed
+          if (this.headSha && this.headSha !== (await this.getLocalHeadSha())) {
+            this.remoteChangedDuringRestore = true;
+          }
+          this.headSha = await this.getLocalHeadSha();
         });
       })
       .catch((err) => {
@@ -327,6 +339,7 @@ export default class GitManager {
     await this.checkout();
     // then push the branch to the remote
     await this.push();
+    this.headSha = await this.getLocalHeadSha();
     return branch;
   }
 
@@ -351,9 +364,9 @@ export default class GitManager {
         singleBranch: true,
         author,
       });
+      this.headSha = this.getLocalHeadSha();
     } catch (err) {
-      console.error('pull error', err);
-      throw err;
+      console.warn('Conflicting change on remote: ', err);
     }
   }
 
@@ -377,7 +390,8 @@ export default class GitManager {
     await this.pull();
   }
 
-  async add(path = this.filepath) {
+  async add() {
+    let path = this.filepath;
     if (path.startsWith('/')) {
       path = path.substring(1);
     }
@@ -402,6 +416,7 @@ export default class GitManager {
       ref: this.branch,
       message: message,
     });
+    this.headSha = await this.getLocalHeadSha();
   }
 
   async status(path = this.filepath) {

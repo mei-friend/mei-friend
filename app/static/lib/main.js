@@ -322,6 +322,7 @@ export async function updateGithubInLocalStorage() {
       githubRepo: gm.repo,
       githubToken: gm.token,
       branch: gm.branch,
+      headSha: gm.headSha,
       filepath: gm.filepath,
       userLogin: author.username,
       userName: author.name,
@@ -585,8 +586,10 @@ async function completeInitialLoad() {
         repo: storage.github.githubRepo,
         branch: storage.github.branch,
         filepath: storage.github.filepath,
+        headSha: storage.github.headSha,
         onRemoteUpdate,
       });
+      gm.clone();
 
       //document.querySelector("#fileLocation").innerText = meiFileLocationPrintable;
     } else if (storage.github && !isLoggedIn) {
@@ -608,11 +611,13 @@ async function completeInitialLoad() {
             githubRepo: gm.repo,
             githubToken: gm.token,
             branch: gm.branch,
+            headSha: gm.headSha,
             filepath: gm.filepath,
             userLogin: author.username,
             userName: author.name,
             userEmail: author.email,
           };
+          gm.clone();
         })
         .catch((err) => {
           console.warn('Error getting author: ', err);
@@ -920,6 +925,7 @@ function openUrlProcess(content, url, updateAfterLoading) {
     // re-initialise github menu since we're now working from a URL
     gm.filepath = '';
     gm.branch = '';
+    gm.headSha = '';
     if (storage.supported) {
       updateGithubInLocalStorage();
     }
