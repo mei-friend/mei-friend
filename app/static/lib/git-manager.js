@@ -18,14 +18,8 @@ export default class GitManager {
     this.repo = opts.repo || null;
     this.branch = opts.branch || null;
     this.headSha = opts.headSha || null; // sha of most recent commit
-    this.pullFrequency = opts.remoteCheckFreq || 5000; // how often to check remote for updates - default to once every 5 seconds
+    this.pullFrequency = opts.remoteCheckFreq || 10000; // how often to check remote for updates - default to once every 10 seconds
     this.onRemoteUpdate = opts.onRemoteUpdate || null; // callback for when remote is updated
-    if (this.onRemoteUpdate) {
-      // if we have a callback, set up a timeout to check the remote periodically
-      this.checkRemoteTimeout = setTimeout(() => {
-        this.checkRemote();
-      }, this.pullFrequency);
-    }
     //set up type-specific onAuth, see https://isomorphic-git.org/docs/en/onAuth#docsNav
     switch (providerType) {
       case 'github':
@@ -83,10 +77,8 @@ export default class GitManager {
       }
     }
     // reset the timeout
-    clearTimeout(this.checkRemoteTimeout);
-    this.checkRemoteTimeout = setTimeout(() => {
-      this.checkRemote();
-    }, this.pullFrequency);
+    this.stopPollingForRemoteUpdates();
+    this.pollForRemoteUpdates();
   }
 
   async checkout() {
@@ -98,6 +90,24 @@ export default class GitManager {
       dir: this.directory,
       ref: this.branch,
     });
+  }
+
+  async pollForRemoteUpdates() {
+    // check if the remote has been updated
+    if (this.onRemoteUpdate) {
+      // if we have a callback, set up a timeout to check the remote periodically
+      this.checkRemoteTimeout = setTimeout(() => {
+        this.checkRemote();
+      }, this.pullFrequency);
+    }
+  }
+
+  async stopPollingForRemoteUpdates() {
+    // stop polling for remote updates
+    if (this.checkRemoteTimeout) {
+      clearTimeout(this.checkRemoteTimeout);
+      this.checkRemoteTimeout = null;
+    }
   }
 
   async fetch() {
@@ -186,19 +196,7 @@ export default class GitManager {
               }
             },
           };
-          await git.clone(cloneobj) /*.catch(async (err) => {
-            console.error('clone error, checking repo size', err);
-            // check if repo is too large
-            let size = await this.getRepoSize();
-            console.log('Got size: ', size);
-            // size.size is reported in kb
-            // check if it is larger than 100mb
-            if (size > 100000) {
-              throw { name: 'RepoTooLargeError', message: size };
-            } else {
-              throw new Error('clone error');
-            }
-          })*/;
+          await git.clone(cloneobj);
 
           // update remote
           await git.deleteRemote({
@@ -218,6 +216,8 @@ export default class GitManager {
             this.remoteChangedDuringRestore = true;
           }
           this.headSha = await this.getLocalHeadSha();
+          // poll for remote updates
+          this.pollForRemoteUpdates();
         });
       })
       .catch((err) => {
@@ -245,31 +245,28 @@ export default class GitManager {
 
   async getRemote() {
     console.log('getRemote(), git: ', git, 'dir: ', this.directory, 'fs: ', fs);
-    return git
-      .listRemotes({
-        fs,
-        dir: this.directory,
-      })
-      .then((remote) => {
-        const remoteUrl = remote[0].url;
-        console.log('getRemote(), remoteUrl: ', remoteUrl);
-        if (remoteUrl) {
-          switch (this.providerType) {
-            // TODO check these, they are imagined by copilot
-            // particularly, they should use the provider in the URI
-            case 'github':
-              return remoteUrl.match(/github.com\/([^/]+\/.+)/)[1];
-            case 'gitlab':
-              return remoteUrl.match(/gitlab.com\/([^/]+\/.+)/)[1];
-            case 'bitbucket':
-              return remoteUrl.match(/bitbucket.org\/([^/]+\/.+)/)[1];
-            case 'codeberg':
-              return remoteUrl.match(/codeberg.org\/([^/]+\/.+)/)[1];
-            default:
-              throw new Error('Unknown provider');
-          }
+    const remote = await git.listRemotes({ fs, dir: this.directory });
+    if (remote && remote.length > 0) {
+      console.log('getRemote(), remote: ', remote);
+      const remoteUrl = remote[0].url;
+      console.log('getRemote(), remoteUrl: ', remoteUrl);
+      if (remoteUrl) {
+        switch (this.providerType) {
+          // TODO check these, they are imagined by copilot
+          // particularly, they should use the provider in the URI
+          case 'github':
+            return remoteUrl.match(/github.com\/([^/]+\/.+)/)[1];
+          case 'gitlab':
+            return remoteUrl.match(/gitlab.com\/([^/]+\/.+)/)[1];
+          case 'bitbucket':
+            return remoteUrl.match(/bitbucket.org\/([^/]+\/.+)/)[1];
+          case 'codeberg':
+            return remoteUrl.match(/codeberg.org\/([^/]+\/.+)/)[1];
+          default:
+            throw new Error('Unknown provider');
         }
-      });
+      }
+    }
   }
 
   async getLocalHeadSha() {
