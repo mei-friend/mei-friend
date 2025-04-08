@@ -236,6 +236,18 @@ export function setMeiFileInfo(fName, fLocation, fLocationPrintable) {
 
 export function setFileLocationType(t) {
   fileLocationType = t; // wrap in function to facilitate external setting
+  if (gm) {
+    if (t === 'github') {
+      // poll for remote updates when working from github
+      gm.pollForRemoteUpdates();
+    } else {
+      // stop polling for remote updates when not working from github
+      gm.stopPollingForRemoteUpdates();
+      // remove remote change indicator
+      const remoteFileChanged = document.querySelector('#remoteFileChanged');
+      remoteFileChanged.innerHTML = '';
+    }
+  }
 }
 
 export function updateFileStatusDisplay() {
@@ -589,8 +601,6 @@ async function completeInitialLoad() {
         headSha: storage.github.headSha,
         onRemoteUpdate,
       });
-      gm.clone();
-
       //document.querySelector("#fileLocation").innerText = meiFileLocationPrintable;
     } else if (storage.github && !isLoggedIn) {
       // we have github data but are not logged in
@@ -617,7 +627,6 @@ async function completeInitialLoad() {
             userName: author.name,
             userEmail: author.email,
           };
-          gm.clone();
         })
         .catch((err) => {
           console.warn('Error getting author: ', err);
@@ -836,6 +845,16 @@ async function completeInitialLoad() {
       loginAndFetch(getSolidIdP(), populateSolidTab);
     }, restoreSolidTimeoutDelay);
   }
+
+  // if we are working from github and have a gm, clone it
+  if (fileLocationType === 'github' && gm) {
+    // remove remote changed indicator
+    const remoteFileChanged = document.getElementById('remoteFileChanged');
+    if (remoteFileChanged) {
+      remoteFileChanged.innerHTML = '';
+    }
+    gm.clone();
+  }
 } // completeInitialLoad()
 
 export async function openUrlFetch(url = '', updateAfterLoading = true) {
@@ -857,6 +876,12 @@ export async function openUrlFetch(url = '', updateAfterLoading = true) {
         gm = new GitManager('github', 'github', githubToken, { onRemoteUpdate });
         // TODO modify for multiple git providers
         // TODO use checkAndClone mechanism to warn about excessive sizes
+
+        // remove remote changed indicator
+        const remoteFileChanged = document.getElementById('remoteFileChanged');
+        if (remoteFileChanged) {
+          remoteFileChanged.innerHTML = '';
+        }
         gm.clone(`https://github.com/${userOrg}/${repo}.git`, branch)
           .then(() => {
             gm.readFile(filepath)
@@ -1222,7 +1247,7 @@ export function openFile(file = defaultMeiFileURL, setFreshlyLoaded = true, upda
   if (storage.supported) {
     storage.fileLocationType = 'url';
   }
-  fileLocationType = 'url';
+  setFileLocationType('url');
   if (gm) gm.filepath = '';
   if (file === defaultMeiFileURL) {
     // opening default MEI file

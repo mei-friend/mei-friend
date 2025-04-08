@@ -314,7 +314,7 @@ export async function onRemoteUpdate() {
   if (!commitBtn) {
     // user no longer in commit mode
     // e.g., user has navigated away from the commit UI
-    clearTimeout(gm.checkRemoteTimeout);
+    gm.stopPollingForRemoteUpdates();
     return;
   }
   console.log('Called onRemoteUpdate  ');
@@ -341,7 +341,7 @@ export async function onRemoteUpdate() {
       // keep displaying the '!' indicator
       // clear the check remote timeout
       // user will be asked to fork-and-PR on commit
-      clearTimeout(gm.checkRemoteTimeout);
+      this.stopPollingForRemoteUpdates();
     });
 }
 
@@ -1190,6 +1190,11 @@ export async function checkAndClone(file, branchurl = gm.cloud.getCloneURL(), br
             document.getElementById('GithubLogo').classList.add('clockwise');
             // hide the warning prompt
             v.hideUserPrompt();
+            // remove remote changed indicator
+            const remoteFileChanged = document.getElementById('remoteFileChanged');
+            if (remoteFileChanged) {
+              remoteFileChanged.innerHTML = '';
+            }
             // proceed with clone
             gm.clone(branchurl, branch)
               .then(() => {
@@ -1206,6 +1211,11 @@ export async function checkAndClone(file, branchurl = gm.cloud.getCloneURL(), br
     );
   } else {
     console.log('Repo size is OK, proceeding with clone...');
+    // remove remote changed indicator
+    const remoteFileChanged = document.getElementById('remoteFileChanged');
+    if (remoteFileChanged) {
+      remoteFileChanged.innerHTML = '';
+    }
     gm.clone(branchurl, branch)
       .then(() => {
         loadFile(file);
