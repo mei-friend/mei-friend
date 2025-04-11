@@ -1,6 +1,7 @@
+import * as defaults from './defaults.js';
 import * as dutils from './dom-utils.js';
 import * as editor from './editor.js';
-import { translator } from './main.js';
+import { setProgressBar, translator } from './main.js';
 import * as speed from './speed.js';
 import * as utils from './utils.js';
 
@@ -14,42 +15,70 @@ import * as utils from './utils.js';
  */
 export function checkAccidGes(v, cm) {
   v.allowCursorActivity = false;
-  v.initCodeCheckerPanel(translator.lang.codeCheckerTitle.text);
+  v.initCodeCheckerPanel(translator.lang.accidGesCodeCheckerTitle.text);
 
   let d = true; // send debug info to console
-  setTimeout(() => {
-    v.loadXml(cm.getValue(), true); // force reload DOM
 
-    // define default key signatures per staff
-    let noStaves = v.xmlDoc.querySelector('scoreDef').querySelectorAll('staffDef').length;
-    let keySignatures = Array(noStaves).fill('0');
-    if (d) console.debug('correctAccidGes. ' + noStaves + ' staves defined.');
+  v.loadXml(cm.getValue(), true); // force reload DOM
 
-    // list all ties to handle those separately
-    let ties = {};
-    v.xmlDoc.querySelectorAll('tie').forEach((t) => {
-      let startId = utils.rmHash(t.getAttribute('startid')) || '';
-      let endId = utils.rmHash(t.getAttribute('endid')) || '';
-      if (endId) {
-        if (!startId) console.log('Tie ' + t.getAttribute('xml:id') + ' without startId. ');
-        else ties[endId] = startId;
+  // define default key signatures per staff
+  let noStaves = v.xmlDoc.querySelector('scoreDef').querySelectorAll('staffDef').length;
+  let keySignatures = Array(noStaves).fill('0');
+  if (d) console.debug('correctAccidGes. ' + noStaves + ' staves defined.');
+
+  // list all ties to handle those separately
+  let ties = {};
+  v.xmlDoc.querySelectorAll('tie').forEach((t) => {
+    let startId = utils.rmHash(t.getAttribute('startid')) || '';
+    let endId = utils.rmHash(t.getAttribute('endid')) || '';
+    if (endId) {
+      if (!startId) {
+        console.log('Tie ' + t.getAttribute('xml:id') + ' without startId. ');
+      } else {
+        ties[endId] = startId;
       }
-    });
+    }
+  });
 
-    let count = 0;
-    let measureAccids = {}; // accidentals within a measure[staff][oct][pname]
-    let list = v.xmlDoc.querySelectorAll('[key\\.sig],keySig,measure,note');
-    list.forEach((element) => {
+  let count = 0;
+  let measureAccids = {}; // accidentals within a measure[staff][oct][pname]
+  const list = v.xmlDoc.querySelectorAll('[key\\.sig],keySig,measure,note');
+  let i = 0;
+  const increment = list.length / 100;
+  let step = increment;
+
+  setProgressBar(0);
+  document.getElementById('statusBar').innerHTML = 'Checking accid.ges... 0 of ' + list.length + ' measures checked.';
+
+  /**
+   * Iterate through all elements in the list and check for
+   * accid.ges and accid attributes. Recursively call this function
+   * until all elements have been processed, with setTimeout() for GUI updates.
+   */
+  function processAccidGes() {
+    let element = list[i];
+    if (i < list.length) {
+      if (i > step) {
+        setProgressBar((100 * i) / list.length);
+        document.getElementById('statusBar').innerHTML =
+          'Checking accid.ges... ' + i + ' of ' + list.length + ' measures checked.';
+        step += increment;
+      }
+
       if (element.nodeName === 'scoreDef' && element.hasAttribute('key.sig')) {
         // key.sig inside scoreDef: write @sig to all staves
         const value = element.getAttribute('key.sig');
-        for (let k in keySignatures) keySignatures[k] = value;
+        for (let k in keySignatures) {
+          keySignatures[k] = value;
+        }
         if (d) console.debug('New key.sig in scoreDef: ' + value);
       } else if (element.nodeName === 'staffDef' && element.hasAttribute('key.sig')) {
         // key.sig inside staffDef: write @sig to that staff
         const n = parseInt(element.getAttribute('n'));
         const value = element.getAttribute('key.sig');
-        if (n && n > 0 && n <= keySignatures.length) keySignatures[n - 1] = value;
+        if (n && n > 0 && n <= keySignatures.length) {
+          keySignatures[n - 1] = value;
+        }
         if (d) console.debug('New key.sig in staffDef(' + element.getAttribute('xml:id') + ', n=' + n + '): ' + value);
       } else if (element.nodeName === 'keySig' && element.hasAttribute('sig')) {
         const value = element.getAttribute('sig');
@@ -331,17 +360,27 @@ export function checkAccidGes(v, cm) {
           if (d) console.debug(data.html);
         }
       }
-    });
-    v.finalizeCodeCheckerPanel('All accid.ges attributes seem correct.');
-  }, 0);
+      i++;
+      setTimeout(processAccidGes, 0);
+    } else {
+      console.debug('Found ' + count + ' accid.ges observations.');
 
-  v.allowCursorActivity = true;
+      setProgressBar(0);
+      document.getElementById('statusBar').innerHTML =
+        'Accidental conformance: ' + count + ' accid.ges observations found.';
+
+      v.finalizeCodeCheckerPanel(translator.lang.codeCheckerNoAccidMessagesFound.text);
+      v.allowCursorActivity = true;
+    }
+  } // processAccidGes()
+  processAccidGes();
 
   /**
    * Search for @accid attributes in measure and store them in
    * an object measureAccids[staffNumber][oct][pName][tstamp] = accid
    * @param {Element} measure
-   * @returns {Object} measureAccids
+   * @returns {Object} measureAccids in the form of
+   * measureAccids[staffNumber][oct][pName][tstamp] = {string} accid
    */
   function getAccidsInMeasure(measure) {
     let measureAccids = {};
@@ -372,3 +411,147 @@ export function checkAccidGes(v, cm) {
     return measureAccids;
   } // getAccidsInMeasure()
 } // checkAccidGes()
+
+/**
+ * checkMeterConformance goes through all measure elements in xmlDoc and checks
+ * whether the duration of the elements of each layer in the measure conforms to
+ * the time signature of the measure.
+ * It counts these elements for duration chord, note, space, rest; and treats
+ * fTrem elements as having half the duration of the note.
+ *
+ * TODO: choice, subst not counted twice
+ * TODO: treat meterSigGrp additive
+ * TODO: treat meterSigGrp func = 'mixed', 'alternating'
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
+ */
+export function checkMeterConformance(v, cm) {
+  // checkMeterSignature(v); // test for meter signatures in xmlDoc
+
+  let elementsWithDuration = ['chord', 'note', 'space', 'rest', 'fTrem'];
+  let ignoreElements = ['mRest', 'multiRest', 'mSpace'];
+
+  v.allowCursorActivity = false;
+  v.initCodeCheckerPanel(translator.lang.metConCodeCheckerTitle.text);
+
+  let measures = v.xmlDoc.querySelectorAll('measure:not([metcon="false"])');
+  setProgressBar(0);
+  document.getElementById('statusBar').innerHTML =
+    'Checking meter conformance... 0 of ' + measures.length + ' measures checked.';
+  let n = 0;
+  let increment = measures.length / 100;
+  let step = increment;
+
+  /**
+   * Iterate through all measures and check for
+   * duration of elements in the measure.
+   * Recursively call this function until all measures have been processed,
+   * with setTimeout() for GUI updates.
+   */
+  function processMeasure() {
+    if (n < measures.length) {
+      let measure = measures[n];
+
+      if (n > step) {
+        setProgressBar((100 * n) / measures.length);
+        document.getElementById('statusBar').innerHTML =
+          'Checking meter conformance... ' + n + ' of ' + measures.length + ' measures checked.';
+        step += increment;
+      }
+
+      // iterate through all staves in the measure
+      measure.querySelectorAll('staff').forEach((staff) => {
+        let duration = 0;
+        let meter = speed.getMeterForElement(v.xmlDoc, staff);
+        let conformance = false;
+        // iterate through all layers in the staff
+        staff.querySelectorAll('layer').forEach((layer) => {
+          let layerDuration = 0;
+          let durationElements = Array.from(layer.querySelectorAll(elementsWithDuration.join(',')));
+          dutils.filterChildren(durationElements, elementsWithDuration);
+          durationElements.forEach((element) => {
+            if (element.nodeName === 'fTrem') {
+              // fTrem elements are counted as half the duration of the note/chord duration
+              let ftremDuration = 0;
+              let frtremChildren = Array.from(element.querySelectorAll(elementsWithDuration.join(',')));
+              dutils.filterChildren(frtremChildren, elementsWithDuration);
+              frtremChildren.forEach((e) => {
+                ftremDuration += speed.getDurationOfElement(e, utils.parseMeterNumber(meter.unit));
+              });
+              layerDuration += ftremDuration / 2;
+            } else {
+              layerDuration += speed.getDurationOfElement(element, utils.parseMeterNumber(meter.unit));
+            }
+          });
+          if (layerDuration > duration) {
+            duration = layerDuration;
+          }
+        });
+        let ignore = false;
+        staff.querySelectorAll(ignoreElements.join(',')).forEach(() => (ignore = true));
+        if (
+          utils.compareNumbersWithTolerance(duration, utils.parseMeterNumber(meter.count), defaults.beatTolerance) ||
+          ignore
+        ) {
+          conformance = true;
+        } else {
+          // display non conformance message as entry in code checker panel
+          let data = {};
+          data.xmlId = staff.getAttribute('xml:id') || ''; // click to jump to element
+          data.html =
+            translator.lang.codeCheckerMeasure.text +
+            ' ' +
+            (measure.getAttribute('n') || '') +
+            ' ' +
+            translator.lang.codeCheckerStaff.text +
+            ' ' +
+            (staff.getAttribute('n') || '') +
+            ' ' +
+            translator.lang.codeCheckerHasADurationOf.text +
+            ' ' +
+            duration +
+            ' ' +
+            translator.lang.codeCheckerInsteadOf.text +
+            ' ' +
+            utils.parseMeterNumber(meter.count) +
+            '. ';
+          data.correct = () => {
+            v.allowCursorActivity = false;
+            measure.setAttribute('metcon', 'false');
+            editor.replaceInEditor(cm, measure, false);
+            utils.setCursorToId(cm, measure.getAttribute('xml:id'));
+            v.loadXml(cm.getValue(), true); // force reload DOM
+            v.allowCursorActivity = true;
+          };
+          v.addCodeCheckerEntry(data);
+          console.debug(data.html);
+        }
+      });
+      n++;
+      setTimeout(processMeasure, 0);
+    } else {
+      setProgressBar(0);
+      document.getElementById('statusBar').innerHTML = 'Meter conformance: ' + n + ' measures checked.';
+      v.finalizeCodeCheckerPanel(translator.lang.codeCheckerMeterConformanceMessage.text);
+      v.allowCursorActivity = true;
+    }
+  } // processMeasure()
+  processMeasure();
+} // checkMeterConformance()
+
+/**
+ * Debug function:
+ * Test all note, chord etc elements in the xmlDoc
+ * for a meter signature and report it.
+ */
+function checkMeterSignature(v) {
+  let elements = v.xmlDoc.querySelectorAll('note,rest,chord,space');
+  elements.forEach((element) => {
+    let meter = speed.getMeterForElement(v.xmlDoc, element);
+    if (meter && meter.count && meter.unit) {
+      console.log(element.nodeName + ' (' + element.getAttribute('xml:id') + '): ' + meter.count + '/' + meter.unit);
+    } else {
+      console.log('No scoreDef found for ' + element.nodeName + ' (' + element.getAttribute('xml:id') + ')');
+    }
+  });
+} // checkMeterSignature()

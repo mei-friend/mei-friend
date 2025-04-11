@@ -169,6 +169,7 @@ export const lang = {
   decreaseDurText: { text: 'Смањи трајање' },
   toggleDotsText: { text: 'Toggle dotting' }, // TODO: translate
   cleanAccidText: { text: 'Провери @accid.ges' },
+  meterConformanceText: { text: 'Провери @metcon' },
   renumberMeasuresTestText: { text: ' Ренумерирај мере (тест)' },
   renumberMeasuresExecText: { text: ' Ренумерирај мере (изврши)' },
   addIdsText: { text: 'Додај ИД-ове МЕИ' },
@@ -961,7 +962,7 @@ export const lang = {
   renumberMeasureMeasuresRenumbered: { text: 'тактова је пребројано' },
 
   // Code checker @accid.ges
-  codeCheckerTitle: { text: 'Провера @accid.ges атрибута (против тонова, акциденталних тонова по тактовима и веза).' },
+  accidGesCodeCheckerTitle: { text: 'Провера @accid.ges атрибута (против тонова, акциденталних тонова по тактовима и веза).' },
   codeCheckerFix: { text: 'Исправи' },
   codeCheckerFixAll: { text: 'Исправи све' },
   codeCheckerIgnore: { text: 'Занемари' },

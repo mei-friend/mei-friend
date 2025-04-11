@@ -173,6 +173,7 @@ export const lang = {
   decreaseDurText: { text: 'Malpligrandigi daŭron' },
   toggleDotsText: { text: 'Ŝalti punktadon' },
   cleanAccidText: { text: 'Kontroli @accid.ges' },
+  meterConformanceText: { text: 'Kontroli @metcon' },
   renumberMeasuresTestText: { text: ' Reenumeri taktojn (testo)' },
   renumberMeasuresExecText: { text: ' Reenumeri taktojn (ekzekuti)' },
   addIdsText: { text: 'Aldoni id-ojn al MEI' },
@@ -1088,7 +1089,7 @@ export const lang = {
   renumberMeasureMeasuresRenumbered: { text: 'taktoj renumerigis' },
 
   // Kodo-kontrolilo @accid.ges
-  codeCheckerTitle: {
+  accidGesCodeCheckerTitle: {
     text: 'Kontroli @accid.ges atributojn (kontraŭ ŝlosilsigno, mezur-spezifaj akcidentoj, kaj ligoj).',
   },
   codeCheckerFix: { text: 'Korekti' },

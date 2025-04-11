@@ -1,6 +1,10 @@
 # mei-friend-online CHANGELOG.md
 
 ### 1.2.4 patch
+* Add meter conformance checker (#142) that inspects the duration of each staff within a measure relative to the current time signature
+  * Known shortcomings: 
+      - missing support for markup elements `choice`, `subst`
+      - `meterSigGrp` not handled (`func="mixed,alternating"`)
 * Improve handling of remote changes to Git-managed files
 
 ### 1.2.3 patch

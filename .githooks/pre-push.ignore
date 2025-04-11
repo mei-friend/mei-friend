@@ -1,0 +1,9 @@
+#!/bin/sh
+#
+# run playwright tests before committing to public (testing, staging or main) branches
+
+current_branch=$(git rev-parse --abbrev-ref --symbolic-full-name HEAD)
+if [ "$current_branch" == "testing" ] || [ "$current_branch" == "staging" ] || [ "$current_branch" == "main" ]; then
+  cd e2e
+  npx playwright test --config=../playwright.config.js --project=chromium --retries=3 --reporter=list
+fi

@@ -51,7 +51,6 @@ export function createNotationDiv(parentElement, scale) {
   // // append everything
   // svgContainer.appendChild(svg);
   // facsimilePanel.append(svgContainer);
-  
 
   // add both containers to parent (#notation)
   parentElement.appendChild(verovioContainer);
@@ -535,6 +534,14 @@ export function createFacsimileControlBar(parentElement) {
   facsCtrlBar.appendChild(facsimileCloseButton);
 } // createFacsimileControlBar()
 
+export function createEncodingPanel() {
+  let codeCheckerResizer = document.getElementById('codeCheckerResizer');
+  codeCheckerResizer.classList.add('resizer');
+  codeCheckerResizer.innerHTML = icon.kebab;
+  let codeCheckerPanel = document.getElementById('codeChecker');
+  codeCheckerPanel.style.display = 'none';
+} // createEncodingPanel()
+
 export function showPdfButtons(show = true) {
   document.getElementById('pageRangeSelectorDiv').style.display = show ? '' : 'none';
   document.getElementById('pdfControlsDiv').style.display = show ? '' : 'none';
@@ -645,9 +652,9 @@ export function handleSmartBreaksOption(speedMode) {
 } // handleSmartBreaksOption()
 
 /**
- * Adds the options for choice to the choiceSelect in the 
+ * Adds the options for choice to the choiceSelect in the
  * notation control bar.
- * @param {string} active value of currently active selection 
+ * @param {string} active value of currently active selection
  */
 export function setChoiceOptions(active) {
   let choiceSelect = document.getElementById('choiceSelect');
@@ -678,7 +685,6 @@ export function setChoiceOptions(active) {
     option.id = 'noChoice';
     choiceSelect.appendChild(option);
   }
-  
 }
 
 // checks xmlDoc for section, ending, lem, rdg elements for quick navigation
@@ -722,7 +728,8 @@ export function addModifyerKeys(root) {
       text: 'Alt',
       description: 'Alt key',
     }, // ALT
-    cmd3Key: { // ALT / CMD on Mac
+    cmd3Key: {
+      // ALT / CMD on Mac
       symbol: '&#8997;',
       text: 'Alt',
       description: 'Alt key',

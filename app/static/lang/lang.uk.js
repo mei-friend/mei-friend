@@ -169,6 +169,7 @@ export const lang = {
   decreaseDurText: { text: 'Зменшити тривалість' },
   toggleDotsText: { text: 'перемикання пунктиру' },
   cleanAccidText: { text: 'Перевірити @accid.ges' },
+  meterConformanceText: { text: 'Перевірити @metcon' },
   renumberMeasuresTestText: { text: 'Перенумерувати такти (тест)' },
   renumberMeasuresExecText: { text: 'Перенумерувати такти (виконати)' },
   addIdsText: { text: 'Додати ідентифікатори до MEI' },
@@ -1084,7 +1085,7 @@ export const lang = {
   renumberMeasureMeasuresRenumbered: { text: 'перенумеровані такти' },
 
   // Code checker @accid.ges
-  codeCheckerTitle: {
+  accidGesCodeCheckerTitle: {
     text: "Перевірка атрибутів @accid.ges (відповідно до ключового підпису, атрибутів @accid в тактах та зв'язків).",
   },
   codeCheckerFix: { text: 'Виправити' },
