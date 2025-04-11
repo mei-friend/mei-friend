@@ -582,7 +582,7 @@ export default class GitCloudClient {
     // ... then grab its start_at time, and use that to poll recursively
     const runsUrl = `https://api.github.com/repos/${this.gm.repo}/actions/workflows/${workflowId}/runs`;
     const author = await this.getAuthor();
-    const head_sha = await this.gm.getCurrentHeadSha();
+    const head_sha = await this.gm.getLocalHeadSha();
     console.log('head_sha: ', head_sha);
     return fetch(
       runsUrl +
