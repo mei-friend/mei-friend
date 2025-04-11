@@ -376,7 +376,7 @@ if (env === environments.develop) {
   };
 }
 supportedVerovioVersions.annote = {
-  url: `${root}/vrv/verovio-toolkit-annote-64ea6180c.js`,
+  url: `${root.endsWith('/') ? root : root + '/'}vrv/verovio-toolkit-annote-64ea6180c.js`,
   description: 'Annote version of Verovio toolkit (Experimental!)',
 };
 supportedVerovioVersions.develop = {
