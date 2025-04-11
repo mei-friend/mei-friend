@@ -1,5 +1,8 @@
 # mei-friend-online CHANGELOG.md
 
+### 1.2.5 patch 
+* Support new Verovio annotation features introduced by the Annote project
+
 ### 1.2.4 patch
 * Add meter conformance checker (#142) that inspects the duration of each staff within a measure relative to the current time signature
   * Known shortcomings: 
