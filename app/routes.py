@@ -13,7 +13,7 @@ from app import app
 limiter = Limiter(
     get_remote_address,
     app=app,
-    default_limits=["5 per second"]
+    default_limits=["20 per second"]
 )
 
 mimetypes.add_type('application/javascript', '.js')

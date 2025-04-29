@@ -7,6 +7,7 @@ import {
   gm, // git manager instance
   handleEncoding,
   isMEI,
+  log,
   meiFileName,
   openUrlFetch,
   setFileChangedState,
@@ -302,6 +303,47 @@ function onMessageInput(e) {
     document.getElementById('githubCommitButton').removeAttribute('disabled');
   }
 } // onMessageInput()
+
+/**
+ * onRemoteUpdate
+ * @description If the remote has been updated, indicate this using a '!' in the file status display
+ * and change the commit button to a pull button
+ */
+export async function onRemoteUpdate() {
+  let commitBtn = document.getElementById('githubCommitButton');
+  if (!commitBtn) {
+    // user no longer in commit mode
+    // e.g., user has navigated away from the commit UI
+    gm.stopPollingForRemoteUpdates();
+    return;
+  }
+  console.log('Called onRemoteUpdate  ');
+  // skip if no repository cloned
+  let exists = await gm.pfsDirExists();
+  console.log('onRemoteUpdate() pfsDirExists() returned: ', exists);
+  if (!exists) {
+    return;
+  }
+  // remote has been updated
+  // indicate this using a '!' in the file status display
+  // attempt a git pull
+  const remoteChangedIndicator = document.getElementById('remoteFileChanged');
+  if (remoteChangedIndicator) {
+    remoteChangedIndicator.innerText = '!';
+  }
+  gm.pull()
+    .then(() => {
+      console.log('Pull successful, handling...');
+      handlePullCompleted();
+    })
+    .catch((e) => {
+      // pull failed
+      // keep displaying the '!' indicator
+      // clear the check remote timeout
+      // user will be asked to fork-and-PR on commit
+      this.stopPollingForRemoteUpdates();
+    });
+}
 
 function assignGithubMenuClickHandlers() {
   // This function is called repeatedly during runtime as the content of the
@@ -817,7 +859,7 @@ async function handleClickGithubAction(e, gm) {
                   await gm.pull();
                   // redraw github menu to reflect changes in git log
                   fillInCommitLog('withRefresh');
-                  console.log('pull completed for reload, head hash now ', await gm.getCurrentHeadSha());
+                  console.log('pull completed for reload, head hash now ', await gm.getLocalHeadSha());
                   loadFile();
                   overlay.style.display = 'none';
                   statusMsg.innerHTML = '';
@@ -895,6 +937,7 @@ export function refreshGithubMenu() {
 
 export async function setCommitUIEnabledStatus() {
   const commitButton = document.getElementById('githubCommitButton');
+  const commitMessageInput = document.getElementById('commitMessageInput');
   if (commitButton) {
     const commitFileName = document.getElementById('commitFileName');
     if (commitFileName.innerText === stripMeiFileName()) {
@@ -971,6 +1014,19 @@ async function handleCommitButtonClicked(e) {
   }
 } // handleCommitButtonClicked()
 
+function handlePullCompleted() {
+  console.log('handlePullCompleted()');
+  const githubLoadingIndicator = document.getElementById('GithubLogo');
+  githubLoadingIndicator.classList.remove('clockwise');
+  // if there are no uncommited changes, reload the file
+  if (!fileChanged) {
+    const remoteFileChangedIndicator = document.getElementById('remoteFileChanged');
+    remoteFileChangedIndicator.innerHTML = '';
+    gm.remoteChangedDuringRestore = false;
+    loadFile();
+  }
+}
+
 async function prepareNewFileForCommit() {
   const commitFileName = document.getElementById('commitFileName');
   const newFileName = commitFileName.innerText;
@@ -994,16 +1050,13 @@ async function doCommit() {
   const messageInput = document.getElementById('commitMessageInput');
   const message = messageInput.value;
   const githubLoadingIndicator = document.getElementById('GithubLogo');
-  try {
-    await gm.add();
-    await gm.commit(message);
-    await gm.push();
-  } catch (e) {
+  // are there unmerged changes on the remote?
+  if (await gm.remoteChangesExist()) {
     githubLoadingIndicator.classList.remove('clockwise');
     cm.setOption('readOnly', false);
-    console.warn("Couldn't do commit and push: ", e);
+    console.warn("Couldn't do commit and push due to remote changes");
     v.showUserPrompt(
-      "Couldn't commit and push to Github: " + e,
+      'The remote file has changed since your last commit, and you have local changes that cannot be merged automatically.',
       [
         {
           label: 'Cancel - do not commit',
@@ -1025,6 +1078,7 @@ async function doCommit() {
                   .then((pr) => {
                     console.log('Created PR: ', pr);
                     v.hideUserPrompt();
+                    gm.remoteChangedDuringRestore = false;
                     // update git menu to show new branch name and include link to PR github page
                   })
                   .catch((e) => {
@@ -1043,16 +1097,27 @@ async function doCommit() {
       ],
       'warning'
     );
+  } else {
+    try {
+      await gm.add();
+      await gm.commit(message);
+      await gm.push();
+      gm.remoteChangedDuringRestore = false;
+      console.debug(`Successfully committed and pushed to github: ${gm.repo}${gm.filepath}`);
+      messageInput.value = '';
+      console.log('Status after commit: ', await gm.status());
+      setCommitUIEnabledStatus();
+      updateFileStatusDisplay();
+      setFileChangedState(await gm.fileChanged());
+      githubLoadingIndicator.classList.remove('clockwise');
+      cm.setOption('readOnly', false);
+      fillInCommitLog('withRefresh');
+    } catch (e) {
+      githubLoadingIndicator.classList.remove('clockwise');
+      cm.setOption('readOnly', false);
+      log("Sorry, couldn't commit: ", e);
+    }
   }
-  console.debug(`Successfully committed and pushed to github: ${gm.repo}${gm.filepath}`);
-  messageInput.value = '';
-  console.log('Status after commit: ', await gm.status());
-  setCommitUIEnabledStatus();
-  updateFileStatusDisplay();
-  setFileChangedState(await gm.fileChanged());
-  githubLoadingIndicator.classList.remove('clockwise');
-  cm.setOption('readOnly', false);
-  fillInCommitLog('withRefresh');
 } // doCommit()
 
 function stripMeiFileName() {
@@ -1125,6 +1190,11 @@ export async function checkAndClone(file, branchurl = gm.cloud.getCloneURL(), br
             document.getElementById('GithubLogo').classList.add('clockwise');
             // hide the warning prompt
             v.hideUserPrompt();
+            // remove remote changed indicator
+            const remoteFileChanged = document.getElementById('remoteFileChanged');
+            if (remoteFileChanged) {
+              remoteFileChanged.innerHTML = '';
+            }
             // proceed with clone
             gm.clone(branchurl, branch)
               .then(() => {
@@ -1141,6 +1211,11 @@ export async function checkAndClone(file, branchurl = gm.cloud.getCloneURL(), br
     );
   } else {
     console.log('Repo size is OK, proceeding with clone...');
+    // remove remote changed indicator
+    const remoteFileChanged = document.getElementById('remoteFileChanged');
+    if (remoteFileChanged) {
+      remoteFileChanged.innerHTML = '';
+    }
     gm.clone(branchurl, branch)
       .then(() => {
         loadFile(file);
