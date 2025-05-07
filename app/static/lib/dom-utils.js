@@ -548,3 +548,20 @@ export function filterChildren(elements, elementTypes = ['']) {
   }
   return elements;
 } // filterChidren()
+
+/**
+ * Removes all comments and empty text nodes from the given node
+ * and its descendants.
+ * @param {Node} node
+ */
+export function cleanNode(node) {
+  for (var n = 0; n < node.childNodes.length; n++) {
+    var child = node.childNodes[n];
+    if (child.nodeType === Node.COMMENT_NODE || (child.nodeType === Node.TEXT_NODE && !/\S/.test(child.nodeValue))) {
+      node.removeChild(child);
+      n--;
+    } else if (child.nodeType === Node.ELEMENT_NODE) {
+      cleanNode(child);
+    }
+  }
+} // cleanNode()
