@@ -10,7 +10,7 @@ import * as utils from './utils.js';
 import Viewer from './viewer.js';
 
 /**
- * Returns median of coordinate value for a specified axis.
+ * Returns median of coordinate value for a specified axis ('x' or 'y').
  * Checks for notes within coords, navigation elements (navEls),
  * and the position of navigation elements within markup elements.
  * navElsArray = ['note', 'rest', 'mRest', 'beatRpt', 'halfmRpt', 'mRpt', 'clef'];
@@ -18,9 +18,15 @@ import Viewer from './viewer.js';
  * @param {string} axis [axis="x|y"]
  * @returns {number}
  */
-function getCoordinateValue(element, axis) {
-  if (!element) return false;
-  let values = [];
+function getCoordinateValue(element, axis = 'x') {
+  if (!element) {
+    return false;
+  }
+  if (axis !== 'x' && axis !== 'y') {
+    console.error('getCoordinateValue(): axis must be "x" or "y".');
+    return false;
+  }
+  let values = []; // coordinate values
   let elementClasses = element.getAttribute('class');
   if (elementClasses.includes('chord')) {
     let els = element.querySelectorAll('g.note');
@@ -28,12 +34,13 @@ function getCoordinateValue(element, axis) {
       values.push(getCoordinateValue(item, axis));
     });
   } else if (navElsArray.some((el) => elementClasses.includes(el))) {
-    let els = element.querySelectorAll('.notehead > use[' + axis + ']'); // should be one!
+    let els = Array.from(element.querySelectorAll('.notehead'));
     if (els.length === 0) {
-      els = element.querySelectorAll('use[' + axis + ']');
-    } // non-notes
+      els.push(element); // for non-notes
+    }
     els.forEach((item) => {
-      values.push(parseInt(item.getAttribute(axis)));
+      let bbox = item.getBBox();
+      values.push(axis === 'x' ? bbox.x : bbox.y);
     });
   } else if (
     att.alternativeEncodingElements.some((el) => elementClasses.includes(el)) ||
