@@ -1,5 +1,8 @@
 # mei-friend-online CHANGELOG.md
 
+### 1.2.5 patch
+* Retrieve SVG coordinate values from `getBBox()` instead of `use[x/y]` to address changes in Verovio ([PR#4039](https://github.com/rism-digital/verovio/pull/4039))
+
 ### 1.2.4 patch
 * Add meter conformance checker (#142) that inspects the duration of each staff within a measure relative to the current time signature
   * Known shortcomings: 
