@@ -42,7 +42,7 @@ export function checkAccidGes(v, cm) {
 
   let count = 0;
   let measureAccids = {}; // accidentals within a measure[staff][oct][pname]
-  const list = v.xmlDoc.querySelectorAll('[key\\.sig],keySig,measure,note');
+  const list = v.xmlDoc.querySelectorAll('[key\\.sig],[keysig],keySig,measure,note');
   let i = 0;
   const increment = list.length / 100;
   let step = increment;
@@ -65,17 +65,20 @@ export function checkAccidGes(v, cm) {
         step += increment;
       }
 
-      if (element.nodeName === 'scoreDef' && element.hasAttribute('key.sig')) {
+      if ((element.nodeName === 'scoreDef' && element.hasAttribute('key.sig')) || element.hasAttribute('keysig')) {
         // key.sig inside scoreDef: write @sig to all staves
-        const value = element.getAttribute('key.sig');
+        const value = element.getAttribute('key.sig') || element.getAttribute('keysig');
         for (let k in keySignatures) {
           keySignatures[k] = value;
         }
         if (d) console.debug('New key.sig in scoreDef: ' + value);
-      } else if (element.nodeName === 'staffDef' && element.hasAttribute('key.sig')) {
+      } else if (
+        (element.nodeName === 'staffDef' && element.hasAttribute('key.sig')) ||
+        element.hasAttribute('keysig')
+      ) {
         // key.sig inside staffDef: write @sig to that staff
         const n = parseInt(element.getAttribute('n'));
-        const value = element.getAttribute('key.sig');
+        const value = element.getAttribute('key.sig') || element.getAttribute('keysig');
         if (n && n > 0 && n <= keySignatures.length) {
           keySignatures[n - 1] = value;
         }
@@ -115,6 +118,7 @@ export function checkAccidGes(v, cm) {
           element.getAttribute('accid.ges') || element.querySelector('[accid\\.ges]')?.getAttribute('accid.ges');
         let accidGesMeaning =
           element.getAttribute('accid.ges') || element.querySelector('[accid\\.ges]')?.getAttribute('accid.ges') || 'n';
+
         let mAccid = ''; // measure accid for current note
         if (
           staffNumber in measureAccids &&
@@ -352,7 +356,12 @@ export function checkAccidGes(v, cm) {
             '".';
           data.correct = () => {
             v.allowCursorActivity = false;
-            element.removeAttribute('accid.ges');
+            let accidChild = element.querySelector('accid[accid\\.ges]');
+            if (accidChild) {
+              element.removeChild(accidChild);
+            } else {
+              element.removeAttribute('accid.ges');
+            }
             editor.replaceInEditor(cm, element, false);
             v.allowCursorActivity = true;
           };
