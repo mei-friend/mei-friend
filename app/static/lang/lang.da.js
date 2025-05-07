@@ -175,6 +175,7 @@ export const lang = {
   decreaseDurText: { text: 'Formindsk varighed' },
   toggleDotsText: { text: 'Skift punktering' },
   cleanAccidText: { text: 'Kontroller @accid.ges' },
+  meterConformanceText: { text: 'Kontroller @metcon' },
   renumberMeasuresTestText: { text: 'Omdøbn mål (test)' },
   renumberMeasuresExecText: { text: 'Omdøbn mål (exec)' },
   addIdsText: { text: 'Tilføj ids til MEI' },
@@ -969,7 +970,7 @@ export const lang = {
   renumberMeasureMeasuresRenumbered: { text: 'mål omdøbt' },
 
   // Code checker @accid.ges
-  codeCheckerTitle: { text: 'Kontroller @accid.ges attributter (mod toneart, mål accids og bindinger).' },
+  accidGesCodeCheckerTitle: { text: 'Kontroller @accid.ges attributter (mod toneart, mål accids og bindinger).' },
   codeCheckerFix: { text: 'Fix' },
   codeCheckerFixAll: { text: 'Fix alle' },
   codeCheckerIgnore: { text: 'Ignorer' },

@@ -10,7 +10,7 @@ import * as utils from './utils.js';
 import Viewer from './viewer.js';
 
 /**
- * Returns median of coordinate value for a specified axis.
+ * Returns median of coordinate value for a specified axis ('x' or 'y').
  * Checks for notes within coords, navigation elements (navEls),
  * and the position of navigation elements within markup elements.
  * navElsArray = ['note', 'rest', 'mRest', 'beatRpt', 'halfmRpt', 'mRpt', 'clef'];
@@ -18,26 +18,31 @@ import Viewer from './viewer.js';
  * @param {string} axis [axis="x|y"]
  * @returns {number}
  */
-function getCoordinateValue(element, axis) {
-  if (!element) return false;
-  let values = [];
+function getCoordinateValue(element, axis = 'x') {
+  if (!element) {
+    return false;
+  }
+  if (axis !== 'x' && axis !== 'y') {
+    console.error('getCoordinateValue(): axis must be "x" or "y".');
+    return false;
+  }
+  let values = []; // coordinate values
   let elementClasses = element.getAttribute('class');
   if (elementClasses.includes('chord')) {
     let els = element.querySelectorAll('g.note');
     els.forEach((item) => {
       values.push(getCoordinateValue(item, axis));
     });
-  }
-  else if (navElsArray.some((el) => elementClasses.includes(el))) {
-    let els = element.querySelectorAll('.notehead > use[' + axis + ']'); // should be one!
+  } else if (navElsArray.some((el) => elementClasses.includes(el))) {
+    let els = Array.from(element.querySelectorAll('.notehead'));
     if (els.length === 0) {
-      els = element.querySelectorAll('use[' + axis + ']');
-    } // non-notes
+      els.push(element); // for non-notes
+    }
     els.forEach((item) => {
-      values.push(parseInt(item.getAttribute(axis)));
+      let bbox = item.getBBox();
+      values.push(axis === 'x' ? bbox.x : bbox.y);
     });
-  }
-  else if (
+  } else if (
     att.alternativeEncodingElements.some((el) => elementClasses.includes(el)) ||
     att.modelTranscriptionLike.some((el) => elementClasses.includes(el))
   ) {
@@ -249,7 +254,7 @@ export function getY(element) {
  * Returns the DOM element at encoding cursor position
  * @param {CodeMirror} cm
  * @returns {Element}
- * 
+ *
  * TODO: to be moved to a CodeMirrorController.js
  */
 export function getElementAtCursor(cm) {
@@ -443,18 +448,18 @@ export function addNewXmlIdsToDescendants(xmlNode, dicIdChanges) {
 
 /**
  * Checks if the xmlNode has dependen IDs and replaces them with the one found in dicOld2NewIDs
- * @param {*} xmlNode 
- * @param {*} dicOld2NewIDs 
+ * @param {*} xmlNode
+ * @param {*} dicOld2NewIDs
  */
-export function modifyDependenIDs(xmlNode, dicOld2NewIDs){
+export function modifyDependenIDs(xmlNode, dicOld2NewIDs) {
   let currentID = utils.rmHash(xmlNode.getAttribute('endid'));
   if (currentID && dicOld2NewIDs[currentID]) {
-    xmlNode.setAttribute('endid', "#" + dicOld2NewIDs[currentID]);
+    xmlNode.setAttribute('endid', '#' + dicOld2NewIDs[currentID]);
   }
 
   currentID = utils.rmHash(xmlNode.getAttribute('startid'));
   if (currentID && dicOld2NewIDs[currentID]) {
-    xmlNode.setAttribute('startid', "#" + dicOld2NewIDs[currentID]);
+    xmlNode.setAttribute('startid', '#' + dicOld2NewIDs[currentID]);
   }
 
   if (xmlNode.children.length > 0) {
@@ -470,7 +475,7 @@ export function modifyDependenIDs(xmlNode, dicOld2NewIDs){
  * @param {Element} container
  * @param {Element} element
  * @returns {boolean} if scrolled or not
- * 
+ *
  * TODO: to be moved to a ViewerController.js or Viewer.js
  */
 export function scrollTo(container, element) {
@@ -526,3 +531,20 @@ export function addColorToMarkupElements(xmlNode) {
   });
   return xmlNode;
 } // addColorToMarkupElements()
+
+/**
+ * Filter children of array of elements that have a common parent
+ * @param {Element[]} elements (gets modified in function)
+ * @param {string[]} elementTypes
+ * @returns {Element[]} elements
+ */
+export function filterChildren(elements, elementTypes = ['']) {
+  for (let i = 0; i < elements.length; i++) {
+    let children = elements[i].querySelectorAll(elementTypes.join(','));
+    children.forEach((element) => {
+      let i = elements.findIndex((e) => e === element);
+      elements.splice(i, 1);
+    });
+  }
+  return elements;
+} // filterChidren()

@@ -1,6 +1,6 @@
 // mei-friend version and date
-export const version = '1.2.3';
-export const versionDate = '18 March 2025'; // use full or 3-character english months, will be translated
+export const version = '1.2.5';
+export const versionDate = '7 May 2025'; // use full or 3-character english months, will be translated
 export const splashDate = '17 January 2025'; // date of the splash screen content, same translation rules apply
 
 var vrvWorker;
@@ -42,6 +42,7 @@ export const samp = {
 };
 
 import {
+  addCodeCheckerResizerHandlers,
   addFacsimilerResizerHandlers,
   addNotationResizerHandlers,
   getFacsimileOrientation,
@@ -57,22 +58,23 @@ import {
   addMarkupHandlers,
   clearListItems,
   getSolidIdP,
+  populateSolidTab,
   readListItemsFromXML,
   refreshAnnotationsInNotation,
-  populateSolidTab,
 } from './enrichment-panel.js';
 import { dropHandler, dragEnter, dragOverHandler, dragLeave } from './dragger.js';
 import { openUrl, openUrlCancel } from './open-url.js';
 import {
-  createNotationDiv,
-  setBreaksOptions,
-  handleSmartBreaksOption,
   addModifyerKeys,
-  manualCurrentPage,
+  createNotationDiv,
+  createEncodingPanel,
   generateSectionSelect,
+  handleSmartBreaksOption,
+  manualCurrentPage,
+  setBreaksOptions,
   setChoiceOptions,
 } from './control-menu.js';
-import { clock, file, unverified, xCircleFill } from '../css/icons.js';
+import { clock, unverified, xCircleFill } from '../css/icons.js';
 import { keymap } from '../keymaps/default-keymap.js';
 import { setCursorToId, getChangelogUrl } from './utils.js';
 import { getInMeasure, navElsSelector, getElementAtCursor } from './dom-utils.js';
@@ -94,7 +96,13 @@ import Viewer from './viewer.js';
 import * as speed from './speed.js';
 import { loginAndFetch, solid } from './solid.js';
 import Storage from './storage.js';
-import { fillInBranchContents, logoutFromGithub, refreshGithubMenu, setCommitUIEnabledStatus } from './github-menu.js';
+import {
+  fillInBranchContents,
+  logoutFromGithub,
+  refreshGithubMenu,
+  setCommitUIEnabledStatus,
+  onRemoteUpdate,
+} from './github-menu.js';
 import { forkAndOpen, forkRepositoryCancel } from './fork-repository.js';
 import {
   addZoneDrawer,
@@ -230,6 +238,18 @@ export function setMeiFileInfo(fName, fLocation, fLocationPrintable) {
 
 export function setFileLocationType(t) {
   fileLocationType = t; // wrap in function to facilitate external setting
+  if (gm) {
+    if (t === 'github') {
+      // poll for remote updates when working from github
+      gm.pollForRemoteUpdates();
+    } else {
+      // stop polling for remote updates when not working from github
+      gm.stopPollingForRemoteUpdates();
+      // remove remote change indicator
+      const remoteFileChanged = document.querySelector('#remoteFileChanged');
+      remoteFileChanged.innerHTML = '';
+    }
+  }
 }
 
 export function updateFileStatusDisplay() {
@@ -258,6 +278,7 @@ export function loadDataInEditor(meiXML, setFreshlyLoaded = true) {
     storage.override = false;
   }
   freshlyLoaded = setFreshlyLoaded;
+  v.hideCodeCheckerPanel();
   v.loadXml(meiXML, true);
   cm.blockChanges = true;
   cm.setValue(meiXML);
@@ -316,6 +337,7 @@ export async function updateGithubInLocalStorage() {
       githubRepo: gm.repo,
       githubToken: gm.token,
       branch: gm.branch,
+      headSha: gm.headSha,
       filepath: gm.filepath,
       userLogin: author.username,
       userName: author.name,
@@ -504,6 +526,7 @@ async function completeInitialLoad() {
   breaksParam = searchParams.get('breaks');
 
   createNotationDiv(document.getElementById('notation'), defaultVerovioOptions.scale);
+  createEncodingPanel();
   addModifyerKeys(document); //
 
   console.log('DOMContentLoaded. Trying now to load Verovio...');
@@ -579,8 +602,9 @@ async function completeInitialLoad() {
         repo: storage.github.githubRepo,
         branch: storage.github.branch,
         filepath: storage.github.filepath,
+        headSha: storage.github.headSha,
+        onRemoteUpdate,
       });
-
       //document.querySelector("#fileLocation").innerText = meiFileLocationPrintable;
     } else if (storage.github && !isLoggedIn) {
       // we have github data but are not logged in
@@ -593,7 +617,7 @@ async function completeInitialLoad() {
       // let msg = await gitProxy.registerGitManager('github', 'github', githubToken);
       // console.log('Registered git manager: ', msg);
 
-      gm = new GitManager('github', 'github', githubToken);
+      gm = new GitManager('github', 'github', githubToken, { onRemoteUpdate });
       gm.getAuthor()
         .then((author) => {
           //github = new Github('', githubToken, '', '', '', userLogin, userName, userEmail);
@@ -601,6 +625,7 @@ async function completeInitialLoad() {
             githubRepo: gm.repo,
             githubToken: gm.token,
             branch: gm.branch,
+            headSha: gm.headSha,
             filepath: gm.filepath,
             userLogin: author.username,
             userName: author.name,
@@ -717,7 +742,7 @@ async function completeInitialLoad() {
     // no local storage
     if (isLoggedIn) {
       // initialise new github object
-      gm = new GitManager('github', 'github', githubToken);
+      gm = new GitManager('github', 'github', githubToken, { onRemoteUpdate });
       //github = new Github('', githubToken, '', '', '', userLogin, userName, userEmail);
     }
     meiFileLocation = '';
@@ -800,6 +825,8 @@ async function completeInitialLoad() {
   addMarkupHandlers();
   addNotationResizerHandlers(v, cm);
   addFacsimilerResizerHandlers(v, cm);
+  addCodeCheckerResizerHandlers(v, cm);
+
   let doit;
   window.onresize = () => {
     clearTimeout(doit); // wait half a second before re-calculating orientation
@@ -824,6 +851,16 @@ async function completeInitialLoad() {
       loginAndFetch(getSolidIdP(), populateSolidTab);
     }, restoreSolidTimeoutDelay);
   }
+
+  // if we are working from github and have a gm, clone it
+  if (fileLocationType === 'github' && gm) {
+    // remove remote changed indicator
+    const remoteFileChanged = document.getElementById('remoteFileChanged');
+    if (remoteFileChanged) {
+      remoteFileChanged.innerHTML = '';
+    }
+    gm.clone();
+  }
 } // completeInitialLoad()
 
 export async function openUrlFetch(url = '', updateAfterLoading = true) {
@@ -842,9 +879,15 @@ export async function openUrlFetch(url = '', updateAfterLoading = true) {
 
       if (fileLocationType === 'github' && userOrg && repo && branch && filepath) {
         // clone repo
-        gm = new GitManager('github', 'github', githubToken);
+        gm = new GitManager('github', 'github', githubToken, { onRemoteUpdate });
         // TODO modify for multiple git providers
         // TODO use checkAndClone mechanism to warn about excessive sizes
+
+        // remove remote changed indicator
+        const remoteFileChanged = document.getElementById('remoteFileChanged');
+        if (remoteFileChanged) {
+          remoteFileChanged.innerHTML = '';
+        }
         gm.clone(`https://github.com/${userOrg}/${repo}.git`, branch)
           .then(() => {
             gm.readFile(filepath)
@@ -913,6 +956,7 @@ function openUrlProcess(content, url, updateAfterLoading) {
     // re-initialise github menu since we're now working from a URL
     gm.filepath = '';
     gm.branch = '';
+    gm.headSha = '';
     if (storage.supported) {
       updateGithubInLocalStorage();
     }
@@ -1209,7 +1253,7 @@ export function openFile(file = defaultMeiFileURL, setFreshlyLoaded = true, upda
   if (storage.supported) {
     storage.fileLocationType = 'url';
   }
-  fileLocationType = 'url';
+  setFileLocationType('url');
   if (gm) gm.filepath = '';
   if (file === defaultMeiFileURL) {
     // opening default MEI file
@@ -1824,6 +1868,7 @@ export let cmd = {
   addBeam: () => e.addBeamElement(v, cm),
   addBeamSpan: () => e.addBeamSpan(v, cm),
   correctAccid: () => checker.checkAccidGes(v, cm),
+  checkMeterConformance: () => setTimeout(() => checker.checkMeterConformance(v, cm), 10),
   renumberMeasuresTest: () => e.renumberMeasures(v, cm, false),
   renumberMeasures: () => e.renumberMeasures(v, cm, true),
   reRenderMei: () => v.reRenderMei(cm, false),
@@ -2157,6 +2202,7 @@ function addEventListeners(v, cm) {
   document.getElementById('toggleDots').addEventListener('click', cmd.toggleDots);
   // Manipulate encoding methods
   document.getElementById('cleanAccid').addEventListener('click', cmd.correctAccid);
+  document.getElementById('meterConformance').addEventListener('click', cmd.checkMeterConformance);
   document.getElementById('renumberMeasuresTest').addEventListener('click', () => e.renumberMeasures(v, cm, false));
   document.getElementById('renumberMeasuresExec').addEventListener('click', () => e.renumberMeasures(v, cm, true));
   // rerender through Verovio

@@ -7,6 +7,7 @@ import * as utils from './utils.js';
 import { getControlMenuState, showPdfButtons, setControlMenuState, setCheckbox } from './control-menu.js';
 import { alert, download, info, success, verified, unverified, xCircleFill } from '../css/icons.js';
 import * as facs from './facsimile.js';
+import { codeCheckerHeight } from './resizer.js';
 //  drawFacsimile, highlightZone, zoomFacsimile
 import {
   cm,
@@ -26,6 +27,7 @@ import { startMidiTimeout } from './midi-player.js';
 import { getNotationProportion, setNotationProportion, setOrientation } from './resizer.js';
 import {
   commonSchemas,
+  defaultCodeCheckerHeight,
   codeMirrorSettingsOptions,
   defaultNotationProportion,
   defaultSpeedMode,
@@ -1615,11 +1617,11 @@ export default class Viewer {
   } // addMeiFriendOptionsToSettingsPanel()
 
   /**
-   * 
+   *
    * @param {string} elementName (such as 'supplied', 'unclear', 'sic', 'corr', 'orig', 'reg', 'add', 'del')
    * @param {boolean} checkedMarkup whether the markup is shown in notation
    * @param {string} colorValue the color value to set (e.g. #e69500)
-   * @param {boolean} setDefault 
+   * @param {boolean} setDefault
    */
   setHighlightColorProperty(elementName, checkedMarkup, colorValue, setDefault = false) {
     let rt = document.querySelector(':root');
@@ -2824,23 +2826,20 @@ export default class Viewer {
     let codeChecker = document.getElementById('codeChecker');
     if (!codeChecker) return;
     codeChecker.innerHTML = '';
-    codeChecker.style.display = 'block';
+    codeChecker.style.height = codeCheckerHeight + 'px';
+    codeChecker.style.display = 'flex';
     setOrientation(cm, '', '', this);
-
-    let closeButton = document.createElement('span');
-    closeButton.classList.add('rightButton');
-    closeButton.innerHTML = '&times';
-    closeButton.addEventListener('click', () => {
-      codeChecker.style.display = 'none';
-      setOrientation(cm, '', '', this);
-    });
-    codeChecker.appendChild(closeButton);
 
     let headerDiv = document.createElement('div');
     headerDiv.classList.add('validation-title');
     headerDiv.id = 'codeCheckerTitle';
-    headerDiv.innerHTML = title;
     codeChecker.appendChild(headerDiv);
+
+    let titleSpan = document.createElement('span');
+    titleSpan.innerHTML = title;
+    titleSpan.title = title;
+    titleSpan.classList.add('codeCheckerMessage');
+    headerDiv.appendChild(titleSpan);
 
     // Correct/Fix all
     let correctAllButton = document.createElement('button');
@@ -2887,6 +2886,22 @@ export default class Viewer {
     infoSpanTotal.id = 'codeCheckerInfoTotal';
     headerDiv.appendChild(infoSpanTotal);
 
+    let closeButton = document.createElement('span');
+    closeButton.classList.add('rightButton');
+    closeButton.id = 'codeCheckerCloseButton';
+    closeButton.innerHTML = '&times';
+    closeButton.addEventListener('click', () => {
+      codeChecker.style.display = 'none';
+      setOrientation(cm, '', '', this);
+    });
+    headerDiv.appendChild(closeButton);
+
+    // add empty validation-item to show that the panel is open
+    let emptyDiv = document.createElement('div');
+    emptyDiv.classList.add('validation-item');
+    emptyDiv.classList.add('codeCheckerInfoEmpty');
+    codeChecker.appendChild(emptyDiv);
+
     let noMessages = document.createElement('div');
     noMessages.classList.add('validation-item');
     noMessages.id = 'codeCheckerCheckingCode';
@@ -2915,7 +2930,8 @@ export default class Viewer {
     let span = document.createElement('span');
     span.classList.add('codeCheckerMessage');
     span.innerHTML = data.html;
-    span.addEventListener('click', (ev) => {
+    span.title = data.html;
+    span.addEventListener('click', () => {
       utils.setCursorToId(cm, data.xmlId);
       cm.focus();
     });
@@ -2977,14 +2993,20 @@ export default class Viewer {
     codeChecker.appendChild(div);
   } // addCodeCheckerEntry()
 
-  finalizeCodeCheckerPanel() {
+  finalizeCodeCheckerPanel(allGoodString = translator.lang.codeCheckerNoAccidMessagesFound.text) {
     let nothingFound = document.getElementById('codeCheckerCheckingCode');
     if (nothingFound) {
-      nothingFound.innerHTML = translator.lang.codeCheckerNoAccidMessagesFound.text;
+      nothingFound.innerHTML = allGoodString;
     } else {
       document.getElementById('codeCheckerInfoCurrent').innerHTML = 0;
       document.getElementById('codeCheckerInfoOf').innerHTML = '/';
-      document.getElementById('codeCheckerInfoTotal').innerHTML = document.querySelectorAll('.validation-item')?.length;
+      // decrement the first empty validation-item
+      document.getElementById('codeCheckerInfoTotal').innerHTML = document.querySelectorAll('.validation-item')?.length - 1;
     }
   } // finalizeCodeCheckerPanel()
+
+  hideCodeCheckerPanel() {
+    document.getElementById('codeCheckerResizer').style.display = 'none';
+    document.getElementById('codeChecker').style.display = 'none';
+  }
 } // class Viewer

@@ -293,7 +293,7 @@
   white-space: pre;
 }
 
-#fileStatus #fileChanged {
+#fileStatus #fileChanged, #remoteFileChanged {
   margin-left: 0.2em;
 }
 

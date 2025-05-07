@@ -17,6 +17,9 @@ export default class GitManager {
     this.filepath = opts.filepath || '';
     this.repo = opts.repo || null;
     this.branch = opts.branch || null;
+    this.headSha = opts.headSha || null; // sha of most recent commit
+    this.pullFrequency = opts.remoteCheckFreq || 10000; // how often to check remote for updates - default to once every 10 seconds
+    this.onRemoteUpdate = opts.onRemoteUpdate || null; // callback for when remote is updated
     //set up type-specific onAuth, see https://isomorphic-git.org/docs/en/onAuth#docsNav
     switch (providerType) {
       case 'github':
@@ -44,6 +47,40 @@ export default class GitManager {
     return this.cloud.repo;
   }
 
+  async remoteChangesExist() {
+    await this.fetch({
+      fs,
+      http,
+      dir: this.directory,
+      remote: 'origin',
+      ref: this.branch,
+      singleBranch: true,
+    });
+    // then check the current head sha against the remote head sha
+    let localHeadSha = await this.getLocalHeadSha();
+    let remoteHeadSha = await this.getRemoteHeadSha();
+    return this.remoteChangedDuringRestore || localHeadSha !== remoteHeadSha;
+  }
+
+  async checkRemote() {
+    // check whether the remote has been updated with new commits
+    // if so, call the onRemoteUpdate callback
+    // first, fetch the remote, supplying the current branch appropriately
+    console.log('checking remote for updates');
+    if (await this.remoteChangesExist()) {
+      // remote has been updated
+      if (this.onRemoteUpdate) {
+        console.log('Remote updated, calling onRemoteUpdate');
+        this.onRemoteUpdate();
+      } else {
+        console.warn('Remote updated, but no onRemoteUpdate callback set');
+      }
+    }
+    // reset the timeout
+    this.stopPollingForRemoteUpdates();
+    this.pollForRemoteUpdates();
+  }
+
   async checkout() {
     // first perform a fetch to ensure we have all branches
     await this.fetch();
@@ -53,6 +90,24 @@ export default class GitManager {
       dir: this.directory,
       ref: this.branch,
     });
+  }
+
+  async pollForRemoteUpdates() {
+    // check if the remote has been updated
+    if (this.onRemoteUpdate) {
+      // if we have a callback, set up a timeout to check the remote periodically
+      this.checkRemoteTimeout = setTimeout(() => {
+        this.checkRemote();
+      }, this.pullFrequency);
+    }
+  }
+
+  async stopPollingForRemoteUpdates() {
+    // stop polling for remote updates
+    if (this.checkRemoteTimeout) {
+      clearTimeout(this.checkRemoteTimeout);
+      this.checkRemoteTimeout = null;
+    }
   }
 
   async fetch() {
@@ -141,19 +196,7 @@ export default class GitManager {
               }
             },
           };
-          await git.clone(cloneobj) /*.catch(async (err) => {
-            console.error('clone error, checking repo size', err);
-            // check if repo is too large
-            let size = await this.getRepoSize();
-            console.log('Got size: ', size);
-            // size.size is reported in kb
-            // check if it is larger than 100mb
-            if (size > 100000) {
-              throw { name: 'RepoTooLargeError', message: size };
-            } else {
-              throw new Error('clone error');
-            }
-          })*/;
+          await git.clone(cloneobj);
 
           // update remote
           await git.deleteRemote({
@@ -167,6 +210,14 @@ export default class GitManager {
             remote: 'origin',
             url: url,
           });
+          // if our headSha is set but does not match the new local head sha,
+          // we are trying to restore a previous state and the remote has changed
+          if (this.headSha && this.headSha !== (await this.getLocalHeadSha())) {
+            this.remoteChangedDuringRestore = true;
+          }
+          this.headSha = await this.getLocalHeadSha();
+          // poll for remote updates
+          this.pollForRemoteUpdates();
         });
       })
       .catch((err) => {
@@ -194,34 +245,31 @@ export default class GitManager {
 
   async getRemote() {
     console.log('getRemote(), git: ', git, 'dir: ', this.directory, 'fs: ', fs);
-    return git
-      .listRemotes({
-        fs,
-        dir: this.directory,
-      })
-      .then((remote) => {
-        const remoteUrl = remote[0].url;
-        console.log('getRemote(), remoteUrl: ', remoteUrl);
-        if (remoteUrl) {
-          switch (this.providerType) {
-            // TODO check these, they are imagined by copilot
-            // particularly, they should use the provider in the URI
-            case 'github':
-              return remoteUrl.match(/github.com\/([^/]+\/.+)/)[1];
-            case 'gitlab':
-              return remoteUrl.match(/gitlab.com\/([^/]+\/.+)/)[1];
-            case 'bitbucket':
-              return remoteUrl.match(/bitbucket.org\/([^/]+\/.+)/)[1];
-            case 'codeberg':
-              return remoteUrl.match(/codeberg.org\/([^/]+\/.+)/)[1];
-            default:
-              throw new Error('Unknown provider');
-          }
+    const remote = await git.listRemotes({ fs, dir: this.directory });
+    if (remote && remote.length > 0) {
+      console.log('getRemote(), remote: ', remote);
+      const remoteUrl = remote[0].url;
+      console.log('getRemote(), remoteUrl: ', remoteUrl);
+      if (remoteUrl) {
+        switch (this.providerType) {
+          // TODO check these, they are imagined by copilot
+          // particularly, they should use the provider in the URI
+          case 'github':
+            return remoteUrl.match(/github.com\/([^/]+\/.+)/)[1];
+          case 'gitlab':
+            return remoteUrl.match(/gitlab.com\/([^/]+\/.+)/)[1];
+          case 'bitbucket':
+            return remoteUrl.match(/bitbucket.org\/([^/]+\/.+)/)[1];
+          case 'codeberg':
+            return remoteUrl.match(/codeberg.org\/([^/]+\/.+)/)[1];
+          default:
+            throw new Error('Unknown provider');
         }
-      });
+      }
+    }
   }
 
-  async getCurrentHeadSha() {
+  async getLocalHeadSha() {
     return await git
       .resolveRef({
         fs,
@@ -229,7 +277,20 @@ export default class GitManager {
         ref: 'HEAD',
       })
       .catch((err) => {
-        console.error('getCurrentHeadSha error', err);
+        console.error('getLocalHeadSha error', err);
+        throw err;
+      });
+  }
+
+  async getRemoteHeadSha() {
+    return await git
+      .resolveRef({
+        fs,
+        dir: this.directory,
+        ref: 'refs/remotes/origin/' + this.branch,
+      })
+      .catch((err) => {
+        console.error('getRemoteHeadSha error', err);
         throw err;
       });
   }
@@ -275,6 +336,7 @@ export default class GitManager {
     await this.checkout();
     // then push the branch to the remote
     await this.push();
+    this.headSha = await this.getLocalHeadSha();
     return branch;
   }
 
@@ -299,9 +361,9 @@ export default class GitManager {
         singleBranch: true,
         author,
       });
+      this.headSha = this.getLocalHeadSha();
     } catch (err) {
-      console.error('pull error', err);
-      throw err;
+      console.warn('Conflicting change on remote: ', err);
     }
   }
 
@@ -325,7 +387,8 @@ export default class GitManager {
     await this.pull();
   }
 
-  async add(path = this.filepath) {
+  async add() {
+    let path = this.filepath;
     if (path.startsWith('/')) {
       path = path.substring(1);
     }
@@ -350,6 +413,7 @@ export default class GitManager {
       ref: this.branch,
       message: message,
     });
+    this.headSha = await this.getLocalHeadSha();
   }
 
   async status(path = this.filepath) {

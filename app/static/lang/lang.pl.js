@@ -178,6 +178,7 @@ export const lang = {
   decreaseDurText: { text: 'Zmniejsz długość' },
   toggleDotsText: { text: 'Przełączanie kropkowania' },
   cleanAccidText: { text: 'Sprawdzić @accid.ges' },
+  meterConformanceText: { text: 'Sprawdzić @metcon' },
   renumberMeasuresTestText: { text: 'Numeruj taktowania (test)' },
   renumberMeasuresExecText: { text: 'Numeruj taktowania (wykonaj)' },
   addIdsText: { text: 'Dodaj identyfikatory do MEI' },
@@ -1112,7 +1113,7 @@ export const lang = {
   renumberMeasureMeasuresRenumbered: { text: 'takty zostały ponumerowane' },
 
   // Code checker panel (accid.ges)
-  codeCheckerTitle: {
+  accidGesCodeCheckerTitle: {
     text: 'Sprawdź atrybuty @accid.ges (w stosunku do znaku klucza, akcydenckie na takt oraz wiązania).',
   },
   codeCheckerFix: { text: 'Popraw' },
