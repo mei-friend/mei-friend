@@ -5,7 +5,7 @@ import * as prs from './page-range-selector.js';
 import * as speed from './speed.js';
 import * as utils from './utils.js';
 import { getControlMenuState, showPdfButtons, setControlMenuState, setCheckbox } from './control-menu.js';
-import { alert, download, info, success, verified, unverified, xCircleFill } from '../css/icons.js';
+import * as icons from '../css/icons.js'; // { alert, download, info, success, verified, unverified, xCircleFill }
 import * as facs from './facsimile.js';
 import { codeCheckerHeight } from './resizer.js';
 //  drawFacsimile, highlightZone, zoomFacsimile
@@ -27,7 +27,6 @@ import { startMidiTimeout } from './midi-player.js';
 import { getNotationProportion, setNotationProportion, setOrientation } from './resizer.js';
 import {
   commonSchemas,
-  defaultCodeCheckerHeight,
   codeMirrorSettingsOptions,
   defaultNotationProportion,
   defaultSpeedMode,
@@ -2369,22 +2368,22 @@ export default class Viewer {
     let alertOverlay = document.getElementById('alertOverlay');
     let alertIcon = document.getElementById('alertIcon');
     let alertMessage = document.getElementById('alertMessage');
-    alertIcon.innerHTML = xCircleFill; // error as default icon
+    alertIcon.innerHTML =icons.alertFill; // error as default icon
     alertOverlay.classList.remove('warning');
     alertOverlay.classList.remove('info');
     alertOverlay.classList.remove('success');
     switch (type) {
       case 'warning':
         alertOverlay.classList.add('warning');
-        alertIcon.innerHTML = alert;
+        alertIcon.innerHTML = icons.alert;
         break;
       case 'info':
         alertOverlay.classList.add('info');
-        alertIcon.innerHTML = info;
+        alertIcon.innerHTML = icons.info;
         break;
       case 'success':
         alertOverlay.classList.add('success');
-        alertIcon.innerHTML = success;
+        alertIcon.innerHTML = icons.success;
         break;
     }
     alertMessage.innerHTML = message;
@@ -2408,17 +2407,17 @@ export default class Viewer {
     let promptMessage = document.getElementById('promptMessage');
     let promptButtons = document.getElementById('promptButtons');
     promptButtons.textContent = '';
-    promptIcon.innerHTML = xCircleFill; // error as default icon
+    promptIcon.innerHTML = icons.alertFill; // error as default icon
     promptOverlay.classList.remove('warning');
     promptOverlay.classList.remove('info');
     switch (type) {
       case 'warning':
         promptOverlay.classList.add('warning');
-        promptIcon.innerHTML = alert;
+        promptIcon.innerHTML = icons.alert;
         break;
       case 'info':
         promptOverlay.classList.add('info');
-        promptIcon.innerHTML = info;
+        promptIcon.innerHTML = icons.info;
         break;
     }
     promptMessage.innerHTML = message;
@@ -2512,7 +2511,7 @@ export default class Viewer {
   async replaceSchema(schemaFileName) {
     if (!this.validatorInitialized) return;
     let vs = document.getElementById('validation-status');
-    vs.innerHTML = download;
+    vs.innerHTML = icons.download;
     let msg = translator.lang.loadingSchema.text + ' ' + schemaFileName;
     vs.setAttribute('title', msg);
     Viewer.changeStatus(vs, 'wait', ['error', 'ok', 'manual']);
@@ -2541,7 +2540,7 @@ export default class Viewer {
     }
     msg = translator.lang.schemaLoaded.text + ' ' + schemaFileName;
     vs.setAttribute('title', msg);
-    vs.innerHTML = unverified;
+    vs.innerHTML = icons.unverified;
     this.validatorWithSchema = true;
     const autoValidate = document.getElementById('autoValidate');
     if (autoValidate && autoValidate.checked) {
@@ -2577,7 +2576,7 @@ export default class Viewer {
     if (msgObj.hasOwnProperty('schemaFile')) msg += msgObj.schemaFile;
     // set icon to unverified and error color
     let vs = document.getElementById('validation-status');
-    vs.innerHTML = unverified;
+    vs.innerHTML = icons.unverified;
     vs.setAttribute('title', msg);
     console.warn(msg);
     Viewer.changeStatus(vs, 'error', ['wait', 'ok', 'manual']);
@@ -2641,7 +2640,7 @@ export default class Viewer {
    */
   setValidationStatusToManual() {
     let vs = document.getElementById('validation-status');
-    vs.innerHTML = unverified;
+    vs.innerHTML = icons.unverified;
     vs.style.cursor = 'pointer';
     if (isSafari) {
       translator.handleBrowserExceptions('Safari');
@@ -2718,11 +2717,11 @@ export default class Viewer {
     let msg = '';
     if (found.length === 0 && this.validatorWithSchema) {
       Viewer.changeStatus(vs, 'ok', ['error', 'wait', 'manual']);
-      vs.innerHTML = verified;
+      vs.innerHTML = icons.verified;
       msg = 'Everything ok, no errors.';
     } else {
       Viewer.changeStatus(vs, 'error', ['wait', 'ok', 'manual']);
-      vs.innerHTML = alert;
+      vs.innerHTML = icons.alert;
       vs.innerHTML += '<span>' + Object.keys(messages).length + '</span>';
       msg = 'Validation failed. ' + Object.keys(messages).length + ' validation messages:';
       messages.forEach((m) => (msg += '\nLine ' + m.line + ': ' + m.message));
