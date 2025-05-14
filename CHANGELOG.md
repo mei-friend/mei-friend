@@ -3,6 +3,7 @@
 ### 1.2.5 patch
 * Retrieve SVG coordinate values from `getBBox()` instead of `use[x/y]` to address changes in Verovio ([PR#4039](https://github.com/rism-digital/verovio/pull/4039))
 * Update accid.ges checker for MEI 5 (i.e. `@keysig` instead of `@key.sig`)
+* Change error icon to alert-fill octicon (#147 thanks @ahankinson)
 
 ### 1.2.4 patch
 * Add meter conformance checker (#142) that inspects the duration of each staff within a measure relative to the current time signature
