@@ -210,7 +210,7 @@ export const lang = {
   addPedalDownText: { text: 'Pedal drücken' },
   addPedalUpText: { text: 'Pedal loslassen' },
   addTrillText: { text: 'Triller' },
-  addTurnText: { text: 'Doppleschlag' },
+  addTurnText: { text: 'Doppelschlag' },
   addTurnLowerText: { text: 'Doppelschlag nach unten' },
   addMordentText: { text: 'Mordent' },
   addMordentUpperText: { text: 'Pralltriller' },
@@ -580,7 +580,7 @@ export const lang = {
   addOrigText: {
     text: '<orig>',
     description:
-      '(original) – Enthält Material, das als dem Original folgend markiert ist, anstatt genormalisiert oder korrigiert zu werden.',
+      '(original) – Enthält Material, das als dem Original folgend markiert ist, anstatt normalisiert oder korrigiert zu werden.',
   },
   addRegText: {
     text: '<reg>',
