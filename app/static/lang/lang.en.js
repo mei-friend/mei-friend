@@ -460,6 +460,29 @@ export const lang = {
   annotationListButton: { description: 'List annotations' },
   writeAnnotStandoffText: { text: 'Web Annotation' },
   annotationToolDomainSelectorLegend: { text: 'Select annotation storage' },
+  annotationToolTargetTypeSelectorLegend: { text: 'Target type', description: 'Select an annotation target type' },
+  annotationToolTargetTypeElements: {
+    description: 'Annotate selected MEI elements using @plist.',
+  },
+  annotationToolTargetTypeElementsLabel: {
+    text: 'Elements',
+    description: 'Annotate selected MEI elements using @plist.',
+  },
+  annotationToolTargetTypeRange: {
+    description: 'Annotate the range of selected MEI elements using @startid and @endid',
+  },
+  annotationToolTargetTypeRangeLabel: {
+    text: 'Range',
+    description: 'Annotate the range of selected MEI elements using @startid and @endid',
+  },
+  annotationToolTargetTypeInterval: {
+    description: 'Annotate the time interval corresponding to selected MEI elements using @tstamp and @tstamp2',
+  },
+  annotationToolTargetTypeIntervalLabel: {
+    text: 'Interval',
+    description: 'Annotate the time interval corresponding to selected MEI elements using @tstamp and @tstamp2',
+  },
+
   insertInlineAnnotationLegend: { text: 'Insert annotation' }, // TODO: 'Insert inline annotation'
   insertStandoffAnnotationLegend: { text: 'Insert stand-off annotation' },
   annotationToolsIdentifyTitle: { text: 'Identify' },

@@ -515,31 +515,38 @@ export default class Viewer {
     }
   } // addNotationEventListeners()
 
-  handleClickOnNotation(e, cm) {
+  handleClickOnNotation(event, cm) {
     if (!this.allowNotationInteraction) return;
-    e.stopImmediatePropagation();
+    event.stopImmediatePropagation();
     this.hideAlerts();
     let point = {};
-    point.x = e.clientX;
-    point.y = e.clientY;
+    point.x = event.clientX;
+    point.y = event.clientY;
     var matrix = document.querySelector('g.page-margin').getScreenCTM().inverse();
     let r = {};
     r.x = matrix.a * point.x + matrix.c * point.y + matrix.e;
     r.y = matrix.b * point.x + matrix.d * point.y + matrix.f;
-    console.debug('Click on ' + e.srcElement.id + ', x/y: ' + r.x + '/' + r.y);
+    console.debug('Click on ' + event.srcElement.id + ', x/y: ' + r.x + '/' + r.y);
 
     this.allowCursorActivity = false;
     // console.info('click: ', e);
-    let itemId = String(e.currentTarget.id);
-    if (itemId === 'undefined') return;
+    let itemId = String(event.currentTarget.id);
+    if (itemId === 'undefined') {
+      console.warn('handleClickOnNotation() Cannot find id for clicked element');
+      return;
+    }
     // take chord rather than note xml:id, when ALT is pressed
     let chordId = utils.insideParent(itemId);
-    if (e.altKey && chordId) itemId = chordId;
+    if (event.altKey && chordId) {
+      itemId = chordId;
+    }
     // select tuplet when clicking on tupletNum
-    if (e.currentTarget.getAttribute('class') === 'tupletNum') itemId = utils.insideParent(itemId, 'tuplet');
+    if (event.currentTarget.getAttribute('class') === 'tupletNum') {
+      itemId = utils.insideParent(itemId, 'tuplet');
+    }
 
     let msg = 'handleClickOnNotation() ';
-    if ((platform.startsWith('mac') && e.metaKey) || e.ctrlKey) {
+    if ((platform.startsWith('mac') && event.metaKey) || event.ctrlKey) {
       if (this.selectedElements.includes(itemId)) {
         this.selectedElements.splice(this.selectedElements.indexOf(itemId), 1);
         msg += 'removed: ' + itemId + ', size: ' + this.selectedElements.length;
@@ -551,7 +558,7 @@ export default class Viewer {
       // set cursor position in buffer
       let found = utils.setCursorToId(cm, itemId);
       if (!found) {
-        this.showMissingIdsWarning(e.currentTarget.classList.item(0));
+        this.showMissingIdsWarning(event.currentTarget.classList.item(0));
       }
       this.selectedElements = [];
       this.selectedElements.push(itemId);
@@ -565,7 +572,7 @@ export default class Viewer {
 
     //console.log(msg);
     console.log('handleClickOnNotation() selectedElements: ', this.selectedElements);
-    this.scrollSvgTo(cm, e);
+    this.scrollSvgTo(cm, event);
     this.updateHighlight(cm);
     if (document.getElementById('showMidiPlaybackControlBar').checked) {
       console.log('Viewer.handleClickOnNotation(): HANDLE CLICK MIDI TIMEOUT');
@@ -2368,7 +2375,7 @@ export default class Viewer {
     let alertOverlay = document.getElementById('alertOverlay');
     let alertIcon = document.getElementById('alertIcon');
     let alertMessage = document.getElementById('alertMessage');
-    alertIcon.innerHTML =icons.alertFill; // error as default icon
+    alertIcon.innerHTML = icons.alertFill; // error as default icon
     alertOverlay.classList.remove('warning');
     alertOverlay.classList.remove('info');
     alertOverlay.classList.remove('success');
@@ -3000,7 +3007,8 @@ export default class Viewer {
       document.getElementById('codeCheckerInfoCurrent').innerHTML = 0;
       document.getElementById('codeCheckerInfoOf').innerHTML = '/';
       // decrement the first empty validation-item
-      document.getElementById('codeCheckerInfoTotal').innerHTML = document.querySelectorAll('.validation-item')?.length - 1;
+      document.getElementById('codeCheckerInfoTotal').innerHTML =
+        document.querySelectorAll('.validation-item')?.length - 1;
     }
   } // finalizeCodeCheckerPanel()
 
