@@ -1,5 +1,8 @@
 # mei-friend-online CHANGELOG.md
 
+### 1.2.6 patch
+* Initial implementation of Annote integration for ranged annotations (#149)
+
 ### 1.2.5 patch
 * Retrieve SVG coordinate values from `getBBox()` instead of `use[x/y]` to address changes in Verovio ([PR#4039](https://github.com/rism-digital/verovio/pull/4039))
 * Update accid.ges checker for MEI 5 (i.e. `@keysig` instead of `@key.sig`)
