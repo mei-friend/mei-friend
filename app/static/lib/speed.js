@@ -586,9 +586,9 @@ function readSection(pageNo, spdScore, breaks, countingMode) {
  * Finds out which staff number the element belongs to.
  * @param {Element} element
  * @returns {string} The found `@n` value of the closest `<staff>` or
- * `<staffDef>`, or the empty string if no such elemetn or attribute was found.
+ * `<staffDef>`, or the empty string if no such element or attribute was found.
  */
-function getStaffNumber(element) {
+export function getStaffNumber(element) {
   return element.closest('staff,staffDef')?.getAttribute('n') || '';
 } // getStaffNumber()
 

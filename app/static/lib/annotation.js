@@ -23,7 +23,8 @@ import {
   refreshAnnotationsInNotation,
 } from './enrichment-panel.js';
 import * as att from './attribute-classes.js';
-
+import { getMeasureDistanceBetweenElements, getStaffNumber, getTstampForElement } from './speed.js';
+import { writeMeasureBeat } from './utils.js';
 //#region functions to draw annotations
 
 /**
@@ -32,6 +33,7 @@ import * as att from './attribute-classes.js';
  * @param {Object} a annotation object
  */
 export async function drawIdentify(a) {
+  // n.b. standoff annotations are always of targetType 'elements', so we don't need to check for that
   if ('selection' in a) {
     const els = a.selection.map((s) => document.getElementById(s));
     els
@@ -48,8 +50,13 @@ export async function drawIdentify(a) {
  * @param {Object} a annotation object
  */
 export function drawHighlight(a) {
-  if ('selection' in a) {
-    const els = a.selection.map((s) => document.getElementById(s));
+  let sel = a.selection;
+  if (a.targetType === 'interval' || a.targetType === 'range') {
+    // for ranged annotations, only highlight the range bar, not the constituent elements
+    sel = [a.id];
+  }
+  if (sel) {
+    const els = sel.map((s) => document.getElementById(s));
     els
       .filter((e) => e !== null) // (null if not on current page)
       .forEach((e) => e.classList.add('annotationHighlight'));
@@ -59,11 +66,16 @@ export function drawHighlight(a) {
 }
 
 export function drawCircle(a) {
-  if ('selection' in a) {
+  let sel = a.selection;
+  if (a.targetType === 'interval' || a.targetType === 'range') {
+    // for ranged annotations, only highlight the range bar, not the constituent elements
+    sel = [a.id];
+  }
+  if (sel) {
     // mission: draw an ellipse into the raSvg that encompasses a collection of selection objects
     let raSvg = document.querySelector('#renderedAnnotationsSvg');
     // find bounding boxes of all selected elements on page:
-    const bboxes = a.selection.map((s) => convertCoords(document.getElementById(s)));
+    const bboxes = sel.map((s) => convertCoords(document.getElementById(s)));
     // determine enveloping bbox
     const minX = Math.min(...bboxes.map((b) => b.x));
     const minY = Math.min(...bboxes.map((b) => b.y));
@@ -92,8 +104,13 @@ export function drawCircle(a) {
  * @param {Object} a annotation object
  */
 export function drawDescribe(a) {
-  if ('selection' in a && 'description' in a) {
-    const els = a.selection.map((s) => document.getElementById(s));
+  let sel = a.selection;
+  if (a.targetType === 'interval' || a.targetType === 'range') {
+    // for ranged annotations, only highlight the range bar, not the constituent elements
+    sel = [a.id];
+  }
+  if (sel && 'description' in a) {
+    const els = sel.map((s) => document.getElementById(s));
     els
       .filter((e) => e !== null) // (null if not on current page)
       .forEach((e) => {
@@ -116,8 +133,13 @@ export function drawDescribe(a) {
  * @param {Object} a annotation object
  */
 export function drawLink(a) {
-  if ('selection' in a && 'url' in a) {
-    const els = a.selection.map((s) => document.getElementById(s));
+  let sel = a.selection;
+  if (a.targetType === 'interval' || a.targetType === 'range') {
+    // for ranged annotations, only highlight the range bar, not the constituent elements
+    sel = [a.id];
+  }
+  if (sel && 'url' in a) {
+    const els = sel.map((s) => document.getElementById(s));
     els
       .filter((e) => e !== null) // (null if not on current page)
       .forEach((e) => {
@@ -297,7 +319,13 @@ export function readAnnots(flagLimit = false) {
       annotation.id = 'None';
     }
     annotation.isInline = true;
-
+    if (annot.hasAttribute('startid') && annot.hasAttribute('endid')) {
+      annotation.targetType = 'range';
+    } else if (annot.hasAttribute('tstamp') && annot.hasAttribute('tstamp2')) {
+      annotation.targetType = 'interval';
+    } else {
+      annotation.targetType = 'elements';
+    }
     addListItem(annotation);
   });
 } // readAnnots()
@@ -347,29 +375,37 @@ export async function situateAnnotations(a) {
  * with @xml:id, @plist and optional payload (string or ptr)
  * @param {Element} anchor anchor element
  * @param {string} xmlId xml:id for new annot element
- * @param {Array} plist selected elements
+ * @param {Array} selection selected elements
  * @param {object|string} payload possible content of annot element
  * @returns
  */
-export function writeAnnot(anchor, xmlId, plist, payload) {
+export function writeAnnot(anchor, xmlId, selection, payload) {
+  let targetType = document.querySelector('#annotationToolTargetTypeSelector :checked').getAttribute('value');
   // TODO: Place the annotation in the most sensible place according to the MEI schema
   // i.e., probably the closest permissible level to the anchor element.
   // For now, we only support a limited range of music body elements
   let insertHere;
-  if (anchor.closest(att.modelTranscriptionLike.join(','))) {
-    insertHere = anchor.closest(att.modelTranscriptionLike.join(','));
-  } else if (anchor.closest(att.alternativeEncodingElements.join(','))) {
-    insertHere = anchor.closest(att.alternativeEncodingElements.join(','));
-  } else if (anchor.closest('layer')) insertHere = anchor.closest('layer');
-  else if (anchor.closest('measure')) insertHere = anchor.closest('measure');
-  else if (anchor.closest('section')) insertHere = anchor.closest('section');
-  else if (anchor.closest('score')) insertHere = anchor.closest('score');
-  else {
-    console.error('Sorry, cannot currently write annotations placed outside <score>');
-    v.showAlert(translator.lang.annotationsOutsideScoreWarning.text, 'warning', 5000);
-    // remove from list
-    deleteListItem(xmlId);
-    return;
+  // Range annotations are always inserted above the staff level
+  if (targetType === 'range' || targetType === 'interval') {
+    let closestStaff = anchor.closest('staff');
+    insertHere = closestStaff ? anchor.closest('staff').parentElement : '';
+  }
+  if (!insertHere) {
+    if (anchor.closest(att.modelTranscriptionLike.join(','))) {
+      insertHere = anchor.closest(att.modelTranscriptionLike.join(','));
+    } else if (anchor.closest(att.alternativeEncodingElements.join(','))) {
+      insertHere = anchor.closest(att.alternativeEncodingElements.join(','));
+    } else if (anchor.closest('layer')) insertHere = anchor.closest('layer');
+    else if (anchor.closest('measure')) insertHere = anchor.closest('measure');
+    else if (anchor.closest('section')) insertHere = anchor.closest('section');
+    else if (anchor.closest('score')) insertHere = anchor.closest('score');
+    else {
+      console.error('Sorry, cannot currently write annotations placed outside <score>');
+      v.showAlert(translator.lang.annotationsOutsideScoreWarning.text, 'warning', 5000);
+      // remove from list
+      deleteListItem(xmlId);
+      return;
+    }
   }
   if (insertHere) {
     // disable cursor activity and block changes in CM
@@ -386,7 +422,41 @@ export function writeAnnot(anchor, xmlId, plist, payload) {
       setCursorToId(cm, firstChildNode.getAttribute('xml:id'));
       let annot = document.createElementNS(meiNameSpace, 'annot');
       annot.setAttributeNS(xmlNameSpace, 'xml:id', xmlId);
-      annot.setAttribute('plist', plist.map((p) => '#' + p).join(' '));
+      // set targets according to user's chosen target type
+      if (targetType === 'range') {
+        // use @startid and @endid to identify the range of selected elements
+        // set @staff to a string containing the staff numbers of the selected elements (space-separated, only once per staff)
+        // n.b. they are already sorted in the selection array
+        annot.setAttribute('startid', '#' + selection[0]);
+        annot.setAttribute('endid', '#' + selection[selection.length - 1]);
+        let staffNumbers = selection.map((s) => getStaffNumber(v.xmlDoc.querySelector(`[*|id="${s}"]`)));
+        staffNumbers = [...new Set(staffNumbers)]; // remove duplicates
+        annot.setAttribute('staff', staffNumbers.join(' '));
+        annot.setAttribute('type', 'score');
+      } else if (targetType === 'interval') {
+        // determine the tstamp values of the first and last selected elements
+        // and set @tstamp and @tstamp2 to those values
+        let el1 = v.xmlDoc.querySelector(`[*|id="${selection[0]}"]`);
+        let el2 = v.xmlDoc.querySelector(`[*|id="${selection[selection.length - 1]}"]`);
+        console.log('Interval elements: ', el1, el2, selection);
+        let tstamp = getTstampForElement(v.xmlDoc, el1);
+        let tstamp2 = getTstampForElement(v.xmlDoc, el2);
+        let measureDistance = getMeasureDistanceBetweenElements(v.xmlDoc, el1, el2);
+        annot.setAttribute('tstamp', tstamp);
+        annot.setAttribute('tstamp2', tstamp2);
+        annot.setAttribute('tstamp2', writeMeasureBeat(measureDistance, tstamp2));
+        let staffNumbers = selection.map((s) => getStaffNumber(v.xmlDoc.querySelector(`[*|id="${s}"]`)));
+        staffNumbers = [...new Set(staffNumbers)]; // remove duplicates
+        annot.setAttribute('staff', staffNumbers.join(' '));
+        annot.setAttribute('type', 'score');
+      } else {
+        // use @plist to store the list of selected elements' xml:ids
+        annot.setAttribute('plist', selection.map((p) => '#' + p).join(' '));
+        if (targetType !== 'elements') {
+          console.warn('writeAnnot(): Unknown target type, treating as "elements" and using @plist: ', targetType);
+        }
+      }
+
       if (payload) {
         if (typeof payload === 'string') {
           annot.textContent = payload;

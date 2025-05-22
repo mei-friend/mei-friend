@@ -108,6 +108,7 @@ writeAnnotationStandoffLabel.disabled {
 
 #annotationToolsDomainSelection fieldset {
   flex-direction: row;
+  margin-bottom:1em;
 }
 
 .selectedAnnotationListItem {

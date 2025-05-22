@@ -1275,14 +1275,14 @@
                   >RDF</label
                 >
               </fieldset>
-              <fieldset>
+              <fieldset id="annotationToolTargetTypeSelector">
                 <legend id="annotationToolTargetTypeSelectorLegend">Target type</legend>
                 <input
                   type="radio"
                   checked
                   id="annotationToolTargetTypeElements"
                   title="Annotate specified MEI elements using @plist."
-                  value="annotationToolTargetTypeElements"
+                  value="elements"
                   name="annotationToolTargetTypeSelector"
                 />
                 <label
@@ -1295,7 +1295,7 @@
                   type="radio"
                   id="annotationToolTargetTypeRange"
                   title="Annotate range of selected elements using @startid and @endid."
-                  value="annotationToolTargetTypeRange"
+                  value="range"
                   name="annotationToolTargetTypeSelector"
                 />
                 <label
@@ -1308,7 +1308,7 @@
                   type="radio"
                   id="annotationToolTargetTypeInterval"
                   title="Annotate time interval of selected elements using @tstamp and @tstamp2."
-                  value="annotationToolTargetTypeInterval"
+                  value="interval"
                   name="annotationToolTargetTypeSelector"
                 />
                 <label
