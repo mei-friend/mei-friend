@@ -759,7 +759,10 @@ export function getTstampForElement(xmlDoc, element) {
         if (e === element) {
           break;
         }
-        tstamp += getDurationOfElement(e, parseFloat(meter.unit));
+        let duration = getDurationOfElement(e, parseFloat(meter.unit));
+        if (duration) {
+          tstamp += duration;
+        }
       }
     }
   }

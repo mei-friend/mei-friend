@@ -1883,6 +1883,7 @@ function isEmpty(str) {
  * @returns
  */
 export function replaceInEditor(cm, xmlNode, select = false, newNode = []) {
+  dutils.cleanNode(xmlNode);
   // construct new MEI if newNode has elements
   let newMei = '';
   if (Array.isArray(newNode) && newNode.length > 0) {

@@ -38,11 +38,11 @@ export const lang = {
         这些信息存储在运行在维也纳音乐与表演艺术大学服务器上的 Matomo 实例中，不会与任何第三方共享。
       </p>
       <p>
-        使用 
-        <a href="https://bitbucket.org/bayleaf/luteconv/" target="_blank">luteconv</a> 由 Paul Overell 开发，通过
-        <a href="https://codeberg.org/mdwRepository/luteconv-webui" target="_blank">luteconv-webui 服务</a> 由 Stefan Szepe 开发，并由
-        <a href="https://luteconv.mdw.ac.at" target="_blank">维也纳音乐与表演艺术大学</a> 托管。
-        该服务在转换过程中创建您的编码的 Web 可访问副本，但这些副本仅通过唯一的链接哈希值可访问，并会定期删除。
+        鲁特类指法谱使用由 Paul Overell 开发的 
+        <a href="https://bitbucket.org/bayleaf/luteconv/" target="_blank">luteconv</a>转换为 MEI，通过由 Stefan Szepe 开发的
+        <a href="https://codeberg.org/mdwRepository/luteconv-webui" target="_blank">luteconv-webui 服务</a> 托管于
+        <a href="https://luteconv.mdw.ac.at" target="_blank">维也纳音乐与表演艺术大学</a> 。
+        该服务在转换过程中创建您编码的 Web 可访问副本，但这些副本仅通过唯一的链接哈希值可访问，并会定期删除。
       </p>
       <p>
         Verovio 工具包从 <a href="https://verovio.org" target="_blank">https://verovio.org</a> 加载，由
@@ -129,7 +129,7 @@ export const lang = {
   replaceAllMenuText: { text: '全部替换' },
   indentSelectionText: { text: '缩进选择' },
   surroundWithTagsText: { text: '用标签包围' },
-  surroundWithLastTagText: { text: '用' },
+  surroundWithLastTagText: { text: '用上一个标签包围' },
   jumpToLineText: { text: '跳到行' },
   toMatchingTagText: { text: '转到匹配标签' },
   manualValidateText: { text: '验证' },
@@ -142,30 +142,30 @@ export const lang = {
   notationRight: { text: '乐谱右侧' },
   showSettingsMenuText: { text: '设置面板' },
   showAnnotationMenuText: { text: '注释面板' },
-  showFacsimileMenuText: { text: '影像面板' },
+  showFacsimileMenuText: { text: '摹本面板' },
   showPlaybackControlsText: { text: '播放控制' },
-  facsimileTop: { text: '影像顶部' },
-  facsimileBottom: { text: '影像底部' },
-  facsimileLeft: { text: '影像左侧' },
-  facsimileRight: { text: '影像右侧' },
+  facsimileTop: { text: '摹本顶部' },
+  facsimileBottom: { text: '摹本底部' },
+  facsimileLeft: { text: '摹本左侧' },
+  facsimileRight: { text: '摹本右侧' },
 
   // MANIPULATE MENU ITEM
   manipulateMenuTitle: { text: '操作' },
-  invertPlacementText: { text: '反 转位置' },
-  betweenPlacementText: { text: '在位置之间' },
-  addVerticalGroupText: { text: '添加垂直组' },
+  invertPlacementText: { text: '反转布局' },
+  betweenPlacementText: { text: '在布局之间' },
+  addVerticalGroupText: { text: '添加纵向组' },
   deleteText: { text: '删除元素' },
   pitchChromUpText: { text: '半音升高' },
   pitchChromDownText: { text: '半音降低' },
-  pitchUpDiatText: { text: '全音升高' },
-  pitchDownDiatText: { text: '全音降低' },
+  pitchUpDiatText: { text: '自然音升高' },
+  pitchDownDiatText: { text: '自然音降低' },
   pitchOctaveUpText: { text: '升高一个八度' },
   pitchOctaveDownText: { text: '降低一个八度' },
   staffUpText: { text: '元素上移一个谱表' },
   staffDownText: { text: '元素下移一个谱表' },
   increaseDurText: { text: '增加时值' },
   decreaseDurText: { text: '减少时值' },
-  toggleDotsText: { text: '切换点' },
+  toggleDotsText: { text: '切换附点' },
   cleanAccidText: { text: '检查 @accid.ges' },
   meterConformanceText: { text: '检查 @metcon' },
   renumberMeasuresTestText: { text: '重编号小节（测试）' },
@@ -173,8 +173,8 @@ export const lang = {
   addIdsText: { text: '为 MEI 添加 id' },
   removeIdsText: { text: '从 MEI 中移除 id' },
   reRenderMeiVerovio: { text: '通过 Verovio 重新渲染' },
-  addFacsimile: { text: '添加影像元素' },
-  ingestFacsimileText: { text: '摄取影像' },
+  addFacsimile: { text: '添加摹本元素' },
+  ingestFacsimileText: { text: '摄取摹本' },
 
   // INSERT MENU ITEM
   insertMenuTitle: { text: '插入' },
@@ -191,15 +191,15 @@ export const lang = {
   addDynamicsText: { text: '力度' },
   addSlurText: { text: '连音线' },
   addTieText: { text: '连线' },
-  addCrescendoHairpinText: { text: '渐强发夹' },
-  addDiminuendoHairpinText: { text: '渐弱发夹' },
-  addBeamText: { text: '音符连线' },
-  addBeamSpanText: { text: '音符连线范围' },
+  addCrescendoHairpinText: { text: '渐强' },
+  addDiminuendoHairpinText: { text: '渐弱' },
+  addBeamText: { text: '符尾连线' },
+  addBeamSpanText: { text: '符尾连线范围' },
   addSuppliedText: { text: '补充' },
   addSuppliedArticText: { text: '补充（Artic）' },
   addSuppliedAccidText: { text: '补充（Accid）' },
   addArpeggioText: { text: '琶音' },
-  addFermataText: { text: '延音' },
+  addFermataText: { text: '延长' },
   addGlissandoText: { text: '滑音' },
   addPedalDownText: { text: '踩踏板' },
   addPedalUpText: { text: '放开踏板' },
@@ -212,18 +212,18 @@ export const lang = {
   addOctave15AboveText: { text: '八度（15va 上）' },
   addOctave8BelowText: { text: '八度（8va 下）' },
   addOctave15BelowText: { text: '八度（15va 下）' },
-  addGClefChangeBeforeText: { text: '前 G 谱号' },
-  addGClefChangeAfterText: { text: '后 G 谱号' },
-  addFClefChangeBeforeText: { text: '前 F 谱号' },
-  addFClefChangeAfterText: { text: '后 F 谱号' },
-  addCClefChangeBeforeText: { text: '前 C 谱号' },
-  addCClefChangeAfterText: { text: '后 C 谱号' },
-  toggleStaccText: { text: '断音' },
-  toggleAccentText: { text: '重音' },
-  toggleTenutoText: { text: '保留音' },
-  toggleMarcatoText: { text: '强调音' },
-  toggleStaccissText: { text: '极短音' },
-  toggleSpiccText: { text: '跳弓' },
+  addGClefChangeBeforeText: { text: 'G 谱号在前面' },
+  addGClefChangeAfterText: { text: 'G 谱号在后面' },
+  addFClefChangeBeforeText: { text: 'F 谱号在前面' },
+  addFClefChangeAfterText: { text: 'F 谱号在后面' },
+  addCClefChangeBeforeText: { text: 'C 谱号在前面' },
+  addCClefChangeAfterText: { text: 'C 谱号在后面' },
+  toggleStaccText: { text: '断音Staccato' },
+  toggleAccentText: { text: '重音Accent' },
+  toggleTenutoText: { text: '保持音Tenuto' },
+  toggleMarcatoText: { text: '强调音Marcato' },
+  toggleStaccissText: { text: '极断音Staccatissimo' },
+  toggleSpiccText: { text: '跳音Spiccato' },
 
   // HELP MENU ITEM
   helpMenuTitle: { text: '帮助' },
@@ -237,7 +237,7 @@ export const lang = {
 
   // panel icons
   showMidiPlaybackControlBarButton: { description: '切换 MIDI 播放控制栏' },
-  showFacsimileButton: { description: '切换影像面板' },
+  showFacsimileButton: { description: '切换摹本面板' },
   showAnnotationsButton: { description: '切换注释面板' },
   showSettingsButton: { description: '显示设置面板' },
 
@@ -254,9 +254,9 @@ export const lang = {
   verovioLoaded: { text: '已加载' },
   convertedToPdf: { text: '转换为 PDF' },
   statusBarCompute: { text: '计算' },
-  middleFooterPage: { text: '页' },
-  middleFooterOf: { text: '的' },
-  middleFooterLoaded: { text: '已加载' },
+  middleFooterPage: { text: '第' },
+  middleFooterOf: { text: '页，共' },
+  middleFooterLoaded: { text: '页已加载' },
 
   // Control menu
   verovioIcon: {
@@ -268,7 +268,7 @@ export const lang = {
   verovioZoom: { description: '调整乐谱大小' },
   increaseScaleButton: { description: '放大乐谱' },
   pagination1: { html: '页&nbsp;' },
-  pagination3: { html: '&nbsp;的' },
+  pagination3: { html: '&nbsp;共' },
   sectionSelect: { description: '导航编码部分/结尾结构' },
   firstPageButton: { description: '翻到第一页' },
   previousPageButton: { description: '翻到上一页' },
@@ -312,22 +312,22 @@ export const lang = {
   pdfPreviewNormalModeTitle: { text: '选择要保存为 PDF 的页码范围。' },
 
   // Facsimile panel
-  facsimileIcon: { description: '影像面板' },
-  facsimileDecreaseZoomButton: { description: '缩小影像' },
-  facsimileZoom: { description: '调整影像大小' },
-  facsimileIncreaseZoomButton: { description: '放大影像' },
-  facsimileFullPageLabel: { text: '全页', description: '显示影像全页' },
-  facsimileFullPageCheckbox: { description: '显示影像全页' },
-  facsimileShowZonesLabel: { text: '显示区域框', description: '显示影像区域框' },
-  facsimileShowZonesCheckbox: { description: '显示影像区域框' },
-  facsimileEditZonesCheckbox: { description: '编辑影像区域' },
-  facsimileEditZonesLabel: { text: '编辑区域', description: '编辑影像区域' },
-  facsimileCloseButton: { description: '关闭影像面板' },
-  facsimileDefaultWarning: { text: '没有影像内容可显示。' },
+  facsimileIcon: { description: '摹本面板' },
+  facsimileDecreaseZoomButton: { description: '缩小摹本' },
+  facsimileZoom: { description: '调整摹本大小' },
+  facsimileIncreaseZoomButton: { description: '放大摹本' },
+  facsimileFullPageLabel: { text: '全页', description: '显示摹本全页' },
+  facsimileFullPageCheckbox: { description: '显示摹本全页' },
+  facsimileShowZonesLabel: { text: '显示区域框', description: '显示摹本区域框' },
+  facsimileShowZonesCheckbox: { description: '显示摹本区域框' },
+  facsimileEditZonesCheckbox: { description: '编辑摹本区域' },
+  facsimileEditZonesLabel: { text: '编辑区域', description: '编辑摹本区域' },
+  facsimileCloseButton: { description: '关闭摹本面板' },
+  facsimileDefaultWarning: { text: '没有摹本内容可显示。' },
   facsimileNoSurfaceWarning: {
     text: '未找到此页面的表面元素。\n（可能缺少初始 pb 元素。）',
   },
-  facsimileNoZonesFullPageWarning: { text: '没有区域的影像仅在全页模式下可见。' },
+  facsimileNoZonesFullPageWarning: { text: '没有区域的摹本仅在全页模式下可见。' },
   facsimileImgeNotLoadedWarning: { text: '无法加载图片' },
 
   // Drag'n'drop
@@ -534,8 +534,8 @@ export const lang = {
     description: '选择休止符和重复（休止符，mRest，beatRpt，halfmRpt，mRpt）',
   },
   dragSelectControlElements: {
-    text: '选择放置元素',
-    description: '选择放置元素（即具有 @placement 属性的元素：' + att.attPlacement.join(', ') + '）',
+    text: '选择布局元素',
+    description: '选择布局元素（即具有 @placement 属性的元素：' + att.attPlacement.join(', ') + '）',
   },
   dragSelectSlurs: {
     text: '选择连音线',
@@ -719,37 +719,37 @@ export const lang = {
 
   // Facsimile
   titleFacsimilePanel: {
-    text: '影像面板',
-    description: '显示来源版本的影像（如有）',
+    text: '摹本面板',
+    description: '显示来源版本的摹本（如有）',
   },
   showFacsimilePanel: {
-    text: '显示影像面板',
-    description: '显示 facsimile 元素中提供的来源版本的乐谱影像',
+    text: '显示摹本面板',
+    description: '显示 facsimile 元素中提供的来源版本的乐谱摹本',
   },
   selectFacsimilePanelOrientation: {
-    text: '影像面板位置',
-    description: '选择影像面板相对于乐谱的位置',
+    text: '摹本面板位置',
+    description: '选择摹本面板相对于乐谱的位置',
     labels: ['左', '右', '上', '下'],
   },
   facsimileZoomInput: {
-    text: '影像缩放（%）',
-    description: '影像缩放级别（百分比）',
+    text: '摹本缩放（%）',
+    description: '摹本缩放级别（百分比）',
   },
   showFacsimileFullPage: {
     text: '显示全页',
-    description: '显示影像全页',
+    description: '显示摹本全页',
   },
   showFacsimileZones: {
-    text: '显示影像区域框',
-    description: '显示影像区域边界框',
+    text: '显示摹本区域框',
+    description: '显示摹本区域边界框',
   },
   editFacsimileZones: {
-    text: '编辑影像区域',
-    description: '编辑影像区域（将边界框链接到影像区域）',
+    text: '编辑摹本区域',
+    description: '编辑摹本区域（将边界框链接到摹本区域）',
   },
   showFacsimileTitles: {
-    text: '显示影像标题',
-    description: '在来源影像上方显示影像标题',
+    text: '显示摹本标题',
+    description: '在来源摹本上方显示摹本标题',
   },
 
   // Supplied element
