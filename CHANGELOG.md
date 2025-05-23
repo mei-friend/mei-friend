@@ -2,6 +2,8 @@
 
 ### 1.2.6 patch
 * Initial implementation of Annote integration for ranged annotations (#149)
+* Fix bug on Chrome that selected all notes upon mouse click (tks Clara Byom for raising the issue)
+* Restore cursor position and viewport in CodeMirror after xml:id manipulations (thanks @aaaaalbert for #150, #151, #152, #153)
 
 ### 1.2.5 patch
 * Retrieve SVG coordinate values from `getBBox()` instead of `use[x/y]` to address changes in Verovio ([PR#4039](https://github.com/rism-digital/verovio/pull/4039))
