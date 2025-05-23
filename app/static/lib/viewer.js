@@ -508,31 +508,30 @@ export default class Viewer {
   addNotationEventListeners(cm) {
     let vp = document.getElementById('verovio-panel');
     if (vp) {
-      let elements = vp.querySelectorAll('g[id],rect[id],text[id]');
+      // exclude g elements from the shape definition <defs>
+      let elements = vp.querySelector('.page-margin')?.querySelectorAll('g[id],rect[id],text[id]');
       elements.forEach((item) => {
         item.addEventListener('click', (event) => this.handleClickOnNotation(event, cm));
       });
     }
   } // addNotationEventListeners()
 
+  /**
+   * Handles mouse click events on notation elements.
+   * @param {Event} event 
+   * @param {CodeMirror} cm 
+   * @returns nothing
+   */
   handleClickOnNotation(event, cm) {
     if (!this.allowNotationInteraction) return;
     event.stopImmediatePropagation();
     this.hideAlerts();
-    let point = {};
-    point.x = event.clientX;
-    point.y = event.clientY;
-    var matrix = document.querySelector('g.page-margin').getScreenCTM().inverse();
-    let r = {};
-    r.x = matrix.a * point.x + matrix.c * point.y + matrix.e;
-    r.y = matrix.b * point.x + matrix.d * point.y + matrix.f;
-    console.debug('Click on ' + event.srcElement.id + ', x/y: ' + r.x + '/' + r.y);
-
     this.allowCursorActivity = false;
-    // console.info('click: ', e);
+
+    // determine id of clicked element (i.e. the element that the click handler is attached to)
     let itemId = String(event.currentTarget.id);
-    if (itemId === 'undefined') {
-      console.warn('handleClickOnNotation() Cannot find id for clicked element');
+    if (!itemId || itemId === 'undefined') {
+      console.warn('handleClickOnNotation() Cannot find id for clicked element ', event);
       return;
     }
     // take chord rather than note xml:id, when ALT is pressed
