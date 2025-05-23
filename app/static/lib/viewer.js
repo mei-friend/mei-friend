@@ -508,7 +508,8 @@ export default class Viewer {
   addNotationEventListeners(cm) {
     let vp = document.getElementById('verovio-panel');
     if (vp) {
-      let elements = vp.querySelectorAll('g[id],rect[id],text[id]');
+      // exclude g elements from the shape definition <defs>
+      let elements = vp.querySelector('.page-margin')?.querySelectorAll('g[id],rect[id],text[id]');
       elements.forEach((item) => {
         item.addEventListener('click', (event) => this.handleClickOnNotation(event, cm));
       });
@@ -522,7 +523,7 @@ export default class Viewer {
     let point = {};
     point.x = event.clientX;
     point.y = event.clientY;
-    var matrix = document.querySelector('g.page-margin').getScreenCTM().inverse();
+    var matrix = document.querySelector('g.page-margin')?.getScreenCTM().inverse();
     let r = {};
     r.x = matrix.a * point.x + matrix.c * point.y + matrix.e;
     r.y = matrix.b * point.x + matrix.d * point.y + matrix.f;
