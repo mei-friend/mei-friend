@@ -375,10 +375,6 @@ if (env === environments.develop) {
     description: 'Locally compiled Verovio toolkit version for debugging',
   };
 }
-supportedVerovioVersions.annote = {
-  url: `${root.endsWith('/') ? root : root + '/'}vrv/verovio-toolkit-annote-64ea6180c.js`,
-  description: 'Annote version of Verovio toolkit (Experimental!)',
-};
 supportedVerovioVersions.develop = {
   url: 'https://www.verovio.org/javascript/develop/verovio-toolkit-wasm.js',
   description: 'Current Verovio develop version',
