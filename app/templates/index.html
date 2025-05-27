@@ -1277,46 +1277,52 @@
               </fieldset>
               <fieldset id="annotationToolTargetTypeSelector">
                 <legend id="annotationToolTargetTypeSelectorLegend">Target type</legend>
-                <input
-                  type="radio"
-                  checked
-                  id="annotationToolTargetTypeElements"
-                  title="Annotate specified MEI elements using @plist."
-                  value="elements"
-                  name="annotationToolTargetTypeSelector"
-                />
-                <label
-                  for="annotationToolTargetTypeElements"
-                  title="Annotate specified MEI elements using @plist."
-                  id="annotationToolTargetTypeElementsLabel"
-                  >Elements</label
-                >
-                <input
-                  type="radio"
-                  id="annotationToolTargetTypeRange"
-                  title="Annotate range of selected elements using @startid and @endid."
-                  value="range"
-                  name="annotationToolTargetTypeSelector"
-                />
-                <label
-                  for="annotationToolTargetTypeRange"
-                  title="Annotate range of selected elements using @startid and @endid."
-                  id="annotationToolTargetTypeRangeLabel"
-                  >Range</label
-                >
-                <input
-                  type="radio"
-                  id="annotationToolTargetTypeInterval"
-                  title="Annotate time interval of selected elements using @tstamp and @tstamp2."
-                  value="interval"
-                  name="annotationToolTargetTypeSelector"
-                />
-                <label
-                  for="annotationToolTargetTypeInterval"
-                  title="Annotate time interval of selected elements using @tstamp and @tstamp2."
-                  id="annotationToolTargetTypeIntervalLabel"
-                  >Interval</label
-                >
+                <div class="annotationToolTargetTypeSelectionOption">
+                  <input
+                    type="radio"
+                    checked
+                    id="annotationToolTargetTypeElements"
+                    title="Annotate specified MEI elements using @plist."
+                    value="elements"
+                    name="annotationToolTargetTypeSelector"
+                  />
+                  <label
+                    for="annotationToolTargetTypeElements"
+                    title="Annotate specified MEI elements using @plist."
+                    id="annotationToolTargetTypeElementsLabel"
+                    >Element enumeration</label
+                  >
+                </div>
+                <div class="annotationToolTargetTypeSelectionOption">
+                  <input
+                    type="radio"
+                    id="annotationToolTargetTypeRange"
+                    title="Annotate range of selected elements using @startid and @endid."
+                    value="range"
+                    name="annotationToolTargetTypeSelector"
+                  />
+                  <label
+                    for="annotationToolTargetTypeRange"
+                    title="Annotate range of selected elements using @startid and @endid."
+                    id="annotationToolTargetTypeRangeLabel"
+                    >Element range</label
+                  >
+                </div>
+                <div class="annotationToolTargetTypeSelectionOption">
+                  <input
+                    type="radio"
+                    id="annotationToolTargetTypeInterval"
+                    title="Annotate time interval of selected elements using @tstamp and @tstamp2."
+                    value="interval"
+                    name="annotationToolTargetTypeSelector"
+                  />
+                  <label
+                    for="annotationToolTargetTypeInterval"
+                    title="Annotate time interval of selected elements using @tstamp and @tstamp2."
+                    id="annotationToolTargetTypeIntervalLabel"
+                    >Metrical range</label
+                  >
+                </div>
               </fieldset>
             </div>
             <div class="annotationToolsIconGroup">

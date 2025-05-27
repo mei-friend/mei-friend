@@ -72,6 +72,16 @@
   border-bottom-right-radius: 4px;
 }
 
+#annotationToolTargetTypeSelector {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 0.2em;
+  border: 1px solid black
+}
+
 .annotationListItemButtons.icon {
   cursor: pointer;
 }
@@ -424,4 +434,69 @@ summary.noDetails {
 
 .splitButtonLabel:hover {
   background-color: unset;
+}
+
+
+.annotationToolTargetTypeSelector {
+  display: flex;
+  flex-direction: inherit;
+  align-items: stretch;
+  border: 1px solid #ccc;
+  padding: 0;
+  border-radius: 4px;
+  width: 100%;
+  overflow: hidden;
+}
+
+.annotationToolTargetTypeSelector legend {
+  padding: 0 10px;
+}
+
+.annotationToolTargetTypeSelectionOption {
+  display: flex;
+  align-items: center;
+  position: relative;
+  width: 100%;
+  height:100%;
+  border-radius: 9px;
+}
+
+.annotationToolTargetTypeSelectionOption:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.annotationToolTargetTypeSelectionOption input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.annotationToolTargetTypeSelectionOption label {
+  padding: 10px 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  transition: background-color 0.2s;
+}
+
+.annotationToolTargetTypeSelectionOption input[type="radio"]:checked + label {
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 9px;
+}
+
+
+.annotationToolTargetTypeSelectionOption input[type="radio"] + label::before {
+  content: " ";
+  width:1em;
+  margin-right: 4px;
+}
+
+.annotationToolTargetTypeSelectionOption input[type="radio"]:checked + label::before {
+  content: "✓";
+  width:1em;
+  margin-right: 4px;
 }

@@ -40,6 +40,11 @@
   flex-direction: row;
 }
 
+#annotationToolTargetTypeSelector {
+  flex-direction: column !important;
+  width: fit-content;
+}
+
 #listAnnotations {
   flex-direction: column;
   overflow-y: auto;
