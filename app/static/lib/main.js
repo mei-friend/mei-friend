@@ -1234,6 +1234,8 @@ let inputFormats = {
   // xml: "<score-timewise", // does Verovio import timewise musicXML?
   humdrum: '**kern',
   pae: '@clef',
+  // TODO: check Verovio version for supported formats
+  'cmme.xml': 'xmlns="http://www.cmme.org"', // CMME XML format
 };
 
 export function openFile(file = defaultMeiFileURL, setFreshlyLoaded = true, updateAfterLoading = true) {
