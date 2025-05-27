@@ -3,15 +3,15 @@
 ### 1.2.6 patch
 * Initial implementation of Annote integration for ranged annotations ([#149](https://github.com/mei-friend/mei-friend/issues/149))
 * Fix bug on Chrome that selected all notes upon mouse click (tks Clara Byom for raising the issue)
-* Restore cursor position and viewport in CodeMirror after xml:id manipulations (thanks @aaaaalbert for [#150](https://github.com/mei-friend/mei-friend/issues/150), [#151](https://github.com/mei-friend/mei-friend/issues/151), [#152](https://github.com/mei-friend/mei-friend/issues/152), [#153](https://github.com/mei-friend/mei-friend/issues/153))
-* Support for import of CMME files  (Computerized Mensural Music Editing, thanks to @annplaksin for raising [#155](https://github.com/mei-friend/mei-friend/issues/155)), 
+* Restore cursor position and viewport in CodeMirror after xml:id manipulations (thanks [@aaaaalbert](https://github.com/aaaaalbert) for [#150](https://github.com/mei-friend/mei-friend/issues/150), [#151](https://github.com/mei-friend/mei-friend/issues/151), [#152](https://github.com/mei-friend/mei-friend/issues/152), [#153](https://github.com/mei-friend/mei-friend/issues/153))
+* Support for import of CMME files  (Computerized Mensural Music Editing, thanks to [@annplaksin](https://github.com/annplaksin) for raising [#155](https://github.com/mei-friend/mei-friend/issues/155)), 
   with dedicated warning when using Verovio before version 5.3.1
 * Do not add applicationInfo to files with MEI Basic schema ([#156](https://github.com/mei-friend/mei-friend/issues/156))
 
-### 1.2.5 patch
+### 1.2.5 patch (released 7 May 2025)
 * Retrieve SVG coordinate values from `getBBox()` instead of `use[x/y]` to address changes in Verovio ([PR#4039](https://github.com/rism-digital/verovio/pull/4039))
 * Update accid.ges checker for MEI 5 (i.e. `@keysig` instead of `@key.sig`)
-* Change error icon to alert-fill octicon ([#147](https://github.com/mei-friend/mei-friend/issues/147) thanks @ahankinson)
+* Change error icon to alert-fill octicon ([#147](https://github.com/mei-friend/mei-friend/issues/147) thanks [@ahankinson](https://github.com/ahankinson))
 
 ### 1.2.4 patch
 * Add meter conformance checker ([#142](https://github.com/mei-friend/mei-friend/issues/142)) that inspects the duration of each staff within a measure relative to the current time signature
@@ -25,9 +25,9 @@
 * Better accommodate Solid Pods hosted on providers running Community Solid Server
 
 ### 1.2.2 patch
-* Avoid multiple search dialogs and ensure focus on search dialog (thx @maxrothman for spotting the bug)
-* Reload expansion options on toggle of MIDI playback control bar (thx @maxrothman for the suggestion)
-* Fix undo behavior after using surrounding with tag function (thx @maxrothman, fixes [#135](https://github.com/mei-friend/mei-friend/issues/135))
+* Avoid multiple search dialogs and ensure focus on search dialog (thx [@maxrothman](https://github.com/maxrothman) for spotting the bug)
+* Reload expansion options on toggle of MIDI playback control bar (thx [@maxrothman](https://github.com/maxrothman) for the suggestion)
+* Fix undo behavior after using surrounding with tag function (thx [@maxrothman](https://github.com/maxrothman), fixes [#135](https://github.com/mei-friend/mei-friend/issues/135))
 * Add latest releases of Verovio (4.5.1, 4.5.0)
 
 ### 1.2.1 patch
@@ -39,7 +39,7 @@
 ## 1.2.0 Enrichment panel, editorial mark-up, GitHub improvements (released on 17 January 2025)
 - Release of major new functionalities: 
 
-  - expansion of mei-friend's facilities for editorial mark-up through a re-worked annotation panel (now renamed to enrichment panel). Thanks to @annplaksin!
+  - expansion of mei-friend's facilities for editorial mark-up through a re-worked annotation panel (now renamed to enrichment panel). Thanks to [@annplaksin](https://github.com/annplaksin)!
   - redevelopment of git integration for more stable and sustainable collaborative editing.
 - Changes to splash screen text – extend paragraph on data transmission to announce new proxy server requirement for GitHub interactions: commit [`e7458da`](https://github.com/mei-friend/mei-friend/commit/e7458daba4bc0a7960efc0b8bbfd85e16e08a6c4) (english text) and commit [`ac94ef1`](https://github.com/mei-friend/mei-friend/commit/ac94ef1309bcd728f6c107027b20cb857744bcf8) (translations):
 
@@ -50,7 +50,7 @@
 - Clear undo history upon file loading to prevent undoing freshly loaded MEI file (fixes #117)
 - Allow default key bindings in Solid URL text field
 - Fix bug that prevented Fronimo files being opened via the git integration
-- Improve display of long filenames (thx @maxrothman)
+- Improve display of long filenames (thx [@maxrothman](https://github.com/maxrothman))
 - Set Ludwig Baumann's "Mondnacht am Meer" as default demo encoding at start-up and add it to the public repertoire list
 
 ### 1.1.8 Merge isomorphic-git and mark-up enrichment developments
@@ -59,7 +59,7 @@
 
 ### 1.1.7 patch
 
-- Support for markup color export to PDF (#108)
+- Support for markup color export to PDF ([#108](https://github.com/mei-friend/mei-friend/issues/108))
 - Add checkbox to control markup color export to PDF
 - Improve UIX of markup panel
 - Interactively highlight current markup item in list when clicking or drag-selecting notation and/or navigating in encoding
@@ -115,15 +115,14 @@
 - Prepare for future implementation of non-GitHub cloud providers
 
 ### 1.0.16 Patch 
-* Fix infinite loop when having an incomplete choice element (#109, thx @
-maxrothman)
-* Implement persistent search bar behavior (#110, thx @maxrothmann) with checkbox to toggle
+* Fix infinite loop when having an incomplete choice element (#109, thx [@maxrothman](https://github.com/maxrothman))
+* Implement persistent search bar behavior (#110, thx [@maxrothman](https://github.com/maxrothman)) with checkbox to toggle
 * Update Verovio release version list
 
 ### 1.0.15 Patch
 
 - Add support for new languages (Bosnian, Chinese, Croatian, Danish, Dutch, Serbian)
-- Fix bug preventing file load from GitHub with whitespace sequences in filenames (#95, thx @maxrothman)
+- Fix bug preventing file load from GitHub with whitespace sequences in filenames (#95, thx [@maxrothman](https://github.com/maxrothman))
 
 ### 1.0.14 Patch (released on 23 May 2024 for JOSS publication https://doi.org/10.21105/joss.06002)
 
@@ -360,7 +359,7 @@ maxrothman)
 
 ### 0.8.1 patch
 
-- Support automatic scroll-following of midi playback (feature request by @annplaksin)
+- Support automatic scroll-following of midi playback (feature request by [@annplaksin](https://github.com/annplaksin))
 - Improve scroll-to-element behavior (during playback and navigation)
 
 ## 0.8.0 MIDI playback
@@ -400,7 +399,7 @@ maxrothman)
 - Support for inserting zones with parallel insertion of measure element (`CMD/CTRL`+`click`)
 - Support for deleting zones with (`CMD/CTRL`+`DELETE`) or without (`DELETE`) removing pointing elements
 - Menu item for smart indenting encoding
-- Typescript checks, refactoring and documentation of speed mode (thanks to @th-we)
+- Typescript checks, refactoring and documentation of speed mode (thanks to [@th-we](https://github.com/th-we))
 
 ### 0.6.7 patch: facsimile panel re-organisation
 
