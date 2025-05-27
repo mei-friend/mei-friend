@@ -429,7 +429,9 @@ export function writeAnnot(anchor, xmlId, selection, payload) {
         // n.b. they are already sorted in the selection array
         annot.setAttribute('startid', '#' + selection[0]);
         annot.setAttribute('endid', '#' + selection[selection.length - 1]);
-        let staffNumbers = selection.map((s) => getStaffNumber(v.xmlDoc.querySelector(`[*|id="${s}"]`)));
+        let staffNumbers = selection
+          .map((s) => getStaffNumber(v.xmlDoc.querySelector(`[*|id="${s}"]`)))
+          .filter((s) => !!s); // filter out empty staff numbers
         staffNumbers = [...new Set(staffNumbers)]; // remove duplicates
         annot.setAttribute('staff', staffNumbers.join(' '));
         annot.setAttribute('type', 'score');
@@ -443,14 +445,16 @@ export function writeAnnot(anchor, xmlId, selection, payload) {
         let tstamp2 = getTstampForElement(v.xmlDoc, el2);
         let measureDistance = getMeasureDistanceBetweenElements(v.xmlDoc, el1, el2);
         annot.setAttribute('tstamp', tstamp);
-        annot.setAttribute('tstamp2', tstamp2);
         annot.setAttribute('tstamp2', writeMeasureBeat(measureDistance, tstamp2));
-        let staffNumbers = selection.map((s) => getStaffNumber(v.xmlDoc.querySelector(`[*|id="${s}"]`)));
+        let staffNumbers = selection
+          .map((s) => getStaffNumber(v.xmlDoc.querySelector(`[*|id="${s}"]`)))
+          .filter((s) => !!s); // filter out empty staff numbers
         staffNumbers = [...new Set(staffNumbers)]; // remove duplicates
         annot.setAttribute('staff', staffNumbers.join(' '));
         annot.setAttribute('type', 'score');
       } else {
         // use @plist to store the list of selected elements' xml:ids
+        annot.setAttribute('type', 'score');
         annot.setAttribute('plist', selection.map((p) => '#' + p).join(' '));
         if (targetType !== 'elements') {
           console.warn('writeAnnot(): Unknown target type, treating as "elements" and using @plist: ', targetType);
