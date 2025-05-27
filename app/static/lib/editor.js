@@ -1226,7 +1226,7 @@ export function addVerticalGroup(v, cm) {
  * @param {CodeMirror} cm
  */
 export function addApplicationInfo(v, cm) {
-  if (document.getElementById('addApplicationNote').checked) {
+  if (document.getElementById('addApplicationNote').checked && v.currentMeiProfile !== 'Basic') {
     let meiHead = v.xmlDoc.querySelector('meiHead');
     if (!meiHead) return false;
     let appList = v.xmlDoc.querySelectorAll('application');
