@@ -339,8 +339,8 @@ export const commonSchemas = {
     '3.0.0': 'https://music-encoding.org/schema/3.0.0/mei-Neumes.rng',
     '4.0.0': 'https://music-encoding.org/schema/4.0.0/mei-Neumes.rng',
     '4.0.1': 'https://music-encoding.org/schema/4.0.1/mei-Neumes.rng',
-    '5.0.': 'https://music-encoding.org/schema/5.0/mei-Neumes.rng',
-    '5.1.': 'https://music-encoding.org/schema/5.1/mei-Neumes.rng',
+    '5.0': 'https://music-encoding.org/schema/5.0/mei-Neumes.rng',
+    5.1: 'https://music-encoding.org/schema/5.1/mei-Neumes.rng',
     // '5.0.0-dev': 'https://music-encoding.org/schema/dev/mei-Neumes.rng',
   },
   All: {
@@ -362,8 +362,8 @@ export const commonSchemas = {
     // '5.0.0-dev': 'https://music-encoding.org/schema/dev/mei-all_anyStart.rng',
   },
 };
-export const defaultMeiVersion = '5.1';
-export const defaultMeiProfile = 'CMN';
+export const defaultMeiVersion = '5.1'; // '2.1.1', '3.0.0', '4.0.0', '4.0.1', '5.0', '5.1'
+export const defaultMeiProfile = 'CMN'; // 'Mensural', 'Neumes', 'All', 'Any', 'Basic'
 export const defaultSchema = commonSchemas[defaultMeiProfile][defaultMeiVersion];
 
 export const defaultVerovioVersion = 'latest'; // 'develop', '3.10.0'
@@ -382,6 +382,11 @@ supportedVerovioVersions.develop = {
 supportedVerovioVersions.latest = {
   url: 'https://www.verovio.org/javascript/latest/verovio-toolkit-hum.js',
   description: 'Current Verovio release',
+};
+supportedVerovioVersions['5.3.1'] = {
+  url: 'https://www.verovio.org/javascript/5.3.1/verovio-toolkit-hum.js',
+  description: 'Verovio release 5.3.1',
+  releaseDate: '26 May 2025',
 };
 supportedVerovioVersions['5.2.0'] = {
   url: 'https://www.verovio.org/javascript/5.2.0/verovio-toolkit-hum.js',
