@@ -4,6 +4,8 @@
 * Initial implementation of Annote integration for ranged annotations (#149)
 * Fix bug on Chrome that selected all notes upon mouse click (tks Clara Byom for raising the issue)
 * Restore cursor position and viewport in CodeMirror after xml:id manipulations (thanks @aaaaalbert for #150, #151, #152, #153)
+* Support for import of CMME files  (Computerized Mensural Music Editing, thanks to @annplaksin for raising #155), 
+  with dedicated warning when using Verovio before version 5.3.1
 * Do not add applicationInfo to files with MEI Basic schema (#156)
 
 ### 1.2.5 patch

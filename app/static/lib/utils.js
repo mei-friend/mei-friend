@@ -885,3 +885,28 @@ export function parseMeterNumber(number) {
 export function compareNumbersWithTolerance(num1, num2, tolerance = 0.001) {
   return Math.abs(num1 - num2) <= tolerance;
 } // compareNumbersWithTolerance()
+
+/**
+ * Parse toolkit version string to an object with major, minor, and patch properties
+ * @param {string} versionString - e.g., "1.2.3"
+ * @returns {Object} - object with major, minor, and patch properties
+ */
+export function parseToolkitVersion(versionString) {
+  const versionParts = versionString.split('.');
+  return {
+    major: parseInt(versionParts[0], 10),
+    minor: parseInt(versionParts[1], 10),
+    patch: parseInt(versionParts[2], 10),
+  };
+} // parseToolkitVersion()
+
+/**
+ * Convert toolkit object to a decimal number
+ * @param {string} toolkitVersion - e.g., "1.2.3"
+ * @returns {number} - decimal representation of the toolkit version
+ * e.g., "1.2.3" -> 1.0203
+ */
+export function toolkitVersionToDecimal(toolkitVersion) {
+  const { major, minor, patch } = parseToolkitVersion(toolkitVersion);
+  return major + minor / 100 + patch / 10000;
+} // toolkitVersionToDecimal()
