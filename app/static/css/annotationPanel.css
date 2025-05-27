@@ -473,7 +473,7 @@ summary.noDetails {
 }
 
 .annotationToolTargetTypeSelectionOption label {
-  padding: 10px 20px;
+  padding: 8px 8px;
   cursor: pointer;
   display: flex;
   align-items: center;
