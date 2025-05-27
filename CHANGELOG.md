@@ -1,20 +1,20 @@
 # mei-friend-online CHANGELOG.md
 
 ### 1.2.6 patch
-* Initial implementation of Annote integration for ranged annotations (#149)
+* Initial implementation of Annote integration for ranged annotations ([#149](https://github.com/mei-friend/mei-friend/issues/149))
 * Fix bug on Chrome that selected all notes upon mouse click (tks Clara Byom for raising the issue)
-* Restore cursor position and viewport in CodeMirror after xml:id manipulations (thanks @aaaaalbert for #150, #151, #152, #153)
-* Support for import of CMME files  (Computerized Mensural Music Editing, thanks to @annplaksin for raising #155), 
+* Restore cursor position and viewport in CodeMirror after xml:id manipulations (thanks @aaaaalbert for [#150](https://github.com/mei-friend/mei-friend/issues/150), [#151](https://github.com/mei-friend/mei-friend/issues/151), [#152](https://github.com/mei-friend/mei-friend/issues/152), [#153](https://github.com/mei-friend/mei-friend/issues/153))
+* Support for import of CMME files  (Computerized Mensural Music Editing, thanks to @annplaksin for raising [#155](https://github.com/mei-friend/mei-friend/issues/155)), 
   with dedicated warning when using Verovio before version 5.3.1
-* Do not add applicationInfo to files with MEI Basic schema (#156)
+* Do not add applicationInfo to files with MEI Basic schema ([#156](https://github.com/mei-friend/mei-friend/issues/156))
 
 ### 1.2.5 patch
 * Retrieve SVG coordinate values from `getBBox()` instead of `use[x/y]` to address changes in Verovio ([PR#4039](https://github.com/rism-digital/verovio/pull/4039))
 * Update accid.ges checker for MEI 5 (i.e. `@keysig` instead of `@key.sig`)
-* Change error icon to alert-fill octicon (#147 thanks @ahankinson)
+* Change error icon to alert-fill octicon ([#147](https://github.com/mei-friend/mei-friend/issues/147) thanks @ahankinson)
 
 ### 1.2.4 patch
-* Add meter conformance checker (#142) that inspects the duration of each staff within a measure relative to the current time signature
+* Add meter conformance checker ([#142](https://github.com/mei-friend/mei-friend/issues/142)) that inspects the duration of each staff within a measure relative to the current time signature
   * Known shortcomings: 
       - missing support for markup elements `choice`, `subst`
       - `meterSigGrp` not handled (`func="mixed,alternating"`)
@@ -27,7 +27,7 @@
 ### 1.2.2 patch
 * Avoid multiple search dialogs and ensure focus on search dialog (thx @maxrothman for spotting the bug)
 * Reload expansion options on toggle of MIDI playback control bar (thx @maxrothman for the suggestion)
-* Fix undo behavior after using surrounding with tag function (thx @maxrothman, fixes #135)
+* Fix undo behavior after using surrounding with tag function (thx @maxrothman, fixes [#135](https://github.com/mei-friend/mei-friend/issues/135))
 * Add latest releases of Verovio (4.5.1, 4.5.0)
 
 ### 1.2.1 patch
