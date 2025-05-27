@@ -72,6 +72,16 @@
   border-bottom-right-radius: 4px;
 }
 
+#annotationToolTargetTypeSelector {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 0.2em;
+  border: 1px solid black
+}
+
 .annotationListItemButtons.icon {
   cursor: pointer;
 }

@@ -465,21 +465,21 @@ export const lang = {
     description: 'Annotate selected MEI elements using @plist.',
   },
   annotationToolTargetTypeElementsLabel: {
-    text: 'Elements',
+    text: 'Element enumeration',
     description: 'Annotate selected MEI elements using @plist.',
   },
   annotationToolTargetTypeRange: {
     description: 'Annotate the range of selected MEI elements using @startid and @endid',
   },
   annotationToolTargetTypeRangeLabel: {
-    text: 'Range',
+    text: 'Element range',
     description: 'Annotate the range of selected MEI elements using @startid and @endid',
   },
   annotationToolTargetTypeInterval: {
     description: 'Annotate the time interval corresponding to selected MEI elements using @tstamp and @tstamp2',
   },
   annotationToolTargetTypeIntervalLabel: {
-    text: 'Interval',
+    text: 'Metrical range',
     description: 'Annotate the time interval corresponding to selected MEI elements using @tstamp and @tstamp2',
   },
 
