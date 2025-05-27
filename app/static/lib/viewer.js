@@ -45,7 +45,9 @@ export default class Viewer {
     this.spdWorker = spdWorker;
     this.validatorInitialized = false;
     this.validatorWithSchema = false;
-    this.currentSchema = '';
+    this.currentSchema = ''; // URL
+    this.currentMeiProfile = ''; // CMN, all, Basic, Mensural, Neume, anyStart, see defaults.js commonSchemas
+    // this.currentMeiVersion = ''; // MEI version, e.g. '5.1', '4.0.1', TODO: implement
     this.xmlIdStyle; // xml:id style (Original, Base36, mei-friend)
     this.updateLinting; // CodeMirror function for linting
     this.currentPage = 1;
@@ -518,8 +520,8 @@ export default class Viewer {
 
   /**
    * Handles mouse click events on notation elements.
-   * @param {Event} event 
-   * @param {CodeMirror} cm 
+   * @param {Event} event
+   * @param {CodeMirror} cm
    * @returns nothing
    */
   handleClickOnNotation(event, cm) {
@@ -2515,7 +2517,19 @@ export default class Viewer {
    * @returns
    */
   async replaceSchema(schemaFileName) {
-    if (!this.validatorInitialized) return;
+    if (!this.validatorInitialized) {
+      return;
+    }
+
+    // determine current schema profile (e.g., all, CMN, basic, mensural, neumes, anystart)
+    let schemaTail = schemaFileName.split('/').pop();
+    Object.keys(commonSchemas).forEach((profile) => {
+      if (schemaTail.toLowerCase().includes(profile.toLowerCase())) {
+        this.currentMeiProfile = profile;
+        console.log('Viewer.replaceSchema(): Current MEI profile: ' + this.currentMeiProfile);
+      }
+    });
+
     let vs = document.getElementById('validation-status');
     vs.innerHTML = icons.download;
     let msg = translator.lang.loadingSchema.text + ' ' + schemaFileName;
@@ -2620,7 +2634,12 @@ export default class Viewer {
             let type = pathElements.pop();
             if (type.toLowerCase().includes('anystart')) type = 'any';
             let noChars = 3;
-            if (type.toLowerCase().includes('neumes') || type.toLowerCase().includes('mensural')) noChars = 4;
+            if (type.toLowerCase().includes('neumes') || type.toLowerCase().includes('mensural')) {
+              noChars = 4;
+            }
+            if (type.toLowerCase().includes('basic')) {
+              noChars = 5;
+            }
             let schemaVersion = pathElements.pop();
             el.innerHTML = type.split('mei-').pop().slice(0, noChars).toUpperCase() + ' ' + schemaVersion;
           } else {
