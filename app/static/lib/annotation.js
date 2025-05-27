@@ -436,22 +436,32 @@ export function writeAnnot(anchor, xmlId, selection, payload) {
         annot.setAttribute('staff', staffNumbers.join(' '));
         annot.setAttribute('type', 'score');
       } else if (targetType === 'interval') {
-        // determine the tstamp values of the first and last selected elements
+        let timedEls = selection
+          .map((s) => v.xmlDoc.querySelector(`[*|id="${s}"]`))
+          .filter((el) => getTstampForElement(v.xmlDoc, el) > -1); // only include timed elements
+        // determine the tstamp values of the first and last timed elements
         // and set @tstamp and @tstamp2 to those values
-        let el1 = v.xmlDoc.querySelector(`[*|id="${selection[0]}"]`);
-        let el2 = v.xmlDoc.querySelector(`[*|id="${selection[selection.length - 1]}"]`);
-        console.log('Interval elements: ', el1, el2, selection);
-        let tstamp = getTstampForElement(v.xmlDoc, el1);
-        let tstamp2 = getTstampForElement(v.xmlDoc, el2);
-        let measureDistance = getMeasureDistanceBetweenElements(v.xmlDoc, el1, el2);
-        annot.setAttribute('tstamp', tstamp);
-        annot.setAttribute('tstamp2', writeMeasureBeat(measureDistance, tstamp2));
-        let staffNumbers = selection
-          .map((s) => getStaffNumber(v.xmlDoc.querySelector(`[*|id="${s}"]`)))
-          .filter((s) => !!s); // filter out empty staff numbers
-        staffNumbers = [...new Set(staffNumbers)]; // remove duplicates
-        annot.setAttribute('staff', staffNumbers.join(' '));
-        annot.setAttribute('type', 'score');
+        if (timedEls.length) {
+          let el1 = timedEls[0];
+          let el2 = timedEls[timedEls.length - 1];
+          console.log('Interval elements: ', el1, el2, selection);
+          let tstamp = getTstampForElement(v.xmlDoc, el1);
+          let tstamp2 = getTstampForElement(v.xmlDoc, el2);
+          let measureDistance = getMeasureDistanceBetweenElements(v.xmlDoc, el1, el2);
+          annot.setAttribute('tstamp', tstamp);
+          annot.setAttribute('tstamp2', writeMeasureBeat(measureDistance, tstamp2));
+          let staffNumbers = selection
+            .map((s) => getStaffNumber(v.xmlDoc.querySelector(`[*|id="${s}"]`)))
+            .filter((s) => !!s); // filter out empty staff numbers
+          staffNumbers = [...new Set(staffNumbers)]; // remove duplicates
+          annot.setAttribute('staff', staffNumbers.join(' '));
+          annot.setAttribute('type', 'score');
+        } else {
+          console.warn('writeAnnot(): No timed elements found for interval annotation: ', selection);
+          annot.setAttribute('tstamp', '0');
+          annot.setAttribute('tstamp2', '0');
+          annot.setAttribute('type', 'score');
+        }
       } else {
         // use @plist to store the list of selected elements' xml:ids
         annot.setAttribute('type', 'score');
