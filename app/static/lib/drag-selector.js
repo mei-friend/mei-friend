@@ -189,9 +189,9 @@ export function addDragSelector(v, vp) {
       newEls.forEach((newEl) => {
         if (oldEls.includes(newEl)) {
           v.selectedElements.splice(v.selectedElements.indexOf(newEl), 1);
-        } else {
+        } else if (setCursorToId(cm, newEl)) {
           v.selectedElements.push(newEl);
-        }
+        } // ignore elements without xml:id in the MEI (n.b.., Verovio invents IDs in the SVG for these cases)
       });
       // console.debug('Drag-Selector selected elements: ', v.selectedElements)
 
