@@ -731,37 +731,39 @@ export function getMeterForElement(xmlDoc, element) {
 /**
  * Returns a @tstamp (beat position) of the element within the current measure
  * @param {Document} xmlDoc
- * @param {Element} element
+ * @param {Element} element -- if not a duration logical element, -1 will be returned
  * @returns {number} tstamp (-1 if nothing found)
  *
  * TODO: only used from editor.js; move to new DocumentController.js
  */
 export function getTstampForElement(xmlDoc, element) {
   let tstamp = -1;
-  let chord = element.closest('chord'); // take chord as element, if exists
-  if (chord) element = chord;
-  let meter = getMeterForElement(xmlDoc, element);
-  if (meter && meter.unit) {
-    // iterate over notes before element in current layer
-    let layer = element.closest('layer');
-    if (layer) {
-      tstamp = 1;
-      let chordList = []; // list of chords that have been counted
-      let durList = Array.from(layer.querySelectorAll(att.attDurationLogical.join(',')));
-      for (let e of durList) {
-        // exclude notes within a chord
-        let parentChord = e.closest('chord');
-        if (e.nodeName === 'note' && parentChord && chordList.includes(parentChord)) {
-          continue;
-        }
-        if (parentChord) chordList.push(parentChord);
-        // stop adding beats when requested element is reached
-        if (e === element) {
-          break;
-        }
-        let duration = getDurationOfElement(e, parseFloat(meter.unit));
-        if (duration) {
-          tstamp += duration;
+  if (element && att.attDurationLogical.includes(element.nodeName)) {
+    let chord = element.closest('chord'); // take chord as element, if exists
+    if (chord) element = chord;
+    let meter = getMeterForElement(xmlDoc, element);
+    if (meter && meter.unit) {
+      // iterate over notes before element in current layer
+      let layer = element.closest('layer');
+      if (layer) {
+        tstamp = 1;
+        let chordList = []; // list of chords that have been counted
+        let durList = Array.from(layer.querySelectorAll(att.attDurationLogical.join(',')));
+        for (let e of durList) {
+          // exclude notes within a chord
+          let parentChord = e.closest('chord');
+          if (e.nodeName === 'note' && parentChord && chordList.includes(parentChord)) {
+            continue;
+          }
+          if (parentChord) chordList.push(parentChord);
+          // stop adding beats when requested element is reached
+          if (e === element) {
+            break;
+          }
+          let duration = getDurationOfElement(e, parseFloat(meter.unit));
+          if (duration) {
+            tstamp += duration;
+          }
         }
       }
     }
