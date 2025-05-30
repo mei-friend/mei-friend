@@ -56,10 +56,21 @@ export function drawHighlight(a) {
     sel = [a.id];
   }
   if (sel) {
+    // for all IDs in the selection, find any SVG elements
+    // that either have the ID or a class that starts with 'id-'
+    // (the latter is used by Verovio when the same annotation is rendered multiple times (e.g., across systems))
+
+    // get first annotation glyphs (share ID with the MEI xml:id)
     const els = sel.map((s) => document.getElementById(s));
-    els
-      .filter((e) => e !== null) // (null if not on current page)
-      .forEach((e) => e.classList.add('annotationHighlight'));
+    // get any further annotation glyphs that have a class 'id-' + <xml:id>
+    const furtherEls = sel.map((s) => Array.from(document.getElementsByClassName('id-' + s)));
+
+    // concatenate the two arrays and filter out nulls
+    const allEls = els.concat(furtherEls.flat()).filter((e) => e !== null);
+
+    allEls.forEach((e) => {
+      e.classList.add('annotationHighlight');
+    });
   } else {
     console.warn('failing to draw highlight annotation without selection: ', a);
   }
