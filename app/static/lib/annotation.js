@@ -422,7 +422,7 @@ export function writeAnnot(anchor, xmlId, selection, payload) {
     // disable cursor activity and block changes in CM
     v.allowCursorActivity = false;
     cm.blockChanges = true;
-    // trz to add our annotation at beginning of insertHere element's list of children.
+    // try to add our annotation at beginning of insertHere element's list of children.
     // in case of alternative encodings, add annotation at beginning of first child WRONG!!
     // find first non-text child with an identifier
     const firstChildNode = Array.from(insertHere.childNodes)
@@ -436,16 +436,33 @@ export function writeAnnot(anchor, xmlId, selection, payload) {
       // set targets according to user's chosen target type
       if (targetType === 'range') {
         // use @startid and @endid to identify the range of selected elements
-        // set @staff to a string containing the staff numbers of the selected elements (space-separated, only once per staff)
-        // n.b. they are already sorted in the selection array
-        annot.setAttribute('startid', '#' + selection[0]);
-        annot.setAttribute('endid', '#' + selection[selection.length - 1]);
-        let staffNumbers = selection
-          .map((s) => getStaffNumber(v.xmlDoc.querySelector(`[*|id="${s}"]`)))
-          .filter((s) => !!s); // filter out empty staff numbers
-        staffNumbers = [...new Set(staffNumbers)]; // remove duplicates
-        annot.setAttribute('staff', staffNumbers.join(' '));
-        annot.setAttribute('type', 'score');
+        // if any items in the selection don't have an ID, or have one that does not exist in the MEI (may have been invented for the SVG by Verovio), we have to warn user and refuse...
+        // (_any_ item, not just first and last which are anchoring the range, because we get our 'staff' information by investigating each item in turn)
+        if (checkSelectionElementsValid(selection)) {
+          // set @staff to a string containing the staff numbers of the selected elements (space-separated, only once per staff)
+          // n.b. they are already sorted in the selection array
+          annot.setAttribute('startid', '#' + selection[0]);
+          annot.setAttribute('endid', '#' + selection[selection.length - 1]);
+          let staffNumbers = selection
+            .map((s) => getStaffNumber(v.xmlDoc.querySelector(`[*|id="${s}"]`)))
+            .filter((s) => !!s); // filter out empty staff numbers
+          staffNumbers = [...new Set(staffNumbers)]; // remove duplicates
+          annot.setAttribute('staff', staffNumbers.join(' '));
+          annot.setAttribute('type', 'score');
+        } else {
+          let errMsg =
+            '<p>' +
+            translator.lang.annotationWithoutIdWarning.text1 +
+            '</p>' +
+            '<p>' +
+            translator.lang.annotationWithoutIdWarning.text2 +
+            '</p>';
+          console.warn(errMsg);
+          v.showAlert(errMsg, 'warning', 5000);
+          // remove from list
+          deleteListItem(xmlId);
+          return;
+        }
       } else if (targetType === 'interval') {
         let timedEls = selection
           .map((s) => v.xmlDoc.querySelector(`[*|id="${s}"]`))
@@ -1021,6 +1038,20 @@ async function drawSelectionsForIdentifiedObject(obj, url) {
   } else {
     console.warn('Trying to draw selection for identified object but have no selection div to hook it into', obj, url);
   }
+}
+
+//#endregion
+
+//#region Utilities
+
+function checkSelectionElementsValid(selection) {
+  let valid = true;
+  selection.forEach((id) => {
+    if (!(id && v.xmlDoc.querySelector(`[*|id=${id}]`) !== null)) {
+      valid = false;
+    }
+  });
+  return valid;
 }
 
 //#endregion
