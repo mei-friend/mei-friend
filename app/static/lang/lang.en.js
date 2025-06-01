@@ -526,9 +526,13 @@ export const lang = {
   annotationsOutsideScoreWarning: {
     text: 'Sorry, cannot currently write annotations placed outside &lt;score&gt;',
   },
+  rangedAnnotationInvalidSelection: {
+    text1: 'Cannot write annotation as at least one element in the selection lacks an xml:id.',
+    text2: 'Please assign identifiers by selecting "Manipulate" -> "Add IDs to MEI" and try again.',
+  },
   annotationWithoutIdWarning: {
     text1: 'Cannot write annotation as MEI anchor-point lacks xml:id.',
-    text2: 'Please assign identifiers by selecting "Manipulate" -> "Re-render MEI (with ids)" and try again.',
+    text2: 'Please assign identifiers by selecting "Manipulate" -> "Add IDs to MEI" and try again.',
   },
   // MARKUP MENU
   respSelect: {
