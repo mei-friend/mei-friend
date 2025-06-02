@@ -418,7 +418,7 @@ export function writeAnnot(anchor, xmlId, selection, payload) {
       return;
     }
   }
-  if (insertHere) {
+  if (insertHere && checkSelectionElementsValid(selection)) {
     // disable cursor activity and block changes in CM
     v.allowCursorActivity = false;
     cm.blockChanges = true;
@@ -438,35 +438,31 @@ export function writeAnnot(anchor, xmlId, selection, payload) {
         // use @startid and @endid to identify the range of selected elements
         // if any items in the selection don't have an ID, or have one that does not exist in the MEI (may have been invented for the SVG by Verovio), we have to warn user and refuse...
         // (_any_ item, not just first and last which are anchoring the range, because we get our 'staff' information by investigating each item in turn)
-        if (checkSelectionElementsValid(selection)) {
-          // set @staff to a string containing the staff numbers of the selected elements (space-separated, only once per staff)
-          // n.b. they are already sorted in the selection array
-          annot.setAttribute('startid', '#' + selection[0]);
-          annot.setAttribute('endid', '#' + selection[selection.length - 1]);
-          let staffNumbers = selection
-            .map((s) => getStaffNumber(v.xmlDoc.querySelector(`[*|id="${s}"]`)))
-            .filter((s) => !!s); // filter out empty staff numbers
-          staffNumbers = [...new Set(staffNumbers)]; // remove duplicates
-          annot.setAttribute('staff', staffNumbers.join(' '));
-          annot.setAttribute('type', 'score');
-        } else {
-          let errMsg =
-            '<p>' +
-            translator.lang.annotationWithoutIdWarning.text1 +
-            '</p>' +
-            '<p>' +
-            translator.lang.annotationWithoutIdWarning.text2 +
-            '</p>';
-          console.warn(errMsg);
-          v.showAlert(errMsg, 'warning', 5000);
-          // remove from list
-          deleteListItem(xmlId);
-          return;
-        }
+        // set @staff to a string containing the staff numbers of the selected elements (space-separated, only once per staff)
+        // n.b. they are already sorted in the selection array
+        annot.setAttribute('startid', '#' + selection[0]);
+        annot.setAttribute('endid', '#' + selection[selection.length - 1]);
+        let staffNumbers = selection
+          .map((s) => getStaffNumber(v.xmlDoc.querySelector(`[*|id="${s}"]`)))
+          .filter((s) => !!s); // filter out empty staff numbers
+        staffNumbers = [...new Set(staffNumbers)]; // remove duplicates
+        annot.setAttribute('staff', staffNumbers.join(' '));
+        annot.setAttribute('type', 'score');
       } else if (targetType === 'interval') {
         let timedEls = selection
           .map((s) => v.xmlDoc.querySelector(`[*|id="${s}"]`))
-          .filter((el) => getTstampForElement(v.xmlDoc, el) > -1); // only include timed elements
+          .filter((el) => {
+            if (el) {
+              let closestNote = el.closest('note');
+              if (closestNote) {
+                return true; // elements under a note (e.g., verse/syl...) are considered timed
+              } else {
+                return getTstampForElement(v.xmlDoc, el) > -1; // include all timed elements
+              }
+            } else {
+              return false;
+            }
+          });
         // determine the tstamp values of the first and last timed elements
         // and set @tstamp and @tstamp2 to those values
         if (timedEls.length) {
@@ -474,7 +470,15 @@ export function writeAnnot(anchor, xmlId, selection, payload) {
           let el2 = timedEls[timedEls.length - 1];
           console.log('Interval elements: ', el1, el2, selection);
           let tstamp = getTstampForElement(v.xmlDoc, el1);
+          if (tstamp < 0) {
+            el1 = el1.closest('note'); // borrow tstamp from closest note
+            tstamp = getTstampForElement(v.xmlDoc, el1);
+          }
           let tstamp2 = getTstampForElement(v.xmlDoc, el2);
+          if (tstamp2 < 0) {
+            el2 = el2.closest('note'); // borrow tstamp from closest note
+            tstamp2 = getTstampForElement(v.xmlDoc, el2);
+          }
           let measureDistance = getMeasureDistanceBetweenElements(v.xmlDoc, el1, el2);
           annot.setAttribute('tstamp', tstamp);
           annot.setAttribute('tstamp2', writeMeasureBeat(measureDistance, tstamp2));
@@ -490,13 +494,13 @@ export function writeAnnot(anchor, xmlId, selection, payload) {
           annot.setAttribute('tstamp2', '0');
           annot.setAttribute('type', 'score');
         }
-      } else {
+      } else if (targetType === 'elements') {
         // use @plist to store the list of selected elements' xml:ids
         annot.setAttribute('type', 'score');
         annot.setAttribute('plist', selection.map((p) => '#' + p).join(' '));
-        if (targetType !== 'elements') {
-          console.warn('writeAnnot(): Unknown target type, treating as "elements" and using @plist: ', targetType);
-        }
+      } else {
+        console.error('Unknown annotation target type: ', targetType);
+        return false;
       }
 
       if (payload) {
@@ -539,6 +543,22 @@ export function writeAnnot(anchor, xmlId, selection, payload) {
     cm.blockChanges = false;
     // fire change event to update application state
     handleEditorChanges();
+  } else {
+    let errMsg =
+      '<p>' +
+      translator.lang.annotationWithoutIdWarning.text1 +
+      '</p>' +
+      '<p>' +
+      translator.lang.annotationWithoutIdWarning.text2 +
+      '</p>';
+    console.warn(errMsg);
+    v.showAlert(errMsg, 'warning', 5000);
+    // remove from list
+    deleteListItem(xmlId);
+    // reset drag selector
+    v.selectedElements = [document.querySelector('verovioContainer g.note')];
+    v.updateHighlight(cm);
+    return;
   }
 } // writeAnnot()
 
