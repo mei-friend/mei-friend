@@ -511,6 +511,9 @@ function generateAnnotationButtons(a) {
   const addDescribe = generateListItemButton('describeMarkup', pencil, translator.lang.describeMarkup.description);
   if (a.isMarkup) {
     addDescribe.addEventListener('click', (e) => {
+      // ensure that element enumeration target type is selected
+      document.querySelector('#annotationToolTargetTypeElements').checked = true;
+      // create the describe annotation
       annot.createDescribe(e, a.selection);
     });
   }
