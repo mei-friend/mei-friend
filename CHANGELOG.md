@@ -7,6 +7,7 @@
 * Support for import of CMME files  (Computerized Mensural Music Editing, thanks to [@annplaksin](https://github.com/annplaksin) for raising [#155](https://github.com/mei-friend/mei-friend/issues/155)), 
   with dedicated warning when using Verovio before version 5.3.1
 * Do not add applicationInfo to files with MEI Basic schema ([#156](https://github.com/mei-friend/mei-friend/issues/156))
+* Fix bug with mensural files (without measure elements) that prevented page turning
 
 ### 1.2.5 patch (released 7 May 2025)
 * Retrieve SVG coordinate values from `getBBox()` instead of `use[x/y]` to address changes in Verovio ([PR#4039](https://github.com/rism-digital/verovio/pull/4039))
