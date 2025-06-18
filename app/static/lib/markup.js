@@ -30,7 +30,11 @@ export function readMarkup() {
     return;
   }
   let elementList = att.modelTranscriptionLike.concat(...att.alternativeEncodingElements).join(',');
-  let markup = Array.from(v.xmlDoc.querySelectorAll(elementList));
+  let selector = elementList
+    .split(',')
+    .map(el => `mei > music ${el.trim()}`)
+    .join(',');
+  let markup = Array.from(v.xmlDoc.querySelectorAll(selector));
   markup = markup.filter((markup) => !isItemInList(markup.getAttribute('xml:id')));
 
   let idsToIgnore = [];
