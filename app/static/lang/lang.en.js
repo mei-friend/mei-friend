@@ -623,7 +623,15 @@ export const lang = {
     description:
       '(deletion) – Contains information deleted, marked as deleted, or otherwise indicated as superfluous or spurious in the copy text by an author, scribe, annotator, or corrector.',
   },
-
+  missingParentIdWarning: {
+    text: 'Action can only be performed if parent element has an xml:id. Please first add xml:ids to the document.',
+  },
+  handleMissingParentIdAbort: {
+    text: 'Cancel',
+  },
+  handleMissingParentIdProceed: {
+    text: 'Add ids to MEI',
+  },
   // MIDI
   midiSpeedmodeIndicator: {
     text: 'Speed mode',
