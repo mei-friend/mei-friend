@@ -1334,7 +1334,7 @@ export function manipulateXmlIds(v, cm, removeIds = false) {
   v.loadXml(cm.getValue(), true);
 
   // start from these elements
-  let selector = 'mei > music'; // 'body > mdiv';
+  let selector = 'mei'; // 'body > mdiv';
   let rootList = v.xmlDoc.querySelectorAll(selector);
 
   // determine skipList to securely remove ids
@@ -1353,7 +1353,12 @@ export function manipulateXmlIds(v, cm, removeIds = false) {
 
   // Restore cursor position and editor viewport
   cm.setCursor(cursorPosition);
-  cm.scrollIntoView({"left": scrollInfo.left, "top": scrollInfo.top, "right": scrollInfo.left + scrollInfo.width, "bottom": scrollInfo.top + scrollInfo.height});
+  cm.scrollIntoView({
+    left: scrollInfo.left,
+    top: scrollInfo.top,
+    right: scrollInfo.left + scrollInfo.width,
+    bottom: scrollInfo.top + scrollInfo.height,
+  });
 
   // reporting
   let msg;
