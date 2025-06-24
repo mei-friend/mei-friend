@@ -1353,7 +1353,12 @@ export function manipulateXmlIds(v, cm, removeIds = false) {
 
   // Restore cursor position and editor viewport
   cm.setCursor(cursorPosition);
-  cm.scrollIntoView({"left": scrollInfo.left, "top": scrollInfo.top, "right": scrollInfo.left + scrollInfo.width, "bottom": scrollInfo.top + scrollInfo.height});
+  cm.scrollIntoView({
+    left: scrollInfo.left,
+    top: scrollInfo.top,
+    right: scrollInfo.left + scrollInfo.width,
+    bottom: scrollInfo.top + scrollInfo.height,
+  });
 
   // reporting
   let msg;
@@ -1903,15 +1908,34 @@ export function replaceInEditor(cm, xmlNode, select = false, newNode = []) {
   // search in buffer
   let itemId = xmlNode.getAttribute('xml:id');
   let xmlIdCheck = '';
-  if (itemId) xmlIdCheck = `(\\s+?)([^>]*?)(?:xml:id=["']` + itemId + `['"])`;
-  let searchSelfClosing = '(?:<' + xmlNode.nodeName + `)` + xmlIdCheck + `([^>]*?)(?:/>)`;
+  let searchSelfClosing = '';
+  let searchFullElement = '';
+  if (itemId) {
+    xmlIdCheck = `(\\s+?)([^>]*?)(?:xml:id=["']` + itemId + `['"])`;
+    searchSelfClosing = '(?:<' + xmlNode.nodeName + `)` + xmlIdCheck + `([^>]*?)(?:/>)`;
+    searchFullElement =
+      '(?:<' + xmlNode.nodeName + `)` + xmlIdCheck + `([\\s\\S]*?)(?:</` + xmlNode.nodeName + '[ ]*?>)';
+  } else {
+    console.log('replaceInEditor(): no xml:id found for ' + xmlNode.nodeName + '.');
+    searchSelfClosing = '(?:<' + xmlNode.nodeName + `)` + `([^>]*?)(?:/>)`;
+    // search regex for full element without xml:id
+
+    searchFullElement =
+      '(?:<' + xmlNode.nodeName + ')' + `(>|1\\s[\\s\\S^>]*?>)` + `(\\s\\S*?)` + '(?:</' + xmlNode.nodeName + '[ ]*?>)';
+    // if no xml:id: (?:<title)([\\s\\S^>]*?)(>)(.*?)(?:</title>)
+    // searchFullElement = '(?:<' + xmlNode.nodeName + `)` + `([^>]*?)(?:/>)`;
+    // searchFullElement = '(?:<' + xmlNode.nodeName + `)` + `([\\s\\S]*?)(?:[^>]*?)(?:/>)`;
+    // searchFullElement = '(?:<' + xmlNode.nodeName + `)` + `([\\s\\S]*?)(?:[^>]*?)(?:</` + xmlNode.nodeName + '[ ]*?>)';
+    //
+
+    //searchFullElement = '(?:<' + xmlNode.nodeName + `)` + `([\\s\\S]*?)(?:</` + xmlNode.nodeName + '[ ]*?>)';
+  }
+
   // console.info('searchSelfClosing: ' + searchSelfClosing);
   let sc = cm.getSearchCursor(new RegExp(searchSelfClosing));
   if (sc.findNext()) {
     sc.replace(newMei);
   } else {
-    let searchFullElement =
-      '(?:<' + xmlNode.nodeName + `)` + xmlIdCheck + `([\\s\\S]*?)(?:</` + xmlNode.nodeName + '[ ]*?>)';
     sc = cm.getSearchCursor(new RegExp(searchFullElement));
     if (sc.findNext()) {
       sc.replace(newMei);
