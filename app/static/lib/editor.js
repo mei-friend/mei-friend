@@ -1920,8 +1920,7 @@ export function replaceInEditor(cm, xmlNode, select = false, newNode = []) {
     searchSelfClosing = '(?:<' + xmlNode.nodeName + `)` + `([^>]*?)(?:/>)`;
     // search regex for full element without xml:id
 
-    searchFullElement =
-      '(?:<' + xmlNode.nodeName + ')' + `(>|1\\s[\\s\\S^>]*?>)` + `(\\s\\S*?)` + '(?:</' + xmlNode.nodeName + '[ ]*?>)';
+    searchFullElement = '<' + xmlNode.nodeName + '(>|\\s[^>]*>)' + '[\\s\\S]*' + '</' + xmlNode.nodeName + '.*>';
     // if no xml:id: (?:<title)([\\s\\S^>]*?)(>)(.*?)(?:</title>)
     // searchFullElement = '(?:<' + xmlNode.nodeName + `)` + `([^>]*?)(?:/>)`;
     // searchFullElement = '(?:<' + xmlNode.nodeName + `)` + `([\\s\\S]*?)(?:[^>]*?)(?:/>)`;
