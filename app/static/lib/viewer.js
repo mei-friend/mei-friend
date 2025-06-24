@@ -5,7 +5,7 @@ import * as prs from './page-range-selector.js';
 import * as speed from './speed.js';
 import * as utils from './utils.js';
 import { getControlMenuState, showPdfButtons, setControlMenuState, setCheckbox } from './control-menu.js';
-import { alert, download, info, success, verified, unverified, xCircleFill } from '../css/icons.js';
+import * as icons from '../css/icons.js'; // { alert, download, info, success, verified, unverified, xCircleFill }
 import * as facs from './facsimile.js';
 import { codeCheckerHeight } from './resizer.js';
 //  drawFacsimile, highlightZone, zoomFacsimile
@@ -27,7 +27,6 @@ import { startMidiTimeout } from './midi-player.js';
 import { getNotationProportion, setNotationProportion, setOrientation } from './resizer.js';
 import {
   commonSchemas,
-  defaultCodeCheckerHeight,
   codeMirrorSettingsOptions,
   defaultNotationProportion,
   defaultSpeedMode,
@@ -46,7 +45,9 @@ export default class Viewer {
     this.spdWorker = spdWorker;
     this.validatorInitialized = false;
     this.validatorWithSchema = false;
-    this.currentSchema = '';
+    this.currentSchema = ''; // URL
+    this.currentMeiProfile = ''; // CMN, all, Basic, Mensural, Neume, anyStart, see defaults.js commonSchemas
+    // this.currentMeiVersion = ''; // MEI version, e.g. '5.1', '4.0.1', TODO: implement
     this.xmlIdStyle; // xml:id style (Original, Base36, mei-friend)
     this.updateLinting; // CodeMirror function for linting
     this.currentPage = 1;
@@ -484,8 +485,12 @@ export default class Viewer {
     let sc;
     if (id === '') {
       let note = document.querySelector('.note');
-      if (note) id = note.getAttribute('id');
-      else return '';
+      if (note) {
+        id = note.getAttribute('id');
+      }
+      else {
+        return '';
+      }
     } else {
       sc = cm.getSearchCursor('xml:id="' + id + '"');
       if (sc.findNext()) {
@@ -496,6 +501,12 @@ export default class Viewer {
         // console.info('setCursorToPgBg st/ly;m: ' + stNo + '/' + lyNo + '; ', m);
         if (m) {
           id = dutils.getFirstInMeasure(m, dutils.navElsSelector, stNo, lyNo);
+        } else {
+          id = document.querySelector('.note');;
+          let staff = document.querySelector('.staff');
+          if (staff) {
+            id = dutils.getFirstInMeasure(staff, dutils.navElsSelector, stNo, lyNo);
+          }
         }
       }
     }
@@ -509,38 +520,44 @@ export default class Viewer {
   addNotationEventListeners(cm) {
     let vp = document.getElementById('verovio-panel');
     if (vp) {
-      let elements = vp.querySelectorAll('g[id],rect[id],text[id]');
+      // exclude g elements from the shape definition <defs>
+      let elements = vp.querySelector('.page-margin')?.querySelectorAll('g[id],rect[id],text[id]');
       elements.forEach((item) => {
         item.addEventListener('click', (event) => this.handleClickOnNotation(event, cm));
       });
     }
   } // addNotationEventListeners()
 
-  handleClickOnNotation(e, cm) {
+  /**
+   * Handles mouse click events on notation elements.
+   * @param {Event} event
+   * @param {CodeMirror} cm
+   * @returns nothing
+   */
+  handleClickOnNotation(event, cm) {
     if (!this.allowNotationInteraction) return;
-    e.stopImmediatePropagation();
+    event.stopImmediatePropagation();
     this.hideAlerts();
-    let point = {};
-    point.x = e.clientX;
-    point.y = e.clientY;
-    var matrix = document.querySelector('g.page-margin').getScreenCTM().inverse();
-    let r = {};
-    r.x = matrix.a * point.x + matrix.c * point.y + matrix.e;
-    r.y = matrix.b * point.x + matrix.d * point.y + matrix.f;
-    console.debug('Click on ' + e.srcElement.id + ', x/y: ' + r.x + '/' + r.y);
-
     this.allowCursorActivity = false;
-    // console.info('click: ', e);
-    let itemId = String(e.currentTarget.id);
-    if (itemId === 'undefined') return;
+
+    // determine id of clicked element (i.e. the element that the click handler is attached to)
+    let itemId = String(event.currentTarget.id);
+    if (!itemId || itemId === 'undefined') {
+      console.warn('handleClickOnNotation() Cannot find id for clicked element ', event);
+      return;
+    }
     // take chord rather than note xml:id, when ALT is pressed
     let chordId = utils.insideParent(itemId);
-    if (e.altKey && chordId) itemId = chordId;
+    if (event.altKey && chordId) {
+      itemId = chordId;
+    }
     // select tuplet when clicking on tupletNum
-    if (e.currentTarget.getAttribute('class') === 'tupletNum') itemId = utils.insideParent(itemId, 'tuplet');
+    if (event.currentTarget.getAttribute('class') === 'tupletNum') {
+      itemId = utils.insideParent(itemId, 'tuplet');
+    }
 
     let msg = 'handleClickOnNotation() ';
-    if ((platform.startsWith('mac') && e.metaKey) || e.ctrlKey) {
+    if ((platform.startsWith('mac') && event.metaKey) || event.ctrlKey) {
       if (this.selectedElements.includes(itemId)) {
         this.selectedElements.splice(this.selectedElements.indexOf(itemId), 1);
         msg += 'removed: ' + itemId + ', size: ' + this.selectedElements.length;
@@ -552,7 +569,7 @@ export default class Viewer {
       // set cursor position in buffer
       let found = utils.setCursorToId(cm, itemId);
       if (!found) {
-        this.showMissingIdsWarning(e.currentTarget.classList.item(0));
+        this.showMissingIdsWarning(event.currentTarget.classList.item(0));
       }
       this.selectedElements = [];
       this.selectedElements.push(itemId);
@@ -566,7 +583,7 @@ export default class Viewer {
 
     //console.log(msg);
     console.log('handleClickOnNotation() selectedElements: ', this.selectedElements);
-    this.scrollSvgTo(cm, e);
+    this.scrollSvgTo(cm, event);
     this.updateHighlight(cm);
     if (document.getElementById('showMidiPlaybackControlBar').checked) {
       console.log('Viewer.handleClickOnNotation(): HANDLE CLICK MIDI TIMEOUT');
@@ -604,11 +621,11 @@ export default class Viewer {
     ) {
       this.showAlert(
         translator.lang.missingIdsWarningAlert.text +
-          ' (' +
-          translator.lang.manipulateMenuTitle.text +
-          '&mdash;' +
-          translator.lang.addIdsText.text +
-          ')',
+        ' (' +
+        translator.lang.manipulateMenuTitle.text +
+        '&mdash;' +
+        translator.lang.addIdsText.text +
+        ')',
         'warning'
       );
     }
@@ -1887,8 +1904,8 @@ export default class Viewer {
           option,
           value
             ? {
-                bothTags: true,
-              }
+              bothTags: true,
+            }
             : {}
         );
         break;
@@ -2036,14 +2053,14 @@ export default class Viewer {
       default:
         console.log(
           'Creating Verovio Options: Unhandled data type: ' +
-            o.type +
-            ', title: ' +
-            o.title +
-            ' [' +
-            o.type +
-            '], default: [' +
-            optDefault +
-            ']'
+          o.type +
+          ', title: ' +
+          o.title +
+          ' [' +
+          o.type +
+          '], default: [' +
+          optDefault +
+          ']'
         );
     }
     if (input) div.appendChild(input);
@@ -2369,22 +2386,22 @@ export default class Viewer {
     let alertOverlay = document.getElementById('alertOverlay');
     let alertIcon = document.getElementById('alertIcon');
     let alertMessage = document.getElementById('alertMessage');
-    alertIcon.innerHTML = xCircleFill; // error as default icon
+    alertIcon.innerHTML = icons.alertFill; // error as default icon
     alertOverlay.classList.remove('warning');
     alertOverlay.classList.remove('info');
     alertOverlay.classList.remove('success');
     switch (type) {
       case 'warning':
         alertOverlay.classList.add('warning');
-        alertIcon.innerHTML = alert;
+        alertIcon.innerHTML = icons.alert;
         break;
       case 'info':
         alertOverlay.classList.add('info');
-        alertIcon.innerHTML = info;
+        alertIcon.innerHTML = icons.info;
         break;
       case 'success':
         alertOverlay.classList.add('success');
-        alertIcon.innerHTML = success;
+        alertIcon.innerHTML = icons.success;
         break;
     }
     alertMessage.innerHTML = message;
@@ -2408,17 +2425,17 @@ export default class Viewer {
     let promptMessage = document.getElementById('promptMessage');
     let promptButtons = document.getElementById('promptButtons');
     promptButtons.textContent = '';
-    promptIcon.innerHTML = xCircleFill; // error as default icon
+    promptIcon.innerHTML = icons.alertFill; // error as default icon
     promptOverlay.classList.remove('warning');
     promptOverlay.classList.remove('info');
     switch (type) {
       case 'warning':
         promptOverlay.classList.add('warning');
-        promptIcon.innerHTML = alert;
+        promptIcon.innerHTML = icons.alert;
         break;
       case 'info':
         promptOverlay.classList.add('info');
-        promptIcon.innerHTML = info;
+        promptIcon.innerHTML = icons.info;
         break;
     }
     promptMessage.innerHTML = message;
@@ -2510,9 +2527,21 @@ export default class Viewer {
    * @returns
    */
   async replaceSchema(schemaFileName) {
-    if (!this.validatorInitialized) return;
+    if (!this.validatorInitialized) {
+      return;
+    }
+
+    // determine current schema profile (e.g., all, CMN, basic, mensural, neumes, anystart)
+    let schemaTail = schemaFileName.split('/').pop();
+    Object.keys(commonSchemas).forEach((profile) => {
+      if (schemaTail.toLowerCase().includes(profile.toLowerCase())) {
+        this.currentMeiProfile = profile;
+        console.log('Viewer.replaceSchema(): Current MEI profile: ' + this.currentMeiProfile);
+      }
+    });
+
     let vs = document.getElementById('validation-status');
-    vs.innerHTML = download;
+    vs.innerHTML = icons.download;
     let msg = translator.lang.loadingSchema.text + ' ' + schemaFileName;
     vs.setAttribute('title', msg);
     Viewer.changeStatus(vs, 'wait', ['error', 'ok', 'manual']);
@@ -2541,7 +2570,7 @@ export default class Viewer {
     }
     msg = translator.lang.schemaLoaded.text + ' ' + schemaFileName;
     vs.setAttribute('title', msg);
-    vs.innerHTML = unverified;
+    vs.innerHTML = icons.unverified;
     this.validatorWithSchema = true;
     const autoValidate = document.getElementById('autoValidate');
     if (autoValidate && autoValidate.checked) {
@@ -2577,7 +2606,7 @@ export default class Viewer {
     if (msgObj.hasOwnProperty('schemaFile')) msg += msgObj.schemaFile;
     // set icon to unverified and error color
     let vs = document.getElementById('validation-status');
-    vs.innerHTML = unverified;
+    vs.innerHTML = icons.unverified;
     vs.setAttribute('title', msg);
     console.warn(msg);
     Viewer.changeStatus(vs, 'error', ['wait', 'ok', 'manual']);
@@ -2615,7 +2644,12 @@ export default class Viewer {
             let type = pathElements.pop();
             if (type.toLowerCase().includes('anystart')) type = 'any';
             let noChars = 3;
-            if (type.toLowerCase().includes('neumes') || type.toLowerCase().includes('mensural')) noChars = 4;
+            if (type.toLowerCase().includes('neumes') || type.toLowerCase().includes('mensural')) {
+              noChars = 4;
+            }
+            if (type.toLowerCase().includes('basic')) {
+              noChars = 5;
+            }
             let schemaVersion = pathElements.pop();
             el.innerHTML = type.split('mei-').pop().slice(0, noChars).toUpperCase() + ' ' + schemaVersion;
           } else {
@@ -2641,7 +2675,7 @@ export default class Viewer {
    */
   setValidationStatusToManual() {
     let vs = document.getElementById('validation-status');
-    vs.innerHTML = unverified;
+    vs.innerHTML = icons.unverified;
     vs.style.cursor = 'pointer';
     if (isSafari) {
       translator.handleBrowserExceptions('Safari');
@@ -2718,11 +2752,11 @@ export default class Viewer {
     let msg = '';
     if (found.length === 0 && this.validatorWithSchema) {
       Viewer.changeStatus(vs, 'ok', ['error', 'wait', 'manual']);
-      vs.innerHTML = verified;
+      vs.innerHTML = icons.verified;
       msg = 'Everything ok, no errors.';
     } else {
       Viewer.changeStatus(vs, 'error', ['wait', 'ok', 'manual']);
-      vs.innerHTML = alert;
+      vs.innerHTML = icons.alert;
       vs.innerHTML += '<span>' + Object.keys(messages).length + '</span>';
       msg = 'Validation failed. ' + Object.keys(messages).length + ' validation messages:';
       messages.forEach((m) => (msg += '\nLine ' + m.line + ': ' + m.message));
@@ -2774,13 +2808,13 @@ export default class Viewer {
     vs.setAttribute(
       'title',
       translator.lang.validatedAgainst.text +
-        ' ' +
-        this.currentSchema +
-        ': ' +
-        Object.keys(messages).length +
-        ' ' +
-        translator.lang.validationMessages.text +
-        '.'
+      ' ' +
+      this.currentSchema +
+      ': ' +
+      Object.keys(messages).length +
+      ' ' +
+      translator.lang.validationMessages.text +
+      '.'
     );
     if (reportDiv) {
       vs.removeEventListener('click', this.manualValidate);
@@ -2792,8 +2826,8 @@ export default class Viewer {
       if (!currentVisibility || !document.getElementById('autoValidate')?.checked || showValidation)
         reportDiv.style.visibility =
           document.getElementById('autoShowValidationReport')?.checked ||
-          !document.getElementById('autoValidate')?.checked ||
-          showValidation
+            !document.getElementById('autoValidate')?.checked ||
+            showValidation
             ? 'visible'
             : 'hidden';
     }
@@ -3001,7 +3035,8 @@ export default class Viewer {
       document.getElementById('codeCheckerInfoCurrent').innerHTML = 0;
       document.getElementById('codeCheckerInfoOf').innerHTML = '/';
       // decrement the first empty validation-item
-      document.getElementById('codeCheckerInfoTotal').innerHTML = document.querySelectorAll('.validation-item')?.length - 1;
+      document.getElementById('codeCheckerInfoTotal').innerHTML =
+        document.querySelectorAll('.validation-item')?.length - 1;
     }
   } // finalizeCodeCheckerPanel()
 

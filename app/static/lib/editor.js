@@ -1226,7 +1226,7 @@ export function addVerticalGroup(v, cm) {
  * @param {CodeMirror} cm
  */
 export function addApplicationInfo(v, cm) {
-  if (document.getElementById('addApplicationNote').checked) {
+  if (document.getElementById('addApplicationNote').checked && v.currentMeiProfile !== 'Basic') {
     let meiHead = v.xmlDoc.querySelector('meiHead');
     if (!meiHead) return false;
     let appList = v.xmlDoc.querySelectorAll('application');
@@ -1326,6 +1326,11 @@ export function manipulateXmlIds(v, cm, removeIds = false) {
   let skipList = []; // list of xml:ids that will not be removed
 
   v.allowCursorActivity = false;
+
+  // Save cursor position and editor viewport, restore after XML id updates
+  let cursorPosition = cm.getCursor();
+  let scrollInfo = cm.getScrollInfo();
+
   v.loadXml(cm.getValue(), true);
 
   // start from these elements
@@ -1345,6 +1350,10 @@ export function manipulateXmlIds(v, cm, removeIds = false) {
   cm.setValue(new XMLSerializer().serializeToString(v.xmlDoc));
   addApplicationInfo(v, cm);
   v.updateData(cm, false, true);
+
+  // Restore cursor position and editor viewport
+  cm.setCursor(cursorPosition);
+  cm.scrollIntoView({"left": scrollInfo.left, "top": scrollInfo.top, "right": scrollInfo.left + scrollInfo.width, "bottom": scrollInfo.top + scrollInfo.height});
 
   // reporting
   let msg;

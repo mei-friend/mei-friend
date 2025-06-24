@@ -1,6 +1,6 @@
 // mei-friend version and date
-export const version = '1.2.5';
-export const versionDate = '7 May 2025'; // use full or 3-character english months, will be translated
+export const version = '1.2.6';
+export const versionDate = '4 June 2025'; // use full or 3-character english months, will be translated
 export const splashDate = '17 January 2025'; // date of the splash screen content, same translation rules apply
 
 var vrvWorker;
@@ -21,7 +21,8 @@ export var validator; // validator object
 export var rngLoader; // object for loading a relaxNG schema for hinting
 export let gm; // git manager object - TODO, handle multiple git providers
 export let storage = new Storage();
-export var tkVersion = ''; // string of the currently loaded toolkit version
+export var tkVersion = ''; // string of the currently loaded toolkit version, e.g., Verovio 5.3.1-bc61dbf
+export var tkVersionNumber = 0.0; // decimal number of the currently loaded toolkit, e.g., 5.0301
 export var tkUrl = ''; // string of the currently loaded toolkit origin
 export let meiFileName = '';
 export let meiFileLocation = '';
@@ -76,7 +77,7 @@ import {
 } from './control-menu.js';
 import { clock, unverified, xCircleFill } from '../css/icons.js';
 import { keymap } from '../keymaps/default-keymap.js';
-import { setCursorToId, getChangelogUrl } from './utils.js';
+import { setCursorToId, getChangelogUrl, toolkitVersionToDecimal } from './utils.js';
 import { getInMeasure, navElsSelector, getElementAtCursor } from './dom-utils.js';
 import { addDragSelector } from './drag-selector.js';
 import * as checker from './mei-checker.js';
@@ -1002,6 +1003,7 @@ async function vrvWorkerEventsHandler(ev) {
     case 'vrvLoaded':
       console.info('main(). Handler vrvLoaded: ', this);
       tkVersion = ev.data.version;
+      tkVersionNumber = toolkitVersionToDecimal(tkVersion);
       tkUrl = ev.data.url;
       tkAvailableOptions = ev.data.availableOptions;
       v.clearVrvOptionsSettingsPanel();
@@ -1234,6 +1236,8 @@ let inputFormats = {
   // xml: "<score-timewise", // does Verovio import timewise musicXML?
   humdrum: '**kern',
   pae: '@clef',
+  // TODO: check Verovio version for supported formats
+  'cmme.xml': 'xmlns="http://www.cmme.org"', // CMME XML format
 };
 
 export function openFile(file = defaultMeiFileURL, setFreshlyLoaded = true, updateAfterLoading = true) {
@@ -1366,6 +1370,9 @@ export function handleEncoding(meiXML, setFreshlyLoaded = true, updateAfterLoadi
   } else {
     // all other formats are found by search term in text file
     for (const [key, value] of Object.entries(inputFormats)) {
+      if (key === 'cmme.xml' && tkVersionNumber < 5.0301) {
+        continue;
+      } // CMME XML format only supported in Verovio 5.3.1 and later
       if (meiXML.includes(value)) {
         // a hint that it is a MEI file
         found = true;
@@ -1396,9 +1403,11 @@ export function handleEncoding(meiXML, setFreshlyLoaded = true, updateAfterLoadi
     }
   }
   if (!found) {
-    if (meiXML.includes('<score-timewise'))
+    if (meiXML.includes('<score-timewise')) {
       log('Loading ' + meiFileName + 'did not succeed. ' + 'No support for timewise MusicXML files.');
-    else {
+    } else if (meiXML.includes(inputFormats['cmme.xml'])) {
+      log('CMME format not recognized: ' + meiFileName + '. Use Verovio 5.3.1 or higher. ', 1649499359729);
+    } else {
       log('Format not recognized: ' + meiFileName + '.', 1649499359728);
     }
     setIsMEI(false);

@@ -511,6 +511,9 @@ function generateAnnotationButtons(a) {
   const addDescribe = generateListItemButton('describeMarkup', pencil, translator.lang.describeMarkup.description);
   if (a.isMarkup) {
     addDescribe.addEventListener('click', (e) => {
+      // ensure that element enumeration target type is selected
+      document.querySelector('#annotationToolTargetTypeElements').checked = true;
+      // create the describe annotation
       annot.createDescribe(e, a.selection);
     });
   }
@@ -668,13 +671,13 @@ export function addAnnotationHandlers() {
   // disable 'identify music object' unless 'linked data' domain selected
   document
     .querySelectorAll('.annotationToolsDomainSelectionItem input')
-    .forEach((i) => i.removeEventListener('click', enableDisableIdentifyObject));
+    .forEach((i) => i.removeEventListener('click', onAnnotationStorageSelected));
   document
     .querySelectorAll('.annotationToolsDomainSelectionItem input')
-    .forEach((i) => i.addEventListener('click', enableDisableIdentifyObject));
-  enableDisableIdentifyObject(); // set initial status
-  document.getElementById('annotationToolsButton').removeEventListener('click', enableDisableIdentifyObject);
-  document.getElementById('annotationToolsButton').addEventListener('click', enableDisableIdentifyObject);
+    .forEach((i) => i.addEventListener('click', onAnnotationStorageSelected));
+  onAnnotationStorageSelected(); // set initial status
+  document.getElementById('annotationToolsButton').removeEventListener('click', onAnnotationStorageSelected);
+  document.getElementById('annotationToolsButton').addEventListener('click', onAnnotationStorageSelected);
 } // addAnnotationHandlers()
 
 /**
@@ -810,15 +813,31 @@ function addSelectionSelect() {
 } // addSelectionSelect()
 
 /**
- * enables/disables the 'Identify' button based on selected mode of annotation.
+ * enables/disables the 'Identify' button and target types based on selected mode of annotation.
+ * 'Identify' allowed when 'RDF' (stand-off) selected and unavailable when 'inline' selected.
+ * 'Elements' target type enforced when 'RDF' (stand-off) selected, others available when 'inline' selected.
  * Reads writeAnnotationInline checkbox.
  */
-function enableDisableIdentifyObject() {
+function onAnnotationStorageSelected() {
   let identifyTool = document.getElementById('annotateIdentify');
+  let targetElements = document.getElementById('annotationToolTargetTypeElements');
+  let targetRange = document.getElementById('annotationToolTargetTypeRange');
+  let targetRangeLabel = document.getElementById('annotationToolTargetTypeRangeLabel');
+  let targetInterval = document.getElementById('annotationToolTargetTypeInterval');
+  let targetIntervalLabel = document.getElementById('annotationToolTargetTypeIntervalLabel');
   if (document.getElementById('writeAnnotationInline').checked) {
     identifyTool.classList.add('disabled');
+    targetRange.disabled = false;
+    targetRangeLabel.classList.remove('disabled');
+    targetInterval.disabled = false;
+    targetIntervalLabel.classList.remove('disabled');
   } else {
     identifyTool.classList.remove('disabled');
+    targetElements.checked = true;
+    targetRange.disabled = true;
+    targetRangeLabel.classList.add('disabled');
+    targetInterval.disabled = true;
+    targetIntervalLabel.classList.add('disabled');
   }
 } // enableDisableIdentifyObject()
 

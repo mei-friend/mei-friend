@@ -1115,7 +1115,8 @@ async function doCommit() {
     } catch (e) {
       githubLoadingIndicator.classList.remove('clockwise');
       cm.setOption('readOnly', false);
-      log("Sorry, couldn't commit: ", e);
+      log("Sorry, couldn't commit (error during commit or push to GitHub)");
+      console.error("Sorry, couldn't commit (error during commit or push)", e);
     }
   }
 } // doCommit()
