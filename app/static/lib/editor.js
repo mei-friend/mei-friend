@@ -1908,7 +1908,12 @@ export function replaceInEditor(cm, xmlNode, select = false, newNode = []) {
   // search in buffer
   let itemId = xmlNode.getAttribute('xml:id');
   let xmlIdCheck = '';
-  if (itemId) xmlIdCheck = `(\\s+?)([^>]*?)(?:xml:id=["']` + itemId + `['"])`;
+  if (itemId) {
+    xmlIdCheck = `(\\s+?)([^>]*?)(?:xml:id=["']` + itemId + `['"])`;
+  } else {
+    console.warn('replaceInEditor(): no xml:id found for ' + xmlNode.nodeName + '.');
+    return {};
+  }
   let searchSelfClosing = '(?:<' + xmlNode.nodeName + `)` + xmlIdCheck + `([^>]*?)(?:/>)`;
   // console.info('searchSelfClosing: ' + searchSelfClosing);
   let sc = cm.getSearchCursor(new RegExp(searchSelfClosing));
