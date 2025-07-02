@@ -525,28 +525,27 @@ function addMarkupToXML(v, cm, attrName = 'none', mElName, multiLayerContent = [
     // warn and prevent if currentParrent has no xml:id because replacing in editor will fail
     // added option to add xml:ids to the file before adding markup
     if (parent && parent.getAttribute('xml:id') == null) {
-      const handleMissigParentId = new Promise((resolve, reject) => {
-        const msg =
-          'Action can only be performed if parent element has an xml:id. Please add xml:ids to the document before.';
+      const handleMissingParentId = new Promise((resolve, reject) => {
+        const msg = translator.lang.missingParentIdWarning.text;
         console.log(msg);
 
         v.showUserPrompt(msg, [
           {
-            label: 'Abort action',
+            label: translator.lang.handleMissingParentIdProceed.text, //'Add xml:ids to document',
             event: (abort) => {
-              reject('promptOverlay', abort);
+              resolve('promptOverlay', abort);
             },
           },
           {
-            label: 'Add xml:ids to document',
+            label: translator.lang.handleMissingParentIdAbort.text, //'Abort action',
             event: (abort) => {
-              resolve('promptOverlay', abort);
+              reject('promptOverlay', abort);
             },
           },
         ]);
       });
 
-      handleMissigParentId
+      handleMissingParentId
         .then((resolveModal) => {
           cmd.addIds();
           v.hideUserPrompt(resolveModal);
