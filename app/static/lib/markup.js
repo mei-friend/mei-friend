@@ -48,7 +48,10 @@ export function readMarkup() {
   alternativeVersions?.forEach((element) => {
     let children = element.children;
     for (let i = 0; i < children.length; i++) {
-      idsToIgnore.push(children[i].getAttribute('xml:id'));
+      let currentChildID = children[i].getAttribute('xml:id');
+      if(currentChildID != null) {
+        idsToIgnore.push(currentChildID);
+      }
     }
   });
 
@@ -62,20 +65,38 @@ export function readMarkup() {
         // Automatically add missing xml:ids
         // I replace the parent element to prevent hickups and endless recursions
         // because replaceInEditor() needs xml:ids to work.
-        // This can definitely be solved in a better way,
-        // but I'm not familar enough with the other editor functions
-        elId = utils.generateXmlId(elName, v.xmlIdStyle);
-        markupEl.setAttributeNS(dutils.xmlNameSpace, 'xml:id', elId);
-        // (DW and WG, 24.6.2025
-        // This solution runs into a problem when the parent
-        // element doesn't have an xml:id either.
-        // We therefore should recognize this case and
-        // prompt the user to add IDs. (TODO!)
-        // This is already done further below (around line 500, 'handleMissingParentId') but there it isn't nicely modularized
-        // and cannot easily be made so due to asynchronicity.
-        replaceInEditor(cm, markupEl.parentElement, false);
-        cm.execCommand('indentAuto');
-        console.log(`Added xml:id ${elId} to ${elName}`);
+        // Update (AP, 31.01.2025)
+        // Using Search/Replace instead of replaceInEditor() does not work safely
+        // There are still hickups with lacking xml:ids
+        // String serialisation also turns empty elements into self-closing elements.
+        // This prevents Search/Replace
+        // We can only perform this if the parent element has an xml:id
+
+        if(markupEl.parentElement.getAttribute('xml:id') != null) {
+          elId = utils.generateXmlId(elName, v.xmlIdStyle);
+          markupEl.setAttributeNS(dutils.xmlNameSpace, 'xml:id', elId);
+          replaceInEditor(cm, markupEl.parentElement, false);
+          cm.execCommand('indentAuto');
+          console.log(`Added xml:id ${elId} to ${elName}`);
+        }
+        else {
+          // Abort action
+          // Disable enrichment panel and warn user to add xml:ids to allow usage of enrichment panel
+          // This alert currently shows at every keystroke... this needs improvement!
+          v.showAlert(
+            translator.lang.missingIdsWarningAlertOnLoading.text +
+              ' (' +
+              translator.lang.manipulateMenuTitle.text +
+              '&mdash;' +
+              translator.lang.addIdsText.text +
+              ')',
+            'warning', 4000
+          );
+          // Set focus to code pane to allow further typing
+          // TODO: Check if focus was of cm before to set focus conditionally
+          cm.focus();
+          return;
+        }
       }
 
       if (att.alternativeEncodingElements.includes(elName)) {
@@ -366,25 +387,30 @@ export function addMarkup(event) {
   if (att.alternativeEncodingElements.includes(mElName) && multiLayerContent == undefined) {
     v.showAlert('Please first select a content option for this markup element!');
   } else {
-    addMarkupToXML(v, cm, attrName, mElName, multiLayerContent);
-    handleEditorChanges(); // update editor content
-    //let successfullyAdded = xmlMarkupToListItem(v.selectedElements, mElName);
-    // Manually updating the item list is not necessary because refreshing the code in the editor triggers readMarkup()
-    refreshAnnotationsList();
-    //select elements of last reading for alternative encodings if copied
-    if (multiLayerContent != undefined && document.getElementById('alternativeVersionContent').value == 'copy') {
-      let newSelection = [];
-      v.selectedElements.forEach((id) => {
-        let selEl = v.xmlDoc.querySelector("[*|id='" + id + "']");
-        let lastChild = selEl.lastElementChild;
-        for (let child of lastChild.children) {
-          newSelection.push(child.getAttribute('xml:id'));
-        }
-      });
-      setChoiceOptions(multiLayerContent[multiLayerContent.length - 1]);
-      handleEditorChanges();
-      v.selectedElements = newSelection;
-      v.setFocusToVerovioPane();
+    let success = addMarkupToXML(v, cm, attrName, mElName, multiLayerContent);
+    if (success != false) {
+      handleEditorChanges(); // update editor content
+      // Manually updating the item list is not necessary because refreshing the code in the editor triggers readMarkup()
+      refreshAnnotationsList();
+      //select elements of last reading for alternative encodings if copied
+      if (multiLayerContent != undefined && document.getElementById('alternativeVersionContent').value == 'copy') {
+        let newSelection = [];
+        v.selectedElements.forEach((id) => {
+          let selEl = v.xmlDoc.querySelector("[*|id='" + id + "']");
+          let lastChild = selEl.lastElementChild;
+          for (let child of lastChild.children) {
+            newSelection.push(child.getAttribute('xml:id'));
+          }
+        });
+        setChoiceOptions(multiLayerContent[multiLayerContent.length - 1]);
+        handleEditorChanges();
+        v.selectedElements = newSelection;
+        v.setFocusToVerovioPane();
+      }
+    }
+    else {
+      // TODO: Add localisation!
+      v.showAlert("Adding markup was not successful!");
     }
   }
 } // addMarkup()
@@ -406,12 +432,14 @@ export function addMarkup(event) {
  * @param {CodeMirror} cm
  * @param {string} attrName ('artic', 'accid')
  * @param {string} mElName name of markup element to apply
+ * @returns {boolean} success
  */
 function addMarkupToXML(v, cm, attrName = 'none', mElName, multiLayerContent = []) {
+  let success = false;
   v.loadXml(cm.getValue());
   v.selectedElements = speed.filterElements(v.selectedElements, v.xmlDoc);
   v.selectedElements = utils.sortElementsByScorePosition(v.selectedElements);
-  if (v.selectedElements.length < 1) return;
+  if (v.selectedElements.length < 1) return success;
   v.allowCursorActivity = false;
   cm.blockChanges = true;
 
@@ -487,6 +515,7 @@ function addMarkupToXML(v, cm, attrName = 'none', mElName, multiLayerContent = [
   // dependent IDs we need to change after the copy
   let dicOld2NewIDs = {};
   let copiedChilds = [];
+  // TODO: Find a solution for related control events (like slurs) (AP, 31.01.2025)
 
   // this loop iterates over the array of arrays of grouped ids
   // and wraps the markup around a whole group
@@ -521,6 +550,10 @@ function addMarkupToXML(v, cm, attrName = 'none', mElName, multiLayerContent = [
           cmd.addIds();
           v.hideUserPrompt(resolveModal);
           console.log('Added ids and proceed.');
+          // TODO! (AP, 31.1.2025)
+          // Currently, the xml:ids are successfully added, but the markup will not be created.
+          // Everything in this function after this foreach does not happen
+          // This is already in 1.2.1 the case, maybe earlier
           let markupUuid = createMarkup(v, group, mElName, parent, multiLayerContent, copiedChilds, dicOld2NewIDs);
           uuids.push(markupUuid);
         })
@@ -554,11 +587,13 @@ function addMarkupToXML(v, cm, attrName = 'none', mElName, multiLayerContent = [
       replaceInEditor(cm, parentEl, true);
       replaceInEditor(cm, el, true); // to select new markup element
     });
+    success = true;
   }
 
   addApplicationInfo(v, cm);
   v.allowCursorActivity = true; // update notation again
   cm.blockChanges = false;
+  return success;
 } // addMarkupToXML()
 
 /**

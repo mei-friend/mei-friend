@@ -998,7 +998,10 @@ export const lang = {
   codeCheckerBecauseAlreadyDefined: { text: 'omdat het eerder in de maat is gedefinieerd' },
 
   // Warning for missing ids
-  missingIdsWarningAlert: {
+  missingIdsWarningAlertOnScrolling: {
     text: "mei-friend kan niet naar de geselecteerde elementen in de codering scrollen. Voeg id's toe aan de codering.",
   },
+  missingIdsWarningAlertOnLoading: {
+    text: 'Er is minstens één markup-element omgeven door een bovenliggend element zonder xml:id. mei-friend kan geen markup verwerken in bestanden zonder id\'s. Voeg alstublieft id\'s toe aan de codering.'
+  },  
 };

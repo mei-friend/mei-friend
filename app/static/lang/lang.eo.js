@@ -1116,7 +1116,10 @@ export const lang = {
   codeCheckerBecauseAlreadyDefined: { text: 'ĉar ĝi jam estas difinita antaŭe en la takto' },
 
   // Averto pri mankantaj ID-oj
-  missingIdsWarningAlert: {
+  missingIdsWarningAlertOnScrolling: {
     text: 'mei-friend ne povas ruli al la elektitaj elementoj en la kodo. Bonvolu aldoni ID-ojn al la kodo.',
   },
+  missingIdsWarningAlertOnLoading: {
+    text: 'Estas almenaŭ unu markupa elemento enfermita de gepatra elemento sen xml:id. mei-friend ne povas trakti markupon en dosieroj sen identigiloj. Bonvolu aldoni identigilojn al la kodado.'
+  },  
 };

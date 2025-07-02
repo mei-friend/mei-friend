@@ -1112,7 +1112,10 @@ export const lang = {
   codeCheckerBecauseAlreadyDefined: { text: 'оскільки він вже визначений раніше в такту' },
 
   // Warning for missing ids
-  missingIdsWarningAlert: {
+  missingIdsWarningAlertOnScrolling: {
     text: 'mei-friend не може прокрутити вибрані елементи в кодуванні. Будь ласка, додайте ідентифікатори до кодування.',
   },
+  missingIdsWarningAlertOnLoading: {
+    text: 'Існує принаймні один елемент розмітки, оточений батьківським елементом без xml:id. mei-friend не може обробляти розмітку у файлах без ідентифікаторів. Будь ласка, додайте ідентифікатори до кодування.'
+  },  
 };

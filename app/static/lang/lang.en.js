@@ -1194,7 +1194,10 @@ export const lang = {
   codeCheckerBecauseAlreadyDefined: { text: 'because it has been defined earlier in the measure' },
 
   // Warning for missing ids
-  missingIdsWarningAlert: {
+  missingIdsWarningAlertOnScrolling: {
     text: 'mei-friend is unable to scroll to the selected elements in the encoding. Please add ids to the encoding.',
+  },
+  missingIdsWarningAlertOnLoading: {
+    text: 'There is at least one markup element enclosed by a parent element without xml:id. mei-friend is unable to handle markup in files without ids. Please add ids to the encoding.'
   },
 };

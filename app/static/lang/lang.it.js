@@ -1155,7 +1155,10 @@ export const lang = {
   codeCheckerBecauseAlreadyDefined: { text: 'poiché è già stato definito in precedenza nella misura' },
 
   // Warning for missing ids
-  missingIdsWarningAlert: {
+  missingIdsWarningAlertOnScrolling: {
     text: 'mei-friend non è in grado di scorrere gli elementi selezionati nella codifica. Aggiungere gli id alla codifica.',
   },
+  missingIdsWarningAlertOnLoading: {
+    text: 'C\'è almeno un elemento di markup racchiuso da un elemento padre senza xml:id. mei-friend non può gestire il markup nei file senza ID. Si prega di aggiungere gli ID alla codifica.'
+  },  
 };
