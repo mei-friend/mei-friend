@@ -90,7 +90,7 @@ export function readMarkup() {
               '&mdash;' +
               translator.lang.addIdsText.text +
               ')',
-            'warning', 4000
+            'warning'
           );
           // Set focus to code pane to allow further typing
           // TODO: Check if focus was of cm before to set focus conditionally
