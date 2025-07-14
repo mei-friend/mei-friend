@@ -1,6 +1,6 @@
 // mei-friend version and date
 export const version = '1.2.7';
-export const versionDate = '2 July 2025'; // use full or 3-character english months, will be translated
+export const versionDate = '14 July 2025'; // use full or 3-character english months, will be translated
 export const splashDate = '17 January 2025'; // date of the splash screen content, same translation rules apply
 
 var vrvWorker;
@@ -81,6 +81,7 @@ import { setCursorToId, getChangelogUrl, toolkitVersionToDecimal } from './utils
 import { getInMeasure, navElsSelector, getElementAtCursor } from './dom-utils.js';
 import { addDragSelector } from './drag-selector.js';
 import * as checker from './mei-checker.js';
+import { addMarkupLegendToNotationSVG } from './markup.js';
 import {
   highlightNotesAtMidiPlaybackTime,
   mp,
@@ -1098,6 +1099,11 @@ async function vrvWorkerEventsHandler(ev) {
         refreshAnnotationsInNotation(false);
         v.scrollSvgTo(cm);
         if (v.pdfMode) {
+          // add markup legend to notation SVG
+          let svgMargin = document.querySelector('svg .page-margin');
+          if (svgMargin) {
+            addMarkupLegendToNotationSVG(svgMargin);
+          }
           // switch on frame, when in pdf mode
           const svg = document.querySelector('#verovio-panel svg');
           if (svg) svg.classList.add('showFrame');

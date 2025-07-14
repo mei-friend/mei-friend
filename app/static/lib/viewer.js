@@ -22,7 +22,7 @@ import {
   version,
   versionDate,
 } from './main.js';
-import { selectMarkup } from './markup.js';
+import { addMarkupLegendToNotationSVG, selectMarkup } from './markup.js';
 import { startMidiTimeout } from './midi-player.js';
 import { getNotationProportion, setNotationProportion, setOrientation } from './resizer.js';
 import {
@@ -1035,7 +1035,7 @@ export default class Viewer {
       let col = document.getElementById(element + 'Color').value;
       this.setHighlightColorProperty(element, markupToPDF, col, true);
     });
-  } // pageModeOn()
+  }   // pageModeOn()
 
   // Switches back from pdfMode
   pageModeOff() {

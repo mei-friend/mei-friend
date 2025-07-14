@@ -833,3 +833,94 @@ export function getParentMarkupElementId(xmlDoc, id) {
   }
   return '';
 } // getParentMarkupElementId()
+
+/**
+ * Add markup legend of markup elements used in the MEI encoding to the notation SVG.
+ * Do nothing if no markup elements are used.
+ * The legend is added as a group element with id 'markupLegend'.
+ * Each markup element is represented by a rectangle and a text label.
+ * The rectangle is colored according to the color of the markup element.
+ * The text label is the name of the markup element in angle brackets.
+ * The legend is added to the notation SVG at the end.
+ *
+ * @param {SVGElement} target the SVG element to which the legend should be added
+ * @returns {boolean} true if markup legend was added, false if no markup elements were used
+ */
+export function addMarkupLegendToNotationSVG(target) {
+  // remove existing markup legend if it exists
+  let markupLegend = target.querySelector('g#markupLegend');
+  if (markupLegend) {
+    markupLegend.remove();
+  }
+
+  // find all markup elements rendered in the notation SVG
+  let usedMarkupElements = [];
+  att.modelTranscriptionLike.forEach((el) => {
+    let element = target.querySelector('.' + el);
+    console.log('Checking for markup element: "' + '.' + el + '": ' + element + ' found.');
+    if (element !== null && !usedMarkupElements.includes(el)) {
+      usedMarkupElements.push(el);
+    }
+  });
+
+  if (usedMarkupElements.length <= 0) {
+    console.log('No markup elements used in notation SVG, no legend needed.');
+    return false; // no markup elements used, no legend needed
+  }
+
+  // create markup legend only if there are any markup elements used
+  markupLegend = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  markupLegend.id = 'markupLegend';
+  markupLegend.classList.add('markup-legend');
+  markupLegend.setAttribute('transform', 'scale(30)');
+
+  // set orientation of legend elements
+  let orientation = 'row';
+  let offsetX = 0;
+  let offsetY = 0;
+
+  let oldWidth = 0; // width of last markup legend element
+  let oldHeight = 0; // height of last markup legend element
+
+  usedMarkupElements.forEach((el) => {
+    let markupColor = document.getElementById(el + 'Color')?.value || 'black';
+
+    let markupItem = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    markupItem.classList.add('markup-item');
+    markupItem.classList.add(el.toLowerCase());
+    if (orientation === 'row' && oldHeight > 0) {
+      offsetX += oldWidth + 3; // vertical offset for each item
+    } else if (orientation === 'column' && oldWidth > 0) {
+      offsetY += oldHeight + 3; // horizontal offset for each item
+    }
+    markupItem.setAttribute('font-size', '12px');
+    markupItem.setAttribute('transform', 'translate(' + offsetX + ',' + offsetY + ')');
+
+    // add rectangle for the legend item
+    let rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    rect.setAttribute('width', '36');
+    rect.setAttribute('height', '15');
+    rect.setAttribute('fill', 'none');
+    rect.setAttribute('fill', markupColor);
+    rect.setAttribute('stroke', markupColor);
+    rect.setAttribute('stroke-width', '1');
+    markupItem.appendChild(rect);
+
+    // create text element for the legend item
+    let textElement = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    textElement.classList.add('markup-label');
+    textElement.setAttribute('x', '41');
+    textElement.setAttribute('y', '13');
+    textElement.textContent = '<' + el + '>';
+    markupItem.appendChild(textElement);
+
+    // keep width of the markup item for next item placement
+    // TODO: Problem: getBBox() returns 0 for width and height before it is rendered
+    oldWidth = 100; // markupItem.getBBox().width;
+    oldHeight = 22; // markupItem.getBBox().height;
+
+    markupLegend.appendChild(markupItem);
+  });
+
+  target.appendChild(markupLegend);
+} // addMarkupLegendToNotationSVG()
