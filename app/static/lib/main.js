@@ -539,7 +539,7 @@ async function completeInitialLoad() {
   vrvWorker = new Worker(`${root}lib/verovio-worker.js`);
   vrvWorker.onmessage = vrvWorkerEventsHandler;
 
-  spdWorker = new Worker(`${root}lib/speed-worker.js`);
+  spdWorker = new Worker(`${root}lib/speed-worker.js`, { type: 'module' });
   spdWorker.postMessage({
     cmd: 'variables',
     var: att.timeSpanningElements,
