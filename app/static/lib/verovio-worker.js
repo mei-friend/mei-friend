@@ -2,7 +2,9 @@ var tk;
 var tkOptions;
 var tkUrl;
 
-loadVerovio = () => {
+import * as txml from '../deps/txml.js';
+
+let loadVerovio = () => {
   /* create the worker toolkit instance */
   console.info('VerovioWorker: Loading toolkit...');
   try {
@@ -35,13 +37,17 @@ addEventListener(
         if (tk) tk.destroy();
         // here we attempt to delete/destroy the toolkit module...
         if (typeof verovio !== 'undefined' && 'module' in verovio) delete verovio.module;
-        importScripts(tkUrl);
-        if (['3.7.0*', '3.8.1*', '3.9.0*', '3.10.0*'].includes(result.msg)) {
-          console.log('Load Verovio 3.10.0 or earlier');
-          Module.onRuntimeInitialized = loadVerovio;
-        } else {
-          verovio.module.onRuntimeInitialized = loadVerovio;
-        }
+        // importScripts(tkUrl);
+        import(tkUrl).then(() => {
+          console.log('VerovioWorker: toolkit module loaded from ' + tkUrl);
+          if (['3.7.0*', '3.8.1*', '3.9.0*', '3.10.0*'].includes(result.msg)) {
+            console.log('Load Verovio 3.10.0 or earlier');
+            // TODO: remove these versions from defaults, as they are not supported anymore
+            Module.onRuntimeInitialized = loadVerovio;
+          } else {
+            verovio.module.onRuntimeInitialized = loadVerovio;
+          }
+        });
         return;
       case 'updateAll':
         try {

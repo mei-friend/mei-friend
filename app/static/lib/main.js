@@ -536,7 +536,7 @@ async function completeInitialLoad() {
   drawLeftFooter();
   drawRightFooter();
 
-  vrvWorker = new Worker(`${root}lib/verovio-worker.js`);
+  vrvWorker = new Worker(`${root}lib/verovio-worker.js`, { type: 'module' });
   vrvWorker.onmessage = vrvWorkerEventsHandler;
 
   spdWorker = new Worker(`${root}lib/speed-worker.js`, { type: 'module' });
