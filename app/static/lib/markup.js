@@ -856,9 +856,7 @@ export function addMarkupLegendToNotationSVG(target) {
   // find all markup elements rendered in the notation SVG
   let usedMarkupElements = [];
   att.modelTranscriptionLike.forEach((el) => {
-    let element = target.querySelector('.' + el);
-    console.log('Checking for markup element: "' + '.' + el + '": ' + element + ' found.');
-    if (element !== null && !usedMarkupElements.includes(el)) {
+    if (target.querySelector('.' + el) !== null && !usedMarkupElements.includes(el)) {
       usedMarkupElements.push(el);
     }
   });
@@ -872,10 +870,10 @@ export function addMarkupLegendToNotationSVG(target) {
   markupLegend = document.createElementNS('http://www.w3.org/2000/svg', 'g');
   markupLegend.id = 'markupLegend';
   markupLegend.classList.add('markup-legend');
-  markupLegend.setAttribute('transform', 'scale(30)');
+  markupLegend.setAttribute('transform', 'scale(1)');
 
-  // set orientation of legend elements
-  let orientation = 'row';
+  let orientation = 'column'; // orientation of legend elements (row or column)
+  let fontSize = 12; // default font size for legend items in pt
   let offsetX = 0;
   let offsetY = 0;
 
@@ -885,21 +883,24 @@ export function addMarkupLegendToNotationSVG(target) {
   usedMarkupElements.forEach((el) => {
     let markupColor = document.getElementById(el + 'Color')?.value || 'black';
 
+    // an SVG group element for the markup item
     let markupItem = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     markupItem.classList.add('markup-item');
     markupItem.classList.add(el.toLowerCase());
     if (orientation === 'row' && oldHeight > 0) {
-      offsetX += oldWidth + 3; // vertical offset for each item
+      offsetX += oldWidth + 120; // vertical offset for each item
     } else if (orientation === 'column' && oldWidth > 0) {
-      offsetY += oldHeight + 3; // horizontal offset for each item
+      offsetY += oldHeight + 120; // horizontal offset for each item
     }
-    markupItem.setAttribute('font-size', '12px');
+    markupItem.setAttribute('font-family', 'Times New Roman, Times, serif');
+    markupItem.setAttribute('font-size', ((fontSize * 25.4) / 72) * 100); // convert pt to mm/10 Verovio units (1 pt = 25.4 mm / 72)
+    markupItem.setAttribute('font-weight', 'normal');
     markupItem.setAttribute('transform', 'translate(' + offsetX + ',' + offsetY + ')');
 
     // add rectangle for the legend item
     let rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-    rect.setAttribute('width', '36');
-    rect.setAttribute('height', '15');
+    rect.setAttribute('width', fontSize * 50);
+    rect.setAttribute('height', fontSize * 30);
     rect.setAttribute('fill', 'none');
     rect.setAttribute('fill', markupColor);
     rect.setAttribute('stroke', markupColor);
@@ -909,15 +910,15 @@ export function addMarkupLegendToNotationSVG(target) {
     // create text element for the legend item
     let textElement = document.createElementNS('http://www.w3.org/2000/svg', 'text');
     textElement.classList.add('markup-label');
-    textElement.setAttribute('x', '41');
-    textElement.setAttribute('y', '13');
+    textElement.setAttribute('x', fontSize * 50 + 120); // position text to the right of the rectangle
+    textElement.setAttribute('y', fontSize * 30 - 50);
     textElement.textContent = '<' + el + '>';
     markupItem.appendChild(textElement);
 
     // keep width of the markup item for next item placement
     // TODO: Problem: getBBox() returns 0 for width and height before it is rendered
-    oldWidth = 100; // markupItem.getBBox().width;
-    oldHeight = 22; // markupItem.getBBox().height;
+    oldWidth = fontSize * 170; // markupItem.getBBox().width;
+    oldHeight = fontSize * 30; // markupItem.getBBox().height;
 
     markupLegend.appendChild(markupItem);
   });
