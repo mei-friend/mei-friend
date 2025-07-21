@@ -668,7 +668,7 @@ a:active {
 
 #codeCheckerCloseButton {
   margin-right: 10px;
-  margin-top: .5px;
+  margin-top: 0.5px;
 }
 
 #codeCheckerInfoTotal {
@@ -1207,7 +1207,7 @@ svg text {
   animation-timing-function: ease;
 }
 
-#verovio-panel g.supplied g {
+#verovio-panel .supplied {
   fill: var(--suppliedColor);
   color: var(--suppliedColor);
 }
@@ -1219,13 +1219,13 @@ svg text {
   animation-timing-function: ease;
 }
 
-#verovio-panel g.supplied g.highlighted {
+/* #verovio-panel g.supplied g.highlighted {
   fill: var(--suppliedHighlightedColor);
   animation: pulseHighlighted 0.6s;
   animation-timing-function: ease;
-}
+} */
 
-#verovio-panel g.unclear g {
+#verovio-panel .unclear {
   fill: var(--unclearColor);
   color: var(--unclearColor);
   stroke: var(--unclearColor);
@@ -1236,11 +1236,11 @@ svg text {
   stroke: var(--unclearHighlightedColor);
 }
 
-#verovio-panel g.unclear g.highlighted {
+/* #verovio-panel g.unclear g.highlighted {
   fill: var(--unclearHighlightedColor);
-}
+} */
 
-#verovio-panel g.sic g {
+#verovio-panel .sic {
   fill: var(--sicColor);
   color: var(--sicColor);
   stroke: var(--sicColor);
@@ -1251,11 +1251,11 @@ svg text {
   stroke: var(--sicHighlightedColor);
 }
 
-#verovio-panel g.sic g.highlighted {
+/* #verovio-panel g.sic g.highlighted {
   fill: var(--sicHighlightedColor);
-}
+} */
 
-#verovio-panel g.corr g {
+#verovio-panel .corr {
   fill: var(--corrColor);
   color: var(--corrColor);
   stroke: var(--corrColor);
@@ -1266,11 +1266,11 @@ svg text {
   stroke: var(--corrHighlightedColor);
 }
 
-#verovio-panel g.corr g.highlighted {
+/* #verovio-panel g.corr g.highlighted {
   fill: var(--corrHighlightedColor);
-}
+} */
 
-#verovio-panel g.orig g {
+#verovio-panel .orig {
   fill: var(--origColor);
   color: var(--origColor);
   stroke: var(--origColor);
@@ -1281,11 +1281,11 @@ svg text {
   stroke: var(--origHighlightedColor);
 }
 
-#verovio-panel g.orig g.highlighted {
+/* #verovio-panel g.orig g.highlighted {
   fill: var(--origHighlightedColor);
-}
+} */
 
-#verovio-panel g.reg g {
+#verovio-panel .reg {
   fill: var(--regColor);
   color: var(--regColor);
   stroke: var(--regColor);
@@ -1296,11 +1296,11 @@ svg text {
   stroke: var(--regHighlightedColor);
 }
 
-#verovio-panel g.reg g.highlighted {
+/* #verovio-panel g.reg g.highlighted {
   fill: var(--regHighlightedColor);
-}
+} */
 
-#verovio-panel g.add g {
+#verovio-panel .add {
   fill: var(--addColor);
   color: var(--addColor);
   stroke: var(--addColor);
@@ -1311,11 +1311,11 @@ svg text {
   stroke: var(--addHighlightedColor);
 }
 
-#verovio-panel g.add g.highlighted {
+/* #verovio-panel g.add g.highlighted {
   fill: var(--addHighlightedColor);
-}
+} */
 
-#verovio-panel g.del g {
+#verovio-panel .del {
   fill: var(--delColor);
   color: var(--delColor);
   stroke: var(--delColor);
@@ -1326,324 +1326,9 @@ svg text {
   stroke: var(--delHighlightedColor);
 }
 
-#verovio-panel g.del g.highlighted {
+/* #verovio-panel g.del g.highlighted {
   fill: var(--delHighlightedColor);
-}
-
-#verovio-panel g.unclear g {
-  fill: var(--unclearColor);
-  color: var(--unclearColor);
-  stroke: var(--unclearColor);
-}
-
-#verovio-panel .unclear .highlighted {
-  color: var(--unclearHighlightedColor);
-  stroke: var(--unclearHighlightedColor);
-}
-
-#verovio-panel g.unclear g.highlighted {
-  fill: var(--unclearHighlightedColor);
-}
-
-#verovio-panel g.sic g {
-  fill: var(--sicColor);
-  color: var(--sicColor);
-  stroke: var(--sicColor);
-}
-
-#verovio-panel .sic .highlighted {
-  color: var(--sicHighlightedColor);
-  stroke: var(--sicHighlightedColor);
-}
-
-#verovio-panel g.sic g.highlighted {
-  fill: var(--sicHighlightedColor);
-}
-
-#verovio-panel g.corr g {
-  fill: var(--corrColor);
-  color: var(--corrColor);
-  stroke: var(--corrColor);
-}
-
-#verovio-panel .corr .highlighted {
-  color: var(--corrHighlightedColor);
-  stroke: var(--corrHighlightedColor);
-}
-
-#verovio-panel g.corr g.highlighted {
-  fill: var(--corrHighlightedColor);
-}
-
-#verovio-panel g.orig g {
-  fill: var(--origColor);
-  color: var(--origColor);
-  stroke: var(--origColor);
-}
-
-#verovio-panel .orig .highlighted {
-  color: var(--origHighlightedColor);
-  stroke: var(--origHighlightedColor);
-}
-
-#verovio-panel g.orig g.highlighted {
-  fill: var(--origHighlightedColor);
-}
-
-#verovio-panel g.reg g {
-  fill: var(--regColor);
-  color: var(--regColor);
-  stroke: var(--regColor);
-}
-
-#verovio-panel .reg .highlighted {
-  color: var(--regHighlightedColor);
-  stroke: var(--regHighlightedColor);
-}
-
-#verovio-panel g.reg g.highlighted {
-  fill: var(--regHighlightedColor);
-}
-
-#verovio-panel g.add g {
-  fill: var(--addColor);
-  color: var(--addColor);
-  stroke: var(--addColor);
-}
-
-#verovio-panel .add .highlighted {
-  color: var(--addHighlightedColor);
-  stroke: var(--addHighlightedColor);
-}
-
-#verovio-panel g.add g.highlighted {
-  fill: var(--addHighlightedColor);
-}
-
-#verovio-panel g.del g {
-  fill: var(--delColor);
-  color: var(--delColor);
-  stroke: var(--delColor);
-}
-
-#verovio-panel .del .highlighted {
-  color: var(--delHighlightedColor);
-  stroke: var(--delHighlightedColor);
-}
-
-#verovio-panel g.del g.highlighted {
-  fill: var(--delHighlightedColor);
-}
-
-#verovio-panel g.unclear g {
-  fill: var(--unclearColor);
-  color: var(--unclearColor);
-  stroke: var(--unclearColor);
-}
-
-#verovio-panel .unclear .highlighted {
-  color: var(--unclearHighlightedColor);
-  stroke: var(--unclearHighlightedColor);
-}
-
-#verovio-panel g.unclear g.highlighted {
-  fill: var(--unclearHighlightedColor);
-}
-
-#verovio-panel g.sic g {
-  fill: var(--sicColor);
-  color: var(--sicColor);
-  stroke: var(--sicColor);
-}
-
-#verovio-panel .sic .highlighted {
-  color: var(--sicHighlightedColor);
-  stroke: var(--sicHighlightedColor);
-}
-
-#verovio-panel g.sic g.highlighted {
-  fill: var(--sicHighlightedColor);
-}
-
-#verovio-panel g.corr g {
-  fill: var(--corrColor);
-  color: var(--corrColor);
-  stroke: var(--corrColor);
-}
-
-#verovio-panel .corr .highlighted {
-  color: var(--corrHighlightedColor);
-  stroke: var(--corrHighlightedColor);
-}
-
-#verovio-panel g.corr g.highlighted {
-  fill: var(--corrHighlightedColor);
-}
-
-#verovio-panel g.orig g {
-  fill: var(--origColor);
-  color: var(--origColor);
-  stroke: var(--origColor);
-}
-
-#verovio-panel .orig .highlighted {
-  color: var(--origHighlightedColor);
-  stroke: var(--origHighlightedColor);
-}
-
-#verovio-panel g.orig g.highlighted {
-  fill: var(--origHighlightedColor);
-}
-
-#verovio-panel g.reg g {
-  fill: var(--regColor);
-  color: var(--regColor);
-  stroke: var(--regColor);
-}
-
-#verovio-panel .reg .highlighted {
-  color: var(--regHighlightedColor);
-  stroke: var(--regHighlightedColor);
-}
-
-#verovio-panel g.reg g.highlighted {
-  fill: var(--regHighlightedColor);
-}
-
-#verovio-panel g.add g {
-  fill: var(--addColor);
-  color: var(--addColor);
-  stroke: var(--addColor);
-}
-
-#verovio-panel .add .highlighted {
-  color: var(--addHighlightedColor);
-  stroke: var(--addHighlightedColor);
-}
-
-#verovio-panel g.add g.highlighted {
-  fill: var(--addHighlightedColor);
-}
-
-#verovio-panel g.del g {
-  fill: var(--delColor);
-  color: var(--delColor);
-  stroke: var(--delColor);
-}
-
-#verovio-panel .del .highlighted {
-  color: var(--delHighlightedColor);
-  stroke: var(--delHighlightedColor);
-}
-
-#verovio-panel g.del g.highlighted {
-  fill: var(--delHighlightedColor);
-}
-
-#verovio-panel g.unclear g {
-  fill: var(--unclearColor);
-  color: var(--unclearColor);
-  stroke: var(--unclearColor);
-}
-
-#verovio-panel .unclear .highlighted {
-  color: var(--unclearHighlightedColor);
-  stroke: var(--unclearHighlightedColor);
-}
-
-#verovio-panel g.unclear g.highlighted {
-  fill: var(--unclearHighlightedColor);
-}
-
-#verovio-panel g.sic g {
-  fill: var(--sicColor);
-  color: var(--sicColor);
-  stroke: var(--sicColor);
-}
-
-#verovio-panel .sic .highlighted {
-  color: var(--sicHighlightedColor);
-  stroke: var(--sicHighlightedColor);
-}
-
-#verovio-panel g.sic g.highlighted {
-  fill: var(--sicHighlightedColor);
-}
-
-#verovio-panel g.corr g {
-  fill: var(--corrColor);
-  color: var(--corrColor);
-  stroke: var(--corrColor);
-}
-
-#verovio-panel .corr .highlighted {
-  color: var(--corrHighlightedColor);
-  stroke: var(--corrHighlightedColor);
-}
-
-#verovio-panel g.corr g.highlighted {
-  fill: var(--corrHighlightedColor);
-}
-
-#verovio-panel g.orig g {
-  fill: var(--origColor);
-  color: var(--origColor);
-  stroke: var(--origColor);
-}
-
-#verovio-panel .orig .highlighted {
-  color: var(--origHighlightedColor);
-  stroke: var(--origHighlightedColor);
-}
-
-#verovio-panel g.orig g.highlighted {
-  fill: var(--origHighlightedColor);
-}
-
-#verovio-panel g.reg g {
-  fill: var(--regColor);
-  color: var(--regColor);
-  stroke: var(--regColor);
-}
-
-#verovio-panel .reg .highlighted {
-  color: var(--regHighlightedColor);
-  stroke: var(--regHighlightedColor);
-}
-
-#verovio-panel g.reg g.highlighted {
-  fill: var(--regHighlightedColor);
-}
-
-#verovio-panel g.add g {
-  fill: var(--addColor);
-  color: var(--addColor);
-  stroke: var(--addColor);
-}
-
-#verovio-panel .add .highlighted {
-  color: var(--addHighlightedColor);
-  stroke: var(--addHighlightedColor);
-}
-
-#verovio-panel g.add g.highlighted {
-  fill: var(--addHighlightedColor);
-}
-
-#verovio-panel g.del g {
-  fill: var(--delColor);
-  color: var(--delColor);
-  stroke: var(--delColor);
-}
-
-#verovio-panel .del .highlighted {
-  color: var(--delHighlightedColor);
-  stroke: var(--delHighlightedColor);
-}
-
-#verovio-panel g.del g.highlighted {
-  fill: var(--delHighlightedColor);
-}
+} */
 
 #verovio-panel {
   fill: var(--notationColor);
