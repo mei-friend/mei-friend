@@ -1,5 +1,11 @@
 # mei-friend-online CHANGELOG.md
 
+### 1.2.7 patch
+* Prevent replacement operations for elements without xml:id (addresses partly [#161](https://github.com/mei-friend/mei-friend/issues/161))
+* Include MEI header when adding xml:ids to the document (addresses partly [#161](https://github.com/mei-friend/mei-friend/issues/161))
+* Make markup coloring more general (in part addresses [#159](https://github.com/mei-friend/mei-friend/issues/159))
+* Update Verovio versions until 5.4.0
+
 ### 1.2.6 patch
 * Initial implementation of Annote integration for ranged annotations ([#149](https://github.com/mei-friend/mei-friend/issues/149))
 * Fix bug on Chrome that selected all notes upon mouse click (tks Clara Byom for raising the issue)

@@ -383,10 +383,15 @@ supportedVerovioVersions.latest = {
   url: 'https://www.verovio.org/javascript/latest/verovio-toolkit-hum.js',
   description: 'Current Verovio release',
 };
-supportedVerovioVersions['5.3.1'] = {
-  url: 'https://www.verovio.org/javascript/5.3.1/verovio-toolkit-hum.js',
-  description: 'Verovio release 5.3.1',
-  releaseDate: '26 May 2025',
+supportedVerovioVersions['5.4.0'] = {
+  url: 'https://www.verovio.org/javascript/5.4.0/verovio-toolkit-hum.js',
+  description: 'Verovio release 5.4.0',
+  releaseDate: '15 July 2025',
+};
+supportedVerovioVersions['5.3.2'] = {
+  url: 'https://www.verovio.org/javascript/5.3.2/verovio-toolkit-hum.js',
+  description: 'Verovio release 5.3.2',
+  releaseDate: '28 May 2025',
 };
 supportedVerovioVersions['5.2.0'] = {
   url: 'https://www.verovio.org/javascript/5.2.0/verovio-toolkit-hum.js',

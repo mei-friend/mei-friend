@@ -1,7 +1,7 @@
 import * as att from './attribute-classes.js';
 import * as dutils from './dom-utils.js';
 import { selectItemInAnnotationList } from './enrichment-panel.js';
-import * as prs from './page-range-selector.js';
+import * as pageRagenSelector from './page-range-selector.js';
 import * as speed from './speed.js';
 import * as utils from './utils.js';
 import { getControlMenuState, showPdfButtons, setControlMenuState, setCheckbox } from './control-menu.js';
@@ -473,7 +473,7 @@ export default class Viewer {
     document.getElementById('pagination2').innerHTML = `&nbsp;${this.currentPage}&nbsp;`;
     document.getElementById('pagination3').innerHTML = translator.lang.pagination3.html;
     document.getElementById('pagination4').innerHTML = `&nbsp;${pg}`;
-    prs.updatePageRangeSelector(this);
+    pageRagenSelector.updatePageRangeSelector(this);
   } // updatePageNumDisplay()
 
   // set cursor to first note id in page, taking st/ly of id, if possible
@@ -1079,7 +1079,7 @@ export default class Viewer {
       versionDate: versionDate,
       options: this.vrvOptions,
       speedMode: this.speedMode,
-      pages: prs.getPages(),
+      pages: pageRagenSelector.getPages(),
     });
   } // saveAsPdf()
 

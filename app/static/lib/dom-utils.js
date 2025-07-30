@@ -517,10 +517,8 @@ export function scrollTo(container, element) {
  */
 export function addColorToMarkupElements(xmlNode) {
   let colorChooserIds = att.modelTranscriptionLike.map((type) => type + 'Color');
-
   att.modelTranscriptionLike.forEach((type, index) => {
-    let elements = xmlNode.querySelectorAll(type);
-    elements.forEach((element) => {
+    xmlNode.querySelectorAll(type).forEach((element) => {
       let children = element.children;
       if (children.length > 0) {
         let hexColor = document.getElementById(colorChooserIds[index]).value;
