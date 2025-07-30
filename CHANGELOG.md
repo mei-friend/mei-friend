@@ -1,5 +1,8 @@
 # mei-friend-online CHANGELOG.md
 
+### 1.2.8 patch
+*
+
 ### 1.2.7 patch
 * Prevent replacement operations for elements without xml:id (addresses partly [#161](https://github.com/mei-friend/mei-friend/issues/161))
 * Include MEI header when adding xml:ids to the document (addresses partly [#161](https://github.com/mei-friend/mei-friend/issues/161))
