@@ -1,7 +1,7 @@
 # mei-friend-online CHANGELOG.md
 
 ### 1.2.8 patch
-*
+* Fix new GitHub API incompatibility bug with subdirectories (#166)
 
 ### 1.2.7 patch
 * Prevent replacement operations for elements without xml:id (addresses partly [#161](https://github.com/mei-friend/mei-friend/issues/161))
