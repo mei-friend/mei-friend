@@ -1934,18 +1934,20 @@ export function replaceInEditor(cm, xmlNode, select = false, newNode = []) {
       start: -1,
       end: -1,
     };
-  } else if (select) {
+  } else {
     sc = cm.getSearchCursor(newMei);
     if (sc.findNext()) {
       let c = cm.getCursor();
       for (let l = sc.from().line; l <= sc.to().line; l++) {
+        cm.indentLine(l, 'smart');
         if (isEmpty(cm.getLine(l))) {
           cm.setCursor(l, c.ch);
           cm.execCommand('deleteLine');
         }
       }
-      cm.setSelection(sc.from(), sc.to());
-      cm.execCommand('indentAuto');
+      if (select) {
+        cm.setSelection(sc.from(), sc.to());
+      }
     }
   }
   return {
