@@ -338,8 +338,8 @@ export async function drawFacsimile() {
         viewBox.push(width);
         viewBox.push(height);
         svg.setAttribute('viewBox', viewBox.join(' '));
-        console.log('sourceImageBoxes: ', sourceImageBoxes[sourceImageNumber]);
-        console.log('Facsimile viewBox: ' + viewBox.join(' '));
+        console.debug('sourceImageBoxes: ', sourceImageBoxes[sourceImageNumber]);
+        console.debug('Facsimile viewBox: ' + viewBox.join(' '));
 
         svg.setAttribute('width', Math.round(width * zoomFactor));
         svg.removeAttribute('height');
@@ -693,7 +693,7 @@ export function addZoneResizer(v, rect) {
     if (xr < thres && yl < thres) {
       resize = 'southeast';
     }
-    console.log(
+    console.debug(
       'ZoneResizer: Mouse down ' + resize + ' ev.clientX/Y:' + ev.clientX + '/' + ev.clientX + ', rect:',
       rect
     );
@@ -859,7 +859,7 @@ export function addZoneDrawer() {
       sourceImageNumber = parseInt(svg.getAttribute('data-sourceImageNumber'));
       svg.appendChild(rect);
       drawing = 'new';
-      console.log(
+      console.debug(
         'ZoneDrawer mouse down: ' +
           drawing +
           '; ' +
