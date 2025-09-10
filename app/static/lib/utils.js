@@ -910,3 +910,15 @@ export function toolkitVersionToDecimal(toolkitVersion) {
   const { major, minor, patch } = parseToolkitVersion(toolkitVersion);
   return major + minor / 100 + patch / 10000;
 } // toolkitVersionToDecimal()
+
+/**
+ * Test whether object is empty
+ * @param {Object} obj - The object to test
+ * @returns {boolean} - True if the object is empty, false otherwise
+ */
+export function isEmptyObject(obj) {
+  for (let i in obj) {
+    return false;
+  }
+  return true;
+} // isEmptyObject()

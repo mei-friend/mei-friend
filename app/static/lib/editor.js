@@ -1228,57 +1228,69 @@ export function addVerticalGroup(v, cm) {
 export function addApplicationInfo(v, cm) {
   if (document.getElementById('addApplicationNote').checked && v.currentMeiProfile !== 'Basic') {
     let meiHead = v.xmlDoc.querySelector('meiHead');
-    if (!meiHead) return false;
-    let appList = v.xmlDoc.querySelectorAll('application');
-    let encodingDesc, appInfo, application;
-    let update = false;
-    for (let a of appList) {
-      appInfo = a.parentElement;
-      encodingDesc = appInfo.parentElement;
-      if (a.querySelector('name').textContent === 'mei-friend') {
-        application = a; // update existing application element
-        application.setAttribute('enddate', utils.toISOStringLocal(new Date()));
-        application.setAttribute('version', version);
-        const range = replaceInEditor(cm, application);
-        for (let l = range.start.line; l <= range.end.line; l++) {
-          cm.indentLine(l, 'smart');
-        }
-        update = true;
-        break;
-      }
+    if (meiHead && !meiHead.hasAttribute('xml:id')) {
+      manipulateXmlIds(v, cm, false, ['meiHead'], false); // silently add xml:id to meiHead if missing
+      meiHead = v.xmlDoc.querySelector('meiHead');
     }
-    if (update) return true;
+    if (!meiHead) {
+      return false;
+    }
 
-    // application tree for mei-friend is created first time
+    // application tree for mei-friend is created, if not present
+    let encodingDesc = meiHead.querySelector('encodingDesc');
     if (!encodingDesc) {
       encodingDesc = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'encodingDesc');
       encodingDesc.setAttributeNS(dutils.xmlNameSpace, 'xml:id', utils.generateXmlId('encodingDesc', v.xmlIdStyle));
       meiHead.appendChild(encodingDesc);
     }
+
+    let appInfo = meiHead.querySelector('appInfo');
     if (!appInfo) {
       appInfo = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'appInfo');
       appInfo.setAttributeNS(dutils.xmlNameSpace, 'xml:id', utils.generateXmlId('appInfo', v.xmlIdStyle));
       encodingDesc.appendChild(appInfo);
     }
+
+    // find first application element with a child node "name" and the text content "mei-friend",
+    // remove any other mei-friend application elements
+    let application;
+    let found = false;
+    for (let a of v.xmlDoc.querySelectorAll('application > name')) {
+      if (a.textContent === 'mei-friend') {
+        if (!found) {
+          application = a.parentElement;
+          found = true;
+        } else {
+          a.parentElement?.remove();
+        }
+      }
+    }
     if (!application) {
       application = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'application');
       application.setAttributeNS(dutils.xmlNameSpace, 'xml:id', utils.generateXmlId('application', v.xmlIdStyle));
       application.setAttribute('startdate', utils.toISOStringLocal(new Date()));
-      application.setAttribute('version', version);
+      // name child
       let name = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'name');
       name.textContent = 'mei-friend';
       name.setAttributeNS(dutils.xmlNameSpace, 'xml:id', utils.generateXmlId('name', v.xmlIdStyle));
+      // p child
       let p = v.xmlDoc.createElementNS(dutils.meiNameSpace, 'p');
-      p.textContent = 'First edit by mei-friend ' + version + ', ' + versionDate + '.';
+      p.textContent = 'First edit by mei-friend ' + version + '.';
       p.setAttributeNS(dutils.xmlNameSpace, 'xml:id', utils.generateXmlId('p', v.xmlIdStyle));
       application.appendChild(name);
       application.appendChild(p);
       appInfo.appendChild(application);
     }
+    // update mei-friend application usage
+    application.setAttribute('version', version);
+    application.setAttribute('enddate', utils.toISOStringLocal(new Date()));
+
     // insert new element to editor
     const range = replaceInEditor(cm, meiHead);
-    for (let l = range.start.line; l <= range.end.line; l++) {
-      cm.indentLine(l, 'smart');
+    if (!utils.isEmptyObject(range)) {
+      for (let l = range.start.line; l <= range.end.line; l++) {
+        cm.indentLine(l, 'smart');
+      }
     }
     return true;
   }
@@ -1319,8 +1331,11 @@ export function renumberMeasures(v, cm, change = false) {
  * @param {Viewer} v
  * @param {CodeMirror} cm
  * @param {boolean} removeIds
+ * @param {Array<string>} selectedElements optional, array of node names,
+ *                                         adds/removes only from these elements
+ * @param {boolean} showReport optional, whether to show a report alert after manipulation
  */
-export function manipulateXmlIds(v, cm, removeIds = false) {
+export function manipulateXmlIds(v, cm, removeIds = false, selectedElements = [], showReport = true) {
   let startTime = Date.now();
   let report = { added: 0, removed: 0 };
   let skipList = []; // list of xml:ids that will not be removed
@@ -1376,7 +1391,9 @@ export function manipulateXmlIds(v, cm, removeIds = false) {
   msg += ' (Processing time: ' + (Date.now() - startTime) / 1000 + ' s)';
   console.log(msg);
   v.allowCursorActivity = true;
-  v.showAlert(msg, 'success');
+  if (showReport) {
+    v.showAlert(msg, 'success');
+  }
 
   // digs through xml tree recursively, when explore=true, just adding ids that are pointed to
   function dig(el, explore = false) {
@@ -1390,7 +1407,7 @@ export function manipulateXmlIds(v, cm, removeIds = false) {
             value.split(/[\s]+/).forEach((v) => skipList.push(utils.rmHash(v)));
           }
         }
-      } else {
+      } else if (selectedElements.includes(el.nodeName) || selectedElements.length === 0) {
         if (!removeIds && !el.hasAttribute('xml:id')) {
           // add xml:id when missing
           el.setAttributeNS(dutils.xmlNameSpace, 'xml:id', utils.generateXmlId(el.nodeName, v.xmlIdStyle));
