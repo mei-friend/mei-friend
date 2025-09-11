@@ -1228,11 +1228,6 @@ export function addVerticalGroup(v, cm) {
 export function addApplicationInfo(v, cm) {
   if (document.getElementById('addApplicationNote').checked && v.currentMeiProfile !== 'Basic') {
     let meiHead = v.xmlDoc.querySelector('meiHead');
-    if (meiHead && !meiHead.hasAttribute('xml:id')) {
-      let oldMeiHead = meiHead.cloneNode(true);
-      meiHead.setAttributeNS(dutils.xmlNameSpace, 'xml:id', utils.generateXmlId('meiHead', v.xmlIdStyle));
-      replaceInEditor(cm, oldMeiHead, false, [meiHead], true);
-    }
     if (!meiHead) {
       return false;
     }
@@ -1286,8 +1281,8 @@ export function addApplicationInfo(v, cm) {
     application.setAttribute('version', version);
     application.setAttribute('enddate', utils.toISOStringLocal(new Date()));
 
-    // insert new element to editor
-    const range = replaceInEditor(cm, meiHead);
+    // replace modified meiHead in editor
+    const range = replaceInEditor(cm, meiHead, false, [], true);
     if (!utils.isEmptyObject(range)) {
       for (let l = range.start.line; l <= range.end.line; l++) {
         cm.indentLine(l, 'smart');
