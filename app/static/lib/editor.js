@@ -1229,8 +1229,9 @@ export function addApplicationInfo(v, cm) {
   if (document.getElementById('addApplicationNote').checked && v.currentMeiProfile !== 'Basic') {
     let meiHead = v.xmlDoc.querySelector('meiHead');
     if (meiHead && !meiHead.hasAttribute('xml:id')) {
-      manipulateXmlIds(v, cm, false, ['meiHead'], false); // silently add xml:id to meiHead if missing
-      meiHead = v.xmlDoc.querySelector('meiHead');
+      let oldMeiHead = meiHead.cloneNode(true);
+      meiHead.setAttributeNS(dutils.xmlNameSpace, 'xml:id', utils.generateXmlId('meiHead', v.xmlIdStyle));
+      replaceInEditor(cm, oldMeiHead, false, [meiHead], true);
     }
     if (!meiHead) {
       return false;
@@ -1911,9 +1912,10 @@ function isEmpty(str) {
  * @param {Element} xmlNode element to replace
  * @param {boolean} select keep node in editor selected? (important for auto indentation)
  * @param {Array[Element]} newNode an array of new nodes to replace the old one with
- * @returns
+ * @param {boolean} replaceUnique replace unique elements without xml:id (special case, e.g. for <meiHead>)
+ * @returns {object} range {start: integer, end: integer} or empty object, if nothing found
  */
-export function replaceInEditor(cm, xmlNode, select = false, newNode = []) {
+export function replaceInEditor(cm, xmlNode, select = false, newNode = [], replaceUnique = false) {
   dutils.cleanNode(xmlNode);
   // construct new MEI if newNode has elements
   let newMei = '';
@@ -1927,6 +1929,8 @@ export function replaceInEditor(cm, xmlNode, select = false, newNode = []) {
   let xmlIdCheck = '';
   if (itemId) {
     xmlIdCheck = `(\\s+?)([^>]*?)(?:xml:id=["']` + itemId + `['"])`;
+  } else if (replaceUnique) {
+    xmlIdCheck = ``;
   } else {
     console.warn('replaceInEditor(): no xml:id found for ' + xmlNode.nodeName + '.');
     return {};
