@@ -1,11 +1,14 @@
 # mei-friend-online CHANGELOG.md
 
-### 1.2.8 patch
-* Fix new GitHub API incompatibility bug with subdirectories [#166](https://github.com/mei-friend/mei-friend/issues/166)
+### 1.2.9 patch
 * Fix auto indentation when adding a zone to facsimile
-* Update Verovio version 5.5.0 and 5.6.0
 * Insertion of application info improved (without adding xml:id to meiHead)
 * In facsimile zone rectangles, show zone@label, element@n, or nothing [#167](https://github.com/mei-friend/mei-friend/issues/167)
+* Update Verovio version 5.6.0
+
+### 1.2.8 patch
+* Fix new GitHub API incompatibility bug with subdirectories [#166](https://github.com/mei-friend/mei-friend/issues/166)
+* Update Verovio version 5.5.0
 
 ### 1.2.7 patch
 * Prevent replacement operations for elements without xml:id (addresses partly [#161](https://github.com/mei-friend/mei-friend/issues/161))
