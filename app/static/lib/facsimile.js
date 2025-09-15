@@ -98,12 +98,13 @@ export function loadFacsimile(xmlDoc) {
   let zones = facsimile.querySelectorAll('zone');
   console.debug('facsimile.loadFacsimile(): loading ' + zones.length + ' zones.');
   zones.forEach((z) => {
-    let id, ulx, uly, lrx, lry;
+    let id, ulx, uly, lrx, lry, zoneLabel;
     if (z.hasAttribute('xml:id')) id = z.getAttribute('xml:id');
     if (z.hasAttribute('ulx')) ulx = z.getAttribute('ulx');
     if (z.hasAttribute('uly')) uly = z.getAttribute('uly');
     if (z.hasAttribute('lrx')) lrx = z.getAttribute('lrx');
     if (z.hasAttribute('lry')) lry = z.getAttribute('lry');
+    if (z.hasAttribute('label')) zoneLabel = z.getAttribute('label');
     let parentId = z.parentElement.getAttribute('xml:id');
     let { target, width, height } = fillGraphic(z.parentElement.querySelector('graphic'));
     if (id) {
@@ -117,6 +118,7 @@ export function loadFacsimile(xmlDoc) {
       if (lrx) facs[id]['lrx'] = lrx;
       if (lry) facs[id]['lry'] = lry;
       if (parentId) facs[id]['surfaceId'] = parentId;
+      if (zoneLabel) facs[id]['zoneLabel'] = zoneLabel;
       let pointingElement = xmlDoc.querySelector('[facs="#' + id + '"]');
       if (pointingElement) {
         if (pointingElement.hasAttribute('xml:id')) {
@@ -386,8 +388,8 @@ function drawBoundingBox(zoneId, svg) {
     if (pointerId) rect.id = rectId;
 
     // draw number-like info from element (e.g., measure)
-    let pointerN = facs[zoneId]['pointerN']; // number-like
-    if (pointerN) {
+    let zoneLabel = facs[zoneId]['zoneLabel'] || facs[zoneId]['pointerN']; // zone@label or element@n
+    if (zoneLabel) {
       let txt = document.createElementNS(svgNameSpace, 'text');
       svg.appendChild(txt);
       txt.setAttribute('font-size', '28px');
@@ -396,7 +398,7 @@ function drawBoundingBox(zoneId, svg) {
       txt.setAttribute('x', x + 7);
       txt.setAttribute('y', y + 29);
       txt.addEventListener('click', (e) => v.handleClickOnNotation(e, cm));
-      txt.textContent = pointerN;
+      txt.textContent = zoneLabel;
       if (pointerId) txt.id = rectId;
     }
   }
