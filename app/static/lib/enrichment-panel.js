@@ -215,7 +215,7 @@ async function situateOneListItem(item) {
     }
 
     itemPromise.then((item) => {
-      console.log('Situated ', item);
+      console.debug('Situated ', item);
       const itemLocationLabel = document.querySelector(`.annotationLocationLabel[data-id=loc-${CSS.escape(item.id)}`);
       if (itemLocationLabel) {
         itemLocationLabel.innerHTML = generateAnnotationLocationLabel(item).innerHTML;
@@ -641,8 +641,8 @@ export function addAnnotationHandlers() {
   // TODO extend this to allow app to consume (TROMPA-style) Annotation Toolkit descriptions
 
   const annotationHandler = (e) => {
-    console.log('annotation Handler: Clicked to make new annotation!', e);
-    console.log('annotation Handler: Selected elements: ', v.selectedElements);
+    console.debug('annotation Handler: Clicked to make new annotation!', e);
+    console.debug('annotation Handler: Selected elements: ', v.selectedElements);
     switch (e.target.closest('.annotationToolsIcon')?.getAttribute('id')) {
       case 'annotateIdentify':
         annot.createIdentify(e, v.selectedElements);
@@ -697,7 +697,7 @@ export function addMarkupHandlers() {
     targetDisplay.removeChild(targetDisplay.firstElementChild);
     targetDisplay.setAttribute('data-content', currentElement.dataset.contentChoice);
     let dropdown = document.getElementById(`${elName}-content-options`);
-    console.log('Toggling content selector: ', currentElement, targetID, targetDisplay, elName, dropdown);
+    console.debug('Toggling content selector: ', currentElement, targetID, targetDisplay, elName, dropdown);
     if (dropdown) dropdown.style.display = 'none';
   };
 
@@ -711,7 +711,7 @@ export function addMarkupHandlers() {
     selector.addEventListener('click', (event) => {
       event.stopPropagation();
       let currentElement = event.currentTarget;
-      console.log('Clicked on ', currentElement, event);
+      console.debug('Clicked on ', currentElement, event);
       let targetType = currentElement.dataset.elName;
       let targetElement = document.getElementById(`${targetType}-content-options`);
 
