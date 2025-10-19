@@ -2485,9 +2485,9 @@ export default class Viewer {
    */
   async checkSchema(mei) {
     // console.log('Validation: checking for schema...')
-    const hasNameSpacePattern = /<\?xml-model.*schematypens=\"http?:\/\/relaxng\.org\/ns\/structure\/1\.0\"/;
+    const hasNameSpacePattern = /<\?xml-model\b[^>]*schematypens\s*=\s*["']http:\/\/relaxng\.org\/ns\/structure\/1\.0["']/i;
     const hasSchemaMatch = hasNameSpacePattern.exec(mei);
-    const meiVersionPattern = /<mei.*meiversion="([^"]*).*/;
+    const meiVersionPattern = /<mei[^>]*meiversion=["']([^"']*)["']/;
     const meiVersionMatch = meiVersionPattern.exec(mei);
     if (!hasSchemaMatch) {
       // if no schema namespace, but a version in the mei tag, load common schema
@@ -2511,7 +2511,7 @@ export default class Viewer {
       this.throwSchemaError({ schemaFile: translator.lang.noSchemaFound.text });
       return;
     }
-    const schemaUrlPattern = /<\?xml-model.*href="([^"]*).*/;
+    const schemaUrlPattern = /<\?xml-model.*href=["']([^"']*)["']/;
     const schemaUrlMatch = schemaUrlPattern.exec(mei);
     if (schemaUrlMatch && schemaUrlMatch[1] !== this.currentSchema) {
       this.currentSchema = schemaUrlMatch[1];
