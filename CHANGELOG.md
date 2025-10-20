@@ -1,7 +1,7 @@
 # mei-friend-online CHANGELOG.md
 
 ### 1.2.10 patch
-*
+* Fix [#170](https://github.com/mei-friend/mei-friend/issues/170) to load both types of quotes for MEI schema information
 
 ### 1.2.9 patch
 * Fix auto indentation when adding a zone to facsimile
