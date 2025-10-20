@@ -487,8 +487,7 @@ export default class Viewer {
       let note = document.querySelector('.note');
       if (note) {
         id = note.getAttribute('id');
-      }
-      else {
+      } else {
         return '';
       }
     } else {
@@ -502,7 +501,7 @@ export default class Viewer {
         if (m) {
           id = dutils.getFirstInMeasure(m, dutils.navElsSelector, stNo, lyNo);
         } else {
-          id = document.querySelector('.note');;
+          id = document.querySelector('.note');
           let staff = document.querySelector('.staff');
           if (staff) {
             id = dutils.getFirstInMeasure(staff, dutils.navElsSelector, stNo, lyNo);
@@ -621,11 +620,11 @@ export default class Viewer {
     ) {
       this.showAlert(
         translator.lang.missingIdsWarningAlert.text +
-        ' (' +
-        translator.lang.manipulateMenuTitle.text +
-        '&mdash;' +
-        translator.lang.addIdsText.text +
-        ')',
+          ' (' +
+          translator.lang.manipulateMenuTitle.text +
+          '&mdash;' +
+          translator.lang.addIdsText.text +
+          ')',
         'warning'
       );
     }
@@ -1904,8 +1903,8 @@ export default class Viewer {
           option,
           value
             ? {
-              bothTags: true,
-            }
+                bothTags: true,
+              }
             : {}
         );
         break;
@@ -2053,14 +2052,14 @@ export default class Viewer {
       default:
         console.log(
           'Creating Verovio Options: Unhandled data type: ' +
-          o.type +
-          ', title: ' +
-          o.title +
-          ' [' +
-          o.type +
-          '], default: [' +
-          optDefault +
-          ']'
+            o.type +
+            ', title: ' +
+            o.title +
+            ' [' +
+            o.type +
+            '], default: [' +
+            optDefault +
+            ']'
         );
     }
     if (input) div.appendChild(input);
@@ -2485,12 +2484,24 @@ export default class Viewer {
    */
   async checkSchema(mei) {
     // console.log('Validation: checking for schema...')
-    const hasNameSpacePattern = /<\?xml-model.*schematypens=\"http?:\/\/relaxng\.org\/ns\/structure\/1\.0\"/;
+    const hasNameSpacePattern =
+      /<\?xml-model\b[^>]*schematypens\s*=\s*["']http:\/\/relaxng\.org\/ns\/structure\/1\.0["']/;
     const hasSchemaMatch = hasNameSpacePattern.exec(mei);
-    const meiVersionPattern = /<mei.*meiversion="([^"]*).*/;
-    const meiVersionMatch = meiVersionPattern.exec(mei);
-    if (!hasSchemaMatch) {
-      // if no schema namespace, but a version in the mei tag, load common schema
+    if (hasSchemaMatch) {
+      // schema namespace found, now extract schema file name and load it
+      const schemaUrlPattern = /<\?xml-model\b[^>]*href=["']([^"']*)["']/;
+      const schemaUrlMatch = schemaUrlPattern.exec(mei);
+      if (schemaUrlMatch && schemaUrlMatch[1] !== this.currentSchema) {
+        this.currentSchema = schemaUrlMatch[1];
+        console.log('Viewer.checkSchema(): New schema ' + this.currentSchema);
+        if (await this.replaceSchema(this.currentSchema)) {
+          return;
+        }
+      }
+    } else {
+      // if no schema namespace, but an MEI version in the mei tag, load common schema
+      const meiVersionPattern = /<mei\b[^>]*meiversion=["']([^"']*)["']/;
+      const meiVersionMatch = meiVersionPattern.exec(mei);
       if (meiVersionMatch && meiVersionMatch[1]) {
         let sch = commonSchemas['All'][meiVersionMatch[1]];
         if (sch) {
@@ -2506,17 +2517,11 @@ export default class Viewer {
           return;
         }
       }
+      // nothing at all
       console.error('Viewer.checkSchema(): ' + translator.lang.noSchemaFound.text);
       this.currentSchema = '';
       this.throwSchemaError({ schemaFile: translator.lang.noSchemaFound.text });
       return;
-    }
-    const schemaUrlPattern = /<\?xml-model.*href="([^"]*).*/;
-    const schemaUrlMatch = schemaUrlPattern.exec(mei);
-    if (schemaUrlMatch && schemaUrlMatch[1] !== this.currentSchema) {
-      this.currentSchema = schemaUrlMatch[1];
-      console.log('Viewer.checkSchema(): New schema ' + this.currentSchema);
-      await this.replaceSchema(this.currentSchema);
     }
   } // checkSchema()
 
@@ -2524,11 +2529,11 @@ export default class Viewer {
    * Loads and replaces XML schema; throws errors if not found/CORS error,
    * update validation-status icon
    * @param {string*} schemaFileName
-   * @returns
+   * @returns {boolean} success
    */
   async replaceSchema(schemaFileName) {
     if (!this.validatorInitialized) {
-      return;
+      return false;
     }
 
     // determine current schema profile (e.g., all, CMN, basic, mensural, neumes, anystart)
@@ -2557,7 +2562,7 @@ export default class Viewer {
           response: response,
           schemaFile: schemaFileName,
         });
-        return;
+        return false;
       }
       data = await response.text();
       const res = await validator.setRelaxNGSchema(data);
@@ -2566,7 +2571,7 @@ export default class Viewer {
         err: translator.lang.errorLoadingSchema.text + ': ' + err,
         schemaFile: schemaFileName,
       });
-      return;
+      return false;
     }
     msg = translator.lang.schemaLoaded.text + ' ' + schemaFileName;
     vs.setAttribute('title', msg);
@@ -2583,6 +2588,7 @@ export default class Viewer {
     cm.options.hintOptions.schemaInfo = rngLoader.tags;
     console.log('New schema loaded for auto completion', schemaFileName);
     Viewer.updateSchemaStatusDisplay('ok', schemaFileName, msg);
+    return true;
   } // replaceSchema()
 
   /**
@@ -2808,13 +2814,13 @@ export default class Viewer {
     vs.setAttribute(
       'title',
       translator.lang.validatedAgainst.text +
-      ' ' +
-      this.currentSchema +
-      ': ' +
-      Object.keys(messages).length +
-      ' ' +
-      translator.lang.validationMessages.text +
-      '.'
+        ' ' +
+        this.currentSchema +
+        ': ' +
+        Object.keys(messages).length +
+        ' ' +
+        translator.lang.validationMessages.text +
+        '.'
     );
     if (reportDiv) {
       vs.removeEventListener('click', this.manualValidate);
@@ -2826,8 +2832,8 @@ export default class Viewer {
       if (!currentVisibility || !document.getElementById('autoValidate')?.checked || showValidation)
         reportDiv.style.visibility =
           document.getElementById('autoShowValidationReport')?.checked ||
-            !document.getElementById('autoValidate')?.checked ||
-            showValidation
+          !document.getElementById('autoValidate')?.checked ||
+          showValidation
             ? 'visible'
             : 'hidden';
     }

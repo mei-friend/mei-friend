@@ -1,5 +1,8 @@
 # mei-friend-online CHANGELOG.md
 
+### 1.2.10 patch
+*
+
 ### 1.2.9 patch
 * Fix auto indentation when adding a zone to facsimile
 * Insertion of application info improved (without adding xml:id to meiHead)
