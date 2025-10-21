@@ -619,7 +619,9 @@ export function manualCurrentPage(v, cm, ev) {
 export function setBreaksOptions(tkAvailableOptions, defaultValue = 'auto') {
   if (defaultValue === '') defaultValue = 'auto';
   let breaksEl = document.getElementById('breaksSelect');
-  while (breaksEl.hasChildNodes()) breaksEl.remove(0);
+  while (breaksEl.hasChildNodes()) {
+    breaksEl.remove(0);
+  }
   var breaksOpts = {
     none: translator.lang.breaksSelectNone.text,
     auto: translator.lang.breaksSelectAuto.text,
@@ -632,8 +634,11 @@ export function setBreaksOptions(tkAvailableOptions, defaultValue = 'auto') {
     let o = new Option(breaksOpts[key], key);
     // generate ids in the form of breaksSelectNone, breaksSelectAuto etc.
     o.id = 'breaksSelect' + key.charAt(0).toUpperCase() + key.slice(1);
+    o.title = 'breaks: ' + key; // tooltip with the Verovio option name
     breaksEl[breaksEl.options.length] = o;
-    if (key === 'smart') breaksEl[breaksEl.length - 1].disabled = true;
+    if (key === 'smart') {
+      breaksEl[breaksEl.length - 1].disabled = true;
+    }
   }
 } // setBreaksOptions()
 
