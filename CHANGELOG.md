@@ -4,6 +4,7 @@
 * Fix [#170](https://github.com/mei-friend/mei-friend/issues/170) to load both types of quotes for MEI schema information
 * Show breaks option name as tooltip (title) in breaks select (https://github.com/rism-digital/verovio/issues/4196)
 * Fix [#173](https://github.com/mei-friend/mei-friend/issues/173) to support metcon checker for tabulatures
+* Fix [#172](https://github.com/mei-friend/mei-friend/issues/172) making symbols visible in PDF 
 
 ### 1.2.9 patch
 * Fix auto indentation when adding a zone to facsimile
