@@ -21,15 +21,14 @@ export const lang = {
   splashBody: {
     html: `
    <p>
-      mei-friendは、<a href="https://music-encoding.org">Music Encoding Initiative</a>のエディタで、
-      <a href="https://mdw.ac.at" target="_blank">ウィーン国立音楽大学</a>がホストするプラットフォームです。
+      mei-friendは、<a href="https://music-encoding.org">Music Encoding Initiative</a>で記述された楽譜ファイルの編集を目的に開発された楽譜データエディタです。現在、<a href="https://mdw.ac.at" target="_blank">ウィーン国立音楽大学</a>がホストしています。
       詳細な情報は<a href="https://mei-friend.github.io" target="_blank">こちら</a>をご覧ください。
       </p>
       <p>
-        mei-friendはブラウザベースのアプリケーションですが、個人データ（編集しているエンコーディング、アプリケーション設定、および現在のログイン情報など）はブラウザの<a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank">ローカルストレージ</a>に保存され、当社のサーバーには保存されません。
+        mei-friendはブラウザベースのアプリケーションですが、個人データ（編集しているエンコーディング、アプリケーション設定、および現在のログイン情報など）はブラウザの<a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank">ローカルストレージ</a>に保存され、ホストのサーバーには保存されません。
       </p>
       <p>
-        データは、ユーザーが明示的に要求した場合にのみGitHubに送信されます（例：GitHubにログインする、GitHubリポジトリからエンコーディングを読み込む、コミットする、またはGitHubアクションワークフローを実行するように要求する場合）。同様に、データはユーザーが明示的に要求した場合にのみ選択したSolidプロバイダーに送信されます（例：Solidにログインする、スタンドオフ注釈を読み込むまたは保存する場合）。技術的な理由から、GitHubとの特定のやり取り（エンコーディングを最初に開くときにリポジトリをブラウザにクローンする、またはリポジトリに変更をコミットする）には、ウィーン国立音楽大学（mdw）がホストするプロキシサーバーにデータを送信する必要があります。このサーバーはブラウザとGitHubの間の仲介役として機能し、通過するデータを保存しません。
+        データは、ユーザーが明示的に要求した場合にのみGitHubに送信されます（例：GitHubにログインする、GitHubリポジトリからエンコーディングを読み込む、コミットする、またはGitHubアクションワークフローを実行するように要求する場合）。同様に、データはユーザーが明示的に要求した場合にのみ選択したSolidプロバイダーに送信されます（例：Solidにログインする、スタンドオフ注釈を読み込むまたは保存する場合）。技術的な理由から、GitHubとの特定のやり取り（エンコーディングを最初に開くときにリポジトリをブラウザにクローンする、またはリポジトリに変更をコミットする）には、ウィーン国立音楽大学（mdw）がホストするプロキシサーバーにデータを送信する必要があります。このサーバーはブラウザとGitHubの間の仲介役として機能し、通過するデータは保存されません。
       </p>
       <p>
 
@@ -75,11 +74,11 @@ export const lang = {
   splashVersionText: { text: 'バージョン' },
   splashAlwaysShow: {
     text: '常にこの画面を表示',
-    description: 'アプリケーションの読み込み時に常にこのスプラッシュ画面を表示',
+    description: 'アプリケーションの読み込み時に常にこの画面を表示',
   },
   splashAlwaysShowLabel: {
     text: '常にこの画面を表示',
-    description: 'アプリケーションの読み込み時に常にこのスプラッシュ画面を表示',
+    description: 'アプリケーションの読み込み時に常にこの画面を表示',
   },
 
   // Main menu bar
@@ -105,7 +104,7 @@ export const lang = {
   openMeiText: { text: 'ファイルを開く' },
   openUrlText: { text: 'URLを開く' },
   openExample: {
-    text: '公共レパートリー',
+    text: 'パブリックレパートリー',
     description: 'パブリックドメインのレパートリーのリストを開く',
   },
   importMusicXml: { text: 'MusicXMLをインポート' },
@@ -828,33 +827,33 @@ export const lang = {
 
   // Facsimile
   titleFacsimilePanel: {
-    text: '写真パネル',
-    description: 'ソース版の写真イメージを表示します（利用可能な場合）',
+    text: 'ファクシミリパネル',
+    description: 'ソース版のファクシミリ画像を表示します（利用可能な場合）',
   },
   showFacsimilePanel: {
-    text: '写真パネルを表示',
-    description: '写真パネルで提供されたソース版のスコアイメージを表示',
+    text: 'ファクシミリパネルを表示',
+    description: 'ファクシミリパネルで提供されたソース版のスコアイメージを表示',
   },
   selectFacsimilePanelOrientation: {
-    text: '写真パネルの位置',
-    description: '楽譜に対する写真パネルの位置を選択',
+    text: 'ファクシミリパネルの位置',
+    description: '楽譜に対するファクシミリパネルの位置を選択',
     labels: ['左', '右', '上', '下'],
   },
   facsimileZoomInput: {
-    text: '写真イメージのズーム（％）',
-    description: '写真イメージのズームレベル（パーセント単位）',
+    text: 'ファクシミリのズーム（％）',
+    description: 'ファクシミリのズームレベル（パーセント単位）',
   },
   showFacsimileFullPage: {
     text: 'フルページを表示',
-    description: 'フルページで写真イメージを表示',
+    description: 'フルページでファクシミリを表示',
   },
   showFacsimileZones: {
-    text: '写真ゾーンボックスを表示',
-    description: '写真ゾーンの境界ボックスを表示',
+    text: 'ファクシミリゾーンボックスを表示',
+    description: 'ファクシミリゾーンの境界ボックスを表示',
   },
   editFacsimileZones: {
-    text: '写真ゾーンを編集',
-    description: '写真ゾーンを編集（境界ボックスを写真ゾーンにリンクします）',
+    text: 'ファクシミリゾーンを編集',
+    description: 'ファクシミリゾーンを編集（境界ボックスをファクシミリゾーンにリンクします）',
   },
   showFacsimileTitles: {
     text: 'ファクシミリのタイトルを表示',
@@ -1063,12 +1062,12 @@ export const lang = {
   allComposers: { text: 'すべての作曲家' },
 
   // Utils renumber measures
-  renumberMeasuresModalText: { text: '小節番号を再番号付け' },
+  renumberMeasuresModalText: { text: '小節番号を更新' },
   renumberMeasuresModalTest: { text: 'テスト' },
-  renumberMeasuresWillBe: { text: 'になります' },
-  renumberMeasuresWouldBe: { text: 'になります' },
-  renumberMeasuresChangedTo: { text: 'に変更されました' },
-  renumberMeasureMeasuresRenumbered: { text: '小節が再番号付けされました' },
+  renumberMeasuresWillBe: { text: 'は次の番号に更新されます。' },
+  renumberMeasuresWouldBe: { text: 'は次の番号に更新されます。' },
+  renumberMeasuresChangedTo: { text: '' },
+  renumberMeasureMeasuresRenumbered: { text: '小節が更新されました' },
 
   // Code checker @accid.ges
   accidGesCodeCheckerTitle: { text: '@accid.ges属性をチェック（調号、小節ごとのaccids、タイ）' },
@@ -1097,6 +1096,6 @@ export const lang = {
 
   // Warning for missing ids
   missingIdsWarningAlert: {
-    text: '「メイフレンドはエンコーディング内の選択された要素にスクロールできません。エンコーディングにIDを追加してください。 (メイフレンドはエンコーディングないのせんたくされたようそにすくろーるできません。エンコーディングにIDをついかしてください。)',
+    text: '「XML内の選択された要素にスクロールできません。要素にIDを追加してください。',
   },
 };
