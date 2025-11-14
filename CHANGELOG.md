@@ -5,6 +5,7 @@
 * Show breaks option name as tooltip (title) in breaks select (https://github.com/rism-digital/verovio/issues/4196)
 * Fix [#173](https://github.com/mei-friend/mei-friend/issues/173) to support metcon checker for tabulatures
 * Fix [#172](https://github.com/mei-friend/mei-friend/issues/172) making symbols visible in PDF 
+* Hide stroke on content-bounding-box and bounding-box options of Verovio (see https://github.com/rism-digital/verovio/pull/4201) 
 
 ### 1.2.9 patch
 * Fix auto indentation when adding a zone to facsimile
