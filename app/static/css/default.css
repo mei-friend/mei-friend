@@ -1340,6 +1340,15 @@ svg text {
   color: unset;
 }
 
+/** 
+  Remove bounding box stroke for Verovio options SetSvgBoundingBoxes and SetSvgContentBoundingBoxes 
+  see https://github.com/rism-digital/verovio/pull/4201
+*/
+#verovio-panel g.bounding-box rect,
+#verovio-panel g.content-bounding-box rect {
+  stroke: transparent;
+}
+
 #facsimile-panel rect {
   stroke-opacity: 40%;
 }
