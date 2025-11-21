@@ -498,7 +498,7 @@ export function addControlElement(v, cm, elName, placement = '', form = '') {
   if (startStaffNumber) staveArray.push(startStaffNumber);
   // find and validate end element
   let endId = '';
-  let sc = cm.getSearchCursor('xml:id="' + startId + '"');
+  let sc = cm.getSearchCursor(new RegExp(`xml:id=["']${startId}["']`));
   if (!sc.findNext()) return;
   const p = sc.from();
   var endEl;
@@ -1116,7 +1116,7 @@ export function addBeamSpan(v, cm) {
   let n1 = v.xmlDoc.querySelector('[*|id="' + id1 + '"]');
   n1.closest('measure').appendChild(beamSpan);
   v.allowCursorActivity = false;
-  let sc = cm.getSearchCursor('xml:id="' + id1 + '"');
+  let sc = cm.getSearchCursor(new RegExp(`xml:id=["']${id1}["']`));
   if (sc.findNext()) {
     let p1 = utils.moveCursorToEndOfMeasure(cm, sc.from());
     cm.replaceRange(dutils.xmlToString(beamSpan) + '\n', cm.getCursor());
@@ -1164,7 +1164,7 @@ export function addOctaveElement(v, cm, disPlace = 'above', dis = '8') {
   // add it to CodeMirror
   v.allowCursorActivity = false;
   // let checkPoint = buffer.createCheckpoint(); TODO
-  let sc = cm.getSearchCursor('xml:id="' + id1 + '"');
+  let sc = cm.getSearchCursor(new RegExp(`xml:id=["']${id1}["']`));
   if (sc.findNext()) {
     let p1 = utils.moveCursorToEndOfMeasure(cm, sc.from());
     cm.replaceRange(dutils.xmlToString(octave) + '\n', cm.getCursor());

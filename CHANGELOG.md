@@ -6,6 +6,7 @@
 * Fix [#173](https://github.com/mei-friend/mei-friend/issues/173) to support metcon checker for tabulatures
 * Fix [#172](https://github.com/mei-friend/mei-friend/issues/172) making symbols visible in PDF 
 * Hide stroke on content-bounding-box and bounding-box options of Verovio (see https://github.com/rism-digital/verovio/pull/4201) 
+* Enable CodeMirror search cursor to find single quoted ids (fixes page-turning, and jumping to first page during manual editing)
 
 ### 1.2.9 patch
 * Fix auto indentation when adding a zone to facsimile
