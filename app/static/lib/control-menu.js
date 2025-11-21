@@ -3,7 +3,7 @@ import { fontList, platform } from './defaults.js';
 import { svgNameSpace } from './dom-utils.js';
 import { translator } from './main.js';
 import { createPageRangeSelector } from './page-range-selector.js';
-import { choiceOptions } from './markup.js';
+import { choiceOrigRegOptions, choiceSicCorrOptions, substOptions } from './markup.js';
 
 // constructs the div structure of #notation parent
 export function createNotationDiv(parentElement, scale) {
@@ -256,7 +256,7 @@ export function createNotationControlBar(parentElement, scale) {
   substSelector.id = 'substSelect';
   substSelector.classList.add('btn', 'input-select');
   substSelector.title = 'Choose displayed content for subst elements: add or del';
-  substCtrls.appendChild(substSelector);
+  choiceCtrls.appendChild(substSelector);
 
   // MEI encoding update behavior
   let updateCtrls = document.createElement('div');
@@ -674,6 +674,21 @@ export function handleSmartBreaksOption(speedMode) {
  * @param {string} active value of currently active selection
  */
 export function setChoiceOptions(active, selector) {
+  let choiceOptions;
+  switch (selector) {
+    case 'choiceOrigRegSelect':
+      choiceOptions = choiceOrigRegOptions;
+      break;
+    case 'choiceSicCorrSelect':
+      choiceOptions = choiceSicCorrOptions;
+      break;
+    case 'substSelect':
+      choiceOptions = substOptions;
+      break;
+    default:
+      console.error('setChoiceOptions: Unknown selector ', selector);
+      return;
+  }
   let choiceSelect = document.getElementById(selector);
   while (choiceSelect.hasChildNodes()) {
     choiceSelect.removeChild(choiceSelect.firstChild);
