@@ -491,7 +491,7 @@ export default class Viewer {
         return '';
       }
     } else {
-      sc = cm.getSearchCursor('xml:id="' + id + '"');
+      sc = cm.getSearchCursor(new RegExp(`xml:id=["']${id}["']`));
       if (sc.findNext()) {
         const p = sc.from();
         stNo = utils.getElementAttributeAbove(cm, p.line, 'staff')[0];
