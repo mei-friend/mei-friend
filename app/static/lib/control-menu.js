@@ -240,11 +240,23 @@ export function createNotationControlBar(parentElement, scale) {
   choiceCtrls.classList.add('controls');
   vrvCtrlMenu.appendChild(choiceCtrls);
 
-  let choiceSelector = document.createElement('select');
-  choiceSelector.id = 'choiceSelect';
-  choiceSelector.classList.add('btn', 'input-select');
-  choiceSelector.title = 'Choose displayed content for choice elements';
-  choiceCtrls.appendChild(choiceSelector);
+  let choiceOrigRegSelector = document.createElement('select');
+  choiceOrigRegSelector.id = 'choiceOrigRegSelect';
+  choiceOrigRegSelector.classList.add('btn', 'input-select');
+  choiceOrigRegSelector.title = 'Choose displayed content for choice elements: orig or reg';
+  choiceCtrls.appendChild(choiceOrigRegSelector);
+
+  let choiceSicCorrSelector = document.createElement('select');
+  choiceSicCorrSelector.id = 'choiceSicCorrSelect';
+  choiceSicCorrSelector.classList.add('btn', 'input-select');
+  choiceSicCorrSelector.title = 'Choose displayed content for choice elements: sic or corr';
+  choiceCtrls.appendChild(choiceSicCorrSelector);
+
+  let substSelector = document.createElement('select');
+  substSelector.id = 'substSelect';
+  substSelector.classList.add('btn', 'input-select');
+  substSelector.title = 'Choose displayed content for subst elements: add or del';
+  substCtrls.appendChild(substSelector);
 
   // MEI encoding update behavior
   let updateCtrls = document.createElement('div');
@@ -661,8 +673,8 @@ export function handleSmartBreaksOption(speedMode) {
  * notation control bar.
  * @param {string} active value of currently active selection
  */
-export function setChoiceOptions(active) {
-  let choiceSelect = document.getElementById('choiceSelect');
+export function setChoiceOptions(active, selector) {
+  let choiceSelect = document.getElementById(selector);
   while (choiceSelect.hasChildNodes()) {
     choiceSelect.removeChild(choiceSelect.firstChild);
   }

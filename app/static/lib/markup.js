@@ -381,7 +381,26 @@ export function addMarkup(event) {
           newSelection.push(child.getAttribute('xml:id'));
         }
       });
-      setChoiceOptions(multiLayerContent[multiLayerContent.length - 1]);
+      let lastMultilayerContentItem = multiLayerContent[multiLayerContent.length - 1];
+      switch (lastMultilayerContentItem) {
+        case 'orig':
+        case 'reg':
+          lastMultilayerContentItem = 'choiceOrigRegSelect';
+          break;
+        case 'sic':
+        case 'corr':
+          lastMultilayerContentItem = 'choiceSicCorrSelect';
+          break;
+        case 'add':
+        case 'del':
+          lastMultilayerContentItem = 'substSelect';
+          break;
+        default:
+          console.warn('No corresponding dropdown found for ' + lastMultilayerContentItem);
+      }
+      if (correspondingDropdown) {
+        setChoiceOptions(lastMultilayerContentItem, correspondingDropdown);
+      }
       handleEditorChanges();
       v.selectedElements = newSelection;
       v.setFocusToVerovioPane();
