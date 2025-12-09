@@ -271,14 +271,9 @@ export default class Viewer {
     const choiceSicCorrOption = this.choiceSicCorrSelect.value;
     const substOption = this.substSelect.value;
     // Check if any of the multilevel markup options have been changed:
-    let markupChanged = selectMarkup(speedMeiDoc, choiceOrigRegOption, ['orig', 'reg']); // select markup
-    if (!markupChanged) {
-      // reload
-      markupChanged = selectMarkup(speedMeiDoc, choiceSicCorrOption, ['sic', 'corr']);
-    }
-    if (!markupChanged) {
-      markupChanged = selectMarkup(speedMeiDoc, substOption, ['add', 'del']);
-    }
+    selectMarkup(speedMeiDoc, choiceOrigRegOption, ['orig', 'reg']); // select markup
+    selectMarkup(speedMeiDoc, choiceSicCorrOption, ['sic', 'corr']);
+    selectMarkup(speedMeiDoc, substOption, ['add', 'del']);
 
     // count pages from system/pagebreaks
     if (Array.isArray(breaks)) {
