@@ -1897,6 +1897,68 @@ export function removeInEditor(cm, xmlNode) {
   }
 } // removeInEditor()
 
+/**
+ * Modifies visual offset of element (@version, @ho)
+ * @param {Viewer} v
+ * @param {CodeMirror} cm
+ * @param {string} direction "up" | "down" | "left" | "right"
+ * @param {number} increment increment value in vo virtual units (default: 0.5)
+ * @returns
+ */
+export function shiftVisualOffset(v, cm, direction = 'up', increment = 0.5) {
+  v.allowCursorActivity = false;
+  v.loadXml(cm.getValue(), true); // force reload of xmlDoc
+  for (let id of v.selectedElements) {
+    let element = v.xmlDoc.querySelector('[*|id="' + id + '"]');
+    if (!element) {
+      console.warn('Editor shiftVisualOffset(): element with id "' + id + '" not found.');
+      continue;
+    }
+    let offset = 0;
+    switch (direction) {
+      case 'up':
+      case 'down':
+        if (att.attVisualOffsetVo.includes(element.nodeName)) {
+          offset = parseFloat(element.getAttribute('vo') || '0');
+          offset = direction === 'up' ? offset + increment : offset - increment;
+          element.setAttribute('vo', offset.toString());
+          console.info(
+            'Editor shiftVisualOffset(): element ' + id + ' ' + direction + ' by ' + increment + ' to ' + offset
+          );
+        } else {
+          console.warn(
+            'Editor shiftVisualOffset(): element ' + id + ' of type ' + element.nodeName + ' has no @vo attribute.'
+          );
+          continue;
+        }
+        break;
+      case 'left':
+      case 'right':
+        if (att.attVisualOffsetHo.includes(element.nodeName)) {
+          offset = parseFloat(element.getAttribute('ho') || '0');
+          offset = direction === 'right' ? offset + increment : offset - increment;
+          element.setAttribute('ho', offset.toString());
+          console.info(
+            'Editor shiftVisualOffset(): element ' + id + ' ' + direction + ' by ' + increment + ' to ' + offset
+          );
+        } else {
+          console.warn(
+            'Editor shiftVisualOffset(): element ' + id + ' of type ' + element.nodeName + ' has no @ho attribute.'
+          );
+          continue;
+        }
+        break;
+      default:
+        console.warn('Editor shiftVisualOffset(): unknown direction "' + direction + '".');
+        break;
+    }
+    replaceInEditor(cm, element, true);
+    addApplicationInfo(v, cm);
+    v.updateData(cm, false, true);
+  } // for selectedElements
+  v.allowCursorActivity = true;
+} // shiftVisualOffset()
+
 function isEmpty(str) {
   return !/\S/g.test(str);
 } // isEmpty()

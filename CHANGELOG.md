@@ -8,6 +8,7 @@
 * Hide stroke on content-bounding-box and bounding-box options of Verovio (see https://github.com/rism-digital/verovio/pull/4201) 
 * Enable CodeMirror search cursor to find single quoted ids (fixes page-turning, and jumping to first page during manual editing)
 * Include Verovio version 5.7.0
+* Support for altering @ho/@vo with ALT + arrow keys
 
 ### 1.2.9 patch
 * Fix auto indentation when adding a zone to facsimile

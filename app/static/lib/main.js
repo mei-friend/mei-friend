@@ -1,6 +1,6 @@
 // mei-friend version and date
 export const version = '1.2.10';
-export const versionDate = '5 December 2025'; // use full or 3-character english months, will be translated
+export const versionDate = '9 December 2025'; // use full or 3-character english months, will be translated
 export const splashDate = '17 January 2025'; // date of the splash screen content, same translation rules apply
 
 var vrvWorker;
@@ -1905,6 +1905,7 @@ export let cmd = {
     if (paramsStartIx > -1) url = url.substring(0, paramsStartIx);
     // now modify last slash to navigate to /logout
     window.location.replace(url.substring(0, url.lastIndexOf('/')) + '/logout');
+    
   },
   openHelp: () => window.open(`https://mei-friend.github.io/`, '_blank'),
   consultGuidelines: () => consultGuidelines(),
@@ -1954,6 +1955,10 @@ export let cmd = {
       cmd.toggleMidiPlaybackControlBar();
     }
   },
+  shiftVisualOffsetUp: () => e.shiftVisualOffset(v, cm, 'up'),
+  shiftVisualOffsetDown: () => e.shiftVisualOffset(v, cm, 'down'),
+  shiftVisualOffsetLeft: () => e.shiftVisualOffset(v, cm, 'left'),
+  shiftVisualOffsetRight: () => e.shiftVisualOffset(v, cm, 'right'),
 }; // cmd{}
 
 // add event listeners when controls menu has been instantiated
