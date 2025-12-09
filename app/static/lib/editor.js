@@ -1907,7 +1907,7 @@ export function removeInEditor(cm, xmlNode) {
  */
 export function shiftVisualOffset(v, cm, direction = 'up', increment = 0.5) {
   v.allowCursorActivity = false;
-  v.loadXml(cm.getValue(), true); // force reload of xmlDoc
+  // v.loadXml(cm.getValue(), true); // force reload of xmlDoc
   for (let id of v.selectedElements) {
     let element = v.xmlDoc.querySelector('[*|id="' + id + '"]');
     if (!element) {
@@ -1973,6 +1973,7 @@ function isEmpty(str) {
  * @returns {object} range {start: integer, end: integer} or empty object, if nothing found
  */
 export function replaceInEditor(cm, xmlNode, select = false, newNode = [], replaceUnique = false) {
+  cm.blockChanges = true;
   dutils.cleanNode(xmlNode);
   // construct new MEI if newNode has elements
   let newMei = '';
@@ -2028,6 +2029,8 @@ export function replaceInEditor(cm, xmlNode, select = false, newNode = [], repla
       }
     }
   }
+  cm.blockChanges = false;
+  handleEditorChanges();
   return {
     start: sc.from(),
     end: sc.to(),
