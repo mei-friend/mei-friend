@@ -264,25 +264,22 @@ export default class Viewer {
     this.loadXml(mei, forceReload);
     // create a deep clone of xml.Doc before filtering for markup
     // hard markup filters should never modify v.xmlDoc! (because non-displayed variants will get lost)
+    // TODO: instead of cloning node, just work in this.xmlDoc and force reload when required
     let speedMeiDoc = this.xmlDoc.cloneNode(true);
     if (addColor) speedMeiDoc = dutils.addColorToMarkupElements(speedMeiDoc);
     const choiceOrigRegOption = this.choiceOrigRegSelect.value;
     const choiceSicCorrOption = this.choiceSicCorrSelect.value;
     const substOption = this.substSelect.value;
     // Check if any of the multilevel markup options have been changed:
-    let markupResult = selectMarkup(speedMeiDoc, choiceOrigRegOption); // select markup
-    if (!markupResult?.changed) {
-      markupResult = selectMarkup(speedMeiDoc, choiceSicCorrOption);
+    let markupChanged = selectMarkup(speedMeiDoc, choiceOrigRegOption, ['orig', 'reg']); // select markup
+    if (!markupChanged) {
+      // reload
+      markupChanged = selectMarkup(speedMeiDoc, choiceSicCorrOption, ['sic', 'corr']);
     }
-    if (!markupResult?.changed) {
-      markupResult = selectMarkup(speedMeiDoc, substOption);
+    if (!markupChanged) {
+      markupChanged = selectMarkup(speedMeiDoc, substOption, ['add', 'del']);
     }
-    // if any markup selection changed, update speedMeiDoc
-    if (markupResult?.changed === true) {
-      speedMeiDoc = markupResult.doc;
-      //this.xmlDocOutdated = true;
-      // unnecessary if this.xmlDoc is not touched
-    }
+
     // count pages from system/pagebreaks
     if (Array.isArray(breaks)) {
       let music = speedMeiDoc.querySelector('music score');

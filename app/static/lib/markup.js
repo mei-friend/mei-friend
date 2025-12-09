@@ -282,27 +282,28 @@ export async function situateMarkup(markupItem) {
 
 /**
  * [Wrapper for selectApparatus() and selectChoice().]
- * Returns xmlDoc in which the app and choice elements are
+ * Returns flag to show whether xmlDoc changed when app and choice elements are
  * resolved (i.e. selected elements kept and others removed).
  * Currently they default to lem or first rdg in app
  * and first child in choice.
  * @param {Document} xmlDoc
  * @param {string} selectString
- * @returns {Object} result = { changed: changeFlag, doc: xmlDoc }
+ * @param {Array[string]} possibleChildElNames names of child elements valid for this selection (e.g., 'orig','reg' OR 'sic', 'corr' for choice)
+ * @returns {boolean} result
  */
-export function selectMarkup(xmlDoc, selectString = '') {
+export function selectMarkup(xmlDoc, selectString = '', possibleChildElNames) {
   let result;
   let appResult = selectApparatus(xmlDoc, selectString);
   if (appResult.changed === true) {
-    result = appResult;
+    result = appResult.changed;
   }
-  let choiceResult = selectChoiceSubst(xmlDoc, 'choice', selectString);
+  let choiceResult = selectChoiceSubst(xmlDoc, 'choice', selectString, possibleChildElNames);
   if (result == undefined && choiceResult.changed === true) {
-    result = choiceResult;
+    result = choiceResult.changed;
   }
   let substResult = selectChoiceSubst(xmlDoc, 'subst', selectString);
   if (result == undefined && substResult.changed === true) {
-    result = substResult;
+    result = substResult.changed;
   }
   return result;
 } // selectMarkup()
@@ -350,13 +351,14 @@ export function selectApparatus(xmlDoc, sourceId = '') {
  * @param {Document} xmlDoc
  * @param {string} elName name of element to filter: choice|subst
  * @param {string} childElName name of child element to keep
+ * @param {Array[string]} possibleChildElNames names of child elements valid for this selection (e.g., 'orig','reg' OR 'sic', 'corr' for choice)
  * @returns {Object} result = { changed: changeFlag, doc: xmlDoc }
  */
-export function selectChoiceSubst(xmlDoc, elName, childElName) {
+export function selectChoiceSubst(xmlDoc, elName, childElName, possibleChildElNames = []) {
   if (!xmlDoc) return null;
   let changeFlag = false;
   let choices = Array.from(xmlDoc.querySelectorAll(elName));
-  choices.forEach((choice) => {
+  for (let choice of choices) {
     // this selects the first child inside <choice> by default, to be changed later (TODO)
     let children = choice.children;
     if (children) {
@@ -364,25 +366,29 @@ export function selectChoiceSubst(xmlDoc, elName, childElName) {
       for (let i = 0; i < children.length; i++) {
         childNames.push(children[i].localName);
       }
-      if (childElName === '' || !childNames.includes(childElName)) {
-        // delete currently everything but the first child
-        for (let i = 1; i < children.length; i++) {
-          children[i].remove();
-          changeFlag = true;
-        }
-      } else {
-        for (let i = 0; i < children.length; i++) {
-          let currentChild = children[i];
-          if (currentChild.localName !== childElName) {
-            currentChild.remove();
+      // ensure that we only process if there are "possible" child elements
+      // "possible" meaning, e.g., EITHER 'sic' and 'corr' OR 'orig' and 'reg'
+      if (new Set(childNames).intersection(new Set(possibleChildElNames)).size > 0) {
+        if (childElName === '' || !childNames.includes(childElName)) {
+          // delete currently everything but the first child
+          for (let i = 1; i < children.length; i++) {
+            children[i].remove();
             changeFlag = true;
+          }
+        } else {
+          for (let i = 0; i < children.length; i++) {
+            let currentChild = children[i];
+            if (currentChild.localName !== childElName) {
+              currentChild.remove();
+              changeFlag = true;
+            }
           }
         }
       }
     } else {
       console.log('This choice has no child elements. ', choice);
     }
-  });
+  }
 
   let result = { changed: changeFlag, doc: xmlDoc };
 
