@@ -15,7 +15,9 @@ import { setChoiceOptions } from './control-menu.js';
 /**
  * Contains choice options currently available for the document
  */
-export var choiceOptions = [];
+export var choiceOrigRegOptions = [];
+export var choiceSicCorrOptions = [];
+export var substOptions = [];
 
 /**
  * Reads markup elements from the XML document and creates
@@ -156,7 +158,9 @@ function updateChoiceOptions() {
   // the loading logic causes this function to run twice.
   // so make sure this always represents the state of the mei document
   // therefore reset choiceOptions first
-  choiceOptions = [];
+  choiceOrigRegOptions = [];
+  choiceSicCorrOptions = [];
+  substOptions = [];
 
   let defaultOption = {
     label: translator.lang.choiceDefault.text,
@@ -172,36 +176,90 @@ function updateChoiceOptions() {
 
   let topLevelEls = choices.map((obj) => obj.localName).filter((value, index, array) => array.indexOf(value) === index);
   topLevelEls.forEach((topLevelEl) => {
-    let optGroup = { elName: topLevelEl, options: [] };
-    let newDefault = Object.assign({}, defaultOption);
-    newDefault.id = topLevelEl + newDefault.id;
-    newDefault.prop = topLevelEl + newDefault.prop;
-    optGroup.options.push(newDefault);
+    if (topLevelEl === 'choice') {
+      let origRegOptGroup = { elName: topLevelEl + 'OrigReg', options: [] };
+      let origRegDefault = Object.assign({}, defaultOption);
+      origRegDefault.id = topLevelEl + 'OrigReg' + origRegDefault.id;
+      origRegOptGroup.options.push(origRegDefault);
+      let origRegElNames = origRegOptGroup.options.map((obj) => obj.value);
 
-    let elNames = optGroup.options.map((obj) => obj.value);
+      let sicCorrOptGroup = { elName: topLevelEl + 'SicCorr', options: [] };
+      let sicCorrDefault = Object.assign({}, defaultOption);
+      sicCorrDefault.id = topLevelEl + 'SicCorr' + sicCorrDefault.id;
+      sicCorrOptGroup.options.push(sicCorrDefault);
+      let sicCorrElNames = sicCorrOptGroup.options.map((obj) => obj.value);
 
-    let currentChoices = choices.filter((el) => el.localName === topLevelEl);
-    currentChoices.forEach((choice) => {
-      for (let i = 0; i < choice.children.length; i++) {
-        let child = choice.children[i];
-        if (!elNames.includes(child.localName)) {
-          let capitalisedOption = child.localName[0].toUpperCase() + child.localName.slice(1);
-          optGroup.options.push({
-            label: capitalisedOption,
-            value: child.localName,
-            count: 1,
-            id: topLevelEl + capitalisedOption,
-            prop: topLevelEl + 'XPathQuery',
-          });
-          elNames.push(child.localName);
-        } else {
-          let obj = optGroup.options.find((obj) => obj.value === child.localName);
-          obj.count = obj.count + 1;
+      let currentChoices = choices.filter((el) => el.localName === topLevelEl);
+      currentChoices.forEach((choice) => {
+        for (let i = 0; i < choice.children.length; i++) {
+          let child = choice.children[i];
+          // handle orig/reg and sic/corr separately
+          if (['orig', 'reg'].includes(child.localName)) {
+            if (!origRegElNames.includes(child.localName)) {
+              let capitalisedOption = child.localName[0].toUpperCase() + child.localName.slice(1);
+              origRegOptGroup.options.push({
+                label: capitalisedOption,
+                value: child.localName,
+                count: 1,
+                id: topLevelEl + 'OrigReg' + capitalisedOption,
+                prop: topLevelEl + 'XPathQuery',
+              });
+              origRegElNames.push(child.localName);
+            } else {
+              let obj = origRegOptGroup.options.find((obj) => obj.value === child.localName);
+              obj.count = obj.count + 1;
+            }
+            choiceOrigRegOptions.push(origRegOptGroup);
+          } else if (['sic', 'corr'].includes(child.localName)) {
+            if (!sicCorrElNames.includes(child.localName)) {
+              let capitalisedOption = child.localName[0].toUpperCase() + child.localName.slice(1);
+              sicCorrOptGroup.options.push({
+                label: capitalisedOption,
+                value: child.localName,
+                count: 1,
+                id: topLevelEl + 'SicCorr' + capitalisedOption,
+                prop: topLevelEl + 'XPathQuery',
+              });
+              sicCorrElNames.push(child.localName);
+            } else {
+              let obj = sicCorrOptGroup.options.find((obj) => obj.value === child.localName);
+              obj.count = obj.count + 1;
+            }
+            choiceSicCorrOptions.push(sicCorrOptGroup);
+          } else {
+            console.warn('Unknown child element in <choice>: ', child.localName);
+          }
         }
-      }
-    });
-
-    choiceOptions.push(optGroup);
+      });
+    } else if (topLevelEl === 'subst') {
+      // do the subst stuff
+      let substOptGroup = { elName: topLevelEl, options: [] };
+      let substDefault = Object.assign({}, defaultOption);
+      substDefault.id = topLevelEl + substDefault.id;
+      substOptGroup.options.push(substDefault);
+      let elNames = substOptGroup.options.map((obj) => obj.value);
+      let currentChoices = choices.filter((el) => el.localName === topLevelEl);
+      currentChoices.forEach((choice) => {
+        for (let i = 0; i < choice.children.length; i++) {
+          let child = choice.children[i];
+          if (!elNames.includes(child.localName)) {
+            let capitalisedOption = child.localName[0].toUpperCase() + child.localName.slice(1);
+            substOptGroup.options.push({
+              label: capitalisedOption,
+              value: child.localName,
+              count: 1,
+              id: topLevelEl + capitalisedOption,
+              prop: topLevelEl + 'XPathQuery',
+            });
+            elNames.push(child.localName);
+          } else {
+            let obj = substOptGroup.options.find((obj) => obj.value === child.localName);
+            obj.count = obj.count + 1;
+          }
+        }
+      });
+      substOptions.push(substOptGroup);
+    }
   });
 } // updateChoiceOptions()
 
@@ -224,27 +282,28 @@ export async function situateMarkup(markupItem) {
 
 /**
  * [Wrapper for selectApparatus() and selectChoice().]
- * Returns xmlDoc in which the app and choice elements are
+ * Returns flag to show whether xmlDoc changed when app and choice elements are
  * resolved (i.e. selected elements kept and others removed).
  * Currently they default to lem or first rdg in app
  * and first child in choice.
  * @param {Document} xmlDoc
  * @param {string} selectString
- * @returns {Object} result = { changed: changeFlag, doc: xmlDoc }
+ * @param {Array[string]} possibleChildElNames names of child elements valid for this selection (e.g., 'orig','reg' OR 'sic', 'corr' for choice)
+ * @returns {boolean} result
  */
-export function selectMarkup(xmlDoc, selectString = '') {
+export function selectMarkup(xmlDoc, selectString = '', possibleChildElNames) {
   let result;
   let appResult = selectApparatus(xmlDoc, selectString);
   if (appResult.changed === true) {
-    result = appResult;
+    result = appResult.changed;
   }
-  let choiceResult = selectChoiceSubst(xmlDoc, 'choice', selectString);
+  let choiceResult = selectChoiceSubst(xmlDoc, 'choice', selectString, possibleChildElNames);
   if (result == undefined && choiceResult.changed === true) {
-    result = choiceResult;
+    result = choiceResult.changed;
   }
   let substResult = selectChoiceSubst(xmlDoc, 'subst', selectString);
   if (result == undefined && substResult.changed === true) {
-    result = substResult;
+    result = substResult.changed;
   }
   return result;
 } // selectMarkup()
@@ -292,13 +351,14 @@ export function selectApparatus(xmlDoc, sourceId = '') {
  * @param {Document} xmlDoc
  * @param {string} elName name of element to filter: choice|subst
  * @param {string} childElName name of child element to keep
+ * @param {Array[string]} possibleChildElNames names of child elements valid for this selection (e.g., 'orig','reg' OR 'sic', 'corr' for choice)
  * @returns {Object} result = { changed: changeFlag, doc: xmlDoc }
  */
-export function selectChoiceSubst(xmlDoc, elName, childElName) {
+export function selectChoiceSubst(xmlDoc, elName, childElName, possibleChildElNames = []) {
   if (!xmlDoc) return null;
   let changeFlag = false;
   let choices = Array.from(xmlDoc.querySelectorAll(elName));
-  choices.forEach((choice) => {
+  for (let choice of choices) {
     // this selects the first child inside <choice> by default, to be changed later (TODO)
     let children = choice.children;
     if (children) {
@@ -306,25 +366,29 @@ export function selectChoiceSubst(xmlDoc, elName, childElName) {
       for (let i = 0; i < children.length; i++) {
         childNames.push(children[i].localName);
       }
-      if (childElName === '' || !childNames.includes(childElName)) {
-        // delete currently everything but the first child
-        for (let i = 1; i < children.length; i++) {
-          children[i].remove();
-          changeFlag = true;
-        }
-      } else {
-        for (let i = 0; i < children.length; i++) {
-          let currentChild = children[i];
-          if (currentChild.localName !== childElName) {
-            currentChild.remove();
+      // ensure that we only process if there are "possible" child elements
+      // "possible" meaning, e.g., EITHER 'sic' and 'corr' OR 'orig' and 'reg'
+      if (new Set(childNames).intersection(new Set(possibleChildElNames)).size > 0) {
+        if (childElName === '' || !childNames.includes(childElName)) {
+          // delete currently everything but the first child
+          for (let i = 1; i < children.length; i++) {
+            children[i].remove();
             changeFlag = true;
+          }
+        } else {
+          for (let i = 0; i < children.length; i++) {
+            let currentChild = children[i];
+            if (currentChild.localName !== childElName) {
+              currentChild.remove();
+              changeFlag = true;
+            }
           }
         }
       }
     } else {
       console.log('This choice has no child elements. ', choice);
     }
-  });
+  }
 
   let result = { changed: changeFlag, doc: xmlDoc };
 
@@ -381,7 +445,27 @@ export function addMarkup(event) {
           newSelection.push(child.getAttribute('xml:id'));
         }
       });
-      setChoiceOptions(multiLayerContent[multiLayerContent.length - 1]);
+      let lastMultilayerContentItem = multiLayerContent[multiLayerContent.length - 1];
+      let correspondingDropdown;
+      switch (lastMultilayerContentItem) {
+        case 'orig':
+        case 'reg':
+          correspondingDropdown = 'choiceOrigRegSelect';
+          break;
+        case 'sic':
+        case 'corr':
+          correspondingDropdown = 'choiceSicCorrSelect';
+          break;
+        case 'add':
+        case 'del':
+          correspondingDropdown = 'substSelect';
+          break;
+        default:
+          console.warn('No corresponding dropdown found for ' + lastMultilayerContentItem);
+      }
+      if (correspondingDropdown) {
+        setChoiceOptions(lastMultilayerContentItem, correspondingDropdown);
+      }
       handleEditorChanges();
       v.selectedElements = newSelection;
       v.setFocusToVerovioPane();

@@ -991,6 +991,12 @@ a:active {
   background-color: var(--controlMenuBackgroundColor);
 }
 
+/* Hide the choice / subst control bar menus if they only contain one option (which will be "no choice available")
+n.b. if there are choices available, they are wrapped within an optgroup element*/
+#choiceControls select:has(> option:only-child) {
+  display: none;
+}
+
 .controls {
   display: flex;
   align-items: center;

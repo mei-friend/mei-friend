@@ -1016,7 +1016,9 @@ async function vrvWorkerEventsHandler(ev) {
       drawRightFooter();
       document.getElementById('statusBar').innerHTML = `Verovio ${tkVersion} ${translator.lang.verovioLoaded.text}.`;
       setBreaksOptions(tkAvailableOptions, defaultVerovioOptions.breaks);
-      setChoiceOptions('');
+      setChoiceOptions('', 'choiceOrigRegSelect');
+      setChoiceOptions('', 'choiceSicCorrSelect');
+      setChoiceOptions('', 'substSelect');
       if (!storage.supported || !meiFileName) {
         // open default mei file
         openFile();
@@ -1076,8 +1078,12 @@ async function vrvWorkerEventsHandler(ev) {
         v.pageCount = Object.keys(v.pageBreaks).length;
       }
       //update choiceSelect
-      let cs = document.getElementById('choiceSelect').selectedOptions[0]?.value;
-      setChoiceOptions(cs);
+      let choiceOrigReg = document.getElementById('choiceOrigRegSelect').selectedOptions[0]?.value;
+      let choiceSigCorr = document.getElementById('choiceSicCorrSelect').selectedOptions[0]?.value;
+      let subst = document.getElementById('substSelect').selectedOptions[0]?.value;
+      setChoiceOptions(choiceOrigReg, 'choiceOrigRegSelect');
+      setChoiceOptions(choiceSigCorr, 'choiceSicCorrSelect');
+      setChoiceOptions(subst, 'substSelect');
       // update only if still same page
       if (v.currentPage === ev.data.pageNo || ev.data.forceUpdate || ev.data.computePageBreaks || v.pdfMode) {
         if (ev.data.forceUpdate) {
@@ -2184,12 +2190,25 @@ function addEventListeners(v, cm) {
     v.updateAll(cm, {}, v.selectedElements[0]);
   });
   // choice selector
-  document.getElementById('choiceSelect').addEventListener('change', (ev) => {
+  document.getElementById('choiceOrigRegSelect').addEventListener('change', (ev) => {
     // selection has changed
     // then updateAll()
     v.updateAll(cm, {}, v.selectedElements[0]);
     requestMidiFromVrvWorker(true);
   });
+  document.getElementById('choiceSicCorrSelect').addEventListener('change', (ev) => {
+    // selection has changed
+    // then updateAll()
+    v.updateAll(cm, {}, v.selectedElements[0]);
+    requestMidiFromVrvWorker(true);
+  });
+  document.getElementById('substSelect').addEventListener('change', (ev) => {
+    // selection has changed
+    // then updateAll()
+    v.updateAll(cm, {}, v.selectedElements[0]);
+    requestMidiFromVrvWorker(true);
+  });
+
   // navigation
   document.getElementById('backwardsButton').addEventListener('click', cmd.previousNote);
   document.getElementById('forwardsButton').addEventListener('click', cmd.nextNote);

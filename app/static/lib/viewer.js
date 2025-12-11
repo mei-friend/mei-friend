@@ -75,7 +75,9 @@ export default class Viewer {
     this.timeoutDelay = defaultViewerTimeoutDelay; // ms, window in which concurrent clicks are treated as one update
     this.verovioIcon = document.getElementById('verovioIcon');
     this.breaksSelect = /** @type HTMLSelectElement */ (document.getElementById('breaksSelect'));
-    this.choiceSelect = document.getElementById('choiceSelect'); //choice select control
+    this.choiceOrigRegSelect = document.getElementById('choiceOrigRegSelect'); //choice select control
+    this.choiceSicCorrSelect = document.getElementById('choiceSicCorrSelect'); //choice select control
+    this.substSelect = document.getElementById('substSelect'); //subst select control
     this.alertCloser;
     this.pdfMode = false;
     this.cmd2KeyPressed = false;
@@ -262,15 +264,17 @@ export default class Viewer {
     this.loadXml(mei, forceReload);
     // create a deep clone of xml.Doc before filtering for markup
     // hard markup filters should never modify v.xmlDoc! (because non-displayed variants will get lost)
+    // TODO: instead of cloning node, just work in this.xmlDoc and force reload when required
     let speedMeiDoc = this.xmlDoc.cloneNode(true);
     if (addColor) speedMeiDoc = dutils.addColorToMarkupElements(speedMeiDoc);
-    const choiceOption = this.choiceSelect.value;
-    let markupResult = selectMarkup(speedMeiDoc, choiceOption); // select markup
-    if (markupResult?.changed === true) {
-      speedMeiDoc = markupResult.doc;
-      //this.xmlDocOutdated = true;
-      // unnecessary if this.xmlDoc is not touched
-    }
+    const choiceOrigRegOption = this.choiceOrigRegSelect.value;
+    const choiceSicCorrOption = this.choiceSicCorrSelect.value;
+    const substOption = this.substSelect.value;
+    // Check if any of the multilevel markup options have been changed:
+    selectMarkup(speedMeiDoc, choiceOrigRegOption, ['orig', 'reg']); // select markup
+    selectMarkup(speedMeiDoc, choiceSicCorrOption, ['sic', 'corr']);
+    selectMarkup(speedMeiDoc, substOption, ['add', 'del']);
+
     // count pages from system/pagebreaks
     if (Array.isArray(breaks)) {
       let music = speedMeiDoc.querySelector('music score');
@@ -399,18 +403,33 @@ export default class Viewer {
     if (fontSel) this.vrvOptions.font = fontSel.value;
     let bs = this.breaksSelect;
     if (bs) this.vrvOptions.breaks = bs.value;
-    let choiceSelect = this.choiceSelect;
-    if (choiceSelect && choiceSelect.selectedOptions.length > 0) {
-      let selectedChoice = choiceSelect.selectedOptions[0]; //always the first until type is changed to multiselect
-      if (selectedChoice.dataset.prop) {
-        if (selectedChoice.value != '') {
-          this.vrvOptions[selectedChoice.dataset.prop] = ['./' + selectedChoice.value];
-        } else {
-          this.vrvOptions[selectedChoice.dataset.prop] = [];
-        }
+    let choiceOrigRegSelect = this.choiceOrigRegSelect;
+    let choiceSicCorrSelect = this.choiceSicCorrSelect;
+    let substSelect = this.substSelect;
+    // handle choice translation to Vervio options
+    let choiceSelections = [...choiceOrigRegSelect.selectedOptions, ...choiceSicCorrSelect.selectedOptions];
+    console.log('choiceSelections: ', choiceSelections);
+    let choiceXpath = [];
+    choiceSelections.forEach((opt) => {
+      if (opt.value != '') {
+        choiceXpath.push('./' + opt.value);
       }
+    });
+    if (choiceXpath.length > 0) {
+      this.vrvOptions.choiceXPathQuery = choiceXpath;
     }
-
+    // handle subst translation to Verovio options
+    let substXpath = [];
+    if (substSelect && substSelect.selectedOptions.length > 0) {
+      substXpath = ['./' + substSelect.value];
+    }
+    console.log('substXpath: ', substXpath);
+    console.log('substSelect value: ', substSelect.value);
+    console.log('substSelect.selectedOptions: ', substSelect.selectedOptions);
+    if (substXpath.length > 0) {
+      this.vrvOptions.substXPathQuery = substXpath;
+    }
+    console.log('!!!! ', this.vrvOptions);
     // update page dimensions, only if not in pdf mode
     if (this.pdfMode) {
       let vpw = document.getElementById('vrv-pageWidth');
