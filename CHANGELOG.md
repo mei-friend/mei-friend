@@ -9,6 +9,7 @@
 * Enable CodeMirror search cursor to find single quoted ids (fixes page-turning, and jumping to first page during manual editing)
 * Include Verovio version 5.7.0
 * Support for altering @ho/@vo with ALT + arrow keys
+* Massively reduce editor changes when editing with annotation panel visible
 
 ### 1.2.9 patch
 * Fix auto indentation when adding a zone to facsimile
